@@ -16,7 +16,7 @@ struct zsg2_interface
 };
 
 class zsg2_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -39,4 +39,4 @@ private:
 extern const device_type ZSG2;
 
 
-#endif	/* __ZSG2_H__ */
+#endif  /* __ZSG2_H__ */

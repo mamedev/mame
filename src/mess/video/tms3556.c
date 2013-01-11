@@ -78,13 +78,13 @@ inline void tms3556_device::writebyte(offs_t address, UINT8 data)
 
 tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS3556, "Texas Instruments VDP TMS3556", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(tms3556)),
-	  m_write_ptr(0),
-	  m_reg_ptr(0),
-	  m_reg_access_phase(0),
-	  m_magical_mystery_flag(0),
-	  m_scanline(0)
+		device_memory_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(tms3556)),
+		m_write_ptr(0),
+		m_reg_ptr(0),
+		m_reg_access_phase(0),
+		m_magical_mystery_flag(0),
+		m_scanline(0)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -181,9 +181,9 @@ READ8_MEMBER( tms3556_device::reg_r )
 		m_reg_access_phase = 0;
 	}
 	else
-    {
+	{
 		// ???
-    }
+	}
 
 	return reply;
 }
@@ -197,7 +197,7 @@ WRITE8_MEMBER( tms3556_device::reg_w )
 	if (LOG) logerror("TMS3556 Reg Write: %06x = %02x\n", offset, data);
 
 	if ((m_reg_access_phase == 3) && (data))
-		m_reg_access_phase = 0;	/* ???????????? */
+		m_reg_access_phase = 0; /* ???????????? */
 
 	switch (m_reg_access_phase)
 	{
@@ -215,7 +215,7 @@ WRITE8_MEMBER( tms3556_device::reg_w )
 				m_magical_mystery_flag = 1;
 		}
 		else if (m_reg_ptr == 9)
-		{	/* I don't understand what is going on, but it is the only way to
+		{   /* I don't understand what is going on, but it is the only way to
             get this to work */
 			m_address_regs[m_reg_ptr - 8] = ((m_control_regs[2] << 8) | m_control_regs[1]) + 1;
 			m_reg_access_phase = 0;
@@ -257,7 +257,7 @@ WRITE8_MEMBER( tms3556_device::reg_w )
 
 void tms3556_device::draw_line_empty(UINT16 *ln)
 {
-	int	i;
+	int i;
 
 	for (i = 0; i < TMS3556_TOTAL_WIDTH; i++)
 #if TMS3556_DOUBLE_WIDTH
@@ -304,7 +304,7 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 		if (alphanumeric_mode)
 		{
 			if (name_hi & 4)
-			{	/* inverted color */
+			{   /* inverted color */
 				bg = fg;
 				fg = m_bg_color;
 			}
@@ -320,15 +320,15 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 			dbl_h = 0;
 		}
 		if ((name_lo & 0x80) && m_blink)
-			fg = bg;	/* blink off time */
+			fg = bg;    /* blink off time */
 		if (! dbl_h)
-		{	/* single height */
+		{   /* single height */
 			pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * m_char_line_counter);
 			if (m_char_line_counter == 0)
 				m_dbl_h_phase[x] = 0;
 		}
 		else
-		{	/* double height */
+		{   /* double height */
 			if (! m_dbl_h_phase[x])
 				/* first phase: pattern from upper half */
 				pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * (5 + (m_char_line_counter >> 1)));
@@ -339,7 +339,7 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 				m_dbl_h_phase[x] = !m_dbl_h_phase[x];
 		}
 		if (!dbl_w)
-		{	/* single width */
+		{   /* single width */
 			for (xx = 0; xx < 8; xx++)
 			{
 				UINT16 color = (pattern & 0x80) ? fg : bg;
@@ -352,7 +352,7 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 			dbl_w_phase = 0;
 		}
 		else
-		{	/* double width */
+		{   /* double width */
 			if (dbl_w_phase)
 				/* second phase: display right half */
 				pattern <<= 4;
@@ -459,14 +459,14 @@ void tms3556_device::draw_line_bitmap(UINT16 *ln)
 void tms3556_device::draw_line_mixed(UINT16 *ln)
 {
 	if (m_cg_flag)
-	{	/* bitmap line */
+	{   /* bitmap line */
 		draw_line_bitmap_common(ln);
 		m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
 		m_cg_flag = (readbyte(m_address_regs[2] + m_name_offset) >> 4) & 0x1;
 		m_name_offset += 2;
 	}
 	else
-	{	/* text line */
+	{   /* text line */
 		if (m_char_line_counter == 0)
 			m_char_line_counter = 10;
 		m_char_line_counter--;
@@ -496,7 +496,7 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 //      ln = &bmp->pix16(line, m_field);
 //  }
 //  else
-	{	/* non-interlaced mode */
+	{   /* non-interlaced mode */
 		ln = &bmp.pix16(line);
 		ln2 = &bmp.pix16(line, 1);
 		double_lines = 1;
@@ -547,7 +547,7 @@ void tms3556_device::interrupt_start_vblank(void)
 	if (!m_blink_count)
 	{
 		m_blink = !m_blink;
-		m_blink_count = 60;	/*no idea what the real value is*/
+		m_blink_count = 60; /*no idea what the real value is*/
 	}
 	/* reset background color */
 	m_bg_color = (m_control_regs[7] >> 5) & 0x7;
@@ -569,7 +569,7 @@ void tms3556_device::interrupt_start_vblank(void)
 void tms3556_device::interrupt(running_machine &machine)
 {
 	/* check for start of vblank */
-	if (m_scanline == 310)	/*no idea what the real value is*/
+	if (m_scanline == 310)  /*no idea what the real value is*/
 		interrupt_start_vblank();
 
 	/* render the current line */

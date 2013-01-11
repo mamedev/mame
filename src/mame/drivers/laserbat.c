@@ -463,19 +463,19 @@ static const gfx_layout sprites_layout =
 	2,
 	{ 0, 1 },
 	{  0, 2, 4, 6, 8,10,12,14,16,18,20,22,24,26,28,30,
-	  32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62
+		32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62
 	},
 	{  0*32, 2*32, 4*32, 6*32, 8*32,10*32,12*32,14*32,
-	  16*32,18*32,20*32,22*32,24*32,26*32,28*32,30*32,
-	  32*32,34*32,36*32,38*32,40*32,42*32,44*32,46*32,
-	  48*32,50*32,52*32,54*32,56*32,58*32,60*32,62*32
+		16*32,18*32,20*32,22*32,24*32,26*32,28*32,30*32,
+		32*32,34*32,36*32,38*32,40*32,42*32,44*32,46*32,
+		48*32,50*32,52*32,54*32,56*32,58*32,60*32,62*32
 	},
 	32*32*2
 };
 
 static GFXDECODE_START( laserbat )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 256 )	/* Rom chars */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 )	/* Sprites   */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 256 ) /* Rom chars */
+	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 ) /* Sprites   */
 GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(laserbat_state::get_tile_info)
@@ -529,7 +529,7 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 
 	if (m_sprite_enable)
 		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
-		        m_sprite_code,
+				m_sprite_code,
 				m_sprite_color,
 				0,0,
 				m_sprite_x - 6,m_sprite_y,0);
@@ -541,29 +541,29 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 
 static const sn76477_interface laserbat_sn76477_interface =
 {
-	RES_K(47),		/*  4 noise_res         R21    47K */
-	0,				/*  5 filter_res (variable) */
-	CAP_P(1000),	/*  6 filter_cap        C21    1000 pF */
-	0,				/*  7 decay_res         */
-	0,				/*  8 attack_decay_cap  */
-	0,				/* 10 attack_res        */
-	RES_K(47),		/* 11 amplitude_res     R26    47K */
-	0,				/* 12 feedback_res (variable) */
-	5.0 * RES_K(2.2) / (RES_K(2.2) + RES_K(4.7)),	/* 16  vco_voltage       */
-	0,				/* 17 vco_cap           */
-	0,				/* 18 vco_res (variable) */
-	5.0,			/* 19 pitch_voltage     */
-	0,				/* 20 slf_res (variable) */
-	CAP_U(4.7),		/* 21 slf_cap           C24    4.7 uF */
-	0,				/* 23 oneshot_cap       */
-	0,				/* 24 oneshot_res       */
-	0,			    /* 22 vco (variable) */
-	0,			    /* 26 mixer A           */
-	0,			    /* 25 mixer B (variable) */
-	0,			    /* 27 mixer C           */
-	0,			    /* 1  envelope 1        */
-	1,			    /* 28 envelope 2        */
-	1			    /* 9  enable (variable) */
+	RES_K(47),      /*  4 noise_res         R21    47K */
+	0,              /*  5 filter_res (variable) */
+	CAP_P(1000),    /*  6 filter_cap        C21    1000 pF */
+	0,              /*  7 decay_res         */
+	0,              /*  8 attack_decay_cap  */
+	0,              /* 10 attack_res        */
+	RES_K(47),      /* 11 amplitude_res     R26    47K */
+	0,              /* 12 feedback_res (variable) */
+	5.0 * RES_K(2.2) / (RES_K(2.2) + RES_K(4.7)),   /* 16  vco_voltage       */
+	0,              /* 17 vco_cap           */
+	0,              /* 18 vco_res (variable) */
+	5.0,            /* 19 pitch_voltage     */
+	0,              /* 20 slf_res (variable) */
+	CAP_U(4.7),     /* 21 slf_cap           C24    4.7 uF */
+	0,              /* 23 oneshot_cap       */
+	0,              /* 24 oneshot_res       */
+	0,              /* 22 vco (variable) */
+	0,              /* 26 mixer A           */
+	0,              /* 25 mixer B (variable) */
+	0,              /* 27 mixer C           */
+	0,              /* 1  envelope 1        */
+	1,              /* 28 envelope 2        */
+	1               /* 9  enable (variable) */
 };
 
 /* Cat'N Mouse sound ***********************************/
@@ -621,18 +621,18 @@ WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
 
 static const pia6821_interface pia_intf =
 {
-	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0b_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0a),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0b)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_r),      /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_w),      /* port A out */
+	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0b_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0a),        /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0b)     /* IRQB */
 };
 
 static const ay8910_interface ay8910_config =
@@ -784,7 +784,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( catnmous, laserbat_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)	/* ? */
+	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(catnmous_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state,  laserbat_interrupt)
@@ -846,25 +846,25 @@ Xtal : 4.000 Mhz
 ROM_START( laserbat )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "lb02.7c",      0x0000, 0x0400, CRC(23a257cd) SHA1(08d9e1ff1a5cd8a5e5af6a12ba6104d3b2ccfddf) )
-	ROM_CONTINUE(			  0x4000, 0x0400 )
+	ROM_CONTINUE(             0x4000, 0x0400 )
 	ROM_LOAD( "lb02.6c",      0x0400, 0x0400, CRC(d1d6a67a) SHA1(727898c733633daffb0193cf4a556f89fe7e8a5a) )
-	ROM_CONTINUE(			  0x4400, 0x0400 )
+	ROM_CONTINUE(             0x4400, 0x0400 )
 	ROM_LOAD( "lb02.5c",      0x0800, 0x0400, CRC(8116f1d3) SHA1(f84ace44434c55ca5d0be9f0beb2d4df75694b2f) )
-	ROM_CONTINUE(			  0x4800, 0x0400 )
+	ROM_CONTINUE(             0x4800, 0x0400 )
 	ROM_LOAD( "lb02.3c",      0x0c00, 0x0400, CRC(443ef61e) SHA1(2849af0551bba7be2b4792739e04f18d6ace254c) )
-	ROM_CONTINUE(			  0x4c00, 0x0400 )
+	ROM_CONTINUE(             0x4c00, 0x0400 )
 	ROM_LOAD( "lb02.2c",      0x1000, 0x0400, CRC(0cb8f5f1) SHA1(4ce22c5ae277033cb9905339d24cad272a878088) )
-	ROM_CONTINUE(			  0x5000, 0x0400 )
+	ROM_CONTINUE(             0x5000, 0x0400 )
 	ROM_LOAD( "lb02.7b",      0x2000, 0x0400, CRC(bdc769d1) SHA1(1291c159e779187efbdc3eb4a59a57d8d25ce08e) )
-	ROM_CONTINUE(			  0x6000, 0x0400 )
+	ROM_CONTINUE(             0x6000, 0x0400 )
 	ROM_LOAD( "lb02.6b",      0x2400, 0x0400, CRC(2103646f) SHA1(bbd15a19524aeb8647014914a0b3025a975dfe7c) )
-	ROM_CONTINUE(			  0x6400, 0x0400 )
+	ROM_CONTINUE(             0x6400, 0x0400 )
 	ROM_LOAD( "lb02.5b",      0x2800, 0x0400, CRC(3f8c4246) SHA1(b0d5e3733327140f54ac5a93f3f14d4afe085514) )
-	ROM_CONTINUE(			  0x6800, 0x0400 )
+	ROM_CONTINUE(             0x6800, 0x0400 )
 	ROM_LOAD( "lb02.3b",      0x2c00, 0x0400, CRC(3e557d52) SHA1(860046fcc2d952f3e677e576f1ac23deac2e7caf) )
-	ROM_CONTINUE(			  0x6c00, 0x0400 )
+	ROM_CONTINUE(             0x6c00, 0x0400 )
 	ROM_LOAD( "lb02.2b",      0x3000, 0x0400, CRC(39000248) SHA1(58c6d1c588f4d1a3f579fe14faa8d2ccdfdc001e) )
-	ROM_CONTINUE(			  0x7000, 0x0400 )
+	ROM_CONTINUE(             0x7000, 0x0400 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_LOAD( "lb02.8g",      0x0000, 0x0800, CRC(4bb9f452) SHA1(1ff4ef94f0da3b59377548f3341b083af83f83c6) )
@@ -881,27 +881,27 @@ ROM_END
 ROM_START( lazarian )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "laz.7c",      0x0000, 0x0400, CRC(a2454cf2) SHA1(163b9323e77ee0107e13860b3468e002c335df9e) )
-	ROM_CONTINUE(			 0x4000, 0x0400 )
+	ROM_CONTINUE(            0x4000, 0x0400 )
 	ROM_LOAD( "laz.6c",      0x0400, 0x0400, CRC(23ee6013) SHA1(7ad53d6c321b0161906a512f6575620fd049d2f7) )
-	ROM_CONTINUE(			 0x4400, 0x0400 )
+	ROM_CONTINUE(            0x4400, 0x0400 )
 	ROM_LOAD( "laz.5c",      0x0800, 0x0400, CRC(4234a2ed) SHA1(dc98b04ae7dd1c35687bd8bdf42e8feb5eed321d) )
-	ROM_CONTINUE(			 0x4800, 0x0400 )
+	ROM_CONTINUE(            0x4800, 0x0400 )
 	ROM_LOAD( "laz.3c",      0x0c00, 0x0400, CRC(e901a636) SHA1(86320181a4d697fedfe8d8cbf9189854781e3d8c) )
-	ROM_CONTINUE(			 0x4c00, 0x0400 )
+	ROM_CONTINUE(            0x4c00, 0x0400 )
 	ROM_LOAD( "laz.2c",      0x1000, 0x0400, CRC(657ed7c2) SHA1(8611912001d18af8c932efc7700c0d8b60efb2e8) )
-	ROM_CONTINUE(			 0x5000, 0x0400 )
+	ROM_CONTINUE(            0x5000, 0x0400 )
 	ROM_LOAD( "laz.7b",      0x2000, 0x0400, CRC(43135808) SHA1(2b704ca2f7a0fc46fddd5d7fb7d832a29d0562d0) )
-	ROM_CONTINUE(			 0x6000, 0x0400 )
+	ROM_CONTINUE(            0x6000, 0x0400 )
 	ROM_LOAD( "laz.6b",      0x2400, 0x0400, CRC(95701e50) SHA1(61d6a268696cefb760bf288bcc4eab7ac5f32ec7) )
-	ROM_CONTINUE(			 0x6400, 0x0400 )
+	ROM_CONTINUE(            0x6400, 0x0400 )
 	ROM_LOAD( "laz.5b",      0x2800, 0x0400, CRC(685842ba) SHA1(ee842d1d2c0676fddddf6e4e9cfd0b2962ae900d) )
-	ROM_CONTINUE(			 0x6800, 0x0400 )
+	ROM_CONTINUE(            0x6800, 0x0400 )
 	ROM_LOAD( "laz.3b",      0x2c00, 0x0400, CRC(9ddbe048) SHA1(70d1e8af073c85aba08e5251691842069617e6ac) )
-	ROM_CONTINUE(			 0x6c00, 0x0400 )
+	ROM_CONTINUE(            0x6c00, 0x0400 )
 	ROM_LOAD( "laz10-62.2b", 0x3800, 0x0400, CRC(4ad9f7af) SHA1(71bcb9d148a7372b7be0abccdf71eeedba8b6c0a) )
-	ROM_CONTINUE(			 0x7800, 0x0400 )
-	ROM_CONTINUE(			 0x3000, 0x0400 )
-	ROM_CONTINUE(			 0x7000, 0x0400 )
+	ROM_CONTINUE(            0x7800, 0x0400 )
+	ROM_CONTINUE(            0x3000, 0x0400 )
+	ROM_CONTINUE(            0x7000, 0x0400 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_LOAD( "laz.8g",      0x0000, 0x0800, CRC(3cf76c01) SHA1(1824bc05e8dd2a522409e95fe81d2ad64182dcac) )
@@ -944,27 +944,27 @@ Sound Board 1b11107
 ROM_START( catnmous )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "02-1.7c",      0x0000, 0x0400, CRC(d26ec566) SHA1(ceb16f64a3c1ff25a9eab6549f1ae24085bb9e27) )
-	ROM_CONTINUE(			  0x4000, 0x0400 )
+	ROM_CONTINUE(             0x4000, 0x0400 )
 	ROM_LOAD( "02-2.6c",      0x0400, 0x0400, CRC(02a7e36c) SHA1(8495b2906ecb0791a47e9b6f1959ed6cbc14cce8) )
-	ROM_CONTINUE(			  0x4400, 0x0400 )
+	ROM_CONTINUE(             0x4400, 0x0400 )
 	ROM_LOAD( "02-3.5c",      0x0800, 0x0400, CRC(ee9f90ee) SHA1(dc280dae3a18a9044497bdee41827d2510a04d06) )
-	ROM_CONTINUE(			  0x4800, 0x0400 )
+	ROM_CONTINUE(             0x4800, 0x0400 )
 	ROM_LOAD( "02-4.3c",      0x0c00, 0x0400, CRC(71b97af9) SHA1(6735184dc16c8db3050be3b7b5dfdb7d46a671fe) )
-	ROM_CONTINUE(			  0x4c00, 0x0400 )
+	ROM_CONTINUE(             0x4c00, 0x0400 )
 	ROM_LOAD( "02-5.2c",      0x1000, 0x0400, CRC(887a1da2) SHA1(9e2548d1792c2d2b76811a1e0daae4d378f1f354) )
-	ROM_CONTINUE(			  0x5000, 0x0400 )
+	ROM_CONTINUE(             0x5000, 0x0400 )
 	ROM_LOAD( "02-6.7b",      0x2000, 0x0400, CRC(22e045e9) SHA1(dd332e918500d8024d1329bc12c6f939fd41e4a7) )
-	ROM_CONTINUE(			  0x6000, 0x0400 )
+	ROM_CONTINUE(             0x6000, 0x0400 )
 	ROM_LOAD( "02-7.6b",      0x2400, 0x0400, CRC(af330ad2) SHA1(cac70341687edd1daee323c0e332297c80057e1e) )
-	ROM_CONTINUE(			  0x6400, 0x0400 )
+	ROM_CONTINUE(             0x6400, 0x0400 )
 	ROM_LOAD( "02-8.5b",      0x2800, 0x0400, CRC(c7d38401) SHA1(33a3bb393451cd3fefa23b5c8013068b5b0de7a5) )
-	ROM_CONTINUE(			  0x6800, 0x0400 )
+	ROM_CONTINUE(             0x6800, 0x0400 )
 	ROM_LOAD( "02-9.3b",      0x2c00, 0x0400, CRC(c4a33f20) SHA1(355c4345daa681fa2bcfa1e345d2db34f9d94113) )
-	ROM_CONTINUE(			  0x6c00, 0x0400 )
+	ROM_CONTINUE(             0x6c00, 0x0400 )
 	ROM_LOAD( "02-10-11.2b",  0x3800, 0x0400, CRC(3f7d4b89) SHA1(c8e9be0149a2f728526a416ec5663e69cc2e6758) )
-	ROM_CONTINUE(			  0x7800, 0x0400 )
-	ROM_CONTINUE(			  0x3000, 0x0400 )
-	ROM_CONTINUE(			  0x7000, 0x0400 )
+	ROM_CONTINUE(             0x7800, 0x0400 )
+	ROM_CONTINUE(             0x3000, 0x0400 )
+	ROM_CONTINUE(             0x7000, 0x0400 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound01.1d",   0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
@@ -986,26 +986,26 @@ ROM_END
 ROM_START( catnmousa )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "catnmous.7c",  0x0000, 0x0400, CRC(0bf9fc06) SHA1(7d5857121fe51f43e4ae7db34df720198994afdd) )
-	ROM_CONTINUE(			  0x4000, 0x0400 )
+	ROM_CONTINUE(             0x4000, 0x0400 )
 	ROM_LOAD( "catnmous.6c",  0x0400, 0x0400, CRC(b0e140a0) SHA1(68d8ca25642e872f2177d09b78d553c033411dd5) )
-	ROM_CONTINUE(			  0x4400, 0x0400 )
+	ROM_CONTINUE(             0x4400, 0x0400 )
 	ROM_LOAD( "catnmous.5c",  0x0800, 0x0400, CRC(7bbc0fe5) SHA1(d20e89d89a0958d45ac31b6d2c540fcf3d326068) )
-	ROM_CONTINUE(			  0x4800, 0x0400 )
+	ROM_CONTINUE(             0x4800, 0x0400 )
 	ROM_LOAD( "catnmous.3c",  0x0c00, 0x0400, CRC(0350531d) SHA1(6115f907544ab317e0090a10cce3adce26f4afd9) )
-	ROM_CONTINUE(			  0x4c00, 0x0400 )
+	ROM_CONTINUE(             0x4c00, 0x0400 )
 	ROM_LOAD( "catnmous.2c",  0x1000, 0x0400, CRC(4a26e963) SHA1(be8dd98d3810319a228ce4c07b097eb75f2d1e5c) )
-	ROM_CONTINUE(			  0x5000, 0x0400 )
+	ROM_CONTINUE(             0x5000, 0x0400 )
 	ROM_LOAD( "catnmous.7b",  0x2000, 0x0400, CRC(d8d6a029) SHA1(7e5688fd3af97620ed07d9375335fe1deb6e483f) )
-	ROM_CONTINUE(			  0x6000, 0x0400 )
+	ROM_CONTINUE(             0x6000, 0x0400 )
 	ROM_LOAD( "catnmous.6b",  0x2400, 0x0400, CRC(ccc871d9) SHA1(355eff250ab3d1a75ed690369add1639e7061ee8) )
-	ROM_CONTINUE(			  0x6400, 0x0400 )
+	ROM_CONTINUE(             0x6400, 0x0400 )
 	ROM_LOAD( "catnmous.5b",  0x2800, 0x0400, CRC(23783b84) SHA1(97a3ef7c64e1ded5cc1999d3aa58652ca541166c) )
-	ROM_CONTINUE(			  0x6800, 0x0400 )
+	ROM_CONTINUE(             0x6800, 0x0400 )
 	ROM_LOAD( "catnmous.3b",  0x2c00, 0x0400, CRC(e99fce4b) SHA1(2c8efdea55bae5526b547fec53e8f3642fe2bd2e) )
-	ROM_CONTINUE(			  0x6c00, 0x0400 )
+	ROM_CONTINUE(             0x6c00, 0x0400 )
 	// missing half rom
 	ROM_LOAD( "catnmous.2b",  0x3000, 0x0400, BAD_DUMP CRC(880728fa) SHA1(f204d669c190ad0cf2c885af12625026534db655) )
-	ROM_CONTINUE(			  0x7000, 0x0400 )
+	ROM_CONTINUE(             0x7000, 0x0400 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snd.1d",       0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )

@@ -336,8 +336,8 @@ static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 //  AM_RANGE(0x04, 0x04) AM_WRITE(getstar_port_04_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(slapfight_port_08_w)	/* select bank 0 */
-	AM_RANGE(0x09, 0x09) AM_WRITE(slapfight_port_09_w)	/* select bank 1 */
+	AM_RANGE(0x08, 0x08) AM_WRITE(slapfight_port_08_w)  /* select bank 0 */
+	AM_RANGE(0x09, 0x09) AM_WRITE(slapfight_port_09_w)  /* select bank 1 */
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
 ADDRESS_MAP_END
 
@@ -360,7 +360,7 @@ READ8_MEMBER(slapfght_state::tigerh_status_r)
 
 static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tigerh_status_r) AM_WRITE(slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x00, 0x00) AM_READ(tigerh_status_r) AM_WRITE(slapfight_port_00_w) /* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
@@ -369,7 +369,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w) /* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
@@ -542,43 +542,43 @@ static INPUT_PORTS_START( slapfigh )
 	PORT_INCLUDE(slapfght_generic)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Screen Test" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Screen Test" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE     PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )     PORT_DIPLOCATION("SW1:1")
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:8" )
 	PORT_SERVICE_DIPLOC(0x02, IP_ACTIVE_LOW, "SW2:7" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:6,5")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x30, "30000 100000" )
 	PORT_DIPSETTING(    0x10, "50000 200000" )
 	PORT_DIPSETTING(    0x20, "50000" )
 	PORT_DIPSETTING(    0x00, "100000" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
@@ -643,9 +643,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,			/* 8*8 characters */
-	RGN_FRAC(1,2),	/* 1024 characters */
-	2,				/* 2 bits per pixel */
+	8,8,            /* 8*8 characters */
+	RGN_FRAC(1,2),  /* 1024 characters */
+	2,              /* 2 bits per pixel */
 	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -654,9 +654,9 @@ static const gfx_layout charlayout =
 
 static const gfx_layout tilelayout =
 {
-	8,8,			/* 8*8 tiles */
-	RGN_FRAC(1,4),	/* 2048/4096 tiles */
-	4,				/* 4 bits per pixel */
+	8,8,            /* 8*8 tiles */
+	RGN_FRAC(1,4),  /* 2048/4096 tiles */
+	4,              /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -665,9 +665,9 @@ static const gfx_layout tilelayout =
 
 static const gfx_layout spritelayout =
 {
-	16,16,			/* 16*16 sprites */
-	RGN_FRAC(1,4),	/* 512/1024 sprites */
-	4,				/* 4 bits per pixel */
+	16,16,          /* 16*16 sprites */
+	RGN_FRAC(1,4),  /* 512/1024 sprites */
+	4,              /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8,
 			9, 10 ,11, 12, 13, 14, 15 },
@@ -678,9 +678,9 @@ static const gfx_layout spritelayout =
 
 static const gfx_layout perfrman_charlayout =
 {
-	8,8,			/* 8*8 characters */
-	RGN_FRAC(1,3),	/* 1024 characters */
-	3,				/* 3 bits per pixel */
+	8,8,            /* 8*8 characters */
+	RGN_FRAC(1,3),  /* 1024 characters */
+	3,              /* 3 bits per pixel */
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -689,9 +689,9 @@ static const gfx_layout perfrman_charlayout =
 
 static const gfx_layout perfrman_spritelayout =
 {
-	16,16,			/* 16*16 sprites */
-	RGN_FRAC(1,3),	/* 256 sprites */
-	3,				/* 3 bits per pixel */
+	16,16,          /* 16*16 sprites */
+	RGN_FRAC(1,3),  /* 256 sprites */
+	3,              /* 3 bits per pixel */
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8,
 			9, 10 ,11, 12, 13, 14, 15 },
@@ -745,16 +745,16 @@ INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", Z80,16000000/4)         /* 4MHz ???, 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
 	MCFG_CPU_IO_MAP(slapfght_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
+	MCFG_CPU_ADD("audiocpu", Z80,16000000/8)            /* 2MHz ???, 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 4*60)	/* music speed, verified */
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 4*60)   /* music speed, verified */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))       /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
@@ -800,7 +800,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 6*60)    /* ??? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
@@ -848,7 +848,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
@@ -897,7 +897,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
@@ -950,11 +950,11 @@ MACHINE_CONFIG_END
 
 
 ROM_START( perfrman )
-	ROM_REGION( 0x10000, "maincpu", 0 )				 /* Main CPU code */
+	ROM_REGION( 0x10000, "maincpu", 0 )              /* Main CPU code */
 	ROM_LOAD( "ci07.0",    0x00000, 0x4000, CRC(7ad32eea) SHA1(e5b29793e9c8c5c9322ca2af468a9810a598c0ae) )
 	ROM_LOAD( "ci08.1",    0x04000, 0x4000, CRC(90a02d5f) SHA1(9f2d2ce70a5bc96fc9d268e2b24533f73361225c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )				 /* Sound CPU code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )                 /* Sound CPU code */
 	ROM_LOAD( "ci06.4",    0x0000, 0x2000, CRC(df891ad0) SHA1(0d33e7d0562831382f48d1588ef20a1bc73be71a) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* Tiles */
@@ -967,7 +967,7 @@ ROM_START( perfrman )
 	ROM_LOAD( "ci04.9",     0x2000, 0x2000, CRC(026f27b3) SHA1(a222d31368fa5117824f5a14a1e52f01326e1f63) )
 	ROM_LOAD( "ci03.8",     0x4000, 0x2000, CRC(6410d9eb) SHA1(7e57de9255cbcacb4610cabb1364e2a4933ec12b) )
 
-	ROM_REGION( 0x300, "proms", 0 )				 /* Color BPROMs */
+	ROM_REGION( 0x300, "proms", 0 )              /* Color BPROMs */
 	ROM_LOAD( "ci14.16",    0x000, 0x0100, CRC(515f8a3b) SHA1(a99d4c119f6c4c6cd1b3fd208eadfb69ef7e8e2d) )
 	ROM_LOAD( "ci13.15",    0x100, 0x0100, CRC(a9a397eb) SHA1(a84cf23efa0cf3e97b8dd1fff868c85d7eda1253) )
 	ROM_LOAD( "ci12.14",    0x200, 0x0100, CRC(67f86e3d) SHA1(b1240212ea91cf451dbd7c6e2bfccbac76568cf6) )
@@ -979,11 +979,11 @@ ROM_START( perfrman )
 ROM_END
 
 ROM_START( perfrmanu )
-	ROM_REGION( 0x10000, "maincpu", 0 )				 /* Main CPU code */
+	ROM_REGION( 0x10000, "maincpu", 0 )              /* Main CPU code */
 	ROM_LOAD( "ci07.0",    0x00000, 0x4000, CRC(7ad32eea) SHA1(e5b29793e9c8c5c9322ca2af468a9810a598c0ae) )
 	ROM_LOAD( "ci108r5.1", 0x04000, 0x4000, CRC(9d373efa) SHA1(b1d87e033ee3c50cfc56db05891b00b7bc236733) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )				 /* Sound CPU code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )                 /* Sound CPU code */
 	ROM_LOAD( "ci06.4",    0x0000, 0x2000, CRC(df891ad0) SHA1(0d33e7d0562831382f48d1588ef20a1bc73be71a) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* Tiles */
@@ -996,7 +996,7 @@ ROM_START( perfrmanu )
 	ROM_LOAD( "ci04.9",     0x2000, 0x2000, CRC(026f27b3) SHA1(a222d31368fa5117824f5a14a1e52f01326e1f63) )
 	ROM_LOAD( "ci03.8",     0x4000, 0x2000, CRC(6410d9eb) SHA1(7e57de9255cbcacb4610cabb1364e2a4933ec12b) )
 
-	ROM_REGION( 0x300, "proms", 0 )				 /* Color BPROMs */
+	ROM_REGION( 0x300, "proms", 0 )              /* Color BPROMs */
 	ROM_LOAD( "ci14.16",    0x000, 0x0100, CRC(515f8a3b) SHA1(a99d4c119f6c4c6cd1b3fd208eadfb69ef7e8e2d) )
 	ROM_LOAD( "ci13.15",    0x100, 0x0100, CRC(a9a397eb) SHA1(a84cf23efa0cf3e97b8dd1fff868c85d7eda1253) )
 	ROM_LOAD( "ci12.14",    0x200, 0x0100, CRC(67f86e3d) SHA1(b1240212ea91cf451dbd7c6e2bfccbac76568cf6) )
@@ -1361,7 +1361,7 @@ Notes:
 ROM_START( alcon )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "a77_00-1.8p", 0x00000, 0x8000, CRC(2ba82d60) SHA1(b37659aa18a3f96a3cc7fa93db2439f36487b8c8) )
-	ROM_LOAD( "a77_01-1.8n", 0x10000, 0x8000, CRC(18bb2f12) SHA1(7c16d4bbb8b5e22f227aff170e5e6326c5968968) )	/* banked at 8000 */
+	ROM_LOAD( "a77_01-1.8n", 0x10000, 0x8000, CRC(18bb2f12) SHA1(7c16d4bbb8b5e22f227aff170e5e6326c5968968) )    /* banked at 8000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a77_02.12d",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
@@ -1395,12 +1395,12 @@ ROM_END
 ROM_START( slapfigh )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "a77_00.8p", 0x00000, 0x8000, CRC(674c0e0f) SHA1(69fc17881c89cc5e82b0fefec49c4116054f9e3b) )
-	ROM_LOAD( "a77_01.8n", 0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )	/* banked at 8000 */
+	ROM_LOAD( "a77_01.8n", 0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )  /* banked at 8000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a77_02.12d",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a77_13.6a", 0x0000,  0x0800, CRC(a70c81d9) SHA1(f155ffd25a946b0459216a8f80ded16e6e2f9258) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1437,7 +1437,7 @@ ROM_START( slapfigha )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "a76_00.8p",   0x00000, 0x4000, CRC(ac22bb86) SHA1(3ecff006fc487d494f21adb7bff6f8c56eb5d707) )
 	ROM_LOAD( "a76_01.8n",   0x04000, 0x4000, CRC(d6b4f02e) SHA1(37f840c444ba7dcc75810580c9da83289670d5cc) )
-	ROM_LOAD( "a76_02.8k",   0x10000, 0x8000, CRC(9dd0971f) SHA1(92bd0b54635bf5c4118a53e0f897c65f5eb2984a) )	/* banked at 8000 */
+	ROM_LOAD( "a76_02.8k",   0x10000, 0x8000, CRC(9dd0971f) SHA1(92bd0b54635bf5c4118a53e0f897c65f5eb2984a) )    /* banked at 8000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a76_03.12d",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
@@ -1510,7 +1510,7 @@ sf_s20 (Mitsubishi M5L27128K 16KB EPROM)     CPU Code $4000-$7fff
 ROM_START( slapfighb1 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "sf_r19jb.bin", 0x00000, 0x8000, CRC(9a7ac8b3) SHA1(01fbad9b4fc80f2406eff18db20e196e212d0c17) )
-	ROM_LOAD( "sf_rh.bin",    0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )	/* banked at 8000 */
+	ROM_LOAD( "sf_rh.bin",    0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )   /* banked at 8000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sf_r05.bin",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
@@ -1541,7 +1541,7 @@ ROM_START( slapfighb2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "sf_r19eb.bin", 0x00000, 0x4000, CRC(2efe47af) SHA1(69ce3e83a0d8fa5ee4737c741d31cf32db6b9919) )
 	ROM_LOAD( "sf_r20eb.bin", 0x04000, 0x4000, CRC(f42c7951) SHA1(d76e7a72f6ced67b550ba68cd42987f7111f5468) )
-	ROM_LOAD( "sf_rh.bin",    0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )	/* banked at 8000 */
+	ROM_LOAD( "sf_rh.bin",    0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )   /* banked at 8000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sf_r05.bin",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
@@ -1574,7 +1574,7 @@ ROM_START( slapfighb3 )
 	ROM_LOAD( "k1-10.u90",    0x00000, 0x4000, CRC(2efe47af) SHA1(69ce3e83a0d8fa5ee4737c741d31cf32db6b9919) )
 	ROM_LOAD( "k1-09.u89",    0x04000, 0x4000, CRC(17c187c5) SHA1(6e1fd651f56036d1c6c830de8479df25fc182c10) )
 	ROM_LOAD( "k1-08.u88",    0x0e000, 0x2000, CRC(945af97f) SHA1(4d901be477b6101338eb1d86497e1bdc57f9c1b4) ) // contains another copy of the logo tilemap read at ec00!
-	ROM_LOAD( "k1-07.u87",    0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )	/* banked at 8000 */
+	ROM_LOAD( "k1-07.u87",    0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )   /* banked at 8000 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "k1-11.u89",    0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
@@ -1602,28 +1602,28 @@ ROM_START( slapfighb3 )
 ROM_END
 
 ROM_START( getstar )
-	ROM_REGION( 0x18000, "maincpu", 0 )		/* Region 0 - main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
 	ROM_LOAD( "a68_00-1",     0x00000, 0x4000, CRC(6a8bdc6c) SHA1(c923bca539bd2eb9a34cb9c7a67a199e28bc081a) )
 	ROM_LOAD( "a68_01-1",     0x04000, 0x4000, CRC(ebe8db3c) SHA1(9046d6e63c33fc9cbd48b90dcbcc0badf1d3b9ba) )
 	ROM_LOAD( "a68_02-1",     0x10000, 0x8000, CRC(343e8415) SHA1(00b98055277a0ddfb7d0bda6537df10a4049533e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Region 3 - sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a68_14",    0x0000,  0x0800, NO_DUMP )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_05-1",     0x00000, 0x2000, CRC(06f60107) SHA1(c5dcf0c7a5863ea960ee747d2d7ec7ac8bb7d3af) )  /* Chars */
 	ROM_LOAD( "a68_04-1",     0x02000, 0x2000, CRC(1fc8f277) SHA1(59dc1a0fad23b1e98abca3d0b1685b9d2939b059) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
 	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
 	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
 	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
 	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
 	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
@@ -1636,28 +1636,28 @@ ROM_START( getstar )
 ROM_END
 
 ROM_START( getstarj )
-	ROM_REGION( 0x18000, "maincpu", 0 )		/* Region 0 - main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
 	ROM_LOAD( "a68_00.bin",   0x00000, 0x4000, CRC(ad1a0143) SHA1(0d9adeb12bd4d5ad11e5bada0cd7498bc565c1db) )
 	ROM_LOAD( "a68_01.bin",   0x04000, 0x4000, CRC(3426eb7c) SHA1(e91db45a650a1bfefd7c12c7553b647bc916c7c8) )
 	ROM_LOAD( "a68_02.bin",   0x10000, 0x8000, CRC(3567da17) SHA1(29d698606d0bd30abfc3171d79bfad95b0de89fc) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Region 3 - sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "68705.bin",    0x0000,  0x0800, NO_DUMP )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_05.bin",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) )  /* Chars */
 	ROM_LOAD( "a68_04.bin",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
 	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
 	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
 	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
 	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
 	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
@@ -1670,15 +1670,15 @@ ROM_START( getstarj )
 ROM_END
 
 ROM_START( gtstarb1 )
-	ROM_REGION( 0x18000, "maincpu", 0 )		/* Region 0 - main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
 	ROM_LOAD( "gs_rb_1.bin",  0x00000, 0x4000, CRC(9afad7e0) SHA1(6b2e82a6b7fcbfed5f4d250959ecc571fdf0cbc2) )
 	ROM_LOAD( "gs_rb_2.bin",  0x04000, 0x4000, CRC(5feb0a60) SHA1(b1300055180ddf6ca96475eb3a27a17722273fc6) )
 	ROM_LOAD( "gs_rb_3.bin",  0x10000, 0x8000, CRC(e3cfb1ba) SHA1(bd21655c82a14e18ff9df4539c4d0bb2484c73f1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Region 3 - sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
 	/* these roms were in the set, but they're corrupt */
 //  ROM_LOAD( "gs_rb_8.bin",  0x00000, 0x2000, CRC(a30aaf04) SHA1(2509554c3851a68eaec1cadc01f4d69c7aa2c09d) )  /* Chars */
 //  ROM_LOAD( "gs_rb_7.bin",  0x02000, 0x2000, CRC(f47a93c6) SHA1(441fee1fb195bb2583d220f30dfcff617a31742a) )
@@ -1687,13 +1687,13 @@ ROM_START( gtstarb1 )
 	ROM_LOAD( "a68_04.bin",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) )
 
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
 	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
 	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
 	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
 	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
 	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
@@ -1706,25 +1706,25 @@ ROM_START( gtstarb1 )
 ROM_END
 
 ROM_START( gtstarb2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )		/* Region 0 - main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
 	ROM_LOAD( "gs_14.rom",    0x00000, 0x4000, CRC(1a57a920) SHA1(b1e9d5b29c0e3632eec3ad1ee51bf3392e4b816d) )
 	ROM_LOAD( "gs_13.rom",    0x04000, 0x4000, CRC(805f8e77) SHA1(c3ad6eae842d2d10f716998d5a803038fa7b338f) )
 	ROM_LOAD( "a68_02.bin",   0x10000, 0x8000, CRC(3567da17) SHA1(29d698606d0bd30abfc3171d79bfad95b0de89fc) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Region 3 - sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_05.bin",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) )  /* Chars */
 	ROM_LOAD( "a68_04.bin",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
 	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
 	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
 	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )	/* Region 1 - temporary for gfx */
+	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
 	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
 	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
@@ -1751,48 +1751,48 @@ DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
 READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
 {
 	/* The bootleg has it's own 'protection' on startup ?
-        6D1A: 06 04         ld   b,$04
-        6D1C: DB 00         in   a,($00)
-        6D1E: E6 06         and  $06
-        6D20: 20 FA         jr   nz,$6D1C
-        6D22: DB 00         in   a,($00)
-        6D24: E6 06         and  $06
-        6D26: FE 06         cp   $06
-        6D28: 20 F8         jr   nz,$6D22
-        6D2A: DB 00         in   a,($00)
-        6D2C: E6 06         and  $06
-        6D2E: FE 02         cp   $02
-        6D30: 20 F8         jr   nz,$6D2A
-        6D32: DB 00         in   a,($00)
-        6D34: E6 06         and  $06
-        6D36: FE 04         cp   $04
-        6D38: 20 F8         jr   nz,$6D32
-        6D3A: 10 E0         djnz $6D1C
-    */
+	    6D1A: 06 04         ld   b,$04
+	    6D1C: DB 00         in   a,($00)
+	    6D1E: E6 06         and  $06
+	    6D20: 20 FA         jr   nz,$6D1C
+	    6D22: DB 00         in   a,($00)
+	    6D24: E6 06         and  $06
+	    6D26: FE 06         cp   $06
+	    6D28: 20 F8         jr   nz,$6D22
+	    6D2A: DB 00         in   a,($00)
+	    6D2C: E6 06         and  $06
+	    6D2E: FE 02         cp   $02
+	    6D30: 20 F8         jr   nz,$6D2A
+	    6D32: DB 00         in   a,($00)
+	    6D34: E6 06         and  $06
+	    6D36: FE 04         cp   $04
+	    6D38: 20 F8         jr   nz,$6D32
+	    6D3A: 10 E0         djnz $6D1C
+	*/
 	if (space.device().safe_pc() == 0x6d1e) return 0;
 	if (space.device().safe_pc() == 0x6d24) return 6;
 	if (space.device().safe_pc() == 0x6d2c) return 2;
 	if (space.device().safe_pc() == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
-        6AD4: DB 00         in   a,($00)
-        6AD6: CB 4F         bit  1,a
-        6AD8: 28 FA         jr   z,$6AD4
-        6ADA: 3E 23         ld   a,$23
-        6ADC: CD 52 11      call $1152
-        6ADF: 32 03 E8      ld   ($E803),a
-        6AE2: DB 00         in   a,($00)
-        6AE4: CB 4F         bit  1,a
-        6AE6: 28 FA         jr   z,$6AE2
-        6AE8: 3A 0A C8      ld   a,($C80A)
-        6AEB: E6 03         and  $03
-        6AED: CD 52 11      call $1152
-        6AF0: 32 03 E8      ld   ($E803),a
-        6AF3: DB 00         in   a,($00)
-        6AF5: CB 57         bit  2,a
-        6AF7: 20 FA         jr   nz,$6AF3
-       This seems to be what used to be the MCU status.
-    */
+	    6AD4: DB 00         in   a,($00)
+	    6AD6: CB 4F         bit  1,a
+	    6AD8: 28 FA         jr   z,$6AD4
+	    6ADA: 3E 23         ld   a,$23
+	    6ADC: CD 52 11      call $1152
+	    6ADF: 32 03 E8      ld   ($E803),a
+	    6AE2: DB 00         in   a,($00)
+	    6AE4: CB 4F         bit  1,a
+	    6AE6: 28 FA         jr   z,$6AE2
+	    6AE8: 3A 0A C8      ld   a,($C80A)
+	    6AEB: E6 03         and  $03
+	    6AED: CD 52 11      call $1152
+	    6AF0: 32 03 E8      ld   ($E803),a
+	    6AF3: DB 00         in   a,($00)
+	    6AF5: CB 57         bit  2,a
+	    6AF7: 20 FA         jr   nz,$6AF3
+	   This seems to be what used to be the MCU status.
+	*/
 	if (space.device().safe_pc() == 0x6ad6) return 2; /* bit 1 must be ON */
 	if (space.device().safe_pc() == 0x6ae4) return 2; /* bit 1 must be ON */
 	if (space.device().safe_pc() == 0x6af5) return 0; /* bit 2 must be OFF */
@@ -1832,7 +1832,7 @@ DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
-       that the bootleg simply shouldn't execute the code due to the modified roms */
+	   that the bootleg simply shouldn't execute the code due to the modified roms */
 	/* TODO: find & fix the cause of the following happening. */
 	ROM[0x6d56] = 0xc3; //jp instead of jp z
 }
@@ -1875,4 +1875,3 @@ GAME( 1986, getstar,    0,        slapfigh,   getstar, slapfght_state,  getstar,
 GAME( 1986, getstarj,   getstar,  slapfigh,   getstarj, slapfght_state, getstarj, ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb1,   getstar,  slapfighb1, getstarj, slapfght_state, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb2,   getstar,  slapfighb1, gtstarb2, slapfght_state, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
-

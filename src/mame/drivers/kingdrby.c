@@ -114,8 +114,8 @@ public:
 };
 
 
-#define CLK_1	XTAL_20MHz
-#define CLK_2	XTAL_3_579545MHz
+#define CLK_1   XTAL_20MHz
+#define CLK_2   XTAL_3_579545MHz
 
 
 /*************************************
@@ -373,12 +373,12 @@ static const UINT8 led_map[16] =
 WRITE8_MEMBER(kingdrby_state::led_array_w)
 {
 	/*
-    offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
-    data = xxxx ---- p2 array
-           ---- xxxx p1 array
-    they goes from 0 to 5, to indicate the number.
-    If one player bets something, the other led will toggle between p1 and p2 bets.
-    */
+	offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
+	data = xxxx ---- p2 array
+	       ---- xxxx p1 array
+	they goes from 0 to 5, to indicate the number.
+	If one player bets something, the other led will toggle between p1 and p2 bets.
+	*/
 	output_set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
 	output_set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
 
@@ -406,8 +406,8 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom, tested for the post check
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* I/O Ports */
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* I/O Ports */
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* I/O Ports */
+	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -426,14 +426,14 @@ static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* I/O Ports */
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* I/O Ports */
 //  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")
-    AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
+	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
 	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
@@ -480,23 +480,23 @@ ADDRESS_MAP_END
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
 	/* A & B as input, C (all) as output */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_r),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_r),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,hopper_io_w)         /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
 	/* B & C (lower) as input, A & C (upper) as output */
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),			/* Port A write */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,key_matrix_r),		/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,input_mux_r),			/* Port C read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,outport2_w)			/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),            /* Port A write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,key_matrix_r),       /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,input_mux_r),            /* Port C read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,outport2_w)          /* Port C write */
 };
 
 WRITE8_MEMBER(kingdrby_state::outportb_w)
@@ -508,23 +508,23 @@ WRITE8_MEMBER(kingdrby_state::outportb_w)
 static I8255A_INTERFACE( ppi8255_1986_0_intf )
 {
 	/* C as input, (all) as output */
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),			/* Port A write */
-	DEVCB_INPUT_PORT("IN0"),			/* Port B read */
-	DEVCB_DRIVER_MEMBER(kingdrby_state,outportb_w),			/* Port B write */
-	DEVCB_INPUT_PORT("IN1"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_w),            /* Port A write */
+	DEVCB_INPUT_PORT("IN0"),            /* Port B read */
+	DEVCB_DRIVER_MEMBER(kingdrby_state,outportb_w),         /* Port B write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1986_1_intf )
 {
 	/* actually unused */
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL,							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL,                         /* Port C write */
 };
 
 
@@ -536,7 +536,7 @@ static I8255A_INTERFACE( ppi8255_1986_1_intf )
 
 static INPUT_PORTS_START( kingdrby )
 	/*this might be different.*/
-	PORT_START("HPIO")	// ppi0 (5000)
+	PORT_START("HPIO")  // ppi0 (5000)
 	PORT_DIPNAME( 0x01, 0x01, "HPIO" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -558,7 +558,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
 
-	PORT_START("IN1")	// ppi0 (5001)
+	PORT_START("IN1")   // ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -576,7 +576,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("KEY_1P")	// ppi1 (6001)
+	PORT_START("KEY_1P")    // ppi1 (6001)
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1P 1-4") PORT_CODE(KEYCODE_E)
@@ -594,7 +594,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("1P 5-6") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("KEY_2P")	// ppi1 (6001)
+	PORT_START("KEY_2P")    // ppi1 (6001)
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("2P 1-2") PORT_CODE(KEYCODE_Q) PORT_COCKTAIL
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("2P 1-3") PORT_CODE(KEYCODE_W) PORT_COCKTAIL
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2P 1-4") PORT_CODE(KEYCODE_E) PORT_COCKTAIL
@@ -612,7 +612,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("2P 5-6") PORT_CODE(KEYCODE_V) PORT_COCKTAIL
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("MUX0")	// ppi1 (6002)
+	PORT_START("MUX0")  // ppi1 (6002)
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -693,7 +693,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( kingdrbb )
 	/*this might be different.*/
-	PORT_START("HPIO")	// ppi0 (5000)
+	PORT_START("HPIO")  // ppi0 (5000)
 	PORT_DIPNAME( 0x01, 0x01, "HPIO" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -715,7 +715,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
 
-	PORT_START("IN0")	// ppi0 (5001)
+	PORT_START("IN0")   // ppi0 (5001)
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -741,7 +741,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")	// ppi0 (5001)
+	PORT_START("IN1")   // ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -765,7 +765,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")	// ppi0 (5001)
+	PORT_START("SYSTEM")    // ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_DIPNAME( 0x02, 0x02, "SYSTEM" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -914,16 +914,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 /*************************************
@@ -947,10 +947,10 @@ static const ym2203_interface cowrace_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_r),									// read A
-		DEVCB_DEVICE_MEMBER("oki", okim6295_device, read),			// read B
-		DEVCB_NULL,													// write A
-		DEVCB_DEVICE_MEMBER("oki", okim6295_device, write)			// write B
+		DEVCB_DRIVER_MEMBER(kingdrby_state,sound_cmd_r),                                    // read A
+		DEVCB_DEVICE_MEMBER("oki", okim6295_device, read),          // read B
+		DEVCB_NULL,                                                 // write A
+		DEVCB_DEVICE_MEMBER("oki", okim6295_device, write)          // write B
 	},
 	DEVCB_NULL
 };
@@ -958,8 +958,8 @@ static const ym2203_interface cowrace_ym2203_interface =
 PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
 	for (i = 0; i < 0x200; ++i)
 	{
@@ -985,8 +985,8 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 {
 	UINT8 *raw_prom = machine().root_device().memregion("raw_prom")->base();
 	UINT8 *prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
 	for(i = 0; i < 0x200; i++)
 	{
@@ -1043,15 +1043,15 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)	/* controlled by CRTC */
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)    /* controlled by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, CLK_1/32, mc6845_intf)	/* 53.333 Hz. guess */
+	MCFG_MC6845_ADD("crtc", MC6845, CLK_1/32, mc6845_intf)  /* 53.333 Hz. guess */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CLK_1/8)	/* guess */
+	MCFG_SOUND_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1233,7 +1233,7 @@ ROM_START( kingdrbb2 )
 	ROM_COPY( "soundcpu", 0x0000, 0x3000, 0x1000 )
 
 	/* sprites gfxs */
-	ROM_REGION( 0x8000, "gfx1", 0 )	// kingdrby sprites, smaller top roms
+	ROM_REGION( 0x8000, "gfx1", 0 ) // kingdrby sprites, smaller top roms
 	ROM_LOAD( "7",   0x0000, 0x1000, CRC(26974007) SHA1(5079daf9ad7d84f935c256458060db9497daef91) ) // = s1.d1 kingdrby
 	ROM_LOAD( "8",   0x1000, 0x1000, CRC(bedebfa7) SHA1(5a2116ed4af6bc4b72199017515980e4a937236c) ) // = s2.e1 kingdrby
 	ROM_LOAD( "9",   0x2000, 0x1000, CRC(0aa59571) SHA1(5005ffdd0030e4d4c1d8033fd3c78177c0fbd1b0) ) // = s3.f1 kingdrby
@@ -1246,12 +1246,12 @@ ROM_START( kingdrbb2 )
 	ROM_FILL(        0x7800, 0x0800, 0xff )
 
 	/* tile gfxs */
-	ROM_REGION( 0x2000, "gfx2", 0 )	// kingdrby tiles, but Tazmi logo, Japanese text and upside-down letters removed
+	ROM_REGION( 0x2000, "gfx2", 0 ) // kingdrby tiles, but Tazmi logo, Japanese text and upside-down letters removed
 	ROM_LOAD( "h14", 0x0000, 0x1000, CRC(2d040e86) SHA1(5c6f0404c0740c56b9362aa4665fbd59cf8459d6) ) // = s9_a.k8  (95.6%) kingdrby
 	ROM_LOAD( "h15", 0x1000, 0x1000, CRC(eec11348) SHA1(4933895aed31430f289342c36c57e6741c736a93) ) // = s10_a.l8 (78.6%) kingdrby
 
 	/* color proms */
-	ROM_REGION( 0x200, "proms", 0 )	// mostly 00 (black) -> red (80) changes
+	ROM_REGION( 0x200, "proms", 0 ) // mostly 00 (black) -> red (80) changes
 	ROM_LOAD( "clr", 0x000, 0x200, CRC(ffabacc9) SHA1(9769fb27fc5b6998e6600cb6050086385caa3f96) )
 ROM_END
 

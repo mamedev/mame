@@ -5,7 +5,7 @@ MACHINE_CONFIG_EXTERN( m52_large_audio );
 MACHINE_CONFIG_EXTERN( m62_audio );
 
 class irem_audio_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -26,4 +26,3 @@ private:
 };
 
 extern const device_type IREM_AUDIO;
-

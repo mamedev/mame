@@ -118,13 +118,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int x, y;
 		int xwrap, ywrap;
 
-		int	sx		= source[ 0x0/2 ];
-		int	code	= source[ 0x2/2 ];
-		int	sy		= source[ 0x4/2 ];
-		int	attr	= source[ 0x6/2 ];
+		int sx      = source[ 0x0/2 ];
+		int code    = source[ 0x2/2 ];
+		int sy      = source[ 0x4/2 ];
+		int attr    = source[ 0x6/2 ];
 
-		int dimx	= (attr >> 8) & 0xff;
-		int dimy	= (attr >> 0) & 0xff;
+		int dimx    = (attr >> 8) & 0xff;
+		int dimy    = (attr >> 0) & 0xff;
 
 		if (!sx && !code)
 			return;
@@ -215,18 +215,18 @@ WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,	(data & 0x0004));	// coin counter
-		set_led_status(machine(), 0,	(data & 0x0008));	// you win
+		coin_counter_w(machine(), 0,    (data & 0x0004));   // coin counter
+		set_led_status(machine(), 0,    (data & 0x0008));   // you win
 		if ((data & 0x0010)) increment_dispensed_tickets(machine(), 1); // coin out
-		set_led_status(machine(), 1,	(data & 0x0020));	// coin/hopper jam
+		set_led_status(machine(), 1,    (data & 0x0020));   // coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(), 2,	(data & 0x0100));	// bet
-		set_led_status(machine(), 3,	(data & 0x0800));	// start
-		set_led_status(machine(), 4,	(data & 0x1000));	// ? select/choose
-		set_led_status(machine(), 5,	(data & 0x2000));	// ? select/choose
-		set_led_status(machine(), 6,	(data & 0x4000));	// look
+		set_led_status(machine(), 2,    (data & 0x0100));   // bet
+		set_led_status(machine(), 3,    (data & 0x0800));   // start
+		set_led_status(machine(), 4,    (data & 0x1000));   // ? select/choose
+		set_led_status(machine(), 5,    (data & 0x2000));   // ? select/choose
+		set_led_status(machine(), 6,    (data & 0x4000));   // look
 	}
 //  popmessage("%04X",data);
 }
@@ -251,23 +251,23 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,	(data & 0x0001));	// key in  |
-		coin_counter_w(machine(), 0,	(data & 0x0002));	// coin in |- manual shows 1 in- and 1 out- counter
-		coin_counter_w(machine(), 1,	(data & 0x0004));	// key out |
-		machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0008)<<4);	// hopper motor?
+		coin_counter_w(machine(), 0,    (data & 0x0001));   // key in  |
+		coin_counter_w(machine(), 0,    (data & 0x0002));   // coin in |- manual shows 1 in- and 1 out- counter
+		coin_counter_w(machine(), 1,    (data & 0x0004));   // key out |
+		machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0008)<<4);   // hopper motor?
 		//                                  (data & 0x0010)     // hopper?
-		set_led_status(machine(), 0,	(data & 0x0020));	// error lamp (coin/hopper jam: "call attendant")
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data & 0x0080);	// ticket motor?
+		set_led_status(machine(), 0,    (data & 0x0020));   // error lamp (coin/hopper jam: "call attendant")
+		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data & 0x0080);    // ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// lamps:
-		set_led_status(machine(), 1,	(data & 0x0100));	// select
-		set_led_status(machine(), 2,	(data & 0x0400));	// take
-		set_led_status(machine(), 3,	(data & 0x0800));	// bet
-		set_led_status(machine(), 4,	(data & 0x1000));	// start
-		set_led_status(machine(), 5,	(data & 0x4000));	// win / test
-		set_led_status(machine(), 6,	(data & 0x8000));	// ticket?
+		set_led_status(machine(), 1,    (data & 0x0100));   // select
+		set_led_status(machine(), 2,    (data & 0x0400));   // take
+		set_led_status(machine(), 3,    (data & 0x0800));   // bet
+		set_led_status(machine(), 4,    (data & 0x1000));   // start
+		set_led_status(machine(), 5,    (data & 0x4000));   // win / test
+		set_led_status(machine(), 6,    (data & 0x8000));   // ticket?
 	}
 
 //  popmessage("%04X",data);
@@ -283,7 +283,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_screen_enable_w)
 
 READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 {
-	return 0xffff;	// bit 3?
+	return 0xffff;  // bit 3?
 }
 
 // 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(showhand_outputs_w)
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
-	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram")	// battery
+	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x080000, 0x080001 ) AM_WRITE(astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x08a000, 0x08a001 ) AM_WRITE(showhand_outputs_w)
 	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x090000, 0x093fff ) AM_RAM AM_SHARE("nvram")	// battery
+	AM_RANGE( 0x090000, 0x093fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 ADDRESS_MAP_END
@@ -337,14 +337,14 @@ static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x20e000, 0x20e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x400000, 0x400001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram")	// battery
+	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(skilldrp_sound_bank_w)
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram")	// battery
+	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x382000, 0x382001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x384000, 0x384001 ) AM_READ_PORT("INPUTS")
@@ -362,23 +362,23 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( showhand )
-	PORT_START("INPUTS")	// 54000
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )	PORT_IMPULSE(1)	// coin
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5   )	PORT_NAME("Payout")	PORT_CODE(KEYCODE_F1) // payout (must be 0 on startup)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN   )	// ?
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START2    )	PORT_NAME("Bet / Double")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON3   )	PORT_NAME("Look / Small")
-	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW )	// settings
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN   )	// ?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_SPECIAL   )	// coin sensor
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON2   )	PORT_NAME("Yes / Big")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON4   )	PORT_NAME("Hold1")	// HOLD1 in test mode
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON1   )	PORT_NAME("Select")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START1    )	PORT_NAME("Start / Take")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )	PORT_NAME("Reset Settings")	// when 1 in test mode: reset settings (must be 0 on startup)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )	// ?
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )	// key in
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SPECIAL   )	// coin sensor
+	PORT_START("INPUTS")    // 54000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )   PORT_IMPULSE(1) // coin
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5   )   PORT_NAME("Payout") PORT_CODE(KEYCODE_F1) // payout (must be 0 on startup)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN   )   // ?
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START2    )   PORT_NAME("Bet / Double")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON3   )   PORT_NAME("Look / Small")
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW )   // settings
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN   )   // ?
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_SPECIAL   )   // coin sensor
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON2   )   PORT_NAME("Yes / Big")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON4   )   PORT_NAME("Hold1")  // HOLD1 in test mode
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON1   )   PORT_NAME("Select")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START1    )   PORT_NAME("Start / Take")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )   PORT_NAME("Reset Settings") // when 1 in test mode: reset settings (must be 0 on startup)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )   // ?
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )   // key in
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SPECIAL   )   // coin sensor
 
 	PORT_START( "EEPROMIN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
@@ -391,22 +391,22 @@ static INPUT_PORTS_START( showhand )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( showhanc )
-	PORT_START("INPUTS")	// 84000
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )	PORT_IMPULSE(1)	// coin
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5   )	PORT_NAME("Payout")	PORT_CODE(KEYCODE_F1) // payout (must be 0 on startup)
+	PORT_START("INPUTS")    // 84000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )   PORT_IMPULSE(1) // coin
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5   )   PORT_NAME("Payout") PORT_CODE(KEYCODE_F1) // payout (must be 0 on startup)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START2    )	PORT_NAME("Bet / Double")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1   )	PORT_NAME("Select")
-	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW )	// settings
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START2    )   PORT_NAME("Bet / Double")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1   )   PORT_NAME("Select")
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW )   // settings
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START1    )	PORT_NAME("Start / Take")	// HOLD1 in test mode
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START1    )   PORT_NAME("Start / Take")   // HOLD1 in test mode
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON3   )	PORT_NAME("Look / Small / Exit")	// HOLD5 in test mode
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4   )	PORT_NAME("Hold2")	// HOLD2 in test mode
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_BUTTON2   )	PORT_NAME("Yes / Big")	// HOLD4 in test mode
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )	PORT_NAME("Reset Settings")	// when 1 in test mode: reset settings (must be 0 on startup)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL   )	// must be 0 for inputs to work
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )	PORT_IMPULSE(1)	// key in (shows an error)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON3   )   PORT_NAME("Look / Small / Exit")    // HOLD5 in test mode
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4   )   PORT_NAME("Hold2")  // HOLD2 in test mode
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_BUTTON2   )   PORT_NAME("Yes / Big")  // HOLD4 in test mode
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )   PORT_NAME("Reset Settings") // when 1 in test mode: reset settings (must be 0 on startup)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL   )   // must be 0 for inputs to work
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )   PORT_IMPULSE(1) // key in (shows an error)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 
 	PORT_START( "EEPROMIN" )
@@ -421,21 +421,21 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( skilldrp )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         )	PORT_IMPULSE(5)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         )   PORT_IMPULSE(5)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_GAMBLE_TAKE   )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START3        )	PORT_NAME("Select / Double")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START3        )   PORT_NAME("Select / Double")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START1        )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_OTHER         )	PORT_CODE(KEYCODE_T) PORT_NAME("Ticket Out")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_OTHER         )   PORT_CODE(KEYCODE_T) PORT_NAME("Ticket Out")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START2        )	PORT_NAME("Bet")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)	// ticket sw
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START2        )   PORT_NAME("Bet")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // ticket sw
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// hopper sw
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sw
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 
 	PORT_START( "EEPROMIN" )
@@ -472,7 +472,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static const UINT16 showhand_default_eeprom[15] =	{0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
+static const UINT16 showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
 
 static MACHINE_CONFIG_START( showhand, astrocorp_state )
 
@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.846)	// measured on pcb
+	MCFG_SCREEN_REFRESH_RATE(58.846)    // measured on pcb
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
@@ -526,7 +526,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
 static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)	// JX-1689F1028N GRX586.V5
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) // JX-1689F1028N GRX586.V5
 	MCFG_CPU_PROGRAM_MAP(skilldrp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
 
@@ -829,8 +829,8 @@ MX29F1610MC-10
 
 ROM_START( westvent )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.bin", 0x00000, 0x20000, CRC(5e208192) SHA1(5a35a419fe95513b68423d4eb6c77fdd375667f3) )	// good?
-	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.bin", 0x00001, 0x20000, BAD_DUMP CRC(f56d3ead) SHA1(2cf8960eab221cfce1c7ac6a20d002c4b05d8cc6) )	// FIXED BITS (xxxxxx0xxxxxxxxx)
+	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.bin", 0x00000, 0x20000, CRC(5e208192) SHA1(5a35a419fe95513b68423d4eb6c77fdd375667f3) )  // good?
+	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.bin", 0x00001, 0x20000, BAD_DUMP CRC(f56d3ead) SHA1(2cf8960eab221cfce1c7ac6a20d002c4b05d8cc6) ) // FIXED BITS (xxxxxx0xxxxxxxxx)
 
 	ROM_REGION( 0x600000, "sprites", 0 )
 	ROM_LOAD( "top.bin",    0x000000, 0x200000, CRC(75bbaae0) SHA1(ef35775dd481ff343df1ee071ccd52b024d084b7) )
@@ -915,7 +915,7 @@ ROM_START( winbingo )
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(ad1f61e7) SHA1(845aa01d49c50bcadaed16d76c0dd9131a425b46) )
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(31613d99) SHA1(1c720f8d981c3e9cb9d9b3b27eb95e7f72ccfc93) )
-//	ROM_LOAD( "mx29f1610mc.u30.bad.dump", 0x200000, 0x0a0000, BAD_DUMP CRC(6da439c5) SHA1(6afc0c800fe57b9b34ca317f4d1c040b11d3d988) )
+//  ROM_LOAD( "mx29f1610mc.u30.bad.dump", 0x200000, 0x0a0000, BAD_DUMP CRC(6da439c5) SHA1(6afc0c800fe57b9b34ca317f4d1c040b11d3d988) )
 //  U30 is a bad dump in this set, so use U30 from winbingoa (since U26 is the same too)
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -938,7 +938,7 @@ ROM_END
 /***************************************************************************
 
 Hacher (graphics hack of Win Win Bingo Ver. EN.01.6?)
- 
+
 ASTRO M1.2 PCB with Astro F02 2005-02-18
 
 ***************************************************************************/
@@ -1114,14 +1114,14 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhand)
 #if 0
 	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 
-	rom[0x0a1a/2] = 0x6000;	// hopper jam
+	rom[0x0a1a/2] = 0x6000; // hopper jam
 
-	rom[0x1494/2] = 0x4e71;	// enable full test mode
-	rom[0x1496/2] = 0x4e71;	// ""
-	rom[0x1498/2] = 0x4e71;	// ""
+	rom[0x1494/2] = 0x4e71; // enable full test mode
+	rom[0x1496/2] = 0x4e71; // ""
+	rom[0x1498/2] = 0x4e71; // ""
 
-	rom[0x12f6/2] = 0x6000;	// rom error
-	rom[0x4916/2] = 0x6000;	// rom error
+	rom[0x12f6/2] = 0x6000; // rom error
+	rom[0x4916/2] = 0x6000; // rom error
 #endif
 }
 
@@ -1130,11 +1130,11 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
 #if 0
 	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 
-	rom[0x14d4/2] = 0x4e71;	// enable full test mode
-	rom[0x14d6/2] = 0x4e71;	// ""
-	rom[0x14d8/2] = 0x4e71;	// ""
+	rom[0x14d4/2] = 0x4e71; // enable full test mode
+	rom[0x14d6/2] = 0x4e71; // ""
+	rom[0x14d8/2] = 0x4e71; // ""
 
-	rom[0x139c/2] = 0x6000;	// rom error
+	rom[0x139c/2] = 0x6000; // rom error
 #endif
 }
 

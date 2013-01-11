@@ -30,7 +30,7 @@ protected:
 	void device_start();
 	const rom_entry *device_rom_region() const;
 private:
-	UINT8*	m_ram_ptr;
+	UINT8*  m_ram_ptr;
 };
 
 #endif

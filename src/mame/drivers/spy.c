@@ -250,42 +250,42 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 {
 
 	/*********************************************************************
-    *
-    * Signals, from schematic:
-    *   Bit 0 - CTR1 0x01
-    *   Bit 1 - CTR2 0x02
-    *   Bit 2 - CHA-RD 0x04
-    *   Bit 3 - TV-KILL 0x08  +TV-KILL & COLORBLK to pin 7 of
-    *                                    052535 video chips
-    *
-    *   Bit 4 - COLORBK/RVBK 0x10
-    *   Bit 5 - PMCBK 0x20  GX857 053180 PAL20P Pin 7 (MCE1)
-    *   Bit 6 - PMC-START 0x40  PMC START
-    *   Bit 7 - PMC-BK 0x80  PMC BK
-    *
-    *   PMC takes AB0-AB12, D0-D7 from 6809E, outputs EA0-EA10, ED0-ED7,
-    *   tied to A and D bus of 2128SL
-    *
-    *   See "MCPU" page of S.P.Y schematics for more...
-    *
-    *    PMC ERWE -> ~WR of 2128SL
-    *    PMC ERCS -> ~CE of 2128SL
-    *    PMC EROE -> ~OE of 2128SL
-    *
-    *    PMCOUTO -> PMCFIRQ -> 6809E ~FIRQ and PORT4, bit 0x08
-    *
-    *   PMC selected by PMC/RVRAMCS signal: pin 16 of PAL20P 05318
-    *
-    *    AB0xC -> 0x1000, so if address & 0x1000, appears PMC is selected.
-    *
-    *   Other apparent selects:
-    *
-    *    0x0800 -> COLORCS (color enable?)
-    *    0x2000 -> ~CS1 on 6264W
-    *    0x4000 -> ~OE on S63 27512
-    *    0x8000 -> ~OE on S22 27512
-    *
-    ********************************************************************/
+	*
+	* Signals, from schematic:
+	*   Bit 0 - CTR1 0x01
+	*   Bit 1 - CTR2 0x02
+	*   Bit 2 - CHA-RD 0x04
+	*   Bit 3 - TV-KILL 0x08  +TV-KILL & COLORBLK to pin 7 of
+	*                                    052535 video chips
+	*
+	*   Bit 4 - COLORBK/RVBK 0x10
+	*   Bit 5 - PMCBK 0x20  GX857 053180 PAL20P Pin 7 (MCE1)
+	*   Bit 6 - PMC-START 0x40  PMC START
+	*   Bit 7 - PMC-BK 0x80  PMC BK
+	*
+	*   PMC takes AB0-AB12, D0-D7 from 6809E, outputs EA0-EA10, ED0-ED7,
+	*   tied to A and D bus of 2128SL
+	*
+	*   See "MCPU" page of S.P.Y schematics for more...
+	*
+	*    PMC ERWE -> ~WR of 2128SL
+	*    PMC ERCS -> ~CE of 2128SL
+	*    PMC EROE -> ~OE of 2128SL
+	*
+	*    PMCOUTO -> PMCFIRQ -> 6809E ~FIRQ and PORT4, bit 0x08
+	*
+	*   PMC selected by PMC/RVRAMCS signal: pin 16 of PAL20P 05318
+	*
+	*    AB0xC -> 0x1000, so if address & 0x1000, appears PMC is selected.
+	*
+	*   Other apparent selects:
+	*
+	*    0x0800 -> COLORCS (color enable?)
+	*    0x2000 -> ~CS1 on 6264W
+	*    0x4000 -> ~OE on S63 27512
+	*    0x8000 -> ~OE on S22 27512
+	*
+	********************************************************************/
 
 	/* bits 0/1 = coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -407,33 +407,33 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spy )
 	PORT_START("P1")
-	KONAMI8_ALT_B21(1)	/* button 3 unused */
+	KONAMI8_ALT_B21(1)  /* button 3 unused */
 
 	PORT_START("P2")
-	KONAMI8_ALT_B21(2)	/* button 3 unused */
+	KONAMI8_ALT_B21(2)  /* button 3 unused */
 
 	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "10k and every 20k" )
 	PORT_DIPSETTING(    0x10, "20k and every 30k" )
 	PORT_DIPSETTING(    0x08, "20k only" )
 	PORT_DIPSETTING(    0x00, "30k only" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -441,8 +441,8 @@ static INPUT_PORTS_START( spy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )		/* PMCFIRQ signal from the PMC */
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )        /* PMCFIRQ signal from the PMC */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW3:2" )
@@ -589,15 +589,15 @@ ROM_START( spy )
 	ROM_LOAD( "857d01.bin",   0x0000, 0x8000, CRC(aad4210f) SHA1(bb40b8673939b5ce51012606da86b4dcbfc52a57) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
-	ROM_LOAD( "857b09.bin",   0x00000, 0x40000, CRC(b8780966) SHA1(6c255f1e4d1398fa9010a1ae0f5172dc524df109) )	/* characters */
+	ROM_LOAD( "857b09.bin",   0x00000, 0x40000, CRC(b8780966) SHA1(6c255f1e4d1398fa9010a1ae0f5172dc524df109) )  /* characters */
 	ROM_LOAD( "857b08.bin",   0x40000, 0x40000, CRC(3e4d8d50) SHA1(70f45a725bf1e9d15285ffb6b280945f7ce7faf0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
-	ROM_LOAD( "857b06.bin",   0x00000, 0x80000, CRC(7b515fb1) SHA1(3830649d47964940023760b76e2bf94bb9163f23) )	/* sprites */
+	ROM_LOAD( "857b06.bin",   0x00000, 0x80000, CRC(7b515fb1) SHA1(3830649d47964940023760b76e2bf94bb9163f23) )  /* sprites */
 	ROM_LOAD( "857b05.bin",   0x80000, 0x80000, CRC(27b0f73b) SHA1(6b6a3da11c3005e3a62e6280818c18ae2ea31800) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "857a10.bin",   0x0000, 0x0100, CRC(32758507) SHA1(c21f89ad253502968a755fb0d23da98319f9cd93) )	/* priority encoder (not used) */
+	ROM_LOAD( "857a10.bin",   0x0000, 0x0100, CRC(32758507) SHA1(c21f89ad253502968a755fb0d23da98319f9cd93) )    /* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "k007232_1", 0 ) /* samples for 007232 #0 */
 	ROM_LOAD( "857b07.bin",   0x00000, 0x40000, CRC(ce3512d4) SHA1(1e7c3feabfc3ac89056982b76de39e283cf5894d) )
@@ -616,15 +616,15 @@ ROM_START( spyu )
 	ROM_LOAD( "857d01.bin",   0x0000, 0x8000, CRC(aad4210f) SHA1(bb40b8673939b5ce51012606da86b4dcbfc52a57) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
-	ROM_LOAD( "857b09.bin",   0x00000, 0x40000, CRC(b8780966) SHA1(6c255f1e4d1398fa9010a1ae0f5172dc524df109) )	/* characters */
+	ROM_LOAD( "857b09.bin",   0x00000, 0x40000, CRC(b8780966) SHA1(6c255f1e4d1398fa9010a1ae0f5172dc524df109) )  /* characters */
 	ROM_LOAD( "857b08.bin",   0x40000, 0x40000, CRC(3e4d8d50) SHA1(70f45a725bf1e9d15285ffb6b280945f7ce7faf0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
-	ROM_LOAD( "857b06.bin",   0x00000, 0x80000, CRC(7b515fb1) SHA1(3830649d47964940023760b76e2bf94bb9163f23) )	/* sprites */
+	ROM_LOAD( "857b06.bin",   0x00000, 0x80000, CRC(7b515fb1) SHA1(3830649d47964940023760b76e2bf94bb9163f23) )  /* sprites */
 	ROM_LOAD( "857b05.bin",   0x80000, 0x80000, CRC(27b0f73b) SHA1(6b6a3da11c3005e3a62e6280818c18ae2ea31800) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "857a10.bin",   0x0000, 0x0100, CRC(32758507) SHA1(c21f89ad253502968a755fb0d23da98319f9cd93) )	/* priority encoder (not used) */
+	ROM_LOAD( "857a10.bin",   0x0000, 0x0100, CRC(32758507) SHA1(c21f89ad253502968a755fb0d23da98319f9cd93) )    /* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "k007232_1", 0 ) /* samples for 007232 #0 */
 	ROM_LOAD( "857b07.bin",   0x00000, 0x40000, CRC(ce3512d4) SHA1(1e7c3feabfc3ac89056982b76de39e283cf5894d) )

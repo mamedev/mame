@@ -17,10 +17,10 @@
 
 
 /* waveform generation parameters */
-#define ENABLE_PULSE		1
-#define ENABLE_TRIANGLE		1
-#define ENABLE_SAWTOOTH		1
-#define ENABLE_EXTERNAL		1
+#define ENABLE_PULSE        1
+#define ENABLE_TRIANGLE     1
+#define ENABLE_SAWTOOTH     1
+#define ENABLE_EXTERNAL     1
 
 
 /* pulse shaping parameters */
@@ -30,9 +30,9 @@
 /*    snake pit - bonus counter at the end of level */
 /*    snacks'n jaxson - laugh at end of level is too soft if minimum width is too small */
 
-#define LIMIT_WIDTH			1
-#define MINIMUM_WIDTH		0.25
-#define MAXIMUM_WIDTH		0.75
+#define LIMIT_WIDTH         1
+#define MINIMUM_WIDTH       0.25
+#define MAXIMUM_WIDTH       0.75
 
 
 /********************************************************************************
@@ -90,42 +90,42 @@
 
 
 /* various waveforms */
-#define WAVE_TRIANGLE		1
-#define WAVE_SAWTOOTH		2
-#define WAVE_PULSE			4
+#define WAVE_TRIANGLE       1
+#define WAVE_SAWTOOTH       2
+#define WAVE_PULSE          4
 
 /* keep lots of fractional bits */
-#define FRACTION_BITS		28
-#define FRACTION_ONE		(1 << FRACTION_BITS)
-#define FRACTION_ONE_D		((double)(1 << FRACTION_BITS))
-#define FRACTION_MASK		(FRACTION_ONE - 1)
-#define FRACTION_MULT(a,b)	(((a) >> (FRACTION_BITS / 2)) * ((b) >> (FRACTION_BITS - FRACTION_BITS / 2)))
+#define FRACTION_BITS       28
+#define FRACTION_ONE        (1 << FRACTION_BITS)
+#define FRACTION_ONE_D      ((double)(1 << FRACTION_BITS))
+#define FRACTION_MASK       (FRACTION_ONE - 1)
+#define FRACTION_MULT(a,b)  (((a) >> (FRACTION_BITS / 2)) * ((b) >> (FRACTION_BITS - FRACTION_BITS / 2)))
 
 
 /* this structure defines the parameters for a channel */
 struct cem3394_state
 {
-	sound_stream * stream;			/* our stream */
+	sound_stream * stream;          /* our stream */
 	void (*external)(device_t *, int, short *);/* callback to generate external samples */
-	double vco_zero_freq;			/* frequency of VCO at 0.0V */
-	double filter_zero_freq;		/* frequency of filter at 0.0V */
+	double vco_zero_freq;           /* frequency of VCO at 0.0V */
+	double filter_zero_freq;        /* frequency of filter at 0.0V */
 
-	double values[8];				/* raw values of registers */
-	UINT8 wave_select;				/* flags which waveforms are enabled */
+	double values[8];               /* raw values of registers */
+	UINT8 wave_select;              /* flags which waveforms are enabled */
 
-	UINT32 volume;					/* linear overall volume (0-256) */
-	UINT32 mixer_internal;			/* linear internal volume (0-256) */
-	UINT32 mixer_external;			/* linear external volume (0-256) */
+	UINT32 volume;                  /* linear overall volume (0-256) */
+	UINT32 mixer_internal;          /* linear internal volume (0-256) */
+	UINT32 mixer_external;          /* linear external volume (0-256) */
 
-	UINT32 position;				/* current VCO frequency position (0.FRACTION_BITS) */
-	UINT32 step;					/* per-sample VCO step (0.FRACTION_BITS) */
+	UINT32 position;                /* current VCO frequency position (0.FRACTION_BITS) */
+	UINT32 step;                    /* per-sample VCO step (0.FRACTION_BITS) */
 
-	UINT32 filter_position;			/* current filter frequency position (0.FRACTION_BITS) */
-	UINT32 filter_step;				/* per-sample filter step (0.FRACTION_BITS) */
-	UINT32 modulation_depth;		/* fraction of total by which we modulate (0.FRACTION_BITS) */
-	INT16 last_ext;					/* last external sample we read */
+	UINT32 filter_position;         /* current filter frequency position (0.FRACTION_BITS) */
+	UINT32 filter_step;             /* per-sample filter step (0.FRACTION_BITS) */
+	UINT32 modulation_depth;        /* fraction of total by which we modulate (0.FRACTION_BITS) */
+	INT16 last_ext;                 /* last external sample we read */
 
-	UINT32 pulse_width;				/* fractional pulse width (0.FRACTION_BITS) */
+	UINT32 pulse_width;             /* fractional pulse width (0.FRACTION_BITS) */
 
 	double inv_sample_rate;
 	int sample_rate;
@@ -187,7 +187,7 @@ static STREAM_UPDATE( cem3394_update )
 		depth >>= 13;
 
 		/* "apply" the filter: note this is pretty cheesy; it basically just downsamples the
-           external sample to filter_freq by allowing only 2 transitions for every cycle */
+		   external sample to filter_freq by allowing only 2 transitions for every cycle */
 		for (i = 0, ext = chip->external_buffer, position = chip->position; i < samples; i++, ext++)
 		{
 			UINT32 newposition;
@@ -560,7 +560,7 @@ const device_type CEM3394 = &device_creator<cem3394_device>;
 
 cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(cem3394_state);
 }
@@ -593,5 +593,3 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

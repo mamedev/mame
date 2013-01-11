@@ -16,18 +16,18 @@
 
 #define LOG 1
 
-#define CMD_TYPE_OBJECT_CODE							0x01
-#define CMD_TYPE_TRANSFER_ADDRESS						0x02
-#define CMD_TYPE_END_OF_PARTITIONED_DATA_SET_MEMBER		0x04
-#define CMD_TYPE_LOAD_MODULE_HEADER						0x05
-#define CMD_TYPE_PARTITIONED_DATA_SET_HEADER			0x06
-#define CMD_TYPE_PATCH_NAME_HEADER						0x07
-#define CMD_TYPE_ISAM_DIRECTORY_ENTRY					0x08
-#define CMD_TYPE_END_OF_ISAM_DIRECTORY_ENTRY			0x0a
-#define CMD_TYPE_PDS_DIRECTORY_ENTRY					0x0c
-#define CMD_TYPE_END_OF_PDS_DIRECTORY_ENTRY				0x0e
-#define CMD_TYPE_YANKED_LOAD_BLOCK						0x10
-#define CMD_TYPE_COPYRIGHT_BLOCK						0x1f
+#define CMD_TYPE_OBJECT_CODE                            0x01
+#define CMD_TYPE_TRANSFER_ADDRESS                       0x02
+#define CMD_TYPE_END_OF_PARTITIONED_DATA_SET_MEMBER     0x04
+#define CMD_TYPE_LOAD_MODULE_HEADER                     0x05
+#define CMD_TYPE_PARTITIONED_DATA_SET_HEADER            0x06
+#define CMD_TYPE_PATCH_NAME_HEADER                      0x07
+#define CMD_TYPE_ISAM_DIRECTORY_ENTRY                   0x08
+#define CMD_TYPE_END_OF_ISAM_DIRECTORY_ENTRY            0x0a
+#define CMD_TYPE_PDS_DIRECTORY_ENTRY                    0x0c
+#define CMD_TYPE_END_OF_PDS_DIRECTORY_ENTRY             0x0e
+#define CMD_TYPE_YANKED_LOAD_BLOCK                      0x10
+#define CMD_TYPE_COPYRIGHT_BLOCK                        0x1f
 
 /***************************************************************************
     IMPLEMENTATION
@@ -35,7 +35,7 @@
 
 QUICKLOAD_LOAD( trs80_cmd )
 {
-    address_space &program = image.device().machine().firstcpu->space(AS_PROGRAM);
+	address_space &program = image.device().machine().firstcpu->space(AS_PROGRAM);
 
 	UINT8 type, length;
 	UINT8 data[0x100];

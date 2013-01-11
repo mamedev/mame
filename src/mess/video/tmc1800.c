@@ -45,10 +45,10 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	DEVCB_NULL,
-	RES_K(1.21),	// RL64
-	RES_K(2.05),	// RL63
-	RES_K(2.26),	// RL61
-	RES_K(3.92)		// RL65 (also RH62 (2K pot) in series, but ignored here)
+	RES_K(1.21),    // RL64
+	RES_K(2.05),    // RL63
+	RES_K(2.26),    // RL61
+	RES_K(3.92)     // RL65 (also RH62 (2K pot) in series, but ignored here)
 };
 
 /* OSCOM Nano */

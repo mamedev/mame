@@ -84,17 +84,17 @@
 	</element>
 
 	<element name="counter_throttle" defstate="0">
-    	<simplecounter maxstate="9" digits="1" align="1">
+		<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_speed1" defstate="0">
-    	<simplecounter maxstate="999" digits="3" align="1">
+		<simplecounter maxstate="999" digits="3" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_speed2" defstate="0">
-    	<simplecounter maxstate="9" digits="1" align="1">
+		<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
 	</element>
@@ -114,12 +114,12 @@
 	</element>
 
 	<element name="counter_brake" defstate="0">
-    	<simplecounter maxstate="99" digits="2" align="1">
+		<simplecounter maxstate="99" digits="2" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_pressure" defstate="0">
-    	<simplecounter maxstate="9999" digits="4" align="1">
+		<simplecounter maxstate="9999" digits="4" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
 	</element>

@@ -18,38 +18,38 @@
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 
-#define Z80_TAG			"u20"
-#define Z80CTC_TAG		"u1"
-#define Z80DMA_TAG		"u50"
-#define Z80DART_TAG		"u45"
-#define Z80PIO_TAG		"z80pio"
-#define MB8877_TAG		"u55"
-#define CENTRONICS_TAG	"centronics"
-#define SCSIBUS_TAG		"scsi"
+#define Z80_TAG         "u20"
+#define Z80CTC_TAG      "u1"
+#define Z80DMA_TAG      "u50"
+#define Z80DART_TAG     "u45"
+#define Z80PIO_TAG      "z80pio"
+#define MB8877_TAG      "u55"
+#define CENTRONICS_TAG  "centronics"
+#define SCSIBUS_TAG     "scsi"
 
 class bullet_state : public driver_device
 {
 public:
 	bullet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_dart(*this, Z80DART_TAG),
-		  m_dmac(*this, Z80DMA_TAG),
-		  m_fdc(*this, MB8877_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, MB8877_TAG":0"),
-		  m_floppy1(*this, MB8877_TAG":1"),
-		  m_floppy2(*this, MB8877_TAG":2"),
-		  m_floppy3(*this, MB8877_TAG":3"),
-		  m_floppy4(*this, MB8877_TAG":4"),
-		  m_floppy5(*this, MB8877_TAG":5"),
-		  m_floppy6(*this, MB8877_TAG":6"),
-		  m_floppy7(*this, MB8877_TAG":7"),
-		  m_floppy(NULL),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_fdrdy(0)
+			m_maincpu(*this, Z80_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_dart(*this, Z80DART_TAG),
+			m_dmac(*this, Z80DMA_TAG),
+			m_fdc(*this, MB8877_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, MB8877_TAG":0"),
+			m_floppy1(*this, MB8877_TAG":1"),
+			m_floppy2(*this, MB8877_TAG":2"),
+			m_floppy3(*this, MB8877_TAG":3"),
+			m_floppy4(*this, MB8877_TAG":4"),
+			m_floppy5(*this, MB8877_TAG":5"),
+			m_floppy6(*this, MB8877_TAG":6"),
+			m_floppy7(*this, MB8877_TAG":7"),
+			m_floppy(NULL),
+			m_terminal(*this, TERMINAL_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_fdrdy(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -120,9 +120,9 @@ class bulletf_state : public bullet_state
 public:
 	bulletf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bullet_state(mconfig, type, tag),
-		  m_floppy8(*this, MB8877_TAG":8"),
-		  m_floppy9(*this, MB8877_TAG":9"),
-		  m_scsibus(*this, SCSIBUS_TAG ":host")
+			m_floppy8(*this, MB8877_TAG":8"),
+			m_floppy9(*this, MB8877_TAG":9"),
+			m_scsibus(*this, SCSIBUS_TAG ":host")
 	{ }
 
 	required_device<floppy_connector> m_floppy8;

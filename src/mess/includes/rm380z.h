@@ -19,12 +19,12 @@ Research Machines RM 380Z
 //
 //
 
-#define RM380Z_MAINCPU_TAG		"maincpu"
-#define RM380Z_PORTS_ENABLED_HIGH	( m_port0 & 0x80 )
-#define RM380Z_PORTS_ENABLED_LOW	( ( m_port0 & 0x80 ) == 0x00 )
+#define RM380Z_MAINCPU_TAG      "maincpu"
+#define RM380Z_PORTS_ENABLED_HIGH   ( m_port0 & 0x80 )
+#define RM380Z_PORTS_ENABLED_LOW    ( ( m_port0 & 0x80 ) == 0x00 )
 
-#define RM380Z_VIDEOMODE_40COL	0x01
-#define RM380Z_VIDEOMODE_80COL	0x02
+#define RM380Z_VIDEOMODE_40COL  0x01
+#define RM380Z_VIDEOMODE_80COL  0x02
 
 #define RM380Z_CHDIMX 5
 #define RM380Z_CHDIMY 9
@@ -71,10 +71,10 @@ public:
 
 	UINT8 m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
-	UINT8	m_mainVideoram[RM380Z_VIDEORAM_SIZE];
-	UINT8	m_vramchars[RM380Z_SCREENSIZE];
-	UINT8	m_vramattribs[RM380Z_SCREENSIZE];
-	UINT8	m_vram[RM380Z_SCREENSIZE];
+	UINT8   m_mainVideoram[RM380Z_VIDEORAM_SIZE];
+	UINT8   m_vramchars[RM380Z_SCREENSIZE];
+	UINT8   m_vramattribs[RM380Z_SCREENSIZE];
+	UINT8   m_vram[RM380Z_SCREENSIZE];
 
 	int m_rasterlineCtr;
 	emu_timer* m_vblankTimer;
@@ -90,7 +90,7 @@ public:
 	optional_device<fd1771_device> m_fdc;
 
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
-	  : driver_device(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771")

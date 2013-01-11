@@ -4,11 +4,11 @@
 #define LOG(x) do { if (ORIC_WAV_DEBUG) printf x; } while (0)
 
 /* this code based heavily on tap2wav by Fabrice Frances */
-#define ORIC_SYNC_BYTE	0x016
+#define ORIC_SYNC_BYTE  0x016
 
 /* frequency of wave */
 /* tapes use 1200Hz and 2400Hz samples */
-#define ORIC_WAV_FREQUENCY	4800
+#define ORIC_WAV_FREQUENCY  4800
 
 /* 13 bits define a byte on the cassette */
 /* 1 start bit, 8 data bits, 1 parity bit and 3 stop bits */
@@ -302,10 +302,10 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 					LOG_FORMATS("got end of filename\n");
 
 					/* 100 1 bits to separate header from data */
-                                        for (i=0; i<100; i++)
-                                        {
-                                            count+=oric_get_bit_size_in_samples(1);
-                                        }
+										for (i=0; i<100; i++)
+										{
+											count+=oric_get_bit_size_in_samples(1);
+										}
 
 					oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
 					oric.data_count = 0;
@@ -314,7 +314,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
 					LOG(("start (from header): %02x\n",start));
 					LOG(("end (from header): %02x\n",end));
-                                        oric.data_length = end - start + 1;
+										oric.data_length = end - start + 1;
 				}
 			}
 			break;
@@ -352,7 +352,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 	/* header and trailer act as pauses */
 	/* the trailer is required so that the via sees the last bit of the last
-        byte */
+	    byte */
 	if (bytes == CODE_HEADER) {
 		for (i = 0; i < ORIC_WAVESAMPLES_HEADER; i++)
 			*(p++) = WAVEENTRY_NULL;
@@ -438,10 +438,10 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 					LOG_FORMATS("got end of filename\n");
 
 					/* oric includes a small delay, but I don't see
-                    it being 1 bits */
+					it being 1 bits */
 					for (i=0; i<100; i++)
 					{
-                                            p = oric_output_bit(p,1);
+											p = oric_output_bit(p,1);
 					}
 
 					oric.cassette_state = ORIC_CASSETTE_WRITE_DATA;
@@ -451,7 +451,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 					start = (((header[6] & 0x0ff)<<8) | (header[7] & 0x0ff));
 					LOG(("start (from header): %02x\n",start));
 					LOG(("end (from header): %02x\n",end));
-                                        oric.data_length = end - start + 1;
+										oric.data_length = end - start + 1;
 				}
 			}
 			break;
@@ -479,13 +479,13 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller oric_legacy_fill_wave =
 {
-	oric_cassette_fill_wave,					/* fill_wave */
-	-1,											/* chunk_size */
-	0,											/* chunk_samples */
-	oric_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	ORIC_WAV_FREQUENCY,							/* sample_frequency */
-	ORIC_WAVESAMPLES_HEADER,					/* header_samples */
-	ORIC_WAVESAMPLES_TRAILER					/* trailer_samples */
+	oric_cassette_fill_wave,                    /* fill_wave */
+	-1,                                         /* chunk_size */
+	0,                                          /* chunk_samples */
+	oric_cassette_calculate_size_in_samples,    /* chunk_sample_calc */
+	ORIC_WAV_FREQUENCY,                         /* sample_frequency */
+	ORIC_WAVESAMPLES_HEADER,                    /* header_samples */
+	ORIC_WAVESAMPLES_TRAILER                    /* trailer_samples */
 };
 
 

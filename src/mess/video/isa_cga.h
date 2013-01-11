@@ -51,26 +51,26 @@ public:
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 public:
-	int		m_framecnt;
+	int     m_framecnt;
 
-	UINT8	m_mode_control;  /* wo 0x3d8 */
-	UINT8	m_color_select;  /* wo 0x3d9 */
-	UINT8	m_status;        /* ro 0x3da */
+	UINT8   m_mode_control;  /* wo 0x3d8 */
+	UINT8   m_color_select;  /* wo 0x3d9 */
+	UINT8   m_status;        /* ro 0x3da */
 
-	mc6845_update_row_func	m_update_row;
-	UINT8	m_palette_lut_2bpp[4];
-	offs_t	m_chr_gen_offset[4];
-	UINT8	m_font_selection_mask;
-	UINT8	*m_chr_gen_base;
-	UINT8	*m_chr_gen;
-	UINT8	m_vsync;
-	UINT8	m_hsync;
-	size_t	m_vram_size;
-	UINT8	*m_vram;
-	bool	m_superimpose;
-	UINT8	m_p3df;	/* This should be moved into the appropriate subclass */
-	UINT8	m_plantronics; /* This should be moved into the appropriate subclass */
-	offs_t	m_start_offset;
+	mc6845_update_row_func  m_update_row;
+	UINT8   m_palette_lut_2bpp[4];
+	offs_t  m_chr_gen_offset[4];
+	UINT8   m_font_selection_mask;
+	UINT8   *m_chr_gen_base;
+	UINT8   *m_chr_gen;
+	UINT8   m_vsync;
+	UINT8   m_hsync;
+	size_t  m_vram_size;
+	UINT8   *m_vram;
+	bool    m_superimpose;
+	UINT8   m_p3df; /* This should be moved into the appropriate subclass */
+	UINT8   m_plantronics; /* This should be moved into the appropriate subclass */
+	offs_t  m_start_offset;
 };
 
 // device type definition
@@ -146,14 +146,14 @@ extern const device_type ISA8_CGA_POISK2;
 // ======================> isa8_pc1512_device
 
 class isa8_cga_pc1512_device :
-        public isa8_cga_device
+		public isa8_cga_device
 {
 public:
-    // construction/destruction
-    isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    // optional information overrides
+	// construction/destruction
+	isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
-    virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const;
 	virtual void device_config_complete() { m_shortname = "cga_pc1512"; }
 
 protected:
@@ -162,10 +162,10 @@ protected:
 	virtual void device_reset();
 
 public:
-	UINT8	m_write;
-	UINT8	m_read;
-	UINT8	m_mc6845_address;
-	UINT8	m_mc6845_locked_register[31];
+	UINT8   m_write;
+	UINT8   m_read;
+	UINT8   m_mc6845_address;
+	UINT8   m_mc6845_locked_register[31];
 
 public:
 	// Static information
@@ -186,12 +186,12 @@ extern const device_type ISA8_CGA_PC1512;
 // ======================> isa8_wyse700_device
 
 class isa8_wyse700_device :
-        public isa8_cga_device
+		public isa8_cga_device
 {
 public:
-    // construction/destruction
-    isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    // optional information overrides
+	// construction/destruction
+	isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual void device_config_complete() { m_shortname = "wyse700"; }
 
@@ -215,4 +215,3 @@ public:
 extern const device_type ISA8_WYSE700;
 
 #endif  /* __ISA_CGA_H__ */
-

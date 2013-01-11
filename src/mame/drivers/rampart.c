@@ -30,7 +30,7 @@
 #include "includes/rampart.h"
 
 
-#define MASTER_CLOCK		XTAL_14_31818MHz
+#define MASTER_CLOCK        XTAL_14_31818MHz
 
 
 /*************************************
@@ -78,19 +78,19 @@ WRITE16_MEMBER(rampart_state::latch_w)
 {
 	/* bit layout in this register:
 
-        0x8000 == VCR ???
-        0x2000 == LETAMODE1 (controls right trackball)
-        0x1000 == CBANK (color bank -- is it ever set to non-zero?)
-        0x0800 == LETAMODE0 (controls center and left trackballs)
-        0x0400 == LETARES (reset LETA analog control reader)
-        0x0200 == COINCTRL
-        0x0100 == COINCTRR
+	    0x8000 == VCR ???
+	    0x2000 == LETAMODE1 (controls right trackball)
+	    0x1000 == CBANK (color bank -- is it ever set to non-zero?)
+	    0x0800 == LETAMODE0 (controls center and left trackballs)
+	    0x0400 == LETARES (reset LETA analog control reader)
+	    0x0200 == COINCTRL
+	    0x0100 == COINCTRR
 
-        0x0020 == PMIX0 (ADPCM mixer level)
-        0x0010 == /PCMRES (ADPCM reset)
-        0x000E == YMIX2-0 (YM2413 mixer level)
-        0x0001 == /YAMRES (YM2413 reset)
-    */
+	    0x0020 == PMIX0 (ADPCM mixer level)
+	    0x0010 == /PCMRES (ADPCM reset)
+	    0x000E == YMIX2-0 (YM2413 mixer level)
+	    0x0001 == /YAMRES (YM2413 reset)
+	*/
 
 	/* upper byte being modified? */
 	if (ACCESSING_BITS_8_15)
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rampart_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM /* slapstic goes here */
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
-	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP	/* the code blasts right through this when initializing */
+	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP    /* the code blasts right through this when initializing */
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_RAM_WRITE(expanded_paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3e0800, 0x3e3f3f) AM_MIRROR(0x010000) AM_RAM
@@ -181,19 +181,19 @@ static INPUT_PORTS_START( rampart )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRACK0")
-    PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
-    PORT_BIT( 0xff00, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(3)
+	PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xff00, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START("TRACK1")
-    PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
-    PORT_BIT( 0xff00, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(3)
+	PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xff00, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START("TRACK2")
-    PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRACK3")
-    PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -383,7 +383,7 @@ ROM_START( rampart )
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136082-1009.2n",   0x000000, 0x20000, CRC(23b95f59) SHA1(cec8523eaf83d4c9bb0055f34024a6e9c52c4c0c) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM data */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
@@ -410,7 +410,7 @@ ROM_START( rampart2p )
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136082-1019.2n",   0x000000, 0x20000, CRC(efa38bef) SHA1(d38448138134e7a0be2a75c3cd6ab0729da5b83b) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM data */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
@@ -441,7 +441,7 @@ ROM_START( rampartj )
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "136082-2419.bin",   0x000000, 0x20000, CRC(456a8aae) SHA1(f35a3dc2069e20493661cf35fc0d4f4c4e11e420) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM data */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 

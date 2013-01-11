@@ -32,10 +32,10 @@ Z80PIO_INTERFACE( super80_pio_intf )
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(super80_state, pio_port_a_w),
-	DEVCB_NULL,			/* portA ready active callback (not used in super80) */
+	DEVCB_NULL,         /* portA ready active callback (not used in super80) */
 	DEVCB_DRIVER_MEMBER(super80_state,pio_port_b_r),
 	DEVCB_NULL,
-	DEVCB_NULL			/* portB ready active callback (not used in super80) */
+	DEVCB_NULL          /* portB ready active callback (not used in super80) */
 };
 
 
@@ -60,22 +60,22 @@ static void super80_cassette_motor( running_machine &machine, UINT8 data )
 
 
 	/* this timer runs at 200khz and does 2 jobs:
-    1. Scan the keyboard and present the results to the pio
-    2. Emulate the 2 chips in the cassette input circuit
+	1. Scan the keyboard and present the results to the pio
+	2. Emulate the 2 chips in the cassette input circuit
 
-    Reasons why it is necessary:
-    1. The real z80pio is driven by the cpu clock and is capable of independent actions.
-    MAME does not support this at all. If the interrupt key sequence is entered, the
-    computer can be reset out of a hung state by the operator.
-    2. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
-    and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
+	Reasons why it is necessary:
+	1. The real z80pio is driven by the cpu clock and is capable of independent actions.
+	MAME does not support this at all. If the interrupt key sequence is entered, the
+	computer can be reset out of a hung state by the operator.
+	2. This "emulates" U79 CD4046BCN PLL chip and U1 LM311P op-amp. U79 converts a frequency to a voltage,
+	and U1 amplifies that voltage to digital levels. U1 has a trimpot connected, to set the midpoint.
 
-    The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
-    My "read-any-system" cassette circuit was a CA3140 op-amp, the smarts being done in software.
+	The MDS homebrew input circuit consists of 2 op-amps followed by a D-flipflop.
+	My "read-any-system" cassette circuit was a CA3140 op-amp, the smarts being done in software.
 
-    bit 0 = original system (U79 and U1)
-    bit 1 = MDS fast system
-    bit 2 = CA3140 */
+	bit 0 = original system (U79 and U1)
+	bit 1 = MDS fast system
+	bit 2 = CA3140 */
 
 TIMER_CALLBACK_MEMBER(super80_state::super80_timer)
 {
@@ -86,7 +86,7 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_timer)
 
 	if (cass_ws != m_cass_data[0])
 	{
-		if (cass_ws) m_cass_data[3] ^= 2;		// the MDS flipflop
+		if (cass_ws) m_cass_data[3] ^= 2;       // the MDS flipflop
 		m_cass_data[0] = cass_ws;
 		m_cass_data[2] = ((m_cass_data[1] < 0x40) ? 1 : 0) | cass_ws | m_cass_data[3];
 		m_cass_data[1] = 0;
@@ -104,28 +104,28 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_reset)
 TIMER_CALLBACK_MEMBER(super80_state::super80_halfspeed)
 {
 	UINT8 go_fast = 0;
-	if ( (!BIT(m_shared, 2)) | (!BIT(machine().root_device().ioport("CONFIG")->read(), 1)) )	/* bit 2 of port F0 is low, OR user turned on config switch */
+	if ( (!BIT(m_shared, 2)) | (!BIT(machine().root_device().ioport("CONFIG")->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */
 		go_fast++;
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
 	if (!go_fast)
 	{
 		if (!m_int_sw)
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);    // if going, stop it
 
 		m_int_sw++;
 		if (m_int_sw > 1)
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);     // if stopped, start it
 			m_int_sw = 0;
 		}
 	}
 	else
 	{
-		if (m_int_sw < 8)								// @2MHz, reset just once
+		if (m_int_sw < 8)                               // @2MHz, reset just once
 		{
 			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_int_sw = 8;							// ...not every time
+			m_int_sw = 8;                           // ...not every time
 		}
 	}
 }
@@ -156,9 +156,9 @@ READ8_MEMBER( super80_state::super80_dc_r )
 
 READ8_MEMBER( super80_state::super80_f2_r )
 {
-	UINT8 data = ioport("DSW")->read() & 0xf0;	// dip switches on pcb
-	data |= m_cass_data[2];			// bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
-	data |= 0x08;				// bit 3 - not used
+	UINT8 data = ioport("DSW")->read() & 0xf0;  // dip switches on pcb
+	data |= m_cass_data[2];         // bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
+	data |= 0x08;               // bit 3 - not used
 	return data;
 }
 
@@ -175,9 +175,9 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data;
-	speaker_level_w(m_speaker, BIT(data, 3));				/* bit 3 - speaker */
-	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));	/* bit 1 - cassette motor */
-	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	speaker_level_w(m_speaker, BIT(data, 3));               /* bit 3 - speaker */
+	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));  /* bit 1 - cassette motor */
+	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
 
 	m_last_data = data;
 }
@@ -186,9 +186,9 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data | 0x14;
-	speaker_level_w(m_speaker, BIT(data, 3));				/* bit 3 - speaker */
-	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));	/* bit 1 - cassette motor */
-	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);	/* bit 0 - cass out */
+	speaker_level_w(m_speaker, BIT(data, 3));               /* bit 3 - speaker */
+	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));  /* bit 1 - cassette motor */
+	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
 
 	m_last_data = data;
 }
@@ -207,12 +207,12 @@ static void driver_init_common( running_machine &machine )
 	super80_state *state = machine.driver_data<super80_state>();
 	UINT8 *RAM = state->memregion("maincpu")->base();
 	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
-	machine.scheduler().timer_pulse(attotime::from_hz(200000), timer_expired_delegate(FUNC(super80_state::super80_timer),state));	/* timer for keyboard and cassette */
+	machine.scheduler().timer_pulse(attotime::from_hz(200000), timer_expired_delegate(FUNC(super80_state::super80_timer),state));   /* timer for keyboard and cassette */
 }
 
 DRIVER_INIT_MEMBER(super80_state,super80)
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(super80_state::super80_halfspeed),this));	/* timer for 1MHz slowdown */
+	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(super80_state::super80_halfspeed),this)); /* timer for 1MHz slowdown */
 	driver_init_common(machine());
 }
 
@@ -220,4 +220,3 @@ DRIVER_INIT_MEMBER(super80_state,super80v)
 {
 	driver_init_common(machine());
 }
-

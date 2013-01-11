@@ -137,10 +137,10 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 
 struct namco_50xx_state
 {
-	device_t *	m_cpu;
-	UINT8					m_latched_cmd;
-	UINT8					m_latched_rw;
-	UINT8					m_portO;
+	device_t *  m_cpu;
+	UINT8                   m_latched_cmd;
+	UINT8                   m_latched_rw;
+	UINT8                   m_portO;
 };
 
 INLINE namco_50xx_state *get_safe_token(device_t *device)
@@ -261,7 +261,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( namco_50xx )
-	MCFG_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
+	MCFG_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
 	MCFG_CPU_IO_MAP(namco_50xx_map_io)
 MACHINE_CONFIG_END
 
@@ -338,5 +338,3 @@ const rom_entry *namco_50xx_device::device_rom_region() const
 {
 	return ROM_NAME(namco_50xx );
 }
-
-

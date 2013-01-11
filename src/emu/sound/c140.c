@@ -67,23 +67,23 @@ struct voice_registers
 
 struct VOICE
 {
-	long	ptoffset;
-	long	pos;
-	long	key;
+	long    ptoffset;
+	long    pos;
+	long    key;
 	//--work
-	long	lastdt;
-	long	prevdt;
-	long	dltdt;
+	long    lastdt;
+	long    prevdt;
+	long    dltdt;
 	//--reg
-	long	rvol;
-	long	lvol;
-	long	frequency;
-	long	bank;
-	long	mode;
+	long    rvol;
+	long    lvol;
+	long    frequency;
+	long    bank;
+	long    mode;
 
-	long	sample_start;
-	long	sample_end;
-	long	sample_loop;
+	long    sample_start;
+	long    sample_end;
+	long    sample_loop;
 };
 
 struct c140_state
@@ -99,7 +99,7 @@ struct c140_state
 	void *pRom;
 	UINT8 REG[0x200];
 
-	INT16 pcmtbl[8];		//2000.06.26 CAB
+	INT16 pcmtbl[8];        //2000.06.26 CAB
 
 	VOICE voi[MAX_VOICE];
 };
@@ -239,28 +239,28 @@ void c140_set_base(device_t *device, void *base)
 
 INLINE int limit(INT32 in)
 {
-	if(in>0x7fff)		return 0x7fff;
-	else if(in<-0x8000)	return -0x8000;
+	if(in>0x7fff)       return 0x7fff;
+	else if(in<-0x8000) return -0x8000;
 	return in;
 }
 
 static STREAM_UPDATE( update_stereo )
 {
 	c140_state *info = (c140_state *)param;
-	int		i,j;
+	int     i,j;
 
-	INT32	rvol,lvol;
-	INT32	dt;
-	INT32	sdt;
-	INT32	st,ed,sz;
+	INT32   rvol,lvol;
+	INT32   dt;
+	INT32   sdt;
+	INT32   st,ed,sz;
 
-	INT8	*pSampleData;
-	INT32	frequency,delta,offset,pos;
-	INT32	cnt, voicecnt;
-	INT32	lastdt,prevdt,dltdt;
-	float	pbase=(float)info->baserate*2.0 / (float)info->sample_rate;
+	INT8    *pSampleData;
+	INT32   frequency,delta,offset,pos;
+	INT32   cnt, voicecnt;
+	INT32   lastdt,prevdt,dltdt;
+	float   pbase=(float)info->baserate*2.0 / (float)info->sample_rate;
 
-	INT16	*lmix, *rmix;
+	INT16   *lmix, *rmix;
 
 	if(samples>info->sample_rate) samples=info->sample_rate;
 
@@ -341,10 +341,10 @@ static STREAM_UPDATE( update_stereo )
 						/* Read the chosen sample byte */
 						dt=pSampleData[pos];
 
-						/* decompress to 13bit range */		//2000.06.26 CAB
-						sdt=dt>>3;				//signed
-						if(sdt<0)	sdt = (sdt<<(dt&7)) - info->pcmtbl[dt&7];
-						else		sdt = (sdt<<(dt&7)) + info->pcmtbl[dt&7];
+						/* decompress to 13bit range */     //2000.06.26 CAB
+						sdt=dt>>3;              //signed
+						if(sdt<0)   sdt = (sdt<<(dt&7)) - info->pcmtbl[dt&7];
+						else        sdt = (sdt<<(dt&7)) + info->pcmtbl[dt&7];
 
 						prevdt=lastdt;
 						lastdt=sdt;
@@ -452,13 +452,13 @@ static DEVICE_START( c140 )
 
 	info->pRom=*device->region();
 
-	/* make decompress pcm table */		//2000.06.26 CAB
+	/* make decompress pcm table */     //2000.06.26 CAB
 	{
 		int i;
 		INT32 segbase=0;
 		for(i=0;i<8;i++)
 		{
-			info->pcmtbl[i]=segbase;	//segment base value
+			info->pcmtbl[i]=segbase;    //segment base value
 			segbase += 16<<i;
 		}
 	}
@@ -478,7 +478,7 @@ const device_type C140 = &device_creator<c140_device>;
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C140, "C140", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(c140_state);
 }
@@ -511,5 +511,3 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

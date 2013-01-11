@@ -359,7 +359,7 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_16MHz
+#define MASTER_CLOCK    XTAL_16MHz
 
 #include "emu.h"
 #include "cpu/m6502/m65sc02.h"
@@ -439,17 +439,17 @@ WRITE8_MEMBER(snookr10_state::output_port_0_w)
 	m_bit4 = m_outporth & 1;
 	m_bit5 = (m_outporth >> 1) & 1;
 
-	output_set_lamp_value(0, m_bit5);	/* Lamp 0 - START  */
-	output_set_lamp_value(1, m_bit2);	/* Lamp 1 - CANCEL */
-	output_set_lamp_value(2, m_bit0);	/* Lamp 2 - STOP1  */
-	output_set_lamp_value(3, m_bit1);	/* Lamp 3 - STOP2  */
-	output_set_lamp_value(4, m_bit0);	/* Lamp 4 - STOP3  */
-	output_set_lamp_value(5, m_bit3);	/* Lamp 5 - STOP4  */
-	output_set_lamp_value(6, m_bit4);	/* Lamp 6 - STOP5  */
+	output_set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
+	output_set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
+	output_set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
+	output_set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
+	output_set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
+	output_set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
+	output_set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
 
-	coin_counter_w(machine(), 0, data & 0x01);	/* Coin in */
-	coin_counter_w(machine(), 1, data & 0x10);	/* Key in */
-	coin_counter_w(machine(), 2, data & 0x04);	/* Payout x10 */
+	coin_counter_w(machine(), 0, data & 0x01);  /* Coin in */
+	coin_counter_w(machine(), 1, data & 0x10);  /* Key in */
+	coin_counter_w(machine(), 2, data & 0x04);  /* Payout x10 */
 
 //  logerror("high: %04x - low: %X \n", m_outporth, m_outportl);
 //  popmessage("written : %02X", data);
@@ -480,13 +480,13 @@ WRITE8_MEMBER(snookr10_state::output_port_1_w)
 	m_bit4 = data & 1;
 	m_bit5 = (data >> 1) & 1;
 
-	output_set_lamp_value(0, m_bit5);	/* Lamp 0 - START  */
-	output_set_lamp_value(1, m_bit2);	/* Lamp 1 - CANCEL */
-	output_set_lamp_value(2, m_bit0);	/* Lamp 2 - STOP1  */
-	output_set_lamp_value(3, m_bit1);	/* Lamp 3 - STOP2  */
-	output_set_lamp_value(4, m_bit0);	/* Lamp 4 - STOP3  */
-	output_set_lamp_value(5, m_bit3);	/* Lamp 5 - STOP4  */
-	output_set_lamp_value(6, m_bit4);	/* Lamp 6 - STOP5  */
+	output_set_lamp_value(0, m_bit5);   /* Lamp 0 - START  */
+	output_set_lamp_value(1, m_bit2);   /* Lamp 1 - CANCEL */
+	output_set_lamp_value(2, m_bit0);   /* Lamp 2 - STOP1  */
+	output_set_lamp_value(3, m_bit1);   /* Lamp 3 - STOP2  */
+	output_set_lamp_value(4, m_bit0);   /* Lamp 4 - STOP3  */
+	output_set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
+	output_set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
 }
 
 
@@ -497,13 +497,13 @@ WRITE8_MEMBER(snookr10_state::output_port_1_w)
 static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")		/* IN0 */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")		/* IN1 */
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")		/* IN2 */
-	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("SW1")		/* DS1 */
-	AM_RANGE(0x3004, 0x3004) AM_READ(dsw_port_1_r)		/* complement of DS1, bit 7 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")        /* IN0 */
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")        /* IN1 */
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")        /* IN2 */
+	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("SW1")        /* DS1 */
+	AM_RANGE(0x3004, 0x3004) AM_READ(dsw_port_1_r)      /* complement of DS1, bit 7 */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)  /* OUT0 */
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)  /* OUT1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(snookr10_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -512,12 +512,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")		/* IN0 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")		/* IN1 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")		/* IN2 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("SW1")		/* DS1 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")        /* IN0 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")        /* IN1 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")        /* IN2 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("SW1")        /* DS1 */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)  /* OUT0 */
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)  /* OUT1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(snookr10_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -534,7 +534,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( snookr10 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Remote x100") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Stop 1")	/* Input Test in stats mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Stop 1")    /* Input Test in stats mode */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancella (Cancel) / Play / Bet")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start (Deal) / Raddoppio (Double-Up)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Stop 5 / Risk (Half Gamble) / Super Game")
@@ -563,25 +563,25 @@ static INPUT_PORTS_START( snookr10 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )				PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )                PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, "100" )
 	PORT_DIPSETTING(    0x02, "200" )
 	PORT_DIPSETTING(    0x01, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
-	PORT_DIPNAME( 0x10, 0x10, "Super Game Settings" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Super Game Settings" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, "Play to Payout" )
 	PORT_DIPSETTING(    0x00, "Direct Payout" )
-	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )	PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )   PORT_DIPLOCATION("SW1:3,2")
 	PORT_DIPSETTING(    0x00, "Manual - User Choice" )
 	PORT_DIPSETTING(    0x20, "Manual - Coins" )
 	PORT_DIPSETTING(    0x40, "Manual - Tickets" )
 	PORT_DIPSETTING(    0x60, "Automatic" )
-	PORT_DIPNAME( 0x80, 0x80, "Super Game Button" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Super Game Button" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "PAYOUT button" )
 	PORT_DIPSETTING(    0x80, "STOP 5 button" )
 INPUT_PORTS_END
@@ -593,25 +593,25 @@ static INPUT_PORTS_START( apple10 )
 	PORT_INCLUDE( snookr10 )
 
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )				PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )                PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, "100" )
 	PORT_DIPSETTING(    0x02, "200" )
 	PORT_DIPSETTING(    0x01, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
-	PORT_DIPNAME( 0x10, 0x10, "Super Game Settings" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Super Game Settings" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, "Play to Payout" )
 	PORT_DIPSETTING(    0x00, "Direct Payout" )
-	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )	PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )   PORT_DIPLOCATION("SW1:3,2")
 	PORT_DIPSETTING(    0x00, "Manual - Coins 1" )
 	PORT_DIPSETTING(    0x20, "Manual - Coins 2" )
 	PORT_DIPSETTING(    0x40, "Disable Payment/Game" )
 	PORT_DIPSETTING(    0x60, "Automatic" )
-	PORT_DIPNAME( 0x80, 0x80, "Super Game Button" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Super Game Button" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "PAYOUT button" )
 	PORT_DIPSETTING(    0x80, "STOP 5 button" )
 INPUT_PORTS_END
@@ -622,35 +622,35 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tenballs )
 	PORT_INCLUDE( snookr10 )
 
-    /* tenballs seems a prototype, most DIP
-       switches seems to do nothing at all.
-    */
+	/* tenballs seems a prototype, most DIP
+	   switches seems to do nothing at all.
+	*/
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )        PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, "100" )
 	PORT_DIPSETTING(    0x02, "200" )
 	PORT_DIPSETTING(    0x01, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
-    /* coinage is always 1 coin - 10 credits */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	/* coinage is always 1 coin - 10 credits */
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    /* always play Super Game to payout */
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	/* always play Super Game to payout */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    /* always manual payout */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
+	/* always manual payout */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    /* Super Game always ON */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	/* Super Game always ON */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -687,14 +687,14 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( snookr10, snookr10_state )
 
-    /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
 	MCFG_CPU_PROGRAM_MAP(snookr10_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snookr10_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-    /* video hardware */
+	/* video hardware */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -709,7 +709,7 @@ static MACHINE_CONFIG_START( snookr10, snookr10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)	/* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
 MACHINE_CONFIG_END
@@ -719,7 +719,7 @@ static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(snookr10_state,apple10)
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state,apple10)
 
@@ -746,10 +746,10 @@ ROM_START( snookr10 )
 	ROM_LOAD( "2.u22", 0x0000, 0x8000, CRC(a70d9c48) SHA1(3fa90190323526553866662afda4dbe1c94abeff) )
 	ROM_LOAD( "3.u25", 0x8000, 0x8000, CRC(3009faaa) SHA1(d1cda455b270cb9afa65b9701735a3a1f2a48df2) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "4.u18", 0x00000, 0x40000 , CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
 
-    /* this should be changed because the palette is stored in a normal ROM instead of a color PROM */
+	/* this should be changed because the palette is stored in a normal ROM instead of a color PROM */
 	ROM_REGION( 0x8000, "proms", 0 )
 	ROM_LOAD( "5.u27", 0x0000, 0x8000, CRC(f3d7d640) SHA1(f78060f4603e316fa3c2ec4ba6d7edf261cf6d8a) )
 ROM_END
@@ -762,10 +762,10 @@ ROM_START( apple10 )
 	ROM_LOAD( "2.u22", 0x0000, 0x8000, CRC(42b016f4) SHA1(59d1b77f8cb706a3878813111c6a71514c413784) )
 	ROM_LOAD( "3.u25", 0x8000, 0x8000, CRC(afc535dc) SHA1(ed2d65f3154c6d80b7b22bfef1f30232e4496128) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "4.u18", 0x00000, 0x40000 , CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
 
-    /* this should be changed because the palette is stored in a normal ROM instead of a color PROM */
+	/* this should be changed because the palette is stored in a normal ROM instead of a color PROM */
 	ROM_REGION( 0x8000, "proms", 0 )
 	ROM_LOAD( "5.u27", 0x0000, 0x8000, CRC(3510d705) SHA1(2190c8199d29bf89e3007eb771cc6b0e2b58f6cd) )
 ROM_END
@@ -778,7 +778,7 @@ ROM_START( tenballs )
 	ROM_LOAD( "3.u16", 0x0000, 0x8000, CRC(9eb88a08) SHA1(ab52924103e2b14c598a21c3d77b053da37a0212) )
 	ROM_LOAD( "2.u15", 0x8000, 0x8000, CRC(a5091583) SHA1(c0775d9b77cb634d3702b6c08cdf73c867b6169a) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "1.u28", 0x00000, 0x40000 , CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )

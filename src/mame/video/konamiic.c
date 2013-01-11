@@ -1233,7 +1233,7 @@ void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, i
 	int gfx_index;
 	UINT32 total;
 
-	static const gfx_layout spritelayout =	/* System GX sprite layout */
+	static const gfx_layout spritelayout =  /* System GX sprite layout */
 	{
 		16,16,
 		0,
@@ -1241,10 +1241,10 @@ void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, i
 		{ 32, 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 46, 47 },
 		{ 0, 10*8, 10*8*2, 10*8*3, 10*8*4, 10*8*5, 10*8*6, 10*8*7, 10*8*8,
-		  10*8*9, 10*8*10, 10*8*11, 10*8*12, 10*8*13, 10*8*14, 10*8*15 },
+			10*8*9, 10*8*10, 10*8*11, 10*8*12, 10*8*13, 10*8*14, 10*8*15 },
 		16*16*5
 	};
-	static const gfx_layout spritelayout2 =	/* Run and Gun sprite layout */
+	static const gfx_layout spritelayout2 = /* Run and Gun sprite layout */
 	{
 		16,16,
 		0,
@@ -1254,7 +1254,7 @@ void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, i
 		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
 		16*16*4
 	};
-	static const gfx_layout spritelayout3 =	/* Lethal Enforcers II sprite layout */
+	static const gfx_layout spritelayout3 = /* Lethal Enforcers II sprite layout */
 	{
 		16,16,
 		0,
@@ -1262,10 +1262,10 @@ void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, i
 		{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
 		{  0,1,2,3,4,5,6,7,64+0,64+1,64+2,64+3,64+4,64+5,64+6,64+7 },
 		{ 128*0, 128*1, 128*2,  128*3,  128*4,  128*5,  128*6,  128*7,
-		  128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
+			128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
 		128*16
 	};
-	static const gfx_layout spritelayout4 =	/* System GX 6bpp sprite layout */
+	static const gfx_layout spritelayout4 = /* System GX 6bpp sprite layout */
 	{
 		16,16,
 		0,
@@ -1273,7 +1273,7 @@ void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, i
 		{ 40, 32, 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7, 48, 49, 50, 51, 52, 53, 54, 55 },
 		{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7, 12*8*8,
-		  12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
+			12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 		16*16*6
 	};
 	UINT8 *s1, *s2, *d;
@@ -1300,7 +1300,7 @@ void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, i
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
 		s1 = machine.root_device().memregion(gfx_memory_region)->base(); // 4bpp area
-		s2 = s1 + (size4);	 // 1bpp area
+		s2 = s1 + (size4);   // 1bpp area
 		for (i = 0; i < size4; i+= 4)
 		{
 			*d++ = *s1++;
@@ -1398,33 +1398,33 @@ WRITE32_HANDLER( K053247_long_w )
 // write the address to the 246 as usual, but there's a completely separate ROM
 // window that works without needing an OBJCHA line.
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
-READ16_HANDLER( K055673_rom_word_r )	// 5bpp
+READ16_HANDLER( K055673_rom_word_r )    // 5bpp
 {
 	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(K053247_memory_region)->base();
 	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(K053247_memory_region)->base();
 	int size4 = (space.machine().root_device().memregion(K053247_memory_region)->bytes()/(1024*1024))/5;
 	int romofs;
 
-	size4 *= 4*1024*1024;	// get offset to 5th bit
+	size4 *= 4*1024*1024;   // get offset to 5th bit
 	ROM8 += size4;
 
 	romofs = K053246_regs[6]<<16 | K053246_regs[7]<<8 | K053246_regs[4];
 
 	switch (offset)
 	{
-		case 0:	// 20k / 36u
+		case 0: // 20k / 36u
 			return ROM[romofs+2];
-		case 1:	// 17k / 36y
+		case 1: // 17k / 36y
 			return ROM[romofs+3];
 		case 2: // 10k / 32y
 		case 3:
 			romofs /= 2;
 			return ROM8[romofs+1];
-		case 4:	// 22k / 34u
+		case 4: // 22k / 34u
 			return ROM[romofs];
-		case 5:	// 19k / 34y
+		case 5: // 19k / 34y
 			return ROM[romofs+1];
-		case 6:	// 12k / 29y
+		case 6: // 12k / 29y
 		case 7:
 			romofs /= 2;
 			return ROM8[romofs];
@@ -1443,8 +1443,8 @@ READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 
 	romofs = K053246_regs[6]<<16 | K053246_regs[7]<<8 | K053246_regs[4];
 
-	romofs /= 4;	// romofs increments 4 at a time
-	romofs *= 12/2;	// each increment of romofs = 12 new bytes (6 new words)
+	romofs /= 4;    // romofs increments 4 at a time
+	romofs *= 12/2; // each increment of romofs = 12 new bytes (6 new words)
 
 	switch (offset)
 	{
@@ -1536,7 +1536,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind
 		// it's difficult to know what the output SHOULD be.  (hold W in Racin' Force
 		// to see the chip output)
 
-		if (((ctrl[0x07] & 0x0002) && ctrl[0x09]) && (glfgreat_hack))	/* wrong, but fixes glfgreat */
+		if (((ctrl[0x07] & 0x0002) && ctrl[0x09]) && (glfgreat_hack))   /* wrong, but fixes glfgreat */
 		{
 			my_clip.min_x = ctrl[0x08] + K053936_offset[chip][0]+2;
 			my_clip.max_x = ctrl[0x09] + K053936_offset[chip][0]+2 - 1;
@@ -1587,7 +1587,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind
 			y++;
 		}
 	}
-	else	/* "simple" mode */
+	else    /* "simple" mode */
 	{
 		UINT32 startx,starty;
 		int incxx,incxy,incyx,incyy;
@@ -1737,15 +1737,15 @@ WRITE16_HANDLER( K054000_lsb_w )
 static tilemap_t *K056832_tilemap[K056832_PAGE_COUNT];
 static bitmap_ind16 *K056832_pixmap[K056832_PAGE_COUNT];
 
-static UINT16 K056832_regs[0x20];	// 157/832 regs group 1
-static UINT16 K056832_regsb[4];	// 157/832 regs group 2, board dependent
+static UINT16 K056832_regs[0x20];   // 157/832 regs group 1
+static UINT16 K056832_regsb[4]; // 157/832 regs group 2, board dependent
 
-static UINT8 *K056832_rombase;	// pointer to tile gfx data
+static UINT8 *K056832_rombase;  // pointer to tile gfx data
 static UINT16 *K056832_videoram;
-static int K056832_NumGfxBanks;		// depends on size of graphics ROMs
-static int K056832_CurGfxBank;		// cached info for K056832_regs[0x1a]
-static int K056832_gfxnum;			// graphics element index for unpacked tiles
-static const char *K056832_memory_region;	// memory region for tile gfx data
+static int K056832_NumGfxBanks;     // depends on size of graphics ROMs
+static int K056832_CurGfxBank;      // cached info for K056832_regs[0x1a]
+static int K056832_gfxnum;          // graphics element index for unpacked tiles
+static const char *K056832_memory_region;   // memory region for tile gfx data
 static int K056832_bpp;
 
 // ROM readback involves reading 2 halves of a word
@@ -1757,12 +1757,12 @@ static int K056832_rom_half;
 static int K056832_LayerAssociatedWithPage[K056832_PAGE_COUNT];
 static int K056832_LayerOffset[8][2];
 static int K056832_LSRAMPage[8][2];
-static INT32 K056832_X[8];	// 0..3 left
-static INT32 K056832_Y[8];	// 0..3 top
-static INT32 K056832_W[8];	// 0..3 width  -> 1..4 pages
-static INT32 K056832_H[8];	// 0..3 height -> 1..4 pages
-static INT32 K056832_dx[8];	// scroll
-static INT32 K056832_dy[8];	// scroll
+static INT32 K056832_X[8];  // 0..3 left
+static INT32 K056832_Y[8];  // 0..3 top
+static INT32 K056832_W[8];  // 0..3 width  -> 1..4 pages
+static INT32 K056832_H[8];  // 0..3 height -> 1..4 pages
+static INT32 K056832_dx[8]; // scroll
+static INT32 K056832_dy[8]; // scroll
 static UINT32 K056832_LineDirty[K056832_PAGE_COUNT][8];
 static UINT8 K056832_AllLinesDirty[K056832_PAGE_COUNT];
 static UINT8 K056832_PageTileMode[K056832_PAGE_COUNT];
@@ -1892,7 +1892,7 @@ INLINE void K056832_get_tile_info( running_machine &machine, tile_data &tileinfo
 	if (K056832_LayerAssociation)
 	{
 		layer = K056832_LayerAssociatedWithPage[pageIndex];
-		if (layer == -1) layer = 0;	// use layer 0's palette info for unmapped pages
+		if (layer == -1) layer = 0; // use layer 0's palette info for unmapped pages
 	}
 	else
 		layer = K056832_ActiveLayer;
@@ -1938,11 +1938,11 @@ static TILE_GET_INFO( K056832_get_tile_infof ) { K056832_get_tile_info(machine,t
 static void K056832_change_rambank(void)
 {
 	/* ------xx page col
-     * ---xx--- page row
-     */
+	 * ---xx--- page row
+	 */
 	int bank = K056832_regs[0x19];
 
-	if (K056832_regs[0] & 0x02)	// external linescroll enable
+	if (K056832_regs[0] & 0x02) // external linescroll enable
 	{
 		K056832_SelectedPage = K056832_PAGE_COUNT;
 	}
@@ -1960,7 +1960,7 @@ static void K056832_change_rombank(void)
 {
 	int bank;
 
-	if (K056832_uses_tile_banks)	/* Asterix */
+	if (K056832_uses_tile_banks)    /* Asterix */
 	{
 		bank = (K056832_regs[0x1a] >> 8) | (K056832_regs[0x1b] << 4) | (K056832_cur_tile_bank << 6);
 	}
@@ -2443,10 +2443,10 @@ WRITE16_HANDLER( K056832_word_w )
 		switch(offset)
 		{
 			/* -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
-             * --x- ---- screen flip y
-             * ---x ---- screen flip x
-             * ---- --x- external linescroll RAM page enable
-             */
+			 * --x- ---- screen flip y
+			 * ---x ---- screen flip x
+			 * ---- --x- external linescroll RAM page enable
+			 */
 			case 0x00/2:
 				if ((new_data & 0x30) != (old_data & 0x30))
 				{
@@ -2466,8 +2466,8 @@ WRITE16_HANDLER( K056832_word_w )
 			break;
 
 			/* -------- -----xxx external irqlines enable (not used by GX)
-             * -------- xx------ tilemap attribute config (FBIT0 and FBIT1)
-             */
+			 * -------- xx------ tilemap attribute config (FBIT0 and FBIT1)
+			 */
 			//case 0x06/2: break;
 
 			// -------- ----DCBA tile mode: 0=512x1, 1=8x8
@@ -2486,14 +2486,14 @@ WRITE16_HANDLER( K056832_word_w )
 			break;
 
 			/* -------- ------xx layer A linescroll config
-             * -------- ----xx-- layer B linescroll config
-             * -------- --xx---- layer C linescroll config
-             * -------- xx------ layer D linescroll config
-             *
-             * 0: linescroll
-             * 2: rowscroll
-             * 3: xy scroll
-             */
+			 * -------- ----xx-- layer B linescroll config
+			 * -------- --xx---- layer C linescroll config
+			 * -------- xx------ layer D linescroll config
+			 *
+			 * 0: linescroll
+			 * 2: rowscroll
+			 * 3: xy scroll
+			 */
 			//case 0x0a/2: break;
 
 			case 0x32/2:
@@ -2592,17 +2592,17 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
-			memset (&zerorect, 0, sizeof(rectangle));	// zero dimension
-			tmap->draw(bitmap, zerorect, 0, 0);	// dummy call to reset tile_dirty_map
-			xprmap.fill(0);						// reset pixel transparency_bitmap;
-			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
+			memset (&zerorect, 0, sizeof(rectangle));   // zero dimension
+			tmap->draw(bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
+			xprmap.fill(0);                     // reset pixel transparency_bitmap;
+			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
 		}
 		else
 		{
 			if (!(dirty[0]|dirty[1]|dirty[2]|dirty[3]|dirty[4]|dirty[5]|dirty[6]|dirty[7])) return(0);
 		}
 
-#if 0	/* this code is broken.. really broken .. gijoe uses it for some line/column scroll style effects (lift level of attract mode)
+#if 0   /* this code is broken.. really broken .. gijoe uses it for some line/column scroll style effects (lift level of attract mode)
             we REALLY shouldn't be writing directly back into the pixmap, surely this should
             be done when rendering instead
 
@@ -2619,7 +2619,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 			UINT16 *dst_ptr;
 			UINT16 pen, basepen;
 			int count, src_pitch, src_modulo;
-			int	dst_pitch;
+			int dst_pitch;
 			int line;
 			gfx_element *src_gfx;
 			int offs, mask;
@@ -2779,8 +2779,8 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	last_active = K056832_ActiveLayer;
 	new_colorbase = (K056832_UpdateMode) ? K055555_get_palette_index(layer) : 0;
 
-  for (r=0; r<rowspan; r++)
-  {
+	for (r=0; r<rowspan; r++)
+	{
 	if (rowspan > 1)
 	{
 		sy = ay;
@@ -2846,11 +2846,11 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 			sdat_start = dy;
 		else
 			/*
-                doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
-                LE2U (naturally Y-flipped) seems to expect this condition as an override.
+			    doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
+			    LE2U (naturally Y-flipped) seems to expect this condition as an override.
 
-                sdat_start = K056832_PAGE_HEIGHT-1 -dy;
-            */
+			    sdat_start = K056832_PAGE_HEIGHT-1 -dy;
+			*/
 			sdat_start = K056832_PAGE_HEIGHT-1;
 
 		if (scrollmode == 2) { sdat_start &= ~7; line_starty -= dy & 7; }
@@ -2969,7 +2969,7 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 
 		} // end of line loop
 	} // end of column loop
-  } // end of row loop
+	} // end of row loop
 
 	K056832_ActiveLayer = last_active;
 
@@ -3278,7 +3278,7 @@ int K054338_set_alpha_level(int pblend)
 	if (!(mixset & 0x20))
 	{
 		mixlv = mixlv<<3 | mixlv>>2;
-    }
+	}
 	else
 	{
 		if (!mixpri)
@@ -3325,9 +3325,3 @@ WRITE16_HANDLER( K053252_word_w )
 {
 	COMBINE_DATA(K053252_regs + offset);
 }
-
-
-
-
-
-

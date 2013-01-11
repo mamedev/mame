@@ -10,7 +10,7 @@
 
 
 class pv1000_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -31,7 +31,7 @@ const device_type PV1000 = &device_creator<pv1000_sound_device>;
 
 pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -80,18 +80,18 @@ public:
 	DECLARE_WRITE8_MEMBER(pv1000_io_w);
 	DECLARE_READ8_MEMBER(pv1000_io_r);
 	DECLARE_WRITE8_MEMBER(pv1000_gfxram_w);
-	UINT8	m_io_regs[8];
-	UINT8	m_fd_data;
+	UINT8   m_io_regs[8];
+	UINT8   m_fd_data;
 	struct
 	{
-		UINT32	count;
-		UINT16	period;
-		UINT8	val;
-	}		m_voice[4];
+		UINT32  count;
+		UINT16  period;
+		UINT8   val;
+	}       m_voice[4];
 
-	sound_stream	*m_sh_channel;
-	emu_timer		*m_irq_on_timer;
-	emu_timer		*m_irq_off_timer;
+	sound_stream    *m_sh_channel;
+	emu_timer       *m_irq_on_timer;
+	emu_timer       *m_irq_off_timer;
 	UINT8 m_pcg_bank;
 	UINT8 m_force_pattern;
 	UINT8 m_fd_buffer_flag;
@@ -149,7 +149,7 @@ WRITE8_MEMBER( pv1000_state::pv1000_io_w )
 	case 0x05:
 		m_fd_data = 0xf;
 		break;
-//	case 0x06 VRAM + PCG location, always fixed at 0xb8xx
+//  case 0x06 VRAM + PCG location, always fixed at 0xb8xx
 	case 0x07:
 		/* ---- -xxx unknown, border color? */
 		m_pcg_bank = (data & 0x20) >> 5;
@@ -333,8 +333,8 @@ static STREAM_UPDATE( pv1000_sound_update )
 
 			if (state->m_voice[i].count >= per)
 			{
-			   state->m_voice[i].count = 0;
-			   state->m_voice[i].val = !state->m_voice[i].val;
+				state->m_voice[i].count = 0;
+				state->m_voice[i].val = !state->m_voice[i].val;
 			}
 		}
 
@@ -400,7 +400,7 @@ void pv1000_state::machine_reset()
 
 static const gfx_layout pv1000_3bpp_gfx =
 {
-	8, 8,			/* 8x8 characters */
+	8, 8,           /* 8x8 characters */
 	RGN_FRAC(1,1),
 	3,
 	{ 0, 8*8, 16*8 },

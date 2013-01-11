@@ -243,7 +243,7 @@ static WRITE16_HANDLER( kof99_bankswitch_w )
 		0x42e800, 0x52e800, 0x431800, 0x531800,
 		0x54d000, 0x551000, 0x567000, 0x592800,
 		0x588800, 0x581800, 0x599800, 0x594800,
-		0x598000,	/* rest not used? */
+		0x598000,   /* rest not used? */
 	};
 
 	/* unscramble bank number */
@@ -343,19 +343,19 @@ static WRITE16_HANDLER( mslug3_bankswitch_w )
 	int bankaddress;
 	static const int bankoffset[64] =
 	{
-	  0x000000, 0x020000, 0x040000, 0x060000, // 00
-	  0x070000, 0x090000, 0x0b0000, 0x0d0000, // 04
-	  0x0e0000, 0x0f0000, 0x120000, 0x130000, // 08
-	  0x140000, 0x150000, 0x180000, 0x190000, // 12
-	  0x1a0000, 0x1b0000, 0x1e0000, 0x1f0000, // 16
-	  0x200000, 0x210000, 0x240000, 0x250000, // 20
-	  0x260000, 0x270000, 0x2a0000, 0x2b0000, // 24
-	  0x2c0000, 0x2d0000, 0x300000, 0x310000, // 28
-	  0x320000, 0x330000, 0x360000, 0x370000, // 32
-	  0x380000, 0x390000, 0x3c0000, 0x3d0000, // 36
-	  0x400000, 0x410000, 0x440000, 0x450000, // 40
-	  0x460000, 0x470000, 0x4a0000, 0x4b0000, // 44
-	  0x4c0000, /* rest not used? */
+		0x000000, 0x020000, 0x040000, 0x060000, // 00
+		0x070000, 0x090000, 0x0b0000, 0x0d0000, // 04
+		0x0e0000, 0x0f0000, 0x120000, 0x130000, // 08
+		0x140000, 0x150000, 0x180000, 0x190000, // 12
+		0x1a0000, 0x1b0000, 0x1e0000, 0x1f0000, // 16
+		0x200000, 0x210000, 0x240000, 0x250000, // 20
+		0x260000, 0x270000, 0x2a0000, 0x2b0000, // 24
+		0x2c0000, 0x2d0000, 0x300000, 0x310000, // 28
+		0x320000, 0x330000, 0x360000, 0x370000, // 32
+		0x380000, 0x390000, 0x3c0000, 0x3d0000, // 36
+		0x400000, 0x410000, 0x440000, 0x450000, // 40
+		0x460000, 0x470000, 0x4a0000, 0x4b0000, // 44
+		0x4c0000, /* rest not used? */
 	};
 
 	/* unscramble bank number */
@@ -420,13 +420,13 @@ static READ16_HANDLER( sma_random_r )
 	UINT16 old = state->m_neogeo_rng;
 
 	UINT16 newbit = ((state->m_neogeo_rng >> 2) ^
-					 (state->m_neogeo_rng >> 3) ^
-					 (state->m_neogeo_rng >> 5) ^
-					 (state->m_neogeo_rng >> 6) ^
-					 (state->m_neogeo_rng >> 7) ^
-					 (state->m_neogeo_rng >>11) ^
-					 (state->m_neogeo_rng >>12) ^
-					 (state->m_neogeo_rng >>15)) & 1;
+						(state->m_neogeo_rng >> 3) ^
+						(state->m_neogeo_rng >> 5) ^
+						(state->m_neogeo_rng >> 6) ^
+						(state->m_neogeo_rng >> 7) ^
+						(state->m_neogeo_rng >>11) ^
+						(state->m_neogeo_rng >>12) ^
+						(state->m_neogeo_rng >>15)) & 1;
 
 	state->m_neogeo_rng = (state->m_neogeo_rng << 1) | newbit;
 

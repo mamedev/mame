@@ -19,8 +19,8 @@
  *
  *************************************/
 
-#define MAC_CLK				XTAL_10MHz
-#define VTXROM_FMT(x)		(((x) << 14) | ((x) & (1 << 15) ? 0xc0000000 : 0))
+#define MAC_CLK             XTAL_10MHz
+#define VTXROM_FMT(x)       (((x) << 14) | ((x) & (1 << 15) ? 0xc0000000 : 0))
 
 
 /*************************************
@@ -321,9 +321,9 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 				INT64 acc;
 				micro3d_vtx v1;
 
-				v1.x = VTXROM_FMT(rom[vtx_addr]);	vtx_addr++;
-				v1.y = VTXROM_FMT(rom[vtx_addr]);	vtx_addr++;
-				v1.z = VTXROM_FMT(rom[vtx_addr]);	vtx_addr++;
+				v1.x = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
+				v1.y = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
+				v1.z = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
 
 				acc  = normalised_multiply(mac_sram[mrab11 + 0x7f0], v1.x);
 				acc += normalised_multiply(mac_sram[mrab11 + 0x7f1], v1.y);
@@ -360,9 +360,9 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 				INT64 acc;
 				micro3d_vtx v1;
 
-				v1.x = VTXROM_FMT(rom[vtx_addr]);	vtx_addr++;
-				v1.y = VTXROM_FMT(rom[vtx_addr]);	vtx_addr++;
-				v1.z = VTXROM_FMT(rom[vtx_addr]);	vtx_addr++;
+				v1.x = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
+				v1.y = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
+				v1.z = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
 
 				acc  = normalised_multiply(mac_sram[mrab11 + 0x7f0], v1.x);
 				acc += normalised_multiply(mac_sram[mrab11 + 0x7f1], v1.y);
@@ -611,12 +611,12 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 	m_duart68681 = machine().device("duart68681");
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
-    non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
+	non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
 	space.write_dword(0x00470000, 0xa5a5a5a5);
 
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
-    overwrites memory in use by the Am29000. Slowing down the 68000 slightly
-    avoids this */
+	overwrites memory in use by the Am29000. Slowing down the 68000 slightly
+	avoids this */
 	machine().device("maincpu")->set_clock_scale(0.945f);
 }
 

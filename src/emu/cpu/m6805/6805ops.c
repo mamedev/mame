@@ -897,7 +897,7 @@ OP_HANDLER( txa )
 /* $a0 SUBA immediate ?*** */
 OP_HANDLER( suba_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -908,7 +908,7 @@ OP_HANDLER( suba_im )
 /* $a1 CMPA immediate ?*** */
 OP_HANDLER( cmpa_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -918,7 +918,7 @@ OP_HANDLER( cmpa_im )
 /* $a2 SBCA immediate ?*** */
 OP_HANDLER( sbca_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = A - t - (CC & 0x01);
 	CLR_NZC;
@@ -929,7 +929,7 @@ OP_HANDLER( sbca_im )
 /* $a3 CPX immediate -*** */
 OP_HANDLER( cpx_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = X - t;
 	CLR_NZC;
@@ -1034,7 +1034,7 @@ OP_HANDLER( ldx_im )
 /* $b0 SUBA direct ?*** */
 OP_HANDLER( suba_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1045,7 +1045,7 @@ OP_HANDLER( suba_di )
 /* $b1 CMPA direct ?*** */
 OP_HANDLER( cmpa_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1055,7 +1055,7 @@ OP_HANDLER( cmpa_di )
 /* $b2 SBCA direct ?*** */
 OP_HANDLER( sbca_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t - (CC & 0x01);
 	CLR_NZC;
@@ -1066,7 +1066,7 @@ OP_HANDLER( sbca_di )
 /* $b3 CPX direct -*** */
 OP_HANDLER( cpx_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = X - t;
 	CLR_NZC;
@@ -1189,7 +1189,7 @@ OP_HANDLER( stx_di )
 /* $c0 SUBA extended ?*** */
 OP_HANDLER( suba_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1200,7 +1200,7 @@ OP_HANDLER( suba_ex )
 /* $c1 CMPA extended ?*** */
 OP_HANDLER( cmpa_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1210,7 +1210,7 @@ OP_HANDLER( cmpa_ex )
 /* $c2 SBCA extended ?*** */
 OP_HANDLER( sbca_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t - (CC & 0x01);
 	CLR_NZC;
@@ -1221,7 +1221,7 @@ OP_HANDLER( sbca_ex )
 /* $c3 CPX extended -*** */
 OP_HANDLER( cpx_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = X - t;
 	CLR_NZC;
@@ -1344,7 +1344,7 @@ OP_HANDLER( stx_ex )
 /* $d0 SUBA indexed, 2 byte offset ?*** */
 OP_HANDLER( suba_ix2 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX2BYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1355,7 +1355,7 @@ OP_HANDLER( suba_ix2 )
 /* $d1 CMPA indexed, 2 byte offset ?*** */
 OP_HANDLER( cmpa_ix2 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX2BYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1365,7 +1365,7 @@ OP_HANDLER( cmpa_ix2 )
 /* $d2 SBCA indexed, 2 byte offset ?*** */
 OP_HANDLER( sbca_ix2 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX2BYTE(t);
 	r = A - t - (CC & 0x01);
 	CLR_NZC;
@@ -1376,7 +1376,7 @@ OP_HANDLER( sbca_ix2 )
 /* $d3 CPX indexed, 2 byte offset -*** */
 OP_HANDLER( cpx_ix2 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX2BYTE(t);
 	r = X - t;
 	CLR_NZC;
@@ -1499,7 +1499,7 @@ OP_HANDLER( stx_ix2 )
 /* $e0 SUBA indexed, 1 byte offset ?*** */
 OP_HANDLER( suba_ix1 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX1BYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1510,7 +1510,7 @@ OP_HANDLER( suba_ix1 )
 /* $e1 CMPA indexed, 1 byte offset ?*** */
 OP_HANDLER( cmpa_ix1 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX1BYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1520,7 +1520,7 @@ OP_HANDLER( cmpa_ix1 )
 /* $e2 SBCA indexed, 1 byte offset ?*** */
 OP_HANDLER( sbca_ix1 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX1BYTE(t);
 	r = A - t - (CC & 0x01);
 	CLR_NZC;
@@ -1531,7 +1531,7 @@ OP_HANDLER( sbca_ix1 )
 /* $e3 CPX indexed, 1 byte offset -*** */
 OP_HANDLER( cpx_ix1 )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDX1BYTE(t);
 	r = X - t;
 	CLR_NZC;
@@ -1654,7 +1654,7 @@ OP_HANDLER( stx_ix1 )
 /* $f0 SUBA indexed ?*** */
 OP_HANDLER( suba_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1665,7 +1665,7 @@ OP_HANDLER( suba_ix )
 /* $f1 CMPA indexed ?*** */
 OP_HANDLER( cmpa_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = A - t;
 	CLR_NZC;
@@ -1675,7 +1675,7 @@ OP_HANDLER( cmpa_ix )
 /* $f2 SBCA indexed ?*** */
 OP_HANDLER( sbca_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = A - t - (CC & 0x01);
 	CLR_NZC;
@@ -1686,7 +1686,7 @@ OP_HANDLER( sbca_ix )
 /* $f3 CPX indexed -*** */
 OP_HANDLER( cpx_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = X - t;
 	CLR_NZC;

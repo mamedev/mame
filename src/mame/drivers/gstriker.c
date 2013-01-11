@@ -245,7 +245,7 @@ static const gfx_layout gs_16x16x4_layout =
 	},
 
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	 8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64
+		8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64
 	},
 	16*64
 };
@@ -342,7 +342,7 @@ static INPUT_PORTS_START( gstriker_generic )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )				// "Test"
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )             // "Test"
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN) // vbl?
@@ -356,7 +356,7 @@ static INPUT_PORTS_START( gstriker_generic )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	// "Spare"
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)   // "Spare"
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 
 	PORT_START("P2")
@@ -367,7 +367,7 @@ static INPUT_PORTS_START( gstriker_generic )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	// "Spare"
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)   // "Spare"
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 INPUT_PORTS_END
 
@@ -385,16 +385,16 @@ static INPUT_PORTS_START( gstriker )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0010, 0x0000, "2 Players VS CPU Game" )		// "Cooperation Coin"
+	PORT_DIPNAME( 0x0010, 0x0000, "2 Players VS CPU Game" )     // "Cooperation Coin"
 	PORT_DIPSETTING(      0x0010, "1 Credit" )
 	PORT_DIPSETTING(      0x0000, "2 Credits" )
-	PORT_DIPNAME( 0x0020, 0x0000, "Player VS Player Game" )		// "Competitive Coin"
+	PORT_DIPNAME( 0x0020, 0x0000, "Player VS Player Game" )     // "Competitive Coin"
 	PORT_DIPSETTING(      0x0020, "1 Credit" )
 	PORT_DIPSETTING(      0x0000, "2 Credits" )
-	PORT_DIPNAME( 0x0040, 0x0040, "New Challenger" )			/* unknown purpose */
+	PORT_DIPNAME( 0x0040, 0x0040, "New Challenger" )            /* unknown purpose */
 	PORT_DIPSETTING(      0x0040, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Maximum Players" )			// "Cabinet Type"
+	PORT_DIPNAME( 0x0080, 0x0080, "Maximum Players" )           // "Cabinet Type"
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0080, "2" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
@@ -403,23 +403,23 @@ static INPUT_PORTS_START( gstriker )
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x0006, 0x0006, "Player(s) VS CPU Time" )		// "Tournament  Time"
+	PORT_DIPNAME( 0x0006, 0x0006, "Player(s) VS CPU Time" )     // "Tournament  Time"
 	PORT_DIPSETTING(      0x0006, "1:30" )
 	PORT_DIPSETTING(      0x0004, "2:00" )
 	PORT_DIPSETTING(      0x0002, "3:00" )
 	PORT_DIPSETTING(      0x0000, "4:00" )
-	PORT_DIPNAME( 0x0018, 0x0018, "Player VS Player Time" )		// "Competitive Time"
+	PORT_DIPNAME( 0x0018, 0x0018, "Player VS Player Time" )     // "Competitive Time"
 	PORT_DIPSETTING(      0x0018, "2:00" )
 	PORT_DIPSETTING(      0x0010, "3:00" )
 	PORT_DIPSETTING(      0x0008, "4:00" )
 	PORT_DIPSETTING(      0x0000, "5:00" )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) )		// "Demo Sound"
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) )      // "Demo Sound"
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Communication Mode" )			// "Master/Slave"
+	PORT_DIPNAME( 0x0040, 0x0040, "Communication Mode" )            // "Master/Slave"
 	PORT_DIPSETTING(      0x0040, "Master" )
 	PORT_DIPSETTING(      0x0000, "Slave" )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )					// "Self Test Mode"
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )                   // "Self Test Mode"
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 INPUT_PORTS_END
 
@@ -528,7 +528,7 @@ static INPUT_PORTS_START( vgoalsoc )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "DWS2:6" )		// hangs at POST
+	PORT_DIPNAME( 0x0040, 0x0040, "DWS2:6" )        // hangs at POST
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Start credit" )
@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_CPU_PROGRAM_MAP(gstriker_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( vgoal, gstriker_state )
 	MCFG_CPU_PROGRAM_MAP(vgoal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -691,7 +691,7 @@ ROM_START( gstrikera )
 	ROM_REGION( 0x100000, "ymsnd", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
-      /* PALs were protected on this version, used the ones from the "gstriker" set */
+		/* PALs were protected on this version, used the ones from the "gstriker" set */
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16l8.s201a.u52",   0x0000, 0x0104, CRC(724faf0f) SHA1(755fad09d188af58efce733a9f1256b1abc7c360) )
 	ROM_LOAD( "pal16l8.s202a.u74",   0x0200, 0x0104, CRC(ad5c4722) SHA1(0aad71b73c6674e15596b7de59160a5156a4118d) )
@@ -864,45 +864,45 @@ WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 					case 0x53: PC(0x0000a4c); break; // boot -> main loop
 
 					/*
-                        68 and 62 could be sprite or sound changes, or ?
-                        68(),61()
-                        if( !carry )
-                        {
-                            68(),65()
-                        }
-                        else
-                        {
-                            62(),72()
-                        }
-                    */
+					    68 and 62 could be sprite or sound changes, or ?
+					    68(),61()
+					    if( !carry )
+					    {
+					        68(),65()
+					    }
+					    else
+					    {
+					        62(),72()
+					    }
+					*/
 					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
 					case 0x61: PC(0x0003AF4); break; // after time up, pk shootout???
 					case 0x65: PC(0x0003F26); break;
 
 					// 62->72
-					case 0x62: PC(NULL_SUB); break;	// after lose shootout, continue ???
+					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
 					case 0x72: PC(0x000409E); break; // game over
 
 					/*
-                        Attract mode is pre programmed loop called from main
-                        that runs through top11->demoplay
-                        (NOTE: sprites for demo play are being drawn at 0x141000,
-                        this address is used in a few places, and there's some activity
-                        further up around 0x1410b0.)
+					    Attract mode is pre programmed loop called from main
+					    that runs through top11->demoplay
+					    (NOTE: sprites for demo play are being drawn at 0x141000,
+					    this address is used in a few places, and there's some activity
+					    further up around 0x1410b0.)
 
-                        The loop begins with three prot calls:
-                        one always present (may be diversion to 0x0010DC8 unreachable code
-                        and prot cases 6a,79,6f) and two alternating calls.
-                        The loop is 6e -> [6b|69] -> top11 -> (4 segment)playdemo
+					    The loop begins with three prot calls:
+					    one always present (may be diversion to 0x0010DC8 unreachable code
+					    and prot cases 6a,79,6f) and two alternating calls.
+					    The loop is 6e -> [6b|69] -> top11 -> (4 segment)playdemo
 
-                        These are the likely suspects for attract mode:
-                        0x0010E28 red tecmo on black
-                        0x0010EEC bouncing ball and player with game title
-                        0x00117A2 single segment demo play with player sprites at 0x140000
-                        0x001120A sliding display of player photos
-                        0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
+					    These are the likely suspects for attract mode:
+					    0x0010E28 red tecmo on black
+					    0x0010EEC bouncing ball and player with game title
+					    0x00117A2 single segment demo play with player sprites at 0x140000
+					    0x001120A sliding display of player photos
+					    0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
 
-                    */
+					*/
 					case 0x6e: PC(0x0010E28); break; // loop
 					case 0x6b: PC(0x0010EEC); break; // attract even
 					case 0x69: PC(0x001120A); break; // attract odd
@@ -999,7 +999,7 @@ WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 	gstriker_state *state = machine().driver_data<gstriker_state>();
 	if( COUNTER1_ENABLE == 1 )
 	{
-		TICK_1 = (TICK_1 - 1) & 0xff;	// 8bit
+		TICK_1 = (TICK_1 - 1) & 0xff;   // 8bit
 		if( TICK_1 <= 0 )
 		{
 			TICK_1 = TICKCOUNT_1;

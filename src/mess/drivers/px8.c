@@ -34,16 +34,16 @@
     CONSTANTS
 ***************************************************************************/
 
-#define XTAL_CR1		XTAL_9_8304MHz
-#define XTAL_CR2		XTAL_32_768kHz
+#define XTAL_CR1        XTAL_9_8304MHz
+#define XTAL_CR2        XTAL_32_768kHz
 
 /* interrupt sources */
-#define INT0_7508		0x01
-#define INT1_SERIAL		0x02
-#define INT2_RS232		0x04
-#define INT3_BARCODE	0x08
-#define INT4_FRC		0x10
-#define INT5_OPTION		0x20
+#define INT0_7508       0x01
+#define INT1_SERIAL     0x02
+#define INT2_RS232      0x04
+#define INT3_BARCODE    0x08
+#define INT4_FRC        0x10
+#define INT5_OPTION     0x20
 
 enum
 {
@@ -121,137 +121,137 @@ READ8_MEMBER( px8_state::gah40m_r )
 	case GAH40M_ICRL_C:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       ICR0
-            1       ICR1
-            2       ICR2
-            3       ICR3
-            4       ICR4
-            5       ICR5
-            6       ICR6
-            7       ICR7
+		    0       ICR0
+		    1       ICR1
+		    2       ICR2
+		    3       ICR3
+		    4       ICR4
+		    5       ICR5
+		    6       ICR6
+		    7       ICR7
 
-        */
+		*/
 		break;
 
 	case GAH40M_ICRH_C:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       ICR8
-            1       ICR9
-            2       ICR10
-            3       ICR11
-            4       ICR12
-            5       ICR13
-            6       ICR14
-            7       ICR15
+		    0       ICR8
+		    1       ICR9
+		    2       ICR10
+		    3       ICR11
+		    4       ICR12
+		    5       ICR13
+		    6       ICR14
+		    7       ICR15
 
-        */
+		*/
 		break;
 
 	case GAH40M_ICRL_B:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       ICR0
-            1       ICR1
-            2       ICR2
-            3       ICR3
-            4       ICR4
-            5       ICR5
-            6       ICR6
-            7       ICR7
+		    0       ICR0
+		    1       ICR1
+		    2       ICR2
+		    3       ICR3
+		    4       ICR4
+		    5       ICR5
+		    6       ICR6
+		    7       ICR7
 
-        */
+		*/
 		break;
 
 	case GAH40M_ICRH_B:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       ICR8
-            1       ICR9
-            2       ICR10
-            3       ICR11
-            4       ICR12
-            5       ICR13
-            6       ICR14
-            7       ICR15
+		    0       ICR8
+		    1       ICR9
+		    2       ICR10
+		    3       ICR11
+		    4       ICR12
+		    5       ICR13
+		    6       ICR14
+		    7       ICR15
 
-        */
+		*/
 		break;
 
 	case GAH40M_ISR:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       INT0        7508 interrupt (INT 7508)
-            1       INT1        82C51 interrupt (INT 82C51)
-            2       INT2        6303 interrupt (INT 6303)
-            3       INT3        input capture flag timer (CF)
-            4       INT4        overflow flag timer (OVF)
-            5       INT5        external interrupt (INTEXT)
-            6
-            7
+		    0       INT0        7508 interrupt (INT 7508)
+		    1       INT1        82C51 interrupt (INT 82C51)
+		    2       INT2        6303 interrupt (INT 6303)
+		    3       INT3        input capture flag timer (CF)
+		    4       INT4        overflow flag timer (OVF)
+		    5       INT5        external interrupt (INTEXT)
+		    6
+		    7
 
-        */
+		*/
 		break;
 
 	case GAH40M_STR:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       _BANK0
-            1       BRDT        barcode reader data timer
-            2       RDY         ready (SIO)
-            3       RDYSIO      SIO ready (SIO)
-            4
-            5
-            6
-            7
+		    0       _BANK0
+		    1       BRDT        barcode reader data timer
+		    2       RDY         ready (SIO)
+		    3       RDYSIO      SIO ready (SIO)
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 		break;
 
 	case GAH40M_SIOR:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       SIO0
-            1       SIO1
-            2       SIO2
-            3       SIO3
-            4       SIO4
-            5       SIO5
-            6       SIO6
-            7       SIO7
+		    0       SIO0
+		    1       SIO1
+		    2       SIO2
+		    3       SIO3
+		    4       SIO4
+		    5       SIO5
+		    6       SIO6
+		    7       SIO7
 
-        */
+		*/
 		break;
 
 	case GAH40M_IVR:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       0
-            1       vect 1
-            2       vect 2
-            3       vect 3
-            4       1
-            5       1
-            6       1
-            7       1
+		    0       0
+		    1       vect 1
+		    2       vect 2
+		    3       vect 3
+		    4       1
+		    5       1
+		    6       1
+		    7       1
 
-        */
+		*/
 		break;
 	}
 
@@ -269,18 +269,18 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 	case GAH40M_CTLR1:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       _BANK0      bank switching
-            1       BCK0        barcode mode select 0 timer (down)
-            2       BCK1        barcode mode select 1 timer (up)
-            3       SWBCD       barcode reader switch timer
-            4       BRG0        bad rate generator select 0 timer
-            5       BRG1        bad rate generator select 1 timer
-            6       BRG2        bad rate generator select 2 timer
-            7       BRG3        bad rate generator select 3 timer
+		    0       _BANK0      bank switching
+		    1       BCK0        barcode mode select 0 timer (down)
+		    2       BCK1        barcode mode select 1 timer (up)
+		    3       SWBCD       barcode reader switch timer
+		    4       BRG0        bad rate generator select 0 timer
+		    5       BRG1        bad rate generator select 1 timer
+		    6       BRG2        bad rate generator select 2 timer
+		    7       BRG3        bad rate generator select 3 timer
 
-        */
+		*/
 
 		m_bank0 = BIT(data, 0);
 		bankswitch();
@@ -289,35 +289,35 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 	case GAH40M_CMDR:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       set RDYSIOFF (pulse)
-            1       reset RDYSIOFF (pulse)
-            2       reset OVF (pulse)
-            3
-            4
-            5
-            6
-            7
+		    0       set RDYSIOFF (pulse)
+		    1       reset RDYSIOFF (pulse)
+		    2       reset OVF (pulse)
+		    3
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 		break;
 
 	case GAH40M_CTLR2:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       LED0        LED
-            1       LED1        LED
-            2       LED2        LED
-            3       SWRS        RS-232C switch
-            4       INHRS       inhibit RS-232C
-            5       AUX         external auxiliary output
-            6
-            7
+		    0       LED0        LED
+		    1       LED1        LED
+		    2       LED2        LED
+		    3       SWRS        RS-232C switch
+		    4       INHRS       inhibit RS-232C
+		    5       AUX         external auxiliary output
+		    6
+		    7
 
-        */
+		*/
 
 		output_set_value("led_0", BIT(data, 0));
 		output_set_value("led_1", BIT(data, 1));
@@ -327,18 +327,18 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 	case GAH40M_IER:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       IER0        INT 7508 enable
-            1       IER1        INT 82C51 enable
-            2       IER2        INT 6303 enable
-            3       IER3        INTICF enable
-            4       IER4        INTOVF enable
-            5       IER5        INTEXT enable
-            6
-            7
+		    0       IER0        INT 7508 enable
+		    1       IER1        INT 82C51 enable
+		    2       IER2        INT 6303 enable
+		    3       IER3        INTICF enable
+		    4       IER4        INTOVF enable
+		    5       IER5        INTEXT enable
+		    6
+		    7
 
-        */
+		*/
 
 		m_ier = data;
 		break;
@@ -346,18 +346,18 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 	case GAH40M_SIOR:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       SIO0
-            1       SIO1
-            2       SIO2
-            3       SIO3
-            4       SIO4
-            5       SIO5
-            6       SIO6
-            7       SIO7
+		    0       SIO0
+		    1       SIO1
+		    2       SIO2
+		    3       SIO3
+		    4       SIO4
+		    5       SIO5
+		    6       SIO6
+		    7       SIO7
 
-        */
+		*/
 
 		m_sio = data;
 		break;
@@ -405,18 +405,18 @@ WRITE8_MEMBER( px8_state::gah40s_w )
 	case 1: /* command register */
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       SW PR       PROM power switch
-            1       SW MCT      microcassette power switch
-            2       MTA         microcassette drive motor control signal A
-            3       MTB         microcassette drive motor control signal B
-            4       MTC         microcassette drive motor control signal C
-            5
-            6       _FAST
-            7       _STOP CNT
+		    0       SW PR       PROM power switch
+		    1       SW MCT      microcassette power switch
+		    2       MTA         microcassette drive motor control signal A
+		    3       MTB         microcassette drive motor control signal B
+		    4       MTC         microcassette drive motor control signal C
+		    5
+		    6       _FAST
+		    7       _STOP CNT
 
-        */
+		*/
 
 		m_swpr = BIT(data, 0);
 		break;
@@ -688,8 +688,8 @@ INPUT_PORTS_END
 
 void px8_state::palette_init()
 {
-    palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
-    palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
+	palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
+	palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
 }
 
 /*-------------------------------------------------
@@ -707,15 +707,15 @@ UINT32 px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 static const gfx_layout px8_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 /*-------------------------------------------------
@@ -797,13 +797,13 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_CPU_PROGRAM_MAP(px8_mem)
 	MCFG_CPU_IO_MAP(px8_io)
 
-    /* slave cpu (HD6303) */
+	/* slave cpu (HD6303) */
 	MCFG_CPU_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
 	MCFG_CPU_PROGRAM_MAP(px8_slave_mem)
 	MCFG_CPU_IO_MAP(px8_slave_io)
 	MCFG_DEVICE_DISABLE()
 
-    /* sub CPU (uPD7508) */
+	/* sub CPU (uPD7508) */
 //  MCFG_CPU_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
 //  MCFG_CPU_IO_MAP(px8_sub_io)
 //  MCFG_DEVICE_DISABLE()
@@ -872,4 +872,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,	0,		0,		px8,	px8, driver_device,	0,		"Epson",	"PX-8",		GAME_NOT_WORKING )
+COMP( 1984, px8,    0,      0,      px8,    px8, driver_device, 0,      "Epson",    "PX-8",     GAME_NOT_WORKING )

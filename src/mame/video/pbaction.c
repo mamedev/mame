@@ -116,7 +116,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[(spriteram[offs] & 0x80) ? 3 : 2],	/* normal or double size */
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[(spriteram[offs] & 0x80) ? 3 : 2], /* normal or double size */
 				spriteram[offs],
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,

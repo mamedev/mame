@@ -113,9 +113,9 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	DEVCB_NULL,
 	RES_K(2.2), /* R7 */
-	RES_K(1),	/* R5 */
+	RES_K(1),   /* R5 */
 	RES_K(4.7), /* R6 */
-	RES_K(4.7)	/* R4 */
+	RES_K(4.7)  /* R4 */
 };
 
 /* CDP1802 Interface */
@@ -179,18 +179,18 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     keyboard row 0
-        PA1     keyboard row 1
-        PA2     keyboard row 2
-        PA3     keyboard row 3
-        PA4     keyboard column 0
-        PA5     keyboard column 1
-        PA6     keyboard column 2
-        PA7     keyboard column 3
+	    PA0     keyboard row 0
+	    PA1     keyboard row 1
+	    PA2     keyboard row 2
+	    PA3     keyboard row 3
+	    PA4     keyboard column 0
+	    PA5     keyboard column 1
+	    PA6     keyboard column 2
+	    PA7     keyboard column 3
 
-    */
+	*/
 
 	UINT8 data = 0xf0;
 
@@ -206,36 +206,36 @@ WRITE8_MEMBER( eti660_state::pia_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     keyboard row 0
-        PA1     keyboard row 1
-        PA2     keyboard row 2
-        PA3     keyboard row 3
-        PA4     keyboard column 0
-        PA5     keyboard column 1
-        PA6     keyboard column 2
-        PA7     keyboard column 3
+	    PA0     keyboard row 0
+	    PA1     keyboard row 1
+	    PA2     keyboard row 2
+	    PA3     keyboard row 3
+	    PA4     keyboard column 0
+	    PA5     keyboard column 1
+	    PA6     keyboard column 2
+	    PA7     keyboard column 3
 
-    */
+	*/
 
 	m_keylatch = data & 0x0f;
 }
 
 static const pia6821_interface eti660_mc6821_intf =
 {
-	DEVCB_DRIVER_MEMBER(eti660_state, pia_pa_r),								/* port A input */
-	DEVCB_NULL,													/* port B input */
-	DEVCB_NULL,													/* CA1 input */
-	DEVCB_NULL,													/* CB1 input */
-	DEVCB_NULL,													/* CA2 input */
-	DEVCB_NULL,													/* CB2 input */
-	DEVCB_DRIVER_MEMBER(eti660_state, pia_pa_w),								/* port A output */
-	DEVCB_NULL,													/* port B output */
-	DEVCB_NULL,													/* CA2 output */
-	DEVCB_NULL,													/* CB2 output */
-	DEVCB_NULL,													/* IRQA output */
-	DEVCB_NULL													/* IRQB output */
+	DEVCB_DRIVER_MEMBER(eti660_state, pia_pa_r),                                /* port A input */
+	DEVCB_NULL,                                                 /* port B input */
+	DEVCB_NULL,                                                 /* CA1 input */
+	DEVCB_NULL,                                                 /* CB1 input */
+	DEVCB_NULL,                                                 /* CA2 input */
+	DEVCB_NULL,                                                 /* CB2 input */
+	DEVCB_DRIVER_MEMBER(eti660_state, pia_pa_w),                                /* port A output */
+	DEVCB_NULL,                                                 /* port B output */
+	DEVCB_NULL,                                                 /* CA2 output */
+	DEVCB_NULL,                                                 /* CB2 output */
+	DEVCB_NULL,                                                 /* IRQA output */
+	DEVCB_NULL                                                  /* IRQB output */
 };
 
 /* Machine Drivers */
@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 	MCFG_CPU_IO_MAP(eti660_io_map)
 	MCFG_CPU_CONFIG(eti660_config)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_8_867238MHz/5)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
@@ -282,4 +282,4 @@ ROM_START( eti660 )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                             FULLNAME                FLAGS */
-COMP( 1981, eti660,		0,		0,		eti660,		eti660, driver_device,		0,			"Electronics Today International",	"ETI-660 (Australia)",	GAME_NOT_WORKING )
+COMP( 1981, eti660,     0,      0,      eti660,     eti660, driver_device,      0,          "Electronics Today International",  "ETI-660 (Australia)",  GAME_NOT_WORKING )

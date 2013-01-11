@@ -113,9 +113,9 @@ static void k053252_res_change( device_t *device )
 	if(k053252->screen != NULL)
 	{
 		if(k053252->hc && k053252->vc &&
-		   k053252->hbp && k053252->hfp &&
-		   k053252->vbp && k053252->vfp &&
-		   k053252->hsw && k053252->vsw) //safety checks
+			k053252->hbp && k053252->hfp &&
+			k053252->vbp && k053252->vfp &&
+			k053252->hsw && k053252->vsw) //safety checks
 		{
 			rectangle visarea;
 			//(HC+1) - HFP - HBP - 8*(HSW+1)
@@ -265,6 +265,3 @@ void k053252_device::device_reset()
 {
 	DEVICE_RESET_NAME( k053252 )(this);
 }
-
-
-

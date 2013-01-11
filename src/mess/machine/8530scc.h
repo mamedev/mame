@@ -9,8 +9,8 @@
 #ifndef __8530SCC_H__
 #define __8530SCC_H__
 
-#define MCFG_SCC8530_ADD(_tag, _clock, _intrq_cb)	\
-	MCFG_DEVICE_ADD(_tag, SCC8530, _clock)	\
+#define MCFG_SCC8530_ADD(_tag, _clock, _intrq_cb)   \
+	MCFG_DEVICE_ADD(_tag, SCC8530, _clock)  \
 	downcast<scc8530_t *>(device)->set_intrq_cb(_intrq_cb);
 
 class scc8530_t : public device_t

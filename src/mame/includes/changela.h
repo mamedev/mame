@@ -21,7 +21,7 @@ public:
 	bitmap_ind16 m_tree1_bitmap;
 	UINT8*   m_tree_ram;
 	UINT8*   m_memory_devices;
-	UINT32   m_mem_dev_selected;	/* an offset within memory_devices area */
+	UINT32   m_mem_dev_selected;    /* an offset within memory_devices area */
 	UINT32   m_slopeROM_bank;
 	UINT8    m_tree_en;
 	UINT8    m_horizon;

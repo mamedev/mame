@@ -352,41 +352,41 @@ MACHINE_START_MEMBER(scorpion_state,scorpion)
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	96,                 /* 96 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static const gfx_layout quorum_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	160,					/* 160 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	160,                    /* 160 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static const gfx_layout profi_8_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	224,					/* 224 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	224,                    /* 224 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( scorpion )
@@ -511,8 +511,8 @@ ROM_START( kay1024 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1994, scorpio,  spec128,	 0,	scorpion,	spec_plus, driver_device,	0,		"Zonov and Co.",		"Scorpion ZS-256", GAME_NOT_WORKING )
-COMP( 1991, profi,    spec128,	 0,	profi,  	spec_plus, driver_device,	0,		"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
-COMP( 1998, kay1024,  spec128,	 0,	scorpion,	spec_plus, driver_device,	0,		"NEMO",		"Kay 1024", GAME_NOT_WORKING )
-COMP( 19??, quorum,   spec128,	 0,	quorum, 	spec_plus, driver_device,	0,		"<unknown>",		"Quorum", GAME_NOT_WORKING )
-COMP( 19??, bestzx,   spec128,	 0,	scorpion,	spec_plus, driver_device,	0,		"<unknown>",		"BestZX", GAME_NOT_WORKING )
+COMP( 1994, scorpio,  spec128,   0, scorpion,   spec_plus, driver_device,   0,      "Zonov and Co.",        "Scorpion ZS-256", GAME_NOT_WORKING )
+COMP( 1991, profi,    spec128,   0, profi,      spec_plus, driver_device,   0,      "Kondor and Kramis",        "Profi", GAME_NOT_WORKING )
+COMP( 1998, kay1024,  spec128,   0, scorpion,   spec_plus, driver_device,   0,      "NEMO",     "Kay 1024", GAME_NOT_WORKING )
+COMP( 19??, quorum,   spec128,   0, quorum,     spec_plus, driver_device,   0,      "<unknown>",        "Quorum", GAME_NOT_WORKING )
+COMP( 19??, bestzx,   spec128,   0, scorpion,   spec_plus, driver_device,   0,      "<unknown>",        "BestZX", GAME_NOT_WORKING )

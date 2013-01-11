@@ -5,10 +5,10 @@
 
 /* vis. flags */
 
-#define DISPLAY_SPR		1
-#define DISPLAY_FG		2 /* 2 or 8 */
-#define DISPLAY_BG		4
-#define DISPLAY_TXT		16
+#define DISPLAY_SPR     1
+#define DISPLAY_FG      2 /* 2 or 8 */
+#define DISPLAY_BG      4
+#define DISPLAY_TXT     16
 
 
 TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
@@ -22,9 +22,9 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 
 	SET_TILE_INFO_MEMBER(
 		1,
-        code,
-        pal,
-        0);
+		code,
+		pal,
+		0);
 }
 
 TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
@@ -43,9 +43,9 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 
 	SET_TILE_INFO_MEMBER(
 		1,
-        code,
-        pal,
-        0);
+		code,
+		pal,
+		0);
 }
 
 TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
@@ -63,9 +63,9 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 	SET_TILE_INFO_MEMBER(
 		0,
-        code,
-        pal,
-        0);
+		code,
+		pal,
+		0);
 }
 
 void darkmist_state::palette_init()

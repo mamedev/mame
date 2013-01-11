@@ -30,90 +30,90 @@ static UINT8 used[0xFFFF];
 UINT32 numberUsed = 0;
 #else
 struct {
-    int count;
-    int value;
+	int count;
+	int value;
 } Jr_PacManTable[] = {
-    { 0x00C1, 0x00 },
-    { 0x0002, 0x80 },
-    { 0x0004, 0x00 },
-    { 0x0006, 0x80 },
-    { 0x0003, 0x00 },
-    { 0x0002, 0x80 },
-    { 0x0009, 0x00 },
-    { 0x0004, 0x80 },
-    { 0x9968, 0x00 },
-    { 0x0001, 0x80 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x80 },
-    { 0x0009, 0x00 },
-    { 0x0002, 0x80 },
-    { 0x0009, 0x00 },
-    { 0x0001, 0x80 },
-    { 0x00AF, 0x00 },
-    { 0x000E, 0x04 },
-    { 0x0002, 0x00 },
-    { 0x0004, 0x04 },
-    { 0x001E, 0x00 },
-    { 0x0001, 0x80 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x80 },
-    { 0x0002, 0x00 },
-    { 0x0002, 0x80 },
-    { 0x0009, 0x00 },
-    { 0x0002, 0x80 },
-    { 0x0009, 0x00 },
-    { 0x0002, 0x80 },
-    { 0x0083, 0x00 },
-    { 0x0001, 0x04 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x00 },
-    { 0x0002, 0x05 },
-    { 0x0001, 0x00 },
-    { 0x0003, 0x04 },
-    { 0x0003, 0x01 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x04 },
-    { 0x0003, 0x01 },
-    { 0x0003, 0x00 },
-    { 0x0003, 0x04 },
-    { 0x0001, 0x01 },
-    { 0x002E, 0x00 },
-    { 0x0078, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0001, 0x05 },
-    { 0x0001, 0x00 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0001, 0x05 },
-    { 0x0001, 0x00 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0002, 0x00 },
-    { 0x0001, 0x01 },
-    { 0x0001, 0x04 },
-    { 0x0001, 0x05 },
-    { 0x0001, 0x00 },
-    { 0x01B0, 0x01 },
-    { 0x0001, 0x00 },
-    { 0x0002, 0x01 },
-    { 0x00AD, 0x00 },
-    { 0x0031, 0x01 },
-    { 0x005C, 0x00 },
-    { 0x0005, 0x01 },
-    { 0x604E, 0x00 },
-    { 0,0 }
+	{ 0x00C1, 0x00 },
+	{ 0x0002, 0x80 },
+	{ 0x0004, 0x00 },
+	{ 0x0006, 0x80 },
+	{ 0x0003, 0x00 },
+	{ 0x0002, 0x80 },
+	{ 0x0009, 0x00 },
+	{ 0x0004, 0x80 },
+	{ 0x9968, 0x00 },
+	{ 0x0001, 0x80 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x80 },
+	{ 0x0009, 0x00 },
+	{ 0x0002, 0x80 },
+	{ 0x0009, 0x00 },
+	{ 0x0001, 0x80 },
+	{ 0x00AF, 0x00 },
+	{ 0x000E, 0x04 },
+	{ 0x0002, 0x00 },
+	{ 0x0004, 0x04 },
+	{ 0x001E, 0x00 },
+	{ 0x0001, 0x80 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x80 },
+	{ 0x0002, 0x00 },
+	{ 0x0002, 0x80 },
+	{ 0x0009, 0x00 },
+	{ 0x0002, 0x80 },
+	{ 0x0009, 0x00 },
+	{ 0x0002, 0x80 },
+	{ 0x0083, 0x00 },
+	{ 0x0001, 0x04 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x00 },
+	{ 0x0002, 0x05 },
+	{ 0x0001, 0x00 },
+	{ 0x0003, 0x04 },
+	{ 0x0003, 0x01 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x04 },
+	{ 0x0003, 0x01 },
+	{ 0x0003, 0x00 },
+	{ 0x0003, 0x04 },
+	{ 0x0001, 0x01 },
+	{ 0x002E, 0x00 },
+	{ 0x0078, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0001, 0x05 },
+	{ 0x0001, 0x00 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0001, 0x05 },
+	{ 0x0001, 0x00 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0002, 0x00 },
+	{ 0x0001, 0x01 },
+	{ 0x0001, 0x04 },
+	{ 0x0001, 0x05 },
+	{ 0x0001, 0x00 },
+	{ 0x01B0, 0x01 },
+	{ 0x0001, 0x00 },
+	{ 0x0002, 0x01 },
+	{ 0x00AD, 0x00 },
+	{ 0x0031, 0x01 },
+	{ 0x005C, 0x00 },
+	{ 0x0005, 0x01 },
+	{ 0x604E, 0x00 },
+	{ 0,0 }
 };
 #endif
 
@@ -203,27 +203,27 @@ int jrpacman_romdecode(int offset)
 
 	/* Pal 8C (16L8) */
 	int pcbe =  !(addressBus >= 0x0000 && addressBus <= 0x3fff ||
-				  addressBus >= 0x8000 && addressBus <=
+					addressBus >= 0x8000 && addressBus <=
 0xdfff);
 
 	int sop0 =  !(addressBus >= 0x0000 && addressBus <= 0x001f ||
-				  addressBus >= 0x00e0 && addressBus <=
+					addressBus >= 0x00e0 && addressBus <=
 0x00ff ||
-				  addressBus >= 0x9a60 && addressBus <=
+					addressBus >= 0x9a60 && addressBus <=
 0x9a7f ||
-				  addressBus >= 0x9ac0 && addressBus <=
+					addressBus >= 0x9ac0 && addressBus <=
 0x9adf ||
-				  addressBus >= 0x9b60 && addressBus <=
+					addressBus >= 0x9b60 && addressBus <=
 0x9b7f ||
-				  addressBus >= 0x9be0 && addressBus <=
+					addressBus >= 0x9be0 && addressBus <=
 0x9bff && m1);
 
-	int sop1 =	!(addressBus >= 0x9be0 && addressBus <= 0x9bff && m1 ||
-				  addressBus >= 0x9ca0 && addressBus <=
+	int sop1 =  !(addressBus >= 0x9be0 && addressBus <= 0x9bff && m1 ||
+					addressBus >= 0x9ca0 && addressBus <=
 0x9cbf);
 
-	int sop2 =	!(addressBus >= 0x00c0 && addressBus <= 0x00df ||
-				  addressBus >= 0x9a40 && addressBus <=
+	int sop2 =  !(addressBus >= 0x00c0 && addressBus <= 0x00df ||
+					addressBus >= 0x9a40 && addressBus <=
 0x9a5f);
 
 
@@ -233,20 +233,20 @@ int jrpacman_romdecode(int offset)
 	int md7  = ByteBit(RAM[addressBus],7);
 
 	int d0 =  !( s0 &&  s1 && !md0 ||
-			    !s0 &&  s1 &&  md0 ||
-			     s0 && !s1 && !md0 ||
-			    !s0 && !s1 && !md2);
+				!s0 &&  s1 &&  md0 ||
+					s0 && !s1 && !md0 ||
+				!s0 && !s1 && !md2);
 
 	int d2 =  !( s0 &&  s1 && !md2 ||
-			    !s0 &&  s1 && !md2 ||
-			     s0 && !s1 &&  md2 ||
-			    !s0 && !s1 && !md0);
+				!s0 &&  s1 && !md2 ||
+					s0 && !s1 &&  md2 ||
+				!s0 && !s1 && !md0);
 
 	int d7 =  !( s2 &&  s3  ||
-			    !s2 && !md7);
+				!s2 && !md7);
 
 	int pb1 = !( sop0 &&  s0 ||
-			    !sop0 && !s0);
+				!sop0 && !s0);
 
 	int ns0 =  ( sop1 &&  s0   ||
 				!sop1 && !s0   ||
@@ -254,14 +254,14 @@ int jrpacman_romdecode(int offset)
 
 	int ns1 =  ( sop1 &&  s1 && !pb1 ||
 				!sop1 &&  s1 && !pb1 ||
-				 sop1 &&  s1 &&  pb1 ||
+					sop1 &&  s1 &&  pb1 ||
 				!sop1 && !s1 &&  pb1 ||
 				!sop0 &&  sop1);
 
 	int ns2 =  ( sop0 &&  sop1 &&  s2 ||
-				 sop0 && !sop1 &&  s2 ||
+					sop0 && !sop1 &&  s2 ||
 				!sop0 && !sop1 &&  s2 ||
-				 sop0 && !sop2);
+					sop0 && !sop2);
 
 	int ns3 =  ( !md7 );
 
@@ -297,7 +297,7 @@ int jrpacman_romdecode(int offset)
 				printf("m1   sop0 sop1 sop2 pcbe  md7  md2 md0   d7   d2   d0    pb1   s0   s1   s2   s3    ns0  ns1  ns2  ns3\n");
 			last = TickCount();
 			printf("%-4d %-4d %-4d %-4d %-4d  %-4d %-4d %-4d %-4d %-4d %-4d  %-4d  %-4d %-4d %-4d %-4d  %-4d %-4d %-4d %-4d     ",
-			        m1,  sop0,sop1,sop2,pcbe, md7, md2, md0,
+					m1,  sop0,sop1,sop2,pcbe, md7, md2, md0,
 d7,  d2,  d0,   pb1,  s0,  s1,  s2,  s3,   ns0, ns1, ns2, ns3);
 			printf("%04x: %02x & %02x | %02x = %02x\n",addressBus,RAM[addressBus],~(1<<0) & ~(1<<2) & ~(1<<7), (d0) | (d2<<2) | (d7<<7),(RAM[addressBus] & ~(1<<0) & ~(1<<2) & ~(1<<7)) | (d0) | (d2<<2) | (d7<<7));
 			Z80_Trace = 1; /* stop it if it was running for a count */
@@ -412,7 +412,7 @@ WRITE8_HANDLER( jrpacman_interrupt_mask_w )
 
 ***************************************************************************/
 
-static int IntVector = 0xff;	/* Here we store the interrupt vector, if
+static int IntVector = 0xff;    /* Here we store the interrupt vector, if
 the code performs */
 						/* an OUT to port $0. Not
 all games do it: many use */
@@ -502,7 +502,7 @@ void CreateJrDecodeTable(byte *x, int length)
 	byte last = 0;
 	int count = 0;
 
-	printf(	"struct {\n"
+	printf( "struct {\n"
 			"    int count;\n"
 			"    int value;\n"
 			"} Jr_PacManTable[] = {\n");
@@ -522,7 +522,7 @@ first:
 	}
 
 	printf("    { 0x%04X, 0x%02X },\n",count,last);
-	printf(	"    { 0,0 }\n"
+	printf( "    { 0,0 }\n"
 			"};\n");
 }
 #endif

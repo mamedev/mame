@@ -8,15 +8,15 @@
 
 
 enum {
-	IMAGE_ADDR_LO,		//0xe000
-	IMAGE_ADDR_HI,		//0xe001
-	SCREEN_XPOS,		//0xe002
-	SCREEN_YPOS,		//0xe003
-	BLIT_WIDTH,			//0xe004
-	BLIT_HEIGHT,		//0xe005
-	GFX_PORT,			//0xe006
-	BARL_PORT,			//0xe007
-	BLIT_ATTRIBUTES		//0xe008
+	IMAGE_ADDR_LO,      //0xe000
+	IMAGE_ADDR_HI,      //0xe001
+	SCREEN_XPOS,        //0xe002
+	SCREEN_YPOS,        //0xe003
+	BLIT_WIDTH,         //0xe004
+	BLIT_HEIGHT,        //0xe005
+	GFX_PORT,           //0xe006
+	BARL_PORT,          //0xe007
+	BLIT_ATTRIBUTES     //0xe008
 };
 
 /***************************************************************************/
@@ -54,8 +54,8 @@ WRITE8_MEMBER(thief_state::thief_color_map_w){
 */
 	static const UINT8 intensity[4] = {0x00,0x55,0xAA,0xFF};
 	int r = intensity[(data & 0x03) >> 0];
-    int g = intensity[(data & 0x0C) >> 2];
-    int b = intensity[(data & 0x30) >> 4];
+	int g = intensity[(data & 0x0C) >> 2];
+	int b = intensity[(data & 0x30) >> 4];
 	palette_set_color( machine(),offset,MAKE_RGB(r,g,b) );
 }
 
@@ -169,7 +169,7 @@ WRITE8_MEMBER(thief_state::thief_blit_w){
 	UINT8 old_data;
 	int xor_blit = data;
 		/* making the xor behavior selectable fixes score display,
-        but causes minor glitches on the playfield */
+		but causes minor glitches on the playfield */
 
 	x -= width*8;
 	xoffset = x&7;

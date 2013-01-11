@@ -65,7 +65,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #include "sound/dac.h"
 #include "video/ramdac.h"
 
-#define	RLT_REFRESH_RATE   60
+#define RLT_REFRESH_RATE   60
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
 #define RLT_XTAL           XTAL_12MHz
 
@@ -95,8 +95,8 @@ static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16, rltennis_state )
 	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
 	AM_RANGE(0x740000, 0x740001) AM_WRITE(rlt_snd1_w)
 	AM_RANGE(0x760000, 0x760001) AM_WRITE(rlt_snd2_w)
-	AM_RANGE(0x780000, 0x780001) AM_WRITENOP	/* sound control, unknown, usually = 0x0044 */
-	AM_RANGE(0x7a0000, 0x7a0003) AM_READNOP 	/* unknown, read only at boot time*/
+	AM_RANGE(0x780000, 0x780001) AM_WRITENOP    /* sound control, unknown, usually = 0x0044 */
+	AM_RANGE(0x7a0000, 0x7a0003) AM_READNOP     /* unknown, read only at boot time*/
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(rlt_io_r)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
 ADDRESS_MAP_END

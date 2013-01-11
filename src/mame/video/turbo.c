@@ -12,13 +12,13 @@
 
 struct sprite_info
 {
-	UINT16	ve;					/* VE0-15 signals for this row */
-	UINT8	lst;				/* LST0-7 signals for this row */
-	UINT32	latched[8];			/* latched pixel data */
-	UINT8	plb[8];				/* latched PLB state */
-	UINT32	offset[8];			/* current offset for this row */
-	UINT32	frac[8];			/* leftover fraction */
-	UINT32	step[8];			/* stepping value */
+	UINT16  ve;                 /* VE0-15 signals for this row */
+	UINT8   lst;                /* LST0-7 signals for this row */
+	UINT32  latched[8];         /* latched pixel data */
+	UINT8   plb[8];             /* latched PLB state */
+	UINT32  offset[8];          /* current offset for this row */
+	UINT32  frac[8];            /* leftover fraction */
+	UINT32  step[8];            /* stepping value */
 };
 
 static const UINT32 sprite_expand[16] =
@@ -45,10 +45,10 @@ PALETTE_INIT_MEMBER(turbo_state,turbo)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[0], rweights, 470, 0,
-			3,	&resistances[0], gweights, 470, 0,
-			2,	&resistances[1], bweights, 470, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  &resistances[0], rweights, 470, 0,
+			3,  &resistances[0], gweights, 470, 0,
+			2,  &resistances[1], bweights, 470, 0);
 
 	/* initialize the palette with these colors */
 	for (i = 0; i < 256; i++)
@@ -84,10 +84,10 @@ PALETTE_INIT_MEMBER(turbo_state,subroc3d)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[0], rweights, 470, 0,
-			3,	&resistances[0], gweights, 470, 0,
-			2,	&resistances[1], bweights, 470, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  &resistances[0], rweights, 470, 0,
+			3,  &resistances[0], gweights, 470, 0,
+			2,  &resistances[1], bweights, 470, 0);
 
 	/* initialize the palette with these colors */
 	for (i = 0; i < 256; i++)
@@ -123,10 +123,10 @@ PALETTE_INIT_MEMBER(turbo_state,buckrog)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[1], rweights, 1000, 0,
-			3,	&resistances[1], gweights, 1000, 0,
-			4,	&resistances[0], bweights, 1000, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  &resistances[1], rweights, 1000, 0,
+			3,  &resistances[1], gweights, 1000, 0,
+			4,  &resistances[0], bweights, 1000, 0);
 
 	/* initialize the palette with these colors */
 	for (i = 0; i < 1024; i++)
@@ -260,8 +260,8 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
 	else
 	{
 		/* based on figure 6 of datasheet */
-		vco_freq = -0.9892942 * log10(cext)	- 0.0309697 * vco_cv * vco_cv
-		              +	0.344079975 * vco_cv - 4.086395841;
+		vco_freq = -0.9892942 * log10(cext) - 0.0309697 * vco_cv * vco_cv
+						+   0.344079975 * vco_cv - 4.086395841;
 		vco_freq = pow(10.0, vco_freq);
 	}
 
@@ -315,8 +315,8 @@ static void turbo_prepare_sprites(running_machine &machine, turbo_state *state, 
 			/* look up the low byte of the sum plus the yscale value in */
 			/* IC50/PR1119 to determine if we write back the sum of the */
 			/* offset and the rowbytes this scanline (p. 138) */
-			offs = (sum & 0xff) |			/* A0-A7 = AL0-AL7 */
-				   ((yscale & 0x08) << 5);	/* A8-A9 = /RO11-/RO12 */
+			offs = (sum & 0xff) |           /* A0-A7 = AL0-AL7 */
+					((yscale & 0x08) << 5); /* A8-A9 = /RO11-/RO12 */
 
 			/* one of the bits is selected based on the low 7 bits of yscale */
 			if (!((pr1119[offs] >> (yscale & 0x07)) & 1))
@@ -333,10 +333,10 @@ static void turbo_prepare_sprites(running_machine &machine, turbo_state *state, 
 			info->frac[level] = 0;
 
 			/*
-                actual pots read from one board:
-                    VR1 = 310 Ohm
-                    VR2 = 910 Ohm
-            */
+			    actual pots read from one board:
+			        VR1 = 310 Ohm
+			        VR2 = 910 Ohm
+			*/
 			info->step[level] = sprite_xscale(xscale, 1.0e3 * machine.root_device().ioport("VR1")->read() / 100.0, 1.0e3 * machine.root_device().ioport("VR2")->read() / 100.0, 100e-12);
 		}
 	}
@@ -453,18 +453,18 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 			/* the carry selects which inputs to use (p. 141) */
 			if (carry)
 			{
-				sel	 = m_turbo_ipb;
+				sel  = m_turbo_ipb;
 				coch = m_turbo_ipc >> 4;
 			}
 			else
 			{
-				sel	 = m_turbo_ipa;
+				sel  = m_turbo_ipa;
 				coch = m_turbo_ipc & 15;
 			}
 
 			/* look up AREA1 and AREA2 (p. 142) */
-			offs = va |							/*  A0- A7 = VA0-VA7 */
-				   ((sel & 0x0f) << 8);			/*  A8-A11 = SEL0-3 */
+			offs = va |                         /*  A0- A7 = VA0-VA7 */
+					((sel & 0x0f) << 8);            /*  A8-A11 = SEL0-3 */
 
 			areatmp = road_gfxdata[0x0000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
@@ -475,8 +475,8 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 			area |= areatmp << 1;
 
 			/* look up AREA3 and AREA4 (p. 142) */
-			offs = va |							/*  A0- A7 = VA0-VA7 */
-				   ((sel & 0xf0) << 4);			/*  A8-A11 = SEL4-7 */
+			offs = va |                         /*  A0- A7 = VA0-VA7 */
+					((sel & 0xf0) << 4);            /*  A8-A11 = SEL4-7 */
 
 			areatmp = road_gfxdata[0x2000 | offs];
 			areatmp = ((areatmp + xx) >> 8) & 0x01;
@@ -487,8 +487,8 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 			area |= areatmp << 3;
 
 			/* look up AREA5 (p. 141) */
-			offs = (xx >> 3) |							/*  A0- A4 = H3-H7 */
-				   ((m_turbo_opc & 0x3f) << 5);	/*  A5-A10 = OPC0-5 */
+			offs = (xx >> 3) |                          /*  A0- A4 = H3-H7 */
+					((m_turbo_opc & 0x3f) << 5);    /*  A5-A10 = OPC0-5 */
 
 			areatmp = road_gfxdata[0x4000 | offs];
 			areatmp = (areatmp << (xx & 7)) & 0x80;
@@ -503,8 +503,8 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 				road = 1;
 
 			/* also use the coch value to look up color info in IC13/PR1114 and IC21/PR1117 (p. 144) */
-			offs = (coch & 0x0f) |						/* A0-A3: CONT0-3 = COCH0-3 */
-				   ((m_turbo_fbcol & 0x01) << 4);	/*    A4: COL0 */
+			offs = (coch & 0x0f) |                      /* A0-A3: CONT0-3 = COCH0-3 */
+					((m_turbo_fbcol & 0x01) << 4);  /*    A4: COL0 */
 			bacol = pr1114[offs] | (pr1117[offs] << 8);
 
 			/* at this point, do the character lookup; due to the shift register loading in */
@@ -531,45 +531,45 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 				m_turbo_collision |= pr1116[((sprbits >> 24) & 7) | (slipar_acciar >> 1)];
 
 				/* look up the sprite priority in IC11/PR1122 (p. 144) */
-				priority = ((sprbits & 0xfe000000) >> 25) |		/* A0-A6: PLB1-7 */
-						   ((m_turbo_fbpla & 0x07) << 7);	/* A7-A9: PLA0-2 */
+				priority = ((sprbits & 0xfe000000) >> 25) |     /* A0-A6: PLB1-7 */
+							((m_turbo_fbpla & 0x07) << 7);  /* A7-A9: PLA0-2 */
 				priority = pr1122[priority];
 
 				/* use that to look up the overall priority in IC12/PR1123 (p. 144) */
-				mx = (priority & 7) |						/* A0-A2: PR-1122 output, bits 0-2 */
-					 ((sprbits & 0x01000000) >> 21) |		/*    A3: PLB0 */
-					 ((foreraw & 0x80) >> 3) |				/*    A4: PLBE */
-					 ((forebits & 0x08) << 2) | 			/*    A5: PLBF */
-					 ((babit & 0x07) << 6) |				/* A6-A8: BABIT1-3 */
-					 ((m_turbo_fbpla & 0x08) << 6);	/*    A9: PLA3 */
+				mx = (priority & 7) |                       /* A0-A2: PR-1122 output, bits 0-2 */
+						((sprbits & 0x01000000) >> 21) |        /*    A3: PLB0 */
+						((foreraw & 0x80) >> 3) |               /*    A4: PLBE */
+						((forebits & 0x08) << 2) |          /*    A5: PLBF */
+						((babit & 0x07) << 6) |             /* A6-A8: BABIT1-3 */
+						((m_turbo_fbpla & 0x08) << 6);  /*    A9: PLA3 */
 				mx = pr1123[mx];
 
 				/* the MX output selects one of 16 inputs; build up a 16-bit pattern to match */
 				/* these in red, green, and blue (p. 144) */
-				red = ((sprbits & 0x0000ff) >> 0) |		/*  D0- D7: CDR0-CDR7 */
-					  ((forebits & 0x01) << 8) |		/*      D8: CDRF */
-					  ((bacol & 0x001f) << 9) |			/*  D9-D13: BAR0-BAR4 */
-					  (1 << 14) |						/*     D14: 1 */
-					  (0 << 15);						/*     D15: 0 */
+				red = ((sprbits & 0x0000ff) >> 0) |     /*  D0- D7: CDR0-CDR7 */
+						((forebits & 0x01) << 8) |      /*      D8: CDRF */
+						((bacol & 0x001f) << 9) |           /*  D9-D13: BAR0-BAR4 */
+						(1 << 14) |                     /*     D14: 1 */
+						(0 << 15);                      /*     D15: 0 */
 
-				grn = ((sprbits & 0x00ff00) >> 8) |		/*  D0- D7: CDG0-CDG7 */
-					  ((forebits & 0x02) << 7) |		/*      D8: CDGF */
-					  ((bacol & 0x03e0) << 4) |			/*  D9-D13: BAG0-BAG4 */
-					  (1 << 14) |						/*     D14: 1 */
-					  (0 << 15);						/*     D15: 0 */
+				grn = ((sprbits & 0x00ff00) >> 8) |     /*  D0- D7: CDG0-CDG7 */
+						((forebits & 0x02) << 7) |      /*      D8: CDGF */
+						((bacol & 0x03e0) << 4) |           /*  D9-D13: BAG0-BAG4 */
+						(1 << 14) |                     /*     D14: 1 */
+						(0 << 15);                      /*     D15: 0 */
 
-				blu = ((sprbits & 0xff0000) >> 16) |	/*  D0- D7: CDB0-CDB7 */
-					  ((forebits & 0x04) << 6) |		/*      D8: CDBF */
-					  ((bacol & 0x7c00) >> 1) |			/*  D9-D13: BAB0-BAB4 */
-					  (1 << 14) |						/*     D14: 1 */
-					  (0 << 15);						/*     D15: 0 */
+				blu = ((sprbits & 0xff0000) >> 16) |    /*  D0- D7: CDB0-CDB7 */
+						((forebits & 0x04) << 6) |      /*      D8: CDBF */
+						((bacol & 0x7c00) >> 1) |           /*  D9-D13: BAB0-BAB4 */
+						(1 << 14) |                     /*     D14: 1 */
+						(0 << 15);                      /*     D15: 0 */
 
 				/* we then go through a muxer to select one of the 16 outputs computed above (p. 144) */
-				offs = mx |								/* A0-A3: MX0-MX3 */
-					   (((~red >> mx) & 1) << 4) |		/*    A4: CDR */
-					   (((~grn >> mx) & 1) << 5) |		/*    A5: CDG */
-					   (((~blu >> mx) & 1) << 6) |		/*    A6: CDB */
-					   ((m_turbo_fbcol & 6) << 6);	/* A7-A8: COL1-2 */
+				offs = mx |                             /* A0-A3: MX0-MX3 */
+						(((~red >> mx) & 1) << 4) |     /*    A4: CDR */
+						(((~grn >> mx) & 1) << 5) |     /*    A5: CDG */
+						(((~blu >> mx) & 1) << 6) |     /*    A6: CDB */
+						((m_turbo_fbcol & 6) << 6); /* A7-A8: COL1-2 */
 				dest[x + ix] = pr1121[offs];
 			}
 		}
@@ -672,8 +672,8 @@ static void subroc3d_prepare_sprites(running_machine &machine, turbo_state *stat
 			/* look up the low byte of the sum plus the yscale value in */
 			/* IC50/PR1119 to determine if we write back the sum of the */
 			/* offset and the rowbytes this scanline (p. 138) */
-			offs = (sum & 0xff) |			/* A0-A7 = AL0-AL7 */
-				   ((yscale & 0x08) << 5);	/* A8-A9 = /RO11-/RO12 */
+			offs = (sum & 0xff) |           /* A0-A7 = AL0-AL7 */
+					((yscale & 0x08) << 5); /* A8-A9 = /RO11-/RO12 */
 
 			/* one of the bits is selected based on the low 7 bits of yscale */
 			if (!((pr1449[offs] >> (yscale & 0x07)) & 1))
@@ -697,10 +697,10 @@ static void subroc3d_prepare_sprites(running_machine &machine, turbo_state *stat
 static UINT32 subroc3d_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
-        END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
-        PLB = END ^ (CDA == 1 && (CDC ^ CDD) == 0)
-       end is in bit 1, plb in bit 0
-    */
+	    END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
+	    PLB = END ^ (CDA == 1 && (CDC ^ CDD) == 0)
+	   end is in bit 1, plb in bit 0
+	*/
 	static const UINT8 plb_end[16] = { 0,1,1,2, 1,1,1,1, 1,1,1,1, 0,1,1,2 };
 	UINT32 sprdata = 0;
 	int level;
@@ -815,8 +815,8 @@ UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &
 				/* of IC21/PR1450 (p. 141), unless MPLB = 0, in which case the values are grounded (p. 141) */
 				if (mplb)
 				{
-					offs = (plb ^ 0xff) |						/* A0-A7: /PLB0-7 */
-						   ((m_subroc3d_ply & 0x02) << 7);	/*    A8: PLY1 */
+					offs = (plb ^ 0xff) |                       /* A0-A7: /PLB0-7 */
+							((m_subroc3d_ply & 0x02) << 7); /*    A8: PLY1 */
 					mux = pr1450[offs] >> ((m_subroc3d_ply & 0x01) * 4);
 				}
 				else
@@ -833,9 +833,9 @@ UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &
 					finalbits = forebits;
 
 				/* we then go through a muxer to select one of the 16 outputs computed above (p. 141) */
-				offs = (finalbits & 0x0f) | 				/* A0-A3: CD0-CD3 */
-					   ((mux & 0x08) << 1) |				/*    A4: MUX3 */
-					   (m_subroc3d_col << 5);			/* A5-A8: COL0-COL3 */
+				offs = (finalbits & 0x0f) |                 /* A0-A3: CD0-CD3 */
+						((mux & 0x08) << 1) |               /*    A4: MUX3 */
+						(m_subroc3d_col << 5);          /* A5-A8: COL0-COL3 */
 				dest[x + ix] = pr1419[offs];
 			}
 		}
@@ -889,8 +889,8 @@ static void buckrog_prepare_sprites(running_machine &machine, turbo_state *state
 			/* look up the low byte of the sum plus the yscale value in */
 			/* IC50/PR1119 to determine if we write back the sum of the */
 			/* offset and the rowbytes this scanline (p. 138) */
-			offs = (sum & 0xff) |			/* A0-A7 = AL0-AL7 */
-				   ((yscale & 0x08) << 5);	/* A8-A9 = /RO11-/RO12 */
+			offs = (sum & 0xff) |           /* A0-A7 = AL0-AL7 */
+					((yscale & 0x08) << 5); /* A8-A9 = /RO11-/RO12 */
 
 			/* one of the bits is selected based on the low 7 bits of yscale */
 			if (!((pr5196[offs] >> (yscale & 0x07)) & 1))
@@ -915,10 +915,10 @@ static void buckrog_prepare_sprites(running_machine &machine, turbo_state *state
 static UINT32 buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
-        END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
-        PLB = END ^ (CDA == 1 && (CDC ^ CDD) == 0)
-       end is in bit 1, plb in bit 0
-    */
+	    END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
+	    PLB = END ^ (CDA == 1 && (CDC ^ CDD) == 0)
+	   end is in bit 1, plb in bit 0
+	*/
 	static const UINT8 plb_end[16] = { 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,2 };
 	UINT32 sprdata = 0;
 	int level;
@@ -1007,9 +1007,9 @@ UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &b
 
 			/* at this point, do the character lookup and the foreground color table lookup in IC93/PR1598 (SH 5/5)*/
 			foreraw = fore[(pr5194[((xx >> 3) - 1) & 0x1f] << 3) | (xx & 0x07)];
-			offs = ((foreraw & 0x03) << 0) |			/* A0-A1: BIT0-1 */
-				   ((foreraw & 0xf8) >> 1) |			/* A2-A6: BANK3-7 */
-				   ((m_buckrog_fchg & 0x03) << 7);	/* A7-A9: FCHG0-2 */
+			offs = ((foreraw & 0x03) << 0) |            /* A0-A1: BIT0-1 */
+					((foreraw & 0xf8) >> 1) |           /* A2-A6: BANK3-7 */
+					((m_buckrog_fchg & 0x03) << 7); /* A7-A9: FCHG0-2 */
 			forebits = pr5198[offs];
 
 			/* fetch the STAR bit */
@@ -1049,16 +1049,16 @@ UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &b
 				if (!(forebits & 0x80))
 				{
 					palbits = ((forebits & 0x3c) << 2) |
-							  ((forebits & 0x06) << 1) |
-							  ((forebits & 0x01) << 0);
+								((forebits & 0x06) << 1) |
+								((forebits & 0x01) << 0);
 				}
 
 				/* priority 6 is if MUX3 is 0; CHNG = 1 */
 				else if (!(mux & 0x08))
 				{
-					offs = (cd & 0x0f) |						/* A0-A3: CD0-3 */
-						   ((mux & 0x07) << 4) |				/* A4-A6: MUX0-2 */
-						   ((m_buckrog_obch & 0x07) << 7);	/* A7-A9: OBCH0-2 */
+					offs = (cd & 0x0f) |                        /* A0-A3: CD0-3 */
+							((mux & 0x07) << 4) |               /* A4-A6: MUX0-2 */
+							((m_buckrog_obch & 0x07) << 7); /* A7-A9: OBCH0-2 */
 					palbits = pr5199[offs];
 				}
 
@@ -1066,8 +1066,8 @@ UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &b
 				else if (!(forebits & 0x40))
 				{
 					palbits = ((forebits & 0x3c) << 2) |
-							  ((forebits & 0x06) << 1) |
-							  ((forebits & 0x01) << 0);
+								((forebits & 0x06) << 1) |
+								((forebits & 0x01) << 0);
 				}
 
 				/* priority 1 is if the star is set; CHNG = 2 */

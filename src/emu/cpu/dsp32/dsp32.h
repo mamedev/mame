@@ -56,12 +56,12 @@
 //**************************************************************************
 
 // IRQ sources
-const int DSP32_IRQ0		= 0;		// IRQ0
-const int DSP32_IRQ1		= 1;		// IRQ1
+const int DSP32_IRQ0        = 0;        // IRQ0
+const int DSP32_IRQ1        = 1;        // IRQ1
 
 // pin signal bits
-const int DSP32_OUTPUT_PIF	= 0x01;
-const int DSP32_OUTPUT_PDF	= 0x02;
+const int DSP32_OUTPUT_PIF  = 0x01;
+const int DSP32_OUTPUT_PDF  = 0x02;
 
 // register enumeration
 enum
@@ -132,7 +132,7 @@ class dsp32c_device;
 
 struct dsp32_config
 {
-	void (*m_output_pins_changed)(dsp32c_device &device, UINT32 pins);	// a change has occurred on an output pin
+	void (*m_output_pins_changed)(dsp32c_device &device, UINT32 pins);  // a change has occurred on an output pin
 };
 
 
@@ -140,7 +140,7 @@ struct dsp32_config
 // ======================> dsp32c_device
 
 class dsp32c_device : public cpu_device,
-					  public dsp32_config
+						public dsp32_config
 {
 public:
 	// construction/destruction
@@ -423,54 +423,54 @@ protected:
 	void dma_store();
 
 	// configuration
-	const address_space_config		m_program_config;
+	const address_space_config      m_program_config;
 
 	// internal state
-	UINT32			m_r[32];
-	UINT32			m_pin, m_pout;
-	UINT32			m_ivtp;
-	UINT32			m_nzcflags;
-	UINT32			m_vflags;
+	UINT32          m_r[32];
+	UINT32          m_pin, m_pout;
+	UINT32          m_ivtp;
+	UINT32          m_nzcflags;
+	UINT32          m_vflags;
 
-	double			m_a[6];
-	double			m_NZflags;
-	UINT8			m_VUflags;
+	double          m_a[6];
+	double          m_NZflags;
+	UINT8           m_VUflags;
 
-	double			m_abuf[4];
-	UINT8			m_abufreg[4];
-	UINT8			m_abufVUflags[4];
-	UINT8			m_abufNZflags[4];
-	int				m_abufcycle[4];
-	int				m_abuf_index;
+	double          m_abuf[4];
+	UINT8           m_abufreg[4];
+	UINT8           m_abufVUflags[4];
+	UINT8           m_abufNZflags[4];
+	int             m_abufcycle[4];
+	int             m_abuf_index;
 
-	INT32			m_mbufaddr[4];
-	UINT32			m_mbufdata[4];
-	int				m_mbuf_index;
+	INT32           m_mbufaddr[4];
+	UINT32          m_mbufdata[4];
+	int             m_mbuf_index;
 
-	UINT16			m_par;
-	UINT8			m_pare;
-	UINT16			m_pdr;
-	UINT16			m_pdr2;
-	UINT16			m_pir;
-	UINT16			m_pcr;
-	UINT16			m_emr;
-	UINT8			m_esr;
-	UINT16			m_pcw;
-	UINT8			m_piop;
+	UINT16          m_par;
+	UINT8           m_pare;
+	UINT16          m_pdr;
+	UINT16          m_pdr2;
+	UINT16          m_pir;
+	UINT16          m_pcr;
+	UINT16          m_emr;
+	UINT8           m_esr;
+	UINT16          m_pcw;
+	UINT8           m_piop;
 
-	UINT32			m_ibuf;
-	UINT32			m_isr;
-	UINT32			m_obuf;
-	UINT32			m_osr;
+	UINT32          m_ibuf;
+	UINT32          m_isr;
+	UINT32          m_obuf;
+	UINT32          m_osr;
 
-	UINT32			m_iotemp;
+	UINT32          m_iotemp;
 
 	// internal stuff
-	int 			m_lastp;
-	int				m_icount;
-	UINT8			m_lastpins;
-	UINT32			m_ppc;
-	address_space *	m_program;
+	int             m_lastp;
+	int             m_icount;
+	UINT8           m_lastpins;
+	UINT32          m_ppc;
+	address_space * m_program;
 	direct_read_data *m_direct;
 
 	// tables

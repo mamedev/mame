@@ -159,7 +159,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 
 	if (blend > 0)
 	{
-		dst_base += dst_pitch;		// draw blended
+		dst_base += dst_pitch;      // draw blended
 		starty += incyy;
 		startx += incyx;
 
@@ -200,7 +200,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 			cx = startx; startx += incyx;
 		} while (--ty);
 	}
-	else	//  draw solid
+	else    //  draw solid
 	{
 		if (blend == 0)
 		{
@@ -285,7 +285,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	rectangle my_clip;
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy, y, maxy, clip;
-											  
+
 	bitmap_ind16 &src_bitmap = tmap->pixmap();
 	rectangle &src_cliprect = K053936_cliprect[chip];
 	clip = K053936_clip_enabled[chip];
@@ -555,7 +555,7 @@ INLINE void zdrawgfxzoom32GP(
 		{
 			switch (drawmode)
 			{
-				case 0:	// all pens solid
+				case 0: // all pens solid
 					do {
 						do {
 							eax = src_ptr[src_x];
@@ -688,9 +688,9 @@ INLINE void zdrawgfxzoom32GP(
 					}
 					while (--dst_h);
 					break;
-			}	// switch (drawmode)
-		}	// if (zcode < 0)
-	}	// if (!nozoom)
+			}   // switch (drawmode)
+		}   // if (zcode < 0)
+	}   // if (!nozoom)
 	else
 	{
 		src_ptr = src_base + (src_fby<<4) + src_fbx;
@@ -1184,7 +1184,7 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 	int nobj, i, j, k, l, temp, temp1, temp2, temp3, temp4, count;
 	int order, offs, code, color, zcode, pri = 0, spri, spri_min, shdprisel, shadow, alpha, drawmode;
 
-    // buffer can move when it's resized, so refresh the pointer
+	// buffer can move when it's resized, so refresh the pointer
 	gx_objzbuf = &machine.priority_bitmap.pix8(0);
 
 	// abort if object database failed to initialize
@@ -1319,15 +1319,15 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 		switch (code)
 		{
 			/*
-                Background layers are represented by negative offset values as follow:
+			    Background layers are represented by negative offset values as follow:
 
-                0+ : normal sprites
-                -1 : tile layer A - D
-                -2 : K053936 ROZ+ layer 1
-                -3 : K053936 ROZ+ layer 2
-                -4 : K053250 LVC layer 1
-                -5 : K053250 LVC layer 2
-            */
+			    0+ : normal sprites
+			    -1 : tile layer A - D
+			    -2 : K053936 ROZ+ layer 1
+			    -3 : K053936 ROZ+ layer 2
+			    -4 : K053250 LVC layer 1
+			    -5 : K053250 LVC layer 2
+			*/
 			case 4 :
 				offs = -128;
 				if (sub1flags & 0xf) { if (sub1flags & GXSUB_K053250) offs = -4; else if (sub1) offs = -2; }
@@ -1370,13 +1370,13 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 		(*K053247_callback)(machine, &code, &color, &pri);
 
 		/*
-            shadow = shadow code
-            spri   = shadow priority
-            temp1  = add solid object
-            temp2  = solid pens draw mode
-            temp3  = add shadow object
-            temp4  = shadow pens draw mode
-        */
+		    shadow = shadow code
+		    spri   = shadow priority
+		    temp1  = add solid object
+		    temp2  = solid pens draw mode
+		    temp3  = add shadow object
+		    temp4  = shadow pens draw mode
+		*/
 		temp4 = temp3 = temp2 = temp1 = spri = shadow = 0;
 
 		if (color & K055555_FULLSHADOW)
@@ -1448,14 +1448,14 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 		}
 
 		/*
-            default sort order:
-            fedcba9876543210fedcba9876543210
-            xxxxxxxx------------------------ (priority)
-            --------xxxxxxxx---------------- (zcode)
-            ----------------xxxxxxxx-------- (offset)
-            ------------------------xxxx---- (shadow mode)
-            ----------------------------xxxx (shadow code)
-        */
+		    default sort order:
+		    fedcba9876543210fedcba9876543210
+		    xxxxxxxx------------------------ (priority)
+		    --------xxxxxxxx---------------- (zcode)
+		    ----------------xxxxxxxx-------- (offset)
+		    ------------------------xxxx---- (shadow mode)
+		    ----------------------------xxxx (shadow code)
+		*/
 		if (temp1)
 		{
 			// add objects with solid or alpha pens
@@ -1537,11 +1537,11 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 					}
 
 					/* blend layer only when:
-                        1) vinmix != 0xff
-                        2) its internal mix code is set
-                        3) all mix code bits are internal(overriden until tile blending has been implemented)
-                        4) 0 > alpha < 255;
-                    */
+					    1) vinmix != 0xff
+					    2) its internal mix code is set
+					    3) all mix code bits are internal(overriden until tile blending has been implemented)
+					    4) 0 > alpha < 255;
+					*/
 					if (temp1!=0xff && temp2 /*&& temp3==3*/)
 					{
 						temp4 = K054338_set_alpha_level(temp2);
@@ -1567,7 +1567,7 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 					{
 						temp1 = osinmix;
 						temp2 = osinmix>>2 & 3;
-                        temp3 = osmixon>>2 & 3;
+						temp3 = osmixon>>2 & 3;
 					}
 
 					if (temp1!=0xff && temp2 /*&& temp3==3*/)
@@ -1608,7 +1608,7 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 					{
 						temp1 = osinmix;
 						temp2 = osinmix>>4 & 3;
-                        temp3 = osmixon>>4 & 3;
+						temp3 = osmixon>>4 & 3;
 					}
 
 					if (temp1!=0xff && temp2 /*&& temp3==3*/)
@@ -1858,19 +1858,19 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 	konamigx_type3_psac2_actual_bank = (m_konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
 
 	/* handle this by creating 2 roz tilemaps instead, otherwise performance dies completely on dual screen mode
-    if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
-    {
-        gx_psac_tilemap->mark_all_dirty();
-        konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
-    }
-    */
+	if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
+	{
+	    gx_psac_tilemap->mark_all_dirty();
+	    konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
+	}
+	*/
 }
 
 
 
 /* Soccer Superstars (tile and flip bits now TRUSTED) */
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
- {
+	{
 	int tileno, colour, flip;
 	UINT8 *tmap = machine().root_device().memregion("gfx4")->base();
 
@@ -1888,10 +1888,10 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
 	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
- }
+	}
 
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
- {
+	{
 	int tileno, colour, flip;
 	UINT8 *tmap = machine().root_device().memregion("gfx4")->base()+0x20000;
 
@@ -1909,7 +1909,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
 	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
- }
+	}
 
 
 /* PSAC4 */
@@ -2074,7 +2074,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 	_gxcommoninit(machine());
 
 	/* here are some hand tuned per game scroll offsets to go with the per game visible areas,
-       i see no better way of doing this for now... */
+	   i see no better way of doing this for now... */
 
 	if (!strcmp(machine().system().name,"tbyahhoo"))
 	{
@@ -2682,4 +2682,3 @@ WRITE32_MEMBER(konamigx_state::konamigx_t4_psacmap_w)
 	gx_psac_tilemap->mark_tile_dirty(offset*2);
 	gx_psac_tilemap->mark_tile_dirty((offset*2)+1);
 }
-

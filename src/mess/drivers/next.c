@@ -72,7 +72,7 @@ UINT32 next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		}
 	}
 
-    return 0;
+	return 0;
 }
 
 /* Dummy catcher for any unknown r/w */
@@ -106,30 +106,30 @@ READ32_MEMBER( next_state::scr2_r )
 	if(0 && !space.debugger_access())
 		printf("%08x\n",space.device().safe_pc());
 	/*
-    x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
-    -x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
-    --x- ---- ---- ---- ---- ---- ---- ---- dsp unpacked
-    ---x ---- ---- ---- ---- ---- ---- ---- dsp mode b
-    ---- x--- ---- ---- ---- ---- ---- ---- dsp mode a
-    ---- -x-- ---- ---- ---- ---- ---- ---- remote int
-    ---- ---x ---- ---- ---- ---- ---- ---- local int
-    ---- ---- ---x ---- ---- ---- ---- ---- dram 256k
-    ---- ---- ---- ---x ---- ---- ---- ---- dram 1m
-    ---- ---- ---- ---- x--- ---- ---- ---- "timer on ipl7"
-    ---- ---- ---- ---- -xxx ---- ---- ---- rom waitstates
-    ---- ---- ---- ---- ---- x--- ---- ---- ROM 1M
-    ---- ---- ---- ---- ---- -x-- ---- ---- MCS1850 rtdata
-    ---- ---- ---- ---- ---- --x- ---- ---- MCS1850 rtclk
-    ---- ---- ---- ---- ---- ---x ---- ---- MCS1850 rtce
-    ---- ---- ---- ---- ---- ---- x--- ---- rom overlay
-    ---- ---- ---- ---- ---- ---- -x-- ---- dsp ie
-    ---- ---- ---- ---- ---- ---- --x- ---- mem en
-    ---- ---- ---- ---- ---- ---- ---- ---x led
+	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
+	-x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
+	--x- ---- ---- ---- ---- ---- ---- ---- dsp unpacked
+	---x ---- ---- ---- ---- ---- ---- ---- dsp mode b
+	---- x--- ---- ---- ---- ---- ---- ---- dsp mode a
+	---- -x-- ---- ---- ---- ---- ---- ---- remote int
+	---- ---x ---- ---- ---- ---- ---- ---- local int
+	---- ---- ---x ---- ---- ---- ---- ---- dram 256k
+	---- ---- ---- ---x ---- ---- ---- ---- dram 1m
+	---- ---- ---- ---- x--- ---- ---- ---- "timer on ipl7"
+	---- ---- ---- ---- -xxx ---- ---- ---- rom waitstates
+	---- ---- ---- ---- ---- x--- ---- ---- ROM 1M
+	---- ---- ---- ---- ---- -x-- ---- ---- MCS1850 rtdata
+	---- ---- ---- ---- ---- --x- ---- ---- MCS1850 rtclk
+	---- ---- ---- ---- ---- ---x ---- ---- MCS1850 rtce
+	---- ---- ---- ---- ---- ---- x--- ---- rom overlay
+	---- ---- ---- ---- ---- ---- -x-- ---- dsp ie
+	---- ---- ---- ---- ---- ---- --x- ---- mem en
+	---- ---- ---- ---- ---- ---- ---- ---x led
 
-    68040-25, 100ns, 32M: 00000c80
-    68040-25, 100ns, 20M: 00ff0c80
+	68040-25, 100ns, 32M: 00000c80
+	68040-25, 100ns, 20M: 00ff0c80
 
-    */
+	*/
 
 	UINT32 data = scr2 & 0xfffffbff;
 
@@ -154,29 +154,29 @@ WRITE32_MEMBER( next_state::scr2_w )
 READ32_MEMBER( next_state::scr1_r )
 {
 	/*
-        xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
-        ---- ---- xxxx xxxx ---- ---- ---- ---- DMA type
-        ---- ---- ---- ---- xxxx ---- ---- ---- machine type
-        ---- ---- ---- ---- ---- xxxx ---- ---- board revision
-        ---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
-        ---- ---- ---- ---- ---- ---- ---x x--- mem speed
-        ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed 16/20/25/33/40/50/66/80
+	    xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
+	    ---- ---- xxxx xxxx ---- ---- ---- ---- DMA type
+	    ---- ---- ---- ---- xxxx ---- ---- ---- machine type
+	    ---- ---- ---- ---- ---- xxxx ---- ---- board revision
+	    ---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
+	    ---- ---- ---- ---- ---- ---- ---x x--- mem speed
+	    ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed 16/20/25/33/40/50/66/80
 
-    machine types:
-    0 NeXT_CUBE
-    1 NeXT_WARP9
-    2 NeXT_X15
-    3 NeXT_WARP9C
-    4 NeXT_Turbo
-    5 NeXT_TurboC
-    6 Unknown
-    7 Unknown
-    8 NeXT_TurboCube
-    9 NeXT_TurboCubeC
+	machine types:
+	0 NeXT_CUBE
+	1 NeXT_WARP9
+	2 NeXT_X15
+	3 NeXT_WARP9C
+	4 NeXT_Turbo
+	5 NeXT_TurboC
+	6 Unknown
+	7 Unknown
+	8 NeXT_TurboCube
+	9 NeXT_TurboCubeC
 
-        68040-25: 00011102
-        68040-25: 00013002 (non-turbo, color)
-    */
+	    68040-25: 00011102
+	    68040-25: 00013002 (non-turbo, color)
+	*/
 
 	return scr1;
 }
@@ -934,29 +934,29 @@ SLOT_INTERFACE_END
 
 static const ncr5390_interface next_ncr5390_interface =
 {
-	 DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_irq),
-	 DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_drq)
+		DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_irq),
+		DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_drq)
 };
 
 static MACHINE_CONFIG_START( next_base, next_state )
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
-    MCFG_SCREEN_SIZE(1120, 900)
-    MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
+	MCFG_SCREEN_SIZE(1120, 900)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
-					  line_cb_t(), line_cb_t(), line_cb_t())
+						line_cb_t(), line_cb_t(), line_cb_t())
 	MCFG_SCC8530_ADD("scc", XTAL_25MHz, line_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
 	MCFG_NEXTKBD_ADD("keyboard",
-					 line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
-					 line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),
-					 line_cb_t(FUNC(next_state::nmi_irq), static_cast<next_state *>(owner)))
+						line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
+						line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),
+						line_cb_t(FUNC(next_state::nmi_irq), static_cast<next_state *>(owner)))
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0, 0, 0, false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0, 0, 0, false)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, 0, 0, 0, false)
@@ -979,8 +979,8 @@ static MACHINE_CONFIG_START( next_base, next_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next, next_base )
-    MCFG_CPU_ADD("maincpu", M68030, XTAL_25MHz)
-    MCFG_CPU_PROGRAM_MAP(next_0b_nofdc_mem)
+	MCFG_CPU_ADD("maincpu", M68030, XTAL_25MHz)
+	MCFG_CPU_PROGRAM_MAP(next_0b_nofdc_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
@@ -1029,7 +1029,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 #define ROM_NEXT_V1 \
-    ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
+	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
 	ROM_SYSTEM_BIOS( 0, "v12", "v1.2" ) /* MAC address/serial number word at 0xC: 005AD0 */ \
 	ROMX_LOAD( "rev_1.2.bin",     0x0000, 0x10000, CRC(7070bd78) SHA1(e34418423da61545157e36b084e2068ad41c9e24), ROM_BIOS(1)) /* Label: "(C) 1990 NeXT, Inc. // All Rights Reserved. // Release 1.2 // 1142.02", underlabel exists but unknown */ \
 	ROM_SYSTEM_BIOS( 1, "v10", "v1.0 v41" ) /* MAC address/serial number word at 0xC: 003090 */ \
@@ -1135,11 +1135,11 @@ DRIVER_INIT_MEMBER(next_state,nextctc)
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                      FLAGS */
-COMP( 1987, next,    0,      0,       next,      next, next_state,    next,    "Next Software Inc",   "NeXT Cube",					GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,    nexts,   "Next Software Inc",   "NeXTstation",				GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,    nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,    nextsc,  "Next Software Inc",   "NeXTstation color",			GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,    nextst,  "Next Software Inc",   "NeXTstation turbo",			GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,    nextstc, "Next Software Inc",   "NeXTstation turbo color",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,    nextct,  "Next Software Inc",   "NeXT Cube turbo",			GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,    nextctc, "Next Software Inc",   "NeXT Cube turbo color",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, next,    0,      0,       next,      next, next_state,    next,    "Next Software Inc",   "NeXT Cube",                  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,    nexts,   "Next Software Inc",   "NeXTstation",                GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,    nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,    nextsc,  "Next Software Inc",   "NeXTstation color",          GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,    nextst,  "Next Software Inc",   "NeXTstation turbo",          GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,    nextstc, "Next Software Inc",   "NeXTstation turbo color",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,    nextct,  "Next Software Inc",   "NeXT Cube turbo",            GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,    nextctc, "Next Software Inc",   "NeXT Cube turbo color",      GAME_NOT_WORKING | GAME_NO_SOUND)

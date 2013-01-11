@@ -30,7 +30,7 @@ READ8_MEMBER(megazone_state::megazone_port_a_r)
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = m_audiocpu->total_cycles() * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = m_audiocpu->total_cycles() * 7159/12288;    /* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
@@ -46,9 +46,9 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 	{
 		int C = 0;
 		if (data & 1)
-			C +=  10000;	/*  10000pF = 0.01uF */
+			C +=  10000;    /*  10000pF = 0.01uF */
 		if (data & 2)
-			C += 220000;	/* 220000pF = 0.22uF */
+			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
 		filter_rc_set_RC(machine().device(fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
@@ -70,7 +70,7 @@ WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
 
 WRITE8_MEMBER(megazone_state::megazone_coin_counter_w)
 {
-	coin_counter_w(machine(), 1 - offset, data);		/* 1-offset, because coin counters are in reversed order */
+	coin_counter_w(machine(), 1 - offset, data);        /* 1-offset, because coin counters are in reversed order */
 }
 
 WRITE8_MEMBER(megazone_state::irq_mask_w)
@@ -93,20 +93,20 @@ static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("colorram2")
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM		/* 4000->5FFF is a debug rom */
+	AM_RANGE(0x4000, 0xffff) AM_ROM     /* 4000->5FFF is a debug rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_byte_w)			/* CODE  line. Command Interrupts 8039 */
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")			/* IO Coin */
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")			/* P1 IO */
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")			/* P2 IO */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w) /* START line. Interrupts 8039 */
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_byte_w)            /* CODE  line. Command Interrupts 8039 */
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")            /* IO Coin */
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")            /* P1 IO */
+	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")            /* P2 IO */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP					/* INTMAIN - Interrupts main CPU (unused) */
-	AM_RANGE(0xc000, 0xc000) AM_WRITENOP					/* INT (Actually is NMI) enable/disable (unused)*/
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP                    /* INTMAIN - Interrupts main CPU (unused) */
+	AM_RANGE(0xc000, 0xc000) AM_WRITENOP                    /* INT (Actually is NMI) enable/disable (unused)*/
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -148,25 +148,25 @@ static INPUT_PORTS_START( megazone )
 
 	/* 0x8000 -> 0xe020 (CPU1) = 0x3820 (CPU0) */
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20k 70k 70k+" )
 	PORT_DIPSETTING(    0x10, "20k 80k 80k+" )
 	PORT_DIPSETTING(    0x08, "30k 90k 90k+" )
 	PORT_DIPSETTING(    0x00, "30k 100k 100k+" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -175,7 +175,7 @@ static INPUT_PORTS_START( megazona )
 	PORT_INCLUDE( megazone )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -196,15 +196,15 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	256,	/* 256 sprites */
-	4,	/* 4 bits per pixel */
+	16,16,  /* 16*16 sprites */
+	256,    /* 256 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0x4000*8+4, 0x4000*8+0, 4, 0 },
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,
 		32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static GFXDECODE_START( megazone )
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( megazone, megazone_state )
 	MCFG_CPU_IO_MAP(megazone_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("daccpu", I8039,14318000/2)	/* 1/2 14MHz crystal */
+	MCFG_CPU_ADD("daccpu", I8039,14318000/2)    /* 1/2 14MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(megazone_i8039_map)
 	MCFG_CPU_IO_MAP(megazone_i8039_io_map)
 

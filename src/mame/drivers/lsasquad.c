@@ -149,7 +149,7 @@ Notes:
 #include "includes/lsasquad.h"
 
 
-#define MASTER_CLOCK	XTAL_24MHz
+#define MASTER_CLOCK    XTAL_24MHz
 
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
@@ -168,14 +168,14 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")	/* OBJECT RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
-	AM_RANGE(0xe803, 0xe803) AM_READ(lsasquad_mcu_status_r)	/* COIN + 68705 status */
+	AM_RANGE(0xe803, 0xe803) AM_READ(lsasquad_mcu_status_r) /* COIN + 68705 status */
 	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xe000, 0xefff) AM_ROM		/* space for diagnostic ROM? */
+	AM_RANGE(0xe000, 0xefff) AM_ROM     /* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8, lsasquad_state )
@@ -213,10 +213,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")	/* OBJECT RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
@@ -304,8 +304,8 @@ static INPUT_PORTS_START( lsasquad )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("MCU")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 68705 ready to receive cmd */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 0 = 68705 has sent result */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 68705 ready to receive cmd */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 0 = 68705 has sent result */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -376,13 +376,13 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")	/* OBJECT RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r)	/* COIN + 68705 status */
+	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r) /* COIN + 68705 status */
 	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READ(daikaiju_sound_status_r) AM_WRITENOP
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP
-	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM? */
+	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( daikaiju )
@@ -456,8 +456,8 @@ static INPUT_PORTS_START( daikaiju )
 
 
 	PORT_START("MCU")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 68705 ready to receive cmd */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 0 = 68705 has sent result */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 68705 ready to receive cmd */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 0 = 68705 has sent result */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -683,7 +683,7 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -727,14 +727,14 @@ MACHINE_CONFIG_END
 ROM_START( lsasquad )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a64-21.4",     0x00000, 0x8000, CRC(5ff6b017) SHA1(96cc74edba1208bb8e82f93d2d3a88ea24922dc0) )
-    /* ROMs banked at 8000-9fff */
+	/* ROMs banked at 8000-9fff */
 	ROM_LOAD( "a64-20.3",     0x10000, 0x8000, CRC(7f8b4979) SHA1(975b1a678e1f7d7b5789565063177593639645ce) )
 	ROM_LOAD( "a64-19.2",     0x18000, 0x8000, CRC(ba31d34a) SHA1(e2c515ae8146a37534b19403c03fc5a8719f115f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a64-04.44",    0x0000, 0x8000, CRC(c238406a) SHA1(bb8f9d952c4568edb375328a1f9f6681a1bb5907) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a64-05.35",    0x0000, 0x0800, CRC(572677b9) SHA1(e098d5d842bcc81221ba56652a7019505d8be082) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
@@ -750,10 +750,10 @@ ROM_START( lsasquad )
 	ROM_LOAD( "a64-17.26",    0x18000, 0x8000, CRC(6eaf3735) SHA1(a91fd7c9a6f2f58d311e40edc29d1e4f97746146) )
 
 	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "a64-07.22",    0x0000, 0x0400, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )	/* red   (bottom half unused) */
-	ROM_LOAD( "a64-08.23",    0x0200, 0x0400, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )	/* green (bottom half unused) */
-	ROM_LOAD( "a64-09.24",    0x0400, 0x0400, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )	/* blue  (bottom half unused) */
-	ROM_LOAD( "a64-06.9",     0x0600, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )	/* priority */
+	ROM_LOAD( "a64-07.22",    0x0000, 0x0400, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )    /* red   (bottom half unused) */
+	ROM_LOAD( "a64-08.23",    0x0200, 0x0400, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )    /* green (bottom half unused) */
+	ROM_LOAD( "a64-09.24",    0x0400, 0x0400, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )    /* blue  (bottom half unused) */
+	ROM_LOAD( "a64-06.9",     0x0600, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )    /* priority */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8a.14", 0x0000, 0x0104, CRC(a7cc157d) SHA1(f06f750636d59a610e0b0eda8cb791780ebc57a5) )
@@ -762,11 +762,11 @@ ROM_END
 ROM_START( storming )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "stpartyj.001", 0x00000, 0x8000, CRC(07e6bc61) SHA1(6989a1401868dd93c9466cfd1636ac48a734a5d4) )
-    /* ROMs banked at 8000-9fff */
+	/* ROMs banked at 8000-9fff */
 	ROM_LOAD( "stpartyj.002", 0x10000, 0x8000, CRC(1c7fe5d5) SHA1(15c09e3301d8ce55e59fe90db9f50ee19584ab7b) )
 	ROM_LOAD( "stpartyj.003", 0x18000, 0x8000, CRC(159f23a6) SHA1(2cb4ed78e54dc2acbbfc2d4cfb2d29ff604aa9ae) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a64-04.44",    0x0000, 0x8000, CRC(c238406a) SHA1(bb8f9d952c4568edb375328a1f9f6681a1bb5907) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
@@ -782,10 +782,10 @@ ROM_START( storming )
 	ROM_LOAD( "a64-17.26",    0x18000, 0x8000, CRC(6eaf3735) SHA1(a91fd7c9a6f2f58d311e40edc29d1e4f97746146) )
 
 	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "a64-07.22",    0x0000, 0x0400, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )	/* red   (bottom half unused) */
-	ROM_LOAD( "a64-08.23",    0x0200, 0x0400, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )	/* green (bottom half unused) */
-	ROM_LOAD( "a64-09.24",    0x0400, 0x0400, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )	/* blue  (bottom half unused) */
-	ROM_LOAD( "a64-06.9",     0x0600, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )	/* priority */
+	ROM_LOAD( "a64-07.22",    0x0000, 0x0400, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )    /* red   (bottom half unused) */
+	ROM_LOAD( "a64-08.23",    0x0200, 0x0400, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )    /* green (bottom half unused) */
+	ROM_LOAD( "a64-09.24",    0x0400, 0x0400, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )    /* blue  (bottom half unused) */
+	ROM_LOAD( "a64-06.9",     0x0600, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )    /* priority */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8a.14", 0x0000, 0x0104, CRC(a7cc157d) SHA1(f06f750636d59a610e0b0eda8cb791780ebc57a5) )
@@ -794,11 +794,11 @@ ROM_END
 ROM_START( daikaiju )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a74_01-1.ic4",   0x00000, 0x8000, CRC(89c13d7f) SHA1(2eaec80d7aa360b700387df00b37a692acc50d74) )
-    /* ROMs banked at 8000-9fff */
+	/* ROMs banked at 8000-9fff */
 	ROM_LOAD( "a74_02.ic3",     0x10000, 0x8000, CRC(8ddf6131) SHA1(b5b23550e7ee52554bc1f045ed6f42e254a05bf4) )
 	ROM_LOAD( "a74_03.ic2",     0x18000, 0x8000, CRC(3911ffed) SHA1(ba6dbd74d37ef26621a02baf3479e2764d10d2ba) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a74_04.ic44",    0x0000, 0x8000, CRC(98a6a703) SHA1(0c169a7a5f8b26606f67ee7f14bd487951536ac5) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
@@ -817,10 +817,10 @@ ROM_START( daikaiju )
 	ROM_LOAD( "a74_17.ic26",    0x18000, 0x8000, CRC(d1077878) SHA1(e69893db6b63d5a5192b521d61a86f60b7029b7e) )
 
 	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "a74_07.ic22",    0x0000, 0x0400, CRC(66132341) SHA1(8c6723dfc4f856ef27998411a98c40783d13ac41) )	/* red   (bottom half unused) */
-	ROM_LOAD( "a74_08.ic23",    0x0200, 0x0400, CRC(fb3f0273) SHA1(591577c94865e2e6465e0016350450a19000e52d) )	/* green (bottom half unused) */
-	ROM_LOAD( "a74_09.ic24",    0x0400, 0x0400, CRC(bed6709d) SHA1(ba5435728d6b7847bc86878f6122ce1f86982f0a) )	/* blue  (bottom half unused) */
-	ROM_LOAD( "a74_06.ic9",     0x0600, 0x0400, CRC(cad554e7) SHA1(7890d948bfef198309df810f8401d224224a73a1) )	/* priority */
+	ROM_LOAD( "a74_07.ic22",    0x0000, 0x0400, CRC(66132341) SHA1(8c6723dfc4f856ef27998411a98c40783d13ac41) )  /* red   (bottom half unused) */
+	ROM_LOAD( "a74_08.ic23",    0x0200, 0x0400, CRC(fb3f0273) SHA1(591577c94865e2e6465e0016350450a19000e52d) )  /* green (bottom half unused) */
+	ROM_LOAD( "a74_09.ic24",    0x0400, 0x0400, CRC(bed6709d) SHA1(ba5435728d6b7847bc86878f6122ce1f86982f0a) )  /* blue  (bottom half unused) */
+	ROM_LOAD( "a74_06.ic9",     0x0600, 0x0400, CRC(cad554e7) SHA1(7890d948bfef198309df810f8401d224224a73a1) )  /* priority */
 ROM_END
 
 

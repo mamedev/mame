@@ -53,86 +53,86 @@ enum
 	Z8_REGISTER_SPL
 };
 
-#define Z8_P3_DAV0					0x04	/* not supported */
-#define Z8_P3_DAV1					0x08	/* not supported */
-#define Z8_P3_DAV2					0x02	/* not supported */
-#define Z8_P3_RDY0					0x20	/* not supported */
-#define Z8_P3_RDY1					0x10	/* not supported */
-#define Z8_P3_RDY2					0x40	/* not supported */
-#define Z8_P3_IRQ0					0x04	/* not supported */
-#define Z8_P3_IRQ1					0x08	/* not supported */
-#define Z8_P3_IRQ2					0x02	/* not supported */
-#define Z8_P3_IRQ3					0x01	/* not supported */
-#define Z8_P3_DI					0x01	/* not supported */
-#define Z8_P3_DO					0x80	/* not supported */
-#define Z8_P3_TIN					0x02	/* not supported */
-#define Z8_P3_TOUT					0x40	/* not supported */
-#define Z8_P3_DM					0x10	/* not supported */
+#define Z8_P3_DAV0                  0x04    /* not supported */
+#define Z8_P3_DAV1                  0x08    /* not supported */
+#define Z8_P3_DAV2                  0x02    /* not supported */
+#define Z8_P3_RDY0                  0x20    /* not supported */
+#define Z8_P3_RDY1                  0x10    /* not supported */
+#define Z8_P3_RDY2                  0x40    /* not supported */
+#define Z8_P3_IRQ0                  0x04    /* not supported */
+#define Z8_P3_IRQ1                  0x08    /* not supported */
+#define Z8_P3_IRQ2                  0x02    /* not supported */
+#define Z8_P3_IRQ3                  0x01    /* not supported */
+#define Z8_P3_DI                    0x01    /* not supported */
+#define Z8_P3_DO                    0x80    /* not supported */
+#define Z8_P3_TIN                   0x02    /* not supported */
+#define Z8_P3_TOUT                  0x40    /* not supported */
+#define Z8_P3_DM                    0x10    /* not supported */
 
-#define Z8_PRE0_COUNT_MODULO_N		0x01
+#define Z8_PRE0_COUNT_MODULO_N      0x01
 
-#define Z8_PRE1_COUNT_MODULO_N		0x01
-#define Z8_PRE1_INTERNAL_CLOCK		0x02
+#define Z8_PRE1_COUNT_MODULO_N      0x01
+#define Z8_PRE1_INTERNAL_CLOCK      0x02
 
-#define Z8_TMR_LOAD_T0				0x01
-#define Z8_TMR_ENABLE_T0			0x02
-#define Z8_TMR_LOAD_T1				0x04
-#define Z8_TMR_ENABLE_T1			0x08
-#define Z8_TMR_TIN_MASK				0x30	/* not supported */
-#define Z8_TMR_TIN_EXTERNAL_CLK		0x00	/* not supported */
-#define Z8_TMR_TIN_GATE				0x10	/* not supported */
-#define Z8_TMR_TIN_TRIGGER			0x20	/* not supported */
-#define Z8_TMR_TIN_RETRIGGER		0x30	/* not supported */
-#define Z8_TMR_TOUT_MASK			0xc0	/* not supported */
-#define Z8_TMR_TOUT_OFF				0x00	/* not supported */
-#define Z8_TMR_TOUT_T0				0x40	/* not supported */
-#define Z8_TMR_TOUT_T1				0x80	/* not supported */
-#define Z8_TMR_TOUT_INTERNAL_CLK	0xc0	/* not supported */
+#define Z8_TMR_LOAD_T0              0x01
+#define Z8_TMR_ENABLE_T0            0x02
+#define Z8_TMR_LOAD_T1              0x04
+#define Z8_TMR_ENABLE_T1            0x08
+#define Z8_TMR_TIN_MASK             0x30    /* not supported */
+#define Z8_TMR_TIN_EXTERNAL_CLK     0x00    /* not supported */
+#define Z8_TMR_TIN_GATE             0x10    /* not supported */
+#define Z8_TMR_TIN_TRIGGER          0x20    /* not supported */
+#define Z8_TMR_TIN_RETRIGGER        0x30    /* not supported */
+#define Z8_TMR_TOUT_MASK            0xc0    /* not supported */
+#define Z8_TMR_TOUT_OFF             0x00    /* not supported */
+#define Z8_TMR_TOUT_T0              0x40    /* not supported */
+#define Z8_TMR_TOUT_T1              0x80    /* not supported */
+#define Z8_TMR_TOUT_INTERNAL_CLK    0xc0    /* not supported */
 
-#define Z8_P01M_P0L_MODE_MASK		0x03
-#define Z8_P01M_P0L_MODE_OUTPUT		0x00
-#define Z8_P01M_P0L_MODE_INPUT		0x01
-#define Z8_P01M_P0L_MODE_A8_A11		0x02	/* not supported */
-#define Z8_P01M_INTERNAL_STACK		0x04
-#define Z8_P01M_P1_MODE_MASK		0x18
-#define Z8_P01M_P1_MODE_OUTPUT		0x00
-#define Z8_P01M_P1_MODE_INPUT		0x08
-#define Z8_P01M_P1_MODE_AD0_AD7		0x10	/* not supported */
-#define Z8_P01M_P1_MODE_HI_Z		0x18	/* not supported */
-#define Z8_P01M_EXTENDED_TIMING		0x20	/* not supported */
-#define Z8_P01M_P0H_MODE_MASK		0xc0
-#define Z8_P01M_P0H_MODE_OUTPUT		0x00
-#define Z8_P01M_P0H_MODE_INPUT		0x40
-#define Z8_P01M_P0H_MODE_A12_A15	0x80	/* not supported */
+#define Z8_P01M_P0L_MODE_MASK       0x03
+#define Z8_P01M_P0L_MODE_OUTPUT     0x00
+#define Z8_P01M_P0L_MODE_INPUT      0x01
+#define Z8_P01M_P0L_MODE_A8_A11     0x02    /* not supported */
+#define Z8_P01M_INTERNAL_STACK      0x04
+#define Z8_P01M_P1_MODE_MASK        0x18
+#define Z8_P01M_P1_MODE_OUTPUT      0x00
+#define Z8_P01M_P1_MODE_INPUT       0x08
+#define Z8_P01M_P1_MODE_AD0_AD7     0x10    /* not supported */
+#define Z8_P01M_P1_MODE_HI_Z        0x18    /* not supported */
+#define Z8_P01M_EXTENDED_TIMING     0x20    /* not supported */
+#define Z8_P01M_P0H_MODE_MASK       0xc0
+#define Z8_P01M_P0H_MODE_OUTPUT     0x00
+#define Z8_P01M_P0H_MODE_INPUT      0x40
+#define Z8_P01M_P0H_MODE_A12_A15    0x80    /* not supported */
 
-#define Z8_P3M_P2_ACTIVE_PULLUPS	0x01	/* not supported */
-#define Z8_P3M_P0_STROBED			0x04	/* not supported */
-#define Z8_P3M_P33_P34_MASK			0x18
-#define Z8_P3M_P33_P34_INPUT_OUTPUT	0x00
-#define Z8_P3M_P33_P34_INPUT_DM		0x08	/* not supported */
-#define Z8_P3M_P33_P34_INPUT_DM_2	0x10	/* not supported */
-#define Z8_P3M_P33_P34_DAV1_RDY1	0x18	/* not supported */
-#define Z8_P3M_P2_STROBED			0x20	/* not supported */
-#define Z8_P3M_P3_SERIAL			0x40	/* not supported */
-#define Z8_P3M_PARITY				0x80	/* not supported */
+#define Z8_P3M_P2_ACTIVE_PULLUPS    0x01    /* not supported */
+#define Z8_P3M_P0_STROBED           0x04    /* not supported */
+#define Z8_P3M_P33_P34_MASK         0x18
+#define Z8_P3M_P33_P34_INPUT_OUTPUT 0x00
+#define Z8_P3M_P33_P34_INPUT_DM     0x08    /* not supported */
+#define Z8_P3M_P33_P34_INPUT_DM_2   0x10    /* not supported */
+#define Z8_P3M_P33_P34_DAV1_RDY1    0x18    /* not supported */
+#define Z8_P3M_P2_STROBED           0x20    /* not supported */
+#define Z8_P3M_P3_SERIAL            0x40    /* not supported */
+#define Z8_P3M_PARITY               0x80    /* not supported */
 
-#define Z8_IMR_ENABLE				0x80	/* not supported */
-#define Z8_IMR_RAM_PROTECT			0x40	/* not supported */
-#define Z8_IMR_ENABLE_IRQ5			0x20	/* not supported */
-#define Z8_IMR_ENABLE_IRQ4			0x10	/* not supported */
-#define Z8_IMR_ENABLE_IRQ3			0x08	/* not supported */
-#define Z8_IMR_ENABLE_IRQ2			0x04	/* not supported */
-#define Z8_IMR_ENABLE_IRQ1			0x02	/* not supported */
-#define Z8_IMR_ENABLE_IRQ0			0x01	/* not supported */
+#define Z8_IMR_ENABLE               0x80    /* not supported */
+#define Z8_IMR_RAM_PROTECT          0x40    /* not supported */
+#define Z8_IMR_ENABLE_IRQ5          0x20    /* not supported */
+#define Z8_IMR_ENABLE_IRQ4          0x10    /* not supported */
+#define Z8_IMR_ENABLE_IRQ3          0x08    /* not supported */
+#define Z8_IMR_ENABLE_IRQ2          0x04    /* not supported */
+#define Z8_IMR_ENABLE_IRQ1          0x02    /* not supported */
+#define Z8_IMR_ENABLE_IRQ0          0x01    /* not supported */
 
-#define Z8_FLAGS_F1					0x01
-#define Z8_FLAGS_F2					0x02
-#define Z8_FLAGS_H					0x04
-#define Z8_FLAGS_D					0x08
-#define Z8_FLAGS_V					0x10
-#define Z8_FLAGS_S					0x20
-#define Z8_FLAGS_Z					0x40
-#define Z8_FLAGS_C					0x80
+#define Z8_FLAGS_F1                 0x01
+#define Z8_FLAGS_F2                 0x02
+#define Z8_FLAGS_H                  0x04
+#define Z8_FLAGS_D                  0x08
+#define Z8_FLAGS_V                  0x10
+#define Z8_FLAGS_S                  0x20
+#define Z8_FLAGS_Z                  0x40
+#define Z8_FLAGS_C                  0x80
 
 enum
 {
@@ -144,13 +144,13 @@ enum
     MACROS
 ***************************************************************************/
 
-#define P01M		cpustate->r[Z8_REGISTER_P01M]
-#define P2M			cpustate->r[Z8_REGISTER_P2M]
-#define P3M			cpustate->r[Z8_REGISTER_P3M]
-#define T0			cpustate->r[Z8_REGISTER_T0]
-#define T1			cpustate->r[Z8_REGISTER_T1]
-#define PRE0		cpustate->r[Z8_REGISTER_PRE0]
-#define PRE1		cpustate->r[Z8_REGISTER_PRE1]
+#define P01M        cpustate->r[Z8_REGISTER_P01M]
+#define P2M         cpustate->r[Z8_REGISTER_P2M]
+#define P3M         cpustate->r[Z8_REGISTER_P3M]
+#define T0          cpustate->r[Z8_REGISTER_T0]
+#define T1          cpustate->r[Z8_REGISTER_T1]
+#define PRE0        cpustate->r[Z8_REGISTER_PRE0]
+#define PRE1        cpustate->r[Z8_REGISTER_PRE1]
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -158,29 +158,29 @@ enum
 
 struct z8_state
 {
-    address_space *program;
-    direct_read_data *direct;
-    address_space *data;
-    address_space *io;
+	address_space *program;
+	direct_read_data *direct;
+	address_space *data;
+	address_space *io;
 
 	/* registers */
-	UINT16 pc;				/* program counter */
-	UINT8 r[256];			/* register file */
-	UINT8 input[4];			/* port input latches */
-	UINT8 output[4];		/* port output latches */
-	UINT8 t0;				/* timer 0 current count */
-	UINT8 t1;				/* timer 1 current count */
+	UINT16 pc;              /* program counter */
+	UINT8 r[256];           /* register file */
+	UINT8 input[4];         /* port input latches */
+	UINT8 output[4];        /* port output latches */
+	UINT8 t0;               /* timer 0 current count */
+	UINT8 t1;               /* timer 1 current count */
 
 	/* fake registers */
-	UINT16 fake_sp;			/* fake stack pointer */
-	UINT8 fake_r[16];		/* fake working registers */
+	UINT16 fake_sp;         /* fake stack pointer */
+	UINT8 fake_r[16];       /* fake working registers */
 
 	/* interrupts */
-	int irq[6];				/* interrupts */
+	int irq[6];             /* interrupts */
 
 	/* execution logic */
-	int clock;				/* clock */
-	int icount;				/* instruction counter */
+	int clock;              /* clock */
+	int icount;             /* instruction counter */
 
 	/* timers */
 	emu_timer *t0_timer;
@@ -219,16 +219,16 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 	case Z8_REGISTER_P0:
 		switch (P01M & Z8_P01M_P0L_MODE_MASK)
 		{
-		case Z8_P01M_P0L_MODE_OUTPUT:	data = cpustate->output[offset] & 0x0f;		break;
-		case Z8_P01M_P0L_MODE_INPUT:	mask = 0x0f;								break;
-		default: /* A8...A11 */			data = 0x0f;								break;
+		case Z8_P01M_P0L_MODE_OUTPUT:   data = cpustate->output[offset] & 0x0f;     break;
+		case Z8_P01M_P0L_MODE_INPUT:    mask = 0x0f;                                break;
+		default: /* A8...A11 */         data = 0x0f;                                break;
 		}
 
 		switch (P01M & Z8_P01M_P0H_MODE_MASK)
 		{
-		case Z8_P01M_P0H_MODE_OUTPUT:	data |= cpustate->output[offset] & 0xf0;	break;
-		case Z8_P01M_P0H_MODE_INPUT:	mask |= 0xf0;								break;
-		default: /* A12...A15 */		data |= 0xf0;								break;
+		case Z8_P01M_P0H_MODE_OUTPUT:   data |= cpustate->output[offset] & 0xf0;    break;
+		case Z8_P01M_P0H_MODE_INPUT:    mask |= 0xf0;                               break;
+		default: /* A12...A15 */        data |= 0xf0;                               break;
 		}
 
 		if (!(P3M & Z8_P3M_P0_STROBED))
@@ -242,9 +242,9 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 	case Z8_REGISTER_P1:
 		switch (P01M & Z8_P01M_P1_MODE_MASK)
 		{
-		case Z8_P01M_P1_MODE_OUTPUT:	data = cpustate->output[offset];			break;
-		case Z8_P01M_P1_MODE_INPUT:		mask = 0xff;								break;
-		default: /* AD0..AD7 */			data = 0xff;								break;
+		case Z8_P01M_P1_MODE_OUTPUT:    data = cpustate->output[offset];            break;
+		case Z8_P01M_P1_MODE_INPUT:     mask = 0xff;                                break;
+		default: /* AD0..AD7 */         data = 0xff;                                break;
 		}
 
 		if ((P3M & Z8_P3M_P33_P34_MASK) != Z8_P3M_P33_P34_DAV1_RDY1)
@@ -514,12 +514,12 @@ INLINE void set_flag(z8_state *cpustate, UINT8 flag, int state)
 		cpustate->r[Z8_REGISTER_FLAGS] &= ~flag;
 }
 
-#define set_flag_h(state)	set_flag(cpustate, Z8_FLAGS_H, state);
-#define set_flag_d(state)	set_flag(cpustate, Z8_FLAGS_D, state);
-#define set_flag_v(state)	set_flag(cpustate, Z8_FLAGS_V, state);
-#define set_flag_s(state)	set_flag(cpustate, Z8_FLAGS_S, state);
-#define set_flag_z(state)	set_flag(cpustate, Z8_FLAGS_Z, state);
-#define set_flag_c(state)	set_flag(cpustate, Z8_FLAGS_C, state);
+#define set_flag_h(state)   set_flag(cpustate, Z8_FLAGS_H, state);
+#define set_flag_d(state)   set_flag(cpustate, Z8_FLAGS_D, state);
+#define set_flag_v(state)   set_flag(cpustate, Z8_FLAGS_V, state);
+#define set_flag_s(state)   set_flag(cpustate, Z8_FLAGS_S, state);
+#define set_flag_z(state)   set_flag(cpustate, Z8_FLAGS_Z, state);
+#define set_flag_c(state)   set_flag(cpustate, Z8_FLAGS_C, state);
 
 /***************************************************************************
     OPCODE HANDLERS
@@ -542,60 +542,60 @@ typedef void (*z8_opcode_func) (z8_state *cpustate, UINT8 opcode, int *cycles);
 
 struct z8_opcode_map
 {
-	z8_opcode_func	function;
-	int				execution_cycles;
-	int				pipeline_cycles;
+	z8_opcode_func  function;
+	int             execution_cycles;
+	int             pipeline_cycles;
 };
 
 static const z8_opcode_map Z8601_OPCODE_MAP[] =
 {
-	{ dec_R1, 6, 5 },	{ dec_IR1, 6, 5 },	{ add_r1_r2, 10, 5 },	{ add_r1_Ir2, 10, 5 },	{ add_R2_R1, 10, 5 },	{ add_IR2_R1, 10, 5 },	{ add_R1_IM, 10, 5 },	{ add_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ dec_R1, 6, 5 },   { dec_IR1, 6, 5 },  { add_r1_r2, 10, 5 },   { add_r1_Ir2, 10, 5 },  { add_R2_R1, 10, 5 },   { add_IR2_R1, 10, 5 },  { add_R1_IM, 10, 5 },   { add_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ rlc_R1, 6, 5 },	{ rlc_IR1, 6, 5 },	{ adc_r1_r2, 6, 5 },	{ adc_r1_Ir2, 6, 5 },	{ adc_R2_R1, 10, 5 },	{ adc_IR2_R1, 10, 5 },	{ adc_R1_IM, 10, 5 },	{ adc_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ rlc_R1, 6, 5 },   { rlc_IR1, 6, 5 },  { adc_r1_r2, 6, 5 },    { adc_r1_Ir2, 6, 5 },   { adc_R2_R1, 10, 5 },   { adc_IR2_R1, 10, 5 },  { adc_R1_IM, 10, 5 },   { adc_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ inc_R1, 6, 5 },	{ inc_IR1, 6, 5 },	{ sub_r1_r2, 6, 5 },	{ sub_r1_Ir2, 6, 5 },	{ sub_R2_R1, 10, 5 },	{ sub_IR2_R1, 10, 5 },	{ sub_R1_IM, 10, 5 },	{ sub_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ inc_R1, 6, 5 },   { inc_IR1, 6, 5 },  { sub_r1_r2, 6, 5 },    { sub_r1_Ir2, 6, 5 },   { sub_R2_R1, 10, 5 },   { sub_IR2_R1, 10, 5 },  { sub_R1_IM, 10, 5 },   { sub_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ jp_IRR1, 8, 0 },	{ srp_IM, 6, 1 },	{ sbc_r1_r2, 6, 5 },	{ sbc_r1_Ir2, 6, 5 },	{ sbc_R2_R1, 10, 5 },	{ sbc_IR2_R1, 10, 5 },	{ sbc_R1_IM, 10, 5 },	{ sbc_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ jp_IRR1, 8, 0 },  { srp_IM, 6, 1 },   { sbc_r1_r2, 6, 5 },    { sbc_r1_Ir2, 6, 5 },   { sbc_R2_R1, 10, 5 },   { sbc_IR2_R1, 10, 5 },  { sbc_R1_IM, 10, 5 },   { sbc_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ da_R1, 8, 5 },	{ da_IR1, 8, 5 },	{ or_r1_r2, 6, 5 },		{ or_r1_Ir2, 6, 5 },	{ or_R2_R1, 10, 5 },	{ or_IR2_R1, 10, 5 },	{ or_R1_IM, 10, 5 },	{ or_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ da_R1, 8, 5 },    { da_IR1, 8, 5 },   { or_r1_r2, 6, 5 },     { or_r1_Ir2, 6, 5 },    { or_R2_R1, 10, 5 },    { or_IR2_R1, 10, 5 },   { or_R1_IM, 10, 5 },    { or_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ pop_R1, 10, 5 },	{ pop_IR1, 10, 5 },	{ and_r1_r2, 6, 5 },	{ and_r1_Ir2, 6, 5 },	{ and_R2_R1, 10, 5 },	{ and_IR2_R1, 10, 5 },	{ and_R1_IM, 10, 5 },	{ and_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ pop_R1, 10, 5 },  { pop_IR1, 10, 5 }, { and_r1_r2, 6, 5 },    { and_r1_Ir2, 6, 5 },   { and_R2_R1, 10, 5 },   { and_IR2_R1, 10, 5 },  { and_R1_IM, 10, 5 },   { and_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ com_R1, 6, 5 },	{ com_IR1, 6, 5 },	{ tcm_r1_r2, 6, 5 },	{ tcm_r1_Ir2, 6, 5 },	{ tcm_R2_R1, 10, 5 },	{ tcm_IR2_R1, 10, 5 },	{ tcm_R1_IM, 10, 5 },	{ tcm_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ com_R1, 6, 5 },   { com_IR1, 6, 5 },  { tcm_r1_r2, 6, 5 },    { tcm_r1_Ir2, 6, 5 },   { tcm_R2_R1, 10, 5 },   { tcm_IR2_R1, 10, 5 },  { tcm_R1_IM, 10, 5 },   { tcm_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ push_R2, 10, 1 },	{ push_IR2, 12, 1 },{ tm_r1_r2, 6, 5 },		{ tm_r1_Ir2, 6, 5 },	{ tm_R2_R1, 10, 5 },	{ tm_IR2_R1, 10, 5 },	{ tm_R1_IM, 10, 5 },	{ tm_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ illegal, 0, 0 },
+	{ push_R2, 10, 1 }, { push_IR2, 12, 1 },{ tm_r1_r2, 6, 5 },     { tm_r1_Ir2, 6, 5 },    { tm_R2_R1, 10, 5 },    { tm_IR2_R1, 10, 5 },   { tm_R1_IM, 10, 5 },    { tm_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
 
-	{ decw_RR1, 10, 5 },{ decw_IR1, 10, 5 },{ lde_r1_Irr2, 12, 0 },	{ ldei_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ di, 6, 1 },
+	{ decw_RR1, 10, 5 },{ decw_IR1, 10, 5 },{ lde_r1_Irr2, 12, 0 }, { ldei_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },     { illegal, 0, 0 },      { illegal, 0, 0 },      { illegal, 0, 0 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { di, 6, 1 },
 
-	{ rl_R1, 6, 5 },	{ rl_IR1, 6, 5 },	{ lde_r2_Irr1, 12, 0 },	{ ldei_Ir2_Irr1, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ei, 6, 1 },
+	{ rl_R1, 6, 5 },    { rl_IR1, 6, 5 },   { lde_r2_Irr1, 12, 0 }, { ldei_Ir2_Irr1, 18, 0 },{ illegal, 0, 0 },     { illegal, 0, 0 },      { illegal, 0, 0 },      { illegal, 0, 0 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { ei, 6, 1 },
 
-	{ incw_RR1, 10, 5 },{ incw_IR1, 10, 5 },{ cp_r1_r2, 6, 5 },		{ cp_r1_Ir2, 6, 5 },	{ cp_R2_R1, 10, 5 },	{ cp_IR2_R1, 10, 5 },	{ cp_R1_IM, 10, 5 },	{ cp_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ret, 14, 0 },
+	{ incw_RR1, 10, 5 },{ incw_IR1, 10, 5 },{ cp_r1_r2, 6, 5 },     { cp_r1_Ir2, 6, 5 },    { cp_R2_R1, 10, 5 },    { cp_IR2_R1, 10, 5 },   { cp_R1_IM, 10, 5 },    { cp_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { ret, 14, 0 },
 
-	{ clr_R1, 6, 5 },	{ clr_IR1, 6, 5 },	{ xor_r1_r2, 6, 5 },	{ xor_r1_Ir2, 6, 5 },	{ xor_R2_R1, 10, 5 },	{ xor_IR2_R1, 10, 5 },	{ xor_R1_IM, 10, 5 },	{ xor_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ iret, 16, 0 },
+	{ clr_R1, 6, 5 },   { clr_IR1, 6, 5 },  { xor_r1_r2, 6, 5 },    { xor_r1_Ir2, 6, 5 },   { xor_R2_R1, 10, 5 },   { xor_IR2_R1, 10, 5 },  { xor_R1_IM, 10, 5 },   { xor_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { iret, 16, 0 },
 
-	{ rrc_R1, 6, 5 },	{ rrc_IR1, 6, 5 },	{ ldc_r1_Irr2, 12, 0 },	{ ldci_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ illegal, 0, 0 },		{ ld_r1_x_R2, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ rcf, 6, 5 },
+	{ rrc_R1, 6, 5 },   { rrc_IR1, 6, 5 },  { ldc_r1_Irr2, 12, 0 }, { ldci_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },     { illegal, 0, 0 },      { illegal, 0, 0 },      { ld_r1_x_R2, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { rcf, 6, 5 },
 
-	{ sra_R1, 6, 5 },	{ sra_IR1, 6, 5 },	{ ldc_r2_Irr1, 12, 0 },	{ ldci_Ir2_Irr1, 18, 0 },{ call_IRR1, 20, 0 },	{ illegal, 0, 0 },		{ call_DA, 20, 0 },		{ ld_r2_x_R1, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ scf, 6, 5 },
+	{ sra_R1, 6, 5 },   { sra_IR1, 6, 5 },  { ldc_r2_Irr1, 12, 0 }, { ldci_Ir2_Irr1, 18, 0 },{ call_IRR1, 20, 0 },  { illegal, 0, 0 },      { call_DA, 20, 0 },     { ld_r2_x_R1, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { scf, 6, 5 },
 
-	{ rr_R1, 6, 5 },	{ rr_IR1, 6, 5 },	{ illegal, 0, 0 },		{ ld_r1_Ir2, 6, 5 },	{ ld_R2_R1, 10, 5 },	{ ld_IR2_R1, 10, 5 },	{ ld_R1_IM, 10, 5 },	{ ld_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ ccf, 6, 5 },
+	{ rr_R1, 6, 5 },    { rr_IR1, 6, 5 },   { illegal, 0, 0 },      { ld_r1_Ir2, 6, 5 },    { ld_R2_R1, 10, 5 },    { ld_IR2_R1, 10, 5 },   { ld_R1_IM, 10, 5 },    { ld_IR1_IM, 10, 5 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { ccf, 6, 5 },
 
-	{ swap_R1, 8, 5 },	{ swap_IR1, 8, 5 },	{ illegal, 0, 0 },		{ ld_Ir1_r2, 6, 5 },	{ illegal, 0, 0 },		{ ld_R2_IR1, 10, 5 },	{ illegal, 0, 0 },		{ illegal, 0, 0 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },	{ jr_cc_RA, 10, 0 },	{ ld_r1_IM, 6, 5 },		{ jp_cc_DA, 10, 0 },	{ inc_r1, 6, 5 },		{ nop, 6, 0 },
+	{ swap_R1, 8, 5 },  { swap_IR1, 8, 5 }, { illegal, 0, 0 },      { ld_Ir1_r2, 6, 5 },    { illegal, 0, 0 },      { ld_R2_IR1, 10, 5 },   { illegal, 0, 0 },      { illegal, 0, 0 },
+	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { nop, 6, 0 },
 };
 
 /***************************************************************************
@@ -794,12 +794,12 @@ static CPU_EXPORT_STRING( z8 )
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS: string.printf("%c%c%c%c%c%c",
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_V ? 'V' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_D ? 'D' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_H ? 'H' : '.');	break;
+										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
+										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
+										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',
+										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_V ? 'V' : '.',
+										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_D ? 'D' : '.',
+										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_H ? 'H' : '.');   break;
 	}
 }
 
@@ -813,10 +813,10 @@ static CPU_SET_INFO( z8 )
 
 	switch (state)
 	{
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:	cpustate->irq[0] = info->i;				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1:	cpustate->irq[1] = info->i;				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2:	cpustate->irq[2] = info->i;				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ3:	cpustate->irq[3] = info->i;				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0: cpustate->irq[0] = info->i;             break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1: cpustate->irq[1] = info->i;             break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2: cpustate->irq[2] = info->i;             break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ3: cpustate->irq[3] = info->i;             break;
 	}
 }
 
@@ -827,46 +827,46 @@ static CPU_GET_INFO( z8 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(z8_state);				break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 3;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 6;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 20;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(z8_state);             break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 4;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 2;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 3;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 6;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 20;                           break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 2;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 16;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = 0;                            break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 16;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                            break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 2;                            break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:				info->setinfo = CPU_SET_INFO_NAME(z8);			break;
-		case CPUINFO_FCT_INIT:					info->init = CPU_INIT_NAME(z8);					break;
-		case CPUINFO_FCT_RESET:					info->reset = CPU_RESET_NAME(z8);				break;
-		case CPUINFO_FCT_EXECUTE:				info->execute = CPU_EXECUTE_NAME(z8);			break;
-		case CPUINFO_FCT_DISASSEMBLE:			info->disassemble = CPU_DISASSEMBLE_NAME(z8);	break;
-		case CPUINFO_FCT_IMPORT_STATE:			info->import_state = CPU_IMPORT_STATE_NAME(z8);	break;
-		case CPUINFO_FCT_EXPORT_STATE:			info->export_state = CPU_EXPORT_STATE_NAME(z8);	break;
-		case CPUINFO_FCT_EXPORT_STRING:			info->export_string = CPU_EXPORT_STRING_NAME(z8);	break;
+		case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(z8);          break;
+		case CPUINFO_FCT_INIT:                  info->init = CPU_INIT_NAME(z8);                 break;
+		case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(z8);               break;
+		case CPUINFO_FCT_EXECUTE:               info->execute = CPU_EXECUTE_NAME(z8);           break;
+		case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(z8);   break;
+		case CPUINFO_FCT_IMPORT_STATE:          info->import_state = CPU_IMPORT_STATE_NAME(z8); break;
+		case CPUINFO_FCT_EXPORT_STATE:          info->export_state = CPU_EXPORT_STATE_NAME(z8); break;
+		case CPUINFO_FCT_EXPORT_STRING:         info->export_string = CPU_EXPORT_STRING_NAME(z8);   break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &cpustate->icount;				break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &cpustate->icount;               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Z8");					break;
-		case CPUINFO_STR_FAMILY:						strcpy(info->s, "Zilog Z8");			break;
-		case CPUINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team"); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8");                  break;
+		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Zilog Z8");            break;
+		case CPUINFO_STR_VERSION:                       strcpy(info->s, "1.0");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                       strcpy(info->s, "Copyright MESS Team"); break;
 	}
 }
 
@@ -879,12 +879,12 @@ CPU_GET_INFO( z8601 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);    break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Z8601");								break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8601");                               break;
 
-		default:										CPU_GET_INFO_CALL(z8);									break;
+		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
 	}
 }
 
@@ -893,12 +893,12 @@ CPU_GET_INFO( ub8830d )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);    break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "UB8830D");								break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "UB8830D");                             break;
 
-		default:										CPU_GET_INFO_CALL(z8);									break;
+		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
 	}
 }
 
@@ -907,12 +907,12 @@ CPU_GET_INFO( z8611 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);    break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Z8611");								break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8611");                               break;
 
-		default:										CPU_GET_INFO_CALL(z8);									break;
+		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
 	}
 }
 

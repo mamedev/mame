@@ -150,7 +150,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 			myclip.set(sx, sx + sizex, sy, sy + sizey);
 			myclip &= rawbitmap.cliprect();
 
-			if (shangha3_ram[offs+4] & 0x08)	/* tilemap */
+			if (shangha3_ram[offs+4] & 0x08)    /* tilemap */
 			{
 				int srcx,srcy,dispx,dispy,w,h,condensed;
 
@@ -215,7 +215,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 					}
 				}
 			}
-			else	/* sprite */
+			else    /* sprite */
 			{
 				int w;
 

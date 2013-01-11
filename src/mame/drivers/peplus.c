@@ -180,7 +180,7 @@ class peplus_state : public driver_device
 public:
 	peplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_cmos_ram(*this, "cmos") ,
+			m_cmos_ram(*this, "cmos") ,
 		m_program_ram(*this, "prograram"),
 		m_s3000_ram(*this, "s3000_ram"),
 		m_s5000_ram(*this, "s5000_ram"),
@@ -273,10 +273,10 @@ public:
 static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
 static const UINT16 id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a0a, 0x4a19, 0x4a3a };
 
-#define MASTER_CLOCK		XTAL_20MHz
-#define CPU_CLOCK			((MASTER_CLOCK)/2)		/* divided by 2 - 7474 */
-#define MC6845_CLOCK		((MASTER_CLOCK)/8/3)
-#define SOUND_CLOCK			((MASTER_CLOCK)/12)
+#define MASTER_CLOCK        XTAL_20MHz
+#define CPU_CLOCK           ((MASTER_CLOCK)/2)      /* divided by 2 - 7474 */
+#define MC6845_CLOCK        ((MASTER_CLOCK)/8/3)
+#define SOUND_CLOCK         ((MASTER_CLOCK)/12)
 
 
 #define eeprom_NVRAM_SIZE   0x200 // 4k Bit
@@ -293,16 +293,16 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",				/* screen we are acting on */
-	8,						/* number of pixels per video memory address */
-	NULL,					/* before pixel update callback */
-	NULL,					/* row update callback */
-	NULL,					/* after pixel update callback */
-	DEVCB_NULL,				/* callback for display state changes */
-	DEVCB_NULL,				/* callback for cursor state changes */
-	DEVCB_NULL,				/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(peplus_state,crtc_vsync),	/* VSYNC callback */
-	crtc_addr				/* update address callback */
+	"screen",               /* screen we are acting on */
+	8,                      /* number of pixels per video memory address */
+	NULL,                   /* before pixel update callback */
+	NULL,                   /* row update callback */
+	NULL,                   /* after pixel update callback */
+	DEVCB_NULL,             /* callback for display state changes */
+	DEVCB_NULL,             /* callback for cursor state changes */
+	DEVCB_NULL,             /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(peplus_state,crtc_vsync),  /* VSYNC callback */
+	crtc_addr               /* update address callback */
 };
 
 
@@ -313,15 +313,15 @@ static const mc6845_interface mc6845_intf =
 static void peplus_load_superdata(running_machine &machine, const char *bank_name)
 {
 	peplus_state *state = machine.driver_data<peplus_state>();
-    UINT8 *super_data = state->memregion(bank_name)->base();
+	UINT8 *super_data = state->memregion(bank_name)->base();
 
-    /* Distribute Superboard Data */
-    memcpy(state->m_s3000_ram, &super_data[0x3000], 0x1000);
-    memcpy(state->m_s5000_ram, &super_data[0x5000], 0x1000);
-    memcpy(state->m_s7000_ram, &super_data[0x7000], 0x1000);
-    memcpy(state->m_sb000_ram, &super_data[0xb000], 0x1000);
-    memcpy(state->m_sd000_ram, &super_data[0xd000], 0x1000);
-    memcpy(state->m_sf000_ram, &super_data[0xf000], 0x1000);
+	/* Distribute Superboard Data */
+	memcpy(state->m_s3000_ram, &super_data[0x3000], 0x1000);
+	memcpy(state->m_s5000_ram, &super_data[0x5000], 0x1000);
+	memcpy(state->m_s7000_ram, &super_data[0x7000], 0x1000);
+	memcpy(state->m_sb000_ram, &super_data[0xb000], 0x1000);
+	memcpy(state->m_sd000_ram, &super_data[0xd000], 0x1000);
+	memcpy(state->m_sf000_ram, &super_data[0xf000], 0x1000);
 }
 
 
@@ -381,15 +381,15 @@ TIMER_CALLBACK_MEMBER(peplus_state::assert_lp_cb)
 static void handle_lightpen( device_t *device )
 {
 	peplus_state *state = device->machine().driver_data<peplus_state>();
-    int x_val = device->machine().root_device().ioport("TOUCH_X")->read_safe(0x00);
-    int y_val = device->machine().root_device().ioport("TOUCH_Y")->read_safe(0x00);
-    const rectangle &vis_area = device->machine().primary_screen->visible_area();
-    int xt, yt;
+	int x_val = device->machine().root_device().ioport("TOUCH_X")->read_safe(0x00);
+	int y_val = device->machine().root_device().ioport("TOUCH_Y")->read_safe(0x00);
+	const rectangle &vis_area = device->machine().primary_screen->visible_area();
+	int xt, yt;
 
-    xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
-    yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
+	xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
+	yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
 
-     device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(yt, xt), timer_expired_delegate(FUNC(peplus_state::assert_lp_cb),state), 0, device);
+		device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(yt, xt), timer_expired_delegate(FUNC(peplus_state::assert_lp_cb),state), 0, device);
 }
 
 WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
@@ -477,9 +477,9 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
 	output_set_value("pe_bnka6",(data >> 6) & 1); /* specific to a kind of machine */
 	output_set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
 
-    m_coin_out_state = 0;
-    if(((data >> 4) & 1) || ((data >> 5) & 1))
-        m_coin_out_state = 3;
+	m_coin_out_state = 0;
+	if(((data >> 4) & 1) || ((data >> 5) & 1))
+		m_coin_out_state = 3;
 }
 
 WRITE8_MEMBER(peplus_state::peplus_output_bank_b_w)
@@ -523,7 +523,7 @@ WRITE8_MEMBER(peplus_state::i2c_nvram_w)
 
 READ8_MEMBER(peplus_state::peplus_io_r)
 {
-    return m_io_port[offset];
+	return m_io_port[offset];
 }
 
 READ8_MEMBER(peplus_state::peplus_duart_r)
@@ -849,7 +849,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 */
 	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
 	UINT8 coin_optics = 0x00;
-    UINT8 coin_out = 0x00;
+	UINT8 coin_out = 0x00;
 	UINT64 curr_cycles = machine().firstcpu->total_cycles();
 	UINT16 door_wait = 500;
 
@@ -908,29 +908,29 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 
 	if (curr_cycles - m_last_coin_out > 600000/12 && m_coin_out_state != 0) { // Guessing with 600000
 		if (m_coin_out_state != 2) {
-            m_coin_out_state = 2; // Coin-Out Off
-        } else {
-            m_coin_out_state = 3; // Coin-Out On
-        }
+			m_coin_out_state = 2; // Coin-Out Off
+		} else {
+			m_coin_out_state = 3; // Coin-Out On
+		}
 
 		m_last_coin_out = machine().firstcpu->total_cycles();
 	}
 
-    switch (m_coin_out_state)
-    {
-        case 0x00: // No Coin-Out
-	        coin_out = 0x00;
-	        break;
-        case 0x01: // First Coin-Out On
-	        coin_out = 0x08;
-	        break;
-        case 0x02: // Coin-Out Off
-	        coin_out = 0x00;
-	        break;
-        case 0x03: // Additional Coin-Out On
-	        coin_out = 0x08;
-	        break;
-    }
+	switch (m_coin_out_state)
+	{
+		case 0x00: // No Coin-Out
+			coin_out = 0x00;
+			break;
+		case 0x01: // First Coin-Out On
+			coin_out = 0x08;
+			break;
+		case 0x02: // Coin-Out Off
+			coin_out = 0x00;
+			break;
+		case 0x03: // Additional Coin-Out On
+			coin_out = 0x08;
+			break;
+	}
 
 	bank_a = (sda<<7) | bank_a | (m_door_open<<5) | coin_optics | coin_out;
 
@@ -1043,23 +1043,23 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x2083, 0x2083) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
 
-    // Superboard Data
+	// Superboard Data
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_SHARE("s3000_ram")
 
 	// Sound and Dipswitches
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 
-    // Superboard Data
+	// Superboard Data
 	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_SHARE("s5000_ram")
 
 	// Background Color Latch
 	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
 
-    // Bogus Location for Video RAM
+	// Bogus Location for Video RAM
 	AM_RANGE(0x06001, 0x06400) AM_RAM AM_SHARE("videoram")
 
-    // Superboard Data
+	// Superboard Data
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_SHARE("s7000_ram")
 
 	// Input Bank A, Output Bank C
@@ -1071,19 +1071,19 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	// Input Banks B & C, Output Bank B
 	AM_RANGE(0xa000, 0xa000) AM_READ(peplus_input0_r) AM_WRITE(peplus_output_bank_b_w)
 
-    // Superboard Data
+	// Superboard Data
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_SHARE("sb000_ram")
 
 	// Output Bank A
 	AM_RANGE(0xc000, 0xc000) AM_READ(peplus_watchdog_r) AM_WRITE(peplus_output_bank_a_w)
 
-    // Superboard Data
+	// Superboard Data
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_SHARE("sd000_ram")
 
 	// DUART
 	AM_RANGE(0xe000, 0xe00f) AM_READWRITE(peplus_duart_r, peplus_duart_w)
 
-    // Superboard Data
+	// Superboard Data
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_SHARE("sf000_ram")
 
 	/* Ports start here */
@@ -1426,10 +1426,10 @@ ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
 	ROM_LOAD( "set038.u68",   0x00000, 0x10000, CRC(9c4b1d1a) SHA1(8a65cd1d8e2d74c7b66f4dfc73e7afca8458e979) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1440,10 +1440,10 @@ ROM_START( pepp0043 ) /* Normal board : 10's or Better (PP0043) */
 	ROM_LOAD( "pp0043.u68",   0x00000, 0x10000, CRC(04051a88) SHA1(e7a9ec2ab7f6f575245d47ee10a03f39c887d1b3) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2004.u72",	 0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) )
-	ROM_LOAD( "mgo-cg2004.u73",	 0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",	 0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
-	ROM_LOAD( "mxo-cg2004.u75",	 0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) )
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1454,10 +1454,10 @@ ROM_START( pepp0065 ) /* Normal board : Jokers Wild Poker (PP0065) */
 	ROM_LOAD( "pp0065.u68",   0x00000, 0x10000, CRC(76c1a367) SHA1(ea8be9241e9925b5a4206db6875e1572f85fa5fe) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1468,10 +1468,10 @@ ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) */
 	ROM_LOAD( "pp0158.u68",   0x00000, 0x10000, CRC(5976cd19) SHA1(6a461ea9ddf78dffa3cf8b65903ebf3127f23d45) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1482,10 +1482,10 @@ ROM_START( pepp0188 ) /* Normal board : Standard Draw Poker (PP0188) */
 	ROM_LOAD( "pp0188.u68",   0x00000, 0x10000, CRC(cf36a53c) SHA1(99b578538ab24d9ff91971b1f77599272d1dbfc6) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1496,10 +1496,10 @@ ROM_START( pepp0250 ) /* Normal board : Double Down Stud Poker (PP0250) */
 	ROM_LOAD( "pp0250.u68",   0x00000, 0x10000, CRC(4c919598) SHA1(fe73503c6ccb3c5746fb96be58cd5b740c819713) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1510,10 +1510,10 @@ ROM_START( pepp0447 ) /* Normal board : Standard Draw Poker (PP0447) */
 	ROM_LOAD( "pp0447.u68",   0x00000, 0x10000, CRC(0ef0bb6c) SHA1(d0ef7a83417054f05d32d0a93ed0d5d618f4dfb9) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1524,10 +1524,10 @@ ROM_START( pepp0516 ) /* Normal board : Double Bonus Poker (PP0516) */
 	ROM_LOAD( "pp0516.u68",   0x00000, 0x10000, CRC(d9da6e13) SHA1(421678d9cb42daaf5b21074cc3900db914dd26cf) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
-	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
-	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
-	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
@@ -1538,10 +1538,10 @@ ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
 	ROM_LOAD( "be0014.u68",   0x00000, 0x10000, CRC(232b32b7) SHA1(a3af9414577642fedc23b4c1911901cd31e9d6e0) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2036.u72",	 0x00000, 0x8000, CRC(0a168d06) SHA1(7ed4fb5c7bcacab077bcec030f0465c6eaf3ce1c) )
-	ROM_LOAD( "mgo-cg2036.u73",	 0x08000, 0x8000, CRC(826b4090) SHA1(34390484c0faffe9340fd93d273b9292d09f97fd) )
-	ROM_LOAD( "mbo-cg2036.u74",	 0x10000, 0x8000, CRC(46aac851) SHA1(28d84b49c6cebcf2894b5a15d935618f84093caa) )
-	ROM_LOAD( "mxo-cg2036.u75",	 0x18000, 0x8000, CRC(60204a56) SHA1(2e3420da9e79ba304ca866d124788f84861380a7) )
+	ROM_LOAD( "mro-cg2036.u72",  0x00000, 0x8000, CRC(0a168d06) SHA1(7ed4fb5c7bcacab077bcec030f0465c6eaf3ce1c) )
+	ROM_LOAD( "mgo-cg2036.u73",  0x08000, 0x8000, CRC(826b4090) SHA1(34390484c0faffe9340fd93d273b9292d09f97fd) )
+	ROM_LOAD( "mbo-cg2036.u74",  0x10000, 0x8000, CRC(46aac851) SHA1(28d84b49c6cebcf2894b5a15d935618f84093caa) )
+	ROM_LOAD( "mxo-cg2036.u75",  0x18000, 0x8000, CRC(60204a56) SHA1(2e3420da9e79ba304ca866d124788f84861380a7) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap707.u50", 0x0000, 0x0200, CRC(5bfeed62) SHA1(df47a2723a70a7c16fbf03b9f614e9b98751a59e) )
@@ -1552,10 +1552,10 @@ ROM_START( peke1012 ) /* Normal board : Keno (KE1012) */
 	ROM_LOAD( "ke1012.u68",   0x00000, 0x10000, CRC(470e8c10) SHA1(f8a65a3a73477e9e9d2f582eeefa93b470497dfa) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1267.u72",	 0x00000, 0x8000, CRC(16498b57) SHA1(9c22726299af7204c4be1c6d8afc4c1b512ad918) )
-	ROM_LOAD( "mgo-cg1267.u73",	 0x08000, 0x8000, CRC(80847c5a) SHA1(8422cd13a91c3c462af5efcfca8615e7eeaa2e52) )
-	ROM_LOAD( "mbo-cg1267.u74",	 0x10000, 0x8000, CRC(ce7af8a7) SHA1(38675122c764b8fa9260246ea99ac0f0750da277) )
-	ROM_LOAD( "mxo-cg1267.u75",	 0x18000, 0x8000, CRC(a4394303) SHA1(30a07028de35f74cc4fb776b0505ca743c8d7b5b) )
+	ROM_LOAD( "mro-cg1267.u72",  0x00000, 0x8000, CRC(16498b57) SHA1(9c22726299af7204c4be1c6d8afc4c1b512ad918) )
+	ROM_LOAD( "mgo-cg1267.u73",  0x08000, 0x8000, CRC(80847c5a) SHA1(8422cd13a91c3c462af5efcfca8615e7eeaa2e52) )
+	ROM_LOAD( "mbo-cg1267.u74",  0x10000, 0x8000, CRC(ce7af8a7) SHA1(38675122c764b8fa9260246ea99ac0f0750da277) )
+	ROM_LOAD( "mxo-cg1267.u75",  0x18000, 0x8000, CRC(a4394303) SHA1(30a07028de35f74cc4fb776b0505ca743c8d7b5b) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0200, CRC(3dac264f) SHA1(e9c9de42ffd64d4463bee6fa10886a53bc062ff8) )
@@ -1566,10 +1566,10 @@ ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) */
 	ROM_LOAD( "ps0014.u68",   0x00000, 0x10000, CRC(368c3f58) SHA1(ebefcefbb5386659680719936bff72ad61087343) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg0916.u72",	 0x00000, 0x8000, CRC(d97049d9) SHA1(78f7bb33866ca92922a8b83d5f9ac459edd39176) )
-	ROM_LOAD( "mgo-cg0916.u73",	 0x08000, 0x8000, CRC(6e075788) SHA1(e8e9d8b7943d62e31d1d58f870bc765cba65c203) )
-	ROM_LOAD( "mbo-cg0916.u74",	 0x10000, 0x8000, CRC(a5cdf0f3) SHA1(23b2749fd2cb5b8462ce7c912005779b611f32f9) )
-	ROM_LOAD( "mxo-cg0916.u75",	 0x18000, 0x8000, CRC(1f3a2d72) SHA1(8e07324d436980b628e007d30a835757c1f70f6d) )
+	ROM_LOAD( "mro-cg0916.u72",  0x00000, 0x8000, CRC(d97049d9) SHA1(78f7bb33866ca92922a8b83d5f9ac459edd39176) )
+	ROM_LOAD( "mgo-cg0916.u73",  0x08000, 0x8000, CRC(6e075788) SHA1(e8e9d8b7943d62e31d1d58f870bc765cba65c203) )
+	ROM_LOAD( "mbo-cg0916.u74",  0x10000, 0x8000, CRC(a5cdf0f3) SHA1(23b2749fd2cb5b8462ce7c912005779b611f32f9) )
+	ROM_LOAD( "mxo-cg0916.u75",  0x18000, 0x8000, CRC(1f3a2d72) SHA1(8e07324d436980b628e007d30a835757c1f70f6d) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap0916.u50", 0x0000, 0x0200, CRC(c9a4f87c) SHA1(3c7c53fbf7573f07b334e0529bfd7ccf8d5339b5) )
@@ -1580,10 +1580,10 @@ ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) */
 	ROM_LOAD( "ps0022.u68",   0x00000, 0x10000, CRC(d65c0939) SHA1(d91f472a43f77f9df8845e97561540f988e522e3) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg0960.u72",	 0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
-	ROM_LOAD( "mgo-cg0960.u73",	 0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
-	ROM_LOAD( "mbo-cg0960.u74",	 0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
-	ROM_LOAD( "mxo-cg0960.u75",	 0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
+	ROM_LOAD( "mro-cg0960.u72",  0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
+	ROM_LOAD( "mgo-cg0960.u73",  0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
+	ROM_LOAD( "mbo-cg0960.u74",  0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
+	ROM_LOAD( "mxo-cg0960.u75",  0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap0960.u50", 0x0000, 0x0200, CRC(83d67070) SHA1(4c50abbe750dbd4a461084b0bfc51e38df97e421) )
@@ -1594,10 +1594,10 @@ ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) */
 	ROM_LOAD( "ps0043.u68",   0x00000, 0x10000, CRC(d612429c) SHA1(95eb4774482a930066456d517fb2e4f67d4df4cb) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg1003.u72",	 0x00000, 0x8000, CRC(41ce0395) SHA1(ae90dbae30e4efed33f83ee7038fb2e5171c1945) )
-	ROM_LOAD( "mgo-cg1003.u73",	 0x08000, 0x8000, CRC(5a383fa1) SHA1(27b1febbdda7332e8d474fc0cca683f451a07090) )
-	ROM_LOAD( "mbo-cg1003.u74",	 0x10000, 0x8000, CRC(5ec00224) SHA1(bb70a4326cd1810b200e193a449061df62085f37) )
-	ROM_LOAD( "mxo-cg1003.u75",	 0x18000, 0x8000, CRC(2ffacd52) SHA1(38126ac4998806a1ddd55e6aa1942044240d41d0) )
+	ROM_LOAD( "mro-cg1003.u72",  0x00000, 0x8000, CRC(41ce0395) SHA1(ae90dbae30e4efed33f83ee7038fb2e5171c1945) )
+	ROM_LOAD( "mgo-cg1003.u73",  0x08000, 0x8000, CRC(5a383fa1) SHA1(27b1febbdda7332e8d474fc0cca683f451a07090) )
+	ROM_LOAD( "mbo-cg1003.u74",  0x10000, 0x8000, CRC(5ec00224) SHA1(bb70a4326cd1810b200e193a449061df62085f37) )
+	ROM_LOAD( "mxo-cg1003.u75",  0x18000, 0x8000, CRC(2ffacd52) SHA1(38126ac4998806a1ddd55e6aa1942044240d41d0) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap1003.u50", 0x0000, 0x0200, CRC(1fb7b69f) SHA1(cdb609f39ef1ca0ddf389a599f799c269c7163f9) )
@@ -1608,10 +1608,10 @@ ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) */
 	ROM_LOAD( "ps0045.u68",   0x00000, 0x10000, CRC(de180b84) SHA1(0d592d7d535b0aacbd62c18ac222da770fab7b85) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg0960.u72",	 0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
-	ROM_LOAD( "mgo-cg0960.u73",	 0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
-	ROM_LOAD( "mbo-cg0960.u74",	 0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
-	ROM_LOAD( "mxo-cg0960.u75",	 0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
+	ROM_LOAD( "mro-cg0960.u72",  0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
+	ROM_LOAD( "mgo-cg0960.u73",  0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
+	ROM_LOAD( "mbo-cg0960.u74",  0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
+	ROM_LOAD( "mxo-cg0960.u75",  0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap0960.u50", 0x0000, 0x0200, CRC(83d67070) SHA1(4c50abbe750dbd4a461084b0bfc51e38df97e421) )
@@ -1622,10 +1622,10 @@ ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) */
 	ROM_LOAD( "ps0308.u68",   0x00000, 0x10000, CRC(fe30e081) SHA1(d216cbc6336727caf359e6b178c856ab2659cabd) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg0911.u72",	 0x00000, 0x8000, CRC(48491b50) SHA1(9ec6d3ff34a08d40082a1347a46635838fd31afc) )
-	ROM_LOAD( "mgo-cg0911.u73",	 0x08000, 0x8000, CRC(c1ff7d97) SHA1(78ab138ae9c7f9b3352f9b1ef5fbc473993bb8c8) )
-	ROM_LOAD( "mbo-cg0911.u74",	 0x10000, 0x8000, CRC(202e0f9e) SHA1(51421dfd1b00a9e3b1e938d5bffaa3b7cd4c2b5e) )
-	ROM_LOAD( "mxo-cg0911.u75",	 0x18000, 0x8000, CRC(d97740a2) SHA1(d76926d7fbbc24d2384a1079cb97e654600b134b) )
+	ROM_LOAD( "mro-cg0911.u72",  0x00000, 0x8000, CRC(48491b50) SHA1(9ec6d3ff34a08d40082a1347a46635838fd31afc) )
+	ROM_LOAD( "mgo-cg0911.u73",  0x08000, 0x8000, CRC(c1ff7d97) SHA1(78ab138ae9c7f9b3352f9b1ef5fbc473993bb8c8) )
+	ROM_LOAD( "mbo-cg0911.u74",  0x10000, 0x8000, CRC(202e0f9e) SHA1(51421dfd1b00a9e3b1e938d5bffaa3b7cd4c2b5e) )
+	ROM_LOAD( "mxo-cg0911.u75",  0x18000, 0x8000, CRC(d97740a2) SHA1(d76926d7fbbc24d2384a1079cb97e654600b134b) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap0911.u50", 0x0000, 0x0200, CRC(79dc19c0) SHA1(9ebf998b73c3390cbb957b3dd3fec57b3c70a06d) )
@@ -1636,13 +1636,13 @@ ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
 	ROM_LOAD( "ps0615.u68",   0x00000, 0x10000, CRC(d27dd6ab) SHA1(b3f065f507191682edbd93b07b72ed87bf6ae9b1) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2246.u72",	 0x00000, 0x8000, CRC(7c08c355) SHA1(2a154b81c6d9671cea55a924bffb7f5461747142) )
-	ROM_LOAD( "mgo-cg2246.u73",	 0x08000, 0x8000, CRC(b3c16487) SHA1(c97232fadd086f604eaeb3cd3c2d1c8fe0dcfa70) )
-	ROM_LOAD( "mbo-cg2246.u74",	 0x10000, 0x8000, CRC(e61331f5) SHA1(4364edc625d64151cbae40780b54cb1981086647) )
-	ROM_LOAD( "mxo-cg2246.u75",	 0x18000, 0x8000, CRC(f0f4a27d) SHA1(3a10ab196aeaa5b50d47b9d3c5b378cfadd6fe96) )
+	ROM_LOAD( "mro-cg2246.u72",  0x00000, 0x8000, CRC(7c08c355) SHA1(2a154b81c6d9671cea55a924bffb7f5461747142) )
+	ROM_LOAD( "mgo-cg2246.u73",  0x08000, 0x8000, CRC(b3c16487) SHA1(c97232fadd086f604eaeb3cd3c2d1c8fe0dcfa70) )
+	ROM_LOAD( "mbo-cg2246.u74",  0x10000, 0x8000, CRC(e61331f5) SHA1(4364edc625d64151cbae40780b54cb1981086647) )
+	ROM_LOAD( "mxo-cg2246.u75",  0x18000, 0x8000, CRC(f0f4a27d) SHA1(3a10ab196aeaa5b50d47b9d3c5b378cfadd6fe96) )
 
 	ROM_REGION( 0x200, "proms", 0 ) // WRONG CAP
-    ROM_LOAD( "cap0960.u50", 0x0000, 0x0200, CRC(83d67070) SHA1(4c50abbe750dbd4a461084b0bfc51e38df97e421) )
+	ROM_LOAD( "cap0960.u50", 0x0000, 0x0200, CRC(83d67070) SHA1(4c50abbe750dbd4a461084b0bfc51e38df97e421) )
 ROM_END
 
 ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
@@ -1650,10 +1650,10 @@ ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
 	ROM_LOAD( "ps0716.u68",   0x00000, 0x10000, CRC(7615d7b6) SHA1(91fe62eec720a0dc2ebf48835065148f19499d16) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2266.u72",	 0x00000, 0x8000, CRC(590accd8) SHA1(4e1c963c50799eaa49970e25ecf9cb01eb6b09e1) )
-	ROM_LOAD( "mgo-cg2266.u73",	 0x08000, 0x8000, CRC(b87ffa05) SHA1(92126b670b9cabeb5e2cc35b6e9c458088b18eea) )
-	ROM_LOAD( "mbo-cg2266.u74",	 0x10000, 0x8000, CRC(e3df30e1) SHA1(c7d2ae9a7c7e53bfb6197b635efcb5dc231e4fe0) )
-	ROM_LOAD( "mxo-cg2266.u75",	 0x18000, 0x8000, CRC(56271442) SHA1(61ad0756b9f6412516e46ef6625a4c3899104d4e) )
+	ROM_LOAD( "mro-cg2266.u72",  0x00000, 0x8000, CRC(590accd8) SHA1(4e1c963c50799eaa49970e25ecf9cb01eb6b09e1) )
+	ROM_LOAD( "mgo-cg2266.u73",  0x08000, 0x8000, CRC(b87ffa05) SHA1(92126b670b9cabeb5e2cc35b6e9c458088b18eea) )
+	ROM_LOAD( "mbo-cg2266.u74",  0x10000, 0x8000, CRC(e3df30e1) SHA1(c7d2ae9a7c7e53bfb6197b635efcb5dc231e4fe0) )
+	ROM_LOAD( "mxo-cg2266.u75",  0x18000, 0x8000, CRC(56271442) SHA1(61ad0756b9f6412516e46ef6625a4c3899104d4e) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "cap2266.u50", 0x0000, 0x0200, CRC(ae8b52ac) SHA1(f58d40ee77d7f432dfe5f37954e43cab654c9a4c) )
@@ -1667,10 +1667,10 @@ ROM_START( pex2069p ) /* Superboard : Double Double Bonus Poker (X002069P) */
 	ROM_LOAD( "x002069p.u66",   0x00000, 0x10000, CRC(875ecfcf) SHA1(80472cb43b36e518216e60a9b4883a81163718a2) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",	 0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
-	ROM_LOAD( "mgo-cg2185.u78",	 0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
-	ROM_LOAD( "mbo-cg2185.u79",	 0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
-	ROM_LOAD( "mxo-cg2185.u80",	 0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
+	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
+	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
@@ -1684,10 +1684,10 @@ ROM_START( pexp0019 ) /* Superboard : Deuces Wild Poker (XP000019) */
 	ROM_LOAD( "x002025p.u66",   0x00000, 0x10000, CRC(f3dac423) SHA1(e9394d330deb3b8a1001e57e72a506cd9098f161) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2185.u77",	 0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
-	ROM_LOAD( "mgo-cg2185.u78",	 0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
-	ROM_LOAD( "mbo-cg2185.u79",	 0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
-	ROM_LOAD( "mxo-cg2185.u80",	 0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
+	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
+	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
 
 	ROM_REGION( 0x200, "proms", 0 ) // WRONG CAP
 	ROM_LOAD( "capx2234.u43", 0x0000, 0x0200, CRC(519000fa) SHA1(31cd72643ca74a778418f944045e9e03937143d6) )
@@ -1701,10 +1701,10 @@ ROM_START( pexp0112 ) /* Superboard : White Hot Aces Poker (XP000112) */
 	ROM_LOAD( "x002035p.u66",   0x00000, 0x10000, CRC(dc3f0742) SHA1(d57cf3353b81f41895458019e47203f98645f17a) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2324.u77",	 0x00000, 0x8000, CRC(6eceef42) SHA1(a2ddd2a3290c41e510f483c6b633fe0002694d0b) )
-	ROM_LOAD( "mgo-cg2324.u78",	 0x08000, 0x8000, CRC(26d0acbe) SHA1(09a9127deb88185cd5b748bac657461eadb2f48f) )
-	ROM_LOAD( "mbo-cg2324.u79",	 0x10000, 0x8000, CRC(47baee32) SHA1(d8af09022ccb5fc06aa3aa4c200a734b66cbee00) )
-	ROM_LOAD( "mxo-cg2324.u80",	 0x18000, 0x8000, CRC(60449fc0) SHA1(251d1e04786b70c1d2bc7b02f3b69cd58ac76398) )
+	ROM_LOAD( "mro-cg2324.u77",  0x00000, 0x8000, CRC(6eceef42) SHA1(a2ddd2a3290c41e510f483c6b633fe0002694d0b) )
+	ROM_LOAD( "mgo-cg2324.u78",  0x08000, 0x8000, CRC(26d0acbe) SHA1(09a9127deb88185cd5b748bac657461eadb2f48f) )
+	ROM_LOAD( "mbo-cg2324.u79",  0x10000, 0x8000, CRC(47baee32) SHA1(d8af09022ccb5fc06aa3aa4c200a734b66cbee00) )
+	ROM_LOAD( "mxo-cg2324.u80",  0x18000, 0x8000, CRC(60449fc0) SHA1(251d1e04786b70c1d2bc7b02f3b69cd58ac76398) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
@@ -1718,10 +1718,10 @@ ROM_START( pexs0006 ) /* Superboard : Triple Triple Diamond Slots (XS000006) */
 	ROM_LOAD( "x000998s.u66",   0x00000, 0x10000, CRC(e29d4346) SHA1(93901ff65c8973e34ac1f0dd68bb4c4973da5621) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2361.u77",	 0x00000, 0x8000, CRC(c0eba866) SHA1(8f217aeb3e8028a5633d95e5612f1b55e601650f) )
-	ROM_LOAD( "mgo-cg2361.u78",	 0x08000, 0x8000, CRC(345eaea2) SHA1(18ebb94a323e1cf671201db8b9f85d4f30d8b5ec) )
-	ROM_LOAD( "mbo-cg2361.u79",	 0x10000, 0x8000, CRC(fa130af6) SHA1(aca5e52e00bc75a4801fd3f6c564e62ed4251d8e) )
-	ROM_LOAD( "mxo-cg2361.u80",	 0x18000, 0x8000, CRC(7de1812c) SHA1(c7e23a10f20fc8b618df21dd33ac456e1d2cfe33) )
+	ROM_LOAD( "mro-cg2361.u77",  0x00000, 0x8000, CRC(c0eba866) SHA1(8f217aeb3e8028a5633d95e5612f1b55e601650f) )
+	ROM_LOAD( "mgo-cg2361.u78",  0x08000, 0x8000, CRC(345eaea2) SHA1(18ebb94a323e1cf671201db8b9f85d4f30d8b5ec) )
+	ROM_LOAD( "mbo-cg2361.u79",  0x10000, 0x8000, CRC(fa130af6) SHA1(aca5e52e00bc75a4801fd3f6c564e62ed4251d8e) )
+	ROM_LOAD( "mxo-cg2361.u80",  0x18000, 0x8000, CRC(7de1812c) SHA1(c7e23a10f20fc8b618df21dd33ac456e1d2cfe33) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2361.u43", 0x0000, 0x0200, CRC(93057296) SHA1(534bbf8ee80a22822d577f6685501f4c929987ef) )
@@ -1735,10 +1735,10 @@ ROM_START( pexmp006 ) /* Superboard : Multi-Poker (XMP00006) */
 	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2174.u77",	 0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) )
-	ROM_LOAD( "mgo-cg2174.u78",	 0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) )
-	ROM_LOAD( "mbo-cg2174.u79",	 0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
-	ROM_LOAD( "mxo-cg2174.u80",	 0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
+	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) )
+	ROM_LOAD( "mgo-cg2174.u78",  0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) )
+	ROM_LOAD( "mbo-cg2174.u79",  0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
+	ROM_LOAD( "mxo-cg2174.u80",  0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
@@ -1764,10 +1764,10 @@ ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
 	ROM_LOAD( "x002036p.u66",   0x00000, 0x10000, CRC(69207baf) SHA1(fe038b969106ae5cdc8dde1c06497be9c7b5b8bf) )
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2298.u77",	 0x00000, 0x10000, CRC(8c35dc7f) SHA1(90e9566e816287e6248d7cab318dee3ad6fac871) )
-	ROM_LOAD( "mgo-cg2298.u78",	 0x10000, 0x10000, CRC(3663174a) SHA1(c203a4a59f6bc1625d47f35426ffc5b4d279251a) )
-	ROM_LOAD( "mbo-cg2298.u79",	 0x20000, 0x10000, CRC(9088cdbe) SHA1(dc62951c584463a1e795a774f5752f890d8e3f65) )
-	ROM_LOAD( "mxo-cg2298.u80",	 0x30000, 0x10000, CRC(8d3aafc8) SHA1(931bc82398b94c63ed9f6f1bd95723aa801894cc) )
+	ROM_LOAD( "mro-cg2298.u77",  0x00000, 0x10000, CRC(8c35dc7f) SHA1(90e9566e816287e6248d7cab318dee3ad6fac871) )
+	ROM_LOAD( "mgo-cg2298.u78",  0x10000, 0x10000, CRC(3663174a) SHA1(c203a4a59f6bc1625d47f35426ffc5b4d279251a) )
+	ROM_LOAD( "mbo-cg2298.u79",  0x20000, 0x10000, CRC(9088cdbe) SHA1(dc62951c584463a1e795a774f5752f890d8e3f65) )
+	ROM_LOAD( "mxo-cg2298.u80",  0x30000, 0x10000, CRC(8d3aafc8) SHA1(931bc82398b94c63ed9f6f1bd95723aa801894cc) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
@@ -1781,10 +1781,10 @@ ROM_START( pexmp024 ) /* Superboard : Multi-Poker (XMP00024) */
 	ROM_LOAD( "xm00005p.u66",   0x00000, 0x10000, CRC(c832eac7) SHA1(747d57de602b44ae1276fe1009db1b6de0d2c64c) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2240.u77",	 0x00000, 0x8000, CRC(eedef2d4) SHA1(419a90e1f4a840625e6ac7afc2c24d13c908156d) )
-	ROM_LOAD( "mgo-cg2240.u78",	 0x08000, 0x8000, CRC(c596b058) SHA1(d53824f869bceeda482e434cba9a77ba8ce2015f) )
-	ROM_LOAD( "mbo-cg2240.u79",	 0x10000, 0x8000, CRC(ab1a58ee) SHA1(44963f27d5f5d8f9415d88c12b2d40f0ef55c559) )
-	ROM_LOAD( "mxo-cg2240.u80",	 0x18000, 0x8000, CRC(75488ff7) SHA1(a34ae53847b5643b8c4dc182dc59b1fccf22d557) )
+	ROM_LOAD( "mro-cg2240.u77",  0x00000, 0x8000, CRC(eedef2d4) SHA1(419a90e1f4a840625e6ac7afc2c24d13c908156d) )
+	ROM_LOAD( "mgo-cg2240.u78",  0x08000, 0x8000, CRC(c596b058) SHA1(d53824f869bceeda482e434cba9a77ba8ce2015f) )
+	ROM_LOAD( "mbo-cg2240.u79",  0x10000, 0x8000, CRC(ab1a58ee) SHA1(44963f27d5f5d8f9415d88c12b2d40f0ef55c559) )
+	ROM_LOAD( "mxo-cg2240.u80",  0x18000, 0x8000, CRC(75488ff7) SHA1(a34ae53847b5643b8c4dc182dc59b1fccf22d557) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )

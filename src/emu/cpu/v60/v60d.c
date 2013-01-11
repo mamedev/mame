@@ -27,7 +27,7 @@ static const char *const v60_reg_names[69] = {
 static const UINT8 *rombase;
 static offs_t pcbase;
 
-#define readop(a)	rombase[(a) - pcbase]
+#define readop(a)   rombase[(a) - pcbase]
 
 static signed char read8(unsigned pc)
 {
@@ -238,7 +238,7 @@ static int decode_AM(unsigned ipc, unsigned pc, int m, int opsize, char *out)
 					out_AM_DisplacementIndexed(readop(pc+1)&0x1F, mod&0x1F, read32(pc+2), opsize, out);
 					return 6;
 
-				case 3:	// Register indirect indexed
+				case 3: // Register indirect indexed
 					out_AM_RegisterIndirectIndexed(readop(pc+1)&0x1F, mod&0x1F, opsize, out);
 					return 2;
 

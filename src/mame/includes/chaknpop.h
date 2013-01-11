@@ -1,6 +1,6 @@
 
 
-#define MCU_INITIAL_SEED	0x81
+#define MCU_INITIAL_SEED    0x81
 
 
 class chaknpop_state : public driver_device

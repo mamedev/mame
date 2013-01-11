@@ -112,7 +112,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	if (m_layerpri[0] < k053251_get_priority(m_k053251, K053251_CI1))	/* bucky hides back layer behind background */
+	if (m_layerpri[0] < k053251_get_priority(m_k053251, K053251_CI1))   /* bucky hides back layer behind background */
 		k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[0], 0, 1);
 
 	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[1], 0, 2);

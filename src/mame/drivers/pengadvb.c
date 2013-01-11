@@ -54,13 +54,13 @@ static void mem_map_banks(running_machine &machine)
 {
 	pengadvb_state *state = machine.driver_data<pengadvb_state>();
 	/*  memorymap: (rest is assumed unmapped)
-        slot 0
-            0000-7fff   BIOS ROM
-        slot 1
-            4000-bfff   game ROM
-        slot 3
-            c000-ffff   RAM
-    */
+	    slot 0
+	        0000-7fff   BIOS ROM
+	    slot 1
+	        4000-bfff   game ROM
+	    slot 3
+	        c000-ffff   RAM
+	*/
 
 	// page 0 (0000-3fff)
 	switch(state->m_mem_map & 3)
@@ -269,12 +269,12 @@ void pengadvb_state::machine_reset()
 
 static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)         /* 3.579545 Mhz */
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
 
 
-    MCFG_I8255_ADD( "ppi8255", pengadvb_ppi8255_interface)
+	MCFG_I8255_ADD( "ppi8255", pengadvb_ppi8255_interface)
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pengadvb_tms9928a_interface )

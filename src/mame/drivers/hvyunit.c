@@ -82,25 +82,25 @@ public:
 	/* Video */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	tilemap_t		*m_bg_tilemap;
-	UINT16			m_scrollx;
-	UINT16			m_scrolly;
-	UINT16			m_port0_data;
+	tilemap_t       *m_bg_tilemap;
+	UINT16          m_scrollx;
+	UINT16          m_scrolly;
+	UINT16          m_port0_data;
 
 	/* Mermaid */
-	UINT8			m_data_to_mermaid;
-	UINT8			m_data_to_z80;
-	UINT8			m_mermaid_to_z80_full;
-	UINT8			m_z80_to_mermaid_full;
-	UINT8			m_mermaid_int0_l;
-	UINT8			m_mermaid_p[4];
+	UINT8           m_data_to_mermaid;
+	UINT8           m_data_to_z80;
+	UINT8           m_mermaid_to_z80_full;
+	UINT8           m_z80_to_mermaid_full;
+	UINT8           m_mermaid_int0_l;
+	UINT8           m_mermaid_p[4];
 
 	/* Devices */
-	device_t	*m_master_cpu;
-	device_t	*m_slave_cpu;
-	device_t	*m_sound_cpu;
-	device_t	*m_mermaid;
-	device_t	*m_pandora;
+	device_t    *m_master_cpu;
+	device_t    *m_slave_cpu;
+	device_t    *m_sound_cpu;
+	device_t    *m_mermaid;
+	device_t    *m_pandora;
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mermaid_data_w);
@@ -182,8 +182,8 @@ void hvyunit_state::video_start()
 
 UINT32 hvyunit_state::screen_update_hvyunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#define SX_POS	96
-#define SY_POS	0
+#define SX_POS  96
+#define SY_POS  0
 
 	m_bg_tilemap->set_scrollx(0, ((m_port0_data & 0x40) << 2) + m_scrollx + SX_POS); // TODO
 	m_bg_tilemap->set_scrolly(0, ((m_port0_data & 0x80) << 1) + m_scrolly + SY_POS); // TODO
@@ -517,19 +517,19 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Service_Mode ) )		PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Service_Mode ) )     PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, ( "Coin Mode" ) )			PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, ( "Coin Mode" ) )         PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, ( "Mode 1" ) )
 	PORT_DIPSETTING(    0x00, ( "Mode 2" ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
@@ -538,7 +538,7 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
@@ -549,23 +549,23 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bonus" )				PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bonus" )             PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW2:8")
@@ -576,12 +576,12 @@ static INPUT_PORTS_START( hvyunitj )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSW1:4")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
@@ -639,9 +639,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::hvyunit_scanline)
 
 static const kaneko_pandora_interface hvyunit_pandora_config =
 {
-	"screen",	/* screen tag */
-	0,			/* gfx_region */
-	0, 0		/* x_offs, y_offs */
+	"screen",   /* screen tag */
+	0,          /* gfx_region */
+	0, 0        /* x_offs, y_offs */
 };
 
 

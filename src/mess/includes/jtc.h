@@ -12,21 +12,21 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 
-#define SCREEN_TAG		"screen"
-#define UB8830D_TAG		"ub8830d"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define UB8830D_TAG     "ub8830d"
+#define CENTRONICS_TAG  "centronics"
 
-#define JTC_ES40_VIDEORAM_SIZE	0x2000
+#define JTC_ES40_VIDEORAM_SIZE  0x2000
 
 class jtc_state : public driver_device
 {
 public:
 	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, UB8830D_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
+			m_maincpu(*this, UB8830D_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
 		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;

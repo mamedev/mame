@@ -125,8 +125,8 @@ READ16_MEMBER(rohga_state::rohga_irq_ack_r)
 WRITE16_MEMBER(rohga_state::wizdfire_irq_ack_w)
 {
 	/* This might actually do more, nitrobal for example sets 0xca->0xffff->0x80 at startup then writes 7 all the time
-       except when a credit is inserted (writes 6 twice).
-       Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
+	   except when a credit is inserted (writes 6 twice).
+	   Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
@@ -349,7 +349,7 @@ static INPUT_PORTS_START( rohga )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("DSW3")		/* Dip switch bank 3 */
+	PORT_START("DSW3")      /* Dip switch bank 3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "Stage Clear Bonus" ) /* Life Recovery At stage clear */
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -519,7 +519,7 @@ static INPUT_PORTS_START( nitrobal )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("DSW3")		 /* Not really a DSW, but this way it's easier to read by tag */
+	PORT_START("DSW3")       /* Not really a DSW, but this way it's easier to read by tag */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -603,7 +603,7 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("DSW3")	/* Dip switch bank 3 - This bank of switches are _NOT_ shown in the test mode screen */
+	PORT_START("DSW3")  /* Dip switch bank 3 - This bank of switches are _NOT_ shown in the test mode screen */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -640,7 +640,7 @@ static const gfx_layout charlayout =
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8	/* every char takes 8 consecutive bytes */
+	16*8    /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
@@ -694,25 +694,25 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( rohga )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,        512, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_6bpp,1024, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,        512, 32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_6bpp,1024, 16 )    /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( wizdfire )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )	/* Gfx chip 1 as 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 32 )	/* Gfx chip 1 as 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )  /* Gfx chip 1 as 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 32 )  /* Gfx chip 1 as 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,      512, 32 )  /* Gfx chip 2 as 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,   0, 32 ) /* Sprites 16x16 */
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( schmeisr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,        512, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout2,    1024, 64 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,        512, 32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout2,    1024, 64 )    /* Sprites 16x16 */
 GFXDECODE_END
 
 /**********************************************************************************/
@@ -739,7 +739,7 @@ static const deco16ic_interface rohga_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16,/* color base (default values) */
 	0x0f, 0x0f, /* color masks (default values) */
 	rohga_bank_callback,
@@ -751,9 +751,9 @@ static const deco16ic_interface rohga_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	rohga_bank_callback,
 	rohga_bank_callback,
 	0, 2,
@@ -763,7 +763,7 @@ static const deco16ic_interface nitrobal_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 0,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (pf4 is not default) */
 	0x0f, 0x0f, /* color masks */
 	rohga_bank_callback,
@@ -775,9 +775,9 @@ static const deco16ic_interface nitrobal_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 0,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 0, /* color base (pf4 is not default) */
-	0, 0,	/* color masks */
+	0, 0,   /* color masks */
 	rohga_bank_callback,
 	rohga_bank_callback,
 	0, 2,
@@ -820,7 +820,7 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))	/* IRQ 2 */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.78)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.78)
@@ -875,7 +875,7 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))	/* IRQ 2 */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -930,7 +930,7 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))	/* IRQ 2 */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))	/* IRQ 2 */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -1035,7 +1035,7 @@ ROM_START( rohga ) /* Asia/Europe v5.0 */
 	ROM_LOAD( "mam13.15p", 0x00000,  0x80000,  CRC(525b9461) SHA1(1d9bb3725dfe601b05a779b84b4191455087b969) )
 
 	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
+	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) ) /* ? */
 ROM_END
 
 ROM_START( rohga1 ) /* Asia/Europe v3.0 */
@@ -1075,7 +1075,7 @@ ROM_START( rohga1 ) /* Asia/Europe v3.0 */
 	ROM_LOAD( "mam13.15p", 0x00000,  0x80000,  CRC(525b9461) SHA1(1d9bb3725dfe601b05a779b84b4191455087b969) )
 
 	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
+	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) ) /* ? */
 ROM_END
 
 ROM_START( rohga2 ) /* Asia/Europe v3.0 Alternate Set */
@@ -1115,7 +1115,7 @@ ROM_START( rohga2 ) /* Asia/Europe v3.0 Alternate Set */
 	ROM_LOAD( "mam13.15p", 0x00000,  0x80000,  CRC(525b9461) SHA1(1d9bb3725dfe601b05a779b84b4191455087b969) )
 
 	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
+	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) ) /* ? */
 ROM_END
 
 
@@ -1181,7 +1181,7 @@ ROM_START( rohgah ) /* Hong Kong v3.0 */
 	ROM_LOAD( "mam13.15p", 0x00000,  0x80000,  CRC(525b9461) SHA1(1d9bb3725dfe601b05a779b84b4191455087b969) )
 
 	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
+	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) ) /* ? */
 ROM_END
 
 ROM_START( rohgau ) /* US v1.0 */
@@ -1221,7 +1221,7 @@ ROM_START( rohgau ) /* US v1.0 */
 	ROM_LOAD( "mam13.15p", 0x00000,  0x80000,  CRC(525b9461) SHA1(1d9bb3725dfe601b05a779b84b4191455087b969) )
 
 	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
+	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) ) /* ? */
 ROM_END
 
 ROM_START( wolffang ) /* Japan */
@@ -1261,7 +1261,7 @@ ROM_START( wolffang ) /* Japan */
 	ROM_LOAD( "mam13.15p", 0x00000,  0x80000,  CRC(525b9461) SHA1(1d9bb3725dfe601b05a779b84b4191455087b969) )
 
 	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
+	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) ) /* ? */
 ROM_END
 
 ROM_START( wizdfire )
@@ -1305,7 +1305,7 @@ ROM_START( wizdfire )
 	ROM_LOAD( "mas11",  0x00000,  0x80000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )	/* Priority (unused) */
+	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )   /* Priority (unused) */
 ROM_END
 
 ROM_START( wizdfireu )
@@ -1349,7 +1349,7 @@ ROM_START( wizdfireu )
 	ROM_LOAD( "mas11",  0x00000,  0x80000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )	/* Priority (unused) */
+	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )   /* Priority (unused) */
 ROM_END
 
 ROM_START( darkseal2 )
@@ -1393,7 +1393,7 @@ ROM_START( darkseal2 )
 	ROM_LOAD( "mas11",  0x00000,  0x80000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )	/* Priority (unused) */
+	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )   /* Priority (unused) */
 ROM_END
 
 ROM_START( nitrobal )
@@ -1438,7 +1438,7 @@ ROM_START( nitrobal )
 	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) )	/* Priority (unused) */
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) /* Priority (unused) */
 ROM_END
 
 ROM_START( gunball )
@@ -1483,7 +1483,7 @@ ROM_START( gunball )
 	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) )	/* Priority (unused) */
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) /* Priority (unused) */
 ROM_END
 
 ROM_START( schmeisr )

@@ -38,12 +38,12 @@ extern const device_type MAPPER8;
 
 struct mapper8_list_entry
 {
-	const char*	name;				// Name of the device (used for looking up the device)
-	int			mode;				// Mode of the system which applies to this entry
-	int			stop;				// Mapper shall stop searching for a matching device when this entry applies
-	UINT32		select_pattern;		// State of the address line bits when addressing this device
-	UINT32		address_mask;		// Bits of the address bus used to address this device
-	UINT32		write_select;		// Additional bits set when doing write accesses to this device
+	const char* name;               // Name of the device (used for looking up the device)
+	int         mode;               // Mode of the system which applies to this entry
+	int         stop;               // Mapper shall stop searching for a matching device when this entry applies
+	UINT32      select_pattern;     // State of the address line bits when addressing this device
+	UINT32      address_mask;       // Bits of the address bus used to address this device
+	UINT32      write_select;       // Additional bits set when doing write accesses to this device
 };
 
 #define MAPPER8_CONFIG(name) \
@@ -51,8 +51,8 @@ struct mapper8_list_entry
 
 struct mapper8_config
 {
-	devcb_write_line				ready;
-	const mapper8_list_entry		*devlist;
+	devcb_write_line                ready;
+	const mapper8_list_entry        *devlist;
 };
 
 /*
@@ -65,12 +65,12 @@ class log_addressed_device
 
 public:
 	log_addressed_device(device_t *busdevice, const mapper8_list_entry &entry)
-	:	m_device(busdevice), m_config(&entry) { };
+	:   m_device(busdevice), m_config(&entry) { };
 
 private:
-	log_addressed_device		*m_next;		// needed for simple_list
-	device_t					*m_device;		// the actual device
-	const mapper8_list_entry	*m_config;
+	log_addressed_device        *m_next;        // needed for simple_list
+	device_t                    *m_device;      // the actual device
+	const mapper8_list_entry    *m_config;
 };
 
 /*
@@ -83,12 +83,12 @@ class phys_addressed_device
 
 public:
 	phys_addressed_device(device_t *busdevice, const mapper8_list_entry &entry)
-	:	m_device(busdevice), m_config(&entry) { };
+	:   m_device(busdevice), m_config(&entry) { };
 
 private:
-	phys_addressed_device		*m_next;		// needed for simple_list
-	device_t					*m_device;		// the actual device
-	const mapper8_list_entry	*m_config;
+	phys_addressed_device       *m_next;        // needed for simple_list
+	device_t                    *m_device;      // the actual device
+	const mapper8_list_entry    *m_config;
 };
 
 /*
@@ -98,8 +98,8 @@ class ti998_mapper_device : public bus8z_device
 {
 public:
 	ti998_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8_MEMBER( readm);		// used from address map
-	DECLARE_WRITE8_MEMBER( writem );	// used from address map
+	DECLARE_READ8_MEMBER( readm);       // used from address map
+	DECLARE_WRITE8_MEMBER( writem );    // used from address map
 
 	DECLARE_READ8Z_MEMBER( readz );
 	DECLARE_WRITE8_MEMBER( write );
@@ -133,36 +133,36 @@ private:
 	simple_list<phys_addressed_device> m_physcomp;
 
 	// Select bit for the internal DSR.
-	bool	m_dsr_selected;
+	bool    m_dsr_selected;
 
 	// 99/4A compatibility mode. Name is taken from the spec. If 1, 99/4A compatibility is active.
-	bool	m_CRUS;
+	bool    m_CRUS;
 
 	// P-Code mode. Name is taken from the spec. If 0, P-Code libraries are available.
 	// May be read as "Pascal and Text-to-speech GROM libraries Enable (Negative)"
 	// Note: this is negative logic. GROMs are present only for PTGEN=0
 	// We use PTGE as the inverse signal.
-	bool	m_PTGE;
+	bool    m_PTGE;
 
 	// Counter for the wait states.
 	int   m_waitcount;
 
 	// Address mapper registers. Each offset is selected by the first 4 bits
 	// of the logical address.
-	UINT32	m_pas_offset[16];
+	UINT32  m_pas_offset[16];
 
 	// SRAM area of the system. Directly connected to the address decoder.
-	UINT8	*m_sram;
+	UINT8   *m_sram;
 
 	// DRAM area of the system. Connected to the mapped address bus.
-	UINT8	*m_dram;
+	UINT8   *m_dram;
 
 	// ROM area of the system. Directly connected to the address decoder.
-	UINT8	*m_rom;
+	UINT8   *m_rom;
 };
 
 
-#define MCFG_MAPPER8_ADD(_tag, _devices)			\
+#define MCFG_MAPPER8_ADD(_tag, _devices)            \
 	MCFG_DEVICE_ADD(_tag, MAPPER8, 0) \
 	MCFG_DEVICE_CONFIG( _devices )
 

@@ -26,20 +26,20 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define ADDRESS_ABC832			44
-#define ADDRESS_ABC830			45
-#define ADDRESS_ABC838			46
+#define ADDRESS_ABC832          44
+#define ADDRESS_ABC830          45
+#define ADDRESS_ABC838          46
 
 
-#define DRIVE_TEAC_FD55F		0x01
-#define DRIVE_BASF_6138			0x02
-#define DRIVE_MICROPOLIS_1015F	0x03
-#define DRIVE_BASF_6118			0x04
-#define DRIVE_MICROPOLIS_1115F	0x05
-#define DRIVE_BASF_6106_08		0x08
-#define DRIVE_MPI_51			0x09
-#define DRIVE_BASF_6105			0x0e
-#define DRIVE_BASF_6106			0x0f
+#define DRIVE_TEAC_FD55F        0x01
+#define DRIVE_BASF_6138         0x02
+#define DRIVE_MICROPOLIS_1015F  0x03
+#define DRIVE_BASF_6118         0x04
+#define DRIVE_MICROPOLIS_1115F  0x05
+#define DRIVE_BASF_6106_08      0x08
+#define DRIVE_MPI_51            0x09
+#define DRIVE_BASF_6105         0x0e
+#define DRIVE_BASF_6106         0x0f
 
 
 
@@ -50,11 +50,11 @@
 // ======================> luxor_55_21046_device
 
 class luxor_55_21046_device :  public device_t,
-							   public device_abcbus_card_interface
+								public device_abcbus_card_interface
 {
 public:
-    // construction/destruction
-    luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -75,9 +75,9 @@ public:
 	void fdc_drq_w(bool state);
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete() { m_shortname = "lux21046"; }
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "lux21046"; }
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_abcbus_interface overrides
@@ -100,14 +100,14 @@ private:
 	required_ioport m_sw2;
 	required_ioport m_sw3;
 
-	bool m_cs;					// card selected
-	UINT8 m_status;				// ABC BUS status
-	UINT8 m_data_in;			// ABC BUS data in
-	UINT8 m_data_out;			// ABC BUS data out
-	bool m_fdc_irq;				// FDC interrupt
-	int m_dma_irq;				// DMA interrupt
-	int m_busy;					// busy bit
-	int m_force_busy;			// force busy bit
+	bool m_cs;                  // card selected
+	UINT8 m_status;             // ABC BUS status
+	UINT8 m_data_in;            // ABC BUS data in
+	UINT8 m_data_out;           // ABC BUS data out
+	bool m_fdc_irq;             // FDC interrupt
+	int m_dma_irq;              // DMA interrupt
+	int m_busy;                 // busy bit
+	int m_force_busy;           // force busy bit
 };
 
 

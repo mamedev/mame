@@ -20,9 +20,9 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define ADAM_LEFT_EXPANSION_SLOT_TAG		"slot1"
-#define ADAM_CENTER_EXPANSION_SLOT_TAG		"slot2"
-#define ADAM_RIGHT_EXPANSION_SLOT_TAG		"slot3"
+#define ADAM_LEFT_EXPANSION_SLOT_TAG        "slot1"
+#define ADAM_CENTER_EXPANSION_SLOT_TAG      "slot2"
+#define ADAM_RIGHT_EXPANSION_SLOT_TAG       "slot3"
 
 
 
@@ -35,8 +35,8 @@
 
 
 #define MCFG_ADAM_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, ADAM_EXPANSION_SLOT, _clock) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, ADAM_EXPANSION_SLOT, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -49,7 +49,7 @@
 
 struct adam_expansion_slot_interface
 {
-	devcb_write_line	m_out_int_cb;
+	devcb_write_line    m_out_int_cb;
 };
 
 
@@ -58,9 +58,9 @@ struct adam_expansion_slot_interface
 class device_adam_expansion_slot_card_interface;
 
 class adam_expansion_slot_device : public device_t,
-								   public adam_expansion_slot_interface,
-								   public device_slot_interface,
-								   public device_image_interface
+									public adam_expansion_slot_interface,
+									public device_slot_interface,
+									public device_image_interface
 {
 public:
 	// construction/destruction
@@ -98,7 +98,7 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	devcb_resolved_write_line	m_out_int_func;
+	devcb_resolved_write_line   m_out_int_func;
 
 	device_adam_expansion_slot_card_interface *m_cart;
 };

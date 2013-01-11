@@ -49,7 +49,7 @@
 ***************************************************************************/
 
 #define MAX_COMPARES            16
-#define BITMAP_SPACE			4
+#define BITMAP_SPACE            4
 
 enum
 {
@@ -86,23 +86,23 @@ enum
 
 struct summary_file
 {
-    summary_file *  next;
-    char            name[20];
-    char            source[100];
-    UINT8           status[MAX_COMPARES];
-    UINT8			matchbitmap[MAX_COMPARES];
-    char *          text[MAX_COMPARES];
-    UINT32          textsize[MAX_COMPARES];
-    UINT32          textalloc[MAX_COMPARES];
+	summary_file *  next;
+	char            name[20];
+	char            source[100];
+	UINT8           status[MAX_COMPARES];
+	UINT8           matchbitmap[MAX_COMPARES];
+	char *          text[MAX_COMPARES];
+	UINT32          textsize[MAX_COMPARES];
+	UINT32          textalloc[MAX_COMPARES];
 };
 
 
 struct summary_list
 {
-    summary_list *  next;
-    summary_file *  files;
-    char *			dir;
-    char			version[40];
+	summary_list *  next;
+	summary_file *  files;
+	char *          dir;
+	char            version[40];
 };
 
 
@@ -251,17 +251,17 @@ int main(int argc, char *argv[])
 	UINT32 bufsize;
 	void *buffer;
 	int listnum;
-    int result;
+	int result;
 
-    /* first argument is the directory */
-    if (argc < 4)
-    {
-    	fprintf(stderr, "Usage:\nregrep <template> <outputdir> <summary1> [<summary2> [<summary3> ...]]\n");
-    	return 1;
-    }
-    astring tempfilename(argv[1]);
-    astring dirname(argv[2]);
-    list_count = argc - 3;
+	/* first argument is the directory */
+	if (argc < 4)
+	{
+		fprintf(stderr, "Usage:\nregrep <template> <outputdir> <summary1> [<summary2> [<summary3> ...]]\n");
+		return 1;
+	}
+	astring tempfilename(argv[1]);
+	astring dirname(argv[2]);
+	list_count = argc - 3;
 
 	/* read the template file into an astring */
 	astring tempheader;
@@ -287,17 +287,17 @@ int main(int argc, char *argv[])
 	tempfooter.substr(result + 14);
 	tempheader.substr(0, result);
 
-    /* loop over arguments and read the files */
-    for (listnum = 0; listnum < list_count; listnum++)
-    {
-        result = read_summary_log(argv[listnum + 3], listnum);
-        if (result != 0)
-            return result;
-    }
+	/* loop over arguments and read the files */
+	for (listnum = 0; listnum < list_count; listnum++)
+	{
+		result = read_summary_log(argv[listnum + 3], listnum);
+		if (result != 0)
+			return result;
+	}
 
-    /* output the summary */
-    output_report(dirname, tempheader, tempfooter, sort_file_list());
-    return 0;
+	/* output the summary */
+	output_report(dirname, tempheader, tempfooter, sort_file_list());
+	return 0;
 }
 
 
@@ -314,26 +314,26 @@ int main(int argc, char *argv[])
 
 static summary_file *get_file(const char *filename)
 {
-    summary_file *file;
+	summary_file *file;
 
-    /* use the first two characters as a lookup */
-    for (file = filehash[filename[0] & 0x7f][filename[1] & 0x7f]; file != NULL; file = file->next)
-        if (strcmp(filename, file->name) == 0)
-            return file;
+	/* use the first two characters as a lookup */
+	for (file = filehash[filename[0] & 0x7f][filename[1] & 0x7f]; file != NULL; file = file->next)
+		if (strcmp(filename, file->name) == 0)
+			return file;
 
-    /* didn't find one -- allocate */
-    file = (summary_file *)malloc(sizeof(*file));
-    if (file == NULL)
-        return NULL;
-    memset(file, 0, sizeof(*file));
+	/* didn't find one -- allocate */
+	file = (summary_file *)malloc(sizeof(*file));
+	if (file == NULL)
+		return NULL;
+	memset(file, 0, sizeof(*file));
 
-    /* set the name so we find it in the future */
-    strcpy(file->name, filename);
+	/* set the name so we find it in the future */
+	strcpy(file->name, filename);
 
-    /* add to the head of the list */
-    file->next = filehash[filename[0] & 0x7f][filename[1] & 0x7f];
-    filehash[filename[0] & 0x7f][filename[1] & 0x7f] = file;
-    return file;
+	/* add to the head of the list */
+	file->next = filehash[filename[0] & 0x7f][filename[1] & 0x7f];
+	filehash[filename[0] & 0x7f][filename[1] & 0x7f] = file;
+	return file;
 }
 
 
@@ -344,31 +344,31 @@ static summary_file *get_file(const char *filename)
 
 static int read_summary_log(const char *filename, int index)
 {
-    summary_file *curfile = NULL;
-    char linebuffer[1024];
-    char *linestart;
-    int drivers = 0;
-    FILE *file;
+	summary_file *curfile = NULL;
+	char linebuffer[1024];
+	char *linestart;
+	int drivers = 0;
+	FILE *file;
 
-    /* open the logfile */
-    file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        fprintf(stderr, "Error: file '%s' not found\n", filename);
-        return 1;
-    }
+	/* open the logfile */
+	file = fopen(filename, "r");
+	if (file == NULL)
+	{
+		fprintf(stderr, "Error: file '%s' not found\n", filename);
+		return 1;
+	}
 
-    /* parse it */
-    while (fgets(linebuffer, sizeof(linebuffer), file) != NULL)
-    {
-    	/* trim the leading/trailing spaces */
-    	linestart = trim_string(linebuffer);
+	/* parse it */
+	while (fgets(linebuffer, sizeof(linebuffer), file) != NULL)
+	{
+		/* trim the leading/trailing spaces */
+		linestart = trim_string(linebuffer);
 
-        /* is this one of our specials? */
-        if (strncmp(linestart, "@@@@@", 5) == 0)
-        {
-        	/* advance past the signature */
-        	linestart += 5;
+		/* is this one of our specials? */
+		if (strncmp(linestart, "@@@@@", 5) == 0)
+		{
+			/* advance past the signature */
+			linestart += 5;
 
 			/* look for the driver= tag */
 			if (strncmp(linestart, "driver=", 7) == 0)
@@ -407,16 +407,16 @@ static int read_summary_log(const char *filename, int index)
 			}
 		}
 
-        /* if not, consider other options */
-        else if (curfile != NULL)
-        {
-            int foundchars = 0;
-            char *curptr;
+		/* if not, consider other options */
+		else if (curfile != NULL)
+		{
+			int foundchars = 0;
+			char *curptr;
 
-            /* look for the pngcrc= tag */
+			/* look for the pngcrc= tag */
 			if (strncmp(linestart, "pngcrc: ", 7) == 0)
-            {
-            }
+			{
+			}
 
 			/* otherwise, accumulate the text */
 			else
@@ -462,15 +462,15 @@ static int read_summary_log(const char *filename, int index)
 			strcpy(lists[index].version, start);
 			fprintf(stderr, "Parsing results from version %s\n", lists[index].version);
 		}
-    }
+	}
 
-    fclose(file);
-    fprintf(stderr, "Parsed %d drivers\n", drivers);
-    return 0;
+	fclose(file);
+	fprintf(stderr, "Parsed %d drivers\n", drivers);
+	return 0;
 
 error:
-    fclose(file);
-    return 1;
+	fclose(file);
+	return 1;
 }
 
 
@@ -555,14 +555,14 @@ static summary_file *sort_file_list(void)
 {
 	summary_file *listhead, **tailptr, *curfile, **filearray;
 	int numfiles, filenum;
-    int c0, c1;
+	int c0, c1;
 
-    /* count the total number of files */
-    numfiles = 0;
-    for (c0 = 0; c0 < 128; c0++)
-	    for (c1 = 0; c1 < 128; c1++)
-	    	for (curfile = filehash[c0][c1]; curfile != NULL; curfile = curfile->next)
-	    		numfiles++;
+	/* count the total number of files */
+	numfiles = 0;
+	for (c0 = 0; c0 < 128; c0++)
+		for (c1 = 0; c1 < 128; c1++)
+			for (curfile = filehash[c0][c1]; curfile != NULL; curfile = curfile->next)
+				numfiles++;
 
 	/* allocate an array of files */
 	filearray = (summary_file **)malloc(numfiles * sizeof(*filearray));
@@ -573,27 +573,27 @@ static summary_file *sort_file_list(void)
 	}
 
 	/* populate the array */
-    numfiles = 0;
-    for (c0 = 0; c0 < 128; c0++)
-	    for (c1 = 0; c1 < 128; c1++)
-	    	for (curfile = filehash[c0][c1]; curfile != NULL; curfile = curfile->next)
-	    		filearray[numfiles++] = curfile;
+	numfiles = 0;
+	for (c0 = 0; c0 < 128; c0++)
+		for (c1 = 0; c1 < 128; c1++)
+			for (curfile = filehash[c0][c1]; curfile != NULL; curfile = curfile->next)
+				filearray[numfiles++] = curfile;
 
 	/* sort the array */
 	qsort(filearray, numfiles, sizeof(filearray[0]), compare_file);
 
 	/* now regenerate a single list */
-    listhead = NULL;
-    tailptr = &listhead;
-    for (filenum = 0; filenum < numfiles; filenum++)
-    {
-    	*tailptr = filearray[filenum];
-    	tailptr = &(*tailptr)->next;
-    }
-    *tailptr = NULL;
-    free(filearray);
+	listhead = NULL;
+	tailptr = &listhead;
+	for (filenum = 0; filenum < numfiles; filenum++)
+	{
+		*tailptr = filearray[filenum];
+		tailptr = &(*tailptr)->next;
+	}
+	*tailptr = NULL;
+	free(filearray);
 
-    return listhead;
+	return listhead;
 }
 
 

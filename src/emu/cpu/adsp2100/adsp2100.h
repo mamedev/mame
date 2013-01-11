@@ -47,7 +47,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define ADSP_TRACK_HOTSPOTS		0
+#define ADSP_TRACK_HOTSPOTS     0
 
 
 
@@ -56,63 +56,63 @@
 //**************************************************************************
 
 // ADSP-2100 IRQs
-const int ADSP2100_IRQ0			= 0;		// IRQ0
-const int ADSP2100_SPORT1_RX	= 0;		// SPORT1 receive IRQ
-const int ADSP2100_IRQ1			= 1;		// IRQ1
-const int ADSP2100_SPORT1_TX	= 1;		// SPORT1 transmit IRQ
-const int ADSP2100_IRQ2			= 2;		// IRQ2
-const int ADSP2100_IRQ3			= 3;		// IRQ3
+const int ADSP2100_IRQ0         = 0;        // IRQ0
+const int ADSP2100_SPORT1_RX    = 0;        // SPORT1 receive IRQ
+const int ADSP2100_IRQ1         = 1;        // IRQ1
+const int ADSP2100_SPORT1_TX    = 1;        // SPORT1 transmit IRQ
+const int ADSP2100_IRQ2         = 2;        // IRQ2
+const int ADSP2100_IRQ3         = 3;        // IRQ3
 
 // ADSP-2101 IRQs
-const int ADSP2101_IRQ0			= 0;		// IRQ0
-const int ADSP2101_SPORT1_RX	= 0;		// SPORT1 receive IRQ
-const int ADSP2101_IRQ1			= 1;		// IRQ1
-const int ADSP2101_SPORT1_TX	= 1;		// SPORT1 transmit IRQ
-const int ADSP2101_IRQ2			= 2;		// IRQ2
-const int ADSP2101_SPORT0_RX	= 3;		// SPORT0 receive IRQ
-const int ADSP2101_SPORT0_TX	= 4;		// SPORT0 transmit IRQ
-const int ADSP2101_TIMER		= 5;		// internal timer IRQ
+const int ADSP2101_IRQ0         = 0;        // IRQ0
+const int ADSP2101_SPORT1_RX    = 0;        // SPORT1 receive IRQ
+const int ADSP2101_IRQ1         = 1;        // IRQ1
+const int ADSP2101_SPORT1_TX    = 1;        // SPORT1 transmit IRQ
+const int ADSP2101_IRQ2         = 2;        // IRQ2
+const int ADSP2101_SPORT0_RX    = 3;        // SPORT0 receive IRQ
+const int ADSP2101_SPORT0_TX    = 4;        // SPORT0 transmit IRQ
+const int ADSP2101_TIMER        = 5;        // internal timer IRQ
 
 // ADSP-2104 IRQs
-const int ADSP2104_IRQ0			= 0;		// IRQ0
-const int ADSP2104_SPORT1_RX	= 0;		// SPORT1 receive IRQ
-const int ADSP2104_IRQ1			= 1;		// IRQ1
-const int ADSP2104_SPORT1_TX	= 1;		// SPORT1 transmit IRQ
-const int ADSP2104_IRQ2			= 2;		// IRQ2
-const int ADSP2104_SPORT0_RX	= 3;		// SPORT0 receive IRQ
-const int ADSP2104_SPORT0_TX	= 4;		// SPORT0 transmit IRQ
-const int ADSP2104_TIMER		= 5;		// internal timer IRQ
+const int ADSP2104_IRQ0         = 0;        // IRQ0
+const int ADSP2104_SPORT1_RX    = 0;        // SPORT1 receive IRQ
+const int ADSP2104_IRQ1         = 1;        // IRQ1
+const int ADSP2104_SPORT1_TX    = 1;        // SPORT1 transmit IRQ
+const int ADSP2104_IRQ2         = 2;        // IRQ2
+const int ADSP2104_SPORT0_RX    = 3;        // SPORT0 receive IRQ
+const int ADSP2104_SPORT0_TX    = 4;        // SPORT0 transmit IRQ
+const int ADSP2104_TIMER        = 5;        // internal timer IRQ
 
 // ADSP-2105 IRQs
-const int ADSP2105_IRQ0			= 0;		// IRQ0
-const int ADSP2105_SPORT1_RX	= 0;		// SPORT1 receive IRQ
-const int ADSP2105_IRQ1			= 1;		// IRQ1
-const int ADSP2105_SPORT1_TX	= 1;		// SPORT1 transmit IRQ
-const int ADSP2105_IRQ2			= 2;		// IRQ2
-const int ADSP2105_TIMER		= 5;		// internal timer IRQ
+const int ADSP2105_IRQ0         = 0;        // IRQ0
+const int ADSP2105_SPORT1_RX    = 0;        // SPORT1 receive IRQ
+const int ADSP2105_IRQ1         = 1;        // IRQ1
+const int ADSP2105_SPORT1_TX    = 1;        // SPORT1 transmit IRQ
+const int ADSP2105_IRQ2         = 2;        // IRQ2
+const int ADSP2105_TIMER        = 5;        // internal timer IRQ
 
 // ADSP-2115 IRQs
-const int ADSP2115_IRQ0			= 0;		// IRQ0
-const int ADSP2115_SPORT1_RX	= 0;		// SPORT1 receive IRQ
-const int ADSP2115_IRQ1			= 1;		// IRQ1
-const int ADSP2115_SPORT1_TX	= 1;		// SPORT1 transmit IRQ
-const int ADSP2115_IRQ2			= 2;		// IRQ2
-const int ADSP2115_SPORT0_RX	= 3;		// SPORT0 receive IRQ
-const int ADSP2115_SPORT0_TX	= 4;		// SPORT0 transmit IRQ
-const int ADSP2115_TIMER		= 5;		// internal timer IRQ
+const int ADSP2115_IRQ0         = 0;        // IRQ0
+const int ADSP2115_SPORT1_RX    = 0;        // SPORT1 receive IRQ
+const int ADSP2115_IRQ1         = 1;        // IRQ1
+const int ADSP2115_SPORT1_TX    = 1;        // SPORT1 transmit IRQ
+const int ADSP2115_IRQ2         = 2;        // IRQ2
+const int ADSP2115_SPORT0_RX    = 3;        // SPORT0 receive IRQ
+const int ADSP2115_SPORT0_TX    = 4;        // SPORT0 transmit IRQ
+const int ADSP2115_TIMER        = 5;        // internal timer IRQ
 
 // ADSP-2181 IRQs
-const int ADSP2181_IRQ0			= 0;		// IRQ0
-const int ADSP2181_SPORT1_RX	= 0;		// SPORT1 receive IRQ
-const int ADSP2181_IRQ1			= 1;		// IRQ1
-const int ADSP2181_SPORT1_TX	= 1;		// SPORT1 transmit IRQ
-const int ADSP2181_IRQ2			= 2;		// IRQ2
-const int ADSP2181_SPORT0_RX	= 3;		// SPORT0 receive IRQ
-const int ADSP2181_SPORT0_TX	= 4;		// SPORT0 transmit IRQ
-const int ADSP2181_TIMER		= 5;		// internal timer IRQ
-const int ADSP2181_IRQE			= 6;		// IRQE
-const int ADSP2181_IRQL1		= 7;		// IRQL1
-const int ADSP2181_IRQL2		= 8;		// IRQL2
+const int ADSP2181_IRQ0         = 0;        // IRQ0
+const int ADSP2181_SPORT1_RX    = 0;        // SPORT1 receive IRQ
+const int ADSP2181_IRQ1         = 1;        // IRQ1
+const int ADSP2181_SPORT1_TX    = 1;        // SPORT1 transmit IRQ
+const int ADSP2181_IRQ2         = 2;        // IRQ2
+const int ADSP2181_SPORT0_RX    = 3;        // SPORT0 receive IRQ
+const int ADSP2181_SPORT0_TX    = 4;        // SPORT0 transmit IRQ
+const int ADSP2181_TIMER        = 5;        // internal timer IRQ
+const int ADSP2181_IRQE         = 6;        // IRQE
+const int ADSP2181_IRQL1        = 7;        // IRQL1
+const int ADSP2181_IRQL2        = 8;        // IRQL2
 
 // register enumeration
 enum
@@ -233,9 +233,9 @@ typedef void  (*adsp21xx_timer_func)(adsp21xx_device &device, int enable);
 
 struct adsp21xx_config
 {
-	adsp21xx_rx_func		m_sport_rx_callback;	// callback for serial receive
-	adsp21xx_tx_func		m_sport_tx_callback;	// callback for serial transmit
-	adsp21xx_timer_func		m_timer_fired;			// callback for timer fired
+	adsp21xx_rx_func        m_sport_rx_callback;    // callback for serial receive
+	adsp21xx_tx_func        m_sport_tx_callback;    // callback for serial transmit
+	adsp21xx_timer_func     m_timer_fired;          // callback for timer fired
 };
 
 
@@ -351,16 +351,16 @@ protected:
 	virtual void check_irqs() = 0;
 
 	// internal state
-	static const int PC_STACK_DEPTH		= 16;
-	static const int CNTR_STACK_DEPTH	= 4;
-	static const int STAT_STACK_DEPTH	= 4;
-	static const int LOOP_STACK_DEPTH	= 4;
+	static const int PC_STACK_DEPTH     = 16;
+	static const int CNTR_STACK_DEPTH   = 4;
+	static const int STAT_STACK_DEPTH   = 4;
+	static const int LOOP_STACK_DEPTH   = 4;
 
 	// 16-bit registers that can be loaded signed or unsigned
 	union adsp_reg16
 	{
-		UINT16	u;
-		INT16	s;
+		UINT16  u;
+		INT16   s;
 	};
 
 	// the SHIFT result register is 32 bits
@@ -391,128 +391,128 @@ protected:
 	struct adsp_core
 	{
 		// ALU registers
-		adsp_reg16	ax0, ax1;
-		adsp_reg16	ay0, ay1;
-		adsp_reg16	ar;
-		adsp_reg16	af;
+		adsp_reg16  ax0, ax1;
+		adsp_reg16  ay0, ay1;
+		adsp_reg16  ar;
+		adsp_reg16  af;
 
 		// MAC registers
-		adsp_reg16	mx0, mx1;
-		adsp_reg16	my0, my1;
-		adsp_mac	mr;
-		adsp_reg16	mf;
+		adsp_reg16  mx0, mx1;
+		adsp_reg16  my0, my1;
+		adsp_mac    mr;
+		adsp_reg16  mf;
 
 		// SHIFT registers
-		adsp_reg16	si;
-		adsp_reg16	se;
-		adsp_reg16	sb;
-		adsp_shift	sr;
+		adsp_reg16  si;
+		adsp_reg16  se;
+		adsp_reg16  sb;
+		adsp_shift  sr;
 
 		// dummy registers
-		adsp_reg16	zero;
+		adsp_reg16  zero;
 	};
 
 	// configuration
-	const address_space_config		m_program_config;
-	const address_space_config		m_data_config;
-	UINT32							m_chip_type;
+	const address_space_config      m_program_config;
+	const address_space_config      m_data_config;
+	UINT32                          m_chip_type;
 
 	// other CPU registers
-	UINT32				m_pc;
-	UINT32				m_ppc;
-	UINT32				m_loop;
-	UINT32				m_loop_condition;
-	UINT32				m_cntr;
+	UINT32              m_pc;
+	UINT32              m_ppc;
+	UINT32              m_loop;
+	UINT32              m_loop_condition;
+	UINT32              m_cntr;
 
 	// status registers
-	UINT32				m_astat;
-	UINT32				m_sstat;
-	UINT32				m_mstat;
-	UINT32				m_mstat_prev;
-	UINT32				m_astat_clear;
-	UINT32				m_idle;
+	UINT32              m_astat;
+	UINT32              m_sstat;
+	UINT32              m_mstat;
+	UINT32              m_mstat_prev;
+	UINT32              m_astat_clear;
+	UINT32              m_idle;
 
 	// live set of core registers
-	adsp_core			m_core;
+	adsp_core           m_core;
 
 	// memory addressing registers
-	UINT32				m_i[8];
-	INT32				m_m[8];
-	UINT32				m_l[8];
-	UINT32				m_lmask[8];
-	UINT32				m_base[8];
-	UINT8				m_px;
+	UINT32              m_i[8];
+	INT32               m_m[8];
+	UINT32              m_l[8];
+	UINT32              m_lmask[8];
+	UINT32              m_base[8];
+	UINT8               m_px;
 
 	// stacks
-	UINT32				m_loop_stack[LOOP_STACK_DEPTH];
-	UINT32				m_cntr_stack[CNTR_STACK_DEPTH];
-	UINT32				m_pc_stack[PC_STACK_DEPTH];
-	UINT16				m_stat_stack[STAT_STACK_DEPTH][3];
-	INT32				m_pc_sp;
-	INT32				m_cntr_sp;
-	INT32				m_stat_sp;
-	INT32				m_loop_sp;
+	UINT32              m_loop_stack[LOOP_STACK_DEPTH];
+	UINT32              m_cntr_stack[CNTR_STACK_DEPTH];
+	UINT32              m_pc_stack[PC_STACK_DEPTH];
+	UINT16              m_stat_stack[STAT_STACK_DEPTH][3];
+	INT32               m_pc_sp;
+	INT32               m_cntr_sp;
+	INT32               m_stat_sp;
+	INT32               m_loop_sp;
 
 	// external I/O
-	UINT8				m_flagout;
-	UINT8				m_flagin;
-	UINT8				m_fl0;
-	UINT8				m_fl1;
-	UINT8				m_fl2;
-	UINT16				m_idma_addr;
-	UINT16				m_idma_cache;
-	UINT8				m_idma_offs;
+	UINT8               m_flagout;
+	UINT8               m_flagin;
+	UINT8               m_fl0;
+	UINT8               m_fl1;
+	UINT8               m_fl2;
+	UINT16              m_idma_addr;
+	UINT16              m_idma_cache;
+	UINT8               m_idma_offs;
 
 	// interrupt handling
-	UINT16				m_imask;
-	UINT8				m_icntl;
-	UINT16				m_ifc;
-    UINT8   			m_irq_state[9];
-    UINT8   			m_irq_latch[9];
+	UINT16              m_imask;
+	UINT8               m_icntl;
+	UINT16              m_ifc;
+	UINT8               m_irq_state[9];
+	UINT8               m_irq_latch[9];
 
 	// other internal states
-    int					m_icount;
-	int					m_mstat_mask;
-	int					m_imask_mask;
+	int                 m_icount;
+	int                 m_mstat_mask;
+	int                 m_imask_mask;
 
 	// register maps
-	INT16 *				m_read0_ptr[16];
-	UINT32 *			m_read1_ptr[16];
-	UINT32 *			m_read2_ptr[16];
-	void *				m_alu_xregs[8];
-	void *				m_alu_yregs[4];
-	void *				m_mac_xregs[8];
-	void *				m_mac_yregs[4];
-	void *				m_shift_xregs[8];
+	INT16 *             m_read0_ptr[16];
+	UINT32 *            m_read1_ptr[16];
+	UINT32 *            m_read2_ptr[16];
+	void *              m_alu_xregs[8];
+	void *              m_alu_yregs[4];
+	void *              m_mac_xregs[8];
+	void *              m_mac_yregs[4];
+	void *              m_shift_xregs[8];
 
 	// alternate core registers (at end for performance)
-	adsp_core			m_alt;
+	adsp_core           m_alt;
 
 	// address spaces
-    address_space *		m_program;
-    address_space *		m_data;
-    address_space *		m_io;
-    direct_read_data *	m_direct;
+	address_space *     m_program;
+	address_space *     m_data;
+	address_space *     m_io;
+	direct_read_data *  m_direct;
 
 	// tables
-	UINT8				m_condition_table[0x1000];
-	UINT16				m_mask_table[0x4000];
-	UINT16				m_reverse_table[0x4000];
+	UINT8               m_condition_table[0x1000];
+	UINT16              m_mask_table[0x4000];
+	UINT16              m_reverse_table[0x4000];
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS
-	UINT32				m_pcbucket[0x4000];
+	UINT32              m_pcbucket[0x4000];
 #endif
 
 	// flag definitions
-	static const int SSFLAG		= 0x80;
-	static const int MVFLAG		= 0x40;
-	static const int QFLAG		= 0x20;
-	static const int SFLAG		= 0x10;
-	static const int CFLAG		= 0x08;
-	static const int VFLAG		= 0x04;
-	static const int NFLAG		= 0x02;
-	static const int ZFLAG		= 0x01;
+	static const int SSFLAG     = 0x80;
+	static const int MVFLAG     = 0x40;
+	static const int QFLAG      = 0x20;
+	static const int SFLAG      = 0x10;
+	static const int CFLAG      = 0x08;
+	static const int VFLAG      = 0x04;
+	static const int NFLAG      = 0x02;
+	static const int ZFLAG      = 0x01;
 };
 
 
@@ -580,7 +580,7 @@ protected:
 	virtual void check_irqs();
 
 	// address spaces
-	const address_space_config		m_io_config;
+	const address_space_config      m_io_config;
 
 public:
 	// public interfaces

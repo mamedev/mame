@@ -661,11 +661,11 @@ WRITE16_MEMBER(model1_state::io_w)
 {
 	if(offset == 0x0f){
 		// tested in vf, swa, wingwar
-		set_led_status(machine(), 0, data & 0x4);	// START (1)
-		set_led_status(machine(), 1, data & 0x8);	// VIEW1 (START2 - VF)
-		set_led_status(machine(), 2, data & 0x10);	// VIEW2 (VIEW - SWA)
-		set_led_status(machine(), 3, data & 0x20);	// VIEW3
-		set_led_status(machine(), 4, data & 0x40);	// VIEW4
+		set_led_status(machine(), 0, data & 0x4);   // START (1)
+		set_led_status(machine(), 1, data & 0x8);   // VIEW1 (START2 - VF)
+		set_led_status(machine(), 2, data & 0x10);  // VIEW2 (VIEW - SWA)
+		set_led_status(machine(), 3, data & 0x20);  // VIEW3
+		set_led_status(machine(), 4, data & 0x40);  // VIEW4
 		return;
 	}
 	logerror("IOW: %02x %02x\n", offset, data);
@@ -855,7 +855,7 @@ READ16_MEMBER(model1_state::snd_68k_ready_r)
 	if ((sr & 0x0700) > 0x0100)
 	{
 		space.device().execute().spin_until_time(attotime::from_usec(40));
-		return 0;	// not ready yet, interrupts disabled
+		return 0;   // not ready yet, interrupts disabled
 	}
 
 	return 0xff;
@@ -872,19 +872,19 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 		m_snd_cmd_state = 0;
 	}
 
-    if (m_dsbz80 != NULL)
-    {
-//		printf("%d: %02x (last %02x)\n", m_snd_cmd_state, data, m_last_snd_cmd);
+	if (m_dsbz80 != NULL)
+	{
+//      printf("%d: %02x (last %02x)\n", m_snd_cmd_state, data, m_last_snd_cmd);
 		// HACK: on h/w, who filters out commands the DSB shouldn't see?  Need a wiring diagram.
 		if ((m_snd_cmd_state == 2) && (m_last_snd_cmd == 0x50))
 		{
 			m_dsbz80->latch_w(space, 0, data);
 		}
-		else	// keep in sync but send a "don't care"
+		else    // keep in sync but send a "don't care"
 		{
 			m_dsbz80->latch_w(space, 0, 0x70);
 		}
-    }
+	}
 
 	m_last_snd_cmd = data;
 	m_snd_cmd_state++;
@@ -908,10 +908,10 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
-	AM_RANGE(0x740000, 0x740001) AM_WRITENOP		// Horizontal synchronization register
-	AM_RANGE(0x760000, 0x760001) AM_WRITENOP		// Vertical synchronization register
-	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
+	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
+	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
+	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
+	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("paletteram")
@@ -956,10 +956,10 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
-	AM_RANGE(0x740000, 0x740001) AM_WRITENOP		// Horizontal synchronization register
-	AM_RANGE(0x760000, 0x760001) AM_WRITENOP		// Vertical synchronization register
-	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
+	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
+	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
+	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
+	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("paletteram")
@@ -1076,13 +1076,13 @@ static INPUT_PORTS_START( vf )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vr )
-	PORT_START("AN0")	/* Steering */
+	PORT_START("AN0")   /* Steering */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
 
-	PORT_START("AN1")	/* Accel / Decel */
+	PORT_START("AN1")   /* Accel / Decel */
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL2 ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
 	PORT_START("IN0")
@@ -1113,13 +1113,13 @@ static INPUT_PORTS_START( vr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wingwar )
-	PORT_START("AN0")	/* X */
+	PORT_START("AN0")   /* X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN1")	/* Y */
+	PORT_START("AN1")   /* Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN2")	/* Throttle */
+	PORT_START("AN2")   /* Throttle */
 	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
 	PORT_START("IN0")
@@ -1150,19 +1150,19 @@ static INPUT_PORTS_START( wingwar )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swa )
-	PORT_START("AN0")	/* X */
+	PORT_START("AN0")   /* X */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN1")	/* Y */
+	PORT_START("AN1")   /* Y */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN2")	/* Throttle */
+	PORT_START("AN2")   /* Throttle */
 	PORT_BIT( 0xff, 228, IPT_PEDAL ) PORT_MINMAX(28,228) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_REVERSE
 
-	PORT_START("AN4")	/* X */
+	PORT_START("AN4")   /* X */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("AN5")	/* Y */
+	PORT_START("AN5")   /* Y */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2)
 
 	PORT_START("IN0")
@@ -1359,30 +1359,30 @@ ROM_START( swa )
 	ROM_RELOAD(          0x080000, 0x80000 )
 
 	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
-        ROM_LOAD16_WORD_SWAP( "epr-16470.bin", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
+		ROM_LOAD16_WORD_SWAP( "epr-16470.bin", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
 	ROM_RELOAD(0x80000, 0x20000)
 
 	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
-        ROM_LOAD( "mpr-16486.bin", 0x000000, 0x200000, CRC(7df50533) SHA1(f2fb876738e37d70eb9005e5629a9ae89aa413a8) )
-        ROM_LOAD( "mpr-16487.bin", 0x200000, 0x200000, CRC(31b28dfa) SHA1(bd1ac11bf2f9161f61f8af3b9ff4c2709b7ee700) )
+		ROM_LOAD( "mpr-16486.bin", 0x000000, 0x200000, CRC(7df50533) SHA1(f2fb876738e37d70eb9005e5629a9ae89aa413a8) )
+		ROM_LOAD( "mpr-16487.bin", 0x200000, 0x200000, CRC(31b28dfa) SHA1(bd1ac11bf2f9161f61f8af3b9ff4c2709b7ee700) )
 
 	ROM_REGION( 0x400000, "sega2", 0 ) /* Samples */
-        ROM_LOAD( "mpr-16484.bin", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
-        ROM_LOAD( "mpr-16485.bin", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
+		ROM_LOAD( "mpr-16484.bin", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
+		ROM_LOAD( "mpr-16485.bin", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
 
-    ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
-    ROM_LOAD( "epr-16471.bin", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
+	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
+	ROM_LOAD( "epr-16471.bin", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
 
-    ROM_REGION( 0x400000, "mpeg", 0 ) /* DSB MPEG data */
-    ROM_LOAD( "mpr-16514.bin", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
-    ROM_LOAD( "mpr-16515.bin", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
+	ROM_REGION( 0x400000, "mpeg", 0 ) /* DSB MPEG data */
+	ROM_LOAD( "mpr-16514.bin", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
+	ROM_LOAD( "mpr-16515.bin", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
 
 	ROM_REGION32_LE( 0xc00000, "user1", 0 ) /* TGP model roms */
 	ROM_LOAD32_WORD( "mpr-16476.26", 0x000000, 0x200000, CRC(d48609ae) SHA1(8c8686a5c9ca4837447a7f70ed194e2f1882b66d) )
 // original dump (which one is right?)
 //  ROM_LOAD32_WORD( "mpr-16477.27", 0x000002, 0x200000, CRC(b979b082) SHA1(0c60d259093e987f3856730b57b43bde7e9562e3) )
 // new dump
-        ROM_LOAD32_WORD( "mpr16477.bin", 0x000002, 0x200000, CRC(971ff194) SHA1(9665ede3ca22885489f1f1b5865ccfac42364206) )
+		ROM_LOAD32_WORD( "mpr16477.bin", 0x000002, 0x200000, CRC(971ff194) SHA1(9665ede3ca22885489f1f1b5865ccfac42364206) )
 	ROM_LOAD32_WORD( "mpr-16478.28", 0x400000, 0x200000, CRC(80c780f7) SHA1(2f57c5373b02765d302bcd81e24f7b7bc4181387) )
 	ROM_LOAD32_WORD( "mpr-16479.29", 0x400002, 0x200000, CRC(e43183b3) SHA1(4e62c67cdf7a6fdac0ded86d5f9e81044b9dea8d) )
 	ROM_LOAD32_WORD( "mpr-16480.30", 0x800000, 0x200000, CRC(3185547a) SHA1(9871937372c2c755717802117a3ad39e1a11410e) )
@@ -1544,7 +1544,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_CPU_IO_MAP(model1_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
+	MCFG_CPU_ADD("audiocpu", M68000, 10000000)  // verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
 
 	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
@@ -1580,7 +1580,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(swa, model1)
-    MCFG_DSBZ80_ADD(DSBZ80_TAG)
+	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1591,7 +1591,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_IO_MAP(model1_vr_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
+	MCFG_CPU_ADD("audiocpu", M68000, 10000000)  // verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(model1_snd)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)

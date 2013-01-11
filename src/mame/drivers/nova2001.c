@@ -297,8 +297,8 @@ static INPUT_PORTS_START( nova2001 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// pause
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )	// fire
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // pause
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    // fire
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -359,27 +359,27 @@ static INPUT_PORTS_START( nova2001 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ninjakun )
-	PORT_START("IN0")	/* 0xa000 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,	IPT_JOYSTICK_LEFT ) PORT_2WAY /* "XPOS1" */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,	IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,	IPT_BUTTON2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,	IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,	IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,	IPT_START1  )
+	PORT_START("IN0")   /* 0xa000 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_2WAY /* "XPOS1" */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_START1  )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* 0xa001 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,	IPT_JOYSTICK_LEFT) PORT_2WAY PORT_COCKTAIL /* "YPOS1" */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,	IPT_JOYSTICK_RIGHT) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,	IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,	IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,	IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,	IPT_START2  )
+	PORT_START("IN1")   /* 0xa001 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT) PORT_2WAY PORT_COCKTAIL /* "YPOS1" */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_START2  )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("IN2")	/* 0xa002 */
+	PORT_START("IN2")   /* 0xa002 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nova2001_state,ninjakun_io_A002_ctrl_r, NULL)
 
@@ -600,26 +600,26 @@ static const gfx_layout layout16x16 =
 };
 
 static GFXDECODE_START( nova2001 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16,    0x000, 16 )	// sprites
-	GFXDECODE_ENTRY( "gfx1", 0x0000, layout8x8_part, 0x000, 16 )	// fg tiles (using only 1/4th of the ROM space)
-	GFXDECODE_ENTRY( "gfx1", 0x4000, layout8x8_part, 0x100, 16 )	// bg tiles (using only 1/4th of the ROM space)
+	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16,    0x000, 16 )    // sprites
+	GFXDECODE_ENTRY( "gfx1", 0x0000, layout8x8_part, 0x000, 16 )    // fg tiles (using only 1/4th of the ROM space)
+	GFXDECODE_ENTRY( "gfx1", 0x4000, layout8x8_part, 0x100, 16 )    // bg tiles (using only 1/4th of the ROM space)
 GFXDECODE_END
 
 static GFXDECODE_START( ninjakun )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x200, 16 )	// sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x000, 16 )	// fg tiles
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,   0x100, 16 )	// bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x200, 16 )    // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x000, 16 )    // fg tiles
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( pkunwar )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x000, 16 )	// sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 16 )	// bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x000, 16 )    // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
 static GFXDECODE_START( raiders5 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,    0x200, 16 )	// sprites
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part, 0x000, 16 )	// fg tiles (using only 1/4th of the ROM space)
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,      0x100, 16 )	// bg tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,    0x200, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part, 0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,      0x100, 16 ) // bg tiles
 GFXDECODE_END
 
 
@@ -681,7 +681,7 @@ static const ay8910_interface pkunwar_ay8910_interface_2 =
 static MACHINE_CONFIG_START( nova2001, nova2001_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
 	MCFG_CPU_PROGRAM_MAP(nova2001_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/6)	// 2 MHz verified on schematics
+	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
 	MCFG_SOUND_CONFIG(nova2001_ay8910_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -713,19 +713,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)	// 3 MHz
+	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(nova2001_state,ninjakun)
 
-    /* video hardware */
+	/* video hardware */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -741,11 +741,11 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/4)	// 3 MHz
-	MCFG_SOUND_CONFIG(nova2001_ay8910_interface_2)	// note swapped order wrt nova2001
+	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
+	MCFG_SOUND_CONFIG(nova2001_ay8910_interface_2)  // note swapped order wrt nova2001
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/4)	// 3 MHz
+	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/4) // 3 MHz
 	MCFG_SOUND_CONFIG(nova2001_ay8910_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -753,7 +753,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(pkunwar_map)
 	MCFG_CPU_IO_MAP(pkunwar_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8)	// 1.5MHz (correct?)
+	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
 	MCFG_SOUND_CONFIG(pkunwar_ay8910_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -786,14 +786,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( raiders5, nova2001_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(raiders5_cpu1_map)
 	MCFG_CPU_IO_MAP(raiders5_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)	// 3 MHz
+	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(raiders5_cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)	/* ? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)  /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_START( raiders5, nova2001_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8)	// 1.5MHz
+	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
 	MCFG_SOUND_CONFIG(pkunwar_ay8910_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -835,7 +835,7 @@ ROM_START( nova2001 )
 	ROM_LOAD( "2.6d",         0x2000, 0x2000, CRC(bc4e442b) SHA1(6e1dca5dde442db95403377bf49aaad2a337813e) )
 	ROM_LOAD( "3.6f",         0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
 	ROM_LOAD( "4.6g",         0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
-	ROM_RELOAD(               0x7000, 0x1000 )	// half size ROM, mirrored
+	ROM_RELOAD(               0x7000, 0x1000 )  // half size ROM, mirrored
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "5.12s",        0x0000, 0x2000, CRC(54198941) SHA1(fe762a0bbcf10b13ece87ded2ea730257cfbe7d3) )
@@ -853,7 +853,7 @@ ROM_START( nova2001u )
 	ROM_LOAD( "nova2001.2",   0x2000, 0x2000, CRC(fab87144) SHA1(506703f9d96443839f864ef5bde1a71120f54384) )
 	ROM_LOAD( "3.6f",         0x4000, 0x2000, CRC(b2849038) SHA1(b56c7c03ef7c677cc6df0280a485f9cda3435b23) )
 	ROM_LOAD( "4.6g",         0x6000, 0x1000, CRC(6b5bb12d) SHA1(74aee3d08a7ee1f98eaec4a4b3062aa9d17948ec) )
-	ROM_RELOAD(               0x7000, 0x1000 )	// half size ROM, mirrored
+	ROM_RELOAD(               0x7000, 0x1000 )  // half size ROM, mirrored
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "nova2001.5",   0x0000, 0x2000, CRC(8ea576e8) SHA1(d8dbcfd43aafe25afad7f947a80737cdc55b23d7) )
@@ -894,7 +894,7 @@ ROM_START( pkunwar )
 	ROM_LOAD( "pkwar.02r",    0x4000, 0x4000, CRC(abc1f661) SHA1(c4bf4a345efd4271617de9f334303d81c6885aa5) )
 	ROM_LOAD( "pkwar.03r",    0xe000, 0x2000, CRC(56faebea) SHA1(dd0406c723a08f5d1120655857a115ab8c2d2a11) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )	// (need lineswapping)
+	ROM_REGION( 0x10000, "gfx1", 0 )    // (need lineswapping)
 	ROM_LOAD( "pkwar.01y",    0x0000, 0x4000, CRC(428d3b92) SHA1(7fe11e8d785fe829d34e512f233bb9ccc70cd431) )
 	ROM_LOAD( "pkwar.02y",    0x4000, 0x4000, CRC(ce1da7bc) SHA1(a2357b61703a689ce63aec7dd44702b119894f8e) )
 	ROM_LOAD( "pkwar.03y",    0x8000, 0x4000, CRC(63204400) SHA1(1ba87ad3425c51150cb65408f04ee0147ef332d3) )
@@ -910,7 +910,7 @@ ROM_START( pkunwarj )
 	ROM_LOAD( "pgunwar.5",    0x4000, 0x4000, CRC(0092e49e) SHA1(7945361036f7679e4f4bb6b94f60f3ca09c077dc) )
 	ROM_LOAD( "pkwar.03r",    0xe000, 0x2000, CRC(56faebea) SHA1(dd0406c723a08f5d1120655857a115ab8c2d2a11) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )	// (need lineswapping)
+	ROM_REGION( 0x10000, "gfx1", 0 )    // (need lineswapping)
 	ROM_LOAD( "pkwar.01y",    0x0000, 0x4000, CRC(428d3b92) SHA1(7fe11e8d785fe829d34e512f233bb9ccc70cd431) )
 	ROM_LOAD( "pkwar.02y",    0x4000, 0x4000, CRC(ce1da7bc) SHA1(a2357b61703a689ce63aec7dd44702b119894f8e) )
 	ROM_LOAD( "pgunwar.2",    0x8000, 0x4000, CRC(a2a43443) SHA1(4e10569886d364eb2539928ea81dc1565b60b590) )
@@ -928,11 +928,11 @@ ROM_START( raiders5 )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "raiders5.2", 0x0000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )	// (need lineswapping)
+	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
 	ROM_LOAD( "raiders4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )	// (need lineswapping)
+	ROM_REGION( 0x4000, "gfx2", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders5.11n", 0x0000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
 
@@ -944,11 +944,11 @@ ROM_START( raiders5t )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "raiders2.4d", 0x0000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )	// (need lineswapping)
+	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
 	ROM_LOAD( "raiders4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )	// (need lineswapping)
+	ROM_REGION( 0x4000, "gfx2", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders5.11n", 0x0000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
 

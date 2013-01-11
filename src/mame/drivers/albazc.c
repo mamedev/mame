@@ -90,7 +90,7 @@ void albazc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 UINT32 albazc_state::screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x1f0, cliprect);	// ???
+	bitmap.fill(0x1f0, cliprect);   // ???
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -98,17 +98,17 @@ UINT32 albazc_state::screen_update_hanaroku(screen_device &screen, bitmap_ind16 
 WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
 {
 	/*
-        bit     description
+	    bit     description
 
-         0      meter1 (coin1)
-         1      meter2 (coin2)
-         2      meter3 (1/2 d-up)
-         3      meter4
-         4      call out (meter)
-         5      lockout (key)
-         6      hopper2 (play)
-         7      meter5 (start)
-    */
+	     0      meter1 (coin1)
+	     1      meter2 (coin2)
+	     2      meter3 (1/2 d-up)
+	     3      meter4
+	     4      call out (meter)
+	     5      lockout (key)
+	     6      hopper2 (play)
+	     7      meter5 (start)
+	*/
 
 	coin_counter_w(machine(), 0, data & 0x01);
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -120,17 +120,17 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
 WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)
 {
 	/*
-        bit     description
+	    bit     description
 
-         0      hopper1 (data clear)
-         1      dis dat
-         2      dis clk
-         3      pay out
-         4      ext in 1
-         5      ext in 2
-         6      ?
-         7      ?
-    */
+	     0      hopper1 (data clear)
+	     1      dis dat
+	     2      dis clk
+	     3      pay out
+	     4      ext in 1
+	     5      ext in 2
+	     6      ?
+	     7      ?
+	*/
 }
 
 WRITE8_MEMBER(albazc_state::hanaroku_out_2_w)
@@ -164,11 +164,11 @@ static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram1")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_SHARE("spriteram3")
-	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)	// ???
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM			// main ram
-	AM_RANGE(0xc400, 0xc4ff) AM_RAM			// ???
+	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP    // ??? written once during P.O.S.T.
+	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)   // ???
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // ??? always 0x40
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM         // main ram
+	AM_RANGE(0xc400, 0xc4ff) AM_RAM         // ???
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
@@ -179,9 +179,9 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( hanaroku )
-	PORT_START("IN0")	/* 0xe000 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )		// adds n credits depending on "Coinage" Dip Switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )		// adds 5 credits
+	PORT_START("IN0")   /* 0xe000 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )      // adds n credits depending on "Coinage" Dip Switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )      // adds 5 credits
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1/2 D-Up") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Reset") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Meter") PORT_CODE(KEYCODE_M)
@@ -189,7 +189,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Play")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 
-	PORT_START("IN1")	/* 0xe001 */
+	PORT_START("IN1")   /* 0xe001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )
@@ -199,7 +199,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )
 
-	PORT_START("IN2")	/* 0xe002 */
+	PORT_START("IN2")   /* 0xe002 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Data Clear")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Medal In") PORT_CODE(KEYCODE_I)
@@ -208,29 +208,29 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Ext In 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")	/* 0xd000 - Port A */
+	PORT_START("DSW1")  /* 0xd000 - Port A */
 	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW2")	/* 0xd000 - Port B */
+	PORT_START("DSW2")  /* 0xd000 - Port B */
 	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW3")	/* 0xe004 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		// Stored at 0xc028
+	PORT_START("DSW3")  /* 0xe004 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      // Stored at 0xc028
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	// Stored at 0xc03a
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )  // Stored at 0xc03a
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		// Stored at 0xc078
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      // Stored at 0xc078
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x20, "Game Mode" )				// Stored at 0xc02e
-	PORT_DIPSETTING(    0x30, "Mode 0" )				// Collect OFF
-	PORT_DIPSETTING(    0x20, "Mode 1" )				// Collect ON (code at 0x36ea)
-	PORT_DIPSETTING(    0x10, "Mode 2" )				// Collect ON (code at 0x3728)
-	PORT_DIPSETTING(    0x00, "Mode 3" )				// No credit counter
+	PORT_DIPNAME( 0x30, 0x20, "Game Mode" )             // Stored at 0xc02e
+	PORT_DIPSETTING(    0x30, "Mode 0" )                // Collect OFF
+	PORT_DIPSETTING(    0x20, "Mode 1" )                // Collect ON (code at 0x36ea)
+	PORT_DIPSETTING(    0x10, "Mode 2" )                // Collect ON (code at 0x3728)
+	PORT_DIPSETTING(    0x00, "Mode 3" )                // No credit counter
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
@@ -269,7 +269,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_CONFIG_START( hanaroku, albazc_state )
 
-	MCFG_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(hanaroku_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
 

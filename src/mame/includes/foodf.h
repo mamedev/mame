@@ -12,17 +12,17 @@ class foodf_state : public atarigen_state
 public:
 	foodf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_nvram(*this, "nvram"),
-		  m_spriteram(*this, "spriteram") { }
+			m_nvram(*this, "nvram"),
+			m_spriteram(*this, "spriteram") { }
 
 	required_device<x2212_device> m_nvram;
 
-	double			m_rweights[3];
-	double			m_gweights[3];
-	double			m_bweights[2];
-	UINT8			m_playfield_flip;
+	double          m_rweights[3];
+	double          m_gweights[3];
+	double          m_bweights[2];
+	UINT8           m_playfield_flip;
 
-	UINT8			m_whichport;
+	UINT8           m_whichport;
 	required_shared_ptr<UINT16> m_spriteram;
 	virtual void update_interrupts();
 	DECLARE_WRITE16_MEMBER(nvram_recall_w);

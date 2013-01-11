@@ -142,18 +142,18 @@ void c64_dela_ep64_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       IC6 _CE
-            1       IC5 _CE
-            2
-            3       IC4 _CE
-            4       A13
-            5       A14
-            6
-            7       EXROM
+		    0       IC6 _CE
+		    1       IC5 _CE
+		    2
+		    3       IC4 _CE
+		    4       A13
+		    5       A14
+		    6
+		    7       EXROM
 
-        */
+		*/
 
 		m_reset = 0;
 

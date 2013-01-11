@@ -112,15 +112,15 @@ void SEC::Do_Command(void)
 		case SEC_REQUEST_FINGERPRNT: Cmd_Get_Fpr(); break;
 		case SEC_REQUEST_LAST_CMD:   Cmd_Get_Lst(); break;
 		case SEC_REQUEST_COUNT_VAL:  Cmd_Get_Cnt(); break;
-		case SEC_SET_NUM_COUNTERS:	 Cmd_Set_Ncn(); break;
-		case SEC_SET_MARKET:		 Cmd_Set_Mrk(); break;
-		case SEC_SET_COUNTER_TXT:	 Cmd_Set_Txt(); break;
-		case SEC_COUNT_INC_SMALL:	 Cmd_Inc_Sml(); break;
-		case SEC_COUNT_INC_MED:		 Cmd_Inc_Med(); break;
+		case SEC_SET_NUM_COUNTERS:   Cmd_Set_Ncn(); break;
+		case SEC_SET_MARKET:         Cmd_Set_Mrk(); break;
+		case SEC_SET_COUNTER_TXT:    Cmd_Set_Txt(); break;
+		case SEC_COUNT_INC_SMALL:    Cmd_Inc_Sml(); break;
+		case SEC_COUNT_INC_MED:      Cmd_Inc_Med(); break;
 		case SEC_COUNT_INC_LARGE:    Cmd_Inc_Lrg(); break;
 
 		/* acknowledge these without doing anything */
-		case SEC_SHOW_TEXT:			 Cmd_NOP();     break;
+		case SEC_SHOW_TEXT:          Cmd_NOP();     break;
 		case SEC_SHOW_COUNTER_VAL:   Cmd_NOP();     break;
 		case SEC_SHOW_COUNTER_TXT:   Cmd_NOP();     break;
 		case SEC_SHOW_BITPATTERN:    Cmd_NOP();     break;
@@ -362,5 +362,3 @@ void SEC::Cmd_NOP(void)
 	m_rxclk = 0;
 	m_rxlen = 4;
 }
-
-

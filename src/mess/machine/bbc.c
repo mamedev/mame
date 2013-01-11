@@ -99,9 +99,9 @@ WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
 	{
 		switch (m_SWRAMtype)
 		{
-			case 1:	if (bbc_SWRAMtype1[m_userport]) memregion("user1")->base()[(m_userport << 14) + offset] = data;
-			case 2:	if (bbc_SWRAMtype2[m_rombank])  memregion("user1")->base()[(m_rombank << 14) + offset] = data;
-			case 3:	if (bbc_SWRAMtype3[m_rombank])  memregion("user1")->base()[(m_rombank << 14) + offset] = data;
+			case 1: if (bbc_SWRAMtype1[m_userport]) memregion("user1")->base()[(m_userport << 14) + offset] = data;
+			case 2: if (bbc_SWRAMtype2[m_rombank])  memregion("user1")->base()[(m_rombank << 14) + offset] = data;
+			case 3: if (bbc_SWRAMtype3[m_rombank])  memregion("user1")->base()[(m_rombank << 14) + offset] = data;
 		}
 	}
 }
@@ -562,7 +562,7 @@ long myo;
 		device_t *adlc = machine().device("mc6854");
 
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);		/* Video Controller */
+		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);     /* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
 			acia6850_device *acia = machine().device<acia6850_device>("acia6850");
@@ -572,14 +572,14 @@ long myo;
 			else
 				return acia->data_read(space,0);
 		}
-		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine().device("upd7002"), space, myo-0x18);			/* A to D converter */
-		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;						/* VideoULA */
+		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;                        /* Serial System Chip */
+		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine().device("upd7002"), space, myo-0x18);         /* A to D converter */
+		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;                        /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24); /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);  /* disc control latch */
-		if ((myo>=0x30) && (myo<=0x33)) return 0xfe;						/* page select */
-		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(space, myo-0x34);	/* ACCCON */
-		if ((myo>=0x38) && (myo<=0x3f)) return 0xfe;						/* NC ?? */
+		if ((myo>=0x30) && (myo<=0x33)) return 0xfe;                        /* page select */
+		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(space, myo-0x34);   /* ACCCON */
+		if ((myo>=0x38) && (myo<=0x3f)) return 0xfe;                        /* NC ?? */
 		if ((myo>=0x40) && (myo<=0x5f)) return via_0->read(space,myo-0x40);
 		if ((myo>=0x60) && (myo<=0x7f)) return via_1->read(space,myo-0x60);
 		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
@@ -602,7 +602,7 @@ long myo;
 		device_t *adlc = machine().device("mc6854");
 
 		myo=offset-0x200;
-		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00,data);			/* Video Controller */
+		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00,data);           /* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
 			acia6850_device *acia = machine().device<acia6850_device>("acia6850");
@@ -612,13 +612,13 @@ long myo;
 			else
 				acia->data_write(space, 0, data);
 		}
-		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine().device("upd7002"),space,myo-0x18,data);			/* A to D converter */
-		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
-		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data);	/* 1770 */
-		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);	/* disc control latch */
-		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30,data);		/* page select */
-		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34,data);	/* ACCCON */
+		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10,data);      /* Serial System Chip */
+		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine().device("upd7002"),space,myo-0x18,data);         /* A to D converter */
+		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);           /* VideoULA */
+		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data);   /* 1770 */
+		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);    /* disc control latch */
+		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30,data);      /* page select */
+		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34,data);    /* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f))                                   /* NC ?? */
 		if ((myo>=0x40) && (myo<=0x5f)) via_0->write(space,myo-0x40, data);
 		if ((myo>=0x60) && (myo<=0x7f)) via_1->write(space,myo-0x60, data);
@@ -752,7 +752,7 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
-                 being pressed on the selected m_column */
+			     being pressed on the selected m_column */
 			if ((machine().root_device().ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
@@ -792,7 +792,7 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
-                 being pressed on the selected m_column */
+			     being pressed on the selected m_column */
 			if ((machine().root_device().ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
@@ -859,10 +859,10 @@ static int bbc_keyboard(address_space &space, int data)
 
 static void bbcb_IC32_initialise(bbc_state *state)
 {
-	state->m_b0_sound=0x01;				// Sound is negative edge trigered
-	state->m_b1_speech_read=0x01;		// ????
-	state->m_b2_speech_write=0x01;		// ????
-	state->m_b3_keyboard=0x01;			// Keyboard is negative edge trigered
+	state->m_b0_sound=0x01;             // Sound is negative edge trigered
+	state->m_b1_speech_read=0x01;       // ????
+	state->m_b2_speech_write=0x01;      // ????
+	state->m_b3_keyboard=0x01;          // Keyboard is negative edge trigered
 	state->m_b4_video0=0x01;
 	state->m_b5_video1=0x01;
 	state->m_b6_caps_lock_led=0x01;
@@ -932,7 +932,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 	value = (data >> 3) & 0x01;
 
 
-    //logerror("SYSTEM write portb %d %d %d\n",data,bit,value);
+	//logerror("SYSTEM write portb %d %d %d\n",data,bit,value);
 
 	if (value)
 	{
@@ -1241,18 +1241,18 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_via_user_irq_w)
 
 const via6522_interface bbcb_user_via =
 {
-	DEVCB_NULL,	//via_user_read_porta,
+	DEVCB_NULL, //via_user_read_porta,
 	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_user_read_portb),
-	DEVCB_NULL,	//via_user_read_ca1,
-	DEVCB_NULL,	//via_user_read_cb1,
-	DEVCB_NULL,	//via_user_read_ca2,
-	DEVCB_NULL,	//via_user_read_cb2,
+	DEVCB_NULL, //via_user_read_ca1,
+	DEVCB_NULL, //via_user_read_cb1,
+	DEVCB_NULL, //via_user_read_ca2,
+	DEVCB_NULL, //via_user_read_cb2,
 	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
 	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_user_write_portb),
 	DEVCB_NULL, //via_user_write_ca1
 	DEVCB_NULL, //via_user_write_cb1
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),
-	DEVCB_NULL,	//via_user_write_cb2,
+	DEVCB_NULL, //via_user_write_cb2,
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_via_user_irq_w)
 };
 
@@ -1399,13 +1399,13 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 ***************************************/
 
 
-static void	bbc_i8271_interrupt(device_t *device, int state)
+static void bbc_i8271_interrupt(device_t *device, int state)
 {
 	bbc_state *drvstate = device->machine().driver_data<bbc_state>();
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
-    the nmi will be triggered, but when the state changes because the int
-    is cleared this will not cause another nmi */
+	the nmi will be triggered, but when the state changes because the int
+	is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
 	if (state!=drvstate->m_previous_i8271_int_state)
@@ -1413,7 +1413,7 @@ static void	bbc_i8271_interrupt(device_t *device, int state)
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
-            it would clear - to be checked */
+			it would clear - to be checked */
 			device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
@@ -1425,7 +1425,7 @@ static void	bbc_i8271_interrupt(device_t *device, int state)
 const i8271_interface bbc_i8271_interface=
 {
 	bbc_i8271_interrupt,
-    NULL,
+	NULL,
 	{FLOPPY_0, FLOPPY_1}
 };
 
@@ -1542,13 +1542,13 @@ static void bbc_update_fdq_int(running_machine &machine, int state)
 	}
 
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
-    Here we are checking this transition before triggering the nmi */
+	Here we are checking this transition before triggering the nmi */
 	if (bbc_state!=drvstate->m_previous_wd177x_int_state)
 	{
 		if (bbc_state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
-            it would clear - to be checked */
+			it would clear - to be checked */
 			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
@@ -2103,8 +2103,8 @@ MACHINE_START_MEMBER(bbc_state,bbcm)
 
 MACHINE_RESET_MEMBER(bbc_state,bbcm)
 {
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());			/* bank 1 regular lower ram     from 0000 to 2fff */
-	membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x3000);	/* bank 2 screen/shadow ram     from 3000 to 7fff */
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());           /* bank 1 regular lower ram     from 0000 to 2fff */
+	membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x3000);  /* bank 2 screen/shadow ram     from 3000 to 7fff */
 	membank("bank4")->set_base(machine().root_device().memregion("user1")->base());         /* bank 4 is paged ROM or RAM   from 8000 to 8fff */
 	membank("bank5")->set_entry(0);
 	membank("bank7")->set_base(memregion("user1")->base() + 0x40000); /* bank 6 OS rom of RAM          from c000 to dfff */

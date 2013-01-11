@@ -247,8 +247,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define SEAWOLF_ERASE_SW_PORT_TAG	("ERASESW")
-#define SEAWOLF_ERASE_DIP_PORT_TAG	("ERASEDIP")
+#define SEAWOLF_ERASE_SW_PORT_TAG   ("ERASESW")
+#define SEAWOLF_ERASE_DIP_PORT_TAG  ("ERASEDIP")
 
 
 WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
@@ -306,8 +306,8 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
 WRITE8_MEMBER(mw8080bw_state::seawolf_periscope_lamp_w)
 {
 	/* the schematics and the connecting diagrams show the
-       torpedo light order differently, but this order is
-       confirmed by the software */
+	   torpedo light order differently, but this order is
+	   confirmed by the software */
 	output_set_value("TORP_LAMP_4", (data >> 0) & 0x01);
 	output_set_value("TORP_LAMP_3", (data >> 1) & 0x01);
 	output_set_value("TORP_LAMP_2", (data >> 2) & 0x01);
@@ -322,7 +322,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_periscope_lamp_w)
 CUSTOM_INPUT_MEMBER(mw8080bw_state::seawolf_erase_input_r)
 {
 	return ioport(SEAWOLF_ERASE_SW_PORT_TAG)->read() &
-		   ioport(SEAWOLF_ERASE_DIP_PORT_TAG)->read();
+			ioport(SEAWOLF_ERASE_DIP_PORT_TAG)->read();
 }
 
 
@@ -543,13 +543,13 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define TORNBASE_L_HIT_PORT_TAG			("LHIT")
-#define TORNBASE_R_HIT_PORT_TAG			("RHIT")
-#define TORNBASE_L_PITCH_PORT_TAG		("LPITCH")
-#define TORNBASE_R_PITCH_PORT_TAG		("RPITCH")
-#define TORNBASE_SCORE_SW_PORT_TAG		("SCORESW")
-#define TORNBASE_SCORE_DIP_PORT_TAG		("ERASEDIP")
-#define TORNBASE_CAB_TYPE_PORT_TAG		("CAB")
+#define TORNBASE_L_HIT_PORT_TAG         ("LHIT")
+#define TORNBASE_R_HIT_PORT_TAG         ("RHIT")
+#define TORNBASE_L_PITCH_PORT_TAG       ("LPITCH")
+#define TORNBASE_R_PITCH_PORT_TAG       ("RPITCH")
+#define TORNBASE_SCORE_SW_PORT_TAG      ("SCORESW")
+#define TORNBASE_SCORE_DIP_PORT_TAG     ("ERASEDIP")
+#define TORNBASE_CAB_TYPE_PORT_TAG      ("CAB")
 
 
 UINT8 tornbase_get_cabinet_type(running_machine &machine)
@@ -615,7 +615,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_right_input_r)
 CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
 {
 	return ioport(TORNBASE_SCORE_SW_PORT_TAG)->read() &
-		   ioport(TORNBASE_SCORE_DIP_PORT_TAG)->read();
+			ioport(TORNBASE_SCORE_DIP_PORT_TAG)->read();
 }
 
 
@@ -708,7 +708,7 @@ static INPUT_PORTS_START( tornbase )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* 2 fakes port for the 'ERASE' input, which has a DIP to enable it.
-       This switch is not actually used by the software */
+	   This switch is not actually used by the software */
 	PORT_START(TORNBASE_SCORE_SW_PORT_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("SCORE Input (Not Used)") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -771,11 +771,11 @@ static INPUT_PORTS_START( zzzap )
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(1)   /* accelerator */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	/* not connected */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    /* not connected */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )	/* start button, but never used? */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )    /* start button, but never used? */
 
-	PORT_START("IN1")	/* steering wheel */
+	PORT_START("IN1")   /* steering wheel */
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("IN2")
@@ -860,7 +860,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* schematic says 12.5 Hz, but R/C values shown give 8.5Hz */
-#define MAZE_555_B1_PERIOD		PERIOD_OF_555_ASTABLE(RES_K(33) /* R200 */, RES_K(68) /* R201 */, CAP_U(1) /* C201 */)
+#define MAZE_555_B1_PERIOD      PERIOD_OF_555_ASTABLE(RES_K(33) /* R200 */, RES_K(68) /* R201 */, CAP_U(1) /* C201 */)
 
 static void maze_update_discrete(running_machine &machine)
 {
@@ -932,7 +932,7 @@ static INPUT_PORTS_START( maze )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )	/* labeled 'Not Used' */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )    /* labeled 'Not Used' */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1  )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) ) PORT_CONDITION("IN1", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -1161,8 +1161,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define DESERTGU_DIP_SW_0_1_SET_1_TAG	("DIPSW01SET1")
-#define DESERTGU_DIP_SW_0_1_SET_2_TAG	("DIPSW01SET2")
+#define DESERTGU_DIP_SW_0_1_SET_1_TAG   ("DIPSW01SET1")
+#define DESERTGU_DIP_SW_0_1_SET_2_TAG   ("DIPSW01SET2")
 
 
 MACHINE_START_MEMBER(mw8080bw_state,desertgu)
@@ -1244,7 +1244,7 @@ static INPUT_PORTS_START( desertgu )
 	PORT_BIT( 0xff, 0x48, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x10,0x7f) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
 	/* D0 and D1 in the DIP SW input port can reflect two sets of switches depending on the controller
-       select bit.  These two ports are fakes to handle this case */
+	   select bit.  These two ports are fakes to handle this case */
 	PORT_START(DESERTGU_DIP_SW_0_1_SET_1_TAG)
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_CONDITION("IN1", 0x30, NOTEQUALS, 0x30) PORT_DIPLOCATION("C2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -1296,11 +1296,11 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define DPLAY_L_PITCH_PORT_TAG		("LPITCH")
-#define DPLAY_R_PITCH_PORT_TAG		("RPITCH")
-#define DPLAY_CAB_TYPE_PORT_TAG		("CAB")
-#define DPLAY_CAB_TYPE_UPRIGHT		(0)
-#define DPLAY_CAB_TYPE_COCKTAIL		(1)
+#define DPLAY_L_PITCH_PORT_TAG      ("LPITCH")
+#define DPLAY_R_PITCH_PORT_TAG      ("RPITCH")
+#define DPLAY_CAB_TYPE_PORT_TAG     ("CAB")
+#define DPLAY_CAB_TYPE_UPRIGHT      (0)
+#define DPLAY_CAB_TYPE_COCKTAIL     (1)
 
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_left_input_r)
@@ -1675,8 +1675,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define CLOWNS_CONTROLLER_P1_TAG		("CONTP1")
-#define CLOWNS_CONTROLLER_P2_TAG		("CONTP2")
+#define CLOWNS_CONTROLLER_P1_TAG        ("CONTP1")
+#define CLOWNS_CONTROLLER_P2_TAG        ("CONTP2")
 
 
 MACHINE_START_MEMBER(mw8080bw_state,clowns)
@@ -1875,7 +1875,7 @@ static INPUT_PORTS_START( spacwalk )
 
 	/* 8 pin DIP Switch on location C2 on PCB A084-90700-D640 */
 	/* PCB picture also shows a 2nd DIP Switch on location B2, supposedly for language selection,
-    but ROM contents suggests it's not connected (no different languages or unmapped reads) */
+	but ROM contents suggests it's not connected (no different languages or unmapped reads) */
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("C2:1,2")
 	PORT_DIPSETTING(    0x03, "40 seconds + 20 extended" ) PORT_CONDITION("IN2", 0x30, NOTEQUALS, 0x00) // 45 + 20 for 2 players
@@ -1937,7 +1937,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 static ADDRESS_MAP_START( shuffle_io_map, AS_IO, 8, mw8080bw_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)	/* yes, 4, and no mirroring on the read handlers */
+	ADDRESS_MAP_GLOBAL_MASK(0xf)    /* yes, 4, and no mirroring on the read handlers */
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
 	AM_RANGE(0x03, 0x03) AM_READ(mw8080bw_shift_result_rev_r)
@@ -2101,8 +2101,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define SPCENCTR_STROBE_FREQ		(9.00)  /* Hz - calculated from the 555 timer */
-#define SPCENCTR_STROBE_DUTY_CYCLE	(95.0)	/* % */
+#define SPCENCTR_STROBE_FREQ        (9.00)  /* Hz - calculated from the 555 timer */
+#define SPCENCTR_STROBE_DUTY_CYCLE  (95.0)  /* % */
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
@@ -2145,30 +2145,30 @@ UINT8 spcenctr_get_trench_slope( *running_machine &machine, UINT8 addr )
 #endif
 
 WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
-{												/* A7 A6 A5 A4 A3 A2 A1 A0 */
+{                                               /* A7 A6 A5 A4 A3 A2 A1 A0 */
 
 	if ((offset & 0x07) == 0x02)
-		watchdog_reset_w(space, 0, data);		/*  -  -  -  -  -  0  1  0 */
+		watchdog_reset_w(space, 0, data);       /*  -  -  -  -  -  0  1  0 */
 
 	else if ((offset & 0x5f) == 0x01)
-		spcenctr_audio_1_w(space, 0, data);	/*  -  0  -  0  0  0  0  1 */
+		spcenctr_audio_1_w(space, 0, data); /*  -  0  -  0  0  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x09)
-		spcenctr_audio_2_w(space, 0, data);	/*  -  0  -  0  1  0  0  1 */
+		spcenctr_audio_2_w(space, 0, data); /*  -  0  -  0  1  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x11)
-		spcenctr_audio_3_w(space, 0, data);	/*  -  0  -  1  0  0  0  1 */
+		spcenctr_audio_3_w(space, 0, data); /*  -  0  -  1  0  0  0  1 */
 
 	else if ((offset & 0x07) == 0x03)
-	{											/*  -  -  -  -  -  0  1  1 */
+	{                                           /*  -  -  -  -  -  0  1  1 */
 		UINT8 addr = ((offset & 0xc0) >> 4) | ((offset & 0x18) >> 3);
 		m_spcenctr_trench_slope[addr] = data;
 	}
 	else if ((offset & 0x07) == 0x04)
-		m_spcenctr_trench_center = data;			/*  -  -  -  -  -  1  0  0 */
+		m_spcenctr_trench_center = data;            /*  -  -  -  -  -  1  0  0 */
 
 	else if ((offset & 0x07) == 0x07)
-		m_spcenctr_trench_width = data;			/*  -  -  -  -  -  1  1  1 */
+		m_spcenctr_trench_width = data;         /*  -  -  -  -  -  1  1  1 */
 
 	else
 		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", space.device().safe_pc(), offset, data);
@@ -2247,11 +2247,11 @@ static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 
 	/* timers */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeon", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
-	MCFG_TIMER_PARAM(TRUE)	/* indicates strobe ON */
+	MCFG_TIMER_PARAM(TRUE)  /* indicates strobe ON */
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeoff", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(SPCENCTR_STROBE_FREQ) * (100 - SPCENCTR_STROBE_DUTY_CYCLE) / 100)
-	MCFG_TIMER_PARAM(FALSE)	/* indicates strobe OFF */
+	MCFG_TIMER_PARAM(FALSE) /* indicates strobe OFF */
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2363,8 +2363,8 @@ MACHINE_CONFIG_END
 READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 {
 	/* ZV - not too sure why this is needed, I don't see
-       anything unusual on the schematics that would cause
-       the bits to flip */
+	   anything unusual on the schematics that would cause
+	   the bits to flip */
 
 	return ~mb14241_shift_result_r(m_mb14241, space, 0);
 }
@@ -2518,7 +2518,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
 	UINT32 ret;
 
 	/* upright PCB : switches visible
-       cocktail PCB: HI */
+	   cocktail PCB: HI */
 
 	if (invaders_is_cabinet_cocktail(machine()))
 		ret = 0x03;
@@ -2534,7 +2534,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
 	UINT32 ret;
 
 	/* upright PCB : switch visible
-       cocktail PCB: HI */
+	   cocktail PCB: HI */
 
 	if (invaders_is_cabinet_cocktail(machine()))
 		ret = 0x01;
@@ -2550,7 +2550,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
 	UINT32 ret;
 
 	/* upright PCB : P1 controls
-       cocktail PCB: HI */
+	   cocktail PCB: HI */
 
 	if (invaders_is_cabinet_cocktail(machine()))
 		ret = 0x07;
@@ -2572,7 +2572,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
 	UINT32 ret;
 
 	/* upright PCB : P1 controls
-       cocktail PCB: P2 controls */
+	   cocktail PCB: P2 controls */
 
 	if (invaders_is_cabinet_cocktail(machine()))
 		ret = ioport(INVADERS_P2_CONTROL_PORT_TAG)->read();
@@ -2707,7 +2707,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define BLUESHRK_COIN_INPUT_PORT_TAG	("COIN")
+#define BLUESHRK_COIN_INPUT_PORT_TAG    ("COIN")
 
 
 CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
@@ -2785,7 +2785,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define INVAD2CT_COIN_INPUT_PORT_TAG	("COIN")
+#define INVAD2CT_COIN_INPUT_PORT_TAG    ("COIN")
 
 
 #ifdef UNUSED_FUNCTION
@@ -2966,7 +2966,7 @@ ROM_START( checkmat )
 	ROM_LOAD( "checkmat.g", 0x0400, 0x0400, CRC(df5fa551) SHA1(484ff9bfb95166ba09f34c753a7908a73de3cc7d) )
 	ROM_LOAD( "checkmat.f", 0x0800, 0x0400, CRC(25586406) SHA1(39e0cf502735819a7e1d933e3686945fcfae21af) )
 	ROM_LOAD( "checkmat.e", 0x0c00, 0x0400, CRC(59330d84) SHA1(453f95dd31968d439339c41e625481170437eb0f) )
-	ROM_LOAD( "checkmat.d", 0x1000, 0x0400, NO_DUMP )	/* language ROM */
+	ROM_LOAD( "checkmat.d", 0x1000, 0x0400, NO_DUMP )   /* language ROM */
 ROM_END
 
 

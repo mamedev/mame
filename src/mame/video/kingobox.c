@@ -37,7 +37,7 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 						1, resistances_fg, gweights_fg, 0, 0,
 						1, resistances_fg, bweights_fg, 0, 0);
 
-				   compute_resistor_weights(0, 255, scale,
+					compute_resistor_weights(0, 255, scale,
 						4, resistances, rweights, 470, 0,
 						4, resistances, gweights, 470, 0,
 						4, resistances, bweights, 470, 0);

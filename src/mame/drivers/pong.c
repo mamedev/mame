@@ -46,16 +46,16 @@ TODO:
  * http://www.youtube.com/watch?v=pDrRnJOCKZc
  */
 
-#define MASTER_CLOCK	7159000
-#define V_TOTAL 		(0x105+1)
-#define	H_TOTAL			(0x1C6+1)   	// 454
+#define MASTER_CLOCK    7159000
+#define V_TOTAL         (0x105+1)
+#define H_TOTAL         (0x1C6+1)       // 454
 
-#define HBSTART					(H_TOTAL)
-#define HBEND					(80)
-#define VBSTART					(V_TOTAL)
-#define VBEND					(16)
+#define HBSTART                 (H_TOTAL)
+#define HBEND                   (80)
+#define VBSTART                 (V_TOTAL)
+#define VBEND                   (16)
 
-#define HRES_MULT					(1)
+#define HRES_MULT                   (1)
 
 enum input_changed_enum
 {
@@ -114,8 +114,8 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(pad2, ic_g2a.Q)
 
 	// horizontal counter
-	TTL_7493(ic_f8, clk, ic_f8.QA, ic_e7b.QQ, ic_e7b.QQ)	// f8, f9, f6b
-	TTL_7493(ic_f9, ic_f8.QD, ic_f9.QA, ic_e7b.QQ, ic_e7b.QQ)	// f8, f9, f6b
+	TTL_7493(ic_f8, clk, ic_f8.QA, ic_e7b.QQ, ic_e7b.QQ)    // f8, f9, f6b
+	TTL_7493(ic_f9, ic_f8.QD, ic_f9.QA, ic_e7b.QQ, ic_e7b.QQ)   // f8, f9, f6b
 	TTL_74107(ic_f6b, ic_f9.QD, high, high, ic_e7b.Q)
 	TTL_7430_NAND(ic_f7, ic_f8.QB, ic_f8.QC, ic_f9.QC, ic_f9.QD, ic_f6b.Q, high, high, high)
 	TTL_7474(ic_e7b, clk, ic_f7, high, high)
@@ -132,8 +132,8 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(256HQ, ic_f6b.QQ)
 
 	// vertical counter
-	TTL_7493(ic_e8, hreset, ic_e8.QA, ic_e7a.QQ, ic_e7a.QQ)	// e8, e9, d9b
-	TTL_7493(ic_e9, ic_e8.QD,ic_e9.QA,  ic_e7a.QQ, ic_e7a.QQ)	// e8, e9, d9b
+	TTL_7493(ic_e8, hreset, ic_e8.QA, ic_e7a.QQ, ic_e7a.QQ) // e8, e9, d9b
+	TTL_7493(ic_e9, ic_e8.QD,ic_e9.QA,  ic_e7a.QQ, ic_e7a.QQ)   // e8, e9, d9b
 	TTL_74107(ic_d9b, ic_e9.QD, high, high, ic_e7a.Q)
 	TTL_7474(ic_e7a, hreset, e7a_data, high, high)
 	TTL_7410_NAND(e7a_data, ic_e8.QA, ic_e8.QC, ic_d9b.Q)
@@ -219,7 +219,7 @@ static NETLIST_START(pong_schematics)
 	TTL_7400_NAND(ic_b2b, ic_a3.RC, ic_b3.RC)
 	TTL_7410_NAND(ic_e2b, ic_a3.RC, ic_b3.QC, ic_b3.QD)
 	NET_ALIAS(vvidQ, ic_e2b.Q)
-	TTL_7404_INVERT(vvid, vvidQ)	// D2D
+	TTL_7404_INVERT(vvid, vvidQ)    // D2D
 	NET_ALIAS(vpos256, ic_a3.RC)
 	NET_ALIAS(vpos32, ic_a3.QB)
 	NET_ALIAS(vpos16, ic_a3.QA)
@@ -233,7 +233,7 @@ static NETLIST_START(pong_schematics)
 	TTL_7474(ic_a5b, hit, ic_a6a, attractQ, high)
 	TTL_7474(ic_a5a, hit, ic_a6b, attractQ, high)
 	TTL_7474(ic_b5a, hit, ic_b6b, attractQ, high)
-	TTL_74107(ic_h2x, vblank, vvid, vvid, hitQ)	// two marked at position h2a ==> this h2x
+	TTL_74107(ic_h2x, vblank, vvid, vvid, hitQ) // two marked at position h2a ==> this h2x
 
 	TTL_7486_XOR(ic_a4c, ic_a5b.Q, ic_h2x.Q)
 	TTL_7486_XOR(ic_a4b, ic_a5a.Q, ic_h2x.Q)
@@ -334,7 +334,7 @@ static NETLIST_START(pong_schematics)
 	TTL_74107(ic_c8a, ic_c7.QD, high, high, SRSTQ)
 	NETDEV_SWITCH2(sw1a, high, ic_c7.QC)
 	NETDEV_PARAM(sw1a.POS, 0)
-	TTL_7410_NAND(ic_d8a, ic_c7.QA, sw1a.Q, ic_c8a.Q)		// would be nand2 for 11 instead of 15 points, need a switch dev!
+	TTL_7410_NAND(ic_d8a, ic_c7.QA, sw1a.Q, ic_c8a.Q)       // would be nand2 for 11 instead of 15 points, need a switch dev!
 
 	NET_ALIAS(StopG1Q, ic_d8a.Q)
 	NET_ALIAS(score1_1, ic_c7.QA)
@@ -349,7 +349,7 @@ static NETLIST_START(pong_schematics)
 	TTL_74107(ic_c8b, ic_d7.QD, high, high, SRSTQ)
 	NETDEV_SWITCH2(sw1b, high, ic_d7.QC)
 	NETDEV_PARAM(sw1b.POS, 0)
-	TTL_7410_NAND(ic_d8b, ic_d7.QA, sw1b.Q, ic_c8b.Q)		// would be nand2 for 11 instead of 15 points, need a switch dev!
+	TTL_7410_NAND(ic_d8b, ic_d7.QA, sw1b.Q, ic_c8b.Q)       // would be nand2 for 11 instead of 15 points, need a switch dev!
 
 	NET_ALIAS(StopG2Q, ic_d8b.Q)
 	NET_ALIAS(score2_1, ic_d7.QA)
@@ -395,7 +395,7 @@ static NETLIST_START(pong_schematics)
 	TTL_7410_NAND(ic_d5b,      16V, ic_c5.d, scoreGD)
 
 	TTL_7430_NAND(ic_d3, ic_d4a, ic_d5c, ic_c4c, ic_d5a, ic_d4c, ic_d4b, ic_d5b, high)
-	NET_ALIAS(score, ic_d3.Q)		//FIXME
+	NET_ALIAS(score, ic_d3.Q)       //FIXME
 
 	// net
 	TTL_74107(ic_f3b, clk, 256H, 256HQ, high)
@@ -432,8 +432,8 @@ static NETLIST_START(pong_fast)
 
 	NETLIST_INCLUDE(pong_schematics)
 	/* the signal above is delayed on pong due to counter at gate delays.
-     * This is approximated by the following circuit ...
-     */
+	 * This is approximated by the following circuit ...
+	 */
 	//NET_REMOVE_DEV(ic_h5b)
 	//NETDEV_DELAY_RISE(ic_g5b_D, clk, ic_g5b.Q)
 	//TTL_7400_NAND(ic_h5b, ic_h5c.Q, ic_g5b_D.Q)
@@ -448,15 +448,15 @@ class pong_state : public driver_device
 public:
 	pong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_dac(*this, "dac"),				/* just to have a sound device */
-		  m_srst(*this, "maincpu", "SRST"),
-		  m_p_V0(*this, "maincpu", "P1"),
-		  m_p_V1(*this, "maincpu", "P2"),
-		  m_sw1a(*this, "maincpu", "sw1a.POS"),
-		  m_sw1b(*this, "maincpu", "sw1b.POS"),
-		  m_p_R0(*this, "maincpu", "ic_a9.R"),
-		  m_p_R1(*this, "maincpu", "ic_b9.R")
+			m_maincpu(*this, "maincpu"),
+			m_dac(*this, "dac"),                /* just to have a sound device */
+			m_srst(*this, "maincpu", "SRST"),
+			m_p_V0(*this, "maincpu", "P1"),
+			m_p_V1(*this, "maincpu", "P2"),
+			m_sw1a(*this, "maincpu", "sw1a.POS"),
+			m_sw1b(*this, "maincpu", "sw1b.POS"),
+			m_p_R0(*this, "maincpu", "ic_a9.R"),
+			m_p_R1(*this, "maincpu", "ic_b9.R")
 	{
 	}
 
@@ -630,8 +630,8 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		double pad = vA + (vB - vA)*PRE_R / (Req + PRE_R);
 		switch (numpad)
 		{
-		case IC_PADDLE1:	m_p_V0->setToPS(pad, NLTIME_FROM_NS(0)); break;
-		case IC_PADDLE2:	m_p_V1->setToPS(pad, NLTIME_FROM_NS(0)); break;
+		case IC_PADDLE1:    m_p_V0->setToPS(pad, NLTIME_FROM_NS(0)); break;
+		case IC_PADDLE2:    m_p_V1->setToPS(pad, NLTIME_FROM_NS(0)); break;
 		}
 		break;
 	}
@@ -647,8 +647,8 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		pad = (double) newval / (double) 100 * RES_K(50) + RES_K(56);
 		switch (numpad)
 		{
-		case IC_VR1:	m_p_R0->setTo(pad); break;
-		case IC_VR2:	m_p_R1->setTo(pad); break;
+		case IC_VR1:    m_p_R0->setTo(pad); break;
+		case IC_VR2:    m_p_R1->setTo(pad); break;
 		}
 		break;
 	}
@@ -658,22 +658,22 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 
 
 static INPUT_PORTS_START( pong )
-	PORT_START( "PADDLE0" )	/* fake input port for player 1 paddle */
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)	PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed,IC_PADDLE1)
+	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed,IC_PADDLE1)
 
-	PORT_START( "PADDLE1" )	/* fake input port for player 2 paddle */
+	PORT_START( "PADDLE1" ) /* fake input port for player 2 paddle */
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_PADDLE2)
 
 	PORT_START("IN0") /* fake as well */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )		PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_COIN)
-	PORT_DIPNAME( 0x06, 0x00, "Game Won" )			PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_COIN)
+	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
 	PORT_DIPSETTING(    0x00, "11" )
 	PORT_DIPSETTING(    0x06, "15" )
 
 	PORT_START("VR1")
-	PORT_ADJUSTER( 63, "VR1 - 50k, Paddle 1 adjustment" )	PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR1)
+	PORT_ADJUSTER( 63, "VR1 - 50k, Paddle 1 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR1)
 	PORT_START("VR2")
-	PORT_ADJUSTER( 63, "VR2 - 50k, Paddle 2 adjustment" )	PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR2)
+	PORT_ADJUSTER( 63, "VR2 - 50k, Paddle 2 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR2)
 	//PORT_START("GATESPEED")
 	//PORT_ADJUSTER( 100, "Logic Gate Delay" ) PORT_MINMAX(10, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_GATEDELAY)
 
@@ -684,9 +684,9 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	/* basic machine hardware */
 	MCFG_NETLIST_ADD("maincpu", pong)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK * HRES_MULT, H_TOTAL * HRES_MULT, HBEND * HRES_MULT, HBSTART * HRES_MULT, V_TOTAL, VBEND, VBSTART)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK * HRES_MULT, H_TOTAL * HRES_MULT, HBEND * HRES_MULT, HBSTART * HRES_MULT, V_TOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(pong_state, screen_update)
 
 	/* sound hardware */
@@ -711,7 +711,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* enough for netlist */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
 	ROM_LOAD( "pong.netlist", 0x000000, 0x0029e4, CRC(e9c409a1) SHA1(1dc99437f49261c3cb3f46153c6258043bc720a0) )
 ROM_END
 

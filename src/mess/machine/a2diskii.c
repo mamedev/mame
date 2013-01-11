@@ -31,12 +31,12 @@ const device_type A2BUS_IWM_FDC = &device_creator<a2bus_iwmflop_device>;
 
 const applefdc_interface fdc_interface =
 {
-	apple525_set_lines,			/* set_lines */
-	apple525_set_enable_lines,	/* set_enable_lines */
+	apple525_set_lines,         /* set_lines */
+	apple525_set_enable_lines,  /* set_enable_lines */
 
-	apple525_read_data,			/* read_data */
-	apple525_write_data,	/* write_data */
-	apple525_read_status	/* read_status */
+	apple525_read_data,         /* read_data */
+	apple525_write_data,    /* write_data */
+	apple525_read_status    /* read_status */
 };
 
 static const floppy_interface floppy_interface =
@@ -64,7 +64,7 @@ MACHINE_CONFIG_END
 
 ROM_START( diskii )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
-    ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
+	ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
 ROM_END
 
 //-------------------------------------------------
@@ -96,20 +96,20 @@ const rom_entry *a2bus_floppy_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
-        device_a2bus_card_interface(mconfig, *this),
-        m_fdc(*this, FDC_TAG)
+		device_t(mconfig, type, name, tag, owner, clock),
+		device_a2bus_card_interface(mconfig, *this),
+		m_fdc(*this, FDC_TAG)
 {
 }
 
 a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_floppy_device(mconfig, A2BUS_DISKII, "Apple Disk II controller", tag, owner, clock)
+	a2bus_floppy_device(mconfig, A2BUS_DISKII, "Apple Disk II controller", tag, owner, clock)
 {
 	m_shortname = "a2diskii";
 }
 
 a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock)
+	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock)
 {
 	m_shortname = "a2diskii";
 }
@@ -157,6 +157,5 @@ void a2bus_floppy_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
 
 UINT8 a2bus_floppy_device::read_cnxx(address_space &space, UINT8 offset)
 {
-    return m_rom[offset];
+	return m_rom[offset];
 }
-

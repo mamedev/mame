@@ -258,7 +258,7 @@ WRITE32_MEMBER( psxdma_device::write )
 					dma->fn_read( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
-				else if (dma->n_channelcontrol == 0x11000000 &&	// CD DMA
+				else if (dma->n_channelcontrol == 0x11000000 && // CD DMA
 					!dma->fn_read.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );

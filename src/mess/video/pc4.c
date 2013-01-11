@@ -154,7 +154,7 @@ void pc4_state::update_ac(void)
 	{
 		m_cursor_pos = m_ac;
 		// display is shifted only after a write
-		if (m_shift_on && m_data_bus_flag == 1)	m_disp_shift += m_direction;
+		if (m_shift_on && m_data_bus_flag == 1) m_disp_shift += m_direction;
 	}
 
 	m_data_bus_flag = 0;

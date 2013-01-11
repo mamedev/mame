@@ -85,8 +85,8 @@
 /*
     Defines
 */
-#define Z80_XTAL	5910000		/* Unconfirmed */
-#define M6809_XTAL	1000000
+#define Z80_XTAL    5910000     /* Unconfirmed */
+#define M6809_XTAL  1000000
 
 
 /*
@@ -114,58 +114,58 @@ union ADDR_REG
 };
 
 /* Blitter register flag bits */
-#define	CMD_RUN			0x01
-#define CMD_COLST		0x02
-#define CMD_PARRD		0x04		/* Never used? */
-#define CMD_SRCUP		0x08
-#define CMD_DSTUP		0x10
-#define CMD_LT0 		0x20
-#define CMD_LT1			0x40
-#define CMD_LINEDRAW	0x80
+#define CMD_RUN         0x01
+#define CMD_COLST       0x02
+#define CMD_PARRD       0x04        /* Never used? */
+#define CMD_SRCUP       0x08
+#define CMD_DSTUP       0x10
+#define CMD_LT0         0x20
+#define CMD_LT1         0x40
+#define CMD_LINEDRAW    0x80
 
 
 /* All unconfirmed */
 //#define SRCDST_CMP    0x10
 //#define SRCDST_WRAP   0x20
 //#define SRCDST_SIGN   0x40
-#define SRCDST_A_1		0x80		/* This might be correct for line drawing? */
+#define SRCDST_A_1      0x80        /* This might be correct for line drawing? */
 
 /* These appear to be correct */
-#define MODE_SSIGN		0x80
-#define MODE_DSIGN		0x40
-#define MODE_YFRAC		0x20
-#define MODE_BITTOBYTE	0x04
-#define MODE_PALREMAP	0x10
+#define MODE_SSIGN      0x80
+#define MODE_DSIGN      0x40
+#define MODE_YFRAC      0x20
+#define MODE_BITTOBYTE  0x04
+#define MODE_PALREMAP   0x10
 
-#define CMPFUNC_LT  	0x01
-#define CMPFUNC_EQ  	0x02
-#define CMPFUNC_GT  	0x04
-#define CMPFUNC_BEQ		0x08
-#define CMPFUNC_LOG0	0x10
-#define CMPFUNC_LOG1	0x20
-#define CMPFUNC_LOG2	0x40
-#define CMPFUNC_LOG3	0x80
+#define CMPFUNC_LT      0x01
+#define CMPFUNC_EQ      0x02
+#define CMPFUNC_GT      0x04
+#define CMPFUNC_BEQ     0x08
+#define CMPFUNC_LOG0    0x10
+#define CMPFUNC_LOG1    0x20
+#define CMPFUNC_LOG2    0x40
+#define CMPFUNC_LOG3    0x80
 
 /*
     Blitter state
 */
 struct blitter_t
 {
-	ADDR_REG	program;
+	ADDR_REG    program;
 
-	UINT8		control;
-	UINT8		status;
+	UINT8       control;
+	UINT8       status;
 
-	UINT8		command;
-	ADDR_REG	source;
-	ADDR_REG	dest;
-	UINT8		modectl;
-	UINT8		compfunc;
-	UINT8		outercnt;
+	UINT8       command;
+	ADDR_REG    source;
+	ADDR_REG    dest;
+	UINT8       modectl;
+	UINT8       compfunc;
+	UINT8       outercnt;
 
-	UINT8		innercnt;
-	UINT8		step;
-	UINT8		pattern;
+	UINT8       innercnt;
+	UINT8       step;
+	UINT8       pattern;
 };
 
 #define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
@@ -175,43 +175,43 @@ struct blitter_t
 */
 struct ramdac_t
 {
-	UINT8	addr_w;
-	UINT8	addr_r;
-	UINT8	mask;
+	UINT8   addr_w;
+	UINT8   addr_r;
+	UINT8   mask;
 
 	/* 18-bit colors */
-	UINT8	color_r[3];
-	UINT8	color_w[3];
-	UINT32	table[256];
+	UINT8   color_r[3];
+	UINT8   color_w[3];
+	UINT32  table[256];
 
 	/* Access counts */
-	UINT8	count_r;
-	UINT8	count_w;
+	UINT8   count_r;
+	UINT8   count_w;
 };
 
 
 struct fdc_t
 {
-	UINT8	MSR;
+	UINT8   MSR;
 
-	int		side;
-	int		track;
-	int		sector;
-	int		number;
-	int		stop_track;
-	int		setup_read;
+	int     side;
+	int     track;
+	int     sector;
+	int     number;
+	int     stop_track;
+	int     setup_read;
 
-	int		byte_pos;
-	int		offset;
+	int     byte_pos;
+	int     offset;
 
-	int		phase;
-	int		next_phase;
-	int		cmd_len;
-	int		cmd_cnt;
-	int		res_len;
-	int		res_cnt;
-	UINT8	cmd[10];
-	UINT8	results[8];
+	int     phase;
+	int     next_phase;
+	int     cmd_len;
+	int     cmd_cnt;
+	int     res_len;
+	int     res_cnt;
+	UINT8   cmd[10];
+	UINT8   results[8];
 };
 
 
@@ -364,7 +364,7 @@ void bfcobra_state::video_start()
 		m_col7bit[i] = col;
 
 		col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
-			  (col76index[( (col & 0x30) >> 4) & 3] << 5 );
+				(col76index[( (col & 0x30) >> 4) & 3] << 5 );
 		m_col6bit[i] = col;
 	}
 }
@@ -461,7 +461,7 @@ INLINE UINT8* blitter_get_addr(running_machine &machine, UINT32 addr)
 */
 static void RunBlit(address_space &space)
 {
-#define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(space.machine(), blitter.program.addr++))
+#define BLITPRG_READ(x)     blitter.x = *(blitter_get_addr(space.machine(), blitter.program.addr++))
 
 	bfcobra_state *state = space.machine().driver_data<bfcobra_state>();
 	struct blitter_t &blitter = state->m_blitter;
@@ -492,30 +492,30 @@ static void RunBlit(address_space &space)
 		if (DEBUG_BLITTER)
 		{
 			mame_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context(), blitter.program.addr - 12);
-			mame_printf_debug("Command Reg         %.2x",	blitter.command);
-			mame_printf_debug("		%s %s %s %s %s %s %s\n",
+			mame_printf_debug("Command Reg         %.2x",   blitter.command);
+			mame_printf_debug("     %s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",
 				blitter.command & CMD_COLST ? "COLST" : "     ",
 				blitter.command & CMD_PARRD ? "PARRD" : "     ",
 				blitter.command & CMD_SRCUP ? "SRCUP" : "     ",
 				blitter.command & CMD_DSTUP ? "DSTUP" : "     ");
 
-			mame_printf_debug("Src Address Byte 0  %.2x\n",	blitter.source.addr0);
-			mame_printf_debug("Src Address Byte 1  %.2x\n",	blitter.source.addr1);
-			mame_printf_debug("Src Control         %.2x\n",	blitter.source.addr2);
-			mame_printf_debug("  Src Address       %.5x\n",	blitter.source.addr & 0xfffff);
-			mame_printf_debug("Dest Address Byte 0 %.2x\n",	blitter.dest.addr0);
-			mame_printf_debug("Dest Address Byte 1 %.2x\n",	blitter.dest.addr1);
-			mame_printf_debug("Dest Control        %.2x\n",	blitter.dest.addr2);
-			mame_printf_debug("  Dst. Address      %.5x\n",	blitter.dest.addr & 0xfffff);
-			mame_printf_debug("Mode Control        %.2x",	blitter.modectl);
-			mame_printf_debug("		%s\n", blitter.modectl & MODE_BITTOBYTE ? "BIT_TO_BYTE" : "");
+			mame_printf_debug("Src Address Byte 0  %.2x\n", blitter.source.addr0);
+			mame_printf_debug("Src Address Byte 1  %.2x\n", blitter.source.addr1);
+			mame_printf_debug("Src Control         %.2x\n", blitter.source.addr2);
+			mame_printf_debug("  Src Address       %.5x\n", blitter.source.addr & 0xfffff);
+			mame_printf_debug("Dest Address Byte 0 %.2x\n", blitter.dest.addr0);
+			mame_printf_debug("Dest Address Byte 1 %.2x\n", blitter.dest.addr1);
+			mame_printf_debug("Dest Control        %.2x\n", blitter.dest.addr2);
+			mame_printf_debug("  Dst. Address      %.5x\n", blitter.dest.addr & 0xfffff);
+			mame_printf_debug("Mode Control        %.2x",   blitter.modectl);
+			mame_printf_debug("     %s\n", blitter.modectl & MODE_BITTOBYTE ? "BIT_TO_BYTE" : "");
 
-			mame_printf_debug("Comp. and LFU       %.2x\n",	blitter.compfunc);
+			mame_printf_debug("Comp. and LFU       %.2x\n", blitter.compfunc);
 			mame_printf_debug("Outer Loop Count    %.2x (%d)\n", blitter.outercnt, blitter.outercnt);
 			mame_printf_debug("Inner Loop Count    %.2x (%d)\n", blitter.innercnt, blitter.innercnt);
-			mame_printf_debug("Step Value          %.2x\n",	blitter.step);
-			mame_printf_debug("Pattern Byte        %.2x\n",	blitter.pattern);
+			mame_printf_debug("Step Value          %.2x\n", blitter.step);
+			mame_printf_debug("Pattern Byte        %.2x\n", blitter.pattern);
 		}
 #endif
 
@@ -580,10 +580,10 @@ static void RunBlit(address_space &space)
 			}
 			else do
 			{
-				UINT8	inhibit = 0;
+				UINT8   inhibit = 0;
 
 				/* TODO: Set this correctly */
-				UINT8	result = blitter.pattern;
+				UINT8   result = blitter.pattern;
 
 				if (LOOPTYPE == 3 && innercnt == blitter.innercnt)
 				{
@@ -677,10 +677,10 @@ static void RunBlit(address_space &space)
 					if (blitter.modectl == MODE_PALREMAP)
 					{
 						/*
-                            In this mode, the source points to a 256 entry lookup table.
-                            The existing destination pixel is used as a lookup
-                            into the table and the colours is replaced.
-                        */
+						    In this mode, the source points to a 256 entry lookup table.
+						    The existing destination pixel is used as a lookup
+						    into the table and the colours is replaced.
+						*/
 						UINT8 dest = *blitter_get_addr(space.machine(), blitter.dest.addr);
 						UINT8 newcol = *(blitter_get_addr(space.machine(), (blitter.source.addr + dest) & 0xfffff));
 
@@ -1124,9 +1124,9 @@ READ8_MEMBER(bfcobra_state::fdctrl_r)
 READ8_MEMBER(bfcobra_state::fddata_r)
 {
 	struct fdc_t &fdc = m_fdc;
-	#define	BPS		1024
-	#define SPT		10
-	#define BPT		1024*10
+	#define BPS     1024
+	#define SPT     10
+	#define BPT     1024*10
 
 	UINT8 val = 0;
 
@@ -1408,9 +1408,9 @@ WRITE8_MEMBER(bfcobra_state::meter_w)
 	m_meter_latch = data;
 
 	/*
-        When a meter is triggered, the current drawn is sensed. If a meter
-        is connected, the /FIRQ line will be pulsed.
-    */
+	    When a meter is triggered, the current drawn is sensed. If a meter
+	    is connected, the /FIRQ line will be pulsed.
+	*/
 	for (i = 0; i < 8; i++)
 	{
 		if (changed & (1 << i))
@@ -1478,11 +1478,11 @@ WRITE8_MEMBER(bfcobra_state::upd_w)
 }
 
 static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM	AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x2000) AM_RAM		// W 'B', 6F
-	AM_RANGE(0x2200, 0x2200) AM_RAM		// W 'F'
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x2000, 0x2000) AM_RAM     // W 'B', 6F
+	AM_RANGE(0x2200, 0x2200) AM_RAM     // W 'F'
 	AM_RANGE(0x2600, 0x2600) AM_READWRITE(meter_r, meter_w)
-	AM_RANGE(0x2800, 0x2800) AM_RAM		// W
+	AM_RANGE(0x2800, 0x2800) AM_RAM     // W
 	AM_RANGE(0x2A00, 0x2A02) AM_READWRITE(latch_r, latch_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(int_latch_r)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
@@ -1496,7 +1496,7 @@ static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
 	AM_RANGE(0x3801, 0x3801) AM_READWRITE(upd_r, upd_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* Watchdog */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP    /* Watchdog */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bfcobra )
@@ -1681,7 +1681,7 @@ READ_LINE_MEMBER(bfcobra_state::data_acia_rx_r)
 
 WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
 {
-	 m_data_t = state;
+		m_data_t = state;
 }
 
 
@@ -1702,9 +1702,9 @@ static ACIA6850_INTERFACE( data_acia_if )
 DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 {
 	/*
-        6809 ROM address and data lines are scrambled.
-        This is the same scrambling as Scorpion 2.
-    */
+	    6809 ROM address and data lines are scrambled.
+	    This is the same scrambling as Scorpion 2.
+	*/
 	static const UINT8 datalookup[] = { 1, 3, 5, 6, 4, 2, 0, 7 };
 	static const UINT8 addrlookup[] = { 11, 12, 0, 2, 3, 5, 7, 9, 8, 6, 1, 4, 10, 13, 14 };
 
@@ -1833,7 +1833,7 @@ ROM_START( inquiztr )
 	ROM_REGION( 0x20000, "altuser1", 0 )
 	ROM_LOAD( "9576028.bin", 0x10000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
 
-	 // these look quite different.. (like they belong together) but booting with these gives a checksum error (banking?)
+		// these look quite different.. (like they belong together) but booting with these gives a checksum error (banking?)
 	ROM_LOAD( "inqvypp1", 0x00000, 0x010000, CRC(9bac8c6e) SHA1(15e24d60c2f3997e637694f60daa552b22628766) )
 	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
 
@@ -1959,23 +1959,23 @@ ROM_START( qosb )
 
 	/* there is a set close to this with
 
-        ROM_LOAD( "qosrom0", 0x0000, 0x080000, CRC(4f150634) SHA1(beb1d3c212b189f3baa08fe454e83f30108be08e) )
-        qosrom1 = rom1_307.bin          qosb       A Question of Sport (39-960-089)
-        ROM_LOAD( "qosrom2", 0x0000, 0x080000, CRC(c39737db) SHA1(ccfdb19dab3af064db44e6022248aef98749bc97) )
-        ROM_LOAD( "qosrom3", 0x0000, 0x080000, CRC(785b8ff9) SHA1(61b31e0e60c31ecb4b179bfe008a96155d939709) )
-        ROM_LOAD( "qossnd1", 0x0000, 0x010000, CRC(888a29f8) SHA1(0e5aa9db54e783708ece1e8c7bffb10d994ab384) )
+	    ROM_LOAD( "qosrom0", 0x0000, 0x080000, CRC(4f150634) SHA1(beb1d3c212b189f3baa08fe454e83f30108be08e) )
+	    qosrom1 = rom1_307.bin          qosb       A Question of Sport (39-960-089)
+	    ROM_LOAD( "qosrom2", 0x0000, 0x080000, CRC(c39737db) SHA1(ccfdb19dab3af064db44e6022248aef98749bc97) )
+	    ROM_LOAD( "qosrom3", 0x0000, 0x080000, CRC(785b8ff9) SHA1(61b31e0e60c31ecb4b179bfe008a96155d939709) )
+	    ROM_LOAD( "qossnd1", 0x0000, 0x010000, CRC(888a29f8) SHA1(0e5aa9db54e783708ece1e8c7bffb10d994ab384) )
 
-       but it simply looks like a bad dump, rom3 is an alt 'rom 2' and the others are mostly the same as qosb
-    */
+	   but it simply looks like a bad dump, rom3 is an alt 'rom 2' and the others are mostly the same as qosb
+	*/
 
 ROM_END
 
 
-GAME( 1989, inquiztr, 0			,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Inquizitor",                       GAME_NOT_WORKING )
-GAME( 1990, escounts, 0			,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop, 0			,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,  0			,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr, 0			,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,      0			,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,     qos		,	bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,     qos		,	bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, inquiztr, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Inquizitor",                       GAME_NOT_WORKING )
+GAME( 1990, escounts, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,  0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,      0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,     qos       ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,     qos       ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", GAME_IMPERFECT_GRAPHICS )

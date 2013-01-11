@@ -48,13 +48,13 @@
     CONSTANTS
 ***************************************************************************/
 
-#define JED_MAX_FUSES			(65536)
+#define JED_MAX_FUSES           (65536)
 
 /* error codes */
-#define JEDERR_NONE				0
-#define JEDERR_INVALID_DATA		1
-#define JEDERR_BAD_XMIT_SUM		2
-#define JEDERR_BAD_FUSE_SUM		3
+#define JEDERR_NONE             0
+#define JEDERR_INVALID_DATA     1
+#define JEDERR_BAD_XMIT_SUM     2
+#define JEDERR_BAD_FUSE_SUM     3
 
 
 
@@ -64,8 +64,8 @@
 
 struct jed_data
 {
-	UINT32		numfuses;			/* number of defined fuses */
-	UINT8		fusemap[JED_MAX_FUSES / 8];/* array of bit-packed data */
+	UINT32      numfuses;           /* number of defined fuses */
+	UINT8       fusemap[JED_MAX_FUSES / 8];/* array of bit-packed data */
 };
 
 
@@ -113,4 +113,4 @@ INLINE void jed_set_fuse(jed_data *data, UINT32 fusenum, UINT8 value)
 	}
 }
 
-#endif	/* __JEDPARSE_H__ */
+#endif  /* __JEDPARSE_H__ */

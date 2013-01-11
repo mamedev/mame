@@ -134,52 +134,52 @@ void lucky74_state::palette_init()
 	static const int resistances_rgb[4] = { 2000, 1000, 470, 220 };
 	double weights_r[4], weights_g[4], weights_b[4];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			4,	resistances_rgb,	weights_r,	1000,	0,
-			4,	resistances_rgb,	weights_g,	1000,	0,
-			4,	resistances_rgb,	weights_b,	1000,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			4,  resistances_rgb,    weights_r,  1000,   0,
+			4,  resistances_rgb,    weights_g,  1000,   0,
+			4,  resistances_rgb,    weights_b,  1000,   0);
 
 
 	for (i = 0; i < 256; i++)
 	{
 		int bit0, bit1, bit2, bit3, r1, g1, b1, r2, g2, b2;
 
-        /* red component (this 1, PROM E6) */
+		/* red component (this 1, PROM E6) */
 		bit0 = (color_prom[0x000 + i] >> 0) & 0x01;
 		bit1 = (color_prom[0x000 + i] >> 1) & 0x01;
 		bit2 = (color_prom[0x000 + i] >> 2) & 0x01;
 		bit3 = (color_prom[0x000 + i] >> 3) & 0x01;
 		r1 = combine_4_weights(weights_r, bit0, bit1, bit2, bit3);
 
-        /* red component (this 2, PROM E7) */
+		/* red component (this 2, PROM E7) */
 		bit0 = (color_prom[0x100 + i] >> 0) & 0x01;
 		bit1 = (color_prom[0x100 + i] >> 1) & 0x01;
 		bit2 = (color_prom[0x100 + i] >> 2) & 0x01;
 		bit3 = (color_prom[0x100 + i] >> 3) & 0x01;
 		r2 = combine_4_weights(weights_r, bit0, bit1, bit2, bit3);
 
-        /* green component (this 1, PROM D6) */
+		/* green component (this 1, PROM D6) */
 		bit0 = (color_prom[0x200 + i] >> 0) & 0x01;
 		bit1 = (color_prom[0x200 + i] >> 1) & 0x01;
 		bit2 = (color_prom[0x200 + i] >> 2) & 0x01;
 		bit3 = (color_prom[0x200 + i] >> 3) & 0x01;
 		g1 = combine_4_weights(weights_g, bit0, bit1, bit2, bit3);
 
-        /* green component (this 2, PROM D7) */
+		/* green component (this 2, PROM D7) */
 		bit0 = (color_prom[0x300 + i] >> 0) & 0x01;
 		bit1 = (color_prom[0x300 + i] >> 1) & 0x01;
 		bit2 = (color_prom[0x300 + i] >> 2) & 0x01;
 		bit3 = (color_prom[0x300 + i] >> 3) & 0x01;
 		g2 = combine_4_weights(weights_g, bit0, bit1, bit2, bit3);
 
-        /* blue component (this 1, PROM C6) */
+		/* blue component (this 1, PROM C6) */
 		bit0 = (color_prom[0x400 + i] >> 0) & 0x01;
 		bit1 = (color_prom[0x400 + i] >> 1) & 0x01;
 		bit2 = (color_prom[0x400 + i] >> 2) & 0x01;
 		bit3 = (color_prom[0x400 + i] >> 3) & 0x01;
 		b1 = combine_4_weights(weights_b, bit0, bit1, bit2, bit3);
 
-        /* blue component (this 2, PROM C7) */
+		/* blue component (this 2, PROM C7) */
 		bit0 = (color_prom[0x500 + i] >> 0) & 0x01;
 		bit1 = (color_prom[0x500 + i] >> 1) & 0x01;
 		bit2 = (color_prom[0x500 + i] >> 2) & 0x01;
@@ -187,10 +187,10 @@ void lucky74_state::palette_init()
 		b2 = combine_4_weights(weights_b, bit0, bit1, bit2, bit3);
 
 
-        /* PROMs circuitry, 1st state */
+		/* PROMs circuitry, 1st state */
 		palette_set_color(machine(), i, MAKE_RGB(r1, g1, b1));
 
-        /* PROMs circuitry, 2nd state */
+		/* PROMs circuitry, 2nd state */
 		palette_set_color(machine(), i + 256, MAKE_RGB(r2, g2, b2));
 	}
 }
@@ -241,5 +241,3 @@ UINT32 lucky74_state::screen_update_lucky74(screen_device &screen, bitmap_ind16 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
-
-

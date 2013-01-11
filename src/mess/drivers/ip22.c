@@ -159,45 +159,45 @@ static const struct pit8253_config ip22_pit8254_config =
 {
 	{
 		{
-			1000000,				/* Timer 0: 1MHz */
+			1000000,                /* Timer 0: 1MHz */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			1000000,				/* Timer 1: 1MHz */
+			1000000,                /* Timer 1: 1MHz */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			1000000,				/* Timer 2: 1MHz */
+			1000000,                /* Timer 2: 1MHz */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
 	}
 };
 
-#define RTC_DAY		state->m_RTC.nRAM[0x09]
-#define RTC_HOUR	state->m_RTC.nRAM[0x08]
-#define RTC_MINUTE	state->m_RTC.nRAM[0x07]
-#define RTC_SECOND	state->m_RTC.nRAM[0x06]
-#define RTC_HUNDREDTH	state->m_RTC.nRAM[0x05]
+#define RTC_DAY     state->m_RTC.nRAM[0x09]
+#define RTC_HOUR    state->m_RTC.nRAM[0x08]
+#define RTC_MINUTE  state->m_RTC.nRAM[0x07]
+#define RTC_SECOND  state->m_RTC.nRAM[0x06]
+#define RTC_HUNDREDTH   state->m_RTC.nRAM[0x05]
 
 // interrupt sources handled by INT3
-#define INT3_LOCAL0_FIFO	(0x01)
-#define INT3_LOCAL0_SCSI0	(0x02)
-#define INT3_LOCAL0_SCSI1	(0x04)
-#define INT3_LOCAL0_ETHERNET	(0x08)
-#define INT3_LOCAL0_MC_DMA	(0x10)
-#define INT3_LOCAL0_PARALLEL	(0x20)
-#define INT3_LOCAL0_GRAPHICS	(0x40)
-#define INT3_LOCAL0_MAPPABLE0	(0x80)
+#define INT3_LOCAL0_FIFO    (0x01)
+#define INT3_LOCAL0_SCSI0   (0x02)
+#define INT3_LOCAL0_SCSI1   (0x04)
+#define INT3_LOCAL0_ETHERNET    (0x08)
+#define INT3_LOCAL0_MC_DMA  (0x10)
+#define INT3_LOCAL0_PARALLEL    (0x20)
+#define INT3_LOCAL0_GRAPHICS    (0x40)
+#define INT3_LOCAL0_MAPPABLE0   (0x80)
 
-#define INT3_LOCAL1_GP0		(0x01)
-#define INT3_LOCAL1_PANEL	(0x02)
-#define INT3_LOCAL1_GP2		(0x04)
+#define INT3_LOCAL1_GP0     (0x01)
+#define INT3_LOCAL1_PANEL   (0x02)
+#define INT3_LOCAL1_GP2     (0x04)
 #define INT3_LOCAL1_MAPPABLE1   (0x08)
-#define INT3_LOCAL1_HPC_DMA 	(0x10)
+#define INT3_LOCAL1_HPC_DMA     (0x10)
 #define INT3_LOCAL1_AC_FAIL     (0x20)
-#define INT3_LOCAL1_VSYNC	(0x40)
-#define INT3_LOCAL1_RETRACE	(0x80)
+#define INT3_LOCAL1_VSYNC   (0x40)
+#define INT3_LOCAL1_RETRACE (0x80)
 
 // raise a local0 interrupt
 static void int3_raise_local0_irq(running_machine &machine, UINT8 source_mask)
@@ -260,12 +260,12 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 		//verboselog(( machine, 2, "Serial 1 Command Transfer Read, 0x1fbd9830: %02x\n", 0x04 );
 		switch(space.device().safe_pc())
 		{
-			case 0x9fc1d9e4:	// interpreter (ip244415)
-			case 0x9fc1d9e0:	// DRC (ip244415)
-			case 0x9fc1f8e0:	// interpreter (ip224613)
-			case 0x9fc1f8dc:	// DRC (ip224613)
-			case 0x9fc204c8:	// interpreter (ip225015)
-			case 0x9fc204c4:	// DRC (ip225015)
+			case 0x9fc1d9e4:    // interpreter (ip244415)
+			case 0x9fc1d9e0:    // DRC (ip244415)
+			case 0x9fc1f8e0:    // interpreter (ip224613)
+			case 0x9fc1f8dc:    // DRC (ip224613)
+			case 0x9fc204c8:    // interpreter (ip225015)
+			case 0x9fc204c4:    // DRC (ip225015)
 				return 0x00000005;
 		}
 		return 0x00000004;
@@ -277,7 +277,7 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 	case 0x44/4:
 		return kbdc8042_8_r(space, 4);
 	case 0x58/4:
-		return 0x20;	// chip rev 1, board rev 0, "Guinness" (Indy) => 0x01 for "Full House" (Indigo2)
+		return 0x20;    // chip rev 1, board rev 0, "Guinness" (Indy) => 0x01 for "Full House" (Indigo2)
 	case 0x80/4:
 	case 0x84/4:
 	case 0x88/4:
@@ -585,37 +585,37 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus4_w)
 	}
 }
 
-#define RTC_SECONDS	state->m_RTC.nRegs[0x00]
-#define RTC_SECONDS_A	state->m_RTC.nRegs[0x01]
-#define RTC_MINUTES	state->m_RTC.nRegs[0x02]
-#define RTC_MINUTES_A	state->m_RTC.nRegs[0x03]
-#define RTC_HOURS	state->m_RTC.nRegs[0x04]
-#define RTC_HOURS_A	state->m_RTC.nRegs[0x05]
-#define RTC_DAYOFWEEK	state->m_RTC.nRegs[0x06]
-#define RTC_DAYOFMONTH	state->m_RTC.nRegs[0x07]
-#define RTC_MONTH	state->m_RTC.nRegs[0x08]
-#define RTC_YEAR	state->m_RTC.nRegs[0x09]
-#define RTC_REGISTERA	state->m_RTC.nRegs[0x0a]
-#define RTC_REGISTERB	state->m_RTC.nRegs[0x0b]
-#define RTC_REGISTERC	state->m_RTC.nRegs[0x0c]
-#define RTC_REGISTERD	state->m_RTC.nRegs[0x0d]
-#define RTC_MODELBYTE	state->m_RTC.nRegs[0x40]
-#define RTC_SERBYTE0	state->m_RTC.nRegs[0x41]
-#define RTC_SERBYTE1	state->m_RTC.nRegs[0x42]
-#define RTC_SERBYTE2	state->m_RTC.nRegs[0x43]
-#define RTC_SERBYTE3	state->m_RTC.nRegs[0x44]
-#define RTC_SERBYTE4	state->m_RTC.nRegs[0x45]
-#define RTC_SERBYTE5	state->m_RTC.nRegs[0x46]
-#define RTC_CRC		state->m_RTC.nRegs[0x47]
-#define RTC_CENTURY	state->m_RTC.nRegs[0x48]
+#define RTC_SECONDS state->m_RTC.nRegs[0x00]
+#define RTC_SECONDS_A   state->m_RTC.nRegs[0x01]
+#define RTC_MINUTES state->m_RTC.nRegs[0x02]
+#define RTC_MINUTES_A   state->m_RTC.nRegs[0x03]
+#define RTC_HOURS   state->m_RTC.nRegs[0x04]
+#define RTC_HOURS_A state->m_RTC.nRegs[0x05]
+#define RTC_DAYOFWEEK   state->m_RTC.nRegs[0x06]
+#define RTC_DAYOFMONTH  state->m_RTC.nRegs[0x07]
+#define RTC_MONTH   state->m_RTC.nRegs[0x08]
+#define RTC_YEAR    state->m_RTC.nRegs[0x09]
+#define RTC_REGISTERA   state->m_RTC.nRegs[0x0a]
+#define RTC_REGISTERB   state->m_RTC.nRegs[0x0b]
+#define RTC_REGISTERC   state->m_RTC.nRegs[0x0c]
+#define RTC_REGISTERD   state->m_RTC.nRegs[0x0d]
+#define RTC_MODELBYTE   state->m_RTC.nRegs[0x40]
+#define RTC_SERBYTE0    state->m_RTC.nRegs[0x41]
+#define RTC_SERBYTE1    state->m_RTC.nRegs[0x42]
+#define RTC_SERBYTE2    state->m_RTC.nRegs[0x43]
+#define RTC_SERBYTE3    state->m_RTC.nRegs[0x44]
+#define RTC_SERBYTE4    state->m_RTC.nRegs[0x45]
+#define RTC_SERBYTE5    state->m_RTC.nRegs[0x46]
+#define RTC_CRC     state->m_RTC.nRegs[0x47]
+#define RTC_CENTURY state->m_RTC.nRegs[0x48]
 #define RTC_DAYOFMONTH_A state->m_RTC.nRegs[0x49]
-#define RTC_EXTCTRL0	state->m_RTC.nRegs[0x4a]
-#define RTC_EXTCTRL1	state->m_RTC.nRegs[0x4b]
-#define RTC_RTCADDR2	state->m_RTC.nRegs[0x4e]
-#define RTC_RTCADDR3	state->m_RTC.nRegs[0x4f]
-#define RTC_RAMLSB	state->m_RTC.nRegs[0x50]
-#define RTC_RAMMSB	state->m_RTC.nRegs[0x51]
-#define RTC_WRITECNT	state->m_RTC.nRegs[0x5e]
+#define RTC_EXTCTRL0    state->m_RTC.nRegs[0x4a]
+#define RTC_EXTCTRL1    state->m_RTC.nRegs[0x4b]
+#define RTC_RTCADDR2    state->m_RTC.nRegs[0x4e]
+#define RTC_RTCADDR3    state->m_RTC.nRegs[0x4f]
+#define RTC_RAMLSB  state->m_RTC.nRegs[0x50]
+#define RTC_RAMMSB  state->m_RTC.nRegs[0x51]
+#define RTC_WRITECNT    state->m_RTC.nRegs[0x5e]
 
 READ32_MEMBER(ip22_state::rtc_r)
 {
@@ -914,17 +914,17 @@ WRITE32_MEMBER(ip22_state::ip22_write_ram)
 }
 
 
-#define H2_IAR_TYPE			0xf000
-#define H2_IAR_NUM			0x0f00
-#define H2_IAR_ACCESS_SEL	0x0080
-#define H2_IAR_PARAM		0x000c
-#define H2_IAR_RB_INDEX		0x0003
+#define H2_IAR_TYPE         0xf000
+#define H2_IAR_NUM          0x0f00
+#define H2_IAR_ACCESS_SEL   0x0080
+#define H2_IAR_PARAM        0x000c
+#define H2_IAR_RB_INDEX     0x0003
 
-#define H2_ISR_TSTATUS		0x01
-#define H2_ISR_USTATUS		0x02
-#define H2_ISR_QUAD_MODE	0x04
-#define H2_ISR_GLOBAL_RESET	0x08
-#define H2_ISR_CODEC_RESET	0x10
+#define H2_ISR_TSTATUS      0x01
+#define H2_ISR_USTATUS      0x02
+#define H2_ISR_QUAD_MODE    0x04
+#define H2_ISR_GLOBAL_RESET 0x08
+#define H2_ISR_CODEC_RESET  0x10
 
 READ32_MEMBER(ip22_state::hal2_r)
 {
@@ -1057,22 +1057,22 @@ WRITE32_MEMBER(ip22_state::hal2_w)
 	//verboselog((machine, 0, "Unknown HAL2 write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd8000 + offset*4, data, mem_mask );
 }
 
-#define PBUS_CTRL_ENDIAN		0x00000002
-#define PBUS_CTRL_RECV			0x00000004
-#define PBUS_CTRL_FLUSH			0x00000008
-#define PBUS_CTRL_DMASTART		0x00000010
-#define PBUS_CTRL_LOAD_EN		0x00000020
-#define PBUS_CTRL_REALTIME		0x00000040
-#define PBUS_CTRL_HIGHWATER		0x0000ff00
-#define PBUS_CTRL_FIFO_BEG		0x003f0000
-#define PBUS_CTRL_FIFO_END		0x3f000000
+#define PBUS_CTRL_ENDIAN        0x00000002
+#define PBUS_CTRL_RECV          0x00000004
+#define PBUS_CTRL_FLUSH         0x00000008
+#define PBUS_CTRL_DMASTART      0x00000010
+#define PBUS_CTRL_LOAD_EN       0x00000020
+#define PBUS_CTRL_REALTIME      0x00000040
+#define PBUS_CTRL_HIGHWATER     0x0000ff00
+#define PBUS_CTRL_FIFO_BEG      0x003f0000
+#define PBUS_CTRL_FIFO_END      0x3f000000
 
-#define PBUS_DMADESC_EOX		0x80000000
-#define PBUS_DMADESC_EOXP		0x40000000
-#define PBUS_DMADESC_XIE		0x20000000
-#define PBUS_DMADESC_IPG		0x00ff0000
-#define PBUS_DMADESC_TXD		0x00008000
-#define PBUS_DMADESC_BC			0x00003fff
+#define PBUS_DMADESC_EOX        0x80000000
+#define PBUS_DMADESC_EOXP       0x40000000
+#define PBUS_DMADESC_XIE        0x20000000
+#define PBUS_DMADESC_IPG        0x00ff0000
+#define PBUS_DMADESC_TXD        0x00008000
+#define PBUS_DMADESC_BC         0x00003fff
 
 
 TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
@@ -1196,12 +1196,12 @@ WRITE32_MEMBER(ip22_state::hpc3_unkpbus0_w)
 }
 
 static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
-	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )	/* mirror of first 512k of main RAM */
-	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("mainram") AM_RAM_WRITE(ip22_write_ram)		/* 128 MB of main RAM */
+	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )    /* mirror of first 512k of main RAM */
+	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("mainram") AM_RAM_WRITE(ip22_write_ram)     /* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE_LEGACY(newport_rex3_r, newport_rex3_w )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE_LEGACY(sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE(hpc3_hd_enet_r, hpc3_hd_enet_w )
-	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM	/* unknown, but read a lot and discarded */
+	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM   /* unknown, but read a lot and discarded */
 	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE(hpc3_hd0_r, hpc3_hd0_w )
 	AM_RANGE( 0x1fbc8000, 0x1fbcffff ) AM_READWRITE(hpc3_unkpbus0_r, hpc3_unkpbus0_w ) AM_SHARE("unkpbus0")
 	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE(hpc3_pbusdma_r, hpc3_pbusdma_w )
@@ -1253,10 +1253,10 @@ static void dump_chain(address_space &space, UINT32 ch_base)
 }
 
 // HPC3 SCSI DMA control register bits
-#define HPC3_DMACTRL_IRQ	(0x01)
-#define HPC3_DMACTRL_ENDIAN	(0x02)
-#define HPC3_DMACTRL_DIR	(0x04)
-#define HPC3_DMACTRL_ENABLE	(0x10)
+#define HPC3_DMACTRL_IRQ    (0x01)
+#define HPC3_DMACTRL_ENDIAN (0x02)
+#define HPC3_DMACTRL_DIR    (0x04)
+#define HPC3_DMACTRL_ENABLE (0x10)
 
 
 static void scsi_irq(running_machine &machine, int state)
@@ -1502,7 +1502,7 @@ static void scsi_irq(running_machine &machine, int state)
 
 static const struct WD33C93interface wd33c93_intf =
 {
-	&scsi_irq,		/* command completion IRQ */
+	&scsi_irq,      /* command completion IRQ */
 };
 
 static void ip225015_exit(running_machine &machine)
@@ -1540,11 +1540,11 @@ DRIVER_INIT_MEMBER(ip22_state,ip225015)
 }
 
 static INPUT_PORTS_START( ip225015 )
-	PORT_START("IN0")	// unused IN0
-	PORT_START("DSW0")	// unused IN1
-	PORT_START("DSW1")	// unused IN2
-	PORT_START("DSW2")	// unused IN3
-	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
+	PORT_START("IN0")   // unused IN0
+	PORT_START("DSW0")  // unused IN1
+	PORT_START("DSW1")  // unused IN2
+	PORT_START("DSW2")  // unused IN3
+	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
 static void rtc_update(ip22_state *state)
@@ -1553,7 +1553,7 @@ static void rtc_update(ip22_state *state)
 
 	switch( RTC_REGISTERB & 0x04 )
 	{
-	case 0x00:	/* Non-BCD */
+	case 0x00:  /* Non-BCD */
 		if( RTC_SECONDS == 60 )
 		{
 			RTC_SECONDS = 0;
@@ -1573,7 +1573,7 @@ static void rtc_update(ip22_state *state)
 		RTC_MINUTES_A = RTC_MINUTES;
 		RTC_HOURS_A = RTC_HOURS;
 		break;
-	case 0x04:	/* BCD */
+	case 0x04:  /* BCD */
 		if( ( RTC_SECONDS & 0x0f ) == 0x0a )
 		{
 			RTC_SECONDS -= 0x0a;
@@ -1623,8 +1623,8 @@ INTERRUPT_GEN_MEMBER(ip22_state::ip22_vbl)
 
 static const mips3_config config =
 {
-	32768,	/* code cache size */
-	32768	/* data cache size */
+	32768,  /* code cache size */
+	32768   /* data cache size */
 };
 
 static const pc_lpt_interface ip22_lpt_config =

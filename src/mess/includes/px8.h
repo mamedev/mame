@@ -14,24 +14,24 @@
 #include "machine/pf10.h"
 #include "sound/wave.h"
 
-#define UPD70008_TAG	"4a"
-#define UPD7508_TAG		"2e"
-#define HD6303_TAG		"13d"
-#define SED1320_TAG		"7c"
-#define I8251_TAG		"13e"
-#define UPD7001_TAG		"1d"
-#define SCREEN_TAG		"screen"
+#define UPD70008_TAG    "4a"
+#define UPD7508_TAG     "2e"
+#define HD6303_TAG      "13d"
+#define SED1320_TAG     "7c"
+#define I8251_TAG       "13e"
+#define UPD7001_TAG     "1d"
+#define SCREEN_TAG      "screen"
 
-#define PX8_VIDEORAM_MASK	0x17ff
+#define PX8_VIDEORAM_MASK   0x17ff
 
 class px8_state : public driver_device
 {
 public:
 	px8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, UPD70008_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, UPD70008_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG)
 	,
 		m_video_ram(*this, "video_ram"){ }
 
@@ -39,7 +39,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	/* video state */
-	required_shared_ptr<UINT8> m_video_ram; 		/* LCD video RAM */
+	required_shared_ptr<UINT8> m_video_ram;         /* LCD video RAM */
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -59,24 +59,24 @@ public:
 	UINT8 krtn_read();
 
 	/* GAH40M state */
-	UINT16 m_icr;				/* input capture register */
-	UINT16 m_frc;				/* free running counter */
-	UINT8 m_ier;				/* interrupt acknowledge register */
-	UINT8 m_isr;				/* interrupt status register */
-	UINT8 m_sio;				/* serial I/O register */
-	int m_bank0;				/* */
+	UINT16 m_icr;               /* input capture register */
+	UINT16 m_frc;               /* free running counter */
+	UINT8 m_ier;                /* interrupt acknowledge register */
+	UINT8 m_isr;                /* interrupt status register */
+	UINT8 m_sio;                /* serial I/O register */
+	int m_bank0;                /* */
 
 	/* GAH40S state */
-	UINT16 m_cnt;				/* microcassette tape counter */
-	int m_swpr;				/* P-ROM power switch */
-	UINT16 m_pra;				/* P-ROM address */
-	UINT8 m_prd;				/* P-ROM data */
+	UINT16 m_cnt;               /* microcassette tape counter */
+	int m_swpr;             /* P-ROM power switch */
+	UINT16 m_pra;               /* P-ROM address */
+	UINT8 m_prd;                /* P-ROM data */
 
 	/* memory state */
-	int m_bk2;				/* */
+	int m_bk2;              /* */
 
 	/* keyboard state */
-	int m_ksc;				/* keyboard scan column */
+	int m_ksc;              /* keyboard scan column */
 	virtual void palette_init();
 	UINT32 screen_update_px8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

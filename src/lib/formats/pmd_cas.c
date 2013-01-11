@@ -13,13 +13,13 @@
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 
-#define PMD85_WAV_FREQUENCY	7200
-#define PMD85_TIMER_FREQUENCY	1200
-#define PMD85_BIT_LENGTH	(PMD85_WAV_FREQUENCY/PMD85_TIMER_FREQUENCY)
-#define PMD85_PILOT_BITS	(PMD85_TIMER_FREQUENCY*3)
-#define PMD85_PAUSE_BITS	(PMD85_TIMER_FREQUENCY/2)
-#define PMD85_HEADER_BYTES	63
-#define PMD85_BITS_PER_BYTE	11
+#define PMD85_WAV_FREQUENCY 7200
+#define PMD85_TIMER_FREQUENCY   1200
+#define PMD85_BIT_LENGTH    (PMD85_WAV_FREQUENCY/PMD85_TIMER_FREQUENCY)
+#define PMD85_PILOT_BITS    (PMD85_TIMER_FREQUENCY*3)
+#define PMD85_PAUSE_BITS    (PMD85_TIMER_FREQUENCY/2)
+#define PMD85_HEADER_BYTES  63
+#define PMD85_BITS_PER_BYTE 11
 
 // image size
 static int pmd85_image_size;
@@ -50,7 +50,7 @@ static int pmd85_output_bit(INT16 *buffer, int sample_pos, UINT8 bit)
 		samples += pmd85_emit_level (buffer, sample_pos + samples, PMD85_BIT_LENGTH/2, WAVEENTRY_LOW);
 	}
 
-    return samples;
+	return samples;
 }
 
 static int pmd85_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
@@ -182,13 +182,13 @@ static int pmd85_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 
 static const struct CassetteLegacyWaveFiller pmd85_legacy_fill_wave =
 {
-	pmd85_cassette_fill_wave,					/* fill_wave */
-	-1,											/* chunk_size */
-	0,											/* chunk_samples */
-	pmd85_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	PMD85_WAV_FREQUENCY,						/* sample_frequency */
-	0,											/* header_samples */
-	0											/* trailer_samples */
+	pmd85_cassette_fill_wave,                   /* fill_wave */
+	-1,                                         /* chunk_size */
+	0,                                          /* chunk_samples */
+	pmd85_cassette_calculate_size_in_samples,   /* chunk_sample_calc */
+	PMD85_WAV_FREQUENCY,                        /* sample_frequency */
+	0,                                          /* header_samples */
+	0                                           /* trailer_samples */
 };
 
 static casserr_t pmd85_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)

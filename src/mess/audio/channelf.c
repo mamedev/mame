@@ -84,7 +84,7 @@ static STREAM_UPDATE( channelf_sh_update )
 		state->sample_counter += state->incr;
 		state->envelope *= state->decay_mult;
 		if (state->forced_ontime > 0)          //  added for improved sound
-			state->forced_ontime -= 1;		//  added for improved sound
+			state->forced_ontime -= 1;      //  added for improved sound
 	}
 }
 
@@ -99,22 +99,22 @@ static DEVICE_START(channelf_sound)
 	rate = device->machine().sample_rate();
 
 	/*
-     * 2V = 1000Hz ~= 3579535/224/16
-     * Note 2V on the schematic is not the 2V scanline counter -
-     *      it is the 2V vertical pixel counter
-     *      1 pixel = 4 scanlines high
-     *
-     *
-     * This is a convenient way to generate the relevant frequencies,
-     * using a DDS (Direct Digital Synthesizer)
-     *
-     * Essentially, you want a counter to overflow some bit position
-     * at a fixed rate.  So, you figure out a number which you can add
-     * to the counter at every sample, so that you will achieve this
-     *
-     * In this case, we want to overflow bit 16 and the 2V rate, 1000Hz.
-     * This means we also get bit 17 = 4V, bit 18 = 8V, etc.
-     */
+	 * 2V = 1000Hz ~= 3579535/224/16
+	 * Note 2V on the schematic is not the 2V scanline counter -
+	 *      it is the 2V vertical pixel counter
+	 *      1 pixel = 4 scanlines high
+	 *
+	 *
+	 * This is a convenient way to generate the relevant frequencies,
+	 * using a DDS (Direct Digital Synthesizer)
+	 *
+	 * Essentially, you want a counter to overflow some bit position
+	 * at a fixed rate.  So, you figure out a number which you can add
+	 * to the counter at every sample, so that you will achieve this
+	 *
+	 * In this case, we want to overflow bit 16 and the 2V rate, 1000Hz.
+	 * This means we also get bit 17 = 4V, bit 18 = 8V, etc.
+	 */
 
 	/* This is the proper value to add per sample */
 	state->incr = 65536.0/(rate/1000.0/2.0);
@@ -135,7 +135,7 @@ const device_type CHANNELF = &device_creator<channelf_sound_device>;
 
 channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CHANNELF, "Channel F", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(channelf_sound_state);
 }
@@ -168,5 +168,3 @@ void channelf_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

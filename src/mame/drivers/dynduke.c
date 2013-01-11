@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( dynduke )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
@@ -165,7 +165,7 @@ static INPUT_PORTS_START( dynduke )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )	/* "SW2:1,2" - Always OFF according to the manual */
+	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )  /* "SW2:1,2" - Always OFF according to the manual */
 	PORT_DIPNAME( 0x0c00, 0x0400, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0c00, "80K 100K+" )
 	PORT_DIPSETTING(      0x0800, "100K 100K+" )
@@ -188,9 +188,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,		/* 8*8 characters */
+	8,8,        /* 8*8 characters */
 	1024,
-	4,			/* 4 bits per pixel */
+	4,          /* 4 bits per pixel */
 	{ 4,0,(0x10000*8)+4,0x10000*8 },
 	{ 0,1,2,3,8,9,10,11 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
@@ -199,20 +199,20 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-  16,16,	/* 16*16 tiles */
-  0x4000,
-  4,		/* 4 bits per pixel */
-  { 12, 8, 4, 0 },
-  {
-    0,1,2,3, 16,17,18,19,
+	16,16,  /* 16*16 tiles */
+	0x4000,
+	4,      /* 4 bits per pixel */
+	{ 12, 8, 4, 0 },
+	{
+	0,1,2,3, 16,17,18,19,
 	512+0,512+1,512+2,512+3,
 	512+8+8,512+9+8,512+10+8,512+11+8,
-  },
-  {
+	},
+	{
 	0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-  },
-  1024
+	},
+	1024
 };
 
 static const gfx_layout bg_layout =
@@ -221,8 +221,8 @@ static const gfx_layout bg_layout =
 	RGN_FRAC(1,3),
 	6,
 	{ RGN_FRAC(2,3)+4, RGN_FRAC(2,3)+0,
-	  RGN_FRAC(1,3)+4, RGN_FRAC(1,3)+0,
-	                4,               0 },
+		RGN_FRAC(1,3)+4, RGN_FRAC(1,3)+0,
+					4,               0 },
 	{
 		0,1,2,3,8,9,10,11,
 		256+0,256+1,256+2,256+3,256+8,256+9,256+10,256+11
@@ -265,7 +265,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(dynduke_state::dynduke_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	// VBL
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   // VBL
 }
 
 /* Machine Driver */
@@ -357,7 +357,7 @@ ROM_START( dynduke )
 	ROM_LOAD16_BYTE( "dd.f1", 0x180000, 0x40000, CRC(9aed24ba) SHA1(0068b5bc0d7c817eee3bfbf7de6d19652ba78d41) )
 	ROM_LOAD16_BYTE( "dd.f2", 0x180001, 0x40000, CRC(3eb5783f) SHA1(5487ceb4f3241241af1a81b1bb686bd3af10b0d1) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 ROM_END
 
@@ -405,7 +405,7 @@ ROM_START( dyndukea )
 	ROM_LOAD16_BYTE( "dd.f1", 0x180000, 0x40000, CRC(9aed24ba) SHA1(0068b5bc0d7c817eee3bfbf7de6d19652ba78d41) )
 	ROM_LOAD16_BYTE( "dd.f2", 0x180001, 0x40000, CRC(3eb5783f) SHA1(5487ceb4f3241241af1a81b1bb686bd3af10b0d1) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 ROM_END
 
@@ -453,7 +453,7 @@ ROM_START( dyndukej )
 	ROM_LOAD16_BYTE( "dd.f1", 0x180000, 0x40000, CRC(9aed24ba) SHA1(0068b5bc0d7c817eee3bfbf7de6d19652ba78d41) )
 	ROM_LOAD16_BYTE( "dd.f2", 0x180001, 0x40000, CRC(3eb5783f) SHA1(5487ceb4f3241241af1a81b1bb686bd3af10b0d1) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 ROM_END
 
@@ -501,7 +501,7 @@ ROM_START( dyndukeu )
 	ROM_LOAD16_BYTE( "dd.f1", 0x180000, 0x40000, CRC(9aed24ba) SHA1(0068b5bc0d7c817eee3bfbf7de6d19652ba78d41) )
 	ROM_LOAD16_BYTE( "dd.f2", 0x180001, 0x40000, CRC(3eb5783f) SHA1(5487ceb4f3241241af1a81b1bb686bd3af10b0d1) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 ROM_END
 
@@ -549,7 +549,7 @@ ROM_START( dbldynj )
 	ROM_LOAD16_BYTE( "dd.f1", 0x180000, 0x40000, CRC(9aed24ba) SHA1(0068b5bc0d7c817eee3bfbf7de6d19652ba78d41) )
 	ROM_LOAD16_BYTE( "dd.f2", 0x180001, 0x40000, CRC(3eb5783f) SHA1(5487ceb4f3241241af1a81b1bb686bd3af10b0d1) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 ROM_END
 
@@ -597,7 +597,7 @@ ROM_START( dbldynu )
 	ROM_LOAD16_BYTE( "dd.f1", 0x180000, 0x40000, CRC(9aed24ba) SHA1(0068b5bc0d7c817eee3bfbf7de6d19652ba78d41) )
 	ROM_LOAD16_BYTE( "dd.f2", 0x180001, 0x40000, CRC(3eb5783f) SHA1(5487ceb4f3241241af1a81b1bb686bd3af10b0d1) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 ROM_END
 

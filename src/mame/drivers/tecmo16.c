@@ -45,18 +45,18 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_sound_command_w)
 
 static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_SHARE("charram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(tecmo16_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x122000, 0x127fff) AM_RAM	/* work area */
+	AM_RANGE(0x122000, 0x127fff) AM_RAM /* work area */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
-	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP	/* ??? */
+	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
 	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(tecmo16_scroll_char_x_w)
@@ -68,19 +68,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_SHARE("charram")
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(tecmo16_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x124000, 0x124fff) AM_RAM	/* extra RAM for Riot */
+	AM_RANGE(0x124000, 0x124fff) AM_RAM /* extra RAM for Riot */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
-	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP	/* ??? */
-	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP	/* ??? */
+	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP  /* ??? */
+	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
 	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(tecmo16_scroll_char_x_w)
@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmo16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xfbff) AM_RAM	/* Sound RAM */
+	AM_RANGE(0xf000, 0xfbff) AM_RAM /* Sound RAM */
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_byte_r)
@@ -124,7 +124,7 @@ static INPUT_PORTS_START( fstarfrc )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )   PORT_DIPLOCATION("SW1:8")	// flagged as "unused" in the manual
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )   PORT_DIPLOCATION("SW1:8")    // flagged as "unused" in the manual
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -134,12 +134,12 @@ static INPUT_PORTS_START( fstarfrc )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:3,4")	// enemy shot speed
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:3,4")  // enemy shot speed
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Medium )  )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest )  )
-	PORT_DIPNAME( 0x30, 0x30, "Level Up Speed" )       PORT_DIPLOCATION("SW2:5,6")	// rate of power-up
+	PORT_DIPNAME( 0x30, 0x30, "Level Up Speed" )       PORT_DIPLOCATION("SW2:5,6")  // rate of power-up
 	PORT_DIPSETTING(    0x30, "Fast" )
 	PORT_DIPSETTING(    0x20, "Fastest" )
 	PORT_DIPSETTING(    0x10, "Slow" )
@@ -148,7 +148,7 @@ static INPUT_PORTS_START( fstarfrc )
 	PORT_DIPSETTING(    0xc0, "200000,1000000" )
 	PORT_DIPSETTING(    0x80, "220000,1200000" )
 	PORT_DIPSETTING(    0x40, "240000,1400000" )
-	PORT_DIPSETTING(    0x00, "every 500000,once at highest score" )	// beating the hi-score gives you an extra life
+	PORT_DIPSETTING(    0x00, "every 500000,once at highest score" )    // beating the hi-score gives you an extra life
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( ginkun )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )		/* Doesn't work? */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )      /* Doesn't work? */
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )      PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -320,37 +320,37 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	4096,	/* 4096 characters */
-	4,	/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the bitplanes are packed in one nibble */
+	8,8,    /* 8*8 characters */
+	4096,   /* 4096 characters */
+	4,  /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every char takes 32 consecutive bytes */
+	32*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16*16 tiles */
-	8192,	/* 8192 tiles */
-	4,	/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the bitplanes are packed in one nibble */
+	16,16,  /* 16*16 tiles */
+	8192,   /* 8192 tiles */
+	4,  /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
 			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	8,8,	/* 8*8 sprites */
-	32768,	/* 32768 sprites */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the bitplanes are packed in one nibble */
+	8,8,    /* 8*8 sprites */
+	32768,  /* 32768 sprites */
+	4,      /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( tecmo16 )
@@ -364,11 +364,11 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)			/* 12MHz */
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(fstarfrc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo16_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)			/* 4MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)         /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))

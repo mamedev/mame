@@ -37,10 +37,10 @@
 
 
 
-#define VECTOR_WIDTH_DENOM			512
+#define VECTOR_WIDTH_DENOM          512
 
 
-#define MAX_POINTS	10000
+#define MAX_POINTS  10000
 
 #define VECTOR_TEAM \
 	"-* Vector Heads *-\n" \
@@ -57,19 +57,19 @@
 
 #if 0
 
-#define TEXTURE_LENGTH_BUCKETS		32
-#define TEXTURE_INTENSITY_BUCKETS	4
-#define TEXTURE_WIDTH				16
+#define TEXTURE_LENGTH_BUCKETS      32
+#define TEXTURE_INTENSITY_BUCKETS   4
+#define TEXTURE_WIDTH               16
 
-#define MAX_INTENSITY				2
-#define VECTOR_BLEED				(0.25f)
-#define VECTOR_INT_SCALE			(255.0f * 1.5f)
+#define MAX_INTENSITY               2
+#define VECTOR_BLEED                (0.25f)
+#define VECTOR_INT_SCALE            (255.0f * 1.5f)
 
 
 struct vector_texture
 {
-	render_texture *	texture;
-	bitmap_argb32 *		bitmap;
+	render_texture *    texture;
+	bitmap_argb32 *     bitmap;
 };
 
 static vector_texture *vectortex[TEXTURE_INTENSITY_BUCKETS][TEXTURE_LENGTH_BUCKETS];

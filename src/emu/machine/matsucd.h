@@ -9,11 +9,11 @@ void matsucd_init( cdrom_image_device *cdrom_device, const char *cdda_tag );
 
 
 /* signaling */
-extern void matsucd_enable_w( int level );	/* /ENABLE pin */
-extern void matsucd_cmd_w( int level );		/* /CMD pin */
-extern int matsucd_stch_r( void );			/* /STCH pin */
-extern int matsucd_sten_r( void );			/* /STEN pin */
-extern int matsucd_scor_r( void );			/* /SCOR pin */
+extern void matsucd_enable_w( int level );  /* /ENABLE pin */
+extern void matsucd_cmd_w( int level );     /* /CMD pin */
+extern int matsucd_stch_r( void );          /* /STCH pin */
+extern int matsucd_sten_r( void );          /* /STEN pin */
+extern int matsucd_scor_r( void );          /* /SCOR pin */
 
 /* callback for signal changes */
 extern void matsucd_set_status_enabled_callback( void (*sten_cb)( running_machine &machine, int level ) );

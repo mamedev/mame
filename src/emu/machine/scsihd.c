@@ -169,15 +169,15 @@ void scsihd_device::ReadData( UINT8 *data, int dataLength )
 
 	switch ( command[0] )
 	{
-		case 0x03:	// REQUEST SENSE
-			data[0] = 0x80;	// valid sense
+		case 0x03:  // REQUEST SENSE
+			data[0] = 0x80; // valid sense
 			for (i = 1; i < 12; i++)
 			{
 				data[i] = 0;
 			}
 			break;
 
-		case 0x12:	// INQUIRY
+		case 0x12:  // INQUIRY
 			memset( data, 0, dataLength );
 			data[0] = 0x00; // device is direct-access (e.g. hard disk)
 			data[1] = 0x00; // media is not removable
@@ -189,7 +189,7 @@ void scsihd_device::ReadData( UINT8 *data, int dataLength )
 			strcpy((char *)&data[32], "1.0");
 			break;
 
-		case 0x1a:	// MODE SENSE (6 byte)
+		case 0x1a:  // MODE SENSE (6 byte)
 			// special Apple ID page.  this is a vendor-specific page,
 			// so unless collisions occur there should be no need
 			// to change it.

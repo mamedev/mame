@@ -25,8 +25,8 @@
 class rx01_device :  public device_t
 {
 public:
-    // construction/destruction
-    rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -34,8 +34,8 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 
 	void command_write(UINT16 data);

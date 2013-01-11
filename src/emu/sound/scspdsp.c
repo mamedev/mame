@@ -62,17 +62,17 @@ void SCSPDSP_Init(SCSPDSP *DSP)
 
 void SCSPDSP_Step(SCSPDSP *DSP)
 {
-	INT32 ACC=0;	//26 bit
-	INT32 SHIFTED=0;	//24 bit
-	INT32 X=0;	//24 bit
-	INT32 Y=0;	//13 bit
-	INT32 B=0;	//26 bit
-	INT32 INPUTS=0;	//24 bit
+	INT32 ACC=0;    //26 bit
+	INT32 SHIFTED=0;    //24 bit
+	INT32 X=0;  //24 bit
+	INT32 Y=0;  //13 bit
+	INT32 B=0;  //26 bit
+	INT32 INPUTS=0; //24 bit
 	INT32 MEMVAL=0;
-	INT32 FRC_REG=0;	//13 bit
-	INT32 Y_REG=0;		//24 bit
+	INT32 FRC_REG=0;    //13 bit
+	INT32 Y_REG=0;      //24 bit
 	UINT32 ADDR=0;
-	UINT32 ADRS_REG=0;	//13 bit
+	UINT32 ADRS_REG=0;  //13 bit
 	int step;
 
 	if(DSP->Stopped)
@@ -115,10 +115,10 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 		UINT32 ZERO=(IPtr[2]>>1)&0x01;
 		UINT32 BSEL=(IPtr[2]>>0)&0x01;
 
-		UINT32 NOFL=(IPtr[3]>>15)&1;		//????
+		UINT32 NOFL=(IPtr[3]>>15)&1;        //????
 		UINT32 COEF=(IPtr[3]>>9)&0x3f;
 
-		UINT32 MASA=(IPtr[3]>>2)&0x1f;	//???
+		UINT32 MASA=(IPtr[3]>>2)&0x1f;  //???
 		UINT32 ADREB=(IPtr[3]>>1)&0x1;
 		UINT32 NXADR=(IPtr[3]>>0)&0x1;
 
@@ -135,7 +135,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 
 		if(f)
 		{
-#define DUMP(v)	fprintf(f," " #v ": %04X",v);
+#define DUMP(v) fprintf(f," " #v ": %04X",v);
 
 			fprintf(f,"%d: ",step);
 			DUMP(ACC);
@@ -158,7 +158,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 		if(IRA<=0x1f)
 			INPUTS=DSP->MEMS[IRA];
 		else if(IRA<=0x2F)
-			INPUTS=DSP->MIXS[IRA-0x20]<<4;	//MIXS is 20 bit
+			INPUTS=DSP->MIXS[IRA-0x20]<<4;  //MIXS is 20 bit
 		else if(IRA<=0x31)
 			INPUTS=0;
 		else
@@ -171,7 +171,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 
 		if(IWT)
 		{
-			DSP->MEMS[IWA]=MEMVAL;	//MEMVAL was selected in previous MRD
+			DSP->MEMS[IWA]=MEMVAL;  //MEMVAL was selected in previous MRD
 			if(IRA==IWA)
 				INPUTS=MEMVAL;
 		}
@@ -212,7 +212,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 		if(YSEL==0)
 			Y=FRC_REG;
 		else if(YSEL==1)
-			Y=DSP->COEF[COEF]>>3;	//COEF is 16 bits
+			Y=DSP->COEF[COEF]>>3;   //COEF is 16 bits
 		else if(YSEL==2)
 			Y=(Y_REG>>11)&0x1FFF;
 		else if(YSEL==3)
@@ -296,7 +296,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 			//MEMVAL=DSP->SCSPRAM[ADDR>>1];
 			ADDR+=DSP->RBP<<12;
 			if (ADDR > 0x7ffff) ADDR = 0;
-			if(MRD && (step&1))	//memory only allowed on odd? DoA inserts NOPs on even
+			if(MRD && (step&1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if(NOFL)
 					MEMVAL=DSP->SCSPRAM[ADDR]<<8;
@@ -306,7 +306,7 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 			if(MWT && (step&1))
 			{
 				if(NOFL)
-			    		DSP->SCSPRAM[ADDR]=SHIFTED>>8;
+						DSP->SCSPRAM[ADDR]=SHIFTED>>8;
 				else
 					DSP->SCSPRAM[ADDR]=PACK(SHIFTED);
 			}

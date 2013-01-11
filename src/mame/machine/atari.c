@@ -16,9 +16,9 @@
 #include "sound/dac.h"
 #include "video/gtia.h"
 
-#define VERBOSE_POKEY	1
-#define VERBOSE_SERIAL	1
-#define VERBOSE_TIMERS	1
+#define VERBOSE_POKEY   1
+#define VERBOSE_SERIAL  1
+#define VERBOSE_TIMERS  1
 
 static void a600xl_mmu(running_machine &machine, UINT8 new_mmu);
 
@@ -74,22 +74,22 @@ READ8_DEVICE_HANDLER(atari_pia_pb_r)
 
 WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine(), data); }
 
-WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }	// This is used by Floppy drive on Atari 8bits Home Computers
+WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 
 const pia6821_interface atarixl_pia_interface =
 {
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(a600xl_pia_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_LINE(atari_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_HANDLER(atari_pia_pa_r),      /* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),  /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_HANDLER(a600xl_pia_pb_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_LINE(atari_pia_cb2_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -124,8 +124,8 @@ void a600xl_mmu(running_machine &machine, UINT8 new_mmu)
  *
  **************************************************************/
 
-#define AKEY_BREAK		0x03	/* this not really a scancode */
-#define AKEY_NONE		0x09
+#define AKEY_BREAK      0x03    /* this not really a scancode */
+#define AKEY_NONE       0x09
 
 /**************************************************************
 

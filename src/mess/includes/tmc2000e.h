@@ -14,9 +14,9 @@
 #include "machine/ram.h"
 #include "sound/cdp1864.h"
 
-#define SCREEN_TAG		"screen"
-#define CDP1802_TAG		"cdp1802"
-#define CDP1864_TAG		"cdp1864"
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "cdp1802"
+#define CDP1864_TAG     "cdp1864"
 
 #define TMC2000E_COLORRAM_SIZE 0x100 // ???
 
@@ -25,9 +25,9 @@ class tmc2000e_state : public driver_device
 public:
 	tmc2000e_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_cti(*this, CDP1864_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_cti(*this, CDP1864_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	,
 		m_colorram(*this, "colorram"){ }
 
@@ -59,13 +59,13 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_w );
 
 	/* video state */
-	int m_cdp1864_efx;		/* EFx */
-	required_shared_ptr<UINT8> m_colorram;		/* color memory */
+	int m_cdp1864_efx;      /* EFx */
+	required_shared_ptr<UINT8> m_colorram;      /* color memory */
 	UINT8 m_color;
 
 	/* keyboard state */
-	int m_keylatch;			/* key latch */
-	int m_reset;			/* reset activated */
+	int m_keylatch;         /* key latch */
+	int m_reset;            /* reset activated */
 };
 
 #endif

@@ -4,7 +4,7 @@ MACHINE_CONFIG_EXTERN( timeplt_sound );
 MACHINE_CONFIG_EXTERN( locomotn_sound );
 
 class timeplt_audio_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -25,4 +25,3 @@ private:
 };
 
 extern const device_type TIMEPLT_AUDIO;
-

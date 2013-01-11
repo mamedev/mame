@@ -49,10 +49,10 @@ PAL frame timing
 #include "video/315_5124.h"
 
 
-#define STATUS_VINT           0x80	/* Pending vertical interrupt flag */
-#define STATUS_SPROVR         0x40	/* Sprite overflow flag */
-#define STATUS_SPRCOL         0x20	/* Object collision flag */
-#define STATUS_HINT           0x02	/* Pending horizontal interrupt flag */
+#define STATUS_VINT           0x80  /* Pending vertical interrupt flag */
+#define STATUS_SPROVR         0x40  /* Sprite overflow flag */
+#define STATUS_SPRCOL         0x20  /* Object collision flag */
+#define STATUS_HINT           0x02  /* Pending horizontal interrupt flag */
 
 #define VINT_HPOS             23
 #define HINT_HPOS             23
@@ -62,8 +62,8 @@ PAL frame timing
 #define SPRCOL_BASEHPOS       42
 #define DISPLAY_CB_HPOS       5  /* fix X-Scroll latchtime (Flubba's VDPTest) */
 
-#define DRAW_TIME_GG		86		/* 1 + 2 + 14 +8 + 96/2 */
-#define DRAW_TIME_SMS		0
+#define DRAW_TIME_GG        86      /* 1 + 2 + 14 +8 + 96/2 */
+#define DRAW_TIME_SMS       0
 
 #define PRIORITY_BIT          0x1000
 #define BACKDROP_COLOR        ((m_vdp_mode == 4 ? 0x10 : 0x00) + (m_reg[0x07] & 0x0f))
@@ -344,8 +344,8 @@ void sega315_5124_device::process_line_timer()
 	rectangle rec;
 	int vpos = m_screen->vpos();
 	int vpos_limit = m_frame_timing[VERTICAL_BLANKING] + m_frame_timing[TOP_BLANKING]
-	               + m_frame_timing[TOP_BORDER] + m_frame_timing[ACTIVE_DISPLAY_V]
-	               + m_frame_timing[BOTTOM_BORDER] + m_frame_timing[BOTTOM_BLANKING];
+					+ m_frame_timing[TOP_BORDER] + m_frame_timing[ACTIVE_DISPLAY_V]
+					+ m_frame_timing[BOTTOM_BORDER] + m_frame_timing[BOTTOM_BLANKING];
 
 	rec.min_y = rec.max_y = vpos;
 
@@ -581,15 +581,15 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 		m_addr = (data << 8) | (m_addr & 0xff);
 		switch (m_addrmode)
 		{
-		case 0:		/* VRAM reading mode */
+		case 0:     /* VRAM reading mode */
 			m_buffer = this->space().read_byte(m_addr & 0x3fff);
 			m_addr += 1;
 			break;
 
-		case 1:		/* VRAM writing mode */
+		case 1:     /* VRAM writing mode */
 			break;
 
-		case 2:		/* VDP register write */
+		case 2:     /* VDP register write */
 			reg_num = data & 0x0f;
 			m_reg[reg_num] = m_addr & 0xff;
 			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xf );
@@ -606,7 +606,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 			m_addrmode = 0;
 			break;
 
-		case 3:		/* CRAM writing mode */
+		case 3:     /* CRAM writing mode */
 			break;
 		}
 	}
@@ -677,7 +677,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 	/* else x_scroll = m_reg[0x08]                                                       */
 	x_scroll = (((m_reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - m_reg[0x08]);
 
-	x_scroll_start_column = (x_scroll >> 3);			 /* x starting column tile */
+	x_scroll_start_column = (x_scroll >> 3);             /* x starting column tile */
 
 	/* Draw background layer */
 	for (tile_column = 0; tile_column < 33; tile_column++)
@@ -855,7 +855,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 
 		if (m_reg[0x00] & 0x08)
 		{
-			sprite_x -= 0x08;	 /* sprite shift */
+			sprite_x -= 0x08;    /* sprite shift */
 		}
 
 		if (m_reg[0x06] & 0x04)
@@ -888,7 +888,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 			UINT8 pen_bit_3 = (bit_plane_3 >> (7 - pixel_x)) & 0x01;
 			UINT8 pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0) | 0x10;
 
-			if (pen_selected == 0x10)		/* Transparent palette so skip draw */
+			if (pen_selected == 0x10)       /* Transparent palette so skip draw */
 			{
 				continue;
 			}
@@ -1458,17 +1458,17 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 		}
 
 		/* Do vertical scaling for a screen with 192 or 224 lines
-           Lines 0-2 and 221-223 have no effect on the output on the GG screen.
-           We will calculate the gamegear lines as follows:
-           GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
-           GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
-           GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
-           GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
-           GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
-           .....
-           GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
-           GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
-        */
+		   Lines 0-2 and 221-223 have no effect on the output on the GG screen.
+		   We will calculate the gamegear lines as follows:
+		   GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
+		   GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
+		   GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
+		   GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
+		   GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
+		   .....
+		   GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
+		   GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
+		*/
 		{
 			int gg_line;
 			int my_line = pixel_plot_y + line - (SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
@@ -1500,10 +1500,10 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 			for (x = 0 + 48; x < 160 + 48; x++)
 			{
-				rgb_t	c1 = machine().pens[line1[x]];
-				rgb_t	c2 = machine().pens[line2[x]];
-				rgb_t	c3 = machine().pens[line3[x]];
-				rgb_t	c4 = machine().pens[line4[x]];
+				rgb_t   c1 = machine().pens[line1[x]];
+				rgb_t   c2 = machine().pens[line2[x]];
+				rgb_t   c3 = machine().pens[line3[x]];
+				rgb_t   c4 = machine().pens[line4[x]];
 				m_tmpbitmap.pix32(pixel_plot_y, pixel_offset_x + x) =
 					MAKE_RGB((RGB_RED(c1) / 6 + RGB_RED(c2) / 3 + RGB_RED(c3) / 3 + RGB_RED(c4) / 6 ),
 						(RGB_GREEN(c1) / 6 + RGB_GREEN(c2) / 3 + RGB_GREEN(c3) / 3 + RGB_GREEN(c4) / 6 ),
@@ -1695,5 +1695,3 @@ void sega315_5378_device::device_reset()
 	sega315_5124_device::device_reset();
 	m_draw_time = DRAW_TIME_GG;
 }
-
-

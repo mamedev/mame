@@ -173,13 +173,13 @@ READ32_MEMBER(konamigq_state::pcmram_r)
 /* Video */
 
 static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f10000f) AM_WRITE(soundr3k_w)
 	AM_RANGE(0x1f100010, 0x1f10001f) AM_READ(soundr3k_r)
 	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
-	AM_RANGE(0x1f198000, 0x1f198003) AM_WRITENOP    		/* cabinet lamps? */
-	AM_RANGE(0x1f1a0000, 0x1f1a0003) AM_WRITENOP    		/* indicates gun trigger */
+	AM_RANGE(0x1f198000, 0x1f198003) AM_WRITENOP            /* cabinet lamps? */
+	AM_RANGE(0x1f1a0000, 0x1f1a0003) AM_WRITENOP            /* indicates gun trigger */
 	AM_RANGE(0x1f200000, 0x1f200003) AM_READ_PORT("GUNX1")
 	AM_RANGE(0x1f208000, 0x1f208003) AM_READ_PORT("GUNY1")
 	AM_RANGE(0x1f210000, 0x1f210003) AM_READ_PORT("GUNX2")

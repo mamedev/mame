@@ -32,7 +32,7 @@ void m52_state::palette_init()
 	machine().colortable = colortable_alloc(machine(), 512 + 32 + 32);
 
 	/* compute palette information for characters/backgrounds */
-	scale = compute_resistor_weights(0,	255, -1.0,
+	scale = compute_resistor_weights(0, 255, -1.0,
 			3, resistances_3, weights_r, 0, 0,
 			3, resistances_3, weights_g, 0, 0,
 			2, resistances_2, weights_b, 0, 0);
@@ -60,7 +60,7 @@ void m52_state::palette_init()
 	}
 
 	/* compute palette information for sprites */
-	compute_resistor_weights(0,	255, scale,
+	compute_resistor_weights(0, 255, scale,
 			2, resistances_2, weights_r, 470, 0,
 			3, resistances_3, weights_g, 470, 0,
 			3, resistances_3, weights_b, 470, 0);

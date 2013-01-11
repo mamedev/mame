@@ -12,8 +12,8 @@
 /* for stream system */
 struct ym2413_state
 {
-	sound_stream *	stream;
-	void *			chip;
+	sound_stream *  stream;
+	void *          chip;
 };
 
 
@@ -28,14 +28,14 @@ INLINE ym2413_state *get_safe_token(device_t *device)
 #ifdef UNUSED_FUNCTION
 void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
 {
-    INT16 *buffer = _buffer[0];
-    static int out = 0;
+	INT16 *buffer = _buffer[0];
+	static int out = 0;
 
-    if ( ym2413[chip].reg[0x0F] & 0x01 )
-    {
-        out = ((ym2413[chip].reg[0x10] & 0xF0) << 7);
-    }
-    while (length--) *(buffer++) = out;
+	if ( ym2413[chip].reg[0x0F] & 0x01 )
+	{
+		out = ((ym2413[chip].reg[0x10] & 0xF0) << 7);
+	}
+	while (length--) *(buffer++) = out;
 }
 #endif
 
@@ -118,7 +118,7 @@ const device_type YM2413 = &device_creator<ym2413_device>;
 
 ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2413, "YM2413", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym2413_state);
 }
@@ -169,5 +169,3 @@ void ym2413_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

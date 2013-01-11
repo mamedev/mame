@@ -146,7 +146,7 @@ WRITE8_MEMBER( micronic_state::beep_w )
 {
 	UINT16 frequency[16] =
 	{
-		  0, 4000, 2000, 1333, 1000, 800, 667, 571,
+			0, 4000, 2000, 1333, 1000, 800, 667, 571,
 		500,  444,  400,  364,  333, 308, 286, 267
 	};
 
@@ -209,7 +209,7 @@ WRITE8_MEMBER( micronic_state::rtc_data_w )
 
 static ADDRESS_MAP_START(micronic_mem, AS_PROGRAM, 8, micronic_state)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAM	 AM_SHARE("ram_base")
+	AM_RANGE(0x8000, 0xffff) AM_RAM  AM_SHARE("ram_base")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(micronic_io, AS_IO, 8, micronic_state)
@@ -358,15 +358,15 @@ const struct mc146818_interface micronic_mc146818_config =
 
 static MACHINE_CONFIG_START( micronic, micronic_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
-    MCFG_CPU_PROGRAM_MAP(micronic_mem)
-    MCFG_CPU_IO_MAP(micronic_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
+	MCFG_CPU_PROGRAM_MAP(micronic_mem)
+	MCFG_CPU_IO_MAP(micronic_io)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
 	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(120, 64)	//6x20, 8x8
+	MCFG_SCREEN_SIZE(120, 64)   //6x20, 8x8
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -391,7 +391,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( micronic )
-    ROM_REGION( 0x18000, Z80_TAG, 0 )
+	ROM_REGION( 0x18000, Z80_TAG, 0 )
 	ROM_SYSTEM_BIOS(0, "v228", "Micronic 1000")
 	ROMX_LOAD( "micron1.bin", 0x0000, 0x8000, CRC(5632c8b7) SHA1(d1c9cf691848e9125f9ea352e4ffa41c288f3e29), ROM_BIOS(1))
 	ROMX_LOAD( "micron2.bin", 0x10000, 0x8000, CRC(dc8e7341) SHA1(927dddb3914a50bb051256d126a047a29eff7c65), ROM_BIOS(1))
@@ -402,4 +402,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 198?, micronic,  0,       0,	micronic,	micronic, driver_device,	 0,  "Victor Micronic",   "Micronic 1000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, micronic,  0,       0,  micronic,   micronic, driver_device,     0,  "Victor Micronic",   "Micronic 1000",      GAME_NOT_WORKING | GAME_NO_SOUND)

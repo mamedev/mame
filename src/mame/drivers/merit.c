@@ -73,13 +73,13 @@ Merit Riviera Notes - There are several known versions:
 #include "video/mc6845.h"
 #include "machine/nvram.h"
 
-#define MASTER_CLOCK			(XTAL_10MHz)
-#define CPU_CLOCK				(MASTER_CLOCK / 4)
-#define PIXEL_CLOCK				(MASTER_CLOCK / 1)
-#define CRTC_CLOCK				(MASTER_CLOCK / 8)
+#define MASTER_CLOCK            (XTAL_10MHz)
+#define CPU_CLOCK               (MASTER_CLOCK / 4)
+#define PIXEL_CLOCK             (MASTER_CLOCK / 1)
+#define CRTC_CLOCK              (MASTER_CLOCK / 8)
 
-#define NUM_PENS				(16)
-#define RAM_PALETTE_SIZE		(1024)
+#define NUM_PENS                (16)
+#define RAM_PALETTE_SIZE        (1024)
 
 
 class merit_state : public driver_device
@@ -274,7 +274,7 @@ static MC6845_UPDATE_ROW( update_row )
 		int region = (attr & 0x40) >> 6;
 		int addr = ((state->m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (state->m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
-		UINT8	*data;
+		UINT8   *data;
 
 		addr &= (rlen-1);
 		data = gfx[region];
@@ -315,16 +315,16 @@ WRITE_LINE_MEMBER(merit_state::vsync_changed)
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",					/* screen we are acting on */
-	8,							/* number of pixels per video memory address */
-	begin_update,				/* before pixel update callback */
-	update_row,					/* row update callback */
-	NULL,						/* after pixel update callback */
-	DEVCB_NULL,					/* callback for display state changes */
-	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_DRIVER_LINE_MEMBER(merit_state,hsync_changed),	/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(merit_state,vsync_changed),	/* VSYNC callback */
-	NULL						/* update address callback */
+	"screen",                   /* screen we are acting on */
+	8,                          /* number of pixels per video memory address */
+	begin_update,               /* before pixel update callback */
+	update_row,                 /* row update callback */
+	NULL,                       /* after pixel update callback */
+	DEVCB_NULL,                 /* callback for display state changes */
+	DEVCB_NULL,                 /* callback for cursor state changes */
+	DEVCB_DRIVER_LINE_MEMBER(merit_state,hsync_changed),    /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(merit_state,vsync_changed),    /* VSYNC callback */
+	NULL                        /* update address callback */
 };
 
 WRITE8_MEMBER(merit_state::led1_w)
@@ -575,7 +575,7 @@ static INPUT_PORTS_START( meritpoker )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )		/* AKA Diagnostics */
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )       /* AKA Diagnostics */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -606,25 +606,25 @@ static INPUT_PORTS_START( bigappg )
 	PORT_INCLUDE( meritpoker )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Auto Hold" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Auto Hold" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bonus Jackpot" )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Jackpot" )     PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Take Half Option" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Take Half Option" )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Raise Option" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Raise Option" )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Unlimited Double Up" )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Unlimited Double Up" )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Double Up" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, "Double Up" )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0xc0, "20" )
 	PORT_DIPSETTING(    0x00, "50" )
@@ -635,25 +635,25 @@ static INPUT_PORTS_START( riviera )
 	PORT_INCLUDE( meritpoker )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Auto Hold" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Auto Hold" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bonus Jackpot" )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Jackpot" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3") /* Flyer suggests this might be "10-IN-A-ROW" bonus */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3") /* Flyer suggests this might be "10-IN-A-ROW" bonus */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Raise Option" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Raise Option" )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Points Per Coin" )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Points Per Coin" )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x10, "1" )
-	PORT_DIPNAME( 0x20, 0x00, "Double Up" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, "Double Up" )     PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0xc0, "20" )
 	PORT_DIPSETTING(    0x00, "50" )
@@ -680,10 +680,10 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where a
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	/* AKA Diagnostics - Seems to reset the game */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_COCKTAIL PORT_CODE(KEYCODE_E) PORT_NAME("P2 Cancel")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* AKA Diagnostics - Seems to reset the game */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )    PORT_COCKTAIL PORT_CODE(KEYCODE_E) PORT_NAME("P2 Cancel")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0xc0, 0xc0, "Hands Per Game" )	PORT_DIPLOCATION("Special:1,2") /* Pins #52 & #51?? Listed as "Switch Common Ground" */
+	PORT_DIPNAME( 0xc0, 0xc0, "Hands Per Game" )    PORT_DIPLOCATION("Special:1,2") /* Pins #52 & #51?? Listed as "Switch Common Ground" */
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0xc0, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
@@ -700,28 +700,28 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where a
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Max Double Up" )	PORT_DIPLOCATION("SW:4")
+	PORT_DIPNAME( 0x08, 0x08, "Max Double Up" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING(    0x08, "Once" )
 	PORT_DIPSETTING(    0x00, "Twice" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, "Counter Top" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Free Hands" )	PORT_DIPLOCATION("SW:8")
+	PORT_DIPNAME( 0x80, 0x80, "Free Hands" )    PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, "100,000+ & 200,000+" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
@@ -730,7 +730,7 @@ static INPUT_PORTS_START( pitbossa )
 	PORT_INCLUDE( pitboss )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Lockout" )		PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Coin Lockout" )      PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x30, "2 Coins" )
 	PORT_DIPSETTING(    0x20, "10 Coins" )
@@ -740,7 +740,7 @@ static INPUT_PORTS_START( pitbossb )
 	PORT_INCLUDE( pitboss )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) )		PORT_DIPLOCATION("SW:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) )       PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -755,16 +755,16 @@ static INPUT_PORTS_START( casino5 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Points")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Play")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* pulling this LOW makes the horse racing game to not work */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* pulling this LOW makes the horse racing game to not work */
 
 	PORT_START("IN1") /* Pins #65 through #58 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	/* AKA Diagnostics */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* 1 displays additional screens in attract mode - custom ads screen (requires optional Keyboard to set up) */
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* AKA Diagnostics */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* 1 displays additional screens in attract mode - custom ads screen (requires optional Keyboard to set up) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Likely controls Percentage out, 75%, 80%, 85% & 90%  as per manual's "Tab Positions" */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Likely controls Percentage out, 75%, 80%, 85% & 90%  as per manual's "Tab Positions" */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order (usually P2 controls - Not used!) */
@@ -778,25 +778,25 @@ static INPUT_PORTS_START( casino5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Enable Draw Poker" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Enable Draw Poker" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Enable Black Jack" )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Enable Black Jack" )     PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Enable Dice Game" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Enable Dice Game" )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Enable Foto Finish" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Enable Foto Finish" )    PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Enable Acey Deucey" )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Enable Acey Deucey" )    PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "2 Jokers in Deck" )		PORT_DIPLOCATION("SW1:6") /* Only used in "Points Replay" mode ? */
+	PORT_DIPNAME( 0x20, 0x20, "2 Jokers in Deck" )      PORT_DIPLOCATION("SW1:6") /* Only used in "Points Replay" mode ? */
 	PORT_DIPSETTING(    0x00, "Bet 4 Points" )
 	PORT_DIPSETTING(    0x20, "Always" )
-	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )		PORT_DIPLOCATION("SW1:7,8") /* Only used in "Points Replay" mode */
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )       PORT_DIPLOCATION("SW1:7,8") /* Only used in "Points Replay" mode */
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0xc0, "10" )
 	PORT_DIPSETTING(    0x80, "20" )
@@ -821,7 +821,7 @@ static INPUT_PORTS_START( merittrivia )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Allows Test / Service menu from the "Books" */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Allows Test / Service menu from the "Books" */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -855,25 +855,25 @@ static INPUT_PORTS_START( phrcraze )
 	PORT_INCLUDE( merittrivia )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x02, "6" )
-	PORT_DIPNAME( 0x04, 0x04, "Topic \"8\"" )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Topic \"8\"" )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x00, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
@@ -884,23 +884,23 @@ static INPUT_PORTS_START( phrcrazs )
 	PORT_INCLUDE( merittrivia )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x04, "XXX-Rated Sex Topic" )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "XXX-Rated Sex Topic" )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x08, "Bonus Phraze" )		PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x18, 0x08, "Bonus Phraze" )      PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "800K" )
 	PORT_DIPSETTING(    0x08, "1M" )
 	PORT_DIPSETTING(    0x00, "1.5M" )
-	PORT_DIPNAME( 0x20, 0x20, "Random Sex Category" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Random Sex Category" )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x00, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
@@ -911,32 +911,32 @@ static INPUT_PORTS_START( phrcraza )
 	PORT_INCLUDE( phrcraze )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Phraze Craze (6221-40, U5-0) will hang if pulled HIGH */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Phraze Craze (6221-40, U5-0) will hang if pulled HIGH */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tictac )
 	PORT_INCLUDE( merittrivia )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Lightning Round 1 Credit" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Lightning Round 1 Credit" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x00, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
@@ -947,28 +947,28 @@ static INPUT_PORTS_START( trivia )
 	PORT_INCLUDE( merittrivia )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "On 0 Points" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "On 0 Points" )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, "Continue" )
 	PORT_DIPSETTING(    0x00, "Game Over" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -978,7 +978,7 @@ static INPUT_PORTS_START( trvwhziv )
 	PORT_INCLUDE( trivia )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")	/* no coinage DSW */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")   /* no coinage DSW */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -990,28 +990,28 @@ static INPUT_PORTS_START( dtrvwh5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Answers Shown" )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Answers Shown" )     PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Hi Scores Retained" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Hi Scores Retained" )    PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Cocktail Type" )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Cocktail Type" )     PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Regular Cocktail" )
 	PORT_DIPSETTING(    0x00, "Single Side Cocktail" )
 INPUT_PORTS_END
@@ -1028,28 +1028,28 @@ static INPUT_PORTS_START( couple )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Number of Attempts" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Number of Attempts" )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "99" )
 	PORT_DIPSETTING(    0x00, "9" )
-	PORT_DIPNAME( 0x02, 0x02, "Tries Per Coin" )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Tries Per Coin" )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 /*2 Coins for 2 Credits?I think this is an invalid setting,it doesn't even work correctly*/
 /*  PORT_DIPSETTING(    0x00, DEF_STR( 2C_2C ) ) */
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x00, "Sound" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, "Sound" )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Clear RAM" )			PORT_DIPLOCATION("SW1:8") /* Service Mode shows this as "NOT USED" */
+	PORT_DIPNAME( 0x80, 0x80, "Clear RAM" )         PORT_DIPLOCATION("SW1:8") /* Service Mode shows this as "NOT USED" */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1105,10 +1105,10 @@ static INPUT_PORTS_START( couplep )
 	PORT_INCLUDE( couple )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x40, 0x40, "Bonus Play" )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Bonus Play" )    PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "at 150.000" )
 	PORT_DIPSETTING(    0x00, "at 200.000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1116,31 +1116,31 @@ INPUT_PORTS_END
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),	/* Port C read */
-	DEVCB_NULL					/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),    /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),    /* Port B read */
+	DEVCB_NULL,                 /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),    /* Port C read */
+	DEVCB_NULL                  /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("DSW"),	/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_NULL,					/* Port B read */
-	DEVCB_DRIVER_MEMBER(merit_state,led1_w),		/* Port B write */
-	DEVCB_NULL,					/* Port C read */
-	DEVCB_DRIVER_MEMBER(merit_state,misc_w)		/* Port C write */
+	DEVCB_INPUT_PORT("DSW"),    /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_NULL,                 /* Port B read */
+	DEVCB_DRIVER_MEMBER(merit_state,led1_w),        /* Port B write */
+	DEVCB_NULL,                 /* Port C read */
+	DEVCB_DRIVER_MEMBER(merit_state,misc_w)     /* Port C write */
 };
 
 static I8255A_INTERFACE( couple_ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("DSW"),	/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_NULL,					/* Port B read */
-	DEVCB_DRIVER_MEMBER(merit_state,led1_w),		/* Port B write */
-	DEVCB_NULL,					/* Port C read */
+	DEVCB_INPUT_PORT("DSW"),    /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_NULL,                 /* Port B read */
+	DEVCB_DRIVER_MEMBER(merit_state,led1_w),        /* Port B write */
+	DEVCB_NULL,                 /* Port C read */
 	DEVCB_DRIVER_MEMBER(merit_state,misc_couple_w)/* Port C write */
 };
 
@@ -1179,7 +1179,7 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	/* video hardware */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
@@ -1954,7 +1954,7 @@ ROM_START( couple )
 	ROM_LOAD( "6.10d", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )	/*video timing?*/
+	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )  /*video timing?*/
 ROM_END
 
 /*f205v's dump,same except for the first z80 rom,first noticeable differences are that
@@ -1974,7 +1974,7 @@ ROM_START( couplep )
 	ROM_LOAD( "6.10d", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )	/*video timing?*/
+	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )  /*video timing?*/
 ROM_END
 
 /*f205v's dump,this one looks like an intermediate release between set1 and set2;
@@ -1993,7 +1993,7 @@ ROM_START( couplei )
 	ROM_LOAD( "6.10d", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )	/*video timing?*/
+	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )  /*video timing?*/
 ROM_END
 
 DRIVER_INIT_MEMBER(merit_state,key_0)
@@ -2039,10 +2039,10 @@ DRIVER_INIT_MEMBER(merit_state,couple)
 	#endif
 
 	/*The banked rom isn't a *real* banking,it's just a strange rom hook-up,the 2nd
-      and the 3rd halves are 100% identical(!),unless it's an error of TWO different
-      dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
-      update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
-      all behave the same...*/
+	  and the 3rd halves are 100% identical(!),unless it's an error of TWO different
+	  dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
+	  update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
+	  all behave the same...*/
 	machine().root_device().membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 

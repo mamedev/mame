@@ -20,12 +20,12 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define CRT_SIGNATURE		"C64 CARTRIDGE   "
+#define CRT_SIGNATURE       "C64 CARTRIDGE   "
 
-#define CRT_HEADER_LENGTH	0x40
-#define CRT_CHIP_LENGTH		0x10
+#define CRT_HEADER_LENGTH   0x40
+#define CRT_CHIP_LENGTH     0x10
 
-#define UNSUPPORTED 		"standard"
+#define UNSUPPORTED         "standard"
 
 
 // VIC-20 cartridge types

@@ -19,7 +19,7 @@
 // ======================> dai_sound_device
 
 class dai_sound_device : public device_t,
-						 public device_sound_interface
+							public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -37,10 +37,10 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-	sound_stream *		m_mixer_channel;
-	int 				m_dai_input[3];
-	UINT8				m_osc_volume[3];
-	UINT8				m_noise_volume;
+	sound_stream *      m_mixer_channel;
+	int                 m_dai_input[3];
+	UINT8               m_osc_volume[3];
+	UINT8               m_noise_volume;
 
 	static const UINT16 s_osc_volume_table[];
 	static const UINT16 s_noise_volume_table[];
@@ -53,9 +53,9 @@ class dai_state : public driver_device
 public:
 	dai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_pit(*this, "pit8253"),
-		  m_tms5501(*this, "tms5501"),
-		  m_sound(*this, "custom")
+			m_pit(*this, "pit8253"),
+			m_tms5501(*this, "tms5501"),
+			m_sound(*this, "custom")
 		{ }
 
 	required_device<pit8253_device> m_pit;

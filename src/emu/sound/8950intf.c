@@ -24,9 +24,9 @@
 
 struct y8950_state
 {
-	sound_stream *	stream;
-	emu_timer *		timer[2];
-	void *			chip;
+	sound_stream *  stream;
+	emu_timer *     timer[2];
+	void *          chip;
 	const y8950_interface *intf;
 	y8950_device *device;
 };
@@ -59,11 +59,11 @@ static void TimerHandler(void *param,int c,attotime period)
 {
 	y8950_state *info = (y8950_state *)param;
 	if( period == attotime::zero )
-	{	/* Reset FM Timer */
+	{   /* Reset FM Timer */
 		info->timer[c]->enable(false);
 	}
 	else
-	{	/* Start FM Timer */
+	{   /* Start FM Timer */
 		info->timer[c]->adjust(period);
 	}
 }
@@ -177,7 +177,7 @@ const device_type Y8950 = &device_creator<y8950_device>;
 
 y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Y8950, "Y8950", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(y8950_state);
 }
@@ -248,5 +248,3 @@ void y8950_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

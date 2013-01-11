@@ -62,11 +62,11 @@
  * input[4]    - Channel3 input value
  *
  ************************************************************************/
-#define DST_ADDER__ENABLE	DISCRETE_INPUT(0)
-#define DST_ADDER__IN0		DISCRETE_INPUT(1)
-#define DST_ADDER__IN1		DISCRETE_INPUT(2)
-#define DST_ADDER__IN2		DISCRETE_INPUT(3)
-#define DST_ADDER__IN3		DISCRETE_INPUT(4)
+#define DST_ADDER__ENABLE   DISCRETE_INPUT(0)
+#define DST_ADDER__IN0      DISCRETE_INPUT(1)
+#define DST_ADDER__IN1      DISCRETE_INPUT(2)
+#define DST_ADDER__IN2      DISCRETE_INPUT(3)
+#define DST_ADDER__IN3      DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_adder)
 {
@@ -91,7 +91,7 @@ DISCRETE_STEP(dst_adder)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_COMP_ADDER__SELECT	DISCRETE_INPUT(0)
+#define DST_COMP_ADDER__SELECT  DISCRETE_INPUT(0)
 
 DISCRETE_STEP(dst_comp_adder)
 {
@@ -148,9 +148,9 @@ DISCRETE_RESET(dst_comp_adder)
  * input[2]    - Maximum value
  *
  ************************************************************************/
-#define DST_CLAMP__IN		DISCRETE_INPUT(0)
-#define DST_CLAMP__MIN		DISCRETE_INPUT(1)
-#define DST_CLAMP__MAX		DISCRETE_INPUT(2)
+#define DST_CLAMP__IN       DISCRETE_INPUT(0)
+#define DST_CLAMP__MIN      DISCRETE_INPUT(1)
+#define DST_CLAMP__MAX      DISCRETE_INPUT(2)
 
 DISCRETE_STEP(dst_clamp)
 {
@@ -175,15 +175,15 @@ DISCRETE_STEP(dst_clamp)
  * Mar 2004, D Renaud.
  * Nov 2010, D Renaud. - optimized for speed
  ************************************************************************/
-#define DST_DAC_R1__DATA		DISCRETE_INPUT(0)
-#define DST_DAC_R1__VON			DISCRETE_INPUT(1)
+#define DST_DAC_R1__DATA        DISCRETE_INPUT(0)
+#define DST_DAC_R1__VON         DISCRETE_INPUT(1)
 
 DISCRETE_STEP(dst_dac_r1)
 {
-	int		data = (int)DST_DAC_R1__DATA;
-	double	v = m_v_step[data];
-	double	x_time = DST_DAC_R1__DATA - data;
-	double	last_v = m_last_v;
+	int     data = (int)DST_DAC_R1__DATA;
+	double  v = m_v_step[data];
+	double  x_time = DST_DAC_R1__DATA - data;
+	double  last_v = m_last_v;
 
 	m_last_v = v;
 
@@ -212,7 +212,7 @@ DISCRETE_RESET(dst_dac_r1)
 {
 	DISCRETE_DECLARE_INFO(discrete_dac_r1_ladder)
 
-	int	bit;
+	int bit;
 	int ladderLength = info->ladderLength;
 	int total_steps = 1 << ladderLength;
 	double r_total = 0;
@@ -228,10 +228,10 @@ DISCRETE_RESET(dst_dac_r1)
 		i_bias = 0;
 
 	/*
-     * We will do a small amount of error checking.
-     * But if you are an idiot and pass a bad ladder table
-     * then you deserve a crash.
-     */
+	 * We will do a small amount of error checking.
+	 * But if you are an idiot and pass a bad ladder table
+	 * then you deserve a crash.
+	 */
 	if (ladderLength < 2 && info->rBias == 0 && info->rGnd == 0)
 	{
 		/* You need at least 2 resistors for a ladder */
@@ -243,10 +243,10 @@ DISCRETE_RESET(dst_dac_r1)
 	}
 
 	/*
-     * Calculate the total of all resistors in parallel.
-     * This is the combined resistance of the voltage sources.
-     * This is used for the charging curve.
-     */
+	 * Calculate the total of all resistors in parallel.
+	 * This is the combined resistance of the voltage sources.
+	 * This is used for the charging curve.
+	 */
 	for(bit = 0; bit < ladderLength; bit++)
 	{
 		if (info->r[bit] > 0)
@@ -302,13 +302,13 @@ DISCRETE_RESET(dst_dac_r1)
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_DIODE_MIX_INP_OFFSET	0
-#define DST_DIODE_MIX__INP(addr)	DISCRETE_INPUT(DST_DIODE_MIX_INP_OFFSET + addr)
+#define DST_DIODE_MIX_INP_OFFSET    0
+#define DST_DIODE_MIX__INP(addr)    DISCRETE_INPUT(DST_DIODE_MIX_INP_OFFSET + addr)
 
 DISCRETE_STEP(dst_diode_mix)
 {
-	double	val, max = 0;
-	int		addr;
+	double  val, max = 0;
+	int     addr;
 
 	for (addr = 0; addr < m_size; addr++)
 	{
@@ -323,7 +323,7 @@ DISCRETE_RESET(dst_diode_mix)
 {
 	DISCRETE_DECLARE_INFO(double)
 
-	int		addr;
+	int     addr;
 
 	m_size = this->active_inputs() - DST_DIODE_MIX_INP_OFFSET;
 	assert(m_size <= 8);
@@ -354,9 +354,9 @@ DISCRETE_RESET(dst_diode_mix)
  * input[2]    - Divisor
  *
  ************************************************************************/
-#define DST_DIVIDE__ENABLE	DISCRETE_INPUT(0)
-#define DST_DIVIDE__IN		DISCRETE_INPUT(1)
-#define DST_DIVIDE__DIV		DISCRETE_INPUT(2)
+#define DST_DIVIDE__ENABLE  DISCRETE_INPUT(0)
+#define DST_DIVIDE__IN      DISCRETE_INPUT(1)
+#define DST_DIVIDE__DIV     DISCRETE_INPUT(2)
 
 DISCRETE_STEP(dst_divide)
 {
@@ -364,12 +364,12 @@ DISCRETE_STEP(dst_divide)
 	{
 		if(DST_DIVIDE__DIV == 0)
 		{
-			set_output(0, DBL_MAX);	/* Max out but don't break */
+			set_output(0, DBL_MAX); /* Max out but don't break */
 			m_device->discrete_log("dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",this->index());
 		}
 		else
 		{
-			 set_output(0, DST_DIVIDE__IN / DST_DIVIDE__DIV);
+				set_output(0, DST_DIVIDE__IN / DST_DIVIDE__DIV);
 		}
 	}
 	else
@@ -388,9 +388,9 @@ DISCRETE_STEP(dst_divide)
  * input[2]    - Final addition offset
  *
  ************************************************************************/
-#define DST_GAIN__IN		DISCRETE_INPUT(0)
-#define DST_GAIN__GAIN		DISCRETE_INPUT(1)
-#define DST_GAIN__OFFSET	DISCRETE_INPUT(2)
+#define DST_GAIN__IN        DISCRETE_INPUT(0)
+#define DST_GAIN__GAIN      DISCRETE_INPUT(1)
+#define DST_GAIN__OFFSET    DISCRETE_INPUT(2)
 
 DISCRETE_STEP(dst_gain)
 {
@@ -409,8 +409,8 @@ DISCRETE_STEP(dst_gain)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_INTEGRATE__TRG0	DISCRETE_INPUT(0)
-#define DST_INTEGRATE__TRG1	DISCRETE_INPUT(1)
+#define DST_INTEGRATE__TRG0 DISCRETE_INPUT(0)
+#define DST_INTEGRATE__TRG1 DISCRETE_INPUT(1)
 
 static int dst_trigger_function(int trig0, int trig1, int trig2, int function)
 {
@@ -450,9 +450,9 @@ DISCRETE_STEP(dst_integrate)
 {
 	DISCRETE_DECLARE_INFO(discrete_integrate_info)
 
-	int		trig0, trig1;
-	double	i_neg = 0;	/* current into - input */
-	double	i_pos = 0;	/* current into + input */
+	int     trig0, trig1;
+	double  i_neg = 0;  /* current into - input */
+	double  i_pos = 0;  /* current into + input */
 
 	switch (info->type)
 	{
@@ -460,8 +460,8 @@ DISCRETE_STEP(dst_integrate)
 			if (DST_INTEGRATE__TRG0 != 0)
 			{
 				/* This forces the cap to completely charge,
-                 * and the output to go to it's max value.
-                 */
+				 * and the output to go to it's max value.
+				 */
 				m_v_out = m_v_max_out;
 				set_output(0, m_v_out);
 				return;
@@ -497,7 +497,7 @@ DISCRETE_RESET(dst_integrate)
 {
 	DISCRETE_DECLARE_INFO(discrete_integrate_info)
 
-	double	i, v;
+	double  i, v;
 
 	if (info->type & DISC_OP_AMP_IS_NORTON)
 	{
@@ -509,8 +509,8 @@ DISCRETE_RESET(dst_integrate)
 	{
 		m_v_max_out =  info->vP - OP_AMP_VP_RAIL_OFFSET;
 
-		v = info->v1 * info->r3 / (info->r2 + info->r3);	/* vRef */
-		v = info->v1 - v;	/* actual charging voltage */
+		v = info->v1 * info->r3 / (info->r2 + info->r3);    /* vRef */
+		v = info->v1 - v;   /* actual charging voltage */
 		i = v / info->r1;
 		m_change = i / this->sample_rate() / info->c;
 	}
@@ -527,7 +527,7 @@ DISCRETE_RESET(dst_integrate)
  * input[1]    - input[0] value
  *
  ************************************************************************/
-#define DST_LOGIC_INV__IN		DISCRETE_INPUT(0)
+#define DST_LOGIC_INV__IN       DISCRETE_INPUT(0)
 
 DISCRETE_STEP(dst_logic_inv)
 {
@@ -539,10 +539,10 @@ DISCRETE_STEP(dst_logic_inv)
  * DST_BITS_DECODE - Decode Bits from input node
  *
  ************************************************************************/
-#define DST_BITS_DECODE__IN		DISCRETE_INPUT(0)
-#define DST_BITS_DECODE__FROM	DISCRETE_INPUT(1)
-#define DST_BITS_DECODE__TO		DISCRETE_INPUT(2)
-#define DST_BITS_DECODE__VOUT	DISCRETE_INPUT(3)
+#define DST_BITS_DECODE__IN     DISCRETE_INPUT(0)
+#define DST_BITS_DECODE__FROM   DISCRETE_INPUT(1)
+#define DST_BITS_DECODE__TO     DISCRETE_INPUT(2)
+#define DST_BITS_DECODE__VOUT   DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_bits_decode)
 {
@@ -626,10 +626,10 @@ DISCRETE_RESET(dst_bits_decode)
  * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_AND__IN0		DISCRETE_INPUT(0)
-#define DST_LOGIC_AND__IN1		DISCRETE_INPUT(1)
-#define DST_LOGIC_AND__IN2		DISCRETE_INPUT(2)
-#define DST_LOGIC_AND__IN3		DISCRETE_INPUT(3)
+#define DST_LOGIC_AND__IN0      DISCRETE_INPUT(0)
+#define DST_LOGIC_AND__IN1      DISCRETE_INPUT(1)
+#define DST_LOGIC_AND__IN2      DISCRETE_INPUT(2)
+#define DST_LOGIC_AND__IN3      DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_logic_and)
 {
@@ -646,10 +646,10 @@ DISCRETE_STEP(dst_logic_and)
  * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NAND__IN0		DISCRETE_INPUT(0)
-#define DST_LOGIC_NAND__IN1		DISCRETE_INPUT(1)
-#define DST_LOGIC_NAND__IN2		DISCRETE_INPUT(2)
-#define DST_LOGIC_NAND__IN3		DISCRETE_INPUT(3)
+#define DST_LOGIC_NAND__IN0     DISCRETE_INPUT(0)
+#define DST_LOGIC_NAND__IN1     DISCRETE_INPUT(1)
+#define DST_LOGIC_NAND__IN2     DISCRETE_INPUT(2)
+#define DST_LOGIC_NAND__IN3     DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_logic_nand)
 {
@@ -666,10 +666,10 @@ DISCRETE_STEP(dst_logic_nand)
  * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_OR__IN0		DISCRETE_INPUT(0)
-#define DST_LOGIC_OR__IN1		DISCRETE_INPUT(1)
-#define DST_LOGIC_OR__IN2		DISCRETE_INPUT(2)
-#define DST_LOGIC_OR__IN3		DISCRETE_INPUT(3)
+#define DST_LOGIC_OR__IN0       DISCRETE_INPUT(0)
+#define DST_LOGIC_OR__IN1       DISCRETE_INPUT(1)
+#define DST_LOGIC_OR__IN2       DISCRETE_INPUT(2)
+#define DST_LOGIC_OR__IN3       DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_logic_or)
 {
@@ -686,10 +686,10 @@ DISCRETE_STEP(dst_logic_or)
  * input[3]    - input[3] value
  *
  ************************************************************************/
-#define DST_LOGIC_NOR__IN0		DISCRETE_INPUT(0)
-#define DST_LOGIC_NOR__IN1		DISCRETE_INPUT(1)
-#define DST_LOGIC_NOR__IN2		DISCRETE_INPUT(2)
-#define DST_LOGIC_NOR__IN3		DISCRETE_INPUT(3)
+#define DST_LOGIC_NOR__IN0      DISCRETE_INPUT(0)
+#define DST_LOGIC_NOR__IN1      DISCRETE_INPUT(1)
+#define DST_LOGIC_NOR__IN2      DISCRETE_INPUT(2)
+#define DST_LOGIC_NOR__IN3      DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_logic_nor)
 {
@@ -704,8 +704,8 @@ DISCRETE_STEP(dst_logic_nor)
  * input[1]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XOR__IN0		DISCRETE_INPUT(0)
-#define DST_LOGIC_XOR__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_XOR__IN0      DISCRETE_INPUT(0)
+#define DST_LOGIC_XOR__IN1      DISCRETE_INPUT(1)
 
 DISCRETE_STEP(dst_logic_xor)
 {
@@ -720,8 +720,8 @@ DISCRETE_STEP(dst_logic_xor)
  * input[1]    - input[1] value
  *
  ************************************************************************/
-#define DST_LOGIC_XNOR__IN0		DISCRETE_INPUT(0)
-#define DST_LOGIC_XNOR__IN1		DISCRETE_INPUT(1)
+#define DST_LOGIC_XNOR__IN0     DISCRETE_INPUT(0)
+#define DST_LOGIC_XNOR__IN1     DISCRETE_INPUT(1)
 
 DISCRETE_STEP(dst_logic_nxor)
 {
@@ -739,10 +739,10 @@ DISCRETE_STEP(dst_logic_nxor)
  * input[3]    - data
  *
  ************************************************************************/
-#define DST_LOGIC_DFF__RESET	!DISCRETE_INPUT(0)
-#define DST_LOGIC_DFF__SET		!DISCRETE_INPUT(1)
-#define DST_LOGIC_DFF__CLOCK	 DISCRETE_INPUT(2)
-#define DST_LOGIC_DFF__DATA 	 DISCRETE_INPUT(3)
+#define DST_LOGIC_DFF__RESET    !DISCRETE_INPUT(0)
+#define DST_LOGIC_DFF__SET      !DISCRETE_INPUT(1)
+#define DST_LOGIC_DFF__CLOCK     DISCRETE_INPUT(2)
+#define DST_LOGIC_DFF__DATA      DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_logic_dff)
 {
@@ -752,7 +752,7 @@ DISCRETE_STEP(dst_logic_dff)
 		set_output(0,  0);
 	else if (DST_LOGIC_DFF__SET)
 		set_output(0,  1);
-	else if (!m_last_clk && clk)	/* low to high */
+	else if (!m_last_clk && clk)    /* low to high */
 		set_output(0,  DST_LOGIC_DFF__DATA);
 	m_last_clk = clk;
 }
@@ -775,11 +775,11 @@ DISCRETE_RESET(dst_logic_dff)
  * input[4]    - K
  *
  ************************************************************************/
-#define DST_LOGIC_JKFF__RESET	!DISCRETE_INPUT(0)
-#define DST_LOGIC_JKFF__SET		!DISCRETE_INPUT(1)
-#define DST_LOGIC_JKFF__CLOCK	 DISCRETE_INPUT(2)
-#define DST_LOGIC_JKFF__J		 DISCRETE_INPUT(3)
-#define DST_LOGIC_JKFF__K		 DISCRETE_INPUT(4)
+#define DST_LOGIC_JKFF__RESET   !DISCRETE_INPUT(0)
+#define DST_LOGIC_JKFF__SET     !DISCRETE_INPUT(1)
+#define DST_LOGIC_JKFF__CLOCK    DISCRETE_INPUT(2)
+#define DST_LOGIC_JKFF__J        DISCRETE_INPUT(3)
+#define DST_LOGIC_JKFF__K        DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_logic_jkff)
 {
@@ -791,7 +791,7 @@ DISCRETE_STEP(dst_logic_jkff)
 		m_v_out = 0;
 	else if (DST_LOGIC_JKFF__SET)
 		m_v_out = 1;
-	else if (m_last_clk && !clk)	/* high to low */
+	else if (m_last_clk && !clk)    /* high to low */
 	{
 		if (!j)
 		{
@@ -826,17 +826,17 @@ DISCRETE_RESET(dst_logic_jkff)
  * DST_LOGIC_SHIFT - Shift Register implementation
  *
  ************************************************************************/
-#define DST_LOGIC_SHIFT__IN			DISCRETE_INPUT(0)
-#define DST_LOGIC_SHIFT__RESET		DISCRETE_INPUT(1)
-#define DST_LOGIC_SHIFT__CLK		DISCRETE_INPUT(2)
-#define DST_LOGIC_SHIFT__SIZE		DISCRETE_INPUT(3)
-#define DST_LOGIC_SHIFT__OPTIONS	DISCRETE_INPUT(4)
+#define DST_LOGIC_SHIFT__IN         DISCRETE_INPUT(0)
+#define DST_LOGIC_SHIFT__RESET      DISCRETE_INPUT(1)
+#define DST_LOGIC_SHIFT__CLK        DISCRETE_INPUT(2)
+#define DST_LOGIC_SHIFT__SIZE       DISCRETE_INPUT(3)
+#define DST_LOGIC_SHIFT__OPTIONS    DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_logic_shift)
 {
-	double	cycles;
-	double	ds_clock;
-	int		clock = 0, inc = 0;
+	double  cycles;
+	double  ds_clock;
+	int     clock = 0, inc = 0;
 
 	int input_bit = (DST_LOGIC_SHIFT__IN != 0) ? 1 : 0;
 	ds_clock = DST_LOGIC_SHIFT__CLK;
@@ -930,14 +930,14 @@ DISCRETE_RESET(dst_logic_shift)
  *
  * Feb 2007, D Renaud.
  ************************************************************************/
-#define DST_LOOKUP_TABLE__IN		DISCRETE_INPUT(0)
-#define DST_LOOKUP_TABLE__SIZE		DISCRETE_INPUT(1)
+#define DST_LOOKUP_TABLE__IN        DISCRETE_INPUT(0)
+#define DST_LOOKUP_TABLE__SIZE      DISCRETE_INPUT(1)
 
 DISCRETE_STEP(dst_lookup_table)
 {
 	DISCRETE_DECLARE_INFO(double)
 
-	int	addr = DST_LOOKUP_TABLE__IN;
+	int addr = DST_LOOKUP_TABLE__IN;
 
 	if (addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
 		set_output(0,  0);
@@ -996,25 +996,25 @@ DISCRETE_STEP(dst_lookup_table)
  * The voltage is then modified by an inverting amp formula.
  * v = vRef + (rF/rI) * (vRef - (i * r))
  */
-#define DST_MIXER__ENABLE		DISCRETE_INPUT(0)
-#define DST_MIXER__IN(bit)		DISCRETE_INPUT(bit + 1)
+#define DST_MIXER__ENABLE       DISCRETE_INPUT(0)
+#define DST_MIXER__IN(bit)      DISCRETE_INPUT(bit + 1)
 
 DISCRETE_STEP(dst_mixer)
 {
 	DISCRETE_DECLARE_INFO(discrete_mixer_desc)
 
-	double	v, vTemp, r_total, rTemp, rTemp2 = 0;
-	double	i = 0;		/* total current of inputs */
-	int		bit, connected;
+	double  v, vTemp, r_total, rTemp, rTemp2 = 0;
+	double  i = 0;      /* total current of inputs */
+	int     bit, connected;
 
 	/* put commonly used stuff in local variables for speed */
-	int		r_node_bit_flag = m_r_node_bit_flag;
-	int		c_bit_flag = m_c_bit_flag;
-	int		bit_mask = 1;
-	int		has_rF = (info->rF != 0);
-	int		type = m_type;
-	double	v_ref = info->vRef;
-	double	rI = info->rI;
+	int     r_node_bit_flag = m_r_node_bit_flag;
+	int     c_bit_flag = m_c_bit_flag;
+	int     bit_mask = 1;
+	int     has_rF = (info->rF != 0);
+	int     type = m_type;
+	double  v_ref = info->vRef;
+	double  rI = info->rI;
 
 	if (EXPECTED(DST_MIXER__ENABLE))
 	{
@@ -1123,7 +1123,7 @@ DISCRETE_STEP(dst_mixer)
 		r_total = 1.0 / r_total;
 
 		/* If resistor network or has rI then Millman is used.
-         * If op-amp then summing formula is used. */
+		 * If op-amp then summing formula is used. */
 		v = i * ((type == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
 
 		if (UNEXPECTED(type == DISC_MIXER_IS_OP_AMP_WITH_RI))
@@ -1160,8 +1160,8 @@ DISCRETE_RESET(dst_mixer)
 {
 	DISCRETE_DECLARE_INFO(discrete_mixer_desc)
 
-	int		bit;
-	double	rTemp = 0;
+	int     bit;
+	double  rTemp = 0;
 
 	/* link to r_node outputs */
 	m_r_node_bit_flag = 0;
@@ -1181,20 +1181,20 @@ DISCRETE_RESET(dst_mixer)
 	m_size = this->active_inputs() - 1;
 
 	/*
-     * THERE IS NO ERROR CHECKING!!!!!!!!!
-     * If you pass a bad ladder table
-     * then you deserve a crash.
-     */
+	 * THERE IS NO ERROR CHECKING!!!!!!!!!
+	 * If you pass a bad ladder table
+	 * then you deserve a crash.
+	 */
 
 	m_type = info->type;
 	if ((info->type == DISC_MIXER_IS_OP_AMP) && (info->rI != 0))
 		m_type = DISC_MIXER_IS_OP_AMP_WITH_RI;
 
 	/*
-     * Calculate the total of all resistors in parallel.
-     * This is the combined resistance of the voltage sources.
-     * Also calculate the exponents while we are here.
-     */
+	 * Calculate the total of all resistors in parallel.
+	 * This is the combined resistance of the voltage sources.
+	 * Also calculate the exponents while we are here.
+	 */
 	m_r_total = 0;
 	for(bit = 0; bit < m_size; bit++)
 	{
@@ -1270,14 +1270,14 @@ DISCRETE_RESET(dst_mixer)
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_MULTIPLEX__ADDR			DISCRETE_INPUT(0)
-#define DST_MULTIPLEX__INP(addr)	DISCRETE_INPUT(1 + addr)
+#define DST_MULTIPLEX__ADDR         DISCRETE_INPUT(0)
+#define DST_MULTIPLEX__INP(addr)    DISCRETE_INPUT(1 + addr)
 
 DISCRETE_STEP(dst_multiplex)
 {
 	int addr;
 
-	addr = DST_MULTIPLEX__ADDR;	/* FP to INT */
+	addr = DST_MULTIPLEX__ADDR; /* FP to INT */
 	if ((addr >= 0) && (addr < m_size))
 	{
 		set_output(0,  DST_MULTIPLEX__INP(addr));
@@ -1309,11 +1309,11 @@ DISCRETE_RESET(dst_multiplex)
  *
  * Complete re-write Jan 2004, D Renaud.
  ************************************************************************/
-#define DST_ONESHOT__RESET	DISCRETE_INPUT(0)
-#define DST_ONESHOT__TRIG	DISCRETE_INPUT(1)
-#define DST_ONESHOT__AMP	DISCRETE_INPUT(2)
-#define DST_ONESHOT__WIDTH	DISCRETE_INPUT(3)
-#define DST_ONESHOT__TYPE	(int)DISCRETE_INPUT(4)
+#define DST_ONESHOT__RESET  DISCRETE_INPUT(0)
+#define DST_ONESHOT__TRIG   DISCRETE_INPUT(1)
+#define DST_ONESHOT__AMP    DISCRETE_INPUT(2)
+#define DST_ONESHOT__WIDTH  DISCRETE_INPUT(3)
+#define DST_ONESHOT__TYPE   (int)DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_oneshot)
 {
@@ -1397,12 +1397,12 @@ DISCRETE_RESET(dst_oneshot)
  * input[5]    - Clamp value when disabled
  *
  ************************************************************************/
-#define DST_RAMP__ENABLE	DISCRETE_INPUT(0)
-#define DST_RAMP__DIR		DISCRETE_INPUT(1)
-#define DST_RAMP__GRAD		DISCRETE_INPUT(2)
-#define DST_RAMP__START		DISCRETE_INPUT(3)
-#define DST_RAMP__END		DISCRETE_INPUT(4)
-#define DST_RAMP__CLAMP		DISCRETE_INPUT(5)
+#define DST_RAMP__ENABLE    DISCRETE_INPUT(0)
+#define DST_RAMP__DIR       DISCRETE_INPUT(1)
+#define DST_RAMP__GRAD      DISCRETE_INPUT(2)
+#define DST_RAMP__START     DISCRETE_INPUT(3)
+#define DST_RAMP__END       DISCRETE_INPUT(4)
+#define DST_RAMP__CLAMP     DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dst_ramp)
 {
@@ -1449,9 +1449,9 @@ DISCRETE_RESET(dst_ramp)
  * input[2]    - clock type
  *
  ************************************************************************/
-#define DST_SAMPHOLD__IN0		DISCRETE_INPUT(0)
-#define DST_SAMPHOLD__CLOCK		DISCRETE_INPUT(1)
-#define DST_SAMPHOLD__TYPE		DISCRETE_INPUT(2)
+#define DST_SAMPHOLD__IN0       DISCRETE_INPUT(0)
+#define DST_SAMPHOLD__CLOCK     DISCRETE_INPUT(1)
+#define DST_SAMPHOLD__TYPE      DISCRETE_INPUT(2)
 
 DISCRETE_STEP(dst_samphold)
 {
@@ -1501,10 +1501,10 @@ DISCRETE_RESET(dst_samphold)
  * input[3]    - input[1]
  *
  ************************************************************************/
-#define DST_SWITCH__ENABLE	DISCRETE_INPUT(0)
-#define DST_SWITCH__SWITCH	DISCRETE_INPUT(1)
-#define DST_SWITCH__IN0		DISCRETE_INPUT(2)
-#define DST_SWITCH__IN1		DISCRETE_INPUT(3)
+#define DST_SWITCH__ENABLE  DISCRETE_INPUT(0)
+#define DST_SWITCH__SWITCH  DISCRETE_INPUT(1)
+#define DST_SWITCH__IN0     DISCRETE_INPUT(2)
+#define DST_SWITCH__IN1     DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_switch)
 {
@@ -1527,9 +1527,9 @@ DISCRETE_STEP(dst_switch)
  * input[3]    - Threshold for enable
  *
  ************************************************************************/
-#define DST_ASWITCH__CTRL		DISCRETE_INPUT(0)
-#define DST_ASWITCH__IN			DISCRETE_INPUT(1)
-#define DST_ASWITCH__THRESHOLD	DISCRETE_INPUT(2)
+#define DST_ASWITCH__CTRL       DISCRETE_INPUT(0)
+#define DST_ASWITCH__IN         DISCRETE_INPUT(1)
+#define DST_ASWITCH__THRESHOLD  DISCRETE_INPUT(2)
 
 
 DISCRETE_STEP(dst_aswitch)
@@ -1548,7 +1548,7 @@ DISCRETE_STEP(dst_aswitch)
  * input[4]    - Channel4 input value
  *
  ************************************************************************/
-#define MAX_TRANS_STACK	16
+#define MAX_TRANS_STACK 16
 
 struct double_stack {
 public:
@@ -1573,7 +1573,7 @@ private:
 
 DISCRETE_STEP(dst_transform)
 {
-	double_stack	stack;
+	double_stack    stack;
 	double  top;
 
 	enum token *fPTR = &precomp[0];
@@ -1584,26 +1584,26 @@ DISCRETE_STEP(dst_transform)
 	{
 		switch (*fPTR++)
 		{
-			case TOK_MULT:		top = stack.pop() * top;					break;
-			case TOK_DIV:		top = stack.pop() / top;					break;
-			case TOK_ADD:		top = stack.pop() + top;					break;
-			case TOK_MINUS:		top = stack.pop() - top;					break;
-			case TOK_0:			stack.push(top); top = I_IN0();				break;
-			case TOK_1:			stack.push(top); top = I_IN1();				break;
-			case TOK_2:			stack.push(top); top = I_IN2();				break;
-			case TOK_3:			stack.push(top); top = I_IN3();				break;
-			case TOK_4:			stack.push(top); top = I_IN4();				break;
-			case TOK_DUP:		stack.push(top);							break;
-			case TOK_ABS:		top = fabs(top);							break;	/* absolute value */
-			case TOK_NEG:		top = -top;									break;	/* * -1 */
-			case TOK_NOT:		top = !top;									break;	/* Logical NOT of Last Value */
-			case TOK_EQUAL:		top = (int)stack.pop() == (int)top;			break;	/* Logical = */
-			case TOK_GREATER:	top = (stack.pop() > top);					break;	/* Logical > */
-			case TOK_LESS:		top = (stack.pop() < top);					break;	/* Logical < */
-			case TOK_AND:		top = (int)stack.pop() & (int)top;			break;	/* Bitwise AND */
-			case TOK_OR:		top = (int)stack.pop() | (int)top;			break;	/* Bitwise OR */
-			case TOK_XOR:		top = (int)stack.pop() ^ (int)top;			break;	/* Bitwise XOR */
-			case TOK_END:		break; /* please compiler */
+			case TOK_MULT:      top = stack.pop() * top;                    break;
+			case TOK_DIV:       top = stack.pop() / top;                    break;
+			case TOK_ADD:       top = stack.pop() + top;                    break;
+			case TOK_MINUS:     top = stack.pop() - top;                    break;
+			case TOK_0:         stack.push(top); top = I_IN0();             break;
+			case TOK_1:         stack.push(top); top = I_IN1();             break;
+			case TOK_2:         stack.push(top); top = I_IN2();             break;
+			case TOK_3:         stack.push(top); top = I_IN3();             break;
+			case TOK_4:         stack.push(top); top = I_IN4();             break;
+			case TOK_DUP:       stack.push(top);                            break;
+			case TOK_ABS:       top = fabs(top);                            break;  /* absolute value */
+			case TOK_NEG:       top = -top;                                 break;  /* * -1 */
+			case TOK_NOT:       top = !top;                                 break;  /* Logical NOT of Last Value */
+			case TOK_EQUAL:     top = (int)stack.pop() == (int)top;         break;  /* Logical = */
+			case TOK_GREATER:   top = (stack.pop() > top);                  break;  /* Logical > */
+			case TOK_LESS:      top = (stack.pop() < top);                  break;  /* Logical < */
+			case TOK_AND:       top = (int)stack.pop() & (int)top;          break;  /* Bitwise AND */
+			case TOK_OR:        top = (int)stack.pop() | (int)top;          break;  /* Bitwise OR */
+			case TOK_XOR:       top = (int)stack.pop() ^ (int)top;          break;  /* Bitwise XOR */
+			case TOK_END:       break; /* please compiler */
 		}
 	}
 	set_output(0,  top);
@@ -1618,25 +1618,25 @@ DISCRETE_RESET(dst_transform)
 	{
 		switch (*fPTR++)
 		{
-			case '*':	*p = TOK_MULT;		break;
-			case '/':	*p = TOK_DIV;		break;
-			case '+':	*p = TOK_ADD;		break;
-			case '-':	*p = TOK_MINUS;		break;
-			case '0':	*p = TOK_0;			break;
-			case '1':	*p = TOK_1;			break;
-			case '2':	*p = TOK_2;			break;
-			case '3':	*p = TOK_3;			break;
-			case '4':	*p = TOK_4;			break;
-			case 'P':	*p = TOK_DUP;		break;
-			case 'a':	*p = TOK_ABS;		break; /* absolute value */
-			case 'i':	*p = TOK_NEG;		break; /* * -1 */
-			case '!':	*p = TOK_NOT;		break; /* Logical NOT of Last Value */
-			case '=':	*p = TOK_EQUAL;		break; /* Logical = */
-			case '>':	*p = TOK_GREATER;	break; /* Logical > */
-			case '<':	*p = TOK_LESS;		break; /* Logical < */
-			case '&':	*p = TOK_AND;		break; /* Bitwise AND */
-			case '|':	*p = TOK_OR;		break; /* Bitwise OR */
-			case '^':	*p = TOK_XOR;		break; /* Bitwise XOR */
+			case '*':   *p = TOK_MULT;      break;
+			case '/':   *p = TOK_DIV;       break;
+			case '+':   *p = TOK_ADD;       break;
+			case '-':   *p = TOK_MINUS;     break;
+			case '0':   *p = TOK_0;         break;
+			case '1':   *p = TOK_1;         break;
+			case '2':   *p = TOK_2;         break;
+			case '3':   *p = TOK_3;         break;
+			case '4':   *p = TOK_4;         break;
+			case 'P':   *p = TOK_DUP;       break;
+			case 'a':   *p = TOK_ABS;       break; /* absolute value */
+			case 'i':   *p = TOK_NEG;       break; /* * -1 */
+			case '!':   *p = TOK_NOT;       break; /* Logical NOT of Last Value */
+			case '=':   *p = TOK_EQUAL;     break; /* Logical = */
+			case '>':   *p = TOK_GREATER;   break; /* Logical > */
+			case '<':   *p = TOK_LESS;      break; /* Logical < */
+			case '&':   *p = TOK_AND;       break; /* Bitwise AND */
+			case '|':   *p = TOK_OR;        break; /* Bitwise OR */
+			case '^':   *p = TOK_XOR;       break; /* Bitwise XOR */
 			default:
 				m_device->discrete_log("dst_transform_step - Invalid function type/variable passed: %s",(const char *)this->custom_data());
 				/* that is enough to fatalerror */
@@ -1660,9 +1660,9 @@ DISCRETE_RESET(dst_transform)
  *
  * Mar 2007, D Renaud.
  ************************************************************************/
-#define DST_OP_AMP__ENABLE	DISCRETE_INPUT(0)
-#define DST_OP_AMP__INP0	DISCRETE_INPUT(1)
-#define DST_OP_AMP__INP1	DISCRETE_INPUT(2)
+#define DST_OP_AMP__ENABLE  DISCRETE_INPUT(0)
+#define DST_OP_AMP__INP0    DISCRETE_INPUT(1)
+#define DST_OP_AMP__INP1    DISCRETE_INPUT(2)
 
 DISCRETE_STEP(dst_op_amp)
 {
@@ -1774,7 +1774,7 @@ DISCRETE_RESET(dst_op_amp)
  *
  * Mar 2007, D Renaud.
  ************************************************************************/
-#define DST_OP_AMP_1SHT__TRIGGER	DISCRETE_INPUT(0)
+#define DST_OP_AMP_1SHT__TRIGGER    DISCRETE_INPUT(0)
 
 DISCRETE_STEP(dst_op_amp_1sht)
 {
@@ -1845,24 +1845,24 @@ DISCRETE_RESET(dst_op_amp_1sht)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_TVCA_OP_AMP__TRG0	DISCRETE_INPUT(0)
-#define DST_TVCA_OP_AMP__TRG1	DISCRETE_INPUT(1)
-#define DST_TVCA_OP_AMP__TRG2	DISCRETE_INPUT(2)
-#define DST_TVCA_OP_AMP__INP0	DISCRETE_INPUT(3)
-#define DST_TVCA_OP_AMP__INP1	DISCRETE_INPUT(4)
+#define DST_TVCA_OP_AMP__TRG0   DISCRETE_INPUT(0)
+#define DST_TVCA_OP_AMP__TRG1   DISCRETE_INPUT(1)
+#define DST_TVCA_OP_AMP__TRG2   DISCRETE_INPUT(2)
+#define DST_TVCA_OP_AMP__INP0   DISCRETE_INPUT(3)
+#define DST_TVCA_OP_AMP__INP1   DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_tvca_op_amp)
 {
 	DISCRETE_DECLARE_INFO(discrete_op_amp_tvca_info)
 
-	int		trig0, trig1, trig2, f3;
-	double	i2 = 0;		/* current through r2 */
-	double	i3 = 0;		/* current through r3 */
-	double	i_neg = 0;	/* current into - input */
-	double	i_pos = 0;	/* current into + input */
-	double	i_out = 0;	/* current at output */
+	int     trig0, trig1, trig2, f3;
+	double  i2 = 0;     /* current through r2 */
+	double  i3 = 0;     /* current through r3 */
+	double  i_neg = 0;  /* current into - input */
+	double  i_pos = 0;  /* current into + input */
+	double  i_out = 0;  /* current at output */
 
-	double	v_out;
+	double  v_out;
 
 	trig0 = (int)DST_TVCA_OP_AMP__TRG0;
 	trig1 = (int)DST_TVCA_OP_AMP__TRG1;
@@ -1896,9 +1896,9 @@ DISCRETE_STEP(dst_tvca_op_amp)
 	else
 	{
 		/* F2 is at ground.  The diode blocks this so F2 and r5 are out of circuit.
-         * So now the discharge rate is dependent upon F3.
-         * If F3 is at ground then we discharge to 0V through r6.
-         * If F3 is out of circuit then we discharge to OP_AMP_NORTON_VBE through r6+r7. */
+		 * So now the discharge rate is dependent upon F3.
+		 * If F3 is at ground then we discharge to 0V through r6.
+		 * If F3 is out of circuit then we discharge to OP_AMP_NORTON_VBE through r6+r7. */
 		m_v_cap1 += ((f3 ? OP_AMP_NORTON_VBE : 0.0) - m_v_cap1) * m_exponent_d[f3];
 	}
 
@@ -1962,7 +1962,7 @@ DISCRETE_RESET(dst_tvca_op_amp)
 
 	m_v_out_max = info->vP - OP_AMP_NORTON_VBE;
 	/* This is probably overkill because R5 is usually much lower then r6 or r7,
-     * but it is better to play it safe. */
+	 * but it is better to play it safe. */
 	m_v_trig[0] = (info->v1 - 0.6) * RES_VOLTAGE_DIVIDER(info->r5, info->r6);
 	m_v_trig[1] = (info->v1 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r5, m_r67) + OP_AMP_NORTON_VBE;
 	m_i_fixed   = m_v_out_max / info->r1;
@@ -2027,15 +2027,15 @@ enum
  * If they are both 0, then the output will be X_TIME logic.
  *
  ************************************************************************/
-#define DST_XTIME_BUFFER__IN			DISCRETE_INPUT(0)
-#define DST_XTIME_BUFFER_OUT_LOW		DISCRETE_INPUT(1)
-#define DST_XTIME_BUFFER_OUT_HIGH		DISCRETE_INPUT(2)
-#define DST_XTIME_BUFFER_INVERT			DISCRETE_INPUT(3)
+#define DST_XTIME_BUFFER__IN            DISCRETE_INPUT(0)
+#define DST_XTIME_BUFFER_OUT_LOW        DISCRETE_INPUT(1)
+#define DST_XTIME_BUFFER_OUT_HIGH       DISCRETE_INPUT(2)
+#define DST_XTIME_BUFFER_INVERT         DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_xtime_buffer)
 {
-	int	in0 = (int)DST_XTIME_BUFFER__IN;
-	int	out = in0;
+	int in0 = (int)DST_XTIME_BUFFER__IN;
+	int out = in0;
 	int out_is_energy = 1;
 
 	double x_time = DST_XTIME_BUFFER__IN - in0;
@@ -2073,17 +2073,17 @@ DISCRETE_STEP(dst_xtime_buffer)
  * If they are both 0, then the output will be X_TIME logic.
  *
  ************************************************************************/
-#define DST_XTIME_AND__IN0			DISCRETE_INPUT(0)
-#define DST_XTIME_AND__IN1			DISCRETE_INPUT(1)
-#define DST_XTIME_AND_OUT_LOW		DISCRETE_INPUT(2)
-#define DST_XTIME_AND_OUT_HIGH		DISCRETE_INPUT(3)
-#define DST_XTIME_AND_INVERT		DISCRETE_INPUT(4)
+#define DST_XTIME_AND__IN0          DISCRETE_INPUT(0)
+#define DST_XTIME_AND__IN1          DISCRETE_INPUT(1)
+#define DST_XTIME_AND_OUT_LOW       DISCRETE_INPUT(2)
+#define DST_XTIME_AND_OUT_HIGH      DISCRETE_INPUT(3)
+#define DST_XTIME_AND_INVERT        DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_xtime_and)
 {
-	int	in0 = (int)DST_XTIME_AND__IN0;
-	int	in1 = (int)DST_XTIME_AND__IN1;
-	int	out = 0;
+	int in0 = (int)DST_XTIME_AND__IN0;
+	int in1 = (int)DST_XTIME_AND__IN1;
+	int out = 0;
 	int out_is_energy = 1;
 
 	double x_time = 0;
@@ -2117,52 +2117,52 @@ DISCRETE_STEP(dst_xtime_and)
 
 		case XTIME__IN0_0__IN1_1__IN0_X__IN1_NOX:
 			/*
-             * in0  1   ------
-             *      0         -------
-             *          ...^....^...
-             *
-             * in1  1   -------------
-             *      0
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in0  1   ------
+			 *      0         -------
+			 *          ...^....^...
+			 *
+			 * in1  1   -------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 			x_time = x_time0;
 			break;
 
 		case XTIME__IN0_1__IN1_0__IN0_NOX__IN1_X:
 			/*
-             * in0  1   -------------
-             *      0
-             *          ...^....^...
-             *
-             * in1  1   ------
-             *      0         -------
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in0  1   -------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * in1  1   ------
+			 *      0         -------
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 			x_time = x_time1;
 			break;
 
 		case XTIME__IN0_0__IN1_0__IN0_X__IN1_X:
 			/*
-             * in0  1   -----              -------
-             *      0        --------             ------
-             *          ...^....^...       ...^....^...
-             *
-             * in1  1   -------            -----
-             *      0          ------           --------
-             *          ...^....^...       ...^....^...
-             *
-             * out  1   -----              -----
-             *      0        -------            -------
-             *          ...^....^...       ...^....^...
-             */
+			 * in0  1   -----              -------
+			 *      0        --------             ------
+			 *          ...^....^...       ...^....^...
+			 *
+			 * in1  1   -------            -----
+			 *      0          ------           --------
+			 *          ...^....^...       ...^....^...
+			 *
+			 * out  1   -----              -----
+			 *      0        -------            -------
+			 *          ...^....^...       ...^....^...
+			 */
 			// use x_time of input that went to 0 first/longer
 			if (x_time0 >= x_time1)
 				x_time = x_time0;
@@ -2172,18 +2172,18 @@ DISCRETE_STEP(dst_xtime_and)
 
 		case XTIME__IN0_0__IN1_1__IN0_X__IN1_X:
 			/*
-             * in0  1   -------           -----
-             *      0          -----           -------
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1        -------             -----
-             *      0   -----             -------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1        --
-             *      0   -----  -----      ------------
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1   -------           -----
+			 *      0          -----           -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1        -------             -----
+			 *      0   -----             -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1        --
+			 *      0   -----  -----      ------------
+			 *          ...^....^...      ...^....^...
+			 */
 			// may have went high for a bit in this cycle
 			//if (x_time0 < x_time1)
 			//  x_time = time1 - x_time0;
@@ -2191,18 +2191,18 @@ DISCRETE_STEP(dst_xtime_and)
 
 		case XTIME__IN0_1__IN1_0__IN0_X__IN1_X:
 			/*
-             * in0  1        -------             -----
-             *      0   -----             -------
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1   -------           -----
-             *      0          -----           -------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1        --
-             *      0   -----  -----      ------------
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1        -------             -----
+			 *      0   -----             -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1   -------           -----
+			 *      0          -----           -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1        --
+			 *      0   -----  -----      ------------
+			 *          ...^....^...      ...^....^...
+			 */
 			// may have went high for a bit in this cycle
 			//if (x_time0 > x_time1)
 			//  x_time = x_time0 - x_time1;
@@ -2210,54 +2210,54 @@ DISCRETE_STEP(dst_xtime_and)
 
 		case XTIME__IN0_1__IN1_1__IN0_NOX__IN1_X:
 			/*
-             * in0  1   ------------
-             *      0
-             *          ...^....^...
-             *
-             * in1  1         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in0  1   ------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * in1  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 			out = 1;
 			x_time = x_time1;
 			break;
 
 		case XTIME__IN0_1__IN1_1__IN0_X__IN1_NOX:
 			/*
-             * in1  0         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * in1  1   ------------
-             *      0
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in1  0         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * in1  1   ------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 			out = 1;
 			x_time = x_time0;
 			break;
 
 		case XTIME__IN0_1__IN1_1__IN0_X__IN1_X:
 			/*
-             * in0  1         ------          --------
-             *      0   ------            ----
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1       --------            ------
-             *      0   ----              ------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1         ------            ------
-             *      0   ------            ------
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1         ------          --------
+			 *      0   ------            ----
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1       --------            ------
+			 *      0   ----              ------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1         ------            ------
+			 *      0   ------            ------
+			 *          ...^....^...      ...^....^...
+			 */
 			out = 1;
 			if (x_time0 < x_time1)
 				x_time = x_time0;
@@ -2293,17 +2293,17 @@ DISCRETE_STEP(dst_xtime_and)
  * If they are both 0, then the output will be X_TIME logic.
  *
  ************************************************************************/
-#define DST_XTIME_OR__IN0			DISCRETE_INPUT(0)
-#define DST_XTIME_OR__IN1			DISCRETE_INPUT(1)
-#define DST_XTIME_OR_OUT_LOW		DISCRETE_INPUT(2)
-#define DST_XTIME_OR_OUT_HIGH		DISCRETE_INPUT(3)
-#define DST_XTIME_OR_INVERT			DISCRETE_INPUT(4)
+#define DST_XTIME_OR__IN0           DISCRETE_INPUT(0)
+#define DST_XTIME_OR__IN1           DISCRETE_INPUT(1)
+#define DST_XTIME_OR_OUT_LOW        DISCRETE_INPUT(2)
+#define DST_XTIME_OR_OUT_HIGH       DISCRETE_INPUT(3)
+#define DST_XTIME_OR_INVERT         DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_xtime_or)
 {
-	int	in0 = (int)DST_XTIME_OR__IN0;
-	int	in1 = (int)DST_XTIME_OR__IN1;
-	int	out = 1;
+	int in0 = (int)DST_XTIME_OR__IN0;
+	int in1 = (int)DST_XTIME_OR__IN1;
+	int out = 1;
 	int out_is_energy = 1;
 
 	double x_time = 0;
@@ -2337,54 +2337,54 @@ DISCRETE_STEP(dst_xtime_or)
 
 		case XTIME__IN0_0__IN1_0__IN0_NOX__IN1_X:
 			/*
-             * in0  1
-             *      0   -------------
-             *          ...^....^...
-             *
-             * in1  1   ------
-             *      0         -------
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in0  1
+			 *      0   -------------
+			 *          ...^....^...
+			 *
+			 * in1  1   ------
+			 *      0         -------
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 			out = 0;
 			x_time = x_time1;
 			break;
 
 		case XTIME__IN0_0__IN1_0__IN0_X__IN1_NOX:
 			/*
-             * in0  1   ------
-             *      0         -------
-             *          ...^....^...
-             *
-             * in1  1
-             *      0   -------------
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in0  1   ------
+			 *      0         -------
+			 *          ...^....^...
+			 *
+			 * in1  1
+			 *      0   -------------
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 			out = 0;
 			x_time = x_time0;
 			break;
 
 		case XTIME__IN0_0__IN1_0__IN0_X__IN1_X:
 			/*
-             * in0  1   -----              -------
-             *      0        --------             ------
-             *          ...^....^...       ...^....^...
-             *
-             * in1  1   -------            -----
-             *      0          ------           --------
-             *          ...^....^...       ...^....^...
-             *
-             * out  1   -------            -------
-             *      0          -----              -----
-             *          ...^....^...       ...^....^...
-             */
+			 * in0  1   -----              -------
+			 *      0        --------             ------
+			 *          ...^....^...       ...^....^...
+			 *
+			 * in1  1   -------            -----
+			 *      0          ------           --------
+			 *          ...^....^...       ...^....^...
+			 *
+			 * out  1   -------            -------
+			 *      0          -----              -----
+			 *          ...^....^...       ...^....^...
+			 */
 			out = 0;
 			// use x_time of input that was 1 last/longer
 			// this means at 0 for less x_time
@@ -2396,94 +2396,94 @@ DISCRETE_STEP(dst_xtime_or)
 
 		case XTIME__IN0_0__IN1_1__IN0_NOX__IN1_X:
 			/*
-             * in0  1
-             *      0   ------------
-             *          ...^....^...
-             *
-             * in1  1         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in0  1
+			 *      0   ------------
+			 *          ...^....^...
+			 *
+			 * in1  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 			x_time = x_time1;
 			break;
 
 		case XTIME__IN0_1__IN1_0__IN0_X__IN1_NOX:
 			/*
-             * in0  1         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * in1  1
-             *      0   ------------
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in0  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * in1  1
+			 *      0   ------------
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 			x_time = x_time0;
 			break;
 
 		case XTIME__IN0_0__IN1_1__IN0_X__IN1_X:
 			/*
-             * in0  1   -------           -----
-             *      0          -----           -------
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1        -------             -----
-             *      0   -----             -------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1   ------------      -----  -----
-             *      0                          --
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1   -------           -----
+			 *      0          -----           -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1        -------             -----
+			 *      0   -----             -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1   ------------      -----  -----
+			 *      0                          --
+			 *          ...^....^...      ...^....^...
+			 */
 			// if (x_time0 > x_time1)
 				/* Not sure if it is better to use 1
-                 * or the total energy which would smear the switch points together.
-                 * Let's try just using 1 */
+				 * or the total energy which would smear the switch points together.
+				 * Let's try just using 1 */
 				//x_time = xtime_0 - xtime_1;
 			break;
 
 		case XTIME__IN0_1__IN1_0__IN0_X__IN1_X:
 			/*
-             * in0  1        -------             -----
-             *      0   -----             -------
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1   -------           -----
-             *      0          -----           -------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1   ------------      -----  -----
-             *      0                          --
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1        -------             -----
+			 *      0   -----             -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1   -------           -----
+			 *      0          -----           -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1   ------------      -----  -----
+			 *      0                          --
+			 *          ...^....^...      ...^....^...
+			 */
 			//if (x_time0 < x_time1)
 				/* Not sure if it is better to use 1
-                 * or the total energy which would smear the switch points together.
-                 * Let's try just using 1 */
+				 * or the total energy which would smear the switch points together.
+				 * Let's try just using 1 */
 				//x_time = xtime_1 - xtime_0;
 			break;
 
 		case XTIME__IN0_1__IN1_1__IN0_X__IN1_X:
 			/*
-             * in0  1         ------          --------
-             *      0   ------            ----
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1       --------            ------
-             *      0   ----              ------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1       --------          --------
-             *      0   ----              ----
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1         ------          --------
+			 *      0   ------            ----
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1       --------            ------
+			 *      0   ----              ------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1       --------          --------
+			 *      0   ----              ----
+			 *          ...^....^...      ...^....^...
+			 */
 			if (x_time0 > x_time1)
 				x_time = x_time0;
 			else
@@ -2518,17 +2518,17 @@ DISCRETE_STEP(dst_xtime_or)
  * If they are both 0, then the output will be X_TIME logic.
  *
  ************************************************************************/
-#define DST_XTIME_XOR__IN0			DISCRETE_INPUT(0)
-#define DST_XTIME_XOR__IN1			DISCRETE_INPUT(1)
-#define DST_XTIME_XOR_OUT_LOW		DISCRETE_INPUT(2)
-#define DST_XTIME_XOR_OUT_HIGH		DISCRETE_INPUT(3)
-#define DST_XTIME_XOR_INVERT		DISCRETE_INPUT(4)
+#define DST_XTIME_XOR__IN0          DISCRETE_INPUT(0)
+#define DST_XTIME_XOR__IN1          DISCRETE_INPUT(1)
+#define DST_XTIME_XOR_OUT_LOW       DISCRETE_INPUT(2)
+#define DST_XTIME_XOR_OUT_HIGH      DISCRETE_INPUT(3)
+#define DST_XTIME_XOR_INVERT        DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dst_xtime_xor)
 {
-	int	in0 = (int)DST_XTIME_XOR__IN0;
-	int	in1 = (int)DST_XTIME_XOR__IN1;
-	int	out = 1;
+	int in0 = (int)DST_XTIME_XOR__IN0;
+	int in1 = (int)DST_XTIME_XOR__IN1;
+	int out = 1;
 	int out_is_energy = 1;
 
 	double x_time = 0;
@@ -2558,196 +2558,196 @@ DISCRETE_STEP(dst_xtime_xor)
 
 		case XTIME__IN0_1__IN1_0__IN0_X__IN1_NOX:
 			/*
-             * in0  1         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * in1  1
-             *      0   ------------
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in0  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * in1  1
+			 *      0   ------------
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 		case XTIME__IN0_0__IN1_1__IN0_X__IN1_NOX:
 			/*
-             * in0  1   ------
-             *      0         -------
-             *          ...^....^...
-             *
-             * in1  1   -------------
-             *      0
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in0  1   ------
+			 *      0         -------
+			 *          ...^....^...
+			 *
+			 * in1  1   -------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 			x_time = x_time0;
 			break;
 
 		case XTIME__IN0_0__IN1_1__IN0_NOX__IN1_X:
 			/*
-             * in0  1
-             *      0   ------------
-             *          ...^....^...
-             *
-             * in1  1         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in0  1
+			 *      0   ------------
+			 *          ...^....^...
+			 *
+			 * in1  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 		case XTIME__IN0_1__IN1_0__IN0_NOX__IN1_X:
 			/*
-             * in0  1   -------------
-             *      0
-             *          ...^....^...
-             *
-             * in1  1   ------
-             *      0         -------
-             *          ...^....^...
-             *
-             * out  1         ------
-             *      0   ------
-             *          ...^....^...
-             */
+			 * in0  1   -------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * in1  1   ------
+			 *      0         -------
+			 *          ...^....^...
+			 *
+			 * out  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 */
 			x_time = x_time1;
 			break;
 
 		case XTIME__IN0_0__IN1_0__IN0_X__IN1_NOX:
 			/*
-             * in0  1   ------
-             *      0         ------
-             *          ...^....^...
-             *
-             * in1  1
-             *      0   ------------
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in0  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 *
+			 * in1  1
+			 *      0   ------------
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 		case XTIME__IN0_1__IN1_1__IN0_X__IN1_NOX:
 			/*
-             * in1  0         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * in1  1   ------------
-             *      0
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in1  0         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * in1  1   ------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 			out = 0;
 			x_time = x_time0;
 			break;
 
 		case XTIME__IN0_0__IN1_0__IN0_NOX__IN1_X:
 			/*
-             * in0  1
-             *      0   ------------
-             *          ...^....^...
-             *
-             * in1  1   ------
-             *      0         ------
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in0  1
+			 *      0   ------------
+			 *          ...^....^...
+			 *
+			 * in1  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 		case XTIME__IN0_1__IN1_1__IN0_NOX__IN1_X:
 			/*
-             * in0  1   ------------
-             *      0
-             *          ...^....^...
-             *
-             * in1  1         ------
-             *      0   ------
-             *          ...^....^...
-             *
-             * out  1   ------
-             *      0         ------
-             *          ...^....^...
-             */
+			 * in0  1   ------------
+			 *      0
+			 *          ...^....^...
+			 *
+			 * in1  1         ------
+			 *      0   ------
+			 *          ...^....^...
+			 *
+			 * out  1   ------
+			 *      0         ------
+			 *          ...^....^...
+			 */
 			out = 0;
 			x_time = x_time1;
 			break;
 
 		case XTIME__IN0_0__IN1_0__IN0_X__IN1_X:
 			/*
-             * in0  1   -----              -------
-             *      0        -------              -----
-             *          ...^....^...       ...^....^...
-             *
-             * in1  1   -------            -----
-             *      0          -----            -------
-             *          ...^....^...       ...^....^...
-             *
-             * out  1        --                 --
-             *      0   -----  -----       -----  -----
-             *          ...^....^...       ...^....^...
-             */
+			 * in0  1   -----              -------
+			 *      0        -------              -----
+			 *          ...^....^...       ...^....^...
+			 *
+			 * in1  1   -------            -----
+			 *      0          -----            -------
+			 *          ...^....^...       ...^....^...
+			 *
+			 * out  1        --                 --
+			 *      0   -----  -----       -----  -----
+			 *          ...^....^...       ...^....^...
+			 */
 		case XTIME__IN0_1__IN1_1__IN0_X__IN1_X:
 			/*
-             * in0  1         ------          --------
-             *      0   ------            ----
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1       --------            ------
-             *      0   ----              ------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1       --                --
-             *      0   ----  ------      ----  ------
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1         ------          --------
+			 *      0   ------            ----
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1       --------            ------
+			 *      0   ----              ------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1       --                --
+			 *      0   ----  ------      ----  ------
+			 *          ...^....^...      ...^....^...
+			 */
 			out = 0;
 			/* Not sure if it is better to use 0
-             * or the total energy which would smear the switch points together.
-             * Let's try just using 0 */
+			 * or the total energy which would smear the switch points together.
+			 * Let's try just using 0 */
 			// x_time = abs(x_time0 - x_time1);
 			break;
 
 		case XTIME__IN0_0__IN1_1__IN0_X__IN1_X:
 			/*
-             * in0  1   -------           -----
-             *      0          -----           -------
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1        -------             -----
-             *      0   -----             -------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1   -----  -----      -----  -----
-             *      0        --                --
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1   -------           -----
+			 *      0          -----           -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1        -------             -----
+			 *      0   -----             -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1   -----  -----      -----  -----
+			 *      0        --                --
+			 *          ...^....^...      ...^....^...
+			 */
 		case XTIME__IN0_1__IN1_0__IN0_X__IN1_X:
 			/*
-             * in0  1        -------             -----
-             *      0   -----             -------
-             *          ...^....^...      ...^....^...
-             *
-             * in1  1   -------           -----
-             *      0          -----           -------
-             *          ...^....^...      ...^....^...
-             *
-             * out  1   -----  -----      -----  -----
-             *      0        --                --
-             *          ...^....^...      ...^....^...
-             */
+			 * in0  1        -------             -----
+			 *      0   -----             -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * in1  1   -------           -----
+			 *      0          -----           -------
+			 *          ...^....^...      ...^....^...
+			 *
+			 * out  1   -----  -----      -----  -----
+			 *      0        --                --
+			 *          ...^....^...      ...^....^...
+			 */
 			/* Not sure if it is better to use 1
-             * or the total energy which would smear the switch points together.
-             * Let's try just using 1 */
+			 * or the total energy which would smear the switch points together.
+			 * Let's try just using 1 */
 			// x_time = 1.0 - abs(x_time0 - x_time1);
 			break;
 }

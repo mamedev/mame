@@ -38,7 +38,7 @@ PALETTE_INIT_MEMBER(trackfld_state,trackfld)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 1000, 0,
 			3, &resistances_rg[0], gweights, 1000, 0,
 			2, &resistances_b[0],  bweights, 1000, 0);
@@ -258,4 +258,3 @@ UINT32 trackfld_state::screen_update_trackfld(screen_device &screen, bitmap_ind1
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
-

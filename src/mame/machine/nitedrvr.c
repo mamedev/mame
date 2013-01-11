@@ -100,18 +100,18 @@ READ8_MEMBER(nitedrvr_state::nitedrvr_in0_r)
 {
 	int gear = ioport("GEARS")->read();
 
-	if (gear & 0x10)				m_gear = 1;
-	else if (gear & 0x20)			m_gear = 2;
-	else if (gear & 0x40)			m_gear = 3;
-	else if (gear & 0x80)			m_gear = 4;
+	if (gear & 0x10)                m_gear = 1;
+	else if (gear & 0x20)           m_gear = 2;
+	else if (gear & 0x40)           m_gear = 3;
+	else if (gear & 0x80)           m_gear = 4;
 
 	switch (offset & 0x03)
 	{
-		case 0x00:						/* No remapping necessary */
+		case 0x00:                      /* No remapping necessary */
 			return ioport("DSW0")->read();
-		case 0x01:						/* No remapping necessary */
+		case 0x01:                      /* No remapping necessary */
 			return ioport("DSW1")->read();
-		case 0x02:						/* Remap our gear shift */
+		case 0x02:                      /* Remap our gear shift */
 			if (m_gear == 1)
 				return 0xe0;
 			else if (m_gear == 2)
@@ -120,7 +120,7 @@ READ8_MEMBER(nitedrvr_state::nitedrvr_in0_r)
 				return 0xb0;
 			else
 				return 0x70;
-		case 0x03:						/* Remap our steering */
+		case 0x03:                      /* Remap our steering */
 			return (ioport("DSW2")->read() | nitedrvr_steering(machine()));
 		default:
 			return 0xff;
@@ -165,9 +165,9 @@ READ8_MEMBER(nitedrvr_state::nitedrvr_in1_r)
 
 	m_ac_line = (m_ac_line + 1) % 3;
 
-	if (port & 0x10)				m_track = 0;
-	else if (port & 0x20)			m_track = 1;
-	else if (port & 0x40)			m_track = 2;
+	if (port & 0x10)                m_track = 0;
+	else if (port & 0x20)           m_track = 1;
+	else if (port & 0x40)           m_track = 2;
 
 	switch (offset & 0x07)
 	{
@@ -209,9 +209,9 @@ D5 = SKID2
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_out0_w)
 {
 
-	discrete_sound_w(m_discrete, space, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
-	discrete_sound_w(m_discrete, space, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
-	discrete_sound_w(m_discrete, space, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
+	discrete_sound_w(m_discrete, space, NITEDRVR_MOTOR_DATA, data & 0x0f);  // Motor freq data
+	discrete_sound_w(m_discrete, space, NITEDRVR_SKID1_EN, data & 0x10);    // Skid1 enable
+	discrete_sound_w(m_discrete, space, NITEDRVR_SKID2_EN, data & 0x20);    // Skid2 enable
 }
 
 /***************************************************************************
@@ -232,8 +232,8 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 
 	m_crash_en = data & 0x01;
 
-	discrete_sound_w(m_discrete, space, NITEDRVR_CRASH_EN, m_crash_en);	// Crash enable
-	discrete_sound_w(m_discrete, space, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
+	discrete_sound_w(m_discrete, space, NITEDRVR_CRASH_EN, m_crash_en); // Crash enable
+	discrete_sound_w(m_discrete, space, NITEDRVR_ATTRACT_EN, data & 0x02);      // Attract enable (sound disable)
 
 	if (!m_crash_en)
 	{
@@ -244,7 +244,7 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 		palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
 		palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 	}
-	discrete_sound_w(m_discrete, space, NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);	// Crash Volume
+	discrete_sound_w(m_discrete, space, NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);    // Crash Volume
 }
 
 
@@ -254,9 +254,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 	{
 		m_crash_data--;
 		address_space &space = machine().driver_data()->generic_space();
-		discrete_sound_w(m_discrete, space, NITEDRVR_BANG_DATA, m_crash_data);	// Crash Volume
+		discrete_sound_w(m_discrete, space, NITEDRVR_BANG_DATA, m_crash_data);  // Crash Volume
 		if (!m_crash_data)
-			m_crash_data_en = 0;	// Done counting?
+			m_crash_data_en = 0;    // Done counting?
 
 		if (m_crash_data & 0x01)
 		{

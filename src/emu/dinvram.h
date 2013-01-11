@@ -78,4 +78,4 @@ protected:
 typedef device_interface_iterator<device_nvram_interface> nvram_interface_iterator;
 
 
-#endif	/* __DINVRAM_H__ */
+#endif  /* __DINVRAM_H__ */

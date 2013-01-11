@@ -142,13 +142,13 @@
 #include "jagblit.h"
 
 
-#define ENABLE_BORDERS		0
+#define ENABLE_BORDERS      0
 
-#define LOG_BLITS			0
-#define LOG_BAD_BLITS		0
-#define LOG_BLITTER_STATS	0
-#define LOG_BLITTER_WRITE	0
-#define LOG_UNHANDLED_BLITS	0
+#define LOG_BLITS           0
+#define LOG_BAD_BLITS       0
+#define LOG_BLITTER_STATS   0
+#define LOG_BLITTER_WRITE   0
+#define LOG_UNHANDLED_BLITS 0
 
 
 // FIXME: this should be 1, but then MAME performance will be s*** with this
@@ -169,17 +169,17 @@ const int PIT_MULT_DBG_HACK = 64;
 /* GPU registers */
 enum
 {
-	MEMCON1,	MEMCON2,	HC,			VC,
-	LPH,		LPV,		GPU0,		GPU1,
-	OB_HH,		OB_HL,		OB_LH,		OB_LL,
-	GPU2,		GPU3,		GPU4,		GPU5,
-	OLP_L,		OLP_H,		GPU6,		OBF,
-	VMODE,		BORD1,		BORD2,		HP,
-	HBB,		HBE,		HSYNC,		HVS,
-	HDB1,		HDB2,		HDE,		VP,
-	VBB,		VBE,		VS,			VDB,
-	VDE,		VEB,		VEE,		VI,
-	PIT0,		PIT1,		HEQ,		GPU7,
+	MEMCON1,    MEMCON2,    HC,         VC,
+	LPH,        LPV,        GPU0,       GPU1,
+	OB_HH,      OB_HL,      OB_LH,      OB_LL,
+	GPU2,       GPU3,       GPU4,       GPU5,
+	OLP_L,      OLP_H,      GPU6,       OBF,
+	VMODE,      BORD1,      BORD2,      HP,
+	HBB,        HBE,        HSYNC,      HVS,
+	HDB1,       HDB2,       HDE,        VP,
+	VBB,        VBE,        VS,         VDB,
+	VDE,        VEB,        VEE,        VI,
+	PIT0,       PIT1,       HEQ,        GPU7,
 	BG,
 	INT1 = 0xe0/2,
 	INT2,
@@ -305,9 +305,9 @@ void jaguar_state::set_palette(UINT16 vmode)
 {
 	static const UINT8 red_lookup[256] =
 	{
-		  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
-		 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
+			0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+			34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
+			68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
 		102,102,102,102,102,102,102,102,102,102,102, 95, 71, 47, 23,  0,
 		135,135,135,135,135,135,135,135,135,135,130,104, 78, 52, 26,  0,
 		169,169,169,169,169,169,169,169,169,170,141,113, 85, 56, 28,  0,
@@ -325,22 +325,22 @@ void jaguar_state::set_palette(UINT16 vmode)
 
 	static const UINT8 grn_lookup[256] =
 	{
-		  0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255,
-		  0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
-		  0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
-		  0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
-		  0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
-		  0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
-		  0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
-		  0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
-		  0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
-		  0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
-		  0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
-		  0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
-		  0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
-		  0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
-		  0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
-		  0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255
+			0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255,
+			0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
+			0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
+			0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
+			0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
+			0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
+			0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
+			0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
+			0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
+			0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
+			0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
+			0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
+			0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
+			0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
+			0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
+			0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255
 	};
 
 	static const UINT8 blu_lookup[256] =
@@ -358,9 +358,9 @@ void jaguar_state::set_palette(UINT16 vmode)
 		169,169,169,169,169,169,169,169,169,170,141,113, 85, 56, 28,  0,
 		135,135,135,135,135,135,135,135,135,135,130,104, 78, 52, 26,  0,
 		102,102,102,102,102,102,102,102,102,102,102, 95, 71, 47, 23,  0,
-		 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
-		 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
-		  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+			68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
+			34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
+			0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 	};
 
 	int i;
@@ -535,7 +535,7 @@ READ32_MEMBER( jaguar_state::blitter_r )
 {
 	switch (offset)
 	{
-		case B_CMD:	/* B_CMD */
+		case B_CMD: /* B_CMD */
 			return m_blitter_status & 3;
 
 		default:
@@ -630,7 +630,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 					set_palette(m_gpu_regs[VMODE]);
 				break;
 
-			case OBF:	/* clear GPU interrupt */
+			case OBF:   /* clear GPU interrupt */
 				m_cpu_irq_state &= 0xfd;
 				update_cpu_irq();
 				break;
@@ -769,7 +769,7 @@ void jaguar_state::scanline_update(int param)
 		process_object_list(vc, scanline);
 
 		/* copy the data to the target, clipping */
-		if ((m_gpu_regs[VMODE] & 0x106) == 0x002)	/* RGB24 */
+		if ((m_gpu_regs[VMODE] & 0x106) == 0x002)   /* RGB24 */
 		{
 			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x+=2)
 				for (y = 0; y < pixel_width; y++)
@@ -872,10 +872,10 @@ UINT32 jaguar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
  *************************************/
 
 /* generic blitters */
-#define FUNCNAME	generic_blitter
-#define COMMAND		command
-#define A1FIXED		a1flags
-#define A2FIXED		a2flags
+#define FUNCNAME    generic_blitter
+#define COMMAND     command
+#define A1FIXED     a1flags
+#define A2FIXED     a2flags
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
@@ -883,50 +883,50 @@ UINT32 jaguar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 #undef FUNCNAME
 
 /* optimized common blitters */
-#define FUNCNAME	blitter_09800001_010020_010020
-#define COMMAND		0x09800001
-#define A1FIXED		0x010020
-#define A2FIXED		0x010020
+#define FUNCNAME    blitter_09800001_010020_010020
+#define COMMAND     0x09800001
+#define A1FIXED     0x010020
+#define A2FIXED     0x010020
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
 #undef COMMAND
 #undef FUNCNAME
 
-#define FUNCNAME	blitter_09800009_000020_000020
-#define COMMAND		0x09800009
-#define A1FIXED		0x000020
-#define A2FIXED		0x000020
+#define FUNCNAME    blitter_09800009_000020_000020
+#define COMMAND     0x09800009
+#define A1FIXED     0x000020
+#define A2FIXED     0x000020
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
 #undef COMMAND
 #undef FUNCNAME
 
-#define FUNCNAME	blitter_01800009_000028_000028
-#define COMMAND		0x01800009
-#define A1FIXED		0x000028
-#define A2FIXED		0x000028
+#define FUNCNAME    blitter_01800009_000028_000028
+#define COMMAND     0x01800009
+#define A1FIXED     0x000028
+#define A2FIXED     0x000028
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
 #undef COMMAND
 #undef FUNCNAME
 
-#define FUNCNAME	blitter_01800001_000018_000018
-#define COMMAND		0x01800001
-#define A1FIXED		0x000018
-#define A2FIXED		0x000018
+#define FUNCNAME    blitter_01800001_000018_000018
+#define COMMAND     0x01800001
+#define A1FIXED     0x000018
+#define A2FIXED     0x000018
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
 #undef COMMAND
 #undef FUNCNAME
 
-#define FUNCNAME	blitter_01c00001_000018_000018
-#define COMMAND		0x01c00001
-#define A1FIXED		0x000018
-#define A2FIXED		0x000018
+#define FUNCNAME    blitter_01c00001_000018_000018
+#define COMMAND     0x01c00001
+#define A1FIXED     0x000018
+#define A2FIXED     0x000018
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
@@ -934,33 +934,32 @@ UINT32 jaguar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 #undef FUNCNAME
 
 
-#define FUNCNAME	blitter_00010000_xxxxxx_xxxxxx
-#define COMMAND		0x00010000
-#define A1FIXED		a1flags
-#define A2FIXED		a2flags
+#define FUNCNAME    blitter_00010000_xxxxxx_xxxxxx
+#define COMMAND     0x00010000
+#define A1FIXED     a1flags
+#define A2FIXED     a2flags
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
 #undef COMMAND
 #undef FUNCNAME
 
-#define FUNCNAME	blitter_01800001_xxxxxx_xxxxxx
-#define COMMAND		0x01800001
-#define A1FIXED		a1flags
-#define A2FIXED		a2flags
+#define FUNCNAME    blitter_01800001_xxxxxx_xxxxxx
+#define COMMAND     0x01800001
+#define A1FIXED     a1flags
+#define A2FIXED     a2flags
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
 #undef COMMAND
 #undef FUNCNAME
 
-#define FUNCNAME	blitter_x1800x01_xxxxxx_xxxxxx
-#define COMMAND		((command & 0xf0000f00) | 0x01800001)
-#define A1FIXED		a1flags
-#define A2FIXED		a2flags
+#define FUNCNAME    blitter_x1800x01_xxxxxx_xxxxxx
+#define COMMAND     ((command & 0xf0000f00) | 0x01800001)
+#define A1FIXED     a1flags
+#define A2FIXED     a2flags
 #include "jagblit.c"
 #undef A2FIXED
 #undef A1FIXED
 #undef COMMAND
 #undef FUNCNAME
-

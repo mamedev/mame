@@ -52,7 +52,7 @@ device_abcbus_card_interface::~device_abcbus_card_interface()
 //-------------------------------------------------
 
 abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ABCBUS_SLOT, "ABC bus slot", tag, owner, clock),
+		device_t(mconfig, ABCBUS_SLOT, "ABC bus slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -76,10 +76,10 @@ void abcbus_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-    	memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
-    	memset(&m_out_resin_cb, 0, sizeof(m_out_resin_cb));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
+		memset(&m_out_resin_cb, 0, sizeof(m_out_resin_cb));
 	}
 }
 

@@ -11,8 +11,8 @@
  * along with proper mixing and volume control
  */
 
-#define BLOCKADE_NOTE_DATA		NODE_01
-#define BLOCKADE_NOTE   		NODE_02
+#define BLOCKADE_NOTE_DATA      NODE_01
+#define BLOCKADE_NOTE           NODE_02
 
 DISCRETE_SOUND_START(blockade)
 	DISCRETE_INPUT_DATA  (BLOCKADE_NOTE_DATA)
@@ -65,6 +65,6 @@ static const char *const blockade_sample_names[] =
 
 const samples_interface blockade_samples_interface =
 {
-	1,	/* 1 channel */
+	1,  /* 1 channel */
 	blockade_sample_names
 };

@@ -59,11 +59,11 @@ WCHAR *wstring_from_utf8(const char *s);
 char *utf8_from_wstring(const WCHAR *s);
 
 #ifdef UNICODE
-#define tstring_from_utf8	wstring_from_utf8
-#define utf8_from_tstring	utf8_from_wstring
+#define tstring_from_utf8   wstring_from_utf8
+#define utf8_from_tstring   utf8_from_wstring
 #else // !UNICODE
-#define tstring_from_utf8	astring_from_utf8
-#define utf8_from_tstring	utf8_from_astring
+#define tstring_from_utf8   astring_from_utf8
+#define utf8_from_tstring   utf8_from_astring
 #endif // UNICODE
 
 

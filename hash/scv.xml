@@ -6,55 +6,55 @@ brand. About half of the games released in Japan were also released in Europe.
 
 Information found at http://www.rhod.fr/yeno_epoch.html
 
-    Japan
-    01 Astro Wars
-    02 Battle in Galaxy
-    03 Super Golf
-    04 Super Mahjong
-    05 Super Baseball
-    06 Punch Boy
-    07 Elevator Fight
-    08 Lupin III
-    09 Nebula
-    10 Wheelie Racer
-    11 Boulder Dash
-    12 Miner 2049er
-    13 Super Soccer
-    14 Comic Circus
-    15 Milky Princess
-    16 Pop & Chips
-    17 Kung Fu Road
-    18 Star Speeder
-    19 Ton Ton Ball
-    20 Super Professor
-    21 Japanese Chess
-    22 Doraemon
-    23 Basic
-    24 Dragon Slayer
-    25 Professional Wrestling
-    26 Wai Wai Monster Land
-    27 Dragon Ball
-    28 Mappy
-    29 Sky Kid
-    30 Pole Position II
+	Japan
+	01 Astro Wars
+	02 Battle in Galaxy
+	03 Super Golf
+	04 Super Mahjong
+	05 Super Baseball
+	06 Punch Boy
+	07 Elevator Fight
+	08 Lupin III
+	09 Nebula
+	10 Wheelie Racer
+	11 Boulder Dash
+	12 Miner 2049er
+	13 Super Soccer
+	14 Comic Circus
+	15 Milky Princess
+	16 Pop & Chips
+	17 Kung Fu Road
+	18 Star Speeder
+	19 Ton Ton Ball
+	20 Super Professor
+	21 Japanese Chess
+	22 Doraemon
+	23 Basic
+	24 Dragon Slayer
+	25 Professional Wrestling
+	26 Wai Wai Monster Land
+	27 Dragon Ball
+	28 Mappy
+	29 Sky Kid
+	30 Pole Position II
 
-    Europe
-    01 Astro Wars
-    02 Battle in Galaxy
-    03 Super Golf
-    04 Punchy Boy
-    05 Elevator Fight
-    06 Lupin III
-    07 Nebula
-    08 Wheelie Racer
-    09 Miner 2049er
-    10 Boulder Dash
-    11 Super Soccer
-    12 Comic Circus
-    13 Pop & Chips
-    14 Kung Fu Road
-    15 Star Speeder
-    16 Ton Ton Ball
+	Europe
+	01 Astro Wars
+	02 Battle in Galaxy
+	03 Super Golf
+	04 Punchy Boy
+	05 Elevator Fight
+	06 Lupin III
+	07 Nebula
+	08 Wheelie Racer
+	09 Miner 2049er
+	10 Boulder Dash
+	11 Super Soccer
+	12 Comic Circus
+	13 Pop & Chips
+	14 Kung Fu Road
+	15 Star Speeder
+	16 Ton Ton Ball
 -->
 
 <softwarelist name="scv" description="Epoch Super Cassette Vision cartridges">
@@ -137,16 +137,16 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-    <software name="dball">
-        <description>Dragon Ball - Dragon Dai Hikyou</description>
-        <year>1986</year>
-        <publisher>Epoch</publisher>
-        <part name="cart" interface="scv_cart">
-            <dataarea name="rom" size="131072">
-                <rom name="dragonba.bin" size="131072" crc="ea251664" sha1="bd3791ed43a2019a255152e3fc0d8a663cb9567a" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+	<software name="dball">
+		<description>Dragon Ball - Dragon Dai Hikyou</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="dragonba.bin" size="131072" crc="ea251664" sha1="bd3791ed43a2019a255152e3fc0d8a663cb9567a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="dslayer">
 		<description>Dragon Slayer</description>
@@ -172,17 +172,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-    <!-- unknown whether the rom differs between Japan and Euro versions and which this is if so -->
+	<!-- unknown whether the rom differs between Japan and Euro versions and which this is if so -->
 	<software name="kungfurd">
 		<description>Nekketsu Kung Fu Road / Kung Fu Road</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-            <dataarea name="rom" size="65536">
-                <rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
 				<rom size="24576" offset="0x8000" loadflag="reload" />
-                <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0xe000" />
-            </dataarea>
+				<rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="0xe000" />
+			</dataarea>
 		</part>
 	</software>
 

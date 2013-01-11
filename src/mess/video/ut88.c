@@ -12,13 +12,13 @@
 
 const gfx_layout ut88_charlayout =
 {
-	8, 8,				/* 8x8 characters */
-	256,				/* 256 characters */
-	1,				  /* 1 bits per pixel */
-	{0},				/* no bitplanes; 1 bit per pixel */
+	8, 8,               /* 8x8 characters */
+	256,                /* 256 characters */
+	1,                /* 1 bits per pixel */
+	{0},                /* no bitplanes; 1 bit per pixel */
 	{0, 1, 2, 3, 4, 5, 6, 7},
 	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
-	8*8					/* size of one char */
+	8*8                 /* size of one char */
 };
 
 VIDEO_START_MEMBER(ut88_state,ut88)
@@ -40,4 +40,3 @@ UINT32 ut88_state::screen_update_ut88(screen_device &screen, bitmap_ind16 &bitma
 	}
 	return 0;
 }
-

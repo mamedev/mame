@@ -17,10 +17,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6502_TAG		"ucd5"
-#define M6522_0_TAG		"uab1"
-#define M6522_1_TAG		"ucd4"
-#define C64H156_TAG		"64h156"
+#define M6502_TAG       "ucd5"
+#define M6522_0_TAG     "uab1"
+#define M6522_1_TAG     "ucd4"
+#define C64H156_TAG     "64h156"
 
 
 enum
@@ -86,18 +86,18 @@ READ8_MEMBER( c2031_device::via0_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     DI0
-        PA1     DI1
-        PA2     DI2
-        PA3     DI3
-        PA4     DI4
-        PA5     DI5
-        PA6     DI6
-        PA7     DI7
+	    PA0     DI0
+	    PA1     DI1
+	    PA2     DI2
+	    PA3     DI3
+	    PA4     DI4
+	    PA5     DI5
+	    PA6     DI6
+	    PA7     DI7
 
-    */
+	*/
 
 	return m_bus->dio_r();
 }
@@ -106,18 +106,18 @@ WRITE8_MEMBER( c2031_device::via0_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     DI0
-        PA1     DI1
-        PA2     DI2
-        PA3     DI3
-        PA4     DI4
-        PA5     DI5
-        PA6     DI6
-        PA7     DI7
+	    PA0     DI0
+	    PA1     DI1
+	    PA2     DI2
+	    PA3     DI3
+	    PA4     DI4
+	    PA5     DI5
+	    PA6     DI6
+	    PA7     DI7
 
-    */
+	*/
 
 	m_bus->dio_w(this, data);
 }
@@ -126,18 +126,18 @@ READ8_MEMBER( c2031_device::via0_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     ATNA
-        PB1     NRFD
-        PB2     NDAC
-        PB3     EOI
-        PB4     T/_R
-        PB5     HD SEL
-        PB6     DAV
-        PB7     _ATN
+	    PB0     ATNA
+	    PB1     NRFD
+	    PB2     NDAC
+	    PB3     EOI
+	    PB4     T/_R
+	    PB5     HD SEL
+	    PB6     DAV
+	    PB7     _ATN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -163,18 +163,18 @@ WRITE8_MEMBER( c2031_device::via0_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     ATNA
-        PB1     NRFD
-        PB2     NDAC
-        PB3     EOI
-        PB4     T/_R
-        PB5     HD SEL
-        PB6     DAV
-        PB7     _ATN
+	    PB0     ATNA
+	    PB1     NRFD
+	    PB2     NDAC
+	    PB3     EOI
+	    PB4     T/_R
+	    PB5     HD SEL
+	    PB6     DAV
+	    PB7     _ATN
 
-    */
+	*/
 
 	int atna = BIT(data, 0);
 	int nrfd = BIT(data, 1);
@@ -251,18 +251,18 @@ READ8_MEMBER( c2031_device::via1_pb_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PB0
-        PB1
-        PB2
-        PB3
-        PB4     WPS         write protect sense
-        PB5
-        PB6
-        PB7     SYNC        SYNC detect line
+	    PB0
+	    PB1
+	    PB2
+	    PB3
+	    PB4     WPS         write protect sense
+	    PB5
+	    PB6
+	    PB7     SYNC        SYNC detect line
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -279,18 +279,18 @@ WRITE8_MEMBER( c2031_device::via1_pb_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PB0     STP0        stepping motor bit 0
-        PB1     STP1        stepping motor bit 1
-        PB2     MTR         motor ON/OFF
-        PB3     ACT         drive 0 LED
-        PB4
-        PB5     DS0         density select 0
-        PB6     DS1         density select 1
-        PB7     SYNC        SYNC detect line
+	    PB0     STP0        stepping motor bit 0
+	    PB1     STP1        stepping motor bit 1
+	    PB2     MTR         motor ON/OFF
+	    PB3     ACT         drive 0 LED
+	    PB4
+	    PB5     DS0         density select 0
+	    PB6     DS1         density select 1
+	    PB7     SYNC        SYNC detect line
 
-    */
+	*/
 
 	// spindle motor
 	m_ga->mtr_w(BIT(data, 2));
@@ -387,10 +387,10 @@ inline int c2031_device::get_device_number()
 
 	switch (m_address)
 	{
-	case 8: state = (m_atna && m_nrfd_out);	break;
-	case 9: state = m_nrfd_out;				break;
-	case 10: state = m_atna;				break;
-	case 11: state = 1;						break;
+	case 8: state = (m_atna && m_nrfd_out); break;
+	case 9: state = m_nrfd_out;             break;
+	case 10: state = m_atna;                break;
+	case 11: state = 1;                     break;
 	}
 
 	return state;
@@ -407,18 +407,18 @@ inline int c2031_device::get_device_number()
 //-------------------------------------------------
 
 c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, C2031, "C2031", tag, owner, clock),
-	  device_ieee488_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_TAG),
-	  m_via0(*this, M6522_0_TAG),
-	  m_via1(*this, M6522_1_TAG),
-	  m_ga(*this, C64H156_TAG),
-	  m_image(*this, FLOPPY_0),
-	  m_nrfd_out(1),
-	  m_ndac_out(1),
-	  m_atna(1),
-	  m_via0_irq(0),
-	  m_via1_irq(0)
+	: device_t(mconfig, C2031, "C2031", tag, owner, clock),
+		device_ieee488_interface(mconfig, *this),
+		m_maincpu(*this, M6502_TAG),
+		m_via0(*this, M6522_0_TAG),
+		m_via1(*this, M6522_1_TAG),
+		m_ga(*this, C64H156_TAG),
+		m_image(*this, FLOPPY_0),
+		m_nrfd_out(1),
+		m_ndac_out(1),
+		m_atna(1),
+		m_via0_irq(0),
+		m_via1_irq(0)
 {
 }
 
@@ -447,10 +447,10 @@ void c2031_device::device_start()
 
 void c2031_device::device_reset()
 {
-    m_maincpu->reset();
+	m_maincpu->reset();
 
-    m_via0->reset();
-    m_via1->reset();
+	m_via0->reset();
+	m_via1->reset();
 }
 
 

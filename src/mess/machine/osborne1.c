@@ -16,7 +16,7 @@ be written to RAM if RAM was switched in.
 
 #include "includes/osborne1.h"
 
-#define RAMMODE		(0x01)
+#define RAMMODE     (0x01)
 
 
 WRITE8_MEMBER( osborne1_state::osborne1_0000_w )
@@ -37,7 +37,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_1000_w )
 
 READ8_MEMBER( osborne1_state::osborne1_2000_r )
 {
-	UINT8	data = 0xFF;
+	UINT8   data = 0xFF;
 
 	/* Check whether regular RAM is enabled */
 	if ( ! m_bank2_enabled )
@@ -46,33 +46,33 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 	{
 		switch( offset & 0x0F00 )
 		{
-		case 0x100:	/* Floppy */
+		case 0x100: /* Floppy */
 			data = wd17xx_r( m_fdc, space, offset );
 			break;
-		case 0x200:	/* Keyboard */
+		case 0x200: /* Keyboard */
 			/* Row 0 */
-			if ( offset & 0x01 )	data &= ioport("ROW0")->read();
+			if ( offset & 0x01 )    data &= ioport("ROW0")->read();
 			/* Row 1 */
-			if ( offset & 0x02 )	data &= ioport("ROW1")->read();
+			if ( offset & 0x02 )    data &= ioport("ROW1")->read();
 			/* Row 2 */
-			if ( offset & 0x04 )	data &= ioport("ROW3")->read();
+			if ( offset & 0x04 )    data &= ioport("ROW3")->read();
 			/* Row 3 */
-			if ( offset & 0x08 )	data &= ioport("ROW4")->read();
+			if ( offset & 0x08 )    data &= ioport("ROW4")->read();
 			/* Row 4 */
-			if ( offset & 0x10 )	data &= ioport("ROW5")->read();
+			if ( offset & 0x10 )    data &= ioport("ROW5")->read();
 			/* Row 5 */
-			if ( offset & 0x20 )	data &= ioport("ROW2")->read();
+			if ( offset & 0x20 )    data &= ioport("ROW2")->read();
 			/* Row 6 */
-			if ( offset & 0x40 )	data &= ioport("ROW6")->read();
+			if ( offset & 0x40 )    data &= ioport("ROW6")->read();
 			/* Row 7 */
-			if ( offset & 0x80 )	data &= ioport("ROW7")->read();
+			if ( offset & 0x80 )    data &= ioport("ROW7")->read();
 			break;
-		case 0x900:	/* IEEE488 PIA */
+		case 0x900: /* IEEE488 PIA */
 			data = m_pia0->read(space, offset & 0x03 );
 			break;
-		case 0xA00:	/* Serial */
+		case 0xA00: /* Serial */
 			break;
-		case 0xC00:	/* Video PIA */
+		case 0xC00: /* Video PIA */
 			data = m_pia1->read(space, offset & 0x03 );
 			break;
 		}
@@ -95,15 +95,15 @@ WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 		/* Handle writes to the I/O area */
 		switch( offset & 0x0F00 )
 		{
-		case 0x100:	/* Floppy */
+		case 0x100: /* Floppy */
 			wd17xx_w( m_fdc, space, offset, data );
 			break;
-		case 0x900:	/* IEEE488 PIA */
+		case 0x900: /* IEEE488 PIA */
 			m_pia0->write(space, offset & 0x03, data );
 			break;
-		case 0xA00:	/* Serial */
+		case 0xA00: /* Serial */
 			break;
-		case 0xC00:	/* Video PIA */
+		case 0xC00: /* Video PIA */
 			m_pia1->write(space, offset & 0x03, data );
 			break;
 		}
@@ -194,18 +194,18 @@ READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3       EOI
-        4
-        5       DAV
-        6       NDAC
-        7       NRFD
+	    0
+	    1
+	    2
+	    3       EOI
+	    4
+	    5       DAV
+	    6       NDAC
+	    7       NRFD
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -222,18 +222,18 @@ WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3       EOI
-        4       ATN
-        5       DAV
-        6       NDAC
-        7       NRFD
+	    0
+	    1
+	    2
+	    3       EOI
+	    4       ATN
+	    5       DAV
+	    6       NDAC
+	    7       NRFD
 
-    */
+	*/
 
 	m_ieee->eoi_w(BIT(data, 3));
 	m_ieee->atn_w(BIT(data, 4));
@@ -245,18 +245,18 @@ WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 
 const pia6821_interface osborne1_ieee_pia_config =
 {
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),	/* in_a_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_r),				/* in_b_func */
-	DEVCB_NULL,							/* in_ca1_func */
-	DEVCB_NULL,							/* in_cb1_func */
-	DEVCB_NULL,							/* in_ca2_func */
-	DEVCB_NULL,							/* in_cb2_func */
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),	/* out_a_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_w),				/* out_b_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ifc_w),	/* out_ca2_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ren_w),	/* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(osborne1_state, ieee_pia_irq_a_func),	/* irq_a_func */
-	DEVCB_NULL							/* irq_b_func */
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),    /* in_a_func */
+	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_r),             /* in_b_func */
+	DEVCB_NULL,                         /* in_ca1_func */
+	DEVCB_NULL,                         /* in_cb1_func */
+	DEVCB_NULL,                         /* in_ca2_func */
+	DEVCB_NULL,                         /* in_cb2_func */
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),    /* out_a_func */
+	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_w),             /* out_b_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ifc_w),   /* out_ca2_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ren_w),   /* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(osborne1_state, ieee_pia_irq_a_func),  /* irq_a_func */
+	DEVCB_NULL                          /* irq_b_func */
 };
 
 
@@ -303,18 +303,18 @@ WRITE_LINE_MEMBER( osborne1_state::video_pia_irq_a_func )
 
 const pia6821_interface osborne1_video_pia_config =
 {
-	DEVCB_NULL,								/* in_a_func */
-	DEVCB_NULL,								/* in_b_func */
-	DEVCB_NULL,								/* in_ca1_func */
-	DEVCB_NULL,								/* in_cb1_func */
-	DEVCB_NULL,								/* in_ca2_func */
-	DEVCB_NULL,								/* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_port_a_w),		/* out_a_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_port_b_w),		/* out_b_func */
-	DEVCB_NULL,								/* out_ca2_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_out_cb2_dummy),		/* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(osborne1_state, video_pia_irq_a_func),		/* irq_a_func */
-	DEVCB_NULL								/* irq_b_func */
+	DEVCB_NULL,                             /* in_a_func */
+	DEVCB_NULL,                             /* in_b_func */
+	DEVCB_NULL,                             /* in_ca1_func */
+	DEVCB_NULL,                             /* in_cb1_func */
+	DEVCB_NULL,                             /* in_ca2_func */
+	DEVCB_NULL,                             /* in_cb2_func */
+	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_port_a_w),        /* out_a_func */
+	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_port_b_w),        /* out_b_func */
+	DEVCB_NULL,                             /* out_ca2_func */
+	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_out_cb2_dummy),       /* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(osborne1_state, video_pia_irq_a_func),     /* irq_a_func */
+	DEVCB_NULL                              /* irq_b_func */
 };
 
 
@@ -484,7 +484,7 @@ const device_type OSBORNE1_DAISY = &device_creator<osborne1_daisy_device>;
 //-------------------------------------------------
 osborne1_daisy_device::osborne1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OSBORNE1_DAISY, "Osborne 1 daisy", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this)
 {
 }
 

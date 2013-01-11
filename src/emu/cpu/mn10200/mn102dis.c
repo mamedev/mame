@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-static const UINT8 *sOpROM;	// current opROM pointer
+static const UINT8 *sOpROM; // current opROM pointer
 static UINT32 sBasePC;
 
 static UINT8 program_read_byte(offs_t pc)
@@ -32,32 +32,32 @@ static INT32 r24s(offs_t pc)
 
 static const char *i8str(INT8 v)
 {
-  static char res[4];
-  if(v>=0)
-    sprintf(res, "%x", v);
-  else
-    sprintf(res, "-%x", (UINT8)(-v));
-  return res;
+	static char res[4];
+	if(v>=0)
+	sprintf(res, "%x", v);
+	else
+	sprintf(res, "-%x", (UINT8)(-v));
+	return res;
 }
 
 static const char *i16str(INT16 v)
 {
-  static char res[6];
-  if(v>=0)
-    sprintf(res, "%x", v);
-  else
-    sprintf(res, "-%x", (UINT16)(-v));
-  return res;
+	static char res[6];
+	if(v>=0)
+	sprintf(res, "%x", v);
+	else
+	sprintf(res, "-%x", (UINT16)(-v));
+	return res;
 }
 
 static const char *i24str(INT32 v)
 {
-  static char res[8];
-  if(v>=0)
-    sprintf(res, "%x", v);
-  else
-    sprintf(res, "-%x", -v);
-  return res;
+	static char res[8];
+	if(v>=0)
+	sprintf(res, "%x", v);
+	else
+	sprintf(res, "-%x", -v);
+	return res;
 }
 
 
@@ -745,7 +745,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 			sprintf(buffer, "tbz (%s, a%d) %d, %x", i8str(program_read_byte(pc+2)), (opcode>>3)&1, opcode & 7,
-			      (pc+4+(INT8)program_read_byte(pc+3)) & 0xffffff);
+					(pc+4+(INT8)program_read_byte(pc+3)) & 0xffffff);
 			return 4;
 
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
@@ -756,7 +756,7 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 			sprintf(buffer, "tbnz (%s, a%d) %d, %x", i8str(program_read_byte(pc+2)), (opcode>>3)&1, opcode & 7,
-			      (pc+4+(INT8)program_read_byte(pc+3)) & 0xffffff);
+					(pc+4+(INT8)program_read_byte(pc+3)) & 0xffffff);
 			return 4;
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
@@ -766,12 +766,12 @@ static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 			sprintf(buffer, "tbz (%x) %d, %x", r16u(pc+2), opcode & 7,
-			      (pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
+					(pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
 			return 5;
 
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 			sprintf(buffer, "tbnz (%x) %d, %x", r16u(pc+2), opcode & 7,
-			      (pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
+					(pc+5+(INT8)program_read_byte(pc+4)) & 0xffffff);
 			return 5;
 
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
@@ -1030,4 +1030,3 @@ CPU_DISASSEMBLE( mn10200 )
 {
 	return mn102_disassemble(buffer, pc, oprom);
 }
-

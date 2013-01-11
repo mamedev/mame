@@ -44,11 +44,11 @@ protected:
 
 private:
 	// internal state
-	required_device<fd1793_t>	m_fdc;
+	required_device<fd1793_t>   m_fdc;
 
-	UINT8 *		m_rom;
-	UINT8 *		m_ram;
-	UINT8		m_rom_bank;		// A12 and A13
+	UINT8 *     m_rom;
+	UINT8 *     m_ram;
+	UINT8       m_rom_bank;     // A12 and A13
 };
 
 

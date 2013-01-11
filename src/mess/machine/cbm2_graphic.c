@@ -24,9 +24,9 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define EF9365_TAG	"ef9365"
-#define EF9366_TAG	"ef9366"
-#define SCREEN_TAG	"screen"
+#define EF9365_TAG  "ef9365"
+#define EF9366_TAG  "ef9366"
+#define SCREEN_TAG  "screen"
 
 
 
@@ -147,18 +147,18 @@ UINT8 cbm2_graphic_cartridge_device::cbm2_bd_r(address_space &space, offs_t offs
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       light pen
-                1
-                2
-                3
-                4
-                5
-                6
-                7
+			    0       light pen
+			    1
+			    2
+			    3
+			    4
+			    5
+			    6
+			    7
 
-            */
+			*/
 		}
 		else if (offset == 0x7fb0)
 		{
@@ -186,18 +186,18 @@ void cbm2_graphic_cartridge_device::cbm2_bd_w(address_space &space, offs_t offse
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       hard copy (0=active)
-                1       operating page select (version B)
-                2
-                3       read-modify-write (1=active)
-                4       display switch (1=graphic)
-                5       display page select (version B)
-                6
-                7
+			    0       hard copy (0=active)
+			    1       operating page select (version B)
+			    2
+			    3       read-modify-write (1=active)
+			    4       display switch (1=graphic)
+			    5       display page select (version B)
+			    6
+			    7
 
-            */
+			*/
 		}
 		else if (offset >= 0x7ff0)
 		{

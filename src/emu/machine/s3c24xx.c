@@ -1978,43 +1978,43 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_gpio_w )
 	{
 		case S3C24XX_GPADAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_A, gpio->regs.gpacon ^ 0xFFFFFFFF, data & S3C24XX_GPADAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_A, gpio->regs.gpacon ^ 0xFFFFFFFF, data & S3C24XX_GPADAT_MASK);
 		}
 		break;
 		case S3C24XX_GPBDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_B, s3c24xx_gpio_get_mask( gpio->regs.gpbcon, 1) & S3C24XX_GPBDAT_MASK, data & S3C24XX_GPBDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_B, s3c24xx_gpio_get_mask( gpio->regs.gpbcon, 1) & S3C24XX_GPBDAT_MASK, data & S3C24XX_GPBDAT_MASK);
 		}
 		break;
 		case S3C24XX_GPCDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_C, s3c24xx_gpio_get_mask( gpio->regs.gpccon, 1) & S3C24XX_GPCDAT_MASK, data & S3C24XX_GPCDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_C, s3c24xx_gpio_get_mask( gpio->regs.gpccon, 1) & S3C24XX_GPCDAT_MASK, data & S3C24XX_GPCDAT_MASK);
 		}
 		break;
 		case S3C24XX_GPDDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_D, s3c24xx_gpio_get_mask( gpio->regs.gpdcon, 1) & S3C24XX_GPDDAT_MASK, data & S3C24XX_GPDDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_D, s3c24xx_gpio_get_mask( gpio->regs.gpdcon, 1) & S3C24XX_GPDDAT_MASK, data & S3C24XX_GPDDAT_MASK);
 		}
 		break;
 		case S3C24XX_GPEDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_E, s3c24xx_gpio_get_mask( gpio->regs.gpecon, 1) & S3C24XX_GPEDAT_MASK, data & S3C24XX_GPEDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_E, s3c24xx_gpio_get_mask( gpio->regs.gpecon, 1) & S3C24XX_GPEDAT_MASK, data & S3C24XX_GPEDAT_MASK);
 		}
 		break;
 		case S3C24XX_GPFDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_F, s3c24xx_gpio_get_mask( gpio->regs.gpfcon, 1) & S3C24XX_GPFDAT_MASK, data & S3C24XX_GPFDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_F, s3c24xx_gpio_get_mask( gpio->regs.gpfcon, 1) & S3C24XX_GPFDAT_MASK, data & S3C24XX_GPFDAT_MASK);
 		}
 		break;
 		case S3C24XX_GPGDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_G, s3c24xx_gpio_get_mask( gpio->regs.gpgcon, 1) & S3C24XX_GPGDAT_MASK, data & S3C24XX_GPGDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_G, s3c24xx_gpio_get_mask( gpio->regs.gpgcon, 1) & S3C24XX_GPGDAT_MASK, data & S3C24XX_GPGDAT_MASK);
 		}
 		break;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 		case S3C24XX_GPHDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_H, s3c24xx_gpio_get_mask( gpio->regs.gphcon, 1) & S3C24XX_GPHDAT_MASK, data & S3C24XX_GPHDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_H, s3c24xx_gpio_get_mask( gpio->regs.gphcon, 1) & S3C24XX_GPHDAT_MASK, data & S3C24XX_GPHDAT_MASK);
 		}
 		break;
 		case S3C24XX_EINTPEND :
@@ -2037,7 +2037,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_gpio_w )
 #if defined(DEVICE_S3C2440)
 		case S3C24XX_GPJDAT :
 		{
-			 iface_gpio_port_w( device, S3C24XX_GPIO_PORT_J, s3c24xx_gpio_get_mask( gpio->regs.gpjcon, 1) & S3C24XX_GPJDAT_MASK, data & S3C24XX_GPJDAT_MASK);
+				iface_gpio_port_w( device, S3C24XX_GPIO_PORT_J, s3c24xx_gpio_get_mask( gpio->regs.gpjcon, 1) & S3C24XX_GPJDAT_MASK, data & S3C24XX_GPJDAT_MASK);
 		}
 		break;
 #endif

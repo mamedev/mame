@@ -273,18 +273,18 @@ WRITE8_MEMBER( portfolio_state::speaker_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7       speaker level
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7       speaker level
 
-    */
+	*/
 
 	speaker_level_w(m_speaker, !BIT(data, 7));
 
@@ -303,18 +303,18 @@ WRITE8_MEMBER( portfolio_state::power_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1       1=power off
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1       1=power off
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	//logerror("POWER %02x\n", data);
 }
@@ -327,18 +327,18 @@ READ8_MEMBER( portfolio_state::battery_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0
-        1
-        2
-        3
-        4
-        5       PDET        1=peripheral connected
-        6       BATD?       0=battery low
-        7                   1=cold boot
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5       PDET        1=peripheral connected
+	    6       BATD?       0=battery low
+	    7                   1=cold boot
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -457,19 +457,19 @@ READ8_MEMBER( portfolio_state::pid_r )
 {
 	/*
 
-        PID     peripheral
+	    PID     peripheral
 
-        00      communication card
-        01      serial port
-        02      parallel port
-        03      printer peripheral
-        04      modem
-        05-3f   reserved
-        40-7f   user peripherals
-        80      file-transfer interface
-        81-ff   reserved
+	    00      communication card
+	    01      serial port
+	    02      parallel port
+	    03      printer peripheral
+	    04      modem
+	    05-3f   reserved
+	    40-7f   user peripherals
+	    80      file-transfer interface
+	    81-ff   reserved
 
-    */
+	*/
 
 	return m_pid;
 }
@@ -696,12 +696,12 @@ GFXDECODE_END
 
 static I8255_INTERFACE( ppi_intf )
 {
-	DEVCB_NULL,													// Port A read
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),	// Port A write
-	DEVCB_NULL,													// Port B read
-	DEVCB_INPUT_PORT("PPI-PB"),									// Port B write
-	DEVCB_INPUT_PORT("PPI-PC"),									// Port C read
-	DEVCB_NULL													// Port C write
+	DEVCB_NULL,                                                 // Port A read
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  // Port A write
+	DEVCB_NULL,                                                 // Port B read
+	DEVCB_INPUT_PORT("PPI-PB"),                                 // Port B write
+	DEVCB_INPUT_PORT("PPI-PC"),                                 // Port C read
+	DEVCB_NULL                                                  // Port C write
 };
 
 //-------------------------------------------------
@@ -824,12 +824,12 @@ void portfolio_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( portfolio, portfolio_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
-    MCFG_CPU_PROGRAM_MAP(portfolio_mem)
-    MCFG_CPU_IO_MAP(portfolio_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
+	MCFG_CPU_PROGRAM_MAP(portfolio_mem)
+	MCFG_CPU_IO_MAP(portfolio_io)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
@@ -897,7 +897,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( pofo )
-    ROM_REGION( 0x40000, M80C88A_TAG, 0 )
+	ROM_REGION( 0x40000, M80C88A_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "dip1072", "DIP DOS 1.072" )
 	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(1) ) // dumped with debug.com
 	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(1) ) // dumped with debug.com
@@ -911,4 +911,4 @@ ROM_END
 //**************************************************************************
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS */
-COMP( 1989, pofo,	0,		0,		portfolio,	portfolio, driver_device,	0,		"Atari",	"Portfolio",	GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,      "Atari",    "Portfolio",    GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

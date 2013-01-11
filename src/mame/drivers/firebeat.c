@@ -273,17 +273,17 @@ static void gcu_draw_object(running_machine &machine, bitmap_ind16 &bitmap, cons
 	// 0x03: -------- -------- ------xx xxxxxxxx   object height
 	// 0x03: -------- -----xxx xxxxxx-- --------   object y scale
 
-	int x				= cmd[1] & 0x3ff;
-	int y				= (cmd[1] >> 10) & 0x3ff;
-	int width			= (cmd[2] & 0x3ff) + 1;
-	int height			= (cmd[3] & 0x3ff) + 1;
-	int xscale			= (cmd[2] >> 10) & 0x1ff;
-	int yscale			= (cmd[3] >> 10) & 0x1ff;
-	int xflip			= (cmd[1] & 0x04000000) ? 1 : 0;
-	int yflip			= (cmd[1] & 0x08000000) ? 1 : 0;
-	int alpha_enable	= (cmd[1] & 0x10000000) ? 1 : 0;
-	UINT32 address		= cmd[0] & 0xffffff;
-	int alpha_level		= (cmd[2] >> 27) & 0x1f;
+	int x               = cmd[1] & 0x3ff;
+	int y               = (cmd[1] >> 10) & 0x3ff;
+	int width           = (cmd[2] & 0x3ff) + 1;
+	int height          = (cmd[3] & 0x3ff) + 1;
+	int xscale          = (cmd[2] >> 10) & 0x1ff;
+	int yscale          = (cmd[3] >> 10) & 0x1ff;
+	int xflip           = (cmd[1] & 0x04000000) ? 1 : 0;
+	int yflip           = (cmd[1] & 0x08000000) ? 1 : 0;
+	int alpha_enable    = (cmd[1] & 0x10000000) ? 1 : 0;
+	UINT32 address      = cmd[0] & 0xffffff;
+	int alpha_level     = (cmd[2] >> 27) & 0x1f;
 
 	int i, j;
 	int u, v;
@@ -299,8 +299,8 @@ static void gcu_draw_object(running_machine &machine, bitmap_ind16 &bitmap, cons
 	//if ((cmd[2] >> 24) != 0x84 && (cmd[2] >> 24) != 0x04 && (cmd[2] >> 24) != 0x00)
 	//  printf("Unknown value = %d, %d\n", (cmd[2] >> 27) & 0x1f, (cmd[2] >> 22) & 0x1f);
 
-	width	= (((width * 65536) / xscale) * 64) / 65536;
-	height	= (((height * 65536) / yscale) * 64) / 65536;
+	width   = (((width * 65536) / xscale) * 64) / 65536;
+	height  = (((height * 65536) / yscale) * 64) / 65536;
 
 	if (y > cliprect.max_y || x > cliprect.max_x) {
 		return;
@@ -353,23 +353,23 @@ static void gcu_draw_object(running_machine &machine, bitmap_ind16 &bitmap, cons
 						//*d = pix & 0x7fff;
 						UINT16 srcpix = *d;
 						/*
-                        UINT32 r = pix & 0x7c00;
-                        UINT32 g = pix & 0x03e0;
-                        UINT32 b = pix & 0x001f;
+						UINT32 r = pix & 0x7c00;
+						UINT32 g = pix & 0x03e0;
+						UINT32 b = pix & 0x001f;
 
-                        UINT32 sr = srcpix & 0x7c00;
-                        UINT32 sg = srcpix & 0x03e0;
-                        UINT32 sb = srcpix & 0x001f;
+						UINT32 sr = srcpix & 0x7c00;
+						UINT32 sg = srcpix & 0x03e0;
+						UINT32 sb = srcpix & 0x001f;
 
-                        sr += r;
-                        sg += g;
-                        sb += b;
-                        if (sr > 0x7c00) sr = 0x7c00;
-                        if (sg > 0x03e0) sg = 0x03e0;
-                        if (sb > 0x001f) sb = 0x001f;
+						sr += r;
+						sg += g;
+						sb += b;
+						if (sr > 0x7c00) sr = 0x7c00;
+						if (sg > 0x03e0) sg = 0x03e0;
+						if (sb > 0x001f) sb = 0x001f;
 
-                        *d = sr | sg | sb;
-                        */
+						*d = sr | sg | sb;
+						*/
 
 						UINT32 sr = (srcpix >> 10) & 0x1f;
 						UINT32 sg = (srcpix >>  5) & 0x1f;
@@ -414,10 +414,10 @@ static void gcu_fill_rect(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT3
 	int i, j;
 	int x1, y1, x2, y2;
 
-	int x				= cmd[1] & 0x3ff;
-	int y				= (cmd[1] >> 10) & 0x3ff;
-	int width			= (cmd[0] & 0x3ff) + 1;
-	int height			= ((cmd[0] >> 10) & 0x3ff) + 1;
+	int x               = cmd[1] & 0x3ff;
+	int y               = (cmd[1] >> 10) & 0x3ff;
+	int width           = (cmd[0] & 0x3ff) + 1;
+	int height          = ((cmd[0] >> 10) & 0x3ff) + 1;
 
 	UINT16 color[4];
 
@@ -438,10 +438,10 @@ static void gcu_fill_rect(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT3
 	}
 
 	// clip
-	if (x1 < cliprect.min_x)	x1 = cliprect.min_x;
-	if (y1 < cliprect.min_y)	y1 = cliprect.min_y;
-	if (x2 > cliprect.max_x)	x2 = cliprect.max_x;
-	if (y2 > cliprect.max_y)	y2 = cliprect.max_y;
+	if (x1 < cliprect.min_x)    x1 = cliprect.min_x;
+	if (y1 < cliprect.min_y)    y1 = cliprect.min_y;
+	if (x2 > cliprect.max_x)    x2 = cliprect.max_x;
+	if (y2 > cliprect.max_y)    y2 = cliprect.max_y;
 
 	for (j=y1; j < y2; j++)
 	{
@@ -472,9 +472,9 @@ static void gcu_draw_character(running_machine &machine, bitmap_ind16 &bitmap, c
 	// 0x03: -------- -------- xxxxxxxx xxxxxxxx   color 3
 
 	int i, j;
-	int x				= cmd[1] & 0x3ff;
-	int y				= (cmd[1] >> 10) & 0x3ff;
-	UINT32 address		= cmd[0] & 0xffffff;
+	int x               = cmd[1] & 0x3ff;
+	int y               = (cmd[1] >> 10) & 0x3ff;
+	UINT32 address      = cmd[0] & 0xffffff;
 	UINT16 color[4];
 
 	UINT16 *vr = (UINT16*)state->m_gcu[chip].vram;
@@ -526,41 +526,41 @@ static void gcu_exec_display_list(running_machine &machine, bitmap_ind16 &bitmap
 
 		switch (command)
 		{
-			case 0x0:		// ???
+			case 0x0:       // ???
 			{
 				break;
 			}
 
-			case 0x1:		// Branch
+			case 0x1:       // Branch
 			{
 				gcu_exec_display_list(machine, bitmap, cliprect, chip, cmd[0] & 0xffffff);
 				break;
 			}
 
-			case 0x2:		// End of display list
+			case 0x2:       // End of display list
 			{
 				end = 1;
 				break;
 			}
 
-			case 0x3:		// ???
+			case 0x3:       // ???
 			{
 				break;
 			}
 
-			case 0x4:		// Fill rectangle
+			case 0x4:       // Fill rectangle
 			{
 				gcu_fill_rect(bitmap, cliprect, cmd);
 				break;
 			}
 
-			case 0x5:		// Draw object
+			case 0x5:       // Draw object
 			{
 				gcu_draw_object(machine, bitmap, cliprect, chip, cmd);
 				break;
 			}
 
-			case 0x7:		// Draw 8x8 Character (2-bits per pixel)
+			case 0x7:       // Draw 8x8 Character (2-bits per pixel)
 			{
 				gcu_draw_character(machine, bitmap, cliprect, chip, cmd);
 				break;
@@ -622,33 +622,33 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 		}
 
 		/*
-        if (screen.machine().input().code_pressed_once(KEYCODE_9))
-        {
-            FILE *file = fopen("vram0.bin", "wb");
-            int i;
+		if (screen.machine().input().code_pressed_once(KEYCODE_9))
+		{
+		    FILE *file = fopen("vram0.bin", "wb");
+		    int i;
 
-            for (i=0; i < 0x2000000/4; i++)
-            {
-                fputc((state->m_gcu[0].vram[i] >> 24) & 0xff, file);
-                fputc((state->m_gcu[0].vram[i] >> 16) & 0xff, file);
-                fputc((state->m_gcu[0].vram[i] >> 8) & 0xff, file);
-                fputc((state->m_gcu[0].vram[i] >> 0) & 0xff, file);
-            }
+		    for (i=0; i < 0x2000000/4; i++)
+		    {
+		        fputc((state->m_gcu[0].vram[i] >> 24) & 0xff, file);
+		        fputc((state->m_gcu[0].vram[i] >> 16) & 0xff, file);
+		        fputc((state->m_gcu[0].vram[i] >> 8) & 0xff, file);
+		        fputc((state->m_gcu[0].vram[i] >> 0) & 0xff, file);
+		    }
 
-            fclose(file);
-            file = fopen("vram1.bin", "wb");
+		    fclose(file);
+		    file = fopen("vram1.bin", "wb");
 
-            for (i=0; i < 0x2000000/4; i++)
-            {
-                fputc((state->m_gcu[1].vram[i] >> 24) & 0xff, file);
-                fputc((state->m_gcu[1].vram[i] >> 16) & 0xff, file);
-                fputc((state->m_gcu[1].vram[i] >> 8) & 0xff, file);
-                fputc((state->m_gcu[1].vram[i] >> 0) & 0xff, file);
-            }
+		    for (i=0; i < 0x2000000/4; i++)
+		    {
+		        fputc((state->m_gcu[1].vram[i] >> 24) & 0xff, file);
+		        fputc((state->m_gcu[1].vram[i] >> 16) & 0xff, file);
+		        fputc((state->m_gcu[1].vram[i] >> 8) & 0xff, file);
+		        fputc((state->m_gcu[1].vram[i] >> 0) & 0xff, file);
+		    }
 
-            fclose(file);
-        }
-        */
+		    fclose(file);
+		}
+		*/
 	}
 
 	return 0;
@@ -670,7 +670,7 @@ static UINT32 GCU_r(running_machine &machine, int chip, UINT32 offset, UINT32 me
 
 	switch(reg)
 	{
-		case 0x78:		/* GCU Status */
+		case 0x78:      /* GCU Status */
 			/* ppd checks bits 0x0041 of the upper halfword on interrupt */
 			return 0xffff0005;
 
@@ -694,7 +694,7 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 
 	switch(reg)
 	{
-		case 0x10:		/* ??? */
+		case 0x10:      /* ??? */
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x0001) == 0)
@@ -729,25 +729,25 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 			break;
 		}
 
-		case 0x40:		/* framebuffer config */
+		case 0x40:      /* framebuffer config */
 			// HACK: switch display lists at the right times for the ParaParaParadise games until we
 			// do the video emulation properly
 			if (mame_strnicmp(machine.system().name, "pp", 2) == 0)
 			{
 				switch (data)
 				{
-					case 0x00080000:	// post
+					case 0x00080000:    // post
 						state->m_layer = 0;
 						break;
 
-					case 0x00008400:	// startup tests
+					case 0x00008400:    // startup tests
 						if (state->m_layer != 2)
 						{
 							state->m_layer = 1;
 						}
 						break;
 
-					case 0x00068400:	// game & svc menu
+					case 0x00068400:    // game & svc menu
 						state->m_layer = 2;
 						break;
 				}
@@ -756,11 +756,11 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 			{
 				switch (data)
 				{
-					case 0x00080000:	// post
+					case 0x00080000:    // post
 						state->m_layer = 0;
 						break;
 
-					case 0x0000c400:	// game & svn menu
+					case 0x0000c400:    // game & svn menu
 						state->m_layer = 2;
 						break;
 				}
@@ -770,22 +770,22 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 		//case 0x44:    /* ??? */
 		//  break;
 
-		case 0x5c:		/* VRAM Read Address */
+		case 0x5c:      /* VRAM Read Address */
 			state->m_gcu[chip].vram_read_address = (data & 0xffffff) / 2;
 			break;
 
-		case 0x60:		/* VRAM FIFO Write Address */
+		case 0x60:      /* VRAM FIFO Write Address */
 			state->m_gcu[chip].vram_write_fifo_address = (data & 0xffffff) / 2;
 
 	//      printf("gcu%d_w: %08X, %08X, %08X\n", chip, data, offset, mem_mask);
 			break;
 
-		case 0x68:		/* Unknown */
+		case 0x68:      /* Unknown */
 		{
 			break;
 		}
 
-		case 0x70:		/* VRAM FIFO Write */
+		case 0x70:      /* VRAM FIFO Write */
 			state->m_gcu[chip].vram[state->m_gcu[chip].vram_write_fifo_address] = data;
 			state->m_gcu[chip].vram_write_fifo_address++;
 			break;
@@ -961,18 +961,18 @@ WRITE32_MEMBER(firebeat_state::soundflash_w)
 /*****************************************************************************/
 /* ATAPI Interface */
 
-#define BYTESWAP16(x)	((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
+#define BYTESWAP16(x)   ((((x) >> 8) & 0xff) | (((x) << 8) & 0xff00))
 
 #if 1
-#define ATAPI_ENDIAN(x)	(BYTESWAP16(x))
+#define ATAPI_ENDIAN(x) (BYTESWAP16(x))
 #else
-#define ATAPI_ENDIAN(x)	(x)
+#define ATAPI_ENDIAN(x) (x)
 #endif
 
-#define ATAPI_CYCLES_PER_SECTOR (32000)	// plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
+#define ATAPI_CYCLES_PER_SECTOR (32000) // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
 
-#define ATAPI_STAT_BSY	   0x80
+#define ATAPI_STAT_BSY     0x80
 #define ATAPI_STAT_DRDY    0x40
 #define ATAPI_STAT_DMARDDF 0x20
 #define ATAPI_STAT_SERVDSC 0x10
@@ -984,14 +984,14 @@ WRITE32_MEMBER(firebeat_state::soundflash_w)
 #define ATAPI_INTREASON_IO      0x02
 #define ATAPI_INTREASON_RELEASE 0x04
 
-#define ATAPI_REG_DATA		0
-#define ATAPI_REG_ERRFEAT	1
-#define ATAPI_REG_INTREASON	2
-#define ATAPI_REG_SAMTAG	3
-#define ATAPI_REG_COUNTLOW	4
-#define ATAPI_REG_COUNTHIGH	5
-#define ATAPI_REG_DRIVESEL	6
-#define ATAPI_REG_CMDSTATUS	7
+#define ATAPI_REG_DATA      0
+#define ATAPI_REG_ERRFEAT   1
+#define ATAPI_REG_INTREASON 2
+#define ATAPI_REG_SAMTAG    3
+#define ATAPI_REG_COUNTLOW  4
+#define ATAPI_REG_COUNTHIGH 5
+#define ATAPI_REG_DRIVESEL  6
+#define ATAPI_REG_CMDSTATUS 7
 
 
 static void atapi_cause_irq(running_machine &machine)
@@ -1191,14 +1191,14 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 				switch (state->m_atapi_data[0]&0xff)
 				{
 
-                    case 0x55:	// MODE SELECT
+					case 0x55:  // MODE SELECT
 						state->m_atapi_cdata_wait = state->m_atapi_data[4]/2;
 						state->m_atapi_data_ptr = 0;
 						logerror("ATAPI: Waiting for %x bytes of MODE SELECT data\n", state->m_atapi_cdata_wait);
 						break;
 
 
-					case 0xa8:	// READ (12)
+					case 0xa8:  // READ (12)
 						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
 						state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
 						state->m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
@@ -1220,7 +1220,7 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 //              printf("ATAPI: SCSI device returned error!\n");
 
 				state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				state->m_atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;	// sense key = ILLEGAL REQUEST
+				state->m_atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;  // sense key = ILLEGAL REQUEST
 				state->m_atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 				state->m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 			}
@@ -1243,14 +1243,14 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 
 				switch(data)
 				{
-					case 0x00:		/* NOP */
+					case 0x00:      /* NOP */
 						break;
 
-					case 0x08:		/* ATAPI Soft Reset */
+					case 0x08:      /* ATAPI Soft Reset */
 						atapi_reset(machine);
 						break;
 
-					case 0xa0:		/* ATAPI Packet */
+					case 0xa0:      /* ATAPI Packet */
 						state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRQ;
 						state->m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
@@ -1294,7 +1294,7 @@ static void atapi_control_reg_w(running_machine &machine, int reg, UINT16 data)
 {
 	switch(reg)
 	{
-		case 0x06:		/* Device Control */
+		case 0x06:      /* Device Control */
 		{
 			if (data & 0x4)
 			{
@@ -1443,8 +1443,8 @@ READ32_MEMBER(firebeat_state::cabinet_r )
 			m_cab_data_ptr++;
 			return r;
 		}
-		case 2:		return 0x00000000;
-		case 4:		return 0x00000000;
+		case 2:     return 0x00000000;
+		case 4:     return 0x00000000;
 	}
 
 	return 0;
@@ -1454,11 +1454,11 @@ READ32_MEMBER(firebeat_state::cabinet_r )
 
 READ32_MEMBER(firebeat_state::keyboard_wheel_r )
 {
-	if (offset == 0)		// Keyboard Wheel (P1)
+	if (offset == 0)        // Keyboard Wheel (P1)
 	{
 		return space.machine().root_device().ioport("WHEEL_P1")->read() << 24;
 	}
-	else if (offset == 2)	// Keyboard Wheel (P2)
+	else if (offset == 2)   // Keyboard Wheel (P2)
 	{
 		return space.machine().root_device().ioport("WHEEL_P2")->read() << 24;
 	}
@@ -1514,30 +1514,30 @@ static void midi_uart_irq_callback(running_machine &machine, int channel, int va
 
 static const int keyboard_notes[24] =
 {
-	0x3c,	// C1
-	0x3d,	// C1#
-	0x3e,	// D1
-	0x3f,	// D1#
-	0x40,	// E1
-	0x41,	// F1
-	0x42,	// F1#
-	0x43,	// G1
-	0x44,	// G1#
-	0x45,	// A1
-	0x46,	// A1#
-	0x47,	// B1
-	0x48,	// C2
-	0x49,	// C2#
-	0x4a,	// D2
-	0x4b,	// D2#
-	0x4c,	// E2
-	0x4d,	// F2
-	0x4e,	// F2#
-	0x4f,	// G2
-	0x50,	// G2#
-	0x51,	// A2
-	0x52,	// A2#
-	0x53,	// B2
+	0x3c,   // C1
+	0x3d,   // C1#
+	0x3e,   // D1
+	0x3f,   // D1#
+	0x40,   // E1
+	0x41,   // F1
+	0x42,   // F1#
+	0x43,   // G1
+	0x44,   // G1#
+	0x45,   // A1
+	0x46,   // A1#
+	0x47,   // B1
+	0x48,   // C2
+	0x49,   // C2#
+	0x4a,   // D2
+	0x4b,   // D2#
+	0x4c,   // E2
+	0x4d,   // F2
+	0x4e,   // F2#
+	0x4f,   // G2
+	0x50,   // G2#
+	0x51,   // A2
+	0x52,   // A2#
+	0x53,   // B2
 };
 
 TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
@@ -1642,16 +1642,16 @@ WRITE32_MEMBER(firebeat_state::lamp_output_kbm_w )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		output_set_value("door_lamp",	(data & 0x10000000) ? 1 : 0);
-		output_set_value("start1p",		(data & 0x01000000) ? 1 : 0);
-		output_set_value("start2p",		(data & 0x02000000) ? 1 : 0);
+		output_set_value("door_lamp",   (data & 0x10000000) ? 1 : 0);
+		output_set_value("start1p",     (data & 0x01000000) ? 1 : 0);
+		output_set_value("start2p",     (data & 0x02000000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("lamp1",		(data & 0x00000100) ? 1 : 0);
-		output_set_value("lamp2",		(data & 0x00000200) ? 1 : 0);
-		output_set_value("lamp3",		(data & 0x00000400) ? 1 : 0);
-		output_set_value("neon",		(data & 0x00000800) ? 1 : 0);
+		output_set_value("lamp1",       (data & 0x00000100) ? 1 : 0);
+		output_set_value("lamp2",       (data & 0x00000200) ? 1 : 0);
+		output_set_value("lamp3",       (data & 0x00000400) ? 1 : 0);
+		output_set_value("neon",        (data & 0x00000800) ? 1 : 0);
 	}
 }
 
@@ -1675,25 +1675,25 @@ WRITE32_MEMBER(firebeat_state::lamp_output_ppp_w )
 	// 0x00080000 Stage LED 7
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("left",			(data & 0x00000100) ? 1 : 0);
-		output_set_value("right",			(data & 0x00000200) ? 1 : 0);
-		output_set_value("door_lamp",		(data & 0x00000400) ? 1 : 0);
-		output_set_value("ok",				(data & 0x00000800) ? 1 : 0);
-		output_set_value("slim",			(data & 0x00008000) ? 1 : 0);
+		output_set_value("left",            (data & 0x00000100) ? 1 : 0);
+		output_set_value("right",           (data & 0x00000200) ? 1 : 0);
+		output_set_value("door_lamp",       (data & 0x00000400) ? 1 : 0);
+		output_set_value("ok",              (data & 0x00000800) ? 1 : 0);
+		output_set_value("slim",            (data & 0x00008000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		output_set_value("stage_led_0",		(data & 0x01000000) ? 1 : 0);
-		output_set_value("stage_led_1",		(data & 0x02000000) ? 1 : 0);
-		output_set_value("stage_led_2",		(data & 0x04000000) ? 1 : 0);
-		output_set_value("stage_led_3",		(data & 0x08000000) ? 1 : 0);
+		output_set_value("stage_led_0",     (data & 0x01000000) ? 1 : 0);
+		output_set_value("stage_led_1",     (data & 0x02000000) ? 1 : 0);
+		output_set_value("stage_led_2",     (data & 0x04000000) ? 1 : 0);
+		output_set_value("stage_led_3",     (data & 0x08000000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		output_set_value("stage_led_4",		(data & 0x00010000) ? 1 : 0);
-		output_set_value("stage_led_5",		(data & 0x00020000) ? 1 : 0);
-		output_set_value("stage_led_6",		(data & 0x00040000) ? 1 : 0);
-		output_set_value("stage_led_7",		(data & 0x00080000) ? 1 : 0);
+		output_set_value("stage_led_4",     (data & 0x00010000) ? 1 : 0);
+		output_set_value("stage_led_5",     (data & 0x00020000) ? 1 : 0);
+		output_set_value("stage_led_6",     (data & 0x00040000) ? 1 : 0);
+		output_set_value("stage_led_7",     (data & 0x00080000) ? 1 : 0);
 	}
 }
 
@@ -1717,17 +1717,17 @@ WRITE32_MEMBER(firebeat_state::lamp_output2_ppp_w )
 	// 0x00000008 Top LED 7
 	if (ACCESSING_BITS_16_23)
 	{
-		output_set_value("top_led_0",		(data & 0x00010000) ? 1 : 0);
-		output_set_value("top_led_1",		(data & 0x00020000) ? 1 : 0);
-		output_set_value("top_led_2",		(data & 0x00040000) ? 1 : 0);
-		output_set_value("top_led_3",		(data & 0x00080000) ? 1 : 0);
+		output_set_value("top_led_0",       (data & 0x00010000) ? 1 : 0);
+		output_set_value("top_led_1",       (data & 0x00020000) ? 1 : 0);
+		output_set_value("top_led_2",       (data & 0x00040000) ? 1 : 0);
+		output_set_value("top_led_3",       (data & 0x00080000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		output_set_value("top_led_4",		(data & 0x00000001) ? 1 : 0);
-		output_set_value("top_led_5",		(data & 0x00000002) ? 1 : 0);
-		output_set_value("top_led_6",		(data & 0x00000004) ? 1 : 0);
-		output_set_value("top_led_7",		(data & 0x00000008) ? 1 : 0);
+		output_set_value("top_led_4",       (data & 0x00000001) ? 1 : 0);
+		output_set_value("top_led_5",       (data & 0x00000002) ? 1 : 0);
+		output_set_value("top_led_6",       (data & 0x00000004) ? 1 : 0);
+		output_set_value("top_led_7",       (data & 0x00000008) ? 1 : 0);
 	}
 }
 
@@ -1747,10 +1747,10 @@ WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
 	// 0x00400000 Lamp 3
 	if (ACCESSING_BITS_16_23)
 	{
-		output_set_value("lamp_0",			(data & 0x00010000) ? 1 : 0);
-		output_set_value("lamp_1",			(data & 0x00040000) ? 1 : 0);
-		output_set_value("lamp_2",			(data & 0x00100000) ? 1 : 0);
-		output_set_value("lamp_3",			(data & 0x00400000) ? 1 : 0);
+		output_set_value("lamp_0",          (data & 0x00010000) ? 1 : 0);
+		output_set_value("lamp_1",          (data & 0x00040000) ? 1 : 0);
+		output_set_value("lamp_2",          (data & 0x00100000) ? 1 : 0);
+		output_set_value("lamp_3",          (data & 0x00400000) ? 1 : 0);
 	}
 }
 
@@ -1853,7 +1853,7 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE(gcu1_r, gcu1_w)
 	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(atapi_command_r, atapi_command_w)
 	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(atapi_control_r, atapi_control_w)
-	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)		/* System BIOS */
+	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)       /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
@@ -1889,63 +1889,63 @@ static void sound_irq_callback(device_t *device, int state)
 
 static const ymz280b_interface ymz280b_intf =
 {
-	sound_irq_callback,			// irq
+	sound_irq_callback,         // irq
 	DEVCB_DRIVER_MEMBER(firebeat_state,soundram_r)
 };
 
 static INPUT_PORTS_START(ppp)
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )			// Left
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )			// Right
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW)			// Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )				// Coin
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )				// Start / Ok
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )            // Left
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )            // Right
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW)            // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)      // Service
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )              // Coin
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )             // Start / Ok
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Dip switches */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Dip switches */
 
 	// ParaParaParadise has 24 sensors, grouped into groups of 3 for each sensor bar
 	// Sensors 15...23 are only used by the Korean version of PPP, which has 8 sensor bars
 
 	PORT_START("SENSOR1")
-	PORT_BIT( 0x00070000, IP_ACTIVE_HIGH, IPT_BUTTON3 )		// Sensor 0, 1, 2  (Sensor bar 1)
-	PORT_BIT( 0x00380000, IP_ACTIVE_HIGH, IPT_BUTTON4 )		// Sensor 3, 4, 5  (Sensor bar 2)
-	PORT_BIT( 0x00c00001, IP_ACTIVE_HIGH, IPT_BUTTON5 )		// Sensor 6, 7, 8  (Sensor bar 3)
-	PORT_BIT( 0x0000000e, IP_ACTIVE_HIGH, IPT_BUTTON6 )		// Sensor 9, 10,11 (Sensor bar 4)
+	PORT_BIT( 0x00070000, IP_ACTIVE_HIGH, IPT_BUTTON3 )     // Sensor 0, 1, 2  (Sensor bar 1)
+	PORT_BIT( 0x00380000, IP_ACTIVE_HIGH, IPT_BUTTON4 )     // Sensor 3, 4, 5  (Sensor bar 2)
+	PORT_BIT( 0x00c00001, IP_ACTIVE_HIGH, IPT_BUTTON5 )     // Sensor 6, 7, 8  (Sensor bar 3)
+	PORT_BIT( 0x0000000e, IP_ACTIVE_HIGH, IPT_BUTTON6 )     // Sensor 9, 10,11 (Sensor bar 4)
 
 	PORT_START("SENSOR2")
-	PORT_BIT( 0x00070000, IP_ACTIVE_HIGH, IPT_BUTTON7 )		// Sensor 12,13,14 (Sensor bar 5)
-	PORT_BIT( 0x00380000, IP_ACTIVE_HIGH, IPT_BUTTON8 )		// Sensor 15,16,17 (Sensor bar 6)   (unused by PPP)
-	PORT_BIT( 0x00c00001, IP_ACTIVE_HIGH, IPT_BUTTON9 )		// Sensor 18,19,20 (Sensor bar 7)   (unused by PPP)
-	PORT_BIT( 0x0000000e, IP_ACTIVE_HIGH, IPT_BUTTON10 )	// Sensor 21,22,23 (Sensor bar 8)   (unused by PPP)
+	PORT_BIT( 0x00070000, IP_ACTIVE_HIGH, IPT_BUTTON7 )     // Sensor 12,13,14 (Sensor bar 5)
+	PORT_BIT( 0x00380000, IP_ACTIVE_HIGH, IPT_BUTTON8 )     // Sensor 15,16,17 (Sensor bar 6)   (unused by PPP)
+	PORT_BIT( 0x00c00001, IP_ACTIVE_HIGH, IPT_BUTTON9 )     // Sensor 18,19,20 (Sensor bar 7)   (unused by PPP)
+	PORT_BIT( 0x0000000e, IP_ACTIVE_HIGH, IPT_BUTTON10 )    // Sensor 21,22,23 (Sensor bar 8)   (unused by PPP)
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(kbm)
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )				// Start P1
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )				// Start P2
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW)			// Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )				// Coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )             // Start P1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )             // Start P2
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW)            // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)      // Service
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )              // Coin
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )			// e-Amusement
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )           // e-Amusement
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Dip switches */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Dip switches */
 
-	PORT_START("WHEEL_P1")			// Keyboard modulation wheel (P1)
+	PORT_START("WHEEL_P1")          // Keyboard modulation wheel (P1)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("WHEEL_P2")			// Keyboard modulation wheel (P2)
+	PORT_START("WHEEL_P2")          // Keyboard modulation wheel (P2)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
 	PORT_START("KEYBOARD_P1")
@@ -2004,27 +2004,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(popn)
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )			// Switch 1
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )			// Switch 2
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )			// Switch 3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )			// Switch 4
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )			// Switch 5
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )			// Switch 6
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )			// Switch 7
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )			// Switch 8
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )            // Switch 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )            // Switch 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )            // Switch 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )            // Switch 4
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )            // Switch 5
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )            // Switch 6
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )            // Switch 7
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )            // Switch 8
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )			// Switch 9
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )            // Switch 9
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )				// Coin
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )              // Coin
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW)			// Test
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW)            // Test
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)      // Service
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Dip switches */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Dip switches */
 
 INPUT_PORTS_END
 
@@ -2207,16 +2207,16 @@ static int ibutton_w(running_machine &machine, UINT8 data)
 				//
 				// DS2408B Serial 1-Wire Line Driver with Load Sensor
 				//
-				case 0xc1:			// DS2480B reset
+				case 0xc1:          // DS2480B reset
 				{
 					r = 0xcd;
 					break;
 				}
-				case 0xe1:			// DS2480B set data mode
+				case 0xe1:          // DS2480B set data mode
 				{
 					break;
 				}
-				case 0xe3:			// DS2480B set command mode
+				case 0xe3:          // DS2480B set command mode
 				{
 					break;
 				}
@@ -2224,14 +2224,14 @@ static int ibutton_w(running_machine &machine, UINT8 data)
 				//
 				// DS1991 MultiKey iButton
 				//
-				case 0x66:			// DS1991 Read SubKey
+				case 0x66:          // DS1991 Read SubKey
 				{
 					r = 0x66;
 					state->m_ibutton_state = DS1991_STATE_READ_SUBKEY;
 					state->m_ibutton_read_subkey_ptr = 0;
 					break;
 				}
-				case 0xcc:			// DS1991 skip rom
+				case 0xcc:          // DS1991 skip rom
 				{
 					r = 0xcc;
 					state->m_ibutton_state = DS1991_STATE_NORMAL;
@@ -2248,7 +2248,7 @@ static int ibutton_w(running_machine &machine, UINT8 data)
 
 		case DS1991_STATE_READ_SUBKEY:
 		{
-			if (state->m_ibutton_read_subkey_ptr == 0)		// Read SubKey, 2nd command byte
+			if (state->m_ibutton_read_subkey_ptr == 0)      // Read SubKey, 2nd command byte
 			{
 				int subkey = (data >> 6) & 0x3;
 		//      printf("iButton SubKey %d\n", subkey);
@@ -2265,7 +2265,7 @@ static int ibutton_w(running_machine &machine, UINT8 data)
 					memset(&state->m_ibutton_subkey_data[0], 0, 0x40);
 				}
 			}
-			else if (state->m_ibutton_read_subkey_ptr == 1)	// Read SubKey, 3rd command byte
+			else if (state->m_ibutton_read_subkey_ptr == 1) // Read SubKey, 3rd command byte
 			{
 				r = data;
 			}
@@ -2313,8 +2313,8 @@ static void init_firebeat(running_machine &machine)
 
 	atapi_init(machine);
 
-	pc16552d_init(machine, 0, 19660800, comm_uart_irq_callback, 0);		// Network UART
-	pc16552d_init(machine, 1, 24000000, midi_uart_irq_callback, 0);		// MIDI UART
+	pc16552d_init(machine, 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
+	pc16552d_init(machine, 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
 
 	state->m_extend_board_irq_enable = 0x3f;
 	state->m_extend_board_irq_active = 0x00;
@@ -2369,7 +2369,7 @@ ROM_START( ppp )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", 0)	// Security dongle
+	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
 	DISK_REGION( "scsi0" )
@@ -2385,7 +2385,7 @@ ROM_START( ppp1mp )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", 0)	// Security dongle
+	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD( "gqa11-ja",     0x000000, 0x0000c0, CRC(2ed8e2ae) SHA1(b8c3410dab643111b2d2027068175ba018a0a67e) )
 
 	DISK_REGION( "scsi0" )
@@ -2401,7 +2401,7 @@ ROM_START( kbm )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4578f29b) SHA1(faaeaf6357c1e86e898e7017566cfd2fc7ee3d6f))
 
 	DISK_REGION( "scsi0" )
@@ -2417,7 +2417,7 @@ ROM_START( kbm2nd )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(2bda339d) SHA1(031cb3f44e7a89cd62a9ba948f3d19d53a325abd))
 
 	DISK_REGION( "scsi0" )
@@ -2433,7 +2433,7 @@ ROM_START( kbm3rd )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", 0)	// Security dongle
+	ROM_REGION(0xc0, "user2", 0)    // Security dongle
 	ROM_LOAD("gca12-ja", 0x00, 0xc0, BAD_DUMP CRC(cf01dc15) SHA1(da8d208233487ebe65a0a9826fc72f1f459baa26))
 
 	DISK_REGION( "scsi0" )
@@ -2449,16 +2449,16 @@ ROM_START( popn4 )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gq986-ja", 0x000000, 0x0000c0, CRC(6f8aa811) SHA1(fc970f6b4ada58eee361b3477abe503019b5dfda) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" )	// program CD-ROM
+	DISK_REGION( "scsi0" )  // program CD-ROM
 	DISK_IMAGE_READONLY( "gq986jaa01", 0, SHA1(e5368ac029b0bdf29943ae66677b5521ae1176e1) )
 
-	DISK_REGION( "scsi1" )	// data DVD-ROM
+	DISK_REGION( "scsi1" )  // data DVD-ROM
 	DISK_IMAGE( "gq986jaa02", 1, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
 ROM_END
 
@@ -2468,10 +2468,10 @@ ROM_START( popn5 )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gca04-ja", 0x000000, 0x0000c0, CRC(7724fdbf) SHA1(b1b2d838d1938d9dc15151b7834502c1668bd31b) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
 
 	DISK_REGION( "scsi0" )
@@ -2487,16 +2487,16 @@ ROM_START( popn6 )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gqa16-ja", 0x000000, 0x0000c0, CRC(a3393355) SHA1(6b28b972fe375e6ad0c614110c0ae3832cffccff) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "scsi0" )	// program CD-ROM
+	DISK_REGION( "scsi0" )  // program CD-ROM
 	DISK_IMAGE_READONLY( "gqa16jaa01", 0, SHA1(7a7e475d06c74a273f821fdfde0743b33d566e4c) )
 
-	DISK_REGION( "scsi1" )	// data DVD-ROM
+	DISK_REGION( "scsi1" )  // data DVD-ROM
 	DISK_IMAGE( "gqa16jaa02", 1, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
 ROM_END
 
@@ -2506,10 +2506,10 @@ ROM_START( popn7 )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gcb00-ja", 0x00, 0xc0, CRC(cc28625a) SHA1(e7de79ae72fdbd22328c9de74dfa17b5e6ae43b6))
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( "scsi0" ) // program CD-ROM
@@ -2525,10 +2525,10 @@ ROM_START( popn8 )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gqb30-ja", 0x000000, 0x0000c0, CRC(dbabb51b) SHA1(b53e971f544a654f0811e10eed40bee2e0393855) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( "scsi0" ) // program CD-ROM
@@ -2544,10 +2544,10 @@ ROM_START( popnanm2 )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gea02-ja", 0x000000, 0x0000c0, CRC(072f8624) SHA1(e869b85a891bf7f9c870fb581a9a2ddd70810e2c) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( "scsi0" ) // program CD-ROM
@@ -2563,7 +2563,7 @@ ROM_START( ppd )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977-ko", 0x00, 0xc0, BAD_DUMP CRC(ee743323) SHA1(2042e45879795557ad3cc21b37962f6bf54da60d))
 
 	DISK_REGION( "scsi0" )
@@ -2579,7 +2579,7 @@ ROM_START( ppp11 )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
 	DISK_REGION( "scsi0" )
@@ -2596,10 +2596,10 @@ ROM_START( bm37th )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gcb07-jc", 0x000000, 0x0000c0, CRC(16115b6a) SHA1(dcb2a3346973941a946b2cdfd31a5a761f666ca3) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( "scsi0" ) // program CD-ROM
@@ -2615,10 +2615,10 @@ ROM_START( bm3final )
 
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
-	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gcc01-jc", 0x000000, 0x0000c0, CRC(9c49fed8) SHA1(212b87c1d25763117611ffb2a36ed568d429d2f4) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( "scsi0" ) // program CD-ROM
@@ -2637,9 +2637,9 @@ GAME( 2000, ppp1mp,   ppp,     firebeat,      ppp, firebeat_state,    ppp,      
 GAMEL(2000, kbm,      0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2000, kbm2nd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2001, kbm3rd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat)
-GAME( 2000, popn4,	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 4", GAME_NOT_WORKING)
+GAME( 2000, popn4,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 4", GAME_NOT_WORKING)
 GAME( 2000, popn5,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 5", GAME_NOT_WORKING)
-GAME( 2001, popn6,	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 6", GAME_NOT_WORKING)
+GAME( 2001, popn6,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 6", GAME_NOT_WORKING)
 GAME( 2001, popn7,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 7", GAME_NOT_WORKING)
 GAME( 2001, popnanm2, 0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music Animelo 2", GAME_NOT_WORKING)
 GAME( 2002, popn8,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 8", GAME_NOT_WORKING)

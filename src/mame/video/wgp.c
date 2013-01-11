@@ -8,13 +8,13 @@
 INLINE void common_get_piv_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int num )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	UINT16 tilenum = state->m_pivram[tile_index + num * 0x1000];	/* 3 blocks of $2000 */
-	UINT16 attr = state->m_pivram[tile_index + num * 0x1000 + 0x8000];	/* 3 blocks of $2000 */
+	UINT16 tilenum = state->m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
+	UINT16 attr = state->m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
 
 	SET_TILE_INFO(
 			2,
 			tilenum & 0x3fff,
-			(attr & 0x3f),	/* attr & 0x1 ?? */
+			(attr & 0x3f),  /* attr & 0x1 ?? */
 			TILE_FLIPYX( (attr & 0xc0) >> 6));
 }
 
@@ -162,7 +162,7 @@ WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
 	{
 		case 0x00:
 			a = -data;
-			b = (a & 0xffe0) >> 1;	/* kill bit 4 */
+			b = (a & 0xffe0) >> 1;  /* kill bit 4 */
 			m_piv_scrollx[0] = (a & 0xf) | b;
 			break;
 
@@ -192,10 +192,10 @@ WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
 
 		case 0x06:
 			/* Overall control reg (?)
-               0x39  %00111001   normal
-               0x2d  %00101101   piv2 layer goes under piv1
-                     seen on Wgp stages 4,5,7 in which piv 2 used
-                     for cloud or scenery wandering up screen */
+			   0x39  %00111001   normal
+			   0x2d  %00101101   piv2 layer goes under piv1
+			         seen on Wgp stages 4,5,7 in which piv 2 used
+			         for cloud or scenery wandering up screen */
 
 			m_piv_ctrl_reg = data;
 			break;
@@ -207,13 +207,13 @@ WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
 
 		case 0x09:
 			/* piv 1 y zoom (0x7f = normal, values 0 &
-                  0xff7f-ffbc in Wgp2) */
+			      0xff7f-ffbc in Wgp2) */
 			m_piv_zoom[1] = data;
 			break;
 
 		case 0x0a:
 			/* piv 2 y zoom (0x7f = normal, values 0 &
-                  0xff7f-ffbc in Wgp2, 0-0x98 in Wgp round 4/5) */
+			      0xff7f-ffbc in Wgp2, 0-0x98 in Wgp round 4/5) */
 			m_piv_zoom[2] = data;
 			break;
 	}
@@ -332,15 +332,15 @@ Memory Map
 
 static const UINT8 xlookup[16] =
 	{ 0, 1, 0, 1,
-	  2, 3, 2, 3,
-	  0, 1, 0, 1,
-	  2, 3, 2, 3 };
+		2, 3, 2, 3,
+		0, 1, 0, 1,
+		2, 3, 2, 3 };
 
 static const UINT8 ylookup[16] =
 	{ 0, 0, 1, 1,
-	  0, 0, 1, 1,
-	  2, 2, 3, 3,
-	  2, 2, 3, 3 };
+		0, 0, 1, 1,
+		2, 2, 3, 3,
+		2, 2, 3, 3 };
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
@@ -353,23 +353,23 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT16 code, bigsprite, map_index;
 //  UINT16 rotate = 0;
 	UINT16 tile_mask = (machine.gfx[0]->elements()) - 1;
-	static const int primasks[2] = {0x0, 0xfffc};	/* fff0 => under rhs of road only */
+	static const int primasks[2] = {0x0, 0xfffc};   /* fff0 => under rhs of road only */
 
 	for (offs = 0x1ff; offs >= 0; offs--)
 	{
 		code = (spriteram[0xe00 + offs]);
 
-		if (code)	/* do we have an active sprite ? */
+		if (code)   /* do we have an active sprite ? */
 		{
-			i = (code << 3) & 0xfff;	/* yes, so we look up its sprite entry */
+			i = (code << 3) & 0xfff;    /* yes, so we look up its sprite entry */
 
 			x = spriteram[i];
 			y = spriteram[i + 1];
 			bigsprite = spriteram[i + 2] & 0x3fff;
 
 			/* The last five words [i + 3 through 7] must be zoom/rotation
-               control: for time being we kludge zoom using 1 word.
-               Timing problems are causing many glitches. */
+			   control: for time being we kludge zoom using 1 word.
+			   Timing problems are causing many glitches. */
 
 			if ((spriteram[i + 4] == 0xfff6) && (spriteram[i + 5] == 0))
 				continue;
@@ -394,7 +394,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (x & 0x8000)  x -= 0x10000;
 			if (y & 0x8000)  y -= 0x10000;
 
-			map_index = bigsprite << 1;	/* now we access sprite tilemap */
+			map_index = bigsprite << 1; /* now we access sprite tilemap */
 
 			/* don't know what selects 2x2 sprites: we use a nasty kludge which seems to work */
 
@@ -412,11 +412,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					/* not known what controls priority */
 					priority = (state->m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
 
-					flipx = 0;	// no flip xy?
+					flipx = 0;  // no flip xy?
 					flipy = 0;
 
-					k = xlookup[i];	// assumes no xflip
-					j = ylookup[i];	// assumes no yflip
+					k = xlookup[i]; // assumes no xflip
+					j = ylookup[i]; // assumes no yflip
 
 					curx = x + ((k * zoomx) / 2);
 					cury = y + ((j * zoomy) / 2);
@@ -430,7 +430,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							machine.priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
+							machine.priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
 				}
 			}
 			else
@@ -443,11 +443,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					/* not known what controls priority */
 					priority = (state->m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
 
-					flipx = 0;	// no flip xy?
+					flipx = 0;  // no flip xy?
 					flipy = 0;
 
-					k = xlookup[i];	// assumes no xflip
-					j = ylookup[i];	// assumes no yflip
+					k = xlookup[i]; // assumes no xflip
+					j = ylookup[i]; // assumes no yflip
 
 					curx = x + ((k * zoomx) / 4);
 					cury = y + ((j * zoomy) / 4);
@@ -461,7 +461,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							machine.priority_bitmap,primasks[((priority >> 1) &1)],0);	/* maybe >> 2 or 0...? */
+							machine.priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
 				}
 			}
 		}
@@ -525,14 +525,14 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 	int i, y, y_index, src_y_index, row_index, row_zoom;
 
 	/* I have a fairly strong feeling these should be UINT32's, x_index is
-       falling through from max +ve to max -ve quite a lot in this routine */
+	   falling through from max +ve to max -ve quite a lot in this routine */
 	int sx, x_index, x_step;
 
 	UINT32 zoomx, zoomy;
 	UINT16 scanline[512];
 	UINT16 row_colbank, row_scroll;
-	int flipscreen = 0;	/* n/a */
-	int machine_flip = 0;	/* for  ROT 180 ? */
+	int flipscreen = 0; /* n/a */
+	int machine_flip = 0;   /* for  ROT 180 ? */
 
 	UINT16 screen_width = cliprect.width();
 	UINT16 min_y = cliprect.min_y;
@@ -540,14 +540,14 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 
 	int width_mask = 0x3ff;
 
-	zoomx = 0x10000;	/* No overall X zoom, unlike TC0480SCP */
+	zoomx = 0x10000;    /* No overall X zoom, unlike TC0480SCP */
 
 	/* Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max ???
-       In WGP see:  stage 4 (big spectator stand)
-                    stage 5 (cloud layer)
-                    stage 7 (two bits of background scenery)
-                    stage 8 (unknown - surely something should be appearing here...)
-       In WGP2 see: road at big hill (default course) */
+	   In WGP see:  stage 4 (big spectator stand)
+	                stage 5 (cloud layer)
+	                stage 7 (two bits of background scenery)
+	                stage 8 (unknown - surely something should be appearing here...)
+	   In WGP2 see: road at big hill (default course) */
 
 	/* This calculation may be wrong, the y_index one too */
 	zoomy = 0x10000 - (((state->m_piv_ctrlram[0x08 + layer] & 0xff) - 0x7f) * 512);
@@ -555,12 +555,12 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 	if (!flipscreen)
 	{
 		sx = ((state->m_piv_scrollx[layer]) << 16);
-		sx += (state->m_piv_xoffs) * zoomx;		/* may be imperfect */
+		sx += (state->m_piv_xoffs) * zoomx;     /* may be imperfect */
 
 		y_index = (state->m_piv_scrolly[layer] << 16);
-		y_index += (state->m_piv_yoffs + min_y) * zoomy;		/* may be imperfect */
+		y_index += (state->m_piv_yoffs + min_y) * zoomy;        /* may be imperfect */
 	}
-	else	/* piv tiles flipscreen n/a */
+	else    /* piv tiles flipscreen n/a */
 	{
 		sx = 0;
 		y_index = 0;
@@ -581,21 +581,21 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 		row_zoom = state->m_pivram[row_index + layer * 0x400 + 0x3400] & 0xff;
 
 		row_colbank = state->m_pivram[row_index + layer * 0x400 + 0x3400] >> 8;
-		a = (row_colbank & 0xe0);	/* kill bit 4 */
+		a = (row_colbank & 0xe0);   /* kill bit 4 */
 		row_colbank = (((row_colbank & 0xf) << 1) | a) << 4;
 
 		row_scroll = state->m_pivram[row_index + layer * 0x1000 + 0x4000];
-		a = (row_scroll & 0xffe0) >> 1;	/* kill bit 4 */
+		a = (row_scroll & 0xffe0) >> 1; /* kill bit 4 */
 		row_scroll = ((row_scroll & 0xf) | a) & width_mask;
 
 		x_index = sx - (row_scroll << 16);
 
 		x_step = zoomx;
-		if (row_zoom > 0x7f)	/* zoom in: reduce x_step */
+		if (row_zoom > 0x7f)    /* zoom in: reduce x_step */
 		{
 			x_step -= (((row_zoom - 0x7f) << 8) & 0xffff);
 		}
-		else if (row_zoom < 0x7f)	/* zoom out: increase x_step */
+		else if (row_zoom < 0x7f)   /* zoom out: increase x_step */
 		{
 			x_step += (((0x7f - row_zoom) << 8) & 0xffff);
 		}
@@ -746,4 +746,3 @@ UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap,
 #endif
 	return 0;
 }
-

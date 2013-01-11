@@ -38,54 +38,54 @@ static void dragrace_update_misc_flags( address_space &space )
 {
 	dragrace_state *state = space.machine().driver_data<dragrace_state>();
 	/* 0x0900 = set 3SPEED1         0x00000001
-     * 0x0901 = set 4SPEED1         0x00000002
-     * 0x0902 = set 5SPEED1         0x00000004
-     * 0x0903 = set 6SPEED1         0x00000008
-     * 0x0904 = set 7SPEED1         0x00000010
-     * 0x0905 = set EXPLOSION1      0x00000020
-     * 0x0906 = set SCREECH1        0x00000040
-     * 0x0920 - 0x0927 = clear 0x0900 - 0x0907
+	 * 0x0901 = set 4SPEED1         0x00000002
+	 * 0x0902 = set 5SPEED1         0x00000004
+	 * 0x0903 = set 6SPEED1         0x00000008
+	 * 0x0904 = set 7SPEED1         0x00000010
+	 * 0x0905 = set EXPLOSION1      0x00000020
+	 * 0x0906 = set SCREECH1        0x00000040
+	 * 0x0920 - 0x0927 = clear 0x0900 - 0x0907
 
-     * 0x0909 = set KLEXPL1         0x00000200
-     * 0x090b = set MOTOR1          0x00000800
-     * 0x090c = set ATTRACT         0x00001000
-     * 0x090d = set LOTONE          0x00002000
-     * 0x090f = set Player 1 Start Lamp 0x00008000
-     * 0x0928 - 0x092f = clear 0x0908 - 0x090f
+	 * 0x0909 = set KLEXPL1         0x00000200
+	 * 0x090b = set MOTOR1          0x00000800
+	 * 0x090c = set ATTRACT         0x00001000
+	 * 0x090d = set LOTONE          0x00002000
+	 * 0x090f = set Player 1 Start Lamp 0x00008000
+	 * 0x0928 - 0x092f = clear 0x0908 - 0x090f
 
-     * 0x0910 = set 3SPEED2         0x00010000
-     * 0x0911 = set 4SPEED2         0x00020000
-     * 0x0912 = set 5SPEED2         0x00040000
-     * 0x0913 = set 6SPEED2         0x00080000
-     * 0x0914 = set 7SPEED2         0x00100000
-     * 0x0915 = set EXPLOSION2      0x00200000
-     * 0x0916 = set SCREECH2        0x00400000
-     * 0x0930 = clear 0x0910 - 0x0917
+	 * 0x0910 = set 3SPEED2         0x00010000
+	 * 0x0911 = set 4SPEED2         0x00020000
+	 * 0x0912 = set 5SPEED2         0x00040000
+	 * 0x0913 = set 6SPEED2         0x00080000
+	 * 0x0914 = set 7SPEED2         0x00100000
+	 * 0x0915 = set EXPLOSION2      0x00200000
+	 * 0x0916 = set SCREECH2        0x00400000
+	 * 0x0930 = clear 0x0910 - 0x0917
 
-     * 0x0919 = set KLEXPL2         0x02000000
-     * 0x091b = set MOTOR2          0x08000000
-     * 0x091d = set HITONE          0x20000000
-     * 0x091f = set Player 2 Start Lamp 0x80000000
-     * 0x0938 = clear 0x0918 - 0x091f
-     */
+	 * 0x0919 = set KLEXPL2         0x02000000
+	 * 0x091b = set MOTOR2          0x08000000
+	 * 0x091d = set HITONE          0x20000000
+	 * 0x091f = set Player 2 Start Lamp 0x80000000
+	 * 0x0938 = clear 0x0918 - 0x091f
+	 */
 	set_led_status(space.machine(), 0, state->m_misc_flags & 0x00008000);
 	set_led_status(space.machine(), 1, state->m_misc_flags & 0x80000000);
 
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR1_DATA,  ~state->m_misc_flags & 0x0000001f);		// Speed1 data*
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_EXPLODE1_EN, (state->m_misc_flags & 0x00000020) ? 1: 0);	// Explosion1 enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_SCREECH1_EN, (state->m_misc_flags & 0x00000040) ? 1: 0);	// Screech1 enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_KLEXPL1_EN, (state->m_misc_flags & 0x00000200) ? 1: 0);	// KLEXPL1 enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR1_EN, (state->m_misc_flags & 0x00000800) ? 1: 0);	// Motor1 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR1_DATA,  ~state->m_misc_flags & 0x0000001f);       // Speed1 data*
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_EXPLODE1_EN, (state->m_misc_flags & 0x00000020) ? 1: 0);    // Explosion1 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_SCREECH1_EN, (state->m_misc_flags & 0x00000040) ? 1: 0);    // Screech1 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_KLEXPL1_EN, (state->m_misc_flags & 0x00000200) ? 1: 0); // KLEXPL1 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR1_EN, (state->m_misc_flags & 0x00000800) ? 1: 0);  // Motor1 enable
 
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR2_DATA, (~state->m_misc_flags & 0x001f0000) >> 0x10);	// Speed2 data*
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_EXPLODE2_EN, (state->m_misc_flags & 0x00200000) ? 1: 0);	// Explosion2 enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_SCREECH2_EN, (state->m_misc_flags & 0x00400000) ? 1: 0);	// Screech2 enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_KLEXPL2_EN, (state->m_misc_flags & 0x02000000) ? 1: 0);	// KLEXPL2 enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR2_EN, (state->m_misc_flags & 0x08000000) ? 1: 0);	// Motor2 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR2_DATA, (~state->m_misc_flags & 0x001f0000) >> 0x10);  // Speed2 data*
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_EXPLODE2_EN, (state->m_misc_flags & 0x00200000) ? 1: 0);    // Explosion2 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_SCREECH2_EN, (state->m_misc_flags & 0x00400000) ? 1: 0);    // Screech2 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_KLEXPL2_EN, (state->m_misc_flags & 0x02000000) ? 1: 0); // KLEXPL2 enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_MOTOR2_EN, (state->m_misc_flags & 0x08000000) ? 1: 0);  // Motor2 enable
 
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_ATTRACT_EN, (state->m_misc_flags & 0x00001000) ? 1: 0);	// Attract enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_LOTONE_EN, (state->m_misc_flags & 0x00002000) ? 1: 0);	// LoTone enable
-	discrete_sound_w(state->m_discrete, space, DRAGRACE_HITONE_EN, (state->m_misc_flags & 0x20000000) ? 1: 0);	// HiTone enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_ATTRACT_EN, (state->m_misc_flags & 0x00001000) ? 1: 0); // Attract enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_LOTONE_EN, (state->m_misc_flags & 0x00002000) ? 1: 0);  // LoTone enable
+	discrete_sound_w(state->m_discrete, space, DRAGRACE_HITONE_EN, (state->m_misc_flags & 0x20000000) ? 1: 0);  // HiTone enable
 }
 
 WRITE8_MEMBER(dragrace_state::dragrace_misc_w)

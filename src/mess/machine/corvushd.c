@@ -72,15 +72,15 @@
 #define VERBOSE 0
 #define VERBOSE_RESPONSES 0
 #define VERSION 1
-#define MAX_COMMAND_SIZE 4096	// The maximum size of a command packet (the controller only has 5K of RAM...)
-#define SPARE_TRACKS 7			// This is a Rev B drive, so 7 it is
-#define CALLBACK_CTH_MODE 1		// Set to Controller-to-Host mode when callback fires
-#define CALLBACK_HTC_MODE 2		// Set to Host-to-Controller mode when callback fires
-#define CALLBACK_SAME_MODE 3	// Leave mode the same when callback fires
-#define CALLBACK_TIMEOUT 4		// Four seconds have elapsed.  We're timing out
-#define TRACK_SEEK_TIME 1667	// Track-to-track seek time in microseconds (Maximum Access Time / Total Cylinders)
-#define INTERBYTE_DELAY 5		// Inter-byte delay in microseconds communicating between controller and host
-#define INTERSECTOR_DELAY 25000	// 25ms delay between sectors (4800 RPM = 80 Rev/Second.  Maximum 2 sectors transferred / Rev)
+#define MAX_COMMAND_SIZE 4096   // The maximum size of a command packet (the controller only has 5K of RAM...)
+#define SPARE_TRACKS 7          // This is a Rev B drive, so 7 it is
+#define CALLBACK_CTH_MODE 1     // Set to Controller-to-Host mode when callback fires
+#define CALLBACK_HTC_MODE 2     // Set to Host-to-Controller mode when callback fires
+#define CALLBACK_SAME_MODE 3    // Leave mode the same when callback fires
+#define CALLBACK_TIMEOUT 4      // Four seconds have elapsed.  We're timing out
+#define TRACK_SEEK_TIME 1667    // Track-to-track seek time in microseconds (Maximum Access Time / Total Cylinders)
+#define INTERBYTE_DELAY 5       // Inter-byte delay in microseconds communicating between controller and host
+#define INTERSECTOR_DELAY 25000 // 25ms delay between sectors (4800 RPM = 80 Rev/Second.  Maximum 2 sectors transferred / Rev)
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG_BUFFER(p,s) do { if (VERBOSE) dump_buffer(p,s); } while (0)
@@ -91,28 +91,28 @@
 // Sector addressing scheme for Rev B/H drives used in various commands (Called a DADR in the docs)
 struct dadr_t {
 	UINT8 address_msn_and_drive;// Most significant nibble: Most signficant nibble of sector address, Least significant nibble: Drive #
-	UINT8 address_lsb;			// Least significant byte of sector address
-	UINT8 address_mid;			// Middle byte of sector address
+	UINT8 address_lsb;          // Least significant byte of sector address
+	UINT8 address_mid;          // Middle byte of sector address
 };
 
 // Controller structure
 struct corvus_hdc_t {
-	UINT8	status;				// Controller status byte (DIRECTION + BUSY/READY)
-	char	prep_mode;			// Whether the controller is in Prep Mode or not
+	UINT8   status;             // Controller status byte (DIRECTION + BUSY/READY)
+	char    prep_mode;          // Whether the controller is in Prep Mode or not
 	// Physical drive info
-	UINT8	sectors_per_track;	// Number of sectors per track for this drive
-	UINT8	tracks_per_cylinder;// Number of tracks per cylinder (heads)
-	UINT16	cylinders_per_drive;// Number of cylinders per drive
+	UINT8   sectors_per_track;  // Number of sectors per track for this drive
+	UINT8   tracks_per_cylinder;// Number of tracks per cylinder (heads)
+	UINT16  cylinders_per_drive;// Number of cylinders per drive
 	// Command Processing
-	UINT16	offset;				// Current offset into raw_data buffer
-	char	awaiting_modifier;	// We've received a two-byte command and we're waiting for the mod
-	UINT16	recv_bytes;			// Number of bytes expected to be received from Host
-	UINT16	xmit_bytes;			// Number of bytes expected to be transmitted to host
+	UINT16  offset;             // Current offset into raw_data buffer
+	char    awaiting_modifier;  // We've received a two-byte command and we're waiting for the mod
+	UINT16  recv_bytes;         // Number of bytes expected to be received from Host
+	UINT16  xmit_bytes;         // Number of bytes expected to be transmitted to host
 	// Timing-related values
-	UINT16	last_cylinder;		// Last cylinder accessed - for calculating seek times
-	UINT32	delay;				// Delay in microseconds for callback
-	emu_timer	*timeout_timer;	// Four-second timer for timeouts
-	UINT8	invalid_command_flag;		// I hate this, but it saves a lot more tests
+	UINT16  last_cylinder;      // Last cylinder accessed - for calculating seek times
+	UINT32  delay;              // Delay in microseconds for callback
+	emu_timer   *timeout_timer; // Four-second timer for timeouts
+	UINT8   invalid_command_flag;       // I hate this, but it saves a lot more tests
 
 	//
 	// Union below represents both an input and output buffer and interpretations of it
@@ -121,188 +121,188 @@ struct corvus_hdc_t {
 		//
 		// Raw Buffer
 		//
-		UINT8		raw_data[MAX_COMMAND_SIZE];
+		UINT8       raw_data[MAX_COMMAND_SIZE];
 		//
 		// Basic interpretation of code and modifier
 		//
 		struct {
-			UINT8	code;		// First byte of data is the code (command)
-			UINT8	modifier;	// Second byte of data is the modifier
+			UINT8   code;       // First byte of data is the code (command)
+			UINT8   modifier;   // Second byte of data is the modifier
 		} command;
 		//
 		// Basic response code
 		//
 		struct {
-			UINT8	status;		// Status code returned by the command executed
+			UINT8   status;     // Status code returned by the command executed
 		} single_byte_response;
 		//
 		// Read sector command
 		//
 		struct {
-			UINT8	code;		// Command code
-			dadr_t	dadr;		// Encoded drive and sector to read
+			UINT8   code;       // Command code
+			dadr_t  dadr;       // Encoded drive and sector to read
 		} read_sector_command;
 		//
 		// 128-byte Read Sector response
 		//
 		struct {
-			UINT8	status;		// Status code returned by command executed
-			UINT8	data[128];	// Data returned from read
+			UINT8   status;     // Status code returned by command executed
+			UINT8   data[128];  // Data returned from read
 		} read_128_response;
 		//
 		// 256-byte Read Sector response
 		//
 		struct {
-			UINT8	status;		// Status code returned by command executed
-			UINT8	data[256];	// Data returned from read
+			UINT8   status;     // Status code returned by command executed
+			UINT8   data[256];  // Data returned from read
 		} read_256_reponse;
 		//
 		// 512-byte Read Sector response
 		//
 		struct {
-			UINT8	status;		// Status code returned by command executed
-			UINT8	data[512];	// Data returned by read
+			UINT8   status;     // Status code returned by command executed
+			UINT8   data[512];  // Data returned by read
 		} read_512_response;
 		//
 		// Write 128-byte sector command
 		//
 		struct {
-			UINT8	code;		// Command code
-			dadr_t	dadr;		// Encoded drive and sector to write
-			UINT8	data[128];	// Data to be written
+			UINT8   code;       // Command code
+			dadr_t  dadr;       // Encoded drive and sector to write
+			UINT8   data[128];  // Data to be written
 		} write_128_command;
 		//
 		// Write 256-byte sector command
 		//
 		struct {
-			UINT8	code;		// Command code
-			dadr_t	dadr;		// Encoded drive and sector to write
-			UINT8	data[256];	// Data to be written
+			UINT8   code;       // Command code
+			dadr_t  dadr;       // Encoded drive and sector to write
+			UINT8   data[256];  // Data to be written
 		} write_256_command;
 		//
 		// Write 512-byte sector command
 		//
 		struct {
-			UINT8	code;		// Command Code
-			dadr_t	dadr;		// Encoded drive and sector to write
-			UINT8	data[512];	// Data to be written
+			UINT8   code;       // Command Code
+			dadr_t  dadr;       // Encoded drive and sector to write
+			UINT8   data[512];  // Data to be written
 		} write_512_command;
 		//
 		// Semaphore Lock command
 		//
 		struct {
-			UINT8	code;		// Command code
-			UINT8	modifier;	// Command code modifier
-			UINT8	name[8];	// Semaphore name
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   name[8];    // Semaphore name
 		} lock_semaphore_command;
 		//
 		// Semaphore Unlock command
 		//
 		struct {
-			UINT8	code;		// Command code
-			UINT8	modifier;	// Command code modifier
-			UINT8	name[8];	// Semaphore name
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   name[8];    // Semaphore name
 		} unlock_semaphore_command;
 		//
 		// Semaphore Lock/Unlock response
 		//
 		struct {
-			UINT8	status;		// Disk access status
-			UINT8	result;		// Semaphore action status
-			UINT8	unused[10];	// Unused
+			UINT8   status;     // Disk access status
+			UINT8   result;     // Semaphore action status
+			UINT8   unused[10]; // Unused
 		} semaphore_locking_response;
 		//
 		// Initialize Semaphore table command
 		//
 		struct {
-			UINT8	code;		// Command code
-			UINT8	modifier;	// Command code modifier
-			UINT8	unused[3];	// Unused
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   unused[3];  // Unused
 		} init_semaphore_command;
 		//
 		// Semaphore Status command
 		//
 		struct {
-			UINT8	code;		// Command code
-			UINT8	modifier;	// Command code modifier
-			UINT8	zero_three;	// Don't ask me...
-			UINT8	unused[2];	// Unused
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   zero_three; // Don't ask me...
+			UINT8   unused[2];  // Unused
 		} semaphore_status_command;
 		//
 		// Semaphore Status response
 		//
 		struct {
-			UINT8	status;		// Disk access status
-			UINT8	table[256];	// Contents of the semaphore table
+			UINT8   status;     // Disk access status
+			UINT8   table[256]; // Contents of the semaphore table
 		} semaphore_status_response;
 		//
 		// Get Drive Parameters command (0x10)
 		//
 		struct {
-			UINT8	code;		// Command code
-			UINT8	drive;		// Drive number (starts at 1)
+			UINT8   code;       // Command code
+			UINT8   drive;      // Drive number (starts at 1)
 		} get_drive_parameters_command;
 		//
 		// Get Drive Parameters command response
 		//
 		struct {
-			UINT8	status;						// Status code returned by command executed
-			UINT8	firmware[33];				// Firmware message
-			UINT8	rom_version;				// ROM Version
+			UINT8   status;                     // Status code returned by command executed
+			UINT8   firmware[33];               // Firmware message
+			UINT8   rom_version;                // ROM Version
 			struct {
-				UINT8	sectors_per_track;		// Sectors/Track
-				UINT8	tracks_per_cylinder;	// Tracks/Cylinder (heads)
+				UINT8   sectors_per_track;      // Sectors/Track
+				UINT8   tracks_per_cylinder;    // Tracks/Cylinder (heads)
 				struct {
-					UINT8	lsb;
-					UINT8	msb;
-				} cylinders_per_drive;			// Byte-flipped Cylinders/Drive
+					UINT8   lsb;
+					UINT8   msb;
+				} cylinders_per_drive;          // Byte-flipped Cylinders/Drive
 			} track_info;
 			struct {
-				UINT8	lsb;					// Least significant byte
-				UINT8	midb;					// Middle byte
-				UINT8	msb;					// Most significant byte
-			} capacity;							// 24-bit value, byte-flipped (lsb..msb)
-			UINT8	unused[16];
-			UINT8	interleave;					// Interleave factor
+				UINT8   lsb;                    // Least significant byte
+				UINT8   midb;                   // Middle byte
+				UINT8   msb;                    // Most significant byte
+			} capacity;                         // 24-bit value, byte-flipped (lsb..msb)
+			UINT8   unused[16];
+			UINT8   interleave;                 // Interleave factor
 			struct {
-				UINT8	mux_parameters[12];
-				UINT8	pipe_name_table_ptr[2];	// Pointer to table of 64 entries, 8 bytes each (table of names)
-				UINT8	pipe_ptr_table_ptr[2];	// Pointer to table of 64 entries, 8 bytes each.  See pp. 29 - Mass Storage GTI
-				UINT8	pipe_area_size[2];		// Size of pipe area (lsb, msb)
+				UINT8   mux_parameters[12];
+				UINT8   pipe_name_table_ptr[2]; // Pointer to table of 64 entries, 8 bytes each (table of names)
+				UINT8   pipe_ptr_table_ptr[2];  // Pointer to table of 64 entries, 8 bytes each.  See pp. 29 - Mass Storage GTI
+				UINT8   pipe_area_size[2];      // Size of pipe area (lsb, msb)
 				struct {
-					UINT8	track_offset[2];
-				} vdo_table[7];					// Virtual drive table
-				UINT8	lsi11_vdo_table[8];
-				UINT8	lsi11_spare_table[8];
+					UINT8   track_offset[2];
+				} vdo_table[7];                 // Virtual drive table
+				UINT8   lsi11_vdo_table[8];
+				UINT8   lsi11_spare_table[8];
 			} table_info;
-			UINT8	drive_number;				// Physical drive number
+			UINT8   drive_number;               // Physical drive number
 			struct {
-				UINT8	lsb;					// Least
-				UINT8	midb;					// Middle
-				UINT8	msb;					// Most
-			} physical_capacity;				// Physical capacity of drive
+				UINT8   lsb;                    // Least
+				UINT8   midb;                   // Middle
+				UINT8   msb;                    // Most
+			} physical_capacity;                // Physical capacity of drive
 		} drive_param_response;
 		//
 		// 2-byte Boot command (0x14)
 		//
 		struct {
-			UINT8	code;		// Command code
-			UINT8	boot_block;	// Which boot block to read (0-7)
+			UINT8   code;       // Command code
+			UINT8   boot_block; // Which boot block to read (0-7)
 		} old_boot_command;
 		//
 		// Read Firmware command (Prep Mode 0x32)
 		//
 		struct {
-			UINT8	code;		// Command Code
-			UINT8	encoded_h_s;// Encoded Head (bits 7-5) / Sector (bits 4-0)
+			UINT8   code;       // Command Code
+			UINT8   encoded_h_s;// Encoded Head (bits 7-5) / Sector (bits 4-0)
 		} read_firmware_command;
 		//
 		// Write Firmware command (Prep Mode 0x33)
 		//
 		struct {
-			UINT8	code;		// Command Code
-			UINT8	encoded_h_s; // Encoded Head (bits 7-5) / Sector (bits 4-0)
-			UINT8	data[512];	// Data to be written
+			UINT8   code;       // Command Code
+			UINT8   encoded_h_s; // Encoded Head (bits 7-5) / Sector (bits 4-0)
+			UINT8   data[512];  // Data to be written
 		} write_firmware_command;
 		//
 		// Format Drive command (Prep Mode 0x01)
@@ -313,8 +313,8 @@ struct corvus_hdc_t {
 		// all Corvus diagnostic programs send 513 bytes total, including the command, so I'm going with that.
 		//
 		struct {
-			UINT8	code;		// Command Code
-			UINT8	pattern[512]; // Pattern to be written
+			UINT8   code;       // Command Code
+			UINT8   pattern[512]; // Pattern to be written
 		} format_drive_revbh_command;
 	} buffer;
 };
@@ -322,49 +322,49 @@ struct corvus_hdc_t {
 // Structure of Block #1, the Disk Parameter Block
 struct disk_parameter_block_t {
 	struct {
-		UINT8	lsb;
-		UINT8	msb;
-	} spared_track[8];			// Spared track table (0xffff indicates end)
-	UINT8	interleave;			// Interleave factor
-	UINT8	reserved;
+		UINT8   lsb;
+		UINT8   msb;
+	} spared_track[8];          // Spared track table (0xffff indicates end)
+	UINT8   interleave;         // Interleave factor
+	UINT8   reserved;
 	struct {
-		UINT8 track_offset[2];	// Virtual drive offsets (lsb, msb) 0xffff indicates unused
+		UINT8 track_offset[2];  // Virtual drive offsets (lsb, msb) 0xffff indicates unused
 	} vdo_table[7];
-	UINT8	lsi11_vdo_table[8];
-	UINT8	lsi11_spare_table[8];
-	UINT8	reserved2[432];
+	UINT8   lsi11_vdo_table[8];
+	UINT8   lsi11_spare_table[8];
+	UINT8   reserved2[432];
 	struct {
-		UINT8	lsb;
-		UINT8	msb;
+		UINT8   lsb;
+		UINT8   msb;
 	} revh_spare_table[16];
 };
 
 // Structure of Block #3, the Constellation Parameter Block
 struct constellation_parameter_block_t {
-	UINT8	mux_parameters[12];
-	UINT8	pipe_name_table_ptr[2];
-	UINT8	pipe_ptr_table_ptr[2];
-	UINT8	pipe_area_size[2];
-	UINT8	reserved[470];
-	UINT8	software_protection[12];
-	UINT8	serial_number[12];
+	UINT8   mux_parameters[12];
+	UINT8   pipe_name_table_ptr[2];
+	UINT8   pipe_ptr_table_ptr[2];
+	UINT8   pipe_area_size[2];
+	UINT8   reserved[470];
+	UINT8   software_protection[12];
+	UINT8   serial_number[12];
 };
 
 // Structure of Block #7, the Semaphore Table Block
 struct semaphore_table_block_t {
 	union {
-		UINT8	semaphore_table[256];			// Table consists of 256 bytes
+		UINT8   semaphore_table[256];           // Table consists of 256 bytes
 		struct {
-			UINT8	semaphore_name[8];			// Each semaphore name is 8 bytes
-		} semaphore_entry[32];					// 32 Entries
+			UINT8   semaphore_name[8];          // Each semaphore name is 8 bytes
+		} semaphore_entry[32];                  // 32 Entries
 	} semaphore_block;
-	UINT8	unused[256];						// Remaining half of block is unused
+	UINT8   unused[256];                        // Remaining half of block is unused
 };
 
 // Command size structure (number of bytes to xmit and recv for each command)
 struct corvus_cmd_t {
-	UINT16	recv_bytes;							// Number of bytes from host for this command
-	UINT16	xmit_bytes;							// Number of bytes to return to host
+	UINT16  recv_bytes;                         // Number of bytes from host for this command
+	UINT16  xmit_bytes;                         // Number of bytes to return to host
 };
 
 //
@@ -376,9 +376,9 @@ static TIMER_CALLBACK(corvus_hdc_callback);
 //
 // Globals
 //
-static corvus_hdc_t	corvus_hdc;					// The controller itself
-static corvus_cmd_t	corvus_cmd[0xf5][0xc1];		// Command sizes and their return sizes
-static corvus_cmd_t	corvus_prep_cmd[0x82];		// Prep Command sizes and their return sizes
+static corvus_hdc_t corvus_hdc;                 // The controller itself
+static corvus_cmd_t corvus_cmd[0xf5][0xc1];     // Command sizes and their return sizes
+static corvus_cmd_t corvus_prep_cmd[0x82];      // Prep Command sizes and their return sizes
 
 
 
@@ -396,15 +396,15 @@ static corvus_cmd_t	corvus_prep_cmd[0x82];		// Prep Command sizes and their retu
 //
 static void dump_buffer(UINT8 *buffer, UINT16 length) {
 
-	UINT16	offset;
-	char	ascii_dump[16];
+	UINT16  offset;
+	char    ascii_dump[16];
 
 	logerror("dump_buffer: Dump of %d bytes:\n", length);
 	logerror("Base  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f ASCII\n");
 	logerror("----  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- ----------------");
 
 	for(offset=0; offset < length; offset++) {
-		if(offset % 16 == 0) {					// WHY IS 0 % 16 == 0???
+		if(offset % 16 == 0) {                  // WHY IS 0 % 16 == 0???
 			if(offset > 0 && offset % 16 == 0)
 				logerror("%16.16s", ascii_dump);
 			logerror("\n%4.4x: %2.2x ", offset, *(buffer + offset));
@@ -439,7 +439,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 
 	corvus_hdc_t *c = &corvus_hdc;
 
-	c->awaiting_modifier = FALSE;				// This is the case by definition
+	c->awaiting_modifier = FALSE;               // This is the case by definition
 
 	LOG(("parse_hdc_command: Called with data: 0x%2.2x, Prep mode is: %d\n", data, c->prep_mode));
 
@@ -493,7 +493,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 				LOG(("parse_hdc_command: Double byte command recoginized: 0x%2.2x\n", data));
 				break;
 
-			default:							// This is an INVALID command
+			default:                            // This is an INVALID command
 				c->recv_bytes = 1;
 				c->xmit_bytes = 1;
 				LOG(("parse_hdc_command: Invalid command detected: 0x%2.2x\n", data));
@@ -504,7 +504,7 @@ static UINT8 parse_hdc_command(UINT8 data) {
 			//
 			// Prep Commands
 			//
-			case PREP_MODE_SELECT:				// Apparently I need to be able to do this while in Prep mode
+			case PREP_MODE_SELECT:              // Apparently I need to be able to do this while in Prep mode
 			case PREP_RESET_DRIVE:
 			case PREP_FORMAT_DRIVE:
 			case PREP_FILL_DRIVE_OMNI:
@@ -517,13 +517,13 @@ static UINT8 parse_hdc_command(UINT8 data) {
 					c->recv_bytes, c->xmit_bytes));
 				break;
 
-			default:							// This is an INVALID prep command
+			default:                            // This is an INVALID prep command
 				c->recv_bytes = 1;
 				c->xmit_bytes = 1;
 				LOG(("parse_hdc_command: Invalid Prep command detected: 0x%2.2x\n", data));
 				return TRUE;
 		}
-	}	// if(!prep_mode)
+	}   // if(!prep_mode)
 
 	return FALSE;
 }
@@ -549,9 +549,9 @@ static UINT8 corvus_write_sector(running_machine &machine, UINT8 drv, UINT32 sec
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	hard_disk_file
-			*disk;				// Structures for interface to CHD routines
-	UINT8	tbuffer[512];		// Buffer to hold an entire sector
-	UINT16	cylinder;			// Cylinder this sector resides on
+			*disk;              // Structures for interface to CHD routines
+	UINT8   tbuffer[512];       // Buffer to hold an entire sector
+	UINT16  cylinder;           // Cylinder this sector resides on
 
 	LOG(("corvus_write_sector: Write Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
@@ -576,10 +576,10 @@ static UINT8 corvus_write_sector(running_machine &machine, UINT8 drv, UINT32 sec
 	if(len == 512) {
 		hard_disk_write(disk, sector, buffer);
 	} else {
-		hard_disk_read(disk, sector, tbuffer);		// Read the existing data into our temporary buffer
-		memcpy(tbuffer, buffer, len);					// Overlay the data with the buffer passed
-		c->delay += INTERSECTOR_DELAY;					// Add another delay because of the Read / Write
-		hard_disk_write(disk, sector, tbuffer);		// Re-write the data
+		hard_disk_read(disk, sector, tbuffer);      // Read the existing data into our temporary buffer
+		memcpy(tbuffer, buffer, len);                   // Overlay the data with the buffer passed
+		c->delay += INTERSECTOR_DELAY;                  // Add another delay because of the Read / Write
+		hard_disk_write(disk, sector, tbuffer);     // Re-write the data
 	}
 
 	c->last_cylinder = cylinder;
@@ -609,9 +609,9 @@ static UINT8 corvus_write_logical_sector(running_machine &machine, dadr_t *dadr,
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
-	UINT8	status;				// Status returned from Physical Sector read
-	UINT8	drv;				// Drive number (1 - 15)
-	UINT32	sector;				// Sector number on drive
+	UINT8   status;             // Status returned from Physical Sector read
+	UINT8   drv;                // Drive number (1 - 15)
+	UINT32  sector;             // Sector number on drive
 
 	//
 	// Unencode the first byte of the DADR
@@ -660,9 +660,9 @@ static UINT8 corvus_read_sector(running_machine &machine, UINT8 drv, UINT32 sect
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	hard_disk_file
-			*disk;				// Structures for interface to CHD routines
-	UINT8	tbuffer[512];		// Buffer to store full sector results in
-	UINT16	cylinder;
+			*disk;              // Structures for interface to CHD routines
+	UINT8   tbuffer[512];       // Buffer to store full sector results in
+	UINT16  cylinder;
 
 	LOG(("corvus_read_sector: Read Drive: %d, physical sector: 0x%5.5x\n", drv, sector));
 
@@ -709,9 +709,9 @@ static UINT8 corvus_read_logical_sector(running_machine &machine, dadr_t *dadr, 
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
-	UINT8	status;								// Status returned from Physical Sector read
-	UINT8	drv;								// Drive number (1 - 15)
-	UINT32	sector;								// Sector number on drive
+	UINT8   status;                             // Status returned from Physical Sector read
+	UINT8   drv;                                // Drive number (1 - 15)
+	UINT32  sector;                             // Sector number on drive
 
 	//
 	// Unencode the first byte of the DADR
@@ -762,10 +762,10 @@ static UINT8 corvus_lock_semaphore(running_machine &machine, UINT8 *name) {
 			*c = &corvus_hdc;
 	semaphore_table_block_t
 			semaphore_table;
-	UINT8	offset = 0;
-	UINT8	found = FALSE;
-	UINT8	blank_offset = 32;	// Initialize to invalid offset
-	UINT8	status;				// Status returned from Physical Sector read
+	UINT8   offset = 0;
+	UINT8   found = FALSE;
+	UINT8   blank_offset = 32;  // Initialize to invalid offset
+	UINT8   status;             // Status returned from Physical Sector read
 
 	//
 	// Read the semaphore table from the drive
@@ -800,9 +800,9 @@ static UINT8 corvus_lock_semaphore(running_machine &machine, UINT8 *name) {
 	//
 	if(!found) {
 		if(blank_offset == 32) {
-			c->buffer.semaphore_locking_response.result = SEM_TABLE_FULL;					// No space for the semaphore!
+			c->buffer.semaphore_locking_response.result = SEM_TABLE_FULL;                   // No space for the semaphore!
 		} else {
-			c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_NOT_SET;			// It wasn't there already
+			c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_NOT_SET;          // It wasn't there already
 			memcpy(&semaphore_table.semaphore_block.semaphore_entry[blank_offset], name, 8);// Stick it into the table
 			status = corvus_write_sector(machine, 0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
 			if(status != STAT_SUCCESS) {
@@ -812,7 +812,7 @@ static UINT8 corvus_lock_semaphore(running_machine &machine, UINT8 *name) {
 			}
 		}
 	} else {
-		c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_SET;					// It's already locked -- sorry
+		c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_SET;                  // It's already locked -- sorry
 	}
 
 	return STAT_SUCCESS;
@@ -840,9 +840,9 @@ static UINT8 corvus_unlock_semaphore(running_machine &machine, UINT8 *name) {
 			*c = &corvus_hdc;
 	semaphore_table_block_t
 			semaphore_table;
-	UINT8	offset = 0;
-	UINT8	found = FALSE;
-	UINT8	status;				// Status returned from Physical Sector read
+	UINT8   offset = 0;
+	UINT8   found = FALSE;
+	UINT8   status;             // Status returned from Physical Sector read
 
 	//
 	// Read the semaphore table from the drive
@@ -873,10 +873,10 @@ static UINT8 corvus_unlock_semaphore(running_machine &machine, UINT8 *name) {
 	// Once that's done, write the updated table to the disk
 	//
 	if(!found) {
-		c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_NOT_SET;				// It wasn't there already
+		c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_NOT_SET;              // It wasn't there already
 	} else {
-		c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_SET;					// It was there
-		memcpy(&semaphore_table.semaphore_block.semaphore_entry[offset], "        ", 8);	// Clear it
+		c->buffer.semaphore_locking_response.result = SEM_PRIOR_STATE_SET;                  // It was there
+		memcpy(&semaphore_table.semaphore_block.semaphore_entry[offset], "        ", 8);    // Clear it
 		status = corvus_write_sector(machine, 0, 7, semaphore_table.semaphore_block.semaphore_table, 256);
 		if(status != STAT_SUCCESS) {
 			logerror("corvus_unlock_semaphore: Error updating semaphore table, status: 0x%2.2x\n", status);
@@ -906,7 +906,7 @@ static UINT8 corvus_init_semaphore_table( running_machine &machine ) {
 
 	semaphore_table_block_t
 			semaphore_table;
-	UINT8	status;
+	UINT8   status;
 
 	memset(semaphore_table.semaphore_block.semaphore_table, 0x20, 256);
 
@@ -936,26 +936,26 @@ static UINT8 corvus_get_drive_parameters(running_machine &machine, UINT8 drv) {
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
-	UINT16	capacity;							// Number of usable 512-byte blocks
-	UINT16	raw_capacity;						// Number of actual 512-byte blocks
+	UINT16  capacity;                           // Number of usable 512-byte blocks
+	UINT16  raw_capacity;                       // Number of actual 512-byte blocks
 	union {
 		UINT8
 			buffer[512];
 		disk_parameter_block_t
 			dpb;
-	} raw_disk_parameter_block;					// Buffer for the Disk Parameter Block
+	} raw_disk_parameter_block;                 // Buffer for the Disk Parameter Block
 	union {
 		UINT8
 			buffer[512];
 		constellation_parameter_block_t
 			cpb;
-	} raw_constellation_parameter_block;		// Buffer for the Constellation Parameter Block
-	UINT8	status;								// Status to return
+	} raw_constellation_parameter_block;        // Buffer for the Constellation Parameter Block
+	UINT8   status;                             // Status to return
 
 	//
 	// Make sure a valid drive is being accessed
 	//
-	drv -= 1;									// Internally, drives start at 0
+	drv -= 1;                                   // Internally, drives start at 0
 
 	if ( ! corvus_hdc_file( machine, drv ) )
 	{
@@ -987,7 +987,7 @@ static UINT8 corvus_get_drive_parameters(running_machine &machine, UINT8 drv) {
 	//
 	// Build up the parameter packet
 	//
-	strcpy((char *) c->buffer.drive_param_response.firmware, "V18.4AP   -- CONST II - 11/82  %");	// Pulled from some firmware...
+	strcpy((char *) c->buffer.drive_param_response.firmware, "V18.4AP   -- CONST II - 11/82  %");   // Pulled from some firmware...
 	c->buffer.drive_param_response.rom_version = VERSION;
 	c->buffer.drive_param_response.track_info.sectors_per_track = c->sectors_per_track;
 	c->buffer.drive_param_response.track_info.tracks_per_cylinder = c->tracks_per_cylinder;
@@ -1043,7 +1043,7 @@ static UINT8 corvus_get_drive_parameters(running_machine &machine, UINT8 drv) {
 //
 static UINT8 corvus_read_boot_block(running_machine &machine, UINT8 block) {
 
-	corvus_hdc_t	*c = &corvus_hdc;			// Pick up global controller structure
+	corvus_hdc_t    *c = &corvus_hdc;           // Pick up global controller structure
 
 	LOG(("corvus_read_boot_block: Reading boot block: %d\n", block));
 
@@ -1068,16 +1068,16 @@ static UINT8 corvus_read_boot_block(running_machine &machine, UINT8 block) {
 static UINT8 corvus_read_firmware_block(running_machine &machine, UINT8 head, UINT8 sector) {
 
 	corvus_hdc_t
-			*c = &corvus_hdc;	// Pick up global controller structure
-	UINT16	relative_sector;	// Relative sector on drive for Physical Read
-	UINT8	status;
+			*c = &corvus_hdc;   // Pick up global controller structure
+	UINT16  relative_sector;    // Relative sector on drive for Physical Read
+	UINT8   status;
 
 	relative_sector = head * c->sectors_per_track + sector;
 
 	LOG(("corvus_read_firmware_block: Reading firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_read_sector(machine, 0, relative_sector, c->buffer.read_512_response.data, 512);		// TODO: Which drive should Prep Mode talk to ???
+	status = corvus_read_sector(machine, 0, relative_sector, c->buffer.read_512_response.data, 512);        // TODO: Which drive should Prep Mode talk to ???
 	return status;
 }
 
@@ -1099,16 +1099,16 @@ static UINT8 corvus_read_firmware_block(running_machine &machine, UINT8 head, UI
 static UINT8 corvus_write_firmware_block(running_machine &machine, UINT8 head, UINT8 sector, UINT8 *buffer) {
 
 	corvus_hdc_t
-			*c = &corvus_hdc;	// Pick up global controller structure
-	UINT16	relative_sector;	// Relative sector on drive for Physical Read
-	UINT8	status;
+			*c = &corvus_hdc;   // Pick up global controller structure
+	UINT16  relative_sector;    // Relative sector on drive for Physical Read
+	UINT8   status;
 
 	relative_sector = head * c->sectors_per_track + sector;
 
 	LOG(("corvus_write_firmware_block: Writing firmware head: 0x%2.2x, sector: 0x%2.2x, relative_sector: 0x%2.2x\n",
 		head, sector, relative_sector));
 
-	status = corvus_write_sector(machine, 0, relative_sector, buffer, 512);	// TODO: Which drive should Prep Mode talk to ???
+	status = corvus_write_sector(machine, 0, relative_sector, buffer, 512); // TODO: Which drive should Prep Mode talk to ???
 	return status;
 }
 
@@ -1129,10 +1129,10 @@ static UINT8 corvus_format_drive(running_machine &machine, UINT8 *pattern, UINT1
 
 	corvus_hdc_t
 			*c = &corvus_hdc;
-	UINT32	sector;
-	UINT32	max_sector;
-	UINT8	status = 0;
-	UINT8	tbuffer[512];
+	UINT32  sector;
+	UINT32  max_sector;
+	UINT8   status = 0;
+	UINT8   tbuffer[512];
 
 	max_sector = c->sectors_per_track * c->tracks_per_cylinder * c->cylinders_per_drive;
 
@@ -1207,7 +1207,7 @@ static hard_disk_file *corvus_hdc_file(running_machine &machine, int id) {
 //
 static void corvus_process_command_packet(running_machine &machine, UINT8 invalid_command_flag) {
 
-	corvus_hdc_t	*c = &corvus_hdc;
+	corvus_hdc_t    *c = &corvus_hdc;
 
 	if (VERBOSE_RESPONSES)
 	{
@@ -1289,12 +1289,12 @@ static void corvus_process_command_packet(running_machine &machine, UINT8 invali
 					c->buffer.single_byte_response.status = STAT_SUCCESS;
 					break;
 				default:
-					c->xmit_bytes = 1;						// Return a fatal status
+					c->xmit_bytes = 1;                      // Return a fatal status
 					c->buffer.single_byte_response.status = STAT_FAULT | STAT_FATAL_ERR;
 					logerror("corvus_hdc_data_w: Unimplemented command, returning FATAL FAULT status!\n");
 					break;
 			}
-		} else {	// In Prep mode
+		} else {    // In Prep mode
 			switch(c->buffer.command.code) {
 				case PREP_MODE_SELECT:
 					c->prep_mode = TRUE;
@@ -1341,14 +1341,14 @@ static void corvus_process_command_packet(running_machine &machine, UINT8 invali
 		// An Illegal command was detected (Truly invalid, not just unimplemented)
 		//
 		c->buffer.single_byte_response.status =
-			STAT_FATAL_ERR | STAT_ILL_CMD_OP_CODE;		// Respond with an Illegal Op Code
+			STAT_FATAL_ERR | STAT_ILL_CMD_OP_CODE;      // Respond with an Illegal Op Code
 
 		logerror("corvus_hdc_data_w: Illegal Command, status: 0x%2.2x\n", c->buffer.single_byte_response.status);
 	}
 	//
 	// Command execution complete, free up the controller
 	//
-	c->offset = 0;									// Point to beginning of buffer for response
+	c->offset = 0;                                  // Point to beginning of buffer for response
 
 	LOG(("corvus_hdc_data_w: Setting one-time mame timer of %d microseconds to simulate disk function\n", c->delay));
 
@@ -1356,9 +1356,9 @@ static void corvus_process_command_packet(running_machine &machine, UINT8 invali
 	// Set up timers for command completion and timeout from host
 	//
 	machine.scheduler().timer_set(attotime::from_usec(c->delay), FUNC(corvus_hdc_callback), CALLBACK_CTH_MODE);
-	c->timeout_timer->enable(0);			// We've received enough data, disable the timeout timer
+	c->timeout_timer->enable(0);            // We've received enough data, disable the timeout timer
 
-	c->delay = 0;									// Reset delay for next function
+	c->delay = 0;                                   // Reset delay for next function
 }
 
 
@@ -1381,7 +1381,7 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 
 	switch(function) {
 		case CALLBACK_CTH_MODE:
-			c->status |= CONTROLLER_DIRECTION;				// Set to Controller-to-Host, Ready mode
+			c->status |= CONTROLLER_DIRECTION;              // Set to Controller-to-Host, Ready mode
 			c->status &= ~(CONTROLLER_BUSY);
 
 			LOG(("corvus_hdc_callback: Callback executed with function CALLBACK_CTH_MODE\n"));
@@ -1389,16 +1389,16 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 			break;
 		case CALLBACK_HTC_MODE:
 			c->status &= ~(CONTROLLER_DIRECTION |
-				CONTROLLER_BUSY);							// Set to Host-to-Controller, Ready mode
+				CONTROLLER_BUSY);                           // Set to Host-to-Controller, Ready mode
 
 			LOG(("corvus_hdc_callback: Callback executed with function CALLBACK_HTC_MODE\n"));
 
 			break;
 		case CALLBACK_SAME_MODE:
-			c->status &= ~(CONTROLLER_BUSY);				// Set the controller to Ready mode
+			c->status &= ~(CONTROLLER_BUSY);                // Set the controller to Ready mode
 
 			break;
-		case CALLBACK_TIMEOUT:								// We reached a four-second timeout threshold
+		case CALLBACK_TIMEOUT:                              // We reached a four-second timeout threshold
 			if(c->offset < c->recv_bytes || (c->offset > c->recv_bytes && c->recv_bytes != 0)) {
 				c->buffer.single_byte_response.status = STAT_TIMEOUT;
 				c->status |= CONTROLLER_DIRECTION;
@@ -1408,7 +1408,7 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 				logerror("corvus_hdc_callback: Exceeded four-second timeout for data from host, resetting communications\n");
 			} else { // if(c->recv_bytes == 0)                 This was a variable-size command
 				LOG(("corvus_hdc_callback: Executing variable-length command via four-second timeout\n"));
-				corvus_process_command_packet(machine, 0);			// Process the command
+				corvus_process_command_packet(machine, 0);          // Process the command
 			}
 			break;
 		default:
@@ -1416,7 +1416,7 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 			assert(0);
 	}
 	if(function != CALLBACK_SAME_MODE) {
-		c->timeout_timer->enable(0);				// Disable the four-second timer now that we're done
+		c->timeout_timer->enable(0);                // Disable the four-second timer now that we're done
 	}
 }
 
@@ -1435,28 +1435,28 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 //
 UINT8 corvus_hdc_init(running_machine &machine) {
 
-	corvus_hdc_t			*c = &corvus_hdc;	// Pick up global controller structure
-	hard_disk_file	*disk;				// Structures for interface to CHD routines
-	hard_disk_info	*info;
+	corvus_hdc_t            *c = &corvus_hdc;   // Pick up global controller structure
+	hard_disk_file  *disk;              // Structures for interface to CHD routines
+	hard_disk_info  *info;
 
-	if((disk = corvus_hdc_file(machine, 0)))				// Attach to the CHD file
-		info = hard_disk_get_info(disk);		// Pick up the Head/Cylinder/Sector info
+	if((disk = corvus_hdc_file(machine, 0)))                // Attach to the CHD file
+		info = hard_disk_get_info(disk);        // Pick up the Head/Cylinder/Sector info
 	else
 		return 0;
 
-	c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY);	// Host-to-controller mode, Idle (awaiting command from Host mode)
-	c->prep_mode = FALSE;						// We're not in Prep Mode
+	c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Host-to-controller mode, Idle (awaiting command from Host mode)
+	c->prep_mode = FALSE;                       // We're not in Prep Mode
 	c->sectors_per_track = info->sectors;
 	c->tracks_per_cylinder = info->heads;
 	c->cylinders_per_drive = info->cylinders;
-	c->offset = 0;								// Buffer is empty
-	c->awaiting_modifier = FALSE;				// We're not in the middle of a two-byte command
-	c->xmit_bytes = 0;							// We don't have anything to say to the host
-	c->recv_bytes = 0;							// We aren't waiting on additional data from the host
+	c->offset = 0;                              // Buffer is empty
+	c->awaiting_modifier = FALSE;               // We're not in the middle of a two-byte command
+	c->xmit_bytes = 0;                          // We don't have anything to say to the host
+	c->recv_bytes = 0;                          // We aren't waiting on additional data from the host
 
-	c->timeout_timer = machine.scheduler().timer_alloc(FUNC(corvus_hdc_callback));	// Set up a timer to handle the four-second host-to-controller timeout
+	c->timeout_timer = machine.scheduler().timer_alloc(FUNC(corvus_hdc_callback));  // Set up a timer to handle the four-second host-to-controller timeout
 	c->timeout_timer->adjust(attotime::from_seconds(4), CALLBACK_TIMEOUT);
-	c->timeout_timer->enable(0);		// Start this timer out disabled
+	c->timeout_timer->enable(0);        // Start this timer out disabled
 
 	LOG(("corvus_hdc_init: Attached to drive image: H:%d, C:%d, S:%d\n", info->heads, info->cylinders, info->sectors));
 
@@ -1493,14 +1493,14 @@ UINT8 corvus_hdc_init(running_machine &machine) {
 	corvus_cmd[SEMAPHORE_STATUS_CODE][SEMAPHORE_STATUS_MOD].xmit_bytes = 257;
 
 	// Pipe commands
-	corvus_cmd[PIPE_READ_CODE][PIPE_READ_MOD].recv_bytes =	5;
-	corvus_cmd[PIPE_READ_CODE][PIPE_READ_MOD].xmit_bytes =	516;
+	corvus_cmd[PIPE_READ_CODE][PIPE_READ_MOD].recv_bytes =  5;
+	corvus_cmd[PIPE_READ_CODE][PIPE_READ_MOD].xmit_bytes =  516;
 	corvus_cmd[PIPE_WRITE_CODE][PIPE_WRITE_MOD].recv_bytes = 517;
 	corvus_cmd[PIPE_WRITE_CODE][PIPE_WRITE_MOD].xmit_bytes = 12;
 	corvus_cmd[PIPE_CLOSE_CODE][PIPE_CLOSE_MOD].recv_bytes = 5;
 	corvus_cmd[PIPE_CLOSE_CODE][PIPE_CLOSE_MOD].xmit_bytes = 12;
 	corvus_cmd[PIPE_STATUS_CODE][PIPE_STATUS_MOD].recv_bytes = 5;
-	corvus_cmd[PIPE_STATUS_CODE][PIPE_STATUS_MOD].xmit_bytes = 513;	// There are actually two possibilities here
+	corvus_cmd[PIPE_STATUS_CODE][PIPE_STATUS_MOD].xmit_bytes = 513; // There are actually two possibilities here
 	corvus_cmd[PIPE_OPEN_WRITE_CODE][PIPE_OPEN_WRITE_MOD].recv_bytes = 10;
 	corvus_cmd[PIPE_OPEN_WRITE_CODE][PIPE_OPEN_WRITE_MOD].xmit_bytes = 12;
 	corvus_cmd[PIPE_AREA_INIT_CODE][PIPE_AREA_INIT_MOD].recv_bytes = 10;
@@ -1603,12 +1603,12 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 	corvus_hdc_t *c = &corvus_hdc;
 	UINT8 result;
 
-	if((c->status & CONTROLLER_DIRECTION) == 0) {	// Check to see if we're in Controller-to-Host mode
+	if((c->status & CONTROLLER_DIRECTION) == 0) {   // Check to see if we're in Controller-to-Host mode
 		logerror("corvus_hdc_data_r: Data register read when in Host-to-Controller mode (status: 0x%2.2x)\n", c->status);
 		return 0;
 	}
 
-	if((c->status & CONTROLLER_BUSY) != 0) {		// Check to see if we're Busy
+	if((c->status & CONTROLLER_BUSY) != 0) {        // Check to see if we're Busy
 		logerror("corvus_hdc_data_r: Data register read when Busy (status: 0x%2.2x)\n", c->status);
 		return 0;
 	}
@@ -1618,9 +1618,9 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 	if(c->offset == c->xmit_bytes) {
 		LOG(("corvus_hdc_data_r: Finished transmitting %d bytes of data.  Returning to idle mode.\n", c->xmit_bytes));
 
-		c->offset = 0;			// We've reached the end of valid data
-		c->xmit_bytes = 0;		// We don't have anything more to say
-		c->recv_bytes = 0;		// No active commands
+		c->offset = 0;          // We've reached the end of valid data
+		c->xmit_bytes = 0;      // We don't have anything more to say
+		c->recv_bytes = 0;      // No active commands
 
 		space.machine().scheduler().timer_set((attotime::from_usec(INTERBYTE_DELAY)), FUNC(corvus_hdc_callback), CALLBACK_HTC_MODE);
 
@@ -1650,18 +1650,18 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 //
 WRITE8_HANDLER ( corvus_hdc_data_w ) {
 
-	corvus_hdc_t	*c = &corvus_hdc;
+	corvus_hdc_t    *c = &corvus_hdc;
 
 	//
 	// Received a byte -- check to see if we should really respond
 	//
-	if((c->status & CONTROLLER_DIRECTION) != 0) {		// System wrote to controller when controller wasn't listening
+	if((c->status & CONTROLLER_DIRECTION) != 0) {       // System wrote to controller when controller wasn't listening
 		logerror("corvus_hdc_data_w: Data register written when in Controller-to-Host mode (status: 0x%2.2x, data: 0x%2.2x)\n",
 			c->status, data);
 		return;
 	}
 
-	if((c->status & CONTROLLER_BUSY) != 0) {			// System wrote to controller when controller was busy
+	if((c->status & CONTROLLER_BUSY) != 0) {            // System wrote to controller when controller was busy
 		logerror("corvus_hdc_data_w: Data register written when controller not Ready (status: 0x%2.2x, data: 0x%2.2x)\n",
 			c->status, data);
 		return;
@@ -1670,12 +1670,12 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 	//
 	// We're supposed to be paying attention.  Make a decision about the data received
 	//
-	if(c->offset == 0)	{													// First byte of a packet
+	if(c->offset == 0)  {                                                   // First byte of a packet
 		LOG(("corvus_hdc_data_w: Received a byte with c->offset == 0.  Processing as command: 0x%2.2x\n", data));
 		c->invalid_command_flag = parse_hdc_command(data);
 		c->timeout_timer->reset((attotime::from_seconds(4)));
-		c->timeout_timer->enable(1);								// Start our four-second timer
-	} else if(c->offset == 1 && c->awaiting_modifier) {						// Second byte of a packet
+		c->timeout_timer->enable(1);                                // Start our four-second timer
+	} else if(c->offset == 1 && c->awaiting_modifier) {                     // Second byte of a packet
 		LOG(("corvus_hdc_data_w: Received a byte while awaiting modifier with c->offset == 0.  Processing as modifier: 0x%2.2x\n", data));
 		c->awaiting_modifier = FALSE;
 		c->recv_bytes = corvus_cmd[c->buffer.command.code][data].recv_bytes;
@@ -1684,14 +1684,14 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 
 	c->buffer.raw_data[c->offset++] = data;
 
-	assert(c->offset <= MAX_COMMAND_SIZE);									// Something is wrong, or I undersized the buffer
+	assert(c->offset <= MAX_COMMAND_SIZE);                                  // Something is wrong, or I undersized the buffer
 
 	//
 	// We now have enough information to make a decision whether to execute the command, respond with a fatal response
 	// or just wait for more data.  If we can do something, execute the command.  Otherwise, just fall through and return
 	// to the user with us Ready for more data and in Host-to-Controller mode.
 	//
-	if(c->offset == c->recv_bytes) {						// We've received enough data to process
+	if(c->offset == c->recv_bytes) {                        // We've received enough data to process
 		corvus_process_command_packet(space.machine(), c->invalid_command_flag);
 	} else {
 		//

@@ -16,13 +16,13 @@ const device_type SEGAPCM = &device_creator<segapcm_device>;
 
 segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAPCM, "Sega PCM", "segapcm", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_ram(NULL),
-	  m_rom(NULL),
-	  m_bankshift(0),
-	  m_bankmask(0),
-	  m_rgnmask(0),
-	  m_stream(NULL)
+		device_sound_interface(mconfig, *this),
+		m_ram(NULL),
+		m_rom(NULL),
+		m_bankshift(0),
+		m_bankmask(0),
+		m_rgnmask(0),
+		m_stream(NULL)
 {
 }
 
@@ -153,5 +153,3 @@ READ8_MEMBER( segapcm_device::sega_pcm_r )
 	m_stream->update();
 	return m_ram[offset & 0x07ff];
 }
-
-

@@ -40,35 +40,35 @@
 //============================================================
 
 // these are arbitrary values since AFAIK there's no way to make X/SDL tell you
-#define WINDOW_DECORATION_WIDTH	(8)	// should be more than plenty
-#define WINDOW_DECORATION_HEIGHT (48)	// title bar + bottom drag region
+#define WINDOW_DECORATION_WIDTH (8) // should be more than plenty
+#define WINDOW_DECORATION_HEIGHT (48)   // title bar + bottom drag region
 
 #ifdef MAME_DEBUG
 //#define ASSERT_USE(x) do { printf("%x %x\n", (int) SDL_ThreadID(), x); assert_always(SDL_ThreadID() == x, "Wrong Thread"); } while (0)
-#define ASSERT_USE(x)	do { SDL_threadID _thid = SDL_ThreadID(); assert_always( _thid == x, "Wrong Thread"); } while (0)
+#define ASSERT_USE(x)   do { SDL_threadID _thid = SDL_ThreadID(); assert_always( _thid == x, "Wrong Thread"); } while (0)
 #else
-#define ASSERT_USE(x)	do {} while (0)
+#define ASSERT_USE(x)   do {} while (0)
 //#define ASSERT_USE(x) assert(SDL_ThreadID() == x)
 #endif
 
-#define ASSERT_REDRAW_THREAD()	ASSERT_USE(window_threadid)
-#define ASSERT_WINDOW_THREAD()	ASSERT_USE(window_threadid)
-#define ASSERT_MAIN_THREAD()	ASSERT_USE(main_threadid)
+#define ASSERT_REDRAW_THREAD()  ASSERT_USE(window_threadid)
+#define ASSERT_WINDOW_THREAD()  ASSERT_USE(window_threadid)
+#define ASSERT_MAIN_THREAD()    ASSERT_USE(main_threadid)
 
-#define OSDWORK_CALLBACK(name)	void *name(void *param, ATTR_UNUSED int threadid)
+#define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
 
 // minimum window dimension
-#define MIN_WINDOW_DIM					200
+#define MIN_WINDOW_DIM                  200
 
 #ifndef SDLMAME_WIN32
-#define WMSZ_TOP		(0)
-#define WMSZ_BOTTOM		(1)
-#define WMSZ_BOTTOMLEFT		(2)
-#define WMSZ_BOTTOMRIGHT	(3)
-#define WMSZ_LEFT		(4)
-#define WMSZ_TOPLEFT		(5)
-#define WMSZ_TOPRIGHT		(6)
-#define WMSZ_RIGHT		(7)
+#define WMSZ_TOP        (0)
+#define WMSZ_BOTTOM     (1)
+#define WMSZ_BOTTOMLEFT     (2)
+#define WMSZ_BOTTOMRIGHT    (3)
+#define WMSZ_LEFT       (4)
+#define WMSZ_TOPLEFT        (5)
+#define WMSZ_TOPRIGHT       (6)
+#define WMSZ_RIGHT      (7)
 #endif
 
 //============================================================
@@ -242,7 +242,7 @@ int sdlwindow_init(running_machine &machine)
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
-#if	SDLMAME_SDL2
+#if SDLMAME_SDL2
 	if (video_config.mode == VIDEO_MODE_SDL13)
 	{
 		if (draw13_init(machine, &draw))
@@ -362,8 +362,8 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 		desired_aspect = (float)target_width / (float)target_height;
 	}
 
-    // non-integer scaling - often gives more pleasing results in full screen
-    if (!video_config.fullstretch)
+	// non-integer scaling - often gives more pleasing results in full screen
+	if (!video_config.fullstretch)
 	{
 		// compute maximum integral scaling to fit the window
 		xscale = (target_width + 2) / newwidth;
@@ -409,7 +409,7 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 		newheight = target_height;
 	}
 
-    //FIXME: really necessary to distinguish for yuv_modes ?
+	//FIXME: really necessary to distinguish for yuv_modes ?
 	if (window->target->zoom_to_screen()
 		&& (video_config.scale_mode == VIDEO_SCALE_MODE_NONE ))
 		newwidth = window_width;
@@ -429,8 +429,8 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 
 static OSDWORK_CALLBACK( sdlwindow_resize_wt )
 {
-	worker_param *		wp = (worker_param *) param;
-	sdl_window_info *	window = wp->window;
+	worker_param *      wp = (worker_param *) param;
+	sdl_window_info *   window = wp->window;
 
 	ASSERT_WINDOW_THREAD();
 
@@ -753,8 +753,8 @@ error:
 
 static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt )
 {
-	worker_param *		wp = (worker_param *) param;
-	sdl_window_info *	window = wp->window;
+	worker_param *      wp = (worker_param *) param;
+	sdl_window_info *   window = wp->window;
 
 	ASSERT_WINDOW_THREAD();
 
@@ -901,10 +901,10 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 
 #if 1 // defined(SDLMAME_WIN32)
 	/*
-     *  We need to do this here. If SDL_ListModes is
-     * called in init_monitors, the call will crash
-     * on win32
-     */
+	 *  We need to do this here. If SDL_ListModes is
+	 * called in init_monitors, the call will crash
+	 * on win32
+	 */
 	modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
 #else
 	modes = window->monitor->modes;
@@ -915,7 +915,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		mame_printf_error("SDL: No modes available?!\n");
 		exit(-1);
 	}
-	else if (modes == (SDL_Rect **)-1)	// all modes are possible
+	else if (modes == (SDL_Rect **)-1)  // all modes are possible
 	{
 		*fswidth = window->maxwidth;
 		*fsheight = window->maxheight;
@@ -962,7 +962,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 void sdlwindow_video_window_update(running_machine &machine, sdl_window_info *window)
 {
 
-	osd_ticks_t		event_wait_ticks;
+	osd_ticks_t     event_wait_ticks;
 	ASSERT_MAIN_THREAD();
 
 	// adjust the cursor state
@@ -1049,8 +1049,8 @@ static void set_starting_view(running_machine &machine, int index, sdl_window_in
 
 static OSDWORK_CALLBACK( complete_create_wt )
 {
-	worker_param *		wp = (worker_param *) param;
-	sdl_window_info *	window = wp->window;
+	worker_param *      wp = (worker_param *) param;
+	sdl_window_info *   window = wp->window;
 
 	int tempwidth, tempheight;
 	static int result[2] = {0,1};
@@ -1084,9 +1084,9 @@ static OSDWORK_CALLBACK( complete_create_wt )
 		else
 		{
 			/* Create the window directly with the correct aspect
-               instead of letting sdlwindow_blit_surface_size() resize it
-               this stops the window from "flashing" from the wrong aspect
-               size to the right one at startup. */
+			   instead of letting sdlwindow_blit_surface_size() resize it
+			   this stops the window from "flashing" from the wrong aspect
+			   size to the right one at startup. */
 			tempwidth = (window->maxwidth != 0) ? window->maxwidth : 640;
 			tempheight = (window->maxheight != 0) ? window->maxheight : 480;
 
@@ -1138,16 +1138,16 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 	{
 		dt = (double) (currentTime-startTime) / tps; // in decimale sec.
 		mame_printf_info("%6.2lfs, %4lu F, "
-	          "avrg game: %5.2lf FPS %.2lf ms/f, "
-	          "avrg video: %5.2lf FPS %.2lf ms/f, "
-	          "last video: %5.2lf FPS %.2lf ms/f\n",
-		  dt, frames-frames_skip4fps,
-		  (double)(frames-frames_skip4fps)/dt,                             // avrg game fps
-		  ( (currentTime-startTime) / ((frames-frames_skip4fps)) ) * 1000.0 / osd_ticks_per_second(),
-		  (double)(frames-frames_skip4fps)/((double)(sumdt) / tps), // avrg vid fps
-		  ( sumdt / ((frames-frames_skip4fps)) ) * 1000.0 / tps,
-		  1.0/((currentTime-t0) / osd_ticks_per_second()), // this vid fps
-		  (currentTime-t0) * 1000.0 / tps
+				"avrg game: %5.2lf FPS %.2lf ms/f, "
+				"avrg video: %5.2lf FPS %.2lf ms/f, "
+				"last video: %5.2lf FPS %.2lf ms/f\n",
+			dt, frames-frames_skip4fps,
+			(double)(frames-frames_skip4fps)/dt,                             // avrg game fps
+			( (currentTime-startTime) / ((frames-frames_skip4fps)) ) * 1000.0 / osd_ticks_per_second(),
+			(double)(frames-frames_skip4fps)/((double)(sumdt) / tps), // avrg vid fps
+			( sumdt / ((frames-frames_skip4fps)) ) * 1000.0 / tps,
+			1.0/((currentTime-t0) / osd_ticks_per_second()), // this vid fps
+			(currentTime-t0) * 1000.0 / tps
 		);
 		lastTime = currentTime;
 	}
@@ -1155,8 +1155,8 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 
 static OSDWORK_CALLBACK( draw_video_contents_wt )
 {
-	UINT32	dc =		0;
-	int 	update =	1;
+	UINT32  dc =        0;
+	int     update =    1;
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
 
@@ -1361,4 +1361,3 @@ static void get_max_bounds(sdl_window_info *window, int *window_width, int *wind
 		*window_height = maxheight;
 	}
 }
-

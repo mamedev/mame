@@ -8,9 +8,9 @@
 #include "includes/neogeo.h"
 #include "video/resnet.h"
 
-#define NUM_PENS	(0x1000)
+#define NUM_PENS    (0x1000)
 
-#define VERBOSE 	(0)
+#define VERBOSE     (0)
 
 /*************************************
  *
@@ -75,27 +75,27 @@ static void compute_rgb_weights( running_machine &machine )
 	static const int resistances[] = { 220, 470, 1000, 2200, 3900 };
 
 	/* compute four sets of weights - with or without the pulldowns -
-       ensuring that we use the same scaler for all */
+	   ensuring that we use the same scaler for all */
 
 	double scaler = compute_resistor_weights(0, 0xff, -1,
-							 5, resistances, state->m_rgb_weights_normal, 0, 0,
-							 0, 0, 0, 0, 0,
-							 0, 0, 0, 0, 0);
+								5, resistances, state->m_rgb_weights_normal, 0, 0,
+								0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0);
 
 	compute_resistor_weights(0, 0xff, scaler,
-							 5, resistances, state->m_rgb_weights_normal_bit15, 8200, 0,
-							 0, 0, 0, 0, 0,
-							 0, 0, 0, 0, 0);
+								5, resistances, state->m_rgb_weights_normal_bit15, 8200, 0,
+								0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0);
 
 	compute_resistor_weights(0, 0xff, scaler,
-							 5, resistances, state->m_rgb_weights_dark, 150, 0,
-							 0, 0, 0, 0, 0,
-							 0, 0, 0, 0, 0);
+								5, resistances, state->m_rgb_weights_dark, 150, 0,
+								0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0);
 
 	compute_resistor_weights(0, 0xff, scaler,
-							 5, resistances, state->m_rgb_weights_dark_bit15, 1 / ((1.0 / 8200) + (1.0 / 150)), 0,
-							 0, 0, 0, 0, 0,
-							 0, 0, 0, 0, 0);
+								5, resistances, state->m_rgb_weights_dark_bit15, 1 / ((1.0 / 8200) + (1.0 / 150)), 0,
+								0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0);
 }
 
 
@@ -121,25 +121,25 @@ static pen_t get_pen( running_machine &machine, UINT16 data )
 	}
 
 	r = combine_5_weights(weights,
-						  (data >> 11) & 0x01,
-						  (data >> 10) & 0x01,
-						  (data >>  9) & 0x01,
-						  (data >>  8) & 0x01,
-						  (data >> 14) & 0x01);
+							(data >> 11) & 0x01,
+							(data >> 10) & 0x01,
+							(data >>  9) & 0x01,
+							(data >>  8) & 0x01,
+							(data >> 14) & 0x01);
 
 	g = combine_5_weights(weights,
-						  (data >>  7) & 0x01,
-						  (data >>  6) & 0x01,
-						  (data >>  5) & 0x01,
-						  (data >>  4) & 0x01,
-						  (data >> 13) & 0x01);
+							(data >>  7) & 0x01,
+							(data >>  6) & 0x01,
+							(data >>  5) & 0x01,
+							(data >>  4) & 0x01,
+							(data >> 13) & 0x01);
 
 	b = combine_5_weights(weights,
-						  (data >>  3) & 0x01,
-						  (data >>  2) & 0x01,
-						  (data >>  1) & 0x01,
-						  (data >>  0) & 0x01,
-						  (data >> 12) & 0x01);
+							(data >>  3) & 0x01,
+							(data >>  2) & 0x01,
+							(data >>  1) & 0x01,
+							(data >>  0) & 0x01,
+							(data >> 12) & 0x01);
 
 	return MAKE_RGB(r, g, b);
 }
@@ -390,7 +390,7 @@ INLINE int rows_to_height(int rows)
 INLINE int sprite_on_scanline(int scanline, int y, int rows)
 {
 	/* check if the current scanline falls inside this sprite,
-       two possible scenerios, wrap around or not */
+	   two possible scenerios, wrap around or not */
 	int max_y = (y + rows_to_height(rows) - 1) & 0x1ff;
 
 	return (((max_y >= y) &&  (scanline >= y) && (scanline <= max_y)) ||
@@ -418,8 +418,8 @@ static void draw_sprites( running_machine &machine, bitmap_rgb32 &bitmap, int sc
 		sprite_list = &state->m_videoram[0x8600];
 
 	/* optimization -- find last non-zero entry and only draw that many +1
-       sprite.  This is not 100% correct as the hardware will keep drawing
-       the #0 sprite over and over, but we need the speed */
+	   sprite.  This is not 100% correct as the hardware will keep drawing
+	   the #0 sprite over and over, but we need the speed */
 	for (max_sprite_index = (MAX_SPRITES_PER_LINE - 1); max_sprite_index >= 0; max_sprite_index--)
 	{
 		if (sprite_list[max_sprite_index] != 0)
@@ -457,7 +457,7 @@ static void draw_sprites( running_machine &machine, bitmap_rgb32 &bitmap, int sc
 			continue;
 
 		/* double check the Y coordinate, in case somebody modified the sprite coordinate
-           since we buffered it */
+		   since we buffered it */
 		if (sprite_on_scanline(scanline, y, rows))
 		{
 			int sprite_y;
@@ -644,7 +644,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::sprite_line_timer_callback)
 	int scanline = param;
 
 	/* we are at the beginning of a scanline -
-       we need to draw the previous scanline and parse the sprites on the current one */
+	   we need to draw the previous scanline and parse the sprites on the current one */
 	if (scanline != 0)
 		machine().primary_screen->update_partial(scanline - 1);
 
@@ -676,7 +676,7 @@ static void optimize_sprite_data( running_machine &machine )
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* convert the sprite graphics data into a format that
-       allows faster blitting */
+	   allows faster blitting */
 	int i;
 	int len;
 	UINT8 *src;
@@ -684,7 +684,7 @@ static void optimize_sprite_data( running_machine &machine )
 	UINT32 bit;
 
 	/* get mask based on the length rounded up to the nearest
-       power of 2 */
+	   power of 2 */
 	state->m_sprite_gfx_address_mask = 0xffffffff;
 
 	len = state->memregion("sprites")->bytes();
@@ -713,7 +713,7 @@ static void optimize_sprite_data( running_machine &machine )
 			for (x = 0; x < 8; x++)
 			{
 				*(dest++) = (((src[0x43 | (y << 2)] >> x) & 0x01) << 3) |
-						    (((src[0x41 | (y << 2)] >> x) & 0x01) << 2) |
+							(((src[0x41 | (y << 2)] >> x) & 0x01) << 2) |
 							(((src[0x42 | (y << 2)] >> x) & 0x01) << 1) |
 							(((src[0x40 | (y << 2)] >> x) & 0x01) << 0);
 			}
@@ -721,7 +721,7 @@ static void optimize_sprite_data( running_machine &machine )
 			for (x = 0; x < 8; x++)
 			{
 				*(dest++) = (((src[0x03 | (y << 2)] >> x) & 0x01) << 3) |
-						    (((src[0x01 | (y << 2)] >> x) & 0x01) << 2) |
+							(((src[0x01 | (y << 2)] >> x) & 0x01) << 2) |
 							(((src[0x02 | (y << 2)] >> x) & 0x01) << 1) |
 							(((src[0x00 | (y << 2)] >> x) & 0x01) << 0);
 			}
@@ -743,25 +743,25 @@ static UINT16 get_video_control( running_machine &machine )
 	UINT16 v_counter;
 
 	/*
-        The format of this very important location is:  AAAA AAAA A??? BCCC
+	    The format of this very important location is:  AAAA AAAA A??? BCCC
 
-        A is the raster line counter. mosyougi relies solely on this to do the
-          raster effects on the title screen; sdodgeb loops waiting for the top
-          bit to be 1; zedblade heavily depends on it to work correctly (it
-          checks the top bit in the IRQ2 handler).
-        B is definitely a PAL/NTSC flag. Evidence:
-          1) trally changes the position of the speed indicator depending on
-             it (0 = lower 1 = higher).
-          2) samsho3 sets a variable to 60 when the bit is 0 and 50 when it's 1.
-             This is obviously the video refresh rate in Hz.
-          3) samsho3 sets another variable to 256 or 307. This could be the total
-             screen height (including vblank), or close to that.
-          Some games (e.g. lstbld2, samsho3) do this (or similar):
-          bclr    #$0, $3c000e.l
-          when the bit is set, so 3c000e (whose function is unknown) has to be
-          related
-        C animation counter lower 3 bits
-    */
+	    A is the raster line counter. mosyougi relies solely on this to do the
+	      raster effects on the title screen; sdodgeb loops waiting for the top
+	      bit to be 1; zedblade heavily depends on it to work correctly (it
+	      checks the top bit in the IRQ2 handler).
+	    B is definitely a PAL/NTSC flag. Evidence:
+	      1) trally changes the position of the speed indicator depending on
+	         it (0 = lower 1 = higher).
+	      2) samsho3 sets a variable to 60 when the bit is 0 and 50 when it's 1.
+	         This is obviously the video refresh rate in Hz.
+	      3) samsho3 sets another variable to 256 or 307. This could be the total
+	         screen height (including vblank), or close to that.
+	      Some games (e.g. lstbld2, samsho3) do this (or similar):
+	      bclr    #$0, $3c000e.l
+	      when the bit is set, so 3c000e (whose function is unknown) has to be
+	      related
+	    C animation counter lower 3 bits
+	*/
 
 	/* the vertical counter chain goes from 0xf8 - 0x1ff */
 	v_counter = machine.primary_screen->vpos() + 0x100;

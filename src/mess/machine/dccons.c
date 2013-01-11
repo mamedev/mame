@@ -23,9 +23,9 @@
 #include "machine/gdrom.h"
 #include "imagedev/chd_cd.h"
 
-#define ATAPI_CYCLES_PER_SECTOR (5000)	// TBD for Dreamcast
+#define ATAPI_CYCLES_PER_SECTOR (5000)  // TBD for Dreamcast
 
-#define ATAPI_STAT_BSY	   0x80
+#define ATAPI_STAT_BSY     0x80
 #define ATAPI_STAT_DRDY    0x40
 #define ATAPI_STAT_DMARDDF 0x20
 #define ATAPI_STAT_SERVDSC 0x10
@@ -37,22 +37,22 @@
 #define ATAPI_INTREASON_IO      0x02
 #define ATAPI_INTREASON_RELEASE 0x04
 
-#define ATAPI_REG_DATA		0
-#define ATAPI_REG_FEATURES	1
-#define ATAPI_REG_INTREASON	2
-#define ATAPI_REG_SAMTAG	3
-#define ATAPI_REG_COUNTLOW	4
-#define ATAPI_REG_COUNTHIGH	5
-#define ATAPI_REG_DRIVESEL	6
-#define ATAPI_REG_CMDSTATUS	7
-#define ATAPI_REG_ERROR		16	// read-only ERROR (write is FEATURES)
+#define ATAPI_REG_DATA      0
+#define ATAPI_REG_FEATURES  1
+#define ATAPI_REG_INTREASON 2
+#define ATAPI_REG_SAMTAG    3
+#define ATAPI_REG_COUNTLOW  4
+#define ATAPI_REG_COUNTHIGH 5
+#define ATAPI_REG_DRIVESEL  6
+#define ATAPI_REG_CMDSTATUS 7
+#define ATAPI_REG_ERROR     16  // read-only ERROR (write is FEATURES)
 
 #define ATAPI_REG_MAX 24
 
-#define ATAPI_XFER_PIO		0x00
-#define ATAPI_XFER_PIO_FLOW	0x08
-#define ATAPI_XFER_MULTI_DMA	0x20
-#define ATAPI_XFER_ULTRA_DMA	0x40
+#define ATAPI_XFER_PIO      0x00
+#define ATAPI_XFER_PIO_FLOW 0x08
+#define ATAPI_XFER_MULTI_DMA    0x20
+#define ATAPI_XFER_ULTRA_DMA    0x40
 
 #define ATAPI_DATA_SIZE ( 64 * 1024 )
 
@@ -96,13 +96,13 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_xferlen -= 2048;
 
 		// perform the DMA
-		ddtdata.destination = atapi_xferbase;	// destination address
+		ddtdata.destination = atapi_xferbase;   // destination address
 		ddtdata.length = 2048/4;
 		ddtdata.size = 4;
 		ddtdata.buffer = sector_buffer;
-		ddtdata.direction=1;	// 0 source to buffer, 1 buffer to destination
-		ddtdata.channel= -1;	// not used
-		ddtdata.mode= -1;		// copy from/to buffer
+		ddtdata.direction=1;    // 0 source to buffer, 1 buffer to destination
+		ddtdata.channel= -1;    // not used
+		ddtdata.mode= -1;       // copy from/to buffer
 		printf("ATAPI: DMA one sector to %x, %x remaining\n", atapi_xferbase, atapi_xferlen);
 		sh4_dma_ddt(machine.device("maincpu"), &ddtdata);
 
@@ -150,7 +150,7 @@ static READ32_HANDLER( atapi_r )
 	running_machine &machine = space.machine();
 	int reg, data;
 
-	if (mem_mask == 0x0000ffff)	// word-wide command read
+	if (mem_mask == 0x0000ffff) // word-wide command read
 	{
 //      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
 
@@ -275,7 +275,7 @@ static WRITE32_HANDLER( atapi_w )
 
 //  printf( "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	if (mem_mask == 0x0000ffff)	// word-wide command write
+	if (mem_mask == 0x0000ffff) // word-wide command write
 	{
 //      printf("atapi_w: data=%04x\n", data );
 
@@ -330,7 +330,7 @@ static WRITE32_HANDLER( atapi_w )
 				atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 				atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-				gdrom_alt_status = 0;	// (I guess?)
+				gdrom_alt_status = 0;   // (I guess?)
 
 				if (atapi_xferlen == 0)
 				{
@@ -341,7 +341,7 @@ static WRITE32_HANDLER( atapi_w )
 				else
 				{
 					// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
-					if (atapi_regs[ATAPI_REG_FEATURES] & 0x01)	// DMA feature
+					if (atapi_regs[ATAPI_REG_FEATURES] & 0x01)  // DMA feature
 					{
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRDY | ATAPI_STAT_SERVDSC;
 					}
@@ -378,10 +378,10 @@ static WRITE32_HANDLER( atapi_w )
 			}
 			else
 			{
-            			printf("ATAPI: SCSI device returned error!\n");
+						printf("ATAPI: SCSI device returned error!\n");
 
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				atapi_regs[ATAPI_REG_ERROR] = 0x50;	// sense key = ILLEGAL REQUEST
+				atapi_regs[ATAPI_REG_ERROR] = 0x50; // sense key = ILLEGAL REQUEST
 				atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 				atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 			}
@@ -395,26 +395,26 @@ static WRITE32_HANDLER( atapi_w )
 		{
 		case ATAPI_REG_DATA:
 			printf( "atapi_w: data=%02x\n", data );
-	    		break;
-	    	case ATAPI_REG_FEATURES:
+				break;
+			case ATAPI_REG_FEATURES:
 			printf( "atapi_w: features=%02x\n", data );
-	    		break;
-	    	case ATAPI_REG_INTREASON:
+				break;
+			case ATAPI_REG_INTREASON:
 			printf( "atapi_w: intreason=%02x\n", data );
-	    		break;
-	    	case ATAPI_REG_SAMTAG:
+				break;
+			case ATAPI_REG_SAMTAG:
 			printf( "atapi_w: samtag=%02x\n", data );
-	    		break;
-	    	case ATAPI_REG_COUNTLOW:
+				break;
+			case ATAPI_REG_COUNTLOW:
 			printf( "atapi_w: countlow=%02x\n", data );
-	    		break;
-	    	case ATAPI_REG_COUNTHIGH:
+				break;
+			case ATAPI_REG_COUNTHIGH:
 			printf( "atapi_w: counthigh=%02x\n", data );
-	    		break;
-	    	case ATAPI_REG_DRIVESEL:
+				break;
+			case ATAPI_REG_DRIVESEL:
 			printf( "atapi_w: drivesel=%02x\n", data );
-	    		break;
-	    	case ATAPI_REG_CMDSTATUS:
+				break;
+			case ATAPI_REG_CMDSTATUS:
 			printf( "atapi_w: cmdstatus=%02x\n", data );
 			break;
 		}
@@ -428,7 +428,7 @@ static WRITE32_HANDLER( atapi_w )
 
 			switch (data)
 			{
-				case 0xa0:	// PACKET
+				case 0xa0:  // PACKET
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					gdrom_alt_status = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
@@ -443,7 +443,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_cdata_wait = 0;
 					break;
 
-				case 0xa1:	// IDENTIFY PACKET DEVICE
+				case 0xa1:  // IDENTIFY PACKET DEVICE
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					gdrom_alt_status = ATAPI_STAT_DRQ;
 
@@ -456,7 +456,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					memset( atapi_data, 0, atapi_data_len );
 
-					atapi_data[ 0 ^ 1 ] = 0x86;	// ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
+					atapi_data[ 0 ^ 1 ] = 0x86; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
 					atapi_data[ 1 ^ 1 ] = 0x00;
 
 					memset( &atapi_data[ 46 ], ' ', 8 );
@@ -494,7 +494,7 @@ static WRITE32_HANDLER( atapi_w )
 					gdrom_raise_irq(space.machine());
 					break;
 
-				case 0xef:	// SET FEATURES
+				case 0xef:  // SET FEATURES
 					// set xfer mode?
 					if (atapi_regs[ATAPI_REG_FEATURES] == 0x03)
 					{
@@ -507,7 +507,7 @@ static WRITE32_HANDLER( atapi_w )
 					}
 
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-					gdrom_alt_status = 0;	// is this correct?
+					gdrom_alt_status = 0;   // is this correct?
 
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
@@ -706,4 +706,3 @@ WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 		break;
 	}
 }
-

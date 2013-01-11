@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 
-#define VERBOSE_PIO 0	/* PIO (keyboard controller) */
+#define VERBOSE_PIO 0   /* PIO (keyboard controller) */
 
 #define PIO_LOG(N,M,A) \
 	do { \
@@ -163,21 +163,21 @@ I8237_INTERFACE( pc_dma8237_config )
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma_write_byte),
 
 	{ DEVCB_NULL,
-	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_r),
-	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_r),
-	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_r) },
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_r),
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_r),
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_r) },
 
 
 	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_0_dack_w),
-	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_w),
-	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_w),
-	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_w) },
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_w),
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_w),
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_w) },
 
 	// DACK's
 	{ DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack0_w),
-	  DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack1_w),
-	  DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack2_w),
-	  DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack3_w) }
+		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack1_w),
+		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack2_w),
+		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack3_w) }
 };
 
 
@@ -235,15 +235,15 @@ const struct pit8253_config pc_pit8253_config =
 {
 	{
 		{
-			XTAL_14_31818MHz/12,				/* heartbeat IRQ */
+			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
 		}, {
-			XTAL_14_31818MHz/12,				/* dram refresh */
+			XTAL_14_31818MHz/12,                /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out1_changed)
 		}, {
-			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
+			XTAL_14_31818MHz/12,                /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out2_changed)
 		}
@@ -318,7 +318,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 				/* Data is clocked in on a high->low transition */
 				if ( ! state )
 				{
-					UINT8	trigger_irq = m_ppi_shift_register & 0x01;
+					UINT8   trigger_irq = m_ppi_shift_register & 0x01;
 
 					m_ppi_shift_register = ( m_ppi_shift_register >> 1 ) | ( m_ppi_data_signal << 7 );
 					if ( trigger_irq )
@@ -347,22 +347,22 @@ READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
 	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
-         *   1  Not used
-         * 2-3  The number of memory banks on the system board
-         * 4-5  Display mode
-         *      11 = monochrome
-         *      10 - color 80x25
-         *      01 - color 40x25
-         * 6-7  The number of floppy disk drives
-         */
+		 *   1  Not used
+		 * 2-3  The number of memory banks on the system board
+		 * 4-5  Display mode
+		 *      11 = monochrome
+		 *      10 - color 80x25
+		 *      01 - color 40x25
+		 * 6-7  The number of floppy disk drives
+		 */
 		data = ioport("DSW0")->read();
 	}
 	else
 	{
 		data = m_ppi_shift_register;
 	}
-    PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
-    return data;
+	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
+	return data;
 }
 
 
@@ -510,26 +510,26 @@ machine_config_constructor ibm5160_mb_device::device_mconfig_additions() const
 static INPUT_PORTS_START( ibm5160_mb )
 	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x40, "2" )
-	PORT_DIPSETTING(	0x80, "3" )
-	PORT_DIPSETTING(	0xc0, "4" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
 	PORT_DIPNAME( 0x30, 0x30, "Graphics adapter")
-	PORT_DIPSETTING(	0x00, "EGA/VGA" )
-	PORT_DIPSETTING(	0x10, "Color 40x25" )
-	PORT_DIPSETTING(	0x20, "Color 80x25" )
-	PORT_DIPSETTING(	0x30, "Monochrome" )
+	PORT_DIPSETTING(    0x00, "EGA/VGA" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
 	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
-	PORT_DIPSETTING(	0x00, "1 - 16/ 64/256K" )
-	PORT_DIPSETTING(	0x04, "2 - 32/128/512K" )
-	PORT_DIPSETTING(	0x08, "3 - 48/192/576K" )
-	PORT_DIPSETTING(	0x0c, "4 - 64/256/640K" )
+	PORT_DIPSETTING(    0x00, "1 - 16/ 64/256K" )
+	PORT_DIPSETTING(    0x04, "2 - 32/128/512K" )
+	PORT_DIPSETTING(    0x08, "3 - 48/192/576K" )
+	PORT_DIPSETTING(    0x0c, "4 - 64/256/640K" )
 	PORT_DIPNAME( 0x02, 0x00, "8087 installed")
-	PORT_DIPSETTING(	0x00, DEF_STR(No) )
-	PORT_DIPSETTING(	0x02, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
-	PORT_DIPSETTING(	0x01, DEF_STR(Yes) )
-	PORT_DIPSETTING(	0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 INPUT_PORTS_END
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -556,7 +556,7 @@ void ibm5160_mb_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-       : device_t(mconfig, IBM5160_MOTHERBOARD, "IBM5160_MOTHERBOARD", tag, owner, clock),
+		: device_t(mconfig, IBM5160_MOTHERBOARD, "IBM5160_MOTHERBOARD", tag, owner, clock),
 		m_maincpu(*owner, "maincpu"),
 		m_pic8259(*this, "pic8259"),
 		m_dma8237(*this, "dma8237"),
@@ -733,7 +733,7 @@ machine_config_constructor ibm5150_mb_device::device_mconfig_additions() const
 
 ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ibm5160_mb_device(mconfig, tag, owner, clock),
-	  m_cassette(*this, CASSETTE_TAG)
+		m_cassette(*this, CASSETTE_TAG)
 {
 }
 
@@ -753,24 +753,24 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
-         *   1  Not used
-         * 2-3  The number of memory banks on the system board
-         * 4-5  Display mode
-         *      11 = monochrome
-         *      10 - color 80x25
-         *      01 - color 40x25
-         * 6-7  The number of floppy disk drives
-         */
+		 *   1  Not used
+		 * 2-3  The number of memory banks on the system board
+		 * 4-5  Display mode
+		 *      11 = monochrome
+		 *      10 - color 80x25
+		 *      01 - color 40x25
+		 * 6-7  The number of floppy disk drives
+		 */
 		data = ioport("DSW0")->read() & 0xF3;
 		switch ( machine().device<ram_device>(RAM_TAG)->size() )
 		{
 		case 16 * 1024:
 			data |= 0x00;
 			break;
-		case 32 * 1024:	/* Need to verify if this is correct */
+		case 32 * 1024: /* Need to verify if this is correct */
 			data |= 0x04;
 			break;
-		case 48 * 1024:	/* Need to verify if this is correct */
+		case 48 * 1024: /* Need to verify if this is correct */
 			data |= 0x08;
 			break;
 		default:
@@ -782,8 +782,8 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 	{
 		data = m_ppi_shift_register;
 	}
-    PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
-    return data;
+	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
+	return data;
 }
 
 
@@ -802,21 +802,21 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 
 		switch ( machine().device<ram_device>(RAM_TAG)->size() - 64 * 1024 )
 		{
-		case 64 * 1024:		data |= 0x00; break;
-		case 128 * 1024:	data |= 0x02; break;
-		case 192 * 1024:	data |= 0x04; break;
-		case 256 * 1024:	data |= 0x06; break;
-		case 320 * 1024:	data |= 0x08; break;
-		case 384 * 1024:	data |= 0x0A; break;
-		case 448 * 1024:	data |= 0x0C; break;
-		case 512 * 1024:	data |= 0x0E; break;
-		case 576 * 1024:	data |= 0x01; break;
-		case 640 * 1024:	data |= 0x03; break;
-		case 704 * 1024:	data |= 0x05; break;
-		case 768 * 1024:	data |= 0x07; break;
-		case 832 * 1024:	data |= 0x09; break;
-		case 896 * 1024:	data |= 0x0B; break;
-		case 960 * 1024:	data |= 0x0D; break;
+		case 64 * 1024:     data |= 0x00; break;
+		case 128 * 1024:    data |= 0x02; break;
+		case 192 * 1024:    data |= 0x04; break;
+		case 256 * 1024:    data |= 0x06; break;
+		case 320 * 1024:    data |= 0x08; break;
+		case 384 * 1024:    data |= 0x0A; break;
+		case 448 * 1024:    data |= 0x0C; break;
+		case 512 * 1024:    data |= 0x0E; break;
+		case 576 * 1024:    data |= 0x01; break;
+		case 640 * 1024:    data |= 0x03; break;
+		case 704 * 1024:    data |= 0x05; break;
+		case 768 * 1024:    data |= 0x07; break;
+		case 832 * 1024:    data |= 0x09; break;
+		case 896 * 1024:    data |= 0x0B; break;
+		case 960 * 1024:    data |= 0x0D; break;
 		}
 		if ( machine().device<ram_device>(RAM_TAG)->size() > 960 * 1024 )
 			data |= 0x0D;

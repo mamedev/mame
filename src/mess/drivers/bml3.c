@@ -120,22 +120,22 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 };
 
-#define mc6845_h_char_total 	(m_crtc_vreg[0])
-#define mc6845_h_display		(m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(m_crtc_vreg[2])
-#define mc6845_sync_width		(m_crtc_vreg[3])
-#define mc6845_v_char_total		(m_crtc_vreg[4])
-#define mc6845_v_total_adj		(m_crtc_vreg[5])
-#define mc6845_v_display		(m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(m_crtc_vreg[8])
-#define mc6845_tile_height		(m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total     (m_crtc_vreg[0])
+#define mc6845_h_display        (m_crtc_vreg[1])
+#define mc6845_h_sync_pos       (m_crtc_vreg[2])
+#define mc6845_sync_width       (m_crtc_vreg[3])
+#define mc6845_v_char_total     (m_crtc_vreg[4])
+#define mc6845_v_total_adj      (m_crtc_vreg[5])
+#define mc6845_v_display        (m_crtc_vreg[6])
+#define mc6845_v_sync_pos       (m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (m_crtc_vreg[8])
+#define mc6845_tile_height      (m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
 void bml3_state::video_start()
@@ -259,10 +259,10 @@ void bml3_state::m6845_change_clock(UINT8 setting)
 WRITE8_MEMBER( bml3_state::bml3_hres_reg_w )
 {
 	/*
-    x--- ---- width (1) 80 / (0) 40
-    -x-- ---- used in some modes, unknown purpose
-    --x- ---- used in some modes, unknown purpose (also wants $ffc4 to be 0xff), color / monochrome switch?
-    */
+	x--- ---- width (1) 80 / (0) 40
+	-x-- ---- used in some modes, unknown purpose
+	--x- ---- used in some modes, unknown purpose (also wants $ffc4 to be 0xff), color / monochrome switch?
+	*/
 
 	m_hres_reg = data;
 
@@ -272,8 +272,8 @@ WRITE8_MEMBER( bml3_state::bml3_hres_reg_w )
 WRITE8_MEMBER( bml3_state::bml3_vres_reg_w )
 {
 	/*
-    ---- x--- char height
-    */
+	---- x--- char height
+	*/
 	m_vres_reg = data;
 
 	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
@@ -566,16 +566,16 @@ INPUT_PORTS_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
@@ -656,41 +656,41 @@ void bml3_state::machine_reset()
 /* F4 Character Displayer */
 static const gfx_layout bml3_charlayout8x8even =
 {
-	8, 8,					/* 8 x 8 characters */
-	RGN_FRAC(1,1),					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	RGN_FRAC(1,1),                  /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 2*8,4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
-	8*16					/* every char takes 8 bytes */
+	8*16                    /* every char takes 8 bytes */
 };
 
 static const gfx_layout bml3_charlayout8x8odd =
 {
-	8, 8,					/* 8 x 8 characters */
-	RGN_FRAC(1,1),					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	RGN_FRAC(1,1),                  /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 1*8, 3*8, 5*8, 7*8, 9*8, 11*8, 13*8, 15*8 },
-	8*16					/* every char takes 8 bytes */
+	8*16                    /* every char takes 8 bytes */
 };
 
 static const gfx_layout bml3_charlayout8x16 =
 {
-	8, 16,					/* 8 x 8 characters */
-	RGN_FRAC(1,1),					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 8 characters */
+	RGN_FRAC(1,1),                  /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 8 bytes */
+	8*16                    /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( bml3 )
@@ -705,18 +705,18 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	/* ROM banking:
-    -0-- --0- 0xa000 - 0xbfff ROM R RAM W
-    -1-- --0- 0xa000 - 0xbfff RAM R/W
-    -x-- --1- 0xa000 - 0xbfff no change
-    0--- -0-- 0xc000 - 0xdfff ROM R RAM W
-    1--- -0-- 0xc000 - 0xdfff RAM R/W
-    x--- -1-- 0xc000 - 0xdfff no change
-    0--- 0--- 0xe000 - 0xefff ROM R RAM W
-    1--- 0--- 0xe000 - 0xefff RAM R/W
-    x--- 1--- 0xe000 - 0xefff no change
-    ---- ---x 0xf000 - 0xfeff (0) ROM R RAM W (1) RAM R/W
-    ---- --x- 0xfff0 - 0xffff (0) ROM R RAM W (1) RAM R/W
-    */
+	-0-- --0- 0xa000 - 0xbfff ROM R RAM W
+	-1-- --0- 0xa000 - 0xbfff RAM R/W
+	-x-- --1- 0xa000 - 0xbfff no change
+	0--- -0-- 0xc000 - 0xdfff ROM R RAM W
+	1--- -0-- 0xc000 - 0xdfff RAM R/W
+	x--- -1-- 0xc000 - 0xdfff no change
+	0--- 0--- 0xe000 - 0xefff ROM R RAM W
+	1--- 0--- 0xe000 - 0xefff RAM R/W
+	x--- 1--- 0xe000 - 0xefff no change
+	---- ---x 0xf000 - 0xfeff (0) ROM R RAM W (1) RAM R/W
+	---- --x- 0xfff0 - 0xffff (0) ROM R RAM W (1) RAM R/W
+	*/
 	printf("Check banking PIA A -> %02x\n",data);
 
 	if(!(data & 0x2))
@@ -808,7 +808,7 @@ static const pia6821_interface bml3_pia_config =
 {
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 
-	DEVCB_DRIVER_MEMBER(bml3_state, bml3_piaA_w),	/* port A output */
+	DEVCB_DRIVER_MEMBER(bml3_state, bml3_piaA_w),   /* port A output */
 	DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
@@ -866,10 +866,10 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,	// read A
-		DEVCB_NULL,	// read B
-		DEVCB_NULL,	// write A
-		DEVCB_NULL	// write B
+		DEVCB_NULL, // read A
+		DEVCB_NULL, // read B
+		DEVCB_NULL, // write A
+		DEVCB_NULL  // write B
 	},
 	DEVCB_NULL
 };
@@ -951,4 +951,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY         FULLNAME           FLAGS */
 COMP( 1980, bml3,   0,      0,       bml3,      bml3, driver_device,    0,      "Hitachi", "Basic Master Level 3", GAME_NOT_WORKING | GAME_NO_SOUND)
-

@@ -35,7 +35,7 @@ public:
 	DECLARE_READ8_MEMBER(pc9801_26_r);
 	DECLARE_WRITE8_MEMBER(pc9801_26_w);
 
-//	required_device<cpu_device>  m_maincpu;
+//  required_device<cpu_device>  m_maincpu;
 	required_device<ym2203_device>  m_opn;
 protected:
 	// device-level overrides

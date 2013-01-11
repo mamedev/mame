@@ -33,14 +33,14 @@ enum
 	MASK
 };
 
-const int ICW_ENABLE_INT	= 0x80;
-const int ICW_AND_OR		= 0x40;
-const int ICW_AND			= 0x40;
-const int ICW_OR			= 0x00;
-const int ICW_HIGH_LOW		= 0x20;
-const int ICW_HIGH			= 0x20;
-const int ICW_LOW			= 0x00;
-const int ICW_MASK_FOLLOWS	= 0x10;
+const int ICW_ENABLE_INT    = 0x80;
+const int ICW_AND_OR        = 0x40;
+const int ICW_AND           = 0x40;
+const int ICW_OR            = 0x00;
+const int ICW_HIGH_LOW      = 0x20;
+const int ICW_HIGH          = 0x20;
+const int ICW_LOW           = 0x00;
+const int ICW_MASK_FOLLOWS  = 0x10;
 
 
 
@@ -57,7 +57,7 @@ const device_type Z80PIO = &device_creator<z80pio_device>;
 
 z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80PIO, "Z8420", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -298,21 +298,21 @@ void z80pio_device::check_interrupts()
 
 z80pio_device::pio_port::pio_port()
 	: m_device(NULL),
-	  m_index(0),
-	  m_mode(0),
-	  m_next_control_word(0),
-	  m_input(0),
-	  m_output(0),
-	  m_ior(0),
-	  m_rdy(false),
-	  m_stb(false),
-	  m_ie(false),
-	  m_ip(false),
-	  m_ius(false),
-	  m_icw(0),
-	  m_vector(0),
-	  m_mask(0),
-	  m_match(false)
+		m_index(0),
+		m_mode(0),
+		m_next_control_word(0),
+		m_input(0),
+		m_output(0),
+		m_ior(0),
+		m_rdy(false),
+		m_stb(false),
+		m_ie(false),
+		m_ip(false),
+		m_ius(false),
+		m_icw(0),
+		m_vector(0),
+		m_mask(0),
+		m_match(false)
 {
 	memset(&m_in_p_func, 0, sizeof(m_in_p_func));
 	memset(&m_out_p_func, 0, sizeof(m_out_p_func));

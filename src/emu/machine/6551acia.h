@@ -13,7 +13,7 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ACIA6551_ADD(_tag)	\
+#define MCFG_ACIA6551_ADD(_tag) \
 	MCFG_DEVICE_ADD((_tag), ACIA6551, 0)
 
 
@@ -24,11 +24,11 @@
 // ======================> acia6551_device
 
 class acia6551_device :  public device_t,
-						 public device_serial_interface
+							public device_serial_interface
 {
 public:
-    // construction/destruction
-    acia6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	acia6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* read data register */
 	DECLARE_READ8_MEMBER(read);
@@ -42,8 +42,8 @@ public:
 
 	virtual void input_callback(UINT8 state);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 
 	void refresh_ints();
 	void update_data_form();
@@ -56,7 +56,7 @@ private:
 	UINT8 m_control_register;
 
 	/* internal baud rate timer */
-	emu_timer	*m_timer;
+	emu_timer   *m_timer;
 };
 
 // device type definition

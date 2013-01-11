@@ -37,16 +37,16 @@ const device_type CBM2_EXPANSION_SLOT = &device_creator<cbm2_expansion_slot_devi
 
 device_cbm2_expansion_card_interface::device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_bank1(NULL),
-	  m_bank2(NULL),
-	  m_bank3(NULL),
-	  m_ram(NULL),
-	  m_nvram(NULL),
-	  m_nvram_size(0),
-	  m_bank1_mask(0),
-	  m_bank2_mask(0),
-	  m_bank3_mask(0),
-	  m_ram_mask(0)
+		m_bank1(NULL),
+		m_bank2(NULL),
+		m_bank3(NULL),
+		m_ram(NULL),
+		m_nvram(NULL),
+		m_nvram_size(0),
+		m_bank1_mask(0),
+		m_bank2_mask(0),
+		m_bank3_mask(0),
+		m_ram_mask(0)
 {
 	m_slot = dynamic_cast<cbm2_expansion_slot_device *>(device.owner());
 }
@@ -157,7 +157,7 @@ UINT8* device_cbm2_expansion_card_interface::cbm2_nvram_pointer(running_machine 
 //-------------------------------------------------
 
 cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, CBM2_EXPANSION_SLOT, "CBM-II expansion port", tag, owner, clock),
+		device_t(mconfig, CBM2_EXPANSION_SLOT, "CBM-II expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {

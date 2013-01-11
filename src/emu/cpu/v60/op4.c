@@ -351,4 +351,3 @@ static UINT32 opBSR(v60_state *cpustate) /* TRUSTED */
 	cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
 	return 0;
 }
-

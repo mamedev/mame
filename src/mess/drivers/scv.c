@@ -16,7 +16,7 @@ class scv_state : public driver_device
 public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this,"videoram")		{ }
+		m_videoram(*this,"videoram")        { }
 
 	DECLARE_WRITE8_MEMBER(scv_porta_w);
 	DECLARE_READ8_MEMBER(scv_portb_r);
@@ -45,18 +45,18 @@ public:
 
 
 static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
+	AM_RANGE( 0x0000, 0x0fff ) AM_ROM       /* BIOS */
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")	/* VRAM + 4 registers */
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")  /* VRAM + 4 registers */
 
 	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE_LEGACY("upd1771c", upd1771_w )
 
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank0")
 	AM_RANGE( 0xa000, 0xbfff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0xe000, 0xefff ) AM_READ_BANK("bank3")	AM_WRITE( scv_cart_ram_w )
-	AM_RANGE( 0xf000, 0xff7f ) AM_READ_BANK("bank4")	AM_WRITE( scv_cart_ram2_w )
-	AM_RANGE( 0xff80, 0xffff ) AM_RAM		/* upd7801 internal RAM */
+	AM_RANGE( 0xe000, 0xefff ) AM_READ_BANK("bank3")    AM_WRITE( scv_cart_ram_w )
+	AM_RANGE( 0xf000, 0xff7f ) AM_READ_BANK("bank4")    AM_WRITE( scv_cart_ram2_w )
+	AM_RANGE( 0xff80, 0xffff ) AM_RAM       /* upd7801 internal RAM */
 ADDRESS_MAP_END
 
 
@@ -259,7 +259,7 @@ static void scv_set_banks( running_machine &machine )
 		state->membank( "bank3" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xe000 : 0x6000 ) );
 		state->membank( "bank4" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xf000 : 0x7000 ) );
 		break;
-	case 0x20000:	/* Pole Position 2 */
+	case 0x20000:   /* Pole Position 2 */
 		int base = ( ( state->m_portc >> 5 ) & 0x03 ) * 0x8000 ;
 		state->membank( "bank0" )->set_base( state->m_cart_rom + base + 0 );
 		state->membank( "bank1" )->set_base( state->m_cart_rom + base + 0x2000 );
@@ -359,36 +359,36 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 void scv_state::palette_init()
 {
 	/*
-      SCV Epoch-1A chip RGB voltage readouts from paused Bios color test:
+	  SCV Epoch-1A chip RGB voltage readouts from paused Bios color test:
 
-      (values in millivolts)
+	  (values in millivolts)
 
-            R   G   B
-      0    29  29 325
-      1    29  27  22
-      2    25  24 510
-      3   337  28 508
-      4    29 515  22
-      5   336 512 329
-      6    26 515 511
-      7    29 337  25
-      8   520  24  22
-      9   517 338  21
-      10  520  25 512
-      11  521 336 333
-      12  518 515  21
-      13  342 336  22
-      14  337 336 330
-      15  516 511 508
+	        R   G   B
+	  0    29  29 325
+	  1    29  27  22
+	  2    25  24 510
+	  3   337  28 508
+	  4    29 515  22
+	  5   336 512 329
+	  6    26 515 511
+	  7    29 337  25
+	  8   520  24  22
+	  9   517 338  21
+	  10  520  25 512
+	  11  521 336 333
+	  12  518 515  21
+	  13  342 336  22
+	  14  337 336 330
+	  15  516 511 508
 
-      Only tree 'bins' of values are obviously captured
-       25 ish
-      330 ish
-      520 ish.
+	  Only tree 'bins' of values are obviously captured
+	   25 ish
+	  330 ish
+	  520 ish.
 
-      Quamtizing/scaling/rounding between 0 and 255 we thus get:
+	  Quamtizing/scaling/rounding between 0 and 255 we thus get:
 
-    */
+	*/
 	palette_set_color_rgb( machine(),   0,   0,   0, 155);
 	palette_set_color_rgb( machine(),   1,   0,   0,   0);
 	palette_set_color_rgb( machine(),   2,   0,   0, 255);
@@ -618,7 +618,7 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				switch ( m_videoram[0x1400] & 0x03 )
 				{
-				case 0x01:		/* Semi graphics mode */
+				case 0x01:      /* Semi graphics mode */
 					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg );
 					draw_semi_graph( bitmap, x * 8 + 4, y * 16     , d & 0x40, gr_fg );
 					draw_semi_graph( bitmap, x * 8    , y * 16 +  4, d & 0x20, gr_fg );
@@ -629,12 +629,12 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 					draw_semi_graph( bitmap, x * 8 + 4, y * 16 + 12, d & 0x01, gr_fg );
 					break;
 
-				case 0x03:		/* Block graphics mode */
+				case 0x03:      /* Block graphics mode */
 					draw_block_graph( bitmap, x * 8, y * 16    , d >> 4 );
 					draw_block_graph( bitmap, x * 8, y * 16 + 8, d & 0x0f );
 					break;
 
-				default:		/* Otherwise draw nothing? */
+				default:        /* Otherwise draw nothing? */
 					break;
 				}
 			}
@@ -650,11 +650,11 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 		for ( i = 0; i < 128; i++ )
 		{
 			UINT8 spr_y = m_videoram[ 0x1200 + i * 4 ] & 0xfe;
-			UINT8 y_32 = m_videoram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
+			UINT8 y_32 = m_videoram[ 0x1200 + i * 4 ] & 0x01;       /* Xx32 sprite */
 			UINT8 clip = m_videoram[ 0x1201 + i * 4 ] >> 4;
 			UINT8 col = m_videoram[ 0x1201 + i * 4 ] & 0x0f;
 			UINT8 spr_x = m_videoram[ 0x1202 + i * 4 ] & 0xfe;
-			UINT8 x_32 = m_videoram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
+			UINT8 x_32 = m_videoram[ 0x1202 + i * 4 ] & 0x01;       /* 32xX sprite */
 			UINT8 tile_idx = m_videoram[ 0x1203 + i * 4 ] & 0x7f;
 			UINT8 half = m_videoram[ 0x1203 + i * 4] & 0x80;
 			UINT8 left = 1;
@@ -765,15 +765,15 @@ void scv_state::machine_reset()
 /* F4 Character Displayer */
 static const gfx_layout scv_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( scv )
@@ -795,7 +795,7 @@ static MACHINE_CONFIG_START( scv, scv_state )
 
 	/* Video chip is EPOCH TV-1 */
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 24, 24+192, 262, 23, 23+222 )	/* TODO: Verify */
+	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 24, 24+192, 262, 23, 23+222 )  /* TODO: Verify */
 	MCFG_SCREEN_UPDATE_DRIVER(scv_state, screen_update_scv)
 
 	MCFG_GFXDECODE(scv)
@@ -826,7 +826,7 @@ static MACHINE_CONFIG_DERIVED( scv_pal, scv )
 
 	/* Video chip is EPOCH TV-1A */
 	MCFG_SCREEN_MODIFY( "screen" )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 24, 24+192, 342, 23, 23+222 )		/* TODO: Verify */
+	MCFG_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 24, 24+192, 342, 23, 23+222 )      /* TODO: Verify */
 MACHINE_CONFIG_END
 
 
@@ -854,4 +854,3 @@ ROM_END
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY  FULLNAME                 FLAGS */
 CONS( 1984, scv,     0,      0,      scv,     scv, driver_device,   0,      "Epoch", "Super Cassette Vision", GAME_IMPERFECT_SOUND )
 CONS( 198?, scv_pal, scv,    0,      scv_pal, scv, driver_device,   0,      "Yeno",  "Super Cassette Vision (PAL)", GAME_IMPERFECT_SOUND )
-

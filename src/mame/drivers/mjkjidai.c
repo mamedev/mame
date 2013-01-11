@@ -28,7 +28,7 @@ TODO:
 #include "includes/mjkjidai.h"
 
 class mjkjidai_adpcm_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -104,7 +104,7 @@ const device_type MJKJIDAI = &device_creator<mjkjidai_adpcm_device>;
 
 mjkjidai_adpcm_device::mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MJKJIDAI, "Custom ADPCM", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(mjkjidai_adpcm_state);
 }
@@ -217,20 +217,20 @@ static ADDRESS_MAP_START( mjkjidai_map, AS_PROGRAM, 8, mjkjidai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_SHARE("nvram")	// cleared and initialized on startup if bit 6 if port 00 is 0
-	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_SHARE("spriteram1")			// shared with tilemap ram
-	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_SHARE("spriteram2")		// shared with tilemap ram
-	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_SHARE("spriteram3")		// shared with tilemap ram
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("nvram")   // cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_SHARE("spriteram1")          // shared with tilemap ram
+	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_SHARE("spriteram2")      // shared with tilemap ram
+	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_SHARE("spriteram3")      // shared with tilemap ram
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
-	AM_RANGE(0x01, 0x01) AM_READNOP	// ???
+	AM_RANGE(0x01, 0x01) AM_READNOP // ???
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x01, 0x02) AM_WRITE(keyboard_select_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
+	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)  // rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76489_device, write)
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )	// service mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )    // service mode
 	PORT_DIPNAME( 0x20, 0x20, "Statistics" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )	// reinitialize NVRAM and reset the game
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )   // reinitialize NVRAM and reset the game
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("PL1_1")
@@ -435,14 +435,14 @@ INTERRUPT_GEN_MEMBER(mjkjidai_state::vblank_irq)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
 static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,10000000/2)	/* 5 MHz ??? */
+	MCFG_CPU_ADD("maincpu", Z80,10000000/2) /* 5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(mjkjidai_map)
 	MCFG_CPU_IO_MAP(mjkjidai_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mjkjidai_state,  vblank_irq)
@@ -488,7 +488,7 @@ MACHINE_CONFIG_END
 ROM_START( mjkjidai )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "mkj-00.14g",   0x00000, 0x8000, CRC(188a27e9) SHA1(2306ad112aaf8d9ac77a89d0e4c3a17f36945130) )
-	ROM_LOAD( "mkj-01.15g",   0x08000, 0x4000, CRC(a6a5e9c7) SHA1(974f4343f4347a0065f833c1fdcc47e96d42932d) )	/* banked, there is code flowing from 7fff to this bank */
+	ROM_LOAD( "mkj-01.15g",   0x08000, 0x4000, CRC(a6a5e9c7) SHA1(974f4343f4347a0065f833c1fdcc47e96d42932d) )   /* banked, there is code flowing from 7fff to this bank */
 	ROM_CONTINUE(             0x10000, 0x4000 )
 	ROM_LOAD( "mkj-02.16g",   0x14000, 0x8000, CRC(fb312927) SHA1(b71db72ba881474f9c2523d0617757889af9f28e) )
 
@@ -505,10 +505,9 @@ ROM_START( mjkjidai )
 	ROM_LOAD( "mkj-61.14a",   0x0100, 0x0100, CRC(e9e90d55) SHA1(a14177df3bab59e0f9ce41094e03ef3593329149) )
 	ROM_LOAD( "mkj-62.15a",   0x0200, 0x0100, CRC(934f1d53) SHA1(2b3b2dc77789b814810b25cda3f5adcfd7e0e57e) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
 	ROM_LOAD( "mkj-40.14c",   0x00000, 0x8000, CRC(4d8fcc4a) SHA1(24c2b8031367035c89c6649a084bce0714f3e8d4) )
 ROM_END
 
 
 GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, driver_device, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", GAME_IMPERFECT_GRAPHICS )
-

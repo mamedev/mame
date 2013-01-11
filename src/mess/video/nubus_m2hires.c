@@ -11,10 +11,10 @@
 #include "emu.h"
 #include "video/nubus_m2hires.h"
 
-#define M2HIRES_SCREEN_NAME	"m2hires_screen"
+#define M2HIRES_SCREEN_NAME "m2hires_screen"
 #define M2HIRES_ROM_REGION  "m2hires_rom"
 
-#define VRAM_SIZE	(0x80000)	// 512k max
+#define VRAM_SIZE   (0x80000)   // 512k max
 
 MACHINE_CONFIG_FRAGMENT( m2hires )
 	MCFG_SCREEN_ADD( M2HIRES_SCREEN_NAME, RASTER)
@@ -64,14 +64,14 @@ const rom_entry *nubus_m2hires_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_M2HIRES, "Macintosh II Hi-Resolution video card", tag, owner, clock),
+		device_t(mconfig, NUBUS_M2HIRES, "Macintosh II Hi-Resolution video card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_m2hr";
 }
 
 nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_m2hr";
@@ -101,7 +101,7 @@ void nubus_m2hires_device::device_start()
 	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_m2hires_device::m2hires_r), this), write32_delegate(FUNC(nubus_m2hires_device::m2hires_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -232,7 +232,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 
 	switch (offset)
 	{
-		case 1:			// mode
+		case 1:         // mode
 			switch (data)
 			{
 				case 0x20000000:
@@ -253,7 +253,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 			}
 			break;
 
-		case 0x5038:	// DAC control
+		case 0x5038:    // DAC control
 //          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
 			m_clutoffs = (data>>24)&0xff;
 			break;
@@ -274,12 +274,12 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 			}
 			break;
 
-		case 0x8000:	// enable and ack VBL
+		case 0x8000:    // enable and ack VBL
 			m_vbl_disable = 0;
 			lower_slot_irq();
 			break;
 
-		case 0x8001:	// disable VBL
+		case 0x8001:    // disable VBL
 			m_vbl_disable = 1;
 			break;
 
@@ -294,7 +294,7 @@ READ32_MEMBER( nubus_m2hires_device::m2hires_r )
 	if (offset == 0x10010/4)
 	{
 		m_toggle ^= (1<<16);
-		return m_toggle | (1<<17);	// bit 17 indicates a 4/8bpp capable ASIC apparently; the firmware won't enter those modes otherwise (although they show in the list)
+		return m_toggle | (1<<17);  // bit 17 indicates a 4/8bpp capable ASIC apparently; the firmware won't enter those modes otherwise (although they show in the list)
 	}
 /*  else
     {

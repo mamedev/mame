@@ -22,8 +22,8 @@ class a6809_state : public driver_device
 public:
 	a6809_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_via(*this, "via"),
-		  m_videoram(*this, "videoram")
+			m_via(*this, "via"),
+			m_videoram(*this, "videoram")
 	{ }
 
 	required_device<via6522_device> m_via;

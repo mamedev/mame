@@ -11,39 +11,39 @@
 #include "machine/terminal.h"
 #include "machine/upd765.h"
 
-#define M68000_TAG		"u68"
-#define I8255A_0_TAG	"u22"
-#define I8255A_1_TAG	"u39"
-#define I8253_0_TAG		"u74"
-#define I8253_1_TAG		"u75"
-#define I8259_TAG		"u73"
-#define I8251_0_TAG		"u58"
-#define I8251_1_TAG		"u67"
-#define UPD765_TAG		"u21"
-#define TMS9914_TAG		"u6"
-#define CENTRONICS_TAG	"centronics"
+#define M68000_TAG      "u68"
+#define I8255A_0_TAG    "u22"
+#define I8255A_1_TAG    "u39"
+#define I8253_0_TAG     "u74"
+#define I8253_1_TAG     "u75"
+#define I8259_TAG       "u73"
+#define I8251_0_TAG     "u58"
+#define I8251_1_TAG     "u67"
+#define UPD765_TAG      "u21"
+#define TMS9914_TAG     "u6"
+#define CENTRONICS_TAG  "centronics"
 
 class sage2_state : public driver_device
 {
 public:
 	sage2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M68000_TAG),
-		  m_pic(*this, I8259_TAG),
-		  m_usart0(*this, I8251_0_TAG),
-		  m_usart1(*this, I8251_1_TAG),
-		  m_fdc(*this, UPD765_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:525dd"),
-		  m_floppy1(*this, UPD765_TAG ":1:525dd"),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ieee488(*this, IEEE488_TAG),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_reset(1),
-		  m_fdc_int(0),
-		  m_fdie(0),
-		  m_sl0(1),
-		  m_sl1(1)
+			m_maincpu(*this, M68000_TAG),
+			m_pic(*this, I8259_TAG),
+			m_usart0(*this, I8251_0_TAG),
+			m_usart1(*this, I8251_1_TAG),
+			m_fdc(*this, UPD765_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, UPD765_TAG ":0:525dd"),
+			m_floppy1(*this, UPD765_TAG ":1:525dd"),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ieee488(*this, IEEE488_TAG),
+			m_terminal(*this, TERMINAL_TAG),
+			m_reset(1),
+			m_fdc_int(0),
+			m_fdie(0),
+			m_sl0(1),
+			m_sl1(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

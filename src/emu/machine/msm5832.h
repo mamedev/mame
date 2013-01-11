@@ -43,12 +43,12 @@
 
 // ======================> msm5832_device
 
-class msm5832_device :	public device_t,
+class msm5832_device :  public device_t,
 						public device_rtc_interface
 {
 public:
-    // construction/destruction
-    msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -64,9 +64,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_rtc_interface overrides
@@ -78,10 +78,10 @@ private:
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
 
-	UINT8 m_reg[13];			// registers
+	UINT8 m_reg[13];            // registers
 
-	int m_hold;					// counter hold
-	int m_address;				// address
+	int m_hold;                 // counter hold
+	int m_address;              // address
 
 	int m_read;
 	int m_write;

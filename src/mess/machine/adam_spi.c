@@ -134,15 +134,15 @@ READ8_MEMBER( adam_spi_device::p2_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       mode bit 0
-        1       mode bit 1
-        2       mode bit 2
-        3       NET RXD
-        4
+	    0       mode bit 0
+	    1       mode bit 1
+	    2       mode bit 2
+	    3       NET RXD
+	    4
 
-    */
+	*/
 
 	UINT8 data = M6801_MODE_7;
 
@@ -161,15 +161,15 @@ WRITE8_MEMBER( adam_spi_device::p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4       NET TXD
+	    0
+	    1
+	    2
+	    3
+	    4       NET TXD
 
-    */
+	*/
 
 	m_bus->txd_w(this, BIT(data, 4));
 }

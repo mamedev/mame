@@ -40,8 +40,8 @@ private:
 	UINT32 num_subblocks;
 	UINT32 cur_subblock;
 	UINT32 play_err_flag;
-	UINT32 read_type;	// for command 0x30 only
-	UINT32 data_select;	// for command 0x30 only
+	UINT32 read_type;   // for command 0x30 only
+	UINT32 data_select; // for command 0x30 only
 	cdrom_file *cdrom;
 	bool is_file;
 };

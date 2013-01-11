@@ -47,7 +47,7 @@ class belatra_state : public driver_device
 public:
 	belatra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -117,12 +117,12 @@ ROM_START( ldrinka )
 ROM_END
 
 
-GAME( 2004, fairyl2		,0,			belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (set 1)", GAME_IS_SKELETON )
-GAME( 2004, fairyl2a	,fairyl2,	belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (set 2)", GAME_IS_SKELETON )
-GAME( 2004, fairyl2b	,fairyl2,	belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (set 3)", GAME_IS_SKELETON )
-GAME( 2004, fairyl2bl	,fairyl2,	belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (bootleg)", GAME_IS_SKELETON )
+GAME( 2004, fairyl2     ,0,         belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (set 1)", GAME_IS_SKELETON )
+GAME( 2004, fairyl2a    ,fairyl2,   belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (set 2)", GAME_IS_SKELETON )
+GAME( 2004, fairyl2b    ,fairyl2,   belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (set 3)", GAME_IS_SKELETON )
+GAME( 2004, fairyl2bl   ,fairyl2,   belatra, belatra, driver_device, 0, ROT0, "Belatra","Fairy Land 2 (bootleg)", GAME_IS_SKELETON )
 
-GAME( 2004, ldrink		,0,			belatra, belatra, driver_device, 0, ROT0, "Belatra","Lucky Drink (set 1)", GAME_IS_SKELETON )
-GAME( 2004, ldrinka		,ldrink,	belatra, belatra, driver_device, 0, ROT0, "Belatra","Lucky Drink (set 2)", GAME_IS_SKELETON )
+GAME( 2004, ldrink      ,0,         belatra, belatra, driver_device, 0, ROT0, "Belatra","Lucky Drink (set 1)", GAME_IS_SKELETON )
+GAME( 2004, ldrinka     ,ldrink,    belatra, belatra, driver_device, 0, ROT0, "Belatra","Lucky Drink (set 2)", GAME_IS_SKELETON )
 
-GAME( 2004, merryjn		,0,			belatra, belatra, driver_device, 0, ROT0, "Belatra","Merry Joiner", GAME_IS_SKELETON )
+GAME( 2004, merryjn     ,0,         belatra, belatra, driver_device, 0, ROT0, "Belatra","Merry Joiner", GAME_IS_SKELETON )

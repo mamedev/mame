@@ -92,7 +92,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 
 /* constants */
-#define MASTER_CLOCK	48000000
+#define MASTER_CLOCK    48000000
 
 
 /*************************************
@@ -233,13 +233,13 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 static const eeprom_interface eeprom_interface_policetr =
 {
-	8,				// address bits 8
-	16,				// data bits    16
-	"*110",			// read         1 10 aaaaaa
-	"*101",			// write        1 01 aaaaaa dddddddddddddddd
-	"*111",			// erase        1 11 aaaaaa
-	"*10000xxxx",	// lock         1 00 00xxxx
-	"*10011xxxx"	// unlock       1 00 11xxxx
+	8,              // address bits 8
+	16,             // data bits    16
+	"*110",         // read         1 10 aaaaaa
+	"*101",         // write        1 01 aaaaaa dddddddddddddddd
+	"*111",         // erase        1 11 aaaaaa
+	"*10000xxxx",   // lock         1 00 00xxxx
+	"*10011xxxx"    // unlock       1 00 11xxxx
 };
 
 
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( policetr_map, AS_PROGRAM, 32, policetr_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x00200000, 0x0020000f) AM_WRITE(policetr_video_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
-	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
+	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP        // copies ROM here at startup, plus checksum
 	AM_RANGE(0x00600000, 0x00600003) AM_READ(bsmt2000_data_r)
 	AM_RANGE(0x00700000, 0x00700003) AM_WRITE(policetr_bsmt2000_reg_w)
 	AM_RANGE(0x00800000, 0x00800003) AM_WRITE(policetr_bsmt2000_data_w)
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( policetr_map, AS_PROGRAM, 32, policetr_state )
 	AM_RANGE(0x00a00000, 0x00a00003) AM_READ_PORT("IN0")
 	AM_RANGE(0x00a20000, 0x00a20003) AM_READ_PORT("IN1")
 	AM_RANGE(0x00a40000, 0x00a40003) AM_READ_PORT("DSW")
-	AM_RANGE(0x00e00000, 0x00e00003) AM_WRITENOP		// watchdog???
+	AM_RANGE(0x00e00000, 0x00e00003) AM_WRITENOP        // watchdog???
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( sshooter_map, AS_PROGRAM, 32, policetr_state )
 	AM_RANGE(0x00300000, 0x00300003) AM_WRITE(policetr_palette_offset_w)
 	AM_RANGE(0x00320000, 0x00320003) AM_WRITE(policetr_palette_data_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
-	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
+	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP        // copies ROM here at startup, plus checksum
 	AM_RANGE(0x00600000, 0x00600003) AM_READ(bsmt2000_data_r)
 	AM_RANGE(0x00700000, 0x00700003) AM_WRITE(policetr_bsmt2000_reg_w)
 	AM_RANGE(0x00800000, 0x0080000f) AM_WRITE(policetr_video_w)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( sshooter_map, AS_PROGRAM, 32, policetr_state )
 	AM_RANGE(0x00a00000, 0x00a00003) AM_READ_PORT("IN0")
 	AM_RANGE(0x00a20000, 0x00a20003) AM_READ_PORT("IN1")
 	AM_RANGE(0x00a40000, 0x00a40003) AM_READ_PORT("DSW")
-	AM_RANGE(0x00e00000, 0x00e00003) AM_WRITENOP		// watchdog???
+	AM_RANGE(0x00e00000, 0x00e00003) AM_WRITENOP        // watchdog???
 	AM_RANGE(0x1fc00000, 0x1fcfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -320,7 +320,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x00200000, IP_ACTIVE_LOW )		/* Not actually a dipswitch */
+	PORT_SERVICE( 0x00200000, IP_ACTIVE_LOW )       /* Not actually a dipswitch */
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state,bsmt_status_r, NULL)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -328,7 +328,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* EEPROM read */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* EEPROM read */
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -344,19 +344,19 @@ static INPUT_PORTS_START( policetr )
 	PORT_DIPSETTING(          0x00400000, "-")
 	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8") /* For use with mirrored CRTs - Not supported */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00800000, DEF_STR( On ) )	/* Will invert the Y axis of guns */
+	PORT_DIPSETTING(          0x00800000, DEF_STR( On ) )   /* Will invert the Y axis of guns */
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("GUNX1")				/* fake analog X */
+	PORT_START("GUNX1")             /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.008, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("GUNY1")				/* fake analog Y */
+	PORT_START("GUNY1")             /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.05, 0.002, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("GUNX2")				/* fake analog X */
+	PORT_START("GUNX2")             /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.008, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUNY2")				/* fake analog Y */
+	PORT_START("GUNY2")             /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.05, 0.002, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -364,16 +364,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( polict10 )
 	PORT_INCLUDE( policetr )
 
-	PORT_MODIFY("GUNX1")				/* fake analog X */
+	PORT_MODIFY("GUNX1")                /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.018, -0.037, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNY1")				/* fake analog Y */
+	PORT_MODIFY("GUNY1")                /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -0.033, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNX2")				/* fake analog X */
+	PORT_MODIFY("GUNX2")                /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.018, -0.037, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_MODIFY("GUNY2")				/* fake analog Y */
+	PORT_MODIFY("GUNY2")                /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -0.033, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -381,16 +381,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sshoot11 )
 	PORT_INCLUDE( policetr )
 
-	PORT_MODIFY("GUNX1")				/* fake analog X */
+	PORT_MODIFY("GUNX1")                /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.208, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNY1")				/* fake analog Y */
+	PORT_MODIFY("GUNY1")                /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.093, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_MODIFY("GUNX2")				/* fake analog X */
+	PORT_MODIFY("GUNX2")                /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.012, 0.208, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_MODIFY("GUNY2")				/* fake analog Y */
+	PORT_MODIFY("GUNY2")                /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.093, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -404,9 +404,9 @@ INPUT_PORTS_END
 
 static const r3000_cpu_core r3000_config =
 {
-	0,		/* 1 if we have an FPU, 0 otherwise */
-	4096,	/* code cache size */
-	4096	/* data cache size */
+	0,      /* 1 if we have an FPU, 0 otherwise */
+	4096,   /* code cache size */
+	4096    /* data cache size */
 };
 
 
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(400, 262)	/* needs to be verified */
+	MCFG_SCREEN_SIZE(400, 262)  /* needs to be verified */
 	MCFG_SCREEN_VISIBLE_AREA(0, 393, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(policetr_state, screen_update_policetr)
 
@@ -484,7 +484,7 @@ ROM_START( policetr11 ) /* Rev 0.3 PCB with all chips dated 01/06/97 */
 	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
 	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
 
-	ROM_REGION32_BE( 0x80000, "user1", 0 )	/* 2MB for R3000 code */
+	ROM_REGION32_BE( 0x80000, "user1", 0 )  /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "pt-u113.v11", 0x00000, 0x20000, CRC(3d62f6d6) SHA1(342ffa38a6972bbb03c89b4dd603c2cc60609d3d) )
 	ROM_LOAD32_BYTE( "pt-u112.v11", 0x00001, 0x20000, CRC(942b280b) SHA1(c342ba3255203ce28ff59479da00f26f0bd026e0) )
 	ROM_LOAD32_BYTE( "pt-u111.v11", 0x00002, 0x20000, CRC(da6c45a7) SHA1(471bd372d2ad5bcb29af19dae09f3cfab4b010fd) )
@@ -510,7 +510,7 @@ ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
 	ROM_LOAD16_BYTE( "pt-u127.v10", 0x300000, 0x080000, CRC(5031ea1e) SHA1(c1f9272f9874150d510f22c44c186fad0ed3a7e4) )
 	ROM_LOAD16_BYTE( "pt-u126.v10", 0x300001, 0x080000, CRC(33bf2653) SHA1(357da2da7df417109adbf600f3455c224f6c076f) )
 
-	ROM_REGION32_BE( 0x80000, "user1", 0 )	/* 2MB for R3000 code */
+	ROM_REGION32_BE( 0x80000, "user1", 0 )  /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "pt-u113.v10", 0x00000, 0x20000, CRC(3e27a0ce) SHA1(0d010da68f950a10a74eddc57941e4c0e2144071) )
 	ROM_LOAD32_BYTE( "pt-u112.v10", 0x00001, 0x20000, CRC(fcbcf4ca) SHA1(374291600043cfbbd87260b12961ac6d68caeda0) )
 	ROM_LOAD32_BYTE( "pt-u111.v10", 0x00002, 0x20000, CRC(61f79667) SHA1(25298cd8706b5c59f7c9e0f8d44db0df73c23403) )

@@ -33,51 +33,51 @@ const device_type UPD65031 = &device_creator<upd65031_device>;
 
 #define LOG 0
 
-#define SPEAKER_ALARM_FREQ	 attotime::from_hz(3200)
+#define SPEAKER_ALARM_FREQ   attotime::from_hz(3200)
 
 // internal registers
 enum
 {
 	// write registers
-	REG_PB0  = 0x70,		// pixel base 0
-	REG_PB1  = 0x71,		// pixel base 1
-	REG_PB2  = 0x72,		// pixel base 2
-	REG_PB3  = 0x73,		// pixel base 3
-	REG_SBR  = 0x74,		// screen base register
+	REG_PB0  = 0x70,        // pixel base 0
+	REG_PB1  = 0x71,        // pixel base 1
+	REG_PB2  = 0x72,        // pixel base 2
+	REG_PB3  = 0x73,        // pixel base 3
+	REG_SBR  = 0x74,        // screen base register
 
-	REG_COM  = 0xb0,		// command register
-	REG_INT  = 0xb1,		// interrupt control
-	REG_EPR  = 0xb3,		// EPROM programming
-	REG_TACK = 0xb4,		// RTC acknowledge
-	REG_TMK  = 0xb5,		// RTC interrupt mask
-	REG_ACK  = 0xb6,		// interrupt acknowledge
+	REG_COM  = 0xb0,        // command register
+	REG_INT  = 0xb1,        // interrupt control
+	REG_EPR  = 0xb3,        // EPROM programming
+	REG_TACK = 0xb4,        // RTC acknowledge
+	REG_TMK  = 0xb5,        // RTC interrupt mask
+	REG_ACK  = 0xb6,        // interrupt acknowledge
 
-	REG_SR0  = 0xd0,		// segment register 0
-	REG_SR1  = 0xd1,		// segment register 1
-	REG_SR2  = 0xd2,		// segment register 2
-	REG_SR3  = 0xd3,		// segment register 3
+	REG_SR0  = 0xd0,        // segment register 0
+	REG_SR1  = 0xd1,        // segment register 1
+	REG_SR2  = 0xd2,        // segment register 2
+	REG_SR3  = 0xd3,        // segment register 3
 
-	REG_RXC  = 0xe2,		// UART receiver control
-	REG_TXD  = 0xe3,		// UART transmit data
-	REG_TXC  = 0xe4,		// UART transmit control
-	REG_UMK  = 0xe5,		// UART interrupt mask
-	REG_UAK  = 0xe6,		// UART interrupt acknowledge
+	REG_RXC  = 0xe2,        // UART receiver control
+	REG_TXD  = 0xe3,        // UART transmit data
+	REG_TXC  = 0xe4,        // UART transmit control
+	REG_UMK  = 0xe5,        // UART interrupt mask
+	REG_UAK  = 0xe6,        // UART interrupt acknowledge
 
 
 	// read registers
-	REG_STA  = 0xb1,		// interrupt status
-	REG_KBD  = 0xb2,		// keyboard read
-	REG_TSTA = 0xb5,		// RTC interrupt status
+	REG_STA  = 0xb1,        // interrupt status
+	REG_KBD  = 0xb2,        // keyboard read
+	REG_TSTA = 0xb5,        // RTC interrupt status
 
-	REG_TIM0 = 0xd0,		// RTC 5ms counter
-	REG_TIM1 = 0xd1,		// RTC seconds counter (6 bits)
-	REG_TIM2 = 0xd2,		// RTC minutes counter
-	REG_TIM3 = 0xd3,		// RTC minutes/256 counter
-	REG_TIM4 = 0xd4,		// RTC minutes/65536 counter (5 bits)
+	REG_TIM0 = 0xd0,        // RTC 5ms counter
+	REG_TIM1 = 0xd1,        // RTC seconds counter (6 bits)
+	REG_TIM2 = 0xd2,        // RTC minutes counter
+	REG_TIM3 = 0xd3,        // RTC minutes/256 counter
+	REG_TIM4 = 0xd4,        // RTC minutes/65536 counter (5 bits)
 
-	REG_RXD  = 0xe0,		// UART receive data register
-	REG_RXE  = 0xe1,		// UART extended receiver data
-	REG_UIT  = 0xe5,		// UART interrupt status
+	REG_RXD  = 0xe0,        // UART receive data register
+	REG_RXE  = 0xe1,        // UART extended receiver data
+	REG_UIT  = 0xe5,        // UART interrupt status
 };
 
 //mode
@@ -89,48 +89,48 @@ enum
 };
 
 // interrupt status
-#define STA_FLAPOPEN		0x80
-#define STA_A19				0x40
-#define STA_FLAP			0x20
-#define STA_UART			0x10
-#define STA_BTL				0x08
-#define STA_KEY				0x04
-#define STA_TIME			0x01
+#define STA_FLAPOPEN        0x80
+#define STA_A19             0x40
+#define STA_FLAP            0x20
+#define STA_UART            0x10
+#define STA_BTL             0x08
+#define STA_KEY             0x04
+#define STA_TIME            0x01
 
 // interrupt control
-#define INT_KWAIT			0x80
-#define INT_A19				0x40
-#define INT_FLAP			0x20
-#define INT_UART			0x10
-#define INT_BTL				0x08
-#define INT_KEY				0x04
-#define INT_TIME			0x02
-#define INT_GINT			0x01
+#define INT_KWAIT           0x80
+#define INT_A19             0x40
+#define INT_FLAP            0x20
+#define INT_UART            0x10
+#define INT_BTL             0x08
+#define INT_KEY             0x04
+#define INT_TIME            0x02
+#define INT_GINT            0x01
 
 // command register
-#define COM_SRUN			0x80
-#define COM_SBIT			0x40
-#define COM_OVERP			0x20
-#define COM_RESTIM			0x10
-#define COM_PROGRAM			0x08
-#define COM_RAMS			0x04
-#define COM_VPPON			0x02
-#define COM_LCDON			0x01
+#define COM_SRUN            0x80
+#define COM_SBIT            0x40
+#define COM_OVERP           0x20
+#define COM_RESTIM          0x10
+#define COM_PROGRAM         0x08
+#define COM_RAMS            0x04
+#define COM_VPPON           0x02
+#define COM_LCDON           0x01
 
 // EPROM programming register
-#define EPR_PD1				0x80
-#define EPR_PD0				0x40
-#define EPR_PGMD			0x20
-#define EPR_EOED			0x10
-#define EPR_SE3D			0x08
-#define EPR_PGMP			0x04
-#define EPR_EOEP			0x02
-#define EPR_SE3P			0x01
+#define EPR_PD1             0x80
+#define EPR_PD0             0x40
+#define EPR_PGMD            0x20
+#define EPR_EOED            0x10
+#define EPR_SE3D            0x08
+#define EPR_PGMP            0x04
+#define EPR_EOEP            0x02
+#define EPR_SE3P            0x01
 
 // RTC interrupt status
-#define TSTA_MIN			0x04
-#define TSTA_SEC			0x02
-#define TSTA_TICK			0x01
+#define TSTA_MIN            0x04
+#define TSTA_SEC            0x02
+#define TSTA_TICK           0x01
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -422,7 +422,7 @@ READ8_MEMBER( upd65031_device::read )
 
 	switch (port)
 	{
-		case REG_STA:	// read interrupt status
+		case REG_STA:   // read interrupt status
 			return m_sta;
 
 		case REG_KBD:
@@ -497,7 +497,7 @@ WRITE8_MEMBER( upd65031_device::write )
 			m_lcd_regs[port - REG_PB0] = ((offset & 0xff00) | data);
 			break;
 
-		case REG_COM:	// command register
+		case REG_COM:   // command register
 			if (LOG) logerror("uPD65031 '%s': com w: %02x\n", tag(), data);
 
 			// reset clock?
@@ -533,7 +533,7 @@ WRITE8_MEMBER( upd65031_device::write )
 			m_com = data;
 			break;
 
-		case REG_INT:	// interrupt control
+		case REG_INT:   // interrupt control
 			if (LOG) logerror("uPD65031 '%s': int w: %02x\n", tag(), data);
 
 			m_int = data;
@@ -543,12 +543,12 @@ WRITE8_MEMBER( upd65031_device::write )
 			interrupt_refresh();
 			break;
 
-		case REG_EPR:	// EPROM programming register
+		case REG_EPR:   // EPROM programming register
 			if (LOG) logerror("uPD65031 '%s': epr w: %02x\n", tag(), data);
 			// TODO
 			break;
 
-		case REG_TACK:	// rtc interrupt acknowledge
+		case REG_TACK:  // rtc interrupt acknowledge
 			if (LOG) logerror("uPD65031 '%s': tack w: %02x\n", tag(), data);
 
 			// clear ints that have occurred
@@ -560,13 +560,13 @@ WRITE8_MEMBER( upd65031_device::write )
 			interrupt_refresh();
 			break;
 
-		case REG_TMK:	// write rtc interrupt mask
+		case REG_TMK:   // write rtc interrupt mask
 			if (LOG) logerror("uPD65031 '%s': tmk w: %02x\n", tag(), data);
 
 			m_tmk = data & 0x07;
 			break;
 
-		case REG_ACK:	// acknowledge ints
+		case REG_ACK:   // acknowledge ints
 			if (LOG) logerror("uPD65031 '%s': ack w: %02x\n", tag(), data);
 
 			m_ack = data;

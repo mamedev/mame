@@ -59,10 +59,10 @@ DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 	m_ram        = auto_alloc_array(machine(), UINT8, 256);
 
 	for (i = 0; i < 256; i++)
-    {
+	{
 		gfx[i] = i;     /* TODO: Why i and not 0? */
 		m_ram[i] = 0;
-    }
+	}
 
 	if (image->exists())
 	{
@@ -237,8 +237,8 @@ READ8_MEMBER(odyssey2_state::p2_read)
 		{
 			m_p2 = m_p2 | 0xF0;
 		}
-    }
-    else
+	}
+	else
 	{
 		m_p2 = m_p2 | 0xF0;
 	}
@@ -284,4 +284,3 @@ WRITE8_MEMBER(odyssey2_state::bus_write)
 {
 	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
 }
-

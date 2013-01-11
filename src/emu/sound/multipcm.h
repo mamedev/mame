@@ -11,7 +11,7 @@ DECLARE_READ8_DEVICE_HANDLER( multipcm_r );
 void multipcm_set_bank(device_t *device, UINT32 leftoffs, UINT32 rightoffs);
 
 class multipcm_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

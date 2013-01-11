@@ -45,9 +45,9 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG		"2e"
-#define Z80PIO_TAG	"2c"
-#define FD1771_TAG	"2d"
+#define Z80_TAG     "2e"
+#define Z80PIO_TAG  "2c"
+#define FD1771_TAG  "2d"
 
 
 
@@ -173,13 +173,13 @@ machine_config_constructor abc_fd2_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ABC_FD2, "ABC FD2", tag, owner, clock),
-	  device_abcbus_card_interface(mconfig, *this),
-	  m_maincpu(*this, Z80_TAG),
-	  m_pio(*this, Z80PIO_TAG),
-	  m_fdc(*this, FD1771_TAG),
-	  m_floppy0(*this, FD1771_TAG":0"),
-	  m_floppy1(*this, FD1771_TAG":1")
+	: device_t(mconfig, ABC_FD2, "ABC FD2", tag, owner, clock),
+		device_abcbus_card_interface(mconfig, *this),
+		m_maincpu(*this, Z80_TAG),
+		m_pio(*this, Z80PIO_TAG),
+		m_fdc(*this, FD1771_TAG),
+		m_floppy0(*this, FD1771_TAG":0"),
+		m_floppy1(*this, FD1771_TAG":1")
 {
 }
 

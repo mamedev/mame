@@ -34,16 +34,16 @@ void ajax_tile_callback( running_machine &machine, int layer, int bank, int *cod
 void ajax_sprite_callback( running_machine &machine, int *code, int *color, int *priority, int *shadow )
 {
 	/* priority bits:
-       4 over zoom (0 = have priority)
-       5 over B    (0 = have priority)
-       6 over A    (1 = have priority)
-       never over F
-    */
+	   4 over zoom (0 = have priority)
+	   5 over B    (0 = have priority)
+	   6 over A    (1 = have priority)
+	   never over F
+	*/
 	ajax_state *state = machine.driver_data<ajax_state>();
-	*priority = 0xff00;							/* F = 8 */
-	if ( *color & 0x10) *priority |= 0xf0f0;	/* Z = 4 */
-	if (~*color & 0x40) *priority |= 0xcccc;	/* A = 2 */
-	if ( *color & 0x20) *priority |= 0xaaaa;	/* B = 1 */
+	*priority = 0xff00;                         /* F = 8 */
+	if ( *color & 0x10) *priority |= 0xf0f0;    /* Z = 4 */
+	if (~*color & 0x40) *priority |= 0xcccc;    /* A = 2 */
+	if ( *color & 0x20) *priority |= 0xaaaa;    /* B = 1 */
 	*color = state->m_sprite_colorbase + (*color & 0x0f);
 }
 
@@ -75,7 +75,7 @@ void ajax_state::video_start()
 	m_layer_colorbase[1] = 0;
 	m_layer_colorbase[2] = 32;
 	m_sprite_colorbase = 16;
-	m_zoom_colorbase = 6;	/* == 48 since it's 7-bit graphics */
+	m_zoom_colorbase = 6;   /* == 48 since it's 7-bit graphics */
 }
 
 

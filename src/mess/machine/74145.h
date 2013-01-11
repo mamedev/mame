@@ -43,28 +43,28 @@ class ttl74145_device :  public device_t,
 						public ttl74145_interface
 {
 public:
-    // construction/destruction
-    ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT16 read();
 	void write(UINT8 data);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line	m_output_line_0_func;
-	devcb_resolved_write_line	m_output_line_1_func;
-	devcb_resolved_write_line	m_output_line_2_func;
-	devcb_resolved_write_line	m_output_line_3_func;
-	devcb_resolved_write_line	m_output_line_4_func;
-	devcb_resolved_write_line	m_output_line_5_func;
-	devcb_resolved_write_line	m_output_line_6_func;
-	devcb_resolved_write_line	m_output_line_7_func;
-	devcb_resolved_write_line	m_output_line_8_func;
-	devcb_resolved_write_line	m_output_line_9_func;
+	devcb_resolved_write_line   m_output_line_0_func;
+	devcb_resolved_write_line   m_output_line_1_func;
+	devcb_resolved_write_line   m_output_line_2_func;
+	devcb_resolved_write_line   m_output_line_3_func;
+	devcb_resolved_write_line   m_output_line_4_func;
+	devcb_resolved_write_line   m_output_line_5_func;
+	devcb_resolved_write_line   m_output_line_6_func;
+	devcb_resolved_write_line   m_output_line_7_func;
+	devcb_resolved_write_line   m_output_line_8_func;
+	devcb_resolved_write_line   m_output_line_9_func;
 
 	/* decoded number */
 	UINT16 m_number;

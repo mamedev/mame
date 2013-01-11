@@ -16,24 +16,24 @@ enum
 	TX0_STOP_CYC0, TX0_STOP_CYC1,
 	TX0_RUN, TX0_RIM,
 	TX0_CYCLE, TX0_IOH, TX0_IOS,
-	TX0_RESET,			/* hack, do not use directly, use tx0_pulse_reset instead */
-	TX0_IO_COMPLETE		/* hack, do not use directly, use tx0_pulse_io_complete instead */
+	TX0_RESET,          /* hack, do not use directly, use tx0_pulse_reset instead */
+	TX0_IO_COMPLETE     /* hack, do not use directly, use tx0_pulse_io_complete instead */
 };
 
-#define tx0_pulse_reset(cpudevice)			(cpudevice)->state().set_state_int(TX0_RESET, 0)
-#define tx0_pulse_io_complete(cpudevice)	(cpudevice)->state().set_state_int(TX0_IO_COMPLETE, 0)
+#define tx0_pulse_reset(cpudevice)          (cpudevice)->state().set_state_int(TX0_RESET, 0)
+#define tx0_pulse_io_complete(cpudevice)    (cpudevice)->state().set_state_int(TX0_IO_COMPLETE, 0)
 
 struct tx0_reset_param_t
 {
 	/* 8 standard I/O handlers:
-        0: cpy (8kW only)
-        1: r1l
-        2: dis
-        3: r3l
-        4: prt
-        5: reserved (for unimplemented typ instruction?)
-        6: p6h
-        7: p7h */
+	    0: cpy (8kW only)
+	    1: r1l
+	    2: dis
+	    3: r3l
+	    4: prt
+	    5: reserved (for unimplemented typ instruction?)
+	    6: p6h
+	    7: p7h */
 	void (*io_handlers[8])(device_t *device);
 	/* select instruction handler */
 	void (*sel_handler)(device_t *device);

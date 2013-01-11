@@ -48,22 +48,22 @@ void myb3k_state::video_start()
 {
 }
 
-#define mc6845_h_char_total 	(m_crtc_vreg[0])
-#define mc6845_h_display		(m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(m_crtc_vreg[2])
-#define mc6845_sync_width		(m_crtc_vreg[3])
-#define mc6845_v_char_total		(m_crtc_vreg[4])
-#define mc6845_v_total_adj		(m_crtc_vreg[5])
-#define mc6845_v_display		(m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(m_crtc_vreg[8])
-#define mc6845_tile_height		(m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total     (m_crtc_vreg[0])
+#define mc6845_h_display        (m_crtc_vreg[1])
+#define mc6845_h_sync_pos       (m_crtc_vreg[2])
+#define mc6845_sync_width       (m_crtc_vreg[3])
+#define mc6845_v_char_total     (m_crtc_vreg[4])
+#define mc6845_v_total_adj      (m_crtc_vreg[5])
+#define mc6845_v_display        (m_crtc_vreg[6])
+#define mc6845_v_sync_pos       (m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (m_crtc_vreg[8])
+#define mc6845_tile_height      (m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
 UINT32 myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -232,16 +232,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MB8877_ADD("fdc", myb3k_wd17xx_interface ) //unknown type
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
 MACHINE_CONFIG_END

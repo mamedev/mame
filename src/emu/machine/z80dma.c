@@ -38,26 +38,26 @@ enum
 	INT_MATCH_END_OF_BLOCK
 };
 
-const int COMMAND_RESET							= 0xc3;
-const int COMMAND_RESET_PORT_A_TIMING			= 0xc7;
-const int COMMAND_RESET_PORT_B_TIMING			= 0xcb;
-const int COMMAND_LOAD							= 0xcf;
-const int COMMAND_CONTINUE						= 0xd3;
-const int COMMAND_DISABLE_INTERRUPTS			= 0xaf;
-const int COMMAND_ENABLE_INTERRUPTS				= 0xab;
-const int COMMAND_RESET_AND_DISABLE_INTERRUPTS	= 0xa3;
-const int COMMAND_ENABLE_AFTER_RETI				= 0xb7;
-const int COMMAND_READ_STATUS_BYTE				= 0xbf;
-const int COMMAND_REINITIALIZE_STATUS_BYTE		= 0x8b;
-const int COMMAND_INITIATE_READ_SEQUENCE		= 0xa7;
-const int COMMAND_FORCE_READY					= 0xb3;
-const int COMMAND_ENABLE_DMA					= 0x87;
-const int COMMAND_DISABLE_DMA					= 0x83;
-const int COMMAND_READ_MASK_FOLLOWS				= 0xbb;
+const int COMMAND_RESET                         = 0xc3;
+const int COMMAND_RESET_PORT_A_TIMING           = 0xc7;
+const int COMMAND_RESET_PORT_B_TIMING           = 0xcb;
+const int COMMAND_LOAD                          = 0xcf;
+const int COMMAND_CONTINUE                      = 0xd3;
+const int COMMAND_DISABLE_INTERRUPTS            = 0xaf;
+const int COMMAND_ENABLE_INTERRUPTS             = 0xab;
+const int COMMAND_RESET_AND_DISABLE_INTERRUPTS  = 0xa3;
+const int COMMAND_ENABLE_AFTER_RETI             = 0xb7;
+const int COMMAND_READ_STATUS_BYTE              = 0xbf;
+const int COMMAND_REINITIALIZE_STATUS_BYTE      = 0x8b;
+const int COMMAND_INITIATE_READ_SEQUENCE        = 0xa7;
+const int COMMAND_FORCE_READY                   = 0xb3;
+const int COMMAND_ENABLE_DMA                    = 0x87;
+const int COMMAND_DISABLE_DMA                   = 0x83;
+const int COMMAND_READ_MASK_FOLLOWS             = 0xbb;
 
-const int TM_TRANSFER			= 0x01;
-const int TM_SEARCH				= 0x02;
-const int TM_SEARCH_TRANSFER	= 0x03;
+const int TM_TRANSFER           = 0x01;
+const int TM_SEARCH             = 0x02;
+const int TM_SEARCH_TRANSFER    = 0x03;
 
 
 
@@ -68,67 +68,67 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 #define LOG 0
 #define DMA_LOG 0
 
-#define REGNUM(_m, _s)			(((_m)<<3) + (_s))
-#define GET_REGNUM(_r)			(&(_r) - &(WR0))
-#define REG(_m, _s) 			m_regs[REGNUM(_m,_s)]
-#define WR0						REG(0, 0)
-#define WR1						REG(1, 0)
-#define WR2						REG(2, 0)
-#define WR3						REG(3, 0)
-#define WR4						REG(4, 0)
-#define WR5						REG(5, 0)
-#define WR6						REG(6, 0)
+#define REGNUM(_m, _s)          (((_m)<<3) + (_s))
+#define GET_REGNUM(_r)          (&(_r) - &(WR0))
+#define REG(_m, _s)             m_regs[REGNUM(_m,_s)]
+#define WR0                     REG(0, 0)
+#define WR1                     REG(1, 0)
+#define WR2                     REG(2, 0)
+#define WR3                     REG(3, 0)
+#define WR4                     REG(4, 0)
+#define WR5                     REG(5, 0)
+#define WR6                     REG(6, 0)
 
-#define PORTA_ADDRESS_L			REG(0,1)
-#define PORTA_ADDRESS_H			REG(0,2)
+#define PORTA_ADDRESS_L         REG(0,1)
+#define PORTA_ADDRESS_H         REG(0,2)
 
-#define BLOCKLEN_L				REG(0,3)
-#define BLOCKLEN_H				REG(0,4)
+#define BLOCKLEN_L              REG(0,3)
+#define BLOCKLEN_H              REG(0,4)
 
-#define PORTA_TIMING			REG(1,1)
-#define PORTB_TIMING			REG(2,1)
+#define PORTA_TIMING            REG(1,1)
+#define PORTB_TIMING            REG(2,1)
 
-#define MASK_BYTE				REG(3,1)
-#define MATCH_BYTE				REG(3,2)
+#define MASK_BYTE               REG(3,1)
+#define MATCH_BYTE              REG(3,2)
 
-#define PORTB_ADDRESS_L			REG(4,1)
-#define PORTB_ADDRESS_H			REG(4,2)
-#define INTERRUPT_CTRL			REG(4,3)
-#define INTERRUPT_VECTOR		REG(4,4)
-#define PULSE_CTRL				REG(4,5)
+#define PORTB_ADDRESS_L         REG(4,1)
+#define PORTB_ADDRESS_H         REG(4,2)
+#define INTERRUPT_CTRL          REG(4,3)
+#define INTERRUPT_VECTOR        REG(4,4)
+#define PULSE_CTRL              REG(4,5)
 
-#define READ_MASK				REG(6,1)
+#define READ_MASK               REG(6,1)
 
-#define PORTA_ADDRESS			((PORTA_ADDRESS_H<<8) | PORTA_ADDRESS_L)
-#define PORTB_ADDRESS			((PORTB_ADDRESS_H<<8) | PORTB_ADDRESS_L)
-#define BLOCKLEN				((BLOCKLEN_H<<8) | BLOCKLEN_L)
+#define PORTA_ADDRESS           ((PORTA_ADDRESS_H<<8) | PORTA_ADDRESS_L)
+#define PORTB_ADDRESS           ((PORTB_ADDRESS_H<<8) | PORTB_ADDRESS_L)
+#define BLOCKLEN                ((BLOCKLEN_H<<8) | BLOCKLEN_L)
 
-#define PORTA_INC				(WR1 & 0x10)
-#define PORTB_INC				(WR2 & 0x10)
-#define PORTA_FIXED				(((WR1 >> 4) & 0x02) == 0x02)
-#define PORTB_FIXED				(((WR2 >> 4) & 0x02) == 0x02)
-#define PORTA_MEMORY			(((WR1 >> 3) & 0x01) == 0x00)
-#define PORTB_MEMORY			(((WR2 >> 3) & 0x01) == 0x00)
+#define PORTA_INC               (WR1 & 0x10)
+#define PORTB_INC               (WR2 & 0x10)
+#define PORTA_FIXED             (((WR1 >> 4) & 0x02) == 0x02)
+#define PORTB_FIXED             (((WR2 >> 4) & 0x02) == 0x02)
+#define PORTA_MEMORY            (((WR1 >> 3) & 0x01) == 0x00)
+#define PORTB_MEMORY            (((WR2 >> 3) & 0x01) == 0x00)
 
-#define PORTA_CYCLE_LEN			(4-(PORTA_TIMING & 0x03))
-#define PORTB_CYCLE_LEN			(4-(PORTB_TIMING & 0x03))
+#define PORTA_CYCLE_LEN         (4-(PORTA_TIMING & 0x03))
+#define PORTB_CYCLE_LEN         (4-(PORTB_TIMING & 0x03))
 
-#define PORTA_IS_SOURCE			((WR0 >> 2) & 0x01)
-#define PORTB_IS_SOURCE			(!PORTA_IS_SOURCE)
-#define TRANSFER_MODE			(WR0 & 0x03)
+#define PORTA_IS_SOURCE         ((WR0 >> 2) & 0x01)
+#define PORTB_IS_SOURCE         (!PORTA_IS_SOURCE)
+#define TRANSFER_MODE           (WR0 & 0x03)
 
-#define MATCH_F_SET				(m_status &= ~0x10)
-#define MATCH_F_CLEAR			(m_status |= 0x10)
-#define EOB_F_SET				(m_status &= ~0x20)
-#define EOB_F_CLEAR				(m_status |= 0x20)
+#define MATCH_F_SET             (m_status &= ~0x10)
+#define MATCH_F_CLEAR           (m_status |= 0x10)
+#define EOB_F_SET               (m_status &= ~0x20)
+#define EOB_F_CLEAR             (m_status |= 0x20)
 
-#define READY_ACTIVE_HIGH		((WR5>>3) & 0x01)
+#define READY_ACTIVE_HIGH       ((WR5>>3) & 0x01)
 
-#define INTERRUPT_ENABLE		(WR3 & 0x20)
-#define INT_ON_MATCH			(INTERRUPT_CTRL & 0x01)
-#define INT_ON_END_OF_BLOCK		(INTERRUPT_CTRL & 0x02)
-#define INT_ON_READY			(INTERRUPT_CTRL & 0x40)
-#define STATUS_AFFECTS_VECTOR	(INTERRUPT_CTRL & 0x20)
+#define INTERRUPT_ENABLE        (WR3 & 0x20)
+#define INT_ON_MATCH            (INTERRUPT_CTRL & 0x01)
+#define INT_ON_END_OF_BLOCK     (INTERRUPT_CTRL & 0x02)
+#define INT_ON_READY            (INTERRUPT_CTRL & 0x40)
+#define STATUS_AFFECTS_VECTOR   (INTERRUPT_CTRL & 0x20)
 
 
 
@@ -145,7 +145,7 @@ const device_type Z80DMA = &device_creator<z80dma_device>;
 
 z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80DMA, "Z8410", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -280,11 +280,11 @@ int z80dma_device::z80daisy_irq_ack()
 {
 	if (m_ip)
 	{
-	    if (LOG) logerror("Z80DMA '%s' Interrupt Acknowledge\n", tag());
+		if (LOG) logerror("Z80DMA '%s' Interrupt Acknowledge\n", tag());
 
 		// clear interrupt pending flag
 		m_ip = 0;
-	    interrupt_check();
+		interrupt_check();
 
 		// set interrupt under service flag
 		m_ius = 1;
@@ -310,11 +310,11 @@ void z80dma_device::z80daisy_irq_reti()
 {
 	if (m_ius)
 	{
-	    if (LOG) logerror("Z80DMA '%s' Return from Interrupt\n", tag());
+		if (LOG) logerror("Z80DMA '%s' Return from Interrupt\n", tag());
 
 		// clear interrupt under service flag
 		m_ius = 0;
-	    interrupt_check();
+		interrupt_check();
 
 		return;
 	}
@@ -534,7 +534,7 @@ void z80dma_device::timerproc()
 	if (done)
 	{
 		m_dma_enabled = 0; //FIXME: Correct?
-        m_status = 0x09;
+		m_status = 0x09;
 
 		m_status |= !is_ready() << 1; // ready line status
 
@@ -544,9 +544,9 @@ void z80dma_device::timerproc()
 		if (LOG) logerror("Z80DMA '%s' End of Block\n", tag());
 
 		if (INT_ON_END_OF_BLOCK)
-        {
+		{
 			trigger_interrupt(INT_END_OF_BLOCK);
-        }
+		}
 	}
 }
 
@@ -688,9 +688,9 @@ void z80dma_device::write(UINT8 data)
 					break;
 				case COMMAND_READ_STATUS_BYTE:
 					if (LOG) logerror("Z80DMA '%s' CMD Read status Byte\n", tag());
-        			READ_MASK = 1;
-        			m_read_regs_follow[m_read_num_follow++] = m_status;
-        			break;
+					READ_MASK = 1;
+					m_read_regs_follow[m_read_num_follow++] = m_status;
+					break;
 				case COMMAND_RESET_AND_DISABLE_INTERRUPTS:
 					WR3 &= ~0x20;
 					m_ip = 0;
@@ -845,9 +845,9 @@ void z80dma_device::rdy_write_callback(int state)
 	update_status();
 
 	if (is_ready() && INT_ON_READY)
-    {
+	{
 		trigger_interrupt(INT_RDY);
-    }
+	}
 }
 
 

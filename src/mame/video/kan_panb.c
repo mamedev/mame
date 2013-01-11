@@ -9,8 +9,8 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
-       no extra sprite attribute bits are set during this time, the sprite co-ordinates
-       are simply set to 0 */
+	   no extra sprite attribute bits are set during this time, the sprite co-ordinates
+	   are simply set to 0 */
 
 	/* not standard snowbros video */
 
@@ -94,8 +94,8 @@ UINT32 snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16
 	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
-       no extra sprite attribute bits are set during this time, the sprite co-ordinates
-       are simply set to 0 */
+	   no extra sprite attribute bits are set during this time, the sprite co-ordinates
+	   are simply set to 0 */
 
 	/* not standard snowbros video */
 
@@ -193,26 +193,26 @@ UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind1
 	int sx=0, sy=0, x=0, y=0, offs;
 
 	/*
-     * Sprite Tile Format
-     * ------------------
-     *
-     * Byte | Bit(s)   | Use
-     * -----+-76543210-+----------------
-     *  0-5 | -------- | ?
-     *  6   | -------- | ?
-     *  7   | xxxx.... | Palette Bank
-     *  7   | .......x | XPos - Sign Bit
-     *  9   | xxxxxxxx | XPos
-     *  7   | ......x. | YPos - Sign Bit
-     *  B   | xxxxxxxx | YPos
-     *  7   | .....x.. | Use Relative offsets
-     *  C   | -------- | ?
-     *  D   | xxxxxxxx | Sprite Number (low 8 bits)
-     *  E   | -------- | ?
-     *  F   | ....xxxx | Sprite Number (high 4 bits)
-     *  F   | x....... | Flip Sprite Y-Axis
-     *  F   | .x...... | Flip Sprite X-Axis
-     */
+	 * Sprite Tile Format
+	 * ------------------
+	 *
+	 * Byte | Bit(s)   | Use
+	 * -----+-76543210-+----------------
+	 *  0-5 | -------- | ?
+	 *  6   | -------- | ?
+	 *  7   | xxxx.... | Palette Bank
+	 *  7   | .......x | XPos - Sign Bit
+	 *  9   | xxxxxxxx | XPos
+	 *  7   | ......x. | YPos - Sign Bit
+	 *  B   | xxxxxxxx | YPos
+	 *  7   | .....x.. | Use Relative offsets
+	 *  C   | -------- | ?
+	 *  D   | xxxxxxxx | Sprite Number (low 8 bits)
+	 *  E   | -------- | ?
+	 *  F   | ....xxxx | Sprite Number (high 4 bits)
+	 *  F   | x....... | Flip Sprite Y-Axis
+	 *  F   | .x...... | Flip Sprite X-Axis
+	 */
 
 	/* This clears & redraws the entire screen each pass */
 

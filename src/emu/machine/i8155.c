@@ -53,8 +53,8 @@ enum
 {
 	PORT_MODE_INPUT = 0,
 	PORT_MODE_OUTPUT,
-	PORT_MODE_STROBED_PORT_A,	// not supported
-	PORT_MODE_STROBED			// not supported
+	PORT_MODE_STROBED_PORT_A,   // not supported
+	PORT_MODE_STROBED           // not supported
 };
 
 enum
@@ -63,34 +63,34 @@ enum
 	IO
 };
 
-#define COMMAND_PA					0x01
-#define COMMAND_PB					0x02
-#define COMMAND_PC_MASK				0x0c
-#define COMMAND_PC_ALT_1			0x00
-#define COMMAND_PC_ALT_2			0x0c
-#define COMMAND_PC_ALT_3			0x04	// not supported
-#define COMMAND_PC_ALT_4			0x08	// not supported
-#define COMMAND_IEA					0x10	// not supported
-#define COMMAND_IEB					0x20	// not supported
-#define COMMAND_TM_MASK				0xc0
-#define COMMAND_TM_NOP				0x00
-#define COMMAND_TM_STOP				0x40
-#define COMMAND_TM_STOP_AFTER_TC	0x80
-#define COMMAND_TM_START			0xc0
+#define COMMAND_PA                  0x01
+#define COMMAND_PB                  0x02
+#define COMMAND_PC_MASK             0x0c
+#define COMMAND_PC_ALT_1            0x00
+#define COMMAND_PC_ALT_2            0x0c
+#define COMMAND_PC_ALT_3            0x04    // not supported
+#define COMMAND_PC_ALT_4            0x08    // not supported
+#define COMMAND_IEA                 0x10    // not supported
+#define COMMAND_IEB                 0x20    // not supported
+#define COMMAND_TM_MASK             0xc0
+#define COMMAND_TM_NOP              0x00
+#define COMMAND_TM_STOP             0x40
+#define COMMAND_TM_STOP_AFTER_TC    0x80
+#define COMMAND_TM_START            0xc0
 
-#define STATUS_INTR_A				0x01	// not supported
-#define STATUS_A_BF					0x02	// not supported
-#define STATUS_INTE_A				0x04	// not supported
-#define STATUS_INTR_B				0x08	// not supported
-#define STATUS_B_BF					0x10	// not supported
-#define STATUS_INTE_B				0x20	// not supported
-#define STATUS_TIMER				0x40
+#define STATUS_INTR_A               0x01    // not supported
+#define STATUS_A_BF                 0x02    // not supported
+#define STATUS_INTE_A               0x04    // not supported
+#define STATUS_INTR_B               0x08    // not supported
+#define STATUS_B_BF                 0x10    // not supported
+#define STATUS_INTE_B               0x20    // not supported
+#define STATUS_TIMER                0x40
 
-#define TIMER_MODE_MASK				0xc0
-#define TIMER_MODE_LOW				0x00
-#define TIMER_MODE_SQUARE_WAVE		0x40
-#define TIMER_MODE_SINGLE_PULSE		0x80
-#define TIMER_MODE_AUTOMATIC_RELOAD	0xc0
+#define TIMER_MODE_MASK             0xc0
+#define TIMER_MODE_LOW              0x00
+#define TIMER_MODE_SQUARE_WAVE      0x40
+#define TIMER_MODE_SINGLE_PULSE     0x80
+#define TIMER_MODE_AUTOMATIC_RELOAD 0xc0
 
 
 
@@ -144,10 +144,10 @@ inline int i8155_device::get_port_mode(int port)
 	case PORT_C:
 		switch (m_command & COMMAND_PC_MASK)
 		{
-		case COMMAND_PC_ALT_1: mode = PORT_MODE_INPUT;			break;
-		case COMMAND_PC_ALT_2: mode = PORT_MODE_OUTPUT;			break;
+		case COMMAND_PC_ALT_1: mode = PORT_MODE_INPUT;          break;
+		case COMMAND_PC_ALT_2: mode = PORT_MODE_OUTPUT;         break;
 		case COMMAND_PC_ALT_3: mode = PORT_MODE_STROBED_PORT_A; break;
-		case COMMAND_PC_ALT_4: mode = PORT_MODE_STROBED;		break;
+		case COMMAND_PC_ALT_4: mode = PORT_MODE_STROBED;        break;
 		}
 		break;
 	}
@@ -200,8 +200,8 @@ inline void i8155_device::write_port(int port, UINT8 data)
 
 i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8155, "Intel 8155", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
+		device_memory_interface(mconfig, *this),
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
 {
 
 }

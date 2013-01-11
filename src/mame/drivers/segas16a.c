@@ -211,17 +211,17 @@ static I8255_INTERFACE(single_ppi_intf)
 WRITE8_MEMBER( segas16a_state::misc_control_w )
 {
 	//
-    //  PPI port B
+	//  PPI port B
 	//
-    //  D7 : Screen flip (1= flip, 0= normal orientation)
-    //  D6 : To 8751 pin 13 (/INT1)
-    //  D5 : To 315-5149 pin 17.
-    //  D4 : Screen enable (1= display, 0= blank)
-    //  D3 : Lamp #2 (1= on, 0= off)
-    //  D2 : Lamp #1 (1= on, 0= off)
-    //  D1 : Coin meter #2
-    //  D0 : Coin meter #1
-    //
+	//  D7 : Screen flip (1= flip, 0= normal orientation)
+	//  D6 : To 8751 pin 13 (/INT1)
+	//  D5 : To 315-5149 pin 17.
+	//  D4 : Screen enable (1= display, 0= blank)
+	//  D3 : Lamp #2 (1= on, 0= off)
+	//  D2 : Lamp #1 (1= on, 0= off)
+	//  D1 : Coin meter #2
+	//  D0 : Coin meter #1
+	//
 
 	// bits 2 & 3: control the lamps, allowing for overrides
 	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
@@ -255,19 +255,19 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 {
 	//
-    //  PPI port C
+	//  PPI port C
 	//
-    //  D7 : Port A handshaking signal /OBF
-    //  D6 : Port A handshaking signal ACK
-    //  D5 : Port A handshaking signal IBF
-    //  D4 : Port A handshaking signal /STB
-    //  D3 : Port A handshaking signal INTR
-    //  D2 : To PAL 315-5107 pin 9 (SCONT1)
-    //  D1 : To PAL 315-5108 pin 19 (SCONT0)
-    //  D0 : To MUTE input on MB3733 amplifier.
-    //       0= Sound is disabled
-    //       1= sound is enabled
-    //
+	//  D7 : Port A handshaking signal /OBF
+	//  D6 : Port A handshaking signal ACK
+	//  D5 : Port A handshaking signal IBF
+	//  D4 : Port A handshaking signal /STB
+	//  D3 : Port A handshaking signal INTR
+	//  D2 : To PAL 315-5107 pin 9 (SCONT1)
+	//  D1 : To PAL 315-5108 pin 19 (SCONT0)
+	//  D0 : To MUTE input on MB3733 amplifier.
+	//       0= Sound is disabled
+	//       1= sound is enabled
+	//
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
@@ -519,13 +519,13 @@ WRITE8_MEMBER( segas16a_state::mcu_control_w )
 WRITE8_MEMBER( segas16a_state::mcu_io_w )
 {
 	//
-    //  1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
-    //  1.00 1... = text RAM (accessed @ $8000+x)
-    //  1.01 1... = palette RAM
-    //  1.10 1... = checksum #0
-    //  1.11 0... = checksum #1
-    //  1.11 1... = checksum #2
-    //
+	//  1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
+	//  1.00 1... = text RAM (accessed @ $8000+x)
+	//  1.01 1... = palette RAM
+	//  1.10 1... = checksum #0
+	//  1.11 0... = checksum #1
+	//  1.11 1... = checksum #2
+	//
 	switch ((m_mcu_control >> 3) & 7)
 	{
 		case 0:
@@ -946,8 +946,8 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 		case 0x1000/2:
 			switch (offset & 3)
 			{
-				case 1:	return ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
-				case 3:	return ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
+				case 1: return ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+				case 3: return ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 			}
 			break;
 	}
@@ -1051,7 +1051,7 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas16a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP	// read during jb int0
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP   // read during jb int0
 ADDRESS_MAP_END
 
 
@@ -1123,8 +1123,8 @@ static INPUT_PORTS_START( aceattaa )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )			// Block Switch
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	// Block Switch
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )            // Block Switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Block Switch
 
 	PORT_MODIFY("P1") // "P1" multiplexer(1of4) // direction of "hand" device
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(TMP_PL1HAND)
@@ -1357,8 +1357,8 @@ static INPUT_PORTS_START( mjleague )
 	PORT_INCLUDE( system16a_generic )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	// upper bit of trackball
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// upper bit of trackball
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   // upper bit of trackball
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // upper bit of trackball
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )
@@ -1788,8 +1788,8 @@ static INPUT_PORTS_START( tetris )
 
 	PORT_MODIFY("DSW2")
 	// SW2:1,3,4,7,8 Unused according to manual.
-    // From the code SW2:3,4 looks like some kind of difficulty level,
-    // but all 4 levels points to the same place so it doesn't actually change anything!!
+	// From the code SW2:3,4 looks like some kind of difficulty level,
+	// but all 4 levels points to the same place so it doesn't actually change anything!!
 	//"SW2:1" unused
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -1900,8 +1900,8 @@ static INPUT_PORTS_START( wb3 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x40, 0x40, "Test Mode" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )	// Normal game
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )	// Levels are selectable / Player is Invincible
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )   // Normal game
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )  // Levels are selectable / Player is Invincible
 	//"SW2:8" unused
 	// Switches 1 & 8 are listed as "Always off"
 INPUT_PORTS_END
@@ -1945,7 +1945,7 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(342,262)	// to be verified
+	MCFG_SCREEN_SIZE(342,262)   // to be verified
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16a_state, screen_update)
 
@@ -2404,7 +2404,7 @@ ROM_START( bodyslam )
 	ROM_LOAD( "epr-10031.c3", 0x10000, 0x8000, CRC(ea3c4472) SHA1(ad8eac2d3d14fd6aba713f4d624861c17aabf757) )
 	ROM_LOAD( "epr-10032.c4", 0x18000, 0x8000, CRC(0aabebce) SHA1(fab12df8f4eab270be491c6c025d832c338e1e83) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	// Intel i8751 protection MCU
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "317-0015.bin", 0x0000, 0x1000, CRC(833869e2) SHA1(2675fda669351e958be28ca28de276abb2bbc99a) )
 ROM_END
 
@@ -2430,12 +2430,12 @@ ROM_START( dumpmtmt )
 	ROM_REGION16_BE( 0x40000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-7715.c5",  0x00001, 0x08000, CRC(bf47e040) SHA1(5aa1b9adaa2095844c10993402a0597bb5768efb) )
 	ROM_LOAD16_BYTE( "epr-7719.b2",  0x00000, 0x08000, CRC(fa5c5d6c) SHA1(6cac5d3fd705d1365348d57a18bbeb1eb9e412b8) )
-	ROM_LOAD16_BYTE( "epr-10013.c6", 0x10001, 0x08000, CRC(9a0919c5) SHA1(e39e60c1e834b3b46bf2ef1c5952841bebe66ade) )	// 7716
-	ROM_LOAD16_BYTE( "epr-10017.b3", 0x10000, 0x08000, CRC(62aafd95) SHA1(e1e3a95fd11cabf81f44ac2dd3f951d3094725e6) )	// 7720
+	ROM_LOAD16_BYTE( "epr-10013.c6", 0x10001, 0x08000, CRC(9a0919c5) SHA1(e39e60c1e834b3b46bf2ef1c5952841bebe66ade) )   // 7716
+	ROM_LOAD16_BYTE( "epr-10017.b3", 0x10000, 0x08000, CRC(62aafd95) SHA1(e1e3a95fd11cabf81f44ac2dd3f951d3094725e6) )   // 7720
 	ROM_LOAD16_BYTE( "epr-7717.c7",  0x20001, 0x08000, CRC(fa64c86d) SHA1(ada722dd6efbf466a719ee1fe34a36ce1ea20184) )
 	ROM_LOAD16_BYTE( "epr-7721.b4",  0x20000, 0x08000, CRC(62a9143e) SHA1(28f0dc0329163f0a6505dd34a24a843b35118c5e) )
-	ROM_LOAD16_BYTE( "epr-10015.c8", 0x30001, 0x08000, CRC(582d3b6a) SHA1(4f1d0060682e3fc1147082286e00e6a296a95da2) )	// 7718
-	ROM_LOAD16_BYTE( "epr-10019.b5", 0x30000, 0x08000, CRC(e020c38b) SHA1(d13d38a64f2afa7df3cbccef2fe505a4421b73ad) )	// 7722
+	ROM_LOAD16_BYTE( "epr-10015.c8", 0x30001, 0x08000, CRC(582d3b6a) SHA1(4f1d0060682e3fc1147082286e00e6a296a95da2) )   // 7718
+	ROM_LOAD16_BYTE( "epr-10019.b5", 0x30000, 0x08000, CRC(e020c38b) SHA1(d13d38a64f2afa7df3cbccef2fe505a4421b73ad) )   // 7722
 
 	ROM_REGION( 0x30000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-7710a.b1", 0x00000, 0x8000, CRC(a19b8ba8) SHA1(21b628d4ecbe38a6d96a39ca4252ff1cb728343f) )
@@ -2449,7 +2449,7 @@ ROM_START( dumpmtmt )
 	ROM_LOAD( "epr-7713.c3", 0x10000, 0x8000, CRC(33f292e7) SHA1(4358cd3922a0dcbf109d2d697c7b8c4e090c3d52) )
 	ROM_LOAD( "epr-7714.c4", 0x18000, 0x8000, CRC(8fd48c47) SHA1(1cba63a9e7e0b477683b7758d124f4949558ba7a) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	// protection MCU
+	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
 	ROM_LOAD( "317-0011a.mcu", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -2602,7 +2602,7 @@ ROM_START( passsht16a )
 	ROM_LOAD16_BYTE( "epr-11833.43", 0x000000, 0x10000, CRC(5eb1405c) SHA1(0a68d3fcc074475d38f999c93082d4a9dff0f19a) )
 	ROM_LOAD16_BYTE( "epr-11832.26", 0x000001, 0x10000, CRC(718a3fe4) SHA1(bd6844c53ce3b64b113795360175df92d095b467) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0071.key", 0x0000, 0x2000, CRC(c69949ec) SHA1(1c63f42404ee1d8333e734e892b1c4cac0cb440e) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
@@ -2681,7 +2681,7 @@ ROM_START( quartet )
 	ROM_LOAD( "epr-7474.3c",  0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c",  0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	// Intel i8751 protection MCU
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0500, "plds", 0 )
@@ -2731,7 +2731,7 @@ ROM_START( quarteta )
 	ROM_LOAD( "epr-7474.3c",  0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c",  0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	// Intel i8751 protection MCU
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0500, "plds", 0 )
@@ -2787,7 +2787,7 @@ ROM_START( quartet2 )
 	ROM_LOAD( "epr-7474.3c",  0x10000, 0x8000, CRC(dbf853b8) SHA1(e82f497e1144f23f3233b5c45ef182bfc7923715) )
 	ROM_LOAD( "epr-7476.4c",  0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	// Intel i8751 protection MCU
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "317-0010.bin", 0x00000, 0x1000, CRC(8c2033ea) SHA1(4a60d141517a5d5d065f40f71be4d2ee3be18384) )
 ROM_END
 
@@ -2950,8 +2950,8 @@ ROM_START( shinobls )
 	ROM_LOAD16_BYTE( "b16", 0x20000, 0x08000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
 	ROM_CONTINUE(           0x60000, 0x08000 )
 	// It's possible that the modifications to these roms are meant to stop the Sega logo from appearing,
-    // however, with the current system 16a emulation this doesn't happen, maybe it isn't actually running
-    // on a genuine Sega board?
+	// however, with the current system 16a emulation this doesn't happen, maybe it isn't actually running
+	// on a genuine Sega board?
 	ROM_LOAD16_BYTE( "b13", 0x30001, 0x08000, CRC(7e98bd36) SHA1(069c51478af7567e704fc9e25c9e327f02db171d) )
 	ROM_CONTINUE(           0x70001, 0x08000 )
 	ROM_LOAD16_BYTE( "b17", 0x30000, 0x08000, CRC(0315cf42) SHA1(2d129171aece883cb9c2805f894b3867ec98332b) )
@@ -3028,7 +3028,7 @@ ROM_START( shinobi1 )
 	ROM_LOAD16_BYTE( "epr-11263.43", 0x020000, 0x10000, CRC(a2a620bd) SHA1(f8b135ce14d6c5eac5e40ddfd5ad2f1e6f2bc7a6) )
 	ROM_LOAD16_BYTE( "epr-11261.25", 0x020001, 0x10000, CRC(a3ceda52) SHA1(97a1c52a162fb1d43b3f8f16613b70ce582a8d26) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0050.key", 0x0000, 0x2000, CRC(82c39ced) SHA1(5490237ff7f20f9ebfa3e46eedd5afd4f1c28548) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
@@ -3169,7 +3169,7 @@ ROM_START( tetris )
 	ROM_LOAD16_BYTE( "epr-12201.rom", 0x000000, 0x8000, CRC(338e9b51) SHA1(f56a1124c963d4ad72a806b26f9aa906aaa37d2b) )
 	ROM_LOAD16_BYTE( "epr-12200.rom", 0x000001, 0x8000, CRC(fb058779) SHA1(0045985ea943ebc7e44bd95127c5e5212c2821e8) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0093.key",  0x0000, 0x2000, CRC(e0064442) SHA1(cc70b1a2c66729c4540dabd6a24a5f5615beedcd) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
@@ -3312,7 +3312,7 @@ ROM_START( wb31 )
 	ROM_LOAD16_BYTE( "epr-12085.bin", 0x020000, 0x10000, CRC(0962098b) SHA1(150fc439dd5e773bef706f058abdb4d2ec44e355) )
 	ROM_LOAD16_BYTE( "epr-12083.bin", 0x020001, 0x10000, CRC(3d631a8e) SHA1(4940ff6cf380fb914876ade39ea37f42b79bf11d) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0084.key",  0x0000, 0x2000, CRC(2c58dafa) SHA1(24d06970eda896fdd5e3486132bd19834f7d3659) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles

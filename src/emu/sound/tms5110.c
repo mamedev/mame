@@ -63,31 +63,31 @@
 #include "emu.h"
 #include "tms5110.h"
 
-#define MAX_SAMPLE_CHUNK		512
-#define FIFO_SIZE				64 // TODO: technically the tms51xx chips don't have a fifo at all
+#define MAX_SAMPLE_CHUNK        512
+#define FIFO_SIZE               64 // TODO: technically the tms51xx chips don't have a fifo at all
 
 /* Variants */
 
-#define TMS5110_IS_5110A	(1)
-#define TMS5110_IS_5100		(2)
-#define TMS5110_IS_5110		(3)
+#define TMS5110_IS_5110A    (1)
+#define TMS5110_IS_5100     (2)
+#define TMS5110_IS_5110     (3)
 
-#define TMS5110_IS_CD2801	TMS5110_IS_5100
-#define TMS5110_IS_TMC0281	TMS5110_IS_5100
+#define TMS5110_IS_CD2801   TMS5110_IS_5100
+#define TMS5110_IS_TMC0281  TMS5110_IS_5100
 
-#define TMS5110_IS_CD2802	TMS5110_IS_5110
-#define TMS5110_IS_M58817	TMS5110_IS_5110
+#define TMS5110_IS_CD2802   TMS5110_IS_5110
+#define TMS5110_IS_M58817   TMS5110_IS_5110
 
 /* States for CTL */
 
-#define CTL_STATE_INPUT 		(0)
-#define CTL_STATE_OUTPUT		(1)
-#define CTL_STATE_NEXT_OUTPUT	(2)
+#define CTL_STATE_INPUT         (0)
+#define CTL_STATE_OUTPUT        (1)
+#define CTL_STATE_NEXT_OUTPUT   (2)
 
 struct tms5110_state
 {
 	/* coefficient tables */
-	int variant;				/* Variant of the 5110 - see tms5110.h */
+	int variant;                /* Variant of the 5110 - see tms5110.h */
 
 	/* coefficient tables */
 	const struct tms5100_coeffs *coeff;
@@ -116,11 +116,11 @@ struct tms5110_state
 	void (*set_load_address)(device_t *, int);
 
 	/* callbacks */
-	devcb_resolved_write_line m0_func;		/* the M0 line */
-	devcb_resolved_write_line m1_func;		/* the M1 line */
-	devcb_resolved_write8 addr_func;		/* Write to ADD1,2,4,8 - 4 address bits */
-	devcb_resolved_read_line data_func;		/* Read one bit from ADD8/Data - voice data */
-	devcb_resolved_write_line romclk_func;	/* rom clock - Only used to drive the data lines */
+	devcb_resolved_write_line m0_func;      /* the M0 line */
+	devcb_resolved_write_line m1_func;      /* the M1 line */
+	devcb_resolved_write8 addr_func;        /* Write to ADD1,2,4,8 - 4 address bits */
+	devcb_resolved_read_line data_func;     /* Read one bit from ADD8/Data - voice data */
+	devcb_resolved_write_line romclk_func;  /* rom clock - Only used to drive the data lines */
 
 
 	device_t *device;
@@ -150,7 +150,7 @@ struct tms5110_state
 
 	INT32 x[11];
 
-	INT32 RNG;	/* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+	INT32 RNG;  /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
 
 	const tms5110_interface *intf;
 	const UINT8 *table;
@@ -178,8 +178,8 @@ struct tmsprom_state
 	const UINT8 *rom;
 	const UINT8 *prom;
 
-	devcb_resolved_write_line pdc_func;		/* tms pdc func */
-	devcb_resolved_write8 ctl_func;			/* tms ctl func */
+	devcb_resolved_write_line pdc_func;     /* tms pdc func */
+	devcb_resolved_write8 ctl_func;         /* tms ctl func */
 
 	device_t *device;
 	emu_timer *romclk_timer;
@@ -196,12 +196,12 @@ INLINE tms5110_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS5110 ||
-		   device->type() == TMS5100 ||
-		   device->type() == TMS5110A ||
-		   device->type() == CD2801 ||
-		   device->type() == TMC0281 ||
-		   device->type() == CD2802 ||
-		   device->type() == M58817);
+			device->type() == TMS5100 ||
+			device->type() == TMS5110A ||
+			device->type() == CD2801 ||
+			device->type() == TMC0281 ||
+			device->type() == CD2802 ||
+			device->type() == M58817);
 	return (tms5110_state *)downcast<tms5110_device *>(device)->token();
 }
 
@@ -221,7 +221,7 @@ static STREAM_UPDATE( tms5110_update );
 static TIMER_CALLBACK( romclk_hack_timer_cb );
 
 
-#define DEBUG_5110	0
+#define DEBUG_5110  0
 
 void tms5110_set_variant(tms5110_state *tms, int variant)
 {
@@ -430,12 +430,12 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 
 	/* a "dummy read" is mentioned in the tms5200 datasheet */
 	/* The Bagman speech roms data are organized in such a way that
-    ** the bit at address 0 is NOT a speech data. The bit at address 1
-    ** is the speech data. It seems that the tms5110 performs a dummy read
-    ** just before it executes a SPEAK command.
-    ** This has been moved to command logic ...
-    **  perform_dummy_read(tms);
-    */
+	** the bit at address 0 is NOT a speech data. The bit at address 1
+	** is the speech data. It seems that the tms5110 performs a dummy read
+	** just before it executes a SPEAK command.
+	** This has been moved to command logic ...
+	**  perform_dummy_read(tms);
+	*/
 
 		/* clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
 		tms->new_energy = 0;
@@ -498,9 +498,9 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 			else if ((tms->old_energy == 0) && (tms->new_energy != 0)) /* was the old frame a zero-energy frame? */
 			{
 				/* if so, and if the new frame is non-zero energy frame then the new parameters
-                   should become our current and target parameters immediately,
-                   i.e. we should NOT interpolate them slowly in.
-                */
+				   should become our current and target parameters immediately,
+				   i.e. we should NOT interpolate them slowly in.
+				*/
 
 				/*logerror("processing non-zero energy frame after zero-energy frame\n");*/
 				tms->target_energy = tms->new_energy;
@@ -508,22 +508,22 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
 			}
-			else if ((tms->old_pitch == 0) && (tms->new_pitch != 0))	/* is this a change from unvoiced to voiced frame ? */
+			else if ((tms->old_pitch == 0) && (tms->new_pitch != 0))    /* is this a change from unvoiced to voiced frame ? */
 			{
 				/* if so, then the new parameters should become our current and target parameters immediately,
-                   i.e. we should NOT interpolate them slowly in.
-                */
+				   i.e. we should NOT interpolate them slowly in.
+				*/
 				/*if (DEBUG_5110) logerror("processing frame: UNVOICED->VOICED frame change\n");*/
 				tms->target_energy = tms->new_energy;
 				tms->target_pitch = tms->current_pitch = tms->new_pitch;
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
 			}
-			else if ((tms->old_pitch != 0) && (tms->new_pitch == 0))	/* is this a change from voiced to unvoiced frame ? */
+			else if ((tms->old_pitch != 0) && (tms->new_pitch == 0))    /* is this a change from voiced to unvoiced frame ? */
 			{
 				/* if so, then the new parameters should become our current and target parameters immediately,
-                   i.e. we should NOT interpolate them slowly in.
-                */
+				   i.e. we should NOT interpolate them slowly in.
+				*/
 				/*if (DEBUG_5110) logerror("processing frame: VOICED->UNVOICED frame change\n");*/
 				tms->target_energy = tms->new_energy;
 				tms->target_pitch = tms->current_pitch = tms->new_pitch;
@@ -632,16 +632,16 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 		}
 		else
 		{
-	                 /* generate voiced samples here */
-            /* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
-             * function has a chirp/peak and then a long chain of zeroes.
-             * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
-             * and if the address reaches that point the ADDRESS incrementer is
-             * disabled, forcing all samples beyond 50d to be == 50d
-             * (address 50d holds zeroes)
-             */
+						/* generate voiced samples here */
+			/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
+			 * function has a chirp/peak and then a long chain of zeroes.
+			 * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
+			 * and if the address reaches that point the ADDRESS incrementer is
+			 * disabled, forcing all samples beyond 50d to be == 50d
+			 * (address 50d holds zeroes)
+			 */
 
-	  /*if (tms->coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))*/
+		/*if (tms->coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))*/
 
 		if (tms->pitch_count > 50)
 			current_val = tms->coeff->chirptable[50];
@@ -653,9 +653,9 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 		for (i=0; i<20; i++)
 		{
 			bitout = ((tms->RNG>>12)&1) ^
-				 ((tms->RNG>>10)&1) ^
-				 ((tms->RNG>> 9)&1) ^
-				 ((tms->RNG>> 0)&1);
+					((tms->RNG>>10)&1) ^
+					((tms->RNG>> 9)&1) ^
+					((tms->RNG>> 0)&1);
 			tms->RNG >>= 1;
 			tms->RNG |= (bitout<<12);
 		}
@@ -956,21 +956,21 @@ static void parse_frame(tms5110_state *tms)
 #if 0
 /*This is an example word TEN taken from the TMS5110A datasheet*/
 static const unsigned int example_word_TEN[619]={
-/* 1*/1,0,0,0,	0,	0,0,0,0,0,	1,1,0,0,0,	0,0,0,1,0,	0,1,1,1,	0,1,0,1,
-/* 2*/1,0,0,0,	0,	0,0,0,0,0,	1,0,0,1,0,	0,0,1,1,0,	0,0,1,1,	0,1,0,1,
-/* 3*/1,1,0,0,	0,	1,0,0,0,0,	1,0,1,0,0,	0,1,0,1,0,	0,1,0,0,	1,0,1,0,	1,0,0,0,	1,0,0,1,	0,1,0,1,	0,0,1,	0,1,0,	0,1,1,
-/* 4*/1,1,1,0,	0,	0,1,1,1,1,	1,0,1,0,1,	0,1,1,1,0,	0,1,0,1,	0,1,1,1,	0,1,1,1,	1,0,1,1,	1,0,1,0,	0,1,1,	0,1,0,	0,1,1,
-/* 5*/1,1,1,0,	0,	1,0,0,0,0,	1,0,1,0,0,	0,1,1,1,0,	0,1,0,1,	1,0,1,0,	1,0,0,0,	1,1,0,0,	1,0,1,1,	1,0,0,	0,1,0,	0,1,1,
-/* 6*/1,1,1,0,	0,	1,0,0,0,1,	1,0,1,0,1,	0,1,1,0,1,	0,1,1,0,	0,1,1,1,	0,1,1,1,	1,0,1,0,	1,0,1,0,	1,1,0,	0,0,1,	1,0,0,
-/* 7*/1,1,1,0,	0,	1,0,0,1,0,	1,0,1,1,1,	0,1,1,1,0,	0,1,1,1,	0,1,1,1,	0,1,0,1,	0,1,1,0,	1,0,0,1,	1,1,0,	0,1,0,	0,1,1,
-/* 8*/1,1,1,0,	1,	1,0,1,0,1,
-/* 9*/1,1,1,0,	0,	1,1,0,0,1,	1,0,1,1,1,	0,1,0,1,1,	1,0,1,1,	0,1,1,1,	0,1,0,0,	1,0,0,0,	1,0,0,0,	1,1,0,	0,1,1,	0,1,1,
-/*10*/1,1,0,1,	0,	1,1,0,1,0,	1,0,1,0,1,	0,1,1,0,1,	1,0,1,1,	0,1,0,1,	0,1,0,0,	1,0,0,0,	1,0,1,0,	1,1,0,	0,1,0,	1,0,0,
-/*11*/1,0,1,1,	0,	1,1,0,1,1,	1,0,0,1,1,	1,0,0,1,0,	0,1,1,0,	0,0,1,1,	0,1,0,1,	1,0,0,1,	1,0,1,0,	1,0,0,	0,1,1,	0,1,1,
-/*12*/1,0,0,0,	0,	1,1,1,0,0,	1,0,0,1,1,	0,0,1,1,0,	0,1,0,0,	0,1,1,0,	1,1,0,0,	0,1,0,1,	1,0,0,0,	1,0,0,	0,1,0,	1,0,1,
-/*13*/0,1,1,1,	1,	1,1,1,0,1,
-/*14*/0,1,1,1,	0,	1,1,1,1,0,	1,0,0,1,1,	0,0,1,1,1,	0,1,0,1,	0,1,0,1,	1,1,0,0,	0,1,1,1,	1,0,0,0,	1,0,0,	0,1,0,	1,0,1,
-/*15*/0,1,1,0,	0,	1,1,1,1,0,	1,0,1,0,1,	0,0,1,1,0,	0,1,0,0,	0,0,1,1,	1,1,0,0,	1,0,0,1,	0,1,1,1,	1,0,1,	0,1,0,	1,0,1,
+/* 1*/1,0,0,0,  0,  0,0,0,0,0,  1,1,0,0,0,  0,0,0,1,0,  0,1,1,1,    0,1,0,1,
+/* 2*/1,0,0,0,  0,  0,0,0,0,0,  1,0,0,1,0,  0,0,1,1,0,  0,0,1,1,    0,1,0,1,
+/* 3*/1,1,0,0,  0,  1,0,0,0,0,  1,0,1,0,0,  0,1,0,1,0,  0,1,0,0,    1,0,1,0,    1,0,0,0,    1,0,0,1,    0,1,0,1,    0,0,1,  0,1,0,  0,1,1,
+/* 4*/1,1,1,0,  0,  0,1,1,1,1,  1,0,1,0,1,  0,1,1,1,0,  0,1,0,1,    0,1,1,1,    0,1,1,1,    1,0,1,1,    1,0,1,0,    0,1,1,  0,1,0,  0,1,1,
+/* 5*/1,1,1,0,  0,  1,0,0,0,0,  1,0,1,0,0,  0,1,1,1,0,  0,1,0,1,    1,0,1,0,    1,0,0,0,    1,1,0,0,    1,0,1,1,    1,0,0,  0,1,0,  0,1,1,
+/* 6*/1,1,1,0,  0,  1,0,0,0,1,  1,0,1,0,1,  0,1,1,0,1,  0,1,1,0,    0,1,1,1,    0,1,1,1,    1,0,1,0,    1,0,1,0,    1,1,0,  0,0,1,  1,0,0,
+/* 7*/1,1,1,0,  0,  1,0,0,1,0,  1,0,1,1,1,  0,1,1,1,0,  0,1,1,1,    0,1,1,1,    0,1,0,1,    0,1,1,0,    1,0,0,1,    1,1,0,  0,1,0,  0,1,1,
+/* 8*/1,1,1,0,  1,  1,0,1,0,1,
+/* 9*/1,1,1,0,  0,  1,1,0,0,1,  1,0,1,1,1,  0,1,0,1,1,  1,0,1,1,    0,1,1,1,    0,1,0,0,    1,0,0,0,    1,0,0,0,    1,1,0,  0,1,1,  0,1,1,
+/*10*/1,1,0,1,  0,  1,1,0,1,0,  1,0,1,0,1,  0,1,1,0,1,  1,0,1,1,    0,1,0,1,    0,1,0,0,    1,0,0,0,    1,0,1,0,    1,1,0,  0,1,0,  1,0,0,
+/*11*/1,0,1,1,  0,  1,1,0,1,1,  1,0,0,1,1,  1,0,0,1,0,  0,1,1,0,    0,0,1,1,    0,1,0,1,    1,0,0,1,    1,0,1,0,    1,0,0,  0,1,1,  0,1,1,
+/*12*/1,0,0,0,  0,  1,1,1,0,0,  1,0,0,1,1,  0,0,1,1,0,  0,1,0,0,    0,1,1,0,    1,1,0,0,    0,1,0,1,    1,0,0,0,    1,0,0,  0,1,0,  1,0,1,
+/*13*/0,1,1,1,  1,  1,1,1,0,1,
+/*14*/0,1,1,1,  0,  1,1,1,1,0,  1,0,0,1,1,  0,0,1,1,1,  0,1,0,1,    0,1,0,1,    1,1,0,0,    0,1,1,1,    1,0,0,0,    1,0,0,  0,1,0,  1,0,1,
+/*15*/0,1,1,0,  0,  1,1,1,1,0,  1,0,1,0,1,  0,0,1,1,0,  0,1,0,0,    0,0,1,1,    1,1,0,0,    1,0,0,1,    0,1,1,1,    1,0,1,  0,1,0,  1,0,1,
 /*16*/1,1,1,1
 };
 #endif
@@ -1036,13 +1036,13 @@ static DEVICE_START( tms5110 )
 #if 0
 		assert_always(tms->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
 #endif
-	    tms->M0_callback = tms->intf->M0_callback;
-	    tms->set_load_address = tms->intf->load_address;
+		tms->M0_callback = tms->intf->M0_callback;
+		tms->set_load_address = tms->intf->load_address;
 	}
 	else
 	{
-	    tms->M0_callback = speech_rom_read_bit;
-	    tms->set_load_address = speech_rom_set_addr;
+		tms->M0_callback = speech_rom_read_bit;
+		tms->set_load_address = speech_rom_set_addr;
 	}
 
 	tms->state = CTL_STATE_INPUT; /* most probably not defined */
@@ -1129,8 +1129,8 @@ static DEVICE_RESET( tms5110 )
 	else
 	{
 		/* no dummy read! This makes bagman and ad2083 speech fail
-         * with the new cycle and transition exact interfaces
-         */
+		 * with the new cycle and transition exact interfaces
+		 */
 		tms->schedule_dummy_read = FALSE;
 	}
 	tms->addr_bit = 0;
@@ -1149,8 +1149,8 @@ WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
 {
 	tms5110_state *tms = get_safe_token(device);
 
-    /* bring up to date first */
-    tms->stream->update();
+	/* bring up to date first */
+	tms->stream->update();
 	tms->CTL_pins = data & 0xf;
 }
 
@@ -1165,9 +1165,9 @@ WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w )
 {
 	tms5110_state *tms = get_safe_token(device);
 
-    /* bring up to date first */
-    tms->stream->update();
-    tms5110_PDC_set(tms, state);
+	/* bring up to date first */
+	tms->stream->update();
+	tms5110_PDC_set(tms, state);
 }
 
 
@@ -1191,27 +1191,27 @@ READ8_DEVICE_HANDLER( tms5110_ctl_r )
 {
 	tms5110_state *tms = get_safe_token(device);
 
-    /* bring up to date first */
-    tms->stream->update();
-    if (tms->state == CTL_STATE_OUTPUT)
-    {
+	/* bring up to date first */
+	tms->stream->update();
+	if (tms->state == CTL_STATE_OUTPUT)
+	{
 		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", tms->talk_status);
-    	return (tms->talk_status << 0); /*CTL1 = still talking ? */
-    }
-    else
-    {
+		return (tms->talk_status << 0); /*CTL1 = still talking ? */
+	}
+	else
+	{
 		//if (DEBUG_5110) logerror("Status read (not in output mode)\n");
-    	return (0);
-    }
+		return (0);
+	}
 }
 
 READ8_DEVICE_HANDLER( m58817_status_r )
 {
 	tms5110_state *tms = get_safe_token(device);
 
-    /* bring up to date first */
-    tms->stream->update();
-    return (tms->talk_status << 0); /*CTL1 = still talking ? */
+	/* bring up to date first */
+	tms->stream->update();
+	return (tms->talk_status << 0); /*CTL1 = still talking ? */
 }
 
 /******************************************************************************
@@ -1230,16 +1230,16 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
 {
 	tms5110_state *tms = get_safe_token(device);
 
-    /* bring up to date first */
-    tms->stream->update();
+	/* bring up to date first */
+	tms->stream->update();
 
-    /* create and start timer if necessary */
-    if (!tms->romclk_hack_timer_started)
-    {
-    	tms->romclk_hack_timer_started = TRUE;
+	/* create and start timer if necessary */
+	if (!tms->romclk_hack_timer_started)
+	{
+		tms->romclk_hack_timer_started = TRUE;
 		tms->romclk_hack_timer->adjust(attotime::from_hz(device->clock() / 40), 0, attotime::from_hz(device->clock() / 40));
 	}
-    return tms->romclk_hack_state;
+	return tms->romclk_hack_state;
 }
 
 
@@ -1254,9 +1254,9 @@ int tms5110_ready_r(device_t *device)
 {
 	tms5110_state *tms = get_safe_token(device);
 
-    /* bring up to date first */
-    tms->stream->update();
-    return (tms->fifo_count < FIFO_SIZE-1);
+	/* bring up to date first */
+	tms->stream->update();
+	return (tms->fifo_count < FIFO_SIZE-1);
 }
 
 
@@ -1374,13 +1374,13 @@ static TIMER_CALLBACK( tmsprom_step )
 	tmsprom_state *tms = get_safe_token_prom(device);
 
 	/* only 16 bytes needed ... The original dump is bad. This
-     * is what is needed to get speech to work. The prom data has
-     * been updated and marked as BAD_DUMP. The information below
-     * is given for reference once another dump should surface.
-     *
-     * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
-     *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
-     */
+	 * is what is needed to get speech to work. The prom data has
+	 * been updated and marked as BAD_DUMP. The information below
+	 * is given for reference once another dump should surface.
+	 *
+	 * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
+	 *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
+	 */
 	UINT16 ctrl;
 
 	update_prom_cnt(tms);
@@ -1477,14 +1477,14 @@ WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w )
 		update_prom_cnt(tms);
 
 		/* the following is needed for ad2084.
-         * It is difficult to derive the actual connections from
-         * pcb pictures but the reset pin of the LS393 driving
-         * the prom address line is connected somewhere.
-         *
-         * This does not affect bagman. It just simulates that a
-         * write to ads3 is always happening when the four lower
-         * counter bits are 0!
-         */
+		 * It is difficult to derive the actual connections from
+		 * pcb pictures but the reset pin of the LS393 driving
+		 * the prom address line is connected somewhere.
+		 *
+		 * This does not affect bagman. It just simulates that a
+		 * write to ads3 is always happening when the four lower
+		 * counter bits are 0!
+		 */
 		if (state)
 			tms->prom_cnt &= 0x10;
 	}
@@ -1499,13 +1499,13 @@ const device_type TMS5110 = &device_creator<tms5110_device>;
 
 tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tms5110_state);
 }
 tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tms5110_state);
 }
@@ -1738,5 +1738,3 @@ void tmsprom_device::device_start()
 {
 	DEVICE_START_NAME( tmsprom )(this);
 }
-
-

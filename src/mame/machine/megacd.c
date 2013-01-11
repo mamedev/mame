@@ -380,7 +380,7 @@ READ16_MEMBER( sega_segacd_device::scd_a12002_memory_mode_r )
 	temp2 |= (scd_mode_dmna_ret_flags>>(temp*4))&0x7;
 
 	return (segacd_ram_writeprotect_bits << 8) |
-		   (segacd_4meg_prgbank << 6) |
+			(segacd_4meg_prgbank << 6) |
 			temp2;
 
 }
@@ -458,7 +458,7 @@ READ16_MEMBER( sega_segacd_device::segacd_sub_memory_mode_r )
 	temp2 |= (scd_mode_dmna_ret_flags>>(temp*4))&0x7;
 
 	return (segacd_ram_writeprotect_bits << 8) |
-		   (segacd_memory_priority_mode << 3) |
+			(segacd_memory_priority_mode << 3) |
 			temp2;
 }
 
@@ -483,7 +483,7 @@ WRITE8_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w_0_7 )
 	//printf("segacd_sub_memory_mode_w_0_7 %04x\n",data);
 
 	if (!(data&4)) // check ram mode bit
-	{	// == 0x0 - 2 meg mode
+	{   // == 0x0 - 2 meg mode
 		scd_mode_dmna_ret_flags &= 0xddff;
 
 		if (data&1) // check RET
@@ -506,7 +506,7 @@ WRITE8_MEMBER( sega_segacd_device::segacd_sub_memory_mode_w_0_7 )
 		}
 	}
 	else
-	{	// == 0x4 - 1 meg mode
+	{   // == 0x4 - 1 meg mode
 		data &=1;
 		int temp = data;
 		int scd_rammode_old = scd_rammode;
@@ -701,11 +701,11 @@ READ16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_r )
 			// converts data stored in bitmap format (in dataram) to be read out as tiles (for dma->vram purposes)
 			// used by Heart of the Alien
 
-			if(offset<0x30000/2)		/* 0x20000 - 0x2ffff */ // 512x256 bitmap. tiles
+			if(offset<0x30000/2)        /* 0x20000 - 0x2ffff */ // 512x256 bitmap. tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,8,7,6,5,4,3,2,1,14,13,12,11,10,9,0);
-			else if(offset<0x38000/2)	/* 0x30000 - 0x37fff */  // 512x128 bitmap. tiles
+			else if(offset<0x38000/2)   /* 0x30000 - 0x37fff */  // 512x128 bitmap. tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,7,6,5,4,3,2,1,13,12,11,10,9,8,0);
-			else if(offset<0x3c000/2)	/* 0x38000 - 0x3bfff */  // 512x64 bitmap. tiles
+			else if(offset<0x3c000/2)   /* 0x38000 - 0x3bfff */  // 512x64 bitmap. tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,6,5,4,3,2,1,12,11,10,9,8,7,0);
 			else  /* 0x3c000 - 0x3dfff and 0x3e000 - 0x3ffff */  // 512x32 bitmap (x2) -> tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,12,5,4,3,2,1,11,10,9,8,7,6,0);
@@ -1867,4 +1867,3 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 		m_dmaaddr += length >> 2;
 	}
 }
-

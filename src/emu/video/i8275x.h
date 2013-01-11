@@ -63,7 +63,7 @@ class i8275x_device;
 // ======================> i8275_display_pixels_func
 
 typedef void (*i8275_display_pixels_func)(i8275x_device *device, bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt);
-#define I8275_DISPLAY_PIXELS(name)	void name(i8275x_device *device, bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
+#define I8275_DISPLAY_PIXELS(name)  void name(i8275x_device *device, bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
 
 
 // ======================> i8275_interface
@@ -87,8 +87,8 @@ struct i8275_interface
 
 // ======================> i8275x_device
 
-class i8275x_device :	public device_t,
-                        public i8275_interface
+class i8275x_device :   public device_t,
+						public i8275_interface
 {
 public:
 	// construction/destruction
@@ -104,10 +104,10 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void recompute_parameters();
@@ -172,10 +172,10 @@ protected:
 		FAC_U = 0x20
 	};
 
-	devcb_resolved_write_line	m_out_drq_func;
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_hrtc_func;
-	devcb_resolved_write_line	m_out_vrtc_func;
+	devcb_resolved_write_line   m_out_drq_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_hrtc_func;
+	devcb_resolved_write_line   m_out_vrtc_func;
 
 	screen_device *m_screen;
 	bitmap_rgb32 m_bitmap;

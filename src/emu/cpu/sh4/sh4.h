@@ -12,7 +12,7 @@
 #define __SH4_H__
 
 
-#define SH4_INT_NONE	-1
+#define SH4_INT_NONE    -1
 enum
 {
 	SH4_IRL0=0, SH4_IRL1, SH4_IRL2, SH4_IRL3, SH4_IRLn
@@ -113,16 +113,16 @@ enum
 
 struct sh4_config
 {
-  int md2;
-  int md1;
-  int md0;
-  int md6;
-  int md4;
-  int md3;
-  int md5;
-  int md7;
-  int md8;
-  int clock;
+	int md2;
+	int md1;
+	int md0;
+	int md6;
+	int md4;
+	int md3;
+	int md5;
+	int md7;
+	int md8;
+	int clock;
 };
 
 struct sh4_device_dma
@@ -172,15 +172,14 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s);
     COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
 
-#define SH4DRC_STRICT_VERIFY	0x0001			/* verify all instructions */
-#define SH4DRC_FLUSH_PC			0x0002			/* flush the PC value before each memory access */
-#define SH4DRC_STRICT_PCREL		0x0004			/* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
+#define SH4DRC_STRICT_VERIFY    0x0001          /* verify all instructions */
+#define SH4DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
+#define SH4DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
 
-#define SH4DRC_COMPATIBLE_OPTIONS	(SH4DRC_STRICT_VERIFY | SH4DRC_FLUSH_PC | SH4DRC_STRICT_PCREL)
-#define SH4DRC_FASTEST_OPTIONS	(0)
+#define SH4DRC_COMPATIBLE_OPTIONS   (SH4DRC_STRICT_VERIFY | SH4DRC_FLUSH_PC | SH4DRC_STRICT_PCREL)
+#define SH4DRC_FASTEST_OPTIONS  (0)
 
 void sh4drc_set_options(device_t *device, UINT32 options);
 void sh4drc_add_pcflush(device_t *device, offs_t address);
 
 #endif /* __SH4_H__ */
-

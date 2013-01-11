@@ -16,4 +16,3 @@ char *FindPrefsDir(void);
 #endif
 
 #endif
-

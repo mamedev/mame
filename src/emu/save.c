@@ -70,8 +70,8 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int SAVE_VERSION		= 2;
-const int HEADER_SIZE		= 32;
+const int SAVE_VERSION      = 2;
+const int HEADER_SIZE       = 32;
 
 // Available flags
 enum
@@ -90,11 +90,11 @@ enum
 
 save_manager::save_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_reg_allowed(true),
-	  m_illegal_regs(0),
-	  m_entry_list(machine.respool()),
-	  m_presave_list(machine.respool()),
-	  m_postload_list(machine.respool())
+		m_reg_allowed(true),
+		m_illegal_regs(0),
+		m_entry_list(machine.respool()),
+		m_presave_list(machine.respool()),
+		m_postload_list(machine.respool())
 {
 }
 
@@ -422,7 +422,7 @@ save_error save_manager::validate_header(const UINT8 *header, const char *gamena
 
 save_manager::state_callback::state_callback(save_prepost_delegate callback)
 	: m_next(NULL),
-	  m_func(callback)
+		m_func(callback)
 {
 }
 
@@ -433,11 +433,11 @@ save_manager::state_callback::state_callback(save_prepost_delegate callback)
 
 save_manager::state_entry::state_entry(void *data, const char *name, UINT8 size, UINT32 count)
 	: m_next(NULL),
-	  m_data(data),
-	  m_name(name),
-	  m_typesize(size),
-	  m_typecount(count),
-	  m_offset(0)
+		m_data(data),
+		m_name(name),
+		m_typesize(size),
+		m_typecount(count),
+		m_offset(0)
 {
 }
 

@@ -16,7 +16,7 @@ class bgt_state : public driver_device
 public:
 	bgt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -55,7 +55,7 @@ ROM_START( bg_ddb )
 
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 )
 	/* there were sound roms in the 'CoinWorld Ding Dong Bells' set which might belong here, otherwise
-       roms are probably missing */
+	   roms are probably missing */
 ROM_END
 
 ROM_START( bg_barmy )

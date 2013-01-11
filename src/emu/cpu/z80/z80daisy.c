@@ -163,8 +163,8 @@ void z80_daisy_chain::call_reti_device()
 
 z80_daisy_chain::daisy_entry::daisy_entry(device_t *device)
 	: m_next(NULL),
-	  m_device(device),
-	  m_interface(NULL)
+		m_device(device),
+		m_interface(NULL)
 {
 	device->interface(m_interface);
 }

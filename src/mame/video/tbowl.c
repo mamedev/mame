@@ -122,7 +122,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
-		if (state->m_spriteram[offs+0] & 0x80)	/* enable */
+		if (state->m_spriteram[offs+0] & 0x80)  /* enable */
 		{
 			int code,color,sizex,sizey,flipx,flipy,xpos,ypos;
 			int x,y;//,priority,priority_mask;

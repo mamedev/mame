@@ -17,7 +17,7 @@
   603d: 0 BUSY, 1 DEF, 2 SHIFT, 3 BGN, 4 STAT, 5 FIN, 6 PRINT
   607c: 0 E, 1 M, 2 BAL, 3 INT, 4 PRN, 5 Sum-Sign, 6 PRO */
 
- READ8_HANDLER(pc1401_lcd_read)
+	READ8_HANDLER(pc1401_lcd_read)
 {
 	pc1401_state *state = space.machine().driver_data<pc1401_state>();
 	offset&=0xff;
@@ -31,7 +31,7 @@ WRITE8_HANDLER(pc1401_lcd_write)
 	state->m_reg[offset]=data;
 }
 
-static const POCKETC_FIGURE	line={ /* simple line */
+static const POCKETC_FIGURE line={ /* simple line */
 	"11111",
 	"11111",
 	"11111e"
@@ -214,4 +214,3 @@ UINT32 pc1401_state::screen_update_pc1401(screen_device &screen, bitmap_ind16 &b
 */
 	return 0;
 }
-

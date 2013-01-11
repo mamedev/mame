@@ -19,15 +19,15 @@
 #include "sound/discrete.h"
 
 
-#define STARSHP1_MASTER_CLOCK		(12096000)
-#define STARSHP1_CPU_CLOCK			(STARSHP1_MASTER_CLOCK / 16)
-#define STARSHP1_PIXEL_CLOCK		(STARSHP1_MASTER_CLOCK / 2)
-#define STARSHP1_HTOTAL				(0x200)
-#define STARSHP1_HBEND				(0x000)
-#define STARSHP1_HBSTART			(0x200)
-#define STARSHP1_VTOTAL				(0x106)
-#define STARSHP1_VBEND				(0x000)
-#define STARSHP1_VBSTART			(0x0f0)
+#define STARSHP1_MASTER_CLOCK       (12096000)
+#define STARSHP1_CPU_CLOCK          (STARSHP1_MASTER_CLOCK / 16)
+#define STARSHP1_PIXEL_CLOCK        (STARSHP1_MASTER_CLOCK / 2)
+#define STARSHP1_HTOTAL             (0x200)
+#define STARSHP1_HBEND              (0x000)
+#define STARSHP1_HBSTART            (0x200)
+#define STARSHP1_VTOTAL             (0x106)
+#define STARSHP1_VBEND              (0x000)
+#define STARSHP1_VBSTART            (0x0f0)
 
 
 class starshp1_state : public driver_device
@@ -88,13 +88,13 @@ public:
 DISCRETE_SOUND_EXTERN( starshp1 );
 
 /* Discrete Sound Input Nodes */
-#define STARSHP1_NOISE_AMPLITUDE	NODE_01
+#define STARSHP1_NOISE_AMPLITUDE    NODE_01
 #define STARSHP1_TONE_PITCH         NODE_02
-#define	STARSHP1_MOTOR_SPEED		NODE_03
-#define	STARSHP1_NOISE_FREQ			NODE_04
-#define	STARSHP1_MOLVL				NODE_05
-#define	STARSHP1_SL2				NODE_06
-#define	STARSHP1_SL1				NODE_07
-#define	STARSHP1_KICKER				NODE_08
-#define	STARSHP1_PHASOR_ON			NODE_09
-#define	STARSHP1_ATTRACT			NODE_10
+#define STARSHP1_MOTOR_SPEED        NODE_03
+#define STARSHP1_NOISE_FREQ         NODE_04
+#define STARSHP1_MOLVL              NODE_05
+#define STARSHP1_SL2                NODE_06
+#define STARSHP1_SL1                NODE_07
+#define STARSHP1_KICKER             NODE_08
+#define STARSHP1_PHASOR_ON          NODE_09
+#define STARSHP1_ATTRACT            NODE_10

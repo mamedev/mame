@@ -186,11 +186,11 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 	/* switch off the offset */
 	switch (offset)
 	{
-		case 0:	/* register 0 must return 0x13 in order to pass the self test */
+		case 0: /* register 0 must return 0x13 in order to pass the self test */
 			result = 0x13;
 			break;
 
-		case 1:	/* register 1 contains the status */
+		case 1: /* register 1 contains the status */
 
 			/* loopback case: data always ready, and always ok to send */
 			if (m_uart[1] == 0x66)
@@ -206,7 +206,7 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 			}
 			break;
 
-		case 3:	/* register 3 contains the data read */
+		case 3: /* register 3 contains the data read */
 
 			/* loopback case: feed back last data wrtten */
 			if (m_uart[1] == 0x66)
@@ -217,7 +217,7 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 				result = midxunit_sound_r(space, 0, 0xffff);
 			break;
 
-		case 5:	/* register 5 seems to be like 3, but with in/out swapped */
+		case 5: /* register 5 seems to be like 3, but with in/out swapped */
 
 			/* loopback case: data always ready, and always ok to send */
 			if (m_uart[1] == 0x66)
@@ -254,7 +254,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 	/* switch off the offset */
 	switch (offset)
 	{
-		case 3:	/* register 3 contains the data to be sent */
+		case 3: /* register 3 contains the data to be sent */
 
 			/* loopback case: don't feed through */
 			if (m_uart[1] == 0x66)
@@ -265,7 +265,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 				midxunit_sound_w(space, 0, data, mem_mask);
 			break;
 
-		case 5:	/* register 5 write seems to reset things */
+		case 5: /* register 5 write seems to reset things */
 			dcs_data_r(machine());
 			break;
 

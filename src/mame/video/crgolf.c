@@ -8,8 +8,8 @@
 #include "includes/crgolf.h"
 
 
-#define NUM_PENS		(0x20)
-#define VIDEORAM_SIZE	(0x2000 * 3)
+#define NUM_PENS        (0x20)
+#define VIDEORAM_SIZE   (0x2000 * 3)
 
 
 /*************************************

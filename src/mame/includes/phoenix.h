@@ -43,16 +43,16 @@ public:
 
 /*----------- video timing  -----------*/
 
-#define MASTER_CLOCK			XTAL_11MHz
+#define MASTER_CLOCK            XTAL_11MHz
 
-#define PIXEL_CLOCK				(MASTER_CLOCK/2)
-#define CPU_CLOCK				(PIXEL_CLOCK)
-#define HTOTAL					(512-160)
-#define HBSTART					(256)
-#define HBEND					(0)
-#define VTOTAL					(256)
-#define VBSTART					(208)
-#define VBEND					(0)
+#define PIXEL_CLOCK             (MASTER_CLOCK/2)
+#define CPU_CLOCK               (PIXEL_CLOCK)
+#define HTOTAL                  (512-160)
+#define HBSTART                 (256)
+#define HBEND                   (0)
+#define VTOTAL                  (256)
+#define VBSTART                 (208)
+#define VBEND                   (0)
 
 /*----------- defined in audio/phoenix.c -----------*/
 
@@ -62,7 +62,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w );
 DECLARE_WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w );
 
 class phoenix_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

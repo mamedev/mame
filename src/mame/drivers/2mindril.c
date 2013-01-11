@@ -43,15 +43,15 @@ class _2mindril_state : public taito_f3_state
 public:
 	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taito_f3_state(mconfig, type, tag),
-		  m_iodata(*this, "iodata") { }
+			m_iodata(*this, "iodata") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_iodata;
 
 	/* input-related */
 	UINT16        m_defender_sensor;
-	UINT16		  m_shutter_sensor;
-	UINT16		  irq_reg;
+	UINT16        m_shutter_sensor;
+	UINT16        irq_reg;
 
 	/* devices */
 	cpu_device *m_maincpu;
@@ -77,7 +77,7 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 
 //  if (offset * 2 == 0x4)
 	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", space.device().safe_pc(), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
-                                        m_iodata[8/2], m_iodata[0xa/2], m_iodata[0xc/2], m_iodata[0xe/2]);*/
+	                                    m_iodata[8/2], m_iodata[0xa/2], m_iodata[0xc/2], m_iodata[0xe/2]);*/
 
 	switch(offset)
 	{
@@ -185,11 +185,11 @@ WRITE16_MEMBER(_2mindril_state::drill_irq_w)
 {
 
 	/*
-    (note: could rather be irq mask)
-    ---- ---- ---x ---- irq lv 5 ack, 0->1 latch
-    ---- ---- ---- x--- irq lv 4 ack, 0->1 latch
-    ---- ---- -??- -??? connected to the other levels?
-    */
+	(note: could rather be irq mask)
+	---- ---- ---x ---- irq lv 5 ack, 0->1 latch
+	---- ---- ---- x--- irq lv 4 ack, 0->1 latch
+	---- ---- -??- -??? connected to the other levels?
+	*/
 	if(((irq_reg & 8) == 0) && data & 8)
 		machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
 
@@ -345,7 +345,7 @@ static const gfx_layout charlayout =
 	256,
 	4,
 	{ 0,1,2,3 },
-    { 20, 16, 28, 24, 4, 0, 12, 8 },
+	{ 20, 16, 28, 24, 4, 0, 12, 8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
 };
@@ -356,7 +356,7 @@ static const gfx_layout pivotlayout =
 	2048,
 	4,
 	{ 0,1,2,3 },
-    { 20, 16, 28, 24, 4, 0, 12, 8 },
+	{ 20, 16, 28, 24, 4, 0, 12, 8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
 };
@@ -365,7 +365,7 @@ static const gfx_layout spriteram_layout =
 {
 	16,16,
 	RGN_FRAC(1,2),
-	6,	/* Palettes have 4 bpp indexes despite up to 6 bpp data */
+	6,  /* Palettes have 4 bpp indexes despite up to 6 bpp data */
 	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, 0, 1, 2, 3 },
 	{
 	4, 0, 12, 8,
@@ -374,29 +374,29 @@ static const gfx_layout spriteram_layout =
 	48+4, 48+0, 48+12, 48+8 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout tile_layout =
 {
 	16,16,
 	RGN_FRAC(1,2),
-	6,	/* Palettes have 4 bpp indexes despite up to 6 bpp data */
+	6,  /* Palettes have 4 bpp indexes despite up to 6 bpp data */
 	{ RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3, 0, 1, 2, 3 },
 	{
 	4, 0, 16+4, 16+0,
-    8+4, 8+0, 24+4, 24+0,
+	8+4, 8+0, 24+4, 24+0,
 	32+4, 32+0, 48+4, 48+0,
-    40+4, 40+0, 56+4, 56+0,
+	40+4, 40+0, 56+4, 56+0,
 	},
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( 2mindril )
 	GFXDECODE_ENTRY( NULL,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout, 	 0x0000, 0x2000>>4 ) /* Tiles area */
+	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
 	GFXDECODE_ENTRY( NULL,   0x000000, pivotlayout,      0x0000,  0x400>>4 ) /* Dynamically modified */
 GFXDECODE_END
@@ -505,17 +505,17 @@ void _2mindril_state::tile_decode()
 
 	/* Setup ROM formats:
 
-        Some games will only use 4 or 5 bpp sprites, and some only use 4 bpp tiles,
-        I don't believe this is software or prom controlled but simply the unused data lines
-        are tied low on the game board if unused.  This is backed up by the fact the palette
-        indices are always related to 4 bpp data, even in 6 bpp games.
+	    Some games will only use 4 or 5 bpp sprites, and some only use 4 bpp tiles,
+	    I don't believe this is software or prom controlled but simply the unused data lines
+	    are tied low on the game board if unused.  This is backed up by the fact the palette
+	    indices are always related to 4 bpp data, even in 6 bpp games.
 
-        Most (all?) games with 5bpp tiles have the sixth bit set. Also, in Arabian Magic
-        sprites 1200-120f contain 6bpp data which is probably bogus.
-        VIDEO_START( f3 ) clears the fifth and sixth bit of the decoded graphics according
-        to the bit depth specified in f3_config_table.
+	    Most (all?) games with 5bpp tiles have the sixth bit set. Also, in Arabian Magic
+	    sprites 1200-120f contain 6bpp data which is probably bogus.
+	    VIDEO_START( f3 ) clears the fifth and sixth bit of the decoded graphics according
+	    to the bit depth specified in f3_config_table.
 
-    */
+	*/
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i+=2)

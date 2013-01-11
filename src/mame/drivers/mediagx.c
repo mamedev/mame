@@ -78,12 +78,12 @@
 #include "sound/dmadac.h"
 #include "video/ramdac.h"
 
-#define SPEEDUP_HACKS	1
+#define SPEEDUP_HACKS   1
 
 struct speedup_entry
 {
-	UINT32			offset;
-	UINT32			pc;
+	UINT32          offset;
+	UINT32          pc;
 };
 
 class mediagx_state : public driver_device
@@ -136,11 +136,11 @@ public:
 
 	dmadac_sound_device *m_dmadac[2];
 
-	pit8254_device	*m_pit8254;
-	pic8259_device	*m_pic8259_1;
-	pic8259_device	*m_pic8259_2;
-	i8237_device	*m_dma8237_1;
-	i8237_device	*m_dma8237_2;
+	pit8254_device  *m_pit8254;
+	pic8259_device  *m_pic8259_1;
+	pic8259_device  *m_pic8259_2;
+	i8237_device    *m_dma8237_1;
+	i8237_device    *m_dma8237_2;
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
@@ -202,32 +202,32 @@ public:
 };
 
 // Display controller registers
-#define DC_UNLOCK				0x00/4
-#define DC_GENERAL_CFG			0x04/4
-#define DC_TIMING_CFG			0x08/4
-#define DC_OUTPUT_CFG			0x0c/4
-#define DC_FB_ST_OFFSET			0x10/4
-#define DC_CB_ST_OFFSET			0x14/4
-#define DC_CUR_ST_OFFSET		0x18/4
-#define DC_VID_ST_OFFSET		0x20/4
-#define DC_LINE_DELTA			0x24/4
-#define DC_BUF_SIZE				0x28/4
-#define DC_H_TIMING_1			0x30/4
-#define DC_H_TIMING_2			0x34/4
-#define DC_H_TIMING_3			0x38/4
-#define DC_FP_H_TIMING			0x3c/4
-#define DC_V_TIMING_1			0x40/4
-#define DC_V_TIMING_2			0x44/4
-#define DC_V_TIMING_3			0x48/4
-#define DC_FP_V_TIMING			0x4c/4
-#define DC_CURSOR_X				0x50/4
-#define DC_V_LINE_CNT			0x54/4
-#define DC_CURSOR_Y				0x58/4
-#define DC_SS_LINE_CMP			0x5c/4
-#define DC_PAL_ADDRESS			0x70/4
-#define DC_PAL_DATA				0x74/4
-#define DC_DFIFO_DIAG			0x78/4
-#define DC_CFIFO_DIAG			0x7c/4
+#define DC_UNLOCK               0x00/4
+#define DC_GENERAL_CFG          0x04/4
+#define DC_TIMING_CFG           0x08/4
+#define DC_OUTPUT_CFG           0x0c/4
+#define DC_FB_ST_OFFSET         0x10/4
+#define DC_CB_ST_OFFSET         0x14/4
+#define DC_CUR_ST_OFFSET        0x18/4
+#define DC_VID_ST_OFFSET        0x20/4
+#define DC_LINE_DELTA           0x24/4
+#define DC_BUF_SIZE             0x28/4
+#define DC_H_TIMING_1           0x30/4
+#define DC_H_TIMING_2           0x34/4
+#define DC_H_TIMING_3           0x38/4
+#define DC_FP_H_TIMING          0x3c/4
+#define DC_V_TIMING_1           0x40/4
+#define DC_V_TIMING_2           0x44/4
+#define DC_V_TIMING_3           0x48/4
+#define DC_FP_V_TIMING          0x4c/4
+#define DC_CURSOR_X             0x50/4
+#define DC_V_LINE_CNT           0x54/4
+#define DC_CURSOR_Y             0x58/4
+#define DC_SS_LINE_CMP          0x5c/4
+#define DC_PAL_ADDRESS          0x70/4
+#define DC_PAL_DATA             0x74/4
+#define DC_DFIFO_DIAG           0x78/4
+#define DC_CFIFO_DIAG           0x7c/4
 
 
 
@@ -285,7 +285,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 	int line_delta = (state->m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
 	width = (state->m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
-	if (state->m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)		// pixel double
+	if (state->m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
@@ -294,7 +294,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 	height = (state->m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
 	if ( (width != state->m_frame_width || height != state->m_frame_height) &&
-		 (width > 1 && height > 1 && width <= 640 && height <= 480) )
+			(width > 1 && height > 1 && width <= 640 && height <= 480) )
 	{
 		rectangle visarea;
 
@@ -305,7 +305,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 		machine.primary_screen->configure(width, height * 262 / 240, visarea, machine.primary_screen->frame_period().attoseconds);
 	}
 
-	if (state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
+	if (state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
 		UINT8 *framebuf = (UINT8*)&state->m_vram[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 		UINT8 *pal = state->m_pal;
@@ -325,7 +325,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 			}
 		}
 	}
-	else			// 16-bit
+	else            // 16-bit
 	{
 		UINT16 *framebuf = (UINT16*)&state->m_vram[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
@@ -398,7 +398,7 @@ UINT32 mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 
 
 	draw_framebuffer(machine(), bitmap, cliprect);
 
-	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
+	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)   // don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
 		draw_cga(machine(), bitmap, cliprect);
 	}
@@ -533,7 +533,7 @@ WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
-	if (offset == 3)		// BC_XMAP_3 register
+	if (offset == 3)        // BC_XMAP_3 register
 	{
 		//mame_printf_debug("BC_XMAP_3: %08X, %08X, %08X\n", data, offset, mem_mask);
 	}
@@ -638,26 +638,26 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 
 WRITE32_MEMBER(mediagx_state::parallel_port_w)
 {
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" };	// but parallel_pointer takes values 0 -> 23
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" };   // but parallel_pointer takes values 0 -> 23
 
 	COMBINE_DATA( &m_parport );
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/*
-            Controls:
+		    Controls:
 
-                18 = reset internal pointer to 0
-                19 = reset internal pointer to 1
-                1a = reset internal pointer to 2
-                1b = reset internal pointer to 3
-                2x = set low 4 bits of general purpose output to 'x'
-                3x = set high 4 bits of general purpose output to 'x'
-                4x = control up to 4 coin counters; each bit of 'x' controls one
-                5x = control up to 2 watchdogged outputs (kickers); bits D0-D1 control each one
-                6x = watchdog reset
-                7x..ff = advance pointer
-        */
+		        18 = reset internal pointer to 0
+		        19 = reset internal pointer to 1
+		        1a = reset internal pointer to 2
+		        1b = reset internal pointer to 3
+		        2x = set low 4 bits of general purpose output to 'x'
+		        3x = set high 4 bits of general purpose output to 'x'
+		        4x = control up to 4 coin counters; each bit of 'x' controls one
+		        5x = control up to 2 watchdogged outputs (kickers); bits D0-D1 control each one
+		        6x = watchdog reset
+		        7x..ff = advance pointer
+		*/
 
 		logerror("%08X:", space.device().safe_pc());
 
@@ -726,7 +726,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 	//mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
-		case 0:		return 0x00001078;
+		case 0:     return 0x00001078;
 	}
 
 	return state->m_cx5510_regs[reg/4];
@@ -762,7 +762,7 @@ static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
 
 	switch (reg)
 	{
-		case 8:		// Data format register
+		case 8:     // Data format register
 		{
 			if (data & 0x1)
 			{
@@ -957,7 +957,7 @@ static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, mediagx_state )
 	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE(disp_ctrl_r, disp_ctrl_w)
 	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE(memory_ctrl_r, memory_ctrl_w)
 	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
@@ -966,10 +966,10 @@ static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,              at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP		// I/O delay port
+	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
@@ -981,7 +981,7 @@ ADDRESS_MAP_END
 
 static const gfx_layout CGA_charlayout =
 {
-	8,8,					/* 8 x 16 characters */
+	8,8,                    /* 8 x 16 characters */
 	256,                    /* 256 characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
@@ -989,7 +989,7 @@ static const gfx_layout CGA_charlayout =
 	{ 0,1,2,3,4,5,6,7 },
 	/* y offsets */
 	{ 0*8,1*8,2*8,3*8,
-	  4*8,5*8,6*8,7*8 },
+		4*8,5*8,6*8,7*8 },
 	8*8                     /* every char takes 8 bytes */
 };
 
@@ -1138,15 +1138,15 @@ static const struct pit8253_config mediagx_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -1284,9 +1284,9 @@ READ32_MEMBER(mediagx_state::speedup11_r) { return generic_speedup(space, 11); }
 
 static const struct { read32_delegate func; } speedup_handlers[] =
 {
-	{ read32_delegate(FUNC(mediagx_state::speedup0_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup1_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup2_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup3_r),(mediagx_state*)0) },
-	{ read32_delegate(FUNC(mediagx_state::speedup4_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup5_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup6_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup7_r),(mediagx_state*)0) },
-	{ read32_delegate(FUNC(mediagx_state::speedup8_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup9_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup10_r),(mediagx_state*)0) },	{ read32_delegate(FUNC(mediagx_state::speedup11_r),(mediagx_state*)0) }
+	{ read32_delegate(FUNC(mediagx_state::speedup0_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup1_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup2_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup3_r),(mediagx_state*)0) },
+	{ read32_delegate(FUNC(mediagx_state::speedup4_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup5_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup6_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup7_r),(mediagx_state*)0) },
+	{ read32_delegate(FUNC(mediagx_state::speedup8_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup9_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup10_r),(mediagx_state*)0) },    { read32_delegate(FUNC(mediagx_state::speedup11_r),(mediagx_state*)0) }
 };
 
 #ifdef MAME_DEBUG
@@ -1379,5 +1379,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", GAME_NOT_WORKING )
-GAME( 1998, a51site4a,a51site4,	mediagx, mediagx, mediagx_state, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", GAME_NOT_WORKING )
+GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", GAME_NOT_WORKING )
+GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", GAME_NOT_WORKING )

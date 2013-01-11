@@ -7,7 +7,7 @@
 
 #include "emu.h"
 
-#define MCFG_K053250_ADD(_tag, screen_tag, offx, offy)	\
+#define MCFG_K053250_ADD(_tag, screen_tag, offx, offy)  \
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \
 	k053250_t::static_set_screen_tag(*device, screen_tag); \
 	k053250_t::static_set_offsets(*device, offx, offy);
@@ -47,11 +47,10 @@ private:
 	void unpack_nibbles();
 	void dma(int limiter);
 	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palette, UINT8 *source,
-								 const rectangle &cliprect, int linepos, int scroll, int zoom,
-								 UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri);
+									const rectangle &cliprect, int linepos, int scroll, int zoom,
+									UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri);
 };
 
 extern const device_type K053250;
 
 #endif
-

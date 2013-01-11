@@ -158,13 +158,13 @@ public:
 
 static const eeprom_interface eeprom_intf =
 {
-	6,				/* address bits */
-	16,				/* data bits */
-	"*110",			/*  read command */
-	"*101",			/* write command */
-	NULL,			/* erase command */
-	"*10000xxxx",	/* lock command */
-	"*10011xxxx"	/* unlock command */
+	6,              /* address bits */
+	16,             /* data bits */
+	"*110",         /*  read command */
+	"*101",         /* write command */
+	NULL,           /* erase command */
+	"*10000xxxx",   /* lock command */
+	"*10011xxxx"    /* unlock command */
 };
 
 
@@ -329,7 +329,7 @@ INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 }
 
 static INPUT_PORTS_START( pntnpuzl )
-	PORT_START("IN0")	/* fake inputs */
+	PORT_START("IN0")   /* fake inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 1) PORT_IMPULSE(1)
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )PORT_CHANGED_MEMBER(DEVICE_SELF, pntnpuzl_state,coin_inserted, 2) PORT_IMPULSE(1)

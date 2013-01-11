@@ -56,11 +56,11 @@ public:
 	int      m_scrollx;
 	int      m_scrollx_hi;
 	int      m_rotation_x;
-	int		 m_rotation_sign;
+	int      m_rotation_sign;
 	int      m_disable_roz;
 
 	/* misc */
-	int      m_nmimask;	// zerotrgt only
+	int      m_nmimask; // zerotrgt only
 
 	/* devices */
 	cpu_device *m_maincpu;
@@ -298,16 +298,16 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 		if (rot_val < -90) { rot_val = -90; }
 
 		/*
-        (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
-        */
+		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
+		*/
 		/*
-             1
-        0----|----0
-            -1
-             0
-        0----|----1
-             0
-        */
+		     1
+		0----|----0
+		    -1
+		     0
+		0----|----1
+		     0
+		*/
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
 		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
@@ -346,16 +346,16 @@ UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind1
 //      popmessage("%d %02x %02x", rot_val, m_rotation_sign, m_rotation_x);
 
 		/*
-        (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
-        */
+		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
+		*/
 		/*
-             1
-        0----|----0
-            -1
-             0
-        0----|----1
-             0
-        */
+		     1
+		0----|----0
+		    -1
+		     0
+		0----|----1
+		     0
+		*/
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
 		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
@@ -400,19 +400,19 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
 
 	switch (offset)
 	{
-		case 0:	m_scrolly = data; break;
-		case 1:	m_scrollx = data; break;
-		case 2:	m_bg_bank = (data & 0x30) << 4;
+		case 0: m_scrolly = data; break;
+		case 1: m_scrollx = data; break;
+		case 2: m_bg_bank = (data & 0x30) << 4;
 				m_bg_color_bank = (data & 7);
 				m_disable_roz = (data & 0x40);
 				m_bg_tilemap->mark_all_dirty();
 				break;
-		case 3:	m_rotation_sign = (data & 1);
+		case 3: m_rotation_sign = (data & 1);
 				flip_screen_set(!(data & 4));
 				m_scrolly_hi = (data & 0x30) << 4;
 				m_scrollx_hi = (data & 0xc0) << 2;
 				break;
-		case 4:	m_rotation_x = data; break;
+		case 4: m_rotation_x = data; break;
 	}
 }
 
@@ -425,18 +425,18 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 
 	switch(offset)
 	{
-		case 0:	m_scrolly = data; break;
-		case 1:	m_scrollx = data; break;
-		case 2:	m_bg_bank = (data & 0x01) << 8;
+		case 0: m_scrolly = data; break;
+		case 1: m_scrollx = data; break;
+		case 2: m_bg_bank = (data & 0x01) << 8;
 				m_bg_color_bank = (data & 6) >> 1;
 				m_bg_tilemap->mark_all_dirty();
 				break;
-		case 3:	m_rotation_sign = (data & 7);
+		case 3: m_rotation_sign = (data & 7);
 				m_disable_roz = (~data & 0x08);
 				m_scrolly_hi = (data & 0x30) << 4;
 				m_scrollx_hi = (data & 0xc0) << 2;
 				break;
-		case 4:	m_rotation_x = data; break;
+		case 4: m_rotation_x = data; break;
 	}
 }
 
@@ -753,13 +753,13 @@ INPUT_PORTS_END
 
 static const gfx_layout cntsteer_charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	0x200,
-	2,	/* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
+	2,  /* 2 bits per pixel */
+	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
 	{ 0, 1, 2, 3, 0x800*8+0, 0x800*8+1, 0x800*8+2, 0x800*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout zerotrgt_charlayout =
@@ -770,7 +770,7 @@ static const gfx_layout zerotrgt_charlayout =
 	{ 0,4 },
 	{ 0, 1, 2, 3, 1024*8*8+0, 1024*8*8+1, 1024*8*8+2, 1024*8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every tile takes 32 consecutive bytes */
+	8*8 /* every tile takes 32 consecutive bytes */
 };
 
 static const gfx_layout sprites =
@@ -789,13 +789,13 @@ static const gfx_layout tilelayout =
 {
 	16,16,
 	0x400,
-	3,	/* 3 bits per pixel */
+	3,  /* 3 bits per pixel */
 	{ RGN_FRAC(4,8)+4, 0, 4 },
 	{ 3, 2, 1, 0, 11, 10, 9 , 8, 19, 18, 17,16, 27, 26, 25, 24 },
 	{
-		RGN_FRAC(0,8)+0*8,	RGN_FRAC(1,8)+0*8, RGN_FRAC(2,8)+0*8, RGN_FRAC(3,8)+0*8,
-		RGN_FRAC(0,8)+4*8,	RGN_FRAC(1,8)+4*8, RGN_FRAC(2,8)+4*8, RGN_FRAC(3,8)+4*8,
-		RGN_FRAC(0,8)+8*8,	RGN_FRAC(1,8)+8*8, RGN_FRAC(2,8)+8*8, RGN_FRAC(3,8)+8*8,
+		RGN_FRAC(0,8)+0*8,  RGN_FRAC(1,8)+0*8, RGN_FRAC(2,8)+0*8, RGN_FRAC(3,8)+0*8,
+		RGN_FRAC(0,8)+4*8,  RGN_FRAC(1,8)+4*8, RGN_FRAC(2,8)+4*8, RGN_FRAC(3,8)+4*8,
+		RGN_FRAC(0,8)+8*8,  RGN_FRAC(1,8)+8*8, RGN_FRAC(2,8)+8*8, RGN_FRAC(3,8)+8*8,
 		RGN_FRAC(0,8)+12*8, RGN_FRAC(1,8)+12*8,RGN_FRAC(2,8)+12*8,RGN_FRAC(3,8)+12*8
 	},
 	8*16
@@ -803,15 +803,15 @@ static const gfx_layout tilelayout =
 
 static GFXDECODE_START( cntsteer )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 256 ) /* Only 1 used so far :/ */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,			  0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,		  0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( zerotrgt )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 256 ) /* Only 1 used so far :/ */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,			  0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,		  0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
 GFXDECODE_END
 
 /***************************************************************************/
@@ -881,11 +881,11 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MCFG_DEVICE_DISABLE()
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
@@ -929,15 +929,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
-	MCFG_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_ADD("subcpu", M6809, 2000000)       /* ? */
 	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
 
@@ -1113,7 +1113,7 @@ ROM_START( gekitsui )
 	ROM_LOAD( "ct00.1c",  0xe000, 0x2000,  CRC(ae091b6c) SHA1(8b3a1c0acbfa56f05bcf65677f85d70c8c9640d6) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "ct05", 0x00000, 0x4000, CRC(b9e997a1) SHA1(5891cb0984bf4a1ccd80ef338c47e3d5705a1331) )	/* Characters */
+	ROM_LOAD( "ct05", 0x00000, 0x4000, CRC(b9e997a1) SHA1(5891cb0984bf4a1ccd80ef338c47e3d5705a1331) )   /* Characters */
 
 	ROM_REGION( 0x18000, "gfx2", 0 ) /* Sprites */
 	ROM_LOAD( "ct02.14c", 0x00000, 0x8000, CRC(d2a0bb72) SHA1(ee060f8db0b1fa1ba1034bf94cf44ff6820660bd) )

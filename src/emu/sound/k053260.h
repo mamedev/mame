@@ -13,7 +13,7 @@
 
 struct k053260_interface {
 	const char *rgnoverride;
-	timer_expired_func irq;			/* called on SH1 complete cycle ( clock / 32 ) */
+	timer_expired_func irq;         /* called on SH1 complete cycle ( clock / 32 ) */
 };
 
 
@@ -21,7 +21,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( k053260_w );
 DECLARE_READ8_DEVICE_HANDLER( k053260_r );
 
 class k053260_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

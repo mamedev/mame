@@ -75,11 +75,11 @@ static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 //  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")	// color map ? something else .. only bits 1-3 are used
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")		// dsw ? something else ?
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")       // dsw ? something else ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP
-	AM_RANGE(0xc001, 0xc002) AM_WRITENOP				// bit 7 = strobe ($302)
+	AM_RANGE(0xc001, 0xc002) AM_WRITENOP                // bit 7 = strobe ($302)
 	AM_RANGE(0xc005, 0xc007) AM_WRITENOP
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 ADDRESS_MAP_END
@@ -199,7 +199,7 @@ void tattack_state::palette_init()
 static MACHINE_CONFIG_START( tattack, tattack_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)	/* 4 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
 
@@ -228,10 +228,10 @@ MACHINE_CONFIG_END
 
 ROM_START( tattack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom.9a",		0x0000, 0x1000, CRC(47120994) SHA1(b6e90abbc50cba77df4c0aaf50d1f97b99e33b6d) )
+	ROM_LOAD( "rom.9a",     0x0000, 0x1000, CRC(47120994) SHA1(b6e90abbc50cba77df4c0aaf50d1f97b99e33b6d) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "rom.6c",		0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
+	ROM_LOAD( "rom.6c",     0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
 
 ROM_END
 

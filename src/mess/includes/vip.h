@@ -13,10 +13,10 @@
 #include "sound/discrete.h"
 #include "video/cdp1861.h"
 
-#define SCREEN_TAG		"screen"
-#define CDP1802_TAG		"u1"
-#define CDP1861_TAG		"u2"
-#define DISCRETE_TAG	"discrete"
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "u1"
+#define CDP1861_TAG     "u2"
+#define DISCRETE_TAG    "discrete"
 
 
 class vip_state : public driver_device
@@ -24,25 +24,25 @@ class vip_state : public driver_device
 public:
 	vip_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_vdc(*this, CDP1861_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_beeper(*this, DISCRETE_TAG),
-		  m_byteio(*this, VIP_BYTEIO_PORT_TAG),
-		  m_exp(*this, VIP_EXPANSION_SLOT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_8000(1),
-		  m_vdc_int(CLEAR_LINE),
-		  m_vdc_dma_out(CLEAR_LINE),
-		  m_vdc_ef1(CLEAR_LINE),
-		  m_exp_int(CLEAR_LINE),
-		  m_exp_dma_out(CLEAR_LINE),
-		  m_exp_dma_in(CLEAR_LINE),
-		  m_byteio_ef3(CLEAR_LINE),
-		  m_byteio_ef4(CLEAR_LINE),
-		  m_exp_ef1(CLEAR_LINE),
-		  m_exp_ef3(CLEAR_LINE),
-		  m_exp_ef4(CLEAR_LINE)
+			m_maincpu(*this, CDP1802_TAG),
+			m_vdc(*this, CDP1861_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_beeper(*this, DISCRETE_TAG),
+			m_byteio(*this, VIP_BYTEIO_PORT_TAG),
+			m_exp(*this, VIP_EXPANSION_SLOT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_8000(1),
+			m_vdc_int(CLEAR_LINE),
+			m_vdc_dma_out(CLEAR_LINE),
+			m_vdc_ef1(CLEAR_LINE),
+			m_exp_int(CLEAR_LINE),
+			m_exp_dma_out(CLEAR_LINE),
+			m_exp_dma_in(CLEAR_LINE),
+			m_byteio_ef3(CLEAR_LINE),
+			m_byteio_ef4(CLEAR_LINE),
+			m_exp_ef1(CLEAR_LINE),
+			m_exp_ef3(CLEAR_LINE),
+			m_exp_ef4(CLEAR_LINE)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;

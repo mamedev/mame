@@ -83,18 +83,18 @@ the access to the video memory is unclear to me at the moment.
 #include "includes/dgn_beta.h"
 
 /* GCtrl bitmasks, infered from bits of Beta schematic */
-#define GCtrlWI		0x01
-#define GCtrlSWChar	0x02	/* Character set select */
-#define GCtrlHiLo	0x04	/* Hi/Lo res graphics, Hi=1, Lo=0 */
-#define GCtrlChrGfx	0x08	/* Character=1 / Graphics=0 */
-#define GCtrlControl	0x10	/* Control bit, sets direct drive mode */
-#define GCtrlFS		0x20	/* labeled F/S, not yet sure of function Fast or Slow scan ? */
-#define GCtrlAddrLines	0xC0	/* Top two address lines for text mode */
+#define GCtrlWI     0x01
+#define GCtrlSWChar 0x02    /* Character set select */
+#define GCtrlHiLo   0x04    /* Hi/Lo res graphics, Hi=1, Lo=0 */
+#define GCtrlChrGfx 0x08    /* Character=1 / Graphics=0 */
+#define GCtrlControl    0x10    /* Control bit, sets direct drive mode */
+#define GCtrlFS     0x20    /* labeled F/S, not yet sure of function Fast or Slow scan ? */
+#define GCtrlAddrLines  0xC0    /* Top two address lines for text mode */
 
-#define IsTextMode	(state->m_GCtrl & GCtrlChrGfx) ? 1 : 0					// Is this text mode ?
-#define IsGfx16 	((~state->m_GCtrl & GCtrlChrGfx) && (~state->m_GCtrl & GCtrlControl)) ? 1 : 0	// is this 320x256x16bpp mode
-#define IsGfx2		((state->m_GCtrl & GCtrlHiLo) && (~state->m_GCtrl & GCtrlFS)) ? 1 : 0		// Is this a 2 colour mode
-#define SWChar		(state->m_GCtrl & GCtrlSWChar)>>1					// Swchar bit
+#define IsTextMode  (state->m_GCtrl & GCtrlChrGfx) ? 1 : 0                  // Is this text mode ?
+#define IsGfx16     ((~state->m_GCtrl & GCtrlChrGfx) && (~state->m_GCtrl & GCtrlControl)) ? 1 : 0   // is this 320x256x16bpp mode
+#define IsGfx2      ((state->m_GCtrl & GCtrlHiLo) && (~state->m_GCtrl & GCtrlFS)) ? 1 : 0       // Is this a 2 colour mode
+#define SWChar      (state->m_GCtrl & GCtrlSWChar)>>1                   // Swchar bit
 
 static MC6845_UPDATE_ROW( dgnbeta_update_row )
 {
@@ -116,7 +116,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			/* We will extract the colours below, when we have decoded inverse */
 			/* to indicate a double height character */
 			int UnderLine=(attr & 0x40) >> 6; // Underline active
-			int	FlashChar=(attr & 0x80) >> 7; // Flashing char
+			int FlashChar=(attr & 0x80) >> 7; // Flashing char
 
 			// underline is active for character set 0, on character row 9
 			int ULActive=(UnderLine && (ra==9) && ~SWChar);
@@ -138,13 +138,13 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			/* Invert colours if invert is true */
 			if(!Invert)
 			{
-				fg	= (attr & 0x38) >> 3;
-				bg	= (attr & 0x07);
+				fg  = (attr & 0x38) >> 3;
+				bg  = (attr & 0x07);
 			}
 			else
 			{
-				bg	= (attr & 0x38) >> 3;
-				fg	= (attr & 0x07);
+				bg  = (attr & 0x38) >> 3;
+				fg  = (attr & 0x07);
 			}
 
 
@@ -178,7 +178,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 
 			UINT8 Lo = videoram[ offset ];
 			UINT8 Hi = videoram[ offset +1 ];
-			UINT16 Word	= (Hi<<8) | Lo;
+			UINT16 Word = (Hi<<8) | Lo;
 			int Red;
 			int Green;
 			int Blue;
@@ -192,10 +192,10 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			/* palate register */
 			if (IsGfx16)
 			{
-				Intense	=(Lo & 0x0F);
-				Red	=(Lo & 0xF0)>>4;
-				Green	=(Hi & 0x0F);
-				Blue	=(Hi & 0xF0)>>4;
+				Intense =(Lo & 0x0F);
+				Red =(Lo & 0xF0)>>4;
+				Green   =(Hi & 0x0F);
+				Blue    =(Hi & 0xF0)>>4;
 				Colour=((Intense&0x08) | (Red&0x08)>>1) | ((Green&0x08)>>2) | ((Blue&0x08)>>3);
 
 				for (Dot=0;Dot<4;Dot++)
@@ -205,10 +205,10 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 					*p = palette[Colour]; p++;
 					*p = palette[Colour]; p++;
 
-					Intense	=Intense<<1;
-					Red	=Red<<1;
-					Green	=Green<<1;
-					Blue	=Blue<<1;
+					Intense =Intense<<1;
+					Red =Red<<1;
+					Green   =Green<<1;
+					Blue    =Blue<<1;
 				}
 			}
 			else if (IsGfx2)
@@ -248,8 +248,8 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_vsync_changed)
 		m_FlashCount++;
 		if(m_FlashCount==10)
 		{
-			m_FlashCount=0;			// Reset counter
-			m_FlashBit=(!m_FlashBit) & 0x01;	// Invert flash bit.
+			m_FlashCount=0;         // Reset counter
+			m_FlashBit=(!m_FlashBit) & 0x01;    // Invert flash bit.
 		}
 	}
 
@@ -296,5 +296,5 @@ void dgnbeta_vid_set_gctrl(running_machine &machine, int data)
 /* Write handler for colour, pallate ram */
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_colour_ram_w)
 {
-	m_ColourRAM[offset]=data&0x0f;			/* Colour ram 4 bit and write only to CPU */
+	m_ColourRAM[offset]=data&0x0f;          /* Colour ram 4 bit and write only to CPU */
 }

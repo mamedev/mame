@@ -29,35 +29,35 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define ABC800_X01	XTAL_12MHz
-#define ABC806_X02	XTAL_32_768kHz
+#define ABC800_X01  XTAL_12MHz
+#define ABC806_X02  XTAL_32_768kHz
 
-#define ABC802_AT0	0x01
-#define ABC802_AT1	0x02
-#define ABC802_ATD	0x40
-#define ABC802_ATE	0x80
-#define ABC802_INV	0x80
+#define ABC802_AT0  0x01
+#define ABC802_AT1  0x02
+#define ABC802_ATD  0x40
+#define ABC802_ATE  0x80
+#define ABC802_INV  0x80
 
-#define ABC800C_CHAR_RAM_SIZE	0x400
-#define ABC800M_CHAR_RAM_SIZE	0x800
-#define ABC800_VIDEO_RAM_SIZE	0x4000
-#define ABC802_CHAR_RAM_SIZE	0x800
-#define ABC806_CHAR_RAM_SIZE	0x800
-#define ABC806_ATTR_RAM_SIZE	0x800
-#define ABC806_VIDEO_RAM_SIZE	0x20000
+#define ABC800C_CHAR_RAM_SIZE   0x400
+#define ABC800M_CHAR_RAM_SIZE   0x800
+#define ABC800_VIDEO_RAM_SIZE   0x4000
+#define ABC802_CHAR_RAM_SIZE    0x800
+#define ABC806_CHAR_RAM_SIZE    0x800
+#define ABC806_ATTR_RAM_SIZE    0x800
+#define ABC806_VIDEO_RAM_SIZE   0x20000
 
-#define ABC800_CHAR_WIDTH	6
-#define ABC800_CCLK			ABC800_X01/ABC800_CHAR_WIDTH
+#define ABC800_CHAR_WIDTH   6
+#define ABC800_CCLK         ABC800_X01/ABC800_CHAR_WIDTH
 
-#define SCREEN_TAG			"screen"
-#define Z80_TAG				"z80"
-#define E0516_TAG			"j13"
-#define MC6845_TAG			"b12"
-#define SAA5052_TAG			"5c"
-#define Z80CTC_TAG			"z80ctc"
-#define Z80SIO_TAG			"z80sio"
-#define Z80DART_TAG			"z80dart"
-#define DISCRETE_TAG		"discrete"
+#define SCREEN_TAG          "screen"
+#define Z80_TAG             "z80"
+#define E0516_TAG           "j13"
+#define MC6845_TAG          "b12"
+#define SAA5052_TAG         "5c"
+#define Z80CTC_TAG          "z80ctc"
+#define Z80SIO_TAG          "z80sio"
+#define Z80DART_TAG         "z80dart"
+#define DISCRETE_TAG        "discrete"
 
 
 //**************************************************************************
@@ -71,22 +71,22 @@ class abc800_state : public driver_device
 public:
 	abc800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_dart(*this, Z80DART_TAG),
-		  m_sio(*this, Z80SIO_TAG),
-		  m_discrete(*this, "discrete"),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_video_ram(*this, "video_ram"),
-		  m_char_ram(*this, "char_ram"),
-		  m_ctc_z0(0),
-		  m_sio_rxdb(1),
-		  m_sio_txcb(0),
-		  m_sio_txdb(1),
-		  m_sio_rtsb(1),
-		  m_dfd_out(0),
-		  m_tape_ctr(4)
+			m_maincpu(*this, Z80_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_dart(*this, Z80DART_TAG),
+			m_sio(*this, Z80SIO_TAG),
+			m_discrete(*this, "discrete"),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_char_ram(*this, "char_ram"),
+			m_ctc_z0(0),
+			m_sio_rxdb(1),
+			m_sio_txcb(0),
+			m_sio_txdb(1),
+			m_sio_rtsb(1),
+			m_dfd_out(0),
+			m_tape_ctr(4)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -130,18 +130,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
 
 	// cpu state
-	int m_fetch_charram;			// opcode fetched from character RAM region (0x7800-0x7fff)
+	int m_fetch_charram;            // opcode fetched from character RAM region (0x7800-0x7fff)
 
 	// video state
 	optional_shared_ptr<UINT8> m_video_ram;
 	optional_shared_ptr<UINT8> m_char_ram;
-	const UINT8 *m_char_rom;		// character generator ROM
-	const UINT8 *m_fgctl_prom;		// foreground control PROM
-	UINT8 m_hrs;					// HR picture start scanline
-	UINT8 m_fgctl;					// HR foreground control
+	const UINT8 *m_char_rom;        // character generator ROM
+	const UINT8 *m_fgctl_prom;      // foreground control PROM
+	UINT8 m_hrs;                    // HR picture start scanline
+	UINT8 m_fgctl;                  // HR foreground control
 
 	// sound state
-	int m_pling;					// pling
+	int m_pling;                    // pling
 
 	// serial state
 	UINT8 m_sb;
@@ -165,7 +165,7 @@ class abc800m_state : public abc800_state
 public:
 	abc800m_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
-		  m_crtc(*this, MC6845_TAG)
+			m_crtc(*this, MC6845_TAG)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -184,7 +184,7 @@ class abc800c_state : public abc800_state
 public:
 	abc800c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
-		  m_trom(*this, SAA5052_TAG)
+			m_trom(*this, SAA5052_TAG)
 	{ }
 
 	required_device<saa5052_device> m_trom;
@@ -207,8 +207,8 @@ class abc802_state : public abc800_state
 public:
 	abc802_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
-		  m_crtc(*this, MC6845_TAG),
-		  m_abc77(*this, ABC77_TAG)
+			m_crtc(*this, MC6845_TAG),
+			m_abc77(*this, ABC77_TAG)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -230,14 +230,14 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 
 	// cpu state
-	int m_lrs;					// low RAM select
+	int m_lrs;                  // low RAM select
 
 	// video state
-	const UINT8 *m_char_rom;	// character generator ROM
+	const UINT8 *m_char_rom;    // character generator ROM
 
-	int m_flshclk_ctr;			// flash clock counter
-	int m_flshclk;				// flash clock
-	int m_80_40_mux;			// 40/80 column mode
+	int m_flshclk_ctr;          // flash clock counter
+	int m_flshclk;              // flash clock
+	int m_80_40_mux;            // 40/80 column mode
 };
 
 
@@ -248,9 +248,9 @@ class abc806_state : public abc800_state
 public:
 	abc806_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
-		  m_crtc(*this, MC6845_TAG),
-		  m_rtc(*this, E0516_TAG),
-		  m_abc77(*this, ABC77_TAG)
+			m_crtc(*this, MC6845_TAG),
+			m_rtc(*this, E0516_TAG),
+			m_abc77(*this, ABC77_TAG)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -285,30 +285,30 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 
 	// memory state
-	int m_keydtr;				// keyboard DTR
-	int m_eme;					// extended memory enable
-	int m_fetch_charram;		// opcode fetched from character RAM region (0x7800-0x7fff)
-	UINT8 m_map[16];			// memory page register
+	int m_keydtr;               // keyboard DTR
+	int m_eme;                  // extended memory enable
+	int m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
+	UINT8 m_map[16];            // memory page register
 
 	// video state
-	UINT8 *m_color_ram;			// attribute RAM
-	const UINT8 *m_rad_prom;	// line address PROM
-	const UINT8 *m_hru2_prom;	// HR palette PROM
-	const UINT8 *m_char_rom;	// character generator ROM
+	UINT8 *m_color_ram;         // attribute RAM
+	const UINT8 *m_rad_prom;    // line address PROM
+	const UINT8 *m_hru2_prom;   // HR palette PROM
+	const UINT8 *m_char_rom;    // character generator ROM
 
-	int m_txoff;				// text display enable
-	int m_40;					// 40/80 column mode
-	int m_flshclk_ctr;			// flash clock counter
-	int m_flshclk;				// flash clock
-	UINT8 m_attr_data;			// attribute data latch
-	UINT8 m_hrs;				// HR memory mapping
-	UINT8 m_hrc[16];			// HR palette
-	UINT8 m_sync;				// line synchronization delay
-	UINT8 m_v50_addr;			// vertical sync PROM address
-	int m_hru2_a8;				// HRU II PROM address line 8
-	UINT32 m_vsync_shift;		// vertical sync shift register
-	int m_vsync;				// vertical sync
-	int m_d_vsync;				// delayed vertical sync
+	int m_txoff;                // text display enable
+	int m_40;                   // 40/80 column mode
+	int m_flshclk_ctr;          // flash clock counter
+	int m_flshclk;              // flash clock
+	UINT8 m_attr_data;          // attribute data latch
+	UINT8 m_hrs;                // HR memory mapping
+	UINT8 m_hrc[16];            // HR palette
+	UINT8 m_sync;               // line synchronization delay
+	UINT8 m_v50_addr;           // vertical sync PROM address
+	int m_hru2_a8;              // HRU II PROM address line 8
+	UINT32 m_vsync_shift;       // vertical sync shift register
+	int m_vsync;                // vertical sync
+	int m_d_vsync;              // delayed vertical sync
 };
 
 

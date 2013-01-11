@@ -55,11 +55,11 @@ Standard dm01 memorymap
 struct bfmdm01
 {
 	const bfmdm01_interface *intf;
-	int		 data_avail,
-		        control,
-			  xcounter,
+	int      data_avail,
+				control,
+				xcounter,
 		segbuffer[65],
-				  busy;
+					busy;
 
 UINT8 scanline[DM_BYTESPERROW],
 		comdata;
@@ -105,7 +105,7 @@ static WRITE8_HANDLER( control_w )
 	dm01.control = data;
 
 	if ( changed & 2 )
-	{	// reset horizontal counter
+	{   // reset horizontal counter
 		if ( !(data & 2) )
 		{
 			//int offset = 0;
@@ -116,8 +116,8 @@ static WRITE8_HANDLER( control_w )
 
 	if ( changed & 8 )
 	{ // bit 3 changed = BUSY line
-		if ( data & 8 )	  dm01.busy = 0;
-		else			  dm01.busy = 1;
+		if ( data & 8 )   dm01.busy = 0;
+		else              dm01.busy = 1;
 
 		dm01.intf->busy_func(space.machine(),dm01.busy);
 	}
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( mux_w )
 	}
 	if ( dm01.xcounter == 9 )
 	{
-    	int row = ((0xFF^data) & 0x7C) >> 2;	// 7C = 000001111100
+		int row = ((0xFF^data) & 0x7C) >> 2;    // 7C = 000001111100
 		dm01.scanline[8] &= 0x80;//filter all other bits
 		if ( (row >= 0)  && (row < DM_MAXLINES) )
 		{
@@ -185,7 +185,7 @@ static READ8_HANDLER( comm_r )
 		#ifdef UNUSED_FUNCTION
 		if ( dm01.data_avail() )
 		{
-			cpu_set_irq_line(1, M6809_IRQ_LINE, ASSERT_LINE );	// trigger IRQ
+			cpu_set_irq_line(1, M6809_IRQ_LINE, ASSERT_LINE );  // trigger IRQ
 		}
 		#endif
 	}
@@ -215,12 +215,12 @@ static WRITE8_HANDLER( unknown_w )
 ///////////////////////////////////////////////////////////////////////////
 
 ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8, driver_device )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM								// 8k RAM
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE_LEGACY(control_r, control_w)	// control reg
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE_LEGACY(mux_r,mux_w)			// mux
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(comm_r,comm_w)		//
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE_LEGACY(unknown_r,unknown_w)	// ???
-	AM_RANGE(0x4000, 0xFfff) AM_ROM								// 48k  ROM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM                             // 8k RAM
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE_LEGACY(control_r, control_w)  // control reg
+	AM_RANGE(0x2800, 0x2800) AM_READWRITE_LEGACY(mux_r,mux_w)           // mux
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(comm_r,comm_w)     //
+	AM_RANGE(0x3800, 0x3800) AM_READWRITE_LEGACY(unknown_r,unknown_w)   // ???
+	AM_RANGE(0x4000, 0xFfff) AM_ROM                             // 48k  ROM
 ADDRESS_MAP_END
 
 ///////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ void BFM_dm01_writedata(running_machine &machine, UINT8 data)
 	dm01.comdata = data;
 	dm01.data_avail = 1;
 
-  //pulse IRQ line
+	//pulse IRQ line
 	machine.device("matrix")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE ); // trigger IRQ
 }
 

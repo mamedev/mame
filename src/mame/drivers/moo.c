@@ -56,13 +56,13 @@ Bucky:
 
 static const eeprom_interface eeprom_intf =
 {
-	7,			/* address bits */
-	8,			/* data bits */
-	"011000",		/* read command */
-	"011100",		/* write command */
-	"0100100000000",	/* erase command */
-	"0100000000000",	/* lock command */
-	"0100110000000" 	/* unlock command */
+	7,          /* address bits */
+	8,          /* data bits */
+	"011000",       /* read command */
+	"011100",       /* write command */
+	"0100100000000",    /* erase command */
+	"0100000000000",    /* lock command */
+	"0100110000000"     /* unlock command */
 };
 
 READ16_MEMBER(moo_state::control2_r)
@@ -131,7 +131,7 @@ INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
 		moo_objdma(machine(), m_game_type);
 
 		// schedule DMA end interrupt (delay shortened to catch up with V-blank)
-        m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
+		m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
 	}
 
 	// trigger V-blank interrupt
@@ -144,7 +144,7 @@ INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
 	moo_objdma(machine(), m_game_type);
 
 	// schedule DMA end interrupt (delay shortened to catch up with V-blank)
-    m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
+	m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
 
 	// trigger V-blank interrupt
 	device.execute().set_input_line(5, HOLD_LINE);
@@ -219,7 +219,7 @@ WRITE16_MEMBER(moo_state::moo_prot_w)
 
 	COMBINE_DATA(&m_protram[offset]);
 
-	if (offset == 0xc)	// trigger operation
+	if (offset == 0xc)  // trigger operation
 	{
 		src1 = (m_protram[1] & 0xff) << 16 | m_protram[0];
 		src2 = (m_protram[3] & 0xff) << 16 | m_protram[2];
@@ -257,27 +257,27 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)		/* K054338 alpha blending engine */
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)      /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)					/* CCU regs (ignored) */
+	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)                  /* CCU regs (ignored) */
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM							/* sound regs fall through */
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)		/* VSCCS regs */
+	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM                         /* sound regs fall through */
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)        /* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_SHARE("workram")		/* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_SHARE("spriteram")	/* Sprite RAM */
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes */
-	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")     /* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_SHARE("spriteram")   /* Sprite RAM */
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  /* Graphic planes */
+	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  /* Graphic planes mirror */
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)   /* Passthrough to tile roms */
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD_LEGACY("k056832", k056832_word_r)
@@ -292,11 +292,11 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
-	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READNOP						/* heck if I know, but it's polled constantly */
+	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READNOP                     /* heck if I know, but it's polled constantly */
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)       /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY		            /* CCU regs (ignored) */
+	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY                   /* CCU regs (ignored) */
 	AM_RANGE(0x0d6ffc, 0x0d6ffd) AM_WRITE(moobl_oki_bank_w)
 	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)     /* VSCCS regs */
@@ -306,44 +306,44 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")		 /* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_SHARE("spriteram")	 /* Sprite RAM */
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")      /* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_SHARE("spriteram")    /* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w) /* Graphic planes */
-	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
+	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  /* Graphic planes mirror */
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)   /* Passthrough to tile roms */
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_SHARE("spriteram")	/* Sprite RAM */
-	AM_RANGE(0x0a0000, 0x0affff) AM_RAM							/* extra sprite RAM? */
+	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_SHARE("spriteram")   /* Sprite RAM */
+	AM_RANGE(0x0a0000, 0x0affff) AM_RAM                         /* extra sprite RAM? */
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)		/* K054338 alpha blending engine */
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)      /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)					/* CCU regs (ignored) */
+	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)                  /* CCU regs (ignored) */
 	AM_RANGE(0x0d2000, 0x0d20ff) AM_DEVREADWRITE_LEGACY("k054000", k054000_lsb_r, k054000_lsb_w)
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM							/* sound regs fall through */
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)		/* VSCCS regs */
+	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM                         /* sound regs fall through */
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)        /* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
-	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes */
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
-	AM_RANGE(0x184000, 0x187fff) AM_RAM							/* extra tile RAM? */
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)	/* Passthrough to tile roms */
+	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  /* Graphic planes */
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  /* Graphic planes mirror */
+	AM_RANGE(0x184000, 0x187fff) AM_RAM                         /* extra tile RAM? */
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)   /* Passthrough to tile roms */
 	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
-	AM_RANGE(0x200000, 0x23ffff) AM_ROM							/* data */
+	AM_RANGE(0x200000, 0x23ffff) AM_ROM                         /* data */
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD_LEGACY("k056832", k056832_word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)
@@ -378,16 +378,16 @@ static INPUT_PORTS_START( moo )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output")		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output")       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism") 		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism")         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "Common")
 	PORT_DIPSETTING(    0x00, "Independent")
-	PORT_DIPNAME( 0xc0, 0x80, "Number of Players")		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0xc0, 0x80, "Number of Players")      PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0xc0, "2")
 	PORT_DIPSETTING(    0x40, "3")
 	PORT_DIPSETTING(    0x80, "4")
@@ -438,7 +438,7 @@ MACHINE_START_MEMBER(moo_state,moo)
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_protram));
 
-    m_dmaend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(moo_state::dmaend_callback),this));
+	m_dmaend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(moo_state::dmaend_callback),this));
 }
 
 MACHINE_RESET_MEMBER(moo_state,moo)
@@ -529,7 +529,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))	 // should give IRQ4 sufficient time to update scroll registers
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))   // should give IRQ4 sufficient time to update scroll registers
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_DERIVED( bucky, moo )
 	MCFG_K054000_ADD("k054000")
 
 	MCFG_DEVICE_REMOVE("k053246")
-	MCFG_K053247_ADD("k053246", bucky_k053247_intf)		// diff x offset
+	MCFG_K053247_ADD("k053246", bucky_k053247_intf)     // diff x offset
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
@@ -612,8 +612,8 @@ MACHINE_CONFIG_END
 ROM_START( moomesa ) /* Version EA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
-	ROM_LOAD16_BYTE( "151eab02.q6", 0x000001, 0x40000, CRC(37b30c01) SHA1(cb91739097a4a36f8f8d92998d822ffc851e1279) )	/* EAB */
+	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )   /* B */
+	ROM_LOAD16_BYTE( "151eab02.q6", 0x000001, 0x40000, CRC(37b30c01) SHA1(cb91739097a4a36f8f8d92998d822ffc851e1279) )   /* EAB */
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
@@ -647,8 +647,8 @@ ROM_END
 ROM_START( moomesauac ) /* Version UA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151c01.q5",   0x000000, 0x40000, CRC(10555732) SHA1(b67cb756c250ddd6f3291683b3f3449e13a2ee83) )	/* C */
-	ROM_LOAD16_BYTE( "151uac02.q6", 0x000001, 0x40000, CRC(52ae87b0) SHA1(552d41a2ddd040f92c6a3cfdc07f9d6e751ac9c1) )	/* UAC */
+	ROM_LOAD16_BYTE( "151c01.q5",   0x000000, 0x40000, CRC(10555732) SHA1(b67cb756c250ddd6f3291683b3f3449e13a2ee83) )   /* C */
+	ROM_LOAD16_BYTE( "151uac02.q6", 0x000001, 0x40000, CRC(52ae87b0) SHA1(552d41a2ddd040f92c6a3cfdc07f9d6e751ac9c1) )   /* UAC */
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
@@ -682,8 +682,8 @@ ROM_END
 ROM_START( moomesauab ) /* Version UA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
-	ROM_LOAD16_BYTE( "151uab02.q6", 0x000001, 0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )	/* UAB */
+	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )   /* B */
+	ROM_LOAD16_BYTE( "151uab02.q6", 0x000001, 0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )   /* UAB */
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
@@ -717,8 +717,8 @@ ROM_END
 ROM_START( moomesaaab ) /* Version AA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
-	ROM_LOAD16_BYTE( "151aab02.q6", 0x000001, 0x40000, CRC(2162d593) SHA1(a6cfe4a57b3f22b2aa0f04f91acefe3b7bea9e76) )	/* AAB */
+	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )   /* B */
+	ROM_LOAD16_BYTE( "151aab02.q6", 0x000001, 0x40000, CRC(2162d593) SHA1(a6cfe4a57b3f22b2aa0f04f91acefe3b7bea9e76) )   /* AAB */
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03.t5", 0x100000, 0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
@@ -752,8 +752,8 @@ ROM_END
 ROM_START( bucky ) /* Version EA */
 	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "173eab01.q5", 0x000000, 0x40000, CRC(7785ac8a) SHA1(ef78d14f54d3a0b724b9702a18c67891e2d366a7) )	/* EAB */
-	ROM_LOAD16_BYTE( "173eab02.q6", 0x000001, 0x40000, CRC(9b45f122) SHA1(325af1612e6f90ef9ae9353c43dc645be1f3465c) )	/* EAB */
+	ROM_LOAD16_BYTE( "173eab01.q5", 0x000000, 0x40000, CRC(7785ac8a) SHA1(ef78d14f54d3a0b724b9702a18c67891e2d366a7) )   /* EAB */
+	ROM_LOAD16_BYTE( "173eab02.q6", 0x000001, 0x40000, CRC(9b45f122) SHA1(325af1612e6f90ef9ae9353c43dc645be1f3465c) )   /* EAB */
 
 	/* data */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
@@ -788,8 +788,8 @@ ROM_END
 ROM_START( buckyuab ) /* Version UA */
 	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "173uab01.q5", 0x000000, 0x40000, CRC(dcaecca0) SHA1(c41847c9d89cdaf7cfa81ad9cc018c32592a882f) )	/* UAB */
-	ROM_LOAD16_BYTE( "173uab02.q6", 0x000001, 0x40000, CRC(e3c856a6) SHA1(33cc8a29643e44b31ee280015c0c994bed72a0e3) )	/* UAB */
+	ROM_LOAD16_BYTE( "173uab01.q5", 0x000000, 0x40000, CRC(dcaecca0) SHA1(c41847c9d89cdaf7cfa81ad9cc018c32592a882f) )   /* UAB */
+	ROM_LOAD16_BYTE( "173uab02.q6", 0x000001, 0x40000, CRC(e3c856a6) SHA1(33cc8a29643e44b31ee280015c0c994bed72a0e3) )   /* UAB */
 
 	/* data */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
@@ -824,8 +824,8 @@ ROM_END
 ROM_START( buckyaab ) /* Version AA */
 	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "173aab01.q5", 0x000000, 0x40000, CRC(9193e89f) SHA1(574d6eb4097cd10c3dea99060ee09f220d41f1dc) )	/* AAB */
-	ROM_LOAD16_BYTE( "173aab02.q6", 0x000001, 0x40000, CRC(2567f3eb) SHA1(ccdb2a4b3ad1464f70d1442df8a3a7a7e34f6cd7) )	/* AAB */
+	ROM_LOAD16_BYTE( "173aab01.q5", 0x000000, 0x40000, CRC(9193e89f) SHA1(574d6eb4097cd10c3dea99060ee09f220d41f1dc) )   /* AAB */
+	ROM_LOAD16_BYTE( "173aab02.q6", 0x000001, 0x40000, CRC(2567f3eb) SHA1(ccdb2a4b3ad1464f70d1442df8a3a7a7e34f6cd7) )   /* AAB */
 
 	/* data */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
@@ -922,7 +922,7 @@ GAME( 1992, moomesa,    0,       moo,     moo, moo_state,     moo,      ROT0, "K
 GAME( 1992, moomesauac, moomesa, moo,     moo, moo_state,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1992, moomesauab, moomesa, moo,     moo, moo_state,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1992, moomesaaab, moomesa, moo,     moo, moo_state,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1992, moomesabl,  moomesa, moobl,   moo, moo_state,     moo,      ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )	// based on Version AA
+GAME( 1992, moomesabl,  moomesa, moobl,   moo, moo_state,     moo,      ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // based on Version AA
 GAME( 1992, bucky,      0,       bucky,   bucky, moo_state,   moo,      ROT0, "Konami", "Bucky O'Hare (ver EAB)", GAME_SUPPORTS_SAVE )
 GAME( 1992, buckyuab,   bucky,   bucky,   bucky, moo_state,   moo,      ROT0, "Konami", "Bucky O'Hare (ver UAB)", GAME_SUPPORTS_SAVE )
 GAME( 1992, buckyaab,   bucky,   bucky,   bucky, moo_state,   moo,      ROT0, "Konami", "Bucky O'Hare (ver AAB)", GAME_SUPPORTS_SAVE )

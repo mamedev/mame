@@ -75,7 +75,7 @@ class at586_state : public driver_device
 {
 public:
 	at586_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)	{ }
+		: driver_device(mconfig, type, tag) { }
 };
 
 class at_state : public driver_device

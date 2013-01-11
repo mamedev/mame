@@ -163,10 +163,10 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 	memset(weights_g, 0, sizeof(weights_g));
 	memset(weights_b, 0, sizeof(weights_b));
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistors_txt_rg,	weights_txt_rg,	470,	0,
-			2,	resistors_txt_b,	weights_txt_b,	470,	0,
-			0,	0,	0,	0,	0	);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistors_txt_rg,   weights_txt_rg, 470,    0,
+			2,  resistors_txt_b,    weights_txt_b,  470,    0,
+			0,  0,  0,  0,  0   );
 
 	/* create text palette */
 
@@ -206,8 +206,8 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 	/* create background/sprites palette */
 
 	/* find the output scaler
-       in order to do this we need to calculate the output with everything enabled.
-    */
+	   in order to do this we need to calculate the output with everything enabled.
+	*/
 
 	/* red component */
 	for (i=0; i<6; i++) active_resistors_r[ 0+i] = resistors_0[i];
@@ -222,10 +222,10 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 	for (i=0; i<6; i++) active_resistors_b[ 6+i] = resistors_2[i];
 
 	/* calculate and store the scaler */
-    /*output_scaler = */compute_resistor_weights(0, 255,    -1.0,
-                3*6,    active_resistors_r, weights_r,  470,    0,
-                3*6,    active_resistors_g, weights_g,  470,    0,
-                2*6,    active_resistors_b, weights_b,  470,    0);
+	/*output_scaler = */compute_resistor_weights(0, 255,    -1.0,
+				3*6,    active_resistors_r, weights_r,  470,    0,
+				3*6,    active_resistors_g, weights_g,  470,    0,
+				2*6,    active_resistors_b, weights_b,  470,    0);
 
 /*  compute_resistor_weights(0, 255,    output_scaler,
                 3*6,    active_resistors_r, weights_r,  470,    0,
@@ -240,8 +240,8 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 
 		for (sh=0; sh<0x40; sh++)
 		{
-			int j     = i;			/* active low */
-			int shade = sh^0x3f;	/* negated outputs */
+			int j     = i;          /* active low */
+			int shade = sh^0x3f;    /* negated outputs */
 
 			int bits_r[3*6];
 			int bits_g[3*6];
@@ -270,61 +270,61 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 			//j &= 0x7; /* only red; debug */
 
 			/* red component */
-			if ((j >> 0) & 0x01)	/* if LS368 @E9  is disabled */
+			if ((j >> 0) & 0x01)    /* if LS368 @E9  is disabled */
 			{
 				for (c=0; c<6; c++) bits_r[0 +c] = 0;
 				//active_r-=6;
 			}
-			if ((j >> 1) & 0x01)	/* if LS368 @E10 is disabled */
+			if ((j >> 1) & 0x01)    /* if LS368 @E10 is disabled */
 			{
 				for (c=0; c<6; c++) bits_r[6 +c] = 0;
 				//active_r-=6;
 			}
-			if ((j >> 2) & 0x01)	/* if LS368 @E11 is disabled */
+			if ((j >> 2) & 0x01)    /* if LS368 @E11 is disabled */
 			{
 				for (c=0; c<6; c++) bits_r[12 +c] = 0;
 				//active_r-=6;
 			}
 
 			/* green component */
-			if ((j >> 3) & 0x01)	/* if LS368 @E12 is disabled */
+			if ((j >> 3) & 0x01)    /* if LS368 @E12 is disabled */
 			{
 				for (c=0; c<6; c++) bits_g[0 +c] = 0;
 				//active_g-=6;
 			}
-			if ((j >> 4) & 0x01)	/* if LS368 @E13 is disabled */
+			if ((j >> 4) & 0x01)    /* if LS368 @E13 is disabled */
 			{
 				for (c=0; c<6; c++) bits_g[6 +c] = 0;
 				//active_g-=6;
 			}
-			if ((j >> 5) & 0x01)	/* if LS368 @E14 is disabled */
+			if ((j >> 5) & 0x01)    /* if LS368 @E14 is disabled */
 			{
 				for (c=0; c<6; c++) bits_g[12+c] = 0;
 				//active_g-=6;
 			}
 
 			/* blue component */
-			if ((j >> 6) & 0x01)	/* if LS368 @E15 is disabled */
+			if ((j >> 6) & 0x01)    /* if LS368 @E15 is disabled */
 			{
 				for (c=0; c<6; c++) bits_b[0 +c] = 0;
 				//active_b-=6;
 			}
-			if ((j >> 7) & 0x01)	/* if LS368 @E16 is disabled */
+			if ((j >> 7) & 0x01)    /* if LS368 @E16 is disabled */
 			{
 				for (c=0; c<6; c++) bits_b[6 +c] = 0;
 				//active_b-=6;
 			}
 
 			out = 0.0;
-			for (c=0; c<3*6; c++)	out += weights_r[c] * bits_r[c];
+			for (c=0; c<3*6; c++)   out += weights_r[c] * bits_r[c];
 			r = (int)(out + 0.5);
 
 			out = 0.0;
-			for (c=0; c<3*6; c++)	out += weights_g[c] * bits_g[c];
+			for (c=0; c<3*6; c++)   out += weights_g[c] * bits_g[c];
 			g = (int)(out + 0.5);
 
 			out = 0.0;
-			for (c=0; c<2*6; c++)	out += weights_b[c] * bits_b[c];
+			for (c=0; c<2*6; c++)   out += weights_b[c] * bits_b[c];
 			b = (int)(out + 0.5);
 
 			/*logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);*/
@@ -432,8 +432,8 @@ TIMER_CALLBACK_MEMBER(tubep_state::sprite_timer_callback)
 static void draw_sprite(running_machine &machine)
 {
 	tubep_state *state = machine.driver_data<tubep_state>();
-	UINT32	XDOT;
-	UINT32	YDOT;
+	UINT32  XDOT;
+	UINT32  YDOT;
 	UINT8 * romCxx  = state->memregion("user2")->base()+0x00000;
 	UINT8 * romD10  = romCxx+0x10000;
 	UINT8 * romEF13 = romCxx+0x12000;
@@ -446,7 +446,7 @@ static void draw_sprite(running_machine &machine)
 		UINT32 ls273_e12 = romD10[ state->m_romD_addr | YDOT ] & 0x7f;
 		UINT32 romEF_addr_now = state->m_romEF_addr | ls273_e12;
 		UINT32 E16_add_a = romEF13[ romEF_addr_now ] |
-						 ((romEF13[0x1000 + romEF_addr_now ]&0x0f)<<8);
+							((romEF13[0x1000 + romEF_addr_now ]&0x0f)<<8);
 		UINT32 F16_add_b = E16_add_a + state->m_E16_add_b;
 
 	/* lower part of the schematic */
@@ -506,54 +506,54 @@ WRITE8_MEMBER(tubep_state::tubep_sprite_control_w)
 		/*graph_ctrl[offset] = data;*/
 		switch(offset)
 		{
-		case 0:	/*a*/
+		case 0: /*a*/
 			m_romEF_addr = (0x010 | (data & 0x0f))<<7; /*roms @F13, @E13 have A11 lines connected to +5V directly */
 			m_HINV = (data & 0x10) ? 0xff: 0x00;
 			m_VINV = (data & 0x20) ? 0xff: 0x00;
 			break;
 
-		case 1:	/*b: XSize-1 */
+		case 1: /*b: XSize-1 */
 			m_XSize = data & 0x7f;
 			m_mark_2 = (data&0x80)<<1;
 			break;
 
-		case 2:	/*c: YSize-1 */
+		case 2: /*c: YSize-1 */
 			m_YSize = data & 0x7f;
 			m_mark_1 = (data&0x80)<<1;
 			break;
 
-		case 3:	/*d*/
+		case 3: /*d*/
 			m_ls273_g6 = (data & 0xff);
 			break;
 
-		case 4:	/*e*/
+		case 4: /*e*/
 			m_ls273_j6 = (data & 0xff);
 			break;
 
-		case 5:	/*f*/
+		case 5: /*f*/
 			m_romHI_addr_mid = (data & 0x0f)<<7;
 			m_romHI_addr_msb = (data & 0x30)<<7;
 			break;
 
-		case 6:	/*g*/
+		case 6: /*g*/
 			m_romD_addr = (data & 0x3f)<<7;
 			break;
 
-		case 7:	/*h: adder input LSB*/
+		case 7: /*h: adder input LSB*/
 			m_E16_add_b = ((data & 0xff) << 0) | (m_E16_add_b & 0xff00);
 			break;
 
-		case 8:	/*J: adder input MSB*/
+		case 8: /*J: adder input MSB*/
 			m_E16_add_b = ((data & 0xff) << 8) | (m_E16_add_b & 0x00ff);
 			break;
 
-		case 9:	/*K*/
+		case 9: /*K*/
 			/*write to: LS174 @J3 to set color bank (hi address lines to 2114 colorram @J1 ) */
 			m_colorram_addr_hi = (data & 0x3f) << 4;
 
 			/*write to: LS74 @D13 to clear the interrupt line /SINT
-            /SINT line will be reasserted in m_XSize * m_YSize cycles (RH0 signal cycles)
-            */
+			/SINT line will be reasserted in m_XSize * m_YSize cycles (RH0 signal cycles)
+			*/
 			/* 1.clear the /SINT interrupt line */
 			machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
@@ -589,7 +589,7 @@ UINT32 tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &bit
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect.min_y, cliprect.max_y+1); */
 
-	for (v = cliprect.min_y; v <= cliprect.max_y; v++)	/* only for current scanline */
+	for (v = cliprect.min_y; v <= cliprect.max_y; v++)  /* only for current scanline */
 	{
 		UINT32 h;
 		UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
@@ -690,10 +690,10 @@ PALETTE_INIT_MEMBER(tubep_state,rjammer)
 	double weights_rg[3];
 	double weights_b[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistors_rg,	weights_rg,	470,	0,
-			2,	resistors_b,	weights_b,	470,	0,
-			0,	0,	0,	0,	0	);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistors_rg,   weights_rg, 470,    0,
+			2,  resistors_b,    weights_b,  470,    0,
+			0,  0,  0,  0,  0   );
 
 	for (i = 0;i < machine().total_colors();i++)
 	{
@@ -747,7 +747,7 @@ UINT32 tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 &b
 	/* especially read from ROM19C can be done once per 8 pixels*/
 	/* and the data could be bitswapped beforehand */
 
-	for (v = cliprect.min_y; v <= cliprect.max_y; v++)	/* only for current scanline */
+	for (v = cliprect.min_y; v <= cliprect.max_y; v++)  /* only for current scanline */
 	{
 		UINT32 h;
 		UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
@@ -816,28 +816,28 @@ UINT32 tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 &b
 					pal14h4_pin18 = (rom19C[addr] >> ((h&7)^7) ) &1;
 
 					/*
-                        PAL14H4 @15A funct
+					    PAL14H4 @15A funct
 
-                        PIN6 = disable color on offscreen area
-                        PIN19,PIN18,PIN13 = arguments for PIN17 function
-                        PIN17 = background color bank (goes to A4 line on PROM @16A)
-                                formula for PIN17 is:
+					    PIN6 = disable color on offscreen area
+					    PIN19,PIN18,PIN13 = arguments for PIN17 function
+					    PIN17 = background color bank (goes to A4 line on PROM @16A)
+					            formula for PIN17 is:
 
-                                PIN17 =  ( PIN13 & PIN8 & PIN9 & !PIN11 &  PIN12 )
-                                       | ( PIN18 & PIN8 & PIN9 &  PIN11 & !PIN12 )
-                                       | ( PIN19 )
-                                where:
-                                PIN 8 = bit 3 of bg_data
-                                PIN 9 = bit 2 of bg_data
-                                PIN 11= bit 1 of bg_data
-                                PIN 12= bit 0 of bg_data
+					            PIN17 =  ( PIN13 & PIN8 & PIN9 & !PIN11 &  PIN12 )
+					                   | ( PIN18 & PIN8 & PIN9 &  PIN11 & !PIN12 )
+					                   | ( PIN19 )
+					            where:
+					            PIN 8 = bit 3 of bg_data
+					            PIN 9 = bit 2 of bg_data
+					            PIN 11= bit 1 of bg_data
+					            PIN 12= bit 0 of bg_data
 
-                        not used by now, but for the record:
+					    not used by now, but for the record:
 
-                        PIN15 = select prom @16B (active low)
-                        PIN16 = select prom @16A (active low)
-                        PINs: 1,2,3,4,5 and 7,14 are used for priority system
-                    */
+					    PIN15 = select prom @16B (active low)
+					    PIN16 = select prom @16A (active low)
+					    PINs: 1,2,3,4,5 and 7,14 are used for priority system
+					*/
 					color_bank =  (pal14h4_pin13 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) & (((bg_data&0x02)>>1)^1) &  (bg_data&0x01)    )
 								| (pal14h4_pin18 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) &  ((bg_data&0x02)>>1)    & ((bg_data&0x01)^1) )
 								| (pal14h4_pin19);

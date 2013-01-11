@@ -21,65 +21,65 @@
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 
-#define SCREEN_TAG				"screen"
+#define SCREEN_TAG              "screen"
 
-#define Z80_TAG					"u80"
-#define UPB8214_TAG				"u38"
-#define I8255A_DISP_TAG			"u79"
-#define I8255A_MISC_TAG			"u10"
-#define I8255A_RTC_TAG			"u36"
-#define I8251A_KB_TAG			"u85"
-#define I8251A_SIO_TAG			"u8"
-#define MSM58321RS_TAG			"u26"
-#define MB8877_TAG				"u13"
-#define FDC9216_TAG				"u25"
-#define M6502_TAG				"u76"
-#define I8255A_M6502_TAG		"u101"
-#define H46505_TAG				"u75"
-#define CENTRONICS_TAG			"centronics"
-#define TIMER_KB_TAG			"timer_kb"
-#define TIMER_SIO_TAG			"timer_sio"
-#define TIMER_ACK_TAG			"timer_ack"
-#define TIMER_RST_TAG			"timer_rst"
-#define SASIBUS_TAG				"sasi"
+#define Z80_TAG                 "u80"
+#define UPB8214_TAG             "u38"
+#define I8255A_DISP_TAG         "u79"
+#define I8255A_MISC_TAG         "u10"
+#define I8255A_RTC_TAG          "u36"
+#define I8251A_KB_TAG           "u85"
+#define I8251A_SIO_TAG          "u8"
+#define MSM58321RS_TAG          "u26"
+#define MB8877_TAG              "u13"
+#define FDC9216_TAG             "u25"
+#define M6502_TAG               "u76"
+#define I8255A_M6502_TAG        "u101"
+#define H46505_TAG              "u75"
+#define CENTRONICS_TAG          "centronics"
+#define TIMER_KB_TAG            "timer_kb"
+#define TIMER_SIO_TAG           "timer_sio"
+#define TIMER_ACK_TAG           "timer_ack"
+#define TIMER_RST_TAG           "timer_rst"
+#define SASIBUS_TAG             "sasi"
 
-#define V1050_VIDEORAM_SIZE		0x8000
-#define V1050_VIDEORAM_MASK		0x7fff
+#define V1050_VIDEORAM_SIZE     0x8000
+#define V1050_VIDEORAM_MASK     0x7fff
 
-#define INT_RS_232			0x01
-#define INT_WINCHESTER		0x02
-#define INT_KEYBOARD		0x04
-#define INT_FLOPPY			0x08
-#define INT_VSYNC			0x10
-#define INT_DISPLAY			0x20
-#define INT_EXPANSION_B		0x40
-#define INT_EXPANSION_A		0x80
+#define INT_RS_232          0x01
+#define INT_WINCHESTER      0x02
+#define INT_KEYBOARD        0x04
+#define INT_FLOPPY          0x08
+#define INT_VSYNC           0x10
+#define INT_DISPLAY         0x20
+#define INT_EXPANSION_B     0x40
+#define INT_EXPANSION_A     0x80
 
 class v1050_state : public driver_device
 {
 public:
 	v1050_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_subcpu(*this, M6502_TAG),
-		  m_pic(*this, UPB8214_TAG),
-		  m_rtc(*this, MSM58321RS_TAG),
-		  m_uart_kb(*this, I8251A_KB_TAG),
-		  m_uart_sio(*this, I8251A_SIO_TAG),
-		  m_fdc(*this, MB8877_TAG),
-		  m_crtc(*this, H46505_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, MB8877_TAG":0"),
-		  m_floppy1(*this, MB8877_TAG":1"),
-		  m_floppy2(*this, MB8877_TAG":2"),
-		  m_floppy3(*this, MB8877_TAG":3"),
-		  m_timer_sio(*this, TIMER_SIO_TAG),
-		  m_timer_ack(*this, TIMER_ACK_TAG),
-		  m_timer_rst(*this, TIMER_RST_TAG),
-		  m_sasibus(*this, SASIBUS_TAG ":host"),
-		  m_video_ram(*this, "video_ram"),
-		  m_attr_ram(*this, "attr_ram")
+			m_maincpu(*this, Z80_TAG),
+			m_subcpu(*this, M6502_TAG),
+			m_pic(*this, UPB8214_TAG),
+			m_rtc(*this, MSM58321RS_TAG),
+			m_uart_kb(*this, I8251A_KB_TAG),
+			m_uart_sio(*this, I8251A_SIO_TAG),
+			m_fdc(*this, MB8877_TAG),
+			m_crtc(*this, H46505_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, MB8877_TAG":0"),
+			m_floppy1(*this, MB8877_TAG":1"),
+			m_floppy2(*this, MB8877_TAG":2"),
+			m_floppy3(*this, MB8877_TAG":3"),
+			m_timer_sio(*this, TIMER_SIO_TAG),
+			m_timer_ack(*this, TIMER_ACK_TAG),
+			m_timer_rst(*this, TIMER_RST_TAG),
+			m_sasibus(*this, SASIBUS_TAG ":host"),
+			m_video_ram(*this, "video_ram"),
+			m_attr_ram(*this, "attr_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -147,27 +147,27 @@ public:
 	void scan_keyboard();
 
 	// interrupt state
-	UINT8 m_int_mask;			// interrupt mask
-	UINT8 m_int_state;			// interrupt status
-	int m_f_int_enb;			// floppy interrupt enable
+	UINT8 m_int_mask;           // interrupt mask
+	UINT8 m_int_state;          // interrupt status
+	int m_f_int_enb;            // floppy interrupt enable
 	bool m_fdc_irq;
 	bool m_fdc_drq;
 
 	// keyboard state
-	UINT8 m_keylatch;			// keyboard row select
+	UINT8 m_keylatch;           // keyboard row select
 	UINT8 m_keydata;
 	int m_keyavail;
 
 	// serial state
-	int m_rxrdy;				// receiver ready
-	int m_txrdy;				// transmitter ready
-	int m_baud_sel;				// baud select
+	int m_rxrdy;                // receiver ready
+	int m_txrdy;                // transmitter ready
+	int m_baud_sel;             // baud select
 
 	// memory state
-	UINT8 m_bank;				// bank register
+	UINT8 m_bank;               // bank register
 
 	// video state
-	UINT8 m_attr;				// attribute latch
+	UINT8 m_attr;               // attribute latch
 
 	// sasi state
 	UINT8 data_out;

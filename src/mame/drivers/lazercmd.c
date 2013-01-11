@@ -367,29 +367,29 @@ READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
 
 	switch (offset)
 	{
-		case 0: 			   /* player 1 joysticks */
+		case 0:                /* player 1 joysticks */
 			data = ioport("IN0")->read();
 			break;
-		case 1: 			   /* player 2 joysticks */
+		case 1:                /* player 2 joysticks */
 			data = ioport("IN1")->read();
 			break;
-		case 2: 			   /* player 1 + 2 buttons */
+		case 2:                /* player 1 + 2 buttons */
 			data = ioport("IN3")->read();
 			break;
-		case 3: 			   /* coin slot + start buttons */
+		case 3:                /* coin slot + start buttons */
 			data = ioport("IN2")->read();
 			break;
-		case 4: 			   /* vertical scan counter */
+		case 4:                /* vertical scan counter */
 			data = ((m_timer_count & 0x10) >> 1) | ((m_timer_count & 0x20) >> 3)
 						| ((m_timer_count & 0x40) >> 5) | ((m_timer_count & 0x80) >> 7);
 			break;
-		case 5: 			   /* vertical scan counter */
+		case 5:                /* vertical scan counter */
 			data = m_timer_count & 0x0f;
 			break;
-		case 6: 			   /* 1f02 readback */
+		case 6:                /* 1f02 readback */
 			data = m_marker_x;
 			break;
-		case 7: 			   /* 1f01 readback */
+		case 7:                /* 1f01 readback */
 			data = m_marker_y;
 			break;
 	}
@@ -575,13 +575,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8, 10,					/* 8*10 characters */
-	4*64,					/* 4 * 64 characters */
-	1,						/* 1 bit per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 10,                  /* 8*10 characters */
+	4*64,                   /* 4 * 64 characters */
+	1,                      /* 1 bit per pixel */
+	{ 0 },                  /* no bitplanes */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	10*8					/* every char takes 10 bytes */
+	10*8                    /* every char takes 10 bytes */
 };
 
 static GFXDECODE_START( lazercmd )
@@ -590,13 +590,13 @@ GFXDECODE_END
 
 void lazercmd_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
+	palette_set_color(machine(), 0, MAKE_RGB(0xb0, 0xb0, 0xb0));    /* white */
+	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));    /* black */
 
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
-	palette_set_color(machine(), 3, MAKE_RGB(0xb0, 0xb0, 0xb0));	/* white */
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0x00));    /* black */
+	palette_set_color(machine(), 3, MAKE_RGB(0xb0, 0xb0, 0xb0));    /* white */
 
-	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff));	/* bright white */
+	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff));    /* bright white */
 }
 
 
@@ -626,7 +626,7 @@ void lazercmd_state::machine_reset()
 static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
+	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)              /* 672 kHz? */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
@@ -660,7 +660,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
+	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)              /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
-						 0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
+							0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
 	MCFG_GFXDECODE(lazercmd)
@@ -694,7 +694,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
+	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)              /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
@@ -731,7 +731,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( lazercmd )
-	ROM_REGION( 0x0c00, "maincpu", ROMREGION_INVERT )			   /* 32K cpu, 4K for ROM/RAM */
+	ROM_REGION( 0x0c00, "maincpu", ROMREGION_INVERT )              /* 32K cpu, 4K for ROM/RAM */
 	ROM_LOAD_NIB_HIGH( "lc.e5",        0x0000, 0x0400, CRC(56dc7a40) SHA1(1324d5d6a44d7314723a0b5745d89f8e27f49d25) )
 	ROM_LOAD_NIB_LOW(  "lc.f5",        0x0000, 0x0400, CRC(fc5b38a4) SHA1(bff670d7b78c6b9324d2bf4b2d8a4f9dbfe82158) )
 	ROM_LOAD_NIB_HIGH( "lc.e6",        0x0400, 0x0400, CRC(b1ef0aa2) SHA1(3edeaa4d4f4e18536066898284d430a1ac00512e) )
@@ -744,7 +744,7 @@ ROM_START( lazercmd )
 ROM_END
 
 ROM_START( medlanes )
-	ROM_REGION( 0x1800, "maincpu", ROMREGION_INVERT )	   /* 32K cpu, 4K for ROM/RAM */
+	ROM_REGION( 0x1800, "maincpu", ROMREGION_INVERT )      /* 32K cpu, 4K for ROM/RAM */
 	ROM_LOAD_NIB_HIGH( "medlanes.2a", 0x0000, 0x0400, CRC(9c77566a) SHA1(60e1820012b47da8b86d54f00b6f60d2d0123745) )
 	ROM_LOAD_NIB_LOW(  "medlanes.3a", 0x0000, 0x0400, CRC(22bc56a6) SHA1(7444170c19274d9d889df61796e6f61af2361f3e) )
 	ROM_LOAD_NIB_HIGH( "medlanes.2b", 0x0400, 0x0400, CRC(7841b1a9) SHA1(80621d30995dad42ae44c62494922ca8b75415cf) )
@@ -762,7 +762,7 @@ ROM_END
 
 
 ROM_START( bbonk )
-	ROM_REGION( 0x0c00, "maincpu", ROMREGION_INVERT )			   /* 32K cpu, 4K for ROM/RAM */
+	ROM_REGION( 0x0c00, "maincpu", ROMREGION_INVERT )              /* 32K cpu, 4K for ROM/RAM */
 	ROM_LOAD_NIB_HIGH( "bbonk.e5",     0x0000, 0x0400, CRC(d032baa0) SHA1(09cba16f6a2b7d8a8c501db639bd5eeefb63dc0f) )
 	ROM_LOAD_NIB_LOW(  "bbonk.f5",     0x0000, 0x0400, CRC(748e8c7f) SHA1(99e4e182ee41c246e31f656411a9f09d7b617f92) )
 	ROM_LOAD_NIB_HIGH( "bbonk.e6",     0x0400, 0x0400, CRC(71df0e25) SHA1(c2f78490816add1296923861a89df15be9822fed) )

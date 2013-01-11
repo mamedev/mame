@@ -3,13 +3,13 @@
 
 <!--
 
-  To investigate:
-  - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
+	To investigate:
+	- Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
 
-  Undumped pirate carts:
-  - 4B-003: Sachen 4-in-1 version 3 (Taiwan's Mahjong, Japan's Mahjong, Hong Kong's Mahjong, Store Tris)
-  - 4B-004: Sachen 4-in-1 version 4 (Pile Wonder, Snake Roy, Suleiman's Treasure, Puppet Knight)
-  - GOWIN carts (see below the list of known games)
+	Undumped pirate carts:
+	- 4B-003: Sachen 4-in-1 version 3 (Taiwan's Mahjong, Japan's Mahjong, Hong Kong's Mahjong, Store Tris)
+	- 4B-004: Sachen 4-in-1 version 4 (Pile Wonder, Snake Roy, Suleiman's Treasure, Puppet Knight)
+	- GOWIN carts (see below the list of known games)
 
 -->
 
@@ -11548,7 +11548,7 @@
 
 	<software name="mine2049">
 		<description>Miner 2049er (USA)</description>
-		<year>1992</year	>
+		<year>1992</year    >
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="DMG-MV-USA"/>
 		<part name="cart" interface="gameboy_cart">
@@ -13330,7 +13330,7 @@
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="DMG-NGJ"/>
 		<info name="release" value="19911213"/>
-        <info name="alt_title" value="忍者龍剣伝GB 摩天楼決戦"/>
+		<info name="alt_title" value="忍者龍剣伝GB 摩天楼決戦"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC1" />
 			<dataarea name="rom" size="131072">
@@ -23236,18 +23236,18 @@
 
 <!-- GOWIN games -->
 <!--
-  Other games (which could coincide with some of the games below without serial)
-  * GS-01 - ??
-  * GS-07 - Lost Trip
-  * GS-08 - Binary Monsters
-  * GS-09 - ??
-  * GS-10 - Binary Monsters - Adventure of Hell
-  * GS-11 - Magic Lamp (2000)
+	Other games (which could coincide with some of the games below without serial)
+	* GS-01 - ??
+	* GS-07 - Lost Trip
+	* GS-08 - Binary Monsters
+	* GS-09 - ??
+	* GS-10 - Binary Monsters - Adventure of Hell
+	* GS-11 - Magic Lamp (2000)
 
-  * GS-?? - Binary Monsters 2 (2000)
-  * GS-?? - Binary Monsters 3
-  * GS-?? - Amazing Robot
-  * GS-?? - Crouching Tiger Hidden Dragon (99% this is Tiger A Dragon below)
+	* GS-?? - Binary Monsters 2 (2000)
+	* GS-?? - Binary Monsters 3
+	* GS-?? - Amazing Robot
+	* GS-?? - Crouching Tiger Hidden Dragon (99% this is Tiger A Dragon below)
 -->
 
 	<software name="firedrag">

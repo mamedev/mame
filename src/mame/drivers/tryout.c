@@ -145,13 +145,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,2),
-	2,	/* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
+	2,  /* 2 bits per pixel */
+	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
 	{ 3, 2, 1, 0, RGN_FRAC(1,2)+3, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+0 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout vramlayout =
@@ -162,7 +162,7 @@ static const gfx_layout vramlayout =
 	{ 0x0000 * 8, 0x2000 * 8, 0x4000 * 8 },
 	{ 7, 6, 5, 4, 128+7, 128+6, 128+5, 128+4, 256+7, 256+6, 256+5, 256+4, 384+7, 384+6, 384+5, 384+4  },
 	{ 15*8, 14*8, 13*8, 12*8, 11*8, 10*8, 9*8, 8*8,
-	  7*8, 6*8,5*8,4*8,3*8,2*8,1*8,0*8 },
+		7*8, 6*8,5*8,4*8,3*8,2*8,1*8,0*8 },
 	64*8
 };
 
@@ -182,15 +182,15 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 4 )
-	GFXDECODE_ENTRY( NULL,	 0, vramlayout,   0, 4 )
+	GFXDECODE_ENTRY( NULL,   0, vramlayout,   0, 4 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( tryout, tryout_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)		/* ? */
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)     /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)	/* ? */
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tryout_state, nmi_line_pulse, 1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
 

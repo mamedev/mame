@@ -6,7 +6,7 @@
 #include "machine/dp8390.h"
 
 class ne2000_device: public device_t,
-					 public device_isa16_card_interface
+						public device_isa16_card_interface
 {
 public:
 	ne2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

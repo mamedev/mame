@@ -1,27 +1,27 @@
- /*
-   emulation of Seta sprite chips
-   X1-001A  X1-002A (SDIP64)
+	/*
+	emulation of Seta sprite chips
+	X1-001A  X1-002A (SDIP64)
 
-   these always seem to be used as a pair, some board have been seen without the
-   'A', so it's probably a chip revision / bugfix.
+	these always seem to be used as a pair, some board have been seen without the
+	'A', so it's probably a chip revision / bugfix.
 
-  used by:
+	used by:
 
-  seta.c
-  taito_x.c
-  tnzs.c
-  srmp2.c
-  champbwl.c
-  cchance.c
+	seta.c
+	taito_x.c
+	tnzs.c
+	srmp2.c
+	champbwl.c
+	cchance.c
 
-  note: the data bus is almost certainly 8-bit, dating back to the earliest
-        hardware the games were used on.  the RAM arrangements changes
-        slightly between games depending on how the RAM is hooked up to the
-        main cpu.
+	note: the data bus is almost certainly 8-bit, dating back to the earliest
+	    hardware the games were used on.  the RAM arrangements changes
+	    slightly between games depending on how the RAM is hooked up to the
+	    main cpu.
 
-  'y' low bits are NEVER buffered?
+	'y' low bits are NEVER buffered?
 
- */
+	*/
 
 #include "emu.h"
 #include "seta001.h"
@@ -214,13 +214,13 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_i
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes   =   machine.config().m_gfxdecodeinfo[0].total_color_codes;
 
-	int ctrl	=	m_spritectrl[0];
-	int ctrl2	=	m_spritectrl[1];
+	int ctrl    =   m_spritectrl[0];
+	int ctrl2   =   m_spritectrl[1];
 
-	int flip	=	ctrl & 0x40;
-	int numcol	=	ctrl2 & 0x0f;
+	int flip    =   ctrl & 0x40;
+	int numcol  =   ctrl2 & 0x0f;
 
 	int scrollx, scrolly;
 
@@ -231,18 +231,18 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_i
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
 
-	int max_y	=	0xf0;
+	int max_y   =   0xf0;
 
 	// HACKS
 	// used in conjuntion with setac_type
-	int col0;		/* Kludge, needed for krzybowl and kiwame */
+	int col0;       /* Kludge, needed for krzybowl and kiwame */
 	switch (ctrl & 0x0f)
 	{
-		case 0x01:	col0	=	0x4;	break;	// krzybowl
-		case 0x09:	col0	=	0x4;	break;	// doraemon
-		case 0x06:	col0	=	0x8;	break;	// kiwame
+		case 0x01:  col0    =   0x4;    break;  // krzybowl
+		case 0x09:  col0    =   0x4;    break;  // doraemon
+		case 0x06:  col0    =   0x8;    break;  // kiwame
 
-		default:	col0	=	0x0;
+		default:    col0    =   0x0;
 	}
 
 
@@ -277,13 +277,13 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_i
 			int code = ((m_spritecodehigh[i+0x400+bank]) << 8) | m_spritecodelow[i+0x400+bank];
 			int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank];
 
-			int	flipx	=	code & 0x8000;
-			int	flipy	=	code & 0x4000;
+			int flipx   =   code & 0x8000;
+			int flipy   =   code & 0x4000;
 
-			int sx		=	  scrollx + xoffs  + (offs & 1) * 16;
-			int sy		=	-(scrolly + yoffs) + (offs / 2) * 16;
+			int sx      =     scrollx + xoffs  + (offs & 1) * 16;
+			int sy      =   -(scrolly + yoffs) + (offs / 2) * 16;
 
-			if (upper & (1 << col))	sx -= 256;
+			if (upper & (1 << col)) sx -= 256;
 
 			if (flip)
 			{
@@ -292,7 +292,7 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_i
 				flipy = !flipy;
 			}
 
-			color	=	( color >> (16-5) ) % total_color_codes;
+			color   =   ( color >> (16-5) ) % total_color_codes;
 			code &= 0x3fff;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
@@ -335,15 +335,15 @@ void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_i
 	int ctrl2 = m_spritectrl[1];
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes   =   machine.config().m_gfxdecodeinfo[0].total_color_codes;
 
 	UINT8 *char_pointer = m_spritecodelow + 0x0000;
 	UINT8 *x_pointer = m_spritecodelow + 0x0200;
 	UINT8 *ctrl_pointer = m_spritecodehigh + 0x0000;
 	UINT8 *color_pointer = m_spritecodehigh + 0x0200;
 
-	xoffs	=	screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
-	yoffs	=	screenflip ? m_fg_flipyoffs : m_fg_noflipyoffs;
+	xoffs   =   screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
+	yoffs   =   screenflip ? m_fg_flipyoffs : m_fg_noflipyoffs;
 
 	if ((ctrl2 ^ (~ctrl2 << 1)) & 0x40)
 	{
@@ -425,7 +425,7 @@ void seta001_device::setac_eof()
 	// is this handling right?
 	// it differs to tnzs, and thundercade has sprite flickering issues (not related to the devicification)
 
-	int ctrl2	=	m_spritectrl[1];
+	int ctrl2   =   m_spritectrl[1];
 
 	if (~ctrl2 & 0x20)
 	{
@@ -444,7 +444,7 @@ void seta001_device::setac_eof()
 
 void seta001_device::tnzs_eof( void )
 {
-	int ctrl2 =	m_spritectrl[1];
+	int ctrl2 = m_spritectrl[1];
 	if (~ctrl2 & 0x20)
 	{
 		// note I copy sprites only. setac implementation also copies the "floating tilemap"

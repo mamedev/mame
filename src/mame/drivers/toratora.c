@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER(toratora_state::main_cpu_irq)
 
 INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 {
-	m_timer++;	/* timer counting at 16 Hz */
+	m_timer++;  /* timer counting at 16 Hz */
 
 	/* also, when the timer overflows (16 seconds) watchdog would kick in */
 	if (m_timer & 0x100)
@@ -188,30 +188,30 @@ WRITE8_MEMBER(toratora_state::clear_timer_w)
 
 static const sn76477_interface sn76477_intf =
 {
-	RES_K(47),	/*  4 noise_res                */
+	RES_K(47),  /*  4 noise_res                */
 //  RES_K(120), /*  5 filter_res               */
-	RES_M(1.2),	/*  5 filter_res               */
+	RES_M(1.2), /*  5 filter_res               */
 	CAP_P(470), /*  6 filter_cap               */
-	RES_K(680),	/*  7 decay_res                */
-	CAP_U(0.2),	/*  8 attack_decay_cap         */
+	RES_K(680), /*  7 decay_res                */
+	CAP_U(0.2), /*  8 attack_decay_cap         */
 	RES_K(3.3), /* 10 attack_res               */
-	0,		    /* 11 amplitude_res (variable) */
-	RES_K(50),	/* 12 feedback_res             */
-	0,			/* 16 vco_voltage (variable)   */
-	CAP_U(0.1),	/* 17 vco_cap                  */
-	RES_K(51),	/* 18 vco_res                  */
-	5.0,		/* 19 pitch_voltage (N/C)      */
-	RES_K(470),	/* 20 slf_res                  */
-	CAP_U(0.1),	/* 21 slf_cap                  */
-	CAP_U(0.1),	/* 23 oneshot_cap              */
-	RES_M(1),	/* 24 oneshot_res              */
-	0,			/* 22 vco (variable)           */
-	0,			/* 26 mixer A (variable)       */
-	0,			/* 25 mixer B (variable)       */
-	0,			/* 27 mixer C (variable)       */
-	0,			/* 1  envelope 1 (variable)    */
-	0,			/* 28 envelope 2 (variable)    */
-	1			/* 9  enable (variable)        */
+	0,          /* 11 amplitude_res (variable) */
+	RES_K(50),  /* 12 feedback_res             */
+	0,          /* 16 vco_voltage (variable)   */
+	CAP_U(0.1), /* 17 vco_cap                  */
+	RES_K(51),  /* 18 vco_res                  */
+	5.0,        /* 19 pitch_voltage (N/C)      */
+	RES_K(470), /* 20 slf_res                  */
+	CAP_U(0.1), /* 21 slf_cap                  */
+	CAP_U(0.1), /* 23 oneshot_cap              */
+	RES_M(1),   /* 24 oneshot_res              */
+	0,          /* 22 vco (variable)           */
+	0,          /* 26 mixer A (variable)       */
+	0,          /* 25 mixer B (variable)       */
+	0,          /* 27 mixer C (variable)       */
+	0,          /* 1  envelope 1 (variable)    */
+	0,          /* 28 envelope 2 (variable)    */
+	1           /* 9  enable (variable)        */
 };
 
 
@@ -228,14 +228,14 @@ WRITE8_MEMBER(toratora_state::sn1_port_b_u2_u3_w)
 	device_t *device = machine().device("sn1");
 	static const double resistances[] =
 	{
-	  0,  /* N/C */
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750) + RES_M(1.5),
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750),
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360),
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200),
-	  RES_K(47) + RES_K(47) + RES_K(91),
-	  RES_K(47) + RES_K(47) + RES_K(91),
-	  RES_K(47)
+		0,  /* N/C */
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750) + RES_M(1.5),
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750),
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360),
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200),
+		RES_K(47) + RES_K(47) + RES_K(91),
+		RES_K(47) + RES_K(47) + RES_K(91),
+		RES_K(47)
 	};
 
 	sn76477_mixer_a_w      (device, (data >> 0) & 0x01);
@@ -266,14 +266,14 @@ WRITE8_MEMBER(toratora_state::sn2_port_b_u2_u3_w)
 	device_t *device = machine().device("sn2");
 	static const double resistances[] =
 	{
-	  0,  /* N/C */
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750) + RES_M(1.5),
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750),
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360),
-	  RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200),
-	  RES_K(47) + RES_K(47) + RES_K(91),
-	  RES_K(47) + RES_K(47) + RES_K(91),
-	  RES_K(47)
+		0,  /* N/C */
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750) + RES_M(1.5),
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360) + RES_K(750),
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200) + RES_K(360),
+		RES_K(47) + RES_K(47) + RES_K(91) + RES_K(200),
+		RES_K(47) + RES_K(47) + RES_K(91),
+		RES_K(47) + RES_K(47) + RES_K(91),
+		RES_K(47)
 	};
 
 	sn76477_mixer_a_w      (device, (data >> 0) & 0x01);
@@ -299,52 +299,52 @@ WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_u3_w)
 
 static const pia6821_interface pia_u1_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(toratora_state,port_b_u1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(toratora_state,port_b_u1_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq),      /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq)       /* IRQB */
 };
 
 
 static const pia6821_interface pia_u2_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_a_u2_u3_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_b_u2_u3_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn1_ca2_u2_u3_w),				/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_a_u2_u3_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_b_u2_u3_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn1_ca2_u2_u3_w),               /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
 static const pia6821_interface pia_u3_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_INPUT_PORT("DSW"),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_a_u2_u3_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_b_u2_u3_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn2_ca2_u2_u3_w),				/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,cb2_u3_w),								/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_INPUT_PORT("DSW"),        /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_a_u2_u3_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_b_u2_u3_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn2_ca2_u2_u3_w),               /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(toratora_state,cb2_u3_w),                              /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xf047) AM_NOP
 	AM_RANGE(0xf048, 0xf049) AM_NOP
-	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)	/* the read is mark *LEDEN, but not used */
+	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)   /* the read is mark *LEDEN, but not used */
 	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
 	AM_RANGE(0xa04c, 0xf09f) AM_NOP
 	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_device, read, write)
@@ -447,9 +447,9 @@ void toratora_state::machine_reset()
 static MACHINE_CONFIG_START( toratora, toratora_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800,500000)	/* ?????? game speed is entirely controlled by this */
+	MCFG_CPU_ADD("maincpu", M6800,500000)   /* ?????? game speed is entirely controlled by this */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 16)	/* timer counting at 16 Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 16)    /* timer counting at 16 Hz */
 
 	MCFG_PIA6821_ADD("pia_u1", pia_u1_intf)
 	MCFG_PIA6821_ADD("pia_u2", pia_u2_intf)

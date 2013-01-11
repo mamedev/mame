@@ -169,7 +169,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_i2s_w)
 		count--;
 		sprintf(filename, "39in1_%04d.raw", count);
 		audio_dump = fopen(filename, "wb");
-    }
+	}
 #endif
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
 	{
@@ -384,7 +384,7 @@ TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_dma_dma_end)
 		dma_regs->dcsr[param] |= PXA255_DCSR_ENDINTR;
 	}
 	if(!(dma_regs->ddadr[param] & PXA255_DDADR_STOP) &&
-	    (dma_regs->dcsr[param] & PXA255_DCSR_RUN))
+		(dma_regs->dcsr[param] & PXA255_DCSR_RUN))
 	{
 		if(dma_regs->dcsr[param] & PXA255_DCSR_RUN)
 		{
@@ -410,49 +410,49 @@ READ32_MEMBER(_39in1_state::pxa255_dma_r)
 
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
-		case PXA255_DCSR0:		case PXA255_DCSR1:		case PXA255_DCSR2:		case PXA255_DCSR3:
-		case PXA255_DCSR4:		case PXA255_DCSR5:		case PXA255_DCSR6:		case PXA255_DCSR7:
-		case PXA255_DCSR8:		case PXA255_DCSR9:		case PXA255_DCSR10:		case PXA255_DCSR11:
-		case PXA255_DCSR12:		case PXA255_DCSR13:		case PXA255_DCSR14:		case PXA255_DCSR15:
+		case PXA255_DCSR0:      case PXA255_DCSR1:      case PXA255_DCSR2:      case PXA255_DCSR3:
+		case PXA255_DCSR4:      case PXA255_DCSR5:      case PXA255_DCSR6:      case PXA255_DCSR7:
+		case PXA255_DCSR8:      case PXA255_DCSR9:      case PXA255_DCSR10:     case PXA255_DCSR11:
+		case PXA255_DCSR12:     case PXA255_DCSR13:     case PXA255_DCSR14:     case PXA255_DCSR15:
 			verboselog( machine(), 4, "pxa255_dma_r: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, dma_regs->dcsr[offset], mem_mask );
 			return dma_regs->dcsr[offset];
 		case PXA255_DINT:
 			if (0) verboselog( machine(), 3, "pxa255_dma_r: DMA Interrupt Register: %08x & %08x\n", dma_regs->dint, mem_mask );
 			return dma_regs->dint;
-		case PXA255_DRCMR0:		case PXA255_DRCMR1:		case PXA255_DRCMR2:		case PXA255_DRCMR3:
-		case PXA255_DRCMR4:		case PXA255_DRCMR5:		case PXA255_DRCMR6:		case PXA255_DRCMR7:
-		case PXA255_DRCMR8:		case PXA255_DRCMR9:		case PXA255_DRCMR10:	case PXA255_DRCMR11:
-		case PXA255_DRCMR12:	case PXA255_DRCMR13:	case PXA255_DRCMR14:	case PXA255_DRCMR15:
-		case PXA255_DRCMR16:	case PXA255_DRCMR17:	case PXA255_DRCMR18:	case PXA255_DRCMR19:
-		case PXA255_DRCMR20:	case PXA255_DRCMR21:	case PXA255_DRCMR22:	case PXA255_DRCMR23:
-		case PXA255_DRCMR24:	case PXA255_DRCMR25:	case PXA255_DRCMR26:	case PXA255_DRCMR27:
-		case PXA255_DRCMR28:	case PXA255_DRCMR29:	case PXA255_DRCMR30:	case PXA255_DRCMR31:
-		case PXA255_DRCMR32:	case PXA255_DRCMR33:	case PXA255_DRCMR34:	case PXA255_DRCMR35:
-		case PXA255_DRCMR36:	case PXA255_DRCMR37:	case PXA255_DRCMR38:	case PXA255_DRCMR39:
+		case PXA255_DRCMR0:     case PXA255_DRCMR1:     case PXA255_DRCMR2:     case PXA255_DRCMR3:
+		case PXA255_DRCMR4:     case PXA255_DRCMR5:     case PXA255_DRCMR6:     case PXA255_DRCMR7:
+		case PXA255_DRCMR8:     case PXA255_DRCMR9:     case PXA255_DRCMR10:    case PXA255_DRCMR11:
+		case PXA255_DRCMR12:    case PXA255_DRCMR13:    case PXA255_DRCMR14:    case PXA255_DRCMR15:
+		case PXA255_DRCMR16:    case PXA255_DRCMR17:    case PXA255_DRCMR18:    case PXA255_DRCMR19:
+		case PXA255_DRCMR20:    case PXA255_DRCMR21:    case PXA255_DRCMR22:    case PXA255_DRCMR23:
+		case PXA255_DRCMR24:    case PXA255_DRCMR25:    case PXA255_DRCMR26:    case PXA255_DRCMR27:
+		case PXA255_DRCMR28:    case PXA255_DRCMR29:    case PXA255_DRCMR30:    case PXA255_DRCMR31:
+		case PXA255_DRCMR32:    case PXA255_DRCMR33:    case PXA255_DRCMR34:    case PXA255_DRCMR35:
+		case PXA255_DRCMR36:    case PXA255_DRCMR37:    case PXA255_DRCMR38:    case PXA255_DRCMR39:
 			verboselog( machine(), 3, "pxa255_dma_r: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), 0, mem_mask );
 			return dma_regs->drcmr[offset - (0x100 >> 2)];
-		case PXA255_DDADR0:		case PXA255_DDADR1:		case PXA255_DDADR2:		case PXA255_DDADR3:
-		case PXA255_DDADR4:		case PXA255_DDADR5:		case PXA255_DDADR6:		case PXA255_DDADR7:
-		case PXA255_DDADR8:		case PXA255_DDADR9:		case PXA255_DDADR10:	case PXA255_DDADR11:
-		case PXA255_DDADR12:	case PXA255_DDADR13:	case PXA255_DDADR14:	case PXA255_DDADR15:
+		case PXA255_DDADR0:     case PXA255_DDADR1:     case PXA255_DDADR2:     case PXA255_DDADR3:
+		case PXA255_DDADR4:     case PXA255_DDADR5:     case PXA255_DDADR6:     case PXA255_DDADR7:
+		case PXA255_DDADR8:     case PXA255_DDADR9:     case PXA255_DDADR10:    case PXA255_DDADR11:
+		case PXA255_DDADR12:    case PXA255_DDADR13:    case PXA255_DDADR14:    case PXA255_DDADR15:
 			verboselog( machine(), 3, "pxa255_dma_r: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->ddadr[(offset - (0x200 >> 2)) >> 2];
-		case PXA255_DSADR0:		case PXA255_DSADR1:		case PXA255_DSADR2:		case PXA255_DSADR3:
-		case PXA255_DSADR4:		case PXA255_DSADR5:		case PXA255_DSADR6:		case PXA255_DSADR7:
-		case PXA255_DSADR8:		case PXA255_DSADR9:		case PXA255_DSADR10:	case PXA255_DSADR11:
-		case PXA255_DSADR12:	case PXA255_DSADR13:	case PXA255_DSADR14:	case PXA255_DSADR15:
+		case PXA255_DSADR0:     case PXA255_DSADR1:     case PXA255_DSADR2:     case PXA255_DSADR3:
+		case PXA255_DSADR4:     case PXA255_DSADR5:     case PXA255_DSADR6:     case PXA255_DSADR7:
+		case PXA255_DSADR8:     case PXA255_DSADR9:     case PXA255_DSADR10:    case PXA255_DSADR11:
+		case PXA255_DSADR12:    case PXA255_DSADR13:    case PXA255_DSADR14:    case PXA255_DSADR15:
 			verboselog( machine(), 3, "pxa255_dma_r: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->dsadr[(offset - (0x200 >> 2)) >> 2];
-		case PXA255_DTADR0:		case PXA255_DTADR1:		case PXA255_DTADR2:		case PXA255_DTADR3:
-		case PXA255_DTADR4:		case PXA255_DTADR5:		case PXA255_DTADR6:		case PXA255_DTADR7:
-		case PXA255_DTADR8:		case PXA255_DTADR9:		case PXA255_DTADR10:	case PXA255_DTADR11:
-		case PXA255_DTADR12:	case PXA255_DTADR13:	case PXA255_DTADR14:	case PXA255_DTADR15:
+		case PXA255_DTADR0:     case PXA255_DTADR1:     case PXA255_DTADR2:     case PXA255_DTADR3:
+		case PXA255_DTADR4:     case PXA255_DTADR5:     case PXA255_DTADR6:     case PXA255_DTADR7:
+		case PXA255_DTADR8:     case PXA255_DTADR9:     case PXA255_DTADR10:    case PXA255_DTADR11:
+		case PXA255_DTADR12:    case PXA255_DTADR13:    case PXA255_DTADR14:    case PXA255_DTADR15:
 			verboselog( machine(), 3, "pxa255_dma_r: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->dtadr[(offset - (0x200 >> 2)) >> 2];
-		case PXA255_DCMD0:		case PXA255_DCMD1:		case PXA255_DCMD2:		case PXA255_DCMD3:
-		case PXA255_DCMD4:		case PXA255_DCMD5:		case PXA255_DCMD6:		case PXA255_DCMD7:
-		case PXA255_DCMD8:		case PXA255_DCMD9:		case PXA255_DCMD10:		case PXA255_DCMD11:
-		case PXA255_DCMD12:		case PXA255_DCMD13:		case PXA255_DCMD14:		case PXA255_DCMD15:
+		case PXA255_DCMD0:      case PXA255_DCMD1:      case PXA255_DCMD2:      case PXA255_DCMD3:
+		case PXA255_DCMD4:      case PXA255_DCMD5:      case PXA255_DCMD6:      case PXA255_DCMD7:
+		case PXA255_DCMD8:      case PXA255_DCMD9:      case PXA255_DCMD10:     case PXA255_DCMD11:
+		case PXA255_DCMD12:     case PXA255_DCMD13:     case PXA255_DCMD14:     case PXA255_DCMD15:
 			verboselog( machine(), 3, "pxa255_dma_r: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, 0, mem_mask );
 			return dma_regs->dcmd[(offset - (0x200 >> 2)) >> 2];
 		default:
@@ -468,10 +468,10 @@ WRITE32_MEMBER(_39in1_state::pxa255_dma_w)
 
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
 	{
-		case PXA255_DCSR0:		case PXA255_DCSR1:		case PXA255_DCSR2:		case PXA255_DCSR3:
-		case PXA255_DCSR4:		case PXA255_DCSR5:		case PXA255_DCSR6:		case PXA255_DCSR7:
-		case PXA255_DCSR8:		case PXA255_DCSR9:		case PXA255_DCSR10:		case PXA255_DCSR11:
-		case PXA255_DCSR12:		case PXA255_DCSR13:		case PXA255_DCSR14:		case PXA255_DCSR15:
+		case PXA255_DCSR0:      case PXA255_DCSR1:      case PXA255_DCSR2:      case PXA255_DCSR3:
+		case PXA255_DCSR4:      case PXA255_DCSR5:      case PXA255_DCSR6:      case PXA255_DCSR7:
+		case PXA255_DCSR8:      case PXA255_DCSR9:      case PXA255_DCSR10:     case PXA255_DCSR11:
+		case PXA255_DCSR12:     case PXA255_DCSR13:     case PXA255_DCSR14:     case PXA255_DCSR15:
 			if (0) verboselog( machine(), 3, "pxa255_dma_w: DMA Channel Control/Status Register %d: %08x & %08x\n", offset, data, mem_mask );
 			dma_regs->dcsr[offset] &= ~(data & 0x00000007);
 			dma_regs->dcsr[offset] &= ~0x60000000;
@@ -498,44 +498,44 @@ WRITE32_MEMBER(_39in1_state::pxa255_dma_w)
 			verboselog( machine(), 3, "pxa255_dma_w: DMA Interrupt Register: %08x & %08x\n", data, mem_mask );
 			dma_regs->dint &= ~data;
 			break;
-		case PXA255_DRCMR0:		case PXA255_DRCMR1:		case PXA255_DRCMR2:		case PXA255_DRCMR3:
-		case PXA255_DRCMR4:		case PXA255_DRCMR5:		case PXA255_DRCMR6:		case PXA255_DRCMR7:
-		case PXA255_DRCMR8:		case PXA255_DRCMR9:		case PXA255_DRCMR10:	case PXA255_DRCMR11:
-		case PXA255_DRCMR12:	case PXA255_DRCMR13:	case PXA255_DRCMR14:	case PXA255_DRCMR15:
-		case PXA255_DRCMR16:	case PXA255_DRCMR17:	case PXA255_DRCMR18:	case PXA255_DRCMR19:
-		case PXA255_DRCMR20:	case PXA255_DRCMR21:	case PXA255_DRCMR22:	case PXA255_DRCMR23:
-		case PXA255_DRCMR24:	case PXA255_DRCMR25:	case PXA255_DRCMR26:	case PXA255_DRCMR27:
-		case PXA255_DRCMR28:	case PXA255_DRCMR29:	case PXA255_DRCMR30:	case PXA255_DRCMR31:
-		case PXA255_DRCMR32:	case PXA255_DRCMR33:	case PXA255_DRCMR34:	case PXA255_DRCMR35:
-		case PXA255_DRCMR36:	case PXA255_DRCMR37:	case PXA255_DRCMR38:	case PXA255_DRCMR39:
+		case PXA255_DRCMR0:     case PXA255_DRCMR1:     case PXA255_DRCMR2:     case PXA255_DRCMR3:
+		case PXA255_DRCMR4:     case PXA255_DRCMR5:     case PXA255_DRCMR6:     case PXA255_DRCMR7:
+		case PXA255_DRCMR8:     case PXA255_DRCMR9:     case PXA255_DRCMR10:    case PXA255_DRCMR11:
+		case PXA255_DRCMR12:    case PXA255_DRCMR13:    case PXA255_DRCMR14:    case PXA255_DRCMR15:
+		case PXA255_DRCMR16:    case PXA255_DRCMR17:    case PXA255_DRCMR18:    case PXA255_DRCMR19:
+		case PXA255_DRCMR20:    case PXA255_DRCMR21:    case PXA255_DRCMR22:    case PXA255_DRCMR23:
+		case PXA255_DRCMR24:    case PXA255_DRCMR25:    case PXA255_DRCMR26:    case PXA255_DRCMR27:
+		case PXA255_DRCMR28:    case PXA255_DRCMR29:    case PXA255_DRCMR30:    case PXA255_DRCMR31:
+		case PXA255_DRCMR32:    case PXA255_DRCMR33:    case PXA255_DRCMR34:    case PXA255_DRCMR35:
+		case PXA255_DRCMR36:    case PXA255_DRCMR37:    case PXA255_DRCMR38:    case PXA255_DRCMR39:
 			verboselog( machine(), 3, "pxa255_dma_w: DMA Request to Channel Map Register %d: %08x & %08x\n", offset - (0x100 >> 2), data, mem_mask );
 			dma_regs->drcmr[offset - (0x100 >> 2)] = data & 0x0000008f;
 			break;
-		case PXA255_DDADR0:		case PXA255_DDADR1:		case PXA255_DDADR2:		case PXA255_DDADR3:
-		case PXA255_DDADR4:		case PXA255_DDADR5:		case PXA255_DDADR6:		case PXA255_DDADR7:
-		case PXA255_DDADR8:		case PXA255_DDADR9:		case PXA255_DDADR10:	case PXA255_DDADR11:
-		case PXA255_DDADR12:	case PXA255_DDADR13:	case PXA255_DDADR14:	case PXA255_DDADR15:
+		case PXA255_DDADR0:     case PXA255_DDADR1:     case PXA255_DDADR2:     case PXA255_DDADR3:
+		case PXA255_DDADR4:     case PXA255_DDADR5:     case PXA255_DDADR6:     case PXA255_DDADR7:
+		case PXA255_DDADR8:     case PXA255_DDADR9:     case PXA255_DDADR10:    case PXA255_DDADR11:
+		case PXA255_DDADR12:    case PXA255_DDADR13:    case PXA255_DDADR14:    case PXA255_DDADR15:
 			verboselog( machine(), 3, "pxa255_dma_w: DMA Descriptor Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->ddadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffff1;
 			break;
-		case PXA255_DSADR0:		case PXA255_DSADR1:		case PXA255_DSADR2:		case PXA255_DSADR3:
-		case PXA255_DSADR4:		case PXA255_DSADR5:		case PXA255_DSADR6:		case PXA255_DSADR7:
-		case PXA255_DSADR8:		case PXA255_DSADR9:		case PXA255_DSADR10:	case PXA255_DSADR11:
-		case PXA255_DSADR12:	case PXA255_DSADR13:	case PXA255_DSADR14:	case PXA255_DSADR15:
+		case PXA255_DSADR0:     case PXA255_DSADR1:     case PXA255_DSADR2:     case PXA255_DSADR3:
+		case PXA255_DSADR4:     case PXA255_DSADR5:     case PXA255_DSADR6:     case PXA255_DSADR7:
+		case PXA255_DSADR8:     case PXA255_DSADR9:     case PXA255_DSADR10:    case PXA255_DSADR11:
+		case PXA255_DSADR12:    case PXA255_DSADR13:    case PXA255_DSADR14:    case PXA255_DSADR15:
 			verboselog( machine(), 3, "pxa255_dma_w: DMA Source Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->dsadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffffc;
 			break;
-		case PXA255_DTADR0:		case PXA255_DTADR1:		case PXA255_DTADR2:		case PXA255_DTADR3:
-		case PXA255_DTADR4:		case PXA255_DTADR5:		case PXA255_DTADR6:		case PXA255_DTADR7:
-		case PXA255_DTADR8:		case PXA255_DTADR9:		case PXA255_DTADR10:	case PXA255_DTADR11:
-		case PXA255_DTADR12:	case PXA255_DTADR13:	case PXA255_DTADR14:	case PXA255_DTADR15:
+		case PXA255_DTADR0:     case PXA255_DTADR1:     case PXA255_DTADR2:     case PXA255_DTADR3:
+		case PXA255_DTADR4:     case PXA255_DTADR5:     case PXA255_DTADR6:     case PXA255_DTADR7:
+		case PXA255_DTADR8:     case PXA255_DTADR9:     case PXA255_DTADR10:    case PXA255_DTADR11:
+		case PXA255_DTADR12:    case PXA255_DTADR13:    case PXA255_DTADR14:    case PXA255_DTADR15:
 			verboselog( machine(), 3, "pxa255_dma_w: DMA Target Address Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->dtadr[(offset - (0x200 >> 2)) >> 2] = data & 0xfffffffc;
 			break;
-		case PXA255_DCMD0:		case PXA255_DCMD1:		case PXA255_DCMD2:		case PXA255_DCMD3:
-		case PXA255_DCMD4:		case PXA255_DCMD5:		case PXA255_DCMD6:		case PXA255_DCMD7:
-		case PXA255_DCMD8:		case PXA255_DCMD9:		case PXA255_DCMD10:		case PXA255_DCMD11:
-		case PXA255_DCMD12:		case PXA255_DCMD13:		case PXA255_DCMD14:		case PXA255_DCMD15:
+		case PXA255_DCMD0:      case PXA255_DCMD1:      case PXA255_DCMD2:      case PXA255_DCMD3:
+		case PXA255_DCMD4:      case PXA255_DCMD5:      case PXA255_DCMD6:      case PXA255_DCMD7:
+		case PXA255_DCMD8:      case PXA255_DCMD9:      case PXA255_DCMD10:     case PXA255_DCMD11:
+		case PXA255_DCMD12:     case PXA255_DCMD13:     case PXA255_DCMD14:     case PXA255_DCMD15:
 			verboselog( machine(), 3, "pxa255_dma_w: DMA Command Register %d: %08x & %08x\n", (offset - (0x200 >> 2)) >> 2, data, mem_mask );
 			dma_regs->dcmd[(offset - (0x200 >> 2)) >> 2] = data & 0xf067dfff;
 			break;
@@ -808,8 +808,8 @@ READ32_MEMBER(_39in1_state::pxa255_gpio_r)
 			verboselog( machine(), 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs->gplr1, mem_mask );
 			return 0xff9fffff;
 		/*
-            0x200000 = flip screen
-        */
+		    0x200000 = flip screen
+		*/
 		case PXA255_GPLR2:
 			verboselog( machine(), 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 2: %08x & %08x\n", gpio_regs->gplr2, mem_mask );
 			return gpio_regs->gplr2;
@@ -1061,8 +1061,8 @@ void _39in1_state::pxa255_lcd_irq_check()
 	PXA255_LCD_Regs *lcd_regs = &m_lcd_regs;
 
 	if(((lcd_regs->lcsr & PXA255_LCSR_BS)  != 0 && (lcd_regs->lccr0 & PXA255_LCCR0_BM)  == 0) ||
-	   ((lcd_regs->lcsr & PXA255_LCSR_EOF) != 0 && (lcd_regs->lccr0 & PXA255_LCCR0_EFM) == 0) ||
-	   ((lcd_regs->lcsr & PXA255_LCSR_SOF) != 0 && (lcd_regs->lccr0 & PXA255_LCCR0_SFM) == 0))
+		((lcd_regs->lcsr & PXA255_LCSR_EOF) != 0 && (lcd_regs->lccr0 & PXA255_LCCR0_EFM) == 0) ||
+		((lcd_regs->lcsr & PXA255_LCSR_SOF) != 0 && (lcd_regs->lccr0 & PXA255_LCCR0_SFM) == 0))
 	{
 		pxa255_set_irq_line(PXA255_INT_LCD, 1);
 	}
@@ -1163,58 +1163,58 @@ READ32_MEMBER(_39in1_state::pxa255_lcd_r)
 
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
 	{
-		case PXA255_LCCR0:		// 0x44000000
+		case PXA255_LCCR0:      // 0x44000000
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD Control 0: %08x & %08x\n", lcd_regs->lccr0, mem_mask );
 			return lcd_regs->lccr0;
-		case PXA255_LCCR1:		// 0x44000004
+		case PXA255_LCCR1:      // 0x44000004
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD Control 1: %08x & %08x\n", lcd_regs->lccr1, mem_mask );
 			return lcd_regs->lccr1;
-		case PXA255_LCCR2:		// 0x44000008
+		case PXA255_LCCR2:      // 0x44000008
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD Control 2: %08x & %08x\n", lcd_regs->lccr2, mem_mask );
 			return lcd_regs->lccr2;
-		case PXA255_LCCR3:		// 0x4400000c
+		case PXA255_LCCR3:      // 0x4400000c
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD Control 3: %08x & %08x\n", lcd_regs->lccr3, mem_mask );
 			return lcd_regs->lccr3;
-		case PXA255_FBR0:		// 0x44000020
+		case PXA255_FBR0:       // 0x44000020
 			verboselog( machine(), 4, "pxa255_lcd_r: LCD Frame Branch Register 0: %08x & %08x\n", lcd_regs->fbr[0], mem_mask );
 			return lcd_regs->fbr[0];
-		case PXA255_FBR1:		// 0x44000024
+		case PXA255_FBR1:       // 0x44000024
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD Frame Branch Register 1: %08x & %08x\n", lcd_regs->fbr[1], mem_mask );
 			return lcd_regs->fbr[1];
-		case PXA255_LCSR:		// 0x44000038
+		case PXA255_LCSR:       // 0x44000038
 			verboselog( machine(), 4, "pxa255_lcd_r: LCD Status Register: %08x & %08x\n", lcd_regs->lcsr, mem_mask );
 			return lcd_regs->lcsr;
-		case PXA255_LIIDR:		// 0x4400003c
+		case PXA255_LIIDR:      // 0x4400003c
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD Interrupt ID Register: %08x & %08x\n", lcd_regs->liidr, mem_mask );
 			return lcd_regs->liidr;
-		case PXA255_TRGBR:		// 0x44000040
+		case PXA255_TRGBR:      // 0x44000040
 			verboselog( machine(), 3, "pxa255_lcd_r: TMED RGB Seed Register: %08x & %08x\n", lcd_regs->trgbr, mem_mask );
 			return lcd_regs->trgbr;
-		case PXA255_TCR:		// 0x44000044
+		case PXA255_TCR:        // 0x44000044
 			verboselog( machine(), 3, "pxa255_lcd_r: TMED RGB Seed Register: %08x & %08x\n", lcd_regs->tcr, mem_mask );
 			return lcd_regs->tcr;
-		case PXA255_FDADR0:		// 0x44000200
+		case PXA255_FDADR0:     // 0x44000200
 			if (0) verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", lcd_regs->dma[0].fdadr, mem_mask );
 			return lcd_regs->dma[0].fdadr;
-		case PXA255_FSADR0:		// 0x44000204
+		case PXA255_FSADR0:     // 0x44000204
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Frame Source Address Register 0: %08x & %08x\n", lcd_regs->dma[0].fsadr, mem_mask );
 			return lcd_regs->dma[0].fsadr;
-		case PXA255_FIDR0:		// 0x44000208
+		case PXA255_FIDR0:      // 0x44000208
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Frame ID Register 0: %08x & %08x\n", lcd_regs->dma[0].fidr, mem_mask );
 			return lcd_regs->dma[0].fidr;
-		case PXA255_LDCMD0:		// 0x4400020c
+		case PXA255_LDCMD0:     // 0x4400020c
 			if (0) verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Command Register 0: %08x & %08x\n", lcd_regs->dma[0].ldcmd & 0xfff00000, mem_mask );
 			return lcd_regs->dma[0].ldcmd & 0xfff00000;
-		case PXA255_FDADR1:		// 0x44000210
+		case PXA255_FDADR1:     // 0x44000210
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", lcd_regs->dma[1].fdadr, mem_mask );
 			return lcd_regs->dma[1].fdadr;
-		case PXA255_FSADR1:		// 0x44000214
+		case PXA255_FSADR1:     // 0x44000214
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Frame Source Address Register 1: %08x & %08x\n", lcd_regs->dma[1].fsadr, mem_mask );
 			return lcd_regs->dma[1].fsadr;
-		case PXA255_FIDR1:		// 0x44000218
+		case PXA255_FIDR1:      // 0x44000218
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Frame ID Register 1: %08x & %08x\n", lcd_regs->dma[1].fidr, mem_mask );
 			return lcd_regs->dma[1].fidr;
-		case PXA255_LDCMD1:		// 0x4400021c
+		case PXA255_LDCMD1:     // 0x4400021c
 			verboselog( machine(), 3, "pxa255_lcd_r: LCD DMA Command Register 1: %08x & %08x\n", lcd_regs->dma[1].ldcmd & 0xfff00000, mem_mask );
 			return lcd_regs->dma[1].ldcmd & 0xfff00000;
 		default:
@@ -1230,23 +1230,23 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
 	{
-		case PXA255_LCCR0:		// 0x44000000
+		case PXA255_LCCR0:      // 0x44000000
 			verboselog( machine(), 3, "pxa255_lcd_w: LCD Control 0: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr0 = data & 0x00fffeff;
 			break;
-		case PXA255_LCCR1:		// 0x44000004
+		case PXA255_LCCR1:      // 0x44000004
 			verboselog( machine(), 3, "pxa255_lcd_w: LCD Control 1: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr1 = data;
 			break;
-		case PXA255_LCCR2:		// 0x44000008
+		case PXA255_LCCR2:      // 0x44000008
 			verboselog( machine(), 3, "pxa255_lcd_w: LCD Control 2: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr2 = data;
 			break;
-		case PXA255_LCCR3:		// 0x4400000c
+		case PXA255_LCCR3:      // 0x4400000c
 			verboselog( machine(), 3, "pxa255_lcd_w: LCD Control 3: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lccr3 = data;
 			break;
-		case PXA255_FBR0:		// 0x44000020
+		case PXA255_FBR0:       // 0x44000020
 			verboselog( machine(), 4l, "pxa255_lcd_w: LCD Frame Branch Register 0: %08x & %08x\n", data, mem_mask );
 			lcd_regs->fbr[0] = data & 0xfffffff3;
 			if(!lcd_regs->dma[0].eof->enabled())
@@ -1256,7 +1256,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 				pxa255_lcd_irq_check();
 			}
 			break;
-		case PXA255_FBR1:		// 0x44000024
+		case PXA255_FBR1:       // 0x44000024
 			verboselog( machine(), 3, "pxa255_lcd_w: LCD Frame Branch Register 1: %08x & %08x\n", data, mem_mask );
 			lcd_regs->fbr[1] = data & 0xfffffff3;
 			if(!lcd_regs->dma[1].eof->enabled())
@@ -1266,23 +1266,23 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 				pxa255_lcd_irq_check();
 			}
 			break;
-		case PXA255_LCSR:		// 0x44000038
+		case PXA255_LCSR:       // 0x44000038
 			verboselog( machine(), 4, "pxa255_lcd_w: LCD Controller Status Register: %08x & %08x\n", data, mem_mask );
 			lcd_regs->lcsr &= ~data;
 			pxa255_lcd_irq_check();
 			break;
-		case PXA255_LIIDR:		// 0x4400003c
+		case PXA255_LIIDR:      // 0x4400003c
 			verboselog( machine(), 3, "pxa255_lcd_w: LCD Controller Interrupt ID Register: %08x & %08x\n", data, mem_mask );
 			break;
-		case PXA255_TRGBR:		// 0x44000040
+		case PXA255_TRGBR:      // 0x44000040
 			verboselog( machine(), 3, "pxa255_lcd_w: TMED RGB Seed Register: %08x & %08x\n", data, mem_mask );
 			lcd_regs->trgbr = data & 0x00ffffff;
 			break;
-		case PXA255_TCR:		// 0x44000044
+		case PXA255_TCR:        // 0x44000044
 			verboselog( machine(), 3, "pxa255_lcd_w: TMED Control Register: %08x & %08x\n", data, mem_mask );
 			lcd_regs->tcr = data & 0x00004fff;
 			break;
-		case PXA255_FDADR0:		// 0x44000200
+		case PXA255_FDADR0:     // 0x44000200
 			verboselog( machine(), 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 0: %08x & %08x\n", data, mem_mask );
 			if(!lcd_regs->dma[0].eof->enabled())
 			{
@@ -1294,16 +1294,16 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 				lcd_regs->fbr[0] |= data & 0xfffffff0;
 			}
 			break;
-		case PXA255_FSADR0:		// 0x44000204
+		case PXA255_FSADR0:     // 0x44000204
 			verboselog( machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 0: %08x & %08x\n", data, mem_mask );
 			break;
-		case PXA255_FIDR0:		// 0x44000208
+		case PXA255_FIDR0:      // 0x44000208
 			verboselog( machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame ID Register 0: %08x & %08x\n", data, mem_mask );
 			break;
-		case PXA255_LDCMD0:		// 0x4400020c
+		case PXA255_LDCMD0:     // 0x4400020c
 			verboselog( machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Command Register 0: %08x & %08x\n", data, mem_mask );
 			break;
-		case PXA255_FDADR1:		// 0x44000210
+		case PXA255_FDADR1:     // 0x44000210
 			verboselog( machine(), 4, "pxa255_lcd_w: LCD DMA Frame Descriptor Address Register 1: %08x & %08x\n", data, mem_mask );
 			if(!lcd_regs->dma[1].eof->enabled())
 			{
@@ -1315,13 +1315,13 @@ WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
 				lcd_regs->fbr[1] |= data & 0xfffffff0;
 			}
 			break;
-		case PXA255_FSADR1:		// 0x44000214
+		case PXA255_FSADR1:     // 0x44000214
 			verboselog( machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame Source Address Register 1: %08x & %08x\n", data, mem_mask );
 			break;
-		case PXA255_FIDR1:		// 0x44000218
+		case PXA255_FIDR1:      // 0x44000218
 			verboselog( machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Frame ID Register 1: %08x & %08x\n", data, mem_mask );
 			break;
-		case PXA255_LDCMD1:		// 0x4400021c
+		case PXA255_LDCMD1:     // 0x4400021c
 			verboselog( machine(), 4, "pxa255_lcd_w: (Invalid Write) LCD DMA Command Register 1: %08x & %08x\n", data, mem_mask );
 			break;
 		default:
@@ -1353,7 +1353,7 @@ READ32_MEMBER(_39in1_state::cpld_r)
 
 	if (space.device().safe_pc() == 0x3f04)
 	{
-		return 0xf0;	  // any non-zero value works here
+		return 0xf0;      // any non-zero value works here
 	}
 	else if (space.device().safe_pc() == 0xe3af4)
 	{
@@ -1380,7 +1380,7 @@ READ32_MEMBER(_39in1_state::cpld_r)
 				default: printf("State 1 unknown offset %x\n", offset); break;
 			}
 		}
-		else if (m_state == 2)						// 29c0: 53 ac 0c 2b a2 07 e6 be 31
+		else if (m_state == 2)                      // 29c0: 53 ac 0c 2b a2 07 e6 be 31
 		{
 			UINT32 seed = m_seed;
 			UINT32 magic = m_magic;

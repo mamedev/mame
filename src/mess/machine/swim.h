@@ -3,7 +3,7 @@
     swim.h
 
     Implementation of the Apple SWIM FDC controller; used on (less)
-	early Macs
+    early Macs
 
 *********************************************************************/
 
@@ -37,11 +37,11 @@ protected:
 	virtual void iwm_modereg_w(UINT8 data);
 
 private:
-	UINT8		m_swim_mode;
-	UINT8		m_swim_magic_state;
-	UINT8		m_parm_offset;
-	UINT8		m_ism_regs[8];
-	UINT8		m_parms[16];
+	UINT8       m_swim_mode;
+	UINT8       m_swim_magic_state;
+	UINT8       m_parm_offset;
+	UINT8       m_ism_regs[8];
+	UINT8       m_parms[16];
 };
 
 
@@ -55,7 +55,7 @@ private:
 	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MCFG_SWIM_MODIFY(_tag, _intrf) \
-  MCFG_DEVICE_MODIFY(_tag)	      \
-  MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_MODIFY(_tag)          \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif // __SWIM_H__

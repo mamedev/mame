@@ -139,7 +139,7 @@ WRITE8_MEMBER(mie_device::control_w)
 	control = (control & ~(255 << shift)) | (data << shift);
 
 	if((!(prev_control & CTRL_TXB) && (control & CTRL_TXB)) ||
-	   (!(prev_control & CTRL_CTXB) && (control & CTRL_CTXB))) {
+		(!(prev_control & CTRL_CTXB) && (control & CTRL_CTXB))) {
 		control &= ~(CTRL_TFB|CTRL_RXB|CTRL_RFB|CTRL_BFOV|CTRL_EMP);
 		reply_size = lreg+1;
 		if(reply_size > TBUF_SIZE)

@@ -108,13 +108,13 @@ inline render_font::glyph &render_font::get_char(unicode_char chnum)
 
 render_font::render_font(render_manager &manager, const char *filename)
 	: m_manager(manager),
-	  m_format(FF_UNKNOWN),
-	  m_height(0),
-	  m_yoffs(0),
-	  m_scale(1.0f),
-	  m_rawdata(NULL),
-	  m_rawsize(0),
-	  m_osdfont(NULL)
+		m_format(FF_UNKNOWN),
+		m_height(0),
+		m_yoffs(0),
+		m_scale(1.0f),
+		m_rawdata(NULL),
+		m_rawsize(0),
+		m_osdfont(NULL)
 {
 	memset(m_glyphs, 0, sizeof(m_glyphs));
 

@@ -81,11 +81,11 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 
 core_options::entry::entry(const options_entry &entrylist)
 	: m_next(NULL),
-	  m_flags(entrylist.flags),
-	  m_seqid(0),
-	  m_error_reported(false),
-	  m_priority(OPTION_PRIORITY_DEFAULT),
-	  m_description(entrylist.description)
+		m_flags(entrylist.flags),
+		m_seqid(0),
+		m_error_reported(false),
+		m_priority(OPTION_PRIORITY_DEFAULT),
+		m_description(entrylist.description)
 {
 	// copy in the name(s) as appropriate
 	if (entrylist.name != NULL)
@@ -180,20 +180,20 @@ void core_options::entry::revert(int priority)
 
 core_options::core_options()
 	: m_entrylist(NULL),
-	  m_entrylist_tailptr(&m_entrylist)
+		m_entrylist_tailptr(&m_entrylist)
 {
 }
 
 core_options::core_options(const options_entry *entrylist)
 	: m_entrylist(NULL),
-	  m_entrylist_tailptr(&m_entrylist)
+		m_entrylist_tailptr(&m_entrylist)
 {
 	add_entries(entrylist);
 }
 
 core_options::core_options(const options_entry *entrylist1, const options_entry *entrylist2)
 	: m_entrylist(NULL),
-	  m_entrylist_tailptr(&m_entrylist)
+		m_entrylist_tailptr(&m_entrylist)
 {
 	add_entries(entrylist1);
 	add_entries(entrylist2);
@@ -201,7 +201,7 @@ core_options::core_options(const options_entry *entrylist1, const options_entry 
 
 core_options::core_options(const options_entry *entrylist1, const options_entry *entrylist2, const options_entry *entrylist3)
 	: m_entrylist(NULL),
-	  m_entrylist_tailptr(&m_entrylist)
+		m_entrylist_tailptr(&m_entrylist)
 {
 	add_entries(entrylist1);
 	add_entries(entrylist2);
@@ -210,7 +210,7 @@ core_options::core_options(const options_entry *entrylist1, const options_entry 
 
 core_options::core_options(const core_options &src)
 	: m_entrylist(NULL),
-	  m_entrylist_tailptr(&m_entrylist)
+		m_entrylist_tailptr(&m_entrylist)
 {
 	copyfrom(src);
 }

@@ -14,7 +14,7 @@
 
 // ======================> datapack_device
 
-class datapack_device :	public device_t,
+class datapack_device : public device_t,
 						public device_image_interface
 {
 public:
@@ -54,13 +54,13 @@ protected:
 
 private:
 	// internal device state
-	UINT8  m_id;				//datapack ID
-	UINT8  m_size;				//size in 8k blocks
-	UINT8  m_data;				//data lines
-	UINT8  m_control;			//control lines
-	UINT16 m_counter;			//address counter
-	UINT8  m_page;				//active page (only for paged Datapack)
-	UINT8  m_segment;			//active segment (only for segmented Datapack)
+	UINT8  m_id;                //datapack ID
+	UINT8  m_size;              //size in 8k blocks
+	UINT8  m_data;              //data lines
+	UINT8  m_control;           //control lines
+	UINT16 m_counter;           //address counter
+	UINT8  m_page;              //active page (only for paged Datapack)
+	UINT8  m_segment;           //active segment (only for segmented Datapack)
 };
 
 

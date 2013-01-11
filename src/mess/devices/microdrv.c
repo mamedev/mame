@@ -15,20 +15,20 @@
 
 #define LOG 1
 
-#define MDV_SECTOR_COUNT			255
-#define MDV_SECTOR_LENGTH			686
-#define MDV_IMAGE_LENGTH			(MDV_SECTOR_COUNT * MDV_SECTOR_LENGTH)
+#define MDV_SECTOR_COUNT            255
+#define MDV_SECTOR_LENGTH           686
+#define MDV_IMAGE_LENGTH            (MDV_SECTOR_COUNT * MDV_SECTOR_LENGTH)
 
-#define MDV_PREAMBLE_LENGTH			12
-#define MDV_GAP_LENGTH				120
+#define MDV_PREAMBLE_LENGTH         12
+#define MDV_GAP_LENGTH              120
 
-#define MDV_OFFSET_HEADER_PREAMBLE	0
-#define MDV_OFFSET_HEADER			MDV_OFFSET_HEADER_PREAMBLE + MDV_PREAMBLE_LENGTH
-#define MDV_OFFSET_DATA_PREAMBLE	28
-#define MDV_OFFSET_DATA				MDV_OFFSET_DATA_PREAMBLE + MDV_PREAMBLE_LENGTH
-#define MDV_OFFSET_GAP				566
+#define MDV_OFFSET_HEADER_PREAMBLE  0
+#define MDV_OFFSET_HEADER           MDV_OFFSET_HEADER_PREAMBLE + MDV_PREAMBLE_LENGTH
+#define MDV_OFFSET_DATA_PREAMBLE    28
+#define MDV_OFFSET_DATA             MDV_OFFSET_DATA_PREAMBLE + MDV_PREAMBLE_LENGTH
+#define MDV_OFFSET_GAP              566
 
-#define MDV_BITRATE					120000 // invalid, from ZX microdrive
+#define MDV_BITRATE                 120000 // invalid, from ZX microdrive
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -42,8 +42,8 @@ const device_type MICRODRIVE = &device_creator<microdrive_image_device>;
 //-------------------------------------------------
 
 microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 
 }

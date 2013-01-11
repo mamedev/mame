@@ -148,7 +148,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 	{
 		for (x = 0; x < 32; x++)
 		{
-			drawgfx_transpen(	bitmap,
+			drawgfx_transpen(   bitmap,
 					cliprect,
 					machine().gfx[0],
 					m_videoram[(y * 32 + x) * 2 + 1] + (m_videoram[(y * 32 + x) * 2] & 7) * 256,

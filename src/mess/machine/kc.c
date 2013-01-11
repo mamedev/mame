@@ -7,16 +7,16 @@
 
 struct kcc_header
 {
-	UINT8	name[10];
-	UINT8	reserved[6];
-	UINT8	number_addresses;
-	UINT8	load_address_l;
-	UINT8	load_address_h;
-	UINT8	end_address_l;
-	UINT8	end_address_h;
-	UINT8	execution_address_l;
-	UINT8	execution_address_h;
-	UINT8	pad[128-2-2-2-1-16];
+	UINT8   name[10];
+	UINT8   reserved[6];
+	UINT8   number_addresses;
+	UINT8   load_address_l;
+	UINT8   load_address_h;
+	UINT8   end_address_l;
+	UINT8   end_address_h;
+	UINT8   execution_address_l;
+	UINT8   execution_address_h;
+	UINT8   pad[128-2-2-2-1-16];
 };
 
 /* appears to work a bit.. */
@@ -346,9 +346,9 @@ void kc_state::update_0x0c000()
 	if ((m_pio_data[0] & (1<<7)) && memregion("basic")->base() != NULL)
 	{
 		/* BASIC takes next priority */
-        	LOG(("BASIC rom 0x0c000\n"));
+			LOG(("BASIC rom 0x0c000\n"));
 
-        membank("bank4")->set_base(memregion("basic")->base());
+		membank("bank4")->set_base(memregion("basic")->base());
 		space.install_read_bank(0xc000, 0xdfff, "bank4");
 		space.unmap_write(0xc000, 0xdfff);
 	}
@@ -390,21 +390,21 @@ void kc_state::update_0x08000()
 {
 	address_space &space = m_maincpu->space( AS_PROGRAM );
 
-    if (m_pio_data[0] & (1<<2))
-    {
-        /* IRM enabled */
-        LOG(("IRM enabled\n"));
+	if (m_pio_data[0] & (1<<2))
+	{
+		/* IRM enabled */
+		LOG(("IRM enabled\n"));
 
 		membank("bank3")->set_base(m_video_ram);
 		space.install_readwrite_bank(0x8000, 0xbfff, "bank3");
-    }
-    else
-    {
+	}
+	else
+	{
 		LOG(("Module at 0x8000!\n"));
 
 		space.install_read_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(kc_state::expansion_8000_r), this), 0);
 		space.install_write_handler(0x8000, 0xbfff, 0, 0, write8_delegate(FUNC(kc_state::expansion_8000_w), this), 0);
-    }
+	}
 }
 
 
@@ -504,8 +504,8 @@ void kc85_4_state::update_0x08000()
 		membank("bank6")->set_base(m_video_ram + 0x2800);
 		space.install_readwrite_bank(0xa800, 0xbfff, "bank6");
 	}
-    else if (m_pio_data[1] & (1<<5))
-    {
+	else if (m_pio_data[1] & (1<<5))
+	{
 		LOG(("RAM8 enabled\n"));
 
 		int ram8_block;
@@ -548,14 +548,14 @@ void kc85_4_state::update_0x08000()
 			space.install_write_bank(0x8000, 0xa7ff, "bank3");
 			space.install_write_bank(0xa800, 0xbfff, "bank6");
 		}
-    }
-    else
-    {
+	}
+	else
+	{
 		LOG(("Module at 0x8000\n"));
 
 		space.install_read_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(kc_state::expansion_8000_r), this), 0);
 		space.install_write_handler(0x8000, 0xbfff, 0, 0, write8_delegate(FUNC(kc_state::expansion_8000_w), this), 0);
-    }
+	}
 }
 
 //**************************************************************************
@@ -783,10 +783,10 @@ void kc_state::machine_reset()
 	cassette_set_motor(0);
 
 	/* this is temporary. Normally when a Z80 is reset, it will
-    execute address 0. It appears the KC85 series pages the rom
-    at address 0x0000-0x01000 which has a single jump in it,
-    can't see yet where it disables it later!!!! so for now
-    here will be a override */
+	execute address 0. It appears the KC85 series pages the rom
+	at address 0x0000-0x01000 which has a single jump in it,
+	can't see yet where it disables it later!!!! so for now
+	here will be a override */
 	m_maincpu->set_pc(0x0f000);
 }
 

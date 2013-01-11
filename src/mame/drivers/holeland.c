@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, holeland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(watchdog_reset_r)	/* ? */
+	AM_RANGE(0x01, 0x01) AM_READ(watchdog_reset_r)  /* ? */
 	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("ay2", ay8910_r)
@@ -233,7 +233,7 @@ static const gfx_layout crzrally_spritelayout =
 	{ 0, 1 },
 	{ 3*2, 2*2, 1*2, 0*2, 7*2, 6*2, 5*2, 4*2,
 			16+3*2, 16+2*2, 16+1*2, 16+0*2, 16+7*2, 16+6*2, 16+5*2, 16+4*2 },
-	{		RGN_FRAC(3,4)+0*16, RGN_FRAC(2,4)+0*16, RGN_FRAC(1,4)+0*16, RGN_FRAC(0,4)+0*16,
+	{       RGN_FRAC(3,4)+0*16, RGN_FRAC(2,4)+0*16, RGN_FRAC(1,4)+0*16, RGN_FRAC(0,4)+0*16,
 			RGN_FRAC(3,4)+2*16, RGN_FRAC(2,4)+2*16, RGN_FRAC(1,4)+2*16, RGN_FRAC(0,4)+2*16,
 			RGN_FRAC(3,4)+4*16, RGN_FRAC(2,4)+4*16, RGN_FRAC(1,4)+4*16, RGN_FRAC(0,4)+4*16,
 			RGN_FRAC(3,4)+6*16, RGN_FRAC(2,4)+6*16, RGN_FRAC(1,4)+6*16, RGN_FRAC(0,4)+6*16 },

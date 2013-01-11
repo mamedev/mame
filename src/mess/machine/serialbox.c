@@ -15,9 +15,9 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6502_TAG		"u1"
-#define M8520_TAG		"u5"
-#define WD1770_TAG		"u4"
+#define M6502_TAG       "u1"
+#define M8520_TAG       "u5"
+#define WD1770_TAG      "u4"
 
 
 enum
@@ -95,9 +95,9 @@ machine_config_constructor serial_box_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 serial_box_device::serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SERIAL_BOX, "Serial Box", tag, owner, clock),
-	  device_cbm_iec_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_TAG)
+	: device_t(mconfig, SERIAL_BOX, "Serial Box", tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this),
+		m_maincpu(*this, M6502_TAG)
 {
 }
 

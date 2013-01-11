@@ -156,7 +156,7 @@ WRITE8_MEMBER(jackal_state::jackal_spriteram_w)
  *************************************/
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
-	AM_RANGE(0x0000, 0x0003) AM_RAM AM_SHARE("videoctrl")	// scroll + other things
+	AM_RANGE(0x0000, 0x0003) AM_RAM AM_SHARE("videoctrl")   // scroll + other things
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(jackal_flipscreen_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("IN1")
@@ -166,18 +166,18 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x0018, 0x0018) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0019, 0x0019) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
-	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)				// MAIN   Z RAM,SUB    Z RAM
-	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE("share1")							// M COMMON RAM,S COMMON RAM
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(jackal_voram_r, jackal_voram_w)			// MAIN V O RAM,SUB  V O RAM
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(jackal_spriteram_r, jackal_spriteram_w)	// MAIN V O RAM,SUB  V O RAM
+	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)             // MAIN   Z RAM,SUB    Z RAM
+	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE("share1")                          // M COMMON RAM,S COMMON RAM
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(jackal_voram_r, jackal_voram_w)           // MAIN V O RAM,SUB  V O RAM
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(jackal_spriteram_r, jackal_spriteram_w)   // MAIN V O RAM,SUB  V O RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("paletteram")	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
-	AM_RANGE(0x6000, 0x605f) AM_RAM						// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("paletteram")  // self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
+	AM_RANGE(0x6000, 0x605f) AM_RAM                     // SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -244,10 +244,10 @@ static INPUT_PORTS_START( topgunbl )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DIAL0")	// player 1 8-way rotary control - converted in topgunbl_rotary_r()
+	PORT_START("DIAL0") // player 1 8-way rotary control - converted in topgunbl_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_FULL_TURN_COUNT(8)
 
-	PORT_START("DIAL1")	// player 2 8-way rotary control - converted in topgunbl_rotary_r()
+	PORT_START("DIAL1") // player 2 8-way rotary control - converted in topgunbl_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_FULL_TURN_COUNT(8)
 INPUT_PORTS_END
 
@@ -262,7 +262,7 @@ static const gfx_layout charlayout =
 {
 	8, 8,
 	RGN_FRAC(1,4),
-	8,	/* 8 bits per pixel (!) */
+	8,  /* 8 bits per pixel (!) */
 	{ 0, 1, 2, 3, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
@@ -294,11 +294,11 @@ static const gfx_layout spritelayout8 =
 };
 
 static GFXDECODE_START( jackal )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )	// colors 256-511 without lookup
-	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )	// colors   0- 15 with lookup
-	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )	// to handle 8x8 sprites
-	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout,  0x200, 16 )	// colors  16- 31 with lookup
-	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout8, 0x200, 16 )	// to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
+	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
+	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout,  0x200, 16 )    // colors  16- 31 with lookup
+	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout8, 0x200, 16 )    // to handle 8x8 sprites
 GFXDECODE_END
 
 /*************************************
@@ -392,7 +392,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( jackal )
-	ROM_REGION( 0x20000, "master", 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "j-v02.rom",    0x04000, 0x8000, CRC(0b7e0584) SHA1(e4019463345a4c020d5a004c9a400aca4bdae07b) )
 	ROM_CONTINUE(             0x14000, 0x8000 )
 	ROM_LOAD( "j-v03.rom",    0x0c000, 0x4000, CRC(3e0dfb83) SHA1(5ba7073751eee33180e51143b348256597909516) )
@@ -406,13 +406,13 @@ ROM_START( jackal )
 	ROM_LOAD16_BYTE( "631t06.bin",   0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) )
 	ROM_LOAD16_BYTE( "631t07.bin",   0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, "proms", 0 )    /* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END
 
 ROM_START( topgunr )
-	ROM_REGION( 0x20000, "master", 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "tgnr15d.bin",  0x04000, 0x8000, CRC(f7e28426) SHA1(db2d5f252a574b8aa4d8406a8e93b423fd2a7fef) )
 	ROM_CONTINUE(             0x14000, 0x8000 )
 	ROM_LOAD( "tgnr16d.bin",  0x0c000, 0x4000, CRC(c086844e) SHA1(4d6f27ac3aabb4b2d673aa619e407e417ad89337) )
@@ -426,13 +426,13 @@ ROM_START( topgunr )
 	ROM_LOAD16_BYTE( "tgnr12h.bin",  0x40000, 0x20000, CRC(37dbbdb0) SHA1(f94db780d69e7dd40231a75629af79469d957378) )
 	ROM_LOAD16_BYTE( "tgnr13h.bin",  0x40001, 0x20000, CRC(22effcc8) SHA1(4d174b0ce64def32050f87343c4b1424e0fef6f7) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, "proms", 0 )    /* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END
 
 ROM_START( jackalj )
-	ROM_REGION( 0x20000, "master", 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "631t02.bin",   0x04000, 0x8000, CRC(14db6b1a) SHA1(b469ea50aa94a2bda3bd0442300aa1272e5f30c4) )
 	ROM_CONTINUE(             0x14000, 0x8000 )
 	ROM_LOAD( "631t03.bin",   0x0c000, 0x4000, CRC(fd5f9624) SHA1(2520c1ff54410ef498ecbf52877f011900baed4c) )
@@ -446,13 +446,13 @@ ROM_START( jackalj )
 	ROM_LOAD16_BYTE( "631t06.bin",   0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) )
 	ROM_LOAD16_BYTE( "631t07.bin",   0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, "proms", 0 )    /* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END
 
 ROM_START( topgunbl )
-	ROM_REGION( 0x20000, "master", 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "t-3.c5",       0x04000, 0x8000, CRC(7826ad38) SHA1(875e87867924905b9b83bc203eb7ffe81cf72233) )
 	ROM_LOAD( "t-4.c4",       0x14000, 0x8000, CRC(976c8431) SHA1(c199f57c25380d741aec85b0e0bfb6acf383e6a6) )
 	ROM_LOAD( "t-2.c6",       0x0c000, 0x4000, CRC(d53172e5) SHA1(44b7f180c17f9a121a2f06f2d3471920a8989e21) )
@@ -486,7 +486,7 @@ ROM_START( topgunbl )
 	ROM_LOAD16_WORD_SWAP( "t-12.n7",      0x78000, 0x08000, CRC(15606dfc) )
 #endif
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, "proms", 0 )    /* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END

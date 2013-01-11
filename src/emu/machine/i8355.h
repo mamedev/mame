@@ -51,7 +51,7 @@
 ///*************************************************************************
 
 #define MCFG_I8355_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), I8355, _clock)	\
+	MCFG_DEVICE_ADD((_tag), I8355, _clock)  \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define I8355_INTERFACE(name) \
@@ -67,36 +67,36 @@
 
 struct i8355_interface
 {
-	devcb_read8				m_in_pa_cb;
-	devcb_write8			m_out_pa_cb;
+	devcb_read8             m_in_pa_cb;
+	devcb_write8            m_out_pa_cb;
 
-	devcb_read8				m_in_pb_cb;
-	devcb_write8			m_out_pb_cb;
+	devcb_read8             m_in_pb_cb;
+	devcb_write8            m_out_pb_cb;
 };
 
 
 
 // ======================> i8355_device
 
-class i8355_device :	public device_t,
+class i8355_device :    public device_t,
 						public device_memory_interface,
-                        public i8355_interface
+						public i8355_interface
 {
 public:
-    // construction/destruction
-    i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( io_r );
-    DECLARE_WRITE8_MEMBER( io_w );
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
 
-    DECLARE_READ8_MEMBER( memory_r );
-    DECLARE_WRITE8_MEMBER( memory_w );
+	DECLARE_READ8_MEMBER( memory_r );
+	DECLARE_WRITE8_MEMBER( memory_w );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -105,14 +105,14 @@ protected:
 	inline void write_port(int port, UINT8 data);
 
 private:
-	devcb_resolved_read8		m_in_port_func[2];
-	devcb_resolved_write8		m_out_port_func[2];
+	devcb_resolved_read8        m_in_port_func[2];
+	devcb_resolved_write8       m_out_port_func[2];
 
 	// registers
-	UINT8 m_output[2];			// output latches
-	UINT8 m_ddr[2];				// DDR latches
+	UINT8 m_output[2];          // output latches
+	UINT8 m_ddr[2];             // DDR latches
 
-	const address_space_config		m_space_config;
+	const address_space_config      m_space_config;
 };
 
 

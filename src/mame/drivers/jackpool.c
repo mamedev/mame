@@ -116,8 +116,8 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 		case 0x1c: return ioport("BET")->read();
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
-    	case 0x2c: return machine().device<eeprom_device>("eeprom")->read_bit();
-    	case 0x2e: return machine().device<eeprom_device>("eeprom")->read_bit();
+		case 0x2c: return machine().device<eeprom_device>("eeprom")->read_bit();
+		case 0x2e: return machine().device<eeprom_device>("eeprom")->read_bit();
 //      default: printf("R %02x\n",offset*2); break;
 	}
 

@@ -133,10 +133,10 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 	if (offset==2)
 	{
 		int i,j;
-		int width	= m_reg[2];
-		int y		= m_reg[0];
-		int x		= m_reg[1];
-		int color	= m_reg[3] & 0x0f;
+		int width   = m_reg[2];
+		int y       = m_reg[0];
+		int x       = m_reg[1];
+		int color   = m_reg[3] & 0x0f;
 		int xdirection = 1, ydirection = 1;
 
 		if (m_reg[3] & 0x10) ydirection = -1;
@@ -248,7 +248,7 @@ static INPUT_PORTS_START( roul )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-    /* single - split - street - square / double street / dozen - column - 1 to 18 - 19 to 36 - red - black - odd - even */
+	/* single - split - street - square / double street / dozen - column - 1 to 18 - 19 to 36 - red - black - odd - even */
 	PORT_DIPNAME( 0x81, 0x00, "Max Bet" )
 	PORT_DIPSETTING(    0x00, "10 / 30 / 30" )
 	PORT_DIPSETTING(    0x80, "20 / 40 / 50" )
@@ -306,15 +306,15 @@ MACHINE_CONFIG_END
 
 ROM_START(roul)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("roul.u19",	0x0000, 0x8000, CRC(1ec37876) SHA1(c2877646dad9daebc55db57d513ad448b1f4c923) )
+	ROM_LOAD("roul.u19",    0x0000, 0x8000, CRC(1ec37876) SHA1(c2877646dad9daebc55db57d513ad448b1f4c923) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD("roul.u12",	0x0000, 0x1000, CRC(356fe025) SHA1(bca69e090a852454e921130afbdd28021b62c44e) )
+	ROM_LOAD("roul.u12",    0x0000, 0x1000, CRC(356fe025) SHA1(bca69e090a852454e921130afbdd28021b62c44e) )
 	ROM_CONTINUE(0x0000,0x1000)
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "roul.u53",	0x0000, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
-	ROM_LOAD( "roul.u38",	0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
+	ROM_LOAD( "roul.u53",   0x0000, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
+	ROM_LOAD( "roul.u38",   0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
 
 GAMEL( 1990, roul,  0,   roul, roul, driver_device, 0, ROT0, "bootleg", "Super Lucky Roulette", GAME_IMPERFECT_GRAPHICS, layout_roul )

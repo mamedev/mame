@@ -27,17 +27,17 @@
 
 #define LOG 0
 
-#define OPTION_ID		0x10
+#define OPTION_ID       0x10
 
-#define MC6845_TAG		"mc6845"
-#define SCREEN_TAG		"screen"
+#define MC6845_TAG      "mc6845"
+#define SCREEN_TAG      "screen"
 
-#define RAM_SIZE		0x8000
+#define RAM_SIZE        0x8000
 
-#define OPTION_VRAM		BIT(m_option, 0)
-#define OPTION_UNKNOWN	BIT(m_option, 1)
-#define OPTION_80_COL	BIT(m_option, 2)
-#define OPTION_VSYNC	BIT(m_option, 3)
+#define OPTION_VRAM     BIT(m_option, 0)
+#define OPTION_UNKNOWN  BIT(m_option, 1)
+#define OPTION_80_COL   BIT(m_option, 2)
+#define OPTION_VSYNC    BIT(m_option, 3)
 
 
 
@@ -58,47 +58,47 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 
 	if (OPTION_80_COL)
 	{
-	    for (int column = 0; column < x_count; column++)
-	    {
-	    	offs_t addr = scroll_y + (m_scroll & 0x3f) + ((ma / 80) * 0x480) + (((ra & 0x0f) << 7) | (column & 0x7f));
-	        UINT16 data = m_video_ram[addr & 0x7fff];
+		for (int column = 0; column < x_count; column++)
+		{
+			offs_t addr = scroll_y + (m_scroll & 0x3f) + ((ma / 80) * 0x480) + (((ra & 0x0f) << 7) | (column & 0x7f));
+			UINT16 data = m_video_ram[addr & 0x7fff];
 
-	        for (int bit = 0; bit < 8; bit++)
-	        {
-	            int x = (column * 8) + bit;
-	            int color = (BIT(data, 15) << 1) | BIT(data, 7);
+			for (int bit = 0; bit < 8; bit++)
+			{
+				int x = (column * 8) + bit;
+				int color = (BIT(data, 15) << 1) | BIT(data, 7);
 
-	            if (column == cursor_x) color = 0x03;
+				if (column == cursor_x) color = 0x03;
 
-	            bitmap.pix32(y, x) = m_palette[color];
+				bitmap.pix32(y, x) = m_palette[color];
 
-	            data <<= 1;
-	        }
-	    }
+				data <<= 1;
+			}
+		}
 	}
 	else
 	{
-    	//offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + ((ma / 40) * 0x480) + (((ra & 0x0f) << 7));
-    	offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + (y * 0x80);
+		//offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + ((ma / 40) * 0x480) + (((ra & 0x0f) << 7));
+		offs_t addr = scroll_y + ((m_scroll & 0x3f) << 1) + (y * 0x80);
 
-	    for (int column = 0; column < x_count; column++)
-	    {
-	        UINT32 data = (m_video_ram[(addr + 1) & 0x7fff] << 16) | m_video_ram[addr & 0x7fff];
+		for (int column = 0; column < x_count; column++)
+		{
+			UINT32 data = (m_video_ram[(addr + 1) & 0x7fff] << 16) | m_video_ram[addr & 0x7fff];
 
-	        for (int bit = 0; bit < 8; bit++)
-	        {
-	            int x = (column * 8) + bit;
-	            int color = (BIT(data, 31) << 3) | (BIT(data, 23) << 2) | (BIT(data, 15) << 1) | BIT(data, 7);
+			for (int bit = 0; bit < 8; bit++)
+			{
+				int x = (column * 8) + bit;
+				int color = (BIT(data, 31) << 3) | (BIT(data, 23) << 2) | (BIT(data, 15) << 1) | BIT(data, 7);
 
-	            if (column == cursor_x) color = 0x03;
+				if (column == cursor_x) color = 0x03;
 
-	            bitmap.pix32(y, x) = m_palette[color];
+				bitmap.pix32(y, x) = m_palette[color];
 
-	            data <<= 1;
-	        }
+				data <<= 1;
+			}
 
-	        addr += 2;
-	    }
+			addr += 2;
+		}
 	}
 }
 

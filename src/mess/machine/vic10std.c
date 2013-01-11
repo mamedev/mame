@@ -28,8 +28,8 @@ const device_type VIC10_STD = &device_creator<vic10_standard_cartridge_device>;
 //-------------------------------------------------
 
 vic10_standard_cartridge_device::vic10_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, VIC10_STD, "VIC-10 Standard Cartridge", tag, owner, clock),
-	  device_vic10_expansion_card_interface(mconfig, *this)
+	: device_t(mconfig, VIC10_STD, "VIC-10 Standard Cartridge", tag, owner, clock),
+		device_vic10_expansion_card_interface(mconfig, *this)
 {
 }
 

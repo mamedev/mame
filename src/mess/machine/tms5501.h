@@ -34,18 +34,18 @@ typedef void (*tms5501_interrupt_cb)(device_t &device, int intreq, UINT8 vector)
 
 struct tms5501_interface
 {
-	devcb_read8				m_pio_read_cb;		 // PIO read
-	devcb_write8			m_pio_write_cb;		 // PIO write
-	tms5501_interrupt_cb	m_interrupt_cb;		 // interrupt callback
+	devcb_read8             m_pio_read_cb;       // PIO read
+	devcb_write8            m_pio_write_cb;      // PIO write
+	tms5501_interrupt_cb    m_interrupt_cb;      // interrupt callback
 };
 
 // ======================> tms5501_device
 
-class tms5501_device :	public device_t,
+class tms5501_device :  public device_t,
 						public tms5501_interface
 {
 public:
-    // construction/destruction
+	// construction/destruction
 	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( read );
@@ -69,29 +69,29 @@ public:
 	static const device_timer_id TIMER_DECREMENTER = 0;
 
 	// internal registers
-	UINT8	m_status;					// status register
-	UINT8	m_command;					// command register, bits 1-5 are latched
+	UINT8   m_status;                   // status register
+	UINT8   m_command;                  // command register, bits 1-5 are latched
 
-	UINT8	m_sio_rate;					// SIO configuration register
-	UINT8	m_sio_input_buffer;			// SIO input buffer
-	UINT8	m_sio_output_buffer;		// SIO output buffer
+	UINT8   m_sio_rate;                 // SIO configuration register
+	UINT8   m_sio_input_buffer;         // SIO input buffer
+	UINT8   m_sio_output_buffer;        // SIO output buffer
 
-	UINT8	m_pio_input_buffer;			// PIO input buffer
-	UINT8	m_pio_output_buffer;		// PIO output buffer
+	UINT8   m_pio_input_buffer;         // PIO input buffer
+	UINT8   m_pio_output_buffer;        // PIO output buffer
 
-	UINT8	m_interrupt_mask;			// interrupt mask register
-	UINT8	m_pending_interrupts;		// pending interrupts register
-	UINT8	m_interrupt_address;		// interrupt vector register
+	UINT8   m_interrupt_mask;           // interrupt mask register
+	UINT8   m_pending_interrupts;       // pending interrupts register
+	UINT8   m_interrupt_address;        // interrupt vector register
 
-	int 	m_sensor;					// sensor input
+	int     m_sensor;                   // sensor input
 
 	// internal timers
-	UINT8		m_timer_counter[5];
+	UINT8       m_timer_counter[5];
 	emu_timer * m_timer[5];
 
 	// PIO callbacks
-	devcb_resolved_read8	m_pio_read_func;
-	devcb_resolved_write8	m_pio_write_func;
+	devcb_resolved_read8    m_pio_read_func;
+	devcb_resolved_write8   m_pio_write_func;
 };
 
 

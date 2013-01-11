@@ -52,7 +52,7 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 				scanline[col] = m_bordercolor;
 			}
 		}
-		else	// regular screen area
+		else    // regular screen area
 		{
 			int shrline = beamy - BORDER_TOP;
 
@@ -69,7 +69,7 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 				scanline[col+BORDER_LEFT+640] = m_bordercolor;
 			}
 
-			if (scb & 0x80)	// 640 mode
+			if (scb & 0x80) // 640 mode
 			{
 				for (col = 0; col < 160; col++)
 				{
@@ -80,7 +80,7 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 					scanline[col * 4 + 3 + BORDER_LEFT] = palette + 12 + ((b >> 0) & 0x03);
 				}
 			}
-			else		// 320 mode
+			else        // 320 mode
 			{
 				for (col = 0; col < 160; col++)
 				{
@@ -158,4 +158,3 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 	}
 	return 0;
 }
-

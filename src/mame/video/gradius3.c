@@ -81,7 +81,7 @@ void gradius3_state::video_start()
 	k051960_set_sprite_offsets(m_k051960, 2, 0);
 
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
-       from how they are connected to the CPU. */
+	   from how they are connected to the CPU. */
 	for (i = 0; i < TOTAL_SPRITES; i++)
 		machine().gfx[1]->mark_dirty(i);
 

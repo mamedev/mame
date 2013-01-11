@@ -231,7 +231,7 @@ private:
 	UINT16* m_cram;
 	UINT16* m_vsram;
 	/* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
-       to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
+	   to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
 	UINT16* m_internal_sprite_attribute_table;
 
 	// these are used internally by the VDP to schedule when after the start of a scanline
@@ -290,6 +290,3 @@ private:
 
 
 extern const device_type SEGA_GEN_VDP;
-
-
-

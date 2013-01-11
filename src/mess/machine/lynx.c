@@ -8,10 +8,10 @@
 #include "imagedev/cartslot.h"
 
 
-#define PAD_UP		0x80
-#define PAD_DOWN	0x40
-#define PAD_LEFT	0x20
-#define PAD_RIGHT	0x10
+#define PAD_UP      0x80
+#define PAD_DOWN    0x40
+#define PAD_LEFT    0x20
+#define PAD_RIGHT   0x10
 
 
 /****************************************
@@ -116,18 +116,18 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 	colbuf = state->m_blitter.colbuf + y * 80 + x / 2;
 
 	/* a note on timing: The hardware packs the pixel data and updates the screen and collision buffer a byte at a time.
-    Thus the buffer update for two pixels takes 3 memory accesses for a normal sprite (write to screen buffer, read/write to collision buffer).
-    +1 memory access for palette fetch?
-    */
+	Thus the buffer update for two pixels takes 3 memory accesses for a normal sprite (write to screen buffer, read/write to collision buffer).
+	+1 memory access for palette fetch?
+	*/
 
 	switch (mode&0x7)
 	{
 		case NORMAL_SPRITE:
 		/* A sprite may be set to 'normal'. This means that pen number '0' will be transparent and
-        non-collideable. All other pens will be opaque and collideable */
+		non-collideable. All other pens will be opaque and collideable */
 			if (color == 0)
 				break;
-			if (!(x & 0x01))		/* Upper nibble */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
@@ -143,7 +143,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				}
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0xf0) | color);
@@ -160,10 +160,10 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 
 		case BOUNDARY:
 		/* A sprite may be set to 'boundary'. This is a 'normal' sprite with the exception that pen
-        number 'F' is transparent (and still collideable). */
+		number 'F' is transparent (and still collideable). */
 			if (color == 0)
 				break;
-			if (!(x & 0x01))		/* Upper nibble */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				if (color != 0x0f)
 				{
@@ -181,7 +181,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				}
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				if (color != 0x0f)
 				{
@@ -200,10 +200,10 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 
 		case SHADOW:
 		/* A sprite may be set to 'shadow'. This is a 'normal' sprite with the exception that pen
-        number 'E' is non-collideable (but still opaque) */
+		number 'E' is non-collideable (but still opaque) */
 			if (color == 0)
 				break;
-			if (!(x & 0x01))		/* Upper nibble */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
@@ -219,7 +219,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				}
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0xf0) | color);
@@ -236,11 +236,11 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 
 		case BOUNDARY_SHADOW:
 		/* This sprite is a 'normal' sprite with the characteristics of both 'boundary'
-        and 'shadow'. That is, pen number 'F' is transparent (and still collideable) and
-        pen number 'E' is non-collideable (but still opaque). */
+		and 'shadow'. That is, pen number 'F' is transparent (and still collideable) and
+		pen number 'E' is non-collideable (but still opaque). */
 			if (color == 0)
 				break;
-			if (!(x & 0x01))		/* Upper nibble */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				if (color != 0x0f)
 				{
@@ -258,7 +258,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				}
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				if (color != 0x0f)
 				{
@@ -277,11 +277,11 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 
 		case BACKGROUND:
 		/* A sprite may be set to 'background'. This sprite will overwrite the contents of the video and
-        collision buffers. Pens '0' and 'F' are no longer transparent. This sprite is used to initialize
-        the buffers at the start of a 'painting'. Additionally, no collision detection is done, and no write
-        to the collision depository occurs. The 'E' error will cause the pen number 'E' to be non-collideable
-        and therefore not clear the collision buffer */
-			if (!(x & 0x01))		/* Upper nibble */
+		collision buffers. Pens '0' and 'F' are no longer transparent. This sprite is used to initialize
+		the buffers at the start of a 'painting'. Additionally, no collision detection is done, and no write
+		to the collision depository occurs. The 'E' error will cause the pen number 'E' to be non-collideable
+		and therefore not clear the collision buffer */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
@@ -295,7 +295,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				}
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0xf0) | color);
@@ -310,14 +310,14 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 
 		case BACKGROUND_NO_COLL:
 		/* This is a 'background' sprite with the exception that no activity occurs in the collision buffer */
-			if (!(x & 0x01))		/* Upper nibble */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
 				state->m_blitter.memory_accesses++;
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0xf0) | color);
@@ -326,17 +326,17 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 
 		case NO_COLL:
 		/* A sprite may be set to 'non-collideable'. This means that it will have no affect on the contents of
-        the collision buffer and all other collision activities are overridden (pen 'F' is not collideable). */
+		the collision buffer and all other collision activities are overridden (pen 'F' is not collideable). */
 			if (color == 0)
 				break;
-			if (!(x & 0x01))		/* Upper nibble */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
 				state->m_blitter.memory_accesses++;
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, (back & 0xf0) | color);
@@ -345,12 +345,12 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 
 		case XOR_SPRITE:
 		/* This is a 'normal' sprite with the exception that the data from the video buffer is exclusive-ored
-        with the sprite data and written back out to the video buffer. Collision activity is 'normal'. The 'E'
-        error will cause the pen number 'E' to be non-collideable and therefore not react with the collision
-        buffer */
+		with the sprite data and written back out to the video buffer. Collision activity is 'normal'. The 'E'
+		error will cause the pen number 'E' to be non-collideable and therefore not react with the collision
+		buffer */
 			if (color == 0)
 				break;
-			if (!(x & 0x01))		/* Upper nibble */
+			if (!(x & 0x01))        /* Upper nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, back^(color << 4));
@@ -365,7 +365,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				}
 				state->m_blitter.memory_accesses++;
 			}
-			else					/* Lower nibble */
+			else                    /* Lower nibble */
 			{
 				back = lynx_read_ram(state, screen);
 				lynx_write_ram(state, screen, back^color);
@@ -427,7 +427,7 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 	UINT16 width_accum;
 
 	width_accum = (xdir == 1) ? state->m_blitter.width_offset : 0;
-	for( bits = 0, j = 0, buffer = 0, xi = state->m_blitter.x_pos - state->m_blitter.xoff; ; )		/* through the rle entries */
+	for( bits = 0, j = 0, buffer = 0, xi = state->m_blitter.x_pos - state->m_blitter.xoff; ; )      /* through the rle entries */
 	{
 		if (bits < 5 + bits_per_pixel) /* under 7 bits no complete entry */
 		{
@@ -445,7 +445,7 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 		count = (buffer >> (bits - 4)) & 0x0f; // repeat count (packed) or pixel count (literal)
 		bits -= 4;
 
-		if (literal_data)		/* count of different pixels */
+		if (literal_data)       /* count of different pixels */
 		{
 			for ( ; count >= 0; count--)
 			{
@@ -470,7 +470,7 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 				width_accum &= 0xff;
 			}
 		}
-		else		/* count of same pixels */
+		else        /* count of same pixels */
 		{
 			if (count == 0) // 4 bit count value of zero indicates end-of-line in a packed sprite
 				return;
@@ -516,7 +516,7 @@ static void lynx_blit_lines(lynx_state *state)
 
 	state->m_blitter.everon = FALSE;
 
-	switch (state->m_blitter.spr_ctl1 & 0x03)	/* Initial drawing direction */
+	switch (state->m_blitter.spr_ctl1 & 0x03)   /* Initial drawing direction */
 	{
 		case 0: // Down/Right (quadrant 0)
 			xdir = 1;
@@ -540,12 +540,12 @@ static void lynx_blit_lines(lynx_state *state)
 			break;
 	}
 
-	if (state->m_blitter.spr_ctl0 & 0x20)	/* Horizontal Flip */
+	if (state->m_blitter.spr_ctl0 & 0x20)   /* Horizontal Flip */
 	{
 		xdir *= -1;
 	}
 
-	if (state->m_blitter.spr_ctl0 & 0x10)	/* Vertical Flip */
+	if (state->m_blitter.spr_ctl0 & 0x10)   /* Vertical Flip */
 	{
 		ydir *= -1;
 	}
@@ -758,10 +758,10 @@ static void lynx_blitter(running_machine &machine)
 					state->m_blitter.memory_accesses++;
 				}
 			}
-		 }
+			}
 
 
-		if (!(state->m_blitter.spr_ctl1 & 0x04))		// if 0, we skip this sprite
+		if (!(state->m_blitter.spr_ctl1 & 0x04))        // if 0, we skip this sprite
 		{
 			state->m_blitter.colpos = state->m_blitter.scb + (state->m_suzy.data[COLLOFFL] | (state->m_suzy.data[COLLOFFH]<<8));
 			state->m_blitter.mode = state->m_blitter.spr_ctl0 & 0x07;
@@ -831,13 +831,13 @@ void lynx_state::lynx_divide()
 	UINT16 right;
 	UINT32 res, mod;
 	/*
-    Hardware divide:
-                EFGH
-    *             NP
-    ----------------
-                ABCD
-    Remainder (JK)LM
-    */
+	Hardware divide:
+	            EFGH
+	*             NP
+	----------------
+	            ABCD
+	Remainder (JK)LM
+	*/
 
 	left = m_suzy.data[MATH_H] | (m_suzy.data[MATH_G] << 8) | (m_suzy.data[MATH_F] << 16) | (m_suzy.data[MATH_E] << 24);
 	right = m_suzy.data[MATH_P] | (m_suzy.data[MATH_N] << 8);
@@ -845,7 +845,7 @@ void lynx_state::lynx_divide()
 	m_suzy.accumulate_overflow = FALSE;
 	if (right == 0)
 	{
-		m_suzy.accumulate_overflow = TRUE;	/* during divisions, this bit is used to detect denominator = 0 */
+		m_suzy.accumulate_overflow = TRUE;  /* during divisions, this bit is used to detect denominator = 0 */
 		res = 0xffffffff;
 		mod = 0; //?
 	}
@@ -871,13 +871,13 @@ void lynx_state::lynx_multiply()
 	UINT16 left, right;
 	UINT32 res, accu;
 	/*
-    Hardware multiply:
-                  AB
-    *             CD
-    ----------------
-                EFGH
-    Accumulate  JKLM
-    */
+	Hardware multiply:
+	              AB
+	*             CD
+	----------------
+	            EFGH
+	Accumulate  JKLM
+	*/
 	m_suzy.accumulate_overflow = FALSE;
 
 	left = m_suzy.data[MATH_B] | (m_suzy.data[MATH_A] << 8);
@@ -887,7 +887,7 @@ void lynx_state::lynx_multiply()
 
 	if (m_suzy.signed_math)
 	{
-		if (!(m_sign_AB + m_sign_CD))	/* different signs */
+		if (!(m_sign_AB + m_sign_CD))   /* different signs */
 			res = (res ^ 0xffffffff) + 1;
 	}
 
@@ -1065,9 +1065,9 @@ WRITE8_MEMBER(lynx_state::suzy_write)
 	/* Additional effects of a write */
 	/* Even addresses are the LSB. Any CPU write to an LSB in 0x00-0x7f will set the MSB to 0. */
 	/* This in particular holds for math quantities:  Writing to B (0x54), D (0x52),
-    F (0x62), H (0x60), K (0x6e) or M (0x6c) will force a '0' to be written to A (0x55),
-    C (0x53), E (0x63), G (0x61), J (0x6f) or L (0x6d) respectively */
-   if ((offset < 0x80) && !(offset & 0x01))
+	F (0x62), H (0x60), K (0x6e) or M (0x6c) will force a '0' to be written to A (0x55),
+	C (0x53), E (0x63), G (0x61), J (0x6f) or L (0x6d) respectively */
+	if ((offset < 0x80) && !(offset & 0x01))
 	m_suzy.data[offset + 1] = 0;
 
 	switch(offset)
@@ -1200,12 +1200,12 @@ WRITE8_MEMBER(lynx_state::suzy_write)
 			break;
 		case MATH_C:
 			/* If we are going to perform a signed multiplication, we store the sign and convert the number
-            to an unsigned one */
+			to an unsigned one */
 			if (m_suzy.signed_math)
 			{
 				UINT16 factor, temp;
 				factor = m_suzy.data[MATH_D] | (m_suzy.data[MATH_C] << 8);
-				if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
+				if ((factor - 1) & 0x8000)      /* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
 				{
 					temp = (factor ^ 0xffff) + 1;
 					m_sign_CD = - 1;
@@ -1218,21 +1218,21 @@ WRITE8_MEMBER(lynx_state::suzy_write)
 			break;
 		case MATH_D:
 		/* Documentation states that writing to the MATH_D will set MATH_C to zero but not update the sign flag.
-        Implementing the sign detection as described in the documentation causes Stun Runners to not work.
-        Either the sign error in the docs is not as described or writing to the lower byte does update the sign flag.
-        Here I assume the sign flag gets updated. */
+		Implementing the sign detection as described in the documentation causes Stun Runners to not work.
+		Either the sign error in the docs is not as described or writing to the lower byte does update the sign flag.
+		Here I assume the sign flag gets updated. */
 			if (data)
 				m_sign_CD = 1;
 			break;
 		/* Writing to A will start a 16 bit multiply */
 		/* If we are going to perform a signed multiplication, we also store the sign and convert the
-        number to an unsigned one */
+		number to an unsigned one */
 		case MATH_A:
 			if (m_suzy.signed_math)
 			{
 				UINT16 factor, temp;
 				factor = m_suzy.data[MATH_B] | (m_suzy.data[MATH_A] << 8);
-				if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
+				if ((factor - 1) & 0x8000)      /* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
 				{
 					temp = (factor ^ 0xffff) + 1;
 					m_sign_AB = - 1;
@@ -1390,7 +1390,7 @@ TIM_BORROWIN    EQU %00000010
 TIM_BORROWOUT   EQU %00000001
 */
 
-#define NR_LYNX_TIMERS	8
+#define NR_LYNX_TIMERS  8
 
 
 
@@ -1494,7 +1494,7 @@ static UINT32 lynx_time_factor(int val)
 {
 	switch(val)
 	{
-		case 0:	return 1000000;
+		case 0: return 1000000;
 		case 1: return 500000;
 		case 2: return 250000;
 		case 3: return 125000;
@@ -1589,7 +1589,7 @@ void lynx_state::lynx_timer_write(int which, int offset, UINT8 data)
 	//{
 		m_timer[which].timer->reset();
 		m_timer[which].timer_active = 0;
-		if ((m_timer[which].cntrl1 & 0x08) && !(m_timer[which].cntrl2 & 0x08))		// if enable count
+		if ((m_timer[which].cntrl1 & 0x08) && !(m_timer[which].cntrl2 & 0x08))      // if enable count
 		{
 			if ((m_timer[which].cntrl1 & 0x07) != 0x07)  // if not set to link mode
 			{
@@ -1752,12 +1752,12 @@ READ8_MEMBER(lynx_state::mikey_read)
 
 	case 0x8b:
 		direction = m_mikey.data[0x8a];
-		value |= (direction & 0x01) ? (m_mikey.data[offset] & 0x01) : 0x01;	// External Power input
-		value |= (direction & 0x02) ? (m_mikey.data[offset] & 0x02) : 0x00;	// Cart Address Data output (0 turns cart power on)
-		value |= (direction & 0x04) ? (m_mikey.data[offset] & 0x04) : 0x04;	// noexp input
+		value |= (direction & 0x01) ? (m_mikey.data[offset] & 0x01) : 0x01; // External Power input
+		value |= (direction & 0x02) ? (m_mikey.data[offset] & 0x02) : 0x00; // Cart Address Data output (0 turns cart power on)
+		value |= (direction & 0x04) ? (m_mikey.data[offset] & 0x04) : 0x04; // noexp input
 		// REST read returns actual rest state anded with rest output bit
-		value |= (direction & 0x08) ? (((m_mikey.data[offset] & 0x08) && (m_mikey.vb_rest)) ? 0x00 : 0x08) : 0x00;	// rest output
-		value |= (direction & 0x10) ? (m_mikey.data[offset] & 0x10) : 0x10;	// audin input
+		value |= (direction & 0x08) ? (((m_mikey.data[offset] & 0x08) && (m_mikey.vb_rest)) ? 0x00 : 0x08) : 0x00;  // rest output
+		value |= (direction & 0x10) ? (m_mikey.data[offset] & 0x10) : 0x10; // audin input
 		/* Hack: we disable COMLynx  */
 		value |= 0x04;
 		/* B5, B6 & B7 are not used */
@@ -1818,9 +1818,9 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 
 	case 0x87:
 		m_mikey.data[offset] = data;
-		if (data & 0x02)		// Power (1 = on)
+		if (data & 0x02)        // Power (1 = on)
 		{
-			if (data & 0x01)	// Cart Address Strobe
+			if (data & 0x01)    // Cart Address Strobe
 			{
 				m_suzy.high <<= 1;
 				if (m_mikey.data[0x8b] & 0x02)
@@ -1898,7 +1898,7 @@ READ8_MEMBER(lynx_state::lynx_memory_config_r)
 WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 {
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
-     * when these are safe in the cpu */
+	 * when these are safe in the cpu */
 	m_memory_config = data;
 
 	if (data & 1) {
@@ -2034,8 +2034,8 @@ int lynx_verify_cart (char *header, int kind)
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
-    11 bits are used to address data within the selected bank. Valid bank sizes are 256,
-    512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
+	11 bits are used to address data within the selected bank. Valid bank sizes are 256,
+	512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
 
 	lynx_state *state = image.device().machine().driver_data<lynx_state>();
 	UINT8 *rom = state->memregion("user1")->base();
@@ -2066,8 +2066,8 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 				return IMAGE_INIT_FAIL;
 
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
-            it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
-            implement this as well */
+			it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+			implement this as well */
 			state->m_granularity = header[4] | (header[5] << 8);
 
 			logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
@@ -2078,8 +2078,8 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 		else if (!mame_stricmp (filetype, "lyx"))
 		{
 			/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
-            (see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
-            These should work with most .lyx files, but we need additional info on raw cart images */
+			(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
+			These should work with most .lyx files, but we need additional info on raw cart images */
 			if (size == 0x20000)
 				state->m_granularity = 0x0200;
 			else if (size == 0x80000)
@@ -2094,10 +2094,10 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	else
 	{
 		size = image.get_software_region_length("rom");
-      if (size > 0xffff) // 64,128,256,512k cartridges
-    	state->m_granularity = size >> 8;
-      else
-    	state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
+		if (size > 0xffff) // 64,128,256,512k cartridges
+		state->m_granularity = size >> 8;
+		else
+		state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
 
 		memcpy(rom, image.get_software_region("rom"), size);
 

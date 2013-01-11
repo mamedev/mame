@@ -25,39 +25,39 @@
 
 struct ui_gfx_state
 {
-	UINT8			mode;				/* which mode are we in? */
+	UINT8           mode;               /* which mode are we in? */
 
 	/* intermediate bitmaps */
-	UINT8			bitmap_dirty;		/* is the bitmap dirty? */
-	bitmap_rgb32 *	bitmap;				/* bitmap for drawing gfx and tilemaps */
-	render_texture *texture;			/* texture for rendering the above bitmap */
+	UINT8           bitmap_dirty;       /* is the bitmap dirty? */
+	bitmap_rgb32 *  bitmap;             /* bitmap for drawing gfx and tilemaps */
+	render_texture *texture;            /* texture for rendering the above bitmap */
 
 	/* palette-specific data */
 	struct
 	{
-		int		which;					/* which subset (palette or colortable)? */
-		int		offset;					/* current offset of top,left item */
-		int		count;					/* number of items per row */
+		int     which;                  /* which subset (palette or colortable)? */
+		int     offset;                 /* current offset of top,left item */
+		int     count;                  /* number of items per row */
 	} palette;
 
 	/* graphics-viewer-specific data */
 	struct
 	{
-		int		set;					/* which set is visible */
-		int		offset[MAX_GFX_ELEMENTS]; /* current offset of top,left item */
-		int		color[MAX_GFX_ELEMENTS]; /* current color selected */
-		int		count[MAX_GFX_ELEMENTS]; /* number of items per row */
-		UINT8	rotate[MAX_GFX_ELEMENTS]; /* current rotation (orientation) value */
+		int     set;                    /* which set is visible */
+		int     offset[MAX_GFX_ELEMENTS]; /* current offset of top,left item */
+		int     color[MAX_GFX_ELEMENTS]; /* current color selected */
+		int     count[MAX_GFX_ELEMENTS]; /* number of items per row */
+		UINT8   rotate[MAX_GFX_ELEMENTS]; /* current rotation (orientation) value */
 	} gfxset;
 
 	/* tilemap-viewer-specific data */
 	struct
 	{
-		int		which;					/* which tilemap are we viewing? */
-		int		xoffs;					/* current X offset */
-		int		yoffs;					/* current Y offset */
-		int		zoom;					/* zoom factor */
-		UINT8	rotate;					/* current rotation (orientation) value */
+		int     which;                  /* which tilemap are we viewing? */
+		int     xoffs;                  /* current X offset */
+		int     yoffs;                  /* current Y offset */
+		int     zoom;                   /* zoom factor */
+		UINT8   rotate;                 /* current rotation (orientation) value */
 	} tilemap;
 };
 

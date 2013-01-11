@@ -14,11 +14,11 @@
 
 
 
-#define BASE_CLOCK		5000000
+#define BASE_CLOCK      5000000
 #define BASE_CTR1       (BASE_CLOCK / 256)
-#define BASE_CTR2		(BASE_CLOCK / 32)
+#define BASE_CTR2       (BASE_CLOCK / 32)
 
-#define DIV2OR4_CTR2	0x01
+#define DIV2OR4_CTR2    0x01
 #define ENABLE_CTR2     0x02
 #define ENABLE_DAC      0x04
 #define ENABLE_CTR1     0x08
@@ -116,5 +116,3 @@ void meadows_sh_dac_w(running_machine &machine, int data)
 	else
 		machine.device<dac_device>("dac")->write_unsigned8(0);
 }
-
-

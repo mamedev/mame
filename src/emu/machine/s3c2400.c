@@ -69,7 +69,7 @@ DEVICE_START( s3c2400 )
 const device_type S3C2400 = &device_creator<s3c2400_device>;
 
 s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-       : device_t(mconfig, S3C2400, "Samsung S3C2400", tag, owner, clock)
+		: device_t(mconfig, S3C2400, "Samsung S3C2400", tag, owner, clock)
 {
 	m_token = global_alloc_clear(s3c24xx_t);
 }
@@ -106,4 +106,3 @@ void s3c2400_uart_fifo_w( device_t *device, int uart, UINT8 data)
 {
 	s3c24xx_uart_fifo_w( device, uart, data);
 }
-

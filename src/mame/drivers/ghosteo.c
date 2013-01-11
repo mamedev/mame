@@ -62,8 +62,8 @@ Hopper, Ticket Counter, Prize System (Option)
 
 enum nand_mode_t
 {
-	NAND_M_INIT,		// initial state
-	NAND_M_READ,		// read page data
+	NAND_M_INIT,        // initial state
+	NAND_M_READ,        // read page data
 };
 
 struct nand_t

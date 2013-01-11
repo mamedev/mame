@@ -79,12 +79,12 @@ WRITE8_MEMBER(pcfx_state::extio_w)
 }
 
 static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
-	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM	/* RAM */
+	AM_RANGE( 0x00000000, 0x001FFFFF ) AM_RAM   /* RAM */
 //  AM_RANGE( 0x80000000, 0x807FFFFF ) AM_READWRITE8(extio_r,extio_w,0xffffffff)    /* EXTIO */
-	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP	/* BackUp RAM */
-	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP	/* Extended BackUp RAM */
-	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP	/* PIO */
-	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")	/* ROM */
+	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP   /* BackUp RAM */
+	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP   /* Extended BackUp RAM */
+	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP   /* PIO */
+	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")  /* ROM */
 ADDRESS_MAP_END
 
 READ16_MEMBER( pcfx_state::pad_r )
@@ -96,9 +96,9 @@ READ16_MEMBER( pcfx_state::pad_r )
 	{
 		// status
 		/*
-        ---- x---
-        ---- ---x incoming data state (0=available)
-        */
+		---- x---
+		---- ---x incoming data state (0=available)
+		*/
 		res = m_pad.status[port_type];
 		//printf("STATUS %d\n",port_type);
 	}
@@ -137,10 +137,10 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 	{
 		// control
 		/*
-        ---- -x-- receiver enable
-        ---- --x- enable multi-tap
-        ---- ---x enable send (0->1 transition)
-        */
+		---- -x-- receiver enable
+		---- --x- enable multi-tap
+		---- ---x enable send (0->1 transition)
+		*/
 		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
 			machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(pcfx_state::pad_func),this), port_type); // TODO: time
@@ -158,26 +158,26 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 
 
 static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
-	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff)	/* PAD */
-	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP	/* HuC6230 */
-	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP	/* HuC6271 */
-	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )	/* HuC6261 */
-	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xffff )	/* HuC6270-A */
-	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xffff )	/* HuC6270-B */
-	AM_RANGE( 0x00000600, 0x000006FF ) AM_DEVREADWRITE( "huc6272", huc6272_device, read, write )	/* HuC6272 */
+	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff) /* PAD */
+	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP   /* HuC6230 */
+	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP   /* HuC6271 */
+	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )  /* HuC6261 */
+	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xffff ) /* HuC6270-A */
+	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xffff ) /* HuC6270-B */
+	AM_RANGE( 0x00000600, 0x000006FF ) AM_DEVREADWRITE( "huc6272", huc6272_device, read, write )    /* HuC6272 */
 	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
-	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )	/* Interrupt controller */
+	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_READWRITE16( irq_read, irq_write, 0xffff )    /* Interrupt controller */
 	AM_RANGE( 0x00000F00, 0x00000FFF ) AM_NOP
 //  AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
 	AM_RANGE( 0x00780000, 0x007FFFFF ) AM_ROM AM_REGION("scsi_rom", 0 )
-	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP	/* HuC6273 */
+	AM_RANGE( 0x80500000, 0x805000FF ) AM_NOP   /* HuC6273 */
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pcfx )
 	/*
-    xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = tap, 0xd = ?)
-    */
+	xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = tap, 0xd = ?)
+	*/
 	PORT_START("P1")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ID
 	PORT_DIPNAME( 0x01000000, 0x01000000, "1" )
@@ -522,4 +522,3 @@ ROM_END
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT      INIT    COMPANY                       FULLNAME                  FLAGS */
 CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx, driver_device,      0,      "Nippon Electronic Company",  "PC-FX",                  GAME_NOT_WORKING | GAME_NO_SOUND )
 CONS( 199?, pcfxga,     pcfx,   0,      pcfx,       pcfx, driver_device,      0,      "Nippon Electronic Company",  "PC-FX/GA (PC ISA Card)", GAME_NOT_WORKING | GAME_NO_SOUND )
-

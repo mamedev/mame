@@ -101,24 +101,24 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 		case 2:
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_SHADOW:	break;	// ???
+				case ROM_BOARD_171_SHADOW:  break;  // ???
 				case ROM_BOARD_171_5874:
-				case ROM_BOARD_171_5987:	mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
-				default:					assert(false);
+				case ROM_BOARD_171_5987:    mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
+				default:                    assert(false);
 			}
 			break;
 
 		case 1:
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_SHADOW:	mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
-				case ROM_BOARD_171_5874:	mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate());	break;
-				case ROM_BOARD_171_5987:	if (romsize <= 0x100000)
+				case ROM_BOARD_171_SHADOW:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate()); break;
+				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
 												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
 											else
 												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base",0x100000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
 											break;
-				default:					assert(false);
+				default:                    assert(false);
 			}
 			break;
 
@@ -126,13 +126,13 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 			switch (m_romboard)
 			{
 				case ROM_BOARD_171_SHADOW:
-				case ROM_BOARD_171_5874:	mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0x00000, write16_delegate());	break;
-				case ROM_BOARD_171_5987:	if (romsize <= 0x100000)
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0x00000, write16_delegate()); break;
+				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
 												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0x00000, write16_delegate());
 											else
 												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom0base", 0x00000, write16_delegate());
 											break;
-				default:					assert(false);
+				default:                    assert(false);
 			}
 			break;
 	}
@@ -792,10 +792,10 @@ static INPUT_PORTS_START( bloxeed )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x03, "Price Type" ) PORT_DIPLOCATION("SW2:1,2") // Normal game | VS Mode
-	PORT_DIPSETTING(    0x03, "A" )		// 1 Start / 1 Continue | 2 Start / 1 Continue
-	PORT_DIPSETTING(    0x02, "B" )		// 1 Start / 1 Continue | 1 Start / 1 Continue
-	PORT_DIPSETTING(    0x01, "C" )		// 2 Start / 1 Continue | 4 Start / 2 Continue
-	PORT_DIPSETTING(    0x00, "D" )		// 2 Start / 1 Continue | 2 Start / 2 Continue
+	PORT_DIPSETTING(    0x03, "A" )     // 1 Start / 1 Continue | 2 Start / 1 Continue
+	PORT_DIPSETTING(    0x02, "B" )     // 1 Start / 1 Continue | 1 Start / 1 Continue
+	PORT_DIPSETTING(    0x01, "C" )     // 2 Start / 1 Continue | 4 Start / 2 Continue
+	PORT_DIPSETTING(    0x00, "D" )     // 2 Start / 1 Continue | 2 Start / 2 Continue
 	//"SW2:3" unused
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -1205,7 +1205,7 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( segas18 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	0, 1024 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1024 )
 GFXDECODE_END
 
 
@@ -1325,7 +1325,7 @@ ROM_START( astorm )
 	ROM_LOAD16_BYTE( "epr-13182.a6", 0x000000, 0x40000, CRC(e31f2a1c) SHA1(690ee10c36e5bb6175470fb5564527e0e4a94d2c) )
 	ROM_LOAD16_BYTE( "epr-13181.a5", 0x000001, 0x40000, CRC(78cd3b26) SHA1(a81b807c5da625d8e4648ae80c41e4ca3870c0fa) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0154.key", 0x0000, 0x2000, CRC(b86b6b8f) SHA1(869405383d563a3f3842c89462a7b2e184928532) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1361,7 +1361,7 @@ ROM_START( astorm3 )
 	ROM_LOAD16_BYTE( "epr-13165.a6", 0x000000, 0x40000, CRC(6efcd381) SHA1(547c6703a34c3b9b887f5a63ec59a7055067bf3b) )
 	ROM_LOAD16_BYTE( "epr-13164.a5", 0x000001, 0x40000, CRC(97d693c6) SHA1(1a9aa98b32aae9367ed897e6931b2633b11b079e) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0148.key", 0x0000, 0x2000, CRC(72e4b64a) SHA1(945580d0cf25691370e9f2056cdffc01331d54ad) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1395,7 +1395,7 @@ ROM_START( astormu )
 	ROM_LOAD16_BYTE( "epr-13095.a6", 0x000000, 0x40000, CRC(55d40742) SHA1(c30fcd7da1fe062b1f00275dc8ac79c3c619b719) )
 	ROM_LOAD16_BYTE( "epr-13094.a5", 0x000001, 0x40000, CRC(92b305f9) SHA1(d24a1de619d29a8f6ff9dfce455c2c7d6457ddbe) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0147.key", 0x0000, 0x2000, CRC(3fd54ba7) SHA1(2d74f44f2ed779ed2b119b4fc0bc844d90678c74) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1430,7 +1430,7 @@ ROM_START( astormj )
 	ROM_LOAD16_BYTE( "epr-13085.a6", 0x000000, 0x40000, CRC(15f74e2d) SHA1(30d9d099ec18907edd3d20df312565c3bd5a80de) )
 	ROM_LOAD16_BYTE( "epr-13084.a5", 0x000001, 0x40000, CRC(9687b38f) SHA1(cdeb5b4f06ad4ad8ca579392c1ec901487b08e76) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0146.key", 0x0000, 0x2000, CRC(e94991c5) SHA1(c9a8b56e01792654436f24b219d7a92c0852461f) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1502,7 +1502,7 @@ ROM_START( cltchitr )
 	ROM_LOAD16_BYTE( "epr-13784.a5", 0x80000, 0x40000, CRC(80c8180d) SHA1(80e72ab7d97714009fd31b3d50176af84b0dcdb7) )
 	ROM_LOAD16_BYTE( "epr-13786.a7", 0x80001, 0x40000, CRC(3095dac0) SHA1(20edce74b6f2a82a3865613e601a0e212615d0e4) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0176.key", 0x0000, 0x2000, CRC(9b072430) SHA1(3bc1c7a6d71b4351a42d85e68e70715a7659c096) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) // tiles
@@ -1536,7 +1536,7 @@ ROM_START( cltchitrj )
 	ROM_LOAD16_BYTE( "epr-13785.a5", 0x80000, 0x40000, CRC(09714762) SHA1(c75c88b1c313e172fdb7f9a570d57be38f959b2b) )
 	ROM_LOAD16_BYTE( "epr-13797.a7", 0x80001, 0x40000, CRC(361ade9f) SHA1(a7fd48c55695fd322d0456ff7dc2d2b2bc3e561b) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0175.key", 0x0000, 0x2000, CRC(70d9d283) SHA1(ff309b2a221d9a03ccf301a208c76a7c2eaea790) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) // tiles
@@ -1614,7 +1614,7 @@ ROM_START( ddcrewu )
 	ROM_LOAD16_BYTE( "mpr-14139.a5", 0x80000, 0x40000, CRC(06c31531) SHA1(d084cb72bf83578b34e959bb60a0695faf4161f8) )
 	ROM_LOAD16_BYTE( "mpr-14141.a7", 0x80001, 0x40000, CRC(080a494b) SHA1(64522dccbf6ed856ab80aa185454183df87d7ae9) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0186.key", 0x0000, 0x2000, CRC(7acaf1fd) SHA1(236d6382072adda8f7907d98d428fcca36700fa0) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1689,7 +1689,7 @@ ROM_START( ddcrew1 )
 	ROM_LOAD16_BYTE( "mpr-14139.a5", 0x80000, 0x40000, CRC(06c31531) SHA1(d084cb72bf83578b34e959bb60a0695faf4161f8) )
 	ROM_LOAD16_BYTE( "mpr-14141.a7", 0x80001, 0x40000, CRC(080a494b) SHA1(64522dccbf6ed856ab80aa185454183df87d7ae9) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0187.key", 0x0000, 0x2000, CRC(1dfb60be) SHA1(7bd42a2e54fca574076e5ed164ab4e0cbb645a4f) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1727,7 +1727,7 @@ ROM_START( ddcrewj )
 	ROM_LOAD16_BYTE( "mpr-14139.a5", 0x80000, 0x40000, CRC(06c31531) SHA1(d084cb72bf83578b34e959bb60a0695faf4161f8) )
 	ROM_LOAD16_BYTE( "mpr-14141.a7", 0x80001, 0x40000, CRC(080a494b) SHA1(64522dccbf6ed856ab80aa185454183df87d7ae9) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0182.key", 0x0000, 0x2000, CRC(2e8a3601) SHA1(8b6e10babfd2398c1669ba6bf9aad61cd02f23ba) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1770,7 +1770,7 @@ ROM_START( desertbr )
 	ROM_LOAD16_BYTE( "epr-14793.a5", 0x100000, 0x80000, CRC(dc9d7af3) SHA1(1fc1fedc1a4beed94cece268d0bb4bf62eeb407c) )
 	ROM_LOAD16_BYTE( "epr-14795.a7", 0x100001, 0x80000, CRC(7e5bf7d9) SHA1(32ac68ee423a34e0f1bedc8765e03f40e01c3af1) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0196.key", 0x0000, 0x2000, CRC(cb942262) SHA1(7ad7cd3df887c6e6435d74784cb12ce016acd0da) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) // tiles
@@ -1810,7 +1810,7 @@ ROM_START( desertbrj )
 	ROM_LOAD16_BYTE( "epr-14793.a5", 0x100000, 0x80000, CRC(dc9d7af3) SHA1(1fc1fedc1a4beed94cece268d0bb4bf62eeb407c) )
 	ROM_LOAD16_BYTE( "epr-14795.a7", 0x100001, 0x80000, CRC(7e5bf7d9) SHA1(32ac68ee423a34e0f1bedc8765e03f40e01c3af1) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0194.key", 0x0000, 0x2000, CRC(40cbc4cb) SHA1(51777d8a619268ac0b1fda6e7781cde753354419) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) // tiles
@@ -1850,7 +1850,7 @@ ROM_START( lghost )
 	ROM_LOAD16_BYTE( "epr-13411.a5", 0x80000, 0x40000, CRC(5160167b) SHA1(3d176a18c7527b1e485f10b144bb4db1b945e709) )
 	ROM_LOAD16_BYTE( "epr-13413.a7", 0x80001, 0x40000, CRC(656b3bd8) SHA1(db81d4ae3138308dce1e3db7a859f1d63c4ff815) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0166.key", 0x0000, 0x2000, CRC(8379961f) SHA1(44e0662e92ece65ad2049b2cd804f516e631166e) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1890,7 +1890,7 @@ ROM_START( lghostu )
 	ROM_LOAD16_BYTE( "epr-13411.a5",  0x80000, 0x40000, CRC(5160167b) SHA1(3d176a18c7527b1e485f10b144bb4db1b945e709) )
 	ROM_LOAD16_BYTE( "epr-13413.a7",  0x80001, 0x40000, CRC(656b3bd8) SHA1(db81d4ae3138308dce1e3db7a859f1d63c4ff815) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0165.key", 0x0000, 0x2000,  CRC(a04267ab) SHA1(688ee59dfaaf240e23de4cada648689d1717ab04) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1929,7 +1929,7 @@ ROM_START( mwalk )
 	ROM_LOAD16_BYTE( "epr-13235.a6", 0x000000, 0x40000, CRC(6983e129) SHA1(a8dd430620ab8ce11df46aa208d762d47f510464) )
 	ROM_LOAD16_BYTE( "epr-13234.a5", 0x000001, 0x40000, CRC(c9fd20f2) SHA1(9476e6481e6d8f223acd52f543fa04f408d48dc3) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0159.key", 0x0000, 0x2000, CRC(507838f0) SHA1(0c92d313da40b5dec7398c05b57698de6153b4b0) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1953,7 +1953,7 @@ ROM_START( mwalk )
 	ROM_LOAD( "mpr-13220.b5", 0x110000, 0x40000, CRC(58d4d9ce) SHA1(725e73a656845b02702ef131b4c0aa2a73cdd02e) )
 	ROM_LOAD( "mpr-13249.b6", 0x190000, 0x40000, CRC(623edc5d) SHA1(c32d9f818d40f311877fbe6532d9e95b6045c3c4) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	// protection MCU
+	ROM_REGION( 0x10000, "mcu", 0 ) // protection MCU
 	ROM_LOAD( "315-5437.ic4", 0x00000, 0x1000,  CRC(4bf63bc1) SHA1(2766ab30b466b079febb30c488adad9ea56813f7) )
 ROM_END
 
@@ -1967,7 +1967,7 @@ ROM_START( mwalku )
 	ROM_LOAD16_BYTE( "epr-13233.a6", 0x000000, 0x40000, CRC(f3dac671) SHA1(cd9d372c7e272d2371bc1f9fb0167831c804423f) )
 	ROM_LOAD16_BYTE( "epr-13232.a5", 0x000001, 0x40000, CRC(541d8bdf) SHA1(6a99153fddca246ba070e93c4bacd145f15f76bf) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0158.key", 0x0000, 0x2000, CRC(a8a50e8c) SHA1(6e05a40dbf31b4007df1bb27eee85a78da3d8417) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -1991,7 +1991,7 @@ ROM_START( mwalku )
 	ROM_LOAD( "mpr-13220.b5", 0x110000, 0x40000, CRC(58d4d9ce) SHA1(725e73a656845b02702ef131b4c0aa2a73cdd02e) )
 	ROM_LOAD( "mpr-13249.b6", 0x190000, 0x40000, CRC(623edc5d) SHA1(c32d9f818d40f311877fbe6532d9e95b6045c3c4) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	// protection MCU
+	ROM_REGION( 0x10000, "mcu", 0 ) // protection MCU
 	ROM_LOAD( "315-5437.ic4", 0x00000, 0x1000,  CRC(4bf63bc1) SHA1(2766ab30b466b079febb30c488adad9ea56813f7) )
 ROM_END
 
@@ -2005,7 +2005,7 @@ ROM_START( mwalkj )
 	ROM_LOAD16_BYTE( "epr-13227.a6", 0x000000, 0x40000, CRC(6c0534b3) SHA1(23f35d1a15275cbc4b6d2f81f5634abac3832282) )
 	ROM_LOAD16_BYTE( "epr-13226.a5", 0x000001, 0x40000, CRC(99765854) SHA1(c00776c676b77fed4e94bb02f52f905c845ee73c) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0157.key", 0x0000, 0x2000, CRC(324d6931) SHA1(f8f4530a75aeeace1c8456da37118975c5c43316) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -2029,7 +2029,7 @@ ROM_START( mwalkj )
 	ROM_LOAD( "mpr-13220.b5", 0x110000, 0x40000, CRC(58d4d9ce) SHA1(725e73a656845b02702ef131b4c0aa2a73cdd02e) )
 	ROM_LOAD( "mpr-13249.b6", 0x190000, 0x40000, CRC(623edc5d) SHA1(c32d9f818d40f311877fbe6532d9e95b6045c3c4) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	// protection MCU
+	ROM_REGION( 0x10000, "mcu", 0 ) // protection MCU
 	// not verified if mcu is the same as the other sets..
 	ROM_LOAD( "315-5437.ic4", 0x00000, 0x1000, BAD_DUMP CRC(4bf63bc1) SHA1(2766ab30b466b079febb30c488adad9ea56813f7) )
 ROM_END
@@ -2047,7 +2047,7 @@ ROM_START( pontoon )
 	ROM_LOAD16_BYTE( "epr-13175.a6", 0x000000, 0x40000, CRC(a2a5d0f5) SHA1(e22b13f152e0edadeb0f84b4a93ad366201cbae9) )
 	ROM_LOAD16_BYTE( "epr-13174.a5", 0x000001, 0x40000, CRC(db976b13) SHA1(3970968b21491beb8aac109eeb753b69ca752205) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0153.key", 0x0000, 0x2000, CRC(bcac8c7a) SHA1(1ee9db8f21a55cbfc391af9731d6a1dcf7f2d4c2) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
@@ -2173,7 +2173,7 @@ ROM_START( wwallyj )
 	ROM_LOAD16_BYTE( "epr-14730b.a4", 0x000000, 0x40000, CRC(e72bc17a) SHA1(ac3b7d86571a6f510c202735134c1bc4809aa26e) )
 	ROM_LOAD16_BYTE( "epr-14731b.a6", 0x000001, 0x40000, CRC(6e3235b9) SHA1(11d5628644e8301550c36c93e5f137c67c11e735) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0197b.key", 0x0000, 0x2000, CRC(f5b7c5b4) SHA1(be971a2349e7c3adc995581355fea48f5123421c) )
 
 	ROM_REGION( 0x0c0000, "gfx1", 0 ) // tiles
@@ -2206,7 +2206,7 @@ ROM_START( wwallyja )
 	ROM_LOAD16_BYTE( "epr-14730a.a4", 0x000000, 0x40000, CRC(daa7880e) SHA1(9ea83e04c3e07d84afa67097c28b3951c9db8d00) )
 	ROM_LOAD16_BYTE( "epr-14731a.a6", 0x000001, 0x40000, CRC(5e36353b) SHA1(488c54bbef3c8a129785465887bff3b301e11387) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0197a.key", 0x0000, 0x2000, CRC(2fb6a9a1) SHA1(2649d0905527dbe0dd0ad5cf68c457b4aa5fb32c) )
 
 	ROM_REGION( 0x0c0000, "gfx1", 0 ) // tiles

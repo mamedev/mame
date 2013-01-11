@@ -201,8 +201,8 @@ const char info_xml_creator::s_dtd_string[] =
 
 info_xml_creator::info_xml_creator(driver_enumerator &drivlist)
 	: m_output(NULL),
-	  m_drivlist(drivlist),
-	  m_lookup_options(m_drivlist.options())
+		m_drivlist(drivlist),
+		m_lookup_options(m_drivlist.options())
 {
 	m_lookup_options.remove_device_options();
 }
@@ -696,10 +696,10 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 
 			switch (screendev->screen_type())
 			{
-				case SCREEN_TYPE_RASTER:	fprintf(m_output, " type=\"raster\"");	break;
-				case SCREEN_TYPE_VECTOR:	fprintf(m_output, " type=\"vector\"");	break;
-				case SCREEN_TYPE_LCD:		fprintf(m_output, " type=\"lcd\"");		break;
-				default:					fprintf(m_output, " type=\"unknown\"");	break;
+				case SCREEN_TYPE_RASTER:    fprintf(m_output, " type=\"raster\"");  break;
+				case SCREEN_TYPE_VECTOR:    fprintf(m_output, " type=\"vector\"");  break;
+				case SCREEN_TYPE_LCD:       fprintf(m_output, " type=\"lcd\"");     break;
+				default:                    fprintf(m_output, " type=\"unknown\""); break;
 			}
 
 			// output the orientation as a string
@@ -812,14 +812,14 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	// initialize the list of control types
 	struct
 	{
-		const char *	type;			/* general type of input */
-		bool			analog;
-		bool			keyb;
-		INT32			min;			/* analog minimum value */
-		INT32			max;			/* analog maximum value  */
-		INT32			sensitivity;	/* default analog sensitivity */
-		INT32			keydelta;		/* default analog keydelta */
-		bool			reverse;		/* default analog reverse setting */
+		const char *    type;           /* general type of input */
+		bool            analog;
+		bool            keyb;
+		INT32           min;            /* analog minimum value */
+		INT32           max;            /* analog maximum value  */
+		INT32           sensitivity;    /* default analog sensitivity */
+		INT32           keydelta;       /* default analog keydelta */
+		bool            reverse;        /* default analog reverse setting */
 	} control_info[ANALOG_TYPE_COUNT];
 
 	memset(&control_info, 0, sizeof(control_info));
@@ -851,20 +851,20 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 			switch (field->type())
 			{
 				// map which joystick directions are present
-				case IPT_JOYSTICK_UP:			joytype[0] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);		break;
-				case IPT_JOYSTICK_DOWN:			joytype[0] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICK_LEFT:			joytype[0] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICK_RIGHT:		joytype[0] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICK_UP:           joytype[0] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);        break;
+				case IPT_JOYSTICK_DOWN:         joytype[0] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);  break;
+				case IPT_JOYSTICK_LEFT:         joytype[0] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);  break;
+				case IPT_JOYSTICK_RIGHT:        joytype[0] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0); break;
 
-				case IPT_JOYSTICKLEFT_UP:		joytype[1] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);		break;
-				case IPT_JOYSTICKLEFT_DOWN:		joytype[1] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKLEFT_LEFT:		joytype[1] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKLEFT_RIGHT:	joytype[1] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKLEFT_UP:       joytype[1] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);        break;
+				case IPT_JOYSTICKLEFT_DOWN:     joytype[1] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);  break;
+				case IPT_JOYSTICKLEFT_LEFT:     joytype[1] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);  break;
+				case IPT_JOYSTICKLEFT_RIGHT:    joytype[1] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0); break;
 
-				case IPT_JOYSTICKRIGHT_UP:		joytype[2] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);		break;
-				case IPT_JOYSTICKRIGHT_DOWN:	joytype[2] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKRIGHT_LEFT:	joytype[2] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
-				case IPT_JOYSTICKRIGHT_RIGHT:	joytype[2] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0);	break;
+				case IPT_JOYSTICKRIGHT_UP:      joytype[2] |= DIR_UP | ((field->way() == 4) ? DIR_4WAY : 0);        break;
+				case IPT_JOYSTICKRIGHT_DOWN:    joytype[2] |= DIR_DOWN | ((field->way() == 4) ? DIR_4WAY : 0);  break;
+				case IPT_JOYSTICKRIGHT_LEFT:    joytype[2] |= DIR_LEFT | ((field->way() == 4) ? DIR_4WAY : 0);  break;
+				case IPT_JOYSTICKRIGHT_RIGHT:   joytype[2] |= DIR_RIGHT | ((field->way() == 4) ? DIR_4WAY : 0); break;
 
 				// mark as an analog input, and get analog stats after switch
 				case IPT_AD_STICK_X:
@@ -1262,7 +1262,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 	slot_interface_iterator iter(device);
 	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
-		if (slot->fixed()) continue;	// or shall we list these as non-configurable?
+		if (slot->fixed()) continue;    // or shall we list these as non-configurable?
 
 		if (strcmp(slot->device().tag(), device.tag()))
 		{
@@ -1273,9 +1273,9 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(newtag));
 
 			/*
-             if (slot->slot_interface()[0])
-             fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
-             */
+			 if (slot->slot_interface()[0])
+			 fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
+			 */
 
 			const slot_interface* intf = slot->get_slot_interfaces();
 			for (int i = 0; intf && intf[i].name != NULL && !intf[i].internal; i++)

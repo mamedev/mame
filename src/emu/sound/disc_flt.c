@@ -39,10 +39,10 @@
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_CRFILTER__IN		DISCRETE_INPUT(0)
-#define DST_CRFILTER__R			DISCRETE_INPUT(1)
-#define DST_CRFILTER__C			DISCRETE_INPUT(2)
-#define DST_CRFILTER__VREF		DISCRETE_INPUT(3)
+#define DST_CRFILTER__IN        DISCRETE_INPUT(0)
+#define DST_CRFILTER__R         DISCRETE_INPUT(1)
+#define DST_CRFILTER__C         DISCRETE_INPUT(2)
+#define DST_CRFILTER__VREF      DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_crfilter)
 {
@@ -82,13 +82,13 @@ DISCRETE_RESET(dst_crfilter)
  * input[3]    - Filter type (initialization only)
  *
  ************************************************************************/
-#define DST_FILTER1__ENABLE	DISCRETE_INPUT(0)
-#define DST_FILTER1__IN		DISCRETE_INPUT(1)
-#define DST_FILTER1__FREQ	DISCRETE_INPUT(2)
-#define DST_FILTER1__TYPE	DISCRETE_INPUT(3)
+#define DST_FILTER1__ENABLE DISCRETE_INPUT(0)
+#define DST_FILTER1__IN     DISCRETE_INPUT(1)
+#define DST_FILTER1__FREQ   DISCRETE_INPUT(2)
+#define DST_FILTER1__TYPE   DISCRETE_INPUT(3)
 
 static void calculate_filter1_coefficients(discrete_base_node *node, double fc, double type,
-										   struct discrete_filter_coeff &coeff)
+											struct discrete_filter_coeff &coeff)
 {
 	double den, w, two_over_T;
 
@@ -150,19 +150,19 @@ DISCRETE_RESET(dst_filter1)
  * input[4]    - Filter type (initialization only)
  *
  ************************************************************************/
-#define DST_FILTER2__ENABLE	DISCRETE_INPUT(0)
-#define DST_FILTER2__IN		DISCRETE_INPUT(1)
-#define DST_FILTER2__FREQ	DISCRETE_INPUT(2)
-#define DST_FILTER2__DAMP	DISCRETE_INPUT(3)
-#define DST_FILTER2__TYPE	DISCRETE_INPUT(4)
+#define DST_FILTER2__ENABLE DISCRETE_INPUT(0)
+#define DST_FILTER2__IN     DISCRETE_INPUT(1)
+#define DST_FILTER2__FREQ   DISCRETE_INPUT(2)
+#define DST_FILTER2__DAMP   DISCRETE_INPUT(3)
+#define DST_FILTER2__TYPE   DISCRETE_INPUT(4)
 
 static void calculate_filter2_coefficients(discrete_base_node *node,
-		                                   double fc, double d, double type,
-		                                   struct discrete_filter_coeff &coeff)
+											double fc, double d, double type,
+											struct discrete_filter_coeff &coeff)
 {
-	double w;	/* cutoff freq, in radians/sec */
+	double w;   /* cutoff freq, in radians/sec */
 	double w_squared;
-	double den;	/* temp variable */
+	double den; /* temp variable */
 	double two_over_T = 2 * node->sample_rate();
 	double two_over_T_squared = two_over_T * two_over_T;
 
@@ -222,7 +222,7 @@ DISCRETE_STEP(dst_filter2)
 DISCRETE_RESET(dst_filter2)
 {
 	calculate_filter2_coefficients(this, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
-								   m_fc);
+									m_fc);
 	set_output(0,  0);
 }
 
@@ -240,10 +240,10 @@ DISCRETE_RESET(dst_filter2)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_OP_AMP_FILT__ENABLE	DISCRETE_INPUT(0)
-#define DST_OP_AMP_FILT__INP1	DISCRETE_INPUT(1)
-#define DST_OP_AMP_FILT__INP2	DISCRETE_INPUT(2)
-#define DST_OP_AMP_FILT__TYPE	DISCRETE_INPUT(3)
+#define DST_OP_AMP_FILT__ENABLE DISCRETE_INPUT(0)
+#define DST_OP_AMP_FILT__INP1   DISCRETE_INPUT(1)
+#define DST_OP_AMP_FILT__INP2   DISCRETE_INPUT(2)
+#define DST_OP_AMP_FILT__TYPE   DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_op_amp_filt)
 {
@@ -334,8 +334,8 @@ DISCRETE_STEP(dst_op_amp_filt)
 		}
 
 		/* Clip the output to the voltage rails.
-         * This way we get the original distortion in all it's glory.
-         */
+		 * This way we get the original distortion in all it's glory.
+		 */
 		if (v_out > m_vP) v_out = m_vP;
 		if (v_out < m_vN) v_out = m_vN;
 		m_fc.y1 = v_out - m_vRef;
@@ -376,7 +376,7 @@ DISCRETE_RESET(dst_op_amp_filt)
 		m_vN =  info->vN;
 
 		/* Work out the input resistance.  It is all input and bias resistors in parallel. */
-		m_rTotal  = 1.0 / info->r1;			/* There has to be an R1.  Otherwise the table is wrong. */
+		m_rTotal  = 1.0 / info->r1;         /* There has to be an R1.  Otherwise the table is wrong. */
 		if (info->r2 != 0) m_rTotal += 1.0 / info->r2;
 		if (info->r3 != 0) m_rTotal += 1.0 / info->r3;
 		m_rTotal = 1.0 / m_rTotal;
@@ -450,12 +450,12 @@ DISCRETE_RESET(dst_op_amp_filt)
  * DST_RC_CIRCUIT_1 - RC charge/discharge circuit
  *
  ************************************************************************/
-#define DST_RC_CIRCUIT_1__IN0		DISCRETE_INPUT(0)
-#define DST_RC_CIRCUIT_1__IN1		DISCRETE_INPUT(1)
-#define DST_RC_CIRCUIT_1__R			DISCRETE_INPUT(2)
-#define DST_RC_CIRCUIT_1__C			DISCRETE_INPUT(3)
+#define DST_RC_CIRCUIT_1__IN0       DISCRETE_INPUT(0)
+#define DST_RC_CIRCUIT_1__IN1       DISCRETE_INPUT(1)
+#define DST_RC_CIRCUIT_1__R         DISCRETE_INPUT(2)
+#define DST_RC_CIRCUIT_1__C         DISCRETE_INPUT(3)
 
-#define CD4066_R_ON	270
+#define CD4066_R_ON 270
 
 DISCRETE_STEP( dst_rc_circuit_1 )
 {
@@ -516,10 +516,10 @@ DISCRETE_RESET( dst_rc_circuit_1 )
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC__ENABLE	DISCRETE_INPUT(0)
-#define DST_RCDISC__IN		DISCRETE_INPUT(1)
-#define DST_RCDISC__R		DISCRETE_INPUT(2)
-#define DST_RCDISC__C		DISCRETE_INPUT(3)
+#define DST_RCDISC__ENABLE  DISCRETE_INPUT(0)
+#define DST_RCDISC__IN      DISCRETE_INPUT(1)
+#define DST_RCDISC__R       DISCRETE_INPUT(2)
+#define DST_RCDISC__C       DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_rcdisc)
 {
@@ -569,12 +569,12 @@ DISCRETE_RESET(dst_rcdisc)
  * input[5]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC2__ENABLE	DISCRETE_INPUT(0)
-#define DST_RCDISC2__IN0	DISCRETE_INPUT(1)
-#define DST_RCDISC2__R0		DISCRETE_INPUT(2)
-#define DST_RCDISC2__IN1	DISCRETE_INPUT(3)
-#define DST_RCDISC2__R1		DISCRETE_INPUT(4)
-#define DST_RCDISC2__C		DISCRETE_INPUT(5)
+#define DST_RCDISC2__ENABLE DISCRETE_INPUT(0)
+#define DST_RCDISC2__IN0    DISCRETE_INPUT(1)
+#define DST_RCDISC2__R0     DISCRETE_INPUT(2)
+#define DST_RCDISC2__IN1    DISCRETE_INPUT(3)
+#define DST_RCDISC2__R1     DISCRETE_INPUT(4)
+#define DST_RCDISC2__C      DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dst_rcdisc2)
 {
@@ -612,12 +612,12 @@ DISCRETE_RESET(dst_rcdisc2)
  * input[6]    - Diode Junction voltage (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC3__ENABLE	DISCRETE_INPUT(0)
-#define DST_RCDISC3__IN		DISCRETE_INPUT(1)
-#define DST_RCDISC3__R1		DISCRETE_INPUT(2)
-#define DST_RCDISC3__R2		DISCRETE_INPUT(3)
-#define DST_RCDISC3__C		DISCRETE_INPUT(4)
-#define DST_RCDISC3__DJV	DISCRETE_INPUT(5)
+#define DST_RCDISC3__ENABLE DISCRETE_INPUT(0)
+#define DST_RCDISC3__IN     DISCRETE_INPUT(1)
+#define DST_RCDISC3__R1     DISCRETE_INPUT(2)
+#define DST_RCDISC3__R2     DISCRETE_INPUT(3)
+#define DST_RCDISC3__C      DISCRETE_INPUT(4)
+#define DST_RCDISC3__DJV    DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dst_rcdisc3)
 {
@@ -692,14 +692,14 @@ DISCRETE_RESET(dst_rcdisc3)
  * input[4]    - circuit type (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC4__ENABLE	DISCRETE_INPUT(0)
-#define DST_RCDISC4__IN		DISCRETE_INPUT(1)
-#define DST_RCDISC4__R1		DISCRETE_INPUT(2)
-#define DST_RCDISC4__R2		DISCRETE_INPUT(3)
-#define DST_RCDISC4__R3		DISCRETE_INPUT(4)
-#define DST_RCDISC4__C1		DISCRETE_INPUT(5)
-#define DST_RCDISC4__VP		DISCRETE_INPUT(6)
-#define DST_RCDISC4__TYPE	DISCRETE_INPUT(7)
+#define DST_RCDISC4__ENABLE DISCRETE_INPUT(0)
+#define DST_RCDISC4__IN     DISCRETE_INPUT(1)
+#define DST_RCDISC4__R1     DISCRETE_INPUT(2)
+#define DST_RCDISC4__R2     DISCRETE_INPUT(3)
+#define DST_RCDISC4__R3     DISCRETE_INPUT(4)
+#define DST_RCDISC4__C1     DISCRETE_INPUT(5)
+#define DST_RCDISC4__VP     DISCRETE_INPUT(6)
+#define DST_RCDISC4__TYPE   DISCRETE_INPUT(7)
 
 DISCRETE_STEP(dst_rcdisc4)
 {
@@ -729,7 +729,7 @@ DISCRETE_STEP(dst_rcdisc4)
 
 DISCRETE_RESET( dst_rcdisc4)
 {
-	double	v, i, r, rT;
+	double  v, i, r, rT;
 
 	m_type = 0;
 	/* some error checking. */
@@ -759,9 +759,9 @@ DISCRETE_RESET( dst_rcdisc4)
 	{
 		case 1:
 			/* We will simulate this as a voltage divider with 2 states depending
-             * on the input.  But we have to take the diodes into account.
-             */
-			v = DST_RCDISC4__VP - .5;	/* diode drop */
+			 * on the input.  But we have to take the diodes into account.
+			 */
+			v = DST_RCDISC4__VP - .5;   /* diode drop */
 
 			/* When the input is 1, both R1 & R3 are basically in parallel. */
 			r  = RES_2_PARALLEL(DST_RCDISC4__R1, DST_RCDISC4__R3);
@@ -781,9 +781,9 @@ DISCRETE_RESET( dst_rcdisc4)
 
 		case 3:
 			/* We will simulate this as a voltage divider with 2 states depending
-             * on the input.  The 1k pullup is in parallel with the internal TTL
-             * resistance, so we will just use .5k in series with R1.
-             */
+			 * on the input.  The 1k pullup is in parallel with the internal TTL
+			 * resistance, so we will just use .5k in series with R1.
+			 */
 			r = 500.0 + DST_RCDISC4__R1;
 			m_v[1] = RES_VOLTAGE_DIVIDER(r, DST_RCDISC4__R2) * (5.0 - 0.5);
 			rT = RES_2_PARALLEL(r, DST_RCDISC4__R2);
@@ -806,10 +806,10 @@ DISCRETE_RESET( dst_rcdisc4)
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC5__ENABLE	DISCRETE_INPUT(0)
-#define DST_RCDISC5__IN		DISCRETE_INPUT(1)
-#define DST_RCDISC5__R		DISCRETE_INPUT(2)
-#define DST_RCDISC5__C		DISCRETE_INPUT(3)
+#define DST_RCDISC5__ENABLE DISCRETE_INPUT(0)
+#define DST_RCDISC5__IN     DISCRETE_INPUT(1)
+#define DST_RCDISC5__R      DISCRETE_INPUT(2)
+#define DST_RCDISC5__C      DISCRETE_INPUT(3)
 
 DISCRETE_STEP( dst_rcdisc5)
 {
@@ -817,7 +817,7 @@ DISCRETE_STEP( dst_rcdisc5)
 
 	/* Exponential based in difference between input/output   */
 
-    u = DST_RCDISC5__IN - 0.7; /* Diode drop */
+	u = DST_RCDISC5__IN - 0.7; /* Diode drop */
 	if( u < 0)
 		u = 0;
 
@@ -866,19 +866,19 @@ DISCRETE_RESET( dst_rcdisc5)
  * input[8]    - Voltage Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC_MOD__IN1		DISCRETE_INPUT(0)
-#define DST_RCDISC_MOD__IN2		DISCRETE_INPUT(1)
-#define DST_RCDISC_MOD__R1		DISCRETE_INPUT(2)
-#define DST_RCDISC_MOD__R2		DISCRETE_INPUT(3)
-#define DST_RCDISC_MOD__R3		DISCRETE_INPUT(4)
-#define DST_RCDISC_MOD__R4		DISCRETE_INPUT(5)
-#define DST_RCDISC_MOD__C		DISCRETE_INPUT(6)
-#define DST_RCDISC_MOD__VP		DISCRETE_INPUT(7)
+#define DST_RCDISC_MOD__IN1     DISCRETE_INPUT(0)
+#define DST_RCDISC_MOD__IN2     DISCRETE_INPUT(1)
+#define DST_RCDISC_MOD__R1      DISCRETE_INPUT(2)
+#define DST_RCDISC_MOD__R2      DISCRETE_INPUT(3)
+#define DST_RCDISC_MOD__R3      DISCRETE_INPUT(4)
+#define DST_RCDISC_MOD__R4      DISCRETE_INPUT(5)
+#define DST_RCDISC_MOD__C       DISCRETE_INPUT(6)
+#define DST_RCDISC_MOD__VP      DISCRETE_INPUT(7)
 
 DISCRETE_STEP(dst_rcdisc_mod)
 {
-	double	diff, v_cap, u, vD;
-	int		mod_state, mod1_state, mod2_state;
+	double  diff, v_cap, u, vD;
+	int     mod_state, mod1_state, mod2_state;
 
 	/* Exponential based in difference between input/output   */
 	v_cap = m_v_cap;
@@ -910,7 +910,7 @@ DISCRETE_STEP(dst_rcdisc_mod)
 
 DISCRETE_RESET(dst_rcdisc_mod)
 {
-	double	rc[2], rc2[2];
+	double  rc[2], rc2[2];
 
 	/* pre-calculate fixed values */
 	/* DST_RCDISC_MOD__IN1 <= 0.5 */
@@ -955,10 +955,10 @@ DISCRETE_RESET(dst_rcdisc_mod)
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_RCFILTER__VIN		DISCRETE_INPUT(0)
-#define DST_RCFILTER__R			DISCRETE_INPUT(1)
-#define DST_RCFILTER__C			DISCRETE_INPUT(2)
-#define DST_RCFILTER__VREF		DISCRETE_INPUT(3)
+#define DST_RCFILTER__VIN       DISCRETE_INPUT(0)
+#define DST_RCFILTER__R         DISCRETE_INPUT(1)
+#define DST_RCFILTER__C         DISCRETE_INPUT(2)
+#define DST_RCFILTER__VREF      DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dst_rcfilter)
 {
@@ -1012,11 +1012,11 @@ DISCRETE_RESET(dst_rcfilter)
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_RCFILTER_SW__ENABLE		DISCRETE_INPUT(0)
-#define DST_RCFILTER_SW__VIN		DISCRETE_INPUT(1)
-#define DST_RCFILTER_SW__SWITCH		DISCRETE_INPUT(2)
-#define DST_RCFILTER_SW__R			DISCRETE_INPUT(3)
-#define DST_RCFILTER_SW__C(x)		DISCRETE_INPUT(4+x)
+#define DST_RCFILTER_SW__ENABLE     DISCRETE_INPUT(0)
+#define DST_RCFILTER_SW__VIN        DISCRETE_INPUT(1)
+#define DST_RCFILTER_SW__SWITCH     DISCRETE_INPUT(2)
+#define DST_RCFILTER_SW__R          DISCRETE_INPUT(3)
+#define DST_RCFILTER_SW__C(x)       DISCRETE_INPUT(4+x)
 
 /* 74HC4066 : 15
  * 74VHC4066 : 15
@@ -1119,13 +1119,13 @@ DISCRETE_RESET(dst_rcfilter_sw)
  * input[5]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCINTEGRATE__IN1	DISCRETE_INPUT(0)
-#define DST_RCINTEGRATE__R1		DISCRETE_INPUT(1)
-#define DST_RCINTEGRATE__R2		DISCRETE_INPUT(2)
-#define DST_RCINTEGRATE__R3		DISCRETE_INPUT(3)
-#define DST_RCINTEGRATE__C		DISCRETE_INPUT(4)
-#define DST_RCINTEGRATE__VP		DISCRETE_INPUT(5)
-#define DST_RCINTEGRATE__TYPE	DISCRETE_INPUT(6)
+#define DST_RCINTEGRATE__IN1    DISCRETE_INPUT(0)
+#define DST_RCINTEGRATE__R1     DISCRETE_INPUT(1)
+#define DST_RCINTEGRATE__R2     DISCRETE_INPUT(2)
+#define DST_RCINTEGRATE__R3     DISCRETE_INPUT(3)
+#define DST_RCINTEGRATE__C      DISCRETE_INPUT(4)
+#define DST_RCINTEGRATE__VP     DISCRETE_INPUT(5)
+#define DST_RCINTEGRATE__TYPE   DISCRETE_INPUT(6)
 
 /* Ebers-Moll large signal model
  * Couriersud:
@@ -1138,9 +1138,9 @@ DISCRETE_RESET(dst_rcfilter_sw)
  */
 
 /* reverse saturation current */
-#define IES		7e-15
-#define ALPHAT	0.99
-#define KT		0.026
+#define IES     7e-15
+#define ALPHAT  0.99
+#define KT      0.026
 #define EM_IC(x) (ALPHAT * IES * exp( (x) / KT - 1.0 ))
 
 DISCRETE_STEP( dst_rcintegrate)
@@ -1188,9 +1188,9 @@ DISCRETE_STEP( dst_rcintegrate)
 	m_vCE = MIN(vP - 0.1, vP - RG * iQc);
 
 	/* Avoid oscillations
-     * The method tends to largely overshoot - no wonder without
-     * iterative solution approximation
-     */
+	 * The method tends to largely overshoot - no wonder without
+	 * iterative solution approximation
+	 */
 
 	m_vCE = MAX(m_vCE, 0.1 );
 	m_vCE = 0.1 * m_vCE + 0.9 * (vP - vE - iQ * DST_RCINTEGRATE__R3);
@@ -1249,9 +1249,9 @@ DISCRETE_RESET(dst_rcintegrate)
  *
  * 2008, couriersud
  ************************************************************************/
-#define DST_SALLEN_KEY__ENABLE	DISCRETE_INPUT(0)
-#define DST_SALLEN_KEY__INP0	DISCRETE_INPUT(1)
-#define DST_SALLEN_KEY__TYPE	DISCRETE_INPUT(2)
+#define DST_SALLEN_KEY__ENABLE  DISCRETE_INPUT(0)
+#define DST_SALLEN_KEY__INP0    DISCRETE_INPUT(1)
+#define DST_SALLEN_KEY__TYPE    DISCRETE_INPUT(2)
 
 DISCRETE_STEP(dst_sallen_key)
 {
@@ -1282,9 +1282,9 @@ DISCRETE_RESET(dst_sallen_key)
 	switch ((int) DST_SALLEN_KEY__TYPE)
 	{
 		case DISC_SALLEN_KEY_LOW_PASS:
-		    freq = 1.0 / ( 2.0 * M_PI * sqrt(info->c1 * info->c2 * info->r1 * info->r2));
-		    q = sqrt(info->c1 * info->c2 * info->r1 * info->r2) / (info->c2 * (info->r1 + info->r2));
-		    break;
+			freq = 1.0 / ( 2.0 * M_PI * sqrt(info->c1 * info->c2 * info->r1 * info->r2));
+			q = sqrt(info->c1 * info->c2 * info->r1 * info->r2) / (info->c2 * (info->r1 + info->r2));
+			break;
 		default:
 			fatalerror("Unknown sallen key filter type\n");
 	}
@@ -1307,10 +1307,10 @@ DISCRETE_RESET(dst_sallen_key)
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCFILTERN__ENABLE		DISCRETE_INPUT(0)
-#define DST_RCFILTERN__IN		DISCRETE_INPUT(1)
-#define DST_RCFILTERN__R		DISCRETE_INPUT(2)
-#define DST_RCFILTERN__C		DISCRETE_INPUT(3)
+#define DST_RCFILTERN__ENABLE       DISCRETE_INPUT(0)
+#define DST_RCFILTERN__IN       DISCRETE_INPUT(1)
+#define DST_RCFILTERN__R        DISCRETE_INPUT(2)
+#define DST_RCFILTERN__C        DISCRETE_INPUT(3)
 
 #if 0
 DISCRETE_RESET(dst_rcfilterN)
@@ -1341,10 +1341,10 @@ DISCRETE_RESET(dst_rcfilterN)
  * input[3]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISCN__ENABLE	DISCRETE_INPUT(0)
-#define DST_RCDISCN__IN		DISCRETE_INPUT(1)
-#define DST_RCDISCN__R		DISCRETE_INPUT(2)
-#define DST_RCDISCN__C		DISCRETE_INPUT(3)
+#define DST_RCDISCN__ENABLE DISCRETE_INPUT(0)
+#define DST_RCDISCN__IN     DISCRETE_INPUT(1)
+#define DST_RCDISCN__R      DISCRETE_INPUT(2)
+#define DST_RCDISCN__C      DISCRETE_INPUT(3)
 
 DISCRETE_RESET(dst_rcdiscN)
 {
@@ -1398,12 +1398,12 @@ DISCRETE_STEP(dst_rcdiscN)
  * input[5]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC2N__ENABLE	DISCRETE_INPUT(0)
-#define DST_RCDISC2N__IN0		DISCRETE_INPUT(1)
-#define DST_RCDISC2N__R0		DISCRETE_INPUT(2)
-#define DST_RCDISC2N__IN1		DISCRETE_INPUT(3)
-#define DST_RCDISC2N__R1		DISCRETE_INPUT(4)
-#define DST_RCDISC2N__C			DISCRETE_INPUT(5)
+#define DST_RCDISC2N__ENABLE    DISCRETE_INPUT(0)
+#define DST_RCDISC2N__IN0       DISCRETE_INPUT(1)
+#define DST_RCDISC2N__R0        DISCRETE_INPUT(2)
+#define DST_RCDISC2N__IN1       DISCRETE_INPUT(3)
+#define DST_RCDISC2N__R1        DISCRETE_INPUT(4)
+#define DST_RCDISC2N__C         DISCRETE_INPUT(5)
 
 
 DISCRETE_STEP(dst_rcdisc2N)

@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_SHARE("bg2videoram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP    /* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_SHARE("bg2videoram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP    /* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
@@ -397,7 +397,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)    /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
 	AM_RANGE(0x3400, 0x3400) AM_READ(soundlatch_byte_r)
@@ -414,7 +414,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 		m_coin_command_pending = (UINT8)(FPTR)(param);
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
-            definitely doesn't expect them as it locks out the coin routine */
+		    definitely doesn't expect them as it locks out the coin routine */
 		if (m_coin_command_pending && !m_i8751_current_command)
 		{
 			m_i8751_return = m_coin_command_pending;
@@ -426,7 +426,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( firetrap )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )     PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )   PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )   PORT_4WAY
@@ -436,7 +436,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )  PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")   /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )     PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )   PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )   PORT_4WAY PORT_COCKTAIL
@@ -446,7 +446,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )  PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")   /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -456,50 +456,50 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("DSW0")	/* DSW0 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_START("DSW0")  /* DSW0 */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )		/* Manual shows 1C_5C */
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )        /* Manual shows 1C_5C */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* DSW1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_START("DSW1")  /* DSW1 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "2" )                         /* "1" in the "test mode" but manual states "Infinite" */
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6") /* table at 0x0ca3 - 4*30 bytes */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5,6") /* table at 0x0ca3 - 4*30 bytes */
 	PORT_DIPSETTING(    0x10, "30k and 70k" )
 	PORT_DIPSETTING(    0x00, "50k and 100k" )
 	PORT_DIPSETTING(    0x30, "30k only" )
 	PORT_DIPSETTING(    0x20, "50k only" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW2:8" )
 
-	PORT_START("COIN")	/* Connected to i8751 directly */
+	PORT_START("COIN")  /* Connected to i8751 directly */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrap_state,coin_inserted, 1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrap_state,coin_inserted, 2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrap_state,coin_inserted, 3)
@@ -510,7 +510,7 @@ static INPUT_PORTS_START( firetrapj )
 	PORT_INCLUDE( firetrap )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6") /* table at 0x0ca3 - 4*30 bytes */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5,6") /* table at 0x0ca3 - 4*30 bytes */
 	PORT_DIPSETTING(    0x30, "50k & Every 70k" )             /* last bonus life at 960k */
 	PORT_DIPSETTING(    0x20, "60k & Every 80k" )             /* last bonus life at 940k */
 	PORT_DIPSETTING(    0x10, "80k & Every 100k" )            /* last bonus life at 980k */
@@ -567,18 +567,18 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( firetrap )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )	/* colors 0x00-0x3f */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x80,  4 )	/* colors 0x80-0xbf */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0xc0,  4 )	/* colors 0xc0-0xff */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 0x40,  4 )	/* colors 0x40-0x7f */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )    /* colors 0x00-0x3f */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x80,  4 )    /* colors 0x80-0xbf */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0xc0,  4 )    /* colors 0xc0-0xff */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 0x40,  4 )    /* colors 0x40-0x7f */
 GFXDECODE_END
 
 
 
 static const msm5205_interface msm5205_config =
 {
-	firetrap_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B		/* 7.8125kHz          */
+	firetrap_adpcm_int, /* interrupt function */
+	MSM5205_S48_4B      /* 7.8125kHz          */
 };
 
 INTERRUPT_GEN_MEMBER(firetrap_state::firetrap_irq)
@@ -640,11 +640,11 @@ void firetrap_state::machine_reset()
 static MACHINE_CONFIG_START( firetrap, firetrap_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
+	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrap_state, firetrap_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
+	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
@@ -665,10 +665,10 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)	// 3 MHz
+	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)	// 375 kHz
+	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -676,11 +676,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
+	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_bootleg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrap_state,  firetrap_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
+	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
@@ -701,10 +701,10 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)	// 3 MHz
+	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)	// 375 kHz
+	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -718,22 +718,22 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( firetrap )
-	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 64k for banked ROMs */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64k for banked ROMs */
 	ROM_LOAD( "di-02.4a",     0x00000, 0x8000, CRC(3d1e4bf7) SHA1(ee903b469619f49edb1727fb545c9a6085f50746) )
 	ROM_LOAD( "di-01.3a",     0x10000, 0x8000, CRC(9bbae38b) SHA1(dc1d3ed5da71bfb104fd54fc70c56833f31d281f) )
 	ROM_LOAD( "di-00.2a",     0x18000, 0x8000, CRC(d0dad7de) SHA1(8783ebf6ddfef32f6036913d403f76c1545b813d) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "di-17.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di-18.12j",    0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	/* 8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 8751 protection MCU */
 	ROM_LOAD( "di-12.16h",    0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )	/* characters */
+	ROM_REGION( 0x02000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "di-03.17c",    0x00000, 0x2000, CRC(46721930) SHA1(a605fe993166e95c1602a35b548649ceae77bff2) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
 	ROM_LOAD( "di-06.3e",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -769,7 +769,7 @@ ROM_START( firetrap )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprites */
+	ROM_REGION( 0x20000, "gfx4", 0 )    /* sprites */
 	ROM_LOAD( "di-16.17h",    0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
 	ROM_LOAD( "di-13.13h",    0x08000, 0x8000, CRC(869219da) SHA1(9ab2439d6d1c62fce24c4f78ac7887f34c86cd75) )
 	ROM_LOAD( "di-14.14h",    0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )
@@ -782,22 +782,22 @@ ROM_START( firetrap )
 ROM_END
 
 ROM_START( firetrapj )
-	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 64k for banked ROMs */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64k for banked ROMs */
 	ROM_LOAD( "fi-03.4a",     0x00000, 0x8000, CRC(20b2a4ff) SHA1(7c5de0789c5d3459063eb791f62d41c05ab474cc) )
 	ROM_LOAD( "fi-02.3a",     0x10000, 0x8000, CRC(5c8a0562) SHA1(856766851faa4353445d944b7705e348fd1379e4) )
 	ROM_LOAD( "fi-01.2a",     0x18000, 0x8000, CRC(f2412fe8) SHA1(28a9143e36c31fe34f40888dc848aed3d572d801) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "fi-18.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "fi-19.12j",    0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	/* 8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 8751 protection MCU */
 	ROM_LOAD( "fi-13.16h",    0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )	/* characters */
+	ROM_REGION( 0x02000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "fi-04.17c",    0x00000, 0x2000, CRC(a584fc16) SHA1(6ac3692a14cb7c70799c23f8f6726fa5be1ac0d8) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
 	ROM_LOAD( "fi-06.3e",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -833,7 +833,7 @@ ROM_START( firetrapj )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprites */
+	ROM_REGION( 0x20000, "gfx4", 0 )    /* sprites */
 	ROM_LOAD( "fi-17.17h",    0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
 	ROM_LOAD( "fi-14.13h",    0x08000, 0x8000, CRC(dbcdd3df) SHA1(99a7722e818a0f12ece1abd038531cdcb60f1181) )
 	ROM_LOAD( "fi-15.14h",    0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )
@@ -846,20 +846,20 @@ ROM_START( firetrapj )
 ROM_END
 
 ROM_START( firetrapbl )
-	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "ft0d.bin",     0x00000, 0x8000, CRC(793ef849) SHA1(5a2c587370733d43484ba0a38a357260cdde8357) )
-	ROM_LOAD( "ft0a.bin",     0x08000, 0x8000, CRC(613313ee) SHA1(54e386b2b1faada3441e3e0bb7822a63eab36930) )	/* unprotection code */
+	ROM_LOAD( "ft0a.bin",     0x08000, 0x8000, CRC(613313ee) SHA1(54e386b2b1faada3441e3e0bb7822a63eab36930) )   /* unprotection code */
 	ROM_LOAD( "fi-02.3a",     0x10000, 0x8000, CRC(5c8a0562) SHA1(856766851faa4353445d944b7705e348fd1379e4) )
 	ROM_LOAD( "fi-01.2a",     0x18000, 0x8000, CRC(f2412fe8) SHA1(28a9143e36c31fe34f40888dc848aed3d572d801) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "fi-18.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "fi-19.12j",    0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )	/* characters */
+	ROM_REGION( 0x02000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "fi-04.17c",    0x00000, 0x2000, CRC(a584fc16) SHA1(6ac3692a14cb7c70799c23f8f6726fa5be1ac0d8) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
 	ROM_LOAD( "fi-06.3e",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -895,7 +895,7 @@ ROM_START( firetrapbl )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )	/* sprites */
+	ROM_REGION( 0x20000, "gfx4", 0 )    /* sprites */
 	ROM_LOAD( "fi-17.17h",    0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
 	ROM_LOAD( "fi-14(__bootleg).13h",  0x08000, 0x8000, CRC(869219da) SHA1(9ab2439d6d1c62fce24c4f78ac7887f34c86cd75) )
 	ROM_LOAD( "fi-15.14h",    0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )

@@ -5,12 +5,12 @@
 #ifndef _PSXSIODEV_H_
 #define _PSXSIODEV_H_
 
-#define PSX_SIO_OUT_DATA ( 1 )	/* COMMAND */
-#define PSX_SIO_OUT_DTR ( 2 )	/* ATT */
+#define PSX_SIO_OUT_DATA ( 1 )  /* COMMAND */
+#define PSX_SIO_OUT_DTR ( 2 )   /* ATT */
 #define PSX_SIO_OUT_RTS ( 4 )
-#define PSX_SIO_OUT_CLOCK ( 8 )	/* CLOCK */
-#define PSX_SIO_IN_DATA ( 1 )	/* DATA */
-#define PSX_SIO_IN_DSR ( 2 )	/* ACK */
+#define PSX_SIO_OUT_CLOCK ( 8 ) /* CLOCK */
+#define PSX_SIO_IN_DATA ( 1 )   /* DATA */
+#define PSX_SIO_IN_DSR ( 2 )    /* ACK */
 #define PSX_SIO_IN_CTS ( 4 )
 
 class psxsio_device;

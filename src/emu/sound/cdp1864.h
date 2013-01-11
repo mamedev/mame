@@ -46,33 +46,33 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CDP1864_CLOCK	XTAL_1_75MHz
+#define CDP1864_CLOCK   XTAL_1_75MHz
 
-#define CDP1864_VISIBLE_COLUMNS	64
-#define CDP1864_VISIBLE_LINES	192
+#define CDP1864_VISIBLE_COLUMNS 64
+#define CDP1864_VISIBLE_LINES   192
 
-#define CDP1864_HBLANK_END		 1 * 8
-#define CDP1864_HBLANK_START	13 * 8
-#define CDP1864_HSYNC_START		 0 * 8
-#define CDP1864_HSYNC_END		 1 * 8
-#define CDP1864_SCREEN_START	 4 * 8
-#define CDP1864_SCREEN_END		12 * 8
-#define CDP1864_SCREEN_WIDTH	14 * 8
+#define CDP1864_HBLANK_END       1 * 8
+#define CDP1864_HBLANK_START    13 * 8
+#define CDP1864_HSYNC_START      0 * 8
+#define CDP1864_HSYNC_END        1 * 8
+#define CDP1864_SCREEN_START     4 * 8
+#define CDP1864_SCREEN_END      12 * 8
+#define CDP1864_SCREEN_WIDTH    14 * 8
 
-#define CDP1864_TOTAL_SCANLINES				312
+#define CDP1864_TOTAL_SCANLINES             312
 
-#define CDP1864_SCANLINE_VBLANK_START		CDP1864_TOTAL_SCANLINES - 4
-#define CDP1864_SCANLINE_VBLANK_END			20
-#define CDP1864_SCANLINE_VSYNC_START		0
-#define CDP1864_SCANLINE_VSYNC_END			4
-#define CDP1864_SCANLINE_DISPLAY_START		60 // ???
-#define CDP1864_SCANLINE_DISPLAY_END		CDP1864_SCANLINE_DISPLAY_START + CDP1864_VISIBLE_LINES
-#define CDP1864_SCANLINE_INT_START			CDP1864_SCANLINE_DISPLAY_START - 2
-#define CDP1864_SCANLINE_INT_END			CDP1864_SCANLINE_DISPLAY_START
-#define CDP1864_SCANLINE_EFX_TOP_START		CDP1864_SCANLINE_DISPLAY_START - 4
-#define CDP1864_SCANLINE_EFX_TOP_END		CDP1864_SCANLINE_DISPLAY_START
-#define CDP1864_SCANLINE_EFX_BOTTOM_START	CDP1864_SCANLINE_DISPLAY_END - 4
-#define CDP1864_SCANLINE_EFX_BOTTOM_END		CDP1864_SCANLINE_DISPLAY_END
+#define CDP1864_SCANLINE_VBLANK_START       CDP1864_TOTAL_SCANLINES - 4
+#define CDP1864_SCANLINE_VBLANK_END         20
+#define CDP1864_SCANLINE_VSYNC_START        0
+#define CDP1864_SCANLINE_VSYNC_END          4
+#define CDP1864_SCANLINE_DISPLAY_START      60 // ???
+#define CDP1864_SCANLINE_DISPLAY_END        CDP1864_SCANLINE_DISPLAY_START + CDP1864_VISIBLE_LINES
+#define CDP1864_SCANLINE_INT_START          CDP1864_SCANLINE_DISPLAY_START - 2
+#define CDP1864_SCANLINE_INT_END            CDP1864_SCANLINE_DISPLAY_START
+#define CDP1864_SCANLINE_EFX_TOP_START      CDP1864_SCANLINE_DISPLAY_START - 4
+#define CDP1864_SCANLINE_EFX_TOP_END        CDP1864_SCANLINE_DISPLAY_START
+#define CDP1864_SCANLINE_EFX_BOTTOM_START   CDP1864_SCANLINE_DISPLAY_END - 4
+#define CDP1864_SCANLINE_EFX_BOTTOM_END     CDP1864_SCANLINE_DISPLAY_END
 
 
 
@@ -114,34 +114,34 @@ struct cdp1864_interface
 	const char *m_cpu_tag;
 	const char *m_screen_tag;
 
-	devcb_read_line				m_in_inlace_cb;
+	devcb_read_line             m_in_inlace_cb;
 
-	devcb_read_line				m_in_rdata_cb;
-	devcb_read_line				m_in_bdata_cb;
-	devcb_read_line				m_in_gdata_cb;
+	devcb_read_line             m_in_rdata_cb;
+	devcb_read_line             m_in_bdata_cb;
+	devcb_read_line             m_in_gdata_cb;
 
-	devcb_write_line			m_out_int_cb;
-	devcb_write_line			m_out_dmao_cb;
-	devcb_write_line			m_out_efx_cb;
-	devcb_write_line			m_out_hsync_cb;
+	devcb_write_line            m_out_int_cb;
+	devcb_write_line            m_out_dmao_cb;
+	devcb_write_line            m_out_efx_cb;
+	devcb_write_line            m_out_hsync_cb;
 
-	double m_res_r;				// red output resistor value
-	double m_res_g;				// green output resistor value
-	double m_res_b;				// blue output resistor value
-	double m_res_bkg;			// background output resistor value
+	double m_res_r;             // red output resistor value
+	double m_res_g;             // green output resistor value
+	double m_res_b;             // blue output resistor value
+	double m_res_bkg;           // background output resistor value
 };
 
 
 
 // ======================> cdp1864_device
 
-class cdp1864_device :	public device_t,
+class cdp1864_device :  public device_t,
 						public device_sound_interface,
-                        public cdp1864_interface
+						public cdp1864_interface
 {
 public:
-    // construction/destruction
-    cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_READ8_MEMBER( dispoff_r );
@@ -158,10 +158,10 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// internal callbacks
@@ -175,32 +175,32 @@ private:
 	static const device_timer_id TIMER_DMA = 2;
 	static const device_timer_id TIMER_HSYNC = 3;
 
-	devcb_resolved_read_line		m_in_inlace_func;
-	devcb_resolved_read_line		m_in_rdata_func;
-	devcb_resolved_read_line		m_in_bdata_func;
-	devcb_resolved_read_line		m_in_gdata_func;
-	devcb_resolved_write_line		m_out_int_func;
-	devcb_resolved_write_line		m_out_dmao_func;
-	devcb_resolved_write_line		m_out_efx_func;
-	devcb_resolved_write_line		m_out_hsync_func;
+	devcb_resolved_read_line        m_in_inlace_func;
+	devcb_resolved_read_line        m_in_rdata_func;
+	devcb_resolved_read_line        m_in_bdata_func;
+	devcb_resolved_read_line        m_in_gdata_func;
+	devcb_resolved_write_line       m_out_int_func;
+	devcb_resolved_write_line       m_out_dmao_func;
+	devcb_resolved_write_line       m_out_efx_func;
+	devcb_resolved_write_line       m_out_hsync_func;
 
 	cpu_device *m_cpu;
-	screen_device *m_screen;		// screen
-	bitmap_rgb32 m_bitmap;			// bitmap
-	sound_stream *m_stream;			// sound output
+	screen_device *m_screen;        // screen
+	bitmap_rgb32 m_bitmap;          // bitmap
+	sound_stream *m_stream;         // sound output
 
 	// video state
 	rgb_t m_palette[16];
-	int m_disp;						// display on
-	int m_dmaout;					// DMA request active
-	int m_bgcolor;					// background color
-	int m_con;						// color on
+	int m_disp;                     // display on
+	int m_dmaout;                   // DMA request active
+	int m_bgcolor;                  // background color
+	int m_con;                      // color on
 
 	// sound state
-	int m_aoe;						// audio on
-	int m_latch;					// sound latch
-	INT16 m_signal;					// current signal
-	int m_incr;						// initial wave state
+	int m_aoe;                      // audio on
+	int m_latch;                    // sound latch
+	INT16 m_signal;                 // current signal
+	int m_incr;                     // initial wave state
 
 	// timers
 	emu_timer *m_int_timer;

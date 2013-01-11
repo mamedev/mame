@@ -172,18 +172,18 @@ static SPC7110Decomp* SPC7110Decomp_ctor(running_machine &machine, UINT32 size)
 		#define map(x, y) (((i >> x) & 1) << y)
 		//2x8-bit
 		newclass->morton16[1][i] = map(7, 15) + map(6,  7) + map(5, 14) + map(4,  6)
-                                 + map(3, 13) + map(2,  5) + map(1, 12) + map(0,  4);
+									+ map(3, 13) + map(2,  5) + map(1, 12) + map(0,  4);
 		newclass->morton16[0][i] = map(7, 11) + map(6,  3) + map(5, 10) + map(4,  2)
-                                 + map(3,  9) + map(2,  1) + map(1,  8) + map(0,  0);
+									+ map(3,  9) + map(2,  1) + map(1,  8) + map(0,  0);
 		//4x8-bit
 		newclass->morton32[3][i] = map(7, 31) + map(6, 23) + map(5, 15) + map(4,  7)
-                                 + map(3, 30) + map(2, 22) + map(1, 14) + map(0,  6);
+									+ map(3, 30) + map(2, 22) + map(1, 14) + map(0,  6);
 		newclass->morton32[2][i] = map(7, 29) + map(6, 21) + map(5, 13) + map(4,  5)
-                                 + map(3, 28) + map(2, 20) + map(1, 12) + map(0,  4);
+									+ map(3, 28) + map(2, 20) + map(1, 12) + map(0,  4);
 		newclass->morton32[1][i] = map(7, 27) + map(6, 19) + map(5, 11) + map(4,  3)
-                                 + map(3, 26) + map(2, 18) + map(1, 10) + map(0,  2);
+									+ map(3, 26) + map(2, 18) + map(1, 10) + map(0,  2);
 		newclass->morton32[0][i] = map(7, 25) + map(6, 17) + map(5,  9) + map(4,  1)
-                                 + map(3, 24) + map(2, 16) + map(1,  8) + map(0,  0);
+									+ map(3, 24) + map(2, 16) + map(1,  8) + map(0,  0);
 		#undef map
 	}
 
@@ -751,21 +751,21 @@ static UINT8 SPC7110Decomp_toggle_invert(SPC7110Decomp *thisptr, UINT32 n)
 
 static UINT32 SPC7110Decomp_morton_2x8(SPC7110Decomp *thisptr, UINT32 data)
 {
-  //reverse morton lookup: de-interleave two 8-bit values
-  //15, 13, 11,  9,  7,  5,  3,  1 -> 15- 8
-  //14, 12, 10,  8,  6,  4,  2,  0 ->  7- 0
-  return thisptr->morton16[0][(data >>  0) & 255] + thisptr->morton16[1][(data >>  8) & 255];
+	//reverse morton lookup: de-interleave two 8-bit values
+	//15, 13, 11,  9,  7,  5,  3,  1 -> 15- 8
+	//14, 12, 10,  8,  6,  4,  2,  0 ->  7- 0
+	return thisptr->morton16[0][(data >>  0) & 255] + thisptr->morton16[1][(data >>  8) & 255];
 }
 
 static UINT32 SPC7110Decomp_morton_4x8(SPC7110Decomp *thisptr, UINT32 data)
 {
-  //reverse morton lookup: de-interleave four 8-bit values
-  //31, 27, 23, 19, 15, 11,  7,  3 -> 31-24
-  //30, 26, 22, 18, 14, 10,  6,  2 -> 23-16
-  //29, 25, 21, 17, 13,  9,  5,  1 -> 15- 8
-  //28, 24, 20, 16, 12,  8,  4,  0 ->  7- 0
-  return thisptr->morton32[0][(data >>  0) & 255] + thisptr->morton32[1][(data >>  8) & 255]
-       + thisptr->morton32[2][(data >> 16) & 255] + thisptr->morton32[3][(data >> 24) & 255];
+	//reverse morton lookup: de-interleave four 8-bit values
+	//31, 27, 23, 19, 15, 11,  7,  3 -> 31-24
+	//30, 26, 22, 18, 14, 10,  6,  2 -> 23-16
+	//29, 25, 21, 17, 13,  9,  5,  1 -> 15- 8
+	//28, 24, 20, 16, 12,  8,  4,  0 ->  7- 0
+	return thisptr->morton32[0][(data >>  0) & 255] + thisptr->morton32[1][(data >>  8) & 255]
+		+ thisptr->morton32[2][(data >> 16) & 255] + thisptr->morton32[3][(data >> 24) & 255];
 }
 
 static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data);
@@ -793,29 +793,29 @@ struct snes_spc7110_t
 	//==================
 	//decompression unit
 	//==================
-	UINT8 r4801;		// compression table low
-	UINT8 r4802;		// compression table high
-	UINT8 r4803;		// compression table bank
-	UINT8 r4804;		// compression table index
-	UINT8 r4805;		// decompression buffer index low
-	UINT8 r4806;		// decompression buffer index high
-	UINT8 r4807;		// ???
-	UINT8 r4808;		// ???
-	UINT8 r4809;		// compression length low
-	UINT8 r480a;		// compression length high
-	UINT8 r480b;		// decompression control register
-	UINT8 r480c;		// decompression status
+	UINT8 r4801;        // compression table low
+	UINT8 r4802;        // compression table high
+	UINT8 r4803;        // compression table bank
+	UINT8 r4804;        // compression table index
+	UINT8 r4805;        // decompression buffer index low
+	UINT8 r4806;        // decompression buffer index high
+	UINT8 r4807;        // ???
+	UINT8 r4808;        // ???
+	UINT8 r4809;        // compression length low
+	UINT8 r480a;        // compression length high
+	UINT8 r480b;        // decompression control register
+	UINT8 r480c;        // decompression status
 
 	SPC7110Decomp* decomp;
 
-	UINT8 r4811;		// data pointer low
-	UINT8 r4812;		// data pointer high
-	UINT8 r4813;		// data pointer bank
-	UINT8 r4814;		// data adjust low
-	UINT8 r4815;		// data adjust high
-	UINT8 r4816;		// data increment low
-	UINT8 r4817;		// data increment high
-	UINT8 r4818;		// data port control register
+	UINT8 r4811;        // data pointer low
+	UINT8 r4812;        // data pointer high
+	UINT8 r4813;        // data pointer bank
+	UINT8 r4814;        // data adjust low
+	UINT8 r4815;        // data adjust high
+	UINT8 r4816;        // data increment low
+	UINT8 r4817;        // data increment high
+	UINT8 r4818;        // data port control register
 
 	UINT8 r481x;
 
@@ -825,31 +825,31 @@ struct snes_spc7110_t
 	//=========
 	//math unit
 	//=========
-	UINT8 r4820;		// 16-bit multiplicand B0, 32-bit dividend B0
-	UINT8 r4821;		// 16-bit multiplicand B1, 32-bit dividend B1
-	UINT8 r4822;		// 32-bit dividend B2
-	UINT8 r4823;		// 32-bit dividend B3
-	UINT8 r4824;		// 16-bit multiplier B0
-	UINT8 r4825;		// 16-bit multiplier B1
-	UINT8 r4826;		// 16-bit divisor B0
-	UINT8 r4827;		// 16-bit divisor B1
-	UINT8 r4828;		// 32-bit product B0, 32-bit quotient B0
-	UINT8 r4829;		// 32-bit product B1, 32-bit quotient B1
-	UINT8 r482a;		// 32-bit product B2, 32-bit quotient B2
-	UINT8 r482b;		// 32-bit product B3, 32-bit quotient B3
-	UINT8 r482c;		// 16-bit remainder B0
-	UINT8 r482d;		// 16-bit remainder B1
-	UINT8 r482e;		// math control register
-	UINT8 r482f;		// math status
+	UINT8 r4820;        // 16-bit multiplicand B0, 32-bit dividend B0
+	UINT8 r4821;        // 16-bit multiplicand B1, 32-bit dividend B1
+	UINT8 r4822;        // 32-bit dividend B2
+	UINT8 r4823;        // 32-bit dividend B3
+	UINT8 r4824;        // 16-bit multiplier B0
+	UINT8 r4825;        // 16-bit multiplier B1
+	UINT8 r4826;        // 16-bit divisor B0
+	UINT8 r4827;        // 16-bit divisor B1
+	UINT8 r4828;        // 32-bit product B0, 32-bit quotient B0
+	UINT8 r4829;        // 32-bit product B1, 32-bit quotient B1
+	UINT8 r482a;        // 32-bit product B2, 32-bit quotient B2
+	UINT8 r482b;        // 32-bit product B3, 32-bit quotient B3
+	UINT8 r482c;        // 16-bit remainder B0
+	UINT8 r482d;        // 16-bit remainder B1
+	UINT8 r482e;        // math control register
+	UINT8 r482f;        // math status
 
 	//===================
 	//memory mapping unit
 	//===================
-	UINT8 r4830;		// SRAM write enable
-	UINT8 r4831;		// $[d0-df]:[0000-ffff] mapping
-	UINT8 r4832;		// $[e0-ef]:[0000-ffff] mapping
-	UINT8 r4833;		// $[f0-ff]:[0000-ffff] mapping
-	UINT8 r4834;		// ???
+	UINT8 r4830;        // SRAM write enable
+	UINT8 r4831;        // $[d0-df]:[0000-ffff] mapping
+	UINT8 r4832;        // $[e0-ef]:[0000-ffff] mapping
+	UINT8 r4833;        // $[f0-ff]:[0000-ffff] mapping
+	UINT8 r4834;        // ???
 
 	UINT32 dx_offset;
 	UINT32 ex_offset;
@@ -858,9 +858,9 @@ struct snes_spc7110_t
 	//====================
 	//real-time clock unit
 	//====================
-	UINT8 r4840;		// RTC latch
-	UINT8 r4841;		// RTC index/data port
-	UINT8 r4842;		// RTC status
+	UINT8 r4840;        // RTC latch
+	UINT8 r4841;        // RTC index/data port
+	UINT8 r4842;        // RTC status
 
 	UINT32 rtc_state;
 	UINT32 rtc_mode;
@@ -868,7 +868,7 @@ struct snes_spc7110_t
 
 	UINT64 rtc_offset;
 
-	UINT8 rtc_ram[16];	// 0-12 secs, min, hrs, etc.; 13-14-15 control registers
+	UINT8 rtc_ram[16];  // 0-12 secs, min, hrs, etc.; 13-14-15 control registers
 
 	UINT32 size;
 };
@@ -1283,8 +1283,8 @@ static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data
 			address = spc7110_datarom_addr(table + index);
 			mode    = (ROM[address + 0]);
 			offset  = (ROM[address + 1] << 16)
-                    + (ROM[address + 2] <<  8)
-                    + (ROM[address + 3] <<  0);
+					+ (ROM[address + 2] <<  8)
+					+ (ROM[address + 3] <<  0);
 
 			SPC7110Decomp_init(snes_spc7110.decomp, machine, mode, offset, (snes_spc7110.r4805 + (snes_spc7110.r4806 << 8)) << mode);
 			snes_spc7110.r480c = 0x80;
@@ -1384,13 +1384,13 @@ static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data
 	case 0x4817: snes_spc7110.r4817 = data; break;
 	case 0x4818:
 		{
-    			if(snes_spc7110.r481x != 0x07)
+				if(snes_spc7110.r481x != 0x07)
 				break;
 
-	    		snes_spc7110.r4818 = data;
-    			snes_spc7110.r4814_latch = snes_spc7110.r4815_latch = 0;
-    			break;
-    		}
+				snes_spc7110.r4818 = data;
+				snes_spc7110.r4814_latch = snes_spc7110.r4815_latch = 0;
+				break;
+			}
 
 	//=========
 	//math unit
@@ -1403,31 +1403,31 @@ static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data
 	case 0x4824: snes_spc7110.r4824 = data; break;
 	case 0x4825:
 		{
-	    		snes_spc7110.r4825 = data;
+				snes_spc7110.r4825 = data;
 
-    			if(snes_spc7110.r482e & 1)
+				if(snes_spc7110.r482e & 1)
 			{
-    				//signed 16-bit x 16-bit multiplication
-    				INT16 r0 = (INT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
-    				INT16 r1 = (INT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
+					//signed 16-bit x 16-bit multiplication
+					INT16 r0 = (INT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
+					INT16 r1 = (INT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
 
-	    			INT32 result = r0 * r1;
-	    			snes_spc7110.r4828 = result;
-	    			snes_spc7110.r4829 = result >> 8;
-	    			snes_spc7110.r482a = result >> 16;
-	    			snes_spc7110.r482b = result >> 24;
+					INT32 result = r0 * r1;
+					snes_spc7110.r4828 = result;
+					snes_spc7110.r4829 = result >> 8;
+					snes_spc7110.r482a = result >> 16;
+					snes_spc7110.r482b = result >> 24;
 			}
 			else
 			{
-	    			//unsigned 16-bit x 16-bit multiplication
-	    			UINT16 r0 = (UINT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
-	    			UINT16 r1 = (UINT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
+					//unsigned 16-bit x 16-bit multiplication
+					UINT16 r0 = (UINT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
+					UINT16 r1 = (UINT16)(snes_spc7110.r4820 + (snes_spc7110.r4821 << 8));
 
-	    			UINT32 result = r0 * r1;
-    				snes_spc7110.r4828 = result;
-    				snes_spc7110.r4829 = result >> 8;
-    				snes_spc7110.r482a = result >> 16;
-    				snes_spc7110.r482b = result >> 24;
+					UINT32 result = r0 * r1;
+					snes_spc7110.r4828 = result;
+					snes_spc7110.r4829 = result >> 8;
+					snes_spc7110.r482a = result >> 16;
+					snes_spc7110.r482b = result >> 24;
 			}
 
 			snes_spc7110.r482f = 0x80;

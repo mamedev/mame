@@ -141,9 +141,9 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int w = (spriteram16[offs+0] & 0x0f);
 			int h = ((spriteram16[offs+0] & 0xf0) >> 4);
 			int sy = (spriteram16[offs+4] & 0x0ff) - ((h+1)*0x10);
-/**/		int pri = spriteram16[offs+5];
-/**/		int flipy = ((spriteram16[offs+1] & 0x0200) >> 9);
-/**/		int flipx = ((spriteram16[offs+1] & 0x0100) >> 8);
+/**/        int pri = spriteram16[offs+5];
+/**/        int flipy = ((spriteram16[offs+1] & 0x0200) >> 9);
+/**/        int flipx = ((spriteram16[offs+1] & 0x0100) >> 8);
 
 			int xx,yy,x;
 			int delta = 16;
@@ -195,8 +195,8 @@ void acommand_state::video_start()
 }
 
 
-#define LED_ON		0x01c00
-#define LED_OFF		0x00000
+#define LED_ON      0x01c00
+#define LED_OFF     0x00000
 /*
      a
     ---
@@ -313,17 +313,17 @@ READ16_MEMBER(acommand_state::ac_devices_r)
 	{
 		case 0x0008/2:
 			/*
-                --x- ---- ---- ---- Ticket Dispenser - 2
-                ---x ---- ---- ---- Ticket Dispenser - 1
-                ---- -x-- ---- ---- Right Gun HIT
-                ---- ---x ---- ---- Left Gun HIT
-                ---- ---- --x- ---- Service Mode (Toggle)
-                ---- ---- ---x ---- Service Coin
-                ---- ---- ---- x--- COIN2
-                ---- ---- ---- -x-- COIN1
-                ---- ---- ---- --x- (Activate Test)
-                ---- ---- ---- ---x (Advance through Tests)
-            */
+			    --x- ---- ---- ---- Ticket Dispenser - 2
+			    ---x ---- ---- ---- Ticket Dispenser - 1
+			    ---- -x-- ---- ---- Right Gun HIT
+			    ---- ---x ---- ---- Left Gun HIT
+			    ---- ---- --x- ---- Service Mode (Toggle)
+			    ---- ---- ---x ---- Service Coin
+			    ---- ---- ---- x--- COIN2
+			    ---- ---- ---- -x-- COIN1
+			    ---- ---- ---- --x- (Activate Test)
+			    ---- ---- ---- ---x (Advance through Tests)
+			*/
 			return ioport("IN0")->read();
 		case 0x0014/2:
 		case 0x0016/2:
@@ -333,20 +333,20 @@ READ16_MEMBER(acommand_state::ac_devices_r)
 			return machine().device<okim6295_device>("oki2")->read(space,0);
 		case 0x0040/2:
 			/*
-                "Upper switch / Under Switch"
-                xx-x ---- xx-x xx-x
-                -x-- ---- ---- ---- Catch Switch - 3
-                --x- ---- ---- ---- Lower Switch - 3
-                ---x ---- ---- ---- Upper Switch - 3
-                ---- -x-- ---- ---- Catch Switch - 2
-                ---- --x- ---- ---- Lower Switch - 2
-                ---- ---x ---- ---- Upper Switch - 2
-                ---- ---- -x-- ---- Catch Switch - 1
-                ---- ---- --x- ---- Lower Switch - 1 (active high)
-                ---- ---- ---x ---- Upper Switch - 1 (active low)
-                ---- ---- ---- --xx Boss Door - Motor
-            */
-        //22dc8
+			    "Upper switch / Under Switch"
+			    xx-x ---- xx-x xx-x
+			    -x-- ---- ---- ---- Catch Switch - 3
+			    --x- ---- ---- ---- Lower Switch - 3
+			    ---x ---- ---- ---- Upper Switch - 3
+			    ---- -x-- ---- ---- Catch Switch - 2
+			    ---- --x- ---- ---- Lower Switch - 2
+			    ---- ---x ---- ---- Upper Switch - 2
+			    ---- ---- -x-- ---- Catch Switch - 1
+			    ---- ---- --x- ---- Lower Switch - 1 (active high)
+			    ---- ---- ---x ---- Upper Switch - 1 (active low)
+			    ---- ---- ---- --xx Boss Door - Motor
+			*/
+		//22dc8
 		{
 			m_ufo_sw1 = m_ac_devram[offset] & 3;
 			if(m_ac_devram[offset] & 0x10)
@@ -371,11 +371,11 @@ READ16_MEMBER(acommand_state::ac_devices_r)
 		}
 		case 0x0044/2:
 			/*
-                ---- ---- --x- ---- Lower Switch - 5
-                ---- ---- ---x ---- Upper Switch - 5
-                ---- ---- ---- --x- Lower Switch - 4 (active high)
-                ---- ---- ---- ---x Upper Switch - 4 (active low)
-            */
+			    ---- ---- --x- ---- Lower Switch - 5
+			    ---- ---- ---x ---- Upper Switch - 5
+			    ---- ---- ---- --x- Lower Switch - 4 (active high)
+			    ---- ---- ---- ---x Upper Switch - 4 (active low)
+			*/
 		{
 			m_ufo_sw2 = 0;
 			if(m_ac_devram[offset] & 0x01)
@@ -392,9 +392,9 @@ READ16_MEMBER(acommand_state::ac_devices_r)
 			return m_ac_devram[offset];
 		case 0x005c/2:
 			/*
-                xxxx xxxx ---- ---- DIPSW4
-                ---- ---- xxxx xxxx DIPSW3
-            */
+			    xxxx xxxx ---- ---- DIPSW4
+			    ---- ---- xxxx xxxx DIPSW3
+			*/
 			return ioport("IN1")->read();
 	}
 	return m_ac_devram[offset];
@@ -473,11 +473,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )
 	PORT_START("IN0")
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0040, 0x0040, "IN0" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -485,11 +485,11 @@ static INPUT_PORTS_START( acommand )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -656,10 +656,10 @@ ROM_START( acommand )
 	ROM_LOAD16_BYTE( "jalgp7.bin",   0x300000, 0x080000, CRC(44b71098) SHA1(a6ec2573f9a266d4f8f315f6e99b12525011f512) )
 	ROM_LOAD16_BYTE( "jalgp8.bin",   0x300001, 0x080000, CRC(ce0b7838) SHA1(46e34971cb62565a3948d8c0a18086648c32e13b) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* M6295 samples */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* M6295 samples */
 	ROM_LOAD( "jalcf2.bin",   0x000000, 0x100000, CRC(b982fd97) SHA1(35ee5b1b9be762ccfefda24d73e329ceea876deb) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )	/* M6295 samples */
+	ROM_REGION( 0x100000, "oki2", 0 )   /* M6295 samples */
 	ROM_LOAD( "jalcf1.bin",   0x000000, 0x100000, CRC(24af21d3) SHA1(f68ab81a6c833b57ae9eef916a1c8578f3d893dd) )
 
 	ROM_REGION( 0x100000, "user1", 0 ) /* ? these two below are identical*/

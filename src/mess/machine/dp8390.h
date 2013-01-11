@@ -5,10 +5,10 @@
 
 struct dp8390_interface
 {
-	devcb_write_line	irq_cb;
-	devcb_write_line	breq_cb;
-	devcb_read8			mem_read_cb;
-	devcb_write8		mem_write_cb;
+	devcb_write_line    irq_cb;
+	devcb_write_line    breq_cb;
+	devcb_read8         mem_read_cb;
+	devcb_write8        mem_write_cb;
 };
 
 // device stuff
@@ -21,8 +21,8 @@ struct dp8390_interface
 	MCFG_DEVICE_CONFIG(_intrf)
 
 class dp8390_device : public device_t,
-					  public device_network_interface,
-					  public dp8390_interface
+						public device_network_interface,
+						public dp8390_interface
 {
 public:
 	// construction/destruction
@@ -50,8 +50,8 @@ protected:
 private:
 	devcb_resolved_write_line   irq_func;
 	devcb_resolved_write_line   breq_func;
-	devcb_resolved_read8		mem_read;
-	devcb_resolved_write8		mem_write;
+	devcb_resolved_read8        mem_read;
+	devcb_resolved_write8       mem_write;
 
 	void set_cr(UINT8 newcr);
 	void check_dma_complete();
@@ -129,4 +129,3 @@ extern const device_type DP8390D;
 extern const device_type RTL8019A;
 
 #endif
-

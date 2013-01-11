@@ -238,20 +238,20 @@ READ64_MEMBER(taitopjc_state::ppc_common_r)
 	}
 
 	/*
-    if (offset < 0x7f)
-    {
-        int reg = (offset & 0x7f) * 2;
+	if (offset < 0x7f)
+	{
+	    int reg = (offset & 0x7f) * 2;
 
-        if (!(mem_mask & U64(0xffff000000000000)))
-        {
-            r |= (UINT64)(com_ram[reg + 0]) << 48;
-        }
-        if (!(mem_mask & U64(0x00000000ffff0000)))
-        {
-            r |= (UINT64)(com_ram[reg + 1]) << 16;
-        }
-    }
-    */
+	    if (!(mem_mask & U64(0xffff000000000000)))
+	    {
+	        r |= (UINT64)(com_ram[reg + 0]) << 48;
+	    }
+	    if (!(mem_mask & U64(0x00000000ffff0000)))
+	    {
+	        r |= (UINT64)(com_ram[reg + 1]) << 16;
+	    }
+	}
+	*/
 	return r;
 }
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER(taitopjc_state::tlcs_sound_w)
 // 0xfc0f41: INTTX1
 
 static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitopjc_state )
-	AM_RANGE(0x010000, 0x02ffff) AM_RAM		// Work RAM
+	AM_RANGE(0x010000, 0x02ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE(tlcs_sound_r, tlcs_sound_w)
 	AM_RANGE(0x060000, 0x061fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
@@ -401,7 +401,7 @@ INPUT_PORTS_END
 
 static const powerpc_config ppc603e_config =
 {
-	XTAL_66_6667MHz,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	XTAL_66_6667MHz,        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	NULL,
 	NULL
 };

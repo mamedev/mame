@@ -15,8 +15,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG			"z80"
-#define SASIBUS_TAG		"sasi"
+#define Z80_TAG         "z80"
+#define SASIBUS_TAG     "sasi"
 
 
 
@@ -115,9 +115,9 @@ machine_config_constructor abc_xebec_device::device_mconfig_additions() const
 
 abc_xebec_device::abc_xebec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC_XEBEC, "ABC XEBEC", tag, owner, clock),
-	  device_abcbus_card_interface(mconfig, *this),
-	  m_maincpu(*this, Z80_TAG),
-	  m_sasibus(*this, SASIBUS_TAG)
+		device_abcbus_card_interface(mconfig, *this),
+		m_maincpu(*this, Z80_TAG),
+		m_sasibus(*this, SASIBUS_TAG)
 {
 }
 

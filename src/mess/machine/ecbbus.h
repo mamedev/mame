@@ -19,10 +19,10 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define ECBBUS_TAG			"ecbbus"
+#define ECBBUS_TAG          "ecbbus"
 
 
-#define MAX_ECBBUS_SLOTS	16
+#define MAX_ECBBUS_SLOTS    16
 
 
 
@@ -33,7 +33,7 @@
 #define MCFG_ECBBUS_ADD(_cpu_tag, _config) \
 	MCFG_DEVICE_ADD(ECBBUS_TAG, ECBBUS, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-    ecbbus_device::static_set_cputag(*device, _cpu_tag);
+	ecbbus_device::static_set_cputag(*device, _cpu_tag);
 
 
 #define ECBBUS_INTERFACE(_name) \
@@ -41,7 +41,7 @@
 
 
 #define MCFG_ECBBUS_SLOT_ADD(_num, _tag, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, ECBBUS_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, ECBBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	ecbbus_slot_device::static_set_ecbbus_slot(*device, ECBBUS_TAG, _num);
 
@@ -56,7 +56,7 @@
 class ecbbus_device;
 
 class ecbbus_slot_device : public device_t,
-						   public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -65,8 +65,8 @@ public:
 	// device-level overrides
 	virtual void device_start();
 
-    // inline configuration
-    static void static_set_ecbbus_slot(device_t &device, const char *tag, int num);
+	// inline configuration
+	static void static_set_ecbbus_slot(device_t &device, const char *tag, int num);
 
 private:
 	// configuration
@@ -84,8 +84,8 @@ extern const device_type ECBBUS_SLOT;
 
 struct ecbbus_interface
 {
-    devcb_write_line	m_out_int_cb;
-    devcb_write_line	m_out_nmi_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_nmi_cb;
 };
 
 class device_ecbbus_card_interface;
@@ -94,7 +94,7 @@ class device_ecbbus_card_interface;
 // ======================> ecbbus_device
 
 class ecbbus_device : public device_t,
-					  public ecbbus_interface
+						public ecbbus_interface
 {
 public:
 	// construction/destruction
@@ -123,8 +123,8 @@ private:
 	// internal state
 	cpu_device   *m_maincpu;
 
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_nmi_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_nmi_func;
 
 	device_ecbbus_card_interface *m_ecbbus_device[MAX_ECBBUS_SLOTS];
 	const char *m_cputag;

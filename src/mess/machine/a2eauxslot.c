@@ -25,13 +25,13 @@ const device_type A2EAUXSLOT_SLOT = &device_creator<a2eauxslot_slot_device>;
 //  a2eauxslot_slot_device - constructor
 //-------------------------------------------------
 a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2EAUXSLOT_SLOT, "Apple II Slot", tag, owner, clock),
+		device_t(mconfig, A2EAUXSLOT_SLOT, "Apple II Slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
 
 a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -84,8 +84,8 @@ void a2eauxslot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
 	}
 }
 
@@ -98,12 +98,12 @@ void a2eauxslot_device::device_config_complete()
 //-------------------------------------------------
 
 a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2EAUXSLOT, "Apple II Bus", tag, owner, clock)
+		device_t(mconfig, A2EAUXSLOT, "Apple II Bus", tag, owner, clock)
 {
 }
 
 a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock)
+		device_t(mconfig, type, name, tag, owner, clock)
 {
 }
 //-------------------------------------------------
@@ -114,12 +114,12 @@ void a2eauxslot_device::device_start()
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 
-    // resolve callbacks
+	// resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
 
-    // clear slot
-    m_device = NULL;
+	// clear slot
+	m_device = NULL;
 }
 
 //-------------------------------------------------
@@ -132,7 +132,7 @@ void a2eauxslot_device::device_reset()
 
 device_a2eauxslot_card_interface *a2eauxslot_device::get_a2eauxslot_card(int slot)
 {
-    return m_device;
+	return m_device;
 }
 
 void a2eauxslot_device::add_a2eauxslot_card(device_a2eauxslot_card_interface *card)
@@ -142,12 +142,12 @@ void a2eauxslot_device::add_a2eauxslot_card(device_a2eauxslot_card_interface *ca
 
 void a2eauxslot_device::set_irq_line(int state)
 {
-    m_out_irq_func(state);
+	m_out_irq_func(state);
 }
 
 void a2eauxslot_device::set_nmi_line(int state)
 {
-    m_out_nmi_func(state);
+	m_out_nmi_func(state);
 }
 
 // interrupt request from a2eauxslot card
@@ -169,8 +169,8 @@ WRITE_LINE_MEMBER( a2eauxslot_device::nmi_w ) { m_out_nmi_func(state); }
 
 device_a2eauxslot_card_interface::device_a2eauxslot_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_a2eauxslot(NULL),
-	  m_a2eauxslot_tag(NULL)
+		m_a2eauxslot(NULL),
+		m_a2eauxslot_tag(NULL)
 {
 }
 
@@ -195,4 +195,3 @@ void device_a2eauxslot_card_interface::set_a2eauxslot_device()
 	m_a2eauxslot = dynamic_cast<a2eauxslot_device *>(device().machine().device(m_a2eauxslot_tag));
 	m_a2eauxslot->add_a2eauxslot_card(this);
 }
-

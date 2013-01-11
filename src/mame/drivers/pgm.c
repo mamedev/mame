@@ -391,20 +391,20 @@ INPUT_PORTS_START( pgm )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-//	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )  // test 1p+2p
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )	// what should i use?
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service 1p+2p
-//	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 )  // test 3p+4p
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	// what should i use?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 )	// service 3p+4p
+//  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )  // test 1p+2p
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )  // what should i use?
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service 1p+2p
+//  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 )  // test 3p+4p
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )  // what should i use?
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service 3p+4p
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 
 	PORT_START("DSW")
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
@@ -458,14 +458,14 @@ static const gfx_layout pgm32_charlayout =
 	5,
 	{ 3,4,5,6,7 },
 	{ 0  , 8 ,16 ,24 ,32 ,40 ,48 ,56 ,
-	  64 ,72 ,80 ,88 ,96 ,104,112,120,
-	  128,136,144,152,160,168,176,184,
-	  192,200,208,216,224,232,240,248 },
+		64 ,72 ,80 ,88 ,96 ,104,112,120,
+		128,136,144,152,160,168,176,184,
+		192,200,208,216,224,232,240,248 },
 	{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256,
-	  8*256, 9*256,10*256,11*256,12*256,13*256,14*256,15*256,
-	 16*256,17*256,18*256,19*256,20*256,21*256,22*256,23*256,
-	 24*256,25*256,26*256,27*256,28*256,29*256,30*256,31*256 },
-	 32*256
+		8*256, 9*256,10*256,11*256,12*256,13*256,14*256,15*256,
+		16*256,17*256,18*256,19*256,20*256,21*256,22*256,23*256,
+		24*256,25*256,26*256,27*256,28*256,29*256,30*256,31*256 },
+		32*256
 };
 
 GFXDECODE_START( pgm )
@@ -491,7 +491,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 
 MACHINE_START_MEMBER(pgm_state,pgm)
 {
-//	machine().base_datetime(m_systime);
+//  machine().base_datetime(m_systime);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_soundcpu = machine().device<cpu_device>("soundcpu");
@@ -1546,7 +1546,7 @@ ROM_START( kovqhsgs )
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
-	ROM_IGNORE( 0x800000 )	// second half identical
+	ROM_IGNORE( 0x800000 )  // second half identical
 
 	ROM_REGION( 0x3000000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
@@ -1559,9 +1559,9 @@ ROM_START( kovqhsgs )
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "lsqh2_m01.rom",0x400000, 0x400000, CRC(01af1b65) SHA1(6cf523fa8f1e03f974771611bb9a4e08a4d4443f) )
-	ROM_IGNORE( 0x400000 )	// 400000-7fffff empty
+	ROM_IGNORE( 0x400000 )  // 400000-7fffff empty
 	ROM_CONTINUE( 0x800000, 0x400000 )
-	ROM_IGNORE( 0x400000 )	// c00000-ffffff empty
+	ROM_IGNORE( 0x400000 )  // c00000-ffffff empty
 ROM_END
 
 
@@ -1765,7 +1765,7 @@ ROM_START( pgm3in1 )
 	ROM_LOAD( "pgm_a1102.u6",    0x1000000, 0x0800000, CRC(6da7c143) SHA1(9408ba7722bfc8013f851aadea5e2819f5263129) ) // == y2k2_a1102.u8
 	ROM_LOAD( "pgm_a1103.u7",    0x1800000, 0x0800000, CRC(0ebebfdc) SHA1(4faad7f97c7e734f179ec934a37e75d8d6adccf4) ) // == y2k2_a1103.u9
 	ROM_LOAD( "ext_bit_cg.u20",  0x2000000, 0x0400000, CRC(fe314754) SHA1(ae3e8bbdce852a3fa39806a5221c053dee5abfd4) )
-	
+
 	ROM_REGION( 0x1000000, "sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1100.u8",    0x0000000, 0x0800000, CRC(fa53d6f6) SHA1(c2da55f4b7e721fa1c63bd7f9528f261643164e8) ) // == y2k2_b1100.u4
 	ROM_LOAD( "pgm_b1101.u9",    0x0800000, 0x0800000, CRC(001e4c81) SHA1(21119055f8fd7f831529e73ff9c97bca3987a1dc) ) // == y2k2_b1101.u5
@@ -3192,7 +3192,7 @@ ROM_START( kovlsqh )
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
-	ROM_IGNORE( 0x800000 )	// second half identical
+	ROM_IGNORE( 0x800000 )  // second half identical
 
 	ROM_REGION( 0x3000000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
@@ -3205,9 +3205,9 @@ ROM_START( kovlsqh )
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "lsqh2_m01.rom",0x400000, 0x400000, CRC(01af1b65) SHA1(6cf523fa8f1e03f974771611bb9a4e08a4d4443f) )
-	ROM_IGNORE( 0x400000 )	// 400000-7fffff empty
+	ROM_IGNORE( 0x400000 )  // 400000-7fffff empty
 	ROM_CONTINUE( 0x800000, 0x400000 )
-	ROM_IGNORE( 0x400000 )	// c00000-ffffff empty
+	ROM_IGNORE( 0x400000 )  // c00000-ffffff empty
 ROM_END
 
 ROM_START( kovlsqh2 )
@@ -3221,7 +3221,7 @@ ROM_START( kovlsqh2 )
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
-	ROM_IGNORE( 0x800000 )	// second half identical
+	ROM_IGNORE( 0x800000 )  // second half identical
 
 	ROM_REGION( 0x3000000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
@@ -3234,9 +3234,9 @@ ROM_START( kovlsqh2 )
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "lsqh2_m01.rom",0x400000, 0x400000, CRC(01af1b65) SHA1(6cf523fa8f1e03f974771611bb9a4e08a4d4443f) )
-	ROM_IGNORE( 0x400000 )	// 400000-7fffff empty
+	ROM_IGNORE( 0x400000 )  // 400000-7fffff empty
 	ROM_CONTINUE( 0x800000, 0x400000 )
-	ROM_IGNORE( 0x400000 )	// c00000-ffffff empty
+	ROM_IGNORE( 0x400000 )  // c00000-ffffff empty
 ROM_END
 
 
@@ -3251,7 +3251,7 @@ ROM_START( kovlsjb )
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
-	ROM_IGNORE( 0x800000 )	// second half identical
+	ROM_IGNORE( 0x800000 )  // second half identical
 
 	ROM_REGION( 0x3000000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
@@ -3264,9 +3264,9 @@ ROM_START( kovlsjb )
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "lsqh2_m01.rom",0x400000, 0x400000, CRC(01af1b65) SHA1(6cf523fa8f1e03f974771611bb9a4e08a4d4443f) )
-	ROM_IGNORE( 0x400000 )	// 400000-7fffff empty
+	ROM_IGNORE( 0x400000 )  // 400000-7fffff empty
 	ROM_CONTINUE( 0x800000, 0x400000 )
-	ROM_IGNORE( 0x400000 )	// c00000-ffffff empty
+	ROM_IGNORE( 0x400000 )  // c00000-ffffff empty
 ROM_END
 
 ROM_START( kovlsjba )
@@ -3280,7 +3280,7 @@ ROM_START( kovlsjba )
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
-	ROM_IGNORE( 0x800000 )	// second half identical
+	ROM_IGNORE( 0x800000 )  // second half identical
 
 	ROM_REGION( 0x3000000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
@@ -3293,9 +3293,9 @@ ROM_START( kovlsjba )
 	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "lsqh2_m01.rom",0x400000, 0x400000, CRC(01af1b65) SHA1(6cf523fa8f1e03f974771611bb9a4e08a4d4443f) )
-	ROM_IGNORE( 0x400000 )	// 400000-7fffff empty
+	ROM_IGNORE( 0x400000 )  // 400000-7fffff empty
 	ROM_CONTINUE( 0x800000, 0x400000 )
-	ROM_IGNORE( 0x400000 )	// c00000-ffffff empty
+	ROM_IGNORE( 0x400000 )  // c00000-ffffff empty
 ROM_END
 
 
@@ -3698,7 +3698,7 @@ static void expand_colourdata( running_machine &machine )
 	size_t needed = srcsize / 2 * 3;
 
 	/* work out how much ram we need to allocate to expand the sprites into
-       and be able to mask the offset */
+	   and be able to mask the offset */
 	state->m_sprite_a_region_size = 1;
 	while (state->m_sprite_a_region_size < needed)
 		state->m_sprite_a_region_size <<= 1;
@@ -3769,7 +3769,7 @@ GAME( 1999, kovsh103,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_sta
 GAME( 1999, kovsh102,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 102, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V102, China internal ROM
 GAME( 1999, kovsh101,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 101, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V101, China internal ROM
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
-GAME( 1999, kovqhsgs,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,	kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, kovqhsgs,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 // region provided by internal ARM rom
 GAME( 2000, kov2,         pgm,       pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
@@ -3824,7 +3824,7 @@ GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_s
    Partially Working, playable, but some imperfections
    -----------------------------------------------------------------------------------------------------------------------*/
 
- // it's playable, but the region check is still patched (different IGS025 chips return different sequences so that the game can determine the region)
+	// it's playable, but the region check is still patched (different IGS025 chips return different sequences so that the game can determine the region)
 GAME( 1998, killbld,      pgm,       pgm_022_025_kb, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1998, killbld104,   killbld,   pgm_022_025_kb, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
@@ -3882,12 +3882,12 @@ GAME( 2004, oldsplus,     pgm,       pgm_arm_type1_sim, oldsplus, pgm_arm_type1_
 // kovsh code, tweaked based on tests done with this specific board to catch any different behaviors.  These all seem to be for China only, they don't work as expected when set to other regions.
 GAME( 2004, kovshp,       pgm,       pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 // this bootleg is very close to kovshp
-GAME( 2004, kovshxas,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state,	kovshxas,   ROT0,   "bootleg", "Knights of Valour: Aoshi Sanguo / Sangoku Senki: Aoshi Sanguo (ver. 202CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovshxas,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovshxas,   ROT0,   "bootleg", "Knights of Valour: Aoshi Sanguo / Sangoku Senki: Aoshi Sanguo (ver. 202CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 // these should be bootlegs of kovshp, but have further command changes in their ARMs and have a lot of code shuffled around, bootlegs of a different revision?
-GAME( 2004, kovlsqh,      kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsqh2,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjb,      kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjba,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsqh,      kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsqh2,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsjb,      kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsjba,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2005, killbldp,     pgm,       pgm_arm_type3,     pgm, pgm_arm_type3_state,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 

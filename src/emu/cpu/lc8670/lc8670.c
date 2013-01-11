@@ -21,8 +21,8 @@
 //    DEBUGGING
 //***************************************************************************
 
-#define LOG_TIMERS			0
-#define LOG_IRQ				0
+#define LOG_TIMERS          0
+#define LOG_IRQ             0
 
 
 //**************************************************************************
@@ -37,80 +37,80 @@ const device_type LC8670 = &device_creator<lc8670_cpu_device>;
 //**************************************************************************
 
 // registers
-#define		REG_A		m_sfr[0x00]
-#define		REG_PSW		m_sfr[0x01]
-#define		REG_B		m_sfr[0x02]
-#define		REG_C		m_sfr[0x03]
-#define		REG_TRL		m_sfr[0x04]
-#define		REG_TRH		m_sfr[0x05]
-#define		REG_SP		m_sfr[0x06]
-#define		REG_PCON	m_sfr[0x07]
-#define		REG_IE		m_sfr[0x08]
-#define		REG_IP		m_sfr[0x09]
-#define		REG_EXT		m_sfr[0x0d]
-#define		REG_OCR		m_sfr[0x0e]
-#define		REG_T0CNT	m_sfr[0x10]
-#define		REG_T0PRR	m_sfr[0x11]
-#define		REG_T0LR	m_sfr[0x13]
-#define		REG_T0HR	m_sfr[0x15]
-#define		REG_T1CNT	m_sfr[0x18]
-#define		REG_T1LC	m_sfr[0x1a]
-#define		REG_T1LR	m_sfr[0x1b]
-#define		REG_T1HC	m_sfr[0x1c]
-#define		REG_T1HR	m_sfr[0x1d]
-#define		REG_MCR		m_sfr[0x20]
-#define		REG_STAD	m_sfr[0x22]
-#define		REG_CNR		m_sfr[0x23]
-#define		REG_TDR		m_sfr[0x24]
-#define		REG_XBNK	m_sfr[0x25]
-#define		REG_VCCR	m_sfr[0x27]
-#define		REG_SCON0	m_sfr[0x30]
-#define		REG_SBUF0	m_sfr[0x31]
-#define		REG_SBR		m_sfr[0x32]
-#define		REG_SCON1	m_sfr[0x34]
-#define		REG_SBUF1	m_sfr[0x35]
-#define		REG_P1		m_sfr[0x44]
-#define		REG_P1DDR	m_sfr[0x45]
-#define		REG_P1FCR	m_sfr[0x46]
-#define		REG_P3		m_sfr[0x4c]
-#define		REG_P3DDR	m_sfr[0x4d]
-#define		REG_P3INT	m_sfr[0x4e]
-#define		REG_FPR		m_sfr[0x54]
-#define		REG_I01CR	m_sfr[0x5d]
-#define		REG_I23CR	m_sfr[0x5e]
-#define		REG_ISL		m_sfr[0x5f]
-#define		REG_VSEL	m_sfr[0x63]
-#define		REG_VRMAD1	m_sfr[0x64]
-#define		REG_VRMAD2	m_sfr[0x65]
-#define		REG_BTCR	m_sfr[0x7f]
+#define     REG_A       m_sfr[0x00]
+#define     REG_PSW     m_sfr[0x01]
+#define     REG_B       m_sfr[0x02]
+#define     REG_C       m_sfr[0x03]
+#define     REG_TRL     m_sfr[0x04]
+#define     REG_TRH     m_sfr[0x05]
+#define     REG_SP      m_sfr[0x06]
+#define     REG_PCON    m_sfr[0x07]
+#define     REG_IE      m_sfr[0x08]
+#define     REG_IP      m_sfr[0x09]
+#define     REG_EXT     m_sfr[0x0d]
+#define     REG_OCR     m_sfr[0x0e]
+#define     REG_T0CNT   m_sfr[0x10]
+#define     REG_T0PRR   m_sfr[0x11]
+#define     REG_T0LR    m_sfr[0x13]
+#define     REG_T0HR    m_sfr[0x15]
+#define     REG_T1CNT   m_sfr[0x18]
+#define     REG_T1LC    m_sfr[0x1a]
+#define     REG_T1LR    m_sfr[0x1b]
+#define     REG_T1HC    m_sfr[0x1c]
+#define     REG_T1HR    m_sfr[0x1d]
+#define     REG_MCR     m_sfr[0x20]
+#define     REG_STAD    m_sfr[0x22]
+#define     REG_CNR     m_sfr[0x23]
+#define     REG_TDR     m_sfr[0x24]
+#define     REG_XBNK    m_sfr[0x25]
+#define     REG_VCCR    m_sfr[0x27]
+#define     REG_SCON0   m_sfr[0x30]
+#define     REG_SBUF0   m_sfr[0x31]
+#define     REG_SBR     m_sfr[0x32]
+#define     REG_SCON1   m_sfr[0x34]
+#define     REG_SBUF1   m_sfr[0x35]
+#define     REG_P1      m_sfr[0x44]
+#define     REG_P1DDR   m_sfr[0x45]
+#define     REG_P1FCR   m_sfr[0x46]
+#define     REG_P3      m_sfr[0x4c]
+#define     REG_P3DDR   m_sfr[0x4d]
+#define     REG_P3INT   m_sfr[0x4e]
+#define     REG_FPR     m_sfr[0x54]
+#define     REG_I01CR   m_sfr[0x5d]
+#define     REG_I23CR   m_sfr[0x5e]
+#define     REG_ISL     m_sfr[0x5f]
+#define     REG_VSEL    m_sfr[0x63]
+#define     REG_VRMAD1  m_sfr[0x64]
+#define     REG_VRMAD2  m_sfr[0x65]
+#define     REG_BTCR    m_sfr[0x7f]
 
 // addressing modes
-#define		GET_D9		(((m_op & 0x01)<<8) | fetch())
-#define		GET_D9B3	(((m_op & 0x10)<<4) | fetch())
-#define		GET_I8		fetch()
-#define		GET_R8		fetch()
-#define		GET_RI		(m_op & 0x03)
-#define		GET_B3		(m_op & 0x07)
-#define		GET_A12		(((m_op & 0x10)<<7) | ((m_op & 0x07)<<8) | fetch())
-#define		SIGNED(v)	((v) - (BIT(v,7) ? 0x100 : 0))
+#define     GET_D9      (((m_op & 0x01)<<8) | fetch())
+#define     GET_D9B3    (((m_op & 0x10)<<4) | fetch())
+#define     GET_I8      fetch()
+#define     GET_R8      fetch()
+#define     GET_RI      (m_op & 0x03)
+#define     GET_B3      (m_op & 0x07)
+#define     GET_A12     (((m_op & 0x10)<<7) | ((m_op & 0x07)<<8) | fetch())
+#define     SIGNED(v)   ((v) - (BIT(v,7) ? 0x100 : 0))
 
 // flags
-#define		FLAG_CY		0x80
-#define		FLAG_AC		0x40
-#define		FLAG_OV		0x04
-#define		FLAG_P		0x01
-#define		GET_CY		BIT(REG_PSW,7)
-#define		GET_AC		BIT(REG_PSW,6)
-#define		GET_OV		BIT(REG_PSW,2)
-#define		GET_P		BIT(REG_PSW,0)
-#define		SET_CY(v)	{ if (v) REG_PSW |= FLAG_CY; else REG_PSW &= ~FLAG_CY; } while(0)
-#define		SET_AC(v)	{ if (v) REG_PSW |= FLAG_AC; else REG_PSW &= ~FLAG_AC; } while(0)
-#define		SET_OV(v)	{ if (v) REG_PSW |= FLAG_OV; else REG_PSW &= ~FLAG_OV; } while(0)
-#define		CHECK_P()	check_p_flag()
+#define     FLAG_CY     0x80
+#define     FLAG_AC     0x40
+#define     FLAG_OV     0x04
+#define     FLAG_P      0x01
+#define     GET_CY      BIT(REG_PSW,7)
+#define     GET_AC      BIT(REG_PSW,6)
+#define     GET_OV      BIT(REG_PSW,2)
+#define     GET_P       BIT(REG_PSW,0)
+#define     SET_CY(v)   { if (v) REG_PSW |= FLAG_CY; else REG_PSW &= ~FLAG_CY; } while(0)
+#define     SET_AC(v)   { if (v) REG_PSW |= FLAG_AC; else REG_PSW &= ~FLAG_AC; } while(0)
+#define     SET_OV(v)   { if (v) REG_PSW |= FLAG_OV; else REG_PSW &= ~FLAG_OV; } while(0)
+#define     CHECK_P()   check_p_flag()
 
 // CPU state
-#define		HALT_MODE	0x01
-#define		HOLD_MODE	0x02
+#define     HALT_MODE   0x01
+#define     HOLD_MODE   0x02
 
 
 //**************************************************************************
@@ -119,22 +119,22 @@ const device_type LC8670 = &device_creator<lc8670_cpu_device>;
 
 const lc8670_cpu_device::op_handler lc8670_cpu_device::s_opcode_table[] =
 {
-	&lc8670_cpu_device::op_nop  , &lc8670_cpu_device::op_br  , &lc8670_cpu_device::op_ld  , &lc8670_cpu_device::op_ld  , &lc8670_cpu_device::op_call,	// 0x0*
-	&lc8670_cpu_device::op_callr, &lc8670_cpu_device::op_brf , &lc8670_cpu_device::op_st  , &lc8670_cpu_device::op_st  , &lc8670_cpu_device::op_call,	// 0x1*
-	&lc8670_cpu_device::op_callf, &lc8670_cpu_device::op_jmpf, &lc8670_cpu_device::op_mov , &lc8670_cpu_device::op_mov , &lc8670_cpu_device::op_jmp,	// 0x2*
-	&lc8670_cpu_device::op_mul  , &lc8670_cpu_device::op_be  , &lc8670_cpu_device::op_be  , &lc8670_cpu_device::op_be_ri, &lc8670_cpu_device::op_jmp,	// 0x3*
-	&lc8670_cpu_device::op_div  , &lc8670_cpu_device::op_bne , &lc8670_cpu_device::op_bne , &lc8670_cpu_device::op_bne_ri, &lc8670_cpu_device::op_bpc,	// 0x4*
-	&lc8670_cpu_device::op_ldf  , &lc8670_cpu_device::op_stf , &lc8670_cpu_device::op_dbnz, &lc8670_cpu_device::op_dbnz, &lc8670_cpu_device::op_bpc,	// 0x5*
-	&lc8670_cpu_device::op_push , &lc8670_cpu_device::op_push, &lc8670_cpu_device::op_inc , &lc8670_cpu_device::op_inc , &lc8670_cpu_device::op_bp,		// 0x6*
-	&lc8670_cpu_device::op_pop  , &lc8670_cpu_device::op_pop , &lc8670_cpu_device::op_dec , &lc8670_cpu_device::op_dec , &lc8670_cpu_device::op_bp,		// 0x7*
-	&lc8670_cpu_device::op_bz   , &lc8670_cpu_device::op_add , &lc8670_cpu_device::op_add , &lc8670_cpu_device::op_add , &lc8670_cpu_device::op_bn,		// 0x8*
-	&lc8670_cpu_device::op_bnz  , &lc8670_cpu_device::op_addc, &lc8670_cpu_device::op_addc, &lc8670_cpu_device::op_addc, &lc8670_cpu_device::op_bn,		// 0x9*
-	&lc8670_cpu_device::op_ret  , &lc8670_cpu_device::op_sub , &lc8670_cpu_device::op_sub , &lc8670_cpu_device::op_sub , &lc8670_cpu_device::op_not1,	// 0xa*
-	&lc8670_cpu_device::op_reti , &lc8670_cpu_device::op_subc, &lc8670_cpu_device::op_subc, &lc8670_cpu_device::op_subc, &lc8670_cpu_device::op_not1,	// 0xb*
-	&lc8670_cpu_device::op_ror  , &lc8670_cpu_device::op_ldc , &lc8670_cpu_device::op_xch , &lc8670_cpu_device::op_xch , &lc8670_cpu_device::op_clr1,	// 0xc*
-	&lc8670_cpu_device::op_rorc , &lc8670_cpu_device::op_or  , &lc8670_cpu_device::op_or  , &lc8670_cpu_device::op_or  , &lc8670_cpu_device::op_clr1,	// 0xd*
-	&lc8670_cpu_device::op_rol  , &lc8670_cpu_device::op_and , &lc8670_cpu_device::op_and , &lc8670_cpu_device::op_and , &lc8670_cpu_device::op_set1,	// 0xe*
-	&lc8670_cpu_device::op_rolc , &lc8670_cpu_device::op_xor , &lc8670_cpu_device::op_xor , &lc8670_cpu_device::op_xor , &lc8670_cpu_device::op_set1,	// 0xf*
+	&lc8670_cpu_device::op_nop  , &lc8670_cpu_device::op_br  , &lc8670_cpu_device::op_ld  , &lc8670_cpu_device::op_ld  , &lc8670_cpu_device::op_call,   // 0x0*
+	&lc8670_cpu_device::op_callr, &lc8670_cpu_device::op_brf , &lc8670_cpu_device::op_st  , &lc8670_cpu_device::op_st  , &lc8670_cpu_device::op_call,   // 0x1*
+	&lc8670_cpu_device::op_callf, &lc8670_cpu_device::op_jmpf, &lc8670_cpu_device::op_mov , &lc8670_cpu_device::op_mov , &lc8670_cpu_device::op_jmp,    // 0x2*
+	&lc8670_cpu_device::op_mul  , &lc8670_cpu_device::op_be  , &lc8670_cpu_device::op_be  , &lc8670_cpu_device::op_be_ri, &lc8670_cpu_device::op_jmp,   // 0x3*
+	&lc8670_cpu_device::op_div  , &lc8670_cpu_device::op_bne , &lc8670_cpu_device::op_bne , &lc8670_cpu_device::op_bne_ri, &lc8670_cpu_device::op_bpc,  // 0x4*
+	&lc8670_cpu_device::op_ldf  , &lc8670_cpu_device::op_stf , &lc8670_cpu_device::op_dbnz, &lc8670_cpu_device::op_dbnz, &lc8670_cpu_device::op_bpc,    // 0x5*
+	&lc8670_cpu_device::op_push , &lc8670_cpu_device::op_push, &lc8670_cpu_device::op_inc , &lc8670_cpu_device::op_inc , &lc8670_cpu_device::op_bp,     // 0x6*
+	&lc8670_cpu_device::op_pop  , &lc8670_cpu_device::op_pop , &lc8670_cpu_device::op_dec , &lc8670_cpu_device::op_dec , &lc8670_cpu_device::op_bp,     // 0x7*
+	&lc8670_cpu_device::op_bz   , &lc8670_cpu_device::op_add , &lc8670_cpu_device::op_add , &lc8670_cpu_device::op_add , &lc8670_cpu_device::op_bn,     // 0x8*
+	&lc8670_cpu_device::op_bnz  , &lc8670_cpu_device::op_addc, &lc8670_cpu_device::op_addc, &lc8670_cpu_device::op_addc, &lc8670_cpu_device::op_bn,     // 0x9*
+	&lc8670_cpu_device::op_ret  , &lc8670_cpu_device::op_sub , &lc8670_cpu_device::op_sub , &lc8670_cpu_device::op_sub , &lc8670_cpu_device::op_not1,   // 0xa*
+	&lc8670_cpu_device::op_reti , &lc8670_cpu_device::op_subc, &lc8670_cpu_device::op_subc, &lc8670_cpu_device::op_subc, &lc8670_cpu_device::op_not1,   // 0xb*
+	&lc8670_cpu_device::op_ror  , &lc8670_cpu_device::op_ldc , &lc8670_cpu_device::op_xch , &lc8670_cpu_device::op_xch , &lc8670_cpu_device::op_clr1,   // 0xc*
+	&lc8670_cpu_device::op_rorc , &lc8670_cpu_device::op_or  , &lc8670_cpu_device::op_or  , &lc8670_cpu_device::op_or  , &lc8670_cpu_device::op_clr1,   // 0xd*
+	&lc8670_cpu_device::op_rol  , &lc8670_cpu_device::op_and , &lc8670_cpu_device::op_and , &lc8670_cpu_device::op_and , &lc8670_cpu_device::op_set1,   // 0xe*
+	&lc8670_cpu_device::op_rolc , &lc8670_cpu_device::op_xor , &lc8670_cpu_device::op_xor , &lc8670_cpu_device::op_xor , &lc8670_cpu_device::op_set1,   // 0xf*
 };
 
 
@@ -170,10 +170,10 @@ ADDRESS_MAP_END
 
 lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, LC8670, "Sanyo LC8670", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
-	  m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map)),
-	  m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
-	  m_bankswitch_func(*this)
+		m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
+		m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map)),
+		m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
+		m_bankswitch_func(*this)
 {
 }
 
@@ -392,7 +392,7 @@ void lc8670_cpu_device::state_string_export(const device_state_entry &entry, ast
 
 const address_space_config * lc8670_cpu_device::memory_space_config(address_spacenum spacenum) const
 {
-	return	(spacenum == AS_PROGRAM) ? &m_program_config :
+	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
 			(spacenum == AS_IO) ? &m_io_config :
 			NULL;
@@ -451,25 +451,25 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 	switch(inputnum)
 	{
 		case LC8670_EXT_INT0:
-			if ((REG_I01CR & 0x0c) == 0x00 && m_input_lines[inputnum] && !state)		// falling edge
+			if ((REG_I01CR & 0x0c) == 0x00 && m_input_lines[inputnum] && !state)        // falling edge
 			{
 				REG_I01CR |= 0x02;
 				if (REG_I01CR & 0x01)
 					set_irq_flag(1);
 			}
-			else if ((REG_I01CR & 0x0c) == 0x04 && !state)		// low level
+			else if ((REG_I01CR & 0x0c) == 0x04 && !state)      // low level
 			{
 				REG_I01CR |= 0x02;
 				if (REG_I01CR & 0x01)
 					set_irq_flag(1);
 			}
-			else if ((REG_I01CR & 0x0c) == 0x08 && !m_input_lines[inputnum] && state)		// rising edge
+			else if ((REG_I01CR & 0x0c) == 0x08 && !m_input_lines[inputnum] && state)       // rising edge
 			{
 				REG_I01CR |= 0x02;
 				if (REG_I01CR & 0x01)
 					set_irq_flag(1);
 			}
-			else if ((REG_I01CR & 0x0c) == 0x0c && state)		// high level
+			else if ((REG_I01CR & 0x0c) == 0x0c && state)       // high level
 			{
 				REG_I01CR |= 0x02;
 				if (REG_I01CR & 0x01)
@@ -477,25 +477,25 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 			}
 			break;
 		case LC8670_EXT_INT1:
-			if ((REG_I01CR & 0xc0) == 0x00 && m_input_lines[inputnum] && !state)		// falling edge
+			if ((REG_I01CR & 0xc0) == 0x00 && m_input_lines[inputnum] && !state)        // falling edge
 			{
 				REG_I01CR |= 0x20;
 				if (REG_I01CR & 0x10)
 					set_irq_flag(2);
 			}
-			else if ((REG_I01CR & 0xc0) == 0x40 && !state)		// low level
+			else if ((REG_I01CR & 0xc0) == 0x40 && !state)      // low level
 			{
 				REG_I01CR |= 0x20;
 				if (REG_I01CR & 0x10)
 					set_irq_flag(2);
 			}
-			else if ((REG_I01CR & 0xc0) == 0x80 && !m_input_lines[inputnum] && state)		// rising edge
+			else if ((REG_I01CR & 0xc0) == 0x80 && !m_input_lines[inputnum] && state)       // rising edge
 			{
 				REG_I01CR |= 0x20;
 				if (REG_I01CR & 0x10)
 					set_irq_flag(2);
 			}
-			else if ((REG_I01CR & 0xc0) == 0xc0 && state)		// high level
+			else if ((REG_I01CR & 0xc0) == 0xc0 && state)       // high level
 			{
 				REG_I01CR |= 0x20;
 				if (REG_I01CR & 0x10)
@@ -503,7 +503,7 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 			}
 			break;
 		case LC8670_EXT_INT2:
-			if ((REG_I23CR & 0x04) && m_input_lines[inputnum] && !state)	// falling edge
+			if ((REG_I23CR & 0x04) && m_input_lines[inputnum] && !state)    // falling edge
 			{
 				if (!(REG_ISL & 0x01))
 					timer0_tick(true);
@@ -512,7 +512,7 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 				if (REG_I23CR & 0x01)
 					set_irq_flag(3);
 			}
-			if ((REG_I23CR & 0x08) && !m_input_lines[inputnum] && state)	// rising edge
+			if ((REG_I23CR & 0x08) && !m_input_lines[inputnum] && state)    // rising edge
 			{
 				if (!(REG_ISL & 0x01))
 					timer0_tick(true);
@@ -523,7 +523,7 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 			}
 			break;
 		case LC8670_EXT_INT3:
-			if ((REG_I23CR & 0x40) && m_input_lines[inputnum] && !state)	// falling edge
+			if ((REG_I23CR & 0x40) && m_input_lines[inputnum] && !state)    // falling edge
 			{
 				if (REG_ISL & 0x01)
 					timer0_tick(true);
@@ -532,7 +532,7 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 				if (REG_I23CR & 0x10)
 					set_irq_flag(4);
 			}
-			if ((REG_I23CR & 0x80) && !m_input_lines[inputnum] && state)	// rising edge
+			if ((REG_I23CR & 0x80) && !m_input_lines[inputnum] && state)    // rising edge
 			{
 				if (REG_ISL & 0x01)
 					timer0_tick(true);
@@ -624,13 +624,13 @@ void lc8670_cpu_device::check_irqs()
 		// IRQ with less priority of current interrupt are not executed until the end of the current interrupt routine
 		if (irq != 0 && ((m_irq_lev & (1<<priority)) || (priority == 0 && (m_irq_lev & 0x06)) || (priority == 1 && (m_irq_lev & 0x04))))
 		{
-			if (LOG_IRQ)	logerror("%s: interrupt %d (Priority=%d, Level=%d) delayed\n", tag(), irq, priority, m_irq_lev);
+			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) delayed\n", tag(), irq, priority, m_irq_lev);
 			irq = 0;
 		}
 
 		if (irq != 0)
 		{
-			if (LOG_IRQ)	logerror("%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag(), irq, priority, m_irq_lev);
+			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag(), irq, priority, m_irq_lev);
 
 			m_irq_lev |= (1<<priority);
 
@@ -639,7 +639,7 @@ void lc8670_cpu_device::check_irqs()
 
 			set_pc(s_irq_vectors[irq]);
 
-			REG_PCON &= ~HALT_MODE;		// interrupts resume from HALT state
+			REG_PCON &= ~HALT_MODE;     // interrupts resume from HALT state
 
 			// clear the IRQ flag
 			m_irq_flag &= ~(1<<irq);
@@ -664,14 +664,14 @@ void lc8670_cpu_device::base_timer_tick()
 		UINT16 base_counter_l = m_base_timer[0] + 1;
 		UINT16 base_counter_h = m_base_timer[1];
 
-		if (REG_BTCR & 0x80)	// 6-bit mode
+		if (REG_BTCR & 0x80)    // 6-bit mode
 			base_counter_h++;
 		else if (base_counter_l & 0x100)
 			base_counter_h++;
 
 		if (base_counter_h & 0x40)
 		{
-			if (LOG_TIMERS)	logerror("%s: base timer 0 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,0));
+			if (LOG_TIMERS) logerror("%s: base timer 0 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,0));
 			REG_BTCR |= 0x02;
 			if (REG_BTCR & 0x01)
 				set_irq_flag(4);
@@ -700,7 +700,7 @@ void lc8670_cpu_device::base_timer_tick()
 
 		if (bt1_req)
 		{
-			if (LOG_TIMERS)	logerror("%s: base timer 1 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,3));
+			if (LOG_TIMERS) logerror("%s: base timer 1 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,3));
 			REG_BTCR |= 0x08;
 			if (REG_BTCR & 0x04)
 				set_irq_flag(4);
@@ -725,7 +725,7 @@ void lc8670_cpu_device::timer0_prescaler_tick()
 	UINT16 prescaler = m_timer0_prescaler + 1;
 	if (prescaler & 0x100)
 	{
-		if (LOG_TIMERS)	logerror("%s: timer0 prescaler overflow\n", tag());
+		if (LOG_TIMERS) logerror("%s: timer0 prescaler overflow\n", tag());
 
 		if ((REG_ISL & 0x30) == 0x30)
 			base_timer_tick();
@@ -757,7 +757,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 
 				if (timer0 & 0x10000)
 				{
-					if (LOG_TIMERS)	logerror("%s: timer0 long overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
+					if (LOG_TIMERS) logerror("%s: timer0 long overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
 					m_timer0[0] = REG_T0LR;
 					m_timer0[1] = REG_T0HR;
 					REG_T0CNT |= 0x0a;
@@ -780,7 +780,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 
 				if (timer0l & 0x100)
 				{
-					if (LOG_TIMERS)	logerror("%s: timer0 low overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,0));
+					if (LOG_TIMERS) logerror("%s: timer0 low overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,0));
 					m_timer0[0] = REG_T0LR;
 					REG_T0CNT |= 0x02;
 					if (REG_T0CNT & 0x01)
@@ -796,7 +796,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 				UINT16 timer0h = m_timer0[1] + 1;
 				if (timer0h & 0x100)
 				{
-					if (LOG_TIMERS)	logerror("%s: timer0 high overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
+					if (LOG_TIMERS) logerror("%s: timer0 high overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
 					m_timer0[1] = REG_T0HR;
 					REG_T0CNT |= 0x08;
 					if (REG_T0CNT & 0x04)
@@ -833,7 +833,7 @@ void lc8670_cpu_device::timer1_tick()
 
 					if (timer1h & 0x100)
 					{
-						if (LOG_TIMERS)	logerror("%s: timer1 long overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
+						if (LOG_TIMERS) logerror("%s: timer1 long overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
 						m_timer1[1] = REG_T1HR;
 						REG_T1CNT |= 0x08;
 						if (REG_T1CNT & 0x05)
@@ -862,7 +862,7 @@ void lc8670_cpu_device::timer1_tick()
 
 				if (timer1l & 0x100)
 				{
-					if (LOG_TIMERS)	logerror("%s: timer1 low overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,0));
+					if (LOG_TIMERS) logerror("%s: timer1 low overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,0));
 					m_timer1[0] = REG_T1LR;
 					update_port1(m_p1_data & 0x7f);
 					REG_T1CNT |= 0x02;
@@ -880,7 +880,7 @@ void lc8670_cpu_device::timer1_tick()
 
 				if (timer1h & 0x100)
 				{
-					if (LOG_TIMERS)	logerror("%s: timer1 high overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
+					if (LOG_TIMERS) logerror("%s: timer1 high overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
 					m_timer1[1] = REG_T1HR;
 					REG_T1CNT |= 0x08;
 					if (REG_T1CNT & 0x04)
@@ -912,7 +912,7 @@ WRITE8_MEMBER(lc8670_cpu_device::mram_w)
 
 READ8_MEMBER(lc8670_cpu_device::xram_r)
 {
-	if (!(REG_VCCR & 0x40) || space.debugger_access())	// XRAM access enabled
+	if (!(REG_VCCR & 0x40) || space.debugger_access())  // XRAM access enabled
 	{
 		UINT8 * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
@@ -935,7 +935,7 @@ READ8_MEMBER(lc8670_cpu_device::xram_r)
 
 WRITE8_MEMBER(lc8670_cpu_device::xram_w)
 {
-	if (!(REG_VCCR & 0x40) || space.debugger_access())	// XRAM access enabled
+	if (!(REG_VCCR & 0x40) || space.debugger_access())  // XRAM access enabled
 	{
 		UINT8 * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
@@ -971,7 +971,7 @@ READ8_MEMBER(lc8670_cpu_device::regs_r)
 		case 0x4c:
 			return (REG_P3 & REG_P3DDR) | (m_io->read_byte(LC8670_PORT3) & (REG_P3DDR ^ 0xff));
 		case 0x5c:
-			return m_io->read_byte(LC8670_PORT7) | 0xf0;	// 4-bit read-only port
+			return m_io->read_byte(LC8670_PORT7) | 0xf0;    // 4-bit read-only port
 		case 0x66:
 		{
 			UINT8 data = m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff];
@@ -987,7 +987,7 @@ READ8_MEMBER(lc8670_cpu_device::regs_r)
 		// write-only registers
 		case 0x20: case 0x23: case 0x24: case 0x27:
 		case 0x45: case 0x46: case 0x4d:
-			if(!space.debugger_access())	logerror("%s: read write-only SFR %04x\n", machine().describe_context(), offset);
+			if(!space.debugger_access())    logerror("%s: read write-only SFR %04x\n", machine().describe_context(), offset);
 			return 0xff;
 	}
 	return m_sfr[offset];
@@ -1051,12 +1051,12 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 			break;
 		case 0x7f:
 			if (!(data & 0x40))
-				m_base_timer[0] = m_base_timer[1] = 0;	// stop the timer clear the counter
+				m_base_timer[0] = m_base_timer[1] = 0;  // stop the timer clear the counter
 			break;
 
 		// read-only registers
 		case 0x12: case 0x14: case 0x5c:
-			if(!space.debugger_access())	logerror("%s: write read-only SFR %04x = %02x\n", machine().describe_context(), offset, data);
+			if(!space.debugger_access())    logerror("%s: write read-only SFR %04x = %02x\n", machine().describe_context(), offset, data);
 			return;
 	}
 
@@ -1210,7 +1210,7 @@ inline void lc8670_cpu_device::check_p3int()
 
 inline void lc8670_cpu_device::set_irq_flag(int source)
 {
-	if (LOG_IRQ)	logerror("%s: set interrupt flag: %d\n", tag(), source);
+	if (LOG_IRQ)    logerror("%s: set interrupt flag: %d\n", tag(), source);
 	m_irq_flag |= 1<<source;
 }
 
@@ -1643,7 +1643,7 @@ int lc8670_cpu_device::op_reti()
 	new_pc |= pop();
 	set_pc(new_pc);
 
-	if (LOG_IRQ)	logerror("%s: RETI from level %d\n", machine().describe_context(), m_irq_lev);
+	if (LOG_IRQ)    logerror("%s: RETI from level %d\n", machine().describe_context(), m_irq_lev);
 	for(int i=2; i>=0; i--)
 		if (m_irq_lev & (1<<i))
 		{

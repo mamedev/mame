@@ -17,12 +17,12 @@
 
 struct rtc65271_interface
 {
-    devcb_write_line	m_interrupt_cb;
+	devcb_write_line    m_interrupt_cb;
 };
 
 // ======================> rtc65271_device
 
-class rtc65271_device :	public device_t,
+class rtc65271_device : public device_t,
 						public device_nvram_interface,
 						public rtc65271_interface
 {
@@ -30,9 +30,9 @@ public:
 	// construction/destruction
 	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
 	// device_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
@@ -55,7 +55,7 @@ private:
 	void rtc_begin_update_cb();
 	void rtc_end_update_cb();
 	/* 64 8-bit registers (10 clock registers, 4 control/status registers, and
-    50 bytes of user RAM) */
+	50 bytes of user RAM) */
 	UINT8 m_regs[64];
 	UINT8 m_cur_reg;
 

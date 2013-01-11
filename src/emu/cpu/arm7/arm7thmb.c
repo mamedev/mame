@@ -7,71 +7,71 @@
 arm7thumb_ophandler thumb_handler[0x40*0x10] =
 {
 // #define THUMB_SHIFT_R       ((UINT16)0x0800)
-	tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_0,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,		tg00_1,
+	tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_0,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,     tg00_1,
 // #define THUMB_INSN_ADDSUB   ((UINT16)0x0800)   // #define THUMB_ADDSUB_TYPE   ((UINT16)0x0600)
-	tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_0,		tg01_10,	tg01_10,	tg01_10,	tg01_10,	tg01_10,	tg01_10,	tg01_10,	tg01_10,	tg01_11,	tg01_11,	tg01_11,	tg01_11,	tg01_11,	tg01_11,	tg01_11,	tg01_11,	tg01_12,	tg01_12,	tg01_12,	tg01_12,	tg01_12,	tg01_12,	tg01_12,	tg01_12,	tg01_13,	tg01_13,	tg01_13,	tg01_13,	tg01_13,	tg01_13,	tg01_13,	tg01_13,
+	tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_0,     tg01_10,    tg01_10,    tg01_10,    tg01_10,    tg01_10,    tg01_10,    tg01_10,    tg01_10,    tg01_11,    tg01_11,    tg01_11,    tg01_11,    tg01_11,    tg01_11,    tg01_11,    tg01_11,    tg01_12,    tg01_12,    tg01_12,    tg01_12,    tg01_12,    tg01_12,    tg01_12,    tg01_12,    tg01_13,    tg01_13,    tg01_13,    tg01_13,    tg01_13,    tg01_13,    tg01_13,    tg01_13,
 // #define THUMB_INSN_CMP      ((UINT16)0x0800)
-	tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_0,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,		tg02_1,
+	tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_0,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,     tg02_1,
 // #define THUMB_INSN_SUB      ((UINT16)0x0800)
-	tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_0,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,		tg03_1,
+	tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_0,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,     tg03_1,
 //#define THUMB_GROUP4_TYPE   ((UINT16)0x0c00)  //#define THUMB_ALUOP_TYPE    ((UINT16)0x03c0)  // #define THUMB_HIREG_OP      ((UINT16)0x0300)  // #define THUMB_HIREG_H       ((UINT16)0x00c0)
-	tg04_00_00,	tg04_00_01,	tg04_00_02,	tg04_00_03,	tg04_00_04,	tg04_00_05,	tg04_00_06,	tg04_00_07,	tg04_00_08,	tg04_00_09,	tg04_00_0a,	tg04_00_0b,	tg04_00_0c,	tg04_00_0d,	tg04_00_0e,	tg04_00_0f,	tg04_01_00,	tg04_01_01,	tg04_01_02,	tg04_01_03,	tg04_01_10,	tg04_01_11,	tg04_01_12,	tg04_01_13,	tg04_01_20,	tg04_01_21,	tg04_01_22,	tg04_01_23,	tg04_01_30,	tg04_01_31,	tg04_01_32,	tg04_01_33,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,	tg04_0203,
+	tg04_00_00, tg04_00_01, tg04_00_02, tg04_00_03, tg04_00_04, tg04_00_05, tg04_00_06, tg04_00_07, tg04_00_08, tg04_00_09, tg04_00_0a, tg04_00_0b, tg04_00_0c, tg04_00_0d, tg04_00_0e, tg04_00_0f, tg04_01_00, tg04_01_01, tg04_01_02, tg04_01_03, tg04_01_10, tg04_01_11, tg04_01_12, tg04_01_13, tg04_01_20, tg04_01_21, tg04_01_22, tg04_01_23, tg04_01_30, tg04_01_31, tg04_01_32, tg04_01_33, tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,  tg04_0203,
 //#define THUMB_GROUP5_TYPE   ((UINT16)0x0e00)
-	tg05_0,		tg05_0,		tg05_0,		tg05_0,		tg05_0,		tg05_0,		tg05_0,		tg05_0,		tg05_1,		tg05_1,		tg05_1,		tg05_1,		tg05_1,		tg05_1,		tg05_1,		tg05_1,		tg05_2,		tg05_2,		tg05_2,		tg05_2,		tg05_2,		tg05_2,		tg05_2,		tg05_2,		tg05_3,		tg05_3,		tg05_3,		tg05_3,		tg05_3,		tg05_3,		tg05_3,		tg05_3,		tg05_4,		tg05_4,		tg05_4,		tg05_4,		tg05_4,		tg05_4,		tg05_4,		tg05_4,		tg05_5,		tg05_5,		tg05_5,		tg05_5,		tg05_5,		tg05_5,		tg05_5,		tg05_5,		tg05_6,		tg05_6,		tg05_6,		tg05_6,		tg05_6,		tg05_6,		tg05_6,		tg05_6,		tg05_7,		tg05_7,		tg05_7,		tg05_7,		tg05_7,		tg05_7,		tg05_7,		tg05_7,
+	tg05_0,     tg05_0,     tg05_0,     tg05_0,     tg05_0,     tg05_0,     tg05_0,     tg05_0,     tg05_1,     tg05_1,     tg05_1,     tg05_1,     tg05_1,     tg05_1,     tg05_1,     tg05_1,     tg05_2,     tg05_2,     tg05_2,     tg05_2,     tg05_2,     tg05_2,     tg05_2,     tg05_2,     tg05_3,     tg05_3,     tg05_3,     tg05_3,     tg05_3,     tg05_3,     tg05_3,     tg05_3,     tg05_4,     tg05_4,     tg05_4,     tg05_4,     tg05_4,     tg05_4,     tg05_4,     tg05_4,     tg05_5,     tg05_5,     tg05_5,     tg05_5,     tg05_5,     tg05_5,     tg05_5,     tg05_5,     tg05_6,     tg05_6,     tg05_6,     tg05_6,     tg05_6,     tg05_6,     tg05_6,     tg05_6,     tg05_7,     tg05_7,     tg05_7,     tg05_7,     tg05_7,     tg05_7,     tg05_7,     tg05_7,
 //#define THUMB_LSOP_L        ((UINT16)0x0800)
-	tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_0,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,		tg06_1,
+	tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_0,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,     tg06_1,
 //#define THUMB_LSOP_L        ((UINT16)0x0800)
-	tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_0,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,		tg07_1,
+	tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_0,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,     tg07_1,
 // #define THUMB_HALFOP_L      ((UINT16)0x0800)
-	tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_0,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,		tg08_1,
+	tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_0,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,     tg08_1,
 // #define THUMB_STACKOP_L     ((UINT16)0x0800)
-	tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_0,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,		tg09_1,
+	tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_0,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,     tg09_1,
 // #define THUMB_RELADDR_SP    ((UINT16)0x0800)
-	tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,
+	tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_0,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,     tg0a_1,
 // #define THUMB_STACKOP_TYPE  ((UINT16)0x0f00)
-	tg0b_0,		tg0b_0,		tg0b_0,		tg0b_0,		tg0b_1,		tg0b_1,		tg0b_1,		tg0b_1,		tg0b_2,		tg0b_2,		tg0b_2,		tg0b_2,		tg0b_3,		tg0b_3,		tg0b_3,		tg0b_3,		tg0b_4,		tg0b_4,		tg0b_4,		tg0b_4,		tg0b_5,		tg0b_5,		tg0b_5,		tg0b_5,		tg0b_6,		tg0b_6,		tg0b_6,		tg0b_6,		tg0b_7,		tg0b_7,		tg0b_7,		tg0b_7,		tg0b_8,		tg0b_8,		tg0b_8,		tg0b_8,		tg0b_9,		tg0b_9,		tg0b_9,		tg0b_9,		tg0b_a,		tg0b_a,		tg0b_a,		tg0b_a,		tg0b_b,		tg0b_b,		tg0b_b,		tg0b_b,		tg0b_c,		tg0b_c,		tg0b_c,		tg0b_c,		tg0b_d,		tg0b_d,		tg0b_d,		tg0b_d,		tg0b_e,		tg0b_e,		tg0b_e,		tg0b_e,		tg0b_f,		tg0b_f,		tg0b_f,		tg0b_f,
+	tg0b_0,     tg0b_0,     tg0b_0,     tg0b_0,     tg0b_1,     tg0b_1,     tg0b_1,     tg0b_1,     tg0b_2,     tg0b_2,     tg0b_2,     tg0b_2,     tg0b_3,     tg0b_3,     tg0b_3,     tg0b_3,     tg0b_4,     tg0b_4,     tg0b_4,     tg0b_4,     tg0b_5,     tg0b_5,     tg0b_5,     tg0b_5,     tg0b_6,     tg0b_6,     tg0b_6,     tg0b_6,     tg0b_7,     tg0b_7,     tg0b_7,     tg0b_7,     tg0b_8,     tg0b_8,     tg0b_8,     tg0b_8,     tg0b_9,     tg0b_9,     tg0b_9,     tg0b_9,     tg0b_a,     tg0b_a,     tg0b_a,     tg0b_a,     tg0b_b,     tg0b_b,     tg0b_b,     tg0b_b,     tg0b_c,     tg0b_c,     tg0b_c,     tg0b_c,     tg0b_d,     tg0b_d,     tg0b_d,     tg0b_d,     tg0b_e,     tg0b_e,     tg0b_e,     tg0b_e,     tg0b_f,     tg0b_f,     tg0b_f,     tg0b_f,
 // #define THUMB_MULTLS        ((UINT16)0x0800)
-	tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,
+	tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_0,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,     tg0c_1,
 // #define THUMB_COND_TYPE     ((UINT16)0x0f00)
-	tg0d_0,		tg0d_0,		tg0d_0,		tg0d_0,		tg0d_1,		tg0d_1,		tg0d_1,		tg0d_1,		tg0d_2,		tg0d_2,		tg0d_2,		tg0d_2,		tg0d_3,		tg0d_3,		tg0d_3,		tg0d_3,		tg0d_4,		tg0d_4,		tg0d_4,		tg0d_4,		tg0d_5,		tg0d_5,		tg0d_5,		tg0d_5,		tg0d_6,		tg0d_6,		tg0d_6,		tg0d_6,		tg0d_7,		tg0d_7,		tg0d_7,		tg0d_7,		tg0d_8,		tg0d_8,		tg0d_8,		tg0d_8,		tg0d_9,		tg0d_9,		tg0d_9,		tg0d_9,		tg0d_a,		tg0d_a,		tg0d_a,		tg0d_a,		tg0d_b,		tg0d_b,		tg0d_b,		tg0d_b,		tg0d_c,		tg0d_c,		tg0d_c,		tg0d_c,		tg0d_d,		tg0d_d,		tg0d_d,		tg0d_d,		tg0d_e,		tg0d_e,		tg0d_e,		tg0d_e,		tg0d_f,		tg0d_f,		tg0d_f,		tg0d_f,
+	tg0d_0,     tg0d_0,     tg0d_0,     tg0d_0,     tg0d_1,     tg0d_1,     tg0d_1,     tg0d_1,     tg0d_2,     tg0d_2,     tg0d_2,     tg0d_2,     tg0d_3,     tg0d_3,     tg0d_3,     tg0d_3,     tg0d_4,     tg0d_4,     tg0d_4,     tg0d_4,     tg0d_5,     tg0d_5,     tg0d_5,     tg0d_5,     tg0d_6,     tg0d_6,     tg0d_6,     tg0d_6,     tg0d_7,     tg0d_7,     tg0d_7,     tg0d_7,     tg0d_8,     tg0d_8,     tg0d_8,     tg0d_8,     tg0d_9,     tg0d_9,     tg0d_9,     tg0d_9,     tg0d_a,     tg0d_a,     tg0d_a,     tg0d_a,     tg0d_b,     tg0d_b,     tg0d_b,     tg0d_b,     tg0d_c,     tg0d_c,     tg0d_c,     tg0d_c,     tg0d_d,     tg0d_d,     tg0d_d,     tg0d_d,     tg0d_e,     tg0d_e,     tg0d_e,     tg0d_e,     tg0d_f,     tg0d_f,     tg0d_f,     tg0d_f,
 // #define THUMB_BLOP_LO       ((UINT16)0x0800)
-	tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,
+	tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_0,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,     tg0e_1,
 // #define THUMB_BLOP_LO       ((UINT16)0x0800)
-	tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_0,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,		tg0f_1,
+	tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_0,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,     tg0f_1,
 };
 
- /* Shift operations */
+	/* Shift operations */
 
 const void tg00_0(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Shift left */
 {
 	UINT32 rs, rd, rrs;
 	INT32 offs;
 
-    SET_CPSR(GET_CPSR & ~(N_MASK | Z_MASK));
+	SET_CPSR(GET_CPSR & ~(N_MASK | Z_MASK));
 
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
-    rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-    rrs = GET_REGISTER(cpustate, rs);
-    offs = (insn & THUMB_SHIFT_AMT) >> THUMB_SHIFT_AMT_SHIFT;
-    if (offs != 0)
-    {
-        SET_REGISTER(cpustate, rd, rrs << offs);
-        if (rrs & (1 << (31 - (offs - 1))))
-        {
-            SET_CPSR(GET_CPSR | C_MASK);
-        }
-        else
-        {
-            SET_CPSR(GET_CPSR & ~C_MASK);
-        }
-    }
-    else
-    {
-        SET_REGISTER(cpustate, rd, rrs);
-    }
-    SET_CPSR(GET_CPSR & ~(Z_MASK | N_MASK));
-    SET_CPSR(GET_CPSR | HandleALUNZFlags(GET_REGISTER(cpustate, rd)));
-    R15 += 2;
+	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
+	rrs = GET_REGISTER(cpustate, rs);
+	offs = (insn & THUMB_SHIFT_AMT) >> THUMB_SHIFT_AMT_SHIFT;
+	if (offs != 0)
+	{
+		SET_REGISTER(cpustate, rd, rrs << offs);
+		if (rrs & (1 << (31 - (offs - 1))))
+		{
+			SET_CPSR(GET_CPSR | C_MASK);
+		}
+		else
+		{
+			SET_CPSR(GET_CPSR & ~C_MASK);
+		}
+	}
+	else
+	{
+		SET_REGISTER(cpustate, rd, rrs);
+	}
+	SET_CPSR(GET_CPSR & ~(Z_MASK | N_MASK));
+	SET_CPSR(GET_CPSR | HandleALUNZFlags(GET_REGISTER(cpustate, rd)));
+	R15 += 2;
 }
 
 const void tg00_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Shift right */
@@ -79,39 +79,39 @@ const void tg00_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Shift right */
 	UINT32 rs, rd, rrs;
 	INT32 offs;
 
-    SET_CPSR(GET_CPSR & ~(N_MASK | Z_MASK));
+	SET_CPSR(GET_CPSR & ~(N_MASK | Z_MASK));
 
-    rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
-    rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-    rrs = GET_REGISTER(cpustate, rs);
-    offs = (insn & THUMB_SHIFT_AMT) >> THUMB_SHIFT_AMT_SHIFT;
-    if (offs != 0)
-    {
-        SET_REGISTER(cpustate, rd, rrs >> offs);
-        if (rrs & (1 << (offs - 1)))
-        {
-            SET_CPSR(GET_CPSR | C_MASK);
-        }
-        else
-        {
-            SET_CPSR(GET_CPSR & ~C_MASK);
-        }
-    }
-    else
-    {
-        SET_REGISTER(cpustate, rd, 0);
-        if (rrs & 0x80000000)
-        {
-            SET_CPSR(GET_CPSR | C_MASK);
-        }
-        else
-        {
-            SET_CPSR(GET_CPSR & ~C_MASK);
-        }
-    }
-    SET_CPSR(GET_CPSR & ~(Z_MASK | N_MASK));
-    SET_CPSR(GET_CPSR | HandleALUNZFlags(GET_REGISTER(cpustate, rd)));
-    R15 += 2;
+	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
+	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
+	rrs = GET_REGISTER(cpustate, rs);
+	offs = (insn & THUMB_SHIFT_AMT) >> THUMB_SHIFT_AMT_SHIFT;
+	if (offs != 0)
+	{
+		SET_REGISTER(cpustate, rd, rrs >> offs);
+		if (rrs & (1 << (offs - 1)))
+		{
+			SET_CPSR(GET_CPSR | C_MASK);
+		}
+		else
+		{
+			SET_CPSR(GET_CPSR & ~C_MASK);
+		}
+	}
+	else
+	{
+		SET_REGISTER(cpustate, rd, 0);
+		if (rrs & 0x80000000)
+		{
+			SET_CPSR(GET_CPSR | C_MASK);
+		}
+		else
+		{
+			SET_CPSR(GET_CPSR & ~C_MASK);
+		}
+	}
+	SET_CPSR(GET_CPSR & ~(Z_MASK | N_MASK));
+	SET_CPSR(GET_CPSR | HandleALUNZFlags(GET_REGISTER(cpustate, rd)));
+	R15 += 2;
 }
 
 /* Arithmetic */
@@ -169,11 +169,11 @@ const void tg01_10(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* ADD Rd, Rs, 
 	UINT32 rn, rs, rd;
 
 
-    rn = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT);
-    rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
-    rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-    SET_REGISTER(cpustate, rd, rs + rn);
-    HandleThumbALUAddFlags(GET_REGISTER(cpustate, rd), rs, rn);
+	rn = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT);
+	rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
+	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
+	SET_REGISTER(cpustate, rd, rs + rn);
+	HandleThumbALUAddFlags(GET_REGISTER(cpustate, rd), rs, rn);
 
 }
 
@@ -181,11 +181,11 @@ const void tg01_11(arm_state *cpustate, UINT32 pc, UINT32 insn) /* SUB Rd, Rs, R
 {
 	UINT32 rn, rs, rd;
 
-    rn = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT);
-    rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
-    rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-    SET_REGISTER(cpustate, rd, rs - rn);
-    HandleThumbALUSubFlags(GET_REGISTER(cpustate, rd), rs, rn);
+	rn = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT);
+	rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
+	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
+	SET_REGISTER(cpustate, rd, rs - rn);
+	HandleThumbALUSubFlags(GET_REGISTER(cpustate, rd), rs, rn);
 
 }
 
@@ -193,11 +193,11 @@ const void tg01_12(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD Rd, Rs, #
 {
 	UINT32 rs, rd, imm;
 
-    imm = (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
-    rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
-    rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-    SET_REGISTER(cpustate, rd, rs + imm);
-    HandleThumbALUAddFlags(GET_REGISTER(cpustate, rd), rs, imm);
+	imm = (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
+	rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
+	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
+	SET_REGISTER(cpustate, rd, rs + imm);
+	HandleThumbALUAddFlags(GET_REGISTER(cpustate, rd), rs, imm);
 
 }
 
@@ -205,11 +205,11 @@ const void tg01_13(arm_state *cpustate, UINT32 pc, UINT32 insn) /* SUB Rd, Rs, #
 {
 	UINT32 rs, rd, imm;
 
-    imm = (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
-    rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
-    rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-    SET_REGISTER(cpustate, rd, rs - imm);
-    HandleThumbALUSubFlags(GET_REGISTER(cpustate, rd), rs,imm);
+	imm = (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
+	rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
+	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
+	SET_REGISTER(cpustate, rd, rs - imm);
+	HandleThumbALUSubFlags(GET_REGISTER(cpustate, rd), rs,imm);
 
 }
 
@@ -697,7 +697,7 @@ const void tg04_01_13(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Hd, Hs
 
 }
 
- /* MOV group */
+	/* MOV group */
 
 // "The action of H1 = 0, H2 = 0 for Op = 00 (ADD), Op = 01 (CMP) and Op = 10 (MOV) is undefined, and should not be used."
 const void tg04_01_20(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Rd, Rs (undefined) */
@@ -867,12 +867,12 @@ const void tg05_0(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* STR Rd, [Rn, 
 	UINT32 addr;
 	UINT32 rm, rn, rd;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    WRITE32(addr, GET_REGISTER(cpustate, rd));
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	WRITE32(addr, GET_REGISTER(cpustate, rd));
+	R15 += 2;
 
 }
 
@@ -881,12 +881,12 @@ const void tg05_1(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* STRH Rd, [Rn,
 	UINT32 addr;
 	UINT32 rm, rn, rd;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    WRITE16(addr, GET_REGISTER(cpustate, rd));
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	WRITE16(addr, GET_REGISTER(cpustate, rd));
+	R15 += 2;
 
 }
 
@@ -895,12 +895,12 @@ const void tg05_2(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* STRB Rd, [Rn,
 	UINT32 addr;
 	UINT32 rm, rn, rd;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    WRITE8(addr, GET_REGISTER(cpustate, rd));
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	WRITE8(addr, GET_REGISTER(cpustate, rd));
+	R15 += 2;
 
 }
 
@@ -909,17 +909,17 @@ const void tg05_3(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDSB Rd, [Rn,
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    op2 = READ8(addr);
-    if (op2 & 0x00000080)
-    {
-        op2 |= 0xffffff00;
-    }
-    SET_REGISTER(cpustate, rd, op2);
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	op2 = READ8(addr);
+	if (op2 & 0x00000080)
+	{
+		op2 |= 0xffffff00;
+	}
+	SET_REGISTER(cpustate, rd, op2);
+	R15 += 2;
 
 }
 
@@ -928,13 +928,13 @@ const void tg05_4(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDR Rd, [Rn, 
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    op2 = READ32(addr);
-    SET_REGISTER(cpustate, rd, op2);
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	op2 = READ32(addr);
+	SET_REGISTER(cpustate, rd, op2);
+	R15 += 2;
 
 }
 
@@ -943,13 +943,13 @@ const void tg05_5(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDRH Rd, [Rn,
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    op2 = READ16(addr);
-    SET_REGISTER(cpustate, rd, op2);
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	op2 = READ16(addr);
+	SET_REGISTER(cpustate, rd, op2);
+	R15 += 2;
 
 }
 
@@ -958,13 +958,13 @@ const void tg05_6(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDRB Rd, [Rn,
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    op2 = READ8(addr);
-    SET_REGISTER(cpustate, rd, op2);
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	op2 = READ8(addr);
+	SET_REGISTER(cpustate, rd, op2);
+	R15 += 2;
 
 }
 
@@ -973,21 +973,21 @@ const void tg05_7(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDSH Rd, [Rn,
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
 
-    rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
-    rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
-    rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
-    addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
-    op2 = READ16(addr);
-    if (op2 & 0x00008000)
-    {
-        op2 |= 0xffff0000;
-    }
-    SET_REGISTER(cpustate, rd, op2);
-    R15 += 2;
+	rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
+	rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
+	rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
+	addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
+	op2 = READ16(addr);
+	if (op2 & 0x00008000)
+	{
+		op2 |= 0xffff0000;
+	}
+	SET_REGISTER(cpustate, rd, op2);
+	R15 += 2;
 
 }
 
- /* Word Store w/ Immediate Offset */
+	/* Word Store w/ Immediate Offset */
 
 const void tg06_0(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Store */
 {
@@ -1063,7 +1063,7 @@ const void tg08_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Load */
 	R15 += 2;
 }
 
- /* Stack-Relative Load/Store */
+	/* Stack-Relative Load/Store */
 
 const void tg09_0(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Store */
 {
@@ -1089,17 +1089,17 @@ const void tg09_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Load */
 	R15 += 2;
 }
 
- /* Get relative address */
+	/* Get relative address */
 
 const void tg0a_0(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* ADD Rd, PC, #nn */
 {
 	UINT32 rd;
 	INT32 offs;
 
-    rd = (insn & THUMB_RELADDR_RD) >> THUMB_RELADDR_RD_SHIFT;
-    offs = (UINT8)(insn & THUMB_INSN_IMM) << 2;
-    SET_REGISTER(cpustate, rd, ((R15 + 4) & ~2) + offs);
-    R15 += 2;
+	rd = (insn & THUMB_RELADDR_RD) >> THUMB_RELADDR_RD_SHIFT;
+	offs = (UINT8)(insn & THUMB_INSN_IMM) << 2;
+	SET_REGISTER(cpustate, rd, ((R15 + 4) & ~2) + offs);
+	R15 += 2;
 }
 
 const void tg0a_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD Rd, SP, #nn */
@@ -1113,17 +1113,17 @@ const void tg0a_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD Rd, SP, #n
 	R15 += 2;
 }
 
- /* Stack-Related Opcodes */
+	/* Stack-Related Opcodes */
 
 const void tg0b_0(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD SP, #imm */
 {
 	UINT32 addr;
 
 
-    addr = (insn & THUMB_INSN_IMM);
-    addr &= ~THUMB_INSN_IMM_S;
-    SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + ((insn & THUMB_INSN_IMM_S) ? -(addr << 2) : (addr << 2)));
-    R15 += 2;
+	addr = (insn & THUMB_INSN_IMM);
+	addr &= ~THUMB_INSN_IMM_S;
+	SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + ((insn & THUMB_INSN_IMM_S) ? -(addr << 2) : (addr << 2)));
+	R15 += 2;
 
 }
 
@@ -1132,8 +1132,8 @@ const void tg0b_1(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1142,8 +1142,8 @@ const void tg0b_2(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1152,8 +1152,8 @@ const void tg0b_3(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1161,15 +1161,15 @@ const void tg0b_4(arm_state *cpustate, UINT32 pc, UINT32 insn) /* PUSH {Rlist} *
 {
 	INT32 offs;
 
-    for (offs = 7; offs >= 0; offs--)
-    {
-        if (insn & (1 << offs))
-        {
-            SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) - 4);
-            WRITE32(GET_REGISTER(cpustate, 13), GET_REGISTER(cpustate, offs));
-        }
-    }
-    R15 += 2;
+	for (offs = 7; offs >= 0; offs--)
+	{
+		if (insn & (1 << offs))
+		{
+			SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) - 4);
+			WRITE32(GET_REGISTER(cpustate, 13), GET_REGISTER(cpustate, offs));
+		}
+	}
+	R15 += 2;
 
 }
 
@@ -1177,17 +1177,17 @@ const void tg0b_5(arm_state *cpustate, UINT32 pc, UINT32 insn) /* PUSH {Rlist}{L
 {
 	INT32 offs;
 
-    SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) - 4);
-    WRITE32(GET_REGISTER(cpustate, 13), GET_REGISTER(cpustate, 14));
-    for (offs = 7; offs >= 0; offs--)
-    {
-        if (insn & (1 << offs))
-        {
-            SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) - 4);
-            WRITE32(GET_REGISTER(cpustate, 13), GET_REGISTER(cpustate, offs));
-        }
-    }
-    R15 += 2;
+	SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) - 4);
+	WRITE32(GET_REGISTER(cpustate, 13), GET_REGISTER(cpustate, 14));
+	for (offs = 7; offs >= 0; offs--)
+	{
+		if (insn & (1 << offs))
+		{
+			SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) - 4);
+			WRITE32(GET_REGISTER(cpustate, 13), GET_REGISTER(cpustate, offs));
+		}
+	}
+	R15 += 2;
 
 }
 
@@ -1196,8 +1196,8 @@ const void tg0b_6(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1206,8 +1206,8 @@ const void tg0b_7(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1216,8 +1216,8 @@ const void tg0b_8(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1226,8 +1226,8 @@ const void tg0b_9(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1236,8 +1236,8 @@ const void tg0b_a(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1246,8 +1246,8 @@ const void tg0b_b(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1255,15 +1255,15 @@ const void tg0b_c(arm_state *cpustate, UINT32 pc, UINT32 insn) /* POP {Rlist} */
 {
 	INT32 offs;
 
-    for (offs = 0; offs < 8; offs++)
-    {
-        if (insn & (1 << offs))
-        {
-            SET_REGISTER(cpustate, offs, READ32(GET_REGISTER(cpustate, 13)));
-            SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + 4);
-        }
-    }
-    R15 += 2;
+	for (offs = 0; offs < 8; offs++)
+	{
+		if (insn & (1 << offs))
+		{
+			SET_REGISTER(cpustate, offs, READ32(GET_REGISTER(cpustate, 13)));
+			SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + 4);
+		}
+	}
+	R15 += 2;
 
 }
 
@@ -1271,38 +1271,38 @@ const void tg0b_d(arm_state *cpustate, UINT32 pc, UINT32 insn) /* POP {Rlist}{PC
 {
 	INT32 offs;
 
-    for (offs = 0; offs < 8; offs++)
-    {
-        if (insn & (1 << offs))
-        {
-            SET_REGISTER(cpustate, offs, READ32(GET_REGISTER(cpustate, 13)));
-            SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + 4);
-        }
-    }
-    UINT32 addr = READ32(GET_REGISTER(cpustate, 13));
-    // in v4T, bit 0 is ignored.  v5 and later, it's an ARM/Thumb flag like the BX instruction
-    if (cpustate->archRev < 5)
-    {
-        R15 = addr & ~1;
-    }
-    else
-    {
-        if (addr & 1)
-        {
-            addr &= ~1;
-        }
-        else
-        {
-            SET_CPSR(GET_CPSR & ~T_MASK);
-            if (addr & 2)
-            {
-                addr += 2;
-            }
-        }
+	for (offs = 0; offs < 8; offs++)
+	{
+		if (insn & (1 << offs))
+		{
+			SET_REGISTER(cpustate, offs, READ32(GET_REGISTER(cpustate, 13)));
+			SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + 4);
+		}
+	}
+	UINT32 addr = READ32(GET_REGISTER(cpustate, 13));
+	// in v4T, bit 0 is ignored.  v5 and later, it's an ARM/Thumb flag like the BX instruction
+	if (cpustate->archRev < 5)
+	{
+		R15 = addr & ~1;
+	}
+	else
+	{
+		if (addr & 1)
+		{
+			addr &= ~1;
+		}
+		else
+		{
+			SET_CPSR(GET_CPSR & ~T_MASK);
+			if (addr & 2)
+			{
+				addr += 2;
+			}
+		}
 
-        R15 = addr;
-    }
-    SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + 4);
+		R15 = addr;
+	}
+	SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + 4);
 
 }
 
@@ -1311,8 +1311,8 @@ const void tg0b_e(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1321,8 +1321,8 @@ const void tg0b_f(arm_state *cpustate, UINT32 pc, UINT32 insn)
 //  UINT32 addr;
 //  INT32 offs;
 
-    fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1339,23 +1339,23 @@ const void tg0c_0(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Store */
 	UINT32 rd;
 	INT32 offs;
 
-    UINT32 ld_st_address;
+	UINT32 ld_st_address;
 
-    rd = (insn & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
+	rd = (insn & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
 
 
-    ld_st_address = GET_REGISTER(cpustate, rd);
+	ld_st_address = GET_REGISTER(cpustate, rd);
 
-    for (offs = 0; offs < 8; offs++)
-    {
-        if (insn & (1 << offs))
-        {
-            WRITE32(ld_st_address & ~3, GET_REGISTER(cpustate, offs));
-            ld_st_address += 4;
-        }
-    }
-    SET_REGISTER(cpustate, rd, ld_st_address);
-    R15 += 2;
+	for (offs = 0; offs < 8; offs++)
+	{
+		if (insn & (1 << offs))
+		{
+			WRITE32(ld_st_address & ~3, GET_REGISTER(cpustate, offs));
+			ld_st_address += 4;
+		}
+	}
+	SET_REGISTER(cpustate, rd, ld_st_address);
+	R15 += 2;
 }
 
 
@@ -1364,28 +1364,28 @@ const void tg0c_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Load */
 	UINT32 rd;
 	INT32 offs;
 
-    UINT32 ld_st_address;
+	UINT32 ld_st_address;
 
-    rd = (insn & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
-
-
-    ld_st_address = GET_REGISTER(cpustate, rd);
+	rd = (insn & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
 
 
-    int rd_in_list;
+	ld_st_address = GET_REGISTER(cpustate, rd);
 
-    rd_in_list = insn & (1 << rd);
-    for (offs = 0; offs < 8; offs++)
-    {
-        if (insn & (1 << offs))
-        {
-            SET_REGISTER(cpustate, offs, READ32(ld_st_address & ~1));
-            ld_st_address += 4;
-        }
-    }
+
+	int rd_in_list;
+
+	rd_in_list = insn & (1 << rd);
+	for (offs = 0; offs < 8; offs++)
+	{
+		if (insn & (1 << offs))
+		{
+			SET_REGISTER(cpustate, offs, READ32(ld_st_address & ~1));
+			ld_st_address += 4;
+		}
+	}
 
 	if (!rd_in_list)
-        SET_REGISTER(cpustate, rd, ld_st_address);
+		SET_REGISTER(cpustate, rd, ld_st_address);
 
 	R15 += 2;
 }
@@ -1396,16 +1396,16 @@ const void tg0d_0(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_EQ:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (Z_IS_SET(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (Z_IS_SET(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1413,16 +1413,16 @@ const void tg0d_1(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_NE:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (Z_IS_CLEAR(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (Z_IS_CLEAR(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1430,16 +1430,16 @@ const void tg0d_2(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_CS:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (C_IS_SET(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (C_IS_SET(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1447,16 +1447,16 @@ const void tg0d_3(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_CC:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (C_IS_CLEAR(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (C_IS_CLEAR(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1464,16 +1464,16 @@ const void tg0d_4(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_MI:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (N_IS_SET(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (N_IS_SET(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1481,16 +1481,16 @@ const void tg0d_5(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_PL:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (N_IS_CLEAR(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (N_IS_CLEAR(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1498,16 +1498,16 @@ const void tg0d_6(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_VS:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (V_IS_SET(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (V_IS_SET(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1515,16 +1515,16 @@ const void tg0d_7(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_VC:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (V_IS_CLEAR(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (V_IS_CLEAR(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1532,16 +1532,16 @@ const void tg0d_8(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_HI:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (C_IS_SET(GET_CPSR) && Z_IS_CLEAR(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (C_IS_SET(GET_CPSR) && Z_IS_CLEAR(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1549,16 +1549,16 @@ const void tg0d_9(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_LS:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (C_IS_CLEAR(GET_CPSR) || Z_IS_SET(GET_CPSR))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (C_IS_CLEAR(GET_CPSR) || Z_IS_SET(GET_CPSR))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1566,16 +1566,16 @@ const void tg0d_a(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_GE:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (!(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (!(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1583,16 +1583,16 @@ const void tg0d_b(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_LT:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (!(GET_CPSR & N_MASK) != !(GET_CPSR & V_MASK))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (!(GET_CPSR & N_MASK) != !(GET_CPSR & V_MASK))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1600,16 +1600,16 @@ const void tg0d_c(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_GT:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (Z_IS_CLEAR(GET_CPSR) && !(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (Z_IS_CLEAR(GET_CPSR) && !(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1617,16 +1617,16 @@ const void tg0d_d(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_LE:
 {
 	INT32 offs;
 
-    offs = (INT8)(insn & THUMB_INSN_IMM);
+	offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    if (Z_IS_SET(GET_CPSR) || !(GET_CPSR & N_MASK) != !(GET_CPSR & V_MASK))
-    {
-        R15 += 4 + (offs << 1);
-    }
-    else
-    {
-        R15 += 2;
-    }
+	if (Z_IS_SET(GET_CPSR) || !(GET_CPSR & N_MASK) != !(GET_CPSR & V_MASK))
+	{
+		R15 += 4 + (offs << 1);
+	}
+	else
+	{
+		R15 += 2;
+	}
 
 }
 
@@ -1636,8 +1636,8 @@ const void tg0d_e(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_AL:
 
 //    offs = (INT8)(insn & THUMB_INSN_IMM);
 //case
-    fatalerror("%08x: Undefined Thumb instruction: %04x (ARM9 reserved)\n", pc, insn);
-    R15 += 2;
+	fatalerror("%08x: Undefined Thumb instruction: %04x (ARM9 reserved)\n", pc, insn);
+	R15 += 2;
 
 }
 
@@ -1648,23 +1648,23 @@ const void tg0d_f(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_NV:   // 
 //    offs = (INT8)(insn & THUMB_INSN_IMM);
 
 //case
-    cpustate->pendingSwi = 1;
-    ARM7_CHECKIRQ;
+	cpustate->pendingSwi = 1;
+	ARM7_CHECKIRQ;
 
 }
 
- /* B #offs */
+	/* B #offs */
 
 const void tg0e_0(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	INT32 offs;
 
-    offs = (insn & THUMB_BRANCH_OFFS) << 1;
-    if (offs & 0x00000800)
-    {
-        offs |= 0xfffff800;
-    }
-    R15 += 4 + offs;
+	offs = (insn & THUMB_BRANCH_OFFS) << 1;
+	if (offs & 0x00000800)
+	{
+		offs |= 0xfffff800;
+	}
+	R15 += 4 + offs;
 }
 
 
@@ -1672,27 +1672,27 @@ const void tg0e_1(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	UINT32 addr;
 
-    addr = GET_REGISTER(cpustate, 14);
-    addr += (insn & THUMB_BLOP_OFFS) << 1;
-    addr &= 0xfffffffc;
-    SET_REGISTER(cpustate, 14, (R15 + 4) | 1);
-    R15 = addr;
+	addr = GET_REGISTER(cpustate, 14);
+	addr += (insn & THUMB_BLOP_OFFS) << 1;
+	addr &= 0xfffffffc;
+	SET_REGISTER(cpustate, 14, (R15 + 4) | 1);
+	R15 = addr;
 }
 
- /* BL */
+	/* BL */
 
 const void tg0f_0(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	UINT32 addr;
 
-    addr = (insn & THUMB_BLOP_OFFS) << 12;
-    if (addr & (1 << 22))
-    {
-        addr |= 0xff800000;
-    }
-    addr += R15 + 4;
-    SET_REGISTER(cpustate, 14, addr);
-    R15 += 2;
+	addr = (insn & THUMB_BLOP_OFFS) << 12;
+	if (addr & (1 << 22))
+	{
+		addr |= 0xff800000;
+	}
+	addr += R15 + 4;
+	SET_REGISTER(cpustate, 14, addr);
+	R15 += 2;
 }
 
 
@@ -1700,9 +1700,9 @@ const void tg0f_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* BL */
 {
 	UINT32 addr;
 
-    addr = GET_REGISTER(cpustate, 14) & ~1;
-    addr += (insn & THUMB_BLOP_OFFS) << 1;
-    SET_REGISTER(cpustate, 14, (R15 + 2) | 1);
-    R15 = addr;
-    //R15 += 2;
+	addr = GET_REGISTER(cpustate, 14) & ~1;
+	addr += (insn & THUMB_BLOP_OFFS) << 1;
+	SET_REGISTER(cpustate, 14, (R15 + 2) | 1);
+	R15 = addr;
+	//R15 += 2;
 }

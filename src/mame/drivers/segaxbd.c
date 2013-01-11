@@ -421,9 +421,9 @@ READ16_MEMBER( segaxbd_state::iochip_0_r )
 	{
 		case 0:
 			// Input port:
-            //  D7: (Not connected)
-            //  D6: /INTR of ADC0804
-            //  D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
+			//  D7: (Not connected)
+			//  D6: /INTR of ADC0804
+			//  D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
 			return iochip_r(0, 0, ioport("IO0PORTA")->read());
 
 		case 1:
@@ -470,12 +470,12 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 	{
 		case 2:
 			// Output port:
-            //  D7: (Not connected)
-            //  D6: (/WDC) - watchdog reset
-            //  D5: Screen display (1= blanked, 0= displayed)
-            //  D4-D2: (ADC2-0)
-            //  D1: (CONT) - affects sprite hardware
-            //  D0: Sound section reset (1= normal operation, 0= reset)
+			//  D7: (Not connected)
+			//  D6: (/WDC) - watchdog reset
+			//  D5: Screen display (1= blanked, 0= displayed)
+			//  D4-D2: (ADC2-0)
+			//  D1: (CONT) - affects sprite hardware
+			//  D0: Sound section reset (1= normal operation, 0= reset)
 			if (((oldval ^ data) & 0x40) && !(data & 0x40))
 				machine().watchdog_reset();
 
@@ -488,8 +488,8 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 
 		case 3:
 			// Output port:
-            //  D7: Amplifier mute control (1= sounding, 0= muted)
-            //  D6-D0: CN D pin A17-A23 (output level 1= high, 0= low) - usually set up as lamps and coincounter
+			//  D7: Amplifier mute control (1= sounding, 0= muted)
+			//  D6-D0: CN D pin A17-A23 (output level 1= high, 0= low) - usually set up as lamps and coincounter
 			machine().sound().system_enable(data & 0x80);
 			break;
 
@@ -757,12 +757,12 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 	coin_counter_w(machine(), 0, (data >> 4) & 0x01);
 
 	//
-    //    aburner2:
-    // d1: altitude warning lamp
-    // d2: start lamp
-    // d5: lock on lamp
-    // d6: danger lamp
-    // in clone aburner, lamps work only in testmode?
+	//    aburner2:
+	// d1: altitude warning lamp
+	// d2: start lamp
+	// d5: lock on lamp
+	// d6: danger lamp
+	// in clone aburner, lamps work only in testmode?
 
 	output_set_lamp_value(0, (data >> 5) & 0x01);
 	output_set_lamp_value(1, (data >> 6) & 0x01);
@@ -1060,19 +1060,19 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )	// /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IO0PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IO1PORTA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	// button? not used by any game we have
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // button? not used by any game we have
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// cannon trigger or shift down
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	// missile button or shift up
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // cannon trigger or shift down
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // missile button or shift up
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -1131,19 +1131,19 @@ static INPUT_PORTS_START( aburner )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")	// stick X
+	PORT_START("ADC0")  // stick X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC1")	// stick Y
+	PORT_START("ADC1")  // stick Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC2")	// throttle
+	PORT_START("ADC2")  // throttle
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
-	PORT_START("ADC3")	// motor Y
+	PORT_START("ADC3")  // motor Y
 	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
 
-	PORT_START("ADC4")	// motor X
+	PORT_START("ADC4")  // motor X
 	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
 INPUT_PORTS_END
 
@@ -1186,7 +1186,7 @@ static INPUT_PORTS_START( thndrbld )
 	PORT_MODIFY("IO1PORTD")
 	PORT_DIPNAME( 0x01, 0x01, "Cabinet Type" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x01, "Econ Upright" )
-	PORT_DIPSETTING(    0x00, "Mini Upright" )	// see note about inputs below
+	PORT_DIPSETTING(    0x00, "Mini Upright" )  // see note about inputs below
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1208,16 +1208,16 @@ static INPUT_PORTS_START( thndrbld )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 	//  These inputs are valid for the "Econ Upright" and "Deluxe" cabinets.
-    //  On the "Standing" cabinet, the joystick Y axis is reversed.
-    //  On the "Mini Upright" cabinet, the inputs conform to After Burner II:
-    //  the X axis is (un-)reversed, and the throttle and Y axis switch places
-	PORT_START("ADC0")	// stick X
+	//  On the "Standing" cabinet, the joystick Y axis is reversed.
+	//  On the "Mini Upright" cabinet, the inputs conform to After Burner II:
+	//  the X axis is (un-)reversed, and the throttle and Y axis switch places
+	PORT_START("ADC0")  // stick X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")	// "slottle"
+	PORT_START("ADC1")  // "slottle"
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
-	PORT_START("ADC2")	// stick Y
+	PORT_START("ADC2")  // stick Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
@@ -1228,7 +1228,7 @@ static INPUT_PORTS_START( thndrbd1 )
 	PORT_MODIFY("IO1PORTD")
 	PORT_DIPNAME( 0x01, 0x01, "Cabinet Type" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x01, "Deluxe" )
-	PORT_DIPSETTING(    0x00, "Standing" )	// see note about inputs above
+	PORT_DIPSETTING(    0x00, "Standing" )  // see note about inputs above
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1253,14 +1253,14 @@ INPUT_PORTS_END
 
 static const ioport_value lastsurv_position_table[] =
 {
-	0x0f ^ 0x08 ^ 0x01,		// down + left
-	0x0f ^ 0x01,			// left
-	0x0f ^ 0x04 ^ 0x01,		// up + left
-	0x0f ^ 0x04,			// up
-	0x0f ^ 0x04 ^ 0x02,		// up + right
-	0x0f ^ 0x02,			// right
-	0x0f ^ 0x08 ^ 0x02,		// down + right
-	0x0f ^ 0x08,			// down
+	0x0f ^ 0x08 ^ 0x01,     // down + left
+	0x0f ^ 0x01,            // left
+	0x0f ^ 0x04 ^ 0x01,     // up + left
+	0x0f ^ 0x04,            // up
+	0x0f ^ 0x04 ^ 0x02,     // up + right
+	0x0f ^ 0x02,            // right
+	0x0f ^ 0x08 ^ 0x02,     // down + right
+	0x0f ^ 0x08,            // down
 };
 static INPUT_PORTS_START( lastsurv )
 	PORT_INCLUDE( xboard_generic )
@@ -1400,13 +1400,13 @@ static INPUT_PORTS_START( rachero )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 
-	PORT_START("ADC0")	// steering
+	PORT_START("ADC0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")	// gas pedal
+	PORT_START("ADC1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")	// brake
+	PORT_START("ADC2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -1443,13 +1443,13 @@ static INPUT_PORTS_START( smgp )
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x00, "Deluxe" )
 
-	PORT_START("ADC0")	// steering
+	PORT_START("ADC0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC1")	// gas pedal
+	PORT_START("ADC1")  // gas pedal
 	PORT_BIT( 0xff, 0x38, IPT_PEDAL ) PORT_MINMAX(0x38,0xb8) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")	// brake
+	PORT_START("ADC2")  // brake
 	PORT_BIT( 0xff, 0x28, IPT_PEDAL2 ) PORT_MINMAX(0x28,0xa8) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -1481,10 +1481,10 @@ static INPUT_PORTS_START( abcop )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")	// steering
+	PORT_START("ADC0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")	// accelerator
+	PORT_START("ADC1")  // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
@@ -1514,13 +1514,13 @@ static INPUT_PORTS_START( gprider )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")	// steering
+	PORT_START("ADC0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC1")	// gas pedal
+	PORT_START("ADC1")  // gas pedal
 	PORT_BIT( 0xff, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_REVERSE
 
-	PORT_START("ADC2")	// brake
+	PORT_START("ADC2")  // brake
 	PORT_BIT( 0xff, 0x10, IPT_PEDAL2 ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1811,16 +1811,16 @@ ROM_START( loffire )
 	ROM_LOAD16_BYTE( "epr-12850.63", 0x000001, 0x20000, CRC(14598f2a) SHA1(13a51529ed32acefd733d9f638621c3e023dbd6d) )
 
 	//
-    // It's not possible to determine the original value with just the available
-    // ROM data. The choice was between 47, 56 and 57, which decrypt correctly all
-    // the code at the affected addresses (2638, 6638 and so on).
-    // I chose 57 because it's the only one that has only 1 bit different from the
-    // bad value in the old dump (77).
+	// It's not possible to determine the original value with just the available
+	// ROM data. The choice was between 47, 56 and 57, which decrypt correctly all
+	// the code at the affected addresses (2638, 6638 and so on).
+	// I chose 57 because it's the only one that has only 1 bit different from the
+	// bad value in the old dump (77).
 	//
-    // Nicola Salmoria
-    //
+	// Nicola Salmoria
+	//
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0136.key", 0x0000, 0x2000, BAD_DUMP CRC(344bfe0c) SHA1(f6bb8045b46f90f8abadf1dc2e1ae1d7cef9c810) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -1874,7 +1874,7 @@ ROM_START( loffireu )
 	ROM_LOAD16_BYTE( "epr-12847a.58", 0x000000, 0x20000, CRC(c50eb4ed) SHA1(18a46c97aec2fefd160338c1760b6ee367dcb57f) )
 	ROM_LOAD16_BYTE( "epr-12848a.63", 0x000001, 0x20000, CRC(f8ff8640) SHA1(193bb8f42f3c5011ad1fbf87215f012de5e950fb) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0135.key", 0x0000, 0x2000, CRC(c53ad019) SHA1(7e6dc2b35ebfeefb507d4d03f5a59574944177d1) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -1926,12 +1926,12 @@ ROM_END
 ROM_START( loffirej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	// repaired using data from the loffire set since they are mostly identical
-    // when decrypted, they pass the rom check so are assumed to be ok but double
-    // checking them when possible never hurts
+	// when decrypted, they pass the rom check so are assumed to be ok but double
+	// checking them when possible never hurts
 	ROM_LOAD16_BYTE( "epr-12794.58", 0x000000, 0x20000, CRC(1e588992) SHA1(fe7107e83c12643e7d22fd4b4cd0c7bcff0d84c3) )
 	ROM_LOAD16_BYTE( "epr-12795.63", 0x000001, 0x20000, CRC(d43d7427) SHA1(ecbd425bab6aa65ffbd441d6a0936ac055d5f06d) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0134.key", 0x0000, 0x2000, CRC(732626d4) SHA1(75ed7ca417758dd62afb4edbb9daee754932c392) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -1991,7 +1991,7 @@ ROM_START( thndrbld )
 	ROM_LOAD16_BYTE( "epr-11306.ic57", 0x040000, 0x20000, CRC(4b95f2b4) SHA1(9e0ff898a2af05c35db3551e52c7485748698c28) )
 	ROM_LOAD16_BYTE( "epr-11307.ic62", 0x040001, 0x20000, CRC(2d6833e4) SHA1(b39a744370014237121f0010d18897e63f7058cf) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0056.key", 0x0000, 0x2000, CRC(b40cd2c5) SHA1(865e70bce4f55f6702960d6eaa780b7b1f880e41) )
 
 	ROM_REGION( 0x100000, "subcpu", 0 ) // 2nd 68000 code
@@ -2103,7 +2103,7 @@ ROM_START( lastsurv )
 	ROM_LOAD16_BYTE( "epr-12048.ic57", 0x040000, 0x20000, CRC(648e38ca) SHA1(e5f7fd42f49dbbddd1a812a04d8b95c1a73e640b) )
 	ROM_LOAD16_BYTE( "epr-12049.ic62", 0x040001, 0x20000, CRC(6c5c4753) SHA1(6834542005bc8cad7918ae17d3764306d7f9a959) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0083.key", 0x0000, 0x2000, CRC(dca0b9cc) SHA1(77510804d36d486ffa1e0bb5b0a36d43adc63415) )
 
 	ROM_REGION( 0x100000, "subcpu", 0 ) // 2nd 68000 code
@@ -2161,7 +2161,7 @@ ROM_START( rachero )
 	ROM_LOAD16_BYTE( "epr-12855.ic57", 0x40000, 0x20000,CRC(cecf1e73) SHA1(3f8631379f32dbfda7720ef345276f9be23ada06) )
 	ROM_LOAD16_BYTE( "epr-12856.ic62", 0x40001, 0x20000,CRC(da900ebb) SHA1(595ed65248185ddf8666b3f30ad6329162116448) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0144.key", 0x0000, 0x2000, CRC(8740bbff) SHA1(de96e606c04a09258b966532fb01a6b4d4db86a6) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2257,7 +2257,7 @@ ROM_START( smgp )
 	ROM_LOAD16_BYTE( "epr-12563b.58", 0x00000, 0x20000, CRC(baf1f333) SHA1(f91a7a311237b9940a44b815716d4226a7ae1e8b) )
 	ROM_LOAD16_BYTE( "epr-12564b.63", 0x00001, 0x20000, CRC(b5191af0) SHA1(d6fb19552e4816eefe751907ec55a2e07ad24879) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0126a.key", 0x0000, 0x2000, CRC(2abc1982) SHA1(cc4c36e6ba52431df17c6e36ba08d3a89be7b7e7) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2323,7 +2323,7 @@ ROM_START( smgp6 )
 	ROM_LOAD16_BYTE( "epr-12563a.58", 0x00000, 0x20000, CRC(2e64b10e) SHA1(2be1ffb3120e4af6a61880e2a2602db07a73f373) )
 	ROM_LOAD16_BYTE( "epr-12564a.63", 0x00001, 0x20000, CRC(5baba3e7) SHA1(37194d5a4d3ee48a276f6aeb35b2f20a7661caa2) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0126a.key", 0x0000, 0x2000, CRC(2abc1982) SHA1(cc4c36e6ba52431df17c6e36ba08d3a89be7b7e7) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2439,7 +2439,7 @@ ROM_START( smgp5 )
 	ROM_LOAD16_BYTE( "epr-12563.58", 0x00000, 0x20000, CRC(6d7325ae) SHA1(bf88ceddc49dab5b439080d5bf0e7e084a79546c) )
 	ROM_LOAD16_BYTE( "epr-12564.63", 0x00001, 0x20000, CRC(adfbf921) SHA1(f3321e03dc37b14db065b85d63e321810e4ea797) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0126.key", 0x0000, 0x2000, CRC(4d917996) SHA1(17232c0e35d439a12db3d966064cf00104088903) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2504,7 +2504,7 @@ ROM_START( smgpu )
 	ROM_LOAD16_BYTE( "epr-12561c.58", 0x00000, 0x20000, CRC(a5b0f3fe) SHA1(17103e56f822fdb52e72f597c01415ed375aa102) )
 	ROM_LOAD16_BYTE( "epr-12562c.63", 0x00001, 0x20000, CRC(799e55f4) SHA1(2e02cdc63bda47b087c81021018287cfa961c083) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0125a.key", 0x0000, 0x2000, CRC(3ecdb120) SHA1(c484198e4509d79214e78d4a47e9a7e339f7a2ed) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2570,7 +2570,7 @@ ROM_START( smgpu1 )
 	ROM_LOAD16_BYTE( "epr-12561b.58", 0x00000, 0x20000, CRC(80a32655) SHA1(fe1ffa8af9f1ca175ba90b24a0853329b08d19af) )
 	ROM_LOAD16_BYTE( "epr-12562b.63", 0x00001, 0x20000, CRC(d525f2a8) SHA1(f3241e11485c7428cd9f081ec6768fda39ae3250) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0125a.key", 0x0000, 0x2000, CRC(3ecdb120) SHA1(c484198e4509d79214e78d4a47e9a7e339f7a2ed) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2678,7 +2678,7 @@ ROM_START( smgpu2 )
 	ROM_LOAD16_BYTE( "epr-12561a.58", 0x00000, 0x20000, CRC(e505eb89) SHA1(bfb9a7a8b13ae454a92349e57215562477cd2cd2) )
 	ROM_LOAD16_BYTE( "epr-12562a.63", 0x00001, 0x20000, CRC(c3af4215) SHA1(c46829e08d5492515de5d3269b0e899705d0b108) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0125a.key", 0x0000, 0x2000, CRC(3ecdb120) SHA1(c484198e4509d79214e78d4a47e9a7e339f7a2ed) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2743,7 +2743,7 @@ ROM_START( smgpj )
 	ROM_LOAD16_BYTE( "epr-12432b.58", 0x00000, 0x20000, CRC(c1a29db1) SHA1(0122d366899f98f7a60b0c9bddeece7995cebf83) )
 	ROM_LOAD16_BYTE( "epr-12433b.63", 0x00001, 0x20000, CRC(97199eb1) SHA1(3baccf8159821d4b4d5caedf5eb691f07372be93) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0124a.key", 0x0000, 0x2000, CRC(022a8a16) SHA1(4fd80105cb85ccba77cf1e76a21d6e245d5d2e7d) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2808,7 +2808,7 @@ ROM_START( smgpja )
 	ROM_LOAD16_BYTE( "epr-12432a.58", 0x00000, 0x20000, CRC(22517672) SHA1(db9ac40e83e9786bc9dad70f62c2080d3df694ee) )
 	ROM_LOAD16_BYTE( "epr-12433a.63", 0x00001, 0x20000, CRC(a46b5d13) SHA1(3a7de5cb6f3e6d726f0ea886a87125dedc6f849f) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0124a.key", 0x0000, 0x2000, CRC(022a8a16) SHA1(4fd80105cb85ccba77cf1e76a21d6e245d5d2e7d) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2878,7 +2878,7 @@ ROM_START( abcop )
 	ROM_LOAD16_BYTE( "epr-13559.ic57",  0x40000, 0x20000, CRC(4588bf19) SHA1(6a8b3d4450ac0bc41b46e6a4e1b44d82112fcd64) )
 	ROM_LOAD16_BYTE( "epr-13558.ic62",  0x40001, 0x20000, CRC(11259ed4) SHA1(e7de174a0bdb1d1111e5e419f1d501ab5be1d32d) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0169b.key", 0x0000, 0x2000, CRC(058da36e) SHA1(ab3f68a90725063c68fc5d0f8dbece1f8940dc7d) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2909,7 +2909,7 @@ ROM_START( abcop )
 	ROM_LOAD32_BYTE( "opr-13537.ic105", 0x180003, 0x20000, CRC(fa14ed3e) SHA1(d684496ade2517696a56c1423dd4686d283c133f) )
 
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) // ground data
-	ROM_LOAD( "opr-13564.ic40",	 0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
+	ROM_LOAD( "opr-13564.ic40",  0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
@@ -2931,7 +2931,7 @@ ROM_START( abcopj )
 	ROM_LOAD16_BYTE( "epr-13559.ic57",  0x40000, 0x20000, CRC(4588bf19) SHA1(6a8b3d4450ac0bc41b46e6a4e1b44d82112fcd64) )
 	ROM_LOAD16_BYTE( "epr-13558.ic62",  0x40001, 0x20000, CRC(11259ed4) SHA1(e7de174a0bdb1d1111e5e419f1d501ab5be1d32d) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0169b.key", 0x0000, 0x2000, CRC(058da36e) SHA1(ab3f68a90725063c68fc5d0f8dbece1f8940dc7d) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -2962,7 +2962,7 @@ ROM_START( abcopj )
 	ROM_LOAD32_BYTE( "opr-13537.ic105", 0x180003, 0x20000, CRC(fa14ed3e) SHA1(d684496ade2517696a56c1423dd4686d283c133f) )
 
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) // ground data
-	ROM_LOAD( "opr-13564.ic40",	 0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
+	ROM_LOAD( "opr-13564.ic40",  0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
@@ -2987,7 +2987,7 @@ ROM_START( gprider )
 	ROM_LOAD16_BYTE( "epr-13409.ic58", 0x00000, 0x20000, CRC(9abb81b6) SHA1(f6308f3ec99ee66677e86f6a915e4dff8557d25f) )
 	ROM_LOAD16_BYTE( "epr-13408.ic63", 0x00001, 0x20000, CRC(8e410e97) SHA1(2021d738064e57d175b59ba053d9ee35ed4516c8) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0163.key", 0x0000, 0x2000, CRC(c1d4d207) SHA1(c35b0a49fb6a1e0e9a1c087f0ccd190ad5c2bb2c) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -3042,7 +3042,7 @@ ROM_START( gprideru )
 	ROM_LOAD16_BYTE( "epr-13407.ic58", 0x00000, 0x20000, CRC(03553ebd) SHA1(041a71a2dce2ad56360f500cb11e29a629020160) )
 	ROM_LOAD16_BYTE( "epr-13406.ic63", 0x00001, 0x20000, CRC(122c711f) SHA1(2bcc51347e771a7e7f770e68b24d82497d24aa2e) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0162.key", 0x0000, 0x2000, CRC(8067de53) SHA1(e8cd1dfbad94856c6bd51569557667e72f0a5dd4) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code
@@ -3097,7 +3097,7 @@ ROM_START( gpriderj )
 	ROM_LOAD16_BYTE( "epr-13387.ic58", 0x00000, 0x20000, CRC(a1e8b2c5) SHA1(22b70a9074263af808bb9dffee29cbcff7e304e3) )
 	ROM_LOAD16_BYTE( "epr-13386.ic63", 0x00001, 0x20000, CRC(d8be9e66) SHA1(d81c03b08fd6b971554b94e0adac131a1dcf3248) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0161.key", 0x0000, 0x2000, CRC(e38ddc16) SHA1(d1f7f261320cbc605b4f7e5a9c28f49af5471d87) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 ) // 2nd 68000 code

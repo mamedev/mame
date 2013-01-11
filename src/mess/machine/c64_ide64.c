@@ -28,10 +28,10 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define AT29C010A_TAG		"u3"
-#define DS1302_TAG			"u4"
-#define FT245R_TAG			"u21"
-#define IDE_TAG				"ide"
+#define AT29C010A_TAG       "u3"
+#define DS1302_TAG          "u4"
+#define FT245R_TAG          "u21"
+#define IDE_TAG             "ide"
 
 
 
@@ -192,18 +192,18 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       EXROM
-                1       GAME
-                2       A14
-                3       A15
-                4       A16
-                5       v4.x
-                6
-                7
+			    0       EXROM
+			    1       GAME
+			    2       A14
+			    3       A15
+			    4       A16
+			    5       v4.x
+			    6
+			    7
 
-            */
+			*/
 
 			data = 0x20 | (m_bank << 2) | (m_game << 1) | m_exrom;
 		}
@@ -299,18 +299,18 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       disable cartridge
-                1       RTC CE
-                2
-                3
-                4
-                5
-                6
-                7
+			    0       disable cartridge
+			    1       RTC CE
+			    2
+			    3
+			    4
+			    5
+			    6
+			    7
 
-            */
+			*/
 
 			m_enable = !BIT(data, 0);
 			m_rtc->ce_w(BIT(data, 1));

@@ -55,9 +55,9 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info_1w);
 
 	void draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const UINT16 *mask,
-				   UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
+					UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
 	void draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const UINT16 *mask,
-					   UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
+						UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
 
 	template<class _BitmapClass>
 	void draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);

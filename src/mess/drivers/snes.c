@@ -62,14 +62,14 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
  *************************************/
 
 static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, snes_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)		/* ROM (and reserved in Mode 20) */
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)	/* used by Mode 20 DSP-1 */
+	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)    /* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)    /* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)       /* ROM (and reserved in Mode 20) */
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)    /* used by Mode 20 DSP-1 */
 	AM_RANGE(0x700000, 0x7dffff) AM_READWRITE_LEGACY(snes_r_bank5, snes_w_bank5)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM					/* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)	/* Mirror and ROM */
-	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
+	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)    /* Mirror and ROM */
+	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)    /* Mirror and ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superfx_map, AS_PROGRAM, 8, snes_state )
@@ -82,8 +82,8 @@ static ADDRESS_MAP_START( superfx_map, AS_PROGRAM, 8, snes_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spc_map, AS_PROGRAM, 8, snes_state )
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w) /* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)   /* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_100_r, spc_ram_100_w)
 ADDRESS_MAP_END
 
@@ -148,7 +148,7 @@ static CUSTOM_INPUT( snes_superscope_offscreen_input )
 
 static TIMER_CALLBACK( lightgun_tick )
 {
-	if ((machine.root_device().ioport("CTRLSEL")->read() & 0x0f) == 0x03 || (machine.root_device().ioport("CTRLSEL")->read() & 0x0f) == 0x04)	{
+	if ((machine.root_device().ioport("CTRLSEL")->read() & 0x0f) == 0x03 || (machine.root_device().ioport("CTRLSEL")->read() & 0x0f) == 0x04)   {
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
 	}
@@ -253,7 +253,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( snes_superscope )
 	PORT_START("SUPERSCOPE1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )	// Noise
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )    // Noise
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snes_superscope_offscreen_input, (void *)0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( snes_superscope )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y) PORT_NAME("Port1 Superscope Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x03)
 
 	PORT_START("SUPERSCOPE2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )	// Noise
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )    // Noise
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snes_superscope_offscreen_input, (void *)1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -527,9 +527,9 @@ static void snes_input_read_superscope( running_machine &machine, int port )
 		state->m_scope[port].pause_lock = 0;
 
 	/* If we have pressed fire or cursor and we are on-screen and SuperScope is in Port2, then latch video signal.
-    Notice that we only latch Port2 because its IOBit pin is connected to bit7 of the IO Port, while Port1 has
-    IOBit pin connected to bit6 of the IO Port, and the latter is not detected by the H/V Counters. In other
-    words, you can connect SuperScope to Port1, but there is no way SNES could detect its on-screen position */
+	Notice that we only latch Port2 because its IOBit pin is connected to bit7 of the IO Port, while Port1 has
+	IOBit pin connected to bit6 of the IO Port, and the latter is not detected by the H/V Counters. In other
+	words, you can connect SuperScope to Port1, but there is no way SNES could detect its on-screen position */
 	if ((state->m_scope[port].buttons & 0xc0) && !(state->m_scope[port].buttons & 0x02) && port == 1)
 		snes_gun_latch(machine, state->m_scope[port].x, state->m_scope[port].y);
 
@@ -548,16 +548,16 @@ static void snes_input_read( running_machine &machine )
 
 	switch (ctrl1)
 	{
-	case 1:	/* SNES joypad */
+	case 1: /* SNES joypad */
 		snes_input_read_joy(machine, 0);
 		break;
-	case 2:	/* SNES Mouse */
+	case 2: /* SNES Mouse */
 		snes_input_read_mouse(machine, 0);
 		break;
-	case 3:	/* SNES Superscope */
+	case 3: /* SNES Superscope */
 		snes_input_read_superscope(machine, 0);
 		break;
-	case 0:	/* no controller in port1 */
+	case 0: /* no controller in port1 */
 	default:
 		state->m_data1[0] = 0;
 		state->m_data2[0] = 0;
@@ -566,16 +566,16 @@ static void snes_input_read( running_machine &machine )
 
 	switch (ctrl2)
 	{
-	case 1:	/* SNES joypad */
+	case 1: /* SNES joypad */
 		snes_input_read_joy(machine, 1);
 		break;
-	case 2:	/* SNES Mouse */
+	case 2: /* SNES Mouse */
 		snes_input_read_mouse(machine, 1);
 		break;
-	case 3:	/* SNES Superscope */
+	case 3: /* SNES Superscope */
 		snes_input_read_superscope(machine, 1);
 		break;
-	case 0:	/* no controller in port2 */
+	case 0: /* no controller in port2 */
 	default:
 		state->m_data1[1] = 0;
 		state->m_data2[1] = 0;
@@ -610,13 +610,13 @@ static UINT8 snes_oldjoy1_read( running_machine &machine )
 
 	switch (ctrl1)
 	{
-	case 1:	/* SNES joypad */
+	case 1: /* SNES joypad */
 		if (state->m_read_idx[0] >= 16)
 			res = 0x01;
 		else
 			res = (state->m_joypad[0].buttons >> (15 - state->m_read_idx[0]++)) & 0x01;
 		break;
-	case 2:	/* SNES Mouse */
+	case 2: /* SNES Mouse */
 		if (state->m_read_idx[0] >= 32)
 			res = 0x01;
 		else if (state->m_read_idx[0] >= 24)
@@ -628,13 +628,13 @@ static UINT8 snes_oldjoy1_read( running_machine &machine )
 		else
 			res = 0;
 		break;
-	case 3:	/* SNES Superscope */
+	case 3: /* SNES Superscope */
 		if (state->m_read_idx[0] >= 8)
 			res = 0x01;
 		else
 			res = (state->m_scope[0].buttons >> (7 - state->m_read_idx[0]++)) & 0x01;
 		break;
-	case 0:	/* no controller in port2 */
+	case 0: /* no controller in port2 */
 	default:
 		break;
 	}
@@ -650,13 +650,13 @@ static UINT8 snes_oldjoy2_read( running_machine &machine )
 
 	switch (ctrl2)
 	{
-	case 1:	/* SNES joypad */
+	case 1: /* SNES joypad */
 		if (state->m_read_idx[1] >= 16)
 			res = 0x01;
 		else
 			res = (state->m_joypad[1].buttons >> (15 - state->m_read_idx[1]++)) & 0x01;
 		break;
-	case 2:	/* SNES Mouse */
+	case 2: /* SNES Mouse */
 		if (state->m_read_idx[1] >= 32)
 			res = 0x01;
 		else if (state->m_read_idx[1] >= 24)
@@ -668,13 +668,13 @@ static UINT8 snes_oldjoy2_read( running_machine &machine )
 		else
 			res = 0;
 		break;
-	case 3:	/* SNES Superscope */
+	case 3: /* SNES Superscope */
 		if (state->m_read_idx[1] >= 8)
 			res = 0x01;
 		else
 			res = (state->m_scope[1].buttons >> (7 - state->m_read_idx[1]++)) & 0x01;
 		break;
-	case 0:	/* no controller in port2 */
+	case 0: /* no controller in port2 */
 	default:
 		break;
 	}
@@ -702,10 +702,10 @@ static MACHINE_RESET( snes_mess )
 static MACHINE_CONFIG_START( snes_base, snes_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)	/* 2.68 MHz, also 3.58 MHz */
+	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)	/* 1.024 MHz */
+	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)   /* 1.024 MHz */
 	MCFG_CPU_PROGRAM_MAP(spc_map)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
@@ -735,12 +735,12 @@ MACHINE_CONFIG_END
 
 static SUPERFX_CONFIG( snes_superfx_config )
 {
-	DEVCB_DRIVER_LINE_MEMBER(snes_state,snes_extern_irq_w)	/* IRQ line from cart */
+	DEVCB_DRIVER_LINE_MEMBER(snes_state,snes_extern_irq_w)  /* IRQ line from cart */
 };
 
 static MACHINE_CONFIG_DERIVED( snessfx, snes )
 
-	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)	/* 21.48MHz */
+	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
 	MCFG_CPU_PROGRAM_MAP(superfx_map)
 	MCFG_CPU_CONFIG(snes_superfx_config)
 MACHINE_CONFIG_END
@@ -778,7 +778,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( snespsfx, snespal )
 
-	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)	/* 21.48MHz */
+	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
 	MCFG_CPU_PROGRAM_MAP(superfx_map)
 	MCFG_CPU_CONFIG(snes_superfx_config)
 MACHINE_CONFIG_END
@@ -812,10 +812,10 @@ MACHINE_CONFIG_END
 ROM_START( snes )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )      /* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
@@ -825,10 +825,10 @@ ROM_END
 ROM_START( snesdsp )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) )
 	ROM_LOAD( "dsp1.bin",  SNES_DSP1_OFFSET,  0x002800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) )
 	ROM_LOAD( "dsp2.bin",  SNES_DSP2_OFFSET,  0x002800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) )
@@ -843,10 +843,10 @@ ROM_END
 ROM_START( snesst10 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x11000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x11000, "addons", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
@@ -857,10 +857,10 @@ ROM_END
 ROM_START( snesst11 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x11000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x11000, "addons", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "st011.bin",    0x000000, 0x011000, CRC(34d2952c) SHA1(1375b8c1efc8cae4962b57dfe22f6b78e1ddacc8) )
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
@@ -871,10 +871,10 @@ ROM_END
 ROM_START( snessfx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )      /* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
@@ -884,10 +884,10 @@ ROM_END
 ROM_START( snespal )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )      /* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
@@ -897,10 +897,10 @@ ROM_END
 ROM_START( snespdsp )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) )
 	ROM_LOAD( "dsp1.bin",  SNES_DSP1_OFFSET,  0x002800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) )
 	ROM_LOAD( "dsp2.bin",  SNES_DSP2_OFFSET,  0x002800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) )
@@ -915,10 +915,10 @@ ROM_END
 ROM_START( snespsfx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )      /* add-on chip ROMs (DSP, SFX, etc) */
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
@@ -928,13 +928,13 @@ ROM_END
 ROM_START( snesst )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )      /* add-on chip ROMs (DSP, SFX, etc) */
 
-	ROM_REGION( 0x40000, "sufami", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD( "shvc-qh-0.bin", 0,	0x40000, CRC(9b4ca911) SHA1(ef86ea192eed03d5c413fdbbfd46043be1d7a127) )
+	ROM_REGION( 0x40000, "sufami", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "shvc-qh-0.bin", 0,   0x40000, CRC(9b4ca911) SHA1(ef86ea192eed03d5c413fdbbfd46043be1d7a127) )
 
 	ROM_REGION( MAX_SNES_CART_SIZE, "slot_a", ROMREGION_ERASE00 )
 	ROM_REGION( MAX_SNES_CART_SIZE, "slot_b", ROMREGION_ERASE00 )
@@ -945,10 +945,10 @@ ROM_END
 ROM_START( snesbsx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 
-	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_REGION( 0x10000, "addons", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) )
 	ROM_LOAD( "dsp1.bin",  SNES_DSP1_OFFSET,  0x002800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) )
 	ROM_LOAD( "dsp2.bin",  SNES_DSP2_OFFSET,  0x002800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) )

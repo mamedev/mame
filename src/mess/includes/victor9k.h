@@ -20,41 +20,41 @@
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
 
-#define SCREEN_TAG		"screen"
-#define I8088_TAG		"8l"
-#define I8048_TAG		"5d"
-#define I8253_TAG		"13h"
-#define I8259A_TAG		"7l"
-#define UPD7201_TAG		"16e"
-#define HD46505S_TAG	"11a"
-#define MC6852_TAG		"13b"
-#define HC55516_TAG		"1m"
-#define M6522_1_TAG		"m6522_1"
-#define M6522_2_TAG		"m6522_2"
-#define M6522_3_TAG		"m6522_3"
-#define M6522_4_TAG		"m6522_4"
-#define M6522_5_TAG		"m6522_5"
-#define M6522_6_TAG		"m6522_6"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define I8088_TAG       "8l"
+#define I8048_TAG       "5d"
+#define I8253_TAG       "13h"
+#define I8259A_TAG      "7l"
+#define UPD7201_TAG     "16e"
+#define HD46505S_TAG    "11a"
+#define MC6852_TAG      "13b"
+#define HC55516_TAG     "1m"
+#define M6522_1_TAG     "m6522_1"
+#define M6522_2_TAG     "m6522_2"
+#define M6522_3_TAG     "m6522_3"
+#define M6522_4_TAG     "m6522_4"
+#define M6522_5_TAG     "m6522_5"
+#define M6522_6_TAG     "m6522_6"
+#define CENTRONICS_TAG  "centronics"
 
 class victor9k_state : public driver_device
 {
 public:
 	victor9k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8088_TAG),
-		  m_fdc_cpu(*this, I8048_TAG),
-		  m_ieee488(*this, IEEE488_TAG),
-		  m_pic(*this, I8259A_TAG),
-		  m_ssda(*this, MC6852_TAG),
-		  m_via1(*this, M6522_1_TAG),
-		  m_via2(*this, M6522_2_TAG),
-		  m_cvsd(*this, HC55516_TAG),
-		  m_crtc(*this, HD46505S_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
-		  m_kb(*this, VICTOR9K_KEYBOARD_TAG)
+			m_maincpu(*this, I8088_TAG),
+			m_fdc_cpu(*this, I8048_TAG),
+			m_ieee488(*this, IEEE488_TAG),
+			m_pic(*this, I8259A_TAG),
+			m_ssda(*this, MC6852_TAG),
+			m_via1(*this, M6522_1_TAG),
+			m_via2(*this, M6522_2_TAG),
+			m_cvsd(*this, HC55516_TAG),
+			m_crtc(*this, HD46505S_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, FLOPPY_0),
+			m_floppy1(*this, FLOPPY_1),
+			m_kb(*this, VICTOR9K_KEYBOARD_TAG)
 	,
 		m_video_ram(*this, "video_ram"){ }
 
@@ -120,11 +120,11 @@ public:
 	int m_ssda_irq;
 
 	/* floppy state */
-	int m_lms[2];						/* motor speed */
-	int m_st[2];						/* stepper phase */
-	int m_se[2];						/* stepper enable */
-	int m_drive;						/* selected drive */
-	int m_side;							/* selected side */
+	int m_lms[2];                       /* motor speed */
+	int m_st[2];                        /* stepper phase */
+	int m_se[2];                        /* stepper enable */
+	int m_drive;                        /* selected drive */
+	int m_side;                         /* selected side */
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_b_w);
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_a_w);
 };

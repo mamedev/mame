@@ -38,7 +38,7 @@ static void draw_layer( running_machine &machine, bitmap_ind16 &bitmap, const re
 					color,
 					state->flip_screen(),state->flip_screen(),
 					sx,sy,15);
-			if (sx > 248)	/* wraparound */
+			if (sx > 248)   /* wraparound */
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						code,
 						color,
@@ -63,7 +63,7 @@ static int draw_layer_daikaiju( running_machine &machine, bitmap_ind16 &bitmap, 
 	{
 		int base, y, sx, sy, code, color;
 
-		 //id change
+			//id change
 		if (id != state->m_scrollram[offs + 2])
 		{
 			*previd = id;
@@ -126,7 +126,7 @@ static int draw_layer_daikaiju( running_machine &machine, bitmap_ind16 &bitmap, 
 					color,
 					state->flip_screen(),state->flip_screen(),
 					sx,sy,15);
-				if (sx > 248)	/* wraparound */
+				if (sx > 248)   /* wraparound */
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						code,
 						color,
@@ -215,6 +215,6 @@ UINT32 lsasquad_state::screen_update_daikaiju(screen_device &screen, bitmap_ind1
 	bitmap.fill(511, cliprect);
 	drawbg(machine(), bitmap, cliprect, 0); // bottom
 	draw_sprites(machine(), bitmap, cliprect);
-	drawbg(machine(), bitmap, cliprect, 1);	// top = palette $d ?
+	drawbg(machine(), bitmap, cliprect, 1); // top = palette $d ?
 	return 0;
 }

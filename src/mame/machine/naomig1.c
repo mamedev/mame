@@ -253,4 +253,3 @@ void naomi_g1_device::dma(void *dma_ptr, UINT32 main_adr, UINT32 size, bool to_m
 	ddt.mode = -1;
 	sh4_dma_ddt(cpu, &ddt);
 }
-

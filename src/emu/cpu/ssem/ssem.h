@@ -53,16 +53,16 @@ public:
 	inline void program_write32(UINT32 addr, UINT32 data);
 
 	// CPU registers
-    UINT32 m_pc;
-    UINT32 m_shifted_pc;
-    UINT32 m_a;
-    UINT32 m_halt;
+	UINT32 m_pc;
+	UINT32 m_shifted_pc;
+	UINT32 m_a;
+	UINT32 m_halt;
 
 	// other internal states
-    int m_icount;
+	int m_icount;
 
 	// address spaces
-    address_space *m_program;
+	address_space *m_program;
 };
 
 // device type definition
@@ -74,9 +74,9 @@ extern const device_type SSEMCPU;
 
 enum
 {
-    SSEM_PC = 1,
-    SSEM_A,
-    SSEM_HALT,
+	SSEM_PC = 1,
+	SSEM_A,
+	SSEM_HALT,
 };
 
 CPU_DISASSEMBLE( ssem );

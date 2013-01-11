@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_EPSON_SIO_ADD(_tag) \
-    MCFG_DEVICE_ADD(_tag, EPSON_SIO, 0) \
+	MCFG_DEVICE_ADD(_tag, EPSON_SIO, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, NULL, NULL, false)
 
 
@@ -32,7 +32,7 @@ class device_epson_sio_interface;
 
 
 class epson_sio_device : public device_t,
-                         public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -50,7 +50,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-    device_epson_sio_interface *m_cart;
+	device_epson_sio_interface *m_cart;
 };
 
 

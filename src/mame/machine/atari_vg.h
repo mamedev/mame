@@ -15,19 +15,19 @@
 	MCFG_DEVICE_ADD(_tag, ATARIVGEAROM, 0)
 
 
-#define EAROM_SIZE	0x40
+#define EAROM_SIZE  0x40
 
 // ======================> atari_vg_earom_device
 
-class atari_vg_earom_device :	public device_t,
+class atari_vg_earom_device :   public device_t,
 						public device_nvram_interface
 {
 public:
 	// construction/destruction
 	atari_vg_earom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_nvram_interface overrides

@@ -41,7 +41,7 @@
 // ======================> base_d9060_device
 
 class base_d9060_device :  public device_t,
-						   public device_ieee488_interface
+							public device_ieee488_interface
 {
 
 public:
@@ -52,7 +52,7 @@ public:
 	};
 
 	// construction/destruction
-    base_d9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	base_d9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -74,10 +74,10 @@ public:
 	DECLARE_WRITE8_MEMBER( scsi_data_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state);
@@ -94,9 +94,9 @@ private:
 	required_device<scsicb_device> m_sasibus;
 
 	// IEEE-488 bus
-	int m_rfdo;							// not ready for data output
-	int m_daco;							// not data accepted output
-	int m_atna;							// attention acknowledge
+	int m_rfdo;                         // not ready for data output
+	int m_daco;                         // not data accepted output
+	int m_atna;                         // attention acknowledge
 
 	// SASI bus
 	int m_enable;
@@ -111,8 +111,8 @@ private:
 class d9060_device :  public base_d9060_device
 {
 public:
-    // construction/destruction
-    d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -121,8 +121,8 @@ public:
 class d9090_device :  public base_d9060_device
 {
 public:
-    // construction/destruction
-    d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

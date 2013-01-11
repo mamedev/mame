@@ -39,51 +39,51 @@
 
 const UINT8 masterVolumeLevels[16] =
 {
-    0,  17,  34,  51,  68,  85, 102, 119,
-  136, 153, 170, 187, 204, 221, 238, 255
+	0,  17,  34,  51,  68,  85, 102, 119,
+	136, 153, 170, 187, 204, 221, 238, 255
 };
 
 static UINT16 masterAmplModTable[16*256];
 
 static const float attackTimes[16] =
 {
-  /* milliseconds */
+	/* milliseconds */
 #if defined(SID_REFTIMES)
-    2.0f,   8.0f,  16.0f,  24.0f,   38.0f,   56.0f,   68.0f,   80.0f,
-  100.0f, 250.0f, 500.0f, 800.0f, 1000.0f, 3000.0f, 5000.0f, 8000.0f
+	2.0f,   8.0f,  16.0f,  24.0f,   38.0f,   56.0f,   68.0f,   80.0f,
+	100.0f, 250.0f, 500.0f, 800.0f, 1000.0f, 3000.0f, 5000.0f, 8000.0f
 #else
-   2.2528606f,  8.0099577f, 15.7696042f, 23.7795619f, 37.2963655f, 55.0684591f,
-  66.8330845f, 78.3473987f,
-  98.1219818f, 244.554021f, 489.108042f, 782.472742f, 977.715461f, 2933.64701f,
-  4889.07793f, 7822.72493f
+	2.2528606f,  8.0099577f, 15.7696042f, 23.7795619f, 37.2963655f, 55.0684591f,
+	66.8330845f, 78.3473987f,
+	98.1219818f, 244.554021f, 489.108042f, 782.472742f, 977.715461f, 2933.64701f,
+	4889.07793f, 7822.72493f
 #endif
 };
 
 static const float decayReleaseTimes[16] =
 {
-  /* milliseconds */
+	/* milliseconds */
 #if defined(SID_REFTIMES)
-    8.0f,  24.0f,   48.0f,   72.0f,  114.0f,  168.0f,   204.0f,   240.0f,
-  300.0f, 750.0f, 1500.0f, 2400.0f, 3000.0f, 9000.0f, 15000.0f, 24000.0f
+	8.0f,  24.0f,   48.0f,   72.0f,  114.0f,  168.0f,   204.0f,   240.0f,
+	300.0f, 750.0f, 1500.0f, 2400.0f, 3000.0f, 9000.0f, 15000.0f, 24000.0f
 #else
-  8.91777693f,  24.594051f, 48.4185907f, 73.0116639f, 114.512475f, 169.078356f,
-  205.199432f, 240.551975f,
-  301.266125f, 750.858245f, 1501.71551f, 2402.43682f, 3001.89298f, 9007.21405f,
-   15010.998f, 24018.2111f
+	8.91777693f,  24.594051f, 48.4185907f, 73.0116639f, 114.512475f, 169.078356f,
+	205.199432f, 240.551975f,
+	301.266125f, 750.858245f, 1501.71551f, 2402.43682f, 3001.89298f, 9007.21405f,
+	15010.998f, 24018.2111f
 #endif
 };
 
 #ifdef SID_FPUENVE
-  static float attackRates[16];
-  static float decayReleaseRates[16];
+	static float attackRates[16];
+	static float decayReleaseRates[16];
 #elif defined(DIRECT_FIXPOINT)
-  static UINT32 attackRates[16];
-  static UINT32 decayReleaseRates[16];
+	static UINT32 attackRates[16];
+	static UINT32 decayReleaseRates[16];
 #else
-  static UINT32 attackRates[16];
-  static UINT32 attackRatesP[16];
-  static UINT32 decayReleaseRates[16];
-  static UINT32 decayReleaseRatesP[16];
+	static UINT32 attackRates[16];
+	static UINT32 attackRatesP[16];
+	static UINT32 decayReleaseRates[16];
+	static UINT32 decayReleaseRatesP[16];
 #endif
 
 static const UINT32 attackTabLen = 255;
@@ -223,11 +223,11 @@ const ptr2sidUwordFunc enveModeTable[] =
 	&enveEmuStartShortAttack,
 	&enveEmuMute, &enveEmuMute, &enveEmuMute,
 	&enveEmuMute, &enveEmuMute, &enveEmuMute, &enveEmuMute,
-    /* 32        */
+	/* 32        */
 	&enveEmuStartAttack, &enveEmuStartRelease,
 	&enveEmuAlterAttack, &enveEmuAlterDecay, &enveEmuAlterSustain, &enveEmuAlterRelease,
 	&enveEmuAlterSustainDecay, &enveEmuMute,
-    /* 48        */
+	/* 48        */
 	&enveEmuStartShortAttack,
 	&enveEmuMute, &enveEmuMute, &enveEmuMute,
 	&enveEmuMute, &enveEmuMute, &enveEmuMute, &enveEmuMute
@@ -548,7 +548,7 @@ INLINE UINT16 enveEmuShortAttack(sidOperator* pVoice)
 #else
 	pVoice->enveVol = pVoice->enveStep;
 #endif
-    pVoice->enveShortAttackCount--;
+	pVoice->enveShortAttackCount--;
 /*  cout << hex << pVoice->enveShortAttackCount << " / " << pVoice->enveVol << endl; */
 	enveEmuEnveAdvance(pVoice);
 	return masterAmplModTable[ pVoice->sid->masterVolumeAmplIndex + pVoice->enveVol ];

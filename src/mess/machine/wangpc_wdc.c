@@ -16,14 +16,14 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define OPTION_ID		0x01
+#define OPTION_ID       0x01
 
-#define Z80_TAG			"l53"
-#define MK3882_TAG		"l07"
+#define Z80_TAG         "l53"
+#define MK3882_TAG      "l07"
 
-#define OPTION_DREQ1	BIT(m_option, 1)
-#define OPTION_DREQ2	BIT(m_option, 2)
-#define OPTION_DREQ3	BIT(m_option, 3)
+#define OPTION_DREQ1    BIT(m_option, 1)
+#define OPTION_DREQ2    BIT(m_option, 2)
+#define OPTION_DREQ3    BIT(m_option, 3)
 
 
 
@@ -92,10 +92,10 @@ ADDRESS_MAP_END
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	// interrupt handler
-	DEVCB_NULL,	// ZC/TO0 callback
-	DEVCB_NULL,	// ZC/TO1 callback
-	DEVCB_NULL	// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), // interrupt handler
+	DEVCB_NULL, // ZC/TO0 callback
+	DEVCB_NULL, // ZC/TO1 callback
+	DEVCB_NULL  // ZC/TO2 callback
 };
 
 
@@ -317,18 +317,18 @@ READ8_MEMBER( wangpc_wdc_device::port_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	return 0x72; // TODO
 }

@@ -333,11 +333,11 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 			if (clip.max_x>visarea.max_x) clip.max_x = visarea.max_x;
 
 			/*
-              m_luck_vram1  tttt tttt   (t = low tile bits)
-              m_luck_vram2  tttt ppp?   (t = high tile bits) (p = pal select)?
+			  m_luck_vram1  tttt tttt   (t = low tile bits)
+			  m_luck_vram2  tttt ppp?   (t = high tile bits) (p = pal select)?
 
 
-             */
+			 */
 
 			tile |= (tile_high & 0xf0) << 4;
 			if (tileattr & 0x02) tile |= 0x1000;
@@ -517,14 +517,14 @@ WRITE8_MEMBER(luckgrln_state::lamps_a_w)
     x--- ----  TAKE
 
 */
-	output_set_lamp_value(0, (data >> 0) & 1);		/* HOLD1 */
-	output_set_lamp_value(1, (data >> 1) & 1);		/* HOLD2 */
-	output_set_lamp_value(2, (data >> 2) & 1);		/* HOLD3 */
-	output_set_lamp_value(3, (data >> 3) & 1);		/* HOLD4 */
-	output_set_lamp_value(4, (data >> 4) & 1);		/* HOLD5 */
-	output_set_lamp_value(5, (data >> 5) & 1);		/* START */
-	output_set_lamp_value(6, (data >> 6) & 1);		/* BET */
-	output_set_lamp_value(7, (data >> 7) & 1);		/* TAKE */
+	output_set_lamp_value(0, (data >> 0) & 1);      /* HOLD1 */
+	output_set_lamp_value(1, (data >> 1) & 1);      /* HOLD2 */
+	output_set_lamp_value(2, (data >> 2) & 1);      /* HOLD3 */
+	output_set_lamp_value(3, (data >> 3) & 1);      /* HOLD4 */
+	output_set_lamp_value(4, (data >> 4) & 1);      /* HOLD5 */
+	output_set_lamp_value(5, (data >> 5) & 1);      /* START */
+	output_set_lamp_value(6, (data >> 6) & 1);      /* BET */
+	output_set_lamp_value(7, (data >> 7) & 1);      /* TAKE */
 }
 
 WRITE8_MEMBER(luckgrln_state::lamps_b_w)
@@ -540,10 +540,10 @@ WRITE8_MEMBER(luckgrln_state::lamps_b_w)
     xx-- ----  unused
 
 */
-	output_set_lamp_value(8, (data >> 0) & 1);		/* D-UP */
-	output_set_lamp_value(9, (data >> 1) & 1);		/* HIGH */
-	output_set_lamp_value(10, (data >> 2) & 1);		/* LOW */
-	output_set_lamp_value(11, (data >> 3) & 1);		/* CANCEL */
+	output_set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
+	output_set_lamp_value(9, (data >> 1) & 1);      /* HIGH */
+	output_set_lamp_value(10, (data >> 2) & 1);     /* LOW */
+	output_set_lamp_value(11, (data >> 3) & 1);     /* CANCEL */
 }
 
 WRITE8_MEMBER(luckgrln_state::counters_w)
@@ -558,10 +558,10 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
     xxxx ----  unused
 
 */
-	coin_counter_w(machine(), 0, data & 0x01);	/* COIN 1 */
-	coin_counter_w(machine(), 1, data & 0x04);	/* COIN 2 */
-	coin_counter_w(machine(), 2, data & 0x08);	/* COIN 3 */
-	coin_counter_w(machine(), 3, data & 0x02);	/* KEY IN */
+	coin_counter_w(machine(), 0, data & 0x01);  /* COIN 1 */
+	coin_counter_w(machine(), 1, data & 0x04);  /* COIN 2 */
+	coin_counter_w(machine(), 2, data & 0x08);  /* COIN 3 */
+	coin_counter_w(machine(), 3, data & 0x02);  /* KEY IN */
 }
 
 
@@ -633,9 +633,9 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( luckgrln )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_CODE(KEYCODE_1) PORT_NAME("Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )		PORT_NAME("Play")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_CODE(KEYCODE_1) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
@@ -679,22 +679,22 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R)	PORT_NAME("Reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)	PORT_NAME("Service In")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R)   PORT_NAME("Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)   PORT_NAME("Service In")
 	PORT_DIPNAME( 0x04, 0x04, "IN3" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W)	PORT_NAME("Credit Clear")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W)   PORT_NAME("Credit Clear")
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0)	PORT_NAME("Books SW")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0)   PORT_NAME("Books SW")
 
 	PORT_START("DSW1") //DIP SW 1
 	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )
@@ -975,16 +975,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
@@ -999,7 +999,7 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", luckgrln_state,  luckgrln_irq)
 
-	MCFG_MC6845_ADD("crtc", H46505, 6000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, 6000000/4, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1102,4 +1102,3 @@ ROM_END
        YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                  LAYOUT  */
 GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NO_SOUND, layout_luckgrln )
 GAMEL( 1993, 7smash, 0,        _7smash,  _7smash, driver_device,  0,        ROT0, "Sovic",          "7 Smash", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND, layout_luckgrln )
-

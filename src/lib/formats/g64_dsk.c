@@ -27,8 +27,8 @@
     PARAMETERS
 ***************************************************************************/
 
-#define HEADER_LENGTH		0x2ac			// standard length for 84 half tracks
-#define MAX_TRACKS			84
+#define HEADER_LENGTH       0x2ac           // standard length for 84 half tracks
+#define MAX_TRACKS          84
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -37,11 +37,11 @@
 struct g64dsk_tag
 {
 	int version;
-	int heads;								// number of physical heads
-	int tracks;								// number of physical tracks
-	UINT16 track_size[MAX_TRACKS];			// size of each track
-	UINT32 track_offset[MAX_TRACKS];		// offset within data for each track
-	UINT32 speed_zone_offset[MAX_TRACKS];	// offset within data for each track
+	int heads;                              // number of physical heads
+	int tracks;                             // number of physical tracks
+	UINT16 track_size[MAX_TRACKS];          // size of each track
+	UINT32 track_offset[MAX_TRACKS];        // offset within data for each track
+	UINT32 speed_zone_offset[MAX_TRACKS];   // offset within data for each track
 };
 
 /***************************************************************************
@@ -137,14 +137,14 @@ static floperr_t g64_read_track(floppy_image_legacy *floppy, int head, int track
 {
 	/*
 
-        The following is written into the buffer:
+	    The following is written into the buffer:
 
-        n bytes of track data
-        1982 bytes of speed zone data
+	    n bytes of track data
+	    1982 bytes of speed zone data
 
-        get_track_size() returns n (size of track data)
+	    get_track_size() returns n (size of track data)
 
-    */
+	*/
 
 	struct g64dsk_tag *tag = get_tag(floppy);
 	floperr_t err;

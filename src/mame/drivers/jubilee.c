@@ -83,7 +83,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_8MHz	/* guess */
+#define MASTER_CLOCK    XTAL_8MHz   /* guess */
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
@@ -167,7 +167,7 @@ INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_SHARE("videoram")	/* wrong... just placed somewhere */
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_SHARE("videoram") /* wrong... just placed somewhere */
 	AM_RANGE(0x3100, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -395,16 +395,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -415,7 +415,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/2)	/* guess */
+	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/2)   /* guess */
 	MCFG_CPU_PROGRAM_MAP(jubileep_map)
 	MCFG_CPU_IO_MAP(jubileep_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
@@ -444,14 +444,14 @@ MACHINE_CONFIG_END
 
 ROM_START( jubileep )
 	ROM_REGION( 0x4000, "maincpu", 0 ) /* TMS9980 code */
-	ROM_LOAD( "1_ic59.bin",	0x0000, 0x1000, CRC(534c81c2) SHA1(4ce1d4492de9cbbc37e5a946b1183d8e8b0ba989) )
-	ROM_LOAD( "2_ic58.bin",	0x1000, 0x1000, CRC(69984028) SHA1(c919a5cb43f23a0d9e496107997c74799709b347) )
-	ROM_LOAD( "3_ic57.bin",	0x2000, 0x1000, CRC(c9ae423d) SHA1(8321e3e6fd60d92202b0c7b47e2a333a567b5c22) )
+	ROM_LOAD( "1_ic59.bin", 0x0000, 0x1000, CRC(534c81c2) SHA1(4ce1d4492de9cbbc37e5a946b1183d8e8b0ba989) )
+	ROM_LOAD( "2_ic58.bin", 0x1000, 0x1000, CRC(69984028) SHA1(c919a5cb43f23a0d9e496107997c74799709b347) )
+	ROM_LOAD( "3_ic57.bin", 0x2000, 0x1000, CRC(c9ae423d) SHA1(8321e3e6fd60d92202b0c7b47e2a333a567b5c22) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "ic49.bin",	0x0000, 0x2000, CRC(ec65d259) SHA1(9e82e4043cbea26b91965a19507a5f00dc3ba01a) )
-	ROM_LOAD( "ic48.bin",	0x2000, 0x2000, CRC(74e9ffd9) SHA1(7349fea72a349a58014b795ec6c29647e7159d39) )
-	ROM_LOAD( "ic47.bin",	0x4000, 0x2000, CRC(55dc8482) SHA1(53f22bd66e5fcad5e2397998bc58109c3c19af96) )
+	ROM_LOAD( "ic49.bin",   0x0000, 0x2000, CRC(ec65d259) SHA1(9e82e4043cbea26b91965a19507a5f00dc3ba01a) )
+	ROM_LOAD( "ic48.bin",   0x2000, 0x2000, CRC(74e9ffd9) SHA1(7349fea72a349a58014b795ec6c29647e7159d39) )
+	ROM_LOAD( "ic47.bin",   0x4000, 0x2000, CRC(55dc8482) SHA1(53f22bd66e5fcad5e2397998bc58109c3c19af96) )
 ROM_END
 
 

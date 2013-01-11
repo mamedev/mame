@@ -70,13 +70,13 @@
 
 /* the following values depend on the VIC clock,
  * but to achieve TV-frequency the clock must have a fix frequency */
-#define TED7360_HSIZE	320
-#define TED7360_VSIZE	200
+#define TED7360_HSIZE   320
+#define TED7360_VSIZE   200
 
 /* of course you clock select an other clock, but for accurate */
 /* video timing (these are used in c16/c116/plus4) */
-#define TED7360NTSC_CLOCK	(14318180/4)
-#define TED7360PAL_CLOCK	(17734470/5)
+#define TED7360NTSC_CLOCK   (14318180/4)
+#define TED7360PAL_CLOCK    (17734470/5)
 
 /* pal 50 Hz vertical screen refresh, screen consists of 312 lines
  * ntsc 60 Hz vertical screen refresh, screen consists of 262 lines */
@@ -93,21 +93,21 @@
 
 struct mos7360_interface
 {
-	const char			*m_screen_tag;
-	const char			*m_cpu_tag;
+	const char          *m_screen_tag;
+	const char          *m_cpu_tag;
 
-	devcb_write_line	m_out_irq_cb;
+	devcb_write_line    m_out_irq_cb;
 
-	devcb_read8			m_in_k_cb;
+	devcb_read8         m_in_k_cb;
 };
 
 
 // ======================> mos7360_device
 
 class mos7360_device :  public device_t,
-					    public device_memory_interface,
-					    public device_sound_interface,
-					    public mos7360_interface
+						public device_memory_interface,
+						public device_sound_interface,
+						public mos7360_interface
 {
 public:
 	// construction/destruction
@@ -168,12 +168,12 @@ protected:
 	void drawlines(int first, int last);
 	void soundport_w(int offset, int data);
 
-	const address_space_config		m_videoram_space_config;
+	const address_space_config      m_videoram_space_config;
 
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_read8		m_in_k_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_read8        m_in_k_func;
 
-	screen_device *m_screen;			// screen which sets bitmap properties
+	screen_device *m_screen;            // screen which sets bitmap properties
 	cpu_device *m_cpu;
 	sound_stream *m_stream;
 
@@ -205,9 +205,9 @@ protected:
 	UINT8 *m_noise;
 	int m_tone1pos, m_tone2pos,
 	m_tone1samples, m_tone2samples,
-	m_noisesize,		  /* number of samples */
+	m_noisesize,          /* number of samples */
 	m_noisepos,         /* pos of tone */
-	m_noisesamples;	  /* count of samples to give out per tone */
+	m_noisesamples;   /* count of samples to give out per tone */
 
 	int m_variant;
 };

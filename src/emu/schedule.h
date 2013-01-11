@@ -53,17 +53,17 @@
 
 // macro for the RC time constant on a 74LS123 with C > 1000pF
 // R is in ohms, C is in farads
-#define TIME_OF_74LS123(r,c)			(0.45 * (double)(r) * (double)(c))
+#define TIME_OF_74LS123(r,c)            (0.45 * (double)(r) * (double)(c))
 
 // macros for the RC time constant on a 555 timer IC
 // R is in ohms, C is in farads
-#define PERIOD_OF_555_MONOSTABLE_NSEC(r,c)	((attoseconds_t)(1100000000 * (double)(r) * (double)(c)))
-#define PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c)	((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
-#define PERIOD_OF_555_MONOSTABLE(r,c)		attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
-#define PERIOD_OF_555_ASTABLE(r1,r2,c)		attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
+#define PERIOD_OF_555_MONOSTABLE_NSEC(r,c)  ((attoseconds_t)(1100000000 * (double)(r) * (double)(c)))
+#define PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c) ((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
+#define PERIOD_OF_555_MONOSTABLE(r,c)       attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
+#define PERIOD_OF_555_ASTABLE(r1,r2,c)      attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
 
-#define TIMER_CALLBACK(name)			void name(running_machine &machine, void *ptr, int param)
-#define TIMER_CALLBACK_MEMBER(name)		void name(void *ptr, INT32 param)
+#define TIMER_CALLBACK(name)            void name(running_machine &machine, void *ptr, int param)
+#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, INT32 param)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -124,19 +124,19 @@ private:
 	void dump() const;
 
 	// internal state
-	running_machine *	m_machine;		// reference to the owning machine
-	emu_timer *			m_next;			// next timer in order in the list
-	emu_timer *			m_prev;			// previous timer in order in the list
-	timer_expired_delegate m_callback;	// callback function
-	INT32				m_param;		// integer parameter
-	void *				m_ptr;			// pointer parameter
-	bool				m_enabled;		// is the timer enabled?
-	bool				m_temporary;	// is the timer temporary?
-	attotime			m_period;		// the repeat frequency of the timer
-	attotime			m_start;		// time when the timer was started
-	attotime			m_expire;		// time when the timer will expire
-	device_t *			m_device;		// for device timers, a pointer to the device
-	device_timer_id		m_id;			// for device timers, the ID of the timer
+	running_machine *   m_machine;      // reference to the owning machine
+	emu_timer *         m_next;         // next timer in order in the list
+	emu_timer *         m_prev;         // previous timer in order in the list
+	timer_expired_delegate m_callback;  // callback function
+	INT32               m_param;        // integer parameter
+	void *              m_ptr;          // pointer parameter
+	bool                m_enabled;      // is the timer enabled?
+	bool                m_temporary;    // is the timer temporary?
+	attotime            m_period;       // the repeat frequency of the timer
+	attotime            m_start;        // time when the timer was started
+	attotime            m_expire;       // time when the timer will expire
+	device_t *          m_device;       // for device timers, a pointer to the device
+	device_timer_id     m_id;           // for device timers, the ID of the timer
 };
 
 
@@ -204,19 +204,19 @@ private:
 	void execute_timers();
 
 	// internal state
-	running_machine &			m_machine;					// reference to our machine
-	device_execute_interface *	m_executing_device;			// pointer to currently executing device
-	device_execute_interface *	m_execute_list;				// list of devices to be executed
-	attotime					m_basetime;					// global basetime; everything moves forward from here
+	running_machine &           m_machine;                  // reference to our machine
+	device_execute_interface *  m_executing_device;         // pointer to currently executing device
+	device_execute_interface *  m_execute_list;             // list of devices to be executed
+	attotime                    m_basetime;                 // global basetime; everything moves forward from here
 
 	// list of active timers
-	emu_timer *					m_timer_list;				// head of the active list
-	fixed_allocator<emu_timer>	m_timer_allocator;			// allocator for timers
+	emu_timer *                 m_timer_list;               // head of the active list
+	fixed_allocator<emu_timer>  m_timer_allocator;          // allocator for timers
 
 	// other internal states
-	emu_timer *					m_callback_timer;			// pointer to the current callback timer
-	bool						m_callback_timer_modified;	// true if the current callback timer was modified
-	attotime					m_callback_timer_expire_time; // the original expiration time
+	emu_timer *                 m_callback_timer;           // pointer to the current callback timer
+	bool                        m_callback_timer_modified;  // true if the current callback timer was modified
+	attotime                    m_callback_timer_expire_time; // the original expiration time
 
 	// scheduling quanta
 	class quantum_slot
@@ -226,15 +226,15 @@ private:
 	public:
 		quantum_slot *next() const { return m_next; }
 
-		quantum_slot *			m_next;
-		attoseconds_t			m_actual;					// actual duration of the quantum
-		attoseconds_t			m_requested;				// duration of the requested quantum
-		attotime				m_expire;					// absolute expiration time of this quantum
+		quantum_slot *          m_next;
+		attoseconds_t           m_actual;                   // actual duration of the quantum
+		attoseconds_t           m_requested;                // duration of the requested quantum
+		attotime                m_expire;                   // absolute expiration time of this quantum
 	};
-	simple_list<quantum_slot>	m_quantum_list;				// list of active quanta
-	fixed_allocator<quantum_slot> m_quantum_allocator;		// allocator for quanta
-	attoseconds_t				m_quantum_minimum;			// duration of minimum quantum
+	simple_list<quantum_slot>   m_quantum_list;             // list of active quanta
+	fixed_allocator<quantum_slot> m_quantum_allocator;      // allocator for quanta
+	attoseconds_t               m_quantum_minimum;          // duration of minimum quantum
 };
 
 
-#endif	// __SCHEDULE_H__ */
+#endif  // __SCHEDULE_H__ */

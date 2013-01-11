@@ -20,8 +20,8 @@ class irisha_state : public driver_device
 public:
 	irisha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_pit(*this, "pit8253"),
-		  m_speaker(*this, SPEAKER_TAG)
+			m_pit(*this, "pit8253"),
+			m_speaker(*this, SPEAKER_TAG)
 		{ }
 
 	required_device<pit8253_device> m_pit;

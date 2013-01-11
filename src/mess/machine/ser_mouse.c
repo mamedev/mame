@@ -14,8 +14,8 @@ const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_dev
 
 serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_rs232_port_interface(mconfig, *this),
-	  device_serial_interface(mconfig, *this)
+		device_rs232_port_interface(mconfig, *this),
+		device_serial_interface(mconfig, *this)
 {
 }
 

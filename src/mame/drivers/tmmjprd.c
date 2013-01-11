@@ -39,9 +39,9 @@ class tmmjprd_state : public driver_device
 public:
 	tmmjprd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_tilemap_regs(*this, "tilemap_regs"),
-		  m_spriteregs(*this, "spriteregs"),
-		  m_spriteram(*this, "spriteram") { }
+			m_tilemap_regs(*this, "tilemap_regs"),
+			m_spriteregs(*this, "spriteregs"),
+			m_spriteram(*this, "spriteram") { }
 
 	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
 	required_shared_ptr<UINT32> m_spriteregs;
@@ -304,14 +304,14 @@ UINT32 tmmjprd_state::screen_update_tmmjprd_left(screen_device &screen, bitmap_i
 	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[2], m_tilemap_regs[2], gfxroms );
 
 	/*
-    popmessage("%08x %08x %08x %08x %08x %08x",
-    m_tilemap_regs[2][0],
-    m_tilemap_regs[2][1],
-    m_tilemap_regs[2][2],
-    m_tilemap_regs[2][3],
-    m_tilemap_regs[2][4],
-    m_tilemap_regs[2][5]);
-    */
+	popmessage("%08x %08x %08x %08x %08x %08x",
+	m_tilemap_regs[2][0],
+	m_tilemap_regs[2][1],
+	m_tilemap_regs[2][2],
+	m_tilemap_regs[2][3],
+	m_tilemap_regs[2][4],
+	m_tilemap_regs[2][5]);
+	*/
 
 /*
     popmessage("%08x %08x %08x %08x %08x %08x %08x",
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Right Screen Coin B") // might actually be service 1
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	// CHECK!
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   // CHECK!
 
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
@@ -682,7 +682,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE_LEGACY(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
 	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
-    AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
+	AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("tmmjprd_viewregs7")
 //  AM_RANGE(0x200700, 0x20070f) AM_WRITE(tmmjprd_blitter_w) AM_SHARE("tmmjprd_blitterregs")
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("tmmjprd_viewregs9") // never changes?
@@ -853,7 +853,7 @@ ROM_START( tmpdoki )
 	ROM_LOAD32_WORD( "51.bin", 0x0800002, 0x400000, CRC(6ba1d2ec) SHA1(bbe7309b33f213c8cb9ab7adb3221ea79f89e8b0) )
 
 	/* I think these should be different, the game attempts to draw tiles from here for the title logo, but
-       the tiles are empty.  Once the ROM check is hooked up this will be easier to confirm */
+	   the tiles are empty.  Once the ROM check is hooked up this will be easier to confirm */
 	ROM_LOAD32_WORD( "60.bin", 0x1000000, 0x400000, BAD_DUMP CRC(7cb132e0) SHA1(f9c366befec46c7f6e307111a62eede029202b16) )
 	ROM_LOAD32_WORD( "61.bin", 0x1000002, 0x400000, BAD_DUMP CRC(caa7e854) SHA1(592867e001abd0781f83a5124bf9aa62ad1aa7f3) )
 	ROM_LOAD32_WORD( "70.bin", 0x1800000, 0x400000, BAD_DUMP CRC(9b737ae4) SHA1(0b62a90d42ace81ee32db073a57731a55a32f989) )

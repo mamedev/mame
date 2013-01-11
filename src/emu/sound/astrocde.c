@@ -45,26 +45,26 @@
 
 struct astrocade_state
 {
-	sound_stream *stream;		/* sound stream */
+	sound_stream *stream;       /* sound stream */
 
-	UINT8		reg[8];			/* 8 control registers */
+	UINT8       reg[8];         /* 8 control registers */
 
-	UINT8		master_count;	/* current master oscillator count */
-	UINT16		vibrato_clock;	/* current vibrato clock */
+	UINT8       master_count;   /* current master oscillator count */
+	UINT16      vibrato_clock;  /* current vibrato clock */
 
-	UINT8		noise_clock;	/* current noise generator clock */
-	UINT16		noise_state;	/* current noise LFSR state */
+	UINT8       noise_clock;    /* current noise generator clock */
+	UINT16      noise_state;    /* current noise LFSR state */
 
-	UINT8		a_count;		/* current tone generator A count */
-	UINT8		a_state;		/* current tone generator A state */
+	UINT8       a_count;        /* current tone generator A count */
+	UINT8       a_state;        /* current tone generator A state */
 
-	UINT8		b_count;		/* current tone generator B count */
-	UINT8		b_state;		/* current tone generator B state */
+	UINT8       b_count;        /* current tone generator B count */
+	UINT8       b_state;        /* current tone generator B state */
 
-	UINT8		c_count;		/* current tone generator C count */
-	UINT8		c_state;		/* current tone generator C state */
+	UINT8       c_count;        /* current tone generator C count */
+	UINT8       c_state;        /* current tone generator C state */
 
-	UINT8		bitswap[256];	/* bitswap table */
+	UINT8       bitswap[256];   /* bitswap table */
 };
 
 
@@ -305,7 +305,7 @@ const device_type ASTROCADE = &device_creator<astrocade_device>;
 
 astrocade_device::astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASTROCADE, "Astrocade", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(astrocade_state);
 }
@@ -347,5 +347,3 @@ void astrocade_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

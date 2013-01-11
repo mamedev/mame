@@ -18,8 +18,8 @@ class isa8_ega_device :
 		public device_isa8_card_interface
 {
 public:
-        // construction/destruction
-        isa8_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		isa8_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		isa8_ega_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
@@ -41,9 +41,9 @@ public:
 		DECLARE_WRITE_LINE_MEMBER(vblank_changed);
 
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 
 		UINT8 alu_op( UINT8 data, UINT8 latch_data );
 
@@ -55,47 +55,47 @@ public:
 		DECLARE_WRITE8_MEMBER(pc_ega8_3X0_w);
 		DECLARE_READ8_MEMBER(pc_ega8_3X0_r);
 
-		crtc_ega_update_row_func	m_update_row;
+		crtc_ega_update_row_func    m_update_row;
 
 		/* Video memory and related variables */
-		memory_region	*m_vram;
-		UINT8	*m_plane[4];
-		UINT8	m_read_latch[4];
-		UINT8	*m_videoram;
-		UINT8	*m_charA;
-		UINT8	*m_charB;
+		memory_region   *m_vram;
+		UINT8   *m_plane[4];
+		UINT8   m_read_latch[4];
+		UINT8   *m_videoram;
+		UINT8   *m_charA;
+		UINT8   *m_charB;
 
 		/* Registers */
-		UINT8	m_misc_output;
-		UINT8	m_feature_control;
+		UINT8   m_misc_output;
+		UINT8   m_feature_control;
 
 		/* Attribute registers AR00 - AR14
-        */
+		*/
 		struct {
-			UINT8	index;
-			UINT8	data[32];
-			UINT8	index_write;
+			UINT8   index;
+			UINT8   data[32];
+			UINT8   index_write;
 		} m_attribute;
 
 		/* Sequencer registers SR00 - SR04
-        */
+		*/
 		struct {
-			UINT8	index;
-			UINT8	data[8];
+			UINT8   index;
+			UINT8   data[8];
 		} m_sequencer;
 
 		/* Graphics controller registers GR00 - GR08
-        */
+		*/
 		struct {
-			UINT8	index;
-			UINT8	data[16];
+			UINT8   index;
+			UINT8   data[16];
 		} m_graphics_controller;
 
-		UINT8	m_frame_cnt;
-		UINT8	m_hsync;
-		UINT8	m_vsync;
-		UINT8	m_vblank;
-		UINT8	m_display_enable;
+		UINT8   m_frame_cnt;
+		UINT8   m_hsync;
+		UINT8   m_vsync;
+		UINT8   m_vblank;
+		UINT8   m_display_enable;
 };
 
 
@@ -103,4 +103,3 @@ public:
 extern const device_type ISA8_EGA;
 
 #endif  /* __ISA_EGA_H__ */
-

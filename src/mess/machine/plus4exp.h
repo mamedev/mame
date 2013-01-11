@@ -48,7 +48,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define PLUS4_EXPANSION_SLOT_TAG		"exp"
+#define PLUS4_EXPANSION_SLOT_TAG        "exp"
 
 
 
@@ -61,8 +61,8 @@
 
 
 #define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, PLUS4_EXPANSION_SLOT, _clock) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, PLUS4_EXPANSION_SLOT, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -75,10 +75,10 @@
 
 struct plus4_expansion_slot_interface
 {
-	devcb_read8			m_in_dma_cd_cb;
-	devcb_write8		m_out_dma_cd_cb;
-    devcb_write_line	m_out_irq_cb;
-    devcb_write_line	m_out_aec_cb;
+	devcb_read8         m_in_dma_cd_cb;
+	devcb_write8        m_out_dma_cd_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_aec_cb;
 };
 
 
@@ -134,10 +134,10 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	devcb_resolved_read8		m_in_dma_cd_func;
-	devcb_resolved_write8		m_out_dma_cd_func;
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_aec_func;
+	devcb_resolved_read8        m_in_dma_cd_func;
+	devcb_resolved_write8       m_out_dma_cd_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_aec_func;
 
 	device_plus4_expansion_card_interface *m_cart;
 };

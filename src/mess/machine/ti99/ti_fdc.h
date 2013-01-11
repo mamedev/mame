@@ -45,36 +45,35 @@ private:
 
 
 	// Holds the status of the DRQ and IRQ lines.
-	bool		m_DRQ, m_IRQ;
+	bool        m_DRQ, m_IRQ;
 
 	// When TRUE, keeps DVENA high.
-	bool		m_strobe_motor;
+	bool        m_strobe_motor;
 
 	// Signal DVENA. When TRUE, makes some drive turning.
-	line_state	m_DVENA;
+	line_state  m_DVENA;
 
 	// When TRUE the CPU is halted while DRQ/IRQ are true.
-	bool		m_hold;
+	bool        m_hold;
 
 	// Indicates which drive has been selected. Values are 0, 1, 2, and 4.
 	// 000 = no drive
 	// 001 = drive 1
 	// 010 = drive 2
 	// 100 = drive 3
-	int			m_DSEL;
+	int         m_DSEL;
 
 	// Signal SIDSEL. 0 or 1, indicates the selected head.
-	int			m_SIDSEL;
+	int         m_SIDSEL;
 
 	// count 4.23s from rising edge of motor_on
-	emu_timer*	m_motor_on_timer;
+	emu_timer*  m_motor_on_timer;
 
 	// Link to the FDC1771 controller on the board.
-	device_t*	m_controller;
+	device_t*   m_controller;
 
 	// DSR ROM
-	UINT8*		m_dsrrom;
+	UINT8*      m_dsrrom;
 };
 
 #endif
-

@@ -1636,39 +1636,39 @@ static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 	copd2_table_4[copd2_offs/8] = cop_43c;
 #if 0
 
-    {
-        FILE *fp;
-        char filename[256];
-        sprintf(filename,"copdat_%s.table2", machine.system().name);
-        fp=fopen(filename, "w+b");
-        if (fp)
-        {
-            fwrite(copd2_table_2, 0x200/8, 1, fp);
-            fclose(fp);
-        }
-    }
-    {
-        FILE *fp;
-        char filename[256];
-        sprintf(filename,"copdat_%s.table3", machine.system().name);
-        fp=fopen(filename, "w+b");
-        if (fp)
-        {
-            fwrite(copd2_table_3, 0x200/8, 1, fp);
-            fclose(fp);
-        }
-    }
-    {
-        FILE *fp;
-        char filename[256];
-        sprintf(filename,"copdat_%s.table4", machine.system().name);
-        fp=fopen(filename, "w+b");
-        if (fp)
-        {
-            fwrite(copd2_table_4, 0x200/8, 1, fp);
-            fclose(fp);
-        }
-    }
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"copdat_%s.table2", machine.system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(copd2_table_2, 0x200/8, 1, fp);
+			fclose(fp);
+		}
+	}
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"copdat_%s.table3", machine.system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(copd2_table_3, 0x200/8, 1, fp);
+			fclose(fp);
+		}
+	}
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"copdat_%s.table4", machine.system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(copd2_table_4, 0x200/8, 1, fp);
+			fclose(fp);
+		}
+	}
 
 	{
 		int i;
@@ -1767,17 +1767,17 @@ static void copd2_set_tabledata(running_machine &machine, UINT16 data)
 	}
 	//logerror("mcu_data %04x\n", data);
 #if 0
-    {
-        FILE *fp;
-        char filename[256];
-        sprintf(filename,"copdat_%s.data", machine.system().name);
-        fp=fopen(filename, "w+b");
-        if (fp)
-        {
-            fwrite(copd2_table, 0x200, 1, fp);
-            fclose(fp);
-        }
-    }
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"copdat_%s.data", machine.system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(copd2_table, 0x200, 1, fp);
+			fclose(fp);
+		}
+	}
 #endif
 }
 
@@ -1945,9 +1945,9 @@ READ16_HANDLER( copdxbl_0_r )
 		//  return cop_mcu_ram[offset];
 
 		case (0x700/2): return space.machine().root_device().ioport("DSW1")->read();
-		case (0x704/2):	return space.machine().root_device().ioport("PLAYERS12")->read();
-		case (0x708/2):	return space.machine().root_device().ioport("PLAYERS34")->read();
-		case (0x70c/2):	return space.machine().root_device().ioport("SYSTEM")->read();
+		case (0x704/2): return space.machine().root_device().ioport("PLAYERS12")->read();
+		case (0x708/2): return space.machine().root_device().ioport("PLAYERS34")->read();
+		case (0x70c/2): return space.machine().root_device().ioport("SYSTEM")->read();
 		case (0x71c/2): return space.machine().root_device().ioport("DSW2")->read();
 	}
 }
@@ -2011,10 +2011,10 @@ static UINT16 cop_rom_addr_lo,cop_rom_addr_hi,cop_rom_addr_unk;
 /* RE from Seibu Cup Soccer bootleg */
 static const UINT8 fade_table(int v)
 {
-    int low  = v & 0x001f;
-    int high = v & 0x03e0;
+	int low  = v & 0x001f;
+	int high = v & 0x03e0;
 
-    return (low * (high | (high >> 5)) + 0x210) >> 10;
+	return (low * (high | (high >> 5)) + 0x210) >> 10;
 }
 
 static UINT16 u1,u2;
@@ -2210,7 +2210,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 
 		/* triggered before 0x6200 in Seibu Cup, looks like an angle value ... */
-		case (0x01c/2): cop_angle_compare = INT8(cop_mcu_ram[0x1c/2]);	break;
+		case (0x01c/2): cop_angle_compare = INT8(cop_mcu_ram[0x1c/2]);  break;
 		case (0x01e/2): cop_angle_mod_val = INT8(cop_mcu_ram[0x1e/2]); break;
 
 		/* BCD Protection */
@@ -2225,11 +2225,11 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 		case (0x024/2):
 			/*
-            This looks like a register for the BCD...
-            Godzilla and Heated Barrel sets 3
-            Denjin Makai sets 3 at start-up and toggles between 2 and 3 during gameplay on the BCD subroutine
-            SD Gundam sets 0
-            */
+			This looks like a register for the BCD...
+			Godzilla and Heated Barrel sets 3
+			Denjin Makai sets 3 at start-up and toggles between 2 and 3 during gameplay on the BCD subroutine
+			SD Gundam sets 0
+			*/
 			break;
 
 		case (0x028/2):
@@ -2243,16 +2243,16 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* Command tables for 0x500 / 0x502 commands */
 		case (0x032/2): { copd2_set_tabledata(space.machine(), data); break; }
 		case (0x034/2): { copd2_set_tableoffset(space.machine(), data); break; }
-		case (0x038/2):	{ cop_438 = data; break; }
-		case (0x03a/2):	{ cop_43a = data; break; }
+		case (0x038/2): { cop_438 = data; break; }
+		case (0x03a/2): { cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
 		case (0x03e/2):
 			/*
-            0 in all 68k based games
-            0xffff in raiden2 / raidendx
-            0x2000 in zeroteam / xsedae
-            it's always setted up just before the 0x474 register
-            */
+			0 in all 68k based games
+			0xffff in raiden2 / raidendx
+			0x2000 in zeroteam / xsedae
+			it's always setted up just before the 0x474 register
+			*/
 			break;
 
 		case (0x044/2): { cop_scale = data & 3; break; }
@@ -2267,14 +2267,14 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* DMA / layer clearing section */
 		case (0x074/2):
 			/*
-            This sets up a DMA mode of some sort
-                0x0e00: grainbow, cupsoc
-                0x0a00: legionna, godzilla, denjinmk
-                0x0600: heatbrl
-                0x1e00: zeroteam, xsedae
-            raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
-            (both only uses 0x14 and 0x15 as DMAs)
-            */
+			This sets up a DMA mode of some sort
+			    0x0e00: grainbow, cupsoc
+			    0x0a00: legionna, godzilla, denjinmk
+			    0x0600: heatbrl
+			    0x1e00: zeroteam, xsedae
+			raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
+			(both only uses 0x14 and 0x15 as DMAs)
+			*/
 			break;
 
 		/* used in palette DMAs, for fading effects */
@@ -2357,7 +2357,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* search the uploaded 'trigger' table for a matching trigger*/
 			/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
 			/* note: Zero Team triggers macro 0x904 instead of 0x905, Seibu Cup Soccer triggers 0xe30e instead of 0xe38e. I highly doubt that AT LEAST
-               it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
+			   it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
 			for (i=0;i<32;i++)
 			{
 				if ((cop_mcu_ram[offset] & 0xff00) == (copd2_table_4[i] & 0xff00))
@@ -2396,19 +2396,19 @@ static WRITE16_HANDLER( generic_cop_w )
 			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
 
 			/*
-            Macro notes:
-            - endianess changes from/to Raiden 2:
-              dword ^= 0
-              word ^= 2
-              byte ^= 3
-            - some macro commands here have a commented algorithm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
-              The ROMs map tables in the following arrangement:
-              0x00000 - 0x1ffff Sine math results
-              0x20000 - 0x3ffff Cosine math results
-              0x40000 - 0x7ffff Division math results
-              0x80000 - 0xfffff Pythagorean theorem, hypotenuse length math results
-              Surprisingly atan maths are nowhere to be found from the roms.
-            */
+			Macro notes:
+			- endianess changes from/to Raiden 2:
+			  dword ^= 0
+			  word ^= 2
+			  byte ^= 3
+			- some macro commands here have a commented algorithm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
+			  The ROMs map tables in the following arrangement:
+			  0x00000 - 0x1ffff Sine math results
+			  0x20000 - 0x3ffff Cosine math results
+			  0x40000 - 0x7ffff Division math results
+			  0x80000 - 0xfffff Pythagorean theorem, hypotenuse length math results
+			  Surprisingly atan maths are nowhere to be found from the roms.
+			*/
 
 			/* "automatic" movement */
 			if(COP_CMD(0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
@@ -2439,16 +2439,16 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			/* SINE math - 0x8100 */
 			/*
-                 00000-0ffff:
-                   amp = x/256
-                   ang = x & 255
-                   s = sin(ang*2*pi/256)
-                   val = trunc(s*amp)
-                   if(s<0)
-                     val--
-                   if(s == 192)
-                     val = -2*amp
-            */
+			     00000-0ffff:
+			       amp = x/256
+			       ang = x & 255
+			       s = sin(ang*2*pi/256)
+			       val = trunc(s*amp)
+			       if(s<0)
+			         val--
+			       if(s == 192)
+			         val = -2*amp
+			*/
 			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				int raw_angle = (space.read_word(cop_register[0]+(0x34^2)) & 0xff);
@@ -2468,16 +2468,16 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			/* COSINE math - 0x8900 */
 			/*
-             10000-1ffff:
-               amp = x/256
-               ang = x & 255
-               s = cos(ang*2*pi/256)
-               val = trunc(s*amp)
-               if(s<0)
-                 val--
-               if(s == 128)
-                 val = -2*amp
-            */
+			 10000-1ffff:
+			   amp = x/256
+			   ang = x & 255
+			   s = cos(ang*2*pi/256)
+			   val = trunc(s*amp)
+			   if(s<0)
+			     val--
+			   if(s == 128)
+			     val = -2*amp
+			*/
 			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				int raw_angle = (space.read_word(cop_register[0]+(0x34^2)) & 0xff);
@@ -2549,11 +2549,11 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* Pythagorean theorem, hypotenuse length - 0x3bb0 */
 			//(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 			/*
-             40000-7ffff:
-               v1 = (x / 32768)*64
-               v2 = (x & 255)*32767/255
-               val = sqrt(v1*v1+v2*v2) (unsigned)
-            */
+			 40000-7ffff:
+			   v1 = (x / 32768)*64
+			   v2 = (x & 255)*32767/255
+			   val = sqrt(v1*v1+v2*v2) (unsigned)
+			*/
 			if(COP_CMD(0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
 			{
 				int dy = r0;
@@ -2570,15 +2570,15 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			/* Division - 0x42c2 */
 			/*
-             20000-2ffff:
-               v1 = x / 1024
-               v2 = x & 1023
-               val = !v1 ? 32767 : trunc(v2/v1+0.5)
-             30000-3ffff:
-               v1 = x / 1024
-               v2 = (x & 1023)*32
-               val = !v1 ? 32767 : trunc(v2/v1+0.5)
-            */
+			 20000-2ffff:
+			   v1 = x / 1024
+			   v2 = x & 1023
+			   val = !v1 ? 32767 : trunc(v2/v1+0.5)
+			 30000-3ffff:
+			   v1 = x / 1024
+			   v2 = (x & 1023)*32
+			   val = !v1 ? 32767 : trunc(v2/v1+0.5)
+			*/
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
 				int dy = r0;
@@ -2612,17 +2612,17 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/*
-                collision detection:
+			    collision detection:
 
-                int dy_0 = space.read_dword(cop_register[0]+4);
-                int dx_0 = space.read_dword(cop_register[0]+8);
-                int dy_1 = space.read_dword(cop_register[1]+4);
-                int dx_1 = space.read_dword(cop_register[1]+8);
-                int hitbox_param1 = space.read_dword(cop_register[2]);
-                int hitbox_param2 = space.read_dword(cop_register[3]);
+			    int dy_0 = space.read_dword(cop_register[0]+4);
+			    int dx_0 = space.read_dword(cop_register[0]+8);
+			    int dy_1 = space.read_dword(cop_register[1]+4);
+			    int dx_1 = space.read_dword(cop_register[1]+8);
+			    int hitbox_param1 = space.read_dword(cop_register[2]);
+			    int hitbox_param2 = space.read_dword(cop_register[3]);
 
-                TODO: we are ignoring the u1 / u2 params for now
-            */
+			    TODO: we are ignoring the u1 / u2 params for now
+			*/
 
 			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,u1,u2))
 			{
@@ -2779,15 +2779,15 @@ static WRITE16_HANDLER( generic_cop_w )
 				cur_angle = INT8(space.read_byte(cop_register[0] + (0x34 ^ 3)));
 				//space.write_byte(cop_register[0] + (0^3),space.read_byte(cop_register[0] + (0^3)) & 0xfb); //correct?
 				/*
-                0x00      0x00          0x60            0x00
-                0x00      0x20          0x60            0x20
-                0x00      0x40          0x60            0x60
-                0x00      0x60          0x60            0x60
-                0x00      0x80          0x60            0xa0
-                0x00      0xa0          0x60            0xa0
-                0x00      0xc0          0x60            0xc0
-                0x00      0xe0          0x60            0xe0
-                */
+				0x00      0x00          0x60            0x00
+				0x00      0x20          0x60            0x20
+				0x00      0x40          0x60            0x60
+				0x00      0x60          0x60            0x60
+				0x00      0x80          0x60            0xa0
+				0x00      0xa0          0x60            0xa0
+				0x00      0xc0          0x60            0xc0
+				0x00      0xe0          0x60            0xe0
+				*/
 
 				if(cur_angle > cop_angle_compare)
 				{
@@ -2863,18 +2863,18 @@ static WRITE16_HANDLER( generic_cop_w )
 				UINT32 src,dst,size,i;
 
 				/*
-                Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
-                0x80 is used by Legionnaire
-                0x81 is used by SD Gundam and Godzilla
-                0x82 is used by Zero Team and X Se Dae
-                0x86 is used by Seibu Cup Soccer
-                0x87 is used by Denjin Makai
+				Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
+				0x80 is used by Legionnaire
+				0x81 is used by SD Gundam and Godzilla
+				0x82 is used by Zero Team and X Se Dae
+				0x86 is used by Seibu Cup Soccer
+				0x87 is used by Denjin Makai
 
-                TODO:
-                - Denjin Makai mode 4 is totally guessworked.
-                - SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
-                  presumably bad RAM table or bad algorithm
-                */
+				TODO:
+				- Denjin Makai mode 4 is totally guessworked.
+				- SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
+				  presumably bad RAM table or bad algorithm
+				*/
 
 				//if(dma_trigger != 0x87)
 				//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x %02x %02x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_fade_table * 0x400,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger,pal_brightness_val,pal_brightness_mode);
@@ -3049,9 +3049,9 @@ static WRITE16_HANDLER( generic_cop_w )
 
 						switch(cop_sort_param)
 						{
-							case 2:	xchg_flag = (vali > valj); break;
+							case 2: xchg_flag = (vali > valj); break;
 							case 1: xchg_flag = (vali < valj); break;
-							case 0:	xchg_flag = 0; break; /* ??? */
+							case 0: xchg_flag = 0; break; /* ??? */
 							default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); break;
 						}
 
@@ -3414,4 +3414,3 @@ WRITE16_HANDLER( legionna_mcu_w )
 
 	generic_cop_w(space, offset, data, mem_mask);
 }
-

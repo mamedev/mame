@@ -35,8 +35,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define IO1_FULL_CHARGE		27
-#define IO2_FULL_CHARGE		42
+#define IO1_FULL_CHARGE     27
+#define IO2_FULL_CHARGE     42
 
 
 

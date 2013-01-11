@@ -29,7 +29,7 @@ void scsihle_device::device_start()
 	phase = SCSI_PHASE_BUS_FREE;
 }
 
-#define SCSI_SENSE_SIZE				4
+#define SCSI_SENSE_SIZE             4
 
 void scsihle_device::ExecCommand( int *transferLength )
 {
@@ -154,38 +154,38 @@ static const char *const phasenames[] =
 #define SCSI_CMD_BUFFER_READ ( 0x3c )
 
 // scsihd
-#define SCSI_CMD_FORMAT_UNIT    	0x04
-#define SCSI_CMD_SEARCH_DATA_EQUAL	0x31
-#define SCSI_CMD_READ_DEFECT    	0x37
+#define SCSI_CMD_FORMAT_UNIT        0x04
+#define SCSI_CMD_SEARCH_DATA_EQUAL  0x31
+#define SCSI_CMD_READ_DEFECT        0x37
 
 
-#define IS_COMMAND(cmd)         	(command[0]==cmd)
-#define IS_READ_COMMAND()       	((command[0]==0x08) || (command[0]==0x28) || (command[0]==0xa8))
-#define IS_WRITE_COMMAND()      	((command[0]==0x0a) || (command[0]==0x2a))
+#define IS_COMMAND(cmd)             (command[0]==cmd)
+#define IS_READ_COMMAND()           ((command[0]==0x08) || (command[0]==0x28) || (command[0]==0xa8))
+#define IS_WRITE_COMMAND()          ((command[0]==0x0a) || (command[0]==0x2a))
 
-#define FORMAT_UNIT_TIMEOUT			5
+#define FORMAT_UNIT_TIMEOUT         5
 
 struct adaptec_sense_t
 {
 	// parameter list
-	UINT8		reserved1[3];
-	UINT8		length;
+	UINT8       reserved1[3];
+	UINT8       length;
 
 	// descriptor list
-	UINT8		density;
-	UINT8		reserved2[4];
-	UINT8		block_size[3];
+	UINT8       density;
+	UINT8       reserved2[4];
+	UINT8       block_size[3];
 
 	// drive parameter list
-	UINT8		format_code;
-	UINT8		cylinder_count[2];
-	UINT8		head_count;
-	UINT8		reduced_write[2];
-	UINT8		write_precomp[2];
-	UINT8		landing_zone;
-	UINT8		step_pulse_code;
-	UINT8		bit_flags;
-	UINT8		sectors_per_track;
+	UINT8       format_code;
+	UINT8       cylinder_count[2];
+	UINT8       head_count;
+	UINT8       reduced_write[2];
+	UINT8       write_precomp[2];
+	UINT8       landing_zone;
+	UINT8       step_pulse_code;
+	UINT8       bit_flags;
+	UINT8       sectors_per_track;
 };
 
 /*

@@ -54,9 +54,9 @@
 
 debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &device)
 	: debug_view_source(name, &device),
-	  m_device(device),
-	  m_disasmintf(dynamic_cast<device_disasm_interface *>(&device)),
-	  m_space(device.memory().space(AS_PROGRAM))
+		m_device(device),
+		m_disasmintf(dynamic_cast<device_disasm_interface *>(&device)),
+		m_space(device.memory().space(AS_PROGRAM))
 {
 }
 
@@ -72,20 +72,20 @@ debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &d
 
 debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: debug_view(machine, DVT_DISASSEMBLY, osdupdate, osdprivate),
-	  m_right_column(DASM_RIGHTCOL_RAW),
-	  m_backwards_steps(3),
-	  m_dasm_width(DEFAULT_DASM_WIDTH),
-	  m_last_direct_raw(NULL),
-	  m_last_direct_decrypted(NULL),
-	  m_last_change_count(0),
-	  m_last_pcbyte(0),
-	  m_divider1(0),
-	  m_divider2(0),
-	  m_divider3(0),
-	  m_expression(machine),
-	  m_allocated(0,0),
-	  m_byteaddress(NULL),
-	  m_dasm(NULL)
+		m_right_column(DASM_RIGHTCOL_RAW),
+		m_backwards_steps(3),
+		m_dasm_width(DEFAULT_DASM_WIDTH),
+		m_last_direct_raw(NULL),
+		m_last_direct_decrypted(NULL),
+		m_last_change_count(0),
+		m_last_pcbyte(0),
+		m_divider1(0),
+		m_divider2(0),
+		m_divider3(0),
+		m_expression(machine),
+		m_allocated(0,0),
+		m_byteaddress(NULL),
+		m_dasm(NULL)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -199,7 +199,7 @@ void debug_view_disasm::view_char(int chval)
 				m_cursor.y = temp;
 			break;
 
-		case DCH_HOME:				// set the active column to the PC
+		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 			offs_t pc = source.m_space.address_to_byte(source.m_device.safe_pc()) & source.m_space.logbytemask();
@@ -367,7 +367,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		m_total.x = m_divider2 + 1 + char_num * maxbytes_clamped + (maxbytes_clamped / minbytes - 1) + 1;
 	}
 	else if (m_right_column == DASM_RIGHTCOL_COMMENTS)
-		m_total.x = m_divider2 + 1 + 50;		// DEBUG_COMMENT_MAX_LINE_LENGTH
+		m_total.x = m_divider2 + 1 + 50;        // DEBUG_COMMENT_MAX_LINE_LENGTH
 	else
 		m_total.x = m_divider2 + 1;
 

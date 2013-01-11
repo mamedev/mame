@@ -23,9 +23,9 @@
 //**************************************************************************
 
 /* devices */
-#define PIA2_TAG					"pia2"
-#define AY8912_TAG					"ay8912"
-#define WD2797_TAG					"wd2797"
+#define PIA2_TAG                    "pia2"
+#define AY8912_TAG                  "ay8912"
+#define WD2797_TAG                  "wd2797"
 
 
 
@@ -38,9 +38,9 @@ class dragon_alpha_state : public dragon64_state
 public:
 	dragon_alpha_state(const machine_config &mconfig, device_type type, const char *tag)
 	: dragon64_state(mconfig, type, tag),
-	  m_pia_2(*this, PIA2_TAG),
-	  m_ay8912(*this, AY8912_TAG),
-	  m_fdc(*this, WD2797_TAG)
+		m_pia_2(*this, PIA2_TAG),
+		m_ay8912(*this, AY8912_TAG),
+		m_fdc(*this, WD2797_TAG)
 	{
 	}
 

@@ -22,42 +22,42 @@
 ***************************************************************************/
 
 /* preferred font height; use ui_get_line_height() to get actual height */
-#define UI_TARGET_FONT_ROWS		(25)
-#define UI_TARGET_FONT_HEIGHT	(1.0f / (float)UI_TARGET_FONT_ROWS)
-#define UI_MAX_FONT_HEIGHT		(1.0f / 15.0f)
+#define UI_TARGET_FONT_ROWS     (25)
+#define UI_TARGET_FONT_HEIGHT   (1.0f / (float)UI_TARGET_FONT_ROWS)
+#define UI_MAX_FONT_HEIGHT      (1.0f / 15.0f)
 
 /* width of lines drawn in the UI */
-#define UI_LINE_WIDTH			(1.0f / 500.0f)
+#define UI_LINE_WIDTH           (1.0f / 500.0f)
 
 /* border between outlines and inner text on left/right and top/bottom sides */
-#define UI_BOX_LR_BORDER		(UI_TARGET_FONT_HEIGHT * 0.25f)
-#define UI_BOX_TB_BORDER		(UI_TARGET_FONT_HEIGHT * 0.25f)
+#define UI_BOX_LR_BORDER        (UI_TARGET_FONT_HEIGHT * 0.25f)
+#define UI_BOX_TB_BORDER        (UI_TARGET_FONT_HEIGHT * 0.25f)
 
 /* handy colors */
-#define ARGB_WHITE				MAKE_ARGB(0xff,0xff,0xff,0xff)
-#define ARGB_BLACK				MAKE_ARGB(0xff,0x00,0x00,0x00)
-#define UI_BORDER_COLOR			MAKE_ARGB(0xff,0xff,0xff,0xff)
-#define UI_BACKGROUND_COLOR		MAKE_ARGB(0xef,0x10,0x10,0x30)
-#define UI_GFXVIEWER_BG_COLOR	MAKE_ARGB(0xef,0x10,0x10,0x30)
-#define UI_GREEN_COLOR			MAKE_ARGB(0xef,0x10,0x60,0x10)
-#define UI_YELLOW_COLOR			MAKE_ARGB(0xef,0x60,0x60,0x10)
-#define UI_RED_COLOR			MAKE_ARGB(0xf0,0x60,0x10,0x10)
-#define UI_UNAVAILABLE_COLOR	MAKE_ARGB(0xff,0x40,0x40,0x40)
-#define UI_TEXT_COLOR			MAKE_ARGB(0xff,0xff,0xff,0xff)
-#define UI_TEXT_BG_COLOR		MAKE_ARGB(0xef,0x00,0x00,0x00)
-#define UI_SUBITEM_COLOR		MAKE_ARGB(0xff,0xff,0xff,0xff)
-#define UI_CLONE_COLOR			MAKE_ARGB(0xff,0x80,0x80,0x80)
-#define UI_SELECTED_COLOR		MAKE_ARGB(0xff,0xff,0xff,0x00)
-#define UI_SELECTED_BG_COLOR	MAKE_ARGB(0xef,0x80,0x80,0x00)
-#define UI_MOUSEOVER_COLOR		MAKE_ARGB(0xff,0xff,0xff,0x80)
-#define UI_MOUSEOVER_BG_COLOR	MAKE_ARGB(0x70,0x40,0x40,0x00)
-#define UI_MOUSEDOWN_COLOR		MAKE_ARGB(0xff,0xff,0xff,0x80)
-#define UI_MOUSEDOWN_BG_COLOR	MAKE_ARGB(0xb0,0x60,0x60,0x00)
-#define UI_DIPSW_COLOR			MAKE_ARGB(0xff,0xff,0xff,0x00)
-#define UI_SLIDER_COLOR			MAKE_ARGB(0xff,0xff,0xff,0xff)
+#define ARGB_WHITE              MAKE_ARGB(0xff,0xff,0xff,0xff)
+#define ARGB_BLACK              MAKE_ARGB(0xff,0x00,0x00,0x00)
+#define UI_BORDER_COLOR         MAKE_ARGB(0xff,0xff,0xff,0xff)
+#define UI_BACKGROUND_COLOR     MAKE_ARGB(0xef,0x10,0x10,0x30)
+#define UI_GFXVIEWER_BG_COLOR   MAKE_ARGB(0xef,0x10,0x10,0x30)
+#define UI_GREEN_COLOR          MAKE_ARGB(0xef,0x10,0x60,0x10)
+#define UI_YELLOW_COLOR         MAKE_ARGB(0xef,0x60,0x60,0x10)
+#define UI_RED_COLOR            MAKE_ARGB(0xf0,0x60,0x10,0x10)
+#define UI_UNAVAILABLE_COLOR    MAKE_ARGB(0xff,0x40,0x40,0x40)
+#define UI_TEXT_COLOR           MAKE_ARGB(0xff,0xff,0xff,0xff)
+#define UI_TEXT_BG_COLOR        MAKE_ARGB(0xef,0x00,0x00,0x00)
+#define UI_SUBITEM_COLOR        MAKE_ARGB(0xff,0xff,0xff,0xff)
+#define UI_CLONE_COLOR          MAKE_ARGB(0xff,0x80,0x80,0x80)
+#define UI_SELECTED_COLOR       MAKE_ARGB(0xff,0xff,0xff,0x00)
+#define UI_SELECTED_BG_COLOR    MAKE_ARGB(0xef,0x80,0x80,0x00)
+#define UI_MOUSEOVER_COLOR      MAKE_ARGB(0xff,0xff,0xff,0x80)
+#define UI_MOUSEOVER_BG_COLOR   MAKE_ARGB(0x70,0x40,0x40,0x00)
+#define UI_MOUSEDOWN_COLOR      MAKE_ARGB(0xff,0xff,0xff,0x80)
+#define UI_MOUSEDOWN_BG_COLOR   MAKE_ARGB(0xb0,0x60,0x60,0x00)
+#define UI_DIPSW_COLOR          MAKE_ARGB(0xff,0xff,0xff,0x00)
+#define UI_SLIDER_COLOR         MAKE_ARGB(0xff,0xff,0xff,0xff)
 
 /* cancel return value for a UI handler */
-#define UI_HANDLER_CANCEL		((UINT32)~0)
+#define UI_HANDLER_CANCEL       ((UINT32)~0)
 
 /* justification options for ui_draw_text_full */
 enum
@@ -83,7 +83,7 @@ enum
 	DRAW_OPAQUE
 };
 
-#define SLIDER_NOCHANGE		0x12345678
+#define SLIDER_NOCHANGE     0x12345678
 
 
 
@@ -95,14 +95,14 @@ typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *str
 
 struct slider_state
 {
-	slider_state *	next;				/* pointer to next slider */
-	slider_update	update;				/* callback */
-	void *			arg;				/* argument */
-	INT32			minval;				/* minimum value */
-	INT32			defval;				/* default value */
-	INT32			maxval;				/* maximum value */
-	INT32			incval;				/* increment value */
-	char			description[1];		/* textual description */
+	slider_state *  next;               /* pointer to next slider */
+	slider_update   update;             /* callback */
+	void *          arg;                /* argument */
+	INT32           minval;             /* minimum value */
+	INT32           defval;             /* default value */
+	INT32           maxval;             /* maximum value */
+	INT32           incval;             /* increment value */
+	char            description[1];     /* textual description */
 };
 
 
@@ -189,4 +189,4 @@ int ui_get_use_natural_keyboard(running_machine &machine);
 /* specifies whether the natural keyboard is active */
 void ui_set_use_natural_keyboard(running_machine &machine, int use_natural_keyboard);
 
-#endif	/* __USRINTRF_H__ */
+#endif  /* __USRINTRF_H__ */

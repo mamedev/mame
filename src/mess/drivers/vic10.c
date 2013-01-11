@@ -185,11 +185,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( vic10 )
-	PORT_INCLUDE( common_cbm_keyboard )		// ROW0 -> ROW7
+	PORT_INCLUDE( common_cbm_keyboard )     // ROW0 -> ROW7
 
-	PORT_INCLUDE( c64_special )				// SPECIAL
+	PORT_INCLUDE( c64_special )             // SPECIAL
 
-	PORT_INCLUDE( c64_controls )			// CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER
+	PORT_INCLUDE( c64_controls )            // CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER
 INPUT_PORTS_END
 
 
@@ -279,18 +279,18 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     COL0, JOY B0
-        PA1     COL1, JOY B1
-        PA2     COL2, JOY B2
-        PA3     COL3, JOY B3
-        PA4     COL4, BTNB
-        PA5     COL5
-        PA6     COL6
-        PA7     COL7
+	    PA0     COL0, JOY B0
+	    PA1     COL1, JOY B1
+	    PA2     COL2, JOY B2
+	    PA3     COL3, JOY B3
+	    PA4     COL4, BTNB
+	    PA5     COL5
+	    PA6     COL6
+	    PA7     COL7
 
-    */
+	*/
 
 	UINT8 cia0portb = m_cia->pb_r();
 
@@ -301,18 +301,18 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     JOY A0
-        PB1     JOY A1
-        PB2     JOY A2
-        PB3     JOY A3
-        PB4     BTNA/_LP
-        PB5
-        PB6
-        PB7
+	    PB0     JOY A0
+	    PB1     JOY A1
+	    PB2     JOY A2
+	    PB3     JOY A3
+	    PB4     BTNA/_LP
+	    PB5
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	UINT8 cia0porta = m_cia->pa_r();
 
@@ -323,18 +323,18 @@ WRITE8_MEMBER( vic10_state::cia_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     ROW0
-        PB1     ROW1
-        PB2     ROW2
-        PB3     ROW3
-        PB4     ROW4
-        PB5     ROW5
-        PB6     ROW6
-        PB7     ROW7
+	    PB0     ROW0
+	    PB1     ROW1
+	    PB2     ROW2
+	    PB3     ROW3
+	    PB4     ROW4
+	    PB5     ROW5
+	    PB6     ROW6
+	    PB7     ROW7
 
-    */
+	*/
 
 	m_vic->lp_w(BIT(data, 4));
 }
@@ -360,16 +360,16 @@ READ8_MEMBER( vic10_state::cpu_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      EXPANSION PORT
-        P1
-        P2
-        P3
-        P4      CASS SENS
-        P5      0
+	    P0      EXPANSION PORT
+	    P1
+	    P2
+	    P3
+	    P4      CASS SENS
+	    P5      0
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -386,16 +386,16 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      EXPANSION PORT
-        P1
-        P2
-        P3      CASS WRT
-        P4
-        P5      CASS MOTOR
+	    P0      EXPANSION PORT
+	    P1
+	    P2
+	    P3      CASS WRT
+	    P4
+	    P5      CASS MOTOR
 
-    */
+	*/
 
 	if (BIT(offset, 0))
 	{
@@ -542,4 +542,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1982, vic10,		0,    0,    vic10, vic10, driver_device,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", GAME_SUPPORTS_SAVE )
+COMP( 1982, vic10,      0,    0,    vic10, vic10, driver_device,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", GAME_SUPPORTS_SAVE )

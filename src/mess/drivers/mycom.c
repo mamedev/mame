@@ -132,7 +132,7 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 
 	if (state->m_0a & 0x40)
 	{
-		for (x = 0; x < x_count; x++)					// lores pixels
+		for (x = 0; x < x_count; x++)                   // lores pixels
 		{
 			UINT8 dbit=1;
 			if (x == cursor_x) dbit=0;
@@ -152,13 +152,13 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 	}
 	else
 	{
-		for (x = 0; x < x_count; x++)					// text
+		for (x = 0; x < x_count; x++)                   // text
 		{
 			UINT8 inv=0;
 			if (x == cursor_x) inv=0xff;
 			mem = (ma + x) & 0x7ff;
 			if (ra > 7)
-				gfx = inv;	// some blank spacing lines
+				gfx = inv;  // some blank spacing lines
 			else
 			{
 				chr = state->m_p_videoram[mem];
@@ -316,15 +316,15 @@ INPUT_PORTS_END
 /* F4 Character Displayer */
 static const gfx_layout mycom_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( mycom )
@@ -333,16 +333,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,		/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	mycom_update_row,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,      /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	mycom_update_row,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 WRITE8_MEMBER( mycom_state::mycom_04_w )
@@ -360,10 +360,10 @@ WRITE8_MEMBER( mycom_state::mycom_06_w )
 READ8_MEMBER( mycom_state::mycom_08_r )
 {
 	/*
-    x--- ---- display flag
-    ---- --x- keyboard shift
-    ---- ---x keyboard strobe
-    */
+	x--- ---- display flag
+	---- --x- keyboard shift
+	---- ---x keyboard strobe
+	*/
 	UINT8 data = 0;
 
 	data = m_keyb_press_flag; //~m_keyb_press_flag & 1;
@@ -377,11 +377,11 @@ READ8_MEMBER( mycom_state::mycom_08_r )
 READ8_MEMBER( mycom_state::mycom_06_r )
 {
 	/*
-    x--- ---- keyboard s5
-    -x-- ---- keyboard s4 (motor on/off)
-    --x- ---- keyboard s3 (must be high)
-    ---x ---- keyboard s2
-    */
+	x--- ---- keyboard s5
+	-x-- ---- keyboard s4 (motor on/off)
+	--x- ---- keyboard s3 (must be high)
+	---x ---- keyboard s2
+	*/
 	return 0xff;
 }
 
@@ -393,15 +393,15 @@ READ8_MEMBER( mycom_state::mycom_05_r )
 WRITE8_MEMBER( mycom_state::mycom_0a_w )
 {
 	/*
-    x--- ---- width 80/40 (0 = 80, 1 = 40)
-    -x-- ---- video mode (0= tile, 1 = bitmap)
-    --x- ---- PSG Chip Select bit
-    ---x ---- PSG Write Enable bit
-    ---- x--- cmt remote (defaults to on)
-    ---- -x-- cmt output
-    ---- --x- printer reset
-    ---- ---x printer strobe
-    */
+	x--- ---- width 80/40 (0 = 80, 1 = 40)
+	-x-- ---- video mode (0= tile, 1 = bitmap)
+	--x- ---- PSG Chip Select bit
+	---x ---- PSG Write Enable bit
+	---- x--- cmt remote (defaults to on)
+	---- -x-- cmt output
+	---- --x- printer reset
+	---- ---x printer strobe
+	*/
 
 	if ( (BIT(m_0a, 3)) != (BIT(data, 3)) )
 		m_cass->change_state(
@@ -433,32 +433,32 @@ WRITE8_MEMBER(mycom_state::mycom_rtc_w)
 
 static I8255_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_NULL,			/* Port A read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_04_w),	/* Port A write */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_05_r),	/* Port B read */
-	DEVCB_NULL,			/* Port B write */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_r),	/* Port C read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_w)	/* Port C write */
+	DEVCB_NULL,         /* Port A read */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_04_w),   /* Port A write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_05_r),   /* Port B read */
+	DEVCB_NULL,         /* Port B write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_r),   /* Port C read */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_06_w)    /* Port C write */
 };
 
 static I8255_INTERFACE( ppi8255_intf_1 )
 {
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_08_r),	/* Port A read */
-	DEVCB_NULL,			/* Port A write */
-	DEVCB_NULL,			/* Port B read */
-	DEVCB_NULL,			/* Port B write */
-	DEVCB_NULL,			/* Port C read */
-	DEVCB_DRIVER_MEMBER(mycom_state, mycom_0a_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_08_r),   /* Port A read */
+	DEVCB_NULL,         /* Port A write */
+	DEVCB_NULL,         /* Port B read */
+	DEVCB_NULL,         /* Port B write */
+	DEVCB_NULL,         /* Port C read */
+	DEVCB_DRIVER_MEMBER(mycom_state, mycom_0a_w)    /* Port C write */
 };
 
 static I8255_INTERFACE( ppi8255_intf_2 )
 {
-	DEVCB_NULL,			/* Port A read */
-	DEVCB_NULL,			/* Port A write */
-	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_r),			/* Port B read */
-	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_w),			/* Port B write */
-	DEVCB_NULL,			/* Port C read */
-	DEVCB_DRIVER_MEMBER(mycom_state,mycom_rtc_w)			/* Port C write */
+	DEVCB_NULL,         /* Port A read */
+	DEVCB_NULL,         /* Port A write */
+	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_r),         /* Port B read */
+	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_w),         /* Port B write */
+	DEVCB_NULL,         /* Port C read */
+	DEVCB_DRIVER_MEMBER(mycom_state,mycom_rtc_w)            /* Port C write */
 };
 
 static const UINT8 mycom_keyval[] = { 0,
@@ -559,7 +559,7 @@ static const wd17xx_interface wd1771_intf =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -603,7 +603,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_GFXDECODE(mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
-    The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
+	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
 	MCFG_MC6845_ADD("crtc", MC6845, 1008000, mc6845_intf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

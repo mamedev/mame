@@ -26,7 +26,7 @@ public:
 };
 
 
-#define MASTER_CLOCK	XTAL_3_579545MHz
+#define MASTER_CLOCK    XTAL_3_579545MHz
 
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
@@ -71,8 +71,8 @@ WRITE8_MEMBER(tourtabl_state::watchdog_w)
 
 static const riot6532_interface r6532_interface_0 =
 {
-	DEVCB_INPUT_PORT("RIOT0_SWA"),	/* Port 6 */
-	DEVCB_INPUT_PORT("RIOT0_SWB"),	/* Port 7 */
+	DEVCB_INPUT_PORT("RIOT0_SWA"),  /* Port 6 */
+	DEVCB_INPUT_PORT("RIOT0_SWB"),  /* Port 7 */
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(tourtabl_state,watchdog_w),
 	DEVCB_NULL
@@ -81,8 +81,8 @@ static const riot6532_interface r6532_interface_0 =
 
 static const riot6532_interface r6532_interface_1 =
 {
-	DEVCB_INPUT_PORT("RIOT1_SWA"),	/* Port 8 */
-	DEVCB_INPUT_PORT("RIOT1_SWB"),	/* Port 9 */
+	DEVCB_INPUT_PORT("RIOT1_SWA"),  /* Port 8 */
+	DEVCB_INPUT_PORT("RIOT1_SWB"),  /* Port 9 */
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(tourtabl_state,tourtabl_led_w),
 	DEVCB_NULL
@@ -110,17 +110,17 @@ static INPUT_PORTS_START( tourtabl )
 	PORT_START("PADDLE1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("TIA_IN4")	/* TIA INPT4 */
+	PORT_START("TIA_IN4")   /* TIA INPT4 */
 	PORT_DIPNAME( 0x80, 0x80, "Breakout Replay" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
-	PORT_START("TIA_IN5")	/* TIA INPT5 */
+	PORT_START("TIA_IN5")   /* TIA INPT5 */
 	PORT_DIPNAME( 0x80, 0x80, "Game Length" )
 	PORT_DIPSETTING(    0x00, "11 points (3 balls)" )
 	PORT_DIPSETTING(    0x80, "15 points (5 balls)" )
 
-	PORT_START("RIOT0_SWA")	/* RIOT #0 SWCHA */
+	PORT_START("RIOT0_SWA") /* RIOT #0 SWCHA */
 	PORT_DIPNAME( 0x0F, 0x0E, "Replay Level" )
 	PORT_DIPSETTING(    0x0B, "200 points" )
 	PORT_DIPSETTING(    0x0C, "250 points" )
@@ -132,7 +132,7 @@ static INPUT_PORTS_START( tourtabl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("RIOT0_SWB")	/* RIOT #0 SWCHB */
+	PORT_START("RIOT0_SWB") /* RIOT #0 SWCHB */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Game Select") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -163,7 +163,7 @@ static INPUT_PORTS_START( tourtabl )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("RIOT1_SWB")	/* RIOT #1 SWCHB */
+	PORT_START("RIOT1_SWB") /* RIOT #1 SWCHB */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -173,7 +173,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_RIOT6532_ADD("riot1", MASTER_CLOCK / 3, r6532_interface_0)

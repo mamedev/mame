@@ -59,13 +59,13 @@
 
 #define LOG 0
 
-#define MMU_IOEN	0x01
-#define MMU_RAMEN	0x02
-#define MMU_CE4		0x08
-#define MMU_CE0		0x10
-#define MMU_CE1		0x20
-#define MMU_CE2		0x40
-#define MMU_CE3		0x80
+#define MMU_IOEN    0x01
+#define MMU_RAMEN   0x02
+#define MMU_CE4     0x08
+#define MMU_CE0     0x10
+#define MMU_CE1     0x20
+#define MMU_CE2     0x40
+#define MMU_CE3     0x80
 
 
 
@@ -611,34 +611,34 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 
 static UPD7201_INTERFACE( mpsc_intf )
 {
-	DEVCB_NULL,					// interrupt
+	DEVCB_NULL,                 // interrupt
 	{
 		{
-			0,					// receive clock
-			0,					// transmit clock
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),	// receive DRQ
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),	// transmit DRQ
-			DEVCB_NULL,			// receive data
-			DEVCB_NULL,			// transmit data
-			DEVCB_NULL,			// clear to send
-			DEVCB_NULL,			// data carrier detect
-			DEVCB_NULL,			// ready to send
-			DEVCB_NULL,			// data terminal ready
-			DEVCB_NULL,			// wait
-			DEVCB_NULL			// sync output
+			0,                  // receive clock
+			0,                  // transmit clock
+			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),    // receive DRQ
+			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),    // transmit DRQ
+			DEVCB_NULL,         // receive data
+			DEVCB_NULL,         // transmit data
+			DEVCB_NULL,         // clear to send
+			DEVCB_NULL,         // data carrier detect
+			DEVCB_NULL,         // ready to send
+			DEVCB_NULL,         // data terminal ready
+			DEVCB_NULL,         // wait
+			DEVCB_NULL          // sync output
 		}, {
-			0,					// receive clock
-			0,					// transmit clock
-			DEVCB_NULL,			// receive DRQ
-			DEVCB_NULL,			// transmit DRQ
-			DEVCB_NULL,			// receive data
-			DEVCB_NULL,			// transmit data
-			DEVCB_NULL,			// clear to send
-			DEVCB_LINE_GND,		// data carrier detect
-			DEVCB_NULL,			// ready to send
-			DEVCB_NULL,			// data terminal ready
-			DEVCB_NULL,			// wait
-			DEVCB_NULL			// sync output
+			0,                  // receive clock
+			0,                  // transmit clock
+			DEVCB_NULL,         // receive DRQ
+			DEVCB_NULL,         // transmit DRQ
+			DEVCB_NULL,         // receive data
+			DEVCB_NULL,         // transmit data
+			DEVCB_NULL,         // clear to send
+			DEVCB_LINE_GND,     // data carrier detect
+			DEVCB_NULL,         // ready to send
+			DEVCB_NULL,         // data terminal ready
+			DEVCB_NULL,         // wait
+			DEVCB_NULL          // sync output
 		}
 	}
 };
@@ -655,10 +655,10 @@ READ_LINE_MEMBER( mm1_state::dsra_r )
 
 static I8085_CONFIG( i8085_intf )
 {
-	DEVCB_NULL,			// STATUS changed callback
-	DEVCB_NULL,			// INTE changed callback
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dsra_r),	// SID changed callback (I8085A only)
-	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)	// SOD changed callback (I8085A only)
+	DEVCB_NULL,         // STATUS changed callback
+	DEVCB_NULL,         // INTE changed callback
+	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dsra_r),    // SID changed callback (I8085A only)
+	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w) // SOD changed callback (I8085A only)
 };
 
 
@@ -839,5 +839,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_SUPPORTS_SAVE )
-COMP( 1981, mm1m7,		mm1m6,	0,		mm1m7,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M7",		GAME_SUPPORTS_SAVE )
+COMP( 1981, mm1m6,      0,      0,      mm1m6,      mm1, driver_device,     0,      "Nokia Data",       "MikroMikko 1 M6",      GAME_SUPPORTS_SAVE )
+COMP( 1981, mm1m7,      mm1m6,  0,      mm1m7,      mm1, driver_device,     0,      "Nokia Data",       "MikroMikko 1 M7",      GAME_SUPPORTS_SAVE )

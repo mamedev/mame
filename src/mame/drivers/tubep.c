@@ -121,9 +121,9 @@ WRITE8_MEMBER(tubep_state::tubep_LS259_w)
 		case 0:
 		case 1:
 				/*
-                    port b0: bit0 - coin 1 counter
-                    port b1  bit0 - coin 2 counter
-                */
+				    port b0: bit0 - coin 1 counter
+				    port b1  bit0 - coin 2 counter
+				*/
 				coin_counter_w(machine(), offset,data&1);
 				break;
 		case 2:
@@ -133,10 +133,10 @@ WRITE8_MEMBER(tubep_state::tubep_LS259_w)
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
 				break;
 		case 6:
-				tubep_background_romselect_w(space,offset,data);	/* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
+				tubep_background_romselect_w(space,offset,data);    /* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
 				break;
 		case 7:
-				tubep_colorproms_A4_line_w(space,offset,data);	/* bit0 = line A4 (color proms address) state */
+				tubep_colorproms_A4_line_w(space,offset,data);  /* bit0 = line A4 (color proms address) state */
 				break;
 		default:
 				break;
@@ -147,9 +147,9 @@ WRITE8_MEMBER(tubep_state::tubep_LS259_w)
 static ADDRESS_MAP_START( tubep_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_SHARE("textram")	/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_SHARE("textram")  /* RAM on GFX PCB @B13 */
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITEONLY AM_SHARE("share1")
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram")				/* row of 8 x 2147 RAMs on main PCB */
+	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram")             /* row of 8 x 2147 RAMs on main PCB */
 ADDRESS_MAP_END
 
 
@@ -201,10 +201,10 @@ static ADDRESS_MAP_START( tubep_second_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")								/* 6116 #1 */
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram")	/* row of 8 x 2147 RAMs on main PCB */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("sprite_color")						/* sprites color lookup table */
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")									/* program copies here part of shared ram ?? */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")                              /* 6116 #1 */
+	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram") /* row of 8 x 2147 RAMs on main PCB */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("sprite_color")                      /* sprites color lookup table */
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")                                  /* program copies here part of shared ram ?? */
 ADDRESS_MAP_END
 
 
@@ -240,7 +240,7 @@ WRITE8_MEMBER(tubep_state::tubep_sound_unknown)
 static ADDRESS_MAP_START( tubep_sound_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_READ(tubep_sound_irq_ack)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* 6116 #3 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM     /* 6116 #3 */
 ADDRESS_MAP_END
 
 
@@ -299,7 +299,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
 	if ((scanline == 64) || (scanline == 192))
 	{
-		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
+		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE); /* sound cpu interrupt (music tempo) */
 	}
 
 
@@ -379,7 +379,7 @@ WRITE8_MEMBER(tubep_state::rjammer_LS259_w)
 	{
 		case 0:
 		case 1:
-				coin_counter_w(machine(), offset,data&1);	/* bit 0 = coin counter */
+				coin_counter_w(machine(), offset,data&1);   /* bit 0 = coin counter */
 				break;
 		case 5:
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
@@ -399,15 +399,15 @@ WRITE8_MEMBER(tubep_state::rjammer_soundlatch_w)
 
 static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM                                 /* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_SHARE("textram")/* RAM on GFX PCB @B13 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")						/* MB8416 SRAM on daughterboard (the one on the right) */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")                      /* MB8416 SRAM on daughterboard (the one on the right) */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")	/* a bug in game code (during attract mode) */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")   /* a bug in game code (during attract mode) */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW2")
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
@@ -415,15 +415,15 @@ static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8, tubep_state )
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P2")
 
 	AM_RANGE(0xd0, 0xd7) AM_WRITE(rjammer_LS259_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(main_cpu_irq_line_clear_w)	/* clear IRQ interrupt */
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(main_cpu_irq_line_clear_w)    /* clear IRQ interrupt */
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(rjammer_soundlatch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( rjammer_second_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* M5M5117P @21G */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")				/* MB8416 on daughterboard (the one on the right) */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM                         /* M5M5117P @21G */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")              /* MB8416 on daughterboard (the one on the right) */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("rjammer_bgram")/* M5M5117P @19B (background) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
@@ -481,7 +481,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
 	if ((scanline == 64) || (scanline == 192))
 	{
-		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);	/* sound cpu interrupt (music tempo) */
+		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE); /* sound cpu interrupt (music tempo) */
 	}
 
 
@@ -542,9 +542,9 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_frequency_select_w)
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
 	if (data & 1)
-		msm5205_playmode_w(device, MSM5205_S48_4B);	/* 8 KHz */
+		msm5205_playmode_w(device, MSM5205_S48_4B); /* 8 KHz */
 	else
-		msm5205_playmode_w(device, MSM5205_S96_4B);	/* 4 KHz */
+		msm5205_playmode_w(device, MSM5205_S96_4B); /* 4 KHz */
 
 	return;
 }
@@ -577,9 +577,9 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_input_w)
 
 
 	/* NOTE: game resets interrupt line on ANY access to ANY I/O port.
-            I do it here because this port (0x80) is first one accessed
-            in the interrupt routine.
-    */
+	        I do it here because this port (0x80) is first one accessed
+	        in the interrupt routine.
+	*/
 	machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE );
 	return;
 }
@@ -595,7 +595,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_intensity_control_w)
 
 static ADDRESS_MAP_START( rjammer_sound_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* M5M5117P (M58125P @2C on schematics) */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM     /* M5M5117P (M58125P @2C on schematics) */
 ADDRESS_MAP_END
 
 
@@ -871,8 +871,8 @@ static const ay8910_interface ay8910_interface_3 =
 
 static const msm5205_interface msm5205_config =
 {
-	rjammer_adpcm_vck,			/* VCK function */
-	MSM5205_S48_4B				/* 8 KHz (changes at run time) */
+	rjammer_adpcm_vck,          /* VCK function */
+	MSM5205_S48_4B              /* 8 KHz (changes at run time) */
 };
 
 
@@ -886,19 +886,19 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( tubep, tubep_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(tubep_main_map)
 	MCFG_CPU_IO_MAP(tubep_main_portmap)
 
-	MCFG_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(tubep_second_map)
 	MCFG_CPU_IO_MAP(tubep_second_portmap)
 
-	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MCFG_CPU_PROGRAM_MAP(tubep_sound_map)
 	MCFG_CPU_IO_MAP(tubep_sound_portmap)
 
-	MCFG_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MCFG_CPU_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -947,19 +947,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( rjammer, tubep_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(rjammer_main_map)
 	MCFG_CPU_IO_MAP(rjammer_main_portmap)
 
-	MCFG_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_ADD("slave",Z80,16000000 / 4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(rjammer_second_map)
 	MCFG_CPU_IO_MAP(rjammer_second_portmap)
 
-	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)   /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MCFG_CPU_PROGRAM_MAP(rjammer_sound_map)
 	MCFG_CPU_IO_MAP(rjammer_sound_portmap)
 
-	MCFG_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MCFG_CPU_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
@@ -1054,7 +1054,7 @@ ROM_START( tubep )
 	ROM_LOAD( "tp-g8.i2",  0x16000, 0x2000, CRC(27e5e6c1) SHA1(f3896d0006351d165e36bafa4340175077b3d6ba) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "tp-g3.c10", 0x0000, 0x1000, CRC(657a465d) SHA1(848217c3b736550586e8e9ba7a6e99e884094066) )	/* text characters */
+	ROM_LOAD( "tp-g3.c10", 0x0000, 0x1000, CRC(657a465d) SHA1(848217c3b736550586e8e9ba7a6e99e884094066) )   /* text characters */
 
 	ROM_REGION( 0x40,   "proms", 0 ) /* color proms */
 	ROM_LOAD( "tp-2.c12", 0x0000, 0x0020, CRC(ac7e582f) SHA1(9d8f9eda7130b49b91d9c63bafa119b2a91eeda0) ) /* text and sprites palette */
@@ -1125,7 +1125,7 @@ ROM_START( tubepb )
 	ROM_LOAD( "8.bin",   0x16000, 0x2000, CRC(27e5e6c1) SHA1(f3896d0006351d165e36bafa4340175077b3d6ba) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "3.bin",   0x0000, 0x1000, CRC(657a465d) SHA1(848217c3b736550586e8e9ba7a6e99e884094066) )	/* text characters */
+	ROM_LOAD( "3.bin",   0x0000, 0x1000, CRC(657a465d) SHA1(848217c3b736550586e8e9ba7a6e99e884094066) ) /* text characters */
 
 	ROM_REGION( 0x40,   "proms", 0 ) /* color proms */
 	ROM_LOAD( "prom6331.b", 0x0000, 0x0020, CRC(ac7e582f) SHA1(9d8f9eda7130b49b91d9c63bafa119b2a91eeda0) ) /* text and sprites palette */
@@ -1172,7 +1172,7 @@ ROM_START( rjammer )
 	ROM_LOAD( "tp-c.2", 0xa000, 0x2000, CRC(1d29f1e6) SHA1(278556f89c8aed9b16bdbef7ba2847736473e63d) )
 	ROM_LOAD( "tp-c.3", 0xc000, 0x2000, CRC(086511a7) SHA1(92691aec024312e7c8593a35303df15cb6e9c9f2) )
 	ROM_LOAD( "tp-c.4", 0xe000, 0x2000, CRC(49f372ea) SHA1(16b500157b95437ea27a097010e798f3e82b2b6a) )
-	ROM_LOAD( "tp-g3.d10", 0x10000, 0x1000, CRC(1f2abec5) SHA1(3e7d2849d517cc4941ac86df507743782ed9c694) )	/* 2732 eprom is used, but the PCB is prepared for 2764 eproms */
+	ROM_LOAD( "tp-g3.d10", 0x10000, 0x1000, CRC(1f2abec5) SHA1(3e7d2849d517cc4941ac86df507743782ed9c694) )  /* 2732 eprom is used, but the PCB is prepared for 2764 eproms */
 	ROM_RELOAD(            0x11000, 0x1000 )
 	ROM_LOAD( "tp-g2.e13", 0x12000, 0x1000, CRC(4a7407a2) SHA1(7ca4e03c637a6f1c338ca438a7ab9e4ba537fee0) )
 	ROM_LOAD( "tp-g1.f13", 0x13000, 0x1000, CRC(f0b26c2e) SHA1(54057c619675bb384035547becd2019974bf23fa) )
@@ -1180,7 +1180,7 @@ ROM_START( rjammer )
 	ROM_LOAD( "tp-g5.i2",  0x16000, 0x2000, CRC(27e5e6c1) SHA1(f3896d0006351d165e36bafa4340175077b3d6ba) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "tp-g4.c10", 0x0000, 0x1000, CRC(99e72549) SHA1(2509265c2d84ac6144aecd77f1b3f0d16bdcb572) )	/* text characters */
+	ROM_LOAD( "tp-g4.c10", 0x0000, 0x1000, CRC(99e72549) SHA1(2509265c2d84ac6144aecd77f1b3f0d16bdcb572) )   /* text characters */
 
 	ROM_REGION( 0x40,   "proms", 0 ) /* color proms */
 	ROM_LOAD( "16b", 0x0000, 0x0020, CRC(9a12873a) SHA1(70f088b6eb5431e2ac6afcf15531eeb02a169442) ) /* text palette, sprites palette */

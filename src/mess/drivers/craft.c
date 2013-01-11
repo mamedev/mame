@@ -8,7 +8,7 @@
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 
-#define VERBOSE_LEVEL	(0)
+#define VERBOSE_LEVEL   (0)
 
 #define ENABLE_VERBOSE_LOG (0)
 
@@ -29,16 +29,16 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 #define verboselog(x,y,z,...)
 #endif
 
-#define MASTER_CLOCK	20000000
+#define MASTER_CLOCK    20000000
 
-#define VISIBLE_CYCLES		480
-#define HSYNC_CYCLES		155
-#define LINE_CYCLES 		(VISIBLE_CYCLES + HSYNC_CYCLES)
-#define VISIBLE_LINES		480
-#define VSYNC_LINES			45
-#define LINES_PER_FRAME		(VISIBLE_LINES + VSYNC_LINES)
-#define CYCLES_PER_FRAME	(LINES_PER_FRAME * LINE_CYCLES)
-#define PIXELS_PER_FRAME	(CYCLES_PER_FRAME)
+#define VISIBLE_CYCLES      480
+#define HSYNC_CYCLES        155
+#define LINE_CYCLES         (VISIBLE_CYCLES + HSYNC_CYCLES)
+#define VISIBLE_LINES       480
+#define VSYNC_LINES         45
+#define LINES_PER_FRAME     (VISIBLE_LINES + VSYNC_LINES)
+#define CYCLES_PER_FRAME    (LINES_PER_FRAME * LINE_CYCLES)
+#define PIXELS_PER_FRAME    (CYCLES_PER_FRAME)
 
 /****************************************************\
 * I/O devices                                        *
@@ -49,7 +49,7 @@ class craft_state : public driver_device
 public:
 	craft_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-        m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -57,19 +57,19 @@ public:
 
 	virtual void machine_start();
 
-    dac_device* m_dac;
+	dac_device* m_dac;
 
-    UINT32 m_last_cycles;
-    UINT64 m_frame_start_cycle;
+	UINT32 m_last_cycles;
+	UINT64 m_frame_start_cycle;
 
 	UINT8 m_port_b;
 	UINT8 m_port_c;
 	UINT8 m_port_d;
 
 	UINT8 m_latched_color;
-    UINT8 m_pixels[PIXELS_PER_FRAME];
+	UINT8 m_pixels[PIXELS_PER_FRAME];
 
-    required_device<avr8_device> m_maincpu;
+	required_device<avr8_device> m_maincpu;
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
@@ -84,23 +84,23 @@ void craft_state::machine_start()
 
 READ8_MEMBER(craft_state::port_r)
 {
-    switch( offset )
-    {
+	switch( offset )
+	{
 		case 0x00: // Port A
 		case 0x01: // Port B
 		case 0x02: // Port C
 		case 0x03: // Port D
 			// Unhandled
 			return 0x00;
-    }
+	}
 
-    return 0;
+	return 0;
 }
 
 WRITE8_MEMBER(craft_state::port_w)
 {
-    switch( offset )
-    {
+	switch( offset )
+	{
 		case 0x00: // Port A
 			// Unhandled
 			break;
@@ -137,7 +137,7 @@ WRITE8_MEMBER(craft_state::port_w)
 			m_dac->write_unsigned8(audio_sample << 1);
 			break;
 		}
-    }
+	}
 }
 
 void craft_state::video_update()
@@ -176,15 +176,15 @@ void craft_state::video_update()
 \****************************************************/
 
 static ADDRESS_MAP_START( craft_prg_map, AS_PROGRAM, 8, craft_state )
-    AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( craft_data_map, AS_DATA, 8, craft_state )
-    AM_RANGE(0x0100, 0x04ff) AM_RAM
+	AM_RANGE(0x0100, 0x04ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( craft_io_map, AS_IO, 8, craft_state )
-    AM_RANGE(0x00, 0x03) AM_READWRITE( port_r, port_w )
+	AM_RANGE(0x00, 0x03) AM_READWRITE( port_r, port_w )
 ADDRESS_MAP_END
 
 /****************************************************\
@@ -192,8 +192,8 @@ ADDRESS_MAP_END
 \****************************************************/
 
 static INPUT_PORTS_START( craft )
-    PORT_START("MAIN")
-        PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("MAIN")
+		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 /****************************************************\
@@ -214,7 +214,7 @@ UINT32 craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &bit
 			line[x] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
 	}
-    return 0;
+	return 0;
 }
 
 /****************************************************\
@@ -227,12 +227,12 @@ DRIVER_INIT_MEMBER(craft_state,craft)
 
 void craft_state::machine_reset()
 {
-    m_dac = machine().device<dac_device>("dac");
+	m_dac = machine().device<dac_device>("dac");
 
-    m_dac->write_unsigned8(0x00);
+	m_dac->write_unsigned8(0x00);
 
-    m_frame_start_cycle = 0;
-    m_last_cycles = 0;
+	m_frame_start_cycle = 0;
+	m_last_cycles = 0;
 }
 
 const avr8_config atmega88_config =
@@ -242,26 +242,26 @@ const avr8_config atmega88_config =
 
 static MACHINE_CONFIG_START( craft, craft_state )
 
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
-    MCFG_CPU_AVR8_CONFIG(atmega88_config)
-    MCFG_CPU_PROGRAM_MAP(craft_prg_map)
-    MCFG_CPU_DATA_MAP(craft_data_map)
-    MCFG_CPU_IO_MAP(craft_io_map)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
+	MCFG_CPU_AVR8_CONFIG(atmega88_config)
+	MCFG_CPU_PROGRAM_MAP(craft_prg_map)
+	MCFG_CPU_DATA_MAP(craft_data_map)
+	MCFG_CPU_IO_MAP(craft_io_map)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(59.99)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1429)) /* accurate */
-    MCFG_SCREEN_SIZE(635, 525)
-    MCFG_SCREEN_VISIBLE_AREA(47, 526, 36, 515)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.99)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1429)) /* accurate */
+	MCFG_SCREEN_SIZE(635, 525)
+	MCFG_SCREEN_VISIBLE_AREA(47, 526, 36, 515)
 	MCFG_SCREEN_UPDATE_DRIVER(craft_state, screen_update_craft)
-    MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-    /* sound hardware */
-    MCFG_SPEAKER_STANDARD_MONO("avr8")
-    MCFG_SOUND_ADD("dac", DAC, 0)
-    MCFG_SOUND_ROUTE(0, "avr8", 1.00)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("avr8")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
 MACHINE_CONFIG_END
 
 ROM_START( craft )

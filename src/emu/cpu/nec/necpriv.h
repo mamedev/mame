@@ -11,11 +11,11 @@
 /* interrupt vectors */
 enum
 {
-	NEC_DIVIDE_VECTOR	= 0,
-	NEC_TRAP_VECTOR		= 1,
-	NEC_NMI_VECTOR		= 2,
-	NEC_BRKV_VECTOR		= 4,
-	NEC_CHKIND_VECTOR	= 5,
+	NEC_DIVIDE_VECTOR   = 0,
+	NEC_TRAP_VECTOR     = 1,
+	NEC_NMI_VECTOR      = 2,
+	NEC_BRKV_VECTOR     = 4,
+	NEC_CHKIND_VECTOR   = 5,
 };
 
 /* interrupt sources */
@@ -29,85 +29,85 @@ enum INTSOURCES
 /* NEC registers */
 union necbasicregs
 {                   /* eight general registers */
-    UINT16 w[8];    /* viewed as 16 bits registers */
-    UINT8  b[16];   /* or as 8 bit registers */
+	UINT16 w[8];    /* viewed as 16 bits registers */
+	UINT8  b[16];   /* or as 8 bit registers */
 };
 
 struct nec_state_t
 {
 	necbasicregs regs;
-	offs_t	fetch_xor;
-	UINT16	sregs[4];
+	offs_t  fetch_xor;
+	UINT16  sregs[4];
 
-	UINT16	ip;
+	UINT16  ip;
 
 	/* PSW flags */
-	INT32	SignVal;
-	UINT32	AuxVal, OverVal, ZeroVal, CarryVal, ParityVal;	/* 0 or non-0 valued flags */
-	UINT8	TF, IF, DF, MF;	/* 0 or 1 valued flags */
+	INT32   SignVal;
+	UINT32  AuxVal, OverVal, ZeroVal, CarryVal, ParityVal;  /* 0 or non-0 valued flags */
+	UINT8   TF, IF, DF, MF; /* 0 or 1 valued flags */
 
 	/* interrupt related */
-	UINT32	pending_irq;
-	UINT32	nmi_state;
-	UINT32	irq_state;
-	UINT32	poll_state;
-	UINT8	no_interrupt;
-	UINT8	halted;
+	UINT32  pending_irq;
+	UINT32  nmi_state;
+	UINT32  irq_state;
+	UINT32  poll_state;
+	UINT8   no_interrupt;
+	UINT8   halted;
 
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
 	address_space *io;
-	int		icount;
+	int     icount;
 
-	UINT8	prefetch_size;
-	UINT8	prefetch_cycles;
-	INT8	prefetch_count;
-	UINT8	prefetch_reset;
-	UINT32	chip_type;
+	UINT8   prefetch_size;
+	UINT8   prefetch_cycles;
+	INT8    prefetch_count;
+	UINT8   prefetch_reset;
+	UINT32  chip_type;
 
-	UINT32	prefix_base;	/* base address of the latest prefix segment */
-	UINT8	seg_prefix;		/* prefix segment indicator */
+	UINT32  prefix_base;    /* base address of the latest prefix segment */
+	UINT8   seg_prefix;     /* prefix segment indicator */
 };
 
 enum SREGS { DS1, PS, SS, DS0 };
 enum WREGS { AW, CW, DW, BW, SP, BP, IX, IY };
 enum BREGS {
-   AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
-   AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
-   CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
-   CH = NATIVE_ENDIAN_VALUE_LE_BE(0x3, 0x2),
-   DL = NATIVE_ENDIAN_VALUE_LE_BE(0x4, 0x5),
-   DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
-   BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
-   BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
+	AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
+	AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
+	CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
+	CH = NATIVE_ENDIAN_VALUE_LE_BE(0x3, 0x2),
+	DL = NATIVE_ENDIAN_VALUE_LE_BE(0x4, 0x5),
+	DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
+	BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
+	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
 };
 
-#define Sreg(x)			nec_state->sregs[x]
-#define Wreg(x)			nec_state->regs.w[x]
-#define Breg(x)			nec_state->regs.b[x]
+#define Sreg(x)         nec_state->sregs[x]
+#define Wreg(x)         nec_state->regs.w[x]
+#define Breg(x)         nec_state->regs.b[x]
 
-#define PC(n)		((Sreg(PS)<<4)+(n)->ip)
+#define PC(n)       ((Sreg(PS)<<4)+(n)->ip)
 
-#define CF		(nec_state->CarryVal!=0)
-#define SF		(nec_state->SignVal<0)
-#define ZF		(nec_state->ZeroVal==0)
-#define PF		parity_table[(BYTE)nec_state->ParityVal]
-#define AF		(nec_state->AuxVal!=0)
-#define OF		(nec_state->OverVal!=0)
+#define CF      (nec_state->CarryVal!=0)
+#define SF      (nec_state->SignVal<0)
+#define ZF      (nec_state->ZeroVal==0)
+#define PF      parity_table[(BYTE)nec_state->ParityVal]
+#define AF      (nec_state->AuxVal!=0)
+#define OF      (nec_state->OverVal!=0)
 
 /************************************************************************/
 
-#define read_mem_byte(a)			nec_state->program->read_byte(a)
-#define read_mem_word(a)			nec_state->program->read_word_unaligned(a)
-#define write_mem_byte(a,d)			nec_state->program->write_byte((a),(d))
-#define write_mem_word(a,d)			nec_state->program->write_word_unaligned((a),(d))
+#define read_mem_byte(a)            nec_state->program->read_byte(a)
+#define read_mem_word(a)            nec_state->program->read_word_unaligned(a)
+#define write_mem_byte(a,d)         nec_state->program->write_byte((a),(d))
+#define write_mem_word(a,d)         nec_state->program->write_word_unaligned((a),(d))
 
-#define read_port_byte(a)		nec_state->io->read_byte(a)
-#define read_port_word(a)		nec_state->io->read_word_unaligned(a)
-#define write_port_byte(a,d)	nec_state->io->write_byte((a),(d))
-#define write_port_word(a,d)	nec_state->io->write_word_unaligned((a),(d))
+#define read_port_byte(a)       nec_state->io->read_byte(a)
+#define read_port_word(a)       nec_state->io->read_word_unaligned(a)
+#define write_port_byte(a,d)    nec_state->io->write_byte((a),(d))
+#define write_port_word(a,d)    nec_state->io->write_word_unaligned((a),(d))
 
 /************************************************************************/
 
@@ -125,9 +125,9 @@ enum BREGS {
 
 /* prefetch timing */
 
-#define FETCH() 			fetch(nec_state)
-#define FETCHWORD()			fetchword(nec_state)
-#define EMPTY_PREFETCH()	nec_state->prefetch_reset = 1
+#define FETCH()             fetch(nec_state)
+#define FETCHWORD()         fetchword(nec_state)
+#define EMPTY_PREFETCH()    nec_state->prefetch_reset = 1
 
 
 #define PUSH(val) { Wreg(SP) -= 2; write_mem_word(((Sreg(SS)<<4)+Wreg(SP)), val); }

@@ -14,25 +14,25 @@
 #include "machine/rescap.h"
 #include "machine/ram.h"
 
-#define SCREEN_TAG		"screen"
-#define CDP1802_TAG		"a6"
-#define CDP1861_TAG		"a14"
-#define MM74C923_TAG	"a10"
-#define DM9368_L_TAG	"a12"
-#define DM9368_H_TAG	"a8"
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "a6"
+#define CDP1861_TAG     "a14"
+#define MM74C923_TAG    "a10"
+#define DM9368_L_TAG    "a12"
+#define DM9368_H_TAG    "a8"
 
 class elf2_state : public driver_device
 {
 public:
 	elf2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_vdc(*this, CDP1861_TAG),
-		  m_kb(*this, MM74C923_TAG),
-		  m_led_l(*this, DM9368_L_TAG),
-		  m_led_h(*this, DM9368_H_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_vdc(*this, CDP1861_TAG),
+			m_kb(*this, MM74C923_TAG),
+			m_led_l(*this, DM9368_L_TAG),
+			m_led_h(*this, DM9368_H_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

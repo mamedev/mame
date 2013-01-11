@@ -66,20 +66,20 @@ public:
 
 #define MONITOR_TYPE_PORT_TAG ("MONITOR_TYPE")
 
-#define MASTER_CLOCK				(XTAL_10MHz)
-#define MAIN_CPU_CLOCK  			(MASTER_CLOCK / 4)
-#define PIXEL_CLOCK 				(MASTER_CLOCK / 2)
-#define S14001_CLOCK				(MASTER_CLOCK / 4)
-#define HTOTAL						(0x140)
-#define HBEND						(0x000)
-#define HBSTART						(0x100)
-#define VTOTAL						(0x106)
-#define VBEND						(0x020)
-#define VBSTART						(0x100)
-#define VCOUNTER_START_NO_VBLANK	(0x020)
-#define VCOUNTER_START_VBLANK		(0x0da)
-#define IRQS_PER_FRAME				(2)
-#define NMIS_PER_FRAME				(8)
+#define MASTER_CLOCK                (XTAL_10MHz)
+#define MAIN_CPU_CLOCK              (MASTER_CLOCK / 4)
+#define PIXEL_CLOCK                 (MASTER_CLOCK / 2)
+#define S14001_CLOCK                (MASTER_CLOCK / 4)
+#define HTOTAL                      (0x140)
+#define HBEND                       (0x000)
+#define HBSTART                     (0x100)
+#define VTOTAL                      (0x106)
+#define VBEND                       (0x020)
+#define VBSTART                     (0x100)
+#define VCOUNTER_START_NO_VBLANK    (0x020)
+#define VCOUNTER_START_VBLANK       (0x0da)
+#define IRQS_PER_FRAME              (2)
+#define NMIS_PER_FRAME              (8)
 
 static const UINT8 irq_trigger_counts[IRQS_PER_FRAME] = { 0x80, 0xda };
 static const UINT8 irq_trigger_v256s [IRQS_PER_FRAME] = { 0x00, 0x01 };
@@ -346,10 +346,10 @@ void berzerk_state::machine_reset()
  *
  *************************************/
 
-#define NUM_PENS	(0x10)
+#define NUM_PENS    (0x10)
 
-#define LS181_12C	(0)
-#define LS181_10C	(1)
+#define LS181_12C   (0)
+#define LS181_10C   (1)
 
 
 void berzerk_state::video_start()
@@ -369,16 +369,16 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 	UINT8 current_video_data = m_videoram[offset];
 
 	/* shift data towards LSB.  MSB bits are filled by data from last_shift_data.
-       The shifter consists of 5 74153 devices @ 7A, 8A, 9A, 10A and 11A,
-       followed by 4 more 153's at 11B, 10B, 9B and 8B, which optionally
-       reverse the order of the resulting bits */
+	   The shifter consists of 5 74153 devices @ 7A, 8A, 9A, 10A and 11A,
+	   followed by 4 more 153's at 11B, 10B, 9B and 8B, which optionally
+	   reverse the order of the resulting bits */
 	UINT8 shift_flop_output = (((UINT16)m_last_shift_data << 8) | data) >> (m_magicram_control & 0x07);
 
 	if (m_magicram_control & 0x08)
 		shift_flop_output = BITSWAP8(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	/* collision detection - AND gate output goes to the K pin of the flip-flop,
-       while J is LO, therefore, it only resets, never sets */
+	   while J is LO, therefore, it only resets, never sets */
 	if (shift_flop_output & current_video_data)
 		m_intercept = 0;
 
@@ -391,7 +391,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 	TTL74181_write(LS181_10C, TTL74181_INPUT_S0, 4, m_magicram_control >> 4);
 
 	alu_output = (TTL74181_read(LS181_10C, TTL74181_OUTPUT_F0, 4) << 4) |
-				 (TTL74181_read(LS181_12C, TTL74181_OUTPUT_F0, 4) << 0);
+					(TTL74181_read(LS181_12C, TTL74181_OUTPUT_F0, 4) << 0);
 
 	m_videoram[offset] = alu_output ^ 0xff;
 
@@ -403,7 +403,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 WRITE8_MEMBER(berzerk_state::magicram_control_w)
 {
 	/* save the control byte, clear the shift data latch,
-       and set the intercept flip-flop */
+	   and set the intercept flip-flop */
 	m_magicram_control = data;
 	m_last_shift_data = 0;
 	m_intercept = 1;
@@ -431,14 +431,14 @@ static void get_pens(running_machine &machine, pen_t *pens)
 
 	if (machine.root_device().ioport(MONITOR_TYPE_PORT_TAG)->read() == 0)
 		compute_resistor_weights(0, 0xff, -1.0,
-								 2, resistances_wg, color_weights, 0, 270,
-								 2, resistances_wg, color_weights, 0, 270,
-								 2, resistances_wg, color_weights, 0, 270);
+									2, resistances_wg, color_weights, 0, 270,
+									2, resistances_wg, color_weights, 0, 270,
+									2, resistances_wg, color_weights, 0, 270);
 	else
 		compute_resistor_weights(0, 0xff, -1.0,
-								 2, resistances_el, color_weights, 0, 270,
-								 2, resistances_el, color_weights, 0, 270,
-								 2, resistances_el, color_weights, 0, 270);
+									2, resistances_el, color_weights, 0, 270,
+									2, resistances_el, color_weights, 0, 270,
+									2, resistances_el, color_weights, 0, 270);
 
 	for (color = 0; color < NUM_PENS; color++)
 	{
@@ -535,7 +535,7 @@ WRITE8_MEMBER(berzerk_state::berzerk_audio_w)
 			s14001a_set_volume(device, ((data & 0x38) >> 3) + 1);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
-               giving a final clock from 19.5kHz to 34.7kHz */
+			   giving a final clock from 19.5kHz to 34.7kHz */
 			clock_divisor = 16 - (data & 0x07);
 
 			s14001a_set_clock(device, S14001_CLOCK / clock_divisor / 8);
@@ -716,16 +716,16 @@ static INPUT_PORTS_START( common ) // used on all games
 
 	PORT_START("SW2")
 	/* port for the 'bookkeeping reset' and 'bookkeeping' buttons;
-     * The 'bookkeeping reset' button is an actual button on the zpu-1000 and
-     * zpu-1001 pcbs, labeled 'S2' or 'SW2'. It is wired to bit 0.
-     * * pressing it while high scores are displayed will give a free game
-     *   without adding any coin info to the bookkeeping info in nvram.
-     * The 'bookkeeping' button is wired to the control panel, usually hidden
-     * underneath or only accessible through the coin door. Wired to bit 7.
-     * * It displays various bookkeeping statistics when pressed sequentially.
-     *   Pressing P1 fire (according to the manual) when stats are displayed
-     *   will clear the stat shown on screen.
-     */
+	 * The 'bookkeeping reset' button is an actual button on the zpu-1000 and
+	 * zpu-1001 pcbs, labeled 'S2' or 'SW2'. It is wired to bit 0.
+	 * * pressing it while high scores are displayed will give a free game
+	 *   without adding any coin info to the bookkeeping info in nvram.
+	 * The 'bookkeeping' button is wired to the control panel, usually hidden
+	 * underneath or only accessible through the coin door. Wired to bit 7.
+	 * * It displays various bookkeeping statistics when pressed sequentially.
+	 *   Pressing P1 fire (according to the manual) when stats are displayed
+	 *   will clear the stat shown on screen.
+	 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Free Game (not logged in bookkeeping)")
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Bookkeeping") PORT_CODE(KEYCODE_F1)
@@ -794,8 +794,8 @@ static INPUT_PORTS_START( frenzy )
 
 	PORT_START("F2")
 	/* Bit 0 does some more hardware tests. According to the manual, both bit 0 & 1 must be:
-       - ON for Signature Analysis (S.A.)
-       - OFF for game operation     */
+	   - ON for Signature Analysis (S.A.)
+	   - OFF for game operation     */
 	//PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )  // F2:1,2
 	PORT_DIPNAME( 0x03, 0x00, "Hardware Tests" ) PORT_DIPLOCATION("F2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -946,7 +946,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P1_DIAL")
-    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET
+	PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET
 
 	PORT_START("P2")
 	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_COCKTAIL // spinner/dial
@@ -955,7 +955,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("P2_DIAL")
-    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_RESET
+	PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_RESET
 
 	PORT_START("F2")
 	PORT_DIPNAME( 0x03, 0x00, "Hardware Tests" ) PORT_DIPLOCATION("F2:1,2")
@@ -1099,7 +1099,7 @@ static MACHINE_CONFIG_START( berzerk, berzerk_state )
 
 	MCFG_SOUND_RESET(berzerk)
 
-	MCFG_SOUND_ADD("speech", S14001A, 0)	/* placeholder - the clock is software controllable */
+	MCFG_SOUND_ADD("speech", S14001A, 0)    /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("exidy", EXIDY, 0)
@@ -1153,8 +1153,8 @@ ROM_START( berzerk )
 	ROM_FILL(         0x3800, 0x0800, 0xff )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "berzerk_r_vo_1c.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )	/* VSU-1000 board */
-	ROM_LOAD( "berzerk_r_vo_2c.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )	/* ditto */
+	ROM_LOAD( "berzerk_r_vo_1c.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )  /* VSU-1000 board */
+	ROM_LOAD( "berzerk_r_vo_2c.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )  /* ditto */
 ROM_END
 
 ROM_START( berzerk1 )
@@ -1168,8 +1168,8 @@ ROM_START( berzerk1 )
 	ROM_FILL(            0x3800, 0x0800, 0xff )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "berzerk_r_vo_1c.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )	/* VSU-1000 board */
-	ROM_LOAD( "berzerk_r_vo_2c.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )	/* ditto */
+	ROM_LOAD( "berzerk_r_vo_1c.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )  /* VSU-1000 board */
+	ROM_LOAD( "berzerk_r_vo_2c.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )  /* ditto */
 ROM_END
 
 ROM_START( berzerkg )
@@ -1183,8 +1183,8 @@ ROM_START( berzerkg )
 	ROM_FILL(                  0x3800, 0x0800, 0xff )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "berzerk_german_1c.1c", 0x0000, 0x0800, CRC(fc1da15f) SHA1(f759a017d9e95acf0e1d35b16d8820acee7d7e3d) )	/* VSU-1000 board */
-	ROM_LOAD( "berzerk_german_2c.2c", 0x0800, 0x0800, CRC(7f6808fb) SHA1(8a9c43597f924221f68d1b31e033f1dc492cddc5) )	/* ditto */
+	ROM_LOAD( "berzerk_german_1c.1c", 0x0000, 0x0800, CRC(fc1da15f) SHA1(f759a017d9e95acf0e1d35b16d8820acee7d7e3d) )    /* VSU-1000 board */
+	ROM_LOAD( "berzerk_german_2c.2c", 0x0800, 0x0800, CRC(7f6808fb) SHA1(8a9c43597f924221f68d1b31e033f1dc492cddc5) )    /* ditto */
 ROM_END
 
 
@@ -1197,8 +1197,8 @@ ROM_START( frenzy )
 	ROM_LOAD( "6d-4",         0xc000, 0x1000, CRC(5581a7b1) SHA1(1f633c1c29d3b64f701c601feba26da66a6c6f23) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "e169-1cvo.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )	/* VSU-1000 board */
-	ROM_LOAD( "e169-2cvo.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )	/* ditto */
+	ROM_LOAD( "e169-1cvo.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )    /* VSU-1000 board */
+	ROM_LOAD( "e169-2cvo.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )    /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/rom select prom (N82S123N) */
@@ -1224,7 +1224,7 @@ ROM_START( moonwarp )
 	ROM_LOAD( "5c.bin",      0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "moonwar.1c.bin",           0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) )	/* VSU-1000 board */
+	ROM_LOAD( "moonwar.1c.bin",           0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) )    /* VSU-1000 board */
 	ROM_LOAD( "moonwar.2c.bin",           0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) )    /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )

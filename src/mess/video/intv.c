@@ -5,8 +5,8 @@
 #define FOREGROUND_BIT 0x0010
 
 // conversion from Intellivision color to internal representation
-#define SET_COLOR(c)	((c * 2) + 1)
-#define GET_COLOR(c)	((c - 1) / 2)
+#define SET_COLOR(c)    ((c * 2) + 1)
+#define GET_COLOR(c)    ((c - 1) / 2)
 
 /* initialized to non-zero, because we divide by it */
 
@@ -242,12 +242,12 @@ static void render_color_stack_mode(running_machine &machine, bitmap_ind16 &bitm
 	UINT8 *ram = state->memregion("maincpu")->base();
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay) * STIC_Y_SCALE;
-		 h < STIC_BACKTAB_HEIGHT;
-		 h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
+			h < STIC_BACKTAB_HEIGHT;
+			h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
 	{
 		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay) * STIC_X_SCALE;
-			 w < STIC_BACKTAB_WIDTH;
-			 w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
+				w < STIC_BACKTAB_WIDTH;
+				w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
 		{
 			nextCard = state->m_backtab_buffer[h][w];
 
@@ -313,12 +313,12 @@ static void render_fg_bg_mode(running_machine &machine, bitmap_ind16 &bitmap)
 	UINT8* ram = state->memregion("maincpu")->base();
 
 	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay) * STIC_Y_SCALE;
-		 h < STIC_BACKTAB_HEIGHT;
-		 h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
+			h < STIC_BACKTAB_HEIGHT;
+			h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
 	{
 		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay) * STIC_X_SCALE;
-			 w < STIC_BACKTAB_WIDTH;
-			 w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
+				w < STIC_BACKTAB_WIDTH;
+				w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
 		{
 			nextCard = state->m_backtab_buffer[h][w];
 			fgcolor = (nextCard & STIC_FBM_FG) | FOREGROUND_BIT;
@@ -727,7 +727,7 @@ void intv_stic_screenrefresh(running_machine &machine)
 /* very rudimentary support for the tms9927 character generator IC */
 
 
- READ8_MEMBER( intv_state::intvkbd_tms9927_r )
+	READ8_MEMBER( intv_state::intvkbd_tms9927_r )
 {
 	//intv_state *state = space.machine().driver_data<intv_state>();
 	UINT8 rv;

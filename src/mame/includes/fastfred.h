@@ -12,11 +12,11 @@ class fastfred_state : public galaxold_state
 public:
 	fastfred_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxold_state(mconfig, type, tag),
-		  m_videoram(*this, "videoram"),
-		  m_spriteram(*this, "spriteram"),
-		  m_attributesram(*this, "attributesram"),
-		  m_background_color(*this, "bgcolor"),
-		  m_imago_fg_videoram(*this, "imago_fg_vram") { }
+			m_videoram(*this, "videoram"),
+			m_spriteram(*this, "spriteram"),
+			m_attributesram(*this, "attributesram"),
+			m_background_color(*this, "bgcolor"),
+			m_imago_fg_videoram(*this, "imago_fg_vram") { }
 
 	UINT8 m_imago_sprites[0x800*3];
 	UINT16 m_imago_sprites_address;

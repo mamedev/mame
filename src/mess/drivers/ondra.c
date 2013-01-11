@@ -97,8 +97,8 @@ static INPUT_PORTS_START( ondra )
 	PORT_START("LINE9")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(1)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)   PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)	PORT_PLAYER(1)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)		 PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1)		PORT_PLAYER(1)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)   PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(1)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)       PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1)        PORT_PLAYER(1)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
 		PORT_BIT(0xE0, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_START("NMI")
@@ -128,7 +128,7 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ondra_state,  ondra_interrupt)
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -157,31 +157,31 @@ MACHINE_CONFIG_END
 /* ROM definition */
 
 ROM_START( ondrat )
-    ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "tesla_a.rom", 0x10000, 0x0800, CRC(6d56b815) SHA1(7feb4071d5142e4c2f891747b75fa4d48ccad262) )
-    ROM_COPY( "maincpu", 0x10000, 0x10800, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x11000, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x11800, 0x0800 )
+	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "tesla_a.rom", 0x10000, 0x0800, CRC(6d56b815) SHA1(7feb4071d5142e4c2f891747b75fa4d48ccad262) )
+	ROM_COPY( "maincpu", 0x10000, 0x10800, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x11000, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x11800, 0x0800 )
 	ROM_LOAD( "tesla_b.rom", 0x12000, 0x0800, CRC(5f145eaa) SHA1(c1eac68b13fedc4d0d6f98b15e2a5397f0139dc3) )
-    ROM_COPY( "maincpu", 0x10000, 0x12800, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x13000, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x13800, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x12800, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x13000, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x13800, 0x0800 )
 ROM_END
 
 ROM_START( ondrav )
-    ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "vili_a.rom", 0x10000, 0x0800, CRC(76932657) SHA1(1f3700f670f158e4bed256aed751e2c1331a28e8) )
-    ROM_COPY( "maincpu", 0x10000, 0x10800, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x11000, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x11800, 0x0800 )
-    ROM_LOAD( "vili_b.rom", 0x12000, 0x0800, CRC(03a6073f) SHA1(66f198e63f473e09350bcdbb10fe0cf440111bec) )
-    ROM_COPY( "maincpu", 0x10000, 0x12800, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x13000, 0x0800 )
-    ROM_COPY( "maincpu", 0x10000, 0x13800, 0x0800 )
+	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vili_a.rom", 0x10000, 0x0800, CRC(76932657) SHA1(1f3700f670f158e4bed256aed751e2c1331a28e8) )
+	ROM_COPY( "maincpu", 0x10000, 0x10800, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x11000, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x11800, 0x0800 )
+	ROM_LOAD( "vili_b.rom", 0x12000, 0x0800, CRC(03a6073f) SHA1(66f198e63f473e09350bcdbb10fe0cf440111bec) )
+	ROM_COPY( "maincpu", 0x10000, 0x12800, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x13000, 0x0800 )
+	ROM_COPY( "maincpu", 0x10000, 0x13800, 0x0800 )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1989, ondrat, 0,		0,		ondra,		ondra, driver_device,		0,       "Tesla",		 "Ondra",		0)
-COMP( 1989, ondrav, ondrat,	0,		ondra,		ondra, driver_device,		0,       "ViLi",		 "Ondra ViLi",	0)
+COMP( 1989, ondrat, 0,      0,      ondra,      ondra, driver_device,       0,       "Tesla",        "Ondra",       0)
+COMP( 1989, ondrav, ondrat, 0,      ondra,      ondra, driver_device,       0,       "ViLi",         "Ondra ViLi",  0)

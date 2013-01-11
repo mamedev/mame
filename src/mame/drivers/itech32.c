@@ -358,13 +358,13 @@ Notes:
 #include "machine/timekpr.h"
 
 
-#define FULL_LOGGING				0
-#define LOG_DRIVEDGE_UNINIT_RAM		0
+#define FULL_LOGGING                0
+#define LOG_DRIVEDGE_UNINIT_RAM     0
 
 
 
-#define START_TMS_SPINNING(n)			do { space.device().execute().spin_until_trigger(7351 + n); m_tms_spinning[n] = 1; } while (0)
-#define STOP_TMS_SPINNING(machine, n)	do { (machine).scheduler().trigger(7351 + n); (machine).driver_data<itech32_state>()->m_tms_spinning[n] = 0; } while (0)
+#define START_TMS_SPINNING(n)           do { space.device().execute().spin_until_trigger(7351 + n); m_tms_spinning[n] = 1; } while (0)
+#define STOP_TMS_SPINNING(machine, n)   do { (machine).scheduler().trigger(7351 + n); (machine).driver_data<itech32_state>()->m_tms_spinning[n] = 0; } while (0)
 
 
 
@@ -613,13 +613,13 @@ READ32_MEMBER(itech32_state::itech020_prot_result_r)
 
 READ32_MEMBER(itech32_state::gt2kp_prot_result_r)
 {
-	return 0x00010000;	/* 32 bit value at 680000 to 680003 will return the needed value of 0x01 */
+	return 0x00010000;  /* 32 bit value at 680000 to 680003 will return the needed value of 0x01 */
 }
 
 
 READ32_MEMBER(itech32_state::gtclass_prot_result_r)
 {
-	return 0x00008000;	/* 32 bit value at 680000 to 680003 will return the needed value of 0x80 */
+	return 0x00008000;  /* 32 bit value at 680000 to 680003 will return the needed value of 0x80 */
 }
 
 
@@ -900,7 +900,7 @@ static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x058000, 0x058001) AM_READ_PORT("DIPS") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(timekill_colora_w)
 	AM_RANGE(0x068000, 0x068001) AM_WRITE(timekill_colorbc_w)
-	AM_RANGE(0x070000, 0x070001) AM_WRITENOP	/* noisy */
+	AM_RANGE(0x070000, 0x070001) AM_WRITENOP    /* noisy */
 	AM_RANGE(0x078000, 0x078001) AM_WRITE(sound_data_w)
 	AM_RANGE(0x080000, 0x08007f) AM_READWRITE(itech32_video_r, itech32_video_w) AM_SHARE("video")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(int1_ack_w)
@@ -1023,12 +1023,12 @@ static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x480000, 0x480003) AM_WRITE(sound_data32_w)
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(itech020_video_r, itech020_video_w) AM_SHARE("video")
-	AM_RANGE(0x578000, 0x57ffff) AM_READNOP				/* touched by protection */
+	AM_RANGE(0x578000, 0x57ffff) AM_READNOP             /* touched by protection */
 	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(itech020_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_SHARE("nvram")
-/* ? */	AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP			/* Unknown Writes */
+/* ? */ AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP            /* Unknown Writes */
 	AM_RANGE(0x680000, 0x680003) AM_READ(itech020_prot_result_r) AM_WRITENOP
-/* ! */	AM_RANGE(0x680800, 0x68083f) AM_READONLY AM_WRITENOP /* Serial DUART Channel A/B & Top LED sign - To Do! */
+/* ! */ AM_RANGE(0x680800, 0x68083f) AM_READONLY AM_WRITENOP /* Serial DUART Channel A/B & Top LED sign - To Do! */
 	AM_RANGE(0x700000, 0x700003) AM_WRITE(itech020_plane_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
 ADDRESS_MAP_END
@@ -1047,7 +1047,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, itech32_state )
 	AM_RANGE(0x0400, 0x0400) AM_READ(sound_data_r)
 	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY("ensoniq", es5506_r, es5506_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP    /* noisy */
 	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -1076,7 +1076,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( timekill )
-	PORT_START("P1")		/* 40000 */
+	PORT_START("P1")        /* 40000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -1086,7 +1086,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("P2")		/* 48000 */
+	PORT_START("P2")        /* 48000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -1096,7 +1096,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START("SYSTEM")	/* 50000 */
+	PORT_START("SYSTEM")    /* 50000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -1106,18 +1106,18 @@ static INPUT_PORTS_START( timekill )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DIPS")		/* 58000 */
+	PORT_START("DIPS")      /* 58000 */
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, NULL)
-	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )	 PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, "Violence" )	 PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0040, 0x0000, "Violence" )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_HIGH, "SW1:4" )
@@ -1125,7 +1125,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( itech32_base_16bit )
-	PORT_START("P1")	/* 080000 */
+	PORT_START("P1")    /* 080000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1135,7 +1135,7 @@ static INPUT_PORTS_START( itech32_base_16bit )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("P2")	/* 100000 */
+	PORT_START("P2")    /* 100000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -1145,18 +1145,18 @@ static INPUT_PORTS_START( itech32_base_16bit )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START("P3")	/* 180000 */
+	PORT_START("P3")    /* 180000 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P4")	/* 200000 */
+	PORT_START("P4")    /* 200000 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DIPS")	/* 280000 */
+	PORT_START("DIPS")  /* 280000 */
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, NULL)
-	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )	 PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
@@ -1167,7 +1167,7 @@ static INPUT_PORTS_START( itech32_base_16bit )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_HIGH, "SW1:1" )
 
-	PORT_START("EXTRA")	/* 78000 */
+	PORT_START("EXTRA") /* 78000 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1220,7 +1220,7 @@ static INPUT_PORTS_START( hardyard )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
 
-	PORT_MODIFY("DIPS")	/* 280000 */
+	PORT_MODIFY("DIPS") /* 280000 */
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Players ) ) PORT_DIPLOCATION("SW1:2")
@@ -1291,12 +1291,12 @@ static INPUT_PORTS_START( drivedge )
 
 	PORT_START("82000")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00ff0000, 0x00000000, IPT_PEDAL2 ) PORT_MINMAX(0x00000000,0x00060000) PORT_SENSITIVITY(2) PORT_KEYDELTA(100)	/* Brake */
+	PORT_BIT( 0x00ff0000, 0x00000000, IPT_PEDAL2 ) PORT_MINMAX(0x00000000,0x00060000) PORT_SENSITIVITY(2) PORT_KEYDELTA(100)    /* Brake */
 
-	PORT_START("STEER")		/* 88000 */
+	PORT_START("STEER")     /* 88000 */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("GAS")		/* 8A000 */
+	PORT_START("GAS")       /* 8A000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x0c) PORT_SENSITIVITY(1) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1329,7 +1329,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( itech32_base_32bit )
-	PORT_START("P1")	/* 080000 */
+	PORT_START("P1")    /* 080000 */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START1 )
@@ -1340,7 +1340,7 @@ static INPUT_PORTS_START( itech32_base_32bit )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("P2")	/* 100000 */
+	PORT_START("P2")    /* 100000 */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START2 )
@@ -1351,21 +1351,21 @@ static INPUT_PORTS_START( itech32_base_32bit )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START("P3")	/* 180000 */
+	PORT_START("P3")    /* 180000 */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P4")	/* 200000 */
+	PORT_START("P4")    /* 200000 */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x00ff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DIPS")	/* 280000 */
+	PORT_START("DIPS")  /* 280000 */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x00010000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, NULL)
-	PORT_DIPNAME( 0x00100000, 0x00000000, "Video Sync" )	 PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x00100000, 0x00000000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x00000000, "-" )
 	PORT_DIPSETTING(          0x00100000, "+" )
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
@@ -1402,7 +1402,7 @@ static INPUT_PORTS_START( wcbowln ) /* WCB version 1.66 supports cocktail mode *
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3") /* v1.66 Rom sets support Cocktail mode (verified) */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )	 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
 
@@ -1423,8 +1423,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( wcbowldx )
 	PORT_INCLUDE( wcbowln )
 
-	PORT_MODIFY("DIPS")	/* 280000 */
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")	/* Verified */
+	PORT_MODIFY("DIPS") /* 280000 */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")    /* Verified */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
@@ -1436,11 +1436,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( wcbowlo ) /* Earlier versions of World Class Bowling do NOT support a cocktail mode */
 	PORT_INCLUDE( wcbowln )
 
-	PORT_MODIFY("DIPS")	/* 280000 */
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")	/* Verified */
+	PORT_MODIFY("DIPS") /* 280000 */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")    /* Verified */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )	 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1484,7 +1484,7 @@ static INPUT_PORTS_START( shufshot ) /* ShuffleShot v1.39 & v1.40 support cockta
 	PORT_BIT( 0x00fb0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")	/* Verified */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")    /* Verified */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )
 
@@ -1506,10 +1506,10 @@ static INPUT_PORTS_START( shufshto ) /* Earlier versions of Shuffleshot do NOT s
 	PORT_INCLUDE( shufshot )
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")	/* Verified */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")    /* Verified */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )	 PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x00400000, 0x00000000, "Freeze Screen" )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1566,7 +1566,7 @@ static INPUT_PORTS_START( gt97 ) /* v1.30 is the first known version of GT97 to 
 	PORT_DIPNAME( 0x00100000, 0x00000000, "Freeze Screen" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00100000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")	/* Seem to have no effect on the game */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")    /* Seem to have no effect on the game */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2")
@@ -1589,10 +1589,10 @@ static INPUT_PORTS_START( gt97s )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00100000, 0x00000000, "Freeze Screen" )	 PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x00100000, 0x00000000, "Freeze Screen" )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00100000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")	/* Single controller version -  has no effect */
+	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")    /* Single controller version -  has no effect */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1602,7 +1602,7 @@ static INPUT_PORTS_START( gt98 )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")	/* Seem to have no effect on the game */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")    /* Seem to have no effect on the game */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2")
@@ -1615,10 +1615,10 @@ static INPUT_PORTS_START( gt98s )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")	/* Seem to have no effect on the game */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")    /* Seem to have no effect on the game */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")	/* Single controller version -  has no effect */
+	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")    /* Single controller version -  has no effect */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1628,13 +1628,13 @@ static INPUT_PORTS_START( s_ver )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00100000, 0x00000000, "Trackball Orientation" ) PORT_DIPLOCATION("SW1:4")	/* Determined by actual use / trial & error */
-	PORT_DIPSETTING(          0x00000000, "Normal Mount" )						/* The manual says "Always on (defualt)" and "Off -- UNUSED --" */
+	PORT_DIPNAME( 0x00100000, 0x00000000, "Trackball Orientation" ) PORT_DIPLOCATION("SW1:4")   /* Determined by actual use / trial & error */
+	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (defualt)" and "Off -- UNUSED --" */
 	PORT_DIPSETTING(          0x00100000, "45 Degree Angle" )
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")	/* Single controller version -  has no effect */
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")    /* Single controller version -  has no effect */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")	/* Single controller version -  has no effect */
+	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")    /* Single controller version -  has no effect */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1644,15 +1644,15 @@ static INPUT_PORTS_START( aama )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00100000, 0x00000000, "Trackball Orientation" ) PORT_DIPLOCATION("SW1:4")	/* Determined by actual use / trial & error */
-	PORT_DIPSETTING(          0x00000000, "Normal Mount" )						/* The manual says "Always on (defualt)" and "Off -- UNUSED --" */
+	PORT_DIPNAME( 0x00100000, 0x00000000, "Trackball Orientation" ) PORT_DIPLOCATION("SW1:4")   /* Determined by actual use / trial & error */
+	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (defualt)" and "Off -- UNUSED --" */
 	PORT_DIPSETTING(          0x00100000, "45 Degree Angle" )
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
-	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )					/* Cocktail mode REQUIRES "Controls" to be set to "Two Trackballs" */
+	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )                 /* Cocktail mode REQUIRES "Controls" to be set to "Two Trackballs" */
 	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, "One Trackball" )
-	PORT_DIPSETTING(          0x00400000, "Two Trackballs" )					/* Two Trackballs will work for Upright for "side by side" controls */
+	PORT_DIPSETTING(          0x00400000, "Two Trackballs" )                    /* Two Trackballs will work for Upright for "side by side" controls */
 INPUT_PORTS_END
 
 
@@ -2048,7 +2048,7 @@ ROM_START( bloodstm10 )
 ROM_END
 
 
-ROM_START( hardyard )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( hardyard )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "fb00v12.u83", 0x00000, 0x40000, CRC(c7497692) SHA1(6c11535cf011e15dd7ffb5eba8e8da557c38277e) )
 	ROM_LOAD16_BYTE( "fb01v12.u88", 0x00001, 0x40000, CRC(3320c79a) SHA1(d1d32048c541782e60c525d9789fe12607a6df3a) )
@@ -2080,7 +2080,7 @@ ROM_START( hardyard )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 106
 ROM_END
 
 
-ROM_START( hardyard10 )	/* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( hardyard10 ) /* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "fb00v10.u83", 0x00000, 0x40000, CRC(f839393c) SHA1(ba06172bc4781f7738ce43019031715fee4b344c) )
 	ROM_LOAD16_BYTE( "fb01v10.u88", 0x00001, 0x40000, CRC(ca444702) SHA1(49bcc0994da9cd2c31c0cd78b822aceeaffd035f) )
@@ -2112,7 +2112,7 @@ ROM_START( hardyard10 )	/* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 10
 ROM_END
 
 
-ROM_START( pairs )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( pairs )  /* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "pair0_v1.2.u83", 0x00000, 0x20000, CRC(a9c761d8) SHA1(2618c9c3f336cf30f760fd88f12c09985cfd4ee7) )
 	ROM_LOAD16_BYTE( "pair1_v1.2.u88", 0x00001, 0x20000, CRC(5141eb86) SHA1(3bb10d588e6334a33e5c2c468651699e84f46cdc) )
@@ -2139,7 +2139,7 @@ ROM_START( pairs )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Re
 ROM_END
 
 
-ROM_START( pairsa )	/* Version ?? (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( pairsa ) /* Version ?? (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "pair0.u83", 0x00000, 0x20000, CRC(774995a3) SHA1(93df91378b56802d14c105f7f48ed8a4f7bafffd) )
 	ROM_LOAD16_BYTE( "pair1.u88", 0x00001, 0x20000, CRC(85d0b73a) SHA1(48a6ac6de94be13e407da13e3e2440d858714b4b) )
@@ -2166,7 +2166,7 @@ ROM_START( pairsa )	/* Version ?? (3-tier board set: P/N 1059 Rev 3, P/N 1061 Re
 ROM_END
 
 
-ROM_START( pairsred )	/* Version RED V1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( pairsred )   /* Version RED V1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "pair0_u83_redv1.u83", 0x00000, 0x20000, CRC(cf27b93c) SHA1(4db1d5a756e237d49ace8b5c45d3c4d721a996d5) ) /* Labeled PAIR0 U83 RED V1 */
 	ROM_LOAD16_BYTE( "pair1_u88_redv1.u88", 0x00001, 0x20000, CRC(7ad48e7e) SHA1(ee4c543fbbeb26bcad45a06cda43572f081acb84) ) /* Labeled PAIR1 U88 RED V1 */
@@ -2188,7 +2188,7 @@ ROM_START( pairsred )	/* Version RED V1.0 (3-tier board set: P/N 1059 Rev 3, P/N
 	ROM_LOAD16_BYTE( "srom0_pairs_redv1", 0x000000, 0x80000, CRC(a998e29f) SHA1(fb0556d0e1a6621256e83fb6b0d0ed9885dff1b0) ) /* Labeled SROM0 PAIRS REDV1 */
 ROM_END
 
-ROM_START( hotmemry )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( hotmemry )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "hotmem0_v1.2.u83", 0x00000, 0x40000, CRC(5b9d87a2) SHA1(5a1ca7b622832fcb641e081d0c2a49c38ca795cd) )
 	ROM_LOAD16_BYTE( "hotmem1_v1.2.u88", 0x00001, 0x40000, CRC(aeea087c) SHA1(3a8bdc04bc4051691823d0c5a1a3429475692100) )
@@ -2214,7 +2214,7 @@ ROM_START( hotmemry )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1061
 	ROM_LOAD16_BYTE( "hotmem.srom0", 0x000000, 0x80000, CRC(c1103224) SHA1(52cf341ff9092ecb8cb94f66a96ee0c726bf1412) )
 ROM_END
 
-ROM_START( hotmemry11 )	/* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( hotmemry11 ) /* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "hotmem0_v1.1.u83", 0x00000, 0x20000, CRC(8d614b1b) SHA1(46567b83c595f166573ce6cf93456dbd10ab5b80) )
 	ROM_LOAD16_BYTE( "hotmem1_v1.1.u88", 0x00001, 0x20000, CRC(009639fb) SHA1(8f559a838a12a4e3d39acbea87a9816a66a3f8f8) )
@@ -2240,7 +2240,7 @@ ROM_START( hotmemry11 )	/* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_LOAD16_BYTE( "hotmem_v1.srom0", 0x000000, 0x80000, CRC(c18b76cd) SHA1(2d9ddda3b1d199289792c2e8b8add4a0f35c4a48) )
 ROM_END
 
-ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version is derived from the Tournament version, but tournament features have be removed/disabled */
+ROM_START( wcbowldx )   /* Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version is derived from the Tournament version, but tournament features have be removed/disabled */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcbd_prom0_2.00.prom0", 0x00000, 0x20000, CRC(280df7f0) SHA1(dacffe8fc21263093b0f4a4fbf444abd49afbff1) )
 	ROM_LOAD32_BYTE( "wcbd_prom1_2.00.prom1", 0x00001, 0x20000, CRC(526eded0) SHA1(106d5503ed4db2411e1f3446d613eac525a8a9cc) )
@@ -2276,7 +2276,7 @@ ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version 
 ROM_END
 
 
-ROM_START( wcbowl140 )	/* Version 1.40 Tournament (PCB P/N 1083 Rev 2) */
+ROM_START( wcbowl140 )  /* Version 1.40 Tournament (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcbf_prom0_1.40.prom0", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) )
 	ROM_LOAD32_BYTE( "wcbf_prom1_1.40.prom1", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) )
@@ -2312,7 +2312,7 @@ ROM_START( wcbowl140 )	/* Version 1.40 Tournament (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1083 Rev 2) */
+ROM_START( wcbowl ) /* Version 1.66 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prom0_v1.66n.prom0", 0x00000, 0x20000, CRC(f6774112) SHA1(cb09bb3e40490b3cdc3a5f7d18168384b5b29d85) ) /* original labels also found without the "N" */
 	ROM_LOAD32_BYTE( "wcb_prom1_v1.66n.prom1", 0x00001, 0x20000, CRC(931821ae) SHA1(328cd78ba70fe3cb0bdbc53833fe6fb153aceaea) )
@@ -2344,7 +2344,7 @@ ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbowl165 )	/* Version 1.65 (PCB P/N 1083 Rev 2) */
+ROM_START( wcbowl165 )  /* Version 1.65 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prom0_v1.65n.prom0", 0x00000, 0x20000, CRC(cf0f6c25) SHA1(90685288994dce73d5b1070a55fca3f1713c5bb6) ) /* original labels also found without the "N" */
 	ROM_LOAD32_BYTE( "wcb_prom1_v1.65n.prom1", 0x00001, 0x20000, CRC(076ab158) SHA1(e6d8a6726e27ba6916d4711dff88f26f1dc162e1) )
@@ -2376,7 +2376,7 @@ ROM_START( wcbowl165 )	/* Version 1.65 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbowl161 )	/* Version 1.61 (PCB P/N 1083 Rev 2) */
+ROM_START( wcbowl161 )  /* Version 1.61 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prom0_v1.61n.prom0", 0x00000, 0x20000, CRC(b879d4a7) SHA1(8b5af3f4d3522bdb8e1d6092b2e311fbfaec2bd0) )
 	ROM_LOAD32_BYTE( "wcb_prom1_v1.61n.prom1", 0x00001, 0x20000, CRC(49f3ed6a) SHA1(6c6857bd3fbfe0cfeaf0e512bbbd795376a21472) )
@@ -2408,7 +2408,7 @@ ROM_START( wcbowl161 )	/* Version 1.61 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbowl16 )	/* Version 1.6 (PCB P/N 1083 Rev 2), This is the first set to move to the single board platform */
+ROM_START( wcbowl16 )   /* Version 1.6 (PCB P/N 1083 Rev 2), This is the first set to move to the single board platform */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prom0_v1.6n.prom0", 0x00000, 0x20000, CRC(332c558f) SHA1(179b763e2189c11cf6751eb6c419fe4417b288a8) )
 	ROM_LOAD32_BYTE( "wcb_prom1_v1.6n.prom1", 0x00001, 0x20000, CRC(c5750857) SHA1(8121b56d304ab405b06d4aa4c7d2db2f912f0bf2) )
@@ -2440,7 +2440,7 @@ ROM_START( wcbowl16 )	/* Version 1.6 (PCB P/N 1083 Rev 2), This is the first set
 ROM_END
 
 
-ROM_START( wcbowl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+ROM_START( wcbowl15 )   /* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	/* v1.0 for this platform has been confirmed, but not dumped */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "wcb_v1.5_u83.u83", 0x00000, 0x20000, CRC(3ca9ab85) SHA1(364946dceb3f7279b7d67d9d685a98ba7f4901aa) ) /* Labeled as "WCB V1.5 (U83)" */
@@ -2452,11 +2452,11 @@ ROM_START( wcbowl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
-    ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
-    ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
-    ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
-    ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
-    */
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+	*/
 	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) /* May also be labeled as "WCB GRM0_0" ect */
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
@@ -2476,7 +2476,7 @@ ROM_START( wcbowl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 ROM_END
 
 
-ROM_START( wcbowl14 )	/* Version 1.4 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+ROM_START( wcbowl14 )   /* Version 1.4 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "wcb_v1.4_u83.u83", 0x00000, 0x20000, CRC(7086131f) SHA1(86fe6f725785a5b1a0fc13ca60823f30713253bc) ) /* Labeled as "WCB V1.4 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v1.4_u88.u88", 0x00001, 0x20000, CRC(0225aac1) SHA1(dd37ff8405e98c61acd042d23be93de24af37884) ) /* Labeled as "WCB V1.4 (U88)" */
@@ -2487,11 +2487,11 @@ ROM_START( wcbowl14 )	/* Version 1.4 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
-    ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
-    ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
-    ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
-    ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
-    */
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+	*/
 	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) /* May also be labeled as "WCB GRM0_0" ect */
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
@@ -2511,7 +2511,7 @@ ROM_START( wcbowl14 )	/* Version 1.4 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 ROM_END
 
 
-ROM_START( wcbowl13 )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+ROM_START( wcbowl13 )   /* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "wcb_v1.3_u83.u83", 0x00000, 0x20000, CRC(2b6d284e) SHA1(339951661509d07b69c670b7249f30a616872bdf) ) /* Labeled as "WCB V1.3 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v1.3_u88.u88", 0x00001, 0x20000, CRC(039af877) SHA1(2ac9a57e358ab1ccf9a4d18f7992b59f172e31cf) ) /* Labeled as "WCB V1.3 (U88)" */
@@ -2522,11 +2522,11 @@ ROM_START( wcbowl13 )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
-    ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
-    ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
-    ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
-    ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
-    */
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+	*/
 	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) /* May also be labeled as "WCB GRM0_0" ect */
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
@@ -2546,7 +2546,7 @@ ROM_START( wcbowl13 )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 ROM_END
 
 
-ROM_START( wcbowl13j )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+ROM_START( wcbowl13j )  /* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "wcb_v1.3j_u83.u83", 0x00000, 0x20000, CRC(5805fd92) SHA1(6ec49958364731c9fdac42dfdf515f6a7a91366a) ) /* Labeled as "WCB V1.3J (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v1.3j_u88.u88", 0x00001, 0x20000, CRC(b846660e) SHA1(afb3f459a819afee128849751840db3c02d4762a) ) /* Labeled as "WCB V1.3J (U88)" */
@@ -2557,11 +2557,11 @@ ROM_START( wcbowl13j )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 107
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
-    ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
-    ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
-    ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
-    ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
-    */
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+	*/
 	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) /* May also be labeled as "WCB GRM0_0" ect */
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
@@ -2581,7 +2581,7 @@ ROM_START( wcbowl13j )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 107
 ROM_END
 
 
-ROM_START( wcbowl12 )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+ROM_START( wcbowl12 )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "wcb_v1.2_u83.u83", 0x00000, 0x20000, CRC(0602c5ce) SHA1(4339f77301f9c607c6f1dc81270d03681e874e69) ) /* Labeled as "WCB V1.2 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v1.2_u88.u88", 0x00001, 0x20000, CRC(49573493) SHA1(42813573f4ab951cd830193c0ffe2ce7d79c354b) ) /* Labeled as "WCB V1.2 (U88)" */
@@ -2592,11 +2592,11 @@ ROM_START( wcbowl12 )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
-    ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
-    ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
-    ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
-    ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
-    */
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+	*/
 	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) /* May also be labeled as "WCB GRM0_0" ect */
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
@@ -2616,7 +2616,7 @@ ROM_START( wcbowl12 )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 ROM_END
 
 
-ROM_START( wcbowl11 )	/* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+ROM_START( wcbowl11 )   /* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "wcb_v1.1_u83.u83", 0x00000, 0x20000, CRC(d4902392) SHA1(7dfef3c15a8c6e9eab93742543afce4b39675d0d) ) /* Labeled as "WCB V1.1 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v1.1_u88.u88", 0x00001, 0x20000, CRC(ea81a95c) SHA1(c36e7b52435c68bec34d6fe22f623eac16879b50) ) /* Labeled as "WCB V1.1 (U88)" */
@@ -2627,11 +2627,11 @@ ROM_START( wcbowl11 )	/* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
-    ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
-    ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
-    ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
-    ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
-    */
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+	*/
 	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) /* May also be labeled as "WCB GRM0_0" ect */
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
@@ -2693,7 +2693,7 @@ ROM_START( drivedge )
 ROM_END
 
 
-ROM_START( sftm )	/* Version 1.12 */
+ROM_START( sftm )   /* Version 1.12 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sftmrom0.112", 0x00000, 0x40000, CRC(9d09355c) SHA1(ca8c31d580e4b18b630c38e4ac1c353cf27ab4a2) )
 	ROM_LOAD32_BYTE( "sftmrom1.112", 0x00001, 0x40000, CRC(a58ac6a9) SHA1(a481a789c397151efcbec7ad9983daa30f289d4e) )
@@ -2726,7 +2726,7 @@ ROM_START( sftm )	/* Version 1.12 */
 ROM_END
 
 
-ROM_START( sftm111 )	/* Version 1.11 */
+ROM_START( sftm111 )    /* Version 1.11 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sftmrom0.111", 0x00000, 0x40000, CRC(28187ddc) SHA1(7e4fa285be9389c913fca849098a7c0d9404df7a) )
 	ROM_LOAD32_BYTE( "sftmrom1.111", 0x00001, 0x40000, CRC(ec2ce6fa) SHA1(b79aebb73ba77c2ebe081142853e81473743ac46) )
@@ -2759,7 +2759,7 @@ ROM_START( sftm111 )	/* Version 1.11 */
 ROM_END
 
 
-ROM_START( sftm110 )	/* Version 1.10 */
+ROM_START( sftm110 )    /* Version 1.10 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sftmrom0.110", 0x00000, 0x40000, CRC(00c0c63c) SHA1(39f614cca51fe7843c2158b6d9abdc52dc1b0bef) )
 	ROM_LOAD32_BYTE( "sftmrom1.110", 0x00001, 0x40000, CRC(d4d2a67e) SHA1(88069caf171bb9c5602bc493f1f1dafa26d2fc78) )
@@ -2792,7 +2792,7 @@ ROM_START( sftm110 )	/* Version 1.10 */
 ROM_END
 
 
-ROM_START( sftmj )	/* Version 1.12N (Japan) */
+ROM_START( sftmj )  /* Version 1.12N (Japan) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sfmprom0.12n", 0x00000, 0x40000, CRC(640a04a8) SHA1(adc7f5880962cbcc5f9f28e72a84070da6e2ec36) )
 	ROM_LOAD32_BYTE( "sfmprom1.12n", 0x00001, 0x40000, CRC(2a27b690) SHA1(f63c3665ec030ecc2d7a10ead182941ade1c79d0) )
@@ -2825,7 +2825,7 @@ ROM_START( sftmj )	/* Version 1.12N (Japan) */
 ROM_END
 
 
-ROM_START( shufshot )	/* Version 1.40 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot )   /* Version 1.40 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.40.prom0", 0x00000, 0x20000, CRC(33c0c98b) SHA1(9960a1e8131e5dde33450560665f315e5a97dc05) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.40.prom1", 0x00001, 0x20000, CRC(d30a8831) SHA1(3a7937b542f703dfc2ae74b6fdb2ac6a8e22bdbd) )
@@ -2860,7 +2860,7 @@ ROM_START( shufshot )	/* Version 1.40 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( shufshot139 )	/* Version 1.39 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot139 )    /* Version 1.39 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.39.prom0", 0x00000, 0x20000, CRC(e811fc4a) SHA1(9e1d8f64ac89ac865929f6a23f66d95eeeda3ac9) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.39.prom1", 0x00001, 0x20000, CRC(f9d120c5) SHA1(f94216f1fb6d810ddee98479e83f0719b30b768f) )
@@ -2895,7 +2895,7 @@ ROM_START( shufshot139 )	/* Version 1.39 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( shufshot137 )	/* Version 1.37 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot137 )    /* Version 1.37 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.37.prom0", 0x00000, 0x20000, CRC(6499c76f) SHA1(60fdaefb09088ac609addd40569bd7fab12593bc) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.37.prom1", 0x00001, 0x20000, CRC(64fb47a4) SHA1(32ce9d91b16b8aaf545c0a22842ad8d806727a17) )
@@ -2930,7 +2930,7 @@ ROM_START( shufshot137 )	/* Version 1.37 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( gt3d )	/* Version 1.93N for the single large type PCB P/N 1083 Rev 2 */
+ROM_START( gt3d )   /* Version 1.93N for the single large type PCB P/N 1083 Rev 2 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gtg3_prom0_v1.93n.prom0", 0x00000, 0x80000, CRC(cacacb44) SHA1(747f48a52e140ab3e321b8f6a96f06bc70dc7cfa) )
 	ROM_LOAD32_BYTE( "gtg3_prom1_v1.93n.prom1", 0x00001, 0x80000, CRC(4c172d7f) SHA1(d4217d5d4d561e46e0213e6f8dc8d9a874f86877) )
@@ -3305,9 +3305,9 @@ ROM_START( gt3dt211 ) /* Version 2.11 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_LOAD32_BYTE( "gtg3_grom0_2++.grm0_2", 0x000002, 0x100000, CRC(67a02ef9) SHA1(4f9e5217eeaf68fc72af1dc9e3a16d876de8d11d) )
 	ROM_LOAD32_BYTE( "gtg3_grom0_3++.grm0_3", 0x000003, 0x100000, CRC(1173a710) SHA1(1f612c1efbf38796707f5b5fecf9d4044691f031) )
 	/*
-    The above 4 roms have the same exact data as the other sets, but in 8 meg roms instead of 4 meg roms.
-    This is the only set that specificaly checks for these roms in this format
-    */
+	The above 4 roms have the same exact data as the other sets, but in 8 meg roms instead of 4 meg roms.
+	This is the only set that specificaly checks for these roms in this format
+	*/
 	ROM_LOAD32_BYTE( "gtg3_grom1_0+.grm1_0", 0x400000, 0x080000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) /* actually labeled "GTG3 GROM1_0*" ect */
 	ROM_LOAD32_BYTE( "gtg3_grom1_1+.grm1_1", 0x400001, 0x080000, CRC(0f85a618) SHA1(d9ced21c20f9ed6b7f19e7645d75b239ea709b79) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_2+.grm1_2", 0x400002, 0x080000, CRC(09ca5fbf) SHA1(6a6ed4d5d76035d8acc33c6494fba6012194362e) )
@@ -3536,7 +3536,7 @@ ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( gt98 )	/* Version 1.10 */
+ROM_START( gt98 )   /* Version 1.10 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98_prom0_v1.10.prom0", 0x00000, 0x80000, CRC(dd93ab2a) SHA1(b7eb6331f781422d6d46babcc24a85ae36b25914) )
 	ROM_LOAD32_BYTE( "gt98_prom1_v1.10.prom1", 0x00001, 0x80000, CRC(6ea92960) SHA1(05d22ad6c6027afe7ebb3bc7c70f58d840ed3d4e) )
@@ -3567,7 +3567,7 @@ ROM_START( gt98 )	/* Version 1.10 */
 ROM_END
 
 
-ROM_START( gt98v100 )	/* Version 1.00 */
+ROM_START( gt98v100 )   /* Version 1.00 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98_prom0_v1.00.prom0", 0x00000, 0x80000, CRC(f2dc0a6c) SHA1(59f7f8c7feb30c6416cb4ac2299f2c620d4c4e5f) )
 	ROM_LOAD32_BYTE( "gt98_prom1_v1.00.prom1", 0x00001, 0x80000, CRC(b0ca22f3) SHA1(f849b42d449e07a12e0bc20b98693125506c7ed6) )
@@ -3629,7 +3629,7 @@ ROM_START( gt98s100 ) /* Version 1.00S for the 3 tier type PCB with short ROM bo
 ROM_END
 
 
-ROM_START( gt98t303 )	/* Version 3.03 Tournament Edition (PCB P/N 1083 Rev 2) */
+ROM_START( gt98t303 )   /* Version 3.03 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98_prom0_v3.03t.prom0", 0x00000, 0x100000, CRC(e3879c30) SHA1(fa9dd2df8969a98a3c87c6a96594e1f49ca7ec91) )
 	ROM_LOAD32_BYTE( "gt98_prom1_v3.03t.prom1", 0x00001, 0x100000, CRC(6a42ab1e) SHA1(9d8c5a48f0b91dcc8898913eec3d09ddded0f43d) )
@@ -3660,7 +3660,7 @@ ROM_START( gt98t303 )	/* Version 3.03 Tournament Edition (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( gtdiamond )	/* Version 3.05TL Tournament Edition (PCB P/N 1083 Rev 2) */
+ROM_START( gtdiamond )  /* Version 3.05TL Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98_golf_elc_prom0_v3.05tl.prom0", 0x00000, 0x100000, CRC(b6b0e3b8) SHA1(e2ff88f205ad902d78b8c52ed554eb612c300d3c) )
 	ROM_LOAD32_BYTE( "gt98_golf_elc_prom1_v3.05tl.prom1", 0x00001, 0x100000, CRC(ba15f3a3) SHA1(9ebe81c3f7f8526bf73c6728071905e7803b4101) )
@@ -3694,7 +3694,7 @@ ROM_START( gtdiamond )	/* Version 3.05TL Tournament Edition (PCB P/N 1083 Rev 2)
 ROM_END
 
 
-ROM_START( gt99 )	/* Version 1.00 */
+ROM_START( gt99 )   /* Version 1.00 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt99_prom0_v1.00.prom0", 0x00000, 0x80000, CRC(1ca05267) SHA1(431788db68122df5b6c0642ffc84954fb3043295) )
 	ROM_LOAD32_BYTE( "gt99_prom1_v1.00.prom1", 0x00001, 0x80000, CRC(4fb757fa) SHA1(9efa6f933b20e5a6de9a5da3c0197cf29c8f1df2) )
@@ -3728,7 +3728,7 @@ ROM_START( gt99 )	/* Version 1.00 */
 ROM_END
 
 
-ROM_START( gt99s100 )	/* Version 1.00S for the 3 tier type PCB with short ROM board P/N 1088 Rev 0 */
+ROM_START( gt99s100 )   /* Version 1.00S for the 3 tier type PCB with short ROM board P/N 1088 Rev 0 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt99_prom0_v1.00s.prom0", 0x00000, 0x80000, CRC(58e7c4e1) SHA1(2d5e2d841ffb626338f4dd9ffb558d05ed476078) )
 	ROM_LOAD32_BYTE( "gt99_prom1_v1.00s.prom1", 0x00001, 0x80000, CRC(09f8bdf4) SHA1(b933b48e19ca31ead93027ea328c2d9e581cbd31) )
@@ -3762,7 +3762,7 @@ ROM_START( gt99s100 )	/* Version 1.00S for the 3 tier type PCB with short ROM bo
 ROM_END
 
 
-ROM_START( gt99t400 )	/* Version 4.00 Tournament Edition (PCB P/N 1083 Rev 2) */
+ROM_START( gt99t400 )   /* Version 4.00 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt99_prom0_v4.00t.prom0", 0x00000, 0x100000, CRC(bc58e0a2) SHA1(9e207acb860d532238f6105fd5b0d283056e016f) )
 	ROM_LOAD32_BYTE( "gt99_prom1_v4.00t.prom1", 0x00001, 0x100000, CRC(89d8cc6b) SHA1(ff2a5452c1c3a14c22abe380cb1ce263c23cc071) )
@@ -3796,7 +3796,7 @@ ROM_START( gt99t400 )	/* Version 4.00 Tournament Edition (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( gtroyal )	/* Version 4.02T EDM (Tournament Edition, PCB P/N 1083 Rev 2) */
+ROM_START( gtroyal )    /* Version 4.02T EDM (Tournament Edition, PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gtr_prom0_v4.02t_edm.prom0", 0x00000, 0x100000, CRC(ae499ea3) SHA1(0de651900fd92b2de3fcbc092c1292d546f12819) )
 	ROM_LOAD32_BYTE( "gtr_prom1_v4.02t_edm.prom1", 0x00001, 0x100000, CRC(87ee04b5) SHA1(2c4c4a80073bfd28066bef371fbd1008149cc56c) )
@@ -3898,7 +3898,7 @@ ROM_START( gt2kp100 ) /* Version 1.00 Infinite Loop Protection */
 ROM_END
 
 
-ROM_START( gt2ks100 )	/* Version 1.00S for the 3 tier type PCB with short ROM board P/N 1088 Rev 0 */
+ROM_START( gt2ks100 )   /* Version 1.00S for the 3 tier type PCB with short ROM board P/N 1088 Rev 0 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt2k_kit_prom0_v1.00m.prom0", 0x00000, 0x80000, CRC(3aab67c8) SHA1(c08dcad9e7c2440058ee4d683b2257c6ae42ad4d) ) /* Games shows Golden Tee 2K v1.00S */
 	ROM_LOAD32_BYTE( "gt2k_kit_prom1_v1.00m.prom1", 0x00001, 0x80000, CRC(47d4a74d) SHA1(b4f80de1ffea11bf716c891519990e0fe2dfbc23) )
@@ -4162,11 +4162,11 @@ DRIVER_INIT_MEMBER(itech32_state,drivedge)
 DRIVER_INIT_MEMBER(itech32_state,wcbowl)
 {
 	/*
-        This is the 3 tier PCB set:
-          Main  P/N 1059 Rev 3 (see Hot Memory PCB layout above)
-          ROM   P/N 1079 Rev 1 (contains graphic roms, 4MHz OSC + ITBWL-1 security PIC chip)
-          Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
-    */
+	    This is the 3 tier PCB set:
+	      Main  P/N 1059 Rev 3 (see Hot Memory PCB layout above)
+	      ROM   P/N 1079 Rev 1 (contains graphic roms, 4MHz OSC + ITBWL-1 security PIC chip)
+	      Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
+	*/
 	init_program_rom(machine());
 	m_vram_height = 1024;
 	m_planes = 1;
@@ -4182,11 +4182,11 @@ DRIVER_INIT_MEMBER(itech32_state,wcbowl)
 DRIVER_INIT_MEMBER(itech32_state,wcbowlj)
 {
 	/*
-        This is the 3 tier PCB set:
-          Main  P/N 1059 Rev 3 (see Hot Memory PCB layout above)
-          ROM   P/N 1079 Rev 1 (contains graphic roms, 4MHz OSC + ITBWL-1 security PIC chip)
-          Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
-    */
+	    This is the 3 tier PCB set:
+	      Main  P/N 1059 Rev 3 (see Hot Memory PCB layout above)
+	      ROM   P/N 1079 Rev 1 (contains graphic roms, 4MHz OSC + ITBWL-1 security PIC chip)
+	      Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
+	*/
 	init_program_rom(machine());
 	m_vram_height = 1024;
 	m_planes = 1;
@@ -4231,10 +4231,10 @@ static void init_shuffle_bowl_common(running_machine &machine, int prot_addr)
 {
 	itech32_state *state = machine.driver_data<itech32_state>();
 	/*
-        The newest versions of World Class Bowling are on the same exact
-        platform as Shuffle Shot. So We'll use the same general INIT
-        routine for these two programs.  IE: PCB P/N 1083 Rev 2
-    */
+	    The newest versions of World Class Bowling are on the same exact
+	    platform as Shuffle Shot. So We'll use the same general INIT
+	    routine for these two programs.  IE: PCB P/N 1083 Rev 2
+	*/
 	init_program_rom(machine);
 	state->m_vram_height = 1024;
 	state->m_planes = 1;
@@ -4290,12 +4290,12 @@ static void init_gt_common(running_machine &machine)
 DRIVER_INIT_MEMBER(itech32_state,gt3d)
 {
 	/*
-        This is the 3 tier PCB with the short ROM board:
-        Known (dumped) GT versions on this board:  GT3D v1.4 through v1.92S
+	    This is the 3 tier PCB with the short ROM board:
+	    Known (dumped) GT versions on this board:  GT3D v1.4 through v1.92S
 
-        Hacked versions of this PCB have been found with GT97
-        through GTClassic. This is _NOT_ a factory modification
-    */
+	    Hacked versions of this PCB have been found with GT97
+	    through GTClassic. This is _NOT_ a factory modification
+	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_8bit_r),this));
 	init_gt_common(machine());
 }
@@ -4304,11 +4304,11 @@ DRIVER_INIT_MEMBER(itech32_state,gt3d)
 DRIVER_INIT_MEMBER(itech32_state,aama)
 {
 	/*
-        This is the single PCB style board commonly referred to as:
-        "AAMA Serial Numbers 676266 and Up." All versions of GT on this
-        board share the same sound CPU code and sample ROMs.
-        This board has all versions of GT for it, GT3D through GTClassic
-    */
+	    This is the single PCB style board commonly referred to as:
+	    "AAMA Serial Numbers 676266 and Up." All versions of GT on this
+	    board share the same sound CPU code and sample ROMs.
+	    This board has all versions of GT for it, GT3D through GTClassic
+	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
 	init_gt_common(machine());
@@ -4318,8 +4318,8 @@ DRIVER_INIT_MEMBER(itech32_state,aama)
 DRIVER_INIT_MEMBER(itech32_state,aamat)
 {
 	/*
-        Tournament Version - So install needed handler for the TimeKeeper ram
-    */
+	    Tournament Version - So install needed handler for the TimeKeeper ram
+	*/
 	DRIVER_INIT_CALL(aama);
 
 	install_timekeeper(machine());
@@ -4329,11 +4329,11 @@ DRIVER_INIT_MEMBER(itech32_state,aamat)
 DRIVER_INIT_MEMBER(itech32_state,s_ver)
 {
 	/*
-        This is a special 3 tier PCB with a short ROM board and 1 trackball
-        connector, P/N 1088 Rev 0. Known versions of Golden Tee for this
-        board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
-        Trackball info is read through 200202 (actually 200203).
-    */
+	    This is a special 3 tier PCB with a short ROM board and 1 trackball
+	    connector, P/N 1088 Rev 0. Known versions of Golden Tee for this
+	    board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
+	    Trackball info is read through 200202 (actually 200203).
+	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
 	init_gt_common(machine());
 }
@@ -4342,12 +4342,12 @@ DRIVER_INIT_MEMBER(itech32_state,s_ver)
 DRIVER_INIT_MEMBER(itech32_state,gt3dl)
 {
 	/*
-        This is the 3 tier PCB with the long ROM board:
-        Known GT versions on this board:  GT3D v1.92L & v1.91L
+	    This is the 3 tier PCB with the long ROM board:
+	    Known GT versions on this board:  GT3D v1.92L & v1.91L
 
-        Player 1 trackball read through 200003
-        Player 2 trackball read through 200002
-    */
+	    Player 1 trackball read through 200003
+	    Player 2 trackball read through 200002
+	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),this));
 	init_gt_common(machine());
 }
@@ -4361,16 +4361,16 @@ DRIVER_INIT_MEMBER(itech32_state,gt2kp)
 
 	/* The protection code is:
 
-        addq #1,    1132.w
-        clr.l       d0
-        clr.l       d1
-        move.b      680002,d0       ; Read protection result
-        move.b      112f.w,d1
-        andi.b      #$01,d0
+	    addq #1,    1132.w
+	    clr.l       d0
+	    clr.l       d1
+	    move.b      680002,d0       ; Read protection result
+	    move.b      112f.w,d1
+	    andi.b      #$01,d0
 Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
-        nop                         ; Otherwise just return to the game :-)
+	    nop                         ; Otherwise just return to the game :-)
 
-    */
+	*/
 }
 
 
@@ -4382,16 +4382,16 @@ DRIVER_INIT_MEMBER(itech32_state,gtclasscp)
 
 	/* The protection code is:
 
-        addq #1,    1132.w
-        clr.l       d0
-        clr.l       d1
-        move.b      680002,d0       ; Read protection result
-        andi.b      #$C0,d0
-        cmpi.b      #$80,d0
+	    addq #1,    1132.w
+	    clr.l       d0
+	    clr.l       d1
+	    move.b      680002,d0       ; Read protection result
+	    andi.b      #$C0,d0
+	    cmpi.b      #$80,d0
 Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
-        rts                         ; Otherwise just return to the game :-)
+	    rts                         ; Otherwise just return to the game :-)
 
-    */
+	*/
 }
 
 

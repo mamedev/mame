@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg0tile_info)
 
 	tileno = (m_bg0videoram[tile_index *2+1] & 0x3fff);
 	colour = m_bg0videoram[tile_index *2] & 0x001f;
-	if (colour & 0x10) colour ^= 0x30;	/* skip hole */
+	if (colour & 0x10) colour ^= 0x30;  /* skip hole */
 	fyx = (m_bg0videoram[tile_index *2] & 0x00c0) >>6;
 
 	SET_TILE_INFO_MEMBER(2,tileno,colour,TILE_FLIPYX(fyx));
@@ -106,18 +106,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
-       | ---- ---- -pCc cccX | ---- ---- xxxx xxxx | ---- ---- ---- ---- | ---- ---- ---- ---- | */
+	   | ---- ---- -pCc cccX | ---- ---- xxxx xxxx | ---- ---- ---- ---- | ---- ---- ---- ---- | */
 
 	/* h  = height
-       f  = flipx
-       F  = flipy
-       e  = enable
-       Yy = Y Position
-       Tt = Tile No.
-       Xx = X Position
-       Cc = color
-       P = priority
-    */
+	   f  = flipx
+	   F  = flipy
+	   e  = enable
+	   Yy = Y Position
+	   Tt = Tile No.
+	   Xx = X Position
+	   Cc = color
+	   P = priority
+	*/
 
 	shadfrce_state *state = machine.driver_data<shadfrce_state>();
 	gfx_element *gfx = machine.gfx[1];
@@ -136,10 +136,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int pal = ((source[4] & 0x003e));
 		int pri_mask = (source[4] & 0x0040) ? 0x02 : 0x00;
 
-		if (pal & 0x20) pal ^= 0x60;	/* skip hole */
+		if (pal & 0x20) pal ^= 0x60;    /* skip hole */
 
 		height++;
-		if (enable)	{
+		if (enable) {
 			for (hcount=0;hcount<height;hcount++) {
 				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,machine.priority_bitmap,pri_mask,0);
 				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,machine.priority_bitmap,pri_mask,0);

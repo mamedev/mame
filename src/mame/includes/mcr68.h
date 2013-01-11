@@ -4,12 +4,12 @@
 
 struct counter_state
 {
-	UINT8			control;
-	UINT16			latch;
-	UINT16			count;
-	emu_timer *		timer;
-	UINT8			timer_active;
-	attotime		period;
+	UINT8           control;
+	UINT16          latch;
+	UINT16          count;
+	emu_timer *     timer;
+	UINT8           timer_active;
+	attotime        period;
 };
 
 class mcr68_state : public driver_device
@@ -21,8 +21,8 @@ public:
 		m_sounds_good(*this, "sg"),
 		m_turbo_chip_squeak(*this, "tcs"),
 		m_cvsd_sound(*this, "cvsd"),
-		  m_videoram(*this, "videoram"),
-		  m_spriteram(*this, "spriteram") { }
+			m_videoram(*this, "videoram"),
+			m_spriteram(*this, "spriteram") { }
 
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;

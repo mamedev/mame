@@ -69,16 +69,16 @@ const device_type TICKET_DISPENSER = &device_creator<ticket_dispenser_device>;
 
 ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TICKET_DISPENSER, "Ticket Dispenser", tag, owner, clock),
-	  m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
-	  m_status_sense(TICKET_STATUS_ACTIVE_LOW),
-	  m_period(attotime::from_msec(100)),
-	  m_active_bit(0x80),
-	  m_motoron(0),
-	  m_ticketdispensed(0),
-	  m_ticketnotdispensed(0),
-	  m_status(0),
-	  m_power(0),
-	  m_timer(NULL)
+		m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
+		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
+		m_period(attotime::from_msec(100)),
+		m_active_bit(0x80),
+		m_motoron(0),
+		m_ticketdispensed(0),
+		m_ticketnotdispensed(0),
+		m_status(0),
+		m_power(0),
+		m_timer(NULL)
 {
 }
 

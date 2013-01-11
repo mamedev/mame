@@ -169,7 +169,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 
 	/* draw each one of our four motion objects, the two PLANE sprites
-       can be drawn double width */
+	   can be drawn double width */
 	for (pic = 3; pic >= 0; pic--)
 	{
 		int sx,sy;

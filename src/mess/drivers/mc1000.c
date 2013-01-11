@@ -94,18 +94,18 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       enable CPU video RAM access
-        1       CSS
-        2       GM0
-        3       GM1
-        4       GM2
-        5       _INT/EXT
-        6       _A/S
-        7       _A/G
+	    0       enable CPU video RAM access
+	    1       CSS
+	    2       GM0
+	    3       GM1
+	    4       GM2
+	    5       _INT/EXT
+	    6       _A/S
+	    7       _A/G
 
-    */
+	*/
 
 	m_mc6847_bank = BIT(data, 0);
 	m_vdg->css_w(BIT(data, 1));
@@ -304,7 +304,7 @@ READ8_MEMBER( mc1000_state::keydata_r )
 
 	data = (ioport("MODIFIERS")->read() & 0xc0) | (data & 0x3f);
 
-	if (m_cassette->input() < +0.0)	data &= 0x7f;
+	if (m_cassette->input() < +0.0) data &= 0x7f;
 
 	return data;
 }
@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	MCFG_TIMER_PARAM(ASSERT_LINE)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, mc1000_mc6847_intf)
 
 	/* sound hardware */
@@ -503,4 +503,4 @@ DRIVER_INIT_MEMBER(mc1000_state,mc1000)
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME        FLAGS */
-COMP( 1985,	mc1000,		0,			0,		mc1000,		mc1000, mc1000_state,		mc1000,		"CCE",				"MC-1000",		GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state,       mc1000,     "CCE",              "MC-1000",      GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

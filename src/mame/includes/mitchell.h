@@ -12,10 +12,10 @@ class mitchell_state : public driver_device
 public:
 	mitchell_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_audiocpu(*this, "audiocpu"),
-		  m_oki(*this, "oki") ,
-		  m_nvram(*this, "nvram"),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_oki(*this, "oki") ,
+			m_nvram(*this, "nvram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"){ }
 
@@ -45,7 +45,7 @@ public:
 	int        m_dial_selected;
 	int        m_dir[2];
 	int        m_keymatrix;
-	UINT8		m_dummy_nvram;
+	UINT8       m_dummy_nvram;
 
 	UINT8 m_irq_source;
 	DECLARE_READ8_MEMBER(pang_port5_r);

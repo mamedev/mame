@@ -50,7 +50,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( flower_sound1_w );
 DECLARE_WRITE8_DEVICE_HANDLER( flower_sound2_w );
 
 class flower_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -72,4 +72,3 @@ private:
 };
 
 extern const device_type FLOWER;
-

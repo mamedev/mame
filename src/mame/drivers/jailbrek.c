@@ -157,21 +157,21 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( jailbrek )
-	PORT_START("SYSTEM")	/* $3300 */
+	PORT_START("SYSTEM")    /* $3300 */
 	KONAMI8_SYSTEM_10
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1")		/* $3301 */
-	KONAMI8_B12_UNK(1)	// button1 = shoot, button2 = select
+	PORT_START("P1")        /* $3301 */
+	KONAMI8_B12_UNK(1)  // button1 = shoot, button2 = select
 
-	PORT_START("P2")		/* $3302 */
+	PORT_START("P2")        /* $3302 */
 	KONAMI8_B12_UNK(2)
 
-	PORT_START("DSW1")		/* $3303 */
+	PORT_START("DSW1")      /* $3303 */
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* "Invalid" = both coin slots disabled */
 
-	PORT_START("DSW2")		/* $3100 */
+	PORT_START("DSW2")      /* $3100 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )       PORT_DIPLOCATION( "SW2:1,2" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -193,10 +193,10 @@ static INPUT_PORTS_START( jailbrek )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")		/* $3200 */
+	PORT_START("DSW3")      /* $3200 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION( "SW3:1" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )     PORT_DIPLOCATION( "SW3:2" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
@@ -207,26 +207,26 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	4,	/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the four bitplanes are packed in one nibble */
+	8,8,    /* 8*8 characters */
+	1024,   /* 1024 characters */
+	4,  /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every char takes 32 consecutive bytes */
+	32*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	512,	/* 512 sprites */
-	4,	/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the bitplanes are packed in one nibble */
+	16,16,  /* 16*16 sprites */
+	512,    /* 512 sprites */
+	4,  /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
 			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( jailbrek )
@@ -248,7 +248,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -306,11 +306,11 @@ ROM_START( jailbrek )
 	ROM_LOAD( "507p02.9d",  0xc000, 0x4000, CRC(444b7d8e) SHA1(c708b67c2d249448dae9a3d10c24d13ba6849597) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "507l08.4f",  0x0000, 0x4000, CRC(e3b7a226) SHA1(c19a02a2def65648bf198fccec98ebbd2fc7c0fb) )	/* characters */
+	ROM_LOAD( "507l08.4f",  0x0000, 0x4000, CRC(e3b7a226) SHA1(c19a02a2def65648bf198fccec98ebbd2fc7c0fb) )  /* characters */
 	ROM_LOAD( "507j09.5f",  0x4000, 0x4000, CRC(504f0912) SHA1(b51a45dd5506bccdf0061dd6edd7f49ac86ed0f8) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "507j04.3e",  0x0000, 0x4000, CRC(0d269524) SHA1(a10ddb405e884bfec521a3c7a29d22f63e535b59) )	/* sprites */
+	ROM_LOAD( "507j04.3e",  0x0000, 0x4000, CRC(0d269524) SHA1(a10ddb405e884bfec521a3c7a29d22f63e535b59) )  /* sprites */
 	ROM_LOAD( "507j05.4e",  0x4000, 0x4000, CRC(27d4f6f4) SHA1(c42c064dbd7c5cf0b1d99651367e0bee1728a5b0) )
 	ROM_LOAD( "507j06.5e",  0x8000, 0x4000, CRC(717485cb) SHA1(22609489186dcb3d7cd49b7ddfdc6f04d0739354) )
 	ROM_LOAD( "507j07.3f",  0xc000, 0x4000, CRC(e933086f) SHA1(c0fd1e8d23c0f7e14c0b75f629448034420cf8ef) )
@@ -331,11 +331,11 @@ ROM_START( manhatan )
 	ROM_LOAD( "507n02.9d",  0xc000, 0x4000, CRC(143cc62c) SHA1(9520dbb1b6f1fa439e03d4caa9bed96ef8f805f2) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "507j08.4f",  0x0000, 0x4000, CRC(175e1b49) SHA1(4cfe982cdf7729bd05c6da803480571876320bf6) )	/* characters */
+	ROM_LOAD( "507j08.4f",  0x0000, 0x4000, CRC(175e1b49) SHA1(4cfe982cdf7729bd05c6da803480571876320bf6) )  /* characters */
 	ROM_LOAD( "507j09.5f",  0x4000, 0x4000, CRC(504f0912) SHA1(b51a45dd5506bccdf0061dd6edd7f49ac86ed0f8) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "507j04.3e",  0x0000, 0x4000, CRC(0d269524) SHA1(a10ddb405e884bfec521a3c7a29d22f63e535b59) )	/* sprites */
+	ROM_LOAD( "507j04.3e",  0x0000, 0x4000, CRC(0d269524) SHA1(a10ddb405e884bfec521a3c7a29d22f63e535b59) )  /* sprites */
 	ROM_LOAD( "507j05.4e",  0x4000, 0x4000, CRC(27d4f6f4) SHA1(c42c064dbd7c5cf0b1d99651367e0bee1728a5b0) )
 	ROM_LOAD( "507j06.5e",  0x8000, 0x4000, CRC(717485cb) SHA1(22609489186dcb3d7cd49b7ddfdc6f04d0739354) )
 	ROM_LOAD( "507j07.3f",  0xc000, 0x4000, CRC(e933086f) SHA1(c0fd1e8d23c0f7e14c0b75f629448034420cf8ef) )
@@ -418,24 +418,24 @@ DRIVER_INIT_MEMBER(jailbrek_state,jailbrek)
 	UINT8 *SPEECH_ROM = machine().root_device().memregion("vlm")->base();
 	int ind;
 
-    /*
-       Check if the rom used for the speech is not a 2764, but a 27128.  If a
-       27128 is used then the data is stored in the upper half of the eprom.
-       (The schematics and board refer to a 2764, but all the boards I have seen
-       use a 27128.  According to the schematics pin 26 is tied high so if a 2764
-       is used then the pin is ignored, but if a 27128 is used then pin 26
-       represents address line A13.)
-    */
+	/*
+	   Check if the rom used for the speech is not a 2764, but a 27128.  If a
+	   27128 is used then the data is stored in the upper half of the eprom.
+	   (The schematics and board refer to a 2764, but all the boards I have seen
+	   use a 27128.  According to the schematics pin 26 is tied high so if a 2764
+	   is used then the pin is ignored, but if a 27128 is used then pin 26
+	   represents address line A13.)
+	*/
 
-    if (machine().root_device().memregion("vlm")->bytes() == 0x4000)
-    {
-        for (ind = 0; ind < 0x2000; ++ind)
-        {
-            SPEECH_ROM[ind] = SPEECH_ROM[ind + 0x2000];
-        }
-    }
+	if (machine().root_device().memregion("vlm")->bytes() == 0x4000)
+	{
+		for (ind = 0; ind < 0x2000; ++ind)
+		{
+			SPEECH_ROM[ind] = SPEECH_ROM[ind + 0x2000];
+		}
+	}
 
-    konami1_decode(machine(), "maincpu");
+	konami1_decode(machine(), "maincpu");
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek_state, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )

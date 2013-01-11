@@ -19,7 +19,7 @@
 #include "harddisk.h"
 #include "imagedev/harddriv.h"
 
-#define IDE_DISK_SECTOR_SIZE			512
+#define IDE_DISK_SECTOR_SIZE            512
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -31,8 +31,8 @@ class ide_device_interface : public device_slot_card_interface
 public:
 	ide_device_interface(const machine_config &mconfig, device_t &device);
 public:
-	virtual int	 read_sector(UINT32 lba, void *buffer) = 0;
-	virtual int	 write_sector(UINT32 lba, const void *buffer) = 0;
+	virtual int  read_sector(UINT32 lba, void *buffer) = 0;
+	virtual int  write_sector(UINT32 lba, const void *buffer) = 0;
 
 	UINT8 *get_features() { return m_features;}
 
@@ -43,23 +43,23 @@ public:
 	virtual bool is_ready() { return true; }
 	virtual void read_key(UINT8 key[]) { }
 protected:
-	UINT8			m_features[IDE_DISK_SECTOR_SIZE];
-	UINT16			m_num_cylinders;
-	UINT8			m_num_sectors;
-	UINT8			m_num_heads;
+	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
+	UINT16          m_num_cylinders;
+	UINT8           m_num_sectors;
+	UINT8           m_num_heads;
 };
 
 // ======================> ide_slot_device
 
-class ide_slot_device :	public device_t,
+class ide_slot_device : public device_t,
 						public device_slot_interface
 {
 public:
 	// construction/destruction
 	ide_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	int	 read_sector(UINT32 lba, void *buffer) { return (m_dev) ? m_dev->read_sector(lba,buffer) : 0; }
-	int	 write_sector(UINT32 lba, const void *buffer) { return (m_dev) ? m_dev->write_sector(lba,buffer) : 0; }
+	int  read_sector(UINT32 lba, void *buffer) { return (m_dev) ? m_dev->read_sector(lba,buffer) : 0; }
+	int  write_sector(UINT32 lba, const void *buffer) { return (m_dev) ? m_dev->write_sector(lba,buffer) : 0; }
 	UINT8 *get_features() { return (m_dev) ? m_dev->get_features() : NULL;}
 
 	UINT16 get_cylinders() { return (m_dev) ? m_dev->get_cylinders() : 0; }
@@ -83,19 +83,19 @@ extern const device_type IDE_SLOT;
 // ======================> ide_hdd_device
 
 class ide_hdd_device : public device_t,
-					   public ide_device_interface
+						public ide_device_interface
 {
 public:
-    // construction/destruction
-    ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int	 read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
-	virtual int	 write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
+	virtual int  read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
+	virtual int  write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
 	virtual void read_key(UINT8 key[]);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "hdd"; }
 
@@ -113,11 +113,11 @@ extern const device_type IDE_HARDDISK;
 class ide_hdd_image_device : public ide_hdd_device
 {
 public:
-    // construction/destruction
-    ide_hdd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ide_hdd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "hdd_image"; }
 	// optional information overrides
@@ -177,15 +177,15 @@ DECLARE_WRITE16_DEVICE_HANDLER( ide_controller16_w );
 ***************************************************************************/
 struct ide_device
 {
-	UINT16			cur_cylinder;
-	UINT8			cur_sector;
-	UINT8			cur_head;
-	UINT8			cur_head_reg;
-	UINT32			cur_lba;
+	UINT16          cur_cylinder;
+	UINT8           cur_sector;
+	UINT8           cur_head;
+	UINT8           cur_head_reg;
+	UINT32          cur_lba;
 	ide_slot_device *slot;
 };
 
-#define IDE_CONFIG_REGISTERS				0x10
+#define IDE_CONFIG_REGISTERS                0x10
 
 /* ----- device interface ----- */
 
@@ -212,7 +212,7 @@ public:
 	void read_sector_done();
 	void write_sector_done();
 
-	UINT8			status;
+	UINT8           status;
 
 protected:
 	// device-level overrides
@@ -232,48 +232,48 @@ private:
 	void handle_command(UINT8 _command);
 	void continue_write();
 
-	UINT8			adapter_control;
-	UINT8			error;
-	UINT8			command;
-	UINT8			interrupt_pending;
-	UINT8			precomp_offset;
+	UINT8           adapter_control;
+	UINT8           error;
+	UINT8           command;
+	UINT8           interrupt_pending;
+	UINT8           precomp_offset;
 
-	UINT8			buffer[IDE_DISK_SECTOR_SIZE];
-	UINT16			buffer_offset;
-	UINT16			sector_count;
+	UINT8           buffer[IDE_DISK_SECTOR_SIZE];
+	UINT16          buffer_offset;
+	UINT16          sector_count;
 
-	UINT16			block_count;
-	UINT16			sectors_until_int;
-	UINT8			verify_only;
+	UINT16          block_count;
+	UINT16          sectors_until_int;
+	UINT8           verify_only;
 
-	UINT8			dma_active;
+	UINT8           dma_active;
 	address_space *dma_space;
-	UINT8			dma_address_xor;
-	UINT8			dma_last_buffer;
-	offs_t			dma_address;
-	offs_t			dma_descriptor;
-	UINT32			dma_bytes_left;
+	UINT8           dma_address_xor;
+	UINT8           dma_last_buffer;
+	offs_t          dma_address;
+	offs_t          dma_descriptor;
+	UINT32          dma_bytes_left;
 
-	UINT8			bus_master_command;
-	UINT8			bus_master_status;
-	UINT32			bus_master_descriptor;
+	UINT8           bus_master_command;
+	UINT8           bus_master_status;
+	UINT32          bus_master_descriptor;
 
-	UINT8			config_unknown;
-	UINT8			config_register[IDE_CONFIG_REGISTERS];
-	UINT8			config_register_num;
+	UINT8           config_unknown;
+	UINT8           config_register[IDE_CONFIG_REGISTERS];
+	UINT8           config_register_num;
 
-	emu_timer *		last_status_timer;
-	emu_timer *		reset_timer;
+	emu_timer *     last_status_timer;
+	emu_timer *     reset_timer;
 
-	UINT8			master_password_enable;
-	UINT8			user_password_enable;
-	const UINT8 *	master_password;
-	const UINT8 *	user_password;
+	UINT8           master_password_enable;
+	UINT8           user_password_enable;
+	const UINT8 *   master_password;
+	const UINT8 *   user_password;
 
-	UINT8			gnetreadlock;
+	UINT8           gnetreadlock;
 
-	UINT8			cur_drive;
-	ide_device		drive[2];
+	UINT8           cur_drive;
+	ide_device      drive[2];
 
 	devcb2_write_line m_irq_handler;
 	const char *bmcpu;
@@ -284,4 +284,4 @@ extern const device_type IDE_CONTROLLER;
 
 
 
-#endif	/* __IDECTRL_H__ */
+#endif  /* __IDECTRL_H__ */

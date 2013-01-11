@@ -88,7 +88,7 @@ extern DECLARE_WRITE8_HANDLER( fantasy_sound_w );
 extern DECLARE_WRITE8_HANDLER( fantasy_speech_w );
 
 class snk6502_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -116,4 +116,3 @@ void snk6502_set_music_freq(running_machine &machine, int freq);
 int snk6502_music0_playing(running_machine &machine);
 
 DISCRETE_SOUND_EXTERN( fantasy );
-

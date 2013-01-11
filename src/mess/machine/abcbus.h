@@ -70,7 +70,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define ABCBUS_TAG			"bus"
+#define ABCBUS_TAG          "bus"
 
 
 
@@ -83,7 +83,7 @@
 
 
 #define MCFG_ABCBUS_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, ABCBUS_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, ABCBUS_SLOT, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
@@ -97,10 +97,10 @@
 
 struct abcbus_interface
 {
-    devcb_write_line	m_out_int_cb;
-    devcb_write_line	m_out_nmi_cb;
-    devcb_write_line	m_out_rdy_cb;
-    devcb_write_line	m_out_resin_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_rdy_cb;
+	devcb_write_line    m_out_resin_cb;
 };
 
 
@@ -141,25 +141,25 @@ public:
 // ======================> abcbus_slot_device
 
 class abcbus_slot_device : public device_t,
-						   public device_slot_interface,
-						   public abcbus_interface
+							public device_slot_interface,
+							public abcbus_interface
 {
 public:
 	// construction/destruction
 	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    // computer interface
-    void cs_w(UINT8 data);
-    UINT8 rst_r();
-    UINT8 inp_r();
-    void utp_w(UINT8 data);
-    UINT8 stat_r();
-    void c1_w(UINT8 data);
-    void c2_w(UINT8 data);
-    void c3_w(UINT8 data);
-    void c4_w(UINT8 data);
-    UINT8 xmemfl_r(offs_t offset);
-    void xmemw_w(offs_t offset, UINT8 data);
+	// computer interface
+	void cs_w(UINT8 data);
+	UINT8 rst_r();
+	UINT8 inp_r();
+	void utp_w(UINT8 data);
+	UINT8 stat_r();
+	void c1_w(UINT8 data);
+	void c2_w(UINT8 data);
+	void c3_w(UINT8 data);
+	void c4_w(UINT8 data);
+	UINT8 xmemfl_r(offs_t offset);
+	void xmemw_w(offs_t offset, UINT8 data);
 
 	DECLARE_WRITE8_MEMBER( cs_w );
 	DECLARE_READ8_MEMBER( rst_r );
@@ -173,7 +173,7 @@ public:
 	DECLARE_READ8_MEMBER( xmemfl_r );
 	DECLARE_WRITE8_MEMBER( xmemw_w );
 
-    // peripheral interface
+	// peripheral interface
 	DECLARE_WRITE_LINE_MEMBER( int_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( rdy_w );
@@ -185,10 +185,10 @@ protected:
 	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_rdy_func;
-	devcb_resolved_write_line	m_out_resin_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_rdy_func;
+	devcb_resolved_write_line   m_out_resin_func;
 
 	device_abcbus_card_interface *m_card;
 };

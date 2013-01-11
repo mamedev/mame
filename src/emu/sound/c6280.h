@@ -7,11 +7,11 @@
 
 struct c6280_interface
 {
-	const char *	cpu;
+	const char *    cpu;
 };
 
 class c6280_device : public device_t,
-                     public device_sound_interface
+						public device_sound_interface
 {
 public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -44,14 +44,14 @@ private:
 	// internal state
 	sound_stream *m_stream;
 	h6280_device *m_cpudevice;
-    UINT8 m_select;
-    UINT8 m_balance;
-    UINT8 m_lfo_frequency;
-    UINT8 m_lfo_control;
-    channel m_channel[8];
-    INT16 m_volume_table[32];
-    UINT32 m_noise_freq_tab[32];
-    UINT32 m_wave_freq_tab[4096];
+	UINT8 m_select;
+	UINT8 m_balance;
+	UINT8 m_lfo_frequency;
+	UINT8 m_lfo_control;
+	channel m_channel[8];
+	INT16 m_volume_table[32];
+	UINT32 m_noise_freq_tab[32];
+	UINT32 m_wave_freq_tab[4096];
 };
 
 extern const device_type C6280;

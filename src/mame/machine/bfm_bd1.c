@@ -114,10 +114,10 @@ void bfm_bd1_t::static_set_value(device_t &device, int val)
 void bfm_bd1_t::device_start()
 {
 	save_item(NAME(m_cursor));
-    save_item(NAME(m_cursor_pos));
-	save_item(NAME(m_window_start));		// display window start pos 0-15
-	save_item(NAME(m_window_end));		// display window end   pos 0-15
-	save_item(NAME(m_window_size));		// window  size
+	save_item(NAME(m_cursor_pos));
+	save_item(NAME(m_window_start));        // display window start pos 0-15
+	save_item(NAME(m_window_end));      // display window end   pos 0-15
+	save_item(NAME(m_window_size));     // window  size
 	save_item(NAME(m_shift_count));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_pcursor_pos));
@@ -125,11 +125,11 @@ void bfm_bd1_t::device_start()
 	save_item(NAME(m_display_mode));
 	save_item(NAME(m_flash_rate));
 	save_item(NAME(m_flash_control));
-    save_item(NAME(m_chars));
-    save_item(NAME(m_attrs));
-    save_item(NAME(m_outputs));
-	save_item(NAME(m_user_data));			// user defined character data (16 bit)
-	save_item(NAME(m_user_def));			// user defined character state
+	save_item(NAME(m_chars));
+	save_item(NAME(m_attrs));
+	save_item(NAME(m_outputs));
+	save_item(NAME(m_user_data));           // user defined character data (16 bit)
+	save_item(NAME(m_user_def));            // user defined character state
 
 	device_reset();
 }
@@ -137,7 +137,7 @@ void bfm_bd1_t::device_start()
 void bfm_bd1_t::device_reset()
 {
 	m_cursor = 0;
-    m_cursor_pos = 0;
+	m_cursor_pos = 0;
 	m_window_start = 0;
 	m_window_end = 0;
 	m_window_size = 0;
@@ -151,9 +151,9 @@ void bfm_bd1_t::device_reset()
 	m_user_data = 0;
 	m_user_def = 0;
 
-    memset(m_chars, 0, sizeof(m_chars));
-    memset(m_outputs, 0, sizeof(m_outputs));
-    memset(m_attrs, 0, sizeof(m_attrs));
+	memset(m_chars, 0, sizeof(m_chars));
+	memset(m_outputs, 0, sizeof(m_outputs));
+	memset(m_attrs, 0, sizeof(m_attrs));
 }
 
 UINT16 bfm_bd1_t::set_display(UINT16 segin)
@@ -189,7 +189,7 @@ void bfm_bd1_t::blank(int data)
 {
 	switch ( data & 0x03 )
 	{
-		case 0x00:	//blank all
+		case 0x00:  //blank all
 		{
 			for (int i = 0; i < 15; i++)
 			{
@@ -198,7 +198,7 @@ void bfm_bd1_t::blank(int data)
 		}
 
 		break;
-		case 0x01:	// blank inside window
+		case 0x01:  // blank inside window
 		if ( m_window_size > 0 )
 		{
 			for (int i = m_window_start; i < m_window_end ; i++)
@@ -207,7 +207,7 @@ void bfm_bd1_t::blank(int data)
 			}
 		}
 		break;
-		case 0x02:	// blank outside window
+		case 0x02:  // blank outside window
 		if ( m_window_size > 0 )
 		{
 			if ( m_window_start > 0 )
@@ -227,7 +227,7 @@ void bfm_bd1_t::blank(int data)
 			}
 		}
 		break;
-		case 0x03:	// clear blanking
+		case 0x03:  // clear blanking
 		{
 			for (int i = 0; i < 15; i++)
 			{
@@ -273,13 +273,13 @@ int bfm_bd1_t::write_char(int data)
 		{
 			switch ( data & 0xF0 )
 			{
-				case 0x80:	// 0x80 - 0x8F Set display blanking
+				case 0x80:  // 0x80 - 0x8F Set display blanking
 				{
 					blank(data&0x03);//use the blanking data
 				}
 				break;
 
-				case 0x90:	// 0x90 - 0x9F Set cursor pos
+				case 0x90:  // 0x90 - 0x9F Set cursor pos
 				m_cursor_pos = data & 0x0F;
 				m_scroll_active = 0;
 				if ( m_display_mode == 2 )
@@ -288,18 +288,18 @@ int bfm_bd1_t::write_char(int data)
 				}
 				break;
 
-				case 0xA0:	// 0xA0 - 0xAF Set display mode
+				case 0xA0:  // 0xA0 - 0xAF Set display mode
 				m_display_mode = data &0x03;
 				break;
 
-				case 0xB0:	// 0xB0 - 0xBF Clear display area
+				case 0xB0:  // 0xB0 - 0xBF Clear display area
 
 				switch ( data & 0x03 )
 				{
-					case 0x00:	// clr nothing
+					case 0x00:  // clr nothing
 					break;
 
-					case 0x01:	// clr inside window
+					case 0x01:  // clr inside window
 					if ( m_window_size > 0 )
 					{
 						memset(m_chars+m_window_start,0,m_window_size);
@@ -308,7 +308,7 @@ int bfm_bd1_t::write_char(int data)
 
 					break;
 
-					case 0x02:	// clr outside window
+					case 0x02:  // clr outside window
 					if ( m_window_size > 0 )
 					{
 						if ( m_window_start > 0 )
@@ -329,7 +329,7 @@ int bfm_bd1_t::write_char(int data)
 							}
 						}
 					}
-					case 0x03:	// clr entire display
+					case 0x03:  // clr entire display
 					{
 						memset(m_chars, 0, sizeof(m_chars));
 						memset(m_attrs, 0, sizeof(m_attrs));
@@ -337,20 +337,20 @@ int bfm_bd1_t::write_char(int data)
 				}
 				break;
 
-				case 0xC0:	// 0xC0 - 0xCF Set flash rate
+				case 0xC0:  // 0xC0 - 0xCF Set flash rate
 				m_flash_rate = data & 0x0F;
 				break;
 
-				case 0xD0:	// 0xD0 - 0xDF Set Flash control
+				case 0xD0:  // 0xD0 - 0xDF Set Flash control
 				m_flash_control = data & 0x03;
 				break;
 
-				case 0xE0:	// 0xE0 - 0xEF Set window start pos
+				case 0xE0:  // 0xE0 - 0xEF Set window start pos
 				m_window_start = data &0x0F;
 				m_window_size  = (m_window_end - m_window_start)+1;
 				break;
 
-				case 0xF0:	// 0xF0 - 0xFF Set window end pos
+				case 0xF0:  // 0xF0 - 0xFF Set window end pos
 				m_window_end   = data &0x0F;
 				m_window_size  = (m_window_end - m_window_start)+1;
 				m_scroll_active = 0;
@@ -378,7 +378,7 @@ void bfm_bd1_t::setdata(int segdata, int data)
 	int change =0;
 	switch ( data )
 	{
-		case 0x25:	// flash
+		case 0x25:  // flash
 		if(m_chars[m_pcursor_pos] & (1<<8))
 		{
 			move++;
@@ -405,7 +405,7 @@ void bfm_bd1_t::setdata(int segdata, int data)
 		}
 		break;
 
-		case 0x3B:	// dummy char
+		case 0x3B:  // dummy char
 		move++;
 		break;
 
@@ -525,11 +525,11 @@ void bfm_bd1_t::setdata(int segdata, int data)
 				}
 				if ( change )
 				{
-					 m_chars[m_window_start] = segdata;
-				 }
+						m_chars[m_window_start] = segdata;
+					}
 				else
 				{
-					 m_chars[m_window_start] = 0;
+						m_chars[m_window_start] = 0;
 				}
 			}
 			break;

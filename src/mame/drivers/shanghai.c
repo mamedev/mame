@@ -102,7 +102,7 @@ UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind1
 		int h = hd63484_regs_r(hd63484, space, 0x96/2, 0xffff) & 0x0fff;
 		int sx = ((hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(hd63484, space, 0x84/2, 0xffff) >> 8)) * 4;
 		int w = (hd63484_regs_r(hd63484, space, 0x92/2, 0xffff) & 0xff) * 4;
-		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
+		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
 
 		b = (((hd63484_regs_r(hd63484, space, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, space, 0xde/2, 0xffff));
 
@@ -175,7 +175,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(shanghai_state::kothello_hd63484_status_r)
 {
-	return 0xff22;	/* write FIFO ready + command end + read FIFO ready */
+	return 0xff22;  /* write FIFO ready + command end + read FIFO ready */
 }
 
 static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kothello )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -444,7 +444,7 @@ static const hd63484_interface shanghai_hd63484_intf = { 0 };
 static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
+	MCFG_CPU_ADD("maincpu", V30,16000000/2) /* ? */
 	MCFG_CPU_PROGRAM_MAP(shanghai_map)
 	MCFG_CPU_IO_MAP(shanghai_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
@@ -477,7 +477,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( shangha2, shanghai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
+	MCFG_CPU_ADD("maincpu", V30,16000000/2) /* ? */
 	MCFG_CPU_PROGRAM_MAP(shangha2_map)
 	MCFG_CPU_IO_MAP(shangha2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
@@ -509,7 +509,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
+	MCFG_CPU_ADD("maincpu", V30,16000000/2) /* ? */
 	MCFG_CPU_PROGRAM_MAP(kothello_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
 
@@ -643,4 +643,3 @@ ROM_END
 GAME( 1988, shanghai, 0, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, shangha2, 0, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan)", 0 )
 GAME( 1990, kothello, 0, kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )
-

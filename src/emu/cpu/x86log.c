@@ -20,9 +20,9 @@
 ***************************************************************************/
 
 /* comment parameters */
-#define MAX_COMMENTS		4000
-#define MAX_DATA_RANGES		1000
-#define COMMENT_POOL_SIZE	(MAX_COMMENTS * 40)
+#define MAX_COMMENTS        4000
+#define MAX_DATA_RANGES     1000
+#define COMMENT_POOL_SIZE   (MAX_COMMENTS * 40)
 
 
 
@@ -33,34 +33,34 @@
 /* code logging info */
 struct log_comment
 {
-	x86code *		base;
-	const char *	string;
+	x86code *       base;
+	const char *    string;
 };
 
 
 /* data ranges */
 struct data_range_t
 {
-	x86code *		base;
-	x86code *		end;
-	int				size;
+	x86code *       base;
+	x86code *       end;
+	int             size;
 };
 
 
 /* the code logging context */
 struct x86log_context
 {
-	astring			filename;						/* name of the file */
-	FILE *			file;							/* file we are logging to */
+	astring         filename;                       /* name of the file */
+	FILE *          file;                           /* file we are logging to */
 
-	data_range_t	data_range[MAX_DATA_RANGES];	/* list of data ranges */
-	int				data_range_count;				/* number of data ranges */
+	data_range_t    data_range[MAX_DATA_RANGES];    /* list of data ranges */
+	int             data_range_count;               /* number of data ranges */
 
-	log_comment 	comment_list[MAX_COMMENTS];		/* list of comments */
-	int				comment_count;					/* number of live comments */
+	log_comment     comment_list[MAX_COMMENTS];     /* list of comments */
+	int             comment_count;                  /* number of live comments */
 
-	char			comment_pool[COMMENT_POOL_SIZE];/* string pool to hold comments */
-	char *			comment_pool_next;				/* pointer to next string pool location */
+	char            comment_pool[COMMENT_POOL_SIZE];/* string pool to hold comments */
+	char *          comment_pool_next;              /* pointer to next string pool location */
 };
 
 
@@ -214,10 +214,10 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 			switch (curdata->size)
 			{
 				default:
-				case 1:		sprintf(buffer, "db      %02X", *cur);				break;
-				case 2:		sprintf(buffer, "dw      %04X", *(UINT16 *)cur);	break;
-				case 4:		sprintf(buffer, "dd      %08X", *(UINT32 *)cur);	break;
-				case 8:		sprintf(buffer, "dq      %08X%08X", ((UINT32 *)cur)[1], ((UINT32 *)cur)[0]);	break;
+				case 1:     sprintf(buffer, "db      %02X", *cur);              break;
+				case 2:     sprintf(buffer, "dw      %04X", *(UINT16 *)cur);    break;
+				case 4:     sprintf(buffer, "dd      %08X", *(UINT32 *)cur);    break;
+				case 8:     sprintf(buffer, "dq      %08X%08X", ((UINT32 *)cur)[1], ((UINT32 *)cur)[0]);    break;
 			}
 		}
 

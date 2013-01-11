@@ -25,7 +25,7 @@
 #define VERBOSE 1
 #endif
 
-#define LOG(N,M,A,mac)	\
+#define LOG(N,M,A,mac)  \
 	do { \
 		if(VERBOSE>=N) \
 		{ \
@@ -55,8 +55,8 @@ const struct pit8253_config mz700_pit8253_config =
 	{
 		/* clockin             gate            callback */
 		{ XTAL_17_73447MHz/20, DEVCB_NULL,     DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_out0_changed) },
-		{	          15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
-		{		            0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
+		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
+		{                   0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
 	}
 };
 
@@ -65,8 +65,8 @@ const struct pit8253_config mz800_pit8253_config =
 	{
 		/* clockin             gate            callback */
 		{ XTAL_17_73447MHz/16, DEVCB_NULL,     DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_out0_changed) },
-		{	          15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
-		{		            0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
+		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
+		{                   0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
 	}
 };
 
@@ -304,9 +304,9 @@ WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 
 	if (m_mz700_mode)
 	{
-		m_mz700_ram_lock = FALSE;		/* reset lock */
-		mz700_bank_2_w(space, 0, 0);	/* switch in monitor rom */
-		mz700_bank_3_w(space, 0, 0);	/* switch in videoram, colorram, and mmio */
+		m_mz700_ram_lock = FALSE;       /* reset lock */
+		mz700_bank_2_w(space, 0, 0);    /* switch in monitor rom */
+		mz700_bank_3_w(space, 0, 0);    /* switch in videoram, colorram, and mmio */
 
 		/* rest is ram is always ram in mz700 mode */
 		spc.install_readwrite_bank(0x1000, 0xcfff, "bank2");
@@ -438,7 +438,7 @@ READ8_MEMBER(mz_state::pio_port_b_r)
 			res |= machine().root_device().ioport(keynames[i])->read();
 	}
 
-    return res;
+	return res;
 }
 
 /*
@@ -485,24 +485,24 @@ WRITE8_MEMBER(mz_state::pio_port_a_w)
 
 WRITE8_MEMBER(mz_state::pio_port_c_w)
 {
-    /*
-     * bit 3 out    motor control (0 = on)
-     * bit 2 out    INTMSK
-     * bit 1 out    tape data (WDATA)
-     * bit 0 out    unused
-     */
+	/*
+	 * bit 3 out    motor control (0 = on)
+	 * bit 2 out    INTMSK
+	 * bit 1 out    tape data (WDATA)
+	 * bit 0 out    unused
+	 */
 
 //  UINT8 state = cassette_get_state(machine().device<cassette_image_device>(CASSETTE_TAG));
 //  UINT8 action = ((~pio_port_c_output & 8) & (data & 8));     /* detect low-to-high transition */
 
 	/* The motor control circuit consists of a resistor, capacitor, invertor, nand-gate, and D flip-flop.
-        The sense input from the cassette player goes low whenever play, rewind or fast-forward is pressed.
-        This connects to most of the above components.
-        The Q output enables the motor, and also connects to Bit 4 (input).
-        Bit 3 outputs a string of pulses to the Clock pin, and therefore cannot be used to control
-        the motor directly.
-        For the moment, the user can use the UI to select play, stop, etc.
-        If you load from the command-line or the software-picker, type in L <enter> immediately. */
+	    The sense input from the cassette player goes low whenever play, rewind or fast-forward is pressed.
+	    This connects to most of the above components.
+	    The Q output enables the motor, and also connects to Bit 4 (input).
+	    Bit 3 outputs a string of pulses to the Clock pin, and therefore cannot be used to control
+	    the motor directly.
+	    For the moment, the user can use the UI to select play, stop, etc.
+	    If you load from the command-line or the software-picker, type in L <enter> immediately. */
 #if 0
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
@@ -575,7 +575,7 @@ READ8_MEMBER(mz_state::mz800_crtc_r)
 {
 	UINT8 data = 0x00;
 	LOG(1,"mz800_crtc_r",("%02X\n",data),machine());
-    return data;
+	return data;
 }
 
 
@@ -587,7 +587,7 @@ READ8_MEMBER(mz_state::mz800_ramdisk_r)
 	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", m_mz800_ramaddr, data),machine());
 	if (m_mz800_ramaddr++ == 0)
 		LOG(1,"mz800_ramdisk_r",("address wrap 0000\n"),machine());
-    return data;
+	return data;
 }
 
 /* port CC */
@@ -652,9 +652,9 @@ WRITE8_MEMBER(mz_state::mz800_palette_w)
 {
 	if (data & 0x40)
 	{
-        m_mz800_palette_bank = data & 3;
+		m_mz800_palette_bank = data & 3;
 		LOG(1,"mz800_palette_w",("bank: %d\n", m_mz800_palette_bank),machine());
-    }
+	}
 	else
 	{
 		int idx = (data >> 4) & 3;

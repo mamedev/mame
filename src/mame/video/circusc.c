@@ -39,7 +39,7 @@ void circusc_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 0, 0,
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
@@ -105,9 +105,9 @@ TILE_GET_INFO_MEMBER(circusc_state::get_tile_info)
 	tileinfo.category = (attr & 0x10) >> 4;
 
 	SET_TILE_INFO_MEMBER(0,
-				  m_videoram[tile_index] + ((attr & 0x20) << 3),
-				  attr & 0x0f,
-				  TILE_FLIPYX((attr & 0xc0) >> 6));
+					m_videoram[tile_index] + ((attr & 0x20) << 3),
+					attr & 0x0f,
+					TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
 

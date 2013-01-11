@@ -305,7 +305,7 @@ void i8x9x_device::serial_w(UINT8 val)
 UINT16 i8x9x_device::timer_value(int timer, UINT64 current_time) const
 {
 	if(timer == 2)
-	    current_time -= base_timer2;
+		current_time -= base_timer2;
 	return current_time >> 3;
 }
 
@@ -346,10 +346,10 @@ void i8x9x_device::internal_update(UINT64 current_time)
 			UINT8 cmd = hso_info[i].command;
 			UINT16 t = hso_info[i].time;
 			if(((cmd & 0x40) && t == current_timer2) ||
-			   (!(cmd & 0x40) && t == current_timer1)) {
+				(!(cmd & 0x40) && t == current_timer1)) {
 				if(cmd != 0x18 && cmd != 0x19)
 					logerror("%s: hso cam %02x %04x in slot %d triggered\n",
-							 tag(), cmd, t, i);
+								tag(), cmd, t, i);
 				trigger_cam(i, current_time);
 			}
 		}

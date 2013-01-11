@@ -40,9 +40,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define DATA_BIT	0x01
-#define CLOCK_BIT	0x02
-#define END_BIT		0x04
+#define DATA_BIT    0x01
+#define CLOCK_BIT   0x02
+#define END_BIT     0x04
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -50,21 +50,21 @@
 
 struct upd4990a_state
 {
-	int seconds;	/* seconds BCD */
-	int minutes;	/* minutes BCD */
-	int hours;		/* hours   BCD */
-	int days;		/* days    BCD */
-	int month;		/* month   Hexadecimal form */
-	int year;		/* year    BCD */
-	int weekday;	/* weekday BCD */
+	int seconds;    /* seconds BCD */
+	int minutes;    /* minutes BCD */
+	int hours;      /* hours   BCD */
+	int days;       /* days    BCD */
+	int month;      /* month   Hexadecimal form */
+	int year;       /* year    BCD */
+	int weekday;    /* weekday BCD */
 
 	UINT32 shiftlo;
 	UINT32 shifthi;
 
-	int retraces;	/* Assumes 60 retraces a second */
+	int retraces;   /* Assumes 60 retraces a second */
 	int testwaits;
-	int maxwaits;	/* Switch test every frame*/
-	int testbit;	/* Pulses a bit in order to simulate test output */
+	int maxwaits;   /* Switch test every frame*/
+	int testbit;    /* Pulses a bit in order to simulate test output */
 
 	int outputbit;
 	int bitno;
@@ -72,7 +72,7 @@ struct upd4990a_state
 	INT8 writing;
 
 	int clock_line;
-	int command_line;	//??
+	int command_line;   //??
 };
 
 
@@ -314,9 +314,9 @@ static void upd4990a_resetbitstream( device_t *device )
 static void upd4990a_writebit( device_t *device , UINT8 bit )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
-	if (upd4990a->bitno <= 31)	//low part
+	if (upd4990a->bitno <= 31)  //low part
 		upd4990a->shiftlo |= bit << upd4990a->bitno;
-	else	//high part
+	else    //high part
 		upd4990a->shifthi |= bit << (upd4990a->bitno - 32);
 }
 
@@ -382,24 +382,24 @@ static void upd4990a_process_command( device_t *device )
 
 	switch(upd4990a_getcommand(device))
 	{
-		case 0x1:	//load output register
+		case 0x1:   //load output register
 			upd4990a->bitno = 0;
 			if (upd4990a->reading)
-				upd4990a_readbit(device);	//prepare first bit
+				upd4990a_readbit(device);   //prepare first bit
 			upd4990a->shiftlo = 0;
 			upd4990a->shifthi = 0;
 			break;
 		case 0x2:
-			upd4990a->writing = 0;	//store register to current date
+			upd4990a->writing = 0;  //store register to current date
 			upd4990a_update_date(device);
 			break;
-		case 0x3:	//start reading
+		case 0x3:   //start reading
 			upd4990a->reading = 1;
 			break;
-		case 0x7:	//switch testbit every frame
+		case 0x7:   //switch testbit every frame
 			upd4990a->maxwaits = 1;
 			break;
-		case 0x8:	//switch testbit every half-second
+		case 0x8:   //switch testbit every half-second
 			upd4990a->maxwaits = 30;
 			break;
 	}
@@ -421,7 +421,7 @@ static void upd4990a_serial_control( device_t *device, UINT8 data )
 	}
 	upd4990a->command_line = data & END_BIT;
 
-	if(upd4990a->clock_line && !(data & CLOCK_BIT))	//clock lower edge
+	if(upd4990a->clock_line && !(data & CLOCK_BIT)) //clock lower edge
 	{
 		upd4990a_writebit(device, data & DATA_BIT);
 		upd4990a_nextbit(device);
@@ -555,5 +555,3 @@ void upd4990a_old_device::device_reset()
 {
 	DEVICE_RESET_NAME( upd4990a )(this);
 }
-
-

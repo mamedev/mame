@@ -25,11 +25,11 @@ const device_type ADC0808 = &device_creator<adc0808_device>;
 //-------------------------------------------------
 
 adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ADC0808, "ADC0808", tag, owner, clock),
-	  m_address(0),
-	  m_start(0),
-	  m_next_eoc(0),
-	  m_cycle(0)
+	: device_t(mconfig, ADC0808, "ADC0808", tag, owner, clock),
+		m_address(0),
+		m_start(0),
+		m_next_eoc(0),
+		m_cycle(0)
 {
 }
 

@@ -31,7 +31,7 @@ struct deco16ic_interface
 	int                col_base1, col_base2;
 	int                col_mask1, col_mask2;
 	deco16_bank_cb     bank_cb0, bank_cb1;
-	int				   _8x8_gfxregion, _16x16_gfxregion;
+	int                _8x8_gfxregion, _16x16_gfxregion;
 };
 
 class deco16ic_device : public device_t

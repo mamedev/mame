@@ -27,13 +27,13 @@
 
 struct msm6242_interface
 {
-	devcb_write_line	m_out_int_func;
+	devcb_write_line    m_out_int_func;
 };
 
 
 // ======================> msm6242_device
 
-class msm6242_device :	public device_t, public device_rtc_interface
+class msm6242_device :  public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -63,15 +63,15 @@ private:
 	static const UINT8 IRQ_HOUR = 3;
 
 	// state
-	UINT8						m_reg[3];
-	UINT8						m_irq_flag;
-	UINT8						m_irq_type;
-	UINT16						m_tick;
+	UINT8                       m_reg[3];
+	UINT8                       m_irq_flag;
+	UINT8                       m_irq_type;
+	UINT16                      m_tick;
 
 	// incidentals
-	devcb_resolved_write_line	m_res_out_int_func;
-	emu_timer *					m_timer;
-	UINT64						m_last_update_time;	// last update time, in clock cycles
+	devcb_resolved_write_line   m_res_out_int_func;
+	emu_timer *                 m_timer;
+	UINT64                      m_last_update_time; // last update time, in clock cycles
 
 	// methods
 	void rtc_timer_callback();

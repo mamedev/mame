@@ -51,7 +51,7 @@
 //**************************************************************************
 
 // set to 1 to track memory allocated by emualloc.h itself as well
-#define TRACK_SELF_MEMORY		(0)
+#define TRACK_SELF_MEMORY       (0)
 
 
 
@@ -67,18 +67,18 @@
 #endif
 
 // pool allocation helpers
-#define pool_alloc(_pool, _type)					(_pool).add_object(new(__FILE__, __LINE__) _type)
-#define pool_alloc_clear(_pool, _type)				(_pool).add_object(new(__FILE__, __LINE__, zeromem) _type)
-#define pool_alloc_array(_pool, _type, _num)		(_pool).add_array(new(__FILE__, __LINE__) _type[_num], (_num))
-#define pool_alloc_array_clear(_pool, _type, _num)	(_pool).add_array(new(__FILE__, __LINE__, zeromem) _type[_num], (_num))
-#define pool_free(_pool, v)							(_pool).remove(v)
+#define pool_alloc(_pool, _type)                    (_pool).add_object(new(__FILE__, __LINE__) _type)
+#define pool_alloc_clear(_pool, _type)              (_pool).add_object(new(__FILE__, __LINE__, zeromem) _type)
+#define pool_alloc_array(_pool, _type, _num)        (_pool).add_array(new(__FILE__, __LINE__) _type[_num], (_num))
+#define pool_alloc_array_clear(_pool, _type, _num)  (_pool).add_array(new(__FILE__, __LINE__, zeromem) _type[_num], (_num))
+#define pool_free(_pool, v)                         (_pool).remove(v)
 
 // global allocation helpers
-#define global_alloc(_type)							pool_alloc(global_resource_pool(), _type)
-#define global_alloc_clear(_type)					pool_alloc_clear(global_resource_pool(), _type)
-#define global_alloc_array(_type, _num)				pool_alloc_array(global_resource_pool(), _type, _num)
-#define global_alloc_array_clear(_type, _num)		pool_alloc_array_clear(global_resource_pool(), _type, _num)
-#define global_free(v)								pool_free(global_resource_pool(), v)
+#define global_alloc(_type)                         pool_alloc(global_resource_pool(), _type)
+#define global_alloc_clear(_type)                   pool_alloc_clear(global_resource_pool(), _type)
+#define global_alloc_array(_type, _num)             pool_alloc_array(global_resource_pool(), _type, _num)
+#define global_alloc_array_clear(_type, _num)       pool_alloc_array_clear(global_resource_pool(), _type, _num)
+#define global_free(v)                              pool_free(global_resource_pool(), v)
 
 
 
@@ -216,19 +216,19 @@ private:
 public:
 	resource_pool_item(void *ptr, size_t size)
 		: m_next(NULL),
-		  m_ordered_next(NULL),
-		  m_ordered_prev(NULL),
-		  m_ptr(ptr),
-		  m_size(size),
-		  m_id(~(UINT64)0) { }
+			m_ordered_next(NULL),
+			m_ordered_prev(NULL),
+			m_ptr(ptr),
+			m_size(size),
+			m_id(~(UINT64)0) { }
 	virtual ~resource_pool_item() { }
 
-	resource_pool_item *	m_next;
-	resource_pool_item *	m_ordered_next;
-	resource_pool_item *	m_ordered_prev;
-	void *					m_ptr;
-	size_t					m_size;
-	UINT64					m_id;
+	resource_pool_item *    m_next;
+	resource_pool_item *    m_ordered_next;
+	resource_pool_item *    m_ordered_prev;
+	void *                  m_ptr;
+	size_t                  m_size;
+	UINT64                  m_id;
 };
 
 
@@ -243,11 +243,11 @@ private:
 public:
 	resource_pool_object(_ObjectClass *object)
 		: resource_pool_item(reinterpret_cast<void *>(object), sizeof(_ObjectClass)),
-		  m_object(object) { }
+			m_object(object) { }
 	virtual ~resource_pool_object() { delete m_object; }
 
 private:
-	_ObjectClass *			m_object;
+	_ObjectClass *          m_object;
 };
 
 
@@ -262,13 +262,13 @@ private:
 public:
 	resource_pool_array(_ObjectClass *array, int count)
 		: resource_pool_item(reinterpret_cast<void *>(array), sizeof(_ObjectClass) * count),
-		  m_array(array),
-		  m_count(count) { }
+			m_array(array),
+			m_count(count) { }
 	virtual ~resource_pool_array() { delete[] m_array; }
 
 private:
-	_ObjectClass *			m_array;
-	int 					m_count;
+	_ObjectClass *          m_array;
+	int                     m_count;
 };
 
 
@@ -295,11 +295,11 @@ public:
 	template<class _ObjectClass> _ObjectClass *add_array(_ObjectClass* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<_ObjectClass>(array, count)); return array; }
 
 private:
-	int						m_hash_size;
-	osd_lock *				m_listlock;
-	resource_pool_item **	m_hash;
-	resource_pool_item *	m_ordered_head;
-	resource_pool_item *	m_ordered_tail;
+	int                     m_hash_size;
+	osd_lock *              m_listlock;
+	resource_pool_item **   m_hash;
+	resource_pool_item *    m_ordered_head;
+	resource_pool_item *    m_ordered_tail;
 };
 
 
@@ -327,10 +327,10 @@ resource_pool &global_resource_pool();
 #undef realloc
 #undef free
 
-#define malloc(x)		malloc_array_file_line(x, __FILE__, __LINE__)
-#define calloc(x,y)		__error_use_auto_alloc_clear_or_global_alloc_clear_instead__
-#define realloc(x,y)	__error_realloc_is_dangerous__
-#define free(x)			free_file_line(x, __FILE__, __LINE__)
+#define malloc(x)       malloc_array_file_line(x, __FILE__, __LINE__)
+#define calloc(x,y)     __error_use_auto_alloc_clear_or_global_alloc_clear_instead__
+#define realloc(x,y)    __error_realloc_is_dangerous__
+#define free(x)         free_file_line(x, __FILE__, __LINE__)
 #endif
 
-#endif	/* __EMUALLOC_H__ */
+#endif  /* __EMUALLOC_H__ */

@@ -30,7 +30,7 @@ class cubeqst_state : public driver_device
 public:
 	cubeqst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+			m_laserdisc(*this, "laserdisc") { }
 
 	UINT8 *m_depth_buffer;
 	int m_video_field;
@@ -70,8 +70,8 @@ public:
  *************************************/
 
 /* TODO */
-#define CUBEQST_HBLANK		320
-#define CUBEQST_VCOUNT		280
+#define CUBEQST_HBLANK      320
+#define CUBEQST_VCOUNT      280
 
 
 /*************************************
@@ -118,9 +118,9 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 	int y;
 
 	/*
-     * Clear the display with palette RAM entry 0xff
-     * This will be either transparent or an actual colour
-    */
+	 * Clear the display with palette RAM entry 0xff
+	 * This will be either transparent or an actual colour
+	*/
 
 	/* Bit 3 selects LD/#GRAPHICS */
 	bitmap.fill(m_colormap[255], cliprect);
@@ -308,24 +308,24 @@ WRITE16_MEMBER(cubeqst_state::reset_w)
 WRITE16_MEMBER(cubeqst_state::io_w)
 {
 	/*
-       0: Spare lamp
-       1: Spare driver
-       2: Coin counter
-       3: Left-front lamp
-       4: Right-front lamp
-       5: Righ back lamp
-       6: Spare lamp
-       7: LED latch clock
-    */
+	   0: Spare lamp
+	   1: Spare driver
+	   2: Coin counter
+	   3: Left-front lamp
+	   4: Right-front lamp
+	   5: Righ back lamp
+	   6: Spare lamp
+	   7: LED latch clock
+	*/
 
 	/* TODO: On rising edge of Q7, status LED latch is written */
 	if ( !BIT(m_io_latch, 7) && BIT(data, 7) )
 	{
 		/*
-            0: Battery failure
-            1: Bad coin
-            2: No laser unit
-        */
+		    0: Battery failure
+		    1: Bad coin
+		    2: No laser unit
+		*/
 	}
 
 	m_io_latch = data;
@@ -336,13 +336,13 @@ READ16_MEMBER(cubeqst_state::io_r)
 	UINT16 port_data = ioport("IO")->read();
 
 	/*
-         Certain bits depend on Q7 of the IO latch:
+	     Certain bits depend on Q7 of the IO latch:
 
-          5: Cube   / Trackball H clock
-          6: R-Fire / Trackball H data
-          7: L-Fire / Trackball V clock
-         10: Spare  / Trackball V data
-    */
+	      5: Cube   / Trackball H clock
+	      6: R-Fire / Trackball H data
+	      7: L-Fire / Trackball V clock
+	     10: Spare  / Trackball V data
+	*/
 
 	if ( !BIT(m_io_latch, 7) )
 		return port_data;

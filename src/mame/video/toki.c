@@ -256,16 +256,16 @@ UINT32 toki_state::screen_update_toki(screen_device &screen, bitmap_ind16 &bitma
 	int background_y_scroll,foreground_y_scroll,background_x_scroll,foreground_x_scroll;
 
 	background_x_scroll=((m_scrollram16[0x06] &0x7f) << 1)
-								 |((m_scrollram16[0x06] &0x80) >> 7)
-								 |((m_scrollram16[0x05] &0x10) << 4);
+									|((m_scrollram16[0x06] &0x80) >> 7)
+									|((m_scrollram16[0x05] &0x10) << 4);
 	background_y_scroll=((m_scrollram16[0x0d]&0x10)<<4)+((m_scrollram16[0x0e]&0x7f)<<1)+((m_scrollram16[0x0e]&0x80)>>7);
 
 	m_background_layer->set_scrollx(0, background_x_scroll );
 	m_background_layer->set_scrolly(0, background_y_scroll );
 
 	foreground_x_scroll= ((m_scrollram16[0x16] &0x7f) << 1)
-								 |((m_scrollram16[0x16] &0x80) >> 7)
-								 |((m_scrollram16[0x15] &0x10) << 4);
+									|((m_scrollram16[0x16] &0x80) >> 7)
+									|((m_scrollram16[0x15] &0x10) << 4);
 	foreground_y_scroll=((m_scrollram16[0x1d]&0x10)<<4)+((m_scrollram16[0x1e]&0x7f)<<1)+((m_scrollram16[0x1e]&0x80)>>7);
 
 	m_foreground_layer->set_scrollx(0, foreground_x_scroll );

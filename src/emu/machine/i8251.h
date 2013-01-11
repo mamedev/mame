@@ -14,15 +14,15 @@
     CONSTANTS
 ***************************************************************************/
 
-#define I8251_EXPECTING_MODE		0x01
-#define I8251_EXPECTING_SYNC_BYTE	0x02
+#define I8251_EXPECTING_MODE        0x01
+#define I8251_EXPECTING_SYNC_BYTE   0x02
 
-#define I8251_STATUS_FRAMING_ERROR	0x20
-#define I8251_STATUS_OVERRUN_ERROR	0x10
-#define I8251_STATUS_PARITY_ERROR	0x08
-#define I8251_STATUS_TX_EMPTY		0x04
-#define I8251_STATUS_RX_READY		0x02
-#define I8251_STATUS_TX_READY		0x01
+#define I8251_STATUS_FRAMING_ERROR  0x20
+#define I8251_STATUS_OVERRUN_ERROR  0x10
+#define I8251_STATUS_PARITY_ERROR   0x08
+#define I8251_STATUS_TX_EMPTY       0x04
+#define I8251_STATUS_RX_READY       0x02
+#define I8251_STATUS_TX_READY       0x01
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -43,26 +43,26 @@
 
 struct i8251_interface
 {
-	devcb_read_line		m_in_rxd_cb;
-	devcb_write_line	m_out_txd_cb;
-	devcb_read_line		m_in_dsr_cb;
-	devcb_write_line	m_out_dtr_cb;
-	devcb_write_line	m_out_rts_cb;
-	devcb_write_line	m_out_rxrdy_cb;
-	devcb_write_line	m_out_txrdy_cb;
-	devcb_write_line	m_out_txempty_cb;
-	devcb_write_line	m_out_syndet_cb;
+	devcb_read_line     m_in_rxd_cb;
+	devcb_write_line    m_out_txd_cb;
+	devcb_read_line     m_in_dsr_cb;
+	devcb_write_line    m_out_dtr_cb;
+	devcb_write_line    m_out_rts_cb;
+	devcb_write_line    m_out_rxrdy_cb;
+	devcb_write_line    m_out_txrdy_cb;
+	devcb_write_line    m_out_txempty_cb;
+	devcb_write_line    m_out_syndet_cb;
 };
 
 // ======================> i8251_device
 
 class i8251_device :  public device_t,
-					  public device_serial_interface,
-					  public i8251_interface
+						public device_serial_interface,
+						public i8251_interface
 {
 public:
-    // construction/destruction
-    i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* read data register */
 	DECLARE_READ8_MEMBER(data_r);
@@ -86,8 +86,8 @@ public:
 
 	virtual void input_callback(UINT8 state);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_config_complete();
 	virtual void device_reset();
 
@@ -95,15 +95,15 @@ protected:
 	void update_tx_ready();
 	void update_tx_empty();
 private:
-	devcb_resolved_read_line	m_in_rxd_func;
-	devcb_resolved_write_line	m_out_txd_func;
-	devcb_resolved_read_line	m_in_dsr_func;
-	devcb_resolved_write_line	m_out_dtr_func;
-	devcb_resolved_write_line	m_out_rts_func;
-	devcb_resolved_write_line	m_out_rxrdy_func;
-	devcb_resolved_write_line	m_out_txrdy_func;
-	devcb_resolved_write_line	m_out_txempty_func;
-	devcb_resolved_write_line	m_out_syndet_func;
+	devcb_resolved_read_line    m_in_rxd_func;
+	devcb_resolved_write_line   m_out_txd_func;
+	devcb_resolved_read_line    m_in_dsr_func;
+	devcb_resolved_write_line   m_out_dtr_func;
+	devcb_resolved_write_line   m_out_rts_func;
+	devcb_resolved_write_line   m_out_rxrdy_func;
+	devcb_resolved_write_line   m_out_txrdy_func;
+	devcb_resolved_write_line   m_out_txempty_func;
+	devcb_resolved_write_line   m_out_syndet_func;
 
 	/* flags controlling how i8251_control_w operates */
 	UINT8 m_flags;

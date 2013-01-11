@@ -18,9 +18,9 @@
 
 struct ym2612_state
 {
-	sound_stream *	stream;
-	emu_timer *		timer[2];
-	void *			chip;
+	sound_stream *  stream;
+	emu_timer *     timer[2];
+	void *          chip;
 	const ym2612_interface *intf;
 	device_t *device;
 };
@@ -60,11 +60,11 @@ static void timer_handler(void *param,int c,int count,int clock)
 {
 	ym2612_state *info = (ym2612_state *)param;
 	if( count == 0 )
-	{	/* Reset FM Timer */
+	{   /* Reset FM Timer */
 		info->timer[c]->enable(false);
 	}
 	else
-	{	/* Start FM Timer */
+	{   /* Start FM Timer */
 		attotime period = attotime::from_hz(clock) * count;
 		if (!info->timer[c]->enable(1))
 			info->timer[c]->adjust(period);
@@ -160,13 +160,13 @@ const device_type YM2612 = &device_creator<ym2612_device>;
 
 ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2612, "YM2612", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym2612_state);
 }
 ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym2612_state);
 }
@@ -235,5 +235,3 @@ void ym3438_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

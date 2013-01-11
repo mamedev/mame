@@ -140,7 +140,7 @@ void ti_fdc_device::cruwrite(offs_t offset, UINT8 data)
 		case 1:
 			/* Activate motor */
 			if (data && !m_strobe_motor)
-			{	/* on rising edge, set motor_running for 4.23s */
+			{   /* on rising edge, set motor_running for 4.23s */
 				m_DVENA = ASSERT_LINE;
 				handle_hold();
 				m_motor_on_timer->adjust(attotime::from_msec(4230));
@@ -167,12 +167,12 @@ void ti_fdc_device::cruwrite(offs_t offset, UINT8 data)
 		case 5:
 		case 6:
 			/* Select drive X (bits 4-6) */
-			drive = bit-4;					/* drive # (0-2) */
+			drive = bit-4;                  /* drive # (0-2) */
 			drivebit = 1<<drive;
 
 			if (data)
 			{
-				if ((m_DSEL & drivebit)!=0)			/* select drive */
+				if ((m_DSEL & drivebit)!=0)         /* select drive */
 				{
 					if (m_DSEL != 0)
 						LOG("ti_fdc: Multiple drives selected, %02x\n", m_DSEL);
@@ -316,4 +316,3 @@ const rom_entry *ti_fdc_device::device_rom_region() const
 }
 
 const device_type TI99_FDC = &device_creator<ti_fdc_device>;
-

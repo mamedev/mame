@@ -95,9 +95,9 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *
  *************************************/
 
-#define MASTER_CLOCK		(XTAL_73_728MHz)
-#define MAIN_CPU_CLOCK		(MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
-#define NAMCO_AUDIO_CLOCK	(MASTER_CLOCK / 4 /  6 / 32)
+#define MASTER_CLOCK        (XTAL_73_728MHz)
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
+#define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
 
 
@@ -129,8 +129,8 @@ WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
 
 static const namco_interface namco_config =
 {
-	3,		/* number of voices */
-	0		/* stereo */
+	3,      /* number of voices */
+	0       /* stereo */
 };
 
 
@@ -233,8 +233,8 @@ static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
 	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE_LEGACY("namco", namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
-	AM_RANGE(0x47100, 0x47100) AM_RAM	/* leftover from original Galaga code */
-	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)	/* this should be a mirror of 08000-09ffff */
+	AM_RANGE(0x47100, 0x47100) AM_RAM   /* leftover from original Galaga code */
+	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)  /* this should be a mirror of 08000-09ffff */
 	AM_RANGE(0x4c000, 0x4dfff) AM_WRITE(sprite_gfx_w)
 	AM_RANGE(0x4e000, 0x4e17f) AM_WRITE(sprite_ram_w)
 	AM_RANGE(0x4e180, 0x4feff) AM_WRITENOP
@@ -251,20 +251,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_NOP	/* Z180 internal registers */
-	AM_RANGE(0x40, 0x7f) AM_NOP	/* Z180 internal registers */
+	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
+	AM_RANGE(0x40, 0x7f) AM_NOP /* Z180 internal registers */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)		/* ??? pulsed by the timer irq */
+	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)        /* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
-	AM_RANGE(0x84, 0x84) AM_NOP	/* ?? */
-	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_SHARE("stars_seed")	/* stars: rng seed (lo/hi) */
+	AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
+	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_SHARE("stars_seed")    /* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_SHARE("stars_ctrl")	/* stars: bits 3-4 = active set; bit 5 = enable */
+	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_SHARE("stars_ctrl")    /* stars: bits 3-4 = active set; bit 5 = enable */
 	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_SHARE("flip")
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
 ADDRESS_MAP_END
@@ -309,12 +309,12 @@ static INPUT_PORTS_START( 20pacgal )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* bit 7 is EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   /* bit 7 is EEPROM data */
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)		/* bit 5 is cs (active low) */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)	/* bit 6 is clock (active high) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)		/* bit 7 is data */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)     /* bit 5 is cs (active low) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line) /* bit 6 is clock (active high) */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)      /* bit 7 is data */
 INPUT_PORTS_END
 
 
@@ -410,7 +410,7 @@ ROM_START( 25pacman ) /* Revision 2.00 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) ) /* Label printed Rev 2.0, program says Rev 2.00 */
 
-	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) ) /* Same as the MS. Pacman / Galaga graphics rom */
 ROM_END
 
@@ -422,7 +422,7 @@ ROM_START( 20pacgal ) /* Version 1.08 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.08.u13", 0x00000, 0x40000, CRC(2ea16809) SHA1(27f041bdbb590917e9dcb70c21aa6b6d6c9f04fb) ) /* Also found labeled as "V1.08 HO" */
 
-	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
@@ -430,7 +430,7 @@ ROM_START( 20pacgalr4 ) /* Version 1.04 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.04.u13", 0x00000, 0x40000, CRC(6c474d2d) SHA1(5a150fc9d2ed0e908385b9f9d532aa33cf80dba4) )
 
-	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
@@ -438,7 +438,7 @@ ROM_START( 20pacgalr3 ) /* Version 1.03 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.03.u13", 0x00000, 0x40000, CRC(e13dce63) SHA1(c8943f082883c423210fc3c97323222afb00f0a2) )
 
-	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
@@ -446,7 +446,7 @@ ROM_START( 20pacgalr2 ) /* Version 1.02 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.02.u13", 0x00000, 0x40000, CRC(b939f805) SHA1(5fe9470601156dfc2d339c94fd8f0aa4db197760) )
 
-	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
@@ -454,7 +454,7 @@ ROM_START( 20pacgalr1 ) /* Version 1.01 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.01.u13", 0x00000, 0x40000, CRC(77159582) SHA1(c05e005a941cbdc806dcd76b315069362c792a72) )
 
-	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
@@ -462,7 +462,7 @@ ROM_START( 20pacgalr0 ) /* Version 1.00 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.0.u13", 0x00000, 0x40000, CRC(3c92a269) SHA1(a616d912393f4e49b95231d72eec48567f46fc00) ) /* Label printed V1.0, program says v1.00 */
 
-	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 

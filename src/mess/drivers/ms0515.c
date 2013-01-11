@@ -19,7 +19,7 @@ class ms0515_state : public driver_device
 public:
 	ms0515_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -279,7 +279,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ms0515 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "7004l.bin", 0xc000, 0x2000, CRC(b08b3b73) SHA1(c12fd4672598cdf499656dcbb4118d787769d589))
 	ROM_LOAD16_BYTE( "7004h.bin", 0xc001, 0x2000, CRC(515dcf99) SHA1(edd34300fd642c89ce321321e1b12493cd16b7a5))
 ROM_END
@@ -287,5 +287,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT               COMPANY   FULLNAME       FLAGS */
-COMP( ????, ms0515,  0,       0,	ms0515, 	ms0515,  driver_device, 0,  	"Elektronika",   "MS-0515",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( ????, ms0515,  0,       0,    ms0515,     ms0515,  driver_device, 0,      "Elektronika",   "MS-0515",     GAME_NOT_WORKING | GAME_NO_SOUND)

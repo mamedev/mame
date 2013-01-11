@@ -23,10 +23,10 @@ class Instruction
 {
 public:
 	Instruction(const Opcode* oco) : m_valid(false),
-									 m_oco(oco),
-									 m_sizeIncrement(0),
-									 m_source(iINVALID),
-									 m_destination(iINVALID) { }
+										m_oco(oco),
+										m_sizeIncrement(0),
+										m_source(iINVALID),
+										m_destination(iINVALID) { }
 	virtual ~Instruction() {}
 
 	virtual bool decode(const UINT16 word0, const UINT16 word1) = 0;
@@ -34,14 +34,14 @@ public:
 	virtual void evaluate(dsp56k_core* cpustate) = 0;
 
 	virtual size_t size() const = 0;
-    virtual size_t evalSize() const { return size(); }
+	virtual size_t evalSize() const { return size(); }
 	virtual size_t accumulatorBitsModified() const = 0;   // Potentially make this always return ALL (like flags)
 	virtual size_t flags() const { return 0; }
 
 	static Instruction* decodeInstruction(const Opcode* opc,
-										  const UINT16 word0,
-										  const UINT16 word1,
-										  bool shifted=false);
+											const UINT16 word0,
+											const UINT16 word1,
+											bool shifted=false);
 
 	const bool valid() const { return m_valid; }
 
@@ -121,7 +121,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -147,7 +147,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_uuuuF_table(BITSn(word0,0x17), BITSn(word0,0x08),
-						   m_opcode, m_source, m_destination);
+							m_opcode, m_source, m_destination);
 		// TODO: m_opcode = "add";
 		return true;
 	}
@@ -160,7 +160,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    astring m_opcode;
+	astring m_opcode;
 	astring m_arg;  // TODO: get rid of this Add|Sub thing.
 };
 
@@ -175,7 +175,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08),
-						 m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -383,9 +383,9 @@ public:
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 private:
-    UINT16 m_iVal;
-    astring m_opcode;
-    astring dString;
+	UINT16 m_iVal;
+	astring m_opcode;
+	astring dString;
 };
 
 /* BFCHG  : 0001 0100 101- --RR BBB1 0010 iiii iiii : A-38 */
@@ -450,9 +450,9 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    reg_id m_r;
-    UINT16 m_iVal;
-    astring m_opcode;
+	reg_id m_r;
+	UINT16 m_iVal;
+	astring m_opcode;
 };
 
 /* BFCHG  : 0001 0100 100D DDDD BBB1 0010 iiii iiii : A-38 */
@@ -513,8 +513,8 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    UINT16 m_iVal;
-    astring m_opcode;
+	UINT16 m_iVal;
+	astring m_opcode;
 };
 
 // Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 ////////////////////////
@@ -548,7 +548,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	INT16 m_immediate;
 };
 
@@ -585,7 +585,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	INT8 m_immediate;
 };
 
@@ -615,7 +615,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 };
 
 // BRA : 0000 0001 0011 11-- xxxx xxxx xxxx xxxx : A-50 ////////////////////////
@@ -724,7 +724,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 };
 
 // BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 ///////////////////////
@@ -761,7 +761,7 @@ public:
 	size_t flags() const { return DASMFLAG_STEP_OVER; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	INT16 m_immediate;
 };
 
@@ -792,7 +792,7 @@ public:
 	size_t flags() const { return DASMFLAG_STEP_OVER; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 };
 
 // BSR : 0000 0001 0011 10-- xxxx xxxx xxxx xxxx : A-56 ////////////////////////
@@ -925,9 +925,9 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-                 in before cmp, so the same decode function can be used. */
+		         in before cmp, so the same decode function can be used. */
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -950,9 +950,9 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-                 in before cmp, so the same decode function can be used. */
+		         in before cmp, so the same decode function can be used. */
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -1010,7 +1010,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 };
 
 // DEC : .... .... 0110 F010 : A-72 ////////////////////////////////////////////
@@ -1068,7 +1068,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_DDF_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
-						 m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -1093,7 +1093,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
-								 m_source, m_source2, m_destination);
+									m_source, m_source2, m_destination);
 
 		decode_ss_table(BITSn(word0,0x0024), m_mnem);
 		if (m_mnem == oINVALID) return false;
@@ -1113,7 +1113,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	reg_id m_source2;
 };
 
@@ -1279,7 +1279,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08),
-						 m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -1346,7 +1346,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -1375,7 +1375,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -1467,7 +1467,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	UINT16 m_displacement;
 };
 
@@ -1497,7 +1497,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 };
 
 // JMP : 0000 0001 0011 01-- xxxx xxxx xxxx xxxx : A-110 ///////////////////////
@@ -1530,7 +1530,7 @@ public:
 		/* - - - - - - - - */
 	}
 	size_t size() const { return 2; }
-    size_t evalSize() const { return 0; }
+	size_t evalSize() const { return 0; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
@@ -1563,7 +1563,7 @@ public:
 		/* - - - - - - - - */
 	}
 	size_t size() const { return 1; }
-    size_t evalSize() const { return 0; }
+	size_t evalSize() const { return 0; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
 
@@ -1601,7 +1601,7 @@ public:
 	size_t flags() const { return DASMFLAG_STEP_OVER; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	UINT16 m_displacement;
 };
 
@@ -1632,7 +1632,7 @@ public:
 	size_t flags() const { return DASMFLAG_STEP_OVER; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 };
 
 // JSR : 0000 0001 0011 00-- xxxx xxxx xxxx xxxx : A-114 ///////////////////////
@@ -1748,7 +1748,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    astring m_ea;
+	astring m_ea;
 };
 
 // LEA : 0000 0001 10NN MMRR : A-116 ///////////////////////////////////////////
@@ -1780,7 +1780,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    astring m_ea;
+	astring m_ea;
 };
 
 // LSL : .... .... 0011 F011 : A-118 ///////////////////////////////////////////
@@ -1840,7 +1840,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
@@ -1850,7 +1850,7 @@ public:
 		astring ts = m_sign;
 		if (ts != "-") ts = "";
 		retString = "mac " +
-		        	ts +
+					ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1875,7 +1875,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
-						 m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -1904,7 +1904,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -1934,7 +1934,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
@@ -1944,7 +1944,7 @@ public:
 		astring ts = m_sign;
 		if (ts != "-") ts = "";
 		retString = "macr " +
-		        	ts +
+					ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1953,7 +1953,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    astring m_sign;
+	astring m_sign;
 	reg_id m_source2;
 };
 
@@ -1969,7 +1969,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
-						 m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -2000,7 +2000,7 @@ public:
 	{
 		// Special QQF
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
-								 m_source, m_source2, m_destination);
+									m_source, m_source2, m_destination);
 
 		decode_s_table(BITSn(word0,0x0004), m_mnem);
 		return true;
@@ -2019,7 +2019,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	reg_id m_source2;
 };
 
@@ -2124,8 +2124,8 @@ public:
 
 private:
 	INT8 m_b;
-    UINT8 m_W;
-    reg_id m_SD;
+	UINT8 m_W;
+	reg_id m_SD;
 };
 
 // MOVE(C) : 0011 1WDD DDD0 MMRR : A-144 ///////////////////////////////////////
@@ -2164,7 +2164,7 @@ public:
 private:
 	INT8 m_W;
 	reg_id m_SD;
-    astring m_ea;
+	astring m_ea;
 };
 
 // MOVE(C) : 0011 1WDD DDD1 q0RR : A-144 ///////////////////////////////////////
@@ -2203,7 +2203,7 @@ public:
 private:
 	INT8 m_W;
 	reg_id m_SD;
-    astring m_ea;
+	astring m_ea;
 };
 
 // MOVE(C) : 0011 1WDD DDD1 Z11- : A-144 ///////////////////////////////////////
@@ -2241,7 +2241,7 @@ public:
 private:
 	INT8 m_W;
 	reg_id m_SD;
-    astring m_ea;
+	astring m_ea;
 };
 
 // MOVE(C) : 0011 1WDD DDD1 t10- xxxx xxxx xxxx xxxx : A-144 ///////////////////
@@ -2277,50 +2277,50 @@ public:
 
 		retString = "move ";
 		if (m_W) retString += ea + "," + regIdAsString(m_sd);
-		else	 retString += regIdAsString(m_sd) + "," + ea;
+		else     retString += regIdAsString(m_sd) + "," + ea;
 		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56k_core* cpustate)
-    {
+	{
 		if (m_W)
 		{
-		    if (m_t)
-		    {
-		        setReg16(cpustate, m_value, m_sd);
-		    }
-		    else
-		    {
-		        //UINT16 memValue = memory_read_word_16le(cpustate->data, ADDRESS(m_value));
-		        //setReg16(cpustate, memValue, m_sd);
-		    }
+			if (m_t)
+			{
+				setReg16(cpustate, m_value, m_sd);
+			}
+			else
+			{
+				//UINT16 memValue = memory_read_word_16le(cpustate->data, ADDRESS(m_value));
+				//setReg16(cpustate, memValue, m_sd);
+			}
 		}
 		else
 		{
-		    if (m_t)
-		    {
-		        logerror("DSP561xx|Movec_4: This sure seems like it can't happen.");
-		    }
-		    else
-		    {
-		        //UINT16 regValue = regValue16(cpustate, m_sd);
-		        //memory_write_word_16le(cpustate->data, m_value, regValue);
-		    }
+			if (m_t)
+			{
+				logerror("DSP561xx|Movec_4: This sure seems like it can't happen.");
+			}
+			else
+			{
+				//UINT16 regValue = regValue16(cpustate, m_sd);
+				//memory_write_word_16le(cpustate->data, m_value, regValue);
+			}
 		}
 
-	    /* S L E U N Z V C */
-	    /* * ? ? ? ? ? ? ? */
-	    // All ? bits - If SR is specified as a destination operand, set according to the corresponding
+		/* S L E U N Z V C */
+		/* * ? ? ? ? ? ? ? */
+		// All ? bits - If SR is specified as a destination operand, set according to the corresponding
 		// bit of the source operand. If SR is not specified as a destination operand, L is set if data
 		// limiting occurred. All ? bits are not affected otherwise.
-    }
+	}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    UINT8 m_t;
+	UINT8 m_t;
 	UINT8 m_W;
-    UINT16 m_value;
-    reg_id m_sd;
+	UINT16 m_value;
+	reg_id m_sd;
 };
 
 // MOVE(C) : 0010 10dd dddD DDDD : A-144 ///////////////////////////////////////
@@ -2383,9 +2383,9 @@ public:
 
 private:
 	INT8 m_b;
-    UINT8 m_W;
-    reg_id m_SD;
-    op_mnem m_mnem;
+	UINT8 m_W;
+	reg_id m_SD;
+	op_mnem m_mnem;
 };
 
 // MOVE(I) : 0010 00DD BBBB BBBB : A-150 ///////////////////////////////////////
@@ -2457,7 +2457,7 @@ public:
 private:
 	INT8 m_W;
 	reg_id m_SD;
-    astring m_ea;
+	astring m_ea;
 };
 
 // MOVE(M) : 0000 001W RR11 mmRR : A-152 ///////////////////////////////////////
@@ -2499,9 +2499,9 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    UINT8 m_W;
-    astring m_ea;
-    astring m_ea2;
+	UINT8 m_W;
+	astring m_ea;
+	astring m_ea2;
 };
 
 // MOVE(M) : 0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152 ///////////////////
@@ -2535,10 +2535,10 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    INT8 m_b;
-    UINT8 m_W;
-    reg_id m_SD;
-    op_mnem m_mnem;
+	INT8 m_b;
+	UINT8 m_W;
+	reg_id m_SD;
+	op_mnem m_mnem;
 };
 
 // MOVE(P) : 0001 100W HH1p pppp : A-156 ///////////////////////////////////////
@@ -2577,7 +2577,7 @@ public:
 private:
 	INT8 m_W;
 	reg_id m_SD;
-    astring m_ea;
+	astring m_ea;
 };
 
 // MOVE(P) : 0000 110W RRmp pppp : A-156 ///////////////////////////////////////
@@ -2597,7 +2597,7 @@ public:
 
 		assemble_ea_from_m_table(BITSn(word0,0x0020), rNum, m_ea);
 
-		astring fullAddy;	 /* Convert Short Absolute Address to full 16-bit */
+		astring fullAddy;    /* Convert Short Absolute Address to full 16-bit */
 		assemble_address_from_IO_short_address(BITSn(word0,0x001f), fullAddy);
 
 		m_W = BITSn(word0,0x0100);
@@ -2620,7 +2620,7 @@ public:
 private:
 	INT8 m_W;
 	astring m_SD;
-    astring m_ea;
+	astring m_ea;
 };
 
 // MOVE(S) : 0001 100W HH0a aaaa : A-158 ///////////////////////////////////////
@@ -2660,7 +2660,7 @@ public:
 private:
 	INT8 m_W;
 	reg_id m_SD;
-    astring m_ea;
+	astring m_ea;
 };
 
 // MPY : .... .... 1k00 FQQQ : A-160 ///////////////////////////////////////////
@@ -2676,9 +2676,9 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-           but since it's a multiply it doesn't matter */
+		   but since it's a multiply it doesn't matter */
 		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
@@ -2688,7 +2688,7 @@ public:
 		astring ts = m_sign;
 		if (ts != "-") ts = "";
 		retString = "mpy " +
-		        	ts +
+					ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2697,7 +2697,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    astring m_sign;
+	astring m_sign;
 	reg_id m_source2;
 };
 
@@ -2713,7 +2713,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
-						 m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -2742,7 +2742,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -2772,9 +2772,9 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-           but since it's a multiply it doesn't matter */
+		   but since it's a multiply it doesn't matter */
 		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
@@ -2785,7 +2785,7 @@ public:
 		if (ts != "-") ts = "";
 		retString = "mpyr " +
 					ts +
-		        	regIdAsString(m_source) + "," +
+					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
@@ -2793,7 +2793,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    astring m_sign;
+	astring m_sign;
 	reg_id m_source2;
 };
 
@@ -2809,7 +2809,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
-						 m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -2839,7 +2839,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
-								 m_source, m_source2, m_destination);
+									m_source, m_source2, m_destination);
 
 		decode_s_table(BITSn(word0,0x0004), m_mnem);
 		return true;
@@ -2858,7 +2858,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	reg_id m_source2;
 };
 
@@ -2984,7 +2984,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08),
-						 m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -3128,7 +3128,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 };
 
 // RESET : 0000 0000 0000 1000 : A-186 /////////////////////////////////////////
@@ -3317,7 +3317,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -3341,7 +3341,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_uuuuF_table(BITSn(word0,0x17), BITSn(word0,0x08),
-						   m_opcode, m_source, m_destination);
+							m_opcode, m_source, m_destination);
 
 		// TODO // m_opcode = "sub";
 		return true;
@@ -3355,7 +3355,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    astring m_opcode;
+	astring m_opcode;
 };
 
 // SUBL : .... .... 0100 F001 : A-204 //////////////////////////////////////////
@@ -3446,7 +3446,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_h0hF_table(BITSn(word0,0x0007),BITSn(word0,0x0008),
-						  m_source, m_destination);
+							m_source, m_destination);
 
 		decode_RR_table(BITSn(word0,0x0030), m_destination2);
 
@@ -3475,7 +3475,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
-    op_mnem m_mnem;
+	op_mnem m_mnem;
 	reg_id m_destination2;
 };
 
@@ -3490,7 +3490,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
-						  m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -3513,7 +3513,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_DDF_table(BITSn(word0,0x03), BITSn(word0,0x08),
-						 m_source, m_destination);
+							m_source, m_destination);
 		return true;
 	}
 	void disassemble(astring& retString) const
@@ -3564,7 +3564,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_DDF_table(BITSn(word0,0x0030), BITSn(word0,0x0008),
-						 m_destination, m_source);
+							m_destination, m_source);
 
 		decode_HHH_table(BITSn(word0,0x0007), m_SD);
 		// If the destination of the second move is the same as the first, you're invalid
@@ -3583,7 +3583,7 @@ public:
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source2, destination2);
 		retString = "tfr3 " +
 					regIdAsString(m_source) + "," + regIdAsString(m_destination) + " " +
-		            source2 + "," + destination2;
+					source2 + "," + destination2;
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3592,7 +3592,7 @@ public:
 private:
 	INT8 m_W;
 	reg_id m_SD;
-    astring m_ea;
+	astring m_ea;
 	reg_id m_source2;
 	reg_id m_destination2;
 };
@@ -3696,7 +3696,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 
 		// This hackery amounts to a very strange QQQF table...
 		if (m_source == iX0 && m_source2 == iX0) return false;
@@ -3740,7 +3740,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
-						  m_source, m_source2, m_destination);
+							m_source, m_source2, m_destination);
 
 		// This hackery amounts to a very strange QQQF table...
 		if (m_source == iX0 && m_source2 == iX0) return false;

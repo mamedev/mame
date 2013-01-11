@@ -12,7 +12,7 @@ Todo:
 #include "cpu/z80/z80.h"
 
 
-#define NUM_PENS	(8)
+#define NUM_PENS    (8)
 
 
 class dorachan_state : public driver_device

@@ -3,16 +3,16 @@
 #define F2END(cs) \
 	return 2 + (cs)->amlength1 + (cs)->amlength2;
 
-#define F2LOADOPFLOAT(cs, num)								\
-	if ((cs)->flag##num)									\
-		appf = u2f((cs)->reg[(cs)->op##num]);				\
-	else													\
+#define F2LOADOPFLOAT(cs, num)                              \
+	if ((cs)->flag##num)                                    \
+		appf = u2f((cs)->reg[(cs)->op##num]);               \
+	else                                                    \
 		appf = u2f((cs)->program->read_dword_unaligned((cs)->op##num));
 
-#define F2STOREOPFLOAT(cs,num)								\
-	if ((cs)->flag##num)									\
-		(cs)->reg[(cs)->op##num] = f2u(appf);				\
-	else													\
+#define F2STOREOPFLOAT(cs,num)                              \
+	if ((cs)->flag##num)                                    \
+		(cs)->reg[(cs)->op##num] = f2u(appf);               \
+	else                                                    \
 		(cs)->program->write_dword_unaligned((cs)->op##num, f2u(appf));
 
 static void F2DecodeFirstOperand(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1)

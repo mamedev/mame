@@ -38,11 +38,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int xpos, ypos, tile;
 
 		/* the sprites are in the sprite list twice
-         the first format (in comments) appears to be a buffer, if you use
-         this list you get garbage sprites in 2 player mode
-         the second format (used) seems correct
+		 the first format (in comments) appears to be a buffer, if you use
+		 this list you get garbage sprites in 2 player mode
+		 the second format (used) seems correct
 
-         */
+		 */
 /*
         ypos = 0xff - source[1 + 0x10];
         xpos = source[2 + 0x10];

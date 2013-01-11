@@ -10,7 +10,7 @@
 #include "includes/8080bw.h"
 
 
-#define NUM_PENS	(8)
+#define NUM_PENS    (8)
 
 
 MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_vh)
@@ -200,7 +200,7 @@ UINT32 _8080bw_state::screen_update_schaser(screen_device &screen, bitmap_rgb32 
 			UINT8 back_data = background_map_base[back_address];
 
 			/* the equations derived from the schematics don't appear to produce
-               the right colors, but this one does, at least for this PROM */
+			   the right colors, but this one does, at least for this PROM */
 			back_color = (((back_data & 0x0c) == 0x0c) && m_schaser_background_select) ? 4 : 2;
 		}
 
@@ -284,10 +284,10 @@ UINT32 _8080bw_state::screen_update_polaris(screen_device &screen, bitmap_rgb32 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
 		/* for the background color, bit 0 of the map PROM is connected to green gun.
-           red is 0 and blue is 1, giving cyan and blue for the background.  This
-           is different from what the schematics shows, but it's supported
-           by screenshots.  Bit 3 is connected to cloud enable, while
-           bits 1 and 2 are marked 'not use' (sic) */
+		   red is 0 and blue is 1, giving cyan and blue for the background.  This
+		   is different from what the schematics shows, but it's supported
+		   by screenshots.  Bit 3 is connected to cloud enable, while
+		   bits 1 and 2 are marked 'not use' (sic) */
 
 		UINT8 back_color = (color_map_base[color_address] & 0x01) ? 6 : 2;
 		UINT8 fore_color = ~m_colorram[offs & 0x1f9f] & 0x07;
@@ -490,4 +490,3 @@ UINT32 _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb32
 
 	return 0;
 }
-

@@ -323,24 +323,24 @@ static ADDRESS_MAP_START( bonzeadv_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE_LEGACY(bonzeadv_cchip_ram_r, bonzeadv_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_READWRITE_LEGACY(bonzeadv_cchip_ctrl_r, bonzeadv_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE_LEGACY(bonzeadv_cchip_bank_w)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( asuka_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP	/* Mofflott init does dummy reads here */
+	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP /* Mofflott init does dummy reads here */
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
 	AM_RANGE(0x3a0000, 0x3a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
-	AM_RANGE(0xc10000, 0xc103ff) AM_WRITENOP	/* error in Asuka init code */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
+	AM_RANGE(0xc10000, 0xc103ff) AM_WRITENOP    /* error in Asuka init code */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16, asuka_state )
@@ -349,26 +349,26 @@ static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(cadash_share_r,cadash_share_w)	/* network ram */
+	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(cadash_share_r,cadash_share_w)    /* network ram */
 	AM_RANGE(0x900000, 0x90000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_4bpg_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
-	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram */
+	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16	/* N.B. tc100scn mirror overlaps spriteram */, asuka_state )
+static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16   /* N.B. tc100scn mirror overlaps spriteram */, asuka_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0x400000, 0x40000f) AM_DEVREAD8_LEGACY("tc0220ioc", tc0220ioc_r, 0x00ff)	/* service mode mirror */
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREAD8_LEGACY("tc0220ioc", tc0220ioc_r, 0x00ff)   /* service mode mirror */
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x4e0002, 0x4e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVWRITE_LEGACY("tc0100scn", tc0100scn_word_w)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
@@ -459,20 +459,20 @@ static INPUT_PORTS_START( bonzeadv )
 	/* 0x3b0000 -> 0x10cb7e ($b7e,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SWB)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SWB:3,4") /* see notes */
-	PORT_DIPSETTING(    0x08, "40k 100k" )					/* 300k 1000k 1500k 2000k 2500k 3000k 3500k 5000k */
-	PORT_DIPSETTING(    0x0c, "50k 150k" )					/* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
-	PORT_DIPSETTING(    0x04, "60k 200k" )					/* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
-	PORT_DIPSETTING(    0x00, "80k 250k" )					/* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SWB:3,4") /* see notes */
+	PORT_DIPSETTING(    0x08, "40k 100k" )                  /* 300k 1000k 1500k 2000k 2500k 3000k 3500k 5000k */
+	PORT_DIPSETTING(    0x0c, "50k 150k" )                  /* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
+	PORT_DIPSETTING(    0x04, "60k 200k" )                  /* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
+	PORT_DIPSETTING(    0x00, "80k 250k" )                  /* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SWB:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )			/* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )            /* see notes */
 
 	PORT_START("800007")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -520,17 +520,17 @@ static INPUT_PORTS_START( asuka )
 	/* 0x400002 -> 0x10361c */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SWB)
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Points" )				PORT_DIPLOCATION("SWB:3,4") /* for each plane shot after each end of level boss */
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Points" )              PORT_DIPLOCATION("SWB:3,4") /* for each plane shot after each end of level boss */
 	PORT_DIPSETTING(    0x0c, "500" )
 	PORT_DIPSETTING(    0x08, "1500" )
 	PORT_DIPSETTING(    0x04, "2000" )
 	PORT_DIPSETTING(    0x00, "2500" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SWB:7,8")
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0xc0, "Up To Level 2" )
 	PORT_DIPSETTING(    0x80, "Up To Level 3" )
@@ -563,22 +563,22 @@ static INPUT_PORTS_START( mofflott )
 	/* 0x400002 -> 0x100a93.b */
 	PORT_MODIFY("DSWB")
 	TAITO_DIFFICULTY_LOC(SWB)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x0c, "20k And Every 50k" )
 	PORT_DIPSETTING(    0x08, "50k And Every 100k" )
 	PORT_DIPSETTING(    0x04, "100k Only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SWB:7")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")    PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Number Of Keys" )			PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(    0x00, "B 14" )						/* Hard */
-	PORT_DIPSETTING(    0x80, "A 16" )						/* Easy */
+	PORT_DIPNAME( 0x80, 0x80, "Number Of Keys" )            PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x00, "B 14" )                      /* Hard */
+	PORT_DIPSETTING(    0x80, "A 16" )                      /* Easy */
 INPUT_PORTS_END
 
 /* different players and system inputs than 'asuka' */
@@ -591,7 +591,7 @@ static INPUT_PORTS_START( cadash )
 	/* 0x900002 -> 0x10317c ($317c,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SWB)
-	PORT_DIPNAME( 0x0c, 0x0c, "Starting Time" )			PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Starting Time" )         PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "5:00" )
 	PORT_DIPSETTING(    0x04, "6:00" )
 	PORT_DIPSETTING(    0x0c, "7:00" )
@@ -607,7 +607,7 @@ static INPUT_PORTS_START( cadash )
 	PORT_DIPSETTING(    0x10, "Default - 1:00" )
 	PORT_DIPSETTING(    0x30, "Default" )
 	PORT_DIPSETTING(    0x20, "Default + 1:00" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Communication Mode" )	PORT_DIPLOCATION("SWB:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Communication Mode" )    PORT_DIPLOCATION("SWB:7,8")
 	PORT_DIPSETTING(    0xc0, "Stand alone" )
 	PORT_DIPSETTING(    0x80, "Master" )
 	PORT_DIPSETTING(    0x00, "Slave" )
@@ -649,10 +649,10 @@ static INPUT_PORTS_START( galmedes )
 
 	/* 0x400000 -> 0x100982 */
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWA:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
@@ -661,7 +661,7 @@ static INPUT_PORTS_START( galmedes )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SWA:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWB",0x80,EQUALS,0x80)
@@ -674,20 +674,20 @@ static INPUT_PORTS_START( galmedes )
 	/* 0x400002 -> 0x100984 */
 	PORT_MODIFY("DSWB")
 	TAITO_DIFFICULTY_LOC(SWB)
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x08, "Every 100k" )
 	PORT_DIPSETTING(    0x0c, "100k And Every 200k" )
 	PORT_DIPSETTING(    0x04, "150k And Every 200k" )
 	PORT_DIPSETTING(    0x00, "Every 200k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x80, 0x80, "Coin Mode" )				PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(    0x80, "Mode A (Japan)" )		/* Mode A is TAITO_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x00, "Mode B (World)" )		/* Mode B is TAITO_COINAGE_WORLD */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x80, 0x80, "Coin Mode" )             PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x80, "Mode A (Japan)" )        /* Mode A is TAITO_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x00, "Mode B (World)" )        /* Mode B is TAITO_COINAGE_WORLD */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( earthjkr )
@@ -696,17 +696,17 @@ static INPUT_PORTS_START( earthjkr )
 
 	/* 0x400002 -> 0x1009842 */
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "100k and 300k" )
 	PORT_DIPSETTING(    0x08, "100k only" )
 	PORT_DIPSETTING(    0x04, "200k only" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPNAME( 0x40, 0x40, "Copyright" )				PORT_DIPLOCATION("SWB:7") /* code at 0x00b982 and 0x00dbce */
+	PORT_DIPNAME( 0x40, 0x40, "Copyright" )             PORT_DIPLOCATION("SWB:7") /* code at 0x00b982 and 0x00dbce */
 	PORT_DIPSETTING(    0x40, "Visco" )                          /* Japan notice screen ON */
 	PORT_DIPSETTING(    0x00, "Visco (distributed by Romstar)" ) /* Japan notice screen OFF */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
@@ -721,7 +721,7 @@ static INPUT_PORTS_START( eto )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SWB:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SWB:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SWB:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:6" )	/* value stored at 0x20090a but not read back */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:6" )    /* value stored at 0x20090a but not read back */
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 INPUT_PORTS_END
@@ -749,15 +749,15 @@ static const gfx_layout tilelayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-	  10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
+		10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	128*8
 };
 
 static GFXDECODE_START( asuka )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )	/* OBJ */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )	/* SCR */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* OBJ */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* SCR */
 GFXDECODE_END
 
 
@@ -779,8 +779,8 @@ static const ym2610_interface ym2610_config =
 
 static const msm5205_interface msm5205_config =
 {
-	asuka_msm5205_vck,	/* VCK function */
-	MSM5205_S48_4B		/* 8 kHz */
+	asuka_msm5205_vck,  /* VCK function */
+	MSM5205_S48_4B      /* 8 kHz */
 };
 
 
@@ -791,20 +791,20 @@ static const msm5205_interface msm5205_config =
 static const tc0100scn_interface asuka_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	0, 0,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	0, 0,       /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface cadash_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	1, 0,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	1, 0,       /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
@@ -875,7 +875,7 @@ void asuka_state::screen_eof_asuka(screen_device &screen, bool state)
 static const tc0220ioc_interface asuka_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
 };
 
 
@@ -928,11 +928,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( asuka, asuka_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(asuka_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
 
@@ -975,14 +975,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cadash, asuka_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)	/* 68000p12 running at 16Mhz, verified on pcb  */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 68000p12 running at 16Mhz, verified on pcb  */
 	MCFG_CPU_PROGRAM_MAP(cadash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  cadash_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)	/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)
 
-	MCFG_CPU_ADD("subcpu", Z180, 4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("subcpu", Z180, 4000000)   /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cadash_sub_map)
 	MCFG_CPU_IO_MAP(cadash_sub_io)
 
@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_8MHz/2)	/* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL_8MHz/2)   /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(asuka_state,sound_bankswitch_2151_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -1022,11 +1022,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mofflott, asuka_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(asuka_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
 
@@ -1044,7 +1044,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
-	MCFG_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
+	MCFG_PALETTE_LENGTH(4096)   /* only Mofflott uses full palette space */
 
 	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
@@ -1069,11 +1069,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( galmedes, asuka_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(asuka_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)
 
 
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
 	MCFG_GFXDECODE(asuka)
-	MCFG_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
+	MCFG_PALETTE_LENGTH(4096)   /* only Mofflott uses full palette space */
 
 	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
@@ -1112,11 +1112,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( eto, asuka_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(eto_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cadash_z80_map)
 
 
@@ -1167,10 +1167,10 @@ ROM_START( bonzeadv )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
@@ -1178,7 +1178,7 @@ ROM_START( bonzeadv )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1192,10 +1192,10 @@ ROM_START( bonzeadvo )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
@@ -1203,7 +1203,7 @@ ROM_START( bonzeadvo )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1217,10 +1217,10 @@ ROM_START( bonzeadvu )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
@@ -1228,7 +1228,7 @@ ROM_START( bonzeadvu )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1242,10 +1242,10 @@ ROM_START( jigkmgri )
 	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) )	/* Tiles (8 x 8) */
+	ROM_LOAD( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) /* Tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
@@ -1253,7 +1253,7 @@ ROM_START( jigkmgri )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )     /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1262,21 +1262,21 @@ ROM_START( asuka )
 	ROM_LOAD16_BYTE( "b68-13.bin",  0x00000, 0x20000, CRC(855efb3e) SHA1(644e02e207adeaec7839c824688d88ab8d046418) )
 	ROM_LOAD16_BYTE( "b68-12.bin",  0x00001, 0x20000, CRC(271eeee9) SHA1(c08e347be4aae929c0ab95ff7618edaa1a7d6da9) )
 	/* 0x040000 - 0x7ffff is intentionally empty */
-	ROM_LOAD16_WORD( "b68-03.bin",  0x80000, 0x80000, CRC(d3a59b10) SHA1(35a2ff18b64e73ac5e17484354c0cc58bc2cd7fc) )	/* Fix ROM */
+	ROM_LOAD16_WORD( "b68-03.bin",  0x80000, 0x80000, CRC(d3a59b10) SHA1(35a2ff18b64e73ac5e17484354c0cc58bc2cd7fc) )    /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b68-01.bin",  0x00000, 0x80000, CRC(89f32c94) SHA1(74fbb699e05e2336509cb5ac06ed94335ff870d5) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b68-01.bin",  0x00000, 0x80000, CRC(89f32c94) SHA1(74fbb699e05e2336509cb5ac06ed94335ff870d5) )   /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "b68-02.bin", 0x00000, 0x80000, CRC(f5018cd3) SHA1(860ce140ae369556d03d5d78987b87c0d6070df5) )	/* Sprites (16 x 16) */
+	ROM_LOAD       ( "b68-02.bin", 0x00000, 0x80000, CRC(f5018cd3) SHA1(860ce140ae369556d03d5d78987b87c0d6070df5) ) /* Sprites (16 x 16) */
 	ROM_LOAD16_BYTE( "b68-07.bin", 0x80000, 0x10000, CRC(c113acc8) SHA1(613c61a78df73dcb0b9c9018ae829e865baac772) )
 	ROM_LOAD16_BYTE( "b68-06.bin", 0x80001, 0x10000, CRC(f517e64d) SHA1(8be491bfe0f7eed58521de9d31da677acf635c23) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b68-11.bin", 0x00000, 0x04000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x10000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
 ROM_END
 
@@ -1285,21 +1285,21 @@ ROM_START( asukaj )
 	ROM_LOAD16_BYTE( "b68-09.bin",  0x00000, 0x20000, CRC(1eaa1bbb) SHA1(01ca6a5f3c47dab49654b84601119714eb329cc5) )
 	ROM_LOAD16_BYTE( "b68-08.bin",  0x00001, 0x20000, CRC(8cc96e60) SHA1(dc94f3fd48c0407ec72e8330bc688e9e16d39213) )
 	/* 0x040000 - 0x7ffff is intentionally empty */
-	ROM_LOAD16_WORD( "b68-03.bin",  0x80000, 0x80000, CRC(d3a59b10) SHA1(35a2ff18b64e73ac5e17484354c0cc58bc2cd7fc) )	/* Fix ROM */
+	ROM_LOAD16_WORD( "b68-03.bin",  0x80000, 0x80000, CRC(d3a59b10) SHA1(35a2ff18b64e73ac5e17484354c0cc58bc2cd7fc) )    /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b68-01.bin",  0x00000, 0x80000, CRC(89f32c94) SHA1(74fbb699e05e2336509cb5ac06ed94335ff870d5) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b68-01.bin",  0x00000, 0x80000, CRC(89f32c94) SHA1(74fbb699e05e2336509cb5ac06ed94335ff870d5) )   /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "b68-02.bin", 0x00000, 0x80000, CRC(f5018cd3) SHA1(860ce140ae369556d03d5d78987b87c0d6070df5) )	/* Sprites (16 x 16) */
+	ROM_LOAD       ( "b68-02.bin", 0x00000, 0x80000, CRC(f5018cd3) SHA1(860ce140ae369556d03d5d78987b87c0d6070df5) ) /* Sprites (16 x 16) */
 	ROM_LOAD16_BYTE( "b68-07.bin", 0x80000, 0x10000, CRC(c113acc8) SHA1(613c61a78df73dcb0b9c9018ae829e865baac772) )
 	ROM_LOAD16_BYTE( "b68-06.bin", 0x80001, 0x10000, CRC(f517e64d) SHA1(8be491bfe0f7eed58521de9d31da677acf635c23) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b68-11.bin", 0x00000, 0x04000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x10000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
 ROM_END
 
@@ -1308,21 +1308,21 @@ ROM_START( mofflott )
 	ROM_LOAD16_BYTE( "c17-09.bin",  0x00000, 0x20000, CRC(05ee110f) SHA1(8cedd911d3fdcca1e409260d12dd03a2fb35ef86) )
 	ROM_LOAD16_BYTE( "c17-08.bin",  0x00001, 0x20000, CRC(d0aacffd) SHA1(2c5ec4020aad2c1cd3a004dc70a12e0d77eb6aa7) )
 	/* 0x40000 - 0x7ffff is intentionally empty */
-	ROM_LOAD16_WORD( "c17-03.bin",  0x80000, 0x80000, CRC(27047fc3) SHA1(1f88a7a42a94bac0e164a69896ae168ab821fbb3) )	/* Fix ROM */
+	ROM_LOAD16_WORD( "c17-03.bin",  0x80000, 0x80000, CRC(27047fc3) SHA1(1f88a7a42a94bac0e164a69896ae168ab821fbb3) )    /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c17-01.bin",  0x00000, 0x80000, CRC(e9466d42) SHA1(93d533a9a992e3ff537e914577ede41729235826) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "c17-01.bin",  0x00000, 0x80000, CRC(e9466d42) SHA1(93d533a9a992e3ff537e914577ede41729235826) )   /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "c17-02.bin", 0x00000, 0x80000, CRC(8860a8db) SHA1(372adea8835a9524ece30ab71181ef9d05b120e9) )	/* Sprites (16 x 16) */
+	ROM_LOAD       ( "c17-02.bin", 0x00000, 0x80000, CRC(8860a8db) SHA1(372adea8835a9524ece30ab71181ef9d05b120e9) ) /* Sprites (16 x 16) */
 	ROM_LOAD16_BYTE( "c17-05.bin", 0x80000, 0x10000, CRC(57ac4741) SHA1(3188ff0866324c68fba8e9745a0cb186784cb53d) )
 	ROM_LOAD16_BYTE( "c17-04.bin", 0x80001, 0x10000, CRC(f4250410) SHA1(1f5f6baca4aa695ce2ae5c65adcb460da872a239) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c17-07.bin", 0x00000, 0x04000, CRC(cdb7bc2c) SHA1(5113055c954a39918436db75cc06b53c29c60728) )
-	ROM_CONTINUE(           0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(           0x10000, 0x0c000 )  /* banked stuff */
 
-	ROM_REGION( 0x10000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c17-06.bin", 0x00000, 0x10000, CRC(5c332125) SHA1(408f42df18b38347c8a4e177a9484162a66877e1) )
 ROM_END
 
@@ -1334,16 +1334,16 @@ ROM_START( cadash )
 	ROM_LOAD16_BYTE( "c21-17",  0x40001, 0x20000, CRC(bf9a578a) SHA1(42bde46081db6be2f61eaf171438ecc9264d18be) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )  /* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -1361,16 +1361,16 @@ ROM_START( cadashj )
 	ROM_LOAD16_BYTE( "c21-05.14",  0x40001, 0x20000, CRC(834018d2) SHA1(0b1a29316f90a98478b47d7fa3f05c68e5ddd9b3) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )  /* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1383,17 +1383,17 @@ ROM_START( cadashu )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	// bad dump so used checksum from other sets //
-	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	// bad dump so used checksum from other sets //
-	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )  /* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1405,16 +1405,16 @@ ROM_START( cadashi )
 	ROM_LOAD16_BYTE( "c21-17it",  0x40001, 0x20000, CRC(641fc9dd) SHA1(1497e39f6b250de39ef2785aaca7e68a803612fa) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )  /* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1426,16 +1426,16 @@ ROM_START( cadashf )
 	ROM_LOAD16_BYTE( "c21-20",  0x40001, 0x20000, CRC(b96acfd9) SHA1(d05b55fd5bbf8fd0e5a7272d1951f27a4900371f) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )  /* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1447,16 +1447,16 @@ ROM_START( cadashg )
 	ROM_LOAD16_BYTE( "c21-24-1.15",  0x40001, 0x20000, CRC(2359b93e) SHA1(9a5ce34dd8667a987ab8b6e6246f0ad032af868f) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x08000, "subcpu", 0 )	/* 2 machine interface mcu rom ? */
+	ROM_REGION( 0x08000, "subcpu", 0 )  /* 2 machine interface mcu rom ? */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
 ROM_END
 
@@ -1465,17 +1465,17 @@ ROM_START( galmedes )
 	ROM_LOAD16_BYTE( "gm-prg1.bin",  0x00000, 0x20000, CRC(32a70753) SHA1(3bd094b7ae600dbc87ba74e8b2d6b86a68346f4f) )
 	ROM_LOAD16_BYTE( "gm-prg0.bin",  0x00001, 0x20000, CRC(fae546a4) SHA1(484cad5287daa495b347f6b5b065f3b3d02d8f0e) )
 	/* 0x40000 - 0x7ffff is intentionally empty */
-	ROM_LOAD16_WORD( "gm-30.rom",    0x80000, 0x80000, CRC(4da2a407) SHA1(7bd0eb629dd7022a16e328612c786c544267f7bc) )	/* Fix ROM */
+	ROM_LOAD16_WORD( "gm-30.rom",    0x80000, 0x80000, CRC(4da2a407) SHA1(7bd0eb629dd7022a16e328612c786c544267f7bc) )   /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "gm-scn.bin", 0x00000, 0x80000, CRC(3bab0581) SHA1(56b79a4ffd9f4880a63450b7d1b79f029de75e20) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "gm-scn.bin", 0x00000, 0x80000, CRC(3bab0581) SHA1(56b79a4ffd9f4880a63450b7d1b79f029de75e20) )    /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "gm-obj.bin", 0x00000, 0x80000, CRC(7a4a1315) SHA1(e2010ee4222415fd55ba3102003be4151d29e39b) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "gm-obj.bin", 0x00000, 0x80000, CRC(7a4a1315) SHA1(e2010ee4222415fd55ba3102003be4151d29e39b) )    /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "gm-snd.bin", 0x00000, 0x04000, CRC(d6f56c21) SHA1(ff9743448ac8ce57a2f8c33a26145e7b92cbe3c3) )
-	ROM_CONTINUE(           0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(           0x10000, 0x0c000 )  /* banked stuff */
 ROM_END
 
 ROM_START( earthjkr )
@@ -1483,19 +1483,19 @@ ROM_START( earthjkr )
 	ROM_LOAD16_BYTE( "ej_3b.rom",  0x00000, 0x20000, CRC(bdd86fc2) SHA1(96578860ed03718f8a68847b367eac6c81b79ca2) )
 	ROM_LOAD16_BYTE( "ej_3a.rom",  0x00001, 0x20000, CRC(9c8050c6) SHA1(076c882f75787e8120de66ff0dcd2cb820513c45) )
 	/* 0x40000 - 0x7ffff is intentionally empty */
-	ROM_LOAD16_WORD( "ej_30e.rom", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) )	/* Fix ROM */
+	ROM_LOAD16_WORD( "ej_30e.rom", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) ) /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ej_chr.rom", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "ej_chr.rom", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "ej_obj.rom", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) )	/* Sprites (16 x 16) */
+	ROM_LOAD       ( "ej_obj.rom", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) */
 	ROM_LOAD16_BYTE( "ej_1.rom",   0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
 	ROM_LOAD16_BYTE( "ej_0.rom",   0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "ej_2.rom", 0x00000, 0x04000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) )
-	ROM_CONTINUE(         0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
 ROM_END
 
 ROM_START( eto )
@@ -1503,17 +1503,17 @@ ROM_START( eto )
 	ROM_LOAD16_BYTE( "eto-1.23",  0x00000, 0x20000, CRC(44286597) SHA1(ac37e5edbf9d187f60232adc5e9ebed45b3d2fe2) )
 	ROM_LOAD16_BYTE( "eto-0.8",   0x00001, 0x20000, CRC(57b79370) SHA1(25f83eada982ef654260fe92016d42a90005a05c) )
 	/* 0x40000 - 0x7ffff is intentionally empty */
-	ROM_LOAD16_WORD( "eto-2.30",    0x80000, 0x80000, CRC(12f46fb5) SHA1(04db8b6ccd0051668bd2930275efa0265c0cfd2b) )	/* Fix ROM */
+	ROM_LOAD16_WORD( "eto-2.30",    0x80000, 0x80000, CRC(12f46fb5) SHA1(04db8b6ccd0051668bd2930275efa0265c0cfd2b) )    /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "eto-4.3", 0x00000, 0x80000, CRC(a8768939) SHA1(a2cbbd3e10ed48ba32a680b2e40ea03900cf33fa) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "eto-4.3", 0x00000, 0x80000, CRC(a8768939) SHA1(a2cbbd3e10ed48ba32a680b2e40ea03900cf33fa) )   /* Sprites (16 x 16) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "eto-3.6", 0x00000, 0x80000, CRC(dd247397) SHA1(53a7bf877fd7e5f3daf295a698f4012447b6f113) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "eto-3.6", 0x00000, 0x80000, CRC(dd247397) SHA1(53a7bf877fd7e5f3daf295a698f4012447b6f113) )   /* SCR tiles (8 x 8) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "eto-5.27", 0x00000, 0x04000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) )
-	ROM_CONTINUE(         0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
 ROM_END
 
 

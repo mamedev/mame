@@ -37,8 +37,8 @@ class vic1010_device :  public device_t,
 						public device_vic20_expansion_card_interface
 {
 public:
-    // construction/destruction
-    vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
@@ -46,8 +46,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( res_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "vic1010"; }
 
 	// optional information overrides

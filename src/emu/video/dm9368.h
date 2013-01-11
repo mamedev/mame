@@ -50,38 +50,38 @@
 
 struct dm9368_interface
 {
-	int	m_digit;
+	int m_digit;
 
-	devcb_read_line			m_in_rbi_cb;
-	devcb_write_line		m_out_rbo_cb;
+	devcb_read_line         m_in_rbi_cb;
+	devcb_write_line        m_out_rbo_cb;
 };
 
 
 
 // ======================> dm9368_device
 
-class dm9368_device :	public device_t,
-                        public dm9368_interface
+class dm9368_device :   public device_t,
+						public dm9368_interface
 {
 public:
-    // construction/destruction
-    dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    void a_w(UINT8 data);
+	void a_w(UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER( rbi_w );
 	DECLARE_READ_LINE_MEMBER( rbo_r );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 
 private:
 	inline int get_rbi();
 	inline void set_rbo(int state);
 
-	devcb_resolved_read_line	m_in_rbi_func;
-	devcb_resolved_write_line	m_out_rbo_func;
+	devcb_resolved_read_line    m_in_rbi_func;
+	devcb_resolved_write_line   m_out_rbo_func;
 
 	int m_rbi;
 	int m_rbo;

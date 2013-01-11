@@ -22,13 +22,13 @@
  *
  *************************************/
 
-#define CRYSTAL_OSC				(XTAL_3_579545MHz)
-#define SH8253_CLOCK			(CRYSTAL_OSC / 2)
-#define SH6840_CLOCK			(CRYSTAL_OSC / 4)
-#define SH6532_CLOCK			(CRYSTAL_OSC / 4)
-#define CVSD_CLOCK				(1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
-#define CVSD_Z80_CLOCK			(CRYSTAL_OSC / 2)
-#define BASE_VOLUME				(32767 / 6)
+#define CRYSTAL_OSC             (XTAL_3_579545MHz)
+#define SH8253_CLOCK            (CRYSTAL_OSC / 2)
+#define SH6840_CLOCK            (CRYSTAL_OSC / 4)
+#define SH6532_CLOCK            (CRYSTAL_OSC / 4)
+#define CVSD_CLOCK              (1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
+#define CVSD_Z80_CLOCK          (CRYSTAL_OSC / 2)
+#define BASE_VOLUME             (32767 / 6)
 
 enum
 {
@@ -48,11 +48,11 @@ enum
 /* 6840 variables */
 struct sh6840_timer_channel
 {
-	UINT8	cr;
-	UINT8	state;
-	UINT8	leftovers;
-	UINT16	timer;
-	UINT32	clocks;
+	UINT8   cr;
+	UINT8   state;
+	UINT8   leftovers;
+	UINT16  timer;
+	UINT32  clocks;
 	union
 	{
 #ifdef LSB_FIRST
@@ -66,11 +66,11 @@ struct sh6840_timer_channel
 
 struct sh8253_timer_channel
 {
-	UINT8	clstate;
-	UINT8	enable;
-	UINT16	count;
-	UINT32	step;
-	UINT32	fraction;
+	UINT8   clstate;
+	UINT8   enable;
+	UINT16  count;
+	UINT32  step;
+	UINT32  fraction;
 };
 
 struct exidy_sound_state
@@ -110,7 +110,7 @@ struct exidy_sound_state
 	sound_stream *m_stream;
 	double m_freq_to_step;
 
-	UINT8 m_victory_sound_response_ack_clk;	/* 7474 @ F4 */
+	UINT8 m_victory_sound_response_ack_clk; /* 7474 @ F4 */
 };
 
 
@@ -207,10 +207,10 @@ INLINE int sh6840_update_noise(exidy_sound_state *state, int clocks)
 	for (i = 0; i < clocks; i++)
 	{
 		/* shift the LFSR. its a LOOOONG LFSR, so we need
-        * four longs to hold it all!
-        * first we grab new sample, then shift the high bits,
-        * then the low ones; finally or in the result and see if we've
-        * had a 0->1 transition */
+		* four longs to hold it all!
+		* first we grab new sample, then shift the high bits,
+		* then the low ones; finally or in the result and see if we've
+		* had a 0->1 transition */
 		newxor = (state->m_sh6840_LFSR_3 ^ state->m_sh6840_LFSR_2) >> 31; /* high bits of 3 and 2 xored is new xor */
 		state->m_sh6840_LFSR_3 <<= 1;
 		state->m_sh6840_LFSR_3 |= state->m_sh6840_LFSR_2 >> 31;
@@ -422,14 +422,14 @@ const device_type EXIDY = &device_creator<exidy_sound_device>;
 
 exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(exidy_sound_state);
 }
 
 exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(exidy_sound_state);
 }
@@ -576,11 +576,11 @@ static READ8_DEVICE_HANDLER( r6532_portb_r )
 
 static const riot6532_interface r6532_interface =
 {
-	DEVCB_DEVICE_HANDLER("custom", r6532_porta_r),	/* port A read handler */
-	DEVCB_DEVICE_HANDLER("custom", r6532_portb_r),	/* port B read handler */
-	DEVCB_DEVICE_HANDLER("custom", r6532_porta_w),	/* port A write handler */
-	DEVCB_DEVICE_HANDLER("custom", r6532_portb_w),	/* port B write handler */
-	DEVCB_DEVICE_LINE("custom", r6532_irq)			/* IRQ callback */
+	DEVCB_DEVICE_HANDLER("custom", r6532_porta_r),  /* port A read handler */
+	DEVCB_DEVICE_HANDLER("custom", r6532_portb_r),  /* port B read handler */
+	DEVCB_DEVICE_HANDLER("custom", r6532_porta_w),  /* port A write handler */
+	DEVCB_DEVICE_HANDLER("custom", r6532_portb_w),  /* port B write handler */
+	DEVCB_DEVICE_LINE("custom", r6532_irq)          /* IRQ callback */
 };
 
 
@@ -804,35 +804,35 @@ static WRITE8_DEVICE_HANDLER( exidy_sound_filter_w )
 
 static const pia6821_interface venture_pia0_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_MEMBER("pia1", pia6821_device, portb_w),		/* port A out */
-	DEVCB_DEVICE_MEMBER("pia1", pia6821_device, porta_w),		/* port B out */
-	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, cb1_w),		/* line CA2 out */
-	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, ca1_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DEVICE_MEMBER("pia1", pia6821_device, portb_w),       /* port A out */
+	DEVCB_DEVICE_MEMBER("pia1", pia6821_device, porta_w),       /* port B out */
+	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, cb1_w),        /* line CA2 out */
+	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, ca1_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
 static const pia6821_interface venture_pia1_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_MEMBER("pia0", pia6821_device, portb_w),		/* port A out */
-	DEVCB_DEVICE_MEMBER("pia0", pia6821_device, porta_w),		/* port B out */
-	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w),		/* line CA2 out */
-	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, ca1_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_DEVICE_LINE("custom", update_irq_state)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DEVICE_MEMBER("pia0", pia6821_device, portb_w),       /* port A out */
+	DEVCB_DEVICE_MEMBER("pia0", pia6821_device, porta_w),       /* port B out */
+	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w),        /* line CA2 out */
+	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, ca1_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_DEVICE_LINE("custom", update_irq_state)       /* IRQB */
 };
 
 
@@ -1032,8 +1032,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define VICTORY_AUDIO_CPU_CLOCK		(XTAL_3_579545MHz / 4)
-#define VICTORY_LOG_SOUND			0
+#define VICTORY_AUDIO_CPU_CLOCK     (XTAL_3_579545MHz / 4)
+#define VICTORY_LOG_SOUND           0
 
 
 
@@ -1103,18 +1103,18 @@ static WRITE8_DEVICE_HANDLER( victory_main_ack_w )
 
 static const pia6821_interface victory_pia1_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_DEVICE_HANDLER("custom", victory_sound_irq_clear_w),	/* line CA2 out */
-	DEVCB_DEVICE_HANDLER("custom", victory_main_ack_w),			/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_DEVICE_LINE("custom", update_irq_state)				/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_DEVICE_HANDLER("custom", victory_sound_irq_clear_w),  /* line CA2 out */
+	DEVCB_DEVICE_HANDLER("custom", victory_main_ack_w),         /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_DEVICE_LINE("custom", update_irq_state)               /* IRQB */
 };
 
 
@@ -1145,7 +1145,7 @@ static DEVICE_RESET( victory_sound )
 	pia1->cb1_w(1);
 
 	/* these two lines shouldn't be needed, but it avoids the log entry
-       as the sound CPU checks port A before the main CPU ever writes to it */
+	   as the sound CPU checks port A before the main CPU ever writes to it */
 	pia1->set_a_input(0, 0);
 	pia1->ca1_w(1);
 }

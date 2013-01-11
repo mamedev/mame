@@ -68,11 +68,11 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	const UINT16 *colortable_b = (const UINT16 *)&state->m_colorxlat[0x8000/4];
 	const UINT16 *lumaram = (const UINT16 *)state->m_lumaram.target();
 	const UINT16 *palram = (const UINT16 *)state->m_paletteram32.target();
-	UINT32	lumabase = extra->lumabase;
-	UINT32	color = extra->colorbase;
-	UINT8	luma;
-	UINT32	tr, tg, tb;
-	int		x;
+	UINT32  lumabase = extra->lumabase;
+	UINT32  color = extra->colorbase;
+	UINT8   luma;
+	UINT32  tr, tg, tb;
+	int     x;
 #endif
 	/* if it's translucent, there's nothing to render */
 #if defined( MODEL2_TRANSLUCENT)
@@ -115,8 +115,8 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	UINT32 *p = &destmap->pix32(scanline);
 
-	UINT32	tex_width = extra->texwidth;
-	UINT32	tex_height = extra->texheight;
+	UINT32  tex_width = extra->texwidth;
+	UINT32  tex_height = extra->texheight;
 
 	/* extract color information */
 	const UINT16 *colortable_r = (const UINT16 *)&state->m_colorxlat[0x0000/4];
@@ -124,13 +124,13 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	const UINT16 *colortable_b = (const UINT16 *)&state->m_colorxlat[0x8000/4];
 	const UINT16 *lumaram = (const UINT16 *)state->m_lumaram.target();
 	const UINT16 *palram = (const UINT16 *)state->m_paletteram32.target();
-	UINT32	colorbase = extra->colorbase;
-	UINT32	lumabase = extra->lumabase;
-	UINT32	tex_x = extra->texx;
-	UINT32	tex_y = extra->texy;
-	UINT32	tex_x_mask, tex_y_mask;
-	UINT32	tex_mirr_x = extra->texmirrorx;
-	UINT32	tex_mirr_y = extra->texmirrory;
+	UINT32  colorbase = extra->colorbase;
+	UINT32  lumabase = extra->lumabase;
+	UINT32  tex_x = extra->texx;
+	UINT32  tex_y = extra->texy;
+	UINT32  tex_x_mask, tex_y_mask;
+	UINT32  tex_mirr_x = extra->texmirrorx;
+	UINT32  tex_mirr_y = extra->texmirrory;
 	UINT32 *sheet = extra->texsheet;
 	float ooz = extent->param[0].start;
 	float uoz = extent->param[1].start;
@@ -138,10 +138,10 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	float dooz = extent->param[0].dpdx;
 	float duoz = extent->param[1].dpdx;
 	float dvoz = extent->param[2].dpdx;
-	int		x;
+	int     x;
 
-	tex_x_mask	= tex_width - 1;
-	tex_y_mask	= tex_height - 1;
+	tex_x_mask  = tex_width - 1;
+	tex_y_mask  = tex_height - 1;
 
 	colorbase = palram[BYTE_XOR_LE(colorbase + 0x1000)] & 0x7fff;
 
@@ -154,8 +154,8 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 		float z = recip_approx(ooz) * 256.0f;
 		INT32 u = uoz * z;
 		INT32 v = voz * z;
-		UINT32	tr, tg, tb;
-		UINT16	t;
+		UINT32  tr, tg, tb;
+		UINT16  t;
 		UINT8 luma;
 		int u2;
 		int v2;

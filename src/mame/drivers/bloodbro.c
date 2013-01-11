@@ -192,16 +192,16 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) ) \
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) ) \
 	/* Coin Mode 2 */ \
-    PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) )            PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW",0x0001,EQUALS,0x0000) \
-    PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) ) \
-    PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) ) \
-    PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) ) \
-    PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) ) \
-    PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ) )            PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW",0x0001,EQUALS,0x0000) \
-    PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) ) \
-    PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) ) \
-    PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) ) \
-    PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) ) \
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) )            PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW",0x0001,EQUALS,0x0000) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) ) \
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) ) \
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ) )            PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW",0x0001,EQUALS,0x0000) \
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) ) \
 	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" )              PORT_DIPLOCATION("SW1:6") \
 	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) ) \
 	PORT_DIPSETTING(      0x0000, "x2" )
@@ -210,23 +210,23 @@ static INPUT_PORTS_START( bloodbro_base )
 	PORT_START("DSW")
 	BLOODBRO_COINAGE
 	/*  SW1:7,8 is listed as "ROM change option", "optional"
-                         A  B  C  D
-        Coin Up          0  1  1  1
-        Screen Complete  0  0  0  1
-        Stage Complete   1  1  3  1
-        Top 10           1  3  3  3
-        High Score       1  4  5  4
-        Complete Game    5  5 10 15
+	                     A  B  C  D
+	    Coin Up          0  1  1  1
+	    Screen Complete  0  0  0  1
+	    Stage Complete   1  1  3  1
+	    Top 10           1  3  3  3
+	    High Score       1  4  5  4
+	    Complete Game    5  5 10 15
 
-        D limits 8 tickets/coin except completion
+	    D limits 8 tickets/coin except completion
 
-        The sets handled in MAME don't seem to have this "feature"
-    PORT_DIPNAME( 0x00c0, 0x00c0, "Ticket Dispenser Payout Mode" ) PORT_DIPLOCATION("SW1:7,8")
-    PORT_DIPSETTING(      0x00c0, "A" )
-    PORT_DIPSETTING(      0x0080, "B" )
-    PORT_DIPSETTING(      0x0040, "C" )
-    PORT_DIPSETTING(      0x0000, "D" )
-    */
+	    The sets handled in MAME don't seem to have this "feature"
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Ticket Dispenser Payout Mode" ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x00c0, "A" )
+	PORT_DIPSETTING(      0x0080, "B" )
+	PORT_DIPSETTING(      0x0040, "C" )
+	PORT_DIPSETTING(      0x0000, "D" )
+	*/
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )             PORT_DIPLOCATION("SW2:1,2")
@@ -256,18 +256,18 @@ static INPUT_PORTS_START( bloodbro_base )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	// "Fire"
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// "Roll"
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	// "Dynamite"
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* tested when "continue" - check code at 0x000598 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   // "Fire"
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   // "Roll"
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)   // "Dynamite"
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* tested when "continue" - check code at 0x000598 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	// "Fire"
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// "Roll"
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	// "Dynamite"
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* tested - check code at 0x0005fe - VBLANK ? (probably not) */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   // "Fire"
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // "Roll"
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   // "Dynamite"
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* tested - check code at 0x0005fe - VBLANK ? (probably not) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -283,7 +283,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( weststry )
 	PORT_INCLUDE( bloodbro_base )
 
-	PORT_START("COIN")	/* referenced by seibu sound board */
+	PORT_START("COIN")  /* referenced by seibu sound board */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -296,12 +296,12 @@ static INPUT_PORTS_START( bloodbro )
 	PORT_BIT( 0x000e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* tested - check code at 0x000800 */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* tested - check code at 0x000800 */
 	PORT_BIT( 0x0e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skysmash )
@@ -336,16 +336,16 @@ static INPUT_PORTS_START( skysmash )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	// "Fire"
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// "Bomb"
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   // "Fire"
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   // "Bomb"
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	// "Fire"
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// "Bomb"
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   // "Fire"
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // "Bomb"
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -359,7 +359,7 @@ static INPUT_PORTS_START( skysmash )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 INPUT_PORTS_END
 
 
@@ -367,50 +367,50 @@ INPUT_PORTS_END
 
 static const gfx_layout textlayout =
 {
-	8,8,	/* 8*8 characters */
-	RGN_FRAC(1,2),	/* 4096 characters */
-	4,	/* 4 bits per pixel */
+	8,8,    /* 8*8 characters */
+	RGN_FRAC(1,2),  /* 4096 characters */
+	4,  /* 4 bits per pixel */
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
 	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0},
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8	/* every char takes 16 consecutive bytes */
+	16*8    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites  */
+	16,16,  /* 16*16 sprites  */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 8, 12, 0, 4 },
 	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
-             3+32*16, 2+32*16, 1+32*16, 0+32*16, 16+3+32*16, 16+2+32*16, 16+1+32*16, 16+0+32*16 },
+				3+32*16, 2+32*16, 1+32*16, 0+32*16, 16+3+32*16, 16+2+32*16, 16+1+32*16, 16+0+32*16 },
 	{ 0*16, 2*16, 4*16, 6*16, 8*16, 10*16, 12*16, 14*16,
 			16*16, 18*16, 20*16, 22*16, 24*16, 26*16, 28*16, 30*16 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout weststry_textlayout =
 {
-	8,8,	/* 8*8 sprites */
-	RGN_FRAC(1,4),	/* 4096 sprites */
-	4,	/* 4 bits per pixel */
+	8,8,    /* 8*8 sprites */
+	RGN_FRAC(1,4),  /* 4096 sprites */
+	4,  /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-        { 0, 1, 2, 3, 4, 5, 6, 7 },
-        { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every sprite takes 8 consecutive bytes */
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8 /* every sprite takes 8 consecutive bytes */
 };
 
 static const gfx_layout weststry_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	RGN_FRAC(1,4),	/* 8192 sprites */
-	4,	/* 4 bits per pixel */
+	16,16,  /* 16*16 sprites */
+	RGN_FRAC(1,4),  /* 8192 sprites */
+	4,  /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-        	16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
+			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 /* Graphics Decode Info */
@@ -496,16 +496,16 @@ ROM_START( bloodbro )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )	/* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
+	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
@@ -522,16 +522,16 @@ ROM_START( bloodbroa )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )	/* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
+	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
@@ -548,34 +548,34 @@ ROM_START( bloodbrob )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
 	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )	/* Background+Foreground */
+	ROM_LOAD( "blood_bros_bk__(c)1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
+	ROM_LOAD( "blood_bros_obj__(c)1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
 
 ROM_START( weststry )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "ws13.bin",  0x00001, 0x20000, CRC(158e302a) SHA1(52cc1bf526424ff025a6b79f3fc7bba4b9bbfcbb) )
 	ROM_LOAD16_BYTE( "ws15.bin",  0x00000, 0x20000, CRC(672e9027) SHA1(71cb9fcef04edb972ba88de45d605dcff539ea2d) )
 	ROM_LOAD16_BYTE( "bb_04.bin", 0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
 	ROM_LOAD16_BYTE( "bb_03.bin", 0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "ws17.bin",    0x000000, 0x08000, CRC(e00a8f09) SHA1(e7247ce0ab99d0726f31dee5de5ba33f4ebd183e) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // first half of these is blank
-	ROM_LOAD( "ws09.bin", 0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )	/* characters */
+	ROM_LOAD( "ws09.bin", 0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )  /* characters */
 	ROM_CONTINUE(         0x00000, 0x08000 )
 	ROM_LOAD( "ws11.bin", 0x08000, 0x08000, CRC(2b10e3d2) SHA1(0f5045615b44e2300745fd3afac7f1441352cca5) )
 	ROM_CONTINUE(         0x08000, 0x08000 )
@@ -585,17 +585,17 @@ ROM_START( weststry )
 	ROM_CONTINUE(         0x18000, 0x08000 )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "ws01.bin", 0x20000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )	/* Foreground */
+	ROM_LOAD( "ws01.bin", 0x20000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )  /* Foreground */
 	ROM_LOAD( "ws03.bin", 0x60000, 0x20000, CRC(046b51f8) SHA1(25af752caebdec762582fc0130cf14546110bb54) )
 	ROM_LOAD( "ws02.bin", 0xa0000, 0x20000, CRC(ed9d682e) SHA1(0f79ea09a7af367d175081f72f2bc94f6caad463) )
 	ROM_LOAD( "ws04.bin", 0xe0000, 0x20000, CRC(75f082e5) SHA1(b29f09a3cc9a0ac3f982be3981f5e895050c49e8) )
-	ROM_LOAD( "ws05.bin", 0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )	/* Background */
+	ROM_LOAD( "ws05.bin", 0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )  /* Background */
 	ROM_LOAD( "ws07.bin", 0x40000, 0x20000, CRC(0f0c8d9a) SHA1(f5fe9b5ee4c8ffd7caf5313d13fb5f6e181ed9b6) )
 	ROM_LOAD( "ws06.bin", 0x80000, 0x20000, CRC(459d075e) SHA1(24cd0bffe7c5bbccf653ced0b73579059603d187) )
 	ROM_LOAD( "ws08.bin", 0xc0000, 0x20000, CRC(4d6783b3) SHA1(9870fe9570afeff179b6080581fd6bb187898ff0) )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )
-	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, BAD_DUMP CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) )	/* sprites */
+	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, BAD_DUMP CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) ) /* sprites */
 	ROM_LOAD( "ws26.bin", 0x20000, 0x20000, BAD_DUMP CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
 	ROM_LOAD( "ws23.bin", 0x40000, 0x20000, CRC(43d58e24) SHA1(99e255faa9716d9102a1223419084fc209ab4024) )
 	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) )
@@ -604,7 +604,7 @@ ROM_START( weststry )
 	ROM_LOAD( "ws19.bin", 0xc0000, 0x20000, CRC(c5dd0a96) SHA1(4696ab1b02d40c54a7dacf0bdf90b624b7d6812e) )
 	ROM_LOAD( "ws20.bin", 0xe0000, 0x20000, CRC(f1245c16) SHA1(f3941bf5830995f65a5378326fdb72687fbbddcf) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.bin", 0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
@@ -621,16 +621,16 @@ ROM_START( skysmash )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "rom3", 0x00000, 0x10000, CRC(fbb241be) SHA1(cd94c328891538bbd8c062d90a47ddf3d7d05bb0) )	/* characters */
+	ROM_LOAD( "rom3", 0x00000, 0x10000, CRC(fbb241be) SHA1(cd94c328891538bbd8c062d90a47ddf3d7d05bb0) )  /* characters */
 	ROM_LOAD( "rom4", 0x10000, 0x10000, CRC(ad3cde81) SHA1(2bd0c707e5b67d3699a743d989cb5384cbe37ff7) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "rom9", 0x00000, 0x100000, CRC(b0a5eecf) SHA1(9e8191c7ae4a32dc16aebc37fa942afc531eddd4) )	/* Background + Foreground */
+	ROM_LOAD( "rom9", 0x00000, 0x100000, CRC(b0a5eecf) SHA1(9e8191c7ae4a32dc16aebc37fa942afc531eddd4) ) /* Background + Foreground */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
-	ROM_LOAD( "rom10", 0x00000, 0x080000, CRC(1bbcda5d) SHA1(63915221f70a7dfda6a4d8ac7f5c663c9316610a) )	/* sprites */
+	ROM_LOAD( "rom10", 0x00000, 0x080000, CRC(1bbcda5d) SHA1(63915221f70a7dfda6a4d8ac7f5c663c9316610a) )    /* sprites */
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "rom1", 0x00000, 0x20000, CRC(e69986f6) SHA1(de38bf2d5638cb40740882e1abccf7928e43a5a6) )
 ROM_END
 

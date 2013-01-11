@@ -7,8 +7,8 @@
 
 struct namco_interface
 {
-	int voices;		/* number of voices */
-	int stereo;		/* set to 1 to indicate stereo (e.g., System 1) */
+	int voices;     /* number of voices */
+	int stereo;     /* set to 1 to indicate stereo (e.g., System 1) */
 };
 
 DECLARE_WRITE8_DEVICE_HANDLER( pacman_sound_enable_w );
@@ -20,14 +20,14 @@ DECLARE_WRITE8_DEVICE_HANDLER( polepos_sound_w );
 
 void mappy_sound_enable(device_t *device, int enable);
 
-DECLARE_WRITE8_DEVICE_HANDLER( namcos1_cus30_w );	/* wavedata + sound registers + RAM */
+DECLARE_WRITE8_DEVICE_HANDLER( namcos1_cus30_w );   /* wavedata + sound registers + RAM */
 DECLARE_READ8_DEVICE_HANDLER( namcos1_cus30_r );
 
 DECLARE_READ8_DEVICE_HANDLER( namco_snd_sharedram_r );
 DECLARE_WRITE8_DEVICE_HANDLER( namco_snd_sharedram_w );
 
 class namco_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -69,4 +69,3 @@ extern const device_type NAMCO_CUS30;
 
 
 #endif /* __NAMCO_H__ */
-

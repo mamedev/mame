@@ -5,7 +5,7 @@
 #include "devcb.h"
 
 
-#define K1GE_SCREEN_HEIGHT	199
+#define K1GE_SCREEN_HEIGHT  199
 
 
 class k1ge_device : public device_t
@@ -54,10 +54,10 @@ extern const device_type K2GE;
 
 struct k1ge_interface
 {
-	const char		*screen_tag;		/* screen we are drawing on */
-	const char		*vram_tag;			/* memory region we will use for video ram */
-	devcb_write8	vblank_pin_w;		/* called back when VBlank pin may have changed */
-	devcb_write8	hblank_pin_w;		/* called back when HBlank pin may have changed */
+	const char      *screen_tag;        /* screen we are drawing on */
+	const char      *vram_tag;          /* memory region we will use for video ram */
+	devcb_write8    vblank_pin_w;       /* called back when VBlank pin may have changed */
+	devcb_write8    hblank_pin_w;       /* called back when HBlank pin may have changed */
 };
 
 
@@ -70,4 +70,3 @@ DECLARE_READ8_DEVICE_HANDLER( k1ge_r );
 void k1ge_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 #endif
-

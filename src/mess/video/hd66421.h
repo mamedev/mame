@@ -38,12 +38,12 @@
 
 // ======================> hd66421_device
 
-class hd66421_device :	public device_t,
+class hd66421_device :  public device_t,
 						public device_memory_interface
 {
 public:
-    // construction/destruction
-    hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( reg_idx_r );
 	DECLARE_WRITE8_MEMBER( reg_idx_w );
@@ -53,14 +53,14 @@ public:
 	void update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
-    // address space configurations
-	const address_space_config		m_space_config;
+	// address space configurations
+	const address_space_config      m_space_config;
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);

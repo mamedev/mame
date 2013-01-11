@@ -266,12 +266,12 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		int attr = spriteram[offs+3];
 		int flipx = attr & 0x10;
 		int flipy = attr & 0x20;
-		int sx = spriteram[offs+1] - ((attr & 0x40) << 2);	// high bit shown in schematics, not used by game
+		int sx = spriteram[offs+1] - ((attr & 0x40) << 2);  // high bit shown in schematics, not used by game
 		int sy = spriteram[offs+2];
 		int tile = spriteram[offs+0];
 		int color = attr & 0x0f;
 
-		if (attr & 0x80)	// disable bit shown in schematics, not used by game
+		if (attr & 0x80)    // disable bit shown in schematics, not used by game
 		{
 			continue;
 		}
@@ -309,7 +309,7 @@ static void pkunwar_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		int tile = ((spriteram[offs+0] & 0xfc) >> 2) + ((attr & 0x07) << 6);
 		int color = (attr & 0xf0) >> 4;
 
-		if (attr & 0x08)	// deducted by comparison, not used by game
+		if (attr & 0x08)    // deducted by comparison, not used by game
 		{
 			continue;
 		}

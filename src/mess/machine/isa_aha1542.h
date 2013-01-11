@@ -27,7 +27,7 @@
 // ====================> aha1542_device
 
 class aha1542_device : public device_t,
-                       public device_isa16_card_interface
+						public device_isa16_card_interface
 {
 public:
 	// construction/destruction
@@ -57,4 +57,3 @@ private:
 extern const device_type AHA1542;
 
 #endif
-

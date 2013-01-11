@@ -49,24 +49,24 @@ static wav_file* wavraw; // Raw waveform
 
 
 /*============================================================================
-						Gaelco GAE1 sound device
+                        Gaelco GAE1 sound device
   ============================================================================*/
 
 const device_type GAELCO_GAE1 = &device_creator<gaelco_gae1_device>;
 
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GAELCO_GAE1, "Gaelco GAE1", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_snd_data(NULL)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_snd_data(NULL)
 {
 }
 
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_snd_data(NULL)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_snd_data(NULL)
 {
 }
 
@@ -81,7 +81,7 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 {
 	int j, ch;
 
-    /* fill all data needed */
+	/* fill all data needed */
 	for(j = 0; j < samples; j++){
 		int output_l = 0, output_r = 0;
 
@@ -137,9 +137,9 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 
 				/* check if the current sample has finished playing */
 				if (m_sndregs[base_offset + 3] == 0){
-					if (channel->loop == 0){	/* if no looping, we're done */
+					if (channel->loop == 0){    /* if no looping, we're done */
 						channel->active = 0;
-					} else {					/* if we're looping, swap chunks */
+					} else {                    /* if we're looping, swap chunks */
 						channel->chunkNum = (channel->chunkNum + 1) & 0x01;
 
 						/* if the length of the next chunk is 0, we're done */
@@ -231,7 +231,7 @@ WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
 }
 
 /*============================================================================
-						CG-1V/GAE1 Init / Close
+                        CG-1V/GAE1 Init / Close
   ============================================================================*/
 
 void gaelco_gae1_device::device_start()
@@ -271,7 +271,7 @@ void gaelco_gae1_device::device_stop()
 
 
 /*============================================================================
-						Gaelco CG-1V sound device
+                        Gaelco CG-1V sound device
   ============================================================================*/
 
 const device_type GAELCO_CG1V = &device_creator<gaelco_cg1v_device>;

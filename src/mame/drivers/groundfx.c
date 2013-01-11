@@ -110,13 +110,13 @@ TIMER_CALLBACK_MEMBER(groundfx_state::groundfx_interrupt5)
 
 static const eeprom_interface groundfx_eeprom_interface =
 {
-	6,				/* address bits */
-	16,				/* data bits */
-	"0110",			/* read command */
-	"0101",			/* write command */
-	"0111",			/* erase command */
-	"0100000000",	/* unlock command */
-	"0100110000",	/* lock command */
+	6,              /* address bits */
+	16,             /* data bits */
+	"0110",         /* read command */
+	"0101",         /* write command */
+	"0111",         /* erase command */
+	"0100000000",   /* unlock command */
+	"0100110000",   /* lock command */
 };
 
 
@@ -139,7 +139,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 	switch (offset)
 	{
 		case 0x00:
-			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
+			if (ACCESSING_BITS_24_31)   /* $500000 is watchdog */
 			{
 				machine().watchdog_reset();
 			}
@@ -172,7 +172,7 @@ READ32_MEMBER(groundfx_state::groundfx_adc_r)
 WRITE32_MEMBER(groundfx_state::groundfx_adc_w)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
-        1000 cycle delay is arbitrary */
+	    1000 cycle delay is arbitrary */
 	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), timer_expired_delegate(FUNC(groundfx_state::groundfx_interrupt5),this));
 }
 
@@ -213,22 +213,22 @@ WRITE32_MEMBER(groundfx_state::motor_control_w)
 
 static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_SHARE("ram") /* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_SHARE("spriteram") /* sprite ram */
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)	/* gun vibration */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram") /* main CPUA ram */
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
+	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)  /* gun vibration */
 	AM_RANGE(0x500000, 0x500003) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x500004, 0x500007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500000, 0x500007) AM_WRITE(groundfx_input_w)	/* eeprom etc. */
+	AM_RANGE(0x500000, 0x500007) AM_WRITE(groundfx_input_w) /* eeprom etc. */
 	AM_RANGE(0x600000, 0x600003) AM_READWRITE(groundfx_adc_r,groundfx_adc_w)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)	  /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)	// debugging
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)	/* piv tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)      /* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)  // debugging
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)    /* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_SHARE("paletteram") /* palette ram */
-	AM_RANGE(0xb00000, 0xb003ff) AM_RAM						// ?? single bytes, blending ??
+	AM_RANGE(0xb00000, 0xb003ff) AM_RAM                     // ?? single bytes, blending ??
 	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)	/* perhaps port based rotate control? */
+	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w) /* perhaps port based rotate control? */
 	/* f00000 is seat control? */
 ADDRESS_MAP_END
 
@@ -246,11 +246,11 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON3 )		/* shift hi */
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* brake */
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON3 )      /* shift hi */
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 )      /* brake */
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON2 )		/* shift low */
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON2 )      /* shift low */
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -272,16 +272,16 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,coin_word_r, NULL)
 
-	PORT_START("AN0")	/* IN 2, steering wheel */
+	PORT_START("AN0")   /* IN 2, steering wheel */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("AN1")	/* IN 3, accel */
+	PORT_START("AN1")   /* IN 3, accel */
 	PORT_BIT( 0xff, 0xff, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")	/* IN 4, sound volume */
+	PORT_START("AN2")   /* IN 4, sound volume */
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("AN3")	/* IN 5, unknown */
+	PORT_START("AN3")   /* IN 5, unknown */
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -291,14 +291,14 @@ INPUT_PORTS_END
 
 static const gfx_layout tile16x16_layout =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,2),
-	5,	/* 5 bits per pixel */
+	5,  /* 5 bits per pixel */
 	{ RGN_FRAC(1,2), 0, 8, 16, 24 },
 	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*64, 1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	64*16	/* every sprite takes 128 consecutive bytes */
+		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	64*16   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout charlayout =
@@ -337,21 +337,21 @@ GFXDECODE_END
 static const tc0100scn_interface groundfx_tc0100scn_intf =
 {
 	"screen",
-	2, 3,		/* gfxnum, txnum */
-	50, 8,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	2, 3,       /* gfxnum, txnum */
+	50, 8,      /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0480scp_interface groundfx_tc0480scp_intf =
 {
-	1, 4,		/* gfxnum, txnum */
-	0,		/* pixels */
-	0x24, 0,		/* x_offset, y_offset */
-	-1, 0,		/* text_xoff, text_yoff */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	1, 4,       /* gfxnum, txnum */
+	0,      /* pixels */
+	0x24, 0,        /* x_offset, y_offset */
+	-1, 0,      /* text_xoff, text_yoff */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0       /* col_base */
 };
 
 INTERRUPT_GEN_MEMBER(groundfx_state::groundfx_interrupt)
@@ -363,7 +363,7 @@ INTERRUPT_GEN_MEMBER(groundfx_state::groundfx_interrupt)
 static MACHINE_CONFIG_START( groundfx, groundfx_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(groundfx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state,  groundfx_interrupt)
 
@@ -393,7 +393,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( groundfx )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2048K for 68020 code (CPU A) */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2048K for 68020 code (CPU A) */
 	ROM_LOAD32_BYTE( "d51-24.79", 0x00000, 0x80000, CRC(5caaa031) SHA1(03e727e26df701e3f5e16c5f933d5b29a528945a) )
 	ROM_LOAD32_BYTE( "d51-23.61", 0x00001, 0x80000, CRC(462e3c9b) SHA1(7f116ee755748497b911868a948d3e3b5134e475) )
 	ROM_LOAD32_BYTE( "d51-22.77", 0x00002, 0x80000, CRC(b6b04d88) SHA1(58685ee8fd788dcbfe318f1e3c06d93e2128034c) )
@@ -404,27 +404,27 @@ ROM_START( groundfx )
 	ROM_LOAD16_BYTE( "d51-30.56", 0x100001, 0x40000,  CRC(45f339fe) SHA1(cc7adfb2b86070f5bb426542e3b7ed2a50b3c39e) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "d51-08.35", 0x000000, 0x200000, CRC(835b7a0f) SHA1(0131fceabd73b0045b5d4ae0bb2f03efdd407962) )	/* SCR 16x16 tiles */
+	ROM_LOAD16_BYTE( "d51-08.35", 0x000000, 0x200000, CRC(835b7a0f) SHA1(0131fceabd73b0045b5d4ae0bb2f03efdd407962) )    /* SCR 16x16 tiles */
 	ROM_LOAD16_BYTE( "d51-09.34", 0x000001, 0x200000, CRC(6dabd83d) SHA1(3dbd7ea36b9900faa6420af1f1600efe295db74c) )
 
 	ROM_REGION( 0x1000000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "d51-03.47", 0x800000, 0x200000, CRC(629a5c99) SHA1(cfc1c0b07ecefd6eddb83edcbcf710e8b8de19e4) )	/* OBJ 16x16 tiles */
+	ROM_LOAD32_BYTE( "d51-03.47", 0x800000, 0x200000, CRC(629a5c99) SHA1(cfc1c0b07ecefd6eddb83edcbcf710e8b8de19e4) )    /* OBJ 16x16 tiles */
 	ROM_LOAD32_BYTE( "d51-04.48", 0x000000, 0x200000, CRC(f49b14b7) SHA1(31129771159c1295a074c8311344ece525302289) )
 	ROM_LOAD32_BYTE( "d51-05.49", 0x000001, 0x200000, CRC(3a2e2cbf) SHA1(ed2c1ca9211b1d70b4767a54e08263a3e4867199) )
 	ROM_LOAD32_BYTE( "d51-06.50", 0x000002, 0x200000, CRC(d33ce2a0) SHA1(92c4504344672ea798cd6dd34f4b46848bf9f82b) )
 	ROM_LOAD32_BYTE( "d51-07.51", 0x000003, 0x200000, CRC(24b2f97d) SHA1(6980e67b435d189ce897c0301e0411763410ab47) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "d51-10.95", 0x000000, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )	/* PIV 8x8 tiles, 6bpp */
+	ROM_LOAD16_BYTE( "d51-10.95", 0x000000, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* PIV 8x8 tiles, 6bpp */
 	ROM_LOAD16_BYTE( "d51-11.96", 0x000001, 0x100000, CRC(fee5f5c6) SHA1(1be88747f9c71c348dd61a8f0040007df3a3e6a6) )
 	ROM_LOAD       ( "d51-12.97", 0x300000, 0x100000, CRC(d630287b) SHA1(2fa09e1821b7280d193ca9a2a270759c3c3189d1) )
 	ROM_FILL       (              0x200000, 0x100000, 0 )
 
 	ROM_REGION16_LE( 0x80000, "user1", 0 )
-	ROM_LOAD16_WORD( "d51-13.7", 0x00000,  0x80000,  CRC(36921b8b) SHA1(2130120f78a3b984618a53054fc937cf727177b9) )	/* STY, spritemap */
+	ROM_LOAD16_WORD( "d51-13.7", 0x00000,  0x80000,  CRC(36921b8b) SHA1(2130120f78a3b984618a53054fc937cf727177b9) ) /* STY, spritemap */
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "d51-01.73", 0x000000, 0x200000, CRC(92f09155) SHA1(8015e1997818bb480174394eb43840bf26679bcf) )	/* Ensoniq samples */
+	ROM_LOAD16_BYTE( "d51-01.73", 0x000000, 0x200000, CRC(92f09155) SHA1(8015e1997818bb480174394eb43840bf26679bcf) )    /* Ensoniq samples */
 	ROM_LOAD16_BYTE( "d51-02.74", 0xc00000, 0x200000, CRC(20a9428f) SHA1(c9033d02a49c72f704808f5f899101617d5814e5) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )

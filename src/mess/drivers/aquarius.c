@@ -34,8 +34,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define XTAL1	8866000
-#define XTAL2	XTAL_7_15909MHz
+#define XTAL1   8866000
+#define XTAL2   XTAL_7_15909MHz
 
 
 /***************************************************************************
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_CPU_IO_MAP(aquarius_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2800))

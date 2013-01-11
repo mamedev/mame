@@ -14,22 +14,22 @@
 #include "machine/wd_fdc.h"
 
 /* screen dimensions */
-#define SAM_BLOCK			8
+#define SAM_BLOCK           8
 
-#define SAM_TOTAL_WIDTH		SAM_BLOCK*96
-#define SAM_TOTAL_HEIGHT	312
-#define SAM_SCREEN_WIDTH	SAM_BLOCK*64
-#define SAM_SCREEN_HEIGHT	192
-#define SAM_BORDER_LEFT		SAM_BLOCK*4
-#define SAM_BORDER_RIGHT	SAM_BLOCK*4
-#define SAM_BORDER_TOP		37
-#define SAM_BORDER_BOTTOM	46
+#define SAM_TOTAL_WIDTH     SAM_BLOCK*96
+#define SAM_TOTAL_HEIGHT    312
+#define SAM_SCREEN_WIDTH    SAM_BLOCK*64
+#define SAM_SCREEN_HEIGHT   192
+#define SAM_BORDER_LEFT     SAM_BLOCK*4
+#define SAM_BORDER_RIGHT    SAM_BLOCK*4
+#define SAM_BORDER_TOP      37
+#define SAM_BORDER_BOTTOM   46
 
 /* interrupt sources */
-#define SAM_LINE_INT	 0x01
+#define SAM_LINE_INT     0x01
 #define SAM_MOUSE_INT    0x02
 #define SAM_MIDIIN_INT   0x04
-#define SAM_FRAME_INT	 0x08
+#define SAM_FRAME_INT    0x08
 #define SAM_MIDIOUT_INT  0x10
 
 

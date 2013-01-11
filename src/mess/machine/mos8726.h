@@ -86,8 +86,8 @@ protected:
 	virtual void device_reset();
 	virtual void execute_run();
 
-    int m_icount;
-    int m_bs;
+	int m_icount;
+	int m_bs;
 };
 
 

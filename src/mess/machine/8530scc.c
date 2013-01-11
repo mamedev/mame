@@ -17,7 +17,7 @@ const device_type SCC8530 = &device_creator<scc8530_t>;
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_SCC	(0)
+#define LOG_SCC (0)
 
 /***************************************************************************
     IMPLEMENTATION
@@ -293,10 +293,10 @@ void scc8530_t::putreg(int ch, UINT8 data)
 
 	switch (reg)
 	{
-		case 0:	// command register
+		case 0: // command register
 			switch ((data >> 3) & 7)
 			{
-				case 1:	// select high registers (handled elsewhere)
+				case 1: // select high registers (handled elsewhere)
 					break;
 
 				case 2: // reset external and status IRQs
@@ -308,7 +308,7 @@ void scc8530_t::putreg(int ch, UINT8 data)
 					updateirqs();
 					break;
 
-				case 0:	// nothing
+				case 0: // nothing
 				case 3: // send SDLC abort
 				case 4: // enable IRQ on next Rx byte
 				case 6: // reset errors
@@ -319,7 +319,7 @@ void scc8530_t::putreg(int ch, UINT8 data)
 			}
 			break;
 
-		case 1:	// Tx/Rx IRQ and data transfer mode defintion
+		case 1: // Tx/Rx IRQ and data transfer mode defintion
 			pChan->extIRQEnable = (data & 1);
 			pChan->txIRQEnable = (data & 2) ? 1 : 0;
 			pChan->rxIRQEnable = (data >> 3) & 3;
@@ -341,7 +341,7 @@ void scc8530_t::putreg(int ch, UINT8 data)
 
 			if (pChan->txEnable)
 			{
-				pChan->reg_val[0] |= 0x04;	// Tx empty
+				pChan->reg_val[0] |= 0x04;  // Tx empty
 			}
 			break;
 
@@ -357,10 +357,10 @@ void scc8530_t::putreg(int ch, UINT8 data)
 			// channel reset command
 			switch ((data>>6) & 3)
 			{
-				case 0:	// do nothing
+				case 0: // do nothing
 					break;
 
-				case 1:	// reset channel B
+				case 1: // reset channel B
 					resetchannel(0);
 					break;
 
@@ -385,14 +385,14 @@ void scc8530_t::putreg(int ch, UINT8 data)
 			}
 			break;
 
-		case 10:	// misc transmitter/receiver control bits
-		case 11:	// clock mode control
-		case 12:	// lower byte of baud rate gen
-		case 13:	// upper byte of baud rate gen
+		case 10:    // misc transmitter/receiver control bits
+		case 11:    // clock mode control
+		case 12:    // lower byte of baud rate gen
+		case 13:    // upper byte of baud rate gen
 			break;
 
-		case 14:	// misc control bits
-			if (data & 0x01)	// baud rate generator enable?
+		case 14:    // misc control bits
+			if (data & 0x01)    // baud rate generator enable?
 			{
 				int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
 				int rate = clock() / brconst;
@@ -401,7 +401,7 @@ void scc8530_t::putreg(int ch, UINT8 data)
 			}
 			break;
 
-		case 15:	// external/status interrupt control
+		case 15:    // external/status interrupt control
 			pChan->baudIRQEnable = (data & 2) ? 1 : 0;
 			pChan->DCDEnable = (data & 8) ? 1 : 0;
 			pChan->CTSEnable = (data & 0x20) ? 1 : 0;
@@ -578,10 +578,10 @@ WRITE8_MEMBER( scc8530_t::reg_w )
 				if (pChan->reg_val[14] & 0x10)
 				{
 					pChan->rxData = data;
-					pChan->reg_val[0] |= 0x01;	// Rx character available
+					pChan->reg_val[0] |= 0x01;  // Rx character available
 				}
-				pChan->reg_val[1] |= 0x01;	// All sent
-				pChan->reg_val[0] |= 0x04;	// Tx empty
+				pChan->reg_val[1] |= 0x01;  // All sent
+				pChan->reg_val[0] |= 0x04;  // Tx empty
 				pChan->txUnderrun = 1;
 				pChan->txIRQPending = 1;
 				updateirqs();
@@ -599,10 +599,10 @@ WRITE8_MEMBER( scc8530_t::reg_w )
 				if (pChan->reg_val[14] & 0x10)
 				{
 					pChan->rxData = data;
-					pChan->reg_val[0] |= 0x01;	// Rx character available
+					pChan->reg_val[0] |= 0x01;  // Rx character available
 				}
-				pChan->reg_val[1] |= 0x01;	// All sent
-				pChan->reg_val[0] |= 0x04;	// Tx empty
+				pChan->reg_val[1] |= 0x01;  // All sent
+				pChan->reg_val[0] |= 0x04;  // Tx empty
 				pChan->txUnderrun = 1;
 				pChan->txIRQPending = 1;
 				updateirqs();

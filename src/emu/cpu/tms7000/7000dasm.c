@@ -5,75 +5,75 @@
 enum operandtype { DONE, NONE, UI8, I8, UI16, I16, PCREL, PCABS, TRAP };
 
 struct oprandinfo {
-	char		opstr[4][12];
-	operandtype	decode[4];
+	char        opstr[4][12];
+	operandtype decode[4];
 };
 
 struct opcodeinfo {
-	int		opcode;
-	char		name[8];
-	int		operand;
-	UINT32		s_flag;
+	int     opcode;
+	char        name[8];
+	int     operand;
+	UINT32      s_flag;
 };
 
 static const oprandinfo of[] = {
-/* 00 */ { {" B,A",		"",			"",			""},		{NONE, DONE, DONE, DONE} },
-/* 01 */ { {" R%u",		",A",		"", 		""},		{UI8, NONE, DONE, DONE} },
-/* 02 */ { {" R%u",		",B",		"", 		""},		{UI8, NONE, DONE, DONE} },
-/* 03 */ { {" R%u",		",R%u",		"",			""},		{UI8, UI8, DONE, DONE} },
-/* 04 */ { {" %%>%X",	",A",		"",			""},		{UI8, NONE, DONE, DONE} },
-/* 05 */ { {" %%>%X",	",B",		"",			""},		{UI8, NONE, DONE, DONE} },
-/* 06 */ { {" %%>%X",	",R%u",		"",			""},		{UI8, UI8, DONE, DONE} },
+/* 00 */ { {" B,A",     "",         "",         ""},        {NONE, DONE, DONE, DONE} },
+/* 01 */ { {" R%u",     ",A",       "",         ""},        {UI8, NONE, DONE, DONE} },
+/* 02 */ { {" R%u",     ",B",       "",         ""},        {UI8, NONE, DONE, DONE} },
+/* 03 */ { {" R%u",     ",R%u",     "",         ""},        {UI8, UI8, DONE, DONE} },
+/* 04 */ { {" %%>%X",   ",A",       "",         ""},        {UI8, NONE, DONE, DONE} },
+/* 05 */ { {" %%>%X",   ",B",       "",         ""},        {UI8, NONE, DONE, DONE} },
+/* 06 */ { {" %%>%X",   ",R%u",     "",         ""},        {UI8, UI8, DONE, DONE} },
 
-/* 07 */ { {" A",		",P%u",		"",			""},		{NONE,UI8,DONE,DONE} },
-/* 08 */ { {" B",		",P%u",		"",			""},		{NONE,UI8,DONE,DONE} },
-/* 09 */ { {" %%>%02X",	",P%u",		"",			""},		{UI8,UI8,DONE,DONE} },
+/* 07 */ { {" A",       ",P%u",     "",         ""},        {NONE,UI8,DONE,DONE} },
+/* 08 */ { {" B",       ",P%u",     "",         ""},        {NONE,UI8,DONE,DONE} },
+/* 09 */ { {" %%>%02X", ",P%u",     "",         ""},        {UI8,UI8,DONE,DONE} },
 
-/* 10 */ { {" @>%04X",	"",			"",			""},		{UI16,DONE,DONE,DONE} },
-/* 11 */ { {" R%u",		"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 12 */ { {" @>%04X(B)","",		"",			""},		{UI16, DONE, DONE, DONE} },
+/* 10 */ { {" @>%04X",  "",         "",         ""},        {UI16,DONE,DONE,DONE} },
+/* 11 */ { {" R%u",     "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 12 */ { {" @>%04X(B)","",        "",         ""},        {UI16, DONE, DONE, DONE} },
 
-/* 13 */ { {" B,A",		",%s",		"",			""},		{NONE, PCREL, DONE, DONE} },
-/* 14 */ { {" R%u,A",	",%s",		"",			""},		{UI8, PCREL, DONE, DONE} },
-/* 15 */ { {" R%u,B",	",%s",		"",			""},		{UI8, PCREL, DONE, DONE} },
-/* 16 */ { {" R%u",		",R%u",		",%s",		""},		{UI8, UI8, PCREL, DONE} },
-/* 17 */ { {" %%>%X",	",A,%s",	"",			""},		{UI8, PCREL, DONE, DONE} },
-/* 18 */ { {" %%>%X",	",B,%s",	"",			""},		{UI8, PCREL, DONE, DONE} },
-/* 19 */ { {" %%>%X",	",R%u",		",%s",		""},		{UI8, UI8, PCREL, DONE} },
+/* 13 */ { {" B,A",     ",%s",      "",         ""},        {NONE, PCREL, DONE, DONE} },
+/* 14 */ { {" R%u,A",   ",%s",      "",         ""},        {UI8, PCREL, DONE, DONE} },
+/* 15 */ { {" R%u,B",   ",%s",      "",         ""},        {UI8, PCREL, DONE, DONE} },
+/* 16 */ { {" R%u",     ",R%u",     ",%s",      ""},        {UI8, UI8, PCREL, DONE} },
+/* 17 */ { {" %%>%X",   ",A,%s",    "",         ""},        {UI8, PCREL, DONE, DONE} },
+/* 18 */ { {" %%>%X",   ",B,%s",    "",         ""},        {UI8, PCREL, DONE, DONE} },
+/* 19 */ { {" %%>%X",   ",R%u",     ",%s",      ""},        {UI8, UI8, PCREL, DONE} },
 
-/* 20 */ { {" A,P%u",	",%s",		"",			""},		{UI8, PCREL, DONE, DONE} },
-/* 21 */ { {" B,P%u",	",%s",		"",			""},		{UI8, PCREL, DONE, DONE} },
-/* 22 */ { {" %%>%02X",	",P%u",		",%s"		""},		{UI8, UI8, PCREL, DONE} },
+/* 20 */ { {" A,P%u",   ",%s",      "",         ""},        {UI8, PCREL, DONE, DONE} },
+/* 21 */ { {" B,P%u",   ",%s",      "",         ""},        {UI8, PCREL, DONE, DONE} },
+/* 22 */ { {" %%>%02X", ",P%u",     ",%s"       ""},        {UI8, UI8, PCREL, DONE} },
 
-/* 23 */ { {"",			"",			"",			""},		{DONE, DONE, DONE, DONE} },
-/* 24 */ { {" R%u",		"",			"",			""},		{UI8, DONE, DONE, DONE} },
+/* 23 */ { {"",         "",         "",         ""},        {DONE, DONE, DONE, DONE} },
+/* 24 */ { {" R%u",     "",         "",         ""},        {UI8, DONE, DONE, DONE} },
 
-/* 25 */ { {" A,%s",	"",			"",			""},		{PCREL, DONE, DONE, DONE} },
-/* 26 */ { {" B,%s",	"",			"",			""},		{PCREL, DONE, DONE, DONE} },
-/* 27 */ { {" R%u",		",%s",		"",			""},		{UI8, PCREL, DONE, DONE} },
+/* 25 */ { {" A,%s",    "",         "",         ""},        {PCREL, DONE, DONE, DONE} },
+/* 26 */ { {" B,%s",    "",         "",         ""},        {PCREL, DONE, DONE, DONE} },
+/* 27 */ { {" R%u",     ",%s",      "",         ""},        {UI8, PCREL, DONE, DONE} },
 
-/* 28 */ { {" %s",		"",			"",			""},		{PCREL, DONE, DONE, DONE} },
+/* 28 */ { {" %s",      "",         "",         ""},        {PCREL, DONE, DONE, DONE} },
 
-/* 29 */ { {" A,B",		"",			"",			""},		{NONE, DONE, DONE, DONE} },
-/* 30 */ { {" B,A",		"",			"",			""},		{NONE, DONE, DONE, DONE} },
-/* 31 */ { {" A,R%u",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 32 */ { {" B,R%u",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 33 */ { {" R%u,A",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 34 */ { {" R%u,B",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 35 */ { {" R%u",		",R%u",		"",			""},		{UI8, UI8, DONE, DONE} },
-/* 36 */ { {" %%>%X,A",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 37 */ { {" %%>%X,B",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 38 */ { {" %%>%X",	",R%u",		"",			""},		{UI8, UI8, DONE, DONE} },
+/* 29 */ { {" A,B",     "",         "",         ""},        {NONE, DONE, DONE, DONE} },
+/* 30 */ { {" B,A",     "",         "",         ""},        {NONE, DONE, DONE, DONE} },
+/* 31 */ { {" A,R%u",   "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 32 */ { {" B,R%u",   "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 33 */ { {" R%u,A",   "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 34 */ { {" R%u,B",   "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 35 */ { {" R%u",     ",R%u",     "",         ""},        {UI8, UI8, DONE, DONE} },
+/* 36 */ { {" %%>%X,A", "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 37 */ { {" %%>%X,B", "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 38 */ { {" %%>%X",   ",R%u",     "",         ""},        {UI8, UI8, DONE, DONE} },
 
-/* 39 */ { {" %%>%04X",",R%u",		"",			""},		{UI16, UI8, DONE, DONE} },
-/* 40 */ { {" %%>%04X(B)",",R%u",	"",			""},		{UI16, UI8, DONE, DONE} },
+/* 39 */ { {" %%>%04X",",R%u",      "",         ""},        {UI16, UI8, DONE, DONE} },
+/* 40 */ { {" %%>%04X(B)",",R%u",   "",         ""},        {UI16, UI8, DONE, DONE} },
 
-/* 41 */ { {" P%u,A",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 42 */ { {" P%u,B",	"",			"",			""},		{UI8, DONE, DONE, DONE} },
-/* 43 */ { {" %s",		"",			"",			""},		{PCABS, DONE, DONE, DONE} },
-/* 44 */ { {"",			"",			"",			""},		{TRAP, DONE, DONE, DONE} }, /* Only For TRAP */
+/* 41 */ { {" P%u,A",   "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 42 */ { {" P%u,B",   "",         "",         ""},        {UI8, DONE, DONE, DONE} },
+/* 43 */ { {" %s",      "",         "",         ""},        {PCABS, DONE, DONE, DONE} },
+/* 44 */ { {"",         "",         "",         ""},        {TRAP, DONE, DONE, DONE} }, /* Only For TRAP */
 
-/* 45 */ { {" *R%u",	"",			"",			""},		{UI8, DONE, DONE, DONE} }
+/* 45 */ { {" *R%u",    "",         "",         ""},        {UI8, DONE, DONE, DONE} }
 };
 
 static const opcodeinfo opcodes[] = {
@@ -373,11 +373,11 @@ CPU_DISASSEMBLE( tms7000 )
 		{
 			/* We found a match */
 
-			int 			j,k,vector;
-			UINT8	a;
-			INT8	b;
-			UINT16	c;
-			INT16	d;
+			int             j,k,vector;
+			UINT8   a;
+			INT8    b;
+			UINT16  c;
+			INT16   d;
 
 			buffer += sprintf (buffer, "%s", opcodes[i].name);
 

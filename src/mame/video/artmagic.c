@@ -10,7 +10,7 @@
 #include "includes/artmagic.h"
 
 
-#define INSTANT_BLIT		1
+#define INSTANT_BLIT        1
 
 
 /*************************************
@@ -120,7 +120,7 @@ static void execute_blit(running_machine &machine)
 		hit_list[hit_index++] = offset;
 
 		fprintf(f, "----------------------\n"
-				   "%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
+					"%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
 					machine.describe_context(), offset, x, y, w, h,
 					state->m_blitter_data[0], state->m_blitter_data[1],
 					state->m_blitter_data[2], state->m_blitter_data[3],
@@ -139,20 +139,20 @@ static void execute_blit(running_machine &machine)
 		for (i = 0; i < h; i++)
 		{
 			last = 0;
-			if (i == 0)	/* first line */
+			if (i == 0) /* first line */
 			{
 				/* ultennis, stonebal */
 				last ^= (state->m_blitter_data[7] & 0x0001);
 				if (state->m_is_stoneball)
 					last ^= ((state->m_blitter_data[0] & 0x0020) >> 3);
-				else	/* ultennis */
+				else    /* ultennis */
 					last ^= ((state->m_blitter_data[0] & 0x0040) >> 4);
 
 				/* cheesech */
 				last ^= ((state->m_blitter_data[7] & 0x0400) >> 9);
 				last ^= ((state->m_blitter_data[0] & 0x2000) >> 10);
 			}
-			else	/* following lines */
+			else    /* following lines */
 			{
 				int val = state->m_blitter_base[tempoffs];
 
@@ -199,29 +199,29 @@ static void execute_blit(running_machine &machine)
 				sx = x;
 
 				/* The first pixel of every line doesn't have a previous pixel
-                   to depend on, so it takes the "feed" from other bits.
-                   The very first pixel blitted is also treated differently.
+				   to depend on, so it takes the "feed" from other bits.
+				   The very first pixel blitted is also treated differently.
 
-                   ultennis/stonebal use a different encryption from cheesech,
-                   however the former only need to set bits 0 and 2 of the
-                   feed (the others are irrelevant), while the latter only
-                   bits 1 and 3, so I can handle both at the same time.
-                 */
+				   ultennis/stonebal use a different encryption from cheesech,
+				   however the former only need to set bits 0 and 2 of the
+				   feed (the others are irrelevant), while the latter only
+				   bits 1 and 3, so I can handle both at the same time.
+				 */
 				last = 0;
-				if (i == 0)	/* first line */
+				if (i == 0) /* first line */
 				{
 					/* ultennis, stonebal */
 					last ^= (state->m_blitter_data[7] & 0x0001);
 					if (state->m_is_stoneball)
 						last ^= ((state->m_blitter_data[0] & 0x0020) >> 3);
-					else	/* ultennis */
+					else    /* ultennis */
 						last ^= (((state->m_blitter_data[0] + 1) & 0x0040) >> 4);
 
 					/* cheesech */
 					last ^= ((state->m_blitter_data[7] & 0x0400) >> 9);
 					last ^= ((state->m_blitter_data[0] & 0x2000) >> 10);
 				}
-				else	/* following lines */
+				else    /* following lines */
 				{
 					int val = state->m_blitter_base[offset & state->m_blitter_mask];
 
@@ -301,10 +301,10 @@ static void execute_blit(running_machine &machine)
 READ16_MEMBER(artmagic_state::artmagic_blitter_r)
 {
 	/*
-        bit 1 is a busy flag; loops tightly if clear
-        bit 2 is tested in a similar fashion
-        bit 4 reflects the page
-    */
+	    bit 1 is a busy flag; loops tightly if clear
+	    bit 2 is tested in a similar fashion
+	    bit 4 reflects the page
+	*/
 	UINT16 result = 0xffef | (m_blitter_page << 4);
 #if (!INSTANT_BLIT)
 	if (attotime_compare(machine().time(), m_blitter_busy_until) < 0)

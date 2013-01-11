@@ -62,8 +62,8 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8035_Z2_TAG		"z2"
-#define I8035_Z5_TAG		"z5"
+#define I8035_Z2_TAG        "z2"
+#define I8035_Z5_TAG        "z5"
 
 
 enum
@@ -523,20 +523,20 @@ inline void abc99_device::scan_mouse()
 //-------------------------------------------------
 
 abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock),
-	  m_maincpu(*this, I8035_Z2_TAG),
-	  m_mousecpu(*this, I8035_Z5_TAG),
-	  m_speaker(*this, SPEAKER_TAG),
-	  m_si(1),
-	  m_si_en(1),
-	  m_so(1),
-	  m_so_z2(1),
-	  m_so_z5(1),
-	  m_keydown(0),
-	  m_t1_z2(0),
-	  m_t1_z5(0),
-	  m_led_en(0),
-	  m_reset(0)
+	: device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock),
+		m_maincpu(*this, I8035_Z2_TAG),
+		m_mousecpu(*this, I8035_Z5_TAG),
+		m_speaker(*this, SPEAKER_TAG),
+		m_si(1),
+		m_si_en(1),
+		m_so(1),
+		m_so_z2(1),
+		m_so_z5(1),
+		m_keydown(0),
+		m_t1_z2(0),
+		m_t1_z5(0),
+		m_led_en(0),
+		m_reset(0)
 {
 }
 
@@ -554,8 +554,8 @@ void abc99_device::device_start()
 	m_mouse_timer = timer_alloc(TIMER_MOUSE);
 
 	// resolve callbacks
-    m_out_clock_func.resolve(m_out_clock_cb, *this);
-    m_out_keydown_func.resolve(m_out_keydown_cb, *this);
+	m_out_clock_func.resolve(m_out_clock_cb, *this);
+	m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 
 	// state saving
 	save_item(NAME(m_si));
@@ -629,18 +629,18 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P10     serial output
-        P11     KEY DOWN
-        P12     transmit -> Z5 T1
-        P13     INS led
-        P14     ALT led
-        P15     CAPS LOCK led
-        P16     speaker output
-        P17     Z8 enable
+	    P10     serial output
+	    P11     KEY DOWN
+	    P12     transmit -> Z5 T1
+	    P13     INS led
+	    P14     ALT led
+	    P15     CAPS LOCK led
+	    P16     speaker output
+	    P17     Z8 enable
 
-    */
+	*/
 
 	// serial output
 	int so_z2 = BIT(data, 0);
@@ -678,18 +678,18 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P20
-        P21
-        P22
-        P23
-        P24
-        P25     DIP0
-        P26     DIP1
-        P27     DIP2
+	    P20
+	    P21
+	    P22
+	    P23
+	    P24
+	    P25     DIP0
+	    P26     DIP1
+	    P27     DIP2
 
-    */
+	*/
 
 	UINT8 data = ioport("Z14")->read() << 5;
 
@@ -725,18 +725,18 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P10     XA
-        P11     XB
-        P12     YA
-        P13     YB
-        P14     LB
-        P15     MB
-        P16     RB
-        P17     input from host
+	    P10     XA
+	    P11     XB
+	    P12     YA
+	    P13     YB
+	    P14     LB
+	    P15     MB
+	    P16     RB
+	    P17     input from host
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -758,18 +758,18 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P20
-        P21
-        P22
-        P23
-        P24     Z2 serial input enable
-        P25     Z2 RESET
-        P26     serial output
-        P27     Z2 T1
+	    P20
+	    P21
+	    P22
+	    P23
+	    P24     Z2 serial input enable
+	    P25     Z2 RESET
+	    P26     serial output
+	    P27     Z2 T1
 
-    */
+	*/
 
 	// serial input enable
 	int si_en = BIT(data, 4);

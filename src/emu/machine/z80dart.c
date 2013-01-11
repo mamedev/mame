@@ -70,91 +70,91 @@ enum
 	INT_SPECIAL
 };
 
-const int RR0_RX_CHAR_AVAILABLE		= 0x01;
-const int RR0_INTERRUPT_PENDING		= 0x02;
-const int RR0_TX_BUFFER_EMPTY		= 0x04;
-const int RR0_DCD					= 0x08;
-const int RR0_RI					= 0x10;
-const int RR0_SYNC_HUNT				= 0x10; // not supported
-const int RR0_CTS					= 0x20;
-const int RR0_TX_UNDERRUN			= 0x40; // not supported
-const int RR0_BREAK_ABORT			= 0x80; // not supported
+const int RR0_RX_CHAR_AVAILABLE     = 0x01;
+const int RR0_INTERRUPT_PENDING     = 0x02;
+const int RR0_TX_BUFFER_EMPTY       = 0x04;
+const int RR0_DCD                   = 0x08;
+const int RR0_RI                    = 0x10;
+const int RR0_SYNC_HUNT             = 0x10; // not supported
+const int RR0_CTS                   = 0x20;
+const int RR0_TX_UNDERRUN           = 0x40; // not supported
+const int RR0_BREAK_ABORT           = 0x80; // not supported
 
-const int RR1_ALL_SENT				= 0x01;
-const int RR1_RESIDUE_CODE_MASK		= 0x0e; // not supported
-const int RR1_PARITY_ERROR			= 0x10;
-const int RR1_RX_OVERRUN_ERROR		= 0x20;
-const int RR1_CRC_FRAMING_ERROR		= 0x40;
-const int RR1_END_OF_FRAME			= 0x80; // not supported
+const int RR1_ALL_SENT              = 0x01;
+const int RR1_RESIDUE_CODE_MASK     = 0x0e; // not supported
+const int RR1_PARITY_ERROR          = 0x10;
+const int RR1_RX_OVERRUN_ERROR      = 0x20;
+const int RR1_CRC_FRAMING_ERROR     = 0x40;
+const int RR1_END_OF_FRAME          = 0x80; // not supported
 
-const int WR0_REGISTER_MASK			= 0x07;
-const int WR0_COMMAND_MASK			= 0x38;
-const int WR0_NULL					= 0x00;
-const int WR0_SEND_ABORT			= 0x08; // not supported
-const int WR0_RESET_EXT_STATUS		= 0x10;
-const int WR0_CHANNEL_RESET			= 0x18;
-const int WR0_ENABLE_INT_NEXT_RX	= 0x20;
-const int WR0_RESET_TX_INT			= 0x28; // not supported
-const int WR0_ERROR_RESET			= 0x30;
-const int WR0_RETURN_FROM_INT		= 0x38; // not supported
-const int WR0_CRC_RESET_CODE_MASK	= 0xc0; // not supported
-const int WR0_CRC_RESET_NULL		= 0x00; // not supported
-const int WR0_CRC_RESET_RX			= 0x40; // not supported
-const int WR0_CRC_RESET_TX			= 0x80; // not supported
-const int WR0_CRC_RESET_TX_UNDERRUN	= 0xc0; // not supported
+const int WR0_REGISTER_MASK         = 0x07;
+const int WR0_COMMAND_MASK          = 0x38;
+const int WR0_NULL                  = 0x00;
+const int WR0_SEND_ABORT            = 0x08; // not supported
+const int WR0_RESET_EXT_STATUS      = 0x10;
+const int WR0_CHANNEL_RESET         = 0x18;
+const int WR0_ENABLE_INT_NEXT_RX    = 0x20;
+const int WR0_RESET_TX_INT          = 0x28; // not supported
+const int WR0_ERROR_RESET           = 0x30;
+const int WR0_RETURN_FROM_INT       = 0x38; // not supported
+const int WR0_CRC_RESET_CODE_MASK   = 0xc0; // not supported
+const int WR0_CRC_RESET_NULL        = 0x00; // not supported
+const int WR0_CRC_RESET_RX          = 0x40; // not supported
+const int WR0_CRC_RESET_TX          = 0x80; // not supported
+const int WR0_CRC_RESET_TX_UNDERRUN = 0xc0; // not supported
 
-const int WR1_EXT_INT_ENABLE		= 0x01;
-const int WR1_TX_INT_ENABLE			= 0x02;
-const int WR1_STATUS_VECTOR			= 0x04;
-const int WR1_RX_INT_MODE_MASK		= 0x18;
-const int WR1_RX_INT_DISABLE		= 0x00;
-const int WR1_RX_INT_FIRST			= 0x08;
-const int WR1_RX_INT_ALL_PARITY		= 0x10; // not supported
-const int WR1_RX_INT_ALL			= 0x18;
-const int WR1_WRDY_ON_RX_TX			= 0x20; // not supported
-const int WR1_WRDY_FUNCTION			= 0x40; // not supported
-const int WR1_WRDY_ENABLE			= 0x80; // not supported
+const int WR1_EXT_INT_ENABLE        = 0x01;
+const int WR1_TX_INT_ENABLE         = 0x02;
+const int WR1_STATUS_VECTOR         = 0x04;
+const int WR1_RX_INT_MODE_MASK      = 0x18;
+const int WR1_RX_INT_DISABLE        = 0x00;
+const int WR1_RX_INT_FIRST          = 0x08;
+const int WR1_RX_INT_ALL_PARITY     = 0x10; // not supported
+const int WR1_RX_INT_ALL            = 0x18;
+const int WR1_WRDY_ON_RX_TX         = 0x20; // not supported
+const int WR1_WRDY_FUNCTION         = 0x40; // not supported
+const int WR1_WRDY_ENABLE           = 0x80; // not supported
 
-const int WR3_RX_ENABLE				= 0x01;
+const int WR3_RX_ENABLE             = 0x01;
 const int WR3_SYNC_CHAR_LOAD_INHIBIT= 0x02; // not supported
-const int WR3_ADDRESS_SEARCH_MODE	= 0x04; // not supported
-const int WR3_RX_CRC_ENABLE			= 0x08; // not supported
-const int WR3_ENTER_HUNT_PHASE		= 0x10; // not supported
-const int WR3_AUTO_ENABLES			= 0x20;
-const int WR3_RX_WORD_LENGTH_MASK	= 0xc0;
-const int WR3_RX_WORD_LENGTH_5		= 0x00;
-const int WR3_RX_WORD_LENGTH_7		= 0x40;
-const int WR3_RX_WORD_LENGTH_6		= 0x80;
-const int WR3_RX_WORD_LENGTH_8		= 0xc0;
+const int WR3_ADDRESS_SEARCH_MODE   = 0x04; // not supported
+const int WR3_RX_CRC_ENABLE         = 0x08; // not supported
+const int WR3_ENTER_HUNT_PHASE      = 0x10; // not supported
+const int WR3_AUTO_ENABLES          = 0x20;
+const int WR3_RX_WORD_LENGTH_MASK   = 0xc0;
+const int WR3_RX_WORD_LENGTH_5      = 0x00;
+const int WR3_RX_WORD_LENGTH_7      = 0x40;
+const int WR3_RX_WORD_LENGTH_6      = 0x80;
+const int WR3_RX_WORD_LENGTH_8      = 0xc0;
 
-const int WR4_PARITY_ENABLE			= 0x01; // not supported
-const int WR4_PARITY_EVEN			= 0x02; // not supported
-const int WR4_STOP_BITS_MASK		= 0x0c;
-const int WR4_STOP_BITS_1			= 0x04;
-const int WR4_STOP_BITS_1_5			= 0x08; // not supported
-const int WR4_STOP_BITS_2			= 0x0c;
-const int WR4_SYNC_MODE_MASK		= 0x30; // not supported
-const int WR4_SYNC_MODE_8_BIT		= 0x00; // not supported
-const int WR4_SYNC_MODE_16_BIT		= 0x10; // not supported
-const int WR4_SYNC_MODE_SDLC		= 0x20; // not supported
-const int WR4_SYNC_MODE_EXT			= 0x30; // not supported
-const int WR4_CLOCK_RATE_MASK		= 0xc0;
-const int WR4_CLOCK_RATE_X1			= 0x00;
-const int WR4_CLOCK_RATE_X16		= 0x40;
-const int WR4_CLOCK_RATE_X32		= 0x80;
-const int WR4_CLOCK_RATE_X64		= 0xc0;
+const int WR4_PARITY_ENABLE         = 0x01; // not supported
+const int WR4_PARITY_EVEN           = 0x02; // not supported
+const int WR4_STOP_BITS_MASK        = 0x0c;
+const int WR4_STOP_BITS_1           = 0x04;
+const int WR4_STOP_BITS_1_5         = 0x08; // not supported
+const int WR4_STOP_BITS_2           = 0x0c;
+const int WR4_SYNC_MODE_MASK        = 0x30; // not supported
+const int WR4_SYNC_MODE_8_BIT       = 0x00; // not supported
+const int WR4_SYNC_MODE_16_BIT      = 0x10; // not supported
+const int WR4_SYNC_MODE_SDLC        = 0x20; // not supported
+const int WR4_SYNC_MODE_EXT         = 0x30; // not supported
+const int WR4_CLOCK_RATE_MASK       = 0xc0;
+const int WR4_CLOCK_RATE_X1         = 0x00;
+const int WR4_CLOCK_RATE_X16        = 0x40;
+const int WR4_CLOCK_RATE_X32        = 0x80;
+const int WR4_CLOCK_RATE_X64        = 0xc0;
 
-const int WR5_TX_CRC_ENABLE			= 0x01; // not supported
-const int WR5_RTS					= 0x02;
-const int WR5_CRC16					= 0x04; // not supported
-const int WR5_TX_ENABLE				= 0x08;
-const int WR5_SEND_BREAK			= 0x10;
-const int WR5_TX_WORD_LENGTH_MASK	= 0x60;
-const int WR5_TX_WORD_LENGTH_5		= 0x00;
-const int WR5_TX_WORD_LENGTH_6		= 0x40;
-const int WR5_TX_WORD_LENGTH_7		= 0x20;
-const int WR5_TX_WORD_LENGTH_8		= 0x60;
-const int WR5_DTR					= 0x80;
+const int WR5_TX_CRC_ENABLE         = 0x01; // not supported
+const int WR5_RTS                   = 0x02;
+const int WR5_CRC16                 = 0x04; // not supported
+const int WR5_TX_ENABLE             = 0x08;
+const int WR5_SEND_BREAK            = 0x10;
+const int WR5_TX_WORD_LENGTH_MASK   = 0x60;
+const int WR5_TX_WORD_LENGTH_5      = 0x00;
+const int WR5_TX_WORD_LENGTH_6      = 0x40;
+const int WR5_TX_WORD_LENGTH_7      = 0x20;
+const int WR5_TX_WORD_LENGTH_8      = 0x60;
+const int WR5_DTR                   = 0x80;
 
 
 
@@ -194,7 +194,7 @@ const device_type Z80SIO4 = &device_creator<z80dart_device>;
 
 z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80DART, "Zilog Z80 DART", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this)
 {
 	for (int i = 0; i < 8; i++)
 		m_int_state[i] = 0;
@@ -443,27 +443,27 @@ int z80dart_device::m1_r()
 
 z80dart_device::dart_channel::dart_channel()
 	: m_rx_shift(0),
-	  m_rx_error(0),
-	  m_rx_fifo(-1),
-	  m_rx_clock(0),
-	  m_rx_state(0),
-	  m_rx_bits(0),
-	  m_rx_first(0),
-	  m_rx_parity(0),
-	  m_rx_break(0),
-	  m_rx_rr0_latch(0),
-	  m_ri(0),
-	  m_cts(0),
-	  m_dcd(0),
-	  m_tx_data(0),
-	  m_tx_shift(0),
-	  m_tx_clock(0),
-	  m_tx_state(0),
-	  m_tx_bits(0),
-	  m_tx_parity(0),
-	  m_dtr(0),
-	  m_rts(0),
-	  m_sync(0)
+		m_rx_error(0),
+		m_rx_fifo(-1),
+		m_rx_clock(0),
+		m_rx_state(0),
+		m_rx_bits(0),
+		m_rx_first(0),
+		m_rx_parity(0),
+		m_rx_break(0),
+		m_rx_rr0_latch(0),
+		m_ri(0),
+		m_cts(0),
+		m_dcd(0),
+		m_tx_data(0),
+		m_tx_shift(0),
+		m_tx_clock(0),
+		m_tx_state(0),
+		m_tx_bits(0),
+		m_tx_parity(0),
+		m_dtr(0),
+		m_rts(0),
+		m_sync(0)
 {
 	memset(&m_in_rxd_func, 0, sizeof(m_in_rxd_func));
 	memset(&m_out_txd_func, 0, sizeof(m_out_txd_func));
@@ -557,10 +557,10 @@ int z80dart_device::dart_channel::get_clock_mode()
 
 	switch (m_wr[4] & WR4_CLOCK_RATE_MASK)
 	{
-	case WR4_CLOCK_RATE_X1:		clocks = 1;		break;
-	case WR4_CLOCK_RATE_X16:	clocks = 16;	break;
-	case WR4_CLOCK_RATE_X32:	clocks = 32;	break;
-	case WR4_CLOCK_RATE_X64:	clocks = 64;	break;
+	case WR4_CLOCK_RATE_X1:     clocks = 1;     break;
+	case WR4_CLOCK_RATE_X16:    clocks = 16;    break;
+	case WR4_CLOCK_RATE_X32:    clocks = 32;    break;
+	case WR4_CLOCK_RATE_X64:    clocks = 64;    break;
 	}
 
 	return clocks;
@@ -577,9 +577,9 @@ float z80dart_device::dart_channel::get_stop_bits()
 
 	switch (m_wr[4] & WR4_STOP_BITS_MASK)
 	{
-	case WR4_STOP_BITS_1:		bits = 1;		break;
-	case WR4_STOP_BITS_1_5:		bits = 1.5;		break;
-	case WR4_STOP_BITS_2:		bits = 2;		break;
+	case WR4_STOP_BITS_1:       bits = 1;       break;
+	case WR4_STOP_BITS_1_5:     bits = 1.5;     break;
+	case WR4_STOP_BITS_2:       bits = 2;       break;
 	}
 
 	return bits;
@@ -596,10 +596,10 @@ int z80dart_device::dart_channel::get_rx_word_length()
 
 	switch (m_wr[3] & WR3_RX_WORD_LENGTH_MASK)
 	{
-	case WR3_RX_WORD_LENGTH_5:	bits = 5;		break;
-	case WR3_RX_WORD_LENGTH_6:	bits = 6;		break;
-	case WR3_RX_WORD_LENGTH_7:	bits = 7;		break;
-	case WR3_RX_WORD_LENGTH_8:	bits = 8;		break;
+	case WR3_RX_WORD_LENGTH_5:  bits = 5;       break;
+	case WR3_RX_WORD_LENGTH_6:  bits = 6;       break;
+	case WR3_RX_WORD_LENGTH_7:  bits = 7;       break;
+	case WR3_RX_WORD_LENGTH_8:  bits = 8;       break;
 	}
 
 	return bits;
@@ -616,10 +616,10 @@ int z80dart_device::dart_channel::get_tx_word_length()
 
 	switch (m_wr[5] & WR5_TX_WORD_LENGTH_MASK)
 	{
-	case WR5_TX_WORD_LENGTH_5:	bits = 5;	break;
-	case WR5_TX_WORD_LENGTH_6:	bits = 6;	break;
-	case WR5_TX_WORD_LENGTH_7:	bits = 7;	break;
-	case WR5_TX_WORD_LENGTH_8:	bits = 8;	break;
+	case WR5_TX_WORD_LENGTH_5:  bits = 5;   break;
+	case WR5_TX_WORD_LENGTH_6:  bits = 6;   break;
+	case WR5_TX_WORD_LENGTH_7:  bits = 7;   break;
+	case WR5_TX_WORD_LENGTH_8:  bits = 8;   break;
 	}
 
 	return bits;

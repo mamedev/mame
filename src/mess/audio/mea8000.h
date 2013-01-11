@@ -44,8 +44,8 @@ struct mea8000_interface
 };
 
 
-#define MCFG_MEA8000_ADD(_tag, _intrf)	      \
-	MCFG_DEVICE_ADD(_tag, MEA8000, 0)	      \
+#define MCFG_MEA8000_ADD(_tag, _intrf)        \
+	MCFG_DEVICE_ADD(_tag, MEA8000, 0)         \
 	MCFG_DEVICE_CONFIG(_intrf)
 
 /* interface to CPU via address/data bus*/

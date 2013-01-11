@@ -13,9 +13,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define LMPR_RAM0    0x20	/* If bit set ram is paged into bank 0, else its rom0 */
-#define LMPR_ROM1    0x40	/* If bit set rom1 is paged into bank 3, else its ram */
-#define HMPR_MCNTRL  0x80	/* If set external RAM is enabled */
+#define LMPR_RAM0    0x20   /* If bit set ram is paged into bank 0, else its rom0 */
+#define LMPR_ROM1    0x40   /* If bit set rom1 is paged into bank 3, else its ram */
+#define HMPR_MCNTRL  0x80   /* If set external RAM is enabled */
 
 
 /***************************************************************************
@@ -143,17 +143,17 @@ void samcoupe_update_memory(address_space &space)
 	int is_readonly;
 
 	/* BANK1 */
-    if (state->m_lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
+	if (state->m_lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
 	{
 		if ((state->m_lmpr & 0x1F) <= PAGE_MASK)
 			memory = &space.machine().device<ram_device>(RAM_TAG)->pointer()[(state->m_lmpr & PAGE_MASK) * 0x4000];
 		else
-			memory = NULL;	/* Attempt to page in non existant ram region */
+			memory = NULL;  /* Attempt to page in non existant ram region */
 		is_readonly = FALSE;
 	}
 	else
 	{
-		memory = rom;	/* Rom0 paged in */
+		memory = rom;   /* Rom0 paged in */
 		is_readonly = TRUE;
 	}
 	samcoupe_update_bank(space, 1, memory, is_readonly);
@@ -163,7 +163,7 @@ void samcoupe_update_memory(address_space &space)
 	if (((state->m_lmpr + 1) & 0x1f) <= PAGE_MASK)
 		memory = &space.machine().device<ram_device>(RAM_TAG)->pointer()[((state->m_lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
-		memory = NULL;	/* Attempt to page in non existant ram region */
+		memory = NULL;  /* Attempt to page in non existant ram region */
 	samcoupe_update_bank(space, 2, memory, FALSE);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
@@ -177,12 +177,12 @@ void samcoupe_update_memory(address_space &space)
 		if ((state->m_hmpr & 0x1F) <= PAGE_MASK )
 			memory = &space.machine().device<ram_device>(RAM_TAG)->pointer()[(state->m_hmpr & PAGE_MASK)*0x4000];
 		else
-			memory = NULL;	/* Attempt to page in non existant ram region */
+			memory = NULL;  /* Attempt to page in non existant ram region */
 		samcoupe_update_bank(space, 3, memory, FALSE);
 
 
 		/* BANK4 */
-		if (state->m_lmpr & LMPR_ROM1)	/* Is Rom1 paged in at bank 4 */
+		if (state->m_lmpr & LMPR_ROM1)  /* Is Rom1 paged in at bank 4 */
 		{
 			memory = rom + 0x4000;
 			is_readonly = TRUE;
@@ -192,14 +192,14 @@ void samcoupe_update_memory(address_space &space)
 			if (((state->m_hmpr + 1) & 0x1f) <= PAGE_MASK)
 				memory = &space.machine().device<ram_device>(RAM_TAG)->pointer()[((state->m_hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
-				memory = NULL;	/* Attempt to page in non existant ram region */
+				memory = NULL;  /* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
 		}
 		samcoupe_update_bank(space, 4, memory, FALSE);
 	}
 
 	/* video memory location */
-	if (state->m_vmpr & 0x40)	/* if bit set in 2 bank screen mode */
+	if (state->m_vmpr & 0x40)   /* if bit set in 2 bank screen mode */
 		state->m_videoram = &space.machine().device<ram_device>(RAM_TAG)->pointer()[((state->m_vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
 		state->m_videoram = &space.machine().device<ram_device>(RAM_TAG)->pointer()[((state->m_vmpr & 0x1f) & PAGE_MASK) * 0x4000];

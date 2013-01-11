@@ -27,11 +27,11 @@ static ADDRESS_MAP_START( s11c_main_map, AS_PROGRAM, 8, s11c_state )
 ADDRESS_MAP_END
 /*
 static ADDRESS_MAP_START( s11c_audio_map, AS_PROGRAM, 8, s11c_state )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank0")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
+    AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
+    AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_w)
+    AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pias", pia6821_device, read, write)
+    AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank0")
+    AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_state )
@@ -128,7 +128,7 @@ WRITE8_MEMBER( s11c_state::bgbank_w )
 {
 	UINT8 bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
 	membank("bgbank")->set_entry(bank);
-//	popmessage("BG bank set to %02x (%i)",data,bank);
+//  popmessage("BG bank set to %02x (%i)",data,bank);
 }
 
 MACHINE_RESET_MEMBER( s11c_state, s11c )
@@ -151,130 +151,130 @@ DRIVER_INIT_MEMBER(s11c_state,s11c)
 
 static const pia6821_interface pia21_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),       /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia24_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_LINE_GND,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_LINE_VCC,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_LINE_GND,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_LINE_VCC,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia28_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11b_state, dig1_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11b_state, dig1_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),       /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia2c_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),	/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pa_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pb_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia30_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, switch_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_LINE_GND,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_LINE_VCC,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, switch_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),	/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_r),       /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_LINE_GND,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_LINE_VCC,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_w),       /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia34_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia34_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),	/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11b_state, pia34_pa_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 //static const pia6821_interface pias_intf =
 //{
-//	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
-//	DEVCB_NULL,		/* port B in */
-//	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
-//	DEVCB_NULL,		/* line CB1 in */
-//	DEVCB_NULL,		/* line CA2 in */
-//	DEVCB_NULL,		/* line CB2 in */
-//	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
-//	DEVCB_DRIVER_MEMBER(s11_state, dac_w),		/* port B out */
-//	DEVCB_NULL,		/* line CA2 out */
-//	DEVCB_NULL,		/* line CB2 out */
-//	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
-//	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
+//  DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
+//  DEVCB_NULL,     /* port B in */
+//  DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),        /* line CA1 in */
+//  DEVCB_NULL,     /* line CB1 in */
+//  DEVCB_NULL,     /* line CA2 in */
+//  DEVCB_NULL,     /* line CB2 in */
+//  DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
+//  DEVCB_DRIVER_MEMBER(s11_state, dac_w),      /* port B out */
+//  DEVCB_NULL,     /* line CA2 out */
+//  DEVCB_NULL,     /* line CB2 out */
+//  DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),       /* IRQA */
+//  DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)        /* IRQB */
 //};
 
 static const pia6821_interface pia40_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11b_state, pia40_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),		/* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),		/* IRQA */
-	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11b_state, pia40_ca2_w),      /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),       /* line CB2 out */
+	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),     /* IRQA */
+	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)       /* IRQB */
 };
 
 static MACHINE_CONFIG_START( s11c, s11c_state )
@@ -594,27 +594,27 @@ ROM_START(strax_p7)
 ROM_END
 
 
-GAME(1990,	bbnny_l2,	0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Bugs Bunny Birthday Ball (L-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	bbnny_lu,	bbnny_l2,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Bugs Bunny Birthday Ball (LU-2) European",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	diner_l4,	0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Diner (L-4)",									GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	diner_l3,	diner_l4,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Diner (L-3)",									GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	diner_l1,	diner_l4,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Diner (L-1) Europe",							GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	dd_l2,		0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Dr. Dude (LA-2)",								GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	dd_p6,		dd_l2,		s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Dr. Dude (PA-6)",								GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	pool_l7,	0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Pool Sharks (LA-7)",							GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	pool_l6,	pool_l7,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Pool Sharks (LA-6)",							GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	pool_le2,	pool_l7,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Pool Sharks (LE-2)",							GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	pool_p7,	pool_l7,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Pool Sharks (PA-7)",							GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	radcl_l1,	0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Radical! (L-1)",								GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	radcl_g1,	radcl_l1,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Radical! (G-1)",								GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	radcl_p3,	radcl_l1,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"Radical! (P-3)",								GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	rvrbt_l3,	0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Riverboat Gambler (L-3)",						GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	rollr_l2,	0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Rollergames (L-2)",							GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,	rollr_ex,	rollr_l2,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Rollergames (EXPERIMENTAL)",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,	rollr_e1,	rollr_l2,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Rollergames (PU-1)",							GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,	rollr_p2,	rollr_l2,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Rollergames (PA-2 / PA-1 Sound)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	rollr_l3,	rollr_l2,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Rollergames (LU-3) Europe",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	rollr_g3,	rollr_l2,	s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Rollergames (LG-3) Germany",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	gs_l3,		gs_l4,		s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"The Bally Game Show (L-3)",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	gs_l4,		0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Bally",				"The Bally Game Show (L-4)",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	strax_p7,	0,			s11c,	s11c, s11c_state,	s11c,	ROT0,	"Williams",				"Star Trax (domestic prototype)",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Diner (L-4)",                                  GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Diner (L-3)",                                  GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Diner (L-1) Europe",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Dr. Dude (LA-2)",                              GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Dr. Dude (PA-6)",                              GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-7)",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-6)",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LE-2)",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (PA-7)",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Radical! (L-1)",                               GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Radical! (G-1)",                               GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Radical! (P-3)",                               GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (L-2)",                            GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (PU-1)",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_l3,      gs_l4,      s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "The Bally Game Show (L-3)",                    GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_l4,      0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "The Bally Game Show (L-4)",                    GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Star Trax (domestic prototype)",               GAME_IS_SKELETON_MECHANICAL)

@@ -116,7 +116,7 @@ WRITE32_MEMBER ( cxhumax_state::flash_w )
 	if(ACCESSING_BITS_0_15)
 		m_flash->write(offset, data);
 	if(ACCESSING_BITS_16_31)
-	    m_flash->write(offset+1, data >> 16);
+		m_flash->write(offset+1, data >> 16);
 	verboselog( machine(), 9, "(FLASH) %08X <- %08X\n", 0xF0000000 + (offset << 2), data);
 }
 
@@ -491,13 +491,13 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 	switch (offset >> 3) { // Decode the group
 		case 0: // Group 1
 			switch(offset & 7) {
-				case INTSTATCLR:	// ITC_INTSTATCLR_REG Group 1
+				case INTSTATCLR:    // ITC_INTSTATCLR_REG Group 1
 					/*
-                        Bits 15 (PWM), 14 (PIO103) of Group 1 are the logical OR of their lower level interrupt
-                        status bits down within the interrupting module and are not registered.
+					    Bits 15 (PWM), 14 (PIO103) of Group 1 are the logical OR of their lower level interrupt
+					    status bits down within the interrupting module and are not registered.
 
-                        The source registers must be cleared to clear these interrupt bits.
-                    */
+					    The source registers must be cleared to clear these interrupt bits.
+					*/
 					data &= ~(INT_PWM_BIT|INT_PIO103_BIT);
 
 					m_intctrl_regs[INTREG(INTGROUP1, INTSTATCLR)] &= ~data;
@@ -511,17 +511,17 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 			break;
 		case 1: // Group 2
 			switch(offset & 7) {
-				case INTSTATCLR:	// ITC_INTSTATCLR_REG Group 2
+				case INTSTATCLR:    // ITC_INTSTATCLR_REG Group 2
 					/*
-                        The timer interrupt service routine must write to one of the timer
-                        registers before clearing the corresponding Interrupt Controller ISR timer
-                        interrupt bit.
+					    The timer interrupt service routine must write to one of the timer
+					    registers before clearing the corresponding Interrupt Controller ISR timer
+					    interrupt bit.
 
-                        Bit 7 (Timers) of Group 2 is the logical OR of its lower level interrupt
-                        status bits down within the interrupting module and are not registered.
+					    Bit 7 (Timers) of Group 2 is the logical OR of its lower level interrupt
+					    status bits down within the interrupting module and are not registered.
 
-                        The source registers must be cleared to clear these interrupt bits.
-                    */
+					    The source registers must be cleared to clear these interrupt bits.
+					*/
 					if(m_timer_regs.timer_irq) data &= ~INT_TIMER_BIT;
 
 					m_intctrl_regs[INTREG(INTGROUP2, INTSTATCLR)] &= ~data;
@@ -842,42 +842,42 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 {
 	/* original equations:
 
-        C = Y - 16
-        D = Cb - 128
-        E = Cr - 128
+	    C = Y - 16
+	    D = Cb - 128
+	    E = Cr - 128
 
-        R = clip(( 298 * C           + 409 * E + 128) >> 8)
-        G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
-        B = clip(( 298 * C + 516 * D           + 128) >> 8)
+	    R = clip(( 298 * C           + 409 * E + 128) >> 8)
+	    G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
+	    B = clip(( 298 * C + 516 * D           + 128) >> 8)
 
-        R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
-        G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
-        B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
+	    R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
+	    G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
+	    B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
 
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
 
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
 
-        Now combine constants:
+	    Now combine constants:
 
-        R = clip(( 298 * Y            + 409 * Cr - 56992) >> 8)
-        G = clip(( 298 * Y - 100 * Cb - 208 * Cr + 34784) >> 8)
-        B = clip(( 298 * Y + 516 * Cb            - 70688) >> 8)
+	    R = clip(( 298 * Y            + 409 * Cr - 56992) >> 8)
+	    G = clip(( 298 * Y - 100 * Cb - 208 * Cr + 34784) >> 8)
+	    B = clip(( 298 * Y + 516 * Cb            - 70688) >> 8)
 
-        Define common = 298 * y - 56992. This will save one addition
+	    Define common = 298 * y - 56992. This will save one addition
 
-        R = clip(( common            + 409 * Cr -     0) >> 8)
-        G = clip(( common - 100 * Cb - 208 * Cr + 91776) >> 8)
-        B = clip(( common + 516 * Cb            - 13696) >> 8)
+	    R = clip(( common            + 409 * Cr -     0) >> 8)
+	    G = clip(( common - 100 * Cb - 208 * Cr + 91776) >> 8)
+	    B = clip(( common + 516 * Cb            - 13696) >> 8)
 
-    */
-    UINT8 y = ycc;
-    UINT8 cb = ycc >> 8;
-    UINT8 cr = ycc >> 16;
+	*/
+	UINT8 y = ycc;
+	UINT8 cb = ycc >> 8;
+	UINT8 cr = ycc >> 16;
 	UINT32 r, g, b, common;
 
 	common = 298 * y - 56992;
@@ -916,10 +916,10 @@ UINT32 cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 
 		UINT32 ydisp_start = y_position_and_region_alpha & 0x7ff;
 
 	/*  UINT32 first_x = m_drm0_regs[DRM_ACTIVE_X_REG] & 0xffff;
-        UINT32 last_x = (m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
+	    UINT32 last_x = (m_drm0_regs[DRM_ACTIVE_X_REG] >> 16) & 0xffff;
 
-        UINT32 first_y = m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
-        UINT32 last_y = (m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
+	    UINT32 first_y = m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
+	    UINT32 last_y = (m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
 
 		for (j=ydisp_start; j <= ydisp_last; j++)
 		{
@@ -939,38 +939,38 @@ UINT32 cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 
 }
 
 static ADDRESS_MAP_START(cxhumax_map, AS_PROGRAM, 32, cxhumax_state)
-	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM	AM_SHARE("ram") AM_MIRROR(0x40000000)			// 64?MB RAM
-	AM_RANGE(0xe0000000, 0xe000ffff) AM_READWRITE(cx_hsx_r, cx_hsx_w)						// HSX
-	AM_RANGE(0xe0010000, 0xe0010003) AM_READWRITE(cx_romdescr_r, cx_romdescr_w)				// ROM Descriptor
-	AM_RANGE(0xe0010004, 0xe001000f) AM_READWRITE(cx_isaromdescr_r, cx_isaromdescr_w)		// ISA/ROM Descriptors
-	AM_RANGE(0xe0010010, 0xe001001f) AM_READWRITE(cx_isadescr_r, cx_isadescr_w)				// ISA Descriptors
-	AM_RANGE(0xe0010020, 0xe001002f) AM_READWRITE(cx_rommap_r, cx_rommap_w)					// ROM Mapping
-	AM_RANGE(0xe0010030, 0xe0010033) AM_READWRITE(cx_rommode_r, cx_rommode_w)				// ISA Mode
-	AM_RANGE(0xe0010034, 0xe0010037) AM_READWRITE(cx_xoemask_r, cx_xoemask_w)				// XOE Mask
-	AM_RANGE(0xe0010040, 0xe0010047) AM_READWRITE(cx_pci_r, cx_pci_w)						// PCI
-	AM_RANGE(0xe0010080, 0xe00100ff) AM_READWRITE(cx_extdesc_r, cx_extdesc_w)				// Extended Control
-	AM_RANGE(0xe0400014, 0xe0400017) AM_WRITE(cx_remap_w)									// RST_REMAP_REG
-	AM_RANGE(0xe0400024, 0xe0400027) AM_READWRITE(cx_scratch_r, cx_scratch_w)				// RST_SCRATCH_REG - System Scratch Register
-	AM_RANGE(0xe0430000, 0xe0430103) AM_READWRITE(cx_timers_r, cx_timers_w)					// Timers
-	AM_RANGE(0xe0411000, 0xe0411033) AM_READWRITE(cx_uart2_r, cx_uart2_w)					// UART2
-	AM_RANGE(0xe0440000, 0xe0440013) AM_READWRITE(cx_pll_r, cx_pll_w)						// PLL Registers
-	AM_RANGE(0xe0440020, 0xe0440037) AM_READWRITE(cx_clkdiv_r, cx_clkdiv_w)					// Clock Divider Registers
-	AM_RANGE(0xe0440094, 0xe0440097) AM_READWRITE(cx_pllprescale_r, cx_pllprescale_w)		// PLL Prescale
-	AM_RANGE(0xe0440100, 0xe0440173) AM_READWRITE(cx_chipcontrol_r, cx_chipcontrol_w)		// Chip Control Registers
-	AM_RANGE(0xe0450000, 0xe0450037) AM_READWRITE(cx_intctrl_r, cx_intctrl_w)				// Interrupt Controller Registers
-	AM_RANGE(0xe0490000, 0xe0490017) AM_READWRITE(cx_ss_r, cx_ss_w)							// Synchronous Serial Port
-	AM_RANGE(0xe04e0000, 0xe04e001f) AM_READWRITE(cx_i2c0_r, cx_i2c0_w)						// I2C0
-	AM_RANGE(0xe04e1000, 0xe04e101f) AM_READWRITE(cx_i2c1_r, cx_i2c1_w)						// I2C1
-	AM_RANGE(0xe04e2000, 0xe04e201f) AM_READWRITE(cx_i2c2_r, cx_i2c2_w)						// I2C2
-	AM_RANGE(0xe0500300, 0xe050030b) AM_READWRITE(cx_mc_cfg_r, cx_mc_cfg_w)					// Memory Controller configuration
-	AM_RANGE(0xe0560000, 0xe05600fb) AM_READWRITE(cx_drm0_r, cx_drm0_w)						// DRM0
-	AM_RANGE(0xe0570000, 0xe05700fb) AM_READWRITE(cx_drm1_r, cx_drm1_w)						// DRM1
-	AM_RANGE(0xe05d0800, 0xe05d0bff) AM_READWRITE(cx_hdmi_r, cx_hdmi_w)						// HDMI
-	AM_RANGE(0xe0600000, 0xe063ffff) AM_READWRITE(cx_gxa_r, cx_gxa_w)						// GXA
-	AM_RANGE(0xe4017000, 0xe40173ff) AM_RAM													// HSX - BSP - 1K Video Shared Dual Port RAM (shared with MVP)
-	AM_RANGE(0xe4080000, 0xe4083fff) AM_RAM													// HSX - TSP 0 - 16K Private Instructions/Data and Host-Shared Data
-	AM_RANGE(0xf0000000, 0xf03fffff) AM_READWRITE(flash_r, flash_w)	AM_MIRROR(0xf8000000)	// 4MB FLASH (INTEL 28F320J3D)
-	AM_RANGE(0xf4000000, 0xf43fffff) AM_READ(dummy_flash_r)									// do we need it?
+	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("ram") AM_MIRROR(0x40000000)           // 64?MB RAM
+	AM_RANGE(0xe0000000, 0xe000ffff) AM_READWRITE(cx_hsx_r, cx_hsx_w)                       // HSX
+	AM_RANGE(0xe0010000, 0xe0010003) AM_READWRITE(cx_romdescr_r, cx_romdescr_w)             // ROM Descriptor
+	AM_RANGE(0xe0010004, 0xe001000f) AM_READWRITE(cx_isaromdescr_r, cx_isaromdescr_w)       // ISA/ROM Descriptors
+	AM_RANGE(0xe0010010, 0xe001001f) AM_READWRITE(cx_isadescr_r, cx_isadescr_w)             // ISA Descriptors
+	AM_RANGE(0xe0010020, 0xe001002f) AM_READWRITE(cx_rommap_r, cx_rommap_w)                 // ROM Mapping
+	AM_RANGE(0xe0010030, 0xe0010033) AM_READWRITE(cx_rommode_r, cx_rommode_w)               // ISA Mode
+	AM_RANGE(0xe0010034, 0xe0010037) AM_READWRITE(cx_xoemask_r, cx_xoemask_w)               // XOE Mask
+	AM_RANGE(0xe0010040, 0xe0010047) AM_READWRITE(cx_pci_r, cx_pci_w)                       // PCI
+	AM_RANGE(0xe0010080, 0xe00100ff) AM_READWRITE(cx_extdesc_r, cx_extdesc_w)               // Extended Control
+	AM_RANGE(0xe0400014, 0xe0400017) AM_WRITE(cx_remap_w)                                   // RST_REMAP_REG
+	AM_RANGE(0xe0400024, 0xe0400027) AM_READWRITE(cx_scratch_r, cx_scratch_w)               // RST_SCRATCH_REG - System Scratch Register
+	AM_RANGE(0xe0430000, 0xe0430103) AM_READWRITE(cx_timers_r, cx_timers_w)                 // Timers
+	AM_RANGE(0xe0411000, 0xe0411033) AM_READWRITE(cx_uart2_r, cx_uart2_w)                   // UART2
+	AM_RANGE(0xe0440000, 0xe0440013) AM_READWRITE(cx_pll_r, cx_pll_w)                       // PLL Registers
+	AM_RANGE(0xe0440020, 0xe0440037) AM_READWRITE(cx_clkdiv_r, cx_clkdiv_w)                 // Clock Divider Registers
+	AM_RANGE(0xe0440094, 0xe0440097) AM_READWRITE(cx_pllprescale_r, cx_pllprescale_w)       // PLL Prescale
+	AM_RANGE(0xe0440100, 0xe0440173) AM_READWRITE(cx_chipcontrol_r, cx_chipcontrol_w)       // Chip Control Registers
+	AM_RANGE(0xe0450000, 0xe0450037) AM_READWRITE(cx_intctrl_r, cx_intctrl_w)               // Interrupt Controller Registers
+	AM_RANGE(0xe0490000, 0xe0490017) AM_READWRITE(cx_ss_r, cx_ss_w)                         // Synchronous Serial Port
+	AM_RANGE(0xe04e0000, 0xe04e001f) AM_READWRITE(cx_i2c0_r, cx_i2c0_w)                     // I2C0
+	AM_RANGE(0xe04e1000, 0xe04e101f) AM_READWRITE(cx_i2c1_r, cx_i2c1_w)                     // I2C1
+	AM_RANGE(0xe04e2000, 0xe04e201f) AM_READWRITE(cx_i2c2_r, cx_i2c2_w)                     // I2C2
+	AM_RANGE(0xe0500300, 0xe050030b) AM_READWRITE(cx_mc_cfg_r, cx_mc_cfg_w)                 // Memory Controller configuration
+	AM_RANGE(0xe0560000, 0xe05600fb) AM_READWRITE(cx_drm0_r, cx_drm0_w)                     // DRM0
+	AM_RANGE(0xe0570000, 0xe05700fb) AM_READWRITE(cx_drm1_r, cx_drm1_w)                     // DRM1
+	AM_RANGE(0xe05d0800, 0xe05d0bff) AM_READWRITE(cx_hdmi_r, cx_hdmi_w)                     // HDMI
+	AM_RANGE(0xe0600000, 0xe063ffff) AM_READWRITE(cx_gxa_r, cx_gxa_w)                       // GXA
+	AM_RANGE(0xe4017000, 0xe40173ff) AM_RAM                                                 // HSX - BSP - 1K Video Shared Dual Port RAM (shared with MVP)
+	AM_RANGE(0xe4080000, 0xe4083fff) AM_RAM                                                 // HSX - TSP 0 - 16K Private Instructions/Data and Host-Shared Data
+	AM_RANGE(0xf0000000, 0xf03fffff) AM_READWRITE(flash_r, flash_w) AM_MIRROR(0xf8000000)   // 4MB FLASH (INTEL 28F320J3D)
+	AM_RANGE(0xf4000000, 0xf43fffff) AM_READ(dummy_flash_r)                                 // do we need it?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cxhumax )
@@ -1057,7 +1057,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 static const i2cmem_interface i2cmem_interface =
 {
-       I2CMEM_SLAVE_ADDRESS, 0, 0x2000
+		I2CMEM_SLAVE_ADDRESS, 0, 0x2000
 };
 
 static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
@@ -1069,15 +1069,15 @@ static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
 	MCFG_I2CMEM_ADD("eeprom",i2cmem_interface)
 
 	/* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_SIZE(1920, 1080)
-    MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(1920, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cxhumax_state, screen_update_cxhumax)
 
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
@@ -1093,4 +1093,4 @@ ROM_START( hxhdci2k )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-SYST( 2008, hxhdci2k, 0,       0,	cxhumax,	cxhumax, driver_device,	 0,   "HUMAX",   "HUMAX HDCI-2000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 2008, hxhdci2k, 0,       0,   cxhumax,    cxhumax, driver_device,  0,   "HUMAX",   "HUMAX HDCI-2000",     GAME_NOT_WORKING | GAME_NO_SOUND)

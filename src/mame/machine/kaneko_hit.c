@@ -164,14 +164,14 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 		case 0x04/2: // similar to the hit detection from SuperNova, but much simpler
 
 			// X Absolute Collision
-			if      (hit.x1p >  hit.x2p)	data |= 0x0200;
-			else if (hit.x1p == hit.x2p)	data |= 0x0400;
-			else if (hit.x1p <  hit.x2p)	data |= 0x0800;
+			if      (hit.x1p >  hit.x2p)    data |= 0x0200;
+			else if (hit.x1p == hit.x2p)    data |= 0x0400;
+			else if (hit.x1p <  hit.x2p)    data |= 0x0800;
 
 			// Y Absolute Collision
-			if      (hit.y1p >  hit.y2p)	data |= 0x2000;
-			else if (hit.y1p == hit.y2p)	data |= 0x4000;
-			else if (hit.y1p <  hit.y2p)	data |= 0x8000;
+			if      (hit.y1p >  hit.y2p)    data |= 0x2000;
+			else if (hit.y1p == hit.y2p)    data |= 0x4000;
+			else if (hit.y1p <  hit.y2p)    data |= 0x8000;
 
 			// XY Overlap Collision
 			hit.x12 = (hit.x1p) - (hit.x2p + hit.x2s);
@@ -251,15 +251,15 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
 		case 0x04/2: // similar to the hit detection from SuperNova, but much simpler
 
 			// 4th nibble: Y Absolute Collision -> possible values = 9,8,4,3,2
-			if      (hit.y1p >  hit.y2p)	data |= 0x2000;
-			else if (hit.y1p == hit.y2p)	data |= 0x4000;
-			else if (hit.y1p <  hit.y2p)	data |= 0x8000;
+			if      (hit.y1p >  hit.y2p)    data |= 0x2000;
+			else if (hit.y1p == hit.y2p)    data |= 0x4000;
+			else if (hit.y1p <  hit.y2p)    data |= 0x8000;
 			if (y_coll<0) data |= 0x1000;
 
 			// 3rd nibble: X Absolute Collision -> possible values = 9,8,4,3,2
-			if      (hit.x1p >  hit.x2p)	data |= 0x0200;
-			else if (hit.x1p == hit.x2p)	data |= 0x0400;
-			else if (hit.x1p <  hit.x2p)	data |= 0x0800;
+			if      (hit.x1p >  hit.x2p)    data |= 0x0200;
+			else if (hit.x1p == hit.x2p)    data |= 0x0400;
+			else if (hit.x1p <  hit.x2p)    data |= 0x0800;
 			if (x_coll<0) data |= 0x0100;
 
 			// 2nd nibble: always set to 4
@@ -331,11 +331,11 @@ INT16 kaneko_hit_device::calc_compute_x(calc1_hit_t &hit)
 	INT16 x_coll;
 
 	// X distance
-	if ((hit.x2p >= hit.x1p) && (hit.x2p < (hit.x1p + hit.x1s)))		// x2p inside x1
+	if ((hit.x2p >= hit.x1p) && (hit.x2p < (hit.x1p + hit.x1s)))        // x2p inside x1
 		x_coll = (hit.x1s - (hit.x2p - hit.x1p));
-	else if ((hit.x1p >= hit.x2p) && (hit.x1p < (hit.x2p + hit.x2s)))	// x1p inside x2
+	else if ((hit.x1p >= hit.x2p) && (hit.x1p < (hit.x2p + hit.x2s)))   // x1p inside x2
 		x_coll = (hit.x2s - (hit.x1p - hit.x2p));
-	else																// normal/no overlap
+	else                                                                // normal/no overlap
 		x_coll = ((hit.x1s + hit.x2s)/2) - abs((hit.x1p + hit.x1s/2) - (hit.x2p + hit.x2s/2));
 
 	return x_coll;
@@ -346,11 +346,11 @@ INT16 kaneko_hit_device::calc_compute_y(calc1_hit_t &hit)
 	INT16 y_coll;
 
 	// Y distance
-	if ((hit.y2p >= hit.y1p) && (hit.y2p < (hit.y1p + hit.y1s)))		// y2p inside y1
+	if ((hit.y2p >= hit.y1p) && (hit.y2p < (hit.y1p + hit.y1s)))        // y2p inside y1
 		y_coll = (hit.y1s - (hit.y2p - hit.y1p));
-	else if ((hit.y1p >= hit.y2p) && (hit.y1p < (hit.y2p + hit.y2s)))	// y1p inside y2
+	else if ((hit.y1p >= hit.y2p) && (hit.y1p < (hit.y2p + hit.y2s)))   // y1p inside y2
 		y_coll = (hit.y2s - (hit.y1p - hit.y2p));
-	else																// normal/no overlap
+	else                                                                // normal/no overlap
 		y_coll = ((hit.y1s + hit.y2s)/2) - abs((hit.y1p + hit.y1s/2) - (hit.y2p + hit.y2s/2));
 
 	return y_coll;
@@ -525,7 +525,7 @@ void kaneko_hit_device::type2_calc_org(int mode, int x0, int s0,  int* x1, int* 
 		case 0: *x1=x0; *s1=s0; break;
 		case 1: *x1=x0-s0/2; *s1=s0; break;
 		case 2: *x1=x0-s0; *s1=s0; break;
-		case 3:	*x1=x0-s0; *s1=2*s0; break;
+		case 3: *x1=x0-s0; *s1=2*s0; break;
 	}
 	//x1 is the left most coord, s1 = width
 }
@@ -558,21 +558,21 @@ void kaneko_hit_device::type2_recalc_collisions(calc3_hit_t &hit3)
 
 
 	// 4th nibble: Y Absolute Collision -> possible values = 9,8,4,3,2
-	if      (hit3.y1p >  hit3.y2p)	hit3.flags |= 0x2000;
-	else if (hit3.y1p == hit3.y2p)	hit3.flags |= 0x4000;
-	else if (hit3.y1p <  hit3.y2p)	hit3.flags |= 0x8000;
+	if      (hit3.y1p >  hit3.y2p)  hit3.flags |= 0x2000;
+	else if (hit3.y1p == hit3.y2p)  hit3.flags |= 0x4000;
+	else if (hit3.y1p <  hit3.y2p)  hit3.flags |= 0x8000;
 	if (hit3.y_coll<0) hit3.flags |= 0x1000;
 
 	// 3rd nibble: X Absolute Collision -> possible values = 9,8,4,3,2
-	if      (hit3.x1p >  hit3.x2p)	hit3.flags |= 0x0200;
-	else if (hit3.x1p == hit3.x2p)	hit3.flags |= 0x0400;
-	else if (hit3.x1p <  hit3.x2p)	hit3.flags |= 0x0800;
+	if      (hit3.x1p >  hit3.x2p)  hit3.flags |= 0x0200;
+	else if (hit3.x1p == hit3.x2p)  hit3.flags |= 0x0400;
+	else if (hit3.x1p <  hit3.x2p)  hit3.flags |= 0x0800;
 	if (hit3.x_coll<0) hit3.flags |= 0x0100;
 
 	// 2nd nibble: Z Absolute Collision -> possible values = 9,8,4,3,2
-	if      (hit3.z1p >  hit3.z2p)	hit3.flags |= 0x0020;
-	else if (hit3.z1p == hit3.z2p)	hit3.flags |= 0x0040;
-	else if (hit3.z1p <  hit3.z2p)	hit3.flags |= 0x0080;
+	if      (hit3.z1p >  hit3.z2p)  hit3.flags |= 0x0020;
+	else if (hit3.z1p == hit3.z2p)  hit3.flags |= 0x0040;
+	else if (hit3.z1p <  hit3.z2p)  hit3.flags |= 0x0080;
 	if (hit3.z_coll<0) hit3.flags |= 0x0010;
 
 	// 1st nibble: XYZ Overlap Collision
@@ -581,4 +581,3 @@ void kaneko_hit_device::type2_recalc_collisions(calc3_hit_t &hit3)
 	if ((hit3.y_coll>=0)&&(hit3.z_coll>=0)) hit3.flags |= 0x0002;
 	if ((hit3.x_coll>=0)&&(hit3.y_coll>=0)) hit3.flags |= 0x0001;
 }
-

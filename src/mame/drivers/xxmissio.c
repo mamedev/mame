@@ -155,38 +155,38 @@ static INPUT_PORTS_START( xxmissio )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, "Endless Game (Cheat)")	PORT_DIPLOCATION("SW1:7") /* Shown as "Unused" in the manual */
+	PORT_DIPNAME( 0x40, 0x40, "Endless Game (Cheat)")   PORT_DIPLOCATION("SW1:7") /* Shown as "Unused" in the manual */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW1:8" )	 /* Shown as "Unused" in the manual */
+	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW1:8" )     /* Shown as "Unused" in the manual */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x04, "First Bonus" )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "First Bonus" )       PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "30000" )
 	PORT_DIPSETTING(    0x00, "40000" )
-	PORT_DIPNAME( 0x18, 0x08, "Bonus Every" )		PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x08, "Bonus Every" )       PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "50000" )
 	PORT_DIPSETTING(    0x08, "70000" )
 	PORT_DIPSETTING(    0x10, "90000" )
@@ -222,15 +222,15 @@ static const gfx_layout charlayout =
 static const gfx_layout spritelayout =
 {
 	32,16,    /* 32*16 characters */
-	512,	  /* 512 sprites */
+	512,      /* 512 sprites */
 	4,        /* 4 bits per pixel */
 	{0,1,2,3},
 	{0,4,8,12,16,20,24,28,
-	 32,36,40,44,48,52,56,60,
-	 8*64+0,8*64+4,8*64+8,8*64+12,8*64+16,8*64+20,8*64+24,8*64+28,
-	 8*64+32,8*64+36,8*64+40,8*64+44,8*64+48,8*64+52,8*64+56,8*64+60},
+		32,36,40,44,48,52,56,60,
+		8*64+0,8*64+4,8*64+8,8*64+12,8*64+16,8*64+20,8*64+24,8*64+28,
+		8*64+32,8*64+36,8*64+40,8*64+44,8*64+48,8*64+52,8*64+56,8*64+60},
 	{64*0, 64*1, 64*2, 64*3, 64*4, 64*5, 64*6, 64*7,
-	 64*16, 64*17, 64*18, 64*19, 64*20, 64*21, 64*22, 64*23},
+		64*16, 64*17, 64*18, 64*19, 64*20, 64*21, 64*22, 64*23},
 	64*8*4
 };
 
@@ -282,11 +282,11 @@ static const ym2203_interface ym2203_interface_2 =
 static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/4)	/* 3.0MHz */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */
 	MCFG_CPU_PROGRAM_MAP(map1)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", xxmissio_state,  xxmissio_interrupt_m)
 
-	MCFG_CPU_ADD("sub", Z80,12000000/4)	/* 3.0MHz */
+	MCFG_CPU_ADD("sub", Z80,12000000/4) /* 3.0MHz */
 	MCFG_CPU_PROGRAM_MAP(map2)
 	MCFG_CPU_PERIODIC_INT_DRIVER(xxmissio_state, xxmissio_interrupt_s, 2*60)
 

@@ -49,19 +49,19 @@ enum
 
 
 // Control Register A
-#define CRA_CF			0x80
-#define CRA_CIE			0x10
-#define CRA_AIE			0x08
-#define CRA_AF			0x01
+#define CRA_CF          0x80
+#define CRA_CIE         0x10
+#define CRA_AIE         0x08
+#define CRA_AF          0x01
 
 // Control Register B
-#define CRB_TEST		0x08
-#define CRB_ADJ			0x04
-#define CRB_RESET		0x02
-#define CRB_S			0x01
+#define CRB_TEST        0x08
+#define CRB_ADJ         0x04
+#define CRB_RESET       0x02
+#define CRB_S           0x01
 
 // alarm
-#define ALARM_ENB		0x80
+#define ALARM_ENB       0x80
 
 // register write mask
 static const int REG_WRITE_MASK[0x10] =
@@ -80,7 +80,7 @@ static const int REG_WRITE_MASK[0x10] =
 inline void hd64610_device::set_irq_line()
 {
 	int irq_out = (((m_regs[REG_CRA] & CRA_CF) && (m_regs[REG_CRA] & CRA_CIE)) ||
-				  ((m_regs[REG_CRA] & CRA_AF) && (m_regs[REG_CRA] & CRA_AIE))) ? 0 : 1;
+					((m_regs[REG_CRA] & CRA_AF) && (m_regs[REG_CRA] & CRA_AIE))) ? 0 : 1;
 
 	if (m_irq_out != irq_out)
 	{
@@ -131,7 +131,7 @@ inline void hd64610_device::check_alarm()
 		for (int i = REG_64HZ; i <= REG_DAY; i++)
 		{
 			if ((m_regs[i] & REG_WRITE_MASK[i]) != (m_regs[i+8] & REG_WRITE_MASK[i]) && m_regs[i+8] & ALARM_ENB)
-				 alarm_flag = false;
+					alarm_flag = false;
 		}
 
 		m_regs[REG_CRA] |= (alarm_flag ? CRA_AF : 0);
@@ -150,10 +150,10 @@ inline void hd64610_device::check_alarm()
 
 hd64610_device::hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD64610, "HD64610", tag, owner, clock),
-	  device_rtc_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_hline_state(1),
-	  m_irq_out(1)
+		device_rtc_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_hline_state(1),
+		m_irq_out(1)
 {
 }
 

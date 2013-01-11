@@ -43,14 +43,14 @@
 ***************************************************************************/
 
 // logging
-#define LOG_APPLEFDC		0
-#define LOG_APPLEFDC_EXTRA	0
+#define LOG_APPLEFDC        0
+#define LOG_APPLEFDC_EXTRA  0
 
 // mask for FDC lines
-#define IWM_MOTOR			0x10
-#define IWM_DRIVE			0x20
-#define IWM_Q6				0x40
-#define IWM_Q7				0x80
+#define IWM_MOTOR           0x10
+#define IWM_DRIVE           0x20
+#define IWM_Q6              0x40
+#define IWM_Q7              0x80
 
 const device_timer_id TIMER_MOTOR_ONOFF = 1;
 
@@ -86,11 +86,11 @@ const device_timer_id TIMER_MOTOR_ONOFF = 1;
 
 enum
 {
-	IWM_MODE_CLOCKSPEED			= 0x10,
-	IWM_MODE_BITCELLTIME		= 0x08,
-	IWM_MODE_MOTOROFFDELAY		= 0x04,
-	IWM_MODE_HANDSHAKEPROTOCOL	= 0x02,
-	IWM_MODE_LATCHMODE			= 0x01
+	IWM_MODE_CLOCKSPEED         = 0x10,
+	IWM_MODE_BITCELLTIME        = 0x08,
+	IWM_MODE_MOTOROFFDELAY      = 0x04,
+	IWM_MODE_HANDSHAKEPROTOCOL  = 0x02,
+	IWM_MODE_LATCHMODE          = 0x01
 };
 
 
@@ -121,10 +121,10 @@ void applefdc_base_device::device_start()
 	m_motor_timer = timer_alloc(TIMER_MOTOR_ONOFF);
 
 	// state
-	m_write_byte		= 0x00;
-	m_lines				= 0x00;	
-	m_mode				= 0x1F;	// default value needed by Lisa 2 - no, I don't know if it is true
-	m_handshake_hack	= 0x00;
+	m_write_byte        = 0x00;
+	m_lines             = 0x00;
+	m_mode              = 0x1F; // default value needed by Lisa 2 - no, I don't know if it is true
+	m_handshake_hack    = 0x00;
 
 	// register save states
 	save_item(NAME(m_write_byte));
@@ -144,7 +144,7 @@ void applefdc_base_device::device_reset(void)
 	m_handshake_hack = 0x00;
 	m_write_byte = 0x00;
 	m_lines = 0x00;
-	m_mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
+	m_mode = 0x1F;  /* default value needed by Lisa 2 - no, I don't know if it is true */
 	m_motor_timer->reset();
 }
 
@@ -220,19 +220,19 @@ UINT8 applefdc_base_device::statusreg_r()
 	const applefdc_interface *intf = get_interface();
 
 	/* IWM status:
-     *
-     * Bit 7    Sense input (write protect for 5.25" drive and general status line for 3.5")
-     * Bit 6    Reserved
-     * Bit 5    Drive enable (is 1 if drive is on)
-     * Bits 4-0 Same as IWM mode bits 4-0
-     */
+	 *
+	 * Bit 7    Sense input (write protect for 5.25" drive and general status line for 3.5")
+	 * Bit 6    Reserved
+	 * Bit 5    Drive enable (is 1 if drive is on)
+	 * Bits 4-0 Same as IWM mode bits 4-0
+	 */
 
 	status = iwm_enable2() ? 1 : (intf->read_status ? intf->read_status(this) : 0);
 
 	result = (status ? 0x80 : 0x00);
 
 	if (m_type != APPLEFDC_APPLE2)
-		 result |= (((m_lines & IWM_MOTOR) ? 1 : 0) << 5) | m_mode;
+			result |= (((m_lines & IWM_MOTOR) ? 1 : 0) << 5) | m_mode;
 	return result;
 }
 
@@ -244,7 +244,7 @@ UINT8 applefdc_base_device::statusreg_r()
 
 void applefdc_base_device::iwm_modereg_w(UINT8 data)
 {
-	m_mode = data & 0x1f;	/* write mode register */
+	m_mode = data & 0x1f;   /* write mode register */
 
 	if (LOG_APPLEFDC_EXTRA)
 		logerror("iwm_modereg_w: iwm_mode=0x%02x\n", (unsigned) m_mode);
@@ -291,7 +291,7 @@ UINT8 applefdc_base_device::read_reg(int lines)
 
 		case IWM_Q7:
 			// Classic Apple II: Read status register
-            // IWM: Read handshake register
+			// IWM: Read handshake register
 			if (m_type == APPLEFDC_APPLE2)
 				result = statusreg_r();
 			else
@@ -340,7 +340,7 @@ void applefdc_base_device::write_reg(UINT8 data)
 
 //-------------------------------------------------
 //  turn_motor_onoff - timer callback for turning
-//	motor on or off
+//  motor on or off
 //-------------------------------------------------
 
 void applefdc_base_device::turn_motor_onoff(bool status)

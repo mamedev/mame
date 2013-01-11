@@ -96,7 +96,7 @@ public:
 #define HP48_IO_8(x)   (state->m_io[(x)] | (state->m_io[(x)+1] << 4))
 #define HP48_IO_12(x)  (state->m_io[(x)] | (state->m_io[(x)+1] << 4) | (state->m_io[(x)+2] << 8))
 #define HP48_IO_20(x)  (state->m_io[(x)] | (state->m_io[(x)+1] << 4) | (state->m_io[(x)+2] << 8) | \
-	               (state->m_io[(x)+3] << 12) | (state->m_io[(x)+4] << 16))
+					(state->m_io[(x)+3] << 12) | (state->m_io[(x)+4] << 16))
 
 
 /*----------- defined in machine/hp48.c -----------*/
@@ -148,7 +148,7 @@ struct hp48_port_interface
 	int max_size;             /* maximum size, in bytes 128 KB or 4 GB */
 };
 
-class hp48_port_image_device :	public device_t,
+class hp48_port_image_device :  public device_t,
 								public device_image_interface,
 								public hp48_port_interface
 {
@@ -173,7 +173,7 @@ public:
 	virtual bool call_create(int format_type, option_resolution *format_options);
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 private:
 	void hp48_fill_port();
@@ -191,4 +191,3 @@ extern const device_type HP48_PORT;
 #define MCFG_HP48_PORT_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
-

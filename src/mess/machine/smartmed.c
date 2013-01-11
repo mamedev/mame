@@ -24,7 +24,7 @@
 #include "imagedev/harddriv.h"
 #include "formats/imageutl.h"
 
-#define MAX_SMARTMEDIA	1
+#define MAX_SMARTMEDIA  1
 
 /* machine-independent big-endian 32-bit integer */
 struct UINT32BE
@@ -75,11 +75,11 @@ enum
 const device_type NAND = &device_creator<nand_device>;
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock)
+	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock)
 {
 }
 nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
 {
 }
 
@@ -104,8 +104,8 @@ void nand_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_chip, 0, sizeof(m_chip));
-    	memset(&m_devcb_write_line_cb, 0, sizeof(m_devcb_write_line_cb));
+		memset(&m_chip, 0, sizeof(m_chip));
+		memset(&m_devcb_write_line_cb, 0, sizeof(m_devcb_write_line_cb));
 		m_id_len = 0;
 		m_page_data_size = 0;
 		m_page_total_size = 0;
@@ -483,7 +483,7 @@ void nand_device::command_w(UINT8 data)
 		}
 		break;
 	/*case 0x11:
-        break;*/
+	    break;*/
 	case 0x60: // Block Erase (1st cycle)
 		m_mode = SM_M_ERASE;
 		m_page_addr = 0;
@@ -515,13 +515,13 @@ void nand_device::command_w(UINT8 data)
 		m_mode = SM_M_READSTATUS;
 		break;
 	/*case 0x71:
-        break;*/
+	    break;*/
 	case 0x90: // Read ID
 		m_mode = SM_M_READID;
 		m_addr_load_ptr = 0;
 		break;
 	/*case 0x91:
-        break;*/
+	    break;*/
 	case 0x30: // Read (2nd cycle)
 		if (m_col_address_cycles == 1)
 		{
@@ -793,9 +793,9 @@ void nand_device::device_reset()
 const device_type SMARTMEDIA = &device_creator<smartmedia_image_device>;
 
 smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock),
-	  device_image_interface(mconfig, *this),
-	  m_image_interface(NULL)
+	: nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock),
+		device_image_interface(mconfig, *this),
+		m_image_interface(NULL)
 {
 }
 
@@ -804,4 +804,3 @@ void smartmedia_image_device::device_config_complete()
 	nand_device::device_config_complete();
 	update_names();
 }
-

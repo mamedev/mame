@@ -19,25 +19,25 @@ void pcu_init(dsp56k_core* cpustate, device_t *device);
 #define SP  (cpustate->PCU.sp)
 #define SS  (cpustate->PCU.ss)
 
-#define SSH	(SS[SP].w.h)
-#define SSL	(SS[SP].w.l)
+#define SSH (SS[SP].w.h)
+#define SSL (SS[SP].w.l)
 
-#define ST0		(SS[0].d)
-#define ST1		(SS[1].d)
-#define ST2		(SS[2].d)
-#define ST3		(SS[3].d)
-#define ST4		(SS[4].d)
-#define ST5		(SS[5].d)
-#define ST6		(SS[6].d)
-#define ST7		(SS[7].d)
-#define ST8		(SS[8].d)
-#define ST9		(SS[9].d)
-#define ST10	(SS[10].d)
-#define ST11	(SS[11].d)
-#define ST12	(SS[12].d)
-#define ST13	(SS[13].d)
-#define ST14	(SS[14].d)
-#define ST15	(SS[15].d)
+#define ST0     (SS[0].d)
+#define ST1     (SS[1].d)
+#define ST2     (SS[2].d)
+#define ST3     (SS[3].d)
+#define ST4     (SS[4].d)
+#define ST5     (SS[5].d)
+#define ST6     (SS[6].d)
+#define ST7     (SS[7].d)
+#define ST8     (SS[8].d)
+#define ST9     (SS[9].d)
+#define ST10    (SS[10].d)
+#define ST11    (SS[11].d)
+#define ST12    (SS[12].d)
+#define ST13    (SS[13].d)
+#define ST14    (SS[14].d)
+#define ST15    (SS[15].d)
 
 /* STATUS REGISTER (SR) BITS (1-25) */
 /* MR */
@@ -137,7 +137,7 @@ void dsp56k_irq_table_init(void);
 void dsp56k_set_irq_source(UINT8 irq_num, UINT16 iv, const char* source);
 int dsp56k_get_irq_index_by_tag(const char* tag);
 
-void dsp56k_add_pending_interrupt(dsp56k_core* cpustate, const char* name);		// Call me to add an interrupt to the queue
+void dsp56k_add_pending_interrupt(dsp56k_core* cpustate, const char* name);     // Call me to add an interrupt to the queue
 
 void dsp56k_clear_pending_interrupts(dsp56k_core* cpustate);
 int dsp56k_count_pending_interrupts(dsp56k_core* cpustate);

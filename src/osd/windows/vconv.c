@@ -51,13 +51,13 @@
 //  CONSTANTS
 //============================================================
 
-#define PRINT_COMMAND_LINE	0
+#define PRINT_COMMAND_LINE  0
 
-#define	VS6		0x00060000
-#define VS7		0x00070000
-#define VS71	0x0007000a
-#define VS2005	0x00080000
-#define VS2008	0x00090000
+#define VS6     0x00060000
+#define VS7     0x00070000
+#define VS71    0x0007000a
+#define VS2005  0x00080000
+#define VS2008  0x00090000
 
 
 
@@ -80,90 +80,90 @@ typedef struct
 
 static const translation_info gcc_translate[] =
 {
-	{ 0,		"-D*",						"/D*" },
-	{ 0,		"-U*",						"/U*" },
-	{ 0,		"-I*",						"/I*" },
-	{ 0,		"-o*",						"~*" },
-	{ 0,		"-include*",				"/FI*" },
-	{ 0,		"-c",						"/c~/Fo" },
-	{ 0,		"-E",						"/c~/E >" },
-	{ 0,		"-S",						"/c~/Fa" },
-	{ VS7,		"-O0",						"/Od /GS /Oi" },
-	{ 0,		"-O0",						"/Od" },
-	{ 0,		"-O1",						"/O2" },
-	{ 0,		"-O2",						"/O2" },
-	{ 0,		"-O3",						"/O2" },
-	{ 0,		"-Os",						"/O1" },
-	{ 0,		"-g*",						"/Zi" },
-	{ VS2005,	"-fno-strict-aliasing",		"" },		// deprecated in VS2005
-	{ 0,		"-fno-strict-aliasing",		"/Oa" },
-	{ 0,		"-fno-omit-frame-pointer",	"" },
-	{ 0,		"-fomit-frame-pointer",		"" },
-	{ 0,		"-Werror",					"/WX" },
-	//{ VS7,		"-Wall",					"/Wall /W3 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
-	{ VS7,		"-Wall",					"/Wall /W4 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826 /wd4820 /wd4514 /wd4668 /wd4127 /wd4625 /wd4626 /wd4512 /wd4100 /wd4310 /wd4571 /wd4061 /wd4131 /wd4255 /wd4510 /wd4610 /wd4505 /wd4324 /wd4611 /wd4201 /wd4189 /wd4296 /wd4986 /wd4347" },
-	{ 0,		"-Wall",					"/W0" },
-	{ VS7,		"-Wno-unused",				"/wd4100 /wd4101 /wd4102 /wd4505" },
-	{ 0,		"-Wno-sign-compare",		"/wd4365 /wd4389 /wd4245" },
-	{ 0,		"-W*",						"" },
-	{ VS2005,	"-march=*",					"" },		// deprecated in VS2005
-	{ 0,		"-march=pentium",			"/G5" },
-	{ 0,		"-march=pentiumpro",		"/G6" },
-	{ 0,		"-march=pentium3",			"/G6" },
-	{ 0,		"-march=pentium-m",			"/G6" },
-	{ 0,		"-march=athlon",			"/G7" },
-	{ 0,		"-march=pentium4",			"/G7" },
-	{ 0,		"-march=athlon64",			"/G7" },
-	{ VS71,		"-msse2",					"/arch:SSE2" },
-	{ 0,		"-msse2",					"" },
-	{ 0,		"-msse3",					"" },
-	{ 0,		"-mwindows",				"" },
-	{ 0,		"-mno-cygwin",				"" },
-	{ 0,		"-std=gnu89",				"" },
-	{ 0,		"-std=gnu++98",				"/TP" },
-	{ 0,		"-pipe",					"" },
-	{ 0,		"-x",						"" },
-	{ 0,		"c++",						"" },
+	{ 0,        "-D*",                      "/D*" },
+	{ 0,        "-U*",                      "/U*" },
+	{ 0,        "-I*",                      "/I*" },
+	{ 0,        "-o*",                      "~*" },
+	{ 0,        "-include*",                "/FI*" },
+	{ 0,        "-c",                       "/c~/Fo" },
+	{ 0,        "-E",                       "/c~/E >" },
+	{ 0,        "-S",                       "/c~/Fa" },
+	{ VS7,      "-O0",                      "/Od /GS /Oi" },
+	{ 0,        "-O0",                      "/Od" },
+	{ 0,        "-O1",                      "/O2" },
+	{ 0,        "-O2",                      "/O2" },
+	{ 0,        "-O3",                      "/O2" },
+	{ 0,        "-Os",                      "/O1" },
+	{ 0,        "-g*",                      "/Zi" },
+	{ VS2005,   "-fno-strict-aliasing",     "" },       // deprecated in VS2005
+	{ 0,        "-fno-strict-aliasing",     "/Oa" },
+	{ 0,        "-fno-omit-frame-pointer",  "" },
+	{ 0,        "-fomit-frame-pointer",     "" },
+	{ 0,        "-Werror",                  "/WX" },
+	//{ VS7,        "-Wall",                    "/Wall /W3 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
+	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826 /wd4820 /wd4514 /wd4668 /wd4127 /wd4625 /wd4626 /wd4512 /wd4100 /wd4310 /wd4571 /wd4061 /wd4131 /wd4255 /wd4510 /wd4610 /wd4505 /wd4324 /wd4611 /wd4201 /wd4189 /wd4296 /wd4986 /wd4347" },
+	{ 0,        "-Wall",                    "/W0" },
+	{ VS7,      "-Wno-unused",              "/wd4100 /wd4101 /wd4102 /wd4505" },
+	{ 0,        "-Wno-sign-compare",        "/wd4365 /wd4389 /wd4245" },
+	{ 0,        "-W*",                      "" },
+	{ VS2005,   "-march=*",                 "" },       // deprecated in VS2005
+	{ 0,        "-march=pentium",           "/G5" },
+	{ 0,        "-march=pentiumpro",        "/G6" },
+	{ 0,        "-march=pentium3",          "/G6" },
+	{ 0,        "-march=pentium-m",         "/G6" },
+	{ 0,        "-march=athlon",            "/G7" },
+	{ 0,        "-march=pentium4",          "/G7" },
+	{ 0,        "-march=athlon64",          "/G7" },
+	{ VS71,     "-msse2",                   "/arch:SSE2" },
+	{ 0,        "-msse2",                   "" },
+	{ 0,        "-msse3",                   "" },
+	{ 0,        "-mwindows",                "" },
+	{ 0,        "-mno-cygwin",              "" },
+	{ 0,        "-std=gnu89",               "" },
+	{ 0,        "-std=gnu++98",             "/TP" },
+	{ 0,        "-pipe",                    "" },
+	{ 0,        "-x",                       "" },
+	{ 0,        "c++",                      "" },
 	{ 0 }
 };
 
 static const translation_info ld_translate[] =
 {
-	{ VS2008,	"-lbufferoverflowu",		"" },
-	{ 0,		"-l*",						"*.lib" },
-	{ 0,		"-o*",						"/out:*" },
-	{ 0,		"-Wl,-Map,*",				"/map:*" },
-	{ 0,		"-Wl,--allow-multiple-definition", "/force:multiple" },
-	{ 0,		"-Wl,--warn-common",		"" },
-	{ 0,		"-mno-cygwin",				"" },
-	{ 0,		"-s",						"" },
-	{ 0,		"-WO",						"" },
-	{ 0,		"-mconsole",				"/subsystem:console" },
-	{ 0,		"-mwindows",				"/subsystem:windows" },
-	{ 0,		"-municode",				"" },
-	{ 0,		"-static-libgcc",			"" },
-	{ 0,		"-static-libstdc++",			"" },
-	{ 0,		"-shared",					"/dll" },
+	{ VS2008,   "-lbufferoverflowu",        "" },
+	{ 0,        "-l*",                      "*.lib" },
+	{ 0,        "-o*",                      "/out:*" },
+	{ 0,        "-Wl,-Map,*",               "/map:*" },
+	{ 0,        "-Wl,--allow-multiple-definition", "/force:multiple" },
+	{ 0,        "-Wl,--warn-common",        "" },
+	{ 0,        "-mno-cygwin",              "" },
+	{ 0,        "-s",                       "" },
+	{ 0,        "-WO",                      "" },
+	{ 0,        "-mconsole",                "/subsystem:console" },
+	{ 0,        "-mwindows",                "/subsystem:windows" },
+	{ 0,        "-municode",                "" },
+	{ 0,        "-static-libgcc",           "" },
+	{ 0,        "-static-libstdc++",            "" },
+	{ 0,        "-shared",                  "/dll" },
 	{ 0 }
 };
 
 static const translation_info ar_translate[] =
 {
-	{ 0,		"-cr",						"" },
-	{ 0,		"/LTCG",					"/LTCG" },
+	{ 0,        "-cr",                      "" },
+	{ 0,        "/LTCG",                    "/LTCG" },
 	{ 0 }
 };
 
 
 static const translation_info windres_translate[] =
 {
-	{ 0,		"-D*",						"/D*" },
-	{ 0,		"-U*",						"/U*" },
-	{ 0,		"-I*",						"/I*" },
-	{ 0,		"--include-dir*",			"/I*" },
-	{ 0,		"-o*",						"/fo*" },
-	{ 0,		"-O*",						"" },
-	{ 0,		"-i*",						"*" },
+	{ 0,        "-D*",                      "/D*" },
+	{ 0,        "-U*",                      "/U*" },
+	{ 0,        "-I*",                      "/I*" },
+	{ 0,        "--include-dir*",           "/I*" },
+	{ 0,        "-o*",                      "/fo*" },
+	{ 0,        "-O*",                      "" },
+	{ 0,        "-i*",                      "*" },
 	{ 0 }
 };
 

@@ -19,41 +19,41 @@
 #define LOG 0
 
 
-#define INSTRUCTION_SYSTEM_SET		0x40
-#define INSTRUCTION_SLEEP_IN		0x53	// unimplemented
-#define INSTRUCTION_DISP_ON			0x59
-#define INSTRUCTION_DISP_OFF		0x58
-#define INSTRUCTION_SCROLL			0x44
-#define INSTRUCTION_CSRFORM			0x5d
-#define INSTRUCTION_CGRAM_ADR		0x5c
-#define INSTRUCTION_CSRDIR_RIGHT	0x4c
-#define INSTRUCTION_CSRDIR_LEFT		0x4d
-#define INSTRUCTION_CSRDIR_UP		0x4e
-#define INSTRUCTION_CSRDIR_DOWN		0x4f
-#define INSTRUCTION_HDOT_SCR		0x5a
-#define INSTRUCTION_OVLAY			0x5b
-#define INSTRUCTION_CSRW			0x46
-#define INSTRUCTION_CSRR			0x47	// unimplemented
-#define INSTRUCTION_MWRITE			0x42
-#define INSTRUCTION_MREAD			0x43	// unimplemented
+#define INSTRUCTION_SYSTEM_SET      0x40
+#define INSTRUCTION_SLEEP_IN        0x53    // unimplemented
+#define INSTRUCTION_DISP_ON         0x59
+#define INSTRUCTION_DISP_OFF        0x58
+#define INSTRUCTION_SCROLL          0x44
+#define INSTRUCTION_CSRFORM         0x5d
+#define INSTRUCTION_CGRAM_ADR       0x5c
+#define INSTRUCTION_CSRDIR_RIGHT    0x4c
+#define INSTRUCTION_CSRDIR_LEFT     0x4d
+#define INSTRUCTION_CSRDIR_UP       0x4e
+#define INSTRUCTION_CSRDIR_DOWN     0x4f
+#define INSTRUCTION_HDOT_SCR        0x5a
+#define INSTRUCTION_OVLAY           0x5b
+#define INSTRUCTION_CSRW            0x46
+#define INSTRUCTION_CSRR            0x47    // unimplemented
+#define INSTRUCTION_MWRITE          0x42
+#define INSTRUCTION_MREAD           0x43    // unimplemented
 
 
-#define CSRDIR_RIGHT				0x00
-#define CSRDIR_LEFT					0x01
-#define CSRDIR_UP					0x02
-#define CSRDIR_DOWN					0x03
+#define CSRDIR_RIGHT                0x00
+#define CSRDIR_LEFT                 0x01
+#define CSRDIR_UP                   0x02
+#define CSRDIR_DOWN                 0x03
 
 
-#define MX_OR						0x00
-#define MX_XOR						0x01	// unimplemented
-#define MX_AND						0x02	// unimplemented
-#define MX_PRIORITY_OR				0x03	// unimplemented
+#define MX_OR                       0x00
+#define MX_XOR                      0x01    // unimplemented
+#define MX_AND                      0x02    // unimplemented
+#define MX_PRIORITY_OR              0x03    // unimplemented
 
 
-#define FC_OFF						0x00
-#define FC_SOLID					0x01	// unimplemented
-#define FC_FLASH_32					0x02	// unimplemented
-#define FC_FLASH_64					0x03	// unimplemented
+#define FC_OFF                      0x00
+#define FC_SOLID                    0x01    // unimplemented
+#define FC_FLASH_32                 0x02    // unimplemented
+#define FC_FLASH_64                 0x03    // unimplemented
 
 
 
@@ -141,9 +141,9 @@ inline void sed1330_device::increment_csr()
 
 sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SED1330, "SED1330", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_bf(0),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(sed1330))
+		device_memory_interface(mconfig, *this),
+		m_bf(0),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(sed1330))
 {
 }
 
@@ -275,10 +275,10 @@ WRITE8_MEMBER( sed1330_device::command_w )
 		{
 			switch (m_cd)
 			{
-			case CSRDIR_RIGHT:	logerror("SED1330 '%s' Cursor Direction: Right\n", tag());	break;
-			case CSRDIR_LEFT:	logerror("SED1330 '%s' Cursor Direction: Left\n", tag());	break;
-			case CSRDIR_UP:		logerror("SED1330 '%s' Cursor Direction: Up\n", tag());		break;
-			case CSRDIR_DOWN:	logerror("SED1330 '%s' Cursor Direction: Down\n", tag());	break;
+			case CSRDIR_RIGHT:  logerror("SED1330 '%s' Cursor Direction: Right\n", tag());  break;
+			case CSRDIR_LEFT:   logerror("SED1330 '%s' Cursor Direction: Left\n", tag());   break;
+			case CSRDIR_UP:     logerror("SED1330 '%s' Cursor Direction: Up\n", tag());     break;
+			case CSRDIR_DOWN:   logerror("SED1330 '%s' Cursor Direction: Down\n", tag());   break;
 			}
 		}
 		break;
@@ -386,34 +386,34 @@ WRITE8_MEMBER( sed1330_device::data_w )
 
 			switch (m_fc)
 			{
-			case FC_OFF:		logerror("SED1330 '%s' Cursor: disabled\n", tag());	break;
-			case FC_SOLID:		logerror("SED1330 '%s' Cursor: solid\n", tag());		break;
-			case FC_FLASH_32:	logerror("SED1330 '%s' Cursor: fFR/32\n", tag());		break;
-			case FC_FLASH_64:	logerror("SED1330 '%s' Cursor: fFR/64\n", tag());		break;
+			case FC_OFF:        logerror("SED1330 '%s' Cursor: disabled\n", tag()); break;
+			case FC_SOLID:      logerror("SED1330 '%s' Cursor: solid\n", tag());        break;
+			case FC_FLASH_32:   logerror("SED1330 '%s' Cursor: fFR/32\n", tag());       break;
+			case FC_FLASH_64:   logerror("SED1330 '%s' Cursor: fFR/64\n", tag());       break;
 			}
 
 			switch (m_fp & 0x03)
 			{
-			case FC_OFF:		logerror("SED1330 '%s' Display Page 1: disabled\n", tag());		break;
-			case FC_SOLID:		logerror("SED1330 '%s' Display Page 1: enabled\n", tag());		break;
-			case FC_FLASH_32:	logerror("SED1330 '%s' Display Page 1: flash fFR/32\n", tag());	break;
-			case FC_FLASH_64:	logerror("SED1330 '%s' Display Page 1: flash fFR/64\n", tag());	break;
+			case FC_OFF:        logerror("SED1330 '%s' Display Page 1: disabled\n", tag());     break;
+			case FC_SOLID:      logerror("SED1330 '%s' Display Page 1: enabled\n", tag());      break;
+			case FC_FLASH_32:   logerror("SED1330 '%s' Display Page 1: flash fFR/32\n", tag()); break;
+			case FC_FLASH_64:   logerror("SED1330 '%s' Display Page 1: flash fFR/64\n", tag()); break;
 			}
 
 			switch ((m_fp >> 2) & 0x03)
 			{
-			case FC_OFF:		logerror("SED1330 '%s' Display Page 2/4: disabled\n", tag());		break;
-			case FC_SOLID:		logerror("SED1330 '%s' Display Page 2/4: enabled\n", tag());		break;
-			case FC_FLASH_32:	logerror("SED1330 '%s' Display Page 2/4: flash fFR/32\n", tag());	break;
-			case FC_FLASH_64:	logerror("SED1330 '%s' Display Page 2/4: flash fFR/64\n", tag());	break;
+			case FC_OFF:        logerror("SED1330 '%s' Display Page 2/4: disabled\n", tag());       break;
+			case FC_SOLID:      logerror("SED1330 '%s' Display Page 2/4: enabled\n", tag());        break;
+			case FC_FLASH_32:   logerror("SED1330 '%s' Display Page 2/4: flash fFR/32\n", tag());   break;
+			case FC_FLASH_64:   logerror("SED1330 '%s' Display Page 2/4: flash fFR/64\n", tag());   break;
 			}
 
 			switch ((m_fp >> 4) & 0x03)
 			{
-			case FC_OFF:		logerror("SED1330 '%s' Display Page 3: disabled\n", tag());		break;
-			case FC_SOLID:		logerror("SED1330 '%s' Display Page 3: enabled\n", tag());		break;
-			case FC_FLASH_32:	logerror("SED1330 '%s' Display Page 3: flash fFR/32\n", tag());	break;
-			case FC_FLASH_64:	logerror("SED1330 '%s' Display Page 3: flash fFR/64\n", tag());	break;
+			case FC_OFF:        logerror("SED1330 '%s' Display Page 3: disabled\n", tag());     break;
+			case FC_SOLID:      logerror("SED1330 '%s' Display Page 3: enabled\n", tag());      break;
+			case FC_FLASH_32:   logerror("SED1330 '%s' Display Page 3: flash fFR/32\n", tag()); break;
+			case FC_FLASH_64:   logerror("SED1330 '%s' Display Page 3: flash fFR/64\n", tag()); break;
 			}
 		}
 		break;
@@ -526,10 +526,10 @@ WRITE8_MEMBER( sed1330_device::data_w )
 		{
 			switch (m_mx)
 			{
-			case MX_OR:				logerror("SED1330 '%s' Display Composition Method: OR\n", tag());				break;
-			case MX_XOR:			logerror("SED1330 '%s' Display Composition Method: Exclusive-OR\n", tag());	break;
-			case MX_AND:			logerror("SED1330 '%s' Display Composition Method: AND\n", tag());			break;
-			case MX_PRIORITY_OR:	logerror("SED1330 '%s' Display Composition Method: Priority-OR\n", tag());	break;
+			case MX_OR:             logerror("SED1330 '%s' Display Composition Method: OR\n", tag());               break;
+			case MX_XOR:            logerror("SED1330 '%s' Display Composition Method: Exclusive-OR\n", tag()); break;
+			case MX_AND:            logerror("SED1330 '%s' Display Composition Method: AND\n", tag());          break;
+			case MX_PRIORITY_OR:    logerror("SED1330 '%s' Display Composition Method: Priority-OR\n", tag());  break;
 			}
 
 			logerror("SED1330 '%s' Display Page 1 Mode: %s\n", tag(), BIT(data, 2) ? "Graphics" : "Text");

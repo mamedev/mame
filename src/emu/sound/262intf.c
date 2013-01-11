@@ -12,9 +12,9 @@
 
 struct ymf262_state
 {
-	sound_stream *	stream;
-	emu_timer *		timer[2];
-	void *			chip;
+	sound_stream *  stream;
+	emu_timer *     timer[2];
+	void *          chip;
 	const ymf262_interface *intf;
 	device_t *device;
 };
@@ -52,11 +52,11 @@ static void timer_handler_262(void *param,int timer, attotime period)
 {
 	ymf262_state *info = (ymf262_state *)param;
 	if( period == attotime::zero )
-	{	/* Reset FM Timer */
+	{   /* Reset FM Timer */
 		info->timer[timer]->enable(false);
 	}
 	else
-	{	/* Start FM Timer */
+	{   /* Start FM Timer */
 		info->timer[timer]->adjust(period);
 	}
 }
@@ -134,7 +134,7 @@ const device_type YMF262 = &device_creator<ymf262_device>;
 
 ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF262, "YMF262", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ymf262_state);
 }
@@ -185,5 +185,3 @@ void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

@@ -71,7 +71,7 @@ DECLARE_READ16_DEVICE_HANDLER( spb640_r );
 DECLARE_WRITE16_DEVICE_HANDLER( spb640_w );
 
 class sp0256_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

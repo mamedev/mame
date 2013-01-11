@@ -19,14 +19,14 @@
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180
 
-#define INTERLACED		0
+#define INTERLACED      0
 
 class uzebox_state : public driver_device
 {
 public:
 	uzebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-        m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -48,15 +48,15 @@ public:
 	UINT32 screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	int 			m_vpos;
-	UINT64			m_line_start_cycles;
-	UINT32			m_line_pos_cycles;
-	UINT8			m_port_a;
-	UINT8			m_port_b;
-	UINT8			m_port_c;
-	UINT8			m_port_d;
-	UINT16			m_joy_data[2];
-	bitmap_rgb32	m_bitmap;
+	int             m_vpos;
+	UINT64          m_line_start_cycles;
+	UINT32          m_line_pos_cycles;
+	UINT8           m_port_a;
+	UINT8           m_port_b;
+	UINT8           m_port_c;
+	UINT8           m_port_d;
+	UINT16          m_joy_data[2];
+	bitmap_rgb32    m_bitmap;
 };
 
 void uzebox_state::machine_start()

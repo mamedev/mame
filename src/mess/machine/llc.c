@@ -101,7 +101,7 @@ Z80CTC_INTERFACE( llc1_ctc_intf )
 
 Z80PIO_INTERFACE( llc1_z80pio1_intf )
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_a_r),
 	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_a_w),
 	DEVCB_NULL,
@@ -112,7 +112,7 @@ Z80PIO_INTERFACE( llc1_z80pio1_intf )
 
 Z80PIO_INTERFACE( llc1_z80pio2_intf )
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(llc_state, llc1_port2_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -216,7 +216,7 @@ WRITE8_MEMBER(llc_state::llc2_port1_b_w)
 
 Z80PIO_INTERFACE( llc2_z80pio1_intf )
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_DEVICE_MEMBER(K7659_KEYBOARD_TAG, k7659_keyboard_device, read),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -232,7 +232,7 @@ READ8_MEMBER(llc_state::llc2_port2_a_r)
 
 Z80PIO_INTERFACE( llc2_z80pio2_intf )
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(llc_state, llc2_port2_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -240,4 +240,3 @@ Z80PIO_INTERFACE( llc2_z80pio2_intf )
 	DEVCB_NULL,
 	DEVCB_NULL
 };
-

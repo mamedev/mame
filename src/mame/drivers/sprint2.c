@@ -103,9 +103,9 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 	}
 
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-	discrete_sound_w(discrete, space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
+	discrete_sound_w(discrete, space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
 	discrete_sound_w(discrete, space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
-	discrete_sound_w(discrete, space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
+	discrete_sound_w(discrete, space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( sprint2 )
 	PORT_DIPSETTING(    0x40, "120 seconds" )
 	PORT_DIPSETTING(    0x00, "150 seconds" )
 
-	PORT_START("INA")	/* input A */
+	PORT_START("INA")   /* input A */
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 1st gear */
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 1st gear */
 	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 2nd gear */
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( sprint2 )
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 3rd gear */
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 3rd gear */
 
-	PORT_START("INB")	/* input B */
+	PORT_START("INB")   /* input B */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 1 Gas") PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 2 Gas") PORT_PLAYER(2)
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
@@ -375,9 +375,9 @@ static INPUT_PORTS_START( sprint1 )
 	PORT_DIPSETTING(    0x40, "120 seconds" )
 	PORT_DIPSETTING(    0x00, "150 seconds" )
 
-	PORT_START("INA")	/* input A */
+	PORT_START("INA")   /* input A */
 
-	PORT_START("INB")	/* input B */
+	PORT_START("INB")   /* input B */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* 1st gear */
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* 2nd gear */
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* 3rd gear */
@@ -410,14 +410,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dominos )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x01, "Points to Win" )
-	PORT_DIPSETTING(	0x03, "6" )
-	PORT_DIPSETTING(	0x02, "5" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x00, "3" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPNAME( 0x0C, 0x08, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -431,13 +431,13 @@ static INPUT_PORTS_START( dominos )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("INA")	/* input A */
+	PORT_START("INA")   /* input A */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 
-	PORT_START("INB")	/* input B */
+	PORT_START("INB")   /* input B */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -574,8 +574,8 @@ ROM_START( sprint1 )
 	ROM_LOAD_NIB_LOW ( "6398-01.k6", 0x0000, 0x0200, CRC(c9e1017e) SHA1(e7279a13e4a812d2e0218be0bc5162f2e56c6b66) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* SYNC */
-	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )	/* address */
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  /* address */
 ROM_END
 
 
@@ -599,8 +599,8 @@ ROM_START( sprint2 )
 	ROM_LOAD_NIB_LOW ( "6398-01.k6", 0x0000, 0x0200, CRC(c9e1017e) SHA1(e7279a13e4a812d2e0218be0bc5162f2e56c6b66) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* SYNC */
-	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )	/* address */
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  /* address */
 ROM_END
 
 
@@ -624,8 +624,8 @@ ROM_START( sprint2a )
 	ROM_LOAD_NIB_LOW ( "6398-01.k6", 0x0000, 0x0200, CRC(c9e1017e) SHA1(e7279a13e4a812d2e0218be0bc5162f2e56c6b66) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* SYNC */
-	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )	/* address */
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  /* address */
 ROM_END
 
 
@@ -649,8 +649,8 @@ ROM_START( sprint2h )
 	ROM_LOAD_NIB_LOW ( "6398-01.k6", 0x0000, 0x0200, CRC(c9e1017e) SHA1(e7279a13e4a812d2e0218be0bc5162f2e56c6b66) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* SYNC */
-	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )	/* address */
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  /* address */
 ROM_END
 
 
@@ -669,8 +669,8 @@ ROM_START( dominos )
 	ROM_FILL( 0x0000, 0x0200, 0 )
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* SYNC */
-	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )	/* address */
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  /* address */
 ROM_END
 
 

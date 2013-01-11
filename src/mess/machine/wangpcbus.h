@@ -23,7 +23,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define WANGPC_BUS_TAG		"wangpcbus"
+#define WANGPC_BUS_TAG      "wangpcbus"
 
 
 
@@ -32,8 +32,8 @@
 //**************************************************************************
 
 #define MCFG_WANGPC_BUS_ADD(_config) \
-    MCFG_DEVICE_ADD(WANGPC_BUS_TAG, WANGPC_BUS, 0) \
-    MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_ADD(WANGPC_BUS_TAG, WANGPC_BUS, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 #define WANGPC_BUS_INTERFACE(_name) \
@@ -41,7 +41,7 @@
 
 
 #define MCFG_WANGPC_BUS_SLOT_ADD(_tag, _sid, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, WANGPC_BUS_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, WANGPC_BUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	wangpcbus_slot_device::static_set_wangpcbus_slot(*device, _sid);
 
@@ -56,7 +56,7 @@
 class wangpcbus_device;
 
 class wangpcbus_slot_device : public device_t,
-							  public device_slot_interface
+								public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -65,8 +65,8 @@ public:
 	// device-level overrides
 	virtual void device_start();
 
-    // inline configuration
-    static void static_set_wangpcbus_slot(device_t &device, int sid);
+	// inline configuration
+	static void static_set_wangpcbus_slot(device_t &device, int sid);
 
 private:
 	// configuration
@@ -83,16 +83,16 @@ extern const device_type WANGPC_BUS_SLOT;
 
 struct wangpcbus_interface
 {
-    devcb_write_line	m_out_irq2_cb;
-    devcb_write_line	m_out_irq3_cb;
-    devcb_write_line	m_out_irq4_cb;
-    devcb_write_line	m_out_irq5_cb;
-    devcb_write_line	m_out_irq6_cb;
-    devcb_write_line	m_out_irq7_cb;
-    devcb_write_line	m_out_drq1_cb;
-    devcb_write_line	m_out_drq2_cb;
-    devcb_write_line	m_out_drq3_cb;
-    devcb_write_line	m_out_ioerror_cb;
+	devcb_write_line    m_out_irq2_cb;
+	devcb_write_line    m_out_irq3_cb;
+	devcb_write_line    m_out_irq4_cb;
+	devcb_write_line    m_out_irq5_cb;
+	devcb_write_line    m_out_irq6_cb;
+	devcb_write_line    m_out_irq7_cb;
+	devcb_write_line    m_out_drq1_cb;
+	devcb_write_line    m_out_drq2_cb;
+	devcb_write_line    m_out_drq3_cb;
+	devcb_write_line    m_out_ioerror_cb;
 };
 
 class device_wangpcbus_card_interface;
@@ -101,7 +101,7 @@ class device_wangpcbus_card_interface;
 // ======================> wangpcbus_device
 
 class wangpcbus_device : public device_t,
-						 public wangpcbus_interface
+							public wangpcbus_interface
 {
 public:
 	// construction/destruction
@@ -149,16 +149,16 @@ protected:
 	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line	m_out_irq2_func;
-	devcb_resolved_write_line	m_out_irq3_func;
-	devcb_resolved_write_line	m_out_irq4_func;
-	devcb_resolved_write_line	m_out_irq5_func;
-	devcb_resolved_write_line	m_out_irq6_func;
-	devcb_resolved_write_line	m_out_irq7_func;
-	devcb_resolved_write_line	m_out_drq1_func;
-	devcb_resolved_write_line	m_out_drq2_func;
-	devcb_resolved_write_line	m_out_drq3_func;
-	devcb_resolved_write_line	m_out_ioerror_func;
+	devcb_resolved_write_line   m_out_irq2_func;
+	devcb_resolved_write_line   m_out_irq3_func;
+	devcb_resolved_write_line   m_out_irq4_func;
+	devcb_resolved_write_line   m_out_irq5_func;
+	devcb_resolved_write_line   m_out_irq6_func;
+	devcb_resolved_write_line   m_out_irq7_func;
+	devcb_resolved_write_line   m_out_drq1_func;
+	devcb_resolved_write_line   m_out_drq2_func;
+	devcb_resolved_write_line   m_out_drq3_func;
+	devcb_resolved_write_line   m_out_ioerror_func;
 
 	simple_list<device_wangpcbus_card_interface> m_device_list;
 };

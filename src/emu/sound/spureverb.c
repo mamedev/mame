@@ -92,13 +92,13 @@ void reverb::bandpass(signed short *sp,
 }
 
 void reverb::comb_allpass1(signed short *sp,
-													 signed short *dp,
-													 const comb_param &comb_delay,
-													 const int comb_gain,
-													 const int allpass_delay,
-													 const int allpass_gain,
-													 const int *rvol,
-													 const unsigned int sz)
+														signed short *dp,
+														const comb_param &comb_delay,
+														const int comb_gain,
+														const int allpass_delay,
+														const int allpass_gain,
+														const int *rvol,
+														const unsigned int sz)
 {
 	for (unsigned int i=0; i<(sz>>2); i++, sp+=2, dp+=2)
 	{
@@ -142,16 +142,16 @@ void reverb::comb_allpass1(signed short *sp,
 //
 
 void reverb::comb_allpass4(signed short *sp,
-													 signed short *dp,
-													 const comb_param &comb_delay,
-													 const int comb_gain,
-													 const int allpass_delay,
-													 const int allpass_gain,
-													 const int *rvol,
-													 const unsigned int sz)
+														signed short *dp,
+														const comb_param &comb_delay,
+														const int comb_gain,
+														const int allpass_delay,
+														const int allpass_gain,
+														const int *rvol,
+														const unsigned int sz)
 {
 #ifdef use_intrinsics
-	__m64	cg=_mm_set1_pi16(comb_gain),
+	__m64   cg=_mm_set1_pi16(comb_gain),
 				ag=_mm_set1_pi16(allpass_gain),
 				rv[2];
 	rv[0]=_mm_set1_pi16(rvol[0]);
@@ -237,7 +237,7 @@ void reverb::comb_allpass(signed short *sp,
 {
 	unsigned int sz=_sz;
 	comb_param comb_delay;
-	int	comb_gain=(int)(rp->comb_gain*32767),
+	int comb_gain=(int)(rp->comb_gain*32767),
 			allpass_delay=(int)(((rp->allpass_delay/1000.0f)*sound_hz))&~3,
 			allpass_gain=(int)(rp->allpass_gain*32767),
 			rvol[2]={ (signed short)wetvol_l,
@@ -306,14 +306,14 @@ void reverb::comb_allpass(signed short *sp,
 //
 
 void reverb::process(signed short *output,
-									 signed short *reverb_input,
-									 const reverb_params *rp,
-									 const int wetvol_l,
-									 const int wetvol_r,
-										 const unsigned int sz)
+										signed short *reverb_input,
+										const reverb_params *rp,
+										const int wetvol_l,
+										const int wetvol_r,
+											const unsigned int sz)
 {
 	signed short *sp=(signed short *)reverb_input,
-							 *dp=(signed short *)output;
+								*dp=(signed short *)output;
 
 	if (rp->band_gain>0.0f)
 	{

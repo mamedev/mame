@@ -88,13 +88,13 @@ const device_type SID6581 = &device_creator<sid6581_device>;
 
 sid6581_device::sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SID6581, "SID6581", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(SID6581_t);
 }
 sid6581_device::sid6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(SID6581_t);
 }
@@ -163,5 +163,3 @@ void sid8580_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

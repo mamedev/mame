@@ -289,16 +289,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 WRITE8_MEMBER(speedatk_state::speedatk_output_w)
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update_speedatk)
 
-	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)   /* hand tuned to get ~60 fps */
 
 	MCFG_GFXDECODE(speedatk)
 	MCFG_PALETTE_LENGTH(0x100)
@@ -364,8 +364,8 @@ ROM_START( speedatk )
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "cb0-5",        0x0000, 0x2000, CRC(47a966e7) SHA1(fdaa0f88656afc431bae367679ce6298fa962e0f) )
 	ROM_LOAD( "cb0-6",        0x2000, 0x2000, CRC(cc1da937) SHA1(1697bb008bfa5c33a282bd470ac39c324eea7509) )
-	ROM_COPY( "gfx2",   	  0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
-	ROM_COPY( "gfx1",   	  0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
+	ROM_COPY( "gfx2",         0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
+	ROM_COPY( "gfx1",         0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "cb1.bpr",      0x0000, 0x0020, CRC(a0176c23) SHA1(133fb9eef8a6595cac2dcd7edce4789899a59e84) ) /* color PROM */
@@ -373,4 +373,3 @@ ROM_START( speedatk )
 ROM_END
 
 GAME( 1984, speedatk, 0, speedatk, speedatk, driver_device, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", 0 )
-

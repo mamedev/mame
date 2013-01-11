@@ -160,125 +160,125 @@
     CONSTANTS
 ***************************************************************************/
 
-#define VERBOSE			0	/* General logging */
-#define VERBOSE_DATA	0	/* Logging of each byte during read and write */
+#define VERBOSE         0   /* General logging */
+#define VERBOSE_DATA    0   /* Logging of each byte during read and write */
 
-#define DELAY_ERROR		3
-#define DELAY_NOTREADY	1
-#define DELAY_DATADONE	3
+#define DELAY_ERROR     3
+#define DELAY_NOTREADY  1
+#define DELAY_DATADONE  3
 
-#define TYPE_I			1
-#define TYPE_II 		2
-#define TYPE_III		3
-#define TYPE_IV 		4
+#define TYPE_I          1
+#define TYPE_II         2
+#define TYPE_III        3
+#define TYPE_IV         4
 
 #define FDC_STEP_RATE   0x03    /* Type I additional flags */
-#define FDC_STEP_VERIFY 0x04	/* verify track number */
-#define FDC_STEP_HDLOAD 0x08	/* load head */
-#define FDC_STEP_UPDATE 0x10	/* update track register */
+#define FDC_STEP_VERIFY 0x04    /* verify track number */
+#define FDC_STEP_HDLOAD 0x08    /* load head */
+#define FDC_STEP_UPDATE 0x10    /* update track register */
 
-#define FDC_RESTORE 	0x00	/* Type I commands */
-#define FDC_SEEK		0x10
-#define FDC_STEP		0x20
-#define FDC_STEP_IN 	0x40
-#define FDC_STEP_OUT	0x60
+#define FDC_RESTORE     0x00    /* Type I commands */
+#define FDC_SEEK        0x10
+#define FDC_STEP        0x20
+#define FDC_STEP_IN     0x40
+#define FDC_STEP_OUT    0x60
 
-#define FDC_MASK_TYPE_I 		(FDC_STEP_HDLOAD|FDC_STEP_VERIFY|FDC_STEP_RATE)
+#define FDC_MASK_TYPE_I         (FDC_STEP_HDLOAD|FDC_STEP_VERIFY|FDC_STEP_RATE)
 
 /* Type I commands status */
-#define STA_1_BUSY		0x01	/* controller is busy */
-#define STA_1_IPL		0x02	/* index pulse */
-#define STA_1_TRACK0	0x04	/* track 0 detected */
-#define STA_1_CRC_ERR	0x08	/* CRC error */
-#define STA_1_SEEK_ERR	0x10	/* seek error */
-#define STA_1_HD_LOADED 0x20	/* head loaded */
-#define STA_1_WRITE_PRO 0x40	/* floppy is write protected */
-#define STA_1_NOT_READY 0x80	/* drive not ready */
-#define STA_1_MOTOR_ON	0x80	/* status of the Motor On output (WD1770 and WD1772 only) */
+#define STA_1_BUSY      0x01    /* controller is busy */
+#define STA_1_IPL       0x02    /* index pulse */
+#define STA_1_TRACK0    0x04    /* track 0 detected */
+#define STA_1_CRC_ERR   0x08    /* CRC error */
+#define STA_1_SEEK_ERR  0x10    /* seek error */
+#define STA_1_HD_LOADED 0x20    /* head loaded */
+#define STA_1_WRITE_PRO 0x40    /* floppy is write protected */
+#define STA_1_NOT_READY 0x80    /* drive not ready */
+#define STA_1_MOTOR_ON  0x80    /* status of the Motor On output (WD1770 and WD1772 only) */
 
 /* Type II and III additional flags */
-#define FDC_DELETED_AM	0x01	/* read/write deleted address mark */
-#define FDC_SIDE_CMP_T	0x02	/* side compare track data */
-#define FDC_15MS_DELAY	0x04	/* delay 15ms before command */
-#define FDC_SIDE_CMP_S	0x08	/* side compare sector data */
-#define FDC_MULTI_REC	0x10	/* only for type II commands */
+#define FDC_DELETED_AM  0x01    /* read/write deleted address mark */
+#define FDC_SIDE_CMP_T  0x02    /* side compare track data */
+#define FDC_15MS_DELAY  0x04    /* delay 15ms before command */
+#define FDC_SIDE_CMP_S  0x08    /* side compare sector data */
+#define FDC_MULTI_REC   0x10    /* only for type II commands */
 
 /* Type II commands */
-#define FDC_READ_SEC	0x80	/* read sector */
-#define FDC_WRITE_SEC	0xA0	/* write sector */
+#define FDC_READ_SEC    0x80    /* read sector */
+#define FDC_WRITE_SEC   0xA0    /* write sector */
 
-#define FDC_MASK_TYPE_II		(FDC_MULTI_REC|FDC_SIDE_CMP_S|FDC_15MS_DELAY|FDC_SIDE_CMP_T|FDC_DELETED_AM)
+#define FDC_MASK_TYPE_II        (FDC_MULTI_REC|FDC_SIDE_CMP_S|FDC_15MS_DELAY|FDC_SIDE_CMP_T|FDC_DELETED_AM)
 
 /* Type II commands status */
-#define STA_2_BUSY		0x01
-#define STA_2_DRQ		0x02
-#define STA_2_LOST_DAT	0x04
-#define STA_2_CRC_ERR	0x08
+#define STA_2_BUSY      0x01
+#define STA_2_DRQ       0x02
+#define STA_2_LOST_DAT  0x04
+#define STA_2_CRC_ERR   0x08
 #define STA_2_REC_N_FND 0x10
-#define STA_2_REC_TYPE	0x20
+#define STA_2_REC_TYPE  0x20
 #define STA_2_WRITE_PRO 0x40
 #define STA_2_NOT_READY 0x80
 
-#define FDC_MASK_TYPE_III		(FDC_SIDE_CMP_S|FDC_15MS_DELAY|FDC_SIDE_CMP_T|FDC_DELETED_AM)
+#define FDC_MASK_TYPE_III       (FDC_SIDE_CMP_S|FDC_15MS_DELAY|FDC_SIDE_CMP_T|FDC_DELETED_AM)
 
 /* Type III commands */
-#define FDC_READ_DAM	0xc0	/* read data address mark */
-#define FDC_READ_TRK	0xe0	/* read track */
-#define FDC_WRITE_TRK	0xf0	/* write track (format) */
+#define FDC_READ_DAM    0xc0    /* read data address mark */
+#define FDC_READ_TRK    0xe0    /* read track */
+#define FDC_WRITE_TRK   0xf0    /* write track (format) */
 
 /* Type IV additional flags */
-#define FDC_IM0 		0x01	/* interrupt mode 0 */
-#define FDC_IM1 		0x02	/* interrupt mode 1 */
-#define FDC_IM2 		0x04	/* interrupt mode 2 */
-#define FDC_IM3 		0x08	/* interrupt mode 3 */
+#define FDC_IM0         0x01    /* interrupt mode 0 */
+#define FDC_IM1         0x02    /* interrupt mode 1 */
+#define FDC_IM2         0x04    /* interrupt mode 2 */
+#define FDC_IM3         0x08    /* interrupt mode 3 */
 
-#define FDC_MASK_TYPE_IV		(FDC_IM3|FDC_IM2|FDC_IM1|FDC_IM0)
+#define FDC_MASK_TYPE_IV        (FDC_IM3|FDC_IM2|FDC_IM1|FDC_IM0)
 
 /* Type IV commands */
-#define FDC_FORCE_INT	0xd0	/* force interrupt */
+#define FDC_FORCE_INT   0xd0    /* force interrupt */
 
 /* structure describing a double density track */
-#define TRKSIZE_DD		6144
+#define TRKSIZE_DD      6144
 #if 0
 static const UINT8 track_DD[][2] = {
-	{16, 0x4e}, 	/* 16 * 4E (track lead in)               */
-	{ 8, 0x00}, 	/*  8 * 00 (pre DAM)                     */
-	{ 3, 0xf5}, 	/*  3 * F5 (clear CRC)                   */
+	{16, 0x4e},     /* 16 * 4E (track lead in)               */
+	{ 8, 0x00},     /*  8 * 00 (pre DAM)                     */
+	{ 3, 0xf5},     /*  3 * F5 (clear CRC)                   */
 
-	{ 1, 0xfe}, 	/* *** sector *** FE (DAM)               */
-	{ 1, 0x80}, 	/*  4 bytes track,head,sector,seclen     */
-	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
-	{22, 0x4e}, 	/* 22 * 4E (sector lead in)              */
-	{12, 0x00}, 	/* 12 * 00 (pre AM)                      */
-	{ 3, 0xf5}, 	/*  3 * F5 (clear CRC)                   */
-	{ 1, 0xfb}, 	/*  1 * FB (AM)                          */
-	{ 1, 0x81}, 	/*  x bytes sector data                  */
-	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
-	{16, 0x4e}, 	/* 16 * 4E (sector lead out)             */
-	{ 8, 0x00}, 	/*  8 * 00 (post sector)                 */
-	{ 0, 0x00}, 	/* end of data                           */
+	{ 1, 0xfe},     /* *** sector *** FE (DAM)               */
+	{ 1, 0x80},     /*  4 bytes track,head,sector,seclen     */
+	{ 1, 0xf7},     /*  1 * F7 (CRC)                         */
+	{22, 0x4e},     /* 22 * 4E (sector lead in)              */
+	{12, 0x00},     /* 12 * 00 (pre AM)                      */
+	{ 3, 0xf5},     /*  3 * F5 (clear CRC)                   */
+	{ 1, 0xfb},     /*  1 * FB (AM)                          */
+	{ 1, 0x81},     /*  x bytes sector data                  */
+	{ 1, 0xf7},     /*  1 * F7 (CRC)                         */
+	{16, 0x4e},     /* 16 * 4E (sector lead out)             */
+	{ 8, 0x00},     /*  8 * 00 (post sector)                 */
+	{ 0, 0x00},     /* end of data                           */
 };
 #endif
 
 /* structure describing a single density track */
-#define TRKSIZE_SD		3172
+#define TRKSIZE_SD      3172
 #if 0
 static const UINT8 track_SD[][2] = {
-	{16, 0xff}, 	/* 16 * FF (track lead in)               */
-	{ 8, 0x00}, 	/*  8 * 00 (pre DAM)                     */
-	{ 1, 0xfc}, 	/*  1 * FC (clear CRC)                   */
+	{16, 0xff},     /* 16 * FF (track lead in)               */
+	{ 8, 0x00},     /*  8 * 00 (pre DAM)                     */
+	{ 1, 0xfc},     /*  1 * FC (clear CRC)                   */
 
-	{11, 0xff}, 	/* *** sector *** 11 * FF                */
-	{ 6, 0x00}, 	/*  6 * 00 (pre DAM)                     */
-	{ 1, 0xfe}, 	/*  1 * FE (DAM)                         */
-	{ 1, 0x80}, 	/*  4 bytes track,head,sector,seclen     */
-	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
-	{10, 0xff}, 	/* 10 * FF (sector lead in)              */
-	{ 4, 0x00}, 	/*  4 * 00 (pre AM)                      */
-	{ 1, 0xfb}, 	/*  1 * FB (AM)                          */
-	{ 1, 0x81}, 	/*  x bytes sector data                  */
-	{ 1, 0xf7}, 	/*  1 * F7 (CRC)                         */
-	{ 0, 0x00}, 	/* end of data                           */
+	{11, 0xff},     /* *** sector *** 11 * FF                */
+	{ 6, 0x00},     /*  6 * 00 (pre DAM)                     */
+	{ 1, 0xfe},     /*  1 * FE (DAM)                         */
+	{ 1, 0x80},     /*  4 bytes track,head,sector,seclen     */
+	{ 1, 0xf7},     /*  1 * F7 (CRC)                         */
+	{10, 0xff},     /* 10 * FF (sector lead in)              */
+	{ 4, 0x00},     /*  4 * 00 (pre AM)                      */
+	{ 1, 0xfb},     /*  1 * FB (AM)                          */
+	{ 1, 0x81},     /*  x bytes sector data                  */
+	{ 1, 0xf7},     /*  1 * F7 (CRC)                         */
+	{ 0, 0x00},     /* end of data                           */
 };
 #endif
 
@@ -319,37 +319,37 @@ struct wd1770_state
 
 	int stepping_rate[4];  /* track stepping rate in ms */
 
-        unsigned short  crc;    /* Holds the current CRC value for write_track CRC calculation */
-        int     crc_active;	/* Flag indicating that CRC calculation in write_track is active. */
+		unsigned short  crc;    /* Holds the current CRC value for write_track CRC calculation */
+		int     crc_active; /* Flag indicating that CRC calculation in write_track is active. */
 
-	UINT8	track_reg;				/* value of track register */
-	UINT8	command_type;			/* last command type */
-	UINT8	head;					/* current head # */
+	UINT8   track_reg;              /* value of track register */
+	UINT8   command_type;           /* last command type */
+	UINT8   head;                   /* current head # */
 
-	UINT8	read_cmd;				/* last read command issued */
-	UINT8	write_cmd;				/* last write command issued */
-	INT8	direction;				/* last step direction */
-	UINT8   last_command_data;		/* last command data */
+	UINT8   read_cmd;               /* last read command issued */
+	UINT8   write_cmd;              /* last write command issued */
+	INT8    direction;              /* last step direction */
+	UINT8   last_command_data;      /* last command data */
 
-	UINT8	status_drq; 			/* status register data request bit */
-	UINT8	busy_count; 			/* how long to keep busy bit set */
+	UINT8   status_drq;             /* status register data request bit */
+	UINT8   busy_count;             /* how long to keep busy bit set */
 
-	UINT8	buffer[6144];			/* I/O buffer (holds up to a whole track) */
-	UINT32	data_offset;			/* offset into I/O buffer */
-	INT32	data_count; 			/* transfer count from/into I/O buffer */
+	UINT8   buffer[6144];           /* I/O buffer (holds up to a whole track) */
+	UINT32  data_offset;            /* offset into I/O buffer */
+	INT32   data_count;             /* transfer count from/into I/O buffer */
 
-	UINT8	*fmt_sector_data[256];	/* pointer to data after formatting a track */
+	UINT8   *fmt_sector_data[256];  /* pointer to data after formatting a track */
 
-	UINT8	dam_list[256][4];		/* list of data address marks while formatting */
-	int 	dam_data[256];			/* offset to data inside buffer while formatting */
-	int 	dam_cnt;				/* valid number of entries in the dam_list */
-	UINT16	sector_length;			/* sector length (byte) */
+	UINT8   dam_list[256][4];       /* list of data address marks while formatting */
+	int     dam_data[256];          /* offset to data inside buffer while formatting */
+	int     dam_cnt;                /* valid number of entries in the dam_list */
+	UINT16  sector_length;          /* sector length (byte) */
 
-	UINT8	ddam;					/* ddam of sector found - used when reading */
-	UINT8	sector_data_id;
-	int		data_direction;
+	UINT8   ddam;                   /* ddam of sector found - used when reading */
+	UINT8   sector_data_id;
+	int     data_direction;
 
-	int     hld_count;				/* head loaded counter */
+	int     hld_count;              /* head loaded counter */
 
 	/* timers to delay execution/completion of commands */
 	emu_timer *timer_cmd, *timer_data, *timer_rs, *timer_ws;
@@ -364,7 +364,7 @@ struct wd1770_state
 	int pause_time;
 
 	/* Were we busy when we received a FORCE_INT command */
-	UINT8	was_busy;
+	UINT8   was_busy;
 
 	/* Pointer to interface */
 	const wd17xx_interface *intf;
@@ -480,7 +480,7 @@ static void wd17xx_set_drq(device_t *device)
 }
 
 /* clear interrupt request */
-static void	wd17xx_clear_intrq(device_t *device)
+static void wd17xx_clear_intrq(device_t *device)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -489,7 +489,7 @@ static void	wd17xx_clear_intrq(device_t *device)
 }
 
 /* set interrupt request */
-static void	wd17xx_set_intrq(device_t *device)
+static void wd17xx_set_intrq(device_t *device)
 {
 	wd1770_state *w = get_safe_token(device);
 
@@ -518,15 +518,15 @@ static TIMER_CALLBACK( wd17xx_data_callback )
 	device_t *device = (device_t *)ptr;
 	wd1770_state *w = get_safe_token(device);
 
-   /* check if this is a write command */
-   if( (w->command_type == TYPE_II && w->command == FDC_WRITE_SEC) ||
-         (w->command_type == TYPE_III && w->command == FDC_WRITE_TRK) )
-   {
-      /* we are ready for new data */
-      wd17xx_set_drq(device);
+	/* check if this is a write command */
+	if( (w->command_type == TYPE_II && w->command == FDC_WRITE_SEC) ||
+			(w->command_type == TYPE_III && w->command == FDC_WRITE_TRK) )
+	{
+		/* we are ready for new data */
+		wd17xx_set_drq(device);
 
-      return;
-   }
+		return;
+	}
 
 	/* any bytes remaining? */
 	if (w->data_count >= 1)
@@ -571,7 +571,7 @@ static TIMER_CALLBACK( wd17xx_data_callback )
 			else
 			{
 				/* Delay the INTRQ 3 byte times because we need to read two CRC bytes and
-                   compare them with a calculated CRC */
+				   compare them with a calculated CRC */
 				wd17xx_complete_command(device, DELAY_DATADONE);
 
 				if (VERBOSE)
@@ -641,7 +641,7 @@ static void wd17xx_command_restore(device_t *device)
 	w->track = 0;
 #if 0
 	/* simulate seek time busy signal */
-	w->busy_count = 0;	//w->busy_count * ((w->data & FDC_STEP_RATE) + 1);
+	w->busy_count = 0;  //w->busy_count * ((w->data & FDC_STEP_RATE) + 1);
 
 	/* when command completes set irq */
 	wd17xx_set_intrq(device);
@@ -684,24 +684,24 @@ static void write_track(device_t *device)
 #endif
 
 	/* Get the size in bytes of the current track. For real hardware this
-    may vary per system in small degree, and there even for each track
-    and head, so we should not assume a fixed value here.
-    As we are using a buffered track writing, we have to find out how long
-    the track will become. The only object which can tell us is the
-    selected format.
-    */
+	may vary per system in small degree, and there even for each track
+	and head, so we should not assume a fixed value here.
+	As we are using a buffered track writing, we have to find out how long
+	the track will become. The only object which can tell us is the
+	selected format.
+	*/
 	w->data_count = 0;
 	floppy = flopimg_get_image(w->drive);
 	if (floppy != NULL)
 		w->data_count = floppy_get_track_size(floppy, w->hd, w->track);
 
-        if (w->data_count==0)
-        {
+		if (w->data_count==0)
+		{
 			if (wd17xx_is_sd_only(device))
 				w->data_count = TRKSIZE_SD;
 			else
 				w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
-        }
+		}
 
 	floppy_drive_write_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
 
@@ -723,15 +723,15 @@ static void read_track(device_t *device)
 	wd1770_state *w = get_safe_token(device);
 	floppy_image_legacy *floppy;
 #if 0
-	UINT8 *psrc;		/* pointer to track format structure */
-	UINT8 *pdst;		/* pointer to track buffer */
-	int cnt;			/* number of bytes to fill in */
-	UINT16 crc; 		/* id or data CRC */
-	UINT8 d;			/* data */
+	UINT8 *psrc;        /* pointer to track format structure */
+	UINT8 *pdst;        /* pointer to track buffer */
+	int cnt;            /* number of bytes to fill in */
+	UINT16 crc;         /* id or data CRC */
+	UINT8 d;            /* data */
 	UINT8 t = w->track; /* track of DAM */
-	UINT8 h = w->head;	/* head of DAM */
-	UINT8 s = w->sector_dam;		/* sector of DAM */
-	UINT16 l = w->sector_length;	/* sector length of DAM */
+	UINT8 h = w->head;  /* head of DAM */
+	UINT8 s = w->sector_dam;        /* sector of DAM */
+	UINT16 l = w->sector_length;    /* sector length of DAM */
 	int i;
 
 	for (i = 0; i < w->sec_per_track; i++)
@@ -757,7 +757,7 @@ static void read_track(device_t *device)
 
 	while (cnt > 0)
 	{
-		if (psrc[0] == 0)	   /* no more track format info ? */
+		if (psrc[0] == 0)      /* no more track format info ? */
 		{
 			if (w->dam_cnt < w->sec_per_track) /* but more DAM info ? */
 			{
@@ -768,52 +768,52 @@ static void read_track(device_t *device)
 			}
 		}
 
-		if (psrc[0] != 0)	   /* more track format info ? */
+		if (psrc[0] != 0)      /* more track format info ? */
 		{
 			cnt -= psrc[0];    /* subtract size */
 			d = psrc[1];
 
-			if (d == 0xf5)	   /* clear CRC ? */
+			if (d == 0xf5)     /* clear CRC ? */
 			{
 				crc = 0xffff;
-				d = 0xa1;	   /* store A1 */
+				d = 0xa1;      /* store A1 */
 			}
 
 			for (i = 0; i < *psrc; i++)
 				*pdst++ = d;   /* fill data */
 
-			if (d == 0xf7)	   /* store CRC ? */
+			if (d == 0xf7)     /* store CRC ? */
 			{
-				pdst--; 	   /* go back one byte */
-				*pdst++ = crc & 255;	/* put CRC low */
-				*pdst++ = crc / 256;	/* put CRC high */
-				cnt -= 1;	   /* count one more byte */
+				pdst--;        /* go back one byte */
+				*pdst++ = crc & 255;    /* put CRC low */
+				*pdst++ = crc / 256;    /* put CRC high */
+				cnt -= 1;      /* count one more byte */
 			}
 			else if (d == 0xfe)/* address mark ? */
 			{
-				crc = 0xffff;	/* reset CRC */
+				crc = 0xffff;   /* reset CRC */
 			}
 			else if (d == 0x80)/* sector ID ? */
 			{
-				pdst--; 	   /* go back one byte */
+				pdst--;        /* go back one byte */
 				t = *pdst++ = w->dam_list[w->dam_cnt][0]; /* track number */
 				h = *pdst++ = w->dam_list[w->dam_cnt][1]; /* head number */
 				s = *pdst++ = w->dam_list[w->dam_cnt][2]; /* sector number */
 				l = *pdst++ = w->dam_list[w->dam_cnt][3]; /* sector length code */
 				w->dam_cnt++;
-				crc = ccitt_crc16_one(crc, t);	/* build CRC */
-				crc = ccitt_crc16_one(crc, h);	/* build CRC */
-				crc = ccitt_crc16_one(crc, s);	/* build CRC */
-				crc = ccitt_crc16_one(crc, l);	/* build CRC */
+				crc = ccitt_crc16_one(crc, t);  /* build CRC */
+				crc = ccitt_crc16_one(crc, h);  /* build CRC */
+				crc = ccitt_crc16_one(crc, s);  /* build CRC */
+				crc = ccitt_crc16_one(crc, l);  /* build CRC */
 				l = (l == 0) ? 128 : l << 8;
 			}
 			else if (d == 0xfb)// data address mark ?
 			{
-				crc = 0xffff;	// reset CRC
+				crc = 0xffff;   // reset CRC
 			}
 			else if (d == 0x81)// sector DATA ?
 			{
-				pdst--; 	   /* go back one byte */
+				pdst--;        /* go back one byte */
 				if (seek(w, t, h, s) == 0)
 				{
 					if (mame_fread(w->image_file, pdst, l) != l)
@@ -836,24 +836,24 @@ static void read_track(device_t *device)
 		else
 		{
 			*pdst++ = 0xff;    /* fill track */
-			cnt--;			   /* until end */
+			cnt--;             /* until end */
 		}
 	}
 #endif
 	/* Determine the track size. We cannot allow different sizes in this
-    design (see above, write_track). */
+	design (see above, write_track). */
 	w->data_count = 0;
 	floppy = flopimg_get_image(w->drive);
 	if (floppy != NULL)
 		w->data_count = floppy_get_track_size(floppy, w->hd, w->track);
 
-        if (w->data_count==0)
-        {
+		if (w->data_count==0)
+		{
 			if (wd17xx_is_sd_only(device))
 				w->data_count = TRKSIZE_SD;
 			else
 				w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
-        }
+		}
 
 	floppy_drive_read_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
 
@@ -975,7 +975,7 @@ static int wd17xx_locate_sector(device_t *device)
 			}
 		}
 
-		 /* index set? */
+			/* index set? */
 		if (floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_INDEX))
 		{
 			/* update revolution count */
@@ -1072,9 +1072,9 @@ static void wd17xx_write_sector(device_t *device)
 {
 	wd1770_state *w = get_safe_token(device);
 	/* at this point, the disc is write enabled, and data
-     * has been transfered into our buffer - now write it to
-     * the disc image or to the real disc
-     */
+	 * has been transfered into our buffer - now write it to
+	 * the disc image or to the real disc
+	 */
 
 	/* side compare? */
 	wd17xx_side_compare(device, w->write_cmd);
@@ -1119,7 +1119,7 @@ static void wd17xx_verify_seek(device_t *device)
 			}
 		}
 
-		 /* index set? */
+			/* index set? */
 		if (floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_INDEX))
 		{
 			/* update revolution count */
@@ -1535,10 +1535,10 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if ((data & ~FDC_MASK_TYPE_II) == FDC_READ_SEC)
 		{
 			if (VERBOSE)
-            {
+			{
 				logerror("%s: wd17xx_command_w $%02X READ_SEC (", device->machine().describe_context(), data);
-                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X)\n",w->command,w->track,w->sector,w->data);
-            }
+				logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X)\n",w->command,w->track,w->sector,w->data);
+			}
 			w->read_cmd = data;
 			w->command = data & ~FDC_MASK_TYPE_II;
 			w->command_type = TYPE_II;
@@ -1554,10 +1554,10 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		if ((data & ~FDC_MASK_TYPE_II) == FDC_WRITE_SEC)
 		{
 			if (VERBOSE)
-            {
+			{
 				logerror("%s: wd17xx_command_w $%02X WRITE_SEC (", device->machine().describe_context(), data);
-                logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X)\n",w->command,w->track,w->sector,w->data);
-            }
+				logerror("cmd=%02X, trk=%02X, sec=%02X, dat=%02X)\n",w->command,w->track,w->sector,w->data);
+			}
 
 			w->write_cmd = data;
 			w->command = data & ~FDC_MASK_TYPE_II;
@@ -1712,7 +1712,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		}
 
 		/* simulate seek time busy signal */
-		w->busy_count = 0;	//w->busy_count * ((data & FDC_STEP_RATE) + 1);
+		w->busy_count = 0;  //w->busy_count * ((data & FDC_STEP_RATE) + 1);
 #if 0
 		wd17xx_set_intrq(device);
 #endif
@@ -1726,9 +1726,9 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 			logerror("%s: wd17xx_command_w $%02X STEP dir %+d\n", device->machine().describe_context(), data, w->direction);
 
 		w->command_type = TYPE_I;
-        /* if it is a real floppy, issue a step command */
+		/* if it is a real floppy, issue a step command */
 		/* simulate seek time busy signal */
-		w->busy_count = 0;	//((data & FDC_STEP_RATE) + 1);
+		w->busy_count = 0;  //((data & FDC_STEP_RATE) + 1);
 
 		floppy_drive_seek(w->drive, w->direction);
 
@@ -1751,7 +1751,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		w->command_type = TYPE_I;
 		w->direction = +1;
 		/* simulate seek time busy signal */
-		w->busy_count = 0;	//((data & FDC_STEP_RATE) + 1);
+		w->busy_count = 0;  //((data & FDC_STEP_RATE) + 1);
 
 		floppy_drive_seek(w->drive, w->direction);
 
@@ -1772,7 +1772,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 		w->command_type = TYPE_I;
 		w->direction = -1;
 		/* simulate seek time busy signal */
-		w->busy_count = 0;	//((data & FDC_STEP_RATE) + 1);
+		w->busy_count = 0;  //((data & FDC_STEP_RATE) + 1);
 
 		/* for now only allows a single drive to be selected */
 		floppy_drive_seek(w->drive, w->direction);
@@ -1845,14 +1845,14 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 
 		w->buffer[w->data_offset++] = data;
 
-                if (--w->data_count < 1)
-                {
-                        if (w->command == FDC_WRITE_TRK)
-                                write_track(device);
-                        else
-                                wd17xx_write_sector(device);
+				if (--w->data_count < 1)
+				{
+						if (w->command == FDC_WRITE_TRK)
+								write_track(device);
+						else
+								wd17xx_write_sector(device);
 
-                        w->data_offset = 0;
+						w->data_offset = 0;
 
 						/* Check we should handle the next sector for a multi record write */
 						if ( w->command_type == TYPE_II && w->command == FDC_WRITE_SEC && ( w->write_cmd & FDC_MULTI_REC ) )
@@ -1875,109 +1875,109 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 								logerror("wd17xx_data_w(): multi data write completed\n");
 						}
 //                       wd17xx_complete_command(device, DELAY_DATADONE);
-                }
-                else
-                {
-                        if (w->command == FDC_WRITE_TRK)
-                        {
-                                /* Process special data values according to WD17xx specification.
-                   Note that as CRC values take up two bytes which are written on
-                   every 0xf7 byte, this will cause the actual image to
-                   grow larger than what was written from the system. So we need
-                   to take the value of data_offset when writing the track.
-                                */
-                                if (wd17xx_dden(device))
-                                {
-                                        switch (data)
-                                        {
-                                        case 0xf5:
-                                        case 0xf6:
-                                                /* not allowed in FM. */
-                                                /* Take back the last write. */
-                                                w->data_offset--;
-                                                break;
-                                        case 0xf7:
-                                                /* Take back the last write. */
-                                                w->data_offset--;
-                                                /* write two crc bytes */
-                                                w->buffer[w->data_offset++] = (w->crc>>8)&0xff;
-                                                w->buffer[w->data_offset++] = (w->crc&0xff);
-                                                w->crc_active = FALSE;
-                                                break;
-                                        case 0xf8:
-                                        case 0xf9:
-                                        case 0xfa:
-                                        case 0xfb:
-                                        case 0xfe:
-                                                /* Preset crc */
-                                                w->crc = 0xffff;
+				}
+				else
+				{
+						if (w->command == FDC_WRITE_TRK)
+						{
+								/* Process special data values according to WD17xx specification.
+					Note that as CRC values take up two bytes which are written on
+					every 0xf7 byte, this will cause the actual image to
+					grow larger than what was written from the system. So we need
+					to take the value of data_offset when writing the track.
+								*/
+								if (wd17xx_dden(device))
+								{
+										switch (data)
+										{
+										case 0xf5:
+										case 0xf6:
+												/* not allowed in FM. */
+												/* Take back the last write. */
+												w->data_offset--;
+												break;
+										case 0xf7:
+												/* Take back the last write. */
+												w->data_offset--;
+												/* write two crc bytes */
+												w->buffer[w->data_offset++] = (w->crc>>8)&0xff;
+												w->buffer[w->data_offset++] = (w->crc&0xff);
+												w->crc_active = FALSE;
+												break;
+										case 0xf8:
+										case 0xf9:
+										case 0xfa:
+										case 0xfb:
+										case 0xfe:
+												/* Preset crc */
+												w->crc = 0xffff;
 						/* AM is included in the CRC */
 						w->crc = ccitt_crc16_one(w->crc, data);
-                                                w->crc_active = TRUE;
-                                                break;
-                                        case 0xfc:
-                                                /* Write index mark. No effect here as we do not store clock patterns.
-                           Maybe later. */
-                                                break;
-                                        case 0xfd:
-                                                /* Just write, don't use for CRC. */
-                                                break;
-                                        default:
-                                                /* Byte already written. */
-                                                if (w->crc_active)
-                                                        w->crc = ccitt_crc16_one(w->crc, data);
-                                        }
-                                }
-                                else  /* MFM */
-                                {
-                                        switch (data)
-                                        {
-                                        case 0xf5:
-                                                /* Take back the last write. */
-                                                w->data_offset--;
-                                                /* Write a1 */
-                                                w->buffer[w->data_offset++] = 0xa1;
-                                                /* Preset CRC */
-                                                w->crc = 0xffff;
-                                                w->crc_active = TRUE;
-                                                break;
-                                        case 0xf6:
-                                                /* Take back the last write. */
-                                                w->data_offset--;
-                                                /* Write c2 */
-                                                w->buffer[w->data_offset++] = 0xc2;
-                                                break;
-                                        case 0xf7:
-                                                /* Take back the last write. */
-                                                w->data_offset--;
-                                                /* write two crc bytes */
-                                                w->buffer[w->data_offset++] = (w->crc>>8)&0xff;
-                                                w->buffer[w->data_offset++] = (w->crc&0xff);
-                                                w->crc_active = FALSE;
-                                                break;
-                                        case 0xf8:
-                                        case 0xf9:
-                                        case 0xfa:
-                                        case 0xfb:
-                                        case 0xfc:
-                                        case 0xfd:
-                                                /* Just write, don't use for CRC. */
-                                                break;
-                                        case 0xfe:
+												w->crc_active = TRUE;
+												break;
+										case 0xfc:
+												/* Write index mark. No effect here as we do not store clock patterns.
+							Maybe later. */
+												break;
+										case 0xfd:
+												/* Just write, don't use for CRC. */
+												break;
+										default:
+												/* Byte already written. */
+												if (w->crc_active)
+														w->crc = ccitt_crc16_one(w->crc, data);
+										}
+								}
+								else  /* MFM */
+								{
+										switch (data)
+										{
+										case 0xf5:
+												/* Take back the last write. */
+												w->data_offset--;
+												/* Write a1 */
+												w->buffer[w->data_offset++] = 0xa1;
+												/* Preset CRC */
+												w->crc = 0xffff;
+												w->crc_active = TRUE;
+												break;
+										case 0xf6:
+												/* Take back the last write. */
+												w->data_offset--;
+												/* Write c2 */
+												w->buffer[w->data_offset++] = 0xc2;
+												break;
+										case 0xf7:
+												/* Take back the last write. */
+												w->data_offset--;
+												/* write two crc bytes */
+												w->buffer[w->data_offset++] = (w->crc>>8)&0xff;
+												w->buffer[w->data_offset++] = (w->crc&0xff);
+												w->crc_active = FALSE;
+												break;
+										case 0xf8:
+										case 0xf9:
+										case 0xfa:
+										case 0xfb:
+										case 0xfc:
+										case 0xfd:
+												/* Just write, don't use for CRC. */
+												break;
+										case 0xfe:
 						/* AM is included in the CRC */
 						if (w->crc_active)
 							w->crc = ccitt_crc16_one(w->crc, data);
-                                                break;
-                                        default:
-                                                /* Byte already written. */
-                                                if (w->crc_active)
-                                                        w->crc = ccitt_crc16_one(w->crc, data);
-                                        }
-                                }
-                        }
-                        /* yes... setup a timed data request */
-                        wd17xx_timed_data_request(device);
-                }
+												break;
+										default:
+												/* Byte already written. */
+												if (w->crc_active)
+														w->crc = ccitt_crc16_one(w->crc, data);
+										}
+								}
+						}
+						/* yes... setup a timed data request */
+						wd17xx_timed_data_request(device);
+				}
 	}
 	else
 	{
@@ -1994,9 +1994,9 @@ READ8_DEVICE_HANDLER( wd17xx_r )
 	switch (offset & 0x03)
 	{
 	case 0: data = wd17xx_status_r(device, device->machine().driver_data()->generic_space(), 0); break;
-	case 1:	data = wd17xx_track_r(device, device->machine().driver_data()->generic_space(), 0); break;
-	case 2:	data = wd17xx_sector_r(device, device->machine().driver_data()->generic_space(), 0); break;
-	case 3:	data = wd17xx_data_r(device, device->machine().driver_data()->generic_space(), 0); break;
+	case 1: data = wd17xx_track_r(device, device->machine().driver_data()->generic_space(), 0); break;
+	case 2: data = wd17xx_sector_r(device, device->machine().driver_data()->generic_space(), 0); break;
+	case 3: data = wd17xx_data_r(device, device->machine().driver_data()->generic_space(), 0); break;
 	}
 
 	return data;
@@ -2007,7 +2007,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_w )
 	switch (offset & 0x03)
 	{
 	case 0: wd17xx_command_w(device, device->machine().driver_data()->generic_space(), 0, data); break;
-	case 1:	wd17xx_track_w(device, device->machine().driver_data()->generic_space(), 0, data);   break;
+	case 1: wd17xx_track_w(device, device->machine().driver_data()->generic_space(), 0, data);   break;
 	case 2: wd17xx_sector_w(device, device->machine().driver_data()->generic_space(), 0, data);  break;
 	case 3: wd17xx_data_w(device, device->machine().driver_data()->generic_space(), 0, data);    break;
 	}
@@ -2331,5 +2331,3 @@ mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, dev
 	: wd1770_device(mconfig, MB8877, "MB8877", tag, owner, clock)
 {
 }
-
-

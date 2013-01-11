@@ -25,9 +25,9 @@ const device_type A2BUS_SWYFT = &device_creator<a2bus_swyft_device>;
 
 ROM_START( swyft )
 	ROM_REGION(0x4000, SWYFT_ROM_REGION, 0)
-    ROM_LOAD( "840-003a.bin", 0x000000, 0x004000, CRC(5d6673e9) SHA1(1554bd03c536789f0ff7d1ef6c992265e311935d) )
+	ROM_LOAD( "840-003a.bin", 0x000000, 0x004000, CRC(5d6673e9) SHA1(1554bd03c536789f0ff7d1ef6c992265e311935d) )
 	ROM_REGION(0x1000, "pal16r4", 0)
-    ROM_LOAD( "swyft_pal16r4.jed", 0x0000, 0x08EF, CRC(462a6938) SHA1(38be885539cf91423a246378c411ac8b2f150ec6) ) // swyft3.pal derived by D. Elvey, works as a replacement pal (original is protected?)
+	ROM_LOAD( "swyft_pal16r4.jed", 0x0000, 0x08EF, CRC(462a6938) SHA1(38be885539cf91423a246378c411ac8b2f150ec6) ) // swyft3.pal derived by D. Elvey, works as a replacement pal (original is protected?)
 ROM_END
 
 //-------------------------------------------------
@@ -44,14 +44,14 @@ const rom_entry *a2bus_swyft_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2BUS_SWYFT, "IAI SwyftCard", tag, owner, clock),
+		device_t(mconfig, A2BUS_SWYFT, "IAI SwyftCard", tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this)
 {
 	m_shortname = "a2swyft";
 }
 
 a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this)
 {
 	m_shortname = "a2swyft";
@@ -74,67 +74,66 @@ void a2bus_swyft_device::device_start()
 
 void a2bus_swyft_device::device_reset()
 {
-    m_rombank = 0;
+	m_rombank = 0;
 
-    // take over the machine
+	// take over the machine
 	apple2_state *state = machine().driver_data<apple2_state>();
-    raise_slot_inh();
-    state->m_maincpu->reset();
+	raise_slot_inh();
+	state->m_maincpu->reset();
 }
 
 UINT8 a2bus_swyft_device::read_c0nx(address_space &space, UINT8 offset)
 {
-    switch (offset)
-    {
-        case 0:
-            m_rombank = 0;
-            raise_slot_inh();
-            break;
+	switch (offset)
+	{
+		case 0:
+			m_rombank = 0;
+			raise_slot_inh();
+			break;
 
-        case 1:
-            m_rombank = 0;
-            lower_slot_inh();
-            break;
+		case 1:
+			m_rombank = 0;
+			lower_slot_inh();
+			break;
 
-        case 2:
-            m_rombank = 0x1000;
-            raise_slot_inh();
-            break;
-    }
+		case 2:
+			m_rombank = 0x1000;
+			raise_slot_inh();
+			break;
+	}
 
-    return 0xff;
+	return 0xff;
 }
 
 void a2bus_swyft_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-    switch (offset)
-    {
-        case 0:
-            m_rombank = 0;
-            raise_slot_inh();
-            break;
+	switch (offset)
+	{
+		case 0:
+			m_rombank = 0;
+			raise_slot_inh();
+			break;
 
-        case 1:
-            m_rombank = 0;
-            lower_slot_inh();
-            break;
+		case 1:
+			m_rombank = 0;
+			lower_slot_inh();
+			break;
 
-        case 2:
-            m_rombank = 0x1000;
-            raise_slot_inh();
-            break;
-    }
+		case 2:
+			m_rombank = 0x1000;
+			raise_slot_inh();
+			break;
+	}
 }
 
 UINT8 a2bus_swyft_device::read_inh_rom(address_space &space, UINT16 offset)
 {
-    if (offset < 0x1000)    // banked area d000-dfff
-    {
-        return m_rom[offset + m_rombank];
-    }
-    else                    // fixed area e000-ffff
-    {
-        return m_rom[offset - 0x1000 + 0x2000];
-    }
+	if (offset < 0x1000)    // banked area d000-dfff
+	{
+		return m_rom[offset + m_rombank];
+	}
+	else                    // fixed area e000-ffff
+	{
+		return m_rom[offset - 0x1000 + 0x2000];
+	}
 }
-

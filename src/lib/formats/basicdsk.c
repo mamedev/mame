@@ -24,7 +24,7 @@ static floperr_t basicdsk_format_track(floppy_image_legacy *floppy, int head, in
 
 
 
-#define BASICDSK_TAG	"basicdsktag"
+#define BASICDSK_TAG    "basicdsktag"
 
 struct basicdsk_tag
 {
@@ -290,19 +290,19 @@ static void basicdsk_default_geometry(const struct FloppyFormat *format, struct 
 	int sector_length;
 	memset(geometry, 0, sizeof(*geometry));
 
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_HEADS,			&geometry->heads);
+	err = option_resolution_getdefault(format->param_guidelines, PARAM_HEADS,           &geometry->heads);
 	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_TRACKS,			&geometry->tracks);
+	err = option_resolution_getdefault(format->param_guidelines, PARAM_TRACKS,          &geometry->tracks);
 	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTORS,			&geometry->sectors);
+	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTORS,         &geometry->sectors);
 	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_FIRST_SECTOR_ID,	&geometry->first_sector_id);
+	err = option_resolution_getdefault(format->param_guidelines, PARAM_FIRST_SECTOR_ID, &geometry->first_sector_id);
 	assert(!err);
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_INTERLEAVE,		&geometry->interleave);
+	err = option_resolution_getdefault(format->param_guidelines, PARAM_INTERLEAVE,      &geometry->interleave);
 	if (err!=0) {
 		geometry->interleave = 1;
 	}
-	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTOR_LENGTH,	&sector_length);
+	err = option_resolution_getdefault(format->param_guidelines, PARAM_SECTOR_LENGTH,   &sector_length);
 	assert(!err);
 	geometry->sector_length = sector_length;
 
@@ -349,4 +349,3 @@ FLOPPY_IDENTIFY(basicdsk_identify_default)
 	*vote = (floppy_image_size(floppy) == expected_size) ? 100 : 50;
 	return FLOPPY_ERROR_SUCCESS;
 }
-

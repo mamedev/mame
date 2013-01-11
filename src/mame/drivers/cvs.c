@@ -99,7 +99,7 @@ Todo & FIXME:
 
 
 /* Turn to 1 so all inputs are always available (this shall only be a debug feature) */
-#define CVS_SHOW_ALL_INPUTS	0
+#define CVS_SHOW_ALL_INPUTS 0
 
 
 #define VERBOSE 0
@@ -259,7 +259,7 @@ READ8_MEMBER(cvs_state::cvs_input_r)
 	m_character_ram_page_start = (offset << 2) & 0x300;
 
 	/* the lower 4 (or 3?) bits select the port to read */
-	switch (offset & 0x0f)	/* might be 0x07 */
+	switch (offset & 0x0f)  /* might be 0x07 */
 	{
 	case 0x00:  ret = ioport("IN0")->read(); break;
 	case 0x02:  ret = ioport("IN1")->read(); break;
@@ -336,9 +336,9 @@ WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 
 	/* merge into D0-D3 */
 	dac_value = (m_cvs_4_bit_dac_data[0] << 0) |
-			    (m_cvs_4_bit_dac_data[1] << 1) |
-			    (m_cvs_4_bit_dac_data[2] << 2) |
-			    (m_cvs_4_bit_dac_data[3] << 3);
+				(m_cvs_4_bit_dac_data[1] << 1) |
+				(m_cvs_4_bit_dac_data[2] << 2) |
+				(m_cvs_4_bit_dac_data[3] << 3);
 
 	/* scale up to a full byte and output */
 	device->write_unsigned8((dac_value << 4) | dac_value);
@@ -347,11 +347,11 @@ WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 WRITE8_MEMBER(cvs_state::cvs_unknown_w)
 {
 	/* offset 2 is used in 8ball
-     * offset 0 is used in spacefrt
-     * offset 3 is used in darkwar
-     *
-     * offset 1 is not used (no trace in disassembly)
-     */
+	 * offset 0 is used in spacefrt
+	 * offset 3 is used in darkwar
+	 *
+	 * offset 1 is not used (no trace in disassembly)
+	 */
 
 	if (data != m_dac3_state[offset])
 	{
@@ -388,7 +388,7 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 {
 
 	/* FIXME: this was by observation on board ???
-     *          -bit 7 is TMS status (active LO) */
+	 *          -bit 7 is TMS status (active LO) */
 	return ((tms5110_ctl_r(m_tms, space, 0) ^ 1) << 7) | (soundlatch_byte_r(space, 0) & 0x7f);
 }
 
@@ -398,14 +398,14 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 	device_t *device = machine().device("tms");
 	UINT8 ctl;
 	/*
-     * offset 0: CS ?
-     */
+	 * offset 0: CS ?
+	 */
 	m_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
-	ctl = 0 |								/* CTL1 */
-		  (m_tms5110_ctl_data[1] << 1) |	/* CTL2 */
-		  (m_tms5110_ctl_data[2] << 2) |	/* CTL4 */
-		  (m_tms5110_ctl_data[1] << 3);	/* CTL8 */
+	ctl = 0 |                               /* CTL1 */
+			(m_tms5110_ctl_data[1] << 1) |  /* CTL2 */
+			(m_tms5110_ctl_data[2] << 2) |  /* CTL4 */
+			(m_tms5110_ctl_data[1] << 3);   /* CTL8 */
 
 	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
 	tms5110_ctl_w(device, space, 0, ctl);
@@ -507,13 +507,13 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x1880, 0x1883) AM_WRITE(cvs_4_bit_dac_data_w) AM_SHARE("4bit_dac")
-	AM_RANGE(0x1884, 0x1887) AM_WRITE(cvs_unknown_w)	AM_SHARE("dac3_state")	/* ???? not connected to anything */
+	AM_RANGE(0x1884, 0x1887) AM_WRITE(cvs_unknown_w)    AM_SHARE("dac3_state")  /* ???? not connected to anything */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_dac_cpu_io_map, AS_IO, 8, cvs_state )
 	/* doesn't look like it is used at all */
-    //AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
+	//AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
 ADDRESS_MAP_END
 
 
@@ -538,7 +538,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cvs_speech_cpu_io_map, AS_IO, 8, cvs_state )
 /* romclk is much more probable, 393 Hz results in timing issues */
 //  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(tms_clock_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(tms_clock_r)
 ADDRESS_MAP_END
 
 
@@ -549,7 +549,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( cvs )
-	PORT_START("IN0")	/* Matrix 0 */
+	PORT_START("IN0")   /* Matrix 0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -576,7 +576,7 @@ static INPUT_PORTS_START( cvs )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -655,7 +655,7 @@ static INPUT_PORTS_START( cosmos )
 #endif
 
 	PORT_MODIFY("DSW3")
-    /* DSW3 bits 0 and 1 stored at 0x7d55 (0, 2, 1, 3) - code at 0x66f3 - not read back */
+	/* DSW3 bits 0 and 1 stored at 0x7d55 (0, 2, 1, 3) - code at 0x66f3 - not read back */
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  /* displays "10000" */
 	PORT_DIPSETTING(    0x08, "20k only" )                  /* displays "20000" */
@@ -681,7 +681,7 @@ static INPUT_PORTS_START( darkwar )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN */
 #endif
 
-    /* DSW3 bits 0 to 3 are not read */
+	/* DSW3 bits 0 to 3 are not read */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacefrt )
@@ -699,7 +699,7 @@ static INPUT_PORTS_START( spacefrt )
 #endif
 
 	PORT_MODIFY("DSW3")
-    /* DSW3 bits 0 and 1 stored at 0x7d3f (0, 2, 1, 3) - code at 0x6895 - not read back */
+	/* DSW3 bits 0 and 1 stored at 0x7d3f (0, 2, 1, 3) - code at 0x6895 - not read back */
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "100k only" )                 /* displays "50000" */
 	PORT_DIPSETTING(    0x08, "150k only" )                 /* displays "110000" */
@@ -849,7 +849,7 @@ static INPUT_PORTS_START( heartatk )
 	PORT_INCLUDE(cvs_registration)
 
 	/* DSW3 bits 2 and 3 stored at 0x1c61 (0, 2, 1, 3) - code at 0x0c52
-       read back code at 0x2197 but untested value : bonus life always at 100000 */
+	   read back code at 0x2197 but untested value : bonus life always at 100000 */
 
 	/* DSW2 bit 5 stored at 0x1e76 - code at 0x0c5c - read back code at 0x00e4 */
 INPUT_PORTS_END
@@ -940,13 +940,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	3,		/* 3 bits per pixel */
-	{ 0, 0x800*8, 0x1000*8 },	/* the bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	256,    /* 256 characters */
+	3,      /* 3 bits per pixel */
+	{ 0, 0x800*8, 0x1000*8 },   /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static GFXDECODE_START( cvs )
@@ -1101,22 +1101,22 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define CVS_COMMON_ROMS 																							\
-	ROM_REGION( 0x8000, "speech", 0 )																	\
-	ROM_LOAD( "5b.bin",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) )	\
+#define CVS_COMMON_ROMS                                                                                             \
+	ROM_REGION( 0x8000, "speech", 0 )                                                                   \
+	ROM_LOAD( "5b.bin",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) )  \
 																											\
-	ROM_REGION( 0x0820, "proms", 0 )																	\
-	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) )	\
-	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )	\
+	ROM_REGION( 0x0820, "proms", 0 )                                                                    \
+	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) )  \
+	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )  \
 
-#define CVS_ROM_REGION_SPEECH_DATA(name, len, hash)	\
-	ROM_REGION( 0x1000, "speechdata", 0 )	\
+#define CVS_ROM_REGION_SPEECH_DATA(name, len, hash) \
+	ROM_REGION( 0x1000, "speechdata", 0 )   \
 	ROM_LOAD( name, 0x0000, len, hash )
 
-#define ROM_LOAD_STAGGERED(name, offs, hash)		\
-	ROM_LOAD( name, 0x0000 + offs, 0x0400, hash )	\
-	ROM_CONTINUE(   0x2000 + offs, 0x0400 )			\
-	ROM_CONTINUE(   0x4000 + offs, 0x0400 )			\
+#define ROM_LOAD_STAGGERED(name, offs, hash)        \
+	ROM_LOAD( name, 0x0000 + offs, 0x0400, hash )   \
+	ROM_CONTINUE(   0x2000 + offs, 0x0400 )         \
+	ROM_CONTINUE(   0x4000 + offs, 0x0400 )         \
 	ROM_CONTINUE(   0x6000 + offs, 0x0400 )
 
 

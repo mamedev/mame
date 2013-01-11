@@ -1,21 +1,21 @@
 /*
     Williams System 11b
 
-	Known issues:
-	- Background music is not working in some games
-	- Black Knight 2000 randomly goes nuts or resets
-	  (some bug possibly relating to the 'lighting draws the "Ball 1"' animation???);
-	  if you insert 2 or more credits and hit start 2 times quickly so it doesn't
-	  play the animation, the game seems more stable afterward; original
-	  game bug or 6802 core bug or something else?
-	  This bug behaves slightly differently in the different sets, depending on whether
-	  nvram is cleared beforehand or not, and whether the last reset was soft or hard.
-	- Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?  
-	- Advance button doesn't seem to work well (TODO: check if this may have been fixed with the irq and diagnostic button masking changes)
+    Known issues:
+    - Background music is not working in some games
+    - Black Knight 2000 randomly goes nuts or resets
+      (some bug possibly relating to the 'lighting draws the "Ball 1"' animation???);
+      if you insert 2 or more credits and hit start 2 times quickly so it doesn't
+      play the animation, the game seems more stable afterward; original
+      game bug or 6802 core bug or something else?
+      This bug behaves slightly differently in the different sets, depending on whether
+      nvram is cleared beforehand or not, and whether the last reset was soft or hard.
+    - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
+    - Advance button doesn't seem to work well (TODO: check if this may have been fixed with the irq and diagnostic button masking changes)
 
-	Known keys necessary to get games to start (so the proper number of balls are detected):
-	- Black Knight 2000: Hold "D" "F" "Y" and press "1" after inserting 1 or more credits. press 'x' to get the main music started.
-	- Cyclone: Nothing. The game doesn't bother to check if the ball is ready before allowing start. Insert 1 or more credits first, of course.
+    Known keys necessary to get games to start (so the proper number of balls are detected):
+    - Black Knight 2000: Hold "D" "F" "Y" and press "1" after inserting 1 or more credits. press 'x' to get the main music started.
+    - Cyclone: Nothing. The game doesn't bother to check if the ball is ready before allowing start. Insert 1 or more credits first, of course.
 */
 
 
@@ -163,34 +163,34 @@ WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
 
 static const pia6821_interface pia21_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),       /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia24_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_LINE_GND,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_LINE_VCC,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_LINE_GND,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_LINE_VCC,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 WRITE8_MEMBER( s11b_state::dig1_w )
@@ -211,18 +211,18 @@ WRITE8_MEMBER( s11b_state::dig1_w )
 
 static const pia6821_interface pia28_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11b_state, dig1_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11b_state, dig1_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),       /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 WRITE8_MEMBER( s11b_state::pia2c_pa_w )
@@ -259,34 +259,34 @@ WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 
 static const pia6821_interface pia2c_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),	/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pa_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pb_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia30_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, switch_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_LINE_GND,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_LINE_VCC,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, switch_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),	/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_r),       /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_LINE_GND,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_LINE_VCC,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_w),       /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 WRITE8_MEMBER( s11b_state::pia34_pa_w )
@@ -307,34 +307,34 @@ WRITE8_MEMBER( s11b_state::pia34_pa_w )
 
 static const pia6821_interface pia34_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia34_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),	/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11b_state, pia34_pa_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pias_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, dac_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_cb2_w),		/* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),        /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_w),      /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca2_w),        /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_cb2_w),        /* line CB2 out */
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),       /* IRQA */
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)        /* IRQB */
 };
 
 WRITE_LINE_MEMBER( s11b_state::pia40_ca2_w)
@@ -345,18 +345,18 @@ WRITE_LINE_MEMBER( s11b_state::pia40_ca2_w)
 
 static const pia6821_interface pia40_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11b_state, pia40_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),		/* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),		/* IRQA */
-	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),        /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11b_state, pia40_ca2_w),      /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),       /* line CB2 out */
+	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),     /* IRQA */
+	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)       /* IRQB */
 };
 
 DRIVER_INIT_MEMBER( s11b_state, s11b )
@@ -1050,50 +1050,50 @@ ROM_START(whirl_l2)
 	ROM_LOAD("whir_u20.l1", 0x20000, 0x8000, CRC(713007af) SHA1(3ac88bb905ccf8e227bbf3c102c74e3d2446cc88))
 ROM_END
 
-GAME(1989,	bcats_l5,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Bad Cats (L-5)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	bcats_l2,		bcats_l5,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Bad Cats (LA-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	bnzai_l3,		0,			s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Banzai Run (L-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	bnzai_g3,		bnzai_l3,	s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Banzai Run (L-3) Germany",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	bnzai_l1,		bnzai_l3,	s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Banzai Run (L-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	bnzai_pa,		bnzai_l3,	s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Banzai Run (P-A)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,	bguns_l8,		0,			s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Big Guns (L-8)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,	bguns_l7,		bguns_l8,	s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Big Guns (L-7)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,	bguns_la,		bguns_l8,	s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Big Guns (L-A)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,	bguns_p1,		bguns_l8,	s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Big Guns (P-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	bk2k_l4,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Black Knight 2000 (L-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	bk2k_lg1,		bk2k_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Black Knight 2000 (LG-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	bk2k_lg3,		bk2k_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Black Knight 2000 (LG-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	bk2k_pu1,		bk2k_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Black Knight 2000 (PU-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	cycln_l5,		0,			s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Cyclone (L-5)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	cycln_l4,		cycln_l5,	s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Cyclone (L-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	esha_la3,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Earthshaker (LA-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	esha_ma3,		esha_la3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Earthshaker (Metallica) (LA-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	esha_pr4,		esha_la3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Earthshaker (Family version) (PR-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	esha_lg1,		esha_la3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Earthshaker (German) (LG-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	esha_lg2,		esha_la3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Earthshaker (German) (LG-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	esha_la1,		esha_la3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Earthshaker (LA-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	esha_pa1,		esha_la3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Earthshaker (Prototype) (PA-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	eatpm_l4,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Elvira and the Party Monsters (LA-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	eatpm_l1,		eatpm_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Elvira and the Party Monsters (LA-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	eatpm_l2,		eatpm_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Elvira and the Party Monsters (LA-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	eatpm_4g,		eatpm_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Elvira and the Party Monsters (LG-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	eatpm_4u,		eatpm_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Elvira and the Party Monsters (LU-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	eatpm_p7,		eatpm_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Elvira and the Party Monsters (PA-7)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	jokrz_l6,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Jokerz! (L-6)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	jokrz_l3,		jokrz_l6,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Jokerz! (L-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	mousn_l4,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Mousin' Around! (LA-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	mousn_l1,		mousn_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Mousin' Around! (LA-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	mousn_lu,		mousn_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Mousin' Around! (LU-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	mousn_lx,		mousn_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Mousin' Around! (LX-1)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	polic_l4,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Police Force (LA-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	polic_l3,		polic_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Police Force (LA-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	polic_l2,		polic_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Police Force (LA-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	spstn_l5,		0,			s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Space Station (L-5)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	swrds_l2,		0,			s11b,	s11b, s11b_state,	s11b,	ROT0,	"Williams",				"Swords of Fury (L-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	taxi_l4,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Taxi (Lola) (L-4)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	taxi_l3,		taxi_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Taxi (Marilyn) (L-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	taxi_lg1,		taxi_l4,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Taxi (Marilyn) (L-1) Germany",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	tsptr_l3,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Bally",				"Transporter the Rescue (L-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	whirl_l3,		0,			s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Whirlwind (L-3)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	whirl_l2,		whirl_l3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Whirlwind (L-2)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	whirl_lg3,		whirl_l3,	s11b,	s11b, s11b_state,	s11b_invert,	ROT0,	"Williams",				"Whirlwind (LG-3)",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  bcats_l5,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Bad Cats (L-5)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  bcats_l2,       bcats_l5,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Bad Cats (LA-2)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  bnzai_l3,       0,          s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Banzai Run (L-3)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  bnzai_g3,       bnzai_l3,   s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Banzai Run (L-3) Germany",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  bnzai_l1,       bnzai_l3,   s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Banzai Run (L-1)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  bnzai_pa,       bnzai_l3,   s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Banzai Run (P-A)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  bguns_l8,       0,          s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Big Guns (L-8)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  bguns_l7,       bguns_l8,   s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Big Guns (L-7)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  bguns_la,       bguns_l8,   s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Big Guns (L-A)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  bguns_p1,       bguns_l8,   s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Big Guns (P-1)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  bk2k_l4,        0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (L-4)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  bk2k_lg1,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (LG-1)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  bk2k_lg3,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (LG-3)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  bk2k_pu1,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (PU-1)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  cycln_l5,       0,          s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Cyclone (L-5)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  cycln_l4,       cycln_l5,   s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Cyclone (L-4)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  esha_la3,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (LA-3)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  esha_ma3,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (Metallica) (LA-3)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  esha_pr4,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (Family version) (PR-4)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  esha_lg1,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (German) (LG-1)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  esha_lg2,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (German) (LG-2)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  esha_la1,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (LA-1)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  esha_pa1,       esha_la3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Earthshaker (Prototype) (PA-1)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  eatpm_l4,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LA-4)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  eatpm_l1,       eatpm_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LA-1)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  eatpm_l2,       eatpm_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LA-2)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  eatpm_4g,       eatpm_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LG-4)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  eatpm_4u,       eatpm_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (LU-4)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  eatpm_p7,       eatpm_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Elvira and the Party Monsters (PA-7)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  jokrz_l6,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Jokerz! (L-6)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  jokrz_l3,       jokrz_l6,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Jokerz! (L-3)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  mousn_l4,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Mousin' Around! (LA-4)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  mousn_l1,       mousn_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Mousin' Around! (LA-1)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  mousn_lu,       mousn_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Mousin' Around! (LU-1)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  mousn_lx,       mousn_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Mousin' Around! (LX-1)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  polic_l4,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Police Force (LA-4)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  polic_l3,       polic_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Police Force (LA-3)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  polic_l2,       polic_l4,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Police Force (LA-2)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  spstn_l5,       0,          s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Space Station (L-5)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  swrds_l2,       0,          s11b,   s11b, s11b_state,   s11b,   ROT0,   "Williams",             "Swords of Fury (L-2)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  taxi_l4,        0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Taxi (Lola) (L-4)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  taxi_l3,        taxi_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Taxi (Marilyn) (L-3)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  taxi_lg1,       taxi_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Taxi (Marilyn) (L-1) Germany",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  tsptr_l3,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Bally",                "Transporter the Rescue (L-3)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  whirl_l3,       0,          s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Whirlwind (L-3)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  whirl_l2,       whirl_l3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Whirlwind (L-2)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  whirl_lg3,      whirl_l3,   s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Whirlwind (LG-3)",             GAME_IS_SKELETON_MECHANICAL)

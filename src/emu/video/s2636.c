@@ -85,8 +85,8 @@
  *
  *************************************/
 
-#define SPRITE_WIDTH	(8)
-#define SPRITE_HEIGHT	(10)
+#define SPRITE_WIDTH    (8)
+#define SPRITE_HEIGHT   (10)
 
 static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40 };
 
@@ -390,5 +390,3 @@ void s2636_device::device_start()
 {
 	DEVICE_START_NAME( s2636 )(this);
 }
-
-

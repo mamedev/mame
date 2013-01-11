@@ -133,7 +133,7 @@ void pcf8593_pin_scl(device_t *device, int data)
 			case RTC_MODE_RECV :
 			{
 				// get bit
-	    		if (rtc->pin_sda) rtc->data_recv[rtc->data_recv_index] = rtc->data_recv[rtc->data_recv_index] | (0x80 >> rtc->bits);
+				if (rtc->pin_sda) rtc->data_recv[rtc->data_recv_index] = rtc->data_recv[rtc->data_recv_index] | (0x80 >> rtc->bits);
 				rtc->bits++;
 				// bit 9 = end
 				if (rtc->bits > 8)
@@ -179,7 +179,7 @@ void pcf8593_pin_scl(device_t *device, int data)
 					{
 						_logerror( 2, ("pcf8593 end\n"));
 						rtc->mode = RTC_MODE_RECV;
-        				pcf8593_clear_buffer_rx(device);
+						pcf8593_clear_buffer_rx(device);
 					}
 					// next byte
 					rtc->bits = 0;
@@ -424,22 +424,22 @@ void pcf8593_save(device_t *device, emu_file *file)
 #ifdef UNUSED_FUNCTION
 NVRAM_HANDLER( pcf8593 )
 {
-    _logerror( 0, ("nvram_handler_pcf8593 (%p/%d)\n", file, read_or_write));
-    if (read_or_write)
-    {
-        pcf8593_save( file);
-    }
-    else
-    {
-        if (file)
-        {
-            pcf8593_load( file);
-        }
-        else
-        {
-            memset( rtc->data, 0, rtc->size);
-        }
-    }
+	_logerror( 0, ("nvram_handler_pcf8593 (%p/%d)\n", file, read_or_write));
+	if (read_or_write)
+	{
+		pcf8593_save( file);
+	}
+	else
+	{
+		if (file)
+		{
+			pcf8593_load( file);
+		}
+		else
+		{
+			memset( rtc->data, 0, rtc->size);
+		}
+	}
 }
 #endif
 
@@ -479,5 +479,3 @@ void pcf8593_device::device_reset()
 {
 	DEVICE_RESET_NAME( pcf8593 )(this);
 }
-
-

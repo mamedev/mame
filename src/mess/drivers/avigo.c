@@ -166,7 +166,7 @@ void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 
 	switch (chip_select)
 	{
-		case 0x06:	// videoram
+		case 0x06:  // videoram
 			space.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, read8_delegate(FUNC(avigo_state::vid_memory_r), this), write8_delegate(FUNC(avigo_state::vid_memory_w), this));
 			active_flash = -1;
 			break;
@@ -178,11 +178,11 @@ void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 			active_flash = -1;
 			break;
 
-		case 0x00:	// flash 0
-		case 0x03:	// flash 1
-		case 0x05:	// flash 2
-		case 0x07:	// flash 0
-			if (active_flash < 0)	// to avoid useless calls to install_readwrite_handler that cause slowdowns
+		case 0x00:  // flash 0
+		case 0x03:  // flash 1
+		case 0x05:  // flash 2
+		case 0x07:  // flash 0
+			if (active_flash < 0)   // to avoid useless calls to install_readwrite_handler that cause slowdowns
 			{
 				if (bank == 1)
 					space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(avigo_state::flash_0x4000_read_handler), this), write8_delegate(FUNC(avigo_state::flash_0x4000_write_handler), this));
@@ -370,9 +370,9 @@ WRITE8_MEMBER(avigo_state::irq_w)
 WRITE8_MEMBER(avigo_state::port2_w)
 {
 	/*
-        bit 4     LCD backlight on/off
-        bit 5-6   source select for a/d converter
-    */
+	    bit 4     LCD backlight on/off
+	    bit 5-6   source select for a/d converter
+	*/
 
 	if ((m_port2 ^ data) & 0x10)
 		popmessage("Backlight %s", data & 0x10 ? "on" : "off");
@@ -461,7 +461,7 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
 					if (ioport("LINE3")->read() & 0x01)
 					{
 						/* this might not be totally accurate because hitable screen
-                        area may include the border around the screen! */
+						area may include the border around the screen! */
 						m_ad_value = ioport("POSX")->read();
 					}
 					else
@@ -476,13 +476,13 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
 				{
 					/* in the avigo rom, the y coordinate is inverted! */
 					/* therefore a low value would be near the bottom of the display,
-                    and a high value at the top */
+					and a high value at the top */
 
 					/* total valid range 0x044->0x03a6 */
 					/* 0x0350 is also checked */
 
 					/* assumption 0x044->0x0350 is screen area and
-                    0x0350->0x03a6 is panel at bottom */
+					0x0350->0x03a6 is panel at bottom */
 
 					LOG(("a/d select y coordinate\n"));
 					LOG(("y coord: %d\n", ioport("POSY")->read()));
@@ -618,8 +618,8 @@ WRITE8_MEMBER(avigo_state::speaker_w)
 
   bit 7: ??? if set, does a write 0x00 to 0x02e */
 
-  /* port 0x029:
-    port 0x02e */
+	/* port 0x029:
+	port 0x02e */
 READ8_MEMBER(avigo_state::port_04_r)
 {
 	/* must be both 0 for it to boot! */
@@ -692,111 +692,111 @@ INPUT_CHANGED_MEMBER( avigo_state::power_down_irq )
 
 static INPUT_PORTS_START(avigo)
 	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE UP")		PORT_CODE(KEYCODE_PGUP)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE DOWN")	PORT_CODE(KEYCODE_PGDN)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LIGHT")		PORT_CODE(KEYCODE_L)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE UP")      PORT_CODE(KEYCODE_PGUP) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE DOWN")    PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LIGHT")        PORT_CODE(KEYCODE_L)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TO DO")		PORT_CODE(KEYCODE_T)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("ADDRESS")		PORT_CODE(KEYCODE_A)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SCHEDULE")		PORT_CODE(KEYCODE_S)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TO DO")        PORT_CODE(KEYCODE_T)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("ADDRESS")      PORT_CODE(KEYCODE_A)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SCHEDULE")     PORT_CODE(KEYCODE_S)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MEMO") 		PORT_CODE(KEYCODE_M)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MEMO")         PORT_CODE(KEYCODE_M)    PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, kb_irq, NULL )
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)  PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_irq, NULL )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Power Down")		 PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, power_down_irq, NULL )
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Power Down")       PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, power_down_irq, NULL )
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	PORT_START("POSX") /* Mouse - X AXIS */
-	PORT_BIT(0x3ff, 0x060, IPT_LIGHTGUN_X) PORT_SENSITIVITY(100) PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0x060, 0x3a0) PORT_KEYDELTA(10) PORT_PLAYER(1)				PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, NULL )
+	PORT_BIT(0x3ff, 0x060, IPT_LIGHTGUN_X) PORT_SENSITIVITY(100) PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0x060, 0x3a0) PORT_KEYDELTA(10) PORT_PLAYER(1)              PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, NULL )
 
 	PORT_START("POSY") /* Mouse - Y AXIS */
-	PORT_BIT(0x3ff, 0x044, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(100) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x044, 0x3a6) PORT_INVERT PORT_KEYDELTA(10) PORT_PLAYER(1)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, NULL )
+	PORT_BIT(0x3ff, 0x044, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(100) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x044, 0x3a6) PORT_INVERT PORT_KEYDELTA(10) PORT_PLAYER(1)  PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, NULL )
 INPUT_PORTS_END
 
 /* F4 Character Displayer */
 static const gfx_layout avigo_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	96,                 /* 96 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static const gfx_layout avigo_8_by_14 =
 {
-	8, 14,					/* 8 x 16 characters */
-	1024,					/* 1024 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 14,                  /* 8 x 16 characters */
+	1024,                   /* 1024 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*32					/* every char takes 32 bytes */
+	8*32                    /* every char takes 32 bytes */
 };
 
 static const gfx_layout avigo_16_by_15 =
 {
-	16, 15,					/* 8 x 16 characters */
-	1024,					/* 1024 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	16, 15,                 /* 8 x 16 characters */
+	1024,                   /* 1024 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
 	/* y offsets */
 	{ 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16					/* every char takes 16 bytes */
+	16*16                   /* every char takes 16 bytes */
 };
 
 static const gfx_layout avigo_15_by_16 =
 {
-	15, 16,					/* 8 x 16 characters */
-	1024,					/* 1024 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	15, 16,                 /* 8 x 16 characters */
+	1024,                   /* 1024 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	/* y offsets */
 	{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
-	16*16					/* every char takes 16 bytes */
+	16*16                   /* every char takes 16 bytes */
 };
 
 static const gfx_layout avigo_8_by_8 =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	16*16					/* every char takes 16 bytes */
+	16*16                   /* every char takes 16 bytes */
 };
 
 static const gfx_layout avigo_6_by_8 =
 {
-	6, 8,					/* 6 x 8 characters */
-	255,					/* 255 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	6, 8,                   /* 6 x 8 characters */
+	255,                    /* 255 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	/* y offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	16*16					/* every char takes 16 bytes */
+	16*16                   /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( avigo )
@@ -1026,9 +1026,8 @@ ROM_START(avigo_it)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
-COMP(1997,	avigo,  	0,  		0,		avigo,	avigo, driver_device,	0,		"Texas Instruments", "TI Avigo 10 PDA",         	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_de,	avigo,		0,		avigo,	avigo, driver_device,	0,		"Texas Instruments", "TI Avigo 10 PDA (German)",	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_fr,	avigo,		0,		avigo,	avigo, driver_device,	0,		"Texas Instruments", "TI Avigo 10 PDA (French)",	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_es,	avigo,		0,		avigo,	avigo, driver_device,	0,		"Texas Instruments", "TI Avigo 10 PDA (Spanish)",	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_it,	avigo,		0,		avigo,	avigo, driver_device,	0,		"Texas Instruments", "TI Avigo 10 PDA (Italian)",	GAME_SUPPORTS_SAVE)
-
+COMP(1997,  avigo,      0,          0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA",             GAME_SUPPORTS_SAVE)
+COMP(1997,  avigo_de,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (German)",    GAME_SUPPORTS_SAVE)
+COMP(1997,  avigo_fr,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (French)",    GAME_SUPPORTS_SAVE)
+COMP(1997,  avigo_es,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (Spanish)",   GAME_SUPPORTS_SAVE)
+COMP(1997,  avigo_it,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (Italian)",   GAME_SUPPORTS_SAVE)

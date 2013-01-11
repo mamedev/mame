@@ -51,7 +51,7 @@ device_tvcexp_interface::~device_tvcexp_interface()
 //  tvcexp_slot_device - constructor
 //-------------------------------------------------
 tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, TVCEXP_SLOT, "TVC64 Expansion Slot", tag, owner, clock),
+		device_t(mconfig, TVCEXP_SLOT, "TVC64 Expansion Slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -95,8 +95,8 @@ void tvcexp_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
 	}
 }
 

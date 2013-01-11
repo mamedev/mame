@@ -36,39 +36,39 @@ VIDEO_START_MEMBER(badlands_state,badlands)
 {
 	static const atarimo_desc modesc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		0,					/* are the entries linked? */
-		1,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		0,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		0,                  /* are the entries linked? */
+		1,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		0,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x80,				/* base palette entry */
-		0x80,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x80,               /* base palette entry */
+		0x80,               /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0x1f }},			/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0x0fff,0,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0,0,0x0007 }},	/* mask for the color */
-		{{ 0,0,0,0xff80 }},	/* mask for the X position */
-		{{ 0,0xff80,0,0 }},	/* mask for the Y position */
-		{{ 0 }},			/* mask for the width, in tiles*/
-		{{ 0,0x000f,0,0 }},	/* mask for the height, in tiles */
-		{{ 0 }},			/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0,0,0,0x0008 }},	/* mask for the priority */
-		{{ 0 }},			/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0x1f }},         /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0x0fff,0,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0,0,0x0007 }}, /* mask for the color */
+		{{ 0,0,0,0xff80 }}, /* mask for the X position */
+		{{ 0,0xff80,0,0 }}, /* mask for the Y position */
+		{{ 0 }},            /* mask for the width, in tiles*/
+		{{ 0,0x000f,0,0 }}, /* mask for the height, in tiles */
+		{{ 0 }},            /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0,0,0,0x0008 }}, /* mask for the priority */
+		{{ 0 }},            /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		0					/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		0                   /* callback routine for special entries */
 	};
 
 	/* initialize the playfield */
@@ -129,7 +129,7 @@ UINT32 badlands_state::screen_update_badlands(screen_device &screen, bitmap_ind1
 				if (mo[x])
 				{
 					/* not yet verified
-                    */
+					*/
 					if ((mo[x] & ATARIMO_PRIORITY_MASK) || !(pf[x] & 8))
 						pf[x] = mo[x] & ATARIMO_DATA_MASK;
 

@@ -8,32 +8,32 @@
 #define STIC_H_
 
 // GROM/GRAM cards are 8x8
-#define STIC_CARD_WIDTH				8
-#define STIC_CARD_HEIGHT			8
+#define STIC_CARD_WIDTH             8
+#define STIC_CARD_HEIGHT            8
 
 // Intellivision resolution is 20x12 BACKTAB CARDs, minus the rightmost column,
 // for an effective resolution of (19 * 8 + 1 * 7) x (12 * 8) == 159x96.
 //
 // MOB scanline height can be half of a card scanline height, so y-coordinates
 // are scaled by 2.
-#define STIC_X_SCALE				1
-#define STIC_Y_SCALE				2
+#define STIC_X_SCALE                1
+#define STIC_Y_SCALE                2
 
 // the Intellivision emulation scales to match the output format at the last
 // step. The Intellivision keyboard component appears to be 320x96, but can
 // also run Intellivision carts, so x-coordinates are conditionally scaled
 // by 2.
-#define INTV_X_SCALE				1
-#define INTV_Y_SCALE				1
-#define INTVKBD_X_SCALE				2
-#define INTVKBD_Y_SCALE				INTV_Y_SCALE
+#define INTV_X_SCALE                1
+#define INTV_Y_SCALE                1
+#define INTVKBD_X_SCALE             2
+#define INTVKBD_Y_SCALE             INTV_Y_SCALE
 
 // overscan sizes in intv pixels
 // these values are approximate.
-#define STIC_OVERSCAN_LEFT_WIDTH	13
-#define STIC_OVERSCAN_RIGHT_WIDTH	17
-#define STIC_OVERSCAN_TOP_HEIGHT	12
-#define STIC_OVERSCAN_BOTTOM_HEIGHT	12
+#define STIC_OVERSCAN_LEFT_WIDTH    13
+#define STIC_OVERSCAN_RIGHT_WIDTH   17
+#define STIC_OVERSCAN_TOP_HEIGHT    12
+#define STIC_OVERSCAN_BOTTOM_HEIGHT 12
 
 //Timing constants based on  Joe Zbiciak's documentation
 #define STIC_CYCLES_PER_SCANLINE 57
@@ -45,7 +45,7 @@
 /*** STIC registers *********************************************************/
 
 // number of STIC registers
-#define STIC_REGISTERS				0x33
+#define STIC_REGISTERS              0x33
 
 // STIC MOBs (Moveable OBjects)
 enum
@@ -96,12 +96,12 @@ enum
  *     regardless of width.                                                 *
  *                                                                          *
  ****************************************************************************/
-#define STIC_MXR					0x0000
+#define STIC_MXR                    0x0000
 
-#define STIC_MXR_XSIZE				0x0400
-#define STIC_MXR_VIS				0x0200
-#define STIC_MXR_COL				0x0100
-#define STIC_MXR_X					0x00FF
+#define STIC_MXR_XSIZE              0x0400
+#define STIC_MXR_VIS                0x0200
+#define STIC_MXR_COL                0x0100
+#define STIC_MXR_X                  0x00FF
 
 /****************************************************************************
  *                                                                          *
@@ -133,14 +133,14 @@ enum
  *     sprite, regardless of height.                                        *
  *                                                                          *
  ****************************************************************************/
-#define STIC_MYR					0x0008
+#define STIC_MYR                    0x0008
 
-#define STIC_MYR_YFLIP				0x0800
-#define STIC_MYR_XFLIP				0x0400
-#define STIC_MYR_YSIZE				0x0200
-#define STIC_MYR_YFULL				0x0100
-#define STIC_MYR_YRES				0x0080
-#define STIC_MYR_Y					0x007F
+#define STIC_MYR_YFLIP              0x0800
+#define STIC_MYR_XFLIP              0x0400
+#define STIC_MYR_YSIZE              0x0200
+#define STIC_MYR_YFULL              0x0100
+#define STIC_MYR_YRES               0x0080
+#define STIC_MYR_Y                  0x007F
 
 /****************************************************************************
  *                                                                          *
@@ -157,13 +157,13 @@ enum
  * PRI      sprite priority                 [1=behind set background bit]   *
  *                                                                          *
  ****************************************************************************/
-#define STIC_MAR					0x0010
+#define STIC_MAR                    0x0010
 
-#define STIC_MAR_PRI				0x2000
-#define STIC_MAR_FG3				0x1000
-#define STIC_MAR_SEL				0x0800
-#define STIC_MAR_C					0x07F8
-#define STIC_MAR_FG20				0x0007
+#define STIC_MAR_PRI                0x2000
+#define STIC_MAR_FG3                0x1000
+#define STIC_MAR_SEL                0x0800
+#define STIC_MAR_C                  0x07F8
+#define STIC_MAR_FG20               0x0007
 
 /****************************************************************************
  *                                                                          *
@@ -190,18 +190,18 @@ enum
  *     hidden behind the background, still register a collision.            *
  *                                                                          *
  ****************************************************************************/
-#define STIC_MCR					0x0018
+#define STIC_MCR                    0x0018
 
-#define STIC_MCR_BRDR				0x0200
-#define STIC_MCR_BKGD				0x0100
-#define STIC_MCR_SPR7				0x0080
-#define STIC_MCR_SPR6				0x0040
-#define STIC_MCR_SPR5				0x0020
-#define STIC_MCR_SPR4				0x0010
-#define STIC_MCR_SPR3				0x0008
-#define STIC_MCR_SPR2				0x0004
-#define STIC_MCR_SPR1				0x0002
-#define STIC_MCR_SPR0				0x0001
+#define STIC_MCR_BRDR               0x0200
+#define STIC_MCR_BKGD               0x0100
+#define STIC_MCR_SPR7               0x0080
+#define STIC_MCR_SPR6               0x0040
+#define STIC_MCR_SPR5               0x0020
+#define STIC_MCR_SPR4               0x0010
+#define STIC_MCR_SPR3               0x0008
+#define STIC_MCR_SPR2               0x0004
+#define STIC_MCR_SPR1               0x0002
+#define STIC_MCR_SPR0               0x0001
 
 /****************************************************************************
  *                                                                          *
@@ -219,7 +219,7 @@ enum
  *  1. Any write during VBLANK enables STIC output.                         *
  *                                                                          *
  ****************************************************************************/
-#define STIC_DER					0x0020
+#define STIC_DER                    0x0020
 
 /****************************************************************************
  *                                                                          *
@@ -238,7 +238,7 @@ enum
  *  2. Any read during VBLANK enables COLOR STACK/COLORED SQUARES mode.     *
  *                                                                          *
  ****************************************************************************/
-#define STIC_GMR					0x0021
+#define STIC_GMR                    0x0021
 
 /****************************************************************************
  *                                                                          *
@@ -252,9 +252,9 @@ enum
  * BGn      background color                [0..15]                         *
  *                                                                          *
  ****************************************************************************/
-#define STIC_CSR					0x0028
+#define STIC_CSR                    0x0028
 
-#define STIC_CSR_BG					0x000F
+#define STIC_CSR_BG                 0x000F
 
 /****************************************************************************
  *                                                                          *
@@ -274,9 +274,9 @@ enum
  *  1. Affects overscan, and column and row blockouts.                      *
  *                                                                          *
  ****************************************************************************/
-#define STIC_BCR					0x002C
+#define STIC_BCR                    0x002C
 
-#define STIC_BCR_BC					0x000F
+#define STIC_BCR_BC                 0x000F
 
 /****************************************************************************
  *                                                                          *
@@ -296,9 +296,9 @@ enum
  *  1. Affects both BACKTAB and MOBs.                                       *
  *                                                                          *
  ****************************************************************************/
-#define STIC_HDR					0x0030
+#define STIC_HDR                    0x0030
 
-#define STIC_HDR_DEL				0x0007
+#define STIC_HDR_DEL                0x0007
 
 /****************************************************************************
  *                                                                          *
@@ -318,9 +318,9 @@ enum
  *  1. Affects both BACKTAB and MOBs.                                       *
  *                                                                          *
  ****************************************************************************/
-#define STIC_VDR					0x0031
+#define STIC_VDR                    0x0031
 
-#define STIC_VDR_DEL				0x0007
+#define STIC_VDR_DEL                0x0007
 
 /****************************************************************************
  *                                                                          *
@@ -342,17 +342,17 @@ enum
  *     smooth scrolling.                                                    *
  *                                                                          *
  ****************************************************************************/
-#define STIC_CBR					0x0032
+#define STIC_CBR                    0x0032
 
-#define STIC_CBR_ROW				0x0002
-#define STIC_CBR_COL				0x0001
+#define STIC_CBR_ROW                0x0002
+#define STIC_CBR_COL                0x0001
 
 /*** BACKTAB ****************************************************************/
 
 // BACKTAB is made up of 20x12 cards
 // (the first 19 columns are 8x8, the 20th column is 7x8)
-#define STIC_BACKTAB_WIDTH			20
-#define STIC_BACKTAB_HEIGHT			12
+#define STIC_BACKTAB_WIDTH          20
+#define STIC_BACKTAB_HEIGHT         12
 
 /****************************************************************************
  *                                                                          *
@@ -369,11 +369,11 @@ enum
  * BGn      background color                [0..15]                         *
  *                                                                          *
  ****************************************************************************/
-#define STIC_FBM_BG2				0x2000
-#define STIC_FBM_BG310				0x1600
-#define STIC_FBM_SEL				0x0800
-#define STIC_FBM_C					0x01F8
-#define STIC_FBM_FG					0x0007
+#define STIC_FBM_BG2                0x2000
+#define STIC_FBM_BG310              0x1600
+#define STIC_FBM_SEL                0x0800
+#define STIC_FBM_C                  0x01F8
+#define STIC_FBM_FG                 0x0007
 
 /****************************************************************************
  *                                                                          *
@@ -397,15 +397,15 @@ enum
  * 2. When SEL=1, C7 and C6 can be used as user-defined flags.              *
  *                                                                          *
  ****************************************************************************/
-#define STIC_CSTM_ADV				0x2000
-#define STIC_CSTM_FG3				0x1000
-#define STIC_CSTM_SEL				0x0800
-#define STIC_CSTM_C7				0x0400
-#define STIC_CSTM_C6				0x0200
-#define STIC_CSTM_C50				0x01F8
-#define STIC_CSTM_FG20				0x0007
+#define STIC_CSTM_ADV               0x2000
+#define STIC_CSTM_FG3               0x1000
+#define STIC_CSTM_SEL               0x0800
+#define STIC_CSTM_C7                0x0400
+#define STIC_CSTM_C6                0x0200
+#define STIC_CSTM_C50               0x01F8
+#define STIC_CSTM_FG20              0x0007
 
-#define STIC_CSTM_C					(STIC_CSTM_C7|STIC_CSTM_C6|STIC_CSTM_C50)
+#define STIC_CSTM_C                 (STIC_CSTM_C7|STIC_CSTM_C6|STIC_CSTM_C50)
 
 /****************************************************************************
  *                                                                          *
@@ -436,14 +436,13 @@ enum
  * 2. When color 7 is specified, the color is taken from the color stack.   *
  *                                                                          *
  ****************************************************************************/
-#define STIC_CSQM_D2				0x2000
-#define STIC_CSQM_D10				0x0600
-#define STIC_CSQM_C					0x01C0
-#define STIC_CSQM_B					0x0038
-#define STIC_CSQM_A					0x0007
+#define STIC_CSQM_D2                0x2000
+#define STIC_CSQM_D10               0x0600
+#define STIC_CSQM_C                 0x01C0
+#define STIC_CSQM_B                 0x0038
+#define STIC_CSQM_A                 0x0007
 
-#define STIC_CSQM_WIDTH				(STIC_CARD_WIDTH / 2)
-#define STIC_CSQM_HEIGHT			(STIC_CARD_HEIGHT / 2)
+#define STIC_CSQM_WIDTH             (STIC_CARD_WIDTH / 2)
+#define STIC_CSQM_HEIGHT            (STIC_CARD_HEIGHT / 2)
 
 #endif /* STIC_H_ */
-

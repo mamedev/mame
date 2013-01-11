@@ -835,25 +835,25 @@ READ16_HANDLER( deco16_146_funkyjet_prot_r )
 WRITE16_HANDLER( deco16_104_rohga_prot_w )
 {
 	/*
-        Schmeizr uses a feature of this chip that other games don't seem to exploit.  There
-        appear to be two banks of data ports (referred to here as front and back buffers).
-        These banks are switched when certain addresses are read - also very good protection
-        against trojans as it is non-obvious when data ports are switched.
+	    Schmeizr uses a feature of this chip that other games don't seem to exploit.  There
+	    appear to be two banks of data ports (referred to here as front and back buffers).
+	    These banks are switched when certain addresses are read - also very good protection
+	    against trojans as it is non-obvious when data ports are switched.
 
-        It appears to work as follows..  When the front buffer is active (the state upon
-        reset) any writes to data ports push the existing front buffer word into the back
-        buffer (ie, a FIFO latch type of system).  When the back buffer is active, any writes
-        to data ports affect the back buffer only - the front buffer data is not affected, and
-        there is no FIFO action.
+	    It appears to work as follows..  When the front buffer is active (the state upon
+	    reset) any writes to data ports push the existing front buffer word into the back
+	    buffer (ie, a FIFO latch type of system).  When the back buffer is active, any writes
+	    to data ports affect the back buffer only - the front buffer data is not affected, and
+	    there is no FIFO action.
 
-        By default the read ports return a scrambled address and scrambled data from a
-        front buffer port.  When the back buffer is active most read ports return scrambled
-        data from the back buffer, however some ports work exclusively on front buffer data
-        even if the back buffer is selected.
+	    By default the read ports return a scrambled address and scrambled data from a
+	    front buffer port.  When the back buffer is active most read ports return scrambled
+	    data from the back buffer, however some ports work exclusively on front buffer data
+	    even if the back buffer is selected.
 
-        There doesn't appear to be any way to detect what bank is currently selected - it
-        seems game code must maintain this state (if it matters).
-    */
+	    There doesn't appear to be any way to detect what bank is currently selected - it
+	    seems game code must maintain this state (if it matters).
+	*/
 	if (decoprot_buffer_ram_selected)
 		COMBINE_DATA(&decoprot_buffer_ram[offset]);
 	else
@@ -1856,4 +1856,3 @@ WRITE16_HANDLER( deco16_104_pktgaldx_prot_w )
 }
 
 /**********************************************************************************/
-

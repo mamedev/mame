@@ -14,7 +14,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_LINE				0
+#define LOG_LINE                0
 
 
 
@@ -34,7 +34,7 @@ const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
 //  cococart_slot_device - constructor
 //-------------------------------------------------
 cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, COCOCART_SLOT, "CoCo Cartridge Slot", tag, owner, clock),
+		device_t(mconfig, COCOCART_SLOT, "CoCo Cartridge Slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -60,29 +60,29 @@ void cococart_slot_device::device_start()
 {
 	for(int i=0; i<TIMER_POOL; i++ )
 	{
-	   m_cart_line.timer[i]		= machine().scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) this);
-	   m_nmi_line.timer[i]		= machine().scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *)  this);
-	   m_halt_line.timer[i]		= machine().scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) this);
+		m_cart_line.timer[i]        = machine().scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) this);
+		m_nmi_line.timer[i]     = machine().scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *)  this);
+		m_halt_line.timer[i]        = machine().scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) this);
 	}
 
 	m_cart_line.timer_index     = 0;
-	m_cart_line.delay		    = 0;
-	m_cart_line.value		    = COCOCART_LINE_VALUE_CLEAR;
-	m_cart_line.q_count		    = 0;
+	m_cart_line.delay           = 0;
+	m_cart_line.value           = COCOCART_LINE_VALUE_CLEAR;
+	m_cart_line.q_count         = 0;
 	m_cart_line.callback.resolve(m_cart_callback, *this);
 
 	m_nmi_line.timer_index      = 0;
 	/* 12 allowed one more instruction to finished after the line is pulled */
-	m_nmi_line.delay		    = 12;
-	m_nmi_line.value		    = COCOCART_LINE_VALUE_CLEAR;
-	m_nmi_line.q_count		    = 0;
+	m_nmi_line.delay            = 12;
+	m_nmi_line.value            = COCOCART_LINE_VALUE_CLEAR;
+	m_nmi_line.q_count          = 0;
 	m_nmi_line.callback.resolve(m_nmi_callback, *this);
 
 	m_halt_line.timer_index     = 0;
 	/* 6 allowed one more instruction to finished after the line is pulled */
-	m_halt_line.delay		    = 6;
-	m_halt_line.value		    = COCOCART_LINE_VALUE_CLEAR;
-	m_halt_line.q_count		    = 0;
+	m_halt_line.delay           = 6;
+	m_halt_line.value           = COCOCART_LINE_VALUE_CLEAR;
+	m_halt_line.q_count         = 0;
 	m_halt_line.callback.resolve(m_halt_callback, *this);
 
 	m_cart = dynamic_cast<device_cococart_interface *>(get_card_device());
@@ -108,9 +108,9 @@ void cococart_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_cart_callback, 0, sizeof(m_cart_callback));
-    	memset(&m_nmi_callback,  0, sizeof(m_nmi_callback));
-    	memset(&m_halt_callback, 0, sizeof(m_halt_callback));
+		memset(&m_cart_callback, 0, sizeof(m_cart_callback));
+		memset(&m_nmi_callback,  0, sizeof(m_nmi_callback));
+		memset(&m_halt_callback, 0, sizeof(m_halt_callback));
 	}
 
 	// set brief and instance name
@@ -257,8 +257,8 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line *line, cococart_li
 		? machine().firstcpu->cycles_to_attotime(line->delay)
 		: attotime::zero;
 
-   line->timer[line->timer_index]->adjust(delay, (int) value);
-   line->timer_index = (line->timer_index + 1) % TIMER_POOL;
+	line->timer[line->timer_index]->adjust(delay, (int) value);
+	line->timer_index = (line->timer_index + 1) % TIMER_POOL;
 }
 
 

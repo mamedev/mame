@@ -63,11 +63,11 @@ ADDRESS_MAP_END
 
 es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ES5503, "Ensoniq ES5503", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("es5503_samples", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(es5503)),
-	  m_irq_func(NULL),
-	  m_adc_func(NULL)
+		device_sound_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		m_space_config("es5503_samples", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(es5503)),
+		m_irq_func(NULL),
+		m_adc_func(NULL)
 {
 }
 
@@ -130,26 +130,26 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshi
 	}
 	else    // preserve the relative phase of the oscillator when looping
 	{
-        UINT16 wtsize = pOsc->wtsize - 1;
-        UINT32 altram = (*accumulator) >> resshift;
+		UINT16 wtsize = pOsc->wtsize - 1;
+		UINT32 altram = (*accumulator) >> resshift;
 
-        if (altram > wtsize)
-        {
-            altram -= wtsize;
-        }
-        else
-        {
-            altram = 0;
-        }
+		if (altram > wtsize)
+		{
+			altram -= wtsize;
+		}
+		else
+		{
+			altram = 0;
+		}
 
-        *accumulator = altram << resshift;
+		*accumulator = altram << resshift;
 	}
 
 	// if swap mode, start the partner
 	if (mode == MODE_SWAP)
 	{
-		pPartner->control &= ~1;	// clear the halt bit
-		pPartner->accumulator = 0;	// and make sure it starts from the top (does this also need phase preservation?)
+		pPartner->control &= ~1;    // clear the halt bit
+		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)
 	}
 
 	// IRQ enabled for this voice?
@@ -264,7 +264,7 @@ void es5503_device::device_start()
 		save_item(NAME(oscillators[osc].irqpend), osc);
 	}
 
-	output_rate = (clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
+	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
 	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate, this);
 
 	m_timer = timer_alloc(0, NULL);
@@ -293,7 +293,7 @@ void es5503_device::device_reset()
 
 	m_channel_strobe = 0;
 
-	output_rate = (clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
+	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
 }
 
 READ8_MEMBER( es5503_device::read )
@@ -309,25 +309,25 @@ READ8_MEMBER( es5503_device::read )
 
 		switch(offset & 0xe0)
 		{
-			case 0:		// freq lo
+			case 0:     // freq lo
 				return (oscillators[osc].freq & 0xff);
 
-			case 0x20:  	// freq hi
+			case 0x20:      // freq hi
 				return (oscillators[osc].freq >> 8);
 
-			case 0x40:	// volume
+			case 0x40:  // volume
 				return oscillators[osc].vol;
 
-			case 0x60:	// data
+			case 0x60:  // data
 				return oscillators[osc].data;
 
-			case 0x80:	// wavetable pointer
+			case 0x80:  // wavetable pointer
 				return (oscillators[osc].wavetblpointer>>8) & 0xff;
 
-			case 0xa0:	// oscillator control
+			case 0xa0:  // oscillator control
 				return oscillators[osc].control;
 
-			case 0xc0:	// bank select / wavetable size / resolution
+			case 0xc0:  // bank select / wavetable size / resolution
 				retval = 0;
 				if (oscillators[osc].wavetblpointer & 0x10000)
 				{
@@ -339,17 +339,17 @@ READ8_MEMBER( es5503_device::read )
 				return retval;
 		}
 	}
-	else	 // global registers
+	else     // global registers
 	{
 		switch (offset)
 		{
-            case 0xe0:	// interrupt status
+			case 0xe0:  // interrupt status
 				retval = rege0;
 
-                if (m_irq_func)
-                {
-                    m_irq_func(this, 0);
-                }
+				if (m_irq_func)
+				{
+					m_irq_func(this, 0);
+				}
 
 				// scan all oscillators
 				for (i = 0; i < oscsenabled+1; i++)
@@ -382,10 +382,10 @@ READ8_MEMBER( es5503_device::read )
 
 				return retval;
 
-			case 0xe1:	// oscillator enable
+			case 0xe1:  // oscillator enable
 				return oscsenabled<<1;
 
-			case 0xe2:	// A/D converter
+			case 0xe2:  // A/D converter
 				if (m_adc_func)
 				{
 					return m_adc_func(this);
@@ -407,28 +407,28 @@ WRITE8_MEMBER( es5503_device::write )
 
 		switch(offset & 0xe0)
 		{
-			case 0:		// freq lo
+			case 0:     // freq lo
 				oscillators[osc].freq &= 0xff00;
 				oscillators[osc].freq |= data;
 				break;
 
-			case 0x20:  	// freq hi
+			case 0x20:      // freq hi
 				oscillators[osc].freq &= 0x00ff;
 				oscillators[osc].freq |= (data<<8);
 				break;
 
-			case 0x40:	// volume
+			case 0x40:  // volume
 				oscillators[osc].vol = data;
 				break;
 
-			case 0x60:	// data - ignore writes
+			case 0x60:  // data - ignore writes
 				break;
 
-			case 0x80:	// wavetable pointer
+			case 0x80:  // wavetable pointer
 				oscillators[osc].wavetblpointer = (data<<8);
 				break;
 
-			case 0xa0:	// oscillator control
+			case 0xa0:  // oscillator control
 				// if a fresh key-on, reset the ccumulator
 				if ((oscillators[osc].control & 1) && (!(data&1)))
 				{
@@ -438,8 +438,8 @@ WRITE8_MEMBER( es5503_device::write )
 				oscillators[osc].control = data;
 				break;
 
-			case 0xc0:	// bank select / wavetable size / resolution
-				if (data & 0x40)	// bank select - not used on the Apple IIgs
+			case 0xc0:  // bank select / wavetable size / resolution
+				if (data & 0x40)    // bank select - not used on the Apple IIgs
 				{
 					oscillators[osc].wavetblpointer |= 0x10000;
 				}
@@ -454,14 +454,14 @@ WRITE8_MEMBER( es5503_device::write )
 				break;
 		}
 	}
-	else	 // global registers
+	else     // global registers
 	{
 		switch (offset)
 		{
-			case 0xe0:	// interrupt status
+			case 0xe0:  // interrupt status
 				break;
 
-			case 0xe1:	// oscillator enable
+			case 0xe1:  // oscillator enable
 				oscsenabled = (data>>1) & 0x1f;
 
 				output_rate = (clock()/8)/(2+oscsenabled);
@@ -469,9 +469,8 @@ WRITE8_MEMBER( es5503_device::write )
 				m_timer->adjust(attotime::from_hz(output_rate), 0, attotime::from_hz(output_rate));
 				break;
 
-			case 0xe2:	// A/D converter
+			case 0xe2:  // A/D converter
 				break;
 		}
 	}
 }
-

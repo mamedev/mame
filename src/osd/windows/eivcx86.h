@@ -64,12 +64,12 @@
 INLINE INT64 _mul_32x32(INT32 a, INT32 b)
 {
 	// in theory this should work, but it is untested
-    __asm
-    {
-        mov   eax,a
-        imul  b
-        // leave results in edx:eax
-    }
+	__asm
+	{
+		mov   eax,a
+		imul  b
+		// leave results in edx:eax
+	}
 }
 #endif
 
@@ -85,12 +85,12 @@ INLINE INT64 _mul_32x32(INT32 a, INT32 b)
 INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
 {
 	// in theory this should work, but it is untested
-    __asm
-    {
-        mov   eax,a
-        mul   b
-        // leave results in edx:eax
-    }
+	__asm
+	{
+		mov   eax,a
+		mul   b
+		// leave results in edx:eax
+	}
 }
 #endif
 
@@ -107,12 +107,12 @@ INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
 {
 	INT32 result;
 
-    __asm
-    {
-        mov   eax,a
-        imul  b
-        mov   result,edx
-    }
+	__asm
+	{
+		mov   eax,a
+		imul  b
+		mov   result,edx
+	}
 
 	return result;
 }
@@ -131,12 +131,12 @@ INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 {
 	INT32 result;
 
-    __asm
-    {
-        mov   eax,a
-        mul   b
-        mov   result,edx
-    }
+	__asm
+	{
+		mov   eax,a
+		mul   b
+		mov   result,edx
+	}
 
 	return result;
 }
@@ -156,14 +156,14 @@ INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	INT32 result;
 
-    __asm
-    {
-        mov   eax,a
-        imul  b
-        mov   cl,shift
-        shrd  eax,edx,cl
-        mov   result,eax
-    }
+	__asm
+	{
+		mov   eax,a
+		imul  b
+		mov   cl,shift
+		shrd  eax,edx,cl
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -183,14 +183,14 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	INT32 result;
 
-    __asm
-    {
-        mov   eax,a
-        mul   b
-        mov   cl,shift
-        shrd  eax,edx,cl
-        mov   result,eax
-    }
+	__asm
+	{
+		mov   eax,a
+		mul   b
+		mov   cl,shift
+		shrd  eax,edx,cl
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -210,13 +210,13 @@ INLINE INT32 _div_64x32(INT64 a, INT32 b)
 	INT32 alow = a;
 	INT32 ahigh = a >> 32;
 
-    __asm
-    {
-        mov   eax,alow
-        mov   edx,ahigh
-        idiv  b
-        mov   result,eax
-    }
+	__asm
+	{
+		mov   eax,alow
+		mov   edx,ahigh
+		idiv  b
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -236,13 +236,13 @@ INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
 	UINT32 alow = a;
 	UINT32 ahigh = a >> 32;
 
-    __asm
-    {
-        mov   eax,alow
-        mov   edx,ahigh
-        div   b
-        mov   result,eax
-    }
+	__asm
+	{
+		mov   eax,alow
+		mov   edx,ahigh
+		div   b
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -264,14 +264,14 @@ INLINE INT32 _div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
 	INT32 ahigh = a >> 32;
 	INT32 rem;
 
-    __asm
-    {
-        mov   eax,alow
-        mov   edx,ahigh
-        idiv  b
-        mov   result,eax
-        mov   rem,edx
-    }
+	__asm
+	{
+		mov   eax,alow
+		mov   edx,ahigh
+		idiv  b
+		mov   result,eax
+		mov   rem,edx
+	}
 
 	*remainder = rem;
 	return result;
@@ -294,14 +294,14 @@ INLINE UINT32 _divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
 	UINT32 ahigh = a >> 32;
 	UINT32 rem;
 
-    __asm
-    {
-        mov   eax,alow
-        mov   edx,ahigh
-        div   b
-        mov   result,eax
-        mov   rem,edx
-    }
+	__asm
+	{
+		mov   eax,alow
+		mov   edx,ahigh
+		div   b
+		mov   result,eax
+		mov   rem,edx
+	}
 
 	*remainder = rem;
 	return result;
@@ -321,16 +321,16 @@ INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	INT32 result;
 
-    __asm
-    {
-        mov   eax,a
-        cdq
-        mov   cl,shift
-        shld  edx,eax,cl
-        shl   eax,cl
-        idiv  b
-        mov   result,eax
-    }
+	__asm
+	{
+		mov   eax,a
+		cdq
+		mov   cl,shift
+		shld  edx,eax,cl
+		shl   eax,cl
+		idiv  b
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -349,16 +349,16 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	UINT32 result;
 
-    __asm
-    {
-        mov   eax,a
-        xor   edx,edx
-        mov   cl,shift
-        shld  edx,eax,cl
-        shl   eax,cl
-        div   b
-        mov   result,eax
-    }
+	__asm
+	{
+		mov   eax,a
+		xor   edx,edx
+		mov   cl,shift
+		shld  edx,eax,cl
+		shl   eax,cl
+		div   b
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -378,13 +378,13 @@ INLINE INT32 _mod_64x32(INT64 a, INT32 b)
 	INT32 alow = a;
 	INT32 ahigh = a >> 32;
 
-    __asm
-    {
-        mov   eax,alow
-        mov   edx,ahigh
-        idiv  b
-        mov   result,edx
-    }
+	__asm
+	{
+		mov   eax,alow
+		mov   edx,ahigh
+		idiv  b
+		mov   result,edx
+	}
 
 	return result;
 }
@@ -404,13 +404,13 @@ INLINE UINT32 _modu_64x32(UINT64 a, UINT32 b)
 	UINT32 alow = a;
 	UINT32 ahigh = a >> 32;
 
-    __asm
-    {
-        mov   eax,alow
-        mov   edx,ahigh
-        div   b
-        mov   result,edx
-    }
+	__asm
+	{
+		mov   eax,alow
+		mov   edx,ahigh
+		div   b
+		mov   result,edx
+	}
 
 	return result;
 }
@@ -451,15 +451,15 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 {
 	INT32 result;
 
-    __asm
-    {
-    	bsr   eax,value
-    	jnz   skip
-    	mov   eax,63
-    skip:
-    	xor   eax,31
-        mov   result,eax
-    }
+	__asm
+	{
+		bsr   eax,value
+		jnz   skip
+		mov   eax,63
+	skip:
+		xor   eax,31
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -477,17 +477,17 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 {
 	INT32 result;
 
-    __asm
-    {
-    	mov   eax,value
-    	not   eax
-    	bsr   eax,eax
-    	jnz   skip
-    	mov   eax,63
-    skip:
-    	xor   eax,31
-        mov   result,eax
-    }
+	__asm
+	{
+		mov   eax,value
+		not   eax
+		bsr   eax,eax
+		jnz   skip
+		mov   eax,63
+	skip:
+		xor   eax,31
+		mov   result,eax
+	}
 
 	return result;
 }
@@ -523,7 +523,7 @@ INLINE osd_ticks_t _get_profile_ticks(void)
 	UINT64 *presult = &result;
 
 	__asm {
-		__asm _emit 0Fh __asm _emit 031h	// rdtsc
+		__asm _emit 0Fh __asm _emit 031h    // rdtsc
 		mov ebx, presult
 		mov [ebx],eax
 		mov [ebx+4],edx

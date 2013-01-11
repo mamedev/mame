@@ -5,7 +5,7 @@
 
 struct nec_config
 {
-	const UINT8*	v25v35_decryptiontable; // internal decryption table
+	const UINT8*    v25v35_decryptiontable; // internal decryption table
 };
 
 #define NEC_INPUT_LINE_INTP0 10

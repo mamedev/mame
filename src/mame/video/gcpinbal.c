@@ -82,11 +82,11 @@ WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
 {
 	COMBINE_DATA(&m_tilemapram[offset]);
 
-	if (offset < 0x800)	/* BG0 */
+	if (offset < 0x800) /* BG0 */
 		m_tilemap[0]->mark_tile_dirty(offset / 2);
-	else if ((offset < 0x1000))	/* BG1 */
+	else if ((offset < 0x1000)) /* BG1 */
 		m_tilemap[1]->mark_tile_dirty((offset % 0x800) / 2);
-	else if ((offset < 0x1800))	/* FG */
+	else if ((offset < 0x1800)) /* FG */
 		m_tilemap[2]->mark_tile_dirty((offset % 0x800));
 }
 
@@ -95,49 +95,49 @@ WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
 
 READ16_MEMBER(gcpinbal_state::gcpinbal_ctrl_word_r)
 {
-    // ***** NOT HOOKED UP *****
+	// ***** NOT HOOKED UP *****
 
-    return gcpinbal_piv_ctrlram[offset];
+	return gcpinbal_piv_ctrlram[offset];
 }
 
 
 WRITE16_MEMBER(gcpinbal_state::gcpinbal_ctrl_word_w)
 {
-    // ***** NOT HOOKED UP *****
+	// ***** NOT HOOKED UP *****
 
-    COMBINE_DATA(&gcpinbal_piv_ctrlram[offset]);
-    data = gcpinbal_piv_ctrlram[offset];
+	COMBINE_DATA(&gcpinbal_piv_ctrlram[offset]);
+	data = gcpinbal_piv_ctrlram[offset];
 
-    switch (offset)
-    {
-        case 0x00:
-            gcpinbal_scrollx[0] = -data;
-            break;
+	switch (offset)
+	{
+		case 0x00:
+			gcpinbal_scrollx[0] = -data;
+			break;
 
-        case 0x01:
-            gcpinbal_scrollx[1] = -data;
-            break;
+		case 0x01:
+			gcpinbal_scrollx[1] = -data;
+			break;
 
-        case 0x02:
-            gcpinbal_scrollx[2] = -data;
-            break;
+		case 0x02:
+			gcpinbal_scrollx[2] = -data;
+			break;
 
-        case 0x03:
-            gcpinbal_scrolly[0] = data;
-            break;
+		case 0x03:
+			gcpinbal_scrolly[0] = data;
+			break;
 
-        case 0x04:
-            gcpinbal_scrolly[1] = data;
-            break;
+		case 0x04:
+			gcpinbal_scrolly[1] = data;
+			break;
 
-        case 0x05:
-            gcpinbal_scrolly[2] = data;
-            break;
+		case 0x05:
+			gcpinbal_scrolly[2] = data;
+			break;
 
-        case 0x06:
-            gcpinbal_ctrl_reg = data;
-            break;
-    }
+		case 0x06:
+			gcpinbal_ctrl_reg = data;
+			break;
+	}
 }
 
 #endif
@@ -182,7 +182,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		code = ((spriteram[offs + 5]) & 0xff) + (((spriteram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;
 
-		if (!(spriteram[offs + 4] &0x80))	/* active sprite ? */
+		if (!(spriteram[offs + 4] &0x80))   /* active sprite ? */
 		{
 			x = ((spriteram[offs + 0]) & 0xff) + (((spriteram[offs + 1]) & 0xff) << 8);
 			y = ((spriteram[offs + 2]) & 0xff) + (((spriteram[offs + 3]) & 0xff) << 8);
@@ -214,12 +214,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 				code++;
 
-				if ((spriteram[offs + 4]) & 0x08)	/* Y chain */
+				if ((spriteram[offs + 4]) & 0x08)   /* Y chain */
 				{
-					if (flipy)	cury -= 16;
+					if (flipy)  cury -= 16;
 					else cury += 16;
 				}
-				else	/* X chain */
+				else    /* X chain */
 				{
 					curx += 16;
 				}

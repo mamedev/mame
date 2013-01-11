@@ -11,8 +11,8 @@
 #include "imageutl.h"
 #include "flopimg.h"
 
-#define MV_CPC  	"MV - CPC"
-#define EXTENDED	"EXTENDED"
+#define MV_CPC      "MV - CPC"
+#define EXTENDED    "EXTENDED"
 
 struct dskdsk_tag
 {
@@ -266,8 +266,8 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 #include "emu.h"
 #include "dsk_dsk.h"
 
-#define DSK_FORMAT_HEADER	"MV - CPC"
-#define EXT_FORMAT_HEADER	"EXTENDED CPC DSK"
+#define DSK_FORMAT_HEADER   "MV - CPC"
+#define EXT_FORMAT_HEADER   "EXTENDED CPC DSK"
 
 dsk_format::dsk_format() : floppy_image_format_t()
 {
@@ -331,8 +331,8 @@ struct sector_header
 	UINT8   side;
 	UINT8   sector_id;
 	UINT8   sector_size_code;
-	UINT8	fdc_status_reg1;
-	UINT8	fdc_status_reg2;
+	UINT8   fdc_status_reg1;
+	UINT8   fdc_status_reg2;
 	UINT16  data_length;
 };
 
@@ -420,4 +420,3 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 }
 
 const floppy_format_type FLOPPY_DSK_FORMAT = &floppy_image_format_creator<dsk_format>;
-

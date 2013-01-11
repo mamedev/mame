@@ -14,4 +14,3 @@
 CASSETTE_FORMATLIST_EXTERN(hector_cassette_formats);
 
 #endif /* HECT_TAP_H */
-

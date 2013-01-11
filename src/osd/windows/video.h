@@ -49,12 +49,12 @@
 //  CONSTANTS
 //============================================================
 
-#define MAX_WINDOWS			4
+#define MAX_WINDOWS         4
 
-#define VIDEO_MODE_NONE		0
-#define VIDEO_MODE_GDI		1
-#define VIDEO_MODE_DDRAW	2
-#define VIDEO_MODE_D3D		3
+#define VIDEO_MODE_NONE     0
+#define VIDEO_MODE_GDI      1
+#define VIDEO_MODE_DDRAW    2
+#define VIDEO_MODE_D3D      3
 
 
 
@@ -64,48 +64,48 @@
 
 struct win_monitor_info
 {
-	win_monitor_info  *	next;					// pointer to next monitor in list
-	HMONITOR			handle;					// handle to the monitor
-	MONITORINFOEX		info;					// most recently retrieved info
-	float				aspect;					// computed/configured aspect ratio of the physical device
-	int					reqwidth;				// requested width for this monitor
-	int					reqheight;				// requested height for this monitor
+	win_monitor_info  * next;                   // pointer to next monitor in list
+	HMONITOR            handle;                 // handle to the monitor
+	MONITORINFOEX       info;                   // most recently retrieved info
+	float               aspect;                 // computed/configured aspect ratio of the physical device
+	int                 reqwidth;               // requested width for this monitor
+	int                 reqheight;              // requested height for this monitor
 };
 
 
 struct win_window_config
 {
-	float				aspect;						// decoded aspect ratio
-	int					width;						// decoded width
-	int					height;						// decoded height
-	int					refresh;					// decoded refresh
+	float               aspect;                     // decoded aspect ratio
+	int                 width;                      // decoded width
+	int                 height;                     // decoded height
+	int                 refresh;                    // decoded refresh
 };
 
 
 struct win_video_config
 {
 	// global configuration
-	int					windowed;					// start windowed?
-	int					prescale;					// prescale factor
-	int					keepaspect;					// keep aspect ratio
-	int					numscreens;					// number of screens
-	render_layer_config	layerconfig;				// default configuration of layers
+	int                 windowed;                   // start windowed?
+	int                 prescale;                   // prescale factor
+	int                 keepaspect;                 // keep aspect ratio
+	int                 numscreens;                 // number of screens
+	render_layer_config layerconfig;                // default configuration of layers
 
 	// per-window configuration
-	win_window_config	window[MAX_WINDOWS];		// configuration data per-window
+	win_window_config   window[MAX_WINDOWS];        // configuration data per-window
 
 	// hardware options
-	int					mode;						// output mode
-	int					waitvsync;					// spin until vsync
-	int					syncrefresh;				// sync only to refresh rate
-	int					triplebuf;					// triple buffer
-	int					switchres;					// switch resolutions
+	int                 mode;                       // output mode
+	int                 waitvsync;                  // spin until vsync
+	int                 syncrefresh;                // sync only to refresh rate
+	int                 triplebuf;                  // triple buffer
+	int                 switchres;                  // switch resolutions
 
 	// ddraw options
-	int					hwstretch;					// stretch using the hardware
+	int                 hwstretch;                  // stretch using the hardware
 
 	// d3d options
-	int					filter;						// enable filtering
+	int                 filter;                     // enable filtering
 };
 
 

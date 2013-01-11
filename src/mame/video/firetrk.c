@@ -83,22 +83,22 @@ PALETTE_INIT_MEMBER(firetrk_state,montecar)
 	};
 
 	/*
-     * The color PROM is addressed as follows:
-     *
-     *   A0 => PLAYFIELD 1
-     *   A1 => PLAYFIELD 2
-     *   A2 => DRONE 1
-     *   A3 => DRONE 2
-     *   A4 => CAR 1
-     *   A5 => CAR 2
-     *   A6 => DRONE COLOR 1
-     *   A7 => DRONE COLOR 2
-     *   A8 => PLAYFIELD WINDOW
-     *
-     * This driver hard-codes some behavior which actually depends
-     * on the PROM, like priorities, clipping and transparency.
-     *
-     */
+	 * The color PROM is addressed as follows:
+	 *
+	 *   A0 => PLAYFIELD 1
+	 *   A1 => PLAYFIELD 2
+	 *   A2 => DRONE 1
+	 *   A3 => DRONE 2
+	 *   A4 => CAR 1
+	 *   A5 => CAR 2
+	 *   A6 => DRONE COLOR 1
+	 *   A7 => DRONE COLOR 2
+	 *   A8 => PLAYFIELD WINDOW
+	 *
+	 * This driver hard-codes some behavior which actually depends
+	 * on the PROM, like priorities, clipping and transparency.
+	 *
+	 */
 
 	m_color1_mask = m_color2_mask = 0;
 
@@ -319,7 +319,7 @@ static void montecar_draw_car(running_machine &machine, bitmap_ind16 &bitmap, co
 
 
 static void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, UINT8 *alpha_ram,
-					  int x, int count, int height)
+						int x, int count, int height)
 {
 	int i;
 

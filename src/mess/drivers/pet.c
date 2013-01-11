@@ -473,9 +473,9 @@ static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8, pet_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superpet_m6809_mem, AS_PROGRAM, 8, pet_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("memory")	/* same memory as m6502 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")	/* same memory as m6502 */
-    AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank1")	/* 64 kbyte ram turned in */
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("memory")  /* same memory as m6502 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")    /* same memory as m6502 */
+	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank1")    /* 64 kbyte ram turned in */
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
@@ -496,22 +496,22 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pet )
-	PORT_INCLUDE( pet_keyboard )	/* ROW0 -> ROW9 */
+	PORT_INCLUDE( pet_keyboard )    /* ROW0 -> ROW9 */
 
-	PORT_INCLUDE( pet_special )		/* SPECIAL */
+	PORT_INCLUDE( pet_special )     /* SPECIAL */
 
-	PORT_INCLUDE( pet_config )		/* CFG */
+	PORT_INCLUDE( pet_config )      /* CFG */
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( petb )
-	PORT_INCLUDE( pet_business_keyboard )	/* ROW0 -> ROW9 */
+	PORT_INCLUDE( pet_business_keyboard )   /* ROW0 -> ROW9 */
 
-	PORT_INCLUDE( pet_special )				/* SPECIAL */
+	PORT_INCLUDE( pet_special )             /* SPECIAL */
 
-	PORT_INCLUDE( pet_config )				/* CFG */
+	PORT_INCLUDE( pet_config )              /* CFG */
 
-    PORT_MODIFY("CFG")
+	PORT_MODIFY("CFG")
 	PORT_BIT( 0x180, 0x000, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -519,20 +519,20 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cbm8096 )
 	PORT_INCLUDE( petb )
 
-    PORT_MODIFY("CFG")
+	PORT_MODIFY("CFG")
 	PORT_DIPNAME( 0x08, 0x08, "CBM8096, 8296 Expansion Memory")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START (superpet)
 	PORT_INCLUDE( petb )
 
-    PORT_MODIFY("CFG")
+	PORT_MODIFY("CFG")
 	PORT_DIPNAME( 0x04, 0x04, "CPU Select")
-	PORT_DIPSETTING(	0x00, "M6502" )
-	PORT_DIPSETTING(	0x04, "M6809" )
+	PORT_DIPSETTING(    0x00, "M6502" )
+	PORT_DIPSETTING(    0x04, "M6809" )
 INPUT_PORTS_END
 
 
@@ -662,7 +662,7 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pet_state,  pet_frame_interrupt)
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -722,7 +722,7 @@ static MACHINE_CONFIG_DERIVED( pet40, pet )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( pet40_mem)
 
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3	/* This is a wild guess and mostly likely incorrect */, crtc_pet40)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_17_73447MHz/3  /* This is a wild guess and mostly likely incorrect */, crtc_pet40)
 
 	MCFG_VIDEO_START_OVERRIDE(pet_state, pet_crtc )
 	MCFG_SCREEN_MODIFY("screen")
@@ -746,13 +746,13 @@ static MACHINE_CONFIG_DERIVED( pet80, pet_general )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( pet80_mem)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2	/* This is a wild guess and mostly likely incorrect */, crtc_pet80)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2  /* This is a wild guess and mostly likely incorrect */, crtc_pet80)
 
 	MCFG_GFXDECODE( pet80 )
 	MCFG_VIDEO_START_OVERRIDE(pet_state, pet_crtc )
@@ -849,44 +849,44 @@ ROM_END
 /* BASIC 2 */
 ROM_START( pet2001n )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-01.ud6", 0xc000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )	// BASIC 2
-	ROM_LOAD( "901465-02.ud7", 0xd000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )	// BASIC 2
-	ROM_LOAD( "901447-24.ud8", 0xe000, 0x800,  CRC(e459ab32) SHA1(5e5502ce32f5a7e387d65efe058916282041e54b) )	// Screen Editor (40 columns, no CRTC, Normal Keyb)
-	ROM_LOAD( "901465-03.ud9", 0xf000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )	// Kernal
+	ROM_LOAD( "901465-01.ud6", 0xc000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )   // BASIC 2
+	ROM_LOAD( "901465-02.ud7", 0xd000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )   // BASIC 2
+	ROM_LOAD( "901447-24.ud8", 0xe000, 0x800,  CRC(e459ab32) SHA1(5e5502ce32f5a7e387d65efe058916282041e54b) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
+	ROM_LOAD( "901465-03.ud9", 0xf000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )   // Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
 ROM_END
 
 /* BASIC 2 - Business Keyboard (Number keys, etc.) */
 ROM_START( pet2001b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-01.ud6", 0xc000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )	// BASIC 2
-	ROM_LOAD( "901465-02.ud7", 0xd000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )	// BASIC 2
-	ROM_LOAD( "901474-01.ud8", 0xe000, 0x800,  CRC(05db957e) SHA1(174ace3a8c0348cd21d39cc864e2adc58b0101a9) )	// Screen Editor (40 columns, no CRTC, Business Keyb)
-	ROM_LOAD( "901465-03.ud9", 0xf000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )	// Kernal
+	ROM_LOAD( "901465-01.ud6", 0xc000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )   // BASIC 2
+	ROM_LOAD( "901465-02.ud7", 0xd000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )   // BASIC 2
+	ROM_LOAD( "901474-01.ud8", 0xe000, 0x800,  CRC(05db957e) SHA1(174ace3a8c0348cd21d39cc864e2adc58b0101a9) )   // Screen Editor (40 columns, no CRTC, Business Keyb)
+	ROM_LOAD( "901465-03.ud9", 0xf000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )   // Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
 ROM_END
 
-#define rom_cbm30		rom_pet2001n
-#define rom_cbm30b		rom_pet2001b
+#define rom_cbm30       rom_pet2001n
+#define rom_cbm30b      rom_pet2001b
 
 /* BASIC 4, but 40 columns only and no CRTC */
 ROM_START( pet40on )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "basic4", "BASIC 4r" )
-	ROMX_LOAD( "901465-23.ud5", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) )	// BASIC 4
+	ROMX_LOAD( "901465-23.ud5", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_SYSTEM_BIOS( 1, "basic4o", "BASIC 4" )
 	ROMX_LOAD( "901465-19.ud5", 0xb000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(2) )
-	ROM_LOAD( "901465-20.ud6", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud7", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901447-29.ud8", 0xe000, 0x800,  CRC(e5714d4c) SHA1(e88f56e5c54b0e8d8d4e8cb39a4647c803c1f51c) )	// Screen Editor (40 columns, no CRTC, Normal Keyb)
-	ROM_LOAD( "901465-22.ud9", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-20.ud6", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud7", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901447-29.ud8", 0xe000, 0x800,  CRC(e5714d4c) SHA1(e88f56e5c54b0e8d8d4e8cb39a4647c803c1f51c) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
+	ROM_LOAD( "901465-22.ud9", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
 ROM_END
 
 /* BASIC 4, but 40 columns only and no CRTC - Business Keyboard (Number keys, etc.) */
@@ -896,17 +896,17 @@ ROM_START( pet40ob )
 	ROMX_LOAD( "901465-23.ud5", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "basic4o", "BASIC 4" )
 	ROMX_LOAD( "901465-19.ud5", 0xb000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(2) )
-	ROM_LOAD( "901465-20.ud6", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud7", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901474-02.ud8", 0xe000, 0x800,  CRC(75ff4af7) SHA1(0ca5c4e8f532f914cb0bf86ea9900f20f0a655ce) )	// Screen Editor (40 columns, no CRTC, Business Keyb)
-	ROM_LOAD( "901465-22.ud9", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-20.ud6", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud7", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901474-02.ud8", 0xe000, 0x800,  CRC(75ff4af7) SHA1(0ca5c4e8f532f914cb0bf86ea9900f20f0a655ce) )   // Screen Editor (40 columns, no CRTC, Business Keyb)
+	ROM_LOAD( "901465-22.ud9", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
 ROM_END
 
-#define rom_cbm40o		rom_pet40on
-#define rom_cbm40ob		rom_pet40ob
+#define rom_cbm40o      rom_pet40on
+#define rom_cbm40ob     rom_pet40ob
 
 /* PET 40XX (later) / PET 80XX / CBM 400XX (later) / CBM 80XX - Board type 3 (80 columns Board) & 4 (Universal Board) */
 /* BASIC 4, Board 3: 80 columns only using CRTC - Board 4: 40 or 80 columns using CRTC, changed through a jumper on the board */
@@ -915,89 +915,89 @@ ROM_END
 /* 40 columns - 60 Hz */
 ROM_START( pet40n )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901499-01.ud7", 0xe000, 0x800,  CRC(5f85bdf8) SHA1(8cbf086c1ce4dfb2a2fe24c47476dfb878493dee) )	// Screen Editor (40 columns, CRTC 60Hz, Normal Keyb?)
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901499-01.ud7", 0xe000, 0x800,  CRC(5f85bdf8) SHA1(8cbf086c1ce4dfb2a2fe24c47476dfb878493dee) )   // Screen Editor (40 columns, CRTC 60Hz, Normal Keyb?)
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
 ROM_END
 
 /* 40 columns - 50 Hz */
 ROM_START( cbm40n )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901498-01.ud7", 0xe000, 0x800,  CRC(3370e359) SHA1(05af284c914d53a52987b5f602466de75765f650) )	// Screen Editor (40 columns, CRTC 50Hz, Normal Keyb?)
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901498-01.ud7", 0xe000, 0x800,  CRC(3370e359) SHA1(05af284c914d53a52987b5f602466de75765f650) )   // Screen Editor (40 columns, CRTC 50Hz, Normal Keyb?)
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
 ROM_END
 
 /* 80 columns - 60 Hz */
 ROM_START( pet40b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901474-03.ud7", 0xe000, 0x800,  CRC(5674dd5e) SHA1(c605fa343fd77c73cbe1e0e9567e2f014f6e7e30) )	// Screen Editor (80 columns, CRTC 60Hz, Business Keyb)
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901474-03.ud7", 0xe000, 0x800,  CRC(5674dd5e) SHA1(c605fa343fd77c73cbe1e0e9567e2f014f6e7e30) )   // Screen Editor (80 columns, CRTC 60Hz, Business Keyb)
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
 ROM_END
 
 /* 80 columns - 50 Hz */
 ROM_START( cbm40b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4" )
-	ROMX_LOAD( "901474-04.ud7", 0xe000, 0x800,  CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba), ROM_BIOS(1) )	// Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
+	ROMX_LOAD( "901474-04.ud7", 0xe000, 0x800,  CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba), ROM_BIOS(1) ) // Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
 	ROM_SYSTEM_BIOS( 1, "alt", "BASIC 4 (alt Editor)" )
 	ROMX_LOAD( "901474-04a.ud7", 0xe000, 0x800, BAD_DUMP CRC(845a44e6) SHA1(81975eab31a8f4f51ae2a20d099a567c7b3f2dd1), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "old", "BASIC 4 (Editor dated 3681)" )
 	ROMX_LOAD( "901474-04o.ud7", 0xe000, 0x800, CRC(c1ffca3a) SHA1(7040b283ba39e9630e3d147f7d076b7abc39bc70), ROM_BIOS(3) )
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
 ROM_END
 
 /* 80 columns - 60 Hz - can be expanded to 96k RAM */
 ROM_START( pet80 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901474-03.ud7", 0xe000, 0x800,  CRC(5674dd5e) SHA1(c605fa343fd77c73cbe1e0e9567e2f014f6e7e30) )	// Screen Editor (80 columns, CRTC 60Hz, Business Keyb)
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901474-03.ud7", 0xe000, 0x800,  CRC(5674dd5e) SHA1(c605fa343fd77c73cbe1e0e9567e2f014f6e7e30) )   // Screen Editor (80 columns, CRTC 60Hz, Business Keyb)
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
 ROM_END
 
 /* 80 columns - 50 Hz - can be expanded to 96k RAM */
 ROM_START( cbm80 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_SYSTEM_BIOS( 0, "default", "BASIC 4" )
-	ROMX_LOAD( "901474-04.ud7", 0xe000, 0x800,  CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba), ROM_BIOS(1) )	// Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
+	ROMX_LOAD( "901474-04.ud7", 0xe000, 0x800,  CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba), ROM_BIOS(1) ) // Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
 	ROM_SYSTEM_BIOS( 1, "alt", "BASIC 4 (alt Editor)" )
 	ROMX_LOAD( "901474-04a.ud7", 0xe000, 0x800, BAD_DUMP CRC(845a44e6) SHA1(81975eab31a8f4f51ae2a20d099a567c7b3f2dd1), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "old", "BASIC 4 (Editor dated 3681)" )
 	ROMX_LOAD( "901474-04o.ud7", 0xe000, 0x800, CRC(c1ffca3a) SHA1(7040b283ba39e9630e3d147f7d076b7abc39bc70), ROM_BIOS(3) )
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
 ROM_END
 
 
@@ -1013,11 +1013,11 @@ In this case the labels would have been as follows
 
 ROM_START( superpet )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901474-04.ud7", 0xe000, 0x800,  CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba) )	// Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901474-04.ud7", 0xe000, 0x800,  CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba) )   // Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x10000, "m6809", 0 )
 	ROM_LOAD( "901898-01.u17", 0xa000, 0x1000, CRC(728a998b) SHA1(0414b3ab847c8977eb05c2fcc72efcf2f9d92871) )
@@ -1031,32 +1031,32 @@ ROM_START( superpet )
 	ROM_LOAD( "901640-01.ub3", 0x0000, 0x1000, CRC(ee8229c4) SHA1(bf346f11595a3e65e55d6aeeaa2c0cec807b66c7) )
 ROM_END
 
-#define rom_sp9000		rom_superpet
+#define rom_sp9000      rom_superpet
 
 
 /* CBM 8296 / 8296D - only ROM loading added */
 ROM_START( cbm8296 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "324746-01.ue7", 0xb000, 0x3000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )	// BASIC 4 // FIX ME!!
-	ROM_CONTINUE(			   0xf000, 0x1000 )
-	ROM_LOAD( "901474-04.ue8", 0xe000, 0x800,  CRC(c1ffca3a) SHA1(7040b283ba39e9630e3d147f7d076b7abc39bc70) )	// Dated 0384, coincides with 3681 above according to Andr? Fachat's notes
+	ROM_LOAD( "324746-01.ue7", 0xb000, 0x3000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4 // FIX ME!!
+	ROM_CONTINUE(              0xf000, 0x1000 )
+	ROM_LOAD( "901474-04.ue8", 0xe000, 0x800,  CRC(c1ffca3a) SHA1(7040b283ba39e9630e3d147f7d076b7abc39bc70) )   // Dated 0384, coincides with 3681 above according to Andr? Fachat's notes
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )	// Character Generator
+	ROM_LOAD( "901447-10.uc5", 0x0000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
 ROM_END
 
-#define rom_cbm8296d	rom_cbm8296
+#define rom_cbm8296d    rom_cbm8296
 
 
 /* PAL regional variants */
 
 ROM_START( cbm80ger )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_LOAD( "german.bin",    0xe000, 0x800,  CRC(1c1e597d) SHA1(7ac75ed73832847623c9f4f197fe7fb1a73bb41c) )
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "chargen.de", 0x0000, 0x800, CRC(3bb8cb87) SHA1(a4f0df13473d7f9cd31fd62cfcab11318e2fb1dc) )
@@ -1064,49 +1064,49 @@ ROM_END
 
 ROM_START( cbm80swe )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "swedish.bin",   0xe000, 0x800,  CRC(75901dd7) SHA1(2ead0d83255a344a42bb786428353ca48d446d03) )		// It had a label "8000-UD7, SCREEN-04"
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "swedish.bin",   0xe000, 0x800,  CRC(75901dd7) SHA1(2ead0d83255a344a42bb786428353ca48d446d03) )       // It had a label "8000-UD7, SCREEN-04"
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "901447-14.ua3", 0x0000, 0x800, CRC(48c77d29) SHA1(aa7c8ff844d16ec05e2b32acc586c58d9e35388c) )	// Character Generator
+	ROM_LOAD( "901447-14.ua3", 0x0000, 0x800, CRC(48c77d29) SHA1(aa7c8ff844d16ec05e2b32acc586c58d9e35388c) )    // Character Generator
 ROM_END
 
 /* This had only the CharGen dumped, the editor needs to be dumped as well (and the other ones verified)!!  */
 ROM_START( cbm30nor )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-01.ud6", 0xc000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )	// BASIC 2
-	ROM_LOAD( "901465-02.ud7", 0xd000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )	// BASIC 2
-	ROM_LOAD( "901474-01.ud8", 0xe000, 0x800,  BAD_DUMP CRC(05db957e) SHA1(174ace3a8c0348cd21d39cc864e2adc58b0101a9) )	// Screen Editor to be redumped
-	ROM_LOAD( "901465-03.ud9", 0xf000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )	// Kernal
+	ROM_LOAD( "901465-01.ud6", 0xc000, 0x1000, CRC(63a7fe4a) SHA1(3622111f486d0e137022523657394befa92bde44) )   // BASIC 2
+	ROM_LOAD( "901465-02.ud7", 0xd000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )   // BASIC 2
+	ROM_LOAD( "901474-01.ud8", 0xe000, 0x800,  BAD_DUMP CRC(05db957e) SHA1(174ace3a8c0348cd21d39cc864e2adc58b0101a9) )  // Screen Editor to be redumped
+	ROM_LOAD( "901465-03.ud9", 0xf000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )   // Kernal
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "norwegian.uf10", 0x0000, 0x800, CRC(7c00534a) SHA1(2c46bd5f5351530ceb52686e5196de995e28e24f) )	// Character Generator dumped from a CBM 3032 // FIX ME!!
+	ROM_LOAD( "norwegian.uf10", 0x0000, 0x800, CRC(7c00534a) SHA1(2c46bd5f5351530ceb52686e5196de995e28e24f) )   // Character Generator dumped from a CBM 3032 // FIX ME!!
 ROM_END
 
 /* This had only the CharGen dumped, the editor needs to be dumped as well (and the other ones verified)!!  */
 ROM_START( cbm80hun )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
-	ROM_LOAD( "901474-04.ud7", 0xe000, 0x800,  BAD_DUMP CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba) )	// Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901474-04.ud7", 0xe000, 0x800,  BAD_DUMP CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba) )  // Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "hungarian.ua3", 0x0000, 0x800, CRC(a02d8122) SHA1(2fedbb59068b457d98f28de79f1817e25f745604) )	// Character Generator // FIX ME!!
+	ROM_LOAD( "hungarian.ua3", 0x0000, 0x800, CRC(a02d8122) SHA1(2fedbb59068b457d98f28de79f1817e25f745604) )    // Character Generator // FIX ME!!
 ROM_END
 
 /* Swedish M6809 roms needed */
 ROM_START( mmf9000s )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )	// BASIC 4
-	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )	// BASIC 4
-	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )	// BASIC 4
+	ROM_LOAD( "901465-23.ud10", 0xb000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0xc000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0xd000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
 	ROM_LOAD( "swedish.bin",   0xe000, 0x800,  CRC(75901dd7) SHA1(2ead0d83255a344a42bb786428353ca48d446d03) )
-	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )	// Kernal
+	ROM_LOAD( "901465-22.ud6", 0xf000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x20000, "m6809", 0 )
 	ROM_LOAD( "901898-01.u17", 0xa000, 0x1000, BAD_DUMP CRC(728a998b) SHA1(0414b3ab847c8977eb05c2fcc72efcf2f9d92871) )
@@ -1117,7 +1117,7 @@ ROM_START( mmf9000s )
 	ROM_LOAD( "901898-05.u22", 0xf000, 0x1000, BAD_DUMP CRC(f42df0cb) SHA1(9b4a5134d20345171e7303445f87c4e0b9addc96) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD("skand.gen.ub3", 0x0000, 0x1000, CRC(da1cd630) SHA1(35f472114ff001259bdbae073ae041b0759e32cb) )	// Actual label was "901640-01 SKAND.GEN."
+	ROM_LOAD("skand.gen.ub3", 0x0000, 0x1000, CRC(da1cd630) SHA1(35f472114ff001259bdbae073ae041b0759e32cb) )    // Actual label was "901640-01 SKAND.GEN."
 ROM_END
 
 /***************************************************************************

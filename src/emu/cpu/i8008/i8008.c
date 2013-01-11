@@ -15,9 +15,9 @@
 //  MACROS
 //**************************************************************************
 
-#define REG_1					((opcode >> 3) & 7)
-#define REG_2					(opcode & 7)
-#define GET_PC					(m_ADDR[m_pc_pos])
+#define REG_1                   ((opcode >> 3) & 7)
+#define REG_2                   (opcode & 7)
+#define GET_PC                  (m_ADDR[m_pc_pos])
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -35,10 +35,10 @@ const device_type I8008 = &device_creator<i8008_device>;
 //-------------------------------------------------
 i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, I8008, "i8008", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
-	  m_io_config("io", ENDIANNESS_LITTLE, 8, 8),
-	  m_program(0),
-	  m_direct(0)
+		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
+		m_io_config("io", ENDIANNESS_LITTLE, 8, 8),
+		m_program(0),
+		m_direct(0)
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -141,7 +141,7 @@ void i8008_device::device_reset()
 
 const address_space_config *i8008_device::memory_space_config(address_spacenum spacenum) const
 {
-	return	(spacenum == AS_PROGRAM) ? &m_program_config :
+	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_IO) ? &m_io_config :
 			NULL;
 }
@@ -175,9 +175,9 @@ void i8008_device::state_export(const device_state_entry &entry)
 	{
 		case STATE_GENFLAGS:
 			m_flags = (m_CF ? 0x08 : 0x00) |
-							  (m_ZF ? 0x04 : 0x00) |
-							  (m_SF ? 0x02 : 0x00) |
-							  (m_PF ? 0x01 : 0x00);
+								(m_ZF ? 0x04 : 0x00) |
+								(m_SF ? 0x02 : 0x00) |
+								(m_PF ? 0x01 : 0x00);
 			break;
 	}
 }
@@ -306,7 +306,7 @@ inline void i8008_device::execute_one(int opcode)
 
 	switch (opcode >> 6)
 	{
-		case 0x03:	// starting with 11
+		case 0x03:  // starting with 11
 					if (opcode==0xff) {
 						// HLT
 						m_icount -= 4;
@@ -321,10 +321,10 @@ inline void i8008_device::execute_one(int opcode)
 						set_reg(REG_1, get_reg(REG_2));
 					}
 					break;
-		case 0x00:	// starting with 00
+		case 0x00:  // starting with 00
 					switch(opcode & 7) {
-						case 0 :	if(((opcode >> 3) & 7)==0) {
-							        	// HLT
+						case 0 :    if(((opcode >> 3) & 7)==0) {
+										// HLT
 										m_icount -= 4;
 										GET_PC.w.l = GET_PC.w.l - 1;
 										m_PC = GET_PC;
@@ -343,8 +343,8 @@ inline void i8008_device::execute_one(int opcode)
 										}
 									}
 									break;
-						case 1 :	if(((opcode >> 3) & 7)==0) {
-							        	// HLT
+						case 1 :    if(((opcode >> 3) & 7)==0) {
+										// HLT
 										m_icount -= 4;
 										GET_PC.w.l = GET_PC.w.l - 1;
 										m_PC = GET_PC;
@@ -363,7 +363,7 @@ inline void i8008_device::execute_one(int opcode)
 										}
 									}
 									break;
-						case 2 :	{
+						case 2 :    {
 										// All instuction from this group have same timing
 										m_icount -= 5;
 										switch((opcode >> 3) & 7) {
@@ -409,7 +409,7 @@ inline void i8008_device::execute_one(int opcode)
 										}
 									}
 									break;
-						case 4 :	{
+						case 4 :    {
 										m_icount -= 8;
 										switch((opcode >> 3) & 7) {
 											case 0 :
@@ -470,18 +470,18 @@ inline void i8008_device::execute_one(int opcode)
 										}
 									}
 									break;
-						case 5 :	// RST
+						case 5 :    // RST
 									m_icount -= 5;
 									push_stack();
 									GET_PC.w.l = opcode & 0x38;
 									m_PC = GET_PC;
 									break;
-						case 6 :	// LrI
+						case 6 :    // LrI
 									m_icount -= 8;
 									if (REG_1==7) m_icount -= 1; // LMI
 									set_reg(REG_1, arg());
 									break;
-						case 7 :	// RET
+						case 7 :    // RET
 									m_icount -= 5;
 									pop_stack();
 									m_PC = GET_PC;
@@ -489,7 +489,7 @@ inline void i8008_device::execute_one(int opcode)
 					}
 					break;
 
-		case 0x01:	// starting with 01
+		case 0x01:  // starting with 01
 					switch(opcode & 7) {
 						case 0 :
 							// Jcc
@@ -539,7 +539,7 @@ inline void i8008_device::execute_one(int opcode)
 							break;
 					}
 					break;
-		case 0x02:	// starting with 10
+		case 0x02:  // starting with 10
 					m_icount -= 5;
 					if ((opcode & 7)==7) m_icount -= 3; // operations with memory
 					switch((opcode >> 3) & 7) {

@@ -52,46 +52,46 @@
 //**************************************************************************
 
 // by convention, tags should all lowercase and between 1-15 characters
-#define MIN_TAG_LENGTH			1
-#define MAX_TAG_LENGTH			15
+#define MIN_TAG_LENGTH          1
+#define MAX_TAG_LENGTH          15
 
 
 
 // ----- flags for video_attributes -----
 
 // should VIDEO_UPDATE by called at the start of VBLANK or at the end?
-#define	VIDEO_UPDATE_BEFORE_VBLANK		0x0000
-#define	VIDEO_UPDATE_AFTER_VBLANK		0x0004
+#define VIDEO_UPDATE_BEFORE_VBLANK      0x0000
+#define VIDEO_UPDATE_AFTER_VBLANK       0x0004
 
 // indicates VIDEO_UPDATE will add container bits its
-#define VIDEO_SELF_RENDER				0x0008
+#define VIDEO_SELF_RENDER               0x0008
 
 // automatically extend the palette creating a darker copy for shadows
-#define VIDEO_HAS_SHADOWS				0x0010
+#define VIDEO_HAS_SHADOWS               0x0010
 
 // automatically extend the palette creating a brighter copy for highlights
-#define VIDEO_HAS_HIGHLIGHTS			0x0020
+#define VIDEO_HAS_HIGHLIGHTS            0x0020
 
 // force VIDEO_UPDATE to be called even for skipped frames
-#define VIDEO_ALWAYS_UPDATE				0x0080
+#define VIDEO_ALWAYS_UPDATE             0x0080
 
 // calls VIDEO_UPDATE for every visible scanline, even for skipped frames
-#define VIDEO_UPDATE_SCANLINE			0x0100
+#define VIDEO_UPDATE_SCANLINE           0x0100
 
 
 
-#define NVRAM_HANDLER_NAME(name)	nvram_handler_##name
-#define NVRAM_HANDLER(name)			void NVRAM_HANDLER_NAME(name)(running_machine &machine, emu_file *file, int read_or_write)
-#define NVRAM_HANDLER_CALL(name)	NVRAM_HANDLER_NAME(name)(machine, file, read_or_write)
+#define NVRAM_HANDLER_NAME(name)    nvram_handler_##name
+#define NVRAM_HANDLER(name)         void NVRAM_HANDLER_NAME(name)(running_machine &machine, emu_file *file, int read_or_write)
+#define NVRAM_HANDLER_CALL(name)    NVRAM_HANDLER_NAME(name)(machine, file, read_or_write)
 
-#define MEMCARD_HANDLER_NAME(name)	memcard_handler_##name
-#define MEMCARD_HANDLER(name)		void MEMCARD_HANDLER_NAME(name)(running_machine &machine, emu_file &file, int action)
-#define MEMCARD_HANDLER_CALL(name)	MEMCARD_HANDLER_NAME(name)(machine, file, action)
+#define MEMCARD_HANDLER_NAME(name)  memcard_handler_##name
+#define MEMCARD_HANDLER(name)       void MEMCARD_HANDLER_NAME(name)(running_machine &machine, emu_file &file, int action)
+#define MEMCARD_HANDLER_CALL(name)  MEMCARD_HANDLER_NAME(name)(machine, file, action)
 
 
 // NULL versions
-#define nvram_handler_0 			NULL
-#define memcard_handler_0			NULL
+#define nvram_handler_0             NULL
+#define memcard_handler_0           NULL
 
 
 
@@ -135,20 +135,20 @@ public:
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) const { return downcast<_DeviceClass *>(device(tag)); }
 
 	// public state
-	attotime				m_minimum_quantum;			// minimum scheduling quantum
-	astring					m_perfect_cpu_quantum;		// tag of CPU to use for "perfect" scheduling
-	INT32					m_watchdog_vblank_count;	// number of VBLANKs until the watchdog kills us
-	attotime				m_watchdog_time;			// length of time until the watchdog kills us
+	attotime                m_minimum_quantum;          // minimum scheduling quantum
+	astring                 m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
+	INT32                   m_watchdog_vblank_count;    // number of VBLANKs until the watchdog kills us
+	attotime                m_watchdog_time;            // length of time until the watchdog kills us
 
 	// legacy callbacks
-	nvram_handler_func		m_nvram_handler;			// NVRAM save/load callback
-	memcard_handler_func	m_memcard_handler;			// memory card save/load callback
+	nvram_handler_func      m_nvram_handler;            // NVRAM save/load callback
+	memcard_handler_func    m_memcard_handler;          // memory card save/load callback
 
 	// other parameters
-	UINT32					m_video_attributes;			// flags describing the video system
-	const gfx_decode_entry *m_gfxdecodeinfo;			// pointer to array of graphics decoding information
-	UINT32					m_total_colors;				// total number of colors in the palette
-	const char *			m_default_layout;			// default layout for this machine
+	UINT32                  m_video_attributes;         // flags describing the video system
+	const gfx_decode_entry *m_gfxdecodeinfo;            // pointer to array of graphics decoding information
+	UINT32                  m_total_colors;             // total number of colors in the palette
+	const char *            m_default_layout;           // default layout for this machine
 
 	// helpers during configuration; not for general use
 	device_t *device_add(device_t *owner, const char *tag, device_type type, UINT32 clock);
@@ -158,9 +158,9 @@ public:
 
 private:
 	// internal state
-	const game_driver &		m_gamedrv;
-	emu_options &			m_options;
-	device_t *				m_root_device;
+	const game_driver &     m_gamedrv;
+	emu_options &           m_options;
+	device_t *              m_root_device;
 };
 
 
@@ -276,8 +276,8 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 #define MCFG_DEVICE_REMOVE(_tag) \
 	device = config.device_remove(owner, _tag); \
 
-#define MCFG_DEVICE_MODIFY(_tag)	\
+#define MCFG_DEVICE_MODIFY(_tag)    \
 	device = config.device_find(owner, _tag); \
 
 
-#endif	/* __MCONFIG_H__ */
+#endif  /* __MCONFIG_H__ */

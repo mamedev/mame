@@ -69,12 +69,12 @@ static UINT8 asciihex_to_dec(UINT8 in)
 		return in - 0x37;
 	}
 	/*
-    else
-    if (in>=0x61 && in<=0x66)
-    {
-        return in - 0x57;
-    }
-    */
+	else
+	if (in>=0x61 && in<=0x66)
+	{
+	    return in - 0x57;
+	}
+	*/
 	else
 	{
 		fatalerror("unexpected value in asciihex_to_dec\n");

@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa005, 0xa005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa800, 0xa801) AM_WRITE(sound_command_w)
-	AM_RANGE(0xa802, 0xa802) AM_WRITE(olibochu_flipscreen_w)	/* bit 6 = enable sound? */
+	AM_RANGE(0xa802, 0xa802) AM_WRITE(olibochu_flipscreen_w)    /* bit 6 = enable sound? */
 	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r)	/* likely ay8910 input port, not direct */
+	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r) /* likely ay8910 input port, not direct */
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x7004, 0x7004) AM_WRITENOP //sound filter?
 	AM_RANGE(0x7006, 0x7006) AM_WRITENOP //irq ack?
@@ -289,7 +289,7 @@ static INPUT_PORTS_START( olibochu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )	/* works in service mode but not in game */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )  /* works in service mode but not in game */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
@@ -438,20 +438,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
 }
 
 static MACHINE_CONFIG_START( olibochu, olibochu_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ?? */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(olibochu_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", olibochu_state, olibochu_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ?? */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(olibochu_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(olibochu_state, irq0_line_hold, 60) //???
 
@@ -486,7 +486,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( olibochu )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
 	ROM_LOAD( "1b.3n",        0x0000, 0x1000, CRC(bf17f4f4) SHA1(1075456f4b70a68548e0e1b6271fd4b845a77ce4) )
 	ROM_LOAD( "2b.3lm",       0x1000, 0x1000, CRC(63833b0d) SHA1(0135c449c92470241d03a87709c739209139d660) )
 	ROM_LOAD( "3b.3k",        0x2000, 0x1000, CRC(a4038e8b) SHA1(d7dce830239c8975ac135b213a99eec0c20ec3e2) )
@@ -496,11 +496,11 @@ ROM_START( olibochu )
 	ROM_LOAD( "7c.3e",        0x6000, 0x1000, CRC(89c26fb4) SHA1(ebc51e40612af894b20bd7fc3a5179cd35aaac9b) )
 	ROM_LOAD( "8b.3d",        0x7000, 0x1000, CRC(af19e5a5) SHA1(5a55bbee5b2f20e2988171a310c8293dabbd9a72) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound CPU */
 	ROM_LOAD( "17.4j",        0x0000, 0x1000, CRC(57f07402) SHA1(a763a835ac512c69b4351c1ec72b0a64e46203aa) )
 	ROM_LOAD( "18.4l",        0x1000, 0x1000, CRC(0a903e9c) SHA1(d893c2f5373f748d8bebf3673b15014f4a8d4b5c) )
 
-	ROM_REGION( 0x2000, "samples", 0 )	/* samples? */
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples? */
 	ROM_LOAD( "15.1k",        0x0000, 0x1000, CRC(fb5dd281) SHA1(fba947ae7b619c2559b5af69ef02acfb15733f0d) )
 	ROM_LOAD( "16.1m",        0x1000, 0x1000, CRC(c07614a5) SHA1(d13d271a324f99d008429c16193c4504e5894493) )
 
@@ -515,9 +515,9 @@ ROM_START( olibochu )
 	ROM_LOAD( "12.2a",        0x3000, 0x1000, CRC(d8f0c157) SHA1(a7b0c873e016c3b3252c2c9b6400b0fd3d650b2f) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "c-1",          0x0000, 0x0020, CRC(e488e831) SHA1(6264741f7091c614093ae1ea4f6ead3d0cef83d3) )	/* palette */
-	ROM_LOAD( "c-2",          0x0020, 0x0100, CRC(698a3ba0) SHA1(3c1a6cb881ef74647c651462a27d812234408e45) )	/* sprite lookup table */
-	ROM_LOAD( "c-3",          0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) )	/* char lookup table */
+	ROM_LOAD( "c-1",          0x0000, 0x0020, CRC(e488e831) SHA1(6264741f7091c614093ae1ea4f6ead3d0cef83d3) )    /* palette */
+	ROM_LOAD( "c-2",          0x0020, 0x0100, CRC(698a3ba0) SHA1(3c1a6cb881ef74647c651462a27d812234408e45) )    /* sprite lookup table */
+	ROM_LOAD( "c-3",          0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) )    /* char lookup table */
 ROM_END
 
 

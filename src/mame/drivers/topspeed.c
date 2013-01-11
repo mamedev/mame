@@ -294,11 +294,11 @@ WRITE16_MEMBER(topspeed_state::sharedram_w)
 	COMBINE_DATA(&m_sharedram[offset]);
 }
 
-static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched between 68Ks */
+static void parse_control( running_machine &machine )   /* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
-       if cpu B is disabled !! */
+	   if cpu B is disabled !! */
 	topspeed_state *state = machine.driver_data<topspeed_state>();
 	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -306,7 +306,7 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 {
 	if ((data & 0xff00) && ((data & 0xff) == 0))
-		data = data >> 8;	/* for Wgp */
+		data = data >> 8;   /* for Wgp */
 
 	m_cpua_ctrl = data;
 
@@ -331,7 +331,7 @@ TIMER_CALLBACK_MEMBER(topspeed_state::topspeed_interrupt6)
 
 TIMER_CALLBACK_MEMBER(topspeed_state::topspeed_cpub_interrupt6)
 {
-	m_subcpu->set_input_line(6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -357,7 +357,7 @@ INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_cpub_interrupt)
 
 READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 {
-	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);   /* read port number */
 	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0);
 
 	switch (port)
@@ -385,10 +385,10 @@ READ16_MEMBER(topspeed_state::topspeed_motor_r)
 	switch (offset)
 	{
 		case 0x0:
-			return (machine().rand() & 0xff);	/* motor status ?? */
+			return (machine().rand() & 0xff);   /* motor status ?? */
 
 		case 0x101:
-			return 0x55;	/* motor cpu status ? */
+			return 0x55;    /* motor cpu status ? */
 
 		default:
 			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", space.device().safe_pc(), offset);
@@ -525,7 +525,7 @@ static ADDRESS_MAP_START( topspeed_cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x880000, 0x880001) AM_READ8(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
+	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)   /* motor CPU */
 ADDRESS_MAP_END
 
 
@@ -551,31 +551,31 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( topspeed )
 	/* 0x880000 (port 0) -> 0x400852 (-$77ae,A5) (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SWA:1,2")
-	PORT_DIPSETTING(    0x03, "Deluxe" )	// analog pedals, racing wheel, motor (tilt disabled)
-	PORT_DIPSETTING(    0x02, "Standard" )	// digital pedals, continuous wheel
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SWA:1,2")
+	PORT_DIPSETTING(    0x03, "Deluxe" )    // analog pedals, racing wheel, motor (tilt disabled)
+	PORT_DIPSETTING(    0x02, "Standard" )  // digital pedals, continuous wheel
 //  PORT_DIPSETTING(    0x01, "Standard" )
-	PORT_DIPSETTING(    0x00, "Mini" )		// analog pedals, racing wheel
+	PORT_DIPSETTING(    0x00, "Mini" )      // analog pedals, racing wheel
 	TAITO_DSWA_BITS_2_TO_3_LOC(SWA)
 	TAITO_COINAGE_WORLD_LOC(SWA)
 
 	/* 0x880000 (port 1) -> 0x400850 (-$77b0,A5) (shared RAM) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SWB)
-	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )				PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )              PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "40 seconds" )
 	PORT_DIPSETTING(    0x04, "50 seconds" )
 	PORT_DIPSETTING(    0x0c, "60 seconds" )
 	PORT_DIPSETTING(    0x08, "70 seconds" )
-	PORT_DIPNAME( 0x30, 0x30, "Nitros" )					PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Nitros" )                    PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SWB:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SWB:8") // "KEEP OFF" in manual, see notes
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Continue_Price ) )   PORT_DIPLOCATION("SWB:8") // "KEEP OFF" in manual, see notes
 	PORT_DIPSETTING(    0x80, "Same as Start" )
 	PORT_DIPSETTING(    0x00, "Half of Start" )
 
@@ -597,11 +597,11 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, topspeed_state, topspeed_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
-	PORT_START("IN2")	/* unused */
+	PORT_START("IN2")   /* unused */
 
 	PORT_START("STEER")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)	// racing wheel (absolute)
-	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2)  PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, EQUALS,    0x02)	// continuous (relative)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)    // racing wheel (absolute)
+	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2)  PORT_NAME("Steering Wheel") PORT_CONDITION("DSWA", 0x03, EQUALS,    0x02)    // continuous (relative)
 
 	PORT_START("GAS")
 	PORT_BIT( 0x07, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
@@ -624,29 +624,29 @@ INPUT_PORTS_END
 
 static const gfx_layout tile16x8_layout =
 {
-	16,8,	/* 16*8 sprites */
+	16,8,   /* 16*8 sprites */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 8, 16, 24 },
 	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( topspeed )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )	/* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )		/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    /* sprite parts */
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
 	// Road Lines gfxdecodable ?
 GFXDECODE_END
 
@@ -657,14 +657,14 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config_1 =
 {
-	topspeed_msm5205_vck_1,	/* VCK function */
-	MSM5205_S48_4B			/* 8 kHz */
+	topspeed_msm5205_vck_1, /* VCK function */
+	MSM5205_S48_4B          /* 8 kHz */
 };
 
 static const msm5205_interface msm5205_config_2 =
 {
-	topspeed_msm5205_vck_2,	/* VCK function */
-	MSM5205_S48_4B			/* 8 kHz */
+	topspeed_msm5205_vck_2, /* VCK function */
+	MSM5205_S48_4B          /* 8 kHz */
 };
 
 
@@ -716,14 +716,14 @@ void topspeed_state::machine_reset()
 
 static const pc080sn_interface topspeed_pc080sn_intf =
 {
-	1,	 /* gfxnum */
-	0, 8, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
+	1,   /* gfxnum */
+	0, 8, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const tc0220ioc_interface topspeed_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
 };
 
 static const tc0140syt_interface topspeed_tc0140syt_intf =
@@ -734,14 +734,14 @@ static const tc0140syt_interface topspeed_tc0140syt_intf =
 static MACHINE_CONFIG_START( topspeed, topspeed_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(topspeed_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state,  topspeed_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MCFG_CPU_ADD("subcpu", M68000, 12000000)	/* 12 MHz ??? */
+	MCFG_CPU_ADD("subcpu", M68000, 12000000)    /* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(topspeed_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state,  topspeed_cpub_interrupt)
 
@@ -793,125 +793,125 @@ Note: driver does NOT make use of the zoom sprite tables rom.
 ***************************************************************************/
 
 ROM_START( topspeed )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 128K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 128K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "b14-67-1.11", 0x00000, 0x10000, CRC(23f17616) SHA1(653ab6537f2e5898a77060c82b776852ab1f2b51) )
 	ROM_LOAD16_BYTE( "b14-68-1.9",  0x00001, 0x10000, CRC(835659d9) SHA1(e99967f795c3c6e14bad7a66315640ca5db43c72) )
-	ROM_LOAD16_BYTE( "b14-54.24",   0x80000, 0x20000, CRC(172924d5) SHA1(4a963f2e816f4b1c5acc6d38e99a68d3baeee8c6) )	/* 4 data roms */
+	ROM_LOAD16_BYTE( "b14-54.24",   0x80000, 0x20000, CRC(172924d5) SHA1(4a963f2e816f4b1c5acc6d38e99a68d3baeee8c6) )    /* 4 data roms */
 	ROM_LOAD16_BYTE( "b14-52.26",   0x80001, 0x20000, CRC(e1b5b2a1) SHA1(8e2b992dcd5dc2317594c0187a22767aa626edee) )
 	ROM_LOAD16_BYTE( "b14-55.23",   0xc0000, 0x20000, CRC(a1f15499) SHA1(72f99108713773782fc72aae5a3f6e9e2a1e347c) )
 	ROM_LOAD16_BYTE( "b14-53.25",   0xc0001, 0x20000, CRC(04a04f5f) SHA1(09c15c33967bb141cc504b70d01c154bedb7fa33) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 )	/* 128K for 68000 code (CPU B) */
+	ROM_REGION( 0x20000, "subcpu", 0 )  /* 128K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "b14-69.80",   0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-70.81",   0x00001, 0x10000, CRC(b720592b) SHA1(13298b498a198dcc1a56e533d106545dd77e1bbc) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b14-07.54",   0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )	/* SCR tiles */
+	ROM_LOAD16_BYTE( "b14-07.54",   0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )    /* SCR tiles */
 	ROM_LOAD16_BYTE( "b14-06.52",   0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROMX_LOAD( "b14-48.16", 0x000003, 0x20000, CRC(30c7f265) SHA1(3e52e2aabf2c456d0b57d9414f99bd942bafc887) , ROM_SKIP(7) )	/* OBJ, bitplane 3 */
+	ROMX_LOAD( "b14-48.16", 0x000003, 0x20000, CRC(30c7f265) SHA1(3e52e2aabf2c456d0b57d9414f99bd942bafc887) , ROM_SKIP(7) ) /* OBJ, bitplane 3 */
 	ROMX_LOAD( "b14-49.12", 0x100003, 0x20000, CRC(32ba4265) SHA1(f468243d923726b7eff78d9bc55a3a092f211a24) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-50.8",  0x000007, 0x20000, CRC(ec1ef311) SHA1(4cfa06aec9535f2044b763b071f73d23ca8ba354) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-51.4",  0x100007, 0x20000, CRC(35041c5f) SHA1(71602267736396516366a8abf535db82acaa1c23) , ROM_SKIP(7) )
 
-	ROMX_LOAD( "b14-44.15", 0x000002, 0x20000, CRC(9f6c030e) SHA1(bb278fdcc29530685aa2e76da0712195f6ab0f5f) , ROM_SKIP(7) )	/* OBJ, bitplane 2 */
+	ROMX_LOAD( "b14-44.15", 0x000002, 0x20000, CRC(9f6c030e) SHA1(bb278fdcc29530685aa2e76da0712195f6ab0f5f) , ROM_SKIP(7) ) /* OBJ, bitplane 2 */
 	ROMX_LOAD( "b14-45.11", 0x100002, 0x20000, CRC(63e4ce03) SHA1(92e3f45754676dd15691e48c0d37490c1a3ec328) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-46.7",  0x000006, 0x20000, CRC(d489adf2) SHA1(9f77916594d5ed05b79d7e8d8f534eb39f65edae) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-47.3",  0x100006, 0x20000, CRC(b3a1f75b) SHA1(050dd3313b5392d131c5a62c544260b83af0b8ab) , ROM_SKIP(7) )
 
-	ROMX_LOAD( "b14-40.14", 0x000001, 0x20000, CRC(fa2a3cb3) SHA1(1e102ae6e916fda046a154b89056a18b724d51a3) , ROM_SKIP(7) )	/* OBJ, bitplane 1 */
+	ROMX_LOAD( "b14-40.14", 0x000001, 0x20000, CRC(fa2a3cb3) SHA1(1e102ae6e916fda046a154b89056a18b724d51a3) , ROM_SKIP(7) ) /* OBJ, bitplane 1 */
 	ROMX_LOAD( "b14-41.10", 0x100001, 0x20000, CRC(09455a14) SHA1(dc703e1f9c4f16e330796e9945799e1038ce503b) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-42.6",  0x000005, 0x20000, CRC(ab51f53c) SHA1(0ed9a2e607b0bd2b43b47e3ed29b00a8d8a09f25) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-43.2",  0x100005, 0x20000, CRC(1e6d2b38) SHA1(453cd818a6cd8b238c72cc880c811227609767b8) , ROM_SKIP(7) )
 
-	ROMX_LOAD( "b14-36.13", 0x000000, 0x20000, CRC(20a7c1b8) SHA1(053c6b733a5c33b9259dfc754ce30a880905bb11) , ROM_SKIP(7) )	/* OBJ, bitplane 0 */
+	ROMX_LOAD( "b14-36.13", 0x000000, 0x20000, CRC(20a7c1b8) SHA1(053c6b733a5c33b9259dfc754ce30a880905bb11) , ROM_SKIP(7) ) /* OBJ, bitplane 0 */
 	ROMX_LOAD( "b14-37.9",  0x100000, 0x20000, CRC(801b703b) SHA1(dfbe276bd484815a7e69589eb56d54bc6e12e301) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-38.5",  0x000004, 0x20000, CRC(de0c213e) SHA1(1313b2051e906d22edb55f4d45d3a424b31ca2a2) , ROM_SKIP(7) )
 	ROMX_LOAD( "b14-39.1",  0x100004, 0x20000, CRC(798c28c5) SHA1(d2a8b9f84b3760f3800c5760ecee7ddcbafa6d6e) , ROM_SKIP(7) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "b14-30.88", 0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) )	/* zoom tables for zoom sprite h/w */
+	ROM_LOAD( "b14-30.88", 0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) ) /* zoom tables for zoom sprite h/w */
 
 // One dump has this 0x10000 long, but just contains the same stuff repeated 8 times //
 	ROM_REGION( 0x2000, "user2", 0 )
-	ROM_LOAD( "b14-31.90",  0x0000,  0x2000,  CRC(5c6b013d) SHA1(6d02d4560076213b6fb6fe856143bb533090603e) )	/* microcontroller */
+	ROM_LOAD( "b14-31.90",  0x0000,  0x2000,  CRC(5c6b013d) SHA1(6d02d4560076213b6fb6fe856143bb533090603e) )    /* microcontroller */
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b14-28.103",  0x00000, 0x10000, CRC(df11d0ae) SHA1(259e1e6cc7ab100bfdb60e3d7a6bb46acb6fe2ea) )
 	ROM_LOAD( "b14-29.109",  0x10000, 0x10000, CRC(7ad983e7) SHA1(a3515caf93d6dab86de06ee52d6a13a456507dbe) )
 ROM_END
 
 ROM_START( topspeedu )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 128K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 128K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE     ( "b14-23", 0x00000, 0x10000, CRC(dd0307fd) SHA1(63218a707c78b3c785d1741dabdc511a76f12af1) )
 	ROM_LOAD16_BYTE     ( "b14-24", 0x00001, 0x10000, CRC(acdf08d4) SHA1(506d48d27fc26684a3f884919665cf65a1b3062f) )
-	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )    /* data rom */
 
-	ROM_REGION( 0x20000, "subcpu", 0 )	/* 128K for 68000 code (CPU B) */
+	ROM_REGION( 0x20000, "subcpu", 0 )  /* 128K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "b14-26", 0x00000, 0x10000, CRC(659dc872) SHA1(0a168122fe6324510c830e21a56eace9c8a2c189) )
 	ROM_LOAD16_BYTE( "b14-56", 0x00001, 0x10000, CRC(d165cf1b) SHA1(bfbb8699c5671d3841d4057678ef4085c1927684) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )	/* SCR tiles */
+	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )  /* SCR tiles */
 	ROM_LOAD16_BYTE( "b14-06.52", 0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )	/* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD32_BYTE( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
 	ROM_LOAD32_BYTE( "b14-02", 0x00001, 0x80000, CRC(6889186b) SHA1(3c38e281e8bf416a401c76ebb2d8ca95d09974b6) )
 	ROM_LOAD32_BYTE( "b14-03", 0x00002, 0x80000, CRC(d1ed9e71) SHA1(26a6b2ca5bf6d70ad87f5c40c8e94ec542a2ec04) )
 	ROM_LOAD32_BYTE( "b14-04", 0x00003, 0x80000, CRC(b63f0519) SHA1(e9a6b49effba0cae1ae3536a8584d3efa34ca8c3) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "b14-30.88", 0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) )	/* zoom tables for zoom sprite h/w */
+	ROM_LOAD( "b14-30.88", 0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) ) /* zoom tables for zoom sprite h/w */
 
 	ROM_REGION( 0x2000, "user2", 0 )
-	ROM_LOAD( "b14-31.90", 0x0000,  0x2000,  CRC(5c6b013d) SHA1(6d02d4560076213b6fb6fe856143bb533090603e) )	/* microcontroller */
+	ROM_LOAD( "b14-31.90", 0x0000,  0x2000,  CRC(5c6b013d) SHA1(6d02d4560076213b6fb6fe856143bb533090603e) ) /* microcontroller */
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b14-28.103", 0x00000, 0x10000, CRC(df11d0ae) SHA1(259e1e6cc7ab100bfdb60e3d7a6bb46acb6fe2ea) )
 	ROM_LOAD( "b14-29.109", 0x10000, 0x10000, CRC(7ad983e7) SHA1(a3515caf93d6dab86de06ee52d6a13a456507dbe) )
 ROM_END
 
 ROM_START( fullthrl )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 128K for 68000 code (CPU A) */
-	ROM_LOAD16_BYTE     ( "b14-67", 0x00000, 0x10000, CRC(284c943f) SHA1(e4720b138052d9cbf1290aeca8f9dd7fe2cffcc5) )	// Later rev?
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 128K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE     ( "b14-67", 0x00000, 0x10000, CRC(284c943f) SHA1(e4720b138052d9cbf1290aeca8f9dd7fe2cffcc5) )    // Later rev?
 	ROM_LOAD16_BYTE     ( "b14-68", 0x00001, 0x10000, CRC(54cf6196) SHA1(0e86a7bf7d43526222160f4cd09f8d29fa9abdc4) )
-	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )    /* data rom */
 
-	ROM_REGION( 0x20000, "subcpu", 0 )	/* 128K for 68000 code (CPU B) */
+	ROM_REGION( 0x20000, "subcpu", 0 )  /* 128K for 68000 code (CPU B) */
 	ROM_LOAD16_BYTE( "b14-69.80", 0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-71",    0x00001, 0x10000, CRC(f7081727) SHA1(f0ab6ce9975dd7a1fadd439fd3dfd2f1bf88796c) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )	/* SCR tiles */
+	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )  /* SCR tiles */
 	ROM_LOAD16_BYTE( "b14-06.52", 0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )	/* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD32_BYTE( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
 	ROM_LOAD32_BYTE( "b14-02", 0x00001, 0x80000, CRC(6889186b) SHA1(3c38e281e8bf416a401c76ebb2d8ca95d09974b6) )
 	ROM_LOAD32_BYTE( "b14-03", 0x00002, 0x80000, CRC(d1ed9e71) SHA1(26a6b2ca5bf6d70ad87f5c40c8e94ec542a2ec04) )
 	ROM_LOAD32_BYTE( "b14-04", 0x00003, 0x80000, CRC(b63f0519) SHA1(e9a6b49effba0cae1ae3536a8584d3efa34ca8c3) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "b14-30.88", 0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) )	/* zoom tables for zoom sprite h/w */
+	ROM_LOAD( "b14-30.88", 0x00000, 0x10000, CRC(dccb0c7f) SHA1(42f0af72f559133b74912a4478e1323062be4b77) ) /* zoom tables for zoom sprite h/w */
 
 	ROM_REGION( 0x2000, "user2", 0 )
-	ROM_LOAD( "b14-31.90", 0x0000,  0x2000,  CRC(5c6b013d) SHA1(6d02d4560076213b6fb6fe856143bb533090603e) )	/* microcontroller */
+	ROM_LOAD( "b14-31.90", 0x0000,  0x2000,  CRC(5c6b013d) SHA1(6d02d4560076213b6fb6fe856143bb533090603e) ) /* microcontroller */
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b14-28.103", 0x00000, 0x10000, CRC(df11d0ae) SHA1(259e1e6cc7ab100bfdb60e3d7a6bb46acb6fe2ea) )
 	ROM_LOAD( "b14-29.109", 0x10000, 0x10000, CRC(7ad983e7) SHA1(a3515caf93d6dab86de06ee52d6a13a456507dbe) )
 ROM_END

@@ -125,7 +125,7 @@ void d110_state::machine_start()
 
 void d110_state::machine_reset()
 {
-	//	midi_timer->adjust(attotime::from_hz(1));
+	//  midi_timer->adjust(attotime::from_hz(1));
 	midi_pos = 0;
 	port0 = 0x80; // battery ok
 }
@@ -190,7 +190,7 @@ WRITE8_MEMBER(d110_state::so_w)
 	// bit 1-2 = reverb program a13/a14
 	// bit 3   = R. SW. to ananlog board
 	// bit 5   = boss 8Mhz clock, handled internally
-	//	logerror("so: rw=%d bank=%d led=%d\n", (data >> 3) & 1, (data >> 1) & 3, data & 1);
+	//  logerror("so: rw=%d bank=%d led=%d\n", (data >> 3) & 1, (data >> 1) & 3, data & 1);
 }
 
 void d110_state::palette_init()
@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( d110, d110_state )
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(d110_state, screen_update)
-//	MCFG_SCREEN_SIZE(20*6-1, 2*9-1)
+//  MCFG_SCREEN_SIZE(20*6-1, 2*9-1)
 	MCFG_SCREEN_SIZE(16*6-1, (16*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-2, 0, (16*6-1)*3/4-1)
 	MCFG_PALETTE_LENGTH(2)
@@ -269,4 +269,3 @@ ROM_START( d110 )
 ROM_END
 
 CONS( 1988, d110,  0, 0, d110, d110, driver_device, 0, "Roland", "D110",  GAME_NOT_WORKING|GAME_NO_SOUND )
-

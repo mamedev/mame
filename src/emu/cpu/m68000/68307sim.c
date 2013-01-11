@@ -21,14 +21,14 @@ READ16_HANDLER( m68307_internal_sim_r )
 
 			case m68307SIM_LICR2: return  (sim->m_licr2);
 
-			case m68307SIM_BR0:	return (sim->m_br[0]);
-			case m68307SIM_OR0:	return (sim->m_or[0]);
-			case m68307SIM_BR1:	return (sim->m_br[1]);
-			case m68307SIM_OR1:	return (sim->m_or[1]);
-			case m68307SIM_BR2:	return (sim->m_br[2]);
-			case m68307SIM_OR2:	return (sim->m_or[2]);
-			case m68307SIM_BR3:	return (sim->m_br[3]);
-			case m68307SIM_OR3:	return (sim->m_or[3]);
+			case m68307SIM_BR0: return (sim->m_br[0]);
+			case m68307SIM_OR0: return (sim->m_or[0]);
+			case m68307SIM_BR1: return (sim->m_br[1]);
+			case m68307SIM_OR1: return (sim->m_or[1]);
+			case m68307SIM_BR2: return (sim->m_br[2]);
+			case m68307SIM_OR2: return (sim->m_or[2]);
+			case m68307SIM_BR3: return (sim->m_br[3]);
+			case m68307SIM_OR3: return (sim->m_or[3]);
 
 			default:
 				logerror("%08x m68307_internal_sim_r %08x, (%04x)\n", pc, offset*2,mem_mask);

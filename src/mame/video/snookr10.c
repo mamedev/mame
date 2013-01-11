@@ -65,10 +65,10 @@ void snookr10_state::palette_init()
 	static const int resistances_g [2] = { 470, 220 };
 	double weights_r[3], weights_b[3], weights_g[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rb,	weights_r,	100,	0,
-			3,	resistances_rb,	weights_b,	100,	0,
-			2,	resistances_g,	weights_g,	100,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rb, weights_r,  100,    0,
+			3,  resistances_rb, weights_b,  100,    0,
+			2,  resistances_g,  weights_g,  100,    0);
 
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -125,10 +125,10 @@ PALETTE_INIT_MEMBER(snookr10_state,apple10)
 	static const int resistances_g [2] = { 470, 220 };
 	double weights_r[3], weights_b[3], weights_g[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rb,	weights_r,	100,	0,
-			3,	resistances_rb,	weights_b,	100,	0,
-			2,	resistances_g,	weights_g,	100,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rb, weights_r,  100,    0,
+			3,  resistances_rb, weights_b,  100,    0,
+			2,  resistances_g,  weights_g,  100,    0);
 
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 */
 	int offs = tile_index;
 	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
-	int code = BITSWAP16((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7);	/* encrypted tile matrix */
+	int code = BITSWAP16((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7); /* encrypted tile matrix */
 	int color = m_colorram[offs] >> 4;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);

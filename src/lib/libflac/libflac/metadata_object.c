@@ -268,13 +268,13 @@ static FLAC__bool vorbiscomment_set_entry_(FLAC__StreamMetadata *object, FLAC__S
 			/* we have to make sure that the string we're taking over is null-terminated */
 
 			/*
-             * Stripping the const from src->entry is OK since we're taking
-             * ownership of the pointer.  This is a hack around a deficiency
-             * in the API where the same function is used for 'copy' and
-             * 'own', but the source entry is a const pointer.  If we were
-             * precise, the 'own' flavor would be a separate function with a
-             * non-const source pointer.  But it's not, so we hack away.
-             */
+			 * Stripping the const from src->entry is OK since we're taking
+			 * ownership of the pointer.  This is a hack around a deficiency
+			 * in the API where the same function is used for 'copy' and
+			 * 'own', but the source entry is a const pointer.  If we were
+			 * precise, the 'own' flavor would be a separate function with a
+			 * non-const source pointer.  But it's not, so we hack away.
+			 */
 			if(!ensure_null_terminated_((FLAC__byte**)(&src->entry), src->length))
 				return false;
 			*dest = *src;
@@ -447,21 +447,21 @@ FLAC_API FLAC__StreamMetadata *FLAC__metadata_object_new(FLAC__MetadataType type
 				break;
 			case FLAC__METADATA_TYPE_PADDING:
 				/* calloc() took care of this for us:
-                object->length = 0;
-                */
+				object->length = 0;
+				*/
 				break;
 			case FLAC__METADATA_TYPE_APPLICATION:
 				object->length = FLAC__STREAM_METADATA_APPLICATION_ID_LEN / 8;
 				/* calloc() took care of this for us:
-                object->data.application.data = 0;
-                */
+				object->data.application.data = 0;
+				*/
 				break;
 			case FLAC__METADATA_TYPE_SEEKTABLE:
 				/* calloc() took care of this for us:
-                object->length = 0;
-                object->data.seek_table.num_points = 0;
-                object->data.seek_table.points = 0;
-                */
+				object->length = 0;
+				object->data.seek_table.num_points = 0;
+				object->data.seek_table.points = 0;
+				*/
 				break;
 			case FLAC__METADATA_TYPE_VORBIS_COMMENT:
 				object->data.vorbis_comment.vendor_string.length = (unsigned)strlen(FLAC__VENDOR_STRING);
@@ -490,13 +490,13 @@ FLAC_API FLAC__StreamMetadata *FLAC__metadata_object_new(FLAC__MetadataType type
 				object->data.picture.mime_type = 0;
 				object->data.picture.description = 0;
 				/* calloc() took care of this for us:
-                object->data.picture.width = 0;
-                object->data.picture.height = 0;
-                object->data.picture.depth = 0;
-                object->data.picture.colors = 0;
-                object->data.picture.data_length = 0;
-                object->data.picture.data = 0;
-                */
+				object->data.picture.width = 0;
+				object->data.picture.height = 0;
+				object->data.picture.depth = 0;
+				object->data.picture.colors = 0;
+				object->data.picture.data_length = 0;
+				object->data.picture.data = 0;
+				*/
 				/* now initialize mime_type and description with empty strings to make things easier on the client */
 				if(!copy_cstring_(&object->data.picture.mime_type, "")) {
 					free(object);
@@ -511,9 +511,9 @@ FLAC_API FLAC__StreamMetadata *FLAC__metadata_object_new(FLAC__MetadataType type
 				break;
 			default:
 				/* calloc() took care of this for us:
-                object->length = 0;
-                object->data.unknown.data = 0;
-                */
+				object->length = 0;
+				object->data.unknown.data = 0;
+				*/
 				break;
 		}
 	}

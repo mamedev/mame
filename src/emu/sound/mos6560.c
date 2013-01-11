@@ -78,14 +78,14 @@
 
 /* 2008-05 FP: lightpen code needs to read input port from vc20.c */
 
-#define LIGHTPEN_BUTTON		((!m_lightpen_button_cb.isnull()) ? m_lightpen_button_cb(0) : 0)
-#define LIGHTPEN_X_VALUE	((!m_lightpen_x_cb.isnull()) ? m_lightpen_x_cb(0) : 0)
-#define LIGHTPEN_Y_VALUE	((!m_lightpen_y_cb.isnull()) ? m_lightpen_y_cb(0) : 0)
+#define LIGHTPEN_BUTTON     ((!m_lightpen_button_cb.isnull()) ? m_lightpen_button_cb(0) : 0)
+#define LIGHTPEN_X_VALUE    ((!m_lightpen_x_cb.isnull()) ? m_lightpen_x_cb(0) : 0)
+#define LIGHTPEN_Y_VALUE    ((!m_lightpen_y_cb.isnull()) ? m_lightpen_y_cb(0) : 0)
 
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
 #define MOS6560_X_BEGIN 38
-#define MOS6560_Y_BEGIN -6			   /* first 6 lines after retrace not for lightpen! */
+#define MOS6560_Y_BEGIN -6             /* first 6 lines after retrace not for lightpen! */
 #define MOS6561_X_BEGIN 38
 #define MOS6561_Y_BEGIN -6
 #define MOS656X_X_BEGIN ((m_variant == TYPE_6561) ? MOS6561_X_BEGIN : MOS6560_X_BEGIN)
@@ -413,12 +413,12 @@ READ8_MEMBER( mos6560_device::read )
 	case 3:
 		val = ((m_rasterline & 1) << 7) | (m_reg[offset] & 0x7f);
 		break;
-	case 4:						   /*rasterline */
+	case 4:                        /*rasterline */
 		drawlines(m_lastline, m_rasterline);
 		val = (m_rasterline / 2) & 0xff;
 		break;
-	case 6:						   /*lightpen horizontal */
-	case 7:						   /*lightpen vertical */
+	case 6:                        /*lightpen horizontal */
+	case 7:                        /*lightpen vertical */
 #ifdef UNUSED_FUNCTION
 		if (LIGHTPEN_BUTTON && ((machine().time().as_double() - m_lightpenreadtime) * MOS656X_VRETRACERATE >= 1))
 		{
@@ -434,8 +434,8 @@ READ8_MEMBER( mos6560_device::read )
 #endif
 		val = m_reg[offset];
 		break;
-	case 8:						   /* poti 1 */
-	case 9:						   /* poti 2 */
+	case 8:                        /* poti 1 */
+	case 9:                        /* poti 2 */
 		val = (!m_paddle_cb->isnull()) ? m_paddle_cb[offset - 8](0) : m_reg[offset];
 		break;
 	default:
@@ -584,7 +584,7 @@ void mos6560_device::soundport_w( int offset, int data )
 		if (NOISE_ON)
 		{
 			m_noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * machine().sample_rate()
-								  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
+									* NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
 			DBG_LOG (1, "mos6560", ("noise %.2x %d sample:%d\n",
 									data, NOISE_FREQUENCY, m_noisesamples));
 			if ((double) m_noisepos / m_noisesamples >= 1.0)
@@ -686,20 +686,20 @@ ADDRESS_MAP_END
 
 mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_sound_interface(mconfig, *this),
-	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-	  m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map))
+		device_memory_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map))
 {
 }
 
 mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS6560, "MOS6560", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_sound_interface(mconfig, *this),
-	  m_variant(TYPE_6560),
-	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-	  m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map))
+		device_memory_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this),
+		m_variant(TYPE_6560),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map))
 {
 }
 
@@ -726,7 +726,7 @@ void mos6560_device::device_config_complete()
 	else
 	{
 		// TODO
-    }
+	}
 }
 
 

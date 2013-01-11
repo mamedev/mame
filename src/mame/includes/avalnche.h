@@ -39,4 +39,3 @@ public:
 /*----------- defined in audio/avalnche.c -----------*/
 
 DISCRETE_SOUND_EXTERN( avalnche );
-

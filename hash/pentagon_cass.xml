@@ -3,11 +3,11 @@
 
 <!-- Preliminary list.
 
-     This list contains software for the Russian 'Pentagon 128' systems.
+		This list contains software for the Russian 'Pentagon 128' systems.
 
-     These systems are Spectrum clones, but offer various extended features.
+		These systems are Spectrum clones, but offer various extended features.
 
-     The software listed here will not function correctly (if at all) on a regular Spectrum
+		The software listed here will not function correctly (if at all) on a regular Spectrum
 -->
 
 <softwarelist name="pentagon_cass" description="Pentagon (ZX Spectrum clone) cassettes">

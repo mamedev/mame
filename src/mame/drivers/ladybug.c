@@ -198,8 +198,8 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 }
 
 
-#define LADYBUG_P1_CONTROL_PORT_TAG	("CONTP1")
-#define LADYBUG_P2_CONTROL_PORT_TAG	("CONTP2")
+#define LADYBUG_P1_CONTROL_PORT_TAG ("CONTP1")
+#define LADYBUG_P2_CONTROL_PORT_TAG ("CONTP2")
 
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
 {
@@ -291,7 +291,7 @@ static INPUT_PORTS_START( ladybug )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
-	PORT_START("COIN")	/* FAKE */
+	PORT_START("COIN")  /* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 
@@ -391,7 +391,7 @@ static INPUT_PORTS_START( snapjack )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x04 all give 1 Coin/1 Credit */
 
-	PORT_START("COIN")	/* FAKE */
+	PORT_START("COIN")  /* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
@@ -475,7 +475,7 @@ static INPUT_PORTS_START( cavenger )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
-	PORT_START("COIN")	/* FAKE */
+	PORT_START("COIN")  /* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
@@ -559,13 +559,13 @@ static INPUT_PORTS_START( dorodon )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 
-	PORT_START("COIN")	/* FAKE */
+	PORT_START("COIN")  /* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sraider )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -575,7 +575,7 @@ static INPUT_PORTS_START( sraider )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")   /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -585,7 +585,7 @@ static INPUT_PORTS_START( sraider )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("DSW0")	/* DSW0 */
+	PORT_START("DSW0")  /* DSW0 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
@@ -610,7 +610,7 @@ static INPUT_PORTS_START( sraider )
 	PORT_DIPSETTING(    0x40, "5" )
 
 	/* Free Play setting works when it's set for both */
-	PORT_START("DSW1")	/* DSW1 */
+	PORT_START("DSW1")  /* DSW1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
@@ -641,57 +641,57 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	2,	/* 2 bits per pixel */
-	{ 0, 512*8*8 },	/* the two bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	2,  /* 2 bits per pixel */
+	{ 0, 512*8*8 }, /* the two bitplanes are separated */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	128,	/* 128 sprites */
-	2,	/* 2 bits per pixel */
-	{ 1, 0 },	/* the two bitplanes are packed in two consecutive bits */
+	16,16,  /* 16*16 sprites */
+	128,    /* 128 sprites */
+	2,  /* 2 bits per pixel */
+	{ 1, 0 },   /* the two bitplanes are packed in two consecutive bits */
 	{ 0, 2, 4, 6, 8, 10, 12, 14,
 			8*16+0, 8*16+2, 8*16+4, 8*16+6, 8*16+8, 8*16+10, 8*16+12, 8*16+14 },
 	{ 23*16, 22*16, 21*16, 20*16, 19*16, 18*16, 17*16, 16*16,
 			7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	64*8    /* every sprite takes 64 consecutive bytes */
 };
 static const gfx_layout spritelayout2 =
 {
-	8,8,	/* 8*8 sprites */
-	512,	/* 512 sprites */
-	2,	/* 2 bits per pixel */
-	{ 1, 0 },	/* the two bitplanes are packed in two consecutive bits */
+	8,8,    /* 8*8 sprites */
+	512,    /* 512 sprites */
+	2,  /* 2 bits per pixel */
+	{ 1, 0 },   /* the two bitplanes are packed in two consecutive bits */
 	{ 0, 2, 4, 6, 8, 10, 12, 14 },
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
-	16*8	/* every sprite takes 16 consecutive bytes */
+	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
 static const gfx_layout gridlayout =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	1,	/* 1 bit per pixel */
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	1,  /* 1 bit per pixel */
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout gridlayout2 =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	1,	/* 1 bit per pixel */
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	1,  /* 1 bit per pixel */
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static GFXDECODE_START( ladybug )
@@ -722,7 +722,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -777,7 +777,7 @@ MACHINE_RESET_MEMBER(ladybug_state,sraider)
 static MACHINE_CONFIG_START( ladybug, ladybug_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(ladybug_map)
 
 	MCFG_MACHINE_START_OVERRIDE(ladybug_state,ladybug)
@@ -812,11 +812,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sraider, ladybug_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sraider_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ladybug_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz */
+	MCFG_CPU_ADD("sub", Z80, 4000000)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sraider_cpu2_map)
 	MCFG_CPU_IO_MAP(sraider_cpu2_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ladybug_state,  irq0_line_hold)
@@ -1053,7 +1053,7 @@ ROM_START( sraider )
 	ROM_LOAD( "sraid-s7.m2",  0x0000, 0x1000, CRC(299f8e07) SHA1(1de71f251286088487da7285d6f8070147002af5) )
 	ROM_LOAD( "sraid-s8.n2",  0x1000, 0x1000, CRC(57ba8888) SHA1(2aa1a5f682d146a55a96e471bb78e5c60da02bf9) )
 
-	ROM_REGION( 0x1000, "gfx3", 0 )	/* fixed portion of the grid */
+	ROM_REGION( 0x1000, "gfx3", 0 ) /* fixed portion of the grid */
 	ROM_LOAD( "sraid-s9.f6",  0x0000, 0x1000, CRC(2380b90f) SHA1(0310554e3f2ec973c2bb6e816d04e5c0c1e0a0b9) )
 
 	ROM_REGION( 0x0060, "proms", 0 )

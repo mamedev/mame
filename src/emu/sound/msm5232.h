@@ -7,7 +7,7 @@
 
 struct msm5232_interface
 {
-	double capacity[8];	/* in Farads, capacitors connected to pins: 24,25,26,27 and 37,38,39,40 */
+	double capacity[8]; /* in Farads, capacitors connected to pins: 24,25,26,27 and 37,38,39,40 */
 	devcb_write_line gate_handler_cb; /* callback called when the GATE output pin changes state */
 };
 
@@ -16,7 +16,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( msm5232_w );
 void msm5232_set_clock(device_t *device, int clock);
 
 class msm5232_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

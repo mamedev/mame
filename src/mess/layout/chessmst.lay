@@ -9,21 +9,21 @@
 		</disk>
 	</element>
 
-	<element name="str_your">		<text string="YOUR"/>			</element>
-	<element name="str_cm">			<text string="CM"/>				</element>
-	<element name="str_check">		<text string="CHECK"/>			</element>
-	<element name="str_c1">			<text string="C1"/>				</element>
-	<element name="str_c2">			<text string="C2"/>				</element>
-	<element name="str_c3">			<text string="C3"/>				</element>
-	<element name="str_pawn">		<text string="Pawn"/>			</element>
-	<element name="str_rook">		<text string="Rook"/>			</element>
-	<element name="str_knight">		<text string="Knight"/>			</element>
-	<element name="str_bishop">		<text string="Bishop"/>			</element>
-	<element name="str_queen">		<text string="Queen"/>			</element>
-	<element name="str_king">		<text string="King"/>			</element>
-	<element name="str_white">		<text string="White"/>			</element>
-	<element name="str_black">		<text string="Black"/>			</element>
-	<element name="str_changeb">	<text string="CHANGE BOARD"/>	</element>
+	<element name="str_your">       <text string="YOUR"/>           </element>
+	<element name="str_cm">         <text string="CM"/>             </element>
+	<element name="str_check">      <text string="CHECK"/>          </element>
+	<element name="str_c1">         <text string="C1"/>             </element>
+	<element name="str_c2">         <text string="C2"/>             </element>
+	<element name="str_c3">         <text string="C3"/>             </element>
+	<element name="str_pawn">       <text string="Pawn"/>           </element>
+	<element name="str_rook">       <text string="Rook"/>           </element>
+	<element name="str_knight">     <text string="Knight"/>         </element>
+	<element name="str_bishop">     <text string="Bishop"/>         </element>
+	<element name="str_queen">      <text string="Queen"/>          </element>
+	<element name="str_king">       <text string="King"/>           </element>
+	<element name="str_white">      <text string="White"/>          </element>
+	<element name="str_black">      <text string="Black"/>          </element>
+	<element name="str_changeb">    <text string="CHANGE BOARD"/>   </element>
 
 	<element name="background">
 		<rect>

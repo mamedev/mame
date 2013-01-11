@@ -26,21 +26,21 @@
     MACROS
 ***************************************************************************/
 
-#define DMA_MODE_CHANNEL(mode)		((mode) & 0x03)
-#define DMA_MODE_OPERATION(mode)	((mode) & 0x0c)
-#define DMA_MODE_AUTO_INIT(mode)	((mode) & 0x10)
-#define DMA_MODE_DIRECTION(mode)	((mode) & 0x20)
-#define DMA_MODE_TRANSFERMODE(mode)	((mode) & 0xc0)
+#define DMA_MODE_CHANNEL(mode)      ((mode) & 0x03)
+#define DMA_MODE_OPERATION(mode)    ((mode) & 0x0c)
+#define DMA_MODE_AUTO_INIT(mode)    ((mode) & 0x10)
+#define DMA_MODE_DIRECTION(mode)    ((mode) & 0x20)
+#define DMA_MODE_TRANSFERMODE(mode) ((mode) & 0xc0)
 
-#define DMA8237_VERIFY_TRANSFER		0x00
-#define DMA8237_WRITE_TRANSFER		0x04
-#define DMA8237_READ_TRANSFER		0x08
-#define DMA8237_ILLEGAL_TRANSFER	0x0c
+#define DMA8237_VERIFY_TRANSFER     0x00
+#define DMA8237_WRITE_TRANSFER      0x04
+#define DMA8237_READ_TRANSFER       0x08
+#define DMA8237_ILLEGAL_TRANSFER    0x0c
 
-#define DMA8237_DEMAND_MODE		0x00
-#define DMA8237_SINGLE_MODE		0x40
-#define DMA8237_BLOCK_MODE		0x80
-#define DMA8237_CASCADE_MODE	0xc0
+#define DMA8237_DEMAND_MODE     0x00
+#define DMA8237_SINGLE_MODE     0x40
+#define DMA8237_BLOCK_MODE      0x80
+#define DMA8237_CASCADE_MODE    0xc0
 
 
 //**************************************************************************
@@ -55,7 +55,7 @@ const device_type I8237 = &device_creator<i8237_device>;
 //-------------------------------------------------
 
 i8237_device::i8237_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, I8237, "Intel 8237", tag, owner, clock)
+	: device_t(mconfig, I8237, "Intel 8237", tag, owner, clock)
 {
 }
 
@@ -77,22 +77,22 @@ void i8237_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_hrq_cb, 0, sizeof(m_out_hrq_cb));
-    	memset(&m_out_eop_cb, 0, sizeof(m_out_eop_cb));
-    	memset(&m_in_memr_cb, 0, sizeof(m_in_memr_cb));
-    	memset(&m_out_memw_cb, 0, sizeof(m_out_memw_cb));
-    	memset(&m_in_ior_cb[0], 0, sizeof(m_in_ior_cb[0]));
-    	memset(&m_in_ior_cb[1], 0, sizeof(m_in_ior_cb[1]));
-    	memset(&m_in_ior_cb[2], 0, sizeof(m_in_ior_cb[2]));
-    	memset(&m_in_ior_cb[3], 0, sizeof(m_in_ior_cb[3]));
-    	memset(&m_out_iow_cb[0], 0, sizeof(m_out_iow_cb[0]));
-    	memset(&m_out_iow_cb[1], 0, sizeof(m_out_iow_cb[1]));
-    	memset(&m_out_iow_cb[2], 0, sizeof(m_out_iow_cb[2]));
-    	memset(&m_out_iow_cb[3], 0, sizeof(m_out_iow_cb[3]));
-    	memset(&m_out_dack_cb[0], 0, sizeof(m_out_dack_cb[0]));
-    	memset(&m_out_dack_cb[1], 0, sizeof(m_out_dack_cb[1]));
-    	memset(&m_out_dack_cb[2], 0, sizeof(m_out_dack_cb[2]));
-    	memset(&m_out_dack_cb[3], 0, sizeof(m_out_dack_cb[3]));
+		memset(&m_out_hrq_cb, 0, sizeof(m_out_hrq_cb));
+		memset(&m_out_eop_cb, 0, sizeof(m_out_eop_cb));
+		memset(&m_in_memr_cb, 0, sizeof(m_in_memr_cb));
+		memset(&m_out_memw_cb, 0, sizeof(m_out_memw_cb));
+		memset(&m_in_ior_cb[0], 0, sizeof(m_in_ior_cb[0]));
+		memset(&m_in_ior_cb[1], 0, sizeof(m_in_ior_cb[1]));
+		memset(&m_in_ior_cb[2], 0, sizeof(m_in_ior_cb[2]));
+		memset(&m_in_ior_cb[3], 0, sizeof(m_in_ior_cb[3]));
+		memset(&m_out_iow_cb[0], 0, sizeof(m_out_iow_cb[0]));
+		memset(&m_out_iow_cb[1], 0, sizeof(m_out_iow_cb[1]));
+		memset(&m_out_iow_cb[2], 0, sizeof(m_out_iow_cb[2]));
+		memset(&m_out_iow_cb[3], 0, sizeof(m_out_iow_cb[3]));
+		memset(&m_out_dack_cb[0], 0, sizeof(m_out_dack_cb[0]));
+		memset(&m_out_dack_cb[1], 0, sizeof(m_out_dack_cb[1]));
+		memset(&m_out_dack_cb[2], 0, sizeof(m_out_dack_cb[2]));
+		memset(&m_out_dack_cb[3], 0, sizeof(m_out_dack_cb[3]));
 	}
 }
 
@@ -130,7 +130,7 @@ void i8237_device::device_reset()
 	m_eop = ASSERT_LINE;
 	m_state = DMA8237_SI;
 	m_last_service_channel = 3;
-    m_service_channel = 0;
+	m_service_channel = 0;
 
 	m_command = 0;
 	m_drq = 0;
@@ -277,7 +277,7 @@ void i8237_device::i8237_timerproc()
 
 		/* Check if a new DMA request has been received. */
 		/* Bit 6 of the command register determines whether the DREQ signals are active
-          high or active low. */
+		  high or active low. */
 		UINT16 pending_request = ( ( m_command & 0x40 ) ? ~m_drq : m_drq ) & ~m_mask;
 
 		if ( pending_request & 0x0f )
@@ -320,7 +320,7 @@ void i8237_device::i8237_timerproc()
 
 	case DMA8237_S0:
 		/* S0 is the first of the DMA service. We have requested a hold but are waiting
-          for confirmation. */
+		  for confirmation. */
 		if ( m_hlda )
 		{
 			if ( DMA_MODE_TRANSFERMODE( m_chan[m_service_channel].m_mode ) == DMA8237_CASCADE_MODE )
@@ -347,7 +347,7 @@ void i8237_device::i8237_timerproc()
 		}
 		break;
 
-	case DMA8237_SC:	/* Cascade mode, waiting until peripheral is done */
+	case DMA8237_SC:    /* Cascade mode, waiting until peripheral is done */
 		if ( ! ( m_drq & ( 0x01 << m_service_channel ) ) )
 		{
 			m_hrq = 0;
@@ -368,11 +368,11 @@ void i8237_device::i8237_timerproc()
 		}
 		break;
 
-	case DMA8237_S1:	/* Output A8-A15 */
+	case DMA8237_S1:    /* Output A8-A15 */
 		m_state = DMA8237_S2;
 		break;
 
-	case DMA8237_S2:	/* Output A7-A0 */
+	case DMA8237_S2:    /* Output A7-A0 */
 		/* set DACK */
 		i8327_set_dack(m_service_channel);
 
@@ -387,12 +387,12 @@ void i8237_device::i8237_timerproc()
 		}
 		break;
 
-	case DMA8237_S3:	/* Initiate read */
+	case DMA8237_S3:    /* Initiate read */
 		i8237_do_read();
 		m_state = DMA8237_S4;
 		break;
 
-	case DMA8237_S4:	/* Perform read/write */
+	case DMA8237_S4:    /* Perform read/write */
 		/* Perform read when in compressed timing mode */
 		if ( m_command & 0x08 )
 		{
@@ -541,11 +541,11 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_r)
 		data = m_temp;
 		break;
 
-	case 9:		/* DMA write request register */
-	case 11:	/* DMA mode register */
-	case 12:	/* DMA clear byte pointer flip-flop */
-	case 14:	/* DMA clear mask register */
-	case 15:	/* DMA write mask register */
+	case 9:     /* DMA write request register */
+	case 11:    /* DMA mode register */
+	case 12:    /* DMA clear byte pointer flip-flop */
+	case 14:    /* DMA clear mask register */
+	case 15:    /* DMA write mask register */
 		data = 0xFF;
 		break;
 	}

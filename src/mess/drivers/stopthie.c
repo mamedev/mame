@@ -65,7 +65,7 @@ static const tms0980_config stopthie_tms0980_config =
 
 
 static MACHINE_CONFIG_START( stopthie, stopthie_state )
-	MCFG_CPU_ADD( "maincpu", TMS0980, 5000000 )	/* Clock is wrong */
+	MCFG_CPU_ADD( "maincpu", TMS0980, 5000000 ) /* Clock is wrong */
 	MCFG_CPU_CONFIG( stopthie_tms0980_config )
 
 	MCFG_DEFAULT_LAYOUT(layout_stopthie)
@@ -85,4 +85,3 @@ ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY            FULLNAME      FLAGS */
 CONS( 1979, stopthie,   0,      0,      stopthie,   stopthie, driver_device,  0,      "Parker Brothers", "Stop Thief", GAME_NOT_WORKING | GAME_NO_SOUND)
-

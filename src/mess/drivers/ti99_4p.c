@@ -78,7 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(external_operation);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 
-	void	clock_in(int clock);
+	void    clock_in(int clock);
 
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER( cruread );
@@ -99,45 +99,45 @@ public:
 
 	void set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
 
-	tms9900_device*			m_cpu;
-	tms9901_device*			m_tms9901;
-	ti_sound_system_device*	m_sound;
-	ti_exp_video_device*	m_video;
-	cassette_image_device*	m_cassette;
-	peribox_device*			m_peribox;
-	joyport_device*			m_joyport;
+	tms9900_device*         m_cpu;
+	tms9901_device*         m_tms9901;
+	ti_sound_system_device* m_sound;
+	ti_exp_video_device*    m_video;
+	cassette_image_device*  m_cassette;
+	peribox_device*         m_peribox;
+	joyport_device*         m_joyport;
 
 	// Pointer to ROM0
-	UINT16	*m_rom0;
+	UINT16  *m_rom0;
 
 	// Pointer to DSR ROM
-	UINT16	*m_dsr;
+	UINT16  *m_dsr;
 
 	// Pointer to ROM6, first bank
-	UINT16	*m_rom6a;
+	UINT16  *m_rom6a;
 
 	// Pointer to ROM6, second bank
-	UINT16	*m_rom6b;
+	UINT16  *m_rom6b;
 
 	// AMS RAM (1 Mib)
-	UINT16	*m_ram;
+	UINT16  *m_ram;
 
 	// Scratch pad ram (1 KiB)
-	UINT16	*m_scratchpad;
+	UINT16  *m_scratchpad;
 
 	// First joystick. 6 for TI-99/4A
-	int 	m_firstjoy;
+	int     m_firstjoy;
 
 	// READY line
-	int		m_ready_line, m_ready_line_dmux;
+	int     m_ready_line, m_ready_line_dmux;
 
 private:
 	DECLARE_READ16_MEMBER( datamux_read );
 	DECLARE_WRITE16_MEMBER( datamux_write );
-	void	set_keyboard_column(int number, int data);
+	void    set_keyboard_column(int number, int data);
 
-	int		m_keyboard_column;
-	int		m_check_alphalock;
+	int     m_keyboard_column;
+	int     m_check_alphalock;
 
 	// True if SGCPU DSR is enabled
 	bool m_internal_dsr;
@@ -157,14 +157,14 @@ private:
 	// TRUE when mapper registers are accessible
 	bool m_access_mapper;
 
-	UINT8	m_lowbyte;
-	UINT8	m_highbyte;
-	UINT8	m_latch;
+	UINT8   m_lowbyte;
+	UINT8   m_highbyte;
+	UINT8   m_latch;
 
 	// Mapper registers
 	UINT8 m_mapper[16];
 
-	int		m_ready_prev;		// for debugging purposes only
+	int     m_ready_prev;       // for debugging purposes only
 
 };
 
@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START(ti99_4p)
 	/* 4 ports for keyboard and joystick */
-	PORT_START("COL0")	// col 0
+	PORT_START("COL0")  // col 0
 		PORT_BIT(0x88, IP_ACTIVE_LOW, IPT_UNUSED)
 		/* The original control key is located on the left, but we accept the right control key as well */
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")      PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
@@ -201,7 +201,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= + QUIT")  PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+') PORT_CHAR(UCHAR_MAMEKEY(F12))
 
-	PORT_START("COL1")	// col 1
+	PORT_START("COL1")  // col 1
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)     PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)     PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR('~')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)     PORT_CHAR('s') PORT_CHAR('S') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -211,7 +211,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')
 
-	PORT_START("COL2")	// col 2
+	PORT_START("COL2")  // col 2
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)     PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('`')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)     PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(UCHAR_MAMEKEY(UP))
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)     PORT_CHAR('d') PORT_CHAR('D') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
@@ -221,7 +221,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
-	PORT_START("COL3")	// col 3
+	PORT_START("COL3")  // col 3
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)     PORT_CHAR('v') PORT_CHAR('V')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)     PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR('[')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)     PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR('{')
@@ -231,7 +231,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)     PORT_CHAR('j') PORT_CHAR('J')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)     PORT_CHAR('m') PORT_CHAR('M')
 
-	PORT_START("COL4")	// col 4
+	PORT_START("COL4")  // col 4
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)     PORT_CHAR('b') PORT_CHAR('B')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)     PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(']')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR('}')
@@ -241,7 +241,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)     PORT_CHAR('h') PORT_CHAR('H')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)     PORT_CHAR('n') PORT_CHAR('N')
 
-	PORT_START("COL5")	// col 5
+	PORT_START("COL5")  // col 5
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)     PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR('\\')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)     PORT_CHAR('q') PORT_CHAR('Q')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)     PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR('|')
@@ -251,7 +251,7 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('-')
 
-	PORT_START("ALPHA")	/* one more port for Alpha line */
+	PORT_START("ALPHA") /* one more port for Alpha line */
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 
@@ -263,7 +263,7 @@ INPUT_PORTS_END
 READ16_MEMBER( ti99_4p_state::memread )
 {
 	int addroff = offset << 1;
-	if (m_rom0 == NULL) return 0;	// premature access
+	if (m_rom0 == NULL) return 0;   // premature access
 
 	UINT16 zone = addroff & 0xe000;
 	UINT16 value = 0;
@@ -312,7 +312,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 	// groms are in hsgpl in peribox
 	if (zone==0x8000)
 	{
-		if ((addroff & 0xfff0)==0x8400)	// cannot read from sound
+		if ((addroff & 0xfff0)==0x8400) // cannot read from sound
 		{
 			value = 0;
 			return value;
@@ -384,7 +384,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	// groms are in hsgpl in peribox
 	if (zone==0x8000)
 	{
-		if ((addroff & 0xfff0)==0x8400)		//sound write
+		if ((addroff & 0xfff0)==0x8400)     //sound write
 		{
 			m_sound->write(space, 0, (data >> 8) & 0xff);
 			return;
@@ -485,10 +485,10 @@ WRITE8_MEMBER( ti99_4p_state::cruwrite )
 
 	if ((addroff & 0xff00)==MAP_CRU_BASE)
 	{
-		if ((addroff & 0x000e)==0)	m_internal_dsr = data;
-		if ((addroff & 0x000e)==2)	m_internal_rom6 = data;
-		if ((addroff & 0x000e)==4)	m_peribox->senila((data!=0)? ASSERT_LINE : CLEAR_LINE);
-		if ((addroff & 0x000e)==6)	m_peribox->senilb((data!=0)? ASSERT_LINE : CLEAR_LINE);
+		if ((addroff & 0x000e)==0)  m_internal_dsr = data;
+		if ((addroff & 0x000e)==2)  m_internal_rom6 = data;
+		if ((addroff & 0x000e)==4)  m_peribox->senila((data!=0)? ASSERT_LINE : CLEAR_LINE);
+		if ((addroff & 0x000e)==6)  m_peribox->senilb((data!=0)? ASSERT_LINE : CLEAR_LINE);
 		// TODO: more CRU bits? 8=Fast timing / a=KBENA
 		return;
 	}
@@ -615,8 +615,8 @@ READ8_MEMBER( ti99_4p_state::read_by_9901 )
 */
 void ti99_4p_state::set_keyboard_column(int number, int data)
 {
-	if (data!=0)	m_keyboard_column |= 1 << number;
-	else			m_keyboard_column &= ~(1 << number);
+	if (data!=0)    m_keyboard_column |= 1 << number;
+	else            m_keyboard_column &= ~(1 << number);
 
 	if (m_keyboard_column >= m_firstjoy)
 	{
@@ -679,12 +679,12 @@ WRITE_LINE_MEMBER( ti99_4p_state::cassette_output )
 /* TMS9901 setup. The callback functions pass a reference to the TMS9901 as device. */
 const tms9901_interface tms9901_wiring_sgcpu =
 {
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC, /* only input pins whose state is always known */
 
 	// read handler
 	DEVCB_DRIVER_MEMBER(ti99_4p_state, read_by_9901),
 
-	{	// write handlers
+	{   // write handlers
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, keyC0),
@@ -794,20 +794,20 @@ WRITE8_MEMBER( ti99_4p_state::external_operation )
 
 static PERIBOX_CONFIG( peribox_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, extint),			// INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, notconnected),	// INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, console_ready),	// READY
-	0x70000												// Address bus prefix (AMA/AMB/AMC)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, extint),            // INTA
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, notconnected),  // INTB
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, console_ready), // READY
+	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
 };
 
 static TMS99xx_CONFIG( sgcpu_cpuconf )
 {
 	DEVCB_DRIVER_MEMBER(ti99_4p_state, external_operation),
 	DEVCB_DRIVER_MEMBER(ti99_4p_state, interrupt_level),
-	DEVCB_NULL,		// Instruction acquisition
+	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, clock_out),
-	DEVCB_NULL,		// wait
-	DEVCB_NULL		// Hold acknowledge
+	DEVCB_NULL,     // wait
+	DEVCB_NULL      // Hold acknowledge
 };
 
 void ti99_4p_state::machine_start()
@@ -848,7 +848,7 @@ void ti99_4p_state::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
 
 static TI_SOUND_CONFIG( sound_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, console_ready)	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, console_ready)  // READY
 };
 
 static JOYPORT_CONFIG( joyport4a_60 )
@@ -924,4 +924,4 @@ ROM_START(ti99_4p)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */
-COMP( 1996, ti99_4p,  0,	   0,		ti99_4p_60hz, ti99_4p, driver_device, 0, "System 99 Users Group",		"SGCPU (a.k.a. 99/4P)" , 0 )
+COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System 99 Users Group",       "SGCPU (a.k.a. 99/4P)" , 0 )

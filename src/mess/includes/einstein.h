@@ -44,8 +44,8 @@ class einstein_state : public driver_device
 public:
 	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_fdc(*this, IC_I042)
-		  { }
+			m_fdc(*this, IC_I042)
+			{ }
 
 	required_device<wd1770_t> m_fdc;
 	device_t *m_color_screen;
@@ -64,7 +64,7 @@ public:
 	mc6845_device *m_mc6845;
 	screen_device *m_crtc_screen;
 	UINT8 *m_crtc_ram;
-	UINT8	m_de;
+	UINT8   m_de;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
@@ -93,7 +93,7 @@ public:
 
 // ======================> einstein_keyboard_daisy_device
 
-class einstein_keyboard_daisy_device :	public device_t,
+class einstein_keyboard_daisy_device :  public device_t,
 						public device_z80daisy_interface
 {
 public:
@@ -113,7 +113,7 @@ extern const device_type EINSTEIN_KEYBOARD_DAISY;
 
 // ======================> einstein_adc_daisy_device
 
-class einstein_adc_daisy_device :	public device_t,
+class einstein_adc_daisy_device :   public device_t,
 						public device_z80daisy_interface
 {
 public:
@@ -133,7 +133,7 @@ extern const device_type EINSTEIN_ADC_DAISY;
 
 // ======================> einstein_fire_daisy_device
 
-class einstein_fire_daisy_device :	public device_t,
+class einstein_fire_daisy_device :  public device_t,
 						public device_z80daisy_interface
 {
 public:

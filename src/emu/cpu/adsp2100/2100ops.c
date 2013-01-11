@@ -3,45 +3,45 @@
 ===========================================================================*/
 
 /* extracts flags */
-#define GET_SS			(m_astat & SSFLAG)
-#define GET_MV			(m_astat & MVFLAG)
-#define GET_Q			(m_astat &  QFLAG)
-#define GET_S			(m_astat &  SFLAG)
-#define GET_C			(m_astat &  CFLAG)
-#define GET_V			(m_astat &  VFLAG)
-#define GET_N			(m_astat &  NFLAG)
-#define GET_Z			(m_astat &  ZFLAG)
+#define GET_SS          (m_astat & SSFLAG)
+#define GET_MV          (m_astat & MVFLAG)
+#define GET_Q           (m_astat &  QFLAG)
+#define GET_S           (m_astat &  SFLAG)
+#define GET_C           (m_astat &  CFLAG)
+#define GET_V           (m_astat &  VFLAG)
+#define GET_N           (m_astat &  NFLAG)
+#define GET_Z           (m_astat &  ZFLAG)
 
 /* clears flags */
-#define CLR_SS			(m_astat &= ~SSFLAG)
-#define CLR_MV			(m_astat &= ~MVFLAG)
-#define CLR_Q			(m_astat &=  ~QFLAG)
-#define CLR_S			(m_astat &=  ~SFLAG)
-#define CLR_C			(m_astat &=  ~CFLAG)
-#define CLR_V			(m_astat &=  ~VFLAG)
-#define CLR_N			(m_astat &=  ~NFLAG)
-#define CLR_Z			(m_astat &=  ~ZFLAG)
+#define CLR_SS          (m_astat &= ~SSFLAG)
+#define CLR_MV          (m_astat &= ~MVFLAG)
+#define CLR_Q           (m_astat &=  ~QFLAG)
+#define CLR_S           (m_astat &=  ~SFLAG)
+#define CLR_C           (m_astat &=  ~CFLAG)
+#define CLR_V           (m_astat &=  ~VFLAG)
+#define CLR_N           (m_astat &=  ~NFLAG)
+#define CLR_Z           (m_astat &=  ~ZFLAG)
 
 /* sets flags */
-#define SET_SS			(m_astat |= SSFLAG)
-#define SET_MV			(m_astat |= MVFLAG)
-#define SET_Q			(m_astat |=  QFLAG)
-#define SET_S			(m_astat |=  SFLAG)
-#define SET_C			(m_astat |=  CFLAG)
-#define SET_V			(m_astat |=  VFLAG)
-#define SET_Z			(m_astat |=  ZFLAG)
-#define SET_N			(m_astat |=  NFLAG)
+#define SET_SS          (m_astat |= SSFLAG)
+#define SET_MV          (m_astat |= MVFLAG)
+#define SET_Q           (m_astat |=  QFLAG)
+#define SET_S           (m_astat |=  SFLAG)
+#define SET_C           (m_astat |=  CFLAG)
+#define SET_V           (m_astat |=  VFLAG)
+#define SET_Z           (m_astat |=  ZFLAG)
+#define SET_N           (m_astat |=  NFLAG)
 
 /* flag clearing; must be done before setting */
-#define CLR_FLAGS		(m_astat &= m_astat_clear)
+#define CLR_FLAGS       (m_astat &= m_astat_clear)
 
 /* compute flags */
-#define CALC_Z(r)		(m_astat |= ((r & 0xffff) == 0))
-#define CALC_N(r)		(m_astat |= (r >> 14) & 0x02)
-#define CALC_V(s,d,r)	(m_astat |= ((s ^ d ^ r ^ (r >> 1)) >> 13) & 0x04)
-#define CALC_C(r)		(m_astat |= (r >> 13) & 0x08)
-#define CALC_C_SUB(r)	(m_astat |= (~r >> 13) & 0x08)
-#define CALC_NZ(r)		CLR_FLAGS; CALC_N(r); CALC_Z(r)
+#define CALC_Z(r)       (m_astat |= ((r & 0xffff) == 0))
+#define CALC_N(r)       (m_astat |= (r >> 14) & 0x02)
+#define CALC_V(s,d,r)   (m_astat |= ((s ^ d ^ r ^ (r >> 1)) >> 13) & 0x04)
+#define CALC_C(r)       (m_astat |= (r >> 13) & 0x08)
+#define CALC_C_SUB(r)   (m_astat |= (~r >> 13) & 0x08)
+#define CALC_NZ(r)      CLR_FLAGS; CALC_N(r); CALC_Z(r)
 #define CALC_NZV(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r)
 #define CALC_NZVC(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r); CALC_C(r)
 #define CALC_NZVC_SUB(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r); CALC_C_SUB(r)
@@ -62,13 +62,13 @@ static const INT32 constants[] =
 ===========================================================================*/
 
 /* flag definitions */
-#define MSTAT_BANK		0x01			/* register bank select */
-#define MSTAT_REVERSE	0x02			/* bit-reverse addressing enable (DAG1) */
-#define MSTAT_STICKYV	0x04			/* sticky ALU overflow enable */
-#define MSTAT_SATURATE	0x08			/* AR saturation mode enable */
-#define MSTAT_INTEGER	0x10			/* MAC result placement; 0=fractional, 1=integer */
-#define MSTAT_TIMER		0x20			/* timer enable */
-#define MSTAT_GOMODE	0x40			/* go mode enable */
+#define MSTAT_BANK      0x01            /* register bank select */
+#define MSTAT_REVERSE   0x02            /* bit-reverse addressing enable (DAG1) */
+#define MSTAT_STICKYV   0x04            /* sticky ALU overflow enable */
+#define MSTAT_SATURATE  0x08            /* AR saturation mode enable */
+#define MSTAT_INTEGER   0x10            /* MAC result placement; 0=fractional, 1=integer */
+#define MSTAT_TIMER     0x20            /* timer enable */
+#define MSTAT_GOMODE    0x40            /* go mode enable */
 
 /* you must call this in order to change MSTAT */
 inline void adsp21xx_device::update_mstat()
@@ -95,14 +95,14 @@ inline void adsp21xx_device::update_mstat()
 ===========================================================================*/
 
 /* flag definitions */
-#define PC_EMPTY		0x01			/* PC stack empty */
-#define PC_OVER			0x02			/* PC stack overflow */
-#define COUNT_EMPTY		0x04			/* count stack empty */
-#define COUNT_OVER		0x08			/* count stack overflow */
-#define STATUS_EMPTY	0x10			/* status stack empty */
-#define STATUS_OVER		0x20			/* status stack overflow */
-#define LOOP_EMPTY		0x40			/* loop stack empty */
-#define LOOP_OVER		0x80			/* loop stack overflow */
+#define PC_EMPTY        0x01            /* PC stack empty */
+#define PC_OVER         0x02            /* PC stack overflow */
+#define COUNT_EMPTY     0x04            /* count stack empty */
+#define COUNT_OVER      0x08            /* count stack overflow */
+#define STATUS_EMPTY    0x10            /* status stack empty */
+#define STATUS_OVER     0x20            /* status stack overflow */
+#define LOOP_EMPTY      0x40            /* loop stack empty */
+#define LOOP_OVER       0x80            /* loop stack overflow */
 
 
 
@@ -339,22 +339,22 @@ void adsp21xx_device::write_reg0(int regnum, INT32 val)
 {
 	switch (regnum)
 	{
-		case 0x00:	m_core.ax0.s = val;					break;
-		case 0x01:	m_core.ax1.s = val; 				break;
-		case 0x02:	m_core.mx0.s = val;					break;
-		case 0x03:	m_core.mx1.s = val;					break;
-		case 0x04:	m_core.ay0.s = val;					break;
-		case 0x05:	m_core.ay1.s = val;					break;
-		case 0x06:	m_core.my0.s = val;					break;
-		case 0x07:	m_core.my1.s = val;					break;
-		case 0x08:	m_core.si.s = val;					break;
-		case 0x09:	m_core.se.s = (INT8)val;			break;
-		case 0x0a:	m_core.ar.s = val;					break;
-		case 0x0b:	m_core.mr.mrx.mr0.s = val;			break;
-		case 0x0c:	m_core.mr.mrx.mr1.s = val; m_core.mr.mrx.mr2.s = (INT16)val >> 15;	break;
-		case 0x0d:	m_core.mr.mrx.mr2.s = (INT8)val;	break;
-		case 0x0e:	m_core.sr.srx.sr0.s = val;			break;
-		case 0x0f:	m_core.sr.srx.sr1.s = val;			break;
+		case 0x00:  m_core.ax0.s = val;                 break;
+		case 0x01:  m_core.ax1.s = val;                 break;
+		case 0x02:  m_core.mx0.s = val;                 break;
+		case 0x03:  m_core.mx1.s = val;                 break;
+		case 0x04:  m_core.ay0.s = val;                 break;
+		case 0x05:  m_core.ay1.s = val;                 break;
+		case 0x06:  m_core.my0.s = val;                 break;
+		case 0x07:  m_core.my1.s = val;                 break;
+		case 0x08:  m_core.si.s = val;                  break;
+		case 0x09:  m_core.se.s = (INT8)val;            break;
+		case 0x0a:  m_core.ar.s = val;                  break;
+		case 0x0b:  m_core.mr.mrx.mr0.s = val;          break;
+		case 0x0c:  m_core.mr.mrx.mr1.s = val; m_core.mr.mrx.mr2.s = (INT16)val >> 15;  break;
+		case 0x0d:  m_core.mr.mrx.mr2.s = (INT8)val;    break;
+		case 0x0e:  m_core.sr.srx.sr0.s = val;          break;
+		case 0x0f:  m_core.sr.srx.sr1.s = val;          break;
 	}
 }
 
@@ -412,15 +412,15 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 {
 	switch (regnum)
 	{
-		case 0x00:	m_astat = val & 0x00ff;							break;
-		case 0x01:	m_mstat = val & m_mstat_mask; update_mstat();	break;
-		case 0x03:	m_imask = val & m_imask_mask; check_irqs(); 	break;
-		case 0x04:	m_icntl = val & 0x001f; check_irqs();			break;
-		case 0x05:	cntr_stack_push(); m_cntr = val & 0x3fff;		break;
-		case 0x06:	m_core.sb.s = (INT32)(val << 27) >> 27;			break;
-		case 0x07:	m_px = val;										break;
-		case 0x09:	if (m_sport_tx_callback != NULL) (*m_sport_tx_callback)(*this, 0, val); break;
-		case 0x0b:	if (m_sport_tx_callback != NULL) (*m_sport_tx_callback)(*this, 1, val); break;
+		case 0x00:  m_astat = val & 0x00ff;                         break;
+		case 0x01:  m_mstat = val & m_mstat_mask; update_mstat();   break;
+		case 0x03:  m_imask = val & m_imask_mask; check_irqs();     break;
+		case 0x04:  m_icntl = val & 0x001f; check_irqs();           break;
+		case 0x05:  cntr_stack_push(); m_cntr = val & 0x3fff;       break;
+		case 0x06:  m_core.sb.s = (INT32)(val << 27) >> 27;         break;
+		case 0x07:  m_px = val;                                     break;
+		case 0x09:  if (m_sport_tx_callback != NULL) (*m_sport_tx_callback)(*this, 0, val); break;
+		case 0x0b:  if (m_sport_tx_callback != NULL) (*m_sport_tx_callback)(*this, 1, val); break;
 		case 0x0c:
 			m_ifc = val;
 			if (m_chip_type >= CHIP_TYPE_ADSP2181)
@@ -459,9 +459,9 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 			}
 			check_irqs();
 			break;
-		case 0x0d:	m_cntr = val & 0x3fff;				break;
-		case 0x0f:	pc_stack_push_val(val & 0x3fff);	break;
-		default:	logerror("ADSP %04x: Writing to an invalid register!\n", m_ppc); break;
+		case 0x0d:  m_cntr = val & 0x3fff;              break;
+		case 0x0f:  pc_stack_push_val(val & 0x3fff);    break;
+		default:    logerror("ADSP %04x: Writing to an invalid register!\n", m_ppc); break;
 	}
 }
 
@@ -492,18 +492,18 @@ INT32 adsp21xx_device::read_reg3(int regnum)
 {
 	switch (regnum)
 	{
-		case 0x00:	return m_astat;
-		case 0x01:	return m_mstat;
-		case 0x02:	return m_sstat;
-		case 0x03:	return m_imask;
-		case 0x04:	return m_icntl;
-		case 0x05:	return m_cntr;
-		case 0x06:	return m_core.sb.s;
-		case 0x07:	return m_px;
-		case 0x08:	if (m_sport_rx_callback) return (*m_sport_rx_callback)(*this, 0); else return 0;
-		case 0x0a:	if (m_sport_rx_callback) return (*m_sport_rx_callback)(*this, 1); else return 0;
-		case 0x0f:	return pc_stack_pop_val();
-		default:	logerror("ADSP %04x: Reading from an invalid register!\n", m_ppc); return 0;
+		case 0x00:  return m_astat;
+		case 0x01:  return m_mstat;
+		case 0x02:  return m_sstat;
+		case 0x03:  return m_imask;
+		case 0x04:  return m_icntl;
+		case 0x05:  return m_cntr;
+		case 0x06:  return m_core.sb.s;
+		case 0x07:  return m_px;
+		case 0x08:  if (m_sport_rx_callback) return (*m_sport_rx_callback)(*this, 0); else return 0;
+		case 0x0a:  if (m_sport_rx_callback) return (*m_sport_rx_callback)(*this, 1); else return 0;
+		case 0x0f:  return pc_stack_pop_val();
+		default:    logerror("ADSP %04x: Reading from an invalid register!\n", m_ppc); return 0;
 	}
 }
 
@@ -800,7 +800,7 @@ void adsp21xx_device::alu_op_ar(int op)
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -926,7 +926,7 @@ void adsp21xx_device::alu_op_ar_const(int op)
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -1064,7 +1064,7 @@ void adsp21xx_device::alu_op_af(int op)
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -1187,7 +1187,7 @@ void adsp21xx_device::alu_op_af_const(int op)
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -1338,7 +1338,7 @@ void adsp21xx_device::mac_op_mr(int op)
 	INT32 temp;
 	INT64 res;
 
-	switch (op & (15<<13))	/*JB*/
+	switch (op & (15<<13))  /*JB*/
 	{
 		case 0x00<<13:
 			/* no-op */
@@ -1476,7 +1476,7 @@ void adsp21xx_device::mac_op_mr(int op)
 			res = m_core.mr.mr - (INT64)temp;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -1500,7 +1500,7 @@ void adsp21xx_device::mac_op_mr_xop(int op)
 	INT32 temp;
 	INT64 res;
 
-	switch (op & (15<<13))	/*JB*/
+	switch (op & (15<<13))  /*JB*/
 	{
 		case 0x00<<13:
 			/* no-op */
@@ -1623,7 +1623,7 @@ void adsp21xx_device::mac_op_mr_xop(int op)
 			res = m_core.mr.mr - (INT64)temp;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -1648,7 +1648,7 @@ void adsp21xx_device::mac_op_mf(int op)
 	INT32 temp;
 	INT64 res;
 
-	switch (op & (15<<13))	/*JB*/
+	switch (op & (15<<13))  /*JB*/
 	{
 		case 0x00<<13:
 			/* no-op */
@@ -1786,7 +1786,7 @@ void adsp21xx_device::mac_op_mf(int op)
 			res = m_core.mr.mr - (INT64)temp;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -1807,7 +1807,7 @@ void adsp21xx_device::mac_op_mf_xop(int op)
 	INT32 temp;
 	INT64 res;
 
-	switch (op & (15<<13))	/*JB*/
+	switch (op & (15<<13))  /*JB*/
 	{
 		case 0x00<<13:
 			/* no-op */
@@ -1930,7 +1930,7 @@ void adsp21xx_device::mac_op_mf_xop(int op)
 			res = m_core.mr.mr - (INT64)temp;
 			break;
 		default:
-			res = 0;	/* just to keep the compiler happy */
+			res = 0;    /* just to keep the compiler happy */
 			break;
 	}
 
@@ -1950,7 +1950,7 @@ void adsp21xx_device::shift_op(int op)
 	INT32 xop = (op >> 8) & 7;
 	UINT32 res;
 
-	switch (op & (15<<11))	/*JB*/
+	switch (op & (15<<11))  /*JB*/
 	{
 		case 0x00<<11:
 			/* LSHIFT (HI) */
@@ -2132,7 +2132,7 @@ void adsp21xx_device::shift_op_imm(int op)
 	INT32 xop = (op >> 8) & 7;
 	UINT32 res;
 
-	switch (op & (15<<11))	/*JB*/
+	switch (op & (15<<11))  /*JB*/
 	{
 		case 0x00<<11:
 			/* LSHIFT (HI) */

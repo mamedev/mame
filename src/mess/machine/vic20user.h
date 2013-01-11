@@ -35,7 +35,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define VIC20_USER_PORT_TAG		"user"
+#define VIC20_USER_PORT_TAG     "user"
 
 
 
@@ -48,8 +48,8 @@
 
 
 #define MCFG_VIC20_USER_PORT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, VIC20_USER_PORT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, VIC20_USER_PORT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -62,10 +62,10 @@
 
 struct vic20_user_port_interface
 {
-	devcb_write_line	m_out_light_pen_cb;
-	devcb_write_line	m_out_cb1_cb;
-	devcb_write_line	m_out_cb2_cb;
-    devcb_write_line	m_out_reset_cb;
+	devcb_write_line    m_out_light_pen_cb;
+	devcb_write_line    m_out_cb1_cb;
+	devcb_write_line    m_out_cb2_cb;
+	devcb_write_line    m_out_reset_cb;
 };
 
 
@@ -74,8 +74,8 @@ struct vic20_user_port_interface
 class device_vic20_user_port_interface;
 
 class vic20_user_port_device : public device_t,
-						       public vic20_user_port_interface,
-						       public device_slot_interface
+								public vic20_user_port_interface,
+								public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -107,10 +107,10 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-	devcb_resolved_write_line	m_out_light_pen_func;
-	devcb_resolved_write_line	m_out_cb1_func;
-	devcb_resolved_write_line	m_out_cb2_func;
-    devcb_resolved_write_line	m_out_reset_func;
+	devcb_resolved_write_line   m_out_light_pen_func;
+	devcb_resolved_write_line   m_out_cb1_func;
+	devcb_resolved_write_line   m_out_cb2_func;
+	devcb_resolved_write_line   m_out_reset_func;
 
 	device_vic20_user_port_interface *m_cart;
 };

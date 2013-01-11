@@ -3,8 +3,8 @@
 
 #include "emu.h"
 
-#define MCFG_NEXTKBD_ADD(_tag, _int_change_cb, _int_power_cb, _int_nmi_cb)					\
-	MCFG_DEVICE_ADD(_tag, NEXTKBD, 0)														\
+#define MCFG_NEXTKBD_ADD(_tag, _int_change_cb, _int_power_cb, _int_nmi_cb)                  \
+	MCFG_DEVICE_ADD(_tag, NEXTKBD, 0)                                                       \
 	downcast<nextkbd_device *>(device)->setup(_int_change_cb, _int_power_cb, _int_nmi_cb);
 
 class nextkbd_device : public device_t {

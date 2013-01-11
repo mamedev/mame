@@ -21,8 +21,8 @@ typedef void (*pci_write_func)(device_t *pcibus, device_t *device, int function,
 class pci_bus_legacy_device :  public device_t
 {
 public:
-    // construction/destruction
-    pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -39,26 +39,26 @@ public:
 	void add_sibling(pci_bus_legacy_device *sibling, int busnum);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_post_load();
+	virtual void device_post_load();
 
 private:
-	UINT8				m_busnum;
-	const char *		m_devtag[32];
-	pci_read_func		m_read_callback[32];
-	pci_write_func		m_write_callback[32];
-	const char *		m_father;
-	device_t *			m_device[32];
-	pci_bus_legacy_device *	m_siblings[8];
-	UINT8				m_siblings_busnum[8];
-	int					m_siblings_count;
+	UINT8               m_busnum;
+	const char *        m_devtag[32];
+	pci_read_func       m_read_callback[32];
+	pci_write_func      m_write_callback[32];
+	const char *        m_father;
+	device_t *          m_device[32];
+	pci_bus_legacy_device * m_siblings[8];
+	UINT8               m_siblings_busnum[8];
+	int                 m_siblings_count;
 
-	offs_t				m_address;
-	INT8				m_devicenum; // device number we are addressing
-	INT8				m_busnumber; // pci bus number we are addressing
-	pci_bus_legacy_device *	m_busnumaddr; // pci bus we are addressing
+	offs_t              m_address;
+	INT8                m_devicenum; // device number we are addressing
+	INT8                m_busnumber; // pci bus number we are addressing
+	pci_bus_legacy_device * m_busnumaddr; // pci bus we are addressing
 };
 
 // device type definition
@@ -92,7 +92,7 @@ class pci_bus_device;
 class pci_device_interface :  public device_slot_card_interface
 {
 public:
-    // construction/destruction
+	// construction/destruction
 	pci_device_interface(const machine_config &mconfig, device_t &device);
 	virtual ~pci_device_interface();
 
@@ -102,7 +102,7 @@ private:
 };
 
 class pci_connector: public device_t,
-				     public device_slot_interface
+						public device_slot_interface
 {
 public:
 	pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -121,8 +121,8 @@ extern const device_type PCI_CONNECTOR;
 class pci_bus_device :  public device_t
 {
 public:
-    // construction/destruction
-    pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -139,26 +139,26 @@ public:
 	void add_sibling(pci_bus_device *sibling, int busnum);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_post_load();
+	virtual void device_post_load();
 
 private:
-	UINT8				m_busnum;
+	UINT8               m_busnum;
 
-	const char *		m_devtag[32];
+	const char *        m_devtag[32];
 	pci_device_interface *m_device[32];
 
-	const char *		m_father;
-	pci_bus_device *	m_siblings[8];
-	UINT8				m_siblings_busnum[8];
-	int					m_siblings_count;
+	const char *        m_father;
+	pci_bus_device *    m_siblings[8];
+	UINT8               m_siblings_busnum[8];
+	int                 m_siblings_count;
 
-	offs_t				m_address;
-	INT8				m_devicenum; // device number we are addressing
-	INT8				m_busnumber; // pci bus number we are addressing
-	pci_bus_device *	m_busnumaddr; // pci bus we are addressing
+	offs_t              m_address;
+	INT8                m_devicenum; // device number we are addressing
+	INT8                m_busnumber; // pci bus number we are addressing
+	pci_bus_device *    m_busnumaddr; // pci bus we are addressing
 };
 
 // device type definition

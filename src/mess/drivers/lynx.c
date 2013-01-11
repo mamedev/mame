@@ -43,9 +43,9 @@ INPUT_PORTS_END
 
 void lynx_state::palette_init()
 {
-    int i;
+	int i;
 
-    for (i=0; i< 0x1000; i++)
+	for (i=0; i< 0x1000; i++)
 	{
 		palette_set_color_rgb(machine(), i,
 			((i >> 0) & 0x0f) * 0x11,
@@ -72,7 +72,7 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -186,5 +186,5 @@ static QUICKLOAD_LOAD( lynx )
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME      FLAGS */
-CONS( 1989, lynx,   0,      0,      lynx,   lynx, driver_device,   0,       "Atari",  "Lynx",	0)
+CONS( 1989, lynx,   0,      0,      lynx,   lynx, driver_device,   0,       "Atari",  "Lynx",   0)
 // CONS( 1991, lynx2,  lynx,   0,      lynx2,  lynx, driver_device,   0,       "Atari",  "Lynx II",    GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )

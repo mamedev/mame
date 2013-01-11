@@ -71,10 +71,10 @@ class pcxt_state : public driver_device
 public:
 	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_pit8253(*this,"pit8253"),
-		  m_pic8259_1(*this,"pic8259_1"),
-		  m_pic8259_2(*this,"pic8259_2"),
-		  m_dma8237_1(*this,"dma8237_1") { }
+			m_pit8253(*this,"pit8253"),
+			m_pic8259_1(*this,"pic8259_1"),
+			m_pic8259_2(*this,"pic8259_2"),
+			m_dma8237_1(*this,"dma8237_1") { }
 
 	UINT8 m_bg_bank;
 	int m_bank;
@@ -267,15 +267,15 @@ static const struct pit8253_config pc_pit8253_config =
 {
 	{
 		{
-			XTAL_14_31818MHz/12,				/* heartbeat IRQ */
+			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			XTAL_14_31818MHz/12,				/* dram refresh */
+			XTAL_14_31818MHz/12,                /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
+			XTAL_14_31818MHz/12,                /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(pcxt_state,ibm5150_pit8253_out2_changed)
 		}
@@ -288,13 +288,13 @@ READ8_MEMBER(pcxt_state::port_a_r)
 	if(!(m_port_b_data & 0x80))//???
 	{
 		/*
-        x--- ---- Undefined (Always 0)
-        -x-- ---- B: Floppy disk drive installed.
-        --xx ---- Default Display Mode
-        ---- xx-- Undefined (Always 1)
-        ---- --x- 8087 NDP installed
-        ---- ---x Undefined (Always 1)
-        */
+		x--- ---- Undefined (Always 0)
+		-x-- ---- B: Floppy disk drive installed.
+		--xx ---- Default Display Mode
+		---- xx-- Undefined (Always 1)
+		---- --x- 8087 NDP installed
+		---- ---x Undefined (Always 1)
+		*/
 		return m_wss1_data;
 	}
 	else//keyboard emulation
@@ -358,22 +358,22 @@ WRITE8_MEMBER(pcxt_state::sys_reset_w)
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_a_r),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_r),			/* Port B read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_w),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(pcxt_state,port_c_r),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_a_r),           /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_r),           /* Port B read */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_b_w),           /* Port B write */
+	DEVCB_DRIVER_MEMBER(pcxt_state,port_c_r),           /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,wss_1_w),				/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,wss_2_w),				/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(pcxt_state,sys_reset_w)			/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(pcxt_state,wss_1_w),                /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(pcxt_state,wss_2_w),                /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(pcxt_state,sys_reset_w)         /* Port C write */
 };
 
 
@@ -684,28 +684,28 @@ INPUT_PORTS_END
 /* F4 Character Displayer */
 static const gfx_layout pc_16_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
-	8*8					/* every char takes 2 x 8 bytes */
+	8*8                 /* every char takes 2 x 8 bytes */
 };
 
 static const gfx_layout pc_8_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	512,					/* 512 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	512,                    /* 512 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( pcxt )

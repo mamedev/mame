@@ -8,10 +8,10 @@
 
 /* there are 312 lines per screen, although in reality
    about 35*8 are visible */
-#define ENTERPRISE_SCREEN_HEIGHT	(35*8)
+#define ENTERPRISE_SCREEN_HEIGHT    (35*8)
 
 
-#define NICK_PALETTE_SIZE	256
+#define NICK_PALETTE_SIZE   256
 
 
 struct NICK_STATE;

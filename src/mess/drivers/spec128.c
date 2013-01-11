@@ -173,10 +173,10 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 {
 	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 
-   /* D0-D2: RAM page located at 0x0c000-0x0ffff */
-   /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
-   /* D4 - ROM select - which rom paged into 0x0000-0x03fff */
-   /* D5 - Disable paging */
+	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
+	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
+	/* D4 - ROM select - which rom paged into 0x0000-0x03fff */
+	/* D5 - Disable paging */
 
 	/* disable paging? */
 	if (state->m_port_7ffd_data & 0x20)
@@ -276,15 +276,15 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	96,                 /* 96 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( spec128 )
@@ -383,7 +383,7 @@ ROM_START(hc2000)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1986, spec128,  0,	   0,		spectrum_128,	spec_plus, driver_device,	0,	"Sinclair Research Ltd", "ZX Spectrum 128" , 0 )
-COMP( 1986, specpls2, spec128, 0,		spectrum_128,	spec_plus, driver_device,	0,	"Amstrad plc",           "ZX Spectrum +2" , 0 )
-COMP( 1991, hc128,    spec128, 0,		spectrum_128,	spec_plus, driver_device,	0,	"ICE-Felix",			 "HC-128" , 0 )
-COMP( 1992, hc2000,   spec128, 0,		spectrum_128,	spec_plus, driver_device,	0,	"ICE-Felix",			 "HC-2000" , GAME_NOT_WORKING )
+COMP( 1986, spec128,  0,       0,       spectrum_128,   spec_plus, driver_device,   0,  "Sinclair Research Ltd", "ZX Spectrum 128" , 0 )
+COMP( 1986, specpls2, spec128, 0,       spectrum_128,   spec_plus, driver_device,   0,  "Amstrad plc",           "ZX Spectrum +2" , 0 )
+COMP( 1991, hc128,    spec128, 0,       spectrum_128,   spec_plus, driver_device,   0,  "ICE-Felix",             "HC-128" , 0 )
+COMP( 1992, hc2000,   spec128, 0,       spectrum_128,   spec_plus, driver_device,   0,  "ICE-Felix",             "HC-2000" , GAME_NOT_WORKING )

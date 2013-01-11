@@ -218,8 +218,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-#define SUPRRIDR_P1_CONTROL_PORT_TAG	("CONTP1")
-#define SUPRRIDR_P2_CONTROL_PORT_TAG	("CONTP2")
+#define SUPRRIDR_P1_CONTROL_PORT_TAG    ("CONTP1")
+#define SUPRRIDR_P2_CONTROL_PORT_TAG    ("CONTP2")
 
 CUSTOM_INPUT_MEMBER(suprridr_state::suprridr_control_r)
 {
@@ -257,19 +257,19 @@ static INPUT_PORTS_START( suprridr )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
 	PORT_DIPNAME( 0x18, 0x00, "Timer Speed" )
-	PORT_DIPSETTING(	0x18, "Slow" )
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(	0x08, "Fast" )
-	PORT_DIPSETTING(	0x00, "Fastest" )
+	PORT_DIPSETTING(    0x18, "Slow" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x08, "Fast" )
+	PORT_DIPSETTING(    0x00, "Fastest" )
 	PORT_DIPNAME( 0x20, 0x00, "Bonus" )
-	PORT_DIPSETTING(	0x00, "200k" )
-	PORT_DIPSETTING(	0x20, "400k" )
+	PORT_DIPSETTING(    0x00, "200k" )
+	PORT_DIPSETTING(    0x20, "400k" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x80, 0x00, "Invulnerability?" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START(SUPRRIDR_P1_CONTROL_PORT_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
@@ -355,12 +355,12 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( suprridr, suprridr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)		/* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprridr_state,  main_nmi_gen)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/4)		/* 2.5 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 10000000/4)       /* 2.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 

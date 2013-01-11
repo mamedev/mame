@@ -175,7 +175,7 @@ MACHINE_CONFIG_START( pgm_arm_type3, pgm_arm_type3_state )
 	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 33333333)	// 55857G
+	MCFG_CPU_ADD("prot", ARM7, 33333333)    // 55857G
 	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
 
 MACHINE_CONFIG_END
@@ -315,5 +315,3 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 	svg_latch_init(machine());
 	pgm_create_dummy_internal_arm_region(machine());
 }
-
-

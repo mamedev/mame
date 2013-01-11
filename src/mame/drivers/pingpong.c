@@ -94,9 +94,9 @@ static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa880, 0xa880) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa900, 0xa900) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa980, 0xa980) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* coin counters + irq enables */
-	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
-	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_device, write)	/* trigger read */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)   /* coin counters + irq enables */
+	AM_RANGE(0xa200, 0xa200) AM_WRITENOP        /* SN76496 data latch */
+	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_device, write)    /* trigger read */
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -111,13 +111,13 @@ static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* irq enables */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)   /* irq enables */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("IN1")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN2")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("IN3")
-	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
-	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_device, write)	/* trigger read */
+	AM_RANGE(0xa200, 0xa200) AM_WRITENOP        /* SN76496 data latch */
+	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_device, write)    /* trigger read */
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -145,7 +145,7 @@ static INPUT_PORTS_START( pingpong )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0F, 0x0F, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPNAME( 0x0F, 0x0F, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:8,7,6,5")
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0A, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -162,7 +162,7 @@ static INPUT_PORTS_START( pingpong )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xF0, 0xF0, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPNAME( 0xF0, 0xF0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:4,3,2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0xA0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -181,10 +181,10 @@ static INPUT_PORTS_START( pingpong )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:7,6")
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:7,6")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Difficult ) )
@@ -209,8 +209,8 @@ static INPUT_PORTS_START( merlinmm )
 	PORT_DIPNAME( 0x10, 0x10, "Door Close")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Door Open")		// Seems strange, one input to register an open door
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )	// And a different one for closing it!
+	PORT_DIPNAME( 0x20, 0x20, "Door Open")      // Seems strange, one input to register an open door
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )  // And a different one for closing it!
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -286,7 +286,7 @@ static INPUT_PORTS_START( merlinmm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "10P Level" )		// Most likely to be optos, rather than DIPs.
+	PORT_DIPNAME( 0x01, 0x01, "10P Level" )     // Most likely to be optos, rather than DIPs.
 	PORT_DIPSETTING(    0x01, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x02, 0x02, "20P Level" )
@@ -317,7 +317,7 @@ static INPUT_PORTS_START( cashquiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	// 0x20 and 0x40 if both ON enable a test menu
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  // 0x20 and 0x40 if both ON enable a test menu
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
@@ -410,28 +410,28 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,		/* 8*8 characters */
-	512,		/* 512 characters */
-	2,		/* 2 bits per pixel */
-	{ 4, 0 },	/* the bitplanes are packed in one nibble */
-	{ 3, 2, 1, 0, 8*8+3, 8*8+2, 8*8+1, 8*8+0 },	/* x bit */
+	8,8,        /* 8*8 characters */
+	512,        /* 512 characters */
+	2,      /* 2 bits per pixel */
+	{ 4, 0 },   /* the bitplanes are packed in one nibble */
+	{ 3, 2, 1, 0, 8*8+3, 8*8+2, 8*8+1, 8*8+0 }, /* x bit */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8   },     /* y bit */
-	16*8	/* every char takes 16 consecutive bytes */
+	16*8    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,		/* 16*16 sprites */
-	128,		/* 128 sprites */
-	2,		/* 2 bits per pixel */
-	{ 4, 0 },	/* the bitplanes are packed in one nibble */
+	16,16,      /* 16*16 sprites */
+	128,        /* 128 sprites */
+	2,      /* 2 bits per pixel */
+	{ 4, 0 },   /* the bitplanes are packed in one nibble */
 	{ 12*16+3,12*16+2,12*16+1,12*16+0,
-	   8*16+3, 8*16+2, 8*16+1, 8*16+0,
-	   4*16+3, 4*16+2, 4*16+1, 4*16+0,
-	        3,      2,      1,      0 },			/* x bit */
+		8*16+3, 8*16+2, 8*16+1, 8*16+0,
+		4*16+3, 4*16+2, 4*16+1, 4*16+0,
+			3,      2,      1,      0 },            /* x bit */
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8  },    /* y bit */
-	64*8	/* every char takes 64 consecutive bytes */
+		32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8  },    /* y bit */
+	64*8    /* every char takes 64 consecutive bytes */
 };
 
 static GFXDECODE_START( pingpong )
@@ -453,14 +453,14 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
 static MACHINE_CONFIG_START( pingpong, pingpong_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
+	MCFG_CPU_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
 	MCFG_CPU_PROGRAM_MAP(pingpong_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pingpong_state, pingpong_interrupt, "screen", 0, 1)
 
@@ -540,26 +540,26 @@ ROM_START( cashquiz )
 	/* 0x4000 - 0x7fff = extra hardware for question board */
 
 	ROM_REGION( 0x40000, "user1", 0 ) /* Question roms */
-	ROM_LOAD( "q30_soaps.ic1",		0x02000, 0x6000, CRC(b35a30ac) SHA1(5daf52a6d973f5a1b1ec3395962bcab690c54e43) )
+	ROM_LOAD( "q30_soaps.ic1",      0x02000, 0x6000, CRC(b35a30ac) SHA1(5daf52a6d973f5a1b1ec3395962bcab690c54e43) )
 	ROM_CONTINUE(                   0x00000, 0x2000 )
-	ROM_LOAD( "q10.ic2",			0x0a000, 0x6000, CRC(54962e11) SHA1(3c89ac26ebc002b2bc723f1424a7ba3db7a98e5f) )
+	ROM_LOAD( "q10.ic2",            0x0a000, 0x6000, CRC(54962e11) SHA1(3c89ac26ebc002b2bc723f1424a7ba3db7a98e5f) )
 	ROM_CONTINUE(                   0x08000, 0x2000 )
 	ROM_LOAD( "q29_newsoccrick.ic3",0x12000, 0x6000, CRC(03d47262) SHA1(8a849cb4d4440042042cbdc0f34feebe71d6cb37) )
 	ROM_CONTINUE(                   0x10000, 0x2000 )
 	ROM_LOAD( "q28_sportstime.ic4", 0x1a000, 0x6000, CRC(2bd00476) SHA1(88ed9d26909873c52273290686b4783563edfb61) )
 	ROM_CONTINUE(                   0x18000, 0x2000 )
-	ROM_LOAD( "q20_mot.ic5",		0x22000, 0x6000, CRC(17a38baf) SHA1(5560932e4747a242df7c8b7bbaf8679c9a8be6ac) )
+	ROM_LOAD( "q20_mot.ic5",        0x22000, 0x6000, CRC(17a38baf) SHA1(5560932e4747a242df7c8b7bbaf8679c9a8be6ac) )
 	ROM_CONTINUE(                   0x20000, 0x2000 )
-	ROM_LOAD( "q14_popmusic2.ic6",	0x2a000, 0x6000, CRC(e486d6ee) SHA1(421723fa7604c0509092891e53723191bd62e294) )
+	ROM_LOAD( "q14_popmusic2.ic6",  0x2a000, 0x6000, CRC(e486d6ee) SHA1(421723fa7604c0509092891e53723191bd62e294) )
 	ROM_CONTINUE(                   0x28000, 0x2000 )
-	ROM_LOAD( "q26_screenent.ic7",	0x32000, 0x6000, CRC(9d130515) SHA1(bfc32219d4d4eaca4efa02c3c46125144c8cd286) )
+	ROM_LOAD( "q26_screenent.ic7",  0x32000, 0x6000, CRC(9d130515) SHA1(bfc32219d4d4eaca4efa02c3c46125144c8cd286) )
 	ROM_CONTINUE(                   0x30000, 0x2000 )
-	ROM_LOAD( "q19.ic8",			0x3a000, 0x6000, CRC(9f3f77e6) SHA1(aa1600215e774b090f379a0aae520027cd1795c1) )
+	ROM_LOAD( "q19.ic8",            0x3a000, 0x6000, CRC(9f3f77e6) SHA1(aa1600215e774b090f379a0aae520027cd1795c1) )
 	ROM_CONTINUE(                   0x38000, 0x2000 )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cashq.7h",  0x0000, 0x2000, CRC(44b72a4f) SHA1(a993f1570cf9d8f86d4229198e9b1a0d6a92e51f) )
-	ROM_CONTINUE(          0x0000, 0x2000 )	/* rom is a 27128 in a 2764 socket */
+	ROM_CONTINUE(          0x0000, 0x2000 ) /* rom is a 27128 in a 2764 socket */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "cashq.12c",  0x0000, 0x2000, NO_DUMP ) // missing :-(
@@ -621,6 +621,6 @@ DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 }
 
 
-GAME( 1985, pingpong, 0, pingpong, pingpong, driver_device, 0,		   ROT0, "Konami", "Konami's Ping-Pong", 0 )
+GAME( 1985, pingpong, 0, pingpong, pingpong, driver_device, 0,         ROT0, "Konami", "Konami's Ping-Pong", 0 )
 GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, merlinmm, ROT90,"Zilec-Zenitone", "Merlins Money Maze", 0 )
 GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, cashquiz, ROT0, "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", GAME_IMPERFECT_GRAPHICS )

@@ -309,16 +309,16 @@ static UINT8 nflfoot_serial_in_numbits;
 WRITE8_MEMBER(mcr_state::mcr_control_port_w)
 {
 	/*
-        Bit layout is as follows:
-            D7 = n/c
-            D6 = cocktail flip
-            D5 = red LED
-            D4 = green LED
-            D3 = n/c
-            D2 = coin meter 3
-            D1 = coin meter 2
-            D0 = coin meter 1
-    */
+	    Bit layout is as follows:
+	        D7 = n/c
+	        D6 = cocktail flip
+	        D5 = red LED
+	        D4 = green LED
+	        D3 = n/c
+	        D2 = coin meter 3
+	        D1 = coin meter 2
+	        D0 = coin meter 1
+	*/
 
 	coin_counter_w(machine(), 0, (data >> 0) & 1);
 	coin_counter_w(machine(), 1, (data >> 1) & 1);
@@ -519,10 +519,10 @@ READ8_MEMBER(mcr_state::kroozr_ip1_r)
 WRITE8_MEMBER(mcr_state::kroozr_op4_w)
 {
 	/*
-        bit 2 = ship control
-        bit 4 = cargo light cntl 1
-        bit 5 = cargo light cntl 2
-    */
+	    bit 2 = ship control
+	    bit 4 = cargo light cntl 1
+	    bit 5 = cargo light cntl 2
+	*/
 }
 
 
@@ -582,50 +582,50 @@ WRITE8_MEMBER(mcr_state::twotiger_op4_w)
 WRITE8_MEMBER(mcr_state::dotron_op4_w)
 {
 	/*
-        Flasher Control:
-            A 555 timer is set up in astable mode with R1=R2=56k and C=1uF giving
-            a frequency of 8.5714 Hz. The timer is enabled if J1-3 is high (1).
-            The output of the timer is connected to the input of a D-type flip
-            flop at 1A, which is clocked by the AC sync (since this is a
-            fluorescent light fixture).
+	    Flasher Control:
+	        A 555 timer is set up in astable mode with R1=R2=56k and C=1uF giving
+	        a frequency of 8.5714 Hz. The timer is enabled if J1-3 is high (1).
+	        The output of the timer is connected to the input of a D-type flip
+	        flop at 1A, which is clocked by the AC sync (since this is a
+	        fluorescent light fixture).
 
-            The J1-4 input is also connected the input of another D-type flip flop
-            on the same chip at 1A. The output of this directly controls the light
-            fixture.
+	        The J1-4 input is also connected the input of another D-type flip flop
+	        on the same chip at 1A. The output of this directly controls the light
+	        fixture.
 
-            Thus:
-                J1-3 enables a strobe effect at 8.5714 Hz (77.616ms high, 38.808ms low)
-                J1-4 directly enables/disables the lamp.
-                The two outputs are wire-ored together.
-    */
+	        Thus:
+	            J1-3 enables a strobe effect at 8.5714 Hz (77.616ms high, 38.808ms low)
+	            J1-4 directly enables/disables the lamp.
+	            The two outputs are wire-ored together.
+	*/
 	/* bit 7 = FL1 (J1-3) on flasher control board */
 	/* bit 6 = FL0 (J1-4) on flasher control board */
 	output_set_value("backlight", (data >> 6) & 1);
 
 	/*
-        Lamp Sequencer:
-            A 556 timer is set up in astable mode with two different frequencies,
-            one using R1=R2=10k and C=10uF giving a frequency of 4.8 Hz, and the
-            second using R1=R2=5.1k and C=10uF giving a frequency of 9.4118 Hz.
+	    Lamp Sequencer:
+	        A 556 timer is set up in astable mode with two different frequencies,
+	        one using R1=R2=10k and C=10uF giving a frequency of 4.8 Hz, and the
+	        second using R1=R2=5.1k and C=10uF giving a frequency of 9.4118 Hz.
 
-            The outputs of these clocks go into a mux at U4, whose input is
-            selected by the input bit latched from J1-6.
+	        The outputs of these clocks go into a mux at U4, whose input is
+	        selected by the input bit latched from J1-6.
 
-            The output of the mux clocks a 16-bit binary counter at U3. The
-            output of the binary counter becomes the low 4 address bits of the
-            82S123 PROM at U2. The upper address bit comes from the input bit
-            latched from J1-5.
+	        The output of the mux clocks a 16-bit binary counter at U3. The
+	        output of the binary counter becomes the low 4 address bits of the
+	        82S123 PROM at U2. The upper address bit comes from the input bit
+	        latched from J1-5.
 
-            Each of the 5 output bits from the 82S123 is inverted and connected
-            to one of the lamps. The /CE pin on the 82S123 is connected to the
-            input bit latched from J1-4.
+	        Each of the 5 output bits from the 82S123 is inverted and connected
+	        to one of the lamps. The /CE pin on the 82S123 is connected to the
+	        input bit latched from J1-4.
 
-            Thus:
-                J1-4 enables (0) or disables (1) the lamp sequencing.
-                J1-5 selects one of two 16-entry sequences stored in the 82S123.
-                J1-6 selects one of two speeds (0=4.8 Hz, 1=9.4118 Hz)
+	        Thus:
+	            J1-4 enables (0) or disables (1) the lamp sequencing.
+	            J1-5 selects one of two 16-entry sequences stored in the 82S123.
+	            J1-6 selects one of two speeds (0=4.8 Hz, 1=9.4118 Hz)
 
-    */
+	*/
 	/* bit 5 = SEL1 (J1-1) on the Lamp Sequencer board */
 	if (((last_op4 ^ data) & 0x20) && (data & 0x20))
 	{
@@ -874,7 +874,7 @@ ADDRESS_MAP_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( solarfox )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -884,7 +884,7 @@ static INPUT_PORTS_START( solarfox )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -894,11 +894,11 @@ static INPUT_PORTS_START( solarfox )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x03, 0x03, "Bonus" )
 	PORT_DIPSETTING(    0x02, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x03, "After 10 racks" )
@@ -915,7 +915,7 @@ static INPUT_PORTS_START( solarfox )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
@@ -925,7 +925,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( kick )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -935,19 +935,19 @@ static INPUT_PORTS_START( kick )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(3) PORT_KEYDELTA(50) PORT_REVERSE
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Music" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
@@ -960,7 +960,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( kickc )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -970,14 +970,14 @@ static INPUT_PORTS_START( kickc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(3) PORT_KEYDELTA(50) PORT_REVERSE
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Music" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -987,7 +987,7 @@ static INPUT_PORTS_START( kickc )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ssio:DIP")
@@ -1025,28 +1025,28 @@ static INPUT_PORTS_START( dpoker )
 	// 10-position DIP switch on the sound pcb
 	// settings and defaults are verified from a sticker inside the cabinet, I don't know where 9 or 10 are connected
 	PORT_START("ssio:IP3")
-	PORT_DIPNAME( 0x01, 0x01, "Hopper" )			PORT_DIPLOCATION("B3:1")
+	PORT_DIPNAME( 0x01, 0x01, "Hopper" )            PORT_DIPLOCATION("B3:1")
 	PORT_DIPSETTING(    0x01, "Relay Pulse" )
 	PORT_DIPSETTING(    0x00, "Miser On" ) // what is this? - the game locks up if it's enabled
-	PORT_DIPNAME( 0x02, 0x02, "Music" )				PORT_DIPLOCATION("B3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Music" )             PORT_DIPLOCATION("B3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "Novelty" )			PORT_DIPLOCATION("B3:3")
+	PORT_DIPNAME( 0x04, 0x04, "Novelty" )           PORT_DIPLOCATION("B3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )	PORT_DIPLOCATION("B3:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("B3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )	PORT_DIPLOCATION("B3:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("B3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "Cards After 5th Coin" )	PORT_DIPLOCATION("B3:6")
+	PORT_DIPNAME( 0x20, 0x20, "Cards After 5th Coin" )  PORT_DIPLOCATION("B3:6")
 	PORT_DIPSETTING(    0x20, "Face Up" )
 	PORT_DIPSETTING(    0x00, "Logo Up" )
-	PORT_DIPNAME( 0x40, 0x40, "Currency" )			PORT_DIPLOCATION("B3:7")
+	PORT_DIPNAME( 0x40, 0x40, "Currency" )          PORT_DIPLOCATION("B3:7")
 	PORT_DIPSETTING(    0x40, "Ike Dollars" )
 	PORT_DIPSETTING(    0x00, "Other Coins" )
-	PORT_DIPNAME( 0x80, 0x00, "Background Color" )	PORT_DIPLOCATION("B3:8")
+	PORT_DIPNAME( 0x80, 0x00, "Background Color" )  PORT_DIPLOCATION("B3:8")
 	PORT_DIPSETTING(    0x80, "Green" )
 	PORT_DIPSETTING(    0x00, "Blue" )
 //  PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("B3:9")
@@ -1089,7 +1089,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( shollow )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1099,7 +1099,7 @@ static INPUT_PORTS_START( shollow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -1109,10 +1109,10 @@ static INPUT_PORTS_START( shollow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1121,7 +1121,7 @@ static INPUT_PORTS_START( shollow )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
@@ -1131,7 +1131,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( tron )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1141,10 +1141,10 @@ static INPUT_PORTS_START( tron )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1154,7 +1154,7 @@ static INPUT_PORTS_START( tron )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Coin Meters" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1173,7 +1173,7 @@ static INPUT_PORTS_START( tron )
 	// According to the manual, SW1 is a bank of *10* switches (9 is unused and 10 is freeze)
 	// Where are the values for the other two bits read?
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("ssio:DIP")
@@ -1182,7 +1182,7 @@ static INPUT_PORTS_START( tron )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tron3 )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1192,10 +1192,10 @@ static INPUT_PORTS_START( tron3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1205,7 +1205,7 @@ static INPUT_PORTS_START( tron3 )
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Coin Meters" )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1224,7 +1224,7 @@ static INPUT_PORTS_START( tron3 )
 	// According to the manual, SW1 is a bank of *10* switches (9 is unused and 10 is freeze)
 	// Where are the values for the other two bits read?
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
@@ -1237,7 +1237,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( kroozr )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1247,25 +1247,25 @@ static INPUT_PORTS_START( kroozr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* low 3 bits of spinner */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* sensor J1-10 */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* sensor J1-9 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* sensor J1-8 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* upper 1 bit of spinner */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* low 3 bits of spinner */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* sensor J1-10 */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* sensor J1-9 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* sensor J1-8 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* upper 1 bit of spinner */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0xff, 0x64, IPT_AD_STICK_X ) PORT_MINMAX(48,152) PORT_SENSITIVITY(100) PORT_KEYDELTA(52)
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, 0x64, IPT_AD_STICK_Y ) PORT_MINMAX(48,152) PORT_SENSITIVITY(100) PORT_KEYDELTA(52)
 
 	PORT_START("ssio:DIP")
@@ -1278,7 +1278,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( domino )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1288,14 +1288,14 @@ static INPUT_PORTS_START( domino )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -1303,7 +1303,7 @@ static INPUT_PORTS_START( domino )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Music" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -1318,7 +1318,7 @@ static INPUT_PORTS_START( domino )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ssio:DIP")
@@ -1328,7 +1328,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( journey )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1338,14 +1338,14 @@ static INPUT_PORTS_START( journey )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -1353,7 +1353,7 @@ static INPUT_PORTS_START( journey )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -1362,7 +1362,7 @@ static INPUT_PORTS_START( journey )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ssio:DIP")
@@ -1372,7 +1372,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( wacko )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1382,13 +1382,13 @@ static INPUT_PORTS_START( wacko )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -1397,7 +1397,7 @@ static INPUT_PORTS_START( wacko )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY
@@ -1420,7 +1420,7 @@ INPUT_PORTS_END
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( twotiger )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -1430,13 +1430,13 @@ static INPUT_PORTS_START( twotiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x67, IPT_AD_STICK_X ) PORT_MINMAX(0, 206) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0xff, 0x67, IPT_AD_STICK_X ) PORT_MINMAX(0, 206) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x00, "Shot Speed" )
 	PORT_DIPSETTING(    0x01, "Fast" )
 	PORT_DIPSETTING(    0x00, "Slow" )
@@ -1445,7 +1445,7 @@ static INPUT_PORTS_START( twotiger )
 	PORT_DIPSETTING(    0x02, "2 Credits" )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1461,7 +1461,7 @@ INPUT_PORTS_END
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( twotigrc )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1471,20 +1471,20 @@ static INPUT_PORTS_START( twotigrc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("ssio:DIP")
@@ -1494,7 +1494,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( tapper )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1504,7 +1504,7 @@ static INPUT_PORTS_START( tapper )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -1512,7 +1512,7 @@ static INPUT_PORTS_START( tapper )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
@@ -1520,7 +1520,7 @@ static INPUT_PORTS_START( tapper )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -1533,7 +1533,7 @@ static INPUT_PORTS_START( tapper )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
@@ -1543,7 +1543,7 @@ INPUT_PORTS_END
 
 /* not verified, no manual found */
 static INPUT_PORTS_START( timber )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1553,7 +1553,7 @@ static INPUT_PORTS_START( timber )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -1562,7 +1562,7 @@ static INPUT_PORTS_START( timber )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
@@ -1571,7 +1571,7 @@ static INPUT_PORTS_START( timber )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -1584,7 +1584,7 @@ static INPUT_PORTS_START( timber )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
@@ -1594,7 +1594,7 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( dotron )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1604,11 +1604,11 @@ static INPUT_PORTS_START( dotron )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
 	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1620,19 +1620,19 @@ static INPUT_PORTS_START( dotron )
 	PORT_DIPSETTING(    0x00, "Environmental" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("FAKE")	/* fake port to make aiming up & down easier */
+	PORT_START("FAKE")  /* fake port to make aiming up & down easier */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -1648,43 +1648,43 @@ INPUT_PORTS_END
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( nflfoot )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BILL1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )		/* continue game */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* service */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )		/* new game */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )     /* continue game */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   /* service */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )     /* new game */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) 	/* left engage */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) 	/* left select #1 play */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) 	/* left select #2 play */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) 	/* left select #3 play */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) 	/* left select #4 play */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) 	/* left select #5 play */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)		/* select one player */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)     /* left engage */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)     /* left select #1 play */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)     /* left select #2 play */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)     /* left select #3 play */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)     /* left select #4 play */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)     /* left select #5 play */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)     /* select one player */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) 	/* right engage */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) 	/* right select #1 play */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) 	/* right select #2 play */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) 	/* right select #3 play */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) 	/* right select #4 play */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) 	/* right select #5 play */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)		/* select two player */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )					/* connects to IPU board */
+	PORT_START("ssio:IP2")  /* J5 1-8 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)     /* right engage */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)     /* right select #1 play */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)     /* right select #2 play */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)     /* right select #3 play */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)     /* right select #4 play */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)     /* right select #5 play */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)     /* select two player */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                    /* connects to IPU board */
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
@@ -1695,7 +1695,7 @@ INPUT_PORTS_END
 /* "wiring diagram was not available at time of publication" according to the manual */
 /* DIPs verified from the manual */
 static INPUT_PORTS_START( demoderb )
-	PORT_START("ssio:IP0")	/* J4 1-8 */
+	PORT_START("ssio:IP0")  /* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1705,27 +1705,27 @@ static INPUT_PORTS_START( demoderb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ssio:IP1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */    /* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("ssio:IP1.ALT1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP1.ALT1") /* J4 10-13,15-18 */    /* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("ssio:IP1.ALT2")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP1.ALT2") /* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 
-	PORT_START("ssio:IP2")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP2")  /* J5 1-8 */    /* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("ssio:IP2.ALT1")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP2.ALT1") /* J5 1-8 */    /* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("ssio:IP2.ALT2")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_START("ssio:IP2.ALT2") /* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 
-	PORT_START("ssio:IP3")	/* DIPSW @ B3 */
+	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, "2P Upright" )
 	PORT_DIPSETTING(    0x00, "4P Cocktail" )
@@ -1745,7 +1745,7 @@ static INPUT_PORTS_START( demoderb )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ssio:IP4")	/* J6 1-8 */
+	PORT_START("ssio:IP4")  /* J6 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
@@ -1769,8 +1769,8 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( mcr )
-	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )	/* colors 0-15, 2x2 */
-	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )		/* colors 16-31 */
+	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 ) /* colors 0-15, 2x2 */
+	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )       /* colors 16-31 */
 GFXDECODE_END
 
 
@@ -2070,14 +2070,14 @@ ROM_END
 
 
 ROM_START( dpoker )
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "vppp.b3",      0x0000, 0x1000, CRC(2a76ded2) SHA1(3bb5467f0cbca07e72f6d61deb2687b7c1c839c8) )
-    ROM_LOAD( "vppp.b4",      0x1000, 0x1000, CRC(d6948faa) SHA1(4b9c3df45b1333c4e5595b790b439c104ab89eda) )
-    ROM_LOAD( "vppp.b5",      0x2000, 0x1000, CRC(a49916e5) SHA1(b21268c87bc5c3ea6e072846c5b97a7ae1e3995e) )
-    ROM_LOAD( "vppp.d4",      0x3000, 0x1000, CRC(c496934f) SHA1(cf27b6fb764fbf7ed4c5e1030c43498f0ac60c1c) )
-    ROM_LOAD( "vppp.d5",      0x4000, 0x1000, CRC(84f4bd38) SHA1(d1c53d8c6ba10d3bc343fe120eecbca70d48b759) )
-    ROM_LOAD( "vppp.d6",      0x5000, 0x1000, CRC(b0023bf1) SHA1(77a57a42dd403ef56f334ca295b5b43e94b99598) )
-    ROM_LOAD( "vppp.d7",      0x6000, 0x1000, CRC(a4012f5a) SHA1(011e77a6634fbb02a6ae99fe6685c92f2fad3fee) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "vppp.b3",      0x0000, 0x1000, CRC(2a76ded2) SHA1(3bb5467f0cbca07e72f6d61deb2687b7c1c839c8) )
+	ROM_LOAD( "vppp.b4",      0x1000, 0x1000, CRC(d6948faa) SHA1(4b9c3df45b1333c4e5595b790b439c104ab89eda) )
+	ROM_LOAD( "vppp.b5",      0x2000, 0x1000, CRC(a49916e5) SHA1(b21268c87bc5c3ea6e072846c5b97a7ae1e3995e) )
+	ROM_LOAD( "vppp.d4",      0x3000, 0x1000, CRC(c496934f) SHA1(cf27b6fb764fbf7ed4c5e1030c43498f0ac60c1c) )
+	ROM_LOAD( "vppp.d5",      0x4000, 0x1000, CRC(84f4bd38) SHA1(d1c53d8c6ba10d3bc343fe120eecbca70d48b759) )
+	ROM_LOAD( "vppp.d6",      0x5000, 0x1000, CRC(b0023bf1) SHA1(77a57a42dd403ef56f334ca295b5b43e94b99598) )
+	ROM_LOAD( "vppp.d7",      0x6000, 0x1000, CRC(a4012f5a) SHA1(011e77a6634fbb02a6ae99fe6685c92f2fad3fee) )
 
 	// The sound board was missing in this pcb set, we'll use the roms from Kick as placeholder.
 	// Funnily enough, according to a cabinet recording, the sound is actually very similar to Kickman.
@@ -2087,15 +2087,15 @@ ROM_START( dpoker )
 	ROM_LOAD( "vssp.a9",      0x2000, 0x1000, BAD_DUMP CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
 	ROM_LOAD( "vssp.a10",     0x3000, 0x1000, BAD_DUMP CRC(d36ddcdc) SHA1(2d3ec83b9fa5a9d309c393a0c3ee45f0ba8192c9) )
 
-    ROM_REGION( 0x02000, "gfx1", 0 )
-    ROM_LOAD( "vpbg.g4",      0x0000, 0x1000, CRC(9fe9aad8) SHA1(f9174bcce3886548b8c18c5a06995d5c69ce5486) )
-    ROM_LOAD( "vpbg.g5",      0x1000, 0x1000, CRC(d43aeaae) SHA1(7bbabf9641c73154a769aa9bfc56ab0bc050e964) )
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "vpbg.g4",      0x0000, 0x1000, CRC(9fe9aad8) SHA1(f9174bcce3886548b8c18c5a06995d5c69ce5486) )
+	ROM_LOAD( "vpbg.g5",      0x1000, 0x1000, CRC(d43aeaae) SHA1(7bbabf9641c73154a769aa9bfc56ab0bc050e964) )
 
-    ROM_REGION( 0x08000, "gfx2", 0 )
-    ROM_LOAD( "vpfg.a1",      0x6000, 0x2000, CRC(d76ec7dd) SHA1(a7be6f05a988c59c7f83c640dd0ef824ea4ce839) )
-    ROM_LOAD( "vpfg.b1",      0x4000, 0x2000, CRC(cdba9a7d) SHA1(9076b52363cd84ae6e01ac46b369d7719536fac0) )
-    ROM_LOAD( "vpfg.d1",      0x2000, 0x2000, CRC(c661cace) SHA1(d5755f0c32a7d9ba283822daaf37ccbd2f6667de) )
-    ROM_LOAD( "vpfg.e1",      0x0000, 0x2000, CRC(acb3b469) SHA1(9769d6cfd49cba48264034fb5aed1d1b84ebba4c) )
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "vpfg.a1",      0x6000, 0x2000, CRC(d76ec7dd) SHA1(a7be6f05a988c59c7f83c640dd0ef824ea4ce839) )
+	ROM_LOAD( "vpfg.b1",      0x4000, 0x2000, CRC(cdba9a7d) SHA1(9076b52363cd84ae6e01ac46b369d7719536fac0) )
+	ROM_LOAD( "vpfg.d1",      0x2000, 0x2000, CRC(c661cace) SHA1(d5755f0c32a7d9ba283822daaf37ccbd2f6667de) )
+	ROM_LOAD( "vpfg.e1",      0x0000, 0x2000, CRC(acb3b469) SHA1(9769d6cfd49cba48264034fb5aed1d1b84ebba4c) )
 ROM_END
 
 
@@ -2675,7 +2675,7 @@ ROM_START( dotrone )
 	ROM_LOAD( "loc-b.cp9",    0x0e000, 0x2000, CRC(565a5c48) SHA1(9dfafd58bd552bfda4e1799a175735ecc1369ba3) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "edotlamp.u2",  0x0020, 0x0020, CRC(fb58b867) SHA1(45beb55f2c2e9197f091fc06e9a2f595e57e5c93) )	/* lamp sequencer PROM */
+	ROM_LOAD( "edotlamp.u2",  0x0020, 0x0020, CRC(fb58b867) SHA1(45beb55f2c2e9197f091fc06e9a2f595e57e5c93) )    /* lamp sequencer PROM */
 ROM_END
 
 
@@ -2696,7 +2696,7 @@ ROM_START( nflfoot )
 	ROM_LOAD( "nfl-sqtk-11-15-83.u4", 0x0a000, 0x1000, CRC(b202439b) SHA1(b09e94b0b176f80b12fb4cefa6efd5b2cccb6192) )
 	ROM_LOAD( "nfl-sqtk-11-15-83.u5", 0x0b000, 0x1000, CRC(bbfe4d39) SHA1(161ed211701e576978d6ef8b9766eb7742a29eb3) )
 
-	ROM_REGION( 0x10000, "ipu", 0 )	/* 64k for the IPU CPU */
+	ROM_REGION( 0x10000, "ipu", 0 ) /* 64k for the IPU CPU */
 	ROM_LOAD( "ipu-7-9.a2", 0x0000, 0x2000, CRC(0e083adb) SHA1(b799568ff851f7320869fb84821a90eb1156556f) )
 	ROM_LOAD( "ipu-7-9.a4", 0x2000, 0x2000, CRC(5c9c4764) SHA1(ee9fe1d85dbfb1089bc8ed106a28fe5f3c36fb42) )
 
@@ -2722,9 +2722,9 @@ ROM_START( demoderb )
 	ROM_LOAD( "dd_pro1",      0x04000, 0x4000, CRC(4c713bfe) SHA1(493b6ba01e86e7586ad123c53cf7f0a0c191d670) )
 	ROM_LOAD( "dd_pro2",      0x08000, 0x4000, CRC(c2cbd2a4) SHA1(fa642b2f61ff5529ab688a43c1dc14357a4eba6f) )
 
-	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )	/* 64k for the audio CPU, not populated */
+	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )    /* 64k for the audio CPU, not populated */
 
-	ROM_REGION( 0x10000, "tcs:cpu", 0 )	/* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 ) /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "tcs_u5.bin",   0x0c000, 0x2000, CRC(eca33b2c) SHA1(938b021ea3b0f23aed7a98a930a58af371a02303) )
 	ROM_LOAD( "tcs_u4.bin",   0x0e000, 0x2000, CRC(3490289a) SHA1(a9d56ea60bb901267da41ab408f8e1ed3742b0ac) )
 

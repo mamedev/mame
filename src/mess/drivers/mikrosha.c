@@ -30,16 +30,16 @@ public:
 
 /* Address maps */
 static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
-    AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-    AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
-    AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r) // Not connected
-    AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
-    AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
-    AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
-    AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
-    AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
-    AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
+	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
+	AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
+	AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r) // Not connected
+	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
+	AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
+	AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
+	AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
+	AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
+	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)    // DMA
+	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mikrosha_io , AS_IO, 8, mikrosha_state )
@@ -180,15 +180,15 @@ static const struct pit8253_config mikrosha_pit8253_intf =
 /* F4 Character Displayer */
 static const gfx_layout mikrosha_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( mikrosha )
@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 
 	MCFG_PIT8253_ADD( "pit8253", mikrosha_pit8253_intf )
 
-  /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -243,7 +243,7 @@ ROM_START( mikrosha )
 ROM_END
 
 ROM_START( m86rk )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m86rk.bin", 0xf800, 0x0800, CRC(a898d77a) SHA1(c2497bf8434b5028fe0a9fc09be311465d5553a5))
 	ROM_REGION(0x0800, "gfx1",0)
 	/* here should probably be different rom */
@@ -252,5 +252,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1987, mikrosha, radio86,0,		mikrosha,	mikrosha, radio86_state,	radio86,	"Lianozovo Electromechanical Factory",		"Mikrosha",		0)
-COMP( 1987, m86rk,	  radio86,0,		mikrosha,	mikrosha, radio86_state,	radio86,	"<unknown>",		"Mikrosha-86RK",		0)
+COMP( 1987, mikrosha, radio86,0,        mikrosha,   mikrosha, radio86_state,    radio86,    "Lianozovo Electromechanical Factory",      "Mikrosha",     0)
+COMP( 1987, m86rk,    radio86,0,        mikrosha,   mikrosha, radio86_state,    radio86,    "<unknown>",        "Mikrosha-86RK",        0)

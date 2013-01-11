@@ -9,7 +9,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-#define IsPiece(x)		((m_board[x] >=1) && (m_board[x] <=12))
+#define IsPiece(x)      ((m_board[x] >=1) && (m_board[x] <=12))
 
 const int mboard_state::start_board[64] =
 {
@@ -67,10 +67,10 @@ int mboard_state::get_first_cleared_bit(UINT8 data)
 
 UINT8 mboard_state::read_board()
 {
-	  UINT8 i_18, i_AH;
-	  UINT8 data;
+		UINT8 i_18, i_AH;
+		UINT8 data;
 
-	  data = 0xff;
+		data = 0xff;
 
 /*
 
@@ -100,18 +100,18 @@ data:  0 0000 0000  all fields occupied
 
 /* looking for cleared bit in mask Line18_REED => current line */
 
- if (data && Line18_REED)
- {
+	if (data && Line18_REED)
+	{
 		i_18=get_first_cleared_bit(Line18_REED);
 
 /* looking for a piece in this line and clear bit in data if found */
 
-	   for ( i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
+		for ( i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
 			if (IsPiece(64-(i_18*8 + 8-i_AH)))
-				data &= ~(1 << i_AH);			// clear bit
+				data &= ~(1 << i_AH);           // clear bit
 
-	   read_board_flag = TRUE;
- }
+		read_board_flag = TRUE;
+	}
 
 	return data;
 }
@@ -127,7 +127,7 @@ void mboard_state::write_board(UINT8 data)
 	else
 		Line18_LED = data;
 
-	 read_board_flag = FALSE;
+		read_board_flag = FALSE;
 
 	if (data == 0xff)
 		mboard_key_selector = 0;
@@ -151,19 +151,19 @@ data:  10 0001 0000 Line E
 
 */
 
-	for (i=0; i < 64; i++)							/* all  LED's off */
+	for (i=0; i < 64; i++)                          /* all  LED's off */
 		output_set_led_value(i, 0);
 
-    if (Line18_LED)
-    {
-		for (i_AH = 0; i_AH < 8; i_AH++)				/* turn  LED on depending on bit masks */
+	if (Line18_LED)
+	{
+		for (i_AH = 0; i_AH < 8; i_AH++)                /* turn  LED on depending on bit masks */
 		{
 			if (BIT(data,i_AH))
 			{
 				for (i_18 = 0; i_18 < 8; i_18++)
 				{
 					LED = (i_18*8 + 8-i_AH-1);
-					if (!(Line18_LED & (1 << i_18)))	/* cleared bit */
+					if (!(Line18_LED & (1 << i_18)))    /* cleared bit */
 						output_set_led_value(LED, 1);
 					//else
 					//  output_set_led_value(LED, 0);
@@ -231,8 +231,8 @@ WRITE8_MEMBER(mboard_state::mboard_write_LED_8)
 
 WRITE16_MEMBER(mboard_state::mboard_write_LED_16)
 {
-	 write_LED(data >> 8);
-	 space.device().execute().spin_until_time(attotime::from_usec(9));
+		write_LED(data >> 8);
+		space.device().execute().spin_until_time(attotime::from_usec(9));
 }
 
 WRITE32_MEMBER(mboard_state::mboard_write_LED_32)
@@ -341,14 +341,14 @@ void mboard_state::check_board_buttons()
 	{
 		if (!mouse_down)
 		{
-			if (border_pieces[i] > 12 )		/* second click on selected border piece */
+			if (border_pieces[i] > 12 )     /* second click on selected border piece */
 			{
 				mouse_hold_border_piece=FALSE;
 				border_pieces[i]=border_pieces[i]-12;
 				mouse_hold_from=0;
 				mouse_hold_piece=0;
 			}
-			else if (!mouse_hold_piece)		/*select border piece */
+			else if (!mouse_hold_piece)     /*select border piece */
 			{
 				if  (mouse_hold_border_piece)
 					border_pieces[mouse_hold_from]=border_pieces[mouse_hold_from]-12;
@@ -387,7 +387,7 @@ void mboard_state::check_board_buttons()
 			if (mouse_hold_border_piece)
 			{
 				border_pieces[mouse_hold_from]=border_pieces[mouse_hold_from]-12;
-			}else if ( field != mouse_hold_from  )	/* Put a selected piece back to the source field */
+			}else if ( field != mouse_hold_from  )  /* Put a selected piece back to the source field */
 				m_board[mouse_hold_from] = 0;
 
 
@@ -410,7 +410,7 @@ void mboard_state::check_board_buttons()
 
 		mouse_down = board_row + 1;
 	}
-	else if ((data == 0xff) && (mouse_down == (board_row + 1)))	/* Wait for mouse to be released */
+	else if ((data == 0xff) && (mouse_down == (board_row + 1))) /* Wait for mouse to be released */
 		mouse_down = 0;
 
 /* check click on border - remove selected piece*/

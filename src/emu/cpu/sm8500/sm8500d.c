@@ -67,8 +67,8 @@ static const UINT32 s_flags[] = {
 
 struct sm8500dasm
 {
-	UINT8	mnemonic;
-	UINT8	arguments;
+	UINT8   mnemonic;
+	UINT8   arguments;
 };
 
 static const char *const sm8500_cond[16] = {
@@ -89,85 +89,85 @@ enum e_addrmodes {
 
 static const sm8500dasm mnemonic[256] = {
 	/* 00 - 0F */
-        {zCLR, AM_R},  {zNEG,AM_R},   {zCOM,AM_R},   {zRR,AM_R},
-        {zRL, AM_R},   {zRRC,AM_R},  {zRLC,AM_R},   {zSRL,AM_R},
-        {zINC, AM_R},  {zDEC,AM_R},  {zSRA,AM_R},    {zSLL,AM_R},
-        {zDA, AM_R},   {zSWAP,AM_R}, {zPUSH,AM_R},  {zPOP,AM_R},
+		{zCLR, AM_R},  {zNEG,AM_R},   {zCOM,AM_R},   {zRR,AM_R},
+		{zRL, AM_R},   {zRRC,AM_R},  {zRLC,AM_R},   {zSRL,AM_R},
+		{zINC, AM_R},  {zDEC,AM_R},  {zSRA,AM_R},    {zSLL,AM_R},
+		{zDA, AM_R},   {zSWAP,AM_R}, {zPUSH,AM_R},  {zPOP,AM_R},
 	/* 10 - 1F */
-        {zCMP,AM_rr},  {zADD,AM_rr},  {zSUB,AM_rr},   {zADC,AM_rr},
-        {zSBC,AM_rr},  {zAND,AM_rr},  {zOR,AM_rr},    {zXOR,AM_rr},
-        {zINCW,AM_S}, {zDECW,AM_S}, {z1A,AM_1A},    {z1B,AM_1B},
-        {zBCLR,AM_riB}, {zBSET,AM_riB},   {zPUSHW,AM_S}, {zPOPW,AM_S},
+		{zCMP,AM_rr},  {zADD,AM_rr},  {zSUB,AM_rr},   {zADC,AM_rr},
+		{zSBC,AM_rr},  {zAND,AM_rr},  {zOR,AM_rr},    {zXOR,AM_rr},
+		{zINCW,AM_S}, {zDECW,AM_S}, {z1A,AM_1A},    {z1B,AM_1B},
+		{zBCLR,AM_riB}, {zBSET,AM_riB},   {zPUSHW,AM_S}, {zPOPW,AM_S},
 	/* 20 - 2F */
-        {zCMP,AM_rmb},   {zADD,AM_rmb},  {zSUB,AM_rmb},    {zADC,AM_rmb},
-        {zSBC,AM_rmb},   {zAND,AM_rmb},   {zOR,AM_rmb},    {zXOR,AM_rmb},
-        {zMOV,AM_rmb},  {zMOV,AM_mbr},  {zBBC,AM_bid},    {zBBS,AM_bid},
-        {zEXTS,AM_R}, {zDM,AM_i},   {zMOVPS0,AM_i},    {zBTST,AM_Ri},
+		{zCMP,AM_rmb},   {zADD,AM_rmb},  {zSUB,AM_rmb},    {zADC,AM_rmb},
+		{zSBC,AM_rmb},   {zAND,AM_rmb},   {zOR,AM_rmb},    {zXOR,AM_rmb},
+		{zMOV,AM_rmb},  {zMOV,AM_mbr},  {zBBC,AM_bid},    {zBBS,AM_bid},
+		{zEXTS,AM_R}, {zDM,AM_i},   {zMOVPS0,AM_i},    {zBTST,AM_Ri},
 	/* 30 - 3F */
-        {zCMP,AM_rmw},  {zADD,AM_rmw},  {zSUB,AM_rmw},   {zADC,AM_rmw},
-        {zSBC,AM_rmw},  {zAND,AM_rmw},   {zOR,AM_rmw},    {zXOR,AM_rmw},
-        {zMOV,AM_rmw},  {zMOV,AM_mwr},  {zMOVW,AM_smw},  {zMOVW,AM_mws},
-        {zMOVW,AM_ss}, {zDM,AM_R},   {zJMP,AM_2},   {zCALL,AM_2},
+		{zCMP,AM_rmw},  {zADD,AM_rmw},  {zSUB,AM_rmw},   {zADC,AM_rmw},
+		{zSBC,AM_rmw},  {zAND,AM_rmw},   {zOR,AM_rmw},    {zXOR,AM_rmw},
+		{zMOV,AM_rmw},  {zMOV,AM_mwr},  {zMOVW,AM_smw},  {zMOVW,AM_mws},
+		{zMOVW,AM_ss}, {zDM,AM_R},   {zJMP,AM_2},   {zCALL,AM_2},
 	/* 40 - 4F */
-        {zCMP,AM_RR},  {zADD,AM_RR},  {zSUB,AM_RR},   {zADC,AM_RR},
-        {zSBC,AM_RR},  {zAND,AM_RR},  {zOR,AM_RR},    {zXOR,AM_RR},
-        {zMOV,AM_RR},  {zCALL,AM_ii}, {zMOVW,AM_SS},  {zMOVW,AM_Sw},
-        {zMULT,AM_RR}, {zMULT,AM_iR}, {zBMOV,AM_bR},  {z4F,AM_4F},
+		{zCMP,AM_RR},  {zADD,AM_RR},  {zSUB,AM_RR},   {zADC,AM_RR},
+		{zSBC,AM_RR},  {zAND,AM_RR},  {zOR,AM_RR},    {zXOR,AM_RR},
+		{zMOV,AM_RR},  {zCALL,AM_ii}, {zMOVW,AM_SS},  {zMOVW,AM_Sw},
+		{zMULT,AM_RR}, {zMULT,AM_iR}, {zBMOV,AM_bR},  {z4F,AM_4F},
 	/* 50 - 5F */
-        {zCMP,AM_iR},  {zADD,AM_iR},  {zSUB,AM_iR},   {zADC,AM_iR},
-        {zSBC,AM_iR},  {zAND,AM_iR},  {zOR,AM_iR},    {zXOR,AM_iR},
-        {zMOV, AM_iR}, {zINVLD,0},   {z5A,AM_ii},    {z5B,AM_ii},
-        {zDIV,AM_SS},  {zDIV,AM_iS},   {zMOVM,AM_RiR},  {zMOVM,AM_Rii},
+		{zCMP,AM_iR},  {zADD,AM_iR},  {zSUB,AM_iR},   {zADC,AM_iR},
+		{zSBC,AM_iR},  {zAND,AM_iR},  {zOR,AM_iR},    {zXOR,AM_iR},
+		{zMOV, AM_iR}, {zINVLD,0},   {z5A,AM_ii},    {z5B,AM_ii},
+		{zDIV,AM_SS},  {zDIV,AM_iS},   {zMOVM,AM_RiR},  {zMOVM,AM_Rii},
 	/* 60 - 6F */
-        {zCMPW,AM_SS}, {zADDW,AM_SS}, {zSUBW,AM_SS},  {zADCW,AM_SS},
-        {zSBCW,AM_SS}, {zANDW,AM_SS}, {zORW,AM_SS},   {zXORW,AM_SS},
-        {zCMPW,AM_Sw}, {zADDW,AM_Sw}, {zSUBW,AM_Sw},  {zADCW,AM_Sw},
-        {zSBCW,AM_Sw}, {zANDW,AM_Sw}, {zORW,AM_Sw},   {zXORW,AM_Sw},
+		{zCMPW,AM_SS}, {zADDW,AM_SS}, {zSUBW,AM_SS},  {zADCW,AM_SS},
+		{zSBCW,AM_SS}, {zANDW,AM_SS}, {zORW,AM_SS},   {zXORW,AM_SS},
+		{zCMPW,AM_Sw}, {zADDW,AM_Sw}, {zSUBW,AM_Sw},  {zADCW,AM_Sw},
+		{zSBCW,AM_Sw}, {zANDW,AM_Sw}, {zORW,AM_Sw},   {zXORW,AM_Sw},
 	/* 70 - 7F */
-        {zDBNZ,AM_rbr}, {zDBNZ,AM_rbr}, {zDBNZ,AM_rbr},  {zDBNZ,AM_rbr},
-        {zDBNZ,AM_rbr}, {zDBNZ,AM_rbr}, {zDBNZ,AM_rbr},  {zDBNZ,AM_rbr},
-        {zMOVW,AM_riw}, {zMOVW,AM_riw}, {zMOVW,AM_riw},  {zMOVW,AM_riw},
-        {zMOVW,AM_riw}, {zMOVW,AM_riw}, {zMOVW,AM_riw},  {zMOVW,AM_riw},
+		{zDBNZ,AM_rbr}, {zDBNZ,AM_rbr}, {zDBNZ,AM_rbr},  {zDBNZ,AM_rbr},
+		{zDBNZ,AM_rbr}, {zDBNZ,AM_rbr}, {zDBNZ,AM_rbr},  {zDBNZ,AM_rbr},
+		{zMOVW,AM_riw}, {zMOVW,AM_riw}, {zMOVW,AM_riw},  {zMOVW,AM_riw},
+		{zMOVW,AM_riw}, {zMOVW,AM_riw}, {zMOVW,AM_riw},  {zMOVW,AM_riw},
 	/* 80 - 8F */
-        {zBBC,AM_Rbr},  {zBBC,AM_Rbr},  {zBBC,AM_Rbr},   {zBBC,AM_Rbr},
-        {zBBC,AM_Rbr},  {zBBC,AM_Rbr},  {zBBC,AM_Rbr},   {zBBC,AM_Rbr},
-        {zBBS,AM_Rbr},  {zBBS,AM_Rbr},  {zBBS,AM_Rbr},   {zBBS,AM_Rbr},
-        {zBBS,AM_Rbr},  {zBBS,AM_Rbr},  {zBBS,AM_Rbr},   {zBBS,AM_Rbr},
+		{zBBC,AM_Rbr},  {zBBC,AM_Rbr},  {zBBC,AM_Rbr},   {zBBC,AM_Rbr},
+		{zBBC,AM_Rbr},  {zBBC,AM_Rbr},  {zBBC,AM_Rbr},   {zBBC,AM_Rbr},
+		{zBBS,AM_Rbr},  {zBBS,AM_Rbr},  {zBBS,AM_Rbr},   {zBBS,AM_Rbr},
+		{zBBS,AM_Rbr},  {zBBS,AM_Rbr},  {zBBS,AM_Rbr},   {zBBS,AM_Rbr},
 	/* 90 - 9F */
-        {zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
-        {zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
-        {zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
-        {zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
+		{zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
+		{zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
+		{zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
+		{zJMP,AM_cjp},  {zJMP,AM_cjp},  {zJMP,AM_cjp},   {zJMP,AM_cjp},
 	/* A0 - AF */
-        {zBCLR,AM_Rb}, {zBCLR,AM_Rb}, {zBCLR,AM_Rb},  {zBCLR,AM_Rb},
-        {zBCLR,AM_Rb}, {zBCLR,AM_Rb}, {zBCLR,AM_Rb},  {zBCLR,AM_Rb},
-        {zBSET,AM_Rb}, {zBSET,AM_Rb}, {zBSET,AM_Rb},  {zBSET,AM_Rb},
-        {zBSET,AM_Rb}, {zBSET,AM_Rb}, {zBSET,AM_Rb},  {zBSET,AM_Rb},
+		{zBCLR,AM_Rb}, {zBCLR,AM_Rb}, {zBCLR,AM_Rb},  {zBCLR,AM_Rb},
+		{zBCLR,AM_Rb}, {zBCLR,AM_Rb}, {zBCLR,AM_Rb},  {zBCLR,AM_Rb},
+		{zBSET,AM_Rb}, {zBSET,AM_Rb}, {zBSET,AM_Rb},  {zBSET,AM_Rb},
+		{zBSET,AM_Rb}, {zBSET,AM_Rb}, {zBSET,AM_Rb},  {zBSET,AM_Rb},
 	/* B0 - BF */
-        {zMOV,AM_rR},  {zMOV,AM_rR},  {zMOV,AM_rR},   {zMOV,AM_rR},
-        {zMOV,AM_rR},  {zMOV,AM_rR},  {zMOV,AM_rR},   {zMOV,AM_rR},
-        {zMOV,AM_Rr},  {zMOV,AM_Rr},  {zMOV,AM_Rr},   {zMOV,AM_Rr},
-        {zMOV,AM_Rr},  {zMOV,AM_Rr},  {zMOV,AM_Rr},   {zMOV,AM_Rr},
+		{zMOV,AM_rR},  {zMOV,AM_rR},  {zMOV,AM_rR},   {zMOV,AM_rR},
+		{zMOV,AM_rR},  {zMOV,AM_rR},  {zMOV,AM_rR},   {zMOV,AM_rR},
+		{zMOV,AM_Rr},  {zMOV,AM_Rr},  {zMOV,AM_Rr},   {zMOV,AM_Rr},
+		{zMOV,AM_Rr},  {zMOV,AM_Rr},  {zMOV,AM_Rr},   {zMOV,AM_Rr},
 	/* C0 - CF */
-        {zMOV,AM_rib},  {zMOV,AM_rib},  {zMOV,AM_rib},   {zMOV,AM_rib},
-        {zMOV,AM_rib},  {zMOV,AM_rib},  {zMOV,AM_rib},   {zMOV,AM_rib},
-        {zMOV,AM_pi},  {zMOV,AM_pi},  {zMOV,AM_pi},   {zMOV,AM_pi},
-        {zMOV,AM_pi},  {zMOV,AM_pi},  {zMOV,AM_pi},   {zMOV,AM_pi},
+		{zMOV,AM_rib},  {zMOV,AM_rib},  {zMOV,AM_rib},   {zMOV,AM_rib},
+		{zMOV,AM_rib},  {zMOV,AM_rib},  {zMOV,AM_rib},   {zMOV,AM_rib},
+		{zMOV,AM_pi},  {zMOV,AM_pi},  {zMOV,AM_pi},   {zMOV,AM_pi},
+		{zMOV,AM_pi},  {zMOV,AM_pi},  {zMOV,AM_pi},   {zMOV,AM_pi},
 	/* D0 - DF */
-        {zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
-        {zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
-        {zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
-        {zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
+		{zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
+		{zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
+		{zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
+		{zBR,AM_cbr},   {zBR,AM_cbr},   {zBR,AM_cbr},    {zBR,AM_cbr},
 	/* E0 - EF */
-        {zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
-        {zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
-        {zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
-        {zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
+		{zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
+		{zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
+		{zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
+		{zCALS,AM_CALS},   {zCALS,AM_CALS},   {zCALS,AM_CALS},    {zCALS,AM_CALS},
 	/* F0 - FF */
-        {zSTOP,0}, {zHALT,0}, {zINVLD,0},    {zINVLD,0},
-        {zINVLD,0},   {zINVLD,0},   {zINVLD,0},    {zINVLD,0},
-        {zRET,0},  {zIRET,0}, {zCLRC,0},  {zCOMC,0},
-        {zSETC,0}, {zEI,0},   {zDI,0},    {zNOP,0},
+		{zSTOP,0}, {zHALT,0}, {zINVLD,0},    {zINVLD,0},
+		{zINVLD,0},   {zINVLD,0},   {zINVLD,0},    {zINVLD,0},
+		{zRET,0},  {zIRET,0}, {zCLRC,0},  {zCOMC,0},
+		{zSETC,0}, {zEI,0},   {zDI,0},    {zNOP,0},
 
 };
 
@@ -579,4 +579,3 @@ CPU_DISASSEMBLE( sm8500 )
 
 	return pos | s_flags[instr->mnemonic] | DASMFLAG_SUPPORTED;
 }
-

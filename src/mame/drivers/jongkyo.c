@@ -91,7 +91,7 @@ UINT32 jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 
 	//      data3 = m_videoram2[x/4 + y*64]; // wrong
 
 	// good mahjong tiles
-	      data3 = 0x0f; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
+			data3 = 0x0f; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 	// good girl tiles
 	//  data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 
@@ -103,8 +103,8 @@ UINT32 jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 
 			for (b = 0; b < 4; ++b)
 			{
 				bitmap.pix16(255 - y, 255 - (x + b)) = ((data2 & 0x01)) + ((data2 & 0x10) >> 3) +
-                                                           ((data1 & 0x01) << 2) + ((data1 & 0x10) >> 1) +
-                                                           ((data3 & 0x01) << 4) + ((data3 & 0x10) << 1);
+															((data1 & 0x01) << 2) + ((data1 & 0x10) >> 1) +
+															((data3 & 0x01) << 4) + ((data3 & 0x10) << 1);
 				data1 >>= 1;
 				data2 >>= 1;
 				data3 >>= 1;
@@ -164,7 +164,7 @@ READ8_MEMBER(jongkyo_state::input_1p_r)
 	//  printf("%04x\n", m_mux_data);
 
 	return (ioport("PL1_1")->read() & ioport("PL1_2")->read() & ioport("PL1_3")->read() &
-	       ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
+			ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
 }
 
 READ8_MEMBER(jongkyo_state::input_2p_r)
@@ -183,7 +183,7 @@ READ8_MEMBER(jongkyo_state::input_2p_r)
 	//  printf("%04x\n", m_mux_data);
 
 	return (ioport("PL2_1")->read() & ioport("PL2_2")->read() & ioport("PL2_3")->read() &
-	       ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
+			ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
 }
 
 WRITE8_MEMBER(jongkyo_state::videoram2_w)
@@ -228,7 +228,7 @@ WRITE8_MEMBER(jongkyo_state::unknown_w)
 static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
 	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
-	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")	// banked (8 banks)
+	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")    // banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -444,7 +444,7 @@ void jongkyo_state::palette_init()
 		int g = (data  >> 3) & 0x07;
 		int b = (data  >> 6) & 0x03;
 
-		 palette_set_color_rgb(machine(), i, r << 5, g << 5, b << 6 );
+			palette_set_color_rgb(machine(), i, r << 5, g << 5, b << 6 );
 
 	}
 }
@@ -527,7 +527,7 @@ ROM_START( jongkyo )
 	ROM_LOAD( "epr-6259", 0x02000, 0x02000, CRC(e46cde5d) SHA1(1cbe1677cfb3fa9f76ad90d5b1446ce9cefee6b7) )
 	ROM_LOAD( "epr-6260", 0x04000, 0x02000, CRC(369a5365) SHA1(037a2971a59ab339595b333cbdfd4cbb104de2be) )
 	ROM_LOAD( "epr-6262", 0x06000, 0x01000, CRC(ecf50f34) SHA1(ecfa1a9360d8fbcbed457d46e53bae77f6d78c1d) )
-	ROM_LOAD( "epr-6261", 0x07000, 0x02000, CRC(9c475ae1) SHA1(b993c2636dafed9f80fa87e71921c3c85c039e45) )	// banked at 6c00-6fff
+	ROM_LOAD( "epr-6261", 0x07000, 0x02000, CRC(9c475ae1) SHA1(b993c2636dafed9f80fa87e71921c3c85c039e45) )  // banked at 6c00-6fff
 
 	ROM_REGION( 0x300, "proms", 0 )
 	/* colours */

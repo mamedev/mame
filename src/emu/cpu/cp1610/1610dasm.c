@@ -5,17 +5,17 @@
 CPU_DISASSEMBLE( cp1610 )
 {
 	UINT16 oprom16[4]={ (oprom[0] << 8) | oprom[1], (oprom[2] << 8) | oprom[3], (oprom[4] << 8) | oprom[5], (oprom[6] << 8) | oprom[7] };
-	UINT16 op = oprom16[0];	UINT16 subop;
+	UINT16 op = oprom16[0]; UINT16 subop;
 	UINT16 ea, ea1, ea2;
 	unsigned size = 1;
 //  const char *sym, *sym2;
 
-    switch( op )
+	switch( op )
 	{
 	/* opcode  bitmask */
 	case 0x00: /* 0 000 000 000 */
 //      sym = set_ea_info( 0, 12, EA_UINT8, EA_ZPG_RD );
-        sprintf(buffer, "HLT");
+		sprintf(buffer, "HLT");
 		break;
 	case 0x001: /* 0 000 000 001 */
 		subop = oprom16[1];
@@ -125,14 +125,14 @@ CPU_DISASSEMBLE( cp1610 )
 				break;
 			default:
 				size += 1;
-        		sprintf(buffer, "SDBD ????");
+				sprintf(buffer, "SDBD ????");
 		}
 		break;
 	case 0x002: /* 0 000 000 010 */
-        sprintf(buffer, "EIS");
+		sprintf(buffer, "EIS");
 		break;
 	case 0x003: /* 0 000 000 011 */
-        sprintf(buffer, "DIS");
+		sprintf(buffer, "DIS");
 		break;
 	case 0x004: /* 0 000 000 100 */
 		size += 2;
@@ -145,17 +145,17 @@ CPU_DISASSEMBLE( cp1610 )
 			switch(ea1 & 0x03)
 			{
 				case 0:
-        			sprintf(buffer, "J    %04X",ea);
+					sprintf(buffer, "J    %04X",ea);
 					break;
 				case 1:
-        			sprintf(buffer, "JE   %04X",ea);
+					sprintf(buffer, "JE   %04X",ea);
 					break;
 				case 2:
-        			sprintf(buffer, "JD   %04X",ea);
+					sprintf(buffer, "JD   %04X",ea);
 					break;
 				case 3:
-        			sprintf(buffer, "????");
-        			break;
+					sprintf(buffer, "????");
+					break;
 			}
 		}
 		else
@@ -164,28 +164,28 @@ CPU_DISASSEMBLE( cp1610 )
 			switch(ea1 & 0x03)
 			{
 				case 0:
-        			sprintf(buffer, "JSR  R%01d,%04X",((ea1&0x300)>>8)+4,ea);
+					sprintf(buffer, "JSR  R%01d,%04X",((ea1&0x300)>>8)+4,ea);
 					break;
 				case 1:
-        			sprintf(buffer, "JSRE R%01d,%04X",((ea1&0x300)>>8)+4,ea);
+					sprintf(buffer, "JSRE R%01d,%04X",((ea1&0x300)>>8)+4,ea);
 					break;
 				case 2:
-        			sprintf(buffer, "JSRD R%01d,%04X",((ea1&0x300)>>8)+4,ea);
+					sprintf(buffer, "JSRD R%01d,%04X",((ea1&0x300)>>8)+4,ea);
 					break;
 				case 3:
-        			sprintf(buffer, "????");
-        			break;
+					sprintf(buffer, "????");
+					break;
 			}
 		}
 		break;
 	case 0x005: /* 0 000 000 101 */
-        sprintf(buffer, "TCI");
+		sprintf(buffer, "TCI");
 		break;
 	case 0x006: /* 0 000 000 110 */
-        sprintf(buffer, "CLRC");
+		sprintf(buffer, "CLRC");
 		break;
 	case 0x007: /* 0 000 000 111 */
-        sprintf(buffer, "SETC");
+		sprintf(buffer, "SETC");
 		break;
 	case 0x008: /* 0 000 001 000 */
 	case 0x009: /* 0 000 001 001 */
@@ -195,7 +195,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x00d: /* 0 000 001 101 */
 	case 0x00e: /* 0 000 001 110 */
 	case 0x00f: /* 0 000 001 111 */
-        sprintf(buffer, "INCR R%01d",op&0x7);
+		sprintf(buffer, "INCR R%01d",op&0x7);
 		break;
 	case 0x010: /* 0 000 010 000 */
 	case 0x011: /* 0 000 010 001 */
@@ -205,7 +205,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x015: /* 0 000 010 101 */
 	case 0x016: /* 0 000 010 110 */
 	case 0x017: /* 0 000 010 111 */
-        sprintf(buffer, "DECR R%01d",op&0x7);
+		sprintf(buffer, "DECR R%01d",op&0x7);
 		break;
 	case 0x018: /* 0 000 011 000 */
 	case 0x019: /* 0 000 011 001 */
@@ -215,7 +215,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x01d: /* 0 000 011 101 */
 	case 0x01e: /* 0 000 011 110 */
 	case 0x01f: /* 0 000 011 111 */
-        sprintf(buffer, "COMR R%01d",op&0x7);
+		sprintf(buffer, "COMR R%01d",op&0x7);
 		break;
 	case 0x020: /* 0 000 100 000 */
 	case 0x021: /* 0 000 100 001 */
@@ -225,7 +225,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x025: /* 0 000 100 101 */
 	case 0x026: /* 0 000 100 110 */
 	case 0x027: /* 0 000 100 111 */
-        sprintf(buffer, "NEGR R%01d",op&0x7);
+		sprintf(buffer, "NEGR R%01d",op&0x7);
 		break;
 	case 0x028: /* 0 000 101 000 */
 	case 0x029: /* 0 000 101 001 */
@@ -235,21 +235,21 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x02d: /* 0 000 101 101 */
 	case 0x02e: /* 0 000 101 110 */
 	case 0x02f: /* 0 000 101 111 */
-        sprintf(buffer, "ADCR R%01d",op&0x7);
+		sprintf(buffer, "ADCR R%01d",op&0x7);
 		break;
 	case 0x030: /* 0 000 110 000 */
 	case 0x031: /* 0 000 110 001 */
 	case 0x032: /* 0 000 110 010 */
 	case 0x033: /* 0 000 110 011 */
-        sprintf(buffer, "GSWD R%01d",op&0x3);
+		sprintf(buffer, "GSWD R%01d",op&0x3);
 		break;
 	case 0x034: /* 0 000 110 100 */
 	case 0x035: /* 0 000 110 101 */
-        sprintf(buffer, "NOP (%01d)",op&0x1); //???
-        break;
+		sprintf(buffer, "NOP (%01d)",op&0x1); //???
+		break;
 	case 0x036: /* 0 000 110 110 */
 	case 0x037: /* 0 000 110 111 */
-        sprintf(buffer, "SIN");
+		sprintf(buffer, "SIN");
 		break;
 	case 0x038: /* 0 000 111 000 */
 	case 0x039: /* 0 000 111 001 */
@@ -259,103 +259,103 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x03d: /* 0 000 111 101 */
 	case 0x03e: /* 0 000 111 110 */
 	case 0x03f: /* 0 000 111 111 */
-        sprintf(buffer, "RSWD R%01d",op&0x7);
+		sprintf(buffer, "RSWD R%01d",op&0x7);
 		break;
 	case 0x040: /* 0 001 000 000 */
 	case 0x041: /* 0 001 000 001 */
 	case 0x042: /* 0 001 000 010 */
 	case 0x043: /* 0 001 000 011 */
-        sprintf(buffer, "SWAP R%01d,1",op&0x3);
+		sprintf(buffer, "SWAP R%01d,1",op&0x3);
 		break;
 	case 0x044: /* 0 001 000 100 */
 	case 0x045: /* 0 001 000 101 */
 	case 0x046: /* 0 001 000 110 */
 	case 0x047: /* 0 001 000 111 */
-        sprintf(buffer, "SWAP R%01d,2",op&0x3);
+		sprintf(buffer, "SWAP R%01d,2",op&0x3);
 		break;
 	case 0x048: /* 0 001 001 000 */
 	case 0x049: /* 0 001 001 001 */
 	case 0x04a: /* 0 001 001 010 */
 	case 0x04b: /* 0 001 001 011 */
-        sprintf(buffer, "SLL  R%01d,1",op&0x3);
+		sprintf(buffer, "SLL  R%01d,1",op&0x3);
 		break;
 	case 0x04c: /* 0 001 001 100 */
 	case 0x04d: /* 0 001 001 101 */
 	case 0x04e: /* 0 001 001 110 */
 	case 0x04f: /* 0 001 001 111 */
-        sprintf(buffer, "SLL  R%01d,2",op&0x3);
+		sprintf(buffer, "SLL  R%01d,2",op&0x3);
 		break;
 	case 0x050: /* 0 001 010 000 */
 	case 0x051: /* 0 001 010 001 */
 	case 0x052: /* 0 001 010 010 */
 	case 0x053: /* 0 001 010 011 */
-        sprintf(buffer, "RLC  R%01d,1",op&0x3);
+		sprintf(buffer, "RLC  R%01d,1",op&0x3);
 		break;
 	case 0x054: /* 0 001 010 100 */
 	case 0x055: /* 0 001 010 101 */
 	case 0x056: /* 0 001 010 110 */
 	case 0x057: /* 0 001 010 111 */
-        sprintf(buffer, "RLC  R%01d,2",op&0x3);
+		sprintf(buffer, "RLC  R%01d,2",op&0x3);
 		break;
 	case 0x058: /* 0 001 011 000 */
 	case 0x059: /* 0 001 011 001 */
 	case 0x05a: /* 0 001 011 010 */
 	case 0x05b: /* 0 001 011 011 */
-        sprintf(buffer, "SLLC R%01d,1",op&0x3);
+		sprintf(buffer, "SLLC R%01d,1",op&0x3);
 		break;
 	case 0x05c: /* 0 001 011 100 */
 	case 0x05d: /* 0 001 011 101 */
 	case 0x05e: /* 0 001 011 110 */
 	case 0x05f: /* 0 001 011 111 */
-        sprintf(buffer, "SLLC R%01d,2",op&0x3);
+		sprintf(buffer, "SLLC R%01d,2",op&0x3);
 		break;
 	case 0x060: /* 0 001 100 000 */
 	case 0x061: /* 0 001 100 001 */
 	case 0x062: /* 0 001 100 010 */
 	case 0x063: /* 0 001 100 011 */
-        sprintf(buffer, "SLR  R%01d,1",op&0x3);
+		sprintf(buffer, "SLR  R%01d,1",op&0x3);
 		break;
 	case 0x064: /* 0 001 100 100 */
 	case 0x065: /* 0 001 100 101 */
 	case 0x066: /* 0 001 100 110 */
 	case 0x067: /* 0 001 100 111 */
-        sprintf(buffer, "SLR  R%01d,2",op&0x3);
+		sprintf(buffer, "SLR  R%01d,2",op&0x3);
 		break;
 	case 0x068: /* 0 001 101 000 */
 	case 0x069: /* 0 001 101 001 */
 	case 0x06a: /* 0 001 101 010 */
 	case 0x06b: /* 0 001 101 011 */
-        sprintf(buffer, "SAR  R%01d,1",op&0x3);
+		sprintf(buffer, "SAR  R%01d,1",op&0x3);
 		break;
 	case 0x06c: /* 0 001 101 100 */
 	case 0x06d: /* 0 001 101 101 */
 	case 0x06e: /* 0 001 101 110 */
 	case 0x06f: /* 0 001 101 111 */
-        sprintf(buffer, "SAR  R%01d,2",op&0x3);
+		sprintf(buffer, "SAR  R%01d,2",op&0x3);
 		break;
 	case 0x070: /* 0 001 110 000 */
 	case 0x071: /* 0 001 110 001 */
 	case 0x072: /* 0 001 110 010 */
 	case 0x073: /* 0 001 110 011 */
-        sprintf(buffer, "RRC  R%01d,1",op&0x3);
+		sprintf(buffer, "RRC  R%01d,1",op&0x3);
 		break;
 	case 0x074: /* 0 001 110 100 */
 	case 0x075: /* 0 001 110 101 */
 	case 0x076: /* 0 001 110 110 */
 	case 0x077: /* 0 001 110 111 */
-        sprintf(buffer, "RRC  R%01d,2",op&0x3);
+		sprintf(buffer, "RRC  R%01d,2",op&0x3);
 		break;
 	case 0x078: /* 0 001 111 000 */
 	case 0x079: /* 0 001 111 001 */
 	case 0x07a: /* 0 001 111 010 */
 	case 0x07b: /* 0 001 111 011 */
-        sprintf(buffer, "SARC R%01d,1",op&0x3);
+		sprintf(buffer, "SARC R%01d,1",op&0x3);
 		break;
 	case 0x07c: /* 0 001 111 100 */
 	case 0x07d: /* 0 001 111 101 */
 	case 0x07e: /* 0 001 111 110 */
 	case 0x07f: /* 0 001 111 111 */
-        sprintf(buffer, "SARC R%01d,2",op&0x3);
+		sprintf(buffer, "SARC R%01d,2",op&0x3);
 		break;
 	case 0x080: /* 0 010 000 000 */
 	case 0x089: /* 0 010 001 001 */
@@ -365,7 +365,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x0ad: /* 0 010 101 101 */
 	case 0x0b6: /* 0 010 110 110 */
 	case 0x0bf: /* 0 010 111 111 */
-        sprintf(buffer, "TSTR R%01d",op&0x7);
+		sprintf(buffer, "TSTR R%01d",op&0x7);
 		break;
 	case 0x087: /* 0 010 000 111 */
 	case 0x08f: /* 0 010 001 111 */
@@ -374,7 +374,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x0a7: /* 0 010 100 111 */
 	case 0x0af: /* 0 010 101 111 */
 	case 0x0b7: /* 0 010 110 111 */
-        sprintf(buffer, "JR   R%01d",(op&0x38)>>3);
+		sprintf(buffer, "JR   R%01d",(op&0x38)>>3);
 		break;
 	case 0x081: /* 0 010 000 001 */
 	case 0x082: /* 0 010 000 010 */
@@ -425,7 +425,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x0bc: /* 0 010 111 100 */
 	case 0x0bd: /* 0 010 111 101 */
 	case 0x0be: /* 0 010 111 110 */
-        sprintf(buffer, "MOVR R%01d,R%01d",(op&0x38)>>3,op&0x7);
+		sprintf(buffer, "MOVR R%01d,R%01d",(op&0x38)>>3,op&0x7);
 		break;
 	case 0x0c0: /* 0 011 000 000 */
 	case 0x0c1: /* 0 011 000 001 */
@@ -491,7 +491,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x0fd: /* 0 011 111 101 */
 	case 0x0fe: /* 0 011 111 110 */
 	case 0x0ff: /* 0 011 111 111 */
-        sprintf(buffer, "ADDR R%01d,R%01d",(op&0x38)>>3,op&7);
+		sprintf(buffer, "ADDR R%01d,R%01d",(op&0x38)>>3,op&7);
 		break;
 	case 0x100: /* 0 100 000 000 */
 	case 0x101: /* 0 100 000 001 */
@@ -557,7 +557,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x13d: /* 0 100 111 101 */
 	case 0x13e: /* 0 100 111 110 */
 	case 0x13f: /* 0 100 111 111 */
-        sprintf(buffer, "SUBR R%01d,R%01d",(op&0x38)>>3,op&7);
+		sprintf(buffer, "SUBR R%01d,R%01d",(op&0x38)>>3,op&7);
 		break;
 	case 0x140: /* 0 101 000 000 */
 	case 0x141: /* 0 101 000 001 */
@@ -623,7 +623,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x17d: /* 0 101 111 101 */
 	case 0x17e: /* 0 101 111 110 */
 	case 0x17f: /* 0 101 111 111 */
-        sprintf(buffer, "CMPR R%01d,R%01d",(op&0x38)>>3,op&7);
+		sprintf(buffer, "CMPR R%01d,R%01d",(op&0x38)>>3,op&7);
 		break;
 	case 0x180: /* 0 110 000 000 */
 	case 0x181: /* 0 110 000 001 */
@@ -689,7 +689,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x1bd: /* 0 110 111 101 */
 	case 0x1be: /* 0 110 111 110 */
 	case 0x1bf: /* 0 110 111 111 */
-        sprintf(buffer, "ANDR R%01d,R%01d",(op&0x38)>>3,op&7);
+		sprintf(buffer, "ANDR R%01d,R%01d",(op&0x38)>>3,op&7);
 		break;
 	case 0x1c0: /* 0 111 000 000 */
 	case 0x1c9: /* 0 111 001 001 */
@@ -699,7 +699,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x1ed: /* 0 111 101 101 */
 	case 0x1f6: /* 0 111 110 110 */
 	case 0x1ff: /* 0 111 111 111 */
-        sprintf(buffer, "CLRR R%01d",op&7);
+		sprintf(buffer, "CLRR R%01d",op&7);
 		break;
 	case 0x1c1: /* 0 111 000 001 */
 	case 0x1c2: /* 0 111 000 010 */
@@ -757,7 +757,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x1fc: /* 0 111 111 100 */
 	case 0x1fd: /* 0 111 111 101 */
 	case 0x1fe: /* 0 111 111 110 */
-        sprintf(buffer, "XORR R%01d,R%01d",(op&0x38)>>3,op&7);
+		sprintf(buffer, "XORR R%01d,R%01d",(op&0x38)>>3,op&7);
 		break;
 	case 0x200: /* 1 000 000 000 */
 		size += 1;

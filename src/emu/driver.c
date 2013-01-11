@@ -62,18 +62,18 @@ ADDRESS_MAP_END
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
-	  device_memory_interface(mconfig, *this),
-	  m_generic_paletteram_8(*this, "paletteram"),
-	  m_generic_paletteram2_8(*this, "paletteram2"),
-	  m_generic_paletteram_16(*this, "paletteram"),
-	  m_generic_paletteram2_16(*this, "paletteram2"),
-	  m_generic_paletteram_32(*this, "paletteram"),
-	  m_generic_paletteram2_32(*this, "paletteram2"),
-	  m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, NULL, *ADDRESS_MAP_NAME(generic)),
-	  m_system(NULL),
-	  m_latch_clear_value(0),
-	  m_flip_screen_x(0),
-	  m_flip_screen_y(0)
+		device_memory_interface(mconfig, *this),
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_generic_paletteram2_8(*this, "paletteram2"),
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_generic_paletteram2_16(*this, "paletteram2"),
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_generic_paletteram2_32(*this, "paletteram2"),
+		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, NULL, *ADDRESS_MAP_NAME(generic)),
+		m_system(NULL),
+		m_latch_clear_value(0),
+		m_flip_screen_x(0),
+		m_flip_screen_y(0)
 {
 	memset(m_legacy_callbacks, 0, sizeof(m_legacy_callbacks));
 	memset(m_latched_value, 0, sizeof(m_latched_value));
@@ -395,45 +395,45 @@ void driver_device::generic_pulse_irq_line_and_vector(device_execute_interface &
 //  NMI callbacks
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )	{ device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::nmi_line_assert )	{ device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )   { device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::nmi_line_assert )  { device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE); }
 
 
 //-------------------------------------------------
 //  IRQn callbacks
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( driver_device::irq0_line_hold )	{ device.execute().set_input_line(0, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq0_line_pulse )	{ generic_pulse_irq_line(device.execute(), 0, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq0_line_assert )	{ device.execute().set_input_line(0, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq0_line_hold )   { device.execute().set_input_line(0, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq0_line_pulse )  { generic_pulse_irq_line(device.execute(), 0, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq0_line_assert ) { device.execute().set_input_line(0, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq1_line_hold )	{ device.execute().set_input_line(1, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq1_line_pulse )	{ generic_pulse_irq_line(device.execute(), 1, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq1_line_assert )	{ device.execute().set_input_line(1, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq1_line_hold )   { device.execute().set_input_line(1, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq1_line_pulse )  { generic_pulse_irq_line(device.execute(), 1, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq1_line_assert ) { device.execute().set_input_line(1, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq2_line_hold )	{ device.execute().set_input_line(2, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq2_line_pulse )	{ generic_pulse_irq_line(device.execute(), 2, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq2_line_assert )	{ device.execute().set_input_line(2, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq2_line_hold )   { device.execute().set_input_line(2, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq2_line_pulse )  { generic_pulse_irq_line(device.execute(), 2, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq2_line_assert ) { device.execute().set_input_line(2, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq3_line_hold )	{ device.execute().set_input_line(3, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq3_line_pulse )	{ generic_pulse_irq_line(device.execute(), 3, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq3_line_assert )	{ device.execute().set_input_line(3, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq3_line_hold )   { device.execute().set_input_line(3, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq3_line_pulse )  { generic_pulse_irq_line(device.execute(), 3, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq3_line_assert ) { device.execute().set_input_line(3, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq4_line_hold )	{ device.execute().set_input_line(4, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq4_line_pulse )	{ generic_pulse_irq_line(device.execute(), 4, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq4_line_assert )	{ device.execute().set_input_line(4, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq4_line_hold )   { device.execute().set_input_line(4, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq4_line_pulse )  { generic_pulse_irq_line(device.execute(), 4, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq4_line_assert ) { device.execute().set_input_line(4, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq5_line_hold )	{ device.execute().set_input_line(5, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq5_line_pulse )	{ generic_pulse_irq_line(device.execute(), 5, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq5_line_assert )	{ device.execute().set_input_line(5, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq5_line_hold )   { device.execute().set_input_line(5, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq5_line_pulse )  { generic_pulse_irq_line(device.execute(), 5, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq5_line_assert ) { device.execute().set_input_line(5, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq6_line_hold )	{ device.execute().set_input_line(6, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq6_line_pulse )	{ generic_pulse_irq_line(device.execute(), 6, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq6_line_assert )	{ device.execute().set_input_line(6, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq6_line_hold )   { device.execute().set_input_line(6, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq6_line_pulse )  { generic_pulse_irq_line(device.execute(), 6, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq6_line_assert ) { device.execute().set_input_line(6, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq7_line_hold )	{ device.execute().set_input_line(7, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq7_line_pulse )	{ generic_pulse_irq_line(device.execute(), 7, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert )	{ device.execute().set_input_line(7, ASSERT_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq7_line_hold )   { device.execute().set_input_line(7, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq7_line_pulse )  { generic_pulse_irq_line(device.execute(), 7, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert ) { device.execute().set_input_line(7, ASSERT_LINE); }
 
 
 
@@ -496,14 +496,14 @@ void driver_device::soundlatch_sync_callback(void *ptr, INT32 param)
 //-------------------------------------------------
 
 void driver_device::soundlatch_write(UINT8 index, UINT32 data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), index | (data << 8)); }
-WRITE8_MEMBER( driver_device::soundlatch_byte_w )	{ soundlatch_write(0, data); }
-WRITE16_MEMBER( driver_device::soundlatch_word_w )	{ soundlatch_write(0, data); }
-WRITE8_MEMBER( driver_device::soundlatch2_byte_w )	{ soundlatch_write(1, data); }
-WRITE16_MEMBER( driver_device::soundlatch2_word_w )	{ soundlatch_write(1, data); }
-WRITE8_MEMBER( driver_device::soundlatch3_byte_w )	{ soundlatch_write(2, data); }
-WRITE16_MEMBER( driver_device::soundlatch3_word_w )	{ soundlatch_write(2, data); }
-WRITE8_MEMBER( driver_device::soundlatch4_byte_w )	{ soundlatch_write(3, data); }
-WRITE16_MEMBER( driver_device::soundlatch4_word_w )	{ soundlatch_write(3, data); }
+WRITE8_MEMBER( driver_device::soundlatch_byte_w )   { soundlatch_write(0, data); }
+WRITE16_MEMBER( driver_device::soundlatch_word_w )  { soundlatch_write(0, data); }
+WRITE8_MEMBER( driver_device::soundlatch2_byte_w )  { soundlatch_write(1, data); }
+WRITE16_MEMBER( driver_device::soundlatch2_word_w ) { soundlatch_write(1, data); }
+WRITE8_MEMBER( driver_device::soundlatch3_byte_w )  { soundlatch_write(2, data); }
+WRITE16_MEMBER( driver_device::soundlatch3_word_w ) { soundlatch_write(2, data); }
+WRITE8_MEMBER( driver_device::soundlatch4_byte_w )  { soundlatch_write(3, data); }
+WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { soundlatch_write(3, data); }
 
 
 //-------------------------------------------------
@@ -512,14 +512,14 @@ WRITE16_MEMBER( driver_device::soundlatch4_word_w )	{ soundlatch_write(3, data);
 //-------------------------------------------------
 
 UINT32 driver_device::soundlatch_read(UINT8 index) { m_latch_read[index] = 1; return m_latched_value[index]; }
-READ8_MEMBER( driver_device::soundlatch_byte_r )	{ return soundlatch_read(0); }
-READ16_MEMBER( driver_device::soundlatch_word_r )	{ return soundlatch_read(0); }
-READ8_MEMBER( driver_device::soundlatch2_byte_r )	{ return soundlatch_read(1); }
-READ16_MEMBER( driver_device::soundlatch2_word_r )	{ return soundlatch_read(1); }
-READ8_MEMBER( driver_device::soundlatch3_byte_r )	{ return soundlatch_read(2); }
-READ16_MEMBER( driver_device::soundlatch3_word_r )	{ return soundlatch_read(2); }
-READ8_MEMBER( driver_device::soundlatch4_byte_r )	{ return soundlatch_read(3); }
-READ16_MEMBER( driver_device::soundlatch4_word_r )	{ return soundlatch_read(3); }
+READ8_MEMBER( driver_device::soundlatch_byte_r )    { return soundlatch_read(0); }
+READ16_MEMBER( driver_device::soundlatch_word_r )   { return soundlatch_read(0); }
+READ8_MEMBER( driver_device::soundlatch2_byte_r )   { return soundlatch_read(1); }
+READ16_MEMBER( driver_device::soundlatch2_word_r )  { return soundlatch_read(1); }
+READ8_MEMBER( driver_device::soundlatch3_byte_r )   { return soundlatch_read(2); }
+READ16_MEMBER( driver_device::soundlatch3_word_r )  { return soundlatch_read(2); }
+READ8_MEMBER( driver_device::soundlatch4_byte_r )   { return soundlatch_read(3); }
+READ16_MEMBER( driver_device::soundlatch4_word_r )  { return soundlatch_read(3); }
 
 
 //-------------------------------------------------
@@ -600,9 +600,9 @@ void driver_device::flip_screen_set(UINT32 on)
 void driver_device::flip_screen_set_no_update(UINT32 on)
 {
 	// flip_screen_y is not updated on purpose
-    // this function is for drivers which
-    // where writing to flip_screen_x to
-    // bypass update_flip
+	// this function is for drivers which
+	// where writing to flip_screen_x to
+	// bypass update_flip
 	if (on)
 		on = ~0;
 	m_flip_screen_x = on;
@@ -660,8 +660,8 @@ WRITE8_MEMBER( driver_device::paletteram_BBGGRRII_byte_w )
 	m_generic_paletteram_8[offset] = data;
 	int i = (data >> 0) & 3;
 	palette_set_color_rgb(machine(), offset, pal4bit(((data >> 0) & 0x0c) | i),
-	                                   pal4bit(((data >> 2) & 0x0c) | i),
-	                                   pal4bit(((data >> 4) & 0x0c) | i));
+										pal4bit(((data >> 2) & 0x0c) | i),
+										pal4bit(((data >> 4) & 0x0c) | i));
 }
 
 
@@ -750,8 +750,8 @@ WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBRGBx_word_w )
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	data = m_generic_paletteram_16[offset];
 	palette_set_color_rgb(machine(), offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
-	                                    	pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
-	                                    	pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
+											pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
+											pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
 }
 
 
@@ -782,5 +782,3 @@ WRITE8_MEMBER( driver_device::fatal_generic_write )
 {
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
-
-

@@ -25,8 +25,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define IDE_TAG				"ide"
-#define CENTRONICS_TAG		"centronics"
+#define IDE_TAG             "ide"
+#define CENTRONICS_TAG      "centronics"
 
 
 
@@ -88,9 +88,9 @@ machine_config_constructor powermate_ide_device::device_mconfig_additions() cons
 
 powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock),
-	  device_adam_expansion_slot_card_interface(mconfig, *this),
-	  m_ide(*this, IDE_TAG),
-	  m_centronics(*this, CENTRONICS_TAG)
+		device_adam_expansion_slot_card_interface(mconfig, *this),
+		m_ide(*this, IDE_TAG),
+		m_centronics(*this, CENTRONICS_TAG)
 {
 }
 
@@ -127,18 +127,18 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 		case 0x40: // Printer status
 			/*
 
-                bit     description
+			    bit     description
 
-                0
-                1
-                2
-                3
-                4
-                5
-                6
-                7
+			    0
+			    1
+			    2
+			    3
+			    4
+			    5
+			    6
+			    7
 
-            */
+			*/
 			break;
 
 		case 0x58:

@@ -45,11 +45,11 @@ enum
 
 enum
 {
-	VIEW_STATE_BUTTON			= 0x01,
-	VIEW_STATE_MOVING			= 0x02,
-	VIEW_STATE_SIZING			= 0x04,
-	VIEW_STATE_NEEDS_UPDATE 	= 0x08,
-	VIEW_STATE_FOLLOW_CPU		= 0x10,
+	VIEW_STATE_BUTTON           = 0x01,
+	VIEW_STATE_MOVING           = 0x02,
+	VIEW_STATE_SIZING           = 0x04,
+	VIEW_STATE_NEEDS_UPDATE     = 0x08,
+	VIEW_STATE_FOLLOW_CPU       = 0x10,
 };
 
 /***************************************************************************
@@ -110,13 +110,13 @@ enum
 
 struct adjustment
 {
-	int		visible;
-	int		lower;
-	int		upper;
-	int		value;
-	int		step_increment;
-	int		page_increment;
-	int		page_size;
+	int     visible;
+	int     lower;
+	int     upper;
+	int     value;
+	int     step_increment;
+	int     page_increment;
+	int     page_size;
 };
 
 class DView;
@@ -130,9 +130,9 @@ public:
 	{ }
 	~DView_edit()
 	{ }
-	int					active;
-	render_container *	container;
-	astring				str;
+	int                 active;
+	render_container *  container;
+	astring             str;
 };
 
 /***************************************************************************
@@ -149,11 +149,11 @@ class DView
 public:
 	DView(render_target *target, running_machine &machine, debug_view_type type, int flags)
 		: next(NULL),
-		  type(0),
-		  state(0),
-		  ofs_x(0),
-		  ofs_y(0)
-	  {
+			type(0),
+			state(0),
+			ofs_x(0),
+			ofs_y(0)
+		{
 		this->target = target;
 		//dv->container = render_target_get_component_container(target, name, &pos);
 		this->container = target->debug_alloc();
@@ -176,7 +176,7 @@ public:
 		default:
 			break;
 		}
-	  }
+		}
 	~DView()
 	{
 		this->target->debug_free(*this->container);
@@ -185,29 +185,29 @@ public:
 
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
-	DView *				next;
+	DView *             next;
 
-	int 				type;
-	debug_view *		view;
-	render_container *	container;
-	render_target *		target;
-	running_machine *	m_machine;
-	int					state;
+	int                 type;
+	debug_view *        view;
+	render_container *  container;
+	render_target *     target;
+	running_machine *   m_machine;
+	int                 state;
 	// drawing
-	rectangle			bounds;
-	int					ofs_x;
-	int					ofs_y;
-	astring				title;
-	int					last_x;
-	int					last_y;
+	rectangle           bounds;
+	int                 ofs_x;
+	int                 ofs_y;
+	astring             title;
+	int                 last_x;
+	int                 last_y;
 	// Scrollbars
-	adjustment			hsb;
-	adjustment			vsb;
+	adjustment          hsb;
+	adjustment          vsb;
 	// render target tracking
-	INT32				rt_width;
-	INT32				rt_height;
+	INT32               rt_width;
+	INT32               rt_height;
 	//optional
-	DView_edit			editor;
+	DView_edit          editor;
 };
 
 
@@ -237,15 +237,15 @@ INLINE void dview_set_state(DView *dv, int state, int onoff)
     LOCAL VARIABLES
 ***************************************************************************/
 
-static render_font *	debug_font;
-static int				debug_font_width;
-static int				debug_font_height;
-static float			debug_font_aspect;
-static DView *			list;
-static DView *			focus_view;
+static render_font *    debug_font;
+static int              debug_font_width;
+static int              debug_font_height;
+static float            debug_font_aspect;
+static DView *          list;
+static DView *          focus_view;
 
-static ui_menu *		menu;
-static DView_edit *		cur_editor;
+static ui_menu *        menu;
+static DView_edit *     cur_editor;
 
 static void set_focus_view(DView *dv)
 {
@@ -1058,10 +1058,10 @@ static void on_view_opcodes_activate(DView *dv, const ui_menu_event *event)
 	{
 		switch (rc)
 		{
-		case DASM_RIGHTCOL_RAW:			new_rc = DASM_RIGHTCOL_ENCRYPTED; break;
-		case DASM_RIGHTCOL_ENCRYPTED:	new_rc = DASM_RIGHTCOL_COMMENTS; break;
-		case DASM_RIGHTCOL_COMMENTS:	new_rc = DASM_RIGHTCOL_RAW; break;
-		default:						break;
+		case DASM_RIGHTCOL_RAW:         new_rc = DASM_RIGHTCOL_ENCRYPTED; break;
+		case DASM_RIGHTCOL_ENCRYPTED:   new_rc = DASM_RIGHTCOL_COMMENTS; break;
+		case DASM_RIGHTCOL_COMMENTS:    new_rc = DASM_RIGHTCOL_RAW; break;
+		default:                        break;
 		}
 		dasmview->set_right_column(new_rc);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
@@ -1092,7 +1092,7 @@ static void render_editor(DView_edit *editor)
 	editor->container->empty();
 	/* get the size of the text */
 	ui_draw_text_full(editor->container, editor->str, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, 0.5);
 
@@ -1113,7 +1113,7 @@ static void render_editor(DView_edit *editor)
 
 	/* draw the text within it */
 	ui_draw_text_full(editor->container, editor->str, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 }
 
@@ -1168,9 +1168,9 @@ static void CreateMainMenu(running_machine &machine)
 		rc = downcast<debug_view_disasm *>(focus_view->view)->right_column();
 		switch(rc)
 		{
-		case DASM_RIGHTCOL_RAW:			subtext = "Raw Opcodes"; break;
-		case DASM_RIGHTCOL_ENCRYPTED:	subtext = "Enc Opcodes"; break;
-		case DASM_RIGHTCOL_COMMENTS:		subtext = "Comments"; break;
+		case DASM_RIGHTCOL_RAW:         subtext = "Raw Opcodes"; break;
+		case DASM_RIGHTCOL_ENCRYPTED:   subtext = "Enc Opcodes"; break;
+		case DASM_RIGHTCOL_COMMENTS:        subtext = "Comments"; break;
 		}
 		menu->item_append("View", subtext, MENU_FLAG_RIGHT_ARROW, (void *)on_view_opcodes_activate);
 		menu->item_append("Run to cursor", NULL, 0, (void *)on_run_to_cursor_activate);
@@ -1232,9 +1232,9 @@ static int map_point(DView *dv, INT32 target_x, INT32 target_y, INT32 *mapped_x,
 
 static void handle_mouse(running_machine &machine)
 {
-	render_target *	mouse_target;
-	INT32			x,y;
-	int				button;
+	render_target * mouse_target;
+	INT32           x,y;
+	int             button;
 
 	if (menu != NULL)
 		return;

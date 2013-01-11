@@ -130,4 +130,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY              FULLNAME       FLAGS */
 COMP( 1982, dms86,  0,       0,      dms86,     dms86, driver_device,    0,   "Digital Microsystems", "DMS-86", GAME_NOT_WORKING | GAME_NO_SOUND)
-

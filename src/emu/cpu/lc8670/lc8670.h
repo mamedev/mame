@@ -23,18 +23,18 @@ enum
 // input ports
 enum
 {
-	LC8670_PORT1,		// 8-bit I/O port
-	LC8670_PORT3,		// 8-bit I/O port
-	LC8670_PORT7		// 4-bit I port
+	LC8670_PORT1,       // 8-bit I/O port
+	LC8670_PORT3,       // 8-bit I/O port
+	LC8670_PORT7        // 4-bit I port
 };
 
 // external input lines
 enum
 {
-	LC8670_EXT_INT0 = 0,	// P70
-	LC8670_EXT_INT1,		// P71
-	LC8670_EXT_INT2,		// P72
-	LC8670_EXT_INT3			// P73
+	LC8670_EXT_INT0 = 0,    // P70
+	LC8670_EXT_INT1,        // P71
+	LC8670_EXT_INT2,        // P72
+	LC8670_EXT_INT3         // P73
 };
 
 // clock sources
@@ -198,45 +198,45 @@ private:
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	address_space *		m_program;				// program space (ROM or flash)
-	address_space *		m_data;					// internal RAM/register
-	address_space *		m_io;					// I/O ports
-	direct_read_data *	m_direct;
+	address_space *     m_program;              // program space (ROM or flash)
+	address_space *     m_data;                 // internal RAM/register
+	address_space *     m_io;                   // I/O ports
+	direct_read_data *  m_direct;
 
 	// timers
 	static const device_timer_id BASE_TIMER = 1;
 	static const device_timer_id CLOCK_TIMER = 2;
-	emu_timer *			m_basetimer;
-	emu_timer *			m_clocktimer;
+	emu_timer *         m_basetimer;
+	emu_timer *         m_clocktimer;
 
 	// internal state
-	int					m_icount;
-	UINT16				m_pc;
-	UINT16				m_ppc;
-	UINT8				m_op;
-	UINT8 *				m_sfr;					// special function registers
-	UINT8 *				m_mram;					// main RAM
-	UINT8 *				m_xram;					// XRAM
-	UINT8 *				m_vtrbf;				// work RAM
-	UINT16				m_irq_flag;
-	UINT8				m_irq_lev;
-	bool				m_after_reti;
-	UINT8				m_p1_data;
-	UINT8				m_timer0_prescaler;
-	UINT8				m_timer0[2];
-	UINT8				m_timer1[2];
-	UINT8				m_timer1_comparator[2];
-	UINT8				m_base_timer[2];
-	bool				m_clock_changed;
-	int					m_input_lines[4];
+	int                 m_icount;
+	UINT16              m_pc;
+	UINT16              m_ppc;
+	UINT8               m_op;
+	UINT8 *             m_sfr;                  // special function registers
+	UINT8 *             m_mram;                 // main RAM
+	UINT8 *             m_xram;                 // XRAM
+	UINT8 *             m_vtrbf;                // work RAM
+	UINT16              m_irq_flag;
+	UINT8               m_irq_lev;
+	bool                m_after_reti;
+	UINT8               m_p1_data;
+	UINT8               m_timer0_prescaler;
+	UINT8               m_timer0[2];
+	UINT8               m_timer1[2];
+	UINT8               m_timer1_comparator[2];
+	UINT8               m_base_timer[2];
+	bool                m_clock_changed;
+	int                 m_input_lines[4];
 
 	// configuration
-	UINT32				m_clocks[3];			// clock sources
-	devcb2_write8		m_bankswitch_func;		// bankswitch CB
-	lc8670_lcd_update	m_lcd_update_func;		// LCD update CB
+	UINT32              m_clocks[3];            // clock sources
+	devcb2_write8       m_bankswitch_func;      // bankswitch CB
+	lc8670_lcd_update   m_lcd_update_func;      // LCD update CB
 
 	// interrupts vectors
-	static const UINT16	s_irq_vectors[16];
+	static const UINT16 s_irq_vectors[16];
 
 	// opcodes table
 	typedef int (lc8670_cpu_device::*op_handler)();
@@ -263,9 +263,9 @@ private:
 	struct dasm_entry
 	{
 		const char *str;
-		UINT8		arg1;
-		UINT8		arg2;
-		bool		inv;
+		UINT8       arg1;
+		UINT8       arg2;
+		bool        inv;
 	};
 	static const dasm_entry s_dasm_table[80];
 };

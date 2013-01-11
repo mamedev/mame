@@ -52,16 +52,16 @@ public:
 	// construction/destruction
 	segahang_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_subcpu(*this, "subcpu"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_mcu(*this, "mcu"),
-		  m_i8255_1(*this, "i8255_1"),
-		  m_i8255_2(*this, "i8255_2"),
-		  m_sprites(*this, "sprites"),
-		  m_workram(*this, "workram"),
-		  m_sharrier_video(false),
-		  m_adc_select(0)
+			m_maincpu(*this, "maincpu"),
+			m_subcpu(*this, "subcpu"),
+			m_soundcpu(*this, "soundcpu"),
+			m_mcu(*this, "mcu"),
+			m_i8255_1(*this, "i8255_1"),
+			m_i8255_2(*this, "i8255_2"),
+			m_sprites(*this, "sprites"),
+			m_workram(*this, "workram"),
+			m_sharrier_video(false),
+			m_adc_select(0)
 	{ }
 
 	// PPI read/write callbacks
@@ -125,11 +125,11 @@ protected:
 	required_shared_ptr<UINT16> m_workram;
 
 	// configuration
-	bool					m_sharrier_video;
-	i8751_sim_delegate		m_i8751_vblank_hook;
+	bool                    m_sharrier_video;
+	i8751_sim_delegate      m_i8751_vblank_hook;
 
 	// internal state
-	UINT8					m_adc_select;
-	bool					m_shadow;
+	UINT8                   m_adc_select;
+	bool                    m_shadow;
 	TIMER_DEVICE_CALLBACK_MEMBER(hangon_irq);
 };

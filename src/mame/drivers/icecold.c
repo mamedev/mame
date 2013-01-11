@@ -16,10 +16,10 @@ class icecold_state : public driver_device
 public:
 	icecold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ay8910_0(*this, "ay0"),
-		  m_ay8910_1(*this, "ay1"),
-		  m_pia1(*this, "pia1")
+			m_maincpu(*this, "maincpu"),
+			m_ay8910_0(*this, "ay0"),
+			m_ay8910_1(*this, "ay1"),
+			m_pia1(*this, "pia1")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
@@ -45,17 +45,17 @@ public:
 	required_device<ay8910_device> m_ay8910_1;
 	required_device<pia6821_device> m_pia1;
 
-	UINT8	m_digit;			// scanlines from i8279
-	UINT8	m_sound_latch;		// sound bus latch
-	UINT8	m_ay_ctrl;			// ay controls line
-	UINT8	m_motors_ctrl;		// motors control
-	int		m_sint;				// SINT line
-	int		m_motenbl;			// /MOTENBL line
-	int		m_ball_gate_sw; 	// ball gate switch
+	UINT8   m_digit;            // scanlines from i8279
+	UINT8   m_sound_latch;      // sound bus latch
+	UINT8   m_ay_ctrl;          // ay controls line
+	UINT8   m_motors_ctrl;      // motors control
+	int     m_sint;             // SINT line
+	int     m_motenbl;          // /MOTENBL line
+	int     m_ball_gate_sw;     // ball gate switch
 
 	// motors positions
-	int		m_rmotor;			// right motor position (0-100)
-	int		m_lmotor;			// left motor position (0-100)
+	int     m_rmotor;           // right motor position (0-100)
+	int     m_lmotor;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
 };
@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4010, 0x4013) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4020, 0x4023) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x4040, 0x4043) AM_DEVREADWRITE("pia2", pia6821_device, read, write)	// not used
+	AM_RANGE(0x4040, 0x4043) AM_DEVREADWRITE("pia2", pia6821_device, read, write)   // not used
 	AM_RANGE(0x4080, 0x4080) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
 	AM_RANGE(0x4081, 0x4081) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	AM_RANGE(0x4100, 0x4100) AM_WRITE(motors_w)
@@ -73,30 +73,30 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( icecold )
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "Automatic Attract Mode" )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, "Automatic Attract Mode" )    PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Rounds to Complete to Light Star" )	PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x00, "Rounds to Complete to Light Star" )  PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x00, "1 Frame" )
 	PORT_DIPSETTING(    0x02, "2 Frames" )
-	PORT_DIPNAME( 0x0c, 0x00, "Automatic Attract Mode Delay" )	PORT_DIPLOCATION("SW3:3,SW3:4")
+	PORT_DIPNAME( 0x0c, 0x00, "Automatic Attract Mode Delay" )  PORT_DIPLOCATION("SW3:3,SW3:4")
 	PORT_DIPSETTING(    0x00, "1 Min" )
 	PORT_DIPSETTING(    0x04, "5 Min" )
 	PORT_DIPSETTING(    0x08, "10 Min" )
 	PORT_DIPSETTING(    0x0c, "15 Min" )
-	PORT_DIPNAME( 0x30, 0x00, "Manual Attract Mode Delay" )	PORT_DIPLOCATION("SW3:5,SW3:6")
+	PORT_DIPNAME( 0x30, 0x00, "Manual Attract Mode Delay" ) PORT_DIPLOCATION("SW3:5,SW3:6")
 	PORT_DIPSETTING(    0x00, "0 Min" )
 	PORT_DIPSETTING(    0x10, "2 Min" )
 	PORT_DIPSETTING(    0x20, "5 Min" )
 	PORT_DIPSETTING(    0x30, "10 Min" )
-	PORT_DIPNAME( 0xc0, 0x00, "Difficulty (Prompt Time)" )	PORT_DIPLOCATION("SW3:7,SW3:8")
+	PORT_DIPNAME( 0xc0, 0x00, "Difficulty (Prompt Time)" )  PORT_DIPLOCATION("SW3:7,SW3:8")
 	PORT_DIPSETTING(    0x00, "Easy (5, 4, 2, 1)" )
 	PORT_DIPSETTING(    0x40, "Factory (4, 2, 1, 1)" )
 	PORT_DIPSETTING(    0x80, "Hard (2, 2, 1, 1)" )
 	PORT_DIPSETTING(    0xc0, "X-Hard (1, 1, 1, 1)" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x00, "Dispense Option" )	PORT_DIPLOCATION("SW4:1,SW4:2,SW4:3")
+	PORT_DIPNAME( 0x07, 0x00, "Dispense Option" )   PORT_DIPLOCATION("SW4:1,SW4:2,SW4:3")
 	PORT_DIPSETTING(    0x00, "Disabled" )
 	PORT_DIPSETTING(    0x01, "2 Tickets after Hole 6, 3 Tickets after Hole 10" )
 	PORT_DIPSETTING(    0x02, "1 Ticket after Holes 5 - 10" )
@@ -105,56 +105,56 @@ static INPUT_PORTS_START( icecold )
 	PORT_DIPSETTING(    0x05, "No Tickets Dispensed" )
 	PORT_DIPSETTING(    0x06, "5 Tickets after Hole 10" )
 	PORT_DIPSETTING(    0x07, "No Tickets Dispensed" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW4:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW4:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x00, "Score for Extra Ball" )	PORT_DIPLOCATION("SW4:5,SW4:6")
+	PORT_DIPNAME( 0x30, 0x00, "Score for Extra Ball" )  PORT_DIPLOCATION("SW4:5,SW4:6")
 	PORT_DIPSETTING(    0x00, "No Extra Ball" )
 	PORT_DIPSETTING(    0x10, "2000" )
 	PORT_DIPSETTING(    0x20, "4000" )
 	PORT_DIPSETTING(    0x30, "8000" )
-	PORT_DIPNAME( 0xc0, 0x00, "Bonus Countdown Speed" )	PORT_DIPLOCATION("SW4:7,SW4:8")
+	PORT_DIPNAME( 0xc0, 0x00, "Bonus Countdown Speed" ) PORT_DIPLOCATION("SW4:7,SW4:8")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, "Factory" )
 	PORT_DIPSETTING(    0x80, "Fast" )
 	PORT_DIPSETTING(    0xc0, "X-Fast" )
 
-	PORT_START("TEST")	// service switch is directly hard-wired with the NMI line
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE)	PORT_CHANGED_MEMBER(DEVICE_SELF, icecold_state, test_switch_press, 1)
+	PORT_START("TEST")  // service switch is directly hard-wired with the NMI line
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_CHANGED_MEMBER(DEVICE_SELF, icecold_state, test_switch_press, 1)
 
 	PORT_START("JOY")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP)
-	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_SPECIAL)			PORT_CUSTOM_MEMBER(DEVICE_SELF, icecold_state, motors_limit_r, NULL)
+	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_SPECIAL)          PORT_CUSTOM_MEMBER(DEVICE_SELF, icecold_state, motors_limit_r, NULL)
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Ball Gate")	PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Ball Gate")  PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_TILT1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME(DEF_STR( Free_Play ))	PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hopper cycle sensor")	PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hopper empty")	PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME(DEF_STR( Free_Play )) PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hopper cycle sensor")    PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hopper empty")   PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 1")	PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 2")	PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 3")	PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 4")	PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 5")	PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 6")	PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 7")	PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 8")	PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 9")	PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Hole 10") PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Ticket feed")	PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)	PORT_NAME("Errant Ball")	PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hole 10") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Ticket feed")    PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Errant Ball")    PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -175,10 +175,10 @@ CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
 {
 	UINT8 data = 0;
 
-	if (m_rmotor <= 1)		data |= 0x01;	// right down limit
-	if (m_lmotor <= 1)		data |= 0x04;	// left down limit
-	if (m_rmotor >= 99)		data |= 0x10;	// right up limit
-	if (m_lmotor >= 99)		data |= 0x40;	// left up limit
+	if (m_rmotor <= 1)      data |= 0x01;   // right down limit
+	if (m_lmotor <= 1)      data |= 0x04;   // left down limit
+	if (m_rmotor >= 99)     data |= 0x10;   // right up limit
+	if (m_lmotor >= 99)     data |= 0x40;   // left up limit
 
 	return data;
 }
@@ -274,10 +274,10 @@ WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
 	if (m_motenbl == 0)
 	{
 		output_set_value("start", BIT(data, 0));
-		coin_counter_w(machine(), 1, BIT(data, 1));		// hopper counter
-		coin_counter_w(machine(), 2, BIT(data, 2));		// good game counter
-		coin_lockout_w(machine(), 0, BIT(data, 3));		// not used ??
-		coin_counter_w(machine(), 0, BIT(data, 4));		// coin counter
+		coin_counter_w(machine(), 1, BIT(data, 1));     // hopper counter
+		coin_counter_w(machine(), 2, BIT(data, 2));     // good game counter
+		coin_lockout_w(machine(), 0, BIT(data, 3));     // not used ??
+		coin_counter_w(machine(), 0, BIT(data, 4));     // coin counter
 		// BIT 5 errant ball solenoid
 		// BIT 7 hopper motor
 	}
@@ -326,69 +326,69 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 			output_set_value("rmotor", m_rmotor);
 
 			popmessage("Left Motor   Right Motor\n%-4s         %-4s\n%02d\\100       %02d\\100",
-					  (lmotor_dir > 0) ? " up" : ((lmotor_dir < 0) ? "down" : "off"),
-					  (rmotor_dir > 0) ? " up" : ((rmotor_dir < 0) ? "down" : "off"), m_lmotor, m_rmotor);
+						(lmotor_dir > 0) ? " up" : ((lmotor_dir < 0) ? "down" : "off"),
+						(rmotor_dir > 0) ? " up" : ((rmotor_dir < 0) ? "down" : "off"), m_lmotor, m_rmotor);
 		}
 	}
 }
 
 static const pia6821_interface icecold_pia0_intf =
 {
-	DEVCB_INPUT_PORT("JOY"),							// Port A joystick and motors limits
-	DEVCB_INPUT_PORT("DSW3"),							// Port B DSW3
-	DEVCB_NULL,											// CA1 not connected
-	DEVCB_NULL,											// CB1 input SWIRQ (IRQ from I8279)
-	DEVCB_NULL,											// CA2 not connected
-	DEVCB_NULL,											// CB2 LPFON
-	DEVCB_NULL,											// Port A not used as output
-	DEVCB_NULL,											// Port B not used as output
-	DEVCB_NULL,											// CA2 not connected
-	DEVCB_NULL,											// CB2 not used as output
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),	// IRQA connected to IRQ
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)		// IRQB connected to IRQ
+	DEVCB_INPUT_PORT("JOY"),                            // Port A joystick and motors limits
+	DEVCB_INPUT_PORT("DSW3"),                           // Port B DSW3
+	DEVCB_NULL,                                         // CA1 not connected
+	DEVCB_NULL,                                         // CB1 input SWIRQ (IRQ from I8279)
+	DEVCB_NULL,                                         // CA2 not connected
+	DEVCB_NULL,                                         // CB2 LPFON
+	DEVCB_NULL,                                         // Port A not used as output
+	DEVCB_NULL,                                         // Port B not used as output
+	DEVCB_NULL,                                         // CA2 not connected
+	DEVCB_NULL,                                         // CB2 not used as output
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    // IRQA connected to IRQ
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     // IRQB connected to IRQ
 };
 
 static const pia6821_interface icecold_pia1_intf =
 {
-	DEVCB_DRIVER_MEMBER(icecold_state, ay_r),			// Port A input sound bus
-	DEVCB_NULL,											// Port B not used as input
-	DEVCB_DRIVER_LINE_MEMBER(icecold_state, sint_r),	// CA1 input SINT
-	DEVCB_NULL,											// CB1 not connected
-	DEVCB_NULL,											// CA2 not connected
-	DEVCB_NULL,											// CB2 not connected
-	DEVCB_DRIVER_MEMBER(icecold_state, ay_w),			// Port A output sound bus
-	DEVCB_DRIVER_MEMBER(icecold_state, snd_ctrl_w),		// Port B output ay controls
-	DEVCB_NULL,											// CA2 not used as output
-	DEVCB_NULL,											// CB2 not connected
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE),	// IRQA connected to FIRQ
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)	// IRQB connected to FIRQ
+	DEVCB_DRIVER_MEMBER(icecold_state, ay_r),           // Port A input sound bus
+	DEVCB_NULL,                                         // Port B not used as input
+	DEVCB_DRIVER_LINE_MEMBER(icecold_state, sint_r),    // CA1 input SINT
+	DEVCB_NULL,                                         // CB1 not connected
+	DEVCB_NULL,                                         // CA2 not connected
+	DEVCB_NULL,                                         // CB2 not connected
+	DEVCB_DRIVER_MEMBER(icecold_state, ay_w),           // Port A output sound bus
+	DEVCB_DRIVER_MEMBER(icecold_state, snd_ctrl_w),     // Port B output ay controls
+	DEVCB_NULL,                                         // CA2 not used as output
+	DEVCB_NULL,                                         // CB2 not connected
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE),   // IRQA connected to FIRQ
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)    // IRQB connected to FIRQ
 };
 
 static const pia6821_interface icecold_pia2_intf =
 {
-	DEVCB_NULL,											// Port A not connected
-	DEVCB_NULL,											// Port B not connected
-	DEVCB_NULL,											// CA1 not connected
-	DEVCB_NULL,											// CB1 not connected
-	DEVCB_NULL,											// CA2 not connected
-	DEVCB_NULL,											// CB2 not connected
-	DEVCB_NULL,											// Port A not connected
-	DEVCB_NULL,											// Port B not connected
-	DEVCB_NULL,											// CA2 not connected
-	DEVCB_NULL,											// CB2 not connected
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),	// IRQA connected to IRQ
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)		// IRQB connected to IRQ
+	DEVCB_NULL,                                         // Port A not connected
+	DEVCB_NULL,                                         // Port B not connected
+	DEVCB_NULL,                                         // CA1 not connected
+	DEVCB_NULL,                                         // CB1 not connected
+	DEVCB_NULL,                                         // CA2 not connected
+	DEVCB_NULL,                                         // CB2 not connected
+	DEVCB_NULL,                                         // Port A not connected
+	DEVCB_NULL,                                         // Port B not connected
+	DEVCB_NULL,                                         // CA2 not connected
+	DEVCB_NULL,                                         // CB2 not connected
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    // IRQA connected to IRQ
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     // IRQB connected to IRQ
 };
 
 static I8279_INTERFACE( icecold_i8279_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w), // irq
-	DEVCB_DRIVER_MEMBER(icecold_state, scanlines_w),	// scan SL lines
-	DEVCB_DRIVER_MEMBER(icecold_state, digit_w),		// display A&B
-	DEVCB_NULL,											// BD
-	DEVCB_DRIVER_MEMBER(icecold_state, kbd_r),			// kbd RL lines
-	DEVCB_NULL,											// Shift key
-	DEVCB_NULL											// Ctrl-Strobe line
+	DEVCB_DRIVER_MEMBER(icecold_state, scanlines_w),    // scan SL lines
+	DEVCB_DRIVER_MEMBER(icecold_state, digit_w),        // display A&B
+	DEVCB_NULL,                                         // BD
+	DEVCB_DRIVER_MEMBER(icecold_state, kbd_r),          // kbd RL lines
+	DEVCB_NULL,                                         // Shift key
+	DEVCB_NULL                                          // Ctrl-Strobe line
 };
 
 static const ay8910_interface icecold_ay8910_0_intf =

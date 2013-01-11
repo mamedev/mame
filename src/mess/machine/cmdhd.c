@@ -15,12 +15,12 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6502_TAG		"m6502"
-#define M6522_1_TAG		"m6522_1"
-#define M6522_2_TAG		"m6522_2"
-#define I8255A_TAG		"i8255a"
-#define RTC72421A_TAG	"rtc"
-#define SCSIBUS_TAG		"scsi"
+#define M6502_TAG       "m6502"
+#define M6522_1_TAG     "m6522_1"
+#define M6522_2_TAG     "m6522_2"
+#define I8255A_TAG      "i8255a"
+#define RTC72421A_TAG   "rtc"
+#define SCSIBUS_TAG     "scsi"
 
 
 
@@ -174,10 +174,10 @@ machine_config_constructor cmd_hd_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CMD_HD, "HD", tag, owner, clock),
-	  device_cbm_iec_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_TAG),
-	  m_scsibus(*this, SCSIBUS_TAG":host")
+	: device_t(mconfig, CMD_HD, "HD", tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this),
+		m_maincpu(*this, M6502_TAG),
+		m_scsibus(*this, SCSIBUS_TAG":host")
 {
 }
 
@@ -248,16 +248,16 @@ WRITE8_MEMBER( cmd_hd_device::led_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 }

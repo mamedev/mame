@@ -23,7 +23,7 @@ const device_type I5000_SND = &device_creator<i5000snd_device>;
 
 i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I5000_SND, "I5000", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -53,18 +53,18 @@ void i5000snd_device::device_start()
 		save_item(NAME(m_channels[ch].m_adpcm.m_signal), ch);
 		save_item(NAME(m_channels[ch].m_adpcm.m_step), ch);
 
-        save_item(NAME(m_channels[ch].address), ch);
-        save_item(NAME(m_channels[ch].freq_timer), ch);
-        save_item(NAME(m_channels[ch].freq_base), ch);
-        save_item(NAME(m_channels[ch].freq_min), ch);
-        save_item(NAME(m_channels[ch].sample), ch);
-        save_item(NAME(m_channels[ch].shift_pos), ch);
-        save_item(NAME(m_channels[ch].shift_amount), ch);
-        save_item(NAME(m_channels[ch].shift_mask), ch);
-        save_item(NAME(m_channels[ch].vol_r), ch);
-        save_item(NAME(m_channels[ch].vol_l), ch);
-        save_item(NAME(m_channels[ch].output_r), ch);
-        save_item(NAME(m_channels[ch].output_l), ch);
+		save_item(NAME(m_channels[ch].address), ch);
+		save_item(NAME(m_channels[ch].freq_timer), ch);
+		save_item(NAME(m_channels[ch].freq_base), ch);
+		save_item(NAME(m_channels[ch].freq_min), ch);
+		save_item(NAME(m_channels[ch].sample), ch);
+		save_item(NAME(m_channels[ch].shift_pos), ch);
+		save_item(NAME(m_channels[ch].shift_amount), ch);
+		save_item(NAME(m_channels[ch].shift_mask), ch);
+		save_item(NAME(m_channels[ch].vol_r), ch);
+		save_item(NAME(m_channels[ch].vol_l), ch);
+		save_item(NAME(m_channels[ch].output_r), ch);
+		save_item(NAME(m_channels[ch].output_l), ch);
 	}
 
 	save_item(NAME(m_regs));
@@ -300,4 +300,3 @@ WRITE16_MEMBER( i5000snd_device::write )
 
 	write_reg16(offset, data);
 }
-

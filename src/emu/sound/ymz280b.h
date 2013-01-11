@@ -15,16 +15,16 @@
 
 struct ymz280b_interface
 {
-	void (*irq_callback)(device_t *device, int state);	/* irq callback */
-	devcb_read8 ext_read;			/* external RAM read */
-	devcb_write8 ext_write;		/* external RAM write */
+	void (*irq_callback)(device_t *device, int state);  /* irq callback */
+	devcb_read8 ext_read;           /* external RAM read */
+	devcb_write8 ext_write;     /* external RAM write */
 };
 
 DECLARE_READ8_DEVICE_HANDLER ( ymz280b_r );
 DECLARE_WRITE8_DEVICE_HANDLER( ymz280b_w );
 
 class ymz280b_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

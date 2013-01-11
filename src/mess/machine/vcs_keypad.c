@@ -137,4 +137,3 @@ UINT8 vcs_keypad_device::vcs_pot_y_r()
 	}
 	return 0;
 }
-

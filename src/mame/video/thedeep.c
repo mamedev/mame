@@ -45,19 +45,19 @@ TILEMAP_MAPPER_MEMBER(thedeep_state::tilemap_scan_rows_back)
 
 TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_0)
 {
-	UINT8 code	=	m_vram_0[ tile_index * 2 + 0 ];
-	UINT8 color	=	m_vram_0[ tile_index * 2 + 1 ];
+	UINT8 code  =   m_vram_0[ tile_index * 2 + 0 ];
+	UINT8 color =   m_vram_0[ tile_index * 2 + 1 ];
 	SET_TILE_INFO_MEMBER(
 			1,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
-			TILE_FLIPX	);	// why?
+			TILE_FLIPX  );  // why?
 }
 
 TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_1)
 {
-	UINT8 code	=	m_vram_1[ tile_index * 2 + 0 ];
-	UINT8 color	=	m_vram_1[ tile_index * 2 + 1 ];
+	UINT8 code  =   m_vram_1[ tile_index * 2 + 0 ];
+	UINT8 color =   m_vram_1[ tile_index * 2 + 1 ];
 	SET_TILE_INFO_MEMBER(
 			2,
 			code + (color << 8),
@@ -106,7 +106,7 @@ void thedeep_state::video_start()
 	m_tilemap_0->set_transparent_pen(0 );
 	m_tilemap_1->set_transparent_pen(0 );
 
-	m_tilemap_0->set_scroll_cols(0x20);	// column scroll for the background
+	m_tilemap_0->set_scroll_cols(0x20); // column scroll for the background
 }
 
 /***************************************************************************
@@ -152,22 +152,22 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		int code,color,sx,sy,flipx,flipy,nx,ny,x,y,attr;
 
-		attr	=	 s[1];
-		if (!(attr & 0x80))	{	s+=8;	continue;	}
+		attr    =    s[1];
+		if (!(attr & 0x80)) {   s+=8;   continue;   }
 
-		sx		=	 s[4];
-		sy		=	 s[0];
+		sx      =    s[4];
+		sy      =    s[0];
 
-		color	=	 s[5];
+		color   =    s[5];
 
-		flipx	=	attr & 0x00;	// ?
-		flipy	=	attr & 0x40;
+		flipx   =   attr & 0x00;    // ?
+		flipy   =   attr & 0x40;
 
 		nx = 1 << ((attr & 0x06) >> 1);
 		ny = 1 << ((attr & 0x18) >> 3);
 
-		if (color & 1)	sx -= 256;
-		if (attr  & 1)	sy -= 256;
+		if (color & 1)  sx -= 256;
+		if (attr  & 1)  sy -= 256;
 
 		if (state->flip_screen())
 		{
@@ -183,8 +183,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		for (x = 0; (x < nx) && (s < end);  x++,s+=8)
 		{
-			code	=	 s[2] + (s[3] << 8);
-			color	=	 s[5] >> 4;
+			code    =    s[2] + (s[3] << 8);
+			color   =    s[5] >> 4;
 
 			for (y = 0; y < ny; y++)
 			{

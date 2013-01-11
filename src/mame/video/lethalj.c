@@ -9,9 +9,9 @@
 #include "includes/lethalj.h"
 
 
-#define BLITTER_SOURCE_WIDTH		1024
-#define BLITTER_DEST_WIDTH			512
-#define BLITTER_DEST_HEIGHT			512
+#define BLITTER_SOURCE_WIDTH        1024
+#define BLITTER_DEST_WIDTH          512
+#define BLITTER_DEST_HEIGHT         512
 
 
 /*************************************

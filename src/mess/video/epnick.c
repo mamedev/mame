@@ -19,25 +19,25 @@
 
 /* given a colour index in range 0..255 gives the Red component */
 #define NICK_GET_RED8(x) \
-	((		\
-	  ( ( (x & (1<<0)) >>0) <<2) | \
-	  ( ( (x & (1<<3)) >>3) <<1) | \
-	  ( ( (x & (1<<6)) >>6) <<0) \
+	((      \
+		( ( (x & (1<<0)) >>0) <<2) | \
+		( ( (x & (1<<3)) >>3) <<1) | \
+		( ( (x & (1<<6)) >>6) <<0) \
 	)<<5)
 
 /* given a colour index in range 0..255 gives the Red component */
 #define NICK_GET_GREEN8(x) \
-	((	\
-	  ( ( (x & (1<<1)) >>1) <<2) | \
-	  ( ( (x & (1<<4)) >>4) <<1) | \
-	  ( ( (x & (1<<7)) >>7) <<0) \
+	((  \
+		( ( (x & (1<<1)) >>1) <<2) | \
+		( ( (x & (1<<4)) >>4) <<1) | \
+		( ( (x & (1<<7)) >>7) <<0) \
 	)<<5)
 
 /* given a colour index in range 0..255 gives the Red component */
 #define NICK_GET_BLUE8(x) \
 	(( \
-	  ( ( (x & (1<<2)) >>2) <<1) | \
-	  ( ( (x & (1<<5)) >>5) <<0) \
+		( ( (x & (1<<2)) >>2) <<1) | \
+		( ( (x & (1<<5)) >>5) <<0) \
 	)<<6)
 
 
@@ -45,15 +45,15 @@
 Tables, this is the form of the data */
 struct LPT_ENTRY
 {
-	unsigned char SC;		/* scanlines in this modeline (two's complement) */
-	unsigned char MB;		/* the MODEBYTE (defines video display mode) */
-	unsigned char LM;		/* left margin etc */
-	unsigned char RM;		/* right margin etc */
-	unsigned char LD1L;	/* (a7..a0) of line data pointer LD1 */
-	unsigned char LD1H;	/* (a8..a15) of line data pointer LD1 */
-	unsigned char LD2L;	/* (a7..a0) of line data pointer LD2 */
-	unsigned char LD2H;	/* (a8..a15) of line data pointer LD2 */
-	unsigned char COL[8];	/* COL0..COL7 */
+	unsigned char SC;       /* scanlines in this modeline (two's complement) */
+	unsigned char MB;       /* the MODEBYTE (defines video display mode) */
+	unsigned char LM;       /* left margin etc */
+	unsigned char RM;       /* right margin etc */
+	unsigned char LD1L; /* (a7..a0) of line data pointer LD1 */
+	unsigned char LD1H; /* (a8..a15) of line data pointer LD1 */
+	unsigned char LD2L; /* (a7..a0) of line data pointer LD2 */
+	unsigned char LD2H; /* (a8..a15) of line data pointer LD2 */
+	unsigned char COL[8];   /* COL0..COL7 */
 };
 
 struct NICK_STATE
@@ -71,7 +71,7 @@ struct NICK_STATE
 	unsigned long LD1;
 	unsigned long LD2;
 
-	LPT_ENTRY	LPT;
+	LPT_ENTRY   LPT;
 
 	UINT16 *dest;
 	int dest_pos;
@@ -93,48 +93,48 @@ struct NICK_STATE
 };
 
 /* colour mode types */
-#define	NICK_2_COLOUR_MODE	0
-#define	NICK_4_COLOUR_MODE	1
-#define	NICK_16_COLOUR_MODE	2
-#define	NICK_256_COLOUR_MODE	3
+#define NICK_2_COLOUR_MODE  0
+#define NICK_4_COLOUR_MODE  1
+#define NICK_16_COLOUR_MODE 2
+#define NICK_256_COLOUR_MODE    3
 
 /* Display mode types */
-#define	NICK_VSYNC_MODE	0
-#define	NICK_PIXEL_MODE	1
-#define	NICK_ATTR_MODE	2
-#define	NICK_CH256_MODE	3
-#define	NICK_CH128_MODE	4
-#define	NICK_CH64_MODE	5
-#define	NICK_UNUSED_MODE	6
-#define	NICK_LPIXEL_MODE	7
+#define NICK_VSYNC_MODE 0
+#define NICK_PIXEL_MODE 1
+#define NICK_ATTR_MODE  2
+#define NICK_CH256_MODE 3
+#define NICK_CH128_MODE 4
+#define NICK_CH64_MODE  5
+#define NICK_UNUSED_MODE    6
+#define NICK_LPIXEL_MODE    7
 
 /* MODEBYTE defines */
-#define	NICK_MB_VIRQ			(1<<7)
-#define	NICK_MB_VRES			(1<<4)
-#define	NICK_MB_LPT_RELOAD		(1<<0)
+#define NICK_MB_VIRQ            (1<<7)
+#define NICK_MB_VRES            (1<<4)
+#define NICK_MB_LPT_RELOAD      (1<<0)
 
 /* Left margin defines */
-#define	NICK_LM_MSBALT			(1<<7)
-#define	NICK_LM_LSBALT			(1<<6)
+#define NICK_LM_MSBALT          (1<<7)
+#define NICK_LM_LSBALT          (1<<6)
 
 /* Right margin defines */
-#define	NICK_RM_ALTIND1			(1<<7)
-#define	NICK_RM_ALTIND0			(1<<6)
+#define NICK_RM_ALTIND1         (1<<7)
+#define NICK_RM_ALTIND0         (1<<6)
 
 /* useful macros */
-#define	NICK_GET_LEFT_MARGIN(x)		(x & 0x03f)
-#define	NICK_GET_RIGHT_MARGIN(x)	(x & 0x03f)
-#define	NICK_GET_DISPLAY_MODE(x)	((x>>1) & 0x07)
-#define	NICK_GET_COLOUR_MODE(x)		((x>>5) & 0x03)
+#define NICK_GET_LEFT_MARGIN(x)     (x & 0x03f)
+#define NICK_GET_RIGHT_MARGIN(x)    (x & 0x03f)
+#define NICK_GET_DISPLAY_MODE(x)    ((x>>1) & 0x07)
+#define NICK_GET_COLOUR_MODE(x)     ((x>>5) & 0x03)
 
-#define NICK_RELOAD_LPT(x)			(x & 0x080)
-#define NICK_CLOCK_LPT(x)			(x & 0x040)
+#define NICK_RELOAD_LPT(x)          (x & 0x080)
+#define NICK_CLOCK_LPT(x)           (x & 0x040)
 
 /* Macros to generate memory address is CHx modes */
 /* x = LD2, y = buf1 */
-#define ADDR_CH256(x,y)		(((x & 0x0ff)<<8) | (y & 0x0ff))
-#define ADDR_CH128(x,y)		(((x & 0x01ff)<<7) | (y & 0x07f))
-#define ADDR_CH64(x,y)		(((x & 0x03ff)<<6) | (y & 0x03f))
+#define ADDR_CH256(x,y)     (((x & 0x0ff)<<8) | (y & 0x0ff))
+#define ADDR_CH128(x,y)     (((x & 0x01ff)<<7) | (y & 0x07f))
+#define ADDR_CH64(x,y)      (((x & 0x03ff)<<6) | (y & 0x03f))
 
 
 /*************************************************************/
@@ -176,10 +176,10 @@ void ep_state::palette_init()
 }
 
 /* No of highest resolution pixels per "clock" */
-#define NICK_PIXELS_PER_CLOCK	16
+#define NICK_PIXELS_PER_CLOCK   16
 
 /* "clocks" per line */
-#define NICK_TOTAL_CLOCKS_PER_LINE	64
+#define NICK_TOTAL_CLOCKS_PER_LINE  64
 
 /* we align based on the clocks */
 static void Nick_CalcVisibleClocks(NICK_STATE *nick, int Width)
@@ -779,12 +779,12 @@ static void Nick_DoDisplay(NICK_STATE *nick)
 		/* get display mode */
 		DisplayMode = NICK_GET_DISPLAY_MODE(pLPT->MB);
 
-		if (nick->ScanLineCount == 0)	// ||
+		if (nick->ScanLineCount == 0)   // ||
 			//((pLPT->MB & NICK_MB_VRES)==0))
 		{
 			/* doing first line */
 			/* reload LD1, and LD2 (if necessary) regardless of display mode */
-			nick->LD1 =	(pLPT->LD1L & 0x0ff) |
+			nick->LD1 = (pLPT->LD1L & 0x0ff) |
 					((pLPT->LD1H & 0x0ff)<<8);
 
 			if ((DisplayMode != NICK_LPIXEL_MODE) && (DisplayMode != NICK_PIXEL_MODE))
@@ -961,7 +961,7 @@ static void Nick_DoLine(NICK_STATE *nick)
 READ8_HANDLER( nick_reg_r )
 {
 	/* read from a nick register - return floating bus,
-   because the registers are not readable! */
+	because the registers are not readable! */
 	return 0x0ff;
 }
 #endif

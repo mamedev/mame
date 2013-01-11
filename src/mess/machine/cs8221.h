@@ -26,10 +26,10 @@
 //**************************************************************************
 
 #define MCFG_CS8221_ADD(_tag, _cputag, _isatag, _biostag) \
-    MCFG_DEVICE_ADD(_tag, CS8221, 0) \
-    cs8221_device::static_set_cputag(*device, _cputag); \
-    cs8221_device::static_set_isatag(*device, _isatag); \
-    cs8221_device::static_set_biostag(*device, _biostag);
+	MCFG_DEVICE_ADD(_tag, CS8221, 0) \
+	cs8221_device::static_set_cputag(*device, _cputag); \
+	cs8221_device::static_set_isatag(*device, _isatag); \
+	cs8221_device::static_set_biostag(*device, _biostag);
 
 
 //**************************************************************************
@@ -83,4 +83,4 @@ private:
 extern const device_type CS8221;
 
 
-#endif	/* __CS8221_H__ */
+#endif  /* __CS8221_H__ */

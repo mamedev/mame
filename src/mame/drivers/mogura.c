@@ -113,8 +113,8 @@ WRITE8_MEMBER(mogura_state::mogura_tileram_w)
 
 WRITE8_MEMBER(mogura_state::mogura_dac_w)
 {
-	m_dac1->write_unsigned8(data & 0xf0);	/* left */
-	m_dac2->write_unsigned8((data & 0x0f) << 4);	/* right */
+	m_dac1->write_unsigned8(data & 0xf0);   /* left */
+	m_dac2->write_unsigned8((data & 0x0f) << 4);    /* right */
 }
 
 
@@ -135,14 +135,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8, mogura_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP	// ??
+	AM_RANGE(0x00, 0x00) AM_WRITENOP    // ??
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("P1")
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("P2")
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
+	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w) /* 4 bit DAC x 2. MSB = left, LSB = right */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mogura )
@@ -201,7 +201,7 @@ void mogura_state::machine_start()
 static MACHINE_CONFIG_START( mogura, mogura_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,3000000)		 /* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,3000000)         /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(mogura_map)
 	MCFG_CPU_IO_MAP(mogura_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mogura_state,  irq0_line_hold)

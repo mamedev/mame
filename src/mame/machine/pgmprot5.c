@@ -35,33 +35,33 @@ static UINT16 dw2_asic_hold;
 
 READ16_HANDLER( dw2_d80000_r )
 {
-//	pgm_state *state = space.machine().driver_data<pgm_state>();
+//  pgm_state *state = space.machine().driver_data<pgm_state>();
 	UINT16 ret;
-/*	UINT16 test;
+/*  UINT16 test;
 
-	switch (dw2_asic_reg[0])
-	{
-		case 0x05: // Read to $80eec0
-		case 0x13: // Read to $80eeb8
-		case 0x1f: // Read to $80eeb8
-		case 0x40: // Read to $80eeb8, increase counters
-		case 0xf4: // Read to $80eeb8
-		case 0xf6: // Read to $80eeb8
-		case 0xf8: // Read to $80eeb8
-		break;
+    switch (dw2_asic_reg[0])
+    {
+        case 0x05: // Read to $80eec0
+        case 0x13: // Read to $80eeb8
+        case 0x1f: // Read to $80eeb8
+        case 0x40: // Read to $80eeb8, increase counters
+        case 0xf4: // Read to $80eeb8
+        case 0xf6: // Read to $80eeb8
+        case 0xf8: // Read to $80eeb8
+        break;
 
-		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), dw2_asic_reg[0]);
-	}
+        default:
+            logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), dw2_asic_reg[0]);
+    }
 
-	test = BITSWAP16(state->m_mainram[protection_address], 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff; // original hack
+    test = BITSWAP16(state->m_mainram[protection_address], 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff; // original hack
 */
 	// This bitswap seems to also be common to a few IGS protection devices (igs011.c, Oriental Legend)
 	ret = BITSWAP16(dw2_asic_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 /*
-	if ((ret != test) || (dw2_asic_hold != state->m_mainram[protection_address])) {
-		logerror ("Protection calculation error: SIMRET: %2.2x, HACKRET: %2.2x, SIMHOLD: %4.4x, REALHOLD: %4.4x\n", ret, test, dw2_asic_hold, state->m_mainram[protection_address]);
-	}
+    if ((ret != test) || (dw2_asic_hold != state->m_mainram[protection_address])) {
+        logerror ("Protection calculation error: SIMRET: %2.2x, HACKRET: %2.2x, SIMHOLD: %4.4x, REALHOLD: %4.4x\n", ret, test, dw2_asic_hold, state->m_mainram[protection_address]);
+    }
 */
 	return ret;
 }
@@ -78,7 +78,7 @@ WRITE16_HANDLER( dw2_d80000_w )
 	switch (dw2_asic_reg[0])
 	{
 		case 0x08:
-			// This reg doesn't seem to be used for anything useful but is 
+			// This reg doesn't seem to be used for anything useful but is
 			// initialized. Ok to use as reset??
 			// The last "hold" value used is stored in NVRAM. Otherwise we either
 			// need to set the "hold" value as non-volatile or wipe NVRAM.
@@ -126,22 +126,22 @@ WRITE16_HANDLER( dw2_d80000_w )
 			dw2_asic_hold ^= BIT(~old, 13) <<  4; // inverted!
 
 	/*
-			// additional...
-			// how is this calculated? is it ever used??
-			// drgw2c = $80eeca, drgw2/dw2v100x = $80cb7a, drgw2j = $809168
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 0) << 1;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 1) << 2;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 2) << 3;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 4) << 5;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 5) << 6;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 6) << 7;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 7) << 8;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 0) << 9;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 1) << 10;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 3) << 12;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 4) << 13;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 5) << 14;
-			dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 6) << 15;
+	        // additional...
+	        // how is this calculated? is it ever used??
+	        // drgw2c = $80eeca, drgw2/dw2v100x = $80cb7a, drgw2j = $809168
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 0) << 1;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 1) << 2;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 2) << 3;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 4) << 5;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 5) << 6;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 6) << 7;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eecb), 7) << 8;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 0) << 9;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 1) << 10;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 3) << 12;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 4) << 13;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 5) << 14;
+	        dw2_asic_hold ^= BIT(space.read_byte(0x80eeca), 6) << 15;
 	*/
 		}
 		break;
@@ -157,7 +157,7 @@ WRITE16_HANDLER( dw2_d80000_w )
 // What purpose to writes to this region serve? Written, but never read back? Must be related to the protection device?
 WRITE16_HANDLER(dw2_unk_w)
 {
-//	logerror("%06x: warning, writing to address %6.6x = %4.4x\n", space.device().safe_pc(), 0xd00000+(offset*2), data);
+//  logerror("%06x: warning, writing to address %6.6x = %4.4x\n", space.device().safe_pc(), 0xd00000+(offset*2), data);
 }
 
 static void pgm_dw2_decrypt(running_machine &machine)
@@ -200,8 +200,8 @@ DRIVER_INIT_MEMBER(pgm_state,drgw2)
 	protection_address = 0xcb7e/2; // $80cb7e;
 
 	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
+	   overlays the normal ROM code, this has been confirmed on a real PCB
+	   although some addresses may be missing */
 	mem16[0x131098 / 2] = 0x4e93;
 	mem16[0x13113e / 2] = 0x4e93;
 	mem16[0x1311ce / 2] = 0x4e93;
@@ -216,8 +216,8 @@ DRIVER_INIT_MEMBER(pgm_state,dw2v100x)
 	protection_address = 0xcb7e/2; // $80cb7e;
 
 	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
+	   overlays the normal ROM code, this has been confirmed on a real PCB
+	   although some addresses may be missing */
 	mem16[0x131084 / 2] = 0x4e93;
 	mem16[0x13112a / 2] = 0x4e93;
 	mem16[0x1311ba / 2] = 0x4e93;
@@ -232,8 +232,8 @@ DRIVER_INIT_MEMBER(pgm_state,drgw2c)
 	protection_address = 0xeece/2; // $80eece;
 
 	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
+	   overlays the normal ROM code, this has been confirmed on a real PCB
+	   although some addresses may be missing */
 	mem16[0x1303bc / 2] = 0x4e93;
 	mem16[0x130462 / 2] = 0x4e93;
 	mem16[0x1304f2 / 2] = 0x4e93;
@@ -248,8 +248,8 @@ DRIVER_INIT_MEMBER(pgm_state,drgw2j)
 	protection_address = 0x91cc/2; // $8091cc;
 
 	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
+	   overlays the normal ROM code, this has been confirmed on a real PCB
+	   although some addresses may be missing */
 	mem16[0x1302c0 / 2] = 0x4e93;
 	mem16[0x130366 / 2] = 0x4e93;
 	mem16[0x1303f6 / 2] = 0x4e93;

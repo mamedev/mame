@@ -171,16 +171,16 @@ WRITE8_MEMBER(chance32_state::muxout_w)
   x--- ----   Bet lamp.
 
 */
-	if (data & 1)	// bit 0 is the mux selector.
+	if (data & 1)   // bit 0 is the mux selector.
 
 	{
-		output_set_lamp_value(0, (data >> 1) & 1);	/* Lamp 0 - Small / Big */
-		output_set_lamp_value(1, (data >> 2) & 1);	/* Lamp 1 - Big / Small */
-		output_set_lamp_value(2, (data >> 3) & 1);	/* Lamp 2 - Hold 5 */
-		output_set_lamp_value(3, (data >> 4) & 1);	/* Lamp 3 - Hold 4 */
-		output_set_lamp_value(4, (data >> 5) & 1);	/* Lamp 4 - Hold 3 */
-		output_set_lamp_value(5, (data >> 6) & 1);	/* Lamp 5 - Hold 2 */
-		output_set_lamp_value(6, (data >> 7) & 1);	/* Lamp 6 - Hold 1 */
+		output_set_lamp_value(0, (data >> 1) & 1);  /* Lamp 0 - Small / Big */
+		output_set_lamp_value(1, (data >> 2) & 1);  /* Lamp 1 - Big / Small */
+		output_set_lamp_value(2, (data >> 3) & 1);  /* Lamp 2 - Hold 5 */
+		output_set_lamp_value(3, (data >> 4) & 1);  /* Lamp 3 - Hold 4 */
+		output_set_lamp_value(4, (data >> 5) & 1);  /* Lamp 4 - Hold 3 */
+		output_set_lamp_value(5, (data >> 6) & 1);  /* Lamp 5 - Hold 2 */
+		output_set_lamp_value(6, (data >> 7) & 1);  /* Lamp 6 - Hold 1 */
 
 		logerror("Lamps A: %02x\n", data);
 	}
@@ -188,12 +188,12 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	else
 	{
 		// bit 1 is unknown...
-		output_set_lamp_value(7, (data >> 2) & 1);	/* Lamp 7 - Fever! */
-		output_set_lamp_value(8, (data >> 3) & 1);	/* Lamp 8 - Cancel */
-		output_set_lamp_value(9, (data >> 4) & 1);	/* Lamp 9 - D-Up / Take */
-		output_set_lamp_value(10, (data >> 5) & 1);	/* Lamp 10 - Take / D-Up */
-		output_set_lamp_value(11, (data >> 6) & 1);	/* Lamp 11 - Deal */
-		output_set_lamp_value(12, (data >> 7) & 1);	/* Lamp 12 - Bet */
+		output_set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 - Fever! */
+		output_set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 - Cancel */
+		output_set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 - D-Up / Take */
+		output_set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 - Take / D-Up */
+		output_set_lamp_value(11, (data >> 6) & 1); /* Lamp 11 - Deal */
+		output_set_lamp_value(12, (data >> 7) & 1); /* Lamp 12 - Bet */
 
 		logerror("Lamps B: %02x\n", data);
 	}
@@ -210,7 +210,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chance32_portmap, AS_IO, 8, chance32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP		// writting bit3 constantly... watchdog?
+	AM_RANGE(0x10, 0x10) AM_WRITENOP        // writting bit3 constantly... watchdog?
 	AM_RANGE(0x13, 0x13) AM_WRITE(mux_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW1")
@@ -357,7 +357,7 @@ static INPUT_PORTS_START( chance32 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("UNK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* Otherwise is a 'Freeze' DIP switch */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")  /* Otherwise is a 'Freeze' DIP switch */
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -402,7 +402,7 @@ static INPUT_PORTS_START( chance32 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW )   PORT_NAME("Small / DIP Test (In Book Mode)")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )	// payout (hopper jam)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // payout (hopper jam)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -412,12 +412,12 @@ static INPUT_PORTS_START( chance32 )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )	PORT_IMPULSE(3) PORT_NAME("Coin A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Coin A")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )	PORT_IMPULSE(3) PORT_NAME("Coin B")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_8) PORT_NAME("Flip Screen 1")	/* unknown purpose */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9) PORT_NAME("Flip Screen 2")	/* unknown purpose */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Coin B")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_8) PORT_NAME("Flip Screen 1")  /* unknown purpose */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9) PORT_NAME("Flip Screen 2")  /* unknown purpose */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN)
 INPUT_PORTS_END
 
@@ -452,16 +452,16 @@ void chance32_state::machine_reset()
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	16,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	16,         /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -483,7 +483,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
 
-	MCFG_MC6845_ADD("crtc", H46505, 12000000/16, mc6845_intf)	/* 52.786 Hz (similar to Major Poker) */
+	MCFG_MC6845_ADD("crtc", H46505, 12000000/16, mc6845_intf)   /* 52.786 Hz (similar to Major Poker) */
 
 	MCFG_GFXDECODE(chance32)
 	MCFG_PALETTE_LENGTH(0x800)

@@ -155,7 +155,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	msm5205_playmode_w(state->m_adpcm1, (data >> 2) & 7);
 	if (state->m_adpcm2 != NULL)
-		msm5205_playmode_w(state->m_adpcm2, ((data >> 2) & 4) | 3);	/* always in slave mode */
+		msm5205_playmode_w(state->m_adpcm2, ((data >> 2) & 4) | 3); /* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
 	msm5205_reset_w(state->m_adpcm1, data & 1);
@@ -268,14 +268,14 @@ static const ay8910_interface irem_ay8910_interface_2 =
 
 static const msm5205_interface irem_msm5205_interface_1 =
 {
-	adpcm_int,			/* interrupt function */
-	MSM5205_S96_4B		/* default to 4KHz, but can be changed at run time */
+	adpcm_int,          /* interrupt function */
+	MSM5205_S96_4B      /* default to 4KHz, but can be changed at run time */
 };
 
 static const msm5205_interface irem_msm5205_interface_2 =
 {
-	0,				/* interrupt function */
-	MSM5205_SEX_4B		/* default to 4KHz, but can be changed at run time, slave */
+	0,              /* interrupt function */
+	MSM5205_SEX_4B      /* default to 4KHz, but can be changed at run time, slave */
 };
 
 /*
@@ -289,24 +289,24 @@ static const msm5205_interface irem_msm5205_interface_2 =
  * I did my test to verify against pcb pictures of "tropical angel"
  */
 
-#define M52_R9		560
-#define M52_R10		330
-#define M52_R12		RES_K(10)
-#define M52_R13		RES_K(10)
-#define M52_R14		RES_K(10)
-#define M52_R15		RES_K(2.2)	/* schematics RES_K(22) , althought 10-Yard states 2.2 */
-#define M52_R19		RES_K(10)
-#define M52_R22		RES_K(47)
-#define M52_R23		RES_K(2.2)
-#define M52_R25		RES_K(10)
-#define M52_VR1		RES_K(50)
+#define M52_R9      560
+#define M52_R10     330
+#define M52_R12     RES_K(10)
+#define M52_R13     RES_K(10)
+#define M52_R14     RES_K(10)
+#define M52_R15     RES_K(2.2)  /* schematics RES_K(22) , althought 10-Yard states 2.2 */
+#define M52_R19     RES_K(10)
+#define M52_R22     RES_K(47)
+#define M52_R23     RES_K(2.2)
+#define M52_R25     RES_K(10)
+#define M52_VR1     RES_K(50)
 
-#define M52_C28		CAP_U(1)
-#define M52_C30		CAP_U(0.022)
-#define M52_C32		CAP_U(0.022)
-#define M52_C35		CAP_U(47)
-#define M52_C37		CAP_U(0.1)
-#define M52_C38		CAP_U(0.0068)
+#define M52_C28     CAP_U(1)
+#define M52_C30     CAP_U(0.022)
+#define M52_C32     CAP_U(0.022)
+#define M52_C35     CAP_U(47)
+#define M52_C37     CAP_U(0.1)
+#define M52_C38     CAP_U(0.0068)
 
 /*
  * C35 is disabled, the mixer would just deliver
@@ -318,26 +318,26 @@ static const msm5205_interface irem_msm5205_interface_2 =
 static const discrete_mixer_desc m52_sound_c_stage1 =
 	{DISC_MIXER_IS_RESISTOR,
 		{M52_R19, M52_R22, M52_R23 },
-		{      0,       0,		 0 },	/* variable resistors   */
-		{M52_C37,		0,		 0 },	/* node capacitors      */
-		       0,		0,				/* rI, rF               */
-		M52_C35*0,						/* cF                   */
-		0,								/* cAmp                 */
+		{      0,       0,       0 },   /* variable resistors   */
+		{M52_C37,       0,       0 },   /* node capacitors      */
+				0,      0,              /* rI, rF               */
+		M52_C35*0,                      /* cF                   */
+		0,                              /* cAmp                 */
 		0, 1};
 
 static const discrete_op_amp_filt_info m52_sound_c_sallen_key =
 	{ M52_R13, M52_R14, 0, 0, 0,
-	  M52_C32, M52_C38, 0
+		M52_C32, M52_C38, 0
 	};
 
 static const discrete_mixer_desc m52_sound_c_mix1 =
 	{DISC_MIXER_IS_RESISTOR,
 		{M52_R25, M52_R15 },
-		{      0,       0 },	/* variable resistors   */
+		{      0,       0 },    /* variable resistors   */
 		{      0,       0 },    /* node capacitors      */
-		       0, M52_VR1,		/* rI, rF               */
-		0,						/* cF                   */
-		CAP_U(1),				/* cAmp                 */
+				0, M52_VR1,     /* rI, rF               */
+		0,                      /* cF                   */
+		CAP_U(1),               /* cAmp                 */
 		0, 1};
 
 static DISCRETE_SOUND_START( m52_sound_c )
@@ -470,7 +470,7 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( m52_large_audio, irem_audio_base )	/* 10 yard fight */
+MACHINE_CONFIG_DERIVED( m52_large_audio, irem_audio_base )  /* 10 yard fight */
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iremsound")
@@ -489,7 +489,7 @@ const device_type IREM_AUDIO = &device_creator<irem_audio_device>;
 
 irem_audio_device::irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IREM_AUDIO, "Irem Audio", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(irem_audio_state);
 }
@@ -522,5 +522,3 @@ void irem_audio_device::sound_stream_update(sound_stream &stream, stream_sample_
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

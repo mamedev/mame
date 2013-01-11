@@ -32,10 +32,10 @@ const ppu2c0x_interface vsnes_ppu_interface_1 =
 {
 	"maincpu",
 	"screen1",
-	0,					/* gfxlayout num */
-	0,					/* color base */
-	PPU_MIRROR_NONE,	/* mirroring */
-	ppu_irq_1			/* irq */
+	0,                  /* gfxlayout num */
+	0,                  /* color base */
+	PPU_MIRROR_NONE,    /* mirroring */
+	ppu_irq_1           /* irq */
 };
 
 /* our ppu interface for dual games                             */
@@ -43,10 +43,10 @@ const ppu2c0x_interface vsnes_ppu_interface_2 =
 {
 	"sub",
 	"screen2",
-	1,					/* gfxlayout num */
-	512,				/* color base */
-	PPU_MIRROR_NONE,	/* mirroring */
-	ppu_irq_2			/* irq */
+	1,                  /* gfxlayout num */
+	512,                /* color base */
+	PPU_MIRROR_NONE,    /* mirroring */
+	ppu_irq_2           /* irq */
 };
 
 VIDEO_START_MEMBER(vsnes_state,vsnes )

@@ -8,10 +8,10 @@ public:
 	peyper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-    UINT8 irq_state;
+	UINT8 irq_state;
 
-    UINT8 display_block;
-    UINT8 display[16];
+	UINT8 display_block;
+	UINT8 display[16];
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
@@ -26,30 +26,30 @@ public:
 
 READ8_MEMBER(peyper_state::sw_r)
 {
-    return 0xff;
+	return 0xff;
 }
 
 WRITE8_MEMBER(peyper_state::col_w)
 {
 
-    if (data==0x90) display_block = 0;
+	if (data==0x90) display_block = 0;
 }
 
 static const UINT8 hex_to_7seg[16] =
-    {0x3F, 0x06, 0x5B, 0x4F,
-     0x66, 0x6D, 0x7D, 0x07,
-     0x7F, 0x6F, 0x00, 0x00,
-     0x00, 0x00, 0x00, 0x00 };
+	{0x3F, 0x06, 0x5B, 0x4F,
+		0x66, 0x6D, 0x7D, 0x07,
+		0x7F, 0x6F, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00 };
 
 /* seems to only work correctly for 'solarwap', 'poleposn' and 'sonstwar' (look at how high-scores are displayed for example) - or shall layout be changed ? */
 WRITE8_MEMBER(peyper_state::disp_w)
 {
-    display[display_block] = data;
+	display[display_block] = data;
 
-    UINT8 a = data & 0x0f;
-    UINT8 b = data >> 4;
-    UINT8 hex_a = hex_to_7seg[a];
-    UINT8 hex_b = hex_to_7seg[b];
+	UINT8 a = data & 0x0f;
+	UINT8 b = data >> 4;
+	UINT8 hex_a = hex_to_7seg[a];
+	UINT8 hex_b = hex_to_7seg[b];
 /*
 0 -> XA0 DPL25,DPL27
 1 -> XA1 DPL26,DPL28
@@ -60,39 +60,39 @@ WRITE8_MEMBER(peyper_state::disp_w)
 6 -> DPL19,DPL1
 7 -> DPL30,DPL33
 */
-    switch(display_block) {
-        case 0 :
-                output_set_indexed_value("dpl_",25,hex_a);
-                output_set_indexed_value("dpl_",27,hex_b);
-                break;
-        case 1 :
-                output_set_indexed_value("dpl_",26,hex_a);
-                output_set_indexed_value("dpl_",28,hex_b);
-                break;
-        case 2 :
-                output_set_indexed_value("dpl_",23,hex_a);
-                output_set_indexed_value("dpl_",5,hex_b);
-                break;
-        case 3 :
-                output_set_indexed_value("dpl_",22,hex_a);
-                output_set_indexed_value("dpl_",4,hex_b);
-                break;
-        case 4 :
-                output_set_indexed_value("dpl_",21,hex_a);
-                output_set_indexed_value("dpl_",3,hex_b);
-                break;
-        case 5 :
-                output_set_indexed_value("dpl_",20,hex_a);
-                output_set_indexed_value("dpl_",2,hex_b);
-                break;
-        case 6 :
-                output_set_indexed_value("dpl_",19,hex_a);
-                output_set_indexed_value("dpl_",1,hex_b);
-                break;
-        case 7 :
-                output_set_indexed_value("dpl_",30,hex_a);
-                output_set_indexed_value("dpl_",33,hex_b);
-                break;
+	switch(display_block) {
+		case 0 :
+				output_set_indexed_value("dpl_",25,hex_a);
+				output_set_indexed_value("dpl_",27,hex_b);
+				break;
+		case 1 :
+				output_set_indexed_value("dpl_",26,hex_a);
+				output_set_indexed_value("dpl_",28,hex_b);
+				break;
+		case 2 :
+				output_set_indexed_value("dpl_",23,hex_a);
+				output_set_indexed_value("dpl_",5,hex_b);
+				break;
+		case 3 :
+				output_set_indexed_value("dpl_",22,hex_a);
+				output_set_indexed_value("dpl_",4,hex_b);
+				break;
+		case 4 :
+				output_set_indexed_value("dpl_",21,hex_a);
+				output_set_indexed_value("dpl_",3,hex_b);
+				break;
+		case 5 :
+				output_set_indexed_value("dpl_",20,hex_a);
+				output_set_indexed_value("dpl_",2,hex_b);
+				break;
+		case 6 :
+				output_set_indexed_value("dpl_",19,hex_a);
+				output_set_indexed_value("dpl_",1,hex_b);
+				break;
+		case 7 :
+				output_set_indexed_value("dpl_",30,hex_a);
+				output_set_indexed_value("dpl_",33,hex_b);
+				break;
 /*
 8 ->  XB0
 9 ->  XB1
@@ -103,69 +103,69 @@ WRITE8_MEMBER(peyper_state::disp_w)
 14 -> DPL07,DPL13
 15 -> DPL31,DPL32
 */
-        case 8 :
-                /*
-                if (BIT(a,3)) logerror("TILT\n");
-                if (BIT(a,2)) logerror("ONC\n");
-                if (BIT(a,1)) logerror("GAME OVER\n");
-                if (BIT(a,0)) logerror("BALL IN PLAY\n");
-                */
-                output_set_indexed_value("led_",1,BIT(b,0)); // PLAYER 1
-                output_set_indexed_value("led_",2,BIT(b,1)); // PLAYER 2
-                output_set_indexed_value("led_",3,BIT(b,2)); // PLAYER 3
-                output_set_indexed_value("led_",4,BIT(b,3)); // PLAYER 4
-                break;
-        case 9 :
-                if (!BIT(b,0)) output_set_indexed_value("dpl_",6,hex_to_7seg[0]);
-                if (!BIT(b,1)) output_set_indexed_value("dpl_",12,hex_to_7seg[0]);
-                if (!BIT(b,2)) output_set_indexed_value("dpl_",24,hex_to_7seg[0]);
-                if (!BIT(b,3)) output_set_indexed_value("dpl_",18,hex_to_7seg[0]);
-                output_set_indexed_value("dpl_",29,hex_a);
-                break;
-        case 10 :
-                output_set_indexed_value("dpl_",11,hex_a);
-                output_set_indexed_value("dpl_",17,hex_b);
-                break;
-        case 11 :
-                output_set_indexed_value("dpl_",10,hex_a);
-                output_set_indexed_value("dpl_",16,hex_b);
-                break;
-        case 12 :
-                output_set_indexed_value("dpl_",9,hex_a);
-                output_set_indexed_value("dpl_",15,hex_b);
-                break;
-        case 13 :
-                output_set_indexed_value("dpl_",8,hex_a);
-                output_set_indexed_value("dpl_",14,hex_b);
-                break;
-        case 14 :
-                output_set_indexed_value("dpl_",7,hex_a);
-                output_set_indexed_value("dpl_",13,hex_b);
-                break;
-        case 15 :
-                output_set_indexed_value("dpl_",31,hex_a);
-                output_set_indexed_value("dpl_",32,hex_b);
-                break;
-    }
+		case 8 :
+				/*
+				if (BIT(a,3)) logerror("TILT\n");
+				if (BIT(a,2)) logerror("ONC\n");
+				if (BIT(a,1)) logerror("GAME OVER\n");
+				if (BIT(a,0)) logerror("BALL IN PLAY\n");
+				*/
+				output_set_indexed_value("led_",1,BIT(b,0)); // PLAYER 1
+				output_set_indexed_value("led_",2,BIT(b,1)); // PLAYER 2
+				output_set_indexed_value("led_",3,BIT(b,2)); // PLAYER 3
+				output_set_indexed_value("led_",4,BIT(b,3)); // PLAYER 4
+				break;
+		case 9 :
+				if (!BIT(b,0)) output_set_indexed_value("dpl_",6,hex_to_7seg[0]);
+				if (!BIT(b,1)) output_set_indexed_value("dpl_",12,hex_to_7seg[0]);
+				if (!BIT(b,2)) output_set_indexed_value("dpl_",24,hex_to_7seg[0]);
+				if (!BIT(b,3)) output_set_indexed_value("dpl_",18,hex_to_7seg[0]);
+				output_set_indexed_value("dpl_",29,hex_a);
+				break;
+		case 10 :
+				output_set_indexed_value("dpl_",11,hex_a);
+				output_set_indexed_value("dpl_",17,hex_b);
+				break;
+		case 11 :
+				output_set_indexed_value("dpl_",10,hex_a);
+				output_set_indexed_value("dpl_",16,hex_b);
+				break;
+		case 12 :
+				output_set_indexed_value("dpl_",9,hex_a);
+				output_set_indexed_value("dpl_",15,hex_b);
+				break;
+		case 13 :
+				output_set_indexed_value("dpl_",8,hex_a);
+				output_set_indexed_value("dpl_",14,hex_b);
+				break;
+		case 14 :
+				output_set_indexed_value("dpl_",7,hex_a);
+				output_set_indexed_value("dpl_",13,hex_b);
+				break;
+		case 15 :
+				output_set_indexed_value("dpl_",31,hex_a);
+				output_set_indexed_value("dpl_",32,hex_b);
+				break;
+	}
 
-    display_block++;
-    display_block&=0x0f;
+	display_block++;
+	display_block&=0x0f;
 }
 
 WRITE8_MEMBER(peyper_state::lamp_w)
 {
-    //logerror("lamp_w %02x\n",data);
-    //logerror("[%d]= %02x\n",4+offset/4,data);
+	//logerror("lamp_w %02x\n",data);
+	//logerror("[%d]= %02x\n",4+offset/4,data);
 }
 
 WRITE8_MEMBER(peyper_state::lamp7_w)
 {
-    //logerror("[7]= %02x\n",data);
+	//logerror("[7]= %02x\n",data);
 }
 
 WRITE8_MEMBER(peyper_state::sol_w)
 {
-    //logerror("sol_w %02x\n",data);
+	//logerror("sol_w %02x\n",data);
 }
 
 
@@ -529,7 +529,7 @@ INPUT_PORTS_END
 
 void peyper_state::machine_reset()
 {
-    irq_state = 0;
+	irq_state = 0;
 }
 
 static MACHINE_CONFIG_START( peyper, peyper_state )
@@ -540,8 +540,8 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250 * 2)
 
 
-    /* video hardware */
-    MCFG_DEFAULT_LAYOUT(layout_peyper)
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_peyper)
 MACHINE_CONFIG_END
 
 
@@ -652,7 +652,7 @@ ROM_START(wolfman)
 ROM_END
 
 
-GAME( 1985, odin,	  0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",        		  GAME_IS_SKELETON_MECHANICAL)
+GAME( 1985, odin,     0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin",                  GAME_IS_SKELETON_MECHANICAL)
 GAME( 1985, odin_dlx, 0, peyper,   odin_dlx, peyper_state, peyper,   ROT0, "Sonic",  "Odin De Luxe",          GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, solarwap, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Solar Wars (Sonic)",    GAME_IS_SKELETON_MECHANICAL)
 GAME( 1986, gamatros, 0, peyper,   solarwap, peyper_state, peyper,   ROT0, "Sonic",  "Gamatron (Sonic)",    GAME_IS_SKELETON_MECHANICAL)

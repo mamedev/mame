@@ -88,7 +88,7 @@ There's a separate sound board also, but it wasn't available so is not documente
 #include "includes/midxunit.h"
 
 
-#define PIXEL_CLOCK		(8000000)
+#define PIXEL_CLOCK     (8000000)
 
 
 
@@ -239,15 +239,15 @@ INPUT_PORTS_END
 
 static const tms34010_config tms_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	PIXEL_CLOCK,					/* pixel clock */
-	1,								/* pixels per clock */
-	midxunit_scanline_update,		/* scanline updater (indexed16) */
-	NULL,							/* scanline updater (rgb32) */
-	NULL,							/* generate interrupt */
-	midtunit_to_shiftreg,			/* write to shiftreg function */
-	midtunit_from_shiftreg			/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	PIXEL_CLOCK,                    /* pixel clock */
+	1,                              /* pixels per clock */
+	midxunit_scanline_update,       /* scanline updater (indexed16) */
+	NULL,                           /* scanline updater (rgb32) */
+	NULL,                           /* generate interrupt */
+	midtunit_to_shiftreg,           /* write to shiftreg function */
+	midtunit_from_shiftreg          /* read from shiftreg function */
 };
 
 
@@ -289,7 +289,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( revx )
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "revx_snd.2", 0x000000, 0x80000, CRC(4ed9e803) SHA1(ba50f1beb9f2a2cf5110897209b5e9a2951ff165) )
 	ROM_LOAD16_BYTE( "revx_snd.3", 0x200000, 0x80000, CRC(af8f253b) SHA1(25a0000cab177378070f7a6e3c7378fe87fad63e) )
 	ROM_LOAD16_BYTE( "revx_snd.4", 0x400000, 0x80000, CRC(3ccce59c) SHA1(e81a31d64c64e7b1d25f178c53da3d68453c203c) )
@@ -299,7 +299,7 @@ ROM_START( revx )
 	ROM_LOAD16_BYTE( "revx_snd.8", 0xc00000, 0x80000, CRC(793a7eb5) SHA1(4b1f81b68f95cedf1b356ef362d1eb37acc74b16) )
 	ROM_LOAD16_BYTE( "revx_snd.9", 0xe00000, 0x80000, CRC(14ddbea1) SHA1(8dba9dc5529ea77c4312ea61f825bf9062ffc6c3) )
 
-	ROM_REGION16_LE( 0x200000, "maincpu", 0 )	/* 34020 code */
+	ROM_REGION16_LE( 0x200000, "maincpu", 0 )   /* 34020 code */
 	ROM_LOAD32_BYTE( "revx.51",  0x00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) )
 	ROM_LOAD32_BYTE( "revx.52",  0x00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
 	ROM_LOAD32_BYTE( "revx.53",  0x00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )

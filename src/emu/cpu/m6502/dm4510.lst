@@ -1,18 +1,18 @@
 # m4510 - 65ce02 with a mmu
-brk_ce_imp	ora_ce_idx	cle_imp		see_imp		tsb_ce_zpg	ora_ce_zpg	asl_ce_zpg	rmb_ce_bzp	php_ce_imp	ora_imm		asl_ce_acc	tsy_imp		tsb_ce_aba	ora_aba		asl_ce_aba	bbr_ce_zpb
-bpl_ce_rel	ora_ce_idy	ora_idz		bpl_rw2		trb_ce_zpg	ora_ce_zpx	asl_ce_zpx	rmb_ce_bzp	clc_ce_imp	ora_ce_aby	inc_ce_acc	inz_imp		trb_ce_aba	ora_ce_abx	asl_ce_abx	bbr_ce_zpb
-jsr_ce_adr	and_ce_idx	jsr_ind		jsr_iax		bit_ce_zpg	and_ce_zpg	rol_ce_zpg	rmb_ce_bzp	plp_ce_imp	and_imm		rol_ce_acc	tys_imp		bit_aba		and_aba		rol_ce_aba	bbr_ce_zpb
-bmi_ce_rel	and_ce_idy	and_idz		bmi_rw2		bit_ce_zpx	and_ce_zpx	rol_ce_zpx	rmb_ce_bzp	sec_ce_imp	and_ce_aby	dec_ce_acc	dez_imp		bit_ce_abx	and_ce_abx	rol_ce_abx	bbr_ce_zpb
-rti_ce_imp	eor_ce_idx	neg_acc		asr_acc		asr_zpg		eor_ce_zpg	lsr_ce_zpg	rmb_ce_bzp	pha_ce_imp	eor_imm		lsr_ce_acc	taz_imp		jmp_adr		eor_aba		lsr_ce_aba	bbr_ce_zpb
-bvc_ce_rel	eor_ce_idy	eor_idz		bvc_rw2		asr_zpx		eor_ce_zpx	lsr_ce_zpx	rmb_ce_bzp	cli_ce_imp	eor_ce_aby	phy_ce_imp	tab_imp		map_imp		eor_ce_abx	lsr_ce_abx	bbr_ce_zpb
-rts_ce_imp	adc_ce_idx	rtn_imm		bsr_rw2		stz_ce_zpg	adc_ce_zpg	ror_ce_zpg	rmb_ce_bzp	pla_ce_imp	adc_ce_imm	ror_ce_acc	tza_imp		jmp_ce_ind	adc_ce_aba	ror_ce_aba	bbr_ce_zpb
-bvs_ce_rel	adc_ce_idy	adc_idz		bvs_rw2		stz_ce_zpx	adc_ce_zpx	ror_ce_zpx	rmb_ce_bzp	sei_ce_imp	adc_ce_aby	ply_ce_imp	tba_imp		jmp_ce_iax	adc_ce_abx	ror_ce_abx	bbr_ce_zpb
-bra_ce_rel	sta_ce_idx	sta_isy		bra_rw2		sty_ce_zpg	sta_ce_zpg	stx_ce_zpg	smb_ce_bzp	dey_ce_imp	bit_ce_imm	txa_ce_imp	sty_abx		sty_aba		sta_aba		stx_aba		bbs_ce_zpb
-bcc_ce_rel	sta_ce_idy	sta_idz		bcc_rw2		sty_ce_zpx	sta_ce_zpx	stx_ce_zpy	smb_ce_bzp	tya_ce_imp	sta_ce_aby	txs_ce_imp	stx_aby		stz_ce_aba	sta_ce_abx	stz_ce_abx	bbs_ce_zpb
-ldy_imm		lda_ce_idx	ldx_imm		ldz_imm		ldy_ce_zpg	lda_ce_zpg	ldx_ce_zpg	smb_ce_bzp	tay_ce_imp	lda_imm		tax_ce_imp	ldz_aba		ldy_aba		lda_aba		ldx_aba		bbs_ce_zpb
-bcs_ce_rel	lda_ce_idy	lda_idz		bcs_rw2		ldy_ce_zpx	lda_ce_zpx	ldx_ce_zpy	smb_ce_bzp	clv_ce_imp	lda_ce_aby	tsx_ce_imp	ldz_abx		ldy_ce_abx	lda_ce_abx	ldx_ce_aby	bbs_ce_zpb
-cpy_imm		cmp_ce_idx	cpz_imm		dew_zpg		cpy_ce_zpg	cmp_ce_zpg	dec_ce_zpg	smb_ce_bzp	iny_ce_imp	cmp_imm		dex_ce_imp	asw_aba		cpy_aba		cmp_aba		dec_ce_aba	bbs_ce_zpb
-bne_ce_rel	cmp_ce_idy	cmp_idz		bne_rw2		cpz_zpg		cmp_ce_zpx	dec_ce_zpx	smb_ce_bzp	cld_ce_imp	cmp_ce_aby	phx_ce_imp	phz_imp		cpz_aba		cmp_ce_abx	dec_ce_abx	bbs_ce_zpb
-cpx_imm		sbc_ce_idx	lda_isy		inw_zpg		cpx_ce_zpg	sbc_ce_zpg	inc_ce_zpg	smb_ce_bzp	inx_ce_imp	sbc_ce_imm	eom_imp		row_aba		cpx_aba		sbc_ce_aba	inc_ce_aba	bbs_ce_zpb
-beq_ce_rel	sbc_ce_idy	sbc_idz		beq_rw2		phw_iw2		sbc_ce_zpx	inc_ce_zpx	smb_ce_bzp	sed_ce_imp	sbc_ce_aby	plx_ce_imp	plz_imp		phw_aba		sbc_ce_abx	inc_ce_abx	bbs_ce_zpb
+brk_ce_imp  ora_ce_idx  cle_imp     see_imp     tsb_ce_zpg  ora_ce_zpg  asl_ce_zpg  rmb_ce_bzp  php_ce_imp  ora_imm     asl_ce_acc  tsy_imp     tsb_ce_aba  ora_aba     asl_ce_aba  bbr_ce_zpb
+bpl_ce_rel  ora_ce_idy  ora_idz     bpl_rw2     trb_ce_zpg  ora_ce_zpx  asl_ce_zpx  rmb_ce_bzp  clc_ce_imp  ora_ce_aby  inc_ce_acc  inz_imp     trb_ce_aba  ora_ce_abx  asl_ce_abx  bbr_ce_zpb
+jsr_ce_adr  and_ce_idx  jsr_ind     jsr_iax     bit_ce_zpg  and_ce_zpg  rol_ce_zpg  rmb_ce_bzp  plp_ce_imp  and_imm     rol_ce_acc  tys_imp     bit_aba     and_aba     rol_ce_aba  bbr_ce_zpb
+bmi_ce_rel  and_ce_idy  and_idz     bmi_rw2     bit_ce_zpx  and_ce_zpx  rol_ce_zpx  rmb_ce_bzp  sec_ce_imp  and_ce_aby  dec_ce_acc  dez_imp     bit_ce_abx  and_ce_abx  rol_ce_abx  bbr_ce_zpb
+rti_ce_imp  eor_ce_idx  neg_acc     asr_acc     asr_zpg     eor_ce_zpg  lsr_ce_zpg  rmb_ce_bzp  pha_ce_imp  eor_imm     lsr_ce_acc  taz_imp     jmp_adr     eor_aba     lsr_ce_aba  bbr_ce_zpb
+bvc_ce_rel  eor_ce_idy  eor_idz     bvc_rw2     asr_zpx     eor_ce_zpx  lsr_ce_zpx  rmb_ce_bzp  cli_ce_imp  eor_ce_aby  phy_ce_imp  tab_imp     map_imp     eor_ce_abx  lsr_ce_abx  bbr_ce_zpb
+rts_ce_imp  adc_ce_idx  rtn_imm     bsr_rw2     stz_ce_zpg  adc_ce_zpg  ror_ce_zpg  rmb_ce_bzp  pla_ce_imp  adc_ce_imm  ror_ce_acc  tza_imp     jmp_ce_ind  adc_ce_aba  ror_ce_aba  bbr_ce_zpb
+bvs_ce_rel  adc_ce_idy  adc_idz     bvs_rw2     stz_ce_zpx  adc_ce_zpx  ror_ce_zpx  rmb_ce_bzp  sei_ce_imp  adc_ce_aby  ply_ce_imp  tba_imp     jmp_ce_iax  adc_ce_abx  ror_ce_abx  bbr_ce_zpb
+bra_ce_rel  sta_ce_idx  sta_isy     bra_rw2     sty_ce_zpg  sta_ce_zpg  stx_ce_zpg  smb_ce_bzp  dey_ce_imp  bit_ce_imm  txa_ce_imp  sty_abx     sty_aba     sta_aba     stx_aba     bbs_ce_zpb
+bcc_ce_rel  sta_ce_idy  sta_idz     bcc_rw2     sty_ce_zpx  sta_ce_zpx  stx_ce_zpy  smb_ce_bzp  tya_ce_imp  sta_ce_aby  txs_ce_imp  stx_aby     stz_ce_aba  sta_ce_abx  stz_ce_abx  bbs_ce_zpb
+ldy_imm     lda_ce_idx  ldx_imm     ldz_imm     ldy_ce_zpg  lda_ce_zpg  ldx_ce_zpg  smb_ce_bzp  tay_ce_imp  lda_imm     tax_ce_imp  ldz_aba     ldy_aba     lda_aba     ldx_aba     bbs_ce_zpb
+bcs_ce_rel  lda_ce_idy  lda_idz     bcs_rw2     ldy_ce_zpx  lda_ce_zpx  ldx_ce_zpy  smb_ce_bzp  clv_ce_imp  lda_ce_aby  tsx_ce_imp  ldz_abx     ldy_ce_abx  lda_ce_abx  ldx_ce_aby  bbs_ce_zpb
+cpy_imm     cmp_ce_idx  cpz_imm     dew_zpg     cpy_ce_zpg  cmp_ce_zpg  dec_ce_zpg  smb_ce_bzp  iny_ce_imp  cmp_imm     dex_ce_imp  asw_aba     cpy_aba     cmp_aba     dec_ce_aba  bbs_ce_zpb
+bne_ce_rel  cmp_ce_idy  cmp_idz     bne_rw2     cpz_zpg     cmp_ce_zpx  dec_ce_zpx  smb_ce_bzp  cld_ce_imp  cmp_ce_aby  phx_ce_imp  phz_imp     cpz_aba     cmp_ce_abx  dec_ce_abx  bbs_ce_zpb
+cpx_imm     sbc_ce_idx  lda_isy     inw_zpg     cpx_ce_zpg  sbc_ce_zpg  inc_ce_zpg  smb_ce_bzp  inx_ce_imp  sbc_ce_imm  eom_imp     row_aba     cpx_aba     sbc_ce_aba  inc_ce_aba  bbs_ce_zpb
+beq_ce_rel  sbc_ce_idy  sbc_idz     beq_rw2     phw_iw2     sbc_ce_zpx  inc_ce_zpx  smb_ce_bzp  sed_ce_imp  sbc_ce_aby  plx_ce_imp  plz_imp     phw_aba     sbc_ce_abx  inc_ce_abx  bbs_ce_zpb
 reset

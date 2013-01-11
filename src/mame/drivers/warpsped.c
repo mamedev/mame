@@ -95,10 +95,10 @@ public:
 		m_workram(*this, "workram"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
-	tilemap_t	*m_text_tilemap;
-	tilemap_t	*m_starfield_tilemap;
+	tilemap_t   *m_text_tilemap;
+	tilemap_t   *m_starfield_tilemap;
 	required_shared_ptr<UINT8> m_workram;
-	UINT8		m_regs[0x28];
+	UINT8       m_regs[0x28];
 	DECLARE_WRITE8_MEMBER(warpspeed_hardware_w);
 	DECLARE_WRITE8_MEMBER(warpspeed_vidram_w);
 	DECLARE_DRIVER_INIT(warpspeed);

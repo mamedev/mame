@@ -37,7 +37,7 @@ struct rtc_regs_t
 
 // ======================> s3520cf_device
 
-class s3520cf_device :	public device_t
+class s3520cf_device :  public device_t
 {
 public:
 	// construction/destruction

@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(flower_maincpu_irq_ack)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(flower_subcpu_irq_ack)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(flower_coin_counter_w)
-	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	// subcpu nmi (unused)
+	AM_RANGE(0xa005, 0xa005) AM_WRITENOP    // subcpu nmi (unused)
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN0CPU1")
 	AM_RANGE(0xa101, 0xa101) AM_READ_PORT("IN1CPU1")
 	AM_RANGE(0xa102, 0xa102) AM_READ_PORT("IN0CPU0")
@@ -152,24 +152,24 @@ static INPUT_PORTS_START( flower )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, flower_state,coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_DIPNAME( 0x08, 0x08, "Energy Decrease" )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Energy Decrease" )       PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPNAME( 0x10, 0x10, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Keep Weapons When Destroyed" ) PORT_DIPLOCATION("SW2:6")	// check code at 0x74a2
+	PORT_DIPNAME( 0x20, 0x20, "Keep Weapons When Destroyed" ) PORT_DIPLOCATION("SW2:6") // check code at 0x74a2
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:7")		// "Enemy Bullets"
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:7")       // "Enemy Bullets"
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, "Shot Range" )			PORT_DIPLOCATION("SW2:8")		// check code at 0x75f9
+	PORT_DIPNAME( 0x80, 0x80, "Shot Range" )            PORT_DIPLOCATION("SW2:8")       // check code at 0x75f9
 	PORT_DIPSETTING(    0x80, "Short" )
 	PORT_DIPSETTING(    0x00, "Long" )
 
 	PORT_START("IN1CPU0")
-	PORT_DIPNAME( 0x07, 0x05, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x05, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, "1" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "3" )
@@ -178,18 +178,18 @@ static INPUT_PORTS_START( flower )
 	PORT_DIPSETTING(    0x02, "6" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")		// check code at 0x759f
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")       // check code at 0x759f
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "30k, then every 50k" )
 	PORT_DIPSETTING(    0x00, "50k, then every 80k" )
 
@@ -254,11 +254,11 @@ static MACHINE_CONFIG_START( flower, flower_state )
 
 	MCFG_CPU_ADD("subcpu", Z80,XTAL_18_432MHz/4)
 	MCFG_CPU_PROGRAM_MAP(flower_cpu1_2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold,  120)	// controls game speed? irqsource and frequency unknown
+	MCFG_CPU_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold,  120)    // controls game speed? irqsource and frequency unknown
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_18_432MHz/4)
 	MCFG_CPU_PROGRAM_MAP(flower_sound_cpu)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold,  90)	// controls music speed. irqsource and frequency unknown, same as subcpu perhaps?
+	MCFG_CPU_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold,  90) // controls music speed. irqsource and frequency unknown, same as subcpu perhaps?
 
 	// tight sync, slowdowns otherwise
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( flower, flower_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)		// ?
+	MCFG_SCREEN_REFRESH_RATE(60)        // ?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(34*8, 33*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
@@ -311,10 +311,10 @@ ROM_START( flower ) /* Komax version */
 	ROM_LOAD( "15.9e",  0x6000, 0x2000, CRC(1cad9f72) SHA1(c38dbea266246ed4d47d12bdd8f9fae22a5f8bb8) )
 
 	ROM_REGION( 0x8000, "sound1", 0 )
-	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )	/* 8-bit samples */
+	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
 	ROM_REGION( 0x4000, "sound2", 0 )
-	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )	/* volume tables? */
+	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
 	ROM_LOAD( "82s129.k1",  0x0200, 0x0100, CRC(d311ed0d) SHA1(1d530c874aecf93133d610ab3ce668548712913a) ) // r
@@ -354,10 +354,10 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_LOAD( "7.9e",   0x6000, 0x2000, CRC(e350f36c) SHA1(f97204dc95b4000c268afc053a2333c1629e07d8) )
 
 	ROM_REGION( 0x8000, "sound1", 0 )
-	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )	/* 8-bit samples */
+	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
 	ROM_REGION( 0x4000, "sound2", 0 )
-	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )	/* volume tables? */
+	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
 	ROM_LOAD( "82s129.k1",  0x0200, 0x0100, CRC(d311ed0d) SHA1(1d530c874aecf93133d610ab3ce668548712913a) ) // r

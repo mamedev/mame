@@ -15,11 +15,11 @@
 
 
 /* debugging parameters */
-#define LOG_PUT_SAMPLES			0
-#define DUMP_CASSETTES			0
+#define LOG_PUT_SAMPLES         0
+#define DUMP_CASSETTES          0
 
-#define SAMPLES_PER_BLOCK		0x40000
-#define CASSETTE_FLAG_DIRTY		0x10000
+#define SAMPLES_PER_BLOCK       0x40000
+#define CASSETTE_FLAG_DIRTY     0x10000
 
 
 CASSETTE_FORMATLIST_START(cassette_default_formats)
@@ -535,8 +535,8 @@ casserr_t cassette_put_samples(cassette_image *cassette, int channel,
 	if (LOG_PUT_SAMPLES)
 	{
 		LOG_FORMATS("cassette_put_samples(): Putting samples TIME=[%2.6g..%2.6g] INDEX=[%i..%i]\n",
-			time_index,				time_index + sample_period,
-			(int)ranges.sample_first,	(int)ranges.sample_last);
+			time_index,             time_index + sample_period,
+			(int)ranges.sample_first,   (int)ranges.sample_last);
 	}
 
 	for (sample_index = ranges.sample_first; sample_index <= ranges.sample_last; sample_index++)
@@ -588,7 +588,7 @@ casserr_t cassette_get_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, INT32 *sample)
 {
 	return cassette_get_samples(cassette, channel, time_index,
-		 sample_period, 1, 0, sample, CASSETTE_WAVEFORM_32BIT);
+			sample_period, 1, 0, sample, CASSETTE_WAVEFORM_32BIT);
 }
 
 
@@ -597,7 +597,7 @@ casserr_t cassette_put_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, INT32 sample)
 {
 	return cassette_put_samples(cassette, channel, time_index,
-		 sample_period, 1, 0, &sample, CASSETTE_WAVEFORM_32BIT);
+			sample_period, 1, 0, &sample, CASSETTE_WAVEFORM_32BIT);
 }
 
 
@@ -1056,5 +1056,3 @@ void cassette_dump(cassette_image *image, const char *filename)
 
 	fclose(f);
 }
-
-

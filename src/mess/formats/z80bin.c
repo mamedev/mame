@@ -35,12 +35,12 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 				return IMAGE_INIT_FAIL;
 			}
 
-			pgmname[i] = ch;	/* build program name */
+			pgmname[i] = ch;    /* build program name */
 			i++;
 		}
 	}
 
-	pgmname[i] = '\0';	/* terminate string with a null */
+	pgmname[i] = '\0';  /* terminate string with a null */
 
 	if (image->fread(args, sizeof(args)) != sizeof(args))
 	{
@@ -51,7 +51,7 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 
 	exec_addr[0] = LITTLE_ENDIANIZE_INT16(args[0]);
 	start_addr[0] = LITTLE_ENDIANIZE_INT16(args[1]);
-	end_addr[0]	= LITTLE_ENDIANIZE_INT16(args[2]);
+	end_addr[0] = LITTLE_ENDIANIZE_INT16(args[2]);
 
 	size = (end_addr[0] - start_addr[0] + 1) & 0xffff;
 
@@ -124,11 +124,11 @@ QUICKLOAD_LOAD( mbee_z80bin )
 		device_t *cpu = image.device().machine().device("maincpu");
 		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		space.write_word(0xa6, execute_address);			/* fix the EXEC command */
+		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
 
 		if (autorun)
 		{
-			space.write_word(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
+			space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
 			cpu->state().set_pc(execute_address);
 		}
 		else
@@ -161,24 +161,24 @@ QUICKLOAD_LOAD( sorcerer )
 		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
-			return IMAGE_INIT_FAIL;		/* can't run a program if the cartridge isn't in */
+			return IMAGE_INIT_FAIL;     /* can't run a program if the cartridge isn't in */
 
 		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
-        1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
-        2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
-        Important addresses:
-            01D5 = start (load) address of a conventional basic program
-            C858 = an autorun basic program will have this exec address on the tape
-            C3DD = part of basic that displays READY and lets user enter input */
+		1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
+		2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
+		Important addresses:
+		    01D5 = start (load) address of a conventional basic program
+		    C858 = an autorun basic program will have this exec address on the tape
+		    C3DD = part of basic that displays READY and lets user enter input */
 
 		if ((start_address == 0x1d5) || (execute_address == 0xc858))
 		{
 			UINT8 i;
 			static const UINT8 data[]={
-				0xcd, 0x26, 0xc4,	// CALL C426    ;set up other pointers
-				0x21, 0xd4, 1,		// LD HL,01D4   ;start of program address (used by C689)
-				0x36, 0,		// LD (HL),00   ;make sure dummy end-of-line is there
-				0xc3, 0x89, 0xc6	// JP C689  ;run program
+				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
+				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
+				0x36, 0,        // LD (HL),00   ;make sure dummy end-of-line is there
+				0xc3, 0x89, 0xc6    // JP C689  ;run program
 			};
 
 			for (i = 0; i < ARRAY_LENGTH(data); i++)

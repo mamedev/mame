@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( magmax_map, AS_PROGRAM, 16, magmax_state )
 	AM_RANGE(0x030012, 0x030013) AM_WRITEONLY AM_SHARE("scroll_x")
 	AM_RANGE(0x030014, 0x030015) AM_WRITEONLY AM_SHARE("scroll_y")
 	AM_RANGE(0x03001c, 0x03001d) AM_WRITE(magmax_sound_w)
-	AM_RANGE(0x03001e, 0x03001f) AM_WRITENOP	/* IRQ ack */
+	AM_RANGE(0x03001e, 0x03001f) AM_WRITENOP    /* IRQ ack */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magmax_sound_map, AS_PROGRAM, 8, magmax_state )
@@ -302,9 +302,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8, 8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	4,	/* 4 bits per pixel */
+	8, 8,   /* 8*8 characters */
+	256,    /* 256 characters */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 4, 0, 12, 8, 20, 16, 28, 24 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
@@ -313,12 +313,12 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-	16, 16,	/* 16*16 characters */
-	512,	/* 512 characters */
-	4,	/* 4 bits per pixel */
+	16, 16, /* 16*16 characters */
+	512,    /* 512 characters */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 4, 0, 4+512*64*8, 0+512*64*8, 12, 8, 12+512*64*8, 8+512*64*8,
-	  20, 16, 20+512*64*8, 16+512*64*8, 28, 24, 28+512*64*8, 24+512*64*8 },
+		20, 16, 20+512*64*8, 16+512*64*8, 28, 24, 28+512*64*8, 24+512*64*8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
 	64*8
@@ -344,7 +344,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( magmax, magmax_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(magmax_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magmax_state,  irq1_line_hold)
 

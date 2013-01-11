@@ -25,7 +25,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define FD2000_TAG			"fd2000"
+#define FD2000_TAG          "fd2000"
 
 
 
@@ -36,7 +36,7 @@
 // ======================> fd2000_device
 
 class fd2000_device :  public device_t,
-					   public device_cbm_iec_interface
+						public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
@@ -85,8 +85,8 @@ protected:
 class fd4000_device :  public fd2000_device
 {
 public:
-    // construction/destruction
-    fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

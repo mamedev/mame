@@ -24,4 +24,3 @@ void lc89510_device::device_reset()
 {
 
 }
-

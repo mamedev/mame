@@ -127,10 +127,10 @@ void gomoku_state::video_start()
 		{
 			bgdata = GOMOKU_BG_D[ GOMOKU_BG_X[x] + (GOMOKU_BG_Y[y] << 4) ];
 
-			color = 0x20;						// outside frame (black)
+			color = 0x20;                       // outside frame (black)
 
-			if (bgdata & 0x01) color = 0x21;	// board (brown)
-			if (bgdata & 0x02) color = 0x20;	// frame line (while)
+			if (bgdata & 0x01) color = 0x21;    // board (brown)
+			if (bgdata & 0x02) color = 0x20;    // frame line (while)
 
 			m_bg_bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 		}
@@ -175,11 +175,11 @@ UINT32 gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &b
 				{
 					if (bgram & 0x01)
 					{
-						color = 0x2f;	// stone (black)
+						color = 0x2f;   // stone (black)
 					}
 					else if (bgram & 0x02)
 					{
-						color = 0x22;	// stone (white)
+						color = 0x22;   // stone (white)
 					}
 					else continue;
 				}
@@ -203,11 +203,11 @@ UINT32 gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &b
 				{
 					if (bgram & 0x04)
 					{
-							color = 0x2f;	// cursor (black)
+							color = 0x2f;   // cursor (black)
 					}
 					else if (bgram & 0x08)
 					{
-						color = 0x22;		// cursor (white)
+						color = 0x22;       // cursor (white)
 					}
 					else continue;
 				}

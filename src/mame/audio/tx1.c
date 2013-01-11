@@ -120,16 +120,16 @@ READ8_DEVICE_HANDLER( tx1_pit8253_r )
  *************************************/
 
 /* RC oscillator: 1785Hz */
-#define TX1_NOISE_CLOCK		(1/(1000.0e-12 * 560000.0))
-#define TX1_PIT_CLOCK		(TX1_PIXEL_CLOCK / 16)
-#define TX1_FRAC			30
+#define TX1_NOISE_CLOCK     (1/(1000.0e-12 * 560000.0))
+#define TX1_PIT_CLOCK       (TX1_PIXEL_CLOCK / 16)
+#define TX1_FRAC            30
 
-#define TX1_SHUNT			(250.0)
-#define TX1_R0				(180000.0 + TX1_SHUNT)
-#define TX1_R1				(56000.0  + TX1_SHUNT)
-#define TX1_R2				(22000.0  + TX1_SHUNT)
-#define TX1_R				(100000.0 + TX1_SHUNT)
-#define TX1_RI				(180000.0)
+#define TX1_SHUNT           (250.0)
+#define TX1_R0              (180000.0 + TX1_SHUNT)
+#define TX1_R1              (56000.0  + TX1_SHUNT)
+#define TX1_R2              (22000.0  + TX1_SHUNT)
+#define TX1_R               (100000.0 + TX1_SHUNT)
+#define TX1_RI              (180000.0)
 
 static const double tx1_engine_gains[16] =
 {
@@ -306,7 +306,7 @@ static DEVICE_START( tx1_sound )
 	state->m_freq_to_step = (double)(1 << TX1_FRAC) / (double)machine.sample_rate();
 
 	/* Compute the engine resistor weights */
-	compute_resistor_weights(0,	10000, -1.0,
+	compute_resistor_weights(0, 10000, -1.0,
 			4, &r0[0], state->m_weights0, 0, 0,
 			3, &r1[0], state->m_weights1, 0, 0,
 			3, &r2[0], state->m_weights2, 0, 0);
@@ -325,19 +325,19 @@ static DEVICE_RESET( tx1_sound )
  *
  *************************************/
 
-#define BUGGYBOY_PIT_CLOCK		(BUGGYBOY_ZCLK / 8)
-#define BUGGYBOY_NOISE_CLOCK	(BUGGYBOY_PIT_CLOCK / 4)
+#define BUGGYBOY_PIT_CLOCK      (BUGGYBOY_ZCLK / 8)
+#define BUGGYBOY_NOISE_CLOCK    (BUGGYBOY_PIT_CLOCK / 4)
 
-#define BUGGYBOY_R1		47000.0
-#define BUGGYBOY_R2		22000.0
-#define BUGGYBOY_R3		10000.0
-#define BUGGYBOY_R4		5600.0
-#define BUGGYBOY_SHUNT	250.0
+#define BUGGYBOY_R1     47000.0
+#define BUGGYBOY_R2     22000.0
+#define BUGGYBOY_R3     10000.0
+#define BUGGYBOY_R4     5600.0
+#define BUGGYBOY_SHUNT  250.0
 
-#define BUGGYBOY_R1S	(1.0/(1.0/BUGGYBOY_R1 + 1.0/BUGGYBOY_SHUNT))
-#define BUGGYBOY_R2S	(1.0/(1.0/BUGGYBOY_R2 + 1.0/BUGGYBOY_SHUNT))
-#define BUGGYBOY_R3S	(1.0/(1.0/BUGGYBOY_R3 + 1.0/BUGGYBOY_SHUNT))
-#define BUGGYBOY_R4S	(1.0/(1.0/BUGGYBOY_R4 + 1.0/BUGGYBOY_SHUNT))
+#define BUGGYBOY_R1S    (1.0/(1.0/BUGGYBOY_R1 + 1.0/BUGGYBOY_SHUNT))
+#define BUGGYBOY_R2S    (1.0/(1.0/BUGGYBOY_R2 + 1.0/BUGGYBOY_SHUNT))
+#define BUGGYBOY_R3S    (1.0/(1.0/BUGGYBOY_R3 + 1.0/BUGGYBOY_SHUNT))
+#define BUGGYBOY_R4S    (1.0/(1.0/BUGGYBOY_R4 + 1.0/BUGGYBOY_SHUNT))
 
 static const double bb_engine_gains[16] =
 {
@@ -432,10 +432,10 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 	}
 
 	/*
-        Until we support > 2 speakers, double the gain of the front speakers
+	    Until we support > 2 speakers, double the gain of the front speakers
 
-        TODO: We do support more than 2 speakers but the output is downmixed to stereo.
-    */
+	    TODO: We do support more than 2 speakers but the output is downmixed to stereo.
+	*/
 
 	/* Rear left speaker */
 	device_sound_interface *sound;
@@ -546,8 +546,8 @@ static DEVICE_START( buggyboy_sound )
 		0x0, 0x1, 0xe, 0xf, 0x8, 0x9, 0x6, 0x7, 0xc, 0xd, 0xe, 0xf, 0x4, 0x5, 0x6, 0x7
 	};
 
-	compute_resistor_weights(0,	16384,	-1.0,
-							4,	&resistors[0], aweights, 0,	0,
+	compute_resistor_weights(0, 16384,  -1.0,
+							4,  &resistors[0], aweights, 0, 0,
 							0, 0, 0, 0, 0,
 							0, 0, 0, 0, 0 );
 
@@ -622,14 +622,14 @@ const device_type TX1 = &device_creator<tx1_sound_device>;
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TX1, "TX-1 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tx1_sound_state);
 }
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tx1_sound_state);
 }
@@ -670,5 +670,3 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

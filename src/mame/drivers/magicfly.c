@@ -408,7 +408,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_10MHz
+#define MASTER_CLOCK    XTAL_10MHz
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -475,10 +475,10 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 	int bank = (attr & 0x10) >> 4;   /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;         /* bits 0-2 for color */
 
-    /* Seems that bit 7 is mirrored from bit 3 to have a normal boot */
-    /* Boot only check the first color RAM offset */
+	/* Seems that bit 7 is mirrored from bit 3 to have a normal boot */
+	/* Boot only check the first color RAM offset */
 
-	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x08) << 4);	/* only for 1st offset */
+	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x08) << 4);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
 
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
@@ -505,10 +505,10 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	int bank = (attr & 0x10) >> 4;    /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;          /* bits 0-2 for color */
 
-    /* Seems that bit 7 is mirrored from bit 2 to have a normal boot */
-    /* Boot only check the first color RAM offset */
+	/* Seems that bit 7 is mirrored from bit 2 to have a normal boot */
+	/* Boot only check the first color RAM offset */
 
-	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x04) << 5);	/* only for 1st offset */
+	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x04) << 5);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
 
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
@@ -582,13 +582,13 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
     x--- ----   Sound DAC.
 
 */
-	m_input_selector = data & 0x0f;	/* Input Selector */
+	m_input_selector = data & 0x0f; /* Input Selector */
 
-	machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);		/* Sound DAC */
+	machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);      /* Sound DAC */
 
-	coin_counter_w(machine(), 0, data & 0x40);	/* Coin1 */
-	coin_counter_w(machine(), 1, data & 0x10);	/* Coin2 */
-	coin_counter_w(machine(), 2, data & 0x20);	/* Payout */
+	coin_counter_w(machine(), 0, data & 0x40);  /* Coin1 */
+	coin_counter_w(machine(), 1, data & 0x10);  /* Coin2 */
+	coin_counter_w(machine(), 2, data & 0x20);  /* Payout */
 }
 
 
@@ -600,11 +600,11 @@ static ADDRESS_MAP_START( magicfly_map, AS_PROGRAM, 8, magicfly_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")    /* MK48Z02B NVRAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_SHARE("videoram")	/* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_SHARE("colorram")	/* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)	/* multiplexed input port */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_port_w)	/* output port */
-	AM_RANGE(0xc000, 0xffff) AM_ROM					/* ROM space */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_SHARE("videoram") /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_SHARE("colorram") /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)    /* multiplexed input port */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_port_w)   /* output port */
+	AM_RANGE(0xc000, 0xffff) AM_ROM                 /* ROM space */
 ADDRESS_MAP_END
 
 
@@ -619,28 +619,28 @@ static INPUT_PORTS_START( magicfly )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -664,7 +664,7 @@ static INPUT_PORTS_START( magicfly )
 	PORT_DIPNAME( 0x10, 0x10, "Maximum Bet" )
 	PORT_DIPSETTING(    0x10, "20" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	/* invalid - don't change */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  /* invalid - don't change */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
@@ -682,10 +682,10 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -695,17 +695,17 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Take") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* present in the input test */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* present in the input test */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -727,7 +727,7 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	/* invalid - don't change */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  /* invalid - don't change */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
@@ -782,16 +782,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -802,7 +802,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( magicfly, magicfly_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
 	MCFG_CPU_PROGRAM_MAP(magicfly_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicfly_state,  nmi_line_pulse)
 
@@ -812,8 +812,8 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06. */
+	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06. */
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 
 	MCFG_GFXDECODE(magicfly)
@@ -844,47 +844,47 @@ MACHINE_CONFIG_END
 
 ROM_START( magicfly )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "magicfly3_3.bin",	0xc000, 0x4000, CRC(c29798d5) SHA1(bf92ac93d650398569b3ab79d01344e74a6d35be) )
+	ROM_LOAD( "magicfly3_3.bin",    0xc000, 0x4000, CRC(c29798d5) SHA1(bf92ac93d650398569b3ab79d01344e74a6d35be) )
 
 	ROM_REGION( 0x6000, "gfx", 0 )
-	ROM_LOAD( "magicfly2.bin",	0x0000, 0x2000, CRC(3596a45b) SHA1(7ec32ec767d0883d05606beb588d8f27ba8f10a4) )
-	ROM_LOAD( "magicfly1.bin",	0x2000, 0x2000, CRC(724d330c) SHA1(cce3923ce48634b27f0e7d29979cd36e7394ab37) )
-	ROM_LOAD( "magicfly0.bin",	0x4000, 0x2000, CRC(44e3c9d6) SHA1(677d25360d261bf2400f399b8015eeb529ad405e) )
+	ROM_LOAD( "magicfly2.bin",  0x0000, 0x2000, CRC(3596a45b) SHA1(7ec32ec767d0883d05606beb588d8f27ba8f10a4) )
+	ROM_LOAD( "magicfly1.bin",  0x2000, 0x2000, CRC(724d330c) SHA1(cce3923ce48634b27f0e7d29979cd36e7394ab37) )
+	ROM_LOAD( "magicfly0.bin",  0x4000, 0x2000, CRC(44e3c9d6) SHA1(677d25360d261bf2400f399b8015eeb529ad405e) )
 
 	ROM_REGION( 0x0800, "gfxbnk0", 0 )
 //  ROM_FILL(           0x0000, 0x1000, 0 )         /* filling the R-G bitplanes */
-	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
+	ROM_COPY( "gfx",    0x1800, 0x0000, 0x0800 )    /* chars */
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )
-	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* sprites, bitplane 1 */
-	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* sprites, bitplane 2 */
-	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* sprites, bitplane 3 */
+	ROM_COPY( "gfx",    0x1000, 0x0000, 0x0800 )    /* sprites, bitplane 1 */
+	ROM_COPY( "gfx",    0x3800, 0x0800, 0x0800 )    /* sprites, bitplane 2 */
+	ROM_COPY( "gfx",    0x5800, 0x1000, 0x0800 )    /* sprites, bitplane 3 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "pal16r4a-magicfly.bin",	0x0000, 0x0104, NO_DUMP )	/* PAL is read protected */
+	ROM_LOAD( "pal16r4a-magicfly.bin",  0x0000, 0x0104, NO_DUMP )   /* PAL is read protected */
 
 ROM_END
 
 ROM_START( 7mezzo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ns3_1.bin",	0xc000, 0x4000, CRC(b1867b76) SHA1(eb76cffb81c865352f4767015edade54801f6155) )
+	ROM_LOAD( "ns3_1.bin",  0xc000, 0x4000, CRC(b1867b76) SHA1(eb76cffb81c865352f4767015edade54801f6155) )
 
 	ROM_REGION( 0x6000, "gfx", 0 )
-	ROM_LOAD( "ns2.bin",	0x0000, 0x2000, CRC(7983a41c) SHA1(68805ea960c2738d3cd2c7490ffed84f90da029b) )    /* Renamed as ns2.bin regarding pcb location and content */
-	ROM_LOAD( "ns1.bin",	0x2000, 0x2000, CRC(a6ada872) SHA1(7f531a76e73d479161e485bdcf816eb8eb9fdc62) )
-	ROM_LOAD( "ns0.bin",	0x4000, 0x2000, CRC(e04fb210) SHA1(81e764e296fe387daf8ca67064d5eba2a4fc3c26) )    /* Renamed as ns0.bin regarding pcb location and content */
+	ROM_LOAD( "ns2.bin",    0x0000, 0x2000, CRC(7983a41c) SHA1(68805ea960c2738d3cd2c7490ffed84f90da029b) )    /* Renamed as ns2.bin regarding pcb location and content */
+	ROM_LOAD( "ns1.bin",    0x2000, 0x2000, CRC(a6ada872) SHA1(7f531a76e73d479161e485bdcf816eb8eb9fdc62) )
+	ROM_LOAD( "ns0.bin",    0x4000, 0x2000, CRC(e04fb210) SHA1(81e764e296fe387daf8ca67064d5eba2a4fc3c26) )    /* Renamed as ns0.bin regarding pcb location and content */
 
 	ROM_REGION( 0x0800, "gfxbnk0", 0 )
 //  ROM_FILL(           0x0000, 0x1000, 0 )         /* filling the R-G bitplanes */
-	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
+	ROM_COPY( "gfx",    0x1800, 0x0000, 0x0800 )    /* chars */
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )
-	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* sprites, bitplane 1 */
-	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* sprites, bitplane 2 */
-	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* sprites, bitplane 3 */
+	ROM_COPY( "gfx",    0x1000, 0x0000, 0x0800 )    /* sprites, bitplane 1 */
+	ROM_COPY( "gfx",    0x3800, 0x0800, 0x0800 )    /* sprites, bitplane 2 */
+	ROM_COPY( "gfx",    0x5800, 0x1000, 0x0800 )    /* sprites, bitplane 3 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "pal16r4a-7mezzo.bin",	0x0000, 0x0104, BAD_DUMP CRC(61ac7372) SHA1(7560506468a7409075094787182ded24e2d0c0a3) )
+	ROM_LOAD( "pal16r4a-7mezzo.bin",    0x0000, 0x0104, BAD_DUMP CRC(61ac7372) SHA1(7560506468a7409075094787182ded24e2d0c0a3) )
 ROM_END
 
 

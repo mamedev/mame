@@ -174,7 +174,7 @@ static UINT32 opJSR(v60_state *cpustate) /* TRUSTED */
 	return 0;
 }
 
-static UINT32 opPREPARE(v60_state *cpustate)	/* somewhat TRUSTED */
+static UINT32 opPREPARE(v60_state *cpustate)    /* somewhat TRUSTED */
 {
 	cpustate->modadd = cpustate->PC + 1;
 	cpustate->moddim = 2;

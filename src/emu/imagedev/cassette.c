@@ -12,10 +12,10 @@
 #include "ui.h"
 
 
-#define ANIMATION_FPS		1
-#define ANIMATION_FRAMES	4
+#define ANIMATION_FPS       1
+#define ANIMATION_FRAMES    4
 
-#define VERBOSE				0
+#define VERBOSE             0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* Default cassette_interface for drivers only wav files */
@@ -37,8 +37,8 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 //-------------------------------------------------
 
 cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 
 }
@@ -396,13 +396,13 @@ void cassette_image_device::call_display()
 	/* THE ANIMATION HASN'T WORKED SINCE 0.114 - LEFT HERE FOR REFERENCE */
 	/* NEVER SEEN THE PLAY / RECORD ICONS */
 	/* character pairs 2-3, 4-5, 6-7, 8-9 form little tape cassette images */
-		n * 2 + 2,								/* cassette icon left */
-		n * 2 + 3,								/* cassette icon right */
-		(uistate == CASSETTE_PLAY) ? 16 : 14,	/* play or record icon */
+		n * 2 + 2,                              /* cassette icon left */
+		n * 2 + 3,                              /* cassette icon right */
+		(uistate == CASSETTE_PLAY) ? 16 : 14,   /* play or record icon */
 #else
-		shapes[n],					/* cassette icon left */
-		shapes[n|4],					/* cassette icon right */
-		(uistate == CASSETTE_PLAY) ? 0x50 : 0x52,	/* play (P) or record (R) */
+		shapes[n],                  /* cassette icon left */
+		shapes[n|4],                    /* cassette icon right */
+		(uistate == CASSETTE_PLAY) ? 0x50 : 0x52,   /* play (P) or record (R) */
 #endif
 		((int) position / 60),
 		((int) position % 60),

@@ -39,17 +39,17 @@ struct hcd62121_state
 
 /* From the battery check routine at 20:e874 it looks like
    bit 3 of the flag register should be the Zero flag. */
-#define _FLAG_Z		0x08
-#define _FLAG_C		0x02
-#define _FLAG_ZL	0x04
-#define _FLAG_CL	0x01
-#define _FLAG_ZH	0x10
+#define _FLAG_Z     0x08
+#define _FLAG_C     0x02
+#define _FLAG_ZL    0x04
+#define _FLAG_CL    0x01
+#define _FLAG_ZH    0x10
 
 
-#define mem_readbyte(cs,A)		((UINT8)(cs)->program->read_byte(A))
-#define mem_writebyte(cs,A,V)	((cs)->program->write_byte(A,V))
-#define io_readbyte(cs,A)		((UINT8)(cs)->io->read_byte(A))
-#define io_writebyte(cs,A,V)	((cs)->io->write_byte(A,V))
+#define mem_readbyte(cs,A)      ((UINT8)(cs)->program->read_byte(A))
+#define mem_writebyte(cs,A,V)   ((cs)->program->write_byte(A,V))
+#define io_readbyte(cs,A)       ((UINT8)(cs)->io->read_byte(A))
+#define io_writebyte(cs,A,V)    ((cs)->io->write_byte(A,V))
 
 
 INLINE UINT8 read_op(hcd62121_state *cpustate)
@@ -257,42 +257,42 @@ INLINE int check_cond( hcd62121_state *cpustate, UINT8 op )
 {
 	switch ( op & 0x07 )
 	{
-	case 0x00:	/* ZH set */
+	case 0x00:  /* ZH set */
 		if ( cpustate->f & _FLAG_ZH )
 			return 1;
 		break;
 
-	case 0x01:	/* ZL set */
+	case 0x01:  /* ZL set */
 		if ( cpustate->f & _FLAG_ZL )
 			return 1;
 		break;
 
-	case 0x02:	/* C set */
+	case 0x02:  /* C set */
 		if ( cpustate->f & _FLAG_C )
 			return 1;
 		break;
 
-	case 0x03:	/* Z set */
+	case 0x03:  /* Z set */
 		if ( cpustate->f & _FLAG_Z )
 			return 1;
 		break;
 
-	case 0x04:	/* Z or C set */
+	case 0x04:  /* Z or C set */
 		if ( cpustate->f & ( _FLAG_Z | _FLAG_C ) )
 			return 1;
 		break;
 
-	case 0x05:	/* CL set */
+	case 0x05:  /* CL set */
 		if ( cpustate->f & _FLAG_CL )
 			return 1;
 		break;
 
-	case 0x06:	/* C clear */
+	case 0x06:  /* C clear */
 		if ( ! ( cpustate->f & _FLAG_C ) )
 			return 1;
 		break;
 
-	case 0x07:	/* Z clear */
+	case 0x07:  /* Z clear */
 		if ( ! ( cpustate->f & _FLAG_Z ) )
 			return 1;
 		break;
@@ -377,16 +377,16 @@ static CPU_SET_INFO( hcd62121 )
 	case CPUINFO_INT_INPUT_STATE + 1:
 												break;
 
-	case CPUINFO_INT_SP:							cpustate->sp = info->i;							break;
-	case CPUINFO_INT_PC:							cpustate->ip = info->i;							break;
+	case CPUINFO_INT_SP:                            cpustate->sp = info->i;                         break;
+	case CPUINFO_INT_PC:                            cpustate->ip = info->i;                         break;
 
-	case CPUINFO_INT_REGISTER + HCD62121_IP:		cpustate->ip = info->i;							break;
-	case CPUINFO_INT_REGISTER + HCD62121_SP:		cpustate->sp = info->i;							break;
-	case CPUINFO_INT_REGISTER + HCD62121_LAR:		cpustate->lar = info->i;						break;
-	case CPUINFO_INT_REGISTER + HCD62121_CS:		cpustate->cseg = info->i;						break;
-	case CPUINFO_INT_REGISTER + HCD62121_DS:		cpustate->dseg = info->i;						break;
-	case CPUINFO_INT_REGISTER + HCD62121_SS:		cpustate->sseg = info->i;						break;
-	case CPUINFO_INT_REGISTER + HCD62121_DSIZE:		cpustate->dsize = info->i;						break;
+	case CPUINFO_INT_REGISTER + HCD62121_IP:        cpustate->ip = info->i;                         break;
+	case CPUINFO_INT_REGISTER + HCD62121_SP:        cpustate->sp = info->i;                         break;
+	case CPUINFO_INT_REGISTER + HCD62121_LAR:       cpustate->lar = info->i;                        break;
+	case CPUINFO_INT_REGISTER + HCD62121_CS:        cpustate->cseg = info->i;                       break;
+	case CPUINFO_INT_REGISTER + HCD62121_DS:        cpustate->dseg = info->i;                       break;
+	case CPUINFO_INT_REGISTER + HCD62121_SS:        cpustate->sseg = info->i;                       break;
+	case CPUINFO_INT_REGISTER + HCD62121_DSIZE:     cpustate->dsize = info->i;                      break;
 //  case CPUINFO_INT_REGISTER + HCD62121_R00:   break;
 //  case CPUINFO_INT_REGISTER + HCD62121_R02:   break;
 	}
@@ -400,59 +400,59 @@ CPU_GET_INFO( hcd62121 )
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(hcd62121_state);					break;
-	case CPUINFO_INT_INPUT_LINES:						info->i = 2;							break;
-	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
-	case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-	case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 18;							break;
-	case CPUINFO_INT_MIN_CYCLES:					info->i = 4;	/* right? */			break;
-	case CPUINFO_INT_MAX_CYCLES:					info->i = 48;	/* right? */			break;
+	case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(hcd62121_state);                   break;
+	case CPUINFO_INT_INPUT_LINES:                       info->i = 2;                            break;
+	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0xff;                         break;
+	case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;               break;
+	case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+	case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 18;                           break;
+	case CPUINFO_INT_MIN_CYCLES:                    info->i = 4;    /* right? */            break;
+	case CPUINFO_INT_MAX_CYCLES:                    info->i = 48;   /* right? */            break;
 
-	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 8;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;                  break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 8;                    break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-	case CPUINFO_INT_SP:							info->i = cpustate->sp;					break;
-	case CPUINFO_INT_PC:							info->i = ( cpustate->cseg << 16 ) | cpustate->ip; break;
-	case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->prev_pc;			break;
+	case CPUINFO_INT_SP:                            info->i = cpustate->sp;                 break;
+	case CPUINFO_INT_PC:                            info->i = ( cpustate->cseg << 16 ) | cpustate->ip; break;
+	case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->prev_pc;            break;
 
 	case CPUINFO_INT_INPUT_STATE + 0:
 	case CPUINFO_INT_INPUT_STATE + 1:
-													/* TODO */									break;
+													/* TODO */                                  break;
 
-	case CPUINFO_INT_REGISTER + HCD62121_IP:			info->i = cpustate->ip;					break;
-	case CPUINFO_INT_REGISTER + HCD62121_SP:			info->i = cpustate->sp;					break;
-	case CPUINFO_INT_REGISTER + HCD62121_LAR:			info->i = cpustate->lar;				break;
-	case CPUINFO_INT_REGISTER + HCD62121_CS:			info->i = cpustate->cseg;				break;
-	case CPUINFO_INT_REGISTER + HCD62121_DS:			info->i = cpustate->dseg;				break;
-	case CPUINFO_INT_REGISTER + HCD62121_SS:			info->i = cpustate->sseg;				break;
-	case CPUINFO_INT_REGISTER + HCD62121_DSIZE:			info->i = cpustate->dsize;				break;
-	case CPUINFO_INT_REGISTER + HCD62121_R00:			info->i = ( cpustate->reg[0x00] << 24 ) | ( cpustate->reg[0x01] << 16 ) | ( cpustate->reg[0x02] << 8 ) | cpustate->reg[0x03]; break;
+	case CPUINFO_INT_REGISTER + HCD62121_IP:            info->i = cpustate->ip;                 break;
+	case CPUINFO_INT_REGISTER + HCD62121_SP:            info->i = cpustate->sp;                 break;
+	case CPUINFO_INT_REGISTER + HCD62121_LAR:           info->i = cpustate->lar;                break;
+	case CPUINFO_INT_REGISTER + HCD62121_CS:            info->i = cpustate->cseg;               break;
+	case CPUINFO_INT_REGISTER + HCD62121_DS:            info->i = cpustate->dseg;               break;
+	case CPUINFO_INT_REGISTER + HCD62121_SS:            info->i = cpustate->sseg;               break;
+	case CPUINFO_INT_REGISTER + HCD62121_DSIZE:         info->i = cpustate->dsize;              break;
+	case CPUINFO_INT_REGISTER + HCD62121_R00:           info->i = ( cpustate->reg[0x00] << 24 ) | ( cpustate->reg[0x01] << 16 ) | ( cpustate->reg[0x02] << 8 ) | cpustate->reg[0x03]; break;
 //  case CPUINFO_INT_REGISTER + HCD62121_R02:           info->i = cpustate->;                   break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hcd62121);		break;
-	case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hcd62121);				break;
-	case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(hcd62121);			break;
-	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hcd62121);		break;
-	case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hcd62121);		break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+	case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(hcd62121);        break;
+	case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(hcd62121);               break;
+	case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(hcd62121);         break;
+	case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(hcd62121);     break;
+	case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(hcd62121);     break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME:							strcpy(info->s, "HCD62121"); break;
-	case CPUINFO_STR_FAMILY:						strcpy(info->s, "Hitachi HCD62121"); break;
-	case CPUINFO_STR_VERSION:						strcpy(info->s, "0.1"); break;
-	case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
-	case CPUINFO_STR_CREDITS:						strcpy(info->s, "Copyright The MESS Team."); break;
+	case CPUINFO_STR_NAME:                          strcpy(info->s, "HCD62121"); break;
+	case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Hitachi HCD62121"); break;
+	case CPUINFO_STR_VERSION:                       strcpy(info->s, "0.1"); break;
+	case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__); break;
+	case CPUINFO_STR_CREDITS:                       strcpy(info->s, "Copyright The MESS Team."); break;
 
 	case CPUINFO_STR_FLAGS:
 		sprintf(info->s, "%s-%s-%s-%c-%c",
@@ -507,4 +507,3 @@ CPU_GET_INFO( hcd62121 )
 }
 
 DEFINE_LEGACY_CPU_DEVICE(HCD62121, hcd62121);
-

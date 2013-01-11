@@ -31,7 +31,7 @@ rtl8019a_device::rtl8019a_device(const machine_config &mconfig, const char *tag,
 
 dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, float bandwidth)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_network_interface(mconfig, *this, bandwidth) {
+		device_network_interface(mconfig, *this, bandwidth) {
 }
 
 void dp8390_device::device_start() {

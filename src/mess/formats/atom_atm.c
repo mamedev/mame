@@ -39,17 +39,17 @@ QUICKLOAD_LOAD( atom_atm )
 {
 	/*
 
-        The format for the .ATM files is as follows:
+	    The format for the .ATM files is as follows:
 
-        Offset Size     Description
-        ------ -------- -----------------------------------------------------------
-        0000h  16 BYTEs ATOM filename (if less than 16 BYTEs, rest is 00h bytes)
-        0010h  WORD     Start address for load
-        0012h  WORD     Execution address
-        0014h  WORD     Size of data in BYTEs
-        0016h  Size     Data
+	    Offset Size     Description
+	    ------ -------- -----------------------------------------------------------
+	    0000h  16 BYTEs ATOM filename (if less than 16 BYTEs, rest is 00h bytes)
+	    0010h  WORD     Start address for load
+	    0012h  WORD     Execution address
+	    0014h  WORD     Size of data in BYTEs
+	    0016h  Size     Data
 
-    */
+	*/
 
 	UINT8 header[0x16] = { 0 };
 

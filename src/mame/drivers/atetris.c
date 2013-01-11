@@ -56,8 +56,8 @@
 #include "machine/nvram.h"
 
 
-#define MASTER_CLOCK		XTAL_14_31818MHz
-#define BOOTLEG_CLOCK		XTAL_14_7456MHz
+#define MASTER_CLOCK        XTAL_14_31818MHz
+#define BOOTLEG_CLOCK       XTAL_14_7456MHz
 
 
 /*************************************
@@ -244,14 +244,14 @@ static INPUT_PORTS_START( atetris )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_DIPNAME( 0x04, 0x00, "Freeze" )			PORT_DIPLOCATION("50H:!4")
+	PORT_DIPNAME( 0x04, 0x00, "Freeze" )            PORT_DIPLOCATION("50H:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Freeze Step" )		PORT_DIPLOCATION("50H:!3")
+	PORT_DIPNAME( 0x08, 0x00, "Freeze Step" )       PORT_DIPLOCATION("50H:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "50H:!2" )	/* Listed As "SPARE2 (Unused)" */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "50H:!1" )	/* Listed As "SPARE1 (Unused)" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "50H:!2" )   /* Listed As "SPARE2 (Unused)" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "50H:!1" )   /* Listed As "SPARE1 (Unused)" */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( atetrisc )
 	PORT_INCLUDE( atetris )
 
 	PORT_MODIFY("IN0")
-	PORT_DIPNAME( 0x20, 0x00, "Flip Controls" )		PORT_DIPLOCATION("50H:!1")
+	PORT_DIPNAME( 0x20, 0x00, "Flip Controls" )     PORT_DIPLOCATION("50H:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -287,13 +287,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-   8,8,
-   RGN_FRAC(1,1),
-   4,
-   { 0,1,2,3 },
-   { 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4},
-   { 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8},
-   8*8*4
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4},
+	{ 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8},
+	8*8*4
 };
 
 
@@ -328,7 +328,7 @@ static const pokey_interface pokey_interface_2 =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 /*************************************

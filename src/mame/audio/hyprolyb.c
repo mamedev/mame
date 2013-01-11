@@ -7,7 +7,7 @@ struct hyprolyb_adpcm_state
 {
 	device_t *m_msm;
 	address_space *m_space;
-	UINT8    m_adpcm_ready;	// only bootlegs
+	UINT8    m_adpcm_ready; // only bootlegs
 	UINT8    m_adpcm_busy;
 	UINT8    m_vck_ready;
 };
@@ -26,7 +26,7 @@ static DEVICE_START( hyprolyb_adpcm )
 
 	state->m_space = &device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
 	state->m_msm = device->machine().device("msm");
-	device->save_item(NAME(state->m_adpcm_ready));	// only bootlegs
+	device->save_item(NAME(state->m_adpcm_ready));  // only bootlegs
 	device->save_item(NAME(state->m_adpcm_busy));
 	device->save_item(NAME(state->m_vck_ready));
 }
@@ -120,12 +120,12 @@ static void adpcm_vck_callback( device_t *device )
 
 static const msm5205_interface hyprolyb_msm5205_config =
 {
-	adpcm_vck_callback,	/* VCK function */
-	MSM5205_S96_4B		/* 4 kHz */
+	adpcm_vck_callback, /* VCK function */
+	MSM5205_S96_4B      /* 4 kHz */
 };
 
 MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
-	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)	/* unknown clock */
+	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
@@ -139,7 +139,7 @@ const device_type HYPROLYB_ADPCM = &device_creator<hyprolyb_adpcm_device>;
 
 hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HYPROLYB_ADPCM, "Hyper Olympics Audio", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(hyprolyb_adpcm_state);
 }
@@ -181,5 +181,3 @@ void hyprolyb_adpcm_device::sound_stream_update(sound_stream &stream, stream_sam
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

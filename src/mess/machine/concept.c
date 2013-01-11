@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "includes/concept.h"
-#include "machine/mm58274c.h"	/* mm58274 seems to be compatible with mm58174 */
+#include "machine/mm58274c.h"   /* mm58274 seems to be compatible with mm58174 */
 #include "machine/wd17xx.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/corvushd.h"
@@ -22,26 +22,26 @@
 /* interrupt priority encoder */
 enum
 {
-	IOCINT_level = 1,	/* serial lines (CTS, DSR & DCD) and I/O ports */
-	SR1INT_level,		/* serial port 1 acia */
-	OMINT_level,		/* omninet */
-	SR0INT_level,		/* serial port 0 acia */
-	TIMINT_level,		/* via */
-	KEYINT_level,		/* keyboard acia */
-	NMIINT_level			/* reserved */
+	IOCINT_level = 1,   /* serial lines (CTS, DSR & DCD) and I/O ports */
+	SR1INT_level,       /* serial port 1 acia */
+	OMINT_level,        /* omninet */
+	SR0INT_level,       /* serial port 0 acia */
+	TIMINT_level,       /* via */
+	KEYINT_level,       /* keyboard acia */
+	NMIINT_level            /* reserved */
 };
 
 /* Clock interface */
 
 /* Omninet */
-/*static int ready;*/			/* ready line from monochip, role unknown */
+/*static int ready;*/           /* ready line from monochip, role unknown */
 
 /* Via */
 static void via_irq_func(device_t *device, int state);
 
 
 const via6522_interface concept_via6522_intf =
-{	/* main via */
+{   /* main via */
 	DEVCB_DRIVER_MEMBER(concept_state,via_in_a), DEVCB_DRIVER_MEMBER(concept_state,via_in_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
@@ -70,8 +70,8 @@ void concept_state::machine_start()
 	/* initialize expansion slots */
 	memset(m_expansion_slots, 0, sizeof(m_expansion_slots));
 
-	concept_hdc_init(1);	/* Flat cable Hard Disk Controller in Slot 2 */
-	concept_fdc_init(2);	/* Floppy Disk Controller in Slot 3 */
+	concept_hdc_init(1);    /* Flat cable Hard Disk Controller in Slot 2 */
+	concept_fdc_init(2);    /* Floppy Disk Controller in Slot 3 */
 }
 
 void concept_state::install_expansion_slot( int slot,
@@ -191,7 +191,7 @@ INTERRUPT_GEN_MEMBER(concept_state::concept_interrupt)
 READ8_MEMBER(concept_state::via_in_a)
 {
 	LOG(("via_in_a: VIA port A (Omninet and COMM port status) read\n"));
-	return 1;		/* omninet ready always 1 */
+	return 1;       /* omninet ready always 1 */
 }
 
 WRITE8_MEMBER(concept_state::via_out_a)
@@ -511,35 +511,35 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 
 enum
 {
-	LS_DRQ_bit		= 0,	// DRQ
-	LS_INT_bit		= 1,	// INT
-	LS_SS_bit		= 4,	// 1 if single-sided (floppy or drive?)
-	LS_8IN_bit		= 5,	// 1 if 8" floppy drive?
-	LS_DSKCHG_bit	= 6,	// 0 if disk changed, 1 if not
-	LS_SD_bit		= 7,	// 1 if single density
+	LS_DRQ_bit      = 0,    // DRQ
+	LS_INT_bit      = 1,    // INT
+	LS_SS_bit       = 4,    // 1 if single-sided (floppy or drive?)
+	LS_8IN_bit      = 5,    // 1 if 8" floppy drive?
+	LS_DSKCHG_bit   = 6,    // 0 if disk changed, 1 if not
+	LS_SD_bit       = 7,    // 1 if single density
 
-	LS_DRQ_mask		= (1 << LS_DRQ_bit),
-	LS_INT_mask		= (1 << LS_INT_bit),
-	LS_SS_mask		= (1 << LS_SS_bit),
-	LS_8IN_mask		= (1 << LS_8IN_bit),
-	LS_DSKCHG_mask	= (1 << LS_DSKCHG_bit),
-	LS_SD_mask		= (1 << LS_SD_bit)
+	LS_DRQ_mask     = (1 << LS_DRQ_bit),
+	LS_INT_mask     = (1 << LS_INT_bit),
+	LS_SS_mask      = (1 << LS_SS_bit),
+	LS_8IN_mask     = (1 << LS_8IN_bit),
+	LS_DSKCHG_mask  = (1 << LS_DSKCHG_bit),
+	LS_SD_mask      = (1 << LS_SD_bit)
 };
 enum
 {
-	LC_FLPSD1_bit	= 0,	// 0 if side 0 , 1 if side 1
-	LC_DE0_bit		= 1,	// drive select bit 0
-	LC_DE1_bit		= 4,	// drive select bit 1
-	LC_MOTOROF_bit	= 5,	// 1 if motor to be turned off
-	LC_FLP8IN_bit	= 6,	// 1 to select 8", 0 for 5"1/4 (which I knew what it means)
-	LC_FMMFM_bit	= 7,	// 1 to select single density, 0 for double
+	LC_FLPSD1_bit   = 0,    // 0 if side 0 , 1 if side 1
+	LC_DE0_bit      = 1,    // drive select bit 0
+	LC_DE1_bit      = 4,    // drive select bit 1
+	LC_MOTOROF_bit  = 5,    // 1 if motor to be turned off
+	LC_FLP8IN_bit   = 6,    // 1 to select 8", 0 for 5"1/4 (which I knew what it means)
+	LC_FMMFM_bit    = 7,    // 1 to select single density, 0 for double
 
-	LC_FLPSD1_mask	= (1 << LC_FLPSD1_bit),
-	LC_DE0_mask		= (1 << LC_DE0_bit),
-	LC_DE1_mask		= (1 << LC_DE1_bit),
-	LC_MOTOROF_mask	= (1 << LC_MOTOROF_bit),
-	LC_FLP8IN_mask	= (1 << LC_FLP8IN_bit),
-	LC_FMMFM_mask	= (1 << LC_FMMFM_bit)
+	LC_FLPSD1_mask  = (1 << LC_FLPSD1_bit),
+	LC_DE0_mask     = (1 << LC_DE0_bit),
+	LC_DE1_mask     = (1 << LC_DE1_bit),
+	LC_MOTOROF_mask = (1 << LC_MOTOROF_bit),
+	LC_FLP8IN_mask  = (1 << LC_FLP8IN_bit),
+	LC_FMMFM_mask   = (1 << LC_FMMFM_bit)
 };
 
 
@@ -704,6 +704,6 @@ WRITE8_MEMBER(concept_state::concept_hdc_reg_w)
  */
 READ8_MEMBER(concept_state::concept_hdc_rom_r)
 {
-	static const UINT8 data[8] = { 0xa9, 0x20, 0xa9, 0x00, 0xa9, 0x03, 0xa9, 0x3c };			/* Same as Apple II */
+	static const UINT8 data[8] = { 0xa9, 0x20, 0xa9, 0x00, 0xa9, 0x03, 0xa9, 0x3c };            /* Same as Apple II */
 	return (offset < 8) ? data[offset] : 0;
 }

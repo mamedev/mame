@@ -110,7 +110,7 @@ static STREAM_UPDATE( st0016_update )
 					// not looped yet, check sample end
 					if ((info->vpos[v] + sptr) >= eptr)
 					{
-						if (slot[0x16] & 0x01)	// loop?
+						if (slot[0x16] & 0x01)  // loop?
 						{
 							info->vpos[v] = (lsptr - sptr);
 							info->lponce[v] = 1;
@@ -148,7 +148,7 @@ const device_type ST0016 = &device_creator<st0016_device>;
 
 st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ST0016, "ST0016", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(st0016_device_state);
 }
@@ -181,5 +181,3 @@ void st0016_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

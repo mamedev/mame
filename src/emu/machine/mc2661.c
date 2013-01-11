@@ -36,13 +36,13 @@ enum
 };
 
 
-#define MODE_BAUD_RATE		(m_mr[0] & 0x03)
-#define MODE_CHARACTER		((m_mr[0] >> 2) & 0x03)
-#define MODE_PARITY			BIT(m_mr[0], 4)
-#define MODE_PARITY_EVEN	BIT(m_mr[0], 5)
-#define MODE_TRANSPARENT	BIT(m_mr[0], 6)
-#define MODE_SINGLE_SYN		BIT(m_mr[0], 7)
-#define MODE_STOP_BITS		((m_mr[0] >> 6) & 0x03)
+#define MODE_BAUD_RATE      (m_mr[0] & 0x03)
+#define MODE_CHARACTER      ((m_mr[0] >> 2) & 0x03)
+#define MODE_PARITY         BIT(m_mr[0], 4)
+#define MODE_PARITY_EVEN    BIT(m_mr[0], 5)
+#define MODE_TRANSPARENT    BIT(m_mr[0], 6)
+#define MODE_SINGLE_SYN     BIT(m_mr[0], 7)
+#define MODE_STOP_BITS      ((m_mr[0] >> 6) & 0x03)
 
 
 enum
@@ -54,19 +54,19 @@ enum
 };
 
 
-#define SYN1			m_sync[0]
-#define SYN2			m_sync[1]
-#define DLE				m_sync[2]
+#define SYN1            m_sync[0]
+#define SYN2            m_sync[1]
+#define DLE             m_sync[2]
 
 
-#define COMMAND_TXEN	BIT(m_cr, 0)
-#define COMMAND_DTR		BIT(m_cr, 1)
-#define COMMAND_RXEN	BIT(m_cr, 2)
-#define COMMAND_BREAK	BIT(m_cr, 3)
-#define COMMAND_DLE		BIT(m_cr, 3)
-#define COMMAND_RESET	BIT(m_cr, 4)
-#define COMMAND_RTS		BIT(m_cr, 5)
-#define COMMAND_MODE	(m_cr >> 6)
+#define COMMAND_TXEN    BIT(m_cr, 0)
+#define COMMAND_DTR     BIT(m_cr, 1)
+#define COMMAND_RXEN    BIT(m_cr, 2)
+#define COMMAND_BREAK   BIT(m_cr, 3)
+#define COMMAND_DLE     BIT(m_cr, 3)
+#define COMMAND_RESET   BIT(m_cr, 4)
+#define COMMAND_RTS     BIT(m_cr, 5)
+#define COMMAND_MODE    (m_cr >> 6)
 
 
 enum
@@ -78,16 +78,16 @@ enum
 };
 
 
-#define STATUS_TXRDY	0x01
-#define STATUS_RXRDY	0x02
-#define STATUS_TXEMT	0x04
-#define STATUS_PE		0x08
-#define STATUS_DLE		0x08
-#define STATUS_OVERRUN	0x10
-#define STATUS_FE		0x20
-#define STATUS_SYN		0x20
-#define STATUS_DCD		0x40
-#define STATUS_DSR		0x80
+#define STATUS_TXRDY    0x01
+#define STATUS_RXRDY    0x02
+#define STATUS_TXEMT    0x04
+#define STATUS_PE       0x08
+#define STATUS_DLE      0x08
+#define STATUS_OVERRUN  0x10
+#define STATUS_FE       0x20
+#define STATUS_SYN      0x20
+#define STATUS_DCD      0x40
+#define STATUS_DSR      0x80
 
 
 
@@ -123,8 +123,8 @@ inline void mc2661_device::transmit()
 //-------------------------------------------------
 
 mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MC2661, "MC2661", tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+	: device_t(mconfig, MC2661, "MC2661", tag, owner, clock),
+		device_serial_interface(mconfig, *this)
 {
 }
 
@@ -329,9 +329,9 @@ WRITE8_MEMBER( mc2661_device::write )
 
 			switch (MODE_STOP_BITS)
 			{
-			case STOP_BITS_1:	stop_bits = 1;		break;
-			case STOP_BITS_1_5: stop_bits = 1.5;	break;
-			case STOP_BITS_2:	stop_bits = 2;		break;
+			case STOP_BITS_1:   stop_bits = 1;      break;
+			case STOP_BITS_1_5: stop_bits = 1.5;    break;
+			case STOP_BITS_2:   stop_bits = 2;      break;
 			}
 
 			if (!MODE_PARITY) parity_code = SERIAL_PARITY_NONE;

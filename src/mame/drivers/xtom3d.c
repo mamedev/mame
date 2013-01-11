@@ -57,13 +57,13 @@ class xtom3d_state : public driver_device
 public:
 	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_pit8254(*this, "pit8254"),
-		  m_dma8237_1(*this, "dma8237_1"),
-		  m_dma8237_2(*this, "dma8237_2"),
-		  m_pic8259_1(*this, "pic8259_1"),
-		  m_pic8259_2(*this, "pic8259_2")
-		  { }
+			m_maincpu(*this, "maincpu"),
+			m_pit8254(*this, "pit8254"),
+			m_dma8237_1(*this, "dma8237_1"),
+			m_dma8237_2(*this, "dma8237_2"),
+			m_pic8259_1(*this, "pic8259_1"),
+			m_pic8259_2(*this, "pic8259_2")
+			{ }
 
 	UINT32 *m_bios_ram;
 	UINT32 *m_bios_ext1_ram;
@@ -133,32 +133,32 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	printf("MXTC: write %d, %02X, %02X\n",  function, reg, data);
 
 	/*
-    memory banking with North Bridge:
-    0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
-                ---- xxxx Reserved
-    0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
-                ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
-    0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
-                ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
-    0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
-                ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
-    0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
-                ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
-    0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
-                ---- xxxx BIOS extension 0xe0000 - 0xe3fff
-    0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
-                ---- xxxx BIOS extension 0xe8000 - 0xebfff
+	memory banking with North Bridge:
+	0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
+	            ---- xxxx Reserved
+	0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
+	            ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
+	0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
+	            ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
+	0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
+	            ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
+	0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
+	            ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
+	0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
+	            ---- xxxx BIOS extension 0xe0000 - 0xe3fff
+	0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
+	            ---- xxxx BIOS extension 0xe8000 - 0xebfff
 
-    3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
-    */
+	3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
+	*/
 
 	switch(reg)
 	{
 		case 0x59: // PAM0
 		{
-			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
+			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 				state->membank("bios_bank")->set_base(state->m_bios_ram);
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 				state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x10000);
 			break;
 		}
@@ -323,7 +323,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 
 WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
 {
-	if (m_mxtc_config_reg[0x5a] & 0x2)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_isa_ram1 + offset);
 	}
@@ -331,7 +331,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
 
 WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
 {
-	if (m_mxtc_config_reg[0x5a] & 0x2)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_isa_ram2 + offset);
 	}
@@ -339,7 +339,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
 
 WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
 {
-	if (m_mxtc_config_reg[0x5e] & 0x2)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ext1_ram + offset);
 	}
@@ -348,7 +348,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
 
 WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
 {
-	if (m_mxtc_config_reg[0x5e] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ext2_ram + offset);
 	}
@@ -357,7 +357,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
 
 WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
 {
-	if (m_mxtc_config_reg[0x5f] & 0x2)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ext3_ram + offset);
 	}
@@ -366,7 +366,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
 
 WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
 {
-	if (m_mxtc_config_reg[0x5f] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ext4_ram + offset);
 	}
@@ -375,7 +375,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
 
 WRITE32_MEMBER(xtom3d_state::bios_ram_w)
 {
-	if (m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ram + offset);
 	}
@@ -534,7 +534,7 @@ static ADDRESS_MAP_START(xtom3d_map, AS_PROGRAM, 32, xtom3d_state)
 	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ext4") AM_WRITE(bios_ext4_ram_w)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(xtom3d_io, AS_IO, 32, xtom3d_state)
@@ -543,7 +543,7 @@ static ADDRESS_MAP_START(xtom3d_io, AS_IO, 32, xtom3d_state)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,	at_page8_w, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,  at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
@@ -562,15 +562,15 @@ static const struct pit8253_config xtom3d_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -672,7 +672,7 @@ void xtom3d_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000/16)	// actually Pentium II 450
+	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000/16)  // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
 	MCFG_CPU_IO_MAP(xtom3d_io)
 

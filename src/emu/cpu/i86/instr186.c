@@ -24,7 +24,7 @@ static void PREFIX186(_pusha)(i8086_state *cpustate)    /* Opcode 0x60 */
 	PUSH(cpustate->regs.w[CX]);
 	PUSH(cpustate->regs.w[DX]);
 	PUSH(cpustate->regs.w[BX]);
-    PUSH(tmp);
+	PUSH(tmp);
 	PUSH(cpustate->regs.w[BP]);
 	PUSH(cpustate->regs.w[SI]);
 	PUSH(cpustate->regs.w[DI]);
@@ -52,7 +52,7 @@ static void PREFIX186(_bound)(i8086_state *cpustate)    /* Opcode 0x62 */
 {
 	unsigned ModRM = FETCHOP;
 	int low = (INT16)GetRMWord(ModRM);
-    int high= (INT16)GetnextRMWord;
+	int high= (INT16)GetnextRMWord;
 	int tmp= (INT16)RegWord(ModRM);
 	if (tmp<low || tmp>high) {
 		cpustate->pc-= ( cpustate->seg_prefix ? 3 : 2 );

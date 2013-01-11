@@ -171,7 +171,7 @@ PORT_CONFSETTING ( 0x20, "'MU' TMSCP tapes, including TK50, TU81") \
 
 /* Input ports */
 static INPUT_PORTS_START( pdp11 )
-    PORT_START("S1")
+	PORT_START("S1")
 	PORT_DIPNAME( 0x01, 0x01, "S1-1" )
 	PORT_DIPSETTING(    0x00, "Direct boot" )
 	PORT_DIPSETTING(    0x01, "Console mode" )
@@ -362,7 +362,7 @@ ROM_START( pdp11ub2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x800, "consproms", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-248f1.bin", 0x0000, 0x0400, CRC(ecda1a6d) SHA1(b2bf770dda349fdd469235871564280baf06301d)) // M9312 11/04/05/34/35/40/45/50/55  Console/Diagnostic PROM
-    ROM_LOAD( "23-616f1.bin", 0x0400, 0x0400, CRC(a3dfb5aa) SHA1(7f06c624ae3fbb49535258b8722b5a3c548da3ba)) // M9312 11/60-70 Diagnostic/Console ROM
+	ROM_LOAD( "23-616f1.bin", 0x0400, 0x0400, CRC(a3dfb5aa) SHA1(7f06c624ae3fbb49535258b8722b5a3c548da3ba)) // M9312 11/60-70 Diagnostic/Console ROM
 	ROM_REGION( 0x4200, "devproms", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-751a9.bin", 0x0000, 0x0200, CRC(15bebc6a) SHA1(a621c5b1cebebbb110ee646a8c36ee4c606e269b)) // M9312 'DL' BOOT prom for RL11 controller
 	ROM_LOAD( "23-752a9.bin", 0x0200, 0x0200, CRC(6cf1f859) SHA1(7c876eda2f0d74d6f5d876256c28dbd56c405ca7)) // M9312 'DM' BOOT prom for RK06/07 controller
@@ -374,8 +374,8 @@ ROM_START( pdp11ub2 )
 	ROM_LOAD( "23-759a9.bin", 0x0e00, 0x0200, CRC(29a93448) SHA1(0b549170c6a3f49c1587adb6cc691786111c0dd3)) // M9312 'DS' BOOT prom for RS03/RS04 controller
 	ROM_LOAD( "23-760a9.bin", 0x1000, 0x0200, CRC(ea093648) SHA1(3875a0147c43db1a5a381bbe85937a5628e6220c)) // M9312 'PR/TT' BOOT prom for PC05,LO SPD RDR controllers
 	ROM_LOAD( "23-761a9.bin", 0x1200, 0x0200, CRC(4310ebe8) SHA1(a3144f96819ea57acfac5de5e19961294e7d4ad9)) // M9312 'CT' BOOT prom for TA11/TU60 controller
-	ROM_LOAD( "23-762a9.bin", 0x1400, 0x0200, NO_DUMP)														// M9312 'RS' BOOT prom for RS11, RS64 controller
-	ROM_LOAD( "23-763a9.bin", 0x1600, 0x0200, NO_DUMP)														// M9312 'CR' BOOT prom for CR11 card reader
+	ROM_LOAD( "23-762a9.bin", 0x1400, 0x0200, NO_DUMP)                                                      // M9312 'RS' BOOT prom for RS11, RS64 controller
+	ROM_LOAD( "23-763a9.bin", 0x1600, 0x0200, NO_DUMP)                                                      // M9312 'CR' BOOT prom for CR11 card reader
 	ROM_LOAD( "23-764a9.bin", 0x1800, 0x0200, CRC(7c8b7ed4) SHA1(ba0c9f03027eb3dafcc0936e877637d3c9947f94)) // M9312 'MS' BOOT prom for TS11/TS04/TU80 compatible controller
 	ROM_LOAD( "23-765a9.bin", 0x1a00, 0x0200, CRC(702dfeb2) SHA1(0d37bdd3846de4b104b8968a0e83ed81abd7f9ae)) // M9312 'DD' BOOT prom for TU58 DECtapeII serial tape controller
 	ROM_LOAD( "23-767a9.bin", 0x1c00, 0x0200, CRC(4b94e3fa) SHA1(3cf92c2f64f95e8cc3abb8af2526cc65ce53ca8a)) // M9312 'DU' BOOT prom for MSCP compatible controller
@@ -386,16 +386,16 @@ ROM_START( pdp11ub2 )
 	ROM_LOAD( "23-862a9.bin", 0x2600, 0x0200, CRC(38dbd994) SHA1(c5db671e6b70f3b4d345a02b46e0ea7566160d04)) // M9312 'XM' DECNET 1/3 (DECnet DDCMP DMC11/DMR11)
 	ROM_LOAD( "23-863a9.bin", 0x2800, 0x0200, CRC(bbef2f41) SHA1(f472b7a8bd4c0a49dc3ec38f886755910f73fe66)) // M9312 'XM' DECNET 2/3 (DECnet DDCMP DMC11/DMR11)
 	ROM_LOAD( "23-864a9.bin", 0x2a00, 0x0200, CRC(85cc17dc) SHA1(371dbd3c672fe4b1819762c3082c4217a7597547)) // M9312 'XM' DECNET 3/3 (DECnet DDCMP DMC11/DMR11)
-	ROM_LOAD( "23-865a9.bin", 0x2c00, 0x0200, NO_DUMP)														// M9312 'XU' DECNET 1/3 (DECnet DDCMP DU11)
-	ROM_LOAD( "23-866a9.bin", 0x2e00, 0x0200, NO_DUMP)														// M9312 'XU' DECNET 2/3 (DECnet DDCMP DU11)
-	ROM_LOAD( "23-867a9.bin", 0x3000, 0x0200, NO_DUMP)														// M9312 'XU' DECNET 3/3 (DECnet DDCMP DU11)
-	ROM_LOAD( "23-868a9.bin", 0x3200, 0x0200, NO_DUMP)														// M9312 'XW' DECNET 1/3 (DECnet DDCMP DUP11)
-	ROM_LOAD( "23-869a9.bin", 0x3400, 0x0200, NO_DUMP)														// M9312 'XW' DECNET 2/3 (DECnet DDCMP DUP11)
-	ROM_LOAD( "23-870a9.bin", 0x3600, 0x0200, NO_DUMP)														// M9312 'XW' DECNET 3/3 (DECnet DDCMP DUP11)
-	ROM_LOAD( "23-926a9.bin", 0x3800, 0x0200, NO_DUMP)														// M9312 'XL' DECNET 1/3 (DECnet DDCMP DL11-E)
-	ROM_LOAD( "23-927a9.bin", 0x3a00, 0x0200, NO_DUMP)														// M9312 'XL' DECNET 2/3 (DECnet DDCMP DL11-E)
-	ROM_LOAD( "23-928a9.bin", 0x3c00, 0x0200, NO_DUMP)														// M9312 'XL' DECNET 3/3 (DECnet DDCMP DL11-E)
-	ROM_LOAD( "23-e22a9.bin", 0x3e00, 0x0200, NO_DUMP)														// M9312 'XE' DEUNA DECnet Ethernet
+	ROM_LOAD( "23-865a9.bin", 0x2c00, 0x0200, NO_DUMP)                                                      // M9312 'XU' DECNET 1/3 (DECnet DDCMP DU11)
+	ROM_LOAD( "23-866a9.bin", 0x2e00, 0x0200, NO_DUMP)                                                      // M9312 'XU' DECNET 2/3 (DECnet DDCMP DU11)
+	ROM_LOAD( "23-867a9.bin", 0x3000, 0x0200, NO_DUMP)                                                      // M9312 'XU' DECNET 3/3 (DECnet DDCMP DU11)
+	ROM_LOAD( "23-868a9.bin", 0x3200, 0x0200, NO_DUMP)                                                      // M9312 'XW' DECNET 1/3 (DECnet DDCMP DUP11)
+	ROM_LOAD( "23-869a9.bin", 0x3400, 0x0200, NO_DUMP)                                                      // M9312 'XW' DECNET 2/3 (DECnet DDCMP DUP11)
+	ROM_LOAD( "23-870a9.bin", 0x3600, 0x0200, NO_DUMP)                                                      // M9312 'XW' DECNET 3/3 (DECnet DDCMP DUP11)
+	ROM_LOAD( "23-926a9.bin", 0x3800, 0x0200, NO_DUMP)                                                      // M9312 'XL' DECNET 1/3 (DECnet DDCMP DL11-E)
+	ROM_LOAD( "23-927a9.bin", 0x3a00, 0x0200, NO_DUMP)                                                      // M9312 'XL' DECNET 2/3 (DECnet DDCMP DL11-E)
+	ROM_LOAD( "23-928a9.bin", 0x3c00, 0x0200, NO_DUMP)                                                      // M9312 'XL' DECNET 3/3 (DECnet DDCMP DL11-E)
+	ROM_LOAD( "23-e22a9.bin", 0x3e00, 0x0200, NO_DUMP)                                                      // M9312 'XE' DEUNA DECnet Ethernet
 	ROM_LOAD( "23-e39a9.bin", 0x4000, 0x0200, CRC(4b94e3fa) SHA1(3cf92c2f64f95e8cc3abb8af2526cc65ce53ca8a)) // M9312 'MU' TMSCP tapes, including TK50, TU81
 
 ROM_END
@@ -408,7 +408,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, pdp11ub,  0,       0,	pdp11,	  pdp11, driver_device,	 0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9301-YA)",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, pdp11ub2, pdp11ub, 0,	pdp11ub2, pdp11, driver_device,	 0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9312)",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, pdp11qb,  pdp11ub, 0,	pdp11qb,  pdp11, driver_device,	 0,   "Digital Equipment Corporation",   "PDP-11 [Q-BUS] (M7195 - MXV11)",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( ????, pdp11ub,  0,       0,   pdp11,    pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9301-YA)",       GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, pdp11ub2, pdp11ub, 0,   pdp11ub2, pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9312)",      GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, pdp11qb,  pdp11ub, 0,   pdp11qb,  pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Q-BUS] (M7195 - MXV11)",      GAME_NOT_WORKING | GAME_NO_SOUND)

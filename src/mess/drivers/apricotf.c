@@ -272,10 +272,10 @@ WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_int_w),		// interrupt handler
-	DEVCB_NULL,		// ZC/TO0 callback
-	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_z1_w),	// ZC/TO1 callback
-	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_z2_w),	// ZC/TO2 callback
+	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_int_w),      // interrupt handler
+	DEVCB_NULL,     // ZC/TO0 callback
+	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_z1_w),   // ZC/TO1 callback
+	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_z2_w),   // ZC/TO2 callback
 };
 
 
@@ -372,8 +372,8 @@ MACHINE_CONFIG_END
 
 ROM_START( f1 )
 	ROM_REGION( 0x8000, I8086_TAG, 0 )
-	ROM_LOAD16_BYTE( "lo_f1_1.6.8f",  0x0000, 0x4000, CRC(be018be2) SHA1(80b97f5b2111daf112c69b3f58d1541a4ba69da0) )	// Labelled F1 - LO Vr. 1.6
-	ROM_LOAD16_BYTE( "hi_f1_1.6.10f", 0x0001, 0x4000, CRC(bbba77e2) SHA1(e62bed409eb3198f4848f85fccd171cd0745c7c0) )	// Labelled F1 - HI Vr. 1.6
+	ROM_LOAD16_BYTE( "lo_f1_1.6.8f",  0x0000, 0x4000, CRC(be018be2) SHA1(80b97f5b2111daf112c69b3f58d1541a4ba69da0) )    // Labelled F1 - LO Vr. 1.6
+	ROM_LOAD16_BYTE( "hi_f1_1.6.10f", 0x0001, 0x4000, CRC(bbba77e2) SHA1(e62bed409eb3198f4848f85fccd171cd0745c7c0) )    // Labelled F1 - HI Vr. 1.6
 ROM_END
 
 #define rom_f1e rom_f1
@@ -386,8 +386,8 @@ ROM_END
 
 ROM_START( f10 )
 	ROM_REGION( 0x8000, I8086_TAG, 0 )
-	ROM_LOAD16_BYTE( "lo_f10_3.1.1.8f",  0x0000, 0x4000, CRC(bfd46ada) SHA1(0a36ef379fa9af7af9744b40c167ce6e12093485) )	// Labelled LO-FRange Vr3.1.1
-	ROM_LOAD16_BYTE( "hi_f10_3.1.1.10f", 0x0001, 0x4000, CRC(67ad5b3a) SHA1(a5ececb87476a30167cf2a4eb35c03aeb6766601) )	// Labelled HI-FRange Vr3.1.1
+	ROM_LOAD16_BYTE( "lo_f10_3.1.1.8f",  0x0000, 0x4000, CRC(bfd46ada) SHA1(0a36ef379fa9af7af9744b40c167ce6e12093485) ) // Labelled LO-FRange Vr3.1.1
+	ROM_LOAD16_BYTE( "hi_f10_3.1.1.10f", 0x0001, 0x4000, CRC(67ad5b3a) SHA1(a5ececb87476a30167cf2a4eb35c03aeb6766601) ) // Labelled HI-FRange Vr3.1.1
 ROM_END
 
 

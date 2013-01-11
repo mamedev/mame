@@ -125,8 +125,8 @@
 #include "upd7759.h"
 
 
-#define DEBUG_STATES	(0)
-#define DEBUG_METHOD	mame_printf_debug
+#define DEBUG_STATES    (0)
+#define DEBUG_METHOD    mame_printf_debug
 
 
 
@@ -137,9 +137,9 @@
 *************************************************************/
 
 /* step value fractional bits */
-#define FRAC_BITS		20
-#define FRAC_ONE		(1 << FRAC_BITS)
-#define FRAC_MASK		(FRAC_ONE - 1)
+#define FRAC_BITS       20
+#define FRAC_ONE        (1 << FRAC_BITS)
+#define FRAC_MASK       (FRAC_ONE - 1)
 
 /* chip states */
 enum
@@ -170,49 +170,49 @@ enum
 struct upd7759_state
 {
 	device_t *device;
-	sound_stream *channel;					/* stream channel for playback */
+	sound_stream *channel;                  /* stream channel for playback */
 
 	/* chip configuration */
-	UINT8		sample_offset_shift;		/* header sample address shift (access data > 0xffff) */
+	UINT8       sample_offset_shift;        /* header sample address shift (access data > 0xffff) */
 
 	/* internal clock to output sample rate mapping */
-	UINT32		pos;						/* current output sample position */
-	UINT32		step;						/* step value per output sample */
-	attotime	clock_period;				/* clock period */
-	emu_timer *timer;						/* timer */
+	UINT32      pos;                        /* current output sample position */
+	UINT32      step;                       /* step value per output sample */
+	attotime    clock_period;               /* clock period */
+	emu_timer *timer;                       /* timer */
 
 	/* I/O lines */
-	UINT8		fifo_in;					/* last data written to the sound chip */
-	UINT8		reset;						/* current state of the RESET line */
-	UINT8		start;						/* current state of the START line */
-	UINT8		drq;						/* current state of the DRQ line */
-	void (*drqcallback)(device_t *device, int param);			/* drq callback */
+	UINT8       fifo_in;                    /* last data written to the sound chip */
+	UINT8       reset;                      /* current state of the RESET line */
+	UINT8       start;                      /* current state of the START line */
+	UINT8       drq;                        /* current state of the DRQ line */
+	void (*drqcallback)(device_t *device, int param);           /* drq callback */
 
 	/* internal state machine */
-	INT8		state;						/* current overall chip state */
-	INT32		clocks_left;				/* number of clocks left in this state */
-	UINT16		nibbles_left;				/* number of ADPCM nibbles left to process */
-	UINT8		repeat_count;				/* number of repeats remaining in current repeat block */
-	INT8		post_drq_state;				/* state we will be in after the DRQ line is dropped */
-	INT32		post_drq_clocks;			/* clocks that will be left after the DRQ line is dropped */
-	UINT8		req_sample;					/* requested sample number */
-	UINT8		last_sample;				/* last sample number available */
-	UINT8		block_header;				/* header byte */
-	UINT8		sample_rate;				/* number of UPD clocks per ADPCM nibble */
-	UINT8		first_valid_header;			/* did we get our first valid header yet? */
-	UINT32		offset;						/* current ROM offset */
-	UINT32		repeat_offset;				/* current ROM repeat offset */
+	INT8        state;                      /* current overall chip state */
+	INT32       clocks_left;                /* number of clocks left in this state */
+	UINT16      nibbles_left;               /* number of ADPCM nibbles left to process */
+	UINT8       repeat_count;               /* number of repeats remaining in current repeat block */
+	INT8        post_drq_state;             /* state we will be in after the DRQ line is dropped */
+	INT32       post_drq_clocks;            /* clocks that will be left after the DRQ line is dropped */
+	UINT8       req_sample;                 /* requested sample number */
+	UINT8       last_sample;                /* last sample number available */
+	UINT8       block_header;               /* header byte */
+	UINT8       sample_rate;                /* number of UPD clocks per ADPCM nibble */
+	UINT8       first_valid_header;         /* did we get our first valid header yet? */
+	UINT32      offset;                     /* current ROM offset */
+	UINT32      repeat_offset;              /* current ROM repeat offset */
 
 	/* ADPCM processing */
-	INT8		adpcm_state;				/* ADPCM state index */
-	UINT8		adpcm_data;					/* current byte of ADPCM data */
-	INT16		sample;						/* current sample value */
+	INT8        adpcm_state;                /* ADPCM state index */
+	UINT8       adpcm_data;                 /* current byte of ADPCM data */
+	INT16       sample;                     /* current sample value */
 
 	/* ROM access */
-	UINT8 *		rom;						/* pointer to ROM data or NULL for slave mode */
-	UINT8 *		rombase;					/* pointer to ROM data or NULL for slave mode */
-	UINT32		romoffset;					/* ROM offset to make save/restore easier */
-	UINT32		rommask;					/* maximum address offset */
+	UINT8 *     rom;                        /* pointer to ROM data or NULL for slave mode */
+	UINT8 *     rombase;                    /* pointer to ROM data or NULL for slave mode */
+	UINT32      romoffset;                  /* ROM offset to make save/restore easier */
+	UINT32      rommask;                    /* maximum address offset */
 };
 
 
@@ -305,13 +305,13 @@ static void advance_state(upd7759_state *chip)
 			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: req_sample = %02X\n", chip->req_sample);
 
 			/* 35+ cycles after we get here, the /DRQ goes low
-             *     (first byte (number of samples in ROM) should be sent in response)
-             *
-             * (35 is the minimum number of cycles I found during heavy tests.
-             * Depending on the state the chip was in just before the /MD was set to 0 (reset, standby
-             * or just-finished-playing-previous-sample) this number can range from 35 up to ~24000).
-             * It also varies slightly from test to test, but not much - a few cycles at most.) */
-			chip->clocks_left = 70;	/* 35 - breaks cotton */
+			 *     (first byte (number of samples in ROM) should be sent in response)
+			 *
+			 * (35 is the minimum number of cycles I found during heavy tests.
+			 * Depending on the state the chip was in just before the /MD was set to 0 (reset, standby
+			 * or just-finished-playing-previous-sample) this number can range from 35 up to ~24000).
+			 * It also varies slightly from test to test, but not much - a few cycles at most.) */
+			chip->clocks_left = 70; /* 35 - breaks cotton */
 			chip->state = STATE_FIRST_REQ;
 			break;
 
@@ -334,7 +334,7 @@ static void advance_state(upd7759_state *chip)
 			chip->drq = 1;
 
 			/* 28 cycles later, we will latch this value and request another byte */
-			chip->clocks_left = 28;	/* 28 - breaks cotton */
+			chip->clocks_left = 28; /* 28 - breaks cotton */
 			chip->state = (chip->req_sample > chip->last_sample) ? STATE_IDLE : STATE_DUMMY1;
 			break;
 
@@ -403,30 +403,30 @@ static void advance_state(upd7759_state *chip)
 			/* our next step depends on the top two bits */
 			switch (chip->block_header & 0xc0)
 			{
-				case 0x00:	/* silence */
+				case 0x00:  /* silence */
 					chip->clocks_left = 1024 * ((chip->block_header & 0x3f) + 1);
 					chip->state = (chip->block_header == 0 && chip->first_valid_header) ? STATE_IDLE : STATE_BLOCK_HEADER;
 					chip->sample = 0;
 					chip->adpcm_state = 0;
 					break;
 
-				case 0x40:	/* 256 nibbles */
+				case 0x40:  /* 256 nibbles */
 					chip->sample_rate = (chip->block_header & 0x3f) + 1;
 					chip->nibbles_left = 256;
-					chip->clocks_left = 36;	/* just a guess */
+					chip->clocks_left = 36; /* just a guess */
 					chip->state = STATE_NIBBLE_MSN;
 					break;
 
-				case 0x80:	/* n nibbles */
+				case 0x80:  /* n nibbles */
 					chip->sample_rate = (chip->block_header & 0x3f) + 1;
-					chip->clocks_left = 36;	/* just a guess */
+					chip->clocks_left = 36; /* just a guess */
 					chip->state = STATE_NIBBLE_COUNT;
 					break;
 
-				case 0xc0:	/* repeat loop */
+				case 0xc0:  /* repeat loop */
 					chip->repeat_count = (chip->block_header & 7) + 1;
 					chip->repeat_offset = chip->offset;
-					chip->clocks_left = 36;	/* just a guess */
+					chip->clocks_left = 36; /* just a guess */
 					chip->state = STATE_BLOCK_HEADER;
 					break;
 			}
@@ -444,7 +444,7 @@ static void advance_state(upd7759_state *chip)
 			chip->drq = 1;
 
 			/* 36?? cycles later, we will latch this value and request another byte */
-			chip->clocks_left = 36;	/* just a guess */
+			chip->clocks_left = 36; /* just a guess */
 			chip->state = STATE_NIBBLE_MSN;
 			break;
 
@@ -789,13 +789,13 @@ const device_type UPD7759 = &device_creator<upd7759_device>;
 
 upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7759, "uPD7759", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(upd7759_state);
 }
 upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(upd7759_state);
 }

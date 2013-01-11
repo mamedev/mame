@@ -80,9 +80,9 @@ READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
 	machine().scheduler().synchronize();
 
 	if (!m_directionflag)
-		return 0x00;		// standby
+		return 0x00;        // standby
 	else
-		return 0xff;		// busy
+		return 0xff;        // busy
 }
 
 
@@ -90,9 +90,9 @@ READ8_MEMBER(fromance_state::fromance_busycheck_sub_r)
 {
 
 	if (m_directionflag)
-		return 0xff;		// standby
+		return 0xff;        // standby
 	else
-		return 0x00;		// busy
+		return 0x00;        // busy
 }
 
 
@@ -227,7 +227,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fromance_main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0x9e89, 0x9e89) AM_READNOP			// unknown (idolmj)
+	AM_RANGE(0x9e89, 0x9e89) AM_READNOP         // unknown (idolmj)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ(fromance_keymatrix_r)
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("COIN") AM_WRITE(fromance_coinctr_w)
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
-	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
+	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
 	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
-	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
+	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
-	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
+	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( nekkyoku )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -450,9 +450,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( idolmj )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)	// TEST
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -465,7 +465,7 @@ static INPUT_PORTS_START( idolmj )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )		// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -527,9 +527,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fromance )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)	// TEST
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -542,7 +542,7 @@ static INPUT_PORTS_START( fromance )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )		// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -602,9 +602,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( nmsengen )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)	// TEST
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -617,7 +617,7 @@ static INPUT_PORTS_START( nmsengen )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )		// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -677,9 +677,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( daiyogen )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)	// TEST
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -692,7 +692,7 @@ static INPUT_PORTS_START( daiyogen )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )		// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -754,9 +754,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mfunclub )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)	// TEST
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -769,7 +769,7 @@ static INPUT_PORTS_START( mfunclub )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )		// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -831,9 +831,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjnatsu )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)	// TEST
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -846,7 +846,7 @@ static INPUT_PORTS_START( mjnatsu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )		// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -939,8 +939,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	fromance_adpcm_int,	/* IRQ handler */
-	MSM5205_S48_4B		/* 8 KHz */
+	fromance_adpcm_int, /* IRQ handler */
+	MSM5205_S48_4B      /* 8 KHz */
 };
 
 
@@ -1001,11 +1001,11 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(nekkyoku_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MCFG_CPU_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(nekkyoku_sub_map)
 	MCFG_CPU_IO_MAP(nekkyoku_sub_io_map)
 
@@ -1039,11 +1039,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( idolmj, fromance_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MCFG_CPU_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(idolmj_sub_io_map)
 
@@ -1077,11 +1077,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( fromance, fromance_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MCFG_CPU_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
 	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
 	MCFG_CPU_IO_MAP(fromance_sub_io_map)
 

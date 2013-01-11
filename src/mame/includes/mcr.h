@@ -12,7 +12,7 @@
 #include "audio/midway.h"
 
 /* constants */
-#define MAIN_OSC_MCR_I		XTAL_19_968MHz
+#define MAIN_OSC_MCR_I      XTAL_19_968MHz
 
 
 class mcr_state : public driver_device

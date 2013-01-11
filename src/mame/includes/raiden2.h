@@ -3,11 +3,11 @@ class raiden2_state : public driver_device
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  back_data(*this, "back_data"),
-		  fore_data(*this, "fore_data"),
-		  mid_data(*this, "mid_data"),
-		  text_data(*this, "text_data"),
-		  sprites(*this, "sprites") { }
+			back_data(*this, "back_data"),
+			fore_data(*this, "fore_data"),
+			mid_data(*this, "mid_data"),
+			text_data(*this, "text_data"),
+			sprites(*this, "sprites") { }
 
 	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
 	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
@@ -92,10 +92,10 @@ public:
 	UINT16 sprites_cur_start;
 	UINT16 pal_brightness_val;
 
-	UINT16 cop_func_trigger[0x100/8];		/* function trigger */
-	UINT16 cop_func_value[0x100/8];			/* function value (?) */
-	UINT16 cop_func_mask[0x100/8];			/* function mask (?) */
-	UINT16 cop_program[0x100];				/* program "code" */
+	UINT16 cop_func_trigger[0x100/8];       /* function trigger */
+	UINT16 cop_func_value[0x100/8];         /* function value (?) */
+	UINT16 cop_func_mask[0x100/8];          /* function mask (?) */
+	UINT16 cop_program[0x100];              /* program "code" */
 	UINT16 cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
 	INT8 cop_angle_compare;
 	UINT8 cop_angle_mod_val;

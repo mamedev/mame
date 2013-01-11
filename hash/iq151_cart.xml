@@ -31,7 +31,7 @@
 		<description>AMOS v4.1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-        <info name="usage" value="Execute C8000 in the monitor"/>
+		<info name="usage" value="Execute C8000 in the monitor"/>
 		<part name="cart1" interface="iq151_cart">
 			<!-- AMOS, editor and Pascal run-time -->
 			<feature name="slot" value="amos1" />

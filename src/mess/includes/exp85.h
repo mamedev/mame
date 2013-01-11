@@ -1,20 +1,20 @@
 #ifndef __EXP85__
 #define __EXP85__
 
-#define SCREEN_TAG		"screen"
-#define I8085A_TAG		"u100"
-#define I8155_TAG		"u106"
-#define I8355_TAG		"u105"
+#define SCREEN_TAG      "screen"
+#define I8085A_TAG      "u100"
+#define I8155_TAG       "u106"
+#define I8355_TAG       "u105"
 
 class exp85_state : public driver_device
 {
 public:
 	exp85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8085A_TAG),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_speaker(*this, SPEAKER_TAG)
+			m_maincpu(*this, I8085A_TAG),
+			m_terminal(*this, TERMINAL_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_speaker(*this, SPEAKER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -129,18 +129,18 @@ WRITE8_MEMBER( tmc2000_state::keylatch_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       X0
-        1       X1
-        2       X2
-        3       Y0
-        4       Y1
-        5       Y2
-        6       EXP1
-        7       EXP2
+	    0       X0
+	    1       X1
+	    2       X2
+	    3       Y0
+	    4       Y1
+	    5       Y2
+	    6       EXP1
+	    7       EXP2
 
-    */
+	*/
 
 	m_keylatch = data & 0x3f;
 }
@@ -149,18 +149,18 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       X0
-        1       X1
-        2       X2
-        3       Y0
-        4       not connected
-        5       not connected
-        6       not connected
-        7       not connected
+	    0       X0
+	    1       X1
+	    2       X2
+	    3       Y0
+	    4       not connected
+	    5       not connected
+	    6       not connected
+	    7       not connected
 
-    */
+	*/
 
 	m_keylatch = data & 0x0f;
 }
@@ -879,8 +879,8 @@ ROM_START( osc1000b )
 	ROM_LOAD( "mmi6341-1.ic2", 0x000, 0x0200, NO_DUMP ) // equivalent to 82S141
 
 	ROM_REGION( 0x400, "gfx1", 0 )
-	ROM_LOAD( "mmi6349.5d",	0x000, 0x200, NO_DUMP ) // equivalent to 82S147
-	ROM_LOAD( "mmi6349.5c",	0x200, 0x200, NO_DUMP ) // equivalent to 82S147
+	ROM_LOAD( "mmi6349.5d", 0x000, 0x200, NO_DUMP ) // equivalent to 82S147
+	ROM_LOAD( "mmi6349.5c", 0x200, 0x200, NO_DUMP ) // equivalent to 82S147
 ROM_END
 
 ROM_START( tmc2000 )
@@ -890,7 +890,7 @@ ROM_START( tmc2000 )
 	ROM_SYSTEM_BIOS( 1, "prom202", "PROM N:o 202" )
 	ROMX_LOAD( "202.m5",    0x000, 0x200, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tool2000", "TOOL-2000" )
-	ROMX_LOAD( "tool2000",	0x000, 0x800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "tool2000",  0x000, 0x800, NO_DUMP, ROM_BIOS(3) )
 ROM_END
 
 ROM_START( nano )
@@ -915,7 +915,7 @@ DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800, tmc1800_state,    tmc1800,	"Telercas Oy",	"Telmac 1800",  GAME_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800, driver_device,    0,    "OSCOM Oy",		"OSCOM 1000B",  GAME_NOT_WORKING )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000, driver_device,    0,		    "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
-COMP( 1980, nano,		tmc2000,0,		nano,		nano, driver_device,		0,			"OSCOM Oy",		"OSCOM Nano",	GAME_SUPPORTS_SAVE )
+COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800, tmc1800_state,    tmc1800, "Telercas Oy",  "Telmac 1800",  GAME_NOT_WORKING )
+COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800, driver_device,    0,    "OSCOM Oy",        "OSCOM 1000B",  GAME_NOT_WORKING )
+COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000, driver_device,    0,           "Telercas Oy",  "Telmac 2000",  GAME_SUPPORTS_SAVE )
+COMP( 1980, nano,       tmc2000,0,      nano,       nano, driver_device,        0,          "OSCOM Oy",     "OSCOM Nano",   GAME_SUPPORTS_SAVE )

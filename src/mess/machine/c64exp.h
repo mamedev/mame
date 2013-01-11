@@ -46,7 +46,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define C64_EXPANSION_SLOT_TAG		"exp"
+#define C64_EXPANSION_SLOT_TAG      "exp"
 
 
 
@@ -59,8 +59,8 @@
 
 
 #define MCFG_C64_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, C64_EXPANSION_SLOT, _clock) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, C64_EXPANSION_SLOT, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -73,12 +73,12 @@
 
 struct c64_expansion_slot_interface
 {
-	devcb_read8			m_in_dma_cd_cb;
-	devcb_write8		m_out_dma_cd_cb;
-    devcb_write_line	m_out_irq_cb;
-    devcb_write_line	m_out_nmi_cb;
-    devcb_write_line	m_out_dma_cb;
-    devcb_write_line	m_out_reset_cb;
+	devcb_read8         m_in_dma_cd_cb;
+	devcb_write8        m_out_dma_cd_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_dma_cb;
+	devcb_write_line    m_out_reset_cb;
 };
 
 
@@ -87,9 +87,9 @@ struct c64_expansion_slot_interface
 class device_c64_expansion_card_interface;
 
 class c64_expansion_slot_device : public device_t,
-								  public c64_expansion_slot_interface,
-								  public device_slot_interface,
-								  public device_image_interface
+									public c64_expansion_slot_interface,
+									public device_slot_interface,
+									public device_image_interface
 {
 public:
 	// construction/destruction
@@ -138,12 +138,12 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	devcb_resolved_read8		m_in_dma_cd_func;
-	devcb_resolved_write8		m_out_dma_cd_func;
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_dma_func;
-	devcb_resolved_write_line	m_out_reset_func;
+	devcb_resolved_read8        m_in_dma_cd_func;
+	devcb_resolved_write8       m_out_dma_cd_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_dma_func;
+	devcb_resolved_write_line   m_out_reset_func;
 
 	device_c64_expansion_card_interface *m_cart;
 };

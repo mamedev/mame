@@ -15,15 +15,15 @@
 #include "sound/beep.h"
 
 
-#define BEEP_RATE			48000
+#define BEEP_RATE           48000
 
 struct beep_state
 {
-	sound_stream *stream;	/* stream number */
-	int enable; 			/* enable beep */
-	int frequency;			/* set frequency - this can be changed using the appropiate function */
-	int incr;				/* initial wave state */
-	INT16 signal;			/* current signal */
+	sound_stream *stream;   /* stream number */
+	int enable;             /* enable beep */
+	int frequency;          /* set frequency - this can be changed using the appropiate function */
+	int incr;               /* initial wave state */
+	INT16 signal;           /* current signal */
 };
 
 
@@ -49,7 +49,7 @@ static STREAM_UPDATE( beep_sound_update )
 	INT16 signal = bs->signal;
 	int clock = 0, rate = BEEP_RATE / 2;
 
-    /* get progress through wave */
+	/* get progress through wave */
 	int incr = bs->incr;
 
 	if (bs->frequency > 0)
@@ -166,7 +166,7 @@ const device_type BEEP = &device_creator<beep_device>;
 
 beep_device::beep_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BEEP, "Beep", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(beep_state);
 }
@@ -199,5 +199,3 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

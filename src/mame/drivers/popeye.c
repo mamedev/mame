@@ -24,7 +24,7 @@ Notes:
 INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
 {
 	/* NMIs are enabled by the I register?? How can that be? */
-	if (device.state().state_int(Z80_I) & 1)	/* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
+	if (device.state().state_int(Z80_I) & 1)    /* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -38,7 +38,7 @@ READ8_MEMBER(popeye_state::protection_r)
 	{
 		return ((m_prot1 << m_prot_shift) | (m_prot0 >> (8-m_prot_shift))) & 0xff;
 	}
-	else	/* offset == 1 */
+	else    /* offset == 1 */
 	{
 		/* the game just checks if bit 2 is clear. Returning 0 seems to be enough. */
 		return 0;
@@ -52,7 +52,7 @@ WRITE8_MEMBER(popeye_state::protection_w)
 		/* this is the same as the level number (1-3) */
 		m_prot_shift = data & 0x07;
 	}
-	else	/* offset == 1 */
+	else    /* offset == 1 */
 	{
 		m_prot0 = m_prot1;
 		m_prot1 = data;
@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( skyskipr )
-	PORT_START("P1")	/* IN0 */
+	PORT_START("P1")    /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -123,7 +123,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 
-	PORT_START("P2")	/* IN1 */
+	PORT_START("P2")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -133,7 +133,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 
-	PORT_START("IN0")	/* IN2 */
+	PORT_START("IN0")   /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -143,7 +143,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("DSW0")	/* DSW0 */
+	PORT_START("DSW0")  /* DSW0 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, "A 3/1 B 1/2" )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )
@@ -170,9 +170,9 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* scans DSW1 one bit at a time */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* scans DSW1 one bit at a time */
 
-	PORT_START("DSW1")	/* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
+	PORT_START("DSW1")  /* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -198,7 +198,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( popeye )
-	PORT_START("P1")	/* IN0 */
+	PORT_START("P1")    /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -208,7 +208,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 
-	PORT_START("P2")	/* IN1 */
+	PORT_START("P2")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -218,7 +218,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 
-	PORT_START("IN0")	/* IN2 */
+	PORT_START("IN0")   /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("DSW0")	/* DSW0 */
+	PORT_START("DSW0")  /* DSW0 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )    PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
@@ -247,9 +247,9 @@ static INPUT_PORTS_START( popeye )
 	PORT_DIPSETTING(    0x20, "Nintendo Co.,Ltd" )
 	PORT_DIPSETTING(    0x60, "Nintendo of America" )
 //  PORT_DIPSETTING(    0x00, "Nintendo of America" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* scans DSW1 one bit at a time */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* scans DSW1 one bit at a time */
 
-	PORT_START("DSW1")	/* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
+	PORT_START("DSW1")  /* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -275,7 +275,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( popeyef )
-	PORT_START("P1")	/* IN0 */
+	PORT_START("P1")    /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -285,7 +285,7 @@ static INPUT_PORTS_START( popeyef )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 
-	PORT_START("P2")	/* IN1 */
+	PORT_START("P2")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( popeyef )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 
-	PORT_START("IN0")	/* IN2 */
+	PORT_START("IN0")   /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -305,7 +305,7 @@ static INPUT_PORTS_START( popeyef )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("DSW0")	/* DSW0 */
+	PORT_START("DSW0")  /* DSW0 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, "A 3/1 B 1/2" )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )
@@ -331,9 +331,9 @@ static INPUT_PORTS_START( popeyef )
 	PORT_DIPSETTING(    0x20, "Nintendo Co.,Ltd" )
 	PORT_DIPSETTING(    0x60, "Nintendo of America" )
 //  PORT_DIPSETTING(    0x00, "Nintendo of America" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* scans DSW1 one bit at a time */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* scans DSW1 one bit at a time */
 
-	PORT_START("DSW1")	/* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
+	PORT_START("DSW1")  /* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -360,7 +360,7 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	16,16,	/* 16*16 characters (8*8 doubled) */
+	16,16,  /* 16*16 characters (8*8 doubled) */
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
@@ -376,16 +376,16 @@ static const gfx_layout spritelayout =
 	2,
 	{ 0, RGN_FRAC(1,2) },
 	{RGN_FRAC(1,4)+7,RGN_FRAC(1,4)+6,RGN_FRAC(1,4)+5,RGN_FRAC(1,4)+4,
-	 RGN_FRAC(1,4)+3,RGN_FRAC(1,4)+2,RGN_FRAC(1,4)+1,RGN_FRAC(1,4)+0,
-	 7,6,5,4,3,2,1,0 },
+		RGN_FRAC(1,4)+3,RGN_FRAC(1,4)+2,RGN_FRAC(1,4)+1,RGN_FRAC(1,4)+0,
+		7,6,5,4,3,2,1,0 },
 	{ 15*8, 14*8, 13*8, 12*8, 11*8, 10*8, 9*8, 8*8,
-	  7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
+		7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
 	16*8
 };
 
 static GFXDECODE_START( popeye )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        16, 16 )	/* chars */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 64 )	/* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        16, 16 ) /* chars */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 64 ) /* sprites */
 GFXDECODE_END
 
 
@@ -425,7 +425,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(skyskipr_map)
 	MCFG_CPU_IO_MAP(popeye_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", popeye_state,  popeye_interrupt)
@@ -518,7 +518,7 @@ ROM_START( popeye )
 	ROM_LOAD( "tpp2-c.7e", 0x6000, 0x2000, CRC(ef8649ca) SHA1(a0157f91600e56e2a953dadbd76da4330652e5c8) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "tpp2-v.5n", 0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
+	ROM_LOAD( "tpp2-v.5n", 0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )   /* first half is empty */
 	ROM_CONTINUE(          0x0000, 0x0800 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
@@ -543,7 +543,7 @@ ROM_START( popeyeu )
 	ROM_LOAD( "7e",        0x6000, 0x2000, CRC(b64aa314) SHA1(b5367f518350223e191d94434dc535873efb4c74) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "tpp2-v.5n", 0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
+	ROM_LOAD( "tpp2-v.5n", 0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )   /* first half is empty */
 	ROM_CONTINUE(          0x0000, 0x0800 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
@@ -568,7 +568,7 @@ ROM_START( popeyef )
 	ROM_LOAD( "tpp2-c_f.7e", 0x6000, 0x2000, CRC(f31e7916) SHA1(0f54ea7b1691b7789067fe880ffc56fac1d9523a) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "tpp2-v.5n",   0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
+	ROM_LOAD( "tpp2-v.5n",   0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) ) /* first half is empty */
 	ROM_CONTINUE(            0x0000, 0x0800 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
@@ -591,10 +591,10 @@ ROM_START( popeyebl )
 	ROM_LOAD( "po2",          0x2000, 0x2000, CRC(995475ff) SHA1(5cd5ac23a73722e32c80cd6ffc435584750a46c9) )
 	ROM_LOAD( "po3",          0x4000, 0x2000, CRC(99d6a04a) SHA1(b683a5bb1ac4f6bec7478760c8ad0ff7c00bc652) )
 	ROM_LOAD( "po4",          0x6000, 0x2000, CRC(548a6514) SHA1(006e076781a3e5c3afa084c723247365358e3187) )
-	ROM_LOAD( "po_d1-e1.bin", 0xe000, 0x0020, CRC(8de22998) SHA1(e3a232ff85fb207afbe23049a65e828420589342) )	/* protection PROM */
+	ROM_LOAD( "po_d1-e1.bin", 0xe000, 0x0020, CRC(8de22998) SHA1(e3a232ff85fb207afbe23049a65e828420589342) )    /* protection PROM */
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "v-5n",         0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
+	ROM_LOAD( "v-5n",         0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )    /* first half is empty */
 	ROM_CONTINUE(             0x0000, 0x0800 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
@@ -628,9 +628,9 @@ DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 		auto_free(machine(), buffer);
 	}
 
-    state_save_register_global(machine(), m_prot0);
-    state_save_register_global(machine(), m_prot1);
-    state_save_register_global(machine(), m_prot_shift);
+	state_save_register_global(machine(), m_prot0);
+	state_save_register_global(machine(), m_prot1);
+	state_save_register_global(machine(), m_prot_shift);
 }
 
 DRIVER_INIT_MEMBER(popeye_state,popeye)
@@ -649,9 +649,9 @@ DRIVER_INIT_MEMBER(popeye_state,popeye)
 		auto_free(machine(), buffer);
 	}
 
-    state_save_register_global(machine(), m_prot0);
-    state_save_register_global(machine(), m_prot1);
-    state_save_register_global(machine(), m_prot_shift);
+	state_save_register_global(machine(), m_prot0);
+	state_save_register_global(machine(), m_prot1);
+	state_save_register_global(machine(), m_prot_shift);
 }
 
 

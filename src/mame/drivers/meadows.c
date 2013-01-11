@@ -173,15 +173,15 @@ WRITE8_MEMBER(meadows_state::meadows_audio_w)
 				break;
 			logerror("meadows_audio_w %d $%02x\n", offset, data);
 			m_0c00 = data;
-            break;
+			break;
 
 		case 1:
 			logerror("meadows_audio_w %d $%02x\n", offset, data);
-            break;
+			break;
 
-        case 2:
+		case 2:
 			logerror("meadows_audio_w %d $%02x\n", offset, data);
-            break;
+			break;
 
 		case 3:
 /*          S2650_Clear_Pending_Interrupts(); */
@@ -212,7 +212,7 @@ INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
 
 INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
 {
-    /* fake something toggling the sense input line of the S2650 */
+	/* fake something toggling the sense input line of the S2650 */
 	m_main_sense_state ^= 1;
 	device.execute().set_input_line(1, m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -245,7 +245,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
 	{
 		case 0: /* DAC */
 			meadows_sh_dac_w(machine(), data ^ 0xff);
-            break;
+			break;
 
 		case 1: /* counter clk 5 MHz / 256 */
 			if (data == m_0c01)
@@ -257,19 +257,19 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
 			if (data == m_0c02)
-                break;
+				break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
 			m_0c02 = data;
 			meadows_sh_update(machine());
-            break;
+			break;
 
 		case 3: /* audio enable */
 			if (data == m_0c03)
-                break;
+				break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
 			m_0c03 = data;
 			meadows_sh_update(machine());
-            break;
+			break;
 	}
 }
 
@@ -289,13 +289,13 @@ READ8_MEMBER(meadows_state::audio_hardware_r)
 	{
 		case 0:
 			data = m_0c00;
-            break;
+			break;
 
 		case 1: break;
 		case 2: break;
 		case 3: break;
 	}
-    return data;
+	return data;
 }
 
 
@@ -308,7 +308,7 @@ READ8_MEMBER(meadows_state::audio_hardware_r)
 
 INTERRUPT_GEN_MEMBER(meadows_state::audio_interrupt)
 {
-    /* fake something toggling the sense input line of the S2650 */
+	/* fake something toggling the sense input line of the S2650 */
 	m_audio_sense_state ^= 1;
 	device.execute().set_input_line(1, m_audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -558,36 +558,36 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,							/* 8*8 characters */
-	128,							/* 128 characters ? */
-	1,								/* 1 bit per pixel */
-	{ 0 },							/* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 }, 	/* pretty straight layout */
+	8,8,                            /* 8*8 characters */
+	128,                            /* 128 characters ? */
+	1,                              /* 1 bit per pixel */
+	{ 0 },                          /* no bitplanes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },     /* pretty straight layout */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 							/* every char takes 8 bytes */
+	8*8                             /* every char takes 8 bytes */
 };
 
 
 static const gfx_layout spritelayout =
 {
-	16,16,							/* 16*16 sprites ?  */
-	32, 							/* 32 sprites  */
-	1,								/* 1 bits per pixel */
-	{ 0 },							/* 1 bitplane */
+	16,16,                          /* 16*16 sprites ?  */
+	32,                             /* 32 sprites  */
+	1,                              /* 1 bits per pixel */
+	{ 0 },                          /* 1 bitplane */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	8, 9,10,11,12,13,14,15 },	  /* pretty straight layout */
+	8, 9,10,11,12,13,14,15 },     /* pretty straight layout */
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 	8*16, 9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
-	16*2*8							/* every sprite takes 32 bytes */
+	16*2*8                          /* every sprite takes 32 bytes */
 };
 
 
 static GFXDECODE_START( meadows )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	 0, 1 )		/* character generator */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 1 )		/* sprite prom 1 */
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 1 )		/* sprite prom 2 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 0, 1 )		/* sprite prom 3 (unused) */
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout, 0, 1 )		/* sprite prom 4 (unused) */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )     /* character generator */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 1 )        /* sprite prom 1 */
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 1 )        /* sprite prom 2 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 0, 1 )        /* sprite prom 3 (unused) */
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout, 0, 1 )        /* sprite prom 4 (unused) */
 GFXDECODE_END
 
 
@@ -612,7 +612,7 @@ static const char *const bowl3d_sample_names[] =
 	"footstep", /* "foot sweep" */
 	"crash",    /* "crash" */
 	"cheering", /* "cheering" */
-    0
+	0
 };
 
 
@@ -641,11 +641,11 @@ static const samples_interface bowl3d_samples_interface =
 static MACHINE_CONFIG_START( meadows, meadows_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(meadows_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  meadows_interrupt)	/* one interrupt per frame!? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  meadows_interrupt) /* one interrupt per frame!? */
 
-	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
 
@@ -675,7 +675,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( minferno, meadows_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
 	MCFG_CPU_PROGRAM_MAP(minferno_main_map)
 	MCFG_CPU_IO_MAP(minferno_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  minferno_interrupt)
@@ -698,11 +698,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bowl3d, meadows_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(bowl3d_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  meadows_interrupt)	/* one interrupt per frame!? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  meadows_interrupt) /* one interrupt per frame!? */
 
-	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
 
@@ -776,8 +776,8 @@ ROM_START( bowl3d )
 	ROM_LOAD( "b3d.h12",      0x1400, 0x0400, CRC(80a149d6) SHA1(ab4ca76d9f5aa5e02b9d5bf909af9548fe62f475) )
 	// h13 empty
 
-    /* Universal Game Logic according to schematics  */
-    ROM_REGION( 0x08000, "audiocpu", 0 )	/* 2650 CPU at j8 */
+	/* Universal Game Logic according to schematics  */
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 2650 CPU at j8 */
 	ROM_LOAD( "82s115.a6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
 	ROM_LOAD( "82s115.c6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
 
@@ -818,10 +818,10 @@ ROM_START( gypsyjug )
 	/* empty (copied from 2) */
 
 	ROM_REGION( 0x0400, "gfx4", 0 )
-	ROM_LOAD( "gj.x",         0x0000, 0x0400, NO_DUMP )		/* missing */
+	ROM_LOAD( "gj.x",         0x0000, 0x0400, NO_DUMP )     /* missing */
 
 	ROM_REGION( 0x0400, "gfx5", 0 )
-	ROM_LOAD( "gj.y",         0x0000, 0x0400, NO_DUMP )		/* missing */
+	ROM_LOAD( "gj.y",         0x0000, 0x0400, NO_DUMP )     /* missing */
 
 	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "gj.a4s",       0x0000, 0x0400, CRC(17a116bc) SHA1(797ba0b292afa3ba7eec985b533014acc00ed47d) )
@@ -832,15 +832,15 @@ ROM_END
 
 ROM_START( minferno )
 	ROM_REGION( 0x08000, "maincpu", ROMREGION_INVERT )
-	ROM_LOAD_NIB_LOW ( "inferno.f5",	0x0000, 0x0400, CRC(58472a73) SHA1(7f8b9502c3db11219d6b765dec7b6ff3f62d6c8b) )
-	ROM_LOAD_NIB_HIGH( "inferno.e5",	0x0000, 0x0400, CRC(451942af) SHA1(0a03d74c1b98771d2170c76ca41e972300c34c3a) )
-	ROM_LOAD_NIB_LOW ( "inferno.f6",	0x0400, 0x0400, CRC(d85a195b) SHA1(8250f8e80a9bf196d7bf122af9aad0ae00dedd26) )
-	ROM_LOAD_NIB_HIGH( "inferno.e6",	0x0400, 0x0400, CRC(788ccfac) SHA1(dfa99745db1c3866bf568fad289485aa0850875a) )
-	ROM_LOAD_NIB_LOW ( "inferno.f7",	0x0800, 0x0400, CRC(73b4e9a3) SHA1(d9de88748a3009f3fc1f90c96bfc9732dc6a4a22) )
-	ROM_LOAD_NIB_HIGH( "inferno.e7",	0x0800, 0x0400, CRC(902d9b78) SHA1(3bebbba6c7d00bea2c687b965f59a9e55b430dfa) )
+	ROM_LOAD_NIB_LOW ( "inferno.f5",    0x0000, 0x0400, CRC(58472a73) SHA1(7f8b9502c3db11219d6b765dec7b6ff3f62d6c8b) )
+	ROM_LOAD_NIB_HIGH( "inferno.e5",    0x0000, 0x0400, CRC(451942af) SHA1(0a03d74c1b98771d2170c76ca41e972300c34c3a) )
+	ROM_LOAD_NIB_LOW ( "inferno.f6",    0x0400, 0x0400, CRC(d85a195b) SHA1(8250f8e80a9bf196d7bf122af9aad0ae00dedd26) )
+	ROM_LOAD_NIB_HIGH( "inferno.e6",    0x0400, 0x0400, CRC(788ccfac) SHA1(dfa99745db1c3866bf568fad289485aa0850875a) )
+	ROM_LOAD_NIB_LOW ( "inferno.f7",    0x0800, 0x0400, CRC(73b4e9a3) SHA1(d9de88748a3009f3fc1f90c96bfc9732dc6a4a22) )
+	ROM_LOAD_NIB_HIGH( "inferno.e7",    0x0800, 0x0400, CRC(902d9b78) SHA1(3bebbba6c7d00bea2c687b965f59a9e55b430dfa) )
 
 	ROM_REGION( 0x00400, "gfx1", 0 )
-	ROM_LOAD( "inferno.b8",		0x0200, 0x0200, CRC(1b06466b) SHA1(aef13ab84526ee7493837eef7f48d9ede65b8e62) )
+	ROM_LOAD( "inferno.b8",     0x0200, 0x0200, CRC(1b06466b) SHA1(aef13ab84526ee7493837eef7f48d9ede65b8e62) )
 ROM_END
 
 

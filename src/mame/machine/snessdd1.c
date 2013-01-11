@@ -59,7 +59,7 @@ class SDD1_GCD //Golomb-Code Decoder
 public:
 	SDD1_GCD(running_machine &machine, SDD1_IM* associatedIM)
 		: IM(associatedIM),
-		   m_machine(machine) { }
+			m_machine(machine) { }
 
 	running_machine &machine() const { return m_machine; }
 
@@ -125,8 +125,8 @@ class SDD1_BG // Bits Generator
 public:
 	SDD1_BG(running_machine &machine, SDD1_GCD* associatedGCD, UINT8 code)
 		: code_num(code),
-		  GCD(associatedGCD),
-		  m_machine(machine) { }
+			GCD(associatedGCD),
+			m_machine(machine) { }
 
 	running_machine &machine() const { return m_machine; }
 
@@ -232,10 +232,10 @@ class SDD1_PEM //Probability Estimation Module
 {
 public:
 	SDD1_PEM(running_machine& machine,
-							   SDD1_BG* associatedBG0, SDD1_BG* associatedBG1,
-							   SDD1_BG* associatedBG2, SDD1_BG* associatedBG3,
-							   SDD1_BG* associatedBG4, SDD1_BG* associatedBG5,
-							   SDD1_BG* associatedBG6, SDD1_BG* associatedBG7)
+								SDD1_BG* associatedBG0, SDD1_BG* associatedBG1,
+								SDD1_BG* associatedBG2, SDD1_BG* associatedBG3,
+								SDD1_BG* associatedBG4, SDD1_BG* associatedBG5,
+								SDD1_BG* associatedBG6, SDD1_BG* associatedBG7)
 		: m_machine(machine)
 	{
 		BG[0] = associatedBG0;
@@ -303,7 +303,7 @@ class SDD1_CM
 public:
 	SDD1_CM(running_machine& machine, SDD1_PEM* associatedPEM)
 		: PEM(associatedPEM),
-		  m_machine(machine) { }
+			m_machine(machine) { }
 
 	running_machine &machine() const { return m_machine; }
 
@@ -381,7 +381,7 @@ static UINT8 SDD1_CM_getBit(SDD1_CM* thisptr)
 			currContext |= ((*context_bits & 0x01c0) >> 5) | (*context_bits & 0x0001);
 			break;
 		case 0x10:
-		    currContext |= ((*context_bits & 0x0180) >> 5) | (*context_bits & 0x0001);
+			currContext |= ((*context_bits & 0x0180) >> 5) | (*context_bits & 0x0001);
 			break;
 		case 0x20:
 			currContext |= ((*context_bits & 0x00c0) >> 5) | (*context_bits & 0x0001);
@@ -406,7 +406,7 @@ class SDD1_OL
 public:
 	SDD1_OL(running_machine& machine, SDD1_CM* associatedCM)
 		: CM(associatedCM),
-		  m_machine(machine) { }
+			m_machine(machine) { }
 
 	running_machine &machine() const { return m_machine; }
 
@@ -438,7 +438,7 @@ static void SDD1_OL_launch(SDD1_OL* thisptr)
 		case 0x80:
 			i = 1;
 			do
-			{	// if length == 0, we output 2^16 bytes
+			{   // if length == 0, we output 2^16 bytes
 				if(!i)
 				{
 					*(thisptr->buffer++) = register2;
@@ -486,8 +486,8 @@ public:
 
 	SDD1_IM* IM;
 	SDD1_GCD* GCD;
-	SDD1_BG* BG0;	SDD1_BG* BG1;	SDD1_BG* BG2;	SDD1_BG* BG3;
-	SDD1_BG* BG4;	SDD1_BG* BG5;	SDD1_BG* BG6;	SDD1_BG* BG7;
+	SDD1_BG* BG0;   SDD1_BG* BG1;   SDD1_BG* BG2;   SDD1_BG* BG3;
+	SDD1_BG* BG4;   SDD1_BG* BG5;   SDD1_BG* BG6;   SDD1_BG* BG7;
 	SDD1_PEM* PEM;
 	SDD1_CM* CM;
 	SDD1_OL* OL;
@@ -510,7 +510,7 @@ SDD1emu::SDD1emu(running_machine &machine)
 	BG6 = auto_alloc(machine, SDD1_BG(machine, GCD, 6));
 	BG7 = auto_alloc(machine, SDD1_BG(machine, GCD, 7));
 	PEM = auto_alloc(machine, SDD1_PEM(machine, BG0, BG1, BG2, BG3,
-										   BG4, BG5, BG6, BG7));
+											BG4, BG5, BG6, BG7));
 	CM = auto_alloc(machine, SDD1_CM(machine, PEM));
 	OL = auto_alloc(machine, SDD1_OL(machine, CM));
 }
@@ -535,23 +535,23 @@ static void SDD1emu_decompress(SDD1emu* thisptr, UINT32 in_buf, UINT16 out_len, 
 
 struct snes_sdd1_t
 {
-	UINT8 sdd1_enable;	// channel bit-mask
-	UINT8 xfer_enable;	// channel bit-mask
-	UINT32 mmc[4];		// memory map controller ROM indices
+	UINT8 sdd1_enable;  // channel bit-mask
+	UINT8 xfer_enable;  // channel bit-mask
+	UINT32 mmc[4];      // memory map controller ROM indices
 
 	struct
 	{
-		UINT32 addr;	// $43x2-$43x4 -- DMA transfer address
-		UINT16 size;	// $43x5-$43x6 -- DMA transfer size
+		UINT32 addr;    // $43x2-$43x4 -- DMA transfer address
+		UINT16 size;    // $43x5-$43x6 -- DMA transfer size
 	} dma[8];
 
 	SDD1emu* sdd1emu;
 	struct
 	{
-		UINT8 *data;	// pointer to decompressed S-DD1 data (65536 bytes)
-		UINT16 offset;	// read index into S-DD1 decompression buffer
-		UINT32 size;	// length of data buffer; reads decrement counter, set ready to false at 0
-		UINT8 ready;	// 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
+		UINT8 *data;    // pointer to decompressed S-DD1 data (65536 bytes)
+		UINT16 offset;  // read index into S-DD1 decompression buffer
+		UINT32 size;    // length of data buffer; reads decrement counter, set ready to false at 0
+		UINT8 ready;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
 	} buffer;
 } ;
 

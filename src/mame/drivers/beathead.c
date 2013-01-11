@@ -134,7 +134,7 @@
 
 
 
-#define MAX_SCANLINES	262
+#define MAX_SCANLINES   262
 
 
 
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x41000700, 0x41000703) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(hsync_ram_r, hsync_ram_w)
-	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP	/* noisy x4 during scanline int */
+	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP /* noisy x4 during scanline int */
 	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE(vram_latch_w)
 	AM_RANGE(0x8f900000, 0x8f97ffff) AM_WRITE(vram_transparent_w)
 	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_SHARE("videoram")
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( beathead )
-	PORT_START("IN0")		/* Player 1 */
+	PORT_START("IN0")       /* Player 1 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -367,7 +367,7 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("IN1")		/* Player 2 */
+	PORT_START("IN1")       /* Player 2 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -391,8 +391,8 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
-        PORT_MODIFY("JSAIII")
+	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
+		PORT_MODIFY("JSAIII")
 // coin 1+2 import from JSAIII not used - set to unused
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -439,11 +439,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( beathead )
-	ROM_REGION( 0x14000, "jsa", 0 )			/* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 )         /* 64k + 16k for 6502 code */
 	ROM_LOAD( "bhsnd.bin",  0x10000, 0x4000, CRC(dfd33f02) SHA1(479a4838c89691d5a4654a4cd84b6433a9e86109) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
-	ROM_REGION32_LE( 0x400000, "user1", 0 )	/* 4MB for ASAP code */
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* 4MB for ASAP code */
 	ROM_LOAD32_BYTE( "bhprog0.bin", 0x000000, 0x80000, CRC(87975721) SHA1(862cb3a290c829aedea26ee7100c50a12e9517e7) )
 	ROM_LOAD32_BYTE( "bhprog1.bin", 0x000001, 0x80000, CRC(25d89743) SHA1(9ff9a41355aa6914efc4a44909026e648a3c40f3) )
 	ROM_LOAD32_BYTE( "bhprog2.bin", 0x000002, 0x80000, CRC(87722609) SHA1(dbd766fa57f4528702a98db28ae48fb5d2a7f7df) )
@@ -453,7 +453,7 @@ ROM_START( beathead )
 	ROM_LOAD32_BYTE( "bhpics2.bin", 0x200002, 0x80000, CRC(00b96481) SHA1(39daa46321c1d4f8bce8c25d0450b97f1f19dedb) )
 	ROM_LOAD32_BYTE( "bhpics3.bin", 0x200003, 0x80000, CRC(99c4f1db) SHA1(aba4440c5cdf413f970a0c65457e2d1b37caf2d6) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )		/* 1MB for ADPCM */
+	ROM_REGION( 0x80000, "adpcm", 0 )       /* 1MB for ADPCM */
 	ROM_LOAD( "bhpcm0.bin",  0x00000, 0x20000, CRC(609ca626) SHA1(9bfc913fc4c3453b132595f8553245376bce3a51) )
 	ROM_LOAD( "bhpcm1.bin",  0x20000, 0x20000, CRC(35511509) SHA1(41294b81e253db5d2f30f8589dd59729a31bb2bb) )
 	ROM_LOAD( "bhpcm2.bin",  0x40000, 0x20000, CRC(f71a840a) SHA1(09d045552704cd1434307f9a36ce03c5c06a8ff6) )

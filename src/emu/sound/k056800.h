@@ -64,5 +64,3 @@ DECLARE_WRITE16_DEVICE_HANDLER( k056800_sound_w );
 
 
 #endif /* __K056800_H__ */
-
-

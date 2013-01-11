@@ -17,10 +17,10 @@
 static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8, pecom_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank2")
-    AM_RANGE( 0x8000, 0xbfff ) AM_ROM  // ROM 1
-    AM_RANGE( 0xc000, 0xf3ff ) AM_ROM  // ROM 2
-    AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK("bank3") // CDP1869 / ROM
-    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank4") // CDP1869 / ROM
+	AM_RANGE( 0x8000, 0xbfff ) AM_ROM  // ROM 1
+	AM_RANGE( 0xc000, 0xf3ff ) AM_ROM  // ROM 2
+	AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK("bank3") // CDP1869 / ROM
+	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank4") // CDP1869 / ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pecom64_io, AS_IO, 8, pecom_state )
@@ -176,7 +176,7 @@ static const cassette_interface pecom_cassette_interface =
 /* Machine driver */
 static MACHINE_CONFIG_START( pecom64, pecom_state )
 
-    /* basic machine hardware */
+	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_DOT_CLK_PAL/3)
 	MCFG_CPU_PROGRAM_MAP(pecom64_mem)
 	MCFG_CPU_IO_MAP(pecom64_io)
@@ -198,16 +198,16 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pecom64 )
-	  ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
-	  ROM_SYSTEM_BIOS(0, "ver4", "version 4")
-	  ROMX_LOAD( "pecom64-1.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(1) )
-	  ROMX_LOAD( "pecom64-2.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(1) )
-	  ROM_SYSTEM_BIOS(1, "ver1", "version 1")
-	  ROMX_LOAD( "170887-rom1.bin", 0x8000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(2) )
-	  ROMX_LOAD( "170887-rom2.bin", 0xc000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(2) )
+		ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
+		ROM_SYSTEM_BIOS(0, "ver4", "version 4")
+		ROMX_LOAD( "pecom64-1.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(1) )
+		ROMX_LOAD( "pecom64-2.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(1) )
+		ROM_SYSTEM_BIOS(1, "ver1", "version 1")
+		ROMX_LOAD( "170887-rom1.bin", 0x8000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(2) )
+		ROMX_LOAD( "170887-rom2.bin", 0xc000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(2) )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT       MACHINE     INPUT   INIT   COMPANY  FULLNAME      FLAGS */
-COMP( 1987, pecom64,     0,      0, 	pecom64,	pecom, driver_device,	0,     "Ei Nis", "Pecom 64",	0)
+COMP( 1987, pecom64,     0,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 64",    0)

@@ -17,7 +17,7 @@
  *
  *************************************/
 
-#define COPPER_CYCLES_TO_PIXELS(x)		(4 * (x))
+#define COPPER_CYCLES_TO_PIXELS(x)      (4 * (x))
 
 
 
@@ -67,23 +67,23 @@ const UINT16 amiga_expand_byte[256] =
 
 const UINT16 delay[256] =
 {
-	1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,	/* 0x000 - 0x03e */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x040 - 0x05e */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x060 - 0x07e */
-	0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,						/* 0x080 - 0x09e */
-	1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,	/* 0x0a0 - 0x0de */
+	1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,    /* 0x000 - 0x03e */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x040 - 0x05e */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x060 - 0x07e */
+	0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,                        /* 0x080 - 0x09e */
+	1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,    /* 0x0a0 - 0x0de */
 	/* BPLxPTH/BPLxPTL */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x0e0 - 0x0fe */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x0e0 - 0x0fe */
 	/* BPLCON0-3,BPLMOD1-2 */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x100 - 0x11e */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x100 - 0x11e */
 	/* SPRxPTH/SPRxPTL */
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,						/* 0x120 - 0x13e */
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,                        /* 0x120 - 0x13e */
 	/* SPRxPOS/SPRxCTL/SPRxDATA/SPRxDATB */
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,	/* 0x140 - 0x17e */
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,    /* 0x140 - 0x17e */
 	/* COLORxx */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,	/* 0x180 - 0x1be */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,    /* 0x180 - 0x1be */
 	/* RESERVED */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0	/* 0x1c0 - 0x1fe */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* 0x1c0 - 0x1fe */
 };
 
 
@@ -264,7 +264,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 					logerror("%02X.%02X: Write to %s = %04x\n", state->m_last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
 				amiga_custom_w(machine.device("maincpu")->memory().space(AS_PROGRAM), word0, word1, 0xffff);
 			}
-			else	// additional 2 cycles needed for non-Agnus registers
+			else    // additional 2 cycles needed for non-Agnus registers
 			{
 				state->m_copper_pending_offset = word0;
 				state->m_copper_pending_data = word1;
@@ -424,7 +424,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 			state->m_sprite_ctl_written &= ~bitmask;
 			state->m_sprite_comparitor_enable_mask &= ~bitmask;
 			state->m_sprite_dma_reload_mask |= 1 << num;
-			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;		/* just a guess */
+			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
 			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
 		}
@@ -448,7 +448,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
 INLINE UINT32 interleave_sprite_data(UINT16 lobits, UINT16 hibits)
 {
 	return (amiga_expand_byte[lobits & 0xff] << 0) | (amiga_expand_byte[lobits >> 8] << 16) |
-		   (amiga_expand_byte[hibits & 0xff] << 1) | (amiga_expand_byte[hibits >> 8] << 17);
+			(amiga_expand_byte[hibits & 0xff] << 1) | (amiga_expand_byte[hibits >> 8] << 17);
 }
 
 
@@ -514,10 +514,10 @@ static int get_sprite_pixel(amiga_state *state, int x)
 			if (pixels & 0x0f)
 			{
 				/* final result is:
-                    topmost sprite color in bits 0-5
-                    sprite present bitmask in bits 6-9
-                    topmost sprite pair index in bits 10-11
-                */
+				    topmost sprite color in bits 0-5
+				    sprite present bitmask in bits 6-9
+				    topmost sprite pair index in bits 10-11
+				*/
 				UINT32 result = (collide << 6) | (pair << 10);
 
 				/* attached case */
@@ -1009,4 +1009,3 @@ UINT32 amiga_state::screen_update_amiga(screen_device &screen, bitmap_ind16 &bit
 
 	return 0;
 }
-

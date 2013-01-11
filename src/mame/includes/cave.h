@@ -8,12 +8,12 @@ struct sprite_cave
 {
 	int priority, flags;
 
-	const UINT8 *pen_data;	/* points to top left corner of tile data */
+	const UINT8 *pen_data;  /* points to top left corner of tile data */
 	int line_offset;
 
 	pen_t base_pen;
 	int tile_width, tile_height;
-	int total_width, total_height;	/* in screen coordinates */
+	int total_width, total_height;  /* in screen coordinates */
 	int x, y, xcount0, ycount0;
 	int zoomx_re, zoomy_re;
 };
@@ -26,14 +26,14 @@ class cave_state : public driver_device
 public:
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoregs(*this, "videoregs"),
-		  m_vram(*this, "vram"),
-		  m_vctrl(*this, "vctrl"),
-		  m_spriteram(*this, "spriteram"),
-		  m_spriteram_2(*this, "spriteram_2"),
-		  m_paletteram(*this, "paletteram"),
-		  m_mirror_ram(*this, "mirror_ram"),
-		  m_int_timer(*this, "int_timer") { }
+			m_videoregs(*this, "videoregs"),
+			m_vram(*this, "vram"),
+			m_vctrl(*this, "vctrl"),
+			m_spriteram(*this, "spriteram"),
+			m_spriteram_2(*this, "spriteram_2"),
+			m_paletteram(*this, "paletteram"),
+			m_mirror_ram(*this, "mirror_ram"),
+			m_int_timer(*this, "int_timer") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoregs;

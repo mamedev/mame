@@ -71,12 +71,12 @@ void FLAC__lpc_compute_autocorrelation(const FLAC__real data[], unsigned data_le
 	FLAC__ASSERT(lag <= data_len);
 
 	/*
-     * Technically we should subtract the mean first like so:
-     *   for(i = 0; i < data_len; i++)
-     *     data[i] -= mean;
-     * but it appears not to make enough of a difference to matter, and
-     * most signals are already closely centered around zero
-     */
+	 * Technically we should subtract the mean first like so:
+	 *   for(i = 0; i < data_len; i++)
+	 *     data[i] -= mean;
+	 * but it appears not to make enough of a difference to matter, and
+	 * most signals are already closely centered around zero
+	 */
 	while(lag--) {
 		for(i = lag, d = 0.0; i < data_len; i++)
 			d += data[i] * data[i - lag];
@@ -85,9 +85,9 @@ void FLAC__lpc_compute_autocorrelation(const FLAC__real data[], unsigned data_le
 #endif
 
 	/*
-     * this version tends to run faster because of better data locality
-     * ('data_len' is usually much larger than 'lag')
-     */
+	 * this version tends to run faster because of better data locality
+	 * ('data_len' is usually much larger than 'lag')
+	 */
 	FLAC__real d;
 	unsigned sample, coeff;
 	const unsigned limit = data_len - lag;
@@ -223,9 +223,9 @@ int FLAC__lpc_quantize_coefficients(const FLAC__real lp_coeff[], unsigned order,
 		}
 	}
 	/* negative shift is very rare but due to design flaw, negative shift is
-     * a NOP in the decoder, so it must be handled specially by scaling down
-     * coeffs
-     */
+	 * a NOP in the decoder, so it must be handled specially by scaling down
+	 * coeffs
+	 */
 	else {
 		const int nshift = -(*shift);
 		FLAC__double error = 0.0;
@@ -297,13 +297,13 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients(const FLAC__int32 *data, u
 	}
 
 	/* Here's a slower but clearer version:
-    for(i = 0; i < data_len; i++) {
-        sum = 0;
-        for(j = 0; j < order; j++)
-            sum += qlp_coeff[j] * data[i-j-1];
-        residual[i] = data[i] - (sum >> lp_quantization);
-    }
-    */
+	for(i = 0; i < data_len; i++) {
+	    sum = 0;
+	    for(j = 0; j < order; j++)
+	        sum += qlp_coeff[j] * data[i-j-1];
+	    residual[i] = data[i] - (sum >> lp_quantization);
+	}
+	*/
 }
 #else /* fully unrolled version for normal use */
 {
@@ -314,10 +314,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients(const FLAC__int32 *data, u
 	FLAC__ASSERT(order <= 32);
 
 	/*
-     * We do unique versions up to 12th order since that's the subset limit.
-     * Also they are roughly ordered to match frequency of occurrence to
-     * minimize branching.
-     */
+	 * We do unique versions up to 12th order since that's the subset limit.
+	 * Also they are roughly ordered to match frequency of occurrence to
+	 * minimize branching.
+	 */
 	if(order <= 12) {
 		if(order > 8) {
 			if(order > 10) {
@@ -509,18 +509,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients(const FLAC__int32 *data, u
 				case 15: sum += qlp_coeff[14] * data[i-15];
 				case 14: sum += qlp_coeff[13] * data[i-14];
 				case 13: sum += qlp_coeff[12] * data[i-13];
-				         sum += qlp_coeff[11] * data[i-12];
-				         sum += qlp_coeff[10] * data[i-11];
-				         sum += qlp_coeff[ 9] * data[i-10];
-				         sum += qlp_coeff[ 8] * data[i- 9];
-				         sum += qlp_coeff[ 7] * data[i- 8];
-				         sum += qlp_coeff[ 6] * data[i- 7];
-				         sum += qlp_coeff[ 5] * data[i- 6];
-				         sum += qlp_coeff[ 4] * data[i- 5];
-				         sum += qlp_coeff[ 3] * data[i- 4];
-				         sum += qlp_coeff[ 2] * data[i- 3];
-				         sum += qlp_coeff[ 1] * data[i- 2];
-				         sum += qlp_coeff[ 0] * data[i- 1];
+							sum += qlp_coeff[11] * data[i-12];
+							sum += qlp_coeff[10] * data[i-11];
+							sum += qlp_coeff[ 9] * data[i-10];
+							sum += qlp_coeff[ 8] * data[i- 9];
+							sum += qlp_coeff[ 7] * data[i- 8];
+							sum += qlp_coeff[ 6] * data[i- 7];
+							sum += qlp_coeff[ 5] * data[i- 6];
+							sum += qlp_coeff[ 4] * data[i- 5];
+							sum += qlp_coeff[ 3] * data[i- 4];
+							sum += qlp_coeff[ 2] * data[i- 3];
+							sum += qlp_coeff[ 1] * data[i- 2];
+							sum += qlp_coeff[ 0] * data[i- 1];
 			}
 			residual[i] = data[i] - (sum >> lp_quantization);
 		}
@@ -576,10 +576,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide(const FLAC__int32 *da
 	FLAC__ASSERT(order <= 32);
 
 	/*
-     * We do unique versions up to 12th order since that's the subset limit.
-     * Also they are roughly ordered to match frequency of occurrence to
-     * minimize branching.
-     */
+	 * We do unique versions up to 12th order since that's the subset limit.
+	 * Also they are roughly ordered to match frequency of occurrence to
+	 * minimize branching.
+	 */
 	if(order <= 12) {
 		if(order > 8) {
 			if(order > 10) {
@@ -771,18 +771,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide(const FLAC__int32 *da
 				case 15: sum += qlp_coeff[14] * (FLAC__int64)data[i-15];
 				case 14: sum += qlp_coeff[13] * (FLAC__int64)data[i-14];
 				case 13: sum += qlp_coeff[12] * (FLAC__int64)data[i-13];
-				         sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
-				         sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
-				         sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
-				         sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
-				         sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
-				         sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
-				         sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
-				         sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
-				         sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
-				         sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
-				         sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
-				         sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
+							sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
+							sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
+							sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
+							sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
+							sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
+							sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
+							sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
+							sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
+							sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
+							sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
+							sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
+							sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
 			}
 			residual[i] = data[i] - (FLAC__int32)(sum >> lp_quantization);
 		}
@@ -827,13 +827,13 @@ void FLAC__lpc_restore_signal(const FLAC__int32 residual[], unsigned data_len, c
 	}
 
 	/* Here's a slower but clearer version:
-    for(i = 0; i < data_len; i++) {
-        sum = 0;
-        for(j = 0; j < order; j++)
-            sum += qlp_coeff[j] * data[i-j-1];
-        data[i] = residual[i] + (sum >> lp_quantization);
-    }
-    */
+	for(i = 0; i < data_len; i++) {
+	    sum = 0;
+	    for(j = 0; j < order; j++)
+	        sum += qlp_coeff[j] * data[i-j-1];
+	    data[i] = residual[i] + (sum >> lp_quantization);
+	}
+	*/
 }
 #else /* fully unrolled version for normal use */
 {
@@ -844,10 +844,10 @@ void FLAC__lpc_restore_signal(const FLAC__int32 residual[], unsigned data_len, c
 	FLAC__ASSERT(order <= 32);
 
 	/*
-     * We do unique versions up to 12th order since that's the subset limit.
-     * Also they are roughly ordered to match frequency of occurrence to
-     * minimize branching.
-     */
+	 * We do unique versions up to 12th order since that's the subset limit.
+	 * Also they are roughly ordered to match frequency of occurrence to
+	 * minimize branching.
+	 */
 	if(order <= 12) {
 		if(order > 8) {
 			if(order > 10) {
@@ -1039,18 +1039,18 @@ void FLAC__lpc_restore_signal(const FLAC__int32 residual[], unsigned data_len, c
 				case 15: sum += qlp_coeff[14] * data[i-15];
 				case 14: sum += qlp_coeff[13] * data[i-14];
 				case 13: sum += qlp_coeff[12] * data[i-13];
-				         sum += qlp_coeff[11] * data[i-12];
-				         sum += qlp_coeff[10] * data[i-11];
-				         sum += qlp_coeff[ 9] * data[i-10];
-				         sum += qlp_coeff[ 8] * data[i- 9];
-				         sum += qlp_coeff[ 7] * data[i- 8];
-				         sum += qlp_coeff[ 6] * data[i- 7];
-				         sum += qlp_coeff[ 5] * data[i- 6];
-				         sum += qlp_coeff[ 4] * data[i- 5];
-				         sum += qlp_coeff[ 3] * data[i- 4];
-				         sum += qlp_coeff[ 2] * data[i- 3];
-				         sum += qlp_coeff[ 1] * data[i- 2];
-				         sum += qlp_coeff[ 0] * data[i- 1];
+							sum += qlp_coeff[11] * data[i-12];
+							sum += qlp_coeff[10] * data[i-11];
+							sum += qlp_coeff[ 9] * data[i-10];
+							sum += qlp_coeff[ 8] * data[i- 9];
+							sum += qlp_coeff[ 7] * data[i- 8];
+							sum += qlp_coeff[ 6] * data[i- 7];
+							sum += qlp_coeff[ 5] * data[i- 6];
+							sum += qlp_coeff[ 4] * data[i- 5];
+							sum += qlp_coeff[ 3] * data[i- 4];
+							sum += qlp_coeff[ 2] * data[i- 3];
+							sum += qlp_coeff[ 1] * data[i- 2];
+							sum += qlp_coeff[ 0] * data[i- 1];
 			}
 			data[i] = residual[i] + (sum >> lp_quantization);
 		}
@@ -1106,10 +1106,10 @@ void FLAC__lpc_restore_signal_wide(const FLAC__int32 residual[], unsigned data_l
 	FLAC__ASSERT(order <= 32);
 
 	/*
-     * We do unique versions up to 12th order since that's the subset limit.
-     * Also they are roughly ordered to match frequency of occurrence to
-     * minimize branching.
-     */
+	 * We do unique versions up to 12th order since that's the subset limit.
+	 * Also they are roughly ordered to match frequency of occurrence to
+	 * minimize branching.
+	 */
 	if(order <= 12) {
 		if(order > 8) {
 			if(order > 10) {
@@ -1301,18 +1301,18 @@ void FLAC__lpc_restore_signal_wide(const FLAC__int32 residual[], unsigned data_l
 				case 15: sum += qlp_coeff[14] * (FLAC__int64)data[i-15];
 				case 14: sum += qlp_coeff[13] * (FLAC__int64)data[i-14];
 				case 13: sum += qlp_coeff[12] * (FLAC__int64)data[i-13];
-				         sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
-				         sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
-				         sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
-				         sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
-				         sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
-				         sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
-				         sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
-				         sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
-				         sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
-				         sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
-				         sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
-				         sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
+							sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
+							sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
+							sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
+							sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
+							sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
+							sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
+							sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
+							sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
+							sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
+							sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
+							sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
+							sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
 			}
 			data[i] = residual[i] + (FLAC__int32)(sum >> lp_quantization);
 		}

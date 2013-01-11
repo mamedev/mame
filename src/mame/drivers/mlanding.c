@@ -246,14 +246,14 @@ READ16_MEMBER(mlanding_state::ml_tileram_r)
 READ16_MEMBER(mlanding_state::io1_r)//240006
 {
 	/*
-    fedcba9876543210
-                   x  - mecha driver status
-                  x   - ???
-                 x    - test 2
-                x     - ???
-    x                 - video status
-        other bits = language(german, japan, english), video test
-    */
+	fedcba9876543210
+	               x  - mecha driver status
+	              x   - ???
+	             x    - test 2
+	            x     - ???
+	x                 - video status
+	    other bits = language(german, japan, english), video test
+	*/
 // multiplexed? or just overriden?
 
 	int retval = (m_dma_active << 15) | (ioport("DSW")->read() & 0x7fff);
@@ -264,11 +264,11 @@ READ16_MEMBER(mlanding_state::io1_r)//240006
 WRITE16_MEMBER(mlanding_state::ml_output_w)
 {
 	/*
-    x--- ---- palette fg bankswitch
-    ---x ---- coin lockout?
-    ---- x--- coin counter B
-    ---- -x-- coin counter A
-    */
+	x--- ---- palette fg bankswitch
+	---x ---- coin lockout?
+	---- x--- coin counter B
+	---- -x-- coin counter A
+	*/
 //  popmessage("%04x",data);
 
 	m_pal_fg_bank = (data & 0x80)>>7;
@@ -305,9 +305,9 @@ static void ml_msm5205_vck(device_t *device)
 			//device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			/*TODO: simplify this */
 			if(ROM[state->m_adpcm_pos] == 0x00 && ROM[state->m_adpcm_pos+1] == 0x00 && ROM[state->m_adpcm_pos+2] == 0x00 && ROM[state->m_adpcm_pos+3] == 0x00
-		       && ROM[state->m_adpcm_pos+4] == 0x00 && ROM[state->m_adpcm_pos+5] == 0x00 && ROM[state->m_adpcm_pos+6] == 0x00 && ROM[state->m_adpcm_pos+7] == 0x00
-		       && ROM[state->m_adpcm_pos+8] == 0x00 && ROM[state->m_adpcm_pos+9] == 0x00 && ROM[state->m_adpcm_pos+10] == 0x00 && ROM[state->m_adpcm_pos+11] == 0x00
-		       && ROM[state->m_adpcm_pos+12] == 0x00 && ROM[state->m_adpcm_pos+13] == 0x00 && ROM[state->m_adpcm_pos+14] == 0x00 && ROM[state->m_adpcm_pos+15] == 0x00)
+				&& ROM[state->m_adpcm_pos+4] == 0x00 && ROM[state->m_adpcm_pos+5] == 0x00 && ROM[state->m_adpcm_pos+6] == 0x00 && ROM[state->m_adpcm_pos+7] == 0x00
+				&& ROM[state->m_adpcm_pos+8] == 0x00 && ROM[state->m_adpcm_pos+9] == 0x00 && ROM[state->m_adpcm_pos+10] == 0x00 && ROM[state->m_adpcm_pos+11] == 0x00
+				&& ROM[state->m_adpcm_pos+12] == 0x00 && ROM[state->m_adpcm_pos+13] == 0x00 && ROM[state->m_adpcm_pos+14] == 0x00 && ROM[state->m_adpcm_pos+15] == 0x00)
 				state->m_adpcm_idle = 1;
 		}
 	}
@@ -502,12 +502,12 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_output_w)
 
 	/*  */
-	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(ml_analog1_lsb_r)		//-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(ml_analog2_lsb_r)		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(ml_analog1_lsb_r)      //-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(ml_analog2_lsb_r)      //-40 .. 40 analog controls ?
 	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(ml_analog1_msb_r) // tested in service mode, dips?
-	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(ml_analog3_lsb_r)		//-60 .. 60 analog controls ?
+	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(ml_analog3_lsb_r)      //-60 .. 60 analog controls ?
 	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(ml_analog2_msb_r)
-	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(ml_analog3_msb_r)		// IN2/IN3 could be switched
+	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(ml_analog3_msb_r)      // IN2/IN3 could be switched
 ADDRESS_MAP_END
 
 
@@ -599,53 +599,53 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mlanding )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))
-	PORT_DIPSETTING(	0x01, DEF_STR( Standard ))
-	PORT_DIPSETTING(	0x00, "Deluxe" ) //with Mecha driver
+	PORT_DIPSETTING(    0x01, DEF_STR( Standard ))
+	PORT_DIPSETTING(    0x00, "Deluxe" ) //with Mecha driver
 	PORT_DIPNAME( 0x02, 0x02, "$2000-1")
-	PORT_DIPSETTING(	0x02, "H" )
-	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPSETTING(    0x02, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
 	PORT_DIPNAME( 0x04, 0x04, "Test Mode")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "$2000-3")
-	PORT_DIPSETTING(	0x08, "H" )
-	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPSETTING(    0x08, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
 	PORT_DIPNAME( 0x10, 0x10, "$2000-4")
-	PORT_DIPSETTING(	0x10, "H" )
-	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPSETTING(    0x10, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
 	PORT_DIPNAME( 0x20, 0x20, "$2000-5")
-	PORT_DIPSETTING(	0x20, "H" )
-	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPSETTING(    0x20, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
 	PORT_DIPNAME( 0x40, 0x40, "$2000-6")
-	PORT_DIPSETTING(	0x40, "H" )
-	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPSETTING(    0x40, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
 	PORT_DIPNAME( 0x80, 0x80, "$2000-7")
-	PORT_DIPSETTING(	0x80, "H" )
-	PORT_DIPSETTING(	0x00, "L" )
+	PORT_DIPSETTING(    0x80, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
 	PORT_DIPNAME( 0x0100, 0x0100, "$2001-0")
-	PORT_DIPSETTING(	0x0100, "H" )
-	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPSETTING(    0x0100, "H" )
+	PORT_DIPSETTING(    0x0000, "L" )
 	PORT_DIPNAME( 0x0200, 0x0200, "$2001-1")
-	PORT_DIPSETTING(	0x0200, "H" )
-	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPSETTING(    0x0200, "H" )
+	PORT_DIPSETTING(    0x0000, "L" )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(	0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0800, 0x0800, "$2001-3")
-	PORT_DIPSETTING(	0x0800, "H" )
-	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPSETTING(    0x0800, "H" )
+	PORT_DIPSETTING(    0x0000, "L" )
 	PORT_DIPNAME( 0x1000, 0x1000, "Test Mode 2")
-	PORT_DIPSETTING(	0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x2000, 0x2000, "$2001-5")
-	PORT_DIPSETTING(	0x2000, "H" )
-	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPSETTING(    0x2000, "H" )
+	PORT_DIPSETTING(    0x0000, "L" )
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) )
-	PORT_DIPSETTING(	0x4000, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(	0x0000, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( English ) )
 	PORT_DIPNAME( 0x8000, 0x8000, "$2001-7")
-	PORT_DIPSETTING(	0x8000, "H" )
-	PORT_DIPSETTING(	0x0000, "L" )
+	PORT_DIPSETTING(    0x8000, "H" )
+	PORT_DIPSETTING(    0x0000, "L" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
@@ -720,20 +720,20 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("STICKX")	/* Stick 1 (3) */
+	PORT_START("STICKX")    /* Stick 1 (3) */
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE
 
-	PORT_START("STICKY")	/* Stick 2 (4) */
+	PORT_START("STICKY")    /* Stick 2 (4) */
 	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("STICKZ")	/* Stick 3 (5) */
+	PORT_START("STICKZ")    /* Stick 3 (5) */
 	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static const msm5205_interface msm5205_config =
 {
-	ml_msm5205_vck,	/* VCK function */
-	MSM5205_S48_4B		/* 8 kHz */
+	ml_msm5205_vck, /* VCK function */
+	MSM5205_S48_4B      /* 8 kHz */
 };
 
 static const tc0140syt_interface mlanding_tc0140syt_intf =
@@ -755,22 +755,22 @@ void mlanding_state::machine_reset()
 static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000 )		/* 12 MHz ??? (guess) */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000 )      /* 12 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000 )		/* 12 MHz ??? (guess) */
+	MCFG_CPU_ADD("sub", M68000, 12000000 )      /* 12 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_sub_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mlanding_state, irq6_line_hold, 7*60) /* ??? */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )		/* 4 MHz ??? (guess) */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )     /* 4 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_mem)
 
-	MCFG_CPU_ADD("z80sub", Z80, 4000000 )		/* 4 MHz ??? (guess) */
+	MCFG_CPU_ADD("z80sub", Z80, 4000000 )       /* 4 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025,12000000)			/* 12 MHz ??? */
+	MCFG_CPU_ADD("dsp", TMS32025,12000000)          /* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_CPU_IO_MAP(DSP_map_io)
@@ -806,7 +806,7 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 MACHINE_CONFIG_END
 
 ROM_START( mlanding )
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 */
 	ROM_LOAD16_BYTE( "ml_b0929.epr", 0x00000, 0x10000, CRC(ab3f38f3) SHA1(4357112ca11a8e7bfe08ba99ac3bddac046c230a))
 	ROM_LOAD16_BYTE( "ml_b0928.epr", 0x00001, 0x10000, CRC(21e7a8f6) SHA1(860d3861d4375866cd27d426d546ddb2894a6629) )
 	ROM_LOAD16_BYTE( "ml_b0927.epr", 0x20000, 0x10000, CRC(b02f1805) SHA1(b8050f955c7070dc9b962db329b5b0ee8b2acb70) )
@@ -814,18 +814,18 @@ ROM_START( mlanding )
 	ROM_LOAD16_BYTE( "ml_b0925.epr", 0x40000, 0x10000, CRC(ff59f049) SHA1(aba490a28aba03728415f34d321fd599c31a5fde) )
 	ROM_LOAD16_BYTE( "ml_b0924.epr", 0x40001, 0x10000, CRC(9bc3e1b0) SHA1(6d86804327df11a513a0f06dceb57b83b34ac007) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )	/* z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* z80 */
 	ROM_LOAD( "ml_b0935.epr", 0x00000, 0x4000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
-	ROM_CONTINUE(             0x10000, 0x04000 )	/* banked stuff */
+	ROM_CONTINUE(             0x10000, 0x04000 )    /* banked stuff */
 	ROM_LOAD( "ml_b0936.epr", 0x14000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* 68000 */
+	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 */
 	ROM_LOAD16_BYTE( "ml_b0923.epr", 0x00000, 0x10000, CRC(81b2c871) SHA1(a085bc528c63834079469db6ae263a5b9b984a7c) )
 	ROM_LOAD16_BYTE( "ml_b0922.epr", 0x00001, 0x10000, CRC(36923b42) SHA1(c31d7c45a563cfc4533379f69f32889c79562534) )
 
-	ROM_REGION( 0x10000, "z80sub", 0 )	/* z80 */
+	ROM_REGION( 0x10000, "z80sub", 0 )  /* z80 */
 	ROM_LOAD( "ml_b0937.epr", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) )
 
 	ROM_REGION( 0x80000, "adpcm", ROMREGION_ERASEFF )

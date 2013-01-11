@@ -49,19 +49,19 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
 {
 	/*- FG0 RAM Format -**
 
-      4 bytes per tile
+	  4 bytes per tile
 
-      ---- ----  tttt tttt  ---- ----  ???? TTTT
+	  ---- ----  tttt tttt  ---- ----  ???? TTTT
 
-      C = Colour Bank (0-15)
-      T = Tile Number (0 - 4095)
+	  C = Colour Bank (0-15)
+	  T = Tile Number (0 - 4095)
 
-      other bits unknown / unused
+	  other bits unknown / unused
 
-      basically the same as WWF Superstar's FG0 Ram but
-      more of it and the used bytes the other way around
+	  basically the same as WWF Superstar's FG0 Ram but
+	  more of it and the used bytes the other way around
 
-    **- End of Comments -*/
+	**- End of Comments -*/
 
 	UINT16 *tilebase;
 	int tileno;
@@ -80,18 +80,18 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_bg0_tile_info)
 {
 	/*- BG0 RAM Format -**
 
-      4 bytes per tile
+	  4 bytes per tile
 
-      ---- ----  fF-- CCCC  ---- TTTT tttt tttt
+	  ---- ----  fF-- CCCC  ---- TTTT tttt tttt
 
-      C = Colour Bank (0-15)
-      T = Tile Number (0 - 4095)
-      f = Flip Y
-      F = Flip X
+	  C = Colour Bank (0-15)
+	  T = Tile Number (0 - 4095)
+	  f = Flip Y
+	  F = Flip X
 
-      other bits unknown / unused
+	  other bits unknown / unused
 
-    **- End of Comments -*/
+	**- End of Comments -*/
 
 	UINT16 *tilebase;
 	int tileno,colbank;
@@ -110,14 +110,14 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_bg1_tile_info)
 {
 	/*- BG1 RAM Format -**
 
-      2 bytes per tile
+	  2 bytes per tile
 
-      CCCC TTTT tttt tttt
+	  CCCC TTTT tttt tttt
 
-      C = Colour Bank (0-15)
-      T = Tile Number (0 - 4095)
+	  C = Colour Bank (0-15)
+	  T = Tile Number (0 - 4095)
 
-    **- End of Comments -*/
+	**- End of Comments -*/
 
 	UINT16 *tilebase;
 	int tileno;
@@ -143,23 +143,23 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- SPR RAM Format -**
 
-      16 bytes per sprite
+	  16 bytes per sprite
 
-      ---- ----  yyyy yyyy  ---- ----  lllF fXYE  ---- ----  nnnn nnnn  ---- ----  NNNN NNNN
-      ---- ----  ---- CCCC  ---- ----  xxxx xxxx  ---- ----  ---- ----  ---- ----  ---- ----
+	  ---- ----  yyyy yyyy  ---- ----  lllF fXYE  ---- ----  nnnn nnnn  ---- ----  NNNN NNNN
+	  ---- ----  ---- CCCC  ---- ----  xxxx xxxx  ---- ----  ---- ----  ---- ----  ---- ----
 
-      Yy = sprite Y Position
-      Xx = sprite X Position
-      C  = colour bank
-      f  = flip Y
-      F  = flip X
-      l  = chain sprite
-      E  = sprite enable
-      Nn = Sprite Number
+	  Yy = sprite Y Position
+	  Xx = sprite X Position
+	  C  = colour bank
+	  f  = flip Y
+	  F  = flip X
+	  l  = chain sprite
+	  E  = sprite enable
+	  Nn = Sprite Number
 
-      other bits unused
+	  other bits unused
 
-    **- End of Comments -*/
+	**- End of Comments -*/
 
 	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 	gfx_element *gfx = machine.gfx[1];
@@ -172,7 +172,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		enable = (source[1] & 0x0001);
 
-		if (enable)	{
+		if (enable) {
 			xpos = +(source[5] & 0x00ff) | (source[1] & 0x0004) << 6;
 			if (xpos>512-16) xpos -=512;
 			xpos += state->m_sprite_xoff;
@@ -221,11 +221,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 void wwfwfest_state::video_start()
 {
-    state_save_register_global(machine(), m_pri);
-    state_save_register_global(machine(), m_bg0_scrollx);
-    state_save_register_global(machine(), m_bg0_scrolly);
-    state_save_register_global(machine(), m_bg1_scrollx);
-    state_save_register_global(machine(), m_bg1_scrolly);
+	state_save_register_global(machine(), m_pri);
+	state_save_register_global(machine(), m_bg0_scrollx);
+	state_save_register_global(machine(), m_bg0_scrolly);
+	state_save_register_global(machine(), m_bg1_scrollx);
+	state_save_register_global(machine(), m_bg1_scrolly);
 
 	m_fg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);

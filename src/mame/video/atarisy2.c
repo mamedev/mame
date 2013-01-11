@@ -57,39 +57,39 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
 {
 	static const atarimo_desc modesc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		0,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		0,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x00,				/* base palette entry */
-		0x40,				/* maximum number of colors */
-		15,					/* transparent pen index */
+		0x00,               /* base palette entry */
+		0x40,               /* maximum number of colors */
+		15,                 /* transparent pen index */
 
-		{{ 0,0,0,0x07f8 }},	/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0,0x07ff,0,0 }},	/* mask for the code index */
-		{{ 0x0007,0,0,0 }},	/* mask for the upper code index */
-		{{ 0,0,0,0x3000 }},	/* mask for the color */
-		{{ 0,0,0xffc0,0 }},	/* mask for the X position */
-		{{ 0x7fc0,0,0,0 }},	/* mask for the Y position */
-		{{ 0 }},			/* mask for the width, in tiles*/
-		{{ 0,0x3800,0,0 }},	/* mask for the height, in tiles */
-		{{ 0,0x4000,0,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0,0,0,0xc000 }},	/* mask for the priority */
-		{{ 0,0x8000,0,0 }},	/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0,0,0,0x07f8 }}, /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0,0x07ff,0,0 }}, /* mask for the code index */
+		{{ 0x0007,0,0,0 }}, /* mask for the upper code index */
+		{{ 0,0,0,0x3000 }}, /* mask for the color */
+		{{ 0,0,0xffc0,0 }}, /* mask for the X position */
+		{{ 0x7fc0,0,0,0 }}, /* mask for the Y position */
+		{{ 0 }},            /* mask for the width, in tiles*/
+		{{ 0,0x3800,0,0 }}, /* mask for the height, in tiles */
+		{{ 0,0x4000,0,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0,0,0,0xc000 }}, /* mask for the priority */
+		{{ 0,0x8000,0,0 }}, /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		0					/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		0                   /* callback routine for special entries */
 	};
 
 	/* initialize banked memory */

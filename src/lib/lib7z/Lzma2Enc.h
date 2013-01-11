@@ -12,10 +12,10 @@ extern "C" {
 
 typedef struct
 {
-  CLzmaEncProps lzmaProps;
-  size_t blockSize;
-  int numBlockThreads;
-  int numTotalThreads;
+	CLzmaEncProps lzmaProps;
+	size_t blockSize;
+	int numBlockThreads;
+	int numTotalThreads;
 } CLzma2EncProps;
 
 void Lzma2EncProps_Init(CLzma2EncProps *p);
@@ -40,7 +40,7 @@ void Lzma2Enc_Destroy(CLzma2EncHandle p);
 SRes Lzma2Enc_SetProps(CLzma2EncHandle p, const CLzma2EncProps *props);
 Byte Lzma2Enc_WriteProperties(CLzma2EncHandle p);
 SRes Lzma2Enc_Encode(CLzma2EncHandle p,
-    ISeqOutStream *outStream, ISeqInStream *inStream, ICompressProgress *progress);
+	ISeqOutStream *outStream, ISeqInStream *inStream, ICompressProgress *progress);
 
 /* ---------- One Call Interface ---------- */
 

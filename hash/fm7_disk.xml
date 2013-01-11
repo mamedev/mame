@@ -7,7 +7,7 @@
 <!--
 
 Titles, serial #s, publishers and release dates taken from:
-  - Oh!FM-7 ( http://retropc.net/fm-7/ )
+	- Oh!FM-7 ( http://retropc.net/fm-7/ )
 
 -->
 
@@ -304,8 +304,8 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="gamblerj">
 	<!-- Keys listed in readme are as follows:
 キー操作/ リターン:チー F1:リーチ F2:ポン F3:カン F4:和了 F10:九種九牌
-     F5:指導機能ON/OFF F6:サウンドON/OFF F7:オープンモード F8:オートモード
-     ESC(XM7:半角/全角):ポーズ・点数表示 HOME:捨て牌指導	-->
+		F5:指導機能ON/OFF F6:サウンドON/OFF F7:オープンモード F8:オートモード
+		ESC(XM7:半角/全角):ポーズ・点数表示 HOME:捨て牌指導    -->
 		<description>Gambler Jikochuushinha</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -1517,7 +1517,7 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 
-        <!-- What are these? Tracks created/extracted with FMEXPERT? Data Disks? Add-ons? -->
+		<!-- What are these? Tracks created/extracted with FMEXPERT? Data Disks? Add-ons? -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="exp_c1.d77" size="348848" crc="38f229a4" sha1="88adc54db634de9fad929509653ef40ee62860d8" offset="0"/>
@@ -1563,7 +1563,7 @@ systems, for the moment they stay here!
 メーカー:電波新聞社           機  種 :FM-7
 ジャンル:ACT                備  考 :RUN"ナイザー"で起動
 
- -->
+	-->
 		<description>ナイザー メイガス ビデオ君 BlueFox Lizard</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1673,7 +1673,7 @@ Others are no-warranty...
 <!--
 Disk 04G for FM-7/77/AV
 1. GRAND HEXAGON     RUN"GRANDHEX"
-   You need making character via "DATMAKER".
+	You need making character via "DATMAKER".
 2. LODE Runner       RUN"LODE"
 3. MTOOL-09          LOAD.M"MTOOL-09",,R
 Others are no-warranty,meybe not start.
@@ -1693,7 +1693,7 @@ Others are no-warranty,meybe not start.
 Game disk #11 for FM-7/77/AV
 1. SONIC BOOM       RUN"SONIC"
 2. Dragon Slayer    RUN"DRAGON.M"
-   (Convert from TAPE)
+	(Convert from TAPE)
 3. Nine gate        RUN"9-GATE"
 4. 4 nin mahjong    RUN"MASIAN4"
 Others are not start...

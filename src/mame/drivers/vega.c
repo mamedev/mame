@@ -98,10 +98,10 @@ public:
 	m_ins8154(*this, "ins8154"),
 	m_ay8910(*this, "ay8910") {}
 
-  required_device<cpu_device>		m_maincpu;
-	required_device<i8255_device>	m_i8255;
+	required_device<cpu_device>     m_maincpu;
+	required_device<i8255_device>   m_i8255;
 	required_device<ins8154_device> m_ins8154;
-	required_device<ay8910_device>	m_ay8910;
+	required_device<ay8910_device>  m_ay8910;
 
 	int m_p2_data;
 	int m_ext_offset_w;
@@ -113,7 +113,7 @@ public:
 	UINT8 m_ins8154_ram[0x80];
 	UINT8 m_txt_ram[0x400];
 
-	vega_obj	m_obj[NUM_OBJ];
+	vega_obj    m_obj[NUM_OBJ];
 
 	int m_frame_counter;
 
@@ -421,15 +421,15 @@ static INPUT_PORTS_START( vega )
 
 	PORT_DIPNAME( 0x20, 0x20, "Speed" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 
 	PORT_DIPNAME( 0x40, 0x40, "Ext Play at" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "3.000" )
-    PORT_DIPSETTING(    0x00, "4.000" )
+	PORT_DIPSETTING(    0x00, "4.000" )
 
 	PORT_DIPNAME( 0x80, 0x80, "Bomb Speed" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 
 
 	//PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) /* output */
@@ -455,24 +455,24 @@ static INPUT_PORTS_START( vega )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,IPT_COIN2 )
 
 	PORT_DIPNAME( 0x08, 0x00, "1-3" )  //unused ?
-    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x10, 0x00, "1-4" ) //unused ?
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x20, 0x00, "1-5" ) //unused ?
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x40, 0x00, "1-6" ) //some video status ?
-    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x80, 0x00, "1-7" ) //some video status ?
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 INPUT_PORTS_END
 
@@ -570,13 +570,13 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 				//int color=BITSWAP8(color_lookup[character],7,6,5,4,0,1,2,3)>>1;
 				int color=color_lookup[character]&0xf;
 				/*
-                 bit 0 - unknown
-                 bit 1 - blue
-                 bit 2 - green
-                 bit 3 - red
-                 */
+				 bit 0 - unknown
+				 bit 1 - blue
+				 bit 2 - green
+				 bit 3 - red
+				 */
 
-				 color=BITSWAP8(color,7,6,5,4,0,1,2,3)&0x7;
+					color=BITSWAP8(color,7,6,5,4,0,1,2,3)&0x7;
 
 				color^=0xf;
 
@@ -802,11 +802,11 @@ READ8_MEMBER(vega_state::randomizer )
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_DRIVER_MEMBER(vega_state, txtram_r), /* Port A read */
-	DEVCB_DRIVER_MEMBER(vega_state, txtram_w),		/* Port A write */
-	DEVCB_INPUT_PORT("IN0"),		/* Port B read */
-	DEVCB_DRIVER_MEMBER(vega_state, ppi_pb_w),		/* Port B write */
+	DEVCB_DRIVER_MEMBER(vega_state, txtram_w),      /* Port A write */
+	DEVCB_INPUT_PORT("IN0"),        /* Port B read */
+	DEVCB_DRIVER_MEMBER(vega_state, ppi_pb_w),      /* Port B write */
 	DEVCB_DRIVER_MEMBER(vega_state, randomizer),
-	DEVCB_DRIVER_MEMBER(vega_state, ppi_pc_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(vega_state, ppi_pc_w)       /* Port C write */
 };
 
 
@@ -874,34 +874,34 @@ MACHINE_CONFIG_END
 
 ROM_START( vega )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom9.bin",	      0x0800, 0x0800, CRC(191c73cd) SHA1(17b1c3790f82b276e55d25ea8a38a3c9cf20bf12) )
-	ROM_LOAD( "rom10a.bin",	      0x1000, 0x1000, CRC(fca9a570) SHA1(598772db11b32518ed6bf5155a19f4f1761a4831) )
+	ROM_LOAD( "rom9.bin",         0x0800, 0x0800, CRC(191c73cd) SHA1(17b1c3790f82b276e55d25ea8a38a3c9cf20bf12) )
+	ROM_LOAD( "rom10a.bin",       0x1000, 0x1000, CRC(fca9a570) SHA1(598772db11b32518ed6bf5155a19f4f1761a4831) )
 
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_INVERT  )
-	ROM_LOAD( "rom8.bin",	      0x0000, 0x0800, CRC(ccb8598c) SHA1(8c4a702f0653bb189db7d8ac4c2a06aacecc0de0) )
-	ROM_LOAD( "rom7.bin",	      0x0800, 0x0800, CRC(1de564cd) SHA1(7408cd29f1afc111aa695ecb00160d8f7fba7532) )
+	ROM_LOAD( "rom8.bin",         0x0000, 0x0800, CRC(ccb8598c) SHA1(8c4a702f0653bb189db7d8ac4c2a06aacecc0de0) )
+	ROM_LOAD( "rom7.bin",         0x0800, 0x0800, CRC(1de564cd) SHA1(7408cd29f1afc111aa695ecb00160d8f7fba7532) )
 
 	ROM_REGION( 0x01800, "gfx2", ROMREGION_INVERT  )
-	ROM_LOAD( "rom2.bin",	      0x0000, 0x0800, CRC(718da952) SHA1(1a0023be1ee3a48ed3ddb8daddbb49ca3f442d46) )
-	ROM_LOAD( "rom3.bin",	      0x0800, 0x0800, CRC(37944311) SHA1(8b20be3d3ca5cb27bef78a73ee7e977fdf76c7f1) )
-	ROM_LOAD( "rom4.bin",	      0x1000, 0x0800, CRC(09453d7a) SHA1(75fe96ae25467f82c0725834c6c04a197f50cce7) )
+	ROM_LOAD( "rom2.bin",         0x0000, 0x0800, CRC(718da952) SHA1(1a0023be1ee3a48ed3ddb8daddbb49ca3f442d46) )
+	ROM_LOAD( "rom3.bin",         0x0800, 0x0800, CRC(37944311) SHA1(8b20be3d3ca5cb27bef78a73ee7e977fdf76c7f1) )
+	ROM_LOAD( "rom4.bin",         0x1000, 0x0800, CRC(09453d7a) SHA1(75fe96ae25467f82c0725834c6c04a197f50cce7) )
 
 	ROM_REGION( 0x01000, "gfx3", ROMREGION_INVERT  )
-	ROM_LOAD( "rom5.bin",	      0x0000, 0x0800, CRC(be3df449) SHA1(acba1e07bdf9c0e971f47f2433d2760472c4326a) )
-	ROM_LOAD( "rom6.bin",	      0x0800, 0x0800, CRC(dc46527c) SHA1(d10a54d8d3ce9ffd8a53bede3d089625aff445a2) )
+	ROM_LOAD( "rom5.bin",         0x0000, 0x0800, CRC(be3df449) SHA1(acba1e07bdf9c0e971f47f2433d2760472c4326a) )
+	ROM_LOAD( "rom6.bin",         0x0800, 0x0800, CRC(dc46527c) SHA1(d10a54d8d3ce9ffd8a53bede3d089625aff445a2) )
 
 	ROM_REGION( 0x01000, "gfx4", ROMREGION_INVERT  )
-	ROM_LOAD( "rom11.bin",	      0x0000, 0x0800, CRC(d1896f77) SHA1(5b80bf7aa81508edfae4fa583b4b0077575a300c) )
-	ROM_LOAD( "rom12.bin",	      0x0800, 0x0800, CRC(f5f1df2f) SHA1(5851b468702e5e4f085b64afbe7d8b797bb109b5) )
+	ROM_LOAD( "rom11.bin",        0x0000, 0x0800, CRC(d1896f77) SHA1(5b80bf7aa81508edfae4fa583b4b0077575a300c) )
+	ROM_LOAD( "rom12.bin",        0x0800, 0x0800, CRC(f5f1df2f) SHA1(5851b468702e5e4f085b64afbe7d8b797bb109b5) )
 
 	ROM_REGION( 0x10000, "proms", 0 )
-	ROM_LOAD( "r8.bin",	 0x0000, 0x0100, CRC(40c9caad) SHA1(ddd427ff4df4cb2d217690efefdd5e53e3add118) ) // FIXED BITS (0000xxxx)
-	ROM_LOAD( "r9.bin",	 0x0100, 0x0100, CRC(db0bcea5) SHA1(692bea2d9e28985fe7270a940e9f48ac64bdeaa8) ) // FIXED BITS (0000xxxx)
+	ROM_LOAD( "r8.bin",  0x0000, 0x0100, CRC(40c9caad) SHA1(ddd427ff4df4cb2d217690efefdd5e53e3add118) ) // FIXED BITS (0000xxxx)
+	ROM_LOAD( "r9.bin",  0x0100, 0x0100, CRC(db0bcea5) SHA1(692bea2d9e28985fe7270a940e9f48ac64bdeaa8) ) // FIXED BITS (0000xxxx)
 	ROM_LOAD( "r10.bin", 0x0200, 0x0100, CRC(ca5a3627) SHA1(8c632fa9174e336c588074f92f3519b0cf224852) ) // FIXED BITS (0000xxxx) - txt layer lookup table
 	ROM_LOAD( "r11.bin", 0x0300, 0x0100, CRC(d8aab14a) SHA1(798feaa929dd7b71266220b568826997acd2a93e) ) // FIXED BITS (000011xx) - RNG? not used
 
 	ROM_REGION( 0x800, "tilemaps", 0 )
-	ROM_LOAD( "rom1.bin",	      0x0000, 0x0800, CRC(a0c0e0af) SHA1(7ccbfe3c23cda4c3a639c89ff4b2f554e2876c98) ) // FIXED BITS (00xxxxxx) (tile attribs?)
+	ROM_LOAD( "rom1.bin",         0x0000, 0x0800, CRC(a0c0e0af) SHA1(7ccbfe3c23cda4c3a639c89ff4b2f554e2876c98) ) // FIXED BITS (00xxxxxx) (tile attribs?)
 
 ROM_END
 

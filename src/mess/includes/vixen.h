@@ -12,35 +12,35 @@
 #include "machine/wd_fdc.h"
 #include "sound/discrete.h"
 
-#define Z8400A_TAG		"5f"
-#define FDC1797_TAG		"5n"
-#define P8155H_TAG		"2n"
-#define P8155H_IO_TAG	"c7"
-#define P8251A_TAG		"c3"
-#define DISCRETE_TAG	"discrete"
-#define SCREEN_TAG		"screen"
+#define Z8400A_TAG      "5f"
+#define FDC1797_TAG     "5n"
+#define P8155H_TAG      "2n"
+#define P8155H_IO_TAG   "c7"
+#define P8251A_TAG      "c3"
+#define DISCRETE_TAG    "discrete"
+#define SCREEN_TAG      "screen"
 
 class vixen_state : public driver_device
 {
 public:
 	vixen_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z8400A_TAG),
-		  m_fdc(*this, FDC1797_TAG),
-		  m_io_i8155(*this, P8155H_IO_TAG),
-		  m_usart(*this, P8251A_TAG),
-		  m_discrete(*this, DISCRETE_TAG),
-		  m_ieee488(*this, IEEE488_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FDC1797_TAG":0"),
-		  m_floppy1(*this, FDC1797_TAG":1"),
-		  m_fdint(0),
-		  m_vsync(0),
-		  m_srq(1),
-		  m_atn(1),
-		  m_rxrdy(0),
-		  m_txrdy(0),
-		  m_video_ram(*this, "video_ram")
+			m_maincpu(*this, Z8400A_TAG),
+			m_fdc(*this, FDC1797_TAG),
+			m_io_i8155(*this, P8155H_IO_TAG),
+			m_usart(*this, P8251A_TAG),
+			m_discrete(*this, DISCRETE_TAG),
+			m_ieee488(*this, IEEE488_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, FDC1797_TAG":0"),
+			m_floppy1(*this, FDC1797_TAG":1"),
+			m_fdint(0),
+			m_vsync(0),
+			m_srq(1),
+			m_atn(1),
+			m_rxrdy(0),
+			m_txrdy(0),
+			m_video_ram(*this, "video_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

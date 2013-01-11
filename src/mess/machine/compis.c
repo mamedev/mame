@@ -25,7 +25,7 @@
 #define LOG_TIMER 1
 #define LOG_OPTIMIZATION 1
 #define LOG_DMA 1
-#define CPU_RESUME_TRIGGER	7123
+#define CPU_RESUME_TRIGGER  7123
 
 /* Keyboard */
 static const UINT8 compis_keyb_codes[6][16] = {
@@ -55,21 +55,21 @@ enum COMPIS_USART_STATES
 /* Compis interrupt handling */
 enum COMPIS_INTERRUPTS
 {
-	COMPIS_NMI_KEYB		= 0x00,	/* Default not used */
-	COMPIS_INT_8251_TXRDY	= 0x01,	/* Default not used */
-	COMPIS_INT_8274		= 0x03
+	COMPIS_NMI_KEYB     = 0x00, /* Default not used */
+	COMPIS_INT_8251_TXRDY   = 0x01, /* Default not used */
+	COMPIS_INT_8274     = 0x03
 };
 
 enum COMPIS_INTERRUPT_REQUESTS
 {
-	COMPIS_IRQ_SBX0_INT1	 = 0x00,
-	COMPIS_IRQ_SBX0_INT0	 = 0x01, /* Default not used */
-	COMPIS_IRQ_8251_RXRDY	 = 0x02,
+	COMPIS_IRQ_SBX0_INT1     = 0x00,
+	COMPIS_IRQ_SBX0_INT0     = 0x01, /* Default not used */
+	COMPIS_IRQ_8251_RXRDY    = 0x02,
 	COMPIS_IRQ_80150_SYSTICK = 0x03, /* Default not used */
-	COMPIS_IRQ_ACK_J7	 = 0x04,
-	COMPIS_IRQ_SBX1_INT1	 = 0x05, /* Default not used */
-	COMPIS_IRQ_SBX1_INT0	 = 0x06, /* Default not used */
-	COMPIS_IRQ_80150_DELAY	 = 0x07
+	COMPIS_IRQ_ACK_J7    = 0x04,
+	COMPIS_IRQ_SBX1_INT1     = 0x05, /* Default not used */
+	COMPIS_IRQ_SBX1_INT0     = 0x06, /* Default not used */
+	COMPIS_IRQ_80150_DELAY   = 0x07
 };
 
 /* Main emulation */
@@ -366,9 +366,9 @@ static IRQ_CALLBACK(int_callback)
 	{
 		switch (state->m_i186.intr.poll_status & 0x1f)
 		{
-			case 0x08:	state->m_i186.intr.status &= ~0x01;	break;
-			case 0x12:	state->m_i186.intr.status &= ~0x02;	break;
-			case 0x13:	state->m_i186.intr.status &= ~0x04;	break;
+			case 0x08:  state->m_i186.intr.status &= ~0x01; break;
+			case 0x12:  state->m_i186.intr.status &= ~0x02; break;
+			case 0x13:  state->m_i186.intr.status &= ~0x04; break;
 		}
 	}
 	state->m_i186.intr.ack_mask = 0;
@@ -479,16 +479,16 @@ void compis_state::handle_eoi(int data)
 		/* turn off the appropriate in-service bit */
 		switch (data & 0x1f)
 		{
-			case 0x08:	m_i186.intr.in_service &= ~0x01;	break;
-			case 0x12:	m_i186.intr.in_service &= ~0x01;	break;
-			case 0x13:	m_i186.intr.in_service &= ~0x01;	break;
-			case 0x0a:	m_i186.intr.in_service &= ~0x04;	break;
-			case 0x0b:	m_i186.intr.in_service &= ~0x08;	break;
-			case 0x0c:	m_i186.intr.in_service &= ~0x10;	break;
-			case 0x0d:	m_i186.intr.in_service &= ~0x20;	break;
-			case 0x0e:	m_i186.intr.in_service &= ~0x40;	break;
-			case 0x0f:	m_i186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", m_maincpu->pc(), data & 0x1f);
+			case 0x08:  m_i186.intr.in_service &= ~0x01;    break;
+			case 0x12:  m_i186.intr.in_service &= ~0x01;    break;
+			case 0x13:  m_i186.intr.in_service &= ~0x01;    break;
+			case 0x0a:  m_i186.intr.in_service &= ~0x04;    break;
+			case 0x0b:  m_i186.intr.in_service &= ~0x08;    break;
+			case 0x0c:  m_i186.intr.in_service &= ~0x10;    break;
+			case 0x0d:  m_i186.intr.in_service &= ~0x20;    break;
+			case 0x0e:  m_i186.intr.in_service &= ~0x40;    break;
+			case 0x0f:  m_i186.intr.in_service &= ~0x80;    break;
+			default:    logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", m_maincpu->pc(), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine().time().as_double(), data & 0x1f);
 	}
@@ -616,7 +616,7 @@ void compis_state::internal_timer_update(int which, int new_count, int new_maxA,
 		t->maxA = new_maxA;
 		if (new_maxA == 0)
 		{
-        		new_maxA = 0x10000;
+				new_maxA = 0x10000;
 		}
 	}
 
@@ -633,7 +633,7 @@ void compis_state::internal_timer_update(int which, int new_count, int new_maxA,
 
 		if (new_maxB == 0)
 		{
-        		new_maxB = 0x10000;
+				new_maxB = 0x10000;
 		}
 	}
 
@@ -696,18 +696,18 @@ void compis_state::internal_timer_update(int which, int new_count, int new_maxA,
 	/* update the interrupt timer */
 	if (update_int_timer)
 	{
-	    	if ((t->control & 0x8000) && (t->control & 0x2000))
-	    	{
-	        	int diff = t->maxA - t->count;
-	        	if (diff <= 0)
-	        		diff += 0x10000;
-	        	t->int_timer->adjust(attotime::from_hz(2000000) * diff, which);
-	        	if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
-	    	}
-	    	else
-	    	{
-	        	t->int_timer->adjust(attotime::never, which);
-	    	}
+			if ((t->control & 0x8000) && (t->control & 0x2000))
+			{
+				int diff = t->maxA - t->count;
+				if (diff <= 0)
+					diff += 0x10000;
+				t->int_timer->adjust(attotime::from_hz(2000000) * diff, which);
+				if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
+			}
+			else
+			{
+				t->int_timer->adjust(attotime::never, which);
+			}
 	}
 }
 
@@ -783,7 +783,7 @@ void compis_state::update_dma_control(int which, int new_control)
 //          int count = d->count;
 
 			/* adjust for redline racer */
-        	// int dacnum = (d->dest & 0x3f) / 2;
+			// int dacnum = (d->dest & 0x3f) / 2;
 
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 

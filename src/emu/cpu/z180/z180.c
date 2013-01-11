@@ -93,22 +93,22 @@ Hitachi HD647180 series:
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 /* interrupt priorities */
-#define Z180_INT_TRAP	0			/* Undefined opcode */
-#define Z180_INT_NMI	1			/* NMI */
-#define Z180_INT_IRQ0	2			/* Execute IRQ1 */
-#define Z180_INT_IRQ1	3			/* Execute IRQ1 */
-#define Z180_INT_IRQ2	4			/* Execute IRQ2 */
-#define Z180_INT_PRT0	5			/* Internal PRT channel 0 */
-#define Z180_INT_PRT1	6			/* Internal PRT channel 1 */
-#define Z180_INT_DMA0	7			/* Internal DMA channel 0 */
-#define Z180_INT_DMA1	8			/* Internal DMA channel 1 */
-#define Z180_INT_CSIO	9			/* Internal CSI/O */
-#define Z180_INT_ASCI0	10			/* Internal ASCI channel 0 */
-#define Z180_INT_ASCI1	11			/* Internal ASCI channel 1 */
-#define Z180_INT_MAX	Z180_INT_ASCI1
+#define Z180_INT_TRAP   0           /* Undefined opcode */
+#define Z180_INT_NMI    1           /* NMI */
+#define Z180_INT_IRQ0   2           /* Execute IRQ1 */
+#define Z180_INT_IRQ1   3           /* Execute IRQ1 */
+#define Z180_INT_IRQ2   4           /* Execute IRQ2 */
+#define Z180_INT_PRT0   5           /* Internal PRT channel 0 */
+#define Z180_INT_PRT1   6           /* Internal PRT channel 1 */
+#define Z180_INT_DMA0   7           /* Internal DMA channel 0 */
+#define Z180_INT_DMA1   8           /* Internal DMA channel 1 */
+#define Z180_INT_CSIO   9           /* Internal CSI/O */
+#define Z180_INT_ASCI0  10          /* Internal ASCI channel 0 */
+#define Z180_INT_ASCI1  11          /* Internal ASCI channel 1 */
+#define Z180_INT_MAX    Z180_INT_ASCI1
 
 /****************************************************************************/
 /* The Z180 registers. HALT is set to 1 when the CPU is halted, the refresh */
@@ -116,36 +116,36 @@ Hitachi HD647180 series:
 /****************************************************************************/
 struct z180_state
 {
-	PAIR	PREPC,PC,SP,AF,BC,DE,HL,IX,IY;
-	PAIR	AF2,BC2,DE2,HL2;
-	UINT8	R,R2,IFF1,IFF2,HALT,IM,I;
-	UINT8	tmdr_latch; 					/* flag latched TMDR0H, TMDR1H values */
-	UINT8	read_tcr_tmdr[2];				/* flag to indicate that TCR or TMDR was read */
-	UINT32	iol;							/* I/O line status bits */
-	UINT8	io[64];							/* 64 internal 8 bit registers */
-	offs_t	mmu[16];						/* MMU address translation */
-	UINT8	tmdrh[2];						/* latched TMDR0H and TMDR1H values */
-	UINT16	tmdr_value[2];					/* TMDR values used byt PRT0 and PRT1 as down counter */
-	UINT8	tif[2];							/* TIF0 and TIF1 values */
-	UINT8	nmi_state;						/* nmi line state */
-	UINT8	nmi_pending;					/* nmi pending */
-	UINT8	irq_state[3];					/* irq line states (INT0,INT1,INT2) */
-	UINT8	int_pending[Z180_INT_MAX + 1];	/* interrupt pending */
-	UINT8	after_EI;						/* are we in the EI shadow? */
-	UINT32	ea;
-	UINT8	timer_cnt;						/* timer counter / divide by 20 */
-	UINT8	dma0_cnt;						/* dma0 counter / divide by 20 */
-	UINT8	dma1_cnt;						/* dma1 counter / divide by 20 */
+	PAIR    PREPC,PC,SP,AF,BC,DE,HL,IX,IY;
+	PAIR    AF2,BC2,DE2,HL2;
+	UINT8   R,R2,IFF1,IFF2,HALT,IM,I;
+	UINT8   tmdr_latch;                     /* flag latched TMDR0H, TMDR1H values */
+	UINT8   read_tcr_tmdr[2];               /* flag to indicate that TCR or TMDR was read */
+	UINT32  iol;                            /* I/O line status bits */
+	UINT8   io[64];                         /* 64 internal 8 bit registers */
+	offs_t  mmu[16];                        /* MMU address translation */
+	UINT8   tmdrh[2];                       /* latched TMDR0H and TMDR1H values */
+	UINT16  tmdr_value[2];                  /* TMDR values used byt PRT0 and PRT1 as down counter */
+	UINT8   tif[2];                         /* TIF0 and TIF1 values */
+	UINT8   nmi_state;                      /* nmi line state */
+	UINT8   nmi_pending;                    /* nmi pending */
+	UINT8   irq_state[3];                   /* irq line states (INT0,INT1,INT2) */
+	UINT8   int_pending[Z180_INT_MAX + 1];  /* interrupt pending */
+	UINT8   after_EI;                       /* are we in the EI shadow? */
+	UINT32  ea;
+	UINT8   timer_cnt;                      /* timer counter / divide by 20 */
+	UINT8   dma0_cnt;                       /* dma0 counter / divide by 20 */
+	UINT8   dma1_cnt;                       /* dma1 counter / divide by 20 */
 	z80_daisy_chain daisy;
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
 	address_space *iospace;
-	UINT8	rtemp;
-	UINT32	ioltemp;
+	UINT8   rtemp;
+	UINT32  ioltemp;
 	int icount;
-	int extra_cycles;			/* extra cpu cycles */
+	int extra_cycles;           /* extra cpu cycles */
 	UINT8 *cc[6];
 };
 
@@ -158,35 +158,35 @@ INLINE z180_state *get_safe_token(device_t *device)
 
 static void set_irq_line(z180_state *cpustate, int irqline, int state);
 
-#define CF	0x01
-#define NF	0x02
-#define PF	0x04
-#define VF	PF
-#define XF	0x08
-#define HF	0x10
-#define YF	0x20
-#define ZF	0x40
-#define SF	0x80
+#define CF  0x01
+#define NF  0x02
+#define PF  0x04
+#define VF  PF
+#define XF  0x08
+#define HF  0x10
+#define YF  0x20
+#define ZF  0x40
+#define SF  0x80
 
 /* I/O line status flags */
-#define Z180_CKA0	  0x00000001  /* I/O asynchronous clock 0 (active high) or DREQ0 (mux) */
-#define Z180_CKA1	  0x00000002  /* I/O asynchronous clock 1 (active high) or TEND1 (mux) */
-#define Z180_CKS	  0x00000004  /* I/O serial clock (active high) */
-#define Z180_CTS0	  0x00000100  /* I   clear to send 0 (active low) */
-#define Z180_CTS1	  0x00000200  /* I   clear to send 1 (active low) or RXS (mux) */
-#define Z180_DCD0	  0x00000400  /* I   data carrier detect (active low) */
-#define Z180_DREQ0	  0x00000800  /* I   data request DMA ch 0 (active low) or CKA0 (mux) */
-#define Z180_DREQ1	  0x00001000  /* I   data request DMA ch 1 (active low) */
-#define Z180_RXA0	  0x00002000  /* I   asynchronous receive data 0 (active high) */
-#define Z180_RXA1	  0x00004000  /* I   asynchronous receive data 1 (active high) */
-#define Z180_RXS	  0x00008000  /* I   clocked serial receive data (active high) or CTS1 (mux) */
-#define Z180_RTS0	  0x00010000  /*   O request to send (active low) */
-#define Z180_TEND0	  0x00020000  /*   O transfer end 0 (active low) or CKA1 (mux) */
-#define Z180_TEND1	  0x00040000  /*   O transfer end 1 (active low) */
+#define Z180_CKA0     0x00000001  /* I/O asynchronous clock 0 (active high) or DREQ0 (mux) */
+#define Z180_CKA1     0x00000002  /* I/O asynchronous clock 1 (active high) or TEND1 (mux) */
+#define Z180_CKS      0x00000004  /* I/O serial clock (active high) */
+#define Z180_CTS0     0x00000100  /* I   clear to send 0 (active low) */
+#define Z180_CTS1     0x00000200  /* I   clear to send 1 (active low) or RXS (mux) */
+#define Z180_DCD0     0x00000400  /* I   data carrier detect (active low) */
+#define Z180_DREQ0    0x00000800  /* I   data request DMA ch 0 (active low) or CKA0 (mux) */
+#define Z180_DREQ1    0x00001000  /* I   data request DMA ch 1 (active low) */
+#define Z180_RXA0     0x00002000  /* I   asynchronous receive data 0 (active high) */
+#define Z180_RXA1     0x00004000  /* I   asynchronous receive data 1 (active high) */
+#define Z180_RXS      0x00008000  /* I   clocked serial receive data (active high) or CTS1 (mux) */
+#define Z180_RTS0     0x00010000  /*   O request to send (active low) */
+#define Z180_TEND0    0x00020000  /*   O transfer end 0 (active low) or CKA1 (mux) */
+#define Z180_TEND1    0x00040000  /*   O transfer end 1 (active low) */
 #define Z180_A18_TOUT 0x00080000  /*   O transfer out (PRT channel, active low) or A18 (mux) */
-#define Z180_TXA0	  0x00100000  /*   O asynchronous transmit data 0 (active high) */
-#define Z180_TXA1	  0x00200000  /*   O asynchronous transmit data 1 (active high) */
-#define Z180_TXS	  0x00400000  /*   O clocked serial transmit data (active high) */
+#define Z180_TXA0     0x00100000  /*   O asynchronous transmit data 0 (active high) */
+#define Z180_TXA1     0x00200000  /*   O asynchronous transmit data 1 (active high) */
+#define Z180_TXS      0x00400000  /*   O clocked serial transmit data (active high) */
 
 /*
  * Prevent warnings on NetBSD.  All identifiers beginning with an underscore
@@ -198,600 +198,600 @@ static void set_irq_line(z180_state *cpustate, int irqline, int state);
 #undef _C
 #undef _L
 
-#define _PPC	PREPC.d	/* previous program counter */
+#define _PPC    PREPC.d /* previous program counter */
 
-#define _PCD	PC.d
-#define _PC 	PC.w.l
+#define _PCD    PC.d
+#define _PC     PC.w.l
 
-#define _SPD	SP.d
-#define _SP 	SP.w.l
+#define _SPD    SP.d
+#define _SP     SP.w.l
 
-#define _AFD	AF.d
-#define _AF 	AF.w.l
-#define _A		AF.b.h
-#define _F		AF.b.l
+#define _AFD    AF.d
+#define _AF     AF.w.l
+#define _A      AF.b.h
+#define _F      AF.b.l
 
-#define _BCD	BC.d
-#define _BC 	BC.w.l
-#define _B		BC.b.h
-#define _C		BC.b.l
+#define _BCD    BC.d
+#define _BC     BC.w.l
+#define _B      BC.b.h
+#define _C      BC.b.l
 
-#define _DED	DE.d
-#define _DE 	DE.w.l
-#define _D		DE.b.h
-#define _E		DE.b.l
+#define _DED    DE.d
+#define _DE     DE.w.l
+#define _D      DE.b.h
+#define _E      DE.b.l
 
-#define _HLD	HL.d
-#define _HL 	HL.w.l
-#define _H		HL.b.h
-#define _L		HL.b.l
+#define _HLD    HL.d
+#define _HL     HL.w.l
+#define _H      HL.b.h
+#define _L      HL.b.l
 
-#define _IXD	IX.d
-#define _IX 	IX.w.l
-#define _HX 	IX.b.h
-#define _LX 	IX.b.l
+#define _IXD    IX.d
+#define _IX     IX.w.l
+#define _HX     IX.b.h
+#define _LX     IX.b.l
 
-#define _IYD	IY.d
-#define _IY 	IY.w.l
-#define _HY 	IY.b.h
-#define _LY 	IY.b.l
+#define _IYD    IY.d
+#define _IY     IY.w.l
+#define _HY     IY.b.h
+#define _LY     IY.b.l
 
-#define IO(n)		io[(n)-Z180_CNTLA0]
-#define IO_CNTLA0	IO(Z180_CNTLA0)
-#define IO_CNTLA1	IO(Z180_CNTLA1)
-#define IO_CNTLB0	IO(Z180_CNTLB0)
-#define IO_CNTLB1	IO(Z180_CNTLB1)
-#define IO_STAT0	IO(Z180_STAT0)
-#define IO_STAT1	IO(Z180_STAT1)
-#define IO_TDR0 	IO(Z180_TDR0)
-#define IO_TDR1 	IO(Z180_TDR1)
-#define IO_RDR0 	IO(Z180_RDR0)
-#define IO_RDR1 	IO(Z180_RDR1)
-#define IO_CNTR 	IO(Z180_CNTR)
-#define IO_TRDR 	IO(Z180_TRDR)
-#define IO_TMDR0L	IO(Z180_TMDR0L)
-#define IO_TMDR0H	IO(Z180_TMDR0H)
-#define IO_RLDR0L	IO(Z180_RLDR0L)
-#define IO_RLDR0H	IO(Z180_RLDR0H)
-#define IO_TCR		IO(Z180_TCR)
-#define IO_IO11 	IO(Z180_IO11)
-#define IO_ASEXT0	IO(Z180_ASEXT0)
-#define IO_ASEXT1	IO(Z180_ASEXT1)
-#define IO_TMDR1L	IO(Z180_TMDR1L)
-#define IO_TMDR1H	IO(Z180_TMDR1H)
-#define IO_RLDR1L	IO(Z180_RLDR1L)
-#define IO_RLDR1H	IO(Z180_RLDR1H)
-#define IO_FRC		IO(Z180_FRC)
-#define IO_IO19 	IO(Z180_IO19)
-#define IO_ASTC0L	IO(Z180_ASTC0L)
-#define IO_ASTC0H	IO(Z180_ASTC0H)
-#define IO_ASTC1L	IO(Z180_ASTC1L)
-#define IO_ASTC1H	IO(Z180_ASTC1H)
-#define IO_CMR		IO(Z180_CMR)
-#define IO_CCR		IO(Z180_CCR)
-#define IO_SAR0L	IO(Z180_SAR0L)
-#define IO_SAR0H	IO(Z180_SAR0H)
-#define IO_SAR0B	IO(Z180_SAR0B)
-#define IO_DAR0L	IO(Z180_DAR0L)
-#define IO_DAR0H	IO(Z180_DAR0H)
-#define IO_DAR0B	IO(Z180_DAR0B)
-#define IO_BCR0L	IO(Z180_BCR0L)
-#define IO_BCR0H	IO(Z180_BCR0H)
-#define IO_MAR1L	IO(Z180_MAR1L)
-#define IO_MAR1H	IO(Z180_MAR1H)
-#define IO_MAR1B	IO(Z180_MAR1B)
-#define IO_IAR1L	IO(Z180_IAR1L)
-#define IO_IAR1H	IO(Z180_IAR1H)
-#define IO_IAR1B	IO(Z180_IAR1B)
-#define IO_BCR1L	IO(Z180_BCR1L)
-#define IO_BCR1H	IO(Z180_BCR1H)
-#define IO_DSTAT	IO(Z180_DSTAT)
-#define IO_DMODE	IO(Z180_DMODE)
-#define IO_DCNTL	IO(Z180_DCNTL)
-#define IO_IL		IO(Z180_IL)
-#define IO_ITC		IO(Z180_ITC)
-#define IO_IO35 	IO(Z180_IO35)
-#define IO_RCR		IO(Z180_RCR)
-#define IO_IO37 	IO(Z180_IO37)
-#define IO_CBR		IO(Z180_CBR)
-#define IO_BBR		IO(Z180_BBR)
-#define IO_CBAR 	IO(Z180_CBAR)
-#define IO_IO3B 	IO(Z180_IO3B)
-#define IO_IO3C 	IO(Z180_IO3C)
-#define IO_IO3D 	IO(Z180_IO3D)
-#define IO_OMCR 	IO(Z180_OMCR)
-#define IO_IOCR 	IO(Z180_IOCR)
+#define IO(n)       io[(n)-Z180_CNTLA0]
+#define IO_CNTLA0   IO(Z180_CNTLA0)
+#define IO_CNTLA1   IO(Z180_CNTLA1)
+#define IO_CNTLB0   IO(Z180_CNTLB0)
+#define IO_CNTLB1   IO(Z180_CNTLB1)
+#define IO_STAT0    IO(Z180_STAT0)
+#define IO_STAT1    IO(Z180_STAT1)
+#define IO_TDR0     IO(Z180_TDR0)
+#define IO_TDR1     IO(Z180_TDR1)
+#define IO_RDR0     IO(Z180_RDR0)
+#define IO_RDR1     IO(Z180_RDR1)
+#define IO_CNTR     IO(Z180_CNTR)
+#define IO_TRDR     IO(Z180_TRDR)
+#define IO_TMDR0L   IO(Z180_TMDR0L)
+#define IO_TMDR0H   IO(Z180_TMDR0H)
+#define IO_RLDR0L   IO(Z180_RLDR0L)
+#define IO_RLDR0H   IO(Z180_RLDR0H)
+#define IO_TCR      IO(Z180_TCR)
+#define IO_IO11     IO(Z180_IO11)
+#define IO_ASEXT0   IO(Z180_ASEXT0)
+#define IO_ASEXT1   IO(Z180_ASEXT1)
+#define IO_TMDR1L   IO(Z180_TMDR1L)
+#define IO_TMDR1H   IO(Z180_TMDR1H)
+#define IO_RLDR1L   IO(Z180_RLDR1L)
+#define IO_RLDR1H   IO(Z180_RLDR1H)
+#define IO_FRC      IO(Z180_FRC)
+#define IO_IO19     IO(Z180_IO19)
+#define IO_ASTC0L   IO(Z180_ASTC0L)
+#define IO_ASTC0H   IO(Z180_ASTC0H)
+#define IO_ASTC1L   IO(Z180_ASTC1L)
+#define IO_ASTC1H   IO(Z180_ASTC1H)
+#define IO_CMR      IO(Z180_CMR)
+#define IO_CCR      IO(Z180_CCR)
+#define IO_SAR0L    IO(Z180_SAR0L)
+#define IO_SAR0H    IO(Z180_SAR0H)
+#define IO_SAR0B    IO(Z180_SAR0B)
+#define IO_DAR0L    IO(Z180_DAR0L)
+#define IO_DAR0H    IO(Z180_DAR0H)
+#define IO_DAR0B    IO(Z180_DAR0B)
+#define IO_BCR0L    IO(Z180_BCR0L)
+#define IO_BCR0H    IO(Z180_BCR0H)
+#define IO_MAR1L    IO(Z180_MAR1L)
+#define IO_MAR1H    IO(Z180_MAR1H)
+#define IO_MAR1B    IO(Z180_MAR1B)
+#define IO_IAR1L    IO(Z180_IAR1L)
+#define IO_IAR1H    IO(Z180_IAR1H)
+#define IO_IAR1B    IO(Z180_IAR1B)
+#define IO_BCR1L    IO(Z180_BCR1L)
+#define IO_BCR1H    IO(Z180_BCR1H)
+#define IO_DSTAT    IO(Z180_DSTAT)
+#define IO_DMODE    IO(Z180_DMODE)
+#define IO_DCNTL    IO(Z180_DCNTL)
+#define IO_IL       IO(Z180_IL)
+#define IO_ITC      IO(Z180_ITC)
+#define IO_IO35     IO(Z180_IO35)
+#define IO_RCR      IO(Z180_RCR)
+#define IO_IO37     IO(Z180_IO37)
+#define IO_CBR      IO(Z180_CBR)
+#define IO_BBR      IO(Z180_BBR)
+#define IO_CBAR     IO(Z180_CBAR)
+#define IO_IO3B     IO(Z180_IO3B)
+#define IO_IO3C     IO(Z180_IO3C)
+#define IO_IO3D     IO(Z180_IO3D)
+#define IO_OMCR     IO(Z180_OMCR)
+#define IO_IOCR     IO(Z180_IOCR)
 
 /* 00 ASCI control register A ch 0 */
-#define Z180_CNTLA0_MPE 		0x80
-#define Z180_CNTLA0_RE			0x40
-#define Z180_CNTLA0_TE			0x20
-#define Z180_CNTLA0_RTS0		0x10
-#define Z180_CNTLA0_MPBR_EFR	0x08
-#define Z180_CNTLA0_MODE_DATA	0x04
+#define Z180_CNTLA0_MPE         0x80
+#define Z180_CNTLA0_RE          0x40
+#define Z180_CNTLA0_TE          0x20
+#define Z180_CNTLA0_RTS0        0x10
+#define Z180_CNTLA0_MPBR_EFR    0x08
+#define Z180_CNTLA0_MODE_DATA   0x04
 #define Z180_CNTLA0_MODE_PARITY 0x02
-#define Z180_CNTLA0_MODE_STOPB	0x01
+#define Z180_CNTLA0_MODE_STOPB  0x01
 
-#define Z180_CNTLA0_RESET		0x10
-#define Z180_CNTLA0_RMASK		0xff
-#define Z180_CNTLA0_WMASK		0xff
+#define Z180_CNTLA0_RESET       0x10
+#define Z180_CNTLA0_RMASK       0xff
+#define Z180_CNTLA0_WMASK       0xff
 
 /* 01 ASCI control register A ch 1 */
-#define Z180_CNTLA1_MPE 		0x80
-#define Z180_CNTLA1_RE			0x40
-#define Z180_CNTLA1_TE			0x20
-#define Z180_CNTLA1_CKA1D		0x10
-#define Z180_CNTLA1_MPBR_EFR	0x08
-#define Z180_CNTLA1_MODE		0x07
+#define Z180_CNTLA1_MPE         0x80
+#define Z180_CNTLA1_RE          0x40
+#define Z180_CNTLA1_TE          0x20
+#define Z180_CNTLA1_CKA1D       0x10
+#define Z180_CNTLA1_MPBR_EFR    0x08
+#define Z180_CNTLA1_MODE        0x07
 
-#define Z180_CNTLA1_RESET		0x10
-#define Z180_CNTLA1_RMASK		0xff
-#define Z180_CNTLA1_WMASK		0xff
+#define Z180_CNTLA1_RESET       0x10
+#define Z180_CNTLA1_RMASK       0xff
+#define Z180_CNTLA1_WMASK       0xff
 
 /* 02 ASCI control register B ch 0 */
-#define Z180_CNTLB0_MPBT		0x80
-#define Z180_CNTLB0_MP			0x40
-#define Z180_CNTLB0_CTS_PS		0x20
-#define Z180_CNTLB0_PEO 		0x10
-#define Z180_CNTLB0_DR			0x08
-#define Z180_CNTLB0_SS			0x07
+#define Z180_CNTLB0_MPBT        0x80
+#define Z180_CNTLB0_MP          0x40
+#define Z180_CNTLB0_CTS_PS      0x20
+#define Z180_CNTLB0_PEO         0x10
+#define Z180_CNTLB0_DR          0x08
+#define Z180_CNTLB0_SS          0x07
 
-#define Z180_CNTLB0_RESET		0x07
-#define Z180_CNTLB0_RMASK		0xff
-#define Z180_CNTLB0_WMASK		0xff
+#define Z180_CNTLB0_RESET       0x07
+#define Z180_CNTLB0_RMASK       0xff
+#define Z180_CNTLB0_WMASK       0xff
 
 /* 03 ASCI control register B ch 1 */
-#define Z180_CNTLB1_MPBT		0x80
-#define Z180_CNTLB1_MP			0x40
-#define Z180_CNTLB1_CTS_PS		0x20
-#define Z180_CNTLB1_PEO 		0x10
-#define Z180_CNTLB1_DR			0x08
-#define Z180_CNTLB1_SS			0x07
+#define Z180_CNTLB1_MPBT        0x80
+#define Z180_CNTLB1_MP          0x40
+#define Z180_CNTLB1_CTS_PS      0x20
+#define Z180_CNTLB1_PEO         0x10
+#define Z180_CNTLB1_DR          0x08
+#define Z180_CNTLB1_SS          0x07
 
-#define Z180_CNTLB1_RESET		0x07
-#define Z180_CNTLB1_RMASK		0xff
-#define Z180_CNTLB1_WMASK		0xff
+#define Z180_CNTLB1_RESET       0x07
+#define Z180_CNTLB1_RMASK       0xff
+#define Z180_CNTLB1_WMASK       0xff
 
 /* 04 ASCI status register 0 */
-#define Z180_STAT0_RDRF 		0x80
-#define Z180_STAT0_OVRN 		0x40
-#define Z180_STAT0_PE			0x20
-#define Z180_STAT0_FE			0x10
-#define Z180_STAT0_RIE			0x08
-#define Z180_STAT0_DCD0 		0x04
-#define Z180_STAT0_TDRE 		0x02
-#define Z180_STAT0_TIE			0x01
+#define Z180_STAT0_RDRF         0x80
+#define Z180_STAT0_OVRN         0x40
+#define Z180_STAT0_PE           0x20
+#define Z180_STAT0_FE           0x10
+#define Z180_STAT0_RIE          0x08
+#define Z180_STAT0_DCD0         0x04
+#define Z180_STAT0_TDRE         0x02
+#define Z180_STAT0_TIE          0x01
 
-#define Z180_STAT0_RESET		0x00
-#define Z180_STAT0_RMASK		0xff
-#define Z180_STAT0_WMASK		0x09
+#define Z180_STAT0_RESET        0x00
+#define Z180_STAT0_RMASK        0xff
+#define Z180_STAT0_WMASK        0x09
 
 /* 05 ASCI status register 1 */
-#define Z180_STAT1_RDRF 		0x80
-#define Z180_STAT1_OVRN 		0x40
-#define Z180_STAT1_PE			0x20
-#define Z180_STAT1_FE			0x10
-#define Z180_STAT1_RIE			0x08
-#define Z180_STAT1_CTS1E		0x04
-#define Z180_STAT1_TDRE 		0x02
-#define Z180_STAT1_TIE			0x01
+#define Z180_STAT1_RDRF         0x80
+#define Z180_STAT1_OVRN         0x40
+#define Z180_STAT1_PE           0x20
+#define Z180_STAT1_FE           0x10
+#define Z180_STAT1_RIE          0x08
+#define Z180_STAT1_CTS1E        0x04
+#define Z180_STAT1_TDRE         0x02
+#define Z180_STAT1_TIE          0x01
 
-#define Z180_STAT1_RESET		0x02
-#define Z180_STAT1_RMASK		0xff
-#define Z180_STAT1_WMASK		0x0d
+#define Z180_STAT1_RESET        0x02
+#define Z180_STAT1_RMASK        0xff
+#define Z180_STAT1_WMASK        0x0d
 
 /* 06 ASCI transmit data register 0 */
-#define Z180_TDR0_TDR			0xff
+#define Z180_TDR0_TDR           0xff
 
-#define Z180_TDR0_RESET 		0x00
-#define Z180_TDR0_RMASK 		0xff
-#define Z180_TDR0_WMASK 		0xff
+#define Z180_TDR0_RESET         0x00
+#define Z180_TDR0_RMASK         0xff
+#define Z180_TDR0_WMASK         0xff
 
 /* 07 ASCI transmit data register 1 */
-#define Z180_TDR1_TDR			0xff
+#define Z180_TDR1_TDR           0xff
 
-#define Z180_TDR1_RESET 		0x00
-#define Z180_TDR1_RMASK 		0xff
-#define Z180_TDR1_WMASK 		0xff
+#define Z180_TDR1_RESET         0x00
+#define Z180_TDR1_RMASK         0xff
+#define Z180_TDR1_WMASK         0xff
 
 /* 08 ASCI receive register 0 */
-#define Z180_RDR0_RDR			0xff
+#define Z180_RDR0_RDR           0xff
 
-#define Z180_RDR0_RESET 		0x00
-#define Z180_RDR0_RMASK 		0xff
-#define Z180_RDR0_WMASK 		0xff
+#define Z180_RDR0_RESET         0x00
+#define Z180_RDR0_RMASK         0xff
+#define Z180_RDR0_WMASK         0xff
 
 /* 09 ASCI receive register 1 */
-#define Z180_RDR1_RDR			0xff
+#define Z180_RDR1_RDR           0xff
 
-#define Z180_RDR1_RESET 		0x00
-#define Z180_RDR1_RMASK 		0xff
-#define Z180_RDR1_WMASK 		0xff
+#define Z180_RDR1_RESET         0x00
+#define Z180_RDR1_RMASK         0xff
+#define Z180_RDR1_WMASK         0xff
 
 /* 0a CSI/O control/status register */
-#define Z180_CNTR_EF			0x80
-#define Z180_CNTR_EIE			0x40
-#define Z180_CNTR_RE			0x20
-#define Z180_CNTR_TE			0x10
-#define Z180_CNTR_SS			0x07
+#define Z180_CNTR_EF            0x80
+#define Z180_CNTR_EIE           0x40
+#define Z180_CNTR_RE            0x20
+#define Z180_CNTR_TE            0x10
+#define Z180_CNTR_SS            0x07
 
-#define Z180_CNTR_RESET 		0x07
-#define Z180_CNTR_RMASK 		0xff
-#define Z180_CNTR_WMASK 		0x7f
+#define Z180_CNTR_RESET         0x07
+#define Z180_CNTR_RMASK         0xff
+#define Z180_CNTR_WMASK         0x7f
 
 /* 0b CSI/O transmit/receive register */
-#define Z180_TRDR_RESET 		0x00
-#define Z180_TRDR_RMASK 		0xff
-#define Z180_TRDR_WMASK 		0xff
+#define Z180_TRDR_RESET         0x00
+#define Z180_TRDR_RMASK         0xff
+#define Z180_TRDR_WMASK         0xff
 
 /* 0c TIMER data register ch 0 L */
-#define Z180_TMDR0L_RESET		0x00
-#define Z180_TMDR0L_RMASK		0xff
-#define Z180_TMDR0L_WMASK		0xff
+#define Z180_TMDR0L_RESET       0x00
+#define Z180_TMDR0L_RMASK       0xff
+#define Z180_TMDR0L_WMASK       0xff
 
 /* 0d TIMER data register ch 0 H */
-#define Z180_TMDR0H_RESET		0x00
-#define Z180_TMDR0H_RMASK		0xff
-#define Z180_TMDR0H_WMASK		0xff
+#define Z180_TMDR0H_RESET       0x00
+#define Z180_TMDR0H_RMASK       0xff
+#define Z180_TMDR0H_WMASK       0xff
 
 /* 0e TIMER reload register ch 0 L */
-#define Z180_RLDR0L_RESET		0xff
-#define Z180_RLDR0L_RMASK		0xff
-#define Z180_RLDR0L_WMASK		0xff
+#define Z180_RLDR0L_RESET       0xff
+#define Z180_RLDR0L_RMASK       0xff
+#define Z180_RLDR0L_WMASK       0xff
 
 /* 0f TIMER reload register ch 0 H */
-#define Z180_RLDR0H_RESET		0xff
-#define Z180_RLDR0H_RMASK		0xff
-#define Z180_RLDR0H_WMASK		0xff
+#define Z180_RLDR0H_RESET       0xff
+#define Z180_RLDR0H_RMASK       0xff
+#define Z180_RLDR0H_WMASK       0xff
 
 /* 10 TIMER control register */
-#define Z180_TCR_TIF1			0x80
-#define Z180_TCR_TIF0			0x40
-#define Z180_TCR_TIE1			0x20
-#define Z180_TCR_TIE0			0x10
-#define Z180_TCR_TOC1			0x08
-#define Z180_TCR_TOC0			0x04
-#define Z180_TCR_TDE1			0x02
-#define Z180_TCR_TDE0			0x01
+#define Z180_TCR_TIF1           0x80
+#define Z180_TCR_TIF0           0x40
+#define Z180_TCR_TIE1           0x20
+#define Z180_TCR_TIE0           0x10
+#define Z180_TCR_TOC1           0x08
+#define Z180_TCR_TOC0           0x04
+#define Z180_TCR_TDE1           0x02
+#define Z180_TCR_TDE0           0x01
 
-#define Z180_TCR_RESET			0x00
-#define Z180_TCR_RMASK			0xff
-#define Z180_TCR_WMASK			0x3f
+#define Z180_TCR_RESET          0x00
+#define Z180_TCR_RMASK          0xff
+#define Z180_TCR_WMASK          0x3f
 
 /* 11 reserved */
-#define Z180_IO11_RESET 		0x00
-#define Z180_IO11_RMASK 		0xff
-#define Z180_IO11_WMASK 		0xff
+#define Z180_IO11_RESET         0x00
+#define Z180_IO11_RMASK         0xff
+#define Z180_IO11_WMASK         0xff
 
 /* 12 (Z8S180/Z8L180) ASCI extension control register 0 */
-#define Z180_ASEXT0_RDRF		0x80
-#define Z180_ASEXT0_DCD0		0x40
-#define Z180_ASEXT0_CTS0		0x20
+#define Z180_ASEXT0_RDRF        0x80
+#define Z180_ASEXT0_DCD0        0x40
+#define Z180_ASEXT0_CTS0        0x20
 #define Z180_ASEXT0_X1_BIT_CLK0 0x10
-#define Z180_ASEXT0_BRG0_MODE	0x08
-#define Z180_ASEXT0_BRK_EN		0x04
-#define Z180_ASEXT0_BRK_DET 	0x02
-#define Z180_ASEXT0_BRK_SEND	0x01
+#define Z180_ASEXT0_BRG0_MODE   0x08
+#define Z180_ASEXT0_BRK_EN      0x04
+#define Z180_ASEXT0_BRK_DET     0x02
+#define Z180_ASEXT0_BRK_SEND    0x01
 
-#define Z180_ASEXT0_RESET		0x00
-#define Z180_ASEXT0_RMASK		0xff
-#define Z180_ASEXT0_WMASK		0xfd
+#define Z180_ASEXT0_RESET       0x00
+#define Z180_ASEXT0_RMASK       0xff
+#define Z180_ASEXT0_WMASK       0xfd
 
 /* 13 (Z8S180/Z8L180) ASCI extension control register 0 */
-#define Z180_ASEXT1_RDRF		0x80
+#define Z180_ASEXT1_RDRF        0x80
 #define Z180_ASEXT1_X1_BIT_CLK1 0x10
-#define Z180_ASEXT1_BRG1_MODE	0x08
-#define Z180_ASEXT1_BRK_EN		0x04
-#define Z180_ASEXT1_BRK_DET 	0x02
-#define Z180_ASEXT1_BRK_SEND	0x01
+#define Z180_ASEXT1_BRG1_MODE   0x08
+#define Z180_ASEXT1_BRK_EN      0x04
+#define Z180_ASEXT1_BRK_DET     0x02
+#define Z180_ASEXT1_BRK_SEND    0x01
 
-#define Z180_ASEXT1_RESET		0x00
-#define Z180_ASEXT1_RMASK		0xff
-#define Z180_ASEXT1_WMASK		0xfd
+#define Z180_ASEXT1_RESET       0x00
+#define Z180_ASEXT1_RMASK       0xff
+#define Z180_ASEXT1_WMASK       0xfd
 
 
 /* 14 TIMER data register ch 1 L */
-#define Z180_TMDR1L_RESET		0x00
-#define Z180_TMDR1L_RMASK		0xff
-#define Z180_TMDR1L_WMASK		0xff
+#define Z180_TMDR1L_RESET       0x00
+#define Z180_TMDR1L_RMASK       0xff
+#define Z180_TMDR1L_WMASK       0xff
 
 /* 15 TIMER data register ch 1 H */
-#define Z180_TMDR1H_RESET		0x00
-#define Z180_TMDR1H_RMASK		0xff
-#define Z180_TMDR1H_WMASK		0xff
+#define Z180_TMDR1H_RESET       0x00
+#define Z180_TMDR1H_RMASK       0xff
+#define Z180_TMDR1H_WMASK       0xff
 
 /* 16 TIMER reload register ch 1 L */
-#define Z180_RLDR1L_RESET		0x00
-#define Z180_RLDR1L_RMASK		0xff
-#define Z180_RLDR1L_WMASK		0xff
+#define Z180_RLDR1L_RESET       0x00
+#define Z180_RLDR1L_RMASK       0xff
+#define Z180_RLDR1L_WMASK       0xff
 
 /* 17 TIMER reload register ch 1 H */
-#define Z180_RLDR1H_RESET		0x00
-#define Z180_RLDR1H_RMASK		0xff
-#define Z180_RLDR1H_WMASK		0xff
+#define Z180_RLDR1H_RESET       0x00
+#define Z180_RLDR1H_RMASK       0xff
+#define Z180_RLDR1H_WMASK       0xff
 
 /* 18 free running counter */
-#define Z180_FRC_RESET			0x00
-#define Z180_FRC_RMASK			0xff
-#define Z180_FRC_WMASK			0xff
+#define Z180_FRC_RESET          0x00
+#define Z180_FRC_RMASK          0xff
+#define Z180_FRC_WMASK          0xff
 
 /* 19 reserved */
-#define Z180_IO19_RESET 		0x00
-#define Z180_IO19_RMASK 		0xff
-#define Z180_IO19_WMASK 		0xff
+#define Z180_IO19_RESET         0x00
+#define Z180_IO19_RMASK         0xff
+#define Z180_IO19_WMASK         0xff
 
 /* 1a ASCI time constant ch 0 L */
-#define Z180_ASTC0L_RESET		0x00
-#define Z180_ASTC0L_RMASK		0xff
-#define Z180_ASTC0L_WMASK		0xff
+#define Z180_ASTC0L_RESET       0x00
+#define Z180_ASTC0L_RMASK       0xff
+#define Z180_ASTC0L_WMASK       0xff
 
 /* 1b ASCI time constant ch 0 H */
-#define Z180_ASTC0H_RESET		0x00
-#define Z180_ASTC0H_RMASK		0xff
-#define Z180_ASTC0H_WMASK		0xff
+#define Z180_ASTC0H_RESET       0x00
+#define Z180_ASTC0H_RMASK       0xff
+#define Z180_ASTC0H_WMASK       0xff
 
 /* 1c ASCI time constant ch 1 L */
-#define Z180_ASTC1L_RESET		0x00
-#define Z180_ASTC1L_RMASK		0xff
-#define Z180_ASTC1L_WMASK		0xff
+#define Z180_ASTC1L_RESET       0x00
+#define Z180_ASTC1L_RMASK       0xff
+#define Z180_ASTC1L_WMASK       0xff
 
 /* 1d ASCI time constant ch 1 H */
-#define Z180_ASTC1H_RESET		0x00
-#define Z180_ASTC1H_RMASK		0xff
-#define Z180_ASTC1H_WMASK		0xff
+#define Z180_ASTC1H_RESET       0x00
+#define Z180_ASTC1H_RMASK       0xff
+#define Z180_ASTC1H_WMASK       0xff
 
 /* 1e clock multiplier */
-#define Z180_CMR_X2 			0x80
+#define Z180_CMR_X2             0x80
 
-#define Z180_CMR_RESET			0x7f
-#define Z180_CMR_RMASK			0x80
-#define Z180_CMR_WMASK			0x80
+#define Z180_CMR_RESET          0x7f
+#define Z180_CMR_RMASK          0x80
+#define Z180_CMR_WMASK          0x80
 
 /* 1f chip control register */
-#define Z180_CCR_CLOCK_DIVIDE	0x80
-#define Z180_CCR_STDBY_IDLE1	0x40
-#define Z180_CCR_BREXT			0x20
-#define Z180_CCR_LNPHI			0x10
-#define Z180_CCR_STDBY_IDLE0	0x08
-#define Z180_CCR_LNIO			0x04
-#define Z180_CCR_LNCPU_CTL		0x02
-#define Z180_CCR_LNAD_DATA		0x01
+#define Z180_CCR_CLOCK_DIVIDE   0x80
+#define Z180_CCR_STDBY_IDLE1    0x40
+#define Z180_CCR_BREXT          0x20
+#define Z180_CCR_LNPHI          0x10
+#define Z180_CCR_STDBY_IDLE0    0x08
+#define Z180_CCR_LNIO           0x04
+#define Z180_CCR_LNCPU_CTL      0x02
+#define Z180_CCR_LNAD_DATA      0x01
 
-#define Z180_CCR_RESET			0x00
-#define Z180_CCR_RMASK			0xff
-#define Z180_CCR_WMASK			0xff
+#define Z180_CCR_RESET          0x00
+#define Z180_CCR_RMASK          0xff
+#define Z180_CCR_WMASK          0xff
 
 /* 20 DMA source address register ch 0 L */
-#define Z180_SAR0L_SAR			0xff
+#define Z180_SAR0L_SAR          0xff
 
-#define Z180_SAR0L_RESET		0x00
-#define Z180_SAR0L_RMASK		0xff
-#define Z180_SAR0L_WMASK		0xff
+#define Z180_SAR0L_RESET        0x00
+#define Z180_SAR0L_RMASK        0xff
+#define Z180_SAR0L_WMASK        0xff
 
 /* 21 DMA source address register ch 0 H */
-#define Z180_SAR0H_SAR			0xff
+#define Z180_SAR0H_SAR          0xff
 
-#define Z180_SAR0H_RESET		0x00
-#define Z180_SAR0H_RMASK		0xff
-#define Z180_SAR0H_WMASK		0xff
+#define Z180_SAR0H_RESET        0x00
+#define Z180_SAR0H_RMASK        0xff
+#define Z180_SAR0H_WMASK        0xff
 
 /* 22 DMA source address register ch 0 B */
-#define Z180_SAR0B_SAR			0x0f
+#define Z180_SAR0B_SAR          0x0f
 
-#define Z180_SAR0B_RESET		0x00
-#define Z180_SAR0B_RMASK		0x0f
-#define Z180_SAR0B_WMASK		0x0f
+#define Z180_SAR0B_RESET        0x00
+#define Z180_SAR0B_RMASK        0x0f
+#define Z180_SAR0B_WMASK        0x0f
 
 /* 23 DMA destination address register ch 0 L */
-#define Z180_DAR0L_DAR			0xff
+#define Z180_DAR0L_DAR          0xff
 
-#define Z180_DAR0L_RESET		0x00
-#define Z180_DAR0L_RMASK		0xff
-#define Z180_DAR0L_WMASK		0xff
+#define Z180_DAR0L_RESET        0x00
+#define Z180_DAR0L_RMASK        0xff
+#define Z180_DAR0L_WMASK        0xff
 
 /* 24 DMA destination address register ch 0 H */
-#define Z180_DAR0H_DAR			0xff
+#define Z180_DAR0H_DAR          0xff
 
-#define Z180_DAR0H_RESET		0x00
-#define Z180_DAR0H_RMASK		0xff
-#define Z180_DAR0H_WMASK		0xff
+#define Z180_DAR0H_RESET        0x00
+#define Z180_DAR0H_RMASK        0xff
+#define Z180_DAR0H_WMASK        0xff
 
 /* 25 DMA destination address register ch 0 B */
-#define Z180_DAR0B_DAR			0x00
+#define Z180_DAR0B_DAR          0x00
 
-#define Z180_DAR0B_RESET		0x00
-#define Z180_DAR0B_RMASK		0x0f
-#define Z180_DAR0B_WMASK		0x0f
+#define Z180_DAR0B_RESET        0x00
+#define Z180_DAR0B_RMASK        0x0f
+#define Z180_DAR0B_WMASK        0x0f
 
 /* 26 DMA byte count register ch 0 L */
-#define Z180_BCR0L_BCR			0xff
+#define Z180_BCR0L_BCR          0xff
 
-#define Z180_BCR0L_RESET		0x00
-#define Z180_BCR0L_RMASK		0xff
-#define Z180_BCR0L_WMASK		0xff
+#define Z180_BCR0L_RESET        0x00
+#define Z180_BCR0L_RMASK        0xff
+#define Z180_BCR0L_WMASK        0xff
 
 /* 27 DMA byte count register ch 0 H */
-#define Z180_BCR0H_BCR			0xff
+#define Z180_BCR0H_BCR          0xff
 
-#define Z180_BCR0H_RESET		0x00
-#define Z180_BCR0H_RMASK		0xff
-#define Z180_BCR0H_WMASK		0xff
+#define Z180_BCR0H_RESET        0x00
+#define Z180_BCR0H_RMASK        0xff
+#define Z180_BCR0H_WMASK        0xff
 
 /* 28 DMA memory address register ch 1 L */
-#define Z180_MAR1L_MAR			0xff
+#define Z180_MAR1L_MAR          0xff
 
-#define Z180_MAR1L_RESET		0x00
-#define Z180_MAR1L_RMASK		0xff
-#define Z180_MAR1L_WMASK		0xff
+#define Z180_MAR1L_RESET        0x00
+#define Z180_MAR1L_RMASK        0xff
+#define Z180_MAR1L_WMASK        0xff
 
 /* 29 DMA memory address register ch 1 H */
-#define Z180_MAR1H_MAR			0xff
+#define Z180_MAR1H_MAR          0xff
 
-#define Z180_MAR1H_RESET		0x00
-#define Z180_MAR1H_RMASK		0xff
-#define Z180_MAR1H_WMASK		0xff
+#define Z180_MAR1H_RESET        0x00
+#define Z180_MAR1H_RMASK        0xff
+#define Z180_MAR1H_WMASK        0xff
 
 /* 2a DMA memory address register ch 1 B */
-#define Z180_MAR1B_MAR			0x0f
+#define Z180_MAR1B_MAR          0x0f
 
-#define Z180_MAR1B_RESET		0x00
-#define Z180_MAR1B_RMASK		0x0f
-#define Z180_MAR1B_WMASK		0x0f
+#define Z180_MAR1B_RESET        0x00
+#define Z180_MAR1B_RMASK        0x0f
+#define Z180_MAR1B_WMASK        0x0f
 
 /* 2b DMA I/O address register ch 1 L */
-#define Z180_IAR1L_IAR			0xff
+#define Z180_IAR1L_IAR          0xff
 
-#define Z180_IAR1L_RESET		0x00
-#define Z180_IAR1L_RMASK		0xff
-#define Z180_IAR1L_WMASK		0xff
+#define Z180_IAR1L_RESET        0x00
+#define Z180_IAR1L_RMASK        0xff
+#define Z180_IAR1L_WMASK        0xff
 
 /* 2c DMA I/O address register ch 1 H */
-#define Z180_IAR1H_IAR			0xff
+#define Z180_IAR1H_IAR          0xff
 
-#define Z180_IAR1H_RESET		0x00
-#define Z180_IAR1H_RMASK		0xff
-#define Z180_IAR1H_WMASK		0xff
+#define Z180_IAR1H_RESET        0x00
+#define Z180_IAR1H_RMASK        0xff
+#define Z180_IAR1H_WMASK        0xff
 
 /* 2d (Z8S180/Z8L180) DMA I/O address register ch 1 B */
-#define Z180_IAR1B_IAR			0x0f
+#define Z180_IAR1B_IAR          0x0f
 
-#define Z180_IAR1B_RESET		0x00
-#define Z180_IAR1B_RMASK		0x0f
-#define Z180_IAR1B_WMASK		0x0f
+#define Z180_IAR1B_RESET        0x00
+#define Z180_IAR1B_RMASK        0x0f
+#define Z180_IAR1B_WMASK        0x0f
 
 /* 2e DMA byte count register ch 1 L */
-#define Z180_BCR1L_BCR			0xff
+#define Z180_BCR1L_BCR          0xff
 
-#define Z180_BCR1L_RESET		0x00
-#define Z180_BCR1L_RMASK		0xff
-#define Z180_BCR1L_WMASK		0xff
+#define Z180_BCR1L_RESET        0x00
+#define Z180_BCR1L_RMASK        0xff
+#define Z180_BCR1L_WMASK        0xff
 
 /* 2f DMA byte count register ch 1 H */
-#define Z180_BCR1H_BCR			0xff
+#define Z180_BCR1H_BCR          0xff
 
-#define Z180_BCR1H_RESET		0x00
-#define Z180_BCR1H_RMASK		0xff
-#define Z180_BCR1H_WMASK		0xff
+#define Z180_BCR1H_RESET        0x00
+#define Z180_BCR1H_RMASK        0xff
+#define Z180_BCR1H_WMASK        0xff
 
 /* 30 DMA status register */
-#define Z180_DSTAT_DE1			0x80	/* DMA enable ch 1 */
-#define Z180_DSTAT_DE0			0x40	/* DMA enable ch 0 */
-#define Z180_DSTAT_DWE1 		0x20	/* DMA write enable ch 0 (active low) */
-#define Z180_DSTAT_DWE0 		0x10	/* DMA write enable ch 1 (active low) */
-#define Z180_DSTAT_DIE1 		0x08	/* DMA IRQ enable ch 1 */
-#define Z180_DSTAT_DIE0 		0x04	/* DMA IRQ enable ch 0 */
-#define Z180_DSTAT_DME			0x01	/* DMA enable (read only) */
+#define Z180_DSTAT_DE1          0x80    /* DMA enable ch 1 */
+#define Z180_DSTAT_DE0          0x40    /* DMA enable ch 0 */
+#define Z180_DSTAT_DWE1         0x20    /* DMA write enable ch 0 (active low) */
+#define Z180_DSTAT_DWE0         0x10    /* DMA write enable ch 1 (active low) */
+#define Z180_DSTAT_DIE1         0x08    /* DMA IRQ enable ch 1 */
+#define Z180_DSTAT_DIE0         0x04    /* DMA IRQ enable ch 0 */
+#define Z180_DSTAT_DME          0x01    /* DMA enable (read only) */
 
-#define Z180_DSTAT_RESET		0x30
-#define Z180_DSTAT_RMASK		0xfd
-#define Z180_DSTAT_WMASK		0xcc
+#define Z180_DSTAT_RESET        0x30
+#define Z180_DSTAT_RMASK        0xfd
+#define Z180_DSTAT_WMASK        0xcc
 
 /* 31 DMA mode register */
-#define Z180_DMODE_DM			0x30
-#define Z180_DMODE_SM			0x0c
-#define Z180_DMODE_MMOD 		0x04
+#define Z180_DMODE_DM           0x30
+#define Z180_DMODE_SM           0x0c
+#define Z180_DMODE_MMOD         0x04
 
-#define Z180_DMODE_RESET		0x00
-#define Z180_DMODE_RMASK		0x3e
-#define Z180_DMODE_WMASK		0x3e
+#define Z180_DMODE_RESET        0x00
+#define Z180_DMODE_RMASK        0x3e
+#define Z180_DMODE_WMASK        0x3e
 
 /* 32 DMA/WAIT control register */
-#define Z180_DCNTL_MWI1 		0x80
-#define Z180_DCNTL_MWI0 		0x40
-#define Z180_DCNTL_IWI1 		0x20
-#define Z180_DCNTL_IWI0 		0x10
-#define Z180_DCNTL_DMS1 		0x08
-#define Z180_DCNTL_DMS0 		0x04
-#define Z180_DCNTL_DIM1 		0x02
-#define Z180_DCNTL_DIM0 		0x01
+#define Z180_DCNTL_MWI1         0x80
+#define Z180_DCNTL_MWI0         0x40
+#define Z180_DCNTL_IWI1         0x20
+#define Z180_DCNTL_IWI0         0x10
+#define Z180_DCNTL_DMS1         0x08
+#define Z180_DCNTL_DMS0         0x04
+#define Z180_DCNTL_DIM1         0x02
+#define Z180_DCNTL_DIM0         0x01
 
-#define Z180_DCNTL_RESET		0x00
-#define Z180_DCNTL_RMASK		0xff
-#define Z180_DCNTL_WMASK		0xff
+#define Z180_DCNTL_RESET        0x00
+#define Z180_DCNTL_RMASK        0xff
+#define Z180_DCNTL_WMASK        0xff
 
 /* 33 INT vector low register */
-#define Z180_IL_IL				0xe0
+#define Z180_IL_IL              0xe0
 
-#define Z180_IL_RESET			0x00
-#define Z180_IL_RMASK			0xe0
-#define Z180_IL_WMASK			0xe0
+#define Z180_IL_RESET           0x00
+#define Z180_IL_RMASK           0xe0
+#define Z180_IL_WMASK           0xe0
 
 /* 34 INT/TRAP control register */
-#define Z180_ITC_TRAP			0x80
-#define Z180_ITC_UFO			0x40
-#define Z180_ITC_ITE2			0x04
-#define Z180_ITC_ITE1			0x02
-#define Z180_ITC_ITE0			0x01
+#define Z180_ITC_TRAP           0x80
+#define Z180_ITC_UFO            0x40
+#define Z180_ITC_ITE2           0x04
+#define Z180_ITC_ITE1           0x02
+#define Z180_ITC_ITE0           0x01
 
-#define Z180_ITC_RESET			0x01
-#define Z180_ITC_RMASK			0xc7
-#define Z180_ITC_WMASK			0x87
+#define Z180_ITC_RESET          0x01
+#define Z180_ITC_RMASK          0xc7
+#define Z180_ITC_WMASK          0x87
 
 /* 35 reserved */
-#define Z180_IO35_RESET 		0x00
-#define Z180_IO35_RMASK 		0xff
-#define Z180_IO35_WMASK 		0xff
+#define Z180_IO35_RESET         0x00
+#define Z180_IO35_RMASK         0xff
+#define Z180_IO35_WMASK         0xff
 
 /* 36 refresh control register */
-#define Z180_RCR_REFE			0x80
-#define Z180_RCR_REFW			0x80
-#define Z180_RCR_CYC			0x03
+#define Z180_RCR_REFE           0x80
+#define Z180_RCR_REFW           0x80
+#define Z180_RCR_CYC            0x03
 
-#define Z180_RCR_RESET			0xc0
-#define Z180_RCR_RMASK			0xc3
-#define Z180_RCR_WMASK			0xc3
+#define Z180_RCR_RESET          0xc0
+#define Z180_RCR_RMASK          0xc3
+#define Z180_RCR_WMASK          0xc3
 
 /* 37 reserved */
-#define Z180_IO37_RESET 		0x00
-#define Z180_IO37_RMASK 		0xff
-#define Z180_IO37_WMASK 		0xff
+#define Z180_IO37_RESET         0x00
+#define Z180_IO37_RMASK         0xff
+#define Z180_IO37_WMASK         0xff
 
 /* 38 MMU common base register */
-#define Z180_CBR_CB 			0xff
+#define Z180_CBR_CB             0xff
 
-#define Z180_CBR_RESET			0x00
-#define Z180_CBR_RMASK			0xff
-#define Z180_CBR_WMASK			0xff
+#define Z180_CBR_RESET          0x00
+#define Z180_CBR_RMASK          0xff
+#define Z180_CBR_WMASK          0xff
 
 /* 39 MMU bank base register */
-#define Z180_BBR_BB 			0xff
+#define Z180_BBR_BB             0xff
 
-#define Z180_BBR_RESET			0x00
-#define Z180_BBR_RMASK			0xff
-#define Z180_BBR_WMASK			0xff
+#define Z180_BBR_RESET          0x00
+#define Z180_BBR_RMASK          0xff
+#define Z180_BBR_WMASK          0xff
 
 /* 3a MMU common/bank area register */
-#define Z180_CBAR_CA			0xf0
-#define Z180_CBAR_BA			0x0f
+#define Z180_CBAR_CA            0xf0
+#define Z180_CBAR_BA            0x0f
 
-#define Z180_CBAR_RESET 		0xf0
-#define Z180_CBAR_RMASK 		0xff
-#define Z180_CBAR_WMASK 		0xff
+#define Z180_CBAR_RESET         0xf0
+#define Z180_CBAR_RMASK         0xff
+#define Z180_CBAR_WMASK         0xff
 
 /* 3b reserved */
-#define Z180_IO3B_RESET 		0x00
-#define Z180_IO3B_RMASK 		0xff
-#define Z180_IO3B_WMASK 		0xff
+#define Z180_IO3B_RESET         0x00
+#define Z180_IO3B_RMASK         0xff
+#define Z180_IO3B_WMASK         0xff
 
 /* 3c reserved */
-#define Z180_IO3C_RESET 		0x00
-#define Z180_IO3C_RMASK 		0xff
-#define Z180_IO3C_WMASK 		0xff
+#define Z180_IO3C_RESET         0x00
+#define Z180_IO3C_RMASK         0xff
+#define Z180_IO3C_WMASK         0xff
 
 /* 3d reserved */
-#define Z180_IO3D_RESET 		0x00
-#define Z180_IO3D_RMASK 		0xff
-#define Z180_IO3D_WMASK 		0xff
+#define Z180_IO3D_RESET         0x00
+#define Z180_IO3D_RMASK         0xff
+#define Z180_IO3D_WMASK         0xff
 
 /* 3e operation mode control register */
-#define Z180_OMCR_RESET 		0x00
-#define Z180_OMCR_RMASK 		0xff
-#define Z180_OMCR_WMASK 		0xff
+#define Z180_OMCR_RESET         0x00
+#define Z180_OMCR_RMASK         0xff
+#define Z180_OMCR_WMASK         0xff
 
 /* 3f I/O control register */
-#define Z180_IOCR_RESET 		0x00
-#define Z180_IOCR_RMASK 		0xff
-#define Z180_IOCR_WMASK 		0xff
+#define Z180_IOCR_RESET         0x00
+#define Z180_IOCR_RMASK         0xff
+#define Z180_IOCR_WMASK         0xff
 
 /***************************************************************************
     CPU PREFIXES
@@ -799,20 +799,20 @@ static void set_irq_line(z180_state *cpustate, int irqline, int state);
     order is important here - see z180tbl.h
 ***************************************************************************/
 
-#define Z180_PREFIX_op			0
-#define Z180_PREFIX_cb			1
-#define Z180_PREFIX_dd			2
-#define Z180_PREFIX_ed			3
-#define Z180_PREFIX_fd			4
-#define Z180_PREFIX_xycb		5
+#define Z180_PREFIX_op          0
+#define Z180_PREFIX_cb          1
+#define Z180_PREFIX_dd          2
+#define Z180_PREFIX_ed          3
+#define Z180_PREFIX_fd          4
+#define Z180_PREFIX_xycb        5
 
-#define Z180_PREFIX_COUNT		(Z180_PREFIX_xycb + 1)
+#define Z180_PREFIX_COUNT       (Z180_PREFIX_xycb + 1)
 
 
 
-static UINT8 SZ[256];		/* zero and sign flags */
-static UINT8 SZ_BIT[256];	/* zero, sign and parity/overflow (=zero) flags for BIT opcode */
-static UINT8 SZP[256];		/* zero, sign and parity flags */
+static UINT8 SZ[256];       /* zero and sign flags */
+static UINT8 SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags for BIT opcode */
+static UINT8 SZP[256];      /* zero, sign and parity flags */
 static UINT8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
 static UINT8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 
@@ -1642,16 +1642,16 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 		}
 		switch( cpustate->IO_DMODE & (Z180_DMODE_SM | Z180_DMODE_DM) )
 		{
-		case 0x00:	/* memory SAR0+1 to memory DAR0+1 */
+		case 0x00:  /* memory SAR0+1 to memory DAR0+1 */
 			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0++));
 			break;
-		case 0x04:	/* memory SAR0-1 to memory DAR0+1 */
+		case 0x04:  /* memory SAR0-1 to memory DAR0+1 */
 			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0--));
 			break;
-		case 0x08:	/* memory SAR0 fixed to memory DAR0+1 */
+		case 0x08:  /* memory SAR0 fixed to memory DAR0+1 */
 			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0));
 			break;
-		case 0x0c:	/* I/O SAR0 fixed to memory DAR0+1 */
+		case 0x0c:  /* I/O SAR0 fixed to memory DAR0+1 */
 			if (cpustate->iol & Z180_DREQ0)
 			{
 				cpustate->program->write_byte(dar0++, IN(cpustate, sar0));
@@ -1663,18 +1663,18 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 				}
 			}
 			break;
-		case 0x10:	/* memory SAR0+1 to memory DAR0-1 */
+		case 0x10:  /* memory SAR0+1 to memory DAR0-1 */
 			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0++));
 			break;
-		case 0x14:	/* memory SAR0-1 to memory DAR0-1 */
+		case 0x14:  /* memory SAR0-1 to memory DAR0-1 */
 			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0--));
 			break;
-		case 0x18:	/* memory SAR0 fixed to memory DAR0-1 */
+		case 0x18:  /* memory SAR0 fixed to memory DAR0-1 */
 			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0));
 			break;
-		case 0x1c:	/* I/O SAR0 fixed to memory DAR0-1 */
+		case 0x1c:  /* I/O SAR0 fixed to memory DAR0-1 */
 			if (cpustate->iol & Z180_DREQ0)
-            {
+			{
 				cpustate->program->write_byte(dar0--, IN(cpustate, sar0));
 				/* edge sensitive DREQ0 ? */
 				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
@@ -1684,19 +1684,19 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 				}
 			}
 			break;
-		case 0x20:	/* memory SAR0+1 to memory DAR0 fixed */
+		case 0x20:  /* memory SAR0+1 to memory DAR0 fixed */
 			cpustate->program->write_byte(dar0, cpustate->program->read_byte(sar0++));
 			break;
-		case 0x24:	/* memory SAR0-1 to memory DAR0 fixed */
+		case 0x24:  /* memory SAR0-1 to memory DAR0 fixed */
 			cpustate->program->write_byte(dar0, cpustate->program->read_byte(sar0--));
 			break;
-		case 0x28:	/* reserved */
+		case 0x28:  /* reserved */
 			break;
-		case 0x2c:	/* reserved */
+		case 0x2c:  /* reserved */
 			break;
-		case 0x30:	/* memory SAR0+1 to I/O DAR0 fixed */
+		case 0x30:  /* memory SAR0+1 to I/O DAR0 fixed */
 			if (cpustate->iol & Z180_DREQ0)
-            {
+			{
 				OUT(cpustate, dar0, cpustate->program->read_byte(sar0++));
 				/* edge sensitive DREQ0 ? */
 				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
@@ -1706,9 +1706,9 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 				}
 			}
 			break;
-		case 0x34:	/* memory SAR0-1 to I/O DAR0 fixed */
+		case 0x34:  /* memory SAR0-1 to I/O DAR0 fixed */
 			if (cpustate->iol & Z180_DREQ0)
-            {
+			{
 				OUT(cpustate, dar0, cpustate->program->read_byte(sar0--));
 				/* edge sensitive DREQ0 ? */
 				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
@@ -1718,9 +1718,9 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 				}
 			}
 			break;
-		case 0x38:	/* reserved */
+		case 0x38:  /* reserved */
 			break;
-		case 0x3c:	/* reserved */
+		case 0x3c:  /* reserved */
 			break;
 		}
 		bcr0--;
@@ -1776,16 +1776,16 @@ static int z180_dma1(z180_state *cpustate)
 
 	switch (cpustate->IO_DCNTL & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
-	case 0x00:	/* memory MAR1+1 to I/O IAR1 fixed */
+	case 0x00:  /* memory MAR1+1 to I/O IAR1 fixed */
 		cpustate->iospace->write_byte(iar1, cpustate->program->read_byte(mar1++));
 		break;
-	case 0x01:	/* memory MAR1-1 to I/O IAR1 fixed */
+	case 0x01:  /* memory MAR1-1 to I/O IAR1 fixed */
 		cpustate->iospace->write_byte(iar1, cpustate->program->read_byte(mar1--));
 		break;
-	case 0x02:	/* I/O IAR1 fixed to memory MAR1+1 */
+	case 0x02:  /* I/O IAR1 fixed to memory MAR1+1 */
 		cpustate->program->write_byte(mar1++, cpustate->iospace->read_byte(iar1));
 		break;
-	case 0x03:	/* I/O IAR1 fixed to memory MAR1-1 */
+	case 0x03:  /* I/O IAR1 fixed to memory MAR1-1 */
 		cpustate->program->write_byte(mar1--, cpustate->iospace->read_byte(iar1));
 		break;
 	}
@@ -1817,124 +1817,124 @@ static void z180_write_iolines(z180_state *cpustate, UINT32 data)
 {
 	UINT32 changes = cpustate->iol ^ data;
 
-    /* I/O asynchronous clock 0 (active high) or DREQ0 (mux) */
+	/* I/O asynchronous clock 0 (active high) or DREQ0 (mux) */
 	if (changes & Z180_CKA0)
 	{
 		LOG(("Z180 '%s' CKA0   %d\n", cpustate->device->tag(), data & Z180_CKA0 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_CKA0) | (data & Z180_CKA0);
-    }
+	}
 
-    /* I/O asynchronous clock 1 (active high) or TEND1 (mux) */
+	/* I/O asynchronous clock 1 (active high) or TEND1 (mux) */
 	if (changes & Z180_CKA1)
 	{
 		LOG(("Z180 '%s' CKA1   %d\n", cpustate->device->tag(), data & Z180_CKA1 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_CKA1) | (data & Z180_CKA1);
-    }
+	}
 
-    /* I/O serial clock (active high) */
+	/* I/O serial clock (active high) */
 	if (changes & Z180_CKS)
 	{
 		LOG(("Z180 '%s' CKS    %d\n", cpustate->device->tag(), data & Z180_CKS ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_CKS) | (data & Z180_CKS);
-    }
+	}
 
-    /* I   clear to send 0 (active low) */
+	/* I   clear to send 0 (active low) */
 	if (changes & Z180_CTS0)
 	{
 		LOG(("Z180 '%s' CTS0   %d\n", cpustate->device->tag(), data & Z180_CTS0 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_CTS0) | (data & Z180_CTS0);
-    }
+	}
 
-    /* I   clear to send 1 (active low) or RXS (mux) */
+	/* I   clear to send 1 (active low) or RXS (mux) */
 	if (changes & Z180_CTS1)
 	{
 		LOG(("Z180 '%s' CTS1   %d\n", cpustate->device->tag(), data & Z180_CTS1 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_CTS1) | (data & Z180_CTS1);
-    }
+	}
 
-    /* I   data carrier detect (active low) */
+	/* I   data carrier detect (active low) */
 	if (changes & Z180_DCD0)
 	{
 		LOG(("Z180 '%s' DCD0   %d\n", cpustate->device->tag(), data & Z180_DCD0 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_DCD0) | (data & Z180_DCD0);
-    }
+	}
 
-    /* I   data request DMA ch 0 (active low) or CKA0 (mux) */
+	/* I   data request DMA ch 0 (active low) or CKA0 (mux) */
 	if (changes & Z180_DREQ0)
 	{
 		LOG(("Z180 '%s' DREQ0  %d\n", cpustate->device->tag(), data & Z180_DREQ0 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_DREQ0) | (data & Z180_DREQ0);
-    }
+	}
 
-    /* I   data request DMA ch 1 (active low) */
+	/* I   data request DMA ch 1 (active low) */
 	if (changes & Z180_DREQ1)
 	{
 		LOG(("Z180 '%s' DREQ1  %d\n", cpustate->device->tag(), data & Z180_DREQ1 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_DREQ1) | (data & Z180_DREQ1);
-    }
+	}
 
-    /* I   asynchronous receive data 0 (active high) */
+	/* I   asynchronous receive data 0 (active high) */
 	if (changes & Z180_RXA0)
 	{
 		LOG(("Z180 '%s' RXA0   %d\n", cpustate->device->tag(), data & Z180_RXA0 ? 1 : 0));
-        cpustate->iol = (cpustate->iol & ~Z180_RXA0) | (data & Z180_RXA0);
-    }
+		cpustate->iol = (cpustate->iol & ~Z180_RXA0) | (data & Z180_RXA0);
+	}
 
-    /* I   asynchronous receive data 1 (active high) */
+	/* I   asynchronous receive data 1 (active high) */
 	if (changes & Z180_RXA1)
 	{
 		LOG(("Z180 '%s' RXA1   %d\n", cpustate->device->tag(), data & Z180_RXA1 ? 1 : 0));
 		cpustate->iol = (cpustate->iol & ~Z180_RXA1) | (data & Z180_RXA1);
-    }
+	}
 
-    /* I   clocked serial receive data (active high) or CTS1 (mux) */
+	/* I   clocked serial receive data (active high) or CTS1 (mux) */
 	if (changes & Z180_RXS)
 	{
 		LOG(("Z180 '%s' RXS    %d\n", cpustate->device->tag(), data & Z180_RXS ? 1 : 0));
-        cpustate->iol = (cpustate->iol & ~Z180_RXS) | (data & Z180_RXS);
-    }
+		cpustate->iol = (cpustate->iol & ~Z180_RXS) | (data & Z180_RXS);
+	}
 
-    /*   O request to send (active low) */
+	/*   O request to send (active low) */
 	if (changes & Z180_RTS0)
 	{
 		LOG(("Z180 '%s' RTS0   won't change output\n", cpustate->device->tag()));
-    }
+	}
 
-    /*   O transfer end 0 (active low) or CKA1 (mux) */
+	/*   O transfer end 0 (active low) or CKA1 (mux) */
 	if (changes & Z180_TEND0)
 	{
 		LOG(("Z180 '%s' TEND0  won't change output\n", cpustate->device->tag()));
-    }
+	}
 
-    /*   O transfer end 1 (active low) */
+	/*   O transfer end 1 (active low) */
 	if (changes & Z180_TEND1)
 	{
 		LOG(("Z180 '%s' TEND1  won't change output\n", cpustate->device->tag()));
-    }
+	}
 
-    /*   O transfer out (PRT channel, active low) or A18 (mux) */
+	/*   O transfer out (PRT channel, active low) or A18 (mux) */
 	if (changes & Z180_A18_TOUT)
 	{
 		LOG(("Z180 '%s' TOUT   won't change output\n", cpustate->device->tag()));
-    }
+	}
 
-    /*   O asynchronous transmit data 0 (active high) */
+	/*   O asynchronous transmit data 0 (active high) */
 	if (changes & Z180_TXA0)
 	{
 		LOG(("Z180 '%s' TXA0   won't change output\n", cpustate->device->tag()));
-    }
+	}
 
-    /*   O asynchronous transmit data 1 (active high) */
+	/*   O asynchronous transmit data 1 (active high) */
 	if (changes & Z180_TXA1)
 	{
 		LOG(("Z180 '%s' TXA1   won't change output\n", cpustate->device->tag()));
-    }
+	}
 
-    /*   O clocked serial transmit data (active high) */
+	/*   O clocked serial transmit data (active high) */
 	if (changes & Z180_TXS)
 	{
 		LOG(("Z180 '%s' TXS    won't change output\n", cpustate->device->tag()));
-    }
+	}
 }
 
 
@@ -2103,9 +2103,9 @@ static CPU_RESET( z180 )
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
 	/* allocate big flag arrays once */
-	padd = &SZHVC_add[	0*256];
+	padd = &SZHVC_add[  0*256];
 	padc = &SZHVC_add[256*256];
-	psub = &SZHVC_sub[	0*256];
+	psub = &SZHVC_sub[  0*256];
 	psbc = &SZHVC_sub[256*256];
 	for (oldval = 0; oldval < 256; oldval++)
 	{
@@ -2114,7 +2114,7 @@ static CPU_RESET( z180 )
 			/* add or adc w/o carry set */
 			val = newval - oldval;
 			*padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-			*padd |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
+			*padd |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
 
 			if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
 			if( newval < oldval ) *padd |= CF;
@@ -2124,7 +2124,7 @@ static CPU_RESET( z180 )
 			/* adc with carry set */
 			val = newval - oldval - 1;
 			*padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-			*padc |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
+			*padc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
 			if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
 			if( newval <= oldval ) *padc |= CF;
 			if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
@@ -2133,7 +2133,7 @@ static CPU_RESET( z180 )
 			/* cp, sub or sbc w/o carry set */
 			val = oldval - newval;
 			*psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-			*psub |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
+			*psub |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
 			if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
 			if( newval > oldval ) *psub |= CF;
 			if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
@@ -2142,7 +2142,7 @@ static CPU_RESET( z180 )
 			/* sbc with carry set */
 			val = oldval - newval - 1;
 			*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-			*psbc |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
+			*psbc |= (newval & (YF | XF));  /* undocumented flag bits 5+3 */
 			if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
 			if( newval >= oldval ) *psbc |= CF;
 			if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
@@ -2161,9 +2161,9 @@ static CPU_RESET( z180 )
 		if( i&0x40 ) ++p;
 		if( i&0x80 ) ++p;
 		SZ[i] = i ? i & SF : ZF;
-		SZ[i] |= (i & (YF | XF));		/* undocumented flag bits 5+3 */
+		SZ[i] |= (i & (YF | XF));       /* undocumented flag bits 5+3 */
 		SZ_BIT[i] = i ? i & SF : ZF | PF;
-		SZ_BIT[i] |= (i & (YF | XF));	/* undocumented flag bits 5+3 */
+		SZ_BIT[i] |= (i & (YF | XF));   /* undocumented flag bits 5+3 */
 		SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
 		SZHV_inc[i] = SZ[i];
 		if( i == 0x80 ) SZHV_inc[i] |= VF;
@@ -2219,7 +2219,7 @@ static CPU_RESET( z180 )
 
 	memcpy(cpustate->cc, (UINT8 *)cc_default, sizeof(cpustate->cc));
 	cpustate->_IX = cpustate->_IY = 0xffff; /* IX and IY are FFFF after a reset! */
-	cpustate->_F = ZF;			/* Zero flag is set */
+	cpustate->_F = ZF;          /* Zero flag is set */
 
 	for (i=0; i <= Z180_INT_MAX; i++)
 		cpustate->int_pending[i] = 0;
@@ -2245,7 +2245,7 @@ static CPU_RESET( z180 )
 	cpustate->IO_TMDR0H  = Z180_TMDR0H_RESET;
 	cpustate->IO_RLDR0L  = Z180_RLDR0L_RESET;
 	cpustate->IO_RLDR0H  = Z180_RLDR0H_RESET;
-	cpustate->IO_TCR	   = Z180_TCR_RESET;
+	cpustate->IO_TCR       = Z180_TCR_RESET;
 	cpustate->IO_IO11    = Z180_IO11_RESET;
 	cpustate->IO_ASEXT0  = Z180_ASEXT0_RESET;
 	cpustate->IO_ASEXT1  = Z180_ASEXT1_RESET;
@@ -2253,14 +2253,14 @@ static CPU_RESET( z180 )
 	cpustate->IO_TMDR1H  = Z180_TMDR1H_RESET;
 	cpustate->IO_RLDR1L  = Z180_RLDR1L_RESET;
 	cpustate->IO_RLDR1H  = Z180_RLDR1H_RESET;
-	cpustate->IO_FRC	   = Z180_FRC_RESET;
+	cpustate->IO_FRC       = Z180_FRC_RESET;
 	cpustate->IO_IO19    = Z180_IO19_RESET;
 	cpustate->IO_ASTC0L  = Z180_ASTC0L_RESET;
 	cpustate->IO_ASTC0H  = Z180_ASTC0H_RESET;
 	cpustate->IO_ASTC1L  = Z180_ASTC1L_RESET;
 	cpustate->IO_ASTC1H  = Z180_ASTC1H_RESET;
-	cpustate->IO_CMR	   = Z180_CMR_RESET;
-	cpustate->IO_CCR	   = Z180_CCR_RESET;
+	cpustate->IO_CMR       = Z180_CMR_RESET;
+	cpustate->IO_CCR       = Z180_CCR_RESET;
 	cpustate->IO_SAR0L   = Z180_SAR0L_RESET;
 	cpustate->IO_SAR0H   = Z180_SAR0H_RESET;
 	cpustate->IO_SAR0B   = Z180_SAR0B_RESET;
@@ -2280,13 +2280,13 @@ static CPU_RESET( z180 )
 	cpustate->IO_DSTAT   = Z180_DSTAT_RESET;
 	cpustate->IO_DMODE   = Z180_DMODE_RESET;
 	cpustate->IO_DCNTL   = Z180_DCNTL_RESET;
-	cpustate->IO_IL	   = Z180_IL_RESET;
-	cpustate->IO_ITC	   = Z180_ITC_RESET;
+	cpustate->IO_IL    = Z180_IL_RESET;
+	cpustate->IO_ITC       = Z180_ITC_RESET;
 	cpustate->IO_IO35    = Z180_IO35_RESET;
-	cpustate->IO_RCR	   = Z180_RCR_RESET;
+	cpustate->IO_RCR       = Z180_RCR_RESET;
 	cpustate->IO_IO37    = Z180_IO37_RESET;
-	cpustate->IO_CBR	   = Z180_CBR_RESET;
-	cpustate->IO_BBR	   = Z180_BBR_RESET;
+	cpustate->IO_CBR       = Z180_CBR_RESET;
+	cpustate->IO_BBR       = Z180_BBR_RESET;
 	cpustate->IO_CBAR    = Z180_CBAR_RESET;
 	cpustate->IO_IO3B    = Z180_IO3B_RESET;
 	cpustate->IO_IO3C    = Z180_IO3C_RESET;
@@ -2405,8 +2405,8 @@ static CPU_EXECUTE( z180 )
 	if (cpustate->nmi_pending)
 	{
 		LOG(("Z180 '%s' take NMI\n", cpustate->device->tag()));
-		cpustate->_PPC = -1;			/* there isn't a valid previous program counter */
-		LEAVE_HALT(cpustate);		/* Check if processor was halted */
+		cpustate->_PPC = -1;            /* there isn't a valid previous program counter */
+		LEAVE_HALT(cpustate);       /* Check if processor was halted */
 
 		/* disable DMA transfers!! */
 		cpustate->IO_DSTAT &= ~Z180_DSTAT_DME;
@@ -2421,7 +2421,7 @@ static CPU_EXECUTE( z180 )
 	}
 
 again:
-    /* check if any DMA transfer is running */
+	/* check if any DMA transfer is running */
 	if ((cpustate->IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
 	{
 		/* check if DMA channel 0 is running and also is in burst mode */
@@ -2439,7 +2439,7 @@ again:
 		{
 			do
 			{
-	        	curcycles = check_interrupts(cpustate);
+				curcycles = check_interrupts(cpustate);
 				cpustate->icount -= curcycles;
 				handle_io_timers(cpustate, curcycles);
 				cpustate->after_EI = 0;
@@ -2462,13 +2462,13 @@ again:
 				handle_io_timers(cpustate, curcycles);
 
 				/* FIXME:
-                 * For simultaneous DREQ0 and DREQ1 requests, channel 0 has priority
-                 * over channel 1. When channel 0 is performing a memory to/from memory
-                 * transfer, channel 1 cannot operate until the channel 0 operation has
-                 * terminated. If channel 1 is operating, channel 0 cannot operate until
-                 * channel 1 releases control of the bus.
-                 *
-                 */
+				 * For simultaneous DREQ0 and DREQ1 requests, channel 0 has priority
+				 * over channel 1. When channel 0 is performing a memory to/from memory
+				 * transfer, channel 1 cannot operate until the channel 0 operation has
+				 * terminated. If channel 1 is operating, channel 0 cannot operate until
+				 * channel 1 releases control of the bus.
+				 *
+				 */
 				curcycles = z180_dma0(cpustate, 6);
 				cpustate->icount -= curcycles;
 				handle_io_timers(cpustate, curcycles);
@@ -2482,13 +2482,13 @@ again:
 					break;
 			} while( cpustate->icount > 0 );
 		}
-    }
+	}
 
-    if (cpustate->icount > 0)
-    {
-        do
+	if (cpustate->icount > 0)
+	{
+		do
 		{
-        	curcycles = check_interrupts(cpustate);
+			curcycles = check_interrupts(cpustate);
 			cpustate->icount -= curcycles;
 			handle_io_timers(cpustate, curcycles);
 			cpustate->after_EI = 0;
@@ -2512,10 +2512,10 @@ again:
 			/* If DMA is started go to check the mode */
 			if ((cpustate->IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
 				goto again;
-        } while( cpustate->icount > 0 );
+		} while( cpustate->icount > 0 );
 	}
 
-    //cpustate->old_icount -= cpustate->icount;
+	//cpustate->old_icount -= cpustate->icount;
 }
 
 /****************************************************************************
@@ -2654,18 +2654,18 @@ static CPU_SET_INFO( z180 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ0:		set_irq_line(cpustate, Z180_IRQ0, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ1:		set_irq_line(cpustate, Z180_IRQ1, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ2:		set_irq_line(cpustate, Z180_IRQ2, info->i);			break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  set_irq_line(cpustate, INPUT_LINE_NMI, info->i);    break;
+		case CPUINFO_INT_INPUT_STATE + Z180_IRQ0:       set_irq_line(cpustate, Z180_IRQ0, info->i);         break;
+		case CPUINFO_INT_INPUT_STATE + Z180_IRQ1:       set_irq_line(cpustate, Z180_IRQ1, info->i);         break;
+		case CPUINFO_INT_INPUT_STATE + Z180_IRQ2:       set_irq_line(cpustate, Z180_IRQ2, info->i);         break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:		cpustate->cc[Z180_TABLE_op] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:		cpustate->cc[Z180_TABLE_cb] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:		cpustate->cc[Z180_TABLE_ed] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:		cpustate->cc[Z180_TABLE_xy] = (UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:	cpustate->cc[Z180_TABLE_xycb] = (UINT8 *)info->p;	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:		cpustate->cc[Z180_TABLE_ex] = (UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:      cpustate->cc[Z180_TABLE_op] = (UINT8 *)info->p;     break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:      cpustate->cc[Z180_TABLE_cb] = (UINT8 *)info->p;     break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:      cpustate->cc[Z180_TABLE_ed] = (UINT8 *)info->p;     break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:      cpustate->cc[Z180_TABLE_xy] = (UINT8 *)info->p;     break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:    cpustate->cc[Z180_TABLE_xycb] = (UINT8 *)info->p;   break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:      cpustate->cc[Z180_TABLE_ex] = (UINT8 *)info->p;     break;
 	}
 }
 
@@ -2680,57 +2680,57 @@ CPU_GET_INFO( z180 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(z180_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(z180_state);           break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 3;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0xff;                         break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 16;                           break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 20;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 20;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 0;                            break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 16;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break;
 
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;			break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ0:		info->i = cpustate->irq_state[0];		break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ1:		info->i = cpustate->irq_state[1];		break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ2:		info->i = cpustate->irq_state[2];		break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = cpustate->nmi_state;          break;
+		case CPUINFO_INT_INPUT_STATE + Z180_IRQ0:       info->i = cpustate->irq_state[0];       break;
+		case CPUINFO_INT_INPUT_STATE + Z180_IRQ1:       info->i = cpustate->irq_state[1];       break;
+		case CPUINFO_INT_INPUT_STATE + Z180_IRQ2:       info->i = cpustate->irq_state[2];       break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(z180);				break;
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(z180);						break;
-		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(z180);						break;
-		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(z180);					break;
-		case CPUINFO_FCT_BURN:			info->burn = CPU_BURN_NAME(z180);						break;
-		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(z180);			break;
-		case CPUINFO_FCT_TRANSLATE:		info->translate = CPU_TRANSLATE_NAME(z180);				break;
-		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(z180);		break;
-		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(z180);		break;
-		case CPUINFO_FCT_EXPORT_STRING:	info->export_string = CPU_EXPORT_STRING_NAME(z180);		break;
+		case CPUINFO_FCT_SET_INFO:      info->setinfo = CPU_SET_INFO_NAME(z180);                break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(z180);                       break;
+		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(z180);                     break;
+		case CPUINFO_FCT_EXECUTE:       info->execute = CPU_EXECUTE_NAME(z180);                 break;
+		case CPUINFO_FCT_BURN:          info->burn = CPU_BURN_NAME(z180);                       break;
+		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(z180);         break;
+		case CPUINFO_FCT_TRANSLATE:     info->translate = CPU_TRANSLATE_NAME(z180);             break;
+		case CPUINFO_FCT_IMPORT_STATE:  info->import_state = CPU_IMPORT_STATE_NAME(z180);       break;
+		case CPUINFO_FCT_EXPORT_STATE:  info->export_state = CPU_EXPORT_STATE_NAME(z180);       break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(z180);     break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;       break;
 
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:		info->p = (void *)cpustate->cc[Z180_TABLE_op];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:		info->p = (void *)cpustate->cc[Z180_TABLE_cb];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:		info->p = (void *)cpustate->cc[Z180_TABLE_ed];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:		info->p = (void *)cpustate->cc[Z180_TABLE_xy];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:	info->p = (void *)cpustate->cc[Z180_TABLE_xycb];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:		info->p = (void *)cpustate->cc[Z180_TABLE_ex];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:      info->p = (void *)cpustate->cc[Z180_TABLE_op];  break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:      info->p = (void *)cpustate->cc[Z180_TABLE_cb];  break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:      info->p = (void *)cpustate->cc[Z180_TABLE_ed];  break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:      info->p = (void *)cpustate->cc[Z180_TABLE_xy];  break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:    info->p = (void *)cpustate->cc[Z180_TABLE_xycb];    break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:      info->p = (void *)cpustate->cc[Z180_TABLE_ex];  break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Z180");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Zilog Z8x180");		break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "0.4");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z180");                break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Zilog Z8x180");        break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "0.4");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 	}
 }
 

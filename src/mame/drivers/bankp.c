@@ -97,20 +97,20 @@
 #include "includes/bankp.h"
 
 
-#define MASTER_CLOCK	XTAL_15_468MHz
+#define MASTER_CLOCK    XTAL_15_468MHz
 
 // Video timing
 // PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz
 // --> VTOTAL should be OK, HTOTAL not 100% certain
-#define PIXEL_CLOCK		MASTER_CLOCK/3
+#define PIXEL_CLOCK     MASTER_CLOCK/3
 
-#define HTOTAL			330
-#define HBEND			0+3*8
-#define HBSTART			224+3*8
+#define HTOTAL          330
+#define HBEND           0+3*8
+#define HBSTART         224+3*8
 
-#define VTOTAL			256
-#define VBEND			0+2*8
-#define VBSTART			224+2*8
+#define VTOTAL          256
+#define VBEND           0+2*8
+#define VBSTART         224+2*8
 
 
 /*************************************
@@ -243,23 +243,23 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	2,	/* 2 bits per pixel */
-	{ 0, 4 },	/* the bitplanes are packed in one byte */
+	8,8,    /* 8*8 characters */
+	1024,   /* 1024 characters */
+	2,  /* 2 bits per pixel */
+	{ 0, 4 },   /* the bitplanes are packed in one byte */
 	{ STEP4(8*8+3,-1), STEP4(0*8+3,-1) },
 	{ STEP8(0*8,8) },
-	16*8	/* every char takes 8 consecutive bytes */
+	16*8    /* every char takes 8 consecutive bytes */
 };
 static const gfx_layout charlayout2 =
 {
-	8,8,	/* 8*8 characters */
-	2048,	/* 2048 characters */
-	3,	/* 3 bits per pixel */
-	{ 0, 2048*8*8, 2*2048*8*8 },	/* the bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	2048,   /* 2048 characters */
+	3,  /* 3 bits per pixel */
+	{ 0, 2048*8*8, 2*2048*8*8 },    /* the bitplanes are separated */
 	{ STEP8(7,-1) },
 	{ STEP8(0*8,8) },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static GFXDECODE_START( bankp )
@@ -273,7 +273,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 /*************************************
@@ -346,11 +346,11 @@ ROM_START( bankp )
 	ROM_LOAD( "epr-6176.7d",  0xc000, 0x2000, CRC(c98ac200) SHA1(1bdb87868deebe03da18280e617530c24118da1c) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "epr-6165.5l",  0x0000, 0x2000, CRC(aef34a93) SHA1(513895cd3144977b3d9b5ac7f2bf40384d69e157) )	/* playfield #1 chars */
+	ROM_LOAD( "epr-6165.5l",  0x0000, 0x2000, CRC(aef34a93) SHA1(513895cd3144977b3d9b5ac7f2bf40384d69e157) )    /* playfield #1 chars */
 	ROM_LOAD( "epr-6166.5k",  0x2000, 0x2000, CRC(ca13cb11) SHA1(3aca0b0d3f052a742e1cd0b96bfad834e78fcd7d) )
 
 	ROM_REGION( 0x0c000, "gfx2", 0 )
-	ROM_LOAD( "epr-6172.5b",  0x0000, 0x2000, CRC(c4c4878b) SHA1(423143d81408eda96f87bdc3a306517c473cbe00) )	/* playfield #2 chars */
+	ROM_LOAD( "epr-6172.5b",  0x0000, 0x2000, CRC(c4c4878b) SHA1(423143d81408eda96f87bdc3a306517c473cbe00) )    /* playfield #2 chars */
 	ROM_LOAD( "epr-6171.5d",  0x2000, 0x2000, CRC(a18165a1) SHA1(9a7513ea84f9231edba4e637df28a1705c8cdeb0) )
 	ROM_LOAD( "epr-6170.5e",  0x4000, 0x2000, CRC(b58aa8fa) SHA1(432b43cd9af4e3dab579cfd191b731aa11ceb121) )
 	ROM_LOAD( "epr-6169.5f",  0x6000, 0x2000, CRC(1aa37fce) SHA1(6e2402683145de8972a53c9ec01da9a422392bed) )
@@ -358,9 +358,9 @@ ROM_START( bankp )
 	ROM_LOAD( "epr-6167.5i",  0xa000, 0x2000, CRC(3fa337e1) SHA1(5fdc45436be27cceb5157bd6201c30e3de28fd7b) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr-6177.8a",   0x0000, 0x020, CRC(eb70c5ae) SHA1(13613dad6c14004278f777d6f3f62712a2a85773) ) 	/* palette */
-	ROM_LOAD( "pr-6178.6f",   0x0020, 0x100, CRC(0acca001) SHA1(54c354d825a24a9085867b114a2cd6835baebe55) ) 	/* charset #1 lookup table */
-	ROM_LOAD( "pr-6179.5a",   0x0120, 0x100, CRC(e53bafdb) SHA1(7a414f6db5476dd7d0217e5b846ed931381eda02) ) 	/* charset #2 lookup table */
+	ROM_LOAD( "pr-6177.8a",   0x0000, 0x020, CRC(eb70c5ae) SHA1(13613dad6c14004278f777d6f3f62712a2a85773) )     /* palette */
+	ROM_LOAD( "pr-6178.6f",   0x0020, 0x100, CRC(0acca001) SHA1(54c354d825a24a9085867b114a2cd6835baebe55) )     /* charset #1 lookup table */
+	ROM_LOAD( "pr-6179.5a",   0x0120, 0x100, CRC(e53bafdb) SHA1(7a414f6db5476dd7d0217e5b846ed931381eda02) )     /* charset #2 lookup table */
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )
@@ -388,9 +388,9 @@ ROM_START( combh )
 	ROM_LOAD( "epr-10912.5i",  0xa000, 0x2000, CRC(cbe22738) SHA1(2dbdb593882ec66e783411f02941ce822e1c62a1) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr-10900.8a",   0x0000, 0x020, CRC(f95fcd66) SHA1(ed7bf6691a942f344b0230310876a63a68606922) )	/* palette */
-	ROM_LOAD( "pr-10901.6f",   0x0020, 0x100, CRC(6fd981c8) SHA1(0bd2e7b72fd5e055224a675108e2e706cd6f6e5a) )	/* charset #2 lookup table */
-	ROM_LOAD( "pr-10902.5a",   0x0120, 0x100, CRC(84d6bded) SHA1(67d9c4c7d7c84eb54ec655a4cf1768ca0cbb047d) )	/* charset #1 lookup table */
+	ROM_LOAD( "pr-10900.8a",   0x0000, 0x020, CRC(f95fcd66) SHA1(ed7bf6691a942f344b0230310876a63a68606922) )    /* palette */
+	ROM_LOAD( "pr-10901.6f",   0x0020, 0x100, CRC(6fd981c8) SHA1(0bd2e7b72fd5e055224a675108e2e706cd6f6e5a) )    /* charset #2 lookup table */
+	ROM_LOAD( "pr-10902.5a",   0x0120, 0x100, CRC(84d6bded) SHA1(67d9c4c7d7c84eb54ec655a4cf1768ca0cbb047d) )    /* charset #1 lookup table */
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )

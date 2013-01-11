@@ -9,12 +9,12 @@
 #define __FM_H__
 
 /* --- select emulation chips --- */
-#define BUILD_YM2203  (1)		/* build YM2203(OPN)   emulator */
-#define BUILD_YM2608  (1)		/* build YM2608(OPNA)  emulator */
-#define BUILD_YM2610  (1)		/* build YM2610(OPNB)  emulator */
-#define BUILD_YM2610B (1)		/* build YM2610B(OPNB?)emulator */
-#define BUILD_YM2612  (1)		/* build YM2612(OPN2)  emulator */
-#define BUILD_YM3438  (1)		/* build YM3438(OPN) emulator */
+#define BUILD_YM2203  (1)       /* build YM2203(OPN)   emulator */
+#define BUILD_YM2608  (1)       /* build YM2608(OPNA)  emulator */
+#define BUILD_YM2610  (1)       /* build YM2610(OPNB)  emulator */
+#define BUILD_YM2610B (1)       /* build YM2610B(OPNB?)emulator */
+#define BUILD_YM2612  (1)       /* build YM2612(OPN2)  emulator */
+#define BUILD_YM3438  (1)       /* build YM3438(OPN) emulator */
 
 /* select bit size of output : 8 or 16 */
 #define FM_SAMPLE_BITS 16
@@ -39,48 +39,48 @@ struct ssg_callbacks
 /* --- external callback funstions for realtime update --- */
 
 #if FM_BUSY_FLAG_SUPPORT
-#define TIME_TYPE					attotime
-#define UNDEFINED_TIME				attotime::zero
-#define FM_GET_TIME_NOW(machine)	(machine)->time()
-#define ADD_TIMES(t1, t2)   		((t1) + (t2))
-#define COMPARE_TIMES(t1, t2)		(((t1) == (t2)) ? 0 : ((t1) < (t2)) ? -1 : 1)
-#define MULTIPLY_TIME_BY_INT(t,i)	((t) * (i))
+#define TIME_TYPE                   attotime
+#define UNDEFINED_TIME              attotime::zero
+#define FM_GET_TIME_NOW(machine)    (machine)->time()
+#define ADD_TIMES(t1, t2)           ((t1) + (t2))
+#define COMPARE_TIMES(t1, t2)       (((t1) == (t2)) ? 0 : ((t1) < (t2)) ? -1 : 1)
+#define MULTIPLY_TIME_BY_INT(t,i)   ((t) * (i))
 #endif
 
 #if BUILD_YM2203
-  /* in 2203intf.c */
-  void ym2203_update_request(void *param);
-  #define ym2203_update_req(chip) ym2203_update_request(chip)
+	/* in 2203intf.c */
+	void ym2203_update_request(void *param);
+	#define ym2203_update_req(chip) ym2203_update_request(chip)
 #endif /* BUILD_YM2203 */
 
 #if BUILD_YM2608
-  /* in 2608intf.c */
-  void ym2608_update_request(void *param);
-  #define ym2608_update_req(chip) ym2608_update_request(chip);
+	/* in 2608intf.c */
+	void ym2608_update_request(void *param);
+	#define ym2608_update_req(chip) ym2608_update_request(chip);
 #endif /* BUILD_YM2608 */
 
 #if (BUILD_YM2610||BUILD_YM2610B)
-  /* in 2610intf.c */
-  void ym2610_update_request(void *param);
-  #define ym2610_update_req(chip) ym2610_update_request(chip);
+	/* in 2610intf.c */
+	void ym2610_update_request(void *param);
+	#define ym2610_update_req(chip) ym2610_update_request(chip);
 #endif /* (BUILD_YM2610||BUILD_YM2610B) */
 
 #if (BUILD_YM2612||BUILD_YM3438)
-  /* in 2612intf.c */
-  void ym2612_update_request(void *param);
-  #define ym2612_update_req(chip) ym2612_update_request(chip);
+	/* in 2612intf.c */
+	void ym2612_update_request(void *param);
+	#define ym2612_update_req(chip) ym2612_update_request(chip);
 #endif /* (BUILD_YM2612||BUILD_YM3438) */
 
 /* compiler dependence */
 #if 0
 #ifndef OSD_CPU_H
 #define OSD_CPU_H
-typedef unsigned char	UINT8;   /* unsigned  8bit */
-typedef unsigned short	UINT16;  /* unsigned 16bit */
-typedef unsigned int	UINT32;  /* unsigned 32bit */
-typedef signed char		INT8;    /* signed  8bit   */
-typedef signed short	INT16;   /* signed 16bit   */
-typedef signed int		INT32;   /* signed 32bit   */
+typedef unsigned char   UINT8;   /* unsigned  8bit */
+typedef unsigned short  UINT16;  /* unsigned 16bit */
+typedef unsigned int    UINT32;  /* unsigned 32bit */
+typedef signed char     INT8;    /* signed  8bit   */
+typedef signed short    INT16;   /* signed 16bit   */
+typedef signed int      INT32;   /* signed 32bit   */
 #endif /* OSD_CPU_H */
 #endif
 
@@ -122,7 +122,7 @@ typedef void (*FM_IRQHANDLER)(void *param,int irq);
 ** return      0 = success
 */
 void * ym2203_init(void *param, device_t *device, int baseclock, int rate,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 
 /*
 ** shutdown the YM2203 emulators
@@ -165,8 +165,8 @@ void ym2203_postload(void *chip);
 #if BUILD_YM2608
 /* -------------------- YM2608(OPNA) Interface -------------------- */
 void * ym2608_init(void *param, device_t *device, int baseclock, int rate,
-               void *pcmroma,int pcmsizea,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+				void *pcmroma,int pcmsizea,
+				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void ym2608_shutdown(void *chip);
 void ym2608_reset_chip(void *chip);
 void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length);
@@ -180,8 +180,8 @@ void ym2608_postload(void *chip);
 #if (BUILD_YM2610||BUILD_YM2610B)
 /* -------------------- YM2610(OPNB) Interface -------------------- */
 void * ym2610_init(void *param, device_t *device, int baseclock, int rate,
-               void *pcmroma,int pcmasize,void *pcmromb,int pcmbsize,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+				void *pcmroma,int pcmasize,void *pcmromb,int pcmbsize,
+				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void ym2610_shutdown(void *chip);
 void ym2610_reset_chip(void *chip);
 void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length);
@@ -198,7 +198,7 @@ void ym2610_postload(void *chip);
 
 #if (BUILD_YM2612||BUILD_YM3438)
 void * ym2612_init(void *param, device_t *device, int baseclock, int rate,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
+				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
 void ym2612_shutdown(void *chip);
 void ym2612_reset_chip(void *chip);
 void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length);

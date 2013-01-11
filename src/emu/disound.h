@@ -51,8 +51,8 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int ALL_OUTPUTS		= 65535;	// special value indicating all outputs for the current chip
-const int AUTO_ALLOC_INPUT	= 65535;
+const int ALL_OUTPUTS       = 65535;    // special value indicating all outputs for the current chip
+const int AUTO_ALLOC_INPUT  = 65535;
 
 
 
@@ -109,12 +109,12 @@ public:
 
 		const sound_route *next() const { return m_next; }
 
-		sound_route *		m_next;				// pointer to next route
-		UINT32				m_output;			// output index, or ALL_OUTPUTS
-		UINT32				m_input;			// target input index
-		UINT32				m_mixoutput;		// target mixer output
-		float				m_gain;				// gain
-		astring				m_target;			// target tag
+		sound_route *       m_next;             // pointer to next route
+		UINT32              m_output;           // output index, or ALL_OUTPUTS
+		UINT32              m_input;            // target input index
+		UINT32              m_mixoutput;        // target mixer output
+		float               m_gain;             // gain
+		astring             m_target;           // target tag
 	};
 
 	// construction/destruction
@@ -151,9 +151,9 @@ protected:
 	virtual void interface_pre_reset();
 
 	// internal state
-	simple_list<sound_route> m_route_list;		// list of sound routes
-	int				m_outputs;					// number of outputs from this instance
-	int				m_auto_allocated_inputs;	// number of auto-allocated inputs targeting us
+	simple_list<sound_route> m_route_list;      // list of sound routes
+	int             m_outputs;                  // number of outputs from this instance
+	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
 };
 
 // iterator
@@ -179,13 +179,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
-	UINT8				m_outputs;				// number of outputs
-	dynamic_array<UINT8> m_outputmap;			// map of inputs to outputs
-	sound_stream *		m_mixer_stream;			// mixing stream
+	UINT8               m_outputs;              // number of outputs
+	dynamic_array<UINT8> m_outputmap;           // map of inputs to outputs
+	sound_stream *      m_mixer_stream;         // mixing stream
 };
 
 // iterator
 typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
 
 
-#endif	/* __DISOUND_H__ */
+#endif  /* __DISOUND_H__ */

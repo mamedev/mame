@@ -71,16 +71,16 @@ Detailed list of bugs:
 #include "imagedev/cartslot.h"
 #include "machine/i2cmem.h"
 
-#define PAGE_ENABLE_MASK		0x0008
+#define PAGE_ENABLE_MASK        0x0008
 
-#define PAGE_DEPTH_FLAG_MASK	0x3000
-#define PAGE_DEPTH_FLAG_SHIFT	12
-#define PAGE_TILE_HEIGHT_MASK	0x00c0
-#define PAGE_TILE_HEIGHT_SHIFT	6
-#define PAGE_TILE_WIDTH_MASK	0x0030
-#define PAGE_TILE_WIDTH_SHIFT	4
-#define TILE_X_FLIP				0x0004
-#define TILE_Y_FLIP				0x0008
+#define PAGE_DEPTH_FLAG_MASK    0x3000
+#define PAGE_DEPTH_FLAG_SHIFT   12
+#define PAGE_TILE_HEIGHT_MASK   0x00c0
+#define PAGE_TILE_HEIGHT_SHIFT  6
+#define PAGE_TILE_WIDTH_MASK    0x0030
+#define PAGE_TILE_WIDTH_SHIFT   4
+#define TILE_X_FLIP             0x0004
+#define TILE_Y_FLIP             0x0008
 
 class vii_state : public driver_device
 {
@@ -155,12 +155,12 @@ enum
 };
 
 
-#define VII_CTLR_IRQ_ENABLE	m_io_regs[0x21]
-#define VII_VIDEO_IRQ_ENABLE	m_video_regs[0x62]
-#define VII_VIDEO_IRQ_STATUS	m_video_regs[0x63]
+#define VII_CTLR_IRQ_ENABLE m_io_regs[0x21]
+#define VII_VIDEO_IRQ_ENABLE    m_video_regs[0x62]
+#define VII_VIDEO_IRQ_STATUS    m_video_regs[0x63]
 
 
-#define VERBOSE_LEVEL	(3)
+#define VERBOSE_LEVEL   (3)
 
 #define ENABLE_VERBOSE_LOG (1)
 
@@ -335,15 +335,15 @@ static void vii_blit_page(running_machine &machine, bitmap_rgb32 &bitmap, const 
 			UINT32 tileattr = attr;
 			UINT32 tilectrl = ctrl;
 			if ((ctrl & 2) == 0)
-			{	// -(1) bld(1) flip(2) pal(4)
+			{   // -(1) bld(1) flip(2) pal(4)
 				tileattr &= ~0x000c;
-				tileattr |= (palette >> 2) & 0x000c;	// flip
+				tileattr |= (palette >> 2) & 0x000c;    // flip
 
 				tileattr &= ~0x0f00;
-				tileattr |= (palette << 8) & 0x0f00;	// palette
+				tileattr |= (palette << 8) & 0x0f00;    // palette
 
 				tileattr &= ~0x0100;
-				tileattr |= (palette << 2) & 0x0100;	// blend
+				tileattr |= (palette << 2) & 0x0100;    // blend
 			}
 
 			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
@@ -484,17 +484,17 @@ WRITE16_MEMBER( vii_state::vii_video_w )
 {
 	switch(offset)
 	{
-		case 0x10: case 0x16:	// page 1,2 X scroll
+		case 0x10: case 0x16:   // page 1,2 X scroll
 			data &= 0x01ff;
 			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 
-		case 0x11: case 0x17:	// page 1,2 Y scroll
+		case 0x11: case 0x17:   // page 1,2 Y scroll
 			data &= 0x00ff;
 			COMBINE_DATA(&m_video_regs[offset]);
 			break;
-		case 0x36:		// IRQ pos V
-		case 0x37:		// IRQ pos H
+		case 0x36:      // IRQ pos V
+		case 0x37:      // IRQ pos H
 			data &= 0x01ff;
 			COMBINE_DATA(&m_video_regs[offset]);
 			break;
@@ -731,7 +731,7 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 			vii_do_gpio(offset);
 			break;
 
-		case 0x10:		// timebase control
+		case 0x10:      // timebase control
 			if ((m_io_regs[offset] & 0x0003) != (data & 0x0003)) {
 				UINT16 hz = 8 << (data & 0x0003);
 				verboselog(machine(), 3, "*** TMB1 FREQ set to %dHz\n", hz);
@@ -1054,13 +1054,13 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 //      verboselog(machine(), 0, "audio 1 IRQ\n");
 //      machine().device("maincpu")->execute().set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
 //  }
-    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0c00)
+	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0c00)
 	{
 		verboselog(machine(), 0, "timerA, timer B IRQ\n");
 		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
 	}
 
-    //if(m_io_regs[0x22] & m_io_regs[0x21] & 0x2100)
+	//if(m_io_regs[0x22] & m_io_regs[0x21] & 0x2100)
 	// For now trigger always if any enabled
 	if(VII_CTLR_IRQ_ENABLE)
 	{
@@ -1072,17 +1072,17 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 //      machine().device("maincpu")->execute().set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
 //  }
 
-    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x1200)
+	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x1200)
 	{
 		verboselog(machine(), 0, "External IRQ\n");
 		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ5_LINE, ASSERT_LINE);
 	}
-    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0070)
+	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0070)
 	{
 		verboselog(machine(), 0, "1024Hz, 2048HZ, 4096HZ IRQ\n");
 		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ6_LINE, ASSERT_LINE);
 	}
-    if(m_io_regs[0x22] & m_io_regs[0x21] & 0x008b)
+	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x008b)
 	{
 		verboselog(machine(), 0, "TMB1, TMB2, 4Hz, key change IRQ\n");
 		machine().device("maincpu")->execute().set_input_line(UNSP_IRQ7_LINE, ASSERT_LINE);

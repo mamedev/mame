@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
 	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	/* unused? */
+	AM_RANGE(0xc44006, 0xc44007) AM_READNOP /* unused? */
 	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
 	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	AM_WRITE(deniam16c_oki_rom_bank_w) /* read unused? */
+	AM_RANGE(0xc44006, 0xc44007) AM_READNOP AM_WRITE(deniam16c_oki_rom_bank_w) /* read unused? */
 	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_w, 0xff00)
 	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW") /* probably YM3812 input port */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -217,7 +217,7 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( deniam )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )	/* colors 0-1023 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )    /* colors 0-1023 */
 												/* sprites use colors 1024-2047 */
 GFXDECODE_END
 
@@ -270,11 +270,11 @@ void deniam_state::machine_reset()
 static MACHINE_CONFIG_START( deniam16b, deniam_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(deniam16b_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_25MHz/4)	/* 6.25Mhz verified */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_25MHz/4)  /* 6.25Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -306,7 +306,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( deniam16c, deniam_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */
 	MCFG_CPU_PROGRAM_MAP(deniam16c_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
@@ -348,19 +348,19 @@ ROM_START( logicpro )
 	ROM_LOAD16_BYTE( "logicpro.r4", 0x00000, 0x40000, CRC(c506d484) SHA1(5d662b109e1d2e09556bc4ecbc11bbf5ccb639d3) )
 	ROM_LOAD16_BYTE( "logicpro.r3", 0x00001, 0x40000, CRC(d5a4cf62) SHA1(138ea4f1629e453c1a00410eda7086d3633240e3) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "logicpro.r2", 0x0000, 0x10000, CRC(000d624b) SHA1(c0da218ee81d01b3dcef2159bbaaff5d3ddb7619) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x180000, "gfx1", 0 )   /* chars */
 	ROM_LOAD( "logicpro.r5", 0x000000, 0x080000, CRC(dedf18c9) SHA1(9725e096427f03ed5fd81584c0aa85a53f9681c9) )
 	ROM_LOAD( "logicpro.r6", 0x080000, 0x080000, CRC(3ecbd1c2) SHA1(dd6afacd58eaaa2562e007a92b6667ecc968377d) )
 	ROM_LOAD( "logicpro.r7", 0x100000, 0x080000, CRC(47135521) SHA1(ee6a93332190fc966f8e820430d652942f030b00) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites, used at run time */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites, used at run time */
 	ROM_LOAD16_BYTE( "logicpro.r9", 0x000000, 0x080000, CRC(a98bc1d2) SHA1(f4aed07cccca892f3d3a91546b3a98fbe3e66d9c) )
 	ROM_LOAD16_BYTE( "logicpro.r8", 0x000001, 0x080000, CRC(1de46298) SHA1(3385a2956d9a427c85554f39c8d85922bbeb1ce1) )
 
-	ROM_REGION( 0x100000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "logicpro.r1", 0x0000, 0x080000, CRC(a1fec4d4) SHA1(4390cd18b4a7de2d8cb68270180ea3de42fd2282) )
 ROM_END
 
@@ -369,19 +369,19 @@ ROM_START( croquis )
 	ROM_LOAD16_BYTE( "r4.bin", 0x00000, 0x40000, CRC(03c9055e) SHA1(b1fa8e7a272887decca30eefe73ac782f296f0dd) )
 	ROM_LOAD16_BYTE( "r3.bin", 0x00001, 0x40000, CRC(a98ae4f6) SHA1(80fcedb4ee0f35eb2d0b4a248c15f872af2e08f2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "logicpro.r2", 0x0000, 0x10000, CRC(000d624b) SHA1(c0da218ee81d01b3dcef2159bbaaff5d3ddb7619) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x180000, "gfx1", 0 )   /* chars */
 	ROM_LOAD( "logicpro.r5", 0x000000, 0x080000, CRC(dedf18c9) SHA1(9725e096427f03ed5fd81584c0aa85a53f9681c9) )
 	ROM_LOAD( "logicpro.r6", 0x080000, 0x080000, CRC(3ecbd1c2) SHA1(dd6afacd58eaaa2562e007a92b6667ecc968377d) )
 	ROM_LOAD( "logicpro.r7", 0x100000, 0x080000, CRC(47135521) SHA1(ee6a93332190fc966f8e820430d652942f030b00) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites, used at run time */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites, used at run time */
 	ROM_LOAD16_BYTE( "logicpro.r9", 0x000000, 0x080000, CRC(a98bc1d2) SHA1(f4aed07cccca892f3d3a91546b3a98fbe3e66d9c) )
 	ROM_LOAD16_BYTE( "logicpro.r8", 0x000001, 0x080000, CRC(1de46298) SHA1(3385a2956d9a427c85554f39c8d85922bbeb1ce1) )
 
-	ROM_REGION( 0x100000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "logicpro.r1", 0x0000, 0x080000, CRC(a1fec4d4) SHA1(4390cd18b4a7de2d8cb68270180ea3de42fd2282) )
 ROM_END
 
@@ -390,15 +390,15 @@ ROM_START( karianx )
 	ROM_LOAD16_BYTE( "even",        0x00000, 0x80000, CRC(fd0ce238) SHA1(4b727366c942c62187d8700666b42a85c059c060) )
 	ROM_LOAD16_BYTE( "odd",         0x00001, 0x80000, CRC(be173cdc) SHA1(13230b6129fd1910257624a69a3a4b74696e982e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "snd",         0x0000, 0x10000, CRC(fedd3375) SHA1(09fb2d5fc91704120f757acf9fa00d149f891a28) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x180000, "gfx1", 0 )   /* chars */
 	ROM_LOAD( "bkg1",        0x000000, 0x080000, CRC(5cb8558a) SHA1(9c6024c70a0f0cd529a0e2e853e467ec8d8ab446) )
 	ROM_LOAD( "bkg2",        0x080000, 0x080000, CRC(95ff297c) SHA1(28f6c005e73e1680bd8be7ce355fa0d404827105) )
 	ROM_LOAD( "bkg3",        0x100000, 0x080000, CRC(6c81f1b2) SHA1(14ef907a9c381b7ef45441d480bb4ccb015e474b) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites, used at run time */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites, used at run time */
 	ROM_LOAD16_BYTE( "obj4",        0x000000, 0x080000, CRC(5f8d75a9) SHA1(0552d046742aeb2fee176887156e73480c75a1bd) )
 	ROM_LOAD16_BYTE( "obj1",        0x000001, 0x080000, CRC(967ee97d) SHA1(689f2da67eab86653b846fada39139792cd4aee2) )
 	ROM_LOAD16_BYTE( "obj5",        0x100000, 0x080000, CRC(e9fc22f9) SHA1(a1f7f779520346406949500e3224c0c42cbbe026) )
@@ -406,7 +406,7 @@ ROM_START( karianx )
 	ROM_LOAD16_BYTE( "obj6",        0x200000, 0x080000, CRC(c1ec35a5) SHA1(bf59f4c3de081c8cc398c825fc1f3e8577641f10) )
 	ROM_LOAD16_BYTE( "obj3",        0x200001, 0x080000, CRC(6ac1ac87) SHA1(1954e25ac5489a8eca137b86c89c415f1fed360c) )
 
-	ROM_REGION( 0x100000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "voi",         0x0000, 0x080000, CRC(c6506a80) SHA1(121229c501bd5678e55c7342619743c773a01a7e) )
 ROM_END
 
@@ -415,15 +415,15 @@ ROM_START( logicpr2 )
 	ROM_LOAD16_BYTE( "lp2-2",       0x00000, 0x80000, CRC(cc1880bf) SHA1(5ea542b63947a570aaf924f7ab739e060e359af8) )
 	ROM_LOAD16_BYTE( "lp2-1",       0x00001, 0x80000, CRC(46d5e954) SHA1(7bf5ae19caeecd2123754698276bbc78d68984d9) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x180000, "gfx1", 0 )   /* chars */
 	ROM_LOAD( "log2-b01",    0x000000, 0x080000, CRC(fe789e07) SHA1(c3d542564519fd807bc605029f5a2cca571eec9f) )
 	ROM_LOAD( "log2-b02",    0x080000, 0x080000, CRC(1e0c51cd) SHA1(c25b3259a173e77785dcee1407ddf191c3efad79) )
 	ROM_LOAD( "log2-b03",    0x100000, 0x080000, CRC(916f2928) SHA1(8c73408664dcd3de42cb27fac0d22b87b540bf52) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites, used at run time */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites, used at run time */
 	ROM_LOAD16_WORD_SWAP( "obj",         0x000000, 0x400000, CRC(f221f305) SHA1(aa1d3d86d13e009bfb44cbc6ff4401b811b19f97) )
 
-	ROM_REGION( 0x100000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "log2-s01",    0x0000, 0x100000, CRC(2875c435) SHA1(633538d9ac53228ea344605482ac387852c29193) )
 ROM_END
 

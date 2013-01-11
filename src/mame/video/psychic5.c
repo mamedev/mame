@@ -10,13 +10,13 @@
 #include "video/jalblend.h"
 #include "includes/psychic5.h"
 
-#define	BG_SCROLLX_LSB		0x308
-#define	BG_SCROLLX_MSB		0x309
-#define	BG_SCROLLY_LSB		0x30a
-#define	BG_SCROLLY_MSB		0x30b
-#define	BG_SCREEN_MODE		0x30c
-#define	BG_PAL_INTENSITY_RG	0x1fe
-#define	BG_PAL_INTENSITY_BU	0x1ff
+#define BG_SCROLLX_LSB      0x308
+#define BG_SCROLLX_MSB      0x309
+#define BG_SCROLLY_LSB      0x30a
+#define BG_SCROLLY_MSB      0x30b
+#define BG_SCREEN_MODE      0x30c
+#define BG_PAL_INTENSITY_RG 0x1fe
+#define BG_PAL_INTENSITY_BU 0x1ff
 
 
 /***************************************************************************
@@ -57,7 +57,7 @@ static void psychic5_change_bg_palette(running_machine &machine, int color, int 
 	/* Grey background enable */
 	if (state->m_bg_status & 2)
 	{
-		UINT8 val = (r + g + b) / 3;		/* Grey */
+		UINT8 val = (r + g + b) / 3;        /* Grey */
 		/* Just leave plain grey */
 		palette_set_color(machine,color,jal_blend_func(MAKE_RGB(val,val,val),irgb,ix));
 	}
@@ -146,11 +146,11 @@ WRITE8_MEMBER(psychic5_state::psychic5_paged_ram_w)
 		{
 			m_bg_status = m_ps5_io_ram[BG_SCREEN_MODE];
 		}
-		else if (offset >= 0x400 && offset <= 0x5ff)	/* Sprite color */
+		else if (offset >= 0x400 && offset <= 0x5ff)    /* Sprite color */
 			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x000,offset-0x400);
-		else if (offset >= 0x800 && offset <= 0x9ff)	/* BG color */
+		else if (offset >= 0x800 && offset <= 0x9ff)    /* BG color */
 			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x100,offset-0x400);
-		else if (offset >= 0xa00 && offset <= 0xbff)	/* Text color */
+		else if (offset >= 0xa00 && offset <= 0xbff)    /* Text color */
 			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x200,offset-0x400);
 		else if (offset >= 0x1000)
 			m_fg_tilemap->mark_tile_dirty((offset-0x1000) >> 1);
@@ -372,9 +372,9 @@ static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 		int sx1_old = state->m_sx1;
 		int sy2_old = state->m_sy2;
 
-		state->m_sy1 = spriteram[11];		/* sprite 0 */
+		state->m_sy1 = spriteram[11];       /* sprite 0 */
 		state->m_sx1 = spriteram[12];
-		state->m_sy2 = spriteram[11+128];	/* sprite 8 */
+		state->m_sy2 = spriteram[11+128];   /* sprite 8 */
 
 		switch (state->m_bg_clip_mode)
 		{
@@ -412,7 +412,7 @@ static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	if (m_bg_status & 1)	/* Backgound enable */
+	if (m_bg_status & 1)    /* Backgound enable */
 		draw_background(machine(), bitmap, cliprect);
 	if (!(m_title_screen & 1))
 		draw_sprites(machine(), bitmap, cliprect);
@@ -422,7 +422,7 @@ UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb3
 
 UINT32 psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_bg_status & 1)	/* Backgound enable */
+	if (m_bg_status & 1)    /* Backgound enable */
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(machine().pens[0x0ff], cliprect);

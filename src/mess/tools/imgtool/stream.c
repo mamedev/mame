@@ -64,7 +64,7 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 	imgfile->position = 0;
 
 //  ziperr =
-    zip_file_open(zipname, &z);
+	zip_file_open(zipname, &z);
 	if (!z)
 		goto error;
 
@@ -532,5 +532,3 @@ UINT32 stream_printf(imgtool_stream *stream, const char *fmt, ...)
 
 	return stream_puts(stream, buf);
 }
-
-

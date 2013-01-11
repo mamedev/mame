@@ -16,7 +16,7 @@
 #define VERBOSE 0
 #endif
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 ANTIC antic;
 
@@ -42,10 +42,10 @@ void antic_reset(void)
 	antic.r.antic08 = 0xff;
 	antic.r.antic09 = 0xff;
 	antic.r.antic0a = 0xff;
-	antic.r.penh	= 0x00;
-	antic.r.penv	= 0x00;
+	antic.r.penh    = 0x00;
+	antic.r.penv    = 0x00;
 	antic.r.antic0e = 0xff;
-	antic.r.nmist	= 0x1f;
+	antic.r.nmist   = 0x1f;
 }
 
 /**************************************************************
@@ -585,4 +585,3 @@ ANTIC_RENDERER( antic_mode_f_48 )
 	REP48(MODEF);
 	POST_GFX(48);
 }
-

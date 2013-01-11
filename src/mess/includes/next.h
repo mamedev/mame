@@ -21,16 +21,16 @@ class next_state : public driver_device
 public:
 	next_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  maincpu(*this, "maincpu"),
-		  rtc(*this, "rtc"),
-		  scc(*this, "scc"),
-		  keyboard(*this, "keyboard"),
-		  scsibus(*this, "scsibus"),
-		  scsi(*this, "scsibus:7:ncr5390"),
-		  net(*this, "net"),
-		  mo(*this, "mo"),
-		  fdc(*this, "fdc"),
-		  vram(*this, "vram")
+			maincpu(*this, "maincpu"),
+			rtc(*this, "rtc"),
+			scc(*this, "scc"),
+			keyboard(*this, "keyboard"),
+			scsibus(*this, "scsibus"),
+			scsi(*this, "scsibus:7:ncr5390"),
+			net(*this, "net"),
+			mo(*this, "mo"),
+			fdc(*this, "fdc"),
+			vram(*this, "vram")
 	{ }
 
 	required_device<cpu_device> maincpu;

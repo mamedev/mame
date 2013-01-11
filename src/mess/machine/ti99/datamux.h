@@ -25,13 +25,13 @@ extern const device_type DATAMUX;
 */
 struct dmux_device_list_entry
 {
-	const char				*name;				// Name of the device (used for looking up the device)
-	UINT16					select;				// State of the address line bits when addressing this device
-	UINT16					address_mask;		// Bits of the address bus used to address this device
-	UINT16					write_select;		// Bits set when doing write accesses to this device (ffff = write-only)
-	const char				*setting;			// configuration switch that may have an effect for the presence of this device
-	UINT8					set;				// bits that must be set for this switch so that this device is present
-	UINT8					unset;				// bits that must be reset for this switch so that this device is present
+	const char              *name;              // Name of the device (used for looking up the device)
+	UINT16                  select;             // State of the address line bits when addressing this device
+	UINT16                  address_mask;       // Bits of the address bus used to address this device
+	UINT16                  write_select;       // Bits set when doing write accesses to this device (ffff = write-only)
+	const char              *setting;           // configuration switch that may have an effect for the presence of this device
+	UINT8                   set;                // bits that must be set for this switch so that this device is present
+	UINT8                   unset;              // bits that must be reset for this switch so that this device is present
 };
 
 #define DMUX_CONFIG(name) \
@@ -39,8 +39,8 @@ struct dmux_device_list_entry
 
 struct datamux_config
 {
-	devcb_write_line				ready;
-	const dmux_device_list_entry	*devlist;
+	devcb_write_line                ready;
+	const dmux_device_list_entry    *devlist;
 };
 
 /*
@@ -53,12 +53,12 @@ class attached_device
 
 public:
 	attached_device(device_t *busdevice, const dmux_device_list_entry &entry)
-	:	m_device(busdevice), m_config(&entry) { };
+	:   m_device(busdevice), m_config(&entry) { };
 
 private:
-	attached_device					*m_next;
-	device_t						*m_device;		// the actual device
-	const dmux_device_list_entry	*m_config;
+	attached_device                 *m_next;
+	device_t                        *m_device;      // the actual device
+	const dmux_device_list_entry    *m_config;
 };
 
 /*
@@ -103,13 +103,12 @@ private:
 	device_t *m_cpu;
 
 	/* Reference to the address space, maybe unnecessary. */
-	address_space	*m_space;
+	address_space   *m_space;
 };
 
 /******************************************************************************/
 
-#define MCFG_DMUX_ADD(_tag, _devices)			\
+#define MCFG_DMUX_ADD(_tag, _devices)           \
 	MCFG_DEVICE_ADD(_tag, DATAMUX, 0) \
 	MCFG_DEVICE_CONFIG( _devices )
 #endif
-

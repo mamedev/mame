@@ -20,7 +20,7 @@ driver by David Haywood
 
 
 static ADDRESS_MAP_START( news_map, AS_PROGRAM, 8, news_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM 	/* 4000-7fff is written to during startup, probably leftover code */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM     /* 4000-7fff is written to during startup, probably leftover code */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(news_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(news_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0x9000, 0x91ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_be_w) AM_SHARE("paletteram")
@@ -128,7 +128,7 @@ void news_state::machine_reset()
 static MACHINE_CONFIG_START( news, news_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(news_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", news_state,  irq0_line_hold)
 

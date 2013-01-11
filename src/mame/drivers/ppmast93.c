@@ -225,7 +225,7 @@ WRITE8_MEMBER(ppmast93_state::ppmast_sound_w)
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu2_io, AS_IO, 8, ppmast93_state )
-	  AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE(ppmast_sound_w) AM_REGION("sub", 0x20000)
+		AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE(ppmast_sound_w) AM_REGION("sub", 0x20000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ppmast93 )
@@ -363,12 +363,12 @@ UINT32 ppmast93_state::screen_update_ppmast93(screen_device &screen, bitmap_ind1
 
 static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,5000000)		 /* 5 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,5000000)         /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu1_map)
 	MCFG_CPU_IO_MAP(ppmast93_cpu1_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppmast93_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,5000000)		 /* 5 MHz */
+	MCFG_CPU_ADD("sub", Z80,5000000)         /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu2_map)
 	MCFG_CPU_IO_MAP(ppmast93_cpu2_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ppmast93_state, irq0_line_hold, 8000)

@@ -29,11 +29,11 @@ READ16_MEMBER(prehisle_state::prehisle_control16_r)
 
 	switch (offset)
 	{
-	case 0x08: return ioport("P2")->read();						// Player 2
-	case 0x10: return ioport("COIN")->read();						// Coins, Tilt, Service
-	case 0x20: return ioport("P1")->read() ^ m_invert_controls;		// Player 1
-	case 0x21: return ioport("DSW0")->read();						// DIPs
-	case 0x22: return ioport("DSW1")->read();						// DIPs + VBLANK
+	case 0x08: return ioport("P2")->read();                     // Player 2
+	case 0x10: return ioport("COIN")->read();                       // Coins, Tilt, Service
+	case 0x20: return ioport("P1")->read() ^ m_invert_controls;     // Player 1
+	case 0x21: return ioport("DSW0")->read();                       // DIPs
+	case 0x22: return ioport("DSW1")->read();                       // DIPs + VBLANK
 	default: return 0;
 	}
 }
@@ -93,13 +93,13 @@ void prehisle_state::video_start()
 {
 
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
-		 16, 16, 1024, 32);
+			16, 16, 1024, 32);
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 16, 16, 256, 32);
+			16, 16, 256, 32);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(15);
 	m_fg_tilemap->set_transparent_pen(15);

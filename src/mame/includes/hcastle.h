@@ -11,8 +11,8 @@ class hcastle_state : public driver_device
 public:
 	hcastle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2") ,
+			m_spriteram(*this, "spriteram"),
+			m_spriteram2(*this, "spriteram2") ,
 		m_paletteram(*this, "paletteram"),
 		m_pf1_videoram(*this, "pf1_videoram"),
 		m_pf2_videoram(*this, "pf2_videoram"){ }

@@ -26,9 +26,9 @@ enum
 	SPC700_PC=1, SPC700_S, SPC700_P, SPC700_A, SPC700_X, SPC700_Y
 };
 
-#define SPC700_INT_NONE			0
-#define SPC700_INT_IRQ			1
-#define SPC700_INT_NMI			2
+#define SPC700_INT_NONE         0
+#define SPC700_INT_IRQ          1
+#define SPC700_INT_NMI          2
 
 
 /* ======================================================================== */

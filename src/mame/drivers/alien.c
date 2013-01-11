@@ -17,14 +17,14 @@
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 
-#define MASTER_CLOCK	XTAL_200MHz
+#define MASTER_CLOCK    XTAL_200MHz
 
 class alien_state : public driver_device
 {
 public:
 	alien_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_READ64_MEMBER(test_r);
@@ -79,7 +79,7 @@ void alien_state::machine_reset()
 
 static MACHINE_CONFIG_START( alien, alien_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)	/* 200MHz */
+	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
 	MCFG_CPU_PROGRAM_MAP(alien_map)
 
 	/* video hardware */
@@ -106,7 +106,7 @@ MACHINE_CONFIG_END
 ROM_START( alien )
 	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
 	ROM_LOAD32_WORD( "aln_s04.4.ic30", 0x000000, 0x400000, CRC(11777d3f) SHA1(8cc9fcae7911e6be273b4532d89b44a309687ead) )
-    ROM_LOAD32_WORD( "aln_s05.5.ic33", 0x000002, 0x400000, CRC(71d2f22c) SHA1(16b25aa34f8b0d988565e7ab7cecc4df62ee8cf3) )
+	ROM_LOAD32_WORD( "aln_s05.5.ic33", 0x000002, 0x400000, CRC(71d2f22c) SHA1(16b25aa34f8b0d988565e7ab7cecc4df62ee8cf3) )
 
 	ROM_REGION( 0x800100, "unk", 0 ) //sound samples flash rom
 	ROM_LOAD( "s29jl064hxxtfi00.u35", 0x000000, 0x800100, CRC(01890c61) SHA1(4fad321f42eab835351c6d5f73539bdbed80affe) )

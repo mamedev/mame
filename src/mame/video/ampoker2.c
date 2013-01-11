@@ -83,10 +83,10 @@ void ampoker2_state::palette_init()
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	0,	0,
-			3,	resistances_rg,	weights_g,	0,	0,
-			2,	resistances_b,	weights_b,	0,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rg, weights_r,  0,  0,
+			3,  resistances_rg, weights_g,  0,  0,
+			2,  resistances_b,  weights_b,  0,  0);
 
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 	int code = videoram[offs];
 	int color = attr;
 	code = code + (256 * (color & 0x03));   /* code = color.bit1 + color.bit0 + code */
-	color = color >> 1;	                    /* color = color - bit0 (bit1..bit7) */
+	color = color >> 1;                     /* color = color - bit0 (bit1..bit7) */
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 	int attr = videoram[offs + 1];
 	int code = videoram[offs];
 	int color = attr;
-	code = code + (256 * (color & 0x0f));	/* the game uses 2 extra bits */
+	code = code + (256 * (color & 0x0f));   /* the game uses 2 extra bits */
 	color = color >> 1;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -148,13 +148,13 @@ TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 void ampoker2_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ampoker2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 }
 
 VIDEO_START_MEMBER(ampoker2_state,sigma2k)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ampoker2_state::s2k_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 }
 
 UINT32 ampoker2_state::screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

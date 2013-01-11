@@ -79,11 +79,11 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
 
 	switch (offset)
 	{
-		case 5:	/* blitter start */
+		case 5: /* blitter start */
 			blitter_execute(machine());
 			break;
 
-		case 8:	/* bank select */
+		case 8: /* bank select */
 			membank("bank1")->set_entry((data & 0x05) ? 0 : 1);
 			break;
 	}

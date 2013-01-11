@@ -10,7 +10,7 @@
 #include "crtc_ega.h"
 
 
-#define LOG		(1)
+#define LOG     (1)
 
 
 const device_type CRTC_EGA = &device_creator<crtc_ega_device>;
@@ -124,19 +124,19 @@ WRITE8_MEMBER( crtc_ega_device::register_w )
 		case 0x0d:  m_disp_start_addr   = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00); break;
 		case 0x0e:  m_cursor_addr       = ((data & 0xff) << 8) | (m_cursor_addr & 0x00ff); break;
 		case 0x0f:  m_cursor_addr       = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
-		case 0x10:	m_vert_retr_start   = ((data & 0xff) << 0) | (m_vert_retr_start & 0x0300); break;
-		case 0x11:	m_vert_retr_end     =   data & 0x0f;
+		case 0x10:  m_vert_retr_start   = ((data & 0xff) << 0) | (m_vert_retr_start & 0x0300); break;
+		case 0x11:  m_vert_retr_end     =   data & 0x0f;
 					m_bandwidth         =   data & 0x40;
 					m_protect           =   data & 0x80;
 					break;
-		case 0x12:	m_vert_disp_end     = ((data & 0xff) << 0) | (m_vert_disp_end & 0x0300); break;
-		case 0x13:	m_offset            =  data & 0xff; break;
-		case 0x14:	m_underline_loc     =  data & 0x7f; break;
-		case 0x15:	m_vert_blank_start  = ((data & 0xff) << 0) | (m_vert_blank_start & 0x0300); break;
-		case 0x16:	m_vert_blank_end    =   data & 0x7f; break;
-		case 0x17:	m_mode_control      =   data & 0xff; break;
-		case 0x18:	m_line_compare      = ((data & 0xff) << 0) | (m_line_compare & 0x0300); break;
-		default:	break;
+		case 0x12:  m_vert_disp_end     = ((data & 0xff) << 0) | (m_vert_disp_end & 0x0300); break;
+		case 0x13:  m_offset            =  data & 0xff; break;
+		case 0x14:  m_underline_loc     =  data & 0x7f; break;
+		case 0x15:  m_vert_blank_start  = ((data & 0xff) << 0) | (m_vert_blank_start & 0x0300); break;
+		case 0x16:  m_vert_blank_end    =   data & 0x7f; break;
+		case 0x17:  m_mode_control      =   data & 0xff; break;
+		case 0x18:  m_line_compare      = ((data & 0xff) << 0) | (m_line_compare & 0x0300); break;
+		default:    break;
 	}
 
 	recompute_parameters(false);
@@ -167,7 +167,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 
 	hsync_on_pos = m_horiz_retr_start * m_hpixels_per_column;
 	hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * m_hpixels_per_column);
-	vsync_on_pos = m_vert_retr_start;		/* + 1 ?? */
+	vsync_on_pos = m_vert_retr_start;       /* + 1 ?? */
 	vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
 
 	if (hsync_off_pos > horiz_pix_total)
@@ -183,7 +183,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 
 	/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 	if (postload ||
-	    (horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
+		(horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
 		(max_visible_x != m_max_visible_x) || (max_visible_y != m_max_visible_y) ||
 		(hsync_on_pos != m_hsync_on_pos) || (vsync_on_pos != m_vsync_on_pos) ||
 		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos))
@@ -199,7 +199,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 			rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
 			if (LOG) logerror("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
-							  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 			if ( m_screen != NULL )
 				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
@@ -210,7 +210,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 		{
 			m_has_valid_parameters = false;
 			if (LOG) logerror("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
-			                   horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1);
+								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1);
 
 		}
 
@@ -692,4 +692,3 @@ void crtc_ega_device::device_reset()
 	m_horiz_disp = 0;
 	m_cursor_x = 0;
 }
-

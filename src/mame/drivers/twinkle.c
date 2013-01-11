@@ -249,8 +249,8 @@ public:
 
 	required_device<am53cf96_device> m_am53cf96;
 
-	UINT16 m_spu_ctrl;		// SPU board control register
-	UINT8 m_spu_shared[0x400];	// SPU/PSX shared dual-ported RAM
+	UINT16 m_spu_ctrl;      // SPU board control register
+	UINT8 m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
 	UINT32 m_unknown;
 
 	int m_io_offset;
@@ -623,13 +623,13 @@ READ32_MEMBER(twinkle_state::shared_psx_r)
 
 //  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, space.device().safe_pc());
 
-	result = 0;	// HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
+	result = 0; // HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
 
 	return result;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(shared_psx_r, shared_psx_w)
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
@@ -761,7 +761,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(twinkle_ide_r, twinkle_ide_w)
 	// 34000E = ???
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )    // 8 MB window wave RAM
 ADDRESS_MAP_END
 
 /* SCSI */
@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (twinkle_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (twinkle_state *) owner ) )
 
-	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16.000 MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP( sound_map )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
@@ -959,7 +959,7 @@ static INPUT_PORTS_START( twinkle )
 	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("security", i2cmem_sda_read)
 INPUT_PORTS_END
 
-#define TWINKLE_BIOS	\
+#define TWINKLE_BIOS    \
 	ROM_REGION32_LE( 0x080000, "user1", 0 )\
 	ROM_LOAD( "863a03.7b",    0x000000, 0x080000, CRC(81498f73) SHA1(3599b40a5872eab3a00d345287635355fcb25a71) )\
 \
@@ -975,14 +975,14 @@ ROM_END
 ROM_START( bmiidx )
 	TWINKLE_BIOS
 
-	DISK_REGION( "scsi:cdrom" )	// program
+	DISK_REGION( "scsi:cdrom" ) // program
 	DISK_IMAGE_READONLY("863jaa01", 0, BAD_DUMP SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY("863jaa04", 0, BAD_DUMP SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
 
 	DISK_REGION( "drive_0" )
-	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) )	// was part of a 1st mix machine, but "c44" indicates 8th mix?
+	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) ) // was part of a 1st mix machine, but "c44" indicates 8th mix?
 ROM_END
 
 ROM_START( bmiidx2 )

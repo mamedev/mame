@@ -59,7 +59,7 @@ MACHINE_CONFIG_EXTERN( genesis_scd_scd );
 MACHINE_CONFIG_EXTERN( genesis_scd_mcd );
 MACHINE_CONFIG_EXTERN( genesis_scd_mcdj );
 MACHINE_CONFIG_EXTERN( genesis_32x_scd );
-MACHINE_CONFIG_EXTERN( md_bootleg );	// for topshoot.c & hshavoc.c
+MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
 
 extern UINT16* megadriv_backupram;
 extern int megadriv_backupram_length;
@@ -144,48 +144,48 @@ public:
 		// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
 		// startup
 		/*
-        059ce0 writing to bl_710000_w ff08 ffff
-        059d04 writing to bl_710000_w 000a ffff
-        059d04 writing to bl_710000_w 000b ffff
-        059d04 writing to bl_710000_w 000c ffff
-        059d04 writing to bl_710000_w 000f ffff
-        059d1c writing to bl_710000_w ff09 ffff
-        059d2a reading from bl_710000_r  (wants 0xe)
-        059ce0 writing to bl_710000_w ff08 ffff
-        059d04 writing to bl_710000_w 000a ffff
-        059d04 writing to bl_710000_w 000b ffff
-        059d04 writing to bl_710000_w 000c ffff
-        059d04 writing to bl_710000_w 000f ffff
-        059d1c writing to bl_710000_w ff09 ffff
-        059d2a reading from bl_710000_r  (wants 0xe)
-        */
+		059ce0 writing to bl_710000_w ff08 ffff
+		059d04 writing to bl_710000_w 000a ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0xe)
+		059ce0 writing to bl_710000_w ff08 ffff
+		059d04 writing to bl_710000_w 000a ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0xe)
+		*/
 		// before lv stage 3
 		/*
-        059ce0 writing to bl_710000_w 0008 ffff
-        059d04 writing to bl_710000_w 000b ffff
-        059d04 writing to bl_710000_w 000f ffff
-        059d1c writing to bl_710000_w ff09 ffff
-        059d2a reading from bl_710000_r  (wants 0x4)
-        */
+		059ce0 writing to bl_710000_w 0008 ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0x4)
+		*/
 		// start level 3
 		/*
-        059ce0 writing to bl_710000_w ff08 ffff
-        059d04 writing to bl_710000_w 000b ffff
-        059d04 writing to bl_710000_w 000c ffff
-        059d04 writing to bl_710000_w 000e ffff
-        059d1c writing to bl_710000_w ff09 ffff
-        059d2a reading from bl_710000_r  (wants 0x5)
+		059ce0 writing to bl_710000_w ff08 ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000e ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0x5)
 
-        // after end sequence
-        059ce0 writing to bl_710000_w 0008 ffff
-        059d04 writing to bl_710000_w 000a ffff
-        059d04 writing to bl_710000_w 000b ffff
-        059d04 writing to bl_710000_w 000c ffff
-        059d04 writing to bl_710000_w 000f ffff
-        059d1c writing to bl_710000_w ff09 ffff
-        059d2a reading from bl_710000_r  (wants 0xe)
+		// after end sequence
+		059ce0 writing to bl_710000_w 0008 ffff
+		059d04 writing to bl_710000_w 000a ffff
+		059d04 writing to bl_710000_w 000b ffff
+		059d04 writing to bl_710000_w 000c ffff
+		059d04 writing to bl_710000_w 000f ffff
+		059d1c writing to bl_710000_w ff09 ffff
+		059d2a reading from bl_710000_r  (wants 0xe)
 
-        */
+		*/
 		m_protcount++;
 	}
 
@@ -218,7 +218,7 @@ class segac2_state : public md_base_state
 public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag),
-	  m_paletteram(*this, "paletteram") { }
+		m_paletteram(*this, "paletteram") { }
 
 	// for Print Club only
 	int m_cam_data;
@@ -228,21 +228,21 @@ public:
 	required_shared_ptr<UINT16> m_paletteram;
 
 	/* internal states */
-	UINT8		m_misc_io_data[0x10];	/* holds values written to the I/O chip */
+	UINT8       m_misc_io_data[0x10];   /* holds values written to the I/O chip */
 
 	/* protection-related tracking */
-	int (*m_prot_func)(int in);		/* emulation of protection chip */
-	UINT8		m_prot_write_buf;		/* remembers what was written */
-	UINT8		m_prot_read_buf;		/* remembers what was returned */
+	int (*m_prot_func)(int in);     /* emulation of protection chip */
+	UINT8       m_prot_write_buf;       /* remembers what was written */
+	UINT8       m_prot_read_buf;        /* remembers what was returned */
 
 	/* palette-related variables */
-	UINT8		m_segac2_alt_palette_mode;
-	UINT8		m_palbank;
-	UINT8		m_bg_palbase;
-	UINT8		m_sp_palbase;
+	UINT8       m_segac2_alt_palette_mode;
+	UINT8       m_palbank;
+	UINT8       m_bg_palbase;
+	UINT8       m_sp_palbase;
 
 	/* sound-related variables */
-	UINT8		m_sound_banks;		/* number of sound banks */
+	UINT8       m_sound_banks;      /* number of sound banks */
 
 	DECLARE_DRIVER_INIT(c2boot);
 	DECLARE_DRIVER_INIT(bloxeedc);
@@ -413,12 +413,12 @@ public:
 
 	UINT8 *m_iram; // IRAM (0-0x7ff)
 	UINT8 *m_dram; // [0x20000];
-	UINT32 m_pmac_read[6];	// read modes/addrs for PM0-PM5
-	UINT32 m_pmac_write[6];	// write ...
+	UINT32 m_pmac_read[6];  // read modes/addrs for PM0-PM5
+	UINT32 m_pmac_write[6]; // write ...
 	PAIR m_pmc;
 	UINT32 m_emu_status;
-	UINT16 m_XST;		// external status, mapped at a15000 and a15002 on 68k side.
-	UINT16 m_XST2;		// status of XST (bit1 set when 68k writes to XST)
+	UINT16 m_XST;       // external status, mapped at a15000 and a15002 on 68k side.
+	UINT16 m_XST2;      // status of XST (bit1 set when 68k writes to XST)
 };
 
 ADDRESS_MAP_EXTERN( svp_ssp_map, driver_device );
@@ -449,12 +449,12 @@ extern cpu_device *_32x_slave_cpu;
 
 
 
-class segacd_state : public _32x_state	// use _32x_state as base to make easier the combo 32X + SCD
+class segacd_state : public _32x_state  // use _32x_state as base to make easier the combo 32X + SCD
 {
 public:
 	segacd_state(const machine_config &mconfig, device_type type, const char *tag)
 	: _32x_state(mconfig, type, tag)
-	  { }
+		{ }
 };
 
 

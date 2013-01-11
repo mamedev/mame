@@ -22,7 +22,7 @@ public:
 		m_lsi53c810(*this, "scsi:lsi53c810"),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
-        m_dsbz80(*this, DSBZ80_TAG),
+		m_dsbz80(*this, DSBZ80_TAG),
 		m_soundram(*this, "soundram"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -30,11 +30,11 @@ public:
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;
-    optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
+	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	required_shared_ptr<UINT16> m_soundram;
 
-    int m_sound_irq_enable;
-    emu_timer *m_sound_timer;
+	int m_sound_irq_enable;
+	emu_timer *m_sound_timer;
 	UINT8 m_irq_enable;
 	UINT8 m_irq_state;
 	UINT8 m_scsi_irq_state;

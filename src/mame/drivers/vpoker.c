@@ -184,7 +184,7 @@ WRITE8_MEMBER(vpoker_state::blitter_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vpoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM		/* vpoker has 0x100, 5acespkr has 0x200 */
+	AM_RANGE(0x0000, 0x01ff) AM_RAM     /* vpoker has 0x100, 5acespkr has 0x200 */
 	AM_RANGE(0x0400, 0x0407) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
 	AM_RANGE(0x0800, 0x0807) AM_READ(blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
@@ -193,7 +193,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vpoker )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(3) PORT_NAME("Coin In")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )

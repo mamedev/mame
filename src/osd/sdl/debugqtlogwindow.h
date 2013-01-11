@@ -12,16 +12,16 @@
 //============================================================
 class LogWindow : public WindowQt
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+
 public:
-    LogWindow(running_machine* machine, QWidget* parent=NULL);
-    virtual ~LogWindow() {}
+	LogWindow(running_machine* machine, QWidget* parent=NULL);
+	virtual ~LogWindow() {}
 
 
 private:
-    // Widgets
-    DebuggerView* m_logView;
+	// Widgets
+	DebuggerView* m_logView;
 };
 
 

@@ -26,10 +26,10 @@
 #include "emu.h"
 #include "video/nubus_specpdq.h"
 
-#define SPECPDQ_SCREEN_NAME	"specpdq_screen"
+#define SPECPDQ_SCREEN_NAME "specpdq_screen"
 #define SPECPDQ_ROM_REGION  "specpdq_rom"
 
-#define VRAM_SIZE	(0x400000)
+#define VRAM_SIZE   (0x400000)
 
 MACHINE_CONFIG_FRAGMENT( specpdq )
 	MCFG_SCREEN_ADD( SPECPDQ_SCREEN_NAME, RASTER)
@@ -79,14 +79,14 @@ const rom_entry *nubus_specpdq_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock),
+		device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_spdq";
 }
 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_spdq";
@@ -114,7 +114,7 @@ void nubus_specpdq_device::device_start()
 	m_nubus->install_device(slotspace+0x400000, slotspace+0xfbffff, read32_delegate(FUNC(nubus_specpdq_device::specpdq_r), this), write32_delegate(FUNC(nubus_specpdq_device::specpdq_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -247,11 +247,11 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 	switch (offset)
 	{
-		case 0xc0054:	// mode 1
+		case 0xc0054:   // mode 1
 //          printf("%x to mode1\n", data);
 			break;
 
-		case 0xc005c:	// interrupt control
+		case 0xc005c:   // interrupt control
 			if (!(data & 0x8000))
 			{
 				m_vbl_disable = 1;
@@ -263,7 +263,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			}
 			break;
 
-		case 0xc005e:	// not sure, interrupt related?
+		case 0xc005e:   // not sure, interrupt related?
 			break;
 
 		case 0xc007a:
@@ -287,12 +287,12 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 //          printf("m_mode = %d\n", m_mode);
 			break;
 
-		case 0x120000:	// DAC address
+		case 0x120000:  // DAC address
 //          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
 			m_clutoffs = ((data>>8)&0xff)^0xff;
 			break;
 
-		case 0x120001:	// DAC data
+		case 0x120001:  // DAC data
 			m_colors[m_count++] = ((data>>8)&0xff)^0xff;
 
 			if (m_count == 3)
@@ -422,7 +422,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			if (data == 2)
 			{
 				int x, y;
-				UINT8 *vram = m_vram + m_vram_addr + m_patofsx;	// m_vram_addr is missing the low 2 bits, we add them back here
+				UINT8 *vram = m_vram + m_vram_addr + m_patofsx; // m_vram_addr is missing the low 2 bits, we add them back here
 
 //              printf("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
 

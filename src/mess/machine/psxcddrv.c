@@ -8,7 +8,7 @@
 //
 //
 
-static const unsigned int	num_pf_sectors=32, num_pf_buffers=16;
+static const unsigned int   num_pf_sectors=32, num_pf_buffers=16;
 
 //
 //
@@ -177,7 +177,7 @@ bool cdrom_driver::is_prefetch_sector_loaded(const unsigned int sec)
 #if 0 // we do not load async in MESS
 		INT64 trans=pf_status->bytes_transferred();
 		unsigned int secmod=pfsec%num_pf_sectors,
-								 needbytes=(secmod+1)*native_sector_size;
+									needbytes=(secmod+1)*native_sector_size;
 
 		if (trans<needbytes)
 		{
@@ -209,7 +209,7 @@ unsigned char *cdrom_driver::get_prefetch_sector(const unsigned int sec, unsigne
 			pfsec=sec-pf_head_sector;
 	if ((pfsec>=0) && (pfsec<numpfsec))
 	{
-		int	blk=(pf_head+(pfsec/num_pf_sectors))%num_pf_buffers,
+		int blk=(pf_head+(pfsec/num_pf_sectors))%num_pf_buffers,
 				off=((blk*num_pf_sectors)+(pfsec%num_pf_sectors))*native_sector_size;
 		*sz=native_sector_size;
 		return pf_buffer+off;
@@ -422,8 +422,8 @@ io_status *mess_cdrom_driver::read_sectors(const unsigned int startsec, const un
 	else
 	{
 		printf("mess: read sector out of range (%d, max=%d)\n",
-					 startsec,
-					 num_sectors);
+						startsec,
+						num_sectors);
 
 		memset(buf,0xff,numsec*bin_sector_size);
 		return NULL;
@@ -529,4 +529,3 @@ cdrom_driver *open_mess_drv()
 {
 	return new mess_cdrom_driver();
 }
-

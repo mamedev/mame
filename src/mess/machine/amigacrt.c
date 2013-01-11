@@ -19,7 +19,7 @@ TODO:
 enum
 {
 	/* supported cartridges */
-	ACTION_REPLAY				=	0,
+	ACTION_REPLAY               =   0,
 	ACTION_REPLAY_MKII,
 	ACTION_REPLAY_MKIII
 };
@@ -119,7 +119,7 @@ static WRITE16_HANDLER( amiga_ar1_chipmem_w )
 	if ( ((pc >> 16) & 0xff ) != 0xf0 )
 	{
 		/* if we're not, see if either the Spurious IRQ vector
-           or the NMI vector are being overwritten */
+		   or the NMI vector are being overwritten */
 		if ( offset == (0x60/2) || offset == (0x7c/2) )
 		{
 			/* trigger an NMI or spurious irq */
@@ -273,7 +273,7 @@ static void amiga_ar23_freeze( running_machine &machine )
 
 		if ( ar_ram != NULL )
 		{
-			int		i;
+			int     i;
 
 			for( i = 0; i < 0x100; i++ )
 				ar_ram[0x7800+i] = CUSTOM_REG(i);

@@ -52,10 +52,10 @@
 
 cpu_device::cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_execute_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  device_state_interface(mconfig, *this),
-	  device_disasm_interface(mconfig, *this)
+		device_execute_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		device_state_interface(mconfig, *this),
+		device_disasm_interface(mconfig, *this)
 {
 }
 
@@ -75,22 +75,22 @@ cpu_device::~cpu_device()
 
 legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info)
 	: cpu_device(mconfig, type, "CPU", tag, owner, clock),
-	  m_get_info(get_info),
-	  m_token(NULL),
-	  m_set_info(reinterpret_cast<cpu_set_info_func>(get_legacy_fct(CPUINFO_FCT_SET_INFO))),
-	  m_execute(reinterpret_cast<cpu_execute_func>(get_legacy_fct(CPUINFO_FCT_EXECUTE))),
-	  m_burn(reinterpret_cast<cpu_burn_func>(get_legacy_fct(CPUINFO_FCT_BURN))),
-	  m_translate(reinterpret_cast<cpu_translate_func>(get_legacy_fct(CPUINFO_FCT_TRANSLATE))),
-	  m_read(reinterpret_cast<cpu_read_func>(get_legacy_fct(CPUINFO_FCT_READ))),
-	  m_write(reinterpret_cast<cpu_write_func>(get_legacy_fct(CPUINFO_FCT_WRITE))),
-	  m_readop(reinterpret_cast<cpu_readop_func>(get_legacy_fct(CPUINFO_FCT_READOP))),
-	  m_disassemble(reinterpret_cast<cpu_disassemble_func>(get_legacy_fct(CPUINFO_FCT_DISASSEMBLE))),
-	  m_state_import(reinterpret_cast<cpu_state_io_func>(get_legacy_fct(CPUINFO_FCT_IMPORT_STATE))),
-	  m_state_export(reinterpret_cast<cpu_state_io_func>(get_legacy_fct(CPUINFO_FCT_EXPORT_STATE))),
-	  m_string_export(reinterpret_cast<cpu_string_io_func>(get_legacy_fct(CPUINFO_FCT_EXPORT_STRING))),
-	  m_exit(reinterpret_cast<cpu_exit_func>(get_legacy_fct(CPUINFO_FCT_EXIT))),
-	  m_using_legacy_state(false),
-	  m_inited(false)
+		m_get_info(get_info),
+		m_token(NULL),
+		m_set_info(reinterpret_cast<cpu_set_info_func>(get_legacy_fct(CPUINFO_FCT_SET_INFO))),
+		m_execute(reinterpret_cast<cpu_execute_func>(get_legacy_fct(CPUINFO_FCT_EXECUTE))),
+		m_burn(reinterpret_cast<cpu_burn_func>(get_legacy_fct(CPUINFO_FCT_BURN))),
+		m_translate(reinterpret_cast<cpu_translate_func>(get_legacy_fct(CPUINFO_FCT_TRANSLATE))),
+		m_read(reinterpret_cast<cpu_read_func>(get_legacy_fct(CPUINFO_FCT_READ))),
+		m_write(reinterpret_cast<cpu_write_func>(get_legacy_fct(CPUINFO_FCT_WRITE))),
+		m_readop(reinterpret_cast<cpu_readop_func>(get_legacy_fct(CPUINFO_FCT_READOP))),
+		m_disassemble(reinterpret_cast<cpu_disassemble_func>(get_legacy_fct(CPUINFO_FCT_DISASSEMBLE))),
+		m_state_import(reinterpret_cast<cpu_state_io_func>(get_legacy_fct(CPUINFO_FCT_IMPORT_STATE))),
+		m_state_export(reinterpret_cast<cpu_state_io_func>(get_legacy_fct(CPUINFO_FCT_EXPORT_STATE))),
+		m_string_export(reinterpret_cast<cpu_string_io_func>(get_legacy_fct(CPUINFO_FCT_EXPORT_STRING))),
+		m_exit(reinterpret_cast<cpu_exit_func>(get_legacy_fct(CPUINFO_FCT_EXIT))),
+		m_using_legacy_state(false),
+		m_inited(false)
 {
 	// build up our address spaces; legacy devices don't have logical spaces
 	memset(m_space_config, 0, sizeof(m_space_config));
@@ -443,7 +443,7 @@ void legacy_cpu_device::state_import(const device_state_entry &entry)
 	if (m_using_legacy_state)
 	{
 		if (entry.index() == STATE_GENFLAGS)
-			;	// do nothing
+			;   // do nothing
 		else
 			set_legacy_int(CPUINFO_INT_REGISTER + entry.index(), m_state_io);
 	}

@@ -55,55 +55,55 @@
 /* d3d_texture_info holds information about a texture */
 struct d3d_texture_info
 {
-	d3d_texture_info *		next;						// next texture in the list
-	d3d_texture_info *		prev;						// prev texture in the list
-	UINT32					hash;						// hash value for the texture
-	UINT32					flags;						// rendering flags
-	render_texinfo			texinfo;					// copy of the texture info
-	float					ustart, ustop;				// beginning/ending U coordinates
-	float					vstart, vstop;				// beginning/ending V coordinates
-	int						rawwidth, rawheight;		// raw width/height of the texture
-	int						type;						// what type of texture are we?
-	int						xborderpix;					// number of border pixels in X
-	int						yborderpix;					// number of border pixels in Y
-	int						xprescale;					// what is our X prescale factor?
-	int						yprescale;					// what is our Y prescale factor?
-	int						cur_frame;					// what is our current frame?
-	int						prev_frame;					// what was our last frame? (used to determine pause state)
-	d3d_texture *			d3dtex;						// Direct3D texture pointer
-	d3d_surface *			d3dsurface;					// Direct3D offscreen plain surface pointer
-	d3d_texture *			d3dfinaltex;				// Direct3D final (post-scaled) texture
-	int						target_index;				// Direct3D target index
+	d3d_texture_info *      next;                       // next texture in the list
+	d3d_texture_info *      prev;                       // prev texture in the list
+	UINT32                  hash;                       // hash value for the texture
+	UINT32                  flags;                      // rendering flags
+	render_texinfo          texinfo;                    // copy of the texture info
+	float                   ustart, ustop;              // beginning/ending U coordinates
+	float                   vstart, vstop;              // beginning/ending V coordinates
+	int                     rawwidth, rawheight;        // raw width/height of the texture
+	int                     type;                       // what type of texture are we?
+	int                     xborderpix;                 // number of border pixels in X
+	int                     yborderpix;                 // number of border pixels in Y
+	int                     xprescale;                  // what is our X prescale factor?
+	int                     yprescale;                  // what is our Y prescale factor?
+	int                     cur_frame;                  // what is our current frame?
+	int                     prev_frame;                 // what was our last frame? (used to determine pause state)
+	d3d_texture *           d3dtex;                     // Direct3D texture pointer
+	d3d_surface *           d3dsurface;                 // Direct3D offscreen plain surface pointer
+	d3d_texture *           d3dfinaltex;                // Direct3D final (post-scaled) texture
+	int                     target_index;               // Direct3D target index
 };
 
 
 /* d3d_poly_info holds information about a single polygon/d3d primitive */
 struct d3d_poly_info
 {
-	 D3DPRIMITIVETYPE		type;						// type of primitive
-	 UINT32					count;						// total number of primitives
-	 UINT32					numverts;					// total number of vertices
-	 UINT32					flags;						// rendering flags
-	 DWORD					modmode;					// texture modulation mode
-	 d3d_texture_info *		texture;					// pointer to texture info
+		D3DPRIMITIVETYPE        type;                       // type of primitive
+		UINT32                  count;                      // total number of primitives
+		UINT32                  numverts;                   // total number of vertices
+		UINT32                  flags;                      // rendering flags
+		DWORD                   modmode;                    // texture modulation mode
+		d3d_texture_info *      texture;                    // pointer to texture info
 };
 
 
 /* d3d_vertex describes a single vertex */
 struct d3d_vertex
 {
-	float					x, y, z;					// X,Y,Z coordinates
-	float					rhw;						// RHW when no HLSL, padding when HLSL
-	D3DCOLOR				color;						// diffuse color
-	float					u0, v0;						// texture stage 0 coordinates
+	float                   x, y, z;                    // X,Y,Z coordinates
+	float                   rhw;                        // RHW when no HLSL, padding when HLSL
+	D3DCOLOR                color;                      // diffuse color
+	float                   u0, v0;                     // texture stage 0 coordinates
 };
 
 
 /* line_aa_step is used for drawing antialiased lines */
 struct line_aa_step
 {
-	float					xoffs, yoffs;				// X/Y deltas
-	float					weight;						// weight contribution
+	float                   xoffs, yoffs;               // X/Y deltas
+	float                   weight;                     // weight contribution
 };
 
 

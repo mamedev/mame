@@ -166,18 +166,18 @@ void c64_rex_ep256_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       socket selection bit 0
-            1       socket selection bit 1
-            2       socket selection bit 2
-            3
-            4
-            5       bank selection bit 0
-            6       bank selection bit 1
-            7
+		    0       socket selection bit 0
+		    1       socket selection bit 1
+		    2       socket selection bit 2
+		    3
+		    4
+		    5       bank selection bit 0
+		    6       bank selection bit 1
+		    7
 
-        */
+		*/
 
 		m_reset = 0;
 

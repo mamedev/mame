@@ -47,7 +47,7 @@
 #include "sound/sp0256.h"
 
 class cpc_ssa1_device : public device_t,
-					    public device_cpc_expansion_card_interface
+						public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -71,7 +71,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "cpc_ssa1"; }
+	virtual void device_config_complete() { m_shortname = "cpc_ssa1"; }
 
 private:
 	cpc_expansion_slot_device *m_slot;
@@ -108,7 +108,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "cpc_dkspeech"; }
+	virtual void device_config_complete() { m_shortname = "cpc_dkspeech"; }
 
 private:
 	cpc_expansion_slot_device *m_slot;

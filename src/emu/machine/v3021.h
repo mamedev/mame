@@ -35,7 +35,7 @@ struct rtc_regs_t
 
 // ======================> v3021_device
 
-class v3021_device :	public device_t
+class v3021_device :    public device_t
 {
 public:
 	// construction/destruction

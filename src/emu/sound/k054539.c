@@ -28,7 +28,7 @@ const device_type K054539 = &device_creator<k054539_device>;
 
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054539, "K054539", "k054539", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -349,11 +349,11 @@ WRITE8_MEMBER(k054539_device::write)
 		int voice, reg;
 
 		/* The K054539 has behavior like many other wavetable chips including
-           the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
-           to it's current position is silently ignored.
+		   the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
+		   to it's current position is silently ignored.
 
-           Dadandaan depends on this or the vocals go wrong.
-        */
+		   Dadandaan depends on this or the vocals go wrong.
+		*/
 		if (offset < 8*0x20)
 		{
 			voice = offset / 0x20;
@@ -444,8 +444,8 @@ WRITE8_MEMBER(k054539_device::write)
 				if((offset & 0xff00) == 0) {
 					chanoff = offset & 0x1f;
 					if(chanoff < 4 || chanoff == 5 ||
-					   (chanoff >=8 && chanoff <= 0xa) ||
-					   (chanoff >= 0xc && chanoff <= 0xe))
+						(chanoff >=8 && chanoff <= 0xa) ||
+						(chanoff >= 0xc && chanoff <= 0xe))
 						break;
 				}
 				if(1 || ((offset >= 0x200) && (offset <= 0x210)))
@@ -494,15 +494,15 @@ void k054539_device::device_start()
 	flags = RESET_FLAGS;
 
 	/*
-        I've tried various equations on volume control but none worked consistently.
-        The upper four channels in most MW/GX games simply need a significant boost
-        to sound right. For example, the bass and smash sound volumes in Violent Storm
-        have roughly the same values and the voices in Tokimeki Puzzledama are given
-        values smaller than those of the hihats. Needless to say the two K054539 chips
-        in Mystic Warriors are completely out of balance. Rather than forcing a
-        "one size fits all" function to the voltab the current invert exponential
-        appraoch seems most appropriate.
-    */
+	    I've tried various equations on volume control but none worked consistently.
+	    The upper four channels in most MW/GX games simply need a significant boost
+	    to sound right. For example, the bass and smash sound volumes in Violent Storm
+	    have roughly the same values and the voices in Tokimeki Puzzledama are given
+	    values smaller than those of the hihats. Needless to say the two K054539 chips
+	    in Mystic Warriors are completely out of balance. Rather than forcing a
+	    "one size fits all" function to the voltab the current invert exponential
+	    appraoch seems most appropriate.
+	*/
 	// Factor the 1/4 for the number of channels in the volume (1/8 is too harsh, 1/2 gives clipping)
 	// vol=0 -> no attenuation, vol=0x40 -> -36dB
 	for(int i=0; i<256; i++)

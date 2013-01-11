@@ -189,14 +189,14 @@ READ8_MEMBER( eacc_state::eacc_keyboard_r )
 
 WRITE8_MEMBER( eacc_state::eacc_segment_w )
 {
-    //d7 segment dot
-    //d6 segment c
-    //d5 segment d
-    //d4 segment e
-    //d3 segment a
-    //d2 segment b
-    //d1 segment f
-    //d0 segment g
+	//d7 segment dot
+	//d6 segment c
+	//d5 segment d
+	//d4 segment e
+	//d3 segment a
+	//d2 segment b
+	//d1 segment f
+	//d0 segment g
 
 	if (!m_nmi)
 	{
@@ -233,18 +233,18 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
 
 static const pia6821_interface eacc_mc6821_intf =
 {
-	DEVCB_NULL,	/* port A input */
-	DEVCB_DRIVER_MEMBER(eacc_state, eacc_keyboard_r),	/* port B input - PB0,1,2 keyboard */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_distance_r),	/* CA1 input - pulses as car moves */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_cb1_r),	/* CB1 input - NMI pulse at 15Hz */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_fuel_sensor_r),	/* CA2 input - pulses as fuel consumed */
-	DEVCB_NULL,						/* CB2 input */
-	DEVCB_DRIVER_MEMBER(eacc_state, eacc_segment_w),	/* port A output */
-	DEVCB_DRIVER_MEMBER(eacc_state, eacc_digit_w),		/* port B output */
-	DEVCB_NULL,						/* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_cb2_w),	/* CB2 output - high after boot complete */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),	/* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB output */
+	DEVCB_NULL, /* port A input */
+	DEVCB_DRIVER_MEMBER(eacc_state, eacc_keyboard_r),   /* port B input - PB0,1,2 keyboard */
+	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_distance_r),  /* CA1 input - pulses as car moves */
+	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_cb1_r),   /* CB1 input - NMI pulse at 15Hz */
+	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_fuel_sensor_r),   /* CA2 input - pulses as fuel consumed */
+	DEVCB_NULL,                     /* CB2 input */
+	DEVCB_DRIVER_MEMBER(eacc_state, eacc_segment_w),    /* port A output */
+	DEVCB_DRIVER_MEMBER(eacc_state, eacc_digit_w),      /* port B output */
+	DEVCB_NULL,                     /* CA2 output */
+	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_cb2_w),   /* CB2 output - high after boot complete */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
 };
 
 
@@ -283,4 +283,3 @@ ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME        FLAGS */
 COMP( 1982, eacc,       0,          0,      eacc,       eacc, driver_device,   0,     "Electronics Australia", "EA Car Computer", GAME_NO_SOUND_HW)
-

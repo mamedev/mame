@@ -55,40 +55,40 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 
 
 	/* Draw the beer truck. Positioning was based on a screen shot.
-        We scan the truck's window RAM for a location whose bit is set and
-        which corresponds either to the truck's front end or the truck's back
-        end (based on the value of the truck image line sync register). We
-        then draw a truck image in the proper place and continue scanning.
-        This is not a perfect emulation of the game hardware, but it should
-        suffice for the way the game software uses the hardware.  It does take
-        care of the problem of displaying multiple beer trucks and of scrolling
-        truck images smoothly off the top of the screen. */
+	    We scan the truck's window RAM for a location whose bit is set and
+	    which corresponds either to the truck's front end or the truck's back
+	    end (based on the value of the truck image line sync register). We
+	    then draw a truck image in the proper place and continue scanning.
+	    This is not a perfect emulation of the game hardware, but it should
+	    suffice for the way the game software uses the hardware.  It does take
+	    care of the problem of displaying multiple beer trucks and of scrolling
+	    truck images smoothly off the top of the screen. */
 
 	for (y = 0; y < 256; y++)
 	{
 		/* y is going up the screen, but the truck window RAM locations
-        go down the screen. */
+		go down the screen. */
 
 		if (m_truckram[255 - y])
 		{
 			/* The hardware only uses the low 5 bits of the truck image line
-            sync register. */
+			sync register. */
 			if ((m_trucky[0] & 0x1f) == ((y + 31) & 0x1f))
 			{
 				/* We've hit a truck's back end, so draw the truck.  The front
-                   end may be off the top of the screen, but we don't care. */
+				   end may be off the top of the screen, but we don't care. */
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 						0,0,
 						0,0,
 						0x80,256 - (y + 31),0);
 				/* Skip past this truck's front end so we don't draw this
-                truck twice. */
+				truck twice. */
 				y += 31;
 			}
 			else if ((m_trucky[0] & 0x1f) == (y & 0x1f))
 			{
 				/* We missed a truck's back end (it was off the bottom of the
-                   screen) but have hit its front end, so draw the truck. */
+				   screen) but have hit its front end, so draw the truck. */
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 						0,0,
 						0,0,
@@ -99,8 +99,8 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 
 
 	/* Draw the bullets.
-       They are flickered on/off every frame by the software, so don't
-       play it with frameskip 1 or 3, as they could become invisible */
+	   They are flickered on/off every frame by the software, so don't
+	   play it with frameskip 1 or 3, as they could become invisible */
 
 	for (x = 0; x < 256; x++)
 	{

@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "includes/dai.h"
 
-#define DEBUG_DAI_PORTS	0
+#define DEBUG_DAI_PORTS 0
 
 #define LOG_DAI_PORT_R(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port read : %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
 #define LOG_DAI_PORT_W(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port write: %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
@@ -76,12 +76,12 @@ TMS5501_INTERFACE( dai_tms5501_interface )
 
 I8255A_INTERFACE( dai_ppi82555_intf )
 {
-	DEVCB_NULL,	/* Port A read */
-	DEVCB_NULL,	/* Port A write */
-	DEVCB_NULL,	/* Port B read */
-	DEVCB_NULL,	/* Port B write */
-	DEVCB_NULL,	/* Port C read */
-	DEVCB_NULL	/* Port C write */
+	DEVCB_NULL, /* Port A read */
+	DEVCB_NULL, /* Port A write */
+	DEVCB_NULL, /* Port B read */
+	DEVCB_NULL, /* Port B write */
+	DEVCB_NULL, /* Port C read */
+	DEVCB_NULL  /* Port C write */
 };
 
 const struct pit8253_config dai_pit8253_intf =
@@ -115,7 +115,7 @@ void dai_state::machine_start()
 
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(dai_state::dai_bootstrap_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(dai_state::dai_timer),this));	/* timer for tms5501 */
+	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(dai_state::dai_timer),this)); /* timer for tms5501 */
 
 	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, machine().device<ram_device>(RAM_TAG)->size());
 }
@@ -161,11 +161,11 @@ READ8_MEMBER(dai_state::dai_io_discrete_devices_r)
 	switch(offset & 0x000f) {
 	case 0x00:
 		data = ioport("IN8")->read();
-		data |= 0x08;			// serial ready
+		data |= 0x08;           // serial ready
 		if (machine().rand()&0x01)
-			data |= 0x40;		// random number generator
+			data |= 0x40;       // random number generator
 		if (machine().device<cassette_image_device>(CASSETTE_TAG)->input() > 0.01)
-			data |= 0x80;		// tape input
+			data |= 0x80;       // tape input
 		break;
 
 	default:
@@ -248,4 +248,3 @@ WRITE8_MEMBER(dai_state::dai_amd9511_w)
 {
 	logerror ("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
 }
-

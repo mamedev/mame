@@ -24,7 +24,7 @@
 // ======================> adam_ram_expansion_device
 
 class adam_ram_expansion_device :  public device_t,
-								   public device_adam_expansion_slot_card_interface
+									public device_adam_expansion_slot_card_interface
 {
 public:
 	// construction/destruction

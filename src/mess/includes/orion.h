@@ -16,7 +16,7 @@ class orion_state : public radio86_state
 public:
 	orion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag),
-		  m_fdc(*this, "fd1793")
+			m_fdc(*this, "fd1793")
 		{ }
 
 	UINT8 m_orion128_video_mode;
@@ -80,4 +80,3 @@ public:
 extern const i8255_interface orion128_ppi8255_interface_1;
 
 #endif /* ORION_H_ */
-

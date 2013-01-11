@@ -29,8 +29,8 @@ public:
 	INT32                m_spelunkr_palbank;
 
 	/* misc */
-	int                 m_ldrun2_bankswap;	//ldrun2
-	int                 m_bankcontrol[2];	//ldrun2
+	int                 m_ldrun2_bankswap;  //ldrun2
+	int                 m_bankcontrol[2];   //ldrun2
 	DECLARE_READ8_MEMBER(ldrun2_bankswitch_r);
 	DECLARE_WRITE8_MEMBER(ldrun2_bankswitch_w);
 	DECLARE_READ8_MEMBER(ldrun3_prot_5_r);

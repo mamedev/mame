@@ -133,10 +133,10 @@ WRITE_LINE_MEMBER( lc80_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z0_w),			/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z1_w),			/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z2_w)  		/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z0_w),         /* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z1_w),         /* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(lc80_state, ctc_z2_w)          /* ZC/TO2 callback */
 };
 
 /* Z80-PIO Interface */
@@ -155,18 +155,18 @@ WRITE8_MEMBER( lc80_state::pio1_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     VQE23 segment B
-        PA1     VQE23 segment F
-        PA2     VQE23 segment A
-        PA3     VQE23 segment G
-        PA4     VQE23 segment DP
-        PA5     VQE23 segment C
-        PA6     VQE23 segment E
-        PA7     VQE23 segment D
+	    PA0     VQE23 segment B
+	    PA1     VQE23 segment F
+	    PA2     VQE23 segment A
+	    PA3     VQE23 segment G
+	    PA4     VQE23 segment DP
+	    PA5     VQE23 segment C
+	    PA6     VQE23 segment E
+	    PA7     VQE23 segment D
 
-    */
+	*/
 
 	m_segment = BITSWAP8(~data, 4, 3, 1, 6, 7, 5, 0, 2);
 
@@ -177,18 +177,18 @@ READ8_MEMBER( lc80_state::pio1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     tape input
-        PB1     tape output
-        PB2     digit 0
-        PB3     digit 1
-        PB4     digit 2
-        PB5     digit 3
-        PB6     digit 4
-        PB7     digit 5
+	    PB0     tape input
+	    PB1     tape output
+	    PB2     digit 0
+	    PB3     digit 1
+	    PB4     digit 2
+	    PB5     digit 3
+	    PB6     digit 4
+	    PB7     digit 5
 
-    */
+	*/
 
 	return ((m_cassette)->input() < +0.0);
 }
@@ -197,18 +197,18 @@ WRITE8_MEMBER( lc80_state::pio1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     tape input
-        PB1     tape output, speaker output, OUT led
-        PB2     digit 0
-        PB3     digit 1
-        PB4     digit 2
-        PB5     digit 3
-        PB6     digit 4
-        PB7     digit 5
+	    PB0     tape input
+	    PB1     tape output, speaker output, OUT led
+	    PB2     digit 0
+	    PB3     digit 1
+	    PB4     digit 2
+	    PB5     digit 3
+	    PB6     digit 4
+	    PB7     digit 5
 
-    */
+	*/
 
 	/* tape output */
 	m_cassette->output( BIT(data, 1) ? +1.0 : -1.0);
@@ -228,31 +228,31 @@ WRITE8_MEMBER( lc80_state::pio1_pb_w )
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_DRIVER_MEMBER(lc80_state, pio1_pa_w),	/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(lc80_state, pio1_pb_r),	/* port B read callback */
-	DEVCB_DRIVER_MEMBER(lc80_state, pio1_pb_w),	/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_DRIVER_MEMBER(lc80_state, pio1_pa_w), /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(lc80_state, pio1_pb_r), /* port B read callback */
+	DEVCB_DRIVER_MEMBER(lc80_state, pio1_pb_w), /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 READ8_MEMBER( lc80_state::pio2_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0
-        PB1
-        PB2
-        PB3
-        PB4     key row 0
-        PB5     key row 1
-        PB6     key row 2
-        PB7     key row 3
+	    PB0
+	    PB1
+	    PB2
+	    PB3
+	    PB4     key row 0
+	    PB5     key row 1
+	    PB6     key row 2
+	    PB7     key row 3
 
-    */
+	*/
 
 	UINT8 data = 0xf0;
 	int i;
@@ -273,13 +273,13 @@ READ8_MEMBER( lc80_state::pio2_pb_r )
 
 static Z80PIO_INTERFACE( pio2_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(lc80_state, pio2_pb_r),	/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(lc80_state, pio2_pb_r), /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 /* Z80 Daisy Chain */
@@ -412,8 +412,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sc80, lc80_2 )
 
 	/* basic machine hardware */
-    MCFG_CPU_MODIFY(Z80_TAG)
-    MCFG_CPU_PROGRAM_MAP(sc80_mem)
+	MCFG_CPU_MODIFY(Z80_TAG)
+	MCFG_CPU_PROGRAM_MAP(sc80_mem)
 MACHINE_CONFIG_END
 #endif
 

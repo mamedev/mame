@@ -23,5 +23,3 @@ private:
 };
 
 extern const device_type DECO_MXC06;
-
-

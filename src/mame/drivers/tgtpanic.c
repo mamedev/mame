@@ -146,11 +146,11 @@ static MACHINE_CONFIG_START( tgtpanic, tgtpanic_state )
 MACHINE_CONFIG_END
 
 
- /*************************************
- *
- *  ROM definition
- *
- *************************************/
+	/*************************************
+	*
+	*  ROM definition
+	*
+	*************************************/
 
 ROM_START( tgtpanic )
 	ROM_REGION( 0x10000, "maincpu", 0 )

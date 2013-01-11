@@ -61,4 +61,3 @@ class m68340_sim
 
 	void reset(void);
 };
-

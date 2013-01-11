@@ -17,4 +17,3 @@ MACHINE_CONFIG_EXTERN( sufami_cartslot );
 MACHINE_CONFIG_EXTERN( bsx_cartslot );
 
 #endif /* _SNESCART_H */
-

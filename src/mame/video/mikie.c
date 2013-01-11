@@ -34,7 +34,7 @@ void mikie_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, rweights, 470, 0,
 			4, resistances, gweights, 470, 0,
 			4, resistances, bweights, 470, 0);

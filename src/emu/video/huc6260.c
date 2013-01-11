@@ -18,10 +18,10 @@
 #include "profiler.h"
 #include "huc6260.h"
 
-#define LOG	0
+#define LOG 0
 
-#define HUC6260_HSYNC_LENGTH	237
-#define HUC6260_HSYNC_START		( HUC6260_WPF - HUC6260_HSYNC_LENGTH )
+#define HUC6260_HSYNC_LENGTH    237
+#define HUC6260_HSYNC_START     ( HUC6260_WPF - HUC6260_HSYNC_LENGTH )
 
 
 PALETTE_INIT( huc6260 )
@@ -96,7 +96,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		switch( h )
 		{
-		case HUC6260_HSYNC_START:		/* Start of HSync */
+		case HUC6260_HSYNC_START:       /* Start of HSync */
 			m_hsync_changed( 0 );
 //          if ( v == 0 )
 //          {
@@ -117,14 +117,14 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //          }
 			break;
 
-		case 0:		/* End of HSync */
+		case 0:     /* End of HSync */
 			m_hsync_changed( 1 );
 			m_pixel_clock = 0;
 			v = ( v + 1 ) % m_height;
 			bitmap_line = &m_bmp->pix16(v);
 			break;
 
-		case HUC6260_HSYNC_START + 30:		/* End/Start of VSync */
+		case HUC6260_HSYNC_START + 30:      /* End/Start of VSync */
 			if ( v>= m_height - 4 )
 			{
 				m_vsync_changed( ( v >= m_height - 4 && v < m_height - 1 ) ? 0 : 1 );
@@ -201,11 +201,11 @@ READ8_MEMBER( huc6260_device::read )
 
 	switch ( offset & 7 )
 	{
-		case 0x04:	/* Color table data LSB */
+		case 0x04:  /* Color table data LSB */
 			data = m_palette[ m_address ] & 0xFF;
 			break;
 
-		case 0x05:	/* Color table data MSB */
+		case 0x05:  /* Color table data MSB */
 			data = 0xFE | ( m_palette[ m_address ] >> 8 );
 
 			/* Increment internal address */
@@ -221,25 +221,25 @@ WRITE8_MEMBER( huc6260_device::write )
 {
 	switch ( offset & 7 )
 	{
-		case 0x00:	/* Control register */
+		case 0x00:  /* Control register */
 			m_greyscales = data & 0x80;
 			m_blur = data & 0x04;
 			m_pixels_per_clock = ( data & 0x02 ) ? 2 : ( ( data & 0x01 ) ? 3 : 4 );
 			break;
 
-		case 0x02:	/* Color table address LSB */
+		case 0x02:  /* Color table address LSB */
 			m_address = ( ( m_address & 0xFF00 ) | data ) & 0x1FF;
 			break;
 
-		case 0x03:	/* Color table address MSB */
+		case 0x03:  /* Color table address MSB */
 			m_address = ( ( m_address & 0x00FF ) | ( data << 8 ) ) & 0x1FF;
 			break;
 
-		case 0x04:	/* Color table data LSB */
+		case 0x04:  /* Color table data LSB */
 			m_palette[ m_address ] = ( ( m_palette[ m_address ] & 0xFF00 ) | data ) & 0x1FF;
 			break;
 
-		case 0x05:	/* Color table data MSB */
+		case 0x05:  /* Color table data MSB */
 			m_palette[ m_address ] = ( ( m_palette[ m_address ] & 0x00FF ) | ( data << 8 ) ) & 0x1FF;
 
 			/* Increment internal address */
@@ -296,4 +296,3 @@ void huc6260_device::device_reset()
 	m_last_h = m_screen->hpos();
 	m_timer->adjust( m_screen->time_until_pos( ( m_screen->vpos() + 1 ) % 263, 0 ) );
 }
-

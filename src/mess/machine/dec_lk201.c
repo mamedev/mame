@@ -13,7 +13,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LK201_CPU_TAG	"lk201"
+#define LK201_CPU_TAG   "lk201"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -23,7 +23,7 @@ const device_type LK201 = &device_creator<lk201_device>;
 
 ROM_START( lk201 )
 	ROM_REGION(0x2000, LK201_CPU_TAG, 0)
-    ROM_LOAD( "23-001s9-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
+	ROM_LOAD( "23-001s9-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
 ROM_END
 
 //-------------------------------------------------
@@ -33,9 +33,9 @@ ROM_END
 static ADDRESS_MAP_START( lk201_map, AS_PROGRAM, 8, lk201_device )
 	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
-    AM_RANGE(0x000a, 0x000c) AM_READWRITE(spi_r, spi_w)
-    AM_RANGE(0x000d, 0x0011) AM_READWRITE(sci_r, sci_w)
-    AM_RANGE(0x0050, 0x00ff) AM_RAM
+	AM_RANGE(0x000a, 0x000c) AM_READWRITE(spi_r, spi_w)
+	AM_RANGE(0x000d, 0x0011) AM_READWRITE(sci_r, sci_w)
+	AM_RANGE(0x0050, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x1fff) AM_ROM AM_REGION(LK201_CPU_TAG, 0x100)
 ADDRESS_MAP_END
 
@@ -73,7 +73,7 @@ const rom_entry *lk201_device::device_rom_region() const
 //-------------------------------------------------
 
 lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock),
+	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock),
 	m_maincpu(*this, LK201_CPU_TAG)
 {
 }
@@ -97,7 +97,7 @@ void lk201_device::device_reset()
 
 void lk201_device::device_config_complete()
 {
-    m_shortname = "lk201";
+	m_shortname = "lk201";
 }
 
 READ8_MEMBER( lk201_device::ddr_r )
@@ -120,13 +120,13 @@ READ8_MEMBER( lk201_device::ports_r )
 
 	switch (offset)
 	{
-		case 0: 	// port A
+		case 0:     // port A
 			break;
 
-        case 1:		// port B
+		case 1:     // port B
 			break;
 
-		case 2:		// port C
+		case 2:     // port C
 			break;
 	}
 
@@ -153,11 +153,11 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
 	switch (offset)
 	{
-        case 0: // port A
+		case 0: // port A
 			break;
 
-        case 1: // port B
-            break;
+		case 1: // port B
+			break;
 
 		case 2: // port C
 			break;
@@ -170,21 +170,21 @@ READ8_MEMBER( lk201_device::sci_r )
 
 	switch (offset)
 	{
-		case 0: 	// baud rate
+		case 0:     // baud rate
 			break;
 
-        case 1:		// control 1
+		case 1:     // control 1
 			break;
 
-		case 2:		// control 2
+		case 2:     // control 2
 			break;
 
-        case 3:		// status
-            incoming |= 0x40;   // indicate transmit ready
-            break;
+		case 3:     // status
+			incoming |= 0x40;   // indicate transmit ready
+			break;
 
-        case 4:		// data
-            break;
+		case 4:     // data
+			break;
 	}
 
 //    printf("SCI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
@@ -196,20 +196,20 @@ WRITE8_MEMBER( lk201_device::sci_w )
 {
 	switch (offset)
 	{
-		case 0: 	// baud rate
+		case 0:     // baud rate
 			break;
 
-        case 1:		// control 1
+		case 1:     // control 1
 			break;
 
-		case 2:		// control 2
+		case 2:     // control 2
 			break;
 
-        case 3:		// status
-            break;
+		case 3:     // status
+			break;
 
-        case 4:		// data
-            break;
+		case 4:     // data
+			break;
 	}
 
 //    printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
@@ -221,14 +221,14 @@ READ8_MEMBER( lk201_device::spi_r )
 
 	switch (offset)
 	{
-		case 0: 	// control
+		case 0:     // control
 			break;
 
-        case 1:		// status
-            incoming |= 0x80;
+		case 1:     // status
+			incoming |= 0x80;
 			break;
 
-		case 2:		// data
+		case 2:     // data
 			break;
 	}
 
@@ -241,13 +241,13 @@ WRITE8_MEMBER( lk201_device::spi_w )
 {
 	switch (offset)
 	{
-		case 0: 	// control
+		case 0:     // control
 			break;
 
-        case 1:		// status
+		case 1:     // status
 			break;
 
-		case 2:		// data
+		case 2:     // data
 			break;
 	}
 

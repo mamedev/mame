@@ -13,13 +13,13 @@
 
 
 /* Interrupts */
-#define INT_HIGH_TONE		0x40
-#define INT_TRANSMIT_EMPTY	0x20
-#define INT_RECEIVE_FULL	0x10
-#define INT_RTC			0x08
-#define INT_DISPLAY_END		0x04
-#define INT_SET			0x100
-#define INT_CLEAR		0x200
+#define INT_HIGH_TONE       0x40
+#define INT_TRANSMIT_EMPTY  0x20
+#define INT_RECEIVE_FULL    0x10
+#define INT_RTC         0x08
+#define INT_DISPLAY_END     0x04
+#define INT_SET         0x100
+#define INT_CLEAR       0x200
 
 /* ULA context */
 

@@ -328,8 +328,8 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 //-------------------------------------------------
 
 gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, GGF1, "Gravis GF1", tag, owner, clock),
-        device_sound_interface( mconfig, *this )
+		: device_t(mconfig, GGF1, "Gravis GF1", tag, owner, clock),
+		device_sound_interface( mconfig, *this )
 {
 }
 
@@ -1237,7 +1237,7 @@ MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( gus_joy )
 	PORT_START("gus_joy")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW,	 IPT_UNUSED ) // x/y ad stick to digital converters
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW,   IPT_UNUSED ) // x/y ad stick to digital converters
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,   IPT_BUTTON1) PORT_NAME("GUS Joystick Button 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,   IPT_BUTTON2) PORT_NAME("GUS Joystick Button 2")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,   IPT_BUTTON3) PORT_NAME("GUS Joystick Button 3")
@@ -1267,8 +1267,8 @@ ioport_constructor isa16_gus_device::device_input_ports() const
 
 
 isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, ISA16_GUS, "Gravis Ultrasound", tag, owner, clock),
-        device_isa16_card_interface( mconfig, *this )
+		: device_t(mconfig, ISA16_GUS, "Gravis Ultrasound", tag, owner, clock),
+		device_isa16_card_interface( mconfig, *this )
 {
 }
 
@@ -1299,15 +1299,15 @@ READ8_MEMBER(isa16_gus_device::board_r)
 	case 0x01:
 		return m_gf1->mix_ctrl_r(space,offset);
 		/* port 0x2X6 - IRQ status (active high)
-         * bit 0 - MIDI transmit IRQ
-         * bit 1 - MIDI receive IRQ
-         * bit 2 - Timer 1 IRQ
-         * bit 3 - Timer 2 IRQ
-         * bit 4 - reserved (always 0)
-         * bit 5 - wavetable IRQ
-         * bit 6 - volume ramp IRQ
-         * bit 7 - DRAM TC DMA IRQ
-         */
+		 * bit 0 - MIDI transmit IRQ
+		 * bit 1 - MIDI receive IRQ
+		 * bit 2 - Timer 1 IRQ
+		 * bit 3 - Timer 2 IRQ
+		 * bit 4 - reserved (always 0)
+		 * bit 5 - wavetable IRQ
+		 * bit 6 - volume ramp IRQ
+		 * bit 7 - DRAM TC DMA IRQ
+		 */
 	case 0x06:
 		return m_irq_status;
 	case 0x08:
@@ -1703,4 +1703,3 @@ void isa16_gus_device::eop_w(int state)
 {
 	m_gf1->eop_w(state);
 }
-

@@ -95,7 +95,7 @@ struct tia
 
 	INT16 Outvol[2];                 /* last output volume for each channel */
 
-	int tia_gain;					/* initialized in tia_sound_init() */
+	int tia_gain;                   /* initialized in tia_sound_init() */
 
 	/* Initialze the bit patterns for the polynomials. */
 
@@ -117,7 +117,7 @@ struct tia
 
 	UINT8 Div_n_cnt[2];              /* Divide by n counter. one for each channel */
 	UINT8 Div_n_max[2];              /* Divide by n maximum, one for each channel */
-	UINT8 Div_3_cnt[2];				/* Div 3 counter, used for POLY5_DIV3 mode */
+	UINT8 Div_3_cnt[2];             /* Div 3 counter, used for POLY5_DIV3 mode */
 
 
 	/* In my routines, I treat the sample output as another divide by N counter. */
@@ -127,7 +127,7 @@ struct tia
 	UINT16 Samp_n_max;               /* Sample max, multiplied by 256 */
 	UINT16 Samp_n_cnt;               /* Sample cnt. */
 
-	int oversampling;				/* Added oversampling for sample_rate > clock_rate */
+	int oversampling;               /* Added oversampling for sample_rate > clock_rate */
 };
 
 
@@ -137,7 +137,7 @@ struct tia
 /* implemented by using counters. */
 
 static const UINT8 Div31[POLY5_SIZE] =
-    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 
 /*****************************************************************************/
@@ -160,85 +160,85 @@ static const UINT8 Div31[POLY5_SIZE] =
 void tia_write(void *_chip, offs_t offset, UINT8 data)
 {
 	struct tia *chip = (struct tia *)_chip;
-    UINT16 new_val = 0;
-    UINT8 chan;
+	UINT16 new_val = 0;
+	UINT8 chan;
 
-    /* determine which address was changed */
-    switch (offset)
-    {
-    case AUDC0:
-        chip->AUDC[0] = data & 0x0f;
-        chan = 0;
-        break;
+	/* determine which address was changed */
+	switch (offset)
+	{
+	case AUDC0:
+		chip->AUDC[0] = data & 0x0f;
+		chan = 0;
+		break;
 
-    case AUDC1:
-        chip->AUDC[1] = data & 0x0f;
-        chan = 1;
-        break;
+	case AUDC1:
+		chip->AUDC[1] = data & 0x0f;
+		chan = 1;
+		break;
 
-    case AUDF0:
-        chip->AUDF[0] = data & 0x1f;
-        chan = 0;
-        break;
+	case AUDF0:
+		chip->AUDF[0] = data & 0x1f;
+		chan = 0;
+		break;
 
-    case AUDF1:
-        chip->AUDF[1] = data & 0x1f;
-        chan = 1;
-        break;
+	case AUDF1:
+		chip->AUDF[1] = data & 0x1f;
+		chan = 1;
+		break;
 
-    case AUDV0:
+	case AUDV0:
 		chip->AUDV[0] = ((data & 0x0f) << AUDV_SHIFT);
-        chan = 0;
-        break;
+		chan = 0;
+		break;
 
-    case AUDV1:
+	case AUDV1:
 		chip->AUDV[1] = ((data & 0x0f) << AUDV_SHIFT);
-        chan = 1;
-        break;
+		chan = 1;
+		break;
 
-    default:
-        chan = 255;
-        break;
-    }
+	default:
+		chan = 255;
+		break;
+	}
 
-    /* if the output value changed */
-    if (chan != 255)
-    {
-        /* an AUDC value of 0 is a special case */
-        if (chip->AUDC[chan] == SET_TO_1 || chip->AUDC[chan] == POLY5_POLY5)
-        {
-            /* indicate the clock is zero so no processing will occur */
-            new_val = 0;
+	/* if the output value changed */
+	if (chan != 255)
+	{
+		/* an AUDC value of 0 is a special case */
+		if (chip->AUDC[chan] == SET_TO_1 || chip->AUDC[chan] == POLY5_POLY5)
+		{
+			/* indicate the clock is zero so no processing will occur */
+			new_val = 0;
 
-            /* and set the output to the selected volume */
-            chip->Outvol[chan] = chip->AUDV[chan];
-        }
-        else
-        {
-            /* otherwise calculate the 'divide by N' value */
-            new_val = chip->AUDF[chan] + 1;
+			/* and set the output to the selected volume */
+			chip->Outvol[chan] = chip->AUDV[chan];
+		}
+		else
+		{
+			/* otherwise calculate the 'divide by N' value */
+			new_val = chip->AUDF[chan] + 1;
 
-            /* if bits 2 & 3 are set, then multiply the 'div by n' count by 3 */
-            if ((chip->AUDC[chan] & DIV3_MASK) == DIV3_MASK && chip->AUDC[chan] != POLY5_DIV3)
-            {
-                new_val *= 3;
-            }
-        }
+			/* if bits 2 & 3 are set, then multiply the 'div by n' count by 3 */
+			if ((chip->AUDC[chan] & DIV3_MASK) == DIV3_MASK && chip->AUDC[chan] != POLY5_DIV3)
+			{
+				new_val *= 3;
+			}
+		}
 
-        /* only reset those channels that have changed */
-        if (new_val != chip->Div_n_max[chan])
-        {
-            /* reset the divide by n counters */
-            chip->Div_n_max[chan] = new_val;
+		/* only reset those channels that have changed */
+		if (new_val != chip->Div_n_max[chan])
+		{
+			/* reset the divide by n counters */
+			chip->Div_n_max[chan] = new_val;
 
-            /* if the channel is now volume only or was volume only */
-            if ((chip->Div_n_cnt[chan] == 0) || (new_val == 0))
-            {
-                /* reset the counter (otherwise let it complete the previous) */
-                chip->Div_n_cnt[chan] = new_val;
-            }
-        }
-    }
+			/* if the channel is now volume only or was volume only */
+			if ((chip->Div_n_cnt[chan] == 0) || (new_val == 0))
+			{
+				/* reset the counter (otherwise let it complete the previous) */
+				chip->Div_n_cnt[chan] = new_val;
+			}
+		}
+	}
 }
 
 
@@ -261,52 +261,52 @@ void tia_write(void *_chip, offs_t offset, UINT8 data)
 void tia_process(void *_chip, stream_sample_t *buffer, int length)
 {
 	struct tia *chip = (struct tia *)_chip;
-    UINT8 audc0, audc1;
-    UINT8 div_n_cnt0, div_n_cnt1;
-    UINT8 p5_0, p5_1;
-    INT16 audv0, audv1, outvol_0, outvol_1;
+	UINT8 audc0, audc1;
+	UINT8 div_n_cnt0, div_n_cnt1;
+	UINT8 p5_0, p5_1;
+	INT16 audv0, audv1, outvol_0, outvol_1;
 
-    audc0 = chip->AUDC[0];
-    audc1 = chip->AUDC[1];
-    audv0 = chip->AUDV[0];
-    audv1 = chip->AUDV[1];
+	audc0 = chip->AUDC[0];
+	audc1 = chip->AUDC[1];
+	audv0 = chip->AUDV[0];
+	audv1 = chip->AUDV[1];
 
-    /* make temporary local copy */
-    p5_0 = chip->P5[0];
-    p5_1 = chip->P5[1];
-    outvol_0 = chip->Outvol[0];
-    outvol_1 = chip->Outvol[1];
-    div_n_cnt0 = chip->Div_n_cnt[0];
-    div_n_cnt1 = chip->Div_n_cnt[1];
+	/* make temporary local copy */
+	p5_0 = chip->P5[0];
+	p5_1 = chip->P5[1];
+	outvol_0 = chip->Outvol[0];
+	outvol_1 = chip->Outvol[1];
+	div_n_cnt0 = chip->Div_n_cnt[0];
+	div_n_cnt1 = chip->Div_n_cnt[1];
 
-    /* loop until the buffer is filled */
-    while (length > 0)
-    {
-        /* Process channel 0 */
-        if (div_n_cnt0 > 1)
-        {
-            div_n_cnt0--;
-        }
-        else if (div_n_cnt0 == 1)
-        {
-			int	prev_bit5 = chip->Bit5[p5_0];
+	/* loop until the buffer is filled */
+	while (length > 0)
+	{
+		/* Process channel 0 */
+		if (div_n_cnt0 > 1)
+		{
+			div_n_cnt0--;
+		}
+		else if (div_n_cnt0 == 1)
+		{
+			int prev_bit5 = chip->Bit5[p5_0];
 
-            div_n_cnt0 = chip->Div_n_max[0];
+			div_n_cnt0 = chip->Div_n_max[0];
 
-            /* the chip->P5 counter has multiple uses, so we inc it here */
-            p5_0++;
-            if (p5_0 == POLY5_SIZE)
-                p5_0 = 0;
+			/* the chip->P5 counter has multiple uses, so we inc it here */
+			p5_0++;
+			if (p5_0 == POLY5_SIZE)
+				p5_0 = 0;
 
-            /* check clock modifier for clock tick */
-            if ((audc0 & 0x02) == 0 ||
-                ((audc0 & 0x01) == 0 && Div31[p5_0]) ||
-                ((audc0 & 0x01) == 1 && chip->Bit5[p5_0]) ||
+			/* check clock modifier for clock tick */
+			if ((audc0 & 0x02) == 0 ||
+				((audc0 & 0x01) == 0 && Div31[p5_0]) ||
+				((audc0 & 0x01) == 1 && chip->Bit5[p5_0]) ||
 				((audc0 & 0x0f) == POLY5_DIV3 && chip->Bit5[p5_0] != prev_bit5))
 			{
-                if (audc0 & 0x04)       /* pure modified clock selected */
-                {
-					if ((audc0 & 0x0f) == POLY5_DIV3)	/* POLY5 -> DIV3 mode */
+				if (audc0 & 0x04)       /* pure modified clock selected */
+				{
+					if ((audc0 & 0x0f) == POLY5_DIV3)   /* POLY5 -> DIV3 mode */
 					{
 						if ( chip->Bit5[p5_0] != prev_bit5 )
 						{
@@ -321,26 +321,26 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 							}
 						}
 					}
-                    else if (outvol_0)       /* if the output was set */
-                        outvol_0 = 0;   /* turn it off */
-                    else
-                        outvol_0 = audv0;   /* else turn it on */
-                }
-                else if (audc0 & 0x08)  /* check for p5/p9 */
-                {
-                    if (audc0 == POLY9) /* check for poly9 */
-                    {
-                        /* inc the poly9 counter */
-                        chip->P9[0]++;
-                        if (chip->P9[0] == POLY9_SIZE)
-                            chip->P9[0] = 0;
+					else if (outvol_0)       /* if the output was set */
+						outvol_0 = 0;   /* turn it off */
+					else
+						outvol_0 = audv0;   /* else turn it on */
+				}
+				else if (audc0 & 0x08)  /* check for p5/p9 */
+				{
+					if (audc0 == POLY9) /* check for poly9 */
+					{
+						/* inc the poly9 counter */
+						chip->P9[0]++;
+						if (chip->P9[0] == POLY9_SIZE)
+							chip->P9[0] = 0;
 
-                        if (chip->Bit9[chip->P9[0]])
-                            outvol_0 = audv0;
-                        else
-                            outvol_0 = 0;
-                    }
-                    else if ( audc0 & 0x02 )
+						if (chip->Bit9[chip->P9[0]])
+							outvol_0 = audv0;
+						else
+							outvol_0 = 0;
+					}
+					else if ( audc0 & 0x02 )
 					{
 						if (outvol_0 || audc0 & 0x01 )
 							outvol_0 = 0;
@@ -348,55 +348,55 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 							outvol_0 = audv0;
 					}
 					else
-                    /* must be poly5 */
-                    {
-                        if (chip->Bit5[p5_0])
-                            outvol_0 = audv0;
-                        else
-                            outvol_0 = 0;
-                    }
-                }
-                else
-                /* poly4 is the only remaining option */
-                {
-                    /* inc the poly4 counter */
-                    chip->P4[0]++;
-                    if (chip->P4[0] == POLY4_SIZE)
-                        chip->P4[0] = 0;
+					/* must be poly5 */
+					{
+						if (chip->Bit5[p5_0])
+							outvol_0 = audv0;
+						else
+							outvol_0 = 0;
+					}
+				}
+				else
+				/* poly4 is the only remaining option */
+				{
+					/* inc the poly4 counter */
+					chip->P4[0]++;
+					if (chip->P4[0] == POLY4_SIZE)
+						chip->P4[0] = 0;
 
-                    if (chip->Bit4[chip->P4[0]])
-                        outvol_0 = audv0;
-                    else
-                        outvol_0 = 0;
-                }
-            }
-        }
+					if (chip->Bit4[chip->P4[0]])
+						outvol_0 = audv0;
+					else
+						outvol_0 = 0;
+				}
+			}
+		}
 
 
-        /* Process channel 1 */
-        if (div_n_cnt1 > 1)
-        {
-            div_n_cnt1--;
-        }
-        else if (div_n_cnt1 == 1)
-        {
+		/* Process channel 1 */
+		if (div_n_cnt1 > 1)
+		{
+			div_n_cnt1--;
+		}
+		else if (div_n_cnt1 == 1)
+		{
 			int prev_bit5 = chip->Bit5[p5_1];
 
-            div_n_cnt1 = chip->Div_n_max[1];
+			div_n_cnt1 = chip->Div_n_max[1];
 
-            /* the chip->P5 counter has multiple uses, so we inc it here */
-            p5_1++;
-            if (p5_1 == POLY5_SIZE)
-                p5_1 = 0;
+			/* the chip->P5 counter has multiple uses, so we inc it here */
+			p5_1++;
+			if (p5_1 == POLY5_SIZE)
+				p5_1 = 0;
 
-            /* check clock modifier for clock tick */
-            if ((audc1 & 0x02) == 0 ||
-                ((audc1 & 0x01) == 0 && Div31[p5_1]) ||
-                ((audc1 & 0x01) == 1 && chip->Bit5[p5_1]) ||
+			/* check clock modifier for clock tick */
+			if ((audc1 & 0x02) == 0 ||
+				((audc1 & 0x01) == 0 && Div31[p5_1]) ||
+				((audc1 & 0x01) == 1 && chip->Bit5[p5_1]) ||
 				((audc1 & 0x0f) == POLY5_DIV3 && chip->Bit5[p5_1] != prev_bit5))
-            {
-                if (audc1 & 0x04)       /* pure modified clock selected */
-                {
+			{
+				if (audc1 & 0x04)       /* pure modified clock selected */
+				{
 					if ((audc1 & 0x0f) == POLY5_DIV3)   /* POLY5 -> DIV3 mode */
 					{
 						if ( chip->Bit5[p5_1] != prev_bit5 )
@@ -412,25 +412,25 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 							}
 						}
 					}
-                    else if (outvol_1)       /* if the output was set */
-                        outvol_1 = 0;   /* turn it off */
-                    else
-                        outvol_1 = audv1;   /* else turn it on */
-                }
-                else if (audc1 & 0x08)  /* check for p5/p9 */
-                {
-                    if (audc1 == POLY9) /* check for poly9 */
-                    {
-                        /* inc the poly9 counter */
-                        chip->P9[1]++;
-                        if (chip->P9[1] == POLY9_SIZE)
-                            chip->P9[1] = 0;
+					else if (outvol_1)       /* if the output was set */
+						outvol_1 = 0;   /* turn it off */
+					else
+						outvol_1 = audv1;   /* else turn it on */
+				}
+				else if (audc1 & 0x08)  /* check for p5/p9 */
+				{
+					if (audc1 == POLY9) /* check for poly9 */
+					{
+						/* inc the poly9 counter */
+						chip->P9[1]++;
+						if (chip->P9[1] == POLY9_SIZE)
+							chip->P9[1] = 0;
 
-                        if (chip->Bit9[chip->P9[1]])
-                            outvol_1 = audv1;
-                        else
-                            outvol_1 = 0;
-                    }
+						if (chip->Bit9[chip->P9[1]])
+							outvol_1 = audv1;
+						else
+							outvol_1 = 0;
+					}
 					else if ( audc1 & 0x02 )
 					{
 						if (outvol_1 || audc1 & 0x01 )
@@ -438,35 +438,35 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 						else
 							outvol_1 = audv1;
 					}
-                    else
-                        /* must be poly5 */
-                    {
-                        if (chip->Bit5[p5_1])
-                            outvol_1 = audv1;
-                        else
-                            outvol_1 = 0;
-                    }
-                }
-                else
-                    /* poly4 is the only remaining option */
-                {
-                    /* inc the poly4 counter */
-                    chip->P4[1]++;
-                    if (chip->P4[1] == POLY4_SIZE)
-                        chip->P4[1] = 0;
+					else
+						/* must be poly5 */
+					{
+						if (chip->Bit5[p5_1])
+							outvol_1 = audv1;
+						else
+							outvol_1 = 0;
+					}
+				}
+				else
+					/* poly4 is the only remaining option */
+				{
+					/* inc the poly4 counter */
+					chip->P4[1]++;
+					if (chip->P4[1] == POLY4_SIZE)
+						chip->P4[1] = 0;
 
-                    if (chip->Bit4[chip->P4[1]])
-                        outvol_1 = audv1;
-                    else
-                        outvol_1 = 0;
-                }
-            }
-        }
+					if (chip->Bit4[chip->P4[1]])
+						outvol_1 = audv1;
+					else
+						outvol_1 = 0;
+				}
+			}
+		}
 
 		if (!chip->oversampling)
 		{
 			/* decrement the sample counter - value is 256 since the lower
-             * byte contains the fractional part */
+			 * byte contains the fractional part */
 			chip->Samp_n_cnt -= 256;
 
 			/* if the count down has reached zero */
@@ -487,7 +487,7 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 			do
 			{
 				/* decrement the sample counter - value is 256 since the lower
-                 * byte contains the fractional part */
+				 * byte contains the fractional part */
 				chip->Samp_n_cnt -= 256;
 				/* calculate the latest output value and place in buffer */
 				*buffer++ = outvol_0 + outvol_1;
@@ -499,31 +499,31 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 			if (chip->Samp_n_cnt < 256)
 				chip->Samp_n_cnt += chip->Samp_n_max;
 		}
-    }
+	}
 
-    /* save for next round */
-    chip->P5[0] = p5_0;
-    chip->P5[1] = p5_1;
-    chip->Outvol[0] = outvol_0;
-    chip->Outvol[1] = outvol_1;
-    chip->Div_n_cnt[0] = div_n_cnt0;
-    chip->Div_n_cnt[1] = div_n_cnt1;
+	/* save for next round */
+	chip->P5[0] = p5_0;
+	chip->P5[1] = p5_1;
+	chip->Outvol[0] = outvol_0;
+	chip->Outvol[1] = outvol_1;
+	chip->Div_n_cnt[0] = div_n_cnt0;
+	chip->Div_n_cnt[1] = div_n_cnt1;
 
 }
 
 static void poly_init(UINT8 *poly, int size, int f0, int f1)
 {
-    int mask = (1 << size) - 1;
-    int i, x = mask;
+	int mask = (1 << size) - 1;
+	int i, x = mask;
 
-    for (i = 0; i < mask; i++)
-    {
+	for (i = 0; i < mask; i++)
+	{
 		int bit0 = ( ( size - f0 ) ? ( x >> ( size - f0 ) ) : x ) & 0x01;
-		int	bit1 = ( ( size - f1 ) ? ( x >> ( size - f1 ) ) : x ) & 0x01;
-        poly[i] = x & 1;
-        /* calculate next bit */
+		int bit1 = ( ( size - f1 ) ? ( x >> ( size - f1 ) ) : x ) & 0x01;
+		poly[i] = x & 1;
+		/* calculate next bit */
 		x = ( x >> 1 ) | ( ( bit0 ^ bit1 ) << ( size - 1) );
-    }
+	}
 }
 
 /*****************************************************************************/
@@ -549,40 +549,40 @@ void *tia_sound_init(int clock, int sample_rate, int gain)
 	chip = global_alloc_clear(struct tia);
 
 	/* set the gain factor (normally use TIA_DEFAULT_GAIN) */
-    chip->tia_gain = gain;
+	chip->tia_gain = gain;
 
 	/* fill the polynomials */
-    poly_init(chip->Bit4, 4, 4, 3);
-    poly_init(chip->Bit5, 5, 5, 3);
-    poly_init(chip->Bit9, 9, 9, 5);
+	poly_init(chip->Bit4, 4, 4, 3);
+	poly_init(chip->Bit5, 5, 5, 3);
+	poly_init(chip->Bit9, 9, 9, 5);
 
-    /* calculate the sample 'divide by N' value based on the playback freq. */
-    chip->Samp_n_max = ((UINT16)(UINT32)clock << 8) / sample_rate;
-    chip->Samp_n_cnt = chip->Samp_n_max;                     /* initialize all bits of the sample counter */
+	/* calculate the sample 'divide by N' value based on the playback freq. */
+	chip->Samp_n_max = ((UINT16)(UINT32)clock << 8) / sample_rate;
+	chip->Samp_n_cnt = chip->Samp_n_max;                     /* initialize all bits of the sample counter */
 
 	if (chip->Samp_n_max < 256) /* we need to use oversampling for sample_rate > clock_rate */
 	{
-    	chip->Samp_n_max = ((UINT16)(UINT32)sample_rate << 8) / clock;
+		chip->Samp_n_max = ((UINT16)(UINT32)sample_rate << 8) / clock;
 		chip->Samp_n_cnt = chip->Samp_n_max;
 		chip->oversampling = 1;
 	}
 
-    /* initialize the local globals */
-    for (chan = CHAN1; chan <= CHAN2; chan++)
-    {
-        chip->Outvol[chan] = 0;
-        chip->Div_n_cnt[chan] = 0;
-        chip->Div_n_max[chan] = 0;
+	/* initialize the local globals */
+	for (chan = CHAN1; chan <= CHAN2; chan++)
+	{
+		chip->Outvol[chan] = 0;
+		chip->Div_n_cnt[chan] = 0;
+		chip->Div_n_max[chan] = 0;
 		chip->Div_3_cnt[chan] = 3;
-        chip->AUDC[chan] = 0;
-        chip->AUDF[chan] = 0;
-        chip->AUDV[chan] = 0;
-        chip->P4[chan] = 0;
-        chip->P5[chan] = 0;
-        chip->P9[chan] = 0;
-    }
+		chip->AUDC[chan] = 0;
+		chip->AUDF[chan] = 0;
+		chip->AUDV[chan] = 0;
+		chip->P4[chan] = 0;
+		chip->P5[chan] = 0;
+		chip->P9[chan] = 0;
+	}
 
-    return chip;
+	return chip;
 }
 
 

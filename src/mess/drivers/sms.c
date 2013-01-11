@@ -70,44 +70,44 @@ DC00      - Selection buttons #2, 9-16 (R)
 
 #include "sms1.lh"
 
-#define MASTER_CLOCK_PAL	53203400	/* This might be a tiny bit too low */
+#define MASTER_CLOCK_PAL    53203400    /* This might be a tiny bit too low */
 
 
 static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
-	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")					/* switchable rom bank */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")					/* switchable rom bank */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xc000, 0xdff7) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
-	AM_RANGE(0xdff8, 0xdfff) AM_RAM						/* RAM "underneath" frame registers */
-	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE(sms_sscope_r, sms_sscope_w)	/* 3-D glasses */
-	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
+	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")                    /* First 0x0400 part always points to first page */
+	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")                    /* switchable rom bank */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")                    /* switchable rom bank */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")                    /* switchable rom bank */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")                    /* switchable rom bank */
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)  /* ROM bank / on-cart RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w) /* ROM bank / on-cart RAM */
+	AM_RANGE(0xc000, 0xdff7) AM_MIRROR(0x2000) AM_RAM           /* RAM (mirror at 0xE000) */
+	AM_RANGE(0xdff8, 0xdfff) AM_RAM                     /* RAM "underneath" frame registers */
+	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE(sms_sscope_r, sms_sscope_w)   /* 3-D glasses */
+	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)   /* Bankswitch control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
-	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")					/* switchable rom bank */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")					/* switchable rom bank */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xc000, 0xdffb) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
-	AM_RANGE(0xdffc, 0xdfff) AM_RAM						/* RAM "underneath" frame registers */
-	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
+	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")                    /* First 0x0400 part always points to first page */
+	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")                    /* switchable rom bank */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")                    /* switchable rom bank */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")                    /* switchable rom bank */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")                    /* switchable rom bank */
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)  /* ROM bank / on-cart RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w) /* ROM bank / on-cart RAM */
+	AM_RANGE(0xc000, 0xdffb) AM_MIRROR(0x2000) AM_RAM           /* RAM (mirror at 0xE000) */
+	AM_RANGE(0xdffc, 0xdfff) AM_RAM                     /* RAM "underneath" frame registers */
+	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)   /* Bankswitch control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, sms_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM						/* BIOS */
-	AM_RANGE(0x4000, 0x47ff) AM_RAM						/* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank10")					/* Cartridge/card peek area */
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sms_store_control_r, sms_store_control_w)	/* Control */
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(sms_store_cart_select_r, sms_store_cart_select_w)	/* cartridge/card slot selector */
-	AM_RANGE(0xd800, 0xd800) AM_READ(sms_store_select1)			/* Game selector port #1 */
-	AM_RANGE(0xdc00, 0xdc00) AM_READ(sms_store_select2)			/* Game selector port #2 */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM                     /* BIOS */
+	AM_RANGE(0x4000, 0x47ff) AM_RAM                     /* RAM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank10")                   /* Cartridge/card peek area */
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sms_store_control_r, sms_store_control_w) /* Control */
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(sms_store_cart_select_r, sms_store_cart_select_w) /* cartridge/card slot selector */
+	AM_RANGE(0xd800, 0xd800) AM_READ(sms_store_select1)         /* Game selector port #1 */
+	AM_RANGE(0xdc00, 0xdc00) AM_READ(sms_store_select2)         /* Game selector port #2 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
@@ -182,37 +182,37 @@ static INPUT_PORTS_START( sms )
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME(DEF_STR(Pause))
 
-	PORT_START("LPHASER0")	/* Light phaser X - player 1 */
+	PORT_START("LPHASER0")  /* Light phaser X - player 1 */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun1_changed, NULL) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 
-	PORT_START("LPHASER1")	/* Light phaser Y - player 1 */
+	PORT_START("LPHASER1")  /* Light phaser Y - player 1 */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun1_changed, NULL) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 
-	PORT_START("LPHASER2")	/* Light phaser X - player 2 */
+	PORT_START("LPHASER2")  /* Light phaser X - player 2 */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun2_changed, NULL) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 
-	PORT_START("LPHASER3")	/* Light phaser Y - player 2 */
+	PORT_START("LPHASER3")  /* Light phaser Y - player 2 */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun2_changed, NULL) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 
-	PORT_START("RFU")	/* Rapid Fire Unit */
+	PORT_START("RFU")   /* Rapid Fire Unit */
 	PORT_CONFNAME( 0x03, 0x00, "Rapid Fire Unit - Player 1" )
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(	0x01, "Button A" )
-	PORT_CONFSETTING(	0x02, "Button B" )
-	PORT_CONFSETTING(	0x03, "Button A + B" )
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x01, "Button A" )
+	PORT_CONFSETTING(   0x02, "Button B" )
+	PORT_CONFSETTING(   0x03, "Button A + B" )
 	PORT_CONFNAME( 0x0c, 0x00, "Rapid Fire Unit - Player 2" )
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(	0x04, "Button A" )
-	PORT_CONFSETTING(	0x08, "Button B" )
-	PORT_CONFSETTING(	0x0c, "Button A + B" )
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x04, "Button A" )
+	PORT_CONFSETTING(   0x08, "Button B" )
+	PORT_CONFSETTING(   0x0c, "Button A + B" )
 
-	PORT_START("PADDLE0")	/* Paddle player 1 */
+	PORT_START("PADDLE0")   /* Paddle player 1 */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
 
-	PORT_START("PADDLE1")	/* Paddle player 2 */
+	PORT_START("PADDLE1")   /* Paddle player 2 */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
 
-	PORT_START("CTRLIPT")	/* Light Phaser and Paddle Control buttons */
+	PORT_START("CTRLIPT")   /* Light Phaser and Paddle Control buttons */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x04)
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( sms )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
 
-	PORT_START("CTRLSEL")	/* Controller selection */
+	PORT_START("CTRLSEL")   /* Controller selection */
 	PORT_CONFNAME( 0x0f, 0x00, "Player 1 Controller" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Joystick ) )
 	PORT_CONFSETTING( 0x01, "Light Phaser" )
@@ -234,16 +234,16 @@ static INPUT_PORTS_START( sms )
 	PORT_CONFSETTING( 0x20, "Sega Paddle Control" )
 	PORT_CONFSETTING( 0x40, "Sega Sports Pad" )
 
-	PORT_START("SPORT0")	/* Player 1 Sports Pad X axis */
+	PORT_START("SPORT0")    /* Player 1 Sports Pad X axis */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x04)
 
-	PORT_START("SPORT1")	/* Player 1 Sports Pad Y axis */
+	PORT_START("SPORT1")    /* Player 1 Sports Pad Y axis */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x04)
 
-	PORT_START("SPORT2")	/* Player 2 Sports Pad X axis */
+	PORT_START("SPORT2")    /* Player 2 Sports Pad X axis */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
 
-	PORT_START("SPORT3")	/* Player 2 Sports Pad Y axis */
+	PORT_START("SPORT3")    /* Player 2 Sports Pad Y axis */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
 INPUT_PORTS_END
 
@@ -342,7 +342,7 @@ static const sega315_5124_interface sms_store_intf =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -405,7 +405,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sms1_mem)	// This adds the SegaScope handlers for 3-D glasses
+	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
 	MCFG_CPU_IO_MAP(sms_io)
 
 	/* video hardware */
@@ -415,13 +415,13 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)	// This is needed for SegaScope Left LCD
+	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
 	MCFG_SCREEN_RAW_PARAMS(XTAL_53_693175MHz/10, \
 		SEGA315_5124_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)	// This is needed for SegaScope Right LCD
+	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
 	MCFG_SCREEN_RAW_PARAMS(XTAL_53_693175MHz/10, \
 		SEGA315_5124_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
@@ -519,7 +519,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sms1_mem)	// This adds the SegaScope handlers for 3-D glasses
+	MCFG_CPU_PROGRAM_MAP(sms1_mem)  // This adds the SegaScope handlers for 3-D glasses
 	MCFG_CPU_IO_MAP(sms_io)
 
 	/* video hardware */
@@ -529,13 +529,13 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 		SEGA315_5124_HEIGHT_PAL, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT + 240)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_ADD("left_lcd", LCD)	// This is needed for SegaScope Left LCD
+	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, \
 		SEGA315_5124_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
 		SEGA315_5124_HEIGHT_PAL, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT + 240)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_ADD("right_lcd", LCD)	// This is needed for SegaScope Right LCD
+	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, \
 		SEGA315_5124_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
 		SEGA315_5124_HEIGHT_PAL, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT + 240)

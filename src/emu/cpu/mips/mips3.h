@@ -171,8 +171,8 @@ enum
 	MIPS3_BADVADDR
 };
 
-#define MIPS3_MAX_FASTRAM		4
-#define MIPS3_MAX_HOTSPOTS		16
+#define MIPS3_MAX_FASTRAM       4
+#define MIPS3_MAX_HOTSPOTS      16
 
 enum
 {
@@ -197,12 +197,12 @@ enum
     INTERRUPT CONSTANTS
 ***************************************************************************/
 
-#define MIPS3_IRQ0		0		/* IRQ0 */
-#define MIPS3_IRQ1		1		/* IRQ1 */
-#define MIPS3_IRQ2		2		/* IRQ2 */
-#define MIPS3_IRQ3		3		/* IRQ3 */
-#define MIPS3_IRQ4		4		/* IRQ4 */
-#define MIPS3_IRQ5		5		/* IRQ5 */
+#define MIPS3_IRQ0      0       /* IRQ0 */
+#define MIPS3_IRQ1      1       /* IRQ1 */
+#define MIPS3_IRQ2      2       /* IRQ2 */
+#define MIPS3_IRQ3      3       /* IRQ3 */
+#define MIPS3_IRQ4      4       /* IRQ4 */
+#define MIPS3_IRQ5      5       /* IRQ5 */
 
 
 
@@ -212,9 +212,9 @@ enum
 
 struct mips3_config
 {
-	size_t		icache;							/* code cache size */
-	size_t		dcache;							/* data cache size */
-	UINT32		system_clock;					/* system clock rate */
+	size_t      icache;                         /* code cache size */
+	size_t      dcache;                         /* data cache size */
+	UINT32      system_clock;                   /* system clock rate */
 };
 
 
@@ -257,14 +257,14 @@ DECLARE_LEGACY_CPU_DEVICE(RM7000LE, rm7000le);
 ***************************************************************************/
 
 /* fix me -- how do we make this work?? */
-#define MIPS3DRC_STRICT_VERIFY		0x0001			/* verify all instructions */
-#define MIPS3DRC_STRICT_COP1		0x0002			/* validate all COP1 instructions */
-#define MIPS3DRC_STRICT_COP2		0x0004			/* validate all COP2 instructions */
-#define MIPS3DRC_FLUSH_PC			0x0008			/* flush the PC value before each memory access */
-#define MIPS3DRC_CHECK_OVERFLOWS	0x0010			/* actually check overflows on add/sub instructions */
+#define MIPS3DRC_STRICT_VERIFY      0x0001          /* verify all instructions */
+#define MIPS3DRC_STRICT_COP1        0x0002          /* validate all COP1 instructions */
+#define MIPS3DRC_STRICT_COP2        0x0004          /* validate all COP2 instructions */
+#define MIPS3DRC_FLUSH_PC           0x0008          /* flush the PC value before each memory access */
+#define MIPS3DRC_CHECK_OVERFLOWS    0x0010          /* actually check overflows on add/sub instructions */
 
-#define MIPS3DRC_COMPATIBLE_OPTIONS	(MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
-#define MIPS3DRC_FASTEST_OPTIONS	(0)
+#define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
+#define MIPS3DRC_FASTEST_OPTIONS    (0)
 
 
 

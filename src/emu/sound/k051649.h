@@ -17,7 +17,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( k052539_waveform_w );
 DECLARE_READ8_DEVICE_HANDLER ( k052539_waveform_r );
 
 class k051649_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

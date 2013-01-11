@@ -36,13 +36,13 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6502_TAG		"un1"
-#define M6532_0_TAG		"uc1"
-#define M6532_1_TAG		"ue1"
+#define M6502_TAG       "un1"
+#define M6532_0_TAG     "uc1"
+#define M6532_1_TAG     "ue1"
 
-#define M6504_TAG		"uh3"
-#define M6522_TAG		"um3"
-#define M6530_TAG		"uk3"
+#define M6504_TAG       "uh3"
+#define M6522_TAG       "um3"
+#define M6530_TAG       "uk3"
 
 
 enum
@@ -123,11 +123,11 @@ void c2040_device::device_config_complete()
 
 ROM_START( c2040 ) // schematic 320806
 	ROM_REGION( 0x3000, M6502_TAG, 0 )
-    ROM_DEFAULT_BIOS("dos12")
-    ROM_SYSTEM_BIOS( 0, "dos10", "DOS 1.0" )
+	ROM_DEFAULT_BIOS("dos12")
+	ROM_SYSTEM_BIOS( 0, "dos10", "DOS 1.0" )
 	ROMX_LOAD( "901468-xx.ul1", 0x1000, 0x1000, NO_DUMP, ROM_BIOS(1) )
 	ROMX_LOAD( "901468-xx.uh1", 0x2000, 0x1000, NO_DUMP, ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS( 1, "dos12", "DOS 1.2" )
+	ROM_SYSTEM_BIOS( 1, "dos12", "DOS 1.2" )
 	ROMX_LOAD( "901468-06.ul1", 0x1000, 0x1000, CRC(25b5eed5) SHA1(4d9658f2e6ff3276e5c6e224611a66ce44b16fc7), ROM_BIOS(2) )
 	ROMX_LOAD( "901468-07.uh1", 0x2000, 0x1000, CRC(9b09ae83) SHA1(6a51c7954938439ca8342fc295bda050c06e1791), ROM_BIOS(2) )
 
@@ -146,8 +146,8 @@ ROM_END
 
 ROM_START( c4040 ) // schematic ?
 	ROM_REGION( 0x3000, M6502_TAG, 0 )
-    ROM_DEFAULT_BIOS("dos20r2")
-    ROM_SYSTEM_BIOS( 0, "dos20r1", "DOS 2.0 Revision 1" )
+	ROM_DEFAULT_BIOS("dos20r2")
+	ROM_SYSTEM_BIOS( 0, "dos20r1", "DOS 2.0 Revision 1" )
 	ROMX_LOAD( "901468-11.uj1", 0x0000, 0x1000, CRC(b7157458) SHA1(8415f3159dea73161e0cef7960afa6c76953b6f8), ROM_BIOS(1) )
 	ROMX_LOAD( "901468-12.ul1", 0x1000, 0x1000, CRC(02c44ff9) SHA1(e8a94f239082d45f64f01b2d8e488d18fe659cbb), ROM_BIOS(1) )
 	ROMX_LOAD( "901468-13.uh1", 0x2000, 0x1000, CRC(cbd785b3) SHA1(6ada7904ac9d13c3f1c0a8715f9c4be1aa6eb0bb), ROM_BIOS(1) )
@@ -186,11 +186,11 @@ ROM_END
 
 ROM_START( c8050 ) // schematic 8050001
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_DEFAULT_BIOS("dos27")
-    ROM_SYSTEM_BIOS( 0, "dos25r1", "DOS 2.5 Revision 1" )
+	ROM_DEFAULT_BIOS("dos27")
+	ROM_SYSTEM_BIOS( 0, "dos25r1", "DOS 2.5 Revision 1" )
 	ROMX_LOAD( "901482-01.ul1", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1) )
 	ROMX_LOAD( "901482-02.uh1", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS( 1, "dos25r2", "DOS 2.5 Revision 2" )
+	ROM_SYSTEM_BIOS( 1, "dos25r2", "DOS 2.5 Revision 2" )
 	ROMX_LOAD( "901482-03.ul1", 0x0000, 0x2000, CRC(09a609b9) SHA1(166d8bfaaa9c4767f9b17ad63fc7ae77c199a64e), ROM_BIOS(2) )
 	ROMX_LOAD( "901482-04.uh1", 0x2000, 0x2000, CRC(1bcf9df9) SHA1(217f4a8b348658bb365f4a1de21ecbaa6402b1c0), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "dos25r3", "DOS 2.5 Revision 3" )
@@ -201,7 +201,7 @@ ROM_START( c8050 ) // schematic 8050001
 	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(4) )
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
-	ROM_LOAD_OPTIONAL( "901483-02.uk3", 0x000, 0x400, NO_DUMP )	// 6530-036
+	ROM_LOAD_OPTIONAL( "901483-02.uk3", 0x000, 0x400, NO_DUMP ) // 6530-036
 	ROM_LOAD_OPTIONAL( "901483-03.uk3", 0x000, 0x400, CRC(9e83fa70) SHA1(e367ea8a5ddbd47f13570088427293138a10784b) ) // 6530-038 RIOT DOS 2.5 Micropolis
 	ROM_LOAD_OPTIONAL( "901483-04.uk3", 0x000, 0x400, NO_DUMP ) // 6530-039 RIOT DOS 2.5 Tandon
 	ROM_LOAD_OPTIONAL( "901884-01.uk3", 0x000, 0x400, NO_DUMP ) // 6530-40 RIOT DOS 2.7 Tandon
@@ -220,13 +220,13 @@ ROM_END
 
 ROM_START( c8250lp )
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_DEFAULT_BIOS("dos27")
-    ROM_SYSTEM_BIOS( 0, "dos27", "DOS 2.7" )
+	ROM_DEFAULT_BIOS("dos27")
+	ROM_SYSTEM_BIOS( 0, "dos27", "DOS 2.7" )
 	ROMX_LOAD( "251165-01.ua11",  0x0000, 0x2000, NO_DUMP, ROM_BIOS(1) )
 	ROMX_LOAD( "251166-01.ua13",  0x2000, 0x2000, NO_DUMP, ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS( 1, "dos27b", "DOS 2.7B" )
+	ROM_SYSTEM_BIOS( 1, "dos27b", "DOS 2.7B" )
 	ROMX_LOAD( "dos-2.7b.bin", 0x0000, 0x4000, CRC(96e3b209) SHA1(9849300be9f2e0143c2ed2564d26a4ba3b27526c), ROM_BIOS(2) ) // CBM DOS 2.7B from the 8250LP inside 8296D
-    ROM_SYSTEM_BIOS( 2, "speeddos", "SpeedDOS" )
+	ROM_SYSTEM_BIOS( 2, "speeddos", "SpeedDOS" )
 	ROMX_LOAD( "speeddos-c000.ua11", 0x0000, 0x2000, CRC(46cc260f) SHA1(e9838635d6868e35ec9c161b6e5c1ad92a4a241a), ROM_BIOS(3) )
 	ROMX_LOAD( "speeddos-e000.ua13", 0x2000, 0x2000, CRC(88cfd505) SHA1(0fb570b180504cd1fcb7d203d8d37ea3d7e72ab4), ROM_BIOS(3) )
 
@@ -399,18 +399,18 @@ READ8_MEMBER( c2040_device::dio_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     DI0
-        PA1     DI1
-        PA2     DI2
-        PA3     DI3
-        PA4     DI4
-        PA5     DI5
-        PA6     DI6
-        PA7     DI7
+	    PA0     DI0
+	    PA1     DI1
+	    PA2     DI2
+	    PA3     DI3
+	    PA4     DI4
+	    PA5     DI5
+	    PA6     DI6
+	    PA7     DI7
 
-    */
+	*/
 
 	return m_bus->dio_r();
 }
@@ -419,18 +419,18 @@ WRITE8_MEMBER( c2040_device::dio_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DO0
-        PB1     DO1
-        PB2     DO2
-        PB3     DO3
-        PB4     DO4
-        PB5     DO5
-        PB6     DO6
-        PB7     DO7
+	    PB0     DO0
+	    PB1     DO1
+	    PB2     DO2
+	    PB3     DO3
+	    PB4     DO4
+	    PB5     DO5
+	    PB6     DO6
+	    PB7     DO7
 
-    */
+	*/
 
 	m_bus->dio_w(this, data);
 }
@@ -453,18 +453,18 @@ READ8_MEMBER( c2040_device::riot1_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ATNA
-        PA1     DACO
-        PA2     RFDO
-        PA3     EOIO
-        PA4     DAVO
-        PA5     EOII
-        PA6     DAVI
-        PA7     _ATN
+	    PA0     ATNA
+	    PA1     DACO
+	    PA2     RFDO
+	    PA3     EOIO
+	    PA4     DAVO
+	    PA5     EOII
+	    PA6     DAVI
+	    PA7     _ATN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -484,18 +484,18 @@ WRITE8_MEMBER( c2040_device::riot1_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ATNA
-        PA1     DACO
-        PA2     RFDO
-        PA3     EOIO
-        PA4     DAVO
-        PA5     EOII
-        PA6     DAVI
-        PA7     _ATN
+	    PA0     ATNA
+	    PA1     DACO
+	    PA2     RFDO
+	    PA3     EOIO
+	    PA4     DAVO
+	    PA5     EOII
+	    PA6     DAVI
+	    PA7     _ATN
 
-    */
+	*/
 
 	// attention acknowledge
 	m_atna = BIT(data, 0);
@@ -519,18 +519,18 @@ READ8_MEMBER( c2040_device::riot1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DEVICE NUMBER SELECTION
-        PB1     DEVICE NUMBER SELECTION
-        PB2     DEVICE NUMBER SELECTION
-        PB3     ACT LED 1
-        PB4     ACT LED 0
-        PB5     ERR LED
-        PB6     DACI
-        PB7     RFDI
+	    PB0     DEVICE NUMBER SELECTION
+	    PB1     DEVICE NUMBER SELECTION
+	    PB2     DEVICE NUMBER SELECTION
+	    PB3     ACT LED 1
+	    PB4     ACT LED 0
+	    PB5     ERR LED
+	    PB6     DACI
+	    PB7     RFDI
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -550,18 +550,18 @@ WRITE8_MEMBER( c2040_device::riot1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DEVICE NUMBER SELECTION
-        PB1     DEVICE NUMBER SELECTION
-        PB2     DEVICE NUMBER SELECTION
-        PB3     ACT LED 1
-        PB4     ACT LED 0
-        PB5     ERR LED
-        PB6     DACI
-        PB7     RFDI
+	    PB0     DEVICE NUMBER SELECTION
+	    PB1     DEVICE NUMBER SELECTION
+	    PB2     DEVICE NUMBER SELECTION
+	    PB3     ACT LED 1
+	    PB4     ACT LED 0
+	    PB5     ERR LED
+	    PB6     DACI
+	    PB7     RFDI
 
-    */
+	*/
 
 	// activity led 1
 	output_set_led_value(LED_ACT1, BIT(data, 3));
@@ -591,18 +591,18 @@ READ8_MEMBER( c2040_device::via_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     E0
-        PA1     E1
-        PA2     I2
-        PA3     E2
-        PA4     E4
-        PA5     E5
-        PA6     I7
-        PA7     E6
+	    PA0     E0
+	    PA1     E1
+	    PA2     I2
+	    PA3     E2
+	    PA4     E4
+	    PA5     E5
+	    PA6     I7
+	    PA7     E6
 
-    */
+	*/
 
 	return (BIT(m_e, 6) << 7) | (BIT(m_i, 7) << 6) | (m_e & 0x33) | (BIT(m_e, 2) << 3) | (m_i & 0x04);
 }
@@ -611,18 +611,18 @@ WRITE8_MEMBER( c2040_device::via_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     S1A
-        PB1     S1B
-        PB2     S0A
-        PB3     S0B
-        PB4     MTR1
-        PB5     MTR0
-        PB6
-        PB7
+	    PB0     S1A
+	    PB1     S1B
+	    PB2     S0A
+	    PB3     S0B
+	    PB4     MTR1
+	    PB5     MTR0
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	// spindle motor 1
 	int mtr1 = BIT(data, 4);
@@ -699,18 +699,18 @@ READ8_MEMBER( c8050_device::via_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     S1A
-        PB1     S1B
-        PB2     S0A
-        PB3     S0B
-        PB4     MTR1
-        PB5     MTR0
-        PB6     PULL SYNC
-        PB7     SYNC
+	    PB0     S1A
+	    PB1     S1B
+	    PB2     S0A
+	    PB3     S0B
+	    PB4     MTR1
+	    PB5     MTR0
+	    PB6     PULL SYNC
+	    PB7     SYNC
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -724,18 +724,18 @@ WRITE8_MEMBER( c8050_device::via_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     S1A
-        PB1     S1B
-        PB2     S0A
-        PB3     S0B
-        PB4     MTR1
-        PB5     MTR0
-        PB6     PULL SYNC
-        PB7     SYNC
+	    PB0     S1A
+	    PB1     S1B
+	    PB2     S0A
+	    PB3     S0B
+	    PB4     MTR1
+	    PB5     MTR0
+	    PB6     PULL SYNC
+	    PB7     SYNC
 
-    */
+	*/
 
 	// spindle motor 1
 	int mtr1 = BIT(data, 4);
@@ -784,18 +784,18 @@ READ8_MEMBER( c2040_device::pi_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     PI0
-        PA1     PI1
-        PA2     PI2
-        PA3     PI3
-        PA4     PI4
-        PA5     PI5
-        PA6     PI6
-        PA7     PI7
+	    PA0     PI0
+	    PA1     PI1
+	    PA2     PI2
+	    PA3     PI3
+	    PA4     PI4
+	    PA5     PI5
+	    PA6     PI6
+	    PA7     PI7
 
-    */
+	*/
 
 	return m_pi;
 }
@@ -804,18 +804,18 @@ WRITE8_MEMBER( c2040_device::pi_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     PI0
-        PA1     PI1
-        PA2     PI2
-        PA3     PI3
-        PA4     PI4
-        PA5     PI5
-        PA6     PI6
-        PA7     PI7
+	    PA0     PI0
+	    PA1     PI1
+	    PA2     PI2
+	    PA3     PI3
+	    PA4     PI4
+	    PA5     PI5
+	    PA6     PI6
+	    PA7     PI7
 
-    */
+	*/
 
 	m_pi = data;
 }
@@ -824,18 +824,18 @@ READ8_MEMBER( c2040_device::miot_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DRV SEL
-        PB1     DS0
-        PB2     DS1
-        PB3     WPS
-        PB4
-        PB5
-        PB6     SYNC
-        PB7     M6504 IRQ
+	    PB0     DRV SEL
+	    PB1     DS0
+	    PB2     DS1
+	    PB3     WPS
+	    PB4
+	    PB5
+	    PB6     SYNC
+	    PB7     M6504 IRQ
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -852,18 +852,18 @@ WRITE8_MEMBER( c2040_device::miot_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DRV SEL
-        PB1     DS0
-        PB2     DS1
-        PB3     WPS
-        PB4
-        PB5
-        PB6     SYNC
-        PB7     M6504 IRQ
+	    PB0     DRV SEL
+	    PB1     DS0
+	    PB2     DS1
+	    PB3     WPS
+	    PB4
+	    PB5
+	    PB6     SYNC
+	    PB7     M6504 IRQ
 
-    */
+	*/
 
 	// drive select
 	m_drive = BIT(data, 0);
@@ -902,18 +902,18 @@ READ8_MEMBER( c8050_device::miot_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DRV SEL
-        PB1     DS0
-        PB2     DS1
-        PB3     WPS
-        PB4     DRIVE TYPE (0=2A, 1=2C)
-        PB5
-        PB6     (0=DS, 1=SS)
-        PB7     M6504 IRQ
+	    PB0     DRV SEL
+	    PB1     DS0
+	    PB2     DS1
+	    PB3     WPS
+	    PB4     DRIVE TYPE (0=2A, 1=2C)
+	    PB5
+	    PB6     (0=DS, 1=SS)
+	    PB7     M6504 IRQ
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -936,18 +936,18 @@ WRITE8_MEMBER( c8050_device::miot_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DRV SEL
-        PB1     DS0
-        PB2     DS1
-        PB3     WPS
-        PB4     ODD HD (0=78-154, 1=1-77)
-        PB5
-        PB6     (0=DS, 1=SS)
-        PB7     M6504 IRQ
+	    PB0     DRV SEL
+	    PB1     DS0
+	    PB2     DS1
+	    PB3     WPS
+	    PB4     ODD HD (0=78-154, 1=1-77)
+	    PB5
+	    PB6     (0=DS, 1=SS)
+	    PB7     M6504 IRQ
 
-    */
+	*/
 
 	// drive select
 	if ((m_variant == c2040_device::TYPE_8050) ||
@@ -1300,21 +1300,21 @@ inline void c2040_device::update_gcr_data()
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            I0      SR0
-            I1      SR1
-            I2      SR2
-            I3      SR3
-            I4      SR4
-            I5      SR5
-            I6      SR6
-            I7      SR7
-            I8      SR8
-            I9      SR9
-            I10     R/_W SEL
+		    I0      SR0
+		    I1      SR1
+		    I2      SR2
+		    I3      SR3
+		    I4      SR4
+		    I5      SR5
+		    I6      SR6
+		    I7      SR7
+		    I8      SR8
+		    I9      SR9
+		    I10     R/_W SEL
 
-        */
+		*/
 
 		m_i = (m_rw << 10) | (m_sr & 0x3ff);
 	}
@@ -1322,21 +1322,21 @@ inline void c2040_device::update_gcr_data()
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            I0      PI0
-            I1      PI1
-            I2      PI2
-            I3      PI3
-            I4      MODE SEL
-            I5      PI4
-            I6      PI5
-            I7      PI6
-            I8      PI7
-            I9      0
-            I10     R/_W SEL
+		    I0      PI0
+		    I1      PI1
+		    I2      PI2
+		    I3      PI3
+		    I4      MODE SEL
+		    I5      PI4
+		    I6      PI5
+		    I7      PI6
+		    I8      PI7
+		    I9      0
+		    I10     R/_W SEL
 
-        */
+		*/
 
 		m_i = (m_rw << 10) | ((m_pi & 0xf0) << 1) | (m_mode << 4) | (m_pi & 0x0f);
 	}
@@ -1397,8 +1397,8 @@ inline void c2040_device::micropolis_step_motor(int unit, int stp)
 
 		switch (m_unit[unit].m_stp)
 		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-		case 1:	if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+		case 0: if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+		case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
 		case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
 		case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
 		}
@@ -1429,8 +1429,8 @@ inline void c2040_device::mpi_step_motor(int unit, int stp)
 
 		switch (m_unit[unit].m_stp)
 		{
-		case 0:	if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
-		case 1:	if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
+		case 0: if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
+		case 1: if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
 		case 2: if (stp == 0) tracks++; else if (stp == 3) tracks--; break;
 		case 3: if (stp == 2) tracks++; else if (stp == 1) tracks--; break;
 		}
@@ -1459,28 +1459,28 @@ inline void c2040_device::mpi_step_motor(int unit, int stp)
 //-------------------------------------------------
 
 c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  device_ieee488_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_TAG),
-	  m_fdccpu(*this, M6504_TAG),
-	  m_riot0(*this, M6532_0_TAG),
-	  m_riot1(*this, M6532_1_TAG),
-	  m_miot(*this, M6530_TAG),
-	  m_via(*this, M6522_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1),
-	  m_drive(0),
-	  m_side(0),
-	  m_rfdo(1),
-	  m_daco(1),
-	  m_atna(1),
-	  m_ds(-1),
-	  m_bit_count(0),
-	  m_ready(0),
-	  m_mode(0),
-	  m_rw(0),
-	  m_miot_irq(CLEAR_LINE),
-	  m_variant(variant)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_ieee488_interface(mconfig, *this),
+		m_maincpu(*this, M6502_TAG),
+		m_fdccpu(*this, M6504_TAG),
+		m_riot0(*this, M6532_0_TAG),
+		m_riot1(*this, M6532_1_TAG),
+		m_miot(*this, M6530_TAG),
+		m_via(*this, M6522_TAG),
+		m_image0(*this, FLOPPY_0),
+		m_image1(*this, FLOPPY_1),
+		m_drive(0),
+		m_side(0),
+		m_rfdo(1),
+		m_daco(1),
+		m_atna(1),
+		m_ds(-1),
+		m_bit_count(0),
+		m_ready(0),
+		m_mode(0),
+		m_rw(0),
+		m_miot_irq(CLEAR_LINE),
+		m_variant(variant)
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -1494,27 +1494,27 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 
 c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C2040, "C2040", tag, owner, clock),
-	  device_ieee488_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_TAG),
-	  m_fdccpu(*this, M6504_TAG),
-	  m_riot0(*this, M6532_0_TAG),
-	  m_riot1(*this, M6532_1_TAG),
-	  m_miot(*this, M6530_TAG),
-	  m_via(*this, M6522_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1),
-	  m_drive(0),
-	  m_side(0),
-	  m_rfdo(1),
-	  m_daco(1),
-	  m_atna(1),
-	  m_ds(-1),
-	  m_bit_count(0),
-	  m_ready(0),
-	  m_mode(0),
-	  m_rw(0),
-	  m_miot_irq(CLEAR_LINE),
-	  m_variant(TYPE_2040)
+		device_ieee488_interface(mconfig, *this),
+		m_maincpu(*this, M6502_TAG),
+		m_fdccpu(*this, M6504_TAG),
+		m_riot0(*this, M6532_0_TAG),
+		m_riot1(*this, M6532_1_TAG),
+		m_miot(*this, M6530_TAG),
+		m_via(*this, M6522_TAG),
+		m_image0(*this, FLOPPY_0),
+		m_image1(*this, FLOPPY_1),
+		m_drive(0),
+		m_side(0),
+		m_rfdo(1),
+		m_daco(1),
+		m_atna(1),
+		m_ds(-1),
+		m_bit_count(0),
+		m_ready(0),
+		m_mode(0),
+		m_rw(0),
+		m_miot_irq(CLEAR_LINE),
+		m_variant(TYPE_2040)
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -1642,18 +1642,18 @@ void c2040_device::device_start()
 
 void c2040_device::device_reset()
 {
-    m_maincpu->reset();
+	m_maincpu->reset();
 
 	// toggle M6502 SO
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
 
-    m_fdccpu->reset();
+	m_fdccpu->reset();
 
-    m_riot0->reset();
-    m_riot1->reset();
-    m_miot->reset();
-    m_via->reset();
+	m_riot0->reset();
+	m_riot1->reset();
+	m_miot->reset();
+	m_via->reset();
 
 	// turn off spindle motors
 	m_unit[0].m_mtr = m_unit[1].m_mtr = 1;
@@ -1754,7 +1754,7 @@ void c2040_device::ieee488_ifc(int state)
 
 void c2040_device::on_disk0_change(device_image_interface &image)
 {
-    c2040_device *c2040 = static_cast<c2040_device *>(image.device().owner());
+	c2040_device *c2040 = static_cast<c2040_device *>(image.device().owner());
 
 	c2040->read_current_track(0);
 }
@@ -1766,7 +1766,7 @@ void c2040_device::on_disk0_change(device_image_interface &image)
 
 void c2040_device::on_disk1_change(device_image_interface &image)
 {
-    c2040_device *c2040 = static_cast<c2040_device *>(image.device().owner());
+	c2040_device *c2040 = static_cast<c2040_device *>(image.device().owner());
 
 	c2040->read_current_track(1);
 }

@@ -9,17 +9,17 @@
 #include "includes/gmaster.h"
 
 
-#define MAIN_XTAL	12000000
+#define MAIN_XTAL   12000000
 
 
 READ8_MEMBER(gmaster_state::gmaster_io_r)
 {
-    UINT8 data = 0;
-    if (m_gmachine.ports[2] & 1)
+	UINT8 data = 0;
+	if (m_gmachine.ports[2] & 1)
 	{
 		data = memregion("maincpu")->base()[0x4000 + offset];
 		logerror("%.4x external memory %.4x read %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
-    }
+	}
 	else
 	{
 		switch (offset)
@@ -34,15 +34,15 @@ READ8_MEMBER(gmaster_state::gmaster_io_r)
 		default:
 			logerror("%.4x memory %.4x read %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
 		}
-    }
-    return data;
+	}
+	return data;
 }
 
 #define BLITTER_Y ((m_gmachine.ports[2]&4)|(m_video.data[0]&3))
 
 WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 {
-    if (m_gmachine.ports[2] & 1)
+	if (m_gmachine.ports[2] & 1)
 	{
 		memregion("maincpu")->base()[0x4000 + offset] = data;
 		logerror("%.4x external memory %.4x written %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
@@ -103,28 +103,28 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 READ8_MEMBER(gmaster_state::gmaster_port_r)
 {
 //  UINT8 data = m_gmachine.ports[offset];
-    UINT8 data = 0xff;
-    switch (offset)
+	UINT8 data = 0xff;
+	switch (offset)
 	{
 	case UPD7810_PORTA:
 		data = ioport("JOY")->read();
 		break;
 	default:
 		logerror("%.4x port %d read %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), offset, data);
-    }
-    return data;
+	}
+	return data;
 }
 
 WRITE8_MEMBER(gmaster_state::gmaster_port_w)
 {
-    m_gmachine.ports[offset] = data;
-    logerror("%.4x port %d written %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), offset, data);
-    switch (offset)
+	m_gmachine.ports[offset] = data;
+	logerror("%.4x port %d written %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), offset, data);
+	switch (offset)
 	{
 		case UPD7810_PORTC:
 			m_video.y = BLITTER_Y;
 			break;
-    }
+	}
 }
 
 static ADDRESS_MAP_START( gmaster_mem, AS_PROGRAM, 8, gmaster_state )
@@ -139,26 +139,26 @@ static ADDRESS_MAP_START(gmaster_io, AS_IO, 8, gmaster_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gmaster )
-    PORT_START("JOY")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B")
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
 INPUT_PORTS_END
 
 /* palette in red, green, blue tribles */
 static const unsigned char gmaster_palette[2][3] =
 {
 #if 1
-    { 130, 159, 166 },
-    { 45,45,43 }
+	{ 130, 159, 166 },
+	{ 45,45,43 }
 #else
-    { 255,255,255 },
-    { 0, 0, 0 }
+	{ 255,255,255 },
+	{ 0, 0, 0 }
 #endif
 };
 
@@ -174,9 +174,9 @@ void gmaster_state::palette_init()
 
 UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    int x,y;
+	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0); //xmess rounds up to 64 pixel
-    for (y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
+	for (y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
 	{
 		for (x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
 		{
@@ -200,8 +200,8 @@ UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 
 			line = &bitmap.pix16((y * 8 + 7), x);
 			line[0] = BIT(d, 7);
 		}
-    }
-    return 0;
+	}
+	return 0;
 }
 
 

@@ -79,19 +79,19 @@ READ8_MEMBER(niyanpai_state::tmpz84c011_pio_r)
 
 	switch (offset)
 	{
-		case 0:			/* PA_0 */
+		case 0:         /* PA_0 */
 			portdata = 0xff;
 			break;
-		case 1:			/* PB_0 */
+		case 1:         /* PB_0 */
 			portdata = 0xff;
 			break;
-		case 2:			/* PC_0 */
+		case 2:         /* PC_0 */
 			portdata = 0xff;
 			break;
-		case 3:			/* PD_0 */
+		case 3:         /* PD_0 */
 			portdata = niyanpai_sound_r(space, 0);
 			break;
-		case 4:			/* PE_0 */
+		case 4:         /* PE_0 */
 			portdata = 0xff;
 			break;
 
@@ -108,18 +108,18 @@ WRITE8_MEMBER(niyanpai_state::tmpz84c011_pio_w)
 {
 	switch (offset)
 	{
-		case 0:			/* PA_0 */
+		case 0:         /* PA_0 */
 			niyanpai_soundbank_w(machine(), data & 0x03);
 			break;
-		case 1:			/* PB_0 */
+		case 1:         /* PB_0 */
 			machine().device<dac_device>("dac1")->write_unsigned8(data);
 			break;
-		case 2:			/* PC_0 */
+		case 2:         /* PC_0 */
 			machine().device<dac_device>("dac2")->write_unsigned8(data);
 			break;
-		case 3:			/* PD_0 */
+		case 3:         /* PD_0 */
 			break;
-		case 4:			/* PE_0 */
+		case 4:         /* PE_0 */
 			if (!(data & 0x01)) niyanpai_soundclr_w(space, 0, 0);
 			break;
 
@@ -238,9 +238,9 @@ WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pe_w)
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg3),	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	DEVCB_NULL,					/* ZC/TO1 callback */
-	DEVCB_NULL					/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg3),   /* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	DEVCB_NULL,                 /* ZC/TO1 callback */
+	DEVCB_NULL                  /* ZC/TO2 callback */
 };
 
 void niyanpai_state::machine_reset()
@@ -261,7 +261,7 @@ DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 	UINT8 *SNDROM = memregion("audiocpu")->base();
 
 	// sound program patch
-	SNDROM[0x0213] = 0x00;			// DI -> NOP
+	SNDROM[0x0213] = 0x00;          // DI -> NOP
 
 	// initialize sound rom bank
 	niyanpai_soundbank_w(machine(), 0);
@@ -276,14 +276,14 @@ READ16_MEMBER(niyanpai_state::niyanpai_dipsw_r)
 	UINT8 dipsw_a, dipsw_b;
 
 	dipsw_a = (((ioport("DSWA")->read() & 0x01) << 7) | ((ioport("DSWA")->read() & 0x02) << 5) |
-			   ((ioport("DSWA")->read() & 0x04) << 3) | ((ioport("DSWA")->read() & 0x08) << 1) |
-			   ((ioport("DSWA")->read() & 0x10) >> 1) | ((ioport("DSWA")->read() & 0x20) >> 3) |
-			   ((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
+				((ioport("DSWA")->read() & 0x04) << 3) | ((ioport("DSWA")->read() & 0x08) << 1) |
+				((ioport("DSWA")->read() & 0x10) >> 1) | ((ioport("DSWA")->read() & 0x20) >> 3) |
+				((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
 
 	dipsw_b = (((ioport("DSWB")->read() & 0x01) << 7) | ((ioport("DSWB")->read() & 0x02) << 5) |
-			   ((ioport("DSWB")->read() & 0x04) << 3) | ((ioport("DSWB")->read() & 0x08) << 1) |
-			   ((ioport("DSWB")->read() & 0x10) >> 1) | ((ioport("DSWB")->read() & 0x20) >> 3) |
-			   ((ioport("DSWB")->read() & 0x40) >> 5) | ((ioport("DSWB")->read() & 0x80) >> 7));
+				((ioport("DSWB")->read() & 0x04) << 3) | ((ioport("DSWB")->read() & 0x08) << 1) |
+				((ioport("DSWB")->read() & 0x10) >> 1) | ((ioport("DSWB")->read() & 0x20) >> 3) |
+				((ioport("DSWB")->read() & 0x40) >> 5) | ((ioport("DSWB")->read() & 0x80) >> 7));
 
 	return ((dipsw_a << 8) | dipsw_b);
 }
@@ -294,12 +294,12 @@ READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 
 	switch ((m_musobana_inputport ^ 0xff00) >> 8)
 	{
-		case 0x01:	portdata = ioport("KEY0")->read(); break;
-		case 0x02:	portdata = ioport("KEY1")->read(); break;
-		case 0x04:	portdata = ioport("KEY2")->read(); break;
-		case 0x08:	portdata = ioport("KEY3")->read(); break;
-		case 0x10:	portdata = ioport("KEY4")->read(); break;
-		default:	portdata = ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read()
+		case 0x01:  portdata = ioport("KEY0")->read(); break;
+		case 0x02:  portdata = ioport("KEY1")->read(); break;
+		case 0x04:  portdata = ioport("KEY2")->read(); break;
+		case 0x08:  portdata = ioport("KEY3")->read(); break;
+		case 0x10:  portdata = ioport("KEY4")->read(); break;
+		default:    portdata = ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read()
 								& ioport("KEY3")->read() & ioport("KEY4")->read(); break;
 	}
 
@@ -338,15 +338,15 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
-	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM	// palette work ram?
+	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM // palette work ram?
 
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITENOP			// unknown
-	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
-	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
+	AM_RANGE(0x200200, 0x200201) AM_WRITENOP            // unknown
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
 	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
@@ -373,16 +373,16 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
 	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
-	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM				// palette work ram?
+	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM             // palette work ram?
 
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
-	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
-	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
+	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
 	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
@@ -411,7 +411,7 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
 	AM_RANGE(0x060000, 0x0608ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
-	AM_RANGE(0x060900, 0x0611ff) AM_RAM				// palette work ram?
+	AM_RANGE(0x060900, 0x0611ff) AM_RAM             // palette work ram?
 	AM_RANGE(0x07f800, 0x07ffff) AM_RAM
 
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
@@ -419,9 +419,9 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
-	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
-	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
+	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
 	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
@@ -451,16 +451,16 @@ static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
 
 	AM_RANGE(0x0e0000, 0x0e08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
-	AM_RANGE(0x0e0900, 0x0e11ff) AM_RAM				// palette work ram?
+	AM_RANGE(0x0e0900, 0x0e11ff) AM_RAM             // palette work ram?
 
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
-	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
-	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
+	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP            // unknown
 
 	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
@@ -511,15 +511,15 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( niyanpai )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )			// ?
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )			// START2
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )			// START1
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )			// ?
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )           // ?
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )           // START2
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )           // START1
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )          // ?
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -665,7 +665,7 @@ static INPUT_PORTS_START( nbmjctrl_16 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( musobana )	// I don't have manual for this game.
+static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, "Game Out" )
 	PORT_DIPSETTING(    0x03, "90% (Easy)" )
@@ -715,19 +715,19 @@ static INPUT_PORTS_START( musobana )	// I don't have manual for this game.
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
 	PORT_INCLUDE( nbmjctrl_16 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( 4psimasy )	// I don't have manual for this game.
+static INPUT_PORTS_START( 4psimasy )    // I don't have manual for this game.
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -781,19 +781,19 @@ static INPUT_PORTS_START( 4psimasy )	// I don't have manual for this game.
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
 	PORT_INCLUDE( nbmjctrl_16 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mhhonban )	// I don't have manual for this game.
+static INPUT_PORTS_START( mhhonban )    // I don't have manual for this game.
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -847,19 +847,19 @@ static INPUT_PORTS_START( mhhonban )	// I don't have manual for this game.
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
 	PORT_INCLUDE( nbmjctrl_16 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( zokumahj )	// I don't have manual for this game.
+static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -913,14 +913,14 @@ static INPUT_PORTS_START( zokumahj )	// I don't have manual for this game.
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )			// MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)	// OUT COIN
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, NULL)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )					// TEST
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
 	PORT_INCLUDE( nbmjctrl_16 )
 INPUT_PORTS_END
@@ -941,11 +941,11 @@ static const z80_daisy_config daisy_chain_sound[] =
 static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
 	MCFG_CPU_PROGRAM_MAP(niyanpai_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", niyanpai_state,  niyanpai_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)					/* TMPZ84C011, 8.00 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000)                  /* TMPZ84C011, 8.00 MHz */
 	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(niyanpai_sound_map)
 	MCFG_CPU_IO_MAP(niyanpai_sound_io_map)

@@ -36,7 +36,7 @@ class dlair2_state : public driver_device
 public:
 	dlair2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"){ }
+			m_maincpu(*this, "maincpu"){ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -70,11 +70,11 @@ static ADDRESS_MAP_START( dlair2_map, AS_PROGRAM, 8, dlair2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dlair2_io, AS_IO, 8, dlair2_state )
-//	AM_RANGE(0x020, 0x020) ICR
-//	AM_RANGE(0x042, 0x043) sound related
-//	AM_RANGE(0x061, 0x061) sound related
-//	AM_RANGE(0x200, 0x203) i/o, coin, eeprom
-//	AM_RANGE(0x2f8, 0x2ff) COM2
+//  AM_RANGE(0x020, 0x020) ICR
+//  AM_RANGE(0x042, 0x043) sound related
+//  AM_RANGE(0x061, 0x061) sound related
+//  AM_RANGE(0x200, 0x203) i/o, coin, eeprom
+//  AM_RANGE(0x2f8, 0x2ff) COM2
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dlair2 )
@@ -170,7 +170,7 @@ INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
 static MACHINE_CONFIG_START( dlair2, dlair2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088 , MAIN_CLOCK/3)	/* Schematics show I8088 "max" CPU */
+	MCFG_CPU_ADD("maincpu", I8088 , MAIN_CLOCK/3)   /* Schematics show I8088 "max" CPU */
 	MCFG_CPU_PROGRAM_MAP(dlair2_map)
 	MCFG_CPU_IO_MAP(dlair2_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dlair2_state, dlair2_timer_irq, 60) // timer irq, TODO: timing

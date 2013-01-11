@@ -31,7 +31,7 @@ struct chrn_id_hd
 	UINT8 H;
 	UINT8 R;
 	UINT8 N;
-	int data_id;			// id for read/write data command
+	int data_id;            // id for read/write data command
 	unsigned long flags;
 };
 
@@ -40,30 +40,30 @@ class mfm_harddisk_device : public device_t
 public:
 	mfm_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void	read_sector(int cylinder, int head, int sector, UINT8 *buf);
-	void	write_sector(int cylinder, int head, int sector, UINT8 *buf);
-	void	read_track(int head, UINT8 *buffer);
-	void	write_track(int head, UINT8 *buffer, int data_count);
-	UINT8	get_status();
-	void	seek(int direction);
-	void	get_next_id(int head, chrn_id_hd *id);
-	int		get_track_length();
+	void    read_sector(int cylinder, int head, int sector, UINT8 *buf);
+	void    write_sector(int cylinder, int head, int sector, UINT8 *buf);
+	void    read_track(int head, UINT8 *buffer);
+	void    write_track(int head, UINT8 *buffer, int data_count);
+	UINT8   get_status();
+	void    seek(int direction);
+	void    get_next_id(int head, chrn_id_hd *id);
+	int     get_track_length();
 
 protected:
-	void	device_start();
-	void	device_reset();
+	void    device_start();
+	void    device_reset();
 	machine_config_constructor device_mconfig_additions() const;
 
 private:
-	int 	find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size_t number);
-	UINT8	cylinder_to_ident(int cylinder);
-	bool	harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, int sector, UINT32 *lba);
+	int     find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size_t number);
+	UINT8   cylinder_to_ident(int cylinder);
+	bool    harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, int sector, UINT32 *lba);
 
-	int 	m_current_cylinder;
-	int 	m_current_head;
-	bool	m_seeking;
-	int 	m_status;
-	int 	m_id_index; /* position in track for seeking the sector; counts the sector number */
+	int     m_current_cylinder;
+	int     m_current_head;
+	bool    m_seeking;
+	int     m_status;
+	int     m_id_index; /* position in track for seeking the sector; counts the sector number */
 
 	harddisk_image_device *m_drive;
 };
@@ -73,15 +73,14 @@ class ide_harddisk_device : public device_t
 public:
 	ide_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	void	device_start() { };
-	void	device_reset() { };
+	void    device_start() { };
+	void    device_reset() { };
 	machine_config_constructor device_mconfig_additions() const;
 };
 
-#define MCFG_MFMHD_3_DRIVES_ADD()			\
-	MCFG_DEVICE_ADD(MFMHD_0, TI99_MFMHD, 0)		\
-	MCFG_DEVICE_ADD(MFMHD_1, TI99_MFMHD, 0)		\
+#define MCFG_MFMHD_3_DRIVES_ADD()           \
+	MCFG_DEVICE_ADD(MFMHD_0, TI99_MFMHD, 0)     \
+	MCFG_DEVICE_ADD(MFMHD_1, TI99_MFMHD, 0)     \
 	MCFG_DEVICE_ADD(MFMHD_2, TI99_MFMHD, 0)
 
 #endif
-

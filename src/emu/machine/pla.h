@@ -51,7 +51,7 @@
 	MCFG_DEVICE_ADD(_tag, PLS100, 0)
 
 #define MCFG_MOS8721_ADD(_tag) \
-    MCFG_DEVICE_ADD(_tag, MOS8721, 0)
+	MCFG_DEVICE_ADD(_tag, MOS8721, 0)
 
 
 ///*************************************************************************
@@ -60,36 +60,36 @@
 
 // ======================> pla_device
 
-class pla_device :	public device_t
+class pla_device :  public device_t
 {
 public:
-    // construction/destruction
-    pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 output_mask);
+	// construction/destruction
+	pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 output_mask);
 
 	UINT32 read(UINT32 input);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 
 	void parse_fusemap();
 
-    int m_inputs;
-    int m_outputs;
-    int m_terms;
-    UINT64 m_input_mask;
+	int m_inputs;
+	int m_outputs;
+	int m_terms;
+	UINT64 m_input_mask;
 	UINT64 m_xor;
 
-    struct term
-    {
-        UINT64 m_and;
-        UINT64 m_or;
-    };
+	struct term
+	{
+		UINT64 m_and;
+		UINT64 m_or;
+	};
 
-    term m_term[MAX_TERMS];
+	term m_term[MAX_TERMS];
 
-    UINT64 m_cache[CACHE_SIZE];
-    UINT8 m_cache_ptr;
+	UINT64 m_cache[CACHE_SIZE];
+	UINT8 m_cache_ptr;
 };
 
 
@@ -98,7 +98,7 @@ protected:
 class pls100_device : public pla_device
 {
 public:
-    pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -107,7 +107,7 @@ public:
 class mos8721_device : public pla_device
 {
 public:
-    mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

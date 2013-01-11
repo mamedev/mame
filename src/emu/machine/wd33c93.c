@@ -18,121 +18,121 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* WD commands */
-#define WD_CMD_RESET				0x00
-#define WD_CMD_ABORT				0x01
-#define WD_CMD_ASSERT_ATN			0x02
-#define WD_CMD_NEGATE_ACK			0x03
-#define WD_CMD_DISCONNECT			0x04
-#define WD_CMD_RESELECT				0x05
-#define WD_CMD_SEL_ATN				0x06
-#define WD_CMD_SEL					0x07
-#define WD_CMD_SEL_ATN_XFER			0x08
-#define WD_CMD_SEL_XFER				0x09
-#define WD_CMD_RESEL_RECEIVE		0x0a
-#define WD_CMD_RESEL_SEND			0x0b
-#define WD_CMD_WAIT_SEL_RECEIVE		0x0c
-#define WD_CMD_SSCC					0x0d
-#define WD_CMD_SND_DISC				0x0e
-#define WD_CMD_SET_IDI				0x0f
-#define WD_CMD_RCV_CMD				0x10
-#define WD_CMD_RCV_DATA				0x11
-#define WD_CMD_RCV_MSG_OUT			0x12
-#define WD_CMD_RCV					0x13
-#define WD_CMD_SND_STATUS			0x14
-#define WD_CMD_SND_DATA				0x15
-#define WD_CMD_SND_MSG_IN			0x16
-#define WD_CMD_SND					0x17
-#define WD_CMD_TRANS_ADDR			0x18
-#define WD_CMD_XFER_PAD				0x19
-#define WD_CMD_TRANS_INFO			0x20
-#define WD_CMD_TRANSFER_PAD			0x21
-#define WD_CMD_SBT_MODE				0x80
+#define WD_CMD_RESET                0x00
+#define WD_CMD_ABORT                0x01
+#define WD_CMD_ASSERT_ATN           0x02
+#define WD_CMD_NEGATE_ACK           0x03
+#define WD_CMD_DISCONNECT           0x04
+#define WD_CMD_RESELECT             0x05
+#define WD_CMD_SEL_ATN              0x06
+#define WD_CMD_SEL                  0x07
+#define WD_CMD_SEL_ATN_XFER         0x08
+#define WD_CMD_SEL_XFER             0x09
+#define WD_CMD_RESEL_RECEIVE        0x0a
+#define WD_CMD_RESEL_SEND           0x0b
+#define WD_CMD_WAIT_SEL_RECEIVE     0x0c
+#define WD_CMD_SSCC                 0x0d
+#define WD_CMD_SND_DISC             0x0e
+#define WD_CMD_SET_IDI              0x0f
+#define WD_CMD_RCV_CMD              0x10
+#define WD_CMD_RCV_DATA             0x11
+#define WD_CMD_RCV_MSG_OUT          0x12
+#define WD_CMD_RCV                  0x13
+#define WD_CMD_SND_STATUS           0x14
+#define WD_CMD_SND_DATA             0x15
+#define WD_CMD_SND_MSG_IN           0x16
+#define WD_CMD_SND                  0x17
+#define WD_CMD_TRANS_ADDR           0x18
+#define WD_CMD_XFER_PAD             0x19
+#define WD_CMD_TRANS_INFO           0x20
+#define WD_CMD_TRANSFER_PAD         0x21
+#define WD_CMD_SBT_MODE             0x80
 
 /* ASR register */
-#define ASR_INT						0x80
-#define ASR_LCI						0x40
-#define ASR_BSY						0x20
-#define ASR_CIP						0x10
-#define ASR_PE						0x02
-#define ASR_DBR						0x01
+#define ASR_INT                     0x80
+#define ASR_LCI                     0x40
+#define ASR_BSY                     0x20
+#define ASR_CIP                     0x10
+#define ASR_PE                      0x02
+#define ASR_DBR                     0x01
 
 /* SCSI Bus Phases */
-#define PHS_DATA_OUT				0x00
-#define PHS_DATA_IN					0x01
-#define PHS_COMMAND					0x02
-#define PHS_STATUS					0x03
-#define PHS_MESS_OUT				0x06
-#define PHS_MESS_IN					0x07
+#define PHS_DATA_OUT                0x00
+#define PHS_DATA_IN                 0x01
+#define PHS_COMMAND                 0x02
+#define PHS_STATUS                  0x03
+#define PHS_MESS_OUT                0x06
+#define PHS_MESS_IN                 0x07
 
 /* Command Status Register definitions */
 
-  /* reset state interrupts */
-#define CSR_RESET					0x00
-#define CSR_RESET_AF				0x01
+	/* reset state interrupts */
+#define CSR_RESET                   0x00
+#define CSR_RESET_AF                0x01
 
-  /* successful completion interrupts */
-#define CSR_RESELECT				0x10
-#define CSR_SELECT					0x11
-#define CSR_SEL_XFER_DONE			0x16
-#define CSR_XFER_DONE				0x18
+	/* successful completion interrupts */
+#define CSR_RESELECT                0x10
+#define CSR_SELECT                  0x11
+#define CSR_SEL_XFER_DONE           0x16
+#define CSR_XFER_DONE               0x18
 
-  /* paused or aborted interrupts */
-#define CSR_MSGIN					0x20
-#define CSR_SDP						0x21
-#define CSR_SEL_ABORT				0x22
-#define CSR_RESEL_ABORT				0x25
-#define CSR_RESEL_ABORT_AM			0x27
-#define CSR_ABORT					0x28
+	/* paused or aborted interrupts */
+#define CSR_MSGIN                   0x20
+#define CSR_SDP                     0x21
+#define CSR_SEL_ABORT               0x22
+#define CSR_RESEL_ABORT             0x25
+#define CSR_RESEL_ABORT_AM          0x27
+#define CSR_ABORT                   0x28
 
-  /* terminated interrupts */
-#define CSR_INVALID					0x40
-#define CSR_UNEXP_DISC				0x41
-#define CSR_TIMEOUT					0x42
-#define CSR_PARITY					0x43
-#define CSR_PARITY_ATN				0x44
-#define CSR_BAD_STATUS				0x45
-#define CSR_UNEXP					0x48
+	/* terminated interrupts */
+#define CSR_INVALID                 0x40
+#define CSR_UNEXP_DISC              0x41
+#define CSR_TIMEOUT                 0x42
+#define CSR_PARITY                  0x43
+#define CSR_PARITY_ATN              0x44
+#define CSR_BAD_STATUS              0x45
+#define CSR_UNEXP                   0x48
 
-  /* service required interrupts */
-#define CSR_RESEL					0x80
-#define CSR_RESEL_AM				0x81
-#define CSR_DISC					0x85
-#define CSR_SRV_REQ					0x88
+	/* service required interrupts */
+#define CSR_RESEL                   0x80
+#define CSR_RESEL_AM                0x81
+#define CSR_DISC                    0x85
+#define CSR_SRV_REQ                 0x88
 
-   /* Own ID/CDB Size register */
-#define OWNID_EAF					0x08
-#define OWNID_EHP					0x10
-#define OWNID_RAF					0x20
-#define OWNID_FS_8					0x00
-#define OWNID_FS_12					0x40
-#define OWNID_FS_16					0x80
+	/* Own ID/CDB Size register */
+#define OWNID_EAF                   0x08
+#define OWNID_EHP                   0x10
+#define OWNID_RAF                   0x20
+#define OWNID_FS_8                  0x00
+#define OWNID_FS_12                 0x40
+#define OWNID_FS_16                 0x80
 
-   /* Control register */
-#define CTRL_HSP					0x01
-#define CTRL_HA						0x02
-#define CTRL_IDI					0x04
-#define CTRL_EDI					0x08
-#define CTRL_HHP					0x10
-#define CTRL_POLLED					0x00
-#define CTRL_BURST					0x20
-#define CTRL_BUS					0x40
-#define CTRL_DMA					0x80
+	/* Control register */
+#define CTRL_HSP                    0x01
+#define CTRL_HA                     0x02
+#define CTRL_IDI                    0x04
+#define CTRL_EDI                    0x08
+#define CTRL_HHP                    0x10
+#define CTRL_POLLED                 0x00
+#define CTRL_BURST                  0x20
+#define CTRL_BUS                    0x40
+#define CTRL_DMA                    0x80
 
-   /* Synchronous Transfer Register */
-#define STR_FSS						0x80
+	/* Synchronous Transfer Register */
+#define STR_FSS                     0x80
 
-   /* Destination ID register */
-#define DSTID_DPD					0x40
-#define DATA_OUT_DIR				0
-#define DATA_IN_DIR					1
-#define DSTID_SCC					0x80
+	/* Destination ID register */
+#define DSTID_DPD                   0x40
+#define DATA_OUT_DIR                0
+#define DATA_IN_DIR                 1
+#define DSTID_SCC                   0x80
 
-   /* Source ID register */
-#define SRCID_MASK					0x07
-#define SRCID_SIV					0x08
-#define SRCID_DSP					0x20
-#define SRCID_ES					0x40
-#define SRCID_ER					0x80
+	/* Source ID register */
+#define SRCID_MASK                  0x07
+#define SRCID_SIV                   0x08
+#define SRCID_DSP                   0x20
+#define SRCID_ES                    0x40
+#define SRCID_ER                    0x80
 
 /* convernience functions */
 UINT8 wd33c93_device::getunit( void )
@@ -740,7 +740,7 @@ READ8_MEMBER(wd33c93_device::read)
 }
 
 wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock)
+	: device_t(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock)
 {
 }
 

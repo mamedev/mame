@@ -20,10 +20,10 @@ start of start bit. This is used to synchronise with the data being transfered *
 
 device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
-	  m_other_connection(NULL)
+		m_other_connection(NULL)
 {
 	/* if sum of all bits in the byte is even, then the data
-    has even parity, otherwise it has odd parity */
+	has even parity, otherwise it has odd parity */
 	for (int i=0; i<256; i++)
 	{
 		int sum = 0;
@@ -415,7 +415,7 @@ void device_serial_interface::connect(device_serial_interface *other_connection)
 {
 	/* both connections should have their in connection setup! */
 	/* the in connection is the callback they use to update their state based
-    on the output from the other side */
+	on the output from the other side */
 	set_other_connection(other_connection);
 	other_connection->set_other_connection(this);
 
@@ -434,8 +434,8 @@ const device_type SERIAL_SOURCE = &device_creator<serial_source_device>;
 //-------------------------------------------------
 
 serial_source_device::serial_source_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SERIAL_SOURCE, "Serial source", tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+	: device_t(mconfig, SERIAL_SOURCE, "Serial source", tag, owner, clock),
+		device_serial_interface(mconfig, *this)
 {
 }
 

@@ -74,7 +74,7 @@ static UINT16 ppc_read16_unaligned(address_space &space, UINT32 a)
 static UINT32 ppc_read32_unaligned(address_space &space, UINT32 a)
 {
 	return ((UINT32)ppc.read8(space, a+0) << 24) | ((UINT32)ppc.read8(space, a+1) << 16) |
-				   ((UINT32)ppc.read8(space, a+2) << 8) | ((UINT32)ppc.read8(space, a+3) << 0);
+					((UINT32)ppc.read8(space, a+2) << 8) | ((UINT32)ppc.read8(space, a+3) << 0);
 }
 
 static UINT64 ppc_read64_unaligned(address_space &space, UINT32 a)
@@ -104,17 +104,17 @@ static void ppc_write64_unaligned(address_space &space, UINT32 a, UINT64 d)
 
 /***********************************************************************/
 
-#define DSISR_PAGE		0x40000000
-#define DSISR_PROT		0x08000000
-#define DSISR_STORE		0x02000000
+#define DSISR_PAGE      0x40000000
+#define DSISR_PROT      0x08000000
+#define DSISR_STORE     0x02000000
 
 enum
 {
-	PPC_TRANSLATE_DATA	= 0x0000,
-	PPC_TRANSLATE_CODE	= 0x0001,
+	PPC_TRANSLATE_DATA  = 0x0000,
+	PPC_TRANSLATE_CODE  = 0x0001,
 
-	PPC_TRANSLATE_READ	= 0x0000,
-	PPC_TRANSLATE_WRITE	= 0x0002,
+	PPC_TRANSLATE_READ  = 0x0000,
+	PPC_TRANSLATE_WRITE = 0x0002,
 
 	PPC_TRANSLATE_NOEXCEPTION = 0x0004
 };
@@ -368,10 +368,10 @@ static CPU_READOP( ppc )
 	{
 		switch(size)
 		{
-			case 1:	*value = ppc.program->read_byte(offset);	break;
-			case 2:	*value = ppc.program->read_word(offset);	break;
-			case 4:	*value = ppc.program->read_dword(offset);	break;
-			case 8:	*value = ppc.program->read_qword(offset);	break;
+			case 1: *value = ppc.program->read_byte(offset);    break;
+			case 2: *value = ppc.program->read_word(offset);    break;
+			case 4: *value = ppc.program->read_dword(offset);   break;
+			case 8: *value = ppc.program->read_qword(offset);   break;
 		}
 	}
 
@@ -389,10 +389,10 @@ static CPU_READ( ppc )
 	{
 		switch(size)
 		{
-			case 1:	*value = ppc.program->read_byte(offset);	break;
-			case 2:	*value = ppc.program->read_word(offset);	break;
-			case 4:	*value = ppc.program->read_dword(offset);	break;
-			case 8:	*value = ppc.program->read_qword(offset);	break;
+			case 1: *value = ppc.program->read_byte(offset);    break;
+			case 2: *value = ppc.program->read_word(offset);    break;
+			case 4: *value = ppc.program->read_dword(offset);   break;
+			case 8: *value = ppc.program->read_qword(offset);   break;
 		}
 	}
 
@@ -408,10 +408,10 @@ static CPU_WRITE( ppc )
 	{
 		switch(size)
 		{
-			case 1:	ppc.program->write_byte(offset, value);	break;
-			case 2:	ppc.program->write_word(offset, value);	break;
-			case 4:	ppc.program->write_dword(offset, value);	break;
-			case 8:	ppc.program->write_qword(offset, value);	break;
+			case 1: ppc.program->write_byte(offset, value); break;
+			case 2: ppc.program->write_word(offset, value); break;
+			case 4: ppc.program->write_dword(offset, value);    break;
+			case 8: ppc.program->write_qword(offset, value);    break;
 		}
 	}
 

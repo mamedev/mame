@@ -10,7 +10,7 @@
 
 /* sprites are scaled in the analog domain; to give a better */
 /* rendition of this, we scale in the X direction by this factor */
-#define TURBO_X_SCALE		2
+#define TURBO_X_SCALE       2
 
 
 
@@ -44,52 +44,52 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_sprite_position;
 
-	UINT8 *		m_buckrog_bitmap_ram;
+	UINT8 *     m_buckrog_bitmap_ram;
 
 	/* machine states */
-	UINT8		m_i8279_scanlines;
+	UINT8       m_i8279_scanlines;
 
 	/* sound state */
-	UINT8		m_turbo_osel;
-	UINT8		m_turbo_bsel;
-	UINT8		m_sound_state[3];
+	UINT8       m_turbo_osel;
+	UINT8       m_turbo_bsel;
+	UINT8       m_sound_state[3];
 
 	/* video state */
-	tilemap_t *	m_fg_tilemap;
+	tilemap_t * m_fg_tilemap;
 
 	/* Turbo-specific states */
-	UINT8		m_turbo_opa;
-	UINT8		m_turbo_opb;
-	UINT8		m_turbo_opc;
-	UINT8		m_turbo_ipa;
-	UINT8		m_turbo_ipb;
-	UINT8		m_turbo_ipc;
-	UINT8		m_turbo_fbpla;
-	UINT8		m_turbo_fbcol;
-	UINT8		m_turbo_speed;
-	UINT8		m_turbo_collision;
-	UINT8		m_turbo_last_analog;
-	UINT8		m_turbo_accel;
+	UINT8       m_turbo_opa;
+	UINT8       m_turbo_opb;
+	UINT8       m_turbo_opc;
+	UINT8       m_turbo_ipa;
+	UINT8       m_turbo_ipb;
+	UINT8       m_turbo_ipc;
+	UINT8       m_turbo_fbpla;
+	UINT8       m_turbo_fbcol;
+	UINT8       m_turbo_speed;
+	UINT8       m_turbo_collision;
+	UINT8       m_turbo_last_analog;
+	UINT8       m_turbo_accel;
 
 	/* Subroc-specific states */
-	UINT8		m_subroc3d_col;
-	UINT8		m_subroc3d_ply;
-	UINT8		m_subroc3d_flip;
-	UINT8		m_subroc3d_mdis;
-	UINT8		m_subroc3d_mdir;
-	UINT8		m_subroc3d_tdis;
-	UINT8		m_subroc3d_tdir;
-	UINT8		m_subroc3d_fdis;
-	UINT8		m_subroc3d_fdir;
-	UINT8		m_subroc3d_hdis;
-	UINT8		m_subroc3d_hdir;
+	UINT8       m_subroc3d_col;
+	UINT8       m_subroc3d_ply;
+	UINT8       m_subroc3d_flip;
+	UINT8       m_subroc3d_mdis;
+	UINT8       m_subroc3d_mdir;
+	UINT8       m_subroc3d_tdis;
+	UINT8       m_subroc3d_tdir;
+	UINT8       m_subroc3d_fdis;
+	UINT8       m_subroc3d_fdir;
+	UINT8       m_subroc3d_hdis;
+	UINT8       m_subroc3d_hdir;
 
 	/* Buck Rogers-specific states */
-	UINT8		m_buckrog_fchg;
-	UINT8		m_buckrog_mov;
-	UINT8		m_buckrog_obch;
-	UINT8		m_buckrog_command;
-	UINT8		m_buckrog_myship;
+	UINT8       m_buckrog_fchg;
+	UINT8       m_buckrog_mov;
+	UINT8       m_buckrog_obch;
+	UINT8       m_buckrog_command;
+	UINT8       m_buckrog_myship;
 	int m_last_sound_a;
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);

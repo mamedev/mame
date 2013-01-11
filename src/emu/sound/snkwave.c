@@ -21,13 +21,13 @@ const device_type SNKWAVE = &device_creator<snkwave_device>;
 
 snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SNKWAVE, "SNK Wave", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_external_clock(0),
-	  m_sample_rate(0),
-	  m_frequency(0),
-	  m_counter(0),
-	  m_waveform_position(0)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_external_clock(0),
+		m_sample_rate(0),
+		m_frequency(0),
+		m_counter(0),
+		m_waveform_position(0)
 {
 }
 
@@ -150,5 +150,3 @@ void snkwave_device::update_waveform(unsigned int offset, UINT8 data)
 	m_waveform[SNKWAVE_WAVEFORM_LENGTH-2 - offset * 2] = ~m_waveform[offset * 2 + 1];
 	m_waveform[SNKWAVE_WAVEFORM_LENGTH-1 - offset * 2] = ~m_waveform[offset * 2];
 }
-
-

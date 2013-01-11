@@ -15,8 +15,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CDP1863_TAG		"u1"
-#define CDP1863_XTAL	440560
+#define CDP1863_TAG     "u1"
+#define CDP1863_XTAL    440560
 
 
 

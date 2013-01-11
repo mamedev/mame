@@ -185,10 +185,10 @@ static INPUT_PORTS_START( suprslam )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )				// Only in "test mode"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )                // Only in "test mode"
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )				// "Test"
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )             // "Test"
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
@@ -263,7 +263,7 @@ static const gfx_layout suprslam_16x16x4_layout =
 	{ 8, 12, 0, 4, 24, 28, 16, 20,
 	32+8, 32+12, 32+0, 32+4, 32+24,32+28,32+16,32+20},
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64
+		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64
 	},
 	16*64
 };
@@ -291,7 +291,7 @@ static const ym2610_interface ym2610_config =
 
 static const k053936_interface suprslam_k053936_intf =
 {
-	1, -45, -21	/* wrap, xoff, yoff */
+	1, -45, -21 /* wrap, xoff, yoff */
 };
 
 void suprslam_state::machine_start()
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_CPU_PROGRAM_MAP(suprslam_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprslam_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 

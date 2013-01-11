@@ -237,9 +237,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( docastle_map3, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x00ff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8008) AM_READ(docastle_shared1_r)	// ???
+	AM_RANGE(0x8000, 0x8008) AM_READ(docastle_shared1_r)    // ???
 	AM_RANGE(0xc003, 0xc003) AM_NOP // EP according to schematics
-	AM_RANGE(0xc432, 0xc435) AM_NOP	// ???
+	AM_RANGE(0xc432, 0xc435) AM_NOP // ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_io_map, AS_IO, 8, docastle_state )
@@ -488,16 +488,16 @@ static INPUT_PORTS_START( idsoccer )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, "One Player vs. Computer" ) PORT_DIPLOCATION("SW1:!6")	// Additional time extended for winning score
+	PORT_DIPNAME( 0x04, 0x04, "One Player vs. Computer" ) PORT_DIPLOCATION("SW1:!6")    // Additional time extended for winning score
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Player 2 Time Extension" ) PORT_DIPLOCATION("SW1:4")	// Player may play same game with additional credit
+	PORT_DIPNAME( 0x10, 0x10, "Player 2 Time Extension" ) PORT_DIPLOCATION("SW1:4") // Player may play same game with additional credit
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Player 1 Time Extension" ) PORT_DIPLOCATION("SW1:3")	// Player may play same game with additional credit
+	PORT_DIPNAME( 0x20, 0x20, "Player 1 Time Extension" ) PORT_DIPLOCATION("SW1:3") // Player may play same game with additional credit
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0xc0, "Real Game Time" ) PORT_DIPLOCATION("SW1:1,2") // Indicator always shows 3:00 and counts down
@@ -552,8 +552,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	idsoccer_adpcm_int,	// interrupt function
-	MSM5205_S64_4B		// 6 kHz    ???
+	idsoccer_adpcm_int, // interrupt function
+	MSM5205_S64_4B      // 6 kHz    ???
 };
 
 
@@ -563,7 +563,7 @@ static const msm5205_interface msm5205_config =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.60)	// measured on pcb, real refresh rate should be derived from XTAL_9_828MHz, how?
+	MCFG_SCREEN_REFRESH_RATE(59.60) // measured on pcb, real refresh rate should be derived from XTAL_9_828MHz, how?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
@@ -736,7 +736,7 @@ ROM_END
 
 ROM_START( docastleo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "c1.bin", 	0x0000, 0x2000, CRC(c9ce96ab) SHA1(3166aef4556ce334ecef27dceb285f51de371c35) )
+	ROM_LOAD( "c1.bin",     0x0000, 0x2000, CRC(c9ce96ab) SHA1(3166aef4556ce334ecef27dceb285f51de371c35) )
 	ROM_LOAD( "c2.bin",     0x2000, 0x2000, CRC(42b28369) SHA1(8c9a618984db52cdc4ec3a6bcfa7659866d2709c) )
 	ROM_LOAD( "c3.bin",     0x4000, 0x2000, CRC(c8c13124) SHA1(2cfc15b232744b40350c174b0d89677495c077eb) )
 	ROM_LOAD( "c4.bin",     0x6000, 0x2000, CRC(7ca78471) SHA1(2804f9be825973e69bc35aa703145b3ef22a5ecd) )
@@ -1071,7 +1071,7 @@ ROM_START( asoccer )
 	ROM_LOAD( "as1.e10",   0x00000, 0x2000, CRC(e9d61bbf) SHA1(8f9b3a6fd99f136698035263a20f39c3174b70cf) )
 	ROM_LOAD( "as2.f10",   0x02000, 0x2000, CRC(62b2e4c8) SHA1(4270148652b18006c7df1f612f9b19f06e5400de) )
 	ROM_LOAD( "as3.h10",   0x06000, 0x2000, CRC(25bbd0d8) SHA1(fa7fb4b78e5ac4200ff5f57f94794632af450ce0) )
-    ROM_LOAD( "as4.k10",   0x08000, 0x2000, CRC(8d8bdc08) SHA1(75da310576047102af45c3a5f7d20893ef260d40) )
+	ROM_LOAD( "as4.k10",   0x08000, 0x2000, CRC(8d8bdc08) SHA1(75da310576047102af45c3a5f7d20893ef260d40) )
 
 	ROM_REGION( 0x10000, "slave", 0 ) /* These roms are located on the 8461-A board. */
 	ROM_LOAD( "as0.e2",    0x00000, 0x4000, CRC(05d613bf) SHA1(ab822fc532fc7f1122b5ff0385b268513e7e193e) )
@@ -1090,7 +1090,7 @@ ROM_START( asoccer )
 
 	ROM_REGION( 0x10000, "adpcm", 0 ) /* These roms are located on the 8461-SUB board. */
 	ROM_LOAD( "1.ic1",     0x00000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) )
-    /* Verified on board that IC2 is not populated. */
+	/* Verified on board that IC2 is not populated. */
 	ROM_LOAD( "3.ic3",     0x08000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
 	ROM_LOAD( "4.ic4",     0x0c000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
 

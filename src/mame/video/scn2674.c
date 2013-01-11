@@ -181,9 +181,9 @@ void scn2674_device::scn2674_write_init_regs(UINT8 data)
 			break;
 
 		case 5:
-		   /* IR5 - Active Characters Per Row
-             cccc cccc
-             c = Characters Per Row */
+			/* IR5 - Active Characters Per Row
+			 cccc cccc
+			 c = Characters Per Row */
 			m_IR5_scn2674_character_per_row = data + 1;
 			LOG2674(("IR5 - Active Characters Per Row %02i\n",m_IR5_scn2674_character_per_row));
 			break;
@@ -491,32 +491,32 @@ void scn2674_device::scn2674_write_command(running_machine &machine, UINT8 data)
 READ16_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
 {
 	/*
-    Offset:  Purpose
-     0       Interrupt Register
-     1       Status Register
-     2       Screen Start 1 Lower Register
-     3       Screen Start 1 Upper Register
-     4       Cursor Address Lower Register
-     5       Cursor Address Upper Register
-     6       Screen Start 2 Lower Register
-     7       Screen Start 2 Upper Register
-    */
+	Offset:  Purpose
+	 0       Interrupt Register
+	 1       Status Register
+	 2       Screen Start 1 Lower Register
+	 3       Screen Start 1 Upper Register
+	 4       Cursor Address Lower Register
+	 5       Cursor Address Upper Register
+	 6       Screen Start 2 Lower Register
+	 7       Screen Start 2 Upper Register
+	*/
 
 	switch (offset)
 	{
 
 		/*  Status / Irq Register
 
-            --RV ZSRs
+		    --RV ZSRs
 
-         6+7 -- = ALWAYS 0
-          5  R  = RDFLG (Status Register Only)
-          4  V  = Vblank
-          3  Z  = Line Zero
-          2  S  = Split 1
-          1  R  = Ready
-          0  s  = Split 2
-        */
+		 6+7 -- = ALWAYS 0
+		  5  R  = RDFLG (Status Register Only)
+		  4  V  = Vblank
+		  3  Z  = Line Zero
+		  2  S  = Split 1
+		  1  R  = Ready
+		  0  s  = Split 2
+		*/
 
 		case 0:
 			LOG2674(("Read Irq Register %02x %06x\n",m_scn2674_irq_register,space.device().safe_pc()));
@@ -530,7 +530,7 @@ READ16_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
 		case 3: LOG2674(("Read Screen1_h Register %06x\n",space.device().safe_pc()));return m_scn2674_screen1_h;
 		case 4: LOG2674(("Read Cursor_l Register %06x\n",space.device().safe_pc()));return m_scn2674_cursor_l;
 		case 5: LOG2674(("Read Cursor_h Register %06x\n",space.device().safe_pc()));return m_scn2674_cursor_h;
-		case 6:	LOG2674(("Read Screen2_l Register %06x\n",space.device().safe_pc()));return m_scn2674_screen2_l;
+		case 6: LOG2674(("Read Screen2_l Register %06x\n",space.device().safe_pc()));return m_scn2674_screen2_l;
 		case 7: LOG2674(("Read Screen2_h Register %06x\n",space.device().safe_pc()));return m_scn2674_screen2_h;
 	}
 
@@ -541,16 +541,16 @@ READ16_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
 WRITE16_MEMBER( scn2674_device::mpu4_vid_scn2674_w )
 {
 	/*
-    Offset:  Purpose
-     0       Initialization Registers
-     1       Command Register
-     2       Screen Start 1 Lower Register
-     3       Screen Start 1 Upper Register
-     4       Cursor Address Lower Register
-     5       Cursor Address Upper Register
-     6       Screen Start 2 Lower Register
-     7       Screen Start 2 Upper Register
-    */
+	Offset:  Purpose
+	 0       Initialization Registers
+	 1       Command Register
+	 2       Screen Start 1 Lower Register
+	 3       Screen Start 1 Upper Register
+	 4       Cursor Address Lower Register
+	 5       Cursor Address Upper Register
+	 6       Screen Start 2 Lower Register
+	 7       Screen Start 2 Upper Register
+	*/
 
 	data &=0x00ff; /* it's an 8-bit chip on a 16-bit board, feel the cheapness. */
 
@@ -577,7 +577,7 @@ WRITE16_MEMBER( scn2674_device::mpu4_vid_scn2674_w )
 
 		case 4: m_scn2674_cursor_l  = data; break;
 		case 5: m_scn2674_cursor_h  = data; break;
-		case 6:	m_scn2674_screen2_l = data; break;
+		case 6: m_scn2674_screen2_l = data; break;
 		case 7:
 			m_scn2674_screen2_h = (data&0x3f);
 			m_scn2674_spl1 = (data & 0x40);

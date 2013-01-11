@@ -16,28 +16,28 @@
 #include "sound/speaker.h"
 #include "video/upd3301.h"
 
-#define Z80_TAG			"z80"
-#define I8251_TAG		"i8251"
-#define I8255A_TAG		"i8255"
-#define I8257_TAG		"i8257"
-#define UPD1990A_TAG	"upd1990a"
-#define UPD3301_TAG		"upd3301"
-#define CENTRONICS_TAG	"centronics"
-#define SCREEN_TAG		"screen"
+#define Z80_TAG         "z80"
+#define I8251_TAG       "i8251"
+#define I8255A_TAG      "i8255"
+#define I8257_TAG       "i8257"
+#define UPD1990A_TAG    "upd1990a"
+#define UPD3301_TAG     "upd3301"
+#define CENTRONICS_TAG  "centronics"
+#define SCREEN_TAG      "screen"
 
 class pc8001_state : public driver_device
 {
 public:
 	pc8001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_rtc(*this, UPD1990A_TAG),
-		  m_dma(*this, I8257_TAG),
-		  m_crtc(*this, UPD3301_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_rtc(*this, UPD1990A_TAG),
+			m_dma(*this, I8257_TAG),
+			m_crtc(*this, UPD3301_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

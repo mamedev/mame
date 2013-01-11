@@ -340,27 +340,27 @@ WRITE8_MEMBER(smsmfg_state::p03_w)
 
 static INPUT_PORTS_START(sms)
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Draw")	/* Draw Button */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Deal")	/* Deal Button */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet")	/* Bet Button */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 )	/* Lighted Button 5 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* Lighted Button 4 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* Lighted Button 3 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* Lighted Button 2 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* Lighted Button 1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Draw")  /* Draw Button */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Deal")  /* Deal Button */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet")   /* Bet Button */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 )    /* Lighted Button 5 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* Lighted Button 4 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* Lighted Button 3 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* Lighted Button 2 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* Lighted Button 1 */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Coin Error reset */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	/* Operator Mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Remote Knockoff */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Coin Error reset */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    /* Operator Mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Remote Knockoff */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Cancel")	/* Cancel Button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Stand")		/* Stand Button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Cancel")   /* Cancel Button */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Stand")     /* Stand Button */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	PORT_IMPULSE(1) /* Coin */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(1) /* Coin */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -397,7 +397,7 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
-	output_set_lamp_value(0, !BIT(data,7));	/* Display Light 1 */
+	output_set_lamp_value(0, !BIT(data,7)); /* Display Light 1 */
 	output_set_lamp_value(1, !BIT(data,6)); /* Display Light 2 */
 	output_set_lamp_value(2, !BIT(data,5)); /* Display Light 3 */
 	output_set_lamp_value(3, !BIT(data,4)); /* Display Light 4 */
@@ -419,22 +419,22 @@ WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_a_w),			/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_b_w),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_c_r),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_a_w),         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_b_w),         /* Port B write */
+	DEVCB_DRIVER_MEMBER(smsmfg_state,ppi0_c_r),         /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 

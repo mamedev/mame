@@ -116,7 +116,7 @@ static const char *get_extension(const char *name)
 static void display_usage(void)
 {
 	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "		castool.exe convert <format> <inputfile> <outputfile.wav>\n");
+	fprintf(stderr, "       castool.exe convert <format> <inputfile> <outputfile.wav>\n");
 }
 
 static void display_formats(void)
@@ -169,7 +169,7 @@ int CLIB_DECL main(int argc, char *argv[])
 					return -1;
 				}
 
-				if (cassette_open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, CASSETTE_FLAG_READONLY, &cassette))	{
+				if (cassette_open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, CASSETTE_FLAG_READONLY, &cassette))  {
 					fprintf(stderr, "Invalid format of input file.\n");
 					fclose(f);
 					return -1;

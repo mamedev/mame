@@ -6,12 +6,12 @@
 
 
 /* oscillators and clocks */
-#define JEDI_MAIN_CPU_OSC		(XTAL_10MHz)
-#define JEDI_AUDIO_CPU_OSC		(XTAL_12_096MHz)
-#define JEDI_MAIN_CPU_CLOCK		(JEDI_MAIN_CPU_OSC / 4)
-#define JEDI_AUDIO_CPU_CLOCK	(JEDI_AUDIO_CPU_OSC / 8)
-#define JEDI_POKEY_CLOCK		(JEDI_AUDIO_CPU_CLOCK)
-#define JEDI_TMS5220_CLOCK		(JEDI_AUDIO_CPU_OSC / 2 / 9) /* div by 9 is via a binary counter that counts from 7 to 16 */
+#define JEDI_MAIN_CPU_OSC       (XTAL_10MHz)
+#define JEDI_AUDIO_CPU_OSC      (XTAL_12_096MHz)
+#define JEDI_MAIN_CPU_CLOCK     (JEDI_MAIN_CPU_OSC / 4)
+#define JEDI_AUDIO_CPU_CLOCK    (JEDI_AUDIO_CPU_OSC / 8)
+#define JEDI_POKEY_CLOCK        (JEDI_AUDIO_CPU_CLOCK)
+#define JEDI_TMS5220_CLOCK      (JEDI_AUDIO_CPU_OSC / 2 / 9) /* div by 9 is via a binary counter that counts from 7 to 16 */
 
 
 class jedi_state : public driver_device
@@ -19,7 +19,7 @@ class jedi_state : public driver_device
 public:
 	jedi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") ,
+			m_nvram(*this, "nvram") ,
 		m_foreground_bank(*this, "foreground_bank"),
 		m_video_off(*this, "video_off"),
 		m_backgroundram(*this, "backgroundram"),

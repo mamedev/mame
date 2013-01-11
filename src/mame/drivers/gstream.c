@@ -130,9 +130,9 @@ class gstream_state : public driver_device
 public:
 	gstream_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_oki_1(*this, "oki1"),
-		  m_oki_2(*this, "oki2") ,
+			m_maincpu(*this, "maincpu"),
+			m_oki_1(*this, "oki1"),
+			m_oki_2(*this, "oki2") ,
 		m_workram(*this, "workram"),
 		m_vram(*this, "vram"),
 		m_paletteram(*this, "paletteram"){ }
@@ -366,11 +366,11 @@ WRITE32_MEMBER(gstream_state::gstream_oki_4040_w)
 static ADDRESS_MAP_START( gstream_io, AS_IO, 32, gstream_state )
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
-	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")	// extra coin switches etc
-	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w)	// oki banking
-	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w)	// some clocking?
-	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)	// music and samples
-	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)	// music and samples
+	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")    // extra coin switches etc
+	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w)    // oki banking
+	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w)   // some clocking?
+	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff) // music and samples
+	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff) // music and samples
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gstream )
@@ -404,10 +404,10 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_service_r, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_service_r, NULL)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_r, NULL)
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_r, NULL)
 	PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -430,13 +430,13 @@ static const gfx_layout layout32x32 =
 	8,
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0,   8,   16,  24,  32,  40,  48,  56,
-	  64,  72,  80,  88,  96,  104, 112, 120,
-	  128, 136, 144, 152, 160, 168, 176, 184,
-	  192, 200, 208, 216, 224, 232, 240, 248 },
+		64,  72,  80,  88,  96,  104, 112, 120,
+		128, 136, 144, 152, 160, 168, 176, 184,
+		192, 200, 208, 216, 224, 232, 240, 248 },
 	{ 0*256,  1*256,  2*256,  3*256,  4*256,  5*256,  6*256,  7*256,
-	  8*256,  9*256,  10*256, 11*256, 12*256, 13*256, 14*256, 15*256,
-      16*256, 17*256, 18*256, 19*256, 20*256, 21*256, 22*256, 23*256,
-	  24*256, 25*256, 26*256, 27*256, 28*256, 29*256, 30*256, 31*256,
+		8*256,  9*256,  10*256, 11*256, 12*256, 13*256, 14*256, 15*256,
+		16*256, 17*256, 18*256, 19*256, 20*256, 21*256, 22*256, 23*256,
+		24*256, 25*256, 26*256, 27*256, 28*256, 29*256, 30*256, 31*256,
 	},
 	32*256,
 };
@@ -484,18 +484,18 @@ void gstream_state::video_start()
 UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* The tilemaps and sprite are interleaved together.
-       Even Words are tilemap tiles
-       Odd Words are sprite data
+	   Even Words are tilemap tiles
+	   Odd Words are sprite data
 
-       Sprites start at the top of memory, tilemaps at
-       the bottom, but the areas can overlap
+	   Sprites start at the top of memory, tilemaps at
+	   the bottom, but the areas can overlap
 
-       *What seems an actual game bug*
-       when a sprite ends up with a negative co-ordinate
-       a value of 0xfffffffe gets set in the sprite list.
-       this could corrupt the tile value as both words
-       are being set ?!
-   */
+	   *What seems an actual game bug*
+	   when a sprite ends up with a negative co-ordinate
+	   a value of 0xfffffffe gets set in the sprite list.
+	   this could corrupt the tile value as both words
+	   are being set ?!
+	*/
 
 	int i;
 
@@ -562,7 +562,7 @@ void gstream_state::machine_reset()
 static MACHINE_CONFIG_START( gstream, gstream_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4)	/* 4x internal multiplier */
+	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(gstream_32bit_map)
 	MCFG_CPU_IO_MAP(gstream_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
@@ -645,4 +645,3 @@ DRIVER_INIT_MEMBER(gstream_state,gstream)
 
 
 GAME( 2002, gstream, 0, gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft", "G-Stream G2020", GAME_SUPPORTS_SAVE )
-

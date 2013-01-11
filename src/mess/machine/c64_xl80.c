@@ -42,10 +42,10 @@ Notes:
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define RAM_SIZE			0x800
+#define RAM_SIZE            0x800
 
-#define HD46505SP_TAG		"mc6845"
-#define MC6845_SCREEN_TAG	"screen80"
+#define HD46505SP_TAG       "mc6845"
+#define MC6845_SCREEN_TAG   "screen80"
 
 
 

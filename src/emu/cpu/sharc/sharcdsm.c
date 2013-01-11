@@ -10,20 +10,20 @@
 static UINT32 (* sharcdasm_table[256])(UINT32, UINT64);
 static int dasm_table_built = 0;
 
-#define GET_UREG(x)		(ureg_names[x])
-#define GET_SREG(x)		(GET_UREG(0x70 | (x & 0xf)))
-#define GET_DREG(x)		(GET_UREG(0x00 | (x & 0xf)))
-#define GET_DAG1_I(x)	(GET_UREG(0x10 | (x & 0x7)))
-#define GET_DAG1_M(x)	(GET_UREG(0x20 | (x & 0x7)))
-#define GET_DAG1_L(x)	(GET_UREG(0x30 | (x & 0x7)))
-#define GET_DAG1_B(x)	(GET_UREG(0x40 | (x & 0x7)))
-#define GET_DAG2_I(x)	(GET_UREG(0x10 | (8 + (x & 0x7))))
-#define GET_DAG2_M(x)	(GET_UREG(0x20 | (8 + (x & 0x7))))
-#define GET_DAG2_L(x)	(GET_UREG(0x30 | (8 + (x & 0x7))))
-#define GET_DAG2_B(x)	(GET_UREG(0x40 | (8 + (x & 0x7))))
+#define GET_UREG(x)     (ureg_names[x])
+#define GET_SREG(x)     (GET_UREG(0x70 | (x & 0xf)))
+#define GET_DREG(x)     (GET_UREG(0x00 | (x & 0xf)))
+#define GET_DAG1_I(x)   (GET_UREG(0x10 | (x & 0x7)))
+#define GET_DAG1_M(x)   (GET_UREG(0x20 | (x & 0x7)))
+#define GET_DAG1_L(x)   (GET_UREG(0x30 | (x & 0x7)))
+#define GET_DAG1_B(x)   (GET_UREG(0x40 | (x & 0x7)))
+#define GET_DAG2_I(x)   (GET_UREG(0x10 | (8 + (x & 0x7))))
+#define GET_DAG2_M(x)   (GET_UREG(0x20 | (8 + (x & 0x7))))
+#define GET_DAG2_L(x)   (GET_UREG(0x30 | (8 + (x & 0x7))))
+#define GET_DAG2_B(x)   (GET_UREG(0x40 | (8 + (x & 0x7))))
 
-#define SIGN_EXTEND6(x)		((x & 0x20) ? (0xffffffc0 | x) : x)
-#define SIGN_EXTEND24(x)	((x & 0x800000) ? (0xff000000 | x) : x)
+#define SIGN_EXTEND6(x)     ((x & 0x20) ? (0xffffffc0 | x) : x)
+#define SIGN_EXTEND24(x)    ((x & 0x800000) ? (0xff000000 | x) : x)
 
 
 static char *output;
@@ -49,7 +49,7 @@ static void compute(UINT32 opcode)
 	int ra = rn;
 	int rm = rs;
 
-	if (opcode & 0x400000)		/* Multi-function opcode */
+	if (opcode & 0x400000)      /* Multi-function opcode */
 	{
 		int multiop = (opcode >> 16) & 0x3f;
 		int rxm = (opcode >> 6) & 0x3;
@@ -59,29 +59,29 @@ static void compute(UINT32 opcode)
 
 		switch(multiop)
 		{
-			case 0x04:		print("R%d = R%d * R%d (SSFR),  R%d = R%d + R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x05:		print("R%d = R%d * R%d (SSFR),  R%d = R%d - R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x06:		print("R%d = R%d * R%d (SSFR),  R%d = (R%d + R%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x08:		print("MRF = MRF + R%d * R%d (SSF),  R%d = R%d + R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x09:		print("MRF = MRF + R%d * R%d (SSF),  R%d = R%d - R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x0a:		print("MRF = MRF + R%d * R%d (SSF),  R%d = (R%d + R%d)/2", rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x0c:		print("R%d = MRF + R%d * R%d (SSFR),  R%d = R%d + R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x0d:		print("R%d = MRF + R%d * R%d (SSFR),  R%d = R%d - R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x0e:		print("R%d = MRF + R%d * R%d (SSFR),  R%d = (R%d + R%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x10:		print("MRF = MRF - R%d * R%d (SSF),  R%d = R%d + R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x11:		print("MRF = MRF - R%d * R%d (SSF),  R%d = R%d - R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x12:		print("MRF = MRF - R%d * R%d (SSF),  R%d = (R%d + R%d)/2", rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x14:		print("R%d = MRF - R%d * R%d (SSFR),  R%d = R%d + R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x15:		print("R%d = MRF - R%d * R%d (SSFR),  R%d = R%d - R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x16:		print("R%d = MRF - R%d * R%d (SSFR),  R%d = (R%d + R%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x18:		print("F%d = F%d * F%d,  F%d = F%d + F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x19:		print("F%d = F%d * F%d,  F%d = F%d - F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x1a:		print("F%d = F%d * F%d,  F%d = FLOAT F%d BY F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x1b:		print("F%d = F%d * F%d,  F%d = FIX F%d BY F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x1c:		print("F%d = F%d * F%d,  F%d = (F%d + F%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x1d:		print("F%d = F%d * F%d,  F%d = ABS F%d", rm, rxm, rym+4, ra, rxa+8); break;
-			case 0x1e:		print("F%d = F%d * F%d,  F%d = MAX(F%d, F%d)", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
-			case 0x1f:		print("F%d = F%d * F%d,  F%d = MIN(F%d, F%d)", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x04:      print("R%d = R%d * R%d (SSFR),  R%d = R%d + R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x05:      print("R%d = R%d * R%d (SSFR),  R%d = R%d - R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x06:      print("R%d = R%d * R%d (SSFR),  R%d = (R%d + R%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x08:      print("MRF = MRF + R%d * R%d (SSF),  R%d = R%d + R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x09:      print("MRF = MRF + R%d * R%d (SSF),  R%d = R%d - R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x0a:      print("MRF = MRF + R%d * R%d (SSF),  R%d = (R%d + R%d)/2", rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x0c:      print("R%d = MRF + R%d * R%d (SSFR),  R%d = R%d + R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x0d:      print("R%d = MRF + R%d * R%d (SSFR),  R%d = R%d - R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x0e:      print("R%d = MRF + R%d * R%d (SSFR),  R%d = (R%d + R%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x10:      print("MRF = MRF - R%d * R%d (SSF),  R%d = R%d + R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x11:      print("MRF = MRF - R%d * R%d (SSF),  R%d = R%d - R%d", rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x12:      print("MRF = MRF - R%d * R%d (SSF),  R%d = (R%d + R%d)/2", rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x14:      print("R%d = MRF - R%d * R%d (SSFR),  R%d = R%d + R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x15:      print("R%d = MRF - R%d * R%d (SSFR),  R%d = R%d - R%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x16:      print("R%d = MRF - R%d * R%d (SSFR),  R%d = (R%d + R%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x18:      print("F%d = F%d * F%d,  F%d = F%d + F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x19:      print("F%d = F%d * F%d,  F%d = F%d - F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x1a:      print("F%d = F%d * F%d,  F%d = FLOAT F%d BY F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x1b:      print("F%d = F%d * F%d,  F%d = FIX F%d BY F%d", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x1c:      print("F%d = F%d * F%d,  F%d = (F%d + F%d)/2", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x1d:      print("F%d = F%d * F%d,  F%d = ABS F%d", rm, rxm, rym+4, ra, rxa+8); break;
+			case 0x1e:      print("F%d = F%d * F%d,  F%d = MAX(F%d, F%d)", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
+			case 0x1f:      print("F%d = F%d * F%d,  F%d = MIN(F%d, F%d)", rm, rxm, rym+4, ra, rxa+8, rya+12); break;
 
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
@@ -119,7 +119,7 @@ static void compute(UINT32 opcode)
 			}
 		}
 	}
-	else						/* Single-function */
+	else                        /* Single-function */
 	{
 		switch(cu)
 		{
@@ -131,52 +131,52 @@ static void compute(UINT32 opcode)
 				switch(op)
 				{
 					/* Fixed-point */
-					case 0x01:	print("R%d = R%d + R%d", rn, rx, ry); break;
-					case 0x02:	print("R%d = R%d - R%d", rn, rx, ry); break;
-					case 0x05:	print("R%d = R%d + R%d + CI", rn, rx, ry); break;
-					case 0x06:	print("R%d = R%d - R%d + CI - 1", rn, rx, ry); break;
-					case 0x09:	print("R%d = (R%d + R%d)/2", rn, rx, ry); break;
-					case 0x0a:	print("COMP(R%d, R%d)", rx, ry); break;
-					case 0x25:	print("R%d = R%d + CI", rn, rx); break;
-					case 0x26:	print("R%d = R%d + CI - 1", rn, rx); break;
-					case 0x29:	print("R%d = R%d + 1", rn, rx); break;
-					case 0x2a:	print("R%d = R%d - 1", rn, rx); break;
-					case 0x22:	print("R%d = -R%d", rn, rx); break;
-					case 0x30:	print("R%d = ABS R%d", rn, rx); break;
-					case 0x21:	print("R%d = PASS R%d", rn, rx); break;
-					case 0x40:	print("R%d = R%d AND R%d", rn, rx, ry); break;
-					case 0x41:	print("R%d = R%d OR R%d", rn, rx, ry); break;
-					case 0x42:	print("R%d = R%d XOR R%d", rn, rx, ry); break;
-					case 0x43:	print("R%d = NOT R%d", rn, rx); break;
-					case 0x61:	print("R%d = MIN(R%d, R%d)", rn, rx, ry); break;
-					case 0x62:	print("R%d = MAX(R%d, R%d)", rn, rx, ry); break;
-					case 0x63:	print("R%d = CLIP R%d BY R%d", rn, rx, ry); break;
+					case 0x01:  print("R%d = R%d + R%d", rn, rx, ry); break;
+					case 0x02:  print("R%d = R%d - R%d", rn, rx, ry); break;
+					case 0x05:  print("R%d = R%d + R%d + CI", rn, rx, ry); break;
+					case 0x06:  print("R%d = R%d - R%d + CI - 1", rn, rx, ry); break;
+					case 0x09:  print("R%d = (R%d + R%d)/2", rn, rx, ry); break;
+					case 0x0a:  print("COMP(R%d, R%d)", rx, ry); break;
+					case 0x25:  print("R%d = R%d + CI", rn, rx); break;
+					case 0x26:  print("R%d = R%d + CI - 1", rn, rx); break;
+					case 0x29:  print("R%d = R%d + 1", rn, rx); break;
+					case 0x2a:  print("R%d = R%d - 1", rn, rx); break;
+					case 0x22:  print("R%d = -R%d", rn, rx); break;
+					case 0x30:  print("R%d = ABS R%d", rn, rx); break;
+					case 0x21:  print("R%d = PASS R%d", rn, rx); break;
+					case 0x40:  print("R%d = R%d AND R%d", rn, rx, ry); break;
+					case 0x41:  print("R%d = R%d OR R%d", rn, rx, ry); break;
+					case 0x42:  print("R%d = R%d XOR R%d", rn, rx, ry); break;
+					case 0x43:  print("R%d = NOT R%d", rn, rx); break;
+					case 0x61:  print("R%d = MIN(R%d, R%d)", rn, rx, ry); break;
+					case 0x62:  print("R%d = MAX(R%d, R%d)", rn, rx, ry); break;
+					case 0x63:  print("R%d = CLIP R%d BY R%d", rn, rx, ry); break;
 					/* Floating-point */
-					case 0x81:	print("F%d = F%d + F%d", rn, rx, ry); break;
-					case 0x82:	print("F%d = F%d - F%d", rn, rx, ry); break;
-					case 0x91:	print("F%d = ABS(F%d + F%d)", rn, rx, ry); break;
-					case 0x92:	print("F%d = ABS(F%d - F%d)", rn, rx, ry); break;
-					case 0x89:	print("F%d = (F%d + F%d)/2", rn, rx, ry); break;
-					case 0x8a:	print("COMP(F%d, F%d)", rx, ry); break;
-					case 0xa2:	print("F%d = -F%d", rn, rx); break;
-					case 0xb0:	print("F%d = ABS F%d", rn, rx); break;
-					case 0xa1:	print("F%d = PASS F%d", rn, rx); break;
-					case 0xa5:	print("F%d = RND R%d", rn, rx); break;
-					case 0xbd:	print("F%d = SCALB F%d BY R%d", rn, rx, ry); break;
-					case 0xad:	print("R%d = MANT F%d", rn, rx); break;
-					case 0xc1:	print("R%d = LOGB F%d", rn, rx); break;
-					case 0xd9:	print("R%d = FIX F%d BY R%d", rn, rx, ry); break;
-					case 0xc9:	print("R%d = FIX F%d", rn, rx); break;
-					case 0xdd:	print("R%d = TRUNC F%d BY R%d", rn, rx, ry); break;
-					case 0xcd:	print("R%d = TRUNC F%d", rn, rx); break;
-					case 0xda:	print("F%d = FLOAT R%d BY R%d", rn, rx, ry); break;
-					case 0xca:	print("F%d = FLOAT R%d", rn, rx); break;
-					case 0xc4:	print("F%d = RECIPS F%d", rn, rx); break;
-					case 0xc5:	print("F%d = RSQRTS F%d", rn, rx); break;
-					case 0xe0:	print("F%d = F%d COPYSIGN F%d", rn, rx, ry); break;
-					case 0xe1:	print("F%d = MIN(F%d, F%d)", rn, rx, ry); break;
-					case 0xe2:	print("F%d = MAX(F%d, F%d)", rn, rx, ry); break;
-					case 0xe3:	print("F%d = CLIP F%d BY F%d", rn, rx, ry); break;
+					case 0x81:  print("F%d = F%d + F%d", rn, rx, ry); break;
+					case 0x82:  print("F%d = F%d - F%d", rn, rx, ry); break;
+					case 0x91:  print("F%d = ABS(F%d + F%d)", rn, rx, ry); break;
+					case 0x92:  print("F%d = ABS(F%d - F%d)", rn, rx, ry); break;
+					case 0x89:  print("F%d = (F%d + F%d)/2", rn, rx, ry); break;
+					case 0x8a:  print("COMP(F%d, F%d)", rx, ry); break;
+					case 0xa2:  print("F%d = -F%d", rn, rx); break;
+					case 0xb0:  print("F%d = ABS F%d", rn, rx); break;
+					case 0xa1:  print("F%d = PASS F%d", rn, rx); break;
+					case 0xa5:  print("F%d = RND R%d", rn, rx); break;
+					case 0xbd:  print("F%d = SCALB F%d BY R%d", rn, rx, ry); break;
+					case 0xad:  print("R%d = MANT F%d", rn, rx); break;
+					case 0xc1:  print("R%d = LOGB F%d", rn, rx); break;
+					case 0xd9:  print("R%d = FIX F%d BY R%d", rn, rx, ry); break;
+					case 0xc9:  print("R%d = FIX F%d", rn, rx); break;
+					case 0xdd:  print("R%d = TRUNC F%d BY R%d", rn, rx, ry); break;
+					case 0xcd:  print("R%d = TRUNC F%d", rn, rx); break;
+					case 0xda:  print("F%d = FLOAT R%d BY R%d", rn, rx, ry); break;
+					case 0xca:  print("F%d = FLOAT R%d", rn, rx); break;
+					case 0xc4:  print("F%d = RECIPS F%d", rn, rx); break;
+					case 0xc5:  print("F%d = RSQRTS F%d", rn, rx); break;
+					case 0xe0:  print("F%d = F%d COPYSIGN F%d", rn, rx, ry); break;
+					case 0xe1:  print("F%d = MIN(F%d, F%d)", rn, rx, ry); break;
+					case 0xe2:  print("F%d = MAX(F%d, F%d)", rn, rx, ry); break;
+					case 0xe3:  print("F%d = CLIP F%d BY F%d", rn, rx, ry); break;
 
 					case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 					case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
@@ -212,16 +212,16 @@ static void compute(UINT32 opcode)
 				switch((op >> 1) & 0x3)
 				{
 					case 0:
-					case 1:		print("R%d = ", rn); break;
-					case 2:		print("MRF = "); break;
-					case 3:		print("MRB = "); break;
+					case 1:     print("R%d = ", rn); break;
+					case 2:     print("MRF = "); break;
+					case 3:     print("MRB = "); break;
 				}
 				switch((op >> 6) & 0x3)
 				{
 					case 0:
 						switch((op >> 4) & 0x3)
 						{
-							case 0:		print("SAT %s", (op & 0x2) ? "MRB" : "MRF"); break;
+							case 0:     print("SAT %s", (op & 0x2) ? "MRB" : "MRF"); break;
 							case 1:
 								if (op & 0x8)
 								{
@@ -254,28 +254,28 @@ static void compute(UINT32 opcode)
 			{
 				switch(op)
 				{
-					case 0x00:		print("R%d = LSHIFT R%d BY R%d", rn, rx, ry); break;
-					case 0x20:		print("R%d = R%d OR LSHIFT R%d BY R%d", rn, rn, rx, ry); break;
-					case 0x04:		print("R%d = ASHIFT R%d BY R%d", rn, rx, ry); break;
-					case 0x24:		print("R%d = R%d OR ASHIFT R%d BY R%d", rn, rn, rx, ry); break;
-					case 0x08:		print("R%d = ROT R%d BY R%d", rn, rx, ry); break;
-					case 0xc4:		print("R%d = BCLR R%d BY R%d", rn, rx, ry); break;
-					case 0xc0:		print("R%d = BSET R%d BY R%d", rn, rx, ry); break;
-					case 0xc8:		print("R%d = BTGL R%d BY R%d", rn, rx, ry); break;
-					case 0xcc:		print("BTST R%d BY R%d", rx, ry); break;
-					case 0x44:		print("R%d = FDEP R%d BY R%d", rn, rx, ry); break;
-					case 0x64:		print("R%d = R%d OR FDEP R%d BY R%d", rn, rn, rx, ry); break;
-					case 0x4c:		print("R%d = FDEP R%d BY R%d (SE)", rn, rx, ry); break;
-					case 0x6c:		print("R%d = R%d OR FDEP R%d BY R%d (SE)", rn, rn, rx, ry); break;
-					case 0x40:		print("R%d = FEXT R%d BY R%d", rn, rx, ry); break;
-					case 0x48:		print("R%d = FEXT R%d BY R%d (SE)", rn, rx, ry); break;
-					case 0x80:		print("R%d = EXP R%d", rn, rx); break;
-					case 0x84:		print("R%d = EXP R%d (EX)", rn, rx); break;
-					case 0x88:		print("R%d = LEFTZ R%d", rn, rx); break;
-					case 0x8c:		print("R%d = LEFTO R%d", rn, rx); break;
-					case 0x90:		print("R%d = FPACK F%d", rn, rx); break;
-					case 0x94:		print("F%d = FUNPACK R%d", rn, rx); break;
-					default:		print("??? (COMPUTE, SHIFT)"); break;
+					case 0x00:      print("R%d = LSHIFT R%d BY R%d", rn, rx, ry); break;
+					case 0x20:      print("R%d = R%d OR LSHIFT R%d BY R%d", rn, rn, rx, ry); break;
+					case 0x04:      print("R%d = ASHIFT R%d BY R%d", rn, rx, ry); break;
+					case 0x24:      print("R%d = R%d OR ASHIFT R%d BY R%d", rn, rn, rx, ry); break;
+					case 0x08:      print("R%d = ROT R%d BY R%d", rn, rx, ry); break;
+					case 0xc4:      print("R%d = BCLR R%d BY R%d", rn, rx, ry); break;
+					case 0xc0:      print("R%d = BSET R%d BY R%d", rn, rx, ry); break;
+					case 0xc8:      print("R%d = BTGL R%d BY R%d", rn, rx, ry); break;
+					case 0xcc:      print("BTST R%d BY R%d", rx, ry); break;
+					case 0x44:      print("R%d = FDEP R%d BY R%d", rn, rx, ry); break;
+					case 0x64:      print("R%d = R%d OR FDEP R%d BY R%d", rn, rn, rx, ry); break;
+					case 0x4c:      print("R%d = FDEP R%d BY R%d (SE)", rn, rx, ry); break;
+					case 0x6c:      print("R%d = R%d OR FDEP R%d BY R%d (SE)", rn, rn, rx, ry); break;
+					case 0x40:      print("R%d = FEXT R%d BY R%d", rn, rx, ry); break;
+					case 0x48:      print("R%d = FEXT R%d BY R%d (SE)", rn, rx, ry); break;
+					case 0x80:      print("R%d = EXP R%d", rn, rx); break;
+					case 0x84:      print("R%d = EXP R%d (EX)", rn, rx); break;
+					case 0x88:      print("R%d = LEFTZ R%d", rn, rx); break;
+					case 0x8c:      print("R%d = LEFTO R%d", rn, rx); break;
+					case 0x90:      print("R%d = FPACK F%d", rn, rx); break;
+					case 0x94:      print("F%d = FUNPACK R%d", rn, rx); break;
+					default:        print("??? (COMPUTE, SHIFT)"); break;
 				}
 				break;
 			}
@@ -299,7 +299,7 @@ static void get_if_condition(int cond)
 
 static void pm_dm_ureg(int g, int d, int i, int m, int ureg, int update)
 {
-	if (update)		// post-modify
+	if (update)     // post-modify
 	{
 		if (d)
 		{
@@ -325,7 +325,7 @@ static void pm_dm_ureg(int g, int d, int i, int m, int ureg, int update)
 		}
 
 	}
-	else			// pre-modify
+	else            // pre-modify
 	{
 		if (d)
 		{
@@ -354,7 +354,7 @@ static void pm_dm_ureg(int g, int d, int i, int m, int ureg, int update)
 
 static void pm_dm_imm_dreg(int g, int d, int i, int data, int dreg, int update)
 {
-	if (update)		// post-modify
+	if (update)     // post-modify
 	{
 		if (d)
 		{
@@ -379,7 +379,7 @@ static void pm_dm_imm_dreg(int g, int d, int i, int data, int dreg, int update)
 			}
 		}
 	}
-	else			// pre-modify
+	else            // pre-modify
 	{
 		if (d)
 		{
@@ -440,28 +440,28 @@ static void shiftop(int shift, int data, int rn, int rx)
 
 	switch(shift)
 	{
-		case 0x00:		print("R%d = LSHIFT R%d BY %d", rn, rx, data8); break;
-		case 0x08:		print("R%d = R%d OR LSHIFT R%d BY %d", rn, rn, rx, data8); break;
-		case 0x01:		print("R%d = ASHIFT R%d BY %d", rn, rx, data8); break;
-		case 0x09:		print("R%d = R%d OR ASHIFT R%d BY %d", rn, rn, rx, data8); break;
-		case 0x02:		print("R%d = ROT R%d BY %d", rn, rx, data8); break;
-		case 0x31:		print("R%d = BCLR R%d BY %d", rn, rx, data8); break;
-		case 0x30:		print("R%d = BSET R%d BY %d", rn, rx, data8); break;
-		case 0x32:		print("R%d = BTGL R%d BY %d", rn, rx, data8); break;
-		case 0x33:		print("BTST R%d BY %d", rx, data8); break;
-		case 0x11:		print("R%d = FDEP R%d BY %d:%d", rn, rx, bit6, len); break;
-		case 0x19:		print("R%d = R%d OR FDEP R%d BY %d:%d", rn, rn, rx, bit6, len); break;
-		case 0x13:		print("R%d = FDEP R%d BY %d:%d (SE)", rn, rx, bit6, len); break;
-		case 0x1b:		print("R%d = R%d OR FDEP R%d BY %d:%d (SE)", rn, rn, rx, bit6, len); break;
-		case 0x10:		print("R%d = FEXT R%d BY %d:%d", rn, rx, bit6, len); break;
-		case 0x12:		print("R%d = FEXT R%d BY %d:%d (SE)", rn, rx, bit6, len); break;
-		case 0x20:		print("R%d = EXP R%d", rn, rx); break;
-		case 0x21:		print("R%d = EXP R%d (EX)", rn, rx); break;
-		case 0x22:		print("R%d = LEFTZ R%d", rn, rx); break;
-		case 0x23:		print("R%d = LEFTO R%d", rn, rx); break;
-		case 0x24:		print("R%d = FPACK F%d", rn, rx); break;
-		case 0x25:		print("F%d = FUNPACK R%d", rn, rx); break;
-		default:		print("??? (SHIFTOP)"); break;
+		case 0x00:      print("R%d = LSHIFT R%d BY %d", rn, rx, data8); break;
+		case 0x08:      print("R%d = R%d OR LSHIFT R%d BY %d", rn, rn, rx, data8); break;
+		case 0x01:      print("R%d = ASHIFT R%d BY %d", rn, rx, data8); break;
+		case 0x09:      print("R%d = R%d OR ASHIFT R%d BY %d", rn, rn, rx, data8); break;
+		case 0x02:      print("R%d = ROT R%d BY %d", rn, rx, data8); break;
+		case 0x31:      print("R%d = BCLR R%d BY %d", rn, rx, data8); break;
+		case 0x30:      print("R%d = BSET R%d BY %d", rn, rx, data8); break;
+		case 0x32:      print("R%d = BTGL R%d BY %d", rn, rx, data8); break;
+		case 0x33:      print("BTST R%d BY %d", rx, data8); break;
+		case 0x11:      print("R%d = FDEP R%d BY %d:%d", rn, rx, bit6, len); break;
+		case 0x19:      print("R%d = R%d OR FDEP R%d BY %d:%d", rn, rn, rx, bit6, len); break;
+		case 0x13:      print("R%d = FDEP R%d BY %d:%d (SE)", rn, rx, bit6, len); break;
+		case 0x1b:      print("R%d = R%d OR FDEP R%d BY %d:%d (SE)", rn, rn, rx, bit6, len); break;
+		case 0x10:      print("R%d = FEXT R%d BY %d:%d", rn, rx, bit6, len); break;
+		case 0x12:      print("R%d = FEXT R%d BY %d:%d (SE)", rn, rx, bit6, len); break;
+		case 0x20:      print("R%d = EXP R%d", rn, rx); break;
+		case 0x21:      print("R%d = EXP R%d (EX)", rn, rx); break;
+		case 0x22:      print("R%d = LEFTZ R%d", rn, rx); break;
+		case 0x23:      print("R%d = LEFTO R%d", rn, rx); break;
+		case 0x24:      print("R%d = FPACK F%d", rn, rx); break;
+		case 0x25:      print("F%d = FUNPACK R%d", rn, rx); break;
+		default:        print("??? (SHIFTOP)"); break;
 	}
 }
 
@@ -631,11 +631,11 @@ static UINT32 dasm_direct_jump(UINT32 pc, UINT64 opcode)
 		print("JUMP");
 	}
 
-	if (opcode & U64(0x10000000000))	/* PC-relative branch */
+	if (opcode & U64(0x10000000000))    /* PC-relative branch */
 	{
 		print(" (0x%08X)", pc + SIGN_EXTEND24(addr));
 	}
-	else								/* Indirect branch */
+	else                                /* Indirect branch */
 	{
 		print(" (0x%08X)", addr);
 	}
@@ -674,11 +674,11 @@ static UINT32 dasm_indirect_jump_compute(UINT32 pc, UINT64 opcode)
 		print("JUMP");
 	}
 
-	if (opcode & U64(0x10000000000))	/* PC-relative branch */
+	if (opcode & U64(0x10000000000))    /* PC-relative branch */
 	{
 		print(" (0x%08X)", pc + SIGN_EXTEND6(reladdr));
 	}
-	else								/* Indirect branch */
+	else                                /* Indirect branch */
 	{
 		print(" (%s, %s)", GET_DAG2_M(pmm), GET_DAG2_I(pmi));
 	}
@@ -719,11 +719,11 @@ static UINT32 dasm_indirect_jump_compute_dregdm(UINT32 pc, UINT64 opcode)
 	get_if_condition(cond);
 	print("JUMP");
 
-	if (opcode & U64(0x200000000000))	/* PC-relative branch */
+	if (opcode & U64(0x200000000000))   /* PC-relative branch */
 	{
 		print(" (0x%08X)", pc + SIGN_EXTEND6(reladdr));
 	}
-	else								/* Indirect branch */
+	else                                /* Indirect branch */
 	{
 		print(" (%s, %s)", GET_DAG2_M(pmm), GET_DAG2_I(pmi));
 	}
@@ -792,12 +792,12 @@ static UINT32 dasm_do_until_counter(UINT32 pc, UINT64 opcode)
 	int ureg = (opcode >> 32) & 0xff;
 	UINT32 addr = opcode & 0xffffff;
 
-	if (opcode & U64(0x10000000000))	/* Loop counter from universal register */
+	if (opcode & U64(0x10000000000))    /* Loop counter from universal register */
 	{
 		print("LCNTR = %s, ", GET_UREG(ureg));
 		print("DO (0x%08X)", pc + SIGN_EXTEND24(addr));
 	}
-	else								/* Loop counter from immediate */
+	else                                /* Loop counter from immediate */
 	{
 		print("LCNTR = 0x%04X, ", data);
 		print("DO (0x%08X) UNTIL LCE", pc + SIGN_EXTEND24(addr));
@@ -925,7 +925,7 @@ static UINT32 dasm_ireg_modify(UINT32 pc, UINT64 opcode)
 	int i = (opcode >> 32) & 0x7;
 	UINT32 data = opcode & 0xffffffff;
 
-	if (opcode & U64(0x8000000000))		/* with bit-reverse */
+	if (opcode & U64(0x8000000000))     /* with bit-reverse */
 	{
 		if (g)
 		{
@@ -936,7 +936,7 @@ static UINT32 dasm_ireg_modify(UINT32 pc, UINT64 opcode)
 			print("BITREV (%s, 0x%08X)", GET_DAG1_I(i), data);
 		}
 	}
-	else								/* without bit-reverse */
+	else                                /* without bit-reverse */
 	{
 		if (g)
 		{
@@ -1033,7 +1033,7 @@ static UINT32 dasm_idlenop(UINT32 pc, UINT64 opcode)
 static UINT32 dasm_cjump_rframe(UINT32 pc, UINT64 opcode)
 {
 	/* TODO */
-	if (opcode & U64(0x10000000000))	/* RFRAME */
+	if (opcode & U64(0x10000000000))    /* RFRAME */
 	{
 		print("TODO: RFRAME");
 	}
@@ -1054,70 +1054,70 @@ static UINT32 dasm_invalid(UINT32 pc, UINT64 opcode)
 static const SHARC_DASM_OP sharc_dasm_ops[] =
 {
 	//  |0 0 1|
-	{	0xe000,		0x2000,		dasm_compute_dreg_dmpm								},
+	{   0xe000,     0x2000,     dasm_compute_dreg_dmpm                              },
 
 	//  |0 0 0|0 0 0 0 1|
-	{	0xff00,		0x0100,		dasm_compute										},
+	{   0xff00,     0x0100,     dasm_compute                                        },
 
 	//  |0 1 0|
-	{	0xe000,		0x4000,		dasm_compute_uregdmpm_regmod						},
+	{   0xe000,     0x4000,     dasm_compute_uregdmpm_regmod                        },
 
 	//  |0 1 1|0|
-	{	0xf000,		0x6000,		dasm_compute_dregdmpm_immmod						},
+	{   0xf000,     0x6000,     dasm_compute_dregdmpm_immmod                        },
 
 	//  |0 1 1|1|
-	{	0xf000,		0x7000,		dasm_compute_ureg_ureg								},
+	{   0xf000,     0x7000,     dasm_compute_ureg_ureg                              },
 
 	//  |1 0 0|0|
-	{	0xf000,		0x8000,		dasm_immshift_dregdmpm								},
+	{   0xf000,     0x8000,     dasm_immshift_dregdmpm                              },
 
 	//  |0 0 0|0 0 0 1 0|
-	{	0xff00,		0x0200,		dasm_immshift_dregdmpm_nodata						},
+	{   0xff00,     0x0200,     dasm_immshift_dregdmpm_nodata                       },
 
 	//  |0 0 0|0 0 1 0 0|
-	{	0xff00,		0x0400,		dasm_compute_modify									},
+	{   0xff00,     0x0400,     dasm_compute_modify                                 },
 
 	//  |0 0 0|0 0 1 1 x|
-	{	0xfe00,		0x0600,		dasm_direct_jump									},
+	{   0xfe00,     0x0600,     dasm_direct_jump                                    },
 
 	//  |0 0 0|0 1 0 0 x|
-	{	0xfe00,		0x0800,		dasm_indirect_jump_compute							},
+	{   0xfe00,     0x0800,     dasm_indirect_jump_compute                          },
 
 	//  |1 1 x|
-	{	0xc000,		0xc000,		dasm_indirect_jump_compute_dregdm					},
+	{   0xc000,     0xc000,     dasm_indirect_jump_compute_dregdm                   },
 
 	//  |0 0 0|0 1 0 1 x|
-	{	0xfe00,		0x0a00,		dasm_rts_compute									},
+	{   0xfe00,     0x0a00,     dasm_rts_compute                                    },
 
 	//  |0 0 0|0 1 1 0 x|
-	{	0xfe00,		0x0c00,		dasm_do_until_counter								},
+	{   0xfe00,     0x0c00,     dasm_do_until_counter                               },
 
 	//  |0 0 0|0 1 1 1 0|
-	{	0xff00,		0x0e00,		dasm_do_until										},
+	{   0xff00,     0x0e00,     dasm_do_until                                       },
 
 	//  |0 0 0|1 0 0|x|x|
-	{	0xfc00,		0x1000,		dasm_immmove_uregdmpm								},
+	{   0xfc00,     0x1000,     dasm_immmove_uregdmpm                               },
 
 	//  |1 0 1|x|x x x|x|
-	{	0xe000,		0xa000,		dasm_immmove_uregdmpm_indirect						},
+	{   0xe000,     0xa000,     dasm_immmove_uregdmpm_indirect                      },
 
 	//  |1 0 0|1|
-	{	0xf000,		0x9000,		dasm_immmove_immdata_dmpm							},
+	{   0xf000,     0x9000,     dasm_immmove_immdata_dmpm                           },
 
 	//  |0 0 0|0 1 1 1 1|
-	{	0xff00,		0x0f00,		dasm_immmove_immdata_ureg							},
+	{   0xff00,     0x0f00,     dasm_immmove_immdata_ureg                           },
 
 	//  |0 0 0|1 0 1 0 0|
-	{	0xff00,		0x1400,		dasm_sysreg_bitop									},
+	{   0xff00,     0x1400,     dasm_sysreg_bitop                                   },
 
 	//  |0 0 0|1 0 1 1 0|
-	{	0xff00,		0x1600,		dasm_ireg_modify									},
+	{   0xff00,     0x1600,     dasm_ireg_modify                                    },
 
 	//  |0 0 0|1 0 1 1 1|
-	{	0xff00,		0x1700,		dasm_misc											},
+	{   0xff00,     0x1700,     dasm_misc                                           },
 
 	//  |0 0 0|0 0 0 0 0|
-	{	0xff00,		0x0000,		dasm_idlenop										},
+	{   0xff00,     0x0000,     dasm_idlenop                                        },
 };
 
 static void build_dasm_table(void)
@@ -1153,7 +1153,7 @@ static void build_dasm_table(void)
 
 static UINT32 sharc_dasm_one(char *buffer, offs_t pc, UINT64 opcode)
 {
-	#define DEFAULT_DASM_WIDTH	(64)
+	#define DEFAULT_DASM_WIDTH  (64)
 
 	char dasm_buffer[2000];
 	int i;
@@ -1187,11 +1187,9 @@ CPU_DISASSEMBLE( sharc )
 	UINT32 flags = 0;
 
 	op = ((UINT64)oprom[0] << 0)  | ((UINT64)oprom[1] << 8) |
-		 ((UINT64)oprom[2] << 16) | ((UINT64)oprom[3] << 24) |
-		 ((UINT64)oprom[4] << 32) | ((UINT64)oprom[5] << 40);
+			((UINT64)oprom[2] << 16) | ((UINT64)oprom[3] << 24) |
+			((UINT64)oprom[4] << 32) | ((UINT64)oprom[5] << 40);
 
 	flags = sharc_dasm_one(buffer, pc, op);
 	return 1 | flags | DASMFLAG_SUPPORTED;
 }
-
-

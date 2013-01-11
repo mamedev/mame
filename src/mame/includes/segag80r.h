@@ -122,8 +122,8 @@ MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 
 /*----------- defined in video/segag80r.c -----------*/
 
-#define G80_BACKGROUND_NONE			0
-#define G80_BACKGROUND_SPACEOD		1
-#define G80_BACKGROUND_MONSTERB		2
-#define G80_BACKGROUND_PIGNEWT		3
-#define G80_BACKGROUND_SINDBADM		4
+#define G80_BACKGROUND_NONE         0
+#define G80_BACKGROUND_SPACEOD      1
+#define G80_BACKGROUND_MONSTERB     2
+#define G80_BACKGROUND_PIGNEWT      3
+#define G80_BACKGROUND_SINDBADM     4

@@ -139,20 +139,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 	/*
 
-    nnnn nnnn - EeFf B?cc - yyyy yyyy - xxxx xxxx
+	nnnn nnnn - EeFf B?cc - yyyy yyyy - xxxx xxxx
 
-    n = sprite number
-    E = Sprite Enabled in Top Half of Screen
-    e = Sprite Enabled in Bottom Half of Screen
-    F = Flip Y
-    f = Flip X
-    B = Tile Bank
-    ? = unknown, nothing / unused? recheck
-    c = color
-    y = Y position
-    x = X position
+	n = sprite number
+	E = Sprite Enabled in Top Half of Screen
+	e = Sprite Enabled in Bottom Half of Screen
+	F = Flip Y
+	f = Flip X
+	B = Tile Bank
+	? = unknown, nothing / unused? recheck
+	c = color
+	y = Y position
+	x = X position
 
-    */
+	*/
 		UINT16 tile_no = source[0];
 		UINT8 attr = source[1];
 		UINT8 ypos = source[2];

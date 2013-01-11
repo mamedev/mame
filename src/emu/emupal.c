@@ -18,9 +18,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define PEN_BRIGHTNESS_BITS		8
-#define MAX_PEN_BRIGHTNESS		(4 << PEN_BRIGHTNESS_BITS)
-#define MAX_SHADOW_PRESETS		4
+#define PEN_BRIGHTNESS_BITS     8
+#define MAX_PEN_BRIGHTNESS      (4 << PEN_BRIGHTNESS_BITS)
+#define MAX_SHADOW_PRESETS      4
 
 
 
@@ -31,28 +31,28 @@
 /* information about a shadow table */
 struct shadow_table_data
 {
-	UINT32 *			base;				/* pointer to the base of the table */
-	INT16				dr;					/* delta red value */
-	INT16				dg;					/* delta green value */
-	INT16				db;					/* delta blue value */
-	UINT8				noclip;				/* clip? */
+	UINT32 *            base;               /* pointer to the base of the table */
+	INT16               dr;                 /* delta red value */
+	INT16               dg;                 /* delta green value */
+	INT16               db;                 /* delta blue value */
+	UINT8               noclip;             /* clip? */
 };
 
 
 struct palette_private
 {
-	bitmap_format		format;				/* format assumed for palette data */
+	bitmap_format       format;             /* format assumed for palette data */
 
-	UINT32				shadow_group;		/* index of the shadow group, or 0 if none */
-	UINT32				hilight_group;		/* index of the hilight group, or 0 if none */
+	UINT32              shadow_group;       /* index of the shadow group, or 0 if none */
+	UINT32              hilight_group;      /* index of the hilight group, or 0 if none */
 
-	pen_t				black_pen;			/* precomputed black pen value */
-	pen_t				white_pen;			/* precomputed white pen value */
+	pen_t               black_pen;          /* precomputed black pen value */
+	pen_t               white_pen;          /* precomputed white pen value */
 
-	shadow_table_data	shadow_table[MAX_SHADOW_PRESETS]; /* array of shadow table data */
+	shadow_table_data   shadow_table[MAX_SHADOW_PRESETS]; /* array of shadow table data */
 
-	pen_t *				save_pen;			/* pens for save/restore */
-	float *				save_bright;		/* brightness for save/restore */
+	pen_t *             save_pen;           /* pens for save/restore */
+	float *             save_bright;        /* brightness for save/restore */
 };
 
 
@@ -64,13 +64,13 @@ public:
 
 	running_machine &machine() const { return m_machine; }
 
-	UINT32				entries;			/* number of entries */
-	UINT32				palentries;			/* number of palette entries */
-	UINT16 *			raw;				/* raw data about each entry */
-	rgb_t *				palette;			/* palette entries */
+	UINT32              entries;            /* number of entries */
+	UINT32              palentries;         /* number of palette entries */
+	UINT16 *            raw;                /* raw data about each entry */
+	rgb_t *             palette;            /* palette entries */
 
 private:
-	running_machine &	m_machine;			/* associated machine */
+	running_machine &   m_machine;          /* associated machine */
 };
 
 

@@ -11,7 +11,7 @@ class offtwall_state : public atarigen_state
 public:
 	offtwall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_bankrom_base(*this, "bankrom_base") { }
+			m_bankrom_base(*this, "bankrom_base") { }
 
 	UINT16 *m_bankswitch_base;
 	required_shared_ptr<UINT16> m_bankrom_base;

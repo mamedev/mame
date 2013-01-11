@@ -68,7 +68,7 @@
 #define MCFG_UV201_ADD(_tag, _screen_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, UV201, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-    MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, uv201_device, screen_update) \
 	MCFG_SCREEN_RAW_PARAMS(_clock, 232, 18, 232, 262, 21, 262)
 
@@ -88,34 +88,34 @@ struct uv201_interface
 {
 	const char *m_screen_tag;
 
-	devcb_write_line		m_out_ext_int_cb;
-	devcb_write_line		m_out_hblank_cb;
-	devcb_read8				m_in_db_cb;
+	devcb_write_line        m_out_ext_int_cb;
+	devcb_write_line        m_out_hblank_cb;
+	devcb_read8             m_in_db_cb;
 };
 
 
 // ======================> uv201_device
 
-class uv201_device :	public device_t,
-                        public uv201_interface
+class uv201_device :    public device_t,
+						public uv201_interface
 {
 public:
-    // construction/destruction
-    uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
-    DECLARE_WRITE_LINE_MEMBER( ext_int_w );
-    DECLARE_READ_LINE_MEMBER( kbd_r );
+	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
+	DECLARE_READ_LINE_MEMBER( kbd_r );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -133,9 +133,9 @@ private:
 	void set_y_interrupt();
 	void do_partial_update();
 
-	devcb_resolved_write_line	m_out_ext_int_func;
-	devcb_resolved_write_line	m_out_hblank_func;
-	devcb_resolved_read8		m_in_db_func;
+	devcb_resolved_write_line   m_out_ext_int_func;
+	devcb_resolved_write_line   m_out_hblank_func;
+	devcb_resolved_read8        m_in_db_func;
 
 	screen_device *m_screen;
 

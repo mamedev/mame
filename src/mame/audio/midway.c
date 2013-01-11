@@ -48,11 +48,11 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define SSIO_CLOCK			XTAL_16MHz
-#define CSDELUXE_CLOCK		XTAL_16MHz
-#define SOUNDSGOOD_CLOCK	XTAL_16MHz
-#define TURBOCS_CLOCK		XTAL_8MHz
-#define SQUAWKTALK_CLOCK	XTAL_3_579545MHz
+#define SSIO_CLOCK          XTAL_16MHz
+#define CSDELUXE_CLOCK      XTAL_16MHz
+#define SOUNDSGOOD_CLOCK    XTAL_16MHz
+#define TURBOCS_CLOCK       XTAL_8MHz
+#define SQUAWKTALK_CLOCK    XTAL_3_579545MHz
 
 
 
@@ -78,13 +78,13 @@ extern const device_type MIDWAY_SQUAWK_N_TALK = &device_creator<midway_squawk_n_
 
 midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDWAY_SSIO, "Midway SSIO Sound Board", "midssio", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this, 2),
-	  m_cpu(*this, "cpu"),
-	  m_ay0(*this, "ay0"),
-	  m_ay1(*this, "ay1"),
-	  m_status(0),
-	  m_14024_count(0),
-	  m_mute(0)
+		device_mixer_interface(mconfig, *this, 2),
+		m_cpu(*this, "cpu"),
+		m_ay0(*this, "ay0"),
+		m_ay1(*this, "ay1"),
+		m_status(0),
+		m_14024_count(0),
+		m_mute(0)
 {
 	memset(m_data, 0, sizeof(m_data));
 	memset(m_overall, 0, sizeof(m_overall));
@@ -147,7 +147,7 @@ READ8_MEMBER(midway_ssio_device::ioport_read)
 	UINT8 result = ioport(port[offset])->read_safe(0xff);
 	if (!m_custom_input[offset].isnull())
 		result = (result & ~m_custom_input_mask[offset]) |
-		         (m_custom_input[offset](space, offset, 0xff) & m_custom_input_mask[offset]);
+					(m_custom_input[offset](space, offset, 0xff) & m_custom_input_mask[offset]);
 	return result;
 }
 
@@ -264,17 +264,17 @@ void midway_ssio_device::compute_ay8910_modulation()
 INTERRUPT_GEN_MEMBER(midway_ssio_device::clock_14024)
 {
 	//
-    //  /SINT is generated as follows:
-    //
-    //  Starts with a 16MHz oscillator
-    //      /2 via 7474 flip-flop @ F11
-    //      /16 via 74161 binary counter @ E11
-    //      /10 via 74190 decade counter @ D11
-    //
-    //  Bit 3 of the decade counter clocks a 14024 7-bit async counter @ C12.
-    //  This routine is called to clock this 7-bit counter.
-    //  Bit 6 of the output is inverted and connected to /SINT.
-    //
+	//  /SINT is generated as follows:
+	//
+	//  Starts with a 16MHz oscillator
+	//      /2 via 7474 flip-flop @ F11
+	//      /16 via 74161 binary counter @ E11
+	//      /10 via 74190 decade counter @ D11
+	//
+	//  Bit 3 of the decade counter clocks a 14024 7-bit async counter @ C12.
+	//  This routine is called to clock this 7-bit counter.
+	//  Bit 6 of the output is inverted and connected to /SINT.
+	//
 	m_14024_count = (m_14024_count + 1) & 0x7f;
 
 	// if the low 5 bits clocked to 0, bit 6 has changed state
@@ -423,9 +423,9 @@ static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8, midway_ssio_device )
 	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
 	AM_RANGE(0xc000, 0xcfff) AM_READNOP AM_WRITE(status_w)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP	// low bit controls yellow LED
+	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP    // low bit controls yellow LED
 	AM_RANGE(0xe000, 0xefff) AM_READ(irq_clear)
-	AM_RANGE(0xf000, 0xffff) AM_READ_PORT("DIP")	// 6 DIP switches
+	AM_RANGE(0xf000, 0xffff) AM_READ_PORT("DIP")    // 6 DIP switches
 ADDRESS_MAP_END
 
 
@@ -454,7 +454,7 @@ MACHINE_CONFIG_END
 
 ROM_START( midway_ssio )
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
+	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )    /* from shollow, assuming it's the same */
 ROM_END
 
 
@@ -542,12 +542,12 @@ void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int 
 
 midway_chip_squeak_deluxe_device::midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDWAY_CHIP_SQUEAK_DELUXE, "Midway Chip Squeak Deluxe Sound Board", "midcsd", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_cpu(*this, "cpu"),
-	  m_pia(*this, "pia"),
-	  m_dac(*this, "dac"),
-	  m_status(0),
-	  m_dacval(0)
+		device_mixer_interface(mconfig, *this),
+		m_cpu(*this, "cpu"),
+		m_pia(*this, "pia"),
+		m_dac(*this, "dac"),
+		m_status(0),
+		m_dacval(0)
 {
 }
 
@@ -670,18 +670,18 @@ ADDRESS_MAP_END
 
 static const pia6821_interface csdeluxe_pia_intf =
 {
-	DEVCB_NULL,		// port A in
-	DEVCB_NULL,		// port B in
-	DEVCB_NULL,		// line CA1 in
-	DEVCB_NULL,		// line CB1 in
-	DEVCB_NULL,		// line CA2 in
-	DEVCB_NULL,		// line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, porta_w),	// port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, portb_w),	// port B out
-	DEVCB_NULL,		// line CA2 out
-	DEVCB_NULL,		// port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, irq_w),	// IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, irq_w)	// IRQB
+	DEVCB_NULL,     // port A in
+	DEVCB_NULL,     // port B in
+	DEVCB_NULL,     // line CA1 in
+	DEVCB_NULL,     // line CB1 in
+	DEVCB_NULL,     // line CA2 in
+	DEVCB_NULL,     // line CB2 in
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, porta_w),  // port A out
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, portb_w),  // port B out
+	DEVCB_NULL,     // line CA2 out
+	DEVCB_NULL,     // port CB2 out
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, irq_w),   // IRQA
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, irq_w)    // IRQB
 };
 
 
@@ -757,12 +757,12 @@ void midway_chip_squeak_deluxe_device::device_timer(emu_timer &timer, device_tim
 
 midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, "Midway Sounds Good Sound Board", "midsg", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_cpu(*this, "cpu"),
-	  m_pia(*this, "pia"),
-	  m_dac(*this, "dac"),
-	  m_status(0),
-	  m_dacval(0)
+		device_mixer_interface(mconfig, *this),
+		m_cpu(*this, "cpu"),
+		m_pia(*this, "pia"),
+		m_dac(*this, "dac"),
+		m_status(0),
+		m_dacval(0)
 {
 }
 
@@ -857,18 +857,18 @@ ADDRESS_MAP_END
 
 static const pia6821_interface soundsgood_pia_intf =
 {
-	DEVCB_NULL,		// port A in
-	DEVCB_NULL,		// port B in
-	DEVCB_NULL,		// line CA1 in
-	DEVCB_NULL,		// line CB1 in
-	DEVCB_NULL,		// line CA2 in
-	DEVCB_NULL,		// line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, porta_w),	// port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, portb_w),	// port B out
-	DEVCB_NULL,		// line CA2 out
-	DEVCB_NULL,		// port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, irq_w),	// IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, irq_w)	// IRQB
+	DEVCB_NULL,     // port A in
+	DEVCB_NULL,     // port B in
+	DEVCB_NULL,     // line CA1 in
+	DEVCB_NULL,     // line CB1 in
+	DEVCB_NULL,     // line CA2 in
+	DEVCB_NULL,     // line CB2 in
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, porta_w), // port A out
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, portb_w), // port B out
+	DEVCB_NULL,     // line CA2 out
+	DEVCB_NULL,     // port CB2 out
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, irq_w),  // IRQA
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, irq_w)   // IRQB
 };
 
 
@@ -944,12 +944,12 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 
 midway_turbo_chip_squeak_device::midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDWAY_TURBO_CHIP_SQUEAK, "Midway Turbo Chip Squeak Sound Board", "midtcs", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_cpu(*this, "cpu"),
-	  m_pia(*this, "pia"),
-	  m_dac(*this, "dac"),
-	  m_status(0),
-	  m_dacval(0)
+		device_mixer_interface(mconfig, *this),
+		m_cpu(*this, "cpu"),
+		m_pia(*this, "pia"),
+		m_dac(*this, "dac"),
+		m_status(0),
+		m_dacval(0)
 {
 }
 
@@ -1038,18 +1038,18 @@ ADDRESS_MAP_END
 
 static const pia6821_interface turbocs_pia_intf =
 {
-	DEVCB_NULL,		// port A in
-	DEVCB_NULL,		// port B in
-	DEVCB_NULL,		// line CA1 in
-	DEVCB_NULL,		// line CB1 in
-	DEVCB_NULL,		// line CA2 in
-	DEVCB_NULL,		// line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, porta_w),		// port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, portb_w),		// port B out
-	DEVCB_NULL,		// line CA2 out
-	DEVCB_NULL,		// port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, irq_w),	// IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, irq_w)		// IRQB
+	DEVCB_NULL,     // port A in
+	DEVCB_NULL,     // port B in
+	DEVCB_NULL,     // line CA1 in
+	DEVCB_NULL,     // line CB1 in
+	DEVCB_NULL,     // line CA2 in
+	DEVCB_NULL,     // line CB2 in
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, porta_w),       // port A out
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, portb_w),       // port B out
+	DEVCB_NULL,     // line CA2 out
+	DEVCB_NULL,     // port CB2 out
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, irq_w),    // IRQA
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, irq_w)     // IRQB
 };
 
 
@@ -1124,13 +1124,13 @@ void midway_turbo_chip_squeak_device::device_timer(emu_timer &timer, device_time
 
 midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDWAY_SQUAWK_N_TALK, "Midway Squawk 'n' Talk Sound Board", "midsnt", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_cpu(*this, "cpu"),
-	  m_pia0(*this, "pia0"),
-	  m_pia1(*this, "pia1"),
-	  m_tms5200(*this, "tms5200"),
-	  m_tms_command(0),
-	  m_tms_strobes(0)
+		device_mixer_interface(mconfig, *this),
+		m_cpu(*this, "cpu"),
+		m_pia0(*this, "pia0"),
+		m_pia1(*this, "pia1"),
+		m_tms5200(*this, "tms5200"),
+		m_tms_command(0),
+		m_tms_strobes(0)
 {
 }
 
@@ -1240,7 +1240,7 @@ WRITE_LINE_MEMBER(midway_squawk_n_talk_device::irq_w)
 // address map below
 static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8, midway_squawk_n_talk_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM		// internal RAM
+	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE(dac_w)
@@ -1252,7 +1252,7 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8, midway_squawk_n_talk_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM		// internal RAM
+	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(dac_w)
@@ -1267,34 +1267,34 @@ ADDRESS_MAP_END
 
 static const pia6821_interface squawkntalk_pia0_intf =
 {
-	DEVCB_NULL,		// port A in
-	DEVCB_NULL,		// port B in
-	DEVCB_NULL,		// line CA1 in
-	DEVCB_NULL,		// line CB1 in
-	DEVCB_NULL,		// line CA2 in
-	DEVCB_NULL,		// line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, porta1_w),	// port A out
-	DEVCB_NULL,		// port B out
-	DEVCB_NULL,		// line CA2 out
-	DEVCB_NULL,		// port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w),	// IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w)		// IRQB
+	DEVCB_NULL,     // port A in
+	DEVCB_NULL,     // port B in
+	DEVCB_NULL,     // line CA1 in
+	DEVCB_NULL,     // line CB1 in
+	DEVCB_NULL,     // line CA2 in
+	DEVCB_NULL,     // line CB2 in
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, porta1_w),  // port A out
+	DEVCB_NULL,     // port B out
+	DEVCB_NULL,     // line CA2 out
+	DEVCB_NULL,     // port CB2 out
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w),    // IRQA
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w)     // IRQB
 };
 
 static const pia6821_interface squawkntalk_pia1_intf =
 {
-	DEVCB_NULL,		// port A in
-	DEVCB_NULL,		// port B in
-	DEVCB_NULL,		// line CA1 in
-	DEVCB_NULL,		// line CB1 in
-	DEVCB_NULL,		// line CA2 in
-	DEVCB_NULL,		// line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, porta2_w),		// port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, portb2_w),		// port B out
-	DEVCB_NULL,		// line CA2 out
-	DEVCB_NULL,		// port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w),	// IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w)		// IRQB
+	DEVCB_NULL,     // port A in
+	DEVCB_NULL,     // port B in
+	DEVCB_NULL,     // line CA1 in
+	DEVCB_NULL,     // line CB1 in
+	DEVCB_NULL,     // line CA2 in
+	DEVCB_NULL,     // line CB2 in
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, porta2_w),      // port A out
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, portb2_w),      // port B out
+	DEVCB_NULL,     // line CA2 out
+	DEVCB_NULL,     // port CB2 out
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w),    // IRQA
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w)     // IRQB
 };
 
 

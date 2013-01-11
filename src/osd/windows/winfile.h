@@ -25,10 +25,10 @@ enum
 
 struct osd_file
 {
-	HANDLE		handle;
-	SOCKET		socket;
-	int			type;
-	TCHAR		filename[1];
+	HANDLE      handle;
+	SOCKET      socket;
+	int         type;
+	TCHAR       filename[1];
 };
 
 //============================================================

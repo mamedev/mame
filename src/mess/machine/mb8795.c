@@ -18,7 +18,7 @@ ADDRESS_MAP_END
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock),
-	  device_network_interface(mconfig, *this, 10)
+		device_network_interface(mconfig, *this, 10)
 {
 }
 
@@ -329,5 +329,3 @@ void mb8795_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			drq_rx_cb(drq_rx);
 	}
 }
-
-

@@ -104,8 +104,8 @@ void midas_state::video_start()
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	midas_state *state = machine.driver_data<midas_state>();
-	UINT16 *s		=	state->m_gfxram + 0x8000;
-	UINT16 *codes	=	state->m_gfxram;
+	UINT16 *s       =   state->m_gfxram + 0x8000;
+	UINT16 *codes   =   state->m_gfxram;
 
 	int sx_old = 0, sy_old = 0, ynum_old = 0, xzoom_old = 0;
 	int xdim, ydim, xscale, yscale;
@@ -113,31 +113,31 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	for (i = 0; i < 0x180; i++,s++,codes+=0x40)
 	{
-		int zoom	=	s[0x000];
-		int sy		=	s[0x200];
-		int sx		=	s[0x400];
+		int zoom    =   s[0x000];
+		int sy      =   s[0x200];
+		int sx      =   s[0x400];
 
-		int xzoom	=	((zoom >> 8) & 0x0f) + 1;
-		int yzoom	=	((zoom >> 0) & 0x7f) + 1;
+		int xzoom   =   ((zoom >> 8) & 0x0f) + 1;
+		int yzoom   =   ((zoom >> 0) & 0x7f) + 1;
 
 		int ynum;
 
 		if (sy & 0x40)
 		{
-			ynum	=	ynum_old;
+			ynum    =   ynum_old;
 
-			sx		=	sx_old + xzoom_old;
-			sy		=	sy_old;
+			sx      =   sx_old + xzoom_old;
+			sy      =   sy_old;
 
 			if (sx >= 0x1f0)
 				sx -= 0x200;
 		}
 		else
 		{
-			ynum	=	sy & 0x3f;
+			ynum    =   sy & 0x3f;
 
-			sx		=	(sx >> 7);
-			sy		=	0x200 - (sy >> 7);
+			sx      =   (sx >> 7);
+			sy      =   0x200 - (sy >> 7);
 
 			if (sx >= 0x1f0)
 				sx -= 0x200;
@@ -146,41 +146,41 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				ynum = 0x20;
 		}
 
-		ynum_old	=	ynum;
-		sx_old		=	sx;
-		sy_old		=	sy;
-		xzoom_old	=	xzoom;
+		ynum_old    =   ynum;
+		sx_old      =   sx;
+		sy_old      =   sy;
+		xzoom_old   =   xzoom;
 
 		// Use fixed point values (16.16), for accuracy
 
-		sx			<<=	16;
-		sy			<<=	16;
+		sx          <<= 16;
+		sy          <<= 16;
 
-		xdim	=	( xzoom << 16 ) * 16 / 16;
-		ydim	=	( yzoom << 16 ) * 16 / 0x80;
+		xdim    =   ( xzoom << 16 ) * 16 / 16;
+		ydim    =   ( yzoom << 16 ) * 16 / 0x80;
 
-		xscale	=	xdim / 16;
-		yscale	=	ydim / 16;
+		xscale  =   xdim / 16;
+		yscale  =   ydim / 16;
 
 		// Let's approximate to the nearest greater integer value
-        // to avoid holes in between tiles
+		// to avoid holes in between tiles
 
-		if (xscale & 0xffff)	xscale += (1<<16) / 16;
-		if (yscale & 0xffff)	yscale += (1<<16) / 16;
+		if (xscale & 0xffff)    xscale += (1<<16) / 16;
+		if (yscale & 0xffff)    yscale += (1<<16) / 16;
 
 		// Draw the tiles
 
 		for (y = 0; y < ynum; y++)
 		{
-			UINT16 code		=	codes[y*2];
-			UINT16 attr		=	codes[y*2+1];
+			UINT16 code     =   codes[y*2];
+			UINT16 attr     =   codes[y*2+1];
 
-			drawgfxzoom_transpen(	bitmap,	cliprect, machine.gfx[0],
+			drawgfxzoom_transpen(   bitmap, cliprect, machine.gfx[0],
 							code,
 							attr >> 8,
 							attr & 1, attr & 2,
 							sx / 0x10000, ((sy + y * ydim) / 0x10000)&0x1ff,
-							xscale, yscale, 0			);
+							xscale, yscale, 0           );
 		}
 	}
 }
@@ -193,16 +193,16 @@ UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_ind16 &bit
 	if ( machine().input().code_pressed(KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for m_tmap
-		if (machine().input().code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
+		if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1 << 0;  // for m_tmap
+		if (machine().input().code_pressed(KEYCODE_A))  msk |= 1 << 1;  // for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	bitmap.fill(4095, cliprect);
 
-	if (layers_ctrl & 2)	draw_sprites(machine(), bitmap,cliprect);
-	if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    draw_sprites(machine(), bitmap,cliprect);
+	if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -241,7 +241,7 @@ WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 			m_gfxram[addr] = data;
 			m_gfxregs[0] += m_gfxregs[2];
 
-			if ( addr >= 0x7000 && addr <= 0x7fff )	m_tmap->mark_tile_dirty(addr - 0x7000);
+			if ( addr >= 0x7000 && addr <= 0x7fff ) m_tmap->mark_tile_dirty(addr - 0x7000);
 
 			break;
 		}
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("START3")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("PLAYER3")
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM	// zoom table?
+	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM // zoom table?
 
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
 ADDRESS_MAP_END
@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("TILT")
 
 	AM_RANGE(0x980000, 0x980001) AM_WRITE(hammer_coin_w )
-	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP	// IRQ Ack
+	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP    // IRQ Ack
 	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE(hammer_led_w )
 
 	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE(midas_eeprom_w )
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 
 	AM_RANGE(0xbc0004, 0xbc0005) AM_READ(hammer_sensor_r )
 
-	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM	// zoom table?
+	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM // zoom table?
 
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM
 ADDRESS_MAP_END
@@ -400,7 +400,7 @@ static const gfx_layout layout8x8x8_2 =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 8,9,10,11, 0,1,2,3	 },
+	{ 8,9,10,11, 0,1,2,3     },
 	{ (32*2+1)*4, 32*2*4, (48*2+1)*4, 48*2*4, (0+1)*4, 0*4, (16*2+1)*4, 16*2*4 },
 	{ 0*8*2, 1*8*2, 2*8*2, 3*8*2, 4*8*2, 5*8*2, 6*8*2, 7*8*2 },
 	32*8*2
@@ -414,31 +414,31 @@ GFXDECODE_END
 
 static INPUT_PORTS_START( livequiz )
 
-	PORT_START("DSW_PLAYER1")	// 900000
+	PORT_START("DSW_PLAYER1")   // 900000
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -449,11 +449,11 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SERVICE")	// 920000
+	PORT_START("SERVICE")   // 920000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	// EEPROM
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) // EEPROM
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -468,7 +468,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("PLAYER2")	// 940000
+	PORT_START("PLAYER2")   // 940000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -487,7 +487,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("START")	// 980000
+	PORT_START("START") // 980000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("START3")	// ba0000
+	PORT_START("START3")    // ba0000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3  )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -525,7 +525,7 @@ static INPUT_PORTS_START( livequiz )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("PLAYER3")	// bc0000
+	PORT_START("PLAYER3")   // bc0000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -548,30 +548,30 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hammer )
 
-	PORT_START("DSW")	// 900000
+	PORT_START("DSW")   // 900000
 	PORT_DIPNAME( 0x01, 0x01, "Debug Mode" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Game Mode" )
-	PORT_DIPSETTING(	0x06, "Prize Game" )
-	PORT_DIPSETTING(	0x00, "Ticket Game 1" )	// not in manual, does not work (it requires a toggleable ticket dispenser)
-	PORT_DIPSETTING(	0x04, "Ticket Game 2" )
-	PORT_DIPSETTING(	0x02, "Generic Game" )
+	PORT_DIPSETTING(    0x06, "Prize Game" )
+	PORT_DIPSETTING(    0x00, "Ticket Game 1" ) // not in manual, does not work (it requires a toggleable ticket dispenser)
+	PORT_DIPSETTING(    0x04, "Ticket Game 2" )
+	PORT_DIPSETTING(    0x02, "Generic Game" )
 	PORT_DIPNAME( 0x08, 0x08, "Warning Sound" )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -582,7 +582,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SERVICE")	// 920000
+	PORT_START("SERVICE")   // 920000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2     )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SERVICE1  )
@@ -601,7 +601,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN0")	// 940000
+	PORT_START("IN0")   // 940000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -620,7 +620,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TILT")	// 980000
+	PORT_START("TILT")  // 980000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -639,7 +639,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	// ba0000
+	PORT_START("IN1")   // ba0000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -658,15 +658,15 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("HAMMER")	// bc0000
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize1", ticket_dispenser_device, line_r)	// prize 1 sensor ("tejisw 1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize2", ticket_dispenser_device, line_r)	// prize 2 sensor ("tejisw 2")
+	PORT_START("HAMMER")    // bc0000
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize1", ticket_dispenser_device, line_r) // prize 1 sensor ("tejisw 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize2", ticket_dispenser_device, line_r) // prize 2 sensor ("tejisw 2")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_IMPULSE(5)	PORT_NAME( "Hammer" )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_IMPULSE(5) PORT_NAME( "Hammer" )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -873,7 +873,7 @@ DRIVER_INIT_MEMBER(midas_state,livequiz)
 	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
 	// PROTECTION CHECKS
-	rom[0x13345a/2]	=	0x4e75;
+	rom[0x13345a/2] =   0x4e75;
 }
 
 /***************************************************************************************

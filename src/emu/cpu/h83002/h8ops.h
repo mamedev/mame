@@ -334,7 +334,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 					break;
 
 				case 0x6b:
-					if ((ext16&0xff) == 0x00)	// 16 bit absolute
+					if ((ext16&0xff) == 0x00)   // 16 bit absolute
 					{
 						address24=h8_mem_read16(h8, h8->pc);
 						h8->pc += 2;
@@ -345,7 +345,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 						H8_IFETCH_TIMING(4);
 						H8_BYTE_TIMING(1, address24);
 					}
-					else if ((ext16&0xff) == 0x20)	// 24 bit absolute
+					else if ((ext16&0xff) == 0x20)  // 24 bit absolute
 					{
 						address24=h8_mem_read32(h8, h8->pc);
 						h8->pc += 4;
@@ -354,7 +354,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 						H8_IFETCH_TIMING(4);
 						H8_BYTE_TIMING(1, address24);
 					}
-					else if ((ext16&0xff) == 0x80)	// 16 bit absolute
+					else if ((ext16&0xff) == 0x80)  // 16 bit absolute
 					{
 						address24=h8_mem_read16(h8, h8->pc);
 						h8->pc += 2;
@@ -364,7 +364,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 						H8_IFETCH_TIMING(3);
 						H8_BYTE_TIMING(1, address24);
 					}
-					else if ((ext16&0xff) == 0xa0)	// 24 bit absolute
+					else if ((ext16&0xff) == 0xa0)  // 24 bit absolute
 					{
 						address24=h8_mem_read32(h8, h8->pc);
 						h8->pc += 4;
@@ -402,13 +402,13 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 				dstreg = ext16 & 0x7;
 				switch((ext16>>8)&0xff)
 				{
-				case 0x64:	// or.l ERs, ERd
+				case 0x64:  // or.l ERs, ERd
 					udata32 = h8_or32(h8, h8_getreg32(h8, (ext16>>4) & 0x7), h8_getreg32(h8, dstreg));
 					break;
-				case 0x65:	// xor.l ERs, ERd
+				case 0x65:  // xor.l ERs, ERd
 					udata32 = h8_xor32(h8, h8_getreg32(h8, (ext16>>4) & 0x7), h8_getreg32(h8, dstreg));
 					break;
-				case 0x66:	// and.l ERs, ERd
+				case 0x66:  // and.l ERs, ERd
 					udata32 = h8_and32(h8, h8_getreg32(h8, (ext16>>4) & 0x7), h8_getreg32(h8, dstreg));
 					break;
 				default:
@@ -599,7 +599,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 			sdata8 = ((opcode>>4) & 0xf);
 
 			// check LDM or STM
-			if (ext16 & 0x80)	// STM
+			if (ext16 & 0x80)   // STM
 			{
 				srcreg = (ext16 & 7);
 				for (int i = 0; i <= sdata8; i++)
@@ -613,7 +613,7 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 					H8_IOP_TIMING(2);
 				}
 			}
-			else	// LDM
+			else    // LDM
 			{
 				srcreg = (ext16 & 7);
 				for (int i = 0; i <= sdata8; i++)
@@ -628,23 +628,23 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 				}
 			}
 			break;
-		case 0x8:	// sleep
+		case 0x8:   // sleep
 			H8_IFETCH_TIMING(1);
 			break;
 		case 0xc:
 			// mulxs
 			ext16 = h8_mem_read16(h8, h8->pc);
 			h8->pc+=2;
-			if(((ext16>>8) & 0xf) == 0)	// .b (8x8 = 16)
+			if(((ext16>>8) & 0xf) == 0) // .b (8x8 = 16)
 			{
-				sdata16 = h8_getreg8(h8, (ext16 & 0xf)+8);	// Rd - always the low 8 bits of Rd
-				sdata8 = h8_getreg8(h8, (ext16>>4) & 0xf);	// Rs
+				sdata16 = h8_getreg8(h8, (ext16 & 0xf)+8);  // Rd - always the low 8 bits of Rd
+				sdata8 = h8_getreg8(h8, (ext16>>4) & 0xf);  // Rs
 				sdata16 = h8_mulxs8(h8, sdata8, sdata16);
 				h8_setreg16(h8, ext16 & 0xf, sdata16);
 				H8_IFETCH_TIMING(2);
 				H8_IOP_TIMING(12);
 			}
-			else if(((ext16>>8) & 0xf) == 2)	// .w
+			else if(((ext16>>8) & 0xf) == 2)    // .w
 			{
 				sdata32 = h8_getreg32(h8, ext16 & 0x7);
 				sdata16 = h8_getreg16(h8, (ext16>>4) & 0xf);
@@ -703,10 +703,10 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 			H8_IFETCH_TIMING(1);
 		}
 		else if(((opcode>>4) & 0xf) == 1)
-        {
+		{
 			h8_setreg8(h8, opcode & 0xf, h8_get_exr(h8));
 			H8_IFETCH_TIMING(1);
-        }
+		}
 		else
 		{
 			logerror("H8/3xx: Unk. group 0 2 %x\n", opcode);
@@ -722,11 +722,11 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 			H8_IFETCH_TIMING(1);
 		}
 		else if(((opcode>>4) & 0xf) == 1)
-        {
+		{
 			udata8 = h8_getreg8(h8, opcode & 0xf);
 			h8_set_exr(h8, udata8);
 			H8_IFETCH_TIMING(1);
-        }
+		}
 		else
 		{
 			logerror("H8/3xx: Unk. group 0 3 %x\n", opcode);
@@ -1466,40 +1466,40 @@ static void h8_group1(h83xx_state *h8, UINT16 opcode)
 	case 0xb:
 		switch((opcode>>4)& 0xf)
 		{
-		case 0:	// subs.l #1, rN (decrement without touching flags)
+		case 0: // subs.l #1, rN (decrement without touching flags)
 			dstreg = opcode & 0x7;
 			udata32 = h8_getreg32(h8, dstreg);
 			udata32--;
 			h8_setreg32(h8, dstreg, udata32);
 			H8_IFETCH_TIMING(1);
 			break;
-		case 5:	// dec.w #1, rN
+		case 5: // dec.w #1, rN
 			dstreg = opcode & 0xf;
 			udata16 = h8_dec16(h8, h8_getreg16(h8, dstreg));
 			h8_setreg16(h8, dstreg, udata16);
 			H8_IFETCH_TIMING(1);
 			break;
-		case 7:	// dec.l #1, rN
+		case 7: // dec.l #1, rN
 			dstreg = opcode & 0x7;
 			udata32 = h8_dec32(h8, h8_getreg32(h8, dstreg));
 			h8_setreg32(h8, dstreg, udata32);
 			H8_IFETCH_TIMING(1);
 			break;
-		case 8:	// subs.l #2, rN (decrement without touching flags)
+		case 8: // subs.l #2, rN (decrement without touching flags)
 			dstreg = opcode & 0x7;
 			udata32 = h8_getreg32(h8, dstreg);
 			udata32-=2;
 			h8_setreg32(h8, dstreg, udata32);
 			H8_IFETCH_TIMING(1);
 			break;
-		case 9:	// subs.l #4, rN (decrement without touching flags)
+		case 9: // subs.l #4, rN (decrement without touching flags)
 			dstreg = opcode & 0x7;
 			udata32 = h8_getreg32(h8, dstreg);
 			udata32-=4;
 			h8_setreg32(h8, dstreg, udata32);
 			H8_IFETCH_TIMING(1);
 			break;
-		case 0xd:	// dec.w #2, rN
+		case 0xd:   // dec.w #2, rN
 			dstreg = opcode & 0xf;
 			udata16 = h8_dec16(h8, h8_getreg16(h8, dstreg));
 			if (h8->h8vflag)
@@ -1512,7 +1512,7 @@ static void h8_group1(h83xx_state *h8, UINT16 opcode)
 			h8_setreg16(h8, dstreg, udata16);
 			H8_IFETCH_TIMING(1);
 			break;
-		case 0xf:	// dec.l #2, rN
+		case 0xf:   // dec.l #2, rN
 			dstreg = opcode & 0x7;
 			udata32 = h8_dec32(h8, h8_getreg32(h8, dstreg));
 			if (h8->h8vflag)
@@ -1782,9 +1782,9 @@ static void h8_group6(h83xx_state *h8, UINT16 opcode)
 
 			switch((opcode>>8)&0xf)
 			{
-			case 0:	udata8 = h8_bset8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
-			case 2:	udata8 = h8_bclr8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
-			case 3:	h8_btst8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+			case 0: udata8 = h8_bset8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
+			case 2: udata8 = h8_bclr8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
+			case 3: h8_btst8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
 			default:
 				logerror("H8/3xx: Unk. group 6 def 0-3-0 %x\n", opcode);
 				h8->h8err = 1;
@@ -1891,7 +1891,7 @@ static void h8_group6(h83xx_state *h8, UINT16 opcode)
 			H8_IFETCH_TIMING(1);
 			H8_BYTE_TIMING(1, address24);
 			break;
-		case 0x1:	// btst #xx, @aa:16 or btst Rn, @aa:16
+		case 0x1:   // btst #xx, @aa:16 or btst Rn, @aa:16
 			sdata16 = h8_mem_read16(h8, h8->pc);
 			h8->pc += 2;
 			address24 = sdata16 & H8_ADDR_MASK;
@@ -1934,14 +1934,14 @@ static void h8_group6(h83xx_state *h8, UINT16 opcode)
 			H8_IFETCH_TIMING(2);
 			H8_BYTE_TIMING(1, address24);
 			break;
-		case 0x3:	// bclr #x, @imm:24
+		case 0x3:   // bclr #x, @imm:24
 			address24=h8_mem_read32(h8, h8->pc);
 			h8->pc += 4;
 			udata16 = h8_mem_read16(h8, h8->pc);
 			h8->pc += 2;
 			switch ((udata16 >> 8) & 0xff)
 			{
-				case 0x60 :	// bset Rn, @abs:24
+				case 0x60 : // bset Rn, @abs:24
 					udata8 = h8_mem_read8(address24);
 					udata8 = h8_bset8(h8, h8_getreg8(h8, (udata16 >> 4) & 0xf), udata8);
 					h8_mem_write8(address24, udata8);
@@ -2188,14 +2188,14 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 			{
 				switch((opcode>>8)&0x7)
 				{
-				case 0:	udata8 = h8_bset8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
-				case 1:	udata8 = h8_bnot8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
-				case 2:	udata8 = h8_bclr8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8);H8_IFETCH_TIMING(1);break;
-				case 3:	h8_btst8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
-				case 4:	h8_bor8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
-				case 5:	h8_bxor8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
-				case 6:	h8_band8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
-				case 7:	h8_bld8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 0: udata8 = h8_bset8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
+				case 1: udata8 = h8_bnot8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8); H8_IFETCH_TIMING(1); break;
+				case 2: udata8 = h8_bclr8(h8, bitnr, udata8); h8_setreg8(h8, dstreg, udata8);H8_IFETCH_TIMING(1);break;
+				case 3: h8_btst8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 4: h8_bor8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 5: h8_bxor8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 6: h8_band8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 7: h8_bld8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
 				default:
 					logerror("H8/3xx: Unk. group 7 0-7 def %x\n", opcode);
 					h8->h8err = 1;
@@ -2206,7 +2206,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 			{
 				switch((opcode>>8)&7)
 				{
-				case 7:	h8_bild8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
+				case 7: h8_bild8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
 				default:
 					logerror("H8/3xx: Unk. group 7 0-7-1 def %x\n", opcode);
 					h8->h8err = 1;
@@ -2283,7 +2283,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 
 			switch((opcode>>4)&7)
 			{
-			case 0:	dst16 = h8_mov16(h8, udata16); h8_setreg16(h8, dstreg, dst16); H8_IFETCH_TIMING(2);break;
+			case 0: dst16 = h8_mov16(h8, udata16); h8_setreg16(h8, dstreg, dst16); H8_IFETCH_TIMING(2);break;
 			case 1: dst16 = h8_add16(h8, udata16, dst16); h8_setreg16(h8, dstreg, dst16); H8_IFETCH_TIMING(2); break;
 			case 2: h8_cmp16(h8, udata16, dst16); H8_IFETCH_TIMING(2); break;
 			case 3: dst16 = h8_sub16(h8, udata16, dst16); h8_setreg16(h8, dstreg, dst16); H8_IFETCH_TIMING(2); break;
@@ -2314,7 +2314,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 
 			switch((opcode>>4)&7)
 			{
-			case 0:	dst32 = h8_mov32(h8, udata32); h8_setreg32(h8, dstreg, dst32); H8_IFETCH_TIMING(3); break;
+			case 0: dst32 = h8_mov32(h8, udata32); h8_setreg32(h8, dstreg, dst32); H8_IFETCH_TIMING(3); break;
 			case 1: dst32 = h8_add32(h8, udata32, dst32); h8_setreg32(h8, dstreg, dst32); H8_IFETCH_TIMING(3); break;
 			case 2: h8_cmp32(h8, udata32, dst32); H8_IFETCH_TIMING(3); break;
 			case 3: dst32 = h8_sub32(h8, udata32, dst32); h8_setreg32(h8, dstreg, dst32); H8_IFETCH_TIMING(3); break;
@@ -2332,7 +2332,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 	case 0xb:
 		switch (opcode & 0xff)
 		{
-			case 0xd4:	// eepmov.w
+			case 0xd4:  // eepmov.w
 			{
 				ext16 = h8_mem_read16(h8, h8->pc);
 				h8->pc += 2;
@@ -2360,7 +2360,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 			}
 			break;
 
-			case 0x5c:	// eepmov.b
+			case 0x5c:  // eepmov.b
 			{
 				ext16 = h8_mem_read16(h8, h8->pc);
 				h8->pc += 2;
@@ -2447,20 +2447,20 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 		{
 			// bset/bnot/bclr.b Rn, @ERd
 			case 0x60:
-				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))	{	h8->h8err=1;	break;	}
+				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))  {   h8->h8err=1;    break;  }
 				h8_mem_write8(address24, h8_bset8(h8, h8_getreg16(h8, (ext16>>4)&0xf)&7, h8_mem_read8(address24)));
 				break;
 			case 0x61:
-				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))	{	h8->h8err=1;	break;	}
+				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))  {   h8->h8err=1;    break;  }
 				h8_mem_write8(address24, h8_bnot8(h8, h8_getreg16(h8, (ext16>>4)&0xf)&7, h8_mem_read8(address24)));
 				break;
 			case 0x62:
-				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))	{	h8->h8err=1;	break;	}
+				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))  {   h8->h8err=1;    break;  }
 				h8_mem_write8(address24, h8_bclr8(h8, h8_getreg16(h8, (ext16>>4)&0xf)&7, h8_mem_read8(address24)));
 				break;
 
-			case 0x67:	// bst/bist.b #Imm:3, @ERd
-				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))	{	h8->h8err=1;	break;	}
+			case 0x67:  // bst/bist.b #Imm:3, @ERd
+				if (((opcode & 0x8f)!=0)||((ext16 & 0x0f)!=0))  {   h8->h8err=1;    break;  }
 				if ((ext16 & 0x80)!=0)
 				{
 					h8_mem_write8(address24, h8_bist8(h8, (ext16>>4)&7, h8_mem_read8(address24)));
@@ -2473,15 +2473,15 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 
 			// bset/bnot/bclr.b #Imm:3, @ERd
 			case 0x70:
-				if (((opcode & 0x8f)!=0)||((ext16 & 0x8f)!=0))	{	h8->h8err=1;	break;	}
+				if (((opcode & 0x8f)!=0)||((ext16 & 0x8f)!=0))  {   h8->h8err=1;    break;  }
 				h8_mem_write8(address24, h8_bset8(h8, (ext16>>4)&7, h8_mem_read8(address24)));
 				break;
 			case 0x71:
-				if (((opcode & 0x8f)!=0)||((ext16 & 0x8f)!=0))	{	h8->h8err=1;	break;	}
+				if (((opcode & 0x8f)!=0)||((ext16 & 0x8f)!=0))  {   h8->h8err=1;    break;  }
 				h8_mem_write8(address24, h8_bnot8(h8, (ext16>>4)&7, h8_mem_read8(address24)));
 				break;
 			case 0x72:
-				if (((opcode & 0x8f)!=0)||((ext16 & 0x8f)!=0))	{	h8->h8err=1;	break;	}
+				if (((opcode & 0x8f)!=0)||((ext16 & 0x8f)!=0))  {   h8->h8err=1;    break;  }
 				h8_mem_write8(address24, h8_bclr8(h8, (ext16>>4)&7, h8_mem_read8(address24)));
 				break;
 		}
@@ -4260,4 +4260,3 @@ static int h8_branch(h83xx_state *h8, UINT8 condition)
 	}
 	return taken;
 }
-

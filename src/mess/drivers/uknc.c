@@ -54,7 +54,7 @@ UINT32 uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bitma
 
 static const struct t11_setup t11_data =
 {
-	0x36ff			/* initial mode word has DAL15,14,11,8 pulled low */
+	0x36ff          /* initial mode word has DAL15,14,11,8 pulled low */
 };
 
 

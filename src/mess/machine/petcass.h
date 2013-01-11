@@ -29,7 +29,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define PET_DATASSETTE_PORT_TAG		"tape"
+#define PET_DATASSETTE_PORT_TAG     "tape"
 
 
 
@@ -42,8 +42,8 @@
 
 
 #define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, PET_DATASSETTE_PORT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, PET_DATASSETTE_PORT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -56,7 +56,7 @@
 
 struct pet_datassette_port_interface
 {
-	devcb_write_line	m_out_read_cb;
+	devcb_write_line    m_out_read_cb;
 };
 
 
@@ -65,8 +65,8 @@ struct pet_datassette_port_interface
 class device_pet_datassette_port_interface;
 
 class pet_datassette_port_device : public device_t,
-						    	   public pet_datassette_port_interface,
-						    	   public device_slot_interface
+									public pet_datassette_port_interface,
+									public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -87,7 +87,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 
-	devcb_resolved_write_line	m_out_read_func;
+	devcb_resolved_write_line   m_out_read_func;
 
 	device_pet_datassette_port_interface *m_cart;
 };

@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define YM3526_TAG	"ic3"
+#define YM3526_TAG  "ic3"
 
 
 
@@ -216,7 +216,7 @@ c64_sfx_sound_expander_cartridge_device::c64_sfx_sound_expander_cartridge_device
 	device_t(mconfig, C64_SFX_SOUND_EXPANDER, "C64 SFX Sound Expander cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_opl(*this, YM3526_TAG),
-    m_exp(*this, C64_EXPANSION_SLOT_TAG)
+	m_exp(*this, C64_EXPANSION_SLOT_TAG)
 {
 }
 

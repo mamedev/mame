@@ -9,25 +9,25 @@
 #ifndef ACE_H_
 #define ACE_H_
 
-#define Z80_TAG			"z0"
-#define AY8910_TAG		"ay8910"
-#define I8255_TAG		"i8255"
-#define SP0256AL2_TAG	"ic1"
-#define Z80PIO_TAG		"z80pio"
-#define CENTRONICS_TAG	"centronics"
-#define SCREEN_TAG		"screen"
+#define Z80_TAG         "z0"
+#define AY8910_TAG      "ay8910"
+#define I8255_TAG       "i8255"
+#define SP0256AL2_TAG   "ic1"
+#define Z80PIO_TAG      "z80pio"
+#define CENTRONICS_TAG  "centronics"
+#define SCREEN_TAG      "screen"
 
 class ace_state : public driver_device
 {
 public:
 	ace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ppi(*this, I8255_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, RAM_TAG),
+			m_maincpu(*this, Z80_TAG),
+			m_ppi(*this, I8255_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ram(*this, RAM_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_char_ram(*this, "char_ram"){ }
 

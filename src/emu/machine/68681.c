@@ -10,7 +10,7 @@
 #include "68681.h"
 
 #define VERBOSE 0
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 static const char *const duart68681_reg_read_names[0x10] =
 {
@@ -22,27 +22,27 @@ static const char *const duart68681_reg_write_names[0x10] =
 	"MRA", "CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB", "CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits"
 };
 
-#define INT_INPUT_PORT_CHANGE		0x80
-#define INT_DELTA_BREAK_B			0x40
-#define INT_RXRDY_FFULLB			0x20
-#define INT_TXRDYB					0x10
-#define INT_COUNTER_READY			0x08
-#define INT_DELTA_BREAK_A			0x04
-#define INT_RXRDY_FFULLA			0x02
-#define INT_TXRDYA					0x01
+#define INT_INPUT_PORT_CHANGE       0x80
+#define INT_DELTA_BREAK_B           0x40
+#define INT_RXRDY_FFULLB            0x20
+#define INT_TXRDYB                  0x10
+#define INT_COUNTER_READY           0x08
+#define INT_DELTA_BREAK_A           0x04
+#define INT_RXRDY_FFULLA            0x02
+#define INT_TXRDYA                  0x01
 
-#define STATUS_RECEIVED_BREAK		0x80
-#define STATUS_FRAMING_ERROR		0x40
-#define STATUS_PARITY_ERROR			0x20
-#define STATUS_OVERRUN_ERROR		0x10
-#define STATUS_TRANSMITTER_EMPTY	0x08
-#define STATUS_TRANSMITTER_READY	0x04
-#define STATUS_FIFO_FULL			0x02
-#define STATUS_RECEIVER_READY		0x01
+#define STATUS_RECEIVED_BREAK       0x80
+#define STATUS_FRAMING_ERROR        0x40
+#define STATUS_PARITY_ERROR         0x20
+#define STATUS_OVERRUN_ERROR        0x10
+#define STATUS_TRANSMITTER_EMPTY    0x08
+#define STATUS_TRANSMITTER_READY    0x04
+#define STATUS_FIFO_FULL            0x02
+#define STATUS_RECEIVER_READY       0x01
 
-#define MODE_RX_INT_SELECT_BIT		0x40
+#define MODE_RX_INT_SELECT_BIT      0x40
 
-#define RX_FIFO_SIZE				3
+#define RX_FIFO_SIZE                3
 
 struct DUART68681_CHANNEL
 {
@@ -112,20 +112,20 @@ INLINE duart68681_state *get_safe_token(device_t *device)
 static void duart68681_update_interrupts(duart68681_state *duart68681)
 {
 	/* update SR state and update interrupt ISR state for the following bits:
-    SRn: bits 7-4: handled elsewhere.
-    SRn: bit 3 (TxEMTn) (we can assume since we're not actually emulating the delay/timing of sending bits, that as long as TxRDYn is set, TxEMTn is also set since the transmit byte has 'already happened', therefore TxEMTn is always 1 assuming tx is enabled on channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined)
-    SRn: bit 2 (TxRDYn) (we COULD assume since we're not emulating delay and timing output, that as long as tx is enabled on channel n, TxRDY is 1 for channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined; however, tx_ready is already nicely handled for us elsewhere, so we can use that instead for now, though we may need to retool that code as well)
-    SRn: bit 1 (FFULLn) (this bit we actually emulate; if the receive fifo for channel n is full, this bit is 1, otherwise it is 0. the receive fifo should be three words long.)
-    SRn: bit 0 (RxRDYn) (this bit we also emulate; the bit is always asserted if the receive fifo is not empty)
-    ISR: bit 7: Input Port change; this should be handled elsewhere, on the input port handler
-    ISR: bit 6: Delta Break B; this should be handled elsewhere, on the data receive handler
-    ISR: bit 5: RxRDYB/FFULLB: this is handled here; depending on whether MSR1B bit 6 is 0 or 1, this bit holds the state of SRB bit 0 or bit 1 respectively
-    ISR: bit 4: TxRDYB: this is handled here; it mirrors SRB bit 2
-    ISR: bit 3: Counter ready; this should be handled by the timer generator
-    ISR: bit 2: Delta Break A; this should be handled elsewhere, on the data receive handler
-    ISR: bit 1: RxRDYA/FFULLA: this is handled here; depending on whether MSR1A bit 6 is 0 or 1, this bit holds the state of SRA bit 0 or bit 1 respectively
-    ISR: bit 0: TxRDYA: this is handled here; it mirrors SRA bit 2
-    */
+	SRn: bits 7-4: handled elsewhere.
+	SRn: bit 3 (TxEMTn) (we can assume since we're not actually emulating the delay/timing of sending bits, that as long as TxRDYn is set, TxEMTn is also set since the transmit byte has 'already happened', therefore TxEMTn is always 1 assuming tx is enabled on channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined)
+	SRn: bit 2 (TxRDYn) (we COULD assume since we're not emulating delay and timing output, that as long as tx is enabled on channel n, TxRDY is 1 for channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined; however, tx_ready is already nicely handled for us elsewhere, so we can use that instead for now, though we may need to retool that code as well)
+	SRn: bit 1 (FFULLn) (this bit we actually emulate; if the receive fifo for channel n is full, this bit is 1, otherwise it is 0. the receive fifo should be three words long.)
+	SRn: bit 0 (RxRDYn) (this bit we also emulate; the bit is always asserted if the receive fifo is not empty)
+	ISR: bit 7: Input Port change; this should be handled elsewhere, on the input port handler
+	ISR: bit 6: Delta Break B; this should be handled elsewhere, on the data receive handler
+	ISR: bit 5: RxRDYB/FFULLB: this is handled here; depending on whether MSR1B bit 6 is 0 or 1, this bit holds the state of SRB bit 0 or bit 1 respectively
+	ISR: bit 4: TxRDYB: this is handled here; it mirrors SRB bit 2
+	ISR: bit 3: Counter ready; this should be handled by the timer generator
+	ISR: bit 2: Delta Break A; this should be handled elsewhere, on the data receive handler
+	ISR: bit 1: RxRDYA/FFULLA: this is handled here; depending on whether MSR1A bit 6 is 0 or 1, this bit holds the state of SRA bit 0 or bit 1 respectively
+	ISR: bit 0: TxRDYA: this is handled here; it mirrors SRA bit 2
+	*/
 	UINT8 ch = 0;
 	//logerror("DEBUG: 68681 int check: upon func call, SRA is %02X, SRB is %02X, ISR is %02X\n", duart68681->channel[0].SR, duart68681->channel[1].SR, duart68681->ISR);
 	for (ch = 0; ch < 2; ch++)
@@ -235,14 +235,14 @@ static void duart68681_update_interrupts(duart68681_state *duart68681)
 			duart68681->duart_config->irq_handler( duart68681->device, ASSERT_LINE, duart68681->IVR );
 		}
 	}
-    else
-    {
+	else
+	{
 		if ( duart68681->duart_config->irq_handler )
 		{
 			LOG(( "68681: Interrupt line not active (IMR & ISR = %02X)\n", (duart68681->ISR & duart68681->IMR) ));
 			duart68681->duart_config->irq_handler( duart68681->device, CLEAR_LINE, duart68681->IVR );
 		}
-    }
+	}
 };
 
 double duart68681_get_ct_rate(duart68681_state *duart68681)
@@ -415,7 +415,7 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 			else
 				duart68681->ISR &= ~INT_TXRDYB;
 			duart68681->channel[ch].tx_timer->adjust(attotime::never, ch);
-            break;
+			break;
 		case 4: /* Reset Error Status */
 			duart68681->channel[ch].SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR | STATUS_OVERRUN_ERROR);
 			break;
@@ -462,7 +462,7 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 			duart68681->ISR &= ~INT_TXRDYB;
 	}
 
-    duart68681_update_interrupts(duart68681);
+	duart68681_update_interrupts(duart68681);
 };
 
 static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
@@ -490,7 +490,7 @@ static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
 static TIMER_CALLBACK( tx_timer_callback )
 {
 	device_t *device = (device_t *)ptr;
-	duart68681_state	*duart68681 = get_safe_token(device);
+	duart68681_state    *duart68681 = get_safe_token(device);
 	int ch = param & 1;
 
 	// send the byte unless we're in loopback mode;
@@ -938,5 +938,3 @@ void duart68681_device::device_reset()
 {
 	DEVICE_RESET_NAME( duart68681 )(this);
 }
-
-

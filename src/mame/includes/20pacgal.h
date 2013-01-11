@@ -26,7 +26,7 @@ public:
 	required_shared_ptr<UINT8> m_flip;
 
 	/* machine state */
-	UINT8 m_game_selected;	/* 0 = Ms. Pac-Man, 1 = Galaga */
+	UINT8 m_game_selected;  /* 0 = Ms. Pac-Man, 1 = Galaga */
 
 	/* devices */
 	cpu_device *m_maincpu;

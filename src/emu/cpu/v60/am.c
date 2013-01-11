@@ -80,5 +80,3 @@ static UINT32 WriteAM(v60_state *cpustate)
 	cpustate->modval = OpRead8(cpustate, cpustate->modadd);
 	return AMTable3[cpustate->modm][cpustate->modval >> 5](cpustate);
 }
-
-

@@ -20,13 +20,13 @@ class dmv_state : public driver_device
 public:
 	dmv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_hgdc(*this, "upd7220"),
-		  m_dmac(*this, "dma8237"),
-		  m_fdc(*this, "upd765"),
-		  m_floppy0(*this, "upd765:0:525dd"),
-		  m_floppy1(*this, "upd765:1:525dd"),
-		  m_video_ram(*this, "video_ram")
+			m_maincpu(*this, "maincpu"),
+			m_hgdc(*this, "upd7220"),
+			m_dmac(*this, "dma8237"),
+			m_fdc(*this, "upd765"),
+			m_floppy0(*this, "upd765:0:525dd"),
+			m_floppy1(*this, "upd765:1:525dd"),
+			m_video_ram(*this, "video_ram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -53,25 +53,25 @@ public:
 	void fdc_drq(bool state);
 
 	required_shared_ptr<UINT8> m_video_ram;
-	int 		m_fdc_int_line;
+	int         m_fdc_int_line;
 };
 
 
 WRITE8_MEMBER(dmv_state::leds_w)
 {
 	/*
-        LEDs    Value       Significance
-        ---------------------------------------
-        None    0xFF        Check complete
-        1+8     0x7E        Sumcheck error
-        2+8     0xBE        GDC error
-        3+8     0xDE        Disk drive error
-        4+8     0xEE        16-bit processor error
-        5+8     0xF6        Keyboard error
-        6+8     0xFA        DMA error
-        7+8     0xFC        Memory error
-        All     0x00        Processor error
-    */
+	    LEDs    Value       Significance
+	    ---------------------------------------
+	    None    0xFF        Check complete
+	    1+8     0x7E        Sumcheck error
+	    2+8     0xBE        GDC error
+	    3+8     0xDE        Disk drive error
+	    4+8     0xEE        16-bit processor error
+	    5+8     0xF6        Keyboard error
+	    6+8     0xFA        DMA error
+	    7+8     0xFC        Memory error
+	    All     0x00        Processor error
+	*/
 
 	for(int i=0; i<8; i++)
 		output_set_led_value(8-i, BIT(data, i));
@@ -108,16 +108,16 @@ WRITE8_MEMBER(dmv_state::fdd_motor_w)
 READ8_MEMBER(dmv_state::sys_status_r)
 {
 	/*
-        Main system status
-        x--- ---- FDD index
-        -x--- --- IRQ 2
-        --x--- -- IRQ 3
-        ---x--- - IRQ 4
-        ---- x--- FDC interrupt
-        ---- -x-- FDD ready
-        ---- --x- 16-bit CPU available (active low)
-        ---- ---x FDD motor (active low)
-    */
+	    Main system status
+	    x--- ---- FDD index
+	    -x--- --- IRQ 2
+	    --x--- -- IRQ 3
+	    ---x--- - IRQ 4
+	    ---- x--- FDC interrupt
+	    ---- -x-- FDD ready
+	    ---- --x- 16-bit CPU available (active low)
+	    ---- ---x FDD motor (active low)
+	*/
 	UINT8 data = 0x00;
 
 	// 16-bit CPU not available
@@ -181,7 +181,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 }
 
 static SLOT_INTERFACE_START( dmv_floppies )
-	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 static ADDRESS_MAP_START(dmv_mem, AS_PROGRAM, 8, dmv_state)
@@ -214,7 +214,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dmv_kb_ctrl_io, AS_IO, 8, dmv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP	// bit 0 data from kb, bit 1 data to kb
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP   // bit 0 data from kb, bit 1 data to kb
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
 ADDRESS_MAP_END
 
@@ -244,15 +244,15 @@ void dmv_state::video_start()
 /* F4 Character Displayer */
 static const gfx_layout dmv_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* y offsets */
 	{ STEP16(0,8) },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( dmv )
@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
 	i8237_hlda_w(m_dmac, state);
 }
 
-static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) 			{ return space.read_byte(address); }
+static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask)             { return space.read_byte(address); }
 static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
 
 static I8237_INTERFACE( dmv_dma8237_config )
@@ -299,10 +299,10 @@ static I8237_INTERFACE( dmv_dma8237_config )
 
 
 static MACHINE_CONFIG_START( dmv, dmv_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(dmv_mem)
-    MCFG_CPU_IO_MAP(dmv_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(dmv_mem)
+	MCFG_CPU_IO_MAP(dmv_io)
 
 	MCFG_CPU_ADD("kb_ctrl_mcu", I8741, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(dmv_kb_ctrl_io)
@@ -311,17 +311,17 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_CPU_IO_MAP(dmv_keyboard_io)
 	MCFG_DEVICE_DISABLE()
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	MCFG_GFXDECODE(dmv)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices
@@ -334,19 +334,18 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( dmv )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "dmv_norm.bin", 0x0000, 0x2000, CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964))
 
 	ROM_REGION(0x400, "kb_ctrl_mcu", ROMREGION_ERASEFF)
 	ROM_LOAD( "dmv_kb_ctrl_mcu.bin", 0x0000, 0x0400, CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775))
 
-	 // i8741/8041 microcontroller inside the Keyboard
-    ROM_REGION(0x400, "keyboard_mcu", ROMREGION_ERASEFF)
-    ROM_LOAD( "dmv_kbmcu.bin", 0x0000, 0x0400, CRC(14e376de) SHA1 (ed09048ef03c602dba17ad6fcfe125c082c9bb17))
+		// i8741/8041 microcontroller inside the Keyboard
+	ROM_REGION(0x400, "keyboard_mcu", ROMREGION_ERASEFF)
+	ROM_LOAD( "dmv_kbmcu.bin", 0x0000, 0x0400, CRC(14e376de) SHA1 (ed09048ef03c602dba17ad6fcfe125c082c9bb17))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME             FLAGS */
-COMP( 1984, dmv,	0,       0, 		dmv,	dmv, driver_device,	 0, 	 "NCR",   "Decision Mate V",	GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1984, dmv,    0,       0,         dmv,    dmv, driver_device,  0,      "NCR",   "Decision Mate V",    GAME_NOT_WORKING | GAME_NO_SOUND)

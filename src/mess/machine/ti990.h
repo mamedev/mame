@@ -14,7 +14,7 @@ void ti990_set_int13(running_machine &machine, int state);
 
 void ti990_hold_load(running_machine &machine);
 
- DECLARE_READ8_HANDLER ( ti990_panel_read );
+	DECLARE_READ8_HANDLER ( ti990_panel_read );
 DECLARE_WRITE8_HANDLER ( ti990_panel_write );
 
 void ti990_line_interrupt(running_machine &machine);

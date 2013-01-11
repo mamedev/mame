@@ -129,9 +129,9 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG		"5a"
-#define Z80PIO_TAG	"3a"
-#define MB8876_TAG	"7a"
+#define Z80_TAG     "5a"
+#define Z80PIO_TAG  "3a"
+#define MB8876_TAG  "7a"
 
 
 
@@ -148,23 +148,23 @@ const device_type LUXOR_55_10828 = &device_creator<luxor_55_10828_device>;
 
 ROM_START( luxor_55_10828 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
-    ROM_DEFAULT_BIOS("mpi02n")
-    // ABC 830
-    ROM_SYSTEM_BIOS(0, "basf6106", "BASF 6106/08" )
+	ROM_DEFAULT_BIOS("mpi02n")
+	// ABC 830
+	ROM_SYSTEM_BIOS(0, "basf6106", "BASF 6106/08" )
 	ROMX_LOAD( "basf .02.7c", 0x000, 0x800, CRC(5daba200) SHA1(7881933760bed3b94f27585c0a6fc43e5d5153f5), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS(1, "mpi02", "MPI 51" )
+	ROM_SYSTEM_BIOS(1, "mpi02", "MPI 51" )
 	ROMX_LOAD( "mpi .02.7c",  0x000, 0x800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349), ROM_BIOS(2) )
-    ROM_SYSTEM_BIOS(2, "mpi02n", "MPI 51 (newer)" )
+	ROM_SYSTEM_BIOS(2, "mpi02n", "MPI 51 (newer)" )
 	ROMX_LOAD( "new mpi .02.7c", 0x000, 0x800, CRC(ab788171) SHA1(c8e29965c04c85f2f2648496ea10c9c7ff95392f), ROM_BIOS(3) )
 	// ABC 832
-    ROM_SYSTEM_BIOS(3, "micr1015", "Micropolis 1015 (v1.4)" )
+	ROM_SYSTEM_BIOS(3, "micr1015", "Micropolis 1015 (v1.4)" )
 	ROMX_LOAD( "micr 1.4.7c", 0x000, 0x800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307), ROM_BIOS(4) )
-    ROM_SYSTEM_BIOS(4, "micr1115", "Micropolis 1115 (v2.3)" )
+	ROM_SYSTEM_BIOS(4, "micr1115", "Micropolis 1115 (v2.3)" )
 	ROMX_LOAD( "micr 2.3.7c", 0x000, 0x800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b), ROM_BIOS(5) )
-    ROM_SYSTEM_BIOS(5, "basf6118", "BASF 6118 (v1.2)" )
+	ROM_SYSTEM_BIOS(5, "basf6118", "BASF 6118 (v1.2)" )
 	ROMX_LOAD( "basf 1.2.7c", 0x000, 0x800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1), ROM_BIOS(6) )
 	// ABC 838
-    ROM_SYSTEM_BIOS(6, "basf6104", "BASF 6104, BASF 6115 (v1.0)" )
+	ROM_SYSTEM_BIOS(6, "basf6104", "BASF 6104, BASF 6115 (v1.0)" )
 	ROMX_LOAD( "basf 8 1.0.7c", 0x000, 0x800, NO_DUMP, ROM_BIOS(7) )
 ROM_END
 
@@ -221,18 +221,18 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
-        1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
-        2       8B pin 10
-        3       FDC _DDEN       double density enable
-        4       _R/BS           radial/binary drive select
-        5       FDC HLT         head load timing
-        6       FDC _HDLD       head loaded
-        7       FDC IRQ         interrupt request
+	    0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
+	    1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
+	    2       8B pin 10
+	    3       FDC _DDEN       double density enable
+	    4       _R/BS           radial/binary drive select
+	    5       FDC HLT         head load timing
+	    6       FDC _HDLD       head loaded
+	    7       FDC IRQ         interrupt request
 
-    */
+	*/
 
 	UINT8 data = 0x04;
 
@@ -264,18 +264,18 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
 {
 	/*
 
-        bit     signal          description
+	    bit     signal          description
 
-        0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
-        1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
-        2       8B pin 10
-        3       FDC _DDEN       double density enable
-        4       _R/BS           radial/binary drive select
-        5       FDC HLT         head load timing
-        6       FDC _HDLD       head loaded
-        7       FDC IRQ         interrupt request
+	    0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
+	    1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
+	    2       8B pin 10
+	    3       FDC _DDEN       double density enable
+	    4       _R/BS           radial/binary drive select
+	    5       FDC HLT         head load timing
+	    6       FDC _HDLD       head loaded
+	    7       FDC IRQ         interrupt request
 
-    */
+	*/
 
 	// double density enable
 	m_fdc->dden_w(BIT(data, 3));
@@ -410,21 +410,21 @@ ioport_constructor luxor_55_10828_device::device_input_ports() const
 //-------------------------------------------------
 
 luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock),
-	  device_abcbus_card_interface(mconfig, *this),
-	  m_maincpu(*this, Z80_TAG),
-	  m_pio(*this, Z80PIO_TAG),
-	  m_fdc(*this, MB8876_TAG),
-	  m_floppy0(*this, MB8876_TAG":0"),
-	  m_floppy1(*this, MB8876_TAG":1"),
-	  m_sw1(*this, "SW1"),
-	  m_s1(*this, "S1"),
-	  m_cs(false),
-	  m_fdc_irq(0),
-	  m_fdc_drq(0),
-	  m_wait_enable(0),
-	  m_sel0(0),
-	  m_sel1(0)
+	: device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock),
+		device_abcbus_card_interface(mconfig, *this),
+		m_maincpu(*this, Z80_TAG),
+		m_pio(*this, Z80PIO_TAG),
+		m_fdc(*this, MB8876_TAG),
+		m_floppy0(*this, MB8876_TAG":0"),
+		m_floppy1(*this, MB8876_TAG":1"),
+		m_sw1(*this, "SW1"),
+		m_s1(*this, "S1"),
+		m_cs(false),
+		m_fdc_irq(0),
+		m_fdc_drq(0),
+		m_wait_enable(0),
+		m_sel0(0),
+		m_sel1(0)
 {
 }
 
@@ -598,24 +598,24 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 {
 	/*
 
-        bit     signal          description
+	    bit     signal          description
 
-        0       SEL 0
-        1       SEL 1
-        2       SEL 2
-        3       _MOT ON
-        4       SIDE
-        5       _PRECOMP ON
-        6       _WAIT ENABLE
-        7       FDC _MR
+	    0       SEL 0
+	    1       SEL 1
+	    2       SEL 2
+	    3       _MOT ON
+	    4       SIDE
+	    5       _PRECOMP ON
+	    6       _WAIT ENABLE
+	    7       FDC _MR
 
-    */
+	*/
 
 	// drive selection
 	m_sel0 = BIT(data, 0);
 	m_sel1 = BIT(data, 1);
 
-    floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = NULL;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -647,23 +647,23 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _INT to main Z80
-        1
-        2
-        3
-        4
-        5
-        6       LS245 DIR
-        7
+	    0       _INT to main Z80
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6       LS245 DIR
+	    7
 
-    */
+	*/
 
 	m_status = data & 0xfe;
 
 	// interrupt
-    m_bus->int_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_bus->int_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

@@ -371,7 +371,7 @@ PALETTE_INIT_MEMBER(galaga_state,galaga)
 
 	/* characters */
 	for (i = 0;i < 64*4;i++)
-		colortable_entry_set_value(machine().colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
+		colortable_entry_set_value(machine().colortable, i, (*(color_prom++) & 0x0f) + 0x10);   /* chars */
 
 	/* sprites */
 	for (i = 0;i < 64*4;i++)
@@ -409,11 +409,11 @@ TILEMAP_MAPPER_MEMBER(galaga_state::tilemap_scan)
 TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 {
 	/* the hardware has two character sets, one normal and one x-flipped. When
-       screen is flipped, character y flip is done by the hardware inverting the
-       timing signals, while x flip is done by selecting the 2nd character set.
-       We reproduce this here, but since the tilemap system automatically flips
-       characters when screen is flipped, we have to flip them back. */
-    int color = m_videoram[tile_index + 0x400] & 0x3f;
+	   screen is flipped, character y flip is done by the hardware inverting the
+	   timing signals, while x flip is done by selecting the 2nd character set.
+	   We reproduce this here, but since the tilemap system automatically flips
+	   characters when screen is flipped, we have to flip them back. */
+	int color = m_videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO_MEMBER(
 			0,
 			(m_videoram[tile_index] & 0x7f) | (flip_screen() ? 0x80 : 0) | (m_galaga_gfxbank << 8),
@@ -493,7 +493,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sprite = spriteram[offs] & 0x7f;
 		int color = spriteram[offs+1] & 0x3f;
 		int sx = spriteram_2[offs+1] - 40 + 0x100*(spriteram_3[offs+1] & 3);
-		int sy = 256 - spriteram_2[offs] + 1;	// sprites are buffered and delayed by one scanline
+		int sy = 256 - spriteram_2[offs] + 1;   // sprites are buffered and delayed by one scanline
 		int flipx = (spriteram_3[offs] & 0x01);
 		int flipy = (spriteram_3[offs] & 0x02) >> 1;
 		int sizex = (spriteram_3[offs] & 0x04) >> 2;
@@ -501,7 +501,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int x,y;
 
 		sy -= 16 * sizey;
-		sy = (sy & 0xff) - 32;	// fix wraparound
+		sy = (sy & 0xff) - 32;  // fix wraparound
 
 		if (state->flip_screen())
 		{
@@ -590,5 +590,3 @@ void galaga_state::screen_eof_galaga(screen_device &screen, bool state)
 		m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
 	}
 }
-
-

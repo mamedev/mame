@@ -62,17 +62,17 @@ void aica_dsp_init(AICADSP *DSP)
 
 void aica_dsp_step(AICADSP *DSP)
 {
-	INT32 ACC=0;	//26 bit
-	INT32 SHIFTED=0;	//24 bit
-	INT32 X=0;	//24 bit
-	INT32 Y=0;	//13 bit
-	INT32 B=0;	//26 bit
-	INT32 INPUTS=0;	//24 bit
+	INT32 ACC=0;    //26 bit
+	INT32 SHIFTED=0;    //24 bit
+	INT32 X=0;  //24 bit
+	INT32 Y=0;  //13 bit
+	INT32 B=0;  //26 bit
+	INT32 INPUTS=0; //24 bit
 	INT32 MEMVAL=0;
-	INT32 FRC_REG=0;	//13 bit
-	INT32 Y_REG=0;		//24 bit
+	INT32 FRC_REG=0;    //13 bit
+	INT32 Y_REG=0;      //24 bit
 	UINT32 ADDR=0;
-	UINT32 ADRS_REG=0;	//13 bit
+	UINT32 ADRS_REG=0;  //13 bit
 	int step;
 
 	if(DSP->Stopped)
@@ -115,10 +115,10 @@ void aica_dsp_step(AICADSP *DSP)
 		UINT32 ZERO=(IPtr[4]>>1)&0x01;
 		UINT32 BSEL=(IPtr[4]>>0)&0x01;
 
-		UINT32 NOFL=(IPtr[6]>>15)&1;		//????
+		UINT32 NOFL=(IPtr[6]>>15)&1;        //????
 		UINT32 COEF=step;
 
-		UINT32 MASA=(IPtr[6]>>9)&0x1f;	//???
+		UINT32 MASA=(IPtr[6]>>9)&0x1f;  //???
 		UINT32 ADREB=(IPtr[6]>>8)&0x1;
 		UINT32 NXADR=(IPtr[6]>>7)&0x1;
 
@@ -135,7 +135,7 @@ void aica_dsp_step(AICADSP *DSP)
 
 		if(f)
 		{
-#define DUMP(v)	fprintf(f," " #v ": %04X",v);
+#define DUMP(v) fprintf(f," " #v ": %04X",v);
 
 			fprintf(f,"%d: ",step);
 			DUMP(ACC);
@@ -157,7 +157,7 @@ void aica_dsp_step(AICADSP *DSP)
 		if(IRA<=0x1f)
 			INPUTS=DSP->MEMS[IRA];
 		else if(IRA<=0x2F)
-			INPUTS=DSP->MIXS[IRA-0x20]<<4;	//MIXS is 20 bit
+			INPUTS=DSP->MIXS[IRA-0x20]<<4;  //MIXS is 20 bit
 		else if(IRA<=0x31)
 			INPUTS=0;
 
@@ -168,7 +168,7 @@ void aica_dsp_step(AICADSP *DSP)
 
 		if(IWT)
 		{
-			DSP->MEMS[IWA]=MEMVAL;	//MEMVAL was selected in previous MRD
+			DSP->MEMS[IWA]=MEMVAL;  //MEMVAL was selected in previous MRD
 			if(IRA==IWA)
 				INPUTS=MEMVAL;
 		}
@@ -209,7 +209,7 @@ void aica_dsp_step(AICADSP *DSP)
 		if(YSEL==0)
 			Y=FRC_REG;
 		else if(YSEL==1)
-			Y=DSP->COEF[COEF<<1]>>3;	//COEF is 16 bits
+			Y=DSP->COEF[COEF<<1]>>3;    //COEF is 16 bits
 		else if(YSEL==2)
 			Y=(Y_REG>>11)&0x1FFF;
 		else if(YSEL==3)
@@ -292,7 +292,7 @@ void aica_dsp_step(AICADSP *DSP)
 			//ADDR+=DSP->RBP<<13;
 			//MEMVAL=DSP->AICARAM[ADDR>>1];
 			ADDR+=DSP->RBP<<10;
-			if(MRD && (step&1))	//memory only allowed on odd? DoA inserts NOPs on even
+			if(MRD && (step&1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if(NOFL)
 					MEMVAL=DSP->AICARAM[ADDR]<<8;

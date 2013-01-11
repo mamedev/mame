@@ -70,8 +70,8 @@ public:
 	quakeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
+	device_t    *m_pic8259_1;
+	device_t    *m_pic8259_2;
 	DECLARE_WRITE_LINE_MEMBER(quakeat_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
@@ -191,7 +191,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START(quake)
-	ROM_REGION32_LE(0x20000, "pc_bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x20000, "pc_bios", 0)  /* motherboard bios */
 	ROM_LOAD("quakearcadetournament.pcbios", 0x000000, 0x10000, NO_DUMP )
 
 	DISK_REGION( "disks" )

@@ -31,15 +31,15 @@ wow_sh_ update- Null
 
 static const char *const PhonemeTable[65] =
 {
- "EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
- "AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",
- "CH" ,"SH" ,"Z"  ,"AW1","NG" ,"AH1","OO1","OO",
- "L"  ,"K"  ,"J"  ,"H"  ,"G"  ,"F"  ,"D"  ,"S",
- "A"  ,"AY" ,"Y1" ,"UH3","AH" ,"P"  ,"O"  ,"I",
- "U"  ,"Y"  ,"T"  ,"R"  ,"E"  ,"W"  ,"AE" ,"AE1",
- "AW2","UH2","UH1","UH" ,"O2" ,"O1" ,"IU" ,"U1",
- "THV","TH" ,"ER" ,"EH" ,"E1" ,"AW" ,"PA1","STOP",
- 0
+	"EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
+	"AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",
+	"CH" ,"SH" ,"Z"  ,"AW1","NG" ,"AH1","OO1","OO",
+	"L"  ,"K"  ,"J"  ,"H"  ,"G"  ,"F"  ,"D"  ,"S",
+	"A"  ,"AY" ,"Y1" ,"UH3","AH" ,"P"  ,"O"  ,"I",
+	"U"  ,"Y"  ,"T"  ,"R"  ,"E"  ,"W"  ,"AE" ,"AE1",
+	"AW2","UH2","UH1","UH" ,"O2" ,"O1" ,"IU" ,"U1",
+	"THV","TH" ,"ER" ,"EH" ,"E1" ,"AW" ,"PA1","STOP",
+	0
 };
 
 /* Missing samples : ready,  from,  one,  bite,  youl,  explode,  if,  myself,  back,
@@ -121,47 +121,47 @@ READ8_HANDLER( wow_speech_r )
 	if(Phoneme==63) {
 		samples->stop(0);
 		//logerror("Clearing sample %s\n",state->m_totalword);
-		state->m_totalword[0] = 0;				   /* Clear the total word stack */
+		state->m_totalword[0] = 0;                 /* Clear the total word stack */
 		return data;
 	}
-	if (Phoneme==3)						   /* We know PA0 is never part of a word */
-		state->m_totalword[0] = 0;				   /* Clear the total word stack */
+	if (Phoneme==3)                        /* We know PA0 is never part of a word */
+		state->m_totalword[0] = 0;                 /* Clear the total word stack */
 
 	/* Phoneme to word translation */
 
 	if (*(state->m_totalword) == 0) {
-		strcpy(state->m_totalword,PhonemeTable[Phoneme]);	                   /* Copy over the first phoneme */
+		strcpy(state->m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
 		if (state->m_plural != 0) {
 			//logerror("found a possible plural at %d\n",state->m_plural-1);
-			if (!strcmp("S",state->m_totalword)) {		   /* Plural check */
-				samples->start(0, num_samples-2);	   /* play the sample at position of word */
+			if (!strcmp("S",state->m_totalword)) {         /* Plural check */
+				samples->start(0, num_samples-2);      /* play the sample at position of word */
 				samples->set_frequency(0, 11025);    /* play at correct rate */
-				state->m_totalword[0] = 0;				   /* Clear the total word stack */
-				state->m_oldword[0] = 0;				   /* Clear the total word stack */
+				state->m_totalword[0] = 0;                 /* Clear the total word stack */
+				state->m_oldword[0] = 0;                   /* Clear the total word stack */
 				return data;
 			} else {
-				 state->m_plural=0;
+					state->m_plural=0;
 			}
 		}
 	} else
-		strcat(state->m_totalword,PhonemeTable[Phoneme]);	                   /* Copy over the first phoneme */
+		strcat(state->m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
 
 	//logerror("Total word = %s\n",state->m_totalword);
 
 	for (i=0; wowWordTable[i]; i++) {
-		if (!strcmp(wowWordTable[i],state->m_totalword)) {		   /* Scan the word (sample) table for the complete word */
+		if (!strcmp(wowWordTable[i],state->m_totalword)) {         /* Scan the word (sample) table for the complete word */
 			/* WOW has Dungeon */
-			if ((!strcmp("GDTO1RFYA2N",state->m_totalword)) || (!strcmp("RO1U1BAH1T",state->m_totalword)) || (!strcmp("KO1UH3I3E1N",state->m_totalword))) {		   /* May be plural */
+			if ((!strcmp("GDTO1RFYA2N",state->m_totalword)) || (!strcmp("RO1U1BAH1T",state->m_totalword)) || (!strcmp("KO1UH3I3E1N",state->m_totalword))) {        /* May be plural */
 				state->m_plural=i+1;
 				strcpy(state->m_oldword,state->m_totalword);
 				//logerror("Storing sample position %d and copying string %s\n",state->m_plural,state->m_oldword);
 			} else {
 				state->m_plural=0;
 			}
-			samples->start(0, i);	                   /* play the sample at position of word */
+			samples->start(0, i);                      /* play the sample at position of word */
 			samples->set_frequency(0, 11025);         /* play at correct rate */
 			//logerror("Playing sample %d\n",i);
-			state->m_totalword[0] = 0;				   /* Clear the total word stack */
+			state->m_totalword[0] = 0;                 /* Clear the total word stack */
 			return data;
 		}
 	}
@@ -172,7 +172,7 @@ READ8_HANDLER( wow_speech_r )
 #endif
 
 	/* Note : We should really also use volume in this as well as frequency */
-	return data;				                   /* Return nicely */
+	return data;                                   /* Return nicely */
 }
 
 

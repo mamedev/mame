@@ -12,7 +12,7 @@
 #include "fat.h"
 #include "iflopimg.h"
 
-#define FAT_SECLEN				512
+#define FAT_SECLEN              512
 
 
 static imgtoolerr_t fat_image_create(imgtool_image *image, imgtool_stream *stream, option_resolution *opts)
@@ -52,7 +52,7 @@ done:
 
 
 
-static imgtoolerr_t	fat_image_get_geometry(imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors)
+static imgtoolerr_t fat_image_get_geometry(imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors)
 {
 	imgtoolerr_t err;
 	UINT64 total_sectors;
@@ -139,7 +139,7 @@ static imgtoolerr_t fat_image_writeblock(imgtool_image *image, const void *buffe
 	if (err)
 		return err;
 
-	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, block_size, 0);	/* TODO: pass ddam argument from imgtool */
+	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, block_size, 0);   /* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 	return IMGTOOLERR_SUCCESS;
@@ -152,19 +152,19 @@ void pc_floppy_get_info(const imgtool_class *imgclass, UINT32 state, union imgto
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case IMGTOOLINFO_INT_BLOCK_SIZE:					info->i = FAT_SECLEN; break;
+		case IMGTOOLINFO_INT_BLOCK_SIZE:                    info->i = FAT_SECLEN; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "fat"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "FAT format"); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "fat"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "FAT format"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_MAKE_CLASS:					info->make_class = imgtool_floppy_make_class; break;
-		case IMGTOOLINFO_PTR_FLOPPY_CREATE:					info->create = fat_image_create; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:					info->p = (void *) floppyoptions_pc; break;
-		case IMGTOOLINFO_PTR_READ_BLOCK:					info->read_block = fat_image_readblock; break;
-		case IMGTOOLINFO_PTR_WRITE_BLOCK:					info->write_block = fat_image_writeblock; break;
-		case IMGTOOLINFO_PTR_GET_GEOMETRY:					info->get_geometry = fat_image_get_geometry; break;
+		case IMGTOOLINFO_PTR_MAKE_CLASS:                    info->make_class = imgtool_floppy_make_class; break;
+		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = fat_image_create; break;
+		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_pc; break;
+		case IMGTOOLINFO_PTR_READ_BLOCK:                    info->read_block = fat_image_readblock; break;
+		case IMGTOOLINFO_PTR_WRITE_BLOCK:                   info->write_block = fat_image_writeblock; break;
+		case IMGTOOLINFO_PTR_GET_GEOMETRY:                  info->get_geometry = fat_image_get_geometry; break;
 
 		default: fat_get_info(imgclass, state, info); break;
 	}

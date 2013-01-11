@@ -80,11 +80,11 @@ namespace uml
 	const int MAPVAR_END = MAPVAR_M0 + MAPVAR_COUNT;
 
 	// flag definitions
-	const UINT8 FLAG_C = 0x01;		// carry flag
-	const UINT8 FLAG_V = 0x02;		// overflow flag (defined for integer only)
-	const UINT8 FLAG_Z = 0x04;		// zero flag
-	const UINT8 FLAG_S = 0x08;		// sign flag (defined for integer only)
-	const UINT8 FLAG_U = 0x10;		// unordered flag (defined for FP only)
+	const UINT8 FLAG_C = 0x01;      // carry flag
+	const UINT8 FLAG_V = 0x02;      // overflow flag (defined for integer only)
+	const UINT8 FLAG_Z = 0x04;      // zero flag
+	const UINT8 FLAG_S = 0x08;      // sign flag (defined for integer only)
+	const UINT8 FLAG_U = 0x10;      // unordered flag (defined for FP only)
 
 	// testable conditions; note that these are defined such that (condition ^ 1) is
 	// always the opposite
@@ -92,22 +92,22 @@ namespace uml
 	{
 		COND_ALWAYS = 0,
 
-		COND_Z = 0x80,				// requires Z
-		COND_NZ,					// requires Z
-		COND_S,						// requires S
-		COND_NS,					// requires S
-		COND_C,						// requires C
-		COND_NC,					// requires C
-		COND_V,						// requires V
-		COND_NV,					// requires V
-		COND_U,						// requires U
-		COND_NU,					// requires U
-		COND_A,						// requires CZ
-		COND_BE,					// requires CZ
-		COND_G,						// requires SVZ
-		COND_LE,					// requires SVZ
-		COND_L,						// requires SV
-		COND_GE,					// requires SV
+		COND_Z = 0x80,              // requires Z
+		COND_NZ,                    // requires Z
+		COND_S,                     // requires S
+		COND_NS,                    // requires S
+		COND_C,                     // requires C
+		COND_NC,                    // requires C
+		COND_V,                     // requires V
+		COND_NV,                    // requires V
+		COND_U,                     // requires U
+		COND_NU,                    // requires U
+		COND_A,                     // requires CZ
+		COND_BE,                    // requires CZ
+		COND_G,                     // requires SVZ
+		COND_LE,                    // requires SVZ
+		COND_L,                     // requires SV
+		COND_GE,                    // requires SV
 
 		COND_MAX,
 
@@ -121,32 +121,32 @@ namespace uml
 	// floating point rounding modes
 	enum float_rounding_mode
 	{
-		ROUND_TRUNC = 0,			// truncate
-		ROUND_ROUND,				// round
-		ROUND_CEIL,					// round up
-		ROUND_FLOOR,				// round down
+		ROUND_TRUNC = 0,            // truncate
+		ROUND_ROUND,                // round
+		ROUND_CEIL,                 // round up
+		ROUND_FLOOR,                // round down
 		ROUND_DEFAULT
 	};
 
 	// operand sizes
 	enum operand_size
 	{
-		SIZE_BYTE = 0,				// 1-byte
-		SIZE_WORD,					// 2-byte
-		SIZE_DWORD,					// 4-byte
-		SIZE_QWORD,					// 8-byte
-		SIZE_DQWORD,				// 16-byte (vector)
-		SIZE_SHORT = SIZE_DWORD,	// 4-byte (float)
-		SIZE_DOUBLE = SIZE_QWORD	// 8-byte (float)
+		SIZE_BYTE = 0,              // 1-byte
+		SIZE_WORD,                  // 2-byte
+		SIZE_DWORD,                 // 4-byte
+		SIZE_QWORD,                 // 8-byte
+		SIZE_DQWORD,                // 16-byte (vector)
+		SIZE_SHORT = SIZE_DWORD,    // 4-byte (float)
+		SIZE_DOUBLE = SIZE_QWORD    // 8-byte (float)
 	};
 
 	// memory scale factors
 	enum memory_scale
 	{
-		SCALE_x1 = 0,				// index * 1
-		SCALE_x2,					// index * 2
-		SCALE_x4,					// index * 4
-		SCALE_x8,					// index * 8
+		SCALE_x1 = 0,               // index * 1
+		SCALE_x2,                   // index * 2
+		SCALE_x4,                   // index * 4
+		SCALE_x8,                   // index * 8
 		SCALE_DEFAULT
 	};
 
@@ -164,89 +164,89 @@ namespace uml
 		OP_INVALID,
 
 		// compile-time opcodes
-		OP_HANDLE,					// HANDLE  handle
-		OP_HASH,					// HASH    mode,pc
-		OP_LABEL,					// LABEL   imm
-		OP_COMMENT,					// COMMENT string
-		OP_MAPVAR,					// MAPVAR  mapvar,value
+		OP_HANDLE,                  // HANDLE  handle
+		OP_HASH,                    // HASH    mode,pc
+		OP_LABEL,                   // LABEL   imm
+		OP_COMMENT,                 // COMMENT string
+		OP_MAPVAR,                  // MAPVAR  mapvar,value
 
 		// control flow operations
-		OP_NOP,						// NOP
-		OP_DEBUG,					// DEBUG   pc
-		OP_EXIT,					// EXIT    src1[,c]
-		OP_HASHJMP,					// HASHJMP mode,pc,handle
-		OP_JMP,						// JMP     imm[,c]
-		OP_EXH,						// EXH     handle,param[,c]
-		OP_CALLH,					// CALLH   handle[,c]
-		OP_RET,						// RET     [c]
-		OP_CALLC,					// CALLC   func,ptr[,c]
-		OP_RECOVER,					// RECOVER dst,mapvar
+		OP_NOP,                     // NOP
+		OP_DEBUG,                   // DEBUG   pc
+		OP_EXIT,                    // EXIT    src1[,c]
+		OP_HASHJMP,                 // HASHJMP mode,pc,handle
+		OP_JMP,                     // JMP     imm[,c]
+		OP_EXH,                     // EXH     handle,param[,c]
+		OP_CALLH,                   // CALLH   handle[,c]
+		OP_RET,                     // RET     [c]
+		OP_CALLC,                   // CALLC   func,ptr[,c]
+		OP_RECOVER,                 // RECOVER dst,mapvar
 
 		// internal register operations
-		OP_SETFMOD,					// SETFMOD src
-		OP_GETFMOD,					// GETFMOD dst
-		OP_GETEXP,					// GETEXP  dst
-		OP_GETFLGS,					// GETFLGS dst[,f]
-		OP_SAVE,					// SAVE    mem
-		OP_RESTORE,					// RESTORE mem
+		OP_SETFMOD,                 // SETFMOD src
+		OP_GETFMOD,                 // GETFMOD dst
+		OP_GETEXP,                  // GETEXP  dst
+		OP_GETFLGS,                 // GETFLGS dst[,f]
+		OP_SAVE,                    // SAVE    mem
+		OP_RESTORE,                 // RESTORE mem
 
 		// integer operations
-		OP_LOAD,					// LOAD    dst,base,index,size
-		OP_LOADS,					// LOADS   dst,base,index,size
-		OP_STORE,					// STORE   base,index,src,size
-		OP_READ,					// READ    dst,src1,space/size
-		OP_READM,					// READM   dst,src1,mask,space/size
-		OP_WRITE,					// WRITE   dst,src1,space/size
-		OP_WRITEM,					// WRITEM  dst,mask,src1,space/size
-		OP_CARRY,					// CARRY   src,bitnum
-		OP_SET,						// SET     dst,c
-		OP_MOV,						// MOV     dst,src[,c]
-		OP_SEXT,					// SEXT    dst,src,size
-		OP_ROLAND,					// ROLAND  dst,src,shift,mask
-		OP_ROLINS,					// ROLINS  dst,src,shift,mask
-		OP_ADD,						// ADD     dst,src1,src2[,f]
-		OP_ADDC,					// ADDC    dst,src1,src2[,f]
-		OP_SUB,						// SUB     dst,src1,src2[,f]
-		OP_SUBB,					// SUBB    dst,src1,src2[,f]
-		OP_CMP,						// CMP     src1,src2[,f]
-		OP_MULU,					// MULU    dst,edst,src1,src2[,f]
-		OP_MULS,					// MULS    dst,edst,src1,src2[,f]
-		OP_DIVU,					// DIVU    dst,edst,src1,src2[,f]
-		OP_DIVS,					// DIVS    dst,edst,src1,src2[,f]
-		OP_AND,						// AND     dst,src1,src2[,f]
-		OP_TEST,					// TEST    src1,src2[,f]
-		OP_OR,						// OR      dst,src1,src2[,f]
-		OP_XOR,						// XOR     dst,src1,src2[,f]
-		OP_LZCNT,					// LZCNT   dst,src
-		OP_BSWAP,					// BSWAP   dst,src
-		OP_SHL,						// SHL     dst,src,count[,f]
-		OP_SHR,						// SHR     dst,src,count[,f]
-		OP_SAR,						// SAR     dst,src,count[,f]
-		OP_ROL,						// ROL     dst,src,count[,f]
-		OP_ROLC,					// ROLC    dst,src,count[,f]
-		OP_ROR,						// ROL     dst,src,count[,f]
-		OP_RORC,					// ROLC    dst,src,count[,f]
+		OP_LOAD,                    // LOAD    dst,base,index,size
+		OP_LOADS,                   // LOADS   dst,base,index,size
+		OP_STORE,                   // STORE   base,index,src,size
+		OP_READ,                    // READ    dst,src1,space/size
+		OP_READM,                   // READM   dst,src1,mask,space/size
+		OP_WRITE,                   // WRITE   dst,src1,space/size
+		OP_WRITEM,                  // WRITEM  dst,mask,src1,space/size
+		OP_CARRY,                   // CARRY   src,bitnum
+		OP_SET,                     // SET     dst,c
+		OP_MOV,                     // MOV     dst,src[,c]
+		OP_SEXT,                    // SEXT    dst,src,size
+		OP_ROLAND,                  // ROLAND  dst,src,shift,mask
+		OP_ROLINS,                  // ROLINS  dst,src,shift,mask
+		OP_ADD,                     // ADD     dst,src1,src2[,f]
+		OP_ADDC,                    // ADDC    dst,src1,src2[,f]
+		OP_SUB,                     // SUB     dst,src1,src2[,f]
+		OP_SUBB,                    // SUBB    dst,src1,src2[,f]
+		OP_CMP,                     // CMP     src1,src2[,f]
+		OP_MULU,                    // MULU    dst,edst,src1,src2[,f]
+		OP_MULS,                    // MULS    dst,edst,src1,src2[,f]
+		OP_DIVU,                    // DIVU    dst,edst,src1,src2[,f]
+		OP_DIVS,                    // DIVS    dst,edst,src1,src2[,f]
+		OP_AND,                     // AND     dst,src1,src2[,f]
+		OP_TEST,                    // TEST    src1,src2[,f]
+		OP_OR,                      // OR      dst,src1,src2[,f]
+		OP_XOR,                     // XOR     dst,src1,src2[,f]
+		OP_LZCNT,                   // LZCNT   dst,src
+		OP_BSWAP,                   // BSWAP   dst,src
+		OP_SHL,                     // SHL     dst,src,count[,f]
+		OP_SHR,                     // SHR     dst,src,count[,f]
+		OP_SAR,                     // SAR     dst,src,count[,f]
+		OP_ROL,                     // ROL     dst,src,count[,f]
+		OP_ROLC,                    // ROLC    dst,src,count[,f]
+		OP_ROR,                     // ROL     dst,src,count[,f]
+		OP_RORC,                    // ROLC    dst,src,count[,f]
 
 		// floating point operations
-		OP_FLOAD,					// FLOAD   dst,base,index
-		OP_FSTORE,					// FSTORE  base,index,src
-		OP_FREAD,					// FREAD   dst,space,src1
-		OP_FWRITE,					// FWRITE  space,dst,src1
-		OP_FMOV,					// FMOV    dst,src1[,c]
-		OP_FTOINT,					// FTOINT  dst,src1,size,round
-		OP_FFRINT,					// FFRINT  dst,src1,size
-		OP_FFRFLT,					// FFRFLT  dst,src1,size
-		OP_FRNDS,					// FRNDS   dst,src1
-		OP_FADD,					// FADD    dst,src1,src2
-		OP_FSUB,					// FSUB    dst,src1,src2
-		OP_FCMP,					// FCMP    src1,src2
-		OP_FMUL,					// FMUL    dst,src1,src2
-		OP_FDIV,					// FDIV    dst,src1,src2
-		OP_FNEG,					// FNEG    dst,src1
-		OP_FABS,					// FABS    dst,src1
-		OP_FSQRT,					// FSQRT   dst,src1
-		OP_FRECIP,					// FRECIP  dst,src1
-		OP_FRSQRT,					// FRSQRT  dst,src1
+		OP_FLOAD,                   // FLOAD   dst,base,index
+		OP_FSTORE,                  // FSTORE  base,index,src
+		OP_FREAD,                   // FREAD   dst,space,src1
+		OP_FWRITE,                  // FWRITE  space,dst,src1
+		OP_FMOV,                    // FMOV    dst,src1[,c]
+		OP_FTOINT,                  // FTOINT  dst,src1,size,round
+		OP_FFRINT,                  // FFRINT  dst,src1,size
+		OP_FFRFLT,                  // FFRFLT  dst,src1,size
+		OP_FRNDS,                   // FRNDS   dst,src1
+		OP_FADD,                    // FADD    dst,src1,src2
+		OP_FSUB,                    // FSUB    dst,src1,src2
+		OP_FCMP,                    // FCMP    src1,src2
+		OP_FMUL,                    // FMUL    dst,src1,src2
+		OP_FDIV,                    // FDIV    dst,src1,src2
+		OP_FNEG,                    // FNEG    dst,src1
+		OP_FABS,                    // FABS    dst,src1
+		OP_FSQRT,                   // FSQRT   dst,src1
+		OP_FRECIP,                  // FRECIP  dst,src1
+		OP_FRSQRT,                  // FRSQRT  dst,src1
 
 		OP_MAX
 	};
@@ -275,10 +275,10 @@ namespace uml
 
 	private:
 		// internal state
-		drccodeptr *			m_code;				// pointer in the cache to the associated code
-		astring					m_string;			// pointer to string attached to handle
-		code_handle *			m_next;				// link to next handle in the list
-		drcuml_state &			m_drcuml;			// pointer to owning object
+		drccodeptr *            m_code;             // pointer in the cache to the associated code
+		astring                 m_string;           // pointer to string attached to handle
+		code_handle *           m_next;             // link to next handle in the list
+		drcuml_state &          m_drcuml;           // pointer to owning object
 	};
 
 	// class describing a local code label
@@ -307,21 +307,21 @@ namespace uml
 		// opcode parameter types
 		enum parameter_type
 		{
-			PTYPE_NONE = 0,						// invalid
-			PTYPE_IMMEDIATE,					// immediate; value = sign-extended to 64 bits
-			PTYPE_INT_REGISTER,					// integer register; value = REG_I0 - REG_I_END
-			PTYPE_FLOAT_REGISTER,				// floating point register; value = REG_F0 - REG_F_END
-			PTYPE_VECTOR_REGISTER,				// vector register; value = REG_V0 - REG_V_END
-			PTYPE_MAPVAR,						// map variable; value = MAPVAR_M0 - MAPVAR_END
-			PTYPE_MEMORY,						// memory; value = pointer to memory
-			PTYPE_SIZE,							// size; value = operand_size
-			PTYPE_SIZE_SCALE,					// scale + size; value = memory_scale * 16 + operand_size
-			PTYPE_SIZE_SPACE,					// space + size; value = memory_space * 16 + operand_size
-			PTYPE_CODE_HANDLE,					// code handle; value = pointer to handle
-			PTYPE_CODE_LABEL,					// code label; value = label index
-			PTYPE_C_FUNCTION,					// C function; value = pointer to C code
-			PTYPE_ROUNDING,						// floating point rounding mode; value = float_rounding_mode
-			PTYPE_STRING,						// string parameter; value = pointer to string
+			PTYPE_NONE = 0,                     // invalid
+			PTYPE_IMMEDIATE,                    // immediate; value = sign-extended to 64 bits
+			PTYPE_INT_REGISTER,                 // integer register; value = REG_I0 - REG_I_END
+			PTYPE_FLOAT_REGISTER,               // floating point register; value = REG_F0 - REG_F_END
+			PTYPE_VECTOR_REGISTER,              // vector register; value = REG_V0 - REG_V_END
+			PTYPE_MAPVAR,                       // map variable; value = MAPVAR_M0 - MAPVAR_END
+			PTYPE_MEMORY,                       // memory; value = pointer to memory
+			PTYPE_SIZE,                         // size; value = operand_size
+			PTYPE_SIZE_SCALE,                   // scale + size; value = memory_scale * 16 + operand_size
+			PTYPE_SIZE_SPACE,                   // space + size; value = memory_space * 16 + operand_size
+			PTYPE_CODE_HANDLE,                  // code handle; value = pointer to handle
+			PTYPE_CODE_LABEL,                   // code label; value = label index
+			PTYPE_C_FUNCTION,                   // C function; value = pointer to C code
+			PTYPE_ROUNDING,                     // floating point rounding mode; value = float_rounding_mode
+			PTYPE_STRING,                       // string parameter; value = pointer to string
 			PTYPE_MAX
 		};
 
@@ -394,8 +394,8 @@ namespace uml
 		parameter(parameter_type type, parameter_value value) : m_type(type), m_value(value) { }
 
 		// internals
-		parameter_type		m_type;				// parameter type
-		parameter_value		m_value;			// parameter value
+		parameter_type      m_type;             // parameter type
+		parameter_value     m_value;            // parameter value
 	};
 
 	// structure describing rules for opcode encoding
@@ -403,19 +403,19 @@ namespace uml
 	{
 		struct parameter_info
 		{
-			UINT8				output;			// input or output?
-			UINT8				size;			// size of the parameter
-			UINT16				typemask;		// types allowed
+			UINT8               output;         // input or output?
+			UINT8               size;           // size of the parameter
+			UINT16              typemask;       // types allowed
 		};
 
-		opcode_t			opcode;				// the opcode itself
-		const char *		mnemonic;			// mnemonic string
-		UINT8				sizes;				// allowed sizes
-		bool				condition;			// conditions allowed?
-		UINT8				inflags;			// input flags
-		UINT8				outflags;			// output flags
-		UINT8				modflags;			// modified flags
-		parameter_info		param[4];			// information about parameters
+		opcode_t            opcode;             // the opcode itself
+		const char *        mnemonic;           // mnemonic string
+		UINT8               sizes;              // allowed sizes
+		bool                condition;          // conditions allowed?
+		UINT8               inflags;            // input flags
+		UINT8               outflags;           // output flags
+		UINT8               modflags;           // modified flags
+		parameter_info      param[4];           // information about parameters
 	};
 
 	// a single UML instructon is encoded like this
@@ -613,12 +613,12 @@ namespace uml
 		void convert_to_mov_param(int pnum) { m_opcode = OP_MOV; m_numparams = 2; m_param[1] = m_param[pnum]; }
 
 		// internal state
-		opcode_t			m_opcode;			// opcode
-		condition_t			m_condition;		// condition
-		UINT8				m_flags;			// flags
-		UINT8				m_size;				// operation size
-		UINT8				m_numparams;		// number of parameters
-		parameter			m_param[MAX_PARAMS];// up to 4 parameters
+		opcode_t            m_opcode;           // opcode
+		condition_t         m_condition;        // condition
+		UINT8               m_flags;            // flags
+		UINT8               m_size;             // operation size
+		UINT8               m_numparams;        // number of parameters
+		parameter           m_param[MAX_PARAMS];// up to 4 parameters
 
 		static const opcode_info s_opcode_info_table[OP_MAX];
 	};
@@ -626,9 +626,9 @@ namespace uml
 	// structure describing rules for parameter encoding
 	struct parameter_info
 	{
-		UINT8				output;				// input or output?
-		UINT8				size;				// size of the parameter
-		UINT16				typemask;			// types allowed
+		UINT8               output;             // input or output?
+		UINT8               size;               // size of the parameter
+		UINT16              typemask;           // types allowed
 	};
 
 	// global inline functions to specify a register parameter by index

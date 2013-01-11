@@ -19,10 +19,10 @@ public:
 	int      m_priority;
 	UINT8    m_reikaids_which;
 	int      m_flipscreen;
-	UINT8	   m_gfx_bank[2];	// pteacher only uses the first one
-	UINT8	   m_blitter_bank;
+	UINT8      m_gfx_bank[2];   // pteacher only uses the first one
+	UINT8      m_blitter_bank;
 	int      m_blitter_param_count;
-	UINT8	   m_blitter_param[4];		/* buffers last 4 writes to 0x8006 */
+	UINT8      m_blitter_param[4];      /* buffers last 4 writes to 0x8006 */
 
 
 	/* misc */

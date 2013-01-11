@@ -19,7 +19,7 @@ public:
 		m_textureram1(*this, "textureram1"),
 		m_lumaram(*this, "lumaram"),
 		m_soundram(*this, "soundram"),
-        m_dsbz80(*this, DSBZ80_TAG),
+		m_dsbz80(*this, DSBZ80_TAG),
 		m_tgp_program(*this, "tgp_program"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -31,7 +31,7 @@ public:
 	required_shared_ptr<UINT32> m_textureram1;
 	required_shared_ptr<UINT32> m_lumaram;
 	optional_shared_ptr<UINT16> m_soundram;
-    optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
+	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_shared_ptr<UINT32> m_tgp_program;
 
 	UINT32 m_intreq;

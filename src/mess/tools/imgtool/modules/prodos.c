@@ -128,8 +128,8 @@
 #include "iflopimg.h"
 #include "macutil.h"
 
-#define	ROOTDIR_BLOCK			2
-#define BLOCK_SIZE				512
+#define ROOTDIR_BLOCK           2
+#define BLOCK_SIZE              512
 
 struct prodos_diskinfo
 {
@@ -192,12 +192,12 @@ static time_t prodos_crack_time(UINT32 prodos_time)
 	time(&now);
 	t = *localtime(&now);
 
-	t.tm_sec	= 0;
-	t.tm_min	= (prodos_time >> 16) & 0x3F;
-	t.tm_hour	= (prodos_time >> 24) & 0x1F;
-	t.tm_mday	= (prodos_time >>  0) & 0x1F;
-	t.tm_mon	= (prodos_time >>  5) & 0x0F;
-	t.tm_year	= (prodos_time >>  9) & 0x7F;
+	t.tm_sec    = 0;
+	t.tm_min    = (prodos_time >> 16) & 0x3F;
+	t.tm_hour   = (prodos_time >> 24) & 0x1F;
+	t.tm_mday   = (prodos_time >>  0) & 0x1F;
+	t.tm_mon    = (prodos_time >>  5) & 0x0F;
+	t.tm_year   = (prodos_time >>  9) & 0x7F;
 
 	if (t.tm_year <= 49)
 		t.tm_year += 100;
@@ -215,11 +215,11 @@ static UINT32 prodos_setup_time(time_t ansi_time)
 	if ((t.tm_year >= 100) && (t.tm_year <= 149))
 		t.tm_year -= 100;
 
-	result |= (((UINT32) t.tm_min)	& 0x003F) << 16;
-	result |= (((UINT32) t.tm_hour)	& 0x001F) << 24;
-	result |= (((UINT32) t.tm_mday)	& 0x001F) <<  0;
-	result |= (((UINT32) t.tm_mon)	& 0x000F) <<  5;
-	result |= (((UINT32) t.tm_year)	& 0x007F) <<  9;
+	result |= (((UINT32) t.tm_min)  & 0x003F) << 16;
+	result |= (((UINT32) t.tm_hour) & 0x001F) << 24;
+	result |= (((UINT32) t.tm_mday) & 0x001F) <<  0;
+	result |= (((UINT32) t.tm_mon)  & 0x000F) <<  5;
+	result |= (((UINT32) t.tm_year) & 0x007F) <<  9;
 	return result;
 }
 
@@ -328,13 +328,13 @@ static imgtoolerr_t prodos_save_block_525(imgtool_image *image,
 
 	/* read first sector */
 	ferr = floppy_write_sector(imgtool_floppy(image), head, track,
-		sector1, 0, ((const UINT8 *) buffer) + 0, 256, 0);	/* TODO: pass ddam argument from imgtool */
+		sector1, 0, ((const UINT8 *) buffer) + 0, 256, 0);  /* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
 	/* read second sector */
 	ferr = floppy_write_sector(imgtool_floppy(image), head, track,
-		sector2, 0, ((const UINT8 *) buffer) + 256, 256, 0);	/* TODO: pass ddam argument from imgtool */
+		sector2, 0, ((const UINT8 *) buffer) + 256, 256, 0);    /* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -406,7 +406,7 @@ static imgtoolerr_t prodos_save_block_35(imgtool_image *image,
 	if (err)
 		return err;
 
-	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, 512, 0);	/* TODO: pass ddam argument from imgtool */
+	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, 512, 0);  /* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -481,10 +481,10 @@ static imgtoolerr_t prodos_diskimage_open(imgtool_image *image)
 	/* did we find the volume header? */
 	if ((ent[0] & 0xF0) == 0xF0)
 	{
-		di->dirent_size			= pick_integer_le(ent, 31, 1);
-		di->dirents_per_block	= pick_integer_le(ent, 32, 1);
-		di->volume_bitmap_block	= pick_integer_le(ent, 35, 2);
-		di->total_blocks		= pick_integer_le(ent, 37, 2);
+		di->dirent_size         = pick_integer_le(ent, 31, 1);
+		di->dirents_per_block   = pick_integer_le(ent, 32, 1);
+		di->volume_bitmap_block = pick_integer_le(ent, 35, 2);
+		di->total_blocks        = pick_integer_le(ent, 37, 2);
 	}
 
 	/* sanity check these values */
@@ -820,8 +820,8 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 	ent->storage_type = appleenum->block_data[offset + 0];
 	memcpy(ent->filename, &appleenum->block_data[offset + 1], 15);
 	ent->filename[15] = '\0';
-	ent->creation_time		= pick_integer_le(appleenum->block_data, offset + 24, 4);
-	ent->lastmodified_time	= pick_integer_le(appleenum->block_data, offset + 33, 4);
+	ent->creation_time      = pick_integer_le(appleenum->block_data, offset + 24, 4);
+	ent->lastmodified_time  = pick_integer_le(appleenum->block_data, offset + 33, 4);
 	ent->file_type = 0x3F3F3F3F;
 	ent->file_creator = 0x3F3F3F3F;
 	ent->finder_flags  = 0;
@@ -837,8 +837,8 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 	if (is_extendedfile_storagetype(ent->storage_type))
 	{
 		/* this is a ProDOS extended file; we need to get the extended info
-         * block */
-		ent->extkey_pointer	= pick_integer_le(appleenum->block_data, offset + 17, 2);
+		 * block */
+		ent->extkey_pointer = pick_integer_le(appleenum->block_data, offset + 17, 2);
 
 		err = prodos_load_block(image, ent->extkey_pointer, buffer);
 		if (err)
@@ -846,9 +846,9 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 
 		for (fork_num = 0; fork_num <= 1; fork_num++)
 		{
-			ent->key_pointer[fork_num]	= pick_integer_le(buffer, 1 + (fork_num * 256), 2);
-			ent->filesize[fork_num]		= pick_integer_le(buffer, 5 + (fork_num * 256), 3);
-			ent->depth[fork_num]		= buffer[fork_num * 256] & 0x0F;
+			ent->key_pointer[fork_num]  = pick_integer_le(buffer, 1 + (fork_num * 256), 2);
+			ent->filesize[fork_num]     = pick_integer_le(buffer, 5 + (fork_num * 256), 3);
+			ent->depth[fork_num]        = buffer[fork_num * 256] & 0x0F;
 		}
 
 		finfo_offset = 0;
@@ -858,7 +858,7 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 			{
 				switch(*(info_ptr++))
 				{
-					case 1:	/* FInfo */
+					case 1: /* FInfo */
 						ent->file_type     = pick_integer_be(info_ptr,  0, 4);
 						ent->file_creator  = pick_integer_be(info_ptr,  4, 4);
 						ent->finder_flags  = pick_integer_be(info_ptr,  8, 2);
@@ -867,7 +867,7 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 						ent->finder_folder = pick_integer_be(info_ptr, 14, 4);
 						break;
 
-					case 2:	/* xFInfo */
+					case 2: /* xFInfo */
 						ent->icon_id           = pick_integer_be(info_ptr,  0, 2);
 						ent->script_code       = pick_integer_be(info_ptr,  8, 1);
 						ent->extended_flags    = pick_integer_be(info_ptr,  9, 1);
@@ -881,9 +881,9 @@ static imgtoolerr_t prodos_get_next_dirent(imgtool_image *image,
 	else
 	{
 		/* normal ProDOS files have all of the info right here */
-		ent->key_pointer[0]	= pick_integer_le(appleenum->block_data, offset + 17, 2);
-		ent->filesize[0]	= pick_integer_le(appleenum->block_data, offset + 21, 3);
-		ent->depth[0]		= ent->storage_type >> 4;
+		ent->key_pointer[0] = pick_integer_le(appleenum->block_data, offset + 17, 2);
+		ent->filesize[0]    = pick_integer_le(appleenum->block_data, offset + 21, 3);
+		ent->depth[0]       = ent->storage_type >> 4;
 	}
 
 	/* identify next entry */
@@ -1005,11 +1005,11 @@ static imgtoolerr_t prodos_put_dirent(imgtool_image *image,
 			{
 				switch(*(info_ptr++))
 				{
-					case 1:	/* FInfo */
+					case 1: /* FInfo */
 						finfo = info_ptr;
 						break;
 
-					case 2:	/* xFInfo */
+					case 2: /* xFInfo */
 						xfinfo = info_ptr;
 						break;
 				}
@@ -1548,9 +1548,9 @@ static imgtoolerr_t prodos_diskimage_nextenum(imgtool_directory *enumeration, im
 	}
 
 	strcpy(ent->filename, pd_ent.filename);
-	ent->directory			= is_dir_storagetype(pd_ent.storage_type);
-	ent->creation_time		= prodos_crack_time(pd_ent.creation_time);
-	ent->lastmodified_time	= prodos_crack_time(pd_ent.lastmodified_time);
+	ent->directory          = is_dir_storagetype(pd_ent.storage_type);
+	ent->creation_time      = prodos_crack_time(pd_ent.creation_time);
+	ent->lastmodified_time  = prodos_crack_time(pd_ent.lastmodified_time);
 
 	if (!ent->directory)
 	{
@@ -1593,7 +1593,7 @@ static imgtoolerr_t prodos_read_file_tree(imgtool_image *image, UINT32 *filesize
 		for (i = 0; i < 256; i++)
 		{
 			/* retrieve the block pointer; the two bytes are on either half
-             * of the block */
+			 * of the block */
 			sub_block = buffer[i + 256];
 			sub_block <<= 8;
 			sub_block |= buffer[i + 0];
@@ -2151,7 +2151,7 @@ static imgtoolerr_t prodos_diskimage_suggesttransfer(imgtool_partition *partitio
 
 
 
-static imgtoolerr_t	prodos_diskimage_getchain(imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size)
+static imgtoolerr_t prodos_diskimage_getchain(imgtool_partition *partition, const char *path, imgtool_chainent *chain, size_t chain_size)
 {
 	imgtoolerr_t err;
 	imgtool_image *image = imgtool_partition_image(partition);
@@ -2211,35 +2211,35 @@ static void generic_prodos_get_info(const imgtool_class *imgclass, UINT32 state,
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR:		info->i = 1; break;
-		case IMGTOOLINFO_INT_OPEN_IS_STRICT:				info->i = 1; break;
-		case IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME:		info->i = 1; break;
-		case IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME:	info->i = 1; break;
-		case IMGTOOLINFO_INT_WRITING_UNTESTED:				info->i = 1; break;
-		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:				info->i = sizeof(prodos_diskinfo); break;
-		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:				info->i = sizeof(prodos_direnum); break;
-		case IMGTOOLINFO_INT_PATH_SEPARATOR:				info->i = '/'; break;
+		case IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR:        info->i = 1; break;
+		case IMGTOOLINFO_INT_OPEN_IS_STRICT:                info->i = 1; break;
+		case IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME:        info->i = 1; break;
+		case IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME:    info->i = 1; break;
+		case IMGTOOLINFO_INT_WRITING_UNTESTED:              info->i = 1; break;
+		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:             info->i = sizeof(prodos_diskinfo); break;
+		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(prodos_direnum); break;
+		case IMGTOOLINFO_INT_PATH_SEPARATOR:                info->i = '/'; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "ProDOS format"); break;
-		case IMGTOOLINFO_STR_FILE:							strcpy(info->s = imgtool_temp_str(), __FILE__); break;
-		case IMGTOOLINFO_STR_EOLN:							strcpy(info->s = imgtool_temp_str(), "\r"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "ProDOS format"); break;
+		case IMGTOOLINFO_STR_FILE:                          strcpy(info->s = imgtool_temp_str(), __FILE__); break;
+		case IMGTOOLINFO_STR_EOLN:                          strcpy(info->s = imgtool_temp_str(), "\r"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_MAKE_CLASS:					info->make_class = imgtool_floppy_make_class; break;
-		case IMGTOOLINFO_PTR_BEGIN_ENUM:					info->begin_enum = prodos_diskimage_beginenum; break;
-		case IMGTOOLINFO_PTR_NEXT_ENUM:						info->next_enum = prodos_diskimage_nextenum; break;
-		case IMGTOOLINFO_PTR_FREE_SPACE:					info->free_space = prodos_diskimage_freespace; break;
-		case IMGTOOLINFO_PTR_READ_FILE:						info->read_file = prodos_diskimage_readfile; break;
-		case IMGTOOLINFO_PTR_WRITE_FILE:					info->write_file = prodos_diskimage_writefile; break;
-		case IMGTOOLINFO_PTR_DELETE_FILE:					info->delete_file = prodos_diskimage_deletefile; break;
-		case IMGTOOLINFO_PTR_LIST_FORKS:					info->list_forks = prodos_diskimage_listforks; break;
-		case IMGTOOLINFO_PTR_CREATE_DIR:					info->create_dir = prodos_diskimage_createdir; break;
-		case IMGTOOLINFO_PTR_DELETE_DIR:					info->delete_dir = prodos_diskimage_deletedir; break;
-		case IMGTOOLINFO_PTR_GET_ATTRS:						info->get_attrs = prodos_diskimage_getattrs; break;
-		case IMGTOOLINFO_PTR_SET_ATTRS:						info->set_attrs = prodos_diskimage_setattrs; break;
-		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:				info->suggest_transfer = prodos_diskimage_suggesttransfer; break;
-		case IMGTOOLINFO_PTR_GET_CHAIN:						info->get_chain = prodos_diskimage_getchain; break;
+		case IMGTOOLINFO_PTR_MAKE_CLASS:                    info->make_class = imgtool_floppy_make_class; break;
+		case IMGTOOLINFO_PTR_BEGIN_ENUM:                    info->begin_enum = prodos_diskimage_beginenum; break;
+		case IMGTOOLINFO_PTR_NEXT_ENUM:                     info->next_enum = prodos_diskimage_nextenum; break;
+		case IMGTOOLINFO_PTR_FREE_SPACE:                    info->free_space = prodos_diskimage_freespace; break;
+		case IMGTOOLINFO_PTR_READ_FILE:                     info->read_file = prodos_diskimage_readfile; break;
+		case IMGTOOLINFO_PTR_WRITE_FILE:                    info->write_file = prodos_diskimage_writefile; break;
+		case IMGTOOLINFO_PTR_DELETE_FILE:                   info->delete_file = prodos_diskimage_deletefile; break;
+		case IMGTOOLINFO_PTR_LIST_FORKS:                    info->list_forks = prodos_diskimage_listforks; break;
+		case IMGTOOLINFO_PTR_CREATE_DIR:                    info->create_dir = prodos_diskimage_createdir; break;
+		case IMGTOOLINFO_PTR_DELETE_DIR:                    info->delete_dir = prodos_diskimage_deletedir; break;
+		case IMGTOOLINFO_PTR_GET_ATTRS:                     info->get_attrs = prodos_diskimage_getattrs; break;
+		case IMGTOOLINFO_PTR_SET_ATTRS:                     info->set_attrs = prodos_diskimage_setattrs; break;
+		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = prodos_diskimage_suggesttransfer; break;
+		case IMGTOOLINFO_PTR_GET_CHAIN:                     info->get_chain = prodos_diskimage_getchain; break;
 	}
 }
 
@@ -2250,14 +2250,14 @@ void prodos_525_get_info(const imgtool_class *imgclass, UINT32 state, union imgt
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "prodos_525"); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "prodos_525"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_FLOPPY_CREATE:					info->create = prodos_diskimage_create_525; break;
-		case IMGTOOLINFO_PTR_FLOPPY_OPEN:					info->open = prodos_diskimage_open_525; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:					info->p = (void *) floppyoptions_apple2; break;
+		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = prodos_diskimage_create_525; break;
+		case IMGTOOLINFO_PTR_FLOPPY_OPEN:                   info->open = prodos_diskimage_open_525; break;
+		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple2; break;
 
-		default:											generic_prodos_get_info(imgclass, state, info); break;
+		default:                                            generic_prodos_get_info(imgclass, state, info); break;
 	}
 }
 
@@ -2268,13 +2268,13 @@ void prodos_35_get_info(const imgtool_class *imgclass, UINT32 state, union imgto
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "prodos_35"); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "prodos_35"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_FLOPPY_CREATE:					info->create = prodos_diskimage_create_35; break;
-		case IMGTOOLINFO_PTR_FLOPPY_OPEN:					info->open = prodos_diskimage_open_35; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:					info->p = (void *) floppyoptions_apple35_iigs; break;
+		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = prodos_diskimage_create_35; break;
+		case IMGTOOLINFO_PTR_FLOPPY_OPEN:                   info->open = prodos_diskimage_open_35; break;
+		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_iigs; break;
 
-		default:											generic_prodos_get_info(imgclass, state, info); break;
+		default:                                            generic_prodos_get_info(imgclass, state, info); break;
 	}
 }

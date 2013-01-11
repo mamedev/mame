@@ -12,32 +12,32 @@
 //============================================================
 class MemoryWindow : public WindowQt
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+
 public:
-    MemoryWindow(running_machine* machine, QWidget* parent=NULL);
-    virtual ~MemoryWindow() {}
+	MemoryWindow(running_machine* machine, QWidget* parent=NULL);
+	virtual ~MemoryWindow() {}
 
 
 private slots:
-    void memoryRegionChanged(int index);
-    void expressionSubmitted();
-    void chunkChanged(QAction* changedTo);
-    void addressChanged(QAction* changedTo);
-    void reverseChanged(bool changedTo);
-    void increaseBytesPerLine(bool changedTo);
-    void decreaseBytesPerLine(bool checked=false);
+	void memoryRegionChanged(int index);
+	void expressionSubmitted();
+	void chunkChanged(QAction* changedTo);
+	void addressChanged(QAction* changedTo);
+	void reverseChanged(bool changedTo);
+	void increaseBytesPerLine(bool changedTo);
+	void decreaseBytesPerLine(bool checked=false);
 
 
 private:
-    void populateComboBox();
+	void populateComboBox();
 
 
 private:
-    // Widgets
-    QLineEdit* m_inputEdit;
-    QComboBox* m_memoryComboBox;
-    DebuggerView* m_memTable;
+	// Widgets
+	QLineEdit* m_inputEdit;
+	QComboBox* m_memoryComboBox;
+	DebuggerView* m_memTable;
 };
 
 

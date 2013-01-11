@@ -77,14 +77,14 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_w)
 
 WRITE8_MEMBER(ajax_state::ajax_lamps_w)
 {
-	set_led_status(machine(), 1, data & 0x02);	/* super weapon lamp */
-	set_led_status(machine(), 2, data & 0x04);	/* power up lamps */
-	set_led_status(machine(), 5, data & 0x04);	/* power up lamps */
-	set_led_status(machine(), 0, data & 0x20);	/* start lamp */
-	set_led_status(machine(), 3, data & 0x40);	/* game over lamps */
-	set_led_status(machine(), 6, data & 0x40);	/* game over lamps */
-	set_led_status(machine(), 4, data & 0x80);	/* game over lamps */
-	set_led_status(machine(), 7, data & 0x80);	/* game over lamps */
+	set_led_status(machine(), 1, data & 0x02);  /* super weapon lamp */
+	set_led_status(machine(), 2, data & 0x04);  /* power up lamps */
+	set_led_status(machine(), 5, data & 0x04);  /* power up lamps */
+	set_led_status(machine(), 0, data & 0x20);  /* start lamp */
+	set_led_status(machine(), 3, data & 0x40);  /* game over lamps */
+	set_led_status(machine(), 6, data & 0x40);  /* game over lamps */
+	set_led_status(machine(), 4, data & 0x80);  /* game over lamps */
+	set_led_status(machine(), 7, data & 0x80);  /* game over lamps */
 }
 
 /*  ajax_ls138_f10:
@@ -111,17 +111,17 @@ READ8_MEMBER(ajax_state::ajax_ls138_f10_r)
 
 	switch ((offset & 0x01c0) >> 6)
 	{
-		case 0x00:	/* ??? */
+		case 0x00:  /* ??? */
 			data = machine().rand();
 			break;
-		case 0x04:	/* 2P inputs */
+		case 0x04:  /* 2P inputs */
 			data = ioport("P2")->read();
 			break;
-		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
+		case 0x06:  /* 1P inputs + DIPSW #1 & #2 */
 			index = offset & 0x01;
 			data = ioport((offset & 0x02) ? portnames[2 + index] : portnames[index])->read();
 			break;
-		case 0x07:	/* DIPSW #3 */
+		case 0x07:  /* DIPSW #3 */
 			data = ioport("DSW3")->read();
 			break;
 
@@ -137,24 +137,24 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 
 	switch ((offset & 0x01c0) >> 6)
 	{
-		case 0x00:	/* NSFIRQ + AFR */
+		case 0x00:  /* NSFIRQ + AFR */
 			if (offset)
 				watchdog_reset_w(space, 0, data);
 			else{
-				if (m_firq_enable)	/* Cause interrupt on slave CPU */
+				if (m_firq_enable)  /* Cause interrupt on slave CPU */
 					m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
-		case 0x01:	/* Cause interrupt on audio CPU */
+		case 0x01:  /* Cause interrupt on audio CPU */
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
-		case 0x02:	/* Sound command number */
+		case 0x02:  /* Sound command number */
 			soundlatch_byte_w(space, offset, data);
 			break;
-		case 0x03:	/* Bankswitch + coin counters + priority*/
+		case 0x03:  /* Bankswitch + coin counters + priority*/
 			ajax_bankswitch_w(space, 0, data);
 			break;
-		case 0x05:	/* Lamps + Joystick vibration + Control panel quaking */
+		case 0x05:  /* Lamps + Joystick vibration + Control panel quaking */
 			ajax_lamps_w(space, 0, data);
 			break;
 

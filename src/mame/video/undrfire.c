@@ -76,7 +76,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	int dimension,total_chunks,bad_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
-       while processing sprite ram and then draw them all at the end */
+	   while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->m_spritelist;
 
 	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
@@ -97,8 +97,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		zoomy =    (data & 0x0001fc00) >> 10;
 		y =        (data & 0x000003ff);
 
-		color |= (0x100 + (priority << 6));		/* priority bits select color bank */
-		color /= 2;		/* as sprites are 5bpp */
+		color |= (0x100 + (priority << 6));     /* priority bits select color bank */
+		color /= 2;     /* as sprites are 5bpp */
 		flipy = !flipy;
 		y = (-y &0x3ff);
 
@@ -117,8 +117,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		x -= x_offs;
 
 		bad_chunks = 0;
-		dimension = ((dblsize*2) + 2);	// 2 or 4
-		total_chunks = ((dblsize*3) + 1) << 2;	// 4 or 16
+		dimension = ((dblsize*2) + 2);  // 2 or 4
+		total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
 		map_offset = tilenum << 2;
 
 		{
@@ -150,8 +150,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				if (sprites_flipscreen)
 				{
 					/* -zx/y is there to fix zoomed sprite coords in screenflip.
-                       drawgfxzoom does not know to draw from flip-side of sprites when
-                       screen is flipped; so we must correct the coords ourselves. */
+					   drawgfxzoom does not know to draw from flip-side of sprites when
+					   screen is flipped; so we must correct the coords ourselves. */
 
 					curx = 320 - curx - zx;
 					cury = 256 - cury - zy;
@@ -222,7 +222,7 @@ static void draw_sprites_cbombers(running_machine &machine, bitmap_ind16 &bitmap
 	int dimension,total_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
-       while processing sprite ram and then draw them all at the end */
+	   while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->m_spritelist;
 
 	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
@@ -243,9 +243,9 @@ static void draw_sprites_cbombers(running_machine &machine, bitmap_ind16 &bitmap
 		zoomy =    (data & 0x0001fc00) >> 10;
 		y =        (data & 0x000003ff);
 
-		color |= (/*0x100 +*/ (priority << 6));		/* priority bits select color bank */
+		color |= (/*0x100 +*/ (priority << 6));     /* priority bits select color bank */
 
-		color /= 2;		/* as sprites are 5bpp */
+		color /= 2;     /* as sprites are 5bpp */
 		flipy = !flipy;
 
 		if (!tilenum) continue;
@@ -261,8 +261,8 @@ static void draw_sprites_cbombers(running_machine &machine, bitmap_ind16 &bitmap
 
 		x -= x_offs;
 
-		dimension = ((dblsize*2) + 2);	// 2 or 4
-		total_chunks = ((dblsize*3) + 1) << 2;	// 4 or 16
+		dimension = ((dblsize*2) + 2);  // 2 or 4
+		total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
 		map_offset = tilenum << 2;
 
 		for (sprite_chunk = 0; sprite_chunk < total_chunks; sprite_chunk++)
@@ -290,8 +290,8 @@ static void draw_sprites_cbombers(running_machine &machine, bitmap_ind16 &bitmap
 			if (sprites_flipscreen)
 			{
 				/* -zx/y is there to fix zoomed sprite coords in screenflip.
-                       drawgfxzoom does not know to draw from flip-side of sprites when
-                       screen is flipped; so we must correct the coords ourselves. */
+				       drawgfxzoom does not know to draw from flip-side of sprites when
+				       screen is flipped; so we must correct the coords ourselves. */
 
 				curx = 320 - curx - zx;
 				cury = 256 - cury - zy;
@@ -397,10 +397,10 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
 	layer[2] = (priority & 0x00f0) >>  4;
-	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
+	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
 	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
@@ -408,7 +408,7 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 	pivlayer[2] = 2;
 
 	machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(0, cliprect);	/* wrong color? */
+	bitmap.fill(0, cliprect);   /* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a
@@ -445,7 +445,7 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((tc0480scp_pri_reg_r(tc0480scp, space, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
+		if ((tc0480scp_pri_reg_r(tc0480scp, space, 0) & 0x3) == 3)  /* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
 			draw_sprites(machine(), bitmap, cliprect, primasks, 44, -574);
@@ -460,14 +460,14 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);	/* piv text layer */
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
 
-	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 
 	/* See if we should draw artificial gun targets */
 	/* (not yet implemented...) */
 
-	if (machine().root_device().ioport("FAKE")->read() & 0x1)	/* Fake DSW */
+	if (machine().root_device().ioport("FAKE")->read() & 0x1)   /* Fake DSW */
 	{
 		popmessage("Gunsights on");
 	}
@@ -540,10 +540,10 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
 	layer[2] = (priority & 0x00f0) >>  4;
-	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
+	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
 	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
@@ -551,7 +551,7 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 	pivlayer[2] = 2;
 
 	machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(0, cliprect);	/* wrong color? */
+	bitmap.fill(0, cliprect);   /* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a
@@ -588,7 +588,7 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 #endif
 	/* Sprites have variable priority (we kludge this on road levels) */
 	{
-		if ((tc0480scp_pri_reg_r(tc0480scp, space, 0) & 0x3) == 3)	/* on road levels kludge sprites up 1 priority */
+		if ((tc0480scp_pri_reg_r(tc0480scp, space, 0) & 0x3) == 3)  /* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
 			draw_sprites_cbombers(machine(), bitmap, cliprect, primasks, 80, -208);
@@ -603,9 +603,9 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);	/* piv text layer */
+	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
 
-	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 
 /* Enable this to see rotation (?) control words */
 #if 0

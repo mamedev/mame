@@ -183,15 +183,15 @@ static const wd17xx_interface pk8020_wd17xx_interface =
 /* F4 Character Displayer */
 static const gfx_layout pk8020_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	512,					/* 512 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	512,                    /* 512 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( pk8020 )
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("258K")	//64 + 4*48 + 2
+	MCFG_RAM_DEFAULT_SIZE("258K")   //64 + 4*48 + 2
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
@@ -294,7 +294,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT                  INIT    COMPANY      FULLNAME   FLAGS */
-COMP( 1987, korvet,  0,      0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Korvet",	 0)
-COMP( 1987, neiva,   korvet, 0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Neiva",	 0)
-COMP( 1987, kontur,  korvet, 0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Kontur",	 0)
-COMP( 1987, bk8t,	 korvet, 0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "BK-8T",	 0)
+COMP( 1987, korvet,  0,      0,      pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Korvet",    0)
+COMP( 1987, neiva,   korvet, 0,      pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Neiva",     0)
+COMP( 1987, kontur,  korvet, 0,      pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Kontur",    0)
+COMP( 1987, bk8t,    korvet, 0,      pk8020,     pk8020, driver_device, 0,      "<unknown>", "BK-8T",    0)

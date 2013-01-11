@@ -11,7 +11,7 @@
 #include "machine/decocass_tape.h"
 
 /* dongle type #1: jumpers C and D assignments */
-#define MAKE_MAP(m0,m1,m2,m3,m4,m5,m6,m7)	\
+#define MAKE_MAP(m0,m1,m2,m3,m4,m5,m6,m7)   \
 	((UINT32)(m0)) | \
 	((UINT32)(m1) << 3) | \
 	((UINT32)(m2) << 6) | \
@@ -71,7 +71,7 @@ READ8_MEMBER(decocass_state::decocass_sound_data_r)
 
 READ8_MEMBER(decocass_state::decocass_sound_ack_r)
 {
-	UINT8 data = m_sound_ack;	/* D6+D7 */
+	UINT8 data = m_sound_ack;   /* D6+D7 */
 	LOG(4,("CPU %s sound ack     <- $%02x\n", space.device().tag(), data));
 	return data;
 }
@@ -186,7 +186,7 @@ READ8_MEMBER(decocass_state::decocass_input_r)
  * D7 - cassette present
  */
 
-#define E5XX_MASK	0x02	/* use 0x0e for old style board */
+#define E5XX_MASK   0x02    /* use 0x0e for old style board */
 
 
 WRITE8_MEMBER(decocass_state::decocass_reset_w)
@@ -277,7 +277,7 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
 				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
 			}
 			m_firsttime = 0;
-			m_latch1 = 0;	 /* reset latch (??) */
+			m_latch1 = 0;    /* reset latch (??) */
 		}
 
 		if (0 == (offset & E5XX_MASK))
@@ -285,14 +285,14 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
 		else
 			data = 0xff;
 
-		save = data;	/* save the unmodifed data for the latch */
+		save = data;    /* save the unmodifed data for the latch */
 
 		promaddr = 0;
 		int promshift = 0;
 
 		for (int i=0;i<8;i++)
 		{
-			if (m_type1_map[i] == T1PROM) { promaddr |=	(((data >> T1MAP(i,m_type1_inmap)) & 1) << promshift); promshift++; }
+			if (m_type1_map[i] == T1PROM) { promaddr |= (((data >> T1MAP(i,m_type1_inmap)) & 1) << promshift); promshift++; }
 		}
 
 		if (promshift!=5)
@@ -303,16 +303,16 @@ READ8_MEMBER(decocass_state::decocass_type1_r)
 
 		for (int i=0;i<8;i++)
 		{
-			if (m_type1_map[i] == T1PROM) 	  { data |= (((prom[promaddr] >> promshift) & 1)			   << T1MAP(i,m_type1_outmap)); promshift++; }
+			if (m_type1_map[i] == T1PROM)     { data |= (((prom[promaddr] >> promshift) & 1)               << T1MAP(i,m_type1_outmap)); promshift++; }
 			if (m_type1_map[i] == T1LATCHINV) { data |= ((1 - ((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)) << T1MAP(i,m_type1_outmap)); }
-			if (m_type1_map[i] == T1LATCH)    { data |= (((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)	   << T1MAP(i,m_type1_outmap)); }
-			if (m_type1_map[i] == T1DIRECT)   { data |= (((save >> T1MAP(i,m_type1_inmap)) & 1)		   << T1MAP(i,m_type1_outmap)); }
+			if (m_type1_map[i] == T1LATCH)    { data |= (((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)    << T1MAP(i,m_type1_outmap)); }
+			if (m_type1_map[i] == T1DIRECT)   { data |= (((save >> T1MAP(i,m_type1_inmap)) & 1)        << T1MAP(i,m_type1_outmap)); }
 		}
-	
+
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_r(%02x): $%02x\n",
 			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 
-		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
+		m_latch1 = save;        /* latch the data for the next A0 == 0 read */
 	}
 	return data;
 }
@@ -422,7 +422,7 @@ READ8_MEMBER(decocass_state::decocass_type2_r)
 		}
 		else
 		{
-			data = 0xff;	/* floating input? */
+			data = 0xff;    /* floating input? */
 		}
 	}
 	else
@@ -513,7 +513,7 @@ READ8_MEMBER(decocass_state::decocass_type3_r)
 			}
 			else
 			{
-				data = 0xff;	/* open data bus? */
+				data = 0xff;    /* open data bus? */
 				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 		}
@@ -669,7 +669,7 @@ READ8_MEMBER(decocass_state::decocass_type3_r)
 			}
 			else
 			{
-				save = 0xff;	/* open data bus? */
+				save = 0xff;    /* open data bus? */
 				data =
 					m_type3_d0_latch |
 					(BIT(save, 1) << 1) |
@@ -741,7 +741,7 @@ READ8_MEMBER(decocass_state::decocass_type4_r)
 		}
 		else
 		{
-			data = 0xff;	/* open data bus? */
+			data = 0xff;    /* open data bus? */
 			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
@@ -764,7 +764,7 @@ READ8_MEMBER(decocass_state::decocass_type4_r)
 			}
 			else
 			{
-				data = 0xff;	/* open data bus? */
+				data = 0xff;    /* open data bus? */
 				LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 		}
@@ -824,7 +824,7 @@ READ8_MEMBER(decocass_state::decocass_type5_r)
 		}
 		else
 		{
-			data = 0xff;	/* open data bus? */
+			data = 0xff;    /* open data bus? */
 			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
@@ -832,7 +832,7 @@ READ8_MEMBER(decocass_state::decocass_type5_r)
 	{
 		if (m_type5_latch)
 		{
-			data = 0x55;	/* Only a fixed value? It looks like this is all we need to do */
+			data = 0x55;    /* Only a fixed value? It looks like this is all we need to do */
 			LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
@@ -844,7 +844,7 @@ READ8_MEMBER(decocass_state::decocass_type5_r)
 			}
 			else
 			{
-				data = 0xff;	/* open data bus? */
+				data = 0xff;    /* open data bus? */
 				LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 			}
 		}
@@ -900,7 +900,7 @@ READ8_MEMBER(decocass_state::decocass_nodong_r)
 		}
 		else
 		{
-			data = 0xff;	/* open data bus? */
+			data = 0xff;    /* open data bus? */
 			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
@@ -913,7 +913,7 @@ READ8_MEMBER(decocass_state::decocass_nodong_r)
 		}
 		else
 		{
-			data = 0xff;	/* open data bus? */
+			data = 0xff;    /* open data bus? */
 			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
 		}
 	}
@@ -937,14 +937,14 @@ READ8_MEMBER(decocass_state::decocass_e5xx_r)
 		UINT8 bot_eot = (tape_get_status_bits(m_cassette) >> 5) & 1;
 
 		data =
-			(BIT(m_i8041_p1, 7)	  << 0) |	/* D0 = P17 - REQ/ */
-			(BIT(m_i8041_p2, 0)	  << 1) |	/* D1 = P20 - FNO/ */
-			(BIT(m_i8041_p2, 1)	  << 2) |	/* D2 = P21 - EOT/ */
-			(BIT(m_i8041_p2, 2)	  << 3) |	/* D3 = P22 - ERR/ */
-			((bot_eot)	          << 4) |	/* D4 = BOT/EOT (direct from drive) */
-			(1					  << 5) |	/* D5 floating input */
-			(1					  << 6) |	/* D6 floating input */
-			(!tape_is_present(m_cassette) << 7);	/* D7 = cassette present */
+			(BIT(m_i8041_p1, 7)   << 0) |   /* D0 = P17 - REQ/ */
+			(BIT(m_i8041_p2, 0)   << 1) |   /* D1 = P20 - FNO/ */
+			(BIT(m_i8041_p2, 1)   << 2) |   /* D2 = P21 - EOT/ */
+			(BIT(m_i8041_p2, 2)   << 3) |   /* D3 = P22 - ERR/ */
+			((bot_eot)            << 4) |   /* D4 = BOT/EOT (direct from drive) */
+			(1                    << 5) |   /* D5 floating input */
+			(1                    << 6) |   /* D6 floating input */
+			(!tape_is_present(m_cassette) << 7);    /* D7 = cassette present */
 
 		LOG(4,("%10s 6502-PC: %04x decocass_e5xx_r(%02x): $%02x <- STATUS (%s%s%s%s%s%s%s%s)\n",
 			space.machine().time().as_string(6),
@@ -1008,10 +1008,10 @@ WRITE8_MEMBER(decocass_state::decocass_e900_w)
 	m_de0091_enable = data & 1;
 	membank("bank1")->set_entry(data & 1);
 	/* Perhaps the second row of ROMs is enabled by another bit.
-     * There is no way to verify this yet, so for now just look
-     * at bit 0 to enable the daughter board at reads between
-     * 0x6000 and 0xafff.
-     */
+	 * There is no way to verify this yet, so for now just look
+	 * at bit 0 to enable the daughter board at reads between
+	 * 0x6000 and 0xafff.
+	 */
 }
 
 WRITE8_MEMBER(decocass_state::decocass_de0091_w)
@@ -1382,14 +1382,14 @@ MACHINE_RESET_MEMBER(decocass_state,czeroize)
 	m_type3_swap = TYPE3_SWAP_23_56;
 
 	/*
-     * FIXME: remove if the original ROM is available.
-     * The Zeroize 6502 code at 0x3707 issues LODCTRS with 0x8a,
-     * and expects to read 0x18 from 0x08a0 ff. within 7 bytes
-     * and 0xf7 from 0x8a1 (which 0xd is subtracted from presumably in order
-     * to form a NOP of 0xea).
-     * This hack seems to be sufficient to get around
-     * the missing dongle ROM contents and play the game.
-     */
+	 * FIXME: remove if the original ROM is available.
+	 * The Zeroize 6502 code at 0x3707 issues LODCTRS with 0x8a,
+	 * and expects to read 0x18 from 0x08a0 ff. within 7 bytes
+	 * and 0xf7 from 0x8a1 (which 0xd is subtracted from presumably in order
+	 * to form a NOP of 0xea).
+	 * This hack seems to be sufficient to get around
+	 * the missing dongle ROM contents and play the game.
+	 */
 	memset(mem, 0x00, 0x1000);
 	mem[0x08a0] = 0x18;
 	mem[0x08a1] = 0xf7;

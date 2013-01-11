@@ -49,9 +49,9 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 
-#define VPRINTF(x)		do { if (VERBOSE) mame_printf_debug x; } while (0)
+#define VPRINTF(x)      do { if (VERBOSE) mame_printf_debug x; } while (0)
 
 
 
@@ -79,22 +79,22 @@ const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAM
 
 sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
 	: m_device(device),
-	  m_next(NULL),
-	  m_sample_rate(sample_rate),
-	  m_new_sample_rate(0),
-	  m_attoseconds_per_sample(0),
-	  m_max_samples_per_update(0),
-	  m_input(inputs),
-	  m_input_array(inputs),
-	  m_resample_bufalloc(0),
-	  m_output(outputs),
-	  m_output_array(outputs),
-	  m_output_bufalloc(0),
-	  m_output_sampindex(0),
-	  m_output_update_sampindex(0),
-	  m_output_base_sampindex(0),
-	  m_callback(callback),
-	  m_param(param)
+		m_next(NULL),
+		m_sample_rate(sample_rate),
+		m_new_sample_rate(0),
+		m_attoseconds_per_sample(0),
+		m_max_samples_per_update(0),
+		m_input(inputs),
+		m_input_array(inputs),
+		m_resample_bufalloc(0),
+		m_output(outputs),
+		m_output_array(outputs),
+		m_output_bufalloc(0),
+		m_output_sampindex(0),
+		m_output_update_sampindex(0),
+		m_output_base_sampindex(0),
+		m_callback(callback),
+		m_param(param)
 {
 	// get the device's sound interface
 	device_sound_interface *sound;
@@ -124,7 +124,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	}
 
 	// force an update to the sample rates; this will cause everything to be recomputed
-    // and will generate the initial resample buffers for our inputs
+	// and will generate the initial resample buffers for our inputs
 	recompute_sample_rate_data();
 
 	// set up the initial output buffer positions now that we have data
@@ -493,7 +493,7 @@ void sound_stream::recompute_sample_rate_data()
 		if (input.m_source != NULL)
 		{
 			// okay, we have a new sample rate; recompute the latency to be the maximum
-            // sample period between us and our input
+			// sample period between us and our input
 			attoseconds_t new_attosecs_per_sample = ATTOSECONDS_PER_SECOND / input.m_source->m_stream->m_sample_rate;
 			attoseconds_t latency = MAX(new_attosecs_per_sample, m_attoseconds_per_sample);
 
@@ -507,7 +507,7 @@ void sound_stream::recompute_sample_rate_data()
 				latency = 0;
 
 			// we generally don't want to tweak the latency, so we just keep the greatest
-            // one we've computed thus far
+			// one we've computed thus far
 			input.m_latency_attoseconds = MAX(input.m_latency_attoseconds, latency);
 			assert(input.m_latency_attoseconds < update_attoseconds);
 		}
@@ -761,9 +761,9 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 
 sound_stream::stream_input::stream_input()
 	: m_source(NULL),
-	  m_latency_attoseconds(0),
-	  m_gain(0x100),
-	  m_user_gain(0x100)
+		m_latency_attoseconds(0),
+		m_gain(0x100),
+		m_user_gain(0x100)
 {
 }
 
@@ -779,7 +779,7 @@ sound_stream::stream_input::stream_input()
 
 sound_stream::stream_output::stream_output()
 	: m_dependents(0),
-	  m_gain(0x100)
+		m_gain(0x100)
 {
 }
 
@@ -795,17 +795,17 @@ sound_stream::stream_output::stream_output()
 
 sound_manager::sound_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_update_timer(NULL),
-	  m_finalmix_leftover(0),
-	  m_finalmix(machine.sample_rate()),
-	  m_leftmix(machine.sample_rate()),
-	  m_rightmix(machine.sample_rate()),
-	  m_muted(0),
-	  m_attenuation(0),
-	  m_nosound_mode(!machine.options().sound()),
-	  m_wavfile(NULL),
-	  m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds),
-	  m_last_update(attotime::zero)
+		m_update_timer(NULL),
+		m_finalmix_leftover(0),
+		m_finalmix(machine.sample_rate()),
+		m_leftmix(machine.sample_rate()),
+		m_rightmix(machine.sample_rate()),
+		m_muted(0),
+		m_attenuation(0),
+		m_nosound_mode(!machine.options().sound()),
+		m_wavfile(NULL),
+		m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds),
+		m_last_update(attotime::zero)
 {
 	// get filename for WAV file or AVI file if specified
 	const char *wavfile = machine.options().wav_write();

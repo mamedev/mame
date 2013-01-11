@@ -13,7 +13,7 @@
 
 /* Spectrum crystals */
 
-#define X1 XTAL_14MHz		// Main clock (48k Spectrum)
+#define X1 XTAL_14MHz       // Main clock (48k Spectrum)
 #define X1_128_AMSTRAD  35469000 // Main clock (Amstrad 128K model, +2A?)
 #define X1_128_SINCLAIR 17734475 // Main clock (Sinclair 128K model)
 
@@ -58,9 +58,9 @@
 struct EVENT_LIST_ITEM
 {
 	/* driver defined ID for this write */
-	int	Event_ID;
+	int Event_ID;
 	/* driver defined data for this write */
-	int	Event_Data;
+	int Event_Data;
 	/* time at which this write occurred */
 	int Event_Time;
 };
@@ -75,7 +75,7 @@ public:
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
-	int m_port_1ffd_data;	/* scorpion and plus3 */
+	int m_port_1ffd_data;   /* scorpion and plus3 */
 	int m_port_ff_data; /* Display enhancement control */
 	int m_port_f4_data; /* Horizontal Select Register */
 

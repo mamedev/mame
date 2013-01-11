@@ -6,9 +6,9 @@ class saturn_state : public driver_device
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_workram_l(*this, "workram_l"),
-		  m_workram_h(*this, "workram_h"),
-		  m_sound_ram(*this, "sound_ram") { }
+			m_workram_l(*this, "workram_l"),
+			m_workram_h(*this, "workram_h"),
+			m_sound_ram(*this, "sound_ram") { }
 
 	required_shared_ptr<UINT32> m_workram_l;
 	required_shared_ptr<UINT32> m_workram_h;
@@ -20,18 +20,18 @@ public:
 	UINT16    *m_vdp2_regs;
 	UINT32    *m_vdp2_vram;
 	UINT32    *m_vdp2_cram;
-    UINT32    *m_vdp1_vram;
-    UINT16    *m_vdp1_regs;
+	UINT32    *m_vdp1_vram;
+	UINT16    *m_vdp1_regs;
 
 	UINT8     m_NMI_reset;
 	UINT8     m_en_68k;
 
 	struct {
-		UINT32    src[3];		/* Source DMA lv n address*/
-		UINT32    dst[3];		/* Destination DMA lv n address*/
-		UINT32    src_add[3];	/* Source Addition for DMA lv n*/
-		UINT32    dst_add[3];	/* Destination Addition for DMA lv n*/
-		UINT32    size[3];		/* Transfer DMA size lv n*/
+		UINT32    src[3];       /* Source DMA lv n address*/
+		UINT32    dst[3];       /* Destination DMA lv n address*/
+		UINT32    src_add[3];   /* Source Addition for DMA lv n*/
+		UINT32    dst_add[3];   /* Destination Addition for DMA lv n*/
+		UINT32    size[3];      /* Transfer DMA size lv n*/
 		UINT32    index[3];
 		int       start_factor[3];
 		UINT8     enable_mask[3];
@@ -48,17 +48,17 @@ public:
 		UINT16    **framebuffer_display_lines;
 		int       framebuffer_mode;
 		int       framebuffer_double_interlace;
-		int	      fbcr_accessed;
-        int       framebuffer_width;
-        int       framebuffer_height;
-        int       framebuffer_current_display;
-        int	      framebuffer_current_draw;
-        int	      framebuffer_clear_on_next_frame;
+		int       fbcr_accessed;
+		int       framebuffer_width;
+		int       framebuffer_height;
+		int       framebuffer_current_display;
+		int       framebuffer_current_draw;
+		int       framebuffer_clear_on_next_frame;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
-        UINT16	  *framebuffer[2];
-        UINT16	  **framebuffer_draw_lines;
-	    UINT8     *gfx_decode;
+		UINT16    *framebuffer[2];
+		UINT16    **framebuffer_draw_lines;
+		UINT8     *gfx_decode;
 		UINT16    lopr;
 		UINT16    copr;
 		UINT16    ewdr;
@@ -68,36 +68,36 @@ public:
 	}m_vdp1;
 
 	struct {
-	    UINT8     *gfx_decode;
-	    bitmap_rgb32 roz_bitmap[2];
-	    UINT8     dotsel;
-	    UINT8     pal;
-	    UINT16    h_count;
-	    UINT16    v_count;
-	    UINT8     exltfg;
-	    UINT8     exsyfg;
+		UINT8     *gfx_decode;
+		bitmap_rgb32 roz_bitmap[2];
+		UINT8     dotsel;
+		UINT8     pal;
+		UINT16    h_count;
+		UINT16    v_count;
+		UINT8     exltfg;
+		UINT8     exsyfg;
 		int       old_crmd;
 		int       old_tvmd;
 	}m_vdp2;
 
 	struct {
 		UINT8 IOSEL1;
-        UINT8 IOSEL2;
-        UINT8 EXLE1;
-        UINT8 EXLE2;
-        UINT8 PDR1;
-        UINT8 PDR2;
-        UINT8 DDR1;
-        UINT8 DDR2;
-        UINT8 SF;
-        UINT8 SR;
-        UINT8 IREG[7];
-        UINT8 OREG[32];
-        int   intback_stage;
-        int   pmode;
-        UINT8 SMEM[4];
-        UINT8 intback;
-        UINT8 rtc_data[7];
+		UINT8 IOSEL2;
+		UINT8 EXLE1;
+		UINT8 EXLE2;
+		UINT8 PDR1;
+		UINT8 PDR2;
+		UINT8 DDR1;
+		UINT8 DDR2;
+		UINT8 SF;
+		UINT8 SR;
+		UINT8 IREG[7];
+		UINT8 OREG[32];
+		int   intback_stage;
+		int   pmode;
+		UINT8 SMEM[4];
+		UINT8 intback;
+		UINT8 rtc_data[7];
 	}m_smpc;
 
 	struct {
@@ -113,7 +113,7 @@ public:
 	/* ST-V specific */
 	UINT8     m_stv_multi_bank;
 	UINT8     m_prev_bankswitch;
-    emu_timer *m_stv_rtc_timer;
+	emu_timer *m_stv_rtc_timer;
 	UINT8     m_port_sel,m_mux_data;
 	UINT8     m_system_output;
 	UINT16    m_serial_tx;
@@ -238,10 +238,10 @@ public:
 
 #define MASTER_CLOCK_352 57272720
 #define MASTER_CLOCK_320 53693174
-#define CEF_1	state->m_vdp1_regs[0x010/2]|=0x0002
+#define CEF_1   state->m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   state->m_vdp1_regs[0x010/2]&=~0x0002
-#define BEF_1	state->m_vdp1_regs[0x010/2]|=0x0001
-#define BEF_0	state->m_vdp1_regs[0x010/2]&=~0x0001
+#define BEF_1   state->m_vdp1_regs[0x010/2]|=0x0001
+#define BEF_0   state->m_vdp1_regs[0x010/2]&=~0x0001
 #define STV_VDP1_TVMR ((state->m_vdp1_regs[0x000/2])&0xffff)
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
@@ -270,7 +270,7 @@ void install_stvbios_speedups(running_machine &machine);
 
 /*----------- defined in video/stvvdp1.c -----------*/
 
-extern UINT16	**stv_framebuffer_display_lines;
+extern UINT16   **stv_framebuffer_display_lines;
 extern int stv_framebuffer_double_interlace;
 extern int stv_framebuffer_mode;
 extern UINT8* stv_vdp1_gfx_decode;

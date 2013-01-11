@@ -60,7 +60,7 @@ struct apollo_kbd_interface
 
 // ======================> apollo_kbd_device
 
-class apollo_kbd_device :	public device_t, public apollo_kbd_interface
+class apollo_kbd_device :   public device_t, public apollo_kbd_interface
 {
 public:
 	// construction/destruction
@@ -126,7 +126,7 @@ private:
 		int m_tx_pending;  // mouse data packet is pending
 	};
 
-    /* Transmitter fifo */
+	/* Transmitter fifo */
 	class tx_fifo
 	{
 	public:
@@ -173,10 +173,10 @@ private:
 
 //  const apollo_kbd_interface &m_config;
 
-	beeper	m_beeper;
-	mouse	m_mouse;
-    tx_fifo m_tx_fifo;
-    keyboard_tty  m_keyboard_tty;
+	beeper  m_beeper;
+	mouse   m_mouse;
+	tx_fifo m_tx_fifo;
+	keyboard_tty  m_keyboard_tty;
 
 	apollo_kbd_device *m_device; // pointer to myself (nasty: used for cpu_context)
 

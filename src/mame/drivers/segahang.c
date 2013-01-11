@@ -106,7 +106,7 @@ static I8255_INTERFACE(hangon_ppi_intf_1)
 WRITE8_MEMBER( segahang_state::video_lamps_w )
 {
 	//
-    //  Main PPI port B
+	//  Main PPI port B
 	//
 	//  D7 : FLIPC (1= flip screen, 0= normal orientation)
 	//  D6 : SHADE0 (1= highlight, 0= shadow)
@@ -145,7 +145,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 WRITE8_MEMBER( segahang_state::tilemap_sound_w )
 {
 	//
-    //  Main PPI port C
+	//  Main PPI port C
 	//
 	//  D7 : Port A handshaking signal /OBF
 	//  D6 : Port A handshaking signal ACK
@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 //  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
- // On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
+	// On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segahang_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
@@ -651,13 +651,13 @@ static INPUT_PORTS_START( hangon )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 
-	PORT_START("ADC0")	// steering
+	PORT_START("ADC0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")	// gas pedal
+	PORT_START("ADC1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")	// brake
+	PORT_START("ADC2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -683,13 +683,13 @@ static INPUT_PORTS_START( shangupb )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")	// steering
+	PORT_START("ADC0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")	// gas pedal
+	PORT_START("ADC1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")	// brake
+	PORT_START("ADC2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -735,10 +735,10 @@ static INPUT_PORTS_START( sharrier )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")	// X axis
+	PORT_START("ADC0")  // X axis
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("ADC1")	// Y axis
+	PORT_START("ADC1")  // Y axis
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x60,0xa0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -773,16 +773,16 @@ static INPUT_PORTS_START( enduror )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("ADC0")	// gas pedal
+	PORT_START("ADC0")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC1")	// brake
+	PORT_START("ADC1")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
-	PORT_START("ADC2")	// bank up/down
+	PORT_START("ADC2")  // bank up/down
 	PORT_BIT( 0xff, 0x20, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC3")	// steering
+	PORT_START("ADC3")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1339,7 +1339,7 @@ ROM_START( sharrier )
 	ROM_LOAD( "epr-7231.ic5", 0x00000, 0x8000, CRC(871c6b14) SHA1(6d04ddc32fdf1db409cb519890821bd10fc9e58b) )
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	// Internal i8751 MCU code
+	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
 	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
@@ -1420,7 +1420,7 @@ ROM_START( sharrier1 )
 	ROM_LOAD( "epr-7231.ic5", 0x00000, 0x8000, CRC(871c6b14) SHA1(6d04ddc32fdf1db409cb519890821bd10fc9e58b) )
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	// Internal i8751 MCU code
+	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
 	ROM_LOAD( "315-5163.ic32", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
@@ -1598,12 +1598,12 @@ ROM_START( endurobl )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "7.13j", 0x030000, 0x08000, CRC(f1d6b4b7) SHA1(32bd966191cbb36d1e60ed1a06d4caa023dd6b88) )
 	ROM_CONTINUE(             0x000000, 0x08000 )
-	ROM_LOAD16_BYTE( "4.13h", 0x030001, 0x08000, CRC(43bff873) SHA1(04e906c1965a6211fb8e13987db52f1f99cc0203) )	// rom de-coded
-	ROM_CONTINUE(             0x000001, 0x08000 )		// data de-coded
+	ROM_LOAD16_BYTE( "4.13h", 0x030001, 0x08000, CRC(43bff873) SHA1(04e906c1965a6211fb8e13987db52f1f99cc0203) ) // rom de-coded
+	ROM_CONTINUE(             0x000001, 0x08000 )       // data de-coded
 	ROM_LOAD16_BYTE( "8.14j", 0x010000, 0x08000, CRC(2153154a) SHA1(145d8ed59812d26ca412a01ae77cd7872adaba5a) )
 	ROM_LOAD16_BYTE( "5.14h", 0x010001, 0x08000, CRC(0a97992c) SHA1(7a6fc8c575637107ed07a30f6f0f8cb8877cbb43) )
-	ROM_LOAD16_BYTE( "9.15j", 0x020000, 0x08000, CRC(db3bff1c) SHA1(343ed27a690800683cdd5128dcdb28c7b45288a3) )	// one byte difference from
-	ROM_LOAD16_BYTE( "6.15h", 0x020001, 0x08000, CRC(54b1885a) SHA1(f53d906390e5414e73c4cdcbc102d3cb3e719e67) )	// epr-7638.ic86 / epr-7642.ic99
+	ROM_LOAD16_BYTE( "9.15j", 0x020000, 0x08000, CRC(db3bff1c) SHA1(343ed27a690800683cdd5128dcdb28c7b45288a3) ) // one byte difference from
+	ROM_LOAD16_BYTE( "6.15h", 0x020001, 0x08000, CRC(54b1885a) SHA1(f53d906390e5414e73c4cdcbc102d3cb3e719e67) ) // epr-7638.ic86 / epr-7642.ic99
 
 	ROM_REGION( 0x40000, "subcpu", 0 ) // second 68000 CPU
 	ROM_LOAD16_BYTE("epr-7634.ic54", 0x0000, 0x8000, CRC(3e07fd32) SHA1(7acb9e9712ecfe928c421c84dece783e75077746) )
@@ -1652,8 +1652,8 @@ ROM_START( endurobl )
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-7765.ic73", 0x00000, 0x4000, CRC(81c82fc9) SHA1(99eae7edc62d719993c46a703f9daaf332e236e9) )	// was "13.16d"
-	ROM_LOAD( "epr-7764.ic72", 0x04000, 0x4000, CRC(755bfdad) SHA1(2942f3da5a45a3ac7bba6a73142663fd975f4379) )	// was "12.16e"
+	ROM_LOAD( "epr-7765.ic73", 0x00000, 0x4000, CRC(81c82fc9) SHA1(99eae7edc62d719993c46a703f9daaf332e236e9) )  // was "13.16d"
+	ROM_LOAD( "epr-7764.ic72", 0x04000, 0x4000, CRC(755bfdad) SHA1(2942f3da5a45a3ac7bba6a73142663fd975f4379) )  // was "12.16e"
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-7762.ic5", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )

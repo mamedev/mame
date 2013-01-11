@@ -50,8 +50,8 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8035_TAG		"z16"
-#define DISCRETE_TAG	"discrete"
+#define I8035_TAG       "z16"
+#define DISCRETE_TAG    "discrete"
 
 
 
@@ -138,7 +138,7 @@ ADDRESS_MAP_END
 static const discrete_555_desc abc77_ne556_a =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_DC,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
@@ -445,29 +445,29 @@ inline void abc77_device::key_down(int state)
 //-------------------------------------------------
 
 abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock),
-	  m_maincpu(*this, I8035_TAG),
-	  m_discrete(*this, DISCRETE_TAG),
-	  m_txd(1),
-	  m_keydown(1),
-	  m_clock(0),
-	  m_stb(1)
+	: device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock),
+		m_maincpu(*this, I8035_TAG),
+		m_discrete(*this, DISCRETE_TAG),
+		m_txd(1),
+		m_keydown(1),
+		m_clock(0),
+		m_stb(1)
 {
 }
 
 abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  m_maincpu(*this, I8035_TAG),
-	  m_discrete(*this, DISCRETE_TAG),
-	  m_txd(1),
-	  m_keydown(1),
-	  m_clock(0),
-	  m_stb(1)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		m_maincpu(*this, I8035_TAG),
+		m_discrete(*this, DISCRETE_TAG),
+		m_txd(1),
+		m_keydown(1),
+		m_clock(0),
+		m_stb(1)
 {
 }
 
 abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock) { }
+	: abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -483,8 +483,8 @@ void abc77_device::device_start()
 	m_reset_timer = timer_alloc(TIMER_RESET);
 
 	// resolve callbacks
-    m_out_clock_func.resolve(m_out_clock_cb, *this);
-    m_out_keydown_func.resolve(m_out_keydown_cb, *this);
+	m_out_clock_func.resolve(m_out_clock_cb, *this);
+	m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 }
 
 
@@ -532,18 +532,18 @@ READ8_MEMBER( abc77_device::p1_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P10     Z17 Y0
-        P11     Z17 Y1
-        P12     Z17 Y2
-        P13     Z17 Y3
-        P14     Z17 Y4
-        P15     Z17 Y5
-        P16     Z17 Y6
-        P17     Z17 Y7
+	    P10     Z17 Y0
+	    P11     Z17 Y1
+	    P12     Z17 Y2
+	    P13     Z17 Y3
+	    P14     Z17 Y4
+	    P15     Z17 Y5
+	    P16     Z17 Y6
+	    P17     Z17 Y7
 
-    */
+	*/
 
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11" };
 	UINT8 data = 0xff;
@@ -565,18 +565,18 @@ WRITE8_MEMBER( abc77_device::p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P20     Z2 A0
-        P21     Z2 A1
-        P22     Z2 A2
-        P23     Z2 A3
-        P24     NE556 2,6
-        P25     TxD
-        P26     _KEYDOWN
-        P27     Z17 HYS
+	    P20     Z2 A0
+	    P21     Z2 A1
+	    P22     Z2 A2
+	    P23     Z2 A3
+	    P24     NE556 2,6
+	    P25     TxD
+	    P26     _KEYDOWN
+	    P27     Z17 HYS
 
-    */
+	*/
 
 	if (!m_stb)
 	{

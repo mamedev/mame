@@ -50,9 +50,9 @@ class dlair_state : public driver_device
 public:
 	dlair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ldv1000(*this, "ld_ldv1000"),
-		  m_pr7820(*this, "ld_pr7820"),
-		  m_22vp932(*this, "ld_22vp932") ,
+			m_ldv1000(*this, "ld_ldv1000"),
+			m_pr7820(*this, "ld_pr7820"),
+			m_22vp932(*this, "ld_22vp932") ,
 		m_videoram(*this, "videoram"){ }
 
 	void laserdisc_data_w(UINT8 data)
@@ -129,8 +129,8 @@ public:
  *
  *************************************/
 
-#define MASTER_CLOCK_US				16000000
-#define MASTER_CLOCK_EURO			14318180
+#define MASTER_CLOCK_US             16000000
+#define MASTER_CLOCK_EURO           14318180
 
 
 
@@ -177,8 +177,8 @@ READ16_MEMBER(dlair_state::serial_receive)
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_NULL,         /* ZC/TO0 callback */
 	DEVCB_NULL,         /* ZC/TO1 callback */
 	DEVCB_NULL          /* ZC/TO2 callback */
 };
@@ -186,12 +186,12 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static const z80sio_interface sio_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(dlair_state, dleuro_interrupt),	/* interrupt handler */
-	DEVCB_NULL,					/* DTR changed handler */
-	DEVCB_NULL,					/* RTS changed handler */
-	DEVCB_NULL,					/* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(dlair_state,serial_transmit),	/* transmit handler */
-	DEVCB_DRIVER_MEMBER16(dlair_state,serial_receive)		/* receive handler */
+	DEVCB_DRIVER_LINE_MEMBER(dlair_state, dleuro_interrupt),    /* interrupt handler */
+	DEVCB_NULL,                 /* DTR changed handler */
+	DEVCB_NULL,                 /* RTS changed handler */
+	DEVCB_NULL,                 /* BREAK changed handler */
+	DEVCB_DRIVER_MEMBER16(dlair_state,serial_transmit), /* transmit handler */
+	DEVCB_DRIVER_MEMBER16(dlair_state,serial_receive)       /* receive handler */
 };
 
 
@@ -302,12 +302,12 @@ INTERRUPT_GEN_MEMBER(dlair_state::vblank_callback)
 WRITE8_MEMBER(dlair_state::misc_w)
 {
 	/*
-        D0-D3 = B0-B3
-           D4 = coin counter
-           D5 = OUT DISC DATA
-           D6 = ENTER
-           D7 = INT/EXT
-    */
+	    D0-D3 = B0-B3
+	       D4 = coin counter
+	       D5 = OUT DISC DATA
+	       D6 = ENTER
+	       D7 = INT/EXT
+	*/
 	UINT8 diff = data ^ m_last_misc;
 	m_last_misc = data;
 
@@ -325,15 +325,15 @@ WRITE8_MEMBER(dlair_state::misc_w)
 WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 {
 	/*
-           D0 = CHAR GEN ON+
-           D1 = KILL VIDEO+
-           D2 = SEL CHAR GEN VIDEO+
-           D3 = counter 2
-           D4 = coin counter
-           D5 = OUT DISC DATA
-           D6 = ENTER
-           D7 = INT/EXT
-    */
+	       D0 = CHAR GEN ON+
+	       D1 = KILL VIDEO+
+	       D2 = SEL CHAR GEN VIDEO+
+	       D3 = counter 2
+	       D4 = coin counter
+	       D5 = OUT DISC DATA
+	       D6 = ENTER
+	       D7 = INT/EXT
+	*/
 	UINT8 diff = data ^ m_last_misc;
 	m_last_misc = data;
 
@@ -432,16 +432,16 @@ static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8, dlair_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
-	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)			// WT EXT LED 1
-	AM_RANGE(0xe018, 0xe018) AM_MIRROR(0x1f47) AM_WRITE(led_den2_w)			// WT EXT LED 2
-	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1f47) AM_WRITE(laserdisc_w)		// DISC WT
-	AM_RANGE(0xe028, 0xe028) AM_MIRROR(0x1f47) AM_WRITE(dleuro_misc_w)		// WT MISC
-	AM_RANGE(0xe030, 0xe030) AM_MIRROR(0x1f47) AM_WRITE(watchdog_reset_w)	// CLR WDOG
-	AM_RANGE(0xe080, 0xe080) AM_MIRROR(0x1f47) AM_READ_PORT("P1")			// CP A
-	AM_RANGE(0xe088, 0xe088) AM_MIRROR(0x1f47) AM_READ_PORT("SYSTEM")		// CP B
-	AM_RANGE(0xe090, 0xe090) AM_MIRROR(0x1f47) AM_READ_PORT("DSW1")			// OPT SW A
-	AM_RANGE(0xe098, 0xe098) AM_MIRROR(0x1f47) AM_READ_PORT("DSW2")			// OPT SW B
-	AM_RANGE(0xe0a0, 0xe0a0) AM_MIRROR(0x1f47) AM_READ(laserdisc_r)			// RD DISC DATA
+	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)         // WT EXT LED 1
+	AM_RANGE(0xe018, 0xe018) AM_MIRROR(0x1f47) AM_WRITE(led_den2_w)         // WT EXT LED 2
+	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1f47) AM_WRITE(laserdisc_w)        // DISC WT
+	AM_RANGE(0xe028, 0xe028) AM_MIRROR(0x1f47) AM_WRITE(dleuro_misc_w)      // WT MISC
+	AM_RANGE(0xe030, 0xe030) AM_MIRROR(0x1f47) AM_WRITE(watchdog_reset_w)   // CLR WDOG
+	AM_RANGE(0xe080, 0xe080) AM_MIRROR(0x1f47) AM_READ_PORT("P1")           // CP A
+	AM_RANGE(0xe088, 0xe088) AM_MIRROR(0x1f47) AM_READ_PORT("SYSTEM")       // CP B
+	AM_RANGE(0xe090, 0xe090) AM_MIRROR(0x1f47) AM_READ_PORT("DSW1")         // OPT SW A
+	AM_RANGE(0xe098, 0xe098) AM_MIRROR(0x1f47) AM_READ_PORT("DSW2")         // OPT SW B
+	AM_RANGE(0xe0a0, 0xe0a0) AM_MIRROR(0x1f47) AM_READ(laserdisc_r)         // RD DISC DATA
 ADDRESS_MAP_END
 
 
@@ -560,14 +560,14 @@ static INPUT_PORTS_START( dlair )
 	PORT_DIPSETTING(    0x40, "PAYG3" )
 	PORT_DIPSETTING(    0x60, "PAYG4" )
 	PORT_DIPNAME( 0x90, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("B:8,5")
-	PORT_DIPSETTING(	0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
 
 	PORT_START("CONTROLS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -575,18 +575,18 @@ static INPUT_PORTS_START( dlair )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, NULL) 	/* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, NULL)	/* command strobe */
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, NULL)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, NULL)    /* command strobe */
 INPUT_PORTS_END
 
 
@@ -594,7 +594,7 @@ static INPUT_PORTS_START( dlaire )
 	PORT_INCLUDE(dlair)
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x08, 0x08, "LD Player" )		/* In Rev F, F2 and so on... before it was Joystick Sound Feedback */
+	PORT_DIPNAME( 0x08, 0x08, "LD Player" )     /* In Rev F, F2 and so on... before it was Joystick Sound Feedback */
 	PORT_DIPSETTING(    0x00, "LD-PR7820" )
 	PORT_DIPSETTING(    0x08, "LDV-1000" )
 INPUT_PORTS_END
@@ -607,8 +607,8 @@ static INPUT_PORTS_START( dleuro )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("SYSTEM")
@@ -616,9 +616,9 @@ static INPUT_PORTS_START( dleuro )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, NULL) 	/* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, NULL)	/* command strobe */
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, NULL)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, NULL)    /* command strobe */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:2,1")
@@ -662,14 +662,14 @@ static INPUT_PORTS_START( dleuro )
 	PORT_DIPSETTING(    0x40, "PAYG3" )
 	PORT_DIPSETTING(    0x60, "PAYG4" )
 	PORT_DIPNAME( 0x90, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("B:8,5s")
-	PORT_DIPSETTING(	0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
 INPUT_PORTS_END
 
 
@@ -804,7 +804,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( dlair )		/* revision F2 */
+ROM_START( dlair )      /* revision F2 */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_f2_u1.bin", 0x0000, 0x2000,  CRC(f5ea3b9d) SHA1(c0cafff8b2982125fd3314ffc66681e47f027fc9) )
 	ROM_LOAD( "dl_f2_u2.bin", 0x2000, 0x2000,  CRC(dcc1dff2) SHA1(614ca8f6c5b6fa1d590f6b80d731377faa3a65a9) )
@@ -815,7 +815,7 @@ ROM_START( dlair )		/* revision F2 */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlaira )		/* revision A */
+ROM_START( dlaira )     /* revision A */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_a_u1.bin", 0x0000, 0x2000,  CRC(d76e83ec) SHA1(fc7ff5d883de9b38a9e0532c35990f4b319ba1d3) )
 	ROM_LOAD( "dl_a_u2.bin", 0x2000, 0x2000,  CRC(a6a723d8) SHA1(5c71cb0b6be7331083adaf6fac6bdfc8445cb485) )
@@ -827,7 +827,7 @@ ROM_START( dlaira )		/* revision A */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlairb )		/* revision B */
+ROM_START( dlairb )     /* revision B */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_b_u1.bin", 0x0000, 0x2000,  CRC(d76e83ec) SHA1(fc7ff5d883de9b38a9e0532c35990f4b319ba1d3) )
 	ROM_LOAD( "dl_b_u2.bin", 0x2000, 0x2000,  CRC(6751103d) SHA1(e94e19f738e0eb69700e56c6069c7f3c0911303f) )
@@ -839,7 +839,7 @@ ROM_START( dlairb )		/* revision B */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlairc )		/* revision C */
+ROM_START( dlairc )     /* revision C */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_c_u1.bin", 0x0000, 0x2000,  CRC(cebfe26a) SHA1(1c808de5c92fef67d8088621fbd743c1a0a3bb5e) )
 	ROM_LOAD( "dl_c_u2.bin", 0x2000, 0x2000,  CRC(6751103d) SHA1(e94e19f738e0eb69700e56c6069c7f3c0911303f) )
@@ -851,7 +851,7 @@ ROM_START( dlairc )		/* revision C */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlaird )		/* revision D */
+ROM_START( dlaird )     /* revision D */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_d_u1.bin", 0x0000, 0x2000,  CRC(0b5ab120) SHA1(6ec59d6aaa27994d8de4f5635935fd6c1d42d2f6) )
 	ROM_LOAD( "dl_d_u2.bin", 0x2000, 0x2000,  CRC(93ebfffb) SHA1(2a8f6d7ab18845e22a2ba238b44d7c636908a125) )
@@ -863,7 +863,7 @@ ROM_START( dlaird )		/* revision D */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlaire )		/* revision E */
+ROM_START( dlaire )     /* revision E */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_e_u1.bin", 0x0000, 0x2000,  CRC(02980426) SHA1(409de05045adbd054bc1fda24d4a9672832e2fae) )
 	ROM_LOAD( "dl_e_u2.bin", 0x2000, 0x2000,  CRC(979d4c97) SHA1(5da6ceab5029ac5f5846bf52841675c5c70b17af) )
@@ -874,7 +874,7 @@ ROM_START( dlaire )		/* revision E */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlairf )		/* revision F */
+ROM_START( dlairf )     /* revision F */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_f_u1.bin", 0x0000, 0x2000,  CRC(06fc6941) SHA1(ea8cf6d370f89d60721ab00ec58ff24027b5252f) )
 	ROM_LOAD( "dl_f_u2.bin", 0x2000, 0x2000,  CRC(dcc1dff2) SHA1(614ca8f6c5b6fa1d590f6b80d731377faa3a65a9) )
@@ -885,7 +885,7 @@ ROM_START( dlairf )		/* revision F */
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dleuro )		/* European Atari version */
+ROM_START( dleuro )     /* European Atari version */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "elu45.bin", 0x0000, 0x2000, CRC(4d3a9eac) SHA1(e6cd274b4a0f92b1fb1f013f80f6fd2db3212431) )
 	ROM_LOAD( "elu46.bin", 0x2000, 0x2000, CRC(8479612b) SHA1(b5543a06928274bde0e1bdda0747d936feaff177) )
@@ -899,7 +899,7 @@ ROM_START( dleuro )		/* European Atari version */
 	DISK_IMAGE_READONLY( "dleuro", 0, NO_DUMP )
 ROM_END
 
-ROM_START( dlital )		/* Italian Sidam version */
+ROM_START( dlital )     /* Italian Sidam version */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dlita45.bin", 0x0000, 0x2000, CRC(2ed85958) SHA1(9651989775d215b279716b8c3e30d8e799d91b37) ) /* Label: ELU 45 SID */
 	ROM_LOAD( "dlita46.bin", 0x2000, 0x2000, CRC(8479612b) SHA1(b5543a06928274bde0e1bdda0747d936feaff177) ) /* Label: ELU 46 REV.B */
@@ -914,7 +914,7 @@ ROM_START( dlital )		/* Italian Sidam version */
 ROM_END
 
 
-ROM_START( spaceace )		/* revision A3 */
+ROM_START( spaceace )       /* revision A3 */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a3_u1.bin", 0x0000, 0x2000,  CRC(427522d0) SHA1(de4d5353af0be3e60afe1ed13d1d531c425cdb4d) )
 	ROM_LOAD( "sa_a3_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
@@ -926,7 +926,7 @@ ROM_START( spaceace )		/* revision A3 */
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
-ROM_START( spaceacea2 )		/* revision A2 */
+ROM_START( spaceacea2 )     /* revision A2 */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a2_u1.bin", 0x0000, 0x2000,  CRC(71b39e27) SHA1(15a34eee9d541b186761a78b5c97449c7b496e4f) )
 	ROM_LOAD( "sa_a2_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
@@ -938,7 +938,7 @@ ROM_START( spaceacea2 )		/* revision A2 */
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
-ROM_START( spaceacea )		/* revision A */
+ROM_START( spaceacea )      /* revision A */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a_u1.bin", 0x0000, 0x2000,  CRC(8eb1889e) SHA1(bfa2c5fc139c448b7b6b5c5757d4f2f74e610b85) )
 	ROM_LOAD( "sa_a_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
@@ -950,7 +950,7 @@ ROM_START( spaceacea )		/* revision A */
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
-ROM_START( spaceaceeuro )		/* Italian Sidam version */
+ROM_START( spaceaceeuro )       /* Italian Sidam version */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sa_u45a.bin", 0x0000, 0x2000, CRC(41264d46) SHA1(3e0ecfb3249f857a29fe58a3853a55d31cbd63d6) )
 	ROM_LOAD( "sa_u46a.bin", 0x2000, 0x2000, CRC(bc1c70cf) SHA1(cd6d2456ac2fbbfb86e1f31bd7cbd0cec0d31b45) )

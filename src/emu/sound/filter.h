@@ -57,18 +57,18 @@ filter_real filter_compute(filter* f, filter_state* s);
 
 
 /* Filter types */
-#define FILTER_LOWPASS		0
-#define FILTER_HIGHPASS		1
-#define FILTER_BANDPASS		2
+#define FILTER_LOWPASS      0
+#define FILTER_HIGHPASS     1
+#define FILTER_BANDPASS     2
 
-#define Q_TO_DAMP(q)	(1.0/q)
+#define Q_TO_DAMP(q)    (1.0/q)
 
 struct filter2_context
 {
-	double x0, x1, x2;	/* x[k], x[k-1], x[k-2], current and previous 2 input values */
-	double y0, y1, y2;	/* y[k], y[k-1], y[k-2], current and previous 2 output values */
-	double a1, a2;		/* digital filter coefficients, denominator */
-	double b0, b1, b2;	/* digital filter coefficients, numerator */
+	double x0, x1, x2;  /* x[k], x[k-1], x[k-2], current and previous 2 input values */
+	double y0, y1, y2;  /* y[k], y[k-1], y[k-2], current and previous 2 output values */
+	double a1, a2;      /* digital filter coefficients, denominator */
+	double b0, b1, b2;  /* digital filter coefficients, numerator */
 };
 
 

@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "video/nubus_48gc.h"
 
-#define GC48_SCREEN_NAME	"48gc_screen"
-#define GC48_ROM_REGION		"48gc_rom"
+#define GC48_SCREEN_NAME    "48gc_screen"
+#define GC48_ROM_REGION     "48gc_rom"
 
-#define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
+#define VRAM_SIZE   (0x200000)  // 2 megs, maxed out
 
 MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
 	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
@@ -31,7 +31,7 @@ ROM_END
 
 ROM_START( gc824 )
 	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
-    ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) )
+	ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) )
 ROM_END
 
 //**************************************************************************
@@ -75,7 +75,7 @@ const rom_entry *nubus_824gc_device::device_rom_region() const
 //-------------------------------------------------
 
 jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 }
@@ -155,7 +155,7 @@ UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	switch (m_mode)
 	{
-		case 0:	// 1bpp
+		case 0: // 1bpp
 			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
@@ -175,7 +175,7 @@ UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			}
 			break;
 
-		case 1:	// 2bpp
+		case 1: // 2bpp
 			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
@@ -241,12 +241,12 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 
 	switch (offset)
 	{
-		case 0x8/4:	// base
+		case 0x8/4: // base
 //          printf("%x to base\n", data);
 			m_base = (data*2)<<4;
 			break;
 
-		case 0xc/4:	// stride
+		case 0xc/4: // stride
 //          printf("%x to stride\n", data);
 			// this value is in DWORDs for 1-8 bpp and, uhh, strange for 24bpp
 			if (m_mode < 4)
@@ -259,7 +259,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 			}
 			break;
 
-		case 0x200/4:	// DAC control
+		case 0x200/4:   // DAC control
 //          printf("%08x to DAC control\n", data);
 			if (m_is824)
 			{
@@ -272,7 +272,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 			m_count = 0;
 			break;
 
-		case 0x204/4:	// DAC data
+		case 0x204/4:   // DAC data
 			if (m_is824)
 			{
 				m_colors[m_count++] = data&0xff;
@@ -291,34 +291,34 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 			}
 			break;
 
-		case 0x208/4:	// mode control
+		case 0x208/4:   // mode control
 			m_mode = (data>>3)&3;
-			if (m_mode == 3)	// this can be 8 or 24 bpp
+			if (m_mode == 3)    // this can be 8 or 24 bpp
 			{
 				// check pixel format for 24bpp
 				if (m_is824)
 				{
 					if (data & 2)
 					{
-						m_mode = 4;	// 24bpp
+						m_mode = 4; // 24bpp
 					}
 				}
 				else
 				{
 					if (((data>>5)&3) == 0)
 					{
-						m_mode = 4;	// 24bpp
+						m_mode = 4; // 24bpp
 					}
 				}
 			}
 //          printf("%02x to mode (m_mode = %d)\n", data, m_mode);
 			break;
 
-		case 0x13c/4:	// bit 1 = VBL disable (1=no interrupts)
+		case 0x13c/4:   // bit 1 = VBL disable (1=no interrupts)
 			m_vbl_disable = (data & 2) ? 1 : 0;
 			break;
 
-		case 0x148/4:	// write 1 here to clear interrupt
+		case 0x148/4:   // write 1 here to clear interrupt
 			if (data == 1)
 			{
 				lower_slot_irq();
@@ -337,7 +337,7 @@ READ32_MEMBER( jmfb_device::mac_48gc_r )
 	switch (offset)
 	{
 		case 0:
-			return 0x0c00;	// sense 13" RGB for now
+			return 0x0c00;  // sense 13" RGB for now
 //          return 0x0000;  // sense "RGB Kong" monitor
 
 		case 0x1c0/4:

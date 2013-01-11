@@ -108,9 +108,9 @@ WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x480000, 0x48ffff) AM_RAM
-	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	// '157 RAM is mirrored twice
+	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  // '157 RAM is mirrored twice
 	AM_RANGE(0x492000, 0x493fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
-	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_8000_r)	// code near a60 in dbz2, subroutine at 730 in dbz
+	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_8000_r)  // code near a60 in dbz2, subroutine at 730 in dbz
 	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE_LEGACY("k053246", k053247_word_r, k053247_word_w)
 	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
 	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") // palette
@@ -128,15 +128,15 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE(dbzcontrol_w)
 	AM_RANGE(0x4f0000, 0x4f0001) AM_WRITE(dbz_sound_command_w)
 	AM_RANGE(0x4f4000, 0x4f4001) AM_WRITE(dbz_sound_cause_nmi)
-	AM_RANGE(0x4f8000, 0x4f801f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0xff00)		// 251 #1
-	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)	// 251 #2
+	AM_RANGE(0x4f8000, 0x4f801f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0xff00)      // 251 #1
+	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)   // 251 #2
 
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_SHARE("bg2_videoram")
 	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_SHARE("bg1_videoram")
 	AM_RANGE(0x510000, 0x513fff) AM_DEVREADWRITE_LEGACY("k053936_1", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x518000, 0x51bfff) AM_DEVREADWRITE_LEGACY("k053936_2", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
-	AM_RANGE(0x600000, 0x6fffff) AM_READNOP 			// PSAC 1 ROM readback window
-	AM_RANGE(0x700000, 0x7fffff) AM_READNOP 			// PSAC 2 ROM readback window
+	AM_RANGE(0x600000, 0x6fffff) AM_READNOP             // PSAC 1 ROM readback window
+	AM_RANGE(0x700000, 0x7fffff) AM_READNOP             // PSAC 2 ROM readback window
 ADDRESS_MAP_END
 
 /* dbz sound */
@@ -188,21 +188,21 @@ static INPUT_PORTS_START( dbz )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2")	// I think this is right, but can't stomach the game long enough to check
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:1,2") // I think this is right, but can't stomach the game long enough to check
 	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )						// seems unused
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:4")	// Definitely correct
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )                       // seems unused
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:4")   // Definitely correct
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )
 	PORT_SERVICE_DIPLOC(  0x2000, IP_ACTIVE_LOW, "SW1:6" )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x8000, 0x0000, "Mask ROM Test" )		PORT_DIPLOCATION("SW1:8")			//NOP'd
+	PORT_DIPNAME( 0x8000, 0x0000, "Mask ROM Test" )     PORT_DIPLOCATION("SW1:8")           //NOP'd
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( dbz )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
 
 	PORT_START("FAKE")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -252,20 +252,20 @@ static INPUT_PORTS_START( dbza )
 	PORT_INCLUDE( dbz )
 
 	PORT_MODIFY("SYSTEM_DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )						// tests are always performed at start
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )                       // tests are always performed at start
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dbz2 )
 	PORT_INCLUDE( dbz )
 
 	PORT_MODIFY("SYSTEM_DSW1")
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Level_Select ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -279,7 +279,7 @@ static const gfx_layout bglayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+		9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	128*8

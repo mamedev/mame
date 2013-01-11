@@ -58,7 +58,7 @@ void pc8401a_state::scan_keyboard()
 		logerror("INTERRUPT\n");
 	}
 
-	if (strobe)	m_key_strobe = strobe;
+	if (strobe) m_key_strobe = strobe;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_state::pc8401a_keyboard_tick)
@@ -100,7 +100,7 @@ void pc8401a_state::bankswitch(UINT8 data)
 		//logerror("0x0000-0x7fff = RAM 0-7fff\n");
 		break;
 
-	case 2:	/* RAM 8000H to FFFFH */
+	case 2: /* RAM 8000H to FFFFH */
 		program.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 		membank("bank1")->set_entry(5);
 		//logerror("0x0000-0x7fff = RAM 8000-ffff\n");
@@ -166,18 +166,18 @@ WRITE8_MEMBER( pc8401a_state::mmr_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       ROM section bit 0
-        1       ROM section bit 1
-        2       mapping for CPU addresses 0000H to 7FFFH bit 0
-        3       mapping for CPU addresses 0000H to 7FFFH bit 1
-        4       mapping for CPU addresses 8000H to BFFFH bit 0
-        5       mapping for CPU addresses 8000H to BFFFH bit 1
-        6       mapping for CPU addresses C000H to E7FFH
-        7
+	    0       ROM section bit 0
+	    1       ROM section bit 1
+	    2       mapping for CPU addresses 0000H to 7FFFH bit 0
+	    3       mapping for CPU addresses 0000H to 7FFFH bit 1
+	    4       mapping for CPU addresses 8000H to BFFFH bit 0
+	    5       mapping for CPU addresses 8000H to BFFFH bit 1
+	    6       mapping for CPU addresses C000H to E7FFH
+	    7
 
-    */
+	*/
 
 	if (data != m_mmr)
 	{
@@ -196,18 +196,18 @@ READ8_MEMBER( pc8401a_state::rtc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       RTC TP?
-        1       RTC DATA OUT
-        2       ?
-        3
-        4
-        5
-        6
-        7
+	    0       RTC TP?
+	    1       RTC DATA OUT
+	    2       ?
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	return (m_rtc->data_out_r() << 1) | (m_rtc->tp_r() << 2);
 }
@@ -216,18 +216,18 @@ WRITE8_MEMBER( pc8401a_state::rtc_cmd_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       RTC C0
-        1       RTC C1
-        2       RTC C2
-        3       RTC DATA IN?
-        4
-        5
-        6
-        7
+	    0       RTC C0
+	    1       RTC C1
+	    2       RTC C2
+	    3       RTC DATA IN?
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_rtc->c0_w(BIT(data, 0));
 	m_rtc->c1_w(BIT(data, 1));
@@ -239,18 +239,18 @@ WRITE8_MEMBER( pc8401a_state::rtc_ctrl_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       RTC OE or CS?
-        1       RTC STB
-        2       RTC CLK
-        3
-        4
-        5
-        6
-        7
+	    0       RTC OE or CS?
+	    1       RTC STB
+	    2       RTC CLK
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_rtc->oe_w(BIT(data, 0));
 	m_rtc->stb_w(BIT(data, 1));
@@ -292,18 +292,18 @@ READ8_MEMBER( pc8401a_state::port70_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       key pressed
-        1
-        2
-        3
-        4       must be 1 or CPU goes to HALT
-        5
-        6
-        7
+	    0       key pressed
+	    1
+	    2
+	    3
+	    4       must be 1 or CPU goes to HALT
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	return 0x10 | m_key_strobe;
 }
@@ -524,18 +524,18 @@ READ8_MEMBER( pc8401a_state::ppi_pc_r )
 {
 	/*
 
-        bit     signal          description
+	    bit     signal          description
 
-        PC0
-        PC1
-        PC2
-        PC3
-        PC4     PC-8431A DAV    data valid
-        PC5     PC-8431A RFD    ready for data
-        PC6     PC-8431A DAC    data accepted
-        PC7     PC-8431A ATN    attention
+	    PC0
+	    PC1
+	    PC2
+	    PC3
+	    PC4     PC-8431A DAV    data valid
+	    PC5     PC-8431A RFD    ready for data
+	    PC6     PC-8431A DAC    data accepted
+	    PC7     PC-8431A ATN    attention
 
-    */
+	*/
 
 	return 0;
 }
@@ -544,18 +544,18 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 {
 	/*
 
-        bit     signal          description
+	    bit     signal          description
 
-        PC0
-        PC1
-        PC2
-        PC3
-        PC4     PC-8431A DAV    data valid
-        PC5     PC-8431A RFD    ready for data
-        PC6     PC-8431A DAC    data accepted
-        PC7     PC-8431A ATN    attention
+	    PC0
+	    PC1
+	    PC2
+	    PC3
+	    PC4     PC-8431A DAV    data valid
+	    PC5     PC-8431A RFD    ready for data
+	    PC6     PC-8431A DAC    data accepted
+	    PC7     PC-8431A ATN    attention
 
-    */
+	*/
 }
 
 static I8255A_INTERFACE( ppi_intf )
@@ -688,6 +688,6 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY FULLNAME */
-COMP( 1984,	pc8401a,	0,		0,		pc8401a,	pc8401a, driver_device,	0,		"Nippon Electronic Company",	"PC-8401A-LS", GAME_NOT_WORKING )
+COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8401A-LS", GAME_NOT_WORKING )
 //COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, driver_device,    0,      "Nippon Electronic Company",  "PC-8401BD", GAME_NOT_WORKING )
-COMP( 1985, pc8500,		0,		0,		pc8500,		pc8401a, driver_device,	0,		"Nippon Electronic Company",	"PC-8500", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8500", GAME_NOT_WORKING | GAME_NO_SOUND)

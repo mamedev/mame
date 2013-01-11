@@ -80,7 +80,7 @@
 #include "includes/foodf.h"
 
 
-#define MASTER_CLOCK		12096000
+#define MASTER_CLOCK        12096000
 
 
 /*************************************
@@ -117,9 +117,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 	int scanline = param;
 
 	/* WARNING: the timing of this is not perfectly accurate; it should fire on
-       32V (i.e., on scanlines 32, 96, 160, and 224). However, due to the interrupt
-       structure, it cannot fire at the same time as VBLANK. I have not solved this
-       mystery yet */
+	   32V (i.e., on scanlines 32, 96, 160, and 224). However, due to the interrupt
+	   structure, it cannot fire at the same time as VBLANK. I have not solved this
+	   mystery yet */
 
 	/* INT 1 is on 32V */
 	scanline_int_gen(*subdevice("maincpu"));
@@ -231,19 +231,19 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( foodf )
-	PORT_START("STICK0_X")	/* IN0 */
+	PORT_START("STICK0_X")  /* IN0 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("STICK1_X")	/* IN1 */
+	PORT_START("STICK1_X")  /* IN1 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
-	PORT_START("STICK0_Y")	/* IN2 */
+	PORT_START("STICK0_Y")  /* IN2 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("STICK1_Y")	/* IN3 */
+	PORT_START("STICK1_Y")  /* IN3 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
-	PORT_START("SYSTEM")	/* IN4 */
+	PORT_START("SYSTEM")    /* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -253,22 +253,22 @@ static INPUT_PORTS_START( foodf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW")	/* SW1 */
-	PORT_DIPNAME( 0x07, 0x00, "Bonus Coins" )	PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_START("DSW")   /* SW1 */
+	PORT_DIPNAME( 0x07, 0x00, "Bonus Coins" )   PORT_DIPLOCATION("SW1:8,7,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x05, "1 for every 2" )
 	PORT_DIPSETTING(    0x02, "1 for every 4" )
 	PORT_DIPSETTING(    0x01, "1 for every 5" )
 	PORT_DIPSETTING(    0x06, "2 for every 4" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ))	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ))    PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ))
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_B ))	PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_B ))    PORT_DIPLOCATION("SW1:4,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ))
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ))
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ))	PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ))   PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ))
@@ -396,7 +396,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( foodf )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "136020-301.8c",   0x000001, 0x002000, CRC(dfc3d5a8) SHA1(7abe5e9c27098bd8c93cc06f1b9e3db0744019e9) )
 	ROM_LOAD16_BYTE( "136020-302.9c",   0x000000, 0x002000, CRC(ef92dc5c) SHA1(eb41291615165f549a68ebc6d4664edef1a04ac5) )
 	ROM_LOAD16_BYTE( "136020-303.8d",   0x004001, 0x002000, CRC(64b93076) SHA1(efa4090d96aa0ffd4192a045f174ac5960810bca) )
@@ -419,7 +419,7 @@ ROM_END
 
 
 ROM_START( foodf2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "136020-201.8c",   0x000001, 0x002000, CRC(4ee52d73) SHA1(ff4ab8169a9b260bbd1f49023a30064e2f0b6686) )
 	ROM_LOAD16_BYTE( "136020-202.9c",   0x000000, 0x002000, CRC(f8c4b977) SHA1(824d33baa413b2ee898c75157624ea007c92032f) )
 	ROM_LOAD16_BYTE( "136020-203.8d",   0x004001, 0x002000, CRC(0e9f99a3) SHA1(37bba66957ee19e7d05fcc3e4583e909809075ed) )
@@ -442,7 +442,7 @@ ROM_END
 
 
 ROM_START( foodfc )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "136020-113.8c",   0x000001, 0x002000, CRC(193a299f) SHA1(58bbf714eff22d8a47b174e4b121f14a8dcb4ef9) )
 	ROM_LOAD16_BYTE( "136020-114.9c",   0x000000, 0x002000, CRC(33ed6bbe) SHA1(5d80fb092d2964b851e6c5982572d4ffc5078c55) )
 	ROM_LOAD16_BYTE( "136020-115.8d",   0x004001, 0x002000, CRC(64b93076) SHA1(efa4090d96aa0ffd4192a045f174ac5960810bca) )

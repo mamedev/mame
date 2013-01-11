@@ -409,12 +409,12 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 
 static I8279_INTERFACE( mmd2_intf )
 {
-	DEVCB_NULL,						// irq
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_scanlines_w),	// scan SL lines
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_digit_w),		// display A&B
-	DEVCB_NULL,						// BD
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_kbd_r),		// kbd RL lines
-	DEVCB_LINE_VCC,						// Shift key
+	DEVCB_NULL,                     // irq
+	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_scanlines_w),  // scan SL lines
+	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_digit_w),      // display A&B
+	DEVCB_NULL,                     // BD
+	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_kbd_r),        // kbd RL lines
+	DEVCB_LINE_VCC,                     // Shift key
 	DEVCB_LINE_VCC
 };
 
@@ -435,10 +435,10 @@ WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
 
 static I8085_CONFIG( mmd2_cpu_config )
 {
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_status_callback),		/* Status changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(mmd1_state, mmd2_inte_callback),			/* INTE changed callback */
-	DEVCB_NULL,					/* SID changed callback (I8085A only) */
-	DEVCB_NULL					/* SOD changed callback (I8085A only) */
+	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_status_callback),      /* Status changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(mmd1_state, mmd2_inte_callback),           /* INTE changed callback */
+	DEVCB_NULL,                 /* SID changed callback (I8085A only) */
+	DEVCB_NULL                  /* SOD changed callback (I8085A only) */
 };
 
 MACHINE_RESET_MEMBER(mmd1_state,mmd1)

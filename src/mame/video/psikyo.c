@@ -161,7 +161,7 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 {
 
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
-       the various sized tilemaps now as opposed to later */
+	   the various sized tilemaps now as opposed to later */
 
 	m_tilemap_0_size0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
 	m_tilemap_0_size1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
@@ -176,28 +176,28 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 	m_spritebuf1 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
 	m_spritebuf2 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
 
-	m_tilemap_0_size0->set_scroll_rows(0x80 * 16);	// line scrolling
+	m_tilemap_0_size0->set_scroll_rows(0x80 * 16);  // line scrolling
 	m_tilemap_0_size0->set_scroll_cols(1);
 
-	m_tilemap_0_size1->set_scroll_rows(0x40 * 16);	// line scrolling
+	m_tilemap_0_size1->set_scroll_rows(0x40 * 16);  // line scrolling
 	m_tilemap_0_size1->set_scroll_cols(1);
 
-	m_tilemap_0_size2->set_scroll_rows(0x20 * 16);	// line scrolling
+	m_tilemap_0_size2->set_scroll_rows(0x20 * 16);  // line scrolling
 	m_tilemap_0_size2->set_scroll_cols(1);
 
-	m_tilemap_0_size3->set_scroll_rows(0x10 * 16);	// line scrolling
+	m_tilemap_0_size3->set_scroll_rows(0x10 * 16);  // line scrolling
 	m_tilemap_0_size3->set_scroll_cols(1);
 
-	m_tilemap_1_size0->set_scroll_rows(0x80 * 16);	// line scrolling
+	m_tilemap_1_size0->set_scroll_rows(0x80 * 16);  // line scrolling
 	m_tilemap_1_size0->set_scroll_cols(1);
 
-	m_tilemap_1_size1->set_scroll_rows(0x40 * 16);	// line scrolling
+	m_tilemap_1_size1->set_scroll_rows(0x40 * 16);  // line scrolling
 	m_tilemap_1_size1->set_scroll_cols(1);
 
-	m_tilemap_1_size2->set_scroll_rows(0x20 * 16);	// line scrolling
+	m_tilemap_1_size2->set_scroll_rows(0x20 * 16);  // line scrolling
 	m_tilemap_1_size2->set_scroll_cols(1);
 
-	m_tilemap_1_size3->set_scroll_rows(0x10 * 16);	// line scrolling
+	m_tilemap_1_size3->set_scroll_rows(0x10 * 16);  // line scrolling
 	m_tilemap_1_size3->set_scroll_cols(1);
 
 	save_pointer(NAME(m_spritebuf1), 0x2000 / 4);
@@ -266,17 +266,17 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();	// Sprites LUT
+	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();    // Sprites LUT
 	int TILES_LEN = machine.root_device().memregion("spritelut")->bytes();
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
 	/* Exit if sprites are disabled */
-	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)	return;
+	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)   return;
 
 	/* Look for "end of sprites" marker in the sprites list */
-	for (offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)	// skip last "sprite"
+	for (offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)   // skip last "sprite"
 	{
 		UINT16 sprite = spritelist[BYTE_XOR_BE(offs)];
 		if (sprite == 0xffff)
@@ -302,24 +302,24 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		/* Draw this sprite */
 
-		y	=	source[0 / 4] >> 16;
-		x	=	source[0 / 4] & 0xffff;
-		attr	=	source[4 / 4] >> 16;
-		code	=	source[4 / 4] & 0x1ffff;
+		y   =   source[0 / 4] >> 16;
+		x   =   source[0 / 4] & 0xffff;
+		attr    =   source[4 / 4] >> 16;
+		code    =   source[4 / 4] & 0x1ffff;
 
-		flipx	=	attr & 0x4000;
-		flipy	=	attr & 0x8000;
+		flipx   =   attr & 0x4000;
+		flipy   =   attr & 0x8000;
 
-		zoomx	=	((x & 0xf000) >> 12);
-		zoomy	=	((y & 0xf000) >> 12);
-		nx	=	((x & 0x0e00) >> 9) + 1;
-		ny	=	((y & 0x0e00) >> 9) + 1;
-		x	=	((x & 0x01ff));
-		y	=	((y & 0x00ff)) - (y & 0x100);
+		zoomx   =   ((x & 0xf000) >> 12);
+		zoomy   =   ((y & 0xf000) >> 12);
+		nx  =   ((x & 0x0e00) >> 9) + 1;
+		ny  =   ((y & 0x0e00) >> 9) + 1;
+		x   =   ((x & 0x01ff));
+		y   =   ((y & 0x00ff)) - (y & 0x100);
 
 		/* 180-1ff are negative coordinates. Note that $80 pixels is
-           the maximum extent of a sprite, which can therefore be moved
-           out of screen without problems */
+		   the maximum extent of a sprite, which can therefore be moved
+		   out of screen without problems */
 		if (x >= 0x180)
 			x -= 0x200;
 
@@ -337,11 +337,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		if (flipx)	{ xstart = nx - 1;  xend = -1;  xinc = -1; }
-		else		{ xstart = 0;       xend = nx;  xinc = +1; }
+		if (flipx)  { xstart = nx - 1;  xend = -1;  xinc = -1; }
+		else        { xstart = 0;       xend = nx;  xinc = +1; }
 
-		if (flipy)	{ ystart = ny - 1;  yend = -1;   yinc = -1; }
-		else		{ ystart = 0;       yend = ny;   yinc = +1; }
+		if (flipy)  { ystart = ny - 1;  yend = -1;   yinc = -1; }
+		else        { ystart = 0;       yend = ny;   yinc = +1; }
 
 		for (dy = ystart; dy != yend; dy += yinc)
 		{
@@ -385,7 +385,7 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();	// Sprites LUT
+	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();    // Sprites LUT
 	int TILES_LEN = machine.root_device().memregion("spritelut")->bytes();
 
 	int width = machine.primary_screen->width();
@@ -396,7 +396,7 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 		return;
 
 	/* Look for "end of sprites" marker in the sprites list */
-	for (offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)	// skip last "sprite"
+	for (offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)   // skip last "sprite"
 	{
 		UINT16 sprite = spritelist[BYTE_XOR_BE(offs)];
 		if (sprite == 0xffff)
@@ -422,24 +422,24 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 
 		/* Draw this sprite */
 
-		y	=	source[0] >> 16;
-		x	=	source[0] & 0xffff;
-		attr	=	source[1] >> 16;
-		code	=	source[1] & 0x1ffff;
+		y   =   source[0] >> 16;
+		x   =   source[0] & 0xffff;
+		attr    =   source[1] >> 16;
+		code    =   source[1] & 0x1ffff;
 
-		flipx	=	attr & 0x4000;
-		flipy	=	attr & 0x8000;
+		flipx   =   attr & 0x4000;
+		flipy   =   attr & 0x8000;
 
-		zoomx	=	((x & 0xf000) >> 12);
-		zoomy	=	((y & 0xf000) >> 12);
-		nx	=	((x & 0x0e00) >> 9) + 1;
-		ny	=	((y & 0x0e00) >> 9) + 1;
-		x	=	((x & 0x01ff));
-		y	=	((y & 0x00ff)) - (y & 0x100);
+		zoomx   =   ((x & 0xf000) >> 12);
+		zoomy   =   ((y & 0xf000) >> 12);
+		nx  =   ((x & 0x0e00) >> 9) + 1;
+		ny  =   ((y & 0x0e00) >> 9) + 1;
+		x   =   ((x & 0x01ff));
+		y   =   ((y & 0x00ff)) - (y & 0x100);
 
 		/* 180-1ff are negative coordinates. Note that $80 pixels is
-           the maximum extent of a sprite, which can therefore be moved
-           out of screen without problems */
+		   the maximum extent of a sprite, which can therefore be moved
+		   out of screen without problems */
 		if (x >= 0x180)
 			x -= 0x200;
 
@@ -458,11 +458,11 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 			flipy = !flipy;
 		}
 
-		if (flipx)	{ xstart = nx - 1;  xend = -1;  xinc = -1; }
-		else		{ xstart = 0;       xend = nx;  xinc = +1; }
+		if (flipx)  { xstart = nx - 1;  xend = -1;  xinc = -1; }
+		else        { xstart = 0;       xend = nx;  xinc = +1; }
 
-		if (flipy)	{ ystart = ny - 1;  yend = -1;   yinc = -1; }
-		else		{ ystart = 0;       yend = ny;   yinc = +1; }
+		if (flipy)  { ystart = ny - 1;  yend = -1;   yinc = -1; }
+		else        { ystart = 0;       yend = ny;   yinc = +1; }
 
 		for (dy = ystart; dy != yend; dy += yinc)
 		{
@@ -529,20 +529,20 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
+	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
 	/* bit  0   : layer enable
-            1   : opaque tiles (used in Gunbird attract mode)
-            2   : ?
-            3   : transparent colour (0 or 15)
-            4- 5: ?
-            6- 7: tilemap size
-            8   : per-line rowscroll
-            9   : per-tile rowscroll
-           10   : tilebank (btlkroad/gunbird/s1945jn only)
-           11-15: ? */
+	        1   : opaque tiles (used in Gunbird attract mode)
+	        2   : ?
+	        3   : transparent colour (0 or 15)
+	        4- 5: ?
+	        6- 7: tilemap size
+	        8   : per-line rowscroll
+	        9   : per-tile rowscroll
+	       10   : tilebank (btlkroad/gunbird/s1945jn only)
+	       11-15: ? */
 
 /*
     gunbird:    L:00d0-04d0 S:0008 (00e1 04e1 0009 or 00e2 04e2 000a, for a blink, on scene transitions)
@@ -570,18 +570,18 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	switch ((layer0_ctrl & 0x00c0) >> 6)
 	{
-	case 0:	tm0size = 1;	break;
-	case 1:	tm0size = 2;	break;
-	case 2:	tm0size = 3;	break;
-	default:	tm0size = 0;	break;
+	case 0: tm0size = 1;    break;
+	case 1: tm0size = 2;    break;
+	case 2: tm0size = 3;    break;
+	default:    tm0size = 0;    break;
 	}
 
 	switch ((layer1_ctrl & 0x00c0) >> 6)
 	{
-	case 0:	tm1size = 1;	break;
-	case 1:	tm1size = 2;	break;
-	case 2:	tm1size = 3;	break;
-	default:	tm1size = 0;	break;
+	case 0: tm1size = 1;    break;
+	case 1: tm1size = 2;    break;
+	case 2: tm1size = 3;    break;
+	default:    tm1size = 0;    break;
 	}
 
 	if (tm0size == 0)
@@ -616,7 +616,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	tmptilemap1->set_scrolly(0, layer1_scrolly);
 
-	for (i = 0; i < 256; i++)	/* 256 screen lines */
+	for (i = 0; i < 256; i++)   /* 256 screen lines */
 	{
 		int x0 = 0, x1 = 0;
 
@@ -702,20 +702,20 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
+	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
 	/* bit  0   : layer enable
-            1   : opaque tiles (used in Gunbird attract mode)
-            2   : ?
-            3   : transparent colour (0 or 15)
-            4- 5: ?
-            6- 7: tilemap size
-            8   : per-line rowscroll
-            9   : per-tile rowscroll
-           10   : tilebank (btlkroad/gunbird/s1945jn only)
-           11-15: ? */
+	        1   : opaque tiles (used in Gunbird attract mode)
+	        2   : ?
+	        3   : transparent colour (0 or 15)
+	        4- 5: ?
+	        6- 7: tilemap size
+	        8   : per-line rowscroll
+	        9   : per-tile rowscroll
+	       10   : tilebank (btlkroad/gunbird/s1945jn only)
+	       11-15: ? */
 
 /*
     gunbird:    L:00d0-04d0 S:0008 (00e1 04e1 0009 or 00e2 04e2 000a, for a blink, on scene transitions)
@@ -743,18 +743,18 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	switch ((layer0_ctrl & 0x00c0) >> 6)
 	{
-	case 0:	tm0size = 1;	break;
-	case 1:	tm0size = 2;	break;
-	case 2:	tm0size = 3;	break;
-	default:	tm0size = 0;	break;
+	case 0: tm0size = 1;    break;
+	case 1: tm0size = 2;    break;
+	case 2: tm0size = 3;    break;
+	default:    tm0size = 0;    break;
 	}
 
 	switch ((layer1_ctrl & 0x00c0) >> 6)
 	{
-	case 0:	tm1size = 1;	break;
-	case 1:	tm1size = 2;	break;
-	case 2:	tm1size = 3;	break;
-	default:	tm1size = 0;	break;
+	case 0: tm1size = 1;    break;
+	case 1: tm1size = 2;    break;
+	case 2: tm1size = 3;    break;
+	default:    tm1size = 0;    break;
 	}
 
 	if (tm0size == 0)
@@ -789,7 +789,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	tmptilemap1->set_scrolly(0, layer1_scrolly);
 
-	for (i = 0; i < 256; i++)	/* 256 screen lines */
+	for (i = 0; i < 256; i++)   /* 256 screen lines */
 	{
 		int x0 = 0, x1 = 0;
 

@@ -9,12 +9,12 @@
 #include "includes/exerion.h"
 
 
-#define BACKGROUND_X_START		32
+#define BACKGROUND_X_START      32
 
-#define VISIBLE_X_MIN			(12*8)
-#define VISIBLE_X_MAX			(52*8)
-#define VISIBLE_Y_MIN			(2*8)
-#define VISIBLE_Y_MAX			(30*8)
+#define VISIBLE_X_MIN           (12*8)
+#define VISIBLE_X_MAX           (52*8)
+#define VISIBLE_Y_MIN           (2*8)
+#define VISIBLE_Y_MAX           (30*8)
 
 
 /***************************************************************************
@@ -43,7 +43,7 @@ void exerion_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 0, 0,
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
@@ -121,20 +121,20 @@ void exerion_state::video_start()
 	save_pointer(NAME(m_background_gfx[0]), 256 * 256 * 4);
 
 	/*---------------------------------
-     * Decode the background graphics
-     *
-     * We decode the 4 background layers separately, but shuffle the bits so that
-     * we can OR all four layers together. Each layer has 2 bits per pixel. Each
-     * layer is decoded into the following bit patterns:
-     *
-     *  000a 0000 00AA
-     *  00b0 0000 BB00
-     *  0c00 00CC 0000
-     *  d000 DD00 0000
-     *
-     * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
-     * of these two bits together.
-     */
+	 * Decode the background graphics
+	 *
+	 * We decode the 4 background layers separately, but shuffle the bits so that
+	 * we can OR all four layers together. Each layer has 2 bits per pixel. Each
+	 * layer is decoded into the following bit patterns:
+	 *
+	 *  000a 0000 00AA
+	 *  00b0 0000 BB00
+	 *  0c00 00CC 0000
+	 *  d000 DD00 0000
+	 *
+	 * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
+	 * of these two bits together.
+	 */
 	gfx = memregion("gfx3")->base();
 	for (i = 0; i < 4; i++)
 	{
@@ -389,11 +389,11 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 				code &= ~0x10, code2 |= 0x10;
 
 			drawgfx_transmask(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height(),
-			        colortable_get_transpen_mask(machine().colortable, gfx, color, 0x10));
+					colortable_get_transpen_mask(machine().colortable, gfx, color, 0x10));
 		}
 
 		drawgfx_transmask(bitmap, cliprect, gfx, code, color, xflip, yflip, x, y,
-			    colortable_get_transpen_mask(machine().colortable, gfx, color, 0x10));
+				colortable_get_transpen_mask(machine().colortable, gfx, color, 0x10));
 
 		if (doubled) i += 4;
 	}

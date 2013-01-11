@@ -25,17 +25,17 @@
 //  Constants
 //-------------------------------------------------
 
-#define TCR_TAC					0x01
-#define TCR_TBC					0x02
-#define TCR_TAE					0x04
-#define TCR_TBE					0x08
-#define TCR_EXT8				0x10
-#define TCR_TMSK				0x40
-#define TCR_IBE					0x80
+#define TCR_TAC                 0x01
+#define TCR_TBC                 0x02
+#define TCR_TAE                 0x04
+#define TCR_TBE                 0x08
+#define TCR_EXT8                0x10
+#define TCR_TMSK                0x40
+#define TCR_IBE                 0x80
 
-#define TSR_TAS					0x01
-#define TSR_TBS					0x02
-#define TSR_TCS					0x80
+#define TSR_TAS                 0x01
+#define TSR_TBS                 0x02
+#define TSR_TCS                 0x80
 
 enum
 {
@@ -143,10 +143,10 @@ static INPUT_PORTS_START( ibm_mfc )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x03, 0x00, "IBM MFC SW1: Base Address" )
-	PORT_DIPSETTING(	0x00, "2A00" )
-	PORT_DIPSETTING(	0x01, "2A10" )
-	PORT_DIPSETTING(	0x02, "2A20" )
-	PORT_DIPSETTING(	0x03, "2A30" )
+	PORT_DIPSETTING(    0x00, "2A00" )
+	PORT_DIPSETTING(    0x01, "2A10" )
+	PORT_DIPSETTING(    0x02, "2A20" )
+	PORT_DIPSETTING(    0x03, "2A30" )
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -492,7 +492,7 @@ const rom_entry *isa8_ibm_mfc_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_IBM_MFC, "IBM PC Music Feature Card", tag, owner, clock),
+		device_t(mconfig, ISA8_IBM_MFC, "IBM PC Music Feature Card", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this),
 		m_cpu(*this, "ibm_mfc"),
 		m_ym2151(*this, "ym2151"),

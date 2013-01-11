@@ -4,7 +4,7 @@
 
 **************************************************************************/
 
-#define MASTER_CLOCK		18432000
+#define MASTER_CLOCK        18432000
 
 
 class crgolf_state : public driver_device

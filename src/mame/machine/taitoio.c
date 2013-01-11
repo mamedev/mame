@@ -57,11 +57,11 @@ struct tc0220ioc_state
 	UINT8      regs[8];
 	UINT8      port;
 
-	devcb_resolved_read8	read_0;
-	devcb_resolved_read8	read_1;
-	devcb_resolved_read8	read_2;
-	devcb_resolved_read8	read_3;
-	devcb_resolved_read8	read_7;
+	devcb_resolved_read8    read_0;
+	devcb_resolved_read8    read_1;
+	devcb_resolved_read8    read_2;
+	devcb_resolved_read8    read_3;
+	devcb_resolved_read8    read_7;
 };
 
 /*****************************************************************************
@@ -105,7 +105,7 @@ READ8_DEVICE_HANDLER( tc0220ioc_r )
 		case 0x03:
 			return tc0220ioc->read_3(0);
 
-		case 0x04:	/* coin counters and lockout */
+		case 0x04:  /* coin counters and lockout */
 			return tc0220ioc->regs[4];
 
 		case 0x07:
@@ -129,7 +129,7 @@ WRITE8_DEVICE_HANDLER( tc0220ioc_w )
 			space.machine().watchdog_reset();
 			break;
 
-		case 0x04:	/* coin counters and lockout, hi nibble irrelevant */
+		case 0x04:  /* coin counters and lockout, hi nibble irrelevant */
 
 			coin_lockout_w(space.machine(), 0, ~data & 0x01);
 			coin_lockout_w(space.machine(), 1, ~data & 0x02);
@@ -213,11 +213,11 @@ struct tc0510nio_state
 {
 	UINT8   regs[8];
 
-	devcb_resolved_read8	read_0;
-	devcb_resolved_read8	read_1;
-	devcb_resolved_read8	read_2;
-	devcb_resolved_read8	read_3;
-	devcb_resolved_read8	read_7;
+	devcb_resolved_read8    read_0;
+	devcb_resolved_read8    read_1;
+	devcb_resolved_read8    read_2;
+	devcb_resolved_read8    read_3;
+	devcb_resolved_read8    read_7;
 };
 
 /*****************************************************************************
@@ -261,7 +261,7 @@ READ8_DEVICE_HANDLER( tc0510nio_r )
 		case 0x03:
 			return tc0510nio->read_3(0);
 
-		case 0x04:	/* coin counters and lockout */
+		case 0x04:  /* coin counters and lockout */
 			return tc0510nio->regs[4];
 
 		case 0x07:
@@ -285,7 +285,7 @@ WRITE8_DEVICE_HANDLER( tc0510nio_w )
 			space.machine().watchdog_reset();
 			break;
 
-		case 0x04:	/* coin counters and lockout */
+		case 0x04:  /* coin counters and lockout */
 			coin_lockout_w(space.machine(), 0, ~data & 0x01);
 			coin_lockout_w(space.machine(), 1, ~data & 0x02);
 			coin_counter_w(space.machine(), 0, data & 0x04);
@@ -363,11 +363,11 @@ struct tc0640fio_state
 {
 	UINT8   regs[8];
 
-	devcb_resolved_read8	read_0;
-	devcb_resolved_read8	read_1;
-	devcb_resolved_read8	read_2;
-	devcb_resolved_read8	read_3;
-	devcb_resolved_read8	read_7;
+	devcb_resolved_read8    read_0;
+	devcb_resolved_read8    read_1;
+	devcb_resolved_read8    read_2;
+	devcb_resolved_read8    read_3;
+	devcb_resolved_read8    read_7;
 };
 
 /*****************************************************************************
@@ -411,7 +411,7 @@ READ8_DEVICE_HANDLER( tc0640fio_r )
 		case 0x03:
 			return tc0640fio->read_3(0);
 
-		case 0x04:	/* coin counters and lockout */
+		case 0x04:  /* coin counters and lockout */
 			return tc0640fio->regs[4];
 
 		case 0x07:
@@ -435,7 +435,7 @@ WRITE8_DEVICE_HANDLER( tc0640fio_w )
 			space.machine().watchdog_reset();
 			break;
 
-		case 0x04:	/* coin counters and lockout */
+		case 0x04:  /* coin counters and lockout */
 			coin_lockout_w(space.machine(), 0, ~data & 0x01);
 			coin_lockout_w(space.machine(), 1, ~data & 0x02);
 			coin_counter_w(space.machine(), 0, data & 0x04);
@@ -616,5 +616,3 @@ void tc0640fio_device::device_reset()
 {
 	DEVICE_RESET_NAME( tc0640fio )(this);
 }
-
-

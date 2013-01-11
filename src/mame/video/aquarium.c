@@ -17,7 +17,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		code = ((state->m_spriteram[offs + 5]) & 0xff) + (((state->m_spriteram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;
 
-		if (!(state->m_spriteram[offs + 4] &0x80))	/* active sprite ? */
+		if (!(state->m_spriteram[offs + 4] &0x80))  /* active sprite ? */
 		{
 			x = ((state->m_spriteram[offs + 0]) &0xff) + (((state->m_spriteram[offs + 1]) & 0xff) << 8);
 			y = ((state->m_spriteram[offs + 2]) &0xff) + (((state->m_spriteram[offs + 3]) & 0xff) << 8);
@@ -58,14 +58,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 				code++;
 
-				if ((state->m_spriteram[offs + 4]) &0x08)	/* Y chain */
+				if ((state->m_spriteram[offs + 4]) &0x08)   /* Y chain */
 				{
 					if (flipy)
 						cury -= 16;
 					else
 						cury += 16;
 				}
-				else	/* X chain */
+				else    /* X chain */
 				{
 					if (flipx)
 						curx -= 16;

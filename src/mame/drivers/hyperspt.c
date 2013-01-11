@@ -34,7 +34,7 @@ WRITE8_MEMBER(hyperspt_state::irq_mask_w)
 
 static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")	/* Scroll amount */
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
@@ -55,7 +55,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")	/* Scroll amount */
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
@@ -80,10 +80,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) /* speech data */
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("vlm", hyperspt_sound_w)	  /* speech and output control */
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("vlm", hyperspt_sound_w)      /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)	 /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
@@ -92,10 +92,10 @@ static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_w)	  /* speech and output control */
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_w)   /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)	 /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hyperspt )
@@ -135,34 +135,34 @@ static INPUT_PORTS_START( hyperspt )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "After Last Event" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(	0x01, "Game Over" )
-	PORT_DIPSETTING(	0x00, "Game Continues" )
+	PORT_DIPSETTING(    0x01, "Game Over" )
+	PORT_DIPSETTING(    0x00, "Game Continues" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "World Records" ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(	0x08, "Don't Erase" )
-	PORT_DIPSETTING(	0x00, "Erase on Reset" )
+	PORT_DIPSETTING(    0x08, "Don't Erase" )
+	PORT_DIPSETTING(    0x00, "Erase on Reset" )
 	PORT_DIPNAME( 0xf0, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6,7,8")
-	PORT_DIPSETTING(	0xf0, "Easy 1" )
-	PORT_DIPSETTING(	0xe0, "Easy 2" )
-	PORT_DIPSETTING(	0xd0, "Easy 3" )
-	PORT_DIPSETTING(	0xc0, "Easy 4" )
-	PORT_DIPSETTING(	0xb0, "Normal 1" )
-	PORT_DIPSETTING(	0xa0, "Normal 2" )
-	PORT_DIPSETTING(	0x90, "Normal 3" )
-	PORT_DIPSETTING(	0x80, "Normal 4" )
-	PORT_DIPSETTING(	0x70, "Normal 5" )
-	PORT_DIPSETTING(	0x60, "Normal 6" )
-	PORT_DIPSETTING(	0x50, "Normal 7" )
-	PORT_DIPSETTING(	0x40, "Normal 8" )
-	PORT_DIPSETTING(	0x30, "Difficult 1" )
-	PORT_DIPSETTING(	0x20, "Difficult 2" )
-	PORT_DIPSETTING(	0x10, "Difficult 3" )
-	PORT_DIPSETTING(	0x00, "Difficult 4" )
+	PORT_DIPSETTING(    0xf0, "Easy 1" )
+	PORT_DIPSETTING(    0xe0, "Easy 2" )
+	PORT_DIPSETTING(    0xd0, "Easy 3" )
+	PORT_DIPSETTING(    0xc0, "Easy 4" )
+	PORT_DIPSETTING(    0xb0, "Normal 1" )
+	PORT_DIPSETTING(    0xa0, "Normal 2" )
+	PORT_DIPSETTING(    0x90, "Normal 3" )
+	PORT_DIPSETTING(    0x80, "Normal 4" )
+	PORT_DIPSETTING(    0x70, "Normal 5" )
+	PORT_DIPSETTING(    0x60, "Normal 6" )
+	PORT_DIPSETTING(    0x50, "Normal 7" )
+	PORT_DIPSETTING(    0x40, "Normal 8" )
+	PORT_DIPSETTING(    0x30, "Difficult 1" )
+	PORT_DIPSETTING(    0x20, "Difficult 2" )
+	PORT_DIPSETTING(    0x10, "Difficult 3" )
+	PORT_DIPSETTING(    0x00, "Difficult 4" )
 INPUT_PORTS_END
 
 
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( roadf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* the game doesn't boot if this is 1 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* the game doesn't boot if this is 1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -189,87 +189,87 @@ static INPUT_PORTS_START( roadf )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(	0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x06, 0x04, "Number of Opponents" ) PORT_DIPLOCATION("SW2:2,3")
-	PORT_DIPSETTING(	0x06, "Few" )
-	PORT_DIPSETTING(	0x04, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x02, "Many" )
-	PORT_DIPSETTING(	0x00, "Great Many" )
+	PORT_DIPSETTING(    0x06, "Few" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, "Many" )
+	PORT_DIPSETTING(    0x00, "Great Many" )
 	PORT_DIPNAME( 0x08, 0x08, "Speed of Opponents" ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(	0x08, "Fast" )
-	PORT_DIPSETTING(	0x00, "Slow" )
+	PORT_DIPSETTING(    0x08, "Fast" )
+	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPNAME( 0x30, 0x20, "Fuel Consumption" ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(	0x30, "Slow" )
-	PORT_DIPSETTING(	0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x10, "Fast" )
-	PORT_DIPSETTING(	0x00, "Very Fast" )
+	PORT_DIPSETTING(    0x30, "Slow" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, "Fast" )
+	PORT_DIPSETTING(    0x00, "Very Fast" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 static const gfx_layout hyperspt_charlayout =
 {
-	8,8,	/* 8*8 sprites */
-	1024,	/* 1024 characters */
-	4,	/* 4 bits per pixel */
-	{ 0x4000*8+4, 0x4000*8+0, 4, 0	},
+	8,8,    /* 8*8 sprites */
+	1024,   /* 1024 characters */
+	4,  /* 4 bits per pixel */
+	{ 0x4000*8+4, 0x4000*8+0, 4, 0  },
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every sprite takes 64 consecutive bytes */
+	16*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static const gfx_layout hyperspt_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	512,	/* 512 sprites */
-	4,	/* 4 bits per pixel */
+	16,16,  /* 16*16 sprites */
+	512,    /* 512 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0x8000*8+4, 0x8000*8+0, 4, 0 },
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,
 		32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static GFXDECODE_START( hyperspt )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperspt_spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, hyperspt_charlayout,	16*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, hyperspt_charlayout,    16*16, 16 )
 GFXDECODE_END
 
 
 static const gfx_layout roadf_charlayout =
 {
-	8,8,	/* 8*8 sprites */
-	1536,	/* 1536 characters */
-	4,	/* 4 bits per pixel */
-	{ 0x6000*8+4, 0x6000*8+0, 4, 0	},
+	8,8,    /* 8*8 sprites */
+	1536,   /* 1536 characters */
+	4,  /* 4 bits per pixel */
+	{ 0x6000*8+4, 0x6000*8+0, 4, 0  },
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every sprite takes 64 consecutive bytes */
+	16*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static const gfx_layout roadf_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	256,	/* 256 sprites */
-	4,	/* 4 bits per pixel */
+	16,16,  /* 16*16 sprites */
+	256,    /* 256 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0x4000*8+4, 0x4000*8+0, 4, 0 },
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,
 		32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static GFXDECODE_START( roadf )
 	GFXDECODE_ENTRY( "gfx1", 0, roadf_spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,	 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,    16*16, 16 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
@@ -285,13 +285,13 @@ INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyperspt_state,  vblank_irq)
 
@@ -388,7 +388,7 @@ ROM_START( hyperspt )
 	ROM_LOAD( "j12_c28.bin",  0x0020, 0x0100, CRC(2c891d59) SHA1(79050fbe058c24349927edc7937ec68a77f450f1) )
 	ROM_LOAD( "a09_c29.bin",  0x0120, 0x0100, CRC(811a3f3f) SHA1(474f03345847cd9791ff6b7161286bbfef3f990a) )
 
-	ROM_REGION( 0x10000, "vlm", 0 )	/*  64k for speech rom    */
+	ROM_REGION( 0x10000, "vlm", 0 ) /*  64k for speech rom    */
 	ROM_LOAD( "c08",          0x0000, 0x2000, CRC(e8f8ea78) SHA1(8d37818e5a2740c96696f37996f2a3f870386690) )
 ROM_END
 
@@ -432,8 +432,8 @@ ROM_START( hypersptb )
 	ROM_LOAD( "j12_c28.bin",  0x0020, 0x0100, CRC(2c891d59) SHA1(79050fbe058c24349927edc7937ec68a77f450f1) )
 	ROM_LOAD( "a09_c29.bin",  0x0120, 0x0100, CRC(811a3f3f) SHA1(474f03345847cd9791ff6b7161286bbfef3f990a) )
 
-    /* These ROM's are located on the Sound Board */
-	ROM_REGION( 0x10000, "adpcm", 0 )	/*  64k for the 6802 which plays ADPCM samples */
+	/* These ROM's are located on the Sound Board */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /*  64k for the 6802 which plays ADPCM samples */
 	ROM_LOAD( "10.20c",       0x8000, 0x2000, CRC(a4cddeb8) SHA1(057981ad3b04239662bb19342e9ec14b0dab2351) )
 	ROM_LOAD( "9.20cd",       0xa000, 0x2000, CRC(e9919365) SHA1(bd11d6e3ee2c6e698159c2768e315389d666107f) )
 	ROM_LOAD( "8.20d",        0xc000, 0x2000, CRC(49a06454) SHA1(159a293125d7ac92a81120e290497ee7ed6d8acf) )
@@ -475,7 +475,7 @@ ROM_START( hpolym84 )
 	ROM_LOAD( "j12_c28.bin",  0x0020, 0x0100, CRC(2c891d59) SHA1(79050fbe058c24349927edc7937ec68a77f450f1) )
 	ROM_LOAD( "a09_c29.bin",  0x0120, 0x0100, CRC(811a3f3f) SHA1(474f03345847cd9791ff6b7161286bbfef3f990a) )
 
-	ROM_REGION( 0x10000, "vlm", 0 )	/*  64k for speech rom    */
+	ROM_REGION( 0x10000, "vlm", 0 ) /*  64k for speech rom    */
 	ROM_LOAD( "c08",          0x0000, 0x2000, CRC(e8f8ea78) SHA1(8d37818e5a2740c96696f37996f2a3f870386690) )
 ROM_END
 

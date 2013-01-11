@@ -52,19 +52,19 @@
 //**************************************************************************
 
 // Translation intentions
-const int TRANSLATE_TYPE_MASK		= 0x03;		// read write or fetch
-const int TRANSLATE_USER_MASK		= 0x04;		// user mode or fully privileged
-const int TRANSLATE_DEBUG_MASK		= 0x08;		// debug mode (no side effects)
+const int TRANSLATE_TYPE_MASK       = 0x03;     // read write or fetch
+const int TRANSLATE_USER_MASK       = 0x04;     // user mode or fully privileged
+const int TRANSLATE_DEBUG_MASK      = 0x08;     // debug mode (no side effects)
 
-const int TRANSLATE_READ			= 0;		// translate for read
-const int TRANSLATE_WRITE			= 1;		// translate for write
-const int TRANSLATE_FETCH			= 2;		// translate for instruction fetch
-const int TRANSLATE_READ_USER		= (TRANSLATE_READ | TRANSLATE_USER_MASK);
-const int TRANSLATE_WRITE_USER		= (TRANSLATE_WRITE | TRANSLATE_USER_MASK);
-const int TRANSLATE_FETCH_USER		= (TRANSLATE_FETCH | TRANSLATE_USER_MASK);
-const int TRANSLATE_READ_DEBUG		= (TRANSLATE_READ | TRANSLATE_DEBUG_MASK);
-const int TRANSLATE_WRITE_DEBUG		= (TRANSLATE_WRITE | TRANSLATE_DEBUG_MASK);
-const int TRANSLATE_FETCH_DEBUG		= (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
+const int TRANSLATE_READ            = 0;        // translate for read
+const int TRANSLATE_WRITE           = 1;        // translate for write
+const int TRANSLATE_FETCH           = 2;        // translate for instruction fetch
+const int TRANSLATE_READ_USER       = (TRANSLATE_READ | TRANSLATE_USER_MASK);
+const int TRANSLATE_WRITE_USER      = (TRANSLATE_WRITE | TRANSLATE_USER_MASK);
+const int TRANSLATE_FETCH_USER      = (TRANSLATE_FETCH | TRANSLATE_USER_MASK);
+const int TRANSLATE_READ_DEBUG      = (TRANSLATE_READ | TRANSLATE_DEBUG_MASK);
+const int TRANSLATE_WRITE_DEBUG     = (TRANSLATE_WRITE | TRANSLATE_DEBUG_MASK);
+const int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 
 
 
@@ -143,8 +143,8 @@ protected:
 	virtual void interface_validity_check(validity_checker &valid) const;
 
 	// configuration
-	address_map_constructor	m_address_map[ADDRESS_SPACES]; // address maps for each address space
-	address_space *		m_addrspace[ADDRESS_SPACES]; // reported address spaces
+	address_map_constructor m_address_map[ADDRESS_SPACES]; // address maps for each address space
+	address_space *     m_addrspace[ADDRESS_SPACES]; // reported address spaces
 };
 
 // iterator
@@ -170,4 +170,4 @@ inline const address_space_config *device_get_space_config(const device_t &devic
 }
 
 
-#endif	/* __DIMEMORY_H__ */
+#endif  /* __DIMEMORY_H__ */

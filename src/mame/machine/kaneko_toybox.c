@@ -160,10 +160,10 @@ void kaneko_toybox_device::toybox_mcu_init(running_machine &machine)
 void kaneko_toybox_device::toybox_mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
 {
 	COMBINE_DATA(&m_toybox_mcu_com[_n_]);
-	if (m_toybox_mcu_com[0] != 0xFFFF)	return;
-	if (m_toybox_mcu_com[1] != 0xFFFF)	return;
-	if (m_toybox_mcu_com[2] != 0xFFFF)	return;
-	if (m_toybox_mcu_com[3] != 0xFFFF)	return;
+	if (m_toybox_mcu_com[0] != 0xFFFF)  return;
+	if (m_toybox_mcu_com[1] != 0xFFFF)  return;
+	if (m_toybox_mcu_com[2] != 0xFFFF)  return;
+	if (m_toybox_mcu_com[3] != 0xFFFF)  return;
 
 	memset(m_toybox_mcu_com, 0, 4 * sizeof( UINT16 ) );
 	toybox_mcu_run(machine());
@@ -188,15 +188,15 @@ READ16_MEMBER(kaneko_toybox_device::toybox_mcu_status_r)
 void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 {
 	UINT16 *kaneko16_mcu_ram = m_toybox_mcuram;
-	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
-	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
-	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
+	UINT16 mcu_command  =   kaneko16_mcu_ram[0x0010/2];
+	UINT16 mcu_offset   =   kaneko16_mcu_ram[0x0012/2] / 2;
+	UINT16 mcu_data     =   kaneko16_mcu_ram[0x0014/2];
 
 	//printf("command %04x\n",mcu_command);
 
 	switch (mcu_command >> 8)
 	{
-		case 0x02:	// Read from NVRAM
+		case 0x02:  // Read from NVRAM
 		{
 			UINT8* nvdat = (UINT8*)&kaneko16_mcu_ram[mcu_offset];
 
@@ -212,7 +212,7 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 		}
 		break;
 
-		case 0x42:	// Write to NVRAM
+		case 0x42:  // Write to NVRAM
 		{
 			address_space &eeprom_space = machine.device<eeprom_device>(":eeprom")->space();
 			UINT8* nvdat = (UINT8*)&kaneko16_mcu_ram[mcu_offset];
@@ -225,7 +225,7 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 		}
 		break;
 
-		case 0x43:	// Initialize NVRAM - MCU writes Default Data Set directly to NVRAM (from internal ROM, or from the data ROM?)
+		case 0x43:  // Initialize NVRAM - MCU writes Default Data Set directly to NVRAM (from internal ROM, or from the data ROM?)
 		{
 			// only bonk seems to do this?
 			if (m_gametype == GAME_BONK)
@@ -244,14 +244,14 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 		}
 		break;
 
-		case 0x03:	// DSW
+		case 0x03:  // DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = machine.root_device().ioport(":DSW1")->read();
 			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine.describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
-		case 0x04:	// Protection
+		case 0x04:  // Protection
 		{
 			logerror("%s : MCU executed command: %04X %04X %04X\n", machine.describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
@@ -287,4 +287,3 @@ void kaneko_toybox_device::toybox_mcu_run(running_machine &machine)
 		break;
 	}
 }
-

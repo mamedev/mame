@@ -52,7 +52,7 @@ READ8_MEMBER(rollerg_state::rollerg_sound_r)
 {
 	device_t *device = machine().device("k053260");
 	/* If the sound CPU is running, read the status, otherwise
-       just make it pass the test */
+	   just make it pass the test */
 	return k053260_r(device, space, 2 + offset);
 }
 
@@ -69,7 +69,7 @@ TIMER_CALLBACK_MEMBER(rollerg_state::nmi_callback)
 WRITE8_MEMBER(rollerg_state::sound_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(rollerg_state::nmi_callback),this));	/* kludge until the K053260 is emulated correctly */
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(rollerg_state::nmi_callback),this));   /* kludge until the K053260 is emulated correctly */
 }
 
 READ8_MEMBER(rollerg_state::pip_r)
@@ -80,15 +80,15 @@ READ8_MEMBER(rollerg_state::pip_r)
 static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
 	AM_RANGE(0x0020, 0x0020) AM_READWRITE(watchdog_reset_r,watchdog_reset_w)
-	AM_RANGE(0x0030, 0x0031) AM_READ(rollerg_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)	/* K053260 */
+	AM_RANGE(0x0030, 0x0031) AM_READ(rollerg_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)  /* K053260 */
 	AM_RANGE(0x0040, 0x0040) AM_WRITE(soundirq_w)
 	AM_RANGE(0x0050, 0x0050) AM_READ_PORT("P1")
 	AM_RANGE(0x0051, 0x0051) AM_READ_PORT("P2")
 	AM_RANGE(0x0052, 0x0052) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0053, 0x0053) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0061, 0x0061) AM_READ(pip_r)				/* ????? */
-	AM_RANGE(0x0100, 0x010f) AM_DEVREADWRITE_LEGACY("k053252",k053252_r,k053252_w)		/* 053252? */
+	AM_RANGE(0x0061, 0x0061) AM_READ(pip_r)             /* ????? */
+	AM_RANGE(0x0100, 0x010f) AM_DEVREADWRITE_LEGACY("k053252",k053252_r,k053252_w)      /* 053252? */
 	AM_RANGE(0x0200, 0x020f) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
 	AM_RANGE(0x0300, 0x030f) AM_DEVREADWRITE_LEGACY("k053244", k053244_r, k053244_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE_LEGACY("k051316", k051316_w)
@@ -136,7 +136,7 @@ static INPUT_PORTS_START( rollerg )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -153,7 +153,7 @@ static INPUT_PORTS_START( rollerg )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -173,33 +173,33 @@ static INPUT_PORTS_START( rollerg )
 	/* No Credits = both coin slots open, but no effect on coin counters */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )			/* Manual says it's unused */
-	PORT_DIPNAME( 0x18, 0x10, "Bonus Energy" )			PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )           /* Manual says it's unused */
+	PORT_DIPNAME( 0x18, 0x10, "Bonus Energy" )          PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, "1/2 for Stage Winner" )
 	PORT_DIPSETTING(    0x08, "1/4 for Stage Winner" )
 	PORT_DIPSETTING(    0x10, "1/4 for Cycle Winner" )
 	PORT_DIPSETTING(    0x18, DEF_STR( None ) )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )			/* Manual says it's unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )           /* Manual says it's unused */
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )			/* Manual says it's unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )           /* Manual says it's unused */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -274,7 +274,7 @@ void rollerg_state::machine_reset()
 static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
+	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* ? */
 	MCFG_CPU_PROGRAM_MAP(rollerg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollerg_state,  irq0_line_assert)
 
@@ -333,7 +333,7 @@ ROM_START( rollerg )
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
 	ROM_LOAD( "999h04.f23", 0x040000, 0x040000, CRC(c1a35355) SHA1(615606d30500a8f2be19171893e985b085fff2fc) )
 
-	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 ) /* samples for 053260 */
 	ROM_LOAD( "999h09.c5",  0x000000, 0x080000, CRC(c5188783) SHA1(d9ab69e4197ba2b42e3b0bb713236c8037fc2ab3) )
 ROM_END
 
@@ -353,7 +353,7 @@ ROM_START( rollergj )
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
 	ROM_LOAD( "999h04.f23", 0x040000, 0x040000, CRC(c1a35355) SHA1(615606d30500a8f2be19171893e985b085fff2fc) )
 
-	ROM_REGION( 0x80000, "k053260", 0 )	/* samples for 053260 */
+	ROM_REGION( 0x80000, "k053260", 0 ) /* samples for 053260 */
 	ROM_LOAD( "999h09.c5",  0x000000, 0x080000, CRC(c5188783) SHA1(d9ab69e4197ba2b42e3b0bb713236c8037fc2ab3) )
 ROM_END
 

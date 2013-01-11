@@ -67,7 +67,7 @@ const device_type SEGA_YBOARD_SPRITES = &device_creator<sega_yboard_sprite_devic
 
 sega_16bit_sprite_device::sega_16bit_sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner)
 	: sprite16_device_ind16(mconfig, type, name, tag, owner),
-	  m_flip(false)
+		m_flip(false)
 {
 	// default to 1:1 bank mapping
 	for (int bank = 0; bank < ARRAY_LENGTH(m_bank); bank++)
@@ -1035,14 +1035,14 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Out Run Sprites", tag, owner),
-	  m_is_xboard(false)
+		m_is_xboard(false)
 {
 	set_origin(189, 0x00);
 }
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant)
 	: sega_16bit_sprite_device(mconfig, SEGA_XBOARD_SPRITES, "Sega X-Board Sprites", tag, owner),
-	  m_is_xboard(true)
+		m_is_xboard(true)
 {
 	set_origin(190, 0x00);
 }

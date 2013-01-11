@@ -408,10 +408,10 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_16MHz
-#define CPU_CLOCK		MASTER_CLOCK/4	/* guess */
-#define SND_CLOCK		MASTER_CLOCK/4	/* guess */
-#define CRTC_CLOCK		MASTER_CLOCK/8	/* guess */
+#define MASTER_CLOCK    XTAL_16MHz
+#define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
+#define SND_CLOCK       MASTER_CLOCK/4  /* guess */
+#define CRTC_CLOCK      MASTER_CLOCK/8  /* guess */
 
 
 #include "emu.h"
@@ -518,8 +518,8 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 void amaticmg_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
 	for (i = 0; i < 0x200; ++i)
 	{
@@ -545,8 +545,8 @@ void amaticmg_state::palette_init()
 PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	r, g, b;
-	int	i;
+	int r, g, b;
+	int i;
 
 	for (i = 0; i < machine().root_device().memregion("proms")->bytes(); i+=2)
 	{
@@ -585,10 +585,10 @@ WRITE8_MEMBER(amaticmg_state::out_a_w)
     -x-- ----  HOLD4
 */
 
-	output_set_lamp_value(0, (data >> 3) & 1);	/* START */
-	output_set_lamp_value(1, (data >> 4) & 1);	/* BET */
-	output_set_lamp_value(2, (data >> 5) & 1);	/* HOLD3 */
-	output_set_lamp_value(3, (data >> 6) & 1);	/* HOLD4 */
+	output_set_lamp_value(0, (data >> 3) & 1);  /* START */
+	output_set_lamp_value(1, (data >> 4) & 1);  /* BET */
+	output_set_lamp_value(2, (data >> 5) & 1);  /* HOLD3 */
+	output_set_lamp_value(3, (data >> 6) & 1);  /* HOLD4 */
 
 	logerror("port A: %2X\n", data);
 }
@@ -606,9 +606,9 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
     x--- ----  Hopper motor
     --x- x---  (unknown)
 */
-	output_set_lamp_value(4, (data >> 1) & 1);	/* HOLD1 */
-	output_set_lamp_value(5, (data >> 4) & 1);	/* HOLD2 */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* CANCEL */
+	output_set_lamp_value(4, (data >> 1) & 1);  /* HOLD1 */
+	output_set_lamp_value(5, (data >> 4) & 1);  /* HOLD2 */
+	output_set_lamp_value(6, (data >> 6) & 1);  /* CANCEL */
 
 //  coin_counter_w(machine(), 0, data & 0x04);  /* Coin In */
 //  coin_counter_w(machine(), 1, data & 0x01);  /* Coin Out */
@@ -658,8 +658,8 @@ static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)					// 0e for mg_iii_vger_3.64_v_8309
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)	// 0f for mg_iii_vger_3.64_v_8309
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)                  // 0e for mg_iii_vger_3.64_v_8309
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w) // 0f for mg_iii_vger_3.64_v_8309
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(nmi_mask_w)
 ADDRESS_MAP_END
@@ -692,21 +692,21 @@ static INPUT_PORTS_START( amaticmg )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service B (Dienst B") PORT_CODE(KEYCODE_8) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_NAME("Coin 2 (Muenze 2)")   PORT_IMPULSE(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Payout pulse") PORT_IMPULSE(3)      PORT_CODE(KEYCODE_Q)	// Hopper paying pulse
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Payout pulse") PORT_IMPULSE(3)      PORT_CODE(KEYCODE_Q)  // Hopper paying pulse
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CODE(KEYCODE_W)           // 'Ausgegeben 0 - Hopper Leer' (spent 0 - hopper empty)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 (Halten 3)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 (Halten 2)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 (Halten 3)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 (Halten 2)")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Take (Loeschen)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 (Halten 1)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Take (Loeschen)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 (Halten 1)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service A (Dienst A") PORT_CODE(KEYCODE_7) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Bet (Setzen) / Half Take")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )       PORT_NAME("Service C (Dienst C") PORT_CODE(KEYCODE_9) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (Master)")    PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 (Halten 4)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 (Halten 4)")
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -719,28 +719,28 @@ static INPUT_PORTS_START( amaticmg )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, "DIP1")					PORT_DIPLOCATION("DIP:1")
+	PORT_DIPNAME( 0x01, 0x01, "DIP1")                   PORT_DIPLOCATION("DIP:1")
 	PORT_DIPSETTING(    0x01, "Off (Aus)" )
 	PORT_DIPSETTING(    0x00, "On (Ein)" )
-	PORT_DIPNAME( 0x02, 0x02, "DIP2")					PORT_DIPLOCATION("DIP:2")
+	PORT_DIPNAME( 0x02, 0x02, "DIP2")                   PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(    0x02, "Off (Aus)" )
 	PORT_DIPSETTING(    0x00, "On (Ein)" )
-	PORT_DIPNAME( 0x04, 0x04, "Coin 1 (Muenzen 1)" )	PORT_DIPLOCATION("DIP:3")
+	PORT_DIPNAME( 0x04, 0x04, "Coin 1 (Muenzen 1)" )    PORT_DIPLOCATION("DIP:3")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x08, 0x08, "Coin 2 (Muenzen 2)" )	PORT_DIPLOCATION("DIP:4")
+	PORT_DIPNAME( 0x08, 0x08, "Coin 2 (Muenzen 2)" )    PORT_DIPLOCATION("DIP:4")
 	PORT_DIPSETTING(    0x08, "100" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, "Jackpot")				PORT_DIPLOCATION("DIP:5")
+	PORT_DIPNAME( 0x10, 0x10, "Jackpot")                PORT_DIPLOCATION("DIP:5")
 	PORT_DIPSETTING(    0x10, "Jackpot KZB")
 	PORT_DIPSETTING(    0x00, "Jackpot LZB")
-	PORT_DIPNAME( 0x20, 0x20, "Fruechtebonus" )			PORT_DIPLOCATION("DIP:6")
+	PORT_DIPNAME( 0x20, 0x20, "Fruechtebonus" )         PORT_DIPLOCATION("DIP:6")
 	PORT_DIPSETTING(    0x20, "Fruechtebonus Bleibt" )
 	PORT_DIPSETTING(    0x00, "Fruechtebonus Clear" )
-	PORT_DIPNAME( 0x40, 0x40, "DIP7")					PORT_DIPLOCATION("DIP:7")
+	PORT_DIPNAME( 0x40, 0x40, "DIP7")                   PORT_DIPLOCATION("DIP:7")
 	PORT_DIPSETTING(    0x40, "Off (Aus)" )
 	PORT_DIPSETTING(    0x00, "On (Ein)" )
-	PORT_DIPNAME( 0x80, 0x80, "BH") 					PORT_DIPLOCATION("DIP:8")
+	PORT_DIPNAME( 0x80, 0x80, "BH")                     PORT_DIPLOCATION("DIP:8")
 	PORT_DIPSETTING(    0x80, "BH Dreifach")
 	PORT_DIPSETTING(    0x00, "BH Normal")
 INPUT_PORTS_END
@@ -767,7 +767,7 @@ static const gfx_layout charlayout_6bpp =
 	RGN_FRAC(1,3),
 	6,
 	{ RGN_FRAC(0,3) + 0, RGN_FRAC(0,3) + 4, RGN_FRAC(1,3) + 0, RGN_FRAC(1,3) + 4,RGN_FRAC(2,3) + 0, RGN_FRAC(2,3) + 4, },
-	{ 3, 2, 1, 0 },	/* tiles are x-flipped */
+	{ 3, 2, 1, 0 }, /* tiles are x-flipped */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2
 };
@@ -820,22 +820,22 @@ static const mc6845_interface mc6845_intf =
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_intf_1 )
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_DRIVER_MEMBER(amaticmg_state,out_a_w),			/* Port A write */
-	DEVCB_INPUT_PORT("SW1"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(amaticmg_state,out_c_w)			/* Port C write */
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_DRIVER_MEMBER(amaticmg_state,out_a_w),            /* Port A write */
+	DEVCB_INPUT_PORT("SW1"),        /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_DRIVER_MEMBER(amaticmg_state,out_c_w)         /* Port C write */
 };
 
 
@@ -864,7 +864,7 @@ void amaticmg_state::machine_reset()
 
 static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)		/* WRONG! */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
 	MCFG_CPU_IO_MAP(amaticmg_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  nmi_line_pulse) // no NMI mask?
@@ -934,7 +934,7 @@ MACHINE_CONFIG_END
 ROM_START( suprstar )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x20000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x20000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "u3.bin",  0x00000, 0x20000, CRC(29bf4a95) SHA1(a73873f7cd1fdf5accc3e79f4619949f261400b8) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -951,7 +951,7 @@ ROM_END
 ROM_START( am_mg24 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mgi_vger_3.9-i-8201.i6.bin", 0x00000, 0x40000, CRC(9ce159f7) SHA1(101c277d579a69cb03f879288b2cecf838cf1741) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -967,7 +967,7 @@ ROM_END
 ROM_START( am_mg3 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mg_iii_vger_3.5-i-8205.bin", 0x00000, 0x40000, CRC(21d64029) SHA1(d5c3fde02833a96dd7a43481a489bfc4a5c9609d) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -982,7 +982,7 @@ ROM_END
 ROM_START( am_mg3a )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mg_iii_vger_3.64_v_8309.i16", 0x00000, 0x40000, CRC(c54f97c4) SHA1(d5ce91be7332ada304d18d07706e3b98ac0fa74b) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -999,7 +999,7 @@ ROM_END
 ROM_START( am_mg31i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mgi_sita_3.1_o_8270.bin", 0x00000, 0x40000, CRC(7358bdde) SHA1(674b57ddaaaed9b88ad563762b2421be7057e498) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -1014,7 +1014,7 @@ ROM_END
 ROM_START( am_mg33i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mgi_sita_3.3_o_8270.bin", 0x00000, 0x40000, CRC(eaa1ed83) SHA1(e50d06ea3631bd6e4f5fe14d8283c3550b2779a6) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -1029,7 +1029,7 @@ ROM_END
 ROM_START( am_mg34i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mgi_sita_3.4_o_8270.bin", 0x00000, 0x40000, CRC(bea7cd25) SHA1(89c9e02b48f34b2168e8624e552ead476cc339b9) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
@@ -1044,7 +1044,7 @@ ROM_END
 ROM_START( am_mg35i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "mgi_sita_3.5_o_8270.bin", 0x00000, 0x40000, CRC(816eb41e) SHA1(0cad597e764455011d03f519e4adafb310e75451) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )

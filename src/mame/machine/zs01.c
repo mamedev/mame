@@ -75,9 +75,9 @@ void zs01_device::nvram_default()
 		// Ensure the size is correct though
 		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA)
 			logerror("zs01 %s: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
-					 tag(),
-					 SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA,
-					 m_region->bytes());
+						tag(),
+						SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA,
+						m_region->bytes());
 		else {
 			UINT8 *rb = m_region->base();
 			int offset = 0;
@@ -432,11 +432,11 @@ void zs01_device::scl_1()
 						}
 
 						verboselog(1, "<- status: %02x%02x\n",
-								   read_buffer[0], read_buffer[1]);
+									read_buffer[0], read_buffer[1]);
 
 						verboselog(1, "<- data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
-								   read_buffer[2], read_buffer[3], read_buffer[4], read_buffer[5],
-								   read_buffer[6], read_buffer[7], read_buffer[8], read_buffer[9]);
+									read_buffer[2], read_buffer[3], read_buffer[4], read_buffer[5],
+									read_buffer[6], read_buffer[7], read_buffer[8], read_buffer[9]);
 
 						crc = do_crc(read_buffer, 10);
 						read_buffer[10] = crc >> 8;

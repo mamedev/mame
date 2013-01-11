@@ -118,19 +118,19 @@ WRITE8_MEMBER(mermaid_state::rougien_gfxbankswitch2_w)
 READ8_MEMBER(mermaid_state::mermaid_collision_r)
 {
 	/*
-        collision register active LOW:
+	    collision register active LOW:
 
-    with coll = spriteram[offs + 2] & 0xc0
+	with coll = spriteram[offs + 2] & 0xc0
 
-        Bit 0 - Sprite (coll = 0x40) - Sprite (coll = 0x00)
-        Bit 1 - Sprite (coll = 0x40) - Foreground
-        Bit 2 - Sprite (coll = 0x40) - Background
-        Bit 3 - Sprite (coll = 0x80) - Sprite (coll = 0x00)
-        Bit 4
-        Bit 5
-        Bit 6 - Sprite (coll = 0x40) - Sprite (coll = 0x80)
-        Bit 7
-    */
+	    Bit 0 - Sprite (coll = 0x40) - Sprite (coll = 0x00)
+	    Bit 1 - Sprite (coll = 0x40) - Foreground
+	    Bit 2 - Sprite (coll = 0x40) - Background
+	    Bit 3 - Sprite (coll = 0x80) - Sprite (coll = 0x00)
+	    Bit 4
+	    Bit 5
+	    Bit 6 - Sprite (coll = 0x40) - Sprite (coll = 0x80)
+	    Bit 7
+	*/
 
 	int collision = 0xff;
 

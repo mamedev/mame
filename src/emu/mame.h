@@ -29,16 +29,16 @@
 // return values from run_game
 enum
 {
-	MAMERR_NONE				= 0,	/* no error */
-	MAMERR_FAILED_VALIDITY	= 1,	/* failed validity checks */
-	MAMERR_MISSING_FILES	= 2,	/* missing files */
-	MAMERR_FATALERROR		= 3,	/* some other fatal error */
-	MAMERR_DEVICE			= 4,	/* device initialization error (MESS-specific) */
-	MAMERR_NO_SUCH_GAME		= 5,	/* game was specified but doesn't exist */
-	MAMERR_INVALID_CONFIG	= 6,	/* some sort of error in configuration */
-	MAMERR_IDENT_NONROMS	= 7,	/* identified all non-ROM files */
-	MAMERR_IDENT_PARTIAL	= 8,	/* identified some files but not all */
-	MAMERR_IDENT_NONE		= 9		/* identified no files */
+	MAMERR_NONE             = 0,    /* no error */
+	MAMERR_FAILED_VALIDITY  = 1,    /* failed validity checks */
+	MAMERR_MISSING_FILES    = 2,    /* missing files */
+	MAMERR_FATALERROR       = 3,    /* some other fatal error */
+	MAMERR_DEVICE           = 4,    /* device initialization error (MESS-specific) */
+	MAMERR_NO_SUCH_GAME     = 5,    /* game was specified but doesn't exist */
+	MAMERR_INVALID_CONFIG   = 6,    /* some sort of error in configuration */
+	MAMERR_IDENT_NONROMS    = 7,    /* identified all non-ROM files */
+	MAMERR_IDENT_PARTIAL    = 8,    /* identified some files but not all */
+	MAMERR_IDENT_NONE       = 9     /* identified no files */
 };
 
 
@@ -132,4 +132,4 @@ void CLIB_DECL logerror(const char *format,...) ATTR_PRINTF(1,2);
 void CLIB_DECL vlogerror(const char *format, va_list arg);
 
 
-#endif	/* __MAME_H__ */
+#endif  /* __MAME_H__ */

@@ -97,8 +97,8 @@ static void WRITE_UINT32(unsigned char* data, UINT32 val)
    for this information */
 
 #define expand(W,i) ( W[ i & 15 ] = \
-		      ROTL( 1, ( W[ i & 15 ] ^ W[ (i - 14) & 15 ] ^ \
-				 W[ (i - 8) & 15 ] ^ W[ (i - 3) & 15 ] ) ) )
+				ROTL( 1, ( W[ i & 15 ] ^ W[ (i - 14) & 15 ] ^ \
+					W[ (i - 8) & 15 ] ^ W[ (i - 3) & 15 ] ) ) )
 
 
 /* The prototype SHA sub-round.  The fundamental sub-round is:
@@ -115,25 +115,25 @@ static void WRITE_UINT32(unsigned char* data, UINT32 val)
    the next 20 values from the W[] array each time */
 
 #define subRound(a, b, c, d, e, f, k, data) \
-    ( e += ROTL( 5, a ) + f( b, c, d ) + k + data, b = ROTL( 30, b ) )
+	( e += ROTL( 5, a ) + f( b, c, d ) + k + data, b = ROTL( 30, b ) )
 
 /* Initialize the SHA values */
 
 void
 sha1_init(struct sha1_ctx *ctx)
 {
-  /* Set the h-vars to their initial values */
-  ctx->digest[ 0 ] = h0init;
-  ctx->digest[ 1 ] = h1init;
-  ctx->digest[ 2 ] = h2init;
-  ctx->digest[ 3 ] = h3init;
-  ctx->digest[ 4 ] = h4init;
+	/* Set the h-vars to their initial values */
+	ctx->digest[ 0 ] = h0init;
+	ctx->digest[ 1 ] = h1init;
+	ctx->digest[ 2 ] = h2init;
+	ctx->digest[ 3 ] = h3init;
+	ctx->digest[ 4 ] = h4init;
 
-  /* Initialize bit count */
-  ctx->count_low = ctx->count_high = 0;
+	/* Initialize bit count */
+	ctx->count_low = ctx->count_high = 0;
 
-  /* Initialize buffer */
-  ctx->index = 0;
+	/* Initialize buffer */
+	ctx->index = 0;
 }
 
 /* Perform the SHA transformation.  Note that this code, like MD5, seems to
@@ -146,156 +146,156 @@ sha1_init(struct sha1_ctx *ctx)
 static void
 sha1_transform(UINT32 *state, UINT32 *data)
 {
-  UINT32 A, B, C, D, E;     /* Local vars */
+	UINT32 A, B, C, D, E;     /* Local vars */
 
-  /* Set up first buffer and local data buffer */
-  A = state[0];
-  B = state[1];
-  C = state[2];
-  D = state[3];
-  E = state[4];
+	/* Set up first buffer and local data buffer */
+	A = state[0];
+	B = state[1];
+	C = state[2];
+	D = state[3];
+	E = state[4];
 
-  /* Heavy mangling, in 4 sub-rounds of 20 interations each. */
-  subRound( A, B, C, D, E, f1, K1, data[ 0] );
-  subRound( E, A, B, C, D, f1, K1, data[ 1] );
-  subRound( D, E, A, B, C, f1, K1, data[ 2] );
-  subRound( C, D, E, A, B, f1, K1, data[ 3] );
-  subRound( B, C, D, E, A, f1, K1, data[ 4] );
-  subRound( A, B, C, D, E, f1, K1, data[ 5] );
-  subRound( E, A, B, C, D, f1, K1, data[ 6] );
-  subRound( D, E, A, B, C, f1, K1, data[ 7] );
-  subRound( C, D, E, A, B, f1, K1, data[ 8] );
-  subRound( B, C, D, E, A, f1, K1, data[ 9] );
-  subRound( A, B, C, D, E, f1, K1, data[10] );
-  subRound( E, A, B, C, D, f1, K1, data[11] );
-  subRound( D, E, A, B, C, f1, K1, data[12] );
-  subRound( C, D, E, A, B, f1, K1, data[13] );
-  subRound( B, C, D, E, A, f1, K1, data[14] );
-  subRound( A, B, C, D, E, f1, K1, data[15] );
-  subRound( E, A, B, C, D, f1, K1, expand( data, 16 ) );
-  subRound( D, E, A, B, C, f1, K1, expand( data, 17 ) );
-  subRound( C, D, E, A, B, f1, K1, expand( data, 18 ) );
-  subRound( B, C, D, E, A, f1, K1, expand( data, 19 ) );
+	/* Heavy mangling, in 4 sub-rounds of 20 interations each. */
+	subRound( A, B, C, D, E, f1, K1, data[ 0] );
+	subRound( E, A, B, C, D, f1, K1, data[ 1] );
+	subRound( D, E, A, B, C, f1, K1, data[ 2] );
+	subRound( C, D, E, A, B, f1, K1, data[ 3] );
+	subRound( B, C, D, E, A, f1, K1, data[ 4] );
+	subRound( A, B, C, D, E, f1, K1, data[ 5] );
+	subRound( E, A, B, C, D, f1, K1, data[ 6] );
+	subRound( D, E, A, B, C, f1, K1, data[ 7] );
+	subRound( C, D, E, A, B, f1, K1, data[ 8] );
+	subRound( B, C, D, E, A, f1, K1, data[ 9] );
+	subRound( A, B, C, D, E, f1, K1, data[10] );
+	subRound( E, A, B, C, D, f1, K1, data[11] );
+	subRound( D, E, A, B, C, f1, K1, data[12] );
+	subRound( C, D, E, A, B, f1, K1, data[13] );
+	subRound( B, C, D, E, A, f1, K1, data[14] );
+	subRound( A, B, C, D, E, f1, K1, data[15] );
+	subRound( E, A, B, C, D, f1, K1, expand( data, 16 ) );
+	subRound( D, E, A, B, C, f1, K1, expand( data, 17 ) );
+	subRound( C, D, E, A, B, f1, K1, expand( data, 18 ) );
+	subRound( B, C, D, E, A, f1, K1, expand( data, 19 ) );
 
-  subRound( A, B, C, D, E, f2, K2, expand( data, 20 ) );
-  subRound( E, A, B, C, D, f2, K2, expand( data, 21 ) );
-  subRound( D, E, A, B, C, f2, K2, expand( data, 22 ) );
-  subRound( C, D, E, A, B, f2, K2, expand( data, 23 ) );
-  subRound( B, C, D, E, A, f2, K2, expand( data, 24 ) );
-  subRound( A, B, C, D, E, f2, K2, expand( data, 25 ) );
-  subRound( E, A, B, C, D, f2, K2, expand( data, 26 ) );
-  subRound( D, E, A, B, C, f2, K2, expand( data, 27 ) );
-  subRound( C, D, E, A, B, f2, K2, expand( data, 28 ) );
-  subRound( B, C, D, E, A, f2, K2, expand( data, 29 ) );
-  subRound( A, B, C, D, E, f2, K2, expand( data, 30 ) );
-  subRound( E, A, B, C, D, f2, K2, expand( data, 31 ) );
-  subRound( D, E, A, B, C, f2, K2, expand( data, 32 ) );
-  subRound( C, D, E, A, B, f2, K2, expand( data, 33 ) );
-  subRound( B, C, D, E, A, f2, K2, expand( data, 34 ) );
-  subRound( A, B, C, D, E, f2, K2, expand( data, 35 ) );
-  subRound( E, A, B, C, D, f2, K2, expand( data, 36 ) );
-  subRound( D, E, A, B, C, f2, K2, expand( data, 37 ) );
-  subRound( C, D, E, A, B, f2, K2, expand( data, 38 ) );
-  subRound( B, C, D, E, A, f2, K2, expand( data, 39 ) );
+	subRound( A, B, C, D, E, f2, K2, expand( data, 20 ) );
+	subRound( E, A, B, C, D, f2, K2, expand( data, 21 ) );
+	subRound( D, E, A, B, C, f2, K2, expand( data, 22 ) );
+	subRound( C, D, E, A, B, f2, K2, expand( data, 23 ) );
+	subRound( B, C, D, E, A, f2, K2, expand( data, 24 ) );
+	subRound( A, B, C, D, E, f2, K2, expand( data, 25 ) );
+	subRound( E, A, B, C, D, f2, K2, expand( data, 26 ) );
+	subRound( D, E, A, B, C, f2, K2, expand( data, 27 ) );
+	subRound( C, D, E, A, B, f2, K2, expand( data, 28 ) );
+	subRound( B, C, D, E, A, f2, K2, expand( data, 29 ) );
+	subRound( A, B, C, D, E, f2, K2, expand( data, 30 ) );
+	subRound( E, A, B, C, D, f2, K2, expand( data, 31 ) );
+	subRound( D, E, A, B, C, f2, K2, expand( data, 32 ) );
+	subRound( C, D, E, A, B, f2, K2, expand( data, 33 ) );
+	subRound( B, C, D, E, A, f2, K2, expand( data, 34 ) );
+	subRound( A, B, C, D, E, f2, K2, expand( data, 35 ) );
+	subRound( E, A, B, C, D, f2, K2, expand( data, 36 ) );
+	subRound( D, E, A, B, C, f2, K2, expand( data, 37 ) );
+	subRound( C, D, E, A, B, f2, K2, expand( data, 38 ) );
+	subRound( B, C, D, E, A, f2, K2, expand( data, 39 ) );
 
-  subRound( A, B, C, D, E, f3, K3, expand( data, 40 ) );
-  subRound( E, A, B, C, D, f3, K3, expand( data, 41 ) );
-  subRound( D, E, A, B, C, f3, K3, expand( data, 42 ) );
-  subRound( C, D, E, A, B, f3, K3, expand( data, 43 ) );
-  subRound( B, C, D, E, A, f3, K3, expand( data, 44 ) );
-  subRound( A, B, C, D, E, f3, K3, expand( data, 45 ) );
-  subRound( E, A, B, C, D, f3, K3, expand( data, 46 ) );
-  subRound( D, E, A, B, C, f3, K3, expand( data, 47 ) );
-  subRound( C, D, E, A, B, f3, K3, expand( data, 48 ) );
-  subRound( B, C, D, E, A, f3, K3, expand( data, 49 ) );
-  subRound( A, B, C, D, E, f3, K3, expand( data, 50 ) );
-  subRound( E, A, B, C, D, f3, K3, expand( data, 51 ) );
-  subRound( D, E, A, B, C, f3, K3, expand( data, 52 ) );
-  subRound( C, D, E, A, B, f3, K3, expand( data, 53 ) );
-  subRound( B, C, D, E, A, f3, K3, expand( data, 54 ) );
-  subRound( A, B, C, D, E, f3, K3, expand( data, 55 ) );
-  subRound( E, A, B, C, D, f3, K3, expand( data, 56 ) );
-  subRound( D, E, A, B, C, f3, K3, expand( data, 57 ) );
-  subRound( C, D, E, A, B, f3, K3, expand( data, 58 ) );
-  subRound( B, C, D, E, A, f3, K3, expand( data, 59 ) );
+	subRound( A, B, C, D, E, f3, K3, expand( data, 40 ) );
+	subRound( E, A, B, C, D, f3, K3, expand( data, 41 ) );
+	subRound( D, E, A, B, C, f3, K3, expand( data, 42 ) );
+	subRound( C, D, E, A, B, f3, K3, expand( data, 43 ) );
+	subRound( B, C, D, E, A, f3, K3, expand( data, 44 ) );
+	subRound( A, B, C, D, E, f3, K3, expand( data, 45 ) );
+	subRound( E, A, B, C, D, f3, K3, expand( data, 46 ) );
+	subRound( D, E, A, B, C, f3, K3, expand( data, 47 ) );
+	subRound( C, D, E, A, B, f3, K3, expand( data, 48 ) );
+	subRound( B, C, D, E, A, f3, K3, expand( data, 49 ) );
+	subRound( A, B, C, D, E, f3, K3, expand( data, 50 ) );
+	subRound( E, A, B, C, D, f3, K3, expand( data, 51 ) );
+	subRound( D, E, A, B, C, f3, K3, expand( data, 52 ) );
+	subRound( C, D, E, A, B, f3, K3, expand( data, 53 ) );
+	subRound( B, C, D, E, A, f3, K3, expand( data, 54 ) );
+	subRound( A, B, C, D, E, f3, K3, expand( data, 55 ) );
+	subRound( E, A, B, C, D, f3, K3, expand( data, 56 ) );
+	subRound( D, E, A, B, C, f3, K3, expand( data, 57 ) );
+	subRound( C, D, E, A, B, f3, K3, expand( data, 58 ) );
+	subRound( B, C, D, E, A, f3, K3, expand( data, 59 ) );
 
-  subRound( A, B, C, D, E, f4, K4, expand( data, 60 ) );
-  subRound( E, A, B, C, D, f4, K4, expand( data, 61 ) );
-  subRound( D, E, A, B, C, f4, K4, expand( data, 62 ) );
-  subRound( C, D, E, A, B, f4, K4, expand( data, 63 ) );
-  subRound( B, C, D, E, A, f4, K4, expand( data, 64 ) );
-  subRound( A, B, C, D, E, f4, K4, expand( data, 65 ) );
-  subRound( E, A, B, C, D, f4, K4, expand( data, 66 ) );
-  subRound( D, E, A, B, C, f4, K4, expand( data, 67 ) );
-  subRound( C, D, E, A, B, f4, K4, expand( data, 68 ) );
-  subRound( B, C, D, E, A, f4, K4, expand( data, 69 ) );
-  subRound( A, B, C, D, E, f4, K4, expand( data, 70 ) );
-  subRound( E, A, B, C, D, f4, K4, expand( data, 71 ) );
-  subRound( D, E, A, B, C, f4, K4, expand( data, 72 ) );
-  subRound( C, D, E, A, B, f4, K4, expand( data, 73 ) );
-  subRound( B, C, D, E, A, f4, K4, expand( data, 74 ) );
-  subRound( A, B, C, D, E, f4, K4, expand( data, 75 ) );
-  subRound( E, A, B, C, D, f4, K4, expand( data, 76 ) );
-  subRound( D, E, A, B, C, f4, K4, expand( data, 77 ) );
-  subRound( C, D, E, A, B, f4, K4, expand( data, 78 ) );
-  subRound( B, C, D, E, A, f4, K4, expand( data, 79 ) );
+	subRound( A, B, C, D, E, f4, K4, expand( data, 60 ) );
+	subRound( E, A, B, C, D, f4, K4, expand( data, 61 ) );
+	subRound( D, E, A, B, C, f4, K4, expand( data, 62 ) );
+	subRound( C, D, E, A, B, f4, K4, expand( data, 63 ) );
+	subRound( B, C, D, E, A, f4, K4, expand( data, 64 ) );
+	subRound( A, B, C, D, E, f4, K4, expand( data, 65 ) );
+	subRound( E, A, B, C, D, f4, K4, expand( data, 66 ) );
+	subRound( D, E, A, B, C, f4, K4, expand( data, 67 ) );
+	subRound( C, D, E, A, B, f4, K4, expand( data, 68 ) );
+	subRound( B, C, D, E, A, f4, K4, expand( data, 69 ) );
+	subRound( A, B, C, D, E, f4, K4, expand( data, 70 ) );
+	subRound( E, A, B, C, D, f4, K4, expand( data, 71 ) );
+	subRound( D, E, A, B, C, f4, K4, expand( data, 72 ) );
+	subRound( C, D, E, A, B, f4, K4, expand( data, 73 ) );
+	subRound( B, C, D, E, A, f4, K4, expand( data, 74 ) );
+	subRound( A, B, C, D, E, f4, K4, expand( data, 75 ) );
+	subRound( E, A, B, C, D, f4, K4, expand( data, 76 ) );
+	subRound( D, E, A, B, C, f4, K4, expand( data, 77 ) );
+	subRound( C, D, E, A, B, f4, K4, expand( data, 78 ) );
+	subRound( B, C, D, E, A, f4, K4, expand( data, 79 ) );
 
-  /* Build message digest */
-  state[0] += A;
-  state[1] += B;
-  state[2] += C;
-  state[3] += D;
-  state[4] += E;
+	/* Build message digest */
+	state[0] += A;
+	state[1] += B;
+	state[2] += C;
+	state[3] += D;
+	state[4] += E;
 }
 
 static void
 sha1_block(struct sha1_ctx *ctx, const UINT8 *block)
 {
-  UINT32 data[SHA1_DATA_LENGTH];
-  int i;
+	UINT32 data[SHA1_DATA_LENGTH];
+	int i;
 
-  /* Update block count */
-  if (!++ctx->count_low)
-    ++ctx->count_high;
+	/* Update block count */
+	if (!++ctx->count_low)
+	++ctx->count_high;
 
-  /* Endian independent conversion */
-  for (i = 0; i<SHA1_DATA_LENGTH; i++, block += 4)
-    data[i] = READ_UINT32(block);
+	/* Endian independent conversion */
+	for (i = 0; i<SHA1_DATA_LENGTH; i++, block += 4)
+	data[i] = READ_UINT32(block);
 
-  sha1_transform(ctx->digest, data);
+	sha1_transform(ctx->digest, data);
 }
 
 void
 sha1_update(struct sha1_ctx *ctx,
-	    unsigned length, const UINT8 *buffer)
+		unsigned length, const UINT8 *buffer)
 {
-  if (ctx->index)
-    { /* Try to fill partial block */
-      unsigned left = SHA1_DATA_SIZE - ctx->index;
-      if (length < left)
+	if (ctx->index)
+	{ /* Try to fill partial block */
+		unsigned left = SHA1_DATA_SIZE - ctx->index;
+		if (length < left)
 	{
-	  memcpy(ctx->block + ctx->index, buffer, length);
-	  ctx->index += length;
-	  return; /* Finished */
+		memcpy(ctx->block + ctx->index, buffer, length);
+		ctx->index += length;
+		return; /* Finished */
 	}
-      else
+		else
 	{
-	  memcpy(ctx->block + ctx->index, buffer, left);
-	  sha1_block(ctx, ctx->block);
-	  buffer += left;
-	  length -= left;
+		memcpy(ctx->block + ctx->index, buffer, left);
+		sha1_block(ctx, ctx->block);
+		buffer += left;
+		length -= left;
 	}
-    }
-  while (length >= SHA1_DATA_SIZE)
-    {
-      sha1_block(ctx, buffer);
-      buffer += SHA1_DATA_SIZE;
-      length -= SHA1_DATA_SIZE;
-    }
-  ctx->index = length;
-  if (length)
-    /* Buffer leftovers */
-    memcpy(ctx->block, buffer, length);
+	}
+	while (length >= SHA1_DATA_SIZE)
+	{
+		sha1_block(ctx, buffer);
+		buffer += SHA1_DATA_SIZE;
+		length -= SHA1_DATA_SIZE;
+	}
+	ctx->index = length;
+	if (length)
+	/* Buffer leftovers */
+	memcpy(ctx->block, buffer, length);
 }
 
 /* Final wrapup - pad to SHA1_DATA_SIZE-byte boundary with the bit pattern
@@ -304,84 +304,84 @@ sha1_update(struct sha1_ctx *ctx,
 void
 sha1_final(struct sha1_ctx *ctx)
 {
-  UINT32 data[SHA1_DATA_LENGTH];
-  int i;
-  int words;
+	UINT32 data[SHA1_DATA_LENGTH];
+	int i;
+	int words;
 
-  i = ctx->index;
+	i = ctx->index;
 
-  /* Set the first char of padding to 0x80.  This is safe since there is
-     always at least one byte free */
+	/* Set the first char of padding to 0x80.  This is safe since there is
+	 always at least one byte free */
 
-  assert(i < SHA1_DATA_SIZE);
-  ctx->block[i++] = 0x80;
+	assert(i < SHA1_DATA_SIZE);
+	ctx->block[i++] = 0x80;
 
-  /* Fill rest of word */
-  for( ; i & 3; i++)
-    ctx->block[i] = 0;
+	/* Fill rest of word */
+	for( ; i & 3; i++)
+	ctx->block[i] = 0;
 
-  /* i is now a multiple of the word size 4 */
-  words = i >> 2;
-  for (i = 0; i < words; i++)
-    data[i] = READ_UINT32(ctx->block + 4*i);
+	/* i is now a multiple of the word size 4 */
+	words = i >> 2;
+	for (i = 0; i < words; i++)
+	data[i] = READ_UINT32(ctx->block + 4*i);
 
-  if (words > (SHA1_DATA_LENGTH-2))
-    { /* No room for length in this block. Process it and
+	if (words > (SHA1_DATA_LENGTH-2))
+	{ /* No room for length in this block. Process it and
        * pad with another one */
-      for (i = words ; i < SHA1_DATA_LENGTH; i++)
+		for (i = words ; i < SHA1_DATA_LENGTH; i++)
 	data[i] = 0;
-      sha1_transform(ctx->digest, data);
-      for (i = 0; i < (SHA1_DATA_LENGTH-2); i++)
+		sha1_transform(ctx->digest, data);
+		for (i = 0; i < (SHA1_DATA_LENGTH-2); i++)
 	data[i] = 0;
-    }
-  else
-    for (i = words ; i < SHA1_DATA_LENGTH - 2; i++)
-      data[i] = 0;
+	}
+	else
+	for (i = words ; i < SHA1_DATA_LENGTH - 2; i++)
+		data[i] = 0;
 
-  /* There are 512 = 2^9 bits in one block */
-  data[SHA1_DATA_LENGTH-2] = (ctx->count_high << 9) | (ctx->count_low >> 23);
-  data[SHA1_DATA_LENGTH-1] = (ctx->count_low << 9) | (ctx->index << 3);
-  sha1_transform(ctx->digest, data);
+	/* There are 512 = 2^9 bits in one block */
+	data[SHA1_DATA_LENGTH-2] = (ctx->count_high << 9) | (ctx->count_low >> 23);
+	data[SHA1_DATA_LENGTH-1] = (ctx->count_low << 9) | (ctx->index << 3);
+	sha1_transform(ctx->digest, data);
 }
 
 void
 sha1_digest(const struct sha1_ctx *ctx,
-	    unsigned length,
-	    UINT8 *digest)
+		unsigned length,
+		UINT8 *digest)
 {
-  unsigned i;
-  unsigned words;
-  unsigned leftover;
+	unsigned i;
+	unsigned words;
+	unsigned leftover;
 
-  assert(length <= SHA1_DIGEST_SIZE);
+	assert(length <= SHA1_DIGEST_SIZE);
 
-  words = length / 4;
-  leftover = length % 4;
+	words = length / 4;
+	leftover = length % 4;
 
-  for (i = 0; i < words; i++, digest += 4)
-    WRITE_UINT32(digest, ctx->digest[i]);
+	for (i = 0; i < words; i++, digest += 4)
+	WRITE_UINT32(digest, ctx->digest[i]);
 
-  if (leftover)
-    {
-      UINT32 word;
-      unsigned j = leftover;
+	if (leftover)
+	{
+		UINT32 word;
+		unsigned j = leftover;
 
-      assert(i < _SHA1_DIGEST_LENGTH);
+		assert(i < _SHA1_DIGEST_LENGTH);
 
-      word = ctx->digest[i];
+		word = ctx->digest[i];
 
-      switch (leftover)
+		switch (leftover)
 	{
 	default:
 		/* this is just here to keep the compiler happy; it can never happen */
 	case 3:
-	  digest[--j] = (word >> 8) & 0xff;
-	  /* Fall through */
+		digest[--j] = (word >> 8) & 0xff;
+		/* Fall through */
 	case 2:
-	  digest[--j] = (word >> 16) & 0xff;
-	  /* Fall through */
+		digest[--j] = (word >> 16) & 0xff;
+		/* Fall through */
 	case 1:
-	  digest[--j] = (word >> 24) & 0xff;
+		digest[--j] = (word >> 24) & 0xff;
 	}
-    }
+	}
 }

@@ -10,10 +10,10 @@
 #include "includes/20pacgal.h"
 
 
-#define SCREEN_HEIGHT	(224)
-#define SCREEN_WIDTH	(288)
-#define NUM_PENS		(0x1000)
-#define NUM_STAR_PENS	(64)
+#define SCREEN_HEIGHT   (224)
+#define SCREEN_WIDTH    (288)
+#define NUM_PENS        (0x1000)
+#define NUM_STAR_PENS   (64)
 
 
 /*************************************
@@ -123,9 +123,9 @@ static void draw_sprite(running_machine& machine, const _20pacgal_state *state, 
 			gfx_offs = (gfx_offs & 0x1f83) | ((gfx_offs & 0x003c) << 1) | ((gfx_offs & 0x0040) >> 4);
 
 			data = (state->m_sprite_gfx_ram[gfx_offs + 0] << 24) |
-				   (state->m_sprite_gfx_ram[gfx_offs + 1] << 16) |
-				   (state->m_sprite_gfx_ram[gfx_offs + 2] << 8) |
-				   (state->m_sprite_gfx_ram[gfx_offs + 3] << 0);
+					(state->m_sprite_gfx_ram[gfx_offs + 1] << 16) |
+					(state->m_sprite_gfx_ram[gfx_offs + 2] << 8) |
+					(state->m_sprite_gfx_ram[gfx_offs + 3] << 0);
 
 			/* for each pixel in the row */
 			for (sx = 0; sx < 0x10; sx++)
@@ -188,7 +188,7 @@ static void draw_sprites(running_machine& machine,const _20pacgal_state *state, 
 		int size_y = (state->m_sprite_ram[offs + 0x100] & 0x08) >> 3;
 
 		sy = sy - (16 * size_y);
-		sy = (sy & 0xff) - 32;	/* fix wraparound */
+		sy = (sy & 0xff) - 32;  /* fix wraparound */
 
 		/* only Galaga appears to be effected by the global flip state */
 		if (state->m_game_selected && (state->m_flip[0] & 0x01))
@@ -374,15 +374,15 @@ static void draw_stars(_20pacgal_state *state, bitmap_rgb32 &bitmap, const recta
 			y = clock / 288;
 
 			/* code at d616 translates into:
-             * carryout = lfsr & 1;
-             * lfsr = lfsr>>1;
-             * lfsr = (feedback << 15) | lfsr;
-             * feedback = (((lfsr>>4) & 1) ^ (carryout & 1)) ^ 1;
-             *
-             * and needs a Hack:
-             *  x = 288 - x;
-             *
-             */
+			 * carryout = lfsr & 1;
+			 * lfsr = lfsr>>1;
+			 * lfsr = (feedback << 15) | lfsr;
+			 * feedback = (((lfsr>>4) & 1) ^ (carryout & 1)) ^ 1;
+			 *
+			 * and needs a Hack:
+			 *  x = 288 - x;
+			 *
+			 */
 
 			/* code at d648 */
 			carryout = ((lfsr >> 4) ^ feedback ^ 1) & 1;

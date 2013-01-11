@@ -18,7 +18,7 @@ todo:
 #include "v9938.h"
 
 #define VERBOSE 0
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 enum
 {
@@ -62,7 +62,7 @@ const device_type V9938 = &device_creator<v9938_device>;
 const device_type V9958 = &device_creator<v9958_device>;
 
 v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
-:	device_t(mconfig, type, name, shortname, tag, owner, clock),
+:   device_t(mconfig, type, name, shortname, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 18),
 	m_model(0),
@@ -201,7 +201,7 @@ void v99x8_device::update_mouse_state(int mx_delta, int my_delta, int button_sta
 	m_button_state = (button_state << 6) & 0xc0;
 
 	if ((m_cont_reg[8] & 0xc0) == 0x80)
-	{	// vdp will process mouse deltas only if it is in mouse mode
+	{   // vdp will process mouse deltas only if it is in mouse mode
 		m_mx_delta += mx_delta;
 		m_my_delta += my_delta;
 	}
@@ -245,7 +245,7 @@ b0 is set if b2 and b1 are set (remember, color bus is 3 bits)
 
 PALETTE_INIT( v9938 )
 {
-	int	i;
+	int i;
 
 	// create the full 512 colour palette
 	for (i=0;i<512;i++)
@@ -353,8 +353,8 @@ READ8_MEMBER( v99x8_device::read )
 {
 	switch (offset & 3)
 	{
-	case 0:	return vram_r();
-	case 1:	return status_r();
+	case 0: return vram_r();
+	case 1: return status_r();
 	}
 	return 0xff;
 }
@@ -363,10 +363,10 @@ WRITE8_MEMBER( v99x8_device::write )
 {
 	switch (offset & 3)
 	{
-	case 0:	vram_w(data);		break;
-	case 1:	command_w(data);	break;
-	case 2:	palette_w(data);	break;
-	case 3:	register_w(data);	break;
+	case 0: vram_w(data);       break;
+	case 1: command_w(data);    break;
+	case 2: palette_w(data);    break;
+	case 3: register_w(data);   break;
 	}
 }
 
@@ -384,7 +384,7 @@ UINT8 v99x8_device::vram_r()
 	if (m_cont_reg[45] & 0x40)  // Expansion memory
 	{
 		if ( (m_mode == V9938_MODE_GRAPHIC6) || (m_mode == V9938_MODE_GRAPHIC7) )
-			address >>= 1;	// correct?
+			address >>= 1;  // correct?
 		// Expansion memory only offers 64 K
 		if (m_vram_size > 0x20000 && ((address & 0x10000)==0))
 			m_read_ahead = m_vram_space->read_byte(address + EXPMEM_OFFSET);
@@ -432,20 +432,20 @@ UINT8 v99x8_device::status_r()
 	case 2:
 		/*update_command ();*/
 		/*
-        WTF is this? Whatever this was intended to do, it is nonsensical.
-        Might as well pick a random number....
-        This was an attempt to emulate H-Blank flag ;)
-        n = cycles_currently_ran ();
-        if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
-        else vdp.statReg[2] &= ~0x20;
-        */
+		WTF is this? Whatever this was intended to do, it is nonsensical.
+		Might as well pick a random number....
+		This was an attempt to emulate H-Blank flag ;)
+		n = cycles_currently_ran ();
+		if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
+		else vdp.statReg[2] &= ~0x20;
+		*/
 		if (machine().rand() & 1) m_stat_reg[2] |= 0x20;
 		else m_stat_reg[2] &= ~0x20;
 		ret = m_stat_reg[2];
 		break;
 	case 3:
 		if ((m_cont_reg[8] & 0xc0) == 0x80)
-		{	// mouse mode: return x mouse delta
+		{   // mouse mode: return x mouse delta
 			ret = m_mx_delta;
 			m_mx_delta = 0;
 		}
@@ -454,7 +454,7 @@ UINT8 v99x8_device::status_r()
 		break;
 	case 5:
 		if ((m_cont_reg[8] & 0xc0) == 0x80)
-		{	// mouse mode: return y mouse delta
+		{   // mouse mode: return y mouse delta
 			ret = m_my_delta;
 			m_my_delta = 0;
 		}
@@ -514,7 +514,7 @@ void v99x8_device::vram_w(UINT8 data)
 	if (m_cont_reg[45] & 0x40)
 	{
 		if ( (m_mode == V9938_MODE_GRAPHIC6) || (m_mode == V9938_MODE_GRAPHIC7) )
-			address >>= 1;	// correct?
+			address >>= 1;  // correct?
 		if (m_vram_size > 0x20000 && ((address & 0x10000)==0))
 			m_vram_space->write_byte(EXPMEM_OFFSET + address, data);
 	}
@@ -801,10 +801,10 @@ void v99x8_device::check_int()
 	}
 
 	/*
-    ** Somehow the IRQ request is going down without cpu_irq_line () being
-    ** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
-    ** run. As a patch it's called every scanline
-    */
+	** Somehow the IRQ request is going down without cpu_irq_line () being
+	** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
+	** run. As a patch it's called every scanline
+	*/
 	m_int_callback (*this, n);
 }
 
@@ -922,10 +922,10 @@ inline bool v99x8_device::v9938_second_field()
 template<typename _PixelType, int _Width>
 void v99x8_device::default_border(const pen_t *pens, _PixelType *ln)
 {
-    _PixelType pen;
-	int	i;
+	_PixelType pen;
+	int i;
 
-    pen = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
 	i = _Width;
 	while (i--) *ln++ = pen;
 
@@ -1625,7 +1625,7 @@ void v99x8_device::graphic7_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8
 
 void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 {
-	int	attrtbl_addr, patterntbl_addr, pattern_addr;
+	int attrtbl_addr, patterntbl_addr, pattern_addr;
 	int x, y, p, height, c, p2, i, n, pattern;
 
 	memset(col, 0, 256);
@@ -2280,11 +2280,11 @@ while ((cnt-=delta) > 0) {
 #define post__x_y(MX) \
 if (!--ANX || ((ADX+=TX)&MX)) { \
 	if (!(--NY&1023) || (DY+=TY)==-1) \
-        break; \
-    else { \
-        ADX=DX; \
-        ANX=NX; \
-    } \
+		break; \
+	else { \
+		ADX=DX; \
+		ANX=NX; \
+	} \
 } \
 post_loop
 
@@ -2292,9 +2292,9 @@ post_loop
 #define post__xyy(MX) \
 if ((ADX+=TX)&MX) { \
 	if (!(--NY&1023) || (SY+=TY)==-1 || (DY+=TY)==-1) \
-        break; \
-    else \
-        ADX=DX; \
+		break; \
+	else \
+		ADX=DX; \
 } \
 post_loop
 
@@ -2302,12 +2302,12 @@ post_loop
 #define post_xxyy(MX) \
 if (!--ANX || ((ASX+=TX)&MX) || ((ADX+=TX)&MX)) { \
 	if (!(--NY&1023) || (SY+=TY)==-1 || (DY+=TY)==-1) \
-        break; \
-    else { \
-        ASX=SX; \
-        ADX=DX; \
-        ANX=NX; \
-    } \
+		break; \
+	else { \
+		ASX=SX; \
+		ADX=DX; \
+		ANX=NX; \
+	} \
 } \
 post_loop
 
@@ -2490,11 +2490,11 @@ inline void v99x8_device::VDPpset8(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 inline void v99x8_device::VDPpset(UINT8 SM, int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 {
 	switch (SM) {
-    case 0: VDPpset5(MXD, DX, DY, CL, OP); break;
-    case 1: VDPpset6(MXD, DX, DY, CL, OP); break;
-    case 2: VDPpset7(MXD, DX, DY, CL, OP); break;
-    case 3: VDPpset8(MXD, DX, DY, CL, OP); break;
-    }
+	case 0: VDPpset5(MXD, DX, DY, CL, OP); break;
+	case 1: VDPpset6(MXD, DX, DY, CL, OP); break;
+	case 2: VDPpset7(MXD, DX, DY, CL, OP); break;
+	case 3: VDPpset8(MXD, DX, DY, CL, OP); break;
+	}
 }
 
 /** get_vdp_timing_value() **************************************/
@@ -2839,34 +2839,34 @@ void v99x8_device::hmmv_engine()
 	cnt = m_vdp_ops_count;
 
 	switch (m_mode) {
-    default:
-    case V9938_MODE_GRAPHIC4: pre_loop m_vram_space->write_byte(VDP_VRMP5(MXD, ADX, DY), CL); post__x_y(256)
-    	break;
-    case V9938_MODE_GRAPHIC5: pre_loop m_vram_space->write_byte(VDP_VRMP6(MXD, ADX, DY), CL); post__x_y(512)
-    	break;
-    case V9938_MODE_GRAPHIC6: pre_loop m_vram_space->write_byte(VDP_VRMP7(MXD, ADX, DY), CL); post__x_y(512)
-    	break;
-    case V9938_MODE_GRAPHIC7: pre_loop m_vram_space->write_byte(VDP_VRMP8(MXD, ADX, DY), CL); post__x_y(256)
-    	break;
-    }
+	default:
+	case V9938_MODE_GRAPHIC4: pre_loop m_vram_space->write_byte(VDP_VRMP5(MXD, ADX, DY), CL); post__x_y(256)
+		break;
+	case V9938_MODE_GRAPHIC5: pre_loop m_vram_space->write_byte(VDP_VRMP6(MXD, ADX, DY), CL); post__x_y(512)
+		break;
+	case V9938_MODE_GRAPHIC6: pre_loop m_vram_space->write_byte(VDP_VRMP7(MXD, ADX, DY), CL); post__x_y(512)
+		break;
+	case V9938_MODE_GRAPHIC7: pre_loop m_vram_space->write_byte(VDP_VRMP8(MXD, ADX, DY), CL); post__x_y(256)
+		break;
+	}
 
-    if ((m_vdp_ops_count=cnt)>0) {
-    	// Command execution done
-    	m_stat_reg[2]&=0xFE;
-    	m_vdp_engine=0;
-    	if (!NY)
-    		DY+=TY;
-    	m_cont_reg[42]=NY & 0xFF;
-    	m_cont_reg[43]=(NY>>8) & 0x03;
-    	m_cont_reg[38]=DY & 0xFF;
-    	m_cont_reg[39]=(DY>>8) & 0x03;
-    }
-    else {
-    	m_mmc.DY=DY;
-    	m_mmc.NY=NY;
-    	m_mmc.ANX=ANX;
-    	m_mmc.ADX=ADX;
-    }
+	if ((m_vdp_ops_count=cnt)>0) {
+		// Command execution done
+		m_stat_reg[2]&=0xFE;
+		m_vdp_engine=0;
+		if (!NY)
+			DY+=TY;
+		m_cont_reg[42]=NY & 0xFF;
+		m_cont_reg[43]=(NY>>8) & 0x03;
+		m_cont_reg[38]=DY & 0xFF;
+		m_cont_reg[39]=(DY>>8) & 0x03;
+	}
+	else {
+		m_mmc.DY=DY;
+		m_mmc.NY=NY;
+		m_mmc.ANX=ANX;
+		m_mmc.ADX=ADX;
+	}
 }
 
 /** hmmm_engine() *********************************************/
@@ -3090,7 +3090,7 @@ UINT8 v99x8_device::command_unit_w(UINT8 Op)
 	if (m_mode<5)
 		return(0);
 
-	SM = m_mode-5;		   // Screen mode index 0..3
+	SM = m_mode-5;         // Screen mode index 0..3
 
 	m_mmc.CM = Op>>4;
 	if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)
@@ -3222,4 +3222,3 @@ void v99x8_device::update_command()
 		if(m_vdp_engine) (this->*m_vdp_engine)();
 	}
 }
-

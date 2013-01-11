@@ -41,7 +41,7 @@
 //**************************************************************************
 
 #define MCFG_Z80STI_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), Z80STI, _clock)	\
+	MCFG_DEVICE_ADD((_tag), Z80STI, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define Z80STI_INTERFACE(name) const z80sti_interface (name) =
@@ -57,42 +57,42 @@
 
 struct z80sti_interface
 {
-	int	m_rx_clock;			// serial receive clock
-	int	m_tx_clock;			// serial transmit clock
+	int m_rx_clock;         // serial receive clock
+	int m_tx_clock;         // serial transmit clock
 
 	// this gets called on each change of the _INT pin (pin 17)
-	devcb_write_line		m_out_int_cb;
+	devcb_write_line        m_out_int_cb;
 
 	// this is called on each read of the GPIO pins
-	devcb_read8				m_in_gpio_cb;
+	devcb_read8             m_in_gpio_cb;
 
 	// this is called on each write of the GPIO pins
-	devcb_write8			m_out_gpio_cb;
+	devcb_write8            m_out_gpio_cb;
 
 	// this gets called for each read of the SI pin (pin 38)
-	devcb_read_line			m_in_si_cb;
+	devcb_read_line         m_in_si_cb;
 
 	// this gets called for each change of the SO pin (pin 37)
-	devcb_write_line		m_out_so_cb;
+	devcb_write_line        m_out_so_cb;
 
 	// this gets called for each change of the TAO pin (pin 1)
-	devcb_write_line		m_out_tao_cb;
+	devcb_write_line        m_out_tao_cb;
 
 	// this gets called for each change of the TBO pin (pin 2)
-	devcb_write_line		m_out_tbo_cb;
+	devcb_write_line        m_out_tbo_cb;
 
 	// this gets called for each change of the TCO pin (pin 3)
-	devcb_write_line		m_out_tco_cb;
+	devcb_write_line        m_out_tco_cb;
 
 	// this gets called for each change of the TDO pin (pin 4)
-	devcb_write_line		m_out_tdo_cb;
+	devcb_write_line        m_out_tdo_cb;
 };
 
 
 
 // ======================> z80sti_device
 
-class z80sti_device :	public device_t,
+class z80sti_device :   public device_t,
 						public device_z80daisy_interface,
 						public z80sti_interface
 {
@@ -132,44 +132,44 @@ private:
 	static TIMER_CALLBACK( static_timer_count ) { reinterpret_cast<z80sti_device *>(ptr)->timer_count(param); }
 
 	// device callbacks
-	devcb_resolved_read8				m_in_gpio_func;
-	devcb_resolved_write8				m_out_gpio_func;
-	devcb_resolved_read_line			m_in_si_func;
-	devcb_resolved_write_line			m_out_so_func;
-	devcb_resolved_write_line			m_out_timer_func[4];
-	devcb_resolved_write_line			m_out_int_func;
+	devcb_resolved_read8                m_in_gpio_func;
+	devcb_resolved_write8               m_out_gpio_func;
+	devcb_resolved_read_line            m_in_si_func;
+	devcb_resolved_write_line           m_out_so_func;
+	devcb_resolved_write_line           m_out_timer_func[4];
+	devcb_resolved_write_line           m_out_int_func;
 
 	// I/O state
-	UINT8 m_gpip;						// general purpose I/O register
-	UINT8 m_aer;						// active edge register
-	UINT8 m_ddr;						// data direction register
+	UINT8 m_gpip;                       // general purpose I/O register
+	UINT8 m_aer;                        // active edge register
+	UINT8 m_ddr;                        // data direction register
 
 	// interrupt state
-	UINT16 m_ier;						// interrupt enable register
-	UINT16 m_ipr;						// interrupt pending register
-	UINT16 m_isr;						// interrupt in-service register
-	UINT16 m_imr;						// interrupt mask register
-	UINT8 m_pvr;						// interrupt vector register
-	int m_int_state[16];				// interrupt state
+	UINT16 m_ier;                       // interrupt enable register
+	UINT16 m_ipr;                       // interrupt pending register
+	UINT16 m_isr;                       // interrupt in-service register
+	UINT16 m_imr;                       // interrupt mask register
+	UINT8 m_pvr;                        // interrupt vector register
+	int m_int_state[16];                // interrupt state
 
 	// timer state
-	UINT8 m_tabc;						// timer A/B control register
-	UINT8 m_tcdc;						// timer C/D control register
-	UINT8 m_tdr[4];						// timer data registers
-	UINT8 m_tmc[4];						// timer main counters
-	int m_to[4];						// timer out latch
+	UINT8 m_tabc;                       // timer A/B control register
+	UINT8 m_tcdc;                       // timer C/D control register
+	UINT8 m_tdr[4];                     // timer data registers
+	UINT8 m_tmc[4];                     // timer main counters
+	int m_to[4];                        // timer out latch
 
 	// serial state
-	UINT8 m_scr;						// synchronous character register
-	UINT8 m_ucr;						// USART control register
-	UINT8 m_tsr;						// transmitter status register
-	UINT8 m_rsr;						// receiver status register
-	UINT8 m_udr;						// USART data register
+	UINT8 m_scr;                        // synchronous character register
+	UINT8 m_ucr;                        // USART control register
+	UINT8 m_tsr;                        // transmitter status register
+	UINT8 m_rsr;                        // receiver status register
+	UINT8 m_udr;                        // USART data register
 
 	// timers
-	emu_timer *m_timer[4];				// counter timers
-	emu_timer *m_rx_timer;				// serial receive timer
-	emu_timer *m_tx_timer;				// serial transmit timer
+	emu_timer *m_timer[4];              // counter timers
+	emu_timer *m_rx_timer;              // serial receive timer
+	emu_timer *m_tx_timer;              // serial transmit timer
 };
 
 

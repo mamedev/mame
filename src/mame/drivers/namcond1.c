@@ -139,9 +139,9 @@ static const UINT32 pts_4bits_layout_yoffset[64] =
 
 static const gfx_layout pts_8x8_4bits_layout =
 {
-	8,8,	      /* 8*8 pixels */
+	8,8,          /* 8*8 pixels */
 	RGN_FRAC(1,1),        /* 65536 patterns */
-	4,	          /* 4 bits per pixel */
+	4,            /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
@@ -154,7 +154,7 @@ static const gfx_layout pts_16x16_4bits_layout =
 {
 	16,16,        /* 16*16 pixels */
 	RGN_FRAC(1,1),        /* 16384 patterns */
-	4,	          /* 4 bits per pixel */
+	4,            /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
@@ -167,7 +167,7 @@ static const gfx_layout pts_32x32_4bits_layout =
 {
 	32,32,        /* 32*32 pixels */
 	RGN_FRAC(1,1),         /* 4096 patterns */
-	4,	          /* 4 bits per pixel */
+	4,            /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
@@ -180,7 +180,7 @@ static const gfx_layout pts_64x64_4bits_layout =
 {
 	64,64,        /* 32*32 pixels */
 	RGN_FRAC(1,1),         /* 1024 patterns */
-	4,	          /* 4 bits per pixel */
+	4,            /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
@@ -192,9 +192,9 @@ static const gfx_layout pts_64x64_4bits_layout =
 
 static const gfx_layout pts_8x8_8bits_layout =
 {
-	8,8,	      /* 8*8 pixels */
+	8,8,          /* 8*8 pixels */
 	RGN_FRAC(1,1),        /* 32768 patterns */
-	8,	          /* 8 bits per pixel */
+	8,            /* 8 bits per pixel */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ STEP8( 0*512, 8 ) },
 	{ STEP8( 0*512, 8*8 ) },
@@ -205,7 +205,7 @@ static const gfx_layout pts_16x16_8bits_layout =
 {
 	16,16,        /* 16*16 pixels */
 	RGN_FRAC(1,1),         /* 8192 patterns */
-	8,	          /* 8 bits per pixel */
+	8,            /* 8 bits per pixel */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ STEP8( 0*512, 8 ), STEP8( 1*512, 8 ) },
 	{ STEP8( 0*512, 8*8 ), STEP8( 2*512, 8*8 ) },
@@ -328,80 +328,80 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )
-	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc2main0.14d", 0x00000, 0x80000, CRC(4ffc530b) SHA1(23d622d0261a3584236a77b2cefa522a0f46490e) )
 	ROM_LOAD16_WORD( "nc2main1.13d", 0x80000, 0x80000, CRC(26499a4e) SHA1(4af0c365713b4a51da684a3423b07cbb70d9599b) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )		/* sub CPU */
+	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
+	ROM_REGION( 0x200000,"gfx1", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-    ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
+	ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
 ROM_START( ncv1j )
-	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc1main0.14d",  0x00000, 0x80000, CRC(48ce0b2b) SHA1(07dfca8ba935ee0151211f9eb4d453f2da1d4bd7) )
 	ROM_LOAD16_WORD( "nc1main1.13d",  0x80000, 0x80000, CRC(49f99235) SHA1(97afde7f7dddd8538de78a74325d0038cb1217f7) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )		/* sub CPU */
+	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
+	ROM_REGION( 0x200000,"gfx1", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-    ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
+	ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
 ROM_START( ncv1j2 )
-	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc1main0b.14d", 0x00000, 0x80000, CRC(7207469d) SHA1(73faf1973a57c1bc2163e9ee3fe2febd3b8763a4) )
 	ROM_LOAD16_WORD( "nc1main1b.13d", 0x80000, 0x80000, CRC(52401b17) SHA1(60c9f20831d0101c02dafbc0bd15422f71f3ad81) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )		/* sub CPU */
+	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"gfx1", 0 )	/* 2MB character generator */
+	ROM_REGION( 0x200000,"gfx1", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-    ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
+	ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
 ROM_START( ncv2 )
-	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "ncs2main0.14e", 0x00000, 0x80000, CRC(fb8a4123) SHA1(47acdfe9b5441d0e3649aaa9780e676f760c4e42) )
 	ROM_LOAD16_WORD( "ncs2main1.13e", 0x80000, 0x80000, CRC(7a5ef23b) SHA1(0408742424a6abad512b5baff63409fe44353e10) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )		/* sub CPU */
+	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x400000,"gfx1", 0 )	/* 4MB character generator */
+	ROM_REGION( 0x400000,"gfx1", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-    ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
+	ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
 ROM_START( ncv2j )
-	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "ncs1main0.14e", 0x00000, 0x80000, CRC(99991192) SHA1(e0b0e15ae23560b77119b3d3e4b2d2bb9d8b36c9) )
 	ROM_LOAD16_WORD( "ncs1main1.13e", 0x80000, 0x80000, CRC(af4ba4f6) SHA1(ff5adfdd462cfd3f17fbe2401dfc88ff8c71b6f8) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )		/* sub CPU */
+	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
 	ROM_LOAD("ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x400000,"gfx1", 0 )	/* 4MB character generator */
+	ROM_REGION( 0x400000,"gfx1", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
 	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-    ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
+	ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
 GAME( 1995, ncv1,      0, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.1", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

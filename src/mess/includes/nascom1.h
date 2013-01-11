@@ -12,8 +12,8 @@
 
 struct nascom1_portstat_t
 {
-	UINT8	stat_flags;
-	UINT8	stat_count;
+	UINT8   stat_flags;
+	UINT8   stat_count;
 };
 
 struct nascom2_fdc_t

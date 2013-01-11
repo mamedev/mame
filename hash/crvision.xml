@@ -5,8 +5,8 @@
 <!--
 A couple of comments about the 6k/8k images:
 - game code occupies 6k, but there can be different chips inside the actual carts:
-  1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console
-  actually accesses only the first 2k and the final 4k.
+	1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console
+	actually accesses only the first 2k and the final 4k.
 There have been found carts where the remaining part is empty, and carts where the lower
 2k are repeated (see the Alt dumps below), but the dumps are basically the same and
 a Creativision would not see the difference between them.
@@ -68,9 +68,9 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		</part>
 	</software>
 
-    <!-- astrop1 differs from astropin only in the 1st byte.
-        This image came from FunnyMu < 0.43, and it might be
-        a bad dump (astropin has been confirmed good) -->
+	<!-- astrop1 differs from astropin only in the 1st byte.
+		This image came from FunnyMu < 0.43, and it might be
+		a bad dump (astropin has been confirmed good) -->
 	<software name="astropinb" cloneof="astropin">
 		<description>Astro Pinball (Bad?)</description>
 		<year>1982</year>
@@ -504,9 +504,9 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		</part>
 	</software>
 
-    <!-- hapmon is a homebrew hex editor created in the 80s and perfectly working
-        on the real machine. It was dumped and released to the public in ~2002,
-        when FunnyMu emulator (written by Paul Hayter) was released -->
+	<!-- hapmon is a homebrew hex editor created in the 80s and perfectly working
+		on the real machine. It was dumped and released to the public in ~2002,
+		when FunnyMu emulator (written by Paul Hayter) was released -->
 	<software name="hapmon">
 		<description>Hapmon</description>
 		<year>198?</year>

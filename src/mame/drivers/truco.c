@@ -200,9 +200,9 @@
 *******************************************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_12MHz			/* confirmed */
-#define CPU_CLOCK		(MASTER_CLOCK/16)	/* guess */
-#define CRTC_CLOCK		(MASTER_CLOCK/8)	/* guess */
+#define MASTER_CLOCK    XTAL_12MHz          /* confirmed */
+#define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
+#define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -238,7 +238,7 @@ WRITE8_MEMBER(truco_state::portb_w)
 {
 	if ((data & 0x80) | (data == 0))
 	{
-		machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);	/* Isolated the bit for Delta-Sigma DAC */
+		machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);  /* Isolated the bit for Delta-Sigma DAC */
 	}
 	else
 		logerror("Port B writes: %2x\n", data);
@@ -260,9 +260,9 @@ WRITE8_MEMBER(truco_state::pia_irqb_w)
 *******************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, truco_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM														/* General purpose RAM */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_SHARE("videoram")				/* Video RAM */
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")			/* Battery backed RAM */
+	AM_RANGE(0x0000, 0x17ff) AM_RAM                                                     /* General purpose RAM */
+	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_SHARE("videoram")                /* Video RAM */
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")         /* Battery backed RAM */
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x8005, 0x8005) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -292,58 +292,58 @@ CRTC:
 *******************************************/
 
 static INPUT_PORTS_START( truco )
-	PORT_START("P1")	/* IN0 */
+	PORT_START("P1")    /* IN0 */
 	PORT_DIPNAME( 0x01, 0x01, "IN0-1 (P2 START)" )
-	PORT_DIPSETTING (	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "IN0-2 (SERVICE SW)" )
-	PORT_DIPSETTING (	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "IN0-3 (P2 SELECT)" )
-	PORT_DIPSETTING (	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "IN0-4 (COIN2)" )
-	PORT_DIPSETTING (	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "IN0-5 (TILT SW)" )
-	PORT_DIPSETTING (	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 //  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S17 (P2 START) */
 //  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S14 (SERVICE SW) */
 //  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA C26 (P2 SELECT) */
 //  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S16 (COIN2) */
 //  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S15 (TILT SW) */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* Connected to JAMMA C22 (P1 BUTTON1) */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	/* Connected to JAMMA C18/21 (JOY UP & JOY RIGHT) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	/* Connected to JAMMA C19/20 (JOY DOWN & JOY LEFT) */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )        /* Connected to JAMMA C22 (P1 BUTTON1) */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    /* Connected to JAMMA C18/21 (JOY UP & JOY RIGHT) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  /* Connected to JAMMA C19/20 (JOY DOWN & JOY LEFT) */
 
-	PORT_START("JMPRS")	/* JP1-2 */
+	PORT_START("JMPRS") /* JP1-2 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING (	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Alt. Graphics" )
-	PORT_DIPSETTING (	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING (	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING (	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING (	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING (	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING (	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING (	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING (   0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( On ) )
 
-	PORT_START("COIN")	/* IN1 - FAKE - Used for coinup */
+	PORT_START("COIN")  /* IN1 - FAKE - Used for coinup */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -413,18 +413,18 @@ INTERRUPT_GEN_MEMBER(truco_state::truco_interrupt)
 */
 static const pia6821_interface pia0_intf =
 {
-	DEVCB_INPUT_PORT("P1"),		/* port A in */
-	DEVCB_INPUT_PORT("JMPRS"),	/* port B in */
-	DEVCB_NULL,					/* line CA1 in ??? */
-	DEVCB_NULL,					/* line CB1 in ??? */
-	DEVCB_NULL,					/* line CA2 in */
-	DEVCB_NULL,					/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(truco_state,porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(truco_state,portb_w),		/* port B out */
-	DEVCB_DRIVER_MEMBER(truco_state,pia_ca2_w),	/* line CA2 out */
-	DEVCB_NULL,					/* port CB2 out */
-	DEVCB_DRIVER_MEMBER(truco_state,pia_irqa_w),	/* IRQA */
-	DEVCB_DRIVER_MEMBER(truco_state,pia_irqb_w)	/* IRQB */
+	DEVCB_INPUT_PORT("P1"),     /* port A in */
+	DEVCB_INPUT_PORT("JMPRS"),  /* port B in */
+	DEVCB_NULL,                 /* line CA1 in ??? */
+	DEVCB_NULL,                 /* line CB1 in ??? */
+	DEVCB_NULL,                 /* line CA2 in */
+	DEVCB_NULL,                 /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(truco_state,porta_w),       /* port A out */
+	DEVCB_DRIVER_MEMBER(truco_state,portb_w),       /* port B out */
+	DEVCB_DRIVER_MEMBER(truco_state,pia_ca2_w), /* line CA2 out */
+	DEVCB_NULL,                 /* port CB2 out */
+	DEVCB_DRIVER_MEMBER(truco_state,pia_irqa_w),    /* IRQA */
+	DEVCB_DRIVER_MEMBER(truco_state,pia_irqb_w) /* IRQB */
 };
 
 
@@ -434,16 +434,16 @@ static const pia6821_interface pia0_intf =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	4,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	4,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -457,7 +457,7 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  truco_interrupt)
-    MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))	/* 1.6 seconds */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
 
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( truco, truco_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)	/* Identified as UM6845 */
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)    /* Identified as UM6845 */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

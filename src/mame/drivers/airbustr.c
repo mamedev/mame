@@ -232,25 +232,25 @@ READ8_MEMBER(airbustr_state::devram_r)
 	switch (offset)
 	{
 		/* Reading efe0 probably resets a watchdog mechanism
-           that would reset the main cpu. We avoid this and patch
-           the rom instead (main cpu has to be reset once at startup) */
+		   that would reset the main cpu. We avoid this and patch
+		   the rom instead (main cpu has to be reset once at startup) */
 		case 0xfe0:
 			return watchdog_reset_r(space, 0);
 
 		/* Reading a word at eff2 probably yelds the product
-           of the words written to eff0 and eff2 */
+		   of the words written to eff0 and eff2 */
 		case 0xff2:
 		case 0xff3:
 		{
-			int	x = (m_devram[0xff0] + m_devram[0xff1] * 256) * (m_devram[0xff2] + m_devram[0xff3] * 256);
+			int x = (m_devram[0xff0] + m_devram[0xff1] * 256) * (m_devram[0xff2] + m_devram[0xff3] * 256);
 			if (offset == 0xff2)
 				return (x & 0x00ff) >> 0;
 			else
 				return (x & 0xff00) >> 8;
-		}	break;
+		}   break;
 
 		/* Reading eff4, F0 times must yield at most 80-1 consecutive
-           equal values */
+		   equal values */
 		case 0xff4:
 			return machine().rand();
 
@@ -294,27 +294,27 @@ READ8_MEMBER(airbustr_state::soundcommand_status_r)
 
 READ8_MEMBER(airbustr_state::soundcommand_r)
 {
-	m_soundlatch_status = 0;	// soundlatch has been read
+	m_soundlatch_status = 0;    // soundlatch has been read
 	return soundlatch_byte_r(space, 0);
 }
 
 READ8_MEMBER(airbustr_state::soundcommand2_r)
 {
-	m_soundlatch2_status = 0;	// soundlatch2 has been read
+	m_soundlatch2_status = 0;   // soundlatch2 has been read
 	return soundlatch2_byte_r(space, 0);
 }
 
 WRITE8_MEMBER(airbustr_state::soundcommand_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	m_soundlatch_status = 1;	// soundlatch has been written
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	m_soundlatch_status = 1;    // soundlatch has been written
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // cause a nmi to sub cpu
 }
 
 WRITE8_MEMBER(airbustr_state::soundcommand2_w)
 {
 	soundlatch2_byte_w(space, 0, data);
-	m_soundlatch2_status = 1;	// soundlatch2 has been written
+	m_soundlatch2_status = 1;   // soundlatch2 has been written
 }
 
 WRITE8_MEMBER(airbustr_state::airbustr_paletteram_w)
@@ -427,52 +427,52 @@ static INPUT_PORTS_START( airbustr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )		// used
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )        // used
 
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )				PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "Mode 1" )			//     routine at 0x056d: 11 21 12 16 (bit 3 active)
-	PORT_DIPSETTING(    0x00, "Mode 2" )			//     11 21 13 14 (bit 3 not active)
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )             PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Mode 1" )            //     routine at 0x056d: 11 21 12 16 (bit 3 active)
+	PORT_DIPSETTING(    0x00, "Mode 2" )            //     11 21 13 14 (bit 3 not active)
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )				PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
@@ -483,12 +483,12 @@ static INPUT_PORTS_START( airbustrj )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:4" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,6")	// routine at 0x0546 : 11 12 21 23
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:5,6") // routine at 0x0546 : 11 12 21 23
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
@@ -504,9 +504,9 @@ static const gfx_layout tile_gfxlayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{  1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-	   1*4+32*8, 0*4+32*8, 3*4+32*8, 2*4+32*8, 5*4+32*8, 4*4+32*8, 7*4+32*8, 6*4+32*8 },
+		1*4+32*8, 0*4+32*8, 3*4+32*8, 2*4+32*8, 5*4+32*8, 4*4+32*8, 7*4+32*8, 6*4+32*8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
+		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
 	16*16*4
 };
 
@@ -517,9 +517,9 @@ static const gfx_layout sprite_gfxlayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-	  0*4+32*8, 1*4+32*8, 2*4+32*8, 3*4+32*8, 4*4+32*8, 5*4+32*8, 6*4+32*8, 7*4+32*8 },
+		0*4+32*8, 1*4+32*8, 2*4+32*8, 3*4+32*8, 4*4+32*8, 5*4+32*8, 6*4+32*8, 7*4+32*8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
+		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
 	16*16*4
 };
 
@@ -537,8 +537,8 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW1"),		// DSW-1 connected to port A
-		DEVCB_INPUT_PORT("DSW2"),		// DSW-2 connected to port B
+		DEVCB_INPUT_PORT("DSW1"),       // DSW-1 connected to port A
+		DEVCB_INPUT_PORT("DSW2"),       // DSW-2 connected to port B
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -614,32 +614,32 @@ void airbustr_state::machine_reset()
 
 static const kaneko_pandora_interface airbustr_pandora_config =
 {
-	"screen",	/* screen tag */
-	1,	/* gfx_region */
-	0, 0	/* x_offs, y_offs */
+	"screen",   /* screen tag */
+	1,  /* gfx_region */
+	0, 0    /* x_offs, y_offs */
 };
 
 static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", Z80, 6000000)	// ???
+	MCFG_CPU_ADD("master", Z80, 6000000)    // ???
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airbustr_state, airbustr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", Z80, 6000000)	// ???
+	MCFG_CPU_ADD("slave", Z80, 6000000) // ???
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  slave_interrupt) /* nmi signal from master cpu */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	// ???
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000)  // ???
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)       // nmi are caused by sub cpu writing a sound command
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -700,7 +700,7 @@ ROM_START( airbustr )
 	ROM_LOAD( "pr-001.bin", 0x00000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) ) // sprites
 	ROM_LOAD( "pr-02.bin",  0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* OKI-M6295 samples */
 	ROM_LOAD( "pr-200.bin", 0x00000, 0x40000, CRC(a4dd3390) SHA1(2d72b46b4979857f6b66489bebda9f48799f59cf) )
 ROM_END
 
@@ -727,7 +727,7 @@ ROM_START( airbustrj )
 	ROM_LOAD( "pr-001.bin", 0x000000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) ) // sprites
 	ROM_LOAD( "pr-02.bin",  0x080000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* OKI-M6295 samples */
 	ROM_LOAD( "pr-200.bin", 0x00000, 0x40000, CRC(a4dd3390) SHA1(2d72b46b4979857f6b66489bebda9f48799f59cf) )
 ROM_END
 
@@ -773,7 +773,7 @@ ROM_START( airbustrb )
 
 	ROM_LOAD( "14.bin", 0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* OKI-M6295 samples */
 	/* Same content as airbusj, pr-200.bin, different sized roms */
 	ROM_LOAD( "4.bin", 0x00000, 0x20000, CRC(21d9bfe3) SHA1(4a69458cd2a6309e389c9e7593ae29d3ef0f8daf) )
 	ROM_LOAD( "3.bin", 0x20000, 0x20000, CRC(58cd19e2) SHA1(479f22241bf29f7af67d9679fc6c20f10004fdd8) )
@@ -789,6 +789,6 @@ DRIVER_INIT_MEMBER(airbustr_state,airbustr)
 
 /* Game Drivers */
 
-GAME( 1990, airbustr,   0,        airbustr, airbustr, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", GAME_SUPPORTS_SAVE )	// 891220
+GAME( 1990, airbustr,   0,        airbustr, airbustr, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", GAME_SUPPORTS_SAVE ) // 891220
 GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj, airbustr_state,airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", GAME_SUPPORTS_SAVE)    // 891229
-GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, driver_device,0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", GAME_SUPPORTS_SAVE)	// based on Japan set (891229)
+GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, driver_device,0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", GAME_SUPPORTS_SAVE)    // based on Japan set (891229)

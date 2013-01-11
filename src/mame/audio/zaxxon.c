@@ -189,18 +189,18 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_sound_c_w)
 static const char *const congo_sample_names[] =
 {
 	"*congo",
-	"gorilla",	/* 0 */
-	"bass",		/* 1 */
-	"congal",	/* 2 */
-	"congah",	/* 3 */
-	"rim",		/* 4 */
+	"gorilla",  /* 0 */
+	"bass",     /* 1 */
+	"congal",   /* 2 */
+	"congah",   /* 3 */
+	"rim",      /* 4 */
 	0
 };
 
 
 static const samples_interface congo_samples_interface =
 {
-	5,	/* 5 channels */
+	5,  /* 5 channels */
 	congo_sample_names
 };
 

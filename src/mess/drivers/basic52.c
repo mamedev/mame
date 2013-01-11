@@ -115,12 +115,12 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 static I8255_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,					/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_NULL,					/* Port B read */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_NULL,					/* Port C read */
-	DEVCB_NULL					/* Port C write */
+	DEVCB_NULL,                 /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_NULL,                 /* Port B read */
+	DEVCB_NULL,                 /* Port B write */
+	DEVCB_NULL,                 /* Port C read */
+	DEVCB_NULL                  /* Port C write */
 };
 
 static MACHINE_CONFIG_START( basic31, basic52_state )

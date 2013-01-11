@@ -261,8 +261,8 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 	}
 
 	return ((ioport("BIT_0")->read_safe(0) & (1 << offset)) ? 0x01 : 0) |
-		   ((ioport("BIT_6")->read_safe(0) & (1 << offset)) ? 0x40 : 0) |
-		   ((ioport("BIT_7")->read_safe(0) & (1 << offset)) ? 0x80 : 0);
+			((ioport("BIT_6")->read_safe(0) & (1 << offset)) ? 0x40 : 0) |
+			((ioport("BIT_7")->read_safe(0) & (1 << offset)) ? 0x80 : 0);
 }
 
 
@@ -452,7 +452,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, "Smokey Joe (1 Player)" )
 	PORT_DIPSETTING(    0x40, "Fire Truck (2 Players)" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,	IPT_SERVICE ) PORT_NAME("Diag Hold") PORT_CODE(KEYCODE_F6)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diag Hold") PORT_CODE(KEYCODE_F6)
 
 	PORT_START("BIT_7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -745,7 +745,7 @@ static const gfx_layout montecar_car_layout =
 	32, 32, /* width, height */
 	8,      /* total         */
 	2,      /* planes        */
-	        /* plane offsets */
+			/* plane offsets */
 	{ 1, 0 },
 	{
 		0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e,
@@ -875,7 +875,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( firetrk, firetrk_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
+	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
 	MCFG_CPU_PROGRAM_MAP(firetrk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrk_state,  firetrk_interrupt)
 	MCFG_WATCHDOG_VBLANK_INIT(5)
@@ -926,7 +926,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")	/* 750Khz during service mode */
+	MCFG_CPU_MODIFY("maincpu")  /* 750Khz during service mode */
 	MCFG_CPU_PROGRAM_MAP(montecar_map)
 
 	/* video hardware */

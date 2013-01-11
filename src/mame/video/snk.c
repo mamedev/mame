@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_bg_tile_info)
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x0f) << 8);
 	int color = (attr & 0xf0) >> 4;
 
-	if (m_is_psychos)	// psychos has a separate palette bank bit
+	if (m_is_psychos)   // psychos has a separate palette bank bit
 		color &= 7;
 
 	SET_TILE_INFO_MEMBER(1,
@@ -527,16 +527,16 @@ WRITE8_MEMBER(snk_state::sgladiat_scroll_msb_w)
 WRITE8_MEMBER(snk_state::aso_videoattrs_w)
 {
 	/*
-        video attributes:
-        X-------
-        -X------
-        --X-----    flip screen
-        ---X----    scrolly MSB (background)
-        ----X---    scrolly MSB (sprites)
-        -----X--
-        ------X-    scrollx MSB (background)
-        -------X    scrollx MSB (sprites)
-    */
+	    video attributes:
+	    X-------
+	    -X------
+	    --X-----    flip screen
+	    ---X----    scrolly MSB (background)
+	    ----X---    scrolly MSB (sprites)
+	    -----X--
+	    ------X-    scrollx MSB (background)
+	    -------X    scrollx MSB (sprites)
+	*/
 
 
 	flip_screen_set(data & 0x20);
@@ -550,16 +550,16 @@ WRITE8_MEMBER(snk_state::aso_videoattrs_w)
 WRITE8_MEMBER(snk_state::tnk3_videoattrs_w)
 {
 	/*
-        video attributes:
-        X-------    flip screen
-        -X------    character bank (for text layer)
-        --X-----
-        ---X----    scrolly MSB (background)
-        ----X---    scrolly MSB (sprites)
-        -----X--
-        ------X-    scrollx MSB (background)
-        -------X    scrollx MSB (sprites)
-    */
+	    video attributes:
+	    X-------    flip screen
+	    -X------    character bank (for text layer)
+	    --X-----
+	    ---X----    scrolly MSB (background)
+	    ----X---    scrolly MSB (sprites)
+	    -----X--
+	    ------X-    scrollx MSB (background)
+	    -------X    scrollx MSB (sprites)
+	*/
 
 
 	flip_screen_set(data & 0x80);
@@ -606,15 +606,15 @@ WRITE8_MEMBER(snk_state::ikari_sp_scroll_msb_w)
 WRITE8_MEMBER(snk_state::ikari_unknown_video_w)
 {
 	/* meaning of 0xc980 uncertain.
-       Normally 0x20, ikaria/ikarijp sets it to 0x31 during test mode.
-       Changing char bank is necessary to fix the display during the
-       hard flags test and the test grid.
-       Changing palette bank is necessary to fix colors in test mode. */
+	   Normally 0x20, ikaria/ikarijp sets it to 0x31 during test mode.
+	   Changing char bank is necessary to fix the display during the
+	   hard flags test and the test grid.
+	   Changing palette bank is necessary to fix colors in test mode. */
 
 
-if (data != 0x20 &&	// normal
-	data != 0x31 &&	// ikari test
-	data != 0xaa)	// victroad spurious during boot
+if (data != 0x20 && // normal
+	data != 0x31 && // ikari test
+	data != 0xaa)   // victroad spurious during boot
 	popmessage("attrs %02x contact MAMEDEV", data);
 
 	m_tx_tilemap->set_palette_offset((data & 0x01) << 4);
@@ -767,30 +767,30 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, co
 		xflip = 0;
 		yflip = 0;
 
-		if (gfx->elements() > 256)	// all except jcross
+		if (gfx->elements() > 256)  // all except jcross
 		{
 			tile_number |= (attributes & 0x40) << 2;
 		}
 
-		if (gfx->elements() > 512)	// athena
+		if (gfx->elements() > 512)  // athena
 		{
 			tile_number |= (attributes & 0x20) << 4;
 		}
-		else	// all others
+		else    // all others
 		{
 			yflip = attributes & 0x20;
 		}
 
 		if (state->flip_screen())
 		{
-			sx = 89 - size - sx;	// this causes slight misalignment in tnk3 but is correct for athena and fitegolf
+			sx = 89 - size - sx;    // this causes slight misalignment in tnk3 but is correct for athena and fitegolf
 			sy = 262 - size - sy;
 			xflip = !xflip;
 			yflip = !yflip;
 		}
 
 		sx &= 0x1ff;
-		sy &= state->m_yscroll_mask;	// sgladiat apparently has only 256 pixels of vertical scrolling range
+		sy &= state->m_yscroll_mask;    // sgladiat apparently has only 256 pixels of vertical scrolling range
 		if (sx > 512-size) sx -= 512;
 		if (sy > (state->m_yscroll_mask+1)-size) sy -= (state->m_yscroll_mask+1);
 
@@ -900,9 +900,9 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		{
 			case 16:
 				tile_number |= ((attributes & 0x08) << 5) | ((attributes & 0x60) << 4);
-				color &= 7;	// attribute bit 3 is used for bank select
+				color &= 7; // attribute bit 3 is used for bank select
 				if (from == 0)
-					color |= 8;	// low priority sprites use the other palette bank
+					color |= 8; // low priority sprites use the other palette bank
 				break;
 
 			case 32:

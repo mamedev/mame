@@ -618,26 +618,26 @@ UINT8 lc89510_temp_device::CDC_Reg_r(void)
 
 	switch (reg)
 	{
-		case REG_R_COMIN:  ret = 0/*COMIN*/;						break;
-		case REG_R_IFSTAT: ret = LC8951RegistersR[REG_R_IFSTAT];	break;
-		case REG_R_DBCL:   ret = LC8951RegistersW[REG_W_DBCL];		break;
+		case REG_R_COMIN:  ret = 0/*COMIN*/;                        break;
+		case REG_R_IFSTAT: ret = LC8951RegistersR[REG_R_IFSTAT];    break;
+		case REG_R_DBCL:   ret = LC8951RegistersW[REG_W_DBCL];      break;
 		case REG_R_DBCH:
 //          LC8951RegistersR[REG_R_DBCH] &=  0x0F; // NeoCD?
 //          LC8951RegistersR[REG_R_DBCH] |=  (LC8951RegistersR[REG_R_IFSTAT] & 0x40) ? 0x00 : 0xF0; // NeoCD?
-			ret = LC8951RegistersW[REG_W_DBCH];		break;
-		case REG_R_HEAD0:  ret = LC8951RegistersR[REG_R_HEAD0];		break;
-		case REG_R_HEAD1:  ret = LC8951RegistersR[REG_R_HEAD1];		break;
-		case REG_R_HEAD2:  ret = LC8951RegistersR[REG_R_HEAD2];		break;
-		case REG_R_HEAD3:  ret = LC8951RegistersR[REG_R_HEAD3];		break;
-		case REG_R_PTL:	   ret = LC8951RegistersW[REG_W_PTL];		break;
-		case REG_R_PTH:	   ret = LC8951RegistersW[REG_W_PTH];		break;
-		case REG_R_WAL:    ret = LC8951RegistersW[REG_W_WAL];		break;
-		case REG_R_WAH:    ret = LC8951RegistersW[REG_W_WAH];		break;
-		case REG_R_STAT0:  ret = LC8951RegistersR[REG_R_STAT0];		break;
+			ret = LC8951RegistersW[REG_W_DBCH];     break;
+		case REG_R_HEAD0:  ret = LC8951RegistersR[REG_R_HEAD0];     break;
+		case REG_R_HEAD1:  ret = LC8951RegistersR[REG_R_HEAD1];     break;
+		case REG_R_HEAD2:  ret = LC8951RegistersR[REG_R_HEAD2];     break;
+		case REG_R_HEAD3:  ret = LC8951RegistersR[REG_R_HEAD3];     break;
+		case REG_R_PTL:    ret = LC8951RegistersW[REG_W_PTL];       break;
+		case REG_R_PTH:    ret = LC8951RegistersW[REG_W_PTH];       break;
+		case REG_R_WAL:    ret = LC8951RegistersW[REG_W_WAL];       break;
+		case REG_R_WAH:    ret = LC8951RegistersW[REG_W_WAH];       break;
+		case REG_R_STAT0:  ret = LC8951RegistersR[REG_R_STAT0];     break;
 		case REG_R_STAT1:  ret = LC8951RegistersR[REG_R_STAT1];
 	//      LC8951RegistersR[REG_R_IFSTAT] |= 0x20;  // NeoCD? // reset DECI
 			break;
-		case REG_R_STAT2:  ret = LC8951RegistersR[REG_R_STAT2];		break;
+		case REG_R_STAT2:  ret = LC8951RegistersR[REG_R_STAT2];     break;
 		case REG_R_STAT3:  ret = LC8951RegistersR[REG_R_STAT3];
 
 			LC8951RegistersR[REG_R_IFSTAT] |= 0x20; // SegaCD? // reset DECI
@@ -717,7 +717,7 @@ void lc89510_temp_device::CDC_Reg_w(UINT8 data)
 			//}
 			break;
 	case REG_W_WAL: LC8951RegistersW[REG_W_WAL] = data; break;
-	case REG_W_WAH:	LC8951RegistersW[REG_W_WAH] = data; break;
+	case REG_W_WAH: LC8951RegistersW[REG_W_WAH] = data; break;
 	case REG_W_CTRL0: LC8951RegistersW[REG_W_CTRL0] = data; break;
 	case REG_W_CTRL1: LC8951RegistersW[REG_W_CTRL1] = data;
 		//LC8951UpdateHeader(); // NeoCD
@@ -744,8 +744,8 @@ void lc89510_temp_device::CDD_Handle_TOC_Commands(void)
 
 	switch (subcmd)
 	{
-		case TOCCMD_CURPOS:	   CDD_GetPos();	  break;
-		case TOCCMD_TRKPOS:	   CDD_GetTrackPos(); break;
+		case TOCCMD_CURPOS:    CDD_GetPos();      break;
+		case TOCCMD_TRKPOS:    CDD_GetTrackPos(); break;
 		case TOCCMD_CURTRK:    CDD_GetTrack();   break;
 		case TOCCMD_LENGTH:    CDD_Length();      break;
 		case TOCCMD_FIRSTLAST: CDD_FirstLast();   break;
@@ -757,22 +757,22 @@ void lc89510_temp_device::CDD_Handle_TOC_Commands(void)
 
 static const char *const CDD_import_cmdnames[] =
 {
-	"Get Status",			// 0
-	"Stop ALL",				// 1
-	"Handle TOC",			// 2
-	"Play",					// 3
-	"Seek",					// 4
-	"<undefined> (5)",			// 5
-	"Pause",				// 6
-	"Resume",				// 7
-	"FF",					// 8
-	"RWD",					// 9
-	"INIT",					// A
-	"<undefined> (b)",			// B
-	"Close Tray",			// C
-	"Open Tray",			// D
-	"<undefined> (e)",			// E
-	"<undefined> (f)"			// F
+	"Get Status",           // 0
+	"Stop ALL",             // 1
+	"Handle TOC",           // 2
+	"Play",                 // 3
+	"Seek",                 // 4
+	"<undefined> (5)",          // 5
+	"Pause",                // 6
+	"Resume",               // 7
+	"FF",                   // 8
+	"RWD",                  // 9
+	"INIT",                 // A
+	"<undefined> (b)",          // B
+	"Close Tray",           // C
+	"Open Tray",            // D
+	"<undefined> (e)",          // E
+	"<undefined> (f)"           // F
 };
 
 bool lc89510_temp_device::CDD_Import(running_machine& machine)
@@ -789,19 +789,19 @@ bool lc89510_temp_device::CDD_Import(running_machine& machine)
 
 	switch (CDD_TX[0])
 	{
-		case CMD_STATUS:	CDD_GetStatus();	       break;
-		case CMD_STOPALL:	CDD_Stop(machine);		   break;
-		case CMD_GETTOC:	CDD_Handle_TOC_Commands(); break;
-		case CMD_READ:		CDD_Play(machine);         break;
-		case CMD_SEEK:		CDD_Seek();	               break;
-		case CMD_STOP:		CDD_Pause(machine);	       break;
-		case CMD_RESUME:	CDD_Resume(machine);       break;
-		case CMD_FF:		CDD_FF(machine);           break;
-		case CMD_RW:		CDD_RW(machine);           break;
-		case CMD_INIT:		CDD_Init();	               break;
-		case CMD_CLOSE:		CDD_Open();                break;
-		case CMD_OPEN:		CDD_Close();	           break;
-		default:			CDD_Default();	           break;
+		case CMD_STATUS:    CDD_GetStatus();           break;
+		case CMD_STOPALL:   CDD_Stop(machine);         break;
+		case CMD_GETTOC:    CDD_Handle_TOC_Commands(); break;
+		case CMD_READ:      CDD_Play(machine);         break;
+		case CMD_SEEK:      CDD_Seek();                break;
+		case CMD_STOP:      CDD_Pause(machine);        break;
+		case CMD_RESUME:    CDD_Resume(machine);       break;
+		case CMD_FF:        CDD_FF(machine);           break;
+		case CMD_RW:        CDD_RW(machine);           break;
+		case CMD_INIT:      CDD_Init();                break;
+		case CMD_CLOSE:     CDD_Open();                break;
+		case CMD_OPEN:      CDD_Close();               break;
+		default:            CDD_Default();             break;
 	}
 
 	CDD_DONE = 1;
@@ -1134,20 +1134,20 @@ void lc89510_temp_device::LC8951UpdateHeader() // neocd
 
 		// HEAD registers have sub-header
 
-		LC8951RegistersR[REG_R_HEAD0] = 0;													// HEAD0
-		LC8951RegistersR[REG_R_HEAD1] = 0;													// HEAD1
-		LC8951RegistersR[REG_R_HEAD2] = 0;													// HEAD2
-		LC8951RegistersR[REG_R_HEAD3] = 0;													// HEAD3
+		LC8951RegistersR[REG_R_HEAD0] = 0;                                                  // HEAD0
+		LC8951RegistersR[REG_R_HEAD1] = 0;                                                  // HEAD1
+		LC8951RegistersR[REG_R_HEAD2] = 0;                                                  // HEAD2
+		LC8951RegistersR[REG_R_HEAD3] = 0;                                                  // HEAD3
 
 	} else {
 
 		// HEAD registers have header
 		UINT32 msf = lba_to_msf_alt(SCD_CURLBA+150);
 
-		LC8951RegistersR[REG_R_HEAD0] = to_bcd (((msf & 0x00ff0000)>>16), true);	// HEAD0
-		LC8951RegistersR[REG_R_HEAD1] = to_bcd (((msf & 0x0000ff00)>>8), true);		// HEAD1
-		LC8951RegistersR[REG_R_HEAD2] = to_bcd (((msf & 0x000000ff)>>0), true);		// HEAD2
-		LC8951RegistersR[REG_R_HEAD3] = 0x1;										// HEAD3
+		LC8951RegistersR[REG_R_HEAD0] = to_bcd (((msf & 0x00ff0000)>>16), true);    // HEAD0
+		LC8951RegistersR[REG_R_HEAD1] = to_bcd (((msf & 0x0000ff00)>>8), true);     // HEAD1
+		LC8951RegistersR[REG_R_HEAD2] = to_bcd (((msf & 0x000000ff)>>0), true);     // HEAD2
+		LC8951RegistersR[REG_R_HEAD3] = 0x1;                                        // HEAD3
 	}
 }
 
@@ -1173,9 +1173,9 @@ char* lc89510_temp_device::LC8915InitTransfer(int NeoCDDMACount)
 
 void lc89510_temp_device::LC8915EndTransfer()
 {
-	LC8951RegistersW[REG_W_DTTRG]  = 0x00;												// reset DTTRG
+	LC8951RegistersW[REG_W_DTTRG]  = 0x00;                                              // reset DTTRG
 
-	LC8951RegistersR[REG_R_IFSTAT] |= 0x48;												//   set DTEI & DTBSY
+	LC8951RegistersR[REG_R_IFSTAT] |= 0x48;                                             //   set DTEI & DTBSY
 	if (LC8951RegistersW[REG_W_IFCTRL] & 0x40) {
 
 		// trigger DTE interrupt
@@ -1330,5 +1330,3 @@ void lc89510_temp_device::nff0016_set(UINT16 wordValue)
 }
 
 UINT16 lc89510_temp_device::nff0016_r(void) { return nff0016; }
-
-

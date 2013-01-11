@@ -428,7 +428,7 @@ TO DO :
 #include "includes/galaxian.h"
 
 
-#define KONAMI_SOUND_CLOCK		14318000
+#define KONAMI_SOUND_CLOCK      14318000
 
 
 
@@ -553,19 +553,19 @@ WRITE8_MEMBER(galaxian_state::konami_sound_control_w)
 READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 {
 	/*
-        The timer is clocked at KONAMI_SOUND_CLOCK and cascades through a
-        series of counters. It first encounters a chained pair of 4-bit
-        counters in an LS393, which produce an effective divide-by-256. Next
-        it enters the divide-by-2 counter in an LS93, followed by the
-        divide-by-8 counter. Finally, it clocks a divide-by-5 counter in an
-        LS90, followed by the divide-by-2 counter. This produces an effective
-        period of 16*16*2*8*5*2 = 40960 clocks.
+	    The timer is clocked at KONAMI_SOUND_CLOCK and cascades through a
+	    series of counters. It first encounters a chained pair of 4-bit
+	    counters in an LS393, which produce an effective divide-by-256. Next
+	    it enters the divide-by-2 counter in an LS93, followed by the
+	    divide-by-8 counter. Finally, it clocks a divide-by-5 counter in an
+	    LS90, followed by the divide-by-2 counter. This produces an effective
+	    period of 16*16*2*8*5*2 = 40960 clocks.
 
-        The clock for the sound CPU comes from output C of the first
-        divide-by-16 counter, or KONAMI_SOUND_CLOCK/8. To recover the
-        current counter index, we use the sound cpu clock times 8 mod
-        16*16*2*8*5*2.
-    */
+	    The clock for the sound CPU comes from output C of the first
+	    divide-by-16 counter, or KONAMI_SOUND_CLOCK/8. To recover the
+	    current counter index, we use the sound cpu clock times 8 mod
+	    16*16*2*8*5*2.
+	*/
 	UINT32 cycles = (machine().device<cpu_device>("audiocpu")->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
@@ -577,11 +577,11 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 	}
 
 	/* the top bits of the counter index map to various bits here */
-	return (hibit << 7) |			/* B7 is the output of the final divide-by-2 counter */
-		   (BIT(cycles,14) << 6) |	/* B6 is the high bit of the divide-by-5 counter */
-		   (BIT(cycles,13) << 5) |	/* B5 is the 2nd highest bit of the divide-by-5 counter */
-		   (BIT(cycles,11) << 4) |	/* B4 is the high bit of the divide-by-8 counter */
-		   0x0e;					/* assume remaining bits are high, except B0 which is grounded */
+	return (hibit << 7) |           /* B7 is the output of the final divide-by-2 counter */
+			(BIT(cycles,14) << 6) | /* B6 is the high bit of the divide-by-5 counter */
+			(BIT(cycles,13) << 5) | /* B5 is the 2nd highest bit of the divide-by-5 counter */
+			(BIT(cycles,11) << 4) | /* B4 is the high bit of the divide-by-8 counter */
+			0x0e;                   /* assume remaining bits are high, except B0 which is grounded */
 }
 
 
@@ -621,22 +621,22 @@ WRITE8_MEMBER(galaxian_state::konami_portc_1_w)
 
 static I8255A_INTERFACE( konami_ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,konami_portc_0_w)	/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_portc_0_w)    /* Port C write */
 };
 
 static I8255A_INTERFACE( konami_ppi8255_1_intf )
 {
-	DEVCB_NULL,								/* Port A read */
+	DEVCB_NULL,                             /* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w),	/* Port B write */
-	DEVCB_INPUT_PORT("IN3"),				/* Port C read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,konami_portc_1_w)			/* Port C write */
+	DEVCB_NULL,                             /* Port B read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w), /* Port B write */
+	DEVCB_INPUT_PORT("IN3"),                /* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_portc_1_w)            /* Port C write */
 };
 
 
@@ -672,12 +672,12 @@ WRITE8_MEMBER(galaxian_state::theend_coin_counter_w)
 
 static I8255A_INTERFACE( theend_ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,theend_coin_counter_w)	/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),        /* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,theend_coin_counter_w)   /* Port C write */
 };
 
 
@@ -691,23 +691,23 @@ static I8255A_INTERFACE( theend_ppi8255_0_intf )
 WRITE8_MEMBER(galaxian_state::scramble_protection_w)
 {
 	/*
-        This is not fully understood; the low 4 bits of port C are
-        inputs; the upper 4 bits are outputs. Scramble main set always
-        writes sequences of 3 or more nibbles to the low port and
-        expects certain results in the upper nibble afterwards.
-    */
+	    This is not fully understood; the low 4 bits of port C are
+	    inputs; the upper 4 bits are outputs. Scramble main set always
+	    writes sequences of 3 or more nibbles to the low port and
+	    expects certain results in the upper nibble afterwards.
+	*/
 	m_protection_state = (m_protection_state << 4) | (data & 0x0f);
 	switch (m_protection_state & 0xfff)
 	{
 		/* scramble */
-		case 0xf09:		m_protection_result = 0xff;	break;
-		case 0xa49:		m_protection_result = 0xbf;	break;
-		case 0x319:		m_protection_result = 0x4f;	break;
-		case 0x5c9:		m_protection_result = 0x6f;	break;
+		case 0xf09:     m_protection_result = 0xff; break;
+		case 0xa49:     m_protection_result = 0xbf; break;
+		case 0x319:     m_protection_result = 0x4f; break;
+		case 0x5c9:     m_protection_result = 0x6f; break;
 
 		/* scrambls */
-		case 0x246:		m_protection_result ^= 0x80;	break;
-		case 0xb5f:		m_protection_result = 0x6f;	break;
+		case 0x246:     m_protection_result ^= 0x80;    break;
+		case 0xb5f:     m_protection_result = 0x6f; break;
 	}
 }
 
@@ -721,22 +721,22 @@ READ8_MEMBER(galaxian_state::scramble_protection_r)
 CUSTOM_INPUT_MEMBER(galaxian_state::scramble_protection_alt_r)
 {
 	/*
-        There are two additional bits that are derived from bit 7 of
-        the protection result. This is just a guess but works well enough
-        to boot scrambls.
-    */
+	    There are two additional bits that are derived from bit 7 of
+	    the protection result. This is just a guess but works well enough
+	    to boot scrambls.
+	*/
 	return (m_protection_result >> 7) & 1;
 }
 
 
 static I8255A_INTERFACE( scramble_ppi8255_1_intf )
 {
-	DEVCB_NULL,								/* Port A read */
+	DEVCB_NULL,                             /* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w),	/* Port B write */
-	DEVCB_DRIVER_MEMBER(galaxian_state,scramble_protection_r),	/* Port C read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,scramble_protection_w)	/* Port C write */
+	DEVCB_NULL,                             /* Port B read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w), /* Port B write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scramble_protection_r),  /* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scramble_protection_w)   /* Port C write */
 };
 
 
@@ -797,12 +797,12 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_control_w)
 
 static I8255A_INTERFACE( sfx_ppi8255_2_intf )
 {
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r),	/* Port A read */
-	DEVCB_NULL,								/* Port A write */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_NULL,								/* Port B write */
-	DEVCB_NULL,								/* Port C read */
-	DEVCB_NULL								/* Port C write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r), /* Port A read */
+	DEVCB_NULL,                             /* Port A write */
+	DEVCB_NULL,                             /* Port B read */
+	DEVCB_NULL,                             /* Port B write */
+	DEVCB_NULL,                             /* Port C read */
+	DEVCB_NULL                              /* Port C write */
 };
 
 /*************************************
@@ -867,12 +867,12 @@ WRITE8_MEMBER(galaxian_state::monsterz_portc_1_w)
 
 static I8255A_INTERFACE( monsterz_ppi8255_1_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_porta_1_w),	/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_portb_1_w),	/* Port B write */
-	DEVCB_INPUT_PORT("IN3"),			/* Port C read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_portc_1_w)	/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_porta_1_w), /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_portb_1_w), /* Port B write */
+	DEVCB_INPUT_PORT("IN3"),            /* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,monsterz_portc_1_w)  /* Port C write */
 };
 
 
@@ -1047,12 +1047,12 @@ WRITE8_MEMBER(galaxian_state::scorpion_digitalker_control_w)
 
 static I8255A_INTERFACE( scorpion_ppi8255_1_intf )
 {
-	DEVCB_NULL,								/* Port A read */
+	DEVCB_NULL,                             /* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w),	/* Port B write */
-	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_protection_r),	/* Port C read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_protection_w)	/* Port C write */
+	DEVCB_NULL,                             /* Port B read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,konami_sound_control_w), /* Port B write */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_protection_r),  /* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_protection_w)   /* Port C write */
 };
 
 
@@ -1158,8 +1158,8 @@ CUSTOM_INPUT_MEMBER(galaxian_state::kingball_muxbit_r)
 CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
 {
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
-       that it's working, doesn't actually use return value, so we can just use
-       rand() */
+	   that it's working, doesn't actually use return value, so we can just use
+	   rand() */
 	return machine().rand() & 1;
 }
 
@@ -1324,12 +1324,12 @@ WRITE8_MEMBER(galaxian_state::moonwar_port_select_w)
 
 static I8255A_INTERFACE( moonwar_ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),				/* Port A read */
-	DEVCB_NULL,								/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),				/* Port B read */
-	DEVCB_NULL,								/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),				/* Port C read */
-	DEVCB_DRIVER_MEMBER(galaxian_state,moonwar_port_select_w)	/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),                /* Port A read */
+	DEVCB_NULL,                             /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),                /* Port B read */
+	DEVCB_NULL,                             /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),                /* Port C read */
+	DEVCB_DRIVER_MEMBER(galaxian_state,moonwar_port_select_w)   /* Port C write */
 };
 
 
@@ -1581,7 +1581,7 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x2606, 0x2606) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x2607, 0x2607) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")	/* mirror! */
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram") /* mirror! */
 	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x01ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -1598,8 +1598,8 @@ static ADDRESS_MAP_START( frogger_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb808, 0xb808) AM_MIRROR(0x07e3) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb80c, 0xb80c) AM_MIRROR(0x07e3) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0xb810, 0xb810) AM_MIRROR(0x07e3) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xb818, 0xb818) AM_MIRROR(0x07e3) AM_WRITE(coin_count_0_w)	/* IOPC7 */
-	AM_RANGE(0xb81c, 0xb81c) AM_MIRROR(0x07e3) AM_WRITE(coin_count_1_w)	/* POUT1 */
+	AM_RANGE(0xb818, 0xb818) AM_MIRROR(0x07e3) AM_WRITE(coin_count_0_w) /* IOPC7 */
+	AM_RANGE(0xb81c, 0xb81c) AM_MIRROR(0x07e3) AM_WRITE(coin_count_1_w) /* POUT1 */
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(frogger_ppi8255_r, frogger_ppi8255_w)
 ADDRESS_MAP_END
 
@@ -1780,7 +1780,7 @@ static ADDRESS_MAP_START( frogger_sound_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-    AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_WRITE(konami_sound_filter_w)
+	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x1000) AM_WRITE(konami_sound_filter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( frogger_sound_portmap, AS_IO, 8, galaxian_state )
@@ -1793,7 +1793,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( konami_sound_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x6c00) AM_RAM
-    AM_RANGE(0x9000, 0x9fff) AM_MIRROR(0x6000) AM_WRITE(konami_sound_filter_w)
+	AM_RANGE(0x9000, 0x9fff) AM_MIRROR(0x6000) AM_WRITE(konami_sound_filter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konami_sound_portmap, AS_IO, 8, galaxian_state )
@@ -2023,7 +2023,7 @@ static const ay8910_interface checkmaj_ay8910_interface =
 static const discrete_mixer_desc konami_sound_mixer_desc =
 	{DISC_MIXER_IS_OP_AMP,
 		{RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-		{0,0,0,0,0,0},	/* no variable resistors   */
+		{0,0,0,0,0,0},  /* no variable resistors   */
 		{0,0,0,0,0,0},  /* no node capacitors      */
 		0, RES_K(2.2),
 		0,
@@ -2255,10 +2255,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( checkman, mooncrst )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", Z80, 1620000)	/* 1.62 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 1620000)  /* 1.62 MHz */
 	MCFG_CPU_PROGRAM_MAP(checkman_sound_map)
 	MCFG_CPU_IO_MAP(checkman_sound_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)	/* NMIs are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
@@ -2329,7 +2329,7 @@ static MACHINE_CONFIG_DERIVED( froggrmc, galaxian_base )
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mooncrst_map_base)		/* no discrete sound ! */
+	MCFG_CPU_PROGRAM_MAP(mooncrst_map_base)     /* no discrete sound ! */
 MACHINE_CONFIG_END
 
 
@@ -2536,39 +2536,39 @@ static void decode_mooncrst(running_machine &machine, int length, UINT8 *dest)
 static void decode_checkman(running_machine &machine)
 {
 	/*
-                             Encryption Table
-                             ----------------
-        +---+---+---+------+------+------+------+------+------+------+------+
-        |A2 |A1 |A0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0    |
-        +---+---+---+------+------+------+------+------+------+------+------+
-        | 0 | 0 | 0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0^^D6|
-        | 0 | 0 | 1 |D7    |D6    |D5    |D4    |D3    |D2    |D1^^D5|D0    |
-        | 0 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D4|D1^^D6|D0    |
-        | 0 | 1 | 1 |D7    |D6    |D5    |D4^^D2|D3    |D2    |D1    |D0^^D5|
-        | 1 | 0 | 0 |D7    |D6^^D4|D5^^D1|D4    |D3    |D2    |D1    |D0    |
-        | 1 | 0 | 1 |D7    |D6^^D0|D5^^D2|D4    |D3    |D2    |D1    |D0    |
-        | 1 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D0|D1    |D0    |
-        | 1 | 1 | 1 |D7    |D6    |D5    |D4^^D1|D3    |D2    |D1    |D0    |
-        +---+---+---+------+------+------+------+------+------+------+------+
+	                         Encryption Table
+	                         ----------------
+	    +---+---+---+------+------+------+------+------+------+------+------+
+	    |A2 |A1 |A0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0    |
+	    +---+---+---+------+------+------+------+------+------+------+------+
+	    | 0 | 0 | 0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0^^D6|
+	    | 0 | 0 | 1 |D7    |D6    |D5    |D4    |D3    |D2    |D1^^D5|D0    |
+	    | 0 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D4|D1^^D6|D0    |
+	    | 0 | 1 | 1 |D7    |D6    |D5    |D4^^D2|D3    |D2    |D1    |D0^^D5|
+	    | 1 | 0 | 0 |D7    |D6^^D4|D5^^D1|D4    |D3    |D2    |D1    |D0    |
+	    | 1 | 0 | 1 |D7    |D6^^D0|D5^^D2|D4    |D3    |D2    |D1    |D0    |
+	    | 1 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D0|D1    |D0    |
+	    | 1 | 1 | 1 |D7    |D6    |D5    |D4^^D1|D3    |D2    |D1    |D0    |
+	    +---+---+---+------+------+------+------+------+------+------+------+
 
-        For example if A2=1, A1=1 and A0=0 then D2 to the CPU would be an XOR of
-        D2 and D0 from the ROM's. Note that D7 and D3 are not encrypted.
+	    For example if A2=1, A1=1 and A0=0 then D2 to the CPU would be an XOR of
+	    D2 and D0 from the ROM's. Note that D7 and D3 are not encrypted.
 
-        Encryption PAL 16L8 on cardridge
-                 +--- ---+
-            OE --|   U   |-- VCC
-         ROMD0 --|       |-- D0
-         ROMD1 --|       |-- D1
-         ROMD2 --|VER 5.2|-- D2
-            A0 --|       |-- NOT USED
-            A1 --|       |-- A2
-         ROMD4 --|       |-- D4
-         ROMD5 --|       |-- D5
-         ROMD6 --|       |-- D6
-           GND --|       |-- M1 (NOT USED)
-                 +-------+
-        Pin layout is such that links can replace the PAL if encryption is not used.
-    */
+	    Encryption PAL 16L8 on cardridge
+	             +--- ---+
+	        OE --|   U   |-- VCC
+	     ROMD0 --|       |-- D0
+	     ROMD1 --|       |-- D1
+	     ROMD2 --|VER 5.2|-- D2
+	        A0 --|       |-- NOT USED
+	        A1 --|       |-- A2
+	     ROMD4 --|       |-- D4
+	     ROMD5 --|       |-- D5
+	     ROMD6 --|       |-- D6
+	       GND --|       |-- M1 (NOT USED)
+	             +-------+
+	    Pin layout is such that links can replace the PAL if encryption is not used.
+	*/
 	static const UINT8 xortable[8][4] =
 	{
 		{ 6,0,6,0 },
@@ -2957,7 +2957,7 @@ DRIVER_INIT_MEMBER(galaxian_state,tenspot)
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
-       which tenspot appears to have copied */
+	   which tenspot appears to have copied */
 
 	/* video extensions */
 	//common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
@@ -3007,7 +3007,7 @@ DRIVER_INIT_MEMBER(galaxian_state,zigzag)
 	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
-       the fixed area only extends to 0x1fff */
+	   the fixed area only extends to 0x1fff */
 	space.install_read_bank(0x0000, 0x1fff, "bank3");
 	membank("bank3")->set_base(memregion("maincpu")->base() + 0x0000);
 
@@ -3098,7 +3098,7 @@ DRIVER_INIT_MEMBER(galaxian_state,dingoe)
 	/* attach the sound command handler */
 	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, write8_delegate(FUNC(galaxian_state::checkman_sound_command_w),this));
 
-	space.install_read_handler(0x3001, 0x3001, read8_delegate(FUNC(galaxian_state::dingoe_3001_r),this));	/* Protection check */
+	space.install_read_handler(0x3001, 0x3001, read8_delegate(FUNC(galaxian_state::dingoe_3001_r),this));   /* Protection check */
 
 	/* decrypt program code */
 	decode_dingoe(machine());
@@ -3230,14 +3230,14 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 
 	/* decode code */
 	static const UINT16 lut_am_unscramble[32] = {
-		0, 2, 4, 6,	// ok!
-		7, 3, 5, 1,	// ok!
-		6, 0, 2, 4,	// ok!
-		1, 5, 3, 0,	// ok!
-		2, 4, 6, 3,	// good, good?, guess, guess
-		5, 6, 0, 2,	// good, good?, good?, guess
-		4, 1, 1, 5,	// good, good, guess, good
-		3, 7, 7, 7	// ok!
+		0, 2, 4, 6, // ok!
+		7, 3, 5, 1, // ok!
+		6, 0, 2, 4, // ok!
+		1, 5, 3, 0, // ok!
+		2, 4, 6, 3, // good, good?, guess, guess
+		5, 6, 0, 2, // good, good?, good?, guess
+		4, 1, 1, 5, // good, good, guess, good
+		3, 7, 7, 7  // ok!
 	};
 
 	UINT8* romdata = machine().root_device().memregion("maincpu")->base();

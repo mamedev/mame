@@ -30,9 +30,9 @@
 #include "hashfile.h"
 #include "includes/msx_slot.h"
 
-#define MSX_MAX_CARTS	(2)
+#define MSX_MAX_CARTS   (2)
 
-#define TC8521_TAG	"rtc"
+#define TC8521_TAG  "rtc"
 
 class msx_state : public driver_device
 {

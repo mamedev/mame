@@ -9,7 +9,7 @@
 #ifndef PCECOMMON_H
 #define PCECOMMON_H
 
-#define	PCE_MAIN_CLOCK		21477270
+#define PCE_MAIN_CLOCK      21477270
 
 class pce_common_state : public driver_device
 {
@@ -24,7 +24,7 @@ public:
 
 	virtual UINT8 joy_read();
 private:
-	UINT8 m_io_port_options;	/*driver-specific options for the PCE*/
+	UINT8 m_io_port_options;    /*driver-specific options for the PCE*/
 	int m_joystick_port_select; /* internal index of joystick ports */
 	int m_joystick_data_select; /* which nibble of joystick data we want */
 };

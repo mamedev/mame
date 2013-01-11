@@ -158,10 +158,10 @@ int driver_list::penalty_compare(const char *source, const char *target)
 
 driver_enumerator::driver_enumerator(emu_options &options)
 	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+		m_filtered_count(0),
+		m_options(options),
+		m_included(global_alloc_array(UINT8, s_driver_count)),
+		m_config(global_alloc_array_clear(machine_config *, s_driver_count))
 {
 	include_all();
 }
@@ -169,10 +169,10 @@ driver_enumerator::driver_enumerator(emu_options &options)
 
 driver_enumerator::driver_enumerator(emu_options &options, const char *string)
 	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+		m_filtered_count(0),
+		m_options(options),
+		m_included(global_alloc_array(UINT8, s_driver_count)),
+		m_config(global_alloc_array_clear(machine_config *, s_driver_count))
 {
 	filter(string);
 }
@@ -180,10 +180,10 @@ driver_enumerator::driver_enumerator(emu_options &options, const char *string)
 
 driver_enumerator::driver_enumerator(emu_options &options, const game_driver &driver)
 	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+		m_filtered_count(0),
+		m_options(options),
+		m_included(global_alloc_array(UINT8, s_driver_count)),
+		m_config(global_alloc_array_clear(machine_config *, s_driver_count))
 {
 	filter(driver);
 }
@@ -419,8 +419,8 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 
 driver_enumerator::config_entry::config_entry(machine_config &config, int index)
 	: m_next(NULL),
-	  m_config(&config),
-	  m_index(index)
+		m_config(&config),
+		m_index(index)
 {
 }
 

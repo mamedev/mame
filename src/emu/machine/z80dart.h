@@ -148,33 +148,33 @@
 
 struct z80dart_interface
 {
-	int m_rx_clock_a;			// channel A receive clock
-	int m_tx_clock_a;			// channel A transmit clock
-	int m_rx_clock_b;			// channel B receive clock
-	int m_tx_clock_b;			// channel B transmit clock
+	int m_rx_clock_a;           // channel A receive clock
+	int m_tx_clock_a;           // channel A transmit clock
+	int m_rx_clock_b;           // channel B receive clock
+	int m_tx_clock_b;           // channel B transmit clock
 
-	devcb_read_line		m_in_rxda_cb;
-	devcb_write_line	m_out_txda_cb;
-	devcb_write_line	m_out_dtra_cb;
-	devcb_write_line	m_out_rtsa_cb;
-	devcb_write_line	m_out_wrdya_cb;
-	devcb_write_line	m_out_synca_cb;
+	devcb_read_line     m_in_rxda_cb;
+	devcb_write_line    m_out_txda_cb;
+	devcb_write_line    m_out_dtra_cb;
+	devcb_write_line    m_out_rtsa_cb;
+	devcb_write_line    m_out_wrdya_cb;
+	devcb_write_line    m_out_synca_cb;
 
-	devcb_read_line		m_in_rxdb_cb;
-	devcb_write_line	m_out_txdb_cb;
-	devcb_write_line	m_out_dtrb_cb;
-	devcb_write_line	m_out_rtsb_cb;
-	devcb_write_line	m_out_wrdyb_cb;
-	devcb_write_line	m_out_syncb_cb;
+	devcb_read_line     m_in_rxdb_cb;
+	devcb_write_line    m_out_txdb_cb;
+	devcb_write_line    m_out_dtrb_cb;
+	devcb_write_line    m_out_rtsb_cb;
+	devcb_write_line    m_out_wrdyb_cb;
+	devcb_write_line    m_out_syncb_cb;
 
-	devcb_write_line	m_out_int_cb;
+	devcb_write_line    m_out_int_cb;
 };
 
 
 
 // ======================> z80dart_device
 
-class z80dart_device :	public device_t,
+class z80dart_device :  public device_t,
 						public device_z80daisy_interface,
 						public z80dart_interface
 {
@@ -265,64 +265,64 @@ private:
 		static TIMER_CALLBACK( static_txc_tick ) { reinterpret_cast<dart_channel *>(ptr)->tx_w(1); }
 
 		z80dart_device *m_device;
-		int	m_index;
+		int m_index;
 
-		devcb_resolved_read_line	m_in_rxd_func;
-		devcb_resolved_write_line	m_out_txd_func;
-		devcb_resolved_write_line	m_out_dtr_func;
-		devcb_resolved_write_line	m_out_rts_func;
-		devcb_resolved_write_line	m_out_wrdy_func;
-		devcb_resolved_write_line	m_out_sync_func;
+		devcb_resolved_read_line    m_in_rxd_func;
+		devcb_resolved_write_line   m_out_txd_func;
+		devcb_resolved_write_line   m_out_dtr_func;
+		devcb_resolved_write_line   m_out_rts_func;
+		devcb_resolved_write_line   m_out_wrdy_func;
+		devcb_resolved_write_line   m_out_sync_func;
 
 		// register state
-		UINT8 m_rr[3];				// read register
-		UINT8 m_wr[6];				// write register
+		UINT8 m_rr[3];              // read register
+		UINT8 m_wr[6];              // write register
 
 		// receiver state
-		UINT8 m_rx_data_fifo[3];	// receive data FIFO
-		UINT8 m_rx_error_fifo[3];	// receive error FIFO
-		UINT8 m_rx_shift;			// 8-bit receive shift register
-		UINT8 m_rx_error;			// current receive error
-		int m_rx_fifo;				// receive FIFO pointer
+		UINT8 m_rx_data_fifo[3];    // receive data FIFO
+		UINT8 m_rx_error_fifo[3];   // receive error FIFO
+		UINT8 m_rx_shift;           // 8-bit receive shift register
+		UINT8 m_rx_error;           // current receive error
+		int m_rx_fifo;              // receive FIFO pointer
 
-		int m_rx_clock;				// receive clock pulse count
-		int m_rx_state;				// receive state
-		int m_rx_bits;				// bits received
-		int m_rx_first;				// first character received
-		int m_rx_parity;			// received data parity
-		int m_rx_break;				// receive break condition
-		UINT8 m_rx_rr0_latch;		// read register 0 latched
+		int m_rx_clock;             // receive clock pulse count
+		int m_rx_state;             // receive state
+		int m_rx_bits;              // bits received
+		int m_rx_first;             // first character received
+		int m_rx_parity;            // received data parity
+		int m_rx_break;             // receive break condition
+		UINT8 m_rx_rr0_latch;       // read register 0 latched
 
-		int m_ri;					// ring indicator latch
-		int m_cts;					// clear to send latch
-		int m_dcd;					// data carrier detect latch
+		int m_ri;                   // ring indicator latch
+		int m_cts;                  // clear to send latch
+		int m_dcd;                  // data carrier detect latch
 
 		// transmitter state
-		UINT8 m_tx_data;			// transmit data register
-		UINT8 m_tx_shift;			// transmit shift register
+		UINT8 m_tx_data;            // transmit data register
+		UINT8 m_tx_shift;           // transmit shift register
 
-		int m_tx_clock;				// transmit clock pulse count
-		int m_tx_state;				// transmit state
-		int m_tx_bits;				// bits transmitted
-		int m_tx_parity;			// transmitted data parity
+		int m_tx_clock;             // transmit clock pulse count
+		int m_tx_state;             // transmit state
+		int m_tx_bits;              // bits transmitted
+		int m_tx_parity;            // transmitted data parity
 
-		int m_dtr;					// data terminal ready
-		int m_rts;					// request to send
+		int m_dtr;                  // data terminal ready
+		int m_rts;                  // request to send
 
 		// synchronous state
-		UINT16 m_sync;				// sync character
+		UINT16 m_sync;              // sync character
 	};
 
 	// internal state
-	devcb_resolved_write_line		m_out_int_func;
-	dart_channel					m_channel[2];		// channels
-	int 							m_int_state[8];		// interrupt state
+	devcb_resolved_write_line       m_out_int_func;
+	dart_channel                    m_channel[2];       // channels
+	int                             m_int_state[8];     // interrupt state
 
 	// timers
-	emu_timer *						m_rxca_timer;
-	emu_timer *						m_txca_timer;
-	emu_timer *						m_rxcb_timer;
-	emu_timer *						m_txcb_timer;
+	emu_timer *                     m_rxca_timer;
+	emu_timer *                     m_txca_timer;
+	emu_timer *                     m_rxcb_timer;
+	emu_timer *                     m_txcb_timer;
 };
 
 

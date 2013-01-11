@@ -92,9 +92,9 @@ static const UINT16 roc10937charset[]=
 	0x44FF, // 0100 0100 1111 1111 8.
 	0x44BF, // 0100 0100 1011 1111 9.
 	0x0021, // 0000 0000 0010 0001 -
-	        //                     -.
+			//                     -.
 	0x2001, // 0010 0000 0000 0001 -
-		    //                     /.
+			//                     /.
 	0x2430, // 0010 0100 0011 0000 <.
 	0x4430, // 0100 0100 0011 0000 =.
 	0x8830, // 1000 1000 0011 0000 >.
@@ -146,18 +146,18 @@ void rocvfd_t::static_set_zero(device_t &device, bool reversed)
 
 void rocvfd_t::device_start()
 {
-    save_item(NAME(m_port_val));
-    save_item(NAME(m_reversed));
-    save_item(NAME(m_cursor_pos));
+	save_item(NAME(m_port_val));
+	save_item(NAME(m_reversed));
+	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_size));
 	save_item(NAME(m_shift_count));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_pcursor_pos));
-    save_item(NAME(m_chars));
-    save_item(NAME(m_outputs));
-    save_item(NAME(m_brightness));
-    save_item(NAME(m_count));
-    save_item(NAME(m_duty));
+	save_item(NAME(m_chars));
+	save_item(NAME(m_outputs));
+	save_item(NAME(m_brightness));
+	save_item(NAME(m_count));
+	save_item(NAME(m_duty));
 	save_item(NAME(m_disp));
 
 
@@ -166,7 +166,7 @@ void rocvfd_t::device_start()
 
 void rocvfd_t::device_reset()
 {
-    m_cursor_pos = 0;
+	m_cursor_pos = 0;
 	m_window_size = 16;
 	m_shift_count = 0;
 	m_shift_data = 0;
@@ -174,10 +174,10 @@ void rocvfd_t::device_reset()
 	m_brightness =31;
 	m_count=0;
 	m_duty=31;
-    m_disp = 0;
+	m_disp = 0;
 
-    memset(m_chars, 0, sizeof(m_chars));
-    memset(m_outputs, 0, sizeof(m_outputs));
+	memset(m_chars, 0, sizeof(m_chars));
+	memset(m_outputs, 0, sizeof(m_outputs));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -365,4 +365,3 @@ void roc10957_t::write_char(int data)
 		}
 	}
 }
-

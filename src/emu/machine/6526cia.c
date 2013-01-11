@@ -17,31 +17,31 @@
 //**************************************************************************
 
 /* CIA registers */
-#define CIA_PRA			0
-#define CIA_PRB			1
-#define CIA_DDRA		2
-#define CIA_DDRB		3
-#define CIA_TALO		4
-#define CIA_TAHI		5
-#define CIA_TBLO		6
-#define CIA_TBHI		7
-#define CIA_TOD0		8		/* 6526: 1/10 seconds   8520: bits  0- 7 */
-#define CIA_TOD1		9		/* 6526: seconds        8520: bits  8-15 */
-#define CIA_TOD2		10		/* 6526: minutes        8520: bits 16-23 */
-#define CIA_TOD3		11		/* 6526: hours          8520: N/A */
-#define CIA_SDR			12
-#define CIA_ICR			13
-#define CIA_CRA			14
-#define CIA_CRB			15
+#define CIA_PRA         0
+#define CIA_PRB         1
+#define CIA_DDRA        2
+#define CIA_DDRB        3
+#define CIA_TALO        4
+#define CIA_TAHI        5
+#define CIA_TBLO        6
+#define CIA_TBHI        7
+#define CIA_TOD0        8       /* 6526: 1/10 seconds   8520: bits  0- 7 */
+#define CIA_TOD1        9       /* 6526: seconds        8520: bits  8-15 */
+#define CIA_TOD2        10      /* 6526: minutes        8520: bits 16-23 */
+#define CIA_TOD3        11      /* 6526: hours          8520: N/A */
+#define CIA_SDR         12
+#define CIA_ICR         13
+#define CIA_CRA         14
+#define CIA_CRB         15
 
-#define CIA_CRA_START	0x01
-#define	CIA_CRA_PBON	0x02
-#define	CIA_CRA_OUTMODE	0x04
-#define	CIA_CRA_RUNMODE	0x08
-#define	CIA_CRA_LOAD	0x10
-#define	CIA_CRA_INMODE	0x20
-#define	CIA_CRA_SPMODE	0x40
-#define	CIA_CRA_TODIN	0x80
+#define CIA_CRA_START   0x01
+#define CIA_CRA_PBON    0x02
+#define CIA_CRA_OUTMODE 0x04
+#define CIA_CRA_RUNMODE 0x08
+#define CIA_CRA_LOAD    0x10
+#define CIA_CRA_INMODE  0x20
+#define CIA_CRA_SPMODE  0x40
+#define CIA_CRA_TODIN   0x80
 
 
 
@@ -77,21 +77,21 @@ inline attotime legacy_mos6526_device::cycles_to_time(int c)
 //-------------------------------------------------
 
 legacy_mos6526_device::legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
 {
 }
 
 legacy_mos6526r1_device::legacy_mos6526r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : legacy_mos6526_device(mconfig, LEGACY_MOS6526R1, "MOS6526r1", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R1, "MOS6526r1", tag, owner, clock) { }
 
 legacy_mos6526r2_device::legacy_mos6526r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : legacy_mos6526_device(mconfig, LEGACY_MOS6526R2, "MOS6526r2", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R2, "MOS6526r2", tag, owner, clock) { }
 
 legacy_mos8520_device::legacy_mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : legacy_mos6526_device(mconfig, LEGACY_MOS8520, "LEGACY_MOS8520", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS8520, "LEGACY_MOS8520", tag, owner, clock) { }
 
 legacy_mos5710_device::legacy_mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : legacy_mos6526_device(mconfig, LEGACY_MOS5710, "LEGACY_MOS5710", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS5710, "LEGACY_MOS5710", tag, owner, clock) { }
 
 
 void legacy_mos6526_device::static_set_tod_clock(device_t &device, int tod_clock)
@@ -164,14 +164,14 @@ void legacy_mos6526_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
-    	memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
-    	memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
-    	memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-    	memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-    	memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-    	memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
+		memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
+		memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
+		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
+		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
+		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
+		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
 	}
 }
 
@@ -428,7 +428,7 @@ void legacy_mos6526_device::timer_underflow(int timer)
 
 TIMER_CALLBACK( legacy_mos6526_device::timer_proc )
 {
-    legacy_mos6526_device *cia = reinterpret_cast<legacy_mos6526_device *>(ptr);
+	legacy_mos6526_device *cia = reinterpret_cast<legacy_mos6526_device *>(ptr);
 
 	cia->timer_underflow(param);
 }
@@ -452,10 +452,10 @@ static UINT8 bcd_increment(UINT8 value)
 void legacy_mos6526_device::increment()
 {
 	/* break down TOD value into components */
-	UINT8 subsecond	= (UINT8) (m_tod >>  0);
-	UINT8 second	= (UINT8) (m_tod >>  8);
-	UINT8 minute	= (UINT8) (m_tod >> 16);
-	UINT8 hour		= (UINT8) (m_tod >> 24);
+	UINT8 subsecond = (UINT8) (m_tod >>  0);
+	UINT8 second    = (UINT8) (m_tod >>  8);
+	UINT8 minute    = (UINT8) (m_tod >> 16);
+	UINT8 hour      = (UINT8) (m_tod >> 24);
 
 	subsecond = bcd_increment(subsecond);
 	if (subsecond >= 0x10)
@@ -484,10 +484,10 @@ void legacy_mos6526_device::increment()
 	}
 
 	/* update the TOD with new value */
-	m_tod = (((UINT32) subsecond)	<<  0)
-		  | (((UINT32) second)		<<  8)
-		  | (((UINT32) minute)		<< 16)
-		  | (((UINT32) hour)		<< 24);
+	m_tod = (((UINT32) subsecond)   <<  0)
+			| (((UINT32) second)        <<  8)
+			| (((UINT32) minute)        << 16)
+			| (((UINT32) hour)      << 24);
 }
 
 /*-------------------------------------------------
@@ -501,7 +501,7 @@ void legacy_mos6526_device::clock_tod()
 		if ((type() == LEGACY_MOS6526R1) || (type() == LEGACY_MOS6526R2))
 		{
 			/* The 6526 split the value into hours, minutes, seconds and
-             * subseconds */
+			 * subseconds */
 			increment();
 		}
 		else if (type() == LEGACY_MOS8520)

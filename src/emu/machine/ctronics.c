@@ -19,9 +19,9 @@ const device_type CENTRONICS = &device_creator<centronics_device>;
 //-------------------------------------------------
 
 centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CENTRONICS, "Centronics", tag, owner, clock),
-	  device_slot_interface(mconfig, *this),
-	  m_dev(NULL)
+	: device_t(mconfig, CENTRONICS, "Centronics", tag, owner, clock),
+		device_slot_interface(mconfig, *this),
+		m_dev(NULL)
 {
 
 }
@@ -139,8 +139,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CENTRONICS_PRINTER, "Centronics Printer", tag, owner, clock),
-	  device_centronics_peripheral_interface( mconfig, *this )
+	: device_t(mconfig, CENTRONICS_PRINTER, "Centronics Printer", tag, owner, clock),
+		device_centronics_peripheral_interface( mconfig, *this )
 {
 }
 //-------------------------------------------------
@@ -169,13 +169,13 @@ WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
 
 static TIMER_CALLBACK( timer_ack_callback )
 {
-    centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
+	centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
 	printer->ack_callback(param);
 }
 
 static TIMER_CALLBACK( timer_busy_callback )
 {
-    centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
+	centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
 	printer->busy_callback(param);
 }
 

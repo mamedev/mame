@@ -264,9 +264,9 @@ READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
 	if (offset == 0)
 	{
 		/* bit 7: visible page
-         * bit 6: vblank
-         * other bits are inputs
-         */
+		 * bit 6: vblank
+		 * other bits are inputs
+		 */
 		res |= m_visible_page << 7;
 
 		if (m_vblank)
@@ -295,8 +295,8 @@ READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
 WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
 {
 	/* bit 0 = ROM bank
-       bit 2 = ROM or soundlatch
-     */
+	   bit 2 = ROM or soundlatch
+	 */
 	m_sndbank = data;
 }
 
@@ -342,25 +342,25 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 {
 
 	/* port C layout:
-       7 coin counter
-       6 to main CPU (data)
-       5 YM2203 write clock
-       4 YM2203 read clock
-       3 YM2203 address (0 = register select 1 = data)
-       2 to main CPU (status)
-       1 \ ROM bank
-       0 /
-      */
+	   7 coin counter
+	   6 to main CPU (data)
+	   5 YM2203 write clock
+	   4 YM2203 read clock
+	   3 YM2203 address (0 = register select 1 = data)
+	   2 to main CPU (status)
+	   1 \ ROM bank
+	   0 /
+	  */
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", space.device().safe_pc(), data, BIT(data, 2), BIT(data, 6));
 
 	membank("bank2")->set_entry(data & 0x03);
 
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
-	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))	/* write clock 1->0 */
+	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* write clock 1->0 */
 		ym2203_w(m_ym, space, BIT(data, 3), m_upd7807_porta);
 
-	if (BIT(m_upd7807_portc, 4) && !BIT(data, 4))	/* read clock 1->0 */
+	if (BIT(m_upd7807_portc, 4) && !BIT(data, 4))   /* read clock 1->0 */
 		m_upd7807_porta = ym2203_r(m_ym, space, BIT(data, 3));
 
 	m_upd7807_portc = data;
@@ -368,13 +368,13 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 
 READ8_MEMBER(homedata_state::reikaids_io_r)
 {
-	int res = ioport("IN2")->read();	// bit 4 = coin, bit 5 = service
+	int res = ioport("IN2")->read();    // bit 4 = coin, bit 5 = service
 
-	res |= BIT(m_upd7807_portc, 2) * 0x01;		// bit 0 = upd7807 status
-	res |= BIT(m_upd7807_portc, 6) * 0x02;		// bit 1 = upd7807 data
+	res |= BIT(m_upd7807_portc, 2) * 0x01;      // bit 0 = upd7807 status
+	res |= BIT(m_upd7807_portc, 6) * 0x02;      // bit 1 = upd7807 data
 	if (m_vblank)
-		res |= 0x04;				// bit 2 = vblank
-	res |= m_visible_page * 0x08;	// bit 3 = visible page
+		res |= 0x04;                // bit 2 = vblank
+	res |= m_visible_page * 0x08;   // bit 3 = visible page
 
 	m_vblank = 0;
 
@@ -419,9 +419,9 @@ READ8_MEMBER(homedata_state::pteacher_snd_r)
 READ8_MEMBER(homedata_state::pteacher_io_r)
 {
 	/* bit 6: !vblank
-     * bit 7: visible page
-     * other bits seem unused
-     */
+	 * bit 7: visible page
+	 * other bits seem unused
+	 */
 
 	int res = (m_visible_page ^ 1) << 7;
 
@@ -444,13 +444,13 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	{
 		/* player 1 + dip switches */
 		int row = (m_upd7807_porta & 0x07);
-		return ioport(keynames[row])->read() | (((dips >> row) & 1) << 5);	// 0-5
+		return ioport(keynames[row])->read() | (((dips >> row) & 1) << 5);  // 0-5
 	}
 	if (m_upd7807_porta & 0x08)
 	{
 		/* player 2 (not supported) + dip switches */
 		int row = ((m_upd7807_porta >> 4) & 0x07);
-		return 0xdf | (((dips >> (row + 5)) & 1) << 5);	// 6-11
+		return 0xdf | (((dips >> (row + 5)) & 1) << 5); // 6-11
 	}
 
 	return 0xff;
@@ -480,15 +480,15 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_porta_w)
 WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 {
 	/* port C layout:
-       7 coin counter
-       6 enable message from main CPU on port A
-       5 clock latch for 76489 command
-       4
-       3 \ ROM bank
-       2 /
-       1 input (service)
-       0 input (coin)
-      */
+	   7 coin counter
+	   6 enable message from main CPU on port A
+	   5 clock latch for 76489 command
+	   4
+	   3 \ ROM bank
+	   2 /
+	   1 input (service)
+	   0 input (coin)
+	  */
 
 	//  logerror("%04x: port C wr %02x\n", space.device().safe_pc(), data);
 
@@ -496,7 +496,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
-	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))	/* clock 1->0 */
+	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* clock 1->0 */
 		m_sn->write(space, 0, m_upd7807_porta);
 
 	m_upd7807_portc = data;
@@ -526,13 +526,13 @@ static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM /* hourouki expects this to act as RAM */
 	AM_RANGE(0x7800, 0x7800) AM_RAM /* only used to store the result of the ROM check */
-	AM_RANGE(0x7801, 0x7802) AM_READ(mrokumei_keyboard_r)	// also vblank and active page
-	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")			// coin, service
-	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")			// DSW1
-	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")			// DSW2
+	AM_RANGE(0x7801, 0x7802) AM_READ(mrokumei_keyboard_r)   // also vblank and active page
+	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")            // coin, service
+	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")           // DSW1
+	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")           // DSW2
 	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP // ??? read every vblank, value discarded
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w) // in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("snsnd", sn76489a_device, write)
@@ -543,7 +543,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrokumei_sound_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP	/* stack writes happen here, but there's no RAM */
+	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP    /* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
 ADDRESS_MAP_END
 
@@ -557,11 +557,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( reikaids_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM	/* work RAM */
-	AM_RANGE(0x7800, 0x7800) AM_RAM	/* behaves as normal RAM */
+	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work RAM */
+	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
-	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
+	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r) // coin, blitter, upd7807
 	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
 	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(reikaids_blitter_bank_w)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(reikaids_blitter_start_w)
@@ -574,8 +574,8 @@ static ADDRESS_MAP_START( reikaids_map, AS_PROGRAM, 8, homedata_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_map, AS_PROGRAM, 8, homedata_state )
-	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")	/* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
+	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
+	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_io_map, AS_IO, 8, homedata_state )
@@ -594,7 +594,7 @@ static ADDRESS_MAP_START( pteacher_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x5f00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
-	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r)	// vblank, visible page
+	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r) // vblank, visible page
 	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
 	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_SHARE("vreg")
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(pteacher_blitter_start_w)
@@ -609,8 +609,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
-	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")	/* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
+	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
+	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_io_map, AS_IO, 8, homedata_state )
@@ -680,7 +680,7 @@ static INPUT_PORTS_START( mjhokite )
 	PORT_DIPNAME( 0x02, 0x02, "Freeze?" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )	// doesn't work in all games
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )   // doesn't work in all games
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -729,7 +729,7 @@ static INPUT_PORTS_START( mjhokite )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( reikaids )
-	PORT_START("IN0")	// 0x7801
+	PORT_START("IN0")   // 0x7801
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
@@ -739,7 +739,7 @@ static INPUT_PORTS_START( reikaids )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* jump */
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("IN1")	// 0x7802
+	PORT_START("IN1")   // 0x7802
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
@@ -749,15 +749,15 @@ static INPUT_PORTS_START( reikaids )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* jump */
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2")	// 0x7803
+	PORT_START("IN2")   // 0x7803
 	PORT_BIT(  0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) /* coprocessor status */
 	PORT_BIT(  0x02, IP_ACTIVE_HIGH,IPT_SPECIAL ) /* coprocessor data */
 	PORT_BIT(  0x04, IP_ACTIVE_HIGH,IPT_SPECIAL ) /* vblank */
 	PORT_BIT(  0x08, IP_ACTIVE_HIGH,IPT_SPECIAL ) /* visible page */
-	PORT_BIT(  0x10, IP_ACTIVE_LOW,	IPT_COIN1    )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW,	IPT_SERVICE1 )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW,	IPT_UNKNOWN  )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW,	IPT_UNKNOWN  )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
@@ -862,7 +862,7 @@ static INPUT_PORTS_START( mj_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* dip switch (handled separately) */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* dip switch (handled separately) */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY1")
@@ -871,7 +871,7 @@ static INPUT_PORTS_START( mj_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* dip switch (handled separately) */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* dip switch (handled separately) */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY2")
@@ -880,7 +880,7 @@ static INPUT_PORTS_START( mj_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* dip switch (handled separately) */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* dip switch (handled separately) */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY3")
@@ -889,7 +889,7 @@ static INPUT_PORTS_START( mj_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* dip switch (handled separately) */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* dip switch (handled separately) */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY4")
@@ -898,7 +898,7 @@ static INPUT_PORTS_START( mj_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* dip switch (handled separately) */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* dip switch (handled separately) */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY5")
@@ -907,12 +907,12 @@ static INPUT_PORTS_START( mj_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* dip switch (handled separately) */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* dip switch (handled separately) */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pteacher )
-	PORT_START("DSW")	/* dip switches (handled by pteacher_keyboard_r) */
+	PORT_START("DSW")   /* dip switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -958,7 +958,7 @@ static INPUT_PORTS_START( pteacher )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jogakuen )
-	PORT_START("DSW")	/* dip switches (handled by pteacher_keyboard_r) */
+	PORT_START("DSW")   /* dip switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1004,7 +1004,7 @@ static INPUT_PORTS_START( jogakuen )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjikaga )
-	PORT_START("DSW")	/* dip switches (handled by pteacher_keyboard_r) */
+	PORT_START("DSW")   /* dip switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1135,7 +1135,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -1234,20 +1234,20 @@ MACHINE_RESET_MEMBER(homedata_state,reikaids)
 
 	MACHINE_RESET_CALL_MEMBER(homedata);
 
-	m_reikaids_which = m_priority;	// m_priority is set in DRIVER_INIT
+	m_reikaids_which = m_priority;  // m_priority is set in DRIVER_INIT
 	m_upd7807_porta = 0;
 	m_gfx_bank[0] = 0;
-	m_gfx_bank[1] = 0;	// this is not used by reikaids
+	m_gfx_bank[1] = 0;  // this is not used by reikaids
 }
 
 static MACHINE_CONFIG_START( mrokumei, homedata_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mrokumei_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mrokumei_sound_map)
 	MCFG_CPU_IO_MAP(mrokumei_sound_io_map)
 
@@ -1302,24 +1302,24 @@ static const ym2203_interface ym2203_config =
 static const UPD7810_CONFIG upd_config =
 {
 	TYPE_7810,
-	NULL	/* io_callback */
+	NULL    /* io_callback */
 };
 
 
 static MACHINE_CONFIG_START( reikaids, homedata_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(reikaids_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
+	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
 	MCFG_CPU_CONFIG(upd_config)
 	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
 	MCFG_CPU_IO_MAP(reikaids_upd7807_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	// very high interleave required to sync for startup tests
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) // very high interleave required to sync for startup tests
 
 	MCFG_MACHINE_START_OVERRIDE(homedata_state,reikaids)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,reikaids)
@@ -1359,17 +1359,17 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pteacher, homedata_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
 	MCFG_CPU_PROGRAM_MAP(pteacher_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)	/* 9MHz ? */
+	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
 	MCFG_CPU_CONFIG(upd_config)
 	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
 	MCFG_CPU_IO_MAP(pteacher_upd7807_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// should be enough
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // should be enough
 
 	MCFG_MACHINE_START_OVERRIDE(homedata_state,pteacher)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,pteacher)
@@ -1404,7 +1404,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjkinjas, pteacher )
 
 	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(11000000)	/* 11MHz ? */
+	MCFG_CPU_CLOCK(11000000)    /* 11MHz ? */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lemnangl, pteacher )
@@ -1522,16 +1522,16 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( mirderby, homedata_state )
 
-	MCFG_CPU_ADD("maincpu", M6809, 16000000/8)	/* 2 Mhz */
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/8)  /* 2 Mhz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu0", Z80, 16000000/4)	/* 4 Mhz */
+	MCFG_CPU_ADD("cpu0", Z80, 16000000/4)   /* 4 Mhz */
 	MCFG_DEVICE_DISABLE()
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
 
-	MCFG_CPU_ADD("cpu1", M6809, 16000000/8)	/* 2 Mhz */
+	MCFG_CPU_ADD("cpu1", M6809, 16000000/8) /* 2 Mhz */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_DEVICE_DISABLE()
 	//MCFG_CPU_VBLANK_INT("screen", mirderby_irq)
@@ -1570,7 +1570,7 @@ ROM_START( hourouki )
 	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x77f01.bin", 0x08000, 0x8000, CRC(cd3197b8) SHA1(7dad9ce57a83d675a8a9a4e06df360c22100fe4b) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "x77a10.bin", 0x00000, 0x20000, CRC(dc1d616b) SHA1(93b8dfe1566556e9621c0d5f3998b31874f74a28) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -1581,7 +1581,7 @@ ROM_START( hourouki )
 	ROM_LOAD( "x77a04.bin", 0x00000, 0x20000, CRC(fd348e59) SHA1(df0eb4d24e3e778e7a06b7fd7fa4e077fa0ebf82) )
 	ROM_LOAD( "x77a05.bin", 0x20000, 0x20000, CRC(3f76c8af) SHA1(2b41a9a06f8ccbb9f3879c742fa8af4424837fb2) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x77e06.bin", 0x00000, 0x8000, CRC(63607fe5) SHA1(50c756d741117bd0ea8a877bcb1f025e02cc6d29) )
 	ROM_LOAD16_BYTE( "x77e07.bin", 0x00001, 0x8000, CRC(79fcfc57) SHA1(4311a6bd8aa2dcad2b4fa5a9091c27dd74df62eb) )
 
@@ -1593,7 +1593,7 @@ ROM_START( mhgaiden )
 	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x72e01.bin", 0x08000, 0x8000, CRC(98cfa53e) SHA1(dd08f5f9ff9d4a9e01e531247fcb17a8407ca8b6) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "x72b10.bin", 0x00000, 0x20000, CRC(00ebbc45) SHA1(9e7ade202bf37a86153a38d705ae26a72732d2bb) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -1604,7 +1604,7 @@ ROM_START( mhgaiden )
 	ROM_LOAD( "x72b04.bin", 0x00000, 0x20000, CRC(37e3e779) SHA1(7011159dee2c643c3fd6ffbbd0849f63933279ad) )
 	ROM_LOAD( "x72b05.bin", 0x20000, 0x20000, CRC(aa5ce6f6) SHA1(d97b08fce68a69b1445d5ab28c0c97fabb5f264b) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x72c06.bin", 0x00000, 0x8000, CRC(b57fb589) SHA1(21b2fc33b9045a4ffa9e4b0bd598fd3416c0adbf) )
 	ROM_LOAD16_BYTE( "x72c07.bin", 0x00001, 0x8000, CRC(2aadb285) SHA1(90af8541092fbb116b6d6eaf1511b49a2f9bceaf) )
 
@@ -1616,7 +1616,7 @@ ROM_START( mjhokite )
 	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "a74_g01.6g", 0x08000, 0x8000, CRC(409cc501) SHA1(6e9ab81198a5a54489cca8b6dcafb67995351207) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "a74_a10.11k", 0x00000, 0x20000, CRC(2252f3ec) SHA1(018aaad087354b05b120aa42db572ed13f690f88) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 
@@ -1629,7 +1629,7 @@ ROM_START( mjhokite )
 	ROM_LOAD( "a74_a041.bin", 0x40000, 0x20000, CRC(c6a6407d) SHA1(7421f4ae8b2959d16114cadc9098156e5a97b36f) )
 	ROM_LOAD( "a74_a051.bin", 0x60000, 0x20000, CRC(74522b81) SHA1(6bd9655005f36887bec7c127f467e765447acd8f) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "a74_a06.1l", 0x00000, 0x8000, CRC(df057dd3) SHA1(0afae441b43a87e04511b8e652d2b03f48d8f705) )
 	ROM_LOAD16_BYTE( "a74_a07.1m", 0x00001, 0x8000, CRC(3c230167) SHA1(5d57f614bf07baa8b5c96f1d14241ff7c66806c1) )
 
@@ -1641,7 +1641,7 @@ ROM_START( mjclinic )
 	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x80_g01.6g", 0x08000, 0x8000, CRC(787b4fb5) SHA1(d1708979d209113b604f6d0973fe14a0c4348351) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "x80_a10.11k", 0x00000, 0x20000, CRC(afedbadf) SHA1(e2f101b59c0d23f9dc9b057c41d496fc3223cbb8) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 
@@ -1654,7 +1654,7 @@ ROM_START( mjclinic )
 	ROM_LOAD( "x80_a041.bin", 0x40000, 0x20000, CRC(f70bb001) SHA1(3b29bb0bd155e97d3ccc72a8a07046c676c8452d) )
 	ROM_LOAD( "x80_a051.bin", 0x60000, 0x20000, CRC(c7469cb8) SHA1(bcf7021667e943991865fdbc9620f00b09e1db3e) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x80_a06.1l", 0x00000, 0x8000, CRC(c1f9b2fb) SHA1(abe17e2b3b880f91564e32c246116c33e2884889) )
 	ROM_LOAD16_BYTE( "x80_a07.1m", 0x00001, 0x8000, CRC(e3120152) SHA1(b4a778a9b91e204e2c068dff9a40bd29eccf04a5) )
 
@@ -1666,7 +1666,7 @@ ROM_START( mrokumei )
 	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "m81d01.bin", 0x08000, 0x8000, CRC(6f81a78a) SHA1(5e16327b04b065ed4e39a147b18711902dba6384) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "m81a10.bin", 0x00000, 0x20000, CRC(0866b2d3) SHA1(37a726830476e372db906382e1d0601c461c7c10) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -1679,7 +1679,7 @@ ROM_START( mrokumei )
 	ROM_LOAD( "m81a41.bin", 0x40000, 0x20000, CRC(9332b879) SHA1(fc70a6acf816564c1c90c2f9aa644f702a38eae1) )
 	ROM_LOAD( "m81a51.bin", 0x60000, 0x20000, CRC(dda3ae30) SHA1(a0ba05cc46a4b2869ddf544c538e40a40f3babd5) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "m81b06.bin", 0x00000, 0x8000, CRC(96665d39) SHA1(9173791831555e69b8938d85340a08dd73012f8d) )
 	ROM_LOAD16_BYTE( "m81b07.bin", 0x00001, 0x8000, CRC(14f39690) SHA1(821f9de1b28b9d7844fc1b002c7ee3bbdda7f905) )
 
@@ -1712,7 +1712,7 @@ ROM_START( reikaids )
 	ROM_REGION( 0x080000, "gfx4", 0 )
 	ROM_LOAD( "x82a05.bin",  0x000000, 0x80000, CRC(fb65e0e0) SHA1(d560091cfad17af6539913db1279c62a680de4fc) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "e82a18.bin", 0x00000, 0x8000, CRC(1f52a7aa) SHA1(55bbba5bfad1eee4872939d23ac643aa3074b3cf) )
 	ROM_LOAD16_BYTE( "e82a17.bin", 0x00001, 0x8000, CRC(f91d77a1) SHA1(a650a68e7e75719819fd04dda86d7fc8849dfe7d) )
 
@@ -1720,7 +1720,7 @@ ROM_START( reikaids )
 	ROM_LOAD( "x82a02.bin", 0x00000, 0x040000, CRC(90fe700f) SHA1(bf7f9955a2cb1af43a272bf3366ff8c09ff6f7e6) )
 
 	ROM_REGION( 0x0100, "user2", 0 )
-	ROM_LOAD( "x82a19.bin", 0x0000, 0x0100, CRC(7ed947b4) SHA1(40c74a17976fab5d7f9da367083764934bb87281) )	// priority (not used)
+	ROM_LOAD( "x82a19.bin", 0x0000, 0x0100, CRC(7ed947b4) SHA1(40c74a17976fab5d7f9da367083764934bb87281) )  // priority (not used)
 ROM_END
 
 
@@ -1748,7 +1748,7 @@ ROM_START( battlcry )
 	ROM_REGION( 0x080000, "gfx4", 0 )
 	ROM_LOAD( "s88c05.e7",  0x000000, 0x80000, CRC(e7f13340) SHA1(05b0f3ca369c95d4fd50cd9617fc044ad7bdf0d3) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "s88b18.f10", 0x00000, 0x8000, CRC(fa432edc) SHA1(55c01b6a1175539facdfdd0c3c49d878a59156a4) )
 	ROM_LOAD16_BYTE( "s88b17.f9",  0x00001, 0x8000, CRC(7c55568e) SHA1(1e599cd00abe7b67bcb0c8d3f0c467a99ef79658) )
 
@@ -1756,7 +1756,7 @@ ROM_START( battlcry )
 	ROM_LOAD( "s88b02.f19", 0x00000, 0x040000, CRC(7044a542) SHA1(8efaa512f62fe9a37d2474c435c549118c019d67) )
 
 	ROM_REGION( 0x0100, "user2", 0 )
-	ROM_LOAD( "s88a19.l5", 0x0000, 0x0100, CRC(c8ead41e) SHA1(d1e733691de9f9b71c9724de73086d36f381fc74) )	// priority (not used)
+	ROM_LOAD( "s88a19.l5", 0x0000, 0x0100, CRC(c8ead41e) SHA1(d1e733691de9f9b71c9724de73086d36f381fc74) )   // priority (not used)
 ROM_END
 
 
@@ -1781,7 +1781,7 @@ ROM_START( mjkojink )
 	ROM_LOAD32_BYTE( "x83b12.4c",  2, 0x40000, CRC(2035009d) SHA1(8a2aadcc49ac7e68dfabe5ea66b607459a89045d) )
 	ROM_LOAD32_BYTE( "x83b13.6c",  3, 0x40000, CRC(53800df2) SHA1(5f18052a2d6afd27ff898ab597bb4e92fad238d7) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x83a19.4k", 0x00000, 0x8000, CRC(d29c9ef0) SHA1(c4e2c0c3c9c7abee1a965d6842956cdf98a76ad4) )
 	ROM_LOAD16_BYTE( "x83a18.3k", 0x00001, 0x8000, CRC(c3351952) SHA1(036be91ca428c5df016dd777bd658cb00f44ee3c) )
 
@@ -1809,7 +1809,7 @@ ROM_START( vitaminc )
 	ROM_LOAD32_BYTE( "x90a12.bin", 2, 0x40000, CRC(da6a65d1) SHA1(3ab3a9e9c76dfc02579bf2fc390c23d24fe5a901) )
 	ROM_LOAD32_BYTE( "x90a13.bin", 3, 0x40000, CRC(4da4553b) SHA1(da6fd2cfd5b027afe7e900f90128a25779acb15f) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x90b19.bin", 0x00000, 0x8000, CRC(d0022cfb) SHA1(f384964a09fe6c1f8a993f5da67d81a23df22879) )
 	ROM_LOAD16_BYTE( "x90b18.bin", 0x00001, 0x8000, CRC(fe1de95d) SHA1(e94282065b3c69de7c9ea214c752745c18c38cb7) )
 
@@ -1837,7 +1837,7 @@ ROM_START( mjyougo )
 	ROM_LOAD32_BYTE( "x91a12.bin", 2, 0x40000, CRC(149e8f86) SHA1(660c05deabb0ce43b2f5b936c035df1a2b029fc6) )
 	ROM_LOAD32_BYTE( "x91a13.bin", 3, 0x40000, CRC(59f7a140) SHA1(daad9433742b6292c8299935483f07f171436d17) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x91a19.bin", 0x00000, 0x8000, CRC(f63493df) SHA1(0e436bffb03fa6218363ee205c4fe5f4e16a24cc) )
 	ROM_LOAD16_BYTE( "x91a18.bin", 0x00001, 0x8000, CRC(b3541265) SHA1(d8e79c2856bb81e9ad9b79c012d64663a8997bbd) )
 
@@ -1865,7 +1865,7 @@ ROM_START( mjkinjas )
 	ROM_LOAD32_BYTE( "x07a12.bin", 2, 0x80000, CRC(911f0972) SHA1(90b511725de3a226326ddc39106071230f3d3bc6) )
 	ROM_LOAD32_BYTE( "x07a13.bin", 3, 0x80000, CRC(59be4c77) SHA1(1ba858c6b1e91753204e10738ca685a4df550d64) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x07a19.bin", 0x00000, 0x8000, CRC(7acabdf8) SHA1(90e39c1dd3e32c057ab8bfcd82d022231a06847c) )
 	ROM_LOAD16_BYTE( "x07a18.bin", 0x00001, 0x8000, CRC(d247bd5a) SHA1(298d62395ea7c687ed509863aaf3d8b758743cd8) )
 
@@ -1893,7 +1893,7 @@ ROM_START( jogakuen )
 	ROM_LOAD32_BYTE( "a12.bin",    2, 0x80000, CRC(5db85eb5) SHA1(01291b98676a8f5116739f66e517fe05f806514a) )
 	ROM_LOAD32_BYTE( "a13.bin",    3, 0x80000, CRC(fe04d5b7) SHA1(965c095ce4f8f494d91370fe798be9214c2195f2) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "a19.bin",    0x00000, 0x8000, CRC(9a3d9d5e) SHA1(1ab20fc5b7ab1c2508c76b0051923446c409e074) )
 	ROM_LOAD16_BYTE( "a18.bin",    0x00001, 0x8000, CRC(3289edd4) SHA1(7db4fbda8a22c64dc29ce6b4b63204cebd641351) )
 
@@ -1922,7 +1922,7 @@ ROM_START( lemnangl )
 	ROM_LOAD32_BYTE( "x02a12.4c",  2, 0x40000, CRC(fc3a254a) SHA1(bf8172c00446b348b4432c71d92e8567ba50ab98) )
 	ROM_LOAD32_BYTE( "x02a13.6c",  3, 0x40000, CRC(9f63e7e0) SHA1(4bd8077a3700ccbc4c4a358342b1f9fd4cba8f10) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "x02_b19.5k", 0x00000, 0x8000, CRC(f75959bc) SHA1(59a1debc28263a7f5f9b775817232fffc6e63ac4) )
 	ROM_LOAD16_BYTE( "x02_b18.3k", 0x00001, 0x8000, CRC(3f1510b1) SHA1(a9892beb3d911ee91d7dd276d9c84d14ba3253d8) )
 
@@ -1950,7 +1950,7 @@ ROM_START( mjikaga )
 	ROM_LOAD32_BYTE( "m15a12.bin", 2, 0x40000, CRC(946b3f55) SHA1(17451cbd7b0c828444aaf2ff170f3a7104596c1d) )
 	ROM_LOAD32_BYTE( "m15a13.bin", 3, 0x40000, CRC(d9196955) SHA1(fa8fddbcd91b12d6cb918c0761ea478969a5a795) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "m15a19.bin", 0x00000, 0x8000, CRC(2f247acf) SHA1(468fee5a16c98751524e21ad0f608fc85c95ab86) )
 	ROM_LOAD16_BYTE( "m15a18.bin", 0x00001, 0x8000, CRC(2648ca07) SHA1(e4f5ed62b014a6e397ce611c2c592f795d112219) )
 
@@ -1978,7 +1978,7 @@ ROM_START( mjprivat )
 	ROM_LOAD32_BYTE( "311a12.4c", 2, 0x40000, CRC(ab26bb73) SHA1(3645d3f6767b0bcb43ce2e3b2ef3bdca37d446cf) )
 	ROM_LOAD32_BYTE( "311a13.6c", 3, 0x40000, CRC(f2f8f9a0) SHA1(d6b5dd68c85f9d506147f5ffeb60bdfad2bf0195) )
 
-	ROM_REGION( 0x010000, "proms", 0 )	/* static palette */
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "311a19.4k", 0x00000, 0x8000, CRC(dbb5569a) SHA1(e23a32667adc8eade7555adbac18dac268f08d3e) )
 	ROM_LOAD16_BYTE( "311a18.3k", 0x00001, 0x8000, CRC(a5ca7723) SHA1(d074c5c09a50abdb2b0ffdeacfc077a91b9204bf) )
 
@@ -2014,8 +2014,8 @@ ROM_END
 DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 {
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
-       but with just these two addresses swapped. Instead of creating a new
-       MachineDriver, I just fix them here. */
+	   but with just these two addresses swapped. Instead of creating a new
+	   MachineDriver, I just fix them here. */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x8007, 0x8007, write8_delegate(FUNC(homedata_state::pteacher_blitter_bank_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }

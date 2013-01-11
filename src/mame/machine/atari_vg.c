@@ -16,8 +16,8 @@ const device_type ATARIVGEAROM = &device_creator<atari_vg_earom_device>;
 //-------------------------------------------------
 
 atari_vg_earom_device::atari_vg_earom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ATARIVGEAROM, "ATARI VG EAROM", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, ATARIVGEAROM, "ATARI VG EAROM", tag, owner, clock),
+		device_nvram_interface(mconfig, *this)
 {
 }
 
@@ -44,11 +44,11 @@ WRITE8_MEMBER( atari_vg_earom_device::ctrl_w )
 {
 	logerror("earom ctrl: %02x:%02x\n",offset, data);
 	/*
-        0x01 = clock
-        0x02 = set data latch? - writes only (not always)
-        0x04 = write mode? - writes only
-        0x08 = set addr latch?
-    */
+	    0x01 = clock
+	    0x02 = set data latch? - writes only (not always)
+	    0x04 = write mode? - writes only
+	    0x08 = set addr latch?
+	*/
 	if (data & 0x01)
 	{
 		m_data = m_rom[m_offset];
@@ -111,4 +111,3 @@ void atari_vg_earom_device::device_reset()
 	m_data = 0;
 	m_offset = 0;
 }
-

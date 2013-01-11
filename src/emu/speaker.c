@@ -49,9 +49,9 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 
-#define VPRINTF(x)		do { if (VERBOSE) mame_printf_debug x; } while (0)
+#define VPRINTF(x)      do { if (VERBOSE) mame_printf_debug x; } while (0)
 
 
 
@@ -74,15 +74,15 @@ const device_type SPEAKER = &device_creator<speaker_device>;
 
 speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_x(0.0),
-	  m_y(0.0),
-	  m_z(0.0)
+		device_mixer_interface(mconfig, *this),
+		m_x(0.0),
+		m_y(0.0),
+		m_z(0.0)
 #ifdef MAME_DEBUG
 	,
-	  m_max_sample(0),
-	  m_clipped_samples(0),
-	  m_total_samples(0)
+		m_max_sample(0),
+		m_clipped_samples(0),
+		m_total_samples(0)
 #endif
 {
 }

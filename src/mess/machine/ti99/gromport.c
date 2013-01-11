@@ -129,7 +129,7 @@
 #define GKRACKER_NVRAM_TAG "gkracker_nvram"
 
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:	bus8z_device(mconfig, GROMPORT, "Cartridge port", tag, owner, clock),
+	:   bus8z_device(mconfig, GROMPORT, "Cartridge port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_connector(NULL)
 {
@@ -665,7 +665,7 @@ enum
 #define GKSWITCH5_TAG "GKSWITCH5"
 
 gkracker_device::gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:	ti99_cartridge_connector_device(mconfig, GROMPORT_GK, "GRAMKracker", tag, owner, clock),
+	:   ti99_cartridge_connector_device(mconfig, GROMPORT_GK, "GRAMKracker", tag, owner, clock),
 		device_nvram_interface(mconfig, *this)
 {
 	m_shortname = "ti99_gkracker";
@@ -728,11 +728,11 @@ READ8Z_MEMBER(gkracker_device::readz)
 				// we need not access all slots.
 				if (guest_has_grom)
 				{
-					m_cartridge->readz(space, offset, value, mem_mask);	// read from guest
+					m_cartridge->readz(space, offset, value, mem_mask); // read from guest
 				}
 			}
 			if (!guest_has_grom && (m_gk_switch[1]==GK_NORMAL))
-				*value = m_ram_ptr[m_grom_address];	// use the GK memory
+				*value = m_ram_ptr[m_grom_address]; // use the GK memory
 		}
 
 		// The GK GROM emulation does not wrap at 8K boundaries.
@@ -938,7 +938,7 @@ void gkracker_device::nvram_default()
 	gk_install_menu("RAMS   OK", 9, 0x6040, 0x6060, 0x6100);
 	gk_install_menu("OPTION GRAMS OK", 15, 0x6020, 0x6040, 0x6100);
 
-	m_ram_ptr[0x6100] = 0x0b;		// GPL EXIT
+	m_ram_ptr[0x6100] = 0x0b;       // GPL EXIT
 }
 
 void gkracker_device::nvram_read(emu_file &file)
@@ -963,7 +963,7 @@ void gkracker_device::device_start()
 	m_ram_ptr = memregion(GKRACKER_NVRAM_TAG)->base();
 	m_grom_ptr = memregion(GKRACKER_ROM_TAG)->base();
 	m_cartridge = NULL;
-	m_grom_address = 0;	// for the GROM emulation
+	m_grom_address = 0; // for the GROM emulation
 	for (int i=1; i < 6; i++) m_gk_switch[i] = 0;
 	m_gromport = static_cast<gromport_device*>(owner());
 }
@@ -1077,7 +1077,7 @@ static const pcb_type sw_pcbdefs[] =
 };
 
 ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-:	bus8z_device(mconfig, TI99CART, "TI-99 cartridge", tag, owner, clock),
+:   bus8z_device(mconfig, TI99CART, "TI-99 cartridge", tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_pcb(NULL)
 {
@@ -1983,7 +1983,7 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 		crc = strtoul(crcstr, NULL, 16);
 		header = find_file(zip, file, crc);
 	}
-	if (header == NULL)	throw rpk_exception(RPK_INVALID_FILE_REF, "File not found or CRC check failed");
+	if (header == NULL) throw rpk_exception(RPK_INVALID_FILE_REF, "File not found or CRC check failed");
 
 	length = header->uncompressed_length;
 
@@ -2219,16 +2219,15 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	catch (rpk_exception &exp)
 	{
 		newrpk->close();
-		if (zipfile != NULL)		zip_file_close(zipfile);
-		if (layout_text != NULL)	free(layout_text);
+		if (zipfile != NULL)        zip_file_close(zipfile);
+		if (layout_text != NULL)    free(layout_text);
 
 		// rethrow the exception
 		throw exp;
 	}
 
-	if (zipfile != NULL)		zip_file_close(zipfile);
-	if (layout_text != NULL)	free(layout_text);
+	if (zipfile != NULL)        zip_file_close(zipfile);
+	if (layout_text != NULL)    free(layout_text);
 
 	return newrpk;
 }
-

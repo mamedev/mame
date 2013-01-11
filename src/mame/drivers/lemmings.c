@@ -215,7 +215,7 @@ static const gfx_layout charlayout =
 	2048,
 	4,
 	{ 4, 5, 6, 7 },
-    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	{ 0*0, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
 	8*64
 };
@@ -234,8 +234,8 @@ static const gfx_layout sprite_layout =
 };
 
 static GFXDECODE_START( lemmings )
-	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  0, 16 )	/* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  0, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
 	GFXDECODE_ENTRY( NULL,           0, charlayout,         0, 16 ) /* Dynamically modified */
 GFXDECODE_END
 
@@ -307,7 +307,7 @@ ROM_START( lemmings )
 	ROM_LOAD16_BYTE( "lemmings.8", 0xc0000, 0x20000, CRC(9166ce09) SHA1(7f0970cc07ebdbfc9a738342259d07d37b397161) )
 	ROM_LOAD16_BYTE( "lemmings.4", 0xc0001, 0x20000, CRC(aa845488) SHA1(d17ec80f43d2a0123e93fad83d4e1319eb18d7c7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "lemmings.15",    0x00000, 0x10000, CRC(f0b24a35) SHA1(1aaeb1e6faee04d2e433161fd7aa965b58e3b8a7) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
@@ -322,7 +322,7 @@ ROM_START( lemmings )
 	ROM_LOAD( "lemmings.14", 0x020000, 0x10000, CRC(c162788f) SHA1(e1f669efa59699cd1b7da71b112701ee79240c18) )
 	ROM_FILL(                0x030000, 0x10000, 0 ) /* 3bpp data but sprite chip expects 4 */
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "lemmings.16",    0x00000, 0x20000, CRC(f747847c) SHA1(00880fa6dff979e5d15daea61938bd18c768c92f) )
 ROM_END
 

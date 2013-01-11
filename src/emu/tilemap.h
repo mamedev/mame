@@ -332,35 +332,35 @@
 //**************************************************************************
 
 // maximum number of groups
-#define TILEMAP_NUM_GROUPS				256
+#define TILEMAP_NUM_GROUPS              256
 
 
 // these flags control tilemap_draw() behavior
-const UINT32 TILEMAP_DRAW_CATEGORY_MASK = 0x0f;		// specify the category to draw
-const UINT32 TILEMAP_DRAW_LAYER0 = 0x10;			// draw layer 0
-const UINT32 TILEMAP_DRAW_LAYER1 = 0x20;			// draw layer 1
-const UINT32 TILEMAP_DRAW_LAYER2 = 0x40;			// draw layer 2
-const UINT32 TILEMAP_DRAW_OPAQUE = 0x80;			// draw everything, even transparent stuff
-const UINT32 TILEMAP_DRAW_ALPHA_FLAG = 0x100;		// draw with alpha blending (in the upper 8 bits)
-const UINT32 TILEMAP_DRAW_ALL_CATEGORIES = 0x200;	// draw all categories
+const UINT32 TILEMAP_DRAW_CATEGORY_MASK = 0x0f;     // specify the category to draw
+const UINT32 TILEMAP_DRAW_LAYER0 = 0x10;            // draw layer 0
+const UINT32 TILEMAP_DRAW_LAYER1 = 0x20;            // draw layer 1
+const UINT32 TILEMAP_DRAW_LAYER2 = 0x40;            // draw layer 2
+const UINT32 TILEMAP_DRAW_OPAQUE = 0x80;            // draw everything, even transparent stuff
+const UINT32 TILEMAP_DRAW_ALPHA_FLAG = 0x100;       // draw with alpha blending (in the upper 8 bits)
+const UINT32 TILEMAP_DRAW_ALL_CATEGORIES = 0x200;   // draw all categories
 
 // per-pixel flags in the transparency_bitmap
-const UINT8 TILEMAP_PIXEL_CATEGORY_MASK = 0x0f;		// category is stored in the low 4 bits
-const UINT8 TILEMAP_PIXEL_TRANSPARENT = 0x00;		// transparent if in none of the layers below
-const UINT8 TILEMAP_PIXEL_LAYER0 = 0x10;			// pixel is opaque in layer 0
-const UINT8 TILEMAP_PIXEL_LAYER1 = 0x20;			// pixel is opaque in layer 1
-const UINT8 TILEMAP_PIXEL_LAYER2 = 0x40;			// pixel is opaque in layer 2
+const UINT8 TILEMAP_PIXEL_CATEGORY_MASK = 0x0f;     // category is stored in the low 4 bits
+const UINT8 TILEMAP_PIXEL_TRANSPARENT = 0x00;       // transparent if in none of the layers below
+const UINT8 TILEMAP_PIXEL_LAYER0 = 0x10;            // pixel is opaque in layer 0
+const UINT8 TILEMAP_PIXEL_LAYER1 = 0x20;            // pixel is opaque in layer 1
+const UINT8 TILEMAP_PIXEL_LAYER2 = 0x40;            // pixel is opaque in layer 2
 
 // per-tile flags, set by get_tile_info callback
-const UINT8 TILE_FLIPX = 0x01;						// draw this tile horizontally flipped
-const UINT8 TILE_FLIPY = 0x02;						// draw this tile vertically flipped
+const UINT8 TILE_FLIPX = 0x01;                      // draw this tile horizontally flipped
+const UINT8 TILE_FLIPY = 0x02;                      // draw this tile vertically flipped
 const UINT8 TILE_FORCE_LAYER0 = TILEMAP_PIXEL_LAYER0; // force all pixels to be layer 0 (no transparency)
 const UINT8 TILE_FORCE_LAYER1 = TILEMAP_PIXEL_LAYER1; // force all pixels to be layer 1 (no transparency)
 const UINT8 TILE_FORCE_LAYER2 = TILEMAP_PIXEL_LAYER2; // force all pixels to be layer 2 (no transparency)
 
 // tilemap global flags, used by tilemap_set_flip()
-const UINT32 TILEMAP_FLIPX = TILE_FLIPX;			// draw the tilemap horizontally flipped
-const UINT32 TILEMAP_FLIPY = TILE_FLIPY;			// draw the tilemap vertically flipped
+const UINT32 TILEMAP_FLIPX = TILE_FLIPX;            // draw the tilemap horizontally flipped
+const UINT32 TILEMAP_FLIPY = TILE_FLIPY;            // draw the tilemap vertically flipped
 
 // set this value for a scroll row/column to fully disable it
 const UINT32 TILE_LINE_DISABLED = 0x80000000;
@@ -397,14 +397,14 @@ typedef UINT32 tilemap_memory_index;
 // tile_data is filled in by the get_tile_info callback
 struct tile_data
 {
-	const UINT8 *	pen_data;		// required
-	const UINT8 *	mask_data;		// required
-	pen_t			palette_base;	// defaults to 0
-	UINT8			category;		// defaults to 0; range from 0..15
-	UINT8			group;			// defaults to 0; range from 0..TILEMAP_NUM_GROUPS
-	UINT8			flags;			// defaults to 0; one or more of TILE_* flags above
-	UINT8			pen_mask;		// defaults to 0xff; mask to apply to pen_data while rendering the tile
-	UINT8			gfxnum;			// defaults to 0xff; specify index of machine.gfx for auto-invalidation on dirty
+	const UINT8 *   pen_data;       // required
+	const UINT8 *   mask_data;      // required
+	pen_t           palette_base;   // defaults to 0
+	UINT8           category;       // defaults to 0; range from 0..15
+	UINT8           group;          // defaults to 0; range from 0..TILEMAP_NUM_GROUPS
+	UINT8           flags;          // defaults to 0; one or more of TILE_* flags above
+	UINT8           pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
+	UINT8           gfxnum;         // defaults to 0xff; specify index of machine.gfx for auto-invalidation on dirty
 
 	void set(running_machine &machine, int _gfxnum, int rawcode, int rawcolor, int _flags)
 	{
@@ -443,7 +443,7 @@ class tilemap_t
 
 	friend class tilemap_manager;
 	friend class simple_list<tilemap_t>;
-    friend resource_pool_object<tilemap_t>::~resource_pool_object();
+	friend resource_pool_object<tilemap_t>::~resource_pool_object();
 
 	// logical index
 	typedef UINT32 logical_index;
@@ -533,11 +533,11 @@ private:
 	// blitting parameters for rendering
 	struct blit_parameters
 	{
-		rectangle			cliprect;
-		UINT32				tilemap_priority_code;
-		UINT8				mask;
-		UINT8				value;
-		UINT8				alpha;
+		rectangle           cliprect;
+		UINT32              tilemap_priority_code;
+		UINT8               mask;
+		UINT8               value;
+		UINT8               alpha;
 	};
 
 	// inline helpers
@@ -573,56 +573,56 @@ private:
 	template<class _BitmapClass> void draw_roz_core(_BitmapClass &destbitmap, const blit_parameters &blit, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);
 
 	// basic tilemap metrics
-	tilemap_t *					m_next;					// pointer to next tilemap
-	UINT32						m_rows;					// number of tile rows
-	UINT32						m_cols;					// number of tile columns
-	UINT32						m_tilewidth;			// width of a single tile in pixels
-	UINT32						m_tileheight;			// height of a single tile in pixels
-	UINT32						m_width;				// width of the full tilemap in pixels
-	UINT32						m_height;				// height of the full tilemap in pixels
+	tilemap_t *                 m_next;                 // pointer to next tilemap
+	UINT32                      m_rows;                 // number of tile rows
+	UINT32                      m_cols;                 // number of tile columns
+	UINT32                      m_tilewidth;            // width of a single tile in pixels
+	UINT32                      m_tileheight;           // height of a single tile in pixels
+	UINT32                      m_width;                // width of the full tilemap in pixels
+	UINT32                      m_height;               // height of the full tilemap in pixels
 
 	// logical <-> memory mappings
-	tilemap_mapper_delegate		m_mapper;				// callback to map a row/column to a memory index
-	logical_index *				m_memory_to_logical;	// map from memory index to logical index
-	logical_index				m_max_logical_index;	// maximum valid logical index
-	tilemap_memory_index *		m_logical_to_memory;	// map from logical index to memory index
-	tilemap_memory_index		m_max_memory_index;		// maximum valid memory index
+	tilemap_mapper_delegate     m_mapper;               // callback to map a row/column to a memory index
+	logical_index *             m_memory_to_logical;    // map from memory index to logical index
+	logical_index               m_max_logical_index;    // maximum valid logical index
+	tilemap_memory_index *      m_logical_to_memory;    // map from logical index to memory index
+	tilemap_memory_index        m_max_memory_index;     // maximum valid memory index
 
 	// callback to interpret video RAM for the tilemap
-	tilemap_get_info_delegate	m_tile_get_info;		// callback to get information about a tile
-	tile_data					m_tileinfo;				// structure to hold the data for a tile
-	void *						m_user_data;			// user data value passed to the callback
+	tilemap_get_info_delegate   m_tile_get_info;        // callback to get information about a tile
+	tile_data                   m_tileinfo;             // structure to hold the data for a tile
+	void *                      m_user_data;            // user data value passed to the callback
 
 	// global tilemap states
-	bool						m_enable;				// true if we are enabled
-	UINT8						m_attributes;			// global attributes (flipx/y)
-	bool						m_all_tiles_dirty;		// true if all tiles are dirty
-	bool						m_all_tiles_clean;		// true if all tiles are clean
-	UINT32						m_palette_offset;		// palette offset
-	UINT32						m_pen_data_offset;		// pen data offset
-	UINT32						m_gfx_used;				// bitmask of gfx items used
-	UINT32						m_gfx_dirtyseq[MAX_GFX_ELEMENTS]; // dirtyseq values from last check
+	bool                        m_enable;               // true if we are enabled
+	UINT8                       m_attributes;           // global attributes (flipx/y)
+	bool                        m_all_tiles_dirty;      // true if all tiles are dirty
+	bool                        m_all_tiles_clean;      // true if all tiles are clean
+	UINT32                      m_palette_offset;       // palette offset
+	UINT32                      m_pen_data_offset;      // pen data offset
+	UINT32                      m_gfx_used;             // bitmask of gfx items used
+	UINT32                      m_gfx_dirtyseq[MAX_GFX_ELEMENTS]; // dirtyseq values from last check
 
 	// scroll information
-	UINT32						m_scrollrows;			// number of independently scrolled rows
-	UINT32						m_scrollcols;			// number of independently scrolled columns
-	INT32 *						m_rowscroll;			// array of rowscroll values
-	INT32 *						m_colscroll;			// array of colscroll values
-	INT32						m_dx;					// global horizontal scroll offset
-	INT32						m_dx_flipped;			// global horizontal scroll offset when flipped
-	INT32						m_dy;					// global vertical scroll offset
-	INT32						m_dy_flipped;			// global vertical scroll offset when flipped
+	UINT32                      m_scrollrows;           // number of independently scrolled rows
+	UINT32                      m_scrollcols;           // number of independently scrolled columns
+	INT32 *                     m_rowscroll;            // array of rowscroll values
+	INT32 *                     m_colscroll;            // array of colscroll values
+	INT32                       m_dx;                   // global horizontal scroll offset
+	INT32                       m_dx_flipped;           // global horizontal scroll offset when flipped
+	INT32                       m_dy;                   // global vertical scroll offset
+	INT32                       m_dy_flipped;           // global vertical scroll offset when flipped
 
 	// pixel data
-	bitmap_ind16				m_pixmap;				// cached pixel data
+	bitmap_ind16                m_pixmap;               // cached pixel data
 
 	// transparency mapping
-	bitmap_ind8					m_flagsmap;				// per-pixel flags
-	UINT8 *						m_tileflags;			// per-tile flags
-	UINT8						m_pen_to_flags[MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS];		// mapping of pens to flags
+	bitmap_ind8                 m_flagsmap;             // per-pixel flags
+	UINT8 *                     m_tileflags;            // per-tile flags
+	UINT8                       m_pen_to_flags[MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS];      // mapping of pens to flags
 
 private:
-	tilemap_manager &			m_manager;				// reference to the owning manager
+	tilemap_manager &           m_manager;              // reference to the owning manager
 };
 
 
@@ -657,9 +657,9 @@ private:
 	int alloc_instance() { return ++m_instance; }
 
 	// internal state
-	running_machine &		m_machine;
-	simple_list<tilemap_t>	m_tilemap_list;
-	int						m_instance;
+	running_machine &       m_machine;
+	simple_list<tilemap_t>  m_tilemap_list;
+	int                     m_instance;
 };
 
 
@@ -669,16 +669,16 @@ private:
 //**************************************************************************
 
 // macros to help form flags for tilemap_draw
-#define TILEMAP_DRAW_CATEGORY(x)		(x)		// specify category to draw
-#define TILEMAP_DRAW_ALPHA(x)			(TILEMAP_DRAW_ALPHA_FLAG | (rgb_clamp(x) << 24))
+#define TILEMAP_DRAW_CATEGORY(x)        (x)     // specify category to draw
+#define TILEMAP_DRAW_ALPHA(x)           (TILEMAP_DRAW_ALPHA_FLAG | (rgb_clamp(x) << 24))
 
 // function definition for a get info callback
-#define TILE_GET_INFO(_name)			void _name(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
-#define TILE_GET_INFO_MEMBER(_name)		void _name(tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
+#define TILE_GET_INFO(_name)            void _name(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
+#define TILE_GET_INFO_MEMBER(_name)     void _name(tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
 
 // function definition for a logical-to-memory mapper
-#define TILEMAP_MAPPER(_name)			tilemap_memory_index _name(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
-#define TILEMAP_MAPPER_MEMBER(_name)	tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+#define TILEMAP_MAPPER(_name)           tilemap_memory_index _name(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+#define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 
 // useful macro inside of a TILE_GET_INFO callback to set tile information
 #define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS)         tileinfo.set(machine, GFX, CODE, COLOR, FLAGS)
@@ -687,8 +687,8 @@ private:
 // Macros for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0
 //   TILE_FLIP_XY assumes that flipy is in bit 0 and flipx is in bit 1
-#define TILE_FLIPYX(YX)					((YX) & 3)
-#define TILE_FLIPXY(XY)					((((XY) & 2) >> 1) | (((XY) & 1) << 1))
+#define TILE_FLIPYX(YX)                 ((YX) & 3)
+#define TILE_FLIPXY(XY)                 ((((XY) & 2) >> 1) | (((XY) & 1) << 1))
 
 
 
@@ -717,4 +717,4 @@ inline running_machine &tilemap_t::machine() const
 }
 
 
-#endif	// __TILEMAP_H__
+#endif  // __TILEMAP_H__

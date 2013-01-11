@@ -65,7 +65,7 @@ class pda600_state : public driver_device
 public:
 	pda600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 		{}
 
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *		m_video_ram;
+	UINT8 *     m_video_ram;
 };
 
 
@@ -82,8 +82,8 @@ static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	//AM_RANGE(0x20000, 0x9ffff) AM_RAM // PCMCIA Card
-	AM_RANGE(0xa0000, 0xa7fff) AM_RAM	AM_REGION("videoram", 0)
-	AM_RANGE(0xe0000, 0xfffff) AM_RAM	AM_REGION("mainram", 0)		AM_SHARE("nvram")
+	AM_RANGE(0xa0000, 0xa7fff) AM_RAM   AM_REGION("videoram", 0)
+	AM_RANGE(0xe0000, 0xfffff) AM_RAM   AM_REGION("mainram", 0)     AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pda600_io, AS_IO, 8, pda600_state)

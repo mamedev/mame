@@ -14,13 +14,13 @@
 
 static const res_net_decode_info naughtyb_decode_info =
 {
-	2,		/*  two proms          */
-	0,		/*  start at 0         */
-	255,	/*  end at 255         */
+	2,      /*  two proms          */
+	0,      /*  start at 0         */
+	255,    /*  end at 255         */
 	/*  R,   G,   B,   R,   G,   B */
-	{   0,   0,   0, 256, 256, 256},		/*  offsets */
-	{   0,   2,   1,  -1,   1,   0},		/*  shifts */
-	{0x01,0x01,0x01,0x02,0x02,0x02}		    /*  masks */
+	{   0,   0,   0, 256, 256, 256},        /*  offsets */
+	{   0,   2,   1,  -1,   1,   0},        /*  shifts */
+	{0x01,0x01,0x01,0x02,0x02,0x02}         /*  masks */
 };
 
 static const res_net_info naughtyb_net_info =
@@ -116,10 +116,10 @@ WRITE8_MEMBER(naughtyb_state::naughtyb_videoreg_w)
 	pleiads_sound_control_c_w(machine().device("cust"),space,offset,data);
 
 	m_cocktail =
-		( ( ioport("DSW0")->read() & 0x80 ) &&	// cabinet == cocktail
-		  ( data & 0x01 ) );				// handling player 2
-	m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
-	m_bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
+		( ( ioport("DSW0")->read() & 0x80 ) &&  // cabinet == cocktail
+			( data & 0x01 ) );              // handling player 2
+	m_palreg  = (data >> 1) & 0x03;         // palette sel is bit 1 & 2
+	m_bankreg = (data >> 2) & 0x01;         // banksel is just bit 2
 }
 
 WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
@@ -128,10 +128,10 @@ WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
 	pleiads_sound_control_c_w(machine().device("cust"),space,offset,data);
 
 	m_cocktail =
-		( ( ioport("DSW0")->read() & 0x80 ) &&	// cabinet == cocktail
-		  ( data & 0x01 ) );				// handling player 2
-	m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
-	m_bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
+		( ( ioport("DSW0")->read() & 0x80 ) &&  // cabinet == cocktail
+			( data & 0x01 ) );              // handling player 2
+	m_palreg  = (data >> 1) & 0x03;         // palette sel is bit 1 & 2
+	m_bankreg = (data >> 3) & 0x01;         // banksel is just bit 3
 }
 
 

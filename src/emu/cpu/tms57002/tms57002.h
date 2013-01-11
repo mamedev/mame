@@ -220,4 +220,3 @@ enum {
 extern const device_type TMS57002;
 
 #endif
-

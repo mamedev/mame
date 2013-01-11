@@ -139,10 +139,10 @@ READ16_MEMBER(dblewing_state::dblewing_prot_r)
 		case 0x6d6: return m_boss_move;          // boss 1 2nd pilot
 		case 0x748: return m_boss_move;          // boss 1 3rd pilot
 
-		case 0x566: return 0x0009;  		   // boss BGM,might be a variable one (read->write to the sound latch)
+		case 0x566: return 0x0009;             // boss BGM,might be a variable one (read->write to the sound latch)
 		case 0x1ea: return m_boss_shoot_type;    // boss 1 shoot type
-		case 0x596: return m_boss_3_data;		   // boss 3 appearing
-		case 0x692:	return m_boss_4_data;
+		case 0x596: return m_boss_3_data;          // boss 3 appearing
+		case 0x692: return m_boss_4_data;
 		case 0x6b0: return m_boss_5_data;
 		case 0x51e: return m_boss_5sx_data;
 		case 0x784: return m_boss_6_data;
@@ -395,15 +395,15 @@ static const gfx_layout spritelayout =
 	{ 24,8,16,0 },
 	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
 	32*32
 };
 
 
 static GFXDECODE_START( dblewing )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )	/* Tiles (8x8) */
-	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )	/* Tiles (16x16) */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0x200, 32 )	/* Sprites (16x16) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0x200, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
 static INPUT_PORTS_START( dblewing )
@@ -432,7 +432,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")
-	 /* 16bit - These values are for Dip Switch #1 */
+		/* 16bit - These values are for Dip Switch #1 */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
@@ -550,7 +550,7 @@ static const deco16ic_interface dblewing_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f, 	/* trans masks (default values) */
+	0x0f, 0x0f,     /* trans masks (default values) */
 	0, 16, /* color base (default values) */
 	0x0f, 0x0f, /* color masks (default values) */
 	dblewing_bank_callback,
@@ -633,7 +633,7 @@ void dblewing_state::machine_reset()
 static MACHINE_CONFIG_START( dblewing, dblewing_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
+	MCFG_CPU_ADD("maincpu", M68000, 14000000)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(dblewing_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
 

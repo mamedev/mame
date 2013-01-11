@@ -103,13 +103,13 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		if (tokens->be)
 		{
 			//address = (UINT16)
-            pick_integer_be(line_header, 0, 2);
+			pick_integer_be(line_header, 0, 2);
 			line_number = (UINT16) pick_integer_be(line_header, 2, 2);
 		}
 		else
 		{
 			//address = (UINT16)
-            pick_integer_le(line_header, 0, 2);
+			pick_integer_le(line_header, 0, 2);
 			line_number = (UINT16) pick_integer_le(line_header, 2, 2);
 		}
 
@@ -359,452 +359,452 @@ done:
 
 static const char *const cocobas_statements[] =
 {
-	"FOR",		/* 0x80 */
-	"GO",		/* 0x81 */
-	"REM",		/* 0x82 */
-	"'",		/* 0x83 */
-	"ELSE",		/* 0x84 */
-	"IF",		/* 0x85 */
-	"DATA",		/* 0x86 */
-	"PRINT",	/* 0x87 */
-	"ON",		/* 0x88 */
-	"INPUT",	/* 0x89 */
-	"END",		/* 0x8a */
-	"NEXT",		/* 0x8b */
-	"DIM",		/* 0x8c */
-	"READ",		/* 0x8d */
-	"RUN",		/* 0x8e */
-	"RESTORE",	/* 0x8f */
-	"RETURN",	/* 0x90 */
-	"STOP",		/* 0x91 */
-	"POKE",		/* 0x92 */
-	"CONT",		/* 0x93 */
-	"LIST",		/* 0x94 */
-	"CLEAR",	/* 0x95 */
-	"NEW",		/* 0x96 */
-	"CLOAD",	/* 0x97 */
-	"CSAVE",	/* 0x98 */
-	"OPEN",		/* 0x99 */
-	"CLOSE",	/* 0x9a */
-	"LLIST",	/* 0x9b */
-	"SET",		/* 0x9c */
-	"RESET",	/* 0x9d */
-	"CLS",		/* 0x9e */
-	"MOTOR",	/* 0x9f */
-	"SOUND",	/* 0xa0 */
-	"AUDIO",	/* 0xa1 */
-	"EXEC",		/* 0xa2 */
-	"SKIPF",	/* 0xa3 */
-	"TAB(",		/* 0xa4 */
-	"TO",		/* 0xa5 */
-	"SUB",		/* 0xa6 */
-	"THEN",		/* 0xa7 */
-	"NOT",		/* 0xa8 */
-	"STEP",		/* 0xa9 */
-	"OFF",		/* 0xaa */
-	"+",		/* 0xab */
-	"-",		/* 0xac */
-	"*",		/* 0xad */
-	"/",		/* 0xae */
-	"^",		/* 0xaf */
-	"AND",		/* 0xb0 */
-	"OR",		/* 0xb1 */
-	">",		/* 0xb2 */
-	"=",		/* 0xb3 */
-	"<",		/* 0xb4 */
-	"DEL",		/* 0xb5 */
-	"EDIT",		/* 0xb6 */
-	"TRON",		/* 0xb7 */
-	"TROFF",	/* 0xb8 */
-	"DEF",		/* 0xb9 */
-	"LET",		/* 0xba */
-	"LINE",		/* 0xbb */
-	"PCLS",		/* 0xbc */
-	"PSET",		/* 0xbd */
-	"PRESET",	/* 0xbe */
-	"SCREEN",	/* 0xbf */
-	"PCLEAR",	/* 0xc0 */
-	"COLOR",	/* 0xc1 */
-	"CIRCLE",	/* 0xc2 */
-	"PAINT",	/* 0xc3 */
-	"GET",		/* 0xc4 */
-	"PUT",		/* 0xc5 */
-	"DRAW",		/* 0xc6 */
-	"PCOPY",	/* 0xc7 */
-	"PMODE",	/* 0xc8 */
-	"PLAY",		/* 0xc9 */
-	"DLOAD",	/* 0xca */
-	"RENUM",	/* 0xcb */
-	"FN",		/* 0xcc */
-	"USING",	/* 0xcd */
-	"DIR",		/* 0xce */
-	"DRIVE",	/* 0xcf */
-	"FIELD",	/* 0xd0 */
-	"FILES",	/* 0xd1 */
-	"KILL",		/* 0xd2 */
-	"LOAD",		/* 0xd3 */
-	"LSET",		/* 0xd4 */
-	"MERGE",	/* 0xd5 */
-	"RENAME",	/* 0xd6 */
-	"RSET",		/* 0xd7 */
-	"SAVE",		/* 0xd8 */
-	"WRITE",	/* 0xd9 */
-	"VERIFY",	/* 0xda */
-	"UNLOAD",	/* 0xdb */
-	"DSKINI",	/* 0xdc */
-	"BACKUP",	/* 0xdd */
-	"COPY",		/* 0xde */
-	"DSKI$",	/* 0xdf */
-	"DSKO$",	/* 0xe0 */
-	"DOS",		/* 0xe1 */
-	"WIDTH",	/* 0xe2 */
-	"PALETTE",	/* 0xe3 */
-	"HSCREEN",	/* 0xe4 */
-	"LPOKE",	/* 0xe5 */
-	"HCLS",		/* 0xe6 */
-	"HCOLOR",	/* 0xe7 */
-	"HPAINT",	/* 0xe8 */
-	"HCIRCLE",	/* 0xe9 */
-	"HLINE",	/* 0xea */
-	"HGET",		/* 0xeb */
-	"HPUT",		/* 0xec */
-	"HBUFF",	/* 0xed */
-	"HPRINT",	/* 0xee */
-	"ERR",		/* 0xef */
-	"BRK",		/* 0xf0 */
-	"LOCATE",	/* 0xf1 */
-	"HSTAT",	/* 0xf2 */
-	"HSET",		/* 0xf3 */
-	"HRESET",	/* 0xf4 */
-	"HDRAW",	/* 0xf5 */
-	"CMP",		/* 0xf6 */
-	"RGB",		/* 0xf7 */
-	"ATTR"		/* 0xf8 */
+	"FOR",      /* 0x80 */
+	"GO",       /* 0x81 */
+	"REM",      /* 0x82 */
+	"'",        /* 0x83 */
+	"ELSE",     /* 0x84 */
+	"IF",       /* 0x85 */
+	"DATA",     /* 0x86 */
+	"PRINT",    /* 0x87 */
+	"ON",       /* 0x88 */
+	"INPUT",    /* 0x89 */
+	"END",      /* 0x8a */
+	"NEXT",     /* 0x8b */
+	"DIM",      /* 0x8c */
+	"READ",     /* 0x8d */
+	"RUN",      /* 0x8e */
+	"RESTORE",  /* 0x8f */
+	"RETURN",   /* 0x90 */
+	"STOP",     /* 0x91 */
+	"POKE",     /* 0x92 */
+	"CONT",     /* 0x93 */
+	"LIST",     /* 0x94 */
+	"CLEAR",    /* 0x95 */
+	"NEW",      /* 0x96 */
+	"CLOAD",    /* 0x97 */
+	"CSAVE",    /* 0x98 */
+	"OPEN",     /* 0x99 */
+	"CLOSE",    /* 0x9a */
+	"LLIST",    /* 0x9b */
+	"SET",      /* 0x9c */
+	"RESET",    /* 0x9d */
+	"CLS",      /* 0x9e */
+	"MOTOR",    /* 0x9f */
+	"SOUND",    /* 0xa0 */
+	"AUDIO",    /* 0xa1 */
+	"EXEC",     /* 0xa2 */
+	"SKIPF",    /* 0xa3 */
+	"TAB(",     /* 0xa4 */
+	"TO",       /* 0xa5 */
+	"SUB",      /* 0xa6 */
+	"THEN",     /* 0xa7 */
+	"NOT",      /* 0xa8 */
+	"STEP",     /* 0xa9 */
+	"OFF",      /* 0xaa */
+	"+",        /* 0xab */
+	"-",        /* 0xac */
+	"*",        /* 0xad */
+	"/",        /* 0xae */
+	"^",        /* 0xaf */
+	"AND",      /* 0xb0 */
+	"OR",       /* 0xb1 */
+	">",        /* 0xb2 */
+	"=",        /* 0xb3 */
+	"<",        /* 0xb4 */
+	"DEL",      /* 0xb5 */
+	"EDIT",     /* 0xb6 */
+	"TRON",     /* 0xb7 */
+	"TROFF",    /* 0xb8 */
+	"DEF",      /* 0xb9 */
+	"LET",      /* 0xba */
+	"LINE",     /* 0xbb */
+	"PCLS",     /* 0xbc */
+	"PSET",     /* 0xbd */
+	"PRESET",   /* 0xbe */
+	"SCREEN",   /* 0xbf */
+	"PCLEAR",   /* 0xc0 */
+	"COLOR",    /* 0xc1 */
+	"CIRCLE",   /* 0xc2 */
+	"PAINT",    /* 0xc3 */
+	"GET",      /* 0xc4 */
+	"PUT",      /* 0xc5 */
+	"DRAW",     /* 0xc6 */
+	"PCOPY",    /* 0xc7 */
+	"PMODE",    /* 0xc8 */
+	"PLAY",     /* 0xc9 */
+	"DLOAD",    /* 0xca */
+	"RENUM",    /* 0xcb */
+	"FN",       /* 0xcc */
+	"USING",    /* 0xcd */
+	"DIR",      /* 0xce */
+	"DRIVE",    /* 0xcf */
+	"FIELD",    /* 0xd0 */
+	"FILES",    /* 0xd1 */
+	"KILL",     /* 0xd2 */
+	"LOAD",     /* 0xd3 */
+	"LSET",     /* 0xd4 */
+	"MERGE",    /* 0xd5 */
+	"RENAME",   /* 0xd6 */
+	"RSET",     /* 0xd7 */
+	"SAVE",     /* 0xd8 */
+	"WRITE",    /* 0xd9 */
+	"VERIFY",   /* 0xda */
+	"UNLOAD",   /* 0xdb */
+	"DSKINI",   /* 0xdc */
+	"BACKUP",   /* 0xdd */
+	"COPY",     /* 0xde */
+	"DSKI$",    /* 0xdf */
+	"DSKO$",    /* 0xe0 */
+	"DOS",      /* 0xe1 */
+	"WIDTH",    /* 0xe2 */
+	"PALETTE",  /* 0xe3 */
+	"HSCREEN",  /* 0xe4 */
+	"LPOKE",    /* 0xe5 */
+	"HCLS",     /* 0xe6 */
+	"HCOLOR",   /* 0xe7 */
+	"HPAINT",   /* 0xe8 */
+	"HCIRCLE",  /* 0xe9 */
+	"HLINE",    /* 0xea */
+	"HGET",     /* 0xeb */
+	"HPUT",     /* 0xec */
+	"HBUFF",    /* 0xed */
+	"HPRINT",   /* 0xee */
+	"ERR",      /* 0xef */
+	"BRK",      /* 0xf0 */
+	"LOCATE",   /* 0xf1 */
+	"HSTAT",    /* 0xf2 */
+	"HSET",     /* 0xf3 */
+	"HRESET",   /* 0xf4 */
+	"HDRAW",    /* 0xf5 */
+	"CMP",      /* 0xf6 */
+	"RGB",      /* 0xf7 */
+	"ATTR"      /* 0xf8 */
 };
 
 static const char *const cocobas_functions[] =
 {
-	"SGN",		/* 0xff80 */
-	"INT",		/* 0xff81 */
-	"ABS",		/* 0xff82 */
-	"USR",		/* 0xff83 */
-	"RND",		/* 0xff84 */
-	"SIN",		/* 0xff85 */
-	"PEEK",		/* 0xff86 */
-	"LEN",		/* 0xff87 */
-	"STR$",		/* 0xff88 */
-	"VAL",		/* 0xff89 */
-	"ASC",		/* 0xff8a */
-	"CHR$",		/* 0xff8b */
-	"EOF",		/* 0xff8c */
-	"JOYSTK",	/* 0xff8d */
-	"LEFT$",	/* 0xff8e */
-	"RIGHT$",	/* 0xff8f */
-	"MID$",		/* 0xff90 */
-	"POINT",	/* 0xff91 */
-	"INKEY$",	/* 0xff92 */
-	"MEM",		/* 0xff93 */
-	"ATN",		/* 0xff94 */
-	"COS",		/* 0xff95 */
-	"TAN",		/* 0xff96 */
-	"EXP",		/* 0xff97 */
-	"FIX",		/* 0xff98 */
-	"LOG",		/* 0xff99 */
-	"POS",		/* 0xff9a */
-	"SQR",		/* 0xff9b */
-	"HEX$",		/* 0xff9c */
-	"VARPTR",	/* 0xff9d */
-	"INSTR",	/* 0xff9e */
-	"TIMER",	/* 0xff9f */
-	"PPOINT",	/* 0xffa0 */
-	"STRING$",	/* 0xffa1 */
-	"CVN",		/* 0xffa2 */
-	"FREE",		/* 0xffa3 */
-	"LOC",		/* 0xffa4 */
-	"LOF",		/* 0xffa5 */
-	"MKN$",		/* 0xffa6 */
-	"AS",		/* 0xffa7 */
-	"LPEEK",	/* 0xffa8 */
-	"BUTTON",	/* 0xffa9 */
-	"HPOINT",	/* 0xffaa */
-	"ERNO",		/* 0xffab */
-	"ERLIN"		/* 0xffac */
+	"SGN",      /* 0xff80 */
+	"INT",      /* 0xff81 */
+	"ABS",      /* 0xff82 */
+	"USR",      /* 0xff83 */
+	"RND",      /* 0xff84 */
+	"SIN",      /* 0xff85 */
+	"PEEK",     /* 0xff86 */
+	"LEN",      /* 0xff87 */
+	"STR$",     /* 0xff88 */
+	"VAL",      /* 0xff89 */
+	"ASC",      /* 0xff8a */
+	"CHR$",     /* 0xff8b */
+	"EOF",      /* 0xff8c */
+	"JOYSTK",   /* 0xff8d */
+	"LEFT$",    /* 0xff8e */
+	"RIGHT$",   /* 0xff8f */
+	"MID$",     /* 0xff90 */
+	"POINT",    /* 0xff91 */
+	"INKEY$",   /* 0xff92 */
+	"MEM",      /* 0xff93 */
+	"ATN",      /* 0xff94 */
+	"COS",      /* 0xff95 */
+	"TAN",      /* 0xff96 */
+	"EXP",      /* 0xff97 */
+	"FIX",      /* 0xff98 */
+	"LOG",      /* 0xff99 */
+	"POS",      /* 0xff9a */
+	"SQR",      /* 0xff9b */
+	"HEX$",     /* 0xff9c */
+	"VARPTR",   /* 0xff9d */
+	"INSTR",    /* 0xff9e */
+	"TIMER",    /* 0xff9f */
+	"PPOINT",   /* 0xffa0 */
+	"STRING$",  /* 0xffa1 */
+	"CVN",      /* 0xffa2 */
+	"FREE",     /* 0xffa3 */
+	"LOC",      /* 0xffa4 */
+	"LOF",      /* 0xffa5 */
+	"MKN$",     /* 0xffa6 */
+	"AS",       /* 0xffa7 */
+	"LPEEK",    /* 0xffa8 */
+	"BUTTON",   /* 0xffa9 */
+	"HPOINT",   /* 0xffaa */
+	"ERNO",     /* 0xffab */
+	"ERLIN"     /* 0xffac */
 };
 
 static const char *const dragonbas_statements[] =
 {
-	"FOR",		/* 0x80 */
-	"GO",		/* 0x81 */
-	"REM",		/* 0x82 */
-	"'",		/* 0x83 */
-	"ELSE",		/* 0x84 */
-	"IF",		/* 0x85 */
-	"DATA",		/* 0x86 */
-	"PRINT",	/* 0x87 */
-	"ON",		/* 0x88 */
-	"INPUT",	/* 0x89 */
-	"END",		/* 0x8a */
-	"NEXT",		/* 0x8b */
-	"DIM",		/* 0x8c */
-	"READ",		/* 0x8d */
-	"LET",		/* 0x8e */
-	"RUN",		/* 0x8f */
-	"RESTORE",	/* 0x90 */
-	"RETURN",	/* 0x91 */
-	"STOP",		/* 0x92 */
-	"POKE",		/* 0x93 */
-	"CONT",		/* 0x94 */
-	"LIST",		/* 0x95 */
-	"CLEAR",	/* 0x96 */
-	"NEW",		/* 0x97 */
-	"DEF",		/* 0x98 */
-	"CLOAD",	/* 0x99 */
-	"CSAVE",	/* 0x9a */
-	"OPEN",		/* 0x9b */
-	"CLOSE",	/* 0x9c */
-	"LLIST",	/* 0x9d */
-	"SET",		/* 0x9e */
-	"RESET",	/* 0x9f */
-	"CLS",		/* 0xa0 */
-	"MOTOR",	/* 0xa1 */
-	"SOUND",	/* 0xa2 */
-	"AUDIO",	/* 0xa3 */
-	"EXEC",		/* 0xa4 */
-	"SKIPF",	/* 0xa5 */
-	"DEL",		/* 0xa6 */
-	"EDIT",		/* 0xa7 */
-	"TRON",		/* 0xa8 */
-	"TROFF",	/* 0xa9 */
-	"LINE",		/* 0xaa */
-	"PCLS",		/* 0xab */
-	"PSET",		/* 0xac */
-	"PRESET",	/* 0xad */
-	"SCREEN",	/* 0xae */
-	"PCLEAR",	/* 0xaf */
-	"COLOR",	/* 0xb0 */
-	"CIRCLE",	/* 0xb1 */
-	"PAINT",	/* 0xb2 */
-	"GET",		/* 0xb3 */
-	"PUT",		/* 0xb4 */
-	"DRAW",		/* 0xb5 */
-	"PCOPY",	/* 0xb6 */
-	"PMODE",	/* 0xb7 */
-	"PLAY",		/* 0xb8 */
-	"DLOAD",	/* 0xb9 */
-	"RENUM",	/* 0xba */
-	"TAB(",		/* 0xbb */
-	"TO",		/* 0xbc */
-	"SUB",		/* 0xbd */
-	"FN",		/* 0xbe */
-	"THEN",		/* 0xbf */
-	"NOT",		/* 0xc0 */
-	"STEP",		/* 0xc1 */
-	"OFF",		/* 0xc2 */
-	"+",		/* 0xc3 */
-	"-",		/* 0xc4 */
-	"*",		/* 0xc5 */
-	"/",		/* 0xc6 */
-	"^",		/* 0xc7 */
-	"AND",		/* 0xc8 */
-	"OR",		/* 0xc9 */
-	">",		/* 0xca */
-	"=",		/* 0xcb */
-	"<",		/* 0xcc */
-	"USING",	/* 0xcd */
-	"DIR",		/* 0xce */
-	"DRIVE",	/* 0xcf */
-	"FIELD",	/* 0xd0 */
-	"FILES",	/* 0xd1 */
-	"KILL",		/* 0xd2 */
-	"LOAD",		/* 0xd3 */
-	"LSET",		/* 0xd4 */
-	"MERGE",	/* 0xd5 */
-	"RENAME",	/* 0xd6 */
-	"RSET",		/* 0xd7 */
-	"SAVE",		/* 0xd8 */
-	"WRITE",	/* 0xd9 */
-	"VERIFY",	/* 0xda */
-	"UNLOAD",	/* 0xdb */
-	"DSKINI",	/* 0xdc */
-	"BACKUP",	/* 0xdd */
-	"COPY",		/* 0xde */
-	"DSKI$",	/* 0xdf */
-	"DSKO$"		/* 0xe0 */
+	"FOR",      /* 0x80 */
+	"GO",       /* 0x81 */
+	"REM",      /* 0x82 */
+	"'",        /* 0x83 */
+	"ELSE",     /* 0x84 */
+	"IF",       /* 0x85 */
+	"DATA",     /* 0x86 */
+	"PRINT",    /* 0x87 */
+	"ON",       /* 0x88 */
+	"INPUT",    /* 0x89 */
+	"END",      /* 0x8a */
+	"NEXT",     /* 0x8b */
+	"DIM",      /* 0x8c */
+	"READ",     /* 0x8d */
+	"LET",      /* 0x8e */
+	"RUN",      /* 0x8f */
+	"RESTORE",  /* 0x90 */
+	"RETURN",   /* 0x91 */
+	"STOP",     /* 0x92 */
+	"POKE",     /* 0x93 */
+	"CONT",     /* 0x94 */
+	"LIST",     /* 0x95 */
+	"CLEAR",    /* 0x96 */
+	"NEW",      /* 0x97 */
+	"DEF",      /* 0x98 */
+	"CLOAD",    /* 0x99 */
+	"CSAVE",    /* 0x9a */
+	"OPEN",     /* 0x9b */
+	"CLOSE",    /* 0x9c */
+	"LLIST",    /* 0x9d */
+	"SET",      /* 0x9e */
+	"RESET",    /* 0x9f */
+	"CLS",      /* 0xa0 */
+	"MOTOR",    /* 0xa1 */
+	"SOUND",    /* 0xa2 */
+	"AUDIO",    /* 0xa3 */
+	"EXEC",     /* 0xa4 */
+	"SKIPF",    /* 0xa5 */
+	"DEL",      /* 0xa6 */
+	"EDIT",     /* 0xa7 */
+	"TRON",     /* 0xa8 */
+	"TROFF",    /* 0xa9 */
+	"LINE",     /* 0xaa */
+	"PCLS",     /* 0xab */
+	"PSET",     /* 0xac */
+	"PRESET",   /* 0xad */
+	"SCREEN",   /* 0xae */
+	"PCLEAR",   /* 0xaf */
+	"COLOR",    /* 0xb0 */
+	"CIRCLE",   /* 0xb1 */
+	"PAINT",    /* 0xb2 */
+	"GET",      /* 0xb3 */
+	"PUT",      /* 0xb4 */
+	"DRAW",     /* 0xb5 */
+	"PCOPY",    /* 0xb6 */
+	"PMODE",    /* 0xb7 */
+	"PLAY",     /* 0xb8 */
+	"DLOAD",    /* 0xb9 */
+	"RENUM",    /* 0xba */
+	"TAB(",     /* 0xbb */
+	"TO",       /* 0xbc */
+	"SUB",      /* 0xbd */
+	"FN",       /* 0xbe */
+	"THEN",     /* 0xbf */
+	"NOT",      /* 0xc0 */
+	"STEP",     /* 0xc1 */
+	"OFF",      /* 0xc2 */
+	"+",        /* 0xc3 */
+	"-",        /* 0xc4 */
+	"*",        /* 0xc5 */
+	"/",        /* 0xc6 */
+	"^",        /* 0xc7 */
+	"AND",      /* 0xc8 */
+	"OR",       /* 0xc9 */
+	">",        /* 0xca */
+	"=",        /* 0xcb */
+	"<",        /* 0xcc */
+	"USING",    /* 0xcd */
+	"DIR",      /* 0xce */
+	"DRIVE",    /* 0xcf */
+	"FIELD",    /* 0xd0 */
+	"FILES",    /* 0xd1 */
+	"KILL",     /* 0xd2 */
+	"LOAD",     /* 0xd3 */
+	"LSET",     /* 0xd4 */
+	"MERGE",    /* 0xd5 */
+	"RENAME",   /* 0xd6 */
+	"RSET",     /* 0xd7 */
+	"SAVE",     /* 0xd8 */
+	"WRITE",    /* 0xd9 */
+	"VERIFY",   /* 0xda */
+	"UNLOAD",   /* 0xdb */
+	"DSKINI",   /* 0xdc */
+	"BACKUP",   /* 0xdd */
+	"COPY",     /* 0xde */
+	"DSKI$",    /* 0xdf */
+	"DSKO$"     /* 0xe0 */
 };
 
 static const char *const dragonbas_functions[] =
 {
-	"SGN",		/* 0xff80 */
-	"INT",		/* 0xff81 */
-	"ABS",		/* 0xff82 */
-	"POS",		/* 0xff83 */
-	"RND",		/* 0xff84 */
-	"SQR",		/* 0xff85 */
-	"LOG",		/* 0xff86 */
-	"EXP",		/* 0xff87 */
-	"SIN",		/* 0xff88 */
-	"COS",		/* 0xff89 */
-	"TAN",		/* 0xff8a */
-	"ATN",		/* 0xff8b */
-	"PEEK",		/* 0xff8c */
-	"LEN",		/* 0xff8d */
-	"STR$",		/* 0xff8e */
-	"VAL",		/* 0xff8f */
-	"ASC",		/* 0xff90 */
-	"CHR$",		/* 0xff91 */
-	"EOF",		/* 0xff92 */
-	"JOYSTK",	/* 0xff93 */
-	"FIX",		/* 0xff94 */
-	"HEX$",		/* 0xff95 */
-	"LEFT$",	/* 0xff96 */
-	"RIGHT$",	/* 0xff97 */
-	"MID$",		/* 0xff98 */
-	"POINT",	/* 0xff99 */
-	"INKEY$",	/* 0xff9a */
-	"MEM",		/* 0xff9b */
-	"VARPTR",	/* 0xff9c */
-	"INSTR",	/* 0xff9d */
-	"TIMER",	/* 0xff9e */
-	"PPOINT",	/* 0xff9f */
-	"STRING$",	/* 0xffa0 */
-	"USR"		/* 0xffa1 */
-	"CVN",		/* 0xffa2 */
-	"FREE",		/* 0xffa3 */
-	"LOC",		/* 0xffa4 */
-	"LOF",		/* 0xffa5 */
-	"MKN$"		/* 0xffa6 */
+	"SGN",      /* 0xff80 */
+	"INT",      /* 0xff81 */
+	"ABS",      /* 0xff82 */
+	"POS",      /* 0xff83 */
+	"RND",      /* 0xff84 */
+	"SQR",      /* 0xff85 */
+	"LOG",      /* 0xff86 */
+	"EXP",      /* 0xff87 */
+	"SIN",      /* 0xff88 */
+	"COS",      /* 0xff89 */
+	"TAN",      /* 0xff8a */
+	"ATN",      /* 0xff8b */
+	"PEEK",     /* 0xff8c */
+	"LEN",      /* 0xff8d */
+	"STR$",     /* 0xff8e */
+	"VAL",      /* 0xff8f */
+	"ASC",      /* 0xff90 */
+	"CHR$",     /* 0xff91 */
+	"EOF",      /* 0xff92 */
+	"JOYSTK",   /* 0xff93 */
+	"FIX",      /* 0xff94 */
+	"HEX$",     /* 0xff95 */
+	"LEFT$",    /* 0xff96 */
+	"RIGHT$",   /* 0xff97 */
+	"MID$",     /* 0xff98 */
+	"POINT",    /* 0xff99 */
+	"INKEY$",   /* 0xff9a */
+	"MEM",      /* 0xff9b */
+	"VARPTR",   /* 0xff9c */
+	"INSTR",    /* 0xff9d */
+	"TIMER",    /* 0xff9e */
+	"PPOINT",   /* 0xff9f */
+	"STRING$",  /* 0xffa0 */
+	"USR"       /* 0xffa1 */
+	"CVN",      /* 0xffa2 */
+	"FREE",     /* 0xffa3 */
+	"LOC",      /* 0xffa4 */
+	"LOF",      /* 0xffa5 */
+	"MKN$"      /* 0xffa6 */
 };
 
 static const char *const vzbas[] =
 {
-	"END",		/* 0x80 */
-	"FOR",		/* 0x81 */
-	"RESET",	/* 0x82 */
-	"SET",		/* 0x83 */
-	"CLS",		/* 0x84 */
-	NULL,		/* 0x85 */
-	"RANDOM",	/* 0x86 */
-	"NEXT",		/* 0x87 */
-	"DATA",		/* 0x88 */
-	"INPUT",	/* 0x89 */
-	"DIM",		/* 0x8a */
-	"READ",		/* 0x8b */
-	"LET",		/* 0x8c */
-	"GOTO",		/* 0x8d */
-	"RUN",		/* 0x8e */
-	"IF",		/* 0x8f */
-	"RESTORE",	/* 0x90 */
-	"GOSUB",	/* 0x91 */
-	"RETURN",	/* 0x92 */
-	"'",		/* 0x93 */
-	"STOP",		/* 0x94 */
-	"ELSE",		/* 0x95 */
-	"COPY",		/* 0x96 */
-	"COLOR",	/* 0x97 */
-	"VERIFY",	/* 0x98 */
-	"DEFINT",	/* 0x99 */
-	"DEFSNG",	/* 0x9a */
-	"DEFDBL",	/* 0x9b */
-	"CRUN",		/* 0x9c */
-	"MODE",		/* 0x9d */
-	"ERROR",	/* 0x9e */
-	"RESUME",	/* 0x9f */
-	"OUT",		/* 0xa0 */
-	"IN",		/* 0xa1 */
-	NULL,		/* 0xa2 */
-	NULL,		/* 0xa3 */
-	NULL,		/* 0xa4 */
-	NULL,		/* 0xa5 */
-	NULL,		/* 0xa6 */
-	NULL,		/* 0xa7 */
-	NULL,		/* 0xa8 */
-	NULL,		/* 0xa9 */
-	NULL,		/* 0xaa */
-	NULL,		/* 0xab */
-	NULL,		/* 0xac */
-	NULL,		/* 0xad */
-	"(RESET)",	/* 0xae */
-	"LPRINT",	/* 0xaf */
-	NULL,		/* 0xb0 */
-	"POKE",		/* 0xb1 */
-	"PRINT",	/* 0xb2 */
-	"CONT",		/* 0xb3 */
-	"LIST",		/* 0xb4 */
-	"LLIST",	/* 0xb5 */
-	"DELETE",	/* 0xb6 */
-	"AUTO",		/* 0xb7 */
-	"CLEAR",	/* 0xb8 */
-	"CLOAD",	/* 0xb9 */
-	"CSAVE",	/* 0xba */
-	"NEW",		/* 0xbb */
-	"TAB(",		/* 0xbc */
-	"TO",		/* 0xbd */
-	NULL,		/* 0xbe */
-	"USING",	/* 0xbf */
-	"VARPTR",	/* 0xc0 */
-	"USR",		/* 0xc1 */
-	"ERL",		/* 0xc2 */
-	"ERR",		/* 0xc3 */
-	"STRING$",	/* 0xc4 */
-	NULL,		/* 0xc5 */
-	"POINT",	/* 0xc6 */
-	NULL,		/* 0xc7 */
-	"MEM",		/* 0xc8 */
-	"INKEY$",	/* 0xc9 */
-	"THEN",		/* 0xca */
-	"NOT",		/* 0xcb */
-	"STEP",		/* 0xcc */
-	"+",		/* 0xcd */
-	"-",		/* 0xce */
-	"*",		/* 0xcf */
-	"/",		/* 0xd0 */
-	"^",		/* 0xd1 */
-	"AND",		/* 0xd2 */
-	"OR",		/* 0xd3 */
-	">",		/* 0xd4 */
-	"=",		/* 0xd5 */
-	"<",		/* 0xd6 */
-	"SGN",		/* 0xd7 */
-	"INT",		/* 0xd8 */
-	"ABS",		/* 0xd9 */
-	"FRE",		/* 0xda */
-	"INP",		/* 0xdb */
-	"POS",		/* 0xdc */
-	"SQR",		/* 0xdd */
-	"AND",		/* 0xde */
-	"LOG",		/* 0xdf */
-	"EXP",		/* 0xe0 */
-	"COS",		/* 0xe1 */
-	"SIN",		/* 0xe2 */
-	"TAN",		/* 0xe3 */
-	"ATN",		/* 0xe4 */
-	"PEEK",		/* 0xe5 */
-	NULL,		/* 0xe6 */
-	NULL,		/* 0xe7 */
-	NULL,		/* 0xe8 */
-	NULL,		/* 0xe9 */
-	NULL,		/* 0xea */
-	NULL,		/* 0xeb */
-	NULL,		/* 0xec */
-	NULL,		/* 0xed */
-	NULL,		/* 0xee */
-	"CINT",		/* 0xef */
-	"CSNG",		/* 0xf0 */
-	"CDBL",		/* 0xf1 */
-	"FIX",		/* 0xf2 */
-	"LEN",		/* 0xf3 */
-	"STR$",		/* 0xf4 */
-	"VAL",		/* 0xf5 */
-	"ASC",		/* 0xf6 */
-	"CHR$",		/* 0xf7 */
-	"LEFT$",	/* 0xf8 */
-	"RIGHT$",	/* 0xf9 */
-	"MID$",		/* 0xfa */
-	NULL,		/* 0xfb */
-	NULL,		/* 0xfc */
-	NULL,		/* 0xfd */
-	NULL,		/* 0xfe */
-	NULL		/* 0xff */
+	"END",      /* 0x80 */
+	"FOR",      /* 0x81 */
+	"RESET",    /* 0x82 */
+	"SET",      /* 0x83 */
+	"CLS",      /* 0x84 */
+	NULL,       /* 0x85 */
+	"RANDOM",   /* 0x86 */
+	"NEXT",     /* 0x87 */
+	"DATA",     /* 0x88 */
+	"INPUT",    /* 0x89 */
+	"DIM",      /* 0x8a */
+	"READ",     /* 0x8b */
+	"LET",      /* 0x8c */
+	"GOTO",     /* 0x8d */
+	"RUN",      /* 0x8e */
+	"IF",       /* 0x8f */
+	"RESTORE",  /* 0x90 */
+	"GOSUB",    /* 0x91 */
+	"RETURN",   /* 0x92 */
+	"'",        /* 0x93 */
+	"STOP",     /* 0x94 */
+	"ELSE",     /* 0x95 */
+	"COPY",     /* 0x96 */
+	"COLOR",    /* 0x97 */
+	"VERIFY",   /* 0x98 */
+	"DEFINT",   /* 0x99 */
+	"DEFSNG",   /* 0x9a */
+	"DEFDBL",   /* 0x9b */
+	"CRUN",     /* 0x9c */
+	"MODE",     /* 0x9d */
+	"ERROR",    /* 0x9e */
+	"RESUME",   /* 0x9f */
+	"OUT",      /* 0xa0 */
+	"IN",       /* 0xa1 */
+	NULL,       /* 0xa2 */
+	NULL,       /* 0xa3 */
+	NULL,       /* 0xa4 */
+	NULL,       /* 0xa5 */
+	NULL,       /* 0xa6 */
+	NULL,       /* 0xa7 */
+	NULL,       /* 0xa8 */
+	NULL,       /* 0xa9 */
+	NULL,       /* 0xaa */
+	NULL,       /* 0xab */
+	NULL,       /* 0xac */
+	NULL,       /* 0xad */
+	"(RESET)",  /* 0xae */
+	"LPRINT",   /* 0xaf */
+	NULL,       /* 0xb0 */
+	"POKE",     /* 0xb1 */
+	"PRINT",    /* 0xb2 */
+	"CONT",     /* 0xb3 */
+	"LIST",     /* 0xb4 */
+	"LLIST",    /* 0xb5 */
+	"DELETE",   /* 0xb6 */
+	"AUTO",     /* 0xb7 */
+	"CLEAR",    /* 0xb8 */
+	"CLOAD",    /* 0xb9 */
+	"CSAVE",    /* 0xba */
+	"NEW",      /* 0xbb */
+	"TAB(",     /* 0xbc */
+	"TO",       /* 0xbd */
+	NULL,       /* 0xbe */
+	"USING",    /* 0xbf */
+	"VARPTR",   /* 0xc0 */
+	"USR",      /* 0xc1 */
+	"ERL",      /* 0xc2 */
+	"ERR",      /* 0xc3 */
+	"STRING$",  /* 0xc4 */
+	NULL,       /* 0xc5 */
+	"POINT",    /* 0xc6 */
+	NULL,       /* 0xc7 */
+	"MEM",      /* 0xc8 */
+	"INKEY$",   /* 0xc9 */
+	"THEN",     /* 0xca */
+	"NOT",      /* 0xcb */
+	"STEP",     /* 0xcc */
+	"+",        /* 0xcd */
+	"-",        /* 0xce */
+	"*",        /* 0xcf */
+	"/",        /* 0xd0 */
+	"^",        /* 0xd1 */
+	"AND",      /* 0xd2 */
+	"OR",       /* 0xd3 */
+	">",        /* 0xd4 */
+	"=",        /* 0xd5 */
+	"<",        /* 0xd6 */
+	"SGN",      /* 0xd7 */
+	"INT",      /* 0xd8 */
+	"ABS",      /* 0xd9 */
+	"FRE",      /* 0xda */
+	"INP",      /* 0xdb */
+	"POS",      /* 0xdc */
+	"SQR",      /* 0xdd */
+	"AND",      /* 0xde */
+	"LOG",      /* 0xdf */
+	"EXP",      /* 0xe0 */
+	"COS",      /* 0xe1 */
+	"SIN",      /* 0xe2 */
+	"TAN",      /* 0xe3 */
+	"ATN",      /* 0xe4 */
+	"PEEK",     /* 0xe5 */
+	NULL,       /* 0xe6 */
+	NULL,       /* 0xe7 */
+	NULL,       /* 0xe8 */
+	NULL,       /* 0xe9 */
+	NULL,       /* 0xea */
+	NULL,       /* 0xeb */
+	NULL,       /* 0xec */
+	NULL,       /* 0xed */
+	NULL,       /* 0xee */
+	"CINT",     /* 0xef */
+	"CSNG",     /* 0xf0 */
+	"CDBL",     /* 0xf1 */
+	"FIX",      /* 0xf2 */
+	"LEN",      /* 0xf3 */
+	"STR$",     /* 0xf4 */
+	"VAL",      /* 0xf5 */
+	"ASC",      /* 0xf6 */
+	"CHR$",     /* 0xf7 */
+	"LEFT$",    /* 0xf8 */
+	"RIGHT$",   /* 0xf9 */
+	"MID$",     /* 0xfa */
+	NULL,       /* 0xfb */
+	NULL,       /* 0xfc */
+	NULL,       /* 0xfd */
+	NULL,       /* 0xfe */
+	NULL        /* 0xff */
 };
 
 #ifdef BASIC_
@@ -1155,22 +1155,22 @@ static const char *const basic_20_super_expander_vic[] = /* "BASIC 2.0 with Supe
 	"GO",             /* 0xcb */
 	"KEY",            /* 0xcc */
 	"GRAPHIC",        /* 0xcd */
-	"SCNCLR",	      /* 0xce */
-	"CIRCLE",	      /* 0xcf */
-	"DRAW",	          /* 0xd0 */
-	"REGION",	      /* 0xd1 */
-	"COLOR",	      /* 0xd2 */
-	"POINT",	      /* 0xd3 */
-	"SOUND",	      /* 0xd4 */
-	"CHAR",	          /* 0xd5 */
-	"PAINT",	      /* 0xd6 */
-	"RPOT",	          /* 0xd7 */
-	"RPEN",	          /* 0xd8 */
-	"RSND",	          /* 0xd9 */
-	"RCOLR",	      /* 0xda */
-	"RGR",		      /* 0xdb */
-	"RJOY",	          /* 0xdc */
-	"RDOT",	          /* 0xdd */
+	"SCNCLR",         /* 0xce */
+	"CIRCLE",         /* 0xcf */
+	"DRAW",           /* 0xd0 */
+	"REGION",         /* 0xd1 */
+	"COLOR",          /* 0xd2 */
+	"POINT",          /* 0xd3 */
+	"SOUND",          /* 0xd4 */
+	"CHAR",           /* 0xd5 */
+	"PAINT",          /* 0xd6 */
+	"RPOT",           /* 0xd7 */
+	"RPEN",           /* 0xd8 */
+	"RSND",           /* 0xd9 */
+	"RCOLR",          /* 0xda */
+	"RGR",            /* 0xdb */
+	"RJOY",           /* 0xdc */
+	"RDOT",           /* 0xdd */
 	NULL,               /* 0xde */
 	NULL,               /* 0xdf */
 	NULL,               /* 0xe0 */
@@ -1418,32 +1418,32 @@ static const char *const basic_20_speech_basic_27[] = /* "BASIC 2.0 with Speech 
 	"MID$",           /* 0xca */
 	"GO",             /* 0xcb */
 	"RESET",          /* 0xcc */
-	"BASIC",	      /* 0xcd */
-	"HELP",	          /* 0xce */
-	"KEY",		      /* 0xcf */
-	"HIMEM",	      /* 0xd0 */
-	"DISK",	          /* 0xd1 */
-	"DIR",		      /* 0xd2 */
-	"BLOAD",	      /* 0xd3 */
-	"BSAVE",	      /* 0xd4 */
-	"MAP",		      /* 0xd5 */
-	"MEM",		      /* 0xd6 */
-	"PAUSE",	      /* 0xd7 */
-	"BLOCK",	      /* 0xd8 */
-	"HEAR",	          /* 0xd9 */
-	"RECORD",	      /* 0xda */
-	"PLAY",	          /* 0xdb */
-	"VOLDEF",	      /* 0xdc */
-	"COLDEF",	      /* 0xdd */
-	"HEX",		      /* 0xde */
-	"DEZ",		      /* 0xdf */
-	"SCREEN",	      /* 0xe0 */
-	"EXEC",	          /* 0xe1 */
-	"MON",		      /* 0xe2 */
+	"BASIC",          /* 0xcd */
+	"HELP",           /* 0xce */
+	"KEY",            /* 0xcf */
+	"HIMEM",          /* 0xd0 */
+	"DISK",           /* 0xd1 */
+	"DIR",            /* 0xd2 */
+	"BLOAD",          /* 0xd3 */
+	"BSAVE",          /* 0xd4 */
+	"MAP",            /* 0xd5 */
+	"MEM",            /* 0xd6 */
+	"PAUSE",          /* 0xd7 */
+	"BLOCK",          /* 0xd8 */
+	"HEAR",           /* 0xd9 */
+	"RECORD",         /* 0xda */
+	"PLAY",           /* 0xdb */
+	"VOLDEF",         /* 0xdc */
+	"COLDEF",         /* 0xdd */
+	"HEX",            /* 0xde */
+	"DEZ",            /* 0xdf */
+	"SCREEN",         /* 0xe0 */
+	"EXEC",           /* 0xe1 */
+	"MON",            /* 0xe2 */
 	"{LEFT ARROW}",   /* 0xe3 - A single character shaped as a left pointing arrow */
-	"FROM",	          /* 0xe4 */
-	"SPEED",	      /* 0xe5 */
-	"OFF",		      /* 0xe6 */
+	"FROM",           /* 0xe4 */
+	"SPEED",          /* 0xe5 */
+	"OFF",            /* 0xe6 */
 	NULL,               /* 0xe7 */
 	NULL,               /* 0xe8 */
 	NULL,               /* 0xe9 */
@@ -1941,19 +1941,19 @@ static const char *const basic_20_exp_40[] = /* "BASIC 2.0 with BASIC 4.0 Expans
 	"RIGHT$",         /* 0xc9 */
 	"MID$",           /* 0xca */
 	"GO",             /* 0xcb */
-	"CONCAT",	      /* 0xcc */
-	"DOPEN",	      /* 0xcd */
-	"DCLOSE",	      /* 0xce */
-	"RECORD",	      /* 0xcf */
-	"HEADER",	      /* 0xd0 */
-	"COLLECT",	      /* 0xd1 */
-	"BACKUP",	      /* 0xd2 */
-	"COPY",	          /* 0xd3 */
-	"APPEND",	      /* 0xd4 */
-	"DSAVE",	      /* 0xd5 */
-	"DLOAD",	      /* 0xd6 */
-	"CATALOG",	      /* 0xd7 */
-	"RENAME",	      /* 0xd8 */
+	"CONCAT",         /* 0xcc */
+	"DOPEN",          /* 0xcd */
+	"DCLOSE",         /* 0xce */
+	"RECORD",         /* 0xcf */
+	"HEADER",         /* 0xd0 */
+	"COLLECT",        /* 0xd1 */
+	"BACKUP",         /* 0xd2 */
+	"COPY",           /* 0xd3 */
+	"APPEND",         /* 0xd4 */
+	"DSAVE",          /* 0xd5 */
+	"DLOAD",          /* 0xd6 */
+	"CATALOG",        /* 0xd7 */
+	"RENAME",         /* 0xd8 */
 	"SCRATCH",        /* 0xd9 */
 	"DIRECTORY",      /* 0xda */
 	"COLOR",          /* 0xdb */
@@ -2348,19 +2348,19 @@ static const char *const basic_40[] = /* "BASIC 4.0" - supported by cbm40xx & cb
 	"RIGHT$",         /* 0xc9 */
 	"MID$",           /* 0xca */
 	"GO",             /* 0xcb */
-	"CONCAT",	      /* 0xcc */
-	"DOPEN",	      /* 0xcd */
-	"DCLOSE",	      /* 0xce */
-	"RECORD",	      /* 0xcf */
-	"HEADER",	      /* 0xd0 */
-	"COLLECT",	      /* 0xd1 */
-	"BACKUP",	      /* 0xd2 */
-	"COPY",	          /* 0xd3 */
-	"APPEND",	      /* 0xd4 */
-	"DSAVE",	      /* 0xd5 */
-	"DLOAD",	      /* 0xd6 */
-	"CATALOG",	      /* 0xd7 */
-	"RENAME",	      /* 0xd8 */
+	"CONCAT",         /* 0xcc */
+	"DOPEN",          /* 0xcd */
+	"DCLOSE",         /* 0xce */
+	"RECORD",         /* 0xcf */
+	"HEADER",         /* 0xd0 */
+	"COLLECT",        /* 0xd1 */
+	"BACKUP",         /* 0xd2 */
+	"COPY",           /* 0xd3 */
+	"APPEND",         /* 0xd4 */
+	"DSAVE",          /* 0xd5 */
+	"DLOAD",          /* 0xd6 */
+	"CATALOG",        /* 0xd7 */
+	"RENAME",         /* 0xd8 */
 	"SCRATCH",        /* 0xd9 */
 	"DIRECTORY",      /* 0xda */
 	NULL,               /* 0xdb */
@@ -2799,8 +2799,8 @@ static const char *const basic_100[] = /* "BASIC 10.0" - supported by c65 & clon
 
 static const basictoken_tableent cocobas_tokenents[] =
 {
-	{ 0x00,	0x80,	cocobas_statements,	ARRAY_LENGTH(cocobas_statements) },
-	{ 0xff,	0x80,	cocobas_functions,	ARRAY_LENGTH(cocobas_functions) }
+	{ 0x00, 0x80,   cocobas_statements, ARRAY_LENGTH(cocobas_statements) },
+	{ 0xff, 0x80,   cocobas_functions,  ARRAY_LENGTH(cocobas_functions) }
 };
 
 static const basictokens cocobas_tokens =
@@ -2828,10 +2828,10 @@ void filter_cocobas_getinfo(UINT32 state, union filterinfo *info)
 {
 	switch(state)
 	{
-		case FILTINFO_STR_NAME:			info->s = "cocobas"; break;
-		case FILTINFO_STR_HUMANNAME:	info->s = "CoCo Tokenized Basic Files"; break;
-		case FILTINFO_PTR_READFILE:		info->read_file = cocobas_readfile; break;
-		case FILTINFO_PTR_WRITEFILE:	info->write_file = cocobas_writefile; break;
+		case FILTINFO_STR_NAME:         info->s = "cocobas"; break;
+		case FILTINFO_STR_HUMANNAME:    info->s = "CoCo Tokenized Basic Files"; break;
+		case FILTINFO_PTR_READFILE:     info->read_file = cocobas_readfile; break;
+		case FILTINFO_PTR_WRITEFILE:    info->write_file = cocobas_writefile; break;
 	}
 }
 
@@ -2843,8 +2843,8 @@ void filter_cocobas_getinfo(UINT32 state, union filterinfo *info)
 
 static const basictoken_tableent dragonbas_tokenents[] =
 {
-	{ 0x00,	0x80,	dragonbas_statements,	ARRAY_LENGTH(dragonbas_statements) },
-	{ 0xff,	0x80,	dragonbas_functions,	ARRAY_LENGTH(dragonbas_functions) }
+	{ 0x00, 0x80,   dragonbas_statements,   ARRAY_LENGTH(dragonbas_statements) },
+	{ 0xff, 0x80,   dragonbas_functions,    ARRAY_LENGTH(dragonbas_functions) }
 };
 
 static const basictokens dragonbas_tokens =
@@ -2872,10 +2872,10 @@ void filter_dragonbas_getinfo(UINT32 state, union filterinfo *info)
 {
 	switch(state)
 	{
-		case FILTINFO_STR_NAME:			info->s = "dragonbas"; break;
-		case FILTINFO_STR_HUMANNAME:	info->s = "Dragon Tokenized Basic Files"; break;
-		case FILTINFO_PTR_READFILE:		info->read_file = dragonbas_readfile; break;
-		case FILTINFO_PTR_WRITEFILE:	info->write_file = dragonbas_writefile; break;
+		case FILTINFO_STR_NAME:         info->s = "dragonbas"; break;
+		case FILTINFO_STR_HUMANNAME:    info->s = "Dragon Tokenized Basic Files"; break;
+		case FILTINFO_PTR_READFILE:     info->read_file = dragonbas_readfile; break;
+		case FILTINFO_PTR_WRITEFILE:    info->write_file = dragonbas_writefile; break;
 	}
 }
 
@@ -2887,7 +2887,7 @@ void filter_dragonbas_getinfo(UINT32 state, union filterinfo *info)
 
 static const basictoken_tableent vzbas_tokenents[] =
 {
-	{ 0x00, 0x80,	vzbas,	ARRAY_LENGTH(vzbas) }
+	{ 0x00, 0x80,   vzbas,  ARRAY_LENGTH(vzbas) }
 };
 
 
@@ -2917,9 +2917,9 @@ void filter_vzbas_getinfo(UINT32 state, union filterinfo *info)
 {
 	switch(state)
 	{
-		case FILTINFO_STR_NAME:			info->s = "vzbas"; break;
-		case FILTINFO_STR_HUMANNAME:	info->s = "Laser/VZ Tokenized Basic Files"; break;
-		case FILTINFO_PTR_READFILE:		info->read_file = vzbas_readfile; break;
-		case FILTINFO_PTR_WRITEFILE:	info->write_file = vzbas_writefile; break;
+		case FILTINFO_STR_NAME:         info->s = "vzbas"; break;
+		case FILTINFO_STR_HUMANNAME:    info->s = "Laser/VZ Tokenized Basic Files"; break;
+		case FILTINFO_PTR_READFILE:     info->read_file = vzbas_readfile; break;
+		case FILTINFO_PTR_WRITEFILE:    info->write_file = vzbas_writefile; break;
 	}
 }

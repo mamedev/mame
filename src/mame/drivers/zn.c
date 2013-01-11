@@ -330,23 +330,23 @@ WRITE32_MEMBER(zn_state::znsecsel_w)
 READ32_MEMBER(zn_state::boardconfig_r)
 {
 	/*
-    ------00 mem=4M
-    ------01 mem=4M
-    ------10 mem=8M
-    ------11 mem=16M
-    -----0-- smem=hM
-    -----1-- smem=2M
-    ----0--- vmem=1M
-    ----1--- vmem=2M
-    000----- rev=-2
-    001----- rev=-1
-    010----- rev=0
-    011----- rev=1
-    100----- rev=2
-    101----- rev=3
-    110----- rev=4
-    111----- rev=5
-    */
+	------00 mem=4M
+	------01 mem=4M
+	------10 mem=8M
+	------11 mem=16M
+	-----0-- smem=hM
+	-----1-- smem=2M
+	----0--- vmem=1M
+	----1--- vmem=2M
+	000----- rev=-2
+	001----- rev=-1
+	010----- rev=0
+	011----- rev=1
+	100----- rev=2
+	101----- rev=3
+	110----- rev=4
+	111----- rev=5
+	*/
 
 	if( machine().primary_screen->height() == 1024 )
 	{
@@ -367,11 +367,11 @@ READ32_MEMBER(zn_state::unknown_r)
 WRITE32_MEMBER(zn_state::coin_w)
 {
 	/* 0x01=counter
-       0x02=coin lock 1
-       0x08=??
-       0x20=coin lock 2
-       0x80=??
-    */
+	   0x02=coin lock 1
+	   0x08=??
+	   0x20=coin lock 2
+	   0x80=??
+	*/
 	if( ( data & ~0x23 ) != 0 )
 	{
 		verboselog( machine(), 0, "coin_w %08x\n", data );
@@ -379,7 +379,7 @@ WRITE32_MEMBER(zn_state::coin_w)
 }
 
 static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x00400000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
@@ -632,8 +632,8 @@ DRIVER_INIT_MEMBER(zn_state,coh1000c)
 		strcmp( machine().system().name, "glpracr2l" ) == 0 )
 	{
 		/* disable:
-            the QSound CPU for glpracr as it doesn't have any roms &
-            the link cpu for glprac2l as the h/w is not emulated yet. */
+		    the QSound CPU for glpracr as it doesn't have any roms &
+		    the link cpu for glprac2l as the h/w is not emulated yet. */
 		machine().device<cpu_device>( "audiocpu" )->suspend(SUSPEND_REASON_DISABLE, 1 );
 	}
 }
@@ -647,7 +647,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1000c)
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank10")		/* banked (contains music data) */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank10")       /* banked (contains music data) */
 	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_device, qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_bankswitch_w)
 	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_device, qsound_r)
@@ -854,7 +854,7 @@ MACHINE_RESET_MEMBER(zn_state,coh3002c)
 
 static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000 ) /* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP( qsound_map)
 	MCFG_CPU_IO_MAP( qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
@@ -1137,7 +1137,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")	/* Fallthrough */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")   /* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
@@ -1167,7 +1167,7 @@ static const tc0140syt_interface coh1000ta_tc0140syt_intf =
 
 static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000 / 4 )    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP( fx1a_sound_map)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta )
 	MCFG_NVRAM_ADD_0FILL("eeprom1")
@@ -1570,7 +1570,7 @@ WRITE32_MEMBER(zn_state::coh1002e_bank_w)
 WRITE32_MEMBER(zn_state::coh1002e_latch_w)
 {
 	if (offset)
-		machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);	// irq 2 on the 68k
+		machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);   // irq 2 on the 68k
 	else
 		soundlatch_byte_w(space, 0, data);
 }
@@ -1698,12 +1698,12 @@ READ32_MEMBER(zn_state::bam2_mcu_r)
 
 			switch (m_bam2_mcu_command)
 			{
-				case 0x7f:		// first drive check
-				case 0x1c:		// second drive check (causes HDD detected)
-					return 1;	// return error
+				case 0x7f:      // first drive check
+				case 0x1c:      // second drive check (causes HDD detected)
+					return 1;   // return error
 			}
 
-			return 4;			// return OK
+			return 4;           // return OK
 	}
 
 	return 0;
@@ -2868,7 +2868,7 @@ ROM_START( sfexu )
 	CPZN1_BIOS
 
 	ROM_REGION32_LE( 0x80000, "user3", 0 )
-	ROM_LOAD( "sfeu_04b.2h", 0x0000000, 0x080000, CRC(de02bd29) SHA1(62a88a30f73db661f5b98fc7e2d34d51acb965cc) )	// same code / revision as sfee_04a, sfea_04a, should be sfeu_04a
+	ROM_LOAD( "sfeu_04b.2h", 0x0000000, 0x080000, CRC(de02bd29) SHA1(62a88a30f73db661f5b98fc7e2d34d51acb965cc) )    // same code / revision as sfee_04a, sfea_04a, should be sfeu_04a
 
 	ROM_REGION32_LE( 0x2400000, "user2", 0 )
 	ROM_LOAD( "sfe-05m.3h", 0x0000000, 0x400000, CRC(eab781fe) SHA1(205476cb72c8dac915e140fb32243dfc5d209ba4) )
@@ -3755,10 +3755,10 @@ ROM_START( lpadv )
 	TPS_BIOS
 
 	ROM_REGION32_LE( 0xc00000, "user2", 0 )
-        ROM_LOAD16_BYTE( "lp_3.u0119",   0x000001, 0x100000, CRC(18cade44) SHA1(8a44156224c77c51f4f6ca61a0168e48dfcc6eda) )
-        ROM_LOAD16_BYTE( "lp_4.u0120",   0x000000, 0x100000, CRC(12fffc02) SHA1(3294b65e4a0bbf501785565dd0c1f36f9bcea969) )
-        ROM_LOAD( "rp00.u0216",   0x400000, 0x400000, CRC(d759d0d4) SHA1(47b009a5dfa81611276b1376bdab44dfad597e85) )
-        ROM_LOAD( "rp01.u0217",   0x800000, 0x400000, CRC(5be576e1) SHA1(e24a96d179016d6d65205079874b35500760a642) )
+		ROM_LOAD16_BYTE( "lp_3.u0119",   0x000001, 0x100000, CRC(18cade44) SHA1(8a44156224c77c51f4f6ca61a0168e48dfcc6eda) )
+		ROM_LOAD16_BYTE( "lp_4.u0120",   0x000000, 0x100000, CRC(12fffc02) SHA1(3294b65e4a0bbf501785565dd0c1f36f9bcea969) )
+		ROM_LOAD( "rp00.u0216",   0x400000, 0x400000, CRC(d759d0d4) SHA1(47b009a5dfa81611276b1376bdab44dfad597e85) )
+		ROM_LOAD( "rp01.u0217",   0x800000, 0x400000, CRC(5be576e1) SHA1(e24a96d179016d6d65205079874b35500760a642) )
 ROM_END
 
 ROM_START( mfjump )
@@ -4465,18 +4465,18 @@ ROM_START( bam2 )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x2c00000, "user2", 0 )
-        ROM_LOAD( "u19",             0x0000000, 0x200000, CRC(4d9f2337) SHA1(b156fd461d9d5141c60dbcd9ecd26b4f277b7919) )
-        ROM_LOAD( "u20",             0x0200000, 0x200000, CRC(1efb3c55) SHA1(d86e21a10fbcbcc759ba78b200dc2a10cb945b4c) )
-        ROM_LOAD( "mtr-bam-a01.u23", 0x0400000, 0x400000, CRC(5ed9e2dd) SHA1(85ac746735ec2fd89cd9082a3ab4ac6b4d9e8f4a) )
-        ROM_LOAD( "mtr-bam-a02.u24", 0x0800000, 0x400000, CRC(be335265) SHA1(7e09a166fe6d0e9e96c99fd472afb4db023ad217) )
-        ROM_LOAD( "mtr-bam-a03.u25", 0x0c00000, 0x400000, CRC(bf71791b) SHA1(b3eb791770838fc74e3535340610164166b63af8) )
-        ROM_LOAD( "mtr-bam-a04.u26", 0x1000000, 0x400000, CRC(d3aa62b5) SHA1(958b34fa2fa21c25f34972d4c288ef46e088d6e3) )
-        ROM_LOAD( "mtr-bam-a05.u27", 0x1400000, 0x400000, CRC(bd94d0ae) SHA1(97fe7b25768be2f57d8e823ec445c0ee92f07c02) )
-        ROM_LOAD( "mtr-bam-a06.u28", 0x1800000, 0x400000, CRC(b972c0b4) SHA1(e5ef170d0e71b7e02463462e1ea31c21ae890d14) )
-        ROM_LOAD( "mtr-bam-a07.u29", 0x1c00000, 0x400000, CRC(e8f716c1) SHA1(b15aafb0c9f3484a7ee41b5e6728af08d6a7bd8b) )
-        ROM_LOAD( "mtr-bam-a08.u30", 0x2000000, 0x400000, CRC(6e691ff1) SHA1(3fdcf3403e9ffd99b98e789930fc805dc2bc7692) )
-        ROM_LOAD( "mtr-bam-a09.u31", 0x2400000, 0x400000, CRC(e4bd7cec) SHA1(794d10b15a22aeed89082f4db2f3cb94aa7d807d) )
-        ROM_LOAD( "mtr-bam-a10.u32", 0x2800000, 0x400000, CRC(37fd1fa0) SHA1(afe846a817e499c405a5fd4ad83094270640faf3) )
+		ROM_LOAD( "u19",             0x0000000, 0x200000, CRC(4d9f2337) SHA1(b156fd461d9d5141c60dbcd9ecd26b4f277b7919) )
+		ROM_LOAD( "u20",             0x0200000, 0x200000, CRC(1efb3c55) SHA1(d86e21a10fbcbcc759ba78b200dc2a10cb945b4c) )
+		ROM_LOAD( "mtr-bam-a01.u23", 0x0400000, 0x400000, CRC(5ed9e2dd) SHA1(85ac746735ec2fd89cd9082a3ab4ac6b4d9e8f4a) )
+		ROM_LOAD( "mtr-bam-a02.u24", 0x0800000, 0x400000, CRC(be335265) SHA1(7e09a166fe6d0e9e96c99fd472afb4db023ad217) )
+		ROM_LOAD( "mtr-bam-a03.u25", 0x0c00000, 0x400000, CRC(bf71791b) SHA1(b3eb791770838fc74e3535340610164166b63af8) )
+		ROM_LOAD( "mtr-bam-a04.u26", 0x1000000, 0x400000, CRC(d3aa62b5) SHA1(958b34fa2fa21c25f34972d4c288ef46e088d6e3) )
+		ROM_LOAD( "mtr-bam-a05.u27", 0x1400000, 0x400000, CRC(bd94d0ae) SHA1(97fe7b25768be2f57d8e823ec445c0ee92f07c02) )
+		ROM_LOAD( "mtr-bam-a06.u28", 0x1800000, 0x400000, CRC(b972c0b4) SHA1(e5ef170d0e71b7e02463462e1ea31c21ae890d14) )
+		ROM_LOAD( "mtr-bam-a07.u29", 0x1c00000, 0x400000, CRC(e8f716c1) SHA1(b15aafb0c9f3484a7ee41b5e6728af08d6a7bd8b) )
+		ROM_LOAD( "mtr-bam-a08.u30", 0x2000000, 0x400000, CRC(6e691ff1) SHA1(3fdcf3403e9ffd99b98e789930fc805dc2bc7692) )
+		ROM_LOAD( "mtr-bam-a09.u31", 0x2400000, 0x400000, CRC(e4bd7cec) SHA1(794d10b15a22aeed89082f4db2f3cb94aa7d807d) )
+		ROM_LOAD( "mtr-bam-a10.u32", 0x2800000, 0x400000, CRC(37fd1fa0) SHA1(afe846a817e499c405a5fd4ad83094270640faf3) )
 
 	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
 

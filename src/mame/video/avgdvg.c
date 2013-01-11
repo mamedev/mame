@@ -227,8 +227,8 @@ static void vg_add_clip (int xmin, int ymin, int xmax, int ymax)
 static void dvg_data(vgdata *vg)
 {
 	/*
-     * DVG uses low bit of state for address
-     */
+	 * DVG uses low bit of state for address
+	 */
 	vg->data = avgdvg_vectorram[(vg->pc << 1) | (vg->state_latch & 1)];
 }
 
@@ -273,8 +273,8 @@ static void dvg_draw_to(int x, int y, int intensity)
 {
 	if (((x | y) & 0x400) == 0)
 		vg_add_point_buf((xmin + x - 512) << 16,
-						 (ymin + 512 - y) << 16,
-						 VECTOR_COLOR111(7), intensity << 4);
+							(ymin + 512 - y) << 16,
+							VECTOR_COLOR111(7), intensity << 4);
 }
 
 static int dvg_gostrobe(vgdata *vg)
@@ -285,9 +285,9 @@ static int dvg_gostrobe(vgdata *vg)
 	{
 
 		scale = (vg->scale +
-				 (((vg->dvy & 0x800) >> 11)
-				  | (((vg->dvx & 0x800) ^ 0x800) >> 10)
-				  | ((vg->dvx & 0x800)  >> 9))) & 0xf;
+					(((vg->dvy & 0x800) >> 11)
+					| (((vg->dvx & 0x800) ^ 0x800) >> 10)
+					| ((vg->dvx & 0x800)  >> 9))) & 0xf;
 
 		vg->dvy &= 0xf00;
 		vg->dvx &= 0xf00;
@@ -314,17 +314,17 @@ static int dvg_gostrobe(vgdata *vg)
 	{
 
 		/*
-         *  The 7497 Bit Rate Multiplier is a 6 bit counter with
-         *  clever decoding of output bits to perform the following
-         *  operation:
-         *
-         *  fout = m/64 * fin
-         *
-         *  where fin is the input frequency, fout is the output
-         *  frequency and m is a factor at the input pins. Output
-         *  pulses are more or less evenly spaced so we get straight
-         *  lines. The DVG has two cascaded 7497s for each coordinate.
-         */
+		 *  The 7497 Bit Rate Multiplier is a 6 bit counter with
+		 *  clever decoding of output bits to perform the following
+		 *  operation:
+		 *
+		 *  fout = m/64 * fin
+		 *
+		 *  where fin is the input frequency, fout is the output
+		 *  frequency and m is a factor at the input pins. Output
+		 *  pulses are more or less evenly spaced so we get straight
+		 *  lines. The DVG has two cascaded 7497s for each coordinate.
+		 */
 
 		countx = 0;
 		county = 0;
@@ -344,12 +344,12 @@ static int dvg_gostrobe(vgdata *vg)
 		c = (c + 1) & 0xfff;
 
 		/*
-         *  Since x- and y-counters always hold the correct count
-         *  wrt. to each other, we can do clipping exactly like the
-         *  hardware does. That is, as soon as any counter's bit 10
-         *  changes to high, we finish the vector. If bit 10 changes
-         *  from high to low, we start a new vector.
-         */
+		 *  Since x- and y-counters always hold the correct count
+		 *  wrt. to each other, we can do clipping exactly like the
+		 *  hardware does. That is, as soon as any counter's bit 10
+		 *  changes to high, we finish the vector. If bit 10 changes
+		 *  from high to low, we start a new vector.
+		 */
 
 		if (countx)
 		{
@@ -510,8 +510,8 @@ static int avg_latch0(vgdata *vg)
 static int quantum_st2st3(vgdata *vg)
 {
 	/* Quantum doesn't decode latch0 or latch2 but ST2 and ST3 are fed
-     * into the address controller which increments the PC
-     */
+	 * into the address controller which increments the PC
+	 */
 	vg->pc++;
 	return 0;
 }
@@ -546,10 +546,10 @@ static int quantum_latch1(vgdata *vg)
 static int bzone_latch1(vgdata *vg)
 {
 	/*
-     * Battle Zone has clipping hardware. We need to remember the
-     * position of the beam when the analog switches hst or lst get
-     * turned off.
-     */
+	 * Battle Zone has clipping hardware. We need to remember the
+	 * position of the beam when the analog switches hst or lst get
+	 * turned off.
+	 */
 
 	if (vg->hst == 0)
 	{
@@ -575,8 +575,8 @@ static int bzone_latch1(vgdata *vg)
 static int mhavoc_latch1(vgdata *vg)
 {
 	/*
-     * Major Havoc just has ymin clipping
-     */
+	 * Major Havoc just has ymin clipping
+	 */
 
 	if (vg->lst == 0)
 	{
@@ -627,21 +627,21 @@ static int avg_strobe0(vgdata *vg)
 	else
 	{
 		/*
-         * Normalization is done to get roughly constant deflection
-         * speeds. See Jed's essay why this is important. In addition
-         * to the intensity and overall time saving issues it is also
-         * needed to avoid accumulation of DAC errors. The X/Y DACs
-         * only use bits 3-12. The normalization ensures that the
-         * first three bits hold no important information.
-         *
-         * The circuit doesn't check for dvx=dvy=0. In this case
-         * shifting goes on as long as VCTR, SCALE and CNTR are
-         * low. We cut off after 16 shifts.
-         */
+		 * Normalization is done to get roughly constant deflection
+		 * speeds. See Jed's essay why this is important. In addition
+		 * to the intensity and overall time saving issues it is also
+		 * needed to avoid accumulation of DAC errors. The X/Y DACs
+		 * only use bits 3-12. The normalization ensures that the
+		 * first three bits hold no important information.
+		 *
+		 * The circuit doesn't check for dvx=dvy=0. In this case
+		 * shifting goes on as long as VCTR, SCALE and CNTR are
+		 * low. We cut off after 16 shifts.
+		 */
 		i = 0;
 		while ((((vg->dvy ^ (vg->dvy << 1)) & 0x1000) == 0)
-			   && (((vg->dvx ^ (vg->dvx << 1)) & 0x1000) == 0)
-			   && (i++ < 16))
+				&& (((vg->dvx ^ (vg->dvx << 1)) & 0x1000) == 0)
+				&& (i++ < 16))
 		{
 			vg->dvy = (vg->dvy & 0x1000) | ((vg->dvy << 1) & 0x1fff);
 			vg->dvx = (vg->dvx & 0x1000) | ((vg->dvx << 1) & 0x1fff);
@@ -667,12 +667,12 @@ static int quantum_strobe0(vgdata *vg)
 	else
 	{
 		/*
-         * Quantum normalizes to 12 bit
-         */
+		 * Quantum normalizes to 12 bit
+		 */
 		i = 0;
 		while ((((vg->dvy ^ (vg->dvy << 1)) & 0x800) == 0)
-			   && (((vg->dvx ^ (vg->dvx << 1)) & 0x800) == 0)
-			   && (i++ < 16))
+				&& (((vg->dvx ^ (vg->dvx << 1)) & 0x800) == 0)
+				&& (i++ < 16))
 		{
 			vg->dvy = (vg->dvy << 1) & 0xfff;
 			vg->dvx = (vg->dvx << 1) & 0xfff;
@@ -741,22 +741,22 @@ static int avg_common_strobe2(vgdata *vg)
 			if (vg->dvy == 0)
 			{
 				/*
-                 * Tempest and Quantum keep the AVG in an endless
-                 * loop. I.e. at one point the AVG jumps to address 0
-                 * and starts over again. The main CPU updates vector
-                 * RAM while AVG is running. The hardware takes care
-                 * that the AVG dosen't read vector RAM while the CPU
-                 * writes to it. Usually we wait until the AVG stops
-                 * (halt flag) and then draw all vectors at once. This
-                 * doesn't work for Tempest and Quantum so we wait for
-                 * the jump to zero and draw vectors then.
-                 *
-                 * Note that this has nothing to do with the real hardware
-                 * because for a vector monitor it is perfectly okay to
-                 * have the AVG drawing all the time. In the emulation we
-                 * somehow have to divide the stream of vectors into
-                 * 'frames'.
-                 */
+				 * Tempest and Quantum keep the AVG in an endless
+				 * loop. I.e. at one point the AVG jumps to address 0
+				 * and starts over again. The main CPU updates vector
+				 * RAM while AVG is running. The hardware takes care
+				 * that the AVG dosen't read vector RAM while the CPU
+				 * writes to it. Usually we wait until the AVG stops
+				 * (halt flag) and then draw all vectors at once. This
+				 * doesn't work for Tempest and Quantum so we wait for
+				 * the jump to zero and draw vectors then.
+				 *
+				 * Note that this has nothing to do with the real hardware
+				 * because for a vector monitor it is perfectly okay to
+				 * have the AVG drawing all the time. In the emulation we
+				 * somehow have to divide the stream of vectors into
+				 * 'frames'.
+				 */
 
 				vector_clear_list();
 				vg_flush(vg->machine());
@@ -835,7 +835,7 @@ static int tempest_strobe2(vgdata *vg)
 	if ((OP2 == 0) && (vg->dvy12 == 0))
 	{
 		/* Contrary to previous documentation in MAME,
-        Tempest does not have the vg->enspkl bit. */
+		Tempest does not have the vg->enspkl bit. */
 		if (vg->dvy & 0x800)
 			vg->color = vg->dvy & 0xf;
 		else
@@ -878,11 +878,11 @@ static int bzone_strobe2(vgdata *vg)
 			vg->lst = vg->dvy & 0x200;
 			vg->hst = vg->lst ^ 0x200;
 			/*
-             * If izblank is true the zblank signal gets
-             * inverted. This behaviour can't be handled with the
-             * clipping we have right now. Battle Zone doesn't seem to
-             * invert zblank so it's no issue.
-             */
+			 * If izblank is true the zblank signal gets
+			 * inverted. This behaviour can't be handled with the
+			 * clipping we have right now. Battle Zone doesn't seem to
+			 * invert zblank so it's no issue.
+			 */
 			vg->izblank = vg->dvy & 0x100;
 		}
 	}
@@ -931,7 +931,7 @@ static int avg_strobe3(vgdata *vg)
 	if ((vg->op & 5) == 0)
 	{
 		vg_add_point_buf(vg->xpos, vg->ypos, VECTOR_COLOR111(vg->color),
-						 (((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
+							(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 	}
 
 	return cycles;
@@ -947,7 +947,7 @@ static int bzone_strobe3(vgdata *vg)
 	if ((vg->op & 5) == 0)
 	{
 		vg_add_point_buf(vg->xpos, vg->ypos, VECTOR_COLOR111(7),
-						 (((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
+							(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 	}
 
 	return cycles;
@@ -978,8 +978,8 @@ static int tempest_strobe3(vgdata *vg)
 		avg_apply_flipping(&x, &y);
 
 		vg_add_point_buf(y - ycenter + xcenter,
-						 x - xcenter + ycenter, MAKE_RGB(r, g, b),
-						 (((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
+							x - xcenter + ycenter, MAKE_RGB(r, g, b),
+							(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 	}
 
 	return cycles;
@@ -1016,7 +1016,7 @@ static int mhavoc_strobe3(vgdata *vg)
 				vg->xpos += dx/2;
 				vg->ypos -= dy/2;
 				data = avgdvg_colorram[0xf +
-									   (((vg->spkl_shift & 1) << 3)
+										(((vg->spkl_shift & 1) << 3)
 										| (vg->spkl_shift & 4)
 										| ((vg->spkl_shift & 0x10) >> 3)
 										| ((vg->spkl_shift & 0x40) >> 6))];
@@ -1029,10 +1029,10 @@ static int mhavoc_strobe3(vgdata *vg)
 				b = bit0 * 0xcb;
 
 				vg_add_point_buf(vg->xpos, vg->ypos, MAKE_RGB(r, g, b),
-								 (((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
+									(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 				vg->spkl_shift = (((vg->spkl_shift & 0x40) >> 6)
-								  ^ ((vg->spkl_shift & 0x20) >> 5)
-								  ^ 1 )
+									^ ((vg->spkl_shift & 0x20) >> 5)
+									^ 1 )
 					| (vg->spkl_shift << 1);
 
 				if ((vg->spkl_shift & 0x7f) == 0x7f)
@@ -1054,7 +1054,7 @@ static int mhavoc_strobe3(vgdata *vg)
 			b = bit0 * 0xcb;
 
 			vg_add_point_buf(vg->xpos, vg->ypos, MAKE_RGB(r, g, b),
-							 (((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
+								(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 		}
 	}
 	if (OP2)
@@ -1078,7 +1078,7 @@ static int starwars_strobe3(vgdata *vg)
 	if ((vg->op & 5) == 0)
 	{
 		vg_add_point_buf(vg->xpos, vg->ypos, VECTOR_COLOR111(vg->color),
-						 ((vg->int_latch >> 1) * vg->intensity) >> 3);
+							((vg->int_latch >> 1) * vg->intensity) >> 3);
 	}
 
 	return cycles;
@@ -1116,8 +1116,8 @@ static int quantum_strobe3(vgdata *vg)
 		avg_apply_flipping(&x, &y);
 
 		vg_add_point_buf(y - ycenter + xcenter,
-						 x - xcenter + ycenter, MAKE_RGB(r, g, b),
-						 ((vg->int_latch == 2)? vg->intensity: vg->int_latch) << 4);
+							x - xcenter + ycenter, MAKE_RGB(r, g, b),
+							((vg->int_latch == 2)? vg->intensity: vg->int_latch) << 4);
 	}
 	if (OP2)
 	{
@@ -1142,11 +1142,11 @@ static void tempest_vggo(vgdata *vg)
 	vg->pc = 0;
 	vg->sp = 0;
 	/*
-     * Tempest and Quantum trigger VGGO from time to time even though
-     * the VG runs in an endless loop for these games (see
-     * avg_common_strobe2). If we don't discard all vectors in the
-     * current buffer at this point, the screen starts flickering.
-     */
+	 * Tempest and Quantum trigger VGGO from time to time even though
+	 * the VG runs in an endless loop for these games (see
+	 * avg_common_strobe2). If we don't discard all vectors in the
+	 * current buffer at this point, the screen starts flickering.
+	 */
 	nvect = 0;
 }
 
@@ -1252,10 +1252,10 @@ WRITE8_HANDLER( avgdvg_go_w )
 	if (vg->sync_halt && (nvect > 10))
 	{
 		/*
-         * This is a good time to start a new frame. Major Havoc
-         * sometimes sets VGGO after a very short vector list. That's
-         * why we ignore frames with less than 10 vectors.
-         */
+		 * This is a good time to start a new frame. Major Havoc
+		 * sometimes sets VGGO after a very short vector list. That's
+		 * why we ignore frames with less than 10 vectors.
+		 */
 		vector_clear_list();
 	}
 	vg_flush(space.machine());
@@ -1514,10 +1514,10 @@ static VIDEO_START( avg_common )
 	vg_run_timer = machine.scheduler().timer_alloc(FUNC(run_state_machine));
 
 	/*
-     * The x and y DACs use 10 bit of the counter values which are in
-     * two's complement representation. The DAC input is xored with
-     * 0x200 to convert the value to unsigned.
-     */
+	 * The x and y DACs use 10 bit of the counter values which are in
+	 * two's complement representation. The DAC input is xored with
+	 * 0x200 to convert the value to unsigned.
+	 */
 	vg->xdac_xor = 0x200;
 	vg->ydac_xor = 0x200;
 

@@ -79,18 +79,18 @@ class map_handler_data
 public:
 	map_handler_data()
 		: m_type(AMH_NONE),
-		  m_bits(0),
-		  m_mask(0),
-		  m_name(NULL),
-		  m_devbase(NULL),
-		  m_tag(NULL) { }
+			m_bits(0),
+			m_mask(0),
+			m_name(NULL),
+			m_devbase(NULL),
+			m_tag(NULL) { }
 
-	map_handler_type		m_type;				// type of the handler
-	UINT8					m_bits;				// width of the handler in bits, or 0 for default
-	UINT64					m_mask;				// mask for which lanes apply
-	const char *			m_name;				// name of the handler
-	device_t *				m_devbase;			// pointer to "base" device
-	const char *			m_tag;				// tag for I/O ports and banks
+	map_handler_type        m_type;             // type of the handler
+	UINT8                   m_bits;             // width of the handler in bits, or 0 for default
+	UINT64                  m_mask;             // mask for which lanes apply
+	const char *            m_name;             // name of the handler
+	device_t *              m_devbase;          // pointer to "base" device
+	const char *            m_tag;              // tag for I/O ports and banks
 };
 
 
@@ -131,48 +131,48 @@ public:
 	void set_submap(device_t &device, const char *tag, address_map_delegate func, int bits, UINT64 mask);
 
 	// public state
-	address_map_entry *		m_next;					// pointer to the next entry
-	address_map &			m_map;					// reference to our owning map
-	astring					m_region_string;		// string used to hold derived names
+	address_map_entry *     m_next;                 // pointer to the next entry
+	address_map &           m_map;                  // reference to our owning map
+	astring                 m_region_string;        // string used to hold derived names
 
 	// basic information
-	offs_t					m_addrstart;			// start address
-	offs_t					m_addrend;				// end address
-	offs_t					m_addrmirror;			// mirror bits
-	offs_t					m_addrmask;				// mask bits
-	map_handler_data		m_read;					// data for read handler
-	map_handler_data		m_write;				// data for write handler
-	const char *			m_share;				// tag of a shared memory block
-	const char *			m_region;				// tag of region containing the memory backing this entry
-	offs_t					m_rgnoffs;				// offset within the region
+	offs_t                  m_addrstart;            // start address
+	offs_t                  m_addrend;              // end address
+	offs_t                  m_addrmirror;           // mirror bits
+	offs_t                  m_addrmask;             // mask bits
+	map_handler_data        m_read;                 // data for read handler
+	map_handler_data        m_write;                // data for write handler
+	const char *            m_share;                // tag of a shared memory block
+	const char *            m_region;               // tag of region containing the memory backing this entry
+	offs_t                  m_rgnoffs;              // offset within the region
 
 	// handlers
-	read8_delegate			m_rproto8;				// 8-bit read proto-delegate
-	read16_delegate			m_rproto16;				// 16-bit read proto-delegate
-	read32_delegate			m_rproto32;				// 32-bit read proto-delegate
-	read64_delegate			m_rproto64;				// 64-bit read proto-delegate
-	read8_space_func		m_rspace8;				// 8-bit legacy address space handler
-	read16_space_func		m_rspace16;				// 16-bit legacy address space handler
-	read32_space_func		m_rspace32;				// 32-bit legacy address space handler
-	read64_space_func		m_rspace64;				// 64-bit legacy address space handler
-	write8_delegate			m_wproto8;				// 8-bit write proto-delegate
-	write16_delegate		m_wproto16;				// 16-bit write proto-delegate
-	write32_delegate		m_wproto32;				// 32-bit write proto-delegate
-	write64_delegate		m_wproto64;				// 64-bit write proto-delegate
-	write8_space_func		m_wspace8;				// 8-bit legacy address space handler
-	write16_space_func		m_wspace16;				// 16-bit legacy address space handler
-	write32_space_func		m_wspace32;				// 32-bit legacy address space handler
-	write64_space_func		m_wspace64;				// 64-bit legacy address space handler
+	read8_delegate          m_rproto8;              // 8-bit read proto-delegate
+	read16_delegate         m_rproto16;             // 16-bit read proto-delegate
+	read32_delegate         m_rproto32;             // 32-bit read proto-delegate
+	read64_delegate         m_rproto64;             // 64-bit read proto-delegate
+	read8_space_func        m_rspace8;              // 8-bit legacy address space handler
+	read16_space_func       m_rspace16;             // 16-bit legacy address space handler
+	read32_space_func       m_rspace32;             // 32-bit legacy address space handler
+	read64_space_func       m_rspace64;             // 64-bit legacy address space handler
+	write8_delegate         m_wproto8;              // 8-bit write proto-delegate
+	write16_delegate        m_wproto16;             // 16-bit write proto-delegate
+	write32_delegate        m_wproto32;             // 32-bit write proto-delegate
+	write64_delegate        m_wproto64;             // 64-bit write proto-delegate
+	write8_space_func       m_wspace8;              // 8-bit legacy address space handler
+	write16_space_func      m_wspace16;             // 16-bit legacy address space handler
+	write32_space_func      m_wspace32;             // 32-bit legacy address space handler
+	write64_space_func      m_wspace64;             // 64-bit legacy address space handler
 
-	address_map_delegate	m_submap_delegate;
-	int						m_submap_bits;
+	address_map_delegate    m_submap_delegate;
+	int                     m_submap_bits;
 
 	// information used during processing
-	void *					m_memory;				// pointer to memory backing this entry
-	offs_t					m_bytestart;			// byte-adjusted start address
-	offs_t					m_byteend;				// byte-adjusted end address
-	offs_t					m_bytemirror;			// byte-adjusted mirror bits
-	offs_t					m_bytemask;				// byte-adjusted mask bits
+	void *                  m_memory;               // pointer to memory backing this entry
+	offs_t                  m_bytestart;            // byte-adjusted start address
+	offs_t                  m_byteend;              // byte-adjusted end address
+	offs_t                  m_bytemirror;           // byte-adjusted mirror bits
+	offs_t                  m_bytemask;             // byte-adjusted mask bits
 
 protected:
 	// internal handler setters for 8-bit functions
@@ -359,11 +359,11 @@ public:
 	address_map_entry64 *add(offs_t start, offs_t end, address_map_entry64 *ptr);
 
 	// public data
-	address_spacenum		m_spacenum;			// space number of the map
-	UINT8					m_databits;			// data bits represented by the map
-	UINT8					m_unmapval;			// unmapped memory value
-	offs_t					m_globalmask;		// global mask
-	simple_list<address_map_entry> m_entrylist;	// list of entries
+	address_spacenum        m_spacenum;         // space number of the map
+	UINT8                   m_databits;         // data bits represented by the map
+	UINT8                   m_unmapval;         // unmapped memory value
+	offs_t                  m_globalmask;       // global mask
+	simple_list<address_map_entry> m_entrylist; // list of entries
 
 	void uplift_submaps(running_machine &machine, device_t &device, device_t &owner, endianness_t endian);
 };
@@ -664,14 +664,14 @@ void _class :: _name(::address_map &map, device_t &device) \
 
 
 // common shortcuts
-#define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)
-#define AM_RAMBANK(_bank)					AM_READWRITE_BANK(_bank)
-#define AM_RAM_READ(_read)					AM_READ(_read) AM_WRITEONLY
-#define AM_RAM_WRITE(_write)				AM_READONLY AM_WRITE(_write)
+#define AM_ROMBANK(_bank)                   AM_READ_BANK(_bank)
+#define AM_RAMBANK(_bank)                   AM_READWRITE_BANK(_bank)
+#define AM_RAM_READ(_read)                  AM_READ(_read) AM_WRITEONLY
+#define AM_RAM_WRITE(_write)                AM_READONLY AM_WRITE(_write)
 #define AM_RAM_DEVREAD(_tag, _class, _read) AM_DEVREAD(_tag, _class, _read) AM_WRITEONLY
 #define AM_RAM_DEVWRITE(_tag, _class, _write) AM_READONLY AM_DEVWRITE(_tag, _class, _write)
 
-#define AM_RAM_WRITE_LEGACY(_write)			AM_READONLY AM_WRITE_LEGACY(_write)
+#define AM_RAM_WRITE_LEGACY(_write)         AM_READONLY AM_WRITE_LEGACY(_write)
 #define AM_RAM_DEVWRITE_LEGACY(_tag, _write) AM_READONLY AM_DEVWRITE_LEGACY(_tag, _write)
 
 
@@ -688,4 +688,4 @@ static const char DEVICE_SELF[] = "";
 static const char DEVICE_SELF_OWNER[] = "^";
 
 
-#endif	/* __ADDRMAP_H__ */
+#endif  /* __ADDRMAP_H__ */

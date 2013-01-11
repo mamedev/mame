@@ -120,16 +120,16 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 	{
 		switch((offset & 0xe000)>>13)
 		{
-		case 1:	 // 2000-3fff
+		case 1:  // 2000-3fff
 			*value = m_ram[offset & 0x1fff];
 			return;
-		case 5:	// a000-bfff
+		case 5: // a000-bfff
 			*value = m_ram[(offset & 0x1fff) | 0x2000];
 			return;
-		case 6:	// c000-dfff
+		case 6: // c000-dfff
 			*value = m_ram[(offset & 0x1fff) | 0x4000];
 			return;
-		case 7:	// e000-ffff
+		case 7: // e000-ffff
 			*value = m_ram[(offset & 0x1fff) | 0x6000];
 			return;
 		default:
@@ -185,16 +185,16 @@ WRITE8_MEMBER(horizon_ramdisk_device::write)
 	{
 		switch((offset & 0xe000)>>13)
 		{
-		case 1:	 // 2000-3fff
+		case 1:  // 2000-3fff
 			m_ram[offset & 0x1fff] = data;
 			return;
-		case 5:	// a000-bfff
+		case 5: // a000-bfff
 			m_ram[(offset & 0x1fff) | 0x2000] = data;
 			return;
-		case 6:	// c000-dfff
+		case 6: // c000-dfff
 			m_ram[(offset & 0x1fff) | 0x4000] = data;
 			return;
-		case 7:	// e000-ffff
+		case 7: // e000-ffff
 			m_ram[(offset & 0x1fff) | 0x6000] = data;
 			return;
 		default:
@@ -445,4 +445,3 @@ ioport_constructor horizon_ramdisk_device::device_input_ports() const
 }
 
 const device_type TI99_HORIZON = &device_creator<horizon_ramdisk_device>;
-

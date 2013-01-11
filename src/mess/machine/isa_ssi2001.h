@@ -13,7 +13,7 @@
 // ====================> ssi2001_device
 
 class ssi2001_device : public device_t,
-                       public device_isa8_card_interface
+						public device_isa8_card_interface
 {
 public:
 	// construction/destruction
@@ -37,4 +37,3 @@ protected:
 extern const device_type ISA8_SSI2001;
 
 #endif
-

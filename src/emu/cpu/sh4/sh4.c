@@ -329,10 +329,10 @@ const void BRA(sh4_state *sh4, const UINT16 opcode)
 	{
 		UINT32 next_opcode = RW(sh4,sh4->ppc & AM);
 		/* BRA  $
-         * NOP
-         */
+		 * NOP
+		 */
 		if (next_opcode == 0x0009)
-			sh4->sh4_icount %= 3;	/* cycles for BRA $ and NOP taken (3) */
+			sh4->sh4_icount %= 3;   /* cycles for BRA $ and NOP taken (3) */
 	}
 #endif
 	sh4->delay = sh4->pc;
@@ -516,18 +516,18 @@ const void CMPPZ(sh4_state *sh4, const UINT16 opcode)
  */
 const void CMPSTR(sh4_state *sh4, const UINT16 opcode)
 {
-  UINT32 temp;
-  INT32 HH, HL, LH, LL;
-  temp = sh4->r[Rn] ^ sh4->r[Rm];
-  HH = (temp >> 24) & 0xff;
-  HL = (temp >> 16) & 0xff;
-  LH = (temp >> 8) & 0xff;
-  LL = temp & 0xff;
-  if (HH && HL && LH && LL)
-   sh4->sr &= ~T;
-  else
-   sh4->sr |= T;
- }
+	UINT32 temp;
+	INT32 HH, HL, LH, LL;
+	temp = sh4->r[Rn] ^ sh4->r[Rm];
+	HH = (temp >> 24) & 0xff;
+	HL = (temp >> 16) & 0xff;
+	LH = (temp >> 8) & 0xff;
+	LL = temp & 0xff;
+	if (HH && HL && LH && LL)
+	sh4->sr &= ~T;
+	else
+	sh4->sr |= T;
+	}
 
 
 /*  code                 cycles  t-bit
@@ -767,14 +767,14 @@ const void DT(sh4_state *sh4, const UINT16 opcode)
 	{
 		UINT32 next_opcode = RW(sh4,sh4->ppc & AM);
 		/* DT   Rn
-         * BF   $-2
-         */
+		 * BF   $-2
+		 */
 		if (next_opcode == 0x8bfd)
 		{
 			while (sh4->r[n] > 1 && sh4->sh4_icount > 4)
 			{
 				sh4->r[n]--;
-				sh4->sh4_icount -= 4;	/* cycles for DT (1) and BF taken (3) */
+				sh4->sh4_icount -= 4;   /* cycles for DT (1) and BF taken (3) */
 			}
 		}
 	}
@@ -2485,13 +2485,13 @@ const void FLDI0(sh4_state *sh4, const UINT16 opcode)
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
-const void	FLDS(sh4_state *sh4, const UINT16 opcode)
+const void  FLDS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->fpul = sh4->fr[Rn];
 }
 
 /*  FSTS FPUL,FRn 1111nnnn00001101 */
-const void	FSTS(sh4_state *sh4, const UINT16 opcode)
+const void  FSTS(sh4_state *sh4, const UINT16 opcode)
 {
 	sh4->fr[Rn] = sh4->fpul;
 }
@@ -2818,7 +2818,7 @@ const void dbreak(sh4_state *sh4, const UINT16 opcode)
 
 sh4ophandler op1111_0x13_handlers[] =
 {
-	FSTS,		FLDS,		FLOAT,		FTRC,		FNEG,		FABS,		FSQRT,		FSRRA,		FLDI0,		FLDI1,		FCNVSD,		FCNVDS,		dbreak, dbreak, FIPR,	op1111_0xf13
+	FSTS,       FLDS,       FLOAT,      FTRC,       FNEG,       FABS,       FSQRT,      FSRRA,      FLDI0,      FLDI1,      FCNVSD,     FCNVDS,     dbreak, dbreak, FIPR,   op1111_0xf13
 };
 
 const void op1111_0x13(sh4_state *sh4, UINT16 opcode)
@@ -2838,7 +2838,7 @@ static CPU_RESET( common_sh4_reset )
 	emu_timer *tsave[5];
 	UINT32 *m;
 	int save_is_slave;
-	int	savecpu_clock, savebus_clock, savepm_clock;
+	int savecpu_clock, savebus_clock, savepm_clock;
 
 	void (*f)(UINT32 data);
 	device_irq_acknowledge_callback save_irqcallback;
@@ -2950,73 +2950,73 @@ static CPU_RESET( sh4 )
 
 sh4ophandler op1000_handler[] =
 {
-	MOVBS4,		MOVWS4,		NOP,		NOP,		MOVBL4,		MOVWL4,		NOP,		NOP,		CMPIM,		BT,			NOP,		BF,			NOP,		BTS,		NOP,		BFS
+	MOVBS4,     MOVWS4,     NOP,        NOP,        MOVBL4,     MOVWL4,     NOP,        NOP,        CMPIM,      BT,         NOP,        BF,         NOP,        BTS,        NOP,        BFS
 };
 
 sh4ophandler op1100_handler[] =
 {
-	MOVBSG,		MOVWSG,		MOVLSG,		TRAPA,		MOVBLG,		MOVWLG,		MOVLLG,		MOVA,		TSTI,		ANDI,		XORI,		ORI,		TSTM,		ANDM,		XORM,		ORM
+	MOVBSG,     MOVWSG,     MOVLSG,     TRAPA,      MOVBLG,     MOVWLG,     MOVLLG,     MOVA,       TSTI,       ANDI,       XORI,       ORI,        TSTM,       ANDM,       XORM,       ORM
 };
 
 sh4ophandler op0000_handlers[] =
 {
-	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,
-	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,
-	STCSR,		STCGBR,		STCVBR,		STCSSR,		STCSPC,		NOP,		NOP,		NOP,		STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,	STCRBANK,
-	BSRF,		NOP,		BRAF,		NOP,		NOP,		NOP,		NOP,		NOP,		PREFM,		TODO,		TODO,		TODO,		MOVCAL,		NOP,		NOP,		NOP,
-	MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,		MOVBS0,
-	MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,		MOVWS0,
-	MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,		MOVLS0,
-	MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,		MULL,
-	CLRT,		SETT,		CLRMAC,		TODO,		CLRS,		SETS,		NOP,		NOP,		CLRT,		SETT,		CLRMAC,		TODO,		CLRS,		SETS,		NOP,		NOP,
-	NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,		NOP,		DIV0U,		MOVT,		NOP,
-	STSMACH,	STSMACL,	STSPR,		STCSGR,		NOP,		STSFPUL,	STSFPSCR,	STCDBR,		STSMACH,	STSMACL,	STSPR,		STCSGR,		NOP,		STSFPUL,	STSFPSCR,	STCDBR,
-	RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,		RTS,		SLEEP,		RTE,		NOP,
-	MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,		MOVBL0,
-	MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,		MOVWL0,
-	MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,		MOVLL0,
-	MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,		MAC_L,
+	NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,
+	NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,
+	STCSR,      STCGBR,     STCVBR,     STCSSR,     STCSPC,     NOP,        NOP,        NOP,        STCRBANK,   STCRBANK,   STCRBANK,   STCRBANK,   STCRBANK,   STCRBANK,   STCRBANK,   STCRBANK,
+	BSRF,       NOP,        BRAF,       NOP,        NOP,        NOP,        NOP,        NOP,        PREFM,      TODO,       TODO,       TODO,       MOVCAL,     NOP,        NOP,        NOP,
+	MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,     MOVBS0,
+	MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,     MOVWS0,
+	MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,     MOVLS0,
+	MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,       MULL,
+	CLRT,       SETT,       CLRMAC,     TODO,       CLRS,       SETS,       NOP,        NOP,        CLRT,       SETT,       CLRMAC,     TODO,       CLRS,       SETS,       NOP,        NOP,
+	NOP,        DIV0U,      MOVT,       NOP,        NOP,        DIV0U,      MOVT,       NOP,        NOP,        DIV0U,      MOVT,       NOP,        NOP,        DIV0U,      MOVT,       NOP,
+	STSMACH,    STSMACL,    STSPR,      STCSGR,     NOP,        STSFPUL,    STSFPSCR,   STCDBR,     STSMACH,    STSMACL,    STSPR,      STCSGR,     NOP,        STSFPUL,    STSFPSCR,   STCDBR,
+	RTS,        SLEEP,      RTE,        NOP,        RTS,        SLEEP,      RTE,        NOP,        RTS,        SLEEP,      RTE,        NOP,        RTS,        SLEEP,      RTE,        NOP,
+	MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,     MOVBL0,
+	MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,     MOVWL0,
+	MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,     MOVLL0,
+	MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,      MAC_L,
 };
 
 sh4ophandler op0100_handlers[] =
 {
-	SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP,		SHLL,		DT,			SHAL,		NOP,
-	SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,		SHLR,		CMPPZ,		SHAR,		NOP,
-	STSMMACH,	STSMMACL,	STSMPR,		STCMSGR,	NOP,		STSMFPUL,	STSMFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		STCMDBR,
-	STCMSR,		STCMGBR,	STCMVBR,	STCMSSR,	STCMSPC,	NOP,		NOP,		NOP,		STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,	STCMRBANK,
-	ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,		ROTL,		NOP,		ROTCL,		NOP,
-	ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,		ROTR,		CMPPL,		ROTCR,		NOP,
-	LDSMMACH,	LDSMMACL,	LDSMPR,		NOP,		NOP,		LDSMFPUL,	LDSMFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		LDCMDBR,
-	LDCMSR,		LDCMGBR,	LDCMVBR,	LDCMSSR,	LDCMSPC,	NOP,		NOP,		NOP,		LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,	LDCMRBANK,
-	SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,		SHLL2,		SHLL8,		SHLL16,		NOP,
-	SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,		SHLR2,		SHLR8,		SHLR16,		NOP,
-	LDSMACH,	LDSMACL,	LDSPR,		NOP,		NOP,		LDSFPUL,	LDSFPSCR,	NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		NOP,		LDCDBR,
-	JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,		JSR,		TAS,		JMP,		NOP,
-	SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,		SHAD,
-	SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,		SHLD,
-	LDCSR,		LDCGBR,		LDCVBR,		LDCSSR,		LDCSPC,		NOP,		NOP,		NOP,		LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,	LDCRBANK,
-	MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,		MAC_W,
+	SHLL,       DT,         SHAL,       NOP,        SHLL,       DT,         SHAL,       NOP,        SHLL,       DT,         SHAL,       NOP,        SHLL,       DT,         SHAL,       NOP,
+	SHLR,       CMPPZ,      SHAR,       NOP,        SHLR,       CMPPZ,      SHAR,       NOP,        SHLR,       CMPPZ,      SHAR,       NOP,        SHLR,       CMPPZ,      SHAR,       NOP,
+	STSMMACH,   STSMMACL,   STSMPR,     STCMSGR,    NOP,        STSMFPUL,   STSMFPSCR,  NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        STCMDBR,
+	STCMSR,     STCMGBR,    STCMVBR,    STCMSSR,    STCMSPC,    NOP,        NOP,        NOP,        STCMRBANK,  STCMRBANK,  STCMRBANK,  STCMRBANK,  STCMRBANK,  STCMRBANK,  STCMRBANK,  STCMRBANK,
+	ROTL,       NOP,        ROTCL,      NOP,        ROTL,       NOP,        ROTCL,      NOP,        ROTL,       NOP,        ROTCL,      NOP,        ROTL,       NOP,        ROTCL,      NOP,
+	ROTR,       CMPPL,      ROTCR,      NOP,        ROTR,       CMPPL,      ROTCR,      NOP,        ROTR,       CMPPL,      ROTCR,      NOP,        ROTR,       CMPPL,      ROTCR,      NOP,
+	LDSMMACH,   LDSMMACL,   LDSMPR,     NOP,        NOP,        LDSMFPUL,   LDSMFPSCR,  NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        LDCMDBR,
+	LDCMSR,     LDCMGBR,    LDCMVBR,    LDCMSSR,    LDCMSPC,    NOP,        NOP,        NOP,        LDCMRBANK,  LDCMRBANK,  LDCMRBANK,  LDCMRBANK,  LDCMRBANK,  LDCMRBANK,  LDCMRBANK,  LDCMRBANK,
+	SHLL2,      SHLL8,      SHLL16,     NOP,        SHLL2,      SHLL8,      SHLL16,     NOP,        SHLL2,      SHLL8,      SHLL16,     NOP,        SHLL2,      SHLL8,      SHLL16,     NOP,
+	SHLR2,      SHLR8,      SHLR16,     NOP,        SHLR2,      SHLR8,      SHLR16,     NOP,        SHLR2,      SHLR8,      SHLR16,     NOP,        SHLR2,      SHLR8,      SHLR16,     NOP,
+	LDSMACH,    LDSMACL,    LDSPR,      NOP,        NOP,        LDSFPUL,    LDSFPSCR,   NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        NOP,        LDCDBR,
+	JSR,        TAS,        JMP,        NOP,        JSR,        TAS,        JMP,        NOP,        JSR,        TAS,        JMP,        NOP,        JSR,        TAS,        JMP,        NOP,
+	SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,       SHAD,
+	SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,       SHLD,
+	LDCSR,      LDCGBR,     LDCVBR,     LDCSSR,     LDCSPC,     NOP,        NOP,        NOP,        LDCRBANK,   LDCRBANK,   LDCRBANK,   LDCRBANK,   LDCRBANK,   LDCRBANK,   LDCRBANK,   LDCRBANK,
+	MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,      MAC_W,
 };
 
 
 sh4ophandler upper4bits[] =
 {
-	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0x0000 - uses op0000_handlers*/
-	MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4,		MOVLS4, /* j = 0x1000 */
-	MOVBS,		MOVWS,		MOVLS,		NOP,		MOVBM,		MOVWM,		MOVLM,		DIV0S,		TST,		AND,		XOR,		OR,			CMPSTR,		XTRCT,		MULU,		MULS,	/* j = 0x2000 */
-	CMPEQ,		NOP,		CMPHS,		CMPGE,		DIV1,		DMULU,		CMPHI,		CMPGT,		SUB,		NOP,		SUBC,		SUBV,		ADD,		DMULS,		ADDC,		ADDV,	/* j = 0x3000 */
-	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0x4000 - uses op0100_handlers*/
-	MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4,		MOVLL4, /* j = 0x5000 */
-	MOVBL,		MOVWL,		MOVLL,		MOV,		MOVBP,		MOVWP,		MOVLP,		NOT,		SWAPB,		SWAPW,		NEGC,		NEG,		EXTUB,		EXTUW,		EXTSB,		EXTSW,	/* j = 0x6000 */
-	ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,		ADDI,	/* j = 0x7000 */
-	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0x8000 - uses op1000_handlers */
-	MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,		MOVWI,	/* j = 0x9000 */
-	BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,		BRA,	/* j = 0xa000 */
-	BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,		BSR,	/* j = 0xb000 */
-	0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,			0,		/* j = 0xc000 - uses op1100_handlers */
-	MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,		MOVLI,	/* j = 0xd000 */
-	MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,		MOVI,	/* j = 0xe000 */
-	FADD,		FSUB,		FMUL,		FDIV,		FCMP_EQ,	FCMP_GT,	FMOVS0FR,	FMOVFRS0,	FMOVMRFR,	FMOVMRIFR,	FMOVFRMR,	FMOVFRMDR,	FMOVFR,		op1111_0x13,FMAC,		dbreak	/* j = 0xf000 */
+	0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,      /* j = 0x0000 - uses op0000_handlers*/
+	MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4,     MOVLS4, /* j = 0x1000 */
+	MOVBS,      MOVWS,      MOVLS,      NOP,        MOVBM,      MOVWM,      MOVLM,      DIV0S,      TST,        AND,        XOR,        OR,         CMPSTR,     XTRCT,      MULU,       MULS,   /* j = 0x2000 */
+	CMPEQ,      NOP,        CMPHS,      CMPGE,      DIV1,       DMULU,      CMPHI,      CMPGT,      SUB,        NOP,        SUBC,       SUBV,       ADD,        DMULS,      ADDC,       ADDV,   /* j = 0x3000 */
+	0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,      /* j = 0x4000 - uses op0100_handlers*/
+	MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4,     MOVLL4, /* j = 0x5000 */
+	MOVBL,      MOVWL,      MOVLL,      MOV,        MOVBP,      MOVWP,      MOVLP,      NOT,        SWAPB,      SWAPW,      NEGC,       NEG,        EXTUB,      EXTUW,      EXTSB,      EXTSW,  /* j = 0x6000 */
+	ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,       ADDI,   /* j = 0x7000 */
+	0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,      /* j = 0x8000 - uses op1000_handlers */
+	MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,      MOVWI,  /* j = 0x9000 */
+	BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,        BRA,    /* j = 0xa000 */
+	BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,        BSR,    /* j = 0xb000 */
+	0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,          0,      /* j = 0xc000 - uses op1100_handlers */
+	MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,      MOVLI,  /* j = 0xd000 */
+	MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,       MOVI,   /* j = 0xe000 */
+	FADD,       FSUB,       FMUL,       FDIV,       FCMP_EQ,    FCMP_GT,    FMOVS0FR,   FMOVFRS0,   FMOVMRFR,   FMOVMRIFR,  FMOVFRMR,   FMOVFRMDR,  FMOVFR,     op1111_0x13,FMAC,       dbreak  /* j = 0xf000 */
 };
 
 void sh4_build_optable(sh4_state *sh4)
@@ -3320,131 +3320,131 @@ static CPU_SET_INFO( sh4 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:		sh4_set_irq_line(sh4, SH4_IRL0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:		sh4_set_irq_line(sh4, SH4_IRL1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL2:		sh4_set_irq_line(sh4, SH4_IRL2, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL3:		sh4_set_irq_line(sh4, SH4_IRL3, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_IRLn:		sh4_set_irq_line(sh4, SH4_IRLn, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	sh4_set_irq_line(sh4, INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:        sh4_set_irq_line(sh4, SH4_IRL0, info->i);       break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:        sh4_set_irq_line(sh4, SH4_IRL1, info->i);       break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL2:        sh4_set_irq_line(sh4, SH4_IRL2, info->i);       break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL3:        sh4_set_irq_line(sh4, SH4_IRL3, info->i);       break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRLn:        sh4_set_irq_line(sh4, SH4_IRLn, info->i);       break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  sh4_set_irq_line(sh4, INPUT_LINE_NMI, info->i); break;
 
 		case CPUINFO_INT_REGISTER + SH4_PC:
-		case CPUINFO_INT_PC:							sh4->pc = info->i; sh4->delay = 0;		break;
-		case CPUINFO_INT_SP:							sh4->r[15] = info->i;   				break;
-		case CPUINFO_INT_REGISTER + SH4_PR: 			sh4->pr = info->i;						break;
+		case CPUINFO_INT_PC:                            sh4->pc = info->i; sh4->delay = 0;      break;
+		case CPUINFO_INT_SP:                            sh4->r[15] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_PR:             sh4->pr = info->i;                      break;
 		case CPUINFO_INT_REGISTER + SH4_SR:
 			sh4->sr = info->i;
 			sh4_exception_recompute(sh4);
 			sh4_check_pending_irq(sh4, "sh4_set_info");
 			break;
-		case CPUINFO_INT_REGISTER + SH4_GBR:			sh4->gbr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH4_VBR:			sh4->vbr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH4_DBR:			sh4->dbr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH4_MACH:			sh4->mach = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH4_MACL:			sh4->macl = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH4_R0:				sh4->r[ 0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R1:				sh4->r[ 1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R2:				sh4->r[ 2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R3:				sh4->r[ 3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R4:				sh4->r[ 4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R5:				sh4->r[ 5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R6:				sh4->r[ 6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R7:				sh4->r[ 7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R8:				sh4->r[ 8] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R9:				sh4->r[ 9] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R10:			sh4->r[10] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R11:			sh4->r[11] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R12:			sh4->r[12] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R13:			sh4->r[13] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R14:			sh4->r[14] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_R15:			sh4->r[15] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH4_EA:				sh4->ea = info->i;						break;
-		case CPUINFO_STR_REGISTER + SH4_R0_BK0:			sh4->rbnk[0][0] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R1_BK0:			sh4->rbnk[0][1] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R2_BK0:			sh4->rbnk[0][2] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R3_BK0:			sh4->rbnk[0][3] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R4_BK0:			sh4->rbnk[0][4] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R5_BK0:			sh4->rbnk[0][5] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R6_BK0:			sh4->rbnk[0][6] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R7_BK0:			sh4->rbnk[0][7] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R0_BK1:			sh4->rbnk[1][0] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R1_BK1:			sh4->rbnk[1][1] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R2_BK1:			sh4->rbnk[1][2] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R3_BK1:			sh4->rbnk[1][3] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R4_BK1:			sh4->rbnk[1][4] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R5_BK1:			sh4->rbnk[1][5] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R6_BK1:			sh4->rbnk[1][6] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_R7_BK1:			sh4->rbnk[1][7] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_SPC:			sh4->spc = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_SSR:			sh4->ssr = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_SGR:			sh4->sgr = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sh4->fpscr = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FPUL:			sh4->fpul = info->i; break;
+		case CPUINFO_INT_REGISTER + SH4_GBR:            sh4->gbr = info->i;                     break;
+		case CPUINFO_INT_REGISTER + SH4_VBR:            sh4->vbr = info->i;                     break;
+		case CPUINFO_INT_REGISTER + SH4_DBR:            sh4->dbr = info->i;                     break;
+		case CPUINFO_INT_REGISTER + SH4_MACH:           sh4->mach = info->i;                        break;
+		case CPUINFO_INT_REGISTER + SH4_MACL:           sh4->macl = info->i;                        break;
+		case CPUINFO_INT_REGISTER + SH4_R0:             sh4->r[ 0] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R1:             sh4->r[ 1] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R2:             sh4->r[ 2] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R3:             sh4->r[ 3] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R4:             sh4->r[ 4] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R5:             sh4->r[ 5] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R6:             sh4->r[ 6] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R7:             sh4->r[ 7] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R8:             sh4->r[ 8] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R9:             sh4->r[ 9] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R10:            sh4->r[10] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R11:            sh4->r[11] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R12:            sh4->r[12] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R13:            sh4->r[13] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R14:            sh4->r[14] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_R15:            sh4->r[15] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH4_EA:             sh4->ea = info->i;                      break;
+		case CPUINFO_STR_REGISTER + SH4_R0_BK0:         sh4->rbnk[0][0] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R1_BK0:         sh4->rbnk[0][1] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R2_BK0:         sh4->rbnk[0][2] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R3_BK0:         sh4->rbnk[0][3] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R4_BK0:         sh4->rbnk[0][4] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R5_BK0:         sh4->rbnk[0][5] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R6_BK0:         sh4->rbnk[0][6] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R7_BK0:         sh4->rbnk[0][7] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R0_BK1:         sh4->rbnk[1][0] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R1_BK1:         sh4->rbnk[1][1] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R2_BK1:         sh4->rbnk[1][2] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R3_BK1:         sh4->rbnk[1][3] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R4_BK1:         sh4->rbnk[1][4] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R5_BK1:         sh4->rbnk[1][5] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R6_BK1:         sh4->rbnk[1][6] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_R7_BK1:         sh4->rbnk[1][7] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_SPC:            sh4->spc = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_SSR:            sh4->ssr = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_SGR:            sh4->sgr = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FPSCR:          sh4->fpscr = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FPUL:           sh4->fpul = info->i; break;
 #ifdef LSB_FIRST
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sh4->fr[ 0 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR1:			sh4->fr[ 1 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR2:			sh4->fr[ 2 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR3:			sh4->fr[ 3 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR4:			sh4->fr[ 4 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR5:			sh4->fr[ 5 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR6:			sh4->fr[ 6 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR7:			sh4->fr[ 7 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR8:			sh4->fr[ 8 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR9:			sh4->fr[ 9 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR10:			sh4->fr[10 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR11:			sh4->fr[11 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR12:			sh4->fr[12 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR13:			sh4->fr[13 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR14:			sh4->fr[14 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR15:			sh4->fr[15 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF0:			sh4->xf[ 0 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF1:			sh4->xf[ 1 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF2:			sh4->xf[ 2 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF3:			sh4->xf[ 3 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF4:			sh4->xf[ 4 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF5:			sh4->xf[ 5 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF6:			sh4->xf[ 6 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF7:			sh4->xf[ 7 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF8:			sh4->xf[ 8 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF9:			sh4->xf[ 9 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF10:			sh4->xf[10 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF11:			sh4->xf[11 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF12:			sh4->xf[12 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF13:			sh4->xf[13 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF14:			sh4->xf[14 ^ sh4->fpu_pr] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF15:			sh4->xf[15 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR0:            sh4->fr[ 0 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:            sh4->fr[ 1 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:            sh4->fr[ 2 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:            sh4->fr[ 3 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:            sh4->fr[ 4 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:            sh4->fr[ 5 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:            sh4->fr[ 6 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:            sh4->fr[ 7 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:            sh4->fr[ 8 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:            sh4->fr[ 9 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:           sh4->fr[10 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:           sh4->fr[11 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:           sh4->fr[12 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:           sh4->fr[13 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:           sh4->fr[14 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:           sh4->fr[15 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:            sh4->xf[ 0 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:            sh4->xf[ 1 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:            sh4->xf[ 2 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:            sh4->xf[ 3 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:            sh4->xf[ 4 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:            sh4->xf[ 5 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:            sh4->xf[ 6 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:            sh4->xf[ 7 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:            sh4->xf[ 8 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:            sh4->xf[ 9 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:           sh4->xf[10 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:           sh4->xf[11 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:           sh4->xf[12 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:           sh4->xf[13 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:           sh4->xf[14 ^ sh4->fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:           sh4->xf[15 ^ sh4->fpu_pr] = info->i; break;
 #else
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sh4->fr[ 0] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR1:			sh4->fr[ 1] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR2:			sh4->fr[ 2] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR3:			sh4->fr[ 3] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR4:			sh4->fr[ 4] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR5:			sh4->fr[ 5] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR6:			sh4->fr[ 6] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR7:			sh4->fr[ 7] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR8:			sh4->fr[ 8] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR9:			sh4->fr[ 9] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR10:			sh4->fr[10] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR11:			sh4->fr[11] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR12:			sh4->fr[12] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR13:			sh4->fr[13] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR14:			sh4->fr[14] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_FR15:			sh4->fr[15] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF0:			sh4->xf[ 0] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF1:			sh4->xf[ 1] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF2:			sh4->xf[ 2] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF3:			sh4->xf[ 3] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF4:			sh4->xf[ 4] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF5:			sh4->xf[ 5] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF6:			sh4->xf[ 6] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF7:			sh4->xf[ 7] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF8:			sh4->xf[ 8] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF9:			sh4->xf[ 9] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF10:			sh4->xf[10] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF11:			sh4->xf[11] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF12:			sh4->xf[12] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF13:			sh4->xf[13] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF14:			sh4->xf[14] = info->i; break;
-		case CPUINFO_STR_REGISTER + SH4_XF15:			sh4->xf[15] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR0:            sh4->fr[ 0] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:            sh4->fr[ 1] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:            sh4->fr[ 2] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:            sh4->fr[ 3] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:            sh4->fr[ 4] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:            sh4->fr[ 5] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:            sh4->fr[ 6] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:            sh4->fr[ 7] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:            sh4->fr[ 8] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:            sh4->fr[ 9] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:           sh4->fr[10] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:           sh4->fr[11] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:           sh4->fr[12] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:           sh4->fr[13] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:           sh4->fr[14] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:           sh4->fr[15] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:            sh4->xf[ 0] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:            sh4->xf[ 1] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:            sh4->xf[ 2] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:            sh4->xf[ 3] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:            sh4->xf[ 4] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:            sh4->xf[ 5] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:            sh4->xf[ 6] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:            sh4->xf[ 7] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:            sh4->xf[ 8] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:            sh4->xf[ 9] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:           sh4->xf[10] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:           sh4->xf[11] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:           sh4->xf[12] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:           sh4->xf[13] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:           sh4->xf[14] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:           sh4->xf[15] = info->i; break;
 #endif
 	}
 }
@@ -3491,80 +3491,80 @@ CPU_GET_INFO( sh4 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sh4_state);		break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 5;						break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;						break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;				break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;						break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;						break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;						break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;						break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;						break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;						break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(sh4_state);        break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 5;                        break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                        break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                        break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                        break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                        break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                        break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                        break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                        break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:		info->i = 64;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 32;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;				break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:		info->i = 0;				break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:        info->i = 64;               break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:    info->i = 32;               break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:    info->i = 0;                break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:       info->i = 0;                break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:       info->i = 0;                break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:       info->i = 0;                break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 64;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh4_internal_map); break;
 
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:		info->i = sh4->irq_line_state[SH4_IRL0]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:		info->i = sh4->irq_line_state[SH4_IRL1]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL2:		info->i = sh4->irq_line_state[SH4_IRL2]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_IRL3:		info->i = sh4->irq_line_state[SH4_IRL3]; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = sh4->nmi_line_state;			break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:        info->i = sh4->irq_line_state[SH4_IRL0]; break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:        info->i = sh4->irq_line_state[SH4_IRL1]; break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL2:        info->i = sh4->irq_line_state[SH4_IRL2]; break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL3:        info->i = sh4->irq_line_state[SH4_IRL3]; break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = sh4->nmi_line_state;          break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = sh4->ppc;						break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = sh4->ppc;                     break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SH4_PC:				info->i = (sh4->delay) ? (sh4->delay & AM) : (sh4->pc & AM); break;
-		case CPUINFO_INT_SP:							info->i = sh4->r[15];					break;
-		case CPUINFO_INT_REGISTER + SH4_PR:				info->i = sh4->pr;						break;
-		case CPUINFO_INT_REGISTER + SH4_SR:				info->i = sh4->sr;						break;
-		case CPUINFO_INT_REGISTER + SH4_GBR:			info->i = sh4->gbr;						break;
-		case CPUINFO_INT_REGISTER + SH4_VBR:			info->i = sh4->vbr;						break;
-		case CPUINFO_INT_REGISTER + SH4_DBR:			info->i = sh4->dbr;						break;
-		case CPUINFO_INT_REGISTER + SH4_MACH:			info->i = sh4->mach;						break;
-		case CPUINFO_INT_REGISTER + SH4_MACL:			info->i = sh4->macl;						break;
-		case CPUINFO_INT_REGISTER + SH4_R0:				info->i = sh4->r[ 0];					break;
-		case CPUINFO_INT_REGISTER + SH4_R1:				info->i = sh4->r[ 1];					break;
-		case CPUINFO_INT_REGISTER + SH4_R2:				info->i = sh4->r[ 2];					break;
-		case CPUINFO_INT_REGISTER + SH4_R3:				info->i = sh4->r[ 3];					break;
-		case CPUINFO_INT_REGISTER + SH4_R4:				info->i = sh4->r[ 4];					break;
-		case CPUINFO_INT_REGISTER + SH4_R5:				info->i = sh4->r[ 5];					break;
-		case CPUINFO_INT_REGISTER + SH4_R6:				info->i = sh4->r[ 6];					break;
-		case CPUINFO_INT_REGISTER + SH4_R7:				info->i = sh4->r[ 7];					break;
-		case CPUINFO_INT_REGISTER + SH4_R8:				info->i = sh4->r[ 8];					break;
-		case CPUINFO_INT_REGISTER + SH4_R9:				info->i = sh4->r[ 9];					break;
-		case CPUINFO_INT_REGISTER + SH4_R10:			info->i = sh4->r[10];					break;
-		case CPUINFO_INT_REGISTER + SH4_R11:			info->i = sh4->r[11];					break;
-		case CPUINFO_INT_REGISTER + SH4_R12:			info->i = sh4->r[12];					break;
-		case CPUINFO_INT_REGISTER + SH4_R13:			info->i = sh4->r[13];					break;
-		case CPUINFO_INT_REGISTER + SH4_R14:			info->i = sh4->r[14];					break;
-		case CPUINFO_INT_REGISTER + SH4_R15:			info->i = sh4->r[15];					break;
-		case CPUINFO_INT_REGISTER + SH4_EA:				info->i = sh4->ea;						break;
+		case CPUINFO_INT_REGISTER + SH4_PC:             info->i = (sh4->delay) ? (sh4->delay & AM) : (sh4->pc & AM); break;
+		case CPUINFO_INT_SP:                            info->i = sh4->r[15];                   break;
+		case CPUINFO_INT_REGISTER + SH4_PR:             info->i = sh4->pr;                      break;
+		case CPUINFO_INT_REGISTER + SH4_SR:             info->i = sh4->sr;                      break;
+		case CPUINFO_INT_REGISTER + SH4_GBR:            info->i = sh4->gbr;                     break;
+		case CPUINFO_INT_REGISTER + SH4_VBR:            info->i = sh4->vbr;                     break;
+		case CPUINFO_INT_REGISTER + SH4_DBR:            info->i = sh4->dbr;                     break;
+		case CPUINFO_INT_REGISTER + SH4_MACH:           info->i = sh4->mach;                        break;
+		case CPUINFO_INT_REGISTER + SH4_MACL:           info->i = sh4->macl;                        break;
+		case CPUINFO_INT_REGISTER + SH4_R0:             info->i = sh4->r[ 0];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R1:             info->i = sh4->r[ 1];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R2:             info->i = sh4->r[ 2];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R3:             info->i = sh4->r[ 3];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R4:             info->i = sh4->r[ 4];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R5:             info->i = sh4->r[ 5];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R6:             info->i = sh4->r[ 6];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R7:             info->i = sh4->r[ 7];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R8:             info->i = sh4->r[ 8];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R9:             info->i = sh4->r[ 9];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R10:            info->i = sh4->r[10];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R11:            info->i = sh4->r[11];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R12:            info->i = sh4->r[12];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R13:            info->i = sh4->r[13];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R14:            info->i = sh4->r[14];                   break;
+		case CPUINFO_INT_REGISTER + SH4_R15:            info->i = sh4->r[15];                   break;
+		case CPUINFO_INT_REGISTER + SH4_EA:             info->i = sh4->ea;                      break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh4);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(sh4);					break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(sh4);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh4);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh4);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4->sh4_icount;				break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(sh4);         break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(sh4);                    break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(sh4);              break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(sh4);          break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(sh4);          break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &sh4->sh4_icount;                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "SH-4");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7750");		break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");				break;
-		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright R. Belmont"); break;
+		case CPUINFO_STR_NAME:                      strcpy(info->s, "SH-4");                break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Hitachi SH7750");      break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");             break;
+		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright R. Belmont"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s%s%s%s%c%c%d%c%c",
@@ -3579,118 +3579,118 @@ CPU_GET_INFO( sh4 )
 					sh4->sr & T ? 'T':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + SH4_PC:				sprintf(info->s, "PC  :%08X", sh4->pc); break;
-		case CPUINFO_STR_REGISTER + SH4_SR:				sprintf(info->s, "SR  :%08X", sh4->sr); break;
-		case CPUINFO_STR_REGISTER + SH4_PR:				sprintf(info->s, "PR  :%08X", sh4->pr); break;
-		case CPUINFO_STR_REGISTER + SH4_GBR:			sprintf(info->s, "GBR :%08X", sh4->gbr); break;
-		case CPUINFO_STR_REGISTER + SH4_VBR:			sprintf(info->s, "VBR :%08X", sh4->vbr); break;
-		case CPUINFO_STR_REGISTER + SH4_DBR:			sprintf(info->s, "DBR :%08X", sh4->dbr); break;
-		case CPUINFO_STR_REGISTER + SH4_MACH:			sprintf(info->s, "MACH:%08X", sh4->mach); break;
-		case CPUINFO_STR_REGISTER + SH4_MACL:			sprintf(info->s, "MACL:%08X", sh4->macl); break;
-		case CPUINFO_STR_REGISTER + SH4_R0:				sprintf(info->s, "R0  :%08X", sh4->r[ 0]); break;
-		case CPUINFO_STR_REGISTER + SH4_R1:				sprintf(info->s, "R1  :%08X", sh4->r[ 1]); break;
-		case CPUINFO_STR_REGISTER + SH4_R2:				sprintf(info->s, "R2  :%08X", sh4->r[ 2]); break;
-		case CPUINFO_STR_REGISTER + SH4_R3:				sprintf(info->s, "R3  :%08X", sh4->r[ 3]); break;
-		case CPUINFO_STR_REGISTER + SH4_R4:				sprintf(info->s, "R4  :%08X", sh4->r[ 4]); break;
-		case CPUINFO_STR_REGISTER + SH4_R5:				sprintf(info->s, "R5  :%08X", sh4->r[ 5]); break;
-		case CPUINFO_STR_REGISTER + SH4_R6:				sprintf(info->s, "R6  :%08X", sh4->r[ 6]); break;
-		case CPUINFO_STR_REGISTER + SH4_R7:				sprintf(info->s, "R7  :%08X", sh4->r[ 7]); break;
-		case CPUINFO_STR_REGISTER + SH4_R8:				sprintf(info->s, "R8  :%08X", sh4->r[ 8]); break;
-		case CPUINFO_STR_REGISTER + SH4_R9:				sprintf(info->s, "R9  :%08X", sh4->r[ 9]); break;
-		case CPUINFO_STR_REGISTER + SH4_R10:			sprintf(info->s, "R10 :%08X", sh4->r[10]); break;
-		case CPUINFO_STR_REGISTER + SH4_R11:			sprintf(info->s, "R11 :%08X", sh4->r[11]); break;
-		case CPUINFO_STR_REGISTER + SH4_R12:			sprintf(info->s, "R12 :%08X", sh4->r[12]); break;
-		case CPUINFO_STR_REGISTER + SH4_R13:			sprintf(info->s, "R13 :%08X", sh4->r[13]); break;
-		case CPUINFO_STR_REGISTER + SH4_R14:			sprintf(info->s, "R14 :%08X", sh4->r[14]); break;
-		case CPUINFO_STR_REGISTER + SH4_R15:			sprintf(info->s, "R15 :%08X", sh4->r[15]); break;
-		case CPUINFO_STR_REGISTER + SH4_EA:				sprintf(info->s, "EA  :%08X", sh4->ea);    break;
-		case CPUINFO_STR_REGISTER + SH4_R0_BK0:			sprintf(info->s, "R0 BK 0  :%08X", sh4->rbnk[0][0]); break;
-		case CPUINFO_STR_REGISTER + SH4_R1_BK0:			sprintf(info->s, "R1 BK 0 :%08X", sh4->rbnk[0][1]); break;
-		case CPUINFO_STR_REGISTER + SH4_R2_BK0:			sprintf(info->s, "R2 BK 0 :%08X", sh4->rbnk[0][2]); break;
-		case CPUINFO_STR_REGISTER + SH4_R3_BK0:			sprintf(info->s, "R3 BK 0 :%08X", sh4->rbnk[0][3]); break;
-		case CPUINFO_STR_REGISTER + SH4_R4_BK0:			sprintf(info->s, "R4 BK 0 :%08X", sh4->rbnk[0][4]); break;
-		case CPUINFO_STR_REGISTER + SH4_R5_BK0:			sprintf(info->s, "R5 BK 0 :%08X", sh4->rbnk[0][5]); break;
-		case CPUINFO_STR_REGISTER + SH4_R6_BK0:			sprintf(info->s, "R6 BK 0 :%08X", sh4->rbnk[0][6]); break;
-		case CPUINFO_STR_REGISTER + SH4_R7_BK0:			sprintf(info->s, "R7 BK 0 :%08X", sh4->rbnk[0][7]); break;
-		case CPUINFO_STR_REGISTER + SH4_R0_BK1:			sprintf(info->s, "R0 BK 1 :%08X", sh4->rbnk[1][0]); break;
-		case CPUINFO_STR_REGISTER + SH4_R1_BK1:			sprintf(info->s, "R1 BK 1 :%08X", sh4->rbnk[1][1]); break;
-		case CPUINFO_STR_REGISTER + SH4_R2_BK1:			sprintf(info->s, "R2 BK 1 :%08X", sh4->rbnk[1][2]); break;
-		case CPUINFO_STR_REGISTER + SH4_R3_BK1:			sprintf(info->s, "R3 BK 1 :%08X", sh4->rbnk[1][3]); break;
-		case CPUINFO_STR_REGISTER + SH4_R4_BK1:			sprintf(info->s, "R4 BK 1 :%08X", sh4->rbnk[1][4]); break;
-		case CPUINFO_STR_REGISTER + SH4_R5_BK1:			sprintf(info->s, "R5 BK 1 :%08X", sh4->rbnk[1][5]); break;
-		case CPUINFO_STR_REGISTER + SH4_R6_BK1:			sprintf(info->s, "R6 BK 1 :%08X", sh4->rbnk[1][6]); break;
-		case CPUINFO_STR_REGISTER + SH4_R7_BK1:			sprintf(info->s, "R7 BK 1 :%08X", sh4->rbnk[1][7]); break;
-		case CPUINFO_STR_REGISTER + SH4_SPC:			sprintf(info->s, "SPC  :%08X", sh4->spc); break;
-		case CPUINFO_STR_REGISTER + SH4_SSR:			sprintf(info->s, "SSR  :%08X", sh4->ssr); break;
-		case CPUINFO_STR_REGISTER + SH4_SGR:			sprintf(info->s, "SGR  :%08X", sh4->sgr); break;
-		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sprintf(info->s, "FPSCR :%08X", sh4->fpscr); break;
-		case CPUINFO_STR_REGISTER + SH4_FPUL:			sprintf(info->s, "FPUL :%08X", sh4->fpul); break;
+		case CPUINFO_STR_REGISTER + SH4_PC:             sprintf(info->s, "PC  :%08X", sh4->pc); break;
+		case CPUINFO_STR_REGISTER + SH4_SR:             sprintf(info->s, "SR  :%08X", sh4->sr); break;
+		case CPUINFO_STR_REGISTER + SH4_PR:             sprintf(info->s, "PR  :%08X", sh4->pr); break;
+		case CPUINFO_STR_REGISTER + SH4_GBR:            sprintf(info->s, "GBR :%08X", sh4->gbr); break;
+		case CPUINFO_STR_REGISTER + SH4_VBR:            sprintf(info->s, "VBR :%08X", sh4->vbr); break;
+		case CPUINFO_STR_REGISTER + SH4_DBR:            sprintf(info->s, "DBR :%08X", sh4->dbr); break;
+		case CPUINFO_STR_REGISTER + SH4_MACH:           sprintf(info->s, "MACH:%08X", sh4->mach); break;
+		case CPUINFO_STR_REGISTER + SH4_MACL:           sprintf(info->s, "MACL:%08X", sh4->macl); break;
+		case CPUINFO_STR_REGISTER + SH4_R0:             sprintf(info->s, "R0  :%08X", sh4->r[ 0]); break;
+		case CPUINFO_STR_REGISTER + SH4_R1:             sprintf(info->s, "R1  :%08X", sh4->r[ 1]); break;
+		case CPUINFO_STR_REGISTER + SH4_R2:             sprintf(info->s, "R2  :%08X", sh4->r[ 2]); break;
+		case CPUINFO_STR_REGISTER + SH4_R3:             sprintf(info->s, "R3  :%08X", sh4->r[ 3]); break;
+		case CPUINFO_STR_REGISTER + SH4_R4:             sprintf(info->s, "R4  :%08X", sh4->r[ 4]); break;
+		case CPUINFO_STR_REGISTER + SH4_R5:             sprintf(info->s, "R5  :%08X", sh4->r[ 5]); break;
+		case CPUINFO_STR_REGISTER + SH4_R6:             sprintf(info->s, "R6  :%08X", sh4->r[ 6]); break;
+		case CPUINFO_STR_REGISTER + SH4_R7:             sprintf(info->s, "R7  :%08X", sh4->r[ 7]); break;
+		case CPUINFO_STR_REGISTER + SH4_R8:             sprintf(info->s, "R8  :%08X", sh4->r[ 8]); break;
+		case CPUINFO_STR_REGISTER + SH4_R9:             sprintf(info->s, "R9  :%08X", sh4->r[ 9]); break;
+		case CPUINFO_STR_REGISTER + SH4_R10:            sprintf(info->s, "R10 :%08X", sh4->r[10]); break;
+		case CPUINFO_STR_REGISTER + SH4_R11:            sprintf(info->s, "R11 :%08X", sh4->r[11]); break;
+		case CPUINFO_STR_REGISTER + SH4_R12:            sprintf(info->s, "R12 :%08X", sh4->r[12]); break;
+		case CPUINFO_STR_REGISTER + SH4_R13:            sprintf(info->s, "R13 :%08X", sh4->r[13]); break;
+		case CPUINFO_STR_REGISTER + SH4_R14:            sprintf(info->s, "R14 :%08X", sh4->r[14]); break;
+		case CPUINFO_STR_REGISTER + SH4_R15:            sprintf(info->s, "R15 :%08X", sh4->r[15]); break;
+		case CPUINFO_STR_REGISTER + SH4_EA:             sprintf(info->s, "EA  :%08X", sh4->ea);    break;
+		case CPUINFO_STR_REGISTER + SH4_R0_BK0:         sprintf(info->s, "R0 BK 0  :%08X", sh4->rbnk[0][0]); break;
+		case CPUINFO_STR_REGISTER + SH4_R1_BK0:         sprintf(info->s, "R1 BK 0 :%08X", sh4->rbnk[0][1]); break;
+		case CPUINFO_STR_REGISTER + SH4_R2_BK0:         sprintf(info->s, "R2 BK 0 :%08X", sh4->rbnk[0][2]); break;
+		case CPUINFO_STR_REGISTER + SH4_R3_BK0:         sprintf(info->s, "R3 BK 0 :%08X", sh4->rbnk[0][3]); break;
+		case CPUINFO_STR_REGISTER + SH4_R4_BK0:         sprintf(info->s, "R4 BK 0 :%08X", sh4->rbnk[0][4]); break;
+		case CPUINFO_STR_REGISTER + SH4_R5_BK0:         sprintf(info->s, "R5 BK 0 :%08X", sh4->rbnk[0][5]); break;
+		case CPUINFO_STR_REGISTER + SH4_R6_BK0:         sprintf(info->s, "R6 BK 0 :%08X", sh4->rbnk[0][6]); break;
+		case CPUINFO_STR_REGISTER + SH4_R7_BK0:         sprintf(info->s, "R7 BK 0 :%08X", sh4->rbnk[0][7]); break;
+		case CPUINFO_STR_REGISTER + SH4_R0_BK1:         sprintf(info->s, "R0 BK 1 :%08X", sh4->rbnk[1][0]); break;
+		case CPUINFO_STR_REGISTER + SH4_R1_BK1:         sprintf(info->s, "R1 BK 1 :%08X", sh4->rbnk[1][1]); break;
+		case CPUINFO_STR_REGISTER + SH4_R2_BK1:         sprintf(info->s, "R2 BK 1 :%08X", sh4->rbnk[1][2]); break;
+		case CPUINFO_STR_REGISTER + SH4_R3_BK1:         sprintf(info->s, "R3 BK 1 :%08X", sh4->rbnk[1][3]); break;
+		case CPUINFO_STR_REGISTER + SH4_R4_BK1:         sprintf(info->s, "R4 BK 1 :%08X", sh4->rbnk[1][4]); break;
+		case CPUINFO_STR_REGISTER + SH4_R5_BK1:         sprintf(info->s, "R5 BK 1 :%08X", sh4->rbnk[1][5]); break;
+		case CPUINFO_STR_REGISTER + SH4_R6_BK1:         sprintf(info->s, "R6 BK 1 :%08X", sh4->rbnk[1][6]); break;
+		case CPUINFO_STR_REGISTER + SH4_R7_BK1:         sprintf(info->s, "R7 BK 1 :%08X", sh4->rbnk[1][7]); break;
+		case CPUINFO_STR_REGISTER + SH4_SPC:            sprintf(info->s, "SPC  :%08X", sh4->spc); break;
+		case CPUINFO_STR_REGISTER + SH4_SSR:            sprintf(info->s, "SSR  :%08X", sh4->ssr); break;
+		case CPUINFO_STR_REGISTER + SH4_SGR:            sprintf(info->s, "SGR  :%08X", sh4->sgr); break;
+		case CPUINFO_STR_REGISTER + SH4_FPSCR:          sprintf(info->s, "FPSCR :%08X", sh4->fpscr); break;
+		case CPUINFO_STR_REGISTER + SH4_FPUL:           sprintf(info->s, "FPUL :%08X", sh4->fpul); break;
 #ifdef LSB_FIRST
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %f", FP_RS2( 0),(double)FP_RFS2( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %f", FP_RS2( 1),(double)FP_RFS2( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %f", FP_RS2( 2),(double)FP_RFS2( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %f", FP_RS2( 3),(double)FP_RFS2( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %f", FP_RS2( 4),(double)FP_RFS2( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %f", FP_RS2( 5),(double)FP_RFS2( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %f", FP_RS2( 6),(double)FP_RFS2( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %f", FP_RS2( 7),(double)FP_RFS2( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %f", FP_RS2( 8),(double)FP_RFS2( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %f", FP_RS2( 9),(double)FP_RFS2( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %f", FP_RS2(10),(double)FP_RFS2(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %f", FP_RS2(11),(double)FP_RFS2(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %f", FP_RS2(12),(double)FP_RFS2(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %f", FP_RS2(13),(double)FP_RFS2(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %f", FP_RS2(14),(double)FP_RFS2(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %f", FP_RS2(15),(double)FP_RFS2(15)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %f", FP_XS2( 0),(double)FP_XFS2( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %f", FP_XS2( 1),(double)FP_XFS2( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %f", FP_XS2( 2),(double)FP_XFS2( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %f", FP_XS2( 3),(double)FP_XFS2( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %f", FP_XS2( 4),(double)FP_XFS2( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %f", FP_XS2( 5),(double)FP_XFS2( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %f", FP_XS2( 6),(double)FP_XFS2( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %f", FP_XS2( 7),(double)FP_XFS2( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %f", FP_XS2( 8),(double)FP_XFS2( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %f", FP_XS2( 9),(double)FP_XFS2( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %f", FP_XS2(10),(double)FP_XFS2(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %f", FP_XS2(11),(double)FP_XFS2(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %f", FP_XS2(12),(double)FP_XFS2(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %f", FP_XS2(13),(double)FP_XFS2(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %f", FP_XS2(14),(double)FP_XFS2(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %f", FP_XS2(15),(double)FP_XFS2(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR0:            sprintf(info->s, "FR0  :%08X %f", FP_RS2( 0),(double)FP_RFS2( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:            sprintf(info->s, "FR1  :%08X %f", FP_RS2( 1),(double)FP_RFS2( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:            sprintf(info->s, "FR2  :%08X %f", FP_RS2( 2),(double)FP_RFS2( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:            sprintf(info->s, "FR3  :%08X %f", FP_RS2( 3),(double)FP_RFS2( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:            sprintf(info->s, "FR4  :%08X %f", FP_RS2( 4),(double)FP_RFS2( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:            sprintf(info->s, "FR5  :%08X %f", FP_RS2( 5),(double)FP_RFS2( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:            sprintf(info->s, "FR6  :%08X %f", FP_RS2( 6),(double)FP_RFS2( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:            sprintf(info->s, "FR7  :%08X %f", FP_RS2( 7),(double)FP_RFS2( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:            sprintf(info->s, "FR8  :%08X %f", FP_RS2( 8),(double)FP_RFS2( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:            sprintf(info->s, "FR9  :%08X %f", FP_RS2( 9),(double)FP_RFS2( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:           sprintf(info->s, "FR10 :%08X %f", FP_RS2(10),(double)FP_RFS2(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:           sprintf(info->s, "FR11 :%08X %f", FP_RS2(11),(double)FP_RFS2(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:           sprintf(info->s, "FR12 :%08X %f", FP_RS2(12),(double)FP_RFS2(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:           sprintf(info->s, "FR13 :%08X %f", FP_RS2(13),(double)FP_RFS2(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:           sprintf(info->s, "FR14 :%08X %f", FP_RS2(14),(double)FP_RFS2(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:           sprintf(info->s, "FR15 :%08X %f", FP_RS2(15),(double)FP_RFS2(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:            sprintf(info->s, "XF0  :%08X %f", FP_XS2( 0),(double)FP_XFS2( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:            sprintf(info->s, "XF1  :%08X %f", FP_XS2( 1),(double)FP_XFS2( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:            sprintf(info->s, "XF2  :%08X %f", FP_XS2( 2),(double)FP_XFS2( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:            sprintf(info->s, "XF3  :%08X %f", FP_XS2( 3),(double)FP_XFS2( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:            sprintf(info->s, "XF4  :%08X %f", FP_XS2( 4),(double)FP_XFS2( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:            sprintf(info->s, "XF5  :%08X %f", FP_XS2( 5),(double)FP_XFS2( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:            sprintf(info->s, "XF6  :%08X %f", FP_XS2( 6),(double)FP_XFS2( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:            sprintf(info->s, "XF7  :%08X %f", FP_XS2( 7),(double)FP_XFS2( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:            sprintf(info->s, "XF8  :%08X %f", FP_XS2( 8),(double)FP_XFS2( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:            sprintf(info->s, "XF9  :%08X %f", FP_XS2( 9),(double)FP_XFS2( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:           sprintf(info->s, "XF10 :%08X %f", FP_XS2(10),(double)FP_XFS2(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:           sprintf(info->s, "XF11 :%08X %f", FP_XS2(11),(double)FP_XFS2(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:           sprintf(info->s, "XF12 :%08X %f", FP_XS2(12),(double)FP_XFS2(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:           sprintf(info->s, "XF13 :%08X %f", FP_XS2(13),(double)FP_XFS2(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:           sprintf(info->s, "XF14 :%08X %f", FP_XS2(14),(double)FP_XFS2(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:           sprintf(info->s, "XF15 :%08X %f", FP_XS2(15),(double)FP_XFS2(15)); break;
 #else
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %f", FP_RS( 0),(double)FP_RFS( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %f", FP_RS( 1),(double)FP_RFS( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %f", FP_RS( 2),(double)FP_RFS( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %f", FP_RS( 3),(double)FP_RFS( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %f", FP_RS( 4),(double)FP_RFS( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %f", FP_RS( 5),(double)FP_RFS( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %f", FP_RS( 6),(double)FP_RFS( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %f", FP_RS( 7),(double)FP_RFS( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %f", FP_RS( 8),(double)FP_RFS( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %f", FP_RS( 9),(double)FP_RFS( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %f", FP_RS(10),(double)FP_RFS(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %f", FP_RS(11),(double)FP_RFS(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %f", FP_RS(12),(double)FP_RFS(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %f", FP_RS(13),(double)FP_RFS(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %f", FP_RS(14),(double)FP_RFS(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %f", FP_RS(15),(double)FP_RFS(15)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %f", FP_XS( 0),(double)FP_XFS( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %f", FP_XS( 1),(double)FP_XFS( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %f", FP_XS( 2),(double)FP_XFS( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %f", FP_XS( 3),(double)FP_XFS( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %f", FP_XS( 4),(double)FP_XFS( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %f", FP_XS( 5),(double)FP_XFS( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %f", FP_XS( 6),(double)FP_XFS( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %f", FP_XS( 7),(double)FP_XFS( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %f", FP_XS( 8),(double)FP_XFS( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %f", FP_XS( 9),(double)FP_XFS( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %f", FP_XS(10),(double)FP_XFS(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %f", FP_XS(11),(double)FP_XFS(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %f", FP_XS(12),(double)FP_XFS(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %f", FP_XS(13),(double)FP_XFS(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %f", FP_XS(14),(double)FP_XFS(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %f", FP_XS(15),(double)FP_XFS(15)); break; //%01.2e
+		case CPUINFO_STR_REGISTER + SH4_FR0:            sprintf(info->s, "FR0  :%08X %f", FP_RS( 0),(double)FP_RFS( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:            sprintf(info->s, "FR1  :%08X %f", FP_RS( 1),(double)FP_RFS( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:            sprintf(info->s, "FR2  :%08X %f", FP_RS( 2),(double)FP_RFS( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:            sprintf(info->s, "FR3  :%08X %f", FP_RS( 3),(double)FP_RFS( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:            sprintf(info->s, "FR4  :%08X %f", FP_RS( 4),(double)FP_RFS( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:            sprintf(info->s, "FR5  :%08X %f", FP_RS( 5),(double)FP_RFS( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:            sprintf(info->s, "FR6  :%08X %f", FP_RS( 6),(double)FP_RFS( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:            sprintf(info->s, "FR7  :%08X %f", FP_RS( 7),(double)FP_RFS( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:            sprintf(info->s, "FR8  :%08X %f", FP_RS( 8),(double)FP_RFS( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:            sprintf(info->s, "FR9  :%08X %f", FP_RS( 9),(double)FP_RFS( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:           sprintf(info->s, "FR10 :%08X %f", FP_RS(10),(double)FP_RFS(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:           sprintf(info->s, "FR11 :%08X %f", FP_RS(11),(double)FP_RFS(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:           sprintf(info->s, "FR12 :%08X %f", FP_RS(12),(double)FP_RFS(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:           sprintf(info->s, "FR13 :%08X %f", FP_RS(13),(double)FP_RFS(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:           sprintf(info->s, "FR14 :%08X %f", FP_RS(14),(double)FP_RFS(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:           sprintf(info->s, "FR15 :%08X %f", FP_RS(15),(double)FP_RFS(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:            sprintf(info->s, "XF0  :%08X %f", FP_XS( 0),(double)FP_XFS( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:            sprintf(info->s, "XF1  :%08X %f", FP_XS( 1),(double)FP_XFS( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:            sprintf(info->s, "XF2  :%08X %f", FP_XS( 2),(double)FP_XFS( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:            sprintf(info->s, "XF3  :%08X %f", FP_XS( 3),(double)FP_XFS( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:            sprintf(info->s, "XF4  :%08X %f", FP_XS( 4),(double)FP_XFS( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:            sprintf(info->s, "XF5  :%08X %f", FP_XS( 5),(double)FP_XFS( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:            sprintf(info->s, "XF6  :%08X %f", FP_XS( 6),(double)FP_XFS( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:            sprintf(info->s, "XF7  :%08X %f", FP_XS( 7),(double)FP_XFS( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:            sprintf(info->s, "XF8  :%08X %f", FP_XS( 8),(double)FP_XFS( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:            sprintf(info->s, "XF9  :%08X %f", FP_XS( 9),(double)FP_XFS( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:           sprintf(info->s, "XF10 :%08X %f", FP_XS(10),(double)FP_XFS(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:           sprintf(info->s, "XF11 :%08X %f", FP_XS(11),(double)FP_XFS(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:           sprintf(info->s, "XF12 :%08X %f", FP_XS(12),(double)FP_XFS(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:           sprintf(info->s, "XF13 :%08X %f", FP_XS(13),(double)FP_XFS(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:           sprintf(info->s, "XF14 :%08X %f", FP_XS(14),(double)FP_XFS(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:           sprintf(info->s, "XF15 :%08X %f", FP_XS(15),(double)FP_XFS(15)); break; //%01.2e
 #endif
 	}
 }
@@ -3700,15 +3700,15 @@ CPU_GET_INFO( sh3 )
 	switch (state)
 	{
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh3);				break;
+	case CPUINFO_FCT_RESET:                     info->reset = CPU_RESET_NAME(sh3);              break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME:						strcpy(info->s, "SH-3");				break;
-	case CPUINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7700");		break;
+	case CPUINFO_STR_NAME:                      strcpy(info->s, "SH-3");                break;
+	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Hitachi SH7700");      break;
 
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh3_internal_map); break;
 
-	default:									CPU_GET_INFO_CALL(sh4);					break;
+	default:                                    CPU_GET_INFO_CALL(sh4);                 break;
 	}
 }
 
@@ -3717,19 +3717,19 @@ CPU_GET_INFO( sh3be )
 	switch (state)
 	{
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh3);				break;
-	case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(sh4be);			break;
-	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(sh4be);			break;
+	case CPUINFO_FCT_RESET:                     info->reset = CPU_RESET_NAME(sh3);              break;
+	case CPUINFO_FCT_EXECUTE:                   info->execute = CPU_EXECUTE_NAME(sh4be);            break;
+	case CPUINFO_FCT_DISASSEMBLE:               info->disassemble = CPU_DISASSEMBLE_NAME(sh4be);            break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME:						strcpy(info->s, "SH-3");				break;
-	case CPUINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7700");		break;
+	case CPUINFO_STR_NAME:                      strcpy(info->s, "SH-3");                break;
+	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Hitachi SH7700");      break;
 
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(sh3_internal_map); break;
 
-	case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;				break;
+	case CPUINFO_INT_ENDIANNESS:                info->i = ENDIANNESS_BIG;               break;
 
-	default:									CPU_GET_INFO_CALL(sh4);					break;
+	default:                                    CPU_GET_INFO_CALL(sh4);                 break;
 	}
 }
 
@@ -3737,10 +3737,10 @@ CPU_GET_INFO( sh4be )
 {
 	switch (state)
 	{
-	case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(sh4be);			break;
-	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(sh4be);			break;
-	case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;				break;
-	default:									CPU_GET_INFO_CALL(sh4);					break;
+	case CPUINFO_FCT_EXECUTE:                   info->execute = CPU_EXECUTE_NAME(sh4be);            break;
+	case CPUINFO_FCT_DISASSEMBLE:               info->disassemble = CPU_DISASSEMBLE_NAME(sh4be);            break;
+	case CPUINFO_INT_ENDIANNESS:                info->i = ENDIANNESS_BIG;               break;
+	default:                                    CPU_GET_INFO_CALL(sh4);                 break;
 	}
 }
 
@@ -3749,4 +3749,4 @@ DEFINE_LEGACY_CPU_DEVICE(SH3BE, sh3be);
 DEFINE_LEGACY_CPU_DEVICE(SH4LE, sh4);
 DEFINE_LEGACY_CPU_DEVICE(SH4BE, sh4be);
 
-#endif	// USE_SH4DRC
+#endif  // USE_SH4DRC

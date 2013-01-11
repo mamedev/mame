@@ -30,13 +30,13 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_PHYSICAL_DIPS		10
-#define MAX_INPUT_PORTS			32
-#define MAX_BITS_PER_PORT		32
+#define MAX_PHYSICAL_DIPS       10
+#define MAX_INPUT_PORTS         32
+#define MAX_BITS_PER_PORT       32
 
 /* DIP switch rendering parameters */
-#define DIP_SWITCH_HEIGHT		0.05f
-#define DIP_SWITCH_SPACING		0.01
+#define DIP_SWITCH_HEIGHT       0.05f
+#define DIP_SWITCH_SPACING      0.01
 #define SINGLE_TOGGLE_SWITCH_FIELD_WIDTH 0.025f
 #define SINGLE_TOGGLE_SWITCH_WIDTH 0.020f
 /* make the switch 80% of the width space and 1/2 of the switch height */
@@ -1242,7 +1242,7 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
 	x1 += (x2 - x1 - numtoggles * switch_field_width) / 2;
 
 	/* draw the dip switch name */
-	ui_draw_text_full(	container,
+	ui_draw_text_full(  container,
 						dip->name,
 						0,
 						y1 + (DIP_SWITCH_HEIGHT - UI_TARGET_FONT_HEIGHT) / 2,
@@ -1276,14 +1276,14 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
 		{
 			float innery1 = (dip->state & (1 << toggle)) ? y1_on : y1_off;
 			container->add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
-							   (selectedmask & (1 << toggle)) ? UI_DIPSW_COLOR : UI_TEXT_COLOR,
-							   PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+								(selectedmask & (1 << toggle)) ? UI_DIPSW_COLOR : UI_TEXT_COLOR,
+								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
 			container->add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
-							   UI_UNAVAILABLE_COLOR,
-							   PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+								UI_UNAVAILABLE_COLOR,
+								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 
 		/* advance to the next switch */
@@ -1340,10 +1340,10 @@ void ui_menu_analog::handle()
 			data->field->get_user_settings(settings);
 			switch (data->type)
 			{
-				case ANALOG_ITEM_KEYSPEED:		settings.delta = newval;		break;
-				case ANALOG_ITEM_CENTERSPEED:	settings.centerdelta = newval;	break;
-				case ANALOG_ITEM_REVERSE:		settings.reverse = newval;		break;
-				case ANALOG_ITEM_SENSITIVITY:	settings.sensitivity = newval;	break;
+				case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
+				case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
+				case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
+				case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
 			}
 			data->field->set_user_settings(settings);
 
@@ -2190,10 +2190,10 @@ void ui_menu_video_options::populate()
 	/* add a rotate item */
 	switch (target->orientation())
 	{
-		case ROT0:		subtext = "None";					break;
-		case ROT90:		subtext = "CW 90" UTF8_DEGREES; 	break;
-		case ROT180:	subtext = "180" UTF8_DEGREES;		break;
-		case ROT270:	subtext = "CCW 90" UTF8_DEGREES;	break;
+		case ROT0:      subtext = "None";                   break;
+		case ROT90:     subtext = "CW 90" UTF8_DEGREES;     break;
+		case ROT180:    subtext = "180" UTF8_DEGREES;       break;
+		case ROT270:    subtext = "CCW 90" UTF8_DEGREES;    break;
 	}
 	item_append("Rotate", subtext, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_ROTATE);
 
@@ -2599,9 +2599,9 @@ void ui_menu_select_game::handle()
 	/* if we're in an error state, overlay an error message */
 	if (error)
 		ui_draw_text_box(container,
-						 "The selected game is missing one or more required ROM or CHD images. "
-		                 "Please select a different game.\n\nPress any key to continue.",
-		                 JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+							"The selected game is missing one or more required ROM or CHD images. "
+							"Please select a different game.\n\nPress any key to continue.",
+							JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 }
 
 
@@ -2741,7 +2741,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 
 	/* get the size of the text */
 	ui_draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
 
@@ -2762,7 +2762,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 
 	/* draw the text within it */
 	ui_draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* determine the text to render below */
 	driver = ((FPTR)selectedref > 1) ? (const game_driver *)selectedref : NULL;
@@ -2832,7 +2832,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	for (line = 0; line < 4; line++)
 	{
 		ui_draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+							DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -2863,10 +2863,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	for (line = 0; line < 4; line++)
 	{
 		ui_draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+							DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 		y1 += ui_get_line_height(machine());
 	}
 }
-
-
-

@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x0018, 0x0018) AM_WRITE(contra_coin_counter_w)
 	AM_RANGE(0x001a, 0x001a) AM_WRITE(contra_sh_irqtrigger_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(cpu_sound_command_w)
-	AM_RANGE(0x001e, 0x001e) AM_WRITENOP	/* ? */
+	AM_RANGE(0x001e, 0x001e) AM_WRITENOP    /* ? */
 	AM_RANGE(0x0060, 0x0067) AM_WRITE(contra_K007121_ctrl_1_w)
 
 	AM_RANGE(0x0c00, 0x0cff) AM_RAM AM_SHARE("paletteram")
@@ -125,7 +125,7 @@ static INPUT_PORTS_START( contra )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")	/* Not Used according to manual */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")    /* Not Used according to manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( contra )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")	/* Not Used according to manual */
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")    /* Not Used according to manual */
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -196,7 +196,7 @@ static MACHINE_CONFIG_START( contra, contra_state )
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/8) /* 3000000? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* enough for the sound CPU to read all commands */
 
 
 	/* video hardware */
@@ -224,12 +224,12 @@ MACHINE_CONFIG_END
 
 
 ROM_START( contra )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633m03.18a",   0x20000, 0x08000, CRC(d045e1da) SHA1(ec781e98a6efb14861223250c6239b06ec98ed0b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -241,22 +241,22 @@ ROM_START( contra )
 	ROM_LOAD16_BYTE( "633e07.16f",   0x00001, 0x40000, CRC(f2d06638) SHA1(0fa0fbfc53ab5c31b9de22f90153d9af37ff22ce) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
-	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
+	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
 	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contra1 )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633e03.18a",   0x20000, 0x08000, CRC(7fc0d8cf) SHA1(cf1cf15646a4e5dc72671e957bc51ca44d30995c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -268,22 +268,22 @@ ROM_START( contra1 )
 	ROM_LOAD16_BYTE( "633e07.16f",   0x00001, 0x40000, CRC(f2d06638) SHA1(0fa0fbfc53ab5c31b9de22f90153d9af37ff22ce) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
-	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
+	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
 	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrab )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633m03.18a",   0x20000, 0x08000, CRC(d045e1da) SHA1(ec781e98a6efb14861223250c6239b06ec98ed0b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -309,20 +309,20 @@ ROM_START( contrab )
 	/* This last section, 0x70000-0x7ffff is empty */
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
-	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
-	ROM_LOAD( "conprom.53",   0x0400, 0x0100, CRC(05a1da7e) SHA1(ec0bdfc9da05c99e6a283014769db6d641f1a0aa) )	/* unknown (only present in this bootleg) */
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
+	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
+	ROM_LOAD( "conprom.53",   0x0400, 0x0100, CRC(05a1da7e) SHA1(ec0bdfc9da05c99e6a283014769db6d641f1a0aa) )    /* unknown (only present in this bootleg) */
 ROM_END
 
 ROM_START( contraj )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633n03.18a",   0x20000, 0x08000, CRC(fedab568) SHA1(7fd4546335bdeef7f8326d4cbde7fa36d74e5cfc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633k02.17a",   0x10000, 0x10000, CRC(5d5f7438) SHA1(489fe56ca57ef4f6a7792fba07a9656009f3f285) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -334,22 +334,22 @@ ROM_START( contraj )
 	ROM_LOAD16_BYTE( "633e07.16f",   0x00001, 0x40000, CRC(f2d06638) SHA1(0fa0fbfc53ab5c31b9de22f90153d9af37ff22ce) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
-	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
+	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
 	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrajb )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "g-2.18a",      0x20000, 0x08000, CRC(bdb9196d) SHA1(fad170e8fda94c9c9d7b82433daa30b80af12efc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633k02.17a",   0x10000, 0x10000, CRC(5d5f7438) SHA1(489fe56ca57ef4f6a7792fba07a9656009f3f285) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -376,19 +376,19 @@ ROM_START( contrajb )
 
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
-	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
+	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 ROM_END
 
 ROM_START( gryzor )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "g2.18a",       0x20000, 0x08000, CRC(92ca77bd) SHA1(3a56f51a617edff9f2a60df0141dff040881b82a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "g3.17a",       0x10000, 0x10000, CRC(bbd9e95e) SHA1(fd5de1bcc485de7b8fc2e321351c2e3ddd25d053) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -400,22 +400,22 @@ ROM_START( gryzor )
 	ROM_LOAD16_BYTE( "633e07.16f",   0x00001, 0x40000, CRC(f2d06638) SHA1(0fa0fbfc53ab5c31b9de22f90153d9af37ff22ce) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
-	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
+	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
 	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( gryzora )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633j03.18a",   0x20000, 0x08000, CRC(20919162) SHA1(2f375166428ee03f6e8ac0372a373bb8ab35e64c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633j02.17a",   0x10000, 0x10000, CRC(b5922f9a) SHA1(441a23dc99a908ec2c09c855e73070dbab8c5ae2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -427,10 +427,10 @@ ROM_START( gryzora )
 	ROM_LOAD16_BYTE( "633e07.16f",   0x00001, 0x40000, CRC(f2d06638) SHA1(0fa0fbfc53ab5c31b9de22f90153d9af37ff22ce) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
-	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
+	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
 	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */

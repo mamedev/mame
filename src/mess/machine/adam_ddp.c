@@ -166,18 +166,18 @@ WRITE8_MEMBER( adam_digital_data_pack_device::p1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SPD SEL (0=20 ips, 1=80ips)
-        1       STOP0
-        2       STOP1
-        3       _GO FWD
-        4       _GO REV
-        5       BRAKE
-        6       _WR0
-        7       _WR1
+	    0       SPD SEL (0=20 ips, 1=80ips)
+	    1       STOP0
+	    2       STOP1
+	    3       _GO FWD
+	    4       _GO REV
+	    5       BRAKE
+	    6       _WR0
+	    7       _WR1
 
-    */
+	*/
 
 	if (m_ddp0->exists())
 	{
@@ -211,15 +211,15 @@ READ8_MEMBER( adam_digital_data_pack_device::p2_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       mode bit 0
-        1       mode bit 1 / CIP1
-        2       mode bit 2
-        3       NET RXD
-        4
+	    0       mode bit 0
+	    1       mode bit 1 / CIP1
+	    2       mode bit 2
+	    3       NET RXD
+	    4
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -243,15 +243,15 @@ WRITE8_MEMBER( adam_digital_data_pack_device::p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       WRT DATA
-        1
-        2       TRACK A/B (0=B, 1=A)
-        3
-        4       NET TXD
+	    0       WRT DATA
+	    1
+	    2       TRACK A/B (0=B, 1=A)
+	    3
+	    4       NET TXD
 
-    */
+	*/
 
 	if (m_ddp0->exists())
 	{
@@ -278,18 +278,18 @@ READ8_MEMBER( adam_digital_data_pack_device::p4_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       A8
-        1       A9
-        2       A10 (2114 _S)
-        3       MSENSE 0
-        4       MSENSE 1
-        5       CIP0
-        6       RD DATA 0 (always 1)
-        7       RD DATA 1 (data from drives ORed together)
+	    0       A8
+	    1       A9
+	    2       A10 (2114 _S)
+	    3       MSENSE 0
+	    4       MSENSE 1
+	    5       CIP0
+	    6       RD DATA 0 (always 1)
+	    7       RD DATA 1 (data from drives ORed together)
 
-    */
+	*/
 
 	UINT8 data = 0;
 

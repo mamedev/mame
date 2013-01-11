@@ -393,22 +393,22 @@ void at45dbxx_save(device_t *device, emu_file *file)
 #ifdef UNUSED_FUNCTION
 NVRAM_HANDLER( at45dbxx )
 {
-    _logerror( 0, ("nvram_handler_at45dbxx (%p/%d)\n", file, read_or_write));
-    if (read_or_write)
-    {
-        at45dbxx_save( file);
-    }
-    else
-    {
-        if (file)
-        {
-            at45dbxx_load( file);
-        }
-        else
-        {
-            memset( flash->data, 0xFF, flash->size);
-        }
-    }
+	_logerror( 0, ("nvram_handler_at45dbxx (%p/%d)\n", file, read_or_write));
+	if (read_or_write)
+	{
+		at45dbxx_save( file);
+	}
+	else
+	{
+		if (file)
+		{
+			at45dbxx_load( file);
+		}
+		else
+		{
+			memset( flash->data, 0xFF, flash->size);
+		}
+	}
 }
 #endif
 
@@ -487,5 +487,3 @@ void at45db161_device::device_start()
 {
 	DEVICE_START_NAME( at45db161 )(this);
 }
-
-

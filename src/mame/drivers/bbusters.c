@@ -327,20 +327,20 @@ static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM		/* service mode */
+	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM     /* service mode */
 	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x0a9000, 0x0affff) AM_RAM		/* service mode */
+	AM_RANGE(0x0a9000, 0x0affff) AM_RAM     /* service mode */
 	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbusters_pf1_w) AM_SHARE("pf1_data")
 	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM		/* service mode */
+	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM     /* service mode */
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
 	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("COINS")	/* Coins */
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")	/* Player 1 & 2 */
-	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")	/* Player 3 */
-	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")	/* Dip 1 */
-	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")	/* Dip 2 */
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("COINS")  /* Coins */
+	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")    /* Player 1 & 2 */
+	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")    /* Player 3 */
+	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")   /* Dip 1 */
+	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")   /* Dip 2 */
 	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_status_r)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(kludge_r, gun_select_w)
 	AM_RANGE(0x0e8002, 0x0e8003) AM_READ(control_3_r)
@@ -396,18 +396,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bbusters )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	PORT_NAME("P1 Fire")	// "Fire"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	PORT_NAME("P1 Grenade")	// "Grenade"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire")    // "Fire"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Grenade") // "Grenade"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	PORT_NAME("P2 Fire")	// "Fire"
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	PORT_NAME("P2 Grenade")	// "Grenade"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")    // "Fire"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Grenade") // "Grenade"
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)	PORT_NAME("P3 Fire")	// "Fire"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)	PORT_NAME("P3 Grenade")	// "Grenade"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Fire")    // "Fire"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Grenade") // "Grenade"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -421,59 +421,59 @@ static INPUT_PORTS_START( bbusters )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )		// See notes
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )       // See notes
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x06, 0x06, "Magazine / Grenade" )		PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x06, 0x06, "Magazine / Grenade" )        PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x04, "5 / 2" )
 	PORT_DIPSETTING(    0x06, "7 / 3" )
 	PORT_DIPSETTING(    0x02, "9 / 4" )
 	PORT_DIPSETTING(    0x00, "12 / 5" )
 	/* Manual (from a different revision/region?) says:
-                        SW1:4   SW1:5   SW1:6
-    1C_1C 1 To continue OFF     OFF     OFF
-    2C_1C 1 To continue ON      OFF     OFF
-    1C_2C 1 To continue OFF     ON      OFF
-    2C_1C 2 To continue ON      ON      OFF
-    3C_1C 1 To continue OFF     OFF     ON
-    3C_1C 2 To continue ON      OFF     ON
-    4C_3C 1 To continue OFF     ON      ON
-    Free Play Mode      OFF     OFF     OFF
+	                    SW1:4   SW1:5   SW1:6
+	1C_1C 1 To continue OFF     OFF     OFF
+	2C_1C 1 To continue ON      OFF     OFF
+	1C_2C 1 To continue OFF     ON      OFF
+	2C_1C 2 To continue ON      ON      OFF
+	3C_1C 1 To continue OFF     OFF     ON
+	3C_1C 2 To continue ON      OFF     ON
+	4C_3C 1 To continue OFF     ON      ON
+	Free Play Mode      OFF     OFF     OFF
 
-    SW1:7 Unused
-    SW1:8 Blood color: ON=green OFF=red */
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:4,5")
+	SW1:7 Unused
+	SW1:8 Blood color: ON=green OFF=red */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )				PORT_DIPLOCATION("SW1:8") // See notes
+	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )                PORT_DIPLOCATION("SW1:8") // See notes
 	PORT_DIPSETTING(    0x80, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )					PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )                 PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x04, "Infinite Energy (Cheat)")
 	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )			/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )			/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )			/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )            /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )            /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )            /* Listed as "Unused" */
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START("GUNX1")
@@ -496,56 +496,56 @@ static INPUT_PORTS_START( mechatt )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )		// See notes
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )     // See notes
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire")	// "Fire"
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Grenade")	// "Grenade"
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire")  // "Fire"
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Grenade")   // "Grenade"
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")	// "Fire"
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Grenade")	// "Grenade"
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")  // "Fire"
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Grenade")   // "Grenade"
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slots" )				PORT_DIPLOCATION("SW1:1") // Listed as "Unused" (manual from different revision/region?), See notes
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slots" )                PORT_DIPLOCATION("SW1:1") // Listed as "Unused" (manual from different revision/region?), See notes
 	PORT_DIPSETTING(      0x0001, "Common" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x000c, 0x000c, "Magazine / Grenade" )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x000c, 0x000c, "Magazine / Grenade" )        PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0008, "5 / 2" )
 	PORT_DIPSETTING(      0x000c, "6 / 3" )
 	PORT_DIPSETTING(      0x0004, "7 / 4" )
 	PORT_DIPSETTING(      0x0000, "8 / 5" )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:5,6") // See notes
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:5,6") // See notes
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:7,8") // Listed as "Unused" (manual from different revision/region?), See notes
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:7,8") // Listed as "Unused" (manual from different revision/region?), See notes
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Game Mode" )					PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Game Mode" )                 PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, "Demo Sounds Off" )
 	PORT_DIPSETTING(      0x0c00, "Demo Sounds On" )
 	PORT_DIPSETTING(      0x0400, "Infinite Energy (Cheat)")
 	PORT_DIPSETTING(      0x0000, "Freeze" )
-	PORT_DIPUNUSED_DIPLOC(0x1000, 0x1000, "SW2:5" )			/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC(0x2000, 0x2000, "SW2:6" )			/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC(0x4000, 0x4000, "SW2:7" )			/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC(0x1000, 0x1000, "SW2:5" )         /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC(0x2000, 0x2000, "SW2:6" )         /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC(0x4000, 0x4000, "SW2:7" )         /* Listed as "Unused" */
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START("GUNX1")
@@ -564,7 +564,7 @@ static INPUT_PORTS_START( mechattu )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(      0x0010, "1 Coin/2 Credits first, then 1 Coin/1 Credit" )
 	PORT_DIPSETTING(      0x0020, "2 Coins/1 Credit first, then 1 Coin/1 Credit" )
@@ -606,9 +606,9 @@ static const gfx_layout spritelayout =
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
 		0+64*8, 4+64*8, 8+64*8, 12+64*8,

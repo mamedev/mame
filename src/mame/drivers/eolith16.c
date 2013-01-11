@@ -41,13 +41,13 @@ public:
 // It's configured for 512 bytes
 static const eeprom_interface eeprom_interface_93C66 =
 {
-	9,				// address bits 9
-	8,				// data bits    8
-	"*110",			// read         110 aaaaaaaaa
-	"*101",			// write        101 aaaaaaaaa dddddddd
-	"*111",			// erase        111 aaaaaaaaa
-	"*10000xxxxxx",	// lock         100 00xxxxxxx
-	"*10011xxxxxx"	// unlock       100 11xxxxxxx
+	9,              // address bits 9
+	8,              // data bits    8
+	"*110",         // read         110 aaaaaaaaa
+	"*101",         // write        101 aaaaaaaaa dddddddd
+	"*111",         // erase        111 aaaaaaaaa
+	"*10000xxxxxx", // lock         100 00xxxxxxx
+	"*10011xxxxxx"  // unlock       100 11xxxxxxx
 };
 
 WRITE16_MEMBER(eolith16_state::eeprom_w)
@@ -177,7 +177,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 
 
 static MACHINE_CONFIG_START( eolith16, eolith16_state )
-	MCFG_CPU_ADD("maincpu", E116T, 60000000)		/* no internal multiplier */
+	MCFG_CPU_ADD("maincpu", E116T, 60000000)        /* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 

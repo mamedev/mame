@@ -9,11 +9,11 @@
    ------------------------
 
    At U12 the chip is Toshiba TA8428FG
- 
+
    At U1 the chip is H8/3008
- 
+
    At X1 on the crystal it is printed S753
- 
+
    big gfx chip marked
 
    YAMAHA JAPAN
@@ -32,7 +32,7 @@ class bowltry_state : public driver_device
 public:
 	bowltry_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	UINT32 screen_update_bowltry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -75,15 +75,15 @@ MACHINE_CONFIG_END
 
 ROM_START( bowltry )
 	ROM_REGION( 0x080000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "u30_v1.00.u30", 0x000000, 0x080000, CRC(2bd47419) SHA1(8fc975340e47ddeedf96e454a6c5372328f28b72) )	
-	
+	ROM_LOAD16_WORD_SWAP( "u30_v1.00.u30", 0x000000, 0x080000, CRC(2bd47419) SHA1(8fc975340e47ddeedf96e454a6c5372328f28b72) )
+
 	ROM_REGION( 0x800000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "u27_v1.00.u27", 0x000000, 0x400000, CRC(80f51c25) SHA1(53c21325e7796197c26ca0cf4f8e51bf1e0bdcd3) )
 	ROM_LOAD16_BYTE( "u28_v1.00.u28", 0x000001, 0x400000, CRC(9cc8b577) SHA1(6ef5cbb83860f88c9c83d4410034c5b528b2138b) )
-	
+
 	ROM_REGION( 0x400000, "tt5665", 0 )
-	ROM_LOAD( "u24_v1.00.u24", 0x000000, 0x400000, CRC(4e082d58) SHA1(d2eb58bc3d8ade2ea556960013d580f0fb952090) )	
+	ROM_LOAD( "u24_v1.00.u24", 0x000000, 0x400000, CRC(4e082d58) SHA1(d2eb58bc3d8ade2ea556960013d580f0fb952090) )
 ROM_END
 
 
-GAME( 200?, bowltry,	0,			bowltry,  bowltry, driver_device,  0, ROT0, "Atlus",        "Bowling Try",GAME_IS_SKELETON )
+GAME( 200?, bowltry,    0,          bowltry,  bowltry, driver_device,  0, ROT0, "Atlus",        "Bowling Try",GAME_IS_SKELETON )

@@ -41,8 +41,8 @@ DRIVER_INIT_MEMBER(adder5_state,ad5)
 	// help identify roms where one of the pair is missing too
 	if (!found)
 	{
-		 found = find_project_string(machine(), 3, 1);
-		 found = find_project_string(machine(), 3, 2);
+			found = find_project_string(machine(), 3, 1);
+			found = find_project_string(machine(), 3, 2);
 	}
 
 	if (!found)
@@ -73,4 +73,3 @@ MACHINE_CONFIG_START( bfm_ad5, adder5_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
 MACHINE_CONFIG_END
-

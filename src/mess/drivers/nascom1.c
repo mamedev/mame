@@ -76,10 +76,10 @@ static ADDRESS_MAP_START( nascom1_mem, AS_PROGRAM, 8, nascom1_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM	/* 1Kb */
-	AM_RANGE(0x1400, 0x4fff) AM_RAM	/* 16Kb */
-	AM_RANGE(0x5000, 0x8fff) AM_RAM	/* 32Kb */
-	AM_RANGE(0x9000, 0xafff) AM_RAM	/* 40Kb */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM /* 1Kb */
+	AM_RANGE(0x1400, 0x4fff) AM_RAM /* 16Kb */
+	AM_RANGE(0x5000, 0x8fff) AM_RAM /* 32Kb */
+	AM_RANGE(0x9000, 0xafff) AM_RAM /* 40Kb */
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -120,7 +120,7 @@ static const gfx_layout nascom1_charlayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+		8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	8 * 16
 };
 
@@ -138,7 +138,7 @@ static const gfx_layout nascom2_charlayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8,  3*8,  4*8,  5*8,  6*8,
-	  7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8 },
+		7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8 },
 	8 * 16
 };
 

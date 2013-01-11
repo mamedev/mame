@@ -63,24 +63,24 @@
 
 struct crt9021_interface
 {
-	const char *screen_tag;		/* screen we are acting on */
+	const char *screen_tag;     /* screen we are acting on */
 
-	devcb_read8				in_data_cb;
-	devcb_read8				in_attr_cb;
+	devcb_read8             in_data_cb;
+	devcb_read8             in_attr_cb;
 
-	devcb_read_line			in_atten_cb;
+	devcb_read_line         in_atten_cb;
 };
 
 
 
 // ======================> crt9021_device
 
-class crt9021_device :	public device_t,
-                        public crt9021_interface
+class crt9021_device :  public device_t,
+						public crt9021_interface
 {
 public:
-    // construction/destruction
-    crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( slg_w );
 	DECLARE_WRITE_LINE_MEMBER( sld_w );
@@ -91,16 +91,16 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 	virtual void device_clock_changed();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_read8			m_in_data_func;
-	devcb_resolved_read8			m_in_attr_func;
-	devcb_resolved_read_line		m_in_atten_func;
+	devcb_resolved_read8            m_in_data_func;
+	devcb_resolved_read8            m_in_attr_func;
+	devcb_resolved_read_line        m_in_atten_func;
 
 	screen_device *m_screen;
 

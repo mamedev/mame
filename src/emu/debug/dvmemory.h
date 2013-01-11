@@ -60,13 +60,13 @@ public:
 	address_space *space() const { return m_space; }
 
 private:
-	address_space *m_space;				// address space we reference (if any)
-	device_memory_interface *m_memintf;			// pointer to the memory interface of the device
-	void *				m_base;					// pointer to memory base
-	offs_t				m_length;				// length of memory
-	offs_t				m_offsetxor;			// XOR to apply to offsets
-	endianness_t		m_endianness;			// endianness of memory
-	UINT8				m_prefsize;				// preferred bytes per chunk
+	address_space *m_space;             // address space we reference (if any)
+	device_memory_interface *m_memintf;         // pointer to the memory interface of the device
+	void *              m_base;                 // pointer to memory base
+	offs_t              m_length;               // length of memory
+	offs_t              m_offsetxor;            // XOR to apply to offsets
+	endianness_t        m_endianness;           // endianness of memory
+	UINT8               m_prefsize;             // preferred bytes per chunk
 };
 
 
@@ -126,31 +126,31 @@ private:
 	void write(UINT8 size, offs_t offs, UINT64 data);
 
 	// internal state
-	debug_view_expression m_expression;			// expression describing the start address
-	UINT32				m_chunks_per_row;		// number of chunks displayed per line
-	UINT8				m_bytes_per_chunk;		// bytes per chunk
-	bool				m_reverse_view;			// reverse-endian view?
-	bool				m_ascii_view;			// display ASCII characters?
-	bool				m_no_translation;		// don't run addresses through the cpu translation hook
-	offs_t				m_maxaddr;				// (derived) maximum address to display
-	UINT32				m_bytes_per_row;		// (derived) number of bytes displayed per line
-	UINT32				m_byte_offset;			// (derived) offset of starting visible byte
-	astring				m_addrformat;			// (derived) format string to use to print addresses
+	debug_view_expression m_expression;         // expression describing the start address
+	UINT32              m_chunks_per_row;       // number of chunks displayed per line
+	UINT8               m_bytes_per_chunk;      // bytes per chunk
+	bool                m_reverse_view;         // reverse-endian view?
+	bool                m_ascii_view;           // display ASCII characters?
+	bool                m_no_translation;       // don't run addresses through the cpu translation hook
+	offs_t              m_maxaddr;              // (derived) maximum address to display
+	UINT32              m_bytes_per_row;        // (derived) number of bytes displayed per line
+	UINT32              m_byte_offset;          // (derived) offset of starting visible byte
+	astring             m_addrformat;           // (derived) format string to use to print addresses
 
 	struct section
 	{
 		bool contains(int x) const { return x >= m_pos && x < m_pos + m_width; }
-		INT32			m_pos;					/* starting position */
-		INT32			m_width;				/* width of this section */
+		INT32           m_pos;                  /* starting position */
+		INT32           m_width;                /* width of this section */
 	};
-	section				m_section[3];			// (derived) 3 sections to manage
+	section             m_section[3];           // (derived) 3 sections to manage
 
 	struct memory_view_pos
 	{
-		UINT8			m_spacing;				/* spacing between each entry */
-		UINT8			m_shift[24];			/* shift for each character */
+		UINT8           m_spacing;              /* spacing between each entry */
+		UINT8           m_shift[24];            /* shift for each character */
 	};
-	static const memory_view_pos s_memory_pos_table[9];	// table for rendering at different chunk sizes
+	static const memory_view_pos s_memory_pos_table[9]; // table for rendering at different chunk sizes
 
 	// constants
 	static const int MEM_MAX_LINE_WIDTH = 1024;

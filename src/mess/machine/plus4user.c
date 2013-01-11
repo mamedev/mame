@@ -53,7 +53,7 @@ device_plus4_user_port_interface::~device_plus4_user_port_interface()
 //-------------------------------------------------
 
 plus4_user_port_device::plus4_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PLUS4_USER_PORT, "User Port", tag, owner, clock),
+		device_t(mconfig, PLUS4_USER_PORT, "User Port", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }

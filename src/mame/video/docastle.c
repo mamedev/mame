@@ -55,8 +55,8 @@ void docastle_state::palette_init()
 		b = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
 
 		/* because the graphics are decoded as 4bpp with the top bit used for transparency
-           or priority, we create matching 3bpp sets of palette entries, which effectively
-           ignores the value of the top bit */
+		   or priority, we create matching 3bpp sets of palette entries, which effectively
+		   ignores the value of the top bit */
 		palette_set_color(machine(), ((i & 0xf8) << 1) | 0x00 | (i & 0x07), MAKE_RGB(r,g,b));
 		palette_set_color(machine(), ((i & 0xf8) << 1) | 0x08 | (i & 0x07), MAKE_RGB(r,g,b));
 		color_prom++;
@@ -141,20 +141,20 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			/* spriteram
 
-             indoor soccer appears to have a slightly different spriteram
-             format to the other games, allowing a larger number of sprite
-             tiles
+			 indoor soccer appears to have a slightly different spriteram
+			 format to the other games, allowing a larger number of sprite
+			 tiles
 
-             yyyy yyyy  xxxx xxxx  TX-T pppp  tttt tttt
+			 yyyy yyyy  xxxx xxxx  TX-T pppp  tttt tttt
 
-             y = ypos
-             x = xpos
-             X = x-flip
-             T = extra tile number bits
-             p = palette
-             t = tile number
+			 y = ypos
+			 x = xpos
+			 X = x-flip
+			 T = extra tile number bits
+			 p = palette
+			 t = tile number
 
-             */
+			 */
 
 			code = state->m_spriteram[offs + 3];
 			color = state->m_spriteram[offs + 2] & 0x0f;
@@ -169,18 +169,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			/* spriteram
 
-            this is the standard spriteram layout, used by most games
+			this is the standard spriteram layout, used by most games
 
-             yyyy yyyy  xxxx xxxx  YX-p pppp  tttt tttt
+			 yyyy yyyy  xxxx xxxx  YX-p pppp  tttt tttt
 
-             y = ypos
-             x = xpos
-             X = x-flip
-             Y = y-flip
-             p = palette
-             t = tile number
+			 y = ypos
+			 x = xpos
+			 X = x-flip
+			 Y = y-flip
+			 p = palette
+			 t = tile number
 
-             */
+			 */
 
 			code = state->m_spriteram[offs + 3];
 			color = state->m_spriteram[offs + 2] & 0x1f;

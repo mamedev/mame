@@ -135,7 +135,7 @@ these functions in Input (This System) menu, hence we live some empty space in t
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B  OR RET") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("CONFIG")	/* config diode on main board */
+	PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x40, 0x40, "TV system")
 	PORT_CONFSETTING(    0x00, "NTSC")
 	PORT_CONFSETTING(    0x40, "PAL")
@@ -211,7 +211,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( zx81 )
 	PORT_INCLUDE(pc8300)
 
-	PORT_START("CONFIG")	/* config diode on main board */
+	PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x40, 0x40, "TV system")
 	PORT_CONFSETTING(    0x00, "NTSC")
 	PORT_CONFSETTING(    0x40, "PAL")
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( pow3000 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B  Left") PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("CONFIG")	/* config diode on main board */
+	PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x01, 0x00, "TV system")
 	PORT_CONFSETTING(    0x00, "NTSC")
 	PORT_CONFSETTING(    0x01, "PAL")
@@ -293,15 +293,15 @@ INPUT_PORTS_END
 
 static const gfx_layout zx_gfx_layout =
 {
-	8, 8,							   /* 8x8 pixels */
-	64,								   /* 64 codes */
-	1,								   /* 1 bit per pixel */
-	{0},							   /* no bitplanes */
+	8, 8,                              /* 8x8 pixels */
+	64,                                /* 64 codes */
+	1,                                 /* 1 bit per pixel */
+	{0},                               /* no bitplanes */
 	/* x offsets */
 	{0, 1, 2, 3, 4, 5, 6, 7},
 	/* y offsets */
 	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
-	8 * 8							   /* eight bytes per code */
+	8 * 8                              /* eight bytes per code */
 };
 
 
@@ -341,24 +341,24 @@ PALETTE_INIT_MEMBER(zx_state,ts1000)
 }
 
 
-#define ZX81_CPU_CLOCK			3250000
-#define ZX81_CYCLES_PER_SCANLINE	207
-#define ZX81_PIXELS_PER_SCANLINE	256
-#define ZX81_CYCLES_PER_VBLANK		1235
-#define ZX81_VBLANK_DURATION		(1.0*ZX81_CYCLES_PER_VBLANK/ZX81_CPU_CLOCK*1000*1000)
+#define ZX81_CPU_CLOCK          3250000
+#define ZX81_CYCLES_PER_SCANLINE    207
+#define ZX81_PIXELS_PER_SCANLINE    256
+#define ZX81_CYCLES_PER_VBLANK      1235
+#define ZX81_VBLANK_DURATION        (1.0*ZX81_CYCLES_PER_VBLANK/ZX81_CPU_CLOCK*1000*1000)
 
-#define ZX81_PAL_SCANLINES		304
-#define ZX81_PAL_FRAMES_PER_SECOND	(1.0*ZX81_CPU_CLOCK/(ZX81_PAL_SCANLINES*ZX81_CYCLES_PER_SCANLINE+ZX81_CYCLES_PER_VBLANK))
+#define ZX81_PAL_SCANLINES      304
+#define ZX81_PAL_FRAMES_PER_SECOND  (1.0*ZX81_CPU_CLOCK/(ZX81_PAL_SCANLINES*ZX81_CYCLES_PER_SCANLINE+ZX81_CYCLES_PER_VBLANK))
 
-#define ZX81_NTSC_SCANLINES		256
-#define ZX81_NTSC_FRAMES_PER_SECOND	(1.0*ZX81_CPU_CLOCK/(ZX81_NTSC_SCANLINES*ZX81_CYCLES_PER_SCANLINE+ZX81_CYCLES_PER_VBLANK))
+#define ZX81_NTSC_SCANLINES     256
+#define ZX81_NTSC_FRAMES_PER_SECOND (1.0*ZX81_CPU_CLOCK/(ZX81_NTSC_SCANLINES*ZX81_CYCLES_PER_SCANLINE+ZX81_CYCLES_PER_VBLANK))
 
 /* Machine Drivers */
 
 static const struct CassetteOptions zx81_cassette_options = {
-	1,		/* channels */
-	16,		/* bits per sample */
-	44100	/* sample frequency */
+	1,      /* channels */
+	16,     /* bits per sample */
+	44100   /* sample frequency */
 };
 
 static const cassette_interface zx80_cassette_interface =
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)	/* Used by pc8300/lambda/pow3000 */
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)   /* Used by pc8300/lambda/pow3000 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -544,7 +544,7 @@ ROM_END
 ROM_START( zx97 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zx97.rom", 0x0000, 0x2000, CRC(5cf49744) SHA1(b2a486efdc7b2bc3dc8e5a441ea5532bfa3207bd) )
-	ROM_IGNORE( 0x6000 )	/* Unemulated bankswitched part */
+	ROM_IGNORE( 0x6000 )    /* Unemulated bankswitched part */
 ROM_END
 
 /* Game Drivers */

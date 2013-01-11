@@ -41,13 +41,13 @@ RAM = 4116 (x11)
 #include "machine/nvram.h"
 
 
-#define NUM_PENS	(8)
+#define NUM_PENS    (8)
 
-#define LOG_AUDIO_COMM	(0)
+#define LOG_AUDIO_COMM  (0)
 
-#define MAIN_CPU_MASTER_CLOCK	(11200000)
-#define PIXEL_CLOCK				(MAIN_CPU_MASTER_CLOCK / 2)
-#define CRTC_CLOCK				(MAIN_CPU_MASTER_CLOCK / 16)
+#define MAIN_CPU_MASTER_CLOCK   (11200000)
+#define PIXEL_CLOCK             (MAIN_CPU_MASTER_CLOCK / 2)
+#define CRTC_CLOCK              (MAIN_CPU_MASTER_CLOCK / 16)
 
 class r2dtank_state : public driver_device
 {
@@ -102,7 +102,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 	pia6821_device *pia0 = machine().device<pia6821_device>("pia_main");
 	pia6821_device *pia1 = machine().device<pia6821_device>("pia_audio");
 	int combined_state = pia0->irq_a_state() | pia0->irq_b_state() |
-						 pia1->irq_a_state() | pia1->irq_b_state();
+							pia1->irq_a_state() | pia1->irq_b_state();
 
 	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -159,12 +159,12 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", space.devi
 WRITE8_MEMBER(r2dtank_state::AY8910_select_w)
 {
 	/* not sure what all the bits mean:
-       D0 - ????? definetely used
-       D1 - not used?
-       D2 - selects ay8910 control or port
-       D3 - selects ay8910 #0
-       D4 - selects ay8910 #1
-       D5-D7 - not used */
+	   D0 - ????? definetely used
+	   D1 - not used?
+	   D2 - selects ay8910 control or port
+	   D3 - selects ay8910 #0
+	   D4 - selects ay8910 #1
+	   D5-D7 - not used */
 	m_AY8910_selected = data;
 
 if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().describe_context(), data);
@@ -246,12 +246,12 @@ CUSTOM_INPUT_MEMBER(r2dtank_state::get_ttl74123_output)
 
 static const ttl74123_interface ttl74123_intf =
 {
-	TTL74123_GROUNDED,	/* the hook up type */
-	RES_K(22),			/* resistor connected to RCext */
-	CAP_U(0.01),		/* capacitor connected to Cext and RCext */
-	1,					/* A pin - driven by the CRTC */
-	1,					/* B pin - pulled high */
-	1,					/* Clear pin - pulled high */
+	TTL74123_GROUNDED,  /* the hook up type */
+	RES_K(22),          /* resistor connected to RCext */
+	CAP_U(0.01),        /* capacitor connected to Cext and RCext */
+	1,                  /* A pin - driven by the CRTC */
+	1,                  /* B pin - pulled high */
+	1,                  /* Clear pin - pulled high */
 	DEVCB_DRIVER_MEMBER(r2dtank_state,ttl74123_output_changed)
 };
 
@@ -265,35 +265,35 @@ static const ttl74123_interface ttl74123_intf =
 
 static const pia6821_interface pia_main_intf =
 {
-	DEVCB_INPUT_PORT("IN0"),		/* port A in */
-	DEVCB_INPUT_PORT("IN1"),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,flipscreen_w),		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq)		/* IRQB */
+	DEVCB_INPUT_PORT("IN0"),        /* port A in */
+	DEVCB_INPUT_PORT("IN1"),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,flipscreen_w),       /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq)        /* IRQB */
 };
 
 
 static const pia6821_interface pia_audio_intf =
 {
-	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_port_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_port_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_select_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_port_r),       /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_port_w),       /* port A out */
+	DEVCB_DRIVER_MEMBER(r2dtank_state,AY8910_select_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,main_cpu_irq)        /* IRQB */
 };
 
 
@@ -350,8 +350,8 @@ static MC6845_UPDATE_ROW( update_row )
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x1f00) |
-					  ((ra << 5) & 0x00e0) |
-					  ((ma << 0) & 0x001f);
+						((ra << 5) & 0x00e0) |
+						((ma << 0) & 0x001f);
 
 		if (state->m_flipscreen)
 			offs = offs ^ 0x1fff;
@@ -394,16 +394,16 @@ WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",				/* screen we are acting on */
-	8,						/* number of pixels per video memory address */
-	begin_update,			/* before pixel update callback */
-	update_row,				/* row update callback */
-	NULL,					/* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,display_enable_changed),	/* callback for display state changes */
-	DEVCB_NULL,				/* callback for cursor state changes */
-	DEVCB_NULL,				/* HSYNC callback */
-	DEVCB_NULL,				/* VSYNC callback */
-	NULL					/* update address callback */
+	"screen",               /* screen we are acting on */
+	8,                      /* number of pixels per video memory address */
+	begin_update,           /* before pixel update callback */
+	update_row,             /* row update callback */
+	NULL,                   /* after pixel update callback */
+	DEVCB_DRIVER_LINE_MEMBER(r2dtank_state,display_enable_changed), /* callback for display state changes */
+	DEVCB_NULL,             /* callback for cursor state changes */
+	DEVCB_NULL,             /* HSYNC callback */
+	DEVCB_NULL,             /* VSYNC callback */
+	NULL                    /* update address callback */
 };
 
 
@@ -436,7 +436,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( r2dtank_audio_map, AS_PROGRAM, 8, r2dtank_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
+	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("pia_audio", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -534,17 +534,17 @@ INPUT_PORTS_END
  *************************************/
 
 static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
-	MCFG_CPU_ADD("maincpu", M6809,3000000)		 /* ?? too fast ? */
+	MCFG_CPU_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802,3000000)			/* ?? */
+	MCFG_CPU_ADD("audiocpu", M6802,3000000)         /* ?? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_audio_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)

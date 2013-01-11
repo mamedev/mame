@@ -187,23 +187,23 @@ READ8_MEMBER(champbas_state::champbja_alt_protection_r)
 {
 	UINT8 data = 0;
 	/*
-    (68BA) & 0x99 == 0x00
-    (6867) & 0x99 == 0x99
-    (68AB) & 0x80 == 0x80
-    (6854) & 0x99 == 0x19
+	(68BA) & 0x99 == 0x00
+	(6867) & 0x99 == 0x99
+	(68AB) & 0x80 == 0x80
+	(6854) & 0x99 == 0x19
 
-    BA 1011_1010
-    00 0--0_0--0
+	BA 1011_1010
+	00 0--0_0--0
 
-    54 0101_0100
-    19 0--1_1--1
+	54 0101_0100
+	19 0--1_1--1
 
-    67 0110_0111
-    99 1--1_1--1
+	67 0110_0111
+	99 1--1_1--1
 
-    AB 1010_1011
-    80 1--0_0--0
-    */
+	AB 1010_1011
+	80 1--0_0--0
+	*/
 
 	/* bit7 =  bit0 */
 	if ((offset & 0x01))
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
+	AM_RANGE(0xa001, 0xa001) AM_WRITENOP    // !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITENOP
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITENOP
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
+	AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
@@ -265,13 +265,13 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
+	AM_RANGE(0xa001, 0xa001) AM_WRITENOP    // !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(champbas_palette_bank_w)
-	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	// n.c.
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)	// MCU not present/not used in champbas
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)	// MCU not present/not used in champbas
+	AM_RANGE(0xa005, 0xa005) AM_WRITENOP    // n.c.
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)  // MCU not present/not used in champbas
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)    // MCU not present/not used in champbas
 
 	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_SHARE("spriteram_2")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
@@ -296,11 +296,11 @@ static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	/* ??? */
+	AM_RANGE(0xa001, 0xa001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
+	AM_RANGE(0xa006, 0xa006) AM_WRITENOP    /* MCU is not used, but some leftover code still writes here */
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP    /* MCU is not used, but some leftover code still writes here */
 
 	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram") /* Sprite Pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)
@@ -337,7 +337,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champbas_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITENOP	// 4-bit return code to main CPU (not used)
+	AM_RANGE(0x8000, 0x9fff) AM_WRITENOP    // 4-bit return code to main CPU (not used)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(champbas_dac_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
@@ -411,7 +411,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -428,16 +428,16 @@ static INPUT_PORTS_START( champbas )
 	PORT_INCLUDE( talbot )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// throw (red)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    // throw (red)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )	// changes (blue)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )	// steal (yellow)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    // changes (blue)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )    // steal (yellow)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL	// steal (yellow)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL	// changes (blue)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // steal (yellow)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL  // changes (blue)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL	// throw (red)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL  // throw (red)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )
@@ -458,7 +458,7 @@ static INPUT_PORTS_START( champbas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exctsccr )
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_DIPSETTING(    0x00, "2 Min." )
 	PORT_DIPSETTING(    0x60, "3 Min." )
 	PORT_DIPSETTING(    0x40, "4 Min." )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state,champbas_watchdog_bit2, NULL)   // bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 
@@ -600,7 +600,7 @@ MACHINE_RESET_MEMBER(champbas_state,champbas)
 {
 
 	m_palette_bank = 0;
-	m_gfx_bank = 0;	// talbot has only 1 bank
+	m_gfx_bank = 0; // talbot has only 1 bank
 }
 
 INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse,  4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
-	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)		/* Actually 8302 */
+	MCFG_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)     /* Actually 8302 */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_MACHINE_START_OVERRIDE(champbas_state,exctsccr)
@@ -812,10 +812,10 @@ ROM_START( talbot )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )	// chars
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "7.6a", 0x0000, 0x1000, CRC(bde14194) SHA1(f8f569342a3094eb5450a30b8ab87901b98e6061) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )	// sprites
+	ROM_REGION( 0x1000, "gfx2", 0 ) // sprites
 	ROM_LOAD( "8.6b", 0x0000, 0x1000, CRC(ddcd227a) SHA1(c44de36311cd173afb3eebf8487305b06e069c0f) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -834,10 +834,10 @@ ROM_START( champbas )
 	ROM_LOAD( "champbb.7", 0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "champbb.8", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "champbb.4", 0x0000, 0x2000, CRC(1930fb52) SHA1(cae0b2701c2b53b79e9df3a7496442ba3472e996) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "champbb.5", 0x0000, 0x2000, CRC(a4cef5a1) SHA1(fa00ed0d075e00992a1ddce3c1327ed74770a735) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -859,10 +859,10 @@ ROM_START( champbasj )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "14.5e", 0x0000, 0x2000, CRC(1b8202b3) SHA1(889b77fc3d0cb029baf8c47be260f513f3ed59bd) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "15.5g", 0x0000, 0x2000, CRC(a67c0c40) SHA1(3845839eff8c1624d26937f28ffde67a5fcb4805) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -881,10 +881,10 @@ ROM_START( champbasja )
 	ROM_LOAD( "17.2l", 0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
 	ROM_LOAD( "18.2n", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "14.5e", 0x0000, 0x2000, CRC(1b8202b3) SHA1(889b77fc3d0cb029baf8c47be260f513f3ed59bd) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "15.5g", 0x0000, 0x2000, CRC(a67c0c40) SHA1(3845839eff8c1624d26937f28ffde67a5fcb4805) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -908,10 +908,10 @@ ROM_START( champbb2 )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "epr5937", 0x0000, 0x2000, CRC(5c80ec42) SHA1(9b79737577e48a6b2ec20ce145252545955e82c3) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -936,10 +936,10 @@ ROM_START( champbb2a )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "epr5937", 0x0000, 0x2000, CRC(5c80ec42) SHA1(9b79737577e48a6b2ec20ce145252545955e82c3) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -964,10 +964,10 @@ ROM_START( champbb2j )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4.6a", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x2000, "gfx2", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "5.6b", 0x0000, 0x2000, CRC(5c80ec42) SHA1(9b79737577e48a6b2ec20ce145252545955e82c3) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -988,14 +988,14 @@ ROM_START( exctsccr ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
 	ROM_LOAD( "6_c5.bin",     0x2000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) ) /* plane 3 */
 
-	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "5_b5.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
 
-	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
 	ROM_LOAD( "2.5k",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3.5l",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -1018,14 +1018,14 @@ ROM_START( exctsccra ) /* Teams: ITA AUS GBR FRA FRG BRA */
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
 	ROM_LOAD( "6_c5.bin",     0x2000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) ) /* plane 3 */
 
-	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "5_b5.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
 
-	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
 	ROM_LOAD( "2.5k",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3.5l",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -1048,14 +1048,14 @@ ROM_START( exctsccru ) /* Teams: ITA USA GBR FRA FRG BRA */
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "vr4u.a5",     0x0000, 0x2000, CRC(103bb739) SHA1(335d89b3a374daa3fd1bd3fd66a82e7310303051) ) /* planes 0,1 */
 	ROM_LOAD( "vr6u.c5",     0x2000, 0x2000, CRC(a5b2b303) SHA1(0dd1912baa8236cba2baa4bc3d2955fd19617be9) ) /* plane 3 */
 
-	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "5_b5.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
 
-	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
 	ROM_LOAD( "2.5k",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3.5l",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -1078,14 +1078,14 @@ ROM_START( exctsccrj ) /* Teams: JPN USA GBR FRA FRG BRA */
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_5a.bin",     0x0000, 0x2000, CRC(74cc71d6) SHA1(ff3d59845bc66ec3335eadf81d799a684182c66f) ) /* planes 0,1 */
 	ROM_LOAD( "6_5c.bin",     0x2000, 0x2000, CRC(7c4cd1b6) SHA1(141e67fec9b6d6b4380cb941b4d79341787680e3) ) /* plane 3 */
 
-	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "5_5b.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
 
-	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
 	ROM_LOAD( "2.5k",         0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3.5l",         0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -1107,14 +1107,14 @@ ROM_START( exctsccrjo ) /* Teams: JPN USA ENG FRA GFR BRA */
 	ROM_LOAD( "8.6d",     0x4000, 0x2000, CRC(b6b209a5) SHA1(e49a0db65b29337ac6b919237067b1990f2233ab) )
 	ROM_LOAD( "7.6c",     0x6000, 0x2000, CRC(8856452a) SHA1(4494c225c9df97da09c180caadb4dda49d0d5392) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4.5a",     0x0000, 0x2000, CRC(c4259307) SHA1(7bd4e229a5e1a5136826a57aa61810fcdf9c5027) ) /* planes 0,1 */
 	ROM_LOAD( "6.5c",     0x2000, 0x2000, CRC(cca53367) SHA1(f06ebf2ab8f8f10cfe118af490017972990e3073) ) /* plane 3 */
 
-	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "5.5b",     0x0000, 0x2000, CRC(851d1a18) SHA1(2cfad530c8f9d95094fd0aacd2e0965b0300898c) ) /* planes 0,1 */
 
-	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
 	ROM_LOAD( "2.5k",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3.5l",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -1147,20 +1147,20 @@ ROM_START( exctsccrb )
 	ROM_LOAD( "es-2.g2",      0x2000, 0x2000, CRC(5c66e792) SHA1(f7a7f32806965fa926261217cee3159ccd198d49) )
 	ROM_LOAD( "es-3.h2",      0x4000, 0x2000, CRC(e0d504c0) SHA1(d9a9f37b3a44a05a3f3389aa9617c419a2cee661) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* sound */
+	ROM_REGION( 0x10000, "sub", 0 ) /* sound */
 	ROM_LOAD( "es-a.k2",      0x0000, 0x2000, CRC(99e87b78) SHA1(f12006ff3f6f3c706e06288c97a1446141373432) )
 	ROM_LOAD( "es-b.l2",      0x2000, 0x2000, CRC(8b3db794) SHA1(dbfed2357c7631bfca6bbd63a23617bc3abf6ca3) )
 	ROM_LOAD( "es-c.m2",      0x4000, 0x2000, CRC(7bed2f81) SHA1(cbbb0480519cc04a99e8983228b18c9e49a9985d) )
 
 	/* the national flags are wrong. This happens on the real board */
-	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
 	ROM_LOAD( "6_c5.bin",     0x2000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) ) /* plane 3 */
 
-	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "5_b5.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
 
-	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
 	ROM_LOAD( "2_k5.bin",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3_l5.bin",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -1179,21 +1179,21 @@ ROM_START( exctscc2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "vr.7d",        0x0000, 0x2000, CRC(2c675a43) SHA1(aa0a8dbcae955e3da92c435202f2a1ed238c377e) )
 	ROM_LOAD( "vr.7e",        0x2000, 0x2000, CRC(e571873d) SHA1(2dfff24f5dac86e92612f40cf3642005c7f36ad3) )
-	ROM_LOAD( "8_d6.bin",     0x4000, 0x2000, CRC(88651ee1) SHA1(2052e1b3f9784439369f464e31f4a2b0d1bb0565) )	/* vr.7f */
-	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )	/* vr.7h */
-	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )	/* vr.7k */
+	ROM_LOAD( "8_d6.bin",     0x4000, 0x2000, CRC(88651ee1) SHA1(2052e1b3f9784439369f464e31f4a2b0d1bb0565) )    /* vr.7f */
+	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )    /* vr.7h */
+	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )    /* vr.7k */
 
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_REGION( 0x04000, "gfx1", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "vr.5a",        0x0000, 0x2000, CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c) ) /* planes 0,1 */
 	ROM_LOAD( "vr.5c",        0x2000, 0x2000, CRC(1fb84ee6) SHA1(56ceb86c509be783f806403ac21e7c9684760d5f) ) /* plane 3 */
 
-	ROM_REGION( 0x04000, "gfx2", 0 )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_REGION( 0x04000, "gfx2", 0 )    // 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
 	ROM_LOAD( "vr.5b",        0x0000, 0x2000, CRC(5605b60b) SHA1(19d5909896ae4a3d7552225c369d30475c56793b) ) /* planes 0,1 */
 
-	ROM_REGION( 0x02000, "gfx3", 0 )	// 4bpp sprites
+	ROM_REGION( 0x02000, "gfx3", 0 )    // 4bpp sprites
 	ROM_LOAD( "vr.5k",        0x0000, 0x1000, CRC(1d37edfa) SHA1(184fa6dd7b1b3fff4c5fc19b42301ccb7979ac84) )
 	ROM_LOAD( "vr.5l",        0x1000, 0x1000, CRC(b97f396c) SHA1(4ffe512acf047230bd593911a615fc0ef66b481d) )
 
@@ -1268,7 +1268,7 @@ GAME( 1983, champbas,   0,        champbas, champbas, champbas_state, champbas, 
 GAME( 1983, champbasj,  champbas, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbasja, champbas, champbas, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbb2,   0,        champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, champbb2a,  champbb2, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )	// no dump
+GAME( 1983, champbb2a,  champbb2, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no dump
 GAME( 1983, champbb2j,  champbb2, champmcu, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (Japan)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 GAME( 1983, exctsccr,   0,        exctsccr, exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", GAME_SUPPORTS_SAVE )

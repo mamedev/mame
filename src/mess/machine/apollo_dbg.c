@@ -1131,7 +1131,7 @@ int apollo_debug_instruction_hook(device_t *device, offs_t curpc)
 			m68k->mmu_tmp_buserror_occurred = 0;
 			// give up
 		}
-		else if ((ir & 0xff00) == 0xf200 && (apollo_config(	APOLLO_CONF_FPU_TRACE)))
+		else if ((ir & 0xff00) == 0xf200 && (apollo_config( APOLLO_CONF_FPU_TRACE)))
 		{
 			char sb[256];
 			LOG(("%s sp=%08x FPU: %x %s", apollo_cpu_context(device->machine().firstcpu),
@@ -1181,5 +1181,5 @@ int apollo_debug_instruction_hook(device_t *device, offs_t curpc)
 		// restore previous PC
 		REG_PPC(m68k) = ppc_save;
 	}
-    return 0;
+	return 0;
 }

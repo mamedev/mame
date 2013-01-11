@@ -16,33 +16,33 @@
 #include "sound/sid6581.h"
 #include "video/mos6566.h"
 
-#define M6510_TAG		"u3"
-#define MOS6566_TAG		"u2"
-#define MOS6581_TAG		"u6"
-#define MOS6526_TAG		"u9"
-#define SCREEN_TAG		"screen"
-#define TIMER_C1531_TAG	"c1531"
-#define CONTROL1_TAG	"joy1"
-#define CONTROL2_TAG	"joy2"
+#define M6510_TAG       "u3"
+#define MOS6566_TAG     "u2"
+#define MOS6581_TAG     "u6"
+#define MOS6526_TAG     "u9"
+#define SCREEN_TAG      "screen"
+#define TIMER_C1531_TAG "c1531"
+#define CONTROL1_TAG    "joy1"
+#define CONTROL2_TAG    "joy2"
 
 class vic10_state : public driver_device
 {
 public:
 	vic10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M6510_TAG),
-		  m_vic(*this, MOS6566_TAG),
-		  m_sid(*this, MOS6581_TAG),
-		  m_cia(*this, MOS6526_TAG),
-		  m_joy1(*this, CONTROL1_TAG),
-		  m_joy2(*this, CONTROL2_TAG),
-		  m_exp(*this, VIC10_EXPANSION_SLOT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		  m_color_ram(*this, "color_ram"),
-		  m_cia_irq(CLEAR_LINE),
-		  m_vic_irq(CLEAR_LINE),
-		  m_exp_irq(CLEAR_LINE)
+			m_maincpu(*this, M6510_TAG),
+			m_vic(*this, MOS6566_TAG),
+			m_sid(*this, MOS6581_TAG),
+			m_cia(*this, MOS6526_TAG),
+			m_joy1(*this, CONTROL1_TAG),
+			m_joy2(*this, CONTROL2_TAG),
+			m_exp(*this, VIC10_EXPANSION_SLOT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_color_ram(*this, "color_ram"),
+			m_cia_irq(CLEAR_LINE),
+			m_vic_irq(CLEAR_LINE),
+			m_exp_irq(CLEAR_LINE)
 	{ }
 
 	required_device<m6510_device> m_maincpu;

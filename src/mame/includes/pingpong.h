@@ -30,4 +30,3 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pingpong_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(merlinmm_interrupt);
 };
-

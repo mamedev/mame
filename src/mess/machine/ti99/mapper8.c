@@ -130,7 +130,7 @@ READ8_MEMBER( ti998_mapper_device::readm )
 		// In that case, the address decoder could not find a suitable device.
 		// This means the logical address is transformed by the mapper.
 		// NOTE: Use "+", not OR. The offset is not a prefix.
-		UINT32	pas_address = m_pas_offset[(offset & 0xf000)>>12] + (offset & 0xfff);
+		UINT32  pas_address = m_pas_offset[(offset & 0xf000)>>12] + (offset & 0xfff);
 
 		// So now let's do the same as above with physical addresses
 		search_physically_addressed_r(space, pas_address, &value, mem_mask);
@@ -241,7 +241,7 @@ void ti998_mapper_device::mapwrite(int offset, UINT8 data)
 			for (int i=0; i < 16; i++)
 			{
 				int ptr = (bankindx << 6);
-				m_pas_offset[i] =	(m_sram[(i<<2) + ptr] << 24) | (m_sram[(i<<2)+ ptr+1] << 16)
+				m_pas_offset[i] =   (m_sram[(i<<2) + ptr] << 24) | (m_sram[(i<<2)+ ptr+1] << 16)
 				| (m_sram[(i<<2) + ptr+2] << 8) | (m_sram[(i<<2) + ptr+3]);
 			}
 		}

@@ -96,8 +96,8 @@ public:
 
 private:
 	// internal state
-	running_machine *	m_machine;
+	running_machine *   m_machine;
 };
 
 
-#endif	/* __OSDEPEND_H__ */
+#endif  /* __OSDEPEND_H__ */

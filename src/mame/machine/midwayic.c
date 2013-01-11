@@ -12,11 +12,11 @@
 #include "audio/dcs.h"
 
 
-#define LOG_NVRAM			(0)
+#define LOG_NVRAM           (0)
 
-#define PRINTF_DEBUG		(0)
-#define LOG_IOASIC			(0)
-#define LOG_FIFO			(0)
+#define PRINTF_DEBUG        (0)
+#define LOG_IOASIC          (0)
+#define LOG_FIFO            (0)
 
 
 /*************************************
@@ -25,8 +25,8 @@
  *
  *************************************/
 
-#define PIC_NVRAM_SIZE		0x100
-#define FIFO_SIZE			512
+#define PIC_NVRAM_SIZE      0x100
+#define FIFO_SIZE           512
 
 
 
@@ -38,52 +38,52 @@
 
 struct serial_state
 {
-	UINT8	data[16];
-	UINT8	buffer;
-	UINT8	index;
-	UINT8	status;
-	UINT8	bits;
-	UINT8	ormask;
+	UINT8   data[16];
+	UINT8   buffer;
+	UINT8   index;
+	UINT8   status;
+	UINT8   bits;
+	UINT8   ormask;
 };
 
 struct pic_state
 {
-	UINT16	latch;
+	UINT16  latch;
 	attotime latch_expire_time;
-	UINT8	state;
-	UINT8	index;
-	UINT8	total;
-	UINT8	nvram_addr;
-	UINT8	buffer[0x10];
-	UINT8	nvram[PIC_NVRAM_SIZE];
-	UINT8	default_nvram[PIC_NVRAM_SIZE];
-	UINT8	time_buf[8];
-	UINT8	time_index;
-	UINT8	time_just_written;
-	UINT16	yearoffs;
+	UINT8   state;
+	UINT8   index;
+	UINT8   total;
+	UINT8   nvram_addr;
+	UINT8   buffer[0x10];
+	UINT8   nvram[PIC_NVRAM_SIZE];
+	UINT8   default_nvram[PIC_NVRAM_SIZE];
+	UINT8   time_buf[8];
+	UINT8   time_index;
+	UINT8   time_just_written;
+	UINT16  yearoffs;
 	emu_timer *time_write_timer;
 };
 
 struct ioasic_state
 {
-	UINT32	reg[16];
-	UINT8	has_dcs;
-	UINT8	has_cage;
+	UINT32  reg[16];
+	UINT8   has_dcs;
+	UINT8   has_cage;
 	device_t *dcs_cpu;
-	UINT8	shuffle_type;
-	UINT8	shuffle_active;
-	const UINT8 *	shuffle_map;
-	void	(*irq_callback)(running_machine &, int);
-	UINT8	irq_state;
-	UINT16	sound_irq_state;
-	UINT8	auto_ack;
-	UINT8	force_fifo_full;
+	UINT8   shuffle_type;
+	UINT8   shuffle_active;
+	const UINT8 *   shuffle_map;
+	void    (*irq_callback)(running_machine &, int);
+	UINT8   irq_state;
+	UINT16  sound_irq_state;
+	UINT8   auto_ack;
+	UINT8   force_fifo_full;
 
-	UINT16	fifo[FIFO_SIZE];
-	UINT16	fifo_in;
-	UINT16	fifo_out;
-	UINT16	fifo_bytes;
-	offs_t	fifo_force_buffer_empty_pc;
+	UINT16  fifo[FIFO_SIZE];
+	UINT16  fifo_in;
+	UINT16  fifo_out;
+	UINT16  fifo_bytes;
+	offs_t  fifo_force_buffer_empty_pc;
 };
 
 
@@ -539,22 +539,22 @@ NVRAM_HANDLER( midway_serial_pic2 )
 
 enum
 {
-	IOASIC_PORT0,		/* 0: input port 0 */
-	IOASIC_PORT1,		/* 1: input port 1 */
-	IOASIC_PORT2,		/* 2: input port 2 */
-	IOASIC_PORT3,		/* 3: input port 3 */
-	IOASIC_UARTCONTROL,	/* 4: controls some UART behavior */
-	IOASIC_UARTOUT,		/* 5: UART output */
-	IOASIC_UARTIN,		/* 6: UART input */
-	IOASIC_UNKNOWN7,	/* 7: ??? */
-	IOASIC_SOUNDCTL,	/* 8: sound communications control */
-	IOASIC_SOUNDOUT,	/* 9: sound output port */
-	IOASIC_SOUNDSTAT,	/* a: sound status port */
-	IOASIC_SOUNDIN,		/* b: sound input port */
-	IOASIC_PICOUT,		/* c: PIC output port */
-	IOASIC_PICIN,		/* d: PIC input port */
-	IOASIC_INTSTAT,		/* e: interrupt status */
-	IOASIC_INTCTL		/* f: interrupt control */
+	IOASIC_PORT0,       /* 0: input port 0 */
+	IOASIC_PORT1,       /* 1: input port 1 */
+	IOASIC_PORT2,       /* 2: input port 2 */
+	IOASIC_PORT3,       /* 3: input port 3 */
+	IOASIC_UARTCONTROL, /* 4: controls some UART behavior */
+	IOASIC_UARTOUT,     /* 5: UART output */
+	IOASIC_UARTIN,      /* 6: UART input */
+	IOASIC_UNKNOWN7,    /* 7: ??? */
+	IOASIC_SOUNDCTL,    /* 8: sound communications control */
+	IOASIC_SOUNDOUT,    /* 9: sound output port */
+	IOASIC_SOUNDSTAT,   /* a: sound status port */
+	IOASIC_SOUNDIN,     /* b: sound input port */
+	IOASIC_PICOUT,      /* c: PIC output port */
+	IOASIC_PICIN,       /* d: PIC input port */
+	IOASIC_INTSTAT,     /* e: interrupt status */
+	IOASIC_INTCTL       /* f: interrupt control */
 };
 
 static UINT16 ioasic_fifo_r(device_t *device);
@@ -585,15 +585,15 @@ void midway_ioasic_init(running_machine &machine, int shuffle, int upper, int ye
 {
 	static const UINT8 shuffle_maps[][16] =
 	{
-		{ 0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf },	/* WarGods, WG3DH, SFRush, MK4 */
-		{ 0x4,0x5,0x6,0x7,0xb,0xa,0x9,0x8,0x3,0x2,0x1,0x0,0xf,0xe,0xd,0xc },	/* Blitz, Blitz99 */
-		{ 0x7,0x3,0x2,0x0,0x1,0xc,0xd,0xe,0xf,0x4,0x5,0x6,0x8,0x9,0xa,0xb },	/* Carnevil */
-		{ 0x8,0x9,0xa,0xb,0x0,0x1,0x2,0x3,0xf,0xe,0xc,0xd,0x4,0x5,0x6,0x7 },	/* Calspeed, Gauntlet Legends */
-		{ 0xf,0xe,0xd,0xc,0x4,0x5,0x6,0x7,0x9,0x8,0xa,0xb,0x2,0x3,0x1,0x0 },	/* Mace */
-		{ 0xc,0xd,0xe,0xf,0x0,0x1,0x2,0x3,0x7,0x8,0x9,0xb,0xa,0x5,0x6,0x4 },	/* Gauntlet Dark Legacy */
-		{ 0x7,0x4,0x5,0x6,0x2,0x0,0x1,0x3,0x8,0x9,0xa,0xb,0xd,0xc,0xe,0xf },	/* Vapor TRX */
-		{ 0x7,0x4,0x5,0x6,0x2,0x0,0x1,0x3,0x8,0x9,0xa,0xb,0xd,0xc,0xe,0xf },	/* San Francisco Rush: The Rock */
-		{ 0x1,0x2,0x3,0x0,0x4,0x5,0x6,0x7,0xa,0xb,0x8,0x9,0xc,0xd,0xe,0xf },	/* Hyperdrive */
+		{ 0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf },    /* WarGods, WG3DH, SFRush, MK4 */
+		{ 0x4,0x5,0x6,0x7,0xb,0xa,0x9,0x8,0x3,0x2,0x1,0x0,0xf,0xe,0xd,0xc },    /* Blitz, Blitz99 */
+		{ 0x7,0x3,0x2,0x0,0x1,0xc,0xd,0xe,0xf,0x4,0x5,0x6,0x8,0x9,0xa,0xb },    /* Carnevil */
+		{ 0x8,0x9,0xa,0xb,0x0,0x1,0x2,0x3,0xf,0xe,0xc,0xd,0x4,0x5,0x6,0x7 },    /* Calspeed, Gauntlet Legends */
+		{ 0xf,0xe,0xd,0xc,0x4,0x5,0x6,0x7,0x9,0x8,0xa,0xb,0x2,0x3,0x1,0x0 },    /* Mace */
+		{ 0xc,0xd,0xe,0xf,0x0,0x1,0x2,0x3,0x7,0x8,0x9,0xb,0xa,0x5,0x6,0x4 },    /* Gauntlet Dark Legacy */
+		{ 0x7,0x4,0x5,0x6,0x2,0x0,0x1,0x3,0x8,0x9,0xa,0xb,0xd,0xc,0xe,0xf },    /* Vapor TRX */
+		{ 0x7,0x4,0x5,0x6,0x2,0x0,0x1,0x3,0x8,0x9,0xa,0xb,0xd,0xc,0xe,0xf },    /* San Francisco Rush: The Rock */
+		{ 0x1,0x2,0x3,0x0,0x4,0x5,0x6,0x7,0xa,0xb,0x8,0x9,0xc,0xd,0xe,0xf },    /* Hyperdrive */
 	};
 
 	ioasic_register_state(machine);
@@ -968,7 +968,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 				ioasic.shuffle_active = 1;
 				logerror("*** I/O ASIC shuffling enabled!\n");
 				ioasic.reg[IOASIC_INTCTL] = 0;
-				ioasic.reg[IOASIC_UARTCONTROL] = 0;	/* bug in 10th Degree assumes this */
+				ioasic.reg[IOASIC_UARTCONTROL] = 0; /* bug in 10th Degree assumes this */
 			}
 			break;
 

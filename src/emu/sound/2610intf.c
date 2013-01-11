@@ -18,10 +18,10 @@
 
 struct ym2610_state
 {
-	sound_stream *	stream;
-	emu_timer *		timer[2];
-	void *			chip;
-	void *			psg;
+	sound_stream *  stream;
+	emu_timer *     timer[2];
+	void *          chip;
+	void *          psg;
 	const ym2610_interface *intf;
 	device_t *device;
 };
@@ -92,11 +92,11 @@ static void timer_handler(void *param,int c,int count,int clock)
 {
 	ym2610_state *info = (ym2610_state *)param;
 	if( count == 0 )
-	{	/* Reset FM Timer */
+	{   /* Reset FM Timer */
 		info->timer[c]->enable(false);
 	}
 	else
-	{	/* Start FM Timer */
+	{   /* Start FM Timer */
 		attotime period = attotime::from_hz(clock) * count;
 
 		if (!info->timer[c]->enable(true))
@@ -173,8 +173,8 @@ static DEVICE_START( ym2610 )
 
 	/**** initialize YM2610 ****/
 	info->chip = ym2610_init(info,device,device->clock(),rate,
-		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
-		           timer_handler,IRQHandler,&psgintf);
+					pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
+					timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2610 chip");
 
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(ym2610_intf_postload), info));
@@ -220,13 +220,13 @@ const device_type YM2610 = &device_creator<ym2610_device>;
 
 ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2610, "YM2610", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym2610_state);
 }
 ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym2610_state);
 }
@@ -295,5 +295,3 @@ void ym2610b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

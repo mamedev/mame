@@ -236,13 +236,13 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 }
 
 static ADDRESS_MAP_START( cham24_map, AS_PROGRAM, 8, cham24_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)            /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(cham24_IN0_r,        cham24_IN0_w)			/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r) AM_WRITE(psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)           /* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(cham24_IN0_r,        cham24_IN0_w)            /* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r) AM_WRITE(psg_4017_w)     /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(cham24_mapper_w)
 ADDRESS_MAP_END
 
@@ -250,7 +250,7 @@ static INPUT_PORTS_START( cham24 )
 	PORT_START("P1") /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* Select */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    /* Select */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( cham24 )
 	PORT_START("P2") /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)	/* Select */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)    /* Select */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -293,10 +293,10 @@ static const ppu2c0x_interface ppu_interface =
 {
 	"maincpu",
 	"screen",
-	0,					/* gfxlayout num */
-	0,					/* color base */
-	PPU_MIRROR_NONE,	/* mirroring */
-	ppu_irq				/* irq */
+	0,                  /* gfxlayout num */
+	0,                  /* color base */
+	PPU_MIRROR_NONE,    /* mirroring */
+	ppu_irq             /* irq */
 };
 
 void cham24_state::video_start()

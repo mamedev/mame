@@ -9,7 +9,7 @@
 #include "includes/cloak.h"
 
 
-#define NUM_PENS	(0x40)
+#define NUM_PENS    (0x40)
 
 /***************************************************************************
 
@@ -53,10 +53,10 @@ static void set_pens(running_machine &machine)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-							 3, resistances, weights, 0, 1000,
-							 0, 0, 0, 0, 0,
-							 0, 0, 0, 0, 0);
+	compute_resistor_weights(0, 255, -1.0,
+								3, resistances, weights, 0, 1000,
+								0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0);
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
@@ -99,7 +99,7 @@ WRITE8_MEMBER(cloak_state::cloak_clearbmp_w)
 	m_bitmap_videoram_selected = data & 0x01;
 	set_current_bitmap_videoram_pointer();
 
-	if (data & 0x02)	/* clear */
+	if (data & 0x02)    /* clear */
 		memset(m_current_bitmap_videoram_accessed, 0, 256*256);
 }
 
@@ -108,11 +108,11 @@ void cloak_state::adjust_xy(int offset)
 	switch (offset)
 	{
 		case 0x00:  m_bitmap_videoram_address_x--; m_bitmap_videoram_address_y++; break;
-		case 0x01:						 m_bitmap_videoram_address_y--; break;
-		case 0x02:  m_bitmap_videoram_address_x--;							  break;
+		case 0x01:                       m_bitmap_videoram_address_y--; break;
+		case 0x02:  m_bitmap_videoram_address_x--;                            break;
 		case 0x04:  m_bitmap_videoram_address_x++; m_bitmap_videoram_address_y++; break;
-		case 0x05:						 m_bitmap_videoram_address_y++; break;
-		case 0x06:  m_bitmap_videoram_address_x++;							  break;
+		case 0x05:                       m_bitmap_videoram_address_y++; break;
+		case 0x06:  m_bitmap_videoram_address_x++;                            break;
 	}
 }
 
@@ -218,7 +218,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, 0, flipx, flipy,	sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, 0, flipx, flipy,   sx, sy, 0);
 	}
 }
 

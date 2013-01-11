@@ -48,13 +48,13 @@ struct ttl74148_state
 	void (*output_cb)(device_t *device);
 
 	/* inputs */
-	int input_lines[8];	/* pins 1-4,10-13 */
-	int enable_input;	/* pin 5 */
+	int input_lines[8]; /* pins 1-4,10-13 */
+	int enable_input;   /* pin 5 */
 
 	/* outputs */
-	int output;			/* pins 6,7,9 */
-	int output_valid;	/* pin 14 */
-	int enable_output;	/* pin 15 */
+	int output;         /* pins 6,7,9 */
+	int output_valid;   /* pin 14 */
+	int enable_output;  /* pin 15 */
 
 	/* internals */
 	int last_output;
@@ -88,40 +88,40 @@ void ttl74148_update(device_t *device)
 
 		/* this comes straight off the data sheet schematics */
 		bit0 = !(((!state->input_lines[1]) &
-		           state->input_lines[2] &
-		           state->input_lines[4] &
-		           state->input_lines[6])  |
-		         ((!state->input_lines[3]) &
-		           state->input_lines[4] &
-		           state->input_lines[6])  |
-		         ((!state->input_lines[5]) &
-		           state->input_lines[6])  |
-		         (!state->input_lines[7]));
+					state->input_lines[2] &
+					state->input_lines[4] &
+					state->input_lines[6])  |
+					((!state->input_lines[3]) &
+					state->input_lines[4] &
+					state->input_lines[6])  |
+					((!state->input_lines[5]) &
+					state->input_lines[6])  |
+					(!state->input_lines[7]));
 
 		bit1 = !(((!state->input_lines[2]) &
-		           state->input_lines[4] &
-		           state->input_lines[5])  |
-		         ((!state->input_lines[3]) &
-		           state->input_lines[4] &
-		           state->input_lines[5])  |
-		         (!state->input_lines[6])  |
-		         (!state->input_lines[7]));
+					state->input_lines[4] &
+					state->input_lines[5])  |
+					((!state->input_lines[3]) &
+					state->input_lines[4] &
+					state->input_lines[5])  |
+					(!state->input_lines[6])  |
+					(!state->input_lines[7]));
 
 		bit2 = !((!state->input_lines[4])  |
-		         (!state->input_lines[5])  |
-		         (!state->input_lines[6])  |
-		         (!state->input_lines[7]));
+					(!state->input_lines[5])  |
+					(!state->input_lines[6])  |
+					(!state->input_lines[7]));
 
 		state->output = (bit2 << 2) | (bit1 << 1) | bit0;
 
 		state->output_valid = (state->input_lines[0] &
-									 state->input_lines[1] &
-									 state->input_lines[2] &
-									 state->input_lines[3] &
-									 state->input_lines[4] &
-									 state->input_lines[5] &
-									 state->input_lines[6] &
-									 state->input_lines[7]);
+										state->input_lines[1] &
+										state->input_lines[2] &
+										state->input_lines[3] &
+										state->input_lines[4] &
+										state->input_lines[5] &
+										state->input_lines[6] &
+										state->input_lines[7]);
 
 		state->enable_output = !state->output_valid;
 	}
@@ -130,8 +130,8 @@ void ttl74148_update(device_t *device)
 	/* call callback if any of the outputs changed */
 	if (  state->output_cb &&
 		((state->output        != state->last_output) ||
-	     (state->output_valid  != state->last_output_valid) ||
-	     (state->enable_output != state->last_enable_output)))
+			(state->output_valid  != state->last_output_valid) ||
+			(state->enable_output != state->last_enable_output)))
 	{
 		state->last_output = state->output;
 		state->last_output_valid = state->output_valid;
@@ -181,16 +181,16 @@ static DEVICE_START( ttl74148 )
 {
 	ttl74148_config *config = (ttl74148_config *)device->static_config();
 	ttl74148_state *state = get_safe_token(device);
-    state->output_cb = config->output_cb;
+	state->output_cb = config->output_cb;
 
-    device->save_item(NAME(state->input_lines));
-    device->save_item(NAME(state->enable_input));
-    device->save_item(NAME(state->output));
-    device->save_item(NAME(state->output_valid));
-    device->save_item(NAME(state->enable_output));
-    device->save_item(NAME(state->last_output));
-    device->save_item(NAME(state->last_output_valid));
-    device->save_item(NAME(state->last_enable_output));
+	device->save_item(NAME(state->input_lines));
+	device->save_item(NAME(state->enable_input));
+	device->save_item(NAME(state->output));
+	device->save_item(NAME(state->output_valid));
+	device->save_item(NAME(state->enable_output));
+	device->save_item(NAME(state->last_output));
+	device->save_item(NAME(state->last_output_valid));
+	device->save_item(NAME(state->last_enable_output));
 }
 
 
@@ -198,19 +198,19 @@ static DEVICE_RESET( ttl74148 )
 {
 	ttl74148_state *state = get_safe_token(device);
 
-    state->enable_input = 1;
-    state->input_lines[0] = 1;
-    state->input_lines[1] = 1;
-    state->input_lines[2] = 1;
-    state->input_lines[3] = 1;
-    state->input_lines[4] = 1;
-    state->input_lines[5] = 1;
-    state->input_lines[6] = 1;
-    state->input_lines[7] = 1;
+	state->enable_input = 1;
+	state->input_lines[0] = 1;
+	state->input_lines[1] = 1;
+	state->input_lines[2] = 1;
+	state->input_lines[3] = 1;
+	state->input_lines[4] = 1;
+	state->input_lines[5] = 1;
+	state->input_lines[6] = 1;
+	state->input_lines[7] = 1;
 
-    state->last_output = -1;
-    state->last_output_valid = -1;
-    state->last_enable_output = -1;
+	state->last_output = -1;
+	state->last_output_valid = -1;
+	state->last_enable_output = -1;
 }
 
 const device_type TTL74148 = &device_creator<ttl74148_device>;
@@ -248,5 +248,3 @@ void ttl74148_device::device_reset()
 {
 	DEVICE_RESET_NAME( ttl74148 )(this);
 }
-
-

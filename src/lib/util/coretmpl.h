@@ -61,8 +61,8 @@ public:
 	// construction/destruction
 	dynamic_array(int initial = 0)
 		: m_array(NULL),
-		  m_count(0),
-		  m_allocated(0) { if (initial != 0) expand_internal(initial); m_count = initial; }
+			m_count(0),
+			m_allocated(0) { if (initial != 0) expand_internal(initial); m_count = initial; }
 	virtual ~dynamic_array() { reset(); }
 
 	// operators
@@ -94,9 +94,9 @@ private:
 	}
 
 	// internal state
-	_ElementType *	m_array;		// allocated array
-	int 			m_count;		// number of objects accessed in the list
-	int				m_allocated;	// amount of space allocated for the array
+	_ElementType *  m_array;        // allocated array
+	int             m_count;        // number of objects accessed in the list
+	int             m_allocated;    // amount of space allocated for the array
 };
 
 

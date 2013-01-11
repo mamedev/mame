@@ -12,12 +12,12 @@ class midtunit_state : public driver_device
 public:
 	midtunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram"),
-		  m_gfxrom(*this, "gfxrom"),
-		  m_cvsd_sound(*this, "cvsd"),
-		  m_adpcm_sound(*this, "adpcm") { }
+			m_nvram(*this, "nvram"),
+			m_gfxrom(*this, "gfxrom"),
+			m_cvsd_sound(*this, "cvsd"),
+			m_adpcm_sound(*this, "adpcm") { }
 
-	required_shared_ptr<UINT16>	m_nvram;
+	required_shared_ptr<UINT16> m_nvram;
 	required_memory_region m_gfxrom;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;

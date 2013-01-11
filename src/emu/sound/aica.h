@@ -11,8 +11,8 @@
 struct aica_interface
 {
 	int master;
-	int roffset;				/* offset in the region */
-	void (*irq_callback)(device_t *device, int state);	/* irq callback */
+	int roffset;                /* offset in the region */
+	void (*irq_callback)(device_t *device, int state);  /* irq callback */
 };
 
 void aica_set_ram_base(device_t *device, void *base, int size);
@@ -26,7 +26,7 @@ DECLARE_WRITE16_DEVICE_HANDLER( aica_midi_in );
 DECLARE_READ16_DEVICE_HANDLER( aica_midi_out_r );
 
 class aica_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

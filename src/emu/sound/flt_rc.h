@@ -6,9 +6,9 @@
 #include "machine/rescap.h"
 #include "devlegcy.h"
 
-#define FLT_RC_LOWPASS		0
-#define FLT_RC_HIGHPASS		1
-#define FLT_RC_AC			2
+#define FLT_RC_LOWPASS      0
+#define FLT_RC_HIGHPASS     1
+#define FLT_RC_AC           2
 
 /*
  * FLT_RC_LOWPASS:
@@ -47,11 +47,11 @@
 
 struct flt_rc_config
 {
-	int	type;
-	double	R1;
-	double	R2;
-	double	R3;
-	double	C;
+	int type;
+	double  R1;
+	double  R2;
+	double  R3;
+	double  C;
 };
 
 extern const flt_rc_config flt_rc_ac_default;
@@ -59,7 +59,7 @@ extern const flt_rc_config flt_rc_ac_default;
 void filter_rc_set_RC(device_t *device, int type, double R1, double R2, double R3, double C);
 
 class filter_rc_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

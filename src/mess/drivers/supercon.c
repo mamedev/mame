@@ -78,11 +78,11 @@ public:
 
 
 #define VERBOSE 0
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 enum
 {
-	EM,		/*No piece*/
+	EM,     /*No piece*/
 	BP,
 	BN,
 	BB,
@@ -98,18 +98,18 @@ enum
 };
 
 
-#define LED_LINE_AH		0x10
-#define LED_LINE_ST		0x20
-#define LED_LINE_18		0x40
+#define LED_LINE_AH     0x10
+#define LED_LINE_ST     0x20
+#define LED_LINE_18     0x40
 
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */
 
-#define NOT_VALID	99
+#define NOT_VALID   99
 
-#define NO_ACTION	0
-#define	TAKE		1
-#define SET		2
+#define NO_ACTION   0
+#define TAKE        1
+#define SET     2
 
 /* artwork board */
 
@@ -307,7 +307,7 @@ READ8_MEMBER( supercon_state::supercon_port3_r )
 	LOG(("LED_AH from %02x \n",m_LED_AH));
 	LOG(("LED_ST from %02x \n",m_LED_ST));
 
-	if (m_led_update)			/*No LED Update if Port 1C00,1D00 was read */
+	if (m_led_update)           /*No LED Update if Port 1C00,1D00 was read */
 		update_leds();
 
 	m_remove_led_flag=TRUE;
@@ -416,8 +416,8 @@ READ8_MEMBER( supercon_state::supercon_port4_r )
 				m_moving_piece = *m_current_field;
 				*m_current_field = EM;
 			}
-			m_selecting=TRUE;				/* Flag is removed in timer -timer_mouse_click- */
-			m_save_key_data=key_data;		/* return same key_data til flag selecting is removed */
+			m_selecting=TRUE;               /* Flag is removed in timer -timer_mouse_click- */
+			m_save_key_data=key_data;       /* return same key_data til flag selecting is removed */
 
 			m_timer_mouse_click->adjust(m_wait_time, 0);
 
@@ -462,7 +462,7 @@ WRITE8_MEMBER( supercon_state::supercon_port3_w )
 
 			if (m_data_1F00 & LED_LINE_AH )
 			{
-				m_last_LED = &m_LED_AH;				/* save last value */
+				m_last_LED = &m_LED_AH;             /* save last value */
 				m_last_LED_value = *m_last_LED;
 
 				m_LED_AH=m_LED_AH | m_data_1E00;

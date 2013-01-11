@@ -107,17 +107,17 @@ enum
 };
 
 // timer C/D control register
-const int Z80STI_TCDC_TARS	= 0x80;
-const int Z80STI_TCDC_TBRS	= 0x08;
+const int Z80STI_TCDC_TARS  = 0x80;
+const int Z80STI_TCDC_TBRS  = 0x08;
 
 // interrupt vector register
-const int Z80STI_PVR_ISE	= 0x08;
-const int Z80STI_PVR_VR4	= 0x10;
+const int Z80STI_PVR_ISE    = 0x08;
+const int Z80STI_PVR_VR4    = 0x10;
 
 // general purpose I/O interrupt levels
 static const int INT_LEVEL_GPIP[] =
 {
-	Z80STI_IR_P0, Z80STI_IR_P1, Z80STI_IR_P2, Z80STI_IR_P3,	Z80STI_IR_P4, Z80STI_IR_P5, Z80STI_IR_P6, Z80STI_IR_P7
+	Z80STI_IR_P0, Z80STI_IR_P1, Z80STI_IR_P2, Z80STI_IR_P3, Z80STI_IR_P4, Z80STI_IR_P5, Z80STI_IR_P6, Z80STI_IR_P7
 };
 
 // timer interrupt levels
@@ -148,13 +148,13 @@ static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
 z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80STI, "Mostek MK3801", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this),
-	  m_gpip(0),
-	  m_aer(0),
-	  m_ier(0),
-	  m_ipr(0),
-	  m_isr(0),
-	  m_imr(0)
+		device_z80daisy_interface(mconfig, *this),
+		m_gpip(0),
+		m_aer(0),
+		m_ier(0),
+		m_ipr(0),
+		m_isr(0),
+		m_imr(0)
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -436,32 +436,32 @@ UINT8 z80sti_device::read(offs_t offset)
 	case Z80STI_REGISTER_IR:
 		switch (m_pvr & 0x07)
 		{
-		case Z80STI_REGISTER_IR_SCR:	return m_scr;
-		case Z80STI_REGISTER_IR_TDDR:	return m_tmc[TIMER_D];
-		case Z80STI_REGISTER_IR_TCDR:	return m_tmc[TIMER_C];
-		case Z80STI_REGISTER_IR_AER:	return m_aer;
-		case Z80STI_REGISTER_IR_IERB:	return m_ier & 0xff;
-		case Z80STI_REGISTER_IR_IERA:	return m_ier >> 8;
-		case Z80STI_REGISTER_IR_DDR:	return m_ddr;
-		case Z80STI_REGISTER_IR_TCDC:	return m_tcdc;
+		case Z80STI_REGISTER_IR_SCR:    return m_scr;
+		case Z80STI_REGISTER_IR_TDDR:   return m_tmc[TIMER_D];
+		case Z80STI_REGISTER_IR_TCDR:   return m_tmc[TIMER_C];
+		case Z80STI_REGISTER_IR_AER:    return m_aer;
+		case Z80STI_REGISTER_IR_IERB:   return m_ier & 0xff;
+		case Z80STI_REGISTER_IR_IERA:   return m_ier >> 8;
+		case Z80STI_REGISTER_IR_DDR:    return m_ddr;
+		case Z80STI_REGISTER_IR_TCDC:   return m_tcdc;
 		}
 		break;
 
-	case Z80STI_REGISTER_GPIP:	m_gpip = (m_in_gpio_func(0) & ~m_ddr) | (m_gpip & m_ddr); return m_gpip;
-	case Z80STI_REGISTER_IPRB:	return m_ipr & 0xff;
-	case Z80STI_REGISTER_IPRA:	return m_ipr >> 8;
-	case Z80STI_REGISTER_ISRB:	return m_isr & 0xff;
-	case Z80STI_REGISTER_ISRA:	return m_isr >> 8;
-	case Z80STI_REGISTER_IMRB:	return m_imr & 0xff;
-	case Z80STI_REGISTER_IMRA:	return m_imr >> 8;
-	case Z80STI_REGISTER_PVR:	return m_pvr;
-	case Z80STI_REGISTER_TABC:	return m_tabc;
-	case Z80STI_REGISTER_TBDR:	return m_tmc[TIMER_B];
-	case Z80STI_REGISTER_TADR:	return m_tmc[TIMER_A];
-	case Z80STI_REGISTER_UCR:	return m_ucr;
-	case Z80STI_REGISTER_RSR:	return m_rsr;
-	case Z80STI_REGISTER_TSR:	return m_tsr;
-	case Z80STI_REGISTER_UDR:	return m_udr;
+	case Z80STI_REGISTER_GPIP:  m_gpip = (m_in_gpio_func(0) & ~m_ddr) | (m_gpip & m_ddr); return m_gpip;
+	case Z80STI_REGISTER_IPRB:  return m_ipr & 0xff;
+	case Z80STI_REGISTER_IPRA:  return m_ipr >> 8;
+	case Z80STI_REGISTER_ISRB:  return m_isr & 0xff;
+	case Z80STI_REGISTER_ISRA:  return m_isr >> 8;
+	case Z80STI_REGISTER_IMRB:  return m_imr & 0xff;
+	case Z80STI_REGISTER_IMRA:  return m_imr >> 8;
+	case Z80STI_REGISTER_PVR:   return m_pvr;
+	case Z80STI_REGISTER_TABC:  return m_tabc;
+	case Z80STI_REGISTER_TBDR:  return m_tmc[TIMER_B];
+	case Z80STI_REGISTER_TADR:  return m_tmc[TIMER_A];
+	case Z80STI_REGISTER_UCR:   return m_ucr;
+	case Z80STI_REGISTER_RSR:   return m_rsr;
+	case Z80STI_REGISTER_TSR:   return m_tsr;
+	case Z80STI_REGISTER_UDR:   return m_udr;
 	}
 
 	return 0;
@@ -654,21 +654,21 @@ void z80sti_device::write(offs_t offset, UINT8 data)
 		m_tdr[TIMER_A] = data;
 		break;
 #if 0
-    case Z80STI_REGISTER_UCR:
-        m_ucr = data;
-        break;
+	case Z80STI_REGISTER_UCR:
+		m_ucr = data;
+		break;
 
-    case Z80STI_REGISTER_RSR:
-        m_rsr = data;
-        break;
+	case Z80STI_REGISTER_RSR:
+		m_rsr = data;
+		break;
 
-    case Z80STI_REGISTER_TSR:
-        m_tsr = data;
-        break;
+	case Z80STI_REGISTER_TSR:
+		m_tsr = data;
+		break;
 
-    case Z80STI_REGISTER_UDR:
-        m_udr = data;
-        break;
+	case Z80STI_REGISTER_UDR:
+		m_udr = data;
+		break;
 #endif
 	default:
 		LOG(("Z80STI '%s' Unsupported Register %x\n", tag(), offset & 0x0f));

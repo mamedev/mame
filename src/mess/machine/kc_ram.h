@@ -38,12 +38,12 @@ protected:
 	kcexp_slot_device *m_slot;
 
 	// internal state
-	int		m_mei;			// module enable line
-	UINT8 *	m_ram;
-	UINT8	m_enabled;
-	UINT8	m_write_enabled;
-	UINT16	m_base;
-	UINT8	m_segment;
+	int     m_mei;          // module enable line
+	UINT8 * m_ram;
+	UINT8   m_enabled;
+	UINT8   m_write_enabled;
+	UINT16  m_base;
+	UINT8   m_segment;
 
 private:
 	// internal helpers

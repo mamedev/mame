@@ -2,7 +2,7 @@ void ppc603_exception(int exception)
 {
 	switch( exception )
 	{
-		case EXCEPTION_IRQ:		/* External Interrupt */
+		case EXCEPTION_IRQ:     /* External Interrupt */
 			if( ppc_get_msr() & MSR_EE ) {
 				UINT32 msr = ppc_get_msr();
 
@@ -25,7 +25,7 @@ void ppc603_exception(int exception)
 			}
 			break;
 
-		case EXCEPTION_DECREMENTER:		/* Decrementer overflow exception */
+		case EXCEPTION_DECREMENTER:     /* Decrementer overflow exception */
 			if( ppc_get_msr() & MSR_EE ) {
 				UINT32 msr = ppc_get_msr();
 
@@ -48,12 +48,12 @@ void ppc603_exception(int exception)
 			}
 			break;
 
-		case EXCEPTION_TRAP:			/* Program exception / Trap */
+		case EXCEPTION_TRAP:            /* Program exception / Trap */
 			{
 				UINT32 msr = ppc_get_msr();
 
 				SRR0 = ppc.pc;
-				SRR1 = (msr & 0xff73) | 0x20000;	/* 0x20000 = TRAP bit */
+				SRR1 = (msr & 0xff73) | 0x20000;    /* 0x20000 = TRAP bit */
 
 				msr &= ~(MSR_POW | MSR_EE | MSR_PR | MSR_FP | MSR_FE0 | MSR_SE | MSR_BE | MSR_FE1 | MSR_IR | MSR_DR | MSR_RI);
 				if( msr & MSR_ILE )
@@ -69,7 +69,7 @@ void ppc603_exception(int exception)
 			}
 			break;
 
-		case EXCEPTION_SYSTEM_CALL:		/* System call */
+		case EXCEPTION_SYSTEM_CALL:     /* System call */
 			{
 				UINT32 msr = ppc_get_msr();
 
@@ -257,11 +257,11 @@ static CPU_EXECUTE( ppc603 )
 		ppc.npc = ppc.pc + 4;
 		switch(opcode >> 26)
 		{
-			case 19:	ppc.optable19[(opcode >> 1) & 0x3ff](opcode); break;
-			case 31:	ppc.optable31[(opcode >> 1) & 0x3ff](opcode); break;
-			case 59:	ppc.optable59[(opcode >> 1) & 0x3ff](opcode); break;
-			case 63:	ppc.optable63[(opcode >> 1) & 0x3ff](opcode); break;
-			default:	ppc.optable[opcode >> 26](opcode); break;
+			case 19:    ppc.optable19[(opcode >> 1) & 0x3ff](opcode); break;
+			case 31:    ppc.optable31[(opcode >> 1) & 0x3ff](opcode); break;
+			case 59:    ppc.optable59[(opcode >> 1) & 0x3ff](opcode); break;
+			case 63:    ppc.optable63[(opcode >> 1) & 0x3ff](opcode); break;
+			default:    ppc.optable[opcode >> 26](opcode); break;
 		}
 
 		ppc_icount--;

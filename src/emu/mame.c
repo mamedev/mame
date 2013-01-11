@@ -103,16 +103,16 @@ static running_machine *global_machine;
 /* output channels */
 static output_delegate output_cb[OUTPUT_CHANNEL_COUNT] =
 {
-	output_delegate(FUNC(mame_file_output_callback), stderr),	// OUTPUT_CHANNEL_ERROR
-	output_delegate(FUNC(mame_file_output_callback), stderr),	// OUTPUT_CHANNEL_WARNING
-	output_delegate(FUNC(mame_file_output_callback), stdout),	// OUTPUT_CHANNEL_INFO
+	output_delegate(FUNC(mame_file_output_callback), stderr),   // OUTPUT_CHANNEL_ERROR
+	output_delegate(FUNC(mame_file_output_callback), stderr),   // OUTPUT_CHANNEL_WARNING
+	output_delegate(FUNC(mame_file_output_callback), stdout),   // OUTPUT_CHANNEL_INFO
 #ifdef MAME_DEBUG
-	output_delegate(FUNC(mame_file_output_callback), stdout),	// OUTPUT_CHANNEL_DEBUG
+	output_delegate(FUNC(mame_file_output_callback), stdout),   // OUTPUT_CHANNEL_DEBUG
 #else
-	output_delegate(FUNC(mame_null_output_callback), stdout),	// OUTPUT_CHANNEL_DEBUG
+	output_delegate(FUNC(mame_null_output_callback), stdout),   // OUTPUT_CHANNEL_DEBUG
 #endif
-	output_delegate(FUNC(mame_file_output_callback), stdout),	// OUTPUT_CHANNEL_VERBOSE
-	output_delegate(FUNC(mame_file_output_callback), stdout)	// OUTPUT_CHANNEL_LOG
+	output_delegate(FUNC(mame_file_output_callback), stdout),   // OUTPUT_CHANNEL_VERBOSE
+	output_delegate(FUNC(mame_file_output_callback), stdout)    // OUTPUT_CHANNEL_LOG
 };
 
 
@@ -409,4 +409,3 @@ void CLIB_DECL vlogerror(const char *format, va_list arg)
 	if (global_machine != NULL)
 		global_machine->vlogerror(format, arg);
 }
-

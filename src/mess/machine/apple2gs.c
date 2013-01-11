@@ -130,9 +130,9 @@
 #include "debugger.h"
 #include "machine/a2bus.h"
 
-#define LOG_C0XX			0
-#define LOG_ADB				0
-#define LOG_IRQ				0
+#define LOG_C0XX            0
+#define LOG_ADB             0
+#define LOG_IRQ             0
 
 /* -----------------------------------------------------------------------
  * Apple IIgs clock
@@ -239,15 +239,15 @@ static const char *apple2gs_irq_name(UINT16 irq_mask)
 {
 	switch(irq_mask)
 	{
-		case IRQ_KBD_SRQ:			return "IRQ_KBD_SRQ";
-		case IRQ_ADB_DATA:			return "IRQ_ADB_DATA";
-		case IRQ_ADB_MOUSE:			return "IRQ_ADB_MOUSE";
-		case IRQ_VGC_SCANLINE:		return "IRQ_VGC_SCANLINE";
-		case IRQ_VGC_SECOND:		return "IRQ_VGC_SECOND";
-		case IRQ_INTEN_QSECOND:		return "IRQ_INTEN_QSECOND";
-		case IRQ_INTEN_VBL:			return "IRQ_INTEN_VBL";
-        case IRQ_DOC:				return "IRQ_DOC";
-		case IRQ_SLOT:				return "IRQ_SLOT";
+		case IRQ_KBD_SRQ:           return "IRQ_KBD_SRQ";
+		case IRQ_ADB_DATA:          return "IRQ_ADB_DATA";
+		case IRQ_ADB_MOUSE:         return "IRQ_ADB_MOUSE";
+		case IRQ_VGC_SCANLINE:      return "IRQ_VGC_SCANLINE";
+		case IRQ_VGC_SECOND:        return "IRQ_VGC_SECOND";
+		case IRQ_INTEN_QSECOND:     return "IRQ_INTEN_QSECOND";
+		case IRQ_INTEN_VBL:         return "IRQ_INTEN_VBL";
+		case IRQ_DOC:               return "IRQ_DOC";
+		case IRQ_SLOT:              return "IRQ_SLOT";
 	}
 	return NULL;
 }
@@ -257,7 +257,7 @@ void apple2gs_add_irq(running_machine &machine, UINT16 irq_mask)
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if ((state->m_pending_irqs & irq_mask) == 0x00)
 	{
-    	if (LOG_IRQ)
+		if (LOG_IRQ)
 			logerror("apple2gs_add_irq(): adding %s\n", apple2gs_irq_name(irq_mask));
 
 		state->m_pending_irqs |= irq_mask;
@@ -394,36 +394,36 @@ static void adb_do_command(apple2gs_state *state)
 
 	switch(state->m_adb_command)
 	{
-		case 0x00:	/* ??? */
+		case 0x00:  /* ??? */
 			break;
 
-		case 0x03:	/* flush keyboard buffer */
+		case 0x03:  /* flush keyboard buffer */
 			break;
 
-		case 0x04:	/* set modes */
+		case 0x04:  /* set modes */
 			adb_set_mode(state, state->m_adb_mode | state->m_adb_command_bytes[0]);
 			break;
 
-		case 0x05:	/* clear modes */
+		case 0x05:  /* clear modes */
 			adb_set_mode(state, state->m_adb_mode & ~state->m_adb_command_bytes[0]);
 			break;
 
-		case 0x06:	/* set config */
+		case 0x06:  /* set config */
 			adb_set_config(state->m_adb_command_bytes[0], state->m_adb_command_bytes[1], state->m_adb_command_bytes[2]);
 			break;
 
-		case 0x07:	/* synchronize */
+		case 0x07:  /* synchronize */
 			adb_set_mode(state, state->m_adb_command_bytes[0]);
 			adb_set_config(state->m_adb_command_bytes[1], state->m_adb_command_bytes[2], state->m_adb_command_bytes[3]);
 			break;
 
-		case 0x08:	/* write memory */
+		case 0x08:  /* write memory */
 			address = state->m_adb_command_bytes[0];
 			val = state->m_adb_command_bytes[1];
 			adb_write_memory(state, address, val);
 			break;
 
-		case 0x09:	/* read memory */
+		case 0x09:  /* read memory */
 			address = (state->m_adb_command_bytes[1] << 8) | state->m_adb_command_bytes[0];
 			adb_post_response_1(state, adb_read_memory(state, address));
 			break;
@@ -432,20 +432,20 @@ static void adb_do_command(apple2gs_state *state)
 		case 0x0b: /* ??? */
 			break;
 
-		case 0x0d:	/* get version */
+		case 0x0d:  /* get version */
 			adb_post_response_1(state, 0x06);
 			break;
 
-		case 0x0e:	/* read available charsets */
+		case 0x0e:  /* read available charsets */
 			adb_post_response_2(state, 0x01, 0x00);
 			break;
 
-		case 0x0f:	/* read available layouts */
+		case 0x0f:  /* read available layouts */
 			adb_post_response_2(state, 0x01, 0x00);
 			break;
 
-		case 0x12:	/* mystery command 0x12 */
-		case 0x13:	/* mystery command 0x13 */
+		case 0x12:  /* mystery command 0x12 */
+		case 0x13:  /* mystery command 0x13 */
 			break;
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
@@ -462,8 +462,8 @@ static void adb_do_command(apple2gs_state *state)
 			}
 			break;
 
-        case 0xf2:
-            break;
+		case 0xf2:
+			break;
 
 		default:
 			fatalerror("ADB command 0x%02x unimplemented\n", state->m_adb_command);
@@ -518,33 +518,33 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 
 			switch(data)
 			{
-				case 0x00:	/* ??? */
-				case 0x01:	/* abort */
+				case 0x00:  /* ??? */
+				case 0x01:  /* abort */
 					/* do nothing for now */
 					break;
 
-				case 0x03:	/* flush keyboard buffer */
+				case 0x03:  /* flush keyboard buffer */
 					state->m_adb_command_length = 0;
 					break;
 
-				case 0x04:	/* set modes */
-				case 0x05:	/* clear modes */
+				case 0x04:  /* set modes */
+				case 0x05:  /* clear modes */
 					state->m_adb_command_length = 1;
 					break;
 
-				case 0x06:	/* set config */
+				case 0x06:  /* set config */
 					state->m_adb_command_length = 3;
 					break;
 
-				case 0x07:	/* synchronize */
-					if (state->memregion("maincpu")->bytes() == 0x40000)	/* HACK */
+				case 0x07:  /* synchronize */
+					if (state->memregion("maincpu")->bytes() == 0x40000)    /* HACK */
 						state->m_adb_command_length = 8;
 					else
 						state->m_adb_command_length = 4;
 					break;
 
-				case 0x08:	/* write memory */
-				case 0x09:	/* read memory */
+				case 0x08:  /* write memory */
+				case 0x09:  /* read memory */
 					state->m_adb_command_length = 2;
 					break;
 
@@ -553,29 +553,29 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 					state->m_adb_command_length = 0;
 					break;
 
-				case 0x0d:	/* get version */
+				case 0x0d:  /* get version */
 					state->m_adb_command_length = 0;
 					break;
 
-				case 0x0e:	/* read available charsets */
+				case 0x0e:  /* read available charsets */
 					state->m_adb_command_length = 0;
-					state->m_adb_state = ADBSTATE_INCOMMAND;	/* HACK */
+					state->m_adb_state = ADBSTATE_INCOMMAND;    /* HACK */
 					break;
 
-				case 0x0f:	/* read available layouts */
+				case 0x0f:  /* read available layouts */
 					state->m_adb_command_length = 0;
-					state->m_adb_state = ADBSTATE_INCOMMAND;	/* HACK */
+					state->m_adb_state = ADBSTATE_INCOMMAND;    /* HACK */
 					break;
 
-				case 0x12:	/* mystery command 0x12 */
-				case 0x13:	/* mystery command 0x13 */
+				case 0x12:  /* mystery command 0x12 */
+				case 0x13:  /* mystery command 0x13 */
 					state->m_adb_command_length = 2;
 					break;
 
-				case 0x70:	/* disable SRQ device 0 */
-				case 0x71:	/* disable SRQ device 1 */
-				case 0x72:	/* disable SRQ device 2 */
-				case 0x73:	/* disable SRQ device 3 */
+				case 0x70:  /* disable SRQ device 0 */
+				case 0x71:  /* disable SRQ device 1 */
+				case 0x72:  /* disable SRQ device 2 */
+				case 0x73:  /* disable SRQ device 3 */
 					/* ignore for now */
 					break;
 
@@ -587,8 +587,8 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 					state->m_adb_command_length = 2;
 					break;
 
-                case 0xf2:
-                    break;
+				case 0xf2:
+					break;
 
 				default:
 					fatalerror("ADB command 0x%02x unimplemented\n", data);
@@ -596,7 +596,7 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 
 			}
 
-            if (state->m_adb_command_length > 0)
+			if (state->m_adb_command_length > 0)
 			{
 				state->m_adb_state = ADBSTATE_INCOMMAND;
 				if (LOG_ADB)
@@ -644,9 +644,9 @@ static UINT8 adb_read_mousedata(running_machine &machine)
 	UINT8 absolute;
 	INT8 delta;
 
-	if (state->m_adb_kmstatus & 0x80)	// mouse register full
+	if (state->m_adb_kmstatus & 0x80)   // mouse register full
 	{
-		if (state->m_adb_kmstatus & 0x02)	// H/V mouse data select
+		if (state->m_adb_kmstatus & 0x02)   // H/V mouse data select
 		{
 			absolute = state->m_mouse_y;
 			delta = state->m_mouse_dy;
@@ -803,13 +803,13 @@ static READ8_HANDLER( gssnd_r )
 
 	switch (offset)
 	{
-		case 0:	// control
+		case 0: // control
 			ret = state->m_sndglu_ctrl;
 			break;
-		case 1:	// data read
+		case 1: // data read
 			ret = state->m_sndglu_dummy_read;
 
-			if (state->m_sndglu_ctrl & 0x40)	// docram access
+			if (state->m_sndglu_ctrl & 0x40)    // docram access
 			{
 				UINT8 *docram = state->memregion("es5503")->base();
 				state->m_sndglu_dummy_read = docram[state->m_sndglu_addr];
@@ -819,15 +819,15 @@ static READ8_HANDLER( gssnd_r )
 				state->m_sndglu_dummy_read = state->m_es5503->read(space, state->m_sndglu_addr);
 			}
 
-			if (state->m_sndglu_ctrl & 0x20)	// auto-increment
+			if (state->m_sndglu_ctrl & 0x20)    // auto-increment
 			{
 				state->m_sndglu_addr++;
 			}
 			break;
-		case 2:	// addr l
+		case 2: // addr l
 			ret = state->m_sndglu_addr & 0xff;
 			break;
-		case 3:	// addr h
+		case 3: // addr h
 			ret = (state->m_sndglu_addr >> 8) & 0xff;
 			break;
 	}
@@ -842,15 +842,15 @@ static WRITE8_HANDLER( gssnd_w )
 	apple2gs_state *state = space.machine().driver_data<apple2gs_state>();
 	switch (offset)
 	{
-		case 0:	// control
-			state->m_sndglu_ctrl = data & 0x7f;	// make sure DOC is never busy
-			if (!(state->m_sndglu_ctrl & 0x40))	// clear hi byte of address pointer on DOC access
+		case 0: // control
+			state->m_sndglu_ctrl = data & 0x7f; // make sure DOC is never busy
+			if (!(state->m_sndglu_ctrl & 0x40)) // clear hi byte of address pointer on DOC access
 			{
 				state->m_sndglu_addr &= 0xff;
 			}
 			break;
-		case 1:	// data write
-			if (state->m_sndglu_ctrl & 0x40)	// docram access
+		case 1: // data write
+			if (state->m_sndglu_ctrl & 0x40)    // docram access
 			{
 				UINT8 *docram = space.machine().root_device().memregion("es5503")->base();
 				docram[state->m_sndglu_addr] = data;
@@ -860,12 +860,12 @@ static WRITE8_HANDLER( gssnd_w )
 				state->m_es5503->write(space, state->m_sndglu_addr, data);
 			}
 
-			if (state->m_sndglu_ctrl & 0x20)	// auto-increment
+			if (state->m_sndglu_ctrl & 0x20)    // auto-increment
 			{
 				state->m_sndglu_addr++;
 			}
 			break;
-		case 2:	// addr l
+		case 2: // addr l
 			state->m_sndglu_addr &= 0xff00;
 			state->m_sndglu_addr |= data;
 			break;
@@ -913,59 +913,59 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 	scc8530_t *scc;
 
 	if(space.debugger_access())
-    {
-        return 0;
-    }
+	{
+		return 0;
+	}
 
 	offset &= 0xFF;
 
 	switch(offset)
 	{
-		case 0x19:	/* C019 - RDVBLBAR */
+		case 0x19:  /* C019 - RDVBLBAR */
 			result = (space.machine().primary_screen->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
-		case 0x22:	/* C022 - TBCOLOR */
+		case 0x22:  /* C022 - TBCOLOR */
 			result = (m_fgcolor << 4) | m_bgcolor;
 			break;
 
-		case 0x23:	/* C023 - VGCINT */
+		case 0x23:  /* C023 - VGCINT */
 			result = m_vgcint;
 			break;
 
-		case 0x24:	/* C024 - MOUSEDATA */
+		case 0x24:  /* C024 - MOUSEDATA */
 			result = adb_read_mousedata(space.machine());
 			break;
 
-		case 0x25:	/* C025 - KEYMODREG */
+		case 0x25:  /* C025 - KEYMODREG */
 			result = AY3600_keymod_r(space.machine());
 			break;
 
-		case 0x26:	/* C026 - DATAREG */
+		case 0x26:  /* C026 - DATAREG */
 			result = adb_read_datareg();
 			break;
 
-		case 0x27:	/* C027 - KMSTATUS */
+		case 0x27:  /* C027 - KMSTATUS */
 			result = adb_read_kmstatus();
 			break;
 
-		case 0x29:	/* C029 - NEWVIDEO */
+		case 0x29:  /* C029 - NEWVIDEO */
 			result = m_newvideo;
 			break;
 
-		case 0x2B:	/* C02B - LANGSEL */
+		case 0x2B:  /* C02B - LANGSEL */
 			result = m_langsel;
 			break;
 
-		case 0x2D:	/* C02D - SLTROMSEL */
+		case 0x2D:  /* C02D - SLTROMSEL */
 			result = m_sltromsel;
 			break;
 
-		case 0x2E:	/* C02E - VERTCNT */
+		case 0x2E:  /* C02E - VERTCNT */
 			result = apple2gs_get_vpos(space.machine()) >> 1;
 			break;
 
-		case 0x2F:	/* C02F - HORIZCNT */
+		case 0x2F:  /* C02F - HORIZCNT */
 			result = space.machine().primary_screen->hpos() / 11;
 			if (result > 0)
 			{
@@ -978,57 +978,57 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			}
 			break;
 
-		case 0x31:	/* C031 - DISKREG */
+		case 0x31:  /* C031 - DISKREG */
 			result = m_fdc_diskreg;
 			break;
 
-		case 0x33:	/* C033 - CLOCKDATA */
+		case 0x33:  /* C033 - CLOCKDATA */
 			result = m_clock_data;
 			break;
 
-		case 0x34:	/* C034 - CLOCKCTL */
+		case 0x34:  /* C034 - CLOCKCTL */
 			result = m_clock_control;
 			break;
 
-		case 0x35:	/* C035 - SHADOW */
+		case 0x35:  /* C035 - SHADOW */
 			result = m_shadow;
 			break;
 
-		case 0x36:	/* C036 - CYAREG */
+		case 0x36:  /* C036 - CYAREG */
 			result = m_cyareg;
 			break;
 
-		case 0x38:	/* C038 - SCCBREG */
-		case 0x39:	/* C039 - SCCAREG */
-		case 0x3A:	/* C03A - SCCBDATA */
-		case 0x3B:	/* C03B - SCCADATA */
+		case 0x38:  /* C038 - SCCBREG */
+		case 0x39:  /* C039 - SCCAREG */
+		case 0x3A:  /* C03A - SCCBDATA */
+		case 0x3B:  /* C03B - SCCADATA */
 			scc = space.machine().device<scc8530_t>("scc");
 			result = scc->reg_r(space, offset & 0x03);
 			break;
 
-		case 0x3C:	/* C03C - SOUNDCTL */
-		case 0x3D:	/* C03D - SOUNDDATA */
-		case 0x3E:	/* C03E - SOUNDADRL */
-		case 0x3F:	/* C03F - SOUNDADRH */
+		case 0x3C:  /* C03C - SOUNDCTL */
+		case 0x3D:  /* C03D - SOUNDDATA */
+		case 0x3E:  /* C03E - SOUNDADRL */
+		case 0x3F:  /* C03F - SOUNDADRH */
 			result = gssnd_r(space, offset & 0x03, mem_mask);
 			break;
 
-		case 0x41:	/* C041 - INTEN */
+		case 0x41:  /* C041 - INTEN */
 			result = m_inten;
 			break;
 
-		case 0x46:	/* C046 - INTFLAG */
+		case 0x46:  /* C046 - INTFLAG */
 			result = m_intflag;
 			break;
 
-		case 0x68:	/* C068 - STATEREG */
-			result = ((m_flags & VAR_ALTZP)	? 0x80 : 0x00)
-				|	((m_flags & VAR_PAGE2)	? 0x40 : 0x00)
-				|	((m_flags & VAR_RAMRD)	? 0x20 : 0x00)
-				|	((m_flags & VAR_RAMWRT)	? 0x10 : 0x00)
-				|	((m_flags & VAR_LCRAM)	? 0x00 : 0x08)
-				|	((m_flags & VAR_LCRAM2)	? 0x04 : 0x00)
-				|	((m_flags & VAR_INTCXROM)? 0x01 : 0x00);
+		case 0x68:  /* C068 - STATEREG */
+			result = ((m_flags & VAR_ALTZP) ? 0x80 : 0x00)
+				|   ((m_flags & VAR_PAGE2)  ? 0x40 : 0x00)
+				|   ((m_flags & VAR_RAMRD)  ? 0x20 : 0x00)
+				|   ((m_flags & VAR_RAMWRT) ? 0x10 : 0x00)
+				|   ((m_flags & VAR_LCRAM)  ? 0x00 : 0x08)
+				|   ((m_flags & VAR_LCRAM2) ? 0x04 : 0x00)
+				|   ((m_flags & VAR_INTCXROM)? 0x01 : 0x00);
 			break;
 
 		case 0x71: case 0x72: case 0x73:
@@ -1039,33 +1039,33 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			result = space.machine().root_device().memregion("maincpu")->base()[offset];
 			break;
 
-		case 0x21:	/* C021 - MONOCOLOR */
-		case 0x2C:	/* C02C - CHARROM */
+		case 0x21:  /* C021 - MONOCOLOR */
+		case 0x2C:  /* C02C - CHARROM */
 			result = 0x00;
-            break;
+			break;
 
-        // slot 6 registers should go to applefdc if slot 6 not "Your Card"
-        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
-        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
+		// slot 6 registers should go to applefdc if slot 6 not "Your Card"
+		case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+		case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 			if ((m_sltromsel & (1 << 6)) == 0)
 			{
-                result = m_fdc->read(offset);
-            }
-            else
-            {
-                result = apple2_c0xx_r(space, offset, 0);
-            }
-            break;
+				result = m_fdc->read(offset);
+			}
+			else
+			{
+				result = apple2_c0xx_r(space, offset, 0);
+			}
+			break;
 
-        default:
-            if (offset < 0x80)
-            {
-                result = apple2_c0xx_r(space, offset, 0);
-            }
-            else
-            {
-                result = apple2_c080_r(space, offset, 0);
-            }
+		default:
+			if (offset < 0x80)
+			{
+				result = apple2_c0xx_r(space, offset, 0);
+			}
+			else
+			{
+				result = apple2_c080_r(space, offset, 0);
+			}
 			break;
 	}
 
@@ -1087,66 +1087,66 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 
 	switch(offset)
 	{
-		case 0x22:	/* C022 - TBCOLOR */
+		case 0x22:  /* C022 - TBCOLOR */
 			m_fgcolor = (data >> 4) & 0x0F;
 			m_bgcolor = (data >> 0) & 0x0F;
 			break;
 
-		case 0x23:	/* C023 - VGCINT */
+		case 0x23:  /* C023 - VGCINT */
 			m_vgcint &= ~0x0F;
 			m_vgcint |= data & 0x0F;
 			break;
 
-		case 0x24:	/* C024 - MOUSEDATA */
-		case 0x25:	/* C025 - KEYMODREG */
-		case 0x28:	/* C028 - ROMBANK */
-		case 0x2C:	/* C02C - CHARROM */
-		case 0x2E:	/* C02E - VERTCNT */
-		case 0x2F:	/* C02F - HORIZCNT */
+		case 0x24:  /* C024 - MOUSEDATA */
+		case 0x25:  /* C025 - KEYMODREG */
+		case 0x28:  /* C028 - ROMBANK */
+		case 0x2C:  /* C02C - CHARROM */
+		case 0x2E:  /* C02E - VERTCNT */
+		case 0x2F:  /* C02F - HORIZCNT */
 			/* ignore these writes */
 			break;
 
-		case 0x26:	/* C026 - DATAREG */
+		case 0x26:  /* C026 - DATAREG */
 			adb_write_datareg(space.machine(), data);
 			break;
 
-		case 0x27:	/* C027 - KMSTATUS */
+		case 0x27:  /* C027 - KMSTATUS */
 			adb_write_kmstatus(this, data);
 			break;
 
-		case 0x29:	/* C029 - NEWVIDEO */
+		case 0x29:  /* C029 - NEWVIDEO */
 			m_newvideo = data;
 			break;
 
-		case 0x2B:	/* C02B - LANGSEL */
+		case 0x2B:  /* C02B - LANGSEL */
 			m_langsel = data;
 			break;
 
-		case 0x2D:	/* C02D - SLTROMSEL */
+		case 0x2D:  /* C02D - SLTROMSEL */
 			m_sltromsel = data;
 			apple2_update_memory(space.machine());
 			break;
 
-		case 0x31:	/* C031 - DISKREG */
+		case 0x31:  /* C031 - DISKREG */
 			apple2_iwm_setdiskreg(space.machine(), data);
 			break;
 
-		case 0x32:	/* C032 - SCANINT */
+		case 0x32:  /* C032 - SCANINT */
 			apple2gs_set_scanint(space.machine(), data);
 			break;
 
-		case 0x33:	/* C033 - CLOCKDATA */
+		case 0x33:  /* C033 - CLOCKDATA */
 			m_clock_data = data;
 			break;
 
-		case 0x34:	/* C034 - CLOCKCTL */
+		case 0x34:  /* C034 - CLOCKCTL */
 			m_clock_control = data & 0x7F;
 			m_bordercolor = data & 0x0F;
 			if (data & 0x80)
 				process_clock(space.machine());
 			break;
 
-		case 0x35:	/* C035 - SHADOW */
+		case 0x35:  /* C035 - SHADOW */
 			if (m_shadow != data)
 			{
 				m_shadow = data;
@@ -1154,27 +1154,27 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 			}
 			break;
 
-		case 0x36:	/* C036 - CYAREG */
+		case 0x36:  /* C036 - CYAREG */
 			m_cyareg = data & ~0x20;
 			space.machine().device("maincpu")->set_unscaled_clock((data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
 			break;
 
-		case 0x38:	/* C038 - SCCBREG */
-		case 0x39:	/* C039 - SCCAREG */
-		case 0x3A:	/* C03A - SCCBDATA */
-		case 0x3B:	/* C03B - SCCADATA */
+		case 0x38:  /* C038 - SCCBREG */
+		case 0x39:  /* C039 - SCCAREG */
+		case 0x3A:  /* C03A - SCCBDATA */
+		case 0x3B:  /* C03B - SCCADATA */
 			scc = space.machine().device<scc8530_t>("scc");
 			scc->reg_w(space, offset & 0x03, data);
 			break;
 
-		case 0x3C:	/* C03C - SOUNDCTL */
-		case 0x3D:	/* C03D - SOUNDDATA */
-		case 0x3E:	/* C03E - SOUNDADRL */
-		case 0x3F:	/* C03F - SOUNDADRH */
+		case 0x3C:  /* C03C - SOUNDCTL */
+		case 0x3D:  /* C03D - SOUNDDATA */
+		case 0x3E:  /* C03E - SOUNDADRL */
+		case 0x3F:  /* C03F - SOUNDADRH */
 			gssnd_w(space, offset & 0x03, data, mem_mask);
 			break;
 
-		case 0x41:	/* C041 - INTEN */
+		case 0x41:  /* C041 - INTEN */
 			m_inten = data & 0x1F;
 			if ((m_inten & 0x10) == 0x00)
 				apple2gs_remove_irq(space.machine(), IRQ_INTEN_QSECOND);
@@ -1182,13 +1182,13 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 				apple2gs_remove_irq(space.machine(), IRQ_INTEN_VBL);
 			break;
 
-		case 0x47:	/* C047 - CLRVBLINT */
+		case 0x47:  /* C047 - CLRVBLINT */
 			m_intflag &= ~0x18;
 			apple2gs_remove_irq(space.machine(), IRQ_INTEN_QSECOND);
 			apple2gs_remove_irq(space.machine(), IRQ_INTEN_VBL);
 			break;
 
-		case 0x68:	/* C068 - STATEREG */
+		case 0x68:  /* C068 - STATEREG */
 			apple2_setvar(space.machine(),
 				((data & 0x80) ? VAR_ALTZP : 0) |
 				((data & 0x40) ? VAR_PAGE2 : 0) |
@@ -1200,28 +1200,28 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 				VAR_ALTZP | VAR_PAGE2 | VAR_RAMRD | VAR_RAMWRT | VAR_LCRAM | VAR_LCRAM2 | VAR_INTCXROM);
 			break;
 
-        // slot 6 registers should go to applefdc if slot 6 not "Your Card"
-        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
-        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
-            if ((m_sltromsel & (1 << 6)) == 0)
-            {
-                m_fdc->write(offset, data);
-            }
-            else
-            {
-                apple2_c0xx_w(space, offset, data, 0);
-            }
-            break;
+		// slot 6 registers should go to applefdc if slot 6 not "Your Card"
+		case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+		case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
+			if ((m_sltromsel & (1 << 6)) == 0)
+			{
+				m_fdc->write(offset, data);
+			}
+			else
+			{
+				apple2_c0xx_w(space, offset, data, 0);
+			}
+			break;
 
 		default:
-            if (offset < 0x80)
-            {
-                apple2_c0xx_w(space, offset, data, 0);
-            }
-            else
-            {
-                apple2_c080_w(space, offset, data, 0);
-            }
+			if (offset < 0x80)
+			{
+				apple2_c0xx_w(space, offset, data, 0);
+			}
+			else
+			{
+				apple2_c080_w(space, offset, data, 0);
+			}
 			break;
 	}
 }
@@ -1322,15 +1322,15 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_aux4000_w )
 static void apple2gs_mem_000000(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	meminfo->read_mem			= (state->m_flags & VAR_ALTZP)	? 0x010000 : 0x000000;
-	meminfo->write_mem			= (state->m_flags & VAR_ALTZP)	? 0x010000 : 0x000000;
+	meminfo->read_mem           = (state->m_flags & VAR_ALTZP)  ? 0x010000 : 0x000000;
+	meminfo->write_mem          = (state->m_flags & VAR_ALTZP)  ? 0x010000 : 0x000000;
 }
 
 static void apple2gs_mem_000200(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	meminfo->read_mem			= (state->m_flags & VAR_RAMRD)	? 0x010200 : 0x000200;
-	meminfo->write_mem			= (state->m_flags & VAR_RAMWRT)	? 0x010200 : 0x000200;
+	meminfo->read_mem           = (state->m_flags & VAR_RAMRD)  ? 0x010200 : 0x000200;
+	meminfo->write_mem          = (state->m_flags & VAR_RAMWRT) ? 0x010200 : 0x000200;
 }
 
 static void apple2gs_mem_000400(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
@@ -1338,23 +1338,23 @@ static void apple2gs_mem_000400(running_machine &machine,offs_t begin, offs_t en
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if (state->m_flags & VAR_80STORE)
 	{
-		meminfo->read_mem		= (state->m_flags & VAR_PAGE2)	? 0x010400 : 0x000400;
-		meminfo->write_mem		= (state->m_flags & VAR_PAGE2)	? 0x010400 : 0x000400;
-		meminfo->write_handler	= (state->m_flags & VAR_PAGE2)	? &state->write_delegates_2gs0400[0] : &state->write_delegates_2gs0400[1];
+		meminfo->read_mem       = (state->m_flags & VAR_PAGE2)  ? 0x010400 : 0x000400;
+		meminfo->write_mem      = (state->m_flags & VAR_PAGE2)  ? 0x010400 : 0x000400;
+		meminfo->write_handler  = (state->m_flags & VAR_PAGE2)  ? &state->write_delegates_2gs0400[0] : &state->write_delegates_2gs0400[1];
 	}
 	else
 	{
-		meminfo->read_mem		= (state->m_flags & VAR_RAMRD)	? 0x010400 : 0x000400;
-		meminfo->write_mem		= (state->m_flags & VAR_RAMWRT)	? 0x010400 : 0x000400;
-		meminfo->write_handler	= (state->m_flags & VAR_RAMWRT)	? &state->write_delegates_2gs0400[0] : &state->write_delegates_2gs0400[1];
+		meminfo->read_mem       = (state->m_flags & VAR_RAMRD)  ? 0x010400 : 0x000400;
+		meminfo->write_mem      = (state->m_flags & VAR_RAMWRT) ? 0x010400 : 0x000400;
+		meminfo->write_handler  = (state->m_flags & VAR_RAMWRT) ? &state->write_delegates_2gs0400[0] : &state->write_delegates_2gs0400[1];
 	}
 }
 
 static void apple2gs_mem_000800(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	meminfo->read_mem			= (state->m_flags & VAR_RAMRD)	? 0x010800 : 0x000800;
-	meminfo->write_mem			= (state->m_flags & VAR_RAMWRT)	? 0x010800 : 0x000800;
+	meminfo->read_mem           = (state->m_flags & VAR_RAMRD)  ? 0x010800 : 0x000800;
+	meminfo->write_mem          = (state->m_flags & VAR_RAMWRT) ? 0x010800 : 0x000800;
 }
 
 static void apple2gs_mem_002000(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
@@ -1362,23 +1362,23 @@ static void apple2gs_mem_002000(running_machine &machine,offs_t begin, offs_t en
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if ((state->m_flags & (VAR_80STORE|VAR_HIRES)) == (VAR_80STORE|VAR_HIRES))
 	{
-		meminfo->read_mem		= (state->m_flags & VAR_PAGE2)	? 0x012000 : 0x002000;
-		meminfo->write_mem		= (state->m_flags & VAR_PAGE2)	? 0x012000 : 0x002000;
-		meminfo->write_handler	= (state->m_flags & VAR_PAGE2)	? &state->write_delegates_2gs2000[0] : &state->write_delegates_2gs2000[1];
+		meminfo->read_mem       = (state->m_flags & VAR_PAGE2)  ? 0x012000 : 0x002000;
+		meminfo->write_mem      = (state->m_flags & VAR_PAGE2)  ? 0x012000 : 0x002000;
+		meminfo->write_handler  = (state->m_flags & VAR_PAGE2)  ? &state->write_delegates_2gs2000[0] : &state->write_delegates_2gs2000[1];
 	}
 	else
 	{
-		meminfo->read_mem		= (state->m_flags & VAR_RAMRD)	? 0x012000 : 0x002000;
-		meminfo->write_mem		= (state->m_flags & VAR_RAMWRT)	? 0x012000 : 0x002000;
-		meminfo->write_handler	= (state->m_flags & VAR_RAMWRT)	? &state->write_delegates_2gs2000[0] : &state->write_delegates_2gs2000[1];
+		meminfo->read_mem       = (state->m_flags & VAR_RAMRD)  ? 0x012000 : 0x002000;
+		meminfo->write_mem      = (state->m_flags & VAR_RAMWRT) ? 0x012000 : 0x002000;
+		meminfo->write_handler  = (state->m_flags & VAR_RAMWRT) ? &state->write_delegates_2gs2000[0] : &state->write_delegates_2gs2000[1];
 	}
 }
 
 static void apple2gs_mem_004000(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	meminfo->read_mem			= (state->m_flags & VAR_RAMRD)	? 0x014000 : 0x004000;
-	meminfo->write_handler		= (state->m_flags & VAR_RAMWRT)	? &state->write_delegates_2gs4000[0] : &state->write_delegates_2gs4000[1];
+	meminfo->read_mem           = (state->m_flags & VAR_RAMRD)  ? 0x014000 : 0x004000;
+	meminfo->write_handler      = (state->m_flags & VAR_RAMWRT) ? &state->write_delegates_2gs4000[0] : &state->write_delegates_2gs4000[1];
 }
 
 static void apple2gs_mem_xxD000(running_machine &machine,apple2_meminfo *meminfo, UINT32 lcmem)
@@ -1387,21 +1387,21 @@ static void apple2gs_mem_xxD000(running_machine &machine,apple2_meminfo *meminfo
 	if (state->m_flags & VAR_LCRAM)
 	{
 		if (state->m_flags & VAR_LCRAM2)
-			meminfo->read_mem	= lcmem | 0x00C000;
+			meminfo->read_mem   = lcmem | 0x00C000;
 		else
-			meminfo->read_mem	= lcmem | 0x00D000;
+			meminfo->read_mem   = lcmem | 0x00D000;
 	}
 	else
 	{
-		meminfo->read_mem		= 0x03D000 | APPLE2_MEM_ROM;
+		meminfo->read_mem       = 0x03D000 | APPLE2_MEM_ROM;
 	}
 
 	if (state->m_flags & VAR_LCWRITE)
 	{
 		if (state->m_flags & VAR_LCRAM2)
-			meminfo->write_mem	= lcmem | 0x00C000;
+			meminfo->write_mem  = lcmem | 0x00C000;
 		else
-			meminfo->write_mem	= lcmem | 0x00D000;
+			meminfo->write_mem  = lcmem | 0x00D000;
 	}
 	else
 	{
@@ -1413,14 +1413,14 @@ static void apple2gs_mem_xxE000(running_machine &machine,apple2_meminfo *meminfo
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if (state->m_flags & VAR_LCRAM)
-		meminfo->read_mem		= lcmem | 0x00E000;
+		meminfo->read_mem       = lcmem | 0x00E000;
 	else
-		meminfo->read_mem		= 0x03E000 | APPLE2_MEM_ROM;
+		meminfo->read_mem       = 0x03E000 | APPLE2_MEM_ROM;
 
 	if (state->m_flags & VAR_LCWRITE)
-		meminfo->write_mem		= lcmem | 0x00E000;
+		meminfo->write_mem      = lcmem | 0x00E000;
 	else
-		meminfo->write_mem		= APPLE2_MEM_FLOATING;
+		meminfo->write_mem      = APPLE2_MEM_FLOATING;
 }
 
 static void apple2gs_mem_00D000(running_machine &machine,offs_t begin, offs_t end, apple2_meminfo *meminfo)
@@ -1428,8 +1428,8 @@ static void apple2gs_mem_00D000(running_machine &machine,offs_t begin, offs_t en
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if (state->m_shadow & 0x40)
 	{
-		meminfo->read_mem		= (state->m_flags & VAR_RAMRD) ? 0x01D000 : 0x00D000;
-		meminfo->write_mem		= (state->m_flags & VAR_RAMWRT) ? 0x01D000 : 0x00D000;
+		meminfo->read_mem       = (state->m_flags & VAR_RAMRD) ? 0x01D000 : 0x00D000;
+		meminfo->write_mem      = (state->m_flags & VAR_RAMWRT) ? 0x01D000 : 0x00D000;
 	}
 	else
 	{
@@ -1442,8 +1442,8 @@ static void apple2gs_mem_00E000(running_machine &machine,offs_t begin, offs_t en
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if (state->m_shadow & 0x40)
 	{
-		meminfo->read_mem		= (state->m_flags & VAR_RAMRD) ? 0x01E000 : 0x00E000;
-		meminfo->write_mem		= (state->m_flags & VAR_RAMWRT) ? 0x01E000 : 0x00E000;
+		meminfo->read_mem       = (state->m_flags & VAR_RAMRD) ? 0x01E000 : 0x00E000;
+		meminfo->write_mem      = (state->m_flags & VAR_RAMWRT) ? 0x01E000 : 0x00E000;
 	}
 	else
 	{
@@ -1456,8 +1456,8 @@ static void apple2gs_mem_01D000(running_machine &machine,offs_t begin, offs_t en
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if (state->m_shadow & 0x40)
 	{
-		meminfo->read_mem		= 0x01D000;
-		meminfo->write_mem		= 0x01D000;
+		meminfo->read_mem       = 0x01D000;
+		meminfo->write_mem      = 0x01D000;
 	}
 	else
 	{
@@ -1470,8 +1470,8 @@ static void apple2gs_mem_01E000(running_machine &machine,offs_t begin, offs_t en
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	if (state->m_shadow & 0x40)
 	{
-		meminfo->read_mem		= 0x01E000;
-		meminfo->write_mem		= 0x01E000;
+		meminfo->read_mem       = 0x01E000;
+		meminfo->write_mem      = 0x01E000;
 	}
 	else
 	{
@@ -1545,11 +1545,11 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 	UINT8 result;
 	int slot;
 
-	if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))	// shadow all banks and C0xx?
+	if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000)) // shadow all banks and C0xx?
 	{
 		result = machine.device<ram_device>(RAM_TAG)->pointer()[address];
 	}
-	else if ((address & 0x000F00) == 0x000000)	// accessing C0xx?
+	else if ((address & 0x000F00) == 0x000000)  // accessing C0xx?
 	{
 		result = state->apple2gs_c0xx_r(machine.device("maincpu")->memory().space(AS_PROGRAM), address, 0);
 	}
@@ -1558,7 +1558,7 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 		device_a2bus_card_interface *slotdevice;
 
 		slot = (address & 0x000F00) / 0x100;
-		if (slot <= 7)	// slots 1-7, it's the slot
+		if (slot <= 7)  // slots 1-7, it's the slot
 		{
 			slotdevice = state->m_a2bus->get_a2bus_card(slot);
 
@@ -1567,7 +1567,7 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 			{
 				// accessing a slot mapped to internal, let's put back the internal ROM
 				state->m_a2_cnxx_slot = -1;
-                apple2_update_memory(space.machine());
+				apple2_update_memory(space.machine());
 				result = *apple2gs_getslotmem(machine, address);
 			}
 			else
@@ -1588,19 +1588,19 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 				}
 			}
 		}
-		else	// C800-CFFF, not cards
+		else    // C800-CFFF, not cards
 		{
 			slotdevice = NULL;
 
 			// if CFFF accessed, reset C800 area to internal ROM
-            if(!space.debugger_access())
-            {
-                if ((address & 0xfff) == 0xfff)
-                {
-                    state->m_a2_cnxx_slot = -1;
-                    apple2_update_memory(space.machine());
-                }
-            }
+			if(!space.debugger_access())
+			{
+				if ((address & 0xfff) == 0xfff)
+				{
+					state->m_a2_cnxx_slot = -1;
+					apple2_update_memory(space.machine());
+				}
+			}
 
 			if ( state->m_a2_cnxx_slot >= 0 && state->m_a2_cnxx_slot <= 7 )
 			{
@@ -1628,14 +1628,14 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 	int slot;
 
 	// if CFFF accessed, reset C800 area to internal ROM
-    if(!space.debugger_access())
-    {
-    	if ((address & 0xfff) == 0xfff)
-    	{
-    		state->m_a2_cnxx_slot = -1;
-            apple2_update_memory(space.machine());
-    	}
-    }
+	if(!space.debugger_access())
+	{
+		if ((address & 0xfff) == 0xfff)
+		{
+			state->m_a2_cnxx_slot = -1;
+			apple2_update_memory(space.machine());
+		}
+	}
 
 	if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 	{
@@ -1651,7 +1651,7 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 
 		slot = (address & 0x000F00) / 0x100;
 
-		if (slot <= 7)	// slots 1-7, it's the slot
+		if (slot <= 7)  // slots 1-7, it's the slot
 		{
 			slotdevice = state->m_a2bus->get_a2bus_card(slot);
 
@@ -1660,7 +1660,7 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 			{
 				// accessing a slot mapped to internal, let's put back the internal ROM
 				state->m_a2_cnxx_slot = -1;
-                apple2_update_memory(space.machine());
+				apple2_update_memory(space.machine());
 				*apple2gs_getslotmem(machine, address) = data;
 			}
 			else
@@ -1678,7 +1678,7 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 				// (else slot is your card but there's no card inserted so the write goes nowhere)
 			}
 		}
-		else	// C800-CFFF, not cards
+		else    // C800-CFFF, not cards
 		{
 			slotdevice = NULL;
 
@@ -1686,7 +1686,7 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 			if ((address & 0xfff) == 0xfff)
 			{
 				state->m_a2_cnxx_slot = -1;
-                apple2_update_memory(space.machine());
+				apple2_update_memory(space.machine());
 			}
 
 			if ( state->m_a2_cnxx_slot >= 0 && state->m_a2_cnxx_slot <= 7 )
@@ -1882,7 +1882,7 @@ READ8_MEMBER(apple2gs_state::apple2gs_read_vector)
 MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 {
 
-    apple2gs_refresh_delegates();
+	apple2gs_refresh_delegates();
 
 	m_cur_slot6_image = NULL;
 	m_newvideo = 0x00;
@@ -1930,7 +1930,7 @@ MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 {
 
-    apple2gs_refresh_delegates();
+	apple2gs_refresh_delegates();
 	apple2_init_common(machine());
 
 	/* set up Apple IIgs vectoring */
@@ -2019,11 +2019,10 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gsr1)
 
 void apple2gs_state::apple2gs_refresh_delegates()
 {
-    write_delegates_2gs0400[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux0400_w), this);
-    write_delegates_2gs0400[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main0400_w), this);
-    write_delegates_2gs2000[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux2000_w), this);
-    write_delegates_2gs2000[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main2000_w), this);
-    write_delegates_2gs4000[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux4000_w), this);
-    write_delegates_2gs4000[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main4000_w), this);
+	write_delegates_2gs0400[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux0400_w), this);
+	write_delegates_2gs0400[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main0400_w), this);
+	write_delegates_2gs2000[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux2000_w), this);
+	write_delegates_2gs2000[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main2000_w), this);
+	write_delegates_2gs4000[0] = write8_delegate(FUNC(apple2gs_state::apple2gs_aux4000_w), this);
+	write_delegates_2gs4000[1] = write8_delegate(FUNC(apple2gs_state::apple2gs_main4000_w), this);
 }
-

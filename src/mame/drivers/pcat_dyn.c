@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pcat_dyn )
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
@@ -96,13 +96,13 @@ static INPUT_PORTS_START( pcat_dyn )
 	PORT_START("pc_keyboard_5")
 
 	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
@@ -142,7 +142,7 @@ void pcat_dyn_state::machine_start()
 
 static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000)	/* Am486 DX-40 */
+	MCFG_CPU_ADD("maincpu", I486, 40000000) /* Am486 DX-40 */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
 
@@ -163,14 +163,14 @@ MACHINE_CONFIG_END
 ***************************************/
 
 ROM_START(toursol)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* Motherboard BIOS */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)	/* Trident TVGA9000 BIOS */
+	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
-	ROM_CONTINUE(				0x00001, 0x04000 )
+	ROM_CONTINUE(               0x00001, 0x04000 )
 
-	ROM_REGION32_LE(0x100000, "game_prg", 0)	/* PromStor 32, mapping unknown */
+	ROM_REGION32_LE(0x100000, "game_prg", 0)    /* PromStor 32, mapping unknown */
 	ROM_LOAD("sol.u21", 0x00000, 0x40000, CRC(e97724d9) SHA1(995b89d129c371b815c6b498093bd1bbf9fd8755))
 	ROM_LOAD("sol.u22", 0x40000, 0x40000, CRC(69d42f50) SHA1(737fe62f3827b00b4f6f3b72ef6c7b6740947e95))
 	ROM_LOAD("sol.u23", 0x80000, 0x40000, CRC(d1e39bd4) SHA1(39c7ee43cddb53fba0f7c0572ddc40289c4edd07))
@@ -180,14 +180,14 @@ ROM_END
 
 
 ROM_START(toursol1)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* Motherboard BIOS */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)	/* Trident TVGA9000 BIOS */
+	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
-	ROM_CONTINUE(				0x00001, 0x04000 )
+	ROM_CONTINUE(               0x00001, 0x04000 )
 
-	ROM_REGION32_LE(0x100000, "game_prg", 0)	/* PromStor 32, mapping unknown */
+	ROM_REGION32_LE(0x100000, "game_prg", 0)    /* PromStor 32, mapping unknown */
 	ROM_LOAD("prom.0", 0x00000, 0x40000, CRC(f26ce73f) SHA1(5516c31aa18716a47f46e412fc273ae8784d2061))
 	ROM_LOAD("prom.1", 0x40000, 0x40000, CRC(8f96e2a8) SHA1(bc3ce8b99e6ff40e355df2c3f797f1fe88b3b219))
 	ROM_LOAD("prom.2", 0x80000, 0x40000, CRC(8b0ac5cf) SHA1(1c2b6a53c9ff4d18a5227d899facbbc719f40205))

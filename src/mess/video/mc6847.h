@@ -19,25 +19,25 @@
 #define MCFG_MC6847_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#define MCFG_MC6847_ADD(_tag, _variant, _clock, _config)		\
-	MCFG_DEVICE_ADD(_tag, _variant, _clock)						\
+#define MCFG_MC6847_ADD(_tag, _variant, _clock, _config)        \
+	MCFG_DEVICE_ADD(_tag, _variant, _clock)                     \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_SCREEN_MC6847_NTSC_ADD(_tag, _mctag) \
-	MCFG_SCREEN_ADD(_tag, RASTER)								\
+	MCFG_SCREEN_ADD(_tag, RASTER)                               \
 	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
-	MCFG_SCREEN_REFRESH_RATE(60)								\
-	MCFG_SCREEN_SIZE(320, 243)									\
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)				\
-	MCFG_SCREEN_VBLANK_TIME(0)									\
+	MCFG_SCREEN_REFRESH_RATE(60)                                \
+	MCFG_SCREEN_SIZE(320, 243)                                  \
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
+	MCFG_SCREEN_VBLANK_TIME(0)                                  \
 
 #define MCFG_SCREEN_MC6847_PAL_ADD(_tag, _mctag) \
-	MCFG_SCREEN_ADD(_tag, RASTER)								\
+	MCFG_SCREEN_ADD(_tag, RASTER)                               \
 	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
-	MCFG_SCREEN_REFRESH_RATE(50)								\
-	MCFG_SCREEN_SIZE(320, 243)									\
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)				\
-	MCFG_SCREEN_VBLANK_TIME(0)									\
+	MCFG_SCREEN_REFRESH_RATE(50)                                \
+	MCFG_SCREEN_SIZE(320, 243)                                  \
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
+	MCFG_SCREEN_VBLANK_TIME(0)                                  \
 
 /* interface */
 struct mc6847_interface
@@ -46,32 +46,32 @@ struct mc6847_interface
 	const char *m_screen_tag;
 
 	/* if specified, this gets called whenever reading a byte (offs_t ~0 specifies DA* entering the tristate mode) */
-	devcb_read8					m_input_func;
+	devcb_read8                 m_input_func;
 
 	/* if specified, this gets called for every change of the HS pin (pin 38) */
-	devcb_write_line			m_out_hsync_func;
+	devcb_write_line            m_out_hsync_func;
 
 	/* if specified, this gets called for every change of the FS pin (pin 37) */
-	devcb_write_line			m_out_fsync_func;
+	devcb_write_line            m_out_fsync_func;
 
 	/* mode control lines input */
-	devcb_read_line 			m_in_ag_func;
-	devcb_read_line				m_in_gm2_func;
-	devcb_read_line				m_in_gm1_func;
-	devcb_read_line 			m_in_gm0_func;
-	devcb_read_line 			m_in_css_func;
-	devcb_read_line 			m_in_as_func;
-	devcb_read_line 			m_in_intext_func;
-	devcb_read_line 			m_in_inv_func;
+	devcb_read_line             m_in_ag_func;
+	devcb_read_line             m_in_gm2_func;
+	devcb_read_line             m_in_gm1_func;
+	devcb_read_line             m_in_gm0_func;
+	devcb_read_line             m_in_css_func;
+	devcb_read_line             m_in_as_func;
+	devcb_read_line             m_in_intext_func;
+	devcb_read_line             m_in_inv_func;
 
 	/* if specified, this reads the external char rom off of the driver state */
 	UINT8 (*m_get_char_rom)(running_machine &machine, UINT8 ch, int line);
 
 	/* if true, this is black and white */
-	bool						m_black_and_white;
+	bool                        m_black_and_white;
 };
 
-#define	ARTIFACTING_TAG		"artifacting"
+#define ARTIFACTING_TAG     "artifacting"
 
 INPUT_PORTS_EXTERN(mc6847_artifacting);
 
@@ -88,22 +88,22 @@ class mc6847_friend_device : public device_t
 {
 public:
 	// inlines
-	bool hs_r(void)					{ return m_horizontal_sync; }
-	bool fs_r(void)					{ return m_field_sync; }
+	bool hs_r(void)                 { return m_horizontal_sync; }
+	bool fs_r(void)                 { return m_field_sync; }
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
 		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline);
 
 	// video mode constants
-	static const UINT8 MODE_AG		= 0x80;
-	static const UINT8 MODE_GM2		= 0x40;
-	static const UINT8 MODE_GM1		= 0x20;
-	static const UINT8 MODE_GM0		= 0x10;
-	static const UINT8 MODE_CSS		= 0x08;
-	static const UINT8 MODE_AS		= 0x04;
-	static const UINT8 MODE_INTEXT	= 0x02;
-	static const UINT8 MODE_INV		= 0x01;
+	static const UINT8 MODE_AG      = 0x80;
+	static const UINT8 MODE_GM2     = 0x40;
+	static const UINT8 MODE_GM1     = 0x20;
+	static const UINT8 MODE_GM0     = 0x10;
+	static const UINT8 MODE_CSS     = 0x08;
+	static const UINT8 MODE_AS      = 0x04;
+	static const UINT8 MODE_INTEXT  = 0x02;
+	static const UINT8 MODE_INV     = 0x01;
 
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;
@@ -230,12 +230,12 @@ protected:
 				int x, i;
 				for (x = 0; x < 256; x += 2)
 				{
-					UINT8 val =	((pixels[(x - 2) * xscale] == c1) ? 0x20 : 0x00)
-						|	((pixels[(x - 1) * xscale] == c1) ? 0x10 : 0x00)
-						|	((pixels[(x + 0) * xscale] == c1) ? 0x08 : 0x00)
-						|	((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
-						|	((pixels[(x + 2) * xscale] == c1) ? 0x02 : 0x00)
-						|	((pixels[(x + 3) * xscale] == c1) ? 0x01 : 0x00);
+					UINT8 val = ((pixels[(x - 2) * xscale] == c1) ? 0x20 : 0x00)
+						|   ((pixels[(x - 1) * xscale] == c1) ? 0x10 : 0x00)
+						|   ((pixels[(x + 0) * xscale] == c1) ? 0x08 : 0x00)
+						|   ((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
+						|   ((pixels[(x + 2) * xscale] == c1) ? 0x02 : 0x00)
+						|   ((pixels[(x + 3) * xscale] == c1) ? 0x01 : 0x00);
 
 					new_line[x + 0] = m_expanded_colors[val * 2 + 0];
 					new_line[x + 1] = m_expanded_colors[val * 2 + 1];
@@ -277,8 +277,8 @@ protected:
 	character_map m_character_map;
 	artifacter m_artifacter;
 
-    // device-level overrides
-    virtual void device_start(void);
+	// device-level overrides
+	virtual void device_start(void);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_reset(void);
 	virtual void device_post_load(void);
@@ -493,25 +493,25 @@ class mc6847_base_device : public mc6847_friend_device
 {
 public:
 	/* updates the screen -- this will call begin_update(),
-       followed by update_row() reapeatedly and after all row
-       updating is complete, end_update() */
+	   followed by update_row() reapeatedly and after all row
+	   updating is complete, end_update() */
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// mode changing operations
-	DECLARE_WRITE_LINE_MEMBER( ag_w )		{ change_mode(MODE_AG, state); }
-	DECLARE_WRITE_LINE_MEMBER( gm2_w )		{ change_mode(MODE_GM2, state); }
-	DECLARE_WRITE_LINE_MEMBER( gm1_w )		{ change_mode(MODE_GM1, state); }
-	DECLARE_WRITE_LINE_MEMBER( gm0_w )		{ change_mode(MODE_GM0, state); }
-	DECLARE_WRITE_LINE_MEMBER( as_w )		{ change_mode(MODE_AS, state); }
-	DECLARE_WRITE_LINE_MEMBER( css_w )		{ change_mode(MODE_CSS, state); }
-	DECLARE_WRITE_LINE_MEMBER( intext_w )	{ change_mode(MODE_INTEXT, state); }
-	DECLARE_WRITE_LINE_MEMBER( inv_w )		{ change_mode(MODE_INV, state); }
+	DECLARE_WRITE_LINE_MEMBER( ag_w )       { change_mode(MODE_AG, state); }
+	DECLARE_WRITE_LINE_MEMBER( gm2_w )      { change_mode(MODE_GM2, state); }
+	DECLARE_WRITE_LINE_MEMBER( gm1_w )      { change_mode(MODE_GM1, state); }
+	DECLARE_WRITE_LINE_MEMBER( gm0_w )      { change_mode(MODE_GM0, state); }
+	DECLARE_WRITE_LINE_MEMBER( as_w )       { change_mode(MODE_AS, state); }
+	DECLARE_WRITE_LINE_MEMBER( css_w )      { change_mode(MODE_CSS, state); }
+	DECLARE_WRITE_LINE_MEMBER( intext_w )   { change_mode(MODE_INTEXT, state); }
+	DECLARE_WRITE_LINE_MEMBER( inv_w )      { change_mode(MODE_INV, state); }
 
 protected:
 	mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs);
 
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual ioport_constructor device_input_ports() const;
 
@@ -637,4 +637,3 @@ extern const device_type MC6847T1_NTSC;
 extern const device_type MC6847T1_PAL;
 
 #endif /* __MC6847__ */
-

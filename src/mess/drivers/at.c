@@ -225,28 +225,28 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( atcga )
-    PORT_START("DSW0") /* IN1 */
+	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x40, "2" )
-	PORT_DIPSETTING(	0x80, "3" )
-	PORT_DIPSETTING(	0xc0, "4" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
 	PORT_DIPNAME( 0x30, 0x00, "Graphics adapter")
-	PORT_DIPSETTING(	0x00, "EGA/VGA" )
-	PORT_DIPSETTING(	0x10, "Color 40x25" )
-	PORT_DIPSETTING(	0x20, "Color 80x25" )
-	PORT_DIPSETTING(	0x30, "Monochrome" )
+	PORT_DIPSETTING(    0x00, "EGA/VGA" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
 	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
-	PORT_DIPSETTING(	0x00, "1 - 16  64 256K" )
-	PORT_DIPSETTING(	0x04, "2 - 32 128 512K" )
-	PORT_DIPSETTING(	0x08, "3 - 48 192 576K" )
-	PORT_DIPSETTING(	0x0c, "4 - 64 256 640K" )
+	PORT_DIPSETTING(    0x00, "1 - 16  64 256K" )
+	PORT_DIPSETTING(    0x04, "2 - 32 128 512K" )
+	PORT_DIPSETTING(    0x08, "3 - 48 192 576K" )
+	PORT_DIPSETTING(    0x0c, "4 - 64 256 640K" )
 	PORT_DIPNAME( 0x02, 0x00, "80387 installed")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -254,40 +254,40 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( atvga )
 	PORT_START("IN0") /* IN0 */
 	PORT_DIPNAME( 0x08, 0x00, "VGA 1")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "VGA 2")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "VGA 3")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x01, 0x01, "VGA 4")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-    PORT_START("DSW0") /* IN1 */
+	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x40, "2" )
-	PORT_DIPSETTING(	0x80, "3" )
-	PORT_DIPSETTING(	0xc0, "4" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
 	PORT_DIPNAME( 0x30, 0x00, "Graphics adapter")
-	PORT_DIPSETTING(	0x00, "EGA/VGA" )
-	PORT_DIPSETTING(	0x10, "Color 40x25" )
-	PORT_DIPSETTING(	0x20, "Color 80x25" )
-	PORT_DIPSETTING(	0x30, "Monochrome" )
+	PORT_DIPSETTING(    0x00, "EGA/VGA" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
 	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
-	PORT_DIPSETTING(	0x00, "1 - 16  64 256K" )
-	PORT_DIPSETTING(	0x04, "2 - 32 128 512K" )
-	PORT_DIPSETTING(	0x08, "3 - 48 192 576K" )
-	PORT_DIPSETTING(	0x0c, "4 - 64 256 640K" )
+	PORT_DIPSETTING(    0x00, "1 - 16  64 256K" )
+	PORT_DIPSETTING(    0x04, "2 - 32 128 512K" )
+	PORT_DIPSETTING(    0x08, "3 - 48 192 576K" )
+	PORT_DIPSETTING(    0x0c, "4 - 64 256 640K" )
 	PORT_DIPNAME( 0x02, 0x00, "80387 installed")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static const unsigned i286_address_mask = 0x00ffffff;
@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( at586, at586_state )
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
-	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", NULL, NULL,	   0, true)
+	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", NULL, NULL,       0, true)
 
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
-	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", NULL, NULL,	   0, true)
+	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", NULL, NULL,       0, true)
 
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa1", pc_isa16_cards, "svga_et4k", NULL, false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa2", pc_isa16_cards, NULL, NULL, false)
@@ -698,7 +698,7 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c386sx16, at386 )
-	MCFG_CPU_REPLACE("maincpu", I386, 16000000)		/* 386SX */
+	MCFG_CPU_REPLACE("maincpu", I386, 16000000)     /* 386SX */
 	MCFG_CPU_PROGRAM_MAP(at386_map)
 	MCFG_CPU_IO_MAP(at386_io)
 MACHINE_CONFIG_END
@@ -756,7 +756,7 @@ ROM_START( ibm5170 )
 	ROMX_LOAD("6181028.u27", 0xf0000, 0x8000, CRC(f6573f2a) SHA1(3e52cfa6a6a62b4e8576f4fe076c858c220e6c1a), ROM_SKIP(1) | ROM_BIOS(1)) /* T 6181028 8506AAA // TMM23256P-5878 // (C)IBM CORP 1981,-1984 */
 	ROMX_LOAD("6181029.u47", 0xf0001, 0x8000, CRC(7075fbb2) SHA1(a7b885cfd38710c9bc509da1e3ba9b543a2760be), ROM_SKIP(1) | ROM_BIOS(1)) /* T 6181029 8506AAA // TMM23256P-5879 // (C)IBM CORP 1981,-1984 */
 
-	ROM_SYSTEM_BIOS( 1, "rev2", "IBM PC/AT 5170 06/10/85")	/* Another verifaction of these crcs would be nice */
+	ROM_SYSTEM_BIOS( 1, "rev2", "IBM PC/AT 5170 06/10/85")  /* Another verifaction of these crcs would be nice */
 	ROMX_LOAD("6480090.u27", 0xf0000, 0x8000, CRC(99703aa9) SHA1(18022e93a0412c8477e58f8c61a87718a0b9ab0e), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("6480091.u47", 0xf0001, 0x8000, CRC(013ef44b) SHA1(bfa15d2180a1902cb6d38c6eed3740f5617afd16), ROM_SKIP(1) | ROM_BIOS(2))
 
@@ -803,7 +803,7 @@ ROM_START( ibm5170a )
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("1501824_717750.mmipal14l4.u87.jed", 0x0000, 0x02E7, CRC(3C819A27) SHA1(D2F4889E628DBBEF50B7F48CB1D1A313232BACC8)) /* MMI 1501824 717750 // (C)1983 IBM(M) */
-	ROM_LOAD("1503135_705075.mmipal14l4.u130.jed", 0x02E7, 0x02E7, CRC(AAC77198) SHA1(B318DA3A1FBE5402836C1B548E231E0794D0C032)) /* MMI 1503135 705075 // (C) IBM CORP 83 */	/* P/N 6320947 Serial/Parallel ISA expansion card PAL */
+	ROM_LOAD("1503135_705075.mmipal14l4.u130.jed", 0x02E7, 0x02E7, CRC(AAC77198) SHA1(B318DA3A1FBE5402836C1B548E231E0794D0C032)) /* MMI 1503135 705075 // (C) IBM CORP 83 */    /* P/N 6320947 Serial/Parallel ISA expansion card PAL */
 	ROM_LOAD("1503085.mmipal.u14.jed", 0x1000, 0x0800, NO_DUMP) /* MMI 1503085 8449 // (C) IBM CORP 83 */ /* Not sure of type */
 
 	/* Mainboard PROMS */
@@ -890,7 +890,7 @@ IBM Personal System/2 Model 65 SX (8565-061 and 8565-121)
 
 */
 ROM_START( i8550021 )
-    ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_LOAD16_BYTE( "90x7423.zm14", 0xe0000, 0x8000, CRC(2c1633e0) SHA1(1af7faa526585a7cfb69e71d90a75e1f1c541586))
 	ROM_RELOAD(0xfe0000, 0x8000)
 	ROM_LOAD16_BYTE( "90x7426.zm16", 0xe0001, 0x8000, CRC(e7c762ce) SHA1(228f67dc915d84519da7fc1a59b7f9254278f3a0))
@@ -916,7 +916,7 @@ http://ps-2.kev009.com:8081/ohlandl/8550/8550z_Planar.html
 
 */
 ROM_START( i8550061 )
-    ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_LOAD16_BYTE( "15f8365.zm5", 0xe0001, 0x10000, CRC(35aa3ecf) SHA1(a122531092a9cb08600b276da9c9c3ce385aab7b))
 	ROM_RELOAD(0xfe0001, 0x10000)
 	ROM_LOAD16_BYTE( "15f8366.zm6", 0xe0000, 0x10000, CRC(11bf564d) SHA1(0dda6a7ca9294cfaab5bdf4c05973be13b2766fc))
@@ -978,12 +978,12 @@ ROM_END
 ROM_START( at )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
-	ROMX_LOAD( "ami211.bin",	 0xf0000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(1))
+	ROMX_LOAD( "ami211.bin",     0xf0000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
 	ROMX_LOAD("at110387.1", 0xf0001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(2) )
 	ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")  /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
-	ROMX_LOAD( "amic206.bin",	 0xf0000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
+	ROMX_LOAD( "amic206.bin",    0xf0000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* might be bad dump, doesn't start */
 	ROMX_LOAD( "amic21-1.bin",  0xf0001, 0x8000, CRC(5644ed38) SHA1(963555ec77845defc3b42b433280908e1797076e),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "amic21-2.bin",  0xf0000, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(4) )
@@ -1038,9 +1038,9 @@ ROM_START( atvga )
 	ROM_SYSTEM_BIOS(0, "vl82c", "VL82C311L-FC4")/*(Motherboard Manufacturer: Biostar Microtech Corp.) (BIOS release date: 05-05-1991)*/
 	ROMX_LOAD( "2vlm001.bin",     0xf0000, 0x10000, CRC(f34d800a) SHA1(638aca592a0e525f957beb525e95ca666a994ee8), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
-	ROMX_LOAD( "ami211.bin",	 0xf0000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(2))
+	ROMX_LOAD( "ami211.bin",     0xf0000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
-	ROMX_LOAD( "amic206.bin",	 0xf0000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
+	ROMX_LOAD( "amic206.bin",    0xf0000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* might be bad dump, doesn't start */
 	ROMX_LOAD( "amic21-1.bin",  0xf0001, 0x8000, CRC(5644ed38) SHA1(963555ec77845defc3b42b433280908e1797076e),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "amic21-2.bin",  0xf0000, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(4) )
@@ -1132,7 +1132,7 @@ ROM_START( at386 )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "ami386", "AMI 386")
 	ROMX_LOAD("ami386.bin",  0xf0000, 0x10000, CRC(3a807d7f) SHA1(8289ba36a3dfc3324333b1a834bc6b0402b546f0), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "at386", "unknown 386")	// This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
+	ROM_SYSTEM_BIOS(1, "at386", "unknown 386")  // This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
 	ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(2))
 	//ROM_RELOAD(0xff0000,0x10000)
 	ROM_SYSTEM_BIOS(2, "neatsx", "NEATsx 386sx")
@@ -1141,7 +1141,7 @@ ROM_START( at386 )
 	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(3) )
 	//ROM_RELOAD(0xff0000,0x8000)
 	ROM_SYSTEM_BIOS(3, "amicg", "AMI CG")
-	ROMX_LOAD( "amicg.1",		 0xf0000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(4) )
+	ROMX_LOAD( "amicg.1",        0xf0000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(4) )
 ROM_END
 
 
@@ -1157,15 +1157,15 @@ ROM_START( at486 )
 
 	/* 486 boards from FIC
 
-    naming convention
-    xxxxx101 --> for EPROM
-    xxxxx701 --> for EEPROM using a Flash Utility v5.02
-    xxxxBxxx --> NS 311/312 IO Core Logic
-    xxxxCxxx --> NS 332 IO Core Logic
-    xxxxGxxx --> Winbond W83787F IO Core Logic
-    xxxxJxxx --> Winbond W83877F IO Core Logic
+	naming convention
+	xxxxx101 --> for EPROM
+	xxxxx701 --> for EEPROM using a Flash Utility v5.02
+	xxxxBxxx --> NS 311/312 IO Core Logic
+	xxxxCxxx --> NS 332 IO Core Logic
+	xxxxGxxx --> Winbond W83787F IO Core Logic
+	xxxxJxxx --> Winbond W83877F IO Core Logic
 
-    */
+	*/
 
 	/* this is the year 2000 beta bios from FIC, supports GIO-VT, GAC-V, GAC-2, VIP-IO, VIO-VP and GVT-2 */
 	ROM_SYSTEM_BIOS(3, "ficy2k", "FIC 486 3.276GN1") /* 1997-06-16, includes CL-GD5429 VGA BIOS 1.00a */
@@ -1291,7 +1291,7 @@ ROM_START( ftsserv )
 	ROM_LOAD16_BYTE( "fts10226.hi", 0xe0001, 0x10000, CRC(2460853f) SHA1(a6bba8d2f800140afd129c4d5278f7ae8fe7e63a))
 	/* FT Server series Front Panel */
 	ROM_REGION(0x10000,"front", 0)
-	ROM_LOAD( "fp10009.bin",	 0x0000, 0x8000, CRC(8aa7f718) SHA1(9ee6c6a5bb92622ea8d3805196d42ff68887d820))
+	ROM_LOAD( "fp10009.bin",     0x0000, 0x8000, CRC(8aa7f718) SHA1(9ee6c6a5bb92622ea8d3805196d42ff68887d820))
 ROM_END
 
 ROM_START( apxenls3 )
@@ -1445,9 +1445,9 @@ COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga, at_state,      atcga,
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,  "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
 COMP ( 1990, i8530h31, ibm5170, 0,       ps2m30286, atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8530-H31 (Model 30/286)", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 Model 30-286", GAME_NOT_WORKING )
-COMP ( 198?, i8535043, ibm5170, 0,       at386, 	atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8535-043 (Model 35)", GAME_NOT_WORKING )
-COMP ( 198?, i8550021, ibm5170, 0,       at386, 	atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", GAME_NOT_WORKING )
-COMP ( 198?, i8550061, ibm5170, 0,       at386, 	atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", GAME_NOT_WORKING )
+COMP ( 198?, i8535043, ibm5170, 0,       at386,     atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8535-043 (Model 35)", GAME_NOT_WORKING )
+COMP ( 198?, i8550021, ibm5170, 0,       at386,     atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", GAME_NOT_WORKING )
+COMP ( 198?, i8550061, ibm5170, 0,       at386,     atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", GAME_NOT_WORKING )
 COMP ( 1989, i8555081, ibm5170, 0,       at386,     atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8550-081 (Model 55SX)", GAME_NOT_WORKING )
 COMP ( 198?, i8580071, ibm5170, 0,       at386,     atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8580-071 (Model 80)", GAME_NOT_WORKING )
 COMP ( 198?, i8580111, ibm5170, 0,       at386,     atvga, at_state,      atvga,  "International Business Machines",  "IBM PS/2 8580-111 (Model 80)", GAME_NOT_WORKING )
@@ -1455,8 +1455,8 @@ COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga, at_state,      atvga,  "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga, at_state,      atvga,  "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga, at_state,      atvga,  "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, driver_device,      0,	"<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
-COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, driver_device,      0,	    "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, driver_device,      0,   "<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
+COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, driver_device,      0,       "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atcga, at_state,      atcga,  "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga, at_state,      atvga,  "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga, at_state,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )

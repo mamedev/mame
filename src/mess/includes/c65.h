@@ -42,8 +42,8 @@ class c65_state : public legacy_c64_state
 public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: legacy_c64_state(mconfig, type, tag),
-		  m_c65_chargen(*this, "c65_chargen"),
-		  m_interface(*this, "interface")
+			m_c65_chargen(*this, "c65_chargen"),
+			m_interface(*this, "interface")
 	{ }
 
 	required_shared_ptr<UINT8> m_c65_chargen;

@@ -246,7 +246,7 @@ WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 }
 
 static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8, fp1100_state )
-	AM_RANGE(0xff80, 0xffff) AM_RAM		/* upd7801 internal RAM */
+	AM_RANGE(0xff80, 0xffff) AM_RAM     /* upd7801 internal RAM */
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("sub_ipl",0x0000)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x1000)
 	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_SHARE("videoram") //vram B/R/G
@@ -383,16 +383,16 @@ static const UPD7810_CONFIG fp1100_slave_cpu_config = { TYPE_7801, NULL };
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	fp1100_update_row,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	fp1100_update_row,      /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
@@ -426,7 +426,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_GFXDECODE(fp1100)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/2, mc6845_intf)	/* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/2, mc6845_intf)   /* hand tuned to get ~60 fps */
 MACHINE_CONFIG_END
 
 /* ROM definition */

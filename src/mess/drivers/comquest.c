@@ -169,12 +169,12 @@ INPUT_PORTS_END
 
 static const gfx_layout comquest_charlayout =
 {
-        8,8,
-        256*8,                                    /* 256 characters */
-        1,                      /* 1 bits per pixel */
-        { 0 },                  /* no bitplanes; 1 bit per pixel */
-        /* x offsets */
-        {
+		8,8,
+		256*8,                                    /* 256 characters */
+		1,                      /* 1 bits per pixel */
+		{ 0 },                  /* no bitplanes; 1 bit per pixel */
+		/* x offsets */
+		{
 			0,
 			1,
 			2,
@@ -183,9 +183,9 @@ static const gfx_layout comquest_charlayout =
 			5,
 			6,
 			7,
-        },
-        /* y offsets */
-        {
+		},
+		/* y offsets */
+		{
 			0,
 			8,
 			16,
@@ -195,7 +195,7 @@ static const gfx_layout comquest_charlayout =
 			48,
 			56,
 		},
-        8*8
+		8*8
 };
 
 static GFXDECODE_START( comquest )
@@ -214,7 +214,7 @@ static const UINT32 amask= 0xffff;
 
 static MACHINE_CONFIG_START( comquest, comquest_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, 4000000)		/* 4000000? */
+	MCFG_CPU_ADD("maincpu", M6805, 4000000)     /* 4000000? */
 	/*MCFG_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
 	/*MCFG_CPU_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
 
@@ -246,11 +246,11 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_CPU_CONFIG( amask )
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*4, 128)	/* 160 x 102 */
+	MCFG_SCREEN_SIZE(64*4, 128) /* 160 x 102 */
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
 
@@ -306,4 +306,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    MONITOR COMPANY   FULLNAME */
-CONS( 1995, comquest, 0,		0,		comquest, comquest, driver_device, 0,		"Data Concepts",  "ComQuest Plus (German)", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 1995, comquest, 0,        0,      comquest, comquest, driver_device, 0,       "Data Concepts",  "ComQuest Plus (German)", GAME_NOT_WORKING | GAME_NO_SOUND)

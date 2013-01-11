@@ -154,15 +154,15 @@ WRITE8_MEMBER(flstory_state::onna34ro_mcu_w)
 			break;
 		case 0x40:
 			if(score_adr >= 0xe000 && score_adr < 0xe800)
-				m_from_mcu = m_workram[score_adr - 0xe000];			/* score l*/
+				m_from_mcu = m_workram[score_adr - 0xe000];         /* score l*/
 			break;
 		case 0x41:
 			if(score_adr >= 0xe000 && score_adr < 0xe800)
-				m_from_mcu = m_workram[(score_adr + 1) - 0xe000];		/* score m*/
+				m_from_mcu = m_workram[(score_adr + 1) - 0xe000];       /* score m*/
 			break;
 		case 0x42:
 			if(score_adr >= 0xe000 && score_adr < 0xe800)
-				m_from_mcu = m_workram[(score_adr + 2) - 0xe000] & 0x0f;	/* score h*/
+				m_from_mcu = m_workram[(score_adr + 2) - 0xe000] & 0x0f;    /* score h*/
 			break;
 		default:
 			m_from_mcu = 0x80;
@@ -182,7 +182,7 @@ READ8_MEMBER(flstory_state::onna34ro_mcu_status_r)
 }
 
 
-#define VICTNINE_MCU_SEED	(m_workram[0x685])
+#define VICTNINE_MCU_SEED   (m_workram[0x685])
 
 static const UINT8 victnine_mcu_data[0x100] =
 {

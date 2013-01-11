@@ -69,10 +69,10 @@ READ8_MEMBER(tnzs_state::tnzs_port1_r)
 
 	switch (m_input_select & 0x0f)
 	{
-		case 0x0a:	data = ioport("IN2")->read(); break;
-		case 0x0c:	data = ioport("IN0")->read(); break;
-		case 0x0d:	data = ioport("IN1")->read(); break;
-		default:	data = 0xff; break;
+		case 0x0a:  data = ioport("IN2")->read(); break;
+		case 0x0c:  data = ioport("IN0")->read(); break;
+		case 0x0d:  data = ioport("IN1")->read(); break;
+		default:    data = 0xff; break;
 	}
 
 //  logerror("I8742:%04x  Read %02x from port 1\n", space.device().safe_pcbase(), data);
@@ -143,11 +143,11 @@ static void mcu_handle_coins( running_machine &machine, int coin )
 	/* Credits are limited to 9, so more coins should be rejected */
 	/* Coin/Play settings must also be taken into consideration */
 
-	if (coin & 0x08)	/* tilt */
+	if (coin & 0x08)    /* tilt */
 		state->m_mcu_reportcoin = coin;
 	else if (coin && coin != state->m_insertcoin)
 	{
-		if (coin & 0x01)	/* coin A */
+		if (coin & 0x01)    /* coin A */
 		{
 //          logerror("Coin dropped into slot A\n");
 			coin_counter_w(machine,0,1); coin_counter_w(machine,0,0); /* Count slot A */
@@ -168,7 +168,7 @@ static void mcu_handle_coins( running_machine &machine, int coin )
 			}
 		}
 
-		if (coin & 0x02)	/* coin B */
+		if (coin & 0x02)    /* coin B */
 		{
 //          logerror("Coin dropped into slot B\n");
 			coin_counter_w(machine,1,1); coin_counter_w(machine,1,0); /* Count slot B */
@@ -189,7 +189,7 @@ static void mcu_handle_coins( running_machine &machine, int coin )
 			}
 		}
 
-		if (coin & 0x04)	/* service */
+		if (coin & 0x04)    /* service */
 		{
 //          logerror("Coin dropped into service slot C\n");
 			state->m_mcu_credits++;
@@ -236,11 +236,11 @@ READ8_MEMBER(tnzs_state::mcu_arknoid2_r)
 					if (m_mcu_reportcoin & 0x08)
 					{
 						m_mcu_initializing = 3;
-						return 0xee;	/* tilt */
+						return 0xee;    /* tilt */
 					}
 					else return m_mcu_credits;
 				}
-				else return ioport("IN0")->read();	/* buttons */
+				else return ioport("IN0")->read();  /* buttons */
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -251,20 +251,20 @@ READ8_MEMBER(tnzs_state::mcu_arknoid2_r)
 	else
 	{
 		/*
-        status bits:
-        0 = mcu is ready to send data (read from c000)
-        1 = mcu has read data (from c000)
-        2 = unused
-        3 = unused
-        4-7 = coin code
-              0 = nothing
-              1,2,3 = coin switch pressed
-              e = tilt
-        */
-		if (m_mcu_reportcoin & 0x08) return 0xe1;	/* tilt */
-		if (m_mcu_reportcoin & 0x01) return 0x11;	/* coin 1 (will trigger "coin inserted" sound) */
-		if (m_mcu_reportcoin & 0x02) return 0x21;	/* coin 2 (will trigger "coin inserted" sound) */
-		if (m_mcu_reportcoin & 0x04) return 0x31;	/* coin 3 (will trigger "coin inserted" sound) */
+		status bits:
+		0 = mcu is ready to send data (read from c000)
+		1 = mcu has read data (from c000)
+		2 = unused
+		3 = unused
+		4-7 = coin code
+		      0 = nothing
+		      1,2,3 = coin switch pressed
+		      e = tilt
+		*/
+		if (m_mcu_reportcoin & 0x08) return 0xe1;   /* tilt */
+		if (m_mcu_reportcoin & 0x01) return 0x11;   /* coin 1 (will trigger "coin inserted" sound) */
+		if (m_mcu_reportcoin & 0x02) return 0x21;   /* coin 2 (will trigger "coin inserted" sound) */
+		if (m_mcu_reportcoin & 0x04) return 0x31;   /* coin 3 (will trigger "coin inserted" sound) */
 		return 0x01;
 	}
 }
@@ -282,14 +282,14 @@ WRITE8_MEMBER(tnzs_state::mcu_arknoid2_w)
 	else
 	{
 		/*
-        0xc1: read number of credits, then buttons
-        0x54+0x41: add value to number of credits
-        0x15: sub 1 credit (when "Continue Play" only)
-        0x84: coin 1 lockout (issued only in test mode)
-        0x88: coin 2 lockout (issued only in test mode)
-        0x80: release coin lockout (issued only in test mode)
-        during initialization, a sequence of 4 bytes sets coin/credit settings
-        */
+		0xc1: read number of credits, then buttons
+		0x54+0x41: add value to number of credits
+		0x15: sub 1 credit (when "Continue Play" only)
+		0x84: coin 1 lockout (issued only in test mode)
+		0x88: coin 2 lockout (issued only in test mode)
+		0x80: release coin lockout (issued only in test mode)
+		during initialization, a sequence of 4 bytes sets coin/credit settings
+		*/
 //      logerror("PC %04x: write %02x to mcu %04x\n", space.device().safe_pc(), data, 0xc000 + offset);
 
 		if (m_mcu_initializing)
@@ -297,11 +297,11 @@ WRITE8_MEMBER(tnzs_state::mcu_arknoid2_w)
 			/* set up coin/credit settings */
 			m_mcu_coinage[m_mcu_coinage_init++] = data;
 			if (m_mcu_coinage_init == 4)
-				m_mcu_coinage_init = 0;	/* must not happen */
+				m_mcu_coinage_init = 0; /* must not happen */
 		}
 
 		if (data == 0xc1)
-			m_mcu_readcredits = 0;	/* reset input port number */
+			m_mcu_readcredits = 0;  /* reset input port number */
 
 		if (data == 0x15)
 		{
@@ -332,10 +332,10 @@ READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
 		switch (m_mcu_command)
 		{
 			case 0x01:
-				return ioport("IN0")->read() ^ 0xff;	/* player 1 joystick + buttons */
+				return ioport("IN0")->read() ^ 0xff;    /* player 1 joystick + buttons */
 
 			case 0x02:
-				return ioport("IN1")->read() ^ 0xff;	/* player 2 joystick + buttons */
+				return ioport("IN1")->read() ^ 0xff;    /* player 2 joystick + buttons */
 
 			case 0x1a:
 				return (ioport("COIN1")->read() | (ioport("COIN2")->read() << 1));
@@ -351,7 +351,7 @@ READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
 				if (m_mcu_reportcoin & 0x08)
 				{
 					m_mcu_initializing = 3;
-					return 0xee;	/* tilt */
+					return 0xee;    /* tilt */
 				}
 				else return m_mcu_credits;
 
@@ -363,7 +363,7 @@ READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
 					if (m_mcu_reportcoin & 0x08)
 					{
 						m_mcu_initializing = 3;
-						return 0xee;	/* tilt */
+						return 0xee;    /* tilt */
 //                      return 0x64;    /* theres a reset input somewhere */
 					}
 					else return m_mcu_credits;
@@ -380,20 +380,20 @@ READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
 	else
 	{
 		/*
-        status bits:
-        0 = mcu is ready to send data (read from c000)
-        1 = mcu has read data (from c000)
-        2 = unused
-        3 = unused
-        4-7 = coin code
-              0 = nothing
-              1,2,3 = coin switch pressed
-              e = tilt
-        */
-		if (m_mcu_reportcoin & 0x08) return 0xe1;	/* tilt */
-		if (m_mcu_reportcoin & 0x01) return 0x11;	/* coin 1 (will trigger "coin inserted" sound) */
-		if (m_mcu_reportcoin & 0x02) return 0x21;	/* coin 2 (will trigger "coin inserted" sound) */
-		if (m_mcu_reportcoin & 0x04) return 0x31;	/* coin 3 (will trigger "coin inserted" sound) */
+		status bits:
+		0 = mcu is ready to send data (read from c000)
+		1 = mcu has read data (from c000)
+		2 = unused
+		3 = unused
+		4-7 = coin code
+		      0 = nothing
+		      1,2,3 = coin switch pressed
+		      e = tilt
+		*/
+		if (m_mcu_reportcoin & 0x08) return 0xe1;   /* tilt */
+		if (m_mcu_reportcoin & 0x01) return 0x11;   /* coin 1 (will trigger "coin inserted" sound) */
+		if (m_mcu_reportcoin & 0x02) return 0x21;   /* coin 2 (will trigger "coin inserted" sound) */
+		if (m_mcu_reportcoin & 0x04) return 0x31;   /* coin 3 (will trigger "coin inserted" sound) */
 		return 0x01;
 	}
 }
@@ -411,18 +411,18 @@ WRITE8_MEMBER(tnzs_state::mcu_extrmatn_w)
 	else
 	{
 		/*
-        0xa0: read number of credits
-        0xa1: read number of credits, then buttons
-        0x01: read player 1 joystick + buttons
-        0x02: read player 2 joystick + buttons
-        0x1a: read coin switches
-        0x21: read service & tilt switches
-        0x4a+0x41: add value to number of credits
-        0x84: coin 1 lockout (issued only in test mode)
-        0x88: coin 2 lockout (issued only in test mode)
-        0x80: release coin lockout (issued only in test mode)
-        during initialization, a sequence of 4 bytes sets coin/credit settings
-        */
+		0xa0: read number of credits
+		0xa1: read number of credits, then buttons
+		0x01: read player 1 joystick + buttons
+		0x02: read player 2 joystick + buttons
+		0x1a: read coin switches
+		0x21: read service & tilt switches
+		0x4a+0x41: add value to number of credits
+		0x84: coin 1 lockout (issued only in test mode)
+		0x88: coin 2 lockout (issued only in test mode)
+		0x80: release coin lockout (issued only in test mode)
+		during initialization, a sequence of 4 bytes sets coin/credit settings
+		*/
 
 //      logerror("PC %04x: write %02x to mcu %04x\n", space.device().safe_pc(), data, 0xc000 + offset);
 
@@ -431,17 +431,17 @@ WRITE8_MEMBER(tnzs_state::mcu_extrmatn_w)
 			/* set up coin/credit settings */
 			m_mcu_coinage[m_mcu_coinage_init++] = data;
 			if (m_mcu_coinage_init == 4)
-				m_mcu_coinage_init = 0;	/* must not happen */
+				m_mcu_coinage_init = 0; /* must not happen */
 		}
 
 		if (data == 0xa1)
-			m_mcu_readcredits = 0;	/* reset input port number */
+			m_mcu_readcredits = 0;  /* reset input port number */
 
 		/* Dr Toppel decrements credits differently. So handle it */
 		if ((data == 0x09) && (m_mcu_type == MCU_DRTOPPEL || m_mcu_type == MCU_PLUMPOP))
-			m_mcu_credits = (m_mcu_credits - 1) & 0xff;		/* Player 1 start */
+			m_mcu_credits = (m_mcu_credits - 1) & 0xff;     /* Player 1 start */
 		if ((data == 0x18) && (m_mcu_type == MCU_DRTOPPEL || m_mcu_type == MCU_PLUMPOP))
-			m_mcu_credits = (m_mcu_credits - 2) & 0xff;		/* Player 2 start */
+			m_mcu_credits = (m_mcu_credits - 2) & 0xff;     /* Player 2 start */
 
 		m_mcu_command = data;
 	}
@@ -656,8 +656,8 @@ MACHINE_RESET_MEMBER(tnzs_state,tnzs)
 	m_screenflip = 0;
 	m_kageki_csport_sel = 0;
 	m_input_select = 0;
-	m_mcu_readcredits = 0;	// this might belong to mcu_reset
-	m_insertcoin = 0;		// this might belong to mcu_reset
+	m_mcu_readcredits = 0;  // this might belong to mcu_reset
+	m_insertcoin = 0;       // this might belong to mcu_reset
 }
 
 MACHINE_RESET_MEMBER(tnzs_state,jpopnics)

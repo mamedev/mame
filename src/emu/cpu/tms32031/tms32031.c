@@ -77,29 +77,29 @@ enum
 	TMR_RS,
 	TMR_RE,
 	TMR_RC,
-	TMR_R8,		// 3204x only
-	TMR_R9,		// 3204x only
-	TMR_R10,	// 3204x only
-	TMR_R11,	// 3204x only
-	TMR_TEMP1,	// used by the interpreter
-	TMR_TEMP2,	// used by the interpreter
-	TMR_TEMP3	// used by the interpreter
+	TMR_R8,     // 3204x only
+	TMR_R9,     // 3204x only
+	TMR_R10,    // 3204x only
+	TMR_R11,    // 3204x only
+	TMR_TEMP1,  // used by the interpreter
+	TMR_TEMP2,  // used by the interpreter
+	TMR_TEMP3   // used by the interpreter
 };
 
 // flags
-const int CFLAG		= 0x0001;
-const int VFLAG		= 0x0002;
-const int ZFLAG		= 0x0004;
-const int NFLAG		= 0x0008;
-const int UFFLAG	= 0x0010;
-const int LVFLAG	= 0x0020;
-const int LUFFLAG	= 0x0040;
-const int OVMFLAG	= 0x0080;
-const int RMFLAG	= 0x0100;
-const int CFFLAG	= 0x0400;
-const int CEFLAG	= 0x0800;
-const int CCFLAG	= 0x1000;
-const int GIEFLAG	= 0x2000;
+const int CFLAG     = 0x0001;
+const int VFLAG     = 0x0002;
+const int ZFLAG     = 0x0004;
+const int NFLAG     = 0x0008;
+const int UFFLAG    = 0x0010;
+const int LVFLAG    = 0x0020;
+const int LUFFLAG   = 0x0040;
+const int OVMFLAG   = 0x0080;
+const int RMFLAG    = 0x0100;
+const int CFFLAG    = 0x0400;
+const int CEFLAG    = 0x0800;
+const int CCFLAG    = 0x1000;
+const int GIEFLAG   = 0x2000;
 
 
 
@@ -107,7 +107,7 @@ const int GIEFLAG	= 0x2000;
 //  MACROS
 //**************************************************************************
 
-#define IREG(rnum)	(m_r[rnum].i32[0])
+#define IREG(rnum)  (m_r[rnum].i32[0])
 
 
 
@@ -282,18 +282,18 @@ void tms3203x_device::tmsreg::from_double(double val)
 
 tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, name, tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
-	  m_chip_type(chiptype),
-	  m_pc(0),
-	  m_bkmask(0),
-	  m_irq_state(0),
-	  m_delayed(false),
-	  m_irq_pending(false),
-	  m_is_idling(false),
-	  m_icount(0),
-	  m_irq_callback(0),
-	  m_program(0),
-	  m_direct(0)
+		m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
+		m_chip_type(chiptype),
+		m_pc(0),
+		m_bkmask(0),
+		m_irq_state(0),
+		m_delayed(false),
+		m_irq_pending(false),
+		m_is_idling(false),
+		m_icount(0),
+		m_irq_callback(0),
+		m_program(0),
+		m_direct(0)
 {
 	m_mcbl_mode = false;
 	m_xf0_w = NULL;
@@ -373,8 +373,8 @@ const rom_entry *tms3203x_device::device_rom_region() const
 	switch (m_chip_type)
 	{
 		default:
-		case CHIP_TYPE_TMS32031:	return ROM_NAME( tms32031 );
-		case CHIP_TYPE_TMS32032:	return ROM_NAME( tms32032 );
+		case CHIP_TYPE_TMS32031:    return ROM_NAME( tms32031 );
+		case CHIP_TYPE_TMS32032:    return ROM_NAME( tms32032 );
 	}
 }
 
@@ -591,12 +591,12 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, astri
 			string.printf("%c%c%c%c%c%c%c%c",
 				(temp & 0x80) ? 'O':'.',
 				(temp & 0x40) ? 'U':'.',
-                (temp & 0x20) ? 'V':'.',
-                (temp & 0x10) ? 'u':'.',
-                (temp & 0x08) ? 'n':'.',
-                (temp & 0x04) ? 'z':'.',
-                (temp & 0x02) ? 'v':'.',
-                (temp & 0x01) ? 'c':'.');
+				(temp & 0x20) ? 'V':'.',
+				(temp & 0x10) ? 'u':'.',
+				(temp & 0x08) ? 'n':'.',
+				(temp & 0x04) ? 'z':'.',
+				(temp & 0x02) ? 'v':'.',
+				(temp & 0x01) ? 'c':'.');
 			break;
 	}
 }
@@ -726,7 +726,7 @@ void tms3203x_device::check_irqs()
 		trap(whichtrap);
 
 		// after auto-clearing the interrupt bit, we need to re-trigger
-        // level-sensitive interrupts
+		// level-sensitive interrupts
 		if (m_chip_type == CHIP_TYPE_TMS32031 || (IREG(TMR_ST) & 0x4000) == 0)
 			IREG(TMR_IF) |= m_irq_state & 0x0f;
 	}
@@ -788,17 +788,17 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 
 	// update the external state
 	UINT16 intmask = 1 << inputnum;
-    if (state == ASSERT_LINE)
-    {
+	if (state == ASSERT_LINE)
+	{
 		m_irq_state |= intmask;
-	    IREG(TMR_IF) |= intmask;
+		IREG(TMR_IF) |= intmask;
 	}
 	else
 		m_irq_state &= ~intmask;
 
 	// external interrupts are level-sensitive on the '31 and can be
-    // configured as such on the '32; in that case, if the external
-    // signal is high, we need to update the value in IF accordingly
+	// configured as such on the '32; in that case, if the external
+	// signal is high, we need to update the value in IF accordingly
 	if (m_chip_type == CHIP_TYPE_TMS32031 || (IREG(TMR_ST) & 0x4000) == 0)
 		IREG(TMR_IF) |= m_irq_state & 0x0f;
 }

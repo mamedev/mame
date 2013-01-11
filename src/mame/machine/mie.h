@@ -8,13 +8,13 @@
 
 #define MCFG_MIE_ADD(_tag, _clock, _host_tag, _host_port, g0, g1, g2, g3, g4, g5, g6, g7) \
 	MCFG_MAPLE_DEVICE_ADD(_tag "_maple", MIE, _clock, _host_tag, _host_port) \
-	mie_device::static_set_gpio_name(*device, 0, g0);	\
-	mie_device::static_set_gpio_name(*device, 1, g1);	\
-	mie_device::static_set_gpio_name(*device, 2, g2);	\
-	mie_device::static_set_gpio_name(*device, 3, g3);	\
-	mie_device::static_set_gpio_name(*device, 4, g4);	\
-	mie_device::static_set_gpio_name(*device, 5, g5);	\
-	mie_device::static_set_gpio_name(*device, 6, g6);	\
+	mie_device::static_set_gpio_name(*device, 0, g0);   \
+	mie_device::static_set_gpio_name(*device, 1, g1);   \
+	mie_device::static_set_gpio_name(*device, 2, g2);   \
+	mie_device::static_set_gpio_name(*device, 3, g3);   \
+	mie_device::static_set_gpio_name(*device, 4, g4);   \
+	mie_device::static_set_gpio_name(*device, 5, g5);   \
+	mie_device::static_set_gpio_name(*device, 6, g6);   \
 	mie_device::static_set_gpio_name(*device, 7, g7); \
 	mie_device::static_set_jvs_name(*device, _tag); \
 	MCFG_DEVICE_ADD(_tag, MIE_JVS, _clock)

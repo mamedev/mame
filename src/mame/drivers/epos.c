@@ -108,12 +108,12 @@ WRITE8_MEMBER(epos_state::write_prtc)
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("INPUTS"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(epos_state,write_prtc)		/* Port C write */
+	DEVCB_INPUT_PORT("INPUTS"),     /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_DRIVER_MEMBER(epos_state,write_prtc)      /* Port C write */
 };
 
 
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( megadon )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL )	/* this has to be HI */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL )   /* this has to be HI */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL )   /* this has to be HI */
 
 	PORT_START("INPUTS")
@@ -216,7 +216,7 @@ static INPUT_PORTS_START( suprglob )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* this has to be LO */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* this has to be LO */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL )   /* this has to be HI */
 
 	PORT_START("INPUTS")
@@ -270,7 +270,7 @@ static INPUT_PORTS_START( igmo )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL )	/* this has to be HI */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL )   /* this has to be HI */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL )   /* this has to be HI */
 
 	PORT_START("INPUTS")
@@ -289,7 +289,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( catapult )
 	PORT_INCLUDE(igmo)
-        PORT_MODIFY("DSW")
+		PORT_MODIFY("DSW")
 
 // There are odd port mappings (old=new)
 // 02=08, 04=20, 08=40, 10=02, 20=10, 40=04
@@ -395,7 +395,7 @@ MACHINE_START_MEMBER(epos_state,dealer)
 static MACHINE_CONFIG_START( epos, epos_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)    /* 2.75 MHz (see notes) */
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -419,7 +419,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dealer, epos_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)    /* 2.75 MHz (see notes) */
 	MCFG_CPU_PROGRAM_MAP(dealer_map)
 	MCFG_CPU_IO_MAP(dealer_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -483,93 +483,93 @@ ROM_END
 
 ROM_START( suprglob )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u10",			0x0000, 0x1000, CRC(c0141324) SHA1(a54bd71da233eb22f45da630693fddd5a0bcf25b) )
-	ROM_LOAD( "u9",				0x1000, 0x1000, CRC(58be8128) SHA1(534f0a093b3ff577a2a5461498bc11ce14dc6d97) )
-	ROM_LOAD( "u8",				0x2000, 0x1000, CRC(6d088c16) SHA1(0929ea1b58eab997b5d9c9642f8b47557a4045f1) )
-	ROM_LOAD( "u7",				0x3000, 0x1000, CRC(b2768203) SHA1(9de52f4dbe6a46ea1b9b7f9cf70378211d372353) )
-	ROM_LOAD( "u6",				0x4000, 0x1000, CRC(976c8f46) SHA1(120c76eff8c04ccb5ad945c4333e8c9de0cbc3af) )
-	ROM_LOAD( "u5",				0x5000, 0x1000, CRC(340f5290) SHA1(2e5fa0c41d1626e5a435f2c55eec0bcdcb004223) )
-	ROM_LOAD( "u4",				0x6000, 0x1000, CRC(173bd589) SHA1(25690a0c3cd0e017f8d220d8fbf2eaeb86f05fc5) )
-	ROM_LOAD( "u11",			0x7000, 0x0800, CRC(d45b740d) SHA1(54c15f378b6d91ea1aba0a51921178bb15854079) )
+	ROM_LOAD( "u10",            0x0000, 0x1000, CRC(c0141324) SHA1(a54bd71da233eb22f45da630693fddd5a0bcf25b) )
+	ROM_LOAD( "u9",             0x1000, 0x1000, CRC(58be8128) SHA1(534f0a093b3ff577a2a5461498bc11ce14dc6d97) )
+	ROM_LOAD( "u8",             0x2000, 0x1000, CRC(6d088c16) SHA1(0929ea1b58eab997b5d9c9642f8b47557a4045f1) )
+	ROM_LOAD( "u7",             0x3000, 0x1000, CRC(b2768203) SHA1(9de52f4dbe6a46ea1b9b7f9cf70378211d372353) )
+	ROM_LOAD( "u6",             0x4000, 0x1000, CRC(976c8f46) SHA1(120c76eff8c04ccb5ad945c4333e8c9de0cbc3af) )
+	ROM_LOAD( "u5",             0x5000, 0x1000, CRC(340f5290) SHA1(2e5fa0c41d1626e5a435f2c55eec0bcdcb004223) )
+	ROM_LOAD( "u4",             0x6000, 0x1000, CRC(173bd589) SHA1(25690a0c3cd0e017f8d220d8fbf2eaeb86f05fc5) )
+	ROM_LOAD( "u11",            0x7000, 0x0800, CRC(d45b740d) SHA1(54c15f378b6d91ea1aba0a51921178bb15854079) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
 ROM_END
 
 
 ROM_START( theglob )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "globu10.bin",	0x0000, 0x1000, CRC(08fdb495) SHA1(739efa676b5a3df36a6061382aeb8c2d495ba23f) )
-	ROM_LOAD( "globu9.bin",		0x1000, 0x1000, CRC(827cd56c) SHA1(3aedc1cefb463cf6b31befb33e50c832dc2e3941) )
-	ROM_LOAD( "globu8.bin",		0x2000, 0x1000, CRC(d1219966) SHA1(571349f9c978fdcf826a0c66c3fb11a9e27b240a) )
-	ROM_LOAD( "globu7.bin",		0x3000, 0x1000, CRC(b1649da7) SHA1(1509d48a72e545195e45d1170cdb113c6aecc8d9) )
-	ROM_LOAD( "globu6.bin",		0x4000, 0x1000, CRC(b3457e67) SHA1(1347bdf085ad69879f9a9e7e4ed1ca4869e8e8cd) )
-	ROM_LOAD( "globu5.bin",		0x5000, 0x1000, CRC(89d582cd) SHA1(f331c7a2fce606153992abb312c5406251a7fb3b) )
-	ROM_LOAD( "globu4.bin",		0x6000, 0x1000, CRC(7ee9fdeb) SHA1(a8e0dd5d1cdcff132edc0eb182b66656ce244fa1) )
-	ROM_LOAD( "globu11.bin",	0x7000, 0x0800, CRC(9e05dee3) SHA1(751799b23f0e664f59d3785b438ec3ae9f5bab2c) )
+	ROM_LOAD( "globu10.bin",    0x0000, 0x1000, CRC(08fdb495) SHA1(739efa676b5a3df36a6061382aeb8c2d495ba23f) )
+	ROM_LOAD( "globu9.bin",     0x1000, 0x1000, CRC(827cd56c) SHA1(3aedc1cefb463cf6b31befb33e50c832dc2e3941) )
+	ROM_LOAD( "globu8.bin",     0x2000, 0x1000, CRC(d1219966) SHA1(571349f9c978fdcf826a0c66c3fb11a9e27b240a) )
+	ROM_LOAD( "globu7.bin",     0x3000, 0x1000, CRC(b1649da7) SHA1(1509d48a72e545195e45d1170cdb113c6aecc8d9) )
+	ROM_LOAD( "globu6.bin",     0x4000, 0x1000, CRC(b3457e67) SHA1(1347bdf085ad69879f9a9e7e4ed1ca4869e8e8cd) )
+	ROM_LOAD( "globu5.bin",     0x5000, 0x1000, CRC(89d582cd) SHA1(f331c7a2fce606153992abb312c5406251a7fb3b) )
+	ROM_LOAD( "globu4.bin",     0x6000, 0x1000, CRC(7ee9fdeb) SHA1(a8e0dd5d1cdcff132edc0eb182b66656ce244fa1) )
+	ROM_LOAD( "globu11.bin",    0x7000, 0x0800, CRC(9e05dee3) SHA1(751799b23f0e664f59d3785b438ec3ae9f5bab2c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
 ROM_END
 
 
 ROM_START( theglob2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "611293.u10",		0x0000, 0x1000, CRC(870af7ce) SHA1(f901619663313a72997f30ccecdeac8294fe200e) )
-	ROM_LOAD( "611293.u9",		0x1000, 0x1000, CRC(a3679782) SHA1(fbc26ae98e2bf10272d61159b084d78a6f410374) )
-	ROM_LOAD( "611293.u8",		0x2000, 0x1000, CRC(67499d1a) SHA1(dce7041df5ed1847e0ffc82672d09e00b16de3a9) )
-	ROM_LOAD( "611293.u7",		0x3000, 0x1000, CRC(55e53aac) SHA1(20a428db287e8b7fb55cb9fe1a1ed0196481114c) )
-	ROM_LOAD( "611293.u6",		0x4000, 0x1000, CRC(c64ad743) SHA1(572ff6acb9b2281581974646e96699d7d2388aff) )
-	ROM_LOAD( "611293.u5",		0x5000, 0x1000, CRC(f93c3203) SHA1(8cb88b5202e99d206eccf7d25e168cf23acee19b) )
-	ROM_LOAD( "611293.u4",		0x6000, 0x1000, CRC(ceea0018) SHA1(511430539429ef0e5368f7b605f2e680ca9038bc) )
-	ROM_LOAD( "611293.u11",		0x7000, 0x0800, CRC(6ac83f9b) SHA1(b1e8482ec04107f0e595a714b7c0f70571aca6e5) )
+	ROM_LOAD( "611293.u10",     0x0000, 0x1000, CRC(870af7ce) SHA1(f901619663313a72997f30ccecdeac8294fe200e) )
+	ROM_LOAD( "611293.u9",      0x1000, 0x1000, CRC(a3679782) SHA1(fbc26ae98e2bf10272d61159b084d78a6f410374) )
+	ROM_LOAD( "611293.u8",      0x2000, 0x1000, CRC(67499d1a) SHA1(dce7041df5ed1847e0ffc82672d09e00b16de3a9) )
+	ROM_LOAD( "611293.u7",      0x3000, 0x1000, CRC(55e53aac) SHA1(20a428db287e8b7fb55cb9fe1a1ed0196481114c) )
+	ROM_LOAD( "611293.u6",      0x4000, 0x1000, CRC(c64ad743) SHA1(572ff6acb9b2281581974646e96699d7d2388aff) )
+	ROM_LOAD( "611293.u5",      0x5000, 0x1000, CRC(f93c3203) SHA1(8cb88b5202e99d206eccf7d25e168cf23acee19b) )
+	ROM_LOAD( "611293.u4",      0x6000, 0x1000, CRC(ceea0018) SHA1(511430539429ef0e5368f7b605f2e680ca9038bc) )
+	ROM_LOAD( "611293.u11",     0x7000, 0x0800, CRC(6ac83f9b) SHA1(b1e8482ec04107f0e595a714b7c0f70571aca6e5) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
 ROM_END
 
 
 ROM_START( theglob3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "theglob3.u10",	0x0000, 0x1000, CRC(969cfaf6) SHA1(b63226b8694640d6452bca12755780d1b52d1d3c) )
-	ROM_LOAD( "theglob3.u9",	0x1000, 0x1000, CRC(8e6c010a) SHA1(ec9627742ce52eb29bbafc9d0555d16ac7146f2e) )
-	ROM_LOAD( "theglob3.u8",	0x2000, 0x1000, CRC(1c1ca5c8) SHA1(6e5f9d7f9f016a72003433375c806c5f921ed423) )
-	ROM_LOAD( "theglob3.u7",	0x3000, 0x1000, CRC(a54b9d22) SHA1(3db96d1f55642ecf1ebc76387cac76e8f9721919) )
-	ROM_LOAD( "theglob3.u6",	0x4000, 0x1000, CRC(5a6f82a9) SHA1(ea92ad949373e8b1f06c65f243ceedad2fdcd934) )
-	ROM_LOAD( "theglob3.u5",	0x5000, 0x1000, CRC(72f935db) SHA1(d7023cf5f16a77a42590a9c97c2690ac0e3d282a) )
-	ROM_LOAD( "theglob3.u4",	0x6000, 0x1000, CRC(81db53ad) SHA1(a1e4aa8e08ca0f585b3638a3849a465977d44af0) )
-	ROM_LOAD( "theglob3.u11",	0x7000, 0x0800, CRC(0e2e6359) SHA1(f231637ad4c997406989cf5a701d26c95e69171e) )
+	ROM_LOAD( "theglob3.u10",   0x0000, 0x1000, CRC(969cfaf6) SHA1(b63226b8694640d6452bca12755780d1b52d1d3c) )
+	ROM_LOAD( "theglob3.u9",    0x1000, 0x1000, CRC(8e6c010a) SHA1(ec9627742ce52eb29bbafc9d0555d16ac7146f2e) )
+	ROM_LOAD( "theglob3.u8",    0x2000, 0x1000, CRC(1c1ca5c8) SHA1(6e5f9d7f9f016a72003433375c806c5f921ed423) )
+	ROM_LOAD( "theglob3.u7",    0x3000, 0x1000, CRC(a54b9d22) SHA1(3db96d1f55642ecf1ebc76387cac76e8f9721919) )
+	ROM_LOAD( "theglob3.u6",    0x4000, 0x1000, CRC(5a6f82a9) SHA1(ea92ad949373e8b1f06c65f243ceedad2fdcd934) )
+	ROM_LOAD( "theglob3.u5",    0x5000, 0x1000, CRC(72f935db) SHA1(d7023cf5f16a77a42590a9c97c2690ac0e3d282a) )
+	ROM_LOAD( "theglob3.u4",    0x6000, 0x1000, CRC(81db53ad) SHA1(a1e4aa8e08ca0f585b3638a3849a465977d44af0) )
+	ROM_LOAD( "theglob3.u11",   0x7000, 0x0800, CRC(0e2e6359) SHA1(f231637ad4c997406989cf5a701d26c95e69171e) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) )
 ROM_END
 
 
 ROM_START( igmo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "igmo-u10.732",	0x0000, 0x1000, CRC(a9f691a4) SHA1(e3f2dc41bd8760fc52e99b7e9faa12c7cf51ffe0) )
-	ROM_LOAD( "igmo-u9.732",	0x1000, 0x1000, CRC(3c133c97) SHA1(002b5aff6b947b6a9cbabeed5be798c1ddf2bda1) )
-	ROM_LOAD( "igmo-u8.732",	0x2000, 0x1000, CRC(5692f8d8) SHA1(6ab50775dff49330a85fbfb2d4d4c3a2e54df3d1) )
-	ROM_LOAD( "igmo-u7.732",	0x3000, 0x1000, CRC(630ae2ed) SHA1(0c293b6192e703b16ed20c277c706ae90773f477) )
-	ROM_LOAD( "igmo-u6.732",	0x4000, 0x1000, CRC(d3f20e1d) SHA1(c0e0b542ac020adc085ec90c2462c6544098447e) )
-	ROM_LOAD( "igmo-u5.732",	0x5000, 0x1000, CRC(e26bb391) SHA1(ba0e44c02fbb36e18e0d779d46bb992e6aba6cf1) )
-	ROM_LOAD( "igmo-u4.732",	0x6000, 0x1000, CRC(762a4417) SHA1(7fed5221950e3e1ce41c0b4ded44597a242a0177) )
-	ROM_LOAD( "igmo-u11.716",	0x7000, 0x0800, CRC(8c675837) SHA1(2725729693960b53ea01ebffa0a81df2cd425890) )
+	ROM_LOAD( "igmo-u10.732",   0x0000, 0x1000, CRC(a9f691a4) SHA1(e3f2dc41bd8760fc52e99b7e9faa12c7cf51ffe0) )
+	ROM_LOAD( "igmo-u9.732",    0x1000, 0x1000, CRC(3c133c97) SHA1(002b5aff6b947b6a9cbabeed5be798c1ddf2bda1) )
+	ROM_LOAD( "igmo-u8.732",    0x2000, 0x1000, CRC(5692f8d8) SHA1(6ab50775dff49330a85fbfb2d4d4c3a2e54df3d1) )
+	ROM_LOAD( "igmo-u7.732",    0x3000, 0x1000, CRC(630ae2ed) SHA1(0c293b6192e703b16ed20c277c706ae90773f477) )
+	ROM_LOAD( "igmo-u6.732",    0x4000, 0x1000, CRC(d3f20e1d) SHA1(c0e0b542ac020adc085ec90c2462c6544098447e) )
+	ROM_LOAD( "igmo-u5.732",    0x5000, 0x1000, CRC(e26bb391) SHA1(ba0e44c02fbb36e18e0d779d46bb992e6aba6cf1) )
+	ROM_LOAD( "igmo-u4.732",    0x6000, 0x1000, CRC(762a4417) SHA1(7fed5221950e3e1ce41c0b4ded44597a242a0177) )
+	ROM_LOAD( "igmo-u11.716",   0x7000, 0x0800, CRC(8c675837) SHA1(2725729693960b53ea01ebffa0a81df2cd425890) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, NO_DUMP )	/* missing */
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
 ROM_END
 
 
 ROM_START( dealer )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "u1.bin",			0x0000, 0x2000, CRC(e06f3563) SHA1(0d58cd1f2e1ca89adb9c64d7dd520bb1f2d50f1a) )
-	ROM_LOAD( "u2.bin",			0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
-	ROM_LOAD( "u3.bin",			0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
-	ROM_LOAD( "u4.bin",			0x6000, 0x2000, CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
+	ROM_LOAD( "u1.bin",         0x0000, 0x2000, CRC(e06f3563) SHA1(0d58cd1f2e1ca89adb9c64d7dd520bb1f2d50f1a) )
+	ROM_LOAD( "u2.bin",         0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
+	ROM_LOAD( "u3.bin",         0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
+	ROM_LOAD( "u4.bin",         0x6000, 0x2000, CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, NO_DUMP )	/* missing */
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
 ROM_END
 
 /*
@@ -600,7 +600,7 @@ ROM_START( revenger )
 	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, CRC(0b81c303) BAD_DUMP SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, NO_DUMP )	/* missing */
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
 ROM_END
 
 DRIVER_INIT_MEMBER(epos_state,dealer)
@@ -625,22 +625,22 @@ DRIVER_INIT_MEMBER(epos_state,dealer)
 		rom[A + 0x30000] = BITSWAP8(rom[A] ^ 1, 7,5,4,6,3,0,2,1 );
 
 	/*
-        there is not enough data to determine key 3.
-        the code in question is this:
+	    there is not enough data to determine key 3.
+	    the code in question is this:
 
-        [this is the data as decrypted by Key 1]
-        2F58: 55 5C 79
-        2F5B: 55 F7 79
-        2F5E: 55 CD 79
+	    [this is the data as decrypted by Key 1]
+	    2F58: 55 5C 79
+	    2F5B: 55 F7 79
+	    2F5E: 55 CD 79
 
-        it must become
+	    it must become
 
-        2F58: 32 3e 78  ld (793e),a
-        2F5B: 32 xx 78  ld (79xx),a
-        2F5E: 32 xx 78  ld (79xx),a
+	    2F58: 32 3e 78  ld (793e),a
+	    2F5B: 32 xx 78  ld (79xx),a
+	    2F5E: 32 xx 78  ld (79xx),a
 
-        the obvious solution is a combination of key 1 and key 2.
-    */
+	    the obvious solution is a combination of key 1 and key 2.
+	*/
 }
 
 
@@ -650,12 +650,12 @@ DRIVER_INIT_MEMBER(epos_state,dealer)
  *
  *************************************/
 
-GAME( 1982, megadon,  0,        epos,   megadon, driver_device,  0,	      ROT270, "Epos Corporation (Photar Industries license)", "Megadon", GAME_SUPPORTS_SAVE )
-GAME( 1982, catapult, 0,        epos,   catapult, driver_device, 0,	      ROT270, "Epos Corporation", "Catapult", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
-GAME( 1983, suprglob, 0,        epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "Super Glob", GAME_SUPPORTS_SAVE )
-GAME( 1983, theglob,  suprglob, epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "The Glob", GAME_SUPPORTS_SAVE )
-GAME( 1983, theglob2, suprglob, epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "The Glob (earlier)", GAME_SUPPORTS_SAVE )
-GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,	      ROT270, "Epos Corporation", "The Glob (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,	      ROT270, "Epos Corporation", "IGMO", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1982, megadon,  0,        epos,   megadon, driver_device,  0,       ROT270, "Epos Corporation (Photar Industries license)", "Megadon", GAME_SUPPORTS_SAVE )
+GAME( 1982, catapult, 0,        epos,   catapult, driver_device, 0,       ROT270, "Epos Corporation", "Catapult", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
+GAME( 1983, suprglob, 0,        epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "Super Glob", GAME_SUPPORTS_SAVE )
+GAME( 1983, theglob,  suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob", GAME_SUPPORTS_SAVE )
+GAME( 1983, theglob2, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (earlier)", GAME_SUPPORTS_SAVE )
+GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,       ROT270, "Epos Corporation", "IGMO", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

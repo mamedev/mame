@@ -7,7 +7,7 @@ static UINT32 pm_read32(SHARC_REGS *cpustate, UINT32 address)
 		UINT32 addr = (address & 0x7fff) * 3;
 
 		return (UINT32)(cpustate->internal_ram_block0[addr + 0] << 16) |
-					   (cpustate->internal_ram_block0[addr + 1]);
+						(cpustate->internal_ram_block0[addr + 1]);
 	}
 	else if (address >= 0x28000 && address < 0x40000)
 	{
@@ -15,7 +15,7 @@ static UINT32 pm_read32(SHARC_REGS *cpustate, UINT32 address)
 		UINT32 addr = (address & 0x7fff) * 3;
 
 		return (UINT32)(cpustate->internal_ram_block1[addr + 0] << 16) |
-					   (cpustate->internal_ram_block1[addr + 1]);
+						(cpustate->internal_ram_block1[addr + 1]);
 	}
 	else {
 		fatalerror("SHARC: PM Bus Read %08X at %08X\n", address, cpustate->pc);
@@ -53,8 +53,8 @@ static UINT64 pm_read48(SHARC_REGS *cpustate, UINT32 address)
 		UINT32 addr = (address & 0x7fff) * 3;
 
 		return ((UINT64)(cpustate->internal_ram_block0[addr + 0]) << 32) |
-			   ((UINT64)(cpustate->internal_ram_block0[addr + 1]) << 16) |
-			   ((UINT64)(cpustate->internal_ram_block0[addr + 2]) << 0);
+				((UINT64)(cpustate->internal_ram_block0[addr + 1]) << 16) |
+				((UINT64)(cpustate->internal_ram_block0[addr + 2]) << 0);
 	}
 	else if (address >= 0x28000 && address < 0x40000)
 	{
@@ -62,8 +62,8 @@ static UINT64 pm_read48(SHARC_REGS *cpustate, UINT32 address)
 		UINT32 addr = (address & 0x7fff) * 3;
 
 		return ((UINT64)(cpustate->internal_ram_block1[addr + 0]) << 32) |
-			   ((UINT64)(cpustate->internal_ram_block1[addr + 1]) << 16) |
-			   ((UINT64)(cpustate->internal_ram_block1[addr + 2]) << 0);
+				((UINT64)(cpustate->internal_ram_block1[addr + 1]) << 16) |
+				((UINT64)(cpustate->internal_ram_block1[addr + 2]) << 0);
 	}
 	else {
 		fatalerror("SHARC: PM Bus Read %08X at %08X\n", address, cpustate->pc);
@@ -109,7 +109,7 @@ static UINT32 dm_read32(SHARC_REGS *cpustate, UINT32 address)
 		UINT32 addr = (address & 0x7fff) * 2;
 
 		return (UINT32)(cpustate->internal_ram_block0[addr + 0] << 16) |
-					   (cpustate->internal_ram_block0[addr + 1]);
+						(cpustate->internal_ram_block0[addr + 1]);
 	}
 	else if (address >= 0x28000 && address < 0x40000)
 	{
@@ -117,7 +117,7 @@ static UINT32 dm_read32(SHARC_REGS *cpustate, UINT32 address)
 		UINT32 addr = (address & 0x7fff) * 2;
 
 		return (UINT32)(cpustate->internal_ram_block1[addr + 0] << 16) |
-					   (cpustate->internal_ram_block1[addr + 1]);
+						(cpustate->internal_ram_block1[addr + 1]);
 	}
 
 	// short word addressing

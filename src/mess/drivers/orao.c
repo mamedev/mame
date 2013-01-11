@@ -20,13 +20,13 @@
 
 /* Address maps */
 static ADDRESS_MAP_START(orao_mem, AS_PROGRAM, 8, orao_state )
-    AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_SHARE("memory")
-    AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_SHARE("video_ram") // video ram
-    AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(orao_io_r, orao_io_w )
-    AM_RANGE( 0xa000, 0xafff ) AM_RAM  // extension
-    AM_RANGE( 0xb000, 0xbfff ) AM_RAM  // DOS
-    AM_RANGE( 0xc000, 0xdfff ) AM_ROM
-    AM_RANGE( 0xe000, 0xffff ) AM_ROM
+	AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_SHARE("memory")
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_SHARE("video_ram") // video ram
+	AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(orao_io_r, orao_io_w )
+	AM_RANGE( 0xa000, 0xafff ) AM_RAM  // extension
+	AM_RANGE( 0xb000, 0xbfff ) AM_RAM  // DOS
+	AM_RANGE( 0xc000, 0xdfff ) AM_ROM
+	AM_RANGE( 0xe000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -173,11 +173,11 @@ static const cassette_interface orao_cassette_interface =
 
 
 static MACHINE_CONFIG_START( orao, orao_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M6502, 1000000)
-    MCFG_CPU_PROGRAM_MAP(orao_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6502, 1000000)
+	MCFG_CPU_PROGRAM_MAP(orao_mem)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( orao, orao_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 
-    /* audio hardware */
+	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.00)
@@ -202,18 +202,18 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( orao )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "bas12.rom", 0xc000, 0x2000, CRC(42ae6f69) SHA1(b9d4a544fae13a9c492af027545178addd557111) )
-    ROM_LOAD( "crt12.rom", 0xe000, 0x2000, CRC(94ebdc94) SHA1(3959d717f96558823ccc806c842d2fb5ab0c3890) )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bas12.rom", 0xc000, 0x2000, CRC(42ae6f69) SHA1(b9d4a544fae13a9c492af027545178addd557111) )
+	ROM_LOAD( "crt12.rom", 0xe000, 0x2000, CRC(94ebdc94) SHA1(3959d717f96558823ccc806c842d2fb5ab0c3890) )
 ROM_END
 
 ROM_START( orao103 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "bas13.rom", 0xc000, 0x2000, CRC(35daf5da) SHA1(499c5a4bd930c26ec6226623c2793b4c7f771658) )
-    ROM_LOAD( "crt13.rom", 0xe000, 0x2000, CRC(e7076014) SHA1(0e213287b0b520440af6a2a6297788a9356818c2) )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bas13.rom", 0xc000, 0x2000, CRC(35daf5da) SHA1(499c5a4bd930c26ec6226623c2793b4c7f771658) )
+	ROM_LOAD( "crt13.rom", 0xe000, 0x2000, CRC(e7076014) SHA1(0e213287b0b520440af6a2a6297788a9356818c2) )
 ROM_END
 
 /* Driver */
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT           COMPANY          FULLNAME       FLAGS */
-COMP( 1984, orao,     0,      0,		orao,	orao, orao_state,	orao,	   "PEL Varazdin", "Orao 102",		 0)
-COMP( 1985, orao103,  orao,   0,		orao,	orao, orao_state,	orao103,   "PEL Varazdin", "Orao 103",		 0)
+COMP( 1984, orao,     0,      0,        orao,   orao, orao_state,   orao,      "PEL Varazdin", "Orao 102",       0)
+COMP( 1985, orao103,  orao,   0,        orao,   orao, orao_state,   orao103,   "PEL Varazdin", "Orao 103",       0)

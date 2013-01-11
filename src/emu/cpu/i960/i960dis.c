@@ -10,8 +10,8 @@
 
 struct mnemonic_t
 {
-	const char		*mnem;
-	unsigned short	type;
+	const char      *mnem;
+	unsigned short  type;
 };
 
 
@@ -103,12 +103,12 @@ static const char *const regnames[32] =
 	"g0","g1","g2","g3", "g4","g5","g6","g7", "g8","g9","g10","g11", "g12","g13","g14","fp",
 };
 
-#define REG_DST		regnames[dst]
-#define REG_ABASE	regnames[abase]
-#define REG_REG2	regnames[reg2]
-#define REG_COBR_SRC1	((iCode & 0x2000) ? constnames[COBRSRC1] : regnames[COBRSRC1])
-#define REG_COBR_SRC2	regnames[COBRSRC2]
-#define NEM	    	mnemonic[op].mnem
+#define REG_DST     regnames[dst]
+#define REG_ABASE   regnames[abase]
+#define REG_REG2    regnames[reg2]
+#define REG_COBR_SRC1   ((iCode & 0x2000) ? constnames[COBRSRC1] : regnames[COBRSRC1])
+#define REG_COBR_SRC2   regnames[COBRSRC2]
+#define NEM         mnemonic[op].mnem
 
 // REG format
 #define SRC1 (iCode & 0x1f)
@@ -135,17 +135,17 @@ static char *dis_decode_reg(unsigned long iCode, char* tmpStr,unsigned char cnt)
 	if (S1) src1[0] = 0;
 	else
 	{
-		if(M1)	sprintf(src1,"0x%lx",SRC1);
-		else		sprintf(src1,"%s",regnames[SRC1]);
+		if(M1)  sprintf(src1,"0x%lx",SRC1);
+		else        sprintf(src1,"%s",regnames[SRC1]);
 	}
 	if (S2) sprintf(src2,"reserved");
 	else
 	{
-		if(M2)	sprintf(src2,"0x%lx,",SRC2);
-		else		sprintf(src2,"%s,",regnames[SRC2]);
+		if(M2)  sprintf(src2,"0x%lx,",SRC2);
+		else        sprintf(src2,"%s,",regnames[SRC2]);
 	}
-	if(M3)		dst[0] = 0;
-	else			sprintf(dst,"%s,",regnames[DST]);
+	if(M3)      dst[0] = 0;
+	else            sprintf(dst,"%s,",regnames[DST]);
 	if (cnt == 1)
 		sprintf(tmpStr,"%s%s",dst,src1);
 	else
@@ -302,4 +302,3 @@ CPU_DISASSEMBLE( i960  )
 
 	return dis.IPinc | dis.disflags | DASMFLAG_SUPPORTED;
 }
-

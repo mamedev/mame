@@ -30,7 +30,7 @@ class istellar_state : public driver_device
 public:
 	istellar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") ,
+			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
 		m_sprite_ram(*this, "sprite_ram"){ }
@@ -112,7 +112,7 @@ WRITE8_MEMBER(istellar_state::z80_0_latch2_write)
 	if (m_z80_2_nmi_enable)
 	{
 		logerror("Executing an NMI on CPU2\n");
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);      /* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
 		m_z80_2_nmi_enable = 0;
 	}
 }
@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_2_mem, AS_PROGRAM, 8, istellar_state )
 	AM_RANGE(0x0000,0x17ff) AM_ROM
 	AM_RANGE(0x1800,0x1fff) AM_RAM
-	AM_RANGE(0xc000,0xc000) AM_READ(z80_2_unknown_read)		/* Seems to be thrown away every time it's read - maybe interrupt related? */
+	AM_RANGE(0xc000,0xc000) AM_READ(z80_2_unknown_read)     /* Seems to be thrown away every time it's read - maybe interrupt related? */
 ADDRESS_MAP_END
 
 
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( istellar )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/* NOTE - bit 0x80 in the above read is combined with bits 0x03 in the below read to form the Coin_B
-              settings.  I'm unaware of what mechanism MAME will use to make this work right? */
+	          settings.  I'm unaware of what mechanism MAME will use to make this work right? */
 
 	/* "In case of inter-stellar upright type the coin switch 2 is not used."  Quoth the manual. */
 	PORT_START("DSW2")
@@ -246,7 +246,7 @@ static INPUT_PORTS_START( istellar )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:!5")		/* Maybe SERVICE? */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:!5")        /* Maybe SERVICE? */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH )
@@ -369,31 +369,31 @@ MACHINE_CONFIG_END
 ROM_START( istellar )
 	/* Main program CPU */
 	ROM_REGION( 0xa000, "maincpu", 0 )
-	ROM_LOAD( "rom2.top", 0x0000, 0x2000, CRC(5d643381) SHA1(75ca52c28a52f534eda00c18b0db97e9923ff670) )	/* At IC location C63 (top board) - label ? */
-	ROM_LOAD( "rom3.top", 0x2000, 0x2000, CRC(ce5a2b09) SHA1(2de6a6e993c3411577ac0c834db8aaf16fb007ed) )	/* At IC location C64 (top board) - label ? */
-	ROM_LOAD( "rom4.top", 0x4000, 0x2000, CRC(7c2cb1f1) SHA1(ffd92510c03c2d35a59d233883c2b9f57394a51c) )	/* At IC location C65 (top board) - label ? */
-	ROM_LOAD( "rom5.top", 0x6000, 0x2000, CRC(354377f6) SHA1(bcf95b7ee1b47854e10baf24b0d8af3d56738b99) )	/* At IC location C66 (top board) - label ? */
-	ROM_LOAD( "rom6.top", 0x8000, 0x2000, CRC(0319bf40) SHA1(f324626e457c3eb7d6b74bc6afbfcc3aab2b3c72) )	/* At IC location C67 (top board) - label ? */
+	ROM_LOAD( "rom2.top", 0x0000, 0x2000, CRC(5d643381) SHA1(75ca52c28a52f534eda00c18b0db97e9923ff670) )    /* At IC location C63 (top board) - label ? */
+	ROM_LOAD( "rom3.top", 0x2000, 0x2000, CRC(ce5a2b09) SHA1(2de6a6e993c3411577ac0c834db8aaf16fb007ed) )    /* At IC location C64 (top board) - label ? */
+	ROM_LOAD( "rom4.top", 0x4000, 0x2000, CRC(7c2cb1f1) SHA1(ffd92510c03c2d35a59d233883c2b9f57394a51c) )    /* At IC location C65 (top board) - label ? */
+	ROM_LOAD( "rom5.top", 0x6000, 0x2000, CRC(354377f6) SHA1(bcf95b7ee1b47854e10baf24b0d8af3d56738b99) )    /* At IC location C66 (top board) - label ? */
+	ROM_LOAD( "rom6.top", 0x8000, 0x2000, CRC(0319bf40) SHA1(f324626e457c3eb7d6b74bc6afbfcc3aab2b3c72) )    /* At IC location C67 (top board) - label ? */
 
 	/* Sound CPU */
 	ROM_REGION( 0x2000, "audiocpu", 0 )
-	ROM_LOAD( "rom1.top", 0x0000, 0x2000, CRC(4f34fb1d) SHA1(56ca19344c84c5989d0be797e2759f84760310be) )	/* At IC location C62 (top board) - label ? */
+	ROM_LOAD( "rom1.top", 0x0000, 0x2000, CRC(4f34fb1d) SHA1(56ca19344c84c5989d0be797e2759f84760310be) )    /* At IC location C62 (top board) - label ? */
 
 	/* LDP Communications CPU */
 	ROM_REGION( 0x2000, "sub", 0 )
-	ROM_LOAD( "rom11.bot", 0x0000, 0x2000, CRC(165cbc57) SHA1(39463888f22ec3125f0686066d923a9aae79a8f7) )	/* At IC location C12 (bottom board) - label IS11 */
+	ROM_LOAD( "rom11.bot", 0x0000, 0x2000, CRC(165cbc57) SHA1(39463888f22ec3125f0686066d923a9aae79a8f7) )   /* At IC location C12 (bottom board) - label IS11 */
 
 	/* Tiles */
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "rom9.bot", 0x0000, 0x2000, CRC(9d79acb6) SHA1(72af972695face0016afce8a26c629d963e86d48) )	/* At IC location C47? (bottom board) - label ? */
-	ROM_LOAD( "rom8.bot", 0x2000, 0x2000, CRC(e9c9e490) SHA1(79aa35552b984018bc723adece5c40a0833a313c) )	/* At IC location C48? (bottom board) - label ? */
-	ROM_LOAD( "rom7.bot", 0x4000, 0x2000, CRC(1447ce3a) SHA1(8545cec108df6adab303802b1407c89b2dceba21) )	/* At IC location C49? (bottom board) - label ? */
+	ROM_LOAD( "rom9.bot", 0x0000, 0x2000, CRC(9d79acb6) SHA1(72af972695face0016afce8a26c629d963e86d48) )    /* At IC location C47? (bottom board) - label ? */
+	ROM_LOAD( "rom8.bot", 0x2000, 0x2000, CRC(e9c9e490) SHA1(79aa35552b984018bc723adece5c40a0833a313c) )    /* At IC location C48? (bottom board) - label ? */
+	ROM_LOAD( "rom7.bot", 0x4000, 0x2000, CRC(1447ce3a) SHA1(8545cec108df6adab303802b1407c89b2dceba21) )    /* At IC location C49? (bottom board) - label ? */
 
 	/* Color PROMs */
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "red6b.bot",   0x000, 0x100, CRC(5c52f844) SHA1(a8a3d91f3247ad13c805d8d8288b07f3cdaf1189) )	/* At IC location C63? (bottom board) - label ? */
-	ROM_LOAD( "green6c.bot", 0x100, 0x100, CRC(7d8c845c) SHA1(04ae2ca0cc6679e21346ce34e9e01aa5bf4e2067) )	/* At IC location C62? (bottom board) - label ? */
-	ROM_LOAD( "blue6d.bot",  0x200, 0x100, CRC(5ebb81f9) SHA1(285d60f2894c524ca80fc68ad7c2dfd9093a67ea) )	/* At IC location C61? (bottom board) - label ? */
+	ROM_LOAD( "red6b.bot",   0x000, 0x100, CRC(5c52f844) SHA1(a8a3d91f3247ad13c805d8d8288b07f3cdaf1189) )   /* At IC location C63? (bottom board) - label ? */
+	ROM_LOAD( "green6c.bot", 0x100, 0x100, CRC(7d8c845c) SHA1(04ae2ca0cc6679e21346ce34e9e01aa5bf4e2067) )   /* At IC location C62? (bottom board) - label ? */
+	ROM_LOAD( "blue6d.bot",  0x200, 0x100, CRC(5ebb81f9) SHA1(285d60f2894c524ca80fc68ad7c2dfd9093a67ea) )   /* At IC location C61? (bottom board) - label ? */
 
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "istellar", 0, NO_DUMP )

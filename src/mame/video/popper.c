@@ -19,13 +19,13 @@
 
 static const res_net_decode_info popper_decode_info =
 {
-	1,		// there may be two proms needed to construct color
-	0,		// start at 0
-	63,	// end at 255
+	1,      // there may be two proms needed to construct color
+	0,      // start at 0
+	63, // end at 255
 	//  R,   G,   B,
-	{   0,   0,   0, },		// offsets
-	{   0,   3,   6, },		// shifts
-	{0x07,0x07,0x03, }	    // masks
+	{   0,   0,   0, },     // offsets
+	{   0,   3,   6, },     // shifts
+	{0x07,0x07,0x03, }      // masks
 };
 
 static const res_net_info popper_net_info =
@@ -47,7 +47,7 @@ static const res_net_info popper_net_info =
 void popper_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	rgb_t	*rgb;
+	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &popper_decode_info, &popper_net_info);
 	palette_set_colors(machine(), 0, rgb, 64);

@@ -129,13 +129,13 @@ static void CX4_op1f(running_machine &machine)
 	}
 	else
 	{
-    	cx4.tanval = ((double)cx4.C41FYVal) / ((double)cx4.C41FXVal);
-    	cx4.C41FAngleRes = (INT16)(atan(cx4.tanval) / (PI * 2) * 512);
-    	cx4.C41FAngleRes = cx4.C41FAngleRes;
-    	if(cx4.C41FXVal < 0)
-    	{
-    		cx4.C41FAngleRes += 0x100;
-    	}
+		cx4.tanval = ((double)cx4.C41FYVal) / ((double)cx4.C41FXVal);
+		cx4.C41FAngleRes = (INT16)(atan(cx4.tanval) / (PI * 2) * 512);
+		cx4.C41FAngleRes = cx4.C41FAngleRes;
+		if(cx4.C41FXVal < 0)
+		{
+			cx4.C41FAngleRes += 0x100;
+		}
 		cx4.C41FAngleRes &= 0x1ff;
 	}
 	CX4_writew(machine, 0x1f86, cx4.C41FAngleRes);

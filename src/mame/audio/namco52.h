@@ -8,11 +8,11 @@
 
 struct namco_52xx_interface
 {
-	const char *	discrete;	/* name of the discrete sound device */
-	int				firstnode;	/* index of the first node */
-	attoseconds_t	extclock;	/* external clock period */
-	devcb_read8		romread;	/* ROM read handler */
-	devcb_read8 	si;			/* SI (pin 6) read handler */
+	const char *    discrete;   /* name of the discrete sound device */
+	int             firstnode;  /* index of the first node */
+	attoseconds_t   extclock;   /* external clock period */
+	devcb_read8     romread;    /* ROM read handler */
+	devcb_read8     si;         /* SI (pin 6) read handler */
 };
 
 
@@ -48,7 +48,7 @@ extern const device_type NAMCO_52XX;
 
 
 /* discrete nodes */
-#define NAMCO_52XX_P_DATA(base)		(base)
+#define NAMCO_52XX_P_DATA(base)     (base)
 
 
-#endif	/* NAMCO52_H */
+#endif  /* NAMCO52_H */

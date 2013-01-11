@@ -43,29 +43,29 @@ public:
 
 static const sn76477_interface rotaryf_sn76477_interface =
 {
-	0,			/*  4 noise_res (N/C)        */
-	0,			/*  5 filter_res (N/C)       */
-	0,			/*  6 filter_cap (N/C)       */
-	0,			/*  7 decay_res (N/C)        */
-	0,			/*  8 attack_decay_cap (N/C) */
+	0,          /*  4 noise_res (N/C)        */
+	0,          /*  5 filter_res (N/C)       */
+	0,          /*  6 filter_cap (N/C)       */
+	0,          /*  7 decay_res (N/C)        */
+	0,          /*  8 attack_decay_cap (N/C) */
 	RES_K(100), /* 10 attack_res             */
-	RES_K(56),	/* 11 amplitude_res          */
-	RES_K(10),	/* 12 feedback_res           */
-	0,			/* 16 vco_voltage (N/C)      */
-	CAP_U(0.1),	/* 17 vco_cap                */
-	RES_K(8.2),	/* 18 vco_res                */
-	5.0,		/* 19 pitch_voltage          */
-	RES_K(120),	/* 20 slf_res                */
-	CAP_U(1.0),	/* 21 slf_cap                */
-	0,			/* 23 oneshot_cap (N/C)      */
-	0,			/* 24 oneshot_res (N/C)      */
-	1,			/* 22 vco                    */
-	0,			/* 26 mixer A                */
-	0,			/* 25 mixer B                */
-	0,			/* 27 mixer C                */
-	1,			/* 1  envelope 1             */
-	0,			/* 28 envelope 2             */
-	1			/* 9  enable (variable)      */
+	RES_K(56),  /* 11 amplitude_res          */
+	RES_K(10),  /* 12 feedback_res           */
+	0,          /* 16 vco_voltage (N/C)      */
+	CAP_U(0.1), /* 17 vco_cap                */
+	RES_K(8.2), /* 18 vco_res                */
+	5.0,        /* 19 pitch_voltage          */
+	RES_K(120), /* 20 slf_res                */
+	CAP_U(1.0), /* 21 slf_cap                */
+	0,          /* 23 oneshot_cap (N/C)      */
+	0,          /* 24 oneshot_res (N/C)      */
+	1,          /* 22 vco                    */
+	0,          /* 26 mixer A                */
+	0,          /* 25 mixer B                */
+	0,          /* 27 mixer C                */
+	1,          /* 1  envelope 1             */
+	0,          /* 28 envelope 2             */
+	1           /* 9  enable (variable)      */
 };
 
 
@@ -73,22 +73,22 @@ static const sn76477_interface rotaryf_sn76477_interface =
 static const char *const rotaryf_sample_names[] =
 {
 	"*invaders",
-	"1",		/* shot/missle */
-	"2",		/* base hit/explosion */
-	"3",		/* invader hit */
-	"4",		/* fleet move 1 */
-	"5",		/* fleet move 2 */
-	"6",		/* fleet move 3 */
-	"7",		/* fleet move 4 */
-	"8",		/* UFO/saucer hit */
-	"9",		/* bonus base */
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
 	0
 };
 
 
 static const samples_interface rotaryf_samples_interface =
 {
-	6,	/* 6 channels */
+	6,  /* 6 channels */
 	rotaryf_sample_names
 };
 
@@ -105,20 +105,20 @@ WRITE8_MEMBER( rotaryf_state::port28_w )
 {
 	UINT8 rising_bits = data & ~m_last;
 
-	if (BIT(rising_bits, 0)) m_samples->start (3, 7);	/* Hit Saucer */
-	if (BIT(rising_bits, 2)) m_samples->start (5, 8);	/* Bonus */
-	if (BIT(rising_bits, 5)) m_samples->start (1, 1);	/* Death */
-	if (BIT(rising_bits, 6)) m_samples->start (2, 2);	/* Hit */
-	if (BIT(rising_bits, 7)) m_samples->start (0, 0);	/* Shoot */
+	if (BIT(rising_bits, 0)) m_samples->start (3, 7);   /* Hit Saucer */
+	if (BIT(rising_bits, 2)) m_samples->start (5, 8);   /* Bonus */
+	if (BIT(rising_bits, 5)) m_samples->start (1, 1);   /* Death */
+	if (BIT(rising_bits, 6)) m_samples->start (2, 2);   /* Hit */
+	if (BIT(rising_bits, 7)) m_samples->start (0, 0);   /* Shoot */
 
-	sn76477_enable_w(m_sn, (data & 3) ? 1 : 0);		/* Saucer Sound */
+	sn76477_enable_w(m_sn, (data & 3) ? 1 : 0);     /* Saucer Sound */
 
 	if (BIT(rising_bits, 4))
 	{
 		if (BIT(rising_bits, 3))
-			m_samples->start (4, 3);		/* Fleet 1 */
+			m_samples->start (4, 3);        /* Fleet 1 */
 		else
-			m_samples->start (4, 6);		/* Fleet 2 */
+			m_samples->start (4, 6);        /* Fleet 2 */
 	}
 
 	m_last = data;
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( rotaryf_map, AS_PROGRAM, 8, rotaryf_state )
 	AM_RANGE(0x0000, 0x17ff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x7000, 0x73ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM	/* writes 00, 18, 27, 3C, 7E, FE to A019, A039, A059... A179 */
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM /* writes 00, 18, 27, 3C, 7E, FE to A019, A039, A059... A179 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rotaryf_io_map, AS_IO, 8, rotaryf_state )
@@ -252,7 +252,7 @@ static INPUT_PORTS_START( rotaryf )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
-	PORT_START("COCKTAIL")		/* Dummy port for cocktail mode */
+	PORT_START("COCKTAIL")      /* Dummy port for cocktail mode */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -269,7 +269,7 @@ static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
+	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size is a guess, taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(rotaryf_state, screen_update_rotaryf)

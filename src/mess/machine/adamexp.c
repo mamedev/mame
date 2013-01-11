@@ -37,10 +37,10 @@ const device_type ADAM_EXPANSION_SLOT = &device_creator<adam_expansion_slot_devi
 
 device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_rom(NULL),
-	  m_ram(NULL),
-	  m_rom_mask(0),
-	  m_ram_mask(0)
+		m_rom(NULL),
+		m_ram(NULL),
+		m_rom_mask(0),
+		m_ram_mask(0)
 {
 	m_slot = dynamic_cast<adam_expansion_slot_device *>(device.owner());
 }
@@ -99,7 +99,7 @@ UINT8* device_adam_expansion_slot_card_interface::adam_ram_pointer(running_machi
 //-------------------------------------------------
 
 adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock),
+		device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -133,7 +133,7 @@ void adam_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
 	}
 
 	// set brief and instance name

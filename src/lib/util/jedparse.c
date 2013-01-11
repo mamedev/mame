@@ -57,7 +57,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_PARSE		0
+#define LOG_PARSE       0
 
 
 
@@ -67,8 +67,8 @@
 
 struct parse_info
 {
-	UINT16		checksum;				/* checksum value */
-	UINT32		explicit_numfuses;		/* explicitly specified number of fuses */
+	UINT16      checksum;               /* checksum value */
+	UINT32      explicit_numfuses;      /* explicitly specified number of fuses */
 };
 
 
@@ -459,4 +459,3 @@ size_t jedbin_output(const jed_data *data, void *result, size_t length)
 	/* return the final size */
 	return 4 + (data->numfuses + 7) / 8;
 }
-

@@ -71,9 +71,9 @@ static void triplhnt_update_misc(address_space &space, int offset)
 	coin_lockout_w(space.machine(), 0, !(state->m_misc_flags & 0x08));
 	coin_lockout_w(space.machine(), 1, !(state->m_misc_flags & 0x08));
 
-	discrete_sound_w(discrete, space, TRIPLHNT_SCREECH_EN, state->m_misc_flags & 0x04);	// screech
-	discrete_sound_w(discrete, space, TRIPLHNT_LAMP_EN, state->m_misc_flags & 0x02);	// Lamp is used to reset noise
-	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_EN, state->m_misc_flags & 0x80);	// bear
+	discrete_sound_w(discrete, space, TRIPLHNT_SCREECH_EN, state->m_misc_flags & 0x04); // screech
+	discrete_sound_w(discrete, space, TRIPLHNT_LAMP_EN, state->m_misc_flags & 0x02);    // Lamp is used to reset noise
+	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_EN, state->m_misc_flags & 0x80);    // bear
 
 	is_witch_hunt = space.machine().root_device().ioport("0C09")->read() == 0x40;
 	bit = ~state->m_misc_flags & 0x40;
@@ -154,39 +154,39 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( triplhnt )
-	PORT_START("0C00")	/* 0C00 */
+	PORT_START("0C00")  /* 0C00 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("0C08")	/* 0C08 */
+	PORT_START("0C08")  /* 0C08 */
 	PORT_DIPNAME( 0xc0, 0x00, "Play Time" )
 	PORT_DIPSETTING( 0x00, "32 seconds / 16 raccoons" )
 	PORT_DIPSETTING( 0x40, "64 seconds / 32 raccoons" )
 	PORT_DIPSETTING( 0x80, "96 seconds / 48 raccoons" )
 	PORT_DIPSETTING( 0xc0, "128 seconds / 64 raccoons" )
 
-	PORT_START("0C09")	/* 0C09 */
+	PORT_START("0C09")  /* 0C09 */
 	PORT_DIPNAME( 0xc0, 0x40, "Game Select" )
 	PORT_DIPSETTING( 0x00, "Hit the Bear" )
 	PORT_DIPSETTING( 0x40, "Witch Hunt" )
 	PORT_DIPSETTING( 0xc0, "Raccoon Hunt" )
 
-	PORT_START("0C0A")	/* 0C0A */
+	PORT_START("0C0A")  /* 0C0A */
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ))
 	PORT_DIPSETTING( 0x40, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING( 0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING( 0x80, DEF_STR( 1C_2C ))
 
-	PORT_START("0C0B")	/* 0C0B */
+	PORT_START("0C0B")  /* 0C0B */
 	PORT_DIPNAME( 0x80, 0x00, "Extended Play" )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ))
 	PORT_DIPSETTING( 0x00, DEF_STR( On ))
 
-	PORT_START("0C40")	/* 0C40 */
+	PORT_START("0C40")  /* 0C40 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("0C48")	/* 0C48 */
+	PORT_START("0C48")  /* 0C48 */
 // default to service enabled to make users calibrate gun
 //  PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Service_Mode )) PORT_TOGGLE PORT_CODE(KEYCODE_F2)
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( triplhnt )
 	PORT_START("STICKY")
 	PORT_BIT( 0xfc, 0x78, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xec)  PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15)
 
-	PORT_START("BEAR")	/* 10 */
+	PORT_START("BEAR")  /* 10 */
 	PORT_ADJUSTER( 35, "Bear Roar Frequency" )
 INPUT_PORTS_END
 
@@ -213,7 +213,7 @@ static const gfx_layout triplhnt_small_sprite_layout =
 	32, 32,   /* width, height */
 	16,       /* total         */
 	2,        /* planes        */
-	          /* plane offsets */
+				/* plane offsets */
 	{ 0x0000, 0x4000 },
 	{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,

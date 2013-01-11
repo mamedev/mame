@@ -57,8 +57,8 @@ const FLAC__fixedpoint FLAC__FP_E = 178145;
 static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	{
 		/*
-         * 0 fraction bits
-         */
+		 * 0 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x00000001,
 		/* lg(4/3) = */ 0x00000000,
@@ -78,8 +78,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	},
 	{
 		/*
-         * 4 fraction bits
-         */
+		 * 4 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x00000010,
 		/* lg(4/3) = */ 0x00000007,
@@ -99,8 +99,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	},
 	{
 		/*
-         * 8 fraction bits
-         */
+		 * 8 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x00000100,
 		/* lg(4/3) = */ 0x0000006a,
@@ -120,8 +120,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	},
 	{
 		/*
-         * 12 fraction bits
-         */
+		 * 12 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x00001000,
 		/* lg(4/3) = */ 0x000006a4,
@@ -141,8 +141,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	},
 	{
 		/*
-         * 16 fraction bits
-         */
+		 * 16 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x00010000,
 		/* lg(4/3) = */ 0x00006a40,
@@ -162,8 +162,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	},
 	{
 		/*
-         * 20 fraction bits
-         */
+		 * 20 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x00100000,
 		/* lg(4/3) = */ 0x0006a3fe,
@@ -183,8 +183,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	},
 	{
 		/*
-         * 24 fraction bits
-         */
+		 * 24 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x01000000,
 		/* lg(4/3) = */ 0x006a3fe6,
@@ -204,8 +204,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 	},
 	{
 		/*
-         * 28 fraction bits
-         */
+		 * 28 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ 0x10000000,
 		/* lg(4/3) = */ 0x06a3fe5c,
@@ -229,8 +229,8 @@ static const FLAC__uint32 log2_lookup[][LOG2_LOOKUP_PRECISION] = {
 static const FLAC__uint64 log2_lookup_wide[] = {
 	{
 		/*
-         * 32 fraction bits
-         */
+		 * 32 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ FLAC__U64L(0x100000000),
 		/* lg(4/3) = */ FLAC__U64L(0x6a3fe5c6),
@@ -250,8 +250,8 @@ static const FLAC__uint64 log2_lookup_wide[] = {
 	},
 	{
 		/*
-         * 48 fraction bits
-         */
+		 * 48 fraction bits
+		 */
 		/* undefined */ 0x00000000,
 		/* lg(2/1) = */ FLAC__U64L(0x1000000000000),
 		/* lg(4/3) = */ FLAC__U64L(0x6a3fe5c60429),

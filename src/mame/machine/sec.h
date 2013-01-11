@@ -47,32 +47,32 @@ private:
 	// stuff the SEC stores
 	int m_counters[MAX_COUNTERS];
 	char m_strings[MAX_COUNTERS][8];
-    UINT8 m_market;
-    UINT8 m_nocnt;
-    UINT8 m_last;
+	UINT8 m_market;
+	UINT8 m_nocnt;
+	UINT8 m_last;
 
 	// serial comms
 	UINT8 m_curbyte;
-    UINT8 m_data;
+	UINT8 m_data;
 
 	UINT8 m_clk;
 	UINT8 m_clks;
-    UINT8 m_rxpos;
-    UINT8 m_rxclk;
-    UINT8 m_rxdat;
-    UINT8 m_rxlen;
-    UINT8 chars_left;
+	UINT8 m_rxpos;
+	UINT8 m_rxclk;
+	UINT8 m_rxdat;
+	UINT8 m_rxlen;
+	UINT8 chars_left;
 
-    UINT8 n_reqpos;
+	UINT8 n_reqpos;
 
 	// communication buffer
-    UINT8 m_request[12];
-    UINT8 m_reply[8];
+	UINT8 m_request[12];
+	UINT8 m_reply[8];
 
-    bool             enabled;
+	bool             enabled;
 
 	// execute command
-    void             Do_Command(void);
+	void             Do_Command(void);
 	// command handlers
 	void Cmd_NOP(void);
 	void Cmd_Set_Txt(void);
@@ -89,13 +89,13 @@ private:
 	void Cmd_Get_Ver(void);
 	void Cmd_Get_Cnt(void);
 
-	UINT8		CalcByteSum(int length);
+	UINT8       CalcByteSum(int length);
 
 public:
-	void			 reset(void);
+	void             reset(void);
 
 	/* serial interface */
-    void write_clock_line(UINT8 bit);
+	void write_clock_line(UINT8 bit);
 	void write_data_line(UINT8 bit);
 	void write_cs_line(UINT8 bit);
 	UINT8 read_data_line(void);

@@ -55,4 +55,4 @@ char *osd_getenv(const char *name);
 
 int osd_setenv(const char *name, const char *value, int overwrite);
 
-#endif	/* __SDLOS__ */
+#endif  /* __SDLOS__ */

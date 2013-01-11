@@ -33,7 +33,7 @@ class jpmmps_state : public driver_device
 public:
 	jpmmps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -85,60 +85,60 @@ INPUT_PORTS_END
 
 static I8255_INTERFACE (ppi8255_intf_ic26)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_ic21)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_ic22)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_ic25)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 // Communication with Reel MCU
 static const tms9902_interface tms9902_uart4_ic10_params =
 {
-	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
-	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
-	DEVCB_NULL,				/* called when a character is transmitted */
-	DEVCB_NULL				/* called for setting interface parameters and line states */
+	DEVCB_NULL,             /*int_callback,*/   /* called when interrupt pin state changes */
+	DEVCB_NULL,             /*rcv_callback,*/   /* called when a character shall be received  */
+	DEVCB_NULL,             /* called when a character is transmitted */
+	DEVCB_NULL              /* called for setting interface parameters and line states */
 };
 
 // Communication with Security / Printer
 static const tms9902_interface tms9902_uart2_ic5_params =
 {
-	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
-	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
-	DEVCB_NULL,				/* called when a character is transmitted */
-	DEVCB_NULL				/* called for setting interface parameters and line states */
+	DEVCB_NULL,             /*int_callback,*/   /* called when interrupt pin state changes */
+	DEVCB_NULL,             /*rcv_callback,*/   /* called when a character shall be received  */
+	DEVCB_NULL,             /* called when a character is transmitted */
+	DEVCB_NULL              /* called for setting interface parameters and line states */
 };
 
 // these are wrong
@@ -160,7 +160,7 @@ static const tms9902_interface tms9902_uart2_ic5_params =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -176,8 +176,8 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 	MCFG_I8255_ADD( "ppi8255_ic22", ppi8255_intf_ic22 )
 	MCFG_I8255_ADD( "ppi8255_ic25", ppi8255_intf_ic25 )
 
-	MCFG_TMS9902_ADD("tms9902_ic10", tms9902_uart4_ic10_params,	DUART_CLOCK)
-	MCFG_TMS9902_ADD("tms9902_ic5",  tms9902_uart2_ic5_params,	DUART_CLOCK)
+	MCFG_TMS9902_ADD("tms9902_ic10", tms9902_uart4_ic10_params, DUART_CLOCK)
+	MCFG_TMS9902_ADD("tms9902_ic5",  tms9902_uart2_ic5_params,  DUART_CLOCK)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2027,211 +2027,211 @@ ROM_END
 
 
 
-GAME(198?, j2adnote	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 1)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnotea,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 2)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnoteb,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 3)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnotec,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 4)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnoted,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 5)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnotee,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 6)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnotef,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 7)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnoteg,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 8)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnoteh,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 9)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2adnotei,j2adnote	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 10)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2bankch	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bank Chase (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2bankrd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bank Raid (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2bigbnk	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Banker (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2bigbox	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Box (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2bigbuk	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Buck$ (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2bigdl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Deal (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2blkchy	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Black Cherry (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashbn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Bonus Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashfl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Falls (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashrl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Reels (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashrv	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Reserve (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashro	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Rolls (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashtk	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Track (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashtd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Track Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2coppot	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Copper Pot (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2coprun	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Copper Run (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cprndx	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Copper Run Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2crkbnk	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Crack The Bank (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2droplt	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Drop The Lot (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2dropld	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Drop The Lot Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2ewn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Each Way Nudger (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2ews	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Each Way Shuffle (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2exec	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Executive Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fasttk	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Fast Trak (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fqueen	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Find The Queen (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fiveal	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Alive (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fiveln	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Liner (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fws	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Way Shuffle (Set 1) (JPM) (MPS)",			GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fwsa	,j2fws		,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Way Shuffle (Set 2) (JPM) (MPS)",			GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2frmtch	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Fruit Match (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fullhs	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Full House Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2ghostb	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Ghostbuster (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2goldrn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Gold Run (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2goldbr	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Golden Bars (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2gldchy	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Golden Cherry (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2gldwin	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Golden Win (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hinote	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hi Note (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hiroll	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hi Roller (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hotpot	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hot Pot (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hotptd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hot Pot Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hotsht	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hot Shot Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hypnot	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hypernote (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2jackbr	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Jackpot Bars (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2jackdc	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Jackpot Dice (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2jokers	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Jokers (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2kingcl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","King Of Clubs (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2litean	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Lite A Nudge (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2lovsht	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Loot Shoot (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2lovshd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Loot Shoot Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2luckar	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Lucky Arrows (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2lucky2	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Lucky 2s (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2monblt	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Belt (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2mongam	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Game (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2mongmd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Game Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2multwn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Multi Win (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2notexc	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Exchange (Set 1) (JPM) (MPS)",			GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2notexca,j2notexc	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Exchange (Set 2) (JPM) (MPS)",			GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2notexcb,j2notexc	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Exchange (Set 3) (JPM) (MPS)",			GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2notesh	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Shoot (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nudbnz	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Bonanza Deluxe (Set 1) (JPM) (MPS)",		GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nudbnza,j2nudbnz	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Bonanza Deluxe (Set 2) (JPM) (MPS)",		GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nuddup	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Double Up (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nuddud	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Double Up Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nudup3	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Double Up MkIII (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nudshf	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Shuffler (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2plsmon	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Plus Money (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2plsmnd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Plus Money Deluxe (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2plsnud	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Plus Nudge (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2potlck	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pot Luck (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2pndrsh	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pound Rush (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2pyramd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pyramid (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelbn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Bingo Club (Set 1) (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelbna,j2reelbn	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Bingo Club (Set 2) (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelbo	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Bonus (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelmg	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Magic (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelmgd,j2reelmg	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Magic (JPM) [Dutch] (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelmc	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Magic Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelmo	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Money (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2rotnot	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Rota Note (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2roulcl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Roulette Club (JPM) [Mps] (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2rdclb	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Royal Deal Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2slvrgh	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Silver Ghost (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2sldgld	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Solid Gold (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2spcrsv	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Special Reserve (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2stahed	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Streets Ahead (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2supfrt	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Fruit (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2supfrc	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Fruit Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(1987, j2supsft	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supashifta (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2supstp	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Steppa (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2suptrk	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Track (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2suprft	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Fruit (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2supln	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Line (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2suppot	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Pots (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2suprl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Reel (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2suprsh	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supershot (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2supstr	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Superstars (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2swbank	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Switch Back (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2take2	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Take 2 (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2topsht	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Top Shot (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2westrn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Western (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnote ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 1)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnotea,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 2)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnoteb,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 3)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnotec,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 4)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnoted,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 5)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnotee,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 6)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnotef,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 7)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnoteg,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 8)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnoteh,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 9)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2adnotei,j2adnote   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Add A Note (JPM) (MPS, set 10)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bankch ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bank Chase (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bankrd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bank Raid (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bigbnk ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Banker (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bigbox ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Box (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bigbuk ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Buck$ (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bigdl  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Big Deal (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2blkchy ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Black Cherry (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashbn ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Bonus Club (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashfl ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Falls (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashrl ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Reels (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashrv ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Reserve (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashro ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Rolls (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashtk ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Track (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashtd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Track Deluxe (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2coppot ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Copper Pot (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2coprun ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Copper Run (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cprndx ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Copper Run Deluxe (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2crkbnk ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Crack The Bank (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2droplt ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Drop The Lot (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2dropld ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Drop The Lot Deluxe (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2ewn    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Each Way Nudger (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2ews    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Each Way Shuffle (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2exec   ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Executive Club (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fasttk ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Fast Trak (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fqueen ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Find The Queen (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fiveal ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Alive (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fiveln ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Liner (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fws    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Way Shuffle (Set 1) (JPM) (MPS)",           GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fwsa   ,j2fws      ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Five Way Shuffle (Set 2) (JPM) (MPS)",           GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2frmtch ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Fruit Match (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fullhs ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Full House Club (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2ghostb ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Ghostbuster (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2goldrn ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Gold Run (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2goldbr ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Golden Bars (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2gldchy ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Golden Cherry (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2gldwin ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Golden Win (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hinote ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hi Note (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hiroll ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hi Roller (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hotpot ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hot Pot (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hotptd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hot Pot Deluxe (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hotsht ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hot Shot Club (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hypnot ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Hypernote (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2jackbr ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Jackpot Bars (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2jackdc ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Jackpot Dice (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2jokers ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Jokers (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2kingcl ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","King Of Clubs (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2litean ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Lite A Nudge (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2lovsht ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Loot Shoot (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2lovshd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Loot Shoot Deluxe (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2luckar ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Lucky Arrows (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2lucky2 ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Lucky 2s (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2monblt ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Belt (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2mongam ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Game (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2mongmd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Game Deluxe (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2multwn ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Multi Win (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2notexc ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Exchange (Set 1) (JPM) (MPS)",          GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2notexca,j2notexc   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Exchange (Set 2) (JPM) (MPS)",          GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2notexcb,j2notexc   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Exchange (Set 3) (JPM) (MPS)",          GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2notesh ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Note Shoot (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nudbnz ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Bonanza Deluxe (Set 1) (JPM) (MPS)",       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nudbnza,j2nudbnz   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Bonanza Deluxe (Set 2) (JPM) (MPS)",       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nuddup ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Double Up (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nuddud ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Double Up Deluxe (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nudup3 ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Double Up MkIII (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nudshf ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Shuffler (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2plsmon ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Plus Money (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2plsmnd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Plus Money Deluxe (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2plsnud ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Plus Nudge (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2potlck ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pot Luck (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2pndrsh ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pound Rush (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2pyramd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pyramid (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelbn ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Bingo Club (Set 1) (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelbna,j2reelbn   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Bingo Club (Set 2) (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelbo ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Bonus (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelmg ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Magic (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelmgd,j2reelmg   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Magic (JPM) [Dutch] (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelmc ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Magic Club (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelmo ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Money (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2rotnot ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Rota Note (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2roulcl ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Roulette Club (JPM) [Mps] (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2rdclb  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Royal Deal Club (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2slvrgh ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Silver Ghost (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2sldgld ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Solid Gold (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2spcrsv ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Special Reserve (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2stahed ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Streets Ahead (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2supfrt ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Fruit (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2supfrc ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Fruit Club (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(1987, j2supsft ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supashifta (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2supstp ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Steppa (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2suptrk ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Track (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2suprft ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Fruit (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2supln  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Line (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2suppot ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Pots (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2suprl  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Super Reel (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2suprsh ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supershot (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2supstr ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Superstars (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2swbank ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Switch Back (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2take2  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Take 2 (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2topsht ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Top Shot (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2westrn ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Western (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
 
 
-GAME(198?, j2blustr	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Blue Streak (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cshalm	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash Alarm (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cshcrd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash Cards (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cshfil	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash-Filla (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cshsmh	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash Smash (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2criscr	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Criss Cross Jackpot (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2frucnx	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Fruit Connexion (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hitmon	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Hit Money (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2penny	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","In For A Penny In For A Pound (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2maxima	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Maxima (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2montrp	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Money Trapper (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nudmon	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Nudge Money (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2paypkt	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Pay Packet (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2silvcl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Silver Classic (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2silvsh	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Silver Shot (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2sstrea	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Supa Streak (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2tstplt	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Test Pilot (Set 1) (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2tstplta,j2tstplt	,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Test Pilot (Set 2) (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2blustr ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Blue Streak (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cshalm ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash Alarm (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cshcrd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash Cards (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cshfil ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash-Filla (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cshsmh ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cash Smash (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2criscr ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Criss Cross Jackpot (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2frucnx ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Fruit Connexion (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hitmon ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Hit Money (Pcp) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2penny  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","In For A Penny In For A Pound (Pcp) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2maxima ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Maxima (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2montrp ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Money Trapper (Pcp) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nudmon ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Nudge Money (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2paypkt ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Pay Packet (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2silvcl ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Silver Classic (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2silvsh ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Silver Shot (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2sstrea ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Supa Streak (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2tstplt ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Test Pilot (Set 1) (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2tstplta,j2tstplt   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Test Pilot (Set 2) (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2bonanz	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Eurocoin","Bonanza (Eurocoin) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2supchy	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Eurocoin","Super Cherry (Eurocoin) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bonanz ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Eurocoin","Bonanza (Eurocoin) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2supchy ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Eurocoin","Super Cherry (Eurocoin) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2hilocl	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal","Hi Lo Climber Club (Crystal) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2litnot	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal","Lite A Note Club (Crystal) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2missis	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal","Mississippi Gambler Club (Crystal) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hilocl ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal","Hi Lo Climber Club (Crystal) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2litnot ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal","Lite A Note Club (Crystal) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2missis ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal","Mississippi Gambler Club (Crystal) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2always	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Always Eight (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2coinsh	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Coin Shoot (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nudfev	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Nudge Fever (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2trail	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Trailblazer (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2wag	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Win-A-Gain (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2always ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Always Eight (Bwb) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2coinsh ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Coin Shoot (Bwb) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nudfev ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Nudge Fever (Bwb) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2trail  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Trailblazer (Bwb) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2wag    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Win-A-Gain (Bwb) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2cshnud	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Cash Nudger (Mdm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2fivepn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Fivepenny Nudger (Mdm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nolimt	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","No Limit Nudge (Mdm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cshnud ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Cash Nudger (Mdm) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2fivepn ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Fivepenny Nudger (Mdm) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nolimt ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","No Limit Nudge (Mdm) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2strk10	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Ace?","Strike Ten (Ace) (MPS)",						GAME_IS_SKELETON_MECHANICAL ) // there was another (68k based) game in this set, which makes me wonder if this one is by Ace at all
-
-
+GAME(198?, j2strk10 ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Ace?","Strike Ten (Ace) (MPS)",                        GAME_IS_SKELETON_MECHANICAL ) // there was another (68k based) game in this set, which makes me wonder if this one is by Ace at all
 
 
-GAME(198?, j2bkroll	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bank Roll (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2bodym	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Body Match (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cvault	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Vault (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashab	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cashablanca (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2cashry	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cashino Royale (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2casino	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Casino Classic (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2coinct	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Coin Count (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2loots	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Loot Shoot (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2match	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Match It (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2monbnd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Bands (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2monmtx	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Money Matrix (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2tst	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","MPS 1 Test Rom (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nudnud	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Nudge (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2pinac	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pinnacle (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2pinclb	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pinnacle Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reelcz	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Crazy (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2reeldc	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Deal Club (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2topcd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Top Card (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2xxx	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Triple X (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2tupnud	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Tuppenny Nudger (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2wrb	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Wild Reel Bingo (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2ncsp	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","unknown 'ncsp0pp' (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nrrp	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","unknown 'nprpopp' (Bwb) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nsc15	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","unknown 'nsc15' (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nsw12	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","unknown 'nsw12' (Pcp) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2club77	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Club 77 (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2contnd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Continuous Nudger (Mdm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2crown	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Crown Dealer (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2hirola	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Hi Roll (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2monmin	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Money Mine (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2notspn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Note Spinner (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2super7	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Super 7's (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2sex	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Super Exchanger (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2sng	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Cotswold Microsystems","Super Nudge Gambler (Cotswold Microsystems) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2tupnd	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Tuppenny Nudger (Mdm) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2008	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown '008' (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2chsn	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'chsnsn05' (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2lhs	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'lhs' (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nn2	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'nn_2' (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2rm941	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'rm941' (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2pharo	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Pharoah (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2nud5p	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","5p Nudger (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2b7		,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bar 7? (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2ss		,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Stepper (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2nbz	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Bonanza (JPM) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bkroll ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bank Roll (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2bodym  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Body Match (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cvault ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cash Vault (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashab ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Cashablanca (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2cashry ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Cashino Royale (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2casino ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Casino Classic (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2coinct ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Coin Count (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2loots  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","Loot Shoot (Pcp) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2match  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Match It (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2monbnd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Money Bands (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2monmtx ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Money Matrix (Bwb) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2tst    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","MPS 1 Test Rom (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nudnud ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Nudge (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2pinac  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pinnacle (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2pinclb ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Pinnacle Club (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reelcz ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Crazy (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2reeldc ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Reel Deal Club (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2topcd  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Top Card (Bwb) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2xxx    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","Triple X (Bwb) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2tupnud ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Tuppenny Nudger (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2wrb    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Wild Reel Bingo (JPM) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2ncsp   ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","unknown 'ncsp0pp' (Bwb) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nrrp   ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Bwb","unknown 'nprpopp' (Bwb) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nsc15  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","unknown 'nsc15' (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nsw12  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Pcp","unknown 'nsw12' (Pcp) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2clbbin	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal?","Club Bingo (Crystal) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2club77 ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Club 77 (Unk) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2contnd ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Continuous Nudger (Mdm) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2crown  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Crown Dealer (Unk) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2hirola ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Hi Roll (Unk) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2monmin ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Money Mine (Unk) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2notspn ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Note Spinner (Unk) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2super7 ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Super 7's (Unk) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2sex    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Super Exchanger (Unk) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2sng    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Cotswold Microsystems","Super Nudge Gambler (Cotswold Microsystems) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2tupnd  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Mdm","Tuppenny Nudger (Mdm) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2008    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown '008' (Unk) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2chsn   ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'chsnsn05' (Unk) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2lhs    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'lhs' (Unk) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nn2    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'nn_2' (Unk) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2rm941  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","unknown 'rm941' (Unk) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2pharo  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Pharoah (Unk) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2sirich	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Strike It Rich (JPM) (MPS) (set 1)",						GAME_IS_SKELETON_MECHANICAL ) // I don't think this is MayGay, it was just in a MayGay set with some actual MayGay roms
-GAME(198?, j2siricha,j2sirich   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Strike It Rich (JPM) (MPS) (set 2)",						GAME_IS_SKELETON_MECHANICAL ) // I don't think this is MayGay, it was just in a MayGay set with some actual MayGay roms
+GAME(198?, j2nud5p  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","5p Nudger (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2b7     ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Bar 7? (JPM) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2ss     ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Supa Stepper (JPM) (MPS)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2nbz    ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Nudge Bonanza (JPM) (MPS)",                      GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j2hcash	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Hot Cash (Unk) (MPS)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j2sset	,0			,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Sunset Strip (v2.0) (Unk) (MPS?)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2clbbin ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "Crystal?","Club Bingo (Crystal) (MPS)",                        GAME_IS_SKELETON_MECHANICAL )
+
+GAME(198?, j2sirich ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Strike It Rich (JPM) (MPS) (set 1)",                     GAME_IS_SKELETON_MECHANICAL ) // I don't think this is MayGay, it was just in a MayGay set with some actual MayGay roms
+GAME(198?, j2siricha,j2sirich   ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "JPM","Strike It Rich (JPM) (MPS) (set 2)",                     GAME_IS_SKELETON_MECHANICAL ) // I don't think this is MayGay, it was just in a MayGay set with some actual MayGay roms
+
+GAME(198?, j2hcash  ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Hot Cash (Unk) (MPS)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j2sset   ,0          ,jpmmps,jpmmps, jpmmps_state,jpmmps,ROT0,   "<unknown>","Sunset Strip (v2.0) (Unk) (MPS?)",                     GAME_IS_SKELETON_MECHANICAL )

@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
 	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)	/* text color, flip screen & coin counters */
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)    /* text color, flip screen & coin counters */
 	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
 	AM_RANGE(0x1810, 0x1810) AM_WRITE(subirqtrigger_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ_PORT("DSW1")
@@ -129,7 +129,7 @@ static INPUT_PORTS_START( dogfgt )
 	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x80, "Upright 2 Players" )
 //  PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )     // "Cocktail 1 Player" - IMPOSSIBLE !
-	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )		// "Cocktail 2 Players"
+	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )     // "Cocktail 2 Players"
 
 
 /*  Manual shows:
@@ -240,11 +240,11 @@ void dogfgt_state::machine_reset()
 static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dogfgt_state, irq0_line_hold, 16*60)	/* ? controls music tempo */
+	MCFG_CPU_PERIODIC_INT_DRIVER(dogfgt_state, irq0_line_hold, 16*60)   /* ? controls music tempo */
 
-	MCFG_CPU_ADD("sub", M6502, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_ADD("sub", M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -281,7 +281,7 @@ ROM_START( dogfgt )
 	ROM_LOAD( "bx02-5.36",   0xc000, 0x2000, CRC(d11b50c3) SHA1(99dbbc85e8ff66eadc48a9f65f800676b10e35e4) )
 	ROM_LOAD( "bx03-5.22",   0xe000, 0x2000, CRC(0e4813fb) SHA1(afcbd17029bc3c2de83c15cc941fe8f2ad062a5d) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for audio code */
 	ROM_LOAD( "bx04.117",    0x8000, 0x2000, CRC(f8945f9d) SHA1(a0782a5007dc5efc302c4fd61827e1b68475e7ab) )
 	ROM_LOAD( "bx05.118",    0xa000, 0x2000, CRC(3ade57ad) SHA1(cc0a35257c00c463614a6718a24cc6dee75c2e5d) )
 	ROM_LOAD( "bx06.119",    0xc000, 0x2000, CRC(4a3b34cf) SHA1(f2e0bf9923a288b8137840f46fd90a23010f8018) )
@@ -315,7 +315,7 @@ ROM_START( dogfgtu )
 	ROM_LOAD( "bx02-7.36",   0xc000, 0x2000, CRC(afaf10e6) SHA1(67b1e0722ae0e8110acc44bc582b308e86743d60) )
 	ROM_LOAD( "bx03-6.33",   0xe000, 0x2000, CRC(51b20e8b) SHA1(0247345b3f9736e9140faf765cb33f97660f0ddd) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for audio code */
 	ROM_LOAD( "bx04-7.117",  0x8000, 0x2000, CRC(c4c2183b) SHA1(27cf40d6f03b078c5cc4497f393309bf33dea9dc) )
 	ROM_LOAD( "bx05-7.118",  0xa000, 0x2000, CRC(d9a705ab) SHA1(7a49769d6c32e3d9840e4b24e3cbcd84a075d36d) )
 	ROM_LOAD( "bx06.119",    0xc000, 0x2000, CRC(4a3b34cf) SHA1(f2e0bf9923a288b8137840f46fd90a23010f8018) )
@@ -349,7 +349,7 @@ ROM_START( dogfgtj )
 	ROM_LOAD( "bx02.36",     0xc000, 0x2000, CRC(91f1b9b3) SHA1(dd939538abf615d3a0271fd561038acc6a2a616d) )
 	ROM_LOAD( "bx03.22",     0xe000, 0x2000, CRC(959ebf93) SHA1(de79dd44c68a232278b8d251e39c0ad35d160595) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for audio code */
 	ROM_LOAD( "bx04.117",    0x8000, 0x2000, CRC(f8945f9d) SHA1(a0782a5007dc5efc302c4fd61827e1b68475e7ab) )
 	ROM_LOAD( "bx05.118",    0xa000, 0x2000, CRC(3ade57ad) SHA1(cc0a35257c00c463614a6718a24cc6dee75c2e5d) )
 	ROM_LOAD( "bx06.119",    0xc000, 0x2000, CRC(4a3b34cf) SHA1(f2e0bf9923a288b8137840f46fd90a23010f8018) )

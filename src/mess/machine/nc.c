@@ -140,5 +140,3 @@ DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
 	/* set card not present state */
 	nc_set_card_present_state(image.device().machine(), 0);
 }
-
-

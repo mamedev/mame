@@ -34,32 +34,32 @@ enum
 };
 
 
-#define MOR_GRAPHICS		0x01
-#define MOR_4_BIT_PARALLEL	0x02
-#define MOR_2_BIT_PARALLEL	0x04
-#define MOR_DISPLAY_ON		0x08
-#define MOR_CURSOR_BLINK	0x10
-#define MOR_CURSOR_ON		0x20
-#define MOR_BLINK_TIME_16	0x40
+#define MOR_GRAPHICS        0x01
+#define MOR_4_BIT_PARALLEL  0x02
+#define MOR_2_BIT_PARALLEL  0x04
+#define MOR_DISPLAY_ON      0x08
+#define MOR_CURSOR_BLINK    0x10
+#define MOR_CURSOR_ON       0x20
+#define MOR_BLINK_TIME_16   0x40
 
 
-#define PR_HP_4				0x03
-#define PR_HP_5				0x04
-#define PR_HP_6				0x05
-#define PR_HP_7				0x06
-#define PR_HP_8				0x07
-#define PR_HP_MASK			0x07
-#define PR_VP_MASK			0xf0
+#define PR_HP_4             0x03
+#define PR_HP_5             0x04
+#define PR_HP_6             0x05
+#define PR_HP_7             0x06
+#define PR_HP_8             0x07
+#define PR_HP_MASK          0x07
+#define PR_VP_MASK          0xf0
 
 
-#define HNR_HN_MASK			0x7f
+#define HNR_HN_MASK         0x7f
 
 
-#define DVR_DN_MASK			0x7f
+#define DVR_DN_MASK         0x7f
 
 
-#define CPR_CPD_MASK		0x0f
-#define CPR_CPU_MASK		0xf0
+#define CPR_CPD_MASK        0x0f
+#define CPR_CPU_MASK        0xf0
 
 
 
@@ -113,10 +113,10 @@ inline UINT8 msm6255_device::read_byte(UINT16 ma, UINT8 ra)
 //-------------------------------------------------
 
 msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(msm6255)),
-	  m_cursor(0)
+	: device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock),
+		device_memory_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(msm6255)),
+		m_cursor(0)
 {
 }
 

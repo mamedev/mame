@@ -73,37 +73,37 @@
 
 struct mm74c922_interface
 {
-	double				m_cap_osc;
-	double				m_cap_debounce;
+	double              m_cap_osc;
+	double              m_cap_debounce;
 
-	devcb_write_line	m_out_da_cb;
+	devcb_write_line    m_out_da_cb;
 
-	devcb_read8			m_in_x1_cb;
-	devcb_read8			m_in_x2_cb;
-	devcb_read8			m_in_x3_cb;
-	devcb_read8			m_in_x4_cb;
-	devcb_read8			m_in_x5_cb;
+	devcb_read8         m_in_x1_cb;
+	devcb_read8         m_in_x2_cb;
+	devcb_read8         m_in_x3_cb;
+	devcb_read8         m_in_x4_cb;
+	devcb_read8         m_in_x5_cb;
 };
 
 
 // ======================> mm74c922_device
 
 class mm74c922_device :  public device_t,
-						 public mm74c922_interface
+							public mm74c922_interface
 {
 public:
-    // construction/destruction
-    mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_config(device_t &device, int max_y);
 
-    UINT8 data_out_r();
+	UINT8 data_out_r();
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -113,20 +113,20 @@ private:
 
 	int m_max_y;
 
-	devcb_resolved_write_line	m_out_da_func;
-	devcb_resolved_read8		m_in_x_func[5];
+	devcb_resolved_write_line   m_out_da_func;
+	devcb_resolved_read8        m_in_x_func[5];
 
-	int m_inhibit;				// scan counter clock inhibit
-	int m_x;					// currently scanned column
-	int m_y;					// latched row
+	int m_inhibit;              // scan counter clock inhibit
+	int m_x;                    // currently scanned column
+	int m_y;                    // latched row
 
-	UINT8 m_data;				// data latch
+	UINT8 m_data;               // data latch
 
-	int m_da;					// data available flag
-	int m_next_da;				// next value of data available flag
+	int m_da;                   // data available flag
+	int m_next_da;              // next value of data available flag
 
 	// timers
-	emu_timer *m_scan_timer;	// keyboard scan timer
+	emu_timer *m_scan_timer;    // keyboard scan timer
 };
 
 

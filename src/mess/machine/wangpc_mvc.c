@@ -26,26 +26,26 @@
 
 #define LOG 0
 
-#define OPTION_ID			0x15
+#define OPTION_ID           0x15
 
-#define MC6845_TAG			"mc6845"
-#define SCREEN_TAG			"screen"
+#define MC6845_TAG          "mc6845"
+#define SCREEN_TAG          "screen"
 
-#define VIDEO_RAM_SIZE		0x800
-#define CHAR_RAM_SIZE		0x1000
-#define BITMAP_RAM_SIZE		0x4000
+#define VIDEO_RAM_SIZE      0x800
+#define CHAR_RAM_SIZE       0x1000
+#define BITMAP_RAM_SIZE     0x4000
 
-#define OPTION_VRAM			BIT(m_option, 0)
-#define OPTION_VSYNC		BIT(m_option, 3)
+#define OPTION_VRAM         BIT(m_option, 0)
+#define OPTION_VSYNC        BIT(m_option, 3)
 
-#define ATTR_BLINK			BIT(attr, 0)
-#define ATTR_REVERSE		BIT(attr, 1)
-#define ATTR_BLANK			BIT(attr, 2)
-#define ATTR_BOLD			BIT(attr, 3)
-#define ATTR_OVERSCORE		BIT(attr, 4)
-#define ATTR_UNDERSCORE		BIT(attr, 5)
-#define ATTR_SUBSCRIPT		BIT(attr, 6)
-#define ATTR_SUPERSCRIPT	BIT(attr, 7)
+#define ATTR_BLINK          BIT(attr, 0)
+#define ATTR_REVERSE        BIT(attr, 1)
+#define ATTR_BLANK          BIT(attr, 2)
+#define ATTR_BOLD           BIT(attr, 3)
+#define ATTR_OVERSCORE      BIT(attr, 4)
+#define ATTR_UNDERSCORE     BIT(attr, 5)
+#define ATTR_SUBSCRIPT      BIT(attr, 6)
+#define ATTR_SUPERSCRIPT    BIT(attr, 7)
 
 static const rgb_t PALETTE[] =
 {
@@ -104,7 +104,7 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 		offs_t addr = ((code >> 8) << 4) | (new_ra & 0x0f);
 		UINT16 data = m_char_ram[addr & 0xfff];
 
-		if ((column == cursor_x) ||	(!ra && ATTR_OVERSCORE) || ((ra == 9) && ATTR_UNDERSCORE))
+		if ((column == cursor_x) || (!ra && ATTR_OVERSCORE) || ((ra == 9) && ATTR_UNDERSCORE))
 		{
 			data = 0xffff;
 		}

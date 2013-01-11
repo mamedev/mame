@@ -32,7 +32,7 @@ void scsibus_device::scsi_update()
 }
 
 scsibus_device::scsibus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SCSIBUS, "SCSI bus", tag, owner, clock)
+	: device_t(mconfig, SCSIBUS, "SCSI bus", tag, owner, clock)
 {
 }
 

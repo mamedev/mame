@@ -171,10 +171,10 @@ void osd_interface::set_mastervolume(int attenuation)
 	//
 	// Attenuation is the attenuation in dB (a negative number).
 	// To convert from dB to a linear volume scale do the following:
-    //    volume = MAX_VOLUME;
-    //    while (attenuation++ < 0)
-    //       volume /= 1.122018454;      //  = (10 ^ (1/20)) = 1dB
-    //
+	//    volume = MAX_VOLUME;
+	//    while (attenuation++ < 0)
+	//       volume /= 1.122018454;      //  = (10 ^ (1/20)) = 1dB
+	//
 }
 
 

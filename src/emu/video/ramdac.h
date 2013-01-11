@@ -37,7 +37,7 @@ struct ramdac_interface
 
 // ======================> ramdac_device
 
-class ramdac_device :	public device_t,
+class ramdac_device :   public device_t,
 						public device_memory_interface,
 						public ramdac_interface
 {
@@ -75,7 +75,7 @@ private:
 	UINT8 m_int_index[2];
 	UINT8 *m_palram;
 
-	const address_space_config		m_space_config;
+	const address_space_config      m_space_config;
 };
 
 

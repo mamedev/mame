@@ -14,12 +14,12 @@
 ***************************************************************************/
 struct ins8250_interface
 {
-	devcb_write_line	m_out_tx_cb;
-	devcb_write_line	m_out_dtr_cb;
-	devcb_write_line	m_out_rts_cb;
-	devcb_write_line	m_out_int_cb;
-	devcb_write_line	m_out_out1_cb;
-	devcb_write_line	m_out_out2_cb;
+	devcb_write_line    m_out_tx_cb;
+	devcb_write_line    m_out_dtr_cb;
+	devcb_write_line    m_out_rts_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_out1_cb;
+	devcb_write_line    m_out_out2_cb;
 };
 
 class ins8250_uart_device : public device_t,
@@ -77,12 +77,12 @@ protected:
 private:
 	UINT8 m_int_pending;
 
-	devcb_resolved_write_line	m_out_tx_func;
-	devcb_resolved_write_line	m_out_dtr_func;
-	devcb_resolved_write_line	m_out_rts_func;
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_out1_func;
-	devcb_resolved_write_line	m_out_out2_func;
+	devcb_resolved_write_line   m_out_tx_func;
+	devcb_resolved_write_line   m_out_dtr_func;
+	devcb_resolved_write_line   m_out_rts_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_out1_func;
+	devcb_resolved_write_line   m_out_out2_func;
 
 	void update_interrupt();
 	void update_clock();

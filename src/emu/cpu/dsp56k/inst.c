@@ -117,10 +117,10 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	/* Quote: (32 General parallel move instructions) */
 	/****************************************************************/
 	else if (((w0 & 0xff00) == 0x4a00) ||
-			 ((w0 & 0xf000) == 0x4000) ||
-			 ((w0 & 0xf800) == 0x3000) ||
-			 ((w0 & 0x8000) == 0x8000) ||
-			 ((w0 & 0xf000) == 0x5000))
+				((w0 & 0xf000) == 0x4000) ||
+				((w0 & 0xf800) == 0x3000) ||
+				((w0 & 0x8000) == 0x8000) ||
+				((w0 & 0xf000) == 0x5000))
 	{
 		/* Note: There is much overlap down here, so certain ops must come before others */
 
@@ -486,22 +486,22 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 		return global_alloc(Dmac(opc, w0, w1));
 	}
 	/* DO : 0000 0000 110- --RR xxxx xxxx xxxx xxxx : A-82 */
-	else if (((w0 & 0xffe0) == 0x00c0) && ((w1 & 0x0000) == 0x0000))	   // Wait.  Huh?
+	else if (((w0 & 0xffe0) == 0x00c0) && ((w1 & 0x0000) == 0x0000))       // Wait.  Huh?
 	{
 		return global_alloc(Do(opc, w0, w1));
 	}
 	/* DO : 0000 1110 iiii iiii xxxx xxxx xxxx xxxx : A-82 */
-	else if (((w0 & 0xff00) == 0x0e00) && ((w1 & 0x0000) == 0x0000))	   // Wait.  Huh?
+	else if (((w0 & 0xff00) == 0x0e00) && ((w1 & 0x0000) == 0x0000))       // Wait.  Huh?
 	{
 		return global_alloc(Do_2(opc, w0, w1));
 	}
 	/* DO : 0000 0100 000D DDDD xxxx xxxx xxxx xxxx : A-82 */
-	else if (((w0 & 0xffe0) == 0x0400) && ((w1 & 0x0000) == 0x0000))	   // Wait.  Huh?
+	else if (((w0 & 0xffe0) == 0x0400) && ((w1 & 0x0000) == 0x0000))       // Wait.  Huh?
 	{
 		return global_alloc(Do_3(opc, w0, w1));
 	}
 	/* DO FOREVER : 0000 0000 0000 0010 xxxx xxxx xxxx xxxx : A-88 */
-	else if (((w0 & 0xffff) == 0x0002) && ((w1 & 0x0000) == 0x0000))	   // Wait.  Huh?
+	else if (((w0 & 0xffff) == 0x0002) && ((w1 & 0x0000) == 0x0000))       // Wait.  Huh?
 	{
 		return global_alloc(DoForever(opc, w0, w1));
 	}

@@ -151,7 +151,7 @@ REF. 970429
 #include "machine/gaelco3d.h"
 #include "sound/dmadac.h"
 
-#define	LOG				0
+#define LOG             0
 
 
 
@@ -667,8 +667,8 @@ static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
 		if (state->m_adsp_control_regs[S1_AUTOBUF_REG] & 0x0002) /* bit 1 */
 		{
 			/* get the autobuffer registers */
-			int		mreg, lreg;
-			UINT16	source;
+			int     mreg, lreg;
+			UINT16  source;
 			attotime sample_period;
 
 			state->m_adsp_ireg = (state->m_adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
@@ -833,15 +833,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, gaelco3d_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("adsp_ram_base")		/* 1k words internal RAM */
-	AM_RANGE(0x37ff, 0x37ff) AM_READNOP							/* speedup hammers this for no apparent reason */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("adsp_ram_base")       /* 1k words internal RAM */
+	AM_RANGE(0x37ff, 0x37ff) AM_READNOP                         /* speedup hammers this for no apparent reason */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, gaelco3d_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(adsp_rombank_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(sound_data_r, sound_status_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("adsp_fastram")	/* 512 words internal RAM */
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("adsp_fastram")    /* 512 words internal RAM */
 	AM_RANGE(0x3fe0, 0x3fff) AM_WRITE(adsp_control_w) AM_SHARE("adsp_regs")
 ADDRESS_MAP_END
 
@@ -859,10 +859,10 @@ static INPUT_PORTS_START( speedup )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LSHIFT)	// view
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LALT)		// brake
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_SPACE)	PORT_TOGGLE // gear (low=1 high=2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )		// start
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LSHIFT)    // view
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LALT)      // brake
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE // gear (low=1 high=2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )       // start
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -870,18 +870,18 @@ static INPUT_PORTS_START( speedup )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )		// verified
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// checked after reading analog from port 1
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	// checked after reading analog from port 2
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	// checked after reading analog from port 3
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )        // verified
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // checked after reading analog from port 1
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   // checked after reading analog from port 2
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)   // checked after reading analog from port 3
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
 
 	PORT_START("IN3")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )		// verified
-	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )		// verified
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )        // verified
+	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )     // verified
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ANALOG0")
@@ -894,14 +894,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( surfplnt )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VOLUME_UP )	// low two bits read, compared against 3
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )	// low four bits read, compared against f
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VOLUME_UP )    // low two bits read, compared against 3
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )  // low four bits read, compared against f
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )		// checked
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )      // checked
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )		// start
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )       // start
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -909,7 +909,7 @@ static INPUT_PORTS_START( surfplnt )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )		// coin
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )        // coin
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
@@ -932,11 +932,11 @@ static INPUT_PORTS_START( radikalb )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	// handle up
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 )		// view
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 )		// brake
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON1 )		// accel
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START1 )		// start
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )  // handle up
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 )      // view
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 )      // brake
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON1 )      // accel
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START1 )       // start
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -946,7 +946,7 @@ static INPUT_PORTS_START( radikalb )
 	PORT_START("IN2")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x00ff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )		// coin
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )        // coin
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x08000000, IP_ACTIVE_LOW )
@@ -973,9 +973,9 @@ INPUT_PORTS_END
 
 static const adsp21xx_config adsp_config =
 {
-	NULL,					/* callback for serial receive */
-	adsp_tx_callback,		/* callback for serial transmit */
-	NULL					/* callback for timer fired */
+	NULL,                   /* callback for serial receive */
+	adsp_tx_callback,       /* callback for serial transmit */
+	NULL                    /* callback for timer fired */
 };
 
 static const tms3203x_config tms_config =
@@ -1027,16 +1027,16 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("dac1", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: front mono */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: front mono */
 
 	MCFG_SOUND_ADD("dac2", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: left rear */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: left rear */
 
 	MCFG_SOUND_ADD("dac3", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: right rear */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: right rear */
 
 	MCFG_SOUND_ADD("dac4", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: seat speaker */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: seat speaker */
 MACHINE_CONFIG_END
 
 
@@ -1062,11 +1062,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( speedup )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "sup10.bin", 0x000000, 0x80000, CRC(07e70bae) SHA1(17013d859ec075e12518b094040a056d850b3271) )
 	ROM_LOAD16_BYTE( "sup15.bin", 0x000001, 0x80000, CRC(7947c28d) SHA1(46efb56d0f7fe2e92d0d04dcd2f130aef3be436d) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
 	ROM_LOAD( "sup25.bin", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) )
 
 	ROM_REGION32_LE( 0x800000, "user2", 0 )
@@ -1089,13 +1089,13 @@ ROM_END
 
 
 ROM_START( surfplnt )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "surfplnt.u5",  0x000000, 0x80000, CRC(c96e0a18) SHA1(b313d02d1d1bff8717b3d798e6ae681baefc1061) )
 	ROM_LOAD16_BYTE( "surfplnt.u11", 0x000001, 0x80000, CRC(99211d2d) SHA1(dee5b157489ce9c6988c8eec92fa91fff60d521c) )
 	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "surfplnt.u13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
 	ROM_LOAD( "pls.18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) )
 
 	ROM_REGION32_LE( 0x800000, "user2", 0 )
@@ -1122,13 +1122,13 @@ ROM_END
 
 
 ROM_START( surfplnt40 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "surfpl40.u5",  0x000000, 0x80000, CRC(572e0343) SHA1(badb08a5a495611b5fd2d821d4299348b2c9f308) )
 	ROM_LOAD16_BYTE( "surfpl40.u11", 0x000001, 0x80000, CRC(6056edaa) SHA1(9bc2df54d1367b9d58272a8f506e523e74110361) )
 	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "surfplnt.u13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
 	ROM_LOAD( "pls.18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) )
 
 	ROM_REGION32_LE( 0x800000, "user2", 0 )
@@ -1155,13 +1155,13 @@ ROM_END
 
 
 ROM_START( radikalb )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68020 code */
 	ROM_LOAD32_BYTE( "rab.6",  0x000000, 0x80000, CRC(ccac98c5) SHA1(43a30caf9880f48aba79676f9e746fdc6258139d) )
 	ROM_LOAD32_BYTE( "rab.12", 0x000001, 0x80000, CRC(26199506) SHA1(1b7b44895aa296eab8061ae85cbb5b0d30119dc7) )
 	ROM_LOAD32_BYTE( "rab.14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )
 	ROM_LOAD32_BYTE( "rab.19", 0x000003, 0x80000, CRC(2631bd61) SHA1(57331ad49e7284b82073f696049de109b7683b03) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
 	ROM_LOAD( "rab.23", 0x0000000, 0x400000, CRC(dcf52520) SHA1(ab54421c182436660d2a56a334c1aa335424644a) )
 
 	ROM_REGION32_LE( 0x800000, "user2", 0 )

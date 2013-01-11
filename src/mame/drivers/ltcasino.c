@@ -645,7 +645,7 @@ UINT32 ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind1
 
 static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,2000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", M6502,2000000)       /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ltcasino_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
 
@@ -671,15 +671,15 @@ MACHINE_CONFIG_END
 
 ROM_START( ltcasino )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a",			0x8000, 0x1000, CRC(14909fee) SHA1(bf53fa65da7f013ea1ac6b4942cdfdb34ef16252) )
-	ROM_LOAD( "b",			0x9800, 0x0800, CRC(1473f854) SHA1(eadaec1f6d653e61458bc262945c20140f4530eb) )
-	ROM_LOAD( "c",			0xa800, 0x0800, CRC(7a07004b) SHA1(62bd0f3d12b7eada6fc271abea60569aca7262b0) )
-	ROM_LOAD( "d",			0xb800, 0x0800, CRC(5148cafc) SHA1(124039f48784bf032f612714db73fb67a216a1e7) )
-	ROM_LOAD( "e",			0xc800, 0x0800, CRC(5f9e103a) SHA1(b0e9ace4c3962c06e5250fac16a245dca711350f) )
-	ROM_LOAD( "f",			0xf000, 0x1000, CRC(7345aada) SHA1(6640f5eb1130c8f1cb197eb12b8e6403c7f8d34d) )
+	ROM_LOAD( "a",          0x8000, 0x1000, CRC(14909fee) SHA1(bf53fa65da7f013ea1ac6b4942cdfdb34ef16252) )
+	ROM_LOAD( "b",          0x9800, 0x0800, CRC(1473f854) SHA1(eadaec1f6d653e61458bc262945c20140f4530eb) )
+	ROM_LOAD( "c",          0xa800, 0x0800, CRC(7a07004b) SHA1(62bd0f3d12b7eada6fc271abea60569aca7262b0) )
+	ROM_LOAD( "d",          0xb800, 0x0800, CRC(5148cafc) SHA1(124039f48784bf032f612714db73fb67a216a1e7) )
+	ROM_LOAD( "e",          0xc800, 0x0800, CRC(5f9e103a) SHA1(b0e9ace4c3962c06e5250fac16a245dca711350f) )
+	ROM_LOAD( "f",          0xf000, 0x1000, CRC(7345aada) SHA1(6640f5eb1130c8f1cb197eb12b8e6403c7f8d34d) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "v",			0x0000, 0x0800, CRC(f1f75675) SHA1(8f3777e6b2a3f824f94b28669cac501ec02bbf36) )
+	ROM_LOAD( "v",          0x0000, 0x0800, CRC(f1f75675) SHA1(8f3777e6b2a3f824f94b28669cac501ec02bbf36) )
 ROM_END
 
 

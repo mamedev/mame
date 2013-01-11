@@ -30,7 +30,7 @@ INLINE UINT16 galpani2_bg8_regs_r(address_space &space, offs_t offset, int n)
 	galpani2_state *state = space.machine().driver_data<galpani2_state>();
 	switch (offset * 2)
 	{
-		case 0x16:	return space.machine().rand() & 1;
+		case 0x16:  return space.machine().rand() & 1;
 		default:
 			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",space.cpu->safe_pc(),_n_,offset*2);
 	}
@@ -62,9 +62,9 @@ INLINE void galpani2_bg8_w(address_space &space, offs_t offset, UINT16 data, UIN
 	galpani2_state *state = space.machine().driver_data<galpani2_state>();
 	int x,y,pen;
 	UINT16 newword = COMBINE_DATA(&state->m_bg8[_n_][offset]);
-	pen	=	newword & 0xff;
-	x	=	(offset % 512);	/* 512 x 256 */
-	y	=	(offset / 512);
+	pen =   newword & 0xff;
+	x   =   (offset % 512); /* 512 x 256 */
+	y   =   (offset / 512);
 	state->m_bg8_bitmap[_n_]->pix16(y, x) = 0x4000 + pen;
 }
 
@@ -145,10 +145,10 @@ UINT32 galpani2_state::screen_update_galpani2(screen_device &screen, bitmap_ind1
 if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -161,8 +161,8 @@ if (machine().input().code_pressed(KEYCODE_Z))
 		int x = 0;
 		int y = 0;
 		copyscrollbitmap_trans(bitmap, *m_bg15_bitmap,
-							   1, &x, 1, &y,
-							   cliprect,0x4200 + 0);
+								1, &x, 1, &y,
+								cliprect,0x4200 + 0);
 	}
 
 /*  test mode:
@@ -176,8 +176,8 @@ if (machine().input().code_pressed(KEYCODE_Z))
 		int x = - ( *m_bg8_scrollx[0] + 0x200 - 0x0f5 );
 		int y = - ( *m_bg8_scrolly[0] + 0x200 - 0x1be );
 		copyscrollbitmap_trans(bitmap, *m_bg8_bitmap[0],
-							   1, &x, 1, &y,
-							   cliprect,0x4000 + 0);
+								1, &x, 1, &y,
+								cliprect,0x4000 + 0);
 	}
 
 	if (layers_ctrl & 0x4)
@@ -185,8 +185,8 @@ if (machine().input().code_pressed(KEYCODE_Z))
 		int x = - ( *m_bg8_scrollx[1] + 0x200 - 0x0f5 );
 		int y = - ( *m_bg8_scrolly[1] + 0x200 - 0x1be );
 		copyscrollbitmap_trans(bitmap, *m_bg8_bitmap[1],
-							   1, &x, 1, &y,
-							   cliprect,0x4000 + 0);
+								1, &x, 1, &y,
+								cliprect,0x4000 + 0);
 	}
 
 	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(machine(), bitmap, cliprect, m_spriteram, m_spriteram.bytes());

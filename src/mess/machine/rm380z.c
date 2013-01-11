@@ -28,7 +28,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 {
 	switch ( offset )
 	{
-	case 0xFC:		// PORT0
+	case 0xFC:      // PORT0
 		//printf("FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",data,m_fbfd,m_fbfe,machine().device("maincpu")->safe_pc(),writenum);
 		m_port0 = data;
 		if (data&0x01)
@@ -42,7 +42,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 		config_memory_map();
 		break;
 
-	case 0xFD:		// screen line counter (?)
+	case 0xFD:      // screen line counter (?)
 		//printf("FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,data,m_fbfe,machine().device("maincpu")->safe_pc(),writenum);
 
 		m_old_old_fbfd=m_old_fbfd;
@@ -55,12 +55,12 @@ WRITE8_MEMBER( rm380z_state::port_write )
 
 		break;
 
-	case 0xFE:		// line on screen to write to divided by 2
+	case 0xFE:      // line on screen to write to divided by 2
 		//printf("FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,m_fbfd,data,machine().device("maincpu")->safe_pc(),writenum);
 		m_fbfe=data;
 		break;
 
-	case 0xFF:		// user I/O port
+	case 0xFF:      // user I/O port
 		//printf("write of [%x] to FBFF\n",data);
 		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data );
 		break;
@@ -76,7 +76,7 @@ READ8_MEMBER( rm380z_state::port_read )
 
 	switch ( offset )
 	{
-	case 0xFC:		// PORT0
+	case 0xFC:      // PORT0
 		//m_port0_kbd=getKeyboard();
 		data = m_port0_kbd;
 		//if (m_port0_kbd!=0) m_port0_kbd=0;
@@ -84,17 +84,17 @@ READ8_MEMBER( rm380z_state::port_read )
 		//printf("read of port0 (kbd) from PC [%x]\n",machine().device("maincpu")->safe_pc());
 		break;
 
-	case 0xFD:		// "counter" (?)
+	case 0xFD:      // "counter" (?)
 		//printf("%s: Read from counter FBFD\n", machine().describe_context());
 		data = 0x00;
 		break;
 
-	case 0xFE:		// PORT1
+	case 0xFE:      // PORT1
 		data = m_port1;
 		//printf("read of port1 from PC [%x]\n",machine().device("maincpu")->safe_pc());
 		break;
 
-	case 0xFF:		// user port
+	case 0xFF:      // user port
 		//printf("%s: Read from user port\n", machine().describe_context());
 		break;
 
@@ -292,7 +292,7 @@ void rm380z_state::config_memory_map()
 	else
 	{
 		program.install_rom( 0x0000, 0x0FFF, rom );
-		program.install_readwrite_handler(0x1BFC, 0x1BFF,read8_delegate(FUNC(rm380z_state::port_read_1b00), this),write8_delegate(FUNC(rm380z_state::port_write_1b00), this)	);
+		program.install_readwrite_handler(0x1BFC, 0x1BFF,read8_delegate(FUNC(rm380z_state::port_read_1b00), this),write8_delegate(FUNC(rm380z_state::port_write_1b00), this)    );
 		program.install_rom( 0x1C00, 0x1DFF, rom + 0x1400 );
 		program.install_ram( 0x4000, 0xDFFF, m_ram_p );
 	}

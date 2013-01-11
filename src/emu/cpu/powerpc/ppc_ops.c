@@ -868,14 +868,14 @@ static void ppc_mtcrf(UINT32 op)
 	int fxm = FXM;
 	int t = RT;
 
-	if( fxm & 0x80 )	CR(0) = (REG(t) >> 28) & 0xf;
-	if( fxm & 0x40 )	CR(1) = (REG(t) >> 24) & 0xf;
-	if( fxm & 0x20 )	CR(2) = (REG(t) >> 20) & 0xf;
-	if( fxm & 0x10 )	CR(3) = (REG(t) >> 16) & 0xf;
-	if( fxm & 0x08 )	CR(4) = (REG(t) >> 12) & 0xf;
-	if( fxm & 0x04 )	CR(5) = (REG(t) >> 8) & 0xf;
-	if( fxm & 0x02 )	CR(6) = (REG(t) >> 4) & 0xf;
-	if( fxm & 0x01 )	CR(7) = (REG(t) >> 0) & 0xf;
+	if( fxm & 0x80 )    CR(0) = (REG(t) >> 28) & 0xf;
+	if( fxm & 0x40 )    CR(1) = (REG(t) >> 24) & 0xf;
+	if( fxm & 0x20 )    CR(2) = (REG(t) >> 20) & 0xf;
+	if( fxm & 0x10 )    CR(3) = (REG(t) >> 16) & 0xf;
+	if( fxm & 0x08 )    CR(4) = (REG(t) >> 12) & 0xf;
+	if( fxm & 0x04 )    CR(5) = (REG(t) >> 8) & 0xf;
+	if( fxm & 0x02 )    CR(6) = (REG(t) >> 4) & 0xf;
+	if( fxm & 0x01 )    CR(7) = (REG(t) >> 0) & 0xf;
 }
 
 #ifndef PPC_DRC
@@ -1442,8 +1442,8 @@ static void ppc_subfex(UINT32 op)
 	r = ~ra + carry;
 	REG(RT) = rb + r;
 
-	SET_ADD_CA(r, ~ra, carry);		/* step 1 carry */
-	if( REG(RT) < r )				/* step 2 carry */
+	SET_ADD_CA(r, ~ra, carry);      /* step 1 carry */
+	if( REG(RT) < r )               /* step 2 carry */
 		XER |= XER_CA;
 
 	if( OEBIT ) {
@@ -1474,9 +1474,9 @@ static void ppc_subfmex(UINT32 op)
 	r = ~ra + carry;
 	REG(RT) = r - 1;
 
-	SET_SUB_CA(r, ~ra, carry);		/* step 1 carry */
+	SET_SUB_CA(r, ~ra, carry);      /* step 1 carry */
 	if( REG(RT) < r )
-		XER |= XER_CA;				/* step 2 carry */
+		XER |= XER_CA;              /* step 2 carry */
 
 	if( OEBIT ) {
 		SET_SUB_OV(REG(RT), -1, ra);
@@ -1621,10 +1621,10 @@ static void ppc_invalid(UINT32 op)
 // !here are the 6xx ops! //
 ////////////////////////////
 
-#define DOUBLE_SIGN		(U64(0x8000000000000000))
-#define DOUBLE_EXP		(U64(0x7ff0000000000000))
-#define DOUBLE_FRAC		(U64(0x000fffffffffffff))
-#define DOUBLE_ZERO		(0)
+#define DOUBLE_SIGN     (U64(0x8000000000000000))
+#define DOUBLE_EXP      (U64(0x7ff0000000000000))
+#define DOUBLE_FRAC     (U64(0x000fffffffffffff))
+#define DOUBLE_ZERO     (0)
 
 /*
   Floating point operations.
@@ -1718,30 +1718,30 @@ INLINE void set_fprf(FPR f)
 	}
 	else if (is_infinity_double(f))
 	{
-		if (sign_double(f))		// -INF
+		if (sign_double(f))     // -INF
 			fprf = 0x09;
-		else					// +INF
+		else                    // +INF
 			fprf = 0x05;
 	}
 	else if (is_normalized_double(f))
 	{
-		if (sign_double(f))		// -Normalized
+		if (sign_double(f))     // -Normalized
 			fprf = 0x08;
-		else					// +Normalized
+		else                    // +Normalized
 			fprf = 0x04;
 	}
 	else if (is_denormalized_double(f))
 	{
-		if (sign_double(f))		// -Denormalized
+		if (sign_double(f))     // -Denormalized
 			fprf = 0x18;
-		else					// +Denormalized
+		else                    // +Denormalized
 			fprf = 0x14;
 	}
 	else    // Zero
 	{
-		if (sign_double(f))		// -Zero
+		if (sign_double(f))     // -Zero
 			fprf = 0x12;
-		else					// +Zero
+		else                    // +Zero
 			fprf = 0x02;
 	}
 
@@ -1949,9 +1949,9 @@ static void ppc_mftb(UINT32 op)
 
 	switch(x)
 	{
-		case 268:	REG(RT) = (UINT32)(ppc_read_timebase()); break;
-		case 269:	REG(RT) = (UINT32)(ppc_read_timebase() >> 32); break;
-		default:	fatalerror("ppc: Invalid timebase register %d at %08X\n", x, ppc.pc); break;
+		case 268:   REG(RT) = (UINT32)(ppc_read_timebase()); break;
+		case 269:   REG(RT) = (UINT32)(ppc_read_timebase() >> 32); break;
+		default:    fatalerror("ppc: Invalid timebase register %d at %08X\n", x, ppc.pc); break;
 	}
 }
 
@@ -2098,11 +2098,11 @@ static void ppc_faddx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN(FPR(a), FPR(b));
+	SET_VXSNAN(FPR(a), FPR(b));
 
 	FPR(t).fd = FPR(a).fd + FPR(b).fd;
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2154,9 +2154,9 @@ static void ppc_fcmpu(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN(FPR(a), FPR(b));
+	SET_VXSNAN(FPR(a), FPR(b));
 
-    if(is_nan_double(FPR(a)) || is_nan_double(FPR(b)))
+	if(is_nan_double(FPR(a)) || is_nan_double(FPR(b)))
 	{
 		c = 1; /* OX */
 		if(is_snan_double(FPR(a)) || is_snan_double(FPR(b))) {
@@ -2189,7 +2189,7 @@ static void ppc_fctiwx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN_1(FPR(b));
+	SET_VXSNAN_1(FPR(b));
 
 	switch(ppc.fpscr & 3)
 	{
@@ -2199,7 +2199,7 @@ static void ppc_fctiwx(UINT32 op)
 		case 3: r = (INT64)round_toward_negative_infinity(FPR(b)); break;
 	}
 
-    if(r > (INT64)((INT32)0x7FFFFFFF))
+	if(r > (INT64)((INT32)0x7FFFFFFF))
 	{
 		FPR(t).id = 0x7FFFFFFF;
 		// FPSCR[FR] = 0
@@ -2237,10 +2237,10 @@ static void ppc_fctiwzx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN_1(FPR(b));
+	SET_VXSNAN_1(FPR(b));
 	r = round_toward_zero(FPR(b));
 
-    if(r > (INT64)((INT32)0x7fffffff))
+	if(r > (INT64)((INT32)0x7fffffff))
 	{
 		FPR(t).id = 0x7fffffff;
 		// FPSCR[FR] = 0
@@ -2277,11 +2277,11 @@ static void ppc_fdivx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN(FPR(a), FPR(b));
+	SET_VXSNAN(FPR(a), FPR(b));
 
-    FPR(t).fd = FPR(a).fd / FPR(b).fd;
+	FPR(t).fd = FPR(a).fd / FPR(b).fd;
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2336,11 +2336,11 @@ static void ppc_frspx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN_1(FPR(b));
+	SET_VXSNAN_1(FPR(b));
 
 	FPR(t).fd = (float)FPR(b).fd;
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2353,11 +2353,11 @@ static void ppc_frsqrtex(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN_1(FPR(b));
+	SET_VXSNAN_1(FPR(b));
 
-	FPR(t).fd = 1.0 / sqrt(FPR(b).fd);	/* verify this */
+	FPR(t).fd = 1.0 / sqrt(FPR(b).fd);  /* verify this */
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2371,11 +2371,11 @@ static void ppc_fsqrtx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN_1(FPR(b));
+	SET_VXSNAN_1(FPR(b));
 
 	FPR(t).fd = (double)(sqrt(FPR(b).fd));
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2389,11 +2389,11 @@ static void ppc_fsubx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN(FPR(a), FPR(b));
+	SET_VXSNAN(FPR(a), FPR(b));
 
 	FPR(t).fd = FPR(a).fd - FPR(b).fd;
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2410,28 +2410,28 @@ static void ppc_mffsx(UINT32 op)
 
 static void ppc_mtfsb0x(UINT32 op)
 {
-    UINT32 crbD;
+	UINT32 crbD;
 
-    crbD = (op >> 21) & 0x1F;
+	crbD = (op >> 21) & 0x1F;
 
-    if (crbD != 1 && crbD != 2) // these bits cannot be explicitly cleared
-        ppc.fpscr &= ~(1 << (31 - crbD));
+	if (crbD != 1 && crbD != 2) // these bits cannot be explicitly cleared
+		ppc.fpscr &= ~(1 << (31 - crbD));
 
-    if( RCBIT ) {
+	if( RCBIT ) {
 		SET_CR1();
 	}
 }
 
 static void ppc_mtfsb1x(UINT32 op)
 {
-    UINT32 crbD;
+	UINT32 crbD;
 
-    crbD = (op >> 21) & 0x1F;
+	crbD = (op >> 21) & 0x1F;
 
-    if (crbD != 1 && crbD != 2) // these bits cannot be explicitly cleared
-        ppc.fpscr |= (1 << (31 - crbD));
+	if (crbD != 1 && crbD != 2) // these bits cannot be explicitly cleared
+		ppc.fpscr |= (1 << (31 - crbD));
 
-    if( RCBIT ) {
+	if( RCBIT ) {
 		SET_CR1();
 	}
 }
@@ -2455,30 +2455,30 @@ static void ppc_mtfsfx(UINT32 op)
 
 static void ppc_mtfsfix(UINT32 op)
 {
-    UINT32 crfd = CRFD;
-    UINT32 imm = (op >> 12) & 0xF;
+	UINT32 crfd = CRFD;
+	UINT32 imm = (op >> 12) & 0xF;
 
-    /*
-     * According to the manual:
-     *
-     * If bits 0 and 3 of FPSCR are to be modified, they take the immediate
-     * value specified. Bits 1 and 2 (FEX and VX) are set according to the
-     * "usual rule" and not from IMM[1-2].
-     *
-     * The "usual rule" is not emulated, so these bits simply aren't modified
-     * at all here.
-     */
+	/*
+	 * According to the manual:
+	 *
+	 * If bits 0 and 3 of FPSCR are to be modified, they take the immediate
+	 * value specified. Bits 1 and 2 (FEX and VX) are set according to the
+	 * "usual rule" and not from IMM[1-2].
+	 *
+	 * The "usual rule" is not emulated, so these bits simply aren't modified
+	 * at all here.
+	 */
 
-    crfd = (7 - crfd) * 4;  // calculate LSB position of field
+	crfd = (7 - crfd) * 4;  // calculate LSB position of field
 
-    if (crfd == 28)         // field containing FEX and VX is special...
-    {                       // bits 1 and 2 of FPSCR must not be altered
-        ppc.fpscr &= 0x9fffffff;
-        ppc.fpscr |= (imm & 0x9fffffff);
-    }
+	if (crfd == 28)         // field containing FEX and VX is special...
+	{                       // bits 1 and 2 of FPSCR must not be altered
+		ppc.fpscr &= 0x9fffffff;
+		ppc.fpscr |= (imm & 0x9fffffff);
+	}
 
-    ppc.fpscr &= ~(0xf << crfd);    // clear field
-    ppc.fpscr |= (imm << crfd);     // insert new data
+	ppc.fpscr &= ~(0xf << crfd);    // clear field
+	ppc.fpscr |= (imm << crfd);     // insert new data
 
 	if( RCBIT ) {
 		SET_CR1();
@@ -2490,24 +2490,24 @@ static void ppc_mcrfs(UINT32 op)
 	UINT32 crfs, f;
 	crfs = CRFA;
 
-	f = ppc.fpscr >> ((7 - crfs) * 4);	// get crfS field from FPSCR
+	f = ppc.fpscr >> ((7 - crfs) * 4);  // get crfS field from FPSCR
 	f &= 0xf;
 
-	switch(crfs)	// determine which exception bits to clear in FPSCR
+	switch(crfs)    // determine which exception bits to clear in FPSCR
 	{
-		case 0:		// FX, OX
+		case 0:     // FX, OX
 			ppc.fpscr &= ~0x90000000;
 			break;
-		case 1:		// UX, ZX, XX, VXSNAN
+		case 1:     // UX, ZX, XX, VXSNAN
 			ppc.fpscr &= ~0x0f000000;
 			break;
-		case 2:		// VXISI, VXIDI, VXZDZ, VXIMZ
+		case 2:     // VXISI, VXIDI, VXZDZ, VXIMZ
 			ppc.fpscr &= ~0x00F00000;
 			break;
-		case 3:		// VXVC
+		case 3:     // VXVC
 			ppc.fpscr &= ~0x00080000;
 			break;
-		case 5:		// VXSOFT, VXSQRT, VXCVI
+		case 5:     // VXSOFT, VXSQRT, VXCVI
 			ppc.fpscr &= ~0x00000e00;
 			break;
 		default:
@@ -2578,11 +2578,11 @@ static void ppc_fsqrtsx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN_1(FPR(b));
+	SET_VXSNAN_1(FPR(b));
 
 	FPR(t).fd = (float)(sqrt(FPR(b).fd));
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2596,11 +2596,11 @@ static void ppc_fsubsx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN(FPR(a), FPR(b));
+	SET_VXSNAN(FPR(a), FPR(b));
 
 	FPR(t).fd = (float)(FPR(a).fd - FPR(b).fd);
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2615,12 +2615,12 @@ static void ppc_fmaddx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN(FPR(a), FPR(b));
-    SET_VXSNAN_1(FPR(c));
+	SET_VXSNAN(FPR(a), FPR(b));
+	SET_VXSNAN_1(FPR(c));
 
 	FPR(t).fd = ((FPR(a).fd * FPR(c).fd) + FPR(b).fd);
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2635,12 +2635,12 @@ static void ppc_fmsubx(UINT32 op)
 
 	CHECK_FPU_AVAILABLE();
 
-    SET_VXSNAN(FPR(a), FPR(b));
-    SET_VXSNAN_1(FPR(c));
+	SET_VXSNAN(FPR(a), FPR(b));
+	SET_VXSNAN_1(FPR(c));
 
-    FPR(t).fd = ((FPR(a).fd * FPR(c).fd) - FPR(b).fd);
+	FPR(t).fd = ((FPR(a).fd * FPR(c).fd) - FPR(b).fd);
 
-    set_fprf(FPR(t));
+	set_fprf(FPR(t));
 	if( RCBIT ) {
 		SET_CR1();
 	}
@@ -2789,7 +2789,7 @@ static void ppc_fnmaddsx(UINT32 op)
 	SET_VXSNAN(FPR(a), FPR(b));
 	SET_VXSNAN_1(FPR(c));
 
-    FPR(t).fd = (float)(-((FPR(a).fd * FPR(c).fd) + FPR(b).fd));
+	FPR(t).fd = (float)(-((FPR(a).fd * FPR(c).fd) + FPR(b).fd));
 
 	set_fprf(FPR(t));
 	if( RCBIT ) {

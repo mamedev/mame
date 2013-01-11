@@ -53,8 +53,8 @@
 //**************************************************************************
 
 // macros for a timer callback functions
-#define TIMER_DEVICE_CALLBACK(name)		void name(device_t *, timer_device &timer, void *ptr, INT32 param)
-#define TIMER_DEVICE_CALLBACK_MEMBER(name)	void name(timer_device &timer, void *ptr, INT32 param)
+#define TIMER_DEVICE_CALLBACK(name)     void name(device_t *, timer_device &timer, void *ptr, INT32 param)
+#define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, void *ptr, INT32 param)
 
 //**************************************************************************
 //  TIMER DEVICE CONFIGURATION MACROS
@@ -172,24 +172,24 @@ private:
 	};
 
 	// configuration data
-	timer_type				m_type;				// type of timer
-	timer_device_expired_delegate	m_callback;			// the timer's callback function
-	void *					m_ptr;				// the pointer parameter passed to the timer callback
+	timer_type              m_type;             // type of timer
+	timer_device_expired_delegate   m_callback;         // the timer's callback function
+	void *                  m_ptr;              // the pointer parameter passed to the timer callback
 
 	// periodic timers only
-	attotime				m_start_delay;		// delay before the timer fires for the first time
-	attotime				m_period;			// period of repeated timer firings
-	INT32					m_param;			// the integer parameter passed to the timer callback
+	attotime                m_start_delay;      // delay before the timer fires for the first time
+	attotime                m_period;           // period of repeated timer firings
+	INT32                   m_param;            // the integer parameter passed to the timer callback
 
 	// scanline timers only
-	const char *			m_screen_tag;		// the tag of the screen this timer tracks
-	screen_device *			m_screen;			// pointer to the screen device
-	UINT32					m_first_vpos;		// the first vertical scanline position the timer fires on
-	UINT32					m_increment;		// the number of scanlines between firings
+	const char *            m_screen_tag;       // the tag of the screen this timer tracks
+	screen_device *         m_screen;           // pointer to the screen device
+	UINT32                  m_first_vpos;       // the first vertical scanline position the timer fires on
+	UINT32                  m_increment;        // the number of scanlines between firings
 
 	// internal state
-	emu_timer *				m_timer;			// the backing timer
-	bool					m_first_time;		// indicates that the system is starting (scanline timers only)
+	emu_timer *             m_timer;            // the backing timer
+	bool                    m_first_time;       // indicates that the system is starting (scanline timers only)
 };
 
 
@@ -201,4 +201,4 @@ private:
 extern const device_type TIMER;
 
 
-#endif	/* __TIMER_H__ */
+#endif  /* __TIMER_H__ */

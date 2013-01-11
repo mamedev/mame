@@ -11,34 +11,34 @@
 
 #define LOG 0
 
-#define BASE_SHIFT	16
+#define BASE_SHIFT  16
 
 struct k053260_channel
 {
-	UINT32		rate;
-	UINT32		size;
-	UINT32		start;
-	UINT32		bank;
-	UINT32		volume;
-	int			play;
-	UINT32		pan;
-	UINT32		pos;
-	int			loop;
-	int			ppcm; /* packed PCM ( 4 bit signed ) */
-	int			ppcm_data;
+	UINT32      rate;
+	UINT32      size;
+	UINT32      start;
+	UINT32      bank;
+	UINT32      volume;
+	int         play;
+	UINT32      pan;
+	UINT32      pos;
+	int         loop;
+	int         ppcm; /* packed PCM ( 4 bit signed ) */
+	int         ppcm_data;
 };
 
 struct k053260_state
 {
-	sound_stream *				channel;
-	int							mode;
-	int							regs[0x30];
-	UINT8						*rom;
-	int							rom_size;
-	UINT32						*delta_table;
-	k053260_channel				channels[4];
-	const k053260_interface		*intf;
-	device_t				*device;
+	sound_stream *              channel;
+	int                         mode;
+	int                         regs[0x30];
+	UINT8                       *rom;
+	int                         rom_size;
+	UINT32                      *delta_table;
+	k053260_channel             channels[4];
+	const k053260_interface     *intf;
+	device_t                *device;
 };
 
 INLINE k053260_state *get_safe_token(device_t *device)
@@ -51,9 +51,9 @@ INLINE k053260_state *get_safe_token(device_t *device)
 
 static void InitDeltaTable( k053260_state *ic, int rate, int clock )
 {
-	int		i;
-	double	base = ( double )rate;
-	double	max = (double)(clock); /* Hz */
+	int     i;
+	double  base = ( double )rate;
+	double  max = (double)(clock); /* Hz */
 	UINT32 val;
 
 	for( i = 0; i < 0x1000; i++ ) {
@@ -294,7 +294,7 @@ WRITE8_DEVICE_HANDLER( k053260_w )
 		return;
 	}
 
-	 ic->channel->update();
+		ic->channel->update();
 
 	/* before we update the regs, we need to check for a latched reg */
 	if ( r == 0x28 ) {
@@ -439,7 +439,7 @@ const device_type K053260 = &device_creator<k053260_device>;
 
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053260, "K053260", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(k053260_state);
 }
@@ -481,5 +481,3 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

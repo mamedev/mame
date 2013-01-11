@@ -157,36 +157,36 @@ static INPUT_PORTS_START( dairesya )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30K 70K+" )
 	PORT_DIPSETTING(    0x10, "40K 80K+" )
 	PORT_DIPSETTING(    0x08, "40K" )
 	PORT_DIPSETTING(    0x00, "50K" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )		// factory default (JP)
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )			// factory default (US)
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )       // factory default (JP)
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )         // factory default (US)
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_DIPNAME( 0x04, 0x04, "Button Layout" )			PORT_DIPLOCATION("SW3:3") // though US manual says unused
+	PORT_DIPNAME( 0x04, 0x04, "Button Layout" )         PORT_DIPLOCATION("SW3:3") // though US manual says unused
 	PORT_DIPSETTING(    0x04, "Power Attack Squat" )
 	PORT_DIPSETTING(    0x00, "Squat Attack Power" )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -244,37 +244,37 @@ GFXDECODE_END
 
 static const gfx_layout farwest_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	2048,	/* 2048 characters */
-	4,	/* 4 bits per pixel */
-	{ 0, 2, 4, 6 },	/* the four bitplanes are packed in one byte */
+	8,8,    /* 8*8 characters */
+	2048,   /* 2048 characters */
+	4,  /* 4 bits per pixel */
+	{ 0, 2, 4, 6 }, /* the four bitplanes are packed in one byte */
 	{ 3*8+1, 3*8+0, 0*8+1, 0*8+0, 1*8+1, 1*8+0, 2*8+1, 2*8+0 },
 	{ 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8 },
-	32*8	/* every char takes 32 consecutive bytes */
+	32*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout farwest_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	512,	/* 512 sprites */
-	4,	/* 4 bits per pixel */
-	{ 0, 512*32*8, 2*512*32*8, 3*512*32*8 },	/* the four bitplanes are separated */
+	16,16,  /* 16*16 sprites */
+	512,    /* 512 sprites */
+	4,  /* 4 bits per pixel */
+	{ 0, 512*32*8, 2*512*32*8, 3*512*32*8 },    /* the four bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout farwest_spritelayout2 =
 {
-	8,8,	/* 8*8 characters */
-	2048,	/* 2048 characters */
-	4,	/* 4 bits per pixel */
-	{ 0, 2048*8*8, 2*2048*8*8, 3*2048*8*8 },	/* the four bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	2048,   /* 2048 characters */
+	4,  /* 4 bits per pixel */
+	{ 0, 2048*8*8, 2*2048*8*8, 3*2048*8*8 },    /* the four bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static GFXDECODE_START( farwest )
@@ -293,7 +293,7 @@ GFXDECODE_END
 static const discrete_mixer_desc ironhors_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(2.2), RES_K(2.2), RES_K(2.2)},
-		{0,0,0,0,0,0},	/* no variable resistors   */
+		{0,0,0,0,0,0},  /* no variable resistors   */
 		{0,0,0,0,0,0},  /* no node capacitors      */
 		0, RES_K(1),   /* RF */
 		0,
@@ -303,7 +303,7 @@ static const discrete_mixer_desc ironhors_mixer_desc =
 static const discrete_mixer_desc ironhors_mixer_desc_final =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(0.5), RES_K(1)},
-		{0,0,0,0,0,0},	/* no variable resistors   */
+		{0,0,0,0,0,0},  /* no variable resistors   */
 		{CAP_U(4.7), CAP_U(4.7)},  /* node capacitors         */
 		0, RES_K(1),   /* RF */
 		0,
@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, ironhors_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu",Z80,18432000/6)		 /* 3.072 MHz */
+	MCFG_CPU_ADD("soundcpu",Z80,18432000/6)      /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 
@@ -525,10 +525,10 @@ ROM_START( dairesya )
 ROM_END
 
 ROM_START( farwest )
-	ROM_REGION( 0x12000, "maincpu", 0 )	/* 64k for code + 8k for extra ROM */
+	ROM_REGION( 0x12000, "maincpu", 0 ) /* 64k for code + 8k for extra ROM */
 	ROM_LOAD( "ironhors.008", 0x04000, 0x4000, CRC(b1c8246c) SHA1(4ceb098bb0b4efcbe50bb4b23bd27a60dabf2b3e) )
 	ROM_LOAD( "ironhors.009", 0x08000, 0x8000, CRC(ea34ecfc) SHA1(8c7f12e76d2b9eb592ebf1bfd3e16a6b130da8e5) )
-	ROM_LOAD( "ironhors.007", 0x00000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )	/* don't know what this is for */
+	ROM_LOAD( "ironhors.007", 0x00000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )   /* don't know what this is for */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ironhors.010", 0x0000, 0x4000, CRC(a28231a6) SHA1(617e8fdf8129081c6a1bbbf140837a375a51da72) )

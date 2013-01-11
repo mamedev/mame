@@ -37,18 +37,18 @@ const device_type PLUS4_EXPANSION_SLOT = &device_creator<plus4_expansion_slot_de
 
 device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_c1l(NULL),
-	  m_c1h(NULL),
-	  m_c2l(NULL),
-	  m_c2h(NULL),
-	  m_ram(NULL),
-	  m_nvram(NULL),
-	  m_nvram_size(0),
-	  m_c1l_mask(0),
-	  m_c1h_mask(0),
-	  m_c2l_mask(0),
-	  m_c2h_mask(0),
-	  m_ram_mask(0)
+		m_c1l(NULL),
+		m_c1h(NULL),
+		m_c2l(NULL),
+		m_c2h(NULL),
+		m_ram(NULL),
+		m_nvram(NULL),
+		m_nvram_size(0),
+		m_c1l_mask(0),
+		m_c1h_mask(0),
+		m_c2l_mask(0),
+		m_c2h_mask(0),
+		m_ram_mask(0)
 {
 	m_slot = dynamic_cast<plus4_expansion_slot_device *>(device.owner());
 }
@@ -176,7 +176,7 @@ UINT8* device_plus4_expansion_card_interface::plus4_nvram_pointer(running_machin
 //-------------------------------------------------
 
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock),
+		device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -210,10 +210,10 @@ void plus4_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
-    	memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_aec_cb, 0, sizeof(m_out_aec_cb));
+		memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
+		memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_aec_cb, 0, sizeof(m_out_aec_cb));
 	}
 
 	// set brief and instance name

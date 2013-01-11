@@ -5,8 +5,8 @@
 ****************************************************************************/
 
 
-#define LOG_COMM			(0)
-#define LOG_32031_IOPORTS	(0)
+#define LOG_COMM            (0)
+#define LOG_32031_IOPORTS   (0)
 
 
 #include "emu.h"
@@ -22,8 +22,8 @@
  *
  *************************************/
 
-#define DAC_BUFFER_CHANNELS		4
-#define STACK_SOUND_BUFSIZE		(1024)
+#define DAC_BUFFER_CHANNELS     4
+#define STACK_SOUND_BUFSIZE     (1024)
 
 
 
@@ -71,27 +71,27 @@ static cage_t cage;
  *
  *************************************/
 
-#define DMA_GLOBAL_CTL			0x00
-#define DMA_SOURCE_ADDR			0x04
-#define DMA_DEST_ADDR			0x06
-#define DMA_TRANSFER_COUNT		0x08
+#define DMA_GLOBAL_CTL          0x00
+#define DMA_SOURCE_ADDR         0x04
+#define DMA_DEST_ADDR           0x06
+#define DMA_TRANSFER_COUNT      0x08
 
-#define TIMER0_GLOBAL_CTL		0x20
-#define TIMER0_COUNTER			0x24
-#define TIMER0_PERIOD			0x28
+#define TIMER0_GLOBAL_CTL       0x20
+#define TIMER0_COUNTER          0x24
+#define TIMER0_PERIOD           0x28
 
-#define TIMER1_GLOBAL_CTL		0x30
-#define TIMER1_COUNTER			0x34
-#define TIMER1_PERIOD			0x38
+#define TIMER1_GLOBAL_CTL       0x30
+#define TIMER1_COUNTER          0x34
+#define TIMER1_PERIOD           0x38
 
-#define SPORT_GLOBAL_CTL		0x40
-#define SPORT_TX_CTL			0x42
-#define SPORT_RX_CTL			0x43
-#define SPORT_TIMER_CTL			0x44
-#define SPORT_TIMER_COUNTER		0x45
-#define SPORT_TIMER_PERIOD		0x46
-#define SPORT_DATA_TX			0x48
-#define SPORT_DATA_RX			0x4c
+#define SPORT_GLOBAL_CTL        0x40
+#define SPORT_TX_CTL            0x42
+#define SPORT_RX_CTL            0x43
+#define SPORT_TIMER_CTL         0x44
+#define SPORT_TIMER_COUNTER     0x45
+#define SPORT_TIMER_PERIOD      0x46
+#define SPORT_DATA_TX           0x48
+#define SPORT_DATA_RX           0x4c
 
 static const char *const register_names[] =
 {

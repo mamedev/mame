@@ -13,7 +13,7 @@
 #define XCEEDMC30_SCREEN_NAME "x30hr_screen"
 #define XCEEDMC30_ROM_REGION  "x30hr_rom"
 
-#define VRAM_SIZE	(0x200000)	// 16 42C4256 256Kx4 VRAMs on the board = 2MB
+#define VRAM_SIZE   (0x200000)  // 16 42C4256 256Kx4 VRAMs on the board = 2MB
 
 MACHINE_CONFIG_FRAGMENT( xceedmc30 )
 	MCFG_SCREEN_ADD( XCEEDMC30_SCREEN_NAME, RASTER)
@@ -24,7 +24,7 @@ MACHINE_CONFIG_FRAGMENT( xceedmc30 )
 MACHINE_CONFIG_END
 
 ROM_START( xceedmc30 )
-    ROM_REGION(0x8000, XCEEDMC30_ROM_REGION, 0)
+	ROM_REGION(0x8000, XCEEDMC30_ROM_REGION, 0)
 	ROM_LOAD( "0390.bin", 0x000000, 0x008000, CRC(adea7a18) SHA1(9141eb1a0e5061e0409d65a89b4eaeb119ee4ffb) )
 ROM_END
 
@@ -63,14 +63,14 @@ const rom_entry *nubus_xceedmc30_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PDS030_XCEEDMC30, "Micron/XCEED Technology MacroColor 30", tag, owner, clock),
+		device_t(mconfig, PDS030_XCEEDMC30, "Micron/XCEED Technology MacroColor 30", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "pd3_mclr";
 }
 
 nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "pd3_mclr";
@@ -99,7 +99,7 @@ void nubus_xceedmc30_device::device_start()
 	m_nubus->install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceedmc30_device::xceedmc30_r), this), write32_delegate(FUNC(nubus_xceedmc30_device::xceedmc30_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -217,7 +217,7 @@ UINT32 nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb32
 			}
 			break;
 
-		case 4:	// 24 bpp
+		case 4: // 24 bpp
 			{
 				UINT32 *vram32 = (UINT32 *)vram;
 				UINT32 *base;
@@ -243,9 +243,9 @@ UINT32 nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb32
 
 WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 {
-    switch (offset)
+	switch (offset)
 	{
-		case 0x80000:			// mode
+		case 0x80000:           // mode
 			switch (data & 0xff000000)
 			{
 				case 0xfb000000:
@@ -260,9 +260,9 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 					m_mode = 2;
 					break;
 
-                case 0xf8000000:
-                    m_mode = 3;
-                    break;
+				case 0xf8000000:
+					m_mode = 3;
+					break;
 
 				case 0xff000000:
 					m_mode = 4;
@@ -270,46 +270,46 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 			}
 			break;
 
-        case 0x80005:   // ack VBL
-            lower_slot_irq();
-            break;
+		case 0x80005:   // ack VBL
+			lower_slot_irq();
+			break;
 
-        case 0x100000:
+		case 0x100000:
 //            printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
-            m_clutoffs = (data&0xff);
-            m_count = 0;
-            break;
+			m_clutoffs = (data&0xff);
+			m_count = 0;
+			break;
 
-        case 0x100001:
+		case 0x100001:
 //            printf("%08x to DAC data (PC=%x)\n", data, space.device().safe_pc());
-            m_colors[m_count++] = ((data>>24) & 0xff);
+			m_colors[m_count++] = ((data>>24) & 0xff);
 
-            if (m_count == 3)
-            {
+			if (m_count == 3)
+			{
 //                printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
-                m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
-                m_clutoffs++;
-                if (m_clutoffs > 255)
-                {
-                    m_clutoffs = 0;
-                }
-                m_count = 0;
-            }
+				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+				m_clutoffs++;
+				if (m_clutoffs > 255)
+				{
+					m_clutoffs = 0;
+				}
+				m_count = 0;
+			}
 			break;
 
-        case 0x80002:	// VBL control
-            if (data == 0xdcef0000)
-            {
-                m_vbl_disable = 0;
-                lower_slot_irq();
-            }
-            else
-            {
-                m_vbl_disable = 1;
-            }
+		case 0x80002:   // VBL control
+			if (data == 0xdcef0000)
+			{
+				m_vbl_disable = 0;
+				lower_slot_irq();
+			}
+			else
+			{
+				m_vbl_disable = 1;
+			}
 			break;
 
-        default:
+		default:
 //            printf("xceedmc30_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
@@ -318,11 +318,11 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 READ32_MEMBER( nubus_xceedmc30_device::xceedmc30_r )
 {
 //    printf("xceedmc30_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
-    if (offset == 0x80008)
-    {
-        m_toggle ^= 0x04;
-        return m_toggle;
-    }
+	if (offset == 0x80008)
+	{
+		m_toggle ^= 0x04;
+		return m_toggle;
+	}
 
 	return 0;
 }

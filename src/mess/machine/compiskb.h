@@ -21,7 +21,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define COMPIS_KEYBOARD_TAG	"compiskb"
+#define COMPIS_KEYBOARD_TAG "compiskb"
 
 
 
@@ -30,7 +30,7 @@
 //**************************************************************************
 
 #define MCFG_COMPIS_KEYBOARD_ADD() \
-    MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
+	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
 
 
 #define COMPIS_KEYBOARD_INTERFACE(_name) \
@@ -46,7 +46,7 @@
 
 struct compis_keyboard_interface
 {
-	devcb_write_line	m_out_int_cb;
+	devcb_write_line    m_out_int_cb;
 };
 
 
@@ -56,8 +56,8 @@ class compis_keyboard_device :  public device_t,
 								public compis_keyboard_interface
 {
 public:
-    // construction/destruction
-    compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -69,13 +69,13 @@ public:
 	DECLARE_READ_LINE_MEMBER( so_r );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	devcb_resolved_write_line	m_out_int_func;
+	devcb_resolved_write_line   m_out_int_func;
 
 	required_device<cpu_device> m_maincpu;
 

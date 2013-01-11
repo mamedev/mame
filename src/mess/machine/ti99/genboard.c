@@ -236,7 +236,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_grom )
 		}
 	}
 	else
-	{	// write GPL data
+	{   // write GPL data
 		// The Geneve GROM simulator allows for GROM writing (verified with a real system)
 		int page = 0x38;
 		m_dram[(page<<13) + m_grom_address] = data;
@@ -284,7 +284,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 {
 	UINT8 value = 0;
 	int page;
-	UINT32	physaddr;
+	UINT32  physaddr;
 
 	// Premature access. The CPU reads the start vector before RESET.
 	if (m_eprom==NULL) return 0;
@@ -557,10 +557,10 @@ TI mode:
 
 WRITE8_MEMBER( geneve_mapper_device::writem )
 {
-	UINT32	physaddr;
+	UINT32  physaddr;
 	int page;
 
-	if (m_peribox==NULL) return;	// see above: prevent premature access
+	if (m_peribox==NULL) return;    // see above: prevent premature access
 
 	if (m_geneve_mode)
 	{
@@ -908,15 +908,15 @@ void geneve_mapper_device::device_reset()
     1 1101 1... .... .... .... on-board sram (32K) - standard setup
 */
 	case 0: // 32 KiB
-		m_sram_mask =	0x1f8000;
-		m_sram_val =	0x1d8000;
+		m_sram_mask =   0x1f8000;
+		m_sram_val =    0x1d8000;
 		break;
 	case 1: // 64 KiB
-		m_sram_mask =	0x1f0000;
-		m_sram_val =	0x1d0000;
+		m_sram_mask =   0x1f0000;
+		m_sram_val =    0x1d0000;
 		break;
 	case 2: // 384 KiB (actually 512 KiB, but the EPROM masks the upper 128 KiB)
-		m_sram_mask =	0x180000;
+		m_sram_mask =   0x180000;
 		m_sram_val =    0x180000;
 		break;
 	}
@@ -933,29 +933,29 @@ static const char *const KEYNAMES[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", 
 static const UINT8 MF1_CODE[0xe] =
 {
 	/* extended keys that are equivalent to non-extended keys */
-	0x1c,	/* keypad enter */
-	0x1d,	/* right control */
-	0x38,	/* alt gr */
+	0x1c,   /* keypad enter */
+	0x1d,   /* right control */
+	0x38,   /* alt gr */
 	// extra codes are 0x5b for Left Windows, 0x5c for Right Windows, 0x5d
 	// for Menu, 0x5e for power, 0x5f for sleep, 0x63 for wake, but I doubt
 	// any Geneve program would take advantage of these. */
 
 	// extended key that is equivalent to a non-extended key
 	// with shift off
-	0x35,	/* pad slash */
+	0x35,   /* pad slash */
 
 	// extended keys that are equivalent to non-extended keys
 	// with numlock off
-	0x47,	/* home */
-	0x48,	/* up */
-	0x49,	/* page up */
-	0x4b,	/* left */
-	0x4d,	/* right */
-	0x4f,	/* end */
-	0x50,	/* down */
-	0x51,	/* page down */
-	0x52,	/* insert */
-	0x53	/* delete */
+	0x47,   /* home */
+	0x48,   /* up */
+	0x49,   /* page up */
+	0x4b,   /* left */
+	0x4d,   /* right */
+	0x4f,   /* end */
+	0x50,   /* down */
+	0x51,   /* page down */
+	0x52,   /* insert */
+	0x53    /* delete */
 };
 
 geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -1045,20 +1045,20 @@ void geneve_keyboard_device::poll()
 						m_key_numlock_state = !m_key_numlock_state;
 
 					if ((keycode >= 0x60) && (keycode < 0x6e))
-					{	/* simpler extended keys */
+					{   /* simpler extended keys */
 						/* these keys are emulated */
 
 						if ((keycode >= 0x63) && pressed)
 						{
 							/* Handle shift state */
 							if (keycode == 0x63)
-							{	/* non-shifted key */
+							{   /* non-shifted key */
 								if (m_key_real_shift_state!=0)
 									/* Fake shift unpress */
 									m_key_fake_unshift_state = true;
 							}
 							else /*if (keycode >= 0x64)*/
-							{	/* non-numlock mode key */
+							{   /* non-numlock mode key */
 								if (m_key_numlock_state & (m_key_real_shift_state==0))
 									/* Fake shift press if numlock is active */
 									m_key_fake_shift_state = true;
@@ -1086,7 +1086,7 @@ void geneve_keyboard_device::poll()
 						post_in_key_queue(keycode);
 					}
 					else if (keycode == 0x6e)
-					{	/* emulate Print Screen / System Request (F13) key */
+					{   /* emulate Print Screen / System Request (F13) key */
 						/* this is a bit complex, as Alt+PrtScr -> SysRq */
 						/* Additionally, Ctrl+PrtScr involves no fake shift press */
 						if (m_key_alt_state!=0)
@@ -1100,7 +1100,7 @@ void geneve_keyboard_device::poll()
 						{
 							/* Handle shift state */
 							if (pressed && (m_key_real_shift_state==0) && (m_key_ctrl_state==0))
-							{	/* Fake shift press */
+							{   /* Fake shift press */
 								post_in_key_queue(0xe0);
 								post_in_key_queue(0x2a);
 								m_key_fake_shift_state = true;
@@ -1113,7 +1113,7 @@ void geneve_keyboard_device::poll()
 						}
 					}
 					else if (keycode == 0x6f)
-					{	// emulate pause (F15) key
+					{   // emulate pause (F15) key
 						// this is a bit complex, as Pause -> Ctrl+NumLock and
 						// Ctrl+Pause -> Ctrl+ScrLock.  Furthermore, there is no
 						// repeat or release.
@@ -1272,8 +1272,8 @@ void geneve_keyboard_device::device_reset()
 }
 
 INPUT_PORTS_START( genkeys )
-	PORT_START("KEY0")	/* IN3 */
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_START("KEY0")  /* IN3 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) /* Esc                       01  81 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) /* 1                           02  82 */
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) /* 2                           03  83 */
@@ -1290,7 +1290,7 @@ INPUT_PORTS_START( genkeys )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) /* Backspace                 0E  8E */
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) /* Tab                       0F  8F */
 
-	PORT_START("KEY1")	/* IN4 */
+	PORT_START("KEY1")  /* IN4 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) /* Q                         10  90 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) /* W                         11  91 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) /* E                         12  92 */
@@ -1308,7 +1308,7 @@ INPUT_PORTS_START( genkeys )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) /* A                         1E  9E */
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) /* S                         1F  9F */
 
-	PORT_START("KEY2")	/* IN5 */
+	PORT_START("KEY2")  /* IN5 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) /* D                         20  A0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) /* F                         21  A1 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) /* G                         22  A2 */
@@ -1326,7 +1326,7 @@ INPUT_PORTS_START( genkeys )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) /* C                         2E  AE */
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) /* V                         2F  AF */
 
-	PORT_START("KEY3")	/* IN6 */
+	PORT_START("KEY3")  /* IN6 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) /* B                         30  B0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) /* N                         31  B1 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) /* M                         32  B2 */
@@ -1334,7 +1334,7 @@ INPUT_PORTS_START( genkeys )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) /* .                            34  B4 */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) /* /                           35  B5 */
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-Shift") PORT_CODE(KEYCODE_RSHIFT) /* Right Shift                36  B6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP * (PrtScr)") PORT_CODE(KEYCODE_ASTERISK	) /* Keypad *  (PrtSc)          37  B7 */
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP * (PrtScr)") PORT_CODE(KEYCODE_ASTERISK    ) /* Keypad *  (PrtSc)          37  B7 */
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) /* Left Alt                 38  B8 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) /* Space                     39  B9 */
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) /* Caps Lock                   3A  BA */
@@ -1344,7 +1344,7 @@ INPUT_PORTS_START( genkeys )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) /* F4                          3E  BE */
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) /* F5                          3F  BF */
 
-	PORT_START("KEY4")	/* IN7 */
+	PORT_START("KEY4")  /* IN7 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) /* F6                          40  C0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) /* F7                          41  C1 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) /* F8                          42  C2 */
@@ -1352,28 +1352,28 @@ INPUT_PORTS_START( genkeys )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) /* F10                       44  C4 */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) /* Num Lock                  45  C5 */
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ScrLock (F14)") PORT_CODE(KEYCODE_SCRLOCK) /* Scroll Lock             46  C6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 (Home)") PORT_CODE(KEYCODE_7_PAD		) /* Keypad 7  (Home)           47  C7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 (Up)") PORT_CODE(KEYCODE_8_PAD		) /* Keypad 8  (Up arrow)       48  C8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD		) /* Keypad 9  (PgUp)           49  C9 */
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 (Home)") PORT_CODE(KEYCODE_7_PAD     ) /* Keypad 7  (Home)           47  C7 */
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 (Up)") PORT_CODE(KEYCODE_8_PAD       ) /* Keypad 8  (Up arrow)       48  C8 */
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD     ) /* Keypad 9  (PgUp)           49  C9 */
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP -") PORT_CODE(KEYCODE_MINUS_PAD) /* Keypad -                   4A  CA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 (Left)") PORT_CODE(KEYCODE_4_PAD		) /* Keypad 4  (Left arrow)     4B  CB */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 (Left)") PORT_CODE(KEYCODE_4_PAD     ) /* Keypad 4  (Left arrow)     4B  CB */
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 5") PORT_CODE(KEYCODE_5_PAD) /* Keypad 5                   4C  CC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6 (Right)") PORT_CODE(KEYCODE_6_PAD		) /* Keypad 6  (Right arrow)    4D  CD */
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6 (Right)") PORT_CODE(KEYCODE_6_PAD        ) /* Keypad 6  (Right arrow)    4D  CD */
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP +") PORT_CODE(KEYCODE_PLUS_PAD) /* Keypad +                    4E  CE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD		) /* Keypad 1  (End)            4F  CF */
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD      ) /* Keypad 1  (End)            4F  CF */
 
-	PORT_START("KEY5")	/* IN8 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 (Down)") PORT_CODE(KEYCODE_2_PAD		) /* Keypad 2  (Down arrow)     50  D0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD		) /* Keypad 3  (PgDn)           51  D1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0 (Ins)") PORT_CODE(KEYCODE_0_PAD		) /* Keypad 0  (Ins)            52  D2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP . (Del)") PORT_CODE(KEYCODE_DEL_PAD		) /* Keypad .  (Del)            53  D3 */
+	PORT_START("KEY5")  /* IN8 */
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 (Down)") PORT_CODE(KEYCODE_2_PAD     ) /* Keypad 2  (Down arrow)     50  D0 */
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD     ) /* Keypad 3  (PgDn)           51  D1 */
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0 (Ins)") PORT_CODE(KEYCODE_0_PAD      ) /* Keypad 0  (Ins)            52  D2 */
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP . (Del)") PORT_CODE(KEYCODE_DEL_PAD        ) /* Keypad .  (Del)            53  D3 */
 	PORT_BIT ( 0x0030, 0x0000, IPT_UNUSED )
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(84/102)\\") PORT_CODE(KEYCODE_BACKSLASH2) /* Backslash 2             56  D6 */
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F11") PORT_CODE(KEYCODE_F11) /* F11                      57  D7 */
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F12") PORT_CODE(KEYCODE_F12) /* F12                      58  D8 */
 	PORT_BIT ( 0xfe00, 0x0000, IPT_UNUSED )
 
-	PORT_START("KEY6")	/* IN9 */
+	PORT_START("KEY6")  /* IN9 */
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)KP Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* PAD Enter                 60  e0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)R-Control") PORT_CODE(KEYCODE_RCONTROL) /* Right Control             61  e1 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)ALTGR") PORT_CODE(KEYCODE_RALT) /* ALTGR                     64  e4 */
@@ -1394,7 +1394,7 @@ INPUT_PORTS_START( genkeys )
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)PrtScr (F13)") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen             63  e3 */
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Pause (F15)") PORT_CODE(KEYCODE_PAUSE) /* Pause                      65  e5 */
 
-	PORT_START("KEY7")	/* IN10 */
+	PORT_START("KEY7")  /* IN10 */
 	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 #if 0
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Print Screen") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen alternate        77  f7 */
@@ -1490,4 +1490,3 @@ ioport_constructor geneve_mouse_device::device_input_ports() const
 }
 
 const device_type GENEVE_MOUSE = &device_creator<geneve_mouse_device>;
-

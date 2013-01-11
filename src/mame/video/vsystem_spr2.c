@@ -203,10 +203,10 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 
 				if (m_pritype == 0 || m_pritype == 1 || m_pritype == 2) // pdrawgfx cases
 				{
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x000,sy-0x000, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,	 machine.priority_bitmap,usepri,15);
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x200,sy-0x000, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,	 machine.priority_bitmap,usepri,15);
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x000,sy-0x200, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,	 machine.priority_bitmap,usepri,15);
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x200,sy-0x200, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,	 machine.priority_bitmap,usepri,15);
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x000,sy-0x000, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,  machine.priority_bitmap,usepri,15);
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x200,sy-0x000, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,  machine.priority_bitmap,usepri,15);
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x000,sy-0x200, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,  machine.priority_bitmap,usepri,15);
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[m_gfx_region], curr, curr_sprite.color, curr_sprite.flipx,curr_sprite.flipy, sx-0x200,sy-0x200, curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,  machine.priority_bitmap,usepri,15);
 				}
 				else // drawgfx cases (welltris, pipedrm)
 				{
@@ -227,6 +227,3 @@ void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int sprite
 
 void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri_param )
 { turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spritepalettebank, machine, bitmap, cliprect, pri_param ); }
-
-
-

@@ -21,10 +21,10 @@
 
 static int verbose = VERBOSE;
 
-#define LOG(x)	{ logerror ("%s: ", cpu_context()); logerror x; logerror ("\n"); }
-#define LOG1(x)	{ if (verbose > 0) LOG(x)}
-#define LOG2(x)	{ if (verbose > 1) LOG(x)}
-#define LOG3(x)	{ if (verbose > 2) LOG(x)}
+#define LOG(x)  { logerror ("%s: ", cpu_context()); logerror x; logerror ("\n"); }
+#define LOG1(x) { if (verbose > 0) LOG(x)}
+#define LOG2(x) { if (verbose > 1) LOG(x)}
+#define LOG3(x) { if (verbose > 2) LOG(x)}
 
 #define  MAINCPU "maincpu"
 
@@ -161,7 +161,7 @@ const device_type SC499 = &device_creator<sc499_device>;
 //-------------------------------------------------
 
 sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock)
+	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock)
 {
 	memset(static_cast<sc499_interface *>(this), 0, sizeof(sc499_interface));
 }
@@ -367,7 +367,7 @@ void sc499_device::timer_func(int timer_type)
 		switch (++m_data_index)
 		{
 		case 1: m_data = m_tape_status >> 8;  break;
-		case 2: m_data = m_tape_status & 0xff;	 break;
+		case 2: m_data = m_tape_status & 0xff;   break;
 		case 3: m_data = m_data_error_counter >> 8; break;
 		case 4: m_data = m_data_error_counter & 0xff; break;
 		case 5: m_data = m_underrun_counter >> 8; break;
@@ -460,7 +460,7 @@ void sc499_device::timer_func(int timer_type)
 		break;
 
 	case SC499_TIMER_7: // reset
-		 // set exception
+			// set exception
 		m_status &= ~SC499_STAT_EXC;
 		if (m_control & SC499_CTR_IEN)
 		{
@@ -1141,7 +1141,7 @@ void sc499_set_verbose(int on_off)
 }
 
 //##########################################################################
-class sc499_ctape_image_device :	public device_t,
+class sc499_ctape_image_device :    public device_t,
 									public device_image_interface
 {
 public:
@@ -1161,7 +1161,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start() { };
 };
 
@@ -1171,8 +1171,8 @@ extern const device_type SC499_CTAPE;
 const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
 
 sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 }
 

@@ -188,10 +188,10 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 
 static I8085_CONFIG( cpu_config )
 {
-	DEVCB_NULL,				/* STATUS changed callback */
-	DEVCB_NULL,				/* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(bob85_state, sid_r),	/* SID changed callback (I8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(bob85_state, sod_w)	/* SOD changed callback (I8085A only) */
+	DEVCB_NULL,             /* STATUS changed callback */
+	DEVCB_NULL,             /* INTE changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(bob85_state, sid_r),   /* SID changed callback (I8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(bob85_state, sod_w)    /* SOD changed callback (I8085A only) */
 };
 
 static MACHINE_CONFIG_START( bob85, bob85_state )
@@ -218,4 +218,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1984, bob85,  0,       0, 	bob85,	bob85, driver_device,	 0, 	  "Josef Kratochvil",   "BOB-85", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, bob85,  0,       0,     bob85,  bob85, driver_device,    0,       "Josef Kratochvil",   "BOB-85", GAME_NOT_WORKING | GAME_NO_SOUND)

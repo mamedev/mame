@@ -94,10 +94,10 @@ inline void bitmap_t::compute_base(int xslop, int yslop)
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xslop, int yslop)
 	: m_alloc(NULL),
-	  m_allocbytes(0),
-	  m_format(format),
-	  m_bpp(bpp),
-	  m_palette(NULL)
+		m_allocbytes(0),
+		m_format(format),
+		m_bpp(bpp),
+		m_palette(NULL)
 {
 	// allocate intializes all other fields
 	allocate(width, height, xslop, yslop);
@@ -106,30 +106,30 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xsl
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int height, int rowpixels)
 	: m_alloc(NULL),
-	  m_allocbytes(0),
-	  m_base(base),
-	  m_rowpixels(rowpixels),
-	  m_width(width),
-	  m_height(height),
-	  m_format(format),
-	  m_bpp(bpp),
-	  m_palette(NULL),
-	  m_cliprect(0, width - 1, 0, height - 1)
+		m_allocbytes(0),
+		m_base(base),
+		m_rowpixels(rowpixels),
+		m_width(width),
+		m_height(height),
+		m_format(format),
+		m_bpp(bpp),
+		m_palette(NULL),
+		m_cliprect(0, width - 1, 0, height - 1)
 {
 }
 
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectangle &subrect)
 	: m_alloc(NULL),
-	  m_allocbytes(0),
-	  m_base(source.raw_pixptr(subrect.min_y, subrect.min_x)),
-	  m_rowpixels(source.m_rowpixels),
-	  m_width(subrect.width()),
-	  m_height(subrect.height()),
-	  m_format(format),
-	  m_bpp(bpp),
-	  m_palette(NULL),
-	  m_cliprect(0, subrect.width() - 1, 0, subrect.height() - 1)
+		m_allocbytes(0),
+		m_base(source.raw_pixptr(subrect.min_y, subrect.min_x)),
+		m_rowpixels(source.m_rowpixels),
+		m_width(subrect.width()),
+		m_height(subrect.height()),
+		m_format(format),
+		m_bpp(bpp),
+		m_palette(NULL),
+		m_cliprect(0, subrect.width() - 1, 0, subrect.height() - 1)
 {
 	assert(format == source.m_format);
 	assert(bpp == source.m_bpp);

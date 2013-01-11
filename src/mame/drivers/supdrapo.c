@@ -56,9 +56,9 @@
 ************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_12MHz
-#define CPU_CLOCK		MASTER_CLOCK/4	/* guess */
-#define SND_CLOCK		MASTER_CLOCK/8	/* guess */
+#define MASTER_CLOCK    XTAL_12MHz
+#define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
+#define SND_CLOCK       MASTER_CLOCK/8  /* guess */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -133,8 +133,8 @@ UINT32 supdrapo_state::screen_update_supdrapo(screen_device &screen, bitmap_ind1
 void supdrapo_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
 	for (i = 0; i < 0x100; ++i)
 	{
@@ -199,7 +199,7 @@ WRITE8_MEMBER(supdrapo_state::wdog8000_w)
 
 	if (m_wdog == data)
 	{
-		watchdog_reset_w(space, 0, 0);	/* Reset */
+		watchdog_reset_w(space, 0, 0);  /* Reset */
 	}
 
 	m_wdog = data;
@@ -228,12 +228,12 @@ WRITE8_MEMBER(supdrapo_state::debug7c00_w)
 
 WRITE8_MEMBER(supdrapo_state::coinin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);	/* Coin In */
+	coin_counter_w(machine(), 0, data & 0x01);  /* Coin In */
 }
 
 WRITE8_MEMBER(supdrapo_state::payout_w)
 {
-	coin_counter_w(machine(), 1, data & 0x01);	/* Payout */
+	coin_counter_w(machine(), 1, data & 0x01);  /* Payout */
 }
 
 
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( supdrapo )
 	PORT_DIPSETTING(    0x80, "2 Players" )
 
 	PORT_START("SW1") // Bank 1 @ 8A
-	PORT_DIPNAME( 0x0f, 0x02, "Payout Percentage" )		PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x02, "Payout Percentage" )     PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "25%" )
 	PORT_DIPSETTING(    0x01, "30%" )
 	PORT_DIPSETTING(    0x02, "35%" )
@@ -352,40 +352,40 @@ static INPUT_PORTS_START( supdrapo )
 	PORT_DIPSETTING(    0x0d, "90%" )
 	PORT_DIPSETTING(    0x0e, "95%" )
 	PORT_DIPSETTING(    0x0f, "100%" )
-	PORT_DIPNAME( 0x30, 0x10, "Maximum Payout Points" )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x10, "Maximum Payout Points" ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x10, "200" )
 	PORT_DIPSETTING(    0x20, "500" )
 	PORT_DIPSETTING(    0x30, "1000" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Maximum Bet Points" )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Maximum Bet Points" )    PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x80, "15" )
 	PORT_DIPSETTING(    0xc0, "30" )
 
 	PORT_START("SW2") // Bank 2 @ 9A
-	PORT_DIPNAME( 0x01, 0x01, "Deal Play Last Amount" )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Deal Play Last Amount" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Allow Raise" )			PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, "Allow Raise" )           PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "Red/Black Double-Up" )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Red/Black Double-Up" )   PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "Minimum Winning Hand" )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Minimum Winning Hand" )  PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "Jacks or Better" )
 	PORT_DIPSETTING(    0x00, "Two Pair or Better" )
-	PORT_DIPNAME( 0x10, 0x10, "Deal Speed" )			PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Deal Speed" )            PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x10, "Fast" )
-	PORT_DIPNAME( 0x20, 0x20, "Flash Buttons" )			PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Flash Buttons" )         PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
-	PORT_DIPNAME( 0x80, 0x00, "Cards Deck Type" )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, "Cards Deck Type" )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "English Cards" )
 	PORT_DIPSETTING(    0x80, "French Cards" )
 INPUT_PORTS_END
@@ -443,7 +443,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
 
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)	/* guess */
+	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)  /* guess */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -520,19 +520,19 @@ ROM_END
 */
 ROM_START( supdrapoa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "0.c1",	0x0000, 0x1000, CRC(63e2775a) SHA1(742e8db5378631fd93a22d2131f9523ee74c03a5) )
-	ROM_LOAD( "1.d1",	0x1000, 0x1000, CRC(aa1578de) SHA1(8f1a33864b2c8e09a25c7603522ebfc7e0757d56) )
-	ROM_LOAD( "2.e1",	0x2000, 0x1000, CRC(ffe0415c) SHA1(0233d192814ced0b32abd4b7d2e93431a339732f) )
-	ROM_LOAD( "3.h1",	0x3000, 0x1000, CRC(1bae52fa) SHA1(f89d48d67e52d0fca51eb23fee2d5cb94afcf7f4) )
-	ROM_LOAD( "4.j1",	0x4000, 0x1000, CRC(7af26f63) SHA1(aeeca69ef1c21acae4283183e4b073ec0d303f4a) )
+	ROM_LOAD( "0.c1",   0x0000, 0x1000, CRC(63e2775a) SHA1(742e8db5378631fd93a22d2131f9523ee74c03a5) )
+	ROM_LOAD( "1.d1",   0x1000, 0x1000, CRC(aa1578de) SHA1(8f1a33864b2c8e09a25c7603522ebfc7e0757d56) )
+	ROM_LOAD( "2.e1",   0x2000, 0x1000, CRC(ffe0415c) SHA1(0233d192814ced0b32abd4b7d2e93431a339732f) )
+	ROM_LOAD( "3.h1",   0x3000, 0x1000, CRC(1bae52fa) SHA1(f89d48d67e52d0fca51eb23fee2d5cb94afcf7f4) )
+	ROM_LOAD( "4.j1",   0x4000, 0x1000, CRC(7af26f63) SHA1(aeeca69ef1c21acae4283183e4b073ec0d303f4a) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "8.p4",	0x0000, 0x1000, CRC(ef0700c5) SHA1(53f49d99f310fdf675e3b7339bdca1115e4a1935) )
-	ROM_LOAD( "7.n4",	0x1000, 0x1000, CRC(3f77031b) SHA1(2d282d39ea568aa44af8b56228b6e096c2713a15) )
-	ROM_LOAD( "6.l4",	0x2000, 0x1000, CRC(d70cd50e) SHA1(c3e3dcf79f8a25df5b878ef8734a6d0dc22004ba) )
-	ROM_LOAD( "5.k4",	0x3000, 0x1000, CRC(34564917) SHA1(90b49fe8a5371159388839d42913352cf58c60e6) )
+	ROM_LOAD( "8.p4",   0x0000, 0x1000, CRC(ef0700c5) SHA1(53f49d99f310fdf675e3b7339bdca1115e4a1935) )
+	ROM_LOAD( "7.n4",   0x1000, 0x1000, CRC(3f77031b) SHA1(2d282d39ea568aa44af8b56228b6e096c2713a15) )
+	ROM_LOAD( "6.l4",   0x2000, 0x1000, CRC(d70cd50e) SHA1(c3e3dcf79f8a25df5b878ef8734a6d0dc22004ba) )
+	ROM_LOAD( "5.k4",   0x3000, 0x1000, CRC(34564917) SHA1(90b49fe8a5371159388839d42913352cf58c60e6) )
 
-	ROM_REGION( 0x00200, "proms", 0 )	/* using the color PROMs from the parent set - no reason to think they differ */
+	ROM_REGION( 0x00200, "proms", 0 )   /* using the color PROMs from the parent set - no reason to think they differ */
 	ROM_LOAD( "a1-9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
 	ROM_LOAD( "a1-9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
 ROM_END
@@ -577,17 +577,17 @@ At 1p there is an unmarked DIP20 mil.300 chip.
 
 ROM_START( supdrapob )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pok0.1c",	0x0000, 0x1000, CRC(b53f0470) SHA1(79003cc957e22d5bde720b6f4caed5481edd2c7e) )
-	ROM_LOAD( "pok1.1d",	0x1000, 0x1000, CRC(9797a42d) SHA1(65446317e6f1a2de53dd10146338fb63bd5b0a99) )
-	ROM_LOAD( "pok2.1ef",	0x2000, 0x1000, CRC(2b7a5baa) SHA1(dd86bb35692eabc1482768cf0bc082f3e0bd90fe) )
-	ROM_LOAD( "pok3.1h",	0x3000, 0x1000, CRC(9c3ea609) SHA1(612f455515f367b7d59608528d06221665da8876) )
-	ROM_LOAD( "pok4.1j",	0x4000, 0x1000, CRC(52025ba3) SHA1(923de6110a3608698a31baf552d4854b1053cc0e) )
+	ROM_LOAD( "pok0.1c",    0x0000, 0x1000, CRC(b53f0470) SHA1(79003cc957e22d5bde720b6f4caed5481edd2c7e) )
+	ROM_LOAD( "pok1.1d",    0x1000, 0x1000, CRC(9797a42d) SHA1(65446317e6f1a2de53dd10146338fb63bd5b0a99) )
+	ROM_LOAD( "pok2.1ef",   0x2000, 0x1000, CRC(2b7a5baa) SHA1(dd86bb35692eabc1482768cf0bc082f3e0bd90fe) )
+	ROM_LOAD( "pok3.1h",    0x3000, 0x1000, CRC(9c3ea609) SHA1(612f455515f367b7d59608528d06221665da8876) )
+	ROM_LOAD( "pok4.1j",    0x4000, 0x1000, CRC(52025ba3) SHA1(923de6110a3608698a31baf552d4854b1053cc0e) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "pok8.4p",	0x0000, 0x1000, CRC(82b387e1) SHA1(d7b7e4f7b5b8082438444ce1fa585917ae737bcf) )
-	ROM_LOAD( "pok7.4n",	0x1000, 0x1000, CRC(6ab0ad02) SHA1(86b22ab3ceb69f981aa32247c93411631c33a6e8) )
-	ROM_LOAD( "pok6.4lm",	0x2000, 0x1000, CRC(c8eab65c) SHA1(c4d37fed9675d8bb051e6f97e56f27450a24ddb8) )
-	ROM_LOAD( "pok5.4k",	0x3000, 0x1000, CRC(2c0bb656) SHA1(aa2f309afcdefda5e40be0a354d0b3e5548c44bb) )
+	ROM_LOAD( "pok8.4p",    0x0000, 0x1000, CRC(82b387e1) SHA1(d7b7e4f7b5b8082438444ce1fa585917ae737bcf) )
+	ROM_LOAD( "pok7.4n",    0x1000, 0x1000, CRC(6ab0ad02) SHA1(86b22ab3ceb69f981aa32247c93411631c33a6e8) )
+	ROM_LOAD( "pok6.4lm",   0x2000, 0x1000, CRC(c8eab65c) SHA1(c4d37fed9675d8bb051e6f97e56f27450a24ddb8) )
+	ROM_LOAD( "pok5.4k",    0x3000, 0x1000, CRC(2c0bb656) SHA1(aa2f309afcdefda5e40be0a354d0b3e5548c44bb) )
 
 	ROM_REGION( 0x00200, "proms", 0 )
 	ROM_LOAD( "dm74s287n.9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )

@@ -23,9 +23,9 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MB8866_TAG		"14b"
-#define S1602_TAG		"14d"
-#define BR1941_TAG		"13d"
+#define MB8866_TAG      "14b"
+#define S1602_TAG       "14d"
+#define BR1941_TAG      "13d"
 
 
 
@@ -336,35 +336,35 @@ UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       PE
-            1       OE
-            2       DR
-            3       TBRE
-            4       FE
-            5
-            6
-            7
+		    0       PE
+		    1       OE
+		    2       DR
+		    3       TBRE
+		    4       FE
+		    5
+		    6
+		    7
 
-        */
+		*/
 	}
 	else if (offset == 0xfbfa) // DISK STAT
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       HEAD
-            1       DATA RQ
-            2       INT RQ
-            3       _TWO SIDED
-            4       _INDEX
-            5
-            6
-            7       _READY
+		    0       HEAD
+		    1       DATA RQ
+		    2       INT RQ
+		    3       _TWO SIDED
+		    4       _INDEX
+		    5
+		    6
+		    7       _READY
 
-        */
+		*/
 
 		data |= !m_head;
 		data |= !m_fdc->drq_r() << 1;
@@ -412,18 +412,18 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 d
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       DRIVE 1
-            1       DRIVE 2
-            2       DRIVE 3
-            3       DRIVE 4
-            4       IN USE / SIDE SELECT
-            5       INT ENBL
-            6       _ACCESS ENBL
-            7       START
+		    0       DRIVE 1
+		    1       DRIVE 2
+		    2       DRIVE 3
+		    3       DRIVE 4
+		    4       IN USE / SIDE SELECT
+		    5       INT ENBL
+		    6       _ACCESS ENBL
+		    7       START
 
-        */
+		*/
 
 		// drive select
 		m_floppy = NULL;
@@ -455,18 +455,18 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 d
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       DOUBLE
-            1       8A SET
-            2       8A CLEAR
-            3       LEDOFF
-            4
-            5
-            6
-            7
+		    0       DOUBLE
+		    1       8A SET
+		    2       8A CLEAR
+		    3       LEDOFF
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		// density select
 		m_fdc->dden_w(BIT(data, 0));

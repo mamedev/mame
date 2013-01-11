@@ -18,8 +18,8 @@
 //**************************************************************************
 
 // these constants are returned from the irq_state function
-const UINT8 Z80_DAISY_INT = 0x01;		// interrupt request mask
-const UINT8 Z80_DAISY_IEO =	0x02;		// interrupt disable mask (IEO)
+const UINT8 Z80_DAISY_INT = 0x01;       // interrupt request mask
+const UINT8 Z80_DAISY_IEO = 0x02;       // interrupt disable mask (IEO)
 
 
 
@@ -32,7 +32,7 @@ const UINT8 Z80_DAISY_IEO =	0x02;		// interrupt disable mask (IEO)
 
 struct z80_daisy_config
 {
-	const char *	devname;					// name of the device
+	const char *    devname;                    // name of the device
 };
 
 
@@ -75,12 +75,12 @@ protected:
 	public:
 		daisy_entry(device_t *device);
 
-		daisy_entry *				m_next;			// next device
-		device_t *					m_device;		// associated device
-		device_z80daisy_interface *	m_interface;	// associated device's daisy interface
+		daisy_entry *               m_next;         // next device
+		device_t *                  m_device;       // associated device
+		device_z80daisy_interface * m_interface;    // associated device's daisy interface
 	};
 
-	daisy_entry *			m_daisy_list;	// head of the daisy chain
+	daisy_entry *           m_daisy_list;   // head of the daisy chain
 };
 
 

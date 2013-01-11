@@ -257,7 +257,7 @@ class coolridr_state : public driver_device
 public:
 	coolridr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-        m_textBytesToWrite(0x00),
+		m_textBytesToWrite(0x00),
 		m_blitterSerialCount(0x00),
 		m_blitterMode(0x00),
 		m_textOffset(0x0000),
@@ -517,7 +517,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				// Serialized counts
 				if (m_blitterSerialCount == 1)
 				{
-					m_colorNumber = (data & 0x000000ff);	// Probably more bits
+					m_colorNumber = (data & 0x000000ff);    // Probably more bits
 				}
 				else if (m_blitterSerialCount == 6)
 				{
@@ -1151,9 +1151,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 
 	switch(scanline)
 	{
-    	case 512:m_subcpu->set_input_line(0xa, HOLD_LINE); break;
-        case 256:m_subcpu->set_input_line(0xc, HOLD_LINE); break;
-        case 0:m_subcpu->set_input_line(0xe, HOLD_LINE); break;
+		case 512:m_subcpu->set_input_line(0xa, HOLD_LINE); break;
+		case 256:m_subcpu->set_input_line(0xc, HOLD_LINE); break;
+		case 0:m_subcpu->set_input_line(0xe, HOLD_LINE); break;
 	}
 }
 
@@ -1164,14 +1164,14 @@ void coolridr_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( coolridr, coolridr_state )
-	MCFG_CPU_ADD("maincpu", SH2, 28000000)	// 28 mhz
+	MCFG_CPU_ADD("maincpu", SH2, 28000000)  // 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coolridr_state, system_h1)
 
 	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)
 
-	MCFG_CPU_ADD("sub", SH1, 16000000)	// SH7032 HD6417032F20!! 16 mhz
+	MCFG_CPU_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_sub, "screen", 0, 1)
 
@@ -1208,7 +1208,7 @@ ROM_START( coolridr )
 
 	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )	/* 68000 */
+	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
 	ROM_COPY( "maincpu", 0x100000, 0x000000, 0x080000 ) //hardcoded from SH-2 roms? no, It doesn't seem so...
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */

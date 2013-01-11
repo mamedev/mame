@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 		color_prom++;
 	}
 
-	m_backcolor = 0;	/* background color can be changed by the game */
+	m_backcolor = 0;    /* background color can be changed by the game */
 
 	for (i = 0; i < TOTAL_COLORS(machine(),0); i++)
 		palette_set_color(machine(), COLOR(machine(), 0, i), m_palette[i]);
@@ -240,7 +240,7 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 		color_prom++;
 	}
 
-	m_backcolor = 0;	/* background color can be changed by the game */
+	m_backcolor = 0;    /* background color can be changed by the game */
 
 	for (i = 0; i < TOTAL_COLORS(machine(),0); i++)
 		palette_set_color(machine(), COLOR(machine(), 0, i), m_palette[4 * (i % 4) + (i / 4)]);

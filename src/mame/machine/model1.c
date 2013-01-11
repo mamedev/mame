@@ -194,8 +194,8 @@ static TGP_FUNCTION( matrix_write )
 	for(i=0; i<12; i++)
 		state->m_cmat[i] = fifoin_pop_f(state);
 	logerror("TGP matrix_write %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f) (%x)\n",
-			 state->m_cmat[0], state->m_cmat[1], state->m_cmat[2], state->m_cmat[3], state->m_cmat[4], state->m_cmat[5], state->m_cmat[6], state->m_cmat[7], state->m_cmat[8], state->m_cmat[9], state->m_cmat[10], state->m_cmat[11],
-			 state->m_pushpc);
+				state->m_cmat[0], state->m_cmat[1], state->m_cmat[2], state->m_cmat[3], state->m_cmat[4], state->m_cmat[5], state->m_cmat[6], state->m_cmat[7], state->m_cmat[8], state->m_cmat[9], state->m_cmat[10], state->m_cmat[11],
+				state->m_pushpc);
 	next_fn(state);
 }
 
@@ -383,7 +383,7 @@ static TGP_FUNCTION( matrix_read )
 	model1_state *state = machine.driver_data<model1_state>();
 	int i;
 	logerror("TGP matrix_read (%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f) (%x)\n",
-			 state->m_cmat[0], state->m_cmat[1], state->m_cmat[2], state->m_cmat[3], state->m_cmat[4], state->m_cmat[5], state->m_cmat[6], state->m_cmat[7], state->m_cmat[8], state->m_cmat[9], state->m_cmat[10], state->m_cmat[11], state->m_pushpc);
+				state->m_cmat[0], state->m_cmat[1], state->m_cmat[2], state->m_cmat[3], state->m_cmat[4], state->m_cmat[5], state->m_cmat[6], state->m_cmat[7], state->m_cmat[8], state->m_cmat[9], state->m_cmat[10], state->m_cmat[11], state->m_pushpc);
 	for(i=0; i<12; i++)
 		fifoout_push_f(state, state->m_cmat[i]);
 	next_fn(state);
@@ -2164,7 +2164,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_vr_adr_w)
 
 READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
 {
-	UINT16	r;
+	UINT16  r;
 
 	if (!offset)
 	{

@@ -117,8 +117,8 @@ protected:
 	virtual void device_start();
 
 	// internal state
-	bool						m_flip;					// screen flip?
-	UINT8						m_bank[16];				// banking redirection
+	bool                        m_flip;                 // screen flip?
+	UINT8                       m_bank[16];             // banking redirection
 };
 
 
@@ -164,7 +164,7 @@ protected:
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// configuration
-	bool			m_is_xboard;
+	bool            m_is_xboard;
 };
 
 class sega_xboard_sprite_device : public sega_outrun_sprite_device
@@ -205,7 +205,7 @@ protected:
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// internal state
-	UINT8		m_addrmap[8];
+	UINT8       m_addrmap[8];
 };
 
 
@@ -249,4 +249,3 @@ extern const device_type SEGA_YBOARD_SPRITES;
 
 
 #endif
-

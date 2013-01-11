@@ -24,7 +24,7 @@ extern const device_type TMS9901;
 /* Masks for the interrupts levels available on TMS9901 */
 #define TMS9901_INT1 0x0002
 #define TMS9901_INT2 0x0004
-#define TMS9901_INT3 0x0008		// overriden by the timer interrupt
+#define TMS9901_INT3 0x0008     // overriden by the timer interrupt
 #define TMS9901_INT4 0x0010
 #define TMS9901_INT5 0x0020
 #define TMS9901_INT6 0x0040
@@ -52,10 +52,10 @@ enum
 
 struct tms9901_interface
 {
-	int 				interrupt_mask;			// a bit for each input pin whose state is always notified to the TMS9901 core
-	devcb_read8 		read_handler;			// 4*8 bits, to be selected using the offset (0-3)
-	devcb_write_line	write_handler[16];		// 16 Pn outputs
-	devcb_write8		interrupt_callback; 	// called when interrupt bus state changes
+	int                 interrupt_mask;         // a bit for each input pin whose state is always notified to the TMS9901 core
+	devcb_read8         read_handler;           // 4*8 bits, to be selected using the offset (0-3)
+	devcb_write_line    write_handler[16];      // 16 Pn outputs
+	devcb_write8        interrupt_callback;     // called when interrupt bus state changes
 };
 
 class tms9901_device : public device_t
@@ -86,15 +86,15 @@ private:
 	// saving the state of interrupt pins and feeding it to the port read
 	// handlers again
 	int m_supported_int_mask;
-	int m_int_state;			// state of the int1-int15 lines (must be inverted when queried)
-	int m_old_int_state;		// stores the previous value to avoid useless INT line assertions
-	int m_enabled_ints;			// interrupt enable mask
+	int m_int_state;            // state of the int1-int15 lines (must be inverted when queried)
+	int m_old_int_state;        // stores the previous value to avoid useless INT line assertions
+	int m_enabled_ints;         // interrupt enable mask
 
-	bool m_int_pending;			// status of the int* pin (connected to TMS9900)
-	bool m_timer_int_pending;	// timer int pending (overrides int3 pin if timer enabled)
+	bool m_int_pending;         // status of the int* pin (connected to TMS9900)
+	bool m_timer_int_pending;   // timer int pending (overrides int3 pin if timer enabled)
 
 	// PIO registers
-	int m_pio_direction;		// direction register for PIO
+	int m_pio_direction;        // direction register for PIO
 
 	// current PIO output (to be masked with pio_direction)
 	int m_pio_output;
@@ -126,9 +126,9 @@ private:
 	// =======================================================================
 
 	// Callbacks
-	devcb_resolved_read8		m_read_block;
-	devcb_resolved_write_line	m_write_line[16];
-	devcb_resolved_write8		m_interrupt;  // also delivers the interrupt level
+	devcb_resolved_read8        m_read_block;
+	devcb_resolved_write_line   m_write_line[16];
+	devcb_resolved_write8       m_interrupt;  // also delivers the interrupt level
 };
 
 /***************************************************************************

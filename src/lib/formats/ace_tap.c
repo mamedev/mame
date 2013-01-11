@@ -10,9 +10,9 @@ For more information see:
 #include "ace_tap.h"
 
 
-#define SMPLO	-32768
-#define SILENCE	0
-#define SMPHI	32767
+#define SMPLO   -32768
+#define SILENCE 0
+#define SMPHI   32767
 
 
 static int cas_size;
@@ -79,7 +79,7 @@ INLINE int ace_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 
 static int ace_handle_tap(INT16 *buffer, const UINT8 *casdata)
 {
-	int	data_pos, sample_count;
+	int data_pos, sample_count;
 
 	/* Make sure the file starts with a valid header */
 	if ( cas_size < 0x1C )
@@ -92,8 +92,8 @@ static int ace_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
 	while( data_pos < cas_size )
 	{
-		UINT16	block_size;
-		int		i;
+		UINT16  block_size;
+		int     i;
 
 		/* Handle a block of tape data */
 		block_size = casdata[data_pos] + ( casdata[data_pos + 1] << 8 );
@@ -152,13 +152,13 @@ static int ace_tap_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller ace_legacy_fill_wave =
 {
-	ace_tap_fill_wave,					/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	ace_tap_to_wav_size,				/* chunk_sample_calc */
-	44100,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	ace_tap_fill_wave,                  /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	ace_tap_to_wav_size,                /* chunk_sample_calc */
+	44100,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 

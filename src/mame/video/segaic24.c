@@ -101,7 +101,7 @@ void segas24_tile::device_start()
 }
 
 void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const UINT16 *mask,
-							 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
+								UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
 	const UINT16 *source  = &bm.pix16(sy, sx);
@@ -168,8 +168,8 @@ void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm
 							int xx;
 							for(xx=0; xx<8; xx++)
 								if(srct[xx] == tpri) {
-								   dst[xx] = src[xx];
-								   pr[xx] |= lpri;
+									dst[xx] = src[xx];
+									pr[xx] |= lpri;
 								}
 						}
 						src += 8;
@@ -188,8 +188,8 @@ void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm
 					int x;
 					for(x = cur_x; x<llx1; x++) {
 						if(*srct++ == tpri) {
-						   *dst = *src;
-						   *pr |= lpri;
+							*dst = *src;
+							*pr |= lpri;
 						}
 						src++;
 						dst++;
@@ -208,8 +208,8 @@ void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm
 					int x;
 					for(x=cur_x; x<llx1; x++) {
 						if(*srct++ == tpri && !(m & (0x8000 >> (x >> 3)))) {
-						   *dst = *src;
-						   *pr |= lpri;
+							*dst = *src;
+							*pr |= lpri;
 						}
 
 						src++;
@@ -235,7 +235,7 @@ void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm
 // priority_bitmap
 
 void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const UINT16 *mask,
-								 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
+									UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
 	const UINT16 *source  = &bm.pix16(sy, sx);
@@ -296,7 +296,7 @@ void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm
 							int xx;
 							for(xx=0; xx<8; xx++)
 								if(srct[xx] == tpri)
-								   dst[xx] = pens[src[xx]];
+									dst[xx] = pens[src[xx]];
 						}
 						src += 8;
 						srct += 8;
@@ -313,7 +313,7 @@ void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm
 					int x;
 					for(x = cur_x; x<llx1; x++) {
 						if(*srct++ == tpri)
-						   *dst = pens[*src];
+							*dst = pens[*src];
 						src++;
 						dst++;
 					}
@@ -329,7 +329,7 @@ void segas24_tile::draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm
 					int x;
 					for(x=cur_x; x<llx1; x++) {
 						if(*srct++ == tpri && !(m & (0x8000 >> (x >> 3))))
-						   *dst = pens[*src];
+							*dst = pens[*src];
 
 						src++;
 						dst++;
@@ -847,4 +847,3 @@ UINT16 segas24_mixer::get_reg(int reg)
 {
 	return mixer_reg[reg];
 }
-

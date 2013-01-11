@@ -10,8 +10,8 @@
 
 // these are needed because the MC6845 emulation does
 // not position the active display area correctly
-#define HORIZONTAL_PORCH_HACK	115
-#define VERTICAL_PORCH_HACK		29
+#define HORIZONTAL_PORCH_HACK   115
+#define VERTICAL_PORCH_HACK     29
 
 
 static const rgb_t PALETTE[] =

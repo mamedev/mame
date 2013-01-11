@@ -1605,4 +1605,3 @@ void fm7_state::palette_init()
 	for(x=0;x<8;x++)
 		m_video.fm7_pal[x] = x;
 }
-

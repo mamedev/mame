@@ -26,52 +26,52 @@ struct msx_slot_layout {
 static const msx_slot_layout msx_slot_layout_##msx[] = {
 
 #define MSX_LAYOUT_SLOT(prim, sec, page, extend, type, size, option) \
-	{								\
-		MSX_LAYOUT_SLOT_ENTRY,		\
-		SLOT_##type,				\
-		prim,						\
-		sec,						\
-		page,						\
-		extend,						\
-		size,						\
-		option						\
+	{                               \
+		MSX_LAYOUT_SLOT_ENTRY,      \
+		SLOT_##type,                \
+		prim,                       \
+		sec,                        \
+		page,                       \
+		extend,                     \
+		size,                       \
+		option                      \
 	},
 
 #define MSX_LAYOUT_KANJI(offset) \
-	{								\
-		MSX_LAYOUT_KANJI_ENTRY,		\
-		SLOT_EMPTY,					\
-		0,							\
-		0,							\
-		0,							\
-		0,							\
-		0,							\
-		offset						\
+	{                               \
+		MSX_LAYOUT_KANJI_ENTRY,     \
+		SLOT_EMPTY,                 \
+		0,                          \
+		0,                          \
+		0,                          \
+		0,                          \
+		0,                          \
+		offset                      \
 	},
 
 #define MSX_LAYOUT_RAMIO_SET_BITS(offset) \
-	{								\
-		MSX_LAYOUT_RAMIO_SET_BITS_ENTRY,		\
-		SLOT_EMPTY,					\
-		0,							\
-		0,							\
-		0,							\
-		0,							\
-		0,							\
-		offset						\
+	{                               \
+		MSX_LAYOUT_RAMIO_SET_BITS_ENTRY,        \
+		SLOT_EMPTY,                 \
+		0,                          \
+		0,                          \
+		0,                          \
+		0,                          \
+		0,                          \
+		offset                      \
 	},
 
 #define MSX_LAYOUT_END \
-	{								\
-		MSX_LAYOUT_LAST,			\
-		SLOT_END,					\
-		0,							\
-		0,							\
-		0,							\
-		0,							\
-		0,							\
-		0							\
-	}								\
+	{                               \
+		MSX_LAYOUT_LAST,            \
+		SLOT_END,                   \
+		0,                          \
+		0,                          \
+		0,                          \
+		0,                          \
+		0,                          \
+		0                           \
+	}                               \
 };
 
 
@@ -163,80 +163,80 @@ extern const msx_slot msx_slot_list[];
 const msx_slot msx_slot_list[] = {
 
 #define MSX_SLOT_ROM(type, ent) { \
-	type,							\
-	MSX_MEM_ROM,					\
-	#type,							\
-	slot_##ent##_init,				\
-	slot_##ent##_reset,				\
-	slot_##ent##_map,				\
-	NULL,							\
-	NULL,							\
-	NULL							\
+	type,                           \
+	MSX_MEM_ROM,                    \
+	#type,                          \
+	slot_##ent##_init,              \
+	slot_##ent##_reset,             \
+	slot_##ent##_map,               \
+	NULL,                           \
+	NULL,                           \
+	NULL                            \
 },
 
 #define MSX_SLOT_RAM(type, ent) { \
-	type,							\
-	MSX_MEM_RAM,					\
-	#type,							\
-	slot_##ent##_init,				\
-	slot_##ent##_reset,				\
-	slot_##ent##_map,				\
-	NULL,							\
-	NULL,							\
-	NULL							\
+	type,                           \
+	MSX_MEM_RAM,                    \
+	#type,                          \
+	slot_##ent##_init,              \
+	slot_##ent##_reset,             \
+	slot_##ent##_map,               \
+	NULL,                           \
+	NULL,                           \
+	NULL                            \
 },
 
 #define MSX_SLOT(type, ent) { \
-	type,							\
-	MSX_MEM_HANDLER,				\
-	#type,							\
-	slot_##ent##_init,				\
-	slot_##ent##_reset,				\
-	slot_##ent##_map,				\
-	slot_##ent##_write,				\
-	NULL,							\
-	NULL							\
+	type,                           \
+	MSX_MEM_HANDLER,                \
+	#type,                          \
+	slot_##ent##_init,              \
+	slot_##ent##_reset,             \
+	slot_##ent##_map,               \
+	slot_##ent##_write,             \
+	NULL,                           \
+	NULL                            \
 },
 
 #define MSX_SLOT_SRAM(type, ent) { \
-	type,							\
-	MSX_MEM_HANDLER,				\
-	#type,							\
-	slot_##ent##_init,				\
-	slot_##ent##_reset,				\
-	slot_##ent##_map,				\
-	slot_##ent##_write,				\
-	slot_##ent##_loadsram,			\
-	slot_##ent##_savesram			\
+	type,                           \
+	MSX_MEM_HANDLER,                \
+	#type,                          \
+	slot_##ent##_init,              \
+	slot_##ent##_reset,             \
+	slot_##ent##_map,               \
+	slot_##ent##_write,             \
+	slot_##ent##_loadsram,          \
+	slot_##ent##_savesram           \
 },
 
 #define MSX_SLOT_NULL(type) { \
-	type,							\
-	MSX_MEM_ROM,					\
-	#type,							\
-	NULL,							\
-	NULL,							\
-	NULL,							\
-	NULL,							\
-	NULL,							\
-	NULL							\
+	type,                           \
+	MSX_MEM_ROM,                    \
+	#type,                          \
+	NULL,                           \
+	NULL,                           \
+	NULL,                           \
+	NULL,                           \
+	NULL,                           \
+	NULL                            \
 },
 
 #define MSX_SLOT_END \
 	{ SLOT_END, 0, "", NULL, NULL, NULL, NULL, NULL } \
 };
 
-#define MSX_SLOT_INIT(nm)			 static int \
+#define MSX_SLOT_INIT(nm)            static int \
 	slot_##nm##_init (running_machine &machine, slot_state *state, int page, UINT8 *mem, int size)
-#define MSX_SLOT_MAP(nm)			\
+#define MSX_SLOT_MAP(nm)            \
 	static void slot_##nm##_map (running_machine &machine, slot_state *state, int page)
-#define MSX_SLOT_WRITE(nm)			\
+#define MSX_SLOT_WRITE(nm)          \
 	static void slot_##nm##_write (running_machine &machine, slot_state *state, UINT16 addr, UINT8 val)
-#define MSX_SLOT_RESET(nm)			\
+#define MSX_SLOT_RESET(nm)          \
 	static void slot_##nm##_reset (running_machine &machine, slot_state *state)
-#define MSX_SLOT_LOADSRAM(nm)		\
+#define MSX_SLOT_LOADSRAM(nm)       \
 	static int slot_##nm##_loadsram (running_machine &machine, slot_state *state)
-#define MSX_SLOT_SAVESRAM(nm)		\
+#define MSX_SLOT_SAVESRAM(nm)       \
 	static int slot_##nm##_savesram (running_machine &machine, slot_state *state)
 
 struct msx_driver_struct {
@@ -246,12 +246,12 @@ struct msx_driver_struct {
 
 extern const msx_driver_struct msx_driver_list[];
 
-#define MSX_DRIVER_LIST		\
+#define MSX_DRIVER_LIST     \
 const msx_driver_struct msx_driver_list[] = {
-#define MSX_DRIVER(foo)		\
+#define MSX_DRIVER(foo)     \
 		{ #foo, msx_slot_layout_##foo },
-#define MSX_DRIVER_END		\
-		{ "", NULL }		\
+#define MSX_DRIVER_END      \
+		{ "", NULL }        \
 };
 
 

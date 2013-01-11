@@ -71,19 +71,19 @@ struct im6402_interface
 	int m_rrc;
 	int m_trc;
 
-	devcb_read_line		m_in_rri_cb;
-	devcb_write_line	m_out_tro_cb;
-	devcb_write_line	m_out_dr_cb;
-	devcb_write_line	m_out_tbre_cb;
-	devcb_write_line	m_out_tre_cb;
+	devcb_read_line     m_in_rri_cb;
+	devcb_write_line    m_out_tro_cb;
+	devcb_write_line    m_out_dr_cb;
+	devcb_write_line    m_out_tbre_cb;
+	devcb_write_line    m_out_tre_cb;
 };
 
 
 // ======================> im6402_device
 
 class im6402_device :  public device_t,
-					   public device_serial_interface,
-					   public im6402_interface
+						public device_serial_interface,
+						public im6402_interface
 {
 public:
 	// construction/destruction
@@ -136,11 +136,11 @@ private:
 		TIMER_TX
 	};
 
-	devcb_resolved_read_line	m_in_rri_func;
-	devcb_resolved_write_line	m_out_tro_func;
-	devcb_resolved_write_line	m_out_dr_func;
-	devcb_resolved_write_line	m_out_tbre_func;
-	devcb_resolved_write_line	m_out_tre_func;
+	devcb_resolved_read_line    m_in_rri_func;
+	devcb_resolved_write_line   m_out_tro_func;
+	devcb_resolved_write_line   m_out_dr_func;
+	devcb_resolved_write_line   m_out_tbre_func;
+	devcb_resolved_write_line   m_out_tre_func;
 
 	// status
 	int m_dr;
@@ -160,11 +160,11 @@ private:
 
 	// receiver
 	UINT8 m_rbr;
-	int	m_rrc_count;
+	int m_rrc_count;
 
 	// transmitter
 	UINT8 m_tbr;
-	int	m_trc_count;
+	int m_trc_count;
 
 	// timers
 	emu_timer *m_rx_timer;

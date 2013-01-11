@@ -12,10 +12,10 @@
 
 static struct
 {
-	long on,	// Activity of reel
+	long on,    // Activity of reel
 		reacttime,
-		count;		// mechmeter value
-	int  state;		// state 0/1
+		count;      // mechmeter value
+	int  state;     // state 0/1
 	emu_timer *meter_timer;
 } meter_info[MAXMECHMETERS];
 
@@ -38,7 +38,7 @@ void MechMtr_config(running_machine &machine, int number)
 		meter_info[i].reacttime = METERREACTTIME;
 		meter_info[i].state     = 0;
 		meter_info[i].count     = 0;
-		meter_info[i].on		= 0;
+		meter_info[i].on        = 0;
 		meter_info[i].meter_timer = machine.scheduler().timer_alloc(FUNC(meter_callback), (void*)(FPTR)i);
 		meter_info[i].meter_timer->reset();
 	}
@@ -91,14 +91,14 @@ int MechMtr_GetActivity(int id)
 
 int MechMtr_update(int id, int state)
 {
-  int res = 0;
+	int res = 0;
 
-  if ( id >= number_mtr ) return res;
+	if ( id >= number_mtr ) return res;
 
-  state = state?1:0;
+	state = state?1:0;
 
-  if ( meter_info[id].state != state )
-  {	// meter state is changing
+	if ( meter_info[id].state != state )
+	{   // meter state is changing
 	meter_info[id].state = state;
 
 	if ( state )
@@ -111,7 +111,7 @@ int MechMtr_update(int id, int state)
 		meter_info[id].on =0;
 		meter_info[id].meter_timer->adjust(attotime::never, id);
 	}
-  }
+	}
 
-  return res;
+	return res;
 }

@@ -48,8 +48,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define OBJECT_ENTRY_BLOCK	256
-#define POOL_HASH_SIZE		3797
+#define OBJECT_ENTRY_BLOCK  256
+#define POOL_HASH_SIZE      3797
 
 
 
@@ -60,24 +60,24 @@
 /* an object type entry */
 struct objtype_entry
 {
-	objtype_entry *		next;
-	UINT32				type;
-	const char *		friendly;
-	void				(*destructor)(void *, size_t);
+	objtype_entry *     next;
+	UINT32              type;
+	const char *        friendly;
+	void                (*destructor)(void *, size_t);
 };
 
 
 /* an entry in a pool */
 struct object_entry
 {
-	object_entry *		next;
-	object_entry *		globalnext;
-	object_entry *		globalprev;
-	objtype_entry *		type;
-	void *				object;
-	size_t				size;
-	const char *		file;
-	int					line;
+	object_entry *      next;
+	object_entry *      globalnext;
+	object_entry *      globalprev;
+	objtype_entry *     type;
+	void *              object;
+	size_t              size;
+	const char *        file;
+	int                 line;
 };
 
 
@@ -85,28 +85,28 @@ struct object_entry
 struct object_entry_block
 {
 	object_entry_block *next;
-	object_entry		entry[OBJECT_ENTRY_BLOCK];
+	object_entry        entry[OBJECT_ENTRY_BLOCK];
 };
 
 
 /* the object pool itself */
 struct object_pool
 {
-	object_entry *		hashtable[POOL_HASH_SIZE];
-	object_entry *		globallist;
-	object_entry *		freelist;
+	object_entry *      hashtable[POOL_HASH_SIZE];
+	object_entry *      globallist;
+	object_entry *      freelist;
 	object_entry_block *blocklist;
-	objtype_entry *		typelist;
-	void				(*fail)(const char *message);
+	objtype_entry *     typelist;
+	void                (*fail)(const char *message);
 };
 
 
 /* an iterator over objects in a pool */
 struct object_pool_iterator
 {
-	object_pool *		pool;
-	object_type			type;
-	object_entry *		last;
+	object_pool *       pool;
+	object_type         type;
+	object_entry *      last;
 };
 
 

@@ -108,23 +108,23 @@ WRITE8_MEMBER(nbmj8891_state::nbmj8891_blitter_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 0x02:	m_blitter_destx = data; break;
-		case 0x03:	m_blitter_desty = data; break;
-		case 0x04:	m_blitter_sizex = data; break;
-		case 0x05:	m_blitter_sizey = data;
+		case 0x00:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x02:  m_blitter_destx = data; break;
+		case 0x03:  m_blitter_desty = data; break;
+		case 0x04:  m_blitter_sizex = data; break;
+		case 0x05:  m_blitter_sizey = data;
 					/* writing here also starts the blit */
 					nbmj8891_gfxdraw(machine());
 					break;
-		case 0x06:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+		case 0x06:  m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 					m_flipscreen = (data & 0x04) ? 1 : 0;
 					m_dispflag = (data & 0x08) ? 0 : 1;
 					if (m_gfxdraw_mode) nbmj8891_vramflip(machine(), 1);
 					nbmj8891_vramflip(machine(), 0);
 					break;
-		case 0x07:	break;
+		case 0x07:  break;
 	}
 }
 
@@ -132,12 +132,12 @@ WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_blitter_w)
 {
 	switch (offset)
 	{
-		case 0:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
-		case 1:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 2:	m_blitter_destx = data; break;
-		case 3:	m_blitter_desty = data; break;
-		case 4:	m_blitter_sizex = (data - 1) & 0xff; break;
-		case 5:	m_blitter_sizey = (data - 1) & 0xff; break;
+		case 0: m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 1: m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 2: m_blitter_destx = data; break;
+		case 3: m_blitter_desty = data; break;
+		case 4: m_blitter_sizex = (data - 1) & 0xff; break;
+		case 5: m_blitter_sizey = (data - 1) & 0xff; break;
 	}
 }
 
@@ -232,7 +232,7 @@ WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_mcu_w)
 
 //  m_blitter_direction_x = 0;                // for debug
 //  m_blitter_direction_y = 0;                // for debug
-	m_dispflag = 1;					// for debug
+	m_dispflag = 1;                 // for debug
 
 	m_param_cnt++;
 }

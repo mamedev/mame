@@ -21,12 +21,12 @@
 ***************************************************************************/
 
 /* total # of coin counters */
-#define COIN_COUNTERS			8
+#define COIN_COUNTERS           8
 
 /* memory card actions */
-#define MEMCARD_CREATE			0
-#define MEMCARD_INSERT			1
-#define MEMCARD_EJECT			2
+#define MEMCARD_CREATE          0
+#define MEMCARD_INSERT          1
+#define MEMCARD_EJECT           2
 
 
 
@@ -145,4 +145,4 @@ INTERRUPT_GEN( irq7_line_hold );
 INTERRUPT_GEN( irq7_line_pulse );
 INTERRUPT_GEN( irq7_line_assert );
 
-#endif	/* __MACHINE_GENERIC_H__ */
+#endif  /* __MACHINE_GENERIC_H__ */

@@ -14,7 +14,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class pc_kbd_microsoft_natural_device :	public device_t,
+class pc_kbd_microsoft_natural_device : public device_t,
 										public device_pc_kbd_interface
 {
 public:
@@ -43,10 +43,10 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	UINT8	m_p0;
-	UINT8	m_p1;
-	UINT8	m_p2;
-	UINT8	m_p3;
+	UINT8   m_p0;
+	UINT8   m_p1;
+	UINT8   m_p2;
+	UINT8   m_p3;
 };
 
 
@@ -54,4 +54,3 @@ protected:
 extern const device_type PC_KBD_MICROSOFT_NATURAL;
 
 #endif  /* __KB_MSNAT_H__ */
-

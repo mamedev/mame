@@ -25,7 +25,7 @@
 // ======================> comx_joy_device
 
 class comx_joy_device : public device_t,
-					    public device_comx_expansion_card_interface
+						public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction

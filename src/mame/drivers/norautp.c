@@ -537,10 +537,10 @@
 *******************************************************************************/
 
 
-#define NORAUT_MASTER_CLOCK		XTAL_18_432MHz
-#define DPHL_MASTER_CLOCK		XTAL_18MHz
-#define NORAUT_CPU_CLOCK		NORAUT_MASTER_CLOCK / 8		/* 2.30275 MHz - Measured: 2.305 MHz */
-#define DPHL_CPU_CLOCK			DPHL_MASTER_CLOCK / 9		/* 2 MHz (from 8224) */
+#define NORAUT_MASTER_CLOCK     XTAL_18_432MHz
+#define DPHL_MASTER_CLOCK       XTAL_18MHz
+#define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     /* 2.30275 MHz - Measured: 2.305 MHz */
+#define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       /* 2 MHz (from 8224) */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -607,14 +607,14 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 void norautp_state::palette_init()
 {
 	/* 1st gfx bank */
-	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
-	palette_set_color(machine(), 1, MAKE_RGB(0xff, 0xff, 0x00));	/* yellow */
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0xff));	/* blue */
-	palette_set_color(machine(), 3, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
-	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
-	palette_set_color(machine(), 5, MAKE_RGB(0xff, 0x00, 0x00));	/* red */
-	palette_set_color(machine(), 6, MAKE_RGB(0xff, 0xff, 0xff));	/* white */
-	palette_set_color(machine(), 7, MAKE_RGB(0x00, 0x00, 0x00));	/* black */
+	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
+	palette_set_color(machine(), 1, MAKE_RGB(0xff, 0xff, 0x00));    /* yellow */
+	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
+	palette_set_color(machine(), 3, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
+	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
+	palette_set_color(machine(), 5, MAKE_RGB(0xff, 0x00, 0x00));    /* red */
+	palette_set_color(machine(), 6, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
+	palette_set_color(machine(), 7, MAKE_RGB(0x00, 0x00, 0x00));    /* black */
 }
 
 
@@ -637,14 +637,14 @@ WRITE8_MEMBER(norautp_state::mainlamps_w)
     -x-- ----  * HOLD 5 lamp.
     x--- ----  * CANCEL lamp.
 */
-	output_set_lamp_value(0, (data >> 0) & 1);	/* CHANGE CARD lamp */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* SAVE / HALF GAMBLE lamp */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* HOLD 1 lamp */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* HOLD 2 lamp */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* HOLD 3 lamp */
-	output_set_lamp_value(5, (data >> 5) & 1);	/* HOLD 4 lamp */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* HOLD 5 lamp */
-	output_set_lamp_value(7, (data >> 7) & 1);	/* CANCEL lamp */
+	output_set_lamp_value(0, (data >> 0) & 1);  /* CHANGE CARD lamp */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* SAVE / HALF GAMBLE lamp */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* HOLD 1 lamp */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* HOLD 2 lamp */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* HOLD 3 lamp */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* HOLD 4 lamp */
+	output_set_lamp_value(6, (data >> 6) & 1);  /* HOLD 5 lamp */
+	output_set_lamp_value(7, (data >> 7) & 1);  /* CANCEL lamp */
 
 //  popmessage("lamps: %02x", data);
 }
@@ -664,8 +664,8 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
 
 	device_t *discrete = machine().device("discrete");
 
-	output_set_lamp_value(8, (data >> 0) & 1);	/* DEAL / DRAW lamp */
-	output_set_lamp_value(9, (data >> 1) & 1);	/* BET / COLLECT lamp */
+	output_set_lamp_value(8, (data >> 0) & 1);  /* DEAL / DRAW lamp */
+	output_set_lamp_value(9, (data >> 1) & 1);  /* BET / COLLECT lamp */
 
 	/* the 4 MSB are for discrete sound */
 	discrete_sound_w(discrete, space, NORAUTP_SND_EN, (data >> 7) & 0x01);
@@ -689,12 +689,12 @@ WRITE8_MEMBER(norautp_state::counterlamps_w)
     -x-- ----  + Coin counter related.
     x--- ----  + DEFLECT (always activated).
 */
-	output_set_lamp_value(10, (data >> 0) & 1);	/* HI lamp */
-	output_set_lamp_value(11, (data >> 1) & 1);	/* LO lamp */
+	output_set_lamp_value(10, (data >> 0) & 1); /* HI lamp */
+	output_set_lamp_value(11, (data >> 1) & 1); /* LO lamp */
 
-	coin_counter_w(machine(), 0, data & 0x10);	/* Coin1/3 counter */
-	coin_counter_w(machine(), 1, data & 0x20);	/* Coin2 counter */
-	coin_counter_w(machine(), 2, data & 0x08);	/* Payout pulse */
+	coin_counter_w(machine(), 0, data & 0x10);  /* Coin1/3 counter */
+	coin_counter_w(machine(), 1, data & 0x20);  /* Coin2 counter */
+	coin_counter_w(machine(), 2, data & 0x08);  /* Payout pulse */
 }
 
 
@@ -807,7 +807,7 @@ READ8_MEMBER(norautp_state::test2_r)
 static ADDRESS_MAP_START( norautp_map, AS_PROGRAM, 8, norautp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("nvram")	/* 6116 */
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("nvram")   /* 6116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautp_portmap, AS_IO, 8, norautp_state )
@@ -844,7 +844,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( norautxp_map, AS_PROGRAM, 8, norautp_state )
 //  ADDRESS_MAP_GLOBAL_MASK(~0x4000)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* need to be checked */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM /* need to be checked */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram") /* HM6116 */
 ADDRESS_MAP_END
 
@@ -855,7 +855,7 @@ ADDRESS_MAP_END
 
 #ifdef UNUSED_CODE
 static ADDRESS_MAP_START( norautx8_map, AS_PROGRAM, 8, norautp_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* need to be checked */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM /* need to be checked */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram") /* 6116 */
 ADDRESS_MAP_END
 #endif
@@ -863,7 +863,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kimble_map, AS_PROGRAM, 8, norautp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM	/* working RAM? */
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM /* working RAM? */
 ADDRESS_MAP_END
 
 #ifdef UNUSED_CODE
@@ -874,15 +874,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newhilop_map, AS_PROGRAM, 8, norautp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")	/* 6116 */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")   /* 6116 */
 ADDRESS_MAP_END
 
 /*********** 8080 based **********/
 
 static ADDRESS_MAP_START( dphl_map, AS_PROGRAM, 8, norautp_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM	AM_SHARE("nvram")	/* should be 2x 0x100 segments (4x 2111) */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")   /* should be 2x 0x100 segments (4x 2111) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphla_map, AS_PROGRAM, 8, norautp_state )
@@ -923,7 +923,7 @@ static ADDRESS_MAP_START( kimbldhl_map, AS_PROGRAM, 8, norautp_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drhl_map, AS_PROGRAM, 8, norautp_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
@@ -939,8 +939,8 @@ static INPUT_PORTS_START( norautp )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Collect")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN0-5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
@@ -954,9 +954,9 @@ static INPUT_PORTS_START( norautp )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)	/* Coin C */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)  /* Coin C */
 
-	PORT_START("IN2")	/* Only 3 lines: PPI-2; PC0-PC2 */
+	PORT_START("IN2")   /* Only 3 lines: PPI-2; PC0-PC2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN2-1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_CODE(KEYCODE_9) PORT_NAME("Readout")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("Low Level Hopper")
@@ -994,8 +994,8 @@ static INPUT_PORTS_START( norautrh )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
@@ -1009,36 +1009,36 @@ static INPUT_PORTS_START( norautrh )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	/* Coin C for other games */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   /* Coin C for other games */
 
-	PORT_START("IN2")	/* Only 3 lines: PPI-2; PC0-PC2 */
+	PORT_START("IN2")   /* Only 3 lines: PPI-2; PC0-PC2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )			PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Bet Max" )           PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "25" )
-	PORT_DIPNAME( 0x08, 0x08, "Raise Ante" )		PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x08, 0x08, "Raise Ante" )        PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, "Random" )
 	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x10, 0x00, "Type of Game" )		PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x10, 0x00, "Type of Game" )      PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x10, "Jacks Plus" )
 	PORT_DIPSETTING(    0x00, "Joker Poker" )
-	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW1:3,1")
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW1:3,1")
 	PORT_DIPSETTING(    0x00, "A=1; B=5" )
 	PORT_DIPSETTING(    0xa0, "A=5; B=25" )
 	PORT_DIPSETTING(    0x20, "A=10; B=5" )
 	PORT_DIPSETTING(    0x80, "A=50; B=25" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Bet")			PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Show Bet")           PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1048,8 +1048,8 @@ static INPUT_PORTS_START( norautpn )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)	/* Coin B */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Readout") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
@@ -1065,7 +1065,7 @@ static INPUT_PORTS_START( norautpn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 
-	PORT_START("IN2")	/* Only 3 lines: PPI-2; PC0-PC2 */
+	PORT_START("IN2")   /* Only 3 lines: PPI-2; PC0-PC2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1103,7 +1103,7 @@ static INPUT_PORTS_START( mainline )
 	PORT_INCLUDE( norautrh )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW1:3,1")
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW1:3,1")
 	PORT_DIPSETTING(    0x00, "A=1; B=10" )
 	PORT_DIPSETTING(    0xa0, "A=1; B=25" )
 	PORT_DIPSETTING(    0x20, "A=10; B=10" )
@@ -1125,28 +1125,28 @@ static INPUT_PORTS_START( norautkl )
 	PORT_INCLUDE( norautrh )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )				PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )               PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, "25" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Raise Ante" )			PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x04, 0x00, "Raise Ante" )            PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x00, "Random" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown )  )		PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown )  )     PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Type of Game" )			PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x10, 0x00, "Type of Game" )          PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x10, "Deluxe Poker" )
 	PORT_DIPSETTING(    0x00, "Joker Poker" )
-	PORT_DIPNAME( 0x20, 0x20, "Min Bet for Jokers" )	PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Min Bet for Jokers" )    PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPNAME( 0x40, 0x00, "Deal Speed")				PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Deal Speed")             PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x40, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x00, "A=5; B=2" )
 	PORT_DIPSETTING(    0x80, "A=1; B=1" )
 INPUT_PORTS_END
@@ -1168,7 +1168,7 @@ static const gfx_layout charlayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
 	{ 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-	  8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, },
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, 0*16, },
 	16*16
 };
 
@@ -1180,7 +1180,7 @@ static const gfx_layout charlayout32x32 =
 	{ 0 },
 	{ 0,0, 1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7, 8,8, 9,9, 10,10, 11,11, 12,12, 13,13, 14,14, 15,15 },
 	{ 0*16, 0*16, 1*16, 1*16, 2*16, 2*16, 3*16, 3*16, 4*16, 4*16, 5*16, 5*16, 6*16, 6*16, 7*16, 7*16,
-	  8*16, 8*16, 9*16, 9*16, 10*16,10*16,11*16,11*16,12*16,12*16,13*16,13*16,14*16,14*16,15*16,15*16 },
+		8*16, 8*16, 9*16, 9*16, 10*16,10*16,11*16,11*16,12*16,12*16,13*16,13*16,14*16,14*16,15*16,15*16 },
 	16*16
 };
 
@@ -1203,29 +1203,29 @@ GFXDECODE_END
 static I8255_INTERFACE (ppi8255_intf_0)
 {
 	/* (60-63) Mode 0 - Port A set as input */
-	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_DRIVER_MEMBER(norautp_state,mainlamps_w),		/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(norautp_state,counterlamps_w)	/* Port C write */
+	DEVCB_INPUT_PORT("DSW1"),       /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_DRIVER_MEMBER(norautp_state,mainlamps_w),     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_DRIVER_MEMBER(norautp_state,counterlamps_w)   /* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_1)
 {
 	/* (a0-a3) Mode 0 - Ports A & B set as input */
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(norautp_state,soundlamps_w)		/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_DRIVER_MEMBER(norautp_state,soundlamps_w)     /* Port C write */
 };
 
 //static I8255A_INTERFACE (ppi8255_intf_2)
 //{
-    /* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
-               Group B Mode 0, output;  (see below for lines PC0-PC2) */
+	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
+	           Group B Mode 0, output;  (see below for lines PC0-PC2) */
 //  DEVCB_HANDLER(vram_data_r),     /* Port A read (VRAM data read)*/
 //  DEVCB_HANDLER(vram_data_w),     /* Port A write (VRAM data write) */
 //  DEVCB_NULL,                     /* Port B read */
@@ -1234,9 +1234,9 @@ static I8255_INTERFACE (ppi8255_intf_1)
 //  DEVCB_HANDLER(ppi2_portc_w)     /* Port C write */
 
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
-        It means that port A should be bidirectional and port B just as output.
-        Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets).
-    */
+	    It means that port A should be bidirectional and port B just as output.
+	    Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets).
+	*/
 //};
 
 
@@ -1251,7 +1251,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_CPU_PROGRAM_MAP(norautp_map)
 	MCFG_CPU_IO_MAP(norautp_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")	/* doesn't work if placed at derivative drivers */
+	MCFG_NVRAM_ADD_0FILL("nvram")   /* doesn't work if placed at derivative drivers */
 
 	/* 3x 8255 */
 	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
@@ -1263,7 +1263,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)	/* the hardware clips the top 8 pixels */
+	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)    /* the hardware clips the top 8 pixels */
 	MCFG_SCREEN_UPDATE_DRIVER(norautp_state, screen_update_norautp)
 
 	MCFG_GFXDECODE(norautp)
@@ -1532,10 +1532,10 @@ MACHINE_CONFIG_END
 
 ROM_START( norautp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jpoker.bin",	    0x0000,  0x2000,  CRC(e22ed34d) SHA1(108f034335b5bed183ee316a61880f7b9485b34f) )
+	ROM_LOAD( "jpoker.bin",     0x0000,  0x2000,  CRC(e22ed34d) SHA1(108f034335b5bed183ee316a61880f7b9485b34f) )
 
 	ROM_REGION( 0x10000, "gfx", 0 )
-	ROM_LOAD( "displayrom.bin",	0x00000, 0x10000, CRC(ed3605bd) SHA1(0174e880835815558328789226234e36b673b249) )
+	ROM_LOAD( "displayrom.bin", 0x00000, 0x10000, CRC(ed3605bd) SHA1(0174e880835815558328789226234e36b673b249) )
 ROM_END
 
 /*
@@ -1558,7 +1558,7 @@ ROM_END
 */
 
 ROM_START( norautdx )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* console version */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* console version */
 	ROM_LOAD( "noraut_deluxe_24pin_console.bin", 0x0000, 0x1000, CRC(d41bd404) SHA1(52e984ca28a15a1485ca672dd1fef973cf0c7617) )
 	ROM_LOAD( "noraut_deluxe_24pin_z80.bin",     0x1000, 0x0800, CRC(c70bc8f9) SHA1(d947be4e6741f3a884ceca76d1a0fd13625a5f78) )
 
@@ -1696,7 +1696,7 @@ ROM_END
 */
 
 ROM_START( norautpl )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* slightly different than original JP */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* slightly different than original JP */
 	ROM_LOAD( "u11.bin",  0x0000, 0x1000, CRC(2abd1b82) SHA1(8cbe9ea481ec2465faaf79fcfc22ec78d83bd98d) )
 	ROM_LOAD( "u16.bin",  0x1000, 0x1000, CRC(dbc3960a) SHA1(d58ee89134f9d8db80d3e066fd01e4e484126d00) )
 
@@ -1791,13 +1791,13 @@ ROM_START( norautjp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2764-1prog.bin",   0x0000, 0x2000, CRC(5f776ce1) SHA1(673b8c67ebd5c1334187a9407b86a43150cbe67b) )
 
-	ROM_REGION( 0x1000,	"gfx", 0 )
+	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_FILL(                     0x0000, 0x0800, 0xff )
-	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )	/* first half 0xff filled */
+	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )    /* first half 0xff filled */
 	ROM_CONTINUE(                 0x0800, 0x0800 )
 
-	ROM_REGION( 0x800,	"nvram", 0 )
-	ROM_LOAD( "norautjp_nv.bin",  0x0000, 0x0400, CRC(0a0614b2) SHA1(eb21b2723b41743daf787cfc379bc67cce2b8538) )	/* default NVRAM */
+	ROM_REGION( 0x800,  "nvram", 0 )
+	ROM_LOAD( "norautjp_nv.bin",  0x0000, 0x0400, CRC(0a0614b2) SHA1(eb21b2723b41743daf787cfc379bc67cce2b8538) )    /* default NVRAM */
 
 ROM_END
 
@@ -1835,7 +1835,7 @@ ROM_END
 */
 
 ROM_START( norautra )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-1fff and identical to norautrh, the rest is filled with FF's */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-1fff and identical to norautrh, the rest is filled with FF's */
 	ROM_LOAD( "noraut_red_hot_1bet_joker_poker.bin", 0x0000, 0x8000, CRC(f284b574) SHA1(ff683731f3dbdaed5d0d25276ca90b68a422e403) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -1882,8 +1882,8 @@ ROM_END
 
 ROM_START( norautu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2563.bin",	0x0000, 0x8000, CRC(6cbe68bd) SHA1(93201baaf03a9bba6c52c64cc26e8e445aa6454e) )
-	ROM_RELOAD(				0x8000, 0x8000 )
+	ROM_LOAD( "2563.bin",   0x0000, 0x8000, CRC(6cbe68bd) SHA1(93201baaf03a9bba6c52c64cc26e8e445aa6454e) )
+	ROM_RELOAD(             0x8000, 0x8000 )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "club250.bin", 0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )
@@ -2123,7 +2123,7 @@ ROM_END
 */
 
 ROM_START( df_djpkr )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-1fff, copied along the 64K of the ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-1fff, copied along the 64K of the ROM */
 	ROM_LOAD( "dellfern_4bet_joker_z80_28pin_45-75_payout.bin", 0x0000, 0x10000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -2183,7 +2183,7 @@ ROM_END
 */
 
 ROM_START( cgip30cs )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-3fff, duplicated to fit the ROM size */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-3fff, duplicated to fit the ROM size */
 	ROM_LOAD( "cgi_standard_no_bonus_30c_z80_28pin.bin", 0x0000, 0x8000, CRC(7c784964) SHA1(c3deeacc73493939a11dd4cdf0fe07fcd2a9ad8a) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -2396,7 +2396,7 @@ ROM_END
 ROM_START( pma )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pma.e5", 0x0000, 0x1000, CRC(e05ab5b9) SHA1(8bd13e8ed723ac256545f19bef4fa3fe507ab9d5) )
-	ROM_RELOAD(			0x1000, 0x1000 )
+	ROM_RELOAD(         0x1000, 0x1000 )
 	ROM_LOAD( "pma.e4", 0x2000, 0x1000, CRC(0f8b11fc) SHA1(7292b0ac368c469ff2e1ede1765c08f1ccc1a36c) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -2755,13 +2755,13 @@ ROM_END
 
 */
 
-ROM_START( dphljp )	/* close to GTI Poker */
+ROM_START( dphljp ) /* close to GTI Poker */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "japan_12.u12", 0x0000, 0x0800, CRC(086a2303) SHA1(900c7241c33a38fb1a791b311e50f7d7f43bb955) )
-	ROM_RELOAD(	              0x0800, 0x0800 )
+	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_LOAD( "japan_13.u18", 0x1000, 0x0800, CRC(ccaad5cb) SHA1(5f6ca497ccb7c535714a6e24df00f2831a7840c1) )
-	ROM_RELOAD(	              0x1800, 0x0800 )
-	ROM_LOAD( "japan_11.u19", 0x2000, 0x0800, CRC(9f9c67d5) SHA1(cd11849b245406821af7ac3554805c9dd89645b2) )	// ???
+	ROM_RELOAD(               0x1800, 0x0800 )
+	ROM_LOAD( "japan_11.u19", 0x2000, 0x0800, CRC(9f9c67d5) SHA1(cd11849b245406821af7ac3554805c9dd89645b2) )    // ???
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_FILL(                 0x0000, 0x0800, 0xff )
@@ -2888,7 +2888,7 @@ ROM_END
 */
 
 ROM_START( kimbldhl )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-6e40 */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-6e40 */
 	ROM_LOAD( "jpc525611.bin", 0x0000, 0x8000, CRC(4a3f1aef) SHA1(570ef733989da6e89f0387f1e80b934cec7a7663) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -3090,7 +3090,7 @@ ROM_START( drhl )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "drhl_v1.0.u31",  0x0000, 0x1000, CRC(bbc7c970) SHA1(9268a430764a5ea8ba7cd18944ec254a44d9dff2) )
 
-	ROM_REGION( 0x0200,  "plds", 0 )	/* possible bad dump. fusemap's 1st half is all 1's and 2nd half 0's */
+	ROM_REGION( 0x0200,  "plds", 0 )    /* possible bad dump. fusemap's 1st half is all 1's and 2nd half 0's */
 	ROM_LOAD( "drhl_ampal16l8pc.u51",  0x0000, 0x0104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 ROM_END
 
@@ -3104,10 +3104,10 @@ ROM_START( drhla )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "drews.u31",  0x0000, 0x1000, CRC(bbc7c970) SHA1(9268a430764a5ea8ba7cd18944ec254a44d9dff2) )
 
-	ROM_REGION( 0x0800,  "dallas", 0 )	/* it's in fact NVRAM, but double sized... */
+	ROM_REGION( 0x0800,  "dallas", 0 )  /* it's in fact NVRAM, but double sized... */
 	ROM_LOAD( "ds1220ab.u33",  0x0000, 0x0800, CRC(f357d314) SHA1(72791b2effd3ec2e98b735c9b215fc9abe3f5aea) )
 
-	ROM_REGION( 0x0200,  "plds", 0 )	/* this one is unprotected and seems ok */
+	ROM_REGION( 0x0200,  "plds", 0 )    /* this one is unprotected and seems ok */
 	ROM_LOAD( "pal16l8a.u51",  0x0000, 0x0104, CRC(4c98193f) SHA1(b6bdb6eef0d962a3aa4df0e23a8937a7e3210062) )
 ROM_END
 
@@ -3249,7 +3249,7 @@ ROM_START( tpoker2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tp2.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 )	/* 68705 */
+	ROM_REGION( 0x0800,  "mcu", 0 ) /* 68705 */
 	ROM_LOAD( "tp2.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -3289,7 +3289,7 @@ ROM_END
 */
 
 ROM_START( ssjkrpkr )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Southern Systems */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Southern Systems */
 	ROM_LOAD( "oc.u11", 0x0000, 0x1000, CRC(b9072aa5) SHA1(bfa3df090e1030aaebbb784cb5e686f4f84f2263) )
 	ROM_LOAD( "oc.u10", 0x1000, 0x1000, CRC(8652ebb9) SHA1(e907df4f8da99b42c425ed58da3cda9943c89fb7) )
 
@@ -3316,7 +3316,7 @@ ROM_END
 */
 
 ROM_START( fastdrwp )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* PC=0x068b for error screen */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* PC=0x068b for error screen */
 	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(d020d7d3) SHA1(4808ef14adf230e3971161c9375f2b354cd9d519) )
 	ROM_LOAD( "u18.bin", 0x1000, 0x1000, CRC(03de6413) SHA1(c61131244e8095b998c5e31724a21496cacad247) )
 
@@ -3338,7 +3338,7 @@ ROM_END
 */
 
 ROM_START( dphlunka )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* no stack, call's RET go to PC=0 */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* no stack, call's RET go to PC=0 */
 	ROM_LOAD( "u-12_ss.u12", 0x0000, 0x1000, CRC(10ddbc16) SHA1(ab683d836c9223bc67701e092c2cb95afc0f0fa2) )
 	ROM_LOAD( "u-18_ss.u18", 0x1000, 0x1000, CRC(ffbac2bf) SHA1(219247624e0eb0c0c805f5f9a96c4b6b60c9c5ac) )
 
@@ -3360,7 +3360,7 @@ ROM_END
 */
 
 ROM_START( dphlunkb )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* PC=0x068b for error screen */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* PC=0x068b for error screen */
 	ROM_LOAD( "u-12_rev-2.u12", 0x0000, 0x1000, CRC(1b1d8ca4) SHA1(405bf8a56dfc669a0890b0af9417c1ed6a3bf374) )
 	ROM_LOAD( "u-18_rev-2.u18", 0x1000, 0x1000, CRC(22dbe0c7) SHA1(ca223074b0f4b86e60a1b91c22568680845ae17e) )
 

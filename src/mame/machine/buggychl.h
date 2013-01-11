@@ -23,4 +23,3 @@ private:
 };
 
 extern const device_type BUGGYCHL_MCU;
-

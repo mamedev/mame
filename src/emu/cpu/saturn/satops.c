@@ -1,4 +1,4 @@
-#define IRQ_ADDRESS	0xf
+#define IRQ_ADDRESS 0xf
 
 #define saturn_assert(x) \
 	do { if (!(x)) logerror("SATURN '%s' assertion failed: %s at %s:%i, pc=%05x\n", cpustate->device->tag(), #x, __FILE__, __LINE__, cpustate->pc); } while (0)
@@ -7,7 +7,7 @@ INLINE int READ_OP(saturn_state *cpustate)
 {
 	UINT8 data;
 	cpustate->icount-=3;
-        data=cpustate->direct->read_decrypted_byte(cpustate->pc);
+		data=cpustate->direct->read_decrypted_byte(cpustate->pc);
 	saturn_assert(data<0x10);
 	cpustate->pc=(cpustate->pc+1)&0xfffff;
 	return data;
@@ -17,7 +17,7 @@ INLINE int READ_OP_ARG(saturn_state *cpustate)
 {
 	UINT8 data;
 	cpustate->icount-=3;
-        data=cpustate->direct->read_raw_byte(cpustate->pc);
+		data=cpustate->direct->read_raw_byte(cpustate->pc);
 	saturn_assert(data<0x10);
 	cpustate->pc=(cpustate->pc+1)&0xfffff;
 	return data;
@@ -275,7 +275,7 @@ INLINE void saturn_in(saturn_state *cpustate, int reg)
 	saturn_assert(reg>=0 && reg<9);
 	if (!(cpustate->pc&1))
 		logerror( "SATURN '%s' at %05x: reg=IN opcode at odd addresse\n",
-			  cpustate->device->tag(), cpustate->pc-3 );
+				cpustate->device->tag(), cpustate->pc-3 );
 	if (cpustate->config&&cpustate->config->in) in = cpustate->config->in(cpustate->device);
 	S64_WRITE_WORD(cpustate, reg,in);
 	cpustate->monitor_in = in;

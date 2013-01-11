@@ -13,18 +13,18 @@
 
 #include "devlegcy.h"
 
-#define SPEAKER_TAG		"speaker"
+#define SPEAKER_TAG     "speaker"
 
 struct speaker_interface
 {
-	int num_level;	/* optional: number of levels (if not two) */
-	const INT16 *levels;	/* optional: pointer to level lookup table */
+	int num_level;  /* optional: number of levels (if not two) */
+	const INT16 *levels;    /* optional: pointer to level lookup table */
 };
 
 void speaker_level_w (device_t *device, int new_level);
 
 class speaker_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

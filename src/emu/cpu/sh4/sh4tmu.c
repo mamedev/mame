@@ -321,4 +321,3 @@ void sh4_handle_tcpr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_TCPR2);
 }
-

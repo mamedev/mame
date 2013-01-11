@@ -58,24 +58,24 @@
 
 struct z80dma_interface
 {
-	devcb_write_line	m_out_busreq_cb;
-	devcb_write_line	m_out_int_cb;
-	devcb_write_line	m_out_bao_cb;
+	devcb_write_line    m_out_busreq_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_bao_cb;
 
 	// memory accessors
-	devcb_read8			m_in_mreq_cb;
-	devcb_write8		m_out_mreq_cb;
+	devcb_read8         m_in_mreq_cb;
+	devcb_write8        m_out_mreq_cb;
 
 	// I/O accessors
-	devcb_read8			m_in_iorq_cb;
-	devcb_write8		m_out_iorq_cb;
+	devcb_read8         m_in_iorq_cb;
+	devcb_write8        m_out_iorq_cb;
 };
 
 
 
 // ======================> z80dma_device
 
-class z80dma_device :	public device_t,
+class z80dma_device :   public device_t,
 						public device_z80daisy_interface,
 						public z80dma_interface
 {
@@ -119,25 +119,25 @@ private:
 	void rdy_write_callback(int state);
 
 	// internal state
-	devcb_resolved_write_line	m_out_busreq_func;
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_bao_func;
-	devcb_resolved_read8		m_in_mreq_func;
-	devcb_resolved_write8		m_out_mreq_func;
-	devcb_resolved_read8		m_in_iorq_func;
-	devcb_resolved_write8		m_out_iorq_func;
+	devcb_resolved_write_line   m_out_busreq_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_bao_func;
+	devcb_resolved_read8        m_in_mreq_func;
+	devcb_resolved_write8       m_out_mreq_func;
+	devcb_resolved_read8        m_in_iorq_func;
+	devcb_resolved_write8       m_out_iorq_func;
 
 	emu_timer *m_timer;
 
-	UINT16	m_regs[(6<<3)+1+1];
-	UINT8	m_num_follow;
-	UINT8	m_cur_follow;
-	UINT8	m_regs_follow[4];
-	UINT8	m_read_num_follow;
-	UINT8	m_read_cur_follow;
-	UINT8	m_read_regs_follow[7];
-	UINT8	m_status;
-	UINT8	m_dma_enabled;
+	UINT16  m_regs[(6<<3)+1+1];
+	UINT8   m_num_follow;
+	UINT8   m_cur_follow;
+	UINT8   m_regs_follow[4];
+	UINT8   m_read_num_follow;
+	UINT8   m_read_cur_follow;
+	UINT8   m_read_regs_follow[7];
+	UINT8   m_status;
+	UINT8   m_dma_enabled;
 
 	UINT16 m_addressA;
 	UINT16 m_addressB;
@@ -152,9 +152,9 @@ private:
 	UINT8 m_latch;
 
 	// interrupts
-	int m_ip;					// interrupt pending
-	int m_ius;					// interrupt under service
-	UINT8 m_vector;				// interrupt vector
+	int m_ip;                   // interrupt pending
+	int m_ius;                  // interrupt under service
+	UINT8 m_vector;             // interrupt vector
 };
 
 

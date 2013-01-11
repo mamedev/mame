@@ -12,40 +12,40 @@
 #include "sound/dac.h"
 #include "machine/atarigen.h"
 
-#define HARDDRIV_MASTER_CLOCK	XTAL_32MHz
-#define HARDDRIV_GSP_CLOCK		XTAL_48MHz
+#define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
+#define HARDDRIV_GSP_CLOCK      XTAL_48MHz
 
 class harddriv_state : public atarigen_state
 {
 public:
 	harddriv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_gsp(*this, "gsp"),
-		  m_msp(*this, "msp"),
-		  m_adsp(*this, "adsp"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_sounddsp(*this, "sounddsp"),
-		  m_jsacpu(*this, "jsacpu"),
-		  m_dsp32(*this, "dsp32"),
-		  m_ds3sdsp(*this, "ds3sdsp"),
-		  m_ds3xdsp(*this, "ds3xdsp"),
-		  m_ds3dac1(*this, "ds3dac1"),
-		  m_ds3dac2(*this, "ds3dac2"),
-		  m_msp_ram(*this, "msp_ram"),
-		  m_adsp_data_memory(*this, "adsp_data"),
-		  m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
-		  m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
-		  m_ds3sdsp_pgm_memory(*this, "ds3sdsp_pgm"),
-		  m_ds3xdsp_pgm_memory(*this, "ds3xdsp_pgm"),
-		  m_sounddsp_ram(*this, "sounddsp_ram"),
-		  m_gsp_vram(*this, "gsp_vram", 16),
-		  m_gsp_control_lo(*this, "gsp_control_lo"),
-		  m_gsp_control_hi(*this, "gsp_control_hi"),
-		  m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
-		  m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
-		  m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
-		  m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer") { }
+			m_maincpu(*this, "maincpu"),
+			m_gsp(*this, "gsp"),
+			m_msp(*this, "msp"),
+			m_adsp(*this, "adsp"),
+			m_soundcpu(*this, "soundcpu"),
+			m_sounddsp(*this, "sounddsp"),
+			m_jsacpu(*this, "jsacpu"),
+			m_dsp32(*this, "dsp32"),
+			m_ds3sdsp(*this, "ds3sdsp"),
+			m_ds3xdsp(*this, "ds3xdsp"),
+			m_ds3dac1(*this, "ds3dac1"),
+			m_ds3dac2(*this, "ds3dac2"),
+			m_msp_ram(*this, "msp_ram"),
+			m_adsp_data_memory(*this, "adsp_data"),
+			m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
+			m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
+			m_ds3sdsp_pgm_memory(*this, "ds3sdsp_pgm"),
+			m_ds3xdsp_pgm_memory(*this, "ds3xdsp_pgm"),
+			m_sounddsp_ram(*this, "sounddsp_ram"),
+			m_gsp_vram(*this, "gsp_vram", 16),
+			m_gsp_control_lo(*this, "gsp_control_lo"),
+			m_gsp_control_hi(*this, "gsp_control_hi"),
+			m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
+			m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
+			m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
+			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -60,15 +60,15 @@ public:
 	optional_device<dac_device> m_ds3dac1;
 	optional_device<dac_device> m_ds3dac2;
 
-	UINT8					m_hd34010_host_access;
-	UINT8					m_dsk_pio_access;
+	UINT8                   m_hd34010_host_access;
+	UINT8                   m_dsk_pio_access;
 
 	optional_shared_ptr<UINT16> m_msp_ram;
-	UINT16 *				m_dsk_ram;
-	UINT16 *				m_dsk_rom;
-	UINT16 *				m_dsk_zram;
-	UINT16 *				m_m68k_slapstic_base;
-	UINT16 *				m_m68k_sloop_alt_base;
+	UINT16 *                m_dsk_ram;
+	UINT16 *                m_dsk_rom;
+	UINT16 *                m_dsk_zram;
+	UINT16 *                m_m68k_slapstic_base;
+	UINT16 *                m_m68k_sloop_alt_base;
 
 	optional_shared_ptr<UINT16> m_adsp_data_memory;
 	optional_shared_ptr<UINT32> m_adsp_pgm_memory;
@@ -77,27 +77,27 @@ public:
 	optional_shared_ptr<UINT32> m_ds3sdsp_pgm_memory;
 	optional_shared_ptr<UINT32> m_ds3xdsp_pgm_memory;
 
-	UINT16 *				m_gsp_protection;
+	UINT16 *                m_gsp_protection;
 
-	UINT16 *				m_gsp_speedup_addr[2];
-	offs_t					m_gsp_speedup_pc;
+	UINT16 *                m_gsp_speedup_addr[2];
+	offs_t                  m_gsp_speedup_pc;
 
-	UINT16 *				m_msp_speedup_addr;
-	offs_t					m_msp_speedup_pc;
+	UINT16 *                m_msp_speedup_addr;
+	offs_t                  m_msp_speedup_pc;
 
-	UINT16 *				m_ds3_speedup_addr;
-	offs_t					m_ds3_speedup_pc;
-	offs_t					m_ds3_transfer_pc;
+	UINT16 *                m_ds3_speedup_addr;
+	offs_t                  m_ds3_speedup_pc;
+	offs_t                  m_ds3_transfer_pc;
 
-	UINT32 *				m_rddsp32_sync[2];
+	UINT32 *                m_rddsp32_sync[2];
 
-	UINT32					m_gsp_speedup_count[4];
-	UINT32					m_msp_speedup_count[4];
-	UINT32					m_adsp_speedup_count[4];
+	UINT32                  m_gsp_speedup_count[4];
+	UINT32                  m_msp_speedup_count[4];
+	UINT32                  m_adsp_speedup_count[4];
 
 	optional_shared_ptr<UINT16> m_sounddsp_ram;
 
-	UINT8					m_gsp_multisync;
+	UINT8                   m_gsp_multisync;
 	optional_shared_ptr<UINT8> m_gsp_vram;
 	optional_shared_ptr<UINT16> m_gsp_control_lo;
 	optional_shared_ptr<UINT16> m_gsp_control_hi;
@@ -105,111 +105,111 @@ public:
 	optional_shared_ptr<UINT16> m_gsp_paletteram_hi;
 
 	/* machine state */
-	UINT8					m_irq_state;
-	UINT8					m_gsp_irq_state;
-	UINT8					m_msp_irq_state;
-	UINT8					m_adsp_irq_state;
-	UINT8					m_ds3sdsp_irq_state;
-	UINT8					m_duart_irq_state;
+	UINT8                   m_irq_state;
+	UINT8                   m_gsp_irq_state;
+	UINT8                   m_msp_irq_state;
+	UINT8                   m_adsp_irq_state;
+	UINT8                   m_ds3sdsp_irq_state;
+	UINT8                   m_duart_irq_state;
 
-	UINT8					m_last_gsp_shiftreg;
+	UINT8                   m_last_gsp_shiftreg;
 
-	UINT8					m_m68k_zp1;
-	UINT8					m_m68k_zp2;
-	UINT8					m_m68k_adsp_buffer_bank;
+	UINT8                   m_m68k_zp1;
+	UINT8                   m_m68k_zp2;
+	UINT8                   m_m68k_adsp_buffer_bank;
 
-	UINT8					m_adsp_halt;
-	UINT8					m_adsp_br;
-	UINT8					m_adsp_xflag;
-	UINT16					m_adsp_sim_address;
-	UINT16					m_adsp_som_address;
-	UINT32					m_adsp_eprom_base;
+	UINT8                   m_adsp_halt;
+	UINT8                   m_adsp_br;
+	UINT8                   m_adsp_xflag;
+	UINT16                  m_adsp_sim_address;
+	UINT16                  m_adsp_som_address;
+	UINT32                  m_adsp_eprom_base;
 
-	UINT16 *				m_sim_memory;
-	UINT32					m_sim_memory_size;
-	UINT16					m_som_memory[0x8000/2];
-	UINT16 *				m_adsp_pgm_memory_word;
-	
-	UINT16 *				m_ds3_sdata_memory;
-	UINT32					m_ds3_sdata_memory_size;
+	UINT16 *                m_sim_memory;
+	UINT32                  m_sim_memory_size;
+	UINT16                  m_som_memory[0x8000/2];
+	UINT16 *                m_adsp_pgm_memory_word;
 
-	UINT8					m_ds3_gcmd;
-	UINT8					m_ds3_gflag;
-	UINT8					m_ds3_g68irqs;
-	UINT8					m_ds3_gfirqs;
-	UINT8					m_ds3_g68flag;
-	UINT8					m_ds3_send;
-	UINT8					m_ds3_reset;
-	UINT16					m_ds3_gdata;
-	UINT16					m_ds3_g68data;
-	UINT32					m_ds3_sim_address;
-	
-	UINT8					m_ds3_scmd;
-	UINT8					m_ds3_sflag;
-	UINT8					m_ds3_s68irqs;
-	UINT8					m_ds3_sfirqs;
-	UINT8					m_ds3_s68flag;
-	UINT8					m_ds3_sreset;
-	UINT16					m_ds3_sdata;
-	UINT16					m_ds3_s68data;
-	UINT32					m_ds3_sdata_address;
-	UINT16					m_ds3sdsp_regs[32];
-	UINT16					m_ds3sdsp_timer_en;
-	UINT16					m_ds3sdsp_sdata;
+	UINT16 *                m_ds3_sdata_memory;
+	UINT32                  m_ds3_sdata_memory_size;
+
+	UINT8                   m_ds3_gcmd;
+	UINT8                   m_ds3_gflag;
+	UINT8                   m_ds3_g68irqs;
+	UINT8                   m_ds3_gfirqs;
+	UINT8                   m_ds3_g68flag;
+	UINT8                   m_ds3_send;
+	UINT8                   m_ds3_reset;
+	UINT16                  m_ds3_gdata;
+	UINT16                  m_ds3_g68data;
+	UINT32                  m_ds3_sim_address;
+
+	UINT8                   m_ds3_scmd;
+	UINT8                   m_ds3_sflag;
+	UINT8                   m_ds3_s68irqs;
+	UINT8                   m_ds3_sfirqs;
+	UINT8                   m_ds3_s68flag;
+	UINT8                   m_ds3_sreset;
+	UINT16                  m_ds3_sdata;
+	UINT16                  m_ds3_s68data;
+	UINT32                  m_ds3_sdata_address;
+	UINT16                  m_ds3sdsp_regs[32];
+	UINT16                  m_ds3sdsp_timer_en;
+	UINT16                  m_ds3sdsp_sdata;
 	optional_device<timer_device> m_ds3sdsp_internal_timer;
 
-	UINT16					m_ds3xdsp_regs[32];
-	UINT16					m_ds3xdsp_timer_en;
-	UINT16					m_ds3xdsp_sdata;
+	UINT16                  m_ds3xdsp_regs[32];
+	UINT16                  m_ds3xdsp_timer_en;
+	UINT16                  m_ds3xdsp_sdata;
 	optional_device<timer_device> m_ds3xdsp_internal_timer;
 
-	UINT16					m_adc_control;
-	UINT8					m_adc8_select;
-	UINT8					m_adc8_data;
-	UINT8					m_adc12_select;
-	UINT8					m_adc12_byte;
-	UINT16					m_adc12_data;
+	UINT16                  m_adc_control;
+	UINT8                   m_adc8_select;
+	UINT8                   m_adc8_data;
+	UINT8                   m_adc12_select;
+	UINT8                   m_adc12_byte;
+	UINT16                  m_adc12_data;
 
-	UINT16					m_hdc68k_last_wheel;
-	UINT16					m_hdc68k_last_port1;
-	UINT8					m_hdc68k_wheel_edge;
-	UINT8					m_hdc68k_shifter_state;
+	UINT16                  m_hdc68k_last_wheel;
+	UINT16                  m_hdc68k_last_port1;
+	UINT8                   m_hdc68k_wheel_edge;
+	UINT8                   m_hdc68k_shifter_state;
 
-	UINT8					m_st68k_sloop_bank;
-	offs_t					m_st68k_last_alt_sloop_offset;
+	UINT8                   m_st68k_sloop_bank;
+	offs_t                  m_st68k_last_alt_sloop_offset;
 
-	#define MAX_MSP_SYNC	16
-	UINT32 *				m_dataptr[MAX_MSP_SYNC];
-	UINT32					m_dataval[MAX_MSP_SYNC];
-	int 					m_next_msp_sync;
+	#define MAX_MSP_SYNC    16
+	UINT32 *                m_dataptr[MAX_MSP_SYNC];
+	UINT32                  m_dataval[MAX_MSP_SYNC];
+	int                     m_next_msp_sync;
 
 	/* audio state */
-	UINT8					m_soundflag;
-	UINT8					m_mainflag;
-	UINT16					m_sounddata;
-	UINT16					m_maindata;
+	UINT8                   m_soundflag;
+	UINT8                   m_mainflag;
+	UINT16                  m_sounddata;
+	UINT16                  m_maindata;
 
-	UINT8					m_dacmute;
-	UINT8					m_cramen;
-	UINT8					m_irq68k;
+	UINT8                   m_dacmute;
+	UINT8                   m_cramen;
+	UINT8                   m_irq68k;
 
-	offs_t					m_sound_rom_offs;
+	offs_t                  m_sound_rom_offs;
 
-	UINT8 *					m_rombase;
-	UINT32					m_romsize;
-	UINT16					m_comram[0x400/2];
-	UINT64					m_last_bio_cycles;
+	UINT8 *                 m_rombase;
+	UINT32                  m_romsize;
+	UINT16                  m_comram[0x400/2];
+	UINT64                  m_last_bio_cycles;
 
 	/* video state */
-	offs_t					m_vram_mask;
+	offs_t                  m_vram_mask;
 
-	UINT8					m_shiftreg_enable;
+	UINT8                   m_shiftreg_enable;
 
-	UINT32					m_mask_table[65536 * 4];
-	UINT8 *					m_gsp_shiftreg_source;
+	UINT32                  m_mask_table[65536 * 4];
+	UINT8 *                 m_gsp_shiftreg_source;
 
-	INT8					m_gfx_finescroll;
-	UINT8					m_gfx_palettebank;
+	INT8                    m_gfx_finescroll;
+	UINT8                   m_gfx_palettebank;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(steeltal_dummy_r);
 	DECLARE_READ32_MEMBER(rddsp_unmap_r);

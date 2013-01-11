@@ -6,7 +6,7 @@
 struct LSI53C810interface
 {
 	void (*irq_callback)(running_machine &machine, int); /* IRQ callback */
-	void (*dma_callback)(running_machine &machine, UINT32, UINT32, int, int);	/* DMA callback */
+	void (*dma_callback)(running_machine &machine, UINT32, UINT32, int, int);   /* DMA callback */
 	UINT32 (*fetch)(running_machine &machine, UINT32 dsp);
 };
 
@@ -15,7 +15,7 @@ struct LSI53C810interface
 	MCFG_DEVICE_CONFIG(_config)
 
 class lsi53c810_device : public device_t,
-					   public LSI53C810interface
+						public LSI53C810interface
 {
 public:
 	// construction/destruction
@@ -62,7 +62,7 @@ private:
 	UINT32 lsi53c810_dasm_fetch(UINT32 pc);
 	unsigned lsi53c810_dasm(char *buf, UINT32 pc);
 
-	scsihle_device *devices[8];	/* SCSI IDs 0-7 */
+	scsihle_device *devices[8]; /* SCSI IDs 0-7 */
 	UINT8 last_id;
 
 	UINT8 scntl0;

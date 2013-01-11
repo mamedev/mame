@@ -3,15 +3,15 @@
 // it really seems like this should be elsewhere - like maybe the floating point checks can hang out someplace else
 #include <math.h>
 
-#define USE_SSE2			0
-#define COMPILE_FPU			0
+#define USE_SSE2            0
+#define COMPILE_FPU         0
 
 /* recompiler flags */
-#define RECOMPILE_UNIMPLEMENTED			0x0000
-#define RECOMPILE_SUCCESSFUL			0x0001
-#define RECOMPILE_SUCCESSFUL_CP(c,p)	(RECOMPILE_SUCCESSFUL | (((c) & 0xff) << 16) | (((p) & 0xff) << 24))
-#define RECOMPILE_END_OF_STRING			0x0002
-#define RECOMPILE_ADD_DISPATCH			0x0004
+#define RECOMPILE_UNIMPLEMENTED         0x0000
+#define RECOMPILE_SUCCESSFUL            0x0001
+#define RECOMPILE_SUCCESSFUL_CP(c,p)    (RECOMPILE_SUCCESSFUL | (((c) & 0xff) << 16) | (((p) & 0xff) << 24))
+#define RECOMPILE_END_OF_STRING         0x0002
+#define RECOMPILE_ADD_DISPATCH          0x0004
 
 INLINE void emit_mov_r64_m64(x86code **emitptr, UINT8 reghi, UINT8 reglo, DECLARE_MEMPARAMS)
 {
@@ -74,7 +74,7 @@ static void ppcdrc_reset(drc_core *drc)
 	drc_append_restore_volatiles(drc);
 	emit_mov_r32_m32(DRCTOP, REG_EAX, MBD(REG_ESP, 4));
 	emit_mov_r32_m32(DRCTOP, REG_ESP, MABS(&ppc.host_esp));
-	emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);		/* save return address */
+	emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);     /* save return address */
 	emit_jmp_r32(DRCTOP, REG_EAX);
 	code_log("invoke_exception_handler:", ppc.invoke_exception_handler, drc->cache_top);
 
@@ -255,7 +255,7 @@ static UINT32 compile_one(drc_core *drc, UINT32 pc)
 		emit_jcc(DRCTOP, COND_NZ, drc->recompile);
 
 		/* code is up to date; do the exception */
-		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);		/* save return address */
+		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);     /* save return address */
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.generate_isi_exception));
 		emit_jmp_r32(DRCTOP, REG_EAX);
 		return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
@@ -296,14 +296,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 *opptr)
 
 	code_log_add_entry(pc, opcode, drc->cache_top);
 
-	if (opcode != 0) {		// this is a little workaround for VF3
+	if (opcode != 0) {      // this is a little workaround for VF3
 		switch(opcode >> 26)
 		{
-			case 19:	return ppc.optable19[(opcode >> 1) & 0x3ff](drc, opcode);
-			case 31:	return ppc.optable31[(opcode >> 1) & 0x3ff](drc, opcode);
-			case 59:	return ppc.optable59[(opcode >> 1) & 0x3ff](drc, opcode);
-			case 63:	return ppc.optable63[(opcode >> 1) & 0x3ff](drc, opcode);
-			default:	return ppc.optable[opcode >> 26](drc, opcode);
+			case 19:    return ppc.optable19[(opcode >> 1) & 0x3ff](drc, opcode);
+			case 31:    return ppc.optable31[(opcode >> 1) & 0x3ff](drc, opcode);
+			case 59:    return ppc.optable59[(opcode >> 1) & 0x3ff](drc, opcode);
+			case 63:    return ppc.optable63[(opcode >> 1) & 0x3ff](drc, opcode);
+			default:    return ppc.optable[opcode >> 26](drc, opcode);
 		}
 	}
 	return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
@@ -329,10 +329,10 @@ static void append_generate_exception(drc_core *drc, UINT8 exception)
 	// Clear POW, EE, PR, FP, FE0, SE, BE, FE1, IR, DR, RI
 	emit_and_r32_imm(DRCTOP, REG_EAX, ~(MSR_POW | MSR_EE | MSR_PR | MSR_FP | MSR_FE0 | MSR_SE | MSR_BE | MSR_FE1 | MSR_IR | MSR_DR | MSR_RI));
 	// Set LE to ILE
-	emit_and_r32_imm(DRCTOP, REG_EAX, ~MSR_LE);		// clear LE first
+	emit_and_r32_imm(DRCTOP, REG_EAX, ~MSR_LE);     // clear LE first
 	emit_test_r32_imm(DRCTOP, REG_EAX, MSR_ILE);
-	emit_jcc_short_link(DRCTOP, COND_Z, &link1);	// if Z == 0, bit == 1
-	emit_or_r32_imm(DRCTOP, REG_EAX, MSR_LE);		// set LE
+	emit_jcc_short_link(DRCTOP, COND_Z, &link1);    // if Z == 0, bit == 1
+	emit_or_r32_imm(DRCTOP, REG_EAX, MSR_LE);       // set LE
 	resolve_link(DRCTOP, &link1);
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
 	emit_push_r32(DRCTOP, REG_EAX);
@@ -342,18 +342,18 @@ static void append_generate_exception(drc_core *drc, UINT8 exception)
 
 	if (ppc.is603)
 	{
-		emit_mov_r32_imm(DRCTOP, REG_EDI, exception_vector[exception]);		// first move the exception handler offset
-		emit_test_r32_imm(DRCTOP, REG_EDX, MSR_IP);							// test if the base should be 0xfff0 or EVPR
-		emit_jcc_short_link(DRCTOP, COND_Z, &link2);						// if Z == 1, bit == 0 means base == 0x00000000
-		emit_or_r32_imm(DRCTOP, REG_EDI, 0xfff00000);						// else base == 0xfff00000
+		emit_mov_r32_imm(DRCTOP, REG_EDI, exception_vector[exception]);     // first move the exception handler offset
+		emit_test_r32_imm(DRCTOP, REG_EDX, MSR_IP);                         // test if the base should be 0xfff0 or EVPR
+		emit_jcc_short_link(DRCTOP, COND_Z, &link2);                        // if Z == 1, bit == 0 means base == 0x00000000
+		emit_or_r32_imm(DRCTOP, REG_EDI, 0xfff00000);                       // else base == 0xfff00000
 		resolve_link(DRCTOP, &link2);
 	}
 	else if (ppc.is602)
 	{
-		emit_mov_r32_imm(DRCTOP, REG_EDI, exception_vector[exception]);		// first move the exception handler offset
-		emit_test_r32_imm(DRCTOP, REG_EDX, MSR_IP);							// test if the base should be 0xfff0 or IBR
-		emit_jcc_short_link(DRCTOP, COND_NZ, &link2);						// if Z == 0, bit == 1 means base == 0xfff00000
-		emit_or_r32_m32(DRCTOP, REG_EDI, MABS(&ppc.ibr));						// else base == IBR
+		emit_mov_r32_imm(DRCTOP, REG_EDI, exception_vector[exception]);     // first move the exception handler offset
+		emit_test_r32_imm(DRCTOP, REG_EDX, MSR_IP);                         // test if the base should be 0xfff0 or IBR
+		emit_jcc_short_link(DRCTOP, COND_NZ, &link2);                       // if Z == 0, bit == 1 means base == 0xfff00000
+		emit_or_r32_m32(DRCTOP, REG_EDI, MABS(&ppc.ibr));                       // else base == IBR
 		emit_jmp_short_link(DRCTOP, &link3);
 		resolve_link(DRCTOP, &link2);
 		emit_or_r32_imm(DRCTOP, REG_EDI, 0xfff00000);
@@ -361,10 +361,10 @@ static void append_generate_exception(drc_core *drc, UINT8 exception)
 	}
 	else
 	{
-		emit_mov_r32_imm(DRCTOP, REG_EDI, exception_vector[exception]);		// first move the exception handler offset
-		emit_test_r32_imm(DRCTOP, REG_EDX, MSR_IP);							// test if the base should be 0xfff0 or EVPR
-		emit_jcc_short_link(DRCTOP, COND_NZ, &link2);						// if Z == 0, bit == 1 means base == 0xfff00000
-		emit_or_r32_m32(DRCTOP, REG_EDI, MABS(&EVPR));							// else base == EVPR
+		emit_mov_r32_imm(DRCTOP, REG_EDI, exception_vector[exception]);     // first move the exception handler offset
+		emit_test_r32_imm(DRCTOP, REG_EDX, MSR_IP);                         // test if the base should be 0xfff0 or EVPR
+		emit_jcc_short_link(DRCTOP, COND_NZ, &link2);                       // if Z == 0, bit == 1 means base == 0xfff00000
+		emit_or_r32_m32(DRCTOP, REG_EDI, MABS(&EVPR));                          // else base == EVPR
 		emit_jmp_short_link(DRCTOP, &link3);
 		resolve_link(DRCTOP, &link2);
 		emit_or_r32_imm(DRCTOP, REG_EDI, 0xfff00000);
@@ -373,15 +373,15 @@ static void append_generate_exception(drc_core *drc, UINT8 exception)
 
 	if (exception == EXCEPTION_IRQ)
 	{
-		emit_and_m32_imm(DRCTOP, MABS(&ppc.exception_pending), ~0x1);		// clear pending irq
+		emit_and_m32_imm(DRCTOP, MABS(&ppc.exception_pending), ~0x1);       // clear pending irq
 	}
 	if (exception == EXCEPTION_DECREMENTER)
 	{
-		emit_and_m32_imm(DRCTOP, MABS(&ppc.exception_pending), ~0x2);		// clear pending decrementer exception
+		emit_and_m32_imm(DRCTOP, MABS(&ppc.exception_pending), ~0x2);       // clear pending decrementer exception
 	}
 	if (exception == EXCEPTION_FIXED_INTERVAL_TIMER)
 	{
-		emit_and_m32_imm(DRCTOP, MABS(&ppc.exception_pending), ~0x4);		// clear pending fit exception
+		emit_and_m32_imm(DRCTOP, MABS(&ppc.exception_pending), ~0x4);       // clear pending fit exception
 	}
 
 	drc_append_dispatcher(drc);
@@ -392,26 +392,26 @@ static void append_check_interrupts(drc_core *drc, int inline_generate)
 	if (ppc.is602 || ppc.is603)
 	{
 		emit_link link1, link2, link3, link4;
-		emit_test_m32_imm(DRCTOP, MABS(&ppc.msr), MSR_EE);		/* no interrupt if external interrupts are not enabled */
-		emit_jcc_short_link(DRCTOP, COND_Z, &link1);		/* ZF = 1 if bit == 0 */
+		emit_test_m32_imm(DRCTOP, MABS(&ppc.msr), MSR_EE);      /* no interrupt if external interrupts are not enabled */
+		emit_jcc_short_link(DRCTOP, COND_Z, &link1);        /* ZF = 1 if bit == 0 */
 
 		/* else check if any interrupt are pending */
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.exception_pending));
 		emit_cmp_r32_imm(DRCTOP, REG_EAX, 0);
-		emit_jcc_short_link(DRCTOP, COND_Z, &link2);		/* reg == 0, no exceptions are pending */
+		emit_jcc_short_link(DRCTOP, COND_Z, &link2);        /* reg == 0, no exceptions are pending */
 
 		/* else handle the first pending exception */
-		emit_test_r32_imm(DRCTOP, REG_EAX, 0x1);			/* is it a IRQ? */
+		emit_test_r32_imm(DRCTOP, REG_EAX, 0x1);            /* is it a IRQ? */
 		emit_jcc_short_link(DRCTOP, COND_Z, &link3);
 
-		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);		/* save return address */
+		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);     /* save return address */
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.generate_interrupt_exception));
 		emit_jmp_r32(DRCTOP, REG_EAX);
 		resolve_link(DRCTOP, &link3);
 
-		emit_test_r32_imm(DRCTOP, REG_EAX, 0x2);			/* is it a decrementer exception */
+		emit_test_r32_imm(DRCTOP, REG_EAX, 0x2);            /* is it a decrementer exception */
 		emit_jcc_short_link(DRCTOP, COND_Z, &link4);
-		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);		/* save return address */
+		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);     /* save return address */
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.generate_decrementer_exception));
 		emit_jmp_r32(DRCTOP, REG_EAX);
 		resolve_link(DRCTOP, &link4);
@@ -422,16 +422,16 @@ static void append_check_interrupts(drc_core *drc, int inline_generate)
 	else
 	{
 		emit_link link1, link2, link3, link4, link5, link6;
-		emit_test_m32_imm(DRCTOP, MABS(&ppc.msr), MSR_EE);		/* no interrupt if external interrupts are not enabled */
-		emit_jcc_short_link(DRCTOP, COND_Z, &link1);		/* ZF = 1 if bit == 0 */
+		emit_test_m32_imm(DRCTOP, MABS(&ppc.msr), MSR_EE);      /* no interrupt if external interrupts are not enabled */
+		emit_jcc_short_link(DRCTOP, COND_Z, &link1);        /* ZF = 1 if bit == 0 */
 
 		/* else check if any interrupt are pending */
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.exception_pending));
 		emit_cmp_r32_imm(DRCTOP, REG_EAX, 0);
-		emit_jcc_short_link(DRCTOP, COND_Z, &link2);		/* reg == 0, no exceptions are pending */
+		emit_jcc_short_link(DRCTOP, COND_Z, &link2);        /* reg == 0, no exceptions are pending */
 
 		/* else handle the first pending exception */
-		emit_test_r32_imm(DRCTOP, REG_EAX, 0x1);			/* is it a IRQ? */
+		emit_test_r32_imm(DRCTOP, REG_EAX, 0x1);            /* is it a IRQ? */
 		emit_jcc_short_link(DRCTOP, COND_Z, &link3);
 
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.exisr));
@@ -439,7 +439,7 @@ static void append_check_interrupts(drc_core *drc, int inline_generate)
 		emit_cmp_r32_imm(DRCTOP, REG_EAX, 0);
 		emit_jcc_short_link(DRCTOP, COND_Z, &link4);
 
-		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);		/* save return address */
+		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);     /* save return address */
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.generate_interrupt_exception));
 		emit_jmp_r32(DRCTOP, REG_EAX);
 
@@ -457,7 +457,7 @@ static void append_check_interrupts(drc_core *drc, int inline_generate)
 		emit_sub_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.fit_bit));
 		emit_mov_m32_r32(DRCTOP, MABS(&ppc_fit_trigger_cycle), REG_EAX);
 
-		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);		/* save return address */
+		emit_mov_m32_r32(DRCTOP, MABS(&SRR0), REG_EDI);     /* save return address */
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.generate_fit_exception));
 		emit_jmp_r32(DRCTOP, REG_EAX);
 
@@ -520,8 +520,8 @@ static void append_set_cr0(drc_core *drc)
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AH);
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AL);
 
-	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);		// set XER SO bit to carry
-	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);		// effectively sets bit 0 to carry
+	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);        // set XER SO bit to carry
+	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);       // effectively sets bit 0 to carry
 
 	emit_mov_m8_r8(DRCTOP, MABS(&ppc.cr[0]), REG_BL);
 }
@@ -557,13 +557,13 @@ static UINT32 recompile_addcx(drc_core *drc, UINT32 op)
 {
 	emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);
 	emit_mov_r32_m32(DRCTOP, REG_EBX, MABS(&XER));
-	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);		// clear carry
+	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);     // clear carry
 	emit_mov_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RA)));
 	emit_add_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RB)));
 	emit_mov_m32_r32(DRCTOP, MABS(&REG(RT)), REG_EDX);
 
-	emit_setcc_r8(DRCTOP, COND_C, REG_AL);		// carry to AL
-	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);		// shift to carry bit
+	emit_setcc_r8(DRCTOP, COND_C, REG_AL);      // carry to AL
+	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);      // shift to carry bit
 	emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);
 	emit_mov_m32_r32(DRCTOP, MABS(&XER), REG_EBX);
 
@@ -608,13 +608,13 @@ static UINT32 recompile_addic(drc_core *drc, UINT32 op)
 {
 	emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);
 	emit_mov_r32_m32(DRCTOP, REG_EBX, MABS(&XER));
-	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);	// clear carry bit
+	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000); // clear carry bit
 	emit_mov_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RA)));
 	emit_add_r32_imm(DRCTOP, REG_EDX, SIMM16);
 	emit_mov_m32_r32(DRCTOP, MABS(&REG(RT)), REG_EDX);
 
-	emit_setcc_r8(DRCTOP, COND_C, REG_AL);			// carry to AL
-	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);			// shift to carry bit
+	emit_setcc_r8(DRCTOP, COND_C, REG_AL);          // carry to AL
+	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);          // shift to carry bit
 	emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);
 	emit_mov_m32_r32(DRCTOP, MABS(&XER), REG_EBX);
 
@@ -625,13 +625,13 @@ static UINT32 recompile_addic_rc(drc_core *drc, UINT32 op)
 {
 	emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);
 	emit_mov_r32_m32(DRCTOP, REG_EBX, MABS(&XER));
-	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);	// clear carry bit
+	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000); // clear carry bit
 	emit_mov_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RA)));
 	emit_add_r32_imm(DRCTOP, REG_EDX, SIMM16);
 	emit_mov_m32_r32(DRCTOP, MABS(&REG(RT)), REG_EDX);
 
-	emit_setcc_r8(DRCTOP, COND_C, REG_AL);			// carry to AL
-	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);			// shift to carry bit
+	emit_setcc_r8(DRCTOP, COND_C, REG_AL);          // carry to AL
+	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);          // shift to carry bit
 	emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);
 	emit_mov_m32_r32(DRCTOP, MABS(&XER), REG_EBX);
 
@@ -764,7 +764,7 @@ static UINT32 recompile_bcx(drc_core *drc, UINT32 op)
 		emit_mov_m32_imm(DRCTOP, MABS(&LR), temp_ppc_pc + 4);
 	}
 
-	if (BO == 20)		/* condition is always true, so the basic block ends here */
+	if (BO == 20)       /* condition is always true, so the basic block ends here */
 	{
 		append_branch_or_dispatch(drc, newpc, 1);
 
@@ -795,17 +795,17 @@ static UINT32 recompile_bcx(drc_core *drc, UINT32 op)
 		{
 			do_link2 = 1;
 			emit_movzx_r32_m8(DRCTOP, REG_EAX, MABS(&ppc.cr[(BI)/4]));
-			emit_test_r32_imm(DRCTOP, REG_EAX, 1 << (3 - ((BI) & 0x3)));	// test if condition register bit is set
+			emit_test_r32_imm(DRCTOP, REG_EAX, 1 << (3 - ((BI) & 0x3)));    // test if condition register bit is set
 
 			// if BO[3] == 0, branch if condition == FALSE (bit zero)
 			if ((BO & 0x8) == 0)
 			{
-				emit_jcc_near_link(DRCTOP, COND_NZ, &link2);			// bit not zero, skip branch
+				emit_jcc_near_link(DRCTOP, COND_NZ, &link2);            // bit not zero, skip branch
 			}
 			// if BO[3] == 1, branch if condition == TRUE (bit not zero)
 			else
 			{
-				emit_jcc_near_link(DRCTOP, COND_Z, &link2);				// bit zero, skip branch
+				emit_jcc_near_link(DRCTOP, COND_Z, &link2);             // bit zero, skip branch
 			}
 		}
 
@@ -829,9 +829,9 @@ static UINT32 recompile_bcctrx(drc_core *drc, UINT32 op)
 	emit_link link1 = {0} ,link2 = {0};
 	int do_link1 = 0, do_link2 = 0;
 
-	if (BO == 20)		/* condition is always true, so the basic block ends here */
+	if (BO == 20)       /* condition is always true, so the basic block ends here */
 	{
-		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&CTR));					// mov  edi, CTR
+		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&CTR));                  // mov  edi, CTR
 
 		if( LKBIT ) {
 			emit_mov_m32_imm(DRCTOP, MABS(&LR), temp_ppc_pc + 4);
@@ -863,22 +863,22 @@ static UINT32 recompile_bcctrx(drc_core *drc, UINT32 op)
 		{
 			do_link2 = 1;
 			emit_movzx_r32_m8(DRCTOP, REG_EAX, MABS(&ppc.cr[(BI)/4]));
-			emit_test_r32_imm(DRCTOP, REG_EAX, 1 << (3 - ((BI) & 0x3)));	// test if condition register bit is set
+			emit_test_r32_imm(DRCTOP, REG_EAX, 1 << (3 - ((BI) & 0x3)));    // test if condition register bit is set
 
 			// if BO[3] == 0, branch if condition == FALSE (bit zero)
 			if ((BO & 0x8) == 0)
 			{
-				emit_jcc_near_link(DRCTOP, COND_NZ, &link2);			// bit not zero, skip branch
+				emit_jcc_near_link(DRCTOP, COND_NZ, &link2);            // bit not zero, skip branch
 			}
 			// if BO[3] == 1, branch if condition == TRUE (bit not zero)
 			else
 			{
-				emit_jcc_near_link(DRCTOP, COND_Z, &link2);				// bit zero, skip branch
+				emit_jcc_near_link(DRCTOP, COND_Z, &link2);             // bit zero, skip branch
 			}
 		}
 
 		// take the branch
-		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&CTR));		// mov  edi, CTR
+		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&CTR));      // mov  edi, CTR
 		if( LKBIT ) {
 			emit_mov_m32_imm(DRCTOP, MABS(&LR), temp_ppc_pc + 4);
 		}
@@ -906,9 +906,9 @@ static UINT32 recompile_bclrx(drc_core *drc, UINT32 op)
 	emit_link link1 = {0}, link2 = {0};
 	int do_link1 = 0, do_link2 = 0;
 
-	if (BO == 20)		/* condition is always true, so the basic block ends here */
+	if (BO == 20)       /* condition is always true, so the basic block ends here */
 	{
-		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&LR));					// mov  edi, LR
+		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&LR));                   // mov  edi, LR
 
 		if( LKBIT ) {
 			emit_mov_m32_imm(DRCTOP, MABS(&LR), temp_ppc_pc + 4);
@@ -940,22 +940,22 @@ static UINT32 recompile_bclrx(drc_core *drc, UINT32 op)
 		{
 			do_link2 = 1;
 			emit_movzx_r32_m8(DRCTOP, REG_EAX, MABS(&ppc.cr[(BI)/4]));
-			emit_test_r32_imm(DRCTOP, REG_EAX, 1 << (3 - ((BI) & 0x3)));	// test if condition register bit is set
+			emit_test_r32_imm(DRCTOP, REG_EAX, 1 << (3 - ((BI) & 0x3)));    // test if condition register bit is set
 
 			// if BO[3] == 0, branch if condition == FALSE (bit zero)
 			if ((BO & 0x8) == 0)
 			{
-				emit_jcc_near_link(DRCTOP, COND_NZ, &link2);			// bit not zero, skip branch
+				emit_jcc_near_link(DRCTOP, COND_NZ, &link2);            // bit not zero, skip branch
 			}
 			// if BO[3] == 1, branch if condition == TRUE (bit not zero)
 			else
 			{
-				emit_jcc_near_link(DRCTOP, COND_Z, &link2);				// bit zero, skip branch
+				emit_jcc_near_link(DRCTOP, COND_Z, &link2);             // bit zero, skip branch
 			}
 		}
 
 		// take the branch
-		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&LR));		// mov  edi, LR
+		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&LR));       // mov  edi, LR
 		if( LKBIT ) {
 			emit_mov_m32_imm(DRCTOP, MABS(&LR), temp_ppc_pc + 4);
 		}
@@ -994,8 +994,8 @@ static UINT32 recompile_cmp(drc_core *drc, UINT32 op)
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AH);
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AL);
 
-	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);		// set XER SO bit to carry
-	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);		// effectively sets bit 0 to carry
+	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);        // set XER SO bit to carry
+	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);       // effectively sets bit 0 to carry
 	emit_mov_m8_r8(DRCTOP, MABS(&ppc.cr[CRFD]), REG_BL);
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1017,8 +1017,8 @@ static UINT32 recompile_cmpi(drc_core *drc, UINT32 op)
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AH);
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AL);
 
-	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);		// set XER SO bit to carry
-	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);		// effectively sets bit 0 to carry
+	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);        // set XER SO bit to carry
+	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);       // effectively sets bit 0 to carry
 	emit_mov_m8_r8(DRCTOP, MABS(&ppc.cr[CRFD]), REG_BL);
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1040,8 +1040,8 @@ static UINT32 recompile_cmpl(drc_core *drc, UINT32 op)
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AH);
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AL);
 
-	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);		// set XER SO bit to carry
-	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);		// effectively sets bit 0 to carry
+	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);        // set XER SO bit to carry
+	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);       // effectively sets bit 0 to carry
 	emit_mov_m8_r8(DRCTOP, MABS(&ppc.cr[CRFD]), REG_BL);
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1063,8 +1063,8 @@ static UINT32 recompile_cmpli(drc_core *drc, UINT32 op)
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AH);
 	emit_or_r8_r8(DRCTOP, REG_BL, REG_AL);
 
-	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);		// set XER SO bit to carry
-	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);		// effectively sets bit 0 to carry
+	emit_bt_m32_imm(DRCTOP, MABS(&XER), 31);        // set XER SO bit to carry
+	emit_adc_r32_imm(DRCTOP, REG_EBX, 0);       // effectively sets bit 0 to carry
 	emit_mov_m8_r8(DRCTOP, MABS(&ppc.cr[CRFD]), REG_BL);
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1076,7 +1076,7 @@ static UINT32 recompile_cntlzw(drc_core *drc, UINT32 op)
 	emit_mov_r32_imm(DRCTOP, REG_EDX, 31);
 	emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&REG(RT)));
 	emit_bsr_r32_r32(DRCTOP, REG_EAX, REG_EAX);
-	emit_setcc_r8(DRCTOP, COND_Z, REG_BL);			// if all zeros, set BL to 1, so result becomes 32
+	emit_setcc_r8(DRCTOP, COND_Z, REG_BL);          // if all zeros, set BL to 1, so result becomes 32
 	emit_sub_r32_r32(DRCTOP, REG_EDX, REG_EAX);
 	emit_add_r32_r32(DRCTOP, REG_EDX, REG_EBX);
 	emit_mov_m32_r32(DRCTOP, MABS(&REG(RA)), REG_EDX);
@@ -1676,11 +1676,11 @@ static UINT32 recompile_mfmsr(drc_core *drc, UINT32 op)
 
 static UINT32 recompile_mfspr(drc_core *drc, UINT32 op)
 {
-	if (SPR == SPR_LR)			// optimized case, LR
+	if (SPR == SPR_LR)          // optimized case, LR
 	{
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&LR));
 	}
-	else if(SPR == SPR_CTR)		// optimized case, CTR
+	else if(SPR == SPR_CTR)     // optimized case, CTR
 	{
 		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&CTR));
 	}
@@ -1723,11 +1723,11 @@ static UINT32 recompile_mtmsr(drc_core *drc, UINT32 op)
 static UINT32 recompile_mtspr(drc_core *drc, UINT32 op)
 {
 	emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&REG(RS)));
-	if (SPR == SPR_LR)			// optimized case, LR
+	if (SPR == SPR_LR)          // optimized case, LR
 	{
 		emit_mov_m32_r32(DRCTOP, MABS(&LR), REG_EAX);
 	}
-	else if(SPR == SPR_CTR)		// optimized case, CTR
+	else if(SPR == SPR_CTR)     // optimized case, CTR
 	{
 		emit_mov_m32_r32(DRCTOP, MABS(&CTR), REG_EAX);
 	}
@@ -1892,11 +1892,11 @@ static UINT32 recompile_oris(drc_core *drc, UINT32 op)
 static UINT32 recompile_rfi(drc_core *drc, UINT32 op)
 {
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
-	emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&ppc.srr0));	/* get saved PC from SRR0 */
-	emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.srr1));	/* get saved MSR from SRR1 */
+	emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(&ppc.srr0)); /* get saved PC from SRR0 */
+	emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.srr1)); /* get saved MSR from SRR1 */
 
 	emit_push_r32(DRCTOP, REG_EAX);
-	emit_call(DRCTOP, (x86code *)ppc_set_msr);		/* set MSR */
+	emit_call(DRCTOP, (x86code *)ppc_set_msr);      /* set MSR */
 	emit_add_r32_imm(DRCTOP, REG_ESP, 4);
 	emit_mov_r32_m32(DRCTOP, REG_EBP, MABS(&ppc_icount));
 
@@ -1942,7 +1942,7 @@ static UINT32 recompile_rlwnmx(drc_core *drc, UINT32 op)
 {
 	UINT32 mask = GET_ROTATE_MASK(MB, ME);
 
-	emit_mov_r32_m32(DRCTOP, REG_ECX, MABS(&REG(RB)));		// x86 rotate instruction use only 5 bits, so no need to mask this
+	emit_mov_r32_m32(DRCTOP, REG_ECX, MABS(&REG(RB)));      // x86 rotate instruction use only 5 bits, so no need to mask this
 	emit_mov_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RS)));
 	emit_rol_r32_cl(DRCTOP, REG_EDX);
 	emit_and_r32_imm(DRCTOP, REG_EDX, mask);
@@ -2382,13 +2382,13 @@ static UINT32 recompile_subfcx(drc_core *drc, UINT32 op)
 	{
 		emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);
 		emit_mov_r32_m32(DRCTOP, REG_EBX, MABS(&XER));
-		emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);		// clear carry
+		emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);     // clear carry
 		emit_mov_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RB)));
 		emit_sub_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RA)));
 		emit_mov_m32_r32(DRCTOP, MABS(&REG(RT)), REG_EDX);
-		emit_setcc_r8(DRCTOP, COND_NC, REG_AL);				// subtract carry is inverse
-		emit_shl_r32_imm(DRCTOP, REG_EAX, 29);				// move carry to correct location in XER
-		emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);			// insert carry to XER
+		emit_setcc_r8(DRCTOP, COND_NC, REG_AL);             // subtract carry is inverse
+		emit_shl_r32_imm(DRCTOP, REG_EAX, 29);              // move carry to correct location in XER
+		emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);          // insert carry to XER
 		emit_mov_m32_r32(DRCTOP, MABS(&XER), REG_EBX);
 
 		//if (OEBIT) {
@@ -2408,15 +2408,15 @@ static UINT32 recompile_subfex(drc_core *drc, UINT32 op)
 	emit_mov_r32_m32(DRCTOP, REG_EBX, MABS(&XER));
 	emit_mov_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RB)));
 	emit_mov_r32_m32(DRCTOP, REG_ECX, MABS(&REG(RA)));
-	emit_bt_r32_imm(DRCTOP, REG_EBX, 29);				// XER carry to carry flag
-	emit_cmc(DRCTOP);									// invert carry
+	emit_bt_r32_imm(DRCTOP, REG_EBX, 29);               // XER carry to carry flag
+	emit_cmc(DRCTOP);                                   // invert carry
 	emit_adc_r32_imm(DRCTOP, REG_ECX, 0);
 	emit_sub_r32_r32(DRCTOP, REG_EDX, REG_ECX);
 	emit_mov_m32_r32(DRCTOP, MABS(&REG(RT)), REG_EDX);
-	emit_setcc_r8(DRCTOP, COND_NC, REG_AL);				// subtract carry is inverse
-	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);		// clear carry
-	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);				// move carry to correct location in XER
-	emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);			// insert carry to XER
+	emit_setcc_r8(DRCTOP, COND_NC, REG_AL);             // subtract carry is inverse
+	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);     // clear carry
+	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);              // move carry to correct location in XER
+	emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);          // insert carry to XER
 	emit_mov_m32_r32(DRCTOP, MABS(&XER), REG_EBX);
 
 	if (OEBIT) {
@@ -2434,13 +2434,13 @@ static UINT32 recompile_subfic(drc_core *drc, UINT32 op)
 {
 	emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);
 	emit_mov_r32_m32(DRCTOP, REG_EBX, MABS(&XER));
-	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);		// clear carry
+	emit_and_r32_imm(DRCTOP, REG_EBX, ~0x20000000);     // clear carry
 	emit_mov_r32_imm(DRCTOP, REG_EDX, SIMM16);
 	emit_sub_r32_m32(DRCTOP, REG_EDX, MABS(&REG(RA)));
 	emit_mov_m32_r32(DRCTOP, MABS(&REG(RT)), REG_EDX);
-	emit_setcc_r8(DRCTOP, COND_NC, REG_AL);				// subtract carry is inverse
-	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);				// move carry to correct location in XER
-	emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);			// insert carry to XER
+	emit_setcc_r8(DRCTOP, COND_NC, REG_AL);             // subtract carry is inverse
+	emit_shl_r32_imm(DRCTOP, REG_EAX, 29);              // move carry to correct location in XER
+	emit_or_r32_r32(DRCTOP, REG_EBX, REG_EAX);          // insert carry to XER
 	emit_mov_m32_r32(DRCTOP, MABS(&XER), REG_EBX);
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -2487,23 +2487,23 @@ static UINT32 recompile_tw(drc_core *drc, UINT32 op)
 	emit_cmp_r32_r32(DRCTOP, REG_EAX, REG_EDX);
 
 	if (RT & 0x10) {
-		emit_jcc_near_link(DRCTOP, COND_L, &link1);		// less than = signed <
+		emit_jcc_near_link(DRCTOP, COND_L, &link1);     // less than = signed <
 		do_link1 = 1;
 	}
 	if (RT & 0x08) {
-		emit_jcc_near_link(DRCTOP, COND_G, &link2);		// greater = signed >
+		emit_jcc_near_link(DRCTOP, COND_G, &link2);     // greater = signed >
 		do_link2 = 1;
 	}
 	if (RT & 0x04) {
-		emit_jcc_near_link(DRCTOP, COND_E, &link3);		// equal
+		emit_jcc_near_link(DRCTOP, COND_E, &link3);     // equal
 		do_link3 = 1;
 	}
 	if (RT & 0x02) {
-		emit_jcc_near_link(DRCTOP, COND_B, &link4);		// below = unsigned <
+		emit_jcc_near_link(DRCTOP, COND_B, &link4);     // below = unsigned <
 		do_link4 = 1;
 	}
 	if (RT & 0x01) {
-		emit_jcc_near_link(DRCTOP, COND_A, &link5);		// above = unsigned >
+		emit_jcc_near_link(DRCTOP, COND_A, &link5);     // above = unsigned >
 		do_link5 = 1;
 	}
 	emit_jmp_near_link(DRCTOP, &link6);
@@ -2547,23 +2547,23 @@ static UINT32 recompile_twi(drc_core *drc, UINT32 op)
 	emit_cmp_r32_r32(DRCTOP, REG_EAX, REG_EDX);
 
 	if (RT & 0x10) {
-		emit_jcc_near_link(DRCTOP, COND_L, &link1);		// less than = signed <
+		emit_jcc_near_link(DRCTOP, COND_L, &link1);     // less than = signed <
 		do_link1 = 1;
 	}
 	if (RT & 0x08) {
-		emit_jcc_near_link(DRCTOP, COND_G, &link2);		// greater = signed >
+		emit_jcc_near_link(DRCTOP, COND_G, &link2);     // greater = signed >
 		do_link2 = 1;
 	}
 	if (RT & 0x04) {
-		emit_jcc_near_link(DRCTOP, COND_E, &link3);		// equal
+		emit_jcc_near_link(DRCTOP, COND_E, &link3);     // equal
 		do_link3 = 1;
 	}
 	if (RT & 0x02) {
-		emit_jcc_near_link(DRCTOP, COND_B, &link4);		// below = unsigned <
+		emit_jcc_near_link(DRCTOP, COND_B, &link4);     // below = unsigned <
 		do_link4 = 1;
 	}
 	if (RT & 0x01) {
-		emit_jcc_near_link(DRCTOP, COND_A, &link5);		// above = unsigned >
+		emit_jcc_near_link(DRCTOP, COND_A, &link5);     // above = unsigned >
 		do_link5 = 1;
 	}
 	emit_jmp_near_link(DRCTOP, &link6);
@@ -2729,7 +2729,7 @@ static UINT32 recompile_lfs(drc_core *drc,UINT32 op)
 	emit_call(DRCTOP, (genf*)READ32);
 	emit_add_r32_imm(DRCTOP, REG_ESP, 4);
 	emit_movd_r128_r32(DRCTOP, REG_XMM0, REG_EAX);
-	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert float to double
+	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert float to double
 	emit_movq_m64_r128(DRCTOP, MABS(&FPR(RT)), REG_XMM1);
 #else
 	emit_push_imm(DRCTOP, op);
@@ -2752,7 +2752,7 @@ static UINT32 recompile_lfsu(drc_core *drc, UINT32 op)
 	emit_call(DRCTOP, (x86code *)READ32);
 	emit_add_r32_imm(DRCTOP, REG_ESP, 4);
 	emit_movd_r128_r32(DRCTOP, REG_XMM0, REG_EAX);
-	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert float to double
+	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert float to double
 	emit_movq_m64_r128(DRCTOP, MABS(&FPR(RT)), REG_XMM1);
 #else
 	emit_push_imm(DRCTOP, op);
@@ -2805,7 +2805,7 @@ static UINT32 recompile_stfs(drc_core *drc, UINT32 op)
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
 #if USE_SSE2
 	emit_movq_r128_m64(DRCTOP, REG_XMM0, MABS(&FPR(RT)));
-	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert double to float
+	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert double to float
 	emit_movd_r32_r128(DRCTOP, REG_EAX, REG_XMM1);
 	emit_push_r32(DRCTOP, REG_EAX);
 	if (RA == 0)
@@ -2835,7 +2835,7 @@ static UINT32 recompile_stfsu(drc_core *drc, UINT32 op)
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
 #if USE_SSE2
 	emit_movq_r128_m64(DRCTOP, REG_XMM0, MABS(&FPR(RT)));
-	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert double to float
+	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert double to float
 	emit_movd_r32_r128(DRCTOP, REG_EAX, REG_XMM1);
 	emit_push_r32(DRCTOP, REG_EAX);
 
@@ -2939,7 +2939,7 @@ static UINT32 recompile_lfsux(drc_core *drc, UINT32 op)
 	emit_call(DRCTOP, (x86code *)READ32);
 	emit_add_r32_imm(DRCTOP, REG_ESP, 4);
 	emit_movd_r128_r32(DRCTOP, REG_XMM0, REG_EAX);
-	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert float to double
+	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert float to double
 	emit_movq_m64_r128(DRCTOP, MABS(&FPR(RT)), REG_XMM1);
 #else
 	emit_push_imm(DRCTOP, op);
@@ -2964,7 +2964,7 @@ static UINT32 recompile_lfsx(drc_core *drc, UINT32 op)
 	emit_call(DRCTOP, (x86code *)READ32);
 	emit_add_r32_imm(DRCTOP, REG_ESP, 4);
 	emit_movd_r128_r32(DRCTOP, REG_XMM0, REG_EAX);
-	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert float to double
+	emit_cvtss2sd_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert float to double
 	emit_movq_m64_r128(DRCTOP, MABS(&FPR(RT)), REG_XMM1);
 #else
 	emit_push_imm(DRCTOP, op);
@@ -3109,7 +3109,7 @@ static UINT32 recompile_stfsux(drc_core *drc, UINT32 op)
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
 #if USE_SSE2
 	emit_movq_r128_m64(DRCTOP, REG_XMM0, MABS(&FPR(RT)));
-	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert double to float
+	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert double to float
 	emit_movd_r32_r128(DRCTOP, REG_EAX, REG_XMM1);
 	emit_push_r32(DRCTOP, REG_EAX);
 
@@ -3134,7 +3134,7 @@ static UINT32 recompile_stfsx(drc_core *drc, UINT32 op)
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
 #if USE_SSE2
 	emit_movq_r128_m64(DRCTOP, REG_XMM0, MABS(&FPR(RT)));
-	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);		// convert double to float
+	emit_cvtsd2ss_r128_r128(DRCTOP, REG_XMM1, REG_XMM0);        // convert double to float
 	emit_movd_r32_r128(DRCTOP, REG_EAX, REG_XMM1);
 	emit_push_r32(DRCTOP, REG_EAX);
 
@@ -3797,4 +3797,3 @@ static UINT32 recompile_tlbld(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
-

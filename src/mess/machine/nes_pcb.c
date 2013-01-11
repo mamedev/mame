@@ -389,7 +389,7 @@ static const nes_pcb pcb_list[] =
 	{ "TAITO-TC0190FMC",  TAITO_TC0190FMC },
 	{ "TAITO-TC0190FMC+PAL16R4", TAITO_TC0190FMCP },
 	{ "TAITO-TC0350FMR",  TAITO_TC0190FMC },
-	{ "TAITO-X1-005",     TAITO_X1_005 },	// two variants exist, depending on pin17 & pin31 connections
+	{ "TAITO-X1-005",     TAITO_X1_005 },   // two variants exist, depending on pin17 & pin31 connections
 	{ "TAITO-X1-017",     TAITO_X1_017 },
 //
 	{ "AGCI-50282",       AGCI_50282 },
@@ -411,13 +411,13 @@ static const nes_pcb pcb_list[] =
 	{ "CNE-DECATHLON",    CNE_DECATHLON },
 	{ "CNE-PSB",          CNE_FSB },
 	{ "CNE-SHLZ",         CNE_SHLZ },
-	{ "JYCOMPANY-A",      UNSUPPORTED_BOARD },	// mapper 90
-	{ "JYCOMPANY-B",      UNSUPPORTED_BOARD },	// mapper 209
-	{ "JYCOMPANY-C",      UNSUPPORTED_BOARD },	// mapper 211
-	{ "NTDEC-112",        NTDEC_ASDER },	// mapper 112 (better rename this board tag, to avoid confusion with TC-112!!
+	{ "JYCOMPANY-A",      UNSUPPORTED_BOARD },  // mapper 90
+	{ "JYCOMPANY-B",      UNSUPPORTED_BOARD },  // mapper 209
+	{ "JYCOMPANY-C",      UNSUPPORTED_BOARD },  // mapper 211
+	{ "NTDEC-112",        NTDEC_ASDER },    // mapper 112 (better rename this board tag, to avoid confusion with TC-112!!
 	{ "NTDEC-TC-112",     NTDEC_FIGHTINGHERO },
-	{ "NTDEC-193",        NTDEC_FIGHTINGHERO },	// mapper 193
-	{ "UNL-TEK90",        UNSUPPORTED_BOARD },	// related to JY Company? (i.e. mappers 90, 209, 211?)
+	{ "NTDEC-193",        NTDEC_FIGHTINGHERO }, // mapper 193
+	{ "UNL-TEK90",        UNSUPPORTED_BOARD },  // related to JY Company? (i.e. mappers 90, 209, 211?)
 	{ "UNL-SA-002",       SACHEN_TCU02 },
 	{ "UNL-SA-009",       SACHEN_SA009 },
 	{ "UNL-SA-0036",      SACHEN_SA0036 },
@@ -435,13 +435,13 @@ static const nes_pcb pcb_list[] =
 	{ "SACHEN-8259D",     SACHEN_8259D },
 	{ "UNL-SACHEN-8259D", SACHEN_8259D },
 	{ "UNL-SACHEN-74LS374N", SACHEN_74LS374 },
-	{ "UNL-SACHEN-74LS374N-A", SACHEN_74LS374_A },	/* FIXME: Made up boards the different mirroring handling */
+	{ "UNL-SACHEN-74LS374N-A", SACHEN_74LS374_A },  /* FIXME: Made up boards the different mirroring handling */
 	{ "UNL-TC-U01-1.5M",  SACHEN_TCU01 },
 	{ "UNL-SA-9602B",     UNSUPPORTED_BOARD },
 	{ "TENGEN-800032",    TENGEN_800032 },
 	{ "TENGEN-800037",    TENGEN_800037 },
 	{ "WAIXING-A",        WAIXING_TYPE_A },
-	{ "WAIXING-A-1",      WAIXING_TYPE_A_1 },	/* FIXME: Made up boards the different CHRRAM banks (see Ji Jia Zhan Shi) */
+	{ "WAIXING-A-1",      WAIXING_TYPE_A_1 },   /* FIXME: Made up boards the different CHRRAM banks (see Ji Jia Zhan Shi) */
 	{ "WAIXING-B",        WAIXING_TYPE_B },
 	{ "WAIXING-C",        WAIXING_TYPE_C },
 	{ "WAIXING-D",        WAIXING_TYPE_D },
@@ -495,8 +495,8 @@ static const nes_pcb pcb_list[] =
 	{ "KAISER-KS7058",    KAISER_KS7058 },
 	{ "KAISER-KS202",     KAISER_KS202 },// mapper 56
 	{ "KAISER-KS7022",    KAISER_KS7022 },// mapper 175
-	{ "UNL-KS7012",       UNSUPPORTED_BOARD /*KAISER_KS7012*/ },	// used in Zanac (FDS Conversion) (support missing atm)
-	{ "UNL-KS7013B",      UNSUPPORTED_BOARD },	// used in Highway Star (FDS Conversion) (support missing atm)
+	{ "UNL-KS7012",       UNSUPPORTED_BOARD /*KAISER_KS7012*/ },    // used in Zanac (FDS Conversion) (support missing atm)
+	{ "UNL-KS7013B",      UNSUPPORTED_BOARD },  // used in Highway Star (FDS Conversion) (support missing atm)
 	{ "UNL-KS7017",       KAISER_KS7017 },
 	{ "UNL-KS7032",       KAISER_KS7032 }, //  mapper 142
 	{ "RCM-GS2015",       RCM_GS2015 },
@@ -509,7 +509,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-EDU2000",      UNL_EDU2K },
 	{ "UNL-SHERO",        UNSUPPORTED_BOARD /*SACHEN_SHERO*/ },
 	{ "UNL-TF1201",       UNSUPPORTED_BOARD /*UNL_TF1201*/ },
-	{ "RUMBLESTATION",    RUMBLESTATION_BOARD },	// mapper 46
+	{ "RUMBLESTATION",    RUMBLESTATION_BOARD },    // mapper 46
 	{ "UNL-WORLDHERO",    UNSUPPORTED_BOARD },// mapper 27
 	{ "UNL-A9746",        UNSUPPORTED_BOARD },// mapper 219
 	{ "UNL-603-5052",     UNL_603_5052 },// mapper 238?
@@ -529,13 +529,13 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-AX5705",       UNL_AX5705 },
 	{ "UNL-CC-21",        UNL_CC21 },
 	{ "UNL-KOF97",        UNL_KOF97 },
-	{ "UNL-KS7057",       UNL_KS7057 },	// mapper 196 alt (for Street Fighter VI / Fight Street VI)
+	{ "UNL-KS7057",       UNL_KS7057 }, // mapper 196 alt (for Street Fighter VI / Fight Street VI)
 	{ "UNL-T-230",        UNL_T230 },
-	{ "UNL-STUDYNGAME",   UNL_STUDYNGAME },	// mapper 39
+	{ "UNL-STUDYNGAME",   UNL_STUDYNGAME }, // mapper 39
 	{ "UNL-OneBus",       UNSUPPORTED_BOARD },
-	{ "UNL-FS304",        UNL_FS304 },	// used in Zelda 3 by Waixing
-	{ "UNL-43272",        UNSUPPORTED_BOARD },	// used in Gaau Hok Gwong Cheung (support missing atm)
-	{ "UNL-LH10",         UNSUPPORTED_BOARD },	// used in Fuuun Shaolin Kyo (FDS Conversion) (support missing atm)
+	{ "UNL-FS304",        UNL_FS304 },  // used in Zelda 3 by Waixing
+	{ "UNL-43272",        UNSUPPORTED_BOARD },  // used in Gaau Hok Gwong Cheung (support missing atm)
+	{ "UNL-LH10",         UNSUPPORTED_BOARD },  // used in Fuuun Shaolin Kyo (FDS Conversion) (support missing atm)
 //
 	{ "BTL-SMB2A",         BTL_SMB2A },
 	{ "BTL-MARIOBABY",     BTL_MARIOBABY },
@@ -544,7 +544,7 @@ static const nes_pcb pcb_list[] =
 	{ "BTL-SMB3",          BTL_SMB3 },
 	{ "BTL-SUPERBROS11",   BTL_SUPERBROS11 },
 	{ "BTL-DRAGONNINJA",   BTL_DRAGONNINJA },
-	{ "BTL-MARIO1-MALEE2", UNSUPPORTED_BOARD },	// mapper 55?
+	{ "BTL-MARIO1-MALEE2", UNSUPPORTED_BOARD }, // mapper 55?
 	{ "BTL-2708",          UNSUPPORTED_BOARD },// mapper 103
 	{ "BTL-TOBIDASEDAISAKUSEN", BTL_TOBIDASE },// mapper 120
 	{ "BTL-SHUIGUANPIPE",  UNSUPPORTED_BOARD },// mapper 183
@@ -600,19 +600,19 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-FK23C",           BMC_FK23C },
 	{ "BMC-FK23CA",          BMC_FK23CA },
 	{ "BMC-GHOSTBUSTERS63IN1", BMC_G63IN1 },
-	{ "BMC-SUPERVISION16IN1", UNSUPPORTED_BOARD },	// mapper 53
+	{ "BMC-SUPERVISION16IN1", UNSUPPORTED_BOARD },  // mapper 53
 	{ "BMC-RESETBASED-4IN1", UNSUPPORTED_BOARD },// mapper 60 with 64k prg and 32k chr
 	{ "BMC-VT5201",          BMC_VT5201 },// mapper 60 otherwise
 	{ "BMC-D1038",           BMC_VT5201 }, // mapper 60?
-	{ "BMC-42IN1RESETSWITCH", UNSUPPORTED_BOARD },	// mapper 60?
+	{ "BMC-42IN1RESETSWITCH", UNSUPPORTED_BOARD },  // mapper 60?
 	{ "BMC-SUPER22GAMES",    UNSUPPORTED_BOARD },// mapper 233
 	{ "BMC-GOLDENGAME-150IN1", UNSUPPORTED_BOARD },// mapper 235 with 2M PRG
 	{ "BMC-GOLDENGAME-260IN1", UNSUPPORTED_BOARD },// mapper 235 with 4M PRG
-	{ "BMC-70IN1",           UNSUPPORTED_BOARD },	// mapper 236?
-	{ "BMC-70IN1B",          UNSUPPORTED_BOARD },	// mapper 236?
+	{ "BMC-70IN1",           UNSUPPORTED_BOARD },   // mapper 236?
+	{ "BMC-70IN1B",          UNSUPPORTED_BOARD },   // mapper 236?
 	{ "BMC-SUPERHIK-KOF",    UNSUPPORTED_BOARD },// mapper 251
 	{ "BMC-POWERJOY",        BMC_PJOY84 },
-	{ "BMC-POWERFUL-255",    UNSUPPORTED_BOARD },	// mapper 63?
+	{ "BMC-POWERFUL-255",    UNSUPPORTED_BOARD },   // mapper 63?
 	{ "UNL-AC08",            UNSUPPORTED_BOARD }, //  used by Green Beret FDS conversions
 	{ "UNL-BB",              UNSUPPORTED_BOARD }, //  used by a few FDS conversions
 	{ "UNL-LH32",            UNSUPPORTED_BOARD }, //  used by Monty no Doki Doki Daidassou FDS conversion
@@ -946,7 +946,7 @@ static void mmc1_set_wram( address_space &space, int board )
 
 	switch (board)
 	{
-		case STD_SXROM:		// here also reads are disabled!
+		case STD_SXROM:     // here also reads are disabled!
 			if (!BIT(state->m_mmc_reg[3], 4))
 				space.install_readwrite_bank(0x6000, 0x7fff, "bank5");
 			else
@@ -954,13 +954,13 @@ static void mmc1_set_wram( address_space &space, int board )
 				space.unmap_readwrite(0x6000, 0x7fff);
 				break;
 			}
-		case STD_SXROM_A:	// ignore WRAM enable bit
+		case STD_SXROM_A:   // ignore WRAM enable bit
 			if (state->m_battery_size > 0x2000)
 				state->wram_bank(((state->m_mmc_reg[1] & 3) >> 2), NES_BATTERY);
 			else if (state->m_battery_size)
 				state->wram_bank(0, NES_BATTERY);
 			break;
-		case STD_SOROM:		// there are 2 WRAM banks only and battery is bank 2 for the cart (hence, we invert bank, because we have battery first)
+		case STD_SOROM:     // there are 2 WRAM banks only and battery is bank 2 for the cart (hence, we invert bank, because we have battery first)
 			if (!BIT(state->m_mmc_reg[3], 4))
 				space.install_readwrite_bank(0x6000, 0x7fff, "bank5");
 			else
@@ -968,7 +968,7 @@ static void mmc1_set_wram( address_space &space, int board )
 				space.unmap_readwrite(0x6000, 0x7fff);
 				break;
 			}
-		case STD_SOROM_A:	// ignore WRAM enable bit
+		case STD_SOROM_A:   // ignore WRAM enable bit
 			state->wram_bank(0, bank ? NES_BATTERY : NES_WRAM);
 			break;
 	}
@@ -981,14 +981,14 @@ static void mmc1_set_prg( running_machine &machine )
 
 	prg_mode = state->m_mmc_reg[0] & 0x0c;
 	/* prg_mode&0x8 determines bank size: 32k (if 0) or 16k (if 1)? when in 16k mode,
-     prg_mode&0x4 determines which half of the PRG space we can swap: if it is 4,
-     mmc_reg[3] sets banks at 0x8000; if it is 0, mmc_reg[3] sets banks at 0xc000. */
+	 prg_mode&0x4 determines which half of the PRG space we can swap: if it is 4,
+	 mmc_reg[3] sets banks at 0x8000; if it is 0, mmc_reg[3] sets banks at 0xc000. */
 
 	prg_offset = state->m_mmc_reg[1] & 0x10;
 	/* In principle, mmc_reg[2]&0x10 might affect "extended" banks as well, when chr_mode=1.
-     However, quoting Disch's docs: When in 4k CHR mode, 0x10 in both $A000 and $C000 *must* be
-     set to the same value, or else pages will constantly be swapped as graphics render!
-     Hence, we use only mmc_reg[1]&0x10 for prg_offset */
+	 However, quoting Disch's docs: When in 4k CHR mode, 0x10 in both $A000 and $C000 *must* be
+	 set to the same value, or else pages will constantly be swapped as graphics render!
+	 Hence, we use only mmc_reg[1]&0x10 for prg_offset */
 
 	switch (prg_mode)
 	{
@@ -1038,10 +1038,10 @@ static void common_sxrom_write_handler( address_space &space, offs_t offset, UIN
 	/* Space Shuttle will not work if they have independent variables. */
 
 	/* here we would need to add an if(cpu_cycles_passed>1) test, and
-     if requirement is not met simply return without writing anything.
-     Some games (AD&D Hillsfar, Bill & Ted Excellent Adventure, Cosmic
-     Wars, Rocket Ranger, Sesame Street 123 and Snow Brothers) rely on
-     this behavior!! */
+	 if requirement is not met simply return without writing anything.
+	 Some games (AD&D Hillsfar, Bill & Ted Excellent Adventure, Cosmic
+	 Wars, Rocket Ranger, Sesame Street 123 and Snow Brothers) rely on
+	 this behavior!! */
 	if (state->m_mmc1_reg_write_enable == 0)
 	{
 		return;
@@ -1073,7 +1073,7 @@ static void common_sxrom_write_handler( address_space &space, offs_t offset, UIN
 
 	if (state->m_mmc1_count == 5)
 	{
-		switch (offset & 0x6000)	/* Which reg shall we write to? */
+		switch (offset & 0x6000)    /* Which reg shall we write to? */
 		{
 			case 0x0000:
 				state->m_mmc_reg[0] = state->m_mmc1_latch;
@@ -1307,7 +1307,7 @@ static void mmc3_irq( device_t *device, int scanline, int vblank, int blanked )
 		if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count == 0) && (priorCount || state->m_IRQ_clear /*|| !state->m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					 device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
+						device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
 			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
@@ -1339,7 +1339,7 @@ WRITE8_MEMBER(nes_carts_state::txrom_w)
 			cmd = m_mmc3_latch & 0x07;
 			switch (cmd)
 			{
-			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+			case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
 			case 2: case 3: case 4: case 5:
 				m_mmc_vrom_bank[cmd] = data;
 				mmc3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
@@ -1403,10 +1403,10 @@ WRITE8_MEMBER(nes_carts_state::hkrom_m_w)
 	write_hi = ((m_mmc6_reg & 0xc0) == 0xc0);
 	write_lo = ((m_mmc6_reg & 0x30) == 0x30);
 
-	if (BIT(offset, 9) && write_hi)	// access to upper 1k
+	if (BIT(offset, 9) && write_hi) // access to upper 1k
 		m_mapper_bram[offset & (m_mapper_bram_size - 1)] = data;
 
-	if (!BIT(offset, 9) && write_lo)	// access to lower 1k
+	if (!BIT(offset, 9) && write_lo)    // access to lower 1k
 		m_mapper_bram[offset & (m_mapper_bram_size - 1)] = data;
 }
 
@@ -1415,15 +1415,15 @@ READ8_MEMBER(nes_carts_state::hkrom_m_r)
 	LOG_MMC(("hkrom_m_r, offset: %04x\n", offset));
 
 	if (offset < 0x1000)
-		return 0xff;	// here it should be open bus
+		return 0xff;    // here it should be open bus
 
 	if (!(m_mmc6_reg & 0xa0))
-		return 0xff;	// here it should be open bus
+		return 0xff;    // here it should be open bus
 
-	if (BIT(offset, 9) && BIT(m_mmc6_reg, 7))	// access to upper 1k when upper read is enabled
+	if (BIT(offset, 9) && BIT(m_mmc6_reg, 7))   // access to upper 1k when upper read is enabled
 		return m_mapper_bram[offset & (m_mapper_bram_size - 1)];
 
-	if (!BIT(offset, 9) && BIT(m_mmc6_reg, 5))	// access to lower 1k when lower read is enabled
+	if (!BIT(offset, 9) && BIT(m_mmc6_reg, 5))  // access to lower 1k when lower read is enabled
 		return m_mapper_bram[offset & (m_mapper_bram_size - 1)];
 
 	// If only one bank is enabled for reading, the other reads back as zero
@@ -1441,8 +1441,8 @@ WRITE8_MEMBER(nes_carts_state::hkrom_w)
 			mmc6_helper = m_mmc3_latch ^ data;
 			m_mmc3_latch = data;
 
-			if (!m_mmc_latch2 && BIT(data, 5))	// if WRAM is disabled and has to be enabled, write
-				m_mmc_latch2 = BIT(data, 5);	// (once WRAM has been enabled, it cannot be disabled without resetting the game)
+			if (!m_mmc_latch2 && BIT(data, 5))  // if WRAM is disabled and has to be enabled, write
+				m_mmc_latch2 = BIT(data, 5);    // (once WRAM has been enabled, it cannot be disabled without resetting the game)
 
 			/* Has PRG Mode changed? */
 			if (BIT(mmc6_helper, 6))
@@ -1504,7 +1504,7 @@ static void txsrom_set_mirror( running_machine &machine )
 static void txsrom_chr_cb( running_machine &machine, int start, int bank, int source )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	txsrom_set_mirror(machine);	// we could probably update only for one (e.g. the first) call, to slightly optimize the code
+	txsrom_set_mirror(machine); // we could probably update only for one (e.g. the first) call, to slightly optimize the code
 	state->chr1_x(start, bank, source);
 }
 
@@ -1581,7 +1581,7 @@ WRITE8_MEMBER(nes_carts_state::tqrom_w)
 			cmd = m_mmc3_latch & 0x07;
 			switch (cmd)
 			{
-			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+			case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
 			case 2: case 3: case 4: case 5:
 				m_mmc_vrom_bank[cmd] = data;
 				tqrom_set_chr(machine());
@@ -1661,23 +1661,23 @@ static void mmc5_update_chr_a( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	switch (state->m_mmc5_chr_mode)
 	{
-		case 0:	// 8k banks
+		case 0: // 8k banks
 			state->chr8(state->m_mmc5_vrom_regA[7] & 0xff, CHRROM);
 			break;
 
-		case 1:	// 4k banks
+		case 1: // 4k banks
 			state->chr4_0(state->m_mmc5_vrom_regA[3] & 0xff, CHRROM);
 			state->chr4_4(state->m_mmc5_vrom_regA[7] & 0xff, CHRROM);
 			break;
 
-		case 2:	// 2k banks
+		case 2: // 2k banks
 			state->chr2_0(state->m_mmc5_vrom_regA[1], CHRROM);
 			state->chr2_2(state->m_mmc5_vrom_regA[3], CHRROM);
 			state->chr2_4(state->m_mmc5_vrom_regA[5], CHRROM);
 			state->chr2_6(state->m_mmc5_vrom_regA[7], CHRROM);
 			break;
 
-		case 3:	// 1k banks
+		case 3: // 1k banks
 			state->chr1_0(state->m_mmc5_vrom_regA[0], CHRROM);
 			state->chr1_1(state->m_mmc5_vrom_regA[1], CHRROM);
 			state->chr1_2(state->m_mmc5_vrom_regA[2], CHRROM);
@@ -1695,23 +1695,23 @@ static void mmc5_update_chr_b( running_machine &machine )
 	nes_state *state = machine.driver_data<nes_state>();
 	switch (state->m_mmc5_chr_mode)
 	{
-		case 0:	// 8k banks
+		case 0: // 8k banks
 			state->chr8(state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
 			break;
 
-		case 1:	// 4k banks
+		case 1: // 4k banks
 			state->chr4_0(state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
 			state->chr4_4(state->m_mmc5_vrom_regB[3] & 0xff, CHRROM);
 			break;
 
-		case 2:	// 2k banks
+		case 2: // 2k banks
 			state->chr2_0(state->m_mmc5_vrom_regB[1], CHRROM);
 			state->chr2_2(state->m_mmc5_vrom_regB[3], CHRROM);
 			state->chr2_4(state->m_mmc5_vrom_regB[1], CHRROM);
 			state->chr2_6(state->m_mmc5_vrom_regB[3], CHRROM);
 			break;
 
-		case 3:	// 1k banks
+		case 3: // 1k banks
 			state->chr1_0(state->m_mmc5_vrom_regB[0], CHRROM);
 			state->chr1_1(state->m_mmc5_vrom_regB[1], CHRROM);
 			state->chr1_2(state->m_mmc5_vrom_regB[2], CHRROM);
@@ -1732,11 +1732,11 @@ static void mmc5_update_prg( running_machine &machine )
 
 	switch (state->m_mmc5_prg_mode)
 	{
-		case 0:	// 32k banks
+		case 0: // 32k banks
 			state->prg32(state->m_mmc5_prg_regs[3] >> 2);
 			break;
 
-		case 1:	// 16k banks
+		case 1: // 16k banks
 			//          printf("problema 1: %x\n", state->m_mmc5_prg_regs[1]);
 			bank1 = state->m_mmc5_prg_regs[1];
 
@@ -1753,7 +1753,7 @@ static void mmc5_update_prg( running_machine &machine )
 			state->prg16_cdef(state->m_mmc5_prg_regs[3] >> 1);
 			break;
 
-		case 2:	// 16k-8k banks
+		case 2: // 16k-8k banks
 			//          printf("problema 2: %x %x\n", state->m_mmc5_prg_regs[1], state->m_mmc5_prg_regs[2]);
 			bank1 = state->m_mmc5_prg_regs[1];
 			bank3 = state->m_mmc5_prg_regs[2];
@@ -1779,7 +1779,7 @@ static void mmc5_update_prg( running_machine &machine )
 			state->prg8_ef(state->m_mmc5_prg_regs[3]);
 			break;
 
-		case 3:	// 8k banks
+		case 3: // 8k banks
 			//          printf("problema 3: %x %x %x\n", state->m_mmc5_prg_regs[0], state->m_mmc5_prg_regs[1], state->m_mmc5_prg_regs[2]);
 			bank1 = state->m_mmc5_prg_regs[0];
 			bank2 = state->m_mmc5_prg_regs[1];
@@ -1838,7 +1838,7 @@ static void mmc5_irq( device_t *device, int scanline, int vblank, int blanked )
 	}
 
 	/* FIXME: this is ok, but then we would need to update them again when we have the BG Hblank
-     I leave it commented out until the PPU is updated for this */
+	 I leave it commented out until the PPU is updated for this */
 	//  if (ppu2c0x_is_sprite_8x16(state->m_ppu) || state->m_mmc5_last_chr_a)
 	//      mmc5_update_chr_a(device->machine());
 	//  else
@@ -1850,14 +1850,14 @@ static void mmc5_ppu_mirror( running_machine &machine, int page, int src )
 	nes_state *state = machine.driver_data<nes_state>();
 	switch (src)
 	{
-		case 0:	/* CIRAM0 */
+		case 0: /* CIRAM0 */
 			state->set_nt_page(page, CIRAM, 0, 1);
 			break;
-		case 1:	/* CIRAM1 */
+		case 1: /* CIRAM1 */
 			state->set_nt_page(page, CIRAM, 1, 1);
 			break;
-		case 2:	/* ExRAM */
-			state->set_nt_page(page, EXRAM, 0, 1);	// actually only works during rendering.
+		case 2: /* ExRAM */
+			state->set_nt_page(page, EXRAM, 0, 1);  // actually only works during rendering.
 			break;
 		case 3: /* Fill Registers */
 			state->set_nt_page(page, MMC5FILL, 0, 0);
@@ -2475,7 +2475,7 @@ static void jxrom_irq( device_t *device, int scanline, int vblank, int blanked )
 		else
 			state->m_IRQ_count -= 114;
 	}
-	else if (state->m_IRQ_enable & 0x01)	// if enable bit 7 is not set, only decrement the counter!
+	else if (state->m_IRQ_enable & 0x01)    // if enable bit 7 is not set, only decrement the counter!
 	{
 		if (state->m_IRQ_count <= 114)
 			state->m_IRQ_count = 0xffff;
@@ -2580,7 +2580,7 @@ WRITE8_MEMBER(nes_carts_state::dxrom_w)
 {
 	LOG_MMC(("dxrom_w, offset: %04x, data: %02x\n", offset, data));
 
-    if (offset >= 0x2000)
+	if (offset >= 0x2000)
 		return;
 
 	switch (offset & 1)
@@ -2795,7 +2795,7 @@ WRITE8_MEMBER(nes_carts_state::dis_74x161x161x32_w)
 {
 	LOG_MMC(("dis_74x161x161x32_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!m_hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
+	if (!m_hard_mirroring)  // there are two 'variants' depending on hardwired or mapper ctrl mirroring
 		set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	chr8(data, CHRROM);
 	prg16_89ab(data >> 4);
@@ -2838,7 +2838,7 @@ static void bandai_lz_irq( device_t *device, int scanline, int vblank, int blank
 		if (state->m_IRQ_count <= 114)
 		{
 			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_count = (0xffff - 114 + state->m_IRQ_count);	// wrap around the 16 bits counter
+			state->m_IRQ_count = (0xffff - 114 + state->m_IRQ_count);   // wrap around the 16 bits counter
 		}
 		state->m_IRQ_count -= 114;
 	}
@@ -3052,7 +3052,7 @@ WRITE8_MEMBER(nes_carts_state::g101_w)
 			break;
 		case 0x1000:
 			m_mmc_latch1 = BIT(data, 1);
-			if (!m_hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
+			if (!m_hard_mirroring)  // there are two 'variants' depending on hardwired or mapper ctrl mirroring
 				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
@@ -3170,7 +3170,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 		LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, state->m_IRQ_count));
 		if (state->m_IRQ_mode & 0x08)
 		{
-			if ((state->m_IRQ_count & 0x000f) < 114)	// always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
+			if ((state->m_IRQ_count & 0x000f) < 114)    // always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
 			{
 				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 				state->m_IRQ_count = (state->m_IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (state->m_IRQ_count & 0x000f)); // sort of wrap around the counter
@@ -3182,7 +3182,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 			if ((state->m_IRQ_count & 0x00ff) < 114)
 			{
 				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				state->m_IRQ_count = (state->m_IRQ_count & ~0x00ff) | (0xff - 114 + (state->m_IRQ_count & 0x00ff));	// wrap around the 8 bits counter
+				state->m_IRQ_count = (state->m_IRQ_count & ~0x00ff) | (0xff - 114 + (state->m_IRQ_count & 0x00ff)); // wrap around the 8 bits counter
 			}
 			else
 				state->m_IRQ_count -= 114;
@@ -3192,7 +3192,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 			if ((state->m_IRQ_count & 0x0fff)  < 114)
 			{
 				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				state->m_IRQ_count = (state->m_IRQ_count & ~0x0fff) | (0xfff - 114 + (state->m_IRQ_count & 0x0fff));	// wrap around the 12 bits counter
+				state->m_IRQ_count = (state->m_IRQ_count & ~0x0fff) | (0xfff - 114 + (state->m_IRQ_count & 0x0fff));    // wrap around the 12 bits counter
 			}
 			else
 				state->m_IRQ_count -= 114;
@@ -3200,7 +3200,7 @@ static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked
 		else if (state->m_IRQ_count < 114)
 		{
 			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_count = (0xffff - 114 + state->m_IRQ_count);	// wrap around the 16 bits counter
+			state->m_IRQ_count = (0xffff - 114 + state->m_IRQ_count);   // wrap around the 16 bits counter
 		}
 		else
 			state->m_IRQ_count -= 114;
@@ -3646,7 +3646,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc4_w)
 				m_IRQ_count_latch = (m_IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4);
 				break;
 			case 0x7200:
-				m_IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+				m_IRQ_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
 				m_IRQ_enable = data & 0x02;
 				m_IRQ_enable_latch = data & 0x01;
 				if (data & 0x02)
@@ -3722,7 +3722,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc6_w)
 				m_IRQ_count_latch = data;
 				break;
 			case 0x7100:
-				m_IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+				m_IRQ_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
 				m_IRQ_enable = data & 0x02;
 				m_IRQ_enable_latch = data & 0x01;
 				if (data & 0x02)
@@ -3805,7 +3805,7 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc7_w)
 			m_IRQ_count_latch = data;
 			break;
 		case 0x7000:
-			m_IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			m_IRQ_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			m_IRQ_enable = data & 0x02;
 			m_IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
@@ -3927,7 +3927,7 @@ WRITE8_MEMBER(nes_carts_state::namcot163_w)
 			prg8_89(data & 0x3f);
 			break;
 		case 0x6800:
-			m_mmc_latch1 = data & 0xc0;		// this should enable High CHRRAM, but we still have to properly implement it!
+			m_mmc_latch1 = data & 0xc0;     // this should enable High CHRRAM, but we still have to properly implement it!
 			prg8_ab(data & 0x3f);
 			break;
 		case 0x7000:
@@ -3980,7 +3980,7 @@ WRITE8_MEMBER(nes_carts_state::sunsoft2_w)
 	UINT8 sunsoft_helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
 	LOG_MMC(("sunsoft2_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!m_hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
+	if (!m_hard_mirroring)  // there are two 'variants' depending on hardwired or mapper ctrl mirroring
 		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	if (m_chr_chunks)
 		chr8(sunsoft_helper, CHRROM);
@@ -4007,7 +4007,7 @@ static void sunsoft3_irq( device_t *device, int scanline, int vblank, int blanke
 	nes_state *state = device->machine().driver_data<nes_state>();
 
 	/* TODO: change to reflect the actual number of cycles spent: both using 114 or cycling 114,114,113
-     produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
+	 produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
 	if (state->m_IRQ_enable)
 	{
 		if (state->m_IRQ_count <= 114)
@@ -4759,7 +4759,7 @@ READ8_MEMBER(nes_carts_state::cony_l_r)
 {
 	LOG_MMC(("cony_l_r, offset: %04x\n", offset));
 
-	if (offset == 0x0f00)	// 0x5000
+	if (offset == 0x0f00)   // 0x5000
 	{
 		// read dipswitch bit! - currently unimplemented
 	}
@@ -4897,7 +4897,7 @@ READ8_MEMBER(nes_carts_state::yoko_l_r)
 {
 	LOG_MMC(("cony_l_r, offset: %04x\n", offset));
 
-	if (offset >= 0x0f00 && offset < 0x1300)	// 0x5000
+	if (offset >= 0x0f00 && offset < 0x1300)    // 0x5000
 	{
 		// read dipswitch bit! - currently unimplemented
 	}
@@ -4992,7 +4992,7 @@ WRITE8_MEMBER(nes_carts_state::dreamtech_l_w)
 	LOG_MMC(("dreamtech_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
-	if (offset == 0x1020)	/* 0x5020 */
+	if (offset == 0x1020)   /* 0x5020 */
 		prg16_89ab(data);
 }
 
@@ -5854,14 +5854,14 @@ WRITE8_MEMBER(nes_carts_state::nanjing_l_w)
 	if (offset < 0x1000)
 		return;
 
-	if (offset == 0x1100)	// 0x5100
+	if (offset == 0x1100)   // 0x5100
 	{
 		if (data == 6)
 			prg32(3);
 		return;
 	}
 
-	if (offset == 0x1101)	// 0x5101
+	if (offset == 0x1101)   // 0x5101
 	{
 		UINT8 temp = m_mmc_count;
 		m_mmc_count = data;
@@ -6259,7 +6259,7 @@ static void rex_sl1632_set_chr( running_machine &machine, UINT8 chr, int chr_bas
 	{
 		for(i = 0; i < 8; i++)
 		{
-			bank[i] = state->m_mmc_extra_bank[i + 4];	// first 4 state->m_mmc_extra_banks are PRG
+			bank[i] = state->m_mmc_extra_bank[i + 4];   // first 4 state->m_mmc_extra_banks are PRG
 			chr_base2[i] = chr_base;
 		}
 	}
@@ -6310,7 +6310,7 @@ WRITE8_MEMBER(nes_carts_state::rex_sl1632_w)
 				cmd = m_mmc3_latch & 0x07;
 				switch (cmd)
 				{
-				case 0: case 1:	// these have to be changed due to the different way rex_sl1632_set_chr works (it handles 1k banks)!
+				case 0: case 1: // these have to be changed due to the different way rex_sl1632_set_chr works (it handles 1k banks)!
 					m_mmc_vrom_bank[2 * cmd] = data;
 					m_mmc_vrom_bank[2 * cmd + 1] = data;
 					rex_sl1632_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
@@ -6474,7 +6474,7 @@ READ8_MEMBER(nes_carts_state::sachen_74x374_l_r)
 
 	/* read  happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
-		return (~m_mmc_latch1 & 0x3f) /* ^ dips*/;	// we would need to check the Dips here
+		return (~m_mmc_latch1 & 0x3f) /* ^ dips*/;  // we would need to check the Dips here
 	else
 		return 0;
 }
@@ -6888,7 +6888,7 @@ WRITE8_MEMBER(nes_carts_state::subor1_w)
 static void sgame_boog_prg_cb( running_machine &machine, int start, int bank )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	if (!(state->m_mmc_reg[0] & 0x80))	// if this is != 0 we should never even arrive here
+	if (!(state->m_mmc_reg[0] & 0x80))  // if this is != 0 we should never even arrive here
 	{
 		if (state->m_mmc_reg[1] & 0x08)
 			bank = (bank & 0x1f) | 0x20;
@@ -6985,7 +6985,7 @@ WRITE8_MEMBER(nes_carts_state::sgame_boog_w)
 		case 0x0001:
 			if (!m_mmc_reg[2])
 				txrom_w(space, 0x0001, data, mem_mask);
-			else if (m_mmc_reg[3] && ((m_mmc_reg[0] & 0x80) == 0 || (m_mmc_latch1 & 0x07) < 6))	// if we use the prg16 banks and cmd=6,7 DON'T enter!
+			else if (m_mmc_reg[3] && ((m_mmc_reg[0] & 0x80) == 0 || (m_mmc_latch1 & 0x07) < 6)) // if we use the prg16 banks and cmd=6,7 DON'T enter!
 			{
 				m_mmc_reg[3] = 0;
 				txrom_w(space, 0x0001, data, mem_mask);
@@ -7140,7 +7140,7 @@ WRITE8_MEMBER(nes_carts_state::tengen_800008_w)
 static void tengen_800032_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = device->machine().driver_data<nes_state>();
-	if (!state->m_IRQ_mode)	// we are in scanline mode!
+	if (!state->m_IRQ_mode) // we are in scanline mode!
 	{
 		if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 		{
@@ -7154,7 +7154,7 @@ static void tengen_800032_irq( device_t *device, int scanline, int vblank, int b
 					if (state->m_IRQ_enable && !blanked && !state->m_IRQ_count)
 					{
 						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-								 device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
+									device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
 						state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 					}
 				}
@@ -7167,8 +7167,8 @@ static void tengen_800032_irq( device_t *device, int scanline, int vblank, int b
 		}
 	}
 	/* otherwise, we are in CPU cycles mode --> decrement count of 114 every scanline
-     --> in the meanwhile anything can have happened to IRQ_reset and we would not know
-     --> Skulls and Crossbones does not show anything!! */
+	 --> in the meanwhile anything can have happened to IRQ_reset and we would not know
+	 --> Skulls and Crossbones does not show anything!! */
 	else
 	{
 		//      if (!state->m_IRQ_reset)
@@ -7181,7 +7181,7 @@ static void tengen_800032_irq( device_t *device, int scanline, int vblank, int b
 				if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count <= 114))
 				{
 					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-							 device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
+								device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
 					state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 				}
 			}
@@ -7500,7 +7500,7 @@ WRITE8_MEMBER(nes_carts_state::txc_tw_m_w)
 {
 	LOG_MMC(("txctw_m_w, offset: %04x, data: %04x\n", offset, data));
 
-	txc_tw_l_w(space, offset & 0xff, data, mem_mask);	// offset does not really count for this mapper
+	txc_tw_l_w(space, offset & 0xff, data, mem_mask);   // offset does not really count for this mapper
 }
 
 /* writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes) */
@@ -7624,7 +7624,7 @@ WRITE8_MEMBER(nes_carts_state::waixing_a_w)
 	switch (offset & 0x6001)
 	{
 		case 0x2000:
-			waixing_set_mirror(machine(), data);	//maybe data & 0x03?
+			waixing_set_mirror(machine(), data);    //maybe data & 0x03?
 			break;
 
 		case 0x2001:
@@ -7828,7 +7828,7 @@ WRITE8_MEMBER(nes_carts_state::waixing_g_w)
 			cmd = m_mmc_latch1 & 0x0f;
 			switch (cmd)
 			{
-			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+			case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
 			case 2: case 3: case 4: case 5:
 				m_mmc_vrom_bank[cmd] = data;
 				waixing_g_set_chr(machine(), m_mmc_chr_base, m_mmc_chr_mask);
@@ -7886,7 +7886,7 @@ WRITE8_MEMBER(nes_carts_state::waixing_h_w)
 			cmd = m_mmc3_latch & 0x07;
 			switch (cmd)
 			{
-			case 0: 	// in this case we set prg_base in addition to m_mmc_vrom_bank!
+			case 0:     // in this case we set prg_base in addition to m_mmc_vrom_bank!
 				m_mmc_prg_base = (data << 5) & 0x40;
 				m_mmc_prg_mask = 0x3f;
 				mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
@@ -8229,7 +8229,7 @@ static void waixing_sh2_chr_cb( running_machine &machine, int start, int bank, i
 READ8_MEMBER(nes_carts_state::waixing_sh2_chr_r)
 {
 	int bank = offset >> 10;
-	UINT8 val = m_chr_map[bank].access[offset & 0x3ff];	// this would be usual return value
+	UINT8 val = m_chr_map[bank].access[offset & 0x3ff]; // this would be usual return value
 	int chr_helper;
 
 	switch (offset & 0xff8)
@@ -8476,7 +8476,7 @@ WRITE8_MEMBER(nes_carts_state::unl_kof97_w)
 		data = unl_kof97_unscramble(data);
 		txrom_w(space, 0x6001, data, mem_mask);
 	}
-	else		/* Other addresses behaves like MMC3, up to unscrambling data */
+	else        /* Other addresses behaves like MMC3, up to unscrambling data */
 	{
 		switch (offset & 0x6001)
 		{
@@ -8486,7 +8486,7 @@ WRITE8_MEMBER(nes_carts_state::unl_kof97_w)
 			case 0x4001:
 			case 0x6000:
 			case 0x6001:
-			case 0x2000:	/* are these ever called?!? */
+			case 0x2000:    /* are these ever called?!? */
 			case 0x2001:
 				data = unl_kof97_unscramble(data);
 				txrom_w(space, offset, data, mem_mask);
@@ -8585,7 +8585,7 @@ WRITE8_MEMBER(nes_carts_state::unl_t230_w)
 			m_IRQ_count_latch |= (data << 4) & 0xf0;
 			break;
 		case 0x7008:
-			m_IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			m_IRQ_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			m_IRQ_enable = data & 0x02;
 			m_IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
@@ -8850,7 +8850,7 @@ static void sc127_irq( device_t *device, int scanline, int vblank, int blanked )
 		if (!blanked && (state->m_IRQ_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					 device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
+						device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
 			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			state->m_IRQ_enable = 0;
 		}
@@ -8995,7 +8995,7 @@ static void smb2jb_irq( device_t *device, int scanline, int vblank, int blanked 
 		else
 			state->m_IRQ_count += 114;
 
-		state->m_IRQ_count &= 0xffff;	// according to docs is 16bit counter -> it wraps only after 0xffff
+		state->m_IRQ_count &= 0xffff;   // according to docs is 16bit counter -> it wraps only after 0xffff
 	}
 }
 
@@ -9110,10 +9110,10 @@ WRITE8_MEMBER(nes_carts_state::unl_xzy_l_w)
 
 	switch (offset)
 	{
-		case 0x1ef1:	/* 0x5ff1 */
+		case 0x1ef1:    /* 0x5ff1 */
 			prg32(data >> 1);
 			break;
-		case 0x1ef2:	/* 0x5ff2 */
+		case 0x1ef2:    /* 0x5ff2 */
 			chr8(data, CHRROM);
 			break;
 	}
@@ -9431,7 +9431,7 @@ static void btl_dn_irq( device_t *device, int scanline, int vblank, int blanked 
 
 		state->m_IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-				 device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
+					device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
 		state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
@@ -9511,7 +9511,7 @@ READ8_MEMBER(nes_carts_state::btl_pika_y2k_m_r)
 {
 	LOG_MMC(("btl_pika_y2k_m_r, offset: %04x\n", offset));
 
-	return	m_wram[offset] ^ (m_mmc_latch2 & m_mmc_reg[0]);
+	return  m_wram[offset] ^ (m_mmc_latch2 & m_mmc_reg[0]);
 }
 
 /*************************************************************
@@ -9624,7 +9624,7 @@ WRITE8_MEMBER(nes_carts_state::fk23c_l_w)
 
 	if (offset >= 0x1000)
 	{
-		if (offset & (1 << 4))	// here it should be (4 + m_mmc_dipsetting)
+		if (offset & (1 << 4))  // here it should be (4 + m_mmc_dipsetting)
 		{
 			m_mmc_reg[offset & 0x03] = data;
 
@@ -9721,7 +9721,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_64in1nr_l_w)
 			chr8(((m_mmc_reg[0] >> 1) & 0x03) | (m_mmc_reg[2] << 2), CHRROM);
 			break;
 	}
-	if (offset == 0x1000)	/* reg[0] also sets mirroring */
+	if (offset == 0x1000)   /* reg[0] also sets mirroring */
 		set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
@@ -9729,7 +9729,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_64in1nr_w)
 {
 	LOG_MMC(("bmc_64in1nr_w offset: %04x, data: %02x\n", offset, data));
 
-	m_mmc_reg[3] = data;	// reg[3] is currently unused?!?
+	m_mmc_reg[3] = data;    // reg[3] is currently unused?!?
 }
 
 /*************************************************************
@@ -10472,7 +10472,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_22g_w)
 {
 	LOG_MMC(("bmc_22g_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (1)	// this should flip at reset
+	if (1)  // this should flip at reset
 	{
 		prg16_89ab(data & 0x07);
 	}
@@ -10598,7 +10598,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_hik8_m_w)
 	LOG_MMC(("bmc_hik8_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* This bit is the "register lock". Once register are locked, writes go to WRAM
-     and there is no way to unlock them (except by resetting the machine) */
+	 and there is no way to unlock them (except by resetting the machine) */
 	if ((m_mmc_reg[3] & 0x40) && m_wram != NULL)
 		m_wram[offset] = data;
 	else
@@ -10609,7 +10609,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_hik8_m_w)
 		if (!m_mmc_count)
 		{
 			LOG_MMC(("bmc_hik8_m_w, command completed %02x %02x %02x %02x\n", m_mmc_reg[3],
-					 m_mmc_reg[2], m_mmc_reg[1], m_mmc_reg[0]));
+						m_mmc_reg[2], m_mmc_reg[1], m_mmc_reg[0]));
 
 			m_mmc_prg_base = m_mmc_reg[1];
 			m_mmc_prg_mask = 0x3f ^ (m_mmc_reg[3] & 0x3f);
@@ -10619,7 +10619,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_hik8_m_w)
 			else if (m_mmc_reg[2])
 				m_mmc_chr_mask = 0;
 			else
-				m_mmc_chr_mask = 0xff;	// i.e. we use the vrom_bank with no masking
+				m_mmc_chr_mask = 0xff;  // i.e. we use the vrom_bank with no masking
 
 			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 			mmc3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
@@ -10645,11 +10645,11 @@ WRITE8_MEMBER(nes_carts_state::bmc_hik4in1_m_w)
 	LOG_MMC(("bmc_hik4in1_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* mid writes only work when WRAM is enabled. not sure if I should
-     change the condition to m_mmc_latch2==0x80 (i.e. what is the effect of
-     the read-only bit?) */
+	 change the condition to m_mmc_latch2==0x80 (i.e. what is the effect of
+	 the read-only bit?) */
 	if (m_mmc3_wram_protect & 0x80)
 	{
-		if (data & 0x01)	/* if this is 0, then we have 32k PRG blocks */
+		if (data & 0x01)    /* if this is 0, then we have 32k PRG blocks */
 		{
 			m_mmc_prg_base = (data & 0xc0) >> 2;
 			m_mmc_prg_mask = 0x0f;
@@ -10709,7 +10709,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_ball11_w)
 
 	switch (offset & 0x6000)
 	{
-		case 0x4000:	// here we also update reg[0] upper bit
+		case 0x4000:    // here we also update reg[0] upper bit
 			m_mmc_reg[0] = (m_mmc_reg[0] & 0x01) | ((data >> 3) & 0x02);
 		case 0x0000:
 		case 0x2000:
@@ -10741,8 +10741,8 @@ WRITE8_MEMBER(nes_carts_state::bmc_mario7in1_m_w)
 	LOG_MMC(("bmc_mario7in1_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* mid writes only work when WRAM is enabled. not sure if I should
-     change the condition to m_map52_reg_written == 0x80 (i.e. what is the effect of
-     the read-only bit?) and it only can happen once! */
+	 change the condition to m_map52_reg_written == 0x80 (i.e. what is the effect of
+	 the read-only bit?) and it only can happen once! */
 	if ((m_mmc3_wram_protect & 0x80) && !m_map52_reg_written)
 	{
 		map52_helper1 = (data & 0x08);
@@ -10794,7 +10794,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_gold7in1_m_w)
 		mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 		mmc3_set_chr(machine(), m_mmc_chr_source, m_mmc_chr_base, m_mmc_chr_mask);
 
-		m_map52_reg_written = BIT(data, 7);	// mc_2hikg & mc_s3nt3 write here multiple time
+		m_map52_reg_written = BIT(data, 7); // mc_2hikg & mc_s3nt3 write here multiple time
 	}
 	else
 		m_wram[offset] = data;
@@ -10902,7 +10902,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_gc6in1_w)
 				cmd = m_mmc3_latch & 0x07;
 				switch (cmd)
 			{
-				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+				case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
 					m_mmc_vrom_bank[cmd] = data;
 					bmc_gc6in1_set_chr(machine(), m_mmc_chr_source);
@@ -10951,7 +10951,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_gc6in1_w)
 					m_mmc_reg[3] = 0;
 					switch (cmd)
 					{
-						case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+						case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
 						case 2: case 3: case 4: case 5:
 							m_mmc_vrom_bank[cmd] = data;
 							bmc_gc6in1_set_chr(machine(), m_mmc_chr_source);
@@ -11077,7 +11077,7 @@ WRITE8_MEMBER(nes_carts_state::bmc_bs5_w)
 			m_mmc_vrom_bank[bs5_helper] = offset & 0x1f;
 			break;
 		case 0x2000:
-			if (BIT(offset, m_mmc_dipsetting + 4))	// mmc_dipsetting is always zero atm, given we have no way to add cart-based DIPs
+			if (BIT(offset, m_mmc_dipsetting + 4))  // mmc_dipsetting is always zero atm, given we have no way to add cart-based DIPs
 				m_mmc_prg_bank[bs5_helper] = offset & 0x0f;
 			break;
 	}
@@ -11153,11 +11153,11 @@ static void bmc_gb63_update( running_machine &machine )
 
 	if (BIT(state->m_mmc_reg[0], 5))
 	{
-		state->prg16_89ab(state->m_mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
-		state->prg16_cdef(state->m_mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+		state->prg16_89ab(state->m_mmc_reg[0] & 0x1f);  // FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+		state->prg16_cdef(state->m_mmc_reg[0] & 0x1f);  // FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
 	}
 	else
-		state->prg32((state->m_mmc_reg[0] & 0x1f) >> 1);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+		state->prg32((state->m_mmc_reg[0] & 0x1f) >> 1);    // FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
 
 	if (BIT(state->m_mmc_reg[1], 2))
 		state->chr8(0, CHRRAM);
@@ -11180,7 +11180,7 @@ READ8_MEMBER(nes_carts_state::bmc_gb63_r)
 	//  m_mmc_dipsetting = ioport("CARTDIPS")->read();
 
 	if (m_mmc_latch1 == 1)
-		return 0xff;	// open bus
+		return 0xff;    // open bus
 	else
 		return mmc_hi_access_rom(machine(), offset);
 }
@@ -11452,7 +11452,7 @@ WRITE8_MEMBER(nes_carts_state::pjoy84_m_w)
 		case 0x00:
 		case 0x03:
 			if (m_mmc_reg[3] & 0x80)
-				return;	// else we act as if offset & 3 = 1,2
+				return; // else we act as if offset & 3 = 1,2
 		case 0x01:
 		case 0x02:
 			m_mmc_reg[offset & 0x03] = data;
@@ -11752,7 +11752,7 @@ typedef void (*nes_ppu_latch)(device_t *device, offs_t offset);
 
 struct nes_memory_accessor
 {
-	write8_delegate	 write;
+	write8_delegate  write;
 	read8_delegate  read;
 };
 
@@ -11763,8 +11763,8 @@ struct nes_pcb_intf
 	nes_memory_accessor     mmc_m;  /* $6000-$7fff read/write routines */
 	nes_memory_accessor     mmc_h;  /* $8000-$ffff read/write routines */
 	nes_ppu_latch           mmc_ppu_latch;
-	ppu2c0x_scanline_cb		mmc_scanline;
-	ppu2c0x_hblank_cb		mmc_hblank;
+	ppu2c0x_scanline_cb     mmc_scanline;
+	ppu2c0x_hblank_cb       mmc_hblank;
 };
 
 
@@ -11919,7 +11919,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::ks7022_w, nes_carts_state::ks7022_r),                 NULL, NULL, NULL },
 	{ KAISER_KS7032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7032_w),              NULL, NULL, ks7032_irq },
 	{ KAISER_KS202,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks202_w),               NULL, NULL, ks7032_irq },
-	{ KAISER_KS7017,		NES_WRITEONLY(nes_carts_state::ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, mmc_fds_irq },
+	{ KAISER_KS7017,        NES_WRITEONLY(nes_carts_state::ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, mmc_fds_irq },
 	{ KAY_PANDAPRINCE,      NES_READWRITE(nes_carts_state::kay_pp_l_w, nes_carts_state::kay_pp_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kay_pp_w),  NULL, NULL, mmc3_irq },
 	{ KASING_BOARD,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kasing_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),  NULL, NULL, mmc3_irq },
 	{ SACHEN_74LS374,       NES_READWRITE(nes_carts_state::sachen_74x374_l_w, nes_carts_state::sachen_74x374_l_r), NES_NOACCESS, NES_NOACCESS, NULL, NULL, NULL },
@@ -11970,15 +11970,15 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ WAIXING_TYPE_F,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_f_w),           NULL, NULL, mmc3_irq },
 	{ WAIXING_TYPE_G,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_g_w),           NULL, NULL, mmc3_irq },
 	{ WAIXING_TYPE_H,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_h_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_I,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
-	{ WAIXING_TYPE_J,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_TYPE_I,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_TYPE_J,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
 	{ WAIXING_SGZ,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_sgz_w),         NULL, NULL, konami_irq },
 	{ WAIXING_SGZLZ,        NES_WRITEONLY(nes_carts_state::waixing_sgzlz_l_w), NES_NOACCESS, NES_NOACCESS,     NULL, NULL, NULL },
 	{ WAIXING_FFV,          NES_WRITEONLY(nes_carts_state::waixing_ffv_l_w), NES_NOACCESS, NES_NOACCESS,       NULL, NULL, NULL },
 	{ WAIXING_ZS,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_zs_w),          NULL, NULL, NULL },
 	{ WAIXING_DQ8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_dq8_w),         NULL, NULL, NULL },
 	{ WAIXING_SECURITY,     NES_WRITEONLY(nes_carts_state::waixing_sec_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ WAIXING_SH2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },	// this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_SH2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
 	{ WAIXING_PS2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_ps2_w),         NULL, NULL, NULL },
 	{ UNL_8237,             NES_WRITEONLY(nes_carts_state::unl_8237_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_8237_w),      NULL, NULL, mmc3_irq },
 	{ UNL_AX5705,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_ax5705_w),          NULL, NULL, NULL },
@@ -12096,9 +12096,9 @@ void nes_state::pcb_handlers_setup()
 		if (!m_mmc_write.isnull()) m_mmc_write.late_bind(*this);
 		m_mmc_read_low = intf->mmc_l.read;
 		if (!m_mmc_read_low.isnull()) m_mmc_read_low.late_bind(*this);
-		m_mmc_read_mid = intf->mmc_m.read;	// in progress
+		m_mmc_read_mid = intf->mmc_m.read;  // in progress
 		if (!m_mmc_read_mid.isnull()) m_mmc_read_mid.late_bind(*this);
-		m_mmc_read = intf->mmc_h.read;	// in progress
+		m_mmc_read = intf->mmc_h.read;  // in progress
 		if (!m_mmc_read.isnull()) m_mmc_read.late_bind(*this);
 		m_ppu->set_latch(intf->mmc_ppu_latch);
 	}
@@ -12109,8 +12109,8 @@ void nes_state::pcb_handlers_setup()
 		m_mmc_write_mid = write8_delegate();
 		m_mmc_write = write8_delegate();
 		m_mmc_read_low = read8_delegate();
-		m_mmc_read_mid = read8_delegate();	// in progress
-		m_mmc_read = read8_delegate();	// in progress
+		m_mmc_read_mid = read8_delegate();  // in progress
+		m_mmc_read = read8_delegate();  // in progress
 		m_ppu->set_latch(NULL);
 	}
 
@@ -12214,9 +12214,9 @@ static void mmc3_common_initialize( running_machine &machine, int prg_mask, int 
 {
 	nes_state *state = machine.driver_data<nes_state>();
 
-	state->m_mmc3_alt_irq = IRQ_type;		// later MMC3 boards seem to use MMC6-type IRQ... more investigations are in progress at NESDev...
-	state->m_mmc_prg_bank[0] = state->m_mmc_prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
-	state->m_mmc_prg_bank[1] = state->m_mmc_prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
+	state->m_mmc3_alt_irq = IRQ_type;       // later MMC3 boards seem to use MMC6-type IRQ... more investigations are in progress at NESDev...
+	state->m_mmc_prg_bank[0] = state->m_mmc_prg_bank[2] = 0xfe; // prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
+	state->m_mmc_prg_bank[1] = state->m_mmc_prg_bank[3] = 0xff; // but some pirate clone mappers change them after writing certain registers
 	state->m_mmc3_latch = 0;
 	state->m_mmc3_wram_protect = 0x80;
 	state->m_mmc_prg_base = state->m_mmc_chr_base = 0;
@@ -12257,56 +12257,56 @@ int nes_state::pcb_initialize( int idx )
 	switch (idx)
 	{
 			/* many boards only needs PRG to point at first 32k and CHR at first 8k */
-		case STD_NROM:	// mapper 0
+		case STD_NROM:  // mapper 0
 		case HVC_FAMBASIC:
 		case GG_NROM:
-		case UXROM_CC:	// mapper 180
-		case STD_CNROM:	// mapper 3, 185
+		case UXROM_CC:  // mapper 180
+		case STD_CNROM: // mapper 3, 185
 		case BANDAI_PT554:
 		case TENGEN_800008:
-		case STD_BXROM:	// mapper 34
-		case STD_GXROM:	// mapper 66
+		case STD_BXROM: // mapper 34
+		case STD_GXROM: // mapper 66
 		case STD_MXROM:
-		case BANDAI_OEKAKIDS:	// mapper 96
-		case JALECO_JF11:	// mapper 140
-		case JALECO_JF13:	// mapper 86
-		case JALECO_JF19:	// mapper 92
-		case DIS_74X377:	// mapper 11
-		case DIS_74X161X138:	// mapper 38
-		case CALTRON_6IN1:	// mapper 41
-		case TXC_STRIKEWOLF:	// mapper 36
-		case UNL_STUDYNGAME:	// mapper 39
-		case RUMBLESTATION_BOARD:	// mapper 46
-		case BMC_GKB:	// mapper 58
-		case RCM_TETRISFAMILY:	// mapper 61
-		case BMC_SUPER_700IN1:	// mapper 62
-		case MAGICSERIES_MD:	// mapper 107
-		case HES_BOARD:	// mapper 113
-		case HES6IN1_BOARD:	// mapper 113
-		case SACHEN_SA72008:	// mapper 133
-		case SACHEN_TCU02:	// mapper 136
-		case SACHEN_SA72007:	// mapper 145
-		case SACHEN_TCU01:	// mapper 147
-		case SACHEN_SA009:	// mapper 160
-		case SACHEN_SA0037:	// mapper 148
-		case SACHEN_SA0036:	// mapper 149
-		case AGCI_50282:	// mapper 144
-		case KAISER_KS7058:	// mapper 171
-		case HENGEDIANZI_BOARD:	// mapper 177
-		case WAIXING_SGZLZ:	// mapper 178
-		case HENGEDIANZI_XJZB:	// mapper 179
-		case BMC_21IN1:	// mapper 201
-		case BMC_9999999IN1:	// mapper 213
-		case RCM_GS2015:	// mapper 216
-		case BMC_72IN1:	// mapper 225
-		case BMC_76IN1:	// mapper 226
-		case BMC_SUPER_42IN1:	// mapper 226
-		case ACTENT_ACT52:	// mapper 228
-		case CNE_SHLZ:	// mapper 240
-		case TXC_MXMDHTWO:	// mapper 241
-		case WAIXING_ZS:	// mapper 242
-		case WAIXING_DQ8:	// mapper 242
-		case CNE_DECATHLON:	// mapper 244
+		case BANDAI_OEKAKIDS:   // mapper 96
+		case JALECO_JF11:   // mapper 140
+		case JALECO_JF13:   // mapper 86
+		case JALECO_JF19:   // mapper 92
+		case DIS_74X377:    // mapper 11
+		case DIS_74X161X138:    // mapper 38
+		case CALTRON_6IN1:  // mapper 41
+		case TXC_STRIKEWOLF:    // mapper 36
+		case UNL_STUDYNGAME:    // mapper 39
+		case RUMBLESTATION_BOARD:   // mapper 46
+		case BMC_GKB:   // mapper 58
+		case RCM_TETRISFAMILY:  // mapper 61
+		case BMC_SUPER_700IN1:  // mapper 62
+		case MAGICSERIES_MD:    // mapper 107
+		case HES_BOARD: // mapper 113
+		case HES6IN1_BOARD: // mapper 113
+		case SACHEN_SA72008:    // mapper 133
+		case SACHEN_TCU02:  // mapper 136
+		case SACHEN_SA72007:    // mapper 145
+		case SACHEN_TCU01:  // mapper 147
+		case SACHEN_SA009:  // mapper 160
+		case SACHEN_SA0037: // mapper 148
+		case SACHEN_SA0036: // mapper 149
+		case AGCI_50282:    // mapper 144
+		case KAISER_KS7058: // mapper 171
+		case HENGEDIANZI_BOARD: // mapper 177
+		case WAIXING_SGZLZ: // mapper 178
+		case HENGEDIANZI_XJZB:  // mapper 179
+		case BMC_21IN1: // mapper 201
+		case BMC_9999999IN1:    // mapper 213
+		case RCM_GS2015:    // mapper 216
+		case BMC_72IN1: // mapper 225
+		case BMC_76IN1: // mapper 226
+		case BMC_SUPER_42IN1:   // mapper 226
+		case ACTENT_ACT52:  // mapper 228
+		case CNE_SHLZ:  // mapper 240
+		case TXC_MXMDHTWO:  // mapper 241
+		case WAIXING_ZS:    // mapper 242
+		case WAIXING_DQ8:   // mapper 242
+		case CNE_DECATHLON: // mapper 244
 		case UNL_CC21:
 		case BMC_VT5201:
 		case BMC_WS:
@@ -12314,39 +12314,39 @@ int nes_state::pcb_initialize( int idx )
 			break;
 
 			/* other boards need additional initialization */
-		case STD_UXROM:	// mapper 2
-		case STD_UN1ROM:	// mapper 94
-		case STD_JXROM:		// mapper 69
+		case STD_UXROM: // mapper 2
+		case STD_UN1ROM:    // mapper 94
+		case STD_JXROM:     // mapper 69
 		case SUNSOFT_5B:
 		case SUNSOFT_FME7:
-		case NAMCOT_3425:	// mapper 95
-		case DIS_74X139X74:	// mapper 87
-		case DIS_74X161X161X32:	// mapper 152 & 70
-		case BANDAI_LZ93:	// mapper 16, 157
-		case BANDAI_LZ93EX:	// same + EEPROM
+		case NAMCOT_3425:   // mapper 95
+		case DIS_74X139X74: // mapper 87
+		case DIS_74X161X161X32: // mapper 152 & 70
+		case BANDAI_LZ93:   // mapper 16, 157
+		case BANDAI_LZ93EX: // same + EEPROM
 		case BANDAI_DATACH:
 		case BANDAI_FCG:
-		case IREM_HOLYDIV:	// mapper 78
-		case IREM_G101:	// mapper 32
-		case IREM_H3001:	// mapper 65
-		case JALECO_SS88006:	// mapper 18
-		case JALECO_JF16:	// mapper 78
-		case JALECO_JF17:	// mapper 72
-		case KONAMI_VRC1:	// mapper 75
+		case IREM_HOLYDIV:  // mapper 78
+		case IREM_G101: // mapper 32
+		case IREM_H3001:    // mapper 65
+		case JALECO_SS88006:    // mapper 18
+		case JALECO_JF16:   // mapper 78
+		case JALECO_JF17:   // mapper 72
+		case KONAMI_VRC1:   // mapper 75
 		case KONAMI_VRC2:
-		case KONAMI_VRC3:	// mapper 73
+		case KONAMI_VRC3:   // mapper 73
 		case KONAMI_VRC4:
 		case KONAMI_VRC6:
-		case SUNSOFT_3:	// mapper 67
-		case TAITO_TC0190FMC:	// mapper 33
-		case TAITO_TC0190FMCP:	// mapper 48
-		case TAITO_X1_005:	// mapper 80
-		case TAITO_X1_005_A:	// mapper 207
-		case TAITO_X1_017:	// mapper 82
-		case NTDEC_ASDER:	// mapper 112
-		case FUTUREMEDIA_BOARD:	// mapper 117
-		case BTL_DRAGONNINJA:	// mapper 222
-		case WAIXING_SGZ:	// mapper 252
+		case SUNSOFT_3: // mapper 67
+		case TAITO_TC0190FMC:   // mapper 33
+		case TAITO_TC0190FMCP:  // mapper 48
+		case TAITO_X1_005:  // mapper 80
+		case TAITO_X1_005_A:    // mapper 207
+		case TAITO_X1_017:  // mapper 82
+		case NTDEC_ASDER:   // mapper 112
+		case FUTUREMEDIA_BOARD: // mapper 117
+		case BTL_DRAGONNINJA:   // mapper 222
+		case WAIXING_SGZ:   // mapper 252
 		case UNL_T230:
 		case BMC_NTD_03:
 		case KAISER_KS7022:
@@ -12358,14 +12358,14 @@ int nes_state::pcb_initialize( int idx )
 			prg16_cdef(m_prg_chunks - 1);
 			break;
 
-		case STD_CPROM:	// mapper 13
+		case STD_CPROM: // mapper 13
 			chr4_0(0, CHRRAM);
 			chr4_4(0, CHRRAM);
 			break;
-		case STD_AXROM:	// mapper 7
+		case STD_AXROM: // mapper 7
 			set_nt_mirroring(PPU_MIRROR_LOW);
 			break;
-		case STD_SXROM:	// mapper 1, 155
+		case STD_SXROM: // mapper 1, 155
 		case STD_SOROM:
 		case STD_SXROM_A:
 		case STD_SOROM_A:
@@ -12380,7 +12380,7 @@ int nes_state::pcb_initialize( int idx )
 			if (m_battery || m_wram)
 				wram_bank(0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
 			break;
-		case STD_PXROM:	// mapper 9
+		case STD_PXROM: // mapper 9
 			m_mmc_reg[0] = m_mmc_reg[2] = 0;
 			m_mmc_reg[1] = m_mmc_reg[3] = 0;
 			m_mmc_latch1 = m_mmc_latch2 = 0xfe;
@@ -12396,27 +12396,27 @@ int nes_state::pcb_initialize( int idx )
 			prg16_89ab(0);
 			prg16_cdef(m_prg_chunks - 1);
 			break;
-		case STD_TXROM:	// mapper 4
+		case STD_TXROM: // mapper 4
 		case STD_TVROM:
 		case STD_TKROM:
-		case REXSOFT_DBZ5:	// mapper 12
-		case WAIXING_TYPE_A:	// mapper 74
+		case REXSOFT_DBZ5:  // mapper 12
+		case WAIXING_TYPE_A:    // mapper 74
 		case WAIXING_TYPE_A_1:
-		case STD_TXSROM:	// mapper 118
-		case STD_TQROM:	// mapper 119
-		case WAIXING_SH2:	// mapper 165
-		case WAIXING_TYPE_B:	// mapper 191
-		case WAIXING_TYPE_C:	// mapper 192
-		case WAIXING_TYPE_D:	// mapper 194
-		case WAIXING_TYPE_E:	// mapper 195
-		case WAIXING_TYPE_H:	// mapper 245
-		case BTL_SUPERBROS11:	// mapper 196
-		case UNL_KS7057:		// mapper 196 alt (for Street Fighter VI / Fight Street VI)
-		case UNL_H2288:		// mapper 123
+		case STD_TXSROM:    // mapper 118
+		case STD_TQROM: // mapper 119
+		case WAIXING_SH2:   // mapper 165
+		case WAIXING_TYPE_B:    // mapper 191
+		case WAIXING_TYPE_C:    // mapper 192
+		case WAIXING_TYPE_D:    // mapper 194
+		case WAIXING_TYPE_E:    // mapper 195
+		case WAIXING_TYPE_H:    // mapper 245
+		case BTL_SUPERBROS11:   // mapper 196
+		case UNL_KS7057:        // mapper 196 alt (for Street Fighter VI / Fight Street VI)
+		case UNL_H2288:     // mapper 123
 		case UNL_KOF97:
 		case UNL_603_5052:
-		case NITRA_TDA:	// mapper 250
-			if (m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
+		case NITRA_TDA: // mapper 250
+			if (m_four_screen_vram) // only TXROM and DXROM have 4-screen mirroring
 			{
 				set_nt_page(0, CART_NTRAM, 0, 1);
 				set_nt_page(1, CART_NTRAM, 1, 1);
@@ -12425,18 +12425,18 @@ int nes_state::pcb_initialize( int idx )
 			}
 			mmc3_common_initialize(machine(), 0xff, 0xff, 0);
 			break;
-		case STD_HKROM:	// MMC6 (basically the same as TxROM, but alt IRQ behaviour)
+		case STD_HKROM: // MMC6 (basically the same as TxROM, but alt IRQ behaviour)
 			mmc3_common_initialize(machine(), 0xff, 0xff, 1);
 			m_mmc6_reg = 0xf0;
-			m_mmc_latch2 = 0;	// this is used differently here compared to MMC3
+			m_mmc_latch2 = 0;   // this is used differently here compared to MMC3
 			break;
-		case PAL_ZZ:	// mapper 37
+		case PAL_ZZ:    // mapper 37
 			mmc3_common_initialize(machine(), 0x07, 0x7f, 0);
 			break;
-		case NES_QJ:	// mapper 47
+		case NES_QJ:    // mapper 47
 			mmc3_common_initialize(machine(), 0x0f, 0x7f, 0);
 			break;
-		case STD_EXROM:	// mapper 5
+		case STD_EXROM: // mapper 5
 			m_MMC5_rom_bank_mode = 3;
 			m_MMC5_vrom_bank_mode = 0;
 			m_MMC5_vram_protect = 0;
@@ -12455,27 +12455,27 @@ int nes_state::pcb_initialize( int idx )
 			prg16_89ab(m_prg_chunks - 2);
 			prg16_cdef(m_prg_chunks - 1);
 			break;
-		case STD_NXROM:		// mapper 68
-		case SUNSOFT_DCS:		// mapper 68
+		case STD_NXROM:     // mapper 68
+		case SUNSOFT_DCS:       // mapper 68
 			m_mmc_reg[0] = 0;
 			prg16_89ab(0);
 			prg16_cdef(m_prg_chunks - 1);
 			break;
-		case NAMCOT_34X3:	// mapper 88
-		case STD_DXROM:	// mapper 206
+		case NAMCOT_34X3:   // mapper 88
+		case STD_DXROM: // mapper 206
 		case STD_DRROM:
-			if (m_four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
+			if (m_four_screen_vram) // only TXROM and DXROM have 4-screen mirroring
 			{
 				set_nt_page(0, CART_NTRAM, 0, 1);
 				set_nt_page(1, CART_NTRAM, 1, 1);
 				set_nt_page(2, CART_NTRAM, 2, 1);
 				set_nt_page(3, CART_NTRAM, 3, 1);
 			}
-		case NAMCOT_3453:	// mapper 154
+		case NAMCOT_3453:   // mapper 154
 			prg16_89ab(m_prg_chunks - 2);
 			prg16_cdef(m_prg_chunks - 1);
 			break;
-		case NAMCOT_3446:	// mapper 76
+		case NAMCOT_3446:   // mapper 76
 			prg8_89(0);
 			prg8_ab(1);
 			prg16_cdef(m_prg_chunks - 1);
@@ -12484,39 +12484,39 @@ int nes_state::pcb_initialize( int idx )
 			chr2_4(2, CHRROM);
 			chr2_6(3, CHRROM);
 			break;
-		case BANDAI_JUMP2:	// mapper 153
+		case BANDAI_JUMP2:  // mapper 153
 			for (i = 0; i < 8; i++)
 				m_mmc_reg[i] = 0;
 			prg16_89ab(0);
 			prg16_cdef(m_prg_chunks - 1);
 			fjump2_set_prg(machine());
 			break;
-		case BANDAI_KARAOKE:	// mapper 188
+		case BANDAI_KARAOKE:    // mapper 188
 			prg16_89ab(0);
 			prg16_cdef((m_prg_chunks - 1) ^ 0x08);
 			break;
-		case IREM_LROG017:	// mapper 77
+		case IREM_LROG017:  // mapper 77
 			chr2_2(0, CHRROM);
 			chr2_4(1, CHRROM);
 			chr2_6(2, CHRROM);
 			break;
-		case IREM_TAM_S1:	// mapper 97
+		case IREM_TAM_S1:   // mapper 97
 			prg16_89ab(m_prg_chunks - 1);
 			prg16_cdef(0);
 			break;
-		case KONAMI_VRC7:	// mapper 85
+		case KONAMI_VRC7:   // mapper 85
 			prg8_89(0);
 			prg8_ab(0);
 			prg8_cd(0);
 			prg8_ef(0xff);
 			break;
-		case NAMCOT_163:	// mapper 19
+		case NAMCOT_163:    // mapper 19
 			prg16_89ab(0);
 			prg16_cdef(m_prg_chunks - 1);
 			set_nt_mirroring(PPU_MIRROR_VERT);
 			break;
-		case SUNSOFT_1:	// mapper 184
-		case SUNSOFT_2:	// mapper 89 & 93
+		case SUNSOFT_1: // mapper 184
+		case SUNSOFT_2: // mapper 89 & 93
 			prg16_89ab(0);
 			prg16_cdef(m_prg_chunks - 1);
 			if (!m_hard_mirroring)
@@ -12792,7 +12792,7 @@ int nes_state::pcb_initialize( int idx )
 			prg32((m_prg_chunks - 1) >> 1);
 			break;
 
-		case FUKUTAKE_BOARD:	// mapper 186
+		case FUKUTAKE_BOARD:    // mapper 186
 			prg16_89ab(0);
 			prg16_cdef(0);
 			break;
@@ -12868,7 +12868,7 @@ int nes_state::pcb_initialize( int idx )
 			// mapper 205
 		case BMC_15IN1:
 			mmc3_common_initialize(machine(), 0x1f, 0xff, 0);
-			m_mmc_prg_base = 0x10;	// this board has a diff prg_base
+			m_mmc_prg_base = 0x10;  // this board has a diff prg_base
 			mmc3_set_prg(machine(), m_mmc_prg_base, m_mmc_prg_mask);
 			break;
 

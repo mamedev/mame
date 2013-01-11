@@ -108,7 +108,7 @@ static void freekick_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		int ypos = state->m_spriteram[offs + 0];
 		int code = state->m_spriteram[offs + 1] + ((state->m_spriteram[offs + 2] & 0x20) << 3);
 
-		int flipx = state->m_spriteram[offs + 2] & 0x80;	//?? unused ?
+		int flipx = state->m_spriteram[offs + 2] & 0x80;    //?? unused ?
 		int flipy = state->m_spriteram[offs + 2] & 0x40;
 		int color = state->m_spriteram[offs + 2] & 0x1f;
 

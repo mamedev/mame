@@ -12,7 +12,7 @@
 		<description>MIKROS v2.2</description>
 		<year>198?</year>
 		<publisher>VÚVT Žilina</publisher>
-        <info name="usage" value="Execute GFFF8 in the monitor (requires CP/M monitor)"/>
+		<info name="usage" value="Execute GFFF8 in the monitor (requires CP/M monitor)"/>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="256256">
 				<rom name="iq151_fdd1.iqd" size="256256" crc="47d0473d" sha1="43952153a1417ce5a35c2838d878e2b9d6710c17" offset="0x00000" />

@@ -45,9 +45,9 @@ const device_type ASC = &device_creator<asc_device>;
 
 asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASC, "ASC", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_chip_type(0),
-	  m_irq_cb(NULL)
+		device_sound_interface(mconfig, *this),
+		m_chip_type(0),
+		m_irq_cb(NULL)
 {
 }
 
@@ -146,14 +146,14 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 
 	switch (m_regs[R_MODE-0x800] & 3)
 	{
-		case 0:	// chip off
+		case 0: // chip off
 			for (i = 0; i < samples; i++)
 			{
 				outL[i] = outR[i] = 0;
 			}
 			break;
 
-		case 1:	// FIFO mode
+		case 1: // FIFO mode
 			for (i = 0; i < samples; i++)
 			{
 				INT8 smpll, smplr;
@@ -181,8 +181,8 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					case ASC_TYPE_SONORA:
 						if (m_fifo_cap_a < 0x200)
 						{
-							m_regs[R_FIFOSTAT-0x800] |= 0x4;	// fifo less than half full
-							m_regs[R_FIFOSTAT-0x800] |= 0x8;	// just pass the damn test
+							m_regs[R_FIFOSTAT-0x800] |= 0x4;    // fifo less than half full
+							m_regs[R_FIFOSTAT-0x800] |= 0x8;    // just pass the damn test
 							if (m_irq_cb)
 							{
 								m_irq_cb(this, 1);
@@ -193,15 +193,15 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					default:
 						if (m_fifo_cap_a == 0x1ff)
 						{
-							m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
+							m_regs[R_FIFOSTAT-0x800] |= 1;  // fifo A half-empty
 							if (m_irq_cb)
 							{
 								m_irq_cb(this, 1);
 							}
 						}
-						else if (m_fifo_cap_a == 0x1)	// fifo A fully empty
+						else if (m_fifo_cap_a == 0x1)   // fifo A fully empty
 						{
-							m_regs[R_FIFOSTAT-0x800] |= 2;	// fifo A empty
+							m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A empty
 							if (m_irq_cb)
 							{
 								m_irq_cb(this, 1);
@@ -210,15 +210,15 @@ void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 
 						if (m_fifo_cap_b == 0x1ff)
 						{
-							m_regs[R_FIFOSTAT-0x800] |= 4;	// fifo B half-empty
+							m_regs[R_FIFOSTAT-0x800] |= 4;  // fifo B half-empty
 							if (m_irq_cb)
 							{
 								m_irq_cb(this, 1);
 							}
 						}
-						else if (m_fifo_cap_b == 0x1)	// fifo B fully empty
+						else if (m_fifo_cap_b == 0x1)   // fifo B fully empty
 						{
-							m_regs[R_FIFOSTAT-0x800] |= 8;	// fifo B empty
+							m_regs[R_FIFOSTAT-0x800] |= 8;  // fifo B empty
 							if (m_irq_cb)
 							{
 								m_irq_cb(this, 1);
@@ -307,7 +307,7 @@ READ8_MEMBER( asc_device::read )
 					case ASC_TYPE_SONORA:
 						return 0xbc;
 
-					default:	// return the actual register value
+					default:    // return the actual register value
 						break;
 				}
 				break;
@@ -420,7 +420,7 @@ WRITE8_MEMBER( asc_device::write )
 
 			if (m_fifo_cap_a == 0x3ff)
 			{
-				m_regs[R_FIFOSTAT-0x800] |= 2;	// fifo A full
+				m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A full
 			}
 
 			m_fifo_a_wrptr &= 0x3ff;
@@ -439,7 +439,7 @@ WRITE8_MEMBER( asc_device::write )
 
 			if (m_fifo_cap_b == 0x3ff)
 			{
-				m_regs[R_FIFOSTAT-0x800] |= 8;	// fifo B full
+				m_regs[R_FIFOSTAT-0x800] |= 8;  // fifo B full
 			}
 
 			m_fifo_b_wrptr &= 0x3ff;
@@ -457,7 +457,7 @@ WRITE8_MEMBER( asc_device::write )
 		switch (offset)
 		{
 			case R_MODE:
-				data &= 3;	// only bits 0 and 1 can be written
+				data &= 3;  // only bits 0 and 1 can be written
 
 				if (data != m_regs[R_MODE-0x800])
 				{

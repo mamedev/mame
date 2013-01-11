@@ -26,36 +26,36 @@
  ****************************/
 struct gate_array_t
 {
-	bitmap_ind16	*bitmap;		/* The bitmap we work on */
-	UINT8	pen_selected;		/* Pen selection */
-	UINT8	mrer;				/* Mode and ROM Enable Register */
-	UINT8	upper_bank;
-	UINT8	romdis;  // ROMDIS signal from the expansion port
+	bitmap_ind16    *bitmap;        /* The bitmap we work on */
+	UINT8   pen_selected;       /* Pen selection */
+	UINT8   mrer;               /* Mode and ROM Enable Register */
+	UINT8   upper_bank;
+	UINT8   romdis;  // ROMDIS signal from the expansion port
 
 	/* input signals from CRTC */
-	int		vsync;
-	int		hsync;
-	int		de;
-	int		ma;
-	int		ra;
+	int     vsync;
+	int     hsync;
+	int     de;
+	int     ma;
+	int     ra;
 
 	/* used for timing */
-	int		hsync_after_vsync_counter;
-	int		hsync_counter;				/* The gate array counts CRTC HSYNC pulses using an internal 6-bit counter. */
+	int     hsync_after_vsync_counter;
+	int     hsync_counter;              /* The gate array counts CRTC HSYNC pulses using an internal 6-bit counter. */
 
 	/* used for drawing the screen */
-	attotime	last_draw_time;
-	int		y;
-	UINT16	*draw_p;					/* Position in the bitmap where we are currently drawing */
-	UINT16	colour;
-	UINT16	address;
-	UINT8	*mode_lookup;
-	UINT8	data;
-	UINT8	ticks;
-	UINT8	ticks_increment;
-	UINT16	line_ticks;
-	UINT8	colour_ticks;
-	UINT8	max_colour_ticks;
+	attotime    last_draw_time;
+	int     y;
+	UINT16  *draw_p;                    /* Position in the bitmap where we are currently drawing */
+	UINT16  colour;
+	UINT16  address;
+	UINT8   *mode_lookup;
+	UINT8   data;
+	UINT8   ticks;
+	UINT8   ticks_increment;
+	UINT16  line_ticks;
+	UINT8   colour_ticks;
+	UINT8   max_colour_ticks;
 };
 
 /****************************
@@ -63,29 +63,29 @@ struct gate_array_t
  ****************************/
 struct asic_t
 {
-	UINT8	*ram;				/* pointer to RAM used for the CPC+ ASIC memory-mapped registers */
-	UINT8	enabled;			/* Are CPC plus features enabled/unlocked */
-	UINT8	pri;				/* Programmable raster interrupt */
-	UINT8	seqptr;				/* Current position in the ASIC unlocking sequence */
-	UINT8	rmr2;				/* ROM mapping register 2 */
-	UINT16	split_ma_base;		/* Used to handle split screen support */
-	UINT16	split_ma_started;	/* Used to handle split screen support */
-	UINT16	vpos;				/* Current logical scanline */
-	UINT16	h_start;			/* Position where DE became active */
-	UINT16	h_end;				/* Position where DE became inactive */
-	UINT8	addr_6845;			/* We need these to store a shadow copy of R1 of the mc6845 */
-	UINT8	horiz_disp;
-	UINT8	hscroll;
-	UINT8   de_start;			/* flag to check if DE is been enabled this frame yet */
+	UINT8   *ram;               /* pointer to RAM used for the CPC+ ASIC memory-mapped registers */
+	UINT8   enabled;            /* Are CPC plus features enabled/unlocked */
+	UINT8   pri;                /* Programmable raster interrupt */
+	UINT8   seqptr;             /* Current position in the ASIC unlocking sequence */
+	UINT8   rmr2;               /* ROM mapping register 2 */
+	UINT16  split_ma_base;      /* Used to handle split screen support */
+	UINT16  split_ma_started;   /* Used to handle split screen support */
+	UINT16  vpos;               /* Current logical scanline */
+	UINT16  h_start;            /* Position where DE became active */
+	UINT16  h_end;              /* Position where DE became inactive */
+	UINT8   addr_6845;          /* We need these to store a shadow copy of R1 of the mc6845 */
+	UINT8   horiz_disp;
+	UINT8   hscroll;
+	UINT8   de_start;           /* flag to check if DE is been enabled this frame yet */
 
 	/* DMA */
-	UINT8	dma_status;
-	UINT8	dma_clear;			/* Set if DMA interrupts are to be cleared automatically */
-	UINT8	dma_prescaler[3];	/* DMA channel prescaler */
-	UINT16	dma_repeat[3];		/* Location of the DMA channel's last repeat */
-	UINT16	dma_addr[3];		/* DMA channel address */
-	UINT16	dma_loopcount[3];	/* Count loops taken on this channel */
-	UINT16	dma_pause[3];		/* DMA pause count */
+	UINT8   dma_status;
+	UINT8   dma_clear;          /* Set if DMA interrupts are to be cleared automatically */
+	UINT8   dma_prescaler[3];   /* DMA channel prescaler */
+	UINT16  dma_repeat[3];      /* Location of the DMA channel's last repeat */
+	UINT16  dma_addr[3];        /* DMA channel address */
+	UINT16  dma_loopcount[3];   /* Count loops taken on this channel */
+	UINT16  dma_pause[3];       /* DMA pause count */
 };
 
 
@@ -94,17 +94,17 @@ class amstrad_state : public driver_device
 public:
 	amstrad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ay(*this, "ay"),
-		  m_fdc(*this, "upd765"),
-		  m_crtc(*this, "mc6845"),
-		  m_screen(*this, "screen"),
-		  m_ppi(*this, "ppi8255"),
-		  m_centronics(*this, "centronics"),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_exp(*this, "exp"),
-		  m_rtc(*this, "rtc")
+			m_maincpu(*this, "maincpu"),
+			m_ay(*this, "ay"),
+			m_fdc(*this, "upd765"),
+			m_crtc(*this, "mc6845"),
+			m_screen(*this, "screen"),
+			m_ppi(*this, "ppi8255"),
+			m_centronics(*this, "centronics"),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG),
+			m_exp(*this, "exp"),
+			m_rtc(*this, "rtc")
 		{ }
 
 	required_device<cpu_device> m_maincpu;

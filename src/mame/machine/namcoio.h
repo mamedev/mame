@@ -72,4 +72,4 @@ void namco_customio_58xx_run(device_t *device);
 void namco_customio_59xx_run(device_t *device);
 
 
-#endif	/* __NAMCOIO_H__ */
+#endif  /* __NAMCOIO_H__ */

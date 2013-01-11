@@ -29,7 +29,7 @@
 
 // ======================> x1_keyboard_device
 
-class x1_keyboard_device :	public device_t,
+class x1_keyboard_device :  public device_t,
 						public device_z80daisy_interface
 {
 public:

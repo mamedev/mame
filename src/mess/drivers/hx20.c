@@ -51,41 +51,41 @@ UINT32 hx20_state::screen_update_ehx20(screen_device &screen, bitmap_ind16 &bitm
 /* F4 Character Displayer */
 static const gfx_layout hx20_1_charlayout =
 {
-	5, 8,					/* 5 x 8 characters */
-	102,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	5, 8,                   /* 5 x 8 characters */
+	102,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 8, 16, 24, 32 },
 	/* y offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	5*8					/* every char is 5 bits of 8 bytes */
+	5*8                 /* every char is 5 bits of 8 bytes */
 };
 
 static const gfx_layout hx20_2_charlayout =
 {
-	6, 8,					/* 6 x 8 characters */
-	27,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	6, 8,                   /* 6 x 8 characters */
+	27,                 /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 8, 16, 24, 32, 40 },
 	/* y offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	6*8					/* every char is 6 bits of 8 bytes */
+	6*8                 /* every char is 6 bits of 8 bytes */
 };
 
 static const gfx_layout hx20_3_charlayout =
 {
-	5, 8,					/* 5 x 8 characters */
-	34,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	5, 8,                   /* 5 x 8 characters */
+	34,                 /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 16, 24, 32, 40, 48 },
 	/* y offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	5*8					/* every char is 5 bits of 8 bytes */
+	5*8                 /* every char is 5 bits of 8 bytes */
 };
 
 static GFXDECODE_START( hx20 )
@@ -138,4 +138,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
 COMP( 1983, ehx20,  0,       0,      ehx20,     ehx20, driver_device,    0,     "Epson", "HX20", GAME_NOT_WORKING | GAME_NO_SOUND )
-

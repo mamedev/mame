@@ -94,10 +94,10 @@ static ADDRESS_MAP_START( pcktgal_sound_map, AS_PROGRAM, 8, pcktgal_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(pcktgal_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(pcktgal_adpcm_data_w) /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pcktgal_sound_bank_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x3400, 0x3400) AM_READ(pcktgal_adpcm_reset_r)	/* ? not sure */
+	AM_RANGE(0x3400, 0x3400) AM_READ(pcktgal_adpcm_reset_r) /* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -127,27 +127,27 @@ static INPUT_PORTS_START( pcktgal )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Allow 2 Players Game" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Allow 2 Players Game" )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Time" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Time" )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x20, "120" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -156,46 +156,46 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	4096,
 	4,
 	{ 0x10000*8, 0, 0x18000*8, 0x8000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	 /* every char takes 8 consecutive bytes */
+	8*8  /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout bootleg_charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	4096,
 	4,
 	{ 0x18000*8, 0x8000*8, 0x10000*8, 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	 /* every char takes 8 consecutive bytes */
+	8*8  /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	1024,   /* 1024 sprites */
-	2,	  /* 2 bits per pixel */
+	2,    /* 2 bits per pixel */
 	{ 0x8000*8, 0 },
 	{ 128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every char takes 8 consecutive bytes */
+	32*8    /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout bootleg_spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	1024,   /* 1024 sprites */
-	2,	  /* 2 bits per pixel */
+	2,    /* 2 bits per pixel */
 	{ 0x8000*8, 0 },
 	{ 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0, 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every char takes 8 consecutive bytes */
+	32*8    /* every char takes 8 consecutive bytes */
 };
 
 static GFXDECODE_START( pcktgal )
@@ -212,8 +212,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	pcktgal_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B		/* 8KHz            */
+	pcktgal_adpcm_int,  /* interrupt function */
+	MSM5205_S48_4B      /* 8KHz            */
 };
 
 /***************************************************************************/
@@ -281,22 +281,22 @@ MACHINE_CONFIG_END
 /***************************************************************************/
 
 ROM_START( pcktgal )
-	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
-	ROM_LOAD( "eb04.j7",	   0x10000, 0x4000, CRC(8215d60d) SHA1(ac26dfce7e215be21f2a17f864c5e966b8b8322e) )
-	ROM_CONTINUE(			   0x04000, 0xc000)
+	ROM_REGION( 0x14000, "maincpu", 0 )  /* 64k for code + 16k for banks */
+	ROM_LOAD( "eb04.j7",       0x10000, 0x4000, CRC(8215d60d) SHA1(ac26dfce7e215be21f2a17f864c5e966b8b8322e) )
+	ROM_CONTINUE(              0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD( "eb03.f2",	   0x10000, 0x8000, CRC(cb029b02) SHA1(fbb3da08ed05ae73fbeeb13e0e2ff735aaf83db8) )
-	ROM_CONTINUE(			   0x08000, 0x8000 )
+	ROM_REGION( 0x18000, "audiocpu", 0 )     /* 96k for code + 96k for decrypted opcodes */
+	ROM_LOAD( "eb03.f2",       0x10000, 0x8000, CRC(cb029b02) SHA1(fbb3da08ed05ae73fbeeb13e0e2ff735aaf83db8) )
+	ROM_CONTINUE(              0x08000, 0x8000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "eb01.d11",	   0x00000, 0x10000, CRC(63542c3d) SHA1(4f42af99a6d9d4766afe0bebe10d6a97811a0082) )
-	ROM_LOAD( "eb02.d12",	   0x10000, 0x10000, CRC(a9dcd339) SHA1(245824ab86cdfe4b842ce1be0af60f2ff4c6ae07) )
+	ROM_LOAD( "eb01.d11",      0x00000, 0x10000, CRC(63542c3d) SHA1(4f42af99a6d9d4766afe0bebe10d6a97811a0082) )
+	ROM_LOAD( "eb02.d12",      0x10000, 0x10000, CRC(a9dcd339) SHA1(245824ab86cdfe4b842ce1be0af60f2ff4c6ae07) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "eb00.a1",	  0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
+	ROM_LOAD( "eb00.a1",      0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "eb05.k14",     0x0000, 0x0200, CRC(3b6198cb) SHA1(d32b364cfce99637998ca83ad21783f80364dd65) ) /* 82s147.084 */
@@ -304,15 +304,15 @@ ROM_START( pcktgal )
 ROM_END
 
 ROM_START( pcktgalb )
-	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )  /* 64k for code + 16k for banks */
 	ROM_LOAD( "sexybill.001", 0x10000, 0x4000, CRC(4acb3e84) SHA1(c83d03969587c6be80fb8fc84afe250907674a44) )
-	ROM_CONTINUE(			  0x04000, 0xc000)
+	ROM_CONTINUE(             0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD( "eb03.f2",	   0x10000, 0x8000, CRC(cb029b02) SHA1(fbb3da08ed05ae73fbeeb13e0e2ff735aaf83db8) )
-	ROM_CONTINUE(			  0x08000, 0x8000 )
+	ROM_REGION( 0x18000, "audiocpu", 0 )     /* 96k for code + 96k for decrypted opcodes */
+	ROM_LOAD( "eb03.f2",       0x10000, 0x8000, CRC(cb029b02) SHA1(fbb3da08ed05ae73fbeeb13e0e2ff735aaf83db8) )
+	ROM_CONTINUE(             0x08000, 0x8000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "sexybill.005", 0x00000, 0x10000, CRC(3128dc7b) SHA1(d011181e544b8284ecdf54578da5469804e06c63) )
@@ -328,22 +328,22 @@ ROM_START( pcktgalb )
 ROM_END
 
 ROM_START( pcktgal2 )
-	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )  /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04-2.j7",   0x10000, 0x4000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
-	ROM_CONTINUE(			  0x04000, 0xc000)
+	ROM_CONTINUE(             0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )     /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
-	ROM_CONTINUE(			  0x08000, 0x8000)
+	ROM_CONTINUE(             0x08000, 0x8000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "eb01-2.rom",   0x00000, 0x10000, CRC(e52b1f97) SHA1(4814fe3b2eb08ac173e09ffadc6e5daa9affa1a0) )
 	ROM_LOAD( "eb02-2.rom",   0x10000, 0x10000, CRC(f30d965d) SHA1(a787457b33ad39e78fcf8da0715fab7a63869bf9) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "eb00.a1",	  0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
+	ROM_LOAD( "eb00.a1",      0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "eb05.k14",     0x0000, 0x0200, CRC(3b6198cb) SHA1(d32b364cfce99637998ca83ad21783f80364dd65) ) /* 82s147.084 */
@@ -351,22 +351,22 @@ ROM_START( pcktgal2 )
 ROM_END
 
 ROM_START( pcktgal2j )
-	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )  /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04-2.j7",   0x10000, 0x4000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
-	ROM_CONTINUE(			  0x04000, 0xc000)
+	ROM_CONTINUE(             0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )     /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
-	ROM_CONTINUE(			  0x08000, 0x8000)
+	ROM_CONTINUE(             0x08000, 0x8000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "eb01-2.d11",   0x00000, 0x10000, CRC(8f42ab1a) SHA1(315fb26bbe004c08629a0a3a6e9d129768119e6b) )
 	ROM_LOAD( "eb02-2.d12",   0x10000, 0x10000, CRC(f394cb35) SHA1(f351b8b6fd8a6637ef9031f7a410a334da8ea5ae) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "eb00.a1",	  0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
+	ROM_LOAD( "eb00.a1",      0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "eb05.k14",     0x0000, 0x0200, CRC(3b6198cb) SHA1(d32b364cfce99637998ca83ad21783f80364dd65) ) /* 82s147.084 */
@@ -374,22 +374,22 @@ ROM_START( pcktgal2j )
 ROM_END
 
 ROM_START( spool3 )
-	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )  /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04-2.j7",   0x10000, 0x4000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
-	ROM_CONTINUE(			  0x04000, 0xc000)
+	ROM_CONTINUE(             0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )     /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
-	ROM_CONTINUE(			  0x08000, 0x8000)
+	ROM_CONTINUE(             0x08000, 0x8000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "deco2.bin",	  0x00000, 0x10000, CRC(0a23f0cf) SHA1(8554215001ffc9e6f141e57cc11b400a853f89f2) )
-	ROM_LOAD( "deco3.bin",	  0x10000, 0x10000, CRC(55ea7c45) SHA1(a8a6ff0c8a5aaee3afbfc3e71a171fb1d2360b45) )
+	ROM_LOAD( "deco2.bin",    0x00000, 0x10000, CRC(0a23f0cf) SHA1(8554215001ffc9e6f141e57cc11b400a853f89f2) )
+	ROM_LOAD( "deco3.bin",    0x10000, 0x10000, CRC(55ea7c45) SHA1(a8a6ff0c8a5aaee3afbfc3e71a171fb1d2360b45) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "eb00.a1",	  0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
+	ROM_LOAD( "eb00.a1",      0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "eb05.k14",     0x0000, 0x0200, CRC(3b6198cb) SHA1(d32b364cfce99637998ca83ad21783f80364dd65) ) /* 82s147.084 */
@@ -397,22 +397,22 @@ ROM_START( spool3 )
 ROM_END
 
 ROM_START( spool3i )
-	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
-	ROM_LOAD( "de1.bin",	  0x10000, 0x4000, CRC(a59980fe) SHA1(64b55af4d0b314d14184784e9f817b56be0f24f2) )
-	ROM_CONTINUE(			  0x04000, 0xc000)
+	ROM_REGION( 0x14000, "maincpu", 0 )  /* 64k for code + 16k for banks */
+	ROM_LOAD( "de1.bin",      0x10000, 0x4000, CRC(a59980fe) SHA1(64b55af4d0b314d14184784e9f817b56be0f24f2) )
+	ROM_CONTINUE(             0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )     /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
-	ROM_CONTINUE(			  0x08000, 0x8000)
+	ROM_CONTINUE(             0x08000, 0x8000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "deco2.bin",	  0x00000, 0x10000, CRC(0a23f0cf) SHA1(8554215001ffc9e6f141e57cc11b400a853f89f2) )
-	ROM_LOAD( "deco3.bin",	  0x10000, 0x10000, CRC(55ea7c45) SHA1(a8a6ff0c8a5aaee3afbfc3e71a171fb1d2360b45) )
+	ROM_LOAD( "deco2.bin",    0x00000, 0x10000, CRC(0a23f0cf) SHA1(8554215001ffc9e6f141e57cc11b400a853f89f2) )
+	ROM_LOAD( "deco3.bin",    0x10000, 0x10000, CRC(55ea7c45) SHA1(a8a6ff0c8a5aaee3afbfc3e71a171fb1d2360b45) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "eb00.a1",	  0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
+	ROM_LOAD( "eb00.a1",      0x00000, 0x10000, CRC(6c1a14a8) SHA1(03201197304c5f1d854b8c4f4a5c78336b51f872) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "eb05.k14",     0x0000, 0x0200, CRC(3b6198cb) SHA1(d32b364cfce99637998ca83ad21783f80364dd65) ) /* 82s147.084 */

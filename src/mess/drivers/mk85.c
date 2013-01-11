@@ -59,7 +59,7 @@ UINT32 mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bitma
 
 static const struct t11_setup t11_data =
 {
-	5 << 13			/* start from 0000 */
+	5 << 13         /* start from 0000 */
 };
 
 static MACHINE_CONFIG_START( mk85, mk85_state )

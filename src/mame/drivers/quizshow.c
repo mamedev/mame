@@ -20,16 +20,16 @@ TODO:
 #include "quizshow.lh"
 
 
-#define MASTER_CLOCK	XTAL_12_096MHz
-#define PIXEL_CLOCK		(MASTER_CLOCK/2)
+#define MASTER_CLOCK    XTAL_12_096MHz
+#define PIXEL_CLOCK     (MASTER_CLOCK/2)
 
-#define HTOTAL			((32+8+4+1) * 8)
-#define HBEND			(0)
-#define HBSTART			(256)
+#define HTOTAL          ((32+8+4+1) * 8)
+#define HBEND           (0)
+#define HBSTART         (256)
 
-#define VTOTAL			(256+8+4)
-#define VBEND			(0)
-#define VBSTART			(240)
+#define VTOTAL          (256+8+4)
+#define VBEND           (0)
+#define VBSTART         (240)
 
 
 class quizshow_state : public driver_device
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( quizshow )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Answer D") PORT_PLAYER(2)
 
 	PORT_START("IN2") // ADR strobe 2
-	PORT_DIPNAME( 0x0f, 0x05, "Game Duration" )			PORT_DIPLOCATION("SW3:4,3,2,1")
+	PORT_DIPNAME( 0x0f, 0x05, "Game Duration" )         PORT_DIPLOCATION("SW3:4,3,2,1")
 	PORT_DIPSETTING( 0x00, "50 sec. / 5 questions" )
 	PORT_DIPSETTING( 0x01, "60 sec. / 6 questions" )
 	PORT_DIPSETTING( 0x02, "70 sec. / 7 questions" )
@@ -293,17 +293,17 @@ static INPUT_PORTS_START( quizshow )
 	PORT_DIPSETTING( 0x0e, "190 sec. / 19 questions" ) // "
 	PORT_DIPSETTING( 0x0f, "200 sec. / 20 questions" ) // "
 
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING( 0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING( 0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x00, "Duration Mode" )			PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x00, "Duration Mode" )         PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "Question Count" )
 	PORT_DIPSETTING(    0x20, "Timed" )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // N/C
 
 	PORT_START("IN3") // ADR strobe 3
-	PORT_DIPNAME( 0x0f, 0x05, "Bonus Questions" )		PORT_DIPLOCATION("SW2:4,3,2,1")
+	PORT_DIPNAME( 0x0f, 0x05, "Bonus Questions" )       PORT_DIPLOCATION("SW2:4,3,2,1")
 	PORT_DIPSETTING( 0x00, "0" )
 	PORT_DIPSETTING( 0x01, "1" )
 	PORT_DIPSETTING( 0x02, "2" )

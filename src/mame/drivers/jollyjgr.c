@@ -253,48 +253,48 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jollyjgr )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x03, "10000" )
 	PORT_DIPSETTING(    0x02, "20000" )
 	PORT_DIPSETTING(    0x01, "30000" )
 	PORT_DIPSETTING(    0x00, "40000" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x10, "Timer" )			PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x10, "Timer" )         PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x18, "2 min 20 sec" )
 	PORT_DIPSETTING(    0x10, "2 min 40 sec" )
 	PORT_DIPSETTING(    0x08, "3 min" )
 	PORT_DIPSETTING(    0x00, "3 min 20 sec" )
-	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )			PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:!7") // it works only when Cabinet is set to Upright
+	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:!7") // it works only when Cabinet is set to Upright
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x10, 0x00, "Display Coinage" )		PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPNAME( 0x10, 0x00, "Display Coinage" )       PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Display Year" )		PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x20, 0x00, "Display Year" )      PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, "No Hit" )			PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x40, 0x00, "No Hit" )            PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Number of Coin Switches" )	PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Number of Coin Switches" )   PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
@@ -321,7 +321,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( fspider )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 7C_1C ) )
@@ -339,7 +339,7 @@ static INPUT_PORTS_START( fspider )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ) )
 
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!5,!6,!7,!8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!5,!6,!7,!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 7C_1C ) )
@@ -358,26 +358,26 @@ static INPUT_PORTS_START( fspider )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x08, "30000" )
 	PORT_DIPSETTING(    0x0c, "40000" )
-	PORT_DIPNAME( 0x10, 0x10, "Display Coinage Settings" )	PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPNAME( 0x10, 0x10, "Display Coinage Settings" )  PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Show only 1P Coinage" )	PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x20, 0x20, "Show only 1P Coinage" )  PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -557,9 +557,9 @@ UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_ind16
 	screen_update_jollyjgr(screen, bitmap, cliprect);
 
 	/* Draw bullets
-    16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
-    Assume bullets to look the same as on Galaxian hw,
-    that is, simply 4 pixels. Colours are unknown. */
+	16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
+	Assume bullets to look the same as on Galaxian hw,
+	that is, simply 4 pixels. Colours are unknown. */
 	for (int offs=0;offs<0x10;offs+=2) {
 		UINT8 sy=~m_bulletram[offs];
 		UINT8 sx=~m_bulletram[offs|1];
@@ -652,7 +652,7 @@ void jollyjgr_state::machine_reset()
 static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3579545)		 /* 3,579545 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 3579545)        /* 3,579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jollyjgr_state,  jollyjgr_interrupt)
 

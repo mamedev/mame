@@ -117,7 +117,7 @@ WRITE8_MEMBER(wink_state::sound_irq_w)
 static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8, wink_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_SHARE("nvram")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_le_w) AM_SHARE("paletteram") //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
-	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)		//??? no mux on the pcb.
+	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)     //??? no mux on the pcb.
 	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
 //  AM_RANGE(0x23, 0x23) AM_WRITENOP                //?
 //  AM_RANGE(0x24, 0x24) AM_WRITENOP                //cab Knocker like in q-bert!
@@ -160,14 +160,14 @@ static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	AM_RANGE(0x60, 0x60) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x80, 0x80) AM_READ(analog_port_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(player_inputs_r)
-	AM_RANGE(0xa4, 0xa4) AM_READ_PORT("DSW1")	//dipswitch bank2
-	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("DSW2")	//dipswitch bank1
+	AM_RANGE(0xa4, 0xa4) AM_READ_PORT("DSW1")   //dipswitch bank2
+	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("DSW2")   //dipswitch bank1
 //  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
-	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("DSW3")	//unused inputs
-	AM_RANGE(0xb4, 0xb4) AM_READ_PORT("DSW4")	//dipswitch bank3
-	AM_RANGE(0xc0, 0xdf) AM_WRITE(prot_w)		//load load protection-buffer from upper address bus
-	AM_RANGE(0xc3, 0xc3) AM_READNOP				//watchdog?
-	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)		//load math unit from buffer & lower address-bus
+	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("DSW3")   //unused inputs
+	AM_RANGE(0xb4, 0xb4) AM_READ_PORT("DSW4")   //dipswitch bank3
+	AM_RANGE(0xc0, 0xdf) AM_WRITE(prot_w)       //load load protection-buffer from upper address bus
+	AM_RANGE(0xc3, 0xc3) AM_READNOP             //watchdog?
+	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)        //load math unit from buffer & lower address-bus
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wink_sound_map, AS_PROGRAM, 8, wink_state )
@@ -187,14 +187,14 @@ static INPUT_PORTS_START( wink )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(3) PORT_REVERSE
 
 	PORT_START("INPUTS1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	// right curve
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	// left curve
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )    // right curve
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    // left curve
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )	// slam
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )    // slam
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "1" )
@@ -301,7 +301,7 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },

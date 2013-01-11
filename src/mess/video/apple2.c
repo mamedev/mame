@@ -11,25 +11,25 @@
 /***************************************************************************/
 
 
-#define	BLACK	0
-#define DKRED	1
-#define	DKBLUE	2
-#define PURPLE	3
-#define DKGREEN	4
-#define DKGRAY	5
-#define	BLUE	6
-#define LTBLUE	7
-#define BROWN	8
-#define ORANGE	9
-#define	GRAY	10
-#define PINK	11
-#define GREEN	12
-#define YELLOW	13
-#define AQUA	14
-#define	WHITE	15
+#define BLACK   0
+#define DKRED   1
+#define DKBLUE  2
+#define PURPLE  3
+#define DKGREEN 4
+#define DKGRAY  5
+#define BLUE    6
+#define LTBLUE  7
+#define BROWN   8
+#define ORANGE  9
+#define GRAY    10
+#define PINK    11
+#define GREEN   12
+#define YELLOW  13
+#define AQUA    14
+#define WHITE   15
 
-#define ALWAYS_REFRESH			0
-#define PROFILER_VIDEOTOUCH		PROFILER_USER3
+#define ALWAYS_REFRESH          0
+#define PROFILER_VIDEOTOUCH     PROFILER_USER3
 
 /***************************************************************************
     HELPERS
@@ -115,36 +115,36 @@ INLINE void apple2_plot_text_character(running_machine &machine, bitmap_ind16 &b
 	chardata = &textgfx_data[(code * 8) % textgfx_datalen];
 
 	/* and finally, plot the character itself */
-    if (state->m_machinetype == SPACE84)
-    {
-        for (y = 0; y < 8; y++)
-        {
-            for (x = 0; x < 7; x++)
-            {
-                color = (chardata[y] & (1 << (6-x))) ? bg : fg;
+	if (state->m_machinetype == SPACE84)
+	{
+		for (y = 0; y < 8; y++)
+		{
+			for (x = 0; x < 7; x++)
+			{
+				color = (chardata[y] & (1 << (6-x))) ? bg : fg;
 
-                for (i = 0; i < xscale; i++)
-                {
-                    bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
-                }
-            }
-        }
-    }
-    else
-    {
-        for (y = 0; y < 8; y++)
-        {
-            for (x = 0; x < 7; x++)
-            {
-                color = (chardata[y] & (1 << x)) ? bg : fg;
+				for (i = 0; i < xscale; i++)
+				{
+					bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				}
+			}
+		}
+	}
+	else
+	{
+		for (y = 0; y < 8; y++)
+		{
+			for (x = 0; x < 7; x++)
+			{
+				color = (chardata[y] & (1 << x)) ? bg : fg;
 
-                for (i = 0; i < xscale; i++)
-                {
-                    bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
-                }
-            }
-        }
-    }
+				for (i = 0; i < xscale; i++)
+				{
+					bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				}
+			}
+		}
+	}
 }
 
 
@@ -257,15 +257,15 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 	if (endrow < beginrow)
 		return;
 
-    if (state->m_machinetype == TK2000)
-    {
-        vram		= state->m_a2_videoram + (page ? 0xa000 : 0x2000);
-    }
-    else
-    {
-        vram		= state->m_a2_videoram + (page ? 0x4000 : 0x2000);
-    }
-	columns		= ((effective_a2(state) & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
+	if (state->m_machinetype == TK2000)
+	{
+		vram        = state->m_a2_videoram + (page ? 0xa000 : 0x2000);
+	}
+	else
+	{
+		vram        = state->m_a2_videoram + (page ? 0x4000 : 0x2000);
+	}
+	columns     = ((effective_a2(state) & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
 
 	vram_row[0] = 0;
 	vram_row[columns + 1] = 0;
@@ -297,9 +297,9 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 
 		for (col = 0; col < columns; col++)
 		{
-			w =		(((UINT32) vram_row[col+0] & 0x7f) <<  0)
-				|	(((UINT32) vram_row[col+1] & 0x7f) <<  7)
-				|	(((UINT32) vram_row[col+2] & 0x7f) << 14);
+			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
+				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
+				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
 
 			switch(columns)
 			{
@@ -356,16 +356,16 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 
 	static const UINT8 hires_artifact_color_table[] =
 	{
-		BLACK,	PURPLE,	GREEN,	WHITE,
-		BLACK,	BLUE,	ORANGE,	WHITE
+		BLACK,  PURPLE, GREEN,  WHITE,
+		BLACK,  BLUE,   ORANGE, WHITE
 	};
 
 	static const UINT8 dhires_artifact_color_table[] =
 	{
-		BLACK,		DKGREEN,	BROWN,	GREEN,
-		DKRED,		DKGRAY,		ORANGE,	YELLOW,
-		DKBLUE,		BLUE,		GRAY,	AQUA,
-		PURPLE,		LTBLUE,		PINK,	WHITE
+		BLACK,      DKGREEN,    BROWN,  GREEN,
+		DKRED,      DKGRAY,     ORANGE, YELLOW,
+		DKBLUE,     BLUE,       GRAY,   AQUA,
+		PURPLE,     LTBLUE,     PINK,   WHITE
 	};
 
 	state->m_fgcolor = 15;
@@ -498,14 +498,14 @@ UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &b
 	if (effective_a2(this) & VAR_TEXT)
 	{
 		/* text screen - TK2000 uses HGR for text */
-        if (m_machinetype == TK2000)
-        {
-            apple2_hires_draw(machine(), bitmap, cliprect, page, 0, 191);
-        }
-        else
-        {
-            apple2_text_draw(machine(), bitmap, cliprect, page, 0, 191);
-        }
+		if (m_machinetype == TK2000)
+		{
+			apple2_hires_draw(machine(), bitmap, cliprect, page, 0, 191);
+		}
+		else
+		{
+			apple2_text_draw(machine(), bitmap, cliprect, page, 0, 191);
+		}
 	}
 	else if ((effective_a2(this) & VAR_HIRES) && (effective_a2(this) & VAR_MIXED))
 	{

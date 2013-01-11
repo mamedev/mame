@@ -20,7 +20,7 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-    virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const;
 
 	void irq_w(int state);
 	void drq_w(int state);
@@ -31,7 +31,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "x68k_cz6bs1"; }
+	virtual void device_config_complete() { m_shortname = "x68k_cz6bs1"; }
 private:
 	x68k_expansion_slot_device *m_slot;
 

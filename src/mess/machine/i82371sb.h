@@ -15,18 +15,18 @@
 // ======================> i82371sb_device
 
 class i82371sb_device :  public southbridge_device,
-						 public pci_device_interface
+							public pci_device_interface
 {
 public:
-    // construction/destruction
-    i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "i82371sb"; }
 

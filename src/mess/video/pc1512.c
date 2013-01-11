@@ -43,22 +43,22 @@ enum
 };
 
 
-#define MODE_ALPHA_80		0x01
-#define MODE_GRAPHICS		0x02
-#define MODE_PALETTE_2		0x04
-#define MODE_ENABLE_VIDEO	0x08
-#define MODE_GRAPHICS_2		0x10
-#define MODE_BLINK			0x20
+#define MODE_ALPHA_80       0x01
+#define MODE_GRAPHICS       0x02
+#define MODE_PALETTE_2      0x04
+#define MODE_ENABLE_VIDEO   0x08
+#define MODE_GRAPHICS_2     0x10
+#define MODE_BLINK          0x20
 
 
-#define COLOR_INTENSITY		0x10
-#define COLOR_PALETTE_1		0x20
+#define COLOR_INTENSITY     0x10
+#define COLOR_PALETTE_1     0x20
 
 
-#define VFP_HIRES			22
-#define HFP_HIRES			112
-#define VFP_LORES			22
-#define HFP_LORES			16
+#define VFP_HIRES           22
+#define HFP_HIRES           112
+#define VFP_LORES           22
+#define HFP_LORES           16
 
 
 
@@ -141,18 +141,18 @@ READ8_MEMBER( pc1512_state::vdu_r )
 	case 0xa: // VDU Status
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Toggle Bit
-            1       Light-pen latch select
-            2       Light-pen switch off
-            3       Frame Flyback Time
-            4
-            5
-            6
-            7
+		    0       Toggle Bit
+		    1       Light-pen latch select
+		    2       Light-pen switch off
+		    3       Frame Flyback Time
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		// toggle bit
 		data |= m_toggle;
@@ -197,18 +197,18 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 	case 8: // VDU Mode Control
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Select Alpha 80 Char mode (de-select 40 Char mode)
-            1       Select Graphics modes (de-select Alpha modes)
-            2       Select Palette 2 (de-select palettes 0,1)
-            3       Enable Video Display
-            4       Select Graphics Mode 2 (de-select graphics mode 1)
-            5       Enable Blinking Chars (disable intensified backgrounds)
-            6
-            7
+		    0       Select Alpha 80 Char mode (de-select 40 Char mode)
+		    1       Select Graphics modes (de-select Alpha modes)
+		    2       Select Palette 2 (de-select palettes 0,1)
+		    3       Enable Video Display
+		    4       Select Graphics Mode 2 (de-select graphics mode 1)
+		    5       Enable Blinking Chars (disable intensified backgrounds)
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("VDU Mode Control %02x\n", data);
 
@@ -251,18 +251,18 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 	case 9: // VDU Colour Select
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1
-            2
-            3
-            4
-            5
-            6
-            7
+		    0
+		    1
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("VDU Colour Select %02x\n", data);
 
@@ -289,18 +289,18 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 	case 0xd: // VDU Colour Plane Write
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Allow CPU write to Blue Plane
-            1       Allow CPU write to Green Plane
-            2       Allow CPU write to Red Plane
-            3       Allow CPU write to Intensity Plane
-            4
-            5
-            6
-            7
+		    0       Allow CPU write to Blue Plane
+		    1       Allow CPU write to Green Plane
+		    2       Allow CPU write to Red Plane
+		    3       Allow CPU write to Intensity Plane
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("VDU Colour Plane Write %01x\n", data & 0x0f);
 
@@ -313,18 +313,18 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 	case 0xe: // VDU Colour Plane Read
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Read Select bit 0 (RDSEL0)
-            1       Read Select bit 1 (RDSEL1)
-            2
-            3
-            4
-            5
-            6
-            7
+		    0       Read Select bit 0 (RDSEL0)
+		    1       Read Select bit 1 (RDSEL1)
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("VDU Colour Plane Read %u\n", data & 0x03);
 
@@ -337,18 +337,18 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 	case 0xf: // VDU Graphics Mode 2 Border
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Border Blue
-            1       Border Green
-            2       Border Red
-            3       Border Intensity
-            4
-            5
-            6
-            7
+		    0       Border Blue
+		    1       Border Green
+		    2       Border Red
+		    3       Border Intensity
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("VDU Graphics Mode 2 Border %u\n", data & 0x0f);
 

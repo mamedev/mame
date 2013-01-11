@@ -12,12 +12,12 @@
 #include "video/cgapal.h"
 
 
-#define CGA_MONITOR		(space.machine().root_device().ioport("VIDEO")->read() & 0x1C)
-#define CGA_MONITOR_RGB			0x00	/* Colour RGB */
-#define CGA_MONITOR_MONO		0x04	/* Greyscale RGB */
-#define CGA_MONITOR_COMPOSITE	0x08	/* Colour composite */
-#define CGA_MONITOR_TELEVISION	0x0C	/* Television */
-#define CGA_MONITOR_LCD			0x10	/* LCD, eg PPC512 */
+#define CGA_MONITOR     (space.machine().root_device().ioport("VIDEO")->read() & 0x1C)
+#define CGA_MONITOR_RGB         0x00    /* Colour RGB */
+#define CGA_MONITOR_MONO        0x04    /* Greyscale RGB */
+#define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
+#define CGA_MONITOR_TELEVISION  0x0C    /* Television */
+#define CGA_MONITOR_LCD         0x10    /* LCD, eg PPC512 */
 
 
 static VIDEO_START( pc_aga );
@@ -29,36 +29,36 @@ static VIDEO_START( pc200 );
 
 
 static const mc6845_interface mc6845_aga_intf = {
-	AGA_SCREEN_NAME,	/* screen number */
-	8,					/* numbers of pixels per video memory address */
-	NULL,				/* begin_update */
-	aga_update_row,		/* update_row */
-	NULL,				/* end_update */
-	DEVCB_NULL,			/* on_de_chaged */
-	DEVCB_NULL,			/* on_cur_chaged */
-	DEVCB_LINE(aga_hsync_changed),	/* on_hsync_changed */
-	DEVCB_LINE(aga_vsync_changed),	/* on_vsync_changed */
+	AGA_SCREEN_NAME,    /* screen number */
+	8,                  /* numbers of pixels per video memory address */
+	NULL,               /* begin_update */
+	aga_update_row,     /* update_row */
+	NULL,               /* end_update */
+	DEVCB_NULL,         /* on_de_chaged */
+	DEVCB_NULL,         /* on_cur_chaged */
+	DEVCB_LINE(aga_hsync_changed),  /* on_hsync_changed */
+	DEVCB_LINE(aga_vsync_changed),  /* on_vsync_changed */
 	NULL
 };
 
 
 static struct {
-	AGA_MODE	mode;
-	UINT8	mda_mode_control;
-	UINT8	mda_status;
-	UINT8	*mda_chr_gen;
+	AGA_MODE    mode;
+	UINT8   mda_mode_control;
+	UINT8   mda_status;
+	UINT8   *mda_chr_gen;
 
-	UINT8	cga_mode_control;
-	UINT8	cga_color_select;
-	UINT8	cga_status;
-	UINT8	*cga_chr_gen;
+	UINT8   cga_mode_control;
+	UINT8   cga_color_select;
+	UINT8   cga_status;
+	UINT8   *cga_chr_gen;
 
-	UINT8	pc_framecnt;
+	UINT8   pc_framecnt;
 
-	mc6845_update_row_func	update_row;
-	UINT8	cga_palette_lut_2bpp[4];
-	UINT8	vsync;
-	UINT8	hsync;
+	mc6845_update_row_func  update_row;
+	UINT8   cga_palette_lut_2bpp[4];
+	UINT8   vsync;
+	UINT8   hsync;
 
 	UINT8  *videoram;
 } aga;
@@ -123,8 +123,8 @@ static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
 static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *videoram = aga.videoram;
-	UINT32	*p = &bitmap.pix32(y);
-	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	UINT32  *p = &bitmap.pix32(y);
+	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) logerror("mda_text_inten_update_row\n");
@@ -183,8 +183,8 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 	UINT8 *videoram = aga.videoram;
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT32	*p = &bitmap.pix32(y);
-	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	UINT32  *p = &bitmap.pix32(y);
+	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) logerror("mda_text_blink_update_row\n");
@@ -303,7 +303,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *videoram = aga.videoram;
-	UINT32	*p = &bitmap.pix32(y);
+	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
 	for ( i = 0; i < x_count; i++ ) {
@@ -455,7 +455,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 	UINT8 *videoram = aga.videoram;
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32  *p = &bitmap.pix32(y);
-	UINT8	fg = aga.cga_color_select & 0x0F;
+	UINT8   fg = aga.cga_color_select & 0x0F;
 	int i;
 
 	if ( y == 0 ) logerror("cga_gfx_1bpp_update_row\n");
@@ -764,7 +764,7 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 	}
 }
 
- READ8_HANDLER( pc_aga_videoram_r )
+	READ8_HANDLER( pc_aga_videoram_r )
 {
 	UINT8 *videoram = aga.videoram;
 	switch (aga.mode) {

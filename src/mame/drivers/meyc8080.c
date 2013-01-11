@@ -110,7 +110,7 @@ UINT32 meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb3
 		UINT8 data2 = m_videoram_2[offs];
 
 		/* weird equations, but it matches every flyer screenshot -
-           perhaphs they used a look-up PROM? */
+		   perhaphs they used a look-up PROM? */
 		UINT8 data_r = data0;
 		UINT8 data_g = (data2 & ~data0) | (data2 & data1) | (~data2 & ~data1 & data0);
 		UINT8 data_b = data0 ^ data1;
@@ -174,11 +174,11 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
   xxxx ----   Seems unused...
 
 */
-	output_set_lamp_value(0, (data) & 1);		/* Lamp 0 */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* Lamp 1 */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* Lamp 2 */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* Lamp 3 */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* Lamp 4 */
+	output_set_lamp_value(0, (data) & 1);       /* Lamp 0 */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
 
 	logerror("lights 1: %02x\n", data);
 }
@@ -221,13 +221,13 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
   xxx- ----   Unknown.
 
 */
-	output_set_lamp_value(5, (data) & 1);		/* Lamp 5 */
-	output_set_lamp_value(6, (data >> 1) & 1);	/* Lamp 6 */
-	output_set_lamp_value(7, (data >> 2) & 1);	/* Lamp 7 */
-	output_set_lamp_value(8, (data >> 3) & 1);	/* Lamp 8 */
-	output_set_lamp_value(9, (data >> 4) & 1);	/* Lamp 9 */
+	output_set_lamp_value(5, (data) & 1);       /* Lamp 5 */
+	output_set_lamp_value(6, (data >> 1) & 1);  /* Lamp 6 */
+	output_set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 */
+	output_set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 */
+	output_set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 */
 
-	output_set_lamp_value(10, (data >> 5) & 1);	/* Lamp 10 (Game-Over) */
+	output_set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 (Game-Over) */
 
 	logerror("lights 2: %02x\n", data);
 }
@@ -246,12 +246,12 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
   xxxx ----   Seems unused...
 
 */
-	coin_counter_w(machine(), 0, ~data & 0x01);	/* Coin1 */
-	coin_counter_w(machine(), 1, ~data & 0x04);	/* Bets */
-	coin_counter_w(machine(), 2, ~data & 0x02);	/* Payout */
+	coin_counter_w(machine(), 0, ~data & 0x01); /* Coin1 */
+	coin_counter_w(machine(), 1, ~data & 0x04); /* Bets */
+	coin_counter_w(machine(), 2, ~data & 0x02); /* Payout */
 
 	/* Only Draw Poker (2-11) (mdrawpkra) */
-	coin_counter_w(machine(), 3, ~data & 0x08);	/* Manual Keyout */
+	coin_counter_w(machine(), 3, ~data & 0x08); /* Manual Keyout */
 
 	logerror("counters: %02x\n", ~data);
 }
@@ -343,25 +343,25 @@ static INPUT_PORTS_START( wldarrow )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )      PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )      PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )      PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )      PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("BSW:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )      PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )      PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
@@ -402,32 +402,32 @@ static INPUT_PORTS_START( mdrawpkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )      PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )      PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )      PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )      PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )		PORT_DIPLOCATION("BSW:5") // no coinage sw
+	PORT_DIPNAME( 0x10, 0x00, "Bit Switch 5" )      PORT_DIPLOCATION("BSW:5") // no coinage sw
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )      PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )      PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )		PORT_CODE(KEYCODE_S) PORT_NAME("Stand (Hold All)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )      PORT_CODE(KEYCODE_S) PORT_NAME("Stand (Hold All)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -461,32 +461,32 @@ static INPUT_PORTS_START( mdrawpkra )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )      PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )      PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )      PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )      PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("BSW:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )      PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )      PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )		PORT_CODE(KEYCODE_S) PORT_NAME("Stand (Hold All)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )      PORT_CODE(KEYCODE_S) PORT_NAME("Stand (Hold All)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -520,25 +520,25 @@ static INPUT_PORTS_START( casbjack )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BSW")
-	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )		PORT_DIPLOCATION("BSW:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bit Switch 1" )      PORT_DIPLOCATION("BSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )		PORT_DIPLOCATION("BSW:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bit Switch 2" )      PORT_DIPLOCATION("BSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )		PORT_DIPLOCATION("BSW:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )      PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )		PORT_DIPLOCATION("BSW:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bit Switch 4" )      PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("BSW:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )		PORT_DIPLOCATION("BSW:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )      PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )		PORT_DIPLOCATION("BSW:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )      PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )

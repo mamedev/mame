@@ -47,8 +47,8 @@
 //**************************************************************************
 
 // ensure that all memory allocated is aligned to an 8-byte boundary
-#define ALIGN_PTR_UP(p)			((void *)(((FPTR)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
-#define ALIGN_PTR_DOWN(p)		((void *)((FPTR)(p) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_UP(p)         ((void *)(((FPTR)(p) + (CACHE_ALIGNMENT - 1)) & ~(CACHE_ALIGNMENT - 1)))
+#define ALIGN_PTR_DOWN(p)       ((void *)((FPTR)(p) & ~(CACHE_ALIGNMENT - 1)))
 
 
 
@@ -62,12 +62,12 @@
 
 drc_cache::drc_cache(size_t bytes)
 	: m_near((drccodeptr)osd_alloc_executable(bytes)),
-	  m_neartop(m_near),
-	  m_base(m_near + NEAR_CACHE_SIZE),
-	  m_top(m_base),
-	  m_end(m_near + bytes),
-	  m_codegen(0),
-	  m_size(bytes)
+		m_neartop(m_near),
+		m_base(m_near + NEAR_CACHE_SIZE),
+		m_top(m_base),
+		m_end(m_near + bytes),
+		m_codegen(0),
+		m_size(bytes)
 {
 	memset(m_free, 0, sizeof(m_free));
 	memset(m_nearfree, 0, sizeof(m_nearfree));

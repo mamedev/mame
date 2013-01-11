@@ -90,7 +90,7 @@ machine_config_constructor isa8_finalchs_device::device_mconfig_additions() cons
 //-------------------------------------------------
 
 isa8_finalchs_device::isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, ISA8_FINALCHS, "Final Chess Card", tag, owner, clock),
+		: device_t(mconfig, ISA8_FINALCHS, "Final Chess Card", tag, owner, clock),
 		device_isa8_card_interface( mconfig, *this )
 {
 	m_shortname = "finalchs";

@@ -286,14 +286,14 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "includes/snk6502.h"
 
 
-#define MASTER_CLOCK	XTAL_11_289MHz
+#define MASTER_CLOCK    XTAL_11_289MHz
 
 /* Change to 1 to allow fake debug buttons */
-#define NIBBLER_HACK	0
+#define NIBBLER_HACK    0
 
 
 #ifndef M_LN2
-#define M_LN2		0.69314718055994530942
+#define M_LN2       0.69314718055994530942
 #endif
 
 
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4000, 0x8fff) AM_ROM
 	AM_RANGE(0xb000, 0xb001) AM_WRITE_LEGACY(sasuke_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)	/* flip screen & irq enable */
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
 	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4000, 0x97ff) AM_ROM
 	AM_RANGE(0xb000, 0xb001) AM_WRITE_LEGACY(satansat_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)	/* flip screen & irq enable */
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
 	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
@@ -389,9 +389,9 @@ static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x3107, 0x3107) AM_READ_PORT("IN2")
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(snk6502_scrollx_w)
 	AM_RANGE(0x3300, 0x3300) AM_WRITE(snk6502_scrolly_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(vanguard_speech_w)	// speech
+	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(vanguard_speech_w) // speech
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
+	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x2107, 0x2107) AM_READ_PORT("IN2")
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(snk6502_scrollx_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITE(snk6502_scrolly_w)
-	AM_RANGE(0x2400, 0x2400) AM_WRITE_LEGACY(fantasy_speech_w)	// speech
+	AM_RANGE(0x2400, 0x2400) AM_WRITE_LEGACY(fantasy_speech_w)  // speech
 	AM_RANGE(0x3000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -615,7 +615,7 @@ static INPUT_PORTS_START( nibbler )
 	PORT_INCLUDE(snk6502_generic_joy8way)
 
 	/* There are no buttons on a real "Nibbler" cabinet, but I guess that the game was tested
-       with a "Vanguard" cabinet so they have been mapped with debug features. */
+	   with a "Vanguard" cabinet so they have been mapped with debug features. */
 #if NIBBLER_HACK
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 0") PORT_CODE(KEYCODE_Z) // slow down
@@ -685,7 +685,7 @@ INPUT_PORTS_END
 static const gfx_layout swapcharlayout =
 {
 	8,8,    /* 8*8 characters */
-	256,	/* 256 characters */
+	256,    /* 256 characters */
 	2,      /* 2 bits per pixel */
 	{ 256*8*8, 0 }, /* the two bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -707,7 +707,7 @@ static const gfx_layout charlayout =
 static const gfx_layout charlayout_memory =
 {
 	8,8,    /* 8*8 characters */
-	256,	/* 256 characters */
+	256,    /* 256 characters */
 	2,      /* 2 bits per pixel */
 	{ 0, 256*8*8 }, /* the two bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -717,17 +717,17 @@ static const gfx_layout charlayout_memory =
 
 
 static GFXDECODE_START( sasuke )
-	GFXDECODE_ENTRY( NULL,           0x1000, swapcharlayout,      0, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( satansat )
-	GFXDECODE_ENTRY( NULL,           0x1000, charlayout_memory,   0, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( vanguard )
-	GFXDECODE_ENTRY( NULL,           0x1000, charlayout_memory,   0, 8 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
 
@@ -742,12 +742,12 @@ INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
 {
 
 	if(m_irq_mask)
-		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
 INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
 {
-	device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+	device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
 
@@ -759,16 +759,16 @@ INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -892,7 +892,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 
 	// basic machine hardware
 	//MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
-	MCFG_CPU_ADD("maincpu", M6502, 930000)		// adjusted
+	MCFG_CPU_ADD("maincpu", M6502, 930000)      // adjusted
 	MCFG_CPU_PROGRAM_MAP(vanguard_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
@@ -1089,7 +1089,7 @@ ROM_START( vanguard )
 	ROM_LOAD( "sk4_ic09.bin", 0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
 	ROM_LOAD( "sk4_ic10.bin", 0x7000, 0x1000, CRC(54603274) SHA1(31571a560dbe300417b3ed5b114fa1d9ef742da9) )
 	ROM_LOAD( "sk4_ic13.bin", 0x8000, 0x1000, CRC(fde157d0) SHA1(3f705fb6a410004f4f86283694e3694e49701af6) )
-	ROM_RELOAD(               0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(               0xf000, 0x1000 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "sk4_ic14.bin", 0x9000, 0x1000, CRC(0d5b47d0) SHA1(922621c23f33fe756cb6baa12e5465c4e64f2dda) )
 	ROM_LOAD( "sk4_ic15.bin", 0xa000, 0x1000, CRC(8549b8f8) SHA1(375bc6f7e15564d5cf7e00c44e2651793c56d6ca) )
 	ROM_LOAD( "sk4_ic16.bin", 0xb000, 0x1000, CRC(062e0be2) SHA1(45aaf315a62f37460e32d3ba99caaacf4c994810) )
@@ -1102,11 +1102,11 @@ ROM_START( vanguard )
 	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) /* foreground colors */
 	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) /* background colors */
 
-	ROM_REGION( 0x1000, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )  /* sound ROM 1 */
 	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* sound ROM 2 */
 
-	ROM_REGION( 0x5800, "speech", 0 )	/* space for the speech ROMs (not supported) */
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
 	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
 	ROM_LOAD( "sk6_ic07.bin", 0x4000, 0x0800, CRC(2b7cbae9) SHA1(3d44a0232d7c94d8170cc06e90cc30bd57c99202) )
 	ROM_LOAD( "sk6_ic08.bin", 0x4800, 0x0800, CRC(3b7e9d7c) SHA1(d9033188068b2aaa1502c89cf09f955eded8fa7a) )
@@ -1120,7 +1120,7 @@ ROM_START( vanguardc )
 	ROM_LOAD( "sk4_ic09.bin", 0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
 	ROM_LOAD( "4",            0x7000, 0x1000, CRC(770f9714) SHA1(4af37fc24e464681a8da6b184be0df32a4078f4f) )
 	ROM_LOAD( "5",            0x8000, 0x1000, CRC(3445cba6) SHA1(6afe6dad79b53df58b53ef9c5d24bb4d91fa5e8e) )
-	ROM_RELOAD(               0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(               0xf000, 0x1000 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "sk4_ic14.bin", 0x9000, 0x1000, CRC(0d5b47d0) SHA1(922621c23f33fe756cb6baa12e5465c4e64f2dda) )
 	ROM_LOAD( "sk4_ic15.bin", 0xa000, 0x1000, CRC(8549b8f8) SHA1(375bc6f7e15564d5cf7e00c44e2651793c56d6ca) )
 	ROM_LOAD( "8",            0xb000, 0x1000, CRC(4b825bc8) SHA1(3fa32d9677e2cc3a1ebf52c0b9eed7dbf11201e9) )
@@ -1133,11 +1133,11 @@ ROM_START( vanguardc )
 	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) /* foreground colors */
 	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) /* background colors */
 
-	ROM_REGION( 0x1000, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )  /* confirmed, 6/21/05 */
 	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* confirmed, 6/21/05 */
 
-	ROM_REGION( 0x5800, "speech", 0 )	/* space for the speech ROMs (not supported) */
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
 	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
 	ROM_LOAD( "sk6_ic07.bin", 0x4000, 0x0800, CRC(2b7cbae9) SHA1(3d44a0232d7c94d8170cc06e90cc30bd57c99202) )
 	ROM_LOAD( "sk6_ic08.bin", 0x4800, 0x0800, CRC(3b7e9d7c) SHA1(d9033188068b2aaa1502c89cf09f955eded8fa7a) )
@@ -1151,7 +1151,7 @@ ROM_START( vanguardj )
 	ROM_LOAD( "sk4_ic09.bin", 0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
 	ROM_LOAD( "vgj4ic10.bin", 0x7000, 0x1000, CRC(0a91a5d1) SHA1(bef435e431e31179eb22a4c18ca1dedf6a4a0ab0) )
 	ROM_LOAD( "vgj5ic13.bin", 0x8000, 0x1000, CRC(06601a40) SHA1(d1efcf75edf3892fe59d63e524f4880ffce67965) )
-	ROM_RELOAD(               0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(               0xf000, 0x1000 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "sk4_ic14.bin", 0x9000, 0x1000, CRC(0d5b47d0) SHA1(922621c23f33fe756cb6baa12e5465c4e64f2dda) )
 	ROM_LOAD( "sk4_ic15.bin", 0xa000, 0x1000, CRC(8549b8f8) SHA1(375bc6f7e15564d5cf7e00c44e2651793c56d6ca) )
 	ROM_LOAD( "sk4_ic16.bin", 0xb000, 0x1000, CRC(062e0be2) SHA1(45aaf315a62f37460e32d3ba99caaacf4c994810) )
@@ -1164,11 +1164,11 @@ ROM_START( vanguardj )
 	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) /* foreground colors */
 	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) /* background colors */
 
-	ROM_REGION( 0x1000, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )  /* sound ROM 1 */
 	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* sound ROM 2 */
 
-	ROM_REGION( 0x5800, "speech", 0 )	/* space for the speech ROMs (not supported) */
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
 	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
 	ROM_LOAD( "sk6_ic07.bin", 0x4000, 0x0800, CRC(2b7cbae9) SHA1(3d44a0232d7c94d8170cc06e90cc30bd57c99202) )
 	ROM_LOAD( "sk6_ic08.bin", 0x4800, 0x0800, CRC(3b7e9d7c) SHA1(d9033188068b2aaa1502c89cf09f955eded8fa7a) )
@@ -1183,7 +1183,7 @@ ROM_START( fantasyu )
 	ROM_LOAD( "ic09.cpu",     0x6000, 0x1000, CRC(6ac1dbfc) SHA1(b9c7bf8d3b085db0b53646b5639c09f9ced2b1fe) )
 	ROM_LOAD( "ic10.cpu",     0x7000, 0x1000, CRC(c796a406) SHA1(1b7f5f307a81b481a3e7791128a01d4c1a20c4bf) )
 	ROM_LOAD( "ic14.cpu",     0x8000, 0x1000, CRC(6f1f0698) SHA1(05bd114dcd08c990d897518a8ea7965bc82279bf) )
-	ROM_RELOAD(               0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(               0xf000, 0x1000 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "ic15.cpu",     0x9000, 0x1000, CRC(5534d57e) SHA1(e564a3325766423b47de18d6adb61760cbbf88be) )
 	ROM_LOAD( "ic16.cpu",     0xa000, 0x1000, CRC(6c2aeb6e) SHA1(fd0b913a663bf2a5f45fc3d342d7575a9c7dae46) )
 	ROM_LOAD( "ic17.cpu",     0xb000, 0x1000, CRC(f6aa5de1) SHA1(ca53cf66cc6cdb21a60760102f35a5b0745ce09b) )
@@ -1196,12 +1196,12 @@ ROM_START( fantasyu )
 	ROM_LOAD( "fantasy.ic7",  0x0000, 0x0020, CRC(361a5e99) SHA1(b9777ce658549c03971bd476482d5cc0be27d3a9) ) /* foreground colors */
 	ROM_LOAD( "fantasy.ic6",  0x0020, 0x0020, CRC(33d974f7) SHA1(a6f6a531dec3f454b477bfdda8e213e9cad42748) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
 	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
 	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
 
-	ROM_REGION( 0x5800, "speech", 0 )	/* space for the speech ROMs (not supported) */
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
 	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
 	ROM_LOAD( "fs_d_7.bin",   0x4000, 0x0800, CRC(a7ef4cc6) SHA1(8df71cb18fcfe9a2f592f83bc01cf2314ae30e32) )
 	ROM_LOAD( "fs_e_8.bin",   0x4800, 0x0800, CRC(19b8fb3e) SHA1(271c76f68866c28bc6755238a71970d5f7c81ecb) )
@@ -1216,7 +1216,7 @@ ROM_START( fantasy )
 	ROM_LOAD( "3.9",          0x6000, 0x1000, CRC(6fbffeb6) SHA1(b36aeaf095da4957103c8921957ff4be658eddf5) )
 	ROM_LOAD( "4.10",         0x7000, 0x1000, CRC(02e85884) SHA1(71fa6eb375fc417f92c049ec5118818b9ad48468) )
 	ROM_LOAD( "ic14.cpu",     0x8000, 0x1000, CRC(6f1f0698) SHA1(05bd114dcd08c990d897518a8ea7965bc82279bf) )
-	ROM_RELOAD(               0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(               0xf000, 0x1000 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "ic15.cpu",     0x9000, 0x1000, CRC(5534d57e) SHA1(e564a3325766423b47de18d6adb61760cbbf88be) )
 	ROM_LOAD( "8.16",         0xa000, 0x1000, CRC(371129fe) SHA1(c21759222aebcc9ea1292e367a41ac43a4dd3554) )
 	ROM_LOAD( "9.17",         0xb000, 0x1000, CRC(56a7c8b8) SHA1(6c417644851c7b4b5291d9c5b2c808ff4a1ad048) )
@@ -1229,12 +1229,12 @@ ROM_START( fantasy )
 	ROM_LOAD( "fantasy.ic7",  0x0000, 0x0020, CRC(361a5e99) SHA1(b9777ce658549c03971bd476482d5cc0be27d3a9) ) /* foreground colors */
 	ROM_LOAD( "fantasy.ic6",  0x0020, 0x0020, CRC(33d974f7) SHA1(a6f6a531dec3f454b477bfdda8e213e9cad42748) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
 	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
 	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
 
-	ROM_REGION( 0x5800, "speech", 0 )	/* space for the speech ROMs (not supported) */
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
 	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
 	ROM_LOAD( "fs_d_7.bin",   0x4000, 0x0800, CRC(a7ef4cc6) SHA1(8df71cb18fcfe9a2f592f83bc01cf2314ae30e32) )
 	ROM_LOAD( "fs_e_8.bin",   0x4800, 0x0800, CRC(19b8fb3e) SHA1(271c76f68866c28bc6755238a71970d5f7c81ecb) )
@@ -1249,7 +1249,7 @@ ROM_START( fantasyj )
 	ROM_LOAD( "fs3jic9.bin",  0x6000, 0x1000, CRC(36a12617) SHA1(dd74abb4cbaeb1a56ee466043997187ebe933612) )
 	ROM_LOAD( "fs4jic10.bin", 0x7000, 0x1000, CRC(dbf7c347) SHA1(1bb3f924a7e1ec74ef68e237a0f68d62ce78532c) )
 	ROM_LOAD( "fs6jic14.bin", 0x8000, 0x1000, CRC(bf59a33a) SHA1(bdbdd03199758069b904fdf0455193682c4d457f) )
-	ROM_RELOAD(               0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(               0xf000, 0x1000 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "fs7jic15.bin", 0x9000, 0x1000, CRC(cc18428e) SHA1(c7c0a031434cf9ce3c450b0c5dc2b154b08d19cf) )
 	ROM_LOAD( "fs8jic16.bin", 0xa000, 0x1000, CRC(ae5bf727) SHA1(3c5eaaba3971f57a5687945a614dd0d6c9e007d6) )
 	ROM_LOAD( "fs9jic17.bin", 0xb000, 0x1000, CRC(fa6903e2) SHA1(a5b9b7309ecaaeaba76e45610d5ab80415ecbdd0) )
@@ -1262,12 +1262,12 @@ ROM_START( fantasyj )
 	ROM_LOAD( "prom-8.bpr",   0x0000, 0x0020, CRC(1aa9285a) SHA1(d503aa76ca0cf032c7b1c962abc59677c41a2c62) ) /* foreground colors */
 	ROM_LOAD( "prom-7.bpr",   0x0020, 0x0020, CRC(7a6f7dc3) SHA1(e15d898275d1cd205cc2d28f7dd9df653594039e) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "fs_b_51.bin",  0x0000, 0x0800, CRC(48094ec5) SHA1(7d6118133bc1eb8ebc5d8a95d10ef842daffef89) )
 	ROM_LOAD( "fs_a_52.bin",  0x0800, 0x0800, CRC(1d0316e8) SHA1(6a3ab289b5fefef8663514bd1d5817c70fe58882) )
 	ROM_LOAD( "fs_c_53.bin",  0x1000, 0x0800, CRC(49fd4ae8) SHA1(96ff1267c0ffab1e8a0769fa869516e2546ab640) )
 
-	ROM_REGION( 0x5800, "speech", 0 )	/* space for the speech ROMs (not supported) */
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
 	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
 	ROM_LOAD( "fs_d_7.bin",   0x4000, 0x0800, CRC(a7ef4cc6) SHA1(8df71cb18fcfe9a2f592f83bc01cf2314ae30e32) )
 	ROM_LOAD( "fs_e_8.bin",   0x4800, 0x0800, CRC(19b8fb3e) SHA1(271c76f68866c28bc6755238a71970d5f7c81ecb) )
@@ -1293,7 +1293,7 @@ ROM_START( pballoon )
 	ROM_LOAD( "sk8_ic7.bin",  0x0000, 0x0020, CRC(ef6c82a0) SHA1(95b522d6389f25bf5fa2fca5f3f826ef43b2885b) ) /* foreground colors */
 	ROM_LOAD( "sk8_ic6.bin",  0x0020, 0x0020, CRC(eabc6a00) SHA1(942af5e22e49e578c6a24651476e3b60d40e2076) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
 	ROM_LOAD( "sk7_ic52.bin", 0x0800, 0x0800, CRC(5d6d68ea) SHA1(d3e03720eff5c85c1c2fb1d4bf960f45a99dc86a) )
 	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
@@ -1318,7 +1318,7 @@ ROM_START( pballoonr )
 	ROM_LOAD( "sk8_ic7.bin",  0x0000, 0x0020, CRC(ef6c82a0) SHA1(95b522d6389f25bf5fa2fca5f3f826ef43b2885b) ) /* foreground colors */
 	ROM_LOAD( "sk8_ic6.bin",  0x0020, 0x0020, CRC(eabc6a00) SHA1(942af5e22e49e578c6a24651476e3b60d40e2076) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
 	ROM_LOAD( "sk7_ic52.bin", 0x0800, 0x0800, CRC(5d6d68ea) SHA1(d3e03720eff5c85c1c2fb1d4bf960f45a99dc86a) )
 	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
@@ -1332,7 +1332,7 @@ ROM_START( nibbler ) /* revision 9 - rom labels match manual part numbers/locati
 	ROM_LOAD( "g-0960-50.ic9",  0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) )
 	ROM_LOAD( "g-0960-51.ic10", 0x7000, 0x1000, CRC(a6b5abe5) SHA1(a0f228dac801a54dfa1947d6b2f6b4e3d005e0b2) )
 	ROM_LOAD( "g-0960-53.ic14", 0x8000, 0x1000, CRC(9f537185) SHA1(619df63f4df38014dc229f614043f867e6a5aa51) )
-	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
 	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
 	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
 	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
@@ -1345,7 +1345,7 @@ ROM_START( nibbler ) /* revision 9 - rom labels match manual part numbers/locati
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )  /* sound ROMs */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1358,7 +1358,7 @@ ROM_START( nibbler8 ) /* revision 8 */
 	ROM_LOAD( "g-0960-50.ic9",  0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) ) // 50-142.009
 	ROM_LOAD( "g-0960-51.ic10", 0x7000, 0x1000, CRC(a6b5abe5) SHA1(a0f228dac801a54dfa1947d6b2f6b4e3d005e0b2) ) // 50-143.010
 	ROM_LOAD( "50-145.014",     0x8000, 0x1000, CRC(29ea246a) SHA1(bf1afbddbea5ab7e93e5ac69c6445749dd65ed3b) )
-	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
 	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) ) // 50-146.015
 	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) ) // 50-147.016
 	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) ) // 50-148.017
@@ -1371,7 +1371,7 @@ ROM_START( nibbler8 ) /* revision 8 */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )  /* sound ROMs */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1384,7 +1384,7 @@ ROM_START( nibbler6 ) /* revision 6 */
 	ROM_LOAD( "ic9",            0x6000, 0x1000, CRC(91a4f98d) SHA1(678c7e8c91a7fdba8dc2faff4192eb0964abdb3f) )
 	ROM_LOAD( "ic10",           0x7000, 0x1000, CRC(a151d934) SHA1(6681bdcd84cf62b40b2430ff530cb3c9aa36656c) )
 	ROM_LOAD( "ic14",           0x8000, 0x1000, CRC(063f05cc) SHA1(039ac1b007cb817ae0902484ca611ae7076930d6) )
-	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
 	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
 	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
 	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
@@ -1397,7 +1397,7 @@ ROM_START( nibbler6 ) /* revision 6 */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )  /* sound ROMs */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1410,7 +1410,7 @@ ROM_START( nibblerp ) /* revision 6 + extra soundrom */
 	ROM_LOAD( "ic9",            0x6000, 0x1000, CRC(91a4f98d) SHA1(678c7e8c91a7fdba8dc2faff4192eb0964abdb3f) )
 	ROM_LOAD( "ic10",           0x7000, 0x1000, CRC(a151d934) SHA1(6681bdcd84cf62b40b2430ff530cb3c9aa36656c) )
 	ROM_LOAD( "ic14",           0x8000, 0x1000, CRC(063f05cc) SHA1(039ac1b007cb817ae0902484ca611ae7076930d6) )
-	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
 	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
 	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
 	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
@@ -1423,7 +1423,7 @@ ROM_START( nibblerp ) /* revision 6 + extra soundrom */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )  /* sound ROMs */
 	ROM_LOAD( "sk7_ic51.bin",   0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
@@ -1437,7 +1437,7 @@ ROM_START( nibblero ) /* revision 8 */
 	ROM_LOAD( "nibblero.ic9",   0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) ) // ic9
 	ROM_LOAD( "nibblero.ic10",  0x7000, 0x1000, CRC(a6b5abe5) SHA1(a0f228dac801a54dfa1947d6b2f6b4e3d005e0b2) ) // ic10
 	ROM_LOAD( "50-145.014",     0x8000, 0x1000, CRC(29ea246a) SHA1(bf1afbddbea5ab7e93e5ac69c6445749dd65ed3b) )
-	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
 	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
 	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
 	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
@@ -1450,7 +1450,7 @@ ROM_START( nibblero ) /* revision 8 */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )  /* sound ROMs */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END

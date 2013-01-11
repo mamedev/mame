@@ -37,7 +37,7 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, rweights, 470, 0,
 			2, resistances, gweights, 470, 0,
 			2, resistances, bweights, 470, 0);
@@ -179,10 +179,10 @@ WRITE8_MEMBER(ladybug_state::sraider_io_w)
 	redclash_set_stars_enable(machine(), (data & 0x08) >> 3);
 
 	/*
-     * There must be a subtle clocking difference between
-     * Space Raider and the other games using this star generator,
-     * hence the -1 here
-     */
+	 * There must be a subtle clocking difference between
+	 * Space Raider and the other games using this star generator,
+	 * hence the -1 here
+	 */
 
 	redclash_set_stars_speed(machine(), (data & 0x07) - 1);
 }
@@ -259,14 +259,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			if (spriteram[offs + i] & 0x80)
 			{
-				if (spriteram[offs + i] & 0x40)	/* 16x16 */
+				if (spriteram[offs + i] & 0x40) /* 16x16 */
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
 							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),0);
-				else	/* 8x8 */
+				else    /* 8x8 */
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
@@ -339,8 +339,8 @@ UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 
 
 	// draw the gridlines
 	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(m_grid_color & 0x40 ? 0xff : 0,
-		            														 m_grid_color & 0x20 ? 0xff : 0,
-		            														 m_grid_color & 0x10 ? 0xff : 0));
+																				m_grid_color & 0x20 ? 0xff : 0,
+																				m_grid_color & 0x10 ? 0xff : 0));
 	m_grid_tilemap->draw(bitmap, cliprect, 0, flip_screen());
 
 	for (i = 0; i < 0x100; i++)

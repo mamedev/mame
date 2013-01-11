@@ -35,7 +35,7 @@
 
 // ======================> wdxt_gen_device
 
-class wdxt_gen_device :	public device_t,
+class wdxt_gen_device : public device_t,
 						public device_isa8_card_interface
 {
 public:

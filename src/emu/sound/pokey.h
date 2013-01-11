@@ -124,10 +124,10 @@ struct pokey_interface
 // ======================> pokey_device
 
 class pokey_device : public device_t,
-					  public device_sound_interface,
-					  public device_execute_interface,
-					  public device_state_interface,
-					  public pokey_interface
+						public device_sound_interface,
+						public device_execute_interface,
+						public device_state_interface,
+						public pokey_interface
 {
 public:
 
@@ -179,10 +179,10 @@ public:
 
 	enum /* sync-operations */
 	{
-		SYNC_NOOP		= 11,
-		SYNC_SET_IRQST	= 12,
-		SYNC_POT		= 13,
-		SYNC_WRITE		= 14
+		SYNC_NOOP       = 11,
+		SYNC_SET_IRQST  = 12,
+		SYNC_POT        = 13,
+		SYNC_WRITE      = 14
 	};
 
 	enum output_type
@@ -233,52 +233,52 @@ protected:
 
 	//virtual UINT32 execute_min_cycles() const { return 114; }
 	// other internal states
-    int m_icount;
+	int m_icount;
 
 private:
 
 
-    class pokey_channel
-    {
-    public:
-    	pokey_channel();
-    	pokey_device *m_parent;
-    	UINT8 m_INTMask;
-    	UINT8 m_AUDF;           /* AUDFx (D200, D202, D204, D206) */
-    	UINT8 m_AUDC;			/* AUDCx (D201, D203, D205, D207) */
-    	INT32 m_borrow_cnt;		/* borrow counter */
-    	INT32 m_counter;		/* channel counter */
-    	UINT8 m_output;			/* channel output signal (1 active, 0 inactive) */
-    	UINT8 m_filter_sample;  /* high-pass filter sample */
-    	UINT8 m_div2;			/* division by 2 */
+	class pokey_channel
+	{
+	public:
+		pokey_channel();
+		pokey_device *m_parent;
+		UINT8 m_INTMask;
+		UINT8 m_AUDF;           /* AUDFx (D200, D202, D204, D206) */
+		UINT8 m_AUDC;           /* AUDCx (D201, D203, D205, D207) */
+		INT32 m_borrow_cnt;     /* borrow counter */
+		INT32 m_counter;        /* channel counter */
+		UINT8 m_output;         /* channel output signal (1 active, 0 inactive) */
+		UINT8 m_filter_sample;  /* high-pass filter sample */
+		UINT8 m_div2;           /* division by 2 */
 
-    	inline void sample(void)			{ m_filter_sample = m_output; }
-    	inline void reset_channel(void)		{ m_counter = m_AUDF ^ 0xff; }
+		inline void sample(void)            { m_filter_sample = m_output; }
+		inline void reset_channel(void)     { m_counter = m_AUDF ^ 0xff; }
 
-    	inline void inc_chan()
-    	{
-    		m_counter = (m_counter + 1) & 0xff;
-    		if (m_counter == 0 && m_borrow_cnt == 0)
-    		{
-    			m_borrow_cnt = 3;
-    			if (m_parent->m_IRQEN & m_INTMask)
-    			{
-    				/* Exposed state has changed: This should only be updated after a resync ... */
-    				m_parent->synchronize(SYNC_SET_IRQST, m_INTMask);
-    			}
-    		}
-    	}
+		inline void inc_chan()
+		{
+			m_counter = (m_counter + 1) & 0xff;
+			if (m_counter == 0 && m_borrow_cnt == 0)
+			{
+				m_borrow_cnt = 3;
+				if (m_parent->m_IRQEN & m_INTMask)
+				{
+					/* Exposed state has changed: This should only be updated after a resync ... */
+					m_parent->synchronize(SYNC_SET_IRQST, m_INTMask);
+				}
+			}
+		}
 
-    	inline int check_borrow()
-    	{
-    		if (m_borrow_cnt > 0)
-    		{
-    			m_borrow_cnt--;
-    			return (m_borrow_cnt == 0);
-    		}
-    		return 0;
-    	}
-    };
+		inline int check_borrow()
+		{
+			if (m_borrow_cnt > 0)
+			{
+				m_borrow_cnt--;
+				return (m_borrow_cnt == 0);
+			}
+			return 0;
+		}
+	};
 
 	static const int POKEY_CHANNELS = 4;
 
@@ -302,10 +302,10 @@ private:
 
 	pokey_channel m_channel[POKEY_CHANNELS];
 
-	UINT32 m_output;		/* raw output */
-	double m_out_filter;	/* filtered output */
+	UINT32 m_output;        /* raw output */
+	double m_out_filter;    /* filtered output */
 
-	INT32 m_clock_cnt[3];		/* clock counters */
+	INT32 m_clock_cnt[3];       /* clock counters */
 	UINT32 m_p4;              /* poly4 index */
 	UINT32 m_p5;              /* poly5 index */
 	UINT32 m_p9;              /* poly9 index */
@@ -316,16 +316,16 @@ private:
 	devcb_resolved_read8 m_serin_r;
 	devcb_resolved_write8 m_serout_w;
 
-	UINT8 m_POTx[8];		/* POTx   (R/D200-D207) */
-	UINT8 m_AUDCTL;			/* AUDCTL (W/D208) */
-	UINT8 m_ALLPOT;			/* ALLPOT (R/D208) */
-	UINT8 m_KBCODE;			/* KBCODE (R/D209) */
-	UINT8 m_SERIN;			/* SERIN  (R/D20D) */
-	UINT8 m_SEROUT;			/* SEROUT (W/D20D) */
-	UINT8 m_IRQST;			/* IRQST  (R/D20E) */
-	UINT8 m_IRQEN;			/* IRQEN  (W/D20E) */
-	UINT8 m_SKSTAT;			/* SKSTAT (R/D20F) */
-	UINT8 m_SKCTL;			/* SKCTL  (W/D20F) */
+	UINT8 m_POTx[8];        /* POTx   (R/D200-D207) */
+	UINT8 m_AUDCTL;         /* AUDCTL (W/D208) */
+	UINT8 m_ALLPOT;         /* ALLPOT (R/D208) */
+	UINT8 m_KBCODE;         /* KBCODE (R/D209) */
+	UINT8 m_SERIN;          /* SERIN  (R/D20D) */
+	UINT8 m_SEROUT;         /* SEROUT (W/D20D) */
+	UINT8 m_IRQST;          /* IRQST  (R/D20E) */
+	UINT8 m_IRQEN;          /* IRQEN  (W/D20E) */
+	UINT8 m_SKSTAT;         /* SKSTAT (R/D20F) */
+	UINT8 m_SKCTL;          /* SKCTL  (W/D20F) */
 
 	UINT8 m_pot_counter;
 	UINT8 m_kbd_cnt;
@@ -345,4 +345,4 @@ private:
 // device type definition
 extern const device_type POKEY;
 
-#endif	/* __POKEY_H__ */
+#endif  /* __POKEY_H__ */

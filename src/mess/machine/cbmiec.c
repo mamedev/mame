@@ -255,7 +255,7 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 //-------------------------------------------------
 
 cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, CBM_IEC_SLOT, "CBM IEC slot", tag, owner, clock),
+		device_t(mconfig, CBM_IEC_SLOT, "CBM IEC slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -360,11 +360,11 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 	{
 		switch (signal)
 		{
-		case SRQ:	m_out_srq_func(state);	break;
-		case ATN:	m_out_atn_func(state);	break;
-		case CLK:	m_out_clk_func(state);	break;
-		case DATA:	m_out_data_func(state);	break;
-		case RESET:	m_out_reset_func(state);break;
+		case SRQ:   m_out_srq_func(state);  break;
+		case ATN:   m_out_atn_func(state);  break;
+		case CLK:   m_out_clk_func(state);  break;
+		case DATA:  m_out_data_func(state); break;
+		case RESET: m_out_reset_func(state);break;
 		}
 
 		daisy_entry *entry = m_device_list.first();
@@ -441,7 +441,7 @@ inline int cbm_iec_device::get_signal(int signal)
 //-------------------------------------------------
 
 cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CBM_IEC, "CBM IEC bus", tag, owner, clock)
+	: device_t(mconfig, CBM_IEC, "CBM IEC bus", tag, owner, clock)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{
@@ -457,11 +457,11 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 void cbm_iec_device::device_start()
 {
 	// resolve callbacks
-    m_out_srq_func.resolve(m_out_srq_cb, *this);
-    m_out_atn_func.resolve(m_out_atn_cb, *this);
-    m_out_clk_func.resolve(m_out_clk_cb, *this);
-    m_out_data_func.resolve(m_out_data_cb, *this);
-    m_out_reset_func.resolve(m_out_reset_cb, *this);
+	m_out_srq_func.resolve(m_out_srq_cb, *this);
+	m_out_atn_func.resolve(m_out_atn_cb, *this);
+	m_out_clk_func.resolve(m_out_clk_cb, *this);
+	m_out_data_func.resolve(m_out_data_cb, *this);
+	m_out_reset_func.resolve(m_out_reset_cb, *this);
 }
 
 
@@ -505,8 +505,8 @@ void cbm_iec_device::add_device(device_t *target, int address)
 
 cbm_iec_device::daisy_entry::daisy_entry(device_t *device)
 	: m_next(NULL),
-	  m_device(device),
-	  m_interface(NULL)
+		m_device(device),
+		m_interface(NULL)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{

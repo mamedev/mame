@@ -125,18 +125,18 @@ READ8_MEMBER( vcs80_state::pio_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     keyboard and led latch bit 0
-        PA1     keyboard and led latch bit 1
-        PA2     keyboard and led latch bit 2
-        PA3     GND
-        PA4     keyboard row input 0
-        PA5     keyboard row input 1
-        PA6     keyboard row input 2
-        PA7     demultiplexer clock input
+	    PA0     keyboard and led latch bit 0
+	    PA1     keyboard and led latch bit 1
+	    PA2     keyboard and led latch bit 2
+	    PA3     GND
+	    PA4     keyboard row input 0
+	    PA5     keyboard row input 1
+	    PA6     keyboard row input 2
+	    PA7     demultiplexer clock input
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -158,18 +158,18 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     VQD30 segment A
-        PB1     VQD30 segment B
-        PB2     VQD30 segment C
-        PB3     VQD30 segment D
-        PB4     VQD30 segment E
-        PB5     VQD30 segment G
-        PB6     VQD30 segment F
-        PB7     _A0
+	    PB0     VQD30 segment A
+	    PB1     VQD30 segment B
+	    PB2     VQD30 segment C
+	    PB3     VQD30 segment D
+	    PB4     VQD30 segment E
+	    PB5     VQD30 segment G
+	    PB6     VQD30 segment F
+	    PB7     _A0
 
-    */
+	*/
 
 	UINT8 led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
@@ -182,13 +182,13 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(vcs80_state, pio_pa_r),	/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_DRIVER_MEMBER(vcs80_state, pio_pb_w),	/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(vcs80_state, pio_pa_r), /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_DRIVER_MEMBER(vcs80_state, pio_pb_w), /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 /* Z80 Daisy Chain */

@@ -25,8 +25,8 @@ class isa16_vga_gfxultra_device :
 		public device_isa16_card_interface
 {
 public:
-        // construction/destruction
-        isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -34,9 +34,9 @@ public:
 
 		DECLARE_READ8_MEMBER(input_port_0_r);
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 private:
 		ati_vga_device *m_vga;
 		mach8_device *m_8514;

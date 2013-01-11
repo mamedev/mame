@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8048_TAG		"ic801"
+#define I8048_TAG       "ic801"
 
 
 enum
@@ -258,14 +258,14 @@ ioport_constructor pc1512_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock),
-	  m_maincpu(*this, I8048_TAG),
-	  m_data_in(1),
-	  m_clock_in(1),
-	  m_kb_y(0xffff),
-	  m_joy_com(1),
-	  m_m1(1),
-	  m_m2(1)
+	: device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock),
+		m_maincpu(*this, I8048_TAG),
+		m_data_in(1),
+		m_clock_in(1),
+		m_kb_y(0xffff),
+		m_joy_com(1),
+		m_m1(1),
+		m_m2(1)
 {
 }
 
@@ -280,8 +280,8 @@ void pc1512_keyboard_device::device_start()
 	m_reset_timer = timer_alloc();
 
 	// resolve callbacks
-    m_out_data_func.resolve(m_out_data_cb, *this);
-    m_out_clock_func.resolve(m_out_clock_cb, *this);
+	m_out_data_func.resolve(m_out_data_cb, *this);
+	m_out_clock_func.resolve(m_out_clock_cb, *this);
 
 	// state saving
 	save_item(NAME(m_data_in));
@@ -376,18 +376,18 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       X1
-        1       X2
-        2       X3
-        3       X4
-        4       X5
-        5       X6
-        6       X7
-        7       X8
+	    0       X1
+	    1       X2
+	    2       X3
+	    3       X4
+	    4       X5
+	    5       X6
+	    6       X7
+	    7       X8
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 
@@ -416,18 +416,18 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Y1
-        1       Y2
-        2       Y3
-        3       Y4
-        4       Y5
-        5       Y6
-        6       Y7
-        7       Y8
+	    0       Y1
+	    1       Y2
+	    2       Y3
+	    3       Y4
+	    4       Y5
+	    5       Y6
+	    6       Y7
+	    7       Y8
 
-    */
+	*/
 
 	m_kb_y = (m_kb_y & 0xff00) | data;
 }
@@ -441,18 +441,18 @@ READ8_MEMBER( pc1512_keyboard_device::kb_p2_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SERIAL DATA
-        1       SERIAL CLOCK
-        2
-        3
-        4
-        5
-        6
-        7
+	    0       SERIAL DATA
+	    1       SERIAL CLOCK
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -471,18 +471,18 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SERIAL DATA
-        1       SERIAL CLOCK
-        2       CAPS LED
-        3       NUM LED
-        4       Y9
-        5       Y10
-        6       Y11
-        7       joystick COM
+	    0       SERIAL DATA
+	    1       SERIAL CLOCK
+	    2       CAPS LED
+	    3       NUM LED
+	    4       Y9
+	    5       Y10
+	    6       Y11
+	    7       joystick COM
 
-    */
+	*/
 
 	// keyboard data
 	m_out_data_func(BIT(data, 0));

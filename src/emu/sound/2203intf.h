@@ -24,7 +24,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( ym2203_control_port_w );
 DECLARE_WRITE8_DEVICE_HANDLER( ym2203_write_port_w );
 
 class ym2203_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

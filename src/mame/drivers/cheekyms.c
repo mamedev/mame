@@ -176,8 +176,8 @@ ROM_START( cheekyms )
 	ROM_LOAD( "cm08.n6",       0x0800, 0x0800, CRC(b3fbd4ac) SHA1(9f45cc6d9e0bf580149e18de5c3e37d4de347b92) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "cm.m9",         0x0000, 0x0020, CRC(db9c59a5) SHA1(357ed5ac8e954a4c8b4d78d36e57bf2de36c1d57) )	 /* Character colors /                                */
-	ROM_LOAD( "cm.m8",         0x0020, 0x0020, CRC(2386bc68) SHA1(6676082860cd8678a71339a352d2c6286e78ba44) )	 /* Character colors \ Selected by Bit 6 of Port 0x80 */
+	ROM_LOAD( "cm.m9",         0x0000, 0x0020, CRC(db9c59a5) SHA1(357ed5ac8e954a4c8b4d78d36e57bf2de36c1d57) )    /* Character colors /                                */
+	ROM_LOAD( "cm.m8",         0x0020, 0x0020, CRC(2386bc68) SHA1(6676082860cd8678a71339a352d2c6286e78ba44) )    /* Character colors \ Selected by Bit 6 of Port 0x80 */
 	ROM_LOAD( "cm.p3",         0x0040, 0x0020, CRC(6ac41516) SHA1(05bf40790a0de1e859362df892f7f158c183e247) )  /* Sprite colors */
 ROM_END
 

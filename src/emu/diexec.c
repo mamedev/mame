@@ -47,9 +47,9 @@
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-#define TEMPLOG	0
+#define TEMPLOG 0
 
 
 
@@ -57,8 +57,8 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int TRIGGER_INT			= -2000;
-const int TRIGGER_SUSPENDTIME	= -4000;
+const int TRIGGER_INT           = -2000;
+const int TRIGGER_SUSPENDTIME   = -4000;
 
 
 
@@ -72,30 +72,30 @@ const int TRIGGER_SUSPENDTIME	= -4000;
 
 device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
-	  m_disabled(false),
-	  m_vblank_interrupt_legacy(NULL),
-	  m_vblank_interrupt_screen(NULL),
-	  m_timed_interrupt_legacy(NULL),
-	  m_timed_interrupt_period(attotime::zero),
-	  m_is_octal(false),
-	  m_nextexec(NULL),
-	  m_driver_irq(0),
-	  m_timedint_timer(NULL),
-	  m_profiler(PROFILER_IDLE),
-	  m_icountptr(NULL),
-	  m_cycles_running(0),
-	  m_cycles_stolen(0),
-	  m_suspend(0),
-	  m_nextsuspend(0),
-	  m_eatcycles(0),
-	  m_nexteatcycles(0),
-	  m_trigger(0),
-	  m_inttrigger(0),
-	  m_totalcycles(0),
-	  m_divisor(0),
-	  m_divshift(0),
-	  m_cycles_per_second(0),
-	  m_attoseconds_per_cycle(0)
+		m_disabled(false),
+		m_vblank_interrupt_legacy(NULL),
+		m_vblank_interrupt_screen(NULL),
+		m_timed_interrupt_legacy(NULL),
+		m_timed_interrupt_period(attotime::zero),
+		m_is_octal(false),
+		m_nextexec(NULL),
+		m_driver_irq(0),
+		m_timedint_timer(NULL),
+		m_profiler(PROFILER_IDLE),
+		m_icountptr(NULL),
+		m_cycles_running(0),
+		m_cycles_stolen(0),
+		m_suspend(0),
+		m_nextsuspend(0),
+		m_eatcycles(0),
+		m_nexteatcycles(0),
+		m_trigger(0),
+		m_inttrigger(0),
+		m_totalcycles(0),
+		m_divisor(0),
+		m_divshift(0),
+		m_cycles_per_second(0),
+		m_attoseconds_per_cycle(0)
 {
 	memset(&m_localtime, 0, sizeof(m_localtime));
 
@@ -747,12 +747,12 @@ void device_execute_interface::trigger_periodic_interrupt()
 
 device_execute_interface::device_input::device_input()
 	: m_execute(NULL),
-	  m_device(NULL),
-	  m_linenum(0),
-	  m_stored_vector(0),
-	  m_curvector(0),
-	  m_curstate(CLEAR_LINE),
-	  m_qindex(0)
+		m_device(NULL),
+		m_linenum(0),
+		m_stored_vector(0),
+		m_curvector(0),
+		m_curstate(CLEAR_LINE),
+		m_qindex(0)
 {
 	memset(m_queue, 0, sizeof(m_queue));
 }

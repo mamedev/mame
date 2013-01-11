@@ -28,7 +28,7 @@
 #include "emu.h"
 #include "k005289.h"
 
-#define FREQBASEBITS	16
+#define FREQBASEBITS    16
 
 /* this structure defines the parameters for a channel */
 struct k005289_sound_channel
@@ -192,7 +192,7 @@ static void k005289_recompute(k005289_state *info)
 {
 	k005289_sound_channel *voice = info->channel_list;
 
-	info->stream->update();	/* update the streams */
+	info->stream->update(); /* update the streams */
 
 	voice[0].frequency = info->k005289_A_frequency;
 	voice[1].frequency = info->k005289_B_frequency;
@@ -248,7 +248,7 @@ const device_type K005289 = &device_creator<k005289_device>;
 
 k005289_device::k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K005289, "K005289", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(k005289_state);
 }
@@ -281,5 +281,3 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

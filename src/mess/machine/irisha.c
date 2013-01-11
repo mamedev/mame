@@ -140,7 +140,7 @@ const struct pit8253_config irisha_pit8253_intf =
 		{
 			XTAL_16MHz / 9 / 8 / 8,
 			DEVCB_LINE_VCC,
-			DEVCB_NULL			// UART transmit/receive clock
+			DEVCB_NULL          // UART transmit/receive clock
 		},
 		{
 			XTAL_16MHz / 9,
@@ -149,5 +149,3 @@ const struct pit8253_config irisha_pit8253_intf =
 		}
 	}
 };
-
-

@@ -22,70 +22,70 @@
 #include "sound/sid6581.h"
 #include "video/mos6566.h"
 
-#define Z80A_TAG		"u10"
-#define M8502_TAG		"u6"
-#define MOS8563_TAG		"u22"
-#define MOS8564_TAG		"u21"
-#define MOS8566_TAG		"u21"
-#define MOS6581_TAG		"u5"
-#define MOS6526_1_TAG	"u1"
-#define MOS6526_2_TAG	"u4"
-#define MOS8721_TAG		"u11"
-#define MOS8722_TAG		"u7"
-#define SCREEN_VIC_TAG	"screen"
-#define SCREEN_VDC_TAG	"screen80"
-#define CONTROL1_TAG	"joy1"
-#define CONTROL2_TAG	"joy2"
+#define Z80A_TAG        "u10"
+#define M8502_TAG       "u6"
+#define MOS8563_TAG     "u22"
+#define MOS8564_TAG     "u21"
+#define MOS8566_TAG     "u21"
+#define MOS6581_TAG     "u5"
+#define MOS6526_1_TAG   "u1"
+#define MOS6526_2_TAG   "u4"
+#define MOS8721_TAG     "u11"
+#define MOS8722_TAG     "u7"
+#define SCREEN_VIC_TAG  "screen"
+#define SCREEN_VDC_TAG  "screen80"
+#define CONTROL1_TAG    "joy1"
+#define CONTROL2_TAG    "joy2"
 
 class c128_state : public driver_device
 {
 public:
 	c128_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80A_TAG),
-		  m_subcpu(*this, M8502_TAG),
-		  m_mmu(*this, MOS8722_TAG),
-		  m_pla(*this, MOS8721_TAG),
-		  m_vdc(*this, MOS8563_TAG),
-		  m_vic(*this, MOS8564_TAG),
-		  m_sid(*this, MOS6581_TAG),
-		  m_cia1(*this, MOS6526_1_TAG),
-		  m_cia2(*this, MOS6526_2_TAG),
-		  m_iec(*this, CBM_IEC_TAG),
-		  m_joy1(*this, CONTROL1_TAG),
-		  m_joy2(*this, CONTROL2_TAG),
-		  m_exp(*this, C64_EXPANSION_SLOT_TAG),
-		  m_user(*this, C64_USER_PORT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		  m_z80en(0),
-		  m_loram(1),
-		  m_hiram(1),
-		  m_charen(1),
-		  m_game(1),
-		  m_exrom(1),
-		  m_rom1(NULL),
-		  m_rom2(NULL),
-		  m_rom3(NULL),
-		  m_rom4(NULL),
-		  m_from(NULL),
-		  m_charom(NULL),
-		  m_color_ram(*this, "color_ram"),
-		  m_va14(1),
-		  m_va15(1),
-		  m_clrbank(0),
-		  m_cnt1(1),
-		  m_sp1(1),
-		  m_iec_data_out(1),
-		  m_cia1_irq(CLEAR_LINE),
-		  m_cia2_irq(CLEAR_LINE),
-		  m_vic_irq(CLEAR_LINE),
-		  m_exp_irq(CLEAR_LINE),
-		  m_exp_nmi(CLEAR_LINE),
-		  m_cass_rd(1),
-		  m_iec_srq(1),
-		  m_vic_k(0x07),
-		  m_caps_lock(1)
+			m_maincpu(*this, Z80A_TAG),
+			m_subcpu(*this, M8502_TAG),
+			m_mmu(*this, MOS8722_TAG),
+			m_pla(*this, MOS8721_TAG),
+			m_vdc(*this, MOS8563_TAG),
+			m_vic(*this, MOS8564_TAG),
+			m_sid(*this, MOS6581_TAG),
+			m_cia1(*this, MOS6526_1_TAG),
+			m_cia2(*this, MOS6526_2_TAG),
+			m_iec(*this, CBM_IEC_TAG),
+			m_joy1(*this, CONTROL1_TAG),
+			m_joy2(*this, CONTROL2_TAG),
+			m_exp(*this, C64_EXPANSION_SLOT_TAG),
+			m_user(*this, C64_USER_PORT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_z80en(0),
+			m_loram(1),
+			m_hiram(1),
+			m_charen(1),
+			m_game(1),
+			m_exrom(1),
+			m_rom1(NULL),
+			m_rom2(NULL),
+			m_rom3(NULL),
+			m_rom4(NULL),
+			m_from(NULL),
+			m_charom(NULL),
+			m_color_ram(*this, "color_ram"),
+			m_va14(1),
+			m_va15(1),
+			m_clrbank(0),
+			m_cnt1(1),
+			m_sp1(1),
+			m_iec_data_out(1),
+			m_cia1_irq(CLEAR_LINE),
+			m_cia2_irq(CLEAR_LINE),
+			m_vic_irq(CLEAR_LINE),
+			m_exp_irq(CLEAR_LINE),
+			m_exp_nmi(CLEAR_LINE),
+			m_cass_rd(1),
+			m_iec_srq(1),
+			m_vic_k(0x07),
+			m_caps_lock(1)
 	{ }
 
 	required_device<legacy_cpu_device> m_maincpu;

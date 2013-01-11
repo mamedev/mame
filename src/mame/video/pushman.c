@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 			0,
 			(tile & 0xff) | ((tile & 0xc000) >> 6) | ((tile & 0x2000) >> 3),
 			(tile >> 8) & 0xf,
-			(tile & 0x1000) ? TILE_FLIPY : 0);	/* not used? from Tiger Road */
+			(tile & 0x1000) ? TILE_FLIPY : 0);  /* not used? from Tiger Road */
 }
 
 
@@ -101,7 +101,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sprite = spriteram[offs] & 0x7ff;
 		/* ElSemi - Sprite flip info */
 		flipx = spriteram[offs + 1] & 2;
-		flipy = spriteram[offs + 1] & 1;	/* flip y untested */
+		flipy = spriteram[offs + 1] & 1;    /* flip y untested */
 
 		if (state->flip_screen())
 		{
@@ -112,7 +112,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1], sprite,
-                color, flipx, flipy, x, y, 15);
+				color, flipx, flipy, x, y, 15);
 	}
 }
 

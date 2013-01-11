@@ -310,8 +310,8 @@ static const gfx_layout tlayout =
 static GFXDECODE_START( crospang )
 	//GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 256, 16 )    /* Characters 8x8 */
 	//GFXDECODE_ENTRY( "gfx1", 0, tlayout,     512, 16 )    /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 
@@ -323,7 +323,7 @@ static void irqhandler( device_t *device, int linestate )
 
 static const ym3812_interface ym3812_config =
 {
-	irqhandler	/* IRQ Line */
+	irqhandler  /* IRQ Line */
 };
 
 

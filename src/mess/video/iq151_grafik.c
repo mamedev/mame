@@ -43,7 +43,7 @@ const device_type IQ151_GRAFIK = &device_creator<iq151_grafik_device>;
 //-------------------------------------------------
 
 iq151_grafik_device::iq151_grafik_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, IQ151_GRAFIK, "IQ151 grafik", tag, owner, clock),
+		: device_t(mconfig, IQ151_GRAFIK, "IQ151 grafik", tag, owner, clock),
 		device_iq151cart_interface( mconfig, *this ),
 		m_ppi8255(*this, "ppi8255")
 {
@@ -165,10 +165,10 @@ void iq151_grafik_device::io_write(offs_t offset, UINT8 data)
 			}
 			else
 			{
-			  if (m_pen)
-				 m_videoram[m_posx + 0x40 * m_posy] &= ~(1 << (data >> 5));
-			  else
-				 m_videoram[m_posx + 0x40 * m_posy] |= (1 << (data >> 5));
+				if (m_pen)
+					m_videoram[m_posx + 0x40 * m_posy] &= ~(1 << (data >> 5));
+				else
+					m_videoram[m_posx + 0x40 * m_posy] |= (1 << (data >> 5));
 			}
 		}
 	}
@@ -195,4 +195,3 @@ void iq151_grafik_device::video_update(bitmap_ind16 &bitmap, const rectangle &cl
 		}
 	}
 }
-

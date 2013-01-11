@@ -18,11 +18,11 @@ class tsispch_state : public driver_device
 public:
 	tsispch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_dsp(*this, "dsp"),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_uart(*this, "i8251a_u15"),
-		  m_pic(*this, "pic8259")
+			m_maincpu(*this, "maincpu"),
+			m_dsp(*this, "dsp"),
+			m_terminal(*this, TERMINAL_TAG),
+			m_uart(*this, "i8251a_u15"),
+			m_pic(*this, "pic8259")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -31,10 +31,10 @@ public:
 	required_device<i8251_device> m_uart;
 	required_device<pic8259_device> m_pic;
 
-	UINT8 m_infifo[32];			// input fifo
-	UINT8 m_infifo_tail_ptr;		// " tail
-	UINT8 m_infifo_head_ptr;		// " head
-	UINT8 m_paramReg;			// status leds and resets and etc
+	UINT8 m_infifo[32];         // input fifo
+	UINT8 m_infifo_tail_ptr;        // " tail
+	UINT8 m_infifo_head_ptr;        // " head
+	UINT8 m_paramReg;           // status leds and resets and etc
 
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(i8251_rxd);
@@ -52,4 +52,4 @@ public:
 };
 
 
-#endif	// _TSISPCH_H_
+#endif  // _TSISPCH_H_

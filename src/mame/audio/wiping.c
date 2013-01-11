@@ -263,7 +263,7 @@ const device_type WIPING = &device_creator<wiping_sound_device>;
 
 wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WIPING, "Wiping Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(wiping_sound_state);
 }
@@ -296,5 +296,3 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

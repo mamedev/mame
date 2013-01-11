@@ -96,4 +96,4 @@ INLINE INT32 output_get_digit_value(int index)
 }
 
 
-#endif	/* __OUTPUT_H__ */
+#endif  /* __OUTPUT_H__ */

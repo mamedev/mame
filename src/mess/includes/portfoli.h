@@ -16,26 +16,26 @@
 #include "sound/speaker.h"
 #include "video/hd61830.h"
 
-#define SCREEN_TAG		"screen"
-#define M80C88A_TAG		"u1"
-#define M82C55A_TAG		"hpc101_u1"
-#define M82C50A_TAG		"hpc102_u1"
-#define HD61830_TAG		"hd61830"
-#define CENTRONICS_TAG	"centronics"
-#define TIMER_TICK_TAG	"tick"
+#define SCREEN_TAG      "screen"
+#define M80C88A_TAG     "u1"
+#define M82C55A_TAG     "hpc101_u1"
+#define M82C50A_TAG     "hpc102_u1"
+#define HD61830_TAG     "hd61830"
+#define CENTRONICS_TAG  "centronics"
+#define TIMER_TICK_TAG  "tick"
 
 class portfolio_state : public driver_device
 {
 public:
 	portfolio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M80C88A_TAG),
-		  m_lcdc(*this, HD61830_TAG),
-		  m_ppi(*this, M82C55A_TAG),
-		  m_uart(*this, M82C50A_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_timer_tick(*this, TIMER_TICK_TAG),
-		  m_contrast(*this, "contrast")
+			m_maincpu(*this, M80C88A_TAG),
+			m_lcdc(*this, HD61830_TAG),
+			m_ppi(*this, M82C55A_TAG),
+			m_uart(*this, M82C50A_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_timer_tick(*this, TIMER_TICK_TAG),
+			m_contrast(*this, "contrast")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -69,9 +69,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( i8250_intrpt_w );
 
 	/* interrupt state */
-	UINT8 m_ip;							/* interrupt pending */
-	UINT8 m_ie;							/* interrupt enable */
-	UINT8 m_sivr;						/* serial interrupt vector register */
+	UINT8 m_ip;                         /* interrupt pending */
+	UINT8 m_ie;                         /* interrupt enable */
+	UINT8 m_sivr;                       /* serial interrupt vector register */
 
 	/* counter state */
 	UINT16 m_counter;
@@ -83,7 +83,7 @@ public:
 	required_shared_ptr<UINT8> m_contrast;
 
 	/* peripheral state */
-	UINT8 m_pid;						/* peripheral identification */
+	UINT8 m_pid;                        /* peripheral identification */
 	virtual void palette_init();
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);

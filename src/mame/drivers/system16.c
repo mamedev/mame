@@ -168,7 +168,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
 		coin_counter_w(machine(), 1, m_coinctrl & 0x02);
 		coin_counter_w(machine(), 0, m_coinctrl & 0x01);
 		/* bit 6 is also used (1 most of the time; 0 in dduxbl, sdi, wb3;
-           tturf has it normally 1 but 0 after coin insertion) */
+		   tturf has it normally 1 but 0 after coin insertion) */
 		/* eswat sets bit 4 */
 	}
 }
@@ -268,11 +268,11 @@ static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
-	AM_RANGE(0xc43000, 0xc43001) AM_READ_PORT("P1")		// test mode only
+	AM_RANGE(0xc43000, 0xc43001) AM_READ_PORT("P1")     // test mode only
 	AM_RANGE(0xc43002, 0xc43003) AM_READ_PORT("P2")
 	AM_RANGE(0xc43004, 0xc43005) AM_READ_PORT("P3")
 	AM_RANGE(0xc43006, 0xc43007) AM_READ_PORT("P4")
-	AM_RANGE(0xc4600a, 0xc4600b) AM_WRITE(sys16_coinctrl_w)	/* coin counter doesn't work */
+	AM_RANGE(0xc4600a, 0xc4600b) AM_WRITE(sys16_coinctrl_w) /* coin counter doesn't work */
 	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
 	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
 	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
@@ -647,17 +647,17 @@ static void datsu_set_pages( running_machine &machine )
 	UINT16 page;
 
 	page = ((state->m_datsu_page[0] & 0x00f0) >>0) |
-		   ((state->m_datsu_page[1] & 0x00f0) >>4) |
-		   ((state->m_datsu_page[2] & 0x00f0) <<8) |
-		   ((state->m_datsu_page[3] & 0x00f0) <<4);
+			((state->m_datsu_page[1] & 0x00f0) >>4) |
+			((state->m_datsu_page[2] & 0x00f0) <<8) |
+			((state->m_datsu_page[3] & 0x00f0) <<4);
 
 
 	set_fg_page(machine, page);
 
 	page = ((state->m_datsu_page[0] & 0x000f) <<4) |
-		   ((state->m_datsu_page[1] & 0x000f) <<0) |
-		   ((state->m_datsu_page[2] & 0x000f) <<12) |
-		   ((state->m_datsu_page[3] & 0x000f) <<8);
+			((state->m_datsu_page[1] & 0x000f) <<0) |
+			((state->m_datsu_page[2] & 0x000f) <<12) |
+			((state->m_datsu_page[3] & 0x000f) <<8);
 
 	set_bg_page(machine, page);
 }
@@ -785,9 +785,9 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgpage_w)
 	COMBINE_DATA(&m_goldnaxeb2_fgpage[offset]);
 
 	page = ((m_goldnaxeb2_fgpage[1] & 0xf) << 0) |
-		   ((m_goldnaxeb2_fgpage[0] & 0xf) << 4) |
-		   ((m_goldnaxeb2_fgpage[3] & 0xf) << 8) |
-		   ((m_goldnaxeb2_fgpage[2] & 0xf) << 12);
+			((m_goldnaxeb2_fgpage[0] & 0xf) << 4) |
+			((m_goldnaxeb2_fgpage[3] & 0xf) << 8) |
+			((m_goldnaxeb2_fgpage[2] & 0xf) << 12);
 
 	set_fg_page(machine(), page ^ 0xffff);
 
@@ -800,9 +800,9 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgpage_w)
 	COMBINE_DATA(&m_goldnaxeb2_bgpage[offset]);
 
 	page = ((m_goldnaxeb2_bgpage[1] & 0xf) << 0) |
-		   ((m_goldnaxeb2_bgpage[0] & 0xf) << 4) |
-		   ((m_goldnaxeb2_bgpage[3] & 0xf) << 8) |
-		   ((m_goldnaxeb2_bgpage[2] & 0xf) << 12);
+			((m_goldnaxeb2_bgpage[0] & 0xf) << 4) |
+			((m_goldnaxeb2_bgpage[3] & 0xf) << 8) |
+			((m_goldnaxeb2_bgpage[2] & 0xf) << 12);
 
 	set_bg_page(machine(), page ^ 0xffff);
 }
@@ -1034,7 +1034,7 @@ static ADDRESS_MAP_START( sound_18_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	/**** D/A register ****/
 	AM_RANGE(0xc000, 0xc008) AM_DEVWRITE_LEGACY("5c68", rf5c68_w)
 	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE_LEGACY("5c68", rf5c68_mem_r, rf5c68_mem_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM	//??
+	AM_RANGE(0xe000, 0xffff) AM_RAM //??
 ADDRESS_MAP_END
 
 
@@ -1263,15 +1263,15 @@ static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 
 	/* bootleg video regs */
 	/*AM_RANGE(0xc00000, 0xc00001) AM_NOP
-    AM_RANGE(0xc00002, 0xc00003) AM_NOP
-    AM_RANGE(0xc00004, 0xc00005) AM_NOP // tile bank?
-    AM_RANGE(0xc00006, 0xc00007) AM_NOP
-    AM_RANGE(0xc44000, 0xc44001) AM_NOP
-    AM_RANGE(0xc46000, 0xc46001) AM_NOP
-    AM_RANGE(0xc46200, 0xc46201) AM_NOP
-    AM_RANGE(0xc46400, 0xc464ff) AM_NOP // scroll?
-    AM_RANGE(0xc46500, 0xc465ff) AM_NOP // scroll?
-    */
+	AM_RANGE(0xc00002, 0xc00003) AM_NOP
+	AM_RANGE(0xc00004, 0xc00005) AM_NOP // tile bank?
+	AM_RANGE(0xc00006, 0xc00007) AM_NOP
+	AM_RANGE(0xc44000, 0xc44001) AM_NOP
+	AM_RANGE(0xc46000, 0xc46001) AM_NOP
+	AM_RANGE(0xc46200, 0xc46201) AM_NOP
+	AM_RANGE(0xc46400, 0xc464ff) AM_NOP // scroll?
+	AM_RANGE(0xc46500, 0xc465ff) AM_NOP // scroll?
+	*/
 
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
@@ -1536,8 +1536,8 @@ static INPUT_PORTS_START( wb3b )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x40, 0x40, "Test Mode" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )	/* Normal game */
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )	/* Levels are selectable / Player is Invincible */
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )   /* Normal game */
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )  /* Levels are selectable / Player is Invincible */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Listed as "Unused" */
 INPUT_PORTS_END
 
@@ -1772,7 +1772,7 @@ static INPUT_PORTS_START( fpointbl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetris )
-	PORT_INCLUDE( sys16_common )	/* unconfirmed coinage dip */
+	PORT_INCLUDE( sys16_common )    /* unconfirmed coinage dip */
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Listed as "Unused" */
@@ -1780,7 +1780,7 @@ static INPUT_PORTS_START( tetris )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* From the code SW2:3,4 looks like some kind of difficulty level,
-    but all 4 levels points to the same place so it doesn't actually change anything!! */
+	but all 4 levels points to the same place so it doesn't actually change anything!! */
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" ) /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" ) /* Listed as "Unused" */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
@@ -1835,7 +1835,7 @@ static INPUT_PORTS_START( astormbl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("COINAGE")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
@@ -1861,13 +1861,13 @@ static INPUT_PORTS_START( astormbl )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Start Credit" )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Start Credit" )      PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4,5")
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,4,5")
 	PORT_DIPSETTING(    0x04, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easier ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
@@ -1876,7 +1876,7 @@ static INPUT_PORTS_START( astormbl )
 	PORT_DIPSETTING(    0x14, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(    0x00, "Special" )
-	PORT_DIPNAME( 0x20, 0x20, "Coin Chutes" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Chutes" )       PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
@@ -1886,14 +1886,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mwalkbl )
 	PORT_INCLUDE( astormbl )
 
-        PORT_MODIFY("P3")
+		PORT_MODIFY("P3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_MODIFY("COINAGE")
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8") PORT_CONDITION("DSW1",0x20,EQUALS,0x20)
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:5,6,7,8") PORT_CONDITION("DSW1",0x20,EQUALS,0x20)
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
@@ -1912,19 +1912,19 @@ static INPUT_PORTS_START( mwalkbl )
 	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x08, 0x08, "Player Vitality" )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Player Vitality" )       PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x10, 0x00, "Play Mode" )			PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x00, "Play Mode" )         PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "2 Players" )
 	PORT_DIPSETTING(    0x00, "3 Players" )
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mode" )			PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mode" )         PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -1941,7 +1941,7 @@ static INPUT_PORTS_START( shdancbl )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("COINAGE")
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
@@ -1964,17 +1964,17 @@ static INPUT_PORTS_START( shdancbl )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0C, 0x04, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0C, 0x04, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Time Adjust" )		PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Time Adjust" )       PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x80, "3:30" )
 	PORT_DIPSETTING(    0xc0, "3:00" )
 	PORT_DIPSETTING(    0x40, "2:40" )
@@ -2000,7 +2000,7 @@ static const gfx_layout charlayout  =
 };
 
 GFXDECODE_START( sys16 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	0, 1024 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1024 )
 GFXDECODE_END
 
 
@@ -2076,10 +2076,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( system16_datsu_sound )
 	/* TODO:
-    - other games might use this sound configuration
-    - speaker is likely to be mono for the bootlegs, not stereo.
-    - check msm5205 frequency.
-    */
+	- other games might use this sound configuration
+	- speaker is likely to be mono for the bootlegs, not stereo.
+	- check msm5205 frequency.
+	*/
 	MCFG_CPU_ADD("soundcpu",Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(tturfbl_sound_map)
 	MCFG_CPU_IO_MAP(tturfbl_sound_io_map)
@@ -2666,36 +2666,36 @@ ROM_START( goldnaxeb1 )
 	ROM_LOAD( "27.11", 0x50000, 0x10000, CRC(afb1a7e4) SHA1(726fded9db72a881128b43f449d2baf450131f63) )
 
 	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "33.17",		0x000001, 0x10000, CRC(28ba70c8) SHA1(a6f33e1404928b6d1006943494646d6cfbd60a4b) )
-	ROM_LOAD16_BYTE( "34.18",		0x020001, 0x10000, CRC(2ed96a26) SHA1(edcf915243e6f92d31cdfc53965438f6b6bff51d) )
-	ROM_LOAD16_BYTE( "37.bin",		0x100001, 0x10000, CRC(84dccc5b) SHA1(10263d98d663f1170c3203066f391075a1d64ff5) )
-	ROM_LOAD16_BYTE( "13.bin",  	0x120001, 0x10000, CRC(3d41b995) SHA1(913d2a0c9a2ac6d36589966d7eb5537120ea6ff0) )
+	ROM_LOAD16_BYTE( "33.17",       0x000001, 0x10000, CRC(28ba70c8) SHA1(a6f33e1404928b6d1006943494646d6cfbd60a4b) )
+	ROM_LOAD16_BYTE( "34.18",       0x020001, 0x10000, CRC(2ed96a26) SHA1(edcf915243e6f92d31cdfc53965438f6b6bff51d) )
+	ROM_LOAD16_BYTE( "37.bin",      0x100001, 0x10000, CRC(84dccc5b) SHA1(10263d98d663f1170c3203066f391075a1d64ff5) )
+	ROM_LOAD16_BYTE( "13.bin",      0x120001, 0x10000, CRC(3d41b995) SHA1(913d2a0c9a2ac6d36589966d7eb5537120ea6ff0) )
 	//ROM_LOAD16_BYTE( "ga18.a9",     0x120001, 0x10000, CRC(de346006) SHA1(65aa489373b6d2cccbb024f13fc190a7cae86274) ) // the old set had this rom, with most of the data blanked out.. why? logo removed? bad?
 
-	ROM_LOAD16_BYTE( "21.7",		0x000000, 0x10000, CRC(ede51fe0) SHA1(c05a2b51095a322bac5a67ee8886aecc186cbdfe) )
-	ROM_LOAD16_BYTE( "22.8",		0x020000, 0x10000, CRC(30989141) SHA1(f6e7ae258deedec11b1f80c19575c884aac26c56) )
-	ROM_LOAD16_BYTE( "38.bin",		0x100000, 0x10000, CRC(38e4c92a) SHA1(8b8a596da0726bc02c412a68e5163770fe3e62e4) )
-	ROM_LOAD16_BYTE( "14.bin",  	0x120000, 0x10000, CRC(9fb1f9b6) SHA1(a193ff48f2bfbb4afbc322ae33cdf360afcb681e) )
+	ROM_LOAD16_BYTE( "21.7",        0x000000, 0x10000, CRC(ede51fe0) SHA1(c05a2b51095a322bac5a67ee8886aecc186cbdfe) )
+	ROM_LOAD16_BYTE( "22.8",        0x020000, 0x10000, CRC(30989141) SHA1(f6e7ae258deedec11b1f80c19575c884aac26c56) )
+	ROM_LOAD16_BYTE( "38.bin",      0x100000, 0x10000, CRC(38e4c92a) SHA1(8b8a596da0726bc02c412a68e5163770fe3e62e4) )
+	ROM_LOAD16_BYTE( "14.bin",      0x120000, 0x10000, CRC(9fb1f9b6) SHA1(a193ff48f2bfbb4afbc322ae33cdf360afcb681e) )
 
-	ROM_LOAD16_BYTE( "35.19",		0x040001, 0x10000, CRC(101d2fff) SHA1(1de1390c5f55f192491053c8aac31be3389aab2b) )
-	ROM_LOAD16_BYTE( "36.20",		0x060001, 0x10000, CRC(677e64a6) SHA1(e3d0d31097017c6cb1a7f41292783f18ce13b41c) )
-	ROM_LOAD16_BYTE( "15.bin",		0x140001, 0x10000, CRC(11794d05) SHA1(eef52d7a644dbcc5f983222f163445a725286a32) )
-	ROM_LOAD16_BYTE( "17.bin",		0x160001, 0x10000, CRC(ad1c1c90) SHA1(155f17593cfab1a117bb755b1edd0c473d455f91) )
+	ROM_LOAD16_BYTE( "35.19",       0x040001, 0x10000, CRC(101d2fff) SHA1(1de1390c5f55f192491053c8aac31be3389aab2b) )
+	ROM_LOAD16_BYTE( "36.20",       0x060001, 0x10000, CRC(677e64a6) SHA1(e3d0d31097017c6cb1a7f41292783f18ce13b41c) )
+	ROM_LOAD16_BYTE( "15.bin",      0x140001, 0x10000, CRC(11794d05) SHA1(eef52d7a644dbcc5f983222f163445a725286a32) )
+	ROM_LOAD16_BYTE( "17.bin",      0x160001, 0x10000, CRC(ad1c1c90) SHA1(155f17593cfab1a117bb755b1edd0c473d455f91) )
 
-	ROM_LOAD16_BYTE( "23.9",		0x040000, 0x10000, CRC(5853000d) SHA1(db7adf1de74c66f667ea7ccc41702576de081ff5) )
-	ROM_LOAD16_BYTE( "24.10",		0x060000, 0x10000, CRC(697b3276) SHA1(a8aeb2cfaca9368d5bfa14a67de36dbadd4a0585) )
-	ROM_LOAD16_BYTE( "16.bin",		0x140000, 0x10000, CRC(753b01e8) SHA1(0180cf893d63e60e14e2fb0f5836b302f08f0228) )
-	ROM_LOAD16_BYTE( "18.bin",		0x160000, 0x10000, CRC(5dd6d8db) SHA1(270886aebf4549c5cf456b1e90927b759a53e2e1) )
+	ROM_LOAD16_BYTE( "23.9",        0x040000, 0x10000, CRC(5853000d) SHA1(db7adf1de74c66f667ea7ccc41702576de081ff5) )
+	ROM_LOAD16_BYTE( "24.10",       0x060000, 0x10000, CRC(697b3276) SHA1(a8aeb2cfaca9368d5bfa14a67de36dbadd4a0585) )
+	ROM_LOAD16_BYTE( "16.bin",      0x140000, 0x10000, CRC(753b01e8) SHA1(0180cf893d63e60e14e2fb0f5836b302f08f0228) )
+	ROM_LOAD16_BYTE( "18.bin",      0x160000, 0x10000, CRC(5dd6d8db) SHA1(270886aebf4549c5cf456b1e90927b759a53e2e1) )
 
-	ROM_LOAD16_BYTE( "40.23",		0x080001, 0x10000, CRC(a9519afe) SHA1(0550f596ef080db25241d88242d57edb3c7fb685) )
-	ROM_LOAD16_BYTE( "39.22",		0x0a0001, 0x10000, CRC(74df9232) SHA1(61286c83eb6f31983c0ed24ca2151c58a95238f1) )
-	ROM_LOAD16_BYTE( "19.bin",		0x180001, 0x10000, CRC(a8c8c784) SHA1(8e998019b4dbf509179d41eb2b446647db3d00a6) )
-	ROM_LOAD16_BYTE( "25.bin",		0x1a0001, 0x10000, CRC(cc3a922c) SHA1(3c96459d95961d463909b6b0e8c77916c3a018e3) )
+	ROM_LOAD16_BYTE( "40.23",       0x080001, 0x10000, CRC(a9519afe) SHA1(0550f596ef080db25241d88242d57edb3c7fb685) )
+	ROM_LOAD16_BYTE( "39.22",       0x0a0001, 0x10000, CRC(74df9232) SHA1(61286c83eb6f31983c0ed24ca2151c58a95238f1) )
+	ROM_LOAD16_BYTE( "19.bin",      0x180001, 0x10000, CRC(a8c8c784) SHA1(8e998019b4dbf509179d41eb2b446647db3d00a6) )
+	ROM_LOAD16_BYTE( "25.bin",      0x1a0001, 0x10000, CRC(cc3a922c) SHA1(3c96459d95961d463909b6b0e8c77916c3a018e3) )
 
-	ROM_LOAD16_BYTE( "42.26",		0x080000, 0x10000, CRC(ac6ad195) SHA1(3c3fe38047698e28cae9193438fe0b85941476c5) )
-	ROM_LOAD16_BYTE( "41.25",		0x0a0000, 0x10000, CRC(03a905c4) SHA1(c526a744021a392c860ded37afd54a78e9f47778) )
-	ROM_LOAD16_BYTE( "20.bin",		0x180000, 0x10000, CRC(cba013c7) SHA1(a0658aaf7893bc9fb8f0435cab9f77ceb1fb4e1d) )
-	ROM_LOAD16_BYTE( "26.bin",		0x1a0000, 0x10000, CRC(bea4d237) SHA1(46e51e89b4ee1e2701da1004758d7da547a2e4c2) )
+	ROM_LOAD16_BYTE( "42.26",       0x080000, 0x10000, CRC(ac6ad195) SHA1(3c3fe38047698e28cae9193438fe0b85941476c5) )
+	ROM_LOAD16_BYTE( "41.25",       0x0a0000, 0x10000, CRC(03a905c4) SHA1(c526a744021a392c860ded37afd54a78e9f47778) )
+	ROM_LOAD16_BYTE( "20.bin",      0x180000, 0x10000, CRC(cba013c7) SHA1(a0658aaf7893bc9fb8f0435cab9f77ceb1fb4e1d) )
+	ROM_LOAD16_BYTE( "26.bin",      0x1a0000, 0x10000, CRC(bea4d237) SHA1(46e51e89b4ee1e2701da1004758d7da547a2e4c2) )
 
 
 	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
@@ -2752,30 +2752,30 @@ ROM_START( goldnaxeb2 )
 	ROM_LOAD( "ic16.40", 0x50000, 0x10000, CRC(afb1a7e4) SHA1(726fded9db72a881128b43f449d2baf450131f63) )
 
 	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "ic73.34", 		0x000001, 0x10000, CRC(28ba70c8) SHA1(a6f33e1404928b6d1006943494646d6cfbd60a4b) ) // mpr12378.b1  [1/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic74.33", 		0x020001, 0x10000, CRC(2ed96a26) SHA1(edcf915243e6f92d31cdfc53965438f6b6bff51d) ) // mpr12378.b1  [2/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic79.28", 		0x100001, 0x10000, CRC(84dccc5b) SHA1(10263d98d663f1170c3203066f391075a1d64ff5) ) // mpr12378.b1  [3/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic80.27", 		0x120001, 0x10000, CRC(3d41b995) SHA1(913d2a0c9a2ac6d36589966d7eb5537120ea6ff0) ) // mpr12378.b1  [4/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic58.22", 		0x000000, 0x10000, CRC(ede51fe0) SHA1(c05a2b51095a322bac5a67ee8886aecc186cbdfe) ) // mpr12379.b4  [1/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic59.21", 		0x020000, 0x10000, CRC(30989141) SHA1(f6e7ae258deedec11b1f80c19575c884aac26c56) ) // mpr12379.b4  [2/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic64.16", 		0x100000, 0x10000, CRC(38e4c92a) SHA1(8b8a596da0726bc02c412a68e5163770fe3e62e4) ) // mpr12379.b4  [3/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic65.15", 		0x120000, 0x10000, CRC(9fb1f9b6) SHA1(a193ff48f2bfbb4afbc322ae33cdf360afcb681e) ) // mpr12379.b4  [4/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic75.32", 		0x040001, 0x10000, CRC(101d2fff) SHA1(1de1390c5f55f192491053c8aac31be3389aab2b) ) // mpr12380.b2  [1/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic76.31", 		0x060001, 0x10000, CRC(677e64a6) SHA1(e3d0d31097017c6cb1a7f41292783f18ce13b41c) ) // mpr12380.b2  [2/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic81.26", 		0x140001, 0x10000, CRC(a34e84d1) SHA1(5aa8836ef1bdf97e399899c911967840e9873bfb) ) // mpr12380.b2  [3/4]      99.992371%
-	ROM_LOAD16_BYTE( "ic82.25", 		0x160001, 0x10000, CRC(ad1c1c90) SHA1(155f17593cfab1a117bb755b1edd0c473d455f91) ) // mpr12380.b2  [4/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic60.20", 		0x040000, 0x10000, CRC(5853000d) SHA1(db7adf1de74c66f667ea7ccc41702576de081ff5) ) // mpr12381.b5  [1/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic61.19", 		0x060000, 0x10000, CRC(697b3276) SHA1(a8aeb2cfaca9368d5bfa14a67de36dbadd4a0585) ) // mpr12381.b5  [2/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic66.14", 		0x140000, 0x10000, CRC(753b01e8) SHA1(0180cf893d63e60e14e2fb0f5836b302f08f0228) ) // mpr12381.b5  [3/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic67.13", 		0x160000, 0x10000, CRC(5dd6d8db) SHA1(270886aebf4549c5cf456b1e90927b759a53e2e1) ) // mpr12381.b5  [4/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic77.30", 		0x080001, 0x10000, CRC(a9519afe) SHA1(0550f596ef080db25241d88242d57edb3c7fb685) ) // mpr12382.b3  [1/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic78.29", 		0x0a0001, 0x10000, CRC(74df9232) SHA1(61286c83eb6f31983c0ed24ca2151c58a95238f1) ) // mpr12382.b3  [2/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic83.24", 		0x180001, 0x10000, CRC(a8c8c784) SHA1(8e998019b4dbf509179d41eb2b446647db3d00a6) ) // mpr12382.b3  [3/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic84.23", 		0x1a0001, 0x10000, CRC(cc3a922c) SHA1(3c96459d95961d463909b6b0e8c77916c3a018e3) ) // mpr12382.b3  [4/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic62.18", 		0x080000, 0x10000, CRC(ac6ad195) SHA1(3c3fe38047698e28cae9193438fe0b85941476c5) ) // mpr12383.b6  [1/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic63.17", 		0x0a0000, 0x10000, CRC(03a905c4) SHA1(c526a744021a392c860ded37afd54a78e9f47778) ) // mpr12383.b6  [2/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic68.12", 		0x180000, 0x10000, CRC(cba013c7) SHA1(a0658aaf7893bc9fb8f0435cab9f77ceb1fb4e1d) ) // mpr12383.b6  [3/4]      IDENTICAL
-	ROM_LOAD16_BYTE( "ic69.11", 		0x1a0000, 0x10000, CRC(bea4d237) SHA1(46e51e89b4ee1e2701da1004758d7da547a2e4c2) ) // mpr12383.b6  [4/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic73.34",         0x000001, 0x10000, CRC(28ba70c8) SHA1(a6f33e1404928b6d1006943494646d6cfbd60a4b) ) // mpr12378.b1  [1/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic74.33",         0x020001, 0x10000, CRC(2ed96a26) SHA1(edcf915243e6f92d31cdfc53965438f6b6bff51d) ) // mpr12378.b1  [2/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic79.28",         0x100001, 0x10000, CRC(84dccc5b) SHA1(10263d98d663f1170c3203066f391075a1d64ff5) ) // mpr12378.b1  [3/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic80.27",         0x120001, 0x10000, CRC(3d41b995) SHA1(913d2a0c9a2ac6d36589966d7eb5537120ea6ff0) ) // mpr12378.b1  [4/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic58.22",         0x000000, 0x10000, CRC(ede51fe0) SHA1(c05a2b51095a322bac5a67ee8886aecc186cbdfe) ) // mpr12379.b4  [1/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic59.21",         0x020000, 0x10000, CRC(30989141) SHA1(f6e7ae258deedec11b1f80c19575c884aac26c56) ) // mpr12379.b4  [2/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic64.16",         0x100000, 0x10000, CRC(38e4c92a) SHA1(8b8a596da0726bc02c412a68e5163770fe3e62e4) ) // mpr12379.b4  [3/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic65.15",         0x120000, 0x10000, CRC(9fb1f9b6) SHA1(a193ff48f2bfbb4afbc322ae33cdf360afcb681e) ) // mpr12379.b4  [4/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic75.32",         0x040001, 0x10000, CRC(101d2fff) SHA1(1de1390c5f55f192491053c8aac31be3389aab2b) ) // mpr12380.b2  [1/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic76.31",         0x060001, 0x10000, CRC(677e64a6) SHA1(e3d0d31097017c6cb1a7f41292783f18ce13b41c) ) // mpr12380.b2  [2/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic81.26",         0x140001, 0x10000, CRC(a34e84d1) SHA1(5aa8836ef1bdf97e399899c911967840e9873bfb) ) // mpr12380.b2  [3/4]      99.992371%
+	ROM_LOAD16_BYTE( "ic82.25",         0x160001, 0x10000, CRC(ad1c1c90) SHA1(155f17593cfab1a117bb755b1edd0c473d455f91) ) // mpr12380.b2  [4/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic60.20",         0x040000, 0x10000, CRC(5853000d) SHA1(db7adf1de74c66f667ea7ccc41702576de081ff5) ) // mpr12381.b5  [1/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic61.19",         0x060000, 0x10000, CRC(697b3276) SHA1(a8aeb2cfaca9368d5bfa14a67de36dbadd4a0585) ) // mpr12381.b5  [2/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic66.14",         0x140000, 0x10000, CRC(753b01e8) SHA1(0180cf893d63e60e14e2fb0f5836b302f08f0228) ) // mpr12381.b5  [3/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic67.13",         0x160000, 0x10000, CRC(5dd6d8db) SHA1(270886aebf4549c5cf456b1e90927b759a53e2e1) ) // mpr12381.b5  [4/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic77.30",         0x080001, 0x10000, CRC(a9519afe) SHA1(0550f596ef080db25241d88242d57edb3c7fb685) ) // mpr12382.b3  [1/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic78.29",         0x0a0001, 0x10000, CRC(74df9232) SHA1(61286c83eb6f31983c0ed24ca2151c58a95238f1) ) // mpr12382.b3  [2/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic83.24",         0x180001, 0x10000, CRC(a8c8c784) SHA1(8e998019b4dbf509179d41eb2b446647db3d00a6) ) // mpr12382.b3  [3/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic84.23",         0x1a0001, 0x10000, CRC(cc3a922c) SHA1(3c96459d95961d463909b6b0e8c77916c3a018e3) ) // mpr12382.b3  [4/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic62.18",         0x080000, 0x10000, CRC(ac6ad195) SHA1(3c3fe38047698e28cae9193438fe0b85941476c5) ) // mpr12383.b6  [1/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic63.17",         0x0a0000, 0x10000, CRC(03a905c4) SHA1(c526a744021a392c860ded37afd54a78e9f47778) ) // mpr12383.b6  [2/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic68.12",         0x180000, 0x10000, CRC(cba013c7) SHA1(a0658aaf7893bc9fb8f0435cab9f77ceb1fb4e1d) ) // mpr12383.b6  [3/4]      IDENTICAL
+	ROM_LOAD16_BYTE( "ic69.11",         0x1a0000, 0x10000, CRC(bea4d237) SHA1(46e51e89b4ee1e2701da1004758d7da547a2e4c2) ) // mpr12383.b6  [4/4]      IDENTICAL
 
 	ROM_REGION( 0x20000, "soundcpu", 0 ) /* sound CPU + samples */
 	ROM_LOAD( "ic45.10", 0x00000, 0x10000, CRC(804dfba8) SHA1(650ca61f78eb4d0aa256b554fb1570330166cc24) )
@@ -2884,7 +2884,7 @@ ROM_START( fpointbl )
 	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) )	// bootleg rom doesn't work, but should be correct!
+	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) ) // bootleg rom doesn't work, but should be correct!
 ROM_END
 
 ROM_START( fpointbj )
@@ -2902,7 +2902,7 @@ ROM_START( fpointbj )
 	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) )	// bootleg rom doesn't work, but should be correct!
+	ROM_LOAD( "flpoint.001", 0x0000, 0x8000, CRC(c5b8e0fe) SHA1(6cf8c67151d8604326fc6dbf976c0635b452a844) ) // bootleg rom doesn't work, but should be correct!
 
 	/* stuff below isn't used but loaded because it was on the board .. */
 	ROM_REGION( 0x0120, "proms", 0 )
@@ -3409,7 +3409,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 		rom[x] = rom[x] ^ 0x2400;
 
 		if (x & 8) rom[x] = BITSWAP16(rom[x],15,14,10,12,  11,13,9,8,
-		                            7,6,5,4,   3,2,1,0 );
+									7,6,5,4,   3,2,1,0 );
 	}
 
 	DRIVER_INIT_CALL(common);

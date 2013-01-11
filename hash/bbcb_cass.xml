@@ -7,9 +7,9 @@
 
 <!-- Loading Instructions:
 
-      If the system has a disk drive (which the BBC Model B does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
+		If the system has a disk drive (which the BBC Model B does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
 
-      To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
+		To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 -->
 
 <softwarelist name="bbcb_cass" description="BBC Micro Model B Cassette Images">
@@ -492,7 +492,7 @@
 		<description>Airline</description>
 		<year>1983</year>
 		<publisher>CCS</publisher>
-        <part name="cass" interface="bbc_cass">
+		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11678">
 				<rom name="airline-modelb(1983)(ccs).uef" size="11678" crc="208f817d" sha1="e2b9a071d053e48fbc954e4dda61a39d38b0c5b1" offset="0" />
 			</dataarea>
@@ -13968,9 +13968,9 @@
 		</part>
 	</software>
 
-    <!-- Business -->
+	<!-- Business -->
 
-    <software name="ap1beebu">
+	<software name="ap1beebu">
 		<description>Applications1: Beebug</description>
 		<year>19??</year>
 		<publisher>Beebug</publisher>
@@ -13992,7 +13992,7 @@
 		</part>
 	</software>
 
-    <software name="beebcalc">
+	<software name="beebcalc">
 		<description>Beeb Calc and Cashflow Demo</description>
 		<year>19??</year>
 		<publisher>Gemini</publisher>
@@ -14003,7 +14003,7 @@
 		</part>
 	</software>
 
-    <software name="beebpltg">
+	<software name="beebpltg">
 		<description>Beeb Plot (Gemini)</description>
 		<year>19??</year>
 		<publisher>Gemini</publisher>
@@ -14014,7 +14014,7 @@
 		</part>
 	</software>
 
-    <software name="commacco">
+	<software name="commacco">
 		<description>Commercial Accounts</description>
 		<year>19??</year>
 		<publisher>Gemini</publisher>
@@ -14025,7 +14025,7 @@
 		</part>
 	</software>
 
-    <software name="datafile">
+	<software name="datafile">
 		<description>Data File</description>
 		<year>1985</year>
 		<publisher>Kansas</publisher>
@@ -14036,7 +14036,7 @@
 		</part>
 	</software>
 
-    <software name="dskdiaryg" cloneof="dskdiary">
+	<software name="dskdiaryg" cloneof="dskdiary">
 		<description>Desk Diary (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -14058,7 +14058,7 @@
 		</part>
 	</software>
 
-    <software name="forecast">
+	<software name="forecast">
 		<description>Forecast</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -14069,7 +14069,7 @@
 		</part>
 	</software>
 
-    <software name="payroll">
+	<software name="payroll">
 		<description>Payroll</description>
 		<year>19??</year>
 		<publisher>Micro Aid</publisher>
@@ -14085,7 +14085,7 @@
 		</part>
 	</software>
 
-    <software name="pmoneyma">
+	<software name="pmoneyma">
 		<description>Personal Money Management</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -14096,7 +14096,7 @@
 		</part>
 	</software>
 
-    <software name="stockcon">
+	<software name="stockcon">
 		<description>Stock Control</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -14107,7 +14107,7 @@
 		</part>
 	</software>
 
-    <software name="stockmrk">
+	<software name="stockmrk">
 		<description>Stock Market</description>
 		<year>19??</year>
 		<publisher>ASP Software</publisher>
@@ -14118,7 +14118,7 @@
 		</part>
 	</software>
 
-    <software name="taxcalc">
+	<software name="taxcalc">
 		<description>Tax Calc</description>
 		<year>19??</year>
 		<publisher>BBC Soft</publisher>
@@ -14129,7 +14129,7 @@
 		</part>
 	</software>
 
-    <software name="spreadsh">
+	<software name="spreadsh">
 		<description>The Spreadsheet</description>
 		<year>19??</year>
 		<publisher>Microl</publisher>
@@ -14140,7 +14140,7 @@
 		</part>
 	</software>
 
-    <software name="vucalc">
+	<software name="vucalc">
 		<description>Vu-Calc</description>
 		<year>19??</year>
 		<publisher>Psion</publisher>
@@ -14162,9 +14162,9 @@
 		</part>
 	</software>
 
-    <!-- Educational -->
+	<!-- Educational -->
 
-    <software name="10bested">
+	<software name="10bested">
 		<description>10 of the Best Education</description>
 		<year>19??</year>
 		<publisher>Database</publisher>
@@ -14175,7 +14175,7 @@
 		</part>
 	</software>
 
-    <software name="animalve">
+	<software name="animalve">
 		<description>Animal, Vegetable, Mineral</description>
 		<year>19??</year>
 		<publisher>Bourne</publisher>
@@ -14186,7 +14186,7 @@
 		</part>
 	</software>
 
-    <software name="alienpla">
+	<software name="alienpla">
 		<description>Basic Adventures in Space: The Alien Planet</description>
 		<year>19??</year>
 		<publisher>Glentop</publisher>
@@ -14218,7 +14218,7 @@
 		</part>
 	</software>
 
-    <software name="bertboot">
+	<software name="bertboot">
 		<description>Bert Boot</description>
 		<year>19??</year>
 		<publisher>HS</publisher>
@@ -14255,7 +14255,7 @@
 		</part>
 	</software>
 
-    <software name="biology">
+	<software name="biology">
 		<description>Biology</description>
 		<year>1983</year>
 		<publisher>Ivan Berg</publisher>
@@ -14266,7 +14266,7 @@
 		</part>
 	</software>
 
-    <software name="birdwatc">
+	<software name="birdwatc">
 		<description>Bird Watch</description>
 		<year>19??</year>
 		<publisher>Macdonald</publisher>
@@ -14277,7 +14277,7 @@
 		</part>
 	</software>
 
-    <software name="castlclo">
+	<software name="castlclo">
 		<description>Castles and Clowns</description>
 		<year>19??</year>
 		<publisher>Macmillian</publisher>
@@ -14293,7 +14293,7 @@
 		</part>
 	</software>
 
-    <software name="chemanal">
+	<software name="chemanal">
 		<description>Chemical Analysis</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -14326,7 +14326,7 @@
 		</part>
 	</software>
 
-    <software name="chemstry">
+	<software name="chemstry">
 		<description>Chemistry</description>
 		<year>19??</year>
 		<publisher>Micro Power</publisher>
@@ -14337,7 +14337,7 @@
 		</part>
 	</software>
 
-    <software name="countoli">
+	<software name="countoli">
 		<description>Count with Oliver</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
@@ -14353,7 +14353,7 @@
 		</part>
 	</software>
 
-    <software name="cranky">
+	<software name="cranky">
 		<description>Cranky</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
@@ -14364,7 +14364,7 @@
 		</part>
 	</software>
 
-    <software name="cutnval">
+	<software name="cutnval">
 		<description>Cut N Val</description>
 		<year>19??</year>
 		<publisher>MP Software</publisher>
@@ -14375,7 +14375,7 @@
 		</part>
 	</software>
 
-    <software name="dart">
+	<software name="dart">
 		<description>Dart</description>
 		<year>19??</year>
 		<publisher>AUCBE</publisher>
@@ -14386,7 +14386,7 @@
 		</part>
 	</software>
 
-    <software name="enbettyb">
+	<software name="enbettyb">
 		<description>Early Numbers: Betty the Butterfly</description>
 		<year>19??</year>
 		<publisher>MrChips</publisher>
@@ -14463,7 +14463,7 @@
 		</part>
 	</software>
 
-    <software name="educsp1">
+	<software name="educsp1">
 		<description>Educational Special No.1</description>
 		<year>19??</year>
 		<publisher>Database</publisher>
@@ -14490,7 +14490,7 @@
 		</part>
 	</software>
 
-    <software name="facemake">
+	<software name="facemake">
 		<description>Facemaker</description>
 		<year>19??</year>
 		<publisher>Acornsoft/ASK</publisher>
@@ -14501,7 +14501,7 @@
 		</part>
 	</software>
 
-    <software name="microrhy">
+	<software name="microrhy">
 		<description>First Book of Micro Rhymes</description>
 		<year>19??</year>
 		<publisher>Peter Gordon</publisher>
@@ -14512,7 +14512,7 @@
 		</part>
 	</software>
 
-    <software name="fs26to8">
+	<software name="fs26to8">
 		<description>Fun School 2: For 6-8 Years</description>
 		<year>1990</year>
 		<publisher>Database</publisher>
@@ -14556,7 +14556,7 @@
 		</part>
 	</software>
 
-    <software name="hibounce">
+	<software name="hibounce">
 		<description>Hi Bouncer</description>
 		<year>19??</year>
 		<publisher>Mirrorsoft</publisher>
@@ -14567,7 +14567,7 @@
 		</part>
 	</software>
 
-    <software name="honeylog">
+	<software name="honeylog">
 		<description>Honey Logo</description>
 		<year>19??</year>
 		<publisher>Glentop</publisher>
@@ -14578,7 +14578,7 @@
 		</part>
 	</software>
 
-    <software name="jugglepu">
+	<software name="jugglepu">
 		<description>Juggle Puzzle</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
@@ -14589,7 +14589,7 @@
 		</part>
 	</software>
 
-    <software name="jnrmath1">
+	<software name="jnrmath1">
 		<description>Junior Maths Part1</description>
 		<year>19??</year>
 		<publisher>Tynesoft</publisher>
@@ -14622,7 +14622,7 @@
 		</part>
 	</software>
 
-    <software name="lsrlettr">
+	<software name="lsrlettr">
 		<description>Laser Letters</description>
 		<year>19??</year>
 		<publisher>Shards Software</publisher>
@@ -14633,7 +14633,7 @@
 		</part>
 	</software>
 
-    <software name="letscoun">
+	<software name="letscoun">
 		<description>Let's Count</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
@@ -14644,7 +14644,7 @@
 		</part>
 	</software>
 
-    <software name="mathsinv">
+	<software name="mathsinv">
 		<description>Maths Invaders</description>
 		<year>19??</year>
 		<publisher>Stell</publisher>
@@ -14666,7 +14666,7 @@
 		</part>
 	</software>
 
-    <software name="mrmenher">
+	<software name="mrmenher">
 		<description>Mr Men: Here and There</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
@@ -14677,7 +14677,7 @@
 		</part>
 	</software>
 
-    <software name="numbergu">
+	<software name="numbergu">
 		<description>Number Gulper</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
@@ -14688,7 +14688,7 @@
 		</part>
 	</software>
 
-    <software name="numberbag" cloneof="numberba">
+	<software name="numberbag" cloneof="numberba">
 		<description>Number Balance (Ger)</description>
 		<year>19??</year>
 		<publisher>Acornsoft/ESM</publisher>
@@ -14721,7 +14721,7 @@
 		</part>
 	</software>
 
-    <software name="physic">
+	<software name="physic">
 		<description>Physics</description>
 		<year>19??</year>
 		<publisher>Micro Power</publisher>
@@ -14732,7 +14732,7 @@
 		</part>
 	</software>
 
-    <software name="podd">
+	<software name="podd">
 		<description>Podd</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
@@ -14743,7 +14743,7 @@
 		</part>
 	</software>
 
-    <software name="questauc">
+	<software name="questauc">
 		<description>Quest</description>
 		<year>19??</year>
 		<publisher>AUCBE</publisher>
@@ -14754,7 +14754,7 @@
 		</part>
 	</software>
 
-    <software name="puncmn12">
+	<software name="puncmn12">
 		<description>Puncman 1 and 2</description>
 		<year>19??</year>
 		<publisher>Chalksoft</publisher>
@@ -14765,7 +14765,7 @@
 		</part>
 	</software>
 
-    <software name="roadcft1">
+	<software name="roadcft1">
 		<description>Roadcraft 1</description>
 		<year>19??</year>
 		<publisher>HS</publisher>
@@ -14776,7 +14776,7 @@
 		</part>
 	</software>
 
-    <software name="science1">
+	<software name="science1">
 		<description>Science 1</description>
 		<year>1985</year>
 		<publisher>Shards Software</publisher>
@@ -14787,7 +14787,7 @@
 		</part>
 	</software>
 
-    <software name="sentseqg" cloneof="sentseq">
+	<software name="sentseqg" cloneof="sentseq">
 		<description>Sentence Sequencing (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -14809,7 +14809,7 @@
 		</part>
 	</software>
 
-    <software name="spanishg">
+	<software name="spanishg">
 		<description>Spanish Gold</description>
 		<year>19??</year>
 		<publisher>Chalksoft</publisher>
@@ -14820,7 +14820,7 @@
 		</part>
 	</software>
 
-    <software name="symmetry">
+	<software name="symmetry">
 		<description>Symmetry</description>
 		<year>19??</year>
 		<publisher>Garland Computing</publisher>
@@ -14831,7 +14831,7 @@
 		</part>
 	</software>
 
-    <software name="frmistra">
+	<software name="frmistra">
 		<description>The French Mistress Level A</description>
 		<year>1983</year>
 		<publisher>Kosmos</publisher>
@@ -14842,7 +14842,7 @@
 		</part>
 	</software>
 
-    <software name="thegarde">
+	<software name="thegarde">
 		<description>The Garden</description>
 		<year>19??</year>
 		<publisher>Clares</publisher>
@@ -14853,7 +14853,7 @@
 		</part>
 	</software>
 
-    <software name="germasta">
+	<software name="germasta">
 		<description>The German Master Level A</description>
 		<year>1983</year>
 		<publisher>Kosmos</publisher>
@@ -14864,7 +14864,7 @@
 		</part>
 	</software>
 
-    <software name="timeman1">
+	<software name="timeman1">
 		<description>Timeman One</description>
 		<year>19??</year>
 		<publisher>Bourne</publisher>
@@ -14886,7 +14886,7 @@
 		</part>
 	</software>
 
-    <software name="topstail">
+	<software name="topstail">
 		<description>Tops and Tails</description>
 		<year>19??</year>
 		<publisher>Macmillian</publisher>
@@ -14902,7 +14902,7 @@
 		</part>
 	</software>
 
-    <software name="treeknowg" cloneof="treeknow">
+	<software name="treeknowg" cloneof="treeknow">
 		<description>Tree Of Knowledge (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -14924,7 +14924,7 @@
 		</part>
 	</software>
 
-    <software name="twelfnig">
+	<software name="twelfnig">
 		<description>Twelfth Night</description>
 		<year>19??</year>
 		<publisher>Penguin</publisher>
@@ -14935,7 +14935,7 @@
 		</part>
 	</software>
 
-    <software name="where">
+	<software name="where">
 		<description>Where</description>
 		<year>19??</year>
 		<publisher>Micro Power</publisher>
@@ -14957,7 +14957,7 @@
 		</part>
 	</software>
 
-    <software name="wordhang">
+	<software name="wordhang">
 		<description>Wordhang</description>
 		<year>19??</year>
 		<publisher>Bourne</publisher>
@@ -14990,7 +14990,7 @@
 		</part>
 	</software>
 
-    <software name="worldgeo">
+	<software name="worldgeo">
 		<description>World Geography</description>
 		<year>19??</year>
 		<publisher>Micro Power</publisher>
@@ -15001,7 +15001,7 @@
 		</part>
 	</software>
 
-    <software name="worldwis">
+	<software name="worldwis">
 		<description>World Wise</description>
 		<year>19??</year>
 		<publisher>Bourne</publisher>
@@ -15012,7 +15012,7 @@
 		</part>
 	</software>
 
-    <software name="jars">
+	<software name="jars">
 		<description>Jars (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -15023,7 +15023,7 @@
 		</part>
 	</software>
 
-    <software name="spooky">
+	<software name="spooky">
 		<description>Spooky Manor</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -15034,7 +15034,7 @@
 		</part>
 	</software>
 
-    <software name="workshop">
+	<software name="workshop">
 		<description>Workshop</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -15045,7 +15045,7 @@
 		</part>
 	</software>
 
-    <software name="abc">
+	<software name="abc">
 		<description>ABC</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -15056,9 +15056,9 @@
 		</part>
 	</software>
 
-    <!-- Languages -->
+	<!-- Languages -->
 
-    <software name="aslangpr">
+	<software name="aslangpr">
 		<description>Assembly Language Programming</description>
 		<year>19??</year>
 		<publisher>Macmillian</publisher>
@@ -15085,7 +15085,7 @@
 		</part>
 	</software>
 
-    <software name="forth">
+	<software name="forth">
 		<description>Forth</description>
 		<year>19??</year>
 		<publisher>Acornsoft</publisher>
@@ -15096,7 +15096,7 @@
 		</part>
 	</software>
 
-    <software name="lisp">
+	<software name="lisp">
 		<description>LISP</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
@@ -15107,9 +15107,9 @@
 		</part>
 	</software>
 
-    <!-- Graphics and other -->
+	<!-- Graphics and other -->
 
-    <software name="advgraph">
+	<software name="advgraph">
 		<description>Advanced Graphics</description>
 		<year>19??</year>
 		<publisher>Macmillian</publisher>
@@ -15135,7 +15135,7 @@
 		</part>
 	</software>
 
-    <software name="amxart">
+	<software name="amxart">
 		<description>AMX Art</description>
 		<year>19??</year>
 		<publisher>AMX</publisher>
@@ -15151,7 +15151,7 @@
 		</part>
 	</software>
 
-    <software name="animator">
+	<software name="animator">
 		<description>Animator</description>
 		<year>19??</year>
 		<publisher>Screenplay</publisher>
@@ -15167,7 +15167,7 @@
 		</part>
 	</software>
 
-    <software name="artistbr" cloneof="artist">
+	<software name="artistbr" cloneof="artist">
 		<description>Artist (Blue Ribbon Games 3)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
@@ -15189,7 +15189,7 @@
 		</part>
 	</software>
 
-    <software name="bbcmusyn">
+	<software name="bbcmusyn">
 		<description>BBC Music Synthesizer</description>
 		<year>19??</year>
 		<publisher>Bug Byte</publisher>
@@ -15233,7 +15233,7 @@
 		</part>
 	</software>
 
-    <software name="crgraph">
+	<software name="crgraph">
 		<description>Creative Graphics</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -15244,7 +15244,7 @@
 		</part>
 	</software>
 
-    <software name="graphpac">
+	<software name="graphpac">
 		<description>Graphics Package</description>
 		<year>19??</year>
 		<publisher>Bug Byte</publisher>
@@ -15271,7 +15271,7 @@
 		</part>
 	</software>
 
-    <software name="pictmake">
+	<software name="pictmake">
 		<description>Picture Maker</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
@@ -15282,7 +15282,7 @@
 		</part>
 	</software>
 
-    <software name="sconrans">
+	<software name="sconrans">
 		<description>Shirley Conran's Magic Garden</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
@@ -15293,7 +15293,7 @@
 		</part>
 	</software>
 
-    <software name="onetonin">
+	<software name="onetonin">
 		<description>One to Nine</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -15304,7 +15304,7 @@
 		</part>
 	</software>
 
-    <software name="pauldani">
+	<software name="pauldani">
 		<description>Paul Daniel's Magic Show</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
@@ -15315,7 +15315,7 @@
 		</part>
 	</software>
 
-    <software name="lwordspa">
+	<software name="lwordspa">
 		<description>Linkword Spanish</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
@@ -15331,9 +15331,9 @@
 		</part>
 	</software>
 
-    <!-- Magazines -->
+	<!-- Magazines -->
 
-    <software name="acornu42">
+	<software name="acornu42">
 		<description>Acorn User Issue 42 (Jan 1986)</description>
 		<year>19??</year>
 		<publisher>Acorn User</publisher>
@@ -15465,7 +15465,7 @@
 		</part>
 	</software>
 
-    <software name="augamesc">
+	<software name="augamesc">
 		<description>Acorn User Games Compendium</description>
 		<year>19??</year>
 		<publisher>Acorn User</publisher>
@@ -15487,7 +15487,7 @@
 		</part>
 	</software>
 
-    <software name="beebtpe4">
+	<software name="beebtpe4">
 		<description>Beebtape No. 4</description>
 		<year>19??</year>
 		<publisher>Beebtape</publisher>
@@ -15498,7 +15498,7 @@
 		</part>
 	</software>
 
-    <software name="beeb110">
+	<software name="beeb110">
 		<description>beebug1-10</description>
 		<year>19??</year>
 		<publisher>Beebug</publisher>
@@ -15993,7 +15993,7 @@
 		</part>
 	</software>
 
-    <software name="bestofau">
+	<software name="bestofau">
 		<description>Best of Acorn User</description>
 		<year>19??</year>
 		<publisher>Beebug</publisher>
@@ -16004,7 +16004,7 @@
 		</part>
 	</software>
 
-    <software name="letscmp1">
+	<software name="letscmp1">
 		<description>Lets Compute 1</description>
 		<year>19??</year>
 		<publisher>LetsCompute</publisher>
@@ -16015,7 +16015,7 @@
 		</part>
 	</software>
 
-    <software name="modelb10">
+	<software name="modelb10">
 		<description>Model B Computing Issue 10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16114,7 +16114,7 @@
 		</part>
 	</software>
 
-    <software name="mu110">
+	<software name="mu110">
 		<description>Micro User Vol.1-10</description>
 		<year>19??</year>
 		<publisher>Micro User</publisher>
@@ -16840,7 +16840,7 @@
 		</part>
 	</software>
 
-    <software name="trek">
+	<software name="trek">
 		<description>Trek</description>
 		<year>19??</year>
 		<publisher>Acorn User</publisher>
@@ -16851,6 +16851,6 @@
 		</part>
 	</software>
 
-    <!-- Demos -->
+	<!-- Demos -->
 
 </softwarelist>

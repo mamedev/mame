@@ -48,7 +48,7 @@ READ8_MEMBER(yunsung8_state::yunsung8_videoram_r)
 	int bank;
 
 	/*  Bit 1 of the bankswitching register contols the c000-c7ff
-        area (Palette). Bit 0 controls the c800-dfff area (Tiles) */
+	    area (Palette). Bit 0 controls the c800-dfff area (Tiles) */
 
 	if (offset < 0x0800)
 		bank = m_videobank & 2;
@@ -65,7 +65,7 @@ READ8_MEMBER(yunsung8_state::yunsung8_videoram_r)
 WRITE8_MEMBER(yunsung8_state::yunsung8_videoram_w)
 {
 
-	if (offset < 0x0800)		// c000-c7ff    Banked Palette RAM
+	if (offset < 0x0800)        // c000-c7ff    Banked Palette RAM
 	{
 		int bank = m_videobank & 2;
 		UINT8 *RAM;
@@ -88,9 +88,9 @@ WRITE8_MEMBER(yunsung8_state::yunsung8_videoram_w)
 		int bank = m_videobank & 1;
 
 		if (offset < 0x1000)
-			tile = (offset - 0x0800);		// c800-cfff: Banked Color RAM
+			tile = (offset - 0x0800);       // c800-cfff: Banked Color RAM
 		else
-			tile = (offset - 0x1000) / 2;	// d000-dfff: Banked Tiles RAM
+			tile = (offset - 0x1000) / 2;   // d000-dfff: Banked Tiles RAM
 
 		if (bank)
 		{
@@ -128,8 +128,8 @@ WRITE8_MEMBER(yunsung8_state::yunsung8_flipscreen_w)
 
 /* Background */
 
-#define DIM_NX_0			(0x40)
-#define DIM_NY_0			(0x20)
+#define DIM_NX_0            (0x40)
+#define DIM_NY_0            (0x20)
 
 TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
 {
@@ -144,8 +144,8 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
 
 /* Text Plane */
 
-#define DIM_NX_1			(0x40)
-#define DIM_NY_1			(0x20)
+#define DIM_NX_1            (0x40)
+#define DIM_NY_1            (0x20)
 
 TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
 {
@@ -196,8 +196,8 @@ UINT32 yunsung8_state::screen_update_yunsung8(screen_device &screen, bitmap_ind1
 if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

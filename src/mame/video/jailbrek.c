@@ -70,7 +70,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
 	{
-		int attr = spriteram[i + 1];	// attributes = ?tyxcccc
+		int attr = spriteram[i + 1];    // attributes = ?tyxcccc
 		int code = spriteram[i] + ((attr & 0x40) << 2);
 		int color = attr & 0x0f;
 		int flipx = attr & 0x10;

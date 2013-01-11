@@ -21,21 +21,21 @@ static const int nusiz[8][3] =
 };
 
 static void extend_palette(running_machine &machine) {
-	int	i,j;
+	int i,j;
 
 	for( i = 0; i < 128; i ++ )
 	{
-		rgb_t	new_rgb = palette_get_color( machine, i );
-		UINT8	new_r = RGB_RED( new_rgb );
-		UINT8	new_g = RGB_GREEN( new_rgb );
-		UINT8	new_b = RGB_BLUE( new_rgb );
+		rgb_t   new_rgb = palette_get_color( machine, i );
+		UINT8   new_r = RGB_RED( new_rgb );
+		UINT8   new_g = RGB_GREEN( new_rgb );
+		UINT8   new_b = RGB_BLUE( new_rgb );
 
 		for ( j = 0; j < 128; j++ )
 		{
-			rgb_t	old_rgb = palette_get_color( machine, j );
-			UINT8	old_r = RGB_RED( old_rgb );
-			UINT8	old_g = RGB_GREEN( old_rgb );
-			UINT8	old_b = RGB_BLUE( old_rgb );
+			rgb_t   old_rgb = palette_get_color( machine, j );
+			UINT8   old_r = RGB_RED( old_rgb );
+			UINT8   old_g = RGB_GREEN( old_rgb );
+			UINT8   old_b = RGB_BLUE( old_rgb );
 
 			palette_set_color_rgb(machine, ( ( i + 1 ) << 7 ) | j,
 				( new_r + old_r ) / 2,
@@ -170,7 +170,7 @@ const device_type TIA_VIDEO = &device_creator<tia_video_device>;
 //-------------------------------------------------
 
 tia_video_device::tia_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, TIA_VIDEO, "TIA Video", tag, owner, clock)
+	: device_t(mconfig, TIA_VIDEO, "TIA Video", tag, owner, clock)
 {
 }
 
@@ -470,7 +470,7 @@ void tia_video_device::setup_pXgfx(void)
 			if ( i )
 			{
 				p0gfx.start_drawing[i] = ( horzP0 + (p0gfx.size[i] > 1 ? 1 : 0)
-										 + i * 8 * ( nusiz[NUSIZ0 & 7][2] + p0gfx.size[i] ) ) % 160;
+											+ i * 8 * ( nusiz[NUSIZ0 & 7][2] + p0gfx.size[i] ) ) % 160;
 				p0gfx.skipclip[i] = 0;
 			}
 			else
@@ -490,7 +490,7 @@ void tia_video_device::setup_pXgfx(void)
 			if ( i )
 			{
 				p1gfx.start_drawing[i] = ( horzP1 + (p1gfx.size[i] > 1 ? 1 : 0)
-										 + i * 8 * ( nusiz[NUSIZ1 & 7][2] + p1gfx.size[i] ) ) % 160;
+											+ i * 8 * ( nusiz[NUSIZ1 & 7][2] + p1gfx.size[i] ) ) % 160;
 				p1gfx.skipclip[i] = 0;
 			}
 			else
@@ -768,11 +768,11 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 		}
 
 		if ( x2 == 160 && y % screen_height == (screen_height - 1) ) {
-			int	t_y;
+			int t_y;
 			for ( t_y = 0; t_y < helper[2]->height(); t_y++ ) {
-				UINT16*	l0 = &helper[current_bitmap]->pix16(t_y);
-				UINT16*	l1 = &helper[1 - current_bitmap]->pix16(t_y);
-				UINT16*	l2 = &helper[2]->pix16(t_y);
+				UINT16* l0 = &helper[current_bitmap]->pix16(t_y);
+				UINT16* l1 = &helper[1 - current_bitmap]->pix16(t_y);
+				UINT16* l2 = &helper[2]->pix16(t_y);
 				int t_x;
 				for( t_x = 0; t_x < helper[2]->width(); t_x++ ) {
 					if ( l0[t_x] != l1[t_x] ) {
@@ -1117,7 +1117,7 @@ WRITE8_MEMBER( tia_video_device::HMOVE_w )
 		horzBL %= 160;
 
 		/* When HMOVE is triggered on CPU cycle 75, the HBlank period on the
-           next line is also extended. */
+		   next line is also extended. */
 		if (curr_x >= 157)
 		{
 			curr_y += 1;
@@ -1195,7 +1195,7 @@ WRITE8_MEMBER( tia_video_device::NUSIZ0_w )
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-                       it as done/invalid, the data will be reset in the next loop. */
+					   it as done/invalid, the data will be reset in the next loop. */
 					p0gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1273,7 +1273,7 @@ WRITE8_MEMBER( tia_video_device::NUSIZ1_w )
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-                       it as done/invalid, the data will be reset in the next loop. */
+					   it as done/invalid, the data will be reset in the next loop. */
 					p1gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1322,26 +1322,26 @@ WRITE8_MEMBER( tia_video_device::CXCLR_w )
 }
 
 
-#define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION,MOTCLK)									\
-	if ( curr_x < MIN( HMOVE_started + 6 + 16 * 4, 7 ) ) {								\
-		int decrements_passed = ( curr_x - ( HMOVE_started + 4 ) ) / 4;					\
-		HORZ += 8;																		\
-		if ( ( MOTCLK - decrements_passed ) > 0 ) {										\
-			HORZ -= ( MOTCLK - decrements_passed );										\
-			if ( HORZ < 0 )																\
-				HORZ += 160;															\
-		}																				\
+#define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION,MOTCLK)                                    \
+	if ( curr_x < MIN( HMOVE_started + 6 + 16 * 4, 7 ) ) {                              \
+		int decrements_passed = ( curr_x - ( HMOVE_started + 4 ) ) / 4;                 \
+		HORZ += 8;                                                                      \
+		if ( ( MOTCLK - decrements_passed ) > 0 ) {                                     \
+			HORZ -= ( MOTCLK - decrements_passed );                                     \
+			if ( HORZ < 0 )                                                             \
+				HORZ += 160;                                                            \
+		}                                                                               \
 	}
 
-#define RESXX_APPLY_PREVIOUS_HMOVE(HORZ,MOTION)												\
-	if ( HMOVE_started_previous != HMOVE_INACTIVE )											\
-	{																						\
-		UINT8	motclk = ( MOTION ^ 0x80 ) >> 4;											\
-		if ( curr_x <= HMOVE_started_previous - 228 + 5 + motclk * 4 )						\
-		{																					\
-			UINT8	motclk_passed = ( curr_x - ( HMOVE_started_previous - 228 + 6 ) ) / 4;	\
-			HORZ -= ( motclk - motclk_passed );												\
-		}																					\
+#define RESXX_APPLY_PREVIOUS_HMOVE(HORZ,MOTION)                                             \
+	if ( HMOVE_started_previous != HMOVE_INACTIVE )                                         \
+	{                                                                                       \
+		UINT8   motclk = ( MOTION ^ 0x80 ) >> 4;                                            \
+		if ( curr_x <= HMOVE_started_previous - 228 + 5 + motclk * 4 )                      \
+		{                                                                                   \
+			UINT8   motclk_passed = ( curr_x - ( HMOVE_started_previous - 228 + 6 ) ) / 4;  \
+			HORZ -= ( motclk - motclk_passed );                                             \
+		}                                                                                   \
 	}
 
 WRITE8_MEMBER( tia_video_device::RESP0_w )
@@ -1380,7 +1380,7 @@ WRITE8_MEMBER( tia_video_device::RESP0_w )
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-                       it as done/invalid, the data will be reset in the next loop. */
+					   it as done/invalid, the data will be reset in the next loop. */
 					p0gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1440,7 +1440,7 @@ WRITE8_MEMBER( tia_video_device::RESP1_w )
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-                       it as done/invalid, the data will be reset in the next loop. */
+					   it as done/invalid, the data will be reset in the next loop. */
 					p1gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1606,11 +1606,11 @@ READ8_MEMBER( tia_video_device::INPT_r )
 
 READ8_MEMBER( tia_video_device::read )
 {
-	 /* lower bits 0 - 5 seem to depend on the last byte on the
-         data bus. If the driver supplied a routine to retrieve
-         that we will call that, otherwise we will use the lower
-         bit of the offset.
-    */
+		/* lower bits 0 - 5 seem to depend on the last byte on the
+		 data bus. If the driver supplied a routine to retrieve
+		 that we will call that, otherwise we will use the lower
+		 bit of the offset.
+	*/
 	UINT8 data = offset & 0x3f;
 
 	if ( !m_databus_contents_func.isnull() )
@@ -1651,7 +1651,7 @@ READ8_MEMBER( tia_video_device::read )
 		return data | INPT_r(space,3);
 	case 0xC:
 		{
-			int	button = !m_read_input_port_func.isnull() ? ( m_read_input_port_func(4,0xFFFF) & 0x80 ) : 0x80;
+			int button = !m_read_input_port_func.isnull() ? ( m_read_input_port_func(4,0xFFFF) & 0x80 ) : 0x80;
 			INPT4 = ( VBLANK & 0x40) ? ( INPT4 & button ) : button;
 		}
 		return data | INPT4;
@@ -1671,51 +1671,51 @@ WRITE8_MEMBER( tia_video_device::write )
 {
 	static const int delay[0x40] =
 	{
-		 0,	// VSYNC
-		 0,	// VBLANK
-		 0,	// WSYNC
-		 0,	// RSYNC
-		 0,	// NUSIZ0
-		 0,	// NUSIZ1
-		 0,	// COLUP0
-		 0,	// COLUP1
-		 0,	// COLUPF
-		 0,	// COLUBK
-		 0,	// CTRLPF
-		 1,	// REFP0
-		 1,	// REFP1
-		 4,	// PF0
-		 4,	// PF1
-		 4,	// PF2
-		 0,	// RESP0
-		 0,	// RESP1
-		 0,	// RESM0
-		 0,	// RESM1
-		 0,	// RESBL
-		-1,	// AUDC0
-		-1,	// AUDC1
-		-1,	// AUDF0
-		-1,	// AUDF1
-		-1,	// AUDV0
-		-1,	// AUDV1
-		 1,	// GRP0
-		 1,	// GRP1
-		 1,	// ENAM0
-		 1,	// ENAM1
-		 1,	// ENABL
-		 0,	// HMP0
-		 0,	// HMP1
-		 0,	// HMM0
-		 0,	// HMM1
-		 0,	// HMBL
-		 0,	// VDELP0
-		 0,	// VDELP1
-		 0,	// VDELBL
-		 0,	// RESMP0
-		 0,	// RESMP1
-		 3,	// HMOVE
-		 0,	// HMCLR
-		 0,	// CXCLR
+			0,  // VSYNC
+			0,  // VBLANK
+			0,  // WSYNC
+			0,  // RSYNC
+			0,  // NUSIZ0
+			0,  // NUSIZ1
+			0,  // COLUP0
+			0,  // COLUP1
+			0,  // COLUPF
+			0,  // COLUBK
+			0,  // CTRLPF
+			1,  // REFP0
+			1,  // REFP1
+			4,  // PF0
+			4,  // PF1
+			4,  // PF2
+			0,  // RESP0
+			0,  // RESP1
+			0,  // RESM0
+			0,  // RESM1
+			0,  // RESBL
+		-1, // AUDC0
+		-1, // AUDC1
+		-1, // AUDF0
+		-1, // AUDF1
+		-1, // AUDV0
+		-1, // AUDV1
+			1,  // GRP0
+			1,  // GRP1
+			1,  // ENAM0
+			1,  // ENAM1
+			1,  // ENABL
+			0,  // HMP0
+			0,  // HMP1
+			0,  // HMM0
+			0,  // HMM1
+			0,  // HMBL
+			0,  // VDELP0
+			0,  // VDELP1
+			0,  // VDELBL
+			0,  // RESMP0
+			0,  // RESMP1
+			3,  // HMOVE
+			0,  // HMCLR
+			0,  // CXCLR
 	};
 	int curr_x = current_x();
 	int curr_y = current_y();

@@ -75,20 +75,20 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/*  bit 0: enable wraparound for scr #1
-            bit 1: msb of code for scr #1
-            bit 2: enable wraparound for scr #2
-            bit 3: msb of code for scr #2
-            bit 4: enable wraparound for scr #3
-            bit 5: msb of code for scr #3
-            bit 6: coin counter 1
-            bit 7: coin counter 2 */
+		    bit 1: msb of code for scr #1
+		    bit 2: enable wraparound for scr #2
+		    bit 3: msb of code for scr #2
+		    bit 4: enable wraparound for scr #3
+		    bit 5: msb of code for scr #3
+		    bit 6: coin counter 1
+		    bit 7: coin counter 2 */
 
 		k051316_wraparound_enable(m_k051316_1, data & 0x01);
 
 		if (m_bank0 != ((data & 0x02) >> 1))
 		{
 			m_bank0 = (data & 0x02) >> 1;
-			machine().tilemap().mark_all_dirty();	/* should mark only zoom0 */
+			machine().tilemap().mark_all_dirty();   /* should mark only zoom0 */
 		}
 
 		k051316_wraparound_enable(m_k051316_2, data & 0x04);
@@ -96,7 +96,7 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 		if (m_bank1 != ((data & 0x08) >> 3))
 		{
 			m_bank1 = (data & 0x08) >> 3;
-			machine().tilemap().mark_all_dirty();	/* should mark only zoom1 */
+			machine().tilemap().mark_all_dirty();   /* should mark only zoom1 */
 		}
 
 		k051316_wraparound_enable(m_k051316_3, data & 0x10);
@@ -104,7 +104,7 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 		if (m_bank2 != ((data & 0x20) >> 5))
 		{
 			m_bank2 = (data & 0x20) >> 5;
-			machine().tilemap().mark_all_dirty();	/* should mark only zoom2 */
+			machine().tilemap().mark_all_dirty();   /* should mark only zoom2 */
 		}
 
 		coin_counter_w(machine(), 0, data & 0x40);

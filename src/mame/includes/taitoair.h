@@ -22,17 +22,17 @@ class taitoair_state : public driver_device
 public:
 	taitoair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_m68000_mainram(*this, "m68000_mainram"),
-		  m_line_ram(*this, "line_ram"),
-		  m_dsp_ram(*this, "dsp_ram"),
-		  m_paletteram(*this, "paletteram"),
-		  m_gradram(*this, "gradram"),
-		  m_backregs(*this, "backregs") { }
+			m_m68000_mainram(*this, "m68000_mainram"),
+			m_line_ram(*this, "line_ram"),
+			m_dsp_ram(*this, "dsp_ram"),
+			m_paletteram(*this, "paletteram"),
+			m_gradram(*this, "gradram"),
+			m_backregs(*this, "backregs") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_m68000_mainram;
 	required_shared_ptr<UINT16> m_line_ram;
-	required_shared_ptr<UINT16> m_dsp_ram;      	// Shared 68000/TMS32025 RAM
+	required_shared_ptr<UINT16> m_dsp_ram;          // Shared 68000/TMS32025 RAM
 	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
@@ -52,12 +52,12 @@ public:
 
 	bitmap_ind16 *m_framebuffer[2];
 
-    /* 3d info */
-    INT16 m_frustumLeft;
-    INT16 m_frustumBottom;
-    INT16 m_eyecoordBuffer[4];  /* homogeneous */
+	/* 3d info */
+	INT16 m_frustumLeft;
+	INT16 m_frustumBottom;
+	INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
-    //bitmap_ind16 *m_buffer3d;
+	//bitmap_ind16 *m_buffer3d;
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(lineram_r);
 	DECLARE_WRITE16_MEMBER(lineram_w);

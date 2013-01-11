@@ -9,7 +9,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_colorram;  	// for helifire
+	optional_shared_ptr<UINT8> m_colorram;      // for helifire
 
 	/* video-related */
 	emu_timer* m_cannon_timer;

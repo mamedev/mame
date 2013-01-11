@@ -55,4 +55,4 @@ DRVLIBS = \
 # layout dependencies
 #-------------------------------------------------
 
-$(LDPOBJ)/ldplayer.o:	$(LAYOUT)/pr8210.lh \
+$(LDPOBJ)/ldplayer.o:   $(LAYOUT)/pr8210.lh \

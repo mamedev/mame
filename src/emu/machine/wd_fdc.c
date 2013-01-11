@@ -356,8 +356,8 @@ bool wd_fdc_t::sector_matches() const
 {
 	if(0)
 		logerror("%s: matching %02x %02x %02x %02x - %02x %02x\n", tag(),
-				 cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
-				 track, sector);
+					cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
+					track, sector);
 
 	if(cur_live.idbuf[0] != track || cur_live.idbuf[2] != sector)
 		return false;
@@ -1508,7 +1508,7 @@ void wd_fdc_t::live_run(attotime limit)
 				}
 
 				if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg == 0xf56a || cur_live.shift_reg == 0xf56b ||
-													 cur_live.shift_reg == 0xf56e || cur_live.shift_reg == 0xf56f)) {
+														cur_live.shift_reg == 0xf56e || cur_live.shift_reg == 0xf56f)) {
 					cur_live.crc =
 						cur_live.shift_reg == 0xf56a ? 0x8fe7 :
 						cur_live.shift_reg == 0xf56b ? 0x9fc6 :

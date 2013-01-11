@@ -32,7 +32,7 @@
 
 // ======================> grip_device
 
-class grip_device :	public device_t,
+class grip_device : public device_t,
 					public device_ecbbus_card_interface
 {
 public:
@@ -68,7 +68,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "grip"; }
+	virtual void device_config_complete() { m_shortname = "grip"; }
 
 	// device_ecbbus_card_interface overrides
 	virtual UINT8 ecbbus_io_r(offs_t offset);
@@ -86,21 +86,21 @@ private:
 	int m_vol1;
 
 	// keyboard state
-	int m_ia;				// PPI port A interrupt
-	int m_ib;				// PPI port B interrupt
-	UINT8 m_keydata;		// keyboard data
-	int m_kbf;				// keyboard buffer full
+	int m_ia;               // PPI port A interrupt
+	int m_ib;               // PPI port B interrupt
+	UINT8 m_keydata;        // keyboard data
+	int m_kbf;              // keyboard buffer full
 
 	// video state
-	optional_shared_ptr<UINT8> m_video_ram;		// video RAM
-	int m_lps;				// light pen sense
-	int m_page;				// video page
-	int m_flash;			// flash
+	optional_shared_ptr<UINT8> m_video_ram;     // video RAM
+	int m_lps;              // light pen sense
+	int m_page;             // video page
+	int m_flash;            // flash
 
 	// ECB bus state
-	UINT8 m_base;			// ECB base address
-	UINT8 m_ppi_pa;			// PPI port A data
-	UINT8 m_ppi_pc;			// PPI port C data
+	UINT8 m_base;           // ECB base address
+	UINT8 m_ppi_pa;         // PPI port A data
+	UINT8 m_ppi_pc;         // PPI port C data
 
 	// timers
 	emu_timer *m_kb_timer;
@@ -108,13 +108,13 @@ private:
 
 
 	/*
-    required_device<hd6345_device> m_crtc;
-    DECLARE_WRITE8_MEMBER( eprom_w );
-    DECLARE_WRITE8_MEMBER( dpage_w );
+	required_device<hd6345_device> m_crtc;
+	DECLARE_WRITE8_MEMBER( eprom_w );
+	DECLARE_WRITE8_MEMBER( dpage_w );
 
-    // video state
-    int m_dpage;            // displayed video page
-    */
+	// video state
+	int m_dpage;            // displayed video page
+	*/
 
 
 

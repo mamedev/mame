@@ -61,7 +61,7 @@ WRITE8_MEMBER(funybubl_state::funybubl_vidram_bank_w)
 
 WRITE8_MEMBER(funybubl_state::funybubl_cpurombank_w)
 {
-	membank("bank2")->set_entry(data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
+	membank("bank2")->set_entry(data & 0x3f);   // should we add a check that (data&0x3f) < #banks?
 }
 
 
@@ -89,13 +89,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, funybubl_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(funybubl_vidram_bank_w)	// vidram bank
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(funybubl_cpurombank_w)		// rom bank?
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(funybubl_vidram_bank_w)    // vidram bank
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(funybubl_cpurombank_w)     // rom bank?
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(funybubl_soundcommand_w)
-	AM_RANGE(0x06, 0x06) AM_READNOP		/* Nothing is done with the data read */
-	AM_RANGE(0x06, 0x06) AM_WRITENOP		/* Written directly after IO port 0 */
-	AM_RANGE(0x07, 0x07) AM_WRITENOP		/* Reset something on startup - Sound CPU ?? */
+	AM_RANGE(0x06, 0x06) AM_READNOP     /* Nothing is done with the data read */
+	AM_RANGE(0x06, 0x06) AM_WRITENOP        /* Written directly after IO port 0 */
+	AM_RANGE(0x07, 0x07) AM_WRITENOP        /* Reset something on startup - Sound CPU ?? */
 ADDRESS_MAP_END
 
 /* Sound CPU */
@@ -116,10 +116,10 @@ static INPUT_PORTS_START( funybubl )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -127,9 +127,9 @@ static INPUT_PORTS_START( funybubl )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -137,12 +137,12 @@ static INPUT_PORTS_START( funybubl )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Maybe unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Maybe unused */
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_2C ) )
@@ -151,7 +151,7 @@ static INPUT_PORTS_START( funybubl )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( Normal ) )
@@ -159,10 +159,10 @@ static INPUT_PORTS_START( funybubl )
 	PORT_DIPSETTING(    0x18, "Hard 2" )
 	PORT_DIPSETTING(    0x10, "Hard 3" )
 	PORT_DIPSETTING(    0x08, "Hard 4" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Nudity" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Nudity" )            PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Semi" )
 	PORT_DIPSETTING(    0x00, "Full" )
 INPUT_PORTS_END
@@ -188,7 +188,7 @@ static const gfx_layout tiles16x16x8_2_layout =
 	{ RGN_FRAC(3,4)+4,RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+4, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+4, RGN_FRAC(1,4)+0, RGN_FRAC(0,4)+4, RGN_FRAC(0,4)+0  },
 	{ 0, 1,2,3, 8,9,10,11, 256,257,258,259, 264,265,266,267},
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-	  8*16, 9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+		8*16, 9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
 	32*16
 };
 
@@ -218,12 +218,12 @@ void funybubl_state::machine_start()
 static MACHINE_CONFIG_START( funybubl, funybubl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz?? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */
 	MCFG_CPU_PROGRAM_MAP(funybubl_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funybubl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		 /* 4 MHz?? */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)      /* 4 MHz?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 

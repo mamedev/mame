@@ -115,8 +115,8 @@ UINT32 kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 
 {
 	m_framecnt++;
 	m_speed = m_mc6845_reg[10]&0x20;
-	m_flash = m_mc6845_reg[10]&0x40;				// cursor modes
-	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15];					// get cursor position
+	m_flash = m_mc6845_reg[10]&0x40;                // cursor modes
+	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15];                    // get cursor position
 	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
@@ -142,7 +142,7 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 	UINT16 x;
 	UINT8 gfx,fg,bg;
 
-	for (x = 0; x < x_count; x++)				// for each character
+	for (x = 0; x < x_count; x++)               // for each character
 	{
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
@@ -185,7 +185,7 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 				inv ^= state->m_mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
-		if ( (ra == 15) & (BIT(attr, 3)) )	/* underline */
+		if ( (ra == 15) & (BIT(attr, 3)) )  /* underline */
 			gfx = 0xff;
 		else
 			gfx = state->m_p_chargen[(chr<<4) | ra ] ^ inv;
@@ -210,26 +210,26 @@ void kaypro_state::mc6845_cursor_configure()
 	UINT8 i,curs_type=0,r9,r10,r11;
 
 	/* curs_type holds the general cursor shape to be created
-        0 = no cursor
-        1 = partial cursor (only shows on a block of scan lines)
-        2 = full cursor
-        3 = two-part cursor (has a part at the top and bottom with the middle blank) */
+	    0 = no cursor
+	    1 = partial cursor (only shows on a block of scan lines)
+	    2 = full cursor
+	    3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < ARRAY_LENGTH(m_mc6845_cursor); i++) m_mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(m_mc6845_cursor); i++) m_mc6845_cursor[i] = 0;        // prepare cursor by erasing old one
 
-	r9  = m_mc6845_reg[9];					// number of scan lines - 1
-	r10 = m_mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
-	r11 = m_mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
+	r9  = m_mc6845_reg[9];                  // number of scan lines - 1
+	r10 = m_mc6845_reg[10] & 0x1f;              // cursor start line = last 5 bits
+	r11 = m_mc6845_reg[11]+1;                   // cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
-	if (r10 < r11) curs_type=1;				// start less than end, show start to end
+	if (r10 < r11) curs_type=1;             // start less than end, show start to end
 	else
-	if (r10 == r11) curs_type=2;				// if equal, show full cursor
-	else curs_type=3;					// if start greater than end, it's a two-part cursor
+	if (r10 == r11) curs_type=2;                // if equal, show full cursor
+	else curs_type=3;                   // if start greater than end, it's a two-part cursor
 
-	if ((r11 - 1) > r9) curs_type=2;			// if end greater than scan-lines, show full cursor
-	if (r10 > r9) curs_type=0;				// if start greater than scan-lines, then no cursor
-	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
+	if ((r11 - 1) > r9) curs_type=2;            // if end greater than scan-lines, show full cursor
+	if (r10 > r9) curs_type=0;              // if start greater than scan-lines, then no cursor
+	if (r11 > 16) r11=16;                   // truncate 5-bit register to fit our 4-bit hardware
 
 	/* create the new cursor */
 	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(m_mc6845_cursor);i++) m_mc6845_cursor[i]=0xff; // turn on full cursor
@@ -244,12 +244,12 @@ void kaypro_state::mc6845_cursor_configure()
 
 void kaypro_state::mc6845_screen_configure()
 {
-	UINT16 width = m_mc6845_reg[1]*8-1;							// width in pixels
-	UINT16 height = m_mc6845_reg[6]*(m_mc6845_reg[9]+1)-1;					// height in pixels
-	UINT16 bytes = m_mc6845_reg[1]*m_mc6845_reg[6]-1;						// video ram needed -1
+	UINT16 width = m_mc6845_reg[1]*8-1;                         // width in pixels
+	UINT16 height = m_mc6845_reg[6]*(m_mc6845_reg[9]+1)-1;                  // height in pixels
+	UINT16 bytes = m_mc6845_reg[1]*m_mc6845_reg[6]-1;                       // video ram needed -1
 
 	/* Resize the screen */
-	if ((width < 640) && (height < 400) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
+	if ((width < 640) && (height < 400) && (bytes < 0x800)) /* bounds checking to prevent an assert or violation */
 		machine().primary_screen->set_visible_area(0, width, 0, height);
 }
 
@@ -274,20 +274,20 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_register_w )
 	static const UINT8 mcmask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
 	if (m_mc6845_ind < 16)
-		m_mc6845_reg[m_mc6845_ind] = data & mcmask[m_mc6845_ind];	/* save data in register */
+		m_mc6845_reg[m_mc6845_ind] = data & mcmask[m_mc6845_ind];   /* save data in register */
 	else
 		m_mc6845_reg[m_mc6845_ind] = data;
 
 	m_crtc->register_w( space, 0, data );
 
 	if ((m_mc6845_ind == 1) || (m_mc6845_ind == 6) || (m_mc6845_ind == 9))
-		mc6845_screen_configure();			/* adjust screen size */
+		mc6845_screen_configure();          /* adjust screen size */
 
 	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12))
-		mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+		mc6845_cursor_configure();      /* adjust cursor shape - remove when mame fixed */
 
 	if ((m_mc6845_ind > 17) && (m_mc6845_ind < 20))
-		m_mc6845_video_address = m_mc6845_reg[19] | ((m_mc6845_reg[18] & 0x3f) << 8);	/* internal ULA address */
+		m_mc6845_video_address = m_mc6845_reg[19] | ((m_mc6845_reg[18] & 0x3f) << 8);   /* internal ULA address */
 }
 
 READ8_MEMBER( kaypro_state::kaypro_videoram_r )

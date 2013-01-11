@@ -419,7 +419,7 @@
 		</part>
 	</software>
 
-    <software name="chasehq2" supported="no">
+	<software name="chasehq2" supported="no">
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
@@ -6433,12 +6433,12 @@
 		<year>2011</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ide64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
-	
+
 			<dataarea name="ide64:u3" size="0x20000">
 				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" offset="0" />
 			</dataarea>
@@ -6450,12 +6450,12 @@
 		<year>2011</year>
 		<publisher>Mr. SID</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="easyflash" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
-	
+
 			<dataarea name="easyflash:u3" size="0x80000">
 				<rom name="u3" size="0x80000" crc="eef0fd43" sha1="ac7dd49f1b8acb01d074e882006a134c4eca432f" offset="0" />
 			</dataarea>
@@ -6471,12 +6471,12 @@
 		<year>1984</year>
 		<publisher>Sequential Circuits</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="scim64s" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="seq64.0.1" size="0x4000" crc="fe43ccdc" sha1="7119615cccdeca5d5006eb04bcf788cc609fbc91" offset="0" />
 			</dataarea>
@@ -6488,12 +6488,12 @@
 		<year>1983</year>
 		<publisher>Moog</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="moogsp" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="moog song producer" size="0x2000" status="nodump" offset="0" />
 			</dataarea>
@@ -6511,12 +6511,12 @@
 		<year>2007</year>
 		<publisher>8bit ventures</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="prophet64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x40000">
 				<rom name="prophet64.bin" size="0x40000" crc="cd55b218" sha1="903c707a058b4690436eea7832373e45c1066849" offset="0" />
 			</dataarea>
@@ -6528,12 +6528,12 @@
 		<year>1987</year>
 		<publisher>Xetec</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ltkernal" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="u7" size="0x2000" status="nodump" offset="0" />
 			</dataarea>
@@ -6559,11 +6559,11 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="sean's diag cart for c64 cs=87e7" size="0x2000" crc="653ec679" sha1="b2d3e90113d7360c7d01a1f017a8edd8ae4441b7" offset="0" />
 			</dataarea>

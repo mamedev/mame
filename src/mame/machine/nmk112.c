@@ -186,5 +186,3 @@ void nmk112_device::device_reset()
 {
 	DEVICE_RESET_NAME( nmk112 )(this);
 }
-
-

@@ -18,10 +18,10 @@
     CONSTANTS
 ***************************************************************************/
 
-#define Z80NE_CPU_SPEED_HZ		1920000	/* 1.92 MHz */
+#define Z80NE_CPU_SPEED_HZ      1920000 /* 1.92 MHz */
 
-#define LX383_KEYS			16
-#define LX383_DOWNSAMPLING	16
+#define LX383_KEYS          16
+#define LX383_DOWNSAMPLING  16
 
 #define LX385_TAPE_SAMPLE_FREQ 38400
 
@@ -35,16 +35,16 @@ enum z80netape_speed
 
 struct cass_data_t {
 	struct {
-		int length;		/* time cassette level is at input.level */
-		int level;		/* cassette level */
-		int bit;		/* bit being read */
+		int length;     /* time cassette level is at input.level */
+		int level;      /* cassette level */
+		int bit;        /* bit being read */
 	} input;
 	struct {
-		int length;		/* time cassette level is at output.level */
-		int level;		/* cassette level */
-		int bit;		/* bit to to output */
+		int length;     /* time cassette level is at output.level */
+		int level;      /* cassette level */
+		int bit;        /* bit to to output */
 	} output;
-	z80netape_speed speed;			/* 300 - 600 - 1200 */
+	z80netape_speed speed;          /* 300 - 600 - 1200 */
 	int wave_filter;
 	int wave_length;
 	int wave_short;
@@ -64,8 +64,8 @@ class z80ne_state : public driver_device
 public:
 	z80ne_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vdg(*this, "mc6847"),
-		  m_videoram(*this,"videoram") {}
+			m_vdg(*this, "mc6847"),
+			m_videoram(*this,"videoram") {}
 
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<UINT8> m_videoram;

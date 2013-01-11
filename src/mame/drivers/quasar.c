@@ -60,7 +60,7 @@ WRITE8_MEMBER(quasar_state::quasar_video_w)
 	switch (m_page)
 	{
 	case 0:  m_video_ram[offset] = data; break;
-	case 1:  m_color_ram[offset] = data & 7; break;	// 3 bits of ram only - 3 x 2102
+	case 1:  m_color_ram[offset] = data & 7; break; // 3 bits of ram only - 3 x 2102
 	case 2:  m_effectram[offset] = data; break;
 	case 3:  m_effectcontrol = data; break;
 	}
@@ -163,30 +163,30 @@ static INPUT_PORTS_START( quasar )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )			/* test switch */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )            /* test switch */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* table (from manual) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* table (from manual) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* count enable (from manual) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* count enable (from manual) */
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )			/* confirmed */
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )           /* confirmed */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )			/* confirmed */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )           /* confirmed */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x30, 0x00, "Number of Rockets" )			/* confirmed */
+	PORT_DIPNAME( 0x30, 0x00, "Number of Rockets" )         /* confirmed */
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )					/* confirmed */
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )                 /* confirmed */
 	PORT_DIPSETTING(    0x00, "Collisions excluded" )
 	PORT_DIPSETTING(    0x80, "Collisions included" )
 
@@ -211,11 +211,11 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x60, 0x20, "Extended Play" )
-	PORT_DIPSETTING(    0x20, "5500" )						/* confirmed */
+	PORT_DIPSETTING(    0x20, "5500" )                      /* confirmed */
 	PORT_DIPSETTING(    0x40, "7500" )
 	PORT_DIPSETTING(    0x60, "9500" )
 	PORT_DIPSETTING(    0x00, "17500" )
-	PORT_DIPNAME( 0x80, 0x80, "Full Screen Rocket" )		/* confirmed */
+	PORT_DIPNAME( 0x80, 0x80, "Full Screen Rocket" )        /* confirmed */
 	PORT_DIPSETTING(    0x80, "Stop at edge" )
 	PORT_DIPSETTING(    0x00, "Wrap Around" )
 
@@ -265,7 +265,7 @@ static const gfx_layout charlayout =
 /* S2636 Mappings */
 
 static GFXDECODE_START( quasar )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 64+1 )	/* ROM chars */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 64+1 )  /* ROM chars */
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
@@ -325,12 +325,12 @@ MACHINE_RESET_MEMBER(quasar_state,quasar)
 static MACHINE_CONFIG_START( quasar, quasar_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
+	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)  /* 14 mhz crystal divide by 4 on board */
 	MCFG_CPU_PROGRAM_MAP(quasar)
 	MCFG_CPU_IO_MAP(quasar_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quasar_state,  quasar_interrupt)
 
-	MCFG_CPU_ADD("soundcpu",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
+	MCFG_CPU_ADD("soundcpu",I8035,6000000)          /* 6MHz crystal divide by 15 in CPU */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)							/* From dot clock */
+	MCFG_SCREEN_REFRESH_RATE(50)                            /* From dot clock */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
@@ -367,15 +367,15 @@ MACHINE_CONFIG_END
 ROM_START( quasar )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "7b_01.bin",    0x0000, 0x0400, CRC(20a7feaf) SHA1(ab89087efca2fcb9568f49ba117755ae2c1bd3a3) )
-	ROM_CONTINUE(			  0x4000, 0x0400 )
+	ROM_CONTINUE(             0x4000, 0x0400 )
 	ROM_LOAD( "6b_02.bin",    0x0400, 0x0400, CRC(c14af4a1) SHA1(ca2d3aff94db43aa7c25d33b345a53f484f679cd) )
-	ROM_CONTINUE(			  0x4400, 0x0400 )
+	ROM_CONTINUE(             0x4400, 0x0400 )
 	ROM_LOAD( "5b_03.bin",    0x0800, 0x0400, CRC(3f051d8b) SHA1(1dd7a5eddfb0d7871705ac9ec1b9c16c2b80ddf0) )
-	ROM_CONTINUE(			  0x4800, 0x0400 )
+	ROM_CONTINUE(             0x4800, 0x0400 )
 	ROM_LOAD( "3b_04.bin",    0x0c00, 0x0400, CRC(e14d04ed) SHA1(3176902e3efd72946468c7e7a221d88fcbf63c97) )
-	ROM_CONTINUE(			  0x4c00, 0x0400 )
+	ROM_CONTINUE(             0x4c00, 0x0400 )
 	ROM_LOAD( "2b_05.bin",    0x1000, 0x0400, CRC(f2113222) SHA1(576e0ac92ba076e00eeeae73892246f92fff252a) )
-	ROM_CONTINUE(			  0x5000, 0x0400 )
+	ROM_CONTINUE(             0x5000, 0x0400 )
 	ROM_LOAD( "7c_06.bin",    0x2000, 0x0400, CRC(f7f1267d) SHA1(29c99191b0b6186af6772d04543a5fd235f5eafd) )
 	ROM_LOAD( "6c_07.bin",    0x2400, 0x0400, CRC(772004eb) SHA1(bfafb6005a1a0cff39b76ec0ad4ea1f438a2f174) )
 	ROM_LOAD( "5c_08.bin",    0x2800, 0x0400, CRC(7a87b6f3) SHA1(213b8ccd7bdd650e19d2746b2d617c1950ba3d2b) )
@@ -397,15 +397,15 @@ ROM_END
 ROM_START( quasara )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "7b_01.bin",    0x0000, 0x0400, CRC(20a7feaf) SHA1(ab89087efca2fcb9568f49ba117755ae2c1bd3a3) )
-	ROM_CONTINUE(			  0x4000, 0x0400 )
+	ROM_CONTINUE(             0x4000, 0x0400 )
 	ROM_LOAD( "6b_02.bin",    0x0400, 0x0400, CRC(c14af4a1) SHA1(ca2d3aff94db43aa7c25d33b345a53f484f679cd) )
-	ROM_CONTINUE(			  0x4400, 0x0400 )
+	ROM_CONTINUE(             0x4400, 0x0400 )
 	ROM_LOAD( "5b_03.bin",    0x0800, 0x0400, CRC(3f051d8b) SHA1(1dd7a5eddfb0d7871705ac9ec1b9c16c2b80ddf0) )
-	ROM_CONTINUE(			  0x4800, 0x0400 )
+	ROM_CONTINUE(             0x4800, 0x0400 )
 	ROM_LOAD( "3b_04.bin",    0x0c00, 0x0400, CRC(e14d04ed) SHA1(3176902e3efd72946468c7e7a221d88fcbf63c97) )
-	ROM_CONTINUE(			  0x4c00, 0x0400 )
+	ROM_CONTINUE(             0x4c00, 0x0400 )
 	ROM_LOAD( "2b_05.bin",    0x1000, 0x0400, CRC(f2113222) SHA1(576e0ac92ba076e00eeeae73892246f92fff252a) )
-	ROM_CONTINUE(			  0x5000, 0x0400 )
+	ROM_CONTINUE(             0x5000, 0x0400 )
 	ROM_LOAD( "7c_06.bin",    0x2000, 0x0400, CRC(f7f1267d) SHA1(29c99191b0b6186af6772d04543a5fd235f5eafd) )
 	ROM_LOAD( "6c_07.bin",    0x2400, 0x0400, CRC(772004eb) SHA1(bfafb6005a1a0cff39b76ec0ad4ea1f438a2f174) )
 	ROM_LOAD( "5c_08.bin",    0x2800, 0x0400, CRC(7a87b6f3) SHA1(213b8ccd7bdd650e19d2746b2d617c1950ba3d2b) )

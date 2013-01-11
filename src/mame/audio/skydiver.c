@@ -16,30 +16,30 @@
 static const discrete_555_desc skydiverWhistl555 =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_AC,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
 static const discrete_lfsr_desc skydiver_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,						/* Bit Length */
-	0,						/* Reset Value */
-	0,						/* Use Bit 0 as XOR input 0 */
-	14,						/* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,			/* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,			/* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,		/* Feedback stage3 replaces the shifted register contents */
-	0x000001,				/* Everything is shifted into the first bit only */
-	DISC_LFSR_FLAG_OUT_INVERT,	/* Output is inverted, Active Low Reset */
-	15						/* Output bit */
+	16,                     /* Bit Length */
+	0,                      /* Reset Value */
+	0,                      /* Use Bit 0 as XOR input 0 */
+	14,                     /* Use Bit 14 as XOR input 1 */
+	DISC_LFSR_XNOR,         /* Feedback stage1 is XNOR */
+	DISC_LFSR_OR,           /* Feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,      /* Feedback stage3 replaces the shifted register contents */
+	0x000001,               /* Everything is shifted into the first bit only */
+	DISC_LFSR_FLAG_OUT_INVERT,  /* Output is inverted, Active Low Reset */
+	15                      /* Output bit */
 };
 
 /* Nodes - Sounds */
-#define SKYDIVER_NOTE_SND		NODE_11
-#define SKYDIVER_NOISE_SND		NODE_12
-#define SKYDIVER_WHISTLE1_SND	NODE_13
-#define SKYDIVER_WHISTLE2_SND	NODE_14
+#define SKYDIVER_NOTE_SND       NODE_11
+#define SKYDIVER_NOISE_SND      NODE_12
+#define SKYDIVER_WHISTLE1_SND   NODE_13
+#define SKYDIVER_WHISTLE2_SND   NODE_14
 
 DISCRETE_SOUND_START(skydiver)
 	/************************************************/
@@ -100,7 +100,7 @@ DISCRETE_SOUND_START(skydiver)
 	DISCRETE_DIVIDE(NODE_20, SKYDIVER_RANGE_DATA, 12096000.0 /2.0 / 2.0, SKYDIVER_RANGE_DATA)
 	DISCRETE_ADDER2(NODE_21, 1, SKYDIVER_NOTE_DATA, 1)
 	// We will disable the divide if SKYDIVER_NOTE_DATA = 0
-	DISCRETE_DIVIDE(NODE_22, SKYDIVER_NOTE_DATA, NODE_20, NODE_21)	// freq
+	DISCRETE_DIVIDE(NODE_22, SKYDIVER_NOTE_DATA, NODE_20, NODE_21)  // freq
 	DISCRETE_SQUAREWAVE(SKYDIVER_NOTE_SND, SKYDIVER_RANGE3_EN, NODE_22, 1000.0, 50.0, 0, 0.0)
 
 	/************************************************/
@@ -123,17 +123,17 @@ DISCRETE_SOUND_START(skydiver)
 	/* frequency, then decays at the rate set by    */
 	/* a 68k resistor and 22uf capacitor.           */
 	/************************************************/
-	DISCRETE_ADJUSTMENT(NODE_30, 250000, 50000, DISC_LINADJ, "WHISTLE1")	/* R66 */
+	DISCRETE_ADJUSTMENT(NODE_30, 250000, 50000, DISC_LINADJ, "WHISTLE1")    /* R66 */
 	DISCRETE_MULTADD(NODE_31, SKYDIVER_WHISTLE1_EN, 3.05-0.33, 0.33)
-	DISCRETE_RCDISC2(NODE_32, SKYDIVER_WHISTLE1_EN, NODE_31, 1.0, NODE_31, 68000.0, 2.2e-5)	/* CV */
-	DISCRETE_SWITCH(NODE_33, 1, SKYDIVER_OCT1_EN, 1e-8, 1e-8 + 3.3e-9)	/* Cap C73 & C58 */
+	DISCRETE_RCDISC2(NODE_32, SKYDIVER_WHISTLE1_EN, NODE_31, 1.0, NODE_31, 68000.0, 2.2e-5) /* CV */
+	DISCRETE_SWITCH(NODE_33, 1, SKYDIVER_OCT1_EN, 1e-8, 1e-8 + 3.3e-9)  /* Cap C73 & C58 */
 	DISCRETE_555_ASTABLE_CV(NODE_34, SKYDIVER_WHISTLE1_EN, 100000, NODE_30, NODE_33, NODE_32, &skydiverWhistl555)
 	DISCRETE_MULTIPLY(SKYDIVER_WHISTLE1_SND, NODE_34, 228.5/3.3)
 
-	DISCRETE_ADJUSTMENT(NODE_35, 250000, 50000, DISC_LINADJ, "WHISTLE2")	/* R65 */
+	DISCRETE_ADJUSTMENT(NODE_35, 250000, 50000, DISC_LINADJ, "WHISTLE2")    /* R65 */
 	DISCRETE_MULTADD(NODE_36, SKYDIVER_WHISTLE2_EN, 3.05-0.33, 0.33)
-	DISCRETE_RCDISC2(NODE_37, SKYDIVER_WHISTLE2_EN, NODE_36, 1.0, NODE_36, 68000.0, 2.2e-5)	/* CV */
-	DISCRETE_SWITCH(NODE_38, 1, SKYDIVER_OCT2_EN, 1e-8, 1e-8 + 3.3e-9)	/* Cap C72 & C59 */
+	DISCRETE_RCDISC2(NODE_37, SKYDIVER_WHISTLE2_EN, NODE_36, 1.0, NODE_36, 68000.0, 2.2e-5) /* CV */
+	DISCRETE_SWITCH(NODE_38, 1, SKYDIVER_OCT2_EN, 1e-8, 1e-8 + 3.3e-9)  /* Cap C72 & C59 */
 	DISCRETE_555_ASTABLE_CV(NODE_39, SKYDIVER_WHISTLE2_EN, 100000, NODE_35, NODE_38, NODE_37, &skydiverWhistl555)
 	DISCRETE_MULTIPLY(SKYDIVER_WHISTLE2_SND, NODE_39, 228.5/3.3)
 

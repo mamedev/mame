@@ -224,4 +224,3 @@ void cpc_dkspeech_device::device_reset()
 {
 	m_sp0256_device->reset();
 }
-

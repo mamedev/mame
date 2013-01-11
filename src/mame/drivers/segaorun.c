@@ -389,12 +389,12 @@ WRITE8_MEMBER( segaorun_state::unknown_portb_w )
 WRITE8_MEMBER( segaorun_state::video_control_w )
 {
 	// Output port:
-    //  D7: SG1 -- connects to sprite chip
-    //  D6: SG0 -- connects to mixing
-    //  D5: Screen display (1= blanked, 0= displayed)
-    //  D4-D2: (ADC2-0)
-    //  D1: (CONT) - affects sprite hardware
-    //  D0: Sound section reset (1= normal operation, 0= reset)
+	//  D7: SG1 -- connects to sprite chip
+	//  D6: SG0 -- connects to mixing
+	//  D5: Screen display (1= blanked, 0= displayed)
+	//  D4-D2: (ADC2-0)
+	//  D1: (CONT) - affects sprite hardware
+	//  D0: Sound section reset (1= normal operation, 0= reset)
 
 	segaic16_set_display_enable(machine(), data & 0x20);
 	m_adc_select = (data >> 2) & 7;
@@ -680,8 +680,8 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				// Output port:
-                //  D7: /MUTE
-                //  D6-D0: unknown
+				//  D7: /MUTE
+				//  D6-D0: unknown
 				machine().sound().system_enable(data & 0x80);
 			}
 			return;
@@ -744,15 +744,15 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 	{
 		case 0x0000/2:
 			// Output port:
-            //  D7-D6: (ADC1-0)
-            //  D5: Screen display
+			//  D7-D6: (ADC1-0)
+			//  D5: Screen display
 			m_adc_select = (data >> 6) & 3;
 			segaic16_set_display_enable(machine(), (data >> 5) & 1);
 			return;
 
 		case 0x0020/2:
 			// Output port:
-            //  D0: Sound section reset (1= normal operation, 0= reset)
+			//  D0: Sound section reset (1= normal operation, 0= reset)
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
@@ -897,13 +897,13 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("ADC0")	// steering
+	PORT_START("ADC0")  // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("ADC1")	// gas pedal
+	PORT_START("ADC1")  // gas pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("ADC2")	// brake
+	PORT_START("ADC2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
@@ -1034,7 +1034,7 @@ static INPUT_PORTS_START( shangon )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 
-	PORT_MODIFY("ADC0")	// steering
+	PORT_MODIFY("ADC0") // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1372,7 +1372,7 @@ ROM_END
 //
 ROM_START( outrundx )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
-        // Earlier version of CPU BD?? uses half size eproms compared to the above sets
+		// Earlier version of CPU BD?? uses half size eproms compared to the above sets
 	ROM_LOAD16_BYTE( "epr-10183.115", 0x000000, 0x8000, CRC(3d992396) SHA1(8cef43799b71cfd36d3fea140afff7fe0bafcfc1) )
 	ROM_LOAD16_BYTE( "epr-10261.130", 0x000001, 0x8000, CRC(1d034847) SHA1(664b24c13f7885403328906682213e38c1ad994e) )
 	ROM_LOAD16_BYTE( "epr-10184.116", 0x010000, 0x8000, CRC(1a73dc46) SHA1(70f31619e80eb3d70747e7006e135c8bc0a31675) )
@@ -1503,27 +1503,27 @@ ROM_START( outrunb )
 	ROM_LOAD16_BYTE( "a-11.bin", 0x20001, 0x10000, CRC(74c5fbec) SHA1(a44f1477d830fdb4d6c29351da94776843e5d3e1) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "a-15.bin",	0x00000, 0x10000, CRC(4c489133) SHA1(db97de9d84ca5916e69972ee19ccb4c15fa98bf9) )
-	ROM_LOAD( "a-17.bin",	0x10000, 0x10000, CRC(899c781d) SHA1(4f759c316a57a1e42838375525290425d25b53e1) )
-	ROM_LOAD( "a-16.bin",	0x20000, 0x10000, CRC(98dd4d15) SHA1(914ebcb330455ab35968b4add4d94be123a185a5) )
+	ROM_LOAD( "a-15.bin",   0x00000, 0x10000, CRC(4c489133) SHA1(db97de9d84ca5916e69972ee19ccb4c15fa98bf9) )
+	ROM_LOAD( "a-17.bin",   0x10000, 0x10000, CRC(899c781d) SHA1(4f759c316a57a1e42838375525290425d25b53e1) )
+	ROM_LOAD( "a-16.bin",   0x20000, 0x10000, CRC(98dd4d15) SHA1(914ebcb330455ab35968b4add4d94be123a185a5) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	ROM_LOAD32_BYTE( "a-18.bin",	0x00000, 0x10000, CRC(77377e00) SHA1(4f376b05692f33d529f4c058dac989136c808ca1) )
-	ROM_LOAD32_BYTE( "a-20.bin",	0x00001, 0x10000, CRC(69ecc975) SHA1(3560e9a31fc71e263a6ff61224b8db2b17836075) )
-	ROM_LOAD32_BYTE( "a-22.bin",	0x00002, 0x10000, CRC(b6a8d0e2) SHA1(6184700dbe2c8c9c91f220e246501b7a865e4a05) )
-	ROM_LOAD32_BYTE( "a-24.bin",	0x00003, 0x10000, CRC(d632d8a2) SHA1(27ca6faaa073bd01b2be959dba0359f93e8c1ec1) )
-	ROM_LOAD32_BYTE( "a-26.bin",	0x40000, 0x10000, CRC(4f784236) SHA1(1fb610fd29d3ddd8c5d4892ae215386b18552e6f) )
-	ROM_LOAD32_BYTE( "a-28.bin",	0x40001, 0x10000, CRC(ee4f7154) SHA1(3a84c1b19d9dfcd5310e9cee90c0d4562a4a7786) )
-	ROM_LOAD32_BYTE( "a-30.bin",	0x40002, 0x10000, CRC(e9880aa3) SHA1(cc47f631e758bd856bbc6d010fe230f9b1ed29de) )
-	ROM_LOAD32_BYTE( "a-32.bin",	0x40003, 0x10000, CRC(dc286dc2) SHA1(eaa245b81f8a324988f617467fc3134a39b59c65) )
-	ROM_LOAD32_BYTE( "a-19.bin",	0x80000, 0x10000, CRC(2c0e7277) SHA1(cf14d1ca1fba2e2687998c04ad2ab8c629917412) )
-	ROM_LOAD32_BYTE( "a-21.bin",	0x80001, 0x10000, CRC(54761e57) SHA1(dc0fc645eb998675ab9fe683d63d4ee57ae23693) )
-	ROM_LOAD32_BYTE( "a-23.bin",	0x80002, 0x10000, CRC(a00d0676) SHA1(c2ab29a7489c6f774ce26ef023758215ea3f7050) )
-	ROM_LOAD32_BYTE( "a-25.bin",	0x80003, 0x10000, CRC(da398368) SHA1(115b2881d2d5ddeda2ce82bb209a2c0b4acfcae4) )
-	ROM_LOAD32_BYTE( "a-27.bin",	0xc0000, 0x10000, CRC(8d459356) SHA1(143914b1ac074708fed1d89072f915424aeb841e) )
-	ROM_LOAD32_BYTE( "a-29.bin",	0xc0001, 0x10000, CRC(a8245727) SHA1(13c1d417078d91b8c97e35d632e1ac4bc9bd64e3) )
-	ROM_LOAD32_BYTE( "a-31.bin",	0xc0002, 0x10000, CRC(ef7d06fe) SHA1(541b5ba45f4140e2cc29a9da2592b476d414af5d) )
-	ROM_LOAD32_BYTE( "a-33.bin",	0xc0003, 0x10000, CRC(1222af9f) SHA1(2364bd54cbe21dd688efff32e93bf154546c93d6) )
+	ROM_LOAD32_BYTE( "a-18.bin",    0x00000, 0x10000, CRC(77377e00) SHA1(4f376b05692f33d529f4c058dac989136c808ca1) )
+	ROM_LOAD32_BYTE( "a-20.bin",    0x00001, 0x10000, CRC(69ecc975) SHA1(3560e9a31fc71e263a6ff61224b8db2b17836075) )
+	ROM_LOAD32_BYTE( "a-22.bin",    0x00002, 0x10000, CRC(b6a8d0e2) SHA1(6184700dbe2c8c9c91f220e246501b7a865e4a05) )
+	ROM_LOAD32_BYTE( "a-24.bin",    0x00003, 0x10000, CRC(d632d8a2) SHA1(27ca6faaa073bd01b2be959dba0359f93e8c1ec1) )
+	ROM_LOAD32_BYTE( "a-26.bin",    0x40000, 0x10000, CRC(4f784236) SHA1(1fb610fd29d3ddd8c5d4892ae215386b18552e6f) )
+	ROM_LOAD32_BYTE( "a-28.bin",    0x40001, 0x10000, CRC(ee4f7154) SHA1(3a84c1b19d9dfcd5310e9cee90c0d4562a4a7786) )
+	ROM_LOAD32_BYTE( "a-30.bin",    0x40002, 0x10000, CRC(e9880aa3) SHA1(cc47f631e758bd856bbc6d010fe230f9b1ed29de) )
+	ROM_LOAD32_BYTE( "a-32.bin",    0x40003, 0x10000, CRC(dc286dc2) SHA1(eaa245b81f8a324988f617467fc3134a39b59c65) )
+	ROM_LOAD32_BYTE( "a-19.bin",    0x80000, 0x10000, CRC(2c0e7277) SHA1(cf14d1ca1fba2e2687998c04ad2ab8c629917412) )
+	ROM_LOAD32_BYTE( "a-21.bin",    0x80001, 0x10000, CRC(54761e57) SHA1(dc0fc645eb998675ab9fe683d63d4ee57ae23693) )
+	ROM_LOAD32_BYTE( "a-23.bin",    0x80002, 0x10000, CRC(a00d0676) SHA1(c2ab29a7489c6f774ce26ef023758215ea3f7050) )
+	ROM_LOAD32_BYTE( "a-25.bin",    0x80003, 0x10000, CRC(da398368) SHA1(115b2881d2d5ddeda2ce82bb209a2c0b4acfcae4) )
+	ROM_LOAD32_BYTE( "a-27.bin",    0xc0000, 0x10000, CRC(8d459356) SHA1(143914b1ac074708fed1d89072f915424aeb841e) )
+	ROM_LOAD32_BYTE( "a-29.bin",    0xc0001, 0x10000, CRC(a8245727) SHA1(13c1d417078d91b8c97e35d632e1ac4bc9bd64e3) )
+	ROM_LOAD32_BYTE( "a-31.bin",    0xc0002, 0x10000, CRC(ef7d06fe) SHA1(541b5ba45f4140e2cc29a9da2592b476d414af5d) )
+	ROM_LOAD32_BYTE( "a-33.bin",    0xc0003, 0x10000, CRC(1222af9f) SHA1(2364bd54cbe21dd688efff32e93bf154546c93d6) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx - correct order unknown (identical after bitswapping)
 	ROM_LOAD( "a-2.bin", 0x0000, 0x8000, CRC(ed5bda9c) SHA1(f09a34caf1f9f6b119700a00635ab8fa8244362d) )
@@ -1571,7 +1571,7 @@ ROM_START( shangon )
 
 	ROM_REGION16_BE( 0x100000, "sprites", 0 ) // sprites
 	// Super Hang-On Video board 837-6279-01 (mask rom type), same data but mask roms twice the size as "EPR" counterparts
-	ROM_LOAD16_BYTE( "mpr-10794.8",	 0x000001, 0x020000, CRC(7c958e63) SHA1(ef79614e94280607a6cdf6e13db051accfd2add0) )
+	ROM_LOAD16_BYTE( "mpr-10794.8",  0x000001, 0x020000, CRC(7c958e63) SHA1(ef79614e94280607a6cdf6e13db051accfd2add0) )
 	ROM_LOAD16_BYTE( "mpr-10798.16", 0x000000, 0x020000, CRC(7d58f807) SHA1(783c9929d27a0270b3f7d5eb799cee6b2e5b7ae5) )
 	ROM_LOAD16_BYTE( "mpr-10795.6",  0x040001, 0x020000, CRC(d9d31f8c) SHA1(3ce07b83e3aa2d8834c1a449fa31e003df5486a3) )
 	ROM_LOAD16_BYTE( "mpr-10799.14", 0x040000, 0x020000, CRC(96d90d3d) SHA1(6572cbce8f98a1a7a8e59b0c502ab274f78d2819) )
@@ -1629,7 +1629,7 @@ ROM_START( shangon3 )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
 	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
+	ROM_LOAD16_BYTE( "epr-10675.8",  0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-10676.7",  0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
 	ROM_LOAD16_BYTE( "epr-10683.15", 0x020000, 0x010000, CRC(6365d2e9) SHA1(688e2ba194e859f86cd3486c2575ebae257e975a) )
@@ -1690,7 +1690,7 @@ ROM_START( shangon2 )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
 	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
+	ROM_LOAD16_BYTE( "epr-10675.8",  0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-10676.7",  0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
 	ROM_LOAD16_BYTE( "epr-10683.15", 0x020000, 0x010000, CRC(6365d2e9) SHA1(688e2ba194e859f86cd3486c2575ebae257e975a) )
@@ -1751,7 +1751,7 @@ ROM_START( shangon1 )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
 	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
+	ROM_LOAD16_BYTE( "epr-10675.8",  0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-10676.7",  0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
 	ROM_LOAD16_BYTE( "epr-10683.15", 0x020000, 0x010000, CRC(6365d2e9) SHA1(688e2ba194e859f86cd3486c2575ebae257e975a) )
@@ -1812,7 +1812,7 @@ ROM_START( shangonle )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
 	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
+	ROM_LOAD16_BYTE( "epr-10675.8",  0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-13945.7",  0x020001, 0x010000, CRC(fbb1eef9) SHA1(2798df2f25706e0d3be01d945274f478d7e5a2ae) )
 	ROM_LOAD16_BYTE( "epr-13946.15", 0x020000, 0x010000, CRC(03144930) SHA1(c20f4883ee2de35cd0b67949de0e41464f2c5fae) )
@@ -1864,7 +1864,7 @@ ROM_START( toutrun )
 	ROM_LOAD16_BYTE( "epr-12293.131", 0x040000, 0x10000, CRC(f4321eea) SHA1(64334acc82c14bb58b7d51719f34fd81cfb9fc6b) )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0118.key", 0x0000, 0x2000, CRC(083d7d56) SHA1(3153e44479986859f60a26fe9264ecea07e6e469) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
@@ -1924,7 +1924,7 @@ ROM_START( toutrun3 )
 	ROM_LOAD16_BYTE( "epr-12293.131", 0x040000, 0x10000, CRC(f4321eea) SHA1(64334acc82c14bb58b7d51719f34fd81cfb9fc6b) )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0107.key", 0x0000, 0x2000, CRC(33e632ae) SHA1(9fd8bd11d0a87ec4dfc4dc386012ab7992cb2bd7) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
@@ -1991,7 +1991,7 @@ ROM_START( toutrun2 )
 	ROM_LOAD16_BYTE( "epr-12293.131", 0x040000, 0x10000, CRC(f4321eea) SHA1(64334acc82c14bb58b7d51719f34fd81cfb9fc6b) )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0106.key", 0x0000, 0x2000, CRC(a4e33916) SHA1(61d13bf85e13c15642d143ea79afa501980d672f) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
@@ -2052,7 +2052,7 @@ ROM_START( toutrun1 )
 	ROM_LOAD16_BYTE( "epr-12293.131", 0x040000, 0x10000, CRC(f4321eea) SHA1(64334acc82c14bb58b7d51719f34fd81cfb9fc6b) )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 )	// decryption key
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0109.key", 0x0000, 0x2000, CRC(e12a6e78) SHA1(358325490fc93bb979e9a9a296ce639d331e8b52) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU

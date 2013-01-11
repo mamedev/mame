@@ -202,7 +202,7 @@ TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 	UINT8 attr = m_videoram[2 * tile_index + 1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
 
-	tileinfo.group = ((attr & 0x0f) == 0x0f) ? 1 : 0;	/* tunnels */
+	tileinfo.group = ((attr & 0x0f) == 0x0f) ? 1 : 0;   /* tunnels */
 
 	SET_TILE_INFO_MEMBER(
 			0,

@@ -256,8 +256,8 @@ _count_leading_zeros(UINT32 value)
 
 	__asm__ (
 		" cntlzw  %[result], %[value] \n"
-		: [result] "=r" (result)	/* result can be in any register */
-		: [value]  "r"  (value)		/* 'value' can be in any register */
+		: [result] "=r" (result)    /* result can be in any register */
+		: [value]  "r"  (value)     /* 'value' can be in any register */
 	);
 
 	return result;
@@ -278,8 +278,8 @@ _count_leading_ones(UINT32 value)
 	__asm__ (
 		" not     %[result], %[value]  \n"
 		" cntlzw  %[result], %[result] \n"
-		: [result] "=r" (result)	/* result can be in any register */
-		: [value]  "r"  (value)		/* 'value' can be in any register */
+		: [result] "=r" (result)    /* result can be in any register */
+		: [value]  "r"  (value)     /* 'value' can be in any register */
 	);
 
 	return result;
@@ -312,12 +312,12 @@ _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 		"   stwcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
 		"2:                                 "
-	  : [dummy]    "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
-	  , [result]   "=&r" (result)
-	  : [ptr]      "r"   (ptr)
-	  , [exchange] "r"   (exchange)
-	  , [compare]  "r"   (compare)
-	  : "cr0"
+		: [dummy]    "+m"  (*ptr)   /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+		, [result]   "=&r" (result)
+		: [ptr]      "r"   (ptr)
+		, [exchange] "r"   (exchange)
+		, [compare]  "r"   (compare)
+		: "cr0"
 	);
 
 	return result;
@@ -345,12 +345,12 @@ _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 		"   stdcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
 		"2:                                 "
-	  : [dummy]    "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
-	  , [result]   "=&r" (result)
-	  : [ptr]      "r"   (ptr)
-	  , [exchange] "r"   (exchange)
-	  , [compare]  "r"   (compare)
-	  : "cr0"
+		: [dummy]    "+m"  (*ptr)   /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+		, [result]   "=&r" (result)
+		: [ptr]      "r"   (ptr)
+		, [exchange] "r"   (exchange)
+		, [compare]  "r"   (compare)
+		: "cr0"
 	);
 
 	return result;
@@ -375,11 +375,11 @@ _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 		"   sync                          \n"
 		"   stwcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
-	  : [dummy]    "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
-	  , [result]   "=&r" (result)
-	  : [ptr]      "r"   (ptr)
-	  , [exchange] "r"   (exchange)
-	  : "cr0"
+		: [dummy]    "+m"  (*ptr)   /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+		, [result]   "=&r" (result)
+		: [ptr]      "r"   (ptr)
+		, [exchange] "r"   (exchange)
+		: "cr0"
 	);
 
 	return result;
@@ -404,11 +404,11 @@ _atomic_add32(INT32 volatile *ptr, INT32 delta)
 		"   sync                                  \n"
 		"   stwcx. %[result], 0, %[ptr]           \n"
 		"   bne-   1b                             \n"
-	  : [dummy]  "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
-	  , [result] "=&b" (result)
-	  : [ptr]    "r"   (ptr)
-	  , [delta]  "r"   (delta)
-	  : "cr0"
+		: [dummy]  "+m"  (*ptr) /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+		, [result] "=&b" (result)
+		: [ptr]    "r"   (ptr)
+		, [delta]  "r"   (delta)
+		: "cr0"
 	);
 
 	return result;
@@ -433,10 +433,10 @@ _atomic_increment32(INT32 volatile *ptr)
 		"   sync                            \n"
 		"   stwcx.  %[result], 0, %[ptr]    \n"
 		"   bne-    1b                      \n"
-	  : [dummy]  "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
-	  , [result] "=&b" (result)
-	  : [ptr]    "r"   (ptr)
-	  : "cr0"
+		: [dummy]  "+m"  (*ptr) /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+		, [result] "=&b" (result)
+		: [ptr]    "r"   (ptr)
+		: "cr0"
 	);
 
 	return result;
@@ -461,10 +461,10 @@ _atomic_decrement32(INT32 volatile *ptr)
 		"   sync                             \n"
 		"   stwcx.  %[result], 0, %[ptr]     \n"
 		"   bne-    1b                       \n"
-	  : [dummy]  "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
-	  , [result] "=&b" (result)
-	  : [ptr]    "r"   (ptr)
-	  : "cr0"
+		: [dummy]  "+m"  (*ptr) /* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+		, [result] "=&b" (result)
+		: [ptr]    "r"   (ptr)
+		: "cr0"
 	);
 
 	return result;

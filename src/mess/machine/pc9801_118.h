@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	NEC PC-9801-118
+    NEC PC-9801-118
 
 ***************************************************************************/
 
@@ -37,7 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(pc9801_118_ext_r);
 	DECLARE_WRITE8_MEMBER(pc9801_118_ext_w);
 
-//	required_device<cpu_device>  m_maincpu;
+//  required_device<cpu_device>  m_maincpu;
 	required_device<ym2608_device>  m_opn3;
 	virtual const rom_entry *device_rom_region() const;
 protected:

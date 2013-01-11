@@ -51,34 +51,34 @@
 //**************************************************************************
 
 // core commands
-#define CLICOMMAND_HELP					"help"
-#define CLICOMMAND_VALIDATE				"validate"
+#define CLICOMMAND_HELP                 "help"
+#define CLICOMMAND_VALIDATE             "validate"
 
 // configuration commands
-#define CLICOMMAND_CREATECONFIG			"createconfig"
-#define CLICOMMAND_SHOWCONFIG			"showconfig"
-#define CLICOMMAND_SHOWUSAGE			"showusage"
+#define CLICOMMAND_CREATECONFIG         "createconfig"
+#define CLICOMMAND_SHOWCONFIG           "showconfig"
+#define CLICOMMAND_SHOWUSAGE            "showusage"
 
 // frontend commands
-#define CLICOMMAND_LISTXML				"listxml"
-#define CLICOMMAND_LISTFULL				"listfull"
-#define CLICOMMAND_LISTSOURCE			"listsource"
-#define CLICOMMAND_LISTCLONES			"listclones"
-#define CLICOMMAND_LISTBROTHERS			"listbrothers"
-#define CLICOMMAND_LISTCRC				"listcrc"
-#define CLICOMMAND_LISTROMS				"listroms"
-#define CLICOMMAND_LISTSAMPLES			"listsamples"
-#define CLICOMMAND_VERIFYROMS			"verifyroms"
-#define CLICOMMAND_VERIFYSAMPLES		"verifysamples"
-#define CLICOMMAND_ROMIDENT				"romident"
-#define CLICOMMAND_LISTDEVICES			"listdevices"
-#define CLICOMMAND_LISTSLOTS			"listslots"
-#define CLICOMMAND_LISTMEDIA			"listmedia"		// needed by MESS
-#define CLICOMMAND_LISTSOFTWARE			"listsoftware"
-#define CLICOMMAND_VERIFYSOFTWARE		"verifysoftware"
-#define CLICOMMAND_GETSOFTLIST			"getsoftlist"
-#define CLICOMMAND_VERIFYSOFTLIST		"verifysoftlist"
-#define CLICOMMAND_LIST_MIDI_DEVICES	"listmidi"
+#define CLICOMMAND_LISTXML              "listxml"
+#define CLICOMMAND_LISTFULL             "listfull"
+#define CLICOMMAND_LISTSOURCE           "listsource"
+#define CLICOMMAND_LISTCLONES           "listclones"
+#define CLICOMMAND_LISTBROTHERS         "listbrothers"
+#define CLICOMMAND_LISTCRC              "listcrc"
+#define CLICOMMAND_LISTROMS             "listroms"
+#define CLICOMMAND_LISTSAMPLES          "listsamples"
+#define CLICOMMAND_VERIFYROMS           "verifyroms"
+#define CLICOMMAND_VERIFYSAMPLES        "verifysamples"
+#define CLICOMMAND_ROMIDENT             "romident"
+#define CLICOMMAND_LISTDEVICES          "listdevices"
+#define CLICOMMAND_LISTSLOTS            "listslots"
+#define CLICOMMAND_LISTMEDIA            "listmedia"     // needed by MESS
+#define CLICOMMAND_LISTSOFTWARE         "listsoftware"
+#define CLICOMMAND_VERIFYSOFTWARE       "verifysoftware"
+#define CLICOMMAND_GETSOFTLIST          "getsoftlist"
+#define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
+#define CLICOMMAND_LIST_MIDI_DEVICES    "listmidi"
 
 
 //**************************************************************************
@@ -138,9 +138,9 @@ private:
 	void output_single_softlist(FILE *out,software_list *list, const char *listname);
 
 	// internal state
-	cli_options &		m_options;
-	osd_interface &		m_osd;
-	int					m_result;
+	cli_options &       m_options;
+	osd_interface &     m_osd;
+	int                 m_result;
 };
 
 
@@ -166,12 +166,12 @@ public:
 
 private:
 	// internal state
-	driver_enumerator	m_drivlist;
-	int					m_total;
-	int					m_matches;
-	int					m_nonroms;
+	driver_enumerator   m_drivlist;
+	int                 m_total;
+	int                 m_matches;
+	int                 m_nonroms;
 };
 
 
 
-#endif	/* __CLIFRONT_H__ */
+#endif  /* __CLIFRONT_H__ */

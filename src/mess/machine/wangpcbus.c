@@ -29,7 +29,7 @@ const device_type WANGPC_BUS_SLOT = &device_creator<wangpcbus_slot_device>;
 //-------------------------------------------------
 
 wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, WANGPC_BUS_SLOT, "Wang PC bus slot", tag, owner, clock),
+		device_t(mconfig, WANGPC_BUS_SLOT, "Wang PC bus slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -79,16 +79,16 @@ void wangpcbus_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq2_cb, 0, sizeof(m_out_irq2_cb));
-    	memset(&m_out_irq3_cb, 0, sizeof(m_out_irq3_cb));
-    	memset(&m_out_irq4_cb, 0, sizeof(m_out_irq4_cb));
-    	memset(&m_out_irq5_cb, 0, sizeof(m_out_irq5_cb));
-    	memset(&m_out_irq6_cb, 0, sizeof(m_out_irq6_cb));
-    	memset(&m_out_irq7_cb, 0, sizeof(m_out_irq7_cb));
-    	memset(&m_out_drq1_cb, 0, sizeof(m_out_drq1_cb));
-    	memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
-    	memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
-    	memset(&m_out_ioerror_cb, 0, sizeof(m_out_ioerror_cb));
+		memset(&m_out_irq2_cb, 0, sizeof(m_out_irq2_cb));
+		memset(&m_out_irq3_cb, 0, sizeof(m_out_irq3_cb));
+		memset(&m_out_irq4_cb, 0, sizeof(m_out_irq4_cb));
+		memset(&m_out_irq5_cb, 0, sizeof(m_out_irq5_cb));
+		memset(&m_out_irq6_cb, 0, sizeof(m_out_irq6_cb));
+		memset(&m_out_irq7_cb, 0, sizeof(m_out_irq7_cb));
+		memset(&m_out_drq1_cb, 0, sizeof(m_out_drq1_cb));
+		memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
+		memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
+		memset(&m_out_ioerror_cb, 0, sizeof(m_out_ioerror_cb));
 	}
 }
 
@@ -103,7 +103,7 @@ void wangpcbus_device::device_config_complete()
 //-------------------------------------------------
 
 wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, WANGPC_BUS, "Wang PC bus", tag, owner, clock)
+		device_t(mconfig, WANGPC_BUS, "Wang PC bus", tag, owner, clock)
 {
 }
 

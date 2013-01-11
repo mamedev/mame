@@ -242,7 +242,7 @@ TODO: - Distinguish door switches using manual
 #include "includes/mpu4.h"
 
 
-#include "video/awpvid.h"		//Fruit Machines Only
+#include "video/awpvid.h"       //Fruit Machines Only
 
 #include "mpu4.lh"
 #include "mpu4ext.lh"
@@ -320,7 +320,7 @@ static void lamp_extend_large(mpu4_state *state, int data,int column,int active)
 				state->m_lamp_strobe_ext = column;
 			}
 		}
-	    state->m_last_b7 = bit7;
+		state->m_last_b7 = bit7;
 	}
 	else
 	{
@@ -450,7 +450,7 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 
 	m_prot_col  = 0;
 	m_chr_counter    = 0;
-	m_chr_value		= 0;
+	m_chr_value     = 0;
 
 
 	{
@@ -480,12 +480,12 @@ WRITE_LINE_MEMBER(mpu4_state::cpu0_irq)
 {
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	int combined_state = m_pia3->irq_a_state() | m_pia3->irq_b_state() |
-						 m_pia4->irq_a_state() | m_pia4->irq_b_state() |
-						 m_pia5->irq_a_state() | m_pia5->irq_b_state() |
-						 m_pia6->irq_a_state() | m_pia6->irq_b_state() |
-						 m_pia7->irq_a_state() | m_pia7->irq_b_state() |
-						 m_pia8->irq_a_state() | m_pia8->irq_b_state() |
-						 m_6840ptm->irq_state();
+							m_pia4->irq_a_state() | m_pia4->irq_b_state() |
+							m_pia5->irq_a_state() | m_pia5->irq_b_state() |
+							m_pia6->irq_a_state() | m_pia6->irq_b_state() |
+							m_pia7->irq_a_state() | m_pia7->irq_b_state() |
+							m_pia8->irq_a_state() | m_pia8->irq_b_state() |
+							m_6840ptm->irq_state();
 
 	if (!m_link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
 	{
@@ -540,7 +540,7 @@ WRITE8_MEMBER(mpu4_state::bankset_w)
 /* IC2 6840 PTM handler */
 WRITE8_MEMBER(mpu4_state::ic2_o1_callback)
 {
-	m_6840ptm->set_c2(data);	/* copy output value to IC2 c2
+	m_6840ptm->set_c2(data);    /* copy output value to IC2 c2
     this output is the clock for timer2 */
 	/* 1200Hz System interrupt timer */
 }
@@ -548,7 +548,7 @@ WRITE8_MEMBER(mpu4_state::ic2_o1_callback)
 
 WRITE8_MEMBER(mpu4_state::ic2_o2_callback)
 {
-	m_pia3->ca1_w(data);	/* copy output value to IC3 ca1 */
+	m_pia3->ca1_w(data);    /* copy output value to IC3 ca1 */
 	/* the output from timer2 is the input clock for timer3 */
 	/* miscellaneous interrupts generated here */
 	m_6840ptm->set_c3(data);
@@ -558,7 +558,7 @@ WRITE8_MEMBER(mpu4_state::ic2_o2_callback)
 WRITE8_MEMBER(mpu4_state::ic2_o3_callback)
 {
 	/* the output from timer3 is used as a square wave for the alarm output
-    and as an external clock source for timer 1! */
+	and as an external clock source for timer 1! */
 	/* also runs lamp fade */
 	m_6840ptm->set_c1(data);
 }
@@ -569,8 +569,8 @@ static const ptm6840_interface ptm_ic2_intf =
 	MPU4_MASTER_CLOCK / 4,
 	{ 0, 0, 0 },
 	{ DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o1_callback),
-	  DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o2_callback),
-	  DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o3_callback) },
+		DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o2_callback),
+		DEVCB_DRIVER_MEMBER(mpu4_state,ic2_o3_callback) },
 	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)
 };
 
@@ -658,18 +658,18 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic3_cb2_w)
 
 static const pia6821_interface pia_ic3_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic3_porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic3_portb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic3_ca2_w),			/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic3_cb2_w),			/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),				/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)				/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic3_porta_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic3_portb_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic3_ca2_w),         /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic3_cb2_w),         /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),              /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)               /* IRQB */
 };
 
 
@@ -689,13 +689,13 @@ static void ic23_update(mpu4_state *state)
 			if (state->m_IC23G1)
 			{
 				if ( state->m_IC23GA ) state->m_input_strobe |= 0x01;
-				else				 state->m_input_strobe &= ~0x01;
+				else                 state->m_input_strobe &= ~0x01;
 
 				if ( state->m_IC23GB ) state->m_input_strobe |= 0x02;
-				else		         state->m_input_strobe &= ~0x02;
+				else                 state->m_input_strobe &= ~0x02;
 
 				if ( state->m_IC23GC ) state->m_input_strobe |= 0x04;
-				else				 state->m_input_strobe &= ~0x04;
+				else                 state->m_input_strobe &= ~0x04;
 			}
 		}
 	}
@@ -770,8 +770,8 @@ WRITE8_MEMBER(mpu4_state::pia_ic4_portb_w)
 	if (m_reel_mux)
 	{
 		/* A write here connects one reel (and only one)
-        to the optic test circuit. This allows 8 reels
-        to be supported instead of 4. */
+		to the optic test circuit. This allows 8 reels
+		to be supported instead of 4. */
 		if (m_reel_mux == SEVEN_REEL)
 		{
 			m_active_reel= reel_mux_table7[(data >> 4) & 0x07];
@@ -798,16 +798,16 @@ READ8_MEMBER(mpu4_state::pia_ic4_portb_r)
 	if (!m_reel_mux)
 	{
 		if ( m_optic_pattern & 0x01 ) m_ic4_input_b |=  0x40; /* reel A tab */
-		else						  m_ic4_input_b &= ~0x40;
+		else                          m_ic4_input_b &= ~0x40;
 
 		if ( m_optic_pattern & 0x02 ) m_ic4_input_b |=  0x20; /* reel B tab */
-		else						  m_ic4_input_b &= ~0x20;
+		else                          m_ic4_input_b &= ~0x20;
 
 		if ( m_optic_pattern & 0x04 ) m_ic4_input_b |=  0x10; /* reel C tab */
-		else						  m_ic4_input_b &= ~0x10;
+		else                          m_ic4_input_b &= ~0x10;
 
 		if ( m_optic_pattern & 0x08 ) m_ic4_input_b |=  0x08; /* reel D tab */
-		else						  m_ic4_input_b &= ~0x08;
+		else                          m_ic4_input_b &= ~0x08;
 
 	}
 	else
@@ -821,8 +821,8 @@ READ8_MEMBER(mpu4_state::pia_ic4_portb_r)
 			m_ic4_input_b &= ~0x08;
 		}
 	}
-	if ( m_signal_50hz )			m_ic4_input_b |=  0x04; /* 50 Hz */
-	else							m_ic4_input_b &= ~0x04;
+	if ( m_signal_50hz )            m_ic4_input_b |=  0x04; /* 50 Hz */
+	else                            m_ic4_input_b &= ~0x04;
 
 	if (m_ic4_input_b & 0x02)
 	{
@@ -857,18 +857,18 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic4_cb2_w)
 }
 static const pia6821_interface pia_ic4_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic4_portb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic4_porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic4_portb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic4_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic4_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic4_portb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic4_porta_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic4_portb_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic4_ca2_w),     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic4_cb2_w),     /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),      /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)       /* IRQB */
 };
 
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
@@ -969,14 +969,14 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		if (mame_stricmp(machine().system().name, "m4gambal") == 0)
 		{
 		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
-        provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
-        a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
-        holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
-        hole it's currently in, to land in another. Landing in the same hole causes the machine to
-        refire the ball. The ball detection is done by the high 4 bytes of AUX1.
-        Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We
-        then trigger the switches corresponding to the correct number. This appears to be the best way
-        of making the game fair, short of simulating the physics of a bouncing ball ;)*/
+		provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
+		a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
+		holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
+		hole it's currently in, to land in another. Landing in the same hole causes the machine to
+		refire the ball. The ball detection is done by the high 4 bytes of AUX1.
+		Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We
+		then trigger the switches corresponding to the correct number. This appears to be the best way
+		of making the game fair, short of simulating the physics of a bouncing ball ;)*/
 		if (data & 0x0f)
 		{
 			switch ((machine().rand()>>5) % 0x3)
@@ -1136,7 +1136,7 @@ static void update_ay(device_t *device, address_space &space)
 				break;
 			}
 			case 0x01:
-			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
+			{   /* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
 				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
 				LOG(("AY8913 address = %d \n",pia_ic6->a_output()&0x0f));
 				break;
@@ -1176,18 +1176,18 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic5_cb2_w)
 
 static const pia6821_interface pia_ic5_intf =
 {
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_porta_r),		/* port A in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_portb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_portb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic5_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic5_cb2_w),		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),			/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)			/* IRQB */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_porta_r),        /* port A in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_portb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_porta_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic5_portb_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic5_ca2_w),     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic5_cb2_w),     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),          /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)           /* IRQB */
 };
 
 
@@ -1262,18 +1262,18 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 
 static const pia6821_interface pia_ic6_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic6_porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic6_portb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic6_ca2_w),			/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic6_cb2_w),			/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),				/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)				/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic6_porta_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic6_portb_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic6_ca2_w),         /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic6_cb2_w),         /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),              /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)               /* IRQB */
 };
 
 
@@ -1316,7 +1316,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic7_portb_w)
 		//hoppr1_drive_motor(data & 0x10);
 	}
 
-    m_mmtr_data = data;
+	m_mmtr_data = data;
 }
 
 READ8_MEMBER(mpu4_state::pia_ic7_portb_r)
@@ -1334,9 +1334,9 @@ all eight meters are driven from this port, giving the 8 line driver chip
 	//This may be overkill, but the meter sensing is VERY picky
 
 	int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
-						 MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
-						 MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |
-						 MechMtr_GetActivity(6) | MechMtr_GetActivity(7);
+							MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
+							MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |
+							MechMtr_GetActivity(6) | MechMtr_GetActivity(7);
 
 	if(combined_meter)
 	{
@@ -1365,18 +1365,18 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic7_cb2_w)
 
 static const pia6821_interface pia_ic7_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic7_portb_r),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic7_porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic7_portb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic7_ca2_w),			/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic7_cb2_w),			/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),				/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)				/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic7_portb_r),        /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic7_porta_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic7_portb_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic7_ca2_w),         /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic7_cb2_w),         /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),              /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)               /* IRQB */
 };
 
 
@@ -1441,18 +1441,18 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 
 static const pia6821_interface pia_ic8_intf =
 {
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic8_porta_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic8_portb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic8_ca2_w),			/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic8_cb2_w),			/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),				/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)				/* IRQB */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic8_porta_r),        /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_ic8_portb_w),        /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic8_ca2_w),         /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_ic8_cb2_w),         /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq),              /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,cpu0_irq)               /* IRQB */
 };
 
 // universal sampled sound program card PCB 683077
@@ -1508,10 +1508,10 @@ READ8_MEMBER(mpu4_state::pia_gb_portb_r)
 	//
 
 	if ( okim6376_nar_r(msm6376) ) data |= 0x80;
-	else						   data &= ~0x80;
+	else                           data &= ~0x80;
 
-	if ( okim6376_busy_r(msm6376) )	data |= 0x40;
-	else							data &= ~0x40;
+	if ( okim6376_busy_r(msm6376) ) data |= 0x40;
+	else                            data &= ~0x40;
 
 	return ( data | m_expansion_latch );
 }
@@ -1536,18 +1536,18 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 
 static const pia6821_interface pia_ic4ss_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_gb_portb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_gb_porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(mpu4_state,pia_gb_portb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_gb_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_gb_cb2_w),		/* line CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_gb_portb_r), /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_gb_porta_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(mpu4_state,pia_gb_portb_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_gb_ca2_w),      /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4_state,pia_gb_cb2_w),      /* line CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 //Sampled sound timer
@@ -1623,8 +1623,8 @@ static const ptm6840_interface ptm_ic3ss_intf =
 	MPU4_MASTER_CLOCK / 4,
 	{ 0, 0, 0 },
 	{ DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o1_callback),
-	  DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o2_callback),
-	  DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o3_callback) },
+		DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o2_callback),
+		DEVCB_DRIVER_MEMBER(mpu4_state,ic3ss_o3_callback) },
 	DEVCB_NULL//LINE(cpu1_ptm_irq)
 };
 
@@ -1688,7 +1688,7 @@ INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Lo")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("18")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("19")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER)	PORT_NAME("20")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("20")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
@@ -2094,7 +2094,7 @@ WRITE8_MEMBER(mpu4_state::characteriser_w)
 			{
 				for (x = m_prot_col; x < 64; x++)
 				{
-					if	(m_current_chr_table[(x)].call == call)
+					if  (m_current_chr_table[(x)].call == call)
 					{
 						m_prot_col = x;
 						LOG_CHR(("Characteriser find column %02X\n",m_prot_col));
@@ -2238,7 +2238,7 @@ WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
 	m_chr_value = machine().rand();
 	for (x = 0; x < 4; x++)
 	{
-		if	(m_current_chr_table[(x)].call == call)
+		if  (m_current_chr_table[(x)].call == call)
 		{
 			if (x == 0) // reinit
 			{
@@ -2468,7 +2468,7 @@ static mpu4_chr_table blsbys_data[8] = {
 // PAL Codes
 // 0   1   2  3  4  5  6  7  8
 // 42  2E 20 0F 24 3C 36 27 09
-   //      6  0  7  0  8  0  7  0  0  8
+	//      6  0  7  0  8  0  7  0  0  8
 //request 36 42 27 42 09 42 27 42 42 09
 //verify  00 04 04 0C 0C 1C 14 2C 5C 2C
 
@@ -2664,10 +2664,10 @@ DRIVER_INIT_MEMBER(mpu4_state,crystali)
 TIMER_DEVICE_CALLBACK_MEMBER(mpu4_state::gen_50hz)
 {
 	/* Although reported as a '50Hz' signal, the fact that both rising and
-    falling edges of the pulse are used means the timer actually gives a 100Hz
-    oscillating signal.*/
+	falling edges of the pulse are used means the timer actually gives a 100Hz
+	oscillating signal.*/
 	m_signal_50hz = m_signal_50hz?0:1;
-	machine().device<pia6821_device>("pia_ic4")->ca1_w(m_signal_50hz);	/* signal is connected to IC4 CA1 */
+	machine().device<pia6821_device>("pia_ic4")->ca1_w(m_signal_50hz);  /* signal is connected to IC4 CA1 */
 
 	update_meters(this);//run at 100Hz to sync with PIAs
 }
@@ -2675,16 +2675,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu4_state::gen_50hz)
 static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
-	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */
+	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)    /* write bank (rom page select) */
 /*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE_LEGACY(68681_duart_r,68681_duart_w) */ //Runs hoppers
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
-	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	/* 64k  paged ROM (4 pages)  */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)        /* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)        /* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)        /* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)        /* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)        /* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)        /* PIA6821 IC8 */
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")    /* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
 
 const ay8910_interface ay8910_config =
@@ -2737,7 +2737,7 @@ MACHINE_CONFIG_START( mpu4base, mpu4_state )
 MACHINE_CONFIG_END
 
 
- MACHINE_CONFIG_DERIVED( mod2    , mpu4base )
+	MACHINE_CONFIG_DERIVED( mod2    , mpu4base )
 	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -2761,7 +2761,7 @@ MACHINE_CONFIG_DERIVED( mod4oki, mpu4base )
 
 	MCFG_FRAGMENT_ADD(mpu4_common2)
 
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)		//16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2777,4 +2777,3 @@ MACHINE_CONFIG_DERIVED(mpu4crys, mod2     )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
-

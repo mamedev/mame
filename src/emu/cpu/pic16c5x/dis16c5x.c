@@ -1,13 +1,13 @@
- /**************************************************************************\
- *                      Microchip PIC16C5x Emulator                         *
- *                                                                          *
- *                    Copyright Tony La Porta                               *
- *                 Originally written for the MAME project.                 *
- *                                                                          *
- *                                                                          *
- *      Notes : Data is expected to be read from source file as LSB first.  *
- *                                                                          *
- \**************************************************************************/
+	/**************************************************************************\
+	*                      Microchip PIC16C5x Emulator                         *
+	*                                                                          *
+	*                    Copyright Tony La Porta                               *
+	*                 Originally written for the MAME project.                 *
+	*                                                                          *
+	*                                                                          *
+	*      Notes : Data is expected to be read from source file as LSB first.  *
+	*                                                                          *
+	\**************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -101,7 +101,7 @@ int main(int argc,char *argv[])
 			printf("$%03X: ",Counter);
 			for (ii = 0; ii < disasm_words; ii++)
 			{
-				if (((Counter*2) + ii) > filelength)	/* Past end of length to dump ? */
+				if (((Counter*2) + ii) > filelength)    /* Past end of length to dump ? */
 				{
 					sprintf(String_Output,"???? dw %02.2X%02.2Xh (Past end of disassembly !)",Buffer[((Counter-1)*2)+1],Buffer[((Counter-1)*2)]);
 				}

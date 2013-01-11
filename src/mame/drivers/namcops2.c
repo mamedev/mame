@@ -96,7 +96,7 @@ class namcops2_state : public driver_device
 public:
 	namcops2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -121,7 +121,7 @@ UINT32 namcops2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 }
 
 static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32, namcops2_state)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM	// 32 MB RAM in consumer PS2s, do these have more?
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
@@ -130,12 +130,12 @@ INPUT_PORTS_END
 
 static const mips3_config r5000_config =
 {
-	16384,				/* code cache size - probably wrong */
-	16384				/* data cache size */
+	16384,              /* code cache size - probably wrong */
+	16384               /* data cache size */
 };
 
 static MACHINE_CONFIG_START( system246, namcops2_state )
-	MCFG_CPU_ADD("maincpu", R5000LE, 294000000)	// actually R5900 @ 294 MHz
+	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
 	MCFG_CPU_PROGRAM_MAP(ps2_map)
 	MCFG_CPU_CONFIG(r5000_config)
 
@@ -152,10 +152,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system256, system246 )
 MACHINE_CONFIG_END
 
-#define SYSTEM246_BIOS	\
+#define SYSTEM246_BIOS  \
 	ROM_LOAD( "r27v1602f.7d", 0x000000, 0x200000, CRC(2b2e41a2) SHA1(f0a74bbcaf801f3fd0b7002ebd0118564aae3528) )
 
-#define SYSTEM256_BIOS	\
+#define SYSTEM256_BIOS  \
 	ROM_LOAD( "r27v1602f.8g", 0x000000, 0x200000, CRC(b2a8eeb6) SHA1(bc4fb4e1e53adbd92385f1726bd69663ff870f1e) )
 
 ROM_START( sys246 )

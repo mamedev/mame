@@ -21,14 +21,14 @@
 
 struct t6a04_interface
 {
-	UINT8 height;			// number of lines
-	UINT8 width;			// pixels for line
+	UINT8 height;           // number of lines
+	UINT8 width;            // pixels for line
 };
 
 // ======================> t6a04_device
 
 class t6a04_device : public device_t,
-					 public t6a04_interface
+						public t6a04_interface
 {
 public:
 	// construction/destruction
@@ -51,7 +51,7 @@ protected:
 
 private:
 	UINT8 m_busy_flag;
-	UINT8 m_lcd_ram[960];	//7680 bit (64*120)
+	UINT8 m_lcd_ram[960];   //7680 bit (64*120)
 	UINT8 m_display_on;
 	UINT8 m_contrast;
 	UINT8 m_xpos;

@@ -61,9 +61,9 @@
 
 debug_view_source::debug_view_source(const char *name, device_t *device)
 	: m_next(NULL),
-	  m_name(name),
-	  m_device(device),
-	  m_is_octal(false)
+		m_name(name),
+		m_device(device),
+		m_is_octal(false)
 {
 	device_execute_interface *intf;
 	if (device && device->interface(intf))
@@ -92,9 +92,9 @@ debug_view_source::~debug_view_source()
 
 debug_view_source_list::debug_view_source_list(running_machine &machine)
 	: m_machine(machine),
-	  m_head(NULL),
-	  m_tail(NULL),
-	  m_count(0)
+		m_head(NULL),
+		m_tail(NULL),
+		m_count(0)
 {
 }
 
@@ -206,24 +206,24 @@ const debug_view_source *debug_view_source_list::match_device(device_t *device) 
 
 debug_view::debug_view(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: m_next(NULL),
-	  m_type(type),
-	  m_source(NULL),
-	  m_source_list(machine),
-	  m_osdupdate(osdupdate),
-	  m_osdprivate(osdprivate),
-	  m_visible(10,10),
-	  m_total(10,10),
-	  m_topleft(0,0),
-	  m_cursor(0,0),
-	  m_supports_cursor(false),
-	  m_cursor_visible(false),
-	  m_recompute(true),
-	  m_update_level(0),
-	  m_update_pending(true),
-	  m_osd_update_pending(true),
-	  m_viewdata(NULL),
-	  m_viewdata_size(0),
-	  m_machine(machine)
+		m_type(type),
+		m_source(NULL),
+		m_source_list(machine),
+		m_osdupdate(osdupdate),
+		m_osdprivate(osdprivate),
+		m_visible(10,10),
+		m_total(10,10),
+		m_topleft(0,0),
+		m_cursor(0,0),
+		m_supports_cursor(false),
+		m_cursor_visible(false),
+		m_recompute(true),
+		m_update_level(0),
+		m_update_pending(true),
+		m_osd_update_pending(true),
+		m_viewdata(NULL),
+		m_viewdata_size(0),
+		m_machine(machine)
 {
 	// allocate memory for the buffer
 	m_viewdata_size = m_visible.y * m_visible.x;
@@ -440,7 +440,7 @@ void debug_view::view_char(int chval)
 
 debug_view_manager::debug_view_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_viewlist(NULL)
+		m_viewlist(NULL)
 {
 }
 
@@ -562,10 +562,10 @@ debug_view *debug_view_manager::append(debug_view *view)
 
 debug_view_expression::debug_view_expression(running_machine &machine)
 	: m_machine(machine),
-	  m_dirty(true),
-	  m_result(0),
-	  m_parsed(debug_cpu_get_global_symtable(machine)),
-	  m_string("0")
+		m_dirty(true),
+		m_result(0),
+		m_parsed(debug_cpu_get_global_symtable(machine)),
+		m_string("0")
 {
 }
 

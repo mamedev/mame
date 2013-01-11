@@ -8,8 +8,8 @@
 #include "osdnet.h"
 
 #ifdef __linux__
-#define IFF_TAP		0x0002
-#define IFF_NO_PI	0x1000
+#define IFF_TAP     0x0002
+#define IFF_NO_PI   0x1000
 #define TUNSETIFF     _IOW('T', 202, int)
 #endif
 
@@ -51,7 +51,7 @@ netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, 
 		m_fd = -1;
 		return;
 	}
-    mame_printf_verbose("netdev_tap: network up!\n");
+	mame_printf_verbose("netdev_tap: network up!\n");
 	strncpy(m_ifname, ifr.ifr_name, 10);
 	fcntl(m_fd, F_SETFL, O_NONBLOCK);
 

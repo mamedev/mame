@@ -49,9 +49,9 @@ struct k053252_interface
 
 /**  Konami 053252  **/
 /* CRT and interrupt control unit */
-DECLARE_READ8_DEVICE_HANDLER( k053252_r );	// CCU registers
+DECLARE_READ8_DEVICE_HANDLER( k053252_r );  // CCU registers
 DECLARE_WRITE8_DEVICE_HANDLER( k053252_w );
 
 
 
-#endif	/* __K033906_H__ */
+#endif  /* __K033906_H__ */

@@ -195,7 +195,7 @@ TODO:
 #include "audio/timeplt.h"
 #include "includes/rallyx.h"
 
-#define MASTER_CLOCK	XTAL_18_432MHz
+#define MASTER_CLOCK    XTAL_18_432MHz
 
 
 /*************************************
@@ -227,22 +227,22 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 
 	switch (offset)
 	{
-		case 0x00:	/* BANG */
+		case 0x00:  /* BANG */
 			rallyx_bang_w(space, 0, bit);
 			break;
 
-		case 0x01:	/* INT ON */
+		case 0x01:  /* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
 				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
-		case 0x02:	/* SOUND ON */
+		case 0x02:  /* SOUND ON */
 			/* this doesn't work in New Rally X so I'm not supporting it */
 //          pacman_sound_enable_w(machine().device("namco"), bit);
 			break;
 
-		case 0x03:	/* FLIP */
+		case 0x03:  /* FLIP */
 			flip_screen_set_no_update(bit);
 			machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
@@ -272,35 +272,35 @@ WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
 
 	switch (offset)
 	{
-		case 0x00:	/* SOUNDON */
+		case 0x00:  /* SOUNDON */
 			timeplt_sh_irqtrigger_w(space,0,bit);
 			break;
 
-		case 0x01:	/* INTST */
+		case 0x01:  /* INTST */
 			m_main_irq_mask = bit;
 			break;
 
-		case 0x02:	/* MUT */
+		case 0x02:  /* MUT */
 //          sound disable
 			break;
 
-		case 0x03:	/* FLIP */
+		case 0x03:  /* FLIP */
 			flip_screen_set_no_update(bit);
 			machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
-		case 0x04:	/* OUT1 */
+		case 0x04:  /* OUT1 */
 			coin_counter_w(machine(), 0, bit);
 			break;
 
-		case 0x05:	/* OUT2 */
+		case 0x05:  /* OUT2 */
 			break;
 
-		case 0x06:	/* OUT3 */
+		case 0x06:  /* OUT3 */
 			coin_counter_w(machine(), 1,bit);
 			break;
 
-		case 0x07:	/* STARSON */
+		case 0x07:  /* STARSON */
 			tactcian_starson_w(space, offset, bit);
 			break;
 	}
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
-	AM_RANGE(0xa170, 0xa170) AM_WRITENOP			/* ? */
+	AM_RANGE(0xa170, 0xa170) AM_WRITENOP            /* ? */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(rallyx_latch_w)
 ADDRESS_MAP_END
 
@@ -343,11 +343,11 @@ static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("radarattr")	// jungler writes to a03x
+	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("radarattr")   // jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)	/* only jungler and tactcian */
-	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)	/* only jungler and tactcian */
+	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w) /* only jungler and tactcian */
+	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w) /* only jungler and tactcian */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(locomotn_latch_w)
 ADDRESS_MAP_END
 
@@ -371,8 +371,8 @@ static INPUT_PORTS_START( rallyx )
 
 	PORT_START("P2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -383,52 +383,52 @@ static INPUT_PORTS_START( rallyx )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x38, 0x08, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x10, "1 Car, Medium" )
-	PORT_DIPSETTING(	0x28, "1 Car, Hard" )
-	PORT_DIPSETTING(	0x00, "2 Cars, Easy" )
-	PORT_DIPSETTING(	0x18, "2 Cars, Medium" )
-	PORT_DIPSETTING(	0x30, "2 Cars, Hard" )
-	PORT_DIPSETTING(	0x08, "3 Cars, Easy" )
-	PORT_DIPSETTING(	0x20, "3 Cars, Medium" )
-	PORT_DIPSETTING(	0x38, "3 Cars, Hard" )
+	PORT_DIPSETTING(    0x10, "1 Car, Medium" )
+	PORT_DIPSETTING(    0x28, "1 Car, Hard" )
+	PORT_DIPSETTING(    0x00, "2 Cars, Easy" )
+	PORT_DIPSETTING(    0x18, "2 Cars, Medium" )
+	PORT_DIPSETTING(    0x30, "2 Cars, Hard" )
+	PORT_DIPSETTING(    0x08, "3 Cars, Easy" )
+	PORT_DIPSETTING(    0x20, "3 Cars, Medium" )
+	PORT_DIPSETTING(    0x38, "3 Cars, Hard" )
 	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
-	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, "15000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x04, "30000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x06, "40000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
 
-	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
-	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
-	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x02, "20000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x04, "40000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x06, "60000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
 
-	PORT_DIPSETTING(	0x02, "10000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
-	PORT_DIPSETTING(	0x04, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
-	PORT_DIPSETTING(	0x06, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x02, "10000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x04, "20000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x06, "30000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
 
-	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
-	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
-	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
+	PORT_DIPSETTING(    0x02, "15000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
+	PORT_DIPSETTING(    0x04, "30000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
+	PORT_DIPSETTING(    0x06, "40000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
 
-	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
-	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
-	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x02, "20000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x04, "40000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x06, "60000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
 
-	PORT_DIPSETTING(	0x02, "10000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
-	PORT_DIPSETTING(	0x04, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
-	PORT_DIPSETTING(	0x06, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
+	PORT_DIPSETTING(    0x02, "10000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
+	PORT_DIPSETTING(    0x04, "20000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
+	PORT_DIPSETTING(    0x06, "30000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
 
-	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
-	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
-	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
+	PORT_DIPSETTING(    0x02, "15000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
+	PORT_DIPSETTING(    0x04, "30000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
+	PORT_DIPSETTING(    0x06, "40000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
 
-	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
-	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
-	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
-	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x02, "20000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
+	PORT_DIPSETTING(    0x04, "40000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
+	PORT_DIPSETTING(    0x06, "60000" )     PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -445,8 +445,8 @@ static INPUT_PORTS_START( nrallyx )
 
 	PORT_START("P2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -457,25 +457,25 @@ static INPUT_PORTS_START( nrallyx )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x10, "1 Car, Medium" )
-	PORT_DIPSETTING(	0x28, "1 Car, Hard" )
-	PORT_DIPSETTING(	0x18, "2 Cars, Medium" )
-	PORT_DIPSETTING(	0x30, "2 Cars, Hard" )
-	PORT_DIPSETTING(	0x00, "3 Cars, Easy" )
-	PORT_DIPSETTING(	0x20, "3 Cars, Medium" )
-	PORT_DIPSETTING(	0x38, "3 Cars, Hard" )
-	PORT_DIPSETTING(	0x08, "4 Cars, Easy" )
+	PORT_DIPSETTING(    0x10, "1 Car, Medium" )
+	PORT_DIPSETTING(    0x28, "1 Car, Hard" )
+	PORT_DIPSETTING(    0x18, "2 Cars, Medium" )
+	PORT_DIPSETTING(    0x30, "2 Cars, Hard" )
+	PORT_DIPSETTING(    0x00, "3 Cars, Easy" )
+	PORT_DIPSETTING(    0x20, "3 Cars, Medium" )
+	PORT_DIPSETTING(    0x38, "3 Cars, Hard" )
+	PORT_DIPSETTING(    0x08, "4 Cars, Easy" )
 	/* TODO: the bonus score depends on the number of lives */
 	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x02, "A" )
-	PORT_DIPSETTING(	0x04, "B" )
-	PORT_DIPSETTING(	0x06, "C" )
-	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x02, "A" )
+	PORT_DIPSETTING(    0x04, "B" )
+	PORT_DIPSETTING(    0x06, "C" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -646,18 +646,18 @@ static INPUT_PORTS_START( tactcian )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )			// Mode 1
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )          // Mode 1
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	/*
-    PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )          // Mode 2
-    PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x04, "A 2C/1C  B 1C/3C" )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x06, "A 1C/1C  B 1C/6C" )
-    */
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )          // Mode 2
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, "A 2C/1C  B 1C/3C" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, "A 1C/1C  B 1C/6C" )
+	*/
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "10k, 80k then every 100k" )
 	PORT_DIPSETTING(    0x01, "20k, 80k then every 100k" )
@@ -720,7 +720,7 @@ static INPUT_PORTS_START( commsega )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )			// "Infinite Lives" - See notes
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          // "Infinite Lives" - See notes
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
@@ -740,20 +740,20 @@ static INPUT_PORTS_START( commsega )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 4C_1C ) )			// Bonus Life : 50000 points
-	PORT_DIPSETTING(    0x14, DEF_STR( 3C_1C ) )			// Bonus Life : 50000 points
-	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )			// Bonus Life : 30000 points
-	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )			// Bonus Life : 30000 points
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )			// Bonus Life : 50000 points
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )			// Bonus Life : 30000 points
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )			// Bonus Life : 30000 points
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )		// Bonus Life : 50000 points
+	PORT_DIPSETTING(    0x10, DEF_STR( 4C_1C ) )            // Bonus Life : 50000 points
+	PORT_DIPSETTING(    0x14, DEF_STR( 3C_1C ) )            // Bonus Life : 50000 points
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )            // Bonus Life : 30000 points
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )            // Bonus Life : 30000 points
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )            // Bonus Life : 50000 points
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )            // Bonus Life : 30000 points
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )            // Bonus Life : 30000 points
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )        // Bonus Life : 50000 points
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )		// Check code at 0x1fc5
-	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )				// 16 flying enemies to kill
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )				// 24 flying enemies to kill
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )       // Check code at 0x1fc5
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )             // 16 flying enemies to kill
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )             // 24 flying enemies to kill
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
@@ -795,7 +795,7 @@ static const gfx_layout rallyx_spritelayout =
 	2,
 	{ 0, 4 },
 	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			 24*8+0, 24*8+1, 24*8+2, 24*8+3, 0, 1, 2, 3 },
+				24*8+0, 24*8+1, 24*8+2, 24*8+3, 0, 1, 2, 3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
 	64*8
@@ -828,7 +828,7 @@ static const gfx_layout dotlayout =
 static GFXDECODE_START( rallyx )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_spritelayout,   0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,	       64*4,  1 )
+	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,         64*4,  1 )
 GFXDECODE_END
 
 static GFXDECODE_START( jungler )
@@ -846,20 +846,20 @@ GFXDECODE_END
 
 static const namco_interface namco_config =
 {
-	3,				/* number of voices */
-	0				/* stereo */
+	3,              /* number of voices */
+	0               /* stereo */
 };
 
 static const char *const rallyx_sample_names[] =
 {
 	"*rallyx",
 	"bang",
-	0	/* end of array */
+	0   /* end of array */
 };
 
 static const samples_interface rallyx_samples_interface =
 {
-	1,	/* 1 channel */
+	1,  /* 1 channel */
 	rallyx_sample_names
 };
 
@@ -905,7 +905,7 @@ INTERRUPT_GEN_MEMBER(rallyx_state::jungler_vblank_irq)
 static MACHINE_CONFIG_START( rallyx, rallyx_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(rallyx_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state,  rallyx_vblank_irq)
@@ -944,7 +944,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( jungler, rallyx_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(jungler_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state,  jungler_vblank_irq)
 
@@ -956,7 +956,7 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_jungler)
@@ -1233,11 +1233,11 @@ ROM_START( tactcian )
 	ROM_LOAD( "tacticia.c2",  0x1000, 0x1000, CRC(e8c59c4f) SHA1(e4881f2e2e08bb8af37cc679c4e2367528ac4804) )
 
 	ROM_REGION( 0x0100, "gfx2", 0 )
-	ROM_LOAD( "tact6301.004", 0x0000, 0x0100, CRC(88b0b511) SHA1(785eded1ba761cdb59db579eb8a786516ff58152) ) /* dots */	// tac.a7
+	ROM_LOAD( "tact6301.004", 0x0000, 0x0100, CRC(88b0b511) SHA1(785eded1ba761cdb59db579eb8a786516ff58152) ) /* dots */ // tac.a7
 
 	ROM_REGION( 0x0160, "proms", 0 )
 	ROM_LOAD( "tact6331.002", 0x0000, 0x0020, CRC(b7ef83b7) SHA1(5ffab25c2dc5be0856a43a93711d39c4aec6660b) ) /* palette */
-	ROM_LOAD( "tact6301.003", 0x0020, 0x0100, CRC(a92796f2) SHA1(0faab2dc0f868f4023a34ecfcf972d1c86a224a0) ) /* loookup table */	// tac.b4
+	ROM_LOAD( "tact6301.003", 0x0020, 0x0100, CRC(a92796f2) SHA1(0faab2dc0f868f4023a34ecfcf972d1c86a224a0) ) /* loookup table */    // tac.b4
 	ROM_LOAD( "tact6331.001", 0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) ) /* video layout (not used) */
 //  ROM_LOAD( "10a.bpr",      0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
 ROM_END
@@ -1261,11 +1261,11 @@ ROM_START( tactcian2 )
 	ROM_LOAD( "c2",           0x1000, 0x1000, CRC(8e8861e8) SHA1(38728418b09df06356c1e45a26cf438b93517ce5) )
 
 	ROM_REGION( 0x0100, "gfx2", 0 )
-	ROM_LOAD( "tact6301.004", 0x0000, 0x0100, CRC(88b0b511) SHA1(785eded1ba761cdb59db579eb8a786516ff58152) ) /* dots */	// tac.a7
+	ROM_LOAD( "tact6301.004", 0x0000, 0x0100, CRC(88b0b511) SHA1(785eded1ba761cdb59db579eb8a786516ff58152) ) /* dots */ // tac.a7
 
 	ROM_REGION( 0x0160, "proms", 0 )
 	ROM_LOAD( "tact6331.002", 0x0000, 0x0020, CRC(b7ef83b7) SHA1(5ffab25c2dc5be0856a43a93711d39c4aec6660b) ) /* palette */
-	ROM_LOAD( "tact6301.003", 0x0020, 0x0100, CRC(a92796f2) SHA1(0faab2dc0f868f4023a34ecfcf972d1c86a224a0) ) /* loookup table */	// tac.b4
+	ROM_LOAD( "tact6301.003", 0x0020, 0x0100, CRC(a92796f2) SHA1(0faab2dc0f868f4023a34ecfcf972d1c86a224a0) ) /* loookup table */    // tac.b4
 	ROM_LOAD( "tact6331.001", 0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) ) /* video layout (not used) */
 //  ROM_LOAD( "10a.bpr",      0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
 ROM_END
@@ -1353,9 +1353,9 @@ ROM_START( locoboot )
 	ROM_LOAD( "g.119",           0x3000, 0x1000, CRC(3feb762e) SHA1(94ee68549752fac3c67582d968d3f5e3f1380eef) )
 
 	/* no other roms were present in this set,
-       but it appears to work best with the cottong roms,
-       and the program roms appear to be a hack of that
-    */
+	   but it appears to work best with the cottong roms,
+	   and the program roms appear to be a hack of that
+	*/
 
 	ROM_REGION( 0x10000, "tpsound", 0 )
 	ROM_LOAD( "c7",           0x0000, 0x1000, CRC(3d83f6d3) SHA1(e10ed6b6ce7280697c1bc9dbe6c6e6018e1d8be4) )

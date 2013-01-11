@@ -212,9 +212,9 @@ const device_type GP9001_VDP = &device_creator<gp9001vdp_device>;
 
 gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GP9001_VDP, "GP9001_VDP", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map)),
-	  m_gfxregion(0)
+		device_memory_interface(mconfig, *this),
+		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map)),
+		m_gfxregion(0)
 {
 }
 
@@ -557,12 +557,12 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 		case 0x07: gp9001_set_sprite_scrolly_and_flip_reg(&vdp->sp, data,mem_mask,flip); break;
 
 
-		case 0x0e:	/******* Initialise video controller register ? *******/
+		case 0x0e:  /******* Initialise video controller register ? *******/
 
-		case 0x0f:	break;
+		case 0x0f:  break;
 
 
-		default:	logerror("Hmmm, writing %08x to unknown video control register (%08x)  Video controller %01x  !!!\n",data ,vdp->gp9001_scroll_reg,vdp->tile_region>>1);
+		default:    logerror("Hmmm, writing %08x to unknown video control register (%08x)  Video controller %01x  !!!\n",data ,vdp->gp9001_scroll_reg,vdp->tile_region>>1);
 					break;
 	}
 }
@@ -693,15 +693,15 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_scroll_w )
 	{
 		switch(offset)
 		{
-			case 0x00:	data -= 0x01f; break;
-			case 0x01:	data += 0x1ef; break;
-			case 0x02:	data -= 0x01d; break;
-			case 0x03:	data += 0x1ef; break;
-			case 0x04:	data -= 0x01b; break;
-			case 0x05:	data += 0x1ef; break;
-			case 0x06:	data += 0x1d4; break;
-			case 0x07:	data += 0x1f7; break;
-			default:	logerror("PIPIBIBI writing %04x to unknown scroll register %04x",data, offset);
+			case 0x00:  data -= 0x01f; break;
+			case 0x01:  data += 0x1ef; break;
+			case 0x02:  data -= 0x01d; break;
+			case 0x03:  data += 0x1ef; break;
+			case 0x04:  data -= 0x01b; break;
+			case 0x05:  data += 0x1ef; break;
+			case 0x06:  data += 0x1d4; break;
+			case 0x07:  data += 0x1f7; break;
+			default:    logerror("PIPIBIBI writing %04x to unknown scroll register %04x",data, offset);
 		}
 
 		vdp->gp9001_scroll_reg = offset;
@@ -772,11 +772,11 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 
 		if ((attrib & 0x8000))
 		{
-			if (!gp9001_gfxrom_is_banked)	/* No Sprite select bank switching needed */
+			if (!gp9001_gfxrom_is_banked)   /* No Sprite select bank switching needed */
 			{
-				sprite = ((attrib & 3) << 16) | source[offs + 1];	/* 18 bit */
+				sprite = ((attrib & 3) << 16) | source[offs + 1];   /* 18 bit */
 			}
-			else		/* Batrider Sprite select bank switching required */
+			else        /* Batrider Sprite select bank switching required */
 			{
 				sprite_num = source[offs + 1] & 0x7fff;
 				bank = ((attrib & 3) << 1) | (source[offs + 1] >> 15);
@@ -850,11 +850,11 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 					else       sx = sx_base + dim_x;
 
 					/*
-                    drawgfx_transpen(bitmap,cliprect,gfx,sprite,
-                        color,
-                        flipx,flipy,
-                        sx,sy,0);
-                    */
+					drawgfx_transpen(bitmap,cliprect,gfx,sprite,
+					    color,
+					    flipx,flipy,
+					    sx,sy,0);
+					*/
 					sprite %= gfx->elements();
 					color %= gfx->colors();
 
@@ -1012,6 +1012,3 @@ void gp9001vdp_device::gp9001_screen_eof(void)
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
 	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer,sp.vram16,GP9001_SPRITERAM_SIZE);
 }
-
-
-

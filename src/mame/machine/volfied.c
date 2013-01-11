@@ -360,29 +360,29 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 		if (offset == 0x3fe)
 		{
 			/*******************
-            (This table stored in ROM at $146a8)
-            (Level number stored at $100198.b, from $100118.b, from $100098.b)
-            (Level number at $b34 stored to $100098.b)
+			(This table stored in ROM at $146a8)
+			(Level number stored at $100198.b, from $100118.b, from $100098.b)
+			(Level number at $b34 stored to $100098.b)
 
-            round 01 => data $0A
-            round 02 => data $01
-            round 03 => data $03
-            round 04 => data $08
-            round 05 => data $05
-            round 06 => data $04
-            round 07 => data $0B
-            round 08 => data $09
-            round 09 => data $07
-            round 10 => data $06
-            round 11 => data $0E
-            round 12 => data $0D
-            round 13 => data $02
-            round 14 => data $0C
-            round 15 => data $0F
-            round 16 => data $10
-            final    => data $11
+			round 01 => data $0A
+			round 02 => data $01
+			round 03 => data $03
+			round 04 => data $08
+			round 05 => data $05
+			round 06 => data $04
+			round 07 => data $0B
+			round 08 => data $09
+			round 09 => data $07
+			round 10 => data $06
+			round 11 => data $0E
+			round 12 => data $0D
+			round 13 => data $02
+			round 14 => data $0C
+			round 15 => data $0F
+			round 16 => data $10
+			final    => data $11
 
-            ********************/
+			********************/
 
 			m_current_cmd = data;
 
@@ -421,9 +421,9 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
 {
 	/*
-        Bit 2 = Error signal
-        Bit 0 = Ready signal
-    */
+	    Bit 2 = Error signal
+	    Bit 0 = Ready signal
+	*/
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
@@ -450,12 +450,12 @@ READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
 	if (m_current_bank == 2 && offset == 0x005)
 	{
 		/* Not fully understood - Game writes:
-            0001a0c2:  volfied c write 0005 00aa
-            0001a0ca:  volfied c write 0006 0055
-            0001a0d2:  volfied c write 0004 0065
+		    0001a0c2:  volfied c write 0005 00aa
+		    0001a0ca:  volfied c write 0006 0055
+		    0001a0d2:  volfied c write 0004 0065
 
-            Then expects 0x7c to replace the 0xaa some time later.
-        */
+		    Then expects 0x7c to replace the 0xaa some time later.
+		*/
 		return 0x7c;                /* makes worm in round 1 appear */
 	}
 

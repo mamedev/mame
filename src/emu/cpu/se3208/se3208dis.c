@@ -10,18 +10,18 @@ static struct
 	UINT32 ER;
 } Context;
 
-#define FLAG_E		0x0800
+#define FLAG_E      0x0800
 
-#define CLRFLAG(f)	Context.SR&=~(f);
-#define SETFLAG(f)	Context.SR|=(f);
-#define TESTFLAG(f)	(Context.SR&(f))
+#define CLRFLAG(f)  Context.SR&=~(f);
+#define SETFLAG(f)  Context.SR|=(f);
+#define TESTFLAG(f) (Context.SR&(f))
 
-#define EXTRACT(val,sbit,ebit)	(((val)>>sbit)&((1<<((ebit-sbit)+1))-1))
-#define SEX8(val)	((val&0x80)?(val|0xFFFFFF00):(val&0xFF))
-#define SEX16(val)	((val&0x8000)?(val|0xFFFF0000):(val&0xFFFF))
-#define ZEX8(val)	((val)&0xFF)
-#define ZEX16(val)	((val)&0xFFFF)
-#define SEX(bits,val)	((val)&(1<<(bits-1))?((val)|(~((1<<bits)-1))):(val&((1<<bits)-1)))
+#define EXTRACT(val,sbit,ebit)  (((val)>>sbit)&((1<<((ebit-sbit)+1))-1))
+#define SEX8(val)   ((val&0x80)?(val|0xFFFFFF00):(val&0xFF))
+#define SEX16(val)  ((val&0x8000)?(val|0xFFFF0000):(val&0xFFFF))
+#define ZEX8(val)   ((val)&0xFF)
+#define ZEX16(val)  ((val)&0xFFFF)
+#define SEX(bits,val)   ((val)&(1<<(bits-1))?((val)|(~((1<<bits)-1))):(val&((1<<bits)-1)))
 
 typedef UINT32 (*_OP)(UINT16 Opcode,char *dst);
 #define INST(a) static UINT32 a(UINT16 Opcode,char *dst)
@@ -297,7 +297,7 @@ INST(POP)
 	if(Set&(1<<10))
 	{
 		strcat(str,"%PC-");
-		CLRFLAG(FLAG_E);	//Clear the flag, this is a ret so disassemble will start a new E block
+		CLRFLAG(FLAG_E);    //Clear the flag, this is a ret so disassemble will start a new E block
 		Ret=1;
 	}
 	str[strlen(str)-1]=0;
@@ -1188,7 +1188,7 @@ static _OP DecodeOp(UINT16 Opcode)
 					case 5:
 					case 6:
 					case 7:
-					case 8:	//arith
+					case 8: //arith
 					case 9:
 					case 10:
 					case 11:
@@ -1265,7 +1265,7 @@ static _OP DecodeOp(UINT16 Opcode)
 							break;
 					}
 					break;
-				case 1:		//Jumps
+				case 1:     //Jumps
 					switch(EXTRACT(Opcode,8,11))
 					{
 						case 0x0:
@@ -1305,7 +1305,7 @@ static _OP DecodeOp(UINT16 Opcode)
 				case 2:
 					if(Opcode&(1<<11))
 						return LDI;
-					else	//SP Ops
+					else    //SP Ops
 					{
 						if(Opcode&(1<<10))
 						{

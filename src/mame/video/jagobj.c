@@ -9,7 +9,7 @@
 #endif
 
 
-#define LOG_OBJECTS			0
+#define LOG_OBJECTS         0
 
 
 /*************************************
@@ -55,7 +55,7 @@ void jaguar_state::jagobj_init()
  *
  *************************************/
 
-#define BLEND(dst, src)		\
+#define BLEND(dst, src)     \
 	(dst) = (m_blend_cc[((dst) & 0xff00) | (((src) >> 8) & 0xff)] << 8) | m_blend_y[(((dst) & 0xff) << 8) | ((src) & 0xff)];
 
 
@@ -543,9 +543,9 @@ void (jaguar_state::*const jaguar_state::bitmap32[8])(UINT16 *, INT32, INT32, UI
 
 static inline UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
 {
-	int ppl		= 32 / depth;
-	UINT32 data	= src[((i & ppl) / ppl) + ((i / (ppl<<1)) * (pitch<<1))];
-	UINT8 pix	= (data >> ((~i & (ppl-1)) * depth)) & ((1 << depth) - 1);
+	int ppl     = 32 / depth;
+	UINT32 data = src[((i & ppl) / ppl) + ((i / (ppl<<1)) * (pitch<<1))];
+	UINT8 pix   = (data >> ((~i & (ppl-1)) * depth)) & ((1 << depth) - 1);
 	return pix;
 }
 

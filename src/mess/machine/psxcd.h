@@ -4,7 +4,7 @@
 #include "imagedev/chd_cd.h"
 #include "psxcddrv.h"
 
-#define MAX_PSXCD_TIMERS	(4)
+#define MAX_PSXCD_TIMERS    (4)
 
 class event;
 
@@ -18,7 +18,7 @@ const int num_commands=0x20;
 //
 //
 
-#define PSXCD_TAG	"psxcd"
+#define PSXCD_TAG   "psxcd"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -39,11 +39,11 @@ struct psxcd_interface
 };
 
 class psxcd_device : public device_t,
-                     public psxcd_interface
+						public psxcd_interface
 {
 public:
 
-    psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
@@ -55,7 +55,7 @@ private:
 		command_result *next;
 	};
 
-	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;	//480;  //8000; //2000<<2;
+	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;   //480;  //8000; //2000<<2;
 
 	unsigned char sr,res,ir,cmdmode,
 								cmdbuf[64],*cbp,
@@ -72,21 +72,21 @@ private:
 			sechead,sectail,
 			secin;
 	command_result *res_queue,
-								 *cur_res;
+									*cur_res;
 	bool open,
-			 streaming,
-			 first_open;
+				streaming,
+				first_open;
 	event *next_read_event;
 	INT64 next_sector_t;
 	unsigned int autopause_sector,
-							 xa_prefetch_sector,
-							 cdda_prefetch_sector;
+								xa_prefetch_sector,
+								cdda_prefetch_sector;
 
 	cdrom_driver *driver;
 
 	unsigned int start_read_delay,
-							 read_sector_cycles,
-							 preread_delay;
+								read_sector_cycles,
+								preread_delay;
 
 	void write_command(const unsigned char byte);
 
@@ -130,9 +130,9 @@ private:
 	void cmd_complete(command_result *res);
 	void add_result(command_result *res);
 	event *send_result(const unsigned int res,
-										 const unsigned char *data=NULL,
-										 const unsigned int sz=0,
-										 const unsigned int delay=default_irq_delay);
+											const unsigned char *data=NULL,
+											const unsigned int sz=0,
+											const unsigned int delay=default_irq_delay);
 
 	void start_read();
 	void start_play();
@@ -163,7 +163,7 @@ private:
 	UINT32 m_sysclock;
 	const char *m_devname;
 	cdrom_image_device *m_cddevice;
-	cdrom_file	*m_cd;
+	cdrom_file  *m_cd;
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
 	event *m_eventfortimer[MAX_PSXCD_TIMERS];
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
@@ -180,7 +180,7 @@ const int max_event_data=64;
 class event
 {
 public:
-	UINT64 t;				// expire time
+	UINT64 t;               // expire time
 	unsigned int type;
 	unsigned char data[max_event_data];
 	emu_timer *timer;

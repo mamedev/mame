@@ -55,10 +55,10 @@ const device_type NVRAM = &device_creator<nvram_device>;
 
 nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NVRAM, "NVRAM", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this),
-	  m_default_value(DEFAULT_ALL_1),
-	  m_base(NULL),
-	  m_length(0)
+		device_nvram_interface(mconfig, *this),
+		m_default_value(DEFAULT_ALL_1),
+		m_base(NULL),
+		m_length(0)
 {
 }
 

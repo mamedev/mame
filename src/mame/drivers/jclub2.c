@@ -150,7 +150,7 @@ public:
 };
 
 
-#define DARKHORS_DEBUG	0
+#define DARKHORS_DEBUG  0
 
 /***************************************************************************
 
@@ -166,15 +166,15 @@ public:
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
 {
-	UINT16 tile		=	m_tmapram[tile_index] >> 16;
-	UINT16 color	=	m_tmapram[tile_index] & 0xffff;
+	UINT16 tile     =   m_tmapram[tile_index] >> 16;
+	UINT16 color    =   m_tmapram[tile_index] & 0xffff;
 	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
 {
-	UINT16 tile		=	m_tmapram2[tile_index] >> 16;
-	UINT16 color	=	m_tmapram2[tile_index] & 0xffff;
+	UINT16 tile     =   m_tmapram2[tile_index] >> 16;
+	UINT16 color    =   m_tmapram2[tile_index] & 0xffff;
 	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
@@ -192,41 +192,41 @@ WRITE32_MEMBER(darkhors_state::darkhors_tmapram2_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
-	UINT32 *s		=	state->m_spriteram;
-	UINT32 *end		=	state->m_spriteram + 0x02000/4;
+	UINT32 *s       =   state->m_spriteram;
+	UINT32 *end     =   state->m_spriteram + 0x02000/4;
 
 	for ( ; s < end; s += 8/4 )
 	{
 		int attr, code, color, sx, sy, flipx, flipy;
 
-		sx		=		(s[ 0 ] >> 16);
-		sy		=		(s[ 0 ] & 0xffff);
-		attr	=		(s[ 1 ] >> 16);
-		code	=		(s[ 1 ] & 0xffff);
+		sx      =       (s[ 0 ] >> 16);
+		sy      =       (s[ 0 ] & 0xffff);
+		attr    =       (s[ 1 ] >> 16);
+		code    =       (s[ 1 ] & 0xffff);
 
 		// Last sprite
 		if (sx & 0x8000) break;
 
-		flipx	=	0;
-		flipy	=	0;
-		color	=	(attr & 0x0200) ? (attr & 0x1ff) : (attr & 0x1ff) * 4;
+		flipx   =   0;
+		flipy   =   0;
+		color   =   (attr & 0x0200) ? (attr & 0x1ff) : (attr & 0x1ff) * 4;
 
 		// Sign extend the position
-		sx	=	(sx & 0x1ff) - (sx & 0x200);
-		sy	=	(sy & 0x1ff) - (sy & 0x200);
+		sx  =   (sx & 0x1ff) - (sx & 0x200);
+		sy  =   (sy & 0x1ff) - (sy & 0x200);
 
-		sy	=	-sy;
-		sy	+=	0xf8;
+		sy  =   -sy;
+		sy  +=  0xf8;
 
-		drawgfx_transpen(	bitmap,	cliprect, machine.gfx[0],
-					code/2,	color,
-					flipx,	flipy,	sx,	sy, 0);
+		drawgfx_transpen(   bitmap, cliprect, machine.gfx[0],
+					code/2, color,
+					flipx,  flipy,  sx, sy, 0);
 	}
 }
 
 VIDEO_START_MEMBER(darkhors_state,darkhors)
 {
-	m_tmap =	&machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap =    &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap2= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
@@ -242,9 +242,9 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-		if (machine().input().code_pressed(KEYCODE_A))	mask |= 4;
+		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_A))  mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
@@ -253,13 +253,13 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 
 	m_tmap->set_scrollx(0, (m_tmapscroll[0] >> 16) - 5);
 	m_tmap->set_scrolly(0, (m_tmapscroll[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	m_tmap2->set_scrollx(0, (m_tmapscroll2[0] >> 16) - 5);
 	m_tmap2->set_scrolly(0, (m_tmapscroll2[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 2)	m_tmap2->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_tmap2->draw(bitmap, cliprect, 0, 0);
 
-	if (layers_ctrl & 4)	draw_sprites(machine(),bitmap,cliprect);
+	if (layers_ctrl & 4)    draw_sprites(machine(),bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0
@@ -306,8 +306,8 @@ WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 
 WRITE32_MEMBER(darkhors_state::paletteram32_xBBBBBGGGGGRRRRR_dword_w)
 {
-	if (ACCESSING_BITS_16_31)	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
+	if (ACCESSING_BITS_16_31)   paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_BITS_0_15)    paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
 }
 
 WRITE32_MEMBER(darkhors_state::darkhors_input_sel_w)
@@ -321,14 +321,14 @@ static int mask_to_bit( int mask )
 	switch( mask )
 	{
 		default:
-		case 0x01:	return 0;
-		case 0x02:	return 1;
-		case 0x04:	return 2;
-		case 0x08:	return 3;
-		case 0x10:	return 4;
-		case 0x20:	return 5;
-		case 0x40:	return 6;
-		case 0x80:	return 7;
+		case 0x01:  return 0;
+		case 0x02:  return 1;
+		case 0x04:  return 2;
+		case 0x08:  return 3;
+		case 0x10:  return 4;
+		case 0x20:  return 5;
+		case 0x40:  return 6;
+		case 0x80:  return 7;
 	}
 }
 
@@ -339,7 +339,7 @@ READ32_MEMBER(darkhors_state::darkhors_input_sel_r)
 	int bit_p2 = mask_to_bit((m_input_sel & 0xff000000) >> 24);
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
-	return	(ioport(portnames[bit_p1])->read() & 0x00ffffff) |
+	return  (ioport(portnames[bit_p1])->read() & 0x00ffffff) |
 			(ioport(portnames[bit_p2])->read() & 0xff000000) ;
 }
 
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
 	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
-	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
+	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY   // this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_SHARE("tmapscroll")
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_SHARE("tmapscroll2")
 ADDRESS_MAP_END
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
 
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
-	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
+	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY   // this should still be palette ram!
 
 	AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
 	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
@@ -444,16 +444,16 @@ static INPUT_PORTS_START( darkhors )
 
 	PORT_START("580004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BILL1 )	// bill in
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN1 )	// coin in s1
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN3 )	// coin in s2
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )	// coin drop
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SPECIAL )	// hopper full
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1") PORT_CODE(KEYCODE_ENTER)	// bill in p2
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )	// coin in s1 p2
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN4 )	// coin in s2 p2
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_COIN2 )	// coin drop p2
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SPECIAL)	// hopper full p2
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BILL1 )    // bill in
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN1 )    // coin in s1
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN3 )    // coin in s2
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )    // coin drop
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SPECIAL )  // hopper full
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1") PORT_CODE(KEYCODE_ENTER) // bill in p2
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )    // coin in s1 p2
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN4 )    // coin in s2 p2
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_COIN2 )    // coin drop p2
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SPECIAL)   // hopper full p2
 
 	PORT_START("580400")
 	PORT_BIT( 0xfffcffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -467,24 +467,24 @@ static INPUT_PORTS_START( darkhors )
 
 	PORT_START("4e0080")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// config
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_SERVICE2 )	// reset
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_SERVICE3 )	// meter
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_SERVICE4 )	// lastgame
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_SERVICE1 )    // config
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_SERVICE2 )    // reset
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_SERVICE3 )    // meter
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_SERVICE4 )    // lastgame
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1) // test
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// door 1
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// door 2
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )    // door 1
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )    // door 2
 	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )	// start
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)	// payout
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)		// cancel
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_START2   )	// start p2
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Payout") PORT_CODE(KEYCODE_RCONTROL)	// payout p2
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_CODE(KEYCODE_RALT)		// cancel p2
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )    // start
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)    // payout
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)        // cancel
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_START2   )    // start p2
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Payout") PORT_CODE(KEYCODE_RCONTROL)    // payout p2
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_CODE(KEYCODE_RALT)        // cancel p2
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
-	PORT_START("IN0")	/* 580008(0) */
+	PORT_START("IN0")   /* 580008(0) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2") PORT_CODE(KEYCODE_2_PAD)
@@ -503,7 +503,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 7") //PORT_CODE(KEYCODE_)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 8") //PORT_CODE(KEYCODE_)
 
-	PORT_START("IN1")	/* 580008(1) */
+	PORT_START("IN1")   /* 580008(1) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-2") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-3") PORT_CODE(KEYCODE_A)
@@ -522,7 +522,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-8") //PORT_CODE(KEYCODE_)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* 580008(2) */
+	PORT_START("IN2")   /* 580008(2) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-3") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-4") PORT_CODE(KEYCODE_S)
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")	/* 580008(3) */
+	PORT_START("IN3")   /* 580008(3) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-4") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-5") PORT_CODE(KEYCODE_D)
@@ -560,7 +560,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")	/* 580008(4) */
+	PORT_START("IN4")   /* 580008(4) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-5") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-6") PORT_CODE(KEYCODE_F)
@@ -579,7 +579,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN5")	/* 580008(5) */
+	PORT_START("IN5")   /* 580008(5) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 5-6") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 5-7") PORT_CODE(KEYCODE_G)
@@ -598,7 +598,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN6")	/* 580008(6) */
+	PORT_START("IN6")   /* 580008(6) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 6-7") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 6-8") PORT_CODE(KEYCODE_H)
@@ -617,7 +617,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN7")	/* 580008(7) */
+	PORT_START("IN7")   /* 580008(7) */
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 7-8") PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -650,17 +650,17 @@ static const gfx_layout layout_16x16x8 =
 	16,16,
 	RGN_FRAC(1,4),
 	8,
-	{	RGN_FRAC(3,4)+8,RGN_FRAC(3,4)+0,
+	{   RGN_FRAC(3,4)+8,RGN_FRAC(3,4)+0,
 		RGN_FRAC(2,4)+8,RGN_FRAC(2,4)+0,
 		RGN_FRAC(1,4)+8,RGN_FRAC(1,4)+0,
-		RGN_FRAC(0,4)+8,RGN_FRAC(0,4)+0	},
+		RGN_FRAC(0,4)+8,RGN_FRAC(0,4)+0 },
 	{ STEP8(0,1), STEP8(16,1) },
 	{ STEP16(0,16*2)},
 	16*16*2
 };
 
 static GFXDECODE_START( darkhors )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 )	// color codes should be doubled
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 ) // color codes should be doubled
 GFXDECODE_END
 
 
@@ -836,7 +836,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( darkhors )
-	ROM_REGION( 0x100000, "maincpu", 0 )	// 68EC020 code
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68EC020 code
 	ROM_LOAD32_WORD_SWAP( "prg2", 0x00000, 0x80000, CRC(f2ec5818) SHA1(326937a331496880f517f41b0b8ab54e55fd7af7) )
 	ROM_LOAD32_WORD_SWAP( "prg1", 0x00002, 0x80000, CRC(b80f8f59) SHA1(abc26dd8b36da0d510978364febe385f69fb317f) )
 
@@ -851,10 +851,10 @@ ROM_START( darkhors )
 	ROM_FILL(         0x300000, 0x80000, 0 ) // a zero-fill seems fine
 	ROM_LOAD( "gfx8", 0x380000, 0x80000, CRC(590bec2a) SHA1(7fdbb21f1a3eccde65e91eb2443a0e01487c59c3) ) // 000xxxxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION( 0x80000, "oki", 0 )	// Samples
+	ROM_REGION( 0x80000, "oki", 0 ) // Samples
 	ROM_LOAD( "snd", 0x00000, 0x80000, CRC(7aeb12d3) SHA1(3e81725fc206baa7559da87552a0cd73b7616155) )
 
-	ROM_REGION( 0x80, "eeprom", 0 )	// EEPROM
+	ROM_REGION( 0x80, "eeprom", 0 ) // EEPROM
 	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(1f434f66) SHA1(e1bee11d83fb72aed9c312bdc794d8b9a6645534) )
 ROM_END
 
@@ -872,7 +872,7 @@ There is known to be an undumped v4.00 with copyright 1994-97 Seta Corporation o
 
 
 
- /*
+	/*
 Jockey Club II by SETA 1996
 
 PCB E79-001 rev 01a (Newer)
@@ -882,26 +882,26 @@ Main CPU : MC68EC020FG16
 Graphics : SETA ST-0032 70C600JF505
 
 Others :
-     SETA ST-0013
-     SETA ST-0017
+	 SETA ST-0013
+	 SETA ST-0017
 
 Xtal : 42.9545 MHz, 60.0000 MHz, 33.3333 MHz
 
 
 Rams :  Toshiba : TC5118160CJ-60 (x3)
-    NKK N341256SJ-15 (x2)
-    NEC D43001GU-70LL (x4)
+	NKK N341256SJ-15 (x2)
+	NEC D43001GU-70LL (x4)
 
 Gals : gal16V8B(x2) ref : M88-03 M88-04
 
 Eeprom : 93c46
 
 Eproms : M88-01.u38,M88-023.u6 (read as 578200) (1st set)
-     M88-01A.u38,M88-02.u6 (2nd set)
-     M88-01B.u38,M88-02.u6 (3rd set)
-     M88-01.u38,M88-02.u6,Z201x.u39 (4th set)
-     M88-01A.u38,M88-02.u6 M88-03D.u39 (5th set)
-     M88-01B.u38,M88-02.u6,M88-03D.u39 (6th set)
+	 M88-01A.u38,M88-02.u6 (2nd set)
+	 M88-01B.u38,M88-02.u6 (3rd set)
+	 M88-01.u38,M88-02.u6,Z201x.u39 (4th set)
+	 M88-01A.u38,M88-02.u6 M88-03D.u39 (5th set)
+	 M88-01B.u38,M88-02.u6,M88-03D.u39 (6th set)
 
 Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 */
@@ -911,19 +911,19 @@ Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 
 // this contains mutliple sets, although splitting them as listed above makes no sense.. especially not the 'subcpu' roms
 ROM_START( jclub2 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	// 68EC020 code  + compressed GFX
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68EC020 code  + compressed GFX
 	// main program (similar to main program of bootleg
 	ROM_LOAD16_WORD_SWAP( "m88-01b.u38",0x00000, 0x200000, CRC(f1054c69) SHA1(be6d92653f0d3cc0a36a2ff0798043f4a95439bc) )
 	ROM_LOAD16_WORD_SWAP( "m88-01a.u38",0x00000, 0x200000, CRC(c1243e1c) SHA1(2a5857738b8950daf77ddaa8304b765f809f8241) ) // alt revision?
 	ROM_LOAD16_WORD_SWAP( "m88-01.u38", 0x00000, 0x200000, CRC(84476b68) SHA1(1014d23d3cebbfa9aa3bfb90505529989a8eedfa) ) // alt revision?
 
-	ROM_REGION( 0x200000, "patch", 0 )	// 68EC020 code
+	ROM_REGION( 0x200000, "patch", 0 )  // 68EC020 code
 	// it appears that the operator could place a ROM in the socket next to the main CPU rom to update the main program rom by
 	// overriding the initial 0x80000 bytes of the program rom.
 	ROM_LOAD16_WORD_SWAP( "m88-03d.u39",0x00000, 0x080000, CRC(723dd22b) SHA1(0ca622e0dd315f29e72dd9b82fb419d306ec5df8) )
 	ROM_LOAD16_WORD_SWAP( "z201x.u39",0x00000, 0x080000, CRC(1fb79c16) SHA1(c8914f7dfc17c412f6ca756f8eb6d6a35e3b6214) )
 
-	ROM_REGION( 0x100000, "oki", 0 )	// Samples? (not oki probably one of the ST-xx customs, no idea if the dump is good)
+	ROM_REGION( 0x100000, "oki", 0 )    // Samples? (not oki probably one of the ST-xx customs, no idea if the dump is good)
 	// data distribution would indicate this is a sound rom
 	ROM_LOAD( "m88-02.u6", 0x00000, 0x100000, CRC(0dd3436a) SHA1(809d3b7a26d36f71da04036fd8ab5d0c5089392a) )
 
@@ -966,11 +966,11 @@ Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 
 // this contains mutliple sets
 ROM_START( jclub2o )
-	ROM_REGION( 0x200000, "maincpu", 0 )	// 68EC020 code + compressed gfx
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68EC020 code + compressed gfx
 	ROM_LOAD16_WORD_SWAP( "sx006a-01.106",0x00000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) )
 	ROM_LOAD16_WORD_SWAP( "sx006b-01.u26",0x00000, 0x200000, CRC(f730dded) SHA1(efb966dcb98440a072d4825ef2788c85acdfd103) )  // alt revision?
 
-	ROM_REGION( 0x200000, "patch", 0 )	// 68EC020 code
+	ROM_REGION( 0x200000, "patch", 0 )  // 68EC020 code
 	// it appears that the operator could place a ROM in the socket next to the main CPU rom to update the main program rom by
 	// overriding the initial 0x80000 bytes of the program rom.
 	ROM_LOAD16_WORD_SWAP( "jc2-110x.u27",0x00000, 0x080000, CRC(03aa6882) SHA1(e0343bc77a19994ddafa614891663b40e1476332) )

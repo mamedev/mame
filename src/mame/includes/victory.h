@@ -5,28 +5,28 @@
 ****************************************************************************/
 
 
-#define VICTORY_MAIN_CPU_CLOCK		(XTAL_8MHz / 2)
+#define VICTORY_MAIN_CPU_CLOCK      (XTAL_8MHz / 2)
 
-#define VICTORY_PIXEL_CLOCK				(XTAL_11_289MHz / 2)
-#define VICTORY_HTOTAL					(0x150)
-#define VICTORY_HBEND						(0x000)
-#define VICTORY_HBSTART					(0x100)
-#define VICTORY_VTOTAL					(0x118)
-#define VICTORY_VBEND						(0x000)
-#define VICTORY_VBSTART					(0x100)
+#define VICTORY_PIXEL_CLOCK             (XTAL_11_289MHz / 2)
+#define VICTORY_HTOTAL                  (0x150)
+#define VICTORY_HBEND                       (0x000)
+#define VICTORY_HBSTART                 (0x100)
+#define VICTORY_VTOTAL                  (0x118)
+#define VICTORY_VBEND                       (0x000)
+#define VICTORY_VBSTART                 (0x100)
 
 
 /* microcode state */
 struct micro_t
 {
-	UINT16		i;
-	UINT16		pc;
-	UINT8		r,g,b;
-	UINT8		x,xp,y,yp;
-	UINT8		cmd,cmdlo;
-	emu_timer *	timer;
-	UINT8		timer_active;
-	attotime	endtime;
+	UINT16      i;
+	UINT16      pc;
+	UINT8       r,g,b;
+	UINT8       x,xp,y,yp;
+	UINT8       cmd,cmdlo;
+	emu_timer * timer;
+	UINT8       timer_active;
+	attotime    endtime;
 };
 
 class victory_state : public driver_device
@@ -34,8 +34,8 @@ class victory_state : public driver_device
 public:
 	victory_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoram(*this, "videoram"),
-		  m_charram(*this, "charram") { }
+			m_videoram(*this, "videoram"),
+			m_charram(*this, "charram") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_charram;

@@ -23,10 +23,10 @@ const device_type AAKART = &device_creator<aakart_device>;
 #define RAK1 0xfe
 #define RAK2 0xfd
 #define BACK 0x3f
-#define SMAK 0x33	/* keyboard + mouse ack */
-#define MACK 0x32	/* mouse ack */
-#define SACK 0x31	/* keyboard ack */
-#define NACK 0x30	/* no data ack */
+#define SMAK 0x33   /* keyboard + mouse ack */
+#define MACK 0x32   /* mouse ack */
+#define SACK 0x31   /* keyboard ack */
+#define NACK 0x30   /* no data ack */
 #define RQID 0x20
 
 //**************************************************************************
@@ -61,7 +61,7 @@ void aakart_device::device_validity_check(validity_checker &valid) const
 void aakart_device::device_start()
 {
 	m_out_tx_func.resolve(m_out_tx_cb, *this);
-    m_out_rx_func.resolve(m_out_rx_cb, *this);
+	m_out_rx_func.resolve(m_out_rx_cb, *this);
 	m_rxtimer = timer_alloc(RX_TIMER);
 	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 	m_txtimer = timer_alloc(TX_TIMER);
@@ -220,9 +220,9 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			{
 				switch(m_tx_latch)
 				{
-					case HRST:	{ m_rx_latch = HRST; m_keyb_enable = m_mouse_enable = 0; break; }
-					case RAK1:	{ m_rx_latch = RAK1; m_keyb_enable = m_mouse_enable = 0; break; }
-					case RAK2:	{ m_rx_latch = RAK2; m_status = STATUS_NORMAL; break; }
+					case HRST:  { m_rx_latch = HRST; m_keyb_enable = m_mouse_enable = 0; break; }
+					case RAK1:  { m_rx_latch = RAK1; m_keyb_enable = m_mouse_enable = 0; break; }
+					case RAK2:  { m_rx_latch = RAK2; m_status = STATUS_NORMAL; break; }
 				}
 				break;
 			}

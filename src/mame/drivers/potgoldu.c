@@ -31,9 +31,9 @@ public:
 };
 
 
-#define CPU_CLOCK			XTAL_40MHz
-#define VIDEO_CLOCK			(22118400) // ?
-#define SOUND_CLOCK			(3579645)
+#define CPU_CLOCK           XTAL_40MHz
+#define VIDEO_CLOCK         (22118400) // ?
+#define SOUND_CLOCK         (3579645)
 
 
 
@@ -67,15 +67,15 @@ INPUT_PORTS_END
 
 static const tms34010_config tms_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	VIDEO_CLOCK/2,					/* pixel clock */
-	1,								/* pixels per clock */
-	NULL,							/* scanline callback (indexed16) */
-	scanline_update,				/* scanline callback (rgb32) */
-	NULL,							/* generate interrupt */
-	NULL,							/* write to shiftreg function */
-	NULL							/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	VIDEO_CLOCK/2,                  /* pixel clock */
+	1,                              /* pixels per clock */
+	NULL,                           /* scanline callback (indexed16) */
+	scanline_update,                /* scanline callback (rgb32) */
+	NULL,                           /* generate interrupt */
+	NULL,                           /* write to shiftreg function */
+	NULL                            /* read from shiftreg function */
 };
 
 
@@ -97,7 +97,7 @@ static MACHINE_CONFIG_START( potgold, potgold_state )
 MACHINE_CONFIG_END
 
 ROM_START( potgoldu )
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
 
 	// these two are definitely a pair
 	ROM_LOAD16_BYTE( "400x.u5",  0x180000, 0x20000, BAD_DUMP CRC(4949300b) SHA1(edf5e3de8561258ceb8fc0ab0291859d2cf7c21b) )
@@ -114,4 +114,3 @@ ROM_END
 
 
 GAME( 200?, potgoldu,    0,        potgold,   potgold, driver_device,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", GAME_IS_SKELETON | GAME_NO_SOUND )
-

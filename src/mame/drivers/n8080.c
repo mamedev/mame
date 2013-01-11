@@ -14,7 +14,7 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/n8080.h"
 
-#define MASTER_CLOCK	XTAL_20_16MHz
+#define MASTER_CLOCK    XTAL_20_16MHz
 
 
 WRITE8_MEMBER(n8080_state::n8080_shift_bits_w)
@@ -246,17 +246,17 @@ static INPUT_PORTS_START( sheriff )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("IN3")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ))	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives )) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )	// Switches 3-7 are UNUSED
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )    // Switches 3-7 are UNUSED
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ))	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ))   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
 INPUT_PORTS_END
@@ -461,10 +461,10 @@ WRITE8_MEMBER(n8080_state::n8080_status_callback)
 
 static I8085_CONFIG( n8080_cpu_config )
 {
-	DEVCB_DRIVER_MEMBER(n8080_state,n8080_status_callback),	/* STATUS changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(n8080_state,n8080_inte_callback),		/* INTE changed callback */
-	DEVCB_NULL,								/* SID changed callback (8085A only) */
-	DEVCB_NULL								/* SOD changed callback (8085A only) */
+	DEVCB_DRIVER_MEMBER(n8080_state,n8080_status_callback), /* STATUS changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(n8080_state,n8080_inte_callback),      /* INTE changed callback */
+	DEVCB_NULL,                             /* SID changed callback (8085A only) */
+	DEVCB_NULL                              /* SOD changed callback (8085A only) */
 };
 
 MACHINE_START_MEMBER(n8080_state,n8080)

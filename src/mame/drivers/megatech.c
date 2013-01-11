@@ -77,7 +77,7 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "includes/megadriv.h"
 #include "imagedev/cartslot.h"
 
-#define MASTER_CLOCK		53693100
+#define MASTER_CLOCK        53693100
 
 /* not currently used */
 static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
@@ -289,9 +289,9 @@ static void megatech_select_game(running_machine &machine, int gameno)
 static WRITE8_HANDLER( megatech_cart_select_w )
 {
 	/* seems to write the slot number..
-      but it stores something in (banked?) ram
-      because it always seems to show the
-      same instructions ... */
+	  but it stores something in (banked?) ram
+	  because it always seems to show the
+	  same instructions ... */
 	mtech_state *state = space.machine().driver_data<mtech_state>();
 	state->m_mt_cart_select_reg = data;
 
@@ -500,7 +500,7 @@ static const sega315_5124_interface _vdp_intf =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -571,7 +571,7 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 {
 	mtech_state *state = image.device().machine().driver_data<mtech_state>();
 	const struct megatech_cart_region *mt_cart = &megatech_cart_table[0], *this_cart;
-	const char	*pcb_name;
+	const char  *pcb_name;
 
 	/* First, determine where this cart has to be loaded */
 	while (mt_cart->tag)

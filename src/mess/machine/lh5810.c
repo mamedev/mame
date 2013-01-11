@@ -53,7 +53,7 @@ void lh5810_device::device_config_complete()
 //-------------------------------------------------
 
 lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, LH5810, "LH5810", tag, owner, clock)
+	: device_t(mconfig, LH5810, "LH5810", tag, owner, clock)
 {
 }
 
@@ -188,4 +188,3 @@ WRITE8_MEMBER( lh5810_device::data_w )
 			break;
 	}
 }
-

@@ -18,9 +18,9 @@ TILE_GET_INFO_MEMBER(kyugo_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
-				  code,
-				  2 * m_color_codes[code >> 3] + m_fgcolor,
-				  0);
+					code,
+					2 * m_color_codes[code >> 3] + m_fgcolor,
+					0);
 }
 
 
@@ -29,9 +29,9 @@ TILE_GET_INFO_MEMBER(kyugo_state::get_bg_tile_info)
 	int code = m_bgvideoram[tile_index];
 	int attr = m_bgattribram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
-				  code | ((attr & 0x03) << 8),
-				  (attr >> 4) | (m_bgpalbank << 4),
-				  TILE_FLIPYX((attr & 0x0c) >> 2));
+					code | ((attr & 0x03) << 8),
+					(attr >> 4) | (m_bgpalbank << 4),
+					TILE_FLIPYX((attr & 0x0c) >> 2));
 }
 
 
@@ -200,10 +200,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 
 			drawgfx_transpen( bitmap, cliprect,machine.gfx[2],
-					 code,
-					 color,
-					 flipx,flipy,
-					 sx,state->m_flipscreen ? sy - 16*y : sy + 16*y, 0 );
+						code,
+						color,
+						flipx,flipy,
+						sx,state->m_flipscreen ? sy - 16*y : sy + 16*y, 0 );
 		}
 	}
 }

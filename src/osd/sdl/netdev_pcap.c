@@ -84,14 +84,14 @@ void init_pcap()
 		return;
 	}
 
-    if (devs)
+	if (devs)
 	{
-    	while(devs->next)
-    	{
-    		add_netdev(devs->name, devs->description, create_pcap);
-    		devs = devs->next;
-    	}
-    }
+		while(devs->next)
+		{
+			add_netdev(devs->name, devs->description, create_pcap);
+			devs = devs->next;
+		}
+	}
 }
 
 void deinit_pcap()

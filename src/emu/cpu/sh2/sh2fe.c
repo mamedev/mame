@@ -21,7 +21,7 @@
 
 sh2_frontend::sh2_frontend(sh2_state &state, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
 	: drc_frontend(*state.device, window_start, window_end, max_sequence),
-	  m_context(state)
+		m_context(state)
 {
 }
 
@@ -46,7 +46,7 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case  0:
 			return describe_group_0(desc, prev, opcode);
 
-		case  1:	// MOVLS4
+		case  1:    // MOVLS4
 			desc.regin[0] |= REGFLAG_R(Rn) | REGFLAG_R(Rm);
 			desc.flags |= OPFLAG_WRITES_MEMORY;
 			return true;
@@ -60,7 +60,7 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case  4:
 			return describe_group_4(desc, prev, opcode);
 
-		case  5:	// MOVLL4
+		case  5:    // MOVLL4
 			desc.regin[0] |= REGFLAG_R(Rm);
 			desc.regout[0] |= REGFLAG_R(Rn);
 			desc.flags |= OPFLAG_READS_MEMORY;
@@ -69,7 +69,7 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case  6:
 			return describe_group_6(desc, prev, opcode);
 
-		case  7:	// ADDI
+		case  7:    // ADDI
 			desc.regin[0] |= REGFLAG_R(Rn);
 			desc.regout[0] |= REGFLAG_R(Rn);
 			return true;
@@ -77,15 +77,15 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case  8:
 			return describe_group_8(desc, prev, opcode);
 
-		case  9:	// MOVWI
+		case  9:    // MOVWI
 			desc.regout[0] |= REGFLAG_R(Rn);
 			desc.flags |= OPFLAG_READS_MEMORY;
 			return true;
 
-		case 11:	// BSR
+		case 11:    // BSR
 			desc.regout[1] |= REGFLAG_PR;
 			// (intentional fallthrough - BSR is BRA with the addition of PR = the return address)
-		case 10:	// BRA
+		case 10:    // BRA
 			{
 				INT32 disp = ((INT32)opcode << 20) >> 20;
 
@@ -99,16 +99,16 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 12:
 			return describe_group_12(desc, prev, opcode);
 
-		case 13:	// MOVLI
+		case 13:    // MOVLI
 			desc.regout[0] |= REGFLAG_R(Rn);
 			desc.flags |= OPFLAG_READS_MEMORY;
 			return true;
 
-		case 14:	// MOVI
+		case 14:    // MOVI
 			desc.regout[0] |= REGFLAG_R(Rn);
 			return true;
 
-		case 15:	// NOP
+		case 15:    // NOP
 			return true;
 	}
 

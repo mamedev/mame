@@ -18,11 +18,11 @@
 
 #define DEBUG_SET(flags)    ((state->m_debug_machine & (flags))==(flags))
 
-#define DEBUG_NONE			0x0000000
+#define DEBUG_NONE          0x0000000
 #define DMA_BREAK           0x0000001
 #define DECODE_BIOS         0x0000002
 #define DECODE_BIOS_RAW     0x0000004
-#define DECODE_DOS21		0x0000008
+#define DECODE_DOS21        0x0000008
 
 #define LOG_KEYBOARD        1
 
@@ -228,7 +228,7 @@ static void scan_keyboard(running_machine &machine)
 	UINT8   bitno;
 	UINT8   mask;
 
-	char	key;
+	char    key;
 	static const char *const keynames[] =
 	{
 		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
@@ -238,13 +238,13 @@ static void scan_keyboard(running_machine &machine)
 
 	static const char keyvalues_normal[MBC55X_KEYROWS][8] =
 	{
-		{ '1',	'2', '3', '4' , '5',  '6',  '7',  '8'  },
-		{ '9',	'0', '-', '=',  '\\', 'q',  'w',  'e' },
-		{ 'r',	't', 'y', 'u',  'i',  'o',  'p',  '[' },
-		{ ']',	'a', 's', 'd',  'f',  'g',  'h',  'j' },
-		{ 'k',	'l', ';', '\'', '`',  0x0D,  'z',  'x' },
-		{ 'c',	'v', 'b', 'n',  'm',  ',',  '.',  '/', },
-		{ ' ',	' ', ' ', ' ',  ' ',  ' ',  ' ',  ' ', }
+		{ '1',  '2', '3', '4' , '5',  '6',  '7',  '8'  },
+		{ '9',  '0', '-', '=',  '\\', 'q',  'w',  'e' },
+		{ 'r',  't', 'y', 'u',  'i',  'o',  'p',  '[' },
+		{ ']',  'a', 's', 'd',  'f',  'g',  'h',  'j' },
+		{ 'k',  'l', ';', '\'', '`',  0x0D,  'z',  'x' },
+		{ 'c',  'v', 'b', 'n',  'm',  ',',  '.',  '/', },
+		{ ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' ', }
 
 	};
 
@@ -252,11 +252,11 @@ static void scan_keyboard(running_machine &machine)
 	{
 		{ '!',  '@', '#', '$' , '%',  '^',  '&',  '*'  },
 		{ '(',  ')', '_', '+',  '|',  'Q',  'W',  'E'  },
-		{ 'R',	'T', 'Y', 'U',  'I',  'O',  'P',  '{' },
-		{ '}',	'A', 'S', 'D',  'F',  'G',  'H',  'J' },
-		{ 'K',	'L', ':', '"',  '~',  0x0d, 'Z',  'X' },
-		{ 'C',	'V', 'B', 'N',  'M',  ',',  '?',  '/' },
-		{ ' ',	' ', ' ', ' ',  ' ',  ' ',  ' ',  ' ' }
+		{ 'R',  'T', 'Y', 'U',  'I',  'O',  'P',  '{' },
+		{ '}',  'A', 'S', 'D',  'F',  'G',  'H',  'J' },
+		{ 'K',  'L', ':', '"',  '~',  0x0d, 'Z',  'X' },
+		{ 'C',  'V', 'B', 'N',  'M',  ',',  '?',  '/' },
+		{ ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' ' }
 	};
 
 	// First read shift, control and graph
@@ -312,12 +312,12 @@ READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 
 	switch (offset)
 	{
-		case 0	: //logerror("%s read kb_uart\n",machine().describe_context());
+		case 0  : //logerror("%s read kb_uart\n",machine().describe_context());
 				result = m_kb_uart->data_r(space,0); break;
 
-		case 1	:	result = m_kb_uart->status_r(space,0);
+		case 1  :   result = m_kb_uart->status_r(space,0);
 
-				if (m_keyboard.key_special & KEY_BIT_CTRL)	// Parity error used to flag control down
+				if (m_keyboard.key_special & KEY_BIT_CTRL)  // Parity error used to flag control down
 					result |= I8251_STATUS_PARITY_ERROR;
 				break;
 	}
@@ -331,22 +331,22 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 
 	switch (offset)
 	{
-		case 0	: m_kb_uart->data_w(space, 0, data); break;
-		case 1	: m_kb_uart->control_w(space, 0, data); break;
+		case 0  : m_kb_uart->data_w(space, 0, data); break;
+		case 1  : m_kb_uart->control_w(space, 0, data); break;
 	}
 }
 
 static void set_ram_size(running_machine &machine)
 {
-	mbc55x_state	*state		= machine.driver_data<mbc55x_state>();
-	address_space	&space		= machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
-	int 			ramsize 	= state->m_ram->size();
-	int 			nobanks		= ramsize / RAM_BANK_SIZE;
-	char			bank[10];
-	int 			bankno;
-	UINT8			*ram		= &state->m_ram->pointer()[0];
-	UINT8			*map_base;
-	int				bank_base;
+	mbc55x_state    *state      = machine.driver_data<mbc55x_state>();
+	address_space   &space      = machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+	int             ramsize     = state->m_ram->size();
+	int             nobanks     = ramsize / RAM_BANK_SIZE;
+	char            bank[10];
+	int             bankno;
+	UINT8           *ram        = &state->m_ram->pointer()[0];
+	UINT8           *map_base;
+	int             bank_base;
 
 
 	logerror("Ramsize is %d bytes\n",ramsize);
@@ -433,9 +433,9 @@ static void mbc55x_debug(running_machine &machine, int ref, int params, const ch
 
 static int instruction_hook(device_t &device, offs_t curpc)
 {
-	mbc55x_state	*state = device.machine().driver_data<mbc55x_state>();
-	address_space	&space = device.memory().space(AS_PROGRAM);
-	UINT8		   *addr_ptr;
+	mbc55x_state    *state = device.machine().driver_data<mbc55x_state>();
+	address_space   &space = device.memory().space(AS_PROGRAM);
+	UINT8          *addr_ptr;
 
 	addr_ptr = (UINT8*)space.get_read_ptr(curpc);
 

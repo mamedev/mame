@@ -249,7 +249,7 @@ static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_ind16 &bitm
 	char buf[3];
 
 	/* fill with black */
-	const rectangle panel_bitmap_bounds(0, panel_window_width-1,	0, panel_window_height-1);
+	const rectangle panel_bitmap_bounds(0, panel_window_width-1,    0, panel_window_height-1);
 	state->m_panel_bitmap.fill(pen_panel_bg, panel_bitmap_bounds);
 
 	/* column 1: registers, test accumulator, test buffer, toggle switch storage */
@@ -372,41 +372,41 @@ void tx0_typewriter_drawchar(running_machine &machine, int character)
 	tx0_state *state = machine.driver_data<tx0_state>();
 	static const char ascii_table[2][64] =
 	{
-		{	/* lower case */
-			'\0',				'\0',				'e',				'8',
-			'\0',				'|',				'a',				'3',
-			' ',				'=',				's',				'4',
-			'i',				'+',				'u',				'2',
-			'\0',/*color shift*/'.',				'd',				'5',
-			'r',				'1',				'j',				'7',
-			'n',				',',				'f',				'6',
-			'c',				'-',				'k',				'\0',
-			't',				'\0',				'z',				'\0',/*back space*/
-			'l',				'\0',/*tab*/		'w',				'\0',
-			'h',				'\0',/*carr. return*/'y',				'\0',
-			'p',				'\0',				'q',				'\0',
-			'o',				'\0',/*stop*/		'b',				'\0',
-			'g',				'\0',				'9',				'\0',
-			'm',				'\0',/*upper case*/	'x',				'\0',
-			'v',				'\0',/*lower case*/	'0',				'\0'/*delete*/
+		{   /* lower case */
+			'\0',               '\0',               'e',                '8',
+			'\0',               '|',                'a',                '3',
+			' ',                '=',                's',                '4',
+			'i',                '+',                'u',                '2',
+			'\0',/*color shift*/'.',                'd',                '5',
+			'r',                '1',                'j',                '7',
+			'n',                ',',                'f',                '6',
+			'c',                '-',                'k',                '\0',
+			't',                '\0',               'z',                '\0',/*back space*/
+			'l',                '\0',/*tab*/        'w',                '\0',
+			'h',                '\0',/*carr. return*/'y',               '\0',
+			'p',                '\0',               'q',                '\0',
+			'o',                '\0',/*stop*/       'b',                '\0',
+			'g',                '\0',               '9',                '\0',
+			'm',                '\0',/*upper case*/ 'x',                '\0',
+			'v',                '\0',/*lower case*/ '0',                '\0'/*delete*/
 		},
-		{	/* upper case */
-			'\0',				'\0',				'E',				'\210',
-			'\0',				'_',				'A',				'\203',
-			' ',				':',				'S',				'\204',
-			'I',				'/',				'U',				'\202',
-			'\0',/*color shift*/')',				'D',				'\205',
-			'R',				'\201',				'J',				'\207',
-			'N',				'(',				'F',				'\206',
-			'C',				'\212',/*macron*/	'K',				'\0',
-			'T',				'\0',				'Z',				'\0',/*back space*/
-			'L',				'\0',/*tab*/		'W',				'\0',
-			'H',				'\0',/*carr. return*/'Y',				'\0',
-			'P',				'\0',				'Q',				'\0',
-			'O',				'\0',/*stop*/		'B',				'\0',
-			'G',				'\0',				'\211',				'\0',
-			'M',				'\0',/*upper case*/	'X',				'\0',
-			'V',				'\0',/*lower case*/	'\200',				'\0'/*delete*/
+		{   /* upper case */
+			'\0',               '\0',               'E',                '\210',
+			'\0',               '_',                'A',                '\203',
+			' ',                ':',                'S',                '\204',
+			'I',                '/',                'U',                '\202',
+			'\0',/*color shift*/')',                'D',                '\205',
+			'R',                '\201',             'J',                '\207',
+			'N',                '(',                'F',                '\206',
+			'C',                '\212',/*macron*/   'K',                '\0',
+			'T',                '\0',               'Z',                '\0',/*back space*/
+			'L',                '\0',/*tab*/        'W',                '\0',
+			'H',                '\0',/*carr. return*/'Y',               '\0',
+			'P',                '\0',               'Q',                '\0',
+			'O',                '\0',/*stop*/       'B',                '\0',
+			'G',                '\0',               '\211',             '\0',
+			'M',                '\0',/*upper case*/ 'X',                '\0',
+			'V',                '\0',/*lower case*/ '\200',             '\0'/*delete*/
 		}
 	};
 
@@ -465,17 +465,17 @@ void tx0_typewriter_drawchar(running_machine &machine, int character)
 		/* Any printable character... */
 
 		if (state->m_pos >= 80)
-		{	/* if past right border, wrap around. (Right???) */
-			tx0_typewriter_linefeed( machine );	/* next line */
-			state->m_pos = 0;					/* return to start of line */
+		{   /* if past right border, wrap around. (Right???) */
+			tx0_typewriter_linefeed( machine ); /* next line */
+			state->m_pos = 0;                   /* return to start of line */
 		}
 
 		/* print character (lookup ASCII equivalent in table) */
 		tx0_draw_char(machine, state->m_typewriter_bitmap, ascii_table[state->m_case_shift][character],
 						8*state->m_pos, typewriter_write_offset_y,
-						state->m_typewriter_color);	/* print char */
+						state->m_typewriter_color); /* print char */
 
-		state->m_pos++;		/* step carriage forward */
+		state->m_pos++;     /* step carriage forward */
 		break;
 	}
 }

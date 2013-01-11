@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)	/* answer from sound CPU */
+	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)   /* answer from sound CPU */
 	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
@@ -154,9 +154,9 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(m107_state::wpksoc_output_w)
 {
 	/*
-    x--- ---- ?
-    ---- --xx lamps
-    */
+	x--- ---- ?
+	---- --xx lamps
+	*/
 	if(data & 0x7c)
 		popmessage("%04x",data);
 }
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( dsoccr94 )
 	PORT_DIPSETTING(      0x0020, "Start Button" )
 
 	/* Manual says not to use these SW3:3-8 */
-	PORT_START("DSW3")	/* Dip switch bank 3 */
+	PORT_START("DSW3")  /* Dip switch bank 3 */
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -758,7 +758,7 @@ static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
 static MACHINE_CONFIG_START( firebarr, m107_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */
+	MCFG_CPU_ADD("maincpu", V33, 28000000/2)    /* NEC V33, 28MHz clock */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(20000000/2)	/* NEC V33, Could be 28MHz clock? */
+	MCFG_CPU_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_CONFIG(dsoccr94_config)
@@ -832,13 +832,13 @@ ROM_START( firebarr )
 	ROM_LOAD16_BYTE( "f4-b-sh0-b", 0x00001, 0x10000, CRC(30a8e232) SHA1(d4695aed35a1aa796b2872e58a6014e8b28bc154) )
 	ROM_LOAD16_BYTE( "f4-b-sl0-b", 0x00000, 0x10000, CRC(204b5f1f) SHA1(f0386500773cd7cca93f0e8e740db29182320c70) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "f4-c00", 0x000000, 0x80000, CRC(50cab384) SHA1(66e88a1dfa943e0d49c2e186ac2f6cbf5cfe0864) )
 	ROM_LOAD16_BYTE( "f4-c10", 0x000001, 0x80000, CRC(330c6df2) SHA1(f199d959385398adb6b86ec8ec5de8b40899597c) )
 	ROM_LOAD16_BYTE( "f4-c01", 0x100000, 0x80000, CRC(12a698c8) SHA1(74d21768bac70e8cb7e1a6737f758f33869b6af9) )
 	ROM_LOAD16_BYTE( "f4-c11", 0x100001, 0x80000, CRC(3f9add18) SHA1(840339a1f33d68c555e42618dd436788639b1edf) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
 	ROM_LOAD16_BYTE( "f4-000", 0x000000, 0x80000, CRC(920deee9) SHA1(6341eeccdad97fde5337f32f317ddc94f6b8d07a) )
 	ROM_LOAD16_BYTE( "f4-001", 0x000001, 0x80000, CRC(e5725eaf) SHA1(c884d69742484a7c07eb0c7882a33d90b240529e) )
 	ROM_LOAD16_BYTE( "f4-010", 0x100000, 0x80000, CRC(3505d185) SHA1(1330c18eaadb3e23d6205f3912015cb9ca5f3590) )
@@ -848,11 +848,11 @@ ROM_START( firebarr )
 	ROM_LOAD16_BYTE( "f4-030", 0x300000, 0x80000, CRC(7e7b30cd) SHA1(eca9d2a5d9f9deebb565456018126bc37a1de1d8) )
 	ROM_LOAD16_BYTE( "f4-031", 0x300001, 0x80000, CRC(83ac56c5) SHA1(47e1063c71d5570fecf8591c2cb7c74fd45199f5) )
 
-	ROM_REGION( 0x40000, "user1", 0 )	/* sprite tables */
+	ROM_REGION( 0x40000, "user1", 0 )   /* sprite tables */
 	ROM_LOAD16_BYTE( "f4-b-drh", 0x000001, 0x20000, CRC(12001372) SHA1(a5346d8a741cd1a93aa289562bb56d2fc40c1bbb) )
 	ROM_LOAD16_BYTE( "f4-b-drl", 0x000000, 0x20000, CRC(08cb7533) SHA1(9e0d8f8498bddfa1c6135abbab4465e9eeb033fe) )
 
-	ROM_REGION( 0x80000, "irem", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "irem", 0 )    /* ADPCM samples */
 	ROM_LOAD( "f4-b-da0", 0x000000, 0x80000, CRC(7a493e2e) SHA1(f6a8bacbe25760c86bdd8e8bb6d052ff15718eef) )
 ROM_END
 
@@ -867,19 +867,19 @@ ROM_START( dsoccr94 )
 	ROM_LOAD16_BYTE( "a3-sh0-c-0.ic31", 0x00001, 0x10000, CRC(23fe6ffc) SHA1(896377961cafc19e44d9d889f9fbfdbaedd556da) )
 	ROM_LOAD16_BYTE( "a3-sl0-c-0.ic37", 0x00000, 0x10000, CRC(768132e5) SHA1(1bb64516eb58d3b246f08e1c07f091e78085689f) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "ds_c00.ic29", 0x000000, 0x100000, CRC(2d31d418) SHA1(6cd0e362bc2e3f2b20d96ee97a04bff46ee3016a) ) /* MASK ROMs with no "official" rom label */
 	ROM_LOAD16_BYTE( "ds_c10.ic28", 0x000001, 0x100000, CRC(57f7bcd3) SHA1(a38e7cdfdea72d882fba414cae391ba09443e73c) )
 	ROM_LOAD16_BYTE( "ds_c01.ic21", 0x200000, 0x100000, CRC(9d31a464) SHA1(1e38ac296f64d77fabfc0d5f7921a9b7a8424875) )
 	ROM_LOAD16_BYTE( "ds_c11.ic20", 0x200001, 0x100000, CRC(a372e79f) SHA1(6b0889cfc2970028832566e25257927ddc461ea6) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
 	ROM_LOAD( "ds_000.ic11", 0x000000, 0x100000, CRC(366b3e29) SHA1(cb016dcbdc6e8ea56c28c00135263666b07df991) ) /* MASK ROMs with no "official" rom label */
 	ROM_LOAD( "ds_010.ic12", 0x100000, 0x100000, CRC(28a4cc40) SHA1(7f4e1ef995eaadf1945ee22ab3270cb8a21c601d) )
 	ROM_LOAD( "ds_020.ic13", 0x200000, 0x100000, CRC(5a310f7f) SHA1(21969e4247c8328d27118d00604096deaf6700af) )
 	ROM_LOAD( "ds_030.ic14", 0x300000, 0x100000, CRC(328b1f45) SHA1(4cbbd4d9be4fc151d426175bdbd35d8481bf2966) )
 
-	ROM_REGION( 0x100000, "irem", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x100000, "irem", 0 )    /* ADPCM samples */
 	ROM_LOAD( "ds_da0.ic24", 0x000000, 0x100000, CRC(67fc52fd) SHA1(5771e948115af8fe4a6d3f448c03a2a9b42b6f20) )
 ROM_END
 
@@ -892,13 +892,13 @@ ROM_START( wpksoc )
 	ROM_LOAD16_BYTE( "pk-sh0.sh0", 0x00001, 0x10000, CRC(1145998c) SHA1(cdb2a428e0f35302b81696dab02d3dd2c433f6e5) )
 	ROM_LOAD16_BYTE( "pk-sl0.sl0", 0x00000, 0x10000, CRC(542ee1c7) SHA1(b934adeecbba17cf96b06a2b1dc1ceaebdf9ad10) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "pk-c00-os.c00", 0x000000, 0x80000, CRC(42ae3d73) SHA1(e4777066155c9882695ebff0412bd879b8d6f716) )
 	ROM_LOAD16_BYTE( "pk-c10-os.c10", 0x000001, 0x80000, CRC(86acf45c) SHA1(3b3d2abcf8000161a37d5e2619df529533aea47d) )
 	ROM_LOAD16_BYTE( "pk-c01-os.c01", 0x100000, 0x80000, CRC(b0d33f87) SHA1(f2c0e3a10615c6861a3f6fd82a3f066e8e264233) )
 	ROM_LOAD16_BYTE( "pk-c11-os.c11", 0x100001, 0x80000, CRC(19de7d63) SHA1(6d0633e412b47accaecc887a5c39f542eda49e81) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
 	ROM_LOAD16_BYTE( "pk-000.000", 0x000000, 0x80000, CRC(165ce027) SHA1(3510b323c683ade4dd7307b539072bb342b6796d) )
 	ROM_LOAD16_BYTE( "pk-001.001", 0x000001, 0x80000, CRC(e2745147) SHA1(99026525449c2ca84e054a7d633c400e0e836461) )
 	ROM_LOAD16_BYTE( "pk-010.010", 0x100000, 0x80000, CRC(6c171b73) SHA1(a99c9f012f21373daea08d28554cc36170f4e1fa) )
@@ -908,7 +908,7 @@ ROM_START( wpksoc )
 	ROM_LOAD16_BYTE( "pk-030.030", 0x300000, 0x80000, CRC(3390621c) SHA1(4138c690666f78b1c5cf83d815ed6b37239a94b4) )
 	ROM_LOAD16_BYTE( "pk-031.031", 0x300001, 0x80000, CRC(4d322804) SHA1(b5e2b40e3ce83b6f97b2b57edaa79df6968d0997) )
 
-	ROM_REGION( 0x100000, "irem", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x100000, "irem", 0 )    /* ADPCM samples */
 	ROM_LOAD( "pk-da0.da0", 0x000000, 0x80000, CRC(26a34cf4) SHA1(a8a7cd91cdc6d644ee02ca16e7fdc8debf8f3a5f) )
 ROM_END
 
@@ -921,13 +921,13 @@ ROM_START( kftgoal )
 	ROM_LOAD16_BYTE( "pk-sh0.sh0", 0x00001, 0x10000, CRC(1145998c) SHA1(cdb2a428e0f35302b81696dab02d3dd2c433f6e5) )
 	ROM_LOAD16_BYTE( "pk-sl0.sl0", 0x00000, 0x10000, CRC(542ee1c7) SHA1(b934adeecbba17cf96b06a2b1dc1ceaebdf9ad10) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* chars */
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* chars */
 	ROM_LOAD16_BYTE( "pk-c00-os.c00", 0x000000, 0x80000, CRC(42ae3d73) SHA1(e4777066155c9882695ebff0412bd879b8d6f716) )
 	ROM_LOAD16_BYTE( "pk-c10-os.c10", 0x000001, 0x80000, CRC(86acf45c) SHA1(3b3d2abcf8000161a37d5e2619df529533aea47d) )
 	ROM_LOAD16_BYTE( "pk-c01-os.c01", 0x100000, 0x80000, CRC(b0d33f87) SHA1(f2c0e3a10615c6861a3f6fd82a3f066e8e264233) )
 	ROM_LOAD16_BYTE( "pk-c11-os.c11", 0x100001, 0x80000, CRC(19de7d63) SHA1(6d0633e412b47accaecc887a5c39f542eda49e81) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
 	ROM_LOAD16_BYTE( "pk-000-usa.000", 0x000000, 0x80000, CRC(72e905ab) SHA1(5f47f0db0a19311cb74c39ea9d86f6909b926aa8) )
 	ROM_LOAD16_BYTE( "pk-001-usa.001", 0x000001, 0x80000, CRC(eec4f43c) SHA1(93133389701c8752fc288f3f82da2646446804ca) )
 	ROM_LOAD16_BYTE( "pk-010-usa.010", 0x100000, 0x80000, CRC(b3339d73) SHA1(1f59591a24434cf7d754d211c1a20591c1d7234c) )
@@ -937,7 +937,7 @@ ROM_START( kftgoal )
 	ROM_LOAD16_BYTE( "pk-030-usa.030", 0x300000, 0x80000, CRC(8eceef50) SHA1(e39a2420a6259a8571a71fd3f9b003b0e0abea3b) )
 	ROM_LOAD16_BYTE( "pk-031-usa.031", 0x300001, 0x80000, CRC(8aa7dc04) SHA1(8aebdf50a832acf00fcfebb35ab49a06d13bc444) )
 
-	ROM_REGION( 0x100000, "irem", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x100000, "irem", 0 )    /* ADPCM samples */
 	ROM_LOAD( "pk-da0.da0", 0x000000, 0x80000, BAD_DUMP CRC(26a34cf4) SHA1(a8a7cd91cdc6d644ee02ca16e7fdc8debf8f3a5f) ) //clearly taken from World PK Soccer, it says "World PK Soccer" at title screen
 
 	ROM_REGION( 0x2000, "eeprom", 0 ) /* ST M28C64C-20PI Eeprom */

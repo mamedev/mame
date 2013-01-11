@@ -10,7 +10,7 @@
 //============================================================
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE 	// for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
+#define _GNU_SOURCE     // for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
 #endif
 
 #include "sdlinc.h"
@@ -41,24 +41,24 @@
 #include <sys/time.h>
 
 struct osd_lock {
-	volatile pthread_t	holder;
-	INT32				count;
+	volatile pthread_t  holder;
+	INT32               count;
 #ifdef PTR64
-	INT8				padding[52];	// Fill a 64-byte cache line
+	INT8                padding[52];    // Fill a 64-byte cache line
 #else
-	INT8				padding[56];	// A bit more padding
+	INT8                padding[56];    // A bit more padding
 #endif
 };
 
 struct osd_event {
-	pthread_mutex_t 	mutex;
-	pthread_cond_t		cond;
-	volatile INT32		autoreset;
-	volatile INT32		signalled;
+	pthread_mutex_t     mutex;
+	pthread_cond_t      cond;
+	volatile INT32      autoreset;
+	volatile INT32      signalled;
 #ifdef PTR64
-	INT8				padding[40];	// Fill a 64-byte cache line
+	INT8                padding[40];    // Fill a 64-byte cache line
 #else
-	INT8				padding[48];	// A bit more padding
+	INT8                padding[48];    // A bit more padding
 #endif
 };
 
@@ -68,17 +68,17 @@ struct osd_event {
 //============================================================
 
 struct osd_thread {
-	pthread_t			thread;
+	pthread_t           thread;
 };
 
 struct osd_scalable_lock
 {
 	struct
 	{
-		volatile INT32	haslock;		// do we have the lock?
-		INT32			filler[64/4-1];	// assumes a 64-byte cache line
-	} slot[WORK_MAX_THREADS];			// one slot per thread
-	volatile INT32		nextindex;		// index of next slot to use
+		volatile INT32  haslock;        // do we have the lock?
+		INT32           filler[64/4-1]; // assumes a 64-byte cache line
+	} slot[WORK_MAX_THREADS];           // one slot per thread
+	volatile INT32      nextindex;      // index of next slot to use
 };
 
 
@@ -271,9 +271,9 @@ void osd_lock_acquire(osd_lock *lock)
 #endif
 #if 0
 			/* If you mean to use locks as a blocking mechanism for extended
-             * periods of time, you should do something like this.  However,
-             * it kills the performance of gaelco3d.
-             */
+			 * periods of time, you should do something like this.  However,
+			 * it kills the performance of gaelco3d.
+			 */
 			if (spin == 0)
 			{
 				struct timespec sleep = { 0, 100000 }, remaining;
@@ -466,7 +466,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 {
 	osd_thread *thread;
-	pthread_attr_t	attr;
+	pthread_attr_t  attr;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
 	pthread_attr_init(&attr);
@@ -487,8 +487,8 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 
 int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 {
-	struct sched_param	sched;
-	int					policy;
+	struct sched_param  sched;
+	int                 policy;
 
 	if ( pthread_getschedparam( thread->thread, &policy, &sched ) == 0 )
 	{

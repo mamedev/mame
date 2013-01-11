@@ -51,12 +51,12 @@ static const unsigned short ULawTo16[]=
 };
 
 
-#define STATUS			m_SOUNDREGS[0x404/4]
-#define CURSADDR(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x00])
-#define DSADDR(chan)	((m_SOUNDREGS[(0x20/4)*chan+0x08/4]>>0)&0xffff)
-#define LOOPBEGIN(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x0c/4]&0x3fffff)
-#define LOOPEND(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x10/4]&0x3fffff)
-#define ENVVOL(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x04/4]&0xffffff)
+#define STATUS          m_SOUNDREGS[0x404/4]
+#define CURSADDR(chan)  (m_SOUNDREGS[(0x20/4)*chan+0x00])
+#define DSADDR(chan)    ((m_SOUNDREGS[(0x20/4)*chan+0x08/4]>>0)&0xffff)
+#define LOOPBEGIN(chan) (m_SOUNDREGS[(0x20/4)*chan+0x0c/4]&0x3fffff)
+#define LOOPEND(chan)   (m_SOUNDREGS[(0x20/4)*chan+0x10/4]&0x3fffff)
+#define ENVVOL(chan)    (m_SOUNDREGS[(0x20/4)*chan+0x04/4]&0xffffff)
 
 /*
 #define GETSOUNDREG16(Chan,Offs) space.read_word(m_Intf.reg_base+0x20*Chan+Offs)
@@ -83,10 +83,10 @@ const device_type VRENDER0 = &device_creator<vrender0_device>;
 
 vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VRENDER0, "VRender0", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_TexBase(NULL),
-	  m_FBBase(NULL),
-	  m_stream(NULL)
+		device_sound_interface(mconfig, *this),
+		m_TexBase(NULL),
+		m_FBBase(NULL),
+		m_stream(NULL)
 {
 }
 
@@ -198,7 +198,7 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 			if(!(st&(1<<i)) || !(CT2&0x80))
 				continue;
 
-			if(Mode&0x10)		//u-law
+			if(Mode&0x10)       //u-law
 			{
 				UINT16 s=SAMPLES[a];
 				if((cur&0x200))
@@ -207,14 +207,14 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 			}
 			else
 			{
-				if(Mode&0x20)	//8bit
+				if(Mode&0x20)   //8bit
 				{
 					UINT16 s=SAMPLES[a];
 					if((cur&0x200))
 						s>>=8;
 					sample=(signed short) (((signed char) (s&0xff))<<8);
 				}
-				else				//16bit
+				else                //16bit
 				{
 					sample=SAMPLES[a];
 				}
@@ -223,7 +223,7 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 			CURSADDR(i)+=DSADD;
 			if(a>=LOOPEND(i))
 			{
-				if(Mode&1)	//Loop
+				if(Mode&1)  //Loop
 					CURSADDR(i)=0;//LOOPBEGIN(i)<<10;
 				else
 				{

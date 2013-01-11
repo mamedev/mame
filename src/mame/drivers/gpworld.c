@@ -49,7 +49,7 @@ class gpworld_state : public driver_device
 public:
 	gpworld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") ,
+			m_laserdisc(*this, "laserdisc") ,
 		m_sprite_ram(*this, "sprite_ram"),
 		m_palette_ram(*this, "palette_ram"),
 		m_tile_ram(*this, "tile_ram"){ }
@@ -252,9 +252,9 @@ READ8_MEMBER(gpworld_state::ldp_read)
 READ8_MEMBER(gpworld_state::pedal_in)
 {
 	if (m_brake_gas)
-		return	ioport("INACCEL")->read();
+		return  ioport("INACCEL")->read();
 
-	return	ioport("INBRAKE")->read();
+	return  ioport("INBRAKE")->read();
 
 }
 
@@ -291,7 +291,7 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 	g = (m_palette_ram[pal_index]   & 0xf0) << 0;
 	b = (m_palette_ram[pal_index]   & 0x0f) << 4;
 	r = (m_palette_ram[pal_index+1] & 0x0f) << 4;
-	a = (m_palette_ram[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
+	a = (m_palette_ram[pal_index+1] & 0x80) ? 0 : 255;  /* guess */
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
@@ -302,16 +302,16 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
 	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xc800,0xcfff) AM_RAM_WRITE(palette_write) AM_SHARE("palette_ram")	/* The memory test reads at 0xc800 */
+	AM_RANGE(0xc800,0xcfff) AM_RAM_WRITE(palette_write) AM_SHARE("palette_ram") /* The memory test reads at 0xc800 */
 	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_SHARE("tile_ram")
 	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
 /*  AM_RANGE(0xd801,0xd801) AM_READ_LEGACY(???) */
-	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....
-/*  AM_RANGE(0xda01,0xda01) AM_WRITE_LEGACY(???) */					/* These inputs are interesting - there are writes and reads all over these addr's */
-	AM_RANGE(0xda02,0xda02) AM_WRITE(brake_gas_write)				/*bit 0 select gas/brake input */
+	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL") //8255 here....
+/*  AM_RANGE(0xda01,0xda01) AM_WRITE_LEGACY(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
+	AM_RANGE(0xda02,0xda02) AM_WRITE(brake_gas_write)               /*bit 0 select gas/brake input */
 	AM_RANGE(0xda20,0xda20) AM_READ(pedal_in)
 
-	AM_RANGE(0xe000,0xffff) AM_RAM								/* Potentially not all work RAM? */
+	AM_RANGE(0xe000,0xffff) AM_RAM                              /* Potentially not all work RAM? */
 ADDRESS_MAP_END
 
 
@@ -340,7 +340,7 @@ static INPUT_PORTS_START( gpworld )
 
 	PORT_START("IN1")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )		/* maybe? it's not listed in the test screen. */
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )     /* maybe? it's not listed in the test screen. */
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_START1 )
@@ -535,4 +535,4 @@ DRIVER_INIT_MEMBER(gpworld_state,gpworld)
 
 
 /*    YEAR  NAME      PARENT   MACHINE  INPUT    INIT     MONITOR  COMPANY  FULLNAME    FLAGS) */
-GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, gpworld, ROT0,    "Sega",  "GP World",	GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, gpworld, ROT0,    "Sega",  "GP World",  GAME_NOT_WORKING|GAME_NO_SOUND)

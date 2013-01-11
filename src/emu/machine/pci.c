@@ -72,7 +72,7 @@
 #include "emu.h"
 #include "machine/pci.h"
 
-#define LOG_PCI	0
+#define LOG_PCI 0
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -88,7 +88,7 @@ const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
 //  pci_bus_legacy_device - constructor
 //-------------------------------------------------
 pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock),
+		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock),
 		m_father(NULL)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
@@ -305,7 +305,7 @@ const device_type PCI_BUS = &device_creator<pci_bus_device>;
 //  pci_bus_device - constructor
 //-------------------------------------------------
 pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock),
+		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock),
 		m_father(NULL)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {

@@ -148,7 +148,7 @@ static void bloodbro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		int sx,sy,x,y,width,height,attributes,tile_number,color,flipx,flipy,pri_mask;
 
 		attributes = spriteram16[offs+0];
-		if (attributes & 0x8000) continue;	/* disabled */
+		if (attributes & 0x8000) continue;  /* disabled */
 
 		width = ((attributes>>7)&7);
 		height = ((attributes>>4)&7);
@@ -160,7 +160,7 @@ static void bloodbro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		if (sy >= 256) sy -= 512;
 
 		flipx = attributes & 0x2000;
-		flipy = attributes & 0x4000;	/* ?? */
+		flipy = attributes & 0x4000;    /* ?? */
 		color = attributes & 0xf;
 
 		for (x = 0;x <= width;x++)
@@ -202,13 +202,13 @@ static void weststry_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		int sx = spriteram16[offs+3]&0x1ff;
 		int sy = 0xf0-(data0&0xff);
 		int flipx = data & 0x200;
-		int flipy = data & 0x400;	/* ??? */
+		int flipy = data & 0x400;   /* ??? */
 		int color = (data&0xf000)>>12;
 		int pri_mask = (data & 0x0080) ? 0x02 : 0;
 
 		if (sx >= 256) sx -= 512;
 
-		if (data0 & 0x8000) continue;	/* disabled */
+		if (data0 & 0x8000) continue;   /* disabled */
 
 		/* Remap code 0x800 <-> 0x1000 */
 		code = (code&0x7ff) | ((code&0x800)<<1) | ((code&0x1000)>>1);
@@ -227,8 +227,8 @@ static void weststry_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 UINT32 bloodbro_state::screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0,m_scroll[0x10]);	/* ? */
-	m_bg_tilemap->set_scrolly(0,m_scroll[0x11]);	/* ? */
+	m_bg_tilemap->set_scrollx(0,m_scroll[0x10]);    /* ? */
+	m_bg_tilemap->set_scrolly(0,m_scroll[0x11]);    /* ? */
 	m_fg_tilemap->set_scrollx(0,m_scroll[0x12]);
 	m_fg_tilemap->set_scrolly(0,m_scroll[0x13]);
 
@@ -261,9 +261,9 @@ UINT32 bloodbro_state::screen_update_weststry(screen_device &screen, bitmap_ind1
 UINT32 bloodbro_state::screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_scroll[0x08]);
-	m_bg_tilemap->set_scrolly(0,m_scroll[0x09]);	/* ? */
+	m_bg_tilemap->set_scrolly(0,m_scroll[0x09]);    /* ? */
 	m_fg_tilemap->set_scrollx(0,m_scroll[0x0a]);
-	m_fg_tilemap->set_scrolly(0,m_scroll[0x0b]);	/* ? */
+	m_fg_tilemap->set_scrolly(0,m_scroll[0x0b]);    /* ? */
 
 	machine().priority_bitmap.fill(0, cliprect);
 
@@ -273,5 +273,3 @@ UINT32 bloodbro_state::screen_update_skysmash(screen_device &screen, bitmap_ind1
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
-
-

@@ -10,7 +10,7 @@
 #define CB264SE30_SCREEN_NAME "cb264_screen"
 #define CB264SE30_ROM_REGION  "cb264_rom"
 
-#define VRAM_SIZE	(0x200000)
+#define VRAM_SIZE   (0x200000)
 
 MACHINE_CONFIG_FRAGMENT( cb264se30 )
 	MCFG_SCREEN_ADD( CB264SE30_SCREEN_NAME, RASTER)
@@ -22,7 +22,7 @@ MACHINE_CONFIG_END
 
 ROM_START( cb264se30 )
 	ROM_REGION(0x8000, CB264SE30_ROM_REGION, 0)
-    ROM_LOAD( "0002-2019_10-02-90.bin", 0x000000, 0x008000, CRC(5b5b2fab) SHA1(0584deb38b402718f2abef456b0035b34fddb473) )  // EPROM label "264/30 V1.3 0002-2019 10/02/90"
+	ROM_LOAD( "0002-2019_10-02-90.bin", 0x000000, 0x008000, CRC(5b5b2fab) SHA1(0584deb38b402718f2abef456b0035b34fddb473) )  // EPROM label "264/30 V1.3 0002-2019 10/02/90"
 ROM_END
 
 //**************************************************************************
@@ -60,14 +60,14 @@ const rom_entry *nubus_cb264se30_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PDS030_CB264SE30, "RasterOps Colorboard 264/SE30", tag, owner, clock),
+		device_t(mconfig, PDS030_CB264SE30, "RasterOps Colorboard 264/SE30", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "pd3_c264";
 }
 
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "pd3_c264";
@@ -96,7 +96,7 @@ void nubus_cb264se30_device::device_start()
 	m_nubus->install_device(slotspace+0xf00000, slotspace+0xfeffff, read32_delegate(FUNC(nubus_cb264se30_device::cb264se30_r), this), write32_delegate(FUNC(nubus_cb264se30_device::cb264se30_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -158,14 +158,14 @@ UINT32 nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb32
 				{
 					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-                    *scanline++ = m_palette[(pixels&0x80)];
-                    *scanline++ = m_palette[((pixels<<1)&0x80)];
-                    *scanline++ = m_palette[((pixels<<2)&0x80)];
-                    *scanline++ = m_palette[((pixels<<3)&0x80)];
-                    *scanline++ = m_palette[((pixels<<4)&0x80)];
-                    *scanline++ = m_palette[((pixels<<5)&0x80)];
-                    *scanline++ = m_palette[((pixels<<6)&0x80)];
-                    *scanline++ = m_palette[((pixels<<7)&0x80)];
+					*scanline++ = m_palette[(pixels&0x80)];
+					*scanline++ = m_palette[((pixels<<1)&0x80)];
+					*scanline++ = m_palette[((pixels<<2)&0x80)];
+					*scanline++ = m_palette[((pixels<<3)&0x80)];
+					*scanline++ = m_palette[((pixels<<4)&0x80)];
+					*scanline++ = m_palette[((pixels<<5)&0x80)];
+					*scanline++ = m_palette[((pixels<<6)&0x80)];
+					*scanline++ = m_palette[((pixels<<7)&0x80)];
 				}
 			}
 			break;
@@ -214,22 +214,22 @@ UINT32 nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb32
 			}
 			break;
 
-        case 4:	// 24 bpp
-            {
-                UINT32 *vram32 = (UINT32 *)m_vram;
-                UINT32 *base;
+		case 4: // 24 bpp
+			{
+				UINT32 *vram32 = (UINT32 *)m_vram;
+				UINT32 *base;
 
-                for (y = 0; y < 480; y++)
-                {
-                    scanline = &bitmap.pix32(y);
-                    base = &vram32[y * 1024];
-                    for (x = 0; x < 640; x++)
-                    {
-                        *scanline++ = *base++;
-                    }
-                }
-            }
-            break;
+				for (y = 0; y < 480; y++)
+				{
+					scanline = &bitmap.pix32(y);
+					base = &vram32[y * 1024];
+					for (x = 0; x < 640; x++)
+					{
+						*scanline++ = *base++;
+					}
+				}
+			}
+			break;
 
 		default:
 			fatalerror("cb264se30: unknown video mode %d\n", m_mode);
@@ -240,9 +240,9 @@ UINT32 nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb32
 
 WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 {
-    switch (offset)
+	switch (offset)
 	{
-        case 0x38003:			// mode
+		case 0x38003:           // mode
 //            if (data != 0x08000000) printf("%08x to mode\n", data);
 			switch (data & 0xff000000)
 			{
@@ -258,9 +258,9 @@ WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 					m_mode = 2;
 					break;
 
-                case 0x3b000000:
-                    m_mode = 3;
-                    break;
+				case 0x3b000000:
+					m_mode = 3;
+					break;
 
 				case 0x3f000000:
 					m_mode = 4;
@@ -268,40 +268,40 @@ WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 			}
 			break;
 
-        case 0x38000:
-            if (mem_mask == 0xff000000)
-            {
-        //          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
-                    m_clutoffs = (data>>24)&0xff;
-            }
-            else if (mem_mask == 0x0000ff00)
-            {
-                    m_colors[m_count++] = (data>>8) & 0xff;
+		case 0x38000:
+			if (mem_mask == 0xff000000)
+			{
+		//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+					m_clutoffs = (data>>24)&0xff;
+			}
+			else if (mem_mask == 0x0000ff00)
+			{
+					m_colors[m_count++] = (data>>8) & 0xff;
 
-                    if (m_count == 3)
-                    {
+					if (m_count == 3)
+					{
 //                        printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
-                        m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
-                        m_clutoffs++;
-                        if (m_clutoffs > 255)
-                        {
-                            m_clutoffs = 0;
-                        }
-                        m_count = 0;
-                    }
-            }
+						m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+						m_clutoffs++;
+						if (m_clutoffs > 255)
+						{
+							m_clutoffs = 0;
+						}
+						m_count = 0;
+					}
+			}
 			break;
 
-        case 0x2c017:	// VBL control
-            if (data & 0x06000000)
-            {
-                m_vbl_disable = 0;
-                lower_slot_irq();
-            }
-            else
-            {
-                m_vbl_disable = 1;
-            }
+		case 0x2c017:   // VBL control
+			if (data & 0x06000000)
+			{
+				m_vbl_disable = 0;
+				lower_slot_irq();
+			}
+			else
+			{
+				m_vbl_disable = 1;
+			}
 			break;
 
 		default:

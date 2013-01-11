@@ -37,7 +37,7 @@ public:
 	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag) { }
 
-	UINT8	m_nvram[0x100];
+	UINT8   m_nvram[0x100];
 	UINT8 m_prev_cia1_porta;
 	UINT8 m_parallel_data;
 	UINT8 m_nvram_address_latch;
@@ -57,7 +57,7 @@ public:
  *
  *************************************/
 
-#define LOG_IO			0
+#define LOG_IO          0
 
 
 
@@ -173,15 +173,15 @@ WRITE8_MEMBER(upscope_state::upscope_cia_1_porta_w)
 			{
 				case 0x01:
 					/* lamps:
-                        01 = Enemy Right
-                        02 = Enemy Left
-                        04 = Torpedo 1
-                        08 = Torpedo 2
-                        10 = Torpedo 3
-                        20 = Torpedo 4
-                        40 = Sight
-                        80 = Bubble Light
-                    */
+					    01 = Enemy Right
+					    02 = Enemy Left
+					    04 = Torpedo 1
+					    08 = Torpedo 2
+					    10 = Torpedo 3
+					    20 = Torpedo 4
+					    40 = Sight
+					    80 = Bubble Light
+					*/
 					break;
 
 				case 0x02:
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, upscope_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w)  AM_SHARE("custom_regs")
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
 
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END
@@ -285,24 +285,24 @@ INPUT_PORTS_END
 
 static const legacy_mos6526_interface cia_0_intf =
 {
-	DEVCB_LINE(amiga_cia_0_irq),										/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_0_irq),                                        /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_porta_w),					/* port A */
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_porta_w),                   /* port A */
 	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_portb_r),
-	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_portb_w)	/* port B */
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_0_portb_w)    /* port B */
 };
 
 static const legacy_mos6526_interface cia_1_intf =
 {
-	DEVCB_LINE(amiga_cia_1_irq),										/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_1_irq),                                        /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_1_porta_r),
-	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_1_porta_w),	/* port A */
+	DEVCB_DRIVER_MEMBER(upscope_state,upscope_cia_1_porta_w),   /* port A */
 	DEVCB_NULL,
 	DEVCB_NULL
 };

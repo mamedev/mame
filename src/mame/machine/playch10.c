@@ -92,11 +92,11 @@ CUSTOM_INPUT_MEMBER(playch10_state::pc10_int_detect_r)
 WRITE8_MEMBER(playch10_state::pc10_SDCS_w)
 {
 	/*
-        Hooked to CLR on LS194A - Sheet 2, bottom left.
-        Drives character and color code to 0.
-        It's used to keep the screen black during redraws.
-        Also hooked to the video sram. Prevent writes.
-    */
+	    Hooked to CLR on LS194A - Sheet 2, bottom left.
+	    Drives character and color code to 0.
+	    It's used to keep the screen black during redraws.
+	    Also hooked to the video sram. Prevent writes.
+	*/
 	m_pc10_sdcs = ~data & 1;
 }
 
@@ -170,8 +170,8 @@ READ8_MEMBER(playch10_state::pc10_prot_r)
 	if (m_cart_sel == 0)
 	{
 		rp5h01_enable_w(rp5h01, space, 0, 0);
-		data |= ((~rp5h01_counter_r(rp5h01, space, 0)) << 4) & 0x10;	/* D4 */
-		data |= ((rp5h01_data_r(rp5h01, space, 0)) << 3) & 0x08;		/* D3 */
+		data |= ((~rp5h01_counter_r(rp5h01, space, 0)) << 4) & 0x10;    /* D4 */
+		data |= ((rp5h01_data_r(rp5h01, space, 0)) << 3) & 0x08;        /* D3 */
 		rp5h01_enable_w(rp5h01, space, 0, 1);
 	}
 	return data;
@@ -184,9 +184,9 @@ WRITE8_MEMBER(playch10_state::pc10_prot_w)
 	if (m_cart_sel == 0)
 	{
 		rp5h01_enable_w(rp5h01, space, 0, 0);
-		rp5h01_test_w(rp5h01, space, 0, data & 0x10);		/* D4 */
-		rp5h01_clock_w(rp5h01, space, 0, data & 0x08);		/* D3 */
-		rp5h01_reset_w(rp5h01, space, 0, ~data & 0x01);	/* D0 */
+		rp5h01_test_w(rp5h01, space, 0, data & 0x10);       /* D4 */
+		rp5h01_clock_w(rp5h01, space, 0, data & 0x08);      /* D3 */
+		rp5h01_reset_w(rp5h01, space, 0, ~data & 0x01); /* D0 */
 		rp5h01_enable_w(rp5h01, space, 0, 1);
 
 		/* this thing gets dense at some point                      */
@@ -369,10 +369,10 @@ static void pc10_set_videorom_bank( running_machine &machine, int first, int cou
 	/* but the driver is 100% consistant */
 
 	len = state->memregion("gfx2")->bytes();
-	len /= 0x400;	// convert to KB
-	len /= size;	// convert to bank resolution
-	len--;			// convert to mask
-	bank &= len;	// should be the right mask
+	len /= 0x400;   // convert to KB
+	len /= size;    // convert to bank resolution
+	len--;          // convert to mask
+	bank &= len;    // should be the right mask
 
 	for (i = 0; i < count; i++)
 	{
@@ -490,7 +490,7 @@ WRITE8_MEMBER(playch10_state::mmc1_rom_switch_w)
 		/* apply data to registers */
 		switch (reg)
 		{
-			case 0:		/* mirroring and options */
+			case 0:     /* mirroring and options */
 				{
 					int _mirroring;
 
@@ -523,7 +523,7 @@ WRITE8_MEMBER(playch10_state::mmc1_rom_switch_w)
 				}
 			break;
 
-			case 1:	/* video rom banking - bank 0 - 4k or 8k */
+			case 1: /* video rom banking - bank 0 - 4k or 8k */
 				if (m_vram)
 					set_videoram_bank(machine(), 0, (vrom4k) ? 4 : 8, (m_mmc1_shiftreg & 0x1f), 4);
 				else
@@ -540,7 +540,7 @@ WRITE8_MEMBER(playch10_state::mmc1_rom_switch_w)
 				}
 			break;
 
-			case 3:	/* program banking */
+			case 3: /* program banking */
 				{
 					int bank = (m_mmc1_shiftreg & m_mmc1_rom_mask) * 0x4000;
 					UINT8 *prg = memregion("cart")->base();
@@ -894,7 +894,7 @@ WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 
 				switch (cmd)
 				{
-					case 0:	/* char banking */
+					case 0: /* char banking */
 					case 1: /* char banking */
 						data &= 0xfe;
 						page ^= (cmd << 1);
@@ -1070,7 +1070,7 @@ WRITE8_MEMBER(playch10_state::hboard_rom_switch_w)
 
 				switch (cmd)
 				{
-					case 0:	/* char banking */
+					case 0: /* char banking */
 					case 1: /* char banking */
 						data &= 0xfe;
 						page ^= (cmd << 1);

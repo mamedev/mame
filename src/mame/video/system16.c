@@ -861,8 +861,8 @@ UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, b
 	bitmap.fill(0, cliprect);
 
 	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);	//??
-	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);	//??
+	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);   //??
+	m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);   //??
 	m_background->draw(bitmap, cliprect, 1, 0x1);
 	m_background->draw(bitmap, cliprect, 2, 0x3);
 

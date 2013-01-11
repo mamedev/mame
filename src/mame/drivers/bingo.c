@@ -9,7 +9,7 @@ class bingo_state : public driver_device
 public:
 	bingo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -52,7 +52,7 @@ class seeben_state : public driver_device
 public:
 	seeben_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -92,7 +92,7 @@ class splin_state : public driver_device
 public:
 	splin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -238,86 +238,86 @@ ROM_START(topgamet)
 ROM_END
 
 ROM_START(penalty)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("13006-1.epr", 0x8000, 0x8000, CRC(93cfbec9) SHA1(c245604ac42c88c647950db4497a6f9dd3504955))
-    ROM_LOAD("13006-2.epr", 0x0000, 0x4000, CRC(41470cc1) SHA1(7050df563fddbe8216317d96664d12567b618645))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("13006-1.epr", 0x8000, 0x8000, CRC(93cfbec9) SHA1(c245604ac42c88c647950db4497a6f9dd3504955))
+	ROM_LOAD("13006-2.epr", 0x0000, 0x4000, CRC(41470cc1) SHA1(7050df563fddbe8216317d96664d12567b618645))
 ROM_END
 
 ROM_START(brooklyn)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("n10207-1.epr", 0x8000, 0x8000, CRC(7851f870) SHA1(8da400108a352954ced8fc942663c0635bec4d1c))
-    ROM_LOAD("n10207-2.epr", 0x0000, 0x4000, CRC(861dae09) SHA1(d808fbbf6b50e1482a512b9bd1b18a023694adb2))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("n10207-1.epr", 0x8000, 0x8000, CRC(7851f870) SHA1(8da400108a352954ced8fc942663c0635bec4d1c))
+	ROM_LOAD("n10207-2.epr", 0x0000, 0x4000, CRC(861dae09) SHA1(d808fbbf6b50e1482a512b9bd1b18a023694adb2))
 ROM_END
 
 ROM_START(brooklyna)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("o10307-1.epr", 0x8000, 0x8000, CRC(628ac640) SHA1(67edb424f15880e874b03028066e6c0039db21fa))
-    ROM_LOAD("o10307-2.epr", 0x0000, 0x4000, CRC(c35d83ff) SHA1(e37c03e6960138cb6b628dfc6b12e484bbae96e8))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("o10307-1.epr", 0x8000, 0x8000, CRC(628ac640) SHA1(67edb424f15880e874b03028066e6c0039db21fa))
+	ROM_LOAD("o10307-2.epr", 0x0000, 0x4000, CRC(c35d83ff) SHA1(e37c03e6960138cb6b628dfc6b12e484bbae96e8))
 ROM_END
 
 ROM_START(newdixie)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("10307-1.epr", 0x8000, 0x8000, CRC(7b6b2e9c) SHA1(149c9e1d2a3e7db735835c6fa795e41b2eb45175))
-    ROM_LOAD("10307-2.epr", 0x0000, 0x4000, CRC(d99a7866) SHA1(659a0107bc970d2578dcfd7cdd43661da778fd5c))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("10307-1.epr", 0x8000, 0x8000, CRC(7b6b2e9c) SHA1(149c9e1d2a3e7db735835c6fa795e41b2eb45175))
+	ROM_LOAD("10307-2.epr", 0x0000, 0x4000, CRC(d99a7866) SHA1(659a0107bc970d2578dcfd7cdd43661da778fd5c))
 ROM_END
 
 ROM_START(superdix)
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "12906-1.epr", 0x8000, 0x8000, CRC(e90a8aa5) SHA1(88dac74fb020535b535f7c4c245bbece398164ee))
 	ROM_LOAD( "12906-2.epr", 0x0000, 0x4000, CRC(4875dfb4) SHA1(722bfa89f69d14e24555eea9cc975012098db25b))
 ROM_END
 
 ROM_START(cntine31)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("10107-1.epr", 0x8000, 0x8000, CRC(3b67cce3) SHA1(95f71526c236262ff985148ba7ea057f07fadbe8))
-    ROM_LOAD("10107-2.epr", 0x0000, 0x4000, CRC(89d08795) SHA1(dc75502580d681d9b4dc878b0d80346bcef407ae))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("10107-1.epr", 0x8000, 0x8000, CRC(3b67cce3) SHA1(95f71526c236262ff985148ba7ea057f07fadbe8))
+	ROM_LOAD("10107-2.epr", 0x0000, 0x4000, CRC(89d08795) SHA1(dc75502580d681d9b4dc878b0d80346bcef407ae))
 ROM_END
 
 ROM_START(domino2)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("13006.epr", 0x8000, 0x8000, CRC(8ed9b2a5) SHA1(8f3e730cef3e74cb043691a111e1bf6660642a73))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("13006.epr", 0x8000, 0x8000, CRC(8ed9b2a5) SHA1(8f3e730cef3e74cb043691a111e1bf6660642a73))
 ROM_END
 
 ROM_START(ggate)
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "13006-1.epr", 0x8000, 0x8000, CRC(6a451fc6) SHA1(93287937c8a679dfca1a162977a62357134673b6))
 	ROM_LOAD( "13006-2.epr", 0x0000, 0x4000, CRC(217299b0) SHA1(ef3ee8811183dca43699a7c2d75fb99bc3668ae2))
 ROM_END
 
 ROM_START(ggatea)
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "12906-1.epr", 0x8000, 0x8000, CRC(3792fc4c) SHA1(4ab88b6c73ce1b49e1a4d12cc9fa61c7d74ed780))
 	ROM_LOAD( "12906-2.epr", 0x0000, 0x4000, CRC(a1115196) SHA1(dfa549a547b5cd7a9369d30fa1e868e6725cb3f1))
 ROM_END
 
 ROM_START(tripjok)
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "13006-1", 0x8000, 0x8000, CRC(5682ac90) SHA1(c9fa13c56e9178eb861991fcad6b09fd27cca3cb))
 	ROM_LOAD( "13006-2", 0x0000, 0x4000, CRC(c7104e8f) SHA1(a3737f70cb9c97df24b5da915ef53b6d30f2470d))
 ROM_END
 
 
-GAME(1980,	cntinntl,		0,			bingo,	bingo, bingo_state,	bingo,	ROT0,	"Bally",		"Continental (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	goldgame,		0,			splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Golden Game (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	goldgkitb,		goldgame,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Golden Game Kit Bingo Stake 6/10 (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	goldgstake,		goldgame,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Golden Game Bingo Stake 6/10 (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	goldgnew,		goldgame,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Golden Game Bingo New (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	goldgkit1,		goldgame,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Golden Game Kit 1 Generation (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	michigan,		0,			splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Michigan (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	michkit1,		michigan,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Michigan Bingo Kit 1 Generation (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	michkitb,		michigan,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Michigan Kit Bingo Stake 6/10 (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	michstake,		michigan,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Michigan Bingo Stake 6/10 (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	michnew,		michigan,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Michigan Bingo New (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	montana,		0,			splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Montana Bingo Stake 6/10 (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	topgame,		0,			splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Top Game Laser L10 (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	topgamet,		topgame,	splin,	splin, splin_state,	splin,	ROT0,	"Splin",		"Top Game Turbo (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	penalty,		0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Penalty (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	brooklyn,		0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Brooklyn (set 1) (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	brooklyna,		brooklyn,	seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Brooklyn (set 2) (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	newdixie,		0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"New Dixieland (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	superdix,		0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Super Dixieland (Bingo)",	GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	cntine31,		0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Continental 3 in 1 (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	domino2,		0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Domino II (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	tripjok,		0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Triple Joker (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	ggate,			0,			seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Golden Gate (set 1) (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	ggatea,			ggate,		seeben,	seeben, seeben_state,	seeben,	ROT0,	"Seeben (Belgium)",	"Golden Gate (set 2) (Bingo)",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  cntinntl,       0,          bingo,  bingo, bingo_state, bingo,  ROT0,   "Bally",        "Continental (Bingo)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  goldgame,       0,          splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game (Bingo)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  goldgkitb,      goldgame,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game Kit Bingo Stake 6/10 (Bingo)", GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  goldgstake,     goldgame,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game Bingo Stake 6/10 (Bingo)", GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  goldgnew,       goldgame,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game Bingo New (Bingo)",    GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  goldgkit1,      goldgame,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Golden Game Kit 1 Generation (Bingo)", GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  michigan,       0,          splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Michigan (Bingo)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  michkit1,       michigan,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Michigan Bingo Kit 1 Generation (Bingo)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  michkitb,       michigan,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Michigan Kit Bingo Stake 6/10 (Bingo)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  michstake,      michigan,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Michigan Bingo Stake 6/10 (Bingo)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  michnew,        michigan,   splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Michigan Bingo New (Bingo)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  montana,        0,          splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Montana Bingo Stake 6/10 (Bingo)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  topgame,        0,          splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Top Game Laser L10 (Bingo)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  topgamet,       topgame,    splin,  splin, splin_state, splin,  ROT0,   "Splin",        "Top Game Turbo (Bingo)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  penalty,        0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Penalty (Bingo)",  GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  brooklyn,       0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Brooklyn (set 1) (Bingo)", GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  brooklyna,      brooklyn,   seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Brooklyn (set 2) (Bingo)", GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  newdixie,       0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "New Dixieland (Bingo)",    GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  superdix,       0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Super Dixieland (Bingo)",  GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  cntine31,       0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Continental 3 in 1 (Bingo)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  domino2,        0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Domino II (Bingo)",                GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  tripjok,        0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Triple Joker (Bingo)",             GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  ggate,          0,          seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Golden Gate (set 1) (Bingo)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  ggatea,         ggate,      seeben, seeben, seeben_state,   seeben, ROT0,   "Seeben (Belgium)", "Golden Gate (set 2) (Bingo)",              GAME_IS_SKELETON_MECHANICAL)

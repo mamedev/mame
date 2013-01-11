@@ -301,7 +301,7 @@ PALETTE_INIT_MEMBER(centiped_state,warlords)
 		b = ((color_prom[pen] >> 0) & 0x01) * 0xff;
 
 		/* colors 0x40-0x7f are converted to grey scale as it's used on the
-           upright version that had an overlay */
+		   upright version that had an overlay */
 		if (pen >= 0x40)
 		{
 			/* use the standard ratios: r = 30%, g = 59%, b = 11% */
@@ -475,9 +475,9 @@ UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind1
 		int y = 248 - spriteram[offs + 0x10];
 
 		/* The four quadrants have different colors. This is not 100% accurate,
-           because right on the middle the sprite could actually have two or more
-           different color, but this is not noticeable, as the color that
-           changes between the quadrants is mostly used on the paddle sprites */
+		   because right on the middle the sprite could actually have two or more
+		   different color, but this is not noticeable, as the color that
+		   changes between the quadrants is mostly used on the paddle sprites */
 		int color = ((y & 0x80) >> 6) | ((x & 0x80) >> 7) | (upright_mode >> 5);
 
 		/* in upright mode, sprites are flipped */
@@ -559,4 +559,3 @@ UINT32 centiped_state::screen_update_milliped(screen_device &screen, bitmap_ind1
 	}
 	return 0;
 }
-

@@ -288,7 +288,7 @@ static void create_palette_lookup(running_machine &machine)
 	/* compute palette information */
 	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
 	/* by the use of transistors, so we ignore that and just use the relative resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_r, 0, 0,
 			3, resistances_rg, weights_g, 0, 0,
 			2, resistances_b,  weights_b, 0, 0);

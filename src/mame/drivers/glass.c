@@ -31,9 +31,9 @@ INTERRUPT_GEN_MEMBER(glass_state::glass_interrupt)
 
 static const gfx_layout glass_tilelayout16 =
 {
-	16,16,									/* 16x16 tiles */
-	0x100000/32,							/* number of tiles */
-	4,										/* 4 bpp */
+	16,16,                                  /* 16x16 tiles */
+	0x100000/32,                            /* number of tiles */
+	4,                                      /* 4 bpp */
 	{ 3*0x100000*8, 2*0x100000*8, 1*0x100000*8, 0*0x100000*8 },
 	{
 		0, 1, 2, 3, 4, 5, 6, 7,
@@ -63,36 +63,36 @@ WRITE16_MEMBER(glass_state::glass_coin_w)
 {
 	switch (offset >> 3)
 	{
-		case 0x00:	/* Coin Lockouts */
+		case 0x00:  /* Coin Lockouts */
 		case 0x01:
 			coin_lockout_w(machine(), (offset >> 3) & 0x01, ~data & 0x01);
 			break;
-		case 0x02:	/* Coin Counters */
+		case 0x02:  /* Coin Counters */
 		case 0x03:
 			coin_counter_w(machine(), (offset >> 3) & 0x01, data & 0x01);
 			break;
-		case 0x04:	/* Sound Muting (if bit 0 == 1, sound output stream = 0) */
+		case 0x04:  /* Sound Muting (if bit 0 == 1, sound output stream = 0) */
 			break;
 	}
 }
 
 static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_SHARE("videoram")							/* Video RAM */
-	AM_RANGE(0x102000, 0x102fff) AM_RAM																		/* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")												/* Video Registers */
-	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)														/* CLR INT Video */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")												/* Sprite RAM */
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     /* ROM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_SHARE("videoram")                            /* Video RAM */
+	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                     /* Extra Video RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                             /* Video Registers */
+	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)                                                        /* CLR INT Video */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")    /* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x700008, 0x700009) AM_WRITE(glass_blitter_w)													/* serial blitter */
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)											/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)				/* OKI6295 status register */
-	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(glass_coin_w)														/* Coin Counters/Lockout */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("mainram")													/* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0x700008, 0x700009) AM_WRITE(glass_blitter_w)                                                  /* serial blitter */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                                            /* OKI6295 bankswitch */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)              /* OKI6295 status register */
+	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(glass_coin_w)                                                     /* Coin Counters/Lockout */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("mainram")                                                 /* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 
 
@@ -193,7 +193,7 @@ void glass_state::machine_reset()
 static MACHINE_CONFIG_START( glass, glass_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)      /* 12 MHz (M680000 P12) */
 	MCFG_CPU_PROGRAM_MAP(glass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", glass_state,  glass_interrupt)
 
@@ -218,63 +218,63 @@ static MACHINE_CONFIG_START( glass, glass_state )
 MACHINE_CONFIG_END
 
 ROM_START( glass ) /* Version 1.1 */
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
 	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )	/* 16 bitmaps (320x200, indexed colors) */
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
-	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
 	ROM_RELOAD(         0x040000, 0x100000 )
 ROM_END
 
 ROM_START( glass10 ) /* Version 1.0 */
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )	/* 16 bitmaps (320x200, indexed colors) */
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
-	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
 	ROM_RELOAD(         0x040000, 0x100000 )
 ROM_END
 
 ROM_START( glassbrk ) /* Title screen shows "GLASS" and under that "Break Edition" on a real PCB */
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "spl-c23.bin", 0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef) )
 	ROM_LOAD16_BYTE( "spl-c22.bin", 0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
 	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
 
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* Graphics */
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )	/* 16 bitmaps (320x200, indexed colors) */
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
-	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
 	ROM_RELOAD(         0x040000, 0x100000 )
@@ -322,14 +322,14 @@ READ16_MEMBER( glass_state::glass_mainram_r )
 
 		// there are also various code segments like the one below
 		/*
-        start:
-        tst.b   this address
-        bne     end
-        tst.b   $fede1d.l
-        nop << why?
-        bne     start
-        end:
-        */
+		start:
+		tst.b   this address
+		bne     end
+		tst.b   $fede1d.l
+		nop << why?
+		bne     start
+		end:
+		*/
 		return 0x0000;
 		//printf("%06x read %06x - %04x %04x\n", pc , (offset*2 + 0xfec000), ret, mem_mask);
 	}
@@ -394,16 +394,16 @@ WRITE16_MEMBER( glass_state::glass_mainram_w )
 DRIVER_INIT_MEMBER(glass_state,glass)
 {
 	/*
-    For "gfx2" we have this memory map:
-        0x000000-0x1fffff ROM H13
-        0x200000-0x3fffff ROM H11
+	For "gfx2" we have this memory map:
+	    0x000000-0x1fffff ROM H13
+	    0x200000-0x3fffff ROM H11
 
-    and we are going to construct this one for "gfx1":
-        0x000000-0x0fffff ROM H13 even bytes
-        0x100000-0x1fffff ROM H13 odd bytes
-        0x200000-0x2fffff ROM H11 even bytes
-        0x300000-0x3fffff ROM H11 odd bytes
-    */
+	and we are going to construct this one for "gfx1":
+	    0x000000-0x0fffff ROM H13 even bytes
+	    0x100000-0x1fffff ROM H13 odd bytes
+	    0x200000-0x2fffff ROM H11 even bytes
+	    0x300000-0x3fffff ROM H11 odd bytes
+	*/
 
 	/* split ROM H13 */
 	glass_ROM16_split_gfx(machine(), "gfx2", "gfx1", 0x0000000, 0x0200000, 0x0000000, 0x0100000);

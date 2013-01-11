@@ -302,4 +302,3 @@ void oric_state::video_start()
 	/* mode */
 	oric_vh_update_attribute(machine(),(1<<3)|(1<<4));
 }
-

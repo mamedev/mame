@@ -67,19 +67,19 @@ static const UINT8 KR2376_KEY_CODES[3][8][11] =
 struct kr2376_t
 {
 	const kr2376_interface *intf;
-	int	pins[41];
+	int pins[41];
 
-	int ring11;						/* sense input scan counter */
-	int ring8;						/* drive output scan counter */
-	int modifiers;					/* modifier inputs */
+	int ring11;                     /* sense input scan counter */
+	int ring8;                      /* drive output scan counter */
+	int modifiers;                  /* modifier inputs */
 
-	int strobe;						/* strobe output */
+	int strobe;                     /* strobe output */
 	int strobe_old;
 	int parity;
 	int data;
 
 	/* timers */
-	emu_timer *scan_timer;			/* keyboard scan timer */
+	emu_timer *scan_timer;          /* keyboard scan timer */
 	devcb_resolved_write_line on_strobe_changed;
 };
 
@@ -114,7 +114,7 @@ void kr2376_set_input_pin( device_t *device, kr2376_input_pin_t pin, int data )
 -------------------------------------------------*/
 int kr2376_get_output_pin( device_t *device, kr2376_output_pin_t pin )
 {
-	kr2376_t	*kr2376 = get_safe_token(device);
+	kr2376_t    *kr2376 = get_safe_token(device);
 
 	return kr2376->pins[pin];
 }
@@ -400,5 +400,3 @@ void kr2376_device::device_start()
 {
 	DEVICE_START_NAME( kr2376 )(this);
 }
-
-

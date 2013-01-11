@@ -361,7 +361,7 @@ cpu cycles:  Base number of cycles required to execute this opcode on the
 */
 
 
-              spec  spec                    allowed ea  mode      3 C  cpu cycles
+				spec  spec                    allowed ea  mode      3 C  cpu cycles
 name    size  proc   ea   bit pattern       A+-DXWLdxI  0 1 2 3 4 2 F  000 010 020 030 040 340 CLF comments
 ======  ====  ====  ====  ================  ==========  = = = = = = =  === === === === === === === ==========
 M68KMAKE_TABLE_START
@@ -1843,7 +1843,7 @@ M68KMAKE_OP(andi, 16, tos, .)
 	if((mc68kcpu)->s_flag)
 	{
 		UINT32 src = OPER_I_16(mc68kcpu);
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr((mc68kcpu), m68ki_get_sr(mc68kcpu) & src);
 		return;
 	}
@@ -2282,7 +2282,7 @@ M68KMAKE_OP(bcc, 8, ., .)
 {
 	if(M68KMAKE_CC)
 	{
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_8((mc68kcpu), MASK_OUT_ABOVE_8((mc68kcpu)->ir));
 		return;
 	}
@@ -2296,7 +2296,7 @@ M68KMAKE_OP(bcc, 16, ., .)
 	{
 		UINT32 offset = OPER_I_16(mc68kcpu);
 		REG_PC(mc68kcpu) -= 2;
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_16((mc68kcpu), offset);
 		return;
 	}
@@ -2313,7 +2313,7 @@ M68KMAKE_OP(bcc, 32, ., .)
 		{
 			UINT32 offset = OPER_I_32(mc68kcpu);
 			REG_PC(mc68kcpu) -= 4;
-			m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+			m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 			m68ki_branch_32((mc68kcpu), offset);
 			return;
 		}
@@ -2324,7 +2324,7 @@ M68KMAKE_OP(bcc, 32, ., .)
 	{
 		if(M68KMAKE_CC)
 		{
-			m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+			m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 			m68ki_branch_8((mc68kcpu), MASK_OUT_ABOVE_8((mc68kcpu)->ir));
 			return;
 		}
@@ -3167,7 +3167,7 @@ M68KMAKE_OP(bkpt, 0, ., .)
 
 M68KMAKE_OP(bra, 8, ., .)
 {
-	m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 	m68ki_branch_8((mc68kcpu), MASK_OUT_ABOVE_8((mc68kcpu)->ir));
 	if(REG_PC(mc68kcpu) == REG_PPC(mc68kcpu) && (mc68kcpu)->remaining_cycles > 0)
 		(mc68kcpu)->remaining_cycles = 0;
@@ -3178,7 +3178,7 @@ M68KMAKE_OP(bra, 16, ., .)
 {
 	UINT32 offset = OPER_I_16(mc68kcpu);
 	REG_PC(mc68kcpu) -= 2;
-	m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 	m68ki_branch_16((mc68kcpu), offset);
 	if(REG_PC(mc68kcpu) == REG_PPC(mc68kcpu) && (mc68kcpu)->remaining_cycles > 0)
 		(mc68kcpu)->remaining_cycles = 0;
@@ -3191,7 +3191,7 @@ M68KMAKE_OP(bra, 32, ., .)
 	{
 		UINT32 offset = OPER_I_32(mc68kcpu);
 		REG_PC(mc68kcpu) -= 4;
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_32((mc68kcpu), offset);
 		if(REG_PC(mc68kcpu) == REG_PPC(mc68kcpu) && (mc68kcpu)->remaining_cycles > 0)
 			(mc68kcpu)->remaining_cycles = 0;
@@ -3199,7 +3199,7 @@ M68KMAKE_OP(bra, 32, ., .)
 	}
 	else
 	{
-		m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_8((mc68kcpu), MASK_OUT_ABOVE_8((mc68kcpu)->ir));
 		if(REG_PC(mc68kcpu) == REG_PPC(mc68kcpu) && (mc68kcpu)->remaining_cycles > 0)
 			(mc68kcpu)->remaining_cycles = 0;
@@ -3251,7 +3251,7 @@ M68KMAKE_OP(bset, 8, s, .)
 
 M68KMAKE_OP(bsr, 8, ., .)
 {
-	m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32((mc68kcpu), REG_PC(mc68kcpu));
 	m68ki_branch_8((mc68kcpu), MASK_OUT_ABOVE_8((mc68kcpu)->ir));
 }
@@ -3260,7 +3260,7 @@ M68KMAKE_OP(bsr, 8, ., .)
 M68KMAKE_OP(bsr, 16, ., .)
 {
 	UINT32 offset = OPER_I_16(mc68kcpu);
-	m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32((mc68kcpu), REG_PC(mc68kcpu));
 	REG_PC(mc68kcpu) -= 2;
 	m68ki_branch_16((mc68kcpu), offset);
@@ -3272,7 +3272,7 @@ M68KMAKE_OP(bsr, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		UINT32 offset = OPER_I_32(mc68kcpu);
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_push_32((mc68kcpu), REG_PC(mc68kcpu));
 		REG_PC(mc68kcpu) -= 4;
 		m68ki_branch_32((mc68kcpu), offset);
@@ -3280,7 +3280,7 @@ M68KMAKE_OP(bsr, 32, ., .)
 	}
 	else
 	{
-		m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 		m68ki_push_32((mc68kcpu), REG_PC(mc68kcpu));
 		m68ki_branch_8((mc68kcpu), MASK_OUT_ABOVE_8((mc68kcpu)->ir));
 	}
@@ -3320,11 +3320,11 @@ M68KMAKE_OP(callm, 32, ., .)
 	{
 		UINT32 ea = M68KMAKE_GET_EA_AY_32;
 
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_PC(mc68kcpu) += 2;
-(void)ea;	/* just to avoid an 'unused variable' warning */
+(void)ea;   /* just to avoid an 'unused variable' warning */
 		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -3341,7 +3341,7 @@ M68KMAKE_OP(cas, 8, ., .)
 		UINT32* compare = &REG_D(mc68kcpu)[word2 & 7];
 		UINT32 res = dest - MASK_OUT_ABOVE_8(*compare);
 
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		(mc68kcpu)->n_flag = NFLAG_8(res);
 		(mc68kcpu)->not_z_flag = MASK_OUT_ABOVE_8(res);
 		(mc68kcpu)->v_flag = VFLAG_SUB_8(*compare, dest, res);
@@ -3370,7 +3370,7 @@ M68KMAKE_OP(cas, 16, ., .)
 		UINT32* compare = &REG_D(mc68kcpu)[word2 & 7];
 		UINT32 res = dest - MASK_OUT_ABOVE_16(*compare);
 
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		(mc68kcpu)->n_flag = NFLAG_16(res);
 		(mc68kcpu)->not_z_flag = MASK_OUT_ABOVE_16(res);
 		(mc68kcpu)->v_flag = VFLAG_SUB_16(*compare, dest, res);
@@ -3399,7 +3399,7 @@ M68KMAKE_OP(cas, 32, ., .)
 		UINT32* compare = &REG_D(mc68kcpu)[word2 & 7];
 		UINT32 res = dest - *compare;
 
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		(mc68kcpu)->n_flag = NFLAG_32(res);
 		(mc68kcpu)->not_z_flag = MASK_OUT_ABOVE_32(res);
 		(mc68kcpu)->v_flag = VFLAG_SUB_32(*compare, dest, res);
@@ -3432,7 +3432,7 @@ M68KMAKE_OP(cas2, 16, ., .)
 		UINT32 dest2 = m68ki_read_16((mc68kcpu), ea2);
 		UINT32 res2;
 
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		(mc68kcpu)->n_flag = NFLAG_16(res1);
 		(mc68kcpu)->not_z_flag = MASK_OUT_ABOVE_16(res1);
 		(mc68kcpu)->v_flag = VFLAG_SUB_16(*compare1, dest1, res1);
@@ -3477,7 +3477,7 @@ M68KMAKE_OP(cas2, 32, ., .)
 		UINT32 dest2 = m68ki_read_32((mc68kcpu), ea2);
 		UINT32 res2;
 
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		(mc68kcpu)->n_flag = NFLAG_32(res1);
 		(mc68kcpu)->not_z_flag = MASK_OUT_ABOVE_32(res1);
 		(mc68kcpu)->v_flag = VFLAG_SUB_32(*compare1, dest1, res1);
@@ -4402,7 +4402,7 @@ M68KMAKE_OP(cpbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4414,7 +4414,7 @@ M68KMAKE_OP(cpdbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4426,7 +4426,7 @@ M68KMAKE_OP(cpgen, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) && (mc68kcpu->has_fpu || mc68kcpu->has_pmmu))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4438,7 +4438,7 @@ M68KMAKE_OP(cpscc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4450,7 +4450,7 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4472,7 +4472,7 @@ M68KMAKE_OP(dbf, 16, ., .)
 	{
 		UINT32 offset = OPER_I_16(mc68kcpu);
 		REG_PC(mc68kcpu) -= 2;
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_16((mc68kcpu), offset);
 		(mc68kcpu)->remaining_cycles -= (mc68kcpu)->cyc_dbcc_f_noexp;
 		return;
@@ -4494,7 +4494,7 @@ M68KMAKE_OP(dbcc, 16, ., .)
 		{
 			UINT32 offset = OPER_I_16(mc68kcpu);
 			REG_PC(mc68kcpu) -= 2;
-			m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+			m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 			m68ki_branch_16((mc68kcpu), offset);
 			(mc68kcpu)->remaining_cycles -= (mc68kcpu)->cyc_dbcc_f_noexp;
 			return;
@@ -4647,13 +4647,13 @@ M68KMAKE_OP(divl, 32, ., d)
 
 		if(divisor != 0)
 		{
-			if(BIT_A(word2))	/* 64 bit */
+			if(BIT_A(word2))    /* 64 bit */
 			{
 				dividend = REG_D(mc68kcpu)[word2 & 7];
 				dividend <<= 32;
 				dividend |= REG_D(mc68kcpu)[(word2 >> 12) & 7];
 
-				if(BIT_B(word2))	   /* signed */
+				if(BIT_B(word2))       /* signed */
 				{
 					quotient  = (UINT64)((INT64)dividend / (INT64)((INT32)divisor));
 					remainder = (UINT64)((INT64)dividend % (INT64)((INT32)divisor));
@@ -4663,7 +4663,7 @@ M68KMAKE_OP(divl, 32, ., d)
 						return;
 					}
 				}
-				else					/* unsigned */
+				else                    /* unsigned */
 				{
 					quotient = dividend / divisor;
 					if(quotient > 0xffffffff)
@@ -4674,15 +4674,15 @@ M68KMAKE_OP(divl, 32, ., d)
 					remainder = dividend % divisor;
 				}
 			}
-			else	/* 32 bit */
+			else    /* 32 bit */
 			{
 				dividend = REG_D(mc68kcpu)[(word2 >> 12) & 7];
-				if(BIT_B(word2))	   /* signed */
+				if(BIT_B(word2))       /* signed */
 				{
 					quotient  = (UINT64)((INT64)((INT32)dividend) / (INT64)((INT32)divisor));
 					remainder = (UINT64)((INT64)((INT32)dividend) % (INT64)((INT32)divisor));
 				}
-				else					/* unsigned */
+				else                    /* unsigned */
 				{
 					quotient = dividend / divisor;
 					remainder = dividend % divisor;
@@ -4717,13 +4717,13 @@ M68KMAKE_OP(divl, 32, ., .)
 
 		if(divisor != 0)
 		{
-			if(BIT_A(word2))	/* 64 bit */
+			if(BIT_A(word2))    /* 64 bit */
 			{
 				dividend = REG_D(mc68kcpu)[word2 & 7];
 				dividend <<= 32;
 				dividend |= REG_D(mc68kcpu)[(word2 >> 12) & 7];
 
-				if(BIT_B(word2))	   /* signed */
+				if(BIT_B(word2))       /* signed */
 				{
 					quotient  = (UINT64)((INT64)dividend / (INT64)((INT32)divisor));
 					remainder = (UINT64)((INT64)dividend % (INT64)((INT32)divisor));
@@ -4733,7 +4733,7 @@ M68KMAKE_OP(divl, 32, ., .)
 						return;
 					}
 				}
-				else					/* unsigned */
+				else                    /* unsigned */
 				{
 					quotient = dividend / divisor;
 					if(quotient > 0xffffffff)
@@ -4744,15 +4744,15 @@ M68KMAKE_OP(divl, 32, ., .)
 					remainder = dividend % divisor;
 				}
 			}
-			else	/* 32 bit */
+			else    /* 32 bit */
 			{
 				dividend = REG_D(mc68kcpu)[(word2 >> 12) & 7];
-				if(BIT_B(word2))	   /* signed */
+				if(BIT_B(word2))       /* signed */
 				{
 					quotient  = (UINT64)((INT64)((INT32)dividend) / (INT64)((INT32)divisor));
 					remainder = (UINT64)((INT64)((INT32)dividend) % (INT64)((INT32)divisor));
 				}
-				else					/* unsigned */
+				else                    /* unsigned */
 				{
 					quotient = dividend / divisor;
 					remainder = dividend % divisor;
@@ -4939,7 +4939,7 @@ M68KMAKE_OP(eori, 16, tos, .)
 	if((mc68kcpu)->s_flag)
 	{
 		UINT32 src = OPER_I_16(mc68kcpu);
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr((mc68kcpu), m68ki_get_sr(mc68kcpu) ^ src);
 		return;
 	}
@@ -5029,7 +5029,7 @@ M68KMAKE_OP(illegal, 0, ., .)
 M68KMAKE_OP(jmp, 32, ., .)
 {
 	m68ki_jump((mc68kcpu), M68KMAKE_GET_EA_AY_32);
-	m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 	if(REG_PC(mc68kcpu) == REG_PPC(mc68kcpu) && (mc68kcpu)->remaining_cycles > 0)
 		(mc68kcpu)->remaining_cycles = 0;
 }
@@ -5038,7 +5038,7 @@ M68KMAKE_OP(jmp, 32, ., .)
 M68KMAKE_OP(jsr, 32, ., .)
 {
 	UINT32 ea = M68KMAKE_GET_EA_AY_32;
-	m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32((mc68kcpu), REG_PC(mc68kcpu));
 	m68ki_jump((mc68kcpu), ea);
 }
@@ -6487,7 +6487,7 @@ M68KMAKE_OP(move, 16, toc, .)
 
 M68KMAKE_OP(move, 16, frs, d)
 {
-	if(CPU_TYPE_IS_000((mc68kcpu)->cpu_type) || (mc68kcpu)->s_flag)	/* NS990408 */
+	if(CPU_TYPE_IS_000((mc68kcpu)->cpu_type) || (mc68kcpu)->s_flag) /* NS990408 */
 	{
 		DY(mc68kcpu) = MASK_OUT_BELOW_16(DY(mc68kcpu)) | m68ki_get_sr(mc68kcpu);
 		return;
@@ -6498,7 +6498,7 @@ M68KMAKE_OP(move, 16, frs, d)
 
 M68KMAKE_OP(move, 16, frs, .)
 {
-	if(CPU_TYPE_IS_000((mc68kcpu)->cpu_type) || (mc68kcpu)->s_flag)	/* NS990408 */
+	if(CPU_TYPE_IS_000((mc68kcpu)->cpu_type) || (mc68kcpu)->s_flag) /* NS990408 */
 	{
 		UINT32 ea = M68KMAKE_GET_EA_AY_16;
 		m68ki_write_16((mc68kcpu), ea, m68ki_get_sr(mc68kcpu));
@@ -6524,7 +6524,7 @@ M68KMAKE_OP(move, 16, tos, .)
 	if((mc68kcpu)->s_flag)
 	{
 		UINT32 new_sr = M68KMAKE_GET_OPER_AY_16;
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr((mc68kcpu), new_sr);
 		return;
 	}
@@ -6547,7 +6547,7 @@ M68KMAKE_OP(move, 32, tou, .)
 {
 	if((mc68kcpu)->s_flag)
 	{
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_USP(mc68kcpu) = AY(mc68kcpu);
 		return;
 	}
@@ -6563,29 +6563,29 @@ M68KMAKE_OP(movec, 32, cr, .)
 		{
 			UINT32 word2 = OPER_I_16(mc68kcpu);
 
-			m68ki_trace_t0(mc68kcpu);		   /* auto-disable (see m68kcpu.h) */
+			m68ki_trace_t0(mc68kcpu);          /* auto-disable (see m68kcpu.h) */
 			switch (word2 & 0xfff)
 			{
-			case 0x000:			   /* SFC */
+			case 0x000:            /* SFC */
 				REG_DA(mc68kcpu)[(word2 >> 12) & 15] = (mc68kcpu)->sfc;
 				return;
-			case 0x001:			   /* DFC */
+			case 0x001:            /* DFC */
 				REG_DA(mc68kcpu)[(word2 >> 12) & 15] = (mc68kcpu)->dfc;
 				return;
-			case 0x002:			   /* CACR */
+			case 0x002:            /* CACR */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = (mc68kcpu)->cacr;
 					return;
 				}
 				return;
-			case 0x800:			   /* USP */
+			case 0x800:            /* USP */
 				REG_DA(mc68kcpu)[(word2 >> 12) & 15] = REG_USP(mc68kcpu);
 				return;
-			case 0x801:			   /* VBR */
+			case 0x801:            /* VBR */
 				REG_DA(mc68kcpu)[(word2 >> 12) & 15] = (mc68kcpu)->vbr;
 				return;
-			case 0x802:			   /* CAAR */
+			case 0x802:            /* CAAR */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = (mc68kcpu)->caar;
@@ -6593,7 +6593,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				break;
-			case 0x803:			   /* MSP */
+			case 0x803:            /* MSP */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = (mc68kcpu)->m_flag ? REG_SP(mc68kcpu) : REG_MSP(mc68kcpu);
@@ -6601,7 +6601,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x804:			   /* ISP */
+			case 0x804:            /* ISP */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = (mc68kcpu)->m_flag ? REG_ISP(mc68kcpu) : REG_SP(mc68kcpu);
@@ -6609,7 +6609,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x003:				/* TC */
+			case 0x003:             /* TC */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_tc;
@@ -6617,7 +6617,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x004:				/* ITT0 (040+, ACR0 on ColdFire) */
+			case 0x004:             /* ITT0 (040+, ACR0 on ColdFire) */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_itt0;
@@ -6630,7 +6630,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x005:				/* ITT1 (040+, ACR1 on ColdFire) */
+			case 0x005:             /* ITT1 (040+, ACR1 on ColdFire) */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_itt1;
@@ -6643,7 +6643,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x006:				/* DTT0 */
+			case 0x006:             /* DTT0 */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_dtt0;
@@ -6656,7 +6656,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x007:				/* DTT1 */
+			case 0x007:             /* DTT1 */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_dtt1;
@@ -6669,7 +6669,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x805:				/* MMUSR */
+			case 0x805:             /* MMUSR */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_sr_040;
@@ -6677,7 +6677,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x806:				/* URP */
+			case 0x806:             /* URP */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_urp_aptr;
@@ -6685,7 +6685,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x807:				/* SRP */
+			case 0x807:             /* SRP */
 				if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					REG_DA(mc68kcpu)[(word2 >> 12) & 15] = mc68kcpu->mmu_srp_aptr;
@@ -6693,7 +6693,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc00:	// ROMBAR0
+			case 0xc00: // ROMBAR0
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6701,7 +6701,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc01:	// ROMBAR1
+			case 0xc01: // ROMBAR1
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6709,7 +6709,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc04:	// RAMBAR0
+			case 0xc04: // RAMBAR0
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6717,7 +6717,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc05:	// RAMBAR1
+			case 0xc05: // RAMBAR1
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6725,7 +6725,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0c:	// MPCR
+			case 0xc0c: // MPCR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6733,7 +6733,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0d:	// EDRAMBAR
+			case 0xc0d: // EDRAMBAR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6741,7 +6741,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0e:	// SECMBAR
+			case 0xc0e: // SECMBAR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6749,7 +6749,7 @@ M68KMAKE_OP(movec, 32, cr, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0f:	// MBAR
+			case 0xc0f: // MBAR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6777,16 +6777,16 @@ M68KMAKE_OP(movec, 32, rc, .)
 		{
 			UINT32 word2 = OPER_I_16(mc68kcpu);
 
-			m68ki_trace_t0(mc68kcpu);		   /* auto-disable (see m68kcpu.h) */
+			m68ki_trace_t0(mc68kcpu);          /* auto-disable (see m68kcpu.h) */
 			switch (word2 & 0xfff)
 			{
-			case 0x000:			   /* SFC */
+			case 0x000:            /* SFC */
 				(mc68kcpu)->sfc = REG_DA(mc68kcpu)[(word2 >> 12) & 15] & 7;
 				return;
-			case 0x001:			   /* DFC */
+			case 0x001:            /* DFC */
 				(mc68kcpu)->dfc = REG_DA(mc68kcpu)[(word2 >> 12) & 15] & 7;
 				return;
-			case 0x002:			   /* CACR */
+			case 0x002:            /* CACR */
 				/* Only EC020 and later have CACR */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
@@ -6813,13 +6813,13 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x800:			   /* USP */
+			case 0x800:            /* USP */
 				REG_USP(mc68kcpu) = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
 				return;
-			case 0x801:			   /* VBR */
+			case 0x801:            /* VBR */
 				(mc68kcpu)->vbr = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
 				return;
-			case 0x802:			   /* CAAR */
+			case 0x802:            /* CAAR */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
 					(mc68kcpu)->caar = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6827,7 +6827,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x803:			   /* MSP */
+			case 0x803:            /* MSP */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
 					/* we are in supervisor mode so just check for M flag */
@@ -6841,7 +6841,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x804:			   /* ISP */
+			case 0x804:            /* ISP */
 				if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 				{
 					if(!(mc68kcpu)->m_flag)
@@ -6854,7 +6854,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x003:			/* TC */
+			case 0x003:         /* TC */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_tc = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6871,7 +6871,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x004:			/* ITT0 */
+			case 0x004:         /* ITT0 */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_itt0 = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6884,7 +6884,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x005:			/* ITT1 */
+			case 0x005:         /* ITT1 */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_itt1 = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6897,7 +6897,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x006:			/* DTT0 */
+			case 0x006:         /* DTT0 */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_dtt0 = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6910,7 +6910,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x007:			/* DTT1 */
+			case 0x007:         /* DTT1 */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_dtt1 = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6923,7 +6923,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x805:			/* MMUSR */
+			case 0x805:         /* MMUSR */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_sr_040 = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6931,7 +6931,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x806:			/* URP */
+			case 0x806:         /* URP */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_urp_aptr = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6939,7 +6939,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0x807:			/* SRP */
+			case 0x807:         /* SRP */
 				if (CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 				{
 					mc68kcpu->mmu_srp_aptr = REG_DA(mc68kcpu)[(word2 >> 12) & 15];
@@ -6947,7 +6947,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc00:	// ROMBAR0
+			case 0xc00: // ROMBAR0
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6955,7 +6955,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc01:	// ROMBAR1
+			case 0xc01: // ROMBAR1
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6963,7 +6963,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc04:	// RAMBAR0
+			case 0xc04: // RAMBAR0
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6971,7 +6971,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc05:	// RAMBAR1
+			case 0xc05: // RAMBAR1
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6979,7 +6979,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0c:	// MPCR
+			case 0xc0c: // MPCR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6987,7 +6987,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0d:	// EDRAMBAR
+			case 0xc0d: // EDRAMBAR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -6995,7 +6995,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0e:	// SECMBAR
+			case 0xc0e: // SECMBAR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -7003,7 +7003,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 				}
 				m68ki_exception_illegal(mc68kcpu);
 				return;
-			case 0xc0f:	// MBAR
+			case 0xc0f: // MBAR
 				if(CPU_TYPE_IS_COLDFIRE((mc68kcpu)->cpu_type))
 				{
 					/* TODO */
@@ -7305,13 +7305,13 @@ M68KMAKE_OP(moves, 8, ., .)
 			UINT32 word2 = OPER_I_16(mc68kcpu);
 			UINT32 ea = M68KMAKE_GET_EA_AY_8;
 
-			m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
-			if(BIT_B(word2))		   /* Register to memory */
+			m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
+			if(BIT_B(word2))           /* Register to memory */
 			{
 				m68ki_write_8_fc((mc68kcpu), ea, (mc68kcpu)->dfc, MASK_OUT_ABOVE_8(REG_DA(mc68kcpu)[(word2 >> 12) & 15]));
 				return;
 			}
-			if(BIT_F(word2))		   /* Memory to address register */
+			if(BIT_F(word2))           /* Memory to address register */
 			{
 				REG_A(mc68kcpu)[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc((mc68kcpu), ea, (mc68kcpu)->sfc));
 				if(CPU_TYPE_IS_020_VARIANT((mc68kcpu)->cpu_type))
@@ -7340,13 +7340,13 @@ M68KMAKE_OP(moves, 16, ., .)
 			UINT32 word2 = OPER_I_16(mc68kcpu);
 			UINT32 ea = M68KMAKE_GET_EA_AY_16;
 
-			m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
-			if(BIT_B(word2))		   /* Register to memory */
+			m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
+			if(BIT_B(word2))           /* Register to memory */
 			{
 				m68ki_write_16_fc((mc68kcpu), ea, (mc68kcpu)->dfc, MASK_OUT_ABOVE_16(REG_DA(mc68kcpu)[(word2 >> 12) & 15]));
 				return;
 			}
-			if(BIT_F(word2))		   /* Memory to address register */
+			if(BIT_F(word2))           /* Memory to address register */
 			{
 				REG_A(mc68kcpu)[(word2 >> 12) & 7] = MAKE_INT_16(m68ki_read_16_fc((mc68kcpu), ea, (mc68kcpu)->sfc));
 				if(CPU_TYPE_IS_020_VARIANT((mc68kcpu)->cpu_type))
@@ -7375,8 +7375,8 @@ M68KMAKE_OP(moves, 32, ., .)
 			UINT32 word2 = OPER_I_16(mc68kcpu);
 			UINT32 ea = M68KMAKE_GET_EA_AY_32;
 
-			m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
-			if(BIT_B(word2))		   /* Register to memory */
+			m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
+			if(BIT_B(word2))           /* Register to memory */
 			{
 				m68ki_write_32_fc((mc68kcpu), ea, (mc68kcpu)->dfc, REG_DA(mc68kcpu)[(word2 >> 12) & 15]);
 				if(CPU_TYPE_IS_020_VARIANT((mc68kcpu)->cpu_type))
@@ -7489,7 +7489,7 @@ M68KMAKE_OP(mull, 32, ., d)
 
 		(mc68kcpu)->c_flag = CFLAG_CLEAR;
 
-		if(BIT_B(word2))			   /* signed */
+		if(BIT_B(word2))               /* signed */
 		{
 			res = (INT64)((INT32)src) * (INT64)((INT32)dst);
 			if(!BIT_A(word2))
@@ -7539,7 +7539,7 @@ M68KMAKE_OP(mull, 32, ., .)
 
 		(mc68kcpu)->c_flag = CFLAG_CLEAR;
 
-		if(BIT_B(word2))			   /* signed */
+		if(BIT_B(word2))               /* signed */
 		{
 			res = (INT64)((INT32)src) * (INT64)((INT32)dst);
 			if(!BIT_A(word2))
@@ -7607,7 +7607,7 @@ M68KMAKE_OP(nbcd, 8, ., d)
 		(mc68kcpu)->c_flag = CFLAG_CLEAR;
 		(mc68kcpu)->x_flag = XFLAG_CLEAR;
 	}
-	(mc68kcpu)->n_flag = NFLAG_8(res);	/* Undefined N behavior */
+	(mc68kcpu)->n_flag = NFLAG_8(res);  /* Undefined N behavior */
 }
 
 
@@ -7640,7 +7640,7 @@ M68KMAKE_OP(nbcd, 8, ., .)
 		(mc68kcpu)->c_flag = CFLAG_CLEAR;
 		(mc68kcpu)->x_flag = XFLAG_CLEAR;
 	}
-	(mc68kcpu)->n_flag = NFLAG_8(res);	/* Undefined N behavior */
+	(mc68kcpu)->n_flag = NFLAG_8(res);  /* Undefined N behavior */
 }
 
 
@@ -7832,7 +7832,7 @@ M68KMAKE_OP(negx, 32, ., .)
 
 M68KMAKE_OP(nop, 0, ., .)
 {
-	m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 }
 
 
@@ -8115,7 +8115,7 @@ M68KMAKE_OP(ori, 16, tos, .)
 	if((mc68kcpu)->s_flag)
 	{
 		UINT32 src = OPER_I_16(mc68kcpu);
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		m68ki_set_sr((mc68kcpu), m68ki_get_sr(mc68kcpu) | src);
 		return;
 	}
@@ -8950,7 +8950,7 @@ M68KMAKE_OP(rtd, 32, ., .)
 	{
 		UINT32 new_pc = m68ki_pull_32(mc68kcpu);
 
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		REG_A(mc68kcpu)[7] = MASK_OUT_ABOVE_32(REG_A(mc68kcpu)[7] + MAKE_INT_16(OPER_I_16(mc68kcpu)));
 		m68ki_jump((mc68kcpu), new_pc);
 		return;
@@ -8969,7 +8969,7 @@ M68KMAKE_OP(rte, 32, ., .)
 
 		if ((mc68kcpu)->rte_instr_callback != NULL)
 			(*(mc68kcpu)->rte_instr_callback)((mc68kcpu)->device);
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 
 		if(CPU_TYPE_IS_000((mc68kcpu)->cpu_type))
 		{
@@ -8991,7 +8991,7 @@ M68KMAKE_OP(rte, 32, ., .)
 			{
 				new_sr = m68ki_pull_16(mc68kcpu);
 				new_pc = m68ki_pull_32(mc68kcpu);
-				m68ki_fake_pull_16(mc68kcpu);	/* format word */
+				m68ki_fake_pull_16(mc68kcpu);   /* format word */
 				m68ki_jump((mc68kcpu), new_pc);
 				m68ki_set_sr((mc68kcpu), new_sr);
 				(mc68kcpu)->instr_mode = INSTRUCTION_YES;
@@ -9013,7 +9013,7 @@ rte_loop:
 			case 0: /* Normal */
 				new_sr = m68ki_pull_16(mc68kcpu);
 				new_pc = m68ki_pull_32(mc68kcpu);
-				m68ki_fake_pull_16(mc68kcpu);	/* format word */
+				m68ki_fake_pull_16(mc68kcpu);   /* format word */
 				m68ki_jump((mc68kcpu), new_pc);
 				m68ki_set_sr((mc68kcpu), new_sr);
 				(mc68kcpu)->instr_mode = INSTRUCTION_YES;
@@ -9021,15 +9021,15 @@ rte_loop:
 				return;
 			case 1: /* Throwaway */
 				new_sr = m68ki_pull_16(mc68kcpu);
-				m68ki_fake_pull_32(mc68kcpu);	/* program counter */
-				m68ki_fake_pull_16(mc68kcpu);	/* format word */
+				m68ki_fake_pull_32(mc68kcpu);   /* program counter */
+				m68ki_fake_pull_16(mc68kcpu);   /* format word */
 				m68ki_set_sr_noint((mc68kcpu), new_sr);
 				goto rte_loop;
 			case 2: /* Trap */
 				new_sr = m68ki_pull_16(mc68kcpu);
 				new_pc = m68ki_pull_32(mc68kcpu);
-				m68ki_fake_pull_16(mc68kcpu);	/* format word */
-				m68ki_fake_pull_32(mc68kcpu);	/* address */
+				m68ki_fake_pull_16(mc68kcpu);   /* format word */
+				m68ki_fake_pull_32(mc68kcpu);   /* address */
 				m68ki_jump((mc68kcpu), new_pc);
 				m68ki_set_sr((mc68kcpu), new_sr);
 				(mc68kcpu)->instr_mode = INSTRUCTION_YES;
@@ -9038,22 +9038,22 @@ rte_loop:
 			case 7: /* 68040 access error */
 				new_sr = m68ki_pull_16(mc68kcpu);
 				new_pc = m68ki_pull_32(mc68kcpu);
-				m68ki_fake_pull_16(mc68kcpu);	/* $06: format word */
-				m68ki_fake_pull_32(mc68kcpu);	/* $08: effective address */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0c: special status word */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0e: wb3s */
-				m68ki_fake_pull_16(mc68kcpu);	/* $10: wb2s */
-				m68ki_fake_pull_16(mc68kcpu);	/* $12: wb1s */
-				m68ki_fake_pull_32(mc68kcpu);	/* $14: data fault address */
-				m68ki_fake_pull_32(mc68kcpu);	/* $18: wb3a */
-				m68ki_fake_pull_32(mc68kcpu);	/* $1c: wb3d */
-				m68ki_fake_pull_32(mc68kcpu);	/* $20: wb2a */
-				m68ki_fake_pull_32(mc68kcpu);	/* $24: wb2d */
-				m68ki_fake_pull_32(mc68kcpu);	/* $28: wb1a */
-				m68ki_fake_pull_32(mc68kcpu);	/* $2c: wb1d/pd0 */
-				m68ki_fake_pull_32(mc68kcpu);	/* $30: pd1 */
-				m68ki_fake_pull_32(mc68kcpu);	/* $34: pd2 */
-				m68ki_fake_pull_32(mc68kcpu);	/* $38: pd3 */
+				m68ki_fake_pull_16(mc68kcpu);   /* $06: format word */
+				m68ki_fake_pull_32(mc68kcpu);   /* $08: effective address */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0c: special status word */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0e: wb3s */
+				m68ki_fake_pull_16(mc68kcpu);   /* $10: wb2s */
+				m68ki_fake_pull_16(mc68kcpu);   /* $12: wb1s */
+				m68ki_fake_pull_32(mc68kcpu);   /* $14: data fault address */
+				m68ki_fake_pull_32(mc68kcpu);   /* $18: wb3a */
+				m68ki_fake_pull_32(mc68kcpu);   /* $1c: wb3d */
+				m68ki_fake_pull_32(mc68kcpu);   /* $20: wb2a */
+				m68ki_fake_pull_32(mc68kcpu);   /* $24: wb2d */
+				m68ki_fake_pull_32(mc68kcpu);   /* $28: wb1a */
+				m68ki_fake_pull_32(mc68kcpu);   /* $2c: wb1d/pd0 */
+				m68ki_fake_pull_32(mc68kcpu);   /* $30: pd1 */
+				m68ki_fake_pull_32(mc68kcpu);   /* $34: pd2 */
+				m68ki_fake_pull_32(mc68kcpu);   /* $38: pd3 */
 				m68ki_jump((mc68kcpu), new_pc);
 				m68ki_set_sr((mc68kcpu), new_sr);
 				(mc68kcpu)->instr_mode = INSTRUCTION_YES;
@@ -9063,15 +9063,15 @@ rte_loop:
 			case 0x0a: /* Bus Error at instruction boundary */
 				new_sr = m68ki_pull_16(mc68kcpu);
 				new_pc = m68ki_pull_32(mc68kcpu);
-				m68ki_fake_pull_16(mc68kcpu);	/* $06: format word */
-				m68ki_fake_pull_16(mc68kcpu);	/* $08: internal register */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0a: special status word */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0c: instruction pipe stage c */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0e: instruction pipe stage b */
-				m68ki_fake_pull_32(mc68kcpu);	/* $10: data fault address */
-				m68ki_fake_pull_32(mc68kcpu);	/* $14: internal registers */
-				m68ki_fake_pull_32(mc68kcpu);	/* $18: data output buffer */
-				m68ki_fake_pull_32(mc68kcpu);	/* $1c: internal registers */
+				m68ki_fake_pull_16(mc68kcpu);   /* $06: format word */
+				m68ki_fake_pull_16(mc68kcpu);   /* $08: internal register */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0a: special status word */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0c: instruction pipe stage c */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0e: instruction pipe stage b */
+				m68ki_fake_pull_32(mc68kcpu);   /* $10: data fault address */
+				m68ki_fake_pull_32(mc68kcpu);   /* $14: internal registers */
+				m68ki_fake_pull_32(mc68kcpu);   /* $18: data output buffer */
+				m68ki_fake_pull_32(mc68kcpu);   /* $1c: internal registers */
 
 				m68ki_jump((mc68kcpu), new_pc);
 				m68ki_set_sr((mc68kcpu), new_sr);
@@ -9081,31 +9081,31 @@ rte_loop:
 			case 0x0b: /* Bus Error - Instruction Execution in Progress */
 				new_sr = m68ki_pull_16(mc68kcpu);
 				new_pc = m68ki_pull_32(mc68kcpu);
-				m68ki_fake_pull_16(mc68kcpu);	/* $06: format word */
-				m68ki_fake_pull_16(mc68kcpu);	/* $08: internal register */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0a: special status word */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0c: instruction pipe stage c */
-				m68ki_fake_pull_16(mc68kcpu);	/* $0e: instruction pipe stage b */
-				m68ki_fake_pull_32(mc68kcpu);	/* $10: data fault address */
-				m68ki_fake_pull_32(mc68kcpu);	/* $14: internal registers */
-				m68ki_fake_pull_32(mc68kcpu);	/* $18: data output buffer */
-				m68ki_fake_pull_32(mc68kcpu);	/* $1c: internal registers */
-				m68ki_fake_pull_32(mc68kcpu);	/* $20:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $24: stage B address */
-				m68ki_fake_pull_32(mc68kcpu);	/* $28:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $2c: data input buffer */
-				m68ki_fake_pull_32(mc68kcpu);	/* $30:  */
-				m68ki_fake_pull_16(mc68kcpu);	/* $34:  */
-				m68ki_fake_pull_16(mc68kcpu);	/* $36: version #, internal information */
-				m68ki_fake_pull_32(mc68kcpu);	/* $38:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $3c:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $40:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $44:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $48:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $4c:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $50:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $54:  */
-				m68ki_fake_pull_32(mc68kcpu);	/* $58:  */
+				m68ki_fake_pull_16(mc68kcpu);   /* $06: format word */
+				m68ki_fake_pull_16(mc68kcpu);   /* $08: internal register */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0a: special status word */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0c: instruction pipe stage c */
+				m68ki_fake_pull_16(mc68kcpu);   /* $0e: instruction pipe stage b */
+				m68ki_fake_pull_32(mc68kcpu);   /* $10: data fault address */
+				m68ki_fake_pull_32(mc68kcpu);   /* $14: internal registers */
+				m68ki_fake_pull_32(mc68kcpu);   /* $18: data output buffer */
+				m68ki_fake_pull_32(mc68kcpu);   /* $1c: internal registers */
+				m68ki_fake_pull_32(mc68kcpu);   /* $20:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $24: stage B address */
+				m68ki_fake_pull_32(mc68kcpu);   /* $28:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $2c: data input buffer */
+				m68ki_fake_pull_32(mc68kcpu);   /* $30:  */
+				m68ki_fake_pull_16(mc68kcpu);   /* $34:  */
+				m68ki_fake_pull_16(mc68kcpu);   /* $36: version #, internal information */
+				m68ki_fake_pull_32(mc68kcpu);   /* $38:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $3c:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $40:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $44:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $48:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $4c:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $50:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $54:  */
+				m68ki_fake_pull_32(mc68kcpu);   /* $58:  */
 
 				m68ki_jump((mc68kcpu), new_pc);
 				m68ki_set_sr((mc68kcpu), new_sr);
@@ -9127,9 +9127,9 @@ M68KMAKE_OP(rtm, 32, ., .)
 {
 	if(CPU_TYPE_IS_020_VARIANT((mc68kcpu)->cpu_type))
 	{
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		logerror("%s at %08x: called unimplemented instruction %04x (rtm)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -9138,7 +9138,7 @@ M68KMAKE_OP(rtm, 32, ., .)
 
 M68KMAKE_OP(rtr, 32, ., .)
 {
-	m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 	m68ki_set_ccr((mc68kcpu), m68ki_pull_16(mc68kcpu));
 	m68ki_jump((mc68kcpu), m68ki_pull_32(mc68kcpu));
 }
@@ -9146,7 +9146,7 @@ M68KMAKE_OP(rtr, 32, ., .)
 
 M68KMAKE_OP(rts, 32, ., .)
 {
-	m68ki_trace_t0(mc68kcpu);				   /* auto-disable (see m68kcpu.h) */
+	m68ki_trace_t0(mc68kcpu);                  /* auto-disable (see m68kcpu.h) */
 	m68ki_jump((mc68kcpu), m68ki_pull_32(mc68kcpu));
 }
 
@@ -9159,7 +9159,7 @@ M68KMAKE_OP(sbcd, 8, rr, .)
 	UINT32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1(mc68kcpu);
 
 //  (mc68kcpu)->v_flag = ~res; /* Undefined V behavior */
-	(mc68kcpu)->v_flag = VFLAG_CLEAR;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to assume cleared. */
+	(mc68kcpu)->v_flag = VFLAG_CLEAR;   /* Undefined in Motorola's M68000PM/AD rev.1 and safer to assume cleared. */
 
 	if(res > 9)
 		res -= 6;
@@ -9168,7 +9168,7 @@ M68KMAKE_OP(sbcd, 8, rr, .)
 	{
 		res += 0xa0;
 		(mc68kcpu)->x_flag = (mc68kcpu)->c_flag = CFLAG_SET;
-		(mc68kcpu)->n_flag = NFLAG_SET;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
+		(mc68kcpu)->n_flag = NFLAG_SET; /* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
 	}
 	else
 		(mc68kcpu)->n_flag = (mc68kcpu)->x_flag = (mc68kcpu)->c_flag = 0;
@@ -9191,7 +9191,7 @@ M68KMAKE_OP(sbcd, 8, mm, ax7)
 	UINT32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1(mc68kcpu);
 
 //  (mc68kcpu)->v_flag = ~res; /* Undefined V behavior */
-	(mc68kcpu)->v_flag = VFLAG_CLEAR;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
+	(mc68kcpu)->v_flag = VFLAG_CLEAR;   /* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
 
 	if(res > 9)
 		res -= 6;
@@ -9200,7 +9200,7 @@ M68KMAKE_OP(sbcd, 8, mm, ax7)
 	{
 		res += 0xa0;
 		(mc68kcpu)->x_flag = (mc68kcpu)->c_flag = CFLAG_SET;
-		(mc68kcpu)->n_flag = NFLAG_SET;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
+		(mc68kcpu)->n_flag = NFLAG_SET; /* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
 	}
 	else
 		(mc68kcpu)->n_flag = (mc68kcpu)->x_flag = (mc68kcpu)->c_flag = 0;
@@ -9223,7 +9223,7 @@ M68KMAKE_OP(sbcd, 8, mm, ay7)
 	UINT32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1(mc68kcpu);
 
 //  (mc68kcpu)->v_flag = ~res; /* Undefined V behavior */
-	(mc68kcpu)->v_flag = VFLAG_CLEAR;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
+	(mc68kcpu)->v_flag = VFLAG_CLEAR;   /* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
 
 	if(res > 9)
 		res -= 6;
@@ -9232,7 +9232,7 @@ M68KMAKE_OP(sbcd, 8, mm, ay7)
 	{
 		res += 0xa0;
 		(mc68kcpu)->x_flag = (mc68kcpu)->c_flag = CFLAG_SET;
-		(mc68kcpu)->n_flag = NFLAG_SET;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
+		(mc68kcpu)->n_flag = NFLAG_SET; /* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
 	}
 	else
 		(mc68kcpu)->n_flag = (mc68kcpu)->x_flag = (mc68kcpu)->c_flag = 0;
@@ -9255,7 +9255,7 @@ M68KMAKE_OP(sbcd, 8, mm, axy7)
 	UINT32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1(mc68kcpu);
 
 //  (mc68kcpu)->v_flag = ~res; /* Undefined V behavior */
-	(mc68kcpu)->v_flag = VFLAG_CLEAR;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
+	(mc68kcpu)->v_flag = VFLAG_CLEAR;   /* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
 
 	if(res > 9)
 		res -= 6;
@@ -9264,7 +9264,7 @@ M68KMAKE_OP(sbcd, 8, mm, axy7)
 	{
 		res += 0xa0;
 		(mc68kcpu)->x_flag = (mc68kcpu)->c_flag = CFLAG_SET;
-		(mc68kcpu)->n_flag = NFLAG_SET;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
+		(mc68kcpu)->n_flag = NFLAG_SET; /* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
 	}
 	else
 		(mc68kcpu)->n_flag = (mc68kcpu)->x_flag = (mc68kcpu)->c_flag = 0;
@@ -9287,7 +9287,7 @@ M68KMAKE_OP(sbcd, 8, mm, .)
 	UINT32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_AS_1(mc68kcpu);
 
 //  (mc68kcpu)->v_flag = ~res; /* Undefined V behavior */
-	(mc68kcpu)->v_flag = VFLAG_CLEAR;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
+	(mc68kcpu)->v_flag = VFLAG_CLEAR;   /* Undefined in Motorola's M68000PM/AD rev.1 and safer to return zero. */
 
 	if(res > 9)
 		res -= 6;
@@ -9296,7 +9296,7 @@ M68KMAKE_OP(sbcd, 8, mm, .)
 	{
 		res += 0xa0;
 		(mc68kcpu)->x_flag = (mc68kcpu)->c_flag = CFLAG_SET;
-		(mc68kcpu)->n_flag = NFLAG_SET;	/* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
+		(mc68kcpu)->n_flag = NFLAG_SET; /* Undefined in Motorola's M68000PM/AD rev.1 and safer to follow carry. */
 	}
 	else
 		(mc68kcpu)->n_flag = (mc68kcpu)->x_flag = (mc68kcpu)->c_flag = 0;
@@ -9358,7 +9358,7 @@ M68KMAKE_OP(stop, 0, ., .)
 	if((mc68kcpu)->s_flag)
 	{
 		UINT32 new_sr = OPER_I_16(mc68kcpu);
-		m68ki_trace_t0(mc68kcpu);			   /* auto-disable (see m68kcpu.h) */
+		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		(mc68kcpu)->stopped |= STOP_LEVEL_STOP;
 		m68ki_set_sr((mc68kcpu), new_sr);
 		(mc68kcpu)->remaining_cycles = 0;
@@ -10002,9 +10002,9 @@ M68KMAKE_OP(tas, 8, ., .)
 	(mc68kcpu)->c_flag = CFLAG_CLEAR;
 
 	/* The Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS writeback
-       disabled in order to function properly.  Some Amiga software may also rely
-       on (mc68kcpu), but only when accessing specific addresses so additional functionality
-       will be needed. */
+	   disabled in order to function properly.  Some Amiga software may also rely
+	   on (mc68kcpu), but only when accessing specific addresses so additional functionality
+	   will be needed. */
 	if ((mc68kcpu)->tas_instr_callback != NULL)
 		allow_writeback = (*(mc68kcpu)->tas_instr_callback)((mc68kcpu)->device);
 
@@ -10016,7 +10016,7 @@ M68KMAKE_OP(tas, 8, ., .)
 M68KMAKE_OP(trap, 0, ., .)
 {
 	/* Trap#n stacks exception frame type 0 */
-	m68ki_exception_trapN((mc68kcpu), EXCEPTION_TRAP_BASE + ((mc68kcpu)->ir & 0xf));	/* HJB 990403 */
+	m68ki_exception_trapN((mc68kcpu), EXCEPTION_TRAP_BASE + ((mc68kcpu)->ir & 0xf));    /* HJB 990403 */
 }
 
 
@@ -10024,7 +10024,7 @@ M68KMAKE_OP(trapt, 0, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
-		m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);	/* HJB 990403 */
+		m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);  /* HJB 990403 */
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10035,7 +10035,7 @@ M68KMAKE_OP(trapt, 16, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
-		m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);	/* HJB 990403 */
+		m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);  /* HJB 990403 */
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10046,7 +10046,7 @@ M68KMAKE_OP(trapt, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
-		m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);	/* HJB 990403 */
+		m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);  /* HJB 990403 */
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10090,7 +10090,7 @@ M68KMAKE_OP(trapcc, 0, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		if(M68KMAKE_CC)
-			m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);	/* HJB 990403 */
+			m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);  /* HJB 990403 */
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10103,7 +10103,7 @@ M68KMAKE_OP(trapcc, 16, ., .)
 	{
 		if(M68KMAKE_CC)
 		{
-			m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);	/* HJB 990403 */
+			m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);  /* HJB 990403 */
 			return;
 		}
 		REG_PC(mc68kcpu) += 2;
@@ -10119,7 +10119,7 @@ M68KMAKE_OP(trapcc, 32, ., .)
 	{
 		if(M68KMAKE_CC)
 		{
-			m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);	/* HJB 990403 */
+			m68ki_exception_trap((mc68kcpu), EXCEPTION_TRAPV);  /* HJB 990403 */
 			return;
 		}
 		REG_PC(mc68kcpu) += 4;
@@ -10511,7 +10511,7 @@ M68KMAKE_OP(cpush, 32, ., .)
 	if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);

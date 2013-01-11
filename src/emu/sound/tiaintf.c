@@ -50,7 +50,7 @@ const device_type TIA = &device_creator<tia_device>;
 
 tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIA, "TIA", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tia_state);
 }
@@ -92,5 +92,3 @@ void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

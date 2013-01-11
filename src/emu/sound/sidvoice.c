@@ -13,12 +13,12 @@ static const UINT8* waveform50;
 static const UINT8* waveform60;
 static const UINT8* waveform70;
 #if defined(LARGE_NOISE_TABLE)
-  static UINT8 noiseTableMSB[1<<8];
-  static UINT8 noiseTableLSB[1L<<16];
+	static UINT8 noiseTableMSB[1<<8];
+	static UINT8 noiseTableLSB[1L<<16];
 #else
-  static UINT8 noiseTableMSB[1<<8];
-  static UINT8 noiseTableMID[1<<8];
-  static UINT8 noiseTableLSB[1<<8];
+	static UINT8 noiseTableMSB[1<<8];
+	static UINT8 noiseTableMID[1<<8];
+	static UINT8 noiseTableLSB[1<<8];
 #endif
 
 static INT8* ampMod1x8;
@@ -75,15 +75,15 @@ INLINE void noiseAdvance(sidOperator* pVoice)
 #endif
 #if defined(DIRECT_FIXPOINT) && defined(LARGE_NOISE_TABLE)
 		pVoice->noiseOutput = (noiseTableLSB[pVoice->noiseReg.w[LO]]
-							   |noiseTableMSB[pVoice->noiseReg.w[HI]&0xff]);
+								|noiseTableMSB[pVoice->noiseReg.w[HI]&0xff]);
 #elif defined(DIRECT_FIXPOINT)
 		pVoice->noiseOutput = (noiseTableLSB[pVoice->noiseReg.b[LOLO]]
-							   |noiseTableMID[pVoice->noiseReg.b[LOHI]]
-							   |noiseTableMSB[pVoice->noiseReg.b[HILO]]);
+								|noiseTableMID[pVoice->noiseReg.b[LOHI]]
+								|noiseTableMSB[pVoice->noiseReg.b[HILO]]);
 #else
 		pVoice->noiseOutput = (noiseTableLSB[pVoice->noiseReg&0xff]
-							   |noiseTableMID[pVoice->noiseReg>>8&0xff]
-							   |noiseTableMSB[pVoice->noiseReg>>16&0xff]);
+								|noiseTableMID[pVoice->noiseReg>>8&0xff]
+								|noiseTableMSB[pVoice->noiseReg>>16&0xff]);
 #endif
 	}
 }
@@ -116,35 +116,35 @@ INLINE void noiseAdvanceHp(sidOperator* pVoice)
 	}
 #if defined(DIRECT_FIXPOINT) && defined(LARGE_NOISE_TABLE)
 	pVoice->noiseOutput = (noiseTableLSB[pVoice->noiseReg.w[LO]]
-						   |noiseTableMSB[pVoice->noiseReg.w[HI]&0xff]);
+							|noiseTableMSB[pVoice->noiseReg.w[HI]&0xff]);
 #elif defined(DIRECT_FIXPOINT)
 	pVoice->noiseOutput = (noiseTableLSB[pVoice->noiseReg.b[LOLO]]
-						   |noiseTableMID[pVoice->noiseReg.b[LOHI]]
-						   |noiseTableMSB[pVoice->noiseReg.b[HILO]]);
+							|noiseTableMID[pVoice->noiseReg.b[LOHI]]
+							|noiseTableMSB[pVoice->noiseReg.b[HILO]]);
 #else
 	pVoice->noiseOutput = (noiseTableLSB[pVoice->noiseReg&0xff]
-						   |noiseTableMID[pVoice->noiseReg>>8&0xff]
-						   |noiseTableMSB[pVoice->noiseReg>>16&0xff]);
+							|noiseTableMID[pVoice->noiseReg>>8&0xff]
+							|noiseTableMSB[pVoice->noiseReg>>16&0xff]);
 #endif
 }
 
 
 #if defined(DIRECT_FIXPOINT)
-  #define triangle triangleTable[pVoice->waveStep.w[HI]]
-  #define sawtooth sawtoothTable[pVoice->waveStep.w[HI]]
-  #define square squareTable[pVoice->waveStep.w[HI] + pVoice->pulseIndex]
-  #define triSaw waveform30[pVoice->waveStep.w[HI]]
-  #define triSquare waveform50[pVoice->waveStep.w[HI] + pVoice->SIDpulseWidth]
-  #define sawSquare waveform60[pVoice->waveStep.w[HI] + pVoice->SIDpulseWidth]
-  #define triSawSquare waveform70[pVoice->waveStep.w[HI] + pVoice->SIDpulseWidth]
+	#define triangle triangleTable[pVoice->waveStep.w[HI]]
+	#define sawtooth sawtoothTable[pVoice->waveStep.w[HI]]
+	#define square squareTable[pVoice->waveStep.w[HI] + pVoice->pulseIndex]
+	#define triSaw waveform30[pVoice->waveStep.w[HI]]
+	#define triSquare waveform50[pVoice->waveStep.w[HI] + pVoice->SIDpulseWidth]
+	#define sawSquare waveform60[pVoice->waveStep.w[HI] + pVoice->SIDpulseWidth]
+	#define triSawSquare waveform70[pVoice->waveStep.w[HI] + pVoice->SIDpulseWidth]
 #else
-  #define triangle triangleTable[pVoice->waveStep]
-  #define sawtooth sawtoothTable[pVoice->waveStep]
-  #define square squareTable[pVoice->waveStep + pVoice->pulseIndex]
-  #define triSaw waveform30[pVoice->waveStep]
-  #define triSquare waveform50[pVoice->waveStep + pVoice->SIDpulseWidth]
-  #define sawSquare waveform60[pVoice->waveStep + pVoice->SIDpulseWidth]
-  #define triSawSquare waveform70[pVoice->waveStep + pVoice->SIDpulseWidth]
+	#define triangle triangleTable[pVoice->waveStep]
+	#define sawtooth sawtoothTable[pVoice->waveStep]
+	#define square squareTable[pVoice->waveStep + pVoice->pulseIndex]
+	#define triSaw waveform30[pVoice->waveStep]
+	#define triSquare waveform50[pVoice->waveStep + pVoice->SIDpulseWidth]
+	#define sawSquare waveform60[pVoice->waveStep + pVoice->SIDpulseWidth]
+	#define triSawSquare waveform70[pVoice->waveStep + pVoice->SIDpulseWidth]
 #endif
 
 
@@ -162,50 +162,50 @@ static void sidModeReal00(sidOperator* pVoice)  {
 #endif
 
 static void sidMode10(sidOperator* pVoice)  {
-  pVoice->output = triangle;
-  waveAdvance(pVoice);
+	pVoice->output = triangle;
+	waveAdvance(pVoice);
 }
 
 static void sidMode20(sidOperator* pVoice)  {
-  pVoice->output = sawtooth;
-  waveAdvance(pVoice);
+	pVoice->output = sawtooth;
+	waveAdvance(pVoice);
 }
 
 static void sidMode30(sidOperator* pVoice)  {
-  pVoice->output = triSaw;
-  waveAdvance(pVoice);
+	pVoice->output = triSaw;
+	waveAdvance(pVoice);
 }
 
 static void sidMode40(sidOperator* pVoice)  {
-  pVoice->output = square;
-  waveAdvance(pVoice);
+	pVoice->output = square;
+	waveAdvance(pVoice);
 }
 
 static void sidMode50(sidOperator* pVoice)  {
-  pVoice->output = triSquare;
-  waveAdvance(pVoice);
+	pVoice->output = triSquare;
+	waveAdvance(pVoice);
 }
 
 static void sidMode60(sidOperator* pVoice)  {
-  pVoice->output = sawSquare;
-  waveAdvance(pVoice);
+	pVoice->output = sawSquare;
+	waveAdvance(pVoice);
 }
 
 static void sidMode70(sidOperator* pVoice)  {
-  pVoice->output = triSawSquare;
-  waveAdvance(pVoice);
+	pVoice->output = triSawSquare;
+	waveAdvance(pVoice);
 }
 
 static void sidMode80(sidOperator* pVoice)  {
-  pVoice->output = pVoice->noiseOutput;
-  waveAdvance(pVoice);
-  noiseAdvance(pVoice);
+	pVoice->output = pVoice->noiseOutput;
+	waveAdvance(pVoice);
+	noiseAdvance(pVoice);
 }
 
 static void sidMode80hp(sidOperator* pVoice)  {
-  pVoice->output = pVoice->noiseOutput;
-  waveAdvance(pVoice);
-  noiseAdvanceHp(pVoice);
+	pVoice->output = pVoice->noiseOutput;
+	waveAdvance(pVoice);
+	noiseAdvanceHp(pVoice);
 }
 
 static void sidModeLock(sidOperator* pVoice)
@@ -222,50 +222,50 @@ static void sidModeLock(sidOperator* pVoice)
 static void sidMode14(sidOperator* pVoice)
 {
 #if defined(DIRECT_FIXPOINT)
-  if ( pVoice->modulator->waveStep.w[HI] < 2048 )
+	if ( pVoice->modulator->waveStep.w[HI] < 2048 )
 #else
-  if ( pVoice->modulator->waveStep < 2048 )
+	if ( pVoice->modulator->waveStep < 2048 )
 #endif
 	pVoice->output = triangle;
-  else
+	else
 	pVoice->output = 0xFF ^ triangle;
-  waveAdvance(pVoice);
+	waveAdvance(pVoice);
 }
 
 static void sidMode34(sidOperator* pVoice)  {
 #if defined(DIRECT_FIXPOINT)
-  if ( pVoice->modulator->waveStep.w[HI] < 2048 )
+	if ( pVoice->modulator->waveStep.w[HI] < 2048 )
 #else
-  if ( pVoice->modulator->waveStep < 2048 )
+	if ( pVoice->modulator->waveStep < 2048 )
 #endif
 	pVoice->output = triSaw;
-  else
+	else
 	pVoice->output = 0xFF ^ triSaw;
-  waveAdvance(pVoice);
+	waveAdvance(pVoice);
 }
 
 static void sidMode54(sidOperator* pVoice)  {
 #if defined(DIRECT_FIXPOINT)
-  if ( pVoice->modulator->waveStep.w[HI] < 2048 )
+	if ( pVoice->modulator->waveStep.w[HI] < 2048 )
 #else
-  if ( pVoice->modulator->waveStep < 2048 )
+	if ( pVoice->modulator->waveStep < 2048 )
 #endif
 	pVoice->output = triSquare;
-  else
-    pVoice->output = 0xFF ^ triSquare;
-  waveAdvance(pVoice);
+	else
+	pVoice->output = 0xFF ^ triSquare;
+	waveAdvance(pVoice);
 }
 
 static void sidMode74(sidOperator* pVoice)  {
 #if defined(DIRECT_FIXPOINT)
-  if ( pVoice->modulator->waveStep.w[HI] < 2048 )
+	if ( pVoice->modulator->waveStep.w[HI] < 2048 )
 #else
-  if ( pVoice->modulator->waveStep < 2048 )
+	if ( pVoice->modulator->waveStep < 2048 )
 #endif
 	pVoice->output = triSawSquare;
-  else
-    pVoice->output = 0xFF ^ triSawSquare;
-  waveAdvance(pVoice);
+	else
+	pVoice->output = 0xFF ^ triSawSquare;
+	waveAdvance(pVoice);
 }
 
 /* */
@@ -490,19 +490,19 @@ void sidEmuSet(sidOperator* pVoice)
 #endif
 
 
-    oldWave = pVoice->SIDctrl;
-    enveTemp = pVoice->ADSRctrl;
-    pVoice->SIDctrl = (newWave = pVoice->reg[4]|(pVoice->reg[5]<<8));
+	oldWave = pVoice->SIDctrl;
+	enveTemp = pVoice->ADSRctrl;
+	pVoice->SIDctrl = (newWave = pVoice->reg[4]|(pVoice->reg[5]<<8));
 
-    if (( newWave & 1 ) ==0 )
-    {
+	if (( newWave & 1 ) ==0 )
+	{
 		if (( oldWave & 1 ) !=0 )
-		  enveTemp = ENVE_STARTRELEASE;
+			enveTemp = ENVE_STARTRELEASE;
 /*      else if ( pVoice->gateOnCtrl ) */
 /*      { */
 /*          enveTemp = ENVE_STARTSHORTATTACK; */
 /*      } */
-    }
+	}
 	else if ( /*pVoice->gateOffCtrl || */((oldWave&1)==0) )
 	{
 		enveTemp = ENVE_STARTATTACK;
@@ -550,15 +550,15 @@ void sidEmuSet(sidOperator* pVoice)
 /* MOS-8580, MOS-6581 (no 70) */
 static ptr2sidVoidFunc sidModeNormalTable[16] =
 {
-  sidMode00, sidMode10, sidMode20, sidMode30, sidMode40, sidMode50, sidMode60, sidMode70,
-  sidMode80, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock
+	sidMode00, sidMode10, sidMode20, sidMode30, sidMode40, sidMode50, sidMode60, sidMode70,
+	sidMode80, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock
 };
 
 /* MOS-8580, MOS-6581 (no 74) */
 static ptr2sidVoidFunc sidModeRingTable[16] =
 {
-  sidMode00, sidMode14, sidMode00, sidMode34, sidMode00, sidMode54, sidMode00, sidMode74,
-  sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock
+	sidMode00, sidMode14, sidMode00, sidMode34, sidMode00, sidMode54, sidMode00, sidMode74,
+	sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock
 };
 
 void sidClearOperator( sidOperator* pVoice )
@@ -614,98 +614,98 @@ void sidClearOperator( sidOperator* pVoice )
 
 void sidEmuSet2(sidOperator* pVoice)
 {
-    pVoice->outProc = &sidWaveCalcNormal;
-    pVoice->sync = FALSE;
+	pVoice->outProc = &sidWaveCalcNormal;
+	pVoice->sync = FALSE;
 
-    if ( (pVoice->SIDfreq < 16) || ((pVoice->SIDctrl & 8) != 0) )
+	if ( (pVoice->SIDfreq < 16) || ((pVoice->SIDctrl & 8) != 0) )
 //    if ( /*(pVoice->SIDfreq < 16) || */((pVoice->SIDctrl & 8) != 0) )
-    {
+	{
 	pVoice->outProc = waveCalcMute;
 	if (pVoice->SIDfreq == 0)
 	{
 #if defined(DIRECT_FIXPOINT)
-	    pVoice->cycleLen.l = (pVoice->cycleAddLen.l = 0);
-	    pVoice->waveStep.l = 0;
+		pVoice->cycleLen.l = (pVoice->cycleAddLen.l = 0);
+		pVoice->waveStep.l = 0;
 #else
-	    pVoice->cycleLen = (pVoice->cycleLenPnt = 0);
-	    pVoice->cycleAddLenPnt = 0;
-	    pVoice->waveStep = 0;
-	    pVoice->waveStepPnt = 0;
+		pVoice->cycleLen = (pVoice->cycleLenPnt = 0);
+		pVoice->cycleAddLenPnt = 0;
+		pVoice->waveStep = 0;
+		pVoice->waveStepPnt = 0;
 #endif
-	    pVoice->curSIDfreq = (pVoice->curNoiseFreq = 0);
-	    pVoice->noiseStepAdd = 0;
-	    pVoice->cycleLenCount = 0;
+		pVoice->curSIDfreq = (pVoice->curNoiseFreq = 0);
+		pVoice->noiseStepAdd = 0;
+		pVoice->cycleLenCount = 0;
 	}
 	if ((pVoice->SIDctrl & 8) != 0)
 	{
-	    if (pVoice->noiseIsLocked)
-	    {
+		if (pVoice->noiseIsLocked)
+		{
 		pVoice->noiseIsLocked = FALSE;
 #if defined(DIRECT_FIXPOINT)
 		pVoice->noiseReg.l = noiseSeed;
 #else
 		pVoice->noiseReg = noiseSeed;
 #endif
-	    }
+		}
 	}
-    }
-    else
-    {
+	}
+	else
+	{
 	if ( pVoice->curSIDfreq != pVoice->SIDfreq )
 	{
-	    pVoice->curSIDfreq = pVoice->SIDfreq;
-	    /* We keep the value cycleLen between 1 <= x <= 65535. */
-	    /* This makes a range-check in waveCalcCycleLen() unrequired. */
+		pVoice->curSIDfreq = pVoice->SIDfreq;
+		/* We keep the value cycleLen between 1 <= x <= 65535. */
+		/* This makes a range-check in waveCalcCycleLen() unrequired. */
 #if defined(DIRECT_FIXPOINT)
-	    pVoice->cycleLen.l = ((pVoice->sid->PCMsid << 12) / pVoice->SIDfreq) << 4;
-	    if (pVoice->cycleLenCount > 0)
-	    {
+		pVoice->cycleLen.l = ((pVoice->sid->PCMsid << 12) / pVoice->SIDfreq) << 4;
+		if (pVoice->cycleLenCount > 0)
+		{
 		waveCalcCycleLen(pVoice);
 		pVoice->outProc = &waveCalcRangeCheck;
-	    }
+		}
 #else
-	    pVoice->cycleLen = pVoice->sid->PCMsid / pVoice->SIDfreq;
-	    pVoice->cycleLenPnt = (( pVoice->sid->PCMsid % pVoice->SIDfreq ) * 65536UL ) / pVoice->SIDfreq;
-	    if (pVoice->cycleLenCount > 0)
-	    {
+		pVoice->cycleLen = pVoice->sid->PCMsid / pVoice->SIDfreq;
+		pVoice->cycleLenPnt = (( pVoice->sid->PCMsid % pVoice->SIDfreq ) * 65536UL ) / pVoice->SIDfreq;
+		if (pVoice->cycleLenCount > 0)
+		{
 		waveCalcCycleLen(pVoice);
 		pVoice->outProc = &waveCalcRangeCheck;
-	    }
+		}
 #endif
 	}
 
 	if ((( pVoice->SIDctrl & 0x80 ) == 0x80 ) && ( pVoice->curNoiseFreq != pVoice->SIDfreq ))
 	{
-	    pVoice->curNoiseFreq = pVoice->SIDfreq;
-	    pVoice->noiseStepAdd = (pVoice->sid->PCMsidNoise * pVoice->SIDfreq) >> 8;
-	    if (pVoice->noiseStepAdd >= (1L<<21))
+		pVoice->curNoiseFreq = pVoice->SIDfreq;
+		pVoice->noiseStepAdd = (pVoice->sid->PCMsidNoise * pVoice->SIDfreq) >> 8;
+		if (pVoice->noiseStepAdd >= (1L<<21))
 		sidModeNormalTable[8] = sidMode80hp;
-	    else
+		else
 		sidModeNormalTable[8] = sidMode80;
 	}
 
 	if (( pVoice->SIDctrl & 2 ) != 0 )
 	{
-	    if ( ( pVoice->modulator->SIDfreq == 0 ) || (( pVoice->modulator->SIDctrl & 8 ) != 0 ) )
-	    {
+		if ( ( pVoice->modulator->SIDfreq == 0 ) || (( pVoice->modulator->SIDctrl & 8 ) != 0 ) )
+		{
 		;
-	    }
-	    else if ( (( pVoice->carrier->SIDctrl & 2 ) != 0 ) &&
-		      ( pVoice->modulator->SIDfreq >= ( pVoice->SIDfreq << 1 )) )
-	    {
+		}
+		else if ( (( pVoice->carrier->SIDctrl & 2 ) != 0 ) &&
+				( pVoice->modulator->SIDfreq >= ( pVoice->SIDfreq << 1 )) )
+		{
 		;
-	    }
-	    else
-	    {
+		}
+		else
+		{
 		pVoice->sync = TRUE;
-	    }
+		}
 	}
 
 	if ((( pVoice->SIDctrl & 0x14 ) == 0x14 ) && ( pVoice->modulator->SIDfreq != 0 ))
-	    pVoice->waveProc = sidModeRingTable[pVoice->SIDctrl >> 4];
+		pVoice->waveProc = sidModeRingTable[pVoice->SIDctrl >> 4];
 	else
-	    pVoice->waveProc = sidModeNormalTable[pVoice->SIDctrl >> 4];
-    }
+		pVoice->waveProc = sidModeNormalTable[pVoice->SIDctrl >> 4];
+	}
 }
 
 void sidInitWaveformTables(SIDTYPE type)
@@ -728,23 +728,23 @@ void sidInitWaveformTables(SIDTYPE type)
 
 	k = 0;
 	for ( i = 0; i < 4096; i++ )
-	    squareTable[k++] = 255; //0; my estimation; especial for digi sound
+		squareTable[k++] = 255; //0; my estimation; especial for digi sound
 	for ( i = 0; i < 4096; i++ )
-	    squareTable[k++] = 0; //255;
+		squareTable[k++] = 0; //255;
 
 	if ( type==MOS8580 )
 	{
-        waveform30 = waveform30_8580;
-        waveform50 = waveform50_8580;
-        waveform60 = waveform60_8580;
-        waveform70 = waveform70_8580;
+		waveform30 = waveform30_8580;
+		waveform50 = waveform50_8580;
+		waveform60 = waveform60_8580;
+		waveform70 = waveform70_8580;
 	}
 	else
 	{
-        waveform30 = waveform30_6581;
-        waveform50 = waveform50_6581;
-        waveform60 = waveform60_6581;
-        waveform70 = waveform70_6581;  /* really audible? */
+		waveform30 = waveform30_6581;
+		waveform50 = waveform50_6581;
+		waveform60 = waveform60_6581;
+		waveform70 = waveform70_6581;  /* really audible? */
 	}
 
 	if ( type==MOS8580 )
@@ -769,17 +769,17 @@ void sidInitWaveformTables(SIDTYPE type)
 	{
 		noiseTableLSB[ni] = (UINT8)
 			(((ni >> (13-4)) & 0x10) |
-			 ((ni >> (11-3)) & 0x08) |
-			 ((ni >> (7-2)) & 0x04) |
-			 ((ni >> (4-1)) & 0x02) |
-			 ((ni >> (2-0)) & 0x01));
+				((ni >> (11-3)) & 0x08) |
+				((ni >> (7-2)) & 0x04) |
+				((ni >> (4-1)) & 0x02) |
+				((ni >> (2-0)) & 0x01));
 	}
 	for (ni = 0; ni < sizeof(noiseTableMSB); ni++)
 	{
 		noiseTableMSB[ni] = (UINT8)
 			(((ni << (7-(22-16))) & 0x80) |
-			 ((ni << (6-(20-16))) & 0x40) |
-			 ((ni << (5-(16-16))) & 0x20));
+				((ni << (6-(20-16))) & 0x40) |
+				((ni << (5-(16-16))) & 0x20));
 	}
 #else
 	UINT32 ni;
@@ -787,23 +787,22 @@ void sidInitWaveformTables(SIDTYPE type)
 	{
 		noiseTableLSB[ni] = (UINT8)
 			(((ni >> (7-2)) & 0x04) |
-			 ((ni >> (4-1)) & 0x02) |
-			 ((ni >> (2-0)) & 0x01));
+				((ni >> (4-1)) & 0x02) |
+				((ni >> (2-0)) & 0x01));
 	}
 	for (ni = 0; ni < sizeof(noiseTableMID); ni++)
 	{
 		noiseTableMID[ni] = (UINT8)
 			(((ni >> (13-8-4)) & 0x10) |
-			 ((ni << (3-(11-8))) & 0x08));
+				((ni << (3-(11-8))) & 0x08));
 	}
 	for (ni = 0; ni < sizeof(noiseTableMSB); ni++)
 	{
 		noiseTableMSB[ni] = (UINT8)
 			(((ni << (7-(22-16))) & 0x80) |
-			 ((ni << (6-(20-16))) & 0x40) |
-			 ((ni << (5-(16-16))) & 0x20));
+				((ni << (6-(20-16))) & 0x40) |
+				((ni << (5-(16-16))) & 0x20));
 	}
 #endif
 	}
 }
-

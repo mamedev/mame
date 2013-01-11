@@ -26,7 +26,7 @@ void wiping_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 470, 0,
 			3, &resistances_rg[0], gweights, 470, 0,
 			2, &resistances_b[0],  bweights, 470, 0);
@@ -193,7 +193,7 @@ UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &b
 					m_colorram[offs] & 0x3f,
 					m_flipscreen,m_flipscreen,
 					sx*8,sy*8);
-        	}
+			}
 	}
 
 

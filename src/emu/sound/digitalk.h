@@ -10,7 +10,7 @@ int digitalker_0_intr_r(device_t *device);
 DECLARE_WRITE8_DEVICE_HANDLER(digitalker_data_w);
 
 class digitalker_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

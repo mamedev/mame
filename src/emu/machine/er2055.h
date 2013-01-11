@@ -60,7 +60,7 @@
 
 // ======================> er2055_device
 
-class er2055_device :	public device_t,
+class er2055_device :   public device_t,
 						public device_memory_interface,
 						public device_nvram_interface
 {
@@ -97,12 +97,12 @@ protected:
 	static const UINT8 CS2 = 0x10;
 
 	// configuration state
-	address_space_config		m_space_config;
+	address_space_config        m_space_config;
 
 	// internal state
-	UINT8		m_control_state;
-	UINT8		m_address;
-	UINT8		m_data;
+	UINT8       m_control_state;
+	UINT8       m_address;
+	UINT8       m_data;
 };
 
 

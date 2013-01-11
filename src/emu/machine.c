@@ -134,49 +134,49 @@ static char giant_string_buffer[65536] = { 0 };
 
 running_machine::running_machine(const machine_config &_config, osd_interface &osd, bool exit_to_game_select)
 	: firstcpu(NULL),
-	  primary_screen(NULL),
-	  palette(NULL),
-	  pens(NULL),
-	  colortable(NULL),
-	  shadow_table(NULL),
-	  debug_flags(0),
-	  palette_data(NULL),
-	  romload_data(NULL),
-	  ui_input_data(NULL),
-	  debugcpu_data(NULL),
-	  generic_machine_data(NULL),
+		primary_screen(NULL),
+		palette(NULL),
+		pens(NULL),
+		colortable(NULL),
+		shadow_table(NULL),
+		debug_flags(0),
+		palette_data(NULL),
+		romload_data(NULL),
+		ui_input_data(NULL),
+		debugcpu_data(NULL),
+		generic_machine_data(NULL),
 
-	  m_config(_config),
-	  m_system(_config.gamedrv()),
-	  m_osd(osd),
-	  m_cheat(NULL),
-	  m_render(NULL),
-	  m_input(NULL),
-	  m_sound(NULL),
-	  m_video(NULL),
-	  m_tilemap(NULL),
-	  m_debug_view(NULL),
-	  m_current_phase(MACHINE_PHASE_PREINIT),
-	  m_paused(false),
-	  m_hard_reset_pending(false),
-	  m_exit_pending(false),
-	  m_exit_to_game_select(exit_to_game_select),
-	  m_new_driver_pending(NULL),
-	  m_soft_reset_timer(NULL),
-	  m_rand_seed(0x9d14abd7),
-      m_ui_active(_config.options().ui_active()),
-	  m_basename(_config.gamedrv().name),
-	  m_sample_rate(_config.options().sample_rate()),
-	  m_logfile(NULL),
-	  m_saveload_schedule(SLS_NONE),
-	  m_saveload_schedule_time(attotime::zero),
-	  m_saveload_searchpath(NULL),
-	  m_logerror_list(m_respool),
+		m_config(_config),
+		m_system(_config.gamedrv()),
+		m_osd(osd),
+		m_cheat(NULL),
+		m_render(NULL),
+		m_input(NULL),
+		m_sound(NULL),
+		m_video(NULL),
+		m_tilemap(NULL),
+		m_debug_view(NULL),
+		m_current_phase(MACHINE_PHASE_PREINIT),
+		m_paused(false),
+		m_hard_reset_pending(false),
+		m_exit_pending(false),
+		m_exit_to_game_select(exit_to_game_select),
+		m_new_driver_pending(NULL),
+		m_soft_reset_timer(NULL),
+		m_rand_seed(0x9d14abd7),
+		m_ui_active(_config.options().ui_active()),
+		m_basename(_config.gamedrv().name),
+		m_sample_rate(_config.options().sample_rate()),
+		m_logfile(NULL),
+		m_saveload_schedule(SLS_NONE),
+		m_saveload_schedule_time(attotime::zero),
+		m_saveload_searchpath(NULL),
+		m_logerror_list(m_respool),
 
-	  m_save(*this),
-	  m_memory(*this),
-	  m_ioport(*this),
-	  m_scheduler(*this)
+		m_save(*this),
+		m_memory(*this),
+		m_ioport(*this),
+		m_scheduler(*this)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&m_base_time, 0, sizeof(m_base_time));
@@ -719,7 +719,7 @@ UINT32 running_machine::rand()
 	m_rand_seed = 1664525 * m_rand_seed + 1013904223;
 
 	// return rotated by 16 bits; the low bits have a short period
-    // and are frequently used
+	// and are frequently used
 	return (m_rand_seed >> 16) | (m_rand_seed << 16);
 }
 
@@ -1048,7 +1048,7 @@ void running_machine::postload_all_devices()
 
 running_machine::notifier_callback_item::notifier_callback_item(machine_notify_delegate func)
 	: m_next(NULL),
-	  m_func(func)
+		m_func(func)
 {
 }
 
@@ -1059,7 +1059,7 @@ running_machine::notifier_callback_item::notifier_callback_item(machine_notify_d
 
 running_machine::logerror_callback_item::logerror_callback_item(logerror_callback func)
 	: m_next(NULL),
-	  m_func(func)
+		m_func(func)
 {
 }
 
@@ -1098,13 +1098,13 @@ void system_time::set(time_t t)
 
 void system_time::full_time::set(struct tm &t)
 {
-	second	= t.tm_sec;
-	minute	= t.tm_min;
-	hour	= t.tm_hour;
-	mday	= t.tm_mday;
-	month	= t.tm_mon;
-	year	= t.tm_year + 1900;
-	weekday	= t.tm_wday;
-	day		= t.tm_yday;
-	is_dst	= t.tm_isdst;
+	second  = t.tm_sec;
+	minute  = t.tm_min;
+	hour    = t.tm_hour;
+	mday    = t.tm_mday;
+	month   = t.tm_mon;
+	year    = t.tm_year + 1900;
+	weekday = t.tm_wday;
+	day     = t.tm_yday;
+	is_dst  = t.tm_isdst;
 }

@@ -13,12 +13,12 @@
 
 
 /* Screen timing stuff */
-#define HUC6261_WPF			1365	/* width of a line in frame including blanking areas */
-#define HUC6261_LPF			263		/* max number of lines in a single frame */
+#define HUC6261_WPF         1365    /* width of a line in frame including blanking areas */
+#define HUC6261_LPF         263     /* max number of lines in a single frame */
 
 
-#define MCFG_HUC6261_ADD( _tag, clock, _intrf )	\
-	MCFG_DEVICE_ADD( _tag, HUC6261, clock )		\
+#define MCFG_HUC6261_ADD( _tag, clock, _intrf ) \
+	MCFG_DEVICE_ADD( _tag, HUC6261, clock )     \
 	MCFG_DEVICE_CONFIG( _intrf )
 
 
@@ -33,7 +33,7 @@ struct huc6261_interface
 };
 
 
-class huc6261_device :	public device_t,
+class huc6261_device :  public device_t,
 						public huc6261_interface
 {
 public:
@@ -57,24 +57,24 @@ private:
 	screen_device *m_screen;
 	huc6270_device *m_huc6270_a;
 	huc6270_device *m_huc6270_b;
-	int		m_last_h;
-	int		m_last_v;
-	int		m_height;
+	int     m_last_h;
+	int     m_last_v;
+	int     m_height;
 
-	UINT16	m_palette[512];
-	UINT16	m_address;
-	UINT16	m_palette_latch;
-	UINT16	m_register;
-	UINT16	m_control;
-	UINT8	m_priority[7];
+	UINT16  m_palette[512];
+	UINT16  m_address;
+	UINT16  m_palette_latch;
+	UINT16  m_register;
+	UINT16  m_control;
+	UINT8   m_priority[7];
 
-	UINT8	m_pixels_per_clock;	/* Number of pixels to output per colour clock */
-	UINT16	m_pixel_data;
-	UINT8	m_pixel_clock;
+	UINT8   m_pixels_per_clock; /* Number of pixels to output per colour clock */
+	UINT16  m_pixel_data;
+	UINT8   m_pixel_clock;
 
-	emu_timer	*m_timer;
-	bitmap_rgb32	*m_bmp;
-	INT32	m_uv_lookup[65536][3];
+	emu_timer   *m_timer;
+	bitmap_rgb32    *m_bmp;
+	INT32   m_uv_lookup[65536][3];
 };
 
 

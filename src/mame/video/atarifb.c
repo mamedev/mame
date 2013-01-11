@@ -21,7 +21,7 @@ static void get_tile_info_common( running_machine &machine, tile_data &tileinfo,
 	int disable = alpha_videoram[tile_index] & 0x80;
 
 	if (disable)
-		code = 0;	/* I *know* this is a space */
+		code = 0;   /* I *know* this is a space */
 
 	SET_TILE_INFO(0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
 }

@@ -314,8 +314,8 @@ static void thom_border_changed( running_machine &machine )
 	{
 		/* between left and right border */
 		/* NOTE: this makes the lower right part of the color picker blink
-           in the TO8/TO9/TO9+, which actually happens on the real computer!
-        */
+		   in the TO8/TO9/TO9+, which actually happens on the real computer!
+		*/
 		thom_border_r[ y ] = color;
 		thom_border_l[ y + 1 ] = color;
 	}
@@ -415,24 +415,24 @@ void thom_set_video_page ( running_machine &machine, unsigned page )
 
 
 typedef void ( *thom_scandraw ) ( running_machine &machine, UINT8* vram, UINT16* dst, UINT16* pal,
-				  int org, int len );
+					int org, int len );
 
 
 
-#define UPDATE( name, res )						\
-	static void name##_scandraw_##res ( running_machine &machine,	\
-					    UINT8* vram, UINT16* dst,	UINT16* pal, \
-					    int org, int len )		\
-	{								\
-		unsigned gpl;						\
-		vram += org;						\
-		dst += org * res;					\
-		for ( gpl = 0; gpl < len; gpl++, dst += res, vram++ ) {	\
-			UINT8 rama = vram[ 0      ];			\
+#define UPDATE( name, res )                     \
+	static void name##_scandraw_##res ( running_machine &machine,   \
+						UINT8* vram, UINT16* dst,   UINT16* pal, \
+						int org, int len )      \
+	{                               \
+		unsigned gpl;                       \
+		vram += org;                        \
+		dst += org * res;                   \
+		for ( gpl = 0; gpl < len; gpl++, dst += res, vram++ ) { \
+			UINT8 rama = vram[ 0      ];            \
 			UINT8 ramb = vram[ 0x2000 ];
 
-#define END_UPDATE							\
-		}							\
+#define END_UPDATE                          \
+		}                           \
 	}
 
 #define UPDATE_HI( name )  UPDATE( name, 16 )
@@ -751,28 +751,28 @@ END_UPDATE
 UPDATE_HI( overlay3 )
 {
 	static const int p[2][2][2][2] = {
-		  { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
-		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
+			{ { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
+			{ { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
 	};
 	int i;
 	for ( i = 0; i < 16; i += 4, rama >>= 1, ramb >>= 1 )
 		dst[ 15 - i ] = dst[ 14 - i ] = dst[ 13 - i ] = dst[ 12 - i ] =
 			pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
-					    [ rama & 1 ] [ (rama >> 4) & 1 ] ];
+						[ rama & 1 ] [ (rama >> 4) & 1 ] ];
 }
 END_UPDATE
 
 UPDATE_LOW( overlay3 )
 {
 	static const int p[2][2][2][2] = {
-		  { { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
-		  { { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
+			{ { { 0, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } },
+			{ { { 8, 1 }, { 2, 1 }, }, { { 4, 1 }, { 2, 1 } } }
 	};
 	int i;
 	for ( i = 0; i < 8; i += 2, rama >>= 1, ramb >>= 1 )
 		dst[ 7 - i ] = dst[ 6 - i ] =
 			pal[ p[ ramb & 1 ] [ (ramb >> 4) & 1 ]
-					    [ rama & 1 ] [ (rama >> 4) & 1 ] ];
+						[ rama & 1 ] [ (rama >> 4) & 1 ] ];
 }
 END_UPDATE
 
@@ -809,22 +809,22 @@ static TIMER_CALLBACK( thom_scanline_start )
 			assert( mode < THOM_VMODE_NB );
 			assert( page < 4 );
 			if ( thom_vmodepage_changed )
-                        {
-                                do
+						{
+								do
 				{
 					xx++;
 				}
-                                while ( xx < 40 && thom_vmodepage[xx] == -1 );
-                        }
+								while ( xx < 40 && thom_vmodepage[xx] == -1 );
+						}
 			else
-                        {
+						{
 				xx = 40;
-                        }
+						}
 			thom_scandraw_funcs[ mode ][ thom_hires ]
 				( machine,
-				  thom_vram + y * 40 + page * 0x4000,
-				  thom_vbody + y * 320 * (thom_hires+1),
-				  thom_last_pal, x, xx-x );
+					thom_vram + y * 40 + page * 0x4000,
+					thom_vbody + y * 320 * (thom_hires+1),
+					thom_last_pal, x, xx-x );
 			x = xx;
 		}
 		thom_vmem_dirty[y] = 0;
@@ -1086,7 +1086,7 @@ SCREEN_VBLANK ( thom )
 		/* schedule first lightpen signal */
 		l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
 		thom_lightpen_timer->adjust(
-				   attotime::from_usec( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
+					attotime::from_usec( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
 
 		/* schedule first active-area scanline call-back */
 		thom_scanline_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7), -1);
@@ -1341,4 +1341,3 @@ WRITE8_HANDLER ( to8_vcart_w )
 		return;
 	thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
 }
-

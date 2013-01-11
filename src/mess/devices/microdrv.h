@@ -18,14 +18,14 @@
 
 struct microdrive_interface
 {
-	devcb_write_line				m_out_comms_out_cb;
-	const char *					m_interface;
-	device_image_display_info_func	m_device_displayinfo;
+	devcb_write_line                m_out_comms_out_cb;
+	const char *                    m_interface;
+	device_image_display_info_func  m_device_displayinfo;
 };
 
 // ======================> microdrive_image_device
 
-class microdrive_image_device :	public device_t,
+class microdrive_image_device : public device_t,
 								public microdrive_interface,
 								public device_image_interface
 {
@@ -62,7 +62,7 @@ public:
 	DECLARE_READ_LINE_MEMBER ( data2_r );
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:

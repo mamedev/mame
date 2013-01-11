@@ -20,19 +20,19 @@ Framebuffer todo:
 
 struct stv_vdp1_poly_scanline
 {
-	INT32	x[2];
-	INT32	b[2];
-	INT32	g[2];
-	INT32	r[2];
-	INT32	db;
-	INT32	dg;
-	INT32	dr;
+	INT32   x[2];
+	INT32   b[2];
+	INT32   g[2];
+	INT32   r[2];
+	INT32   db;
+	INT32   dg;
+	INT32   dr;
 };
 
 struct stv_vdp1_poly_scanline_data
 {
-	INT32	sy, ey;
-	struct	stv_vdp1_poly_scanline scanline[512];
+	INT32   sy, ey;
+	struct  stv_vdp1_poly_scanline scanline[512];
 };
 
 static struct stv_vdp1_poly_scanline_data* stv_vdp1_shading_data;
@@ -50,9 +50,9 @@ struct shaded_point
 	INT32 r,g,b;
 };
 
-#define RGB_R(_color)	(_color & 0x1f)
-#define RGB_G(_color)	((_color >> 5) & 0x1f)
-#define RGB_B(_color)	((_color >> 10) & 0x1f)
+#define RGB_R(_color)   (_color & 0x1f)
+#define RGB_G(_color)   ((_color >> 5) & 0x1f)
+#define RGB_B(_color)   ((_color >> 10) & 0x1f)
 
 #define SWAP_INT32(_a,_b) \
 	{ \
@@ -179,7 +179,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 		case 0x12/2: return state->m_vdp1.lopr;
 		case 0x14/2: return state->m_vdp1.copr;
 		/* MODR register, read register for the other VDP1 regs
-           (Shienryu SS version abuses of this during intro) */
+		   (Shienryu SS version abuses of this during intro) */
 		case 0x16/2:
 			UINT16 modr;
 
@@ -265,7 +265,7 @@ static void stv_set_framebuffer_config( running_machine &machine )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	if ( state->m_vdp1.framebuffer_mode == STV_VDP1_TVM &&
-		 state->m_vdp1.framebuffer_double_interlace == STV_VDP1_DIE ) return;
+			state->m_vdp1.framebuffer_double_interlace == STV_VDP1_DIE ) return;
 
 	if ( VDP1_LOG ) logerror( "Setting framebuffer config\n" );
 	state->m_vdp1.framebuffer_mode = STV_VDP1_TVM;
@@ -532,10 +532,10 @@ static struct stv_vdp2_sprite_list
 static struct _stv_gouraud_shading
 {
 	/* Gouraud shading table */
-	UINT16	GA;
-	UINT16	GB;
-	UINT16	GC;
-	UINT16	GD;
+	UINT16  GA;
+	UINT16  GB;
+	UINT16  GC;
+	UINT16  GD;
 } stv_gouraud_shading;
 
 static void stv_clear_gouraud_shading(void)
@@ -622,8 +622,8 @@ static void stv_vdp1_setup_shading_for_line(INT32 y, INT32 x1, INT32 x2,
 
 	if ( (y >= 0) && (y < 512) )
 	{
-	    INT32  dx;
-		INT32	gbd, ggd, grd;
+		INT32  dx;
+		INT32   gbd, ggd, grd;
 
 		dx = xx2 - xx1;
 
@@ -1046,7 +1046,7 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 		{
 			switch( stv2_current_sprite.CMDPMOD & 0x7 )
 			{
-				case 0:	/* replace */
+				case 0: /* replace */
 					state->m_vdp1.framebuffer_draw_lines[y][x] = pix;
 					break;
 				case 1: /* shadow */
@@ -1214,8 +1214,8 @@ static void vdp1_fill_slope(running_machine &machine, const rectangle &cliprect,
 
 				while(xx1 <= xx2) {
 					drawpixel(machine,xx1,_y1,
-							  patterndata,
-							  (v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
+								patterndata,
+								(v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
 					xx1++;
 					u += slux;
 					v += slvx;
@@ -1240,7 +1240,7 @@ static void vdp1_fill_slope(running_machine &machine, const rectangle &cliprect,
 }
 
 static void vdp1_fill_line(running_machine &machine, const rectangle &cliprect, int patterndata, int xsize, INT32 y,
-						   INT32 x1, INT32 x2, INT32 u1, INT32 u2, INT32 v1, INT32 v2)
+							INT32 x1, INT32 x2, INT32 u1, INT32 u2, INT32 v1, INT32 v2)
 {
 	int xx1 = x1>>FRAC_SHIFT;
 	int xx2 = x2>>FRAC_SHIFT;
@@ -1268,8 +1268,8 @@ static void vdp1_fill_line(running_machine &machine, const rectangle &cliprect, 
 
 		while(xx1 <= xx2) {
 			drawpixel(machine,xx1,y,
-					  patterndata,
-					  (v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
+						patterndata,
+						(v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
 			xx1++;
 			u += slux;
 			v += slvx;
@@ -1660,9 +1660,9 @@ static void stv_vpd1_draw_scaled_sprite(running_machine &machine, const rectangl
 	}
 
 	/*  0----1
-        |    |
-        |    |
-        3----2   */
+	    |    |
+	    |    |
+	    3----2   */
 
 	if (zoompoint)
 	{
@@ -2114,7 +2114,7 @@ void video_update_vdp1(running_machine &machine)
 				stv_vdp1_process_list(machine);
 			}
 			break;
-		case 3:	/*<invalid>*/
+		case 3: /*<invalid>*/
 			logerror("Warning: Invalid PTM mode set for VDP1!\n");
 			break;
 	}

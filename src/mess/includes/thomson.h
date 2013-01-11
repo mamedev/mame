@@ -272,11 +272,11 @@ extern UINT8* thom_vram;
 /*********************** video signals *****************************/
 
 struct thom_vsignal {
-  unsigned count;  /* pixel counter */
-  unsigned init;   /* 1 -> active vertical windos, 0 -> border/VBLANK */
-  unsigned inil;   /* 1 -> active horizontal window, 0 -> border/HBLANK */
-  unsigned lt3;    /* bit 3 of us counter */
-  unsigned line;   /* line counter */
+	unsigned count;  /* pixel counter */
+	unsigned init;   /* 1 -> active vertical windos, 0 -> border/VBLANK */
+	unsigned inil;   /* 1 -> active horizontal window, 0 -> border/HBLANK */
+	unsigned lt3;    /* bit 3 of us counter */
+	unsigned line;   /* line counter */
 };
 
 /* current video position */
@@ -290,7 +290,7 @@ extern unsigned to7_lightpen_gpl ( running_machine &machine, int decx, int decy 
 
 /* video position corresponding to lightpen (with some offset) */
 extern struct thom_vsignal thom_get_lightpen_vsignal ( running_machine &machine, int xdec, int ydec,
-						       int xdec2 );
+								int xdec2 );
 
 /* specify a lightpencall-back function, called nb times per frame */
 extern void thom_set_lightpen_callback ( running_machine &machine, int nb, void (*cb) ( running_machine &machine, int step ) );
@@ -370,8 +370,8 @@ class to7_io_line_device :  public device_t,
 							public device_serial_interface
 {
 public:
-    // construction/destruction
-    to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void input_callback(UINT8 state);
 
@@ -381,14 +381,14 @@ public:
 	/* write data register */
 	DECLARE_WRITE8_MEMBER(porta_out);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 };
 
 extern const device_type TO7_IO_LINE;
 
-#define MCFG_TO7_IO_LINE_ADD(_tag)	\
+#define MCFG_TO7_IO_LINE_ADD(_tag)  \
 	MCFG_DEVICE_ADD((_tag), TO7_IO_LINE, 0)
 
 #endif /* _THOMSON_H_ */

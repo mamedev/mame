@@ -17,9 +17,9 @@
 #define VERBOSE 0
 #endif
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-#define MASTER_CLOCK_PAL	2000000  /* PAL unit has a separate crystal at 4.000 MHz */
+#define MASTER_CLOCK_PAL    2000000  /* PAL unit has a separate crystal at 4.000 MHz */
 #define PAL_VBLANK_TIME     4623
 
 
@@ -80,7 +80,7 @@ READ8_MEMBER( channelf_state::channelf_port_5_r )
 	return port_read_with_latch(0xff, m_latch[3]);
 }
 
-READ8_MEMBER( channelf_state::channelf_2102A_r )	/* SKR */
+READ8_MEMBER( channelf_state::channelf_2102A_r )    /* SKR */
 {
 	UINT8 pdata;
 
@@ -187,10 +187,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( channelf )
 	PORT_START("PANEL") /* Front panel buttons */
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_START )	/* TIME  (1) */
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )	/* HOLD  (2) */
-	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )	/* MODE  (3) */
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )	/* START (4) */
+	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_START )    /* TIME  (1) */
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )  /* HOLD  (2) */
+	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )  /* MODE  (3) */
+	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )  /* START (4) */
 	PORT_BIT ( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RIGHT_C") /* Right controller */

@@ -26,54 +26,54 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	m_cpu_control = data;
 
 	/*
-      CPU control register
+	  CPU control register
 
-        0x80    = Video Flip
-        0x08    = NMI
-        0x04    = CPU 0 IRQ   (0=Activate)
-        0x02    = CPU 1 IRQ   (0=Activate)
-        0x01    = Y Scroll MSB
-    */
+	    0x80    = Video Flip
+	    0x08    = NMI
+	    0x04    = CPU 0 IRQ   (0=Activate)
+	    0x02    = CPU 1 IRQ   (0=Activate)
+	    0x01    = Y Scroll MSB
+	*/
 
 	flip_screen_set(data & 0x80);
 
 	/*
-        I think that the NMI is an inhibitor. It is constantly set
-        to zero whenever an NMIs are allowed.
+	    I think that the NMI is an inhibitor. It is constantly set
+	    to zero whenever an NMIs are allowed.
 
-        However, it could also be that setting to zero could
-        cause the NMI to trigger. I really don't know.
-    */
-
-    /*
-    if (~m_cpu_control & 0x08)
-    {
-        m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-        m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-    }
-    */
+	    However, it could also be that setting to zero could
+	    cause the NMI to trigger. I really don't know.
+	*/
 
 	/*
-        CPU2's SWI will trigger an 6809 IRQ on the master by resetting 0x04
-        Master will respond by setting the bit back again
-    */
-    m_maincpu->set_input_line(M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
+	if (~m_cpu_control & 0x08)
+	{
+	    m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	    m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	}
+	*/
 
 	/*
-    Slave function call (e.g. ROM test):
-    FA7F: 86 03       LDA   #$03    ; Function code
-    FA81: 97 6B       STA   $6B
-    FA83: 86 0E       LDA   #$0E
-    FA85: 84 FD       ANDA  #$FD    ; Trigger IRQ
-    FA87: 97 66       STA   $66
-    FA89: B7 1C 03    STA   $1C03   ; Do Trigger
-    FA8C: C6 40       LDB   #$40
-    FA8E: D5 68       BITB  $68
-    FA90: 27 FA       BEQ   $FA8C   ; Wait for slave IRQ pre-function dispatch
-    FA92: 96 68       LDA   $68
-    FA94: 84 01       ANDA  #$01
-    FA96: 27 FA       BEQ   $FA92   ; Wait for bit to be set
-    */
+	    CPU2's SWI will trigger an 6809 IRQ on the master by resetting 0x04
+	    Master will respond by setting the bit back again
+	*/
+	m_maincpu->set_input_line(M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
+
+	/*
+	Slave function call (e.g. ROM test):
+	FA7F: 86 03       LDA   #$03    ; Function code
+	FA81: 97 6B       STA   $6B
+	FA83: 86 0E       LDA   #$0E
+	FA85: 84 FD       ANDA  #$FD    ; Trigger IRQ
+	FA87: 97 66       STA   $66
+	FA89: B7 1C 03    STA   $1C03   ; Do Trigger
+	FA8C: C6 40       LDB   #$40
+	FA8E: D5 68       BITB  $68
+	FA90: 27 FA       BEQ   $FA8C   ; Wait for slave IRQ pre-function dispatch
+	FA92: 96 68       LDA   $68
+	FA94: 84 01       ANDA  #$01
+	FA96: 27 FA       BEQ   $FA92   ; Wait for bit to be set
+	*/
 
 	m_subcpu->set_input_line(M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
 }
@@ -139,35 +139,35 @@ static INPUT_PORTS_START( battlane )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C )  )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Easy )  )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard )  )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "20K 50K+" )
 	PORT_DIPSETTING(    0x08, "20K 70K+" )
 	PORT_DIPSETTING(    0x04, "20K 90K+" )
@@ -226,7 +226,7 @@ static const gfx_layout tilelayout2 =
 	16, 16,    /* 16*16 tiles */
 	256,    /* 256 tiles */
 	3,      /* 3 bits per pixel */
-    { 0x8000*8, 0x4000*8+4, 0x4000*8+0 },    /* plane offset */
+	{ 0x8000*8, 0x4000*8+4, 0x4000*8+0 },    /* plane offset */
 	{
 		3, 2, 1, 0,
 		8+3, 8+2, 8+1, 8+0,
@@ -242,9 +242,9 @@ static const gfx_layout tilelayout2 =
 
 
 static GFXDECODE_START( battlane )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 2 )	/* colors 0x00-0x0f */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   32, 4 )	/* colors 0x20-0x3f */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,  32, 4 )	/* colors 0x20-0x3f */
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 2 )   /* colors 0x00-0x0f */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   32, 4 )   /* colors 0x20-0x3f */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,  32, 4 )   /* colors 0x20-0x3f */
 GFXDECODE_END
 
 

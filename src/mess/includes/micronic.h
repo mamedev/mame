@@ -13,21 +13,21 @@
 #include "machine/ram.h"
 #include "sound/beep.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"z80"
-#define MC146818_TAG	"mc146818"
-#define HD61830_TAG		"hd61830"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "z80"
+#define MC146818_TAG    "mc146818"
+#define HD61830_TAG     "hd61830"
 
 class micronic_state : public driver_device
 {
 public:
 	micronic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_lcdc(*this, HD61830_TAG),
-		  m_beep(*this, BEEPER_TAG),
-		  m_rtc(*this, MC146818_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_lcdc(*this, HD61830_TAG),
+			m_beep(*this, BEEPER_TAG),
+			m_rtc(*this, MC146818_TAG),
+			m_ram(*this, RAM_TAG)
 		,
 		m_ram_base(*this, "ram_base"){ }
 

@@ -12,19 +12,19 @@
 #include "machine/z80ctc.h"
 #include "machine/ram.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"i1"
-#define Z80CTC_TAG		"i4"
-#define Z80PIO1_TAG		"i2"
-#define Z80PIO2_TAG		"i3"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "i1"
+#define Z80CTC_TAG      "i4"
+#define Z80PIO1_TAG     "i2"
+#define Z80PIO2_TAG     "i3"
 
 class poly880_state : public driver_device
 {
 public:
 	poly880_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

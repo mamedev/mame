@@ -102,7 +102,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		code >>= 2;
 
-		sx += (spriteram_2[offs] & 0x20) >> 5;	// not sure about this
+		sx += (spriteram_2[offs] & 0x20) >> 5;  // not sure about this
 
 		if (state->flip_screen())
 		{

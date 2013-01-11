@@ -49,4 +49,3 @@ extern const i8251_interface poly88_usart_interface;
 extern SNAPSHOT_LOAD( poly88 );
 
 #endif /* POLY88_H_ */
-

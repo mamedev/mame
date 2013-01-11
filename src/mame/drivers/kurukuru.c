@@ -10,7 +10,7 @@
   This hardware seems to be a derivative of MSX2 'on steroids'.
   It has many similarites with sothello.c and tonton.c
 
-  Special thanks to Charles MacDonald, for all the hardware traces: clocks, 
+  Special thanks to Charles MacDonald, for all the hardware traces: clocks,
   ports, descriptions and a lot of things... :)
 
 
@@ -155,7 +155,7 @@
   - [Left panel]:  All the DIP switches parameters.
 
   - [Right panel]: Bet and Win totals, 100Y/10Y/medal IN/OUT, total of games,
-                   won, loss, won by paid range, and 'omake' (extra/bonus). 
+                   won, loss, won by paid range, and 'omake' (extra/bonus).
 
   2nd screen (press Bookkeeping key again)...
 
@@ -230,21 +230,21 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_vdp_scanline);
 };
 
-#define MAIN_CLOCK		XTAL_21_4772MHz
-#define CPU_CLOCK		MAIN_CLOCK/6
-#define YM2149_CLOCK	MAIN_CLOCK/6/2	// '/SEL' pin tied to GND, so internal divisor x2 is active
-#define M5205_CLOCK		XTAL_384kHz
+#define MAIN_CLOCK      XTAL_21_4772MHz
+#define CPU_CLOCK       MAIN_CLOCK/6
+#define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
+#define M5205_CLOCK     XTAL_384kHz
 
-#define HOPPER_PULSE	50			// time between hopper pulses in milliseconds
-#define VDP_MEM			0x30000
+#define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
+#define VDP_MEM         0x30000
 
 /* from MSX2 driver, may be not accurate for this HW */
-#define MSX2_XBORDER_PIXELS		16
-#define MSX2_YBORDER_PIXELS		28
-#define MSX2_TOTAL_XRES_PIXELS		256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS		212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
+#define MSX2_XBORDER_PIXELS     16
+#define MSX2_YBORDER_PIXELS     28
+#define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
+#define MSX2_TOTAL_YRES_PIXELS      212 * 2 + (MSX2_YBORDER_PIXELS * 2)
+#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
+#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
 
 /*************************************************
@@ -314,10 +314,10 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
     07 | Not connected      | unused
 
 */
-	coin_counter_w(machine(), 0, data & 0x01);		/* Coin Counter 1 */
-	coin_counter_w(machine(), 1, data & 0x20);		/* Coin Counter 2 */ 
-	coin_lockout_global_w(machine(), data & 0x40);	/* Coin Lock */
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x40));	/* Hopper Motor */
+	coin_counter_w(machine(), 0, data & 0x01);      /* Coin Counter 1 */
+	coin_counter_w(machine(), 1, data & 0x20);      /* Coin Counter 2 */
+	coin_lockout_global_w(machine(), data & 0x40);  /* Coin Lock */
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x40));    /* Hopper Motor */
 
 	if (data & 0x9e)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
@@ -327,12 +327,12 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 {
 	membank("bank1")->set_entry(7); // remove banked rom
 /*
-	if bits 5,4 are 00,10,01 then IC10 is enabled
-	if bits 3,2 are 00,10,01 then IC18 is enabled
-	if bits 1,0 are 00,10,01 then IC23 is enabled
-	Then in addition, A15 (ROM half) is determined by the low bit.
-	Note that in theory, it can cause a conflict by enabling more than one chip,
-	but the game never does this.
+    if bits 5,4 are 00,10,01 then IC10 is enabled
+    if bits 3,2 are 00,10,01 then IC18 is enabled
+    if bits 1,0 are 00,10,01 then IC23 is enabled
+    Then in addition, A15 (ROM half) is determined by the low bit.
+    Note that in theory, it can cause a conflict by enabling more than one chip,
+    but the game never does this.
 */
 	for (int chip = 0; chip < 3; chip++)
 	{
@@ -461,11 +461,11 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown B0h - bit4")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// hopper feedback
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
-	PORT_START("DSW1")	// found in the PCB: 11111111
-	PORT_DIPNAME( 0x07, 0x00, "Coinage A (100 Y)" )	PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_START("DSW1")  // found in the PCB: 11111111
+	PORT_DIPNAME( 0x07, 0x00, "Coinage A (100 Y)" ) PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
 	PORT_DIPSETTING(    0x06, "1 Coin / 4 Medal" )
 	PORT_DIPSETTING(    0x01, "1 Coin / 5 Medal" )
@@ -474,23 +474,23 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
 	PORT_DIPSETTING(    0x04, "1 Coin / 20 Medal" )
 	PORT_DIPSETTING(    0x00, "1 Coin / 50 Medal" )
-	PORT_DIPNAME( 0x18, 0x00, "Coinage B (10 Y)" )	PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "Coinage B (10 Y)" )  PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(    0x00, "3 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x10, "2 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x18, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x08, "1 Coin / 2 Medal" )
-	PORT_DIPNAME( 0x20, 0x00, "Coinage Config" )	PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x20, 0x00, "Coinage Config" )    PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x00, "Coin 1 = Normal; Medal In = 2 Credits by Medal" )
 	PORT_DIPSETTING(    0x20, "Coin 1 = Payout; Medal In = 1 Credit by Medal" )
-	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x80, 0x00, "Repeat Last Bet")	PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Repeat Last Bet")    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	PORT_START("DSW2")	// found in the PCB: 01111110
-	PORT_DIPNAME( 0x07, 0x01, "Percentage" )	PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_START("DSW2")  // found in the PCB: 01111110
+	PORT_DIPNAME( 0x07, 0x01, "Percentage" )    PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "50%" )
 	PORT_DIPSETTING(    0x03, "60%" )
 	PORT_DIPSETTING(    0x05, "70%" )
@@ -499,18 +499,18 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_DIPSETTING(    0x02, "85%" )
 	PORT_DIPSETTING(    0x04, "90%" )
 	PORT_DIPSETTING(    0x00, "95%" )
-	PORT_DIPNAME( 0x08, 0x08, "Winwave" )		PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Winwave" )       PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, "Small" )
 	PORT_DIPSETTING(    0x00, "Big" )
-	PORT_DIPNAME( 0x10, 0x10, "M.Medal" )		PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "M.Medal" )       PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "HG" )			PORT_DIPLOCATION("DSW2:6,7")
+	PORT_DIPNAME( 0x60, 0x60, "HG" )            PORT_DIPLOCATION("DSW2:6,7")
 	PORT_DIPSETTING(    0x60, "10-1" )
 	PORT_DIPSETTING(    0x20, "20-1" )
 	PORT_DIPSETTING(    0x40, "50-1" )
 	PORT_DIPSETTING(    0x00, "100-1" )
-	PORT_DIPNAME( 0x80, 0x80, "Bet Max" )		PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Bet Max" )       PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
 
@@ -549,7 +549,7 @@ static const ay8910_interface ym2149_intf =
 static const msm5205_interface msm5205_config =
 {
 	kurukuru_msm5205_vck,
-	MSM5205_S48_4B		/* changed on the fly */
+	MSM5205_S48_4B      /* changed on the fly */
 };
 
 
@@ -622,9 +622,9 @@ ROM_START( kurukuru )
 	ROM_LOAD( "4.ic4",        0x00000, 0x10000, CRC(85d86f32) SHA1(f2aa93d702e6577f8f2204c74c44ac26d05be699) ) // code & adpcm samples
 
 	ROM_REGION( 0x800, "plds", 0 )
-	ROM_LOAD( "51.ic26",	  0x0000, 0x0104, CRC(ce4a601b) SHA1(07f5bbb327b220e5846927cbb91149174dd07b36) )
-	ROM_LOAD( "52.ic27",	  0x0200, 0x0104, CRC(e23296a5) SHA1(4747923d201fcc5e0e752acbf50b41f0414e4ca8) )
-	ROM_LOAD( "53.ic12",	  0x0400, 0x0104, CRC(2ac654f2) SHA1(18668c73781a55dcffc4bf4c107026b0e72a75d1) )
+	ROM_LOAD( "51.ic26",      0x0000, 0x0104, CRC(ce4a601b) SHA1(07f5bbb327b220e5846927cbb91149174dd07b36) )
+	ROM_LOAD( "52.ic27",      0x0200, 0x0104, CRC(e23296a5) SHA1(4747923d201fcc5e0e752acbf50b41f0414e4ca8) )
+	ROM_LOAD( "53.ic12",      0x0400, 0x0104, CRC(2ac654f2) SHA1(18668c73781a55dcffc4bf4c107026b0e72a75d1) )
 	ROM_LOAD( "7908b-4.ic32", 0x0600, 0x0034, CRC(bddf925e) SHA1(861cf5966444d0c0392241e5cfa08db475fb439a) )
 ROM_END
 

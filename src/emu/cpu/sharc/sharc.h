@@ -4,10 +4,10 @@
 #define __SHARC_H__
 
 
-#define SHARC_INPUT_FLAG0		3
-#define SHARC_INPUT_FLAG1		4
-#define SHARC_INPUT_FLAG2		5
-#define SHARC_INPUT_FLAG3		6
+#define SHARC_INPUT_FLAG0       3
+#define SHARC_INPUT_FLAG1       4
+#define SHARC_INPUT_FLAG2       5
+#define SHARC_INPUT_FLAG3       6
 
 enum SHARC_BOOT_MODE
 {

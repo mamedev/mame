@@ -9,10 +9,10 @@
 #include "cpu/nec/nec.h"
 #include "video/resnet.h"
 
-#define CURSOR_XPOS			168
-#define CURSOR_YPOS			239
-#define FRAMEBUFFER_MAX_X	431
-#define FRAMEBUFFER_MAX_Y	(UINT32)((FRAMEBUFFER_CLOCK / (float)(FRAMEBUFFER_MAX_X-1)) / ((float)PIXEL_CLOCK/(HTOTAL*VTOTAL)))
+#define CURSOR_XPOS         168
+#define CURSOR_YPOS         239
+#define FRAMEBUFFER_MAX_X   431
+#define FRAMEBUFFER_MAX_Y   (UINT32)((FRAMEBUFFER_CLOCK / (float)(FRAMEBUFFER_MAX_X-1)) / ((float)PIXEL_CLOCK/(HTOTAL*VTOTAL)))
 
 
 /*************************************
@@ -231,9 +231,9 @@ static void scene_draw( running_machine &machine )
 			}
 
 			col = colour
-				 | (((d2 >> x_gran) & 1) << 2)
-				 | (((d1 >> x_gran) & 1) << 1)
-				 | ( (d0 >> x_gran) & 1);
+					| (((d2 >> x_gran) & 1) << 2)
+					| (((d1 >> x_gran) & 1) << 1)
+					| ( (d0 >> x_gran) & 1);
 
 			*bmpaddr++ = 0xa00 + col;
 
@@ -309,7 +309,7 @@ static void ground_draw( running_machine &machine )
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((state->m_ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);
 	const UINT8 *const clut_rom = gfx_rom + 0x50000;
 
-	UINT32 lut_a15_14	= (state->m_ground_ctrl & 0x3) << 14;
+	UINT32 lut_a15_14   = (state->m_ground_ctrl & 0x3) << 14;
 	UINT32 clut_a14_12 = (state->m_ground_ctrl & 0x70) << 8;
 	UINT32 gfx_a15 = (state->m_ground_ctrl & 0x40) << 9;
 	UINT32 offs = 3;
@@ -334,8 +334,8 @@ static void ground_draw( running_machine &machine )
 			UINT32 gfx_a2_0  =  state->m_ground_ram[offs] & 0x0007;
 			UINT32 gfx_a6_5  = (state->m_ground_ram[offs] & 0x0018) << 2;
 			UINT32 clut_a4_3 = (state->m_ground_ram[offs] & 0x0018) >> 1;
-			UINT8	tz2213_x  = state->m_ground_ram[offs + 1] & 0xff;
-			UINT8	tz2213_dx = state->m_ground_ram[offs + 2] & 0xff;
+			UINT8   tz2213_x  = state->m_ground_ram[offs + 1] & 0xff;
+			UINT8   tz2213_dx = state->m_ground_ram[offs + 2] & 0xff;
 
 			UINT32 lut_address = lut_a15_14 + ((state->m_ground_ram[offs] & 0x7fe0) >> 1);
 			UINT32 cy = state->m_ground_ram[offs + 2] & 0x0100;
@@ -416,13 +416,13 @@ static void ground_draw( running_machine &machine )
 */
 #define DRAW_OBJ_PIXEL(COLOR)                            \
 do {                                                     \
-	if (px < FRAMEBUFFER_MAX_X)							 \
+	if (px < FRAMEBUFFER_MAX_X)                          \
 	if (COLOR != 0xf)                                    \
 	{                                                    \
 		UINT8 clr = state->m_obj_pal_ram[(pal << 4) + COLOR];     \
-		UINT16 *pix = (line + px);						 \
+		UINT16 *pix = (line + px);                       \
 		if (!(clr == 0xff && ((*pix & 0xe00) == 0xa00))) \
-			*pix = 0x400 + clr;			 \
+			*pix = 0x400 + clr;          \
 	}                                                    \
 	px = (px + 1) & 0x7ff;                               \
 } while(0)
@@ -453,15 +453,15 @@ static void objects_draw( running_machine &machine )
 		UINT32 opsta15_8;
 
 		/* Retrieve the object attributes */
-		ypos	= state->m_object_ram[offs] & 0x03ff;
-		xpos	= state->m_object_ram[offs + 3] & 0x07ff;
-		ysize	= (state->m_object_ram[offs] >> 10) & 0x3;
-		xsize	= (state->m_object_ram[offs] >> 12) & 0x3;
-		yflip	= BIT(state->m_object_ram[offs], 14);
-		xflip	= BIT(state->m_object_ram[offs], 15);
-		scale	= state->m_object_ram[offs + 1] & 0xff;
+		ypos    = state->m_object_ram[offs] & 0x03ff;
+		xpos    = state->m_object_ram[offs + 3] & 0x07ff;
+		ysize   = (state->m_object_ram[offs] >> 10) & 0x3;
+		xsize   = (state->m_object_ram[offs] >> 12) & 0x3;
+		yflip   = BIT(state->m_object_ram[offs], 14);
+		xflip   = BIT(state->m_object_ram[offs], 15);
+		scale   = state->m_object_ram[offs + 1] & 0xff;
 		pal = (state->m_object_ram[offs + 1] >> 8) & 0x7f;
-		opsta	= state->m_object_ram[offs + 2];
+		opsta   = state->m_object_ram[offs + 2];
 
 		if (state->m_iden)
 		{
@@ -483,7 +483,7 @@ static void objects_draw( running_machine &machine )
 			UINT32 optab;
 			UINT32 lutaddr;
 			UINT32 tile;
-			UINT8	cnt;
+			UINT8   cnt;
 			UINT32 yidx;
 			UINT16 *line = &state->m_back_buffer->pix16(y);
 			UINT32 px = xpos;
@@ -662,15 +662,15 @@ WRITE16_MEMBER(lockon_state::lockon_rotate_w)
 
 	switch (offset & 7)
 	{
-		case 0: m_xsal  = data & 0x1ff;	break;
-		case 1: m_x0ll  = data & 0xff;	break;
-		case 2: m_dx0ll = data & 0x1ff;	break;
-		case 3: m_dxll  = data & 0x1ff;	break;
+		case 0: m_xsal  = data & 0x1ff; break;
+		case 1: m_x0ll  = data & 0xff;  break;
+		case 2: m_dx0ll = data & 0x1ff; break;
+		case 3: m_dxll  = data & 0x1ff; break;
 
-		case 4: m_ysal  = data & 0x1ff;	break;
-		case 5: m_y0ll  = data & 0xff;	break;
-		case 6: m_dy0ll =	data & 0x1ff;	break;
-		case 7: m_dyll  = data & 0x3ff;	break;
+		case 4: m_ysal  = data & 0x1ff; break;
+		case 5: m_y0ll  = data & 0xff;  break;
+		case 6: m_dy0ll =   data & 0x1ff;   break;
+		case 7: m_dyll  = data & 0x3ff; break;
 	}
 }
 
@@ -796,7 +796,7 @@ static void rotate_draw( running_machine &machine, bitmap_ind16 &bitmap, const r
 static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
-	UINT8	*tile_rom = state->memregion("gfx3")->base();
+	UINT8   *tile_rom = state->memregion("gfx3")->base();
 	UINT32 offs;
 
 	for (offs = 0x0; offs <= state->m_hud_ram.bytes(); offs += 2)
@@ -815,10 +815,10 @@ static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rect
 		if (state->m_hud_ram[offs + 1] & 0x8000)
 			break;
 
-		y_pos	= state->m_hud_ram[offs] & 0x1ff;
-		x_pos	= state->m_hud_ram[offs + 1] & 0x1ff;
+		y_pos   = state->m_hud_ram[offs] & 0x1ff;
+		x_pos   = state->m_hud_ram[offs + 1] & 0x1ff;
 		x_size = (state->m_hud_ram[offs + 1] >> 12) & 7;
-		code	= (state->m_hud_ram[offs] >> 9) & 0x7f;
+		code    = (state->m_hud_ram[offs] >> 9) & 0x7f;
 		colour = 0x200 + ((state->m_hud_ram[offs + 1] >> 9) & 7);
 		layout = (code >> 5) & 3;
 
@@ -851,7 +851,7 @@ static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rect
 			{
 				UINT32 rom_a6_3;
 				UINT32 px;
-				UINT8	gfx_strip;
+				UINT8   gfx_strip;
 
 				if (layout == 3)
 					rom_a6_3 = (BIT(cy, 4) << 3) | (BIT(cy, 3) << 2) | (BIT(xt, 1) << 1) | BIT(xt, 0);

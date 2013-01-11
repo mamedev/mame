@@ -79,7 +79,7 @@ READ16_MEMBER(sderby_state::sderby_input_r)
 		case 0x00 >> 1:
 			return ioport("IN0")->read();
 		case 0x02 >> 1:
-			return 0xffff;			// to avoid game to reset (needs more work)
+			return 0xffff;          // to avoid game to reset (needs more work)
 	}
 
 	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,space.device().safe_pc());
@@ -184,9 +184,9 @@ WRITE16_MEMBER(sderby_state::sderby_out_w)
     x--- ----  End of Race lamp.
 
 */
-	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - START */
-	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET */
-	output_set_lamp_value(3, (data >> 15) & 1);		/* Lamp 3 - END OF RACE */
+	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - START */
+	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - BET */
+	output_set_lamp_value(3, (data >> 15) & 1);     /* Lamp 3 - END OF RACE */
 
 	coin_counter_w(machine(), 0, data & 0x2000);
 }
@@ -229,13 +229,13 @@ WRITE16_MEMBER(sderby_state::scmatto_out_w)
     --x- ----  Coin counter.
 
 */
-	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
-	output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
-	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - BET    */
+	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+	output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+	output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
+	output_set_lamp_value(7, (data >> 6) & 1);      /* Lamp 7 - BET    */
 
 	coin_counter_w(machine(), 0, data & 0x2000);
 }
@@ -265,8 +265,8 @@ WRITE16_MEMBER(sderby_state::roulette_out_w)
     ---- x---  Unknown (always activated).
 
 */
-	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - START */
-	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET   */
+	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - START */
+	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - BET   */
 }
 
 
@@ -276,18 +276,18 @@ WRITE16_MEMBER(sderby_state::roulette_out_w)
 
 static ADDRESS_MAP_START( sderby_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")		/* bg */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram")	/* mid */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram")	/* fg */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram") /* fg */
 	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
-	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* ??? - check code at 0x000456 (executed once at startup) */
-	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* ??? - check code at 0x000524 (executed once at startup) */
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP    /* ??? - check code at 0x000456 (executed once at startup) */
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP    /* ??? - check code at 0x000524 (executed once at startup) */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w) /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -295,57 +295,57 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luckboom_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")		/* bg */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram")	/* mid */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram")	/* fg */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram") /* fg */
 	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
-	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* ??? - check code at 0x000456 (executed once at startup) */
-	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* ??? - check code at 0x000524 (executed once at startup) */
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP    /* ??? - check code at 0x000456 (executed once at startup) */
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP    /* ??? - check code at 0x000524 (executed once at startup) */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w) /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0xe00000, 0xe007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")		/* bg */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram")	/* mid */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram")	/* fg */
-	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)	/* tilemaps offset control */
-	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* seems another video register. constantly used */
-	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* seems another video register. constantly used */
-	AM_RANGE(0x104010, 0x105fff) AM_WRITENOP	/* unknown */
-	AM_RANGE(0x300000, 0x300001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")       /* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram") /* fg */
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)  /* tilemaps offset control */
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP    /* seems another video register. constantly used */
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP    /* seems another video register. constantly used */
+	AM_RANGE(0x104010, 0x105fff) AM_WRITENOP    /* unknown */
+	AM_RANGE(0x300000, 0x300001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(scmatto_out_w)	/* output port */
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(scmatto_out_w)    /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x801000, 0x80100d) AM_WRITENOP	/* unknown */
-	AM_RANGE(0x8f0000, 0x8f07ff) AM_RAM AM_SHARE("nvram")	/* 16K Dallas DS1220Y-200 NVRAM */
+	AM_RANGE(0x801000, 0x80100d) AM_WRITENOP    /* unknown */
+	AM_RANGE(0x8f0000, 0x8f07ff) AM_RAM AM_SHARE("nvram")   /* 16K Dallas DS1220Y-200 NVRAM */
 	AM_RANGE(0x8fc000, 0x8fffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roulette_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x440000, 0x440fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")			/* bg */
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram")	/* mid */
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram")	/* fg */
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(sderby_videoram_w) AM_SHARE("videoram")           /* bg */
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_SHARE("md_videoram") /* mid */
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_SHARE("fg_videoram") /* fg */
 	AM_RANGE(0x504000, 0x50400b) AM_RAM_WRITE(sderby_scroll_w)
 	AM_RANGE(0x50400e, 0x50400f) AM_WRITENOP
 
 	AM_RANGE(0x708000, 0x708009) AM_READ(roulette_input_r)
 	AM_RANGE(0x708006, 0x708007) AM_WRITE(roulette_out_w)
 	AM_RANGE(0x70800a, 0x70800b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x70800c, 0x70800d) AM_WRITENOP	/* watchdog?? (0x0003) */
-	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(rprot_r, rprot_w)	/* MCU communication */
+	AM_RANGE(0x70800c, 0x70800d) AM_WRITENOP    /* watchdog?? (0x0003) */
+	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(rprot_r, rprot_w) /* MCU communication */
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_SHARE("nvram")
@@ -359,7 +359,7 @@ ADDRESS_MAP_END
 ***************************/
 
 static INPUT_PORTS_START( sderby )
-	PORT_START("IN0")	/* 0x308000.w */
+	PORT_START("IN0")   /* 0x308000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_4WAY
@@ -368,18 +368,18 @@ static INPUT_PORTS_START( sderby )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Collect")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )		// Adds n credits depending on settings in service menu
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )        // Adds n credits depending on settings in service menu
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )		// check code at 0x00765e
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )      // check code at 0x00765e
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( luckboom )
-	PORT_START("IN0")	/* 0x308000.w */
+	PORT_START("IN0")   /* 0x308000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
@@ -399,7 +399,7 @@ static INPUT_PORTS_START( luckboom )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacewin )
-	PORT_START("IN0")	/* 0x308000.w */
+	PORT_START("IN0")   /* 0x308000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -470,10 +470,10 @@ static const gfx_layout tiles16x16_layout =
 	5,
 	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	 128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7
+		128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7
 	},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  64+0*8,64+1*8,64+2*8,64+3*8,64+4*8,64+5*8,64+6*8,64+7*8
+		64+0*8,64+1*8,64+2*8,64+3*8,64+4*8,64+5*8,64+6*8,64+7*8
 	},
 	256,
 };

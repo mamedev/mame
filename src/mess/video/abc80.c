@@ -30,7 +30,7 @@ static const gfx_layout charlayout =
 //-------------------------------------------------
 
 static GFXDECODE_START( abc80 )
-	GFXDECODE_ENTRY( "chargen", 0,	   charlayout, 0, 2 ) // normal characters
+	GFXDECODE_ENTRY( "chargen", 0,     charlayout, 0, 2 ) // normal characters
 	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 2 ) // graphics characters
 GFXDECODE_END
 
@@ -74,14 +74,14 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			/*
 
-                Video RAM Addressing Scheme
+			    Video RAM Addressing Scheme
 
-                A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
-                R2 R1 R0 xx xx xx xx C2 C1 C0
+			    A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+			    R2 R1 R0 xx xx xx xx C2 C1 C0
 
-                A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
+			    A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
 
-            */
+			*/
 
 			int a = (c >> 3) & 0x07;
 			int b = ((r >> 1) & 0x0c) | ((r >> 3) & 0x03);

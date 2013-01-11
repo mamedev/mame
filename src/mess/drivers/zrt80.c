@@ -77,9 +77,9 @@ static ADDRESS_MAP_START(zrt80_mem, AS_PROGRAM, 8, zrt80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // Z25 - Main firmware
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
-	AM_RANGE(0x4000, 0x43ff) AM_RAM	// Board RAM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM // Board RAM
 	// Normally video RAM is 0x800 but could be expanded up to 8K
-	AM_RANGE(0xc000, 0xdfff) AM_RAM	AM_SHARE("videoram") // Video RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram") // Video RAM
 
 ADDRESS_MAP_END
 
@@ -265,15 +265,15 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 /* F4 Character Displayer */
 static const gfx_layout zrt80_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( zrt80 )
@@ -322,4 +322,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, driver_device,    0, "Digital Research Computers", "ZRT-80", 0)
-

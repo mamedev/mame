@@ -11,32 +11,32 @@
 
 
 /*#define TI990_9_ID    0*//* early implementation, used in a few real-world applications, 1974 */
-                          /* very similar to mapper-less 990/10 and tms9900, but the Load process */
-                          /* is different */
-                          /* ("ti990/9" is likely to be a nickname) */
-#define TI990_10_ID		1 /* original multi-chip implementation for minicomputer systems, 1975 */
+							/* very similar to mapper-less 990/10 and tms9900, but the Load process */
+							/* is different */
+							/* ("ti990/9" is likely to be a nickname) */
+#define TI990_10_ID     1 /* original multi-chip implementation for minicomputer systems, 1975 */
 /*#define TI990_12_ID       2*//* multi-chip implementation, faster than 990/10. huge instruction set */
-                          /* (144 instructions, with up to 16 additional custom instructions simulteanously) */
-                          /* 1979 (or before) */
+							/* (144 instructions, with up to 16 additional custom instructions simulteanously) */
+							/* 1979 (or before) */
 #define TMS9900_ID      3 /* mono-chip implementation, 1976 */
 #define TMS9940_ID      4 /* microcontroller with 2kb ROM, 128b RAM, decrementer, CRU bus, 1979 */
 #define TMS9980_ID      5 /* 8-bit variant of tms9900.  Two distinct chips actually : tms9980a, */
-                          /* and tms9981 with an extra clock and simplified power supply */
+							/* and tms9981 with an extra clock and simplified power supply */
 #define TMS9985_ID      6 /* 9940 with 8kb ROM, 256b RAM, and a 8-bit external bus, c. 1978 (never released) */
 #define TMS9989_ID      7 /* improved 9980, used in bombs, missiles, and other *nice* hardware */
 /*#define SBP68689_ID     8*//* improved 9989, built as an ASIC as 9989 was running scarce */
 #define TMS9995_ID      9 /* tms9985-like, with many improvements (but no ROM) */
 #define TMS99000_ID     10/* improved mono-chip implementation, meant to replace 990/10, 1981 */
-                          /* This chip is available in several variants (tms99105, tms99110...), */
-                          /* which are similar but emulate additional instructions thanks */
-                          /* to the so-called macrostore feature. */
-#define TMS99105A_ID	11
-#define TMS99110A_ID	12
+							/* This chip is available in several variants (tms99105, tms99110...), */
+							/* which are similar but emulate additional instructions thanks */
+							/* to the so-called macrostore feature. */
+#define TMS99105A_ID    11
+#define TMS99110A_ID    12
 
 
 /* NPW 25-May-2002 - Added these to get it to compile under windows */
-#define TI9940_ID		TMS9940_ID
-#define TI9985_ID		TMS9985_ID
+#define TI9940_ID       TMS9940_ID
+#define TI9985_ID       TMS9985_ID
 
 
 enum
@@ -63,11 +63,11 @@ DECLARE_LEGACY_CPU_DEVICE(TI990_10L, ti990_10l);
 
 struct ti990_10reset_param
 {
-	ti99xx_idle_func	idle_callback;
-	ti99xx_rset_func	rset_callback;
-	ti99xx_lrex_func	lrex_callback;
-	ti99xx_ckon_ckof_func	ckon_ckof_callback;
-	ti99xx_error_interrupt_func	error_interrupt_callback;
+	ti99xx_idle_func    idle_callback;
+	ti99xx_rset_func    rset_callback;
+	ti99xx_lrex_func    lrex_callback;
+	ti99xx_ckon_ckof_func   ckon_ckof_callback;
+	ti99xx_error_interrupt_func error_interrupt_callback;
 };
 
 /* accessor for the internal ROM */
@@ -89,7 +89,7 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9900L, tms9900l);
 */
 struct tms9900reset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 
@@ -101,7 +101,7 @@ struct tms9900reset_param
 */
 struct tms9940reset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 
@@ -113,7 +113,7 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9980L, tms9980al);
 */
 struct tms9980areset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 
@@ -125,7 +125,7 @@ struct tms9980areset_param
 */
 struct tms9985reset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 
@@ -137,7 +137,7 @@ struct tms9985reset_param
 */
 struct tms9989reset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 
@@ -150,14 +150,14 @@ DECLARE_LEGACY_CPU_DEVICE(TMS9995L, tms9995l);
 struct tms9995reset_param
 {
 	/* auto_wait_state : a non-zero value makes tms9995 generate a wait state automatically on each
-       memory access */
+	   memory access */
 	int auto_wait_state;
 
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 
 	/* on the tms9995-mp9537, internal RAM and decrementer register are
-        disabled.  This chip is used by the ti99/8 so that internal RAM does
-        not prevent the mapper from working correctly. */
+	    disabled.  This chip is used by the ti99/8 so that internal RAM does
+	    not prevent the mapper from working correctly. */
 	int is_mp9537;
 };
 
@@ -177,7 +177,7 @@ extern DECLARE_WRITE8_HANDLER(tms9995_internal2_w);
 */
 struct tms99000reset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 
@@ -189,7 +189,7 @@ struct tms99000reset_param
 */
 struct tms99105areset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 
@@ -201,7 +201,7 @@ struct tms99105areset_param
 */
 struct tms99110areset_param
 {
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 };
 
 

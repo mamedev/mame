@@ -30,22 +30,22 @@ ALLOW_SAVE_TYPE(cosmac_device::cosmac_state);
 //  CONSTANTS
 //**************************************************************************
 
-#define CLOCKS_RESET		8
-#define CLOCKS_INIT			8 // really 9, but needs to be 8 to synchronize cdp1861 video timings
-#define CLOCKS_FETCH		8
-#define CLOCKS_EXECUTE		8
-#define CLOCKS_DMA			8
-#define CLOCKS_INTERRUPT	8
+#define CLOCKS_RESET        8
+#define CLOCKS_INIT         8 // really 9, but needs to be 8 to synchronize cdp1861 video timings
+#define CLOCKS_FETCH        8
+#define CLOCKS_EXECUTE      8
+#define CLOCKS_DMA          8
+#define CLOCKS_INTERRUPT    8
 
 const cosmac_state_code COSMAC_STATE_CODE[] =
 {
-	COSMAC_STATE_CODE_S0_FETCH,		// COSMAC_STATE_0_FETCH
-	COSMAC_STATE_CODE_S1_EXECUTE,	// COSMAC_STATE_1_RESET
-	COSMAC_STATE_CODE_S1_EXECUTE,	// COSMAC_STATE_1_INIT
-	COSMAC_STATE_CODE_S1_EXECUTE,	// COSMAC_STATE_1_EXECUTE
-	COSMAC_STATE_CODE_S2_DMA,		// COSMAC_STATE_2_DMA_IN
-	COSMAC_STATE_CODE_S2_DMA,		// COSMAC_STATE_2_DMA_OUT
-	COSMAC_STATE_CODE_S3_INTERRUPT	// COSMAC_STATE_3_INT
+	COSMAC_STATE_CODE_S0_FETCH,     // COSMAC_STATE_0_FETCH
+	COSMAC_STATE_CODE_S1_EXECUTE,   // COSMAC_STATE_1_RESET
+	COSMAC_STATE_CODE_S1_EXECUTE,   // COSMAC_STATE_1_INIT
+	COSMAC_STATE_CODE_S1_EXECUTE,   // COSMAC_STATE_1_EXECUTE
+	COSMAC_STATE_CODE_S2_DMA,       // COSMAC_STATE_2_DMA_IN
+	COSMAC_STATE_CODE_S2_DMA,       // COSMAC_STATE_2_DMA_OUT
+	COSMAC_STATE_CODE_S3_INTERRUPT  // COSMAC_STATE_3_INT
 };
 
 
@@ -54,28 +54,28 @@ const cosmac_state_code COSMAC_STATE_CODE[] =
 //  MACROS
 //**************************************************************************
 
-#define OPCODE_R(addr)		read_opcode(addr)
-#define RAM_R(addr)			read_byte(addr)
-#define RAM_W(addr, data)	write_byte(addr, data)
-#define IO_R(addr)			read_io_byte(addr)
-#define IO_W(addr, data)	write_io_byte(addr, data)
+#define OPCODE_R(addr)      read_opcode(addr)
+#define RAM_R(addr)         read_byte(addr)
+#define RAM_W(addr, data)   write_byte(addr, data)
+#define IO_R(addr)          read_io_byte(addr)
+#define IO_W(addr, data)    write_io_byte(addr, data)
 
-#define P	m_p
-#define X	m_x
-#define D	m_d
+#define P   m_p
+#define X   m_x
+#define D   m_d
 #define B   m_b
-#define T	m_t
+#define T   m_t
 #define R   m_r
-#define DF	m_df
-#define IE	m_ie
-#define Q	m_q
-#define N	m_n
-#define I	m_i
-#define EF	m_ef
+#define DF  m_df
+#define IE  m_ie
+#define Q   m_q
+#define N   m_n
+#define I   m_i
+#define EF  m_ef
 
-#define GET_FLAGS()				((m_df << 2) | (m_ie << 1) | m_q)
+#define GET_FLAGS()             ((m_df << 2) | (m_ie << 1) | m_q)
 
-#define SET_FLAGS(v)			do { \
+#define SET_FLAGS(v)            do { \
 									m_df = BIT(v, 2); \
 									m_ie = BIT(v, 1); \
 									m_q = BIT(v, 0); \
@@ -89,85 +89,85 @@ const cosmac_state_code COSMAC_STATE_CODE[] =
 
 const cosmac_device::ophandler cosmac_device::s_opcodetable[256] =
 {
-	&cosmac_device::idl,	&cosmac_device::ldn,	&cosmac_device::ldn,	&cosmac_device::ldn,
-	&cosmac_device::ldn,	&cosmac_device::ldn,	&cosmac_device::ldn,	&cosmac_device::ldn,
-	&cosmac_device::ldn,	&cosmac_device::ldn,	&cosmac_device::ldn,	&cosmac_device::ldn,
-	&cosmac_device::ldn,	&cosmac_device::ldn,	&cosmac_device::ldn,	&cosmac_device::ldn,
+	&cosmac_device::idl,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
+	&cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
+	&cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
+	&cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
 
-	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,
-	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,
-	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,
-	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,	&cosmac_device::inc,
+	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
+	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
+	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
+	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
 
-	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,
-	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,
-	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,
-	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,
+	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
+	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
+	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
+	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
 
-	&cosmac_device::br,		&cosmac_device::bq,		&cosmac_device::bz,		&cosmac_device::bdf,
-	&cosmac_device::b,		&cosmac_device::b,		&cosmac_device::b,		&cosmac_device::b,
-	&cosmac_device::nbr,	&cosmac_device::bnq,	&cosmac_device::bnz,	&cosmac_device::bnf,
-	&cosmac_device::bn,		&cosmac_device::bn,		&cosmac_device::bn,		&cosmac_device::bn,
+	&cosmac_device::br,     &cosmac_device::bq,     &cosmac_device::bz,     &cosmac_device::bdf,
+	&cosmac_device::b,      &cosmac_device::b,      &cosmac_device::b,      &cosmac_device::b,
+	&cosmac_device::nbr,    &cosmac_device::bnq,    &cosmac_device::bnz,    &cosmac_device::bnf,
+	&cosmac_device::bn,     &cosmac_device::bn,     &cosmac_device::bn,     &cosmac_device::bn,
 
-	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,
-	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,
-	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,
-	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,
+	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
+	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
+	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
+	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
 
-	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,
-	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,
-	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,
-	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,	&cosmac_device::str,
+	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
+	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
+	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
+	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
 
-	&cosmac_device::irx,	&cosmac_device::out,	&cosmac_device::out,	&cosmac_device::out,
-	&cosmac_device::out,	&cosmac_device::out,	&cosmac_device::out,	&cosmac_device::out,
-	&cosmac_device::inp,	&cosmac_device::inp,	&cosmac_device::inp,	&cosmac_device::inp,
-	&cosmac_device::inp,	&cosmac_device::inp,	&cosmac_device::inp,	&cosmac_device::inp,
+	&cosmac_device::irx,    &cosmac_device::out,    &cosmac_device::out,    &cosmac_device::out,
+	&cosmac_device::out,    &cosmac_device::out,    &cosmac_device::out,    &cosmac_device::out,
+	&cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,
+	&cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,
 
-	&cosmac_device::ret,	&cosmac_device::dis,	&cosmac_device::ldxa,	&cosmac_device::stxd,
-	&cosmac_device::adc,	&cosmac_device::sdb,	&cosmac_device::shrc,	&cosmac_device::smb,
-	&cosmac_device::sav,	&cosmac_device::mark,	&cosmac_device::req,	&cosmac_device::seq,
-	&cosmac_device::adci,	&cosmac_device::sdbi,	&cosmac_device::shlc,	&cosmac_device::smbi,
+	&cosmac_device::ret,    &cosmac_device::dis,    &cosmac_device::ldxa,   &cosmac_device::stxd,
+	&cosmac_device::adc,    &cosmac_device::sdb,    &cosmac_device::shrc,   &cosmac_device::smb,
+	&cosmac_device::sav,    &cosmac_device::mark,   &cosmac_device::req,    &cosmac_device::seq,
+	&cosmac_device::adci,   &cosmac_device::sdbi,   &cosmac_device::shlc,   &cosmac_device::smbi,
 
-	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,
-	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,
-	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,
-	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,	&cosmac_device::glo,
+	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
+	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
+	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
+	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
 
-	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,
-	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,
-	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,
-	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,	&cosmac_device::ghi,
+	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
+	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
+	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
+	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
 
-	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,
-	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,
-	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,
-	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,	&cosmac_device::plo,
+	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
+	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
+	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
+	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
 
-	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,
-	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,
-	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,
-	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,	&cosmac_device::phi,
+	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
+	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
+	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
+	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
 
-	&cosmac_device::lbr,	&cosmac_device::lbq,	&cosmac_device::lbz,	&cosmac_device::lbdf,
-	&cosmac_device::nop,	&cosmac_device::lsnq,	&cosmac_device::lsnz,	&cosmac_device::lsnf,
-	&cosmac_device::nlbr,	&cosmac_device::lbnq,	&cosmac_device::lbnz,	&cosmac_device::lbnf,
-	&cosmac_device::lsie,	&cosmac_device::lsq,	&cosmac_device::lsz,	&cosmac_device::lsdf,
+	&cosmac_device::lbr,    &cosmac_device::lbq,    &cosmac_device::lbz,    &cosmac_device::lbdf,
+	&cosmac_device::nop,    &cosmac_device::lsnq,   &cosmac_device::lsnz,   &cosmac_device::lsnf,
+	&cosmac_device::nlbr,   &cosmac_device::lbnq,   &cosmac_device::lbnz,   &cosmac_device::lbnf,
+	&cosmac_device::lsie,   &cosmac_device::lsq,    &cosmac_device::lsz,    &cosmac_device::lsdf,
 
-	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,
-	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,
-	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,
-	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,	&cosmac_device::sep,
+	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
+	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
+	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
+	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
 
-	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,
-	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,
-	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,
-	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,
+	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
+	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
+	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
+	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
 
-	&cosmac_device::ldx,	&cosmac_device::_or,	&cosmac_device::_and,	&cosmac_device::_xor,
-	&cosmac_device::add,	&cosmac_device::sd,		&cosmac_device::shr,	&cosmac_device::sm,
-	&cosmac_device::ldi,	&cosmac_device::ori,	&cosmac_device::ani,	&cosmac_device::xri,
-	&cosmac_device::adi,	&cosmac_device::sdi,	&cosmac_device::shl,	&cosmac_device::smi
+	&cosmac_device::ldx,    &cosmac_device::_or,    &cosmac_device::_and,   &cosmac_device::_xor,
+	&cosmac_device::add,    &cosmac_device::sd,     &cosmac_device::shr,    &cosmac_device::sm,
+	&cosmac_device::ldi,    &cosmac_device::ori,    &cosmac_device::ani,    &cosmac_device::xri,
+	&cosmac_device::adi,    &cosmac_device::sdi,    &cosmac_device::shl,    &cosmac_device::smi
 };
 
 
@@ -186,17 +186,17 @@ const device_type COSMAC = &device_creator<cosmac_device>;
 
 cosmac_device::cosmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, COSMAC, "COSMAC", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
-	  m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
-	  m_op(0),
-	  m_state(COSMAC_STATE_1_RESET),
-	  m_mode(COSMAC_MODE_RESET),
-	  m_irq(0),
-	  m_dmain(0),
-	  m_dmaout(0),
-	  m_program(NULL),
-	  m_io(NULL),
-	  m_direct(NULL)
+		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
+		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
+		m_op(0),
+		m_state(COSMAC_STATE_1_RESET),
+		m_mode(COSMAC_MODE_RESET),
+		m_irq(0),
+		m_dmain(0),
+		m_dmaout(0),
+		m_program(NULL),
+		m_io(NULL),
+		m_direct(NULL)
 {
 	for (int i = 0; i < 4; i++)
 		EF[i] = CLEAR_LINE;
@@ -236,25 +236,25 @@ void cosmac_device::device_start()
 	m_io = &space(AS_IO);
 
 	// register our state for the debugger
-	state_add(STATE_GENPC,		"GENPC",		m_pc).callimport().callexport().noshow();
-	state_add(STATE_GENFLAGS,	"GENFLAGS",		m_flagsio).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
+	state_add(STATE_GENPC,      "GENPC",        m_pc).callimport().callexport().noshow();
+	state_add(STATE_GENFLAGS,   "GENFLAGS",     m_flagsio).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
 
-	state_add(COSMAC_P,		"P",	m_p).mask(0xf);
-	state_add(COSMAC_X,		"X",	m_x).mask(0xf);
-	state_add(COSMAC_D,		"D",	m_d);
-	state_add(COSMAC_B,		"B",	m_b);
-	state_add(COSMAC_T,		"T",	m_t);
+	state_add(COSMAC_P,     "P",    m_p).mask(0xf);
+	state_add(COSMAC_X,     "X",    m_x).mask(0xf);
+	state_add(COSMAC_D,     "D",    m_d);
+	state_add(COSMAC_B,     "B",    m_b);
+	state_add(COSMAC_T,     "T",    m_t);
 
-	state_add(COSMAC_I,		"I",	m_i).mask(0xf);
-	state_add(COSMAC_N,		"N",	m_n).mask(0xf);
+	state_add(COSMAC_I,     "I",    m_i).mask(0xf);
+	state_add(COSMAC_N,     "N",    m_n).mask(0xf);
 
 	astring tempstr;
 	for (int regnum = 0; regnum < 16; regnum++)
 		state_add(COSMAC_R0 + regnum, tempstr.format("R%x", regnum), m_r[regnum]);
 
-	state_add(COSMAC_DF,	"DF",	m_df).mask(0x1).noshow();
-	state_add(COSMAC_IE,	"IE",	m_ie).mask(0x1).noshow();
-	state_add(COSMAC_Q,		"Q",	m_q).mask(0x1).noshow();
+	state_add(COSMAC_DF,    "DF",   m_df).mask(0x1).noshow();
+	state_add(COSMAC_IE,    "IE",   m_ie).mask(0x1).noshow();
+	state_add(COSMAC_Q,     "Q",    m_q).mask(0x1).noshow();
 
 	// resolve callbacks
 	m_in_wait_func.resolve(m_in_wait_cb, *this);
@@ -264,8 +264,8 @@ void cosmac_device::device_start()
 	m_in_ef_func[2].resolve(m_in_ef3_cb, *this);
 	m_in_ef_func[3].resolve(m_in_ef4_cb, *this);
 	m_out_q_func.resolve(m_out_q_cb, *this);
-    m_in_dma_func.resolve(m_in_dma_cb, *this);
-    m_out_dma_func.resolve(m_out_dma_cb, *this);
+	m_in_dma_func.resolve(m_in_dma_cb, *this);
+	m_out_dma_func.resolve(m_out_dma_cb, *this);
 	m_out_sc_func = m_out_sc_cb;
 	m_out_tpa_func.resolve(m_out_tpa_cb, *this);
 	m_out_tpb_func.resolve(m_out_tpb_cb, *this);
@@ -849,28 +849,28 @@ inline void cosmac_device::dma_input()
 
 	R[0]++;
 
-    m_icount -= CLOCKS_DMA;
+	m_icount -= CLOCKS_DMA;
 
-    if (m_dmain)
-    {
-        m_state = COSMAC_STATE_2_DMA_IN;
-    }
-    else if (m_dmaout)
-    {
-        m_state = COSMAC_STATE_2_DMA_OUT;
-    }
-    else if (IE && m_irq)
-    {
-        m_state = COSMAC_STATE_3_INT;
-    }
-    else if (m_mode == COSMAC_MODE_LOAD)
-    {
-        m_state = COSMAC_STATE_1_EXECUTE;
-    }
-    else
-    {
-        m_state = COSMAC_STATE_0_FETCH;
-    }
+	if (m_dmain)
+	{
+		m_state = COSMAC_STATE_2_DMA_IN;
+	}
+	else if (m_dmaout)
+	{
+		m_state = COSMAC_STATE_2_DMA_OUT;
+	}
+	else if (IE && m_irq)
+	{
+		m_state = COSMAC_STATE_3_INT;
+	}
+	else if (m_mode == COSMAC_MODE_LOAD)
+	{
+		m_state = COSMAC_STATE_1_EXECUTE;
+	}
+	else
+	{
+		m_state = COSMAC_STATE_0_FETCH;
+	}
 
 	standard_irq_callback(COSMAC_INPUT_LINE_DMAIN);
 }
@@ -886,24 +886,24 @@ inline void cosmac_device::dma_output()
 
 	R[0]++;
 
-    m_icount -= CLOCKS_DMA;
+	m_icount -= CLOCKS_DMA;
 
-    if (m_dmain)
-    {
-        m_state = COSMAC_STATE_2_DMA_IN;
-    }
-    else if (m_dmaout)
-    {
-        m_state = COSMAC_STATE_2_DMA_OUT;
-    }
-    else if (IE && m_irq)
-    {
-        m_state = COSMAC_STATE_3_INT;
-    }
-    else
-    {
-        m_state = COSMAC_STATE_0_FETCH;
-    }
+	if (m_dmain)
+	{
+		m_state = COSMAC_STATE_2_DMA_IN;
+	}
+	else if (m_dmaout)
+	{
+		m_state = COSMAC_STATE_2_DMA_OUT;
+	}
+	else if (IE && m_irq)
+	{
+		m_state = COSMAC_STATE_3_INT;
+	}
+	else
+	{
+		m_state = COSMAC_STATE_0_FETCH;
+	}
 
 	standard_irq_callback(COSMAC_INPUT_LINE_DMAOUT);
 }
@@ -945,34 +945,34 @@ inline void cosmac_device::interrupt()
 //**************************************************************************
 
 // memory reference opcode handlers
-void cosmac_device::ldn()	{ D = RAM_R(R[N]); }
-void cosmac_device::lda()	{ D = RAM_R(R[N]); R[N]++; }
-void cosmac_device::ldx()	{ D = RAM_R(R[X]); }
-void cosmac_device::ldxa()	{ D = RAM_R(R[X]); R[X]++; }
-void cosmac_device::ldi()	{ D = RAM_R(R[P]); R[P]++; }
-void cosmac_device::str()	{ RAM_W(R[N], D); }
-void cosmac_device::stxd()	{ RAM_W(R[X], D); R[X]--; }
+void cosmac_device::ldn()   { D = RAM_R(R[N]); }
+void cosmac_device::lda()   { D = RAM_R(R[N]); R[N]++; }
+void cosmac_device::ldx()   { D = RAM_R(R[X]); }
+void cosmac_device::ldxa()  { D = RAM_R(R[X]); R[X]++; }
+void cosmac_device::ldi()   { D = RAM_R(R[P]); R[P]++; }
+void cosmac_device::str()   { RAM_W(R[N], D); }
+void cosmac_device::stxd()  { RAM_W(R[X], D); R[X]--; }
 
 // register operations opcode handlers
-void cosmac_device::inc()	{ R[N]++; }
-void cosmac_device::dec()	{ R[N]--; }
-void cosmac_device::irx()	{ R[X]++; }
-void cosmac_device::glo()	{ D = R[N] & 0xff; }
-void cosmac_device::plo()	{ R[N] = (R[N] & 0xff00) | D; }
-void cosmac_device::ghi()	{ D = R[N] >> 8; }
-void cosmac_device::phi()	{ R[N] = (D << 8) | (R[N] & 0xff); }
+void cosmac_device::inc()   { R[N]++; }
+void cosmac_device::dec()   { R[N]--; }
+void cosmac_device::irx()   { R[X]++; }
+void cosmac_device::glo()   { D = R[N] & 0xff; }
+void cosmac_device::plo()   { R[N] = (R[N] & 0xff00) | D; }
+void cosmac_device::ghi()   { D = R[N] >> 8; }
+void cosmac_device::phi()   { R[N] = (D << 8) | (R[N] & 0xff); }
 
 // logic operations opcode handlers
-void cosmac_device::_or()	{ D = RAM_R(R[X]) | D; }
-void cosmac_device::ori()	{ D = RAM_R(R[P]) | D; R[P]++; }
-void cosmac_device::_xor()	{ D = RAM_R(R[X]) ^ D; }
-void cosmac_device::xri()	{ D = RAM_R(R[P]) ^ D; R[P]++; }
-void cosmac_device::_and()	{ D = RAM_R(R[X]) & D; }
-void cosmac_device::ani()	{ D = RAM_R(R[P]) & D; R[P]++; }
-void cosmac_device::shr()	{ DF = BIT(D, 0); D >>= 1; }
-void cosmac_device::shrc()	{ int b = DF; DF = BIT(D, 0); D >>= 1; D |= b << 7; }
-void cosmac_device::shl()	{ DF = BIT(D, 7); D <<= 1; }
-void cosmac_device::shlc()	{ int b = DF; DF = BIT(D, 7); D <<= 1; D |= b; }
+void cosmac_device::_or()   { D = RAM_R(R[X]) | D; }
+void cosmac_device::ori()   { D = RAM_R(R[P]) | D; R[P]++; }
+void cosmac_device::_xor()  { D = RAM_R(R[X]) ^ D; }
+void cosmac_device::xri()   { D = RAM_R(R[P]) ^ D; R[P]++; }
+void cosmac_device::_and()  { D = RAM_R(R[X]) & D; }
+void cosmac_device::ani()   { D = RAM_R(R[P]) & D; R[P]++; }
+void cosmac_device::shr()   { DF = BIT(D, 0); D >>= 1; }
+void cosmac_device::shrc()  { int b = DF; DF = BIT(D, 0); D >>= 1; D |= b << 7; }
+void cosmac_device::shl()   { DF = BIT(D, 7); D <<= 1; }
+void cosmac_device::shlc()  { int b = DF; DF = BIT(D, 7); D <<= 1; D |= b; }
 
 // arithmetic operations opcode handlers
 void cosmac_device::add(int left, int right)
@@ -1007,18 +1007,18 @@ void cosmac_device::subtract_with_borrow(int left, int right)
 	DF = result > 0xff;
 }
 
-void cosmac_device::add()	{ add(RAM_R(R[X]), D); }
-void cosmac_device::adi()	{ add(RAM_R(R[P]), D); R[P]++; }
-void cosmac_device::adc()	{ add_with_carry(RAM_R(R[X]), D); }
-void cosmac_device::adci()	{ add_with_carry(RAM_R(R[P]), D); R[P]++; }
-void cosmac_device::sd()	{ subtract(RAM_R(R[X]), D); }
-void cosmac_device::sdi()	{ subtract(RAM_R(R[P]), D); R[P]++; }
-void cosmac_device::sdb()	{ subtract_with_borrow(RAM_R(R[X]), D); }
-void cosmac_device::sdbi()	{ subtract_with_borrow(RAM_R(R[P]), D); R[P]++; }
-void cosmac_device::sm()	{ subtract(D, RAM_R(R[X])); }
-void cosmac_device::smi()	{ subtract(D, RAM_R(R[P])); R[P]++; }
-void cosmac_device::smb()	{ subtract_with_borrow(D, RAM_R(R[X])); }
-void cosmac_device::smbi()	{ subtract_with_borrow(D, RAM_R(R[P])); R[P]++; }
+void cosmac_device::add()   { add(RAM_R(R[X]), D); }
+void cosmac_device::adi()   { add(RAM_R(R[P]), D); R[P]++; }
+void cosmac_device::adc()   { add_with_carry(RAM_R(R[X]), D); }
+void cosmac_device::adci()  { add_with_carry(RAM_R(R[P]), D); R[P]++; }
+void cosmac_device::sd()    { subtract(RAM_R(R[X]), D); }
+void cosmac_device::sdi()   { subtract(RAM_R(R[P]), D); R[P]++; }
+void cosmac_device::sdb()   { subtract_with_borrow(RAM_R(R[X]), D); }
+void cosmac_device::sdbi()  { subtract_with_borrow(RAM_R(R[P]), D); R[P]++; }
+void cosmac_device::sm()    { subtract(D, RAM_R(R[X])); }
+void cosmac_device::smi()   { subtract(D, RAM_R(R[P])); R[P]++; }
+void cosmac_device::smb()   { subtract_with_borrow(D, RAM_R(R[X])); }
+void cosmac_device::smbi()  { subtract_with_borrow(D, RAM_R(R[P])); R[P]++; }
 
 // short branch instructions opcode handlers
 void cosmac_device::short_branch(int taken)
@@ -1033,16 +1033,16 @@ void cosmac_device::short_branch(int taken)
 	}
 }
 
-void cosmac_device::br()	{ short_branch(1); }
-void cosmac_device::nbr()	{ short_branch(0); }
-void cosmac_device::bz()	{ short_branch(D == 0); }
-void cosmac_device::bnz()	{ short_branch(D != 0); }
-void cosmac_device::bdf()	{ short_branch(DF); }
-void cosmac_device::bnf()	{ short_branch(!DF); }
-void cosmac_device::bq()	{ short_branch(Q); }
-void cosmac_device::bnq()	{ short_branch(!Q); }
-void cosmac_device::b()		{ short_branch(EF[N & 0x03]); }
-void cosmac_device::bn()	{ short_branch(!EF[N & 0x03]); }
+void cosmac_device::br()    { short_branch(1); }
+void cosmac_device::nbr()   { short_branch(0); }
+void cosmac_device::bz()    { short_branch(D == 0); }
+void cosmac_device::bnz()   { short_branch(D != 0); }
+void cosmac_device::bdf()   { short_branch(DF); }
+void cosmac_device::bnf()   { short_branch(!DF); }
+void cosmac_device::bq()    { short_branch(Q); }
+void cosmac_device::bnq()   { short_branch(!Q); }
+void cosmac_device::b()     { short_branch(EF[N & 0x03]); }
+void cosmac_device::bn()    { short_branch(!EF[N & 0x03]); }
 
 // long branch instructions opcode handlers
 void cosmac_device::long_branch(int taken)
@@ -1067,14 +1067,14 @@ void cosmac_device::long_branch(int taken)
 	m_icount -= CLOCKS_EXECUTE;
 }
 
-void cosmac_device::lbr()	{ long_branch(1); }
-void cosmac_device::nlbr()	{ long_skip(1); }
-void cosmac_device::lbz()	{ long_branch(D == 0); }
-void cosmac_device::lbnz()	{ long_branch(D != 0); }
-void cosmac_device::lbdf()	{ long_branch(DF); }
-void cosmac_device::lbnf()	{ long_branch(!DF); }
-void cosmac_device::lbq()	{ long_branch(Q); }
-void cosmac_device::lbnq()	{ long_branch(!Q); }
+void cosmac_device::lbr()   { long_branch(1); }
+void cosmac_device::nlbr()  { long_skip(1); }
+void cosmac_device::lbz()   { long_branch(D == 0); }
+void cosmac_device::lbnz()  { long_branch(D != 0); }
+void cosmac_device::lbdf()  { long_branch(DF); }
+void cosmac_device::lbnf()  { long_branch(!DF); }
+void cosmac_device::lbq()   { long_branch(Q); }
+void cosmac_device::lbnq()  { long_branch(!Q); }
 
 // skip instructions opcode handlers
 void cosmac_device::long_skip(int taken)
@@ -1091,22 +1091,22 @@ void cosmac_device::long_skip(int taken)
 	m_icount -= CLOCKS_EXECUTE;
 }
 
-void cosmac_device::lsz()	{ long_skip(D == 0); }
-void cosmac_device::lsnz()	{ long_skip(D != 0); }
-void cosmac_device::lsdf()	{ long_skip(DF); }
-void cosmac_device::lsnf()	{ long_skip(!DF); }
-void cosmac_device::lsq()	{ long_skip(Q); }
-void cosmac_device::lsnq()	{ long_skip(!Q); }
-void cosmac_device::lsie()	{ long_skip(IE); }
+void cosmac_device::lsz()   { long_skip(D == 0); }
+void cosmac_device::lsnz()  { long_skip(D != 0); }
+void cosmac_device::lsdf()  { long_skip(DF); }
+void cosmac_device::lsnf()  { long_skip(!DF); }
+void cosmac_device::lsq()   { long_skip(Q); }
+void cosmac_device::lsnq()  { long_skip(!Q); }
+void cosmac_device::lsie()  { long_skip(IE); }
 
 // control instructions opcode handlers
-void cosmac_device::idl()	{ /* idle */ }
-void cosmac_device::nop()	{ m_icount -= CLOCKS_EXECUTE; }
-void cosmac_device::sep()	{ P = N; }
-void cosmac_device::sex()	{ X = N; }
-void cosmac_device::seq()	{ set_q_flag(1); }
-void cosmac_device::req()	{ set_q_flag(0); }
-void cosmac_device::sav()	{ RAM_W(R[X], T); }
+void cosmac_device::idl()   { /* idle */ }
+void cosmac_device::nop()   { m_icount -= CLOCKS_EXECUTE; }
+void cosmac_device::sep()   { P = N; }
+void cosmac_device::sex()   { X = N; }
+void cosmac_device::seq()   { set_q_flag(1); }
+void cosmac_device::req()   { set_q_flag(0); }
+void cosmac_device::sav()   { RAM_W(R[X], T); }
 
 void cosmac_device::mark()
 {
@@ -1125,11 +1125,11 @@ void cosmac_device::return_from_interrupt(int ie)
 	IE = ie;
 }
 
-void cosmac_device::ret()	{ return_from_interrupt(1); }
-void cosmac_device::dis()	{ return_from_interrupt(0); }
+void cosmac_device::ret()   { return_from_interrupt(1); }
+void cosmac_device::dis()   { return_from_interrupt(0); }
 
 // input/output byte transfer opcode handlers
-void cosmac_device::out()	{ IO_W(N, RAM_R(R[X])); R[X]++; }
+void cosmac_device::out()   { IO_W(N, RAM_R(R[X])); R[X]++; }
 
 /*
 
@@ -1149,4 +1149,4 @@ void cosmac_device::out()	{ IO_W(N, RAM_R(R[X])); R[X]++; }
     http://www.ittybittycomputers.com/IttyBitty/ShortCor.htm
 
 */
-void cosmac_device::inp()	{ D = IO_R(N & 0x07); RAM_W(R[X], D); }
+void cosmac_device::inp()   { D = IO_R(N & 0x07); RAM_W(R[X], D); }

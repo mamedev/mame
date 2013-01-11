@@ -18,18 +18,18 @@ void sprint2_state::palette_init()
 	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0xa4, 0xa4, 0xa4));
 	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0xff, 0xff, 0xff));
 
-	colortable_entry_set_value(machine().colortable, 0x0, 1);	/* black playfield */
+	colortable_entry_set_value(machine().colortable, 0x0, 1);   /* black playfield */
 	colortable_entry_set_value(machine().colortable, 0x1, 0);
-	colortable_entry_set_value(machine().colortable, 0x2, 1);	/* white playfield */
+	colortable_entry_set_value(machine().colortable, 0x2, 1);   /* white playfield */
 	colortable_entry_set_value(machine().colortable, 0x3, 3);
 
-	colortable_entry_set_value(machine().colortable, 0x4, 1);	/* car #1 */
+	colortable_entry_set_value(machine().colortable, 0x4, 1);   /* car #1 */
 	colortable_entry_set_value(machine().colortable, 0x5, 3);
-	colortable_entry_set_value(machine().colortable, 0x6, 1);	/* car #2 */
+	colortable_entry_set_value(machine().colortable, 0x6, 1);   /* car #2 */
 	colortable_entry_set_value(machine().colortable, 0x7, 0);
-	colortable_entry_set_value(machine().colortable, 0x8, 1);	/* car #3 */
+	colortable_entry_set_value(machine().colortable, 0x8, 1);   /* car #3 */
 	colortable_entry_set_value(machine().colortable, 0x9, 2);
-	colortable_entry_set_value(machine().colortable, 0xa, 1);	/* car #4 */
+	colortable_entry_set_value(machine().colortable, 0xa, 1);   /* car #4 */
 	colortable_entry_set_value(machine().colortable, 0xb, 2);
 }
 
@@ -147,12 +147,12 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 		const rectangle &visarea = machine().primary_screen->visible_area();
 
 		/*
-         * Collisions are detected for both player cars:
-         *
-         * D7 => m_collision w/ white playfield
-         * D6 => m_collision w/ black playfield or another car
-         *
-         */
+		 * Collisions are detected for both player cars:
+		 *
+		 * D7 => m_collision w/ white playfield
+		 * D6 => m_collision w/ black playfield or another car
+		 *
+		 */
 
 		for (i = 0; i < 2; i++)
 		{

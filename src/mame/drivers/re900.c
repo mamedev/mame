@@ -70,9 +70,9 @@
 ***********************************************************************************/
 
 
-#define MAIN_CLOCK		XTAL_11_0592MHz
-#define VDP_CLOCK		XTAL_10_730MHz
-#define TMS_CLOCK		VDP_CLOCK / 24
+#define MAIN_CLOCK      XTAL_11_0592MHz
+#define VDP_CLOCK       XTAL_10_730MHz
+#define TMS_CLOCK       VDP_CLOCK / 24
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
@@ -116,12 +116,12 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 {
 	if ((machine().root_device().ioport("IN0")->read() & 0x01) == 0)
 	{
-		output_set_lamp_value(0,1);		// Operator Key ON
+		output_set_lamp_value(0,1);     // Operator Key ON
 	}
 
 	else
 	{
-		output_set_lamp_value(0,0);		// Operator Key OFF
+		output_set_lamp_value(0,0);     // Operator Key OFF
 	}
 
 	return machine().root_device().ioport("IN0")->read();
@@ -413,7 +413,7 @@ static MACHINE_CONFIG_START( re900, re900_state )
 	MCFG_CPU_IO_MAP(mem_io)
 
 	/* video hardware */
-	MCFG_TMS9928A_ADD( "tms9128", TMS9128, re900_tms9928a_interface )	/* TMS9128NL on pcb */
+	MCFG_TMS9928A_ADD( "tms9128", TMS9128, re900_tms9928a_interface )   /* TMS9128NL on pcb */
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9128", tms9128_device, screen_update )
 

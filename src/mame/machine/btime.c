@@ -34,7 +34,7 @@ WRITE8_MEMBER(btime_state::mmonkey_protection_w)
 
 			switch (m_protection_command)
 			{
-			case 0:	/* score addition */
+			case 0: /* score addition */
 
 				s1 = (1 * (RAM[BASE + 0x0d00] & 0x0f)) + (10 * (RAM[BASE + 0x0d00] >> 4)) +
 					(100 * (RAM[BASE + 0x0d01] & 0x0f)) + (1000 * (RAM[BASE + 0x0d01] >> 4)) +
@@ -55,7 +55,7 @@ WRITE8_MEMBER(btime_state::mmonkey_protection_w)
 
 				break;
 
-			case 1:	/* decryption */
+			case 1: /* decryption */
 
 				/* Compute return value by searching the decryption table. */
 				/* During the search the status should be 2, but we're done */
@@ -89,4 +89,3 @@ WRITE8_MEMBER(btime_state::mmonkey_protection_w)
 	else
 		logerror("Unknown protection write=%02X.  PC=%04X  Offset=%04X\n", data, space.device().safe_pc(), offset);
 }
-

@@ -4,7 +4,7 @@
 
 <softwarelist name="apple2" description="Apple II 5.25 disks">
 
-    <software name="4080trkd">
+	<software name="4080trkd">
 		<description>40 and 80 Track DOS</description>
 		<year>1980</year>
 		<publisher>Sympathetic Software</publisher>

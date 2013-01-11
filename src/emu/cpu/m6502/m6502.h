@@ -102,32 +102,32 @@ protected:
 
 	enum {
 		DASM_non,    /* no additional arguments */
-        DASM_aba,    /* absolute */
-        DASM_abx,    /* absolute + X */
-        DASM_aby,    /* absolute + Y */
-        DASM_acc,    /* accumulator */
-        DASM_adr,    /* absolute address (jmp,jsr) */
-        DASM_bzp,    /* zero page with bit selection */
-        DASM_iax,    /* indirect + X (65c02 jmp) */
-        DASM_idx,    /* zero page pre indexed */
-        DASM_idy,    /* zero page post indexed */
-        DASM_idz,    /* zero page post indexed (65ce02) */
-        DASM_imm,    /* immediate */
-        DASM_imp,    /* implicit */
-        DASM_ind,    /* indirect (jmp) */
-        DASM_isy,    /* zero page pre indexed sp and post indexed Y (65ce02) */
-        DASM_iw2,    /* immediate word (65ce02) */
-        DASM_iw3,    /* augment (65ce02) */
-        DASM_rel,    /* relative */
-        DASM_rw2,    /* relative word (65cs02, 65ce02) */
-        DASM_zpb,    /* zero page and branch (65c02 bbr, bbs) */
-        DASM_zpg,    /* zero page */
-        DASM_zpi,    /* zero page indirect (65c02) */
-        DASM_zpx,    /* zero page + X */
-        DASM_zpy,    /* zero page + Y */
-		DASM_imz,	 /* load immediate byte, store to zero page address (M740) */
-		DASM_spg,	 /* "special page": implied FF00 plus immediate value (M740)*/
-		DASM_biz	 /* bit, zero page (M740) */
+		DASM_aba,    /* absolute */
+		DASM_abx,    /* absolute + X */
+		DASM_aby,    /* absolute + Y */
+		DASM_acc,    /* accumulator */
+		DASM_adr,    /* absolute address (jmp,jsr) */
+		DASM_bzp,    /* zero page with bit selection */
+		DASM_iax,    /* indirect + X (65c02 jmp) */
+		DASM_idx,    /* zero page pre indexed */
+		DASM_idy,    /* zero page post indexed */
+		DASM_idz,    /* zero page post indexed (65ce02) */
+		DASM_imm,    /* immediate */
+		DASM_imp,    /* implicit */
+		DASM_ind,    /* indirect (jmp) */
+		DASM_isy,    /* zero page pre indexed sp and post indexed Y (65ce02) */
+		DASM_iw2,    /* immediate word (65ce02) */
+		DASM_iw3,    /* augment (65ce02) */
+		DASM_rel,    /* relative */
+		DASM_rw2,    /* relative word (65cs02, 65ce02) */
+		DASM_zpb,    /* zero page and branch (65c02 bbr, bbs) */
+		DASM_zpg,    /* zero page */
+		DASM_zpi,    /* zero page indirect (65c02) */
+		DASM_zpx,    /* zero page + X */
+		DASM_zpy,    /* zero page + Y */
+		DASM_imz,    /* load immediate byte, store to zero page address (M740) */
+		DASM_spg,    /* "special page": implied FF00 plus immediate value (M740)*/
+		DASM_biz     /* bit, zero page (M740) */
 	};
 
 	enum {

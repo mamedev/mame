@@ -40,9 +40,9 @@ protected:
 
 private:
 
-	required_device<upd765a_device>	m_fdc;
-	UINT8 *		m_rom;
-	bool		m_rom_enabled;
+	required_device<upd765a_device> m_fdc;
+	UINT8 *     m_rom;
+	bool        m_rom_enabled;
 };
 
 

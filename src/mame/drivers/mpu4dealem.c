@@ -22,7 +22,7 @@ class mpu4dealem_state : public mpu4_state
 public:
 	mpu4dealem_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag),
-		  m_dealem_videoram(*this, "dealem_videoram")
+			m_dealem_videoram(*this, "dealem_videoram")
 	{
 
 	}
@@ -83,10 +83,10 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	1000,	0,
-			3,	resistances_rg,	weights_g,	1000,	0,
-			2,	resistances_b,	weights_b,	1000,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rg, weights_r,  1000,   0,
+			3,  resistances_rg, weights_g,  1000,   0,
+			2,  resistances_b,  weights_b,  1000,   0);
 
 	len = machine().root_device().memregion("proms")->bytes();
 	for (i = 0; i < len; i++)
@@ -147,16 +147,16 @@ WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
 
 static const mc6845_interface hd6845_intf =
 {
-	"screen",							/* screen we are acting on */
-	8,									/* number of pixels per video memory address */
-	NULL,								/* before pixel update callback */
-	NULL,								/* row update callback */
-	NULL,								/* after pixel update callback */
-	DEVCB_NULL,							/* callback for display state changes */
-	DEVCB_NULL,							/* callback for cursor state changes */
-	DEVCB_NULL,							/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4dealem_state, dealem_vsync_changed),	/* VSYNC callback */
-	NULL								/* update address callback */
+	"screen",                           /* screen we are acting on */
+	8,                                  /* number of pixels per video memory address */
+	NULL,                               /* before pixel update callback */
+	NULL,                               /* row update callback */
+	NULL,                               /* after pixel update callback */
+	DEVCB_NULL,                         /* callback for display state changes */
+	DEVCB_NULL,                         /* callback for cursor state changes */
+	DEVCB_NULL,                         /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(mpu4dealem_state, dealem_vsync_changed),   /* VSYNC callback */
+	NULL                                /* update address callback */
 };
 
 
@@ -170,15 +170,15 @@ static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8, mpu4dealem_state )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)        /* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)        /* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)        /* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)        /* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)        /* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)        /* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_SHARE("dealem_videoram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP/* 64k  paged ROM (4 pages) */
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP/* 64k  paged ROM (4 pages) */
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
@@ -200,13 +200,13 @@ MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 
 	m_prot_col  = 0;
 	m_chr_counter    = 0;
-	m_chr_value		= 0;
+	m_chr_value     = 0;
 }
 
 
 /* machine driver for Zenitone Deal 'Em board */
 static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
-	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)							/* main mpu4 board initialisation */
+	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)                          /* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
 
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
@@ -223,9 +223,9 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
-	MCFG_SCREEN_REFRESH_RATE(56)							/* Measured accurately from the flip-flop, but 6845 handles this */
+	MCFG_SCREEN_SIZE((54+1)*8, (32+1)*8)                    /* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)      /* Taken from 6845 init, registers 01 & 06 */
+	MCFG_SCREEN_REFRESH_RATE(56)                            /* Measured accurately from the flip-flop, but 6845 handles this */
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 
 	MCFG_GFXDECODE(dealem)
@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT_OVERRIDE(mpu4dealem_state,dealem)
 
-	MCFG_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf)	/* HD68B45 */
+	MCFG_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf) /* HD68B45 */
 MACHINE_CONFIG_END
 
 
@@ -369,16 +369,16 @@ INPUT_PORTS_END
 
 ROM_START( v4dealem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "zenndlem.u6",	0x8000, 0x8000,  CRC(571e5c05) SHA1(89b4c331407a04eae34bb187b036791e0a671533) )
+	ROM_LOAD( "zenndlem.u6",    0x8000, 0x8000,  CRC(571e5c05) SHA1(89b4c331407a04eae34bb187b036791e0a671533) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "zenndlem.u24",	0x0000, 0x10000, CRC(3a1950c4) SHA1(7138346d4e8b3cffbd9751b4d7ebd367b9ad8da9) )    /* text layer */
+	ROM_LOAD( "zenndlem.u24",   0x0000, 0x10000, CRC(3a1950c4) SHA1(7138346d4e8b3cffbd9751b4d7ebd367b9ad8da9) )    /* text layer */
 
 	ROM_REGION( 0x020, "proms", 0 )
-	ROM_LOAD( "zenndlem.u22",	0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) )
+	ROM_LOAD( "zenndlem.u22",   0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) )
 
 	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "zenndlem.u10",	0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
+	ROM_LOAD( "zenndlem.u10",   0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
 ROM_END
 
 /*Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
@@ -386,4 +386,4 @@ and reel assembly with this kit and a supplied monitor. This explains why the ca
 The original Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 Two further different releases were made, running on the Barcrest MPU4 Video, rather than this one. These are Deal 'Em Again and Deal 'Em 2000*/
 
-GAME(  1987,v4dealem,	0,			dealem,		dealem, driver_device,		0,			ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",GAME_IMPERFECT_GRAPHICS )
+GAME(  1987,v4dealem,   0,          dealem,     dealem, driver_device,      0,          ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",GAME_IMPERFECT_GRAPHICS )

@@ -16,17 +16,17 @@ static struct
 {
 	UINT16 control[0x40/2];
 	/**
-     * [0x1] 0x02/2 tilemap#0.scrollx
-     * [0x3] 0x06/2 tilemap#0.scrolly
-     * [0x5] 0x0a/2 tilemap#1.scrollx
-     * [0x7] 0x0e/2 tilemap#1.scrolly
-     * [0x9] 0x12/2 tilemap#2.scrollx
-     * [0xb] 0x16/2 tilemap#2.scrolly
-     * [0xd] 0x1a/2 tilemap#3.scrollx
-     * [0xf] 0x1e/2 tilemap#3.scrolly
-     * 0x20/2 priority
-     * 0x30/2 color
-     */
+	 * [0x1] 0x02/2 tilemap#0.scrollx
+	 * [0x3] 0x06/2 tilemap#0.scrolly
+	 * [0x5] 0x0a/2 tilemap#1.scrollx
+	 * [0x7] 0x0e/2 tilemap#1.scrolly
+	 * [0x9] 0x12/2 tilemap#2.scrollx
+	 * [0xb] 0x16/2 tilemap#2.scrolly
+	 * [0xd] 0x1a/2 tilemap#3.scrollx
+	 * [0xf] 0x1e/2 tilemap#3.scrolly
+	 * 0x20/2 priority
+	 * 0x30/2 color
+	 */
 	tilemap_t *tmap[6];
 	UINT16 *videoram;
 	int gfxbank;
@@ -433,26 +433,26 @@ namcos2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 	for( loop=0; loop < 128; loop++ )
 	{
 		/****************************************
-        * word#0
-        *   Sprite Y position           D00-D08
-        *   Sprite Size 16/32           D09
-        *   Sprite Size Y               D10-D15
-        *
-        * word#1
-        *   Sprite Quadrant             D00-D01
-        *   Sprite Number               D02-D12
-        *   Sprite ROM Bank select      D13
-        *   Sprite flip X               D14
-        *   Sprite flip Y               D15
-        *
-        * word#2
-        *   Sprite X position           D00-D10
-        *
-        * word#3
-        *   Sprite priority             D00-D02
-        *   Sprite colour index         D04-D07
-        *   Sprite Size X               D10-D15
-        */
+		* word#0
+		*   Sprite Y position           D00-D08
+		*   Sprite Size 16/32           D09
+		*   Sprite Size Y               D10-D15
+		*
+		* word#1
+		*   Sprite Quadrant             D00-D01
+		*   Sprite Number               D02-D12
+		*   Sprite ROM Bank select      D13
+		*   Sprite flip X               D14
+		*   Sprite flip Y               D15
+		*
+		* word#2
+		*   Sprite X position           D00-D10
+		*
+		* word#3
+		*   Sprite priority             D00-D02
+		*   Sprite colour index         D04-D07
+		*   Sprite Size X               D10-D15
+		*/
 		int word3 = m_spriteram[offset+(loop*4)+3];
 		if( (word3&0xf)==pri )
 		{
@@ -504,35 +504,35 @@ namcos2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 void namcos2_state::draw_sprites_metalhawk(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	/**
-     * word#0
-     *  xxxxxx---------- ysize
-     *  ------x--------- sprite tile size
-     *  -------xxxxxxxxx screeny
-     *
-     * word#1
-     *  --x------------- bank
-     *  ----xxxxxxxxxxxx tile
-     *
-     * word#2 (unused)
-     *
-     * word#3
-     *  xxxxxx---------- xsize
-     *  ------xxxxxxxxxx screenx
-     *
-     * word#4 (unused)
-     * word#5 (unused)
-     *
-     * word#6 (orientation)
-     *  ---------------x rot90
-     *  --------------x- flipx
-     *  -------------x-- flipy
-     *  ------------x--- tile size
-     *
-     * word#7
-     *  ------------xxxx priority
-     *  --------xxxx---- color
-     *  x--------------- unknown
-     */
+	 * word#0
+	 *  xxxxxx---------- ysize
+	 *  ------x--------- sprite tile size
+	 *  -------xxxxxxxxx screeny
+	 *
+	 * word#1
+	 *  --x------------- bank
+	 *  ----xxxxxxxxxxxx tile
+	 *
+	 * word#2 (unused)
+	 *
+	 * word#3
+	 *  xxxxxx---------- xsize
+	 *  ------xxxxxxxxxx screenx
+	 *
+	 * word#4 (unused)
+	 * word#5 (unused)
+	 *
+	 * word#6 (orientation)
+	 *  ---------------x rot90
+	 *  --------------x- flipx
+	 *  -------------x-- flipy
+	 *  ------------x--- tile size
+	 *
+	 * word#7
+	 *  ------------xxxx priority
+	 *  --------xxxx---- color
+	 *  x--------------- unknown
+	 */
 	const UINT16 *pSource = m_spriteram;
 	rectangle rect;
 	int loop;
@@ -725,22 +725,22 @@ void namcos2_shared_state::c355_obj_draw_sprite(_BitmapClass &bitmap, const rect
 	int xscroll, yscroll;
 
 	/**
-     * ----xxxx-------- window select
-     * --------xxxx---- priority
-     * ------------xxxx palette select
-     */
+	 * ----xxxx-------- window select
+	 * --------xxxx---- priority
+	 * ------------xxxx palette select
+	 */
 	palette = pSource[6];
 	if( pri != ((palette>>4)&0xf) )
 	{
 		return;
 	}
 
-	linkno		= pSource[0]; /* LINKNO */
-	offset		= pSource[1]; /* OFFSET */
-	hpos		= pSource[2]; /* HPOS       0x000..0x7ff (signed) */
-	vpos		= pSource[3]; /* VPOS       0x000..0x7ff (signed) */
-	hsize		= pSource[4]; /* HSIZE      max 0x3ff pixels */
-	vsize		= pSource[5]; /* VSIZE      max 0x3ff pixels */
+	linkno      = pSource[0]; /* LINKNO */
+	offset      = pSource[1]; /* OFFSET */
+	hpos        = pSource[2]; /* HPOS       0x000..0x7ff (signed) */
+	vpos        = pSource[3]; /* VPOS       0x000..0x7ff (signed) */
+	hsize       = pSource[4]; /* HSIZE      max 0x3ff pixels */
+	vsize       = pSource[5]; /* VSIZE      max 0x3ff pixels */
 	/* pSource[6] contains priority/palette */
 	/* pSource[7] is used in Lucky & Wild, possibly for sprite-road priority */
 
@@ -783,12 +783,12 @@ void namcos2_shared_state::c355_obj_draw_sprite(_BitmapClass &bitmap, const rect
 	hpos&=0x7ff; if( hpos&0x400 ) hpos |= ~0x7ff; /* sign extend */
 	vpos&=0x7ff; if( vpos&0x400 ) vpos |= ~0x7ff; /* sign extend */
 
-	tile_index		= spriteformat16[linkno*4+0];
-	format			= spriteformat16[linkno*4+1];
-	dx				= spriteformat16[linkno*4+2];
-	dy				= spriteformat16[linkno*4+3];
-	num_cols		= (format>>4)&0xf;
-	num_rows		= (format)&0xf;
+	tile_index      = spriteformat16[linkno*4+0];
+	format          = spriteformat16[linkno*4+1];
+	dx              = spriteformat16[linkno*4+2];
+	dy              = spriteformat16[linkno*4+3];
+	num_cols        = (format>>4)&0xf;
+	num_rows        = (format)&0xf;
 
 	if( num_cols == 0 ) num_cols = 0x10;
 	flipx = (hsize&0x8000)?1:0;
@@ -1064,12 +1064,12 @@ void namcos2_shared_state::c169_roz_unpack_params(const UINT16 *source, roz_para
 	const int xoffset = 36, yoffset = 3;
 
 	/**
-     * x-------.-------- disable layer
-     * ----x---.-------- wrap?
-     * ------xx.-------- size
-     * --------.xxxx---- priority
-     * --------.----xxxx color
-     */
+	 * x-------.-------- disable layer
+	 * ----x---.-------- wrap?
+	 * ------xx.-------- size
+	 * --------.xxxx---- priority
+	 * --------.----xxxx color
+	 */
 
 	UINT16 temp = source[1];
 	params.size = 512 << ((temp & 0x0300) >> 8);
@@ -1289,7 +1289,7 @@ WRITE16_MEMBER( namcos2_shared_state::c169_roz_videoram_w )
 
 const gfx_layout namco_c45_road_device::s_tile_layout =
 {
-	ROAD_TILE_SIZE,	ROAD_TILE_SIZE,
+	ROAD_TILE_SIZE, ROAD_TILE_SIZE,
 	ROAD_TILE_COUNT_MAX,
 	2,
 	{ NATIVE_ENDIAN_VALUE_LE_BE(8,0), NATIVE_ENDIAN_VALUE_LE_BE(0,8) },
@@ -1310,9 +1310,9 @@ const gfx_layout namco_c45_road_device::s_tile_layout =
 
 namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock),
-	  m_transparent_color(~0),
-	  m_gfx(NULL),
-	  m_tilemap(NULL)
+		m_transparent_color(~0),
+		m_gfx(NULL),
+		m_tilemap(NULL)
 {
 }
 
@@ -1362,7 +1362,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		// skip if we are not the right priority
-		int screenx	= m_ram[0x1fa00/2 + y + 15];
+		int screenx = m_ram[0x1fa00/2 + y + 15];
 		if (pri != ((screenx & 0xf000) >> 12))
 			continue;
 
@@ -1469,10 +1469,9 @@ void namco_c45_road_device::device_stop()
 TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 {
 	// ------xx xxxxxxxx tile number
-    // xxxxxx-- -------- palette select
+	// xxxxxx-- -------- palette select
 	UINT16 data = m_ram[tile_index];
 	int tile = data & 0x3ff;
 	int color = data >> 10;
 	SET_TILE_INFO_MEMBER(*m_gfx, tile, color, 0);
 }
-

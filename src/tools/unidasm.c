@@ -63,25 +63,25 @@ enum display_type
 
 struct dasm_table_entry
 {
-	const char *			name;
-	display_type			display;
-	INT8					pcshift;
-	cpu_disassemble_func	func;
+	const char *            name;
+	display_type            display;
+	INT8                    pcshift;
+	cpu_disassemble_func    func;
 };
 
 
 struct options
 {
-	const char *			filename;
-	offs_t					basepc;
-	UINT8					norawbytes;
-	UINT8					lower;
-	UINT8					upper;
-	UINT8					flipped;
-	int						mode;
+	const char *            filename;
+	offs_t                  basepc;
+	UINT8                   norawbytes;
+	UINT8                   lower;
+	UINT8                   upper;
+	UINT8                   flipped;
+	int                     mode;
 	const dasm_table_entry *dasm;
-	UINT32					skip;
-	UINT32					count;
+	UINT32                  skip;
+	UINT32                  count;
 };
 
 
@@ -204,45 +204,45 @@ CPU_DISASSEMBLE( z8 );
 
 static const dasm_table_entry dasm_table[] =
 {
-	{ "adsp21xx",	_24le, -2, CPU_DISASSEMBLE_NAME(adsp21xx) },
-	{ "alpha8201",	_8bit,  0, CPU_DISASSEMBLE_NAME(alpha8201) },
-	{ "arm",		_32le,  0, CPU_DISASSEMBLE_NAME(arm) },
-	{ "arm7",		_32le,  0, CPU_DISASSEMBLE_NAME(arm7arm) },
-	{ "arm7thumb",	_16le,  0, CPU_DISASSEMBLE_NAME(arm7thumb) },
-	{ "asap",		_32le,  0, CPU_DISASSEMBLE_NAME(asap) },
-	{ "avr8",		_16le,  0, CPU_DISASSEMBLE_NAME(avr8) },
-	{ "ccpu",		_8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
-	{ "cop410",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
-	{ "cop420",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
-	{ "cop444",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
-	{ "cosmac",		_8bit,  0, CPU_DISASSEMBLE_NAME(cosmac) },
-	{ "cp1610",		_16be, -1, CPU_DISASSEMBLE_NAME(cp1610) },
-	{ "cquestsnd",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestsnd) },
-	{ "cquestrot",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
-	{ "cquestlin",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestlin) },
-	{ "dsp16a",		_16le, -1, CPU_DISASSEMBLE_NAME(dsp16a) },
-	{ "dsp32c",		_32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
-	{ "dsp56k",		_16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
-	{ "hyperstone",	_16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
-	{ "hd61700",	_8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
-	{ "esrip",		_64be,  0, CPU_DISASSEMBLE_NAME(esrip) },
-	{ "f8",			_8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
-	{ "g65816",		_8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },
-	{ "h6280",		_8bit,  0, CPU_DISASSEMBLE_NAME(h6280) },
-	{ "h8",			_16be,  0, CPU_DISASSEMBLE_NAME(h8) },
-	{ "hd6309",		_8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
-	{ "i386",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_32) },
-	{ "i4004",		_8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
-	{ "i8008",		_8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
-	{ "i8085",		_8bit,  0, CPU_DISASSEMBLE_NAME(i8085) },
-	{ "i80286",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
-	{ "i8086",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
-	{ "i960",		_32le,  0, CPU_DISASSEMBLE_NAME(i960) },
-	{ "jaguargpu",	_16be,  0, CPU_DISASSEMBLE_NAME(jaguargpu) },
-	{ "jaguardsp",	_16be,  0, CPU_DISASSEMBLE_NAME(jaguardsp) },
-	{ "x86_16",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
-	{ "x86_32",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_32) },
-	{ "x86_64",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_64) },
+	{ "adsp21xx",   _24le, -2, CPU_DISASSEMBLE_NAME(adsp21xx) },
+	{ "alpha8201",  _8bit,  0, CPU_DISASSEMBLE_NAME(alpha8201) },
+	{ "arm",        _32le,  0, CPU_DISASSEMBLE_NAME(arm) },
+	{ "arm7",       _32le,  0, CPU_DISASSEMBLE_NAME(arm7arm) },
+	{ "arm7thumb",  _16le,  0, CPU_DISASSEMBLE_NAME(arm7thumb) },
+	{ "asap",       _32le,  0, CPU_DISASSEMBLE_NAME(asap) },
+	{ "avr8",       _16le,  0, CPU_DISASSEMBLE_NAME(avr8) },
+	{ "ccpu",       _8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
+	{ "cop410",     _8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
+	{ "cop420",     _8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
+	{ "cop444",     _8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
+	{ "cosmac",     _8bit,  0, CPU_DISASSEMBLE_NAME(cosmac) },
+	{ "cp1610",     _16be, -1, CPU_DISASSEMBLE_NAME(cp1610) },
+	{ "cquestsnd",  _64be, -3, CPU_DISASSEMBLE_NAME(cquestsnd) },
+	{ "cquestrot",  _64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
+	{ "cquestlin",  _64be, -3, CPU_DISASSEMBLE_NAME(cquestlin) },
+	{ "dsp16a",     _16le, -1, CPU_DISASSEMBLE_NAME(dsp16a) },
+	{ "dsp32c",     _32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
+	{ "dsp56k",     _16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
+	{ "hyperstone", _16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
+	{ "hd61700",    _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
+	{ "esrip",      _64be,  0, CPU_DISASSEMBLE_NAME(esrip) },
+	{ "f8",         _8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
+	{ "g65816",     _8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },
+	{ "h6280",      _8bit,  0, CPU_DISASSEMBLE_NAME(h6280) },
+	{ "h8",         _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
+	{ "hd6309",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
+	{ "i386",       _8bit,  0, CPU_DISASSEMBLE_NAME(x86_32) },
+	{ "i4004",      _8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
+	{ "i8008",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
+	{ "i8085",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8085) },
+	{ "i80286",     _8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
+	{ "i8086",      _8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
+	{ "i960",       _32le,  0, CPU_DISASSEMBLE_NAME(i960) },
+	{ "jaguargpu",  _16be,  0, CPU_DISASSEMBLE_NAME(jaguargpu) },
+	{ "jaguardsp",  _16be,  0, CPU_DISASSEMBLE_NAME(jaguardsp) },
+	{ "x86_16",     _8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
+	{ "x86_32",     _8bit,  0, CPU_DISASSEMBLE_NAME(x86_32) },
+	{ "x86_64",     _8bit,  0, CPU_DISASSEMBLE_NAME(x86_64) },
 	{ "konami",     _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
 	{ "lh5801",     _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
 	{ "lr35902",    _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
@@ -278,7 +278,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "r3000le",    _32le,  0, CPU_DISASSEMBLE_NAME(r3000le) },
 	{ "nec",        _8bit,  0, CPU_DISASSEMBLE_NAME(nec_generic) },
 	{ "pdp1",       _32be,  0, CPU_DISASSEMBLE_NAME(pdp1) },
-	{ "pps4",		_8bit,  0, CPU_DISASSEMBLE_NAME(pps4) },
+	{ "pps4",       _8bit,  0, CPU_DISASSEMBLE_NAME(pps4) },
 	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
 	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
 	{ "pic16c5x",   _16le, -1, CPU_DISASSEMBLE_NAME(pic16c5x) },
@@ -288,7 +288,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "s2650",      _8bit,  0, CPU_DISASSEMBLE_NAME(s2650) },
 	{ "saturn",     _8bit,  0, CPU_DISASSEMBLE_NAME(saturn) },
 	{ "sc61860",    _8bit,  0, CPU_DISASSEMBLE_NAME(sc61860) },
-	{ "scmp",   	_8bit,  0, CPU_DISASSEMBLE_NAME(scmp) },
+	{ "scmp",       _8bit,  0, CPU_DISASSEMBLE_NAME(scmp) },
 	{ "se3208",     _16le,  0, CPU_DISASSEMBLE_NAME(se3208) },
 	{ "sh2",        _16be,  0, CPU_DISASSEMBLE_NAME(sh2) },
 	{ "sh4",        _16le,  0, CPU_DISASSEMBLE_NAME(sh4) },
@@ -320,8 +320,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "v810",       _16le,  0, CPU_DISASSEMBLE_NAME(v810) },
 	{ "z180",       _8bit,  0, CPU_DISASSEMBLE_NAME(z180) },
 //  { "z8000",      _16be,  0, CPU_DISASSEMBLE_NAME(z8000) },
-	{ "z80",		_8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
-	{ "z8",			_8bit,  0, CPU_DISASSEMBLE_NAME(z8) },
+	{ "z80",        _8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
+	{ "z8",         _8bit,  0, CPU_DISASSEMBLE_NAME(z8) },
 };
 
 void CLIB_DECL logerror(const char *format, ...)
@@ -504,9 +504,9 @@ int main(int argc, char *argv[])
 	displayendian = opts.dasm->display % 2;
 	switch (displaychunk)
 	{
-		case 1:		maxchunks = 6;	break;
-		case 2:		maxchunks = 3;	break;
-		default:	maxchunks = 1;	break;
+		case 1:     maxchunks = 6;  break;
+		case 2:     maxchunks = 3;  break;
+		default:    maxchunks = 1;  break;
 	}
 
 	// run it

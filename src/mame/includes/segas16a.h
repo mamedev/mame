@@ -56,24 +56,24 @@ public:
 	// construction/destruction
 	segas16a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_mcu(*this, "mcu"),
-		  m_i8255(*this, "i8255"),
-		  m_ymsnd(*this, "ymsnd"),
-		  m_n7751(*this, "n7751"),
-		  m_n7751_i8243(*this, "n7751_8243"),
-		  m_nvram(*this, "nvram"),
-		  m_sprites(*this, "sprites"),
-		  m_workram(*this, "nvram"),
-		  m_video_control(0),
-		  m_mcu_control(0),
-		  m_n7751_command(0),
-		  m_n7751_rom_address(0),
-		  m_last_buttons1(0),
-		  m_last_buttons2(0),
-		  m_read_port(0),
-		  m_mj_input_num(0)
+			m_maincpu(*this, "maincpu"),
+			m_soundcpu(*this, "soundcpu"),
+			m_mcu(*this, "mcu"),
+			m_i8255(*this, "i8255"),
+			m_ymsnd(*this, "ymsnd"),
+			m_n7751(*this, "n7751"),
+			m_n7751_i8243(*this, "n7751_8243"),
+			m_nvram(*this, "nvram"),
+			m_sprites(*this, "sprites"),
+			m_workram(*this, "nvram"),
+			m_video_control(0),
+			m_mcu_control(0),
+			m_n7751_command(0),
+			m_n7751_rom_address(0),
+			m_last_buttons1(0),
+			m_last_buttons2(0),
+			m_read_port(0),
+			m_mj_input_num(0)
 	{ }
 
 	// PPI read/write callbacks
@@ -165,18 +165,18 @@ protected:
 	required_shared_ptr<UINT16> m_workram;
 
 	// configuration
-	read16_delegate			m_custom_io_r;
-	write16_delegate		m_custom_io_w;
-	i8751_sim_delegate		m_i8751_vblank_hook;
-	lamp_changed_delegate	m_lamp_changed_w;
+	read16_delegate         m_custom_io_r;
+	write16_delegate        m_custom_io_w;
+	i8751_sim_delegate      m_i8751_vblank_hook;
+	lamp_changed_delegate   m_lamp_changed_w;
 
 	// internal state
-	UINT8					m_video_control;
-	UINT8					m_mcu_control;
-	UINT8					m_n7751_command;
-	UINT32					m_n7751_rom_address;
-	UINT8					m_last_buttons1;
-	UINT8					m_last_buttons2;
-	UINT8					m_read_port;
-	UINT8					m_mj_input_num;
+	UINT8                   m_video_control;
+	UINT8                   m_mcu_control;
+	UINT8                   m_n7751_command;
+	UINT32                  m_n7751_rom_address;
+	UINT8                   m_last_buttons1;
+	UINT8                   m_last_buttons2;
+	UINT8                   m_read_port;
+	UINT8                   m_mj_input_num;
 };

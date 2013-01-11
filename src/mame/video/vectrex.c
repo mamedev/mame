@@ -119,9 +119,9 @@ WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 			m_refresh->adjust(period, 0, period);
 		else
 			m_refresh->adjust(
-								  min(period, m_refresh->remaining()),
-								  0,
-								  period);
+									min(period, m_refresh->remaining()),
+									0,
+									period);
 		break;
 	}
 	via->write(space, offset, data);
@@ -137,7 +137,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_refresh)
 {
 	/* Refresh only marks the range of vectors which will be drawn
-     * during the next SCREEN_UPDATE_RGB32. */
+	 * during the next SCREEN_UPDATE_RGB32. */
 	m_display_start = m_display_end;
 	m_display_end = m_point_index;
 }
@@ -151,18 +151,18 @@ UINT32 vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 
 
 	/* start black */
 	vector_add_point(machine(),
-					 m_points[m_display_start].x,
-					 m_points[m_display_start].y,
-					 m_points[m_display_start].col,
-					 0);
+						m_points[m_display_start].x,
+						m_points[m_display_start].y,
+						m_points[m_display_start].col,
+						0);
 
 	for (i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
 	{
 		vector_add_point(machine(),
-						 m_points[i].x,
-						 m_points[i].y,
-						 m_points[i].col,
-						 m_points[i].intensity);
+							m_points[i].x,
+							m_points[i].y,
+							m_points[i].col,
+							m_points[i].intensity);
 	}
 
 	SCREEN_UPDATE32_CALL(vector);
@@ -197,14 +197,14 @@ void vectrex_add_point_stereo(running_machine &machine, int x, int y, rgb_t colo
 	vectrex_state *state = machine.driver_data<vectrex_state>();
 	if (state->m_imager_status == 2) /* left = 1, right = 2 */
 		vectrex_add_point(machine, (int)(y * M_SQRT1_2)+ state->m_x_center,
-						   (int)(((state->m_x_max - x) * M_SQRT1_2)),
-						   color,
-						   intensity);
+							(int)(((state->m_x_max - x) * M_SQRT1_2)),
+							color,
+							intensity);
 	else
 		vectrex_add_point(machine, (int)(y * M_SQRT1_2),
-						   (int)((state->m_x_max - x) * M_SQRT1_2),
-						   color,
-						   intensity);
+							(int)((state->m_x_max - x) * M_SQRT1_2),
+							color,
+							intensity);
 }
 
 
@@ -274,9 +274,9 @@ void vectrex_state::video_start()
 	vector_add_point_function = vectrex_add_point;
 	m_imager_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::vectrex_imager_eye),this));
 	m_imager_timer->adjust(
-						  attotime::from_hz(m_imager_freq),
-						  2,
-						  attotime::from_hz(m_imager_freq));
+							attotime::from_hz(m_imager_freq),
+							2,
+							attotime::from_hz(m_imager_freq));
 
 	m_lp_t = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::lightpen_trigger),this));
 
@@ -316,30 +316,30 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 			if (m_lightpen_down)
 			{
 				/* Simple lin. algebra to check if pen is near
-                 * the line defined by (A_X,A_Y).
-                 * If that is the case, set a timer which goes
-                 * off when the beam reaches the pen. Exact
-                 * timing is important here.
-                 *
-                 *    lightpen
-                 *       ^
-                 *  _   /|
-                 *  b  / |
-                 *    /  |
-                 *   /   |d
-                 *  /    |
-                 * /     |
-                 * ------+---------> beam path
-                 *    l  |    _
-                 *            a
-                 */
+				 * the line defined by (A_X,A_Y).
+				 * If that is the case, set a timer which goes
+				 * off when the beam reaches the pen. Exact
+				 * timing is important here.
+				 *
+				 *    lightpen
+				 *       ^
+				 *  _   /|
+				 *  b  / |
+				 *    /  |
+				 *   /   |d
+				 *  /    |
+				 * /     |
+				 * ------+---------> beam path
+				 *    l  |    _
+				 *            a
+				 */
 				double a2, b2, ab, d2;
 				ab = (m_pen_x - m_x_int) * m_analog[A_X]
 					+(m_pen_y - m_y_int) * m_analog[A_Y];
 				if (ab > 0)
 				{
 					a2 = (double)(m_analog[A_X] * m_analog[A_X]
-								  +(double)m_analog[A_Y] * m_analog[A_Y]);
+									+(double)m_analog[A_Y] * m_analog[A_Y]);
 					b2 = (double)(m_pen_x - m_x_int) * (m_pen_x - m_x_int)
 						+(double)(m_pen_y - m_y_int) * (m_pen_y - m_y_int);
 					d2 = b2 - ab * ab / a2;
@@ -458,8 +458,8 @@ const via6522_interface spectrum1_via6522_interface =
 WRITE8_MEMBER(vectrex_state::raaspec_led_w)
 {
 	logerror("Spectrum I+ LED: %i%i%i%i%i%i%i%i\n",
-			 (data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,
-			 (data>>3)&0x1, (data>>2)&0x1, (data>>1)&0x1, data&0x1);
+				(data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,
+				(data>>3)&0x1, (data>>2)&0x1, (data>>1)&0x1, data&0x1);
 }
 
 

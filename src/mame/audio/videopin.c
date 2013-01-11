@@ -14,9 +14,9 @@
 /************************************************************************/
 
 /* Nodes - Sounds */
-#define VIDEOPIN_VOL_SND	NODE_10
-#define VIDEOPIN_BELL_SND	NODE_11
-#define VIDEOPIN_BONG_SND	NODE_12
+#define VIDEOPIN_VOL_SND    NODE_10
+#define VIDEOPIN_BELL_SND   NODE_11
+#define VIDEOPIN_BONG_SND   NODE_12
 
 DISCRETE_SOUND_START(videopin)
 /************************************************/
@@ -71,7 +71,7 @@ DISCRETE_SOUND_START(videopin)
 	DISCRETE_DIVIDE(NODE_20, VIDEOPIN_OCTAVE_DATA, 12096000.0 /3.0 / 2.0, VIDEOPIN_OCTAVE_DATA)
 	DISCRETE_ADDER2(NODE_21, 1, VIDEOPIN_NOTE_DATA, 1)
 	// We will disable the divide if VIDEOPIN_NOTE_DATA = 0
-	DISCRETE_DIVIDE(NODE_22, VIDEOPIN_NOTE_DATA, NODE_20, NODE_21)	// freq
+	DISCRETE_DIVIDE(NODE_22, VIDEOPIN_NOTE_DATA, NODE_20, NODE_21)  // freq
 	DISCRETE_SQUAREWAVE(VIDEOPIN_VOL_SND, VIDEOPIN_OCTAVE_DATA, NODE_22, VIDEOPIN_VOL_DATA, 50.0, 0, 0.0)
 
 	/************************************************/

@@ -17,7 +17,7 @@
 
 *************************************************************************/
 
-#define MASTER_CLOCK	20000000
+#define MASTER_CLOCK    20000000
 
 
 #include "emu.h"
@@ -32,7 +32,7 @@ class superdq_state : public driver_device
 public:
 	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") ,
+			m_laserdisc(*this, "laserdisc") ,
 		m_videoram(*this, "videoram"){ }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -92,10 +92,10 @@ void superdq_state::palette_init()
 	double rweights[3], gweights[3], bweights[2];
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[0], rweights, 220, 0,
-			3,	&resistances[0], gweights, 220, 0,
-			2,	&resistances[1], bweights, 220, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  &resistances[0], rweights, 220, 0,
+			3,  &resistances[0], gweights, 220, 0,
+			2,  &resistances[1], bweights, 220, 0);
 
 	/* initialize the palette with these colors */
 	for (i = 0; i < machine().total_colors(); i++)
@@ -136,13 +136,13 @@ INTERRUPT_GEN_MEMBER(superdq_state::superdq_vblank)
 {
 
 	/* status is read when the STATUS line from the laserdisc
-       toggles (600usec after the vblank). We could set up a
-       timer to do that, but this works as well */
+	   toggles (600usec after the vblank). We could set up a
+	   timer to do that, but this works as well */
 	m_ld_in_latch = m_laserdisc->status_r();
 
 	/* command is written when the COMMAND line from the laserdisc
-       toggles (680usec after the vblank). We could set up a
-       timer to do that, but this works as well */
+	   toggles (680usec after the vblank). We could set up a
+	   timer to do that, but this works as well */
 	m_laserdisc->data_w(m_ld_out_latch);
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
@@ -156,7 +156,7 @@ WRITE8_MEMBER(superdq_state::superdq_videoram_w)
 
 WRITE8_MEMBER(superdq_state::superdq_io_w)
 {
-	int 			i;
+	int             i;
 	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
@@ -177,10 +177,10 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	}
 
 	/*
-        bit 5 = DISP1?
-        bit 4 = DISP2?
-        bit 0 = unused
-    */
+	    bit 5 = DISP1?
+	    bit 4 = DISP2?
+	    bit 0 = unused
+	*/
 }
 
 READ8_MEMBER(superdq_state::superdq_ld_r)
@@ -240,8 +240,8 @@ static INPUT_PORTS_START( superdq )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* Service button */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )		/* TEST button */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   /* Service button */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )       /* TEST button */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -297,13 +297,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 
@@ -324,7 +324,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -378,7 +378,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( superdq )		/* long scenes */
+ROM_START( superdq )        /* long scenes */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq-prog.bin", 0x0000, 0x4000, CRC(96b931e2) SHA1(a2408272e19b02755368a6d7e526eec15896e586) )
 
@@ -392,7 +392,7 @@ ROM_START( superdq )		/* long scenes */
 	DISK_IMAGE_READONLY( "superdq", 0, NO_DUMP )
 ROM_END
 
-ROM_START( superdqs )		/* short scenes */
+ROM_START( superdqs )       /* short scenes */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq_c45.rom", 0x0000, 0x4000, CRC(0f4d4832) SHA1(c6db63721f0c73151eb9a678ceafd0e7d6121fd3) )
 
@@ -406,7 +406,7 @@ ROM_START( superdqs )		/* short scenes */
 	DISK_IMAGE_READONLY( "superdq", 0, NO_DUMP )
 ROM_END
 
-ROM_START( superdqa )		/* short scenes, alternate */
+ROM_START( superdqa )       /* short scenes, alternate */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq_c45a.rom", 0x0000, 0x4000, CRC(b12ce1f8) SHA1(3f0238ea73a6d3e1fe62f83ed3343ca4c268bdd6) )
 
@@ -428,6 +428,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, superdq,  0,		superdq, superdq, driver_device, 0, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)", GAME_NOT_WORKING )
+GAME( 1984, superdq,  0,        superdq, superdq, driver_device, 0, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)", GAME_NOT_WORKING )
 GAME( 1984, superdqs, superdq,  superdq, superdq, driver_device, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)", GAME_NOT_WORKING )
 GAME( 1984, superdqa, superdq,  superdq, superdq, driver_device, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", GAME_NOT_WORKING )

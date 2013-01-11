@@ -47,13 +47,13 @@ typedef bits32 float32;
 typedef bits64 float64;
 #ifdef FLOATX80
 typedef struct {
-    bits16 high;
-    bits64 low;
+	bits16 high;
+	bits64 low;
 } floatx80;
 #endif
 #ifdef FLOAT128
 typedef struct {
-    bits64 high, low;
+	bits64 high, low;
 } float128;
 #endif
 
@@ -69,8 +69,8 @@ typedef struct {
 *----------------------------------------------------------------------------*/
 extern int8 float_detect_tininess;
 enum {
-    float_tininess_after_rounding  = 0,
-    float_tininess_before_rounding = 1
+	float_tininess_after_rounding  = 0,
+	float_tininess_before_rounding = 1
 };
 
 /*----------------------------------------------------------------------------
@@ -78,10 +78,10 @@ enum {
 *----------------------------------------------------------------------------*/
 extern int8 float_rounding_mode;
 enum {
-    float_round_nearest_even = 0,
-    float_round_to_zero      = 1,
-    float_round_down         = 2,
-    float_round_up           = 3
+	float_round_nearest_even = 0,
+	float_round_to_zero      = 1,
+	float_round_down         = 2,
+	float_round_up           = 3
 };
 
 /*----------------------------------------------------------------------------
@@ -89,11 +89,11 @@ enum {
 *----------------------------------------------------------------------------*/
 extern int8 float_exception_flags;
 enum {
-    float_flag_inexact   =  1,
-    float_flag_underflow =  2,
-    float_flag_overflow  =  4,
-    float_flag_divbyzero =  8,
-    float_flag_invalid   = 16
+	float_flag_inexact   =  1,
+	float_flag_underflow =  2,
+	float_flag_overflow  =  4,
+	float_flag_divbyzero =  8,
+	float_flag_invalid   = 16
 };
 
 /*----------------------------------------------------------------------------
@@ -210,11 +210,11 @@ float128 floatx80_to_float128( floatx80 );
 
 INLINE floatx80 packFloatx80( flag zSign, int32 zExp, bits64 zSig )
 {
-    floatx80 z;
+	floatx80 z;
 
-    z.low = zSig;
-    z.high = ( ( (bits16) zSign )<<15 ) + zExp;
-    return z;
+	z.low = zSig;
+	z.high = ( ( (bits16) zSign )<<15 ) + zExp;
+	return z;
 
 }
 
@@ -303,13 +303,13 @@ flag float128_is_signaling_nan( float128 );
 *----------------------------------------------------------------------------*/
 
 INLINE float128
- packFloat128( flag zSign, int32 zExp, bits64 zSig0, bits64 zSig1 )
+	packFloat128( flag zSign, int32 zExp, bits64 zSig0, bits64 zSig1 )
 {
-    float128 z;
+	float128 z;
 
-    z.low = zSig1;
-    z.high = ( ( (bits64) zSign )<<63 ) + ( ( (bits64) zExp )<<48 ) + zSig0;
-    return z;
+	z.low = zSig1;
+	z.high = ( ( (bits64) zSign )<<63 ) + ( ( (bits64) zExp )<<48 ) + zSig0;
+	return z;
 
 }
 
@@ -335,92 +335,92 @@ INLINE float128
 *----------------------------------------------------------------------------*/
 
 INLINE float128
- roundAndPackFloat128(
-     flag zSign, int32 zExp, bits64 zSig0, bits64 zSig1, bits64 zSig2 )
+	roundAndPackFloat128(
+		flag zSign, int32 zExp, bits64 zSig0, bits64 zSig1, bits64 zSig2 )
 {
-    int8 roundingMode;
-    flag roundNearestEven, increment, isTiny;
+	int8 roundingMode;
+	flag roundNearestEven, increment, isTiny;
 
-    roundingMode = float_rounding_mode;
-    roundNearestEven = ( roundingMode == float_round_nearest_even );
-    increment = ( (sbits64) zSig2 < 0 );
-    if ( ! roundNearestEven ) {
-        if ( roundingMode == float_round_to_zero ) {
-            increment = 0;
-        }
-        else {
-            if ( zSign ) {
-                increment = ( roundingMode == float_round_down ) && zSig2;
-            }
-            else {
-                increment = ( roundingMode == float_round_up ) && zSig2;
-            }
-        }
-    }
-    if ( 0x7FFD <= (bits32) zExp ) {
-        if (    ( 0x7FFD < zExp )
-             || (    ( zExp == 0x7FFD )
-                  && eq128(
-                         LIT64( 0x0001FFFFFFFFFFFF ),
-                         LIT64( 0xFFFFFFFFFFFFFFFF ),
-                         zSig0,
-                         zSig1
-                     )
-                  && increment
-                )
-           ) {
-            float_raise( float_flag_overflow | float_flag_inexact );
-            if (    ( roundingMode == float_round_to_zero )
-                 || ( zSign && ( roundingMode == float_round_up ) )
-                 || ( ! zSign && ( roundingMode == float_round_down ) )
-               ) {
-                return
-                    packFloat128(
-                        zSign,
-                        0x7FFE,
-                        LIT64( 0x0000FFFFFFFFFFFF ),
-                        LIT64( 0xFFFFFFFFFFFFFFFF )
-                    );
-            }
-            return packFloat128( zSign, 0x7FFF, 0, 0 );
-        }
-        if ( zExp < 0 ) {
-            isTiny =
-                   ( float_detect_tininess == float_tininess_before_rounding )
-                || ( zExp < -1 )
-                || ! increment
-                || lt128(
-                       zSig0,
-                       zSig1,
-                       LIT64( 0x0001FFFFFFFFFFFF ),
-                       LIT64( 0xFFFFFFFFFFFFFFFF )
-                   );
-            shift128ExtraRightJamming(
-                zSig0, zSig1, zSig2, - zExp, &zSig0, &zSig1, &zSig2 );
-            zExp = 0;
-            if ( isTiny && zSig2 ) float_raise( float_flag_underflow );
-            if ( roundNearestEven ) {
-                increment = ( (sbits64) zSig2 < 0 );
-            }
-            else {
-                if ( zSign ) {
-                    increment = ( roundingMode == float_round_down ) && zSig2;
-                }
-                else {
-                    increment = ( roundingMode == float_round_up ) && zSig2;
-                }
-            }
-        }
-    }
-    if ( zSig2 ) float_exception_flags |= float_flag_inexact;
-    if ( increment ) {
-        add128( zSig0, zSig1, 0, 1, &zSig0, &zSig1 );
-        zSig1 &= ~ ( ( zSig2 + zSig2 == 0 ) & roundNearestEven );
-    }
-    else {
-        if ( ( zSig0 | zSig1 ) == 0 ) zExp = 0;
-    }
-    return packFloat128( zSign, zExp, zSig0, zSig1 );
+	roundingMode = float_rounding_mode;
+	roundNearestEven = ( roundingMode == float_round_nearest_even );
+	increment = ( (sbits64) zSig2 < 0 );
+	if ( ! roundNearestEven ) {
+		if ( roundingMode == float_round_to_zero ) {
+			increment = 0;
+		}
+		else {
+			if ( zSign ) {
+				increment = ( roundingMode == float_round_down ) && zSig2;
+			}
+			else {
+				increment = ( roundingMode == float_round_up ) && zSig2;
+			}
+		}
+	}
+	if ( 0x7FFD <= (bits32) zExp ) {
+		if (    ( 0x7FFD < zExp )
+				|| (    ( zExp == 0x7FFD )
+					&& eq128(
+							LIT64( 0x0001FFFFFFFFFFFF ),
+							LIT64( 0xFFFFFFFFFFFFFFFF ),
+							zSig0,
+							zSig1
+						)
+					&& increment
+				)
+			) {
+			float_raise( float_flag_overflow | float_flag_inexact );
+			if (    ( roundingMode == float_round_to_zero )
+					|| ( zSign && ( roundingMode == float_round_up ) )
+					|| ( ! zSign && ( roundingMode == float_round_down ) )
+				) {
+				return
+					packFloat128(
+						zSign,
+						0x7FFE,
+						LIT64( 0x0000FFFFFFFFFFFF ),
+						LIT64( 0xFFFFFFFFFFFFFFFF )
+					);
+			}
+			return packFloat128( zSign, 0x7FFF, 0, 0 );
+		}
+		if ( zExp < 0 ) {
+			isTiny =
+					( float_detect_tininess == float_tininess_before_rounding )
+				|| ( zExp < -1 )
+				|| ! increment
+				|| lt128(
+						zSig0,
+						zSig1,
+						LIT64( 0x0001FFFFFFFFFFFF ),
+						LIT64( 0xFFFFFFFFFFFFFFFF )
+					);
+			shift128ExtraRightJamming(
+				zSig0, zSig1, zSig2, - zExp, &zSig0, &zSig1, &zSig2 );
+			zExp = 0;
+			if ( isTiny && zSig2 ) float_raise( float_flag_underflow );
+			if ( roundNearestEven ) {
+				increment = ( (sbits64) zSig2 < 0 );
+			}
+			else {
+				if ( zSign ) {
+					increment = ( roundingMode == float_round_down ) && zSig2;
+				}
+				else {
+					increment = ( roundingMode == float_round_up ) && zSig2;
+				}
+			}
+		}
+	}
+	if ( zSig2 ) float_exception_flags |= float_flag_inexact;
+	if ( increment ) {
+		add128( zSig0, zSig1, 0, 1, &zSig0, &zSig1 );
+		zSig1 &= ~ ( ( zSig2 + zSig2 == 0 ) & roundNearestEven );
+	}
+	else {
+		if ( ( zSig0 | zSig1 ) == 0 ) zExp = 0;
+	}
+	return packFloat128( zSign, zExp, zSig0, zSig1 );
 
 }
 
@@ -435,30 +435,29 @@ INLINE float128
 *----------------------------------------------------------------------------*/
 
 INLINE float128
- normalizeRoundAndPackFloat128(
-     flag zSign, int32 zExp, bits64 zSig0, bits64 zSig1 )
+	normalizeRoundAndPackFloat128(
+		flag zSign, int32 zExp, bits64 zSig0, bits64 zSig1 )
 {
-    int8 shiftCount;
-    bits64 zSig2;
+	int8 shiftCount;
+	bits64 zSig2;
 
-    if ( zSig0 == 0 ) {
-        zSig0 = zSig1;
-        zSig1 = 0;
-        zExp -= 64;
-    }
-    shiftCount = countLeadingZeros64( zSig0 ) - 15;
-    if ( 0 <= shiftCount ) {
-        zSig2 = 0;
-        shortShift128Left( zSig0, zSig1, shiftCount, &zSig0, &zSig1 );
-    }
-    else {
-        shift128ExtraRightJamming(
-            zSig0, zSig1, 0, - shiftCount, &zSig0, &zSig1, &zSig2 );
-    }
-    zExp -= shiftCount;
-    return roundAndPackFloat128( zSign, zExp, zSig0, zSig1, zSig2 );
+	if ( zSig0 == 0 ) {
+		zSig0 = zSig1;
+		zSig1 = 0;
+		zExp -= 64;
+	}
+	shiftCount = countLeadingZeros64( zSig0 ) - 15;
+	if ( 0 <= shiftCount ) {
+		zSig2 = 0;
+		shortShift128Left( zSig0, zSig1, shiftCount, &zSig0, &zSig1 );
+	}
+	else {
+		shift128ExtraRightJamming(
+			zSig0, zSig1, 0, - shiftCount, &zSig0, &zSig1, &zSig2 );
+	}
+	zExp -= shiftCount;
+	return roundAndPackFloat128( zSign, zExp, zSig0, zSig1, zSig2 );
 
 }
 
 #endif
-

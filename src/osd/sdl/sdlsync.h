@@ -201,4 +201,4 @@ void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot);
 
 void osd_scalable_lock_free(osd_scalable_lock *lock);
 
-#endif	/* __SDLSYNC__ */
+#endif  /* __SDLSYNC__ */

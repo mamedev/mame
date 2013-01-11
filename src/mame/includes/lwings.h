@@ -5,7 +5,7 @@ class lwings_state : public driver_device
 public:
 	lwings_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") ,
+			m_spriteram(*this, "spriteram") ,
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_soundlatch2(*this, "soundlatch2"){ }

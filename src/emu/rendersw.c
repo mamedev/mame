@@ -51,10 +51,10 @@ private:
 	// internal structs
 	struct quad_setup_data
 	{
-		INT32			dudx, dvdx, dudy, dvdy;
-		INT32			startu, startv;
-		INT32			startx, starty;
-		INT32			endx, endy;
+		INT32           dudx, dvdx, dudy, dvdy;
+		INT32           startu, startv;
+		INT32           startx, starty;
+		INT32           endx, endy;
 	};
 
 	// internal helpers
@@ -105,42 +105,42 @@ private:
 	{
 		// original equations:
 		//
-	    //  C = Y - 16
-	    //  D = Cb - 128
-	    //  E = Cr - 128
+		//  C = Y - 16
+		//  D = Cb - 128
+		//  E = Cr - 128
 		//
-	    //  R = clip(( 298 * C           + 409 * E + 128) >> 8)
-	    //  G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
-	    //  B = clip(( 298 * C + 516 * D           + 128) >> 8)
+		//  R = clip(( 298 * C           + 409 * E + 128) >> 8)
+		//  G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
+		//  B = clip(( 298 * C + 516 * D           + 128) >> 8)
 		//
-	    //  R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
-	    //  G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
-	    //  B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
+		//  R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
+		//  G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
+		//  B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
 		//
-	    //  R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-	    //  G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-	    //  B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+		//  R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+		//  G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+		//  B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
 		//
-	    //  R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-	    //  G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-	    //  B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+		//  R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+		//  G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+		//  B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
 		//
-	    //  Now combine constants:
+		//  Now combine constants:
 		//
-	    //  R = clip(( 298 * Y            + 409 * Cr - 56992) >> 8)
-	    //  G = clip(( 298 * Y - 100 * Cb - 208 * Cr + 34784) >> 8)
-	    //  B = clip(( 298 * Y + 516 * Cb            - 70688) >> 8)
+		//  R = clip(( 298 * Y            + 409 * Cr - 56992) >> 8)
+		//  G = clip(( 298 * Y - 100 * Cb - 208 * Cr + 34784) >> 8)
+		//  B = clip(( 298 * Y + 516 * Cb            - 70688) >> 8)
 		//
-	    //  Define common = 298 * y - 56992. This will save one addition
+		//  Define common = 298 * y - 56992. This will save one addition
 		//
-	    //  R = clip(( common            + 409 * Cr -     0) >> 8)
-	    //  G = clip(( common - 100 * Cb - 208 * Cr + 91776) >> 8)
-	    //  B = clip(( common + 516 * Cb            - 13696) >> 8)
+		//  R = clip(( common            + 409 * Cr -     0) >> 8)
+		//  G = clip(( common - 100 * Cb - 208 * Cr + 91776) >> 8)
+		//  B = clip(( common + 516 * Cb            - 13696) >> 8)
 		//
 
-	    UINT8 y = ycc;
-	    UINT8 cb = ycc >> 8;
-	    UINT8 cr = ycc >> 16;
+		UINT8 y = ycc;
+		UINT8 cb = ycc >> 8;
+		UINT8 cr = ycc >> 16;
 
 		UINT32 common = 298 * y - 56992;
 		UINT32 r = (common +            409 * cr);
@@ -565,7 +565,7 @@ private:
 
 		// only support alpha and "none" blendmodes
 		assert(PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE ||
-		       PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_ALPHA);
+				PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_ALPHA);
 
 		// fast case: no alpha
 		if (PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE || is_opaque(prim.color.a))

@@ -32,7 +32,7 @@
 #include "includes/kaypro.h"
 
 
-READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }	/* to bypass unemulated HD controller */
+READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
 
 /***********************************************************
 
@@ -94,28 +94,28 @@ ADDRESS_MAP_END
 ****************************************************************/
 static const gfx_layout kayproii_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static const gfx_layout kaypro2x_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( kayproii )
@@ -134,24 +134,24 @@ GFXDECODE_END
 
 static const z80_daisy_config kayproii_daisy_chain[] =
 {
-	{ "z80sio" },		/* sio */
-	{ "z80pio_s" },		/* System pio */
-	{ "z80pio_g" },		/* General purpose pio */
+	{ "z80sio" },       /* sio */
+	{ "z80pio_s" },     /* System pio */
+	{ "z80pio_g" },     /* General purpose pio */
 	{ NULL }
 };
 
 static const z80_daisy_config kaypro2x_daisy_chain[] =
 {
-	{ "z80sio" },		/* sio for RS232C and keyboard */
-	{ "z80sio_2x" },	/* sio for serial printer and inbuilt modem */
+	{ "z80sio" },       /* sio for RS232C and keyboard */
+	{ "z80sio_2x" },    /* sio for serial printer and inbuilt modem */
 	{ NULL }
 };
 
 static const mc6845_interface kaypro2x_crtc = {
-	"screen",			/* name of screen */
-	7,				/* number of dots per character */
+	"screen",           /* name of screen */
+	7,              /* number of dots per character */
 	NULL,
-	kaypro2x_update_row,		/* handler to display a scanline */
+	kaypro2x_update_row,        /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -168,20 +168,20 @@ static const mc6845_interface kaypro2x_crtc = {
 
 static COM8116_INTERFACE( kayproii_brg_intf )
 {
-	DEVCB_NULL,		/* fX/4 output */
+	DEVCB_NULL,     /* fX/4 output */
 	DEVCB_NULL, //  DEVCB_DEVICE_LINE("z80sio", rx_tx_a_w), z80sio implementation has no clock pin
 	DEVCB_NULL, // DEVCB_DEVICE_LINE("z80sio", rx_tx_b_w),
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* receiver divisor ROM */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* transmitter divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* receiver divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* transmitter divisor ROM */
 };
 
 static COM8116_INTERFACE( kaypro2x_brg_intf )
 {
-	DEVCB_NULL,		/* fX/4 output */
+	DEVCB_NULL,     /* fX/4 output */
 	DEVCB_NULL,//DEVCB_DEVICE_LINE("z80sio", rx_tx_a_w),
 	DEVCB_NULL,//DEVCB_DEVICE_LINE("z80sio_2x", rx_tx_a_w),
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* receiver divisor ROM */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* transmitter divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* receiver divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* transmitter divisor ROM */
 };
 
 
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_5MHz)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kayproii_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state,  kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state,  kay_kbd_interrupt)  /* this doesn't actually exist, it is to run the keyboard */
 	MCFG_CPU_CONFIG(kayproii_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
@@ -266,10 +266,10 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_QUICKLOAD_ADD("quickload", kayproii, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kayproii_brg_intf)	// WD1943, SMC8116
+	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kayproii_brg_intf)  // WD1943, SMC8116
 	MCFG_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
-	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
+	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )  /* start at 300 baud */
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(kayproii_floppy_interface)
 MACHINE_CONFIG_END
@@ -311,9 +311,9 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_QUICKLOAD_ADD("quickload", kaypro2x, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kaypro2x_brg_intf)	// WD1943, SMC8116
+	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kaypro2x_brg_intf)  // WD1943, SMC8116
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
-	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
+	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )   /* extra sio for modem and printer */
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(kaypro2x_floppy_interface)
 MACHINE_CONFIG_END

@@ -25,7 +25,7 @@
 // ======================> vp620_device
 
 class vp620_device : public device_t,
-					 public device_vip_byteio_port_interface
+						public device_vip_byteio_port_interface
 {
 public:
 	// construction/destruction

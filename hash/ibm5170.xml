@@ -246,8 +246,8 @@ Missing files come here
 	</software>
 
 	<software name="winxpb">
-	    <!-- output of the "Create an MS-DOS startup disk" option in Windows XP's format dialog -->
-	    <!-- extracted from C:\Windows\system32\diskcopy.dll version 6.0.2900.5512 -->
+		<!-- output of the "Create an MS-DOS startup disk" option in Windows XP's format dialog -->
+		<!-- extracted from C:\Windows\system32\diskcopy.dll version 6.0.2900.5512 -->
 		<description>Microsoft Windows XP MS-DOS startup disk</description>
 		<year>2005</year>
 		<publisher>Microsoft</publisher>

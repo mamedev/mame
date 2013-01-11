@@ -209,26 +209,26 @@ static const ay8910_interface ay8910_config =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_DRIVER_MEMBER(albazg_state,mux_w),			/* Port A write */
-	DEVCB_INPUT_PORT("SYSTEM"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_DRIVER_MEMBER(albazg_state,mux_r),			/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_DRIVER_MEMBER(albazg_state,mux_w),            /* Port A write */
+	DEVCB_INPUT_PORT("SYSTEM"),     /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_DRIVER_MEMBER(albazg_state,mux_r),            /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 /***************************************************************************************/
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(albazg_state, screen_update_yumefuda)
 
-	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)   /* hand tuned to get ~60 fps */
 
 	MCFG_GFXDECODE( yumefuda )
 	MCFG_PALETTE_LENGTH(0x80)

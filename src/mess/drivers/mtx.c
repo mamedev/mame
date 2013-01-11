@@ -324,8 +324,8 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 static TMS9928A_INTERFACE(mtx_tms9928a_interface)
 {
 	"screen",
-    0x4000,
-    DEVCB_DRIVER_LINE_MEMBER(mtx_state,mtx_tms9929a_interrupt)
+	0x4000,
+	DEVCB_DRIVER_LINE_MEMBER(mtx_state,mtx_tms9929a_interrupt)
 };
 
 /*-------------------------------------------------
@@ -334,7 +334,7 @@ static TMS9928A_INTERFACE(mtx_tms9928a_interface)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -448,6 +448,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY          FULLNAME   FLAGS */
-COMP( 1983, mtx512,   0,		0,      mtx512,   mtx512, driver_device,   0,		"Memotech Ltd", "MTX 512", 0 )
-COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512, driver_device,   0,		"Memotech Ltd", "MTX 500", 0 )
-COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512, driver_device,   0,		"Memotech Ltd", "RS 128",  0 )
+COMP( 1983, mtx512,   0,        0,      mtx512,   mtx512, driver_device,   0,       "Memotech Ltd", "MTX 512", 0 )
+COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512, driver_device,   0,       "Memotech Ltd", "MTX 500", 0 )
+COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512, driver_device,   0,       "Memotech Ltd", "RS 128",  0 )

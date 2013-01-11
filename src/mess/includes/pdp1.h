@@ -14,16 +14,16 @@ enum
 	/* bit numbers */
 	pdp1_control_bit = 0,
 
-	pdp1_extend_bit		= 1,
+	pdp1_extend_bit     = 1,
 	pdp1_start_nobrk_bit= 2,
-	pdp1_start_brk_bit	= 3,
-	pdp1_stop_bit		= 4,
-	pdp1_continue_bit	= 5,
-	pdp1_examine_bit	= 6,
-	pdp1_deposit_bit	= 7,
-	pdp1_read_in_bit	= 8,
-	pdp1_reader_bit		= 9,
-	pdp1_tape_feed_bit	= 10,
+	pdp1_start_brk_bit  = 3,
+	pdp1_stop_bit       = 4,
+	pdp1_continue_bit   = 5,
+	pdp1_examine_bit    = 6,
+	pdp1_deposit_bit    = 7,
+	pdp1_read_in_bit    = 8,
+	pdp1_reader_bit     = 9,
+	pdp1_tape_feed_bit  = 10,
 	pdp1_single_step_bit= 11,
 	pdp1_single_inst_bit= 12,
 
@@ -58,34 +58,34 @@ enum
 /* defines for each field in input port pdp1_config */
 enum
 {
-	pdp1_config_extend_bit			= 0,
-	pdp1_config_extend_mask			= 0x3,	/* 2 bits */
-	pdp1_config_hw_mul_div_bit		= 2,
-	pdp1_config_hw_mul_div_mask		= 0x1,
+	pdp1_config_extend_bit          = 0,
+	pdp1_config_extend_mask         = 0x3,  /* 2 bits */
+	pdp1_config_hw_mul_div_bit      = 2,
+	pdp1_config_hw_mul_div_mask     = 0x1,
 	/*pdp1_config_hw_obsolete_bit   = 3,
-    pdp1_config_hw_obsolete_mask    = 0x1,*/
-	pdp1_config_type_20_sbs_bit		= 4,
-	pdp1_config_type_20_sbs_mask	= 0x1,
-	pdp1_config_lightpen_bit		= 5,
-	pdp1_config_lightpen_mask		= 0x1
+	pdp1_config_hw_obsolete_mask    = 0x1,*/
+	pdp1_config_type_20_sbs_bit     = 4,
+	pdp1_config_type_20_sbs_mask    = 0x1,
+	pdp1_config_lightpen_bit        = 5,
+	pdp1_config_lightpen_mask       = 0x1
 };
 
 /* defines for each field in input port pdp1_lightpen_state */
 enum
 {
-	pdp1_lightpen_down_bit			= 0,
-	pdp1_lightpen_smaller_bit		= 1,
-	pdp1_lightpen_larger_bit		= 2,
+	pdp1_lightpen_down_bit          = 0,
+	pdp1_lightpen_smaller_bit       = 1,
+	pdp1_lightpen_larger_bit        = 2,
 
-	pdp1_lightpen_down				= (1 << pdp1_lightpen_down_bit),
-	pdp1_lightpen_smaller			= (1 << pdp1_lightpen_smaller_bit),
-	pdp1_lightpen_larger			= (1 << pdp1_lightpen_larger_bit)
+	pdp1_lightpen_down              = (1 << pdp1_lightpen_down_bit),
+	pdp1_lightpen_smaller           = (1 << pdp1_lightpen_smaller_bit),
+	pdp1_lightpen_larger            = (1 << pdp1_lightpen_larger_bit)
 };
 
 /* defines for our font */
 enum
 {
-	pdp1_charnum = /*104*/128,	/* ASCII set + 8 special characters */
+	pdp1_charnum = /*104*/128,  /* ASCII set + 8 special characters */
 									/* for whatever reason, 104 breaks some characters */
 
 	pdp1_fontdata_size = 8 * pdp1_charnum
@@ -125,7 +125,7 @@ enum
 };
 
 enum
-{	/* refresh rate in Hz: can be changed at will */
+{   /* refresh rate in Hz: can be changed at will */
 	refresh_rate = 60
 };
 
@@ -166,17 +166,17 @@ enum
 /* tape reader registers */
 struct tape_reader_t
 {
-	device_image_interface *fd;	/* file descriptor of tape image */
+	device_image_interface *fd; /* file descriptor of tape image */
 
-	int motor_on;	/* 1-bit reader motor on */
+	int motor_on;   /* 1-bit reader motor on */
 
-	int rb;			/* 18-bit reader buffer */
-	int rcl;		/* 1-bit reader clutch */
-	int rc;			/* 2-bit reader counter */
-	int rby;		/* 1-bit reader binary mode flip-flop */
-	int rcp;		/* 1-bit reader "need a completion pulse" flip-flop */
+	int rb;         /* 18-bit reader buffer */
+	int rcl;        /* 1-bit reader clutch */
+	int rc;         /* 2-bit reader counter */
+	int rby;        /* 1-bit reader binary mode flip-flop */
+	int rcp;        /* 1-bit reader "need a completion pulse" flip-flop */
 
-	emu_timer *timer;	/* timer to simulate reader timing */
+	emu_timer *timer;   /* timer to simulate reader timing */
 };
 
 
@@ -184,9 +184,9 @@ struct tape_reader_t
 /* tape puncher registers */
 struct tape_puncher_t
 {
-	device_image_interface *fd;	/* file descriptor of tape image */
+	device_image_interface *fd; /* file descriptor of tape image */
 
-	emu_timer *timer;	/* timer to generate completion pulses */
+	emu_timer *timer;   /* timer to generate completion pulses */
 };
 
 
@@ -194,9 +194,9 @@ struct tape_puncher_t
 /* typewriter registers */
 struct typewriter_t
 {
-	device_image_interface *fd;	/* file descriptor of output image */
+	device_image_interface *fd; /* file descriptor of output image */
 
-	int tb;			/* typewriter buffer */
+	int tb;         /* typewriter buffer */
 
 	emu_timer *tyo_timer;/* timer to generate completion pulses */
 };
@@ -204,18 +204,18 @@ struct typewriter_t
 /* MIT parallel drum (mostly similar to type 23) */
 struct parallel_drum_t
 {
-	device_image_interface *fd;	/* file descriptor of drum image */
+	device_image_interface *fd; /* file descriptor of drum image */
 
-	int il;			/* initial location (12-bit) */
-	int wc;			/* word counter (12-bit) */
-	int wcl;		/* word core location counter (16-bit) */
-	int rfb;		/* read field buffer (5-bit) */
-	int wfb;		/* write field buffer (5-bit) */
+	int il;         /* initial location (12-bit) */
+	int wc;         /* word counter (12-bit) */
+	int wcl;        /* word core location counter (16-bit) */
+	int rfb;        /* read field buffer (5-bit) */
+	int wfb;        /* write field buffer (5-bit) */
 
 	int dba;
 
-	emu_timer *rotation_timer;	/* timer called each time dc is 0 */
-	emu_timer *il_timer;		/* timer called each time dc is il */
+	emu_timer *rotation_timer;  /* timer called each time dc is 0 */
+	emu_timer *il_timer;        /* timer called each time dc is il */
 };
 
 

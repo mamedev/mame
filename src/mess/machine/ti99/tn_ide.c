@@ -42,7 +42,7 @@ enum
 {
 	cru_reg_page_switching = 0x04,
 	cru_reg_page_0 = 0x08,
-	/*cru_reg_rambo = 0x10,*/	/* not emulated */
+	/*cru_reg_rambo = 0x10,*/   /* not emulated */
 	cru_reg_wp = 0x20,
 	cru_reg_int_en = 0x40,
 	cru_reg_reset = 0x80
@@ -67,7 +67,7 @@ void nouspikel_ide_interface_device::crureadz(offs_t offset, UINT8 *value)
 		if (bit==0)
 		{
 			reply = m_cru_register & 0x30;
-			reply |= 8;	/* IDE bus IORDY always set */
+			reply |= 8; /* IDE bus IORDY always set */
 			if (!m_clk_irq)
 				reply |= 4;
 			if (m_sram_enable_dip)
@@ -92,16 +92,16 @@ void nouspikel_ide_interface_device::cruwrite(offs_t offset, UINT8 data)
 		case 0:
 			m_selected = (data!=0);
 
-		case 1:			// enable SRAM or registers in 0x4000-0x40ff
+		case 1:         // enable SRAM or registers in 0x4000-0x40ff
 			m_sram_enable = (data!=0);
 			break;
 
-		case 2:			// enable SRAM page switching
-		case 3:			// force SRAM page 0
-		case 4:			// enable SRAM in 0x6000-0x7000 ("RAMBO" mode)
-		case 5:			// write-protect RAM
-		case 6:			// irq and reset enable
-		case 7:			// reset drive
+		case 2:         // enable SRAM page switching
+		case 3:         // force SRAM page 0
+		case 4:         // enable SRAM in 0x6000-0x7000 ("RAMBO" mode)
+		case 5:         // write-protect RAM
+		case 6:         // irq and reset enable
+		case 7:         // reset drive
 			if (data!=0)
 				m_cru_register |= 1 << bit;
 			else
@@ -130,10 +130,10 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 		int addr = offset & 0x1fff;
 
 		if ((addr <= 0xff) && (m_sram_enable == m_sram_enable_dip))
-		{	/* registers */
+		{   /* registers */
 			switch ((addr >> 5) & 0x3)
 			{
-			case 0:		/* RTC RAM */
+			case 0:     /* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
 					reply = m_rtc->xram_r(machine().driver_data()->generic_space(),(addr & 0x1f) | 0x20);
@@ -141,7 +141,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 					/* RTC RAM read */
 					reply = m_rtc->xram_r(machine().driver_data()->generic_space(),addr);
 				break;
-			case 1:		/* RTC registers */
+			case 1:     /* RTC registers */
 				if (addr & 0x10)
 					/* register data */
 					reply = m_rtc->rtc_r(machine().driver_data()->generic_space(),1);
@@ -149,9 +149,9 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 					/* register select */
 					reply = m_rtc->rtc_r(machine().driver_data()->generic_space(),0);
 				break;
-			case 2:		/* IDE registers set 1 (CS1Fx) */
+			case 2:     /* IDE registers set 1 (CS1Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
-				{	/* first read triggers 16-bit read cycle */
+				{   /* first read triggers 16-bit read cycle */
 					m_input_latch = (! (addr & 0x10)) ? ide_bus_r(m_ide, 0, (addr >> 1) & 0x7) : 0;
 				}
 
@@ -160,9 +160,9 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 				/* return latched input - bytes are swapped in 2004 IDE card */
 				reply = ((addr & 1) ? (m_input_latch >> 8) : m_input_latch) & 0xff;
 				break;
-			case 3:		/* IDE registers set 2 (CS3Fx) */
+			case 3:     /* IDE registers set 2 (CS3Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
-				{	/* first read triggers 16-bit read cycle */
+				{   /* first read triggers 16-bit read cycle */
 					m_input_latch = (! (addr & 0x10)) ? ide_bus_r(m_ide, 1, (addr >> 1) & 0x7) : 0;
 				}
 
@@ -174,7 +174,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			}
 		}
 		else
-		{	/* sram */
+		{   /* sram */
 			if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
 				reply = m_ram[addr+0x2000 * m_cur_page];
 			else
@@ -199,10 +199,10 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 		int addr = offset & 0x1fff;
 
 		if ((addr <= 0xff) && (m_sram_enable == m_sram_enable_dip))
-		{	/* registers */
+		{   /* registers */
 			switch ((addr >> 5) & 0x3)
 			{
-			case 0:		/* RTC RAM */
+			case 0:     /* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
 					m_rtc->xram_w(machine().driver_data()->generic_space(),(addr & 0x1f) | 0x20, data);
@@ -210,7 +210,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 					/* RTC RAM write */
 					m_rtc->xram_w(machine().driver_data()->generic_space(),addr, data);
 				break;
-			case 1:		/* RTC registers */
+			case 1:     /* RTC registers */
 				if (addr & 0x10)
 					/* register data */
 					m_rtc->rtc_w(machine().driver_data()->generic_space(),1, data);
@@ -218,7 +218,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 					/* register select */
 					m_rtc->rtc_w(machine().driver_data()->generic_space(),0, data);
 				break;
-			case 2:		/* IDE registers set 1 (CS1Fx) */
+			case 2:     /* IDE registers set 1 (CS1Fx) */
 /*
                 if (addr & 1)
                     m_output_latch = (m_output_latch & 0xff00) | data;
@@ -232,11 +232,11 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 					m_output_latch = (m_output_latch & 0xff00) | data;
 
 				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
-				{	/* second write triggers 16-bit write cycle */
+				{   /* second write triggers 16-bit write cycle */
 					ide_bus_w(m_ide, 0, (addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
-			case 3:		/* IDE registers set 2 (CS3Fx) */
+			case 3:     /* IDE registers set 2 (CS3Fx) */
 /*
                 if (addr & 1)
                     m_output_latch = (m_output_latch & 0xff00) | data;
@@ -250,14 +250,14 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 					m_output_latch = (m_output_latch & 0xff00) | data;
 
 				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
-				{	/* second write triggers 16-bit write cycle */
+				{   /* second write triggers 16-bit write cycle */
 					ide_bus_w(m_ide, 1, (addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
 			}
 		}
 		else
-		{	/* sram */
+		{   /* sram */
 			if (! (m_cru_register & cru_reg_wp))
 			{
 				if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
@@ -382,4 +382,3 @@ ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
 }
 
 const device_type TI99_IDE = &device_creator<nouspikel_ide_interface_device>;
-

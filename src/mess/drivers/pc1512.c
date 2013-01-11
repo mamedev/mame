@@ -40,18 +40,18 @@ READ8_MEMBER( pc1512_state::system_r )
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       1
-                1       8087 NDP installed
-                2       1
-                3       1
-                4       DDM0
-                5       DDM1
-                6       second floppy disk drive installed
-                7       0
+			    0       1
+			    1       8087 NDP installed
+			    2       1
+			    3       1
+			    4       DDM0
+			    5       DDM1
+			    6       second floppy disk drive installed
+			    7       0
 
-            */
+			*/
 
 			data = m_status1;
 		}
@@ -71,18 +71,18 @@ READ8_MEMBER( pc1512_state::system_r )
 	case 2:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       RAM0 / RAM4
-            1       RAM1
-            2       RAM2
-            3       RAM3
-            4       undefined
-            5       8253 PIT OUT2 output
-            6       external parity error (I/OCHCK from expansion bus)
-            7       on-board system RAM parity error
+		    0       RAM0 / RAM4
+		    1       RAM1
+		    2       RAM2
+		    3       RAM3
+		    4       undefined
+		    5       8253 PIT OUT2 output
+		    6       external parity error (I/OCHCK from expansion bus)
+		    7       on-board system RAM parity error
 
-        */
+		*/
 
 		if (BIT(m_port61, 2))
 			data = m_status2 & 0x0f;
@@ -108,18 +108,18 @@ WRITE8_MEMBER( pc1512_state::system_w )
 	case 1:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       8253 GATE 2 (speaker modulate)
-            1       speaker drive
-            2       enable port C LSB / disable MSB
-            3       undefined
-            4       disable parity checking of on-board RAM
-            5       prevent external parity errors from causing NMI
-            6       enable incoming Keyboard Clock
-            7       enable Status-1/Disable Keyboard Code on Port A
+		    0       8253 GATE 2 (speaker modulate)
+		    1       speaker drive
+		    2       enable port C LSB / disable MSB
+		    3       undefined
+		    4       disable parity checking of on-board RAM
+		    5       prevent external parity errors from causing NMI
+		    6       enable incoming Keyboard Clock
+		    7       enable Status-1/Disable Keyboard Code on Port A
 
-        */
+		*/
 
 		m_port61 = data;
 
@@ -134,18 +134,18 @@ WRITE8_MEMBER( pc1512_state::system_w )
 	case 4:
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1       PA1 - 8087 NDP installed
-            2
-            3
-            4       PA4 - DDM0
-            5       PA5 - DDM1
-            6       PA6 - Second Floppy disk drive installed
-            7
+		    0
+		    1       PA1 - 8087 NDP installed
+		    2
+		    3
+		    4       PA4 - DDM0
+		    5       PA5 - DDM1
+		    6       PA6 - Second Floppy disk drive installed
+		    7
 
-        */
+		*/
 
 		if (BIT(data, 7))
 			m_status1 = data ^ 0x8d;
@@ -156,18 +156,18 @@ WRITE8_MEMBER( pc1512_state::system_w )
 	case 5:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       PC0 (LSB) - RAM0
-            1       PC1 (LSB) - RAM1
-            2       PC2 (LSB) - RAM2
-            3       PC3 (LSB) - RAM3
-            4       PC0 (MSB) - RAM4
-            5       PC1 (MSB) - Undefined
-            6       PC2 (MSB) - Undefined
-            7       PC3 (MSB) - Undefined
+		    0       PC0 (LSB) - RAM0
+		    1       PC1 (LSB) - RAM1
+		    2       PC2 (LSB) - RAM2
+		    3       PC3 (LSB) - RAM3
+		    4       PC0 (MSB) - RAM4
+		    5       PC1 (MSB) - Undefined
+		    6       PC2 (MSB) - Undefined
+		    7       PC3 (MSB) - Undefined
 
-        */
+		*/
 
 		m_status2 = data;
 		break;
@@ -239,18 +239,18 @@ WRITE8_MEMBER( pc1512_state::dma_page_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Address bit A16
-        1       Address bit A17
-        2       Address bit A18
-        3       Address bit A19
-        4
-        5
-        6
-        7
+	    0       Address bit A16
+	    1       Address bit A17
+	    2       Address bit A18
+	    3       Address bit A19
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	switch (offset)
 	{
@@ -306,18 +306,18 @@ READ8_MEMBER( pc1512_state::printer_r )
 	case 1:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       LK1 fitted
-            1       LK2 fitted
-            2       LK3 fitted
-            3       printer error
-            4       printer selected
-            5       paper out
-            6       printer acknowledge
-            7       printer busy
+		    0       LK1 fitted
+		    1       LK2 fitted
+		    2       LK3 fitted
+		    3       printer error
+		    4       printer selected
+		    5       paper out
+		    6       printer acknowledge
+		    7       printer busy
 
-        */
+		*/
 
 		data |= ioport("LK")->read() & 0x07;
 
@@ -331,18 +331,18 @@ READ8_MEMBER( pc1512_state::printer_r )
 	case 2:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Data Strobe
-            1       Select Auto Feed
-            2       Reset Printer
-            3       Select Printer
-            4       Enable Int on ACK
-            5       1
-            6
-            7
+		    0       Data Strobe
+		    1       Select Auto Feed
+		    2       Reset Printer
+		    3       Select Printer
+		    4       Enable Int on ACK
+		    5       1
+		    6
+		    7
 
-        */
+		*/
 
 		data = m_printer_control | 0x20;
 		break;
@@ -365,43 +365,43 @@ READ8_MEMBER( pc1640_state::printer_r )
 	case 2:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Data Strobe
-            1       Select Auto Feed
-            2       Reset Printer
-            3       Select Printer
-            4       Enable Int on ACK
-            5       OPT
-            6       SW6
-            7       SW7
+		    0       Data Strobe
+		    1       Select Auto Feed
+		    2       Reset Printer
+		    3       Select Printer
+		    4       Enable Int on ACK
+		    5       OPT
+		    6       SW6
+		    7       SW7
 
-        */
+		*/
 
 		/*
-        Bit D5 is the option (OPT) bit and can return one of three different pieces of
-        information. Although not documented as such on the PC1512, Bit D5 was always a
-        "1", however on the PC1640 it will always be a zero if immediately prior to the
-        read of channel 037Ah the software performs an I/O read of an I/O channel
-        implemented on the PC1512 main board, having address line A7 high (for example,
-        the CGA channels). This is a simple test for software to detect whether it is
-        running on a PC1512 or a PC1640. A PC1512 will give a 1, whereas a PC1640 will
-        give a 0.
+		Bit D5 is the option (OPT) bit and can return one of three different pieces of
+		information. Although not documented as such on the PC1512, Bit D5 was always a
+		"1", however on the PC1640 it will always be a zero if immediately prior to the
+		read of channel 037Ah the software performs an I/O read of an I/O channel
+		implemented on the PC1512 main board, having address line A7 high (for example,
+		the CGA channels). This is a simple test for software to detect whether it is
+		running on a PC1512 or a PC1640. A PC1512 will give a 1, whereas a PC1640 will
+		give a 0.
 
-        In addition to being a test of machine type the OPT bit, D5, can also reflect
-        the state of either SW9 or SW10. The OPT bit will reflect the state of switch
-        SW9 by an I/O read operation to an I/O channel not implemented on the main
-        board and having address lines A14 and A7 both low (for example channel 0278h)
-        immediately prior to the reading of channel 037Ah. The OPT bit is set to the
-        state of switch SW10 by an I/O read operation to an I/O channel not implemented
-        on the main board having address lines A14 high and A7 low (for example channel
-        4278h). Software testing OPT bit should disable interrupts before the initial
-        (dummy) channel read and the I/O read of channel 037A in order to avoid
-        additional (interrupt based) I/O operations between the setting and the testing
-        of the information read back in the OPT bit. For switches SW9 and SW10, a logic
-        "1" is returned when the switch is on the "on" position and a logic "0" if the
-        switch is in the "off" position.
-        */
+		In addition to being a test of machine type the OPT bit, D5, can also reflect
+		the state of either SW9 or SW10. The OPT bit will reflect the state of switch
+		SW9 by an I/O read operation to an I/O channel not implemented on the main
+		board and having address lines A14 and A7 both low (for example channel 0278h)
+		immediately prior to the reading of channel 037Ah. The OPT bit is set to the
+		state of switch SW10 by an I/O read operation to an I/O channel not implemented
+		on the main board having address lines A14 high and A7 low (for example channel
+		4278h). Software testing OPT bit should disable interrupts before the initial
+		(dummy) channel read and the I/O read of channel 037A in order to avoid
+		additional (interrupt based) I/O operations between the setting and the testing
+		of the information read back in the OPT bit. For switches SW9 and SW10, a logic
+		"1" is returned when the switch is on the "on" position and a logic "0" if the
+		switch is in the "off" position.
+		*/
 		data = m_printer_control;
 		data |= m_opt << 5;
 		data |= (ioport("SW")->read() & 0x60) << 1;
@@ -432,18 +432,18 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 	case 2:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Data Strobe
-            1       Select Auto Feed
-            2       Reset Printer
-            3       Select Printer
-            4       Enable Int on ACK
-            5
-            6
-            7
+		    0       Data Strobe
+		    1       Select Auto Feed
+		    2       Reset Printer
+		    3       Select Printer
+		    4       Enable Int on ACK
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		m_printer_control = data & 0x1f;
 
@@ -659,14 +659,14 @@ static INPUT_PORTS_START( pc1512 )
 
 	PORT_START("LK")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Language ) )
-	PORT_DIPSETTING(	0x07, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x06, DEF_STR( German ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( French ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Spanish ) )
-	PORT_DIPSETTING(	0x03, "Danish" )
-	PORT_DIPSETTING(	0x02, "Swedish" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) )
-	PORT_DIPSETTING(	0x00, "Diagnostic Mode" )
+	PORT_DIPSETTING(    0x07, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x03, "Danish" )
+	PORT_DIPSETTING(    0x02, "Swedish" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) )
+	PORT_DIPSETTING(    0x00, "Diagnostic Mode" )
 	PORT_DIPNAME( 0x08, 0x08, "Memory Size")
 	PORT_DIPSETTING( 0x08, "512 KB" )
 	PORT_DIPSETTING( 0x00, "640 KB" )
@@ -674,10 +674,10 @@ static INPUT_PORTS_START( pc1512 )
 	PORT_DIPSETTING( 0x10, "16 KB" )
 	PORT_DIPSETTING( 0x00, "32 KB" )
 	PORT_DIPNAME( 0x60, 0x60, "Character Set")
-    PORT_DIPSETTING( 0x60, "Default (Codepage 437)" )
-    PORT_DIPSETTING( 0x40, "Portugese (Codepage 865)" )
-    PORT_DIPSETTING( 0x20, "Norwegian (Codepage 860)" )
-    PORT_DIPSETTING( 0x00, "Greek")
+	PORT_DIPSETTING( 0x60, "Default (Codepage 437)" )
+	PORT_DIPSETTING( 0x40, "Portugese (Codepage 865)" )
+	PORT_DIPSETTING( 0x20, "Norwegian (Codepage 860)" )
+	PORT_DIPSETTING( 0x00, "Greek")
 	PORT_DIPNAME( 0x80, 0x80, "Floppy Ready Line")
 	PORT_DIPSETTING( 0x80, "Connected" )
 	PORT_DIPSETTING( 0x00, "Not connected" )
@@ -693,51 +693,51 @@ static INPUT_PORTS_START( pc1640 )
 
 	PORT_START("LK")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Language ) )
-	PORT_DIPSETTING(	0x07, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x06, DEF_STR( German ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( French ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Spanish ) )
-	PORT_DIPSETTING(	0x03, "Danish" )
-	PORT_DIPSETTING(	0x02, "Swedish" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) )
-	PORT_DIPSETTING(	0x00, "Diagnostic Mode" )
+	PORT_DIPSETTING(    0x07, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x03, "Danish" )
+	PORT_DIPSETTING(    0x02, "Swedish" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) )
+	PORT_DIPSETTING(    0x00, "Diagnostic Mode" )
 
 	PORT_START("SW")
 	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
-	PORT_DIPSETTING(	0x0b, "Internal MD, External CGA80" )
-	PORT_DIPSETTING(	0x0a, "Internal MD, External CGA40" )
-	PORT_DIPSETTING(	0x09, "Internal ECD350, External MDA/HERC" )
-	PORT_DIPSETTING(	0x08, "Internal ECD200, External MDA/HERC" )
-	PORT_DIPSETTING(	0x07, "Internal CD80, External MDA/HERC" )
-	PORT_DIPSETTING(	0x06, "Internal CD40, External MDA/HERC" )
-	PORT_DIPSETTING(	0x05, "External CGA80, Internal MD" )
-	PORT_DIPSETTING(	0x04, "External CGA40, Internal MD" )
-	PORT_DIPSETTING(	0x03, "External MDA/HERC, Internal ECD350" )
-	PORT_DIPSETTING(	0x02, "External MDA/HERC, Internal ECD200" )
-	PORT_DIPSETTING(	0x01, "External MDA/HERC, Internal CD80" )
-	PORT_DIPSETTING(	0x00, "External MDA/HERC, Internal CD40" )
+	PORT_DIPSETTING(    0x0b, "Internal MD, External CGA80" )
+	PORT_DIPSETTING(    0x0a, "Internal MD, External CGA40" )
+	PORT_DIPSETTING(    0x09, "Internal ECD350, External MDA/HERC" )
+	PORT_DIPSETTING(    0x08, "Internal ECD200, External MDA/HERC" )
+	PORT_DIPSETTING(    0x07, "Internal CD80, External MDA/HERC" )
+	PORT_DIPSETTING(    0x06, "Internal CD40, External MDA/HERC" )
+	PORT_DIPSETTING(    0x05, "External CGA80, Internal MD" )
+	PORT_DIPSETTING(    0x04, "External CGA40, Internal MD" )
+	PORT_DIPSETTING(    0x03, "External MDA/HERC, Internal ECD350" )
+	PORT_DIPSETTING(    0x02, "External MDA/HERC, Internal ECD200" )
+	PORT_DIPSETTING(    0x01, "External MDA/HERC, Internal CD80" )
+	PORT_DIPSETTING(    0x00, "External MDA/HERC, Internal CD40" )
 	PORT_DIPNAME( 0x10, 0x10, "MC6845 Mode" ) PORT_DIPLOCATION("SW:5") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
-	PORT_DIPSETTING(	0x10, "EGA" )
-	PORT_DIPSETTING(	0x00, "CGA/MDA/HERC" )
+	PORT_DIPSETTING(    0x10, "EGA" )
+	PORT_DIPSETTING(    0x00, "CGA/MDA/HERC" )
 	PORT_DIPNAME( 0x60, 0x00, "Font" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x300, EQUALS, 0x300)
-	PORT_DIPSETTING(	0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x60, "Danish" )
-	PORT_DIPSETTING(	0x40, "Portuguese" )
-	PORT_DIPSETTING(	0x20, "Greek" )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x60, "Danish" )
+	PORT_DIPSETTING(    0x40, "Portuguese" )
+	PORT_DIPSETTING(    0x20, "Greek" )
 	PORT_DIPNAME( 0x60, 0x60, "Default Display Mode" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x200, EQUALS, 0x000)
-	PORT_DIPSETTING(	0x60, "External EGA" )
-	PORT_DIPSETTING(	0x40, "External CGA in 40 Column Mode" )
-	PORT_DIPSETTING(	0x20, "External CGA in 80 Column Mode" )
-	PORT_DIPSETTING(	0x00, "External Monochrome Adapter" )
+	PORT_DIPSETTING(    0x60, "External EGA" )
+	PORT_DIPSETTING(    0x40, "External CGA in 40 Column Mode" )
+	PORT_DIPSETTING(    0x20, "External CGA in 80 Column Mode" )
+	PORT_DIPSETTING(    0x00, "External Monochrome Adapter" )
 	PORT_DIPNAME( 0x80, 0x00, "Monitor" ) PORT_DIPLOCATION("SW:8") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
-	PORT_DIPSETTING(	0x80, "CD (Standard RGB)" )
-	PORT_DIPSETTING(	0x00, "ECD (Enhanced RGB)" )
+	PORT_DIPSETTING(    0x80, "CD (Standard RGB)" )
+	PORT_DIPSETTING(    0x00, "ECD (Enhanced RGB)" )
 	PORT_DIPNAME( 0x100, 0x100, "Foreign Fonts" ) PORT_DIPLOCATION("SW:9") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
-	PORT_DIPSETTING(	 0x100, "Enabled" )
-	PORT_DIPSETTING(	 0x000, "Disabled" )
+	PORT_DIPSETTING(     0x100, "Enabled" )
+	PORT_DIPSETTING(     0x000, "Disabled" )
 	PORT_DIPNAME( 0x200, 0x200, "Internal Graphics Adapter" ) PORT_DIPLOCATION("SW:10")
-	PORT_DIPSETTING(	 0x200, "Enabled" )
-	PORT_DIPSETTING(	 0x000, "Disabled" )
+	PORT_DIPSETTING(     0x200, "Enabled" )
+	PORT_DIPSETTING(     0x000, "Disabled" )
 INPUT_PORTS_END
 
 
@@ -893,17 +893,17 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_MEMBER(pc1512_state, memr_r),
 	DEVCB_DRIVER_MEMBER(pc1512_state, memw_w),
 	{ DEVCB_NULL,
-	  DEVCB_DRIVER_MEMBER(pc1512_state, ior1_r),
-	  DEVCB_DRIVER_MEMBER(pc1512_state, ior2_r),
-	  DEVCB_DRIVER_MEMBER(pc1512_state, ior3_r) },
+		DEVCB_DRIVER_MEMBER(pc1512_state, ior1_r),
+		DEVCB_DRIVER_MEMBER(pc1512_state, ior2_r),
+		DEVCB_DRIVER_MEMBER(pc1512_state, ior3_r) },
 	{ DEVCB_DRIVER_MEMBER(pc1512_state, iow0_w),
-	  DEVCB_DRIVER_MEMBER(pc1512_state, iow1_w),
-	  DEVCB_DRIVER_MEMBER(pc1512_state, iow2_w),
-	  DEVCB_DRIVER_MEMBER(pc1512_state, iow3_w) },
+		DEVCB_DRIVER_MEMBER(pc1512_state, iow1_w),
+		DEVCB_DRIVER_MEMBER(pc1512_state, iow2_w),
+		DEVCB_DRIVER_MEMBER(pc1512_state, iow3_w) },
 	{ DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack0_w),
-	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack1_w),
-	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack2_w),
-	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack3_w) }
+		DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack1_w),
+		DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack2_w),
+		DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack3_w) }
 };
 
 
@@ -1084,7 +1084,7 @@ FLOPPY_FORMATS_MEMBER( pc1512_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( ibmpc_floppies )
-	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 
@@ -1389,7 +1389,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME        FLAGS
-COMP( 1986, pc1512,		0,			0,		pc1512,		pc1512, driver_device,		0,		"Amstrad plc",	"PC1512 (V1)",	GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1512v2,	pc1512,		0,		pc1512,		pc1512, driver_device,		0,		"Amstrad plc",	"PC1512 (V2)",	GAME_SUPPORTS_SAVE )
-COMP( 1989, pc1512v3,	pc1512,		0,		pc1512,		pc1512, driver_device,		0,		"Amstrad plc",	"PC1512 (V3)",	GAME_NOT_WORKING )
-COMP( 1987, pc1640,		0,			0,		pc1640,		pc1640, driver_device,		0,		"Amstrad plc",	"PC1640",		GAME_NOT_WORKING )
+COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V1)",  GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1512v2,   pc1512,     0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V2)",  GAME_SUPPORTS_SAVE )
+COMP( 1989, pc1512v3,   pc1512,     0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V3)",  GAME_NOT_WORKING )
+COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640",       GAME_NOT_WORKING )

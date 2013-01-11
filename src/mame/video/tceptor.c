@@ -8,12 +8,12 @@
 #include "includes/tceptor.h"
 
 
-#define TX_TILE_OFFSET_CENTER	(32 * 2)
-#define TX_TILE_OFFSET_RIGHT	(32 * 0 + 2)
-#define TX_TILE_OFFSET_LEFT	(32 * 31 + 2)
+#define TX_TILE_OFFSET_CENTER   (32 * 2)
+#define TX_TILE_OFFSET_RIGHT    (32 * 0 + 2)
+#define TX_TILE_OFFSET_LEFT (32 * 31 + 2)
 
-#define SPR_TRANS_COLOR		(0xff + 0x300)
-#define SPR_MASK_COLOR		(0xfe + 0x300)
+#define SPR_TRANS_COLOR     (0xff + 0x300)
+#define SPR_MASK_COLOR      (0xfe + 0x300)
 
 
 /*******************************************************************/
@@ -41,12 +41,12 @@ void tceptor_state::palette_init()
 
 
 	/*
-          color lookup table:
-            0-    +1024 ( 4 * 256) colors: text   (use 0-   256 colors)
-            1024- +1024 (16 *  64) colors: sprite (use 768- 256 colors)
-            2048-  +512 ( 8 *  64) colors: bg     (use 0-   512 colors)
-            3840-  +256 ( 4 *  64) colors: road   (use 512- 256 colors)
-        */
+	      color lookup table:
+	        0-    +1024 ( 4 * 256) colors: text   (use 0-   256 colors)
+	        1024- +1024 (16 *  64) colors: sprite (use 768- 256 colors)
+	        2048-  +512 ( 8 *  64) colors: bg     (use 0-   512 colors)
+	        3840-  +256 ( 4 *  64) colors: road   (use 512- 256 colors)
+	    */
 
 	/* tiles lookup table (1024 colors) */
 	for (i = 0; i < 0x0400; i++)
@@ -281,8 +281,8 @@ static void decode_sprite16(running_machine &machine, const char * region)
 			2*8, 2*8+1, 2*8+2, 2*8+3, 3*8, 3*8+1, 3*8+2, 3*8+3
 		},
 		{
-			 0*2*16,  1*2*16,  2*2*16,  3*2*16,  4*2*16,  5*2*16,  6*2*16,  7*2*16,
-			 8*2*16,  9*2*16, 10*2*16, 11*2*16, 12*2*16, 13*2*16, 14*2*16, 15*2*16
+				0*2*16,  1*2*16,  2*2*16,  3*2*16,  4*2*16,  5*2*16,  6*2*16,  7*2*16,
+				8*2*16,  9*2*16, 10*2*16, 11*2*16, 12*2*16, 13*2*16, 14*2*16, 15*2*16
 		},
 		2*16*16
 	};
@@ -298,17 +298,17 @@ static void decode_sprite16(running_machine &machine, const char * region)
 		for (y = 0; y < 16; y++)
 		{
 			memcpy(&dst[(i*4 + 0) * (2*16*16/8) + y * (2*16/8)],
-			       &src[i * (2*32*32/8) + y * (2*32/8)],
-			       4);
+					&src[i * (2*32*32/8) + y * (2*32/8)],
+					4);
 			memcpy(&dst[(i*4 + 1) * (2*16*16/8) + y * (2*16/8)],
-			       &src[i * (2*32*32/8) + y * (2*32/8) + (4*8/8)],
-			       4);
+					&src[i * (2*32*32/8) + y * (2*32/8) + (4*8/8)],
+					4);
 			memcpy(&dst[(i*4 + 2) * (2*16*16/8) + y * (2*16/8)],
-			       &src[i * (2*32*32/8) + y * (2*32/8) + (16*2*32/8)],
-			       4);
+					&src[i * (2*32*32/8) + y * (2*32/8) + (16*2*32/8)],
+					4);
 			memcpy(&dst[(i*4 + 3) * (2*16*16/8) + y * (2*16/8)],
-			       &src[i * (2*32*32/8) + y * (2*32/8) + (4*8/8) + (16*2*32/8)],
-			       4);
+					&src[i * (2*32*32/8) + y * (2*32/8) + (4*8/8) + (16*2*32/8)],
+					4);
 		}
 
 	decode_sprite(machine, state->m_sprite16, &spr16_layout, dst);
@@ -331,8 +331,8 @@ static void decode_sprite32(running_machine &machine, const char * region)
 			6*8, 6*8+1, 6*8+2, 6*8+3, 7*8, 7*8+1, 7*8+2, 7*8+3
 		},
 		{
-			 0*2*32,  1*2*32,  2*2*32,  3*2*32,  4*2*32,  5*2*32,  6*2*32,  7*2*32,
-			 8*2*32,  9*2*32, 10*2*32, 11*2*32, 12*2*32, 13*2*32, 14*2*32, 15*2*32,
+				0*2*32,  1*2*32,  2*2*32,  3*2*32,  4*2*32,  5*2*32,  6*2*32,  7*2*32,
+				8*2*32,  9*2*32, 10*2*32, 11*2*32, 12*2*32, 13*2*32, 14*2*32, 15*2*32,
 			16*2*32, 17*2*32, 18*2*32, 19*2*32, 20*2*32, 21*2*32, 22*2*32, 23*2*32,
 			24*2*32, 25*2*32, 26*2*32, 27*2*32, 28*2*32, 29*2*32, 30*2*32, 31*2*32
 		},
@@ -484,15 +484,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			y -= 78;
 
 			drawgfxzoom_transmask(bitmap,
-			            cliprect,
-			            machine.gfx[gfx],
-			            code,
-			            color,
-			            flipx, flipy,
-			            x, y,
-			            scalex,
-			            scaley,
-			            colortable_get_transpen_mask(machine.colortable, machine.gfx[gfx], color, SPR_TRANS_COLOR));
+						cliprect,
+						machine.gfx[gfx],
+						code,
+						color,
+						flipx, flipy,
+						x, y,
+						scalex,
+						scaley,
+						colortable_get_transpen_mask(machine.colortable, machine.gfx[gfx], color, SPR_TRANS_COLOR));
 		}
 	}
 

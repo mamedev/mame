@@ -166,19 +166,19 @@ static INPUT_PORTS_START( homerun )
 	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DIPSW:1,2")
-	PORT_DIPSETTING(	0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DIPSW:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DIPSW:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DIPSW:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynashot )
@@ -203,19 +203,19 @@ static INPUT_PORTS_START( dynashot )
 	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DIPSW:1,2")
-	PORT_DIPSETTING(	0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DIPSW:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" ) // collisions? (not all bits)
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" ) // "
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" ) // "
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" ) // "
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" ) // "
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DIPSW:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DIPSW:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ganjaja )
@@ -241,20 +241,20 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DIPSW:1")
-	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DIPSW:2")
-	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_1C ) ) // game will boot with 1 credit inserted
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DIPSW:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DIPSW:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) ) // game will boot with 1 credit inserted
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" ) // chance to win?
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" ) // "
-	PORT_DIPNAME( 0x80, 0x80, "Game" )					PORT_DIPLOCATION("DIPSW:8")
-	PORT_DIPSETTING(	0x80, "Saisho wa Goo" )
-	PORT_DIPSETTING(	0x00, "Hop Step & Jump" )
+	PORT_DIPNAME( 0x80, 0x80, "Game" )                  PORT_DIPLOCATION("DIPSW:8")
+	PORT_DIPSETTING(    0x80, "Saisho wa Goo" )
+	PORT_DIPSETTING(    0x00, "Hop Step & Jump" )
 INPUT_PORTS_END
 
 
@@ -284,7 +284,7 @@ static const char *const homerun_sample_names[] =
 	"13", // aho (be called a fool by supervisor)
 	"14", // bat hits ball
 	"15", // crowd cheers
-    0
+	0
 };
 
 static const samples_interface homerun_samples_interface =
@@ -297,24 +297,24 @@ static const samples_interface homerun_samples_interface =
 
 static const gfx_layout gfxlayout =
 {
-   8,8,
-   RGN_FRAC(1,1),
-   2,
-   { 8*8,0},
-   { 0, 1, 2, 3, 4, 5, 6, 7},
-   { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-   8*8*2
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 8*8,0},
+	{ 0, 1, 2, 3, 4, 5, 6, 7},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+	8*8*2
 };
 
 static const gfx_layout spritelayout =
 {
-   16,16,
-   RGN_FRAC(1,1),
-   2,
-   { 8*8,0},
-   { 0, 1, 2, 3, 4, 5, 6, 7,0+8*8*2,1+8*8*2,2+8*8*2,3+8*8*2,4+8*8*2,5+8*8*2,6+8*8*2,7+8*8*2},
-   { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0*8+2*8*8*2,1*8+2*8*8*2,2*8+2*8*8*2,3*8+2*8*8*2,4*8+2*8*8*2,5*8+2*8*8*2,6*8+2*8*8*2,7*8+2*8*8*2},
-   8*8*2*4
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 8*8,0},
+	{ 0, 1, 2, 3, 4, 5, 6, 7,0+8*8*2,1+8*8*2,2+8*8*2,3+8*8*2,4+8*8*2,5+8*8*2,6+8*8*2,7+8*8*2},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0*8+2*8*8*2,1*8+2*8*8*2,2*8+2*8*8*2,3*8+2*8*8*2,4*8+2*8*8*2,5*8+2*8*8*2,6*8+2*8*8*2,7*8+2*8*8*2},
+	8*8*2*4
 };
 
 static GFXDECODE_START( homerun )
@@ -327,12 +327,12 @@ GFXDECODE_END
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	// all ports are outputs
-	DEVCB_NULL,				/* Port A read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollhi_w),	/* Port A write */
-	DEVCB_NULL,				/* Port B read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrolly_w),	/* Port B write */
-	DEVCB_NULL,				/* Port C read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollx_w)	/* Port C write */
+	DEVCB_NULL,             /* Port A read */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollhi_w), /* Port A write */
+	DEVCB_NULL,             /* Port B read */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrolly_w),  /* Port B write */
+	DEVCB_NULL,             /* Port C read */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollx_w)   /* Port C write */
 };
 
 static const ym2203_interface ym2203_config =

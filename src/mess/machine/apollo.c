@@ -283,12 +283,12 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 	else if ((data & APOLLO_CSR_CR_FPU_TRAP_ENABLE) == 0)
 	{
 		// enable FPU (i.e. FPU opcodes in CPU)
-        apollo_set_cpu_has_fpu(&space.device(), 1);
+		apollo_set_cpu_has_fpu(&space.device(), 1);
 	}
 	else
 	{
 		// disable FPU (i.e. FPU opcodes in CPU)
-        apollo_set_cpu_has_fpu(&space.device(), 0);
+		apollo_set_cpu_has_fpu(&space.device(), 0);
 
 		if (!apollo_is_dn3000())
 		{
@@ -454,7 +454,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
 		page_offset = (((offs_t) address_translation_map[0x200 + (offset >> 10)]) << 10) & 0x7FFFFC00;
 		offset &= 0x3ff;
 	}
-    // FIXME: MSB not available, writing only LSB
+	// FIXME: MSB not available, writing only LSB
 	machine().firstcpu->space(AS_PROGRAM).write_byte(page_offset + offset, data);
 
 	if (VERBOSE > 1 || offset < 4 || (offset & 0xff) == 0 || (offset & 0xff) == 0xff)
@@ -480,7 +480,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_word){
 	data = machine().firstcpu->space(AS_PROGRAM).read_byte(page_offset + offset);
 
 	SLOG1(("dma read word at offset %x+%03x = %04x", page_offset, offset , data));
-    // FIXME: MSB will get lost
+	// FIXME: MSB will get lost
 	return data;
 }
 
@@ -589,9 +589,9 @@ static I8237_INTERFACE( apollo_dma8237_1_config )
 	DEVCB_LINE(apollo_dma8237_out_eop),
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma_write_byte),
-	{	DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_ctape_dack_r), DEVCB_HANDLER(apollo_dma8237_fdc_dack_r), DEVCB_NULL},
-	{	DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_ctape_dack_w), DEVCB_HANDLER(apollo_dma8237_fdc_dack_w), DEVCB_NULL},
-	{	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}
+	{   DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_ctape_dack_r), DEVCB_HANDLER(apollo_dma8237_fdc_dack_r), DEVCB_NULL},
+	{   DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_ctape_dack_w), DEVCB_HANDLER(apollo_dma8237_fdc_dack_w), DEVCB_NULL},
+	{   DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}
 };
 
 static I8237_INTERFACE( apollo_dma8237_2_config )
@@ -600,9 +600,9 @@ static I8237_INTERFACE( apollo_dma8237_2_config )
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma_read_word),
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma_write_word),
-	{	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_wdc_dack_r)},
-	{	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_wdc_dack_w)},
-	{	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}
+	{   DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_wdc_dack_r)},
+	{   DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(apollo_dma8237_wdc_dack_w)},
+	{   DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}
 };
 
 //##########################################################################
@@ -1390,8 +1390,8 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, apollo_pic8259_slave_config )
 	MCFG_PTM6840_ADD(APOLLO_PTM_TAG, apollo_ptm_config)
 	MCFG_MC146818_ADD( APOLLO_RTC_TAG, MC146818_UTC )
-    MCFG_DUART68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz, apollo_sio_config )
-    MCFG_DUART68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz, apollo_sio2_config )
+	MCFG_DUART68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz, apollo_sio_config )
+	MCFG_DUART68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz, apollo_sio2_config )
 
 	MCFG_PC_FDC_AT_ADD(APOLLO_FDC_TAG)
 	MCFG_FLOPPY_DRIVE_ADD(APOLLO_FDC_TAG ":0", apollo_floppies, "525hd", 0, apollo_state::floppy_formats)

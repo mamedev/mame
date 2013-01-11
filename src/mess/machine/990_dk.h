@@ -7,4 +7,3 @@ void fd800_machine_init(running_machine &machine, void (*interrupt_callback)(run
 
 extern  DECLARE_READ8_HANDLER(fd800_cru_r);
 extern DECLARE_WRITE8_HANDLER(fd800_cru_w);
-

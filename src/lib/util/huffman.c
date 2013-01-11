@@ -136,7 +136,7 @@
 //  MACROS
 //**************************************************************************
 
-#define MAKE_LOOKUP(code,bits)	(((code) << 5) | ((bits) & 0x1f))
+#define MAKE_LOOKUP(code,bits)  (((code) << 5) | ((bits) & 0x1f))
 
 
 
@@ -151,12 +151,12 @@
 
 huffman_context_base::huffman_context_base(int numcodes, int maxbits, lookup_value *lookup, UINT32 *histo, node_t *nodes)
 	: m_numcodes(numcodes),
-	  m_maxbits(maxbits),
-	  m_prevdata(0),
-	  m_rleremaining(0),
-	  m_lookup(lookup),
-	  m_datahisto(histo),
-	  m_huffnode(nodes)
+		m_maxbits(maxbits),
+		m_prevdata(0),
+		m_rleremaining(0),
+		m_lookup(lookup),
+		m_datahisto(histo),
+		m_huffnode(nodes)
 {
 	// limit to 24 bits
 	if (maxbits > 24)
@@ -536,9 +536,9 @@ int CLIB_DECL huffman_context_base::tree_node_compare(const void *item1, const v
 	const node_t *node1 = *(const node_t **)item1;
 	const node_t *node2 = *(const node_t **)item2;
 	if (node2->m_weight != node1->m_weight)
-	    return node2->m_weight - node1->m_weight;
+		return node2->m_weight - node1->m_weight;
 	if (node2->m_bits - node1->m_bits == 0)
-	    fprintf(stderr, "identical node sort keys, should not happen!\n");
+		fprintf(stderr, "identical node sort keys, should not happen!\n");
 	return (int)node1->m_bits - (int)node2->m_bits;
 }
 

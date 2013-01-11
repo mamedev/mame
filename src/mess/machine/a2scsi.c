@@ -48,7 +48,7 @@ MACHINE_CONFIG_END
 
 ROM_START( scsi )
 	ROM_REGION(0x4000, SCSI_ROM_REGION, 0)  // this is the Rev. C ROM
-    ROM_LOAD( "341-0437-a.bin", 0x0000, 0x4000, CRC(5aff85d3) SHA1(451c85c46b92e6ad2ad930f055ccf0fe3049936d) )
+	ROM_LOAD( "341-0437-a.bin", 0x0000, 0x4000, CRC(5aff85d3) SHA1(451c85c46b92e6ad2ad930f055ccf0fe3049936d) )
 ROM_END
 
 /***************************************************************************
@@ -79,17 +79,17 @@ const rom_entry *a2bus_scsi_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, type, name, tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this),
-    m_ncr5380(*this, SCSI_5380_TAG)
+	device_t(mconfig, type, name, tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_ncr5380(*this, SCSI_5380_TAG)
 {
 	m_shortname = "a2scsi";
 }
 
 a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, A2BUS_SCSI, "Apple II SCSI Card", tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this),
-    m_ncr5380(*this, SCSI_5380_TAG)
+	device_t(mconfig, A2BUS_SCSI, "Apple II SCSI Card", tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_ncr5380(*this, SCSI_5380_TAG)
 {
 	m_shortname = "a2scsi";
 }
@@ -106,7 +106,7 @@ void a2bus_scsi_device::device_start()
 	astring tempstring;
 	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, SCSI_ROM_REGION))->base();
 
-    memset(m_ram, 0, 8192);
+	memset(m_ram, 0, 8192);
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_rambank));
@@ -115,7 +115,7 @@ void a2bus_scsi_device::device_start()
 
 void a2bus_scsi_device::device_reset()
 {
-    m_rambank = m_rombank = 0;      // CLR on 74LS273 at U3E is connected to RES, so these clear on reset
+	m_rambank = m_rombank = 0;      // CLR on 74LS273 at U3E is connected to RES, so these clear on reset
 }
 
 
@@ -125,23 +125,23 @@ void a2bus_scsi_device::device_reset()
 
 UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 {
-    printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
+	printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
 
-    switch (offset)
-    {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-            return m_ncr5380->ncr5380_read_reg(offset);
+	switch (offset)
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			return m_ncr5380->ncr5380_read_reg(offset);
 
-    case 9:         // card's ID?
-        return 7;
-    }
+	case 9:         // card's ID?
+		return 7;
+	}
 
 	return 0xff;
 }
@@ -153,45 +153,45 @@ UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
+	printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
 
-    switch (offset)
-    {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-            m_ncr5380->ncr5380_write_reg(offset, data);
-            break;
+	switch (offset)
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			m_ncr5380->ncr5380_write_reg(offset, data);
+			break;
 
-        case 0xa:  // ROM and RAM banking (74LS273 at U3E)
-            /*
-                ROM banking:
-                (bits EA8-EA13 are all zeroed when /IOSEL is asserted, so CnXX always gets the first page of the ROM)
-                EA10 = bit 0
-                EA11 = bit 1
-                EA12 = bit 2
-                EA13 = bit 3 (N/C)
+		case 0xa:  // ROM and RAM banking (74LS273 at U3E)
+			/*
+			    ROM banking:
+			    (bits EA8-EA13 are all zeroed when /IOSEL is asserted, so CnXX always gets the first page of the ROM)
+			    EA10 = bit 0
+			    EA11 = bit 1
+			    EA12 = bit 2
+			    EA13 = bit 3 (N/C)
 
-                RAM banking:
-                RA10 = bit 4
-                RA11 = bit 5
-                RA12 = bit 6
-            */
+			    RAM banking:
+			    RA10 = bit 4
+			    RA11 = bit 5
+			    RA12 = bit 6
+			*/
 
-            m_rambank = ((data>>4) & 0x7) * 0x400;
-            m_rombank = (data & 0xf) * 0x400;
-            printf("RAM bank to %x, ROM bank to %x\n", m_rambank, m_rombank);
-            break;
+			m_rambank = ((data>>4) & 0x7) * 0x400;
+			m_rombank = (data & 0xf) * 0x400;
+			printf("RAM bank to %x, ROM bank to %x\n", m_rambank, m_rombank);
+			break;
 
-        case 0xb:
-            printf("Reset NCR5380\n");
-            break;
-    }
+		case 0xb:
+			printf("Reset NCR5380\n");
+			break;
+	}
 }
 
 /*-------------------------------------------------
@@ -200,13 +200,13 @@ void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
 
 UINT8 a2bus_scsi_device::read_cnxx(address_space &space, UINT8 offset)
 {
-    // one slot image at the start of the ROM, it appears
-    return m_rom[offset];
+	// one slot image at the start of the ROM, it appears
+	return m_rom[offset];
 }
 
 void a2bus_scsi_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
 {
-    printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
+	printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
 }
 
 /*-------------------------------------------------
@@ -215,17 +215,17 @@ void a2bus_scsi_device::write_cnxx(address_space &space, UINT8 offset, UINT8 dat
 
 UINT8 a2bus_scsi_device::read_c800(address_space &space, UINT16 offset)
 {
-    // bankswitched RAM at c800-cbff
-    // bankswitched ROM at cc00-cfff
-    if (offset < 0x400)
-    {
-        printf("Read RAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
-        return m_ram[offset + m_rambank];
-    }
-    else
-    {
-        return m_rom[(offset-0x400) + m_rombank];
-    }
+	// bankswitched RAM at c800-cbff
+	// bankswitched ROM at cc00-cfff
+	if (offset < 0x400)
+	{
+		printf("Read RAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
+		return m_ram[offset + m_rambank];
+	}
+	else
+	{
+		return m_rom[(offset-0x400) + m_rombank];
+	}
 }
 
 /*-------------------------------------------------
@@ -233,9 +233,9 @@ UINT8 a2bus_scsi_device::read_c800(address_space &space, UINT16 offset)
 -------------------------------------------------*/
 void a2bus_scsi_device::write_c800(address_space &space, UINT16 offset, UINT8 data)
 {
-    if (offset < 0x400)
-    {
-        printf("%02x to RAM at %x\n", data, offset+m_rambank);
-        m_ram[offset + m_rambank] = data;
-    }
+	if (offset < 0x400)
+	{
+		printf("%02x to RAM at %x\n", data, offset+m_rambank);
+		m_ram[offset + m_rambank] = data;
+	}
 }

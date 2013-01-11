@@ -76,15 +76,15 @@ extern const device_type SIMUTREK_SPECIAL;
 class pioneer_pia
 {
 public:
-	UINT8				frame[7];				// (20-26) 7 characters for the chapter/frame
-	UINT8				text[17];				// (20-30) 17 characters for the display
-	UINT8				control;				// (40) control lines
-	UINT8				latchdisplay;			//   flag: set if the display was latched
-	UINT8				portb;					// (60) port B value (LEDs)
-	UINT8				display;				// (80) display enable
-	UINT8				porta;					// (A0) port A value (from serial decoder)
-	UINT8				vbi1;					// (C0) VBI decoding state 1
-	UINT8				vbi2;					// (E0) VBI decoding state 2
+	UINT8               frame[7];               // (20-26) 7 characters for the chapter/frame
+	UINT8               text[17];               // (20-30) 17 characters for the display
+	UINT8               control;                // (40) control lines
+	UINT8               latchdisplay;           //   flag: set if the display was latched
+	UINT8               portb;                  // (60) port B value (LEDs)
+	UINT8               display;                // (80) display enable
+	UINT8               porta;                  // (A0) port A value (from serial decoder)
+	UINT8               vbi1;                   // (C0) VBI decoding state 1
+	UINT8               vbi2;                   // (E0) VBI decoding state 2
 };
 
 
@@ -94,8 +94,8 @@ public:
 class pioneer_pr8210_device : public laserdisc_device
 {
 public:
-    // construction/destruction
-    pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
 
 	// input and output
@@ -147,20 +147,20 @@ protected:
 	void overlay_draw_char(bitmap_yuy16 &bitmap, UINT8 ch, float xstart);
 
 	// internal state
-	UINT8				m_control;				// control line state
-	UINT8				m_lastcommand;			// last command seen
-	UINT16				m_accumulator;			// bit accumulator
-	attotime			m_lastcommandtime;		// time of the last command
-	attotime			m_lastbittime;			// time of last bit received
-	attotime			m_firstbittime;			// time of first bit in command
+	UINT8               m_control;              // control line state
+	UINT8               m_lastcommand;          // last command seen
+	UINT16              m_accumulator;          // bit accumulator
+	attotime            m_lastcommandtime;      // time of the last command
+	attotime            m_lastbittime;          // time of last bit received
+	attotime            m_firstbittime;         // time of first bit in command
 
 	// low-level emulation data
-	required_device<i8049_device> m_i8049_cpu;	// 8049 CPU device
-	attotime			m_slowtrg;				// time of the last SLOW TRG
-	pioneer_pia			m_pia;					// PIA state
-	bool				m_vsync;				// live VSYNC state
-	UINT8				m_i8049_port1;			// 8049 port 1 state
-	UINT8				m_i8049_port2;			// 8049 port 2 state
+	required_device<i8049_device> m_i8049_cpu;  // 8049 CPU device
+	attotime            m_slowtrg;              // time of the last SLOW TRG
+	pioneer_pia         m_pia;                  // PIA state
+	bool                m_vsync;                // live VSYNC state
+	UINT8               m_i8049_port1;          // 8049 port 1 state
+	UINT8               m_i8049_port2;          // 8049 port 2 state
 };
 
 
@@ -169,8 +169,8 @@ protected:
 class simutrek_special_device : public pioneer_pr8210_device
 {
 public:
-    // construction/destruction
-    simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// input and output
 	void data_w(UINT8 data);
@@ -212,12 +212,12 @@ public:
 protected:
 	// internal state
 	required_device<i8748_device> m_i8748_cpu;
-	UINT8				m_audio_squelch;			// audio squelch value
-	UINT8				m_data;					// parallel data for simutrek
-	bool				m_data_ready;				// ready flag for simutrek data
-	UINT8				m_i8748_port2;					// 8748 port 2 state
-	UINT8				m_controlnext;			// latch to control next pair of fields
-	UINT8				m_controlthis;			// latched value for our control over the current pair of fields
+	UINT8               m_audio_squelch;            // audio squelch value
+	UINT8               m_data;                 // parallel data for simutrek
+	bool                m_data_ready;               // ready flag for simutrek data
+	UINT8               m_i8748_port2;                  // 8748 port 2 state
+	UINT8               m_controlnext;          // latch to control next pair of fields
+	UINT8               m_controlthis;          // latched value for our control over the current pair of fields
 };
 
 

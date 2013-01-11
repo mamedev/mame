@@ -59,19 +59,19 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		/* intensity 0 */
-	    colortable_palette_set_color(machine().colortable, 0x100 + i, RGB_BLACK);
+		colortable_palette_set_color(machine().colortable, 0x100 + i, RGB_BLACK);
 
 		/* intensity 1 */
 		color = MAKE_RGB(r >> 2, g >> 2, b >> 2);
-	    colortable_palette_set_color(machine().colortable, 0x200 + i, color);
+		colortable_palette_set_color(machine().colortable, 0x200 + i, color);
 
 		/* intensity 2 */
 		color = MAKE_RGB((r >> 2) + (r >> 3), (g >> 2) + (g >> 3), (b >> 2) + (b >> 2));
-	    colortable_palette_set_color(machine().colortable, 0x300 + i, color);
+		colortable_palette_set_color(machine().colortable, 0x300 + i, color);
 
 		/* intensity 3 */
 		color = MAKE_RGB(r >> 1, g >> 1, b >> 1);
-	    colortable_palette_set_color(machine().colortable, 0x400 + i, color);
+		colortable_palette_set_color(machine().colortable, 0x400 + i, color);
 	}
 
 	// Address 0-2 from graphic rom
@@ -143,29 +143,29 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 		}
 	}
 
-    /* update the S2636 chips */
+	/* update the S2636 chips */
 	bitmap_ind16 &s2636_0_bitmap = s2636_update(m_s2636_0, cliprect);
 	bitmap_ind16 &s2636_1_bitmap = s2636_update(m_s2636_1, cliprect);
 	bitmap_ind16 &s2636_2_bitmap = s2636_update(m_s2636_2, cliprect);
 
-    /* Bullet Hardware */
-    for (offs = 8; offs < 256; offs++ )
-    {
-        if(m_bullet_ram[offs] != 0)
-        {
-        	int ct;
-            for (ct = 0; ct < 1; ct++)
-            {
-            	int bx = 255 - 9 - m_bullet_ram[offs] - ct;
+	/* Bullet Hardware */
+	for (offs = 8; offs < 256; offs++ )
+	{
+		if(m_bullet_ram[offs] != 0)
+		{
+			int ct;
+			for (ct = 0; ct < 1; ct++)
+			{
+				int bx = 255 - 9 - m_bullet_ram[offs] - ct;
 
-            	/* bullet/object Collision */
+				/* bullet/object Collision */
 				if (s2636_0_bitmap.pix16(offs, bx) != 0) m_collision_register |= 0x04;
 				if (s2636_2_bitmap.pix16(offs, bx) != 0) m_collision_register |= 0x08;
 
 				bitmap.pix16(offs, bx) = 7;
-            }
-        }
-    }
+			}
+		}
+	}
 
 
 	/* mix and copy the S2636 images into the main bitmap, also check for collision */

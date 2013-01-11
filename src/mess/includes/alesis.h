@@ -22,7 +22,7 @@
 
 // ======================> alesis_dm3ag_device
 
-class alesis_dm3ag_device :	public device_t
+class alesis_dm3ag_device : public device_t
 {
 
 public:
@@ -45,13 +45,13 @@ private:
 	static const device_timer_id TIMER_DAC_UPDATE = 1;
 	required_device<dac_device> m_dac;
 
-	emu_timer *	m_dac_update_timer;
-	INT8 *		m_samples;
-	bool		m_output_active;
-	int			m_count;
-	int			m_shift;
-	UINT32		m_cur_sample;
-	UINT8		m_cmd[5];
+	emu_timer * m_dac_update_timer;
+	INT8 *      m_samples;
+	bool        m_output_active;
+	int         m_count;
+	int         m_shift;
+	UINT32      m_cur_sample;
+	UINT8       m_cmd[5];
 };
 
 
@@ -62,8 +62,8 @@ class alesis_state : public driver_device
 public:
 	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_lcdc(*this, "hd44780"),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_lcdc(*this, "hd44780"),
+			m_cassette(*this, CASSETTE_TAG)
 		{ }
 
 	required_device<hd44780_device> m_lcdc;
@@ -82,12 +82,11 @@ public:
 	DECLARE_WRITE8_MEMBER( sr16_lcd_w );
 
 private:
-	UINT8		m_kb_matrix;
-	UINT8		m_lcd_digits[5];
+	UINT8       m_kb_matrix;
+	UINT8       m_lcd_digits[5];
 };
 
 // device type definition
 extern const device_type ALESIS_DM3AG;
 
-#endif	// _ALESIS_H_
-
+#endif  // _ALESIS_H_

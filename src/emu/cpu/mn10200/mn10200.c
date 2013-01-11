@@ -17,7 +17,7 @@
 #define MEM_WORD (1)
 
 #define NUM_PRESCALERS (2)
-#define NUM_TIMERS_8BIT	(10)
+#define NUM_TIMERS_8BIT (10)
 #define NUM_IRQ_GROUPS (31)
 
 extern int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom);
@@ -142,7 +142,7 @@ INLINE void w24(mn102_info *mn102, offs_t adr, UINT32 val)
 
 INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
 {
-	 mn102->pc = pc & 0xffffff;
+		mn102->pc = pc & 0xffffff;
 }
 
 INLINE mn102_info *get_safe_token(device_t *device)
@@ -190,7 +190,7 @@ static void refresh_timer(mn102_info *cpustate, int tmr)
 				rate = cpustate->device->unscaled_clock() / cpustate->prescaler[source-2].cycles;
 				rate /= cpustate->simple_timer[tmr].base;
 
-				if (tmr != 8)	// HACK: timer 8 is run at 500 kHz by the Taito program for no obvious reason, which kills performance
+				if (tmr != 8)   // HACK: timer 8 is run at 500 kHz by the Taito program for no obvious reason, which kills performance
 					cpustate->timer_timers[tmr]->adjust(attotime::from_hz(rate), tmr);
 			}
 			else
@@ -199,7 +199,7 @@ static void refresh_timer(mn102_info *cpustate, int tmr)
 			}
 		}
 	}
-	else	// disabled, so stop it
+	else    // disabled, so stop it
 	{
 		cpustate->timer_timers[tmr]->adjust(attotime::never, tmr);
 	}
@@ -468,18 +468,18 @@ INLINE void do_jsr(mn102_info *mn102, UINT32 to, UINT32 ret)
 }
 
 #if 0
-  log_event("MN102", "PSW change S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
-	    (psw >> 12) & 3,
-	    psw & 0x0800 ? "on" : "off",
-	    (psw >> 8) & 7,
-	    psw & 0x0080 ? 'V' : '-',
-	    psw & 0x0040 ? 'C' : '-',
-	    psw & 0x0020 ? 'N' : '-',
-	    psw & 0x0010 ? 'Z' : '-',
-	    psw & 0x0008 ? 'v' : '-',
-	    psw & 0x0004 ? 'c' : '-',
-	    psw & 0x0002 ? 'n' : '-',
-	    psw & 0x0001 ? 'z' : '-');
+	log_event("MN102", "PSW change S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
+		(psw >> 12) & 3,
+		psw & 0x0800 ? "on" : "off",
+		(psw >> 8) & 7,
+		psw & 0x0080 ? 'V' : '-',
+		psw & 0x0040 ? 'C' : '-',
+		psw & 0x0020 ? 'N' : '-',
+		psw & 0x0010 ? 'Z' : '-',
+		psw & 0x0008 ? 'v' : '-',
+		psw & 0x0004 ? 'c' : '-',
+		psw & 0x0002 ? 'n' : '-',
+		psw & 0x0001 ? 'z' : '-');
 #endif
 
 // take an external IRQ
@@ -1817,125 +1817,125 @@ static CPU_EXECUTE(mn10200)
 }
 
 static const char *const inames[10][4] = {
-  { "timer0", "timer1", "timer2", "timer3" },
-  { "timer4", "timer5", "timer6", "timer7" },
-  { "timer8", "timer9", "timer12a", "timer12b" },
-  { "timer10u", "timer10a", "timer10b", "?" },
-  { "timer11u", "timer11a", "timer11b", "?" },
-  { "dma0", "dma1", "dma2", "dma3" },
-  { "dma4", "dma5", "dma6", "dma7" },
-  { "X0", "X1", "X2", "X3" },
-  { "ser0tx", "ser0rx", "ser1tx", "ser1rx" },
-  { "key", "a/d", "?", "?" }
+	{ "timer0", "timer1", "timer2", "timer3" },
+	{ "timer4", "timer5", "timer6", "timer7" },
+	{ "timer8", "timer9", "timer12a", "timer12b" },
+	{ "timer10u", "timer10a", "timer10b", "?" },
+	{ "timer11u", "timer11a", "timer11b", "?" },
+	{ "dma0", "dma1", "dma2", "dma3" },
+	{ "dma4", "dma5", "dma6", "dma7" },
+	{ "X0", "X1", "X2", "X3" },
+	{ "ser0tx", "ser0rx", "ser1tx", "ser1rx" },
+	{ "key", "a/d", "?", "?" }
 };
 
 static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 {
-  if(type == MEM_WORD) {
-    mn10200_w(mn102, adr, data & 0xff, MEM_BYTE);
-    mn10200_w(mn102, adr+1, (data>>8) & 0xff, MEM_BYTE);
-    return;
-  }
-
-  switch(adr) {
-  case 0x000:
-    if(data & 12) {
-      log_event("CPU", "Stop request");
+	if(type == MEM_WORD) {
+	mn10200_w(mn102, adr, data & 0xff, MEM_BYTE);
+	mn10200_w(mn102, adr+1, (data>>8) & 0xff, MEM_BYTE);
+	return;
 	}
-    break;
-  case 0x001:
-    log_event("WATCHDOG", "Write %d", data>>7);
-    break;
 
-  case 0x002: case 0x003: // Memory control
-    break;
+	switch(adr) {
+	case 0x000:
+	if(data & 12) {
+		log_event("CPU", "Stop request");
+	}
+	break;
+	case 0x001:
+	log_event("WATCHDOG", "Write %d", data>>7);
+	break;
 
-  case 0x030: case 0x031: // Memory mode reg 0
-  case 0x032: case 0x033: // Memory mode reg 1
-  case 0x034: case 0x035: // Memory mode reg 2
-  case 0x036: case 0x037: // Memory mode reg 3
-    break;
+	case 0x002: case 0x003: // Memory control
+	break;
 
-    // Non-Maskable irqs
-  case 0x040:
-    mn102->nmicr = data & 6;
-    break;
-  case 0x041:
-    break;
+	case 0x030: case 0x031: // Memory mode reg 0
+	case 0x032: case 0x033: // Memory mode reg 1
+	case 0x034: case 0x035: // Memory mode reg 2
+	case 0x036: case 0x037: // Memory mode reg 3
+	break;
 
-    // Maskable irq control
-  case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
-  case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
-    {
-    	// note: writes here ack interrupts
+	// Non-Maskable irqs
+	case 0x040:
+	mn102->nmicr = data & 6;
+	break;
+	case 0x041:
+	break;
+
+	// Maskable irq control
+	case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
+	case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
+	{
+		// note: writes here ack interrupts
 	mn102->icrl[((adr & 0x3f)>>1)-1] = data;
-    }
-    break;
+	}
+	break;
 
-  case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
-  case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055: {
-    int irq = ((adr & 0x3f)>>1)-1;
-    if((mn102->icrh[irq] != data) && (data & 15)) {
-      printf("MN10200: irq %d enabled, level=%x, enable= %s %s %s %s\n", irq+1, (data >> 4) & 7,
+	case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
+	case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055: {
+	int irq = ((adr & 0x3f)>>1)-1;
+	if((mn102->icrh[irq] != data) && (data & 15)) {
+		printf("MN10200: irq %d enabled, level=%x, enable= %s %s %s %s\n", irq+1, (data >> 4) & 7,
 		data & 1 ? inames[irq][0] : "-",
 		data & 2 ? inames[irq][1] : "-",
 		data & 4 ? inames[irq][2] : "-",
 		data & 8 ? inames[irq][3] : "-");
 	}
-    if((mn102->icrh[irq] != data) && !(data & 15)) {
-        printf("MN10200: irq %d disabled\n", irq+1);
+	if((mn102->icrh[irq] != data) && !(data & 15)) {
+		printf("MN10200: irq %d disabled\n", irq+1);
 	}
-    mn102->icrh[irq] = data;
-    break;
-  }
+	mn102->icrh[irq] = data;
+	break;
+	}
 
-  case 0x056: {
+	case 0x056: {
 //    const char *modes[4] = { "l", "h", "fall", "rise" };
 //    log_event("MN102", "irq3=%s irq2=%s irq1=%s irq0=%s",
 //        modes[(data >> 6) & 3], modes[(data >> 4) & 3], modes[(data >> 2) & 3], modes[data & 3]);
-    break;
-  }
+	break;
+	}
 
-  case 0x057: {
+	case 0x057: {
 //    const char *modes[4] = { "l", "1", "fall", "3" };
 //    log_event("MN102", "irq_ki=%s", modes[data & 3]);
-    break;
-  }
+	break;
+	}
 
-  case 0x100: case 0x101: // DRAM control reg
-  case 0x102: case 0x103: // Refresh counter
-    break;
+	case 0x100: case 0x101: // DRAM control reg
+	case 0x102: case 0x103: // Refresh counter
+	break;
 
-  case 0x180: case 0x190: {
-    int ser = (adr-0x180) >> 4;
+	case 0x180: case 0x190: {
+	int ser = (adr-0x180) >> 4;
 //    const char *parity[8] = { "no", "1", "2", "3", "l", "h", "even", "odd" };
 //    const char *source[4] = { "sbt0", "timer 8", "2", "timer 9" };
-    mn102->serial[ser].ctrll = data;
+	mn102->serial[ser].ctrll = data;
 
 //    log_event("MN102", "Serial %d length=%c, parity=%s, stop=%c, source=%s",
 //        ser,
 //        data & 0x80 ? '8' : '7', parity[(data >> 4) & 7],
 //        data & 8 ? '2' : '1', source[data & 3]);
-    break;
-  }
+	break;
+	}
 
-  case 0x181: case 0x191: {
-    int ser = (adr-0x180) >> 4;
-    mn102->serial[ser].ctrlh = data;
+	case 0x181: case 0x191: {
+	int ser = (adr-0x180) >> 4;
+	mn102->serial[ser].ctrlh = data;
 //    log_event("MN102", "Serial %d transmit=%s, receive=%s, break=%s, proto=%s, order=%s",
 //        ser,
 //        data & 0x80 ? "on" : "off", data & 0x40 ? "on" : "off",
 //        data & 0x20 ? "on" : "off", data & 8 ? "sync" : "async",
 //        data & 2 ? "msb" : "lsb");
-    break;
-  }
+	break;
+	}
 
-  case 0x182: case 0x192: {
-    int ser = (adr-0x180) >> 4;
-    mn102->serial[ser].buf = data;
-    log_event("MN102", "Serial %d buffer=%02x", ser, data);
-    break;
-  }
+	case 0x182: case 0x192: {
+	int ser = (adr-0x180) >> 4;
+	mn102->serial[ser].buf = data;
+	log_event("MN102", "Serial %d buffer=%02x", ser, data);
+	break;
+	}
 
 	case 0x1a0:
 		log_event("MN102", "AN %s timer7=%s /%d %s %s",
@@ -2014,243 +2014,243 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 		break;
 	}
 
-  case 0x234: case 0x244: case 0x254:
-    log_event("MN102", "Timer %d ca=--%02x", 10 + ((adr-0x230) >> 4), data);
-    break;
+	case 0x234: case 0x244: case 0x254:
+	log_event("MN102", "Timer %d ca=--%02x", 10 + ((adr-0x230) >> 4), data);
+	break;
 
-  case 0x235: case 0x245: case 0x255:
-    log_event("MN102", "Timer %d ca=%02x--", 10 + ((adr-0x230) >> 4), data);
-    break;
+	case 0x235: case 0x245: case 0x255:
+	log_event("MN102", "Timer %d ca=%02x--", 10 + ((adr-0x230) >> 4), data);
+	break;
 
-  case 0x236: case 0x246: case 0x256:
-    log_event("MN102", "Timer %d ca read trigger", 10 + ((adr-0x230) >> 4));
-    break;
+	case 0x236: case 0x246: case 0x256:
+	log_event("MN102", "Timer %d ca read trigger", 10 + ((adr-0x230) >> 4));
+	break;
 
-  case 0x237: case 0x247: case 0x257: break;
+	case 0x237: case 0x247: case 0x257: break;
 
-  case 0x238: case 0x248: case 0x258:
-    log_event("MN102", "Timer %d cb=--%02x", 10 + ((adr-0x230) >> 4), data);
-    break;
+	case 0x238: case 0x248: case 0x258:
+	log_event("MN102", "Timer %d cb=--%02x", 10 + ((adr-0x230) >> 4), data);
+	break;
 
-  case 0x239: case 0x249: case 0x259:
-    log_event("MN102", "Timer %d cb=%02x--", 10 + ((adr-0x230) >> 4), data);
-    break;
+	case 0x239: case 0x249: case 0x259:
+	log_event("MN102", "Timer %d cb=%02x--", 10 + ((adr-0x230) >> 4), data);
+	break;
 
-  case 0x23a: case 0x24a: case 0x25a:
-    log_event("MN102", "Timer %d cb read trigger", 10 + ((adr-0x230) >> 4));
-    break;
+	case 0x23a: case 0x24a: case 0x25a:
+	log_event("MN102", "Timer %d cb read trigger", 10 + ((adr-0x230) >> 4));
+	break;
 
-  case 0x23b: case 0x24b: case 0x25b: break;
+	case 0x23b: case 0x24b: case 0x25b: break;
 
-  case 0x260: case 0x261: {
+	case 0x260: case 0x261: {
 //    const char *mode[4] = { "sysbuf", "4-phase", "4-phase 1/2", "3" };
 //    log_event("MN102", "Sync Output %c timing=%s out=%s dir=%s mode=%s",
 //        adr == 0x261 ? 'B' : 'A',
 //        data & 0x10 ? "12A" : "1", data & 8 ? "sync a" :"P13-10",
 //        data & 4 ? "ccw" : "cw", mode[data & 3]);
-    break;
-  }
+	break;
+	}
 
-  case 0x262:
-    log_event("MN102", "Sync Output buffer = %02x", data);
-    break;
+	case 0x262:
+	log_event("MN102", "Sync Output buffer = %02x", data);
+	break;
 
-  case 0x264:
+	case 0x264:
 	mn102->io->write_byte(MN10200_PORT1, data);
-    break;
+	break;
 
-  case 0x280: case 0x290: case 0x2a0: case 0x2b0: case 0x2c0: case 0x2d0: case 0x2e0: case 0x2f0: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x00ffff00) | data;
-    logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
-    break;
-  }
+	case 0x280: case 0x290: case 0x2a0: case 0x2b0: case 0x2c0: case 0x2d0: case 0x2e0: case 0x2f0: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x00ffff00) | data;
+	logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
+	break;
+	}
 
-  case 0x281: case 0x291: case 0x2a1: case 0x2b1: case 0x2c1: case 0x2d1: case 0x2e1: case 0x2f1: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x00ff00ff) | (data << 8);
-    logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
-    break;
-  }
+	case 0x281: case 0x291: case 0x2a1: case 0x2b1: case 0x2c1: case 0x2d1: case 0x2e1: case 0x2f1: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x00ff00ff) | (data << 8);
+	logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
+	break;
+	}
 
-  case 0x282: case 0x292: case 0x2a2: case 0x2b2: case 0x2c2: case 0x2d2: case 0x2e2: case 0x2f2: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x0000ffff) | (data << 16);
-    logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
-    break;
-  }
+	case 0x282: case 0x292: case 0x2a2: case 0x2b2: case 0x2c2: case 0x2d2: case 0x2e2: case 0x2f2: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x0000ffff) | (data << 16);
+	logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
+	break;
+	}
 
-  case 0x283: case 0x293: case 0x2a3: case 0x2b3: case 0x2c3: case 0x2d3: case 0x2e3: case 0x2f3:
-    break;
+	case 0x283: case 0x293: case 0x2a3: case 0x2b3: case 0x2c3: case 0x2d3: case 0x2e3: case 0x2f3:
+	break;
 
-  case 0x284: case 0x294: case 0x2a4: case 0x2b4: case 0x2c4: case 0x2d4: case 0x2e4: case 0x2f4: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].count = (mn102->dma[dma].count & 0x00ffff00) | data;
-    logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
-    break;
-  }
+	case 0x284: case 0x294: case 0x2a4: case 0x2b4: case 0x2c4: case 0x2d4: case 0x2e4: case 0x2f4: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].count = (mn102->dma[dma].count & 0x00ffff00) | data;
+	logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
+	break;
+	}
 
-  case 0x285: case 0x295: case 0x2a5: case 0x2b5: case 0x2c5: case 0x2d5: case 0x2e5: case 0x2f5: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].count = (mn102->dma[dma].count & 0x00ff00ff) | (data << 8);
-    logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
-    break;
-  }
+	case 0x285: case 0x295: case 0x2a5: case 0x2b5: case 0x2c5: case 0x2d5: case 0x2e5: case 0x2f5: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].count = (mn102->dma[dma].count & 0x00ff00ff) | (data << 8);
+	logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
+	break;
+	}
 
-  case 0x286: case 0x296: case 0x2a6: case 0x2b6: case 0x2c6: case 0x2d6: case 0x2e6: case 0x2f6: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].count = (mn102->dma[dma].count & 0x0000ffff) | (data << 16);
-    logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
-    break;
-  }
+	case 0x286: case 0x296: case 0x2a6: case 0x2b6: case 0x2c6: case 0x2d6: case 0x2e6: case 0x2f6: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].count = (mn102->dma[dma].count & 0x0000ffff) | (data << 16);
+	logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
+	break;
+	}
 
-  case 0x287: case 0x297: case 0x2a7: case 0x2b7: case 0x2c7: case 0x2d7: case 0x2e7: case 0x2f7:
-    break;
+	case 0x287: case 0x297: case 0x2a7: case 0x2b7: case 0x2c7: case 0x2d7: case 0x2e7: case 0x2f7:
+	break;
 
-  case 0x288: case 0x298: case 0x2a8: case 0x2b8: case 0x2c8: case 0x2d8: case 0x2e8: case 0x2f8: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].iadr = (mn102->dma[dma].iadr & 0xff00) | data;
-    logerror("MN10200: DMA %d iadr=%03x\n", dma, mn102->dma[dma].iadr);
-    break;
-  }
+	case 0x288: case 0x298: case 0x2a8: case 0x2b8: case 0x2c8: case 0x2d8: case 0x2e8: case 0x2f8: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].iadr = (mn102->dma[dma].iadr & 0xff00) | data;
+	logerror("MN10200: DMA %d iadr=%03x\n", dma, mn102->dma[dma].iadr);
+	break;
+	}
 
-  case 0x289: case 0x299: case 0x2a9: case 0x2b9: case 0x2c9: case 0x2d9: case 0x2e9: case 0x2f9: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].iadr = (mn102->dma[dma].iadr & 0x00ff) | ((data & 3) << 8);
-    logerror("MN10200: DMA %d iadr=%03x\n", dma, mn102->dma[dma].iadr);
-    break;
-  }
+	case 0x289: case 0x299: case 0x2a9: case 0x2b9: case 0x2c9: case 0x2d9: case 0x2e9: case 0x2f9: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].iadr = (mn102->dma[dma].iadr & 0x00ff) | ((data & 3) << 8);
+	logerror("MN10200: DMA %d iadr=%03x\n", dma, mn102->dma[dma].iadr);
+	break;
+	}
 
-  case 0x28a: case 0x29a: case 0x2aa: case 0x2ba: case 0x2ca: case 0x2da: case 0x2ea: case 0x2fa: {
-    static const char *const trans[4] = { "M-IO", "M-M", "M-X1", "m-X2" };
-    static const char *const start[32] = {
-      "soft", "a/d", "ser0tx", "set0rx", "ser1tx", "ser1rx",
-      "timer0", "timer1", "timer2", "timer3", "timer4", "timer5", "timer6", "timer7", "timer8", "timer9",
-      "timer10u", "timer10a", "timer10b",
-      "timer11u", "timer11a", "timer12b",
-      "timer12a", "timer12b",
-      "irq0", "irq1", "irq2", "irq3",
-      "X0e", "X1e", "X0l", "X1l"
-    };
+	case 0x28a: case 0x29a: case 0x2aa: case 0x2ba: case 0x2ca: case 0x2da: case 0x2ea: case 0x2fa: {
+	static const char *const trans[4] = { "M-IO", "M-M", "M-X1", "m-X2" };
+	static const char *const start[32] = {
+		"soft", "a/d", "ser0tx", "set0rx", "ser1tx", "ser1rx",
+		"timer0", "timer1", "timer2", "timer3", "timer4", "timer5", "timer6", "timer7", "timer8", "timer9",
+		"timer10u", "timer10a", "timer10b",
+		"timer11u", "timer11a", "timer12b",
+		"timer12a", "timer12b",
+		"irq0", "irq1", "irq2", "irq3",
+		"X0e", "X1e", "X0l", "X1l"
+	};
 
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].ctrll = data;
-    logerror("MN10200: DMA %d control ack=%s, trans=%s, start=%s\n",
-	      dma,
-	      data & 0x80 ? "level" : "pulse",
-	      trans[(data >> 5) & 3],
-	      start[data & 31]);
-    break;
-  }
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].ctrll = data;
+	logerror("MN10200: DMA %d control ack=%s, trans=%s, start=%s\n",
+			dma,
+			data & 0x80 ? "level" : "pulse",
+			trans[(data >> 5) & 3],
+			start[data & 31]);
+	break;
+	}
 
-  case 0x28b: case 0x29b: case 0x2ab: case 0x2bb: case 0x2cb: case 0x2db: case 0x2eb: case 0x2fb: {
-    static const char *const tradr[4] = { "inc", "dec", "fixed", "reserved" };
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].ctrlh = data;
+	case 0x28b: case 0x29b: case 0x2ab: case 0x2bb: case 0x2cb: case 0x2db: case 0x2eb: case 0x2fb: {
+	static const char *const tradr[4] = { "inc", "dec", "fixed", "reserved" };
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].ctrlh = data;
 	logerror("MN10200: DMA %d control %s irq=%s %s %s dir=%s %s %s\n",
-          dma,
-          data & 0x80 ? "enable" : "disable",
-          data & 0x40 ? "off" : "on",
-          data & 0x20 ? "byte" : "word",
-          data & 0x10 ? "burst" : "single",
-          data & 0x08 ? "dst" : "src",
-          data & 0x04 ? "continue" : "normal",
-          tradr[data & 3]);
-    break;
-  }
+			dma,
+			data & 0x80 ? "enable" : "disable",
+			data & 0x40 ? "off" : "on",
+			data & 0x20 ? "byte" : "word",
+			data & 0x10 ? "burst" : "single",
+			data & 0x08 ? "dst" : "src",
+			data & 0x04 ? "continue" : "normal",
+			tradr[data & 3]);
+	break;
+	}
 
-  case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc: {
-    int dma = (adr-0x280) >> 4;
-    mn102->dma[dma].irq = data & 7;
-    logerror("MN10200: DMA %d irq=%d\n", dma, data & 7);
-    break;
-  }
+	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc: {
+	int dma = (adr-0x280) >> 4;
+	mn102->dma[dma].irq = data & 7;
+	logerror("MN10200: DMA %d irq=%d\n", dma, data & 7);
+	break;
+	}
 
-  case 0x28d: case 0x29d: case 0x2ad: case 0x2bd: case 0x2cd: case 0x2dd: case 0x2ed: case 0x2fd:
-    break;
+	case 0x28d: case 0x29d: case 0x2ad: case 0x2bd: case 0x2cd: case 0x2dd: case 0x2ed: case 0x2fd:
+	break;
 
-  case 0x3b0:
-    log_event("MN102", "Pull-ups 0-7 = -%c%c%c%c%c%c%c",
-	      data & 0x40 ? '#' : '.',
-	      data & 0x20 ? '#' : '.',
-	      data & 0x10 ? '#' : '.',
-	      data & 0x08 ? '#' : '.',
-	      data & 0x04 ? '#' : '.',
-	      data & 0x02 ? '#' : '.',
-	      data & 0x01 ? '#' : '.');
-    break;
+	case 0x3b0:
+	log_event("MN102", "Pull-ups 0-7 = -%c%c%c%c%c%c%c",
+			data & 0x40 ? '#' : '.',
+			data & 0x20 ? '#' : '.',
+			data & 0x10 ? '#' : '.',
+			data & 0x08 ? '#' : '.',
+			data & 0x04 ? '#' : '.',
+			data & 0x02 ? '#' : '.',
+			data & 0x01 ? '#' : '.');
+	break;
 
-  case 0x3b1:
-    log_event("MN102", "Pull-ups 8-f = --%c%c%c%c%c%c",
-	      data & 0x20 ? '#' : '.',
-	      data & 0x10 ? '#' : '.',
-	      data & 0x08 ? '#' : '.',
-	      data & 0x04 ? '#' : '.',
-	      data & 0x02 ? '#' : '.',
-	      data & 0x01 ? '#' : '.');
-    break;
+	case 0x3b1:
+	log_event("MN102", "Pull-ups 8-f = --%c%c%c%c%c%c",
+			data & 0x20 ? '#' : '.',
+			data & 0x10 ? '#' : '.',
+			data & 0x08 ? '#' : '.',
+			data & 0x04 ? '#' : '.',
+			data & 0x02 ? '#' : '.',
+			data & 0x01 ? '#' : '.');
+	break;
 
-  case 0x3b2:
-    log_event("MN102", "Timer I/O 4-0 = %c%c%c%c%c",
-	      data & 0x10 ? 'o' : 'i',
-	      data & 0x08 ? 'o' : 'i',
-	      data & 0x04 ? 'o' : 'i',
-	      data & 0x02 ? 'o' : 'i',
-	      data & 0x01 ? 'o' : 'i');
-    break;
+	case 0x3b2:
+	log_event("MN102", "Timer I/O 4-0 = %c%c%c%c%c",
+			data & 0x10 ? 'o' : 'i',
+			data & 0x08 ? 'o' : 'i',
+			data & 0x04 ? 'o' : 'i',
+			data & 0x02 ? 'o' : 'i',
+			data & 0x01 ? 'o' : 'i');
+	break;
 
-  case 0x3b3:
-    log_event("MN102", "Timer I/O 12b/a-10b/a = %c%c %c%c %c%c",
-	      data & 0x20 ? 'o' : 'i',
-	      data & 0x10 ? 'o' : 'i',
-	      data & 0x08 ? 'o' : 'i',
-	      data & 0x04 ? 'o' : 'i',
-	      data & 0x02 ? 'o' : 'i',
-	      data & 0x01 ? 'o' : 'i');
-    break;
+	case 0x3b3:
+	log_event("MN102", "Timer I/O 12b/a-10b/a = %c%c %c%c %c%c",
+			data & 0x20 ? 'o' : 'i',
+			data & 0x10 ? 'o' : 'i',
+			data & 0x08 ? 'o' : 'i',
+			data & 0x04 ? 'o' : 'i',
+			data & 0x02 ? 'o' : 'i',
+			data & 0x01 ? 'o' : 'i');
+	break;
 
-	case 0x3c0:	// port 0 data
+	case 0x3c0: // port 0 data
 		mn102->io->write_byte(MN10200_PORT0, data);
 		break;
 
-	case 0x3c2:	// port 2 data
+	case 0x3c2: // port 2 data
 		mn102->io->write_byte(MN10200_PORT2, data);
 		break;
 
-	case 0x3c3:	// port 3 data
+	case 0x3c3: // port 3 data
 		mn102->io->write_byte(MN10200_PORT3, data);
 		break;
 
-	case 0x3e0:	// port0 ddr
+	case 0x3e0: // port0 ddr
 		mn102->ddr[0] = data;
 		break;
 
-	case 0x3e1:	// port1 ddr
+	case 0x3e1: // port1 ddr
 		mn102->ddr[1] = data;
 		break;
 
-	case 0x3e2:	// port2 ddr
+	case 0x3e2: // port2 ddr
 		mn102->ddr[2] = data;
 		break;
 
-	case 0x3e3:	// port3 ddr
+	case 0x3e3: // port3 ddr
 		mn102->ddr[3] = data;
 		break;
 
-  case 0x3f3:
+	case 0x3f3:
 /*    log_event("MN102", "Port 3 bits 4=%s 3=%s 2=%s 1=%s 0=%s",
           data & 0x10 ? data & 0x40 ? "serial_1" : "tm9" : "p34",
           data & 0x08 ? data & 0x20 ? "serial_0" : "tm8" : "p33",
           data & 0x04 ? "tm7" : "p32",
           data & 0x04 ? "tm6" : "p31",
           data & 0x04 ? "tm5" : "p30");*/
-    break;
+	break;
 
 
-  default:
-    log_event("MN102", "internal_w %04x, %02x (%03x)", adr+0xfc00, data, adr);
-    break;
-  }
+	default:
+	log_event("MN102", "internal_w %04x, %02x (%03x)", adr+0xfc00, data, adr);
+	break;
+	}
 }
 
 static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
@@ -2260,38 +2260,38 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 		return mn10200_r(mn102, adr, MEM_BYTE) | (mn10200_r(mn102, adr+1, MEM_BYTE) << 8);
 	}
 
-  switch(adr) {
-  case 0x00e:
-    return mn102->iagr;
+	switch(adr) {
+	case 0x00e:
+	return mn102->iagr;
 
-  case 0x00f:
-    return 0;
+	case 0x00f:
+	return 0;
 
-  case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
-  case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
-    return mn102->icrl[((adr & 0x3f)>>1)-1];
+	case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
+	case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
+	return mn102->icrl[((adr & 0x3f)>>1)-1];
 
-  case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
-  case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055:
-    return mn102->icrh[((adr & 0x3f)>>1)-1];
+	case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
+	case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055:
+	return mn102->icrh[((adr & 0x3f)>>1)-1];
 
-  case 0x056:
-    return 0;
+	case 0x056:
+	return 0;
 
-    // p4i1 = tms empty line
-  case 0x057:
-    return 0x20;
+	// p4i1 = tms empty line
+	case 0x057:
+	return 0x20;
 
-  case 0x180: case 0x190:
-    return mn102->serial[(adr-0x180) >> 4].ctrll;
+	case 0x180: case 0x190:
+	return mn102->serial[(adr-0x180) >> 4].ctrll;
 
-  case 0x181: case 0x191:
-    return mn102->serial[(adr-0x180) >> 4].ctrlh;
+	case 0x181: case 0x191:
+	return mn102->serial[(adr-0x180) >> 4].ctrlh;
 
-  case 0x182: {
-    static int zz;
-    return zz++;
-  }
+	case 0x182: {
+	static int zz;
+	return zz++;
+	}
 
 	case 0x183:
 		return 0x10;
@@ -2301,7 +2301,7 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 //      printf("MN10200: timer %d value read = %d\n", adr-0x200, mn102->simple_timer[adr-0x200].cur);
 		return mn102->simple_timer[adr-0x200].cur;
 
-	case 0x264:	// port 1 data
+	case 0x264: // port 1 data
 		return mn102->io->read_byte(MN10200_PORT1);
 
 	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc:
@@ -2310,20 +2310,20 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 			return mn102->dma[dma].irq;
 		}
 
-	case 0x3c0:	// port 0 data
+	case 0x3c0: // port 0 data
 		return mn102->io->read_byte(MN10200_PORT0);
 
-	case 0x3c2:	// port 2 data
+	case 0x3c2: // port 2 data
 		return mn102->io->read_byte(MN10200_PORT2);
 
-	case 0x3c3:	// port 3 data
+	case 0x3c3: // port 3 data
 		return mn102->io->read_byte(MN10200_PORT3);
 
-  default:
-    log_event("MN102", "internal_r %04x (%03x)", adr+0xfc00, adr);
-  }
+	default:
+	log_event("MN102", "internal_r %04x (%03x)", adr+0xfc00, adr);
+	}
 
-  return 0;
+	return 0;
 }
 
 static CPU_SET_INFO(mn10200)
@@ -2332,9 +2332,9 @@ static CPU_SET_INFO(mn10200)
 
 	switch (state)
 	{
-	        /* --- the following bits of info are set as 64-bit signed integers --- */
-	        case CPUINFO_INT_PC:    /* intentional fallthrough */
-	        case CPUINFO_INT_REGISTER + MN10200_PC:            cpustate->pc = info->i;                         break;
+			/* --- the following bits of info are set as 64-bit signed integers --- */
+			case CPUINFO_INT_PC:    /* intentional fallthrough */
+			case CPUINFO_INT_REGISTER + MN10200_PC:            cpustate->pc = info->i;                         break;
 		case CPUINFO_INT_REGISTER + MN10200_PSW:           cpustate->psw = info->i;  break;
 		case CPUINFO_INT_REGISTER + MN10200_MDR:           cpustate->mdr = info->i;  break;
 		case CPUINFO_INT_REGISTER + MN10200_D0:            cpustate->d[0] = info->i;   break;
@@ -2348,10 +2348,10 @@ static CPU_SET_INFO(mn10200)
 		case CPUINFO_INT_REGISTER + MN10200_NMICR:         cpustate->nmicr = info->i;   break;
 		case CPUINFO_INT_REGISTER + MN10200_IAGR:          cpustate->iagr = info->i;   break;
 
-		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ0:	mn102_extirq(cpustate, 0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ1:	mn102_extirq(cpustate, 1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ2:	mn102_extirq(cpustate, 2, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ3:	mn102_extirq(cpustate, 3, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ0:    mn102_extirq(cpustate, 0, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ1:    mn102_extirq(cpustate, 1, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ2:    mn102_extirq(cpustate, 2, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ3:    mn102_extirq(cpustate, 3, info->i); break;
 	}
 }
 
@@ -2385,7 +2385,7 @@ CPU_GET_INFO( mn10200 )
 
 		case CPUINFO_INT_PC:    /* intentional fallthrough */
 		case CPUINFO_INT_REGISTER + MN10200_PC:    info->i = cpustate->pc;                      break;
-		case CPUINFO_INT_REGISTER + MN10200_PSW:   info->i = cpustate->psw; 			break;
+		case CPUINFO_INT_REGISTER + MN10200_PSW:   info->i = cpustate->psw;             break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(mn10200);        break;

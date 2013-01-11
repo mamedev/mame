@@ -36,7 +36,7 @@
 #include <fcntl.h>
 #ifdef _MSC_VER
 #include <io.h>
-#define	S_IRWXU	(_S_IREAD | _S_IWRITE | _S_IEXEC)
+#define S_IRWXU (_S_IREAD | _S_IWRITE | _S_IEXEC)
 #else
 #include <unistd.h>
 #endif
@@ -45,11 +45,11 @@
 #include <sys/mman.h>
 #endif
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #if VERBOSE
-#define LOGMSG(x)	logerror x
+#define LOGMSG(x)   logerror x
 #else
-#define LOGMSG(x)	do {} while (0);
+#define LOGMSG(x)   do {} while (0);
 #endif
 
 /*
@@ -87,8 +87,8 @@ struct buf_t
 
 struct shmem_t
 {
-	volatile INT32	lock;
-	buf_t				buf[2];
+	volatile INT32  lock;
+	buf_t               buf[2];
 };
 
 struct osd_shared_mem;
@@ -472,7 +472,7 @@ static DEVICE_RESET( gaelco_serial )
 {
 	gaelco_serial_state *state = get_token(device);
 
-	state->m_status = GAELCOSER_STATUS_READY	|GAELCOSER_STATUS_IRQ_ENABLE ;
+	state->m_status = GAELCOSER_STATUS_READY    |GAELCOSER_STATUS_IRQ_ENABLE ;
 
 	state->m_last_in_msg_cnt = -1;
 	state->m_slack_cnt = LINK_SLACK_B;
@@ -539,5 +539,3 @@ void gaelco_serial_device::device_stop()
 {
 	DEVICE_STOP_NAME( gaelco_serial )(this);
 }
-
-

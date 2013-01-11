@@ -72,7 +72,7 @@ void bankp_state::palette_init()
 	for (i = 0; i < machine().gfx[0]->colors() * machine().gfx[0]->granularity(); i++)
 		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i, *color_prom++ & 0x0f);
 
-	color_prom += 128;	/* skip the bottom half of the PROM - seems to be not used */
+	color_prom += 128;  /* skip the bottom half of the PROM - seems to be not used */
 
 	/* charset #2 lookup table */
 	for (i = 0; i < machine().gfx[1]->colors() * machine().gfx[1]->granularity(); i++)

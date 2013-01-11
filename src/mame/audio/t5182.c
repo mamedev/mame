@@ -196,7 +196,7 @@ static TIMER_CALLBACK( setirq_callback )
 			break;
 
 		case CPU_ASSERT:
-			irqstate |= 2;	// also used by t5182_sharedram_semaphore_main_r
+			irqstate |= 2;  // also used by t5182_sharedram_semaphore_main_r
 			break;
 
 		case CPU_CLEAR:
@@ -209,9 +209,9 @@ static TIMER_CALLBACK( setirq_callback )
 	if (cpu == NULL)
 		return;
 
-	if (irqstate == 0)	/* no IRQs pending */
+	if (irqstate == 0)  /* no IRQs pending */
 		cpu->execute().set_input_line(0,CLEAR_LINE);
-	else	/* IRQ pending */
+	else    /* IRQ pending */
 		cpu->execute().set_input_line(0,ASSERT_LINE);
 }
 
@@ -295,10 +295,10 @@ static READ8_HANDLER(t5182_sharedram_semaphore_main_r)
 	//  A0XX
 	// rest unused
 ADDRESS_MAP_START( t5182_map, AS_PROGRAM, 8, driver_device )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM	// internal ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM	AM_MIRROR(0x1800) // internal RAM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM // internal ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_MIRROR(0x1800) // internal RAM
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_MIRROR(0x3F00) AM_SHARE("t5182_sharedram") // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
-	AM_RANGE(0x8000, 0xffff) AM_ROM	// external ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM // external ROM
 ADDRESS_MAP_END
 
 

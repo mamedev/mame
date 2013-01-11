@@ -170,7 +170,7 @@ static UINT8 *memcard_data;
 
 static const char *audio_banks[4] =
 {
-    NEOGEO_BANK_AUDIO_CPU_CART_BANK0, NEOGEO_BANK_AUDIO_CPU_CART_BANK1, NEOGEO_BANK_AUDIO_CPU_CART_BANK2, NEOGEO_BANK_AUDIO_CPU_CART_BANK3
+	NEOGEO_BANK_AUDIO_CPU_CART_BANK0, NEOGEO_BANK_AUDIO_CPU_CART_BANK1, NEOGEO_BANK_AUDIO_CPU_CART_BANK2, NEOGEO_BANK_AUDIO_CPU_CART_BANK3
 };
 
 
@@ -446,7 +446,7 @@ READ16_MEMBER(neogeo_state::neogeo_unmapped_r)
 	UINT16 ret;
 
 	/* unmapped memory returns the last word on the data bus, which is almost always the opcode
-       of the next instruction due to prefetch */
+	   of the next instruction due to prefetch */
 
 	/* prevent recursion */
 	if (m_recurse)
@@ -505,13 +505,13 @@ WRITE16_MEMBER(neogeo_state::save_ram_w)
  *
  *************************************/
 
-#define MEMCARD_SIZE	0x0800
+#define MEMCARD_SIZE    0x0800
 
 
 CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
-       write protect status (we are always write enabled) */
+	   write protect status (we are always write enabled) */
 	return (memcard_present(machine()) == -1) ? 0x07 : 0x00;
 }
 
@@ -841,7 +841,7 @@ void neogeo_audio_cpu_banking_init( running_machine &machine )
 	}
 
 	/* set initial audio banks --
-       how does this really work, or is it even necessary? */
+	   how does this really work, or is it even necessary? */
 	state->m_audio_cpu_banks[0] = 0x1e;
 	state->m_audio_cpu_banks[1] = 0x0e;
 	state->m_audio_cpu_banks[2] = 0x06;
@@ -984,7 +984,7 @@ static void set_output_latch( running_machine &machine, UINT8 data )
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* looks like the LEDs are set on the
-       falling edge */
+	   falling edge */
 	UINT8 falling_bits = state->m_output_latch & ~data;
 
 	if (falling_bits & 0x08)
@@ -1186,7 +1186,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, neogeo_state )
-  /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
+	/*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
@@ -1220,91 +1220,91 @@ static const ym2610_interface ym2610_config =
  *
  *************************************/
 
-#define STANDARD_DIPS																		\
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")					\
-	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")					\
-	PORT_DIPSETTING(	  0x0000, "1?" )													\
-	PORT_DIPSETTING(	  0x0002, "2?" )													\
-	PORT_DIPNAME( 0x0004, 0x0004, "Autofire (in some games)" ) PORT_DIPLOCATION("SW:3")		\
-	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")	\
-	PORT_DIPSETTING(	  0x0018, "1" )														\
-	PORT_DIPSETTING(	  0x0010, "2" )														\
-	PORT_DIPSETTING(	  0x0008, "3" )														\
-	PORT_DIPSETTING(	  0x0000, "4" )														\
-	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")	\
-	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")			\
-	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")						\
-	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+#define STANDARD_DIPS                                                                       \
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")                  \
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")                 \
+	PORT_DIPSETTING(      0x0000, "1?" )                                                    \
+	PORT_DIPSETTING(      0x0002, "2?" )                                                    \
+	PORT_DIPNAME( 0x0004, 0x0004, "Autofire (in some games)" ) PORT_DIPLOCATION("SW:3")     \
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5") \
+	PORT_DIPSETTING(      0x0018, "1" )                                                     \
+	PORT_DIPSETTING(      0x0010, "2" )                                                     \
+	PORT_DIPSETTING(      0x0008, "3" )                                                     \
+	PORT_DIPSETTING(      0x0000, "4" )                                                     \
+	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")   \
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")           \
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")                       \
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 
-#define STANDARD_IN0														\
-	PORT_START("IN0")														\
-	STANDARD_DIPS															\
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)		\
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)		\
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)		\
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)	\
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			\
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)			\
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)			\
+#define STANDARD_IN0                                                        \
+	PORT_START("IN0")                                                       \
+	STANDARD_DIPS                                                           \
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)       \
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)     \
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)     \
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)    \
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)           \
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)           \
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)           \
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
 
-#define STANDARD_IN1														\
-	PORT_START("IN1")														\
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )							\
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)		\
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)		\
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)		\
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)	\
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			\
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)			\
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)			\
+#define STANDARD_IN1                                                        \
+	PORT_START("IN1")                                                       \
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )                           \
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)       \
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)     \
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)     \
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)    \
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)           \
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)           \
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)           \
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
 
-#define STANDARD_IN2																				\
-	PORT_START("IN2")																				\
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )													\
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )   												\
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_7)		\
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )   												\
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_8)	\
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)			\
+#define STANDARD_IN2                                                                                \
+	PORT_START("IN2")                                                                               \
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )                                                   \
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )                                                   \
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_7)        \
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )                                                   \
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_8)    \
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)          \
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* In AES 'mode' nitd, kof2000, sengoku3, matrim and mslug5 check if this is ACTIVE_HIGH */
 
 
-#define STANDARD_IN3																				\
-	PORT_START("IN3")																				\
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )													\
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )													\
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )													\
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms; if ACTIVE_HIGH + IN4 bit 6 ACTIVE_HIGH = AES 'mode' */	\
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms; if ACTIVE_HIGH + IN4 bit 6 ACTIVE_HIGH = AES 'mode' */	\
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? When ACTIVE_HIGH + IN4 bit 6 ACTIVE_LOW MVS-4 slot is detected */	\
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)			\
+#define STANDARD_IN3                                                                                \
+	PORT_START("IN3")                                                                               \
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )                                                    \
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )                                                    \
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                 \
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms; if ACTIVE_HIGH + IN4 bit 6 ACTIVE_HIGH = AES 'mode' */    \
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms; if ACTIVE_HIGH + IN4 bit 6 ACTIVE_HIGH = AES 'mode' */    \
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? When ACTIVE_HIGH + IN4 bit 6 ACTIVE_LOW MVS-4 slot is detected */   \
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)         \
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL)
 
 
-#define STANDARD_IN4																			\
-	PORT_START("IN4")																			\
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* what is this? If ACTIVE_LOW, MVS-6 slot detected, when ACTIVE_HIGH MVS-1 slot (AES) detected */	\
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Enter BIOS") PORT_CODE(KEYCODE_F2)	\
+#define STANDARD_IN4                                                                            \
+	PORT_START("IN4")                                                                           \
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* what is this? If ACTIVE_LOW, MVS-6 slot detected, when ACTIVE_HIGH MVS-1 slot (AES) detected */  \
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Enter BIOS") PORT_CODE(KEYCODE_F2)  \
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 
@@ -1448,7 +1448,7 @@ static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mvs, neogeo )
-    MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_LOAD(neo_cartridge)
 	MCFG_CARTSLOT_INTERFACE("neo_cart")
 

@@ -120,7 +120,7 @@ void tms9901_device::field_interrupts(void)
 	/* int_state: state of lines int1-int15 */
 	current_ints = m_int_state;
 	if (m_clock_register != 0)
-	{	/* if timer is enabled, INT3 pin is overriden by timer */
+	{   /* if timer is enabled, INT3 pin is overriden by timer */
 		if (m_timer_int_pending)
 		{
 			if (VERBOSE>8) LOG("tms9901: timer fires\n");
@@ -155,7 +155,7 @@ void tms9901_device::field_interrupts(void)
 
 		while ((current_ints & 1)==0)
 		{
-			current_ints >>= 1;	/* try next bit */
+			current_ints >>= 1; /* try next bit */
 			level++;
 		}
 		m_int_pending = true;
@@ -197,12 +197,12 @@ void tms9901_device::set_single_int(int pin_number, int state)
 void tms9901_device::timer_reload(void)
 {
 	if (m_clock_register != 0)
-	{	/* reset clock interval */
+	{   /* reset clock interval */
 		m_decrementer_value = m_clock_register;
 		m_decrementer->enable(true);
 	}
 	else
-	{	/* clock interval == 0 -> no timer */
+	{   /* clock interval == 0 -> no timer */
 		m_decrementer->enable(false);
 	}
 }
@@ -234,11 +234,11 @@ READ8_MEMBER( tms9901_device::read )
 	{
 	case 0:
 		if (m_clock_mode)
-		{	/* clock mode */
+		{   /* clock mode */
 			answer = ((m_clock_read_register & 0x7F) << 1) | 0x01;
 		}
 		else
-		{	/* interrupt mode */
+		{   /* interrupt mode */
 			// m_int_state stores the INTx values, which are inverted to the pin levels (INTx*)
 			answer = ((~m_int_state) & m_supported_int_mask) & 0xFF;
 
@@ -251,13 +251,13 @@ READ8_MEMBER( tms9901_device::read )
 		break;
 	case 1:
 		if (m_clock_mode)
-		{	/* clock mode */
+		{   /* clock mode */
 			answer = (m_clock_read_register & 0x3F80) >> 7;
 			if (!m_int_pending)
 				answer |= 0x80;
 		}
 		else
-		{	/* interrupt mode */
+		{   /* interrupt mode */
 			answer = ((~m_int_state) & m_supported_int_mask) >> 8;
 
 			if (!m_read_block.isnull())
@@ -313,11 +313,11 @@ READ8_MEMBER( tms9901_device::read )
 */
 WRITE8_MEMBER ( tms9901_device::write )
 {
-	data &= 1;	/* clear extra bits */
+	data &= 1;  /* clear extra bits */
 	offset &= 0x01F;
 	switch (offset)
 	{
-	case 0x00:	/* write to mode bit */
+	case 0x00:  /* write to mode bit */
 		if (data == 0)
 		{
 			/* we are quitting clock mode */
@@ -333,7 +333,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 			if (m_clock_register != 0)
 				m_clock_read_register = m_decrementer_value;
 			else
-				m_clock_read_register = 0;		/* timer inactive... */
+				m_clock_read_register = 0;      /* timer inactive... */
 		}
 		break;
 	case 0x01:
@@ -357,39 +357,39 @@ WRITE8_MEMBER ( tms9901_device::write )
 		//
 		// offset is the index of the modified bit of register (-> interrupt number -1)
 		if (m_clock_mode)
-		{	/* modify clock interval */
-			int mask = 1 << ((offset & 0x0F) - 1);	/* corresponding mask */
+		{   /* modify clock interval */
+			int mask = 1 << ((offset & 0x0F) - 1);  /* corresponding mask */
 
 			if (data)
-				m_clock_register |= mask;		/* set bit */
+				m_clock_register |= mask;       /* set bit */
 			else
-				m_clock_register &= ~mask;		/* clear bit */
+				m_clock_register &= ~mask;      /* clear bit */
 
 			/* reset clock timer (page 8) */
 			if (VERBOSE>6) LOG("tms9901: clock register = %04x\n", m_clock_register);
 			timer_reload();
 		}
 		else
-		{	/* modify interrupt enable mask */
-			int mask = 1 << (offset & 0x0F);	/* corresponding mask */
+		{   /* modify interrupt enable mask */
+			int mask = 1 << (offset & 0x0F);    /* corresponding mask */
 
 			if (data)
-				m_enabled_ints |= mask;		/* set bit */
+				m_enabled_ints |= mask;     /* set bit */
 			else
-				m_enabled_ints &= ~mask;		/* unset bit */
+				m_enabled_ints &= ~mask;        /* unset bit */
 
 			if (offset == 3)
-				m_timer_int_pending = false;	/* SBO 3 clears pending timer interrupt (??) */
+				m_timer_int_pending = false;    /* SBO 3 clears pending timer interrupt (??) */
 
 			if (VERBOSE>6) LOG("tms9901: interrupts = %04x\n", m_enabled_ints);
-			field_interrupts();		/* changed interrupt state */
+			field_interrupts();     /* changed interrupt state */
 		}
 		break;
 	case 0x0F:
 		if (m_clock_mode)
-		{	/* in clock mode this is the soft reset bit */
+		{   /* in clock mode this is the soft reset bit */
 			if (!data)
-			{	// TMS9901 soft reset (RST2*)
+			{   // TMS9901 soft reset (RST2*)
 				// Spec: "Writing a 0 to bit 15 while in the clock mode executes a soft reset on the I/O pins.
 				// [...] RST2* will program all ports to the input mode"
 				m_pio_direction = 0;
@@ -403,14 +403,14 @@ WRITE8_MEMBER ( tms9901_device::write )
 			}
 		}
 		else
-		{	/* modify interrupt enable mask */
+		{   /* modify interrupt enable mask */
 			if (data)
-				m_enabled_ints |= 0x4000;		/* set bit */
+				m_enabled_ints |= 0x4000;       /* set bit */
 			else
-				m_enabled_ints &= ~0x4000;		/* unset bit */
+				m_enabled_ints &= ~0x4000;      /* unset bit */
 
 			if (VERBOSE>6) LOG("tms9901: interrupts = %04x\n", m_enabled_ints);
-			field_interrupts();		/* changed interrupt state */
+			field_interrupts();     /* changed interrupt state */
 		}
 		break;
 	case 0x10:
@@ -436,7 +436,7 @@ WRITE8_MEMBER ( tms9901_device::write )
 		// MZ: see above - I think this is wrong
 		// m_clock_mode = false; // exit timer mode
 
-		m_pio_direction |= mask;			/* set up as output pin */
+		m_pio_direction |= mask;            /* set up as output pin */
 
 		if (data)
 			m_pio_output |= mask;
@@ -444,11 +444,11 @@ WRITE8_MEMBER ( tms9901_device::write )
 			m_pio_output &= ~mask;
 
 		if (pin >= 7)
-		{	/* pins P7-P15 are mirrored as INT15*-INT7* */
+		{   /* pins P7-P15 are mirrored as INT15*-INT7* */
 			int pin2 = 22 - pin;
 			int mask2 = (1 << pin2);
 
-			m_pio_direction_mirror |= mask2;	/* set up as output pin */
+			m_pio_direction_mirror |= mask2;    /* set up as output pin */
 
 			if (data)
 				m_pio_output_mirror |= mask2;
@@ -477,7 +477,7 @@ void tms9901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		if (VERBOSE>6) LOG("tms9901: decrementer = %d\n", m_decrementer_value);
 		if (m_decrementer_value<=0)
 		{
-			m_timer_int_pending = true;			// decrementer interrupt requested
+			m_timer_int_pending = true;         // decrementer interrupt requested
 			field_interrupts();
 			m_decrementer_value = m_clock_register;
 		}

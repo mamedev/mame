@@ -14,10 +14,10 @@
 #include "emu.h"
 #include "video/nubus_cb264.h"
 
-#define CB264_SCREEN_NAME	"cb264_screen"
-#define CB264_ROM_REGION	"cb264_rom"
+#define CB264_SCREEN_NAME   "cb264_screen"
+#define CB264_ROM_REGION    "cb264_rom"
 
-#define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
+#define VRAM_SIZE   (0x200000)  // 2 megs, maxed out
 
 MACHINE_CONFIG_FRAGMENT( cb264 )
 	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
@@ -68,14 +68,14 @@ const rom_entry *nubus_cb264_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_CB264, "RasterOps ColorBoard 264 video card", tag, owner, clock),
+		device_t(mconfig, NUBUS_CB264, "RasterOps ColorBoard 264 video card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_cb264";
 }
 
 nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_cb264";
@@ -202,7 +202,7 @@ UINT32 nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			}
 			break;
 
-		case 4:	// 24 bpp
+		case 4: // 24 bpp
 		case 7: // ???
 			{
 				UINT32 *vram32 = (UINT32 *)m_vram;
@@ -231,15 +231,15 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_w )
 {
 	switch (offset)
 	{
-		case 0x4/4:	// 0 = 1 bpp, 1 = 2bpp, 2 = 4bpp, 3 = 8bpp, 4 = 24bpp
+		case 0x4/4: // 0 = 1 bpp, 1 = 2bpp, 2 = 4bpp, 3 = 8bpp, 4 = 24bpp
 			m_cb264_mode = data;
 			break;
 
-		case 0x14/4:	// VBL ack
+		case 0x14/4:    // VBL ack
 			lower_slot_irq();
 			break;
 
-		case 0x3c/4:	// VBL disable
+		case 0x3c/4:    // VBL disable
 			m_cb264_vbl_disable = data;
 			break;
 
@@ -259,7 +259,7 @@ READ32_MEMBER( nubus_cb264_device::cb264_r )
 
 		case 0x34/4:
 			m_cb264_toggle ^= 1;
-			return m_cb264_toggle;	// bit 0 is vblank?
+			return m_cb264_toggle;  // bit 0 is vblank?
 
 		default:
 			logerror("cb264_r: reg %x (mask %x PC %x)\n", offset*4, mem_mask, space.device().safe_pc());
@@ -299,4 +299,3 @@ READ32_MEMBER( nubus_cb264_device::cb264_ramdac_r )
 {
 	return 0;
 }
-

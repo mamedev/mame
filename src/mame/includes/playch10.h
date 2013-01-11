@@ -1,7 +1,7 @@
 struct chr_bank
 {
-	int writable;	// 1 for RAM, 0 for ROM
-	UINT8* chr;		// direct access to the memory
+	int writable;   // 1 for RAM, 0 for ROM
+	UINT8* chr;     // direct access to the memory
 };
 
 class playch10_state : public driver_device

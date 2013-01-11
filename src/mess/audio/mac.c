@@ -16,10 +16,10 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MAC_MAIN_SND_BUF_OFFSET	0x0300
-#define MAC_ALT_SND_BUF_OFFSET	0x5F00
-#define MAC_SND_BUF_SIZE		370			/* total number of scan lines */
-#define MAC_SAMPLE_RATE			( MAC_SND_BUF_SIZE * 60 /*22255*/ )	/* scan line rate, should be 22254.5 Hz */
+#define MAC_MAIN_SND_BUF_OFFSET 0x0300
+#define MAC_ALT_SND_BUF_OFFSET  0x5F00
+#define MAC_SND_BUF_SIZE        370         /* total number of scan lines */
+#define MAC_SAMPLE_RATE         ( MAC_SND_BUF_SIZE * 60 /*22255*/ ) /* scan line rate, should be 22254.5 Hz */
 
 
 /* intermediate buffer */
@@ -191,7 +191,7 @@ const device_type MAC_SOUND = &device_creator<mac_sound_device>;
 
 mac_sound_device::mac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MAC_SOUND, "Mac Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(mac_sound);
 }
@@ -224,5 +224,3 @@ void mac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

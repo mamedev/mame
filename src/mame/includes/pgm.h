@@ -15,10 +15,10 @@ class pgm_state : public driver_device
 public:
 	pgm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoregs(*this, "videoregs"),
-		  m_videoram(*this, "videoram"),
-		  m_z80_mainram(*this, "z80_mainram"),
-		  m_mainram(*this, "sram")
+			m_videoregs(*this, "videoregs"),
+			m_videoram(*this, "videoram"),
+			m_z80_mainram(*this, "z80_mainram"),
+			m_mainram(*this, "sram")
 		{
 			m_irq4_disabled = 0;
 		}
@@ -151,7 +151,7 @@ class pgm_arm_type1_state : public pgm_state
 public:
 	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-		  m_arm7_shareram(*this, "arm7_shareram") {
+			m_arm7_shareram(*this, "arm7_shareram") {
 
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
@@ -216,8 +216,8 @@ class pgm_arm_type2_state : public pgm_state
 public:
 	pgm_arm_type2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-		  m_arm_ram(*this, "arm_ram"),
-		  m_arm7_shareram(*this, "arm7_shareram") {
+			m_arm_ram(*this, "arm_ram"),
+			m_arm7_shareram(*this, "arm7_shareram") {
 
 	}
 	// kov2
@@ -246,12 +246,12 @@ class pgm_arm_type3_state : public pgm_state
 public:
 	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-		  m_arm_ram(*this, "arm_ram") {
+			m_arm_ram(*this, "arm_ram") {
 
 	}
 	// svg
 	int           m_svg_ram_sel;
-	UINT32 *      m_svg_shareram[2];	//for 5585G MACHINE
+	UINT32 *      m_svg_shareram[2];    //for 5585G MACHINE
 
 	UINT32        m_svg_latchdata_68k_w;
 	UINT32        m_svg_latchdata_arm_w;
@@ -275,13 +275,13 @@ class pgm_022_025_state : public pgm_state
 public:
 	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-		  m_sharedprotram(*this, "sharedprotram") {
+			m_sharedprotram(*this, "sharedprotram") {
 
 	}
 	int           m_kb_cmd;
 	int           m_kb_reg;
 	int           m_kb_ptr;
-	int			  m_kb_region_sequence_position;
+	int           m_kb_region_sequence_position;
 	UINT32        m_kb_regs[0x10];
 	required_shared_ptr<UINT16> m_sharedprotram;
 
@@ -297,7 +297,7 @@ class pgm_028_025_state : public pgm_state
 public:
 	pgm_028_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-		  m_sharedprotram(*this, "sharedprotram") {
+			m_sharedprotram(*this, "sharedprotram") {
 
 	}
 	// olds

@@ -42,8 +42,8 @@
 	#define TEXSRC_TYPE UINT32
 	#define TEXSRC_TO_DEST(src) \
 		(texsource->palette[0x200 + RGB_RED(src)]   | \
-		 texsource->palette[0x100 + RGB_GREEN(src)] | \
-		 texsource->palette[RGB_BLUE(src)] | 0xff000000)
+			texsource->palette[0x100 + RGB_GREEN(src)] | \
+			texsource->palette[RGB_BLUE(src)] | 0xff000000)
 	#define FUNC_NAME(name) name ## _rgb32_paletted
 #elif SDL_TEXFORMAT == SDL_TEXFORMAT_PALETTE16
 	#define DEST_TYPE UINT32
@@ -91,8 +91,8 @@
 	#define TEXSRC_TYPE UINT16
 	#define TEXSRC_TO_DEST(src) \
 		((texsource->palette[src]&0xf80000) >> 9 | \
-		 (texsource->palette[src]&0x00f800) >> 6 | \
-		 (texsource->palette[src]&0x0000f8) >> 3 | 0x8000)
+			(texsource->palette[src]&0x00f800) >> 6 | \
+			(texsource->palette[src]&0x0000f8) >> 3 | 0x8000)
 	#define FUNC_NAME(name) name ## _palette16_argb1555
 #elif SDL_TEXFORMAT == SDL_TEXFORMAT_RGB15_ARGB1555
 	#define DEST_TYPE UINT16
@@ -106,8 +106,8 @@
 	#define TEXSRC_TYPE UINT16
 	#define TEXSRC_TO_DEST(src) \
 		((texsource->palette[(src) >> 10] & 0xf8) << 7 | \
-		 (texsource->palette[((src) >> 5) & 0x1f] & 0xf8) << 2 | \
-		 (texsource->palette[(src) & 0x1f] & 0xf8) >> 3 | 0x8000)
+			(texsource->palette[((src) >> 5) & 0x1f] & 0xf8) << 2 | \
+			(texsource->palette[(src) & 0x1f] & 0xf8) >> 3 | 0x8000)
 	#define FUNC_NAME(name) name ## _rgb15_paletted_argb1555
 #else
 	#error Unknown SRC_TEXFORMAT

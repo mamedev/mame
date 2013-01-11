@@ -42,25 +42,25 @@ protected:
 	void nvram_write(emu_file &file);
 
 private:
-	void	setbit(int& page, int pattern, bool set);
-	int 	get_size();
-	UINT8*	m_ram;
-	UINT8*	m_nvram;
-	UINT8*	m_ros;
+	void    setbit(int& page, int pattern, bool set);
+	int     get_size();
+	UINT8*  m_ram;
+	UINT8*  m_nvram;
+	UINT8*  m_ros;
 
-	int		m_select6_value;
-	int		m_select_all;
+	int     m_select6_value;
+	int     m_select_all;
 
-	int 	m_page;
+	int     m_page;
 
-	int		m_cru_horizon;
-	int		m_cru_phoenix;
-	bool	m_timode;
-	bool	m_32k_installed;
-	bool	m_split_mode;
-	bool	m_rambo_mode;
-	bool	m_killswitch;
-	bool	m_use_rambo;
+	int     m_cru_horizon;
+	int     m_cru_phoenix;
+	bool    m_timode;
+	bool    m_32k_installed;
+	bool    m_split_mode;
+	bool    m_rambo_mode;
+	bool    m_killswitch;
+	bool    m_use_rambo;
 };
 
 #endif

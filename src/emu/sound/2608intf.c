@@ -18,10 +18,10 @@
 
 struct ym2608_state
 {
-	sound_stream *	stream;
-	emu_timer *	timer[2];
-	void *			chip;
-	void *			psg;
+	sound_stream *  stream;
+	emu_timer * timer[2];
+	void *          chip;
+	void *          psg;
 	const ym2608_interface *intf;
 	device_t *device;
 };
@@ -93,11 +93,11 @@ static void timer_handler(void *param,int c,int count,int clock)
 {
 	ym2608_state *info = (ym2608_state *)param;
 	if( count == 0 )
-	{	/* Reset FM Timer */
+	{   /* Reset FM Timer */
 		info->timer[c]->enable(false);
 	}
 	else
-	{	/* Start FM Timer */
+	{   /* Start FM Timer */
 		attotime period = attotime::from_hz(clock) * count;
 		if (!info->timer[c]->enable(true))
 			info->timer[c]->adjust(period);
@@ -161,8 +161,8 @@ static DEVICE_START( ym2608 )
 
 	/* initialize YM2608 */
 	info->chip = ym2608_init(info,device,device->clock(),rate,
-		           pcmbufa,pcmsizea,
-		           timer_handler,IRQHandler,&psgintf);
+					pcmbufa,pcmsizea,
+					timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2608 chip");
 
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(ym2608_intf_postload), info));
@@ -207,7 +207,7 @@ const device_type YM2608 = &device_creator<ym2608_device>;
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2608, "YM2608", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym2608_state);
 }
@@ -258,5 +258,3 @@ void ym2608_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

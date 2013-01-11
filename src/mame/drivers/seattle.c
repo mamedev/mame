@@ -201,11 +201,11 @@
  *
  *************************************/
 
-#define LOG_GALILEO			(0)
-#define LOG_TIMERS			(0)
-#define LOG_DMA				(0)
-#define LOG_PCI				(0)
-#define LOG_WIDGET			(0)
+#define LOG_GALILEO         (0)
+#define LOG_TIMERS          (0)
+#define LOG_DMA             (0)
+#define LOG_PCI             (0)
+#define LOG_WIDGET          (0)
 
 
 
@@ -215,24 +215,24 @@
  *
  *************************************/
 
-#define SYSTEM_CLOCK			50000000
-#define TIMER_PERIOD			attotime::from_hz(SYSTEM_CLOCK)
+#define SYSTEM_CLOCK            50000000
+#define TIMER_PERIOD            attotime::from_hz(SYSTEM_CLOCK)
 
 /* various board configurations */
-#define PHOENIX_CONFIG			(0)
-#define SEATTLE_CONFIG			(1)
-#define SEATTLE_WIDGET_CONFIG	(2)
-#define FLAGSTAFF_CONFIG		(3)
+#define PHOENIX_CONFIG          (0)
+#define SEATTLE_CONFIG          (1)
+#define SEATTLE_WIDGET_CONFIG   (2)
+#define FLAGSTAFF_CONFIG        (3)
 
 /* static interrupts */
-#define GALILEO_IRQ_NUM			(0)
-#define IOASIC_IRQ_NUM			(1)
-#define IDE_IRQ_NUM				(2)
+#define GALILEO_IRQ_NUM         (0)
+#define IOASIC_IRQ_NUM          (1)
+#define IDE_IRQ_NUM             (2)
 
 /* configurable interrupts */
-#define ETHERNET_IRQ_SHIFT		(1)
-#define WIDGET_IRQ_SHIFT		(1)
-#define VBLANK_IRQ_SHIFT		(7)
+#define ETHERNET_IRQ_SHIFT      (1)
+#define WIDGET_IRQ_SHIFT        (1)
+#define VBLANK_IRQ_SHIFT        (7)
 
 
 
@@ -243,117 +243,117 @@
  *************************************/
 
 /* Galileo registers - 0x000-0x3ff */
-#define GREG_CPU_CONFIG		(0x000/4)
-#define GREG_RAS_1_0_LO		(0x008/4)
-#define GREG_RAS_1_0_HI		(0x010/4)
-#define GREG_RAS_3_2_LO		(0x018/4)
-#define GREG_RAS_3_2_HI		(0x020/4)
-#define GREG_CS_2_0_LO		(0x028/4)
-#define GREG_CS_2_0_HI		(0x030/4)
-#define GREG_CS_3_BOOT_LO	(0x038/4)
-#define GREG_CS_3_BOOT_HI	(0x040/4)
-#define GREG_PCI_IO_LO		(0x048/4)
-#define GREG_PCI_IO_HI		(0x050/4)
-#define GREG_PCI_MEM_LO		(0x058/4)
-#define GREG_PCI_MEM_HI		(0x060/4)
-#define GREG_INTERNAL_SPACE	(0x068/4)
-#define GREG_BUSERR_LO		(0x070/4)
-#define GREG_BUSERR_HI		(0x078/4)
+#define GREG_CPU_CONFIG     (0x000/4)
+#define GREG_RAS_1_0_LO     (0x008/4)
+#define GREG_RAS_1_0_HI     (0x010/4)
+#define GREG_RAS_3_2_LO     (0x018/4)
+#define GREG_RAS_3_2_HI     (0x020/4)
+#define GREG_CS_2_0_LO      (0x028/4)
+#define GREG_CS_2_0_HI      (0x030/4)
+#define GREG_CS_3_BOOT_LO   (0x038/4)
+#define GREG_CS_3_BOOT_HI   (0x040/4)
+#define GREG_PCI_IO_LO      (0x048/4)
+#define GREG_PCI_IO_HI      (0x050/4)
+#define GREG_PCI_MEM_LO     (0x058/4)
+#define GREG_PCI_MEM_HI     (0x060/4)
+#define GREG_INTERNAL_SPACE (0x068/4)
+#define GREG_BUSERR_LO      (0x070/4)
+#define GREG_BUSERR_HI      (0x078/4)
 
 /* Galileo registers - 0x400-0x7ff */
-#define GREG_RAS0_LO		(0x400/4)
-#define GREG_RAS0_HI		(0x404/4)
-#define GREG_RAS1_LO		(0x408/4)
-#define GREG_RAS1_HI		(0x40c/4)
-#define GREG_RAS2_LO		(0x410/4)
-#define GREG_RAS2_HI		(0x414/4)
-#define GREG_RAS3_LO		(0x418/4)
-#define GREG_RAS3_HI		(0x41c/4)
-#define GREG_CS0_LO			(0x420/4)
-#define GREG_CS0_HI			(0x424/4)
-#define GREG_CS1_LO			(0x428/4)
-#define GREG_CS1_HI			(0x42c/4)
-#define GREG_CS2_LO			(0x430/4)
-#define GREG_CS2_HI			(0x434/4)
-#define GREG_CS3_LO			(0x438/4)
-#define GREG_CS3_HI			(0x43c/4)
-#define GREG_CSBOOT_LO		(0x440/4)
-#define GREG_CSBOOT_HI		(0x444/4)
-#define GREG_DRAM_CONFIG	(0x448/4)
-#define GREG_DRAM_BANK0		(0x44c/4)
-#define GREG_DRAM_BANK1		(0x450/4)
-#define GREG_DRAM_BANK2		(0x454/4)
-#define GREG_DRAM_BANK3		(0x458/4)
-#define GREG_DEVICE_BANK0	(0x45c/4)
-#define GREG_DEVICE_BANK1	(0x460/4)
-#define GREG_DEVICE_BANK2	(0x464/4)
-#define GREG_DEVICE_BANK3	(0x468/4)
-#define GREG_DEVICE_BOOT	(0x46c/4)
-#define GREG_ADDRESS_ERROR	(0x470/4)
+#define GREG_RAS0_LO        (0x400/4)
+#define GREG_RAS0_HI        (0x404/4)
+#define GREG_RAS1_LO        (0x408/4)
+#define GREG_RAS1_HI        (0x40c/4)
+#define GREG_RAS2_LO        (0x410/4)
+#define GREG_RAS2_HI        (0x414/4)
+#define GREG_RAS3_LO        (0x418/4)
+#define GREG_RAS3_HI        (0x41c/4)
+#define GREG_CS0_LO         (0x420/4)
+#define GREG_CS0_HI         (0x424/4)
+#define GREG_CS1_LO         (0x428/4)
+#define GREG_CS1_HI         (0x42c/4)
+#define GREG_CS2_LO         (0x430/4)
+#define GREG_CS2_HI         (0x434/4)
+#define GREG_CS3_LO         (0x438/4)
+#define GREG_CS3_HI         (0x43c/4)
+#define GREG_CSBOOT_LO      (0x440/4)
+#define GREG_CSBOOT_HI      (0x444/4)
+#define GREG_DRAM_CONFIG    (0x448/4)
+#define GREG_DRAM_BANK0     (0x44c/4)
+#define GREG_DRAM_BANK1     (0x450/4)
+#define GREG_DRAM_BANK2     (0x454/4)
+#define GREG_DRAM_BANK3     (0x458/4)
+#define GREG_DEVICE_BANK0   (0x45c/4)
+#define GREG_DEVICE_BANK1   (0x460/4)
+#define GREG_DEVICE_BANK2   (0x464/4)
+#define GREG_DEVICE_BANK3   (0x468/4)
+#define GREG_DEVICE_BOOT    (0x46c/4)
+#define GREG_ADDRESS_ERROR  (0x470/4)
 
 /* Galileo registers - 0x800-0xbff */
-#define GREG_DMA0_COUNT		(0x800/4)
-#define GREG_DMA1_COUNT		(0x804/4)
-#define GREG_DMA2_COUNT		(0x808/4)
-#define GREG_DMA3_COUNT		(0x80c/4)
-#define GREG_DMA0_SOURCE	(0x810/4)
-#define GREG_DMA1_SOURCE	(0x814/4)
-#define GREG_DMA2_SOURCE	(0x818/4)
-#define GREG_DMA3_SOURCE	(0x81c/4)
-#define GREG_DMA0_DEST		(0x820/4)
-#define GREG_DMA1_DEST		(0x824/4)
-#define GREG_DMA2_DEST		(0x828/4)
-#define GREG_DMA3_DEST		(0x82c/4)
-#define GREG_DMA0_NEXT		(0x830/4)
-#define GREG_DMA1_NEXT		(0x834/4)
-#define GREG_DMA2_NEXT		(0x838/4)
-#define GREG_DMA3_NEXT		(0x83c/4)
-#define GREG_DMA0_CONTROL	(0x840/4)
-#define GREG_DMA1_CONTROL	(0x844/4)
-#define GREG_DMA2_CONTROL	(0x848/4)
-#define GREG_DMA3_CONTROL	(0x84c/4)
-#define GREG_TIMER0_COUNT	(0x850/4)
-#define GREG_TIMER1_COUNT	(0x854/4)
-#define GREG_TIMER2_COUNT	(0x858/4)
-#define GREG_TIMER3_COUNT	(0x85c/4)
-#define GREG_DMA_ARBITER	(0x860/4)
-#define GREG_TIMER_CONTROL	(0x864/4)
+#define GREG_DMA0_COUNT     (0x800/4)
+#define GREG_DMA1_COUNT     (0x804/4)
+#define GREG_DMA2_COUNT     (0x808/4)
+#define GREG_DMA3_COUNT     (0x80c/4)
+#define GREG_DMA0_SOURCE    (0x810/4)
+#define GREG_DMA1_SOURCE    (0x814/4)
+#define GREG_DMA2_SOURCE    (0x818/4)
+#define GREG_DMA3_SOURCE    (0x81c/4)
+#define GREG_DMA0_DEST      (0x820/4)
+#define GREG_DMA1_DEST      (0x824/4)
+#define GREG_DMA2_DEST      (0x828/4)
+#define GREG_DMA3_DEST      (0x82c/4)
+#define GREG_DMA0_NEXT      (0x830/4)
+#define GREG_DMA1_NEXT      (0x834/4)
+#define GREG_DMA2_NEXT      (0x838/4)
+#define GREG_DMA3_NEXT      (0x83c/4)
+#define GREG_DMA0_CONTROL   (0x840/4)
+#define GREG_DMA1_CONTROL   (0x844/4)
+#define GREG_DMA2_CONTROL   (0x848/4)
+#define GREG_DMA3_CONTROL   (0x84c/4)
+#define GREG_TIMER0_COUNT   (0x850/4)
+#define GREG_TIMER1_COUNT   (0x854/4)
+#define GREG_TIMER2_COUNT   (0x858/4)
+#define GREG_TIMER3_COUNT   (0x85c/4)
+#define GREG_DMA_ARBITER    (0x860/4)
+#define GREG_TIMER_CONTROL  (0x864/4)
 
 /* Galileo registers - 0xc00-0xfff */
-#define GREG_PCI_COMMAND	(0xc00/4)
-#define GREG_PCI_TIMEOUT	(0xc04/4)
-#define GREG_PCI_RAS_1_0	(0xc08/4)
-#define GREG_PCI_RAS_3_2	(0xc0c/4)
-#define GREG_PCI_CS_2_0		(0xc10/4)
-#define GREG_PCI_CS_3_BOOT	(0xc14/4)
-#define GREG_INT_STATE		(0xc18/4)
-#define GREG_INT_MASK		(0xc1c/4)
-#define GREG_PCI_INT_MASK	(0xc24/4)
-#define GREG_CONFIG_ADDRESS	(0xcf8/4)
-#define GREG_CONFIG_DATA	(0xcfc/4)
+#define GREG_PCI_COMMAND    (0xc00/4)
+#define GREG_PCI_TIMEOUT    (0xc04/4)
+#define GREG_PCI_RAS_1_0    (0xc08/4)
+#define GREG_PCI_RAS_3_2    (0xc0c/4)
+#define GREG_PCI_CS_2_0     (0xc10/4)
+#define GREG_PCI_CS_3_BOOT  (0xc14/4)
+#define GREG_INT_STATE      (0xc18/4)
+#define GREG_INT_MASK       (0xc1c/4)
+#define GREG_PCI_INT_MASK   (0xc24/4)
+#define GREG_CONFIG_ADDRESS (0xcf8/4)
+#define GREG_CONFIG_DATA    (0xcfc/4)
 
 /* Galileo interrupts */
-#define GINT_SUMMARY_SHIFT	(0)
-#define GINT_MEMOUT_SHIFT	(1)
-#define GINT_DMAOUT_SHIFT	(2)
-#define GINT_CPUOUT_SHIFT	(3)
-#define GINT_DMA0COMP_SHIFT	(4)
-#define GINT_DMA1COMP_SHIFT	(5)
-#define GINT_DMA2COMP_SHIFT	(6)
-#define GINT_DMA3COMP_SHIFT	(7)
-#define GINT_T0EXP_SHIFT	(8)
-#define GINT_T1EXP_SHIFT	(9)
-#define GINT_T2EXP_SHIFT	(10)
-#define GINT_T3EXP_SHIFT	(11)
-#define GINT_MASRDERR_SHIFT	(12)
-#define GINT_SLVWRERR_SHIFT	(13)
-#define GINT_MASWRERR_SHIFT	(14)
-#define GINT_SLVRDERR_SHIFT	(15)
-#define GINT_ADDRERR_SHIFT	(16)
-#define GINT_MEMERR_SHIFT	(17)
-#define GINT_MASABORT_SHIFT	(18)
-#define GINT_TARABORT_SHIFT	(19)
-#define GINT_RETRYCTR_SHIFT	(20)
+#define GINT_SUMMARY_SHIFT  (0)
+#define GINT_MEMOUT_SHIFT   (1)
+#define GINT_DMAOUT_SHIFT   (2)
+#define GINT_CPUOUT_SHIFT   (3)
+#define GINT_DMA0COMP_SHIFT (4)
+#define GINT_DMA1COMP_SHIFT (5)
+#define GINT_DMA2COMP_SHIFT (6)
+#define GINT_DMA3COMP_SHIFT (7)
+#define GINT_T0EXP_SHIFT    (8)
+#define GINT_T1EXP_SHIFT    (9)
+#define GINT_T2EXP_SHIFT    (10)
+#define GINT_T3EXP_SHIFT    (11)
+#define GINT_MASRDERR_SHIFT (12)
+#define GINT_SLVWRERR_SHIFT (13)
+#define GINT_MASWRERR_SHIFT (14)
+#define GINT_SLVRDERR_SHIFT (15)
+#define GINT_ADDRERR_SHIFT  (16)
+#define GINT_MEMERR_SHIFT   (17)
+#define GINT_MASABORT_SHIFT (18)
+#define GINT_TARABORT_SHIFT (19)
+#define GINT_RETRYCTR_SHIFT (20)
 
 
 
@@ -364,13 +364,13 @@
  *************************************/
 
 /* Widget registers */
-#define WREG_ETHER_ADDR		(0x00/4)
-#define WREG_INTERRUPT		(0x04/4)
-#define WREG_ANALOG			(0x10/4)
-#define WREG_ETHER_DATA		(0x14/4)
+#define WREG_ETHER_ADDR     (0x00/4)
+#define WREG_INTERRUPT      (0x04/4)
+#define WREG_ANALOG         (0x10/4)
+#define WREG_ETHER_DATA     (0x14/4)
 
 /* Widget interrupts */
-#define WINT_ETHERNET_SHIFT	(2)
+#define WINT_ETHERNET_SHIFT (2)
 
 
 
@@ -382,39 +382,39 @@
 
 struct galileo_timer
 {
-	emu_timer *		timer;
-	UINT32			count;
-	UINT8			active;
+	emu_timer *     timer;
+	UINT32          count;
+	UINT8           active;
 };
 
 
 struct galileo_data
 {
 	/* raw register data */
-	UINT32			reg[0x1000/4];
+	UINT32          reg[0x1000/4];
 
 	/* timer info */
-	galileo_timer	timer[4];
+	galileo_timer   timer[4];
 
 	/* DMA info */
-	INT8			dma_active;
-	UINT8			dma_stalled_on_voodoo[4];
+	INT8            dma_active;
+	UINT8           dma_stalled_on_voodoo[4];
 
 	/* PCI info */
-	UINT32			pci_bridge_regs[0x40];
-	UINT32			pci_3dfx_regs[0x40];
-	UINT32			pci_ide_regs[0x40];
+	UINT32          pci_bridge_regs[0x40];
+	UINT32          pci_3dfx_regs[0x40];
+	UINT32          pci_ide_regs[0x40];
 };
 
 
 struct widget_data
 {
 	/* ethernet register address */
-	UINT8			ethernet_addr;
+	UINT8           ethernet_addr;
 
 	/* IRQ information */
-	UINT8			irq_num;
-	UINT8			irq_mask;
+	UINT8           irq_num;
+	UINT8           irq_mask;
 };
 
 
@@ -423,14 +423,14 @@ class seattle_state : public driver_device
 public:
 	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") ,
+			m_nvram(*this, "nvram") ,
 		m_rambase(*this, "rambase"),
 		m_interrupt_enable(*this, "int_enable"),
 		m_interrupt_config(*this, "int_config"),
 		m_asic_reset(*this, "asic_reset"),
 		m_rombase(*this, "rombase"){ }
 
-	required_shared_ptr<UINT32>	m_nvram;
+	required_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_rambase;
 	required_shared_ptr<UINT32> m_interrupt_enable;
 	required_shared_ptr<UINT32> m_interrupt_config;
@@ -807,11 +807,11 @@ static UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
 
 	switch (reg)
 	{
-		case 0x00:		/* ID register: 0x0146 = GT64010, 0x11ab = Galileo */
+		case 0x00:      /* ID register: 0x0146 = GT64010, 0x11ab = Galileo */
 			result = 0x014611ab;
 			break;
 
-		case 0x02:		/* Base Class:Sub Class:Reserved:Revision */
+		case 0x02:      /* Base Class:Sub Class:Reserved:Revision */
 			result = 0x06000003;
 			break;
 	}
@@ -845,11 +845,11 @@ static UINT32 pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
 
 	switch (reg)
 	{
-		case 0x00:		/* ID register: 0x0001 = SST-1, 0x121a = 3dfx */
+		case 0x00:      /* ID register: 0x0001 = SST-1, 0x121a = 3dfx */
 			result = 0x0001121a;
 			break;
 
-		case 0x02:		/* Base Class:Sub Class:Reserved:Revision */
+		case 0x02:      /* Base Class:Sub Class:Reserved:Revision */
 			result = 0x00000001;
 			break;
 	}
@@ -867,13 +867,13 @@ static void pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
 
 	switch (reg)
 	{
-		case 0x04:		/* address register */
+		case 0x04:      /* address register */
 			state->m_galileo.pci_3dfx_regs[reg] &= 0xff000000;
 			if (data != 0x08000000)
 				logerror("3dfx not mapped where we expect it! (%08X)\n", data);
 			break;
 
-		case 0x10:		/* initEnable register */
+		case 0x10:      /* initEnable register */
 			voodoo_set_init_enable(state->m_voodoo, data);
 			break;
 	}
@@ -896,11 +896,11 @@ static UINT32 pci_ide_r(address_space &space, UINT8 reg, UINT8 type)
 
 	switch (reg)
 	{
-		case 0x00:		/* ID register: 0x0002 = PC87415, 0x100b = National Semiconductor */
+		case 0x00:      /* ID register: 0x0002 = PC87415, 0x100b = National Semiconductor */
 			result = 0x0002100b;
 			break;
 
-		case 0x02:		/* Base Class:Sub Class:Reserved:Revision */
+		case 0x02:      /* Base Class:Sub Class:Reserved:Revision */
 			result = 0x01010001;
 			break;
 	}
@@ -1034,16 +1034,16 @@ static void galileo_perform_dma(address_space &space, int which)
 		switch ((galileo.reg[GREG_DMA0_CONTROL + which] >> 2) & 3)
 		{
 			default:
-			case 0:		srcinc = 1;		break;
-			case 1:		srcinc = -1;	break;
-			case 2:		srcinc = 0;		break;
+			case 0:     srcinc = 1;     break;
+			case 1:     srcinc = -1;    break;
+			case 2:     srcinc = 0;     break;
 		}
 		switch ((galileo.reg[GREG_DMA0_CONTROL + which] >> 4) & 3)
 		{
 			default:
-			case 0:		dstinc = 1;		break;
-			case 1:		dstinc = -1;	break;
-			case 2:		dstinc = 0;		break;
+			case 0:     dstinc = 1;     break;
+			case 1:     dstinc = -1;    break;
+			case 2:     dstinc = 0;     break;
 		}
 
 		if (LOG_DMA)
@@ -1325,10 +1325,10 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 			break;
 		}
 
-		case GREG_DMA0_COUNT:	case GREG_DMA1_COUNT:	case GREG_DMA2_COUNT:	case GREG_DMA3_COUNT:
-		case GREG_DMA0_SOURCE:	case GREG_DMA1_SOURCE:	case GREG_DMA2_SOURCE:	case GREG_DMA3_SOURCE:
-		case GREG_DMA0_DEST:	case GREG_DMA1_DEST:	case GREG_DMA2_DEST:	case GREG_DMA3_DEST:
-		case GREG_DMA0_NEXT:	case GREG_DMA1_NEXT:	case GREG_DMA2_NEXT:	case GREG_DMA3_NEXT:
+		case GREG_DMA0_COUNT:   case GREG_DMA1_COUNT:   case GREG_DMA2_COUNT:   case GREG_DMA3_COUNT:
+		case GREG_DMA0_SOURCE:  case GREG_DMA1_SOURCE:  case GREG_DMA2_SOURCE:  case GREG_DMA3_SOURCE:
+		case GREG_DMA0_DEST:    case GREG_DMA1_DEST:    case GREG_DMA2_DEST:    case GREG_DMA3_DEST:
+		case GREG_DMA0_NEXT:    case GREG_DMA1_NEXT:    case GREG_DMA2_NEXT:    case GREG_DMA3_NEXT:
 		case GREG_CONFIG_ADDRESS:
 		case GREG_INT_MASK:
 			if (LOG_GALILEO)
@@ -1470,39 +1470,39 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 
 	switch (offset)
 	{
-		case 0:		/* low 8 bits of X */
+		case 0:     /* low 8 bits of X */
 			result = (ioport("LIGHT0_X")->read() << 4) & 0xff;
 			break;
 
-		case 1:		/* upper 4 bits of X */
+		case 1:     /* upper 4 bits of X */
 			result = (ioport("LIGHT0_X")->read() >> 4) & 0x0f;
 			result |= (ioport("FAKE")->read() & 0x03) << 4;
 			result |= 0x40;
 			break;
 
-		case 2:		/* low 8 bits of Y */
+		case 2:     /* low 8 bits of Y */
 			result = (ioport("LIGHT0_Y")->read() << 2) & 0xff;
 			break;
 
-		case 3:		/* upper 4 bits of Y */
+		case 3:     /* upper 4 bits of Y */
 			result = (ioport("LIGHT0_Y")->read() >> 6) & 0x03;
 			break;
 
-		case 4:		/* low 8 bits of X */
+		case 4:     /* low 8 bits of X */
 			result = (ioport("LIGHT1_X")->read() << 4) & 0xff;
 			break;
 
-		case 5:		/* upper 4 bits of X */
+		case 5:     /* upper 4 bits of X */
 			result = (ioport("LIGHT1_X")->read() >> 4) & 0x0f;
 			result |= (ioport("FAKE")->read() & 0x30);
 			result |= 0x40;
 			break;
 
-		case 6:		/* low 8 bits of Y */
+		case 6:     /* low 8 bits of Y */
 			result = (ioport("LIGHT1_Y")->read() << 2) & 0xff;
 			break;
 
-		case 7:		/* upper 4 bits of Y */
+		case 7:     /* upper 4 bits of Y */
 			result = (ioport("LIGHT1_Y")->read() >> 6) & 0x03;
 			break;
 	}
@@ -1574,7 +1574,7 @@ static void update_widget_irq(running_machine &machine)
 
 READ32_MEMBER(seattle_state::widget_r)
 {
-    device_t *device = machine().device("ethernet");
+	device_t *device = machine().device("ethernet");
 	UINT32 result = ~0;
 
 	switch (offset)
@@ -1605,7 +1605,7 @@ READ32_MEMBER(seattle_state::widget_r)
 
 WRITE32_MEMBER(seattle_state::widget_w)
 {
-    device_t *device = machine().device("ethernet");
+	device_t *device = machine().device("ethernet");
 	if (LOG_WIDGET)
 		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
 
@@ -1793,10 +1793,10 @@ READ32_MEMBER(seattle_state::seattle_ide_r)
 
 static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase")	// wg3dh only has 4MB; sfrush, blitz99 8MB
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase") // wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
 	AM_RANGE(0x0a000000, 0x0a0003ff) AM_READ(seattle_ide_r) AM_DEVWRITE_LEGACY("ide", ide_controller32_w)
-	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
+	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP                     // IDE-related, but annoying
 	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE_LEGACY("ide", ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
@@ -1899,7 +1899,7 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	/* 3d cam */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)   /* 3d cam */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1972,7 +1972,7 @@ static INPUT_PORTS_START( sfrush )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Abort") PORT_PLAYER(1) /* Abort */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME(DEF_STR( Reverse )) PORT_PLAYER(1)	/* reverse */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME(DEF_STR( Reverse )) PORT_PLAYER(1)    /* reverse */
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START4 )  /* There are no start buttons on a Rush! */
@@ -1980,18 +1980,18 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 1") PORT_PLAYER(1)	/* view 1 */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 2") PORT_PLAYER(1)	/* view 2 */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 3") PORT_PLAYER(1)	/* view 3 */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Music") PORT_PLAYER(1)	/* music */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Track 1") PORT_PLAYER(1)	/* track 1 */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Track 2") PORT_PLAYER(1)	/* track 2 */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3") PORT_PLAYER(1)	/* track 3 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4") PORT_PLAYER(1)	/* track 4 */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_PLAYER(1)	/* 1st gear */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_PLAYER(1)	/* 2nd gear */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_PLAYER(1)	/* 3rd gear */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_PLAYER(1)	/* 4th gear */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 1") PORT_PLAYER(1)   /* view 1 */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* view 2 */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 3") PORT_PLAYER(1)  /* view 3 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Music") PORT_PLAYER(1)   /* music */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Track 1") PORT_PLAYER(1) /* track 1 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Track 2") PORT_PLAYER(1) /* track 2 */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3") PORT_PLAYER(1) /* track 3 */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4") PORT_PLAYER(1) /* track 4 */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_PLAYER(1) /* 2nd gear */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_PLAYER(1) /* 3rd gear */
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_PLAYER(1) /* 4th gear */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2012,16 +2012,16 @@ static INPUT_PORTS_START( sfrush )
 	PORT_START("AN3")
 	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
 
-	PORT_START("AN4")	/* Accel */
+	PORT_START("AN4")   /* Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("AN5")	/* Brake */
+	PORT_START("AN5")   /* Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
-	PORT_START("AN6")	/* Clutch */
+	PORT_START("AN6")   /* Clutch */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
-	PORT_START("AN7")	/* Steer */
+	PORT_START("AN7")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -2053,7 +2053,7 @@ static INPUT_PORTS_START( calspeed )
 	PORT_SERVICE_NO_TOGGLE( 0x0080, IP_ACTIVE_LOW )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )	/* test */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 ) /* test */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -2061,27 +2061,27 @@ static INPUT_PORTS_START( calspeed )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Radio") PORT_PLAYER(1)	/* radio */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Radio") PORT_PLAYER(1)   /* radio */
 	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1") PORT_PLAYER(1)	/* road cam */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") PORT_PLAYER(1)	/* tailgate cam */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") PORT_PLAYER(1)	/* sky cam */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1") PORT_PLAYER(1)   /* road cam */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* tailgate cam */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") PORT_PLAYER(1)   /* sky cam */
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_PLAYER(1)	/* 1st gear */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("2nd Gear") PORT_PLAYER(1)	/* 2nd gear */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("3rd Gear") PORT_PLAYER(1)	/* 3rd gear */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("4th Gear") PORT_PLAYER(1)	/* 4th gear */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("2nd Gear") PORT_PLAYER(1) /* 2nd gear */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("3rd Gear") PORT_PLAYER(1) /* 3rd gear */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("4th Gear") PORT_PLAYER(1) /* 4th gear */
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN0")	/* Steer */
+	PORT_START("AN0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")	/* Accel */
+	PORT_START("AN1")   /* Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 	PORT_START("AN3")
@@ -2111,8 +2111,8 @@ static INPUT_PORTS_START( vaportrx )
 	PORT_SERVICE_NO_TOGGLE( 0x0080, IP_ACTIVE_LOW )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	/* left trigger */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )					/* test */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   /* left trigger */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )                 /* test */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -2122,13 +2122,13 @@ static INPUT_PORTS_START( vaportrx )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_A) PORT_PLAYER(1)	/* right trigger */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)						/* left thumb */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_S) PORT_PLAYER(1)	/* right thumb */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_A) PORT_PLAYER(1)  /* right trigger */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)                       /* left thumb */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_S) PORT_PLAYER(1)  /* right thumb */
 	PORT_BIT( 0x0180, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)						/* left view */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)                       /* left view */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_PLAYER(1)	/* right view */
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_PLAYER(1)  /* right view */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN2")
@@ -2172,23 +2172,23 @@ static INPUT_PORTS_START( biofreak )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	/* LP = P1 left punch */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* F  = P1 ??? */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	/* RP = P1 right punch */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   /* LP = P1 left punch */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)   /* F  = P1 ??? */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   /* RP = P1 right punch */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	/* LP = P1 left punch */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	/* F  = P1 ??? */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	/* RP = P1 right punch */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   /* LP = P1 left punch */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   /* F  = P1 ??? */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   /* RP = P1 right punch */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	/* LK = P1 left kick */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* RK = P1 right kick */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)	/* T  = P1 ??? */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)   /* LK = P1 left kick */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)   /* RK = P1 right kick */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)   /* T  = P1 ??? */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	/* LK = P2 left kick */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	/* RK = P2 right kick */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)	/* T  = P2 ??? */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)   /* LK = P2 left kick */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)   /* RK = P2 right kick */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)   /* T  = P2 ??? */
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2215,7 +2215,7 @@ static INPUT_PORTS_START( blitz )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
 //  PORT_DIPSETTING(      0x0000, "Not Used" )      /* Marked as Unused in the manual */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ))	/* Marked as Unused in the manual */
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ))   /* Marked as Unused in the manual */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Power Up Test Loop" )
@@ -2378,19 +2378,19 @@ static INPUT_PORTS_START( carnevil )
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("LIGHT0_X")				/* fake analog X */
+	PORT_START("LIGHT0_X")              /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("LIGHT0_Y")				/* fake analog Y */
+	PORT_START("LIGHT0_Y")              /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("LIGHT1_X")				/* fake analog X */
+	PORT_START("LIGHT1_X")              /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("LIGHT1_Y")				/* fake analog Y */
+	PORT_START("LIGHT1_Y")              /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("FAKE")					/* fake switches */
+	PORT_START("FAKE")                  /* fake switches */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -2483,10 +2483,10 @@ static INPUT_PORTS_START( hyprdriv )
 	PORT_BIT( 0x00ff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN1")	/* Accel */
+	PORT_START("AN1")   /* Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 	PORT_START("AN3")
@@ -2519,9 +2519,9 @@ INPUT_PORTS_END
 
 static const mips3_config r5000_config =
 {
-	16384,		/* code cache size */
-	16384,		/* data cache size */
-	SYSTEM_CLOCK	/* system clock rate */
+	16384,      /* code cache size */
+	16384,      /* data cache size */
+	SYSTEM_CLOCK    /* system clock rate */
 };
 
 static const voodoo_config voodoo_intf =
@@ -2634,97 +2634,97 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( wg3dh )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version L1.2 (10/8/96) */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version L1.2 (10/8/96) */
 	ROM_LOAD( "wg3dh_12.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96) */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96) */
 	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version L1.1 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
 ROM_END
 
 
 ROM_START( mace )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.0ce 7/2/97 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.0ce 7/2/97 */
 	ROM_LOAD( "mace10ce.u32", 0x000000, 0x80000, CRC(7a50b37e) SHA1(33788835f84a9443566c80bee9f20a1691490c6d) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97) */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97) */
 	DISK_IMAGE( "mace", 0, SHA1(96ec8d3ff5dd894e21aa81403bcdbeba44bb97ea) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1, Labeled as Version 1.0 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version L1.1, Labeled as Version 1.0 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
 ROM_END
 
 
 ROM_START( macea )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version ??? 5/7/97 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version ??? 5/7/97 */
 	ROM_LOAD( "maceboot.u32", 0x000000, 0x80000, CRC(effe3ebc) SHA1(7af3ca3580d6276ffa7ab8b4c57274e15ee6bcbb) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97) */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97) */
 	DISK_IMAGE( "macea", 0, BAD_DUMP SHA1(9bd4a60627915d71932cab24f89c48ea21f4c1cb) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version L1.1 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
 ROM_END
 
 
 ROM_START( sfrush )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version L1.0 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version L1.0 */
 	ROM_LOAD( "hdboot.u32", 0x000000, 0x80000, CRC(39a35f1b) SHA1(c46d83448399205d38e6e41dd56abbc362254254) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM  Version L1.0 */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
 	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "sfrush.u62",  0x400000, 0x200000, CRC(5d66490e) SHA1(bd39ea3b45d44cae6ca5890f365653326bbecd2d) )
 	ROM_LOAD32_WORD( "sfrush.u61",  0x400002, 0x200000, CRC(f3a00ee8) SHA1(c1ac780efc32b2e30522d7cc3e6d92e7daaadddd) )
 	ROM_LOAD32_WORD( "sfrush.u53",  0x800000, 0x200000, CRC(71f8ddb0) SHA1(c24bef801f43bae68fda043c4356e8cf1298ca97) )
 	ROM_LOAD32_WORD( "sfrush.u49",  0x800002, 0x200000, CRC(dfb0a54c) SHA1(ed34f9485f7a7e5bb73bf5c6428b27548e12db12) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version L1.06 */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version L1.06 */
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
 ROM_END
 
 
 ROM_START( sfrushrk )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code */
 	ROM_LOAD( "boot.bin",   0x000000, 0x080000, CRC(0555b3cf) SHA1(a48abd6d06a26f4f9b6c52d8c0af6095b6be57fd) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "audio.u62",  0x400000, 0x200000, CRC(cacf09e3) SHA1(349af1767cb0ee2a0eb9d7c2ab078fcae5fec8e7) )
 	ROM_LOAD32_WORD( "audio.u61",  0x400002, 0x200000, CRC(ea895d29) SHA1(1edde0497f2abd1636c5d7bcfbc03bcff321261c) )
 	ROM_LOAD32_WORD( "audio.u53",  0x800000, 0x200000, CRC(51c89a14) SHA1(6bc62bcda224040a4596d795132874828011a038) )
 	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.2 */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.2 */
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 ROM_END
 
 
 ROM_START( calspeed )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.2 (2/18/98) */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	DISK_REGION( "drive_0" )	/* Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98) */
+	DISK_REGION( "drive_0" )    /* Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98) */
 	DISK_IMAGE( "calspeed", 0, SHA1(08d411c591d4b8bbdd6437ea80d01c4cec8516f8) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 
 ROM_START( calspeeda )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.2 (2/18/98) */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	DISK_REGION( "drive_0" )	/* Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98) */
+	DISK_REGION( "drive_0" )    /* Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98) */
 	DISK_IMAGE( "calspeda", 0, SHA1(6b1c3a7530195ef7309b06a651b01c8b3ece92c6) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
@@ -2736,7 +2736,7 @@ ROM_START( vaportrx )
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "vaportrx", 0, SHA1(fe53ca7643d2ed2745086abb7f2243c69678cab1) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "vaportrx.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
@@ -2748,13 +2748,13 @@ ROM_START( vaportrxp )
 	DISK_REGION( "drive_0" ) /* Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44 */
 	DISK_IMAGE( "vaportrp", 0, SHA1(6c86637c442ebd6994eee8c0ae0dce343c35dbe9) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "vaportrx.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 
 ROM_START( biofreak )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Seattle System Boot ROM Version 0.1i Apr 14 1997  14:52:53 */
@@ -2766,85 +2766,85 @@ ROM_END
 
 
 ROM_START( blitz )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.2 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 */
 	ROM_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.21 */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.21 */
 	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
 ROM_END
 
 
 ROM_START( blitz11 )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.1 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.1 */
 	ROM_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.21 */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.21 */
 	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
 ROM_END
 
 
 ROM_START( blitz99 )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.0 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.0 */
 	ROM_LOAD( "bltz9910.u32", 0x000000, 0x80000, CRC(777119b2) SHA1(40d255181c2f3a787919c339e83593fd506779a5) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.30 */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.30 */
 	DISK_IMAGE( "blitz99", 0, SHA1(19877e26ffce81dd525031e9e2b4f83ff982e2d9) )
 ROM_END
 
 
 ROM_START( blitz2k )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.4 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.4 */
 	ROM_LOAD( "bltz2k14.u32", 0x000000, 0x80000, CRC(ac4f0051) SHA1(b8125c17370db7bfd9b783230b4ef3d5b22a2025) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive Version 1.5 */
+	DISK_REGION( "drive_0" )    /* Hard Drive Version 1.5 */
 	DISK_IMAGE( "blitz2k", 0, SHA1(e89b7fbd4b4a9854d47ae97493e0afffbd1f69e7) )
 ROM_END
 
 
 ROM_START( carnevil )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07 */
+	DISK_REGION( "drive_0" )    /* Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07 */
 	DISK_IMAGE( "carnevil", 0, SHA1(5cffb0de63ad36eb01c5951bab04d3f8a9e23e16) )
 ROM_END
 
 
 ROM_START( carnevil1 )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( "drive_0" )	/* Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41 */
+	DISK_REGION( "drive_0" )    /* Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41 */
 	DISK_IMAGE( "carnevi1", 0, BAD_DUMP SHA1(94532727512280930a100fe473bf3a938fe2d44f) )
 ROM_END
 
 
 ROM_START( hyprdriv )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, BAD_DUMP CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 9. */
 	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )
 
-	DISK_REGION( "drive_0" )	/* Version 1.40  Oct 23 1998  15:16:00 */
+	DISK_REGION( "drive_0" )    /* Version 1.40  Oct 23 1998  15:16:00 */
 	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
 ROM_END
 
@@ -2894,9 +2894,9 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 	init_common(machine(), MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004413C, 0x0C0054B4, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80094930, 0x00A2102B, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80092984, 0x3C028011, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004413C, 0x0C0054B4, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80094930, 0x00A2102B, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80092984, 0x3C028011, 250);     /* confirmed */
 }
 
 
@@ -2906,7 +2906,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 	init_common(machine(), MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800108F8, 0x8C420000, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800108F8, 0x8C420000, 250);     /* confirmed */
 }
 
 
@@ -2916,9 +2916,9 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 	init_common(machine(), MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80059F34, 0x3C028012, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800A5AF4, 0x8E300010, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004C260, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80059F34, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800A5AF4, 0x8E300010, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004C260, 0x3C028012, 250);     /* confirmed */
 }
 
 
@@ -2928,10 +2928,10 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 	init_common(machine(), MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800343E8, 0x3C028012, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8008F4F0, 0x3C028012, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800A365C, 0x8E300014, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80051DAC, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800343E8, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8008F4F0, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800A365C, 0x8E300014, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80051DAC, 0x3C028012, 250);     /* confirmed */
 }
 
 
@@ -2942,8 +2942,8 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80032534, 0x02221024, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800B1BE4, 0x8E110014, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80032534, 0x02221024, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800B1BE4, 0x8E110014, 250);     /* confirmed */
 }
 
 
@@ -2953,9 +2953,9 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 	init_common(machine(), MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80049F14, 0x3C028020, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004859C, 0x3C028020, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8005922C, 0x8E020014, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80049F14, 0x3C028020, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004859C, 0x3C028020, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8005922C, 0x8E020014, 250);     /* confirmed */
 }
 
 
@@ -2977,8 +2977,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 	m_rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80135510, 0x3C028024, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800087DC, 0x8E820010, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80135510, 0x3C028024, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800087DC, 0x8E820010, 250);     /* confirmed */
 }
 
 
@@ -2988,8 +2988,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 	init_common(machine(), MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8014E41C, 0x3C038025, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011F10, 0x8E020018, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8014E41C, 0x3C038025, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011F10, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -2999,8 +2999,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 	init_common(machine(), MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015773C, 0x3C038025, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80012CA8, 0x8E020018, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015773C, 0x3C038025, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80012CA8, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -3013,8 +3013,8 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015176C, 0x3C03801A, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011FBC, 0x8E020018, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015176C, 0x3C03801A, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011FBC, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -3024,8 +3024,8 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
 	init_common(machine(), MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x801643BC, 0x3C03801B, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011FB8, 0x8E020018, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x801643BC, 0x3C03801B, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011FB8, 0x8E020018, 250);     /* confirmed */
 	//mips3drc_add_hotspot(machine().device("maincpu"), 0x80136A80, 0x3C02801D, 250);      /* potential */
 }
 

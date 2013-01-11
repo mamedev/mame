@@ -91,7 +91,7 @@ Module timer tag static_vblank_timer name m_expire.seconds
 static ADDRESS_MAP_START(rm380z_mem, AS_PROGRAM, 8, rm380z_state)
 	AM_RANGE( 0xe000, 0xefff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
 	AM_RANGE( 0xf000, 0xf5ff ) AM_READWRITE(videoram_read,videoram_write)
-	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0x1000)		/* Extra ROM space for COS4.0 */
+	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0x1000)     /* Extra ROM space for COS4.0 */
 	AM_RANGE( 0xfa00, 0xfaff ) AM_RAM
 	AM_RANGE( 0xfb00, 0xfbff ) AM_READWRITE( port_read, port_write )
 	AM_RANGE( 0xfc00, 0xffff ) AM_READWRITE(hiram_read,hiram_write)

@@ -210,22 +210,22 @@ void busicom_state::machine_reset()
 static const char layout_busicom [] = "busicom";
 
 static MACHINE_CONFIG_START( busicom, busicom_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I4004, 750000)
-    MCFG_CPU_PROGRAM_MAP(busicom_rom)
-    MCFG_CPU_DATA_MAP(busicom_mem)
-    MCFG_CPU_IO_MAP(busicom_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I4004, 750000)
+	MCFG_CPU_PROGRAM_MAP(busicom_rom)
+	MCFG_CPU_DATA_MAP(busicom_mem)
+	MCFG_CPU_IO_MAP(busicom_io)
 
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_SIZE(40*17, 44*11)
-    MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(40*17, 44*11)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
 	MCFG_SCREEN_UPDATE_DRIVER(busicom_state, screen_update_busicom)
 
-    MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(16)
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("busicom_timer", busicom_state, timer_callback, attotime::from_msec(28*2))
@@ -244,5 +244,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1974, busicom,  0,       0,	busicom,	busicom, driver_device,	 0,  "Business Computer Corporation",   "Busicom 141-PF",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1974, busicom,  0,       0,   busicom,    busicom, driver_device,  0,  "Business Computer Corporation",   "Busicom 141-PF",       GAME_NOT_WORKING | GAME_NO_SOUND)

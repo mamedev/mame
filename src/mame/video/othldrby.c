@@ -110,7 +110,7 @@ WRITE16_MEMBER(othldrby_state::othldrby_videoram_w)
 
 WRITE16_MEMBER(othldrby_state::othldrby_vreg_addr_w)
 {
-	m_vreg_addr = data & 0x7f;	/* bit 7 is set when screen is flipped */
+	m_vreg_addr = data & 0x7f;  /* bit 7 is set when screen is flipped */
 }
 
 WRITE16_MEMBER(othldrby_state::othldrby_vreg_w)

@@ -114,7 +114,7 @@ static INPUT_PORTS_START( usg32 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Service Keyboard Attached?" )	// Not actually a DIP, when keyboard is plugged in, this goes low
+	PORT_DIPNAME( 0x01, 0x01, "Service Keyboard Attached?" )    // Not actually a DIP, when keyboard is plugged in, this goes low
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_HIGH )
@@ -216,16 +216,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -364,19 +364,19 @@ ROM_START( usg252 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "usg252.u12",   0x08000, 0x08000, CRC(766a855a) SHA1(e67ca9944d92192de423de6aa8a60f2e28b17db1) )
 	/* for the banked region */
-	ROM_LOAD( "usg252.u28",   0x1c000, 0x04000, CRC(d44d2ffa) SHA1(8bd756418b4f8ad11cb0f2044fb91c63d7771497) )	// ROM 2
+	ROM_LOAD( "usg252.u28",   0x1c000, 0x04000, CRC(d44d2ffa) SHA1(8bd756418b4f8ad11cb0f2044fb91c63d7771497) )  // ROM 2
 	ROM_CONTINUE(             0x18000, 0x04000 )
 	ROM_CONTINUE(             0x14000, 0x04000 )
 	ROM_CONTINUE(             0x10000, 0x04000 )
-	ROM_LOAD( "usg252.u18",   0x2c000, 0x04000, CRC(2fff1da2) SHA1(c44718f7aab82f45379f21b68e8ee2668fe3a378) )	// ROM 1
+	ROM_LOAD( "usg252.u18",   0x2c000, 0x04000, CRC(2fff1da2) SHA1(c44718f7aab82f45379f21b68e8ee2668fe3a378) )  // ROM 1
 	ROM_CONTINUE(             0x28000, 0x04000 )
 	ROM_CONTINUE(             0x24000, 0x04000 )
 	ROM_CONTINUE(             0x20000, 0x04000 )
-	ROM_LOAD( "usg252.u36",   0x3c000, 0x04000, CRC(b6d007be) SHA1(ec2afe983fd925d9f4602f47ddadd117bcc74972) )	// ROM 4
+	ROM_LOAD( "usg252.u36",   0x3c000, 0x04000, CRC(b6d007be) SHA1(ec2afe983fd925d9f4602f47ddadd117bcc74972) )  // ROM 4
 	ROM_CONTINUE(             0x38000, 0x04000 )
 	ROM_CONTINUE(             0x34000, 0x04000 )
 	ROM_CONTINUE(             0x30000, 0x04000 )
-	ROM_LOAD( "usg252.u35",   0x4c000, 0x04000, CRC(9542295b) SHA1(56dd7b8fd581779656cb71cc42dbb9f77fb303f4) )	// ROM 3
+	ROM_LOAD( "usg252.u35",   0x4c000, 0x04000, CRC(9542295b) SHA1(56dd7b8fd581779656cb71cc42dbb9f77fb303f4) )  // ROM 3
 	ROM_CONTINUE(             0x48000, 0x04000 )
 	ROM_CONTINUE(             0x44000, 0x04000 )
 	ROM_CONTINUE(             0x40000, 0x04000 )
@@ -386,7 +386,7 @@ ROM_END
 GAME( 1987, usg32,  0,     usg32,  usg32, driver_device, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
 GAME( 1988, usg83,  0,     usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
 GAME( 1988, usg83x, usg83, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 )
-GAME( 1988, usg82,  usg83, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)	// "Feb.08,1988"
+GAME( 1988, usg82,  usg83, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)   // "Feb.08,1988"
 GAME( 1989, usg182, 0,     usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.2", 0 )
 GAME( 1991, usg185, 0,     usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.7C", 0 )
 GAME( 1992, usg252, 0,     usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V25.4X", 0 )

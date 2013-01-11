@@ -133,4 +133,4 @@ public:
 
 extern const wd17xx_interface trs80_wd17xx_interface;
 
-#endif	/* TRS80_H_ */
+#endif  /* TRS80_H_ */

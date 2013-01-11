@@ -22,8 +22,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define PRINTER_TAG		"printer"
-#define ACIA_TAG		"acia"
+#define PRINTER_TAG     "printer"
+#define ACIA_TAG        "acia"
 
 
 
@@ -36,7 +36,7 @@ class dragon_state : public coco12_state
 public:
 	dragon_state(const machine_config &mconfig, device_type type, const char *tag)
 	: coco12_state(mconfig, type, tag),
-	  m_printer(*this, PRINTER_TAG)
+		m_printer(*this, PRINTER_TAG)
 	{
 	}
 
@@ -53,7 +53,7 @@ class dragon64_state : public dragon_state
 public:
 	dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
 	: dragon_state(mconfig, type, tag),
-	  m_acia(*this, ACIA_TAG)
+		m_acia(*this, ACIA_TAG)
 	{
 	}
 

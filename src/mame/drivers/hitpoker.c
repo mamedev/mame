@@ -218,9 +218,9 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 	if(offset == 0)
 	{
 		if(space.device().safe_pc() == 0x3143 ||
-		   space.device().safe_pc() == 0x314e ||
-		   space.device().safe_pc() == 0x3164 ||
-		   space.device().safe_pc() == 0x3179)
+			space.device().safe_pc() == 0x314e ||
+			space.device().safe_pc() == 0x3164 ||
+			space.device().safe_pc() == 0x3179)
 			return m_pic_data;
 
 		return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
@@ -457,16 +457,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 static const ay8910_interface ay8910_config =
@@ -481,9 +481,9 @@ static const ay8910_interface ay8910_config =
 
 static const hc11_config hitpoker_config =
 {
-	0,		//has extended internal I/O
+	0,      //has extended internal I/O
 	0x100,  //internal RAM size
-	0x01	//INIT defaults to 0x01
+	0x01    //INIT defaults to 0x01
 };
 
 INTERRUPT_GEN_MEMBER(hitpoker_state::hitpoker_irq)
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 648-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitpoker_state, screen_update_hitpoker)
 
-	MCFG_MC6845_ADD("crtc", H46505, CRTC_CLOCK/2, mc6845_intf)	/* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, CRTC_CLOCK/2, mc6845_intf)  /* hand tuned to get ~60 fps */
 
 	MCFG_GFXDECODE(hitpoker)
 	MCFG_PALETTE_LENGTH(0x800)
@@ -541,7 +541,7 @@ ROM_START( hitpoker )
 	ROM_LOAD( "u4.bin",         0x00000, 0x10000, CRC(0016497a) SHA1(017320bfe05fea8a48e26a66c0412415846cee7c) )
 
 	ROM_REGION( 0x10000, "pic", 0 )
-	ROM_LOAD( "pic",			0x00000, 0x1000, NO_DUMP ) // unknown type
+	ROM_LOAD( "pic",            0x00000, 0x1000, NO_DUMP ) // unknown type
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) // tile 0x4c8 seems to contain something non-gfx related, could be tilemap / colour data, check!
 	ROM_LOAD16_BYTE( "u42.bin",         0x00001, 0x40000, CRC(cbe56fec) SHA1(129bfd10243eaa7fb6a087f96de90228e6030353) )
@@ -551,4 +551,3 @@ ROM_START( hitpoker )
 ROM_END
 
 GAME( 1997, hitpoker,  0,    hitpoker, hitpoker, hitpoker_state,  hitpoker, ROT0, "Accept Ltd.", "Hit Poker (Bulgaria)", GAME_NOT_WORKING )
-

@@ -51,7 +51,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::keyboard_callback)
 	for(i = 0; i < 7; i++)
 	{
 
-		code =	machine().root_device().ioport(keynames[i])->read();
+		code =  machine().root_device().ioport(keynames[i])->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

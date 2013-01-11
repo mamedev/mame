@@ -36,8 +36,8 @@ struct ptm6840_interface
 	double m_internal_clock;
 	double m_external_clock[3];
 
-	devcb_write8 m_out_cb[3];		// function to call when output[idx] changes
-	devcb_write_line m_irq_cb;	// function called if IRQ line changes
+	devcb_write8 m_out_cb[3];       // function to call when output[idx] changes
+	devcb_write_line m_irq_cb;  // function called if IRQ line changes
 };
 
 
@@ -45,20 +45,20 @@ struct ptm6840_interface
 // ======================> ptm6840_device
 
 class ptm6840_device :  public device_t,
-                        public ptm6840_interface
+						public ptm6840_interface
 {
 public:
-    // construction/destruction
-    ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void static_set_interface(device_t &device, const ptm6840_interface &interface);
 
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
-	int irq_state() const { return m_IRQ; }					// get IRQ state
-	UINT16 count(int counter) const { return compute_counter(counter); }	// get counter value
-	void set_ext_clock(int counter, double clock);	// set clock frequency
-	int ext_clock(int counter) const { return m_external_clock[counter]; }	// get clock frequency
+	int irq_state() const { return m_IRQ; }                 // get IRQ state
+	UINT16 count(int counter) const { return compute_counter(counter); }    // get counter value
+	void set_ext_clock(int counter, double clock);  // set clock frequency
+	int ext_clock(int counter) const { return m_external_clock[counter]; }  // get clock frequency
 
 	DECLARE_WRITE8_MEMBER( write );
 	void write(offs_t offset, UINT8 data) { write(machine().driver_data()->generic_space(), offset, data); }
@@ -78,9 +78,9 @@ public:
 	void update_interrupts();
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -97,15 +97,15 @@ private:
 		PTM_6840_CTRL2   = 1,
 		PTM_6840_STATUS  = 1,
 		PTM_6840_MSBBUF1 = 2,
-		PTM_6840_LSB1	 = 3,
+		PTM_6840_LSB1    = 3,
 		PTM_6840_MSBBUF2 = 4,
 		PTM_6840_LSB2    = 5,
 		PTM_6840_MSBBUF3 = 6,
 		PTM_6840_LSB3    = 7,
 	};
 
-	devcb_resolved_write8 m_out_func[3];	// function to call when output[idx] changes
-	devcb_resolved_write_line m_irq_func;	// function called if IRQ line changes
+	devcb_resolved_write8 m_out_func[3];    // function to call when output[idx] changes
+	devcb_resolved_write_line m_irq_func;   // function called if IRQ line changes
 
 	UINT8 m_control_reg[3];
 	UINT8 m_output[3]; // Output states

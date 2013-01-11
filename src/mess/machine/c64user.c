@@ -53,7 +53,7 @@ device_c64_user_port_interface::~device_c64_user_port_interface()
 //-------------------------------------------------
 
 c64_user_port_device::c64_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, C64_USER_PORT, "C64 user port", tag, owner, clock),
+		device_t(mconfig, C64_USER_PORT, "C64 user port", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -86,12 +86,12 @@ void c64_user_port_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_cnt1_cb, 0, sizeof(m_out_cnt1_cb));
-    	memset(&m_out_sp1_cb, 0, sizeof(m_out_sp1_cb));
-    	memset(&m_out_cnt2_cb, 0, sizeof(m_out_cnt2_cb));
-    	memset(&m_out_sp2_cb, 0, sizeof(m_out_sp2_cb));
-    	memset(&m_out_flag2_cb, 0, sizeof(m_out_flag2_cb));
-    	memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
+		memset(&m_out_cnt1_cb, 0, sizeof(m_out_cnt1_cb));
+		memset(&m_out_sp1_cb, 0, sizeof(m_out_sp1_cb));
+		memset(&m_out_cnt2_cb, 0, sizeof(m_out_cnt2_cb));
+		memset(&m_out_sp2_cb, 0, sizeof(m_out_sp2_cb));
+		memset(&m_out_flag2_cb, 0, sizeof(m_out_flag2_cb));
+		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
 	}
 }
 

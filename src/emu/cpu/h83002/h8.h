@@ -33,7 +33,7 @@ enum
 
 	H8_PC,
 	H8_CCR,
-    H8_EXR
+	H8_EXR
 };
 
 // external input lines
@@ -45,14 +45,14 @@ enum
 	H8_IRQ3,
 	H8_IRQ4,
 	H8_IRQ5,
-	H8_IRQ6,	// IRQs 6+ only available on 8-bit H8/3xx or 16-bit H8S/2394
+	H8_IRQ6,    // IRQs 6+ only available on 8-bit H8/3xx or 16-bit H8S/2394
 	H8_IRQ7,
 	H8_NMI,
 
-	H8_METRO_TIMER_HACK,	// as described.  this needs to be fixed.
+	H8_METRO_TIMER_HACK,    // as described.  this needs to be fixed.
 
-	H8_SCI_0_RX,	// incoming character on SCI 0
-	H8_SCI_1_RX,	// incoming character on SCI 1
+	H8_SCI_0_RX,    // incoming character on SCI 0
+	H8_SCI_1_RX,    // incoming character on SCI 1
 };
 
 // I/O ports
@@ -60,23 +60,23 @@ enum
 {
 	// digital I/O ports
 	// ports 4-B are valid on 16-bit H8/3xx, ports 1-9 on 8-bit H8/3xx
-    // H8S/2394 has 12 ports named 1-6 and A-G
-	H8_PORT_1 = 0,	// 0
-	H8_PORT_2,	// 1
-	H8_PORT_3,	// 2
-	H8_PORT_4,	// 3
-	H8_PORT_5,	// 4
-	H8_PORT_6,	// 5
-	H8_PORT_7,	// 6
-	H8_PORT_8,	// 7
-	H8_PORT_9,	// 8
-	H8_PORT_A,	// 9
-	H8_PORT_B,	// A
-	H8_PORT_C,	// B
-	H8_PORT_D,	// C
-	H8_PORT_E,	// D
-	H8_PORT_F,	// E
-	H8_PORT_G,	// F
+	// H8S/2394 has 12 ports named 1-6 and A-G
+	H8_PORT_1 = 0,  // 0
+	H8_PORT_2,  // 1
+	H8_PORT_3,  // 2
+	H8_PORT_4,  // 3
+	H8_PORT_5,  // 4
+	H8_PORT_6,  // 5
+	H8_PORT_7,  // 6
+	H8_PORT_8,  // 7
+	H8_PORT_9,  // 8
+	H8_PORT_A,  // 9
+	H8_PORT_B,  // A
+	H8_PORT_C,  // B
+	H8_PORT_D,  // C
+	H8_PORT_E,  // D
+	H8_PORT_F,  // E
+	H8_PORT_G,  // F
 
 	// analog inputs
 	H8_ADC_0_H = 0x20,
@@ -99,7 +99,7 @@ enum
 	// serial ports
 	H8_SERIAL_0 = 0x30,
 	H8_SERIAL_1,
-    H8_SERIAL_2
+	H8_SERIAL_2
 };
 
 ////////////////////////////
@@ -227,87 +227,87 @@ enum
 #define H8S_IO_TSTR   H8S_IO(0xFFC0)
 #define H8S_IO_TSYR   H8S_IO(0xFFC1)
 // TPU0
-#define H8S_IO_TTCR0		H8S_IO(0xFFD0)
-#define H8S_IO_TMDR0		H8S_IO(0xFFD1)
-#define H8S_IO_TIOR0_H		H8S_IO(0xFFD2)
-#define H8S_IO_TIOR0_L		H8S_IO(0xFFD3)
-#define H8S_IO_TIER0		H8S_IO(0xFFD4)
-#define H8S_IO_TSR0			H8S_IO(0xFFD5)
-#define H8S_IO_TCNT0_H		H8S_IO(0xFFD6)
-#define H8S_IO_TCNT0_L		H8S_IO(0xFFD7)
-#define H8S_IO_TGR0A_H		H8S_IO(0xFFD8)
-#define H8S_IO_TGR0A_L		H8S_IO(0xFFD9)
-#define H8S_IO_TGR0B_H		H8S_IO(0xFFDA)
-#define H8S_IO_TGR0B_L		H8S_IO(0xFFDB)
-#define H8S_IO_TGR0C_H		H8S_IO(0xFFDC)
-#define H8S_IO_TGR0C_L		H8S_IO(0xFFDD)
-#define H8S_IO_TGR0D_H		H8S_IO(0xFFDE)
-#define H8S_IO_TGR0D_L		H8S_IO(0xFFDF)
+#define H8S_IO_TTCR0        H8S_IO(0xFFD0)
+#define H8S_IO_TMDR0        H8S_IO(0xFFD1)
+#define H8S_IO_TIOR0_H      H8S_IO(0xFFD2)
+#define H8S_IO_TIOR0_L      H8S_IO(0xFFD3)
+#define H8S_IO_TIER0        H8S_IO(0xFFD4)
+#define H8S_IO_TSR0         H8S_IO(0xFFD5)
+#define H8S_IO_TCNT0_H      H8S_IO(0xFFD6)
+#define H8S_IO_TCNT0_L      H8S_IO(0xFFD7)
+#define H8S_IO_TGR0A_H      H8S_IO(0xFFD8)
+#define H8S_IO_TGR0A_L      H8S_IO(0xFFD9)
+#define H8S_IO_TGR0B_H      H8S_IO(0xFFDA)
+#define H8S_IO_TGR0B_L      H8S_IO(0xFFDB)
+#define H8S_IO_TGR0C_H      H8S_IO(0xFFDC)
+#define H8S_IO_TGR0C_L      H8S_IO(0xFFDD)
+#define H8S_IO_TGR0D_H      H8S_IO(0xFFDE)
+#define H8S_IO_TGR0D_L      H8S_IO(0xFFDF)
 // TPU1
-#define H8S_IO_TTCR1		H8S_IO(0xFFE0)
-#define H8S_IO_TMDR1		H8S_IO(0xFFE1)
-#define H8S_IO_TIOR1		H8S_IO(0xFFE2)
-#define H8S_IO_TIER1		H8S_IO(0xFFE4)
-#define H8S_IO_TSR1			H8S_IO(0xFFE5)
-#define H8S_IO_TCNT1_H		H8S_IO(0xFFE6)
-#define H8S_IO_TCNT1_L		H8S_IO(0xFFE7)
-#define H8S_IO_TGR1A_H		H8S_IO(0xFFE8)
-#define H8S_IO_TGR1A_L		H8S_IO(0xFFE9)
-#define H8S_IO_TGR1B_H		H8S_IO(0xFFEA)
-#define H8S_IO_TGR1B_L		H8S_IO(0xFFEB)
+#define H8S_IO_TTCR1        H8S_IO(0xFFE0)
+#define H8S_IO_TMDR1        H8S_IO(0xFFE1)
+#define H8S_IO_TIOR1        H8S_IO(0xFFE2)
+#define H8S_IO_TIER1        H8S_IO(0xFFE4)
+#define H8S_IO_TSR1         H8S_IO(0xFFE5)
+#define H8S_IO_TCNT1_H      H8S_IO(0xFFE6)
+#define H8S_IO_TCNT1_L      H8S_IO(0xFFE7)
+#define H8S_IO_TGR1A_H      H8S_IO(0xFFE8)
+#define H8S_IO_TGR1A_L      H8S_IO(0xFFE9)
+#define H8S_IO_TGR1B_H      H8S_IO(0xFFEA)
+#define H8S_IO_TGR1B_L      H8S_IO(0xFFEB)
 // TPU2
-#define H8S_IO_TTCR2		H8S_IO(0xFFF0)
-#define H8S_IO_TMDR2		H8S_IO(0xFFF1)
-#define H8S_IO_TIOR2		H8S_IO(0xFFF2)
-#define H8S_IO_TIER2		H8S_IO(0xFFF4)
-#define H8S_IO_TSR2			H8S_IO(0xFFF5)
-#define H8S_IO_TCNT2_H		H8S_IO(0xFFF6)
-#define H8S_IO_TCNT2_L		H8S_IO(0xFFF7)
-#define H8S_IO_TGR2A_H		H8S_IO(0xFFF8)
-#define H8S_IO_TGR2A_L		H8S_IO(0xFFF9)
-#define H8S_IO_TGR2B_H		H8S_IO(0xFFFA)
-#define H8S_IO_TGR2B_L		H8S_IO(0xFFFB)
+#define H8S_IO_TTCR2        H8S_IO(0xFFF0)
+#define H8S_IO_TMDR2        H8S_IO(0xFFF1)
+#define H8S_IO_TIOR2        H8S_IO(0xFFF2)
+#define H8S_IO_TIER2        H8S_IO(0xFFF4)
+#define H8S_IO_TSR2         H8S_IO(0xFFF5)
+#define H8S_IO_TCNT2_H      H8S_IO(0xFFF6)
+#define H8S_IO_TCNT2_L      H8S_IO(0xFFF7)
+#define H8S_IO_TGR2A_H      H8S_IO(0xFFF8)
+#define H8S_IO_TGR2A_L      H8S_IO(0xFFF9)
+#define H8S_IO_TGR2B_H      H8S_IO(0xFFFA)
+#define H8S_IO_TGR2B_L      H8S_IO(0xFFFB)
 // TPU3
-#define H8S_IO_TTCR3		H8S_IO(0xFE80)
-#define H8S_IO_TMDR3		H8S_IO(0xFE81)
-#define H8S_IO_TIOR3_H		H8S_IO(0xFE82)
-#define H8S_IO_TIOR3_L		H8S_IO(0xFE83)
-#define H8S_IO_TIER3		H8S_IO(0xFE84)
-#define H8S_IO_TSR3			H8S_IO(0xFE85)
-#define H8S_IO_TCNT3_H		H8S_IO(0xFE86)
-#define H8S_IO_TCNT3_L		H8S_IO(0xFE87)
-#define H8S_IO_TGR3A_H		H8S_IO(0xFE88)
-#define H8S_IO_TGR3A_L		H8S_IO(0xFE89)
-#define H8S_IO_TGR3B_H		H8S_IO(0xFE8A)
-#define H8S_IO_TGR3B_L		H8S_IO(0xFE8B)
-#define H8S_IO_TGR3C_H		H8S_IO(0xFE8C)
-#define H8S_IO_TGR3C_L		H8S_IO(0xFE8D)
-#define H8S_IO_TGR3D_H		H8S_IO(0xFE8E)
-#define H8S_IO_TGR3D_L		H8S_IO(0xFE8F)
+#define H8S_IO_TTCR3        H8S_IO(0xFE80)
+#define H8S_IO_TMDR3        H8S_IO(0xFE81)
+#define H8S_IO_TIOR3_H      H8S_IO(0xFE82)
+#define H8S_IO_TIOR3_L      H8S_IO(0xFE83)
+#define H8S_IO_TIER3        H8S_IO(0xFE84)
+#define H8S_IO_TSR3         H8S_IO(0xFE85)
+#define H8S_IO_TCNT3_H      H8S_IO(0xFE86)
+#define H8S_IO_TCNT3_L      H8S_IO(0xFE87)
+#define H8S_IO_TGR3A_H      H8S_IO(0xFE88)
+#define H8S_IO_TGR3A_L      H8S_IO(0xFE89)
+#define H8S_IO_TGR3B_H      H8S_IO(0xFE8A)
+#define H8S_IO_TGR3B_L      H8S_IO(0xFE8B)
+#define H8S_IO_TGR3C_H      H8S_IO(0xFE8C)
+#define H8S_IO_TGR3C_L      H8S_IO(0xFE8D)
+#define H8S_IO_TGR3D_H      H8S_IO(0xFE8E)
+#define H8S_IO_TGR3D_L      H8S_IO(0xFE8F)
 // TPU4
-#define H8S_IO_TTCR4		H8S_IO(0xFE90)
-#define H8S_IO_TMDR4		H8S_IO(0xFE91)
-#define H8S_IO_TIOR4		H8S_IO(0xFE92)
-#define H8S_IO_TIER4		H8S_IO(0xFE94)
-#define H8S_IO_TSR4			H8S_IO(0xFE95)
-#define H8S_IO_TCNT4_H		H8S_IO(0xFE96)
-#define H8S_IO_TCNT4_L		H8S_IO(0xFE97)
-#define H8S_IO_TGR4A_H		H8S_IO(0xFE98)
-#define H8S_IO_TGR4A_L		H8S_IO(0xFE99)
-#define H8S_IO_TGR4B_H		H8S_IO(0xFE9A)
-#define H8S_IO_TGR4B_L		H8S_IO(0xFE9B)
+#define H8S_IO_TTCR4        H8S_IO(0xFE90)
+#define H8S_IO_TMDR4        H8S_IO(0xFE91)
+#define H8S_IO_TIOR4        H8S_IO(0xFE92)
+#define H8S_IO_TIER4        H8S_IO(0xFE94)
+#define H8S_IO_TSR4         H8S_IO(0xFE95)
+#define H8S_IO_TCNT4_H      H8S_IO(0xFE96)
+#define H8S_IO_TCNT4_L      H8S_IO(0xFE97)
+#define H8S_IO_TGR4A_H      H8S_IO(0xFE98)
+#define H8S_IO_TGR4A_L      H8S_IO(0xFE99)
+#define H8S_IO_TGR4B_H      H8S_IO(0xFE9A)
+#define H8S_IO_TGR4B_L      H8S_IO(0xFE9B)
 // TPU5
-#define H8S_IO_TTCR5		H8S_IO(0xFEA0)
-#define H8S_IO_TMDR5		H8S_IO(0xFEA1)
-#define H8S_IO_TIOR5		H8S_IO(0xFEA2)
-#define H8S_IO_TIER5		H8S_IO(0xFEA4)
-#define H8S_IO_TSR5			H8S_IO(0xFEA5)
-#define H8S_IO_TCNT5_H		H8S_IO(0xFEA6)
-#define H8S_IO_TCNT5_L		H8S_IO(0xFEA7)
-#define H8S_IO_TGR5A_H		H8S_IO(0xFEA8)
-#define H8S_IO_TGR5A_L		H8S_IO(0xFEA9)
-#define H8S_IO_TGR5B_H		H8S_IO(0xFEAA)
-#define H8S_IO_TGR5B_L		H8S_IO(0xFEAB)
+#define H8S_IO_TTCR5        H8S_IO(0xFEA0)
+#define H8S_IO_TMDR5        H8S_IO(0xFEA1)
+#define H8S_IO_TIOR5        H8S_IO(0xFEA2)
+#define H8S_IO_TIER5        H8S_IO(0xFEA4)
+#define H8S_IO_TSR5         H8S_IO(0xFEA5)
+#define H8S_IO_TCNT5_H      H8S_IO(0xFEA6)
+#define H8S_IO_TCNT5_L      H8S_IO(0xFEA7)
+#define H8S_IO_TGR5A_H      H8S_IO(0xFEA8)
+#define H8S_IO_TGR5A_L      H8S_IO(0xFEA9)
+#define H8S_IO_TGR5B_H      H8S_IO(0xFEAA)
+#define H8S_IO_TGR5B_L      H8S_IO(0xFEAB)
 // DMA
 #define H8S_IO_MAR1AH  H8S_IO(0xFEF0)
 #define H8S_IO_MAR1AL  H8S_IO(0xFEF2)
@@ -423,19 +423,19 @@ enum
 #define H8S_INT_TXI2    0x5A
 #define H8S_INT_TEI2    0x5B
 
-#define H8S_INT_TGI3A	48
-#define H8S_INT_TGI3B	49
-#define H8S_INT_TGI3C	50
-#define H8S_INT_TGI3D	51
-#define H8S_INT_TCI3V	52
-#define H8S_INT_TGI4A	56
-#define H8S_INT_TGI4B	57
-#define H8S_INT_TCI4V	58
-#define H8S_INT_TCI4U	59
-#define H8S_INT_TGI5A	60
-#define H8S_INT_TGI5B	61
-#define H8S_INT_TCI5V	62
-#define H8S_INT_TCI5U	63
+#define H8S_INT_TGI3A   48
+#define H8S_INT_TGI3B   49
+#define H8S_INT_TGI3C   50
+#define H8S_INT_TGI3D   51
+#define H8S_INT_TCI3V   52
+#define H8S_INT_TGI4A   56
+#define H8S_INT_TGI4B   57
+#define H8S_INT_TCI4V   58
+#define H8S_INT_TCI4U   59
+#define H8S_INT_TGI5A   60
+#define H8S_INT_TGI5B   61
+#define H8S_INT_TCI5V   62
+#define H8S_INT_TCI5U   63
 
 DECLARE_LEGACY_CPU_DEVICE(H83002, h8_3002);
 DECLARE_LEGACY_CPU_DEVICE(H83007, h8_3007);

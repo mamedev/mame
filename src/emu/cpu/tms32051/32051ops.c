@@ -23,7 +23,7 @@ INLINE INT32 SUB(tms32051_state *cpustate, UINT32 a, UINT32 b)
 	// check overflow
 	if ((a ^ b) & (a ^ res) & 0x80000000)
 	{
-		if (cpustate->st0.ovm)	// overflow saturation mode
+		if (cpustate->st0.ovm)  // overflow saturation mode
 		{
 			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
@@ -45,7 +45,7 @@ INLINE INT32 ADD(tms32051_state *cpustate, UINT32 a, UINT32 b)
 	// check overflow
 	if ((a ^ res) & (b ^ res) & 0x80000000)
 	{
-		if (cpustate->st0.ovm)	// overflow saturation mode
+		if (cpustate->st0.ovm)  // overflow saturation mode
 		{
 			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
@@ -103,7 +103,7 @@ INLINE void UPDATE_ARP(tms32051_state *cpustate, int nar)
 
 static UINT16 GET_ADDRESS(tms32051_state *cpustate)
 {
-	if (cpustate->op & 0x80)		// Indirect Addressing
+	if (cpustate->op & 0x80)        // Indirect Addressing
 	{
 		UINT16 ea;
 		int arp = cpustate->st0.arp;
@@ -113,66 +113,66 @@ static UINT16 GET_ADDRESS(tms32051_state *cpustate)
 
 		switch ((cpustate->op >> 3) & 0xf)
 		{
-			case 0x0:	// *            (no operation)
+			case 0x0:   // *            (no operation)
 			{
 				break;
 			}
-			case 0x1:	// *, ARn       (NAR -> ARP)
+			case 0x1:   // *, ARn       (NAR -> ARP)
 			{
 				UPDATE_ARP(cpustate, nar);
 				break;
 			}
-			case 0x2:	// *-           ((CurrentAR)-1 -> CurrentAR)
+			case 0x2:   // *-           ((CurrentAR)-1 -> CurrentAR)
 			{
 				UPDATE_AR(cpustate, arp, -1);
 				break;
 			}
-			case 0x3:	// *-, ARn      ((CurrentAR)-1 -> CurrentAR, NAR -> ARP)
+			case 0x3:   // *-, ARn      ((CurrentAR)-1 -> CurrentAR, NAR -> ARP)
 			{
 				UPDATE_AR(cpustate, arp, -1);
 				UPDATE_ARP(cpustate, nar);
 				break;
 			}
-			case 0x4:	// *+           ((CurrentAR)+1 -> CurrentAR)
+			case 0x4:   // *+           ((CurrentAR)+1 -> CurrentAR)
 			{
 				UPDATE_AR(cpustate, arp, 1);
 				break;
 			}
-			case 0x5:	// *+, ARn      ((CurrentAR)+1 -> CurrentAR, NAR -> ARP)
+			case 0x5:   // *+, ARn      ((CurrentAR)+1 -> CurrentAR, NAR -> ARP)
 			{
 				UPDATE_AR(cpustate, arp, 1);
 				UPDATE_ARP(cpustate, nar);
 				break;
 			}
-			case 0xa:	// *0-          ((CurrentAR) - INDX)
+			case 0xa:   // *0-          ((CurrentAR) - INDX)
 			{
 				UPDATE_AR(cpustate, arp, -cpustate->indx);
 				break;
 			}
-			case 0xb:	// *0-, ARn     ((CurrentAR) - INDX -> CurrentAR, NAR -> ARP)
+			case 0xb:   // *0-, ARn     ((CurrentAR) - INDX -> CurrentAR, NAR -> ARP)
 			{
 				UPDATE_AR(cpustate, arp, -cpustate->indx);
 				UPDATE_ARP(cpustate, nar);
 				break;
 			}
-			case 0xc:	// *0+          ((CurrentAR) + INDX -> CurrentAR)
+			case 0xc:   // *0+          ((CurrentAR) + INDX -> CurrentAR)
 			{
 				UPDATE_AR(cpustate, arp, cpustate->indx);
 				break;
 			}
-			case 0xd:	// *0+, ARn     ((CurrentAR) + INDX -> CurrentAR, NAR -> ARP)
+			case 0xd:   // *0+, ARn     ((CurrentAR) + INDX -> CurrentAR, NAR -> ARP)
 			{
 				UPDATE_AR(cpustate, arp, cpustate->indx);
 				UPDATE_ARP(cpustate, nar);
 				break;
 			}
 
-			default:	fatalerror("32051: GET_ADDRESS: unimplemented indirect addressing mode %d at %04X (%04X)\n", (cpustate->op >> 3) & 0xf, cpustate->pc, cpustate->op);
+			default:    fatalerror("32051: GET_ADDRESS: unimplemented indirect addressing mode %d at %04X (%04X)\n", (cpustate->op >> 3) & 0xf, cpustate->pc, cpustate->op);
 		}
 
 		return ea;
 	}
-	else					// Direct Addressing
+	else                    // Direct Addressing
 	{
 		return cpustate->st0.dp | (cpustate->op & 0x7f);
 	}
@@ -180,37 +180,37 @@ static UINT16 GET_ADDRESS(tms32051_state *cpustate)
 
 INLINE int GET_ZLVC_CONDITION(tms32051_state *cpustate, int zlvc, int zlvc_mask)
 {
-	if (zlvc_mask & 0x2)		// OV-bit
+	if (zlvc_mask & 0x2)        // OV-bit
 	{
-		if ((zlvc & 0x2) && cpustate->st0.ov)							// OV
+		if ((zlvc & 0x2) && cpustate->st0.ov)                           // OV
 		{
 			// clear OV
 			cpustate->st0.ov = 0;
 
 			return 1;
 		}
-		else if ((zlvc & 0x2) == 0 && cpustate->st0.ov == 0)			// NOV
+		else if ((zlvc & 0x2) == 0 && cpustate->st0.ov == 0)            // NOV
 			return 1;
 	}
-	if (zlvc_mask & 0x1)		// C-bit
+	if (zlvc_mask & 0x1)        // C-bit
 	{
-		if ((zlvc & 0x1) && cpustate->st1.c)							// C
+		if ((zlvc & 0x1) && cpustate->st1.c)                            // C
 			return 1;
-		else if ((zlvc & 0x1) == 0 && cpustate->st1.c == 0)			// NC
+		else if ((zlvc & 0x1) == 0 && cpustate->st1.c == 0)         // NC
 			return 1;
 	}
-	if (zlvc_mask & 0x8)		// Z-bit
+	if (zlvc_mask & 0x8)        // Z-bit
 	{
-		if ((zlvc & 0x8) && (INT32)(cpustate->acc) == 0)				// EQ
+		if ((zlvc & 0x8) && (INT32)(cpustate->acc) == 0)                // EQ
 			return 1;
-		else if ((zlvc & 0x8) == 0 && (INT32)(cpustate->acc) != 0)	// NEQ
+		else if ((zlvc & 0x8) == 0 && (INT32)(cpustate->acc) != 0)  // NEQ
 			return 1;
 	}
-	if (zlvc_mask & 0x4)		// L-bit
+	if (zlvc_mask & 0x4)        // L-bit
 	{
-		if ((zlvc & 0x4) && (INT32)(cpustate->acc) < 0)				// LT
+		if ((zlvc & 0x4) && (INT32)(cpustate->acc) < 0)             // LT
 			return 1;
-		else if ((zlvc & 0x4) == 0 && (INT32)(cpustate->acc) > 0)		// GT
+		else if ((zlvc & 0x4) == 0 && (INT32)(cpustate->acc) > 0)       // GT
 			return 1;
 	}
 	return 0;
@@ -220,20 +220,20 @@ INLINE int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
 {
 	switch (tp)
 	{
-		case 0:		// BIO pin low
+		case 0:     // BIO pin low
 		{
 			// TODO
 			return 0;
 		}
-		case 1:		// TC = 1
+		case 1:     // TC = 1
 		{
 			return cpustate->st1.tc;
 		}
-		case 2:		// TC = 0
+		case 2:     // TC = 0
 		{
 			return cpustate->st1.tc ^ 1;
 		}
-		case 3:		// always false
+		case 3:     // always false
 		{
 			return 0;
 		}
@@ -245,19 +245,19 @@ INLINE INT32 PREG_PSCALER(tms32051_state *cpustate, INT32 preg)
 {
 	switch (cpustate->st1.pm & 3)
 	{
-		case 0:		// No shift
+		case 0:     // No shift
 		{
 			return preg;
 		}
-		case 1:		// Left-shifted 1 bit, LSB zero-filled
+		case 1:     // Left-shifted 1 bit, LSB zero-filled
 		{
 			return preg << 1;
 		}
-		case 2:		// Left-shifted 4 bits, 4 LSBs zero-filled
+		case 2:     // Left-shifted 4 bits, 4 LSBs zero-filled
 		{
 			return preg << 4;
 		}
-		case 3:		// Right-shifted 6 bits, sign-extended, 6 LSBs lost
+		case 3:     // Right-shifted 6 bits, sign-extended, 6 LSBs lost
 		{
 			return (INT32)(preg >> 6);
 		}
@@ -844,7 +844,7 @@ static void op_cmpr(tms32051_state *cpustate)
 
 	switch (cpustate->op & 0x3)
 	{
-		case 0:			// (CurrentAR) == ARCR
+		case 0:         // (CurrentAR) == ARCR
 		{
 			if (cpustate->ar[cpustate->st0.arp] == cpustate->arcr)
 			{
@@ -852,7 +852,7 @@ static void op_cmpr(tms32051_state *cpustate)
 			}
 			break;
 		}
-		case 1:			// (CurrentAR) < ARCR
+		case 1:         // (CurrentAR) < ARCR
 		{
 			if (cpustate->ar[cpustate->st0.arp] < cpustate->arcr)
 			{
@@ -860,7 +860,7 @@ static void op_cmpr(tms32051_state *cpustate)
 			}
 			break;
 		}
-		case 2:			// (CurrentAR) > ARCR
+		case 2:         // (CurrentAR) > ARCR
 		{
 			if (cpustate->ar[cpustate->st0.arp] > cpustate->arcr)
 			{
@@ -868,7 +868,7 @@ static void op_cmpr(tms32051_state *cpustate)
 			}
 			break;
 		}
-		case 3:			// (CurrentAR) != ARCR
+		case 3:         // (CurrentAR) != ARCR
 		{
 			if (cpustate->ar[cpustate->st0.arp] != cpustate->arcr)
 			{
@@ -953,7 +953,7 @@ static void op_sbrk(tms32051_state *cpustate)
 static void op_b(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);		// update AR/ARP
+	GET_ADDRESS(cpustate);      // update AR/ARP
 
 	CHANGE_PC(cpustate, pma);
 	CYCLES(4);
@@ -990,7 +990,7 @@ static void op_banz(tms32051_state *cpustate)
 		CYCLES(2);
 	}
 
-	GET_ADDRESS(cpustate);		// modify AR/ARP
+	GET_ADDRESS(cpustate);      // modify AR/ARP
 }
 
 static void op_banzd(tms32051_state *cpustate)
@@ -1032,7 +1032,7 @@ static void op_bcndd(tms32051_state *cpustate)
 static void op_bd(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);		// update AR/ARP
+	GET_ADDRESS(cpustate);      // update AR/ARP
 
 	delay_slot(cpustate, cpustate->pc);
 	CHANGE_PC(cpustate, pma);
@@ -1062,7 +1062,7 @@ static void op_calad(tms32051_state *cpustate)
 static void op_call(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);		// update AR/ARP
+	GET_ADDRESS(cpustate);      // update AR/ARP
 	PUSH_STACK(cpustate, cpustate->pc);
 
 	CHANGE_PC(cpustate, pma);
@@ -1073,7 +1073,7 @@ static void op_call(tms32051_state *cpustate)
 static void op_calld(tms32051_state *cpustate)
 {
 	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);		// update AR/ARP
+	GET_ADDRESS(cpustate);      // update AR/ARP
 	PUSH_STACK(cpustate, cpustate->pc+2);
 
 	delay_slot(cpustate, cpustate->pc);

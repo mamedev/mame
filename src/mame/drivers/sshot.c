@@ -171,7 +171,7 @@ public:
 		m_videoram(*this, "videoram"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
-	tilemap_t	*m_tilemap;
+	tilemap_t   *m_tilemap;
 	DECLARE_WRITE8_MEMBER(supershot_vidram_w);
 	DECLARE_WRITE8_MEMBER(supershot_output0_w);
 	DECLARE_WRITE8_MEMBER(supershot_output1_w);
@@ -223,33 +223,33 @@ WRITE8_MEMBER(supershot_state::supershot_vidram_w)
 WRITE8_MEMBER(supershot_state::supershot_output0_w)
 {
 	/*
-        bit     signal      description
+	    bit     signal      description
 
-        0       12          EXPLOSIONE LAMP. DX
-        1       13          RIMBALZO PALLINA (BALL BOUNCE)
-        2       14          CONSENSO GIOCO (CONSENT GAME)
-        3       16          VINCITA EXT. PLAY (WIN EXT. PLAY)
-        4       n.c.
-        5       n.c.
-        6       n.c.
-        7       H           n.c.
-    */
+	    0       12          EXPLOSIONE LAMP. DX
+	    1       13          RIMBALZO PALLINA (BALL BOUNCE)
+	    2       14          CONSENSO GIOCO (CONSENT GAME)
+	    3       16          VINCITA EXT. PLAY (WIN EXT. PLAY)
+	    4       n.c.
+	    5       n.c.
+	    6       n.c.
+	    7       H           n.c.
+	*/
 }
 
 WRITE8_MEMBER(supershot_state::supershot_output1_w)
 {
 	/*
-        bit     signal      description
+	    bit     signal      description
 
-        0       5           ESPL. BICCHIERI E BOTTIGLIE (EXPLOSION GLASSES AND BOTTLES)
-        1       F           n.c.
-        2       E           APPARIZIONE BOTTIGLIE (APPEARANCE BOTTLES)
-        3       4           MUSICA FINE GIOCO (END OF GAME MUSIC)
-        4       S           EXPANSIONE CERCHIO (EXPANSION CIRCLE)
-        5       n.c.
-        6       N           EXPLOSIONE CERCHIO (CIRCLE EXPLOSION)
-        7       11          SIBILO SPIRALE (PATHY SPIRAL)
-    */
+	    0       5           ESPL. BICCHIERI E BOTTIGLIE (EXPLOSION GLASSES AND BOTTLES)
+	    1       F           n.c.
+	    2       E           APPARIZIONE BOTTIGLIE (APPEARANCE BOTTLES)
+	    3       4           MUSICA FINE GIOCO (END OF GAME MUSIC)
+	    4       S           EXPANSIONE CERCHIO (EXPANSION CIRCLE)
+	    5       n.c.
+	    6       N           EXPLOSIONE CERCHIO (CIRCLE EXPLOSION)
+	    7       11          SIBILO SPIRALE (PATHY SPIRAL)
+	*/
 }
 
 

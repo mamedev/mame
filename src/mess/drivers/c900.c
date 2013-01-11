@@ -59,4 +59,4 @@ ROM_START( c900 )
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
-COMP( 1985, c900,   0,      0,      c900,    c900, driver_device,    0,	"Commodore", "Commodore 900", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, c900,   0,      0,      c900,    c900, driver_device,    0, "Commodore", "Commodore 900", GAME_NOT_WORKING | GAME_NO_SOUND)

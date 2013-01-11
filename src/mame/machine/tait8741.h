@@ -18,7 +18,7 @@ struct TAITO8741interface
 {
 	int num;
 	int mode[MAX_TAITO8741];            /* program select */
-	int serial_connect[MAX_TAITO8741];	/* serial port connection */
+	int serial_connect[MAX_TAITO8741];  /* serial port connection */
 	read8_space_func portHandler_r[MAX_TAITO8741]; /* parallel port handler */
 	const char *portName_r[MAX_TAITO8741];
 };
@@ -50,5 +50,3 @@ DECLARE_READ8_HANDLER( josvolly_8741_1_r );
 DECLARE_WRITE8_HANDLER( josvolly_nmi_enable_w );
 
 #endif
-
-

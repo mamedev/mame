@@ -137,7 +137,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_videoram6_w);
 	DECLARE_WRITE16_MEMBER(bg_videoram7_w);
 
-	UINT16*		 m_spriteram[8];
+	UINT16*      m_spriteram[8];
 	tilemap_t    *m_bg_tilemap[8];
 	UINT8 m_txt_bank;
 
@@ -213,7 +213,7 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	base += page * 2;
 
 	/* ---- ---- ---x xxxx
-       xxxx ---y yyyy yyyy */
+	   xxxx ---y yyyy yyyy */
 
 	int xx=  ((state->m_spriteram[0][base+0]&0x001f)<<4) | (state->m_spriteram[0][base+1]&0xf000)>>12;
 	int yy = ((state->m_spriteram[0][base+1]&0x1ff));
@@ -229,7 +229,7 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	for (int y=0;y<32;y++)
 	{
 		/* -Xtt tttt tttt tttt
-           ---- ---- cccc cccc */
+		   ---- ---- cccc cccc */
 
 		UINT16 tile = (base2[y*2+1]&0x3fff);
 		UINT16 flipx = (base2[y*2+1]&0x4000);
@@ -465,7 +465,7 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 #endif
 
-    /* Dipswitch Port A */
+	/* Dipswitch Port A */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -483,14 +483,14 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_DIPNAME( 0x2000, 0x2000, "Bonus Life Type" ) PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(      0x2000, "Every" )
 	PORT_DIPSETTING(      0x0000, "Second Only" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!2")	// ?
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!2")    // ?
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-    /* Dipswitch Port B */
+	/* Dipswitch Port B */
 	PORT_START("DSW2")
 	PORT_SERVICE( 0x0100, IP_ACTIVE_HIGH ) PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPNAME( 0x0200, 0x0000, "Continue" ) PORT_DIPLOCATION("SW2:!7")
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_DIPSETTING(      0x1000, "Never Finish" )
 	PORT_DIPSETTING(      0x2000, "Demo Sound Off" )
 	PORT_DIPSETTING(      0x3000, "Stop Video" )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2")	// 'Level'
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2") // 'Level'
 	PORT_DIPSETTING(      0x8000, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x4000, "3" )
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_CPU_PROGRAM_MAP(blackt96_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000)	/* ? */
+	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 	MCFG_GFXDECODE(blackt96)

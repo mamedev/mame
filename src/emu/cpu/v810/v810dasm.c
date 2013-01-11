@@ -59,7 +59,7 @@ CPU_DISASSEMBLE( v810 )
 		case 0x09: sprintf(buffer,"DIV %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0a: sprintf(buffer,"MULU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0b: sprintf(buffer,"DIVU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x0c: sprintf(buffer,"OR %s,%s",GET1s(opc),GET2s(opc));	size=2; break;
+		case 0x0c: sprintf(buffer,"OR %s,%s",GET1s(opc),GET2s(opc));    size=2; break;
 		case 0x0d: sprintf(buffer,"AND %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0e: sprintf(buffer,"XOR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
 		case 0x0f: sprintf(buffer,"NOT %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
@@ -81,22 +81,22 @@ CPU_DISASSEMBLE( v810 )
 		case 0x1f:
 					switch(opc&0x1f)
 						{
-							case 0x00:	sprintf(buffer,"SCH0BSU"); break;
-							case 0x01:	sprintf(buffer,"SCH0BSD"); break;
-							case 0x02:	sprintf(buffer,"SCH1BSU"); break;
-							case 0x03:	sprintf(buffer,"SCH1BSD"); break;
-							case 0x04:	sprintf(buffer,"UnkS 4"); break;
-							case 0x05:	sprintf(buffer,"UnkS 5"); break;
-							case 0x06:	sprintf(buffer,"UnkS 6"); break;
-							case 0x08:	sprintf(buffer,"ORBSU"); break;
-							case 0x09:	sprintf(buffer,"ANDBSU"); break;
-							case 0x0a:	sprintf(buffer,"XORBSU"); break;
-							case 0x0b:	sprintf(buffer,"MOVBSU"); break;
-							case 0x0c:	sprintf(buffer,"ORNBSU"); break;
-							case 0x0d:	sprintf(buffer,"ANDNBSU"); break;
-							case 0x0e:	sprintf(buffer,"XORNBSU"); break;
-							case 0x0f:	sprintf(buffer,"NOTBSU"); break;
-							default:		sprintf(buffer,"UnkBS 0x%X",opc&0x1f); break;
+							case 0x00:  sprintf(buffer,"SCH0BSU"); break;
+							case 0x01:  sprintf(buffer,"SCH0BSD"); break;
+							case 0x02:  sprintf(buffer,"SCH1BSU"); break;
+							case 0x03:  sprintf(buffer,"SCH1BSD"); break;
+							case 0x04:  sprintf(buffer,"UnkS 4"); break;
+							case 0x05:  sprintf(buffer,"UnkS 5"); break;
+							case 0x06:  sprintf(buffer,"UnkS 6"); break;
+							case 0x08:  sprintf(buffer,"ORBSU"); break;
+							case 0x09:  sprintf(buffer,"ANDBSU"); break;
+							case 0x0a:  sprintf(buffer,"XORBSU"); break;
+							case 0x0b:  sprintf(buffer,"MOVBSU"); break;
+							case 0x0c:  sprintf(buffer,"ORNBSU"); break;
+							case 0x0d:  sprintf(buffer,"ANDNBSU"); break;
+							case 0x0e:  sprintf(buffer,"XORNBSU"); break;
+							case 0x0f:  sprintf(buffer,"NOTBSU"); break;
+							default:        sprintf(buffer,"UnkBS 0x%X",opc&0x1f); break;
 						}
 					size=2;
 					break;
@@ -108,7 +108,7 @@ CPU_DISASSEMBLE( v810 )
 		case 0x25:
 		case 0x26:
 		case 0x27: switch( (opc>>9) &0xf)
-							 {
+								{
 									case 0x0: sprintf(buffer,"BV %X",pc+D9(opc));  break;
 									case 0x1: sprintf(buffer,"BL %X",pc+D9(opc));  break;
 									case 0x2: sprintf(buffer,"BE %X",pc+D9(opc));  break;
@@ -125,33 +125,33 @@ CPU_DISASSEMBLE( v810 )
 									case 0xd: sprintf(buffer,"NOP"); break;
 									case 0xe: sprintf(buffer,"BGE %X",pc+D9(opc)); break;
 									case 0xf: sprintf(buffer,"BGT %X",pc+D9(opc)); break;
-							 }
-							 size=2;
-							 break;
+								}
+								size=2;
+								break;
 
-		case 0x28:	sprintf(buffer,"MOVEA %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x29:	sprintf(buffer,"ADDI %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2a:	sprintf(buffer,"JR %X",pc+D26(opc,opc2));size=4; break;
-		case 0x2b:	sprintf(buffer,"JAL %X",pc+D26(opc,opc2));size=4; flags = DASMFLAG_STEP_OVER; break;
-		case 0x2c:	sprintf(buffer,"ORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2d:	sprintf(buffer,"ANDI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2e:	sprintf(buffer,"XORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2f:	sprintf(buffer,"MOVHI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x30:	sprintf(buffer,"LDB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x31:	sprintf(buffer,"LDH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x28:  sprintf(buffer,"MOVEA %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x29:  sprintf(buffer,"ADDI %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2a:  sprintf(buffer,"JR %X",pc+D26(opc,opc2));size=4; break;
+		case 0x2b:  sprintf(buffer,"JAL %X",pc+D26(opc,opc2));size=4; flags = DASMFLAG_STEP_OVER; break;
+		case 0x2c:  sprintf(buffer,"ORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2d:  sprintf(buffer,"ANDI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2e:  sprintf(buffer,"XORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2f:  sprintf(buffer,"MOVHI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x30:  sprintf(buffer,"LDB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x31:  sprintf(buffer,"LDH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 		case 0x32:  sprintf(buffer,"Unk 0x32"); size=2; break;
-		case 0x33:	sprintf(buffer,"LDW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x34:	sprintf(buffer,"STB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
-		case 0x35:	sprintf(buffer,"STH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x33:  sprintf(buffer,"LDW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x34:  sprintf(buffer,"STB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x35:  sprintf(buffer,"STH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
 		case 0x36:  sprintf(buffer,"Unk 0x36"); size=2; break;
-		case 0x37:	sprintf(buffer,"STW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
-		case 0x38:	sprintf(buffer,"INB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x39:	sprintf(buffer,"INH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x3a:	sprintf(buffer,"CAXI %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x3b:	sprintf(buffer,"INW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x37:  sprintf(buffer,"STW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x38:  sprintf(buffer,"INB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x39:  sprintf(buffer,"INH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x3a:  sprintf(buffer,"CAXI %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x3b:  sprintf(buffer,"INW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 
-		case 0x3c:	sprintf(buffer,"OUTB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
-		case 0x3d:	sprintf(buffer,"OUTH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x3c:  sprintf(buffer,"OUTB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x3d:  sprintf(buffer,"OUTH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
 		case 0x3e:
 								switch((opc2&0xfc00)>>10)
 								{
@@ -167,10 +167,9 @@ CPU_DISASSEMBLE( v810 )
 								}
 							size=4;
 							break;
-		case 0x3f:	sprintf(buffer,"OUTW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x3f:  sprintf(buffer,"OUTW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
 
 		default : size=2;
 	}
 	return size | flags | DASMFLAG_SUPPORTED;
 }
-

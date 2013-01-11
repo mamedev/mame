@@ -101,10 +101,10 @@ void photon2_state::video_start()
 /* return the color to be used inverting FLASHing colors if necessary */
 INLINE unsigned char get_display_color (unsigned char color, int invert)
 {
-    if (invert && (color & 0x80))
-            return (color & 0xc0) + ((color & 0x38) >> 3) + ((color & 0x07) << 3);
-    else
-            return color;
+	if (invert && (color & 0x80))
+			return (color & 0xc0) + ((color & 0x38) >> 3) + ((color & 0x07) << 3);
+	else
+			return color;
 }
 
 /* Code to change the FLASH status every 25 frames. Note this must be
@@ -114,12 +114,12 @@ void photon2_state::screen_eof_spectrum(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-	    m_spectrum_frame_number++;
-	    if (m_spectrum_frame_number >= 25)
-	    {
-	        m_spectrum_frame_number = 0;
-	        m_spectrum_flash_invert = !m_spectrum_flash_invert;
-	    }
+		m_spectrum_frame_number++;
+		if (m_spectrum_frame_number >= 25)
+		{
+			m_spectrum_frame_number = 0;
+			m_spectrum_flash_invert = !m_spectrum_flash_invert;
+		}
 	}
 }
 
@@ -130,45 +130,45 @@ INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color
 
 UINT32 photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    /* for now do a full-refresh */
-    int x, y, b, scrx, scry;
-    unsigned short ink, pap;
-    unsigned char *attr, *scr;
+	/* for now do a full-refresh */
+	int x, y, b, scrx, scry;
+	unsigned short ink, pap;
+	unsigned char *attr, *scr;
 //  int full_refresh = 1;
 
-    scr=m_spectrum_video_ram;
+	scr=m_spectrum_video_ram;
 
 	bitmap.fill(m_spectrum_port_fe & 0x07, cliprect);
 
-    for (y=0; y<192; y++)
-    {
-        scrx=SPEC_LEFT_BORDER;
-        scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-        attr=m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
+	for (y=0; y<192; y++)
+	{
+		scrx=SPEC_LEFT_BORDER;
+		scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
+		attr=m_spectrum_video_ram + ((scry>>3)*32) + 0x1800;
 
-        for (x=0;x<32;x++)
-        {
+		for (x=0;x<32;x++)
+		{
 				/* Get ink and paper colour with bright */
-                if (m_spectrum_flash_invert && (*attr & 0x80))
-                {
-                        ink=((*attr)>>3) & 0x0f;
-                        pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-                }
-                else
-                {
-                        ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-                        pap=((*attr)>>3) & 0x0f;
-                }
-
-                for (b=0x80;b!=0;b>>=1)
-                {
-                        if (*scr&b)
-                                spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
-                        else
-                                spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
+				if (m_spectrum_flash_invert && (*attr & 0x80))
+				{
+						ink=((*attr)>>3) & 0x0f;
+						pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
 				}
-            scr++;
-            attr++;
+				else
+				{
+						ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
+						pap=((*attr)>>3) & 0x0f;
+				}
+
+				for (b=0x80;b!=0;b>>=1)
+				{
+						if (*scr&b)
+								spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
+						else
+								spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
+				}
+			scr++;
+			attr++;
 		}
 	}
 
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", photon2_state, spec_interrupt_hack, "screen", 0, 1)
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50.08)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

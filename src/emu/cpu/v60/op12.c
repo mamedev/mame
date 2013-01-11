@@ -16,40 +16,40 @@
  *  Macro to access data in operands decoded with ReadAMAddress(cpustate)
  */
 
-#define F12LOADOPBYTE(cs, num)							\
-	if ((cs)->flag##num)								\
-		appb = (UINT8)(cs)->reg[(cs)->op##num];			\
-	else												\
+#define F12LOADOPBYTE(cs, num)                          \
+	if ((cs)->flag##num)                                \
+		appb = (UINT8)(cs)->reg[(cs)->op##num];         \
+	else                                                \
 		appb = (cs)->program->read_byte((cs)->op##num);
 
-#define F12LOADOPHALF(cs, num)							\
-	if ((cs)->flag##num)								\
-		apph = (UINT16)(cs)->reg[(cs)->op##num];		\
-	else												\
+#define F12LOADOPHALF(cs, num)                          \
+	if ((cs)->flag##num)                                \
+		apph = (UINT16)(cs)->reg[(cs)->op##num];        \
+	else                                                \
 		apph = (cs)->program->read_word_unaligned((cs)->op##num);
 
-#define F12LOADOPWORD(cs, num)							\
-	if ((cs)->flag##num)								\
-		appw = (cs)->reg[(cs)->op##num];				\
-	else												\
+#define F12LOADOPWORD(cs, num)                          \
+	if ((cs)->flag##num)                                \
+		appw = (cs)->reg[(cs)->op##num];                \
+	else                                                \
 		appw = (cs)->program->read_dword_unaligned((cs)->op##num);
 
-#define F12STOREOPBYTE(cs, num)							\
-	if ((cs)->flag##num)								\
-		SETREG8((cs)->reg[(cs)->op##num], appb);		\
-	else												\
+#define F12STOREOPBYTE(cs, num)                         \
+	if ((cs)->flag##num)                                \
+		SETREG8((cs)->reg[(cs)->op##num], appb);        \
+	else                                                \
 		(cs)->program->write_byte((cs)->op##num, appb);
 
-#define F12STOREOPHALF(cs, num)							\
-	if ((cs)->flag##num)								\
-		SETREG16((cs)->reg[(cs)->op##num], apph);		\
-	else												\
+#define F12STOREOPHALF(cs, num)                         \
+	if ((cs)->flag##num)                                \
+		SETREG16((cs)->reg[(cs)->op##num], apph);       \
+	else                                                \
 		(cs)->program->write_word_unaligned((cs)->op##num, apph);
 
-#define F12STOREOPWORD(cs, num)							\
-	if ((cs)->flag##num)								\
-		(cs)->reg[(cs)->op##num] = appw;				\
-	else												\
+#define F12STOREOPWORD(cs, num)                         \
+	if ((cs)->flag##num)                                \
+		(cs)->reg[(cs)->op##num] = appw;                \
+	else                                                \
 		(cs)->program->write_dword_unaligned((cs)->op##num, appw);
 
 #define F12LOADOP1BYTE(cs)  F12LOADOPBYTE(cs, 1)
@@ -68,7 +68,7 @@
 #define F12STOREOP2HALF(cs)  F12STOREOPHALF(cs, 2)
 #define F12STOREOP2WORD(cs)  F12STOREOPWORD(cs, 2)
 
-#define F12END(cs)									\
+#define F12END(cs)                                  \
 	return (cs)->amlength1 + (cs)->amlength2 + 2;
 
 
@@ -665,7 +665,7 @@ static UINT32 opDIVUB(v60_state *cpustate) /* TRUSTED */
 	F12LOADOP2BYTE(cpustate);
 
 	cpustate->_OV = 0;
-	if (cpustate->op1)	appb /= (UINT8)cpustate->op1;
+	if (cpustate->op1)  appb /= (UINT8)cpustate->op1;
 	cpustate->_Z = (appb == 0);
 	cpustate->_S = ((appb & 0x80) != 0);
 
@@ -681,7 +681,7 @@ static UINT32 opDIVUH(v60_state *cpustate) /* TRUSTED */
 	F12LOADOP2HALF(cpustate);
 
 	cpustate->_OV = 0;
-	if (cpustate->op1)	apph /= (UINT16)cpustate->op1;
+	if (cpustate->op1)  apph /= (UINT16)cpustate->op1;
 	cpustate->_Z = (apph == 0);
 	cpustate->_S = ((apph & 0x8000) != 0);
 
@@ -697,7 +697,7 @@ static UINT32 opDIVUW(v60_state *cpustate) /* TRUSTED */
 	F12LOADOP2WORD(cpustate);
 
 	cpustate->_OV = 0;
-	if (cpustate->op1)	appw /= cpustate->op1;
+	if (cpustate->op1)  appw /= cpustate->op1;
 	cpustate->_Z = (appw == 0);
 	cpustate->_S = ((appw & 0x80000000) != 0);
 
@@ -755,7 +755,7 @@ static UINT32 opLDPR(v60_state *cpustate)
 	F12DecodeOperands(cpustate, ReadAMAddress, 2,ReadAM, 2);
 	if (cpustate->op2 <= 28)
 	{
-	  if (cpustate->flag1 &&(!(OpRead8(cpustate, cpustate->PC + 1)&0x80 && OpRead8(cpustate, cpustate->PC + 2) == 0xf4 ) ))
+		if (cpustate->flag1 &&(!(OpRead8(cpustate, cpustate->PC + 1)&0x80 && OpRead8(cpustate, cpustate->PC + 2) == 0xf4 ) ))
 			cpustate->reg[cpustate->op2 + 36] = cpustate->reg[cpustate->op1];
 		else
 			cpustate->reg[cpustate->op2 + 36] = cpustate->op1;
@@ -920,7 +920,7 @@ static UINT32 opMOVTHB(v60_state *cpustate)
 	// Check for overflow: the truncated bits must match the sign
 	//  of the result, otherwise overflow
 	if (((cpustate->modwritevalb & 0x80) == 0x80 && ((cpustate->op1 & 0xFF00) == 0xFF00)) ||
-		  ((cpustate->modwritevalb & 0x80) == 0 && ((cpustate->op1 & 0xFF00) == 0x0000)))
+			((cpustate->modwritevalb & 0x80) == 0 && ((cpustate->op1 & 0xFF00) == 0x0000)))
 		cpustate->_OV = 0;
 	else
 		cpustate->_OV = 1;
@@ -937,7 +937,7 @@ static UINT32 opMOVTWB(v60_state *cpustate)
 	// Check for overflow: the truncated bits must match the sign
 	//  of the result, otherwise overflow
 	if (((cpustate->modwritevalb & 0x80) == 0x80 && ((cpustate->op1 & 0xFFFFFF00) == 0xFFFFFF00)) ||
-		  ((cpustate->modwritevalb & 0x80) == 0 && ((cpustate->op1 & 0xFFFFFF00) == 0x00000000)))
+			((cpustate->modwritevalb & 0x80) == 0 && ((cpustate->op1 & 0xFFFFFF00) == 0x00000000)))
 		cpustate->_OV = 0;
 	else
 		cpustate->_OV = 1;
@@ -954,7 +954,7 @@ static UINT32 opMOVTWH(v60_state *cpustate)
 	// Check for overflow: the truncated bits must match the sign
 	//  of the result, otherwise overflow
 	if (((cpustate->modwritevalh & 0x8000) == 0x8000 && ((cpustate->op1 & 0xFFFF0000) == 0xFFFF0000)) ||
-		  ((cpustate->modwritevalh & 0x8000) == 0 && ((cpustate->op1 & 0xFFFF0000) == 0x00000000)))
+			((cpustate->modwritevalh & 0x8000) == 0 && ((cpustate->op1 & 0xFFFF0000) == 0x00000000)))
 		cpustate->_OV = 0;
 	else
 		cpustate->_OV = 1;
@@ -1592,13 +1592,13 @@ static UINT32 opRVBIT(v60_state *cpustate)
 
 	cpustate->modwritevalb =(UINT8)
 								(((cpustate->op1 & (1 << 0)) << 7) |
-								 ((cpustate->op1 & (1 << 1)) << 5) |
-								 ((cpustate->op1 & (1 << 2)) << 3) |
-								 ((cpustate->op1 & (1 << 3)) << 1) |
-								 ((cpustate->op1 & (1 << 4)) >> 1) |
-								 ((cpustate->op1 & (1 << 5)) >> 3) |
-								 ((cpustate->op1 & (1 << 6)) >> 5) |
-								 ((cpustate->op1 & (1 << 7)) >> 7));
+									((cpustate->op1 & (1 << 1)) << 5) |
+									((cpustate->op1 & (1 << 2)) << 3) |
+									((cpustate->op1 & (1 << 3)) << 1) |
+									((cpustate->op1 & (1 << 4)) >> 1) |
+									((cpustate->op1 & (1 << 5)) >> 3) |
+									((cpustate->op1 & (1 << 6)) >> 5) |
+									((cpustate->op1 & (1 << 7)) >> 7));
 
 	F12WriteSecondOperand(cpustate, 0);
 	F12END(cpustate);
@@ -1609,9 +1609,9 @@ static UINT32 opRVBYT(v60_state *cpustate) /* TRUSTED */
 	F12DecodeFirstOperand(cpustate, ReadAM, 2);
 
 	cpustate->modwritevalw = ((cpustate->op1 & 0x000000FF) << 24) |
-								 ((cpustate->op1 & 0x0000FF00) << 8)  |
-								 ((cpustate->op1 & 0x00FF0000) >> 8)  |
-								 ((cpustate->op1 & 0xFF000000) >> 24);
+									((cpustate->op1 & 0x0000FF00) << 8)  |
+									((cpustate->op1 & 0x00FF0000) >> 8)  |
+									((cpustate->op1 & 0xFF000000) >> 24);
 
 	F12WriteSecondOperand(cpustate, 2);
 	F12END(cpustate);
@@ -1932,12 +1932,12 @@ static UINT32 opSHLB(v60_state *cpustate) /* TRUSTED */
 		// carry gets the last bit shifted out,
 		// overflow is always CLEARed
 
-		cpustate->_OV = 0;	// default to no overflow
+		cpustate->_OV = 0;  // default to no overflow
 
 		// now handle carry
 		tmp = appb & 0xff;
 		tmp <<= count;
-		SetCFB(tmp);	// set carry properly
+		SetCFB(tmp);    // set carry properly
 
 		// do the actual shift...
 		appb <<= count;
@@ -1951,7 +1951,7 @@ static UINT32 opSHLB(v60_state *cpustate) /* TRUSTED */
 		{
 			// special case: clear carry and overflow, do nothing else
 			cpustate->_CY = cpustate->_OV = 0;
-			SetSZPF_Byte(appb);	// doc. is unclear if this is true...
+			SetSZPF_Byte(appb); // doc. is unclear if this is true...
 		}
 		else
 		{
@@ -1997,7 +1997,7 @@ static UINT32 opSHLH(v60_state *cpustate) /* TRUSTED */
 		// now handle carry
 		tmp = apph & 0xffff;
 		tmp <<= count;
-		SetCFW(tmp);	// set carry properly
+		SetCFW(tmp);    // set carry properly
 
 		// do the actual shift...
 		apph <<= count;
@@ -2011,7 +2011,7 @@ static UINT32 opSHLH(v60_state *cpustate) /* TRUSTED */
 		{
 			// special case: clear carry and overflow, do nothing else
 			cpustate->_CY = cpustate->_OV = 0;
-			SetSZPF_Word(apph);	// doc. is unclear if this is true...
+			SetSZPF_Word(apph); // doc. is unclear if this is true...
 		}
 		else
 		{
@@ -2056,7 +2056,7 @@ static UINT32 opSHLW(v60_state *cpustate) /* TRUSTED */
 		// now handle carry
 		tmp = appw & 0xffffffff;
 		tmp <<= count;
-		SetCFL(tmp);	// set carry properly
+		SetCFL(tmp);    // set carry properly
 
 		// do the actual shift...
 		appw <<= count;
@@ -2070,7 +2070,7 @@ static UINT32 opSHLW(v60_state *cpustate) /* TRUSTED */
 		{
 			// special case: clear carry and overflow, do nothing else
 			cpustate->_CY = cpustate->_OV = 0;
-			SetSZPF_Long(appw);	// doc. is unclear if this is true...
+			SetSZPF_Long(appw); // doc. is unclear if this is true...
 		}
 		else
 		{

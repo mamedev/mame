@@ -1412,7 +1412,7 @@ Sushi Bar
 #define CPU_CLOCK (200000000)
 static macronix_29l001mc_device *awflash;
 
-                                             /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
+												/* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 static READ64_HANDLER( naomi_arm_r )
@@ -1515,9 +1515,9 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
  * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
- // SB_LMMODE0
- static WRITE64_HANDLER( ta_texture_directpath0_w )
- {
+	// SB_LMMODE0
+	static WRITE64_HANDLER( ta_texture_directpath0_w )
+	{
 	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int mode = state->pvrctrl_regs[SB_LMMODE0]&1;
@@ -1530,11 +1530,11 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
 	{
 		COMBINE_DATA(&state->dc_texture_ram[offset]);
 	}
- }
+	}
 
- // SB_LMMODE1
- static WRITE64_HANDLER( ta_texture_directpath1_w )
- {
+	// SB_LMMODE1
+	static WRITE64_HANDLER( ta_texture_directpath1_w )
+	{
 	dc_state *state = space.machine().driver_data<dc_state>();
 
 	int mode = state->pvrctrl_regs[SB_LMMODE1]&1;
@@ -1547,7 +1547,7 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
 	{
 		COMBINE_DATA(&state->dc_texture_ram[offset]);
 	}
- }
+	}
 
 
 /*
@@ -1572,7 +1572,7 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM	// Naomi 2 BIOS tests this, needs to read back as written
+	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 */
@@ -1624,7 +1624,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM	// Naomi 2 BIOS tests this, needs to read back as written
+	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 //  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
@@ -1642,7 +1642,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE_LEGACY(pvrs_ta_w ) // writes to BOTH PVRs
 	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32_LEGACY(elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
-    AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_SHARE("elan_ram") // T&L chip RAM
+	AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_SHARE("elan_ram") // T&L chip RAM
 
 	/* Area 3 */
 	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_SHARE("dc_ram")
@@ -1676,7 +1676,7 @@ ADDRESS_MAP_END
 static READ64_HANDLER( aw_flash_r )
 {
 	return (UINT64)awflash->read(offset*8) | (UINT64)awflash->read((offset*8)+1)<<8 | (UINT64)awflash->read((offset*8)+2)<<16 | (UINT64)awflash->read((offset*8)+3)<<24 |
-	       (UINT64)awflash->read((offset*8)+4)<<32 | (UINT64)awflash->read((offset*8)+5)<<40 | (UINT64)awflash->read((offset*8)+6)<<48 | (UINT64)awflash->read((offset*8)+7)<<56;
+			(UINT64)awflash->read((offset*8)+4)<<32 | (UINT64)awflash->read((offset*8)+5)<<40 | (UINT64)awflash->read((offset*8)+6)<<48 | (UINT64)awflash->read((offset*8)+7)<<56;
 }
 
 static WRITE64_HANDLER( aw_flash_w )
@@ -1733,11 +1733,11 @@ static READ64_HANDLER( aw_modem_r )
 
 		if (coins & 0x01)
 		{
-			return U64(0xffffffff00000002);	// coin A
+			return U64(0xffffffff00000002); // coin A
 		}
 		else if (coins & 0x02)
 		{
-			return U64(0xffffffff00000001);	// coin B
+			return U64(0xffffffff00000001); // coin B
 		}
 
 		return U64(0xffffffffffffffff);
@@ -1763,7 +1763,7 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE_LEGACY(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE_LEGACY(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 
-	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM 	// battery backed up RAM
+	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM     // battery backed up RAM
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", aw_rom_board, submap, U64(0x0000ffff0000ffff) )
@@ -1780,7 +1780,7 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM	AM_MIRROR(0x00800000) AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
@@ -1832,7 +1832,7 @@ static const aica_interface aica_config =
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
@@ -2471,19 +2471,19 @@ static INPUT_PORTS_START( aw1w )
 	PORT_START("P2.A0") /* steering */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("P2.A1")	/* gas pedal */
+	PORT_START("P2.A1") /* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("P2.A2")	/* brake */
+	PORT_START("P2.A2") /* brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("P2.A3") /* steering */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START("P2.A4")	/* gas pedal */
+	PORT_START("P2.A4") /* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
-	PORT_START("P2.A5")	/* brake */
+	PORT_START("P2.A5") /* brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("COINS")
@@ -2511,7 +2511,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, dc_state )
 	MCFG_CPU_PROGRAM_MAP(naomi_map)
 	MCFG_CPU_IO_MAP(naomi_port)
 
-	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
@@ -2900,7 +2900,7 @@ Region byte encoding is as follows:
 	ROM_LOAD("x76f100_eeprom.bin", 0x0000, 0x0084, CRC(3ea24b6a) SHA1(3a730ebcf56e0060fef6b1b02eb2eb7cfb7e61dc) )
 
 /* Version without the default x76f100 eeprom */
-#define NAOMI_DEFAULT_EEPROM_NO_BD	\
+#define NAOMI_DEFAULT_EEPROM_NO_BD  \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
 	ROM_LOAD16_WORD("main_eeprom.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )
 
@@ -3625,7 +3625,7 @@ ROM_START( f355 )
 	ROM_LOAD("mpr-21900.ic20",0xa000000, 0x0800000, CRC(81901130) SHA1(1573b5c4360e29ba1a4b4901af49d5399fa1e635) )
 	ROM_LOAD("mpr-21901.ic21",0xa800000, 0x0800000, BAD_DUMP CRC(55dcbd6d) SHA1(9fec353f9e58016090e177f899a799e2e8fc7c9f) ) // returns bad in Naomi test mode.  ROM reads different each time and fails test mode on real h/w, need a new cart
 
-	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-21867.bin", 0x000000, 0x010000, CRC(4f93a2a0) SHA1(875907e7fcfc44850e2c60c12268ac61c742f217) )
 ROM_END
 
@@ -3946,34 +3946,34 @@ ROM_START( tduno2 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-    ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "epr-23071.ic11",         0x0000000, 0x0200000, CRC(1b58f24a) SHA1(90f91af31beff9399c8d72ae0087bf4d3122cac2) )
-    ROM_LOAD32_WORD( "mpr-23063.ic17s", 0x1000000, 0x0800000, CRC(9678a759) SHA1(6f2602c6eef8db0d4a145d832aec3ea0e0491c0c) )
-    ROM_LOAD32_WORD( "mpr-23064.ic18",  0x1000002, 0x0800000, CRC(e159c44d) SHA1(fd0dcd74f7e214c7c9214bb04167f7c3acea30cf) )
-    ROM_LOAD32_WORD( "mpr-23065.ic19s", 0x2000000, 0x0800000, CRC(10eff527) SHA1(c208529b0825ba45dc474c6aaa4b4c5557335c10) )
-    ROM_LOAD32_WORD( "mpr-23066.ic20",  0x2000002, 0x0800000, CRC(4f9c1710) SHA1(7834bab5933a156656756f837c217e7820f2ae63) )
-    ROM_LOAD32_WORD( "mpr-23067.ic21s", 0x3000000, 0x0800000, CRC(32724cd9) SHA1(7bfdd58dd5e69529125a720f51c53ebe526ef2e9) )
-    ROM_LOAD32_WORD( "mpr-23068.ic22",  0x3000002, 0x0800000, CRC(2ce3e0ea) SHA1(805ec80273856ec6e5ee04fdca5fd1407c404f8e) )
+	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-23071.ic11",         0x0000000, 0x0200000, CRC(1b58f24a) SHA1(90f91af31beff9399c8d72ae0087bf4d3122cac2) )
+	ROM_LOAD32_WORD( "mpr-23063.ic17s", 0x1000000, 0x0800000, CRC(9678a759) SHA1(6f2602c6eef8db0d4a145d832aec3ea0e0491c0c) )
+	ROM_LOAD32_WORD( "mpr-23064.ic18",  0x1000002, 0x0800000, CRC(e159c44d) SHA1(fd0dcd74f7e214c7c9214bb04167f7c3acea30cf) )
+	ROM_LOAD32_WORD( "mpr-23065.ic19s", 0x2000000, 0x0800000, CRC(10eff527) SHA1(c208529b0825ba45dc474c6aaa4b4c5557335c10) )
+	ROM_LOAD32_WORD( "mpr-23066.ic20",  0x2000002, 0x0800000, CRC(4f9c1710) SHA1(7834bab5933a156656756f837c217e7820f2ae63) )
+	ROM_LOAD32_WORD( "mpr-23067.ic21s", 0x3000000, 0x0800000, CRC(32724cd9) SHA1(7bfdd58dd5e69529125a720f51c53ebe526ef2e9) )
+	ROM_LOAD32_WORD( "mpr-23068.ic22",  0x3000002, 0x0800000, CRC(2ce3e0ea) SHA1(805ec80273856ec6e5ee04fdca5fd1407c404f8e) )
 
-    ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "tduno2.key",   0x000000, 0x000004, CRC(8e0f0f3b) SHA1(914d3db8746c806d559539cc0851169161d32c04) )
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "tduno2.key",   0x000000, 0x000004, CRC(8e0f0f3b) SHA1(914d3db8746c806d559539cc0851169161d32c04) )
 ROM_END
 
 ROM_START( mtkob2 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-    ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "epr-24217.ic11",         0x0000000, 0x0400000, CRC(5ecf807b) SHA1(f91d03a68a44d02970e360789b746bec9289275f) )
-    ROM_LOAD32_WORD( "mpr-24218.ic17s", 0x1000000, 0x0800000, CRC(e8c51e1d) SHA1(e81f0580e144aa7a7e8c9399ffa09227b6e93675) )
-    ROM_LOAD32_WORD( "mpr-24219.ic18",  0x1000002, 0x0800000, CRC(b0a5709f) SHA1(993f7a99d59a924641c37a549208723342007e5a) )
-    ROM_LOAD32_WORD( "mpr-24220.ic19s", 0x2000000, 0x0800000, CRC(9f6cefe2) SHA1(499e17d2c284b340db6b124b63a23c7fa5045d0f) )
-    ROM_LOAD32_WORD( "mpr-24221.ic20",  0x2000002, 0x0800000, CRC(73bf9cc6) SHA1(ab187cc0babd1435f5e8636331818d81de23636f) )
-    ROM_LOAD32_WORD( "mpr-24222.ic21s", 0x3000000, 0x0800000, CRC(7098e728) SHA1(82f4f57efcee3063467c24758cefd406dccb1ea4) )
-    ROM_LOAD32_WORD( "mpr-24223.ic22",  0x3000002, 0x0800000, CRC(eca13c90) SHA1(26a66906bf4ebda8697140d89eb5e493e941e8b2) )
+	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24217.ic11",         0x0000000, 0x0400000, CRC(5ecf807b) SHA1(f91d03a68a44d02970e360789b746bec9289275f) )
+	ROM_LOAD32_WORD( "mpr-24218.ic17s", 0x1000000, 0x0800000, CRC(e8c51e1d) SHA1(e81f0580e144aa7a7e8c9399ffa09227b6e93675) )
+	ROM_LOAD32_WORD( "mpr-24219.ic18",  0x1000002, 0x0800000, CRC(b0a5709f) SHA1(993f7a99d59a924641c37a549208723342007e5a) )
+	ROM_LOAD32_WORD( "mpr-24220.ic19s", 0x2000000, 0x0800000, CRC(9f6cefe2) SHA1(499e17d2c284b340db6b124b63a23c7fa5045d0f) )
+	ROM_LOAD32_WORD( "mpr-24221.ic20",  0x2000002, 0x0800000, CRC(73bf9cc6) SHA1(ab187cc0babd1435f5e8636331818d81de23636f) )
+	ROM_LOAD32_WORD( "mpr-24222.ic21s", 0x3000000, 0x0800000, CRC(7098e728) SHA1(82f4f57efcee3063467c24758cefd406dccb1ea4) )
+	ROM_LOAD32_WORD( "mpr-24223.ic22",  0x3000002, 0x0800000, CRC(eca13c90) SHA1(26a66906bf4ebda8697140d89eb5e493e941e8b2) )
 
-    ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "mtkob2-key.bin", 0x000000, 0x000004, CRC(db088208) SHA1(14d65ad2555183a445abcd93907c85df4032b41d) )
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "mtkob2-key.bin", 0x000000, 0x000004, CRC(db088208) SHA1(14d65ad2555183a445abcd93907c85df4032b41d) )
 ROM_END
 
 ROM_START( crackndj )
@@ -4865,7 +4865,7 @@ ROM_START( sambap )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x8800000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "sambaproto.ic22",0x000000, 0x0400000, CRC(ca069449) SHA1(03c2498664df187a98b335f1757979ebcf45c591) )
+	ROM_LOAD( "sambaproto.ic22",0x000000, 0x0400000, CRC(ca069449) SHA1(03c2498664df187a98b335f1757979ebcf45c591) )
 	ROM_LOAD("mpr-22950.ic1",  0x0800000, 0x0800000, CRC(16dee15c) SHA1(b46849e492756ff406bf8956303472255fcf55a5) )
 	ROM_LOAD("mpr-22951.ic2",  0x1000000, 0x0800000, CRC(f509496f) SHA1(41281576f7d58c8ede9c0a89bfd46a98d5b97033) )
 	ROM_LOAD("mpr-22952.ic3",  0x1800000, 0x0800000, CRC(fb9b3ef0) SHA1(e9d44b673c273e97445a12186496a0594e291542) )
@@ -5173,7 +5173,7 @@ ROM_START( virnbap )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD("vnbaearly.ic22",0x0000000, 0x0400000, CRC(5bbf7a45) SHA1(ad71ae8e9e08d7e0a9a60d1ba51bc5dcfeb0f50c) )
+	ROM_LOAD("vnbaearly.ic22",0x0000000, 0x0400000, CRC(5bbf7a45) SHA1(ad71ae8e9e08d7e0a9a60d1ba51bc5dcfeb0f50c) )
 	ROM_LOAD("mpr-22928.ic1", 0x0800000, 0x0800000, CRC(63245c98) SHA1(a5a542244f07c6c8b66961a231fb56c89d2cf20c) )
 	ROM_LOAD("mpr-22929.ic2", 0x1000000, 0x0800000, CRC(eea89d21) SHA1(5fe184267e637f155d767f8d931462d9593eff5a) )
 	ROM_LOAD("mpr-22930.ic3", 0x1800000, 0x0800000, CRC(2fbefa9a) SHA1(a6df46cb8742022e436cdc6a9a50490c7a551421) )
@@ -5403,7 +5403,7 @@ ROM_START( pokasuka )
 	ROM_LOAD( "fpr-24368.ic11", 0x0c000000, 0x4000000, CRC(124f55e2) SHA1(bc2cb9514acd98f116917ea771b06c4e03ffae73) )
 	ROM_LOAD( "fpr-24369.ic12", 0x10000000, 0x4000000, CRC(35b544ab) SHA1(270a75883a867318fd417ec819c40c36f2d296b8) )
 
-	ROM_REGION( 0x200000, "ioboard", 0)	// touch screen I/O board, program disassembles as little-endian SH-4
+	ROM_REGION( 0x200000, "ioboard", 0) // touch screen I/O board, program disassembles as little-endian SH-4
 	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) )
 
 	ROM_REGION( 4, "rom_key", 0 )
@@ -5511,7 +5511,7 @@ ROM_START( gunsur2e )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "bhf2_fl0.2f",  0x0000000, 0x0800000, CRC(756e0de6) SHA1(3eb325613b5095d36aae791a6b1f241e80736ddd) )
+	ROM_LOAD( "bhf2_fl0.2f",  0x0000000, 0x0800000, CRC(756e0de6) SHA1(3eb325613b5095d36aae791a6b1f241e80736ddd) )
 	ROM_LOAD( "bhf1ma2.4m",   0x2000000, 0x1000000, CRC(8073dec7) SHA1(2d4173ff0de37b95a8cb02e1b572a9cdeb448c24) )
 	ROM_LOAD( "bhf1ma3.4l",   0x3000000, 0x1000000, CRC(43cd16a4) SHA1(86258df34b652a614129efd4c825c62ff1382318) )
 	ROM_LOAD( "bhf1ma4.4k",   0x4000000, 0x1000000, CRC(f6aebed8) SHA1(687057aacb45ebffe3b5cf2b8dd52d24039392f1) )
@@ -5528,7 +5528,7 @@ ROM_START( gunsur2e )
 	ROM_LOAD( "bhf1ma15.6l",  0xf000000, 0x1000000, CRC(db3c396b) SHA1(da0e125d627ce890906ca100081ab0685e11c0ef) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "bhf2-key.bin", 0x0000000, 0x0000004, CRC(9899e931) SHA1(c0837262b9069b33d0e72b418e80b5f0da8b9251) )
+	ROM_LOAD( "bhf2-key.bin", 0x0000000, 0x0000004, CRC(9899e931) SHA1(c0837262b9069b33d0e72b418e80b5f0da8b9251) )
 ROM_END
 
 ROM_START( wldkicks )
@@ -5555,110 +5555,110 @@ ROM_START( wldkicks )
 ROM_END
 
 ROM_START( toukon4 )
-    NAOMI_BIOS
-    NAOMI_DEFAULT_EEPROM
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
 
-    ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "trf1fl0.2f",  0x0000000, 0x0800000, CRC(862e673d) SHA1(f2c90932ba4abe31d02e86f80ef3e2689342c384) )
-    ROM_LOAD( "trf1fl1.2d",  0x0800000, 0x0800000, CRC(59a935c9) SHA1(7298d83a27eac74bad18d716a791ab2016fe028f) )
-    ROM_LOAD( "trf1ma1.4n",  0x1000000, 0x1000000, CRC(b1b3ab96) SHA1(3dc4bcf796583a0fb51359a86a46d7883df54fad) )
-    ROM_LOAD( "trf1ma2.4m",  0x2000000, 0x1000000, CRC(a27d3dda) SHA1(b9ec4be5845cbe91fd7bc537669e96716513a5f0) )
-    ROM_LOAD( "trf1ma3.4l",  0x3000000, 0x1000000, CRC(345ec434) SHA1(986d9930e7de46b88936c898ba8b05d950262a1f) )
-    ROM_LOAD( "trf1ma4.4k",  0x4000000, 0x1000000, CRC(fc47a104) SHA1(07ced58c1b17719ac36db1589771e67ce16d912e) )
-    ROM_LOAD( "trf1ma5.4j",  0x5000000, 0x1000000, CRC(e1bb077d) SHA1(6b70d8103bf067319e9022742fc1dd843d7e5076) )
-    ROM_LOAD( "trf1ma6.4h",  0x6000000, 0x1000000, CRC(abae4d06) SHA1(56da2ca3551287942afabf37e7fd1b884bd3cac8) )
-    ROM_LOAD( "trf1ma7.4f",  0x7000000, 0x1000000, CRC(19d0092a) SHA1(2ae2dbf2f3958da9f69b3a8636c6837e4243bb67) )
-    ROM_LOAD( "trf1ma8.4e",  0x8000000, 0x1000000, CRC(6fbf34ab) SHA1(f4747d1a1c02e22502e68d72a4f0c152fa69d778) )
-    ROM_LOAD( "trf1ma9.4d",  0x9000000, 0x1000000, CRC(2fa36c5d) SHA1(6478687c91484141521ae79a997cecbcfbb7beae) )
-    ROM_LOAD( "trf1ma10.4c", 0xa000000, 0x1000000, CRC(bc866a37) SHA1(d4d12f285a3bc9136cf3fc2a59dba5ad557cc7d7) )
-    ROM_LOAD( "trf1ma11.4b", 0xb000000, 0x1000000, CRC(68d11482) SHA1(fe991ba5664d6ccf0aac5167f05c5a780f851ae9) )
-    ROM_LOAD( "trf1ma12.6p", 0xc000000, 0x1000000, CRC(a7c3bd3c) SHA1(ed5a24e4c47f686120577dae4550fb9378209cf8) )
-    ROM_LOAD( "trf1ma13.6n", 0xd000000, 0x1000000, CRC(e52d41fe) SHA1(e1769d42d6048f9621ca289af3ddeca7c14cee00) )
-    ROM_LOAD( "trf1ma14.6m", 0xe000000, 0x1000000, CRC(87cb31a0) SHA1(27aef9ac571a0b5e3a76e4ee22f5bc5d0ae962f2) )
-    ROM_LOAD( "trf1ma15.6l", 0xf000000, 0x1000000, CRC(42d318c5) SHA1(f9fe82ffbfc51fcb52333f94c55a7092e7124fb4) )
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "trf1fl0.2f",  0x0000000, 0x0800000, CRC(862e673d) SHA1(f2c90932ba4abe31d02e86f80ef3e2689342c384) )
+	ROM_LOAD( "trf1fl1.2d",  0x0800000, 0x0800000, CRC(59a935c9) SHA1(7298d83a27eac74bad18d716a791ab2016fe028f) )
+	ROM_LOAD( "trf1ma1.4n",  0x1000000, 0x1000000, CRC(b1b3ab96) SHA1(3dc4bcf796583a0fb51359a86a46d7883df54fad) )
+	ROM_LOAD( "trf1ma2.4m",  0x2000000, 0x1000000, CRC(a27d3dda) SHA1(b9ec4be5845cbe91fd7bc537669e96716513a5f0) )
+	ROM_LOAD( "trf1ma3.4l",  0x3000000, 0x1000000, CRC(345ec434) SHA1(986d9930e7de46b88936c898ba8b05d950262a1f) )
+	ROM_LOAD( "trf1ma4.4k",  0x4000000, 0x1000000, CRC(fc47a104) SHA1(07ced58c1b17719ac36db1589771e67ce16d912e) )
+	ROM_LOAD( "trf1ma5.4j",  0x5000000, 0x1000000, CRC(e1bb077d) SHA1(6b70d8103bf067319e9022742fc1dd843d7e5076) )
+	ROM_LOAD( "trf1ma6.4h",  0x6000000, 0x1000000, CRC(abae4d06) SHA1(56da2ca3551287942afabf37e7fd1b884bd3cac8) )
+	ROM_LOAD( "trf1ma7.4f",  0x7000000, 0x1000000, CRC(19d0092a) SHA1(2ae2dbf2f3958da9f69b3a8636c6837e4243bb67) )
+	ROM_LOAD( "trf1ma8.4e",  0x8000000, 0x1000000, CRC(6fbf34ab) SHA1(f4747d1a1c02e22502e68d72a4f0c152fa69d778) )
+	ROM_LOAD( "trf1ma9.4d",  0x9000000, 0x1000000, CRC(2fa36c5d) SHA1(6478687c91484141521ae79a997cecbcfbb7beae) )
+	ROM_LOAD( "trf1ma10.4c", 0xa000000, 0x1000000, CRC(bc866a37) SHA1(d4d12f285a3bc9136cf3fc2a59dba5ad557cc7d7) )
+	ROM_LOAD( "trf1ma11.4b", 0xb000000, 0x1000000, CRC(68d11482) SHA1(fe991ba5664d6ccf0aac5167f05c5a780f851ae9) )
+	ROM_LOAD( "trf1ma12.6p", 0xc000000, 0x1000000, CRC(a7c3bd3c) SHA1(ed5a24e4c47f686120577dae4550fb9378209cf8) )
+	ROM_LOAD( "trf1ma13.6n", 0xd000000, 0x1000000, CRC(e52d41fe) SHA1(e1769d42d6048f9621ca289af3ddeca7c14cee00) )
+	ROM_LOAD( "trf1ma14.6m", 0xe000000, 0x1000000, CRC(87cb31a0) SHA1(27aef9ac571a0b5e3a76e4ee22f5bc5d0ae962f2) )
+	ROM_LOAD( "trf1ma15.6l", 0xf000000, 0x1000000, CRC(42d318c5) SHA1(f9fe82ffbfc51fcb52333f94c55a7092e7124fb4) )
 
-    ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "tr4ae-key.bin", 0x000000, 0x000004, CRC(986a7cee) SHA1(70c3ff80f86de6a0655251658c66a156fb644995) )
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "tr4ae-key.bin", 0x000000, 0x000004, CRC(986a7cee) SHA1(70c3ff80f86de6a0655251658c66a156fb644995) )
 ROM_END
 
 ROM_START( ninjaslt )
-    NAOMI_BIOS
-    NAOMI_DEFAULT_EEPROM
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
 
-    ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "nja3vera_fl1.2d", 0x0800000, 0x0800000, CRC(442cb858) SHA1(8244871bdb0b49e14ea400d63fe759754a530410) )
-    ROM_LOAD( "nja3vera_fl2.2c", 0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
-    ROM_LOAD( "nja3vera_fl3.2b", 0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
-    ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
-    ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
-    ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
-    ROM_LOAD( "nja1ma5.4h",      0x5000000, 0x1000000, CRC(cf5df4d3) SHA1(220bc51979d2c5f753fc6b544bb38c0c306bbcb8) )
-    ROM_LOAD( "nja1ma6.4f",      0x6000000, 0x1000000, CRC(5daa6ed4) SHA1(139a68ea0cb5c071beeffb893533302fa80bc3f8) )
-    ROM_LOAD( "nja1ma7.4e",      0x7000000, 0x1000000, CRC(d866cfa8) SHA1(a57a761cef0eaaada088a6091ec2324c112253fc) )
-    ROM_LOAD( "nja1ma8.4d",      0x8000000, 0x1000000, CRC(1c959b74) SHA1(f1ff82c26df6250e1d8c23214f7827278cd572db) )
-    ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
-    ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "nja3vera_fl1.2d", 0x0800000, 0x0800000, CRC(442cb858) SHA1(8244871bdb0b49e14ea400d63fe759754a530410) )
+	ROM_LOAD( "nja3vera_fl2.2c", 0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
+	ROM_LOAD( "nja3vera_fl3.2b", 0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
+	ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
+	ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
+	ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
+	ROM_LOAD( "nja1ma5.4h",      0x5000000, 0x1000000, CRC(cf5df4d3) SHA1(220bc51979d2c5f753fc6b544bb38c0c306bbcb8) )
+	ROM_LOAD( "nja1ma6.4f",      0x6000000, 0x1000000, CRC(5daa6ed4) SHA1(139a68ea0cb5c071beeffb893533302fa80bc3f8) )
+	ROM_LOAD( "nja1ma7.4e",      0x7000000, 0x1000000, CRC(d866cfa8) SHA1(a57a761cef0eaaada088a6091ec2324c112253fc) )
+	ROM_LOAD( "nja1ma8.4d",      0x8000000, 0x1000000, CRC(1c959b74) SHA1(f1ff82c26df6250e1d8c23214f7827278cd572db) )
+	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
+	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
 
-    // this is a hack because we don't support the 8MB shift feature in naomibd yet (this also causes IC1 to show BAD
-    // in the ROM test - it is not bad and does not need a redump)
-    ROM_COPY( "rom_board", 0x800000, 0x000000, 0x800000 )
+	// this is a hack because we don't support the 8MB shift feature in naomibd yet (this also causes IC1 to show BAD
+	// in the ROM test - it is not bad and does not need a redump)
+	ROM_COPY( "rom_board", 0x800000, 0x000000, 0x800000 )
 
-    ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "nja3-key.bin", 0x000000, 0x000004, CRC(e6997eb0) SHA1(c866a5069e28939be5a8fc867bc14791decac3c8) )
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "nja3-key.bin", 0x000000, 0x000004, CRC(e6997eb0) SHA1(c866a5069e28939be5a8fc867bc14791decac3c8) )
 
-    ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
-    ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
+	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
+	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
 ROM_END
 
 ROM_START( ninjaslt4 )
-    NAOMI_BIOS
-    NAOMI_DEFAULT_EEPROM
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
 
-    ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "nja1_fl1.2d",     0x0800000, 0x0800000, CRC(a57c0576) SHA1(0c99a3e648798bf6a100512d682c08a3d4f05958) )
-    ROM_LOAD( "nja1_fl2.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
-    ROM_LOAD( "nja1_fl3.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
-    ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
-    ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
-    ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
-    ROM_LOAD( "nja1ma5.4h",      0x5000000, 0x1000000, CRC(cf5df4d3) SHA1(220bc51979d2c5f753fc6b544bb38c0c306bbcb8) )
-    ROM_LOAD( "nja1ma6.4f",      0x6000000, 0x1000000, CRC(5daa6ed4) SHA1(139a68ea0cb5c071beeffb893533302fa80bc3f8) )
-    ROM_LOAD( "nja1ma7.4e",      0x7000000, 0x1000000, CRC(d866cfa8) SHA1(a57a761cef0eaaada088a6091ec2324c112253fc) )
-    ROM_LOAD( "nja1ma8.4d",      0x8000000, 0x1000000, CRC(1c959b74) SHA1(f1ff82c26df6250e1d8c23214f7827278cd572db) )
-    ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
-    ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "nja1_fl1.2d",     0x0800000, 0x0800000, CRC(a57c0576) SHA1(0c99a3e648798bf6a100512d682c08a3d4f05958) )
+	ROM_LOAD( "nja1_fl2.2c",     0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
+	ROM_LOAD( "nja1_fl3.2b",     0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
+	ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
+	ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
+	ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
+	ROM_LOAD( "nja1ma5.4h",      0x5000000, 0x1000000, CRC(cf5df4d3) SHA1(220bc51979d2c5f753fc6b544bb38c0c306bbcb8) )
+	ROM_LOAD( "nja1ma6.4f",      0x6000000, 0x1000000, CRC(5daa6ed4) SHA1(139a68ea0cb5c071beeffb893533302fa80bc3f8) )
+	ROM_LOAD( "nja1ma7.4e",      0x7000000, 0x1000000, CRC(d866cfa8) SHA1(a57a761cef0eaaada088a6091ec2324c112253fc) )
+	ROM_LOAD( "nja1ma8.4d",      0x8000000, 0x1000000, CRC(1c959b74) SHA1(f1ff82c26df6250e1d8c23214f7827278cd572db) )
+	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
+	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
 
-    // this is a hack because we don't support the 8MB shift feature in naomibd yet (this also causes IC1 to show BAD
-    // in the ROM test - it is not bad and does not need a redump)
-    ROM_COPY( "rom_board", 0x800000, 0x000000, 0x800000 )
+	// this is a hack because we don't support the 8MB shift feature in naomibd yet (this also causes IC1 to show BAD
+	// in the ROM test - it is not bad and does not need a redump)
+	ROM_COPY( "rom_board", 0x800000, 0x000000, 0x800000 )
 
-    ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "nja3-key.bin", 0x000000, 0x000004, CRC(e6997eb0) SHA1(c866a5069e28939be5a8fc867bc14791decac3c8) )
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "nja3-key.bin", 0x000000, 0x000004, CRC(e6997eb0) SHA1(c866a5069e28939be5a8fc867bc14791decac3c8) )
 
-    ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
-    ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
+	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
+	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
 ROM_END
 
 // this one's weird: the rom test checksum for IC 1 matches a screenshot from h/w, but on h/w it says ---- instead of BAD.
 // this is likely due to the missing 8MB shift feature as with ninjaslt.
 ROM_START( mazan )
-    NAOMI_BIOS
-    NAOMI_DEFAULT_EEPROM
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
 
-    ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
-    ROM_LOAD( "maz1fl1.2d",  0x0000000, 0x0800000, CRC(620cdbb6) SHA1(95e9d0858e1d3060b3c1c41adfff0539185fb03d) )
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "maz1fl1.2d",  0x0000000, 0x0800000, CRC(620cdbb6) SHA1(95e9d0858e1d3060b3c1c41adfff0539185fb03d) )
 	ROM_RELOAD( 0x800000, 0x800000 )
-    ROM_LOAD( "maz1ma1.4m",  0x1000000, 0x1000000, CRC(68e12189) SHA1(5a434bd0305189620a62c785c5ac2812dae033d6) )
-    ROM_LOAD( "maz1ma2.4l",  0x2000000, 0x1000000, CRC(c7a05b44) SHA1(dfbeb3be5adfdf3d4f1d330f3654a5532eb28cc2) )
-    ROM_LOAD( "maz1ma3.4k",  0x3000000, 0x1000000, CRC(48e1a8a5) SHA1(8b0d83c02ab576d90c95aad297c7447326154c0e) )
-    ROM_LOAD( "maz1ma4.4j",  0x4000000, 0x1000000, CRC(0187cdab) SHA1(aaa9fd208103426eb0eee58ae0a64a191abcd126) )
-    ROM_LOAD( "maz1ma5.4h",  0x5000000, 0x1000000, CRC(c6885ee7) SHA1(14e7e017438adcbe0136d7d863af95fe65bd15d8) )
-    ROM_LOAD( "maz1ma6.4f",  0x6000000, 0x1000000, CRC(a6593c36) SHA1(627bf19d960037ea92b673b786a9da7208acd447) )
-    ROM_LOAD( "maz1ma7.4e",  0x7000000, 0x1000000, CRC(6103ad9c) SHA1(e4abbb5867cae6a9bf9067ab3a091ef7b18fa0cd) )
-    ROM_LOAD( "maz1ma8.4d",  0x8000000, 0x1000000, CRC(d46c9f40) SHA1(45eec7fa3d4261f12438e841254fa75d572331b3) )
+	ROM_LOAD( "maz1ma1.4m",  0x1000000, 0x1000000, CRC(68e12189) SHA1(5a434bd0305189620a62c785c5ac2812dae033d6) )
+	ROM_LOAD( "maz1ma2.4l",  0x2000000, 0x1000000, CRC(c7a05b44) SHA1(dfbeb3be5adfdf3d4f1d330f3654a5532eb28cc2) )
+	ROM_LOAD( "maz1ma3.4k",  0x3000000, 0x1000000, CRC(48e1a8a5) SHA1(8b0d83c02ab576d90c95aad297c7447326154c0e) )
+	ROM_LOAD( "maz1ma4.4j",  0x4000000, 0x1000000, CRC(0187cdab) SHA1(aaa9fd208103426eb0eee58ae0a64a191abcd126) )
+	ROM_LOAD( "maz1ma5.4h",  0x5000000, 0x1000000, CRC(c6885ee7) SHA1(14e7e017438adcbe0136d7d863af95fe65bd15d8) )
+	ROM_LOAD( "maz1ma6.4f",  0x6000000, 0x1000000, CRC(a6593c36) SHA1(627bf19d960037ea92b673b786a9da7208acd447) )
+	ROM_LOAD( "maz1ma7.4e",  0x7000000, 0x1000000, CRC(6103ad9c) SHA1(e4abbb5867cae6a9bf9067ab3a091ef7b18fa0cd) )
+	ROM_LOAD( "maz1ma8.4d",  0x8000000, 0x1000000, CRC(d46c9f40) SHA1(45eec7fa3d4261f12438e841254fa75d572331b3) )
 
-    ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "maz1-key.bin", 0x000000, 0x000004, CRC(79ebd41a) SHA1(3545dacdeac66b46e8706565f0eca784291040d1) )
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "maz1-key.bin", 0x000000, 0x000004, CRC(79ebd41a) SHA1(3545dacdeac66b46e8706565f0eca784291040d1) )
 ROM_END
 
 ROM_START( vtenis2c )
@@ -6074,8 +6074,8 @@ ROM_START( starseek )
 	DISK_IMAGE_READONLY( "gdl-0005", 0, SHA1(9778c00e063f29cb401d1877f277e97ec84c7dc4) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-    //PIC16C621A-20 (317-5077-JPN)
-    //(sticker: 253-5509-5077J)
+	//PIC16C621A-20 (317-5077-JPN)
+	//(sticker: 253-5509-5077J)
 	ROM_LOAD("317-5077-jpn.pic", 0x00, 0x4000, CRC(19f8d4d0) SHA1(d256f26f757d7019cab7950d81992902cdb65e07) )
 ROM_END
 
@@ -6402,8 +6402,8 @@ ROM_START( ss2005 )
 	ROM_REGION( 0x80, "mie_eeprom", 0 )
 	ROM_LOAD("ss2005-default-eeprom.bin", 0, 0x80, CRC(26bd9003) SHA1(f35551c96c49eef5473ff50a94b82ef5110b0f10))
 
-    DISK_REGION( "gdrom" )
-    DISK_IMAGE_READONLY( "gdl-0031", 0, BAD_DUMP SHA1(83697f45f0ffbb964f0504b19171c554499cd709) )
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0031", 0, BAD_DUMP SHA1(83697f45f0ffbb964f0504b19171c554499cd709) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-5108-JPN)
@@ -6991,7 +6991,7 @@ ROM_START( initdv3j )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0379-JPN 253-5508-0379J)
-    ROM_LOAD( "317-0379-jpn.pic", 0x000000, 0x004000, CRC(7f024ff6) SHA1(8a6a44f2c5db147355946f6c5e90e545926595da) )
+	ROM_LOAD( "317-0379-jpn.pic", 0x000000, 0x004000, CRC(7f024ff6) SHA1(8a6a44f2c5db147355946f6c5e90e545926595da) )
 ROM_END
 
 ROM_START( initdv3jb )
@@ -7003,7 +7003,7 @@ ROM_START( initdv3jb )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASE)
 	//PIC16C622A (317-0379-JPN 253-5508-0379J)
-    ROM_LOAD( "317-0379-jpn.pic", 0x000000, 0x004000, CRC(7f024ff6) SHA1(8a6a44f2c5db147355946f6c5e90e545926595da) )
+	ROM_LOAD( "317-0379-jpn.pic", 0x000000, 0x004000, CRC(7f024ff6) SHA1(8a6a44f2c5db147355946f6c5e90e545926595da) )
 ROM_END
 
 ROM_START( initdv3e )
@@ -7015,7 +7015,7 @@ ROM_START( initdv3e )
 
 	ROM_REGION( 0x4300, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0384-COM)
-    ROM_LOAD( "317-0384-com.pic", 0x000000, 0x004300, CRC(081ccd51) SHA1(598b3bd9e8b16f5954d15738c1ca55703609b690) )
+	ROM_LOAD( "317-0384-com.pic", 0x000000, 0x004300, CRC(081ccd51) SHA1(598b3bd9e8b16f5954d15738c1ca55703609b690) )
 ROM_END
 
 /*
@@ -7088,7 +7088,7 @@ ROM_START( ngdup23e )
 	DISK_IMAGE_READONLY( "gds-0023e", 0, SHA1(cc592e5b32273f93866c4447e1fb56751911992c))
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-    // PIC and sticker unknown
+	// PIC and sticker unknown
 	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP )
 ROM_END
 
@@ -7225,31 +7225,31 @@ ROM_START( soulsurf )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-    ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-    // Cart has a Sega factory EPROM sticker stating "EPR-23838C" and a Sega factory sticker stating "Rev. A".  Seriously.
-    ROM_LOAD( "epr-23838c.ic22", 0x000000, 0x400000, CRC(5e5fb00f) SHA1(c5e81ebead9072cc08f09d1715d609cb0f7631ba) )
-    ROM_RELOAD( 0x400000, 0x400000)
-    ROM_LOAD( "ssf01.ic1s",   0x0800000, 0x800000, CRC(4f12f789) SHA1(7b79b687fc61e2e981b9e5e8e0939c4ad24a98f0) )
-    ROM_LOAD( "ssf02.ic2s",   0x1000000, 0x800000, CRC(a255d41a) SHA1(3e932527eb68edf3e8538c1ad264a1c599f6a9d5) )
-    ROM_LOAD( "ssf03.ic3s",   0x1800000, 0x800000, CRC(0f8d6577) SHA1(afaf440e667bacc941c0a5418a0e3b0f2bb725b7) )
-    ROM_LOAD( "ssf04.ic4s",   0x2000000, 0x800000, CRC(bdf25bd0) SHA1(f79b1fdba9c48969c49617c43c1919637adb13ba) )
-    ROM_LOAD( "ssf05.ic5s",   0x2800000, 0x800000, CRC(a74b3bb4) SHA1(0ce7cef849061a9af7a61d69dc633f6971a3a63d) )
-    ROM_LOAD( "ssf06.ic6s",   0x3000000, 0x800000, CRC(3cd1f5d5) SHA1(77573c3a60af64e6e6a0eb85d5b8176ed98b0723) )
-    ROM_LOAD( "ssf07.ic7s",   0x3800000, 0x800000, CRC(00d240f5) SHA1(43010fc596f2cdffdff35a6122f2ab02a5251bc0) )
-    ROM_LOAD( "ssf08.ic8s",   0x4000000, 0x800000, CRC(d4907fa1) SHA1(79b1c771819f6e4baa048010bfb940a45370eba2) )
-    ROM_LOAD( "ssf09.ic9s",   0x4800000, 0x800000, CRC(6327d49e) SHA1(a10e3c27f70dbf18e63cf51962b6a79a52eba26c) )
-    ROM_LOAD( "ssf10.ic10s",  0x5000000, 0x800000, CRC(7975dc80) SHA1(81bda50968f0153a0c4432d8d81e817c1e82e5b2) )
-    ROM_LOAD( "ssf11.ic11s",  0x5800000, 0x800000, CRC(a242f682) SHA1(435ea5bb1b3667f9ef3d7de081b15f4e8e6a0d01) )
-    ROM_LOAD( "ssf12.ic12s",  0x6000000, 0x800000, CRC(45fa259e) SHA1(8d7e708e7a2cbc2d60b68715dd79bac28d894d4c) )
-    ROM_LOAD( "ssf13.ic13s",  0x6800000, 0x800000, CRC(e9578063) SHA1(618f66d01f6bdacbf2a3242774a316b130594e02) )
-    ROM_LOAD( "ssf14.ic14s",  0x7000000, 0x800000, CRC(2edc1311) SHA1(bceb54dd29012580e2e6f15f16c6b31195010153) )
-    ROM_LOAD( "ssf15.ic15s",  0x7800000, 0x800000, CRC(416db320) SHA1(34536716a35260d9457703704bb9174fb1616d60) )
-    ROM_LOAD( "ssf16.ic16s",  0x8000000, 0x800000, CRC(2530cc04) SHA1(6425c031e5a129a3c9451bc694b5da8553f154c2) )
-    ROM_LOAD( "ssf17.ic17s",  0x8800000, 0x800000, CRC(9e6afcc2) SHA1(4fb69d834ea12c82e897af47a22dcc47f3c83768) )
-    ROM_LOAD( "ssf18.ic18s",  0x9000000, 0x800000, CRC(854ed5e5) SHA1(e445599f6a9e9d05c279259307edc08bce5d6d1f) )
-    ROM_LOAD( "ssf19.ic19s",  0x9800000, 0x800000, CRC(4f8ec86a) SHA1(406ab9eeccd99fa5515d4a2c229c8db1a5cb8f83) )
-    ROM_LOAD( "ssf20.ic20s",  0xa000000, 0x800000, CRC(c90b960d) SHA1(66e9f09d1f7f6a991371574a2e095c0e22fb7031) )
-    ROM_LOAD( "ssf21.ic21s",  0xa800000, 0x800000, CRC(1477c064) SHA1(87fb8d8a91d6bed70b246a8df88fa77fbf3db443) )
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	// Cart has a Sega factory EPROM sticker stating "EPR-23838C" and a Sega factory sticker stating "Rev. A".  Seriously.
+	ROM_LOAD( "epr-23838c.ic22", 0x000000, 0x400000, CRC(5e5fb00f) SHA1(c5e81ebead9072cc08f09d1715d609cb0f7631ba) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD( "ssf01.ic1s",   0x0800000, 0x800000, CRC(4f12f789) SHA1(7b79b687fc61e2e981b9e5e8e0939c4ad24a98f0) )
+	ROM_LOAD( "ssf02.ic2s",   0x1000000, 0x800000, CRC(a255d41a) SHA1(3e932527eb68edf3e8538c1ad264a1c599f6a9d5) )
+	ROM_LOAD( "ssf03.ic3s",   0x1800000, 0x800000, CRC(0f8d6577) SHA1(afaf440e667bacc941c0a5418a0e3b0f2bb725b7) )
+	ROM_LOAD( "ssf04.ic4s",   0x2000000, 0x800000, CRC(bdf25bd0) SHA1(f79b1fdba9c48969c49617c43c1919637adb13ba) )
+	ROM_LOAD( "ssf05.ic5s",   0x2800000, 0x800000, CRC(a74b3bb4) SHA1(0ce7cef849061a9af7a61d69dc633f6971a3a63d) )
+	ROM_LOAD( "ssf06.ic6s",   0x3000000, 0x800000, CRC(3cd1f5d5) SHA1(77573c3a60af64e6e6a0eb85d5b8176ed98b0723) )
+	ROM_LOAD( "ssf07.ic7s",   0x3800000, 0x800000, CRC(00d240f5) SHA1(43010fc596f2cdffdff35a6122f2ab02a5251bc0) )
+	ROM_LOAD( "ssf08.ic8s",   0x4000000, 0x800000, CRC(d4907fa1) SHA1(79b1c771819f6e4baa048010bfb940a45370eba2) )
+	ROM_LOAD( "ssf09.ic9s",   0x4800000, 0x800000, CRC(6327d49e) SHA1(a10e3c27f70dbf18e63cf51962b6a79a52eba26c) )
+	ROM_LOAD( "ssf10.ic10s",  0x5000000, 0x800000, CRC(7975dc80) SHA1(81bda50968f0153a0c4432d8d81e817c1e82e5b2) )
+	ROM_LOAD( "ssf11.ic11s",  0x5800000, 0x800000, CRC(a242f682) SHA1(435ea5bb1b3667f9ef3d7de081b15f4e8e6a0d01) )
+	ROM_LOAD( "ssf12.ic12s",  0x6000000, 0x800000, CRC(45fa259e) SHA1(8d7e708e7a2cbc2d60b68715dd79bac28d894d4c) )
+	ROM_LOAD( "ssf13.ic13s",  0x6800000, 0x800000, CRC(e9578063) SHA1(618f66d01f6bdacbf2a3242774a316b130594e02) )
+	ROM_LOAD( "ssf14.ic14s",  0x7000000, 0x800000, CRC(2edc1311) SHA1(bceb54dd29012580e2e6f15f16c6b31195010153) )
+	ROM_LOAD( "ssf15.ic15s",  0x7800000, 0x800000, CRC(416db320) SHA1(34536716a35260d9457703704bb9174fb1616d60) )
+	ROM_LOAD( "ssf16.ic16s",  0x8000000, 0x800000, CRC(2530cc04) SHA1(6425c031e5a129a3c9451bc694b5da8553f154c2) )
+	ROM_LOAD( "ssf17.ic17s",  0x8800000, 0x800000, CRC(9e6afcc2) SHA1(4fb69d834ea12c82e897af47a22dcc47f3c83768) )
+	ROM_LOAD( "ssf18.ic18s",  0x9000000, 0x800000, CRC(854ed5e5) SHA1(e445599f6a9e9d05c279259307edc08bce5d6d1f) )
+	ROM_LOAD( "ssf19.ic19s",  0x9800000, 0x800000, CRC(4f8ec86a) SHA1(406ab9eeccd99fa5515d4a2c229c8db1a5cb8f83) )
+	ROM_LOAD( "ssf20.ic20s",  0xa000000, 0x800000, CRC(c90b960d) SHA1(66e9f09d1f7f6a991371574a2e095c0e22fb7031) )
+	ROM_LOAD( "ssf21.ic21s",  0xa800000, 0x800000, CRC(1477c064) SHA1(87fb8d8a91d6bed70b246a8df88fa77fbf3db443) )
 ROM_END
 
 /*
@@ -7509,7 +7509,7 @@ ROM_START( inidv3cy )
 	DISK_IMAGE_READONLY( "gds-0039b", 0, SHA1(49521709c44a4eee1b384455940b3fec6e03e8fe) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-    // PIC/sticker unknown
+	// PIC/sticker unknown
 	ROM_LOAD("317-unk-com.pic", 0x00, 0x4000, NO_DUMP )
 ROM_END
 
@@ -7608,7 +7608,7 @@ ROM_START( xtrmhnt2 )
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "315-6248.bin", 0, 4, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 
-	ROM_REGION( 0x1400000, "network", 0)	// network board
+	ROM_REGION( 0x1400000, "network", 0)    // network board
 	ROM_LOAD( "fpr-24330a.ic2", 0x000000, 0x400000, CRC(8d89877e) SHA1(6caafc49114eb0358e217bc2d1a3ab58a93c8d19) )
 	ROM_LOAD( "flash128.ic4s", 0x400000, 0x1000000, CRC(866ed675) SHA1(2c4c06935b7ab1876e640cede51713b841833567) )
 ROM_END
@@ -7752,7 +7752,7 @@ ROM_START( ggisuka )
 
 	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASE)
 	ROM_LOAD( "ax1201p01.ic18", 0x0000000, 0x0800000, CRC(0a78d52c) SHA1(e9006dc43cd11d5ba49a092a1dff31dc10700c28) )
-	ROM_LOAD( "ax1201m01.ic10", 0x0800000, 0x1000000, CRC(df96ce30) SHA1(25a9f743b1c2b11896d0c7a2dc1c198fc977aaca) )	// second half is blank
+	ROM_LOAD( "ax1201m01.ic10", 0x0800000, 0x1000000, CRC(df96ce30) SHA1(25a9f743b1c2b11896d0c7a2dc1c198fc977aaca) )    // second half is blank
 	ROM_LOAD( "ax1202m01.ic11", 0x1000000, 0x1000000, CRC(dfc6fd67) SHA1(f9d35b18a03d22f70feda42d314b0f9dd54eea55) )
 	ROM_LOAD( "ax1203m01.ic12", 0x2000000, 0x1000000, CRC(bf623df9) SHA1(8b9a8e8100ff6d2ce9a982ab8eb1d542f1c7af03) )
 	ROM_LOAD( "ax1204m01.ic13", 0x3000000, 0x1000000, CRC(c80c3930) SHA1(5c39fde36e2ebbfe72967d7d0202eb454a8d3bbe) )
@@ -7933,34 +7933,34 @@ ROM_START( claychal )
 	AW_BIOS
 
 	ROM_REGION( 0x8000100, "rom_board", ROMREGION_ERASE)
-    ROM_LOAD( "u3.bin",       0x0000000, 0x1000100, CRC(5bb65194) SHA1(5fa8c38e6aadf5d999e260da24b001c0c7805d48) )
-    ROM_LOAD( "u1.bin",       0x1000000, 0x1000100, CRC(526fc1af) SHA1(dd8a37fa73a9ef193b6f4fb962345bdfc4854b5d) )
-    ROM_LOAD( "u4.bin",       0x2000000, 0x1000100, CRC(55f4e762) SHA1(a11f7d69458e647dd2b8d86c98a54f309b1f1bbc) )
-    ROM_LOAD( "u2.bin",       0x3000000, 0x1000100, CRC(c40dae68) SHA1(29ec47c76373eeaa686684f10907d551de7d9c59) )
-    ROM_LOAD( "u15.bin",      0x4000000, 0x1000100, CRC(b82dcb0a) SHA1(36dc89a388ac0c7e0a0e72428c8149cbda12805a) )
-    ROM_LOAD( "u17.bin",      0x5000000, 0x1000100, CRC(2f973eb4) SHA1(45409b5517cda119315f198892224889ac3a0f53) )
-    ROM_LOAD( "u14.bin",      0x6000000, 0x1000100, CRC(2e7d966f) SHA1(3304fd0c5140a13f6fe2ea9aaa74d7885e1505e1) )
-    ROM_LOAD( "u16.bin",      0x7000000, 0x1000100, CRC(14f8ca87) SHA1(778c048da9434ffda600e35ad5aca29e02cc98c0) )
+	ROM_LOAD( "u3.bin",       0x0000000, 0x1000100, CRC(5bb65194) SHA1(5fa8c38e6aadf5d999e260da24b001c0c7805d48) )
+	ROM_LOAD( "u1.bin",       0x1000000, 0x1000100, CRC(526fc1af) SHA1(dd8a37fa73a9ef193b6f4fb962345bdfc4854b5d) )
+	ROM_LOAD( "u4.bin",       0x2000000, 0x1000100, CRC(55f4e762) SHA1(a11f7d69458e647dd2b8d86c98a54f309b1f1bbc) )
+	ROM_LOAD( "u2.bin",       0x3000000, 0x1000100, CRC(c40dae68) SHA1(29ec47c76373eeaa686684f10907d551de7d9c59) )
+	ROM_LOAD( "u15.bin",      0x4000000, 0x1000100, CRC(b82dcb0a) SHA1(36dc89a388ac0c7e0a0e72428c8149cbda12805a) )
+	ROM_LOAD( "u17.bin",      0x5000000, 0x1000100, CRC(2f973eb4) SHA1(45409b5517cda119315f198892224889ac3a0f53) )
+	ROM_LOAD( "u14.bin",      0x6000000, 0x1000100, CRC(2e7d966f) SHA1(3304fd0c5140a13f6fe2ea9aaa74d7885e1505e1) )
+	ROM_LOAD( "u16.bin",      0x7000000, 0x1000100, CRC(14f8ca87) SHA1(778c048da9434ffda600e35ad5aca29e02cc98c0) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-    ROM_LOAD( "cckey.bin",    0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_LOAD( "cckey.bin",    0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 ROM_END
 
 ROM_START( basschal )
 	AW_BIOS
 
 	ROM_REGION( 0x8000100, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "u3.bin",  0x0000000, 0x1000100, CRC(f690d722) SHA1(03c2b53dda8cc11ba94468e7bd2fcb4e20a95c2d) ) 
-	ROM_LOAD( "u1.bin",  0x1000000, 0x1000100, CRC(d744d326) SHA1(fa3f25d683411c5ba63ed188cfcdba05d9cd9910) ) 
-	ROM_LOAD( "u4.bin",  0x2000000, 0x1000100, CRC(ac58d81d) SHA1(97a61895f543ee00e1f377af0793ad8f83ac34c4) ) 
-	ROM_LOAD( "u2.bin",  0x3000000, 0x1000100, CRC(15351d45) SHA1(6e3cbf356f7a4f4adb32f1b216fbd4fe51ac915f) ) 
-	ROM_LOAD( "u15.bin", 0x4000000, 0x1000100, CRC(1da03c68) SHA1(060b5bad3f79f934c8359a7ae9f9d1bd43c08087) ) 
-	ROM_LOAD( "u17.bin", 0x5000000, 0x1000100, CRC(77cc6fe6) SHA1(3e0567f80738f83113bd6ac01f2b5fc5cea9fb3d) ) 
-	ROM_LOAD( "u14.bin", 0x6000000, 0x1000100, CRC(9f33f186) SHA1(d656f3c11dba50620158394866054e08cdc7f4f0) ) 
-	ROM_LOAD( "u16.bin", 0x7000000, 0x1000100, CRC(5f0a3bd1) SHA1(39c66fce9ef0660491372e1aa4faff5b21524177) ) 
+	ROM_LOAD( "u3.bin",  0x0000000, 0x1000100, CRC(f690d722) SHA1(03c2b53dda8cc11ba94468e7bd2fcb4e20a95c2d) )
+	ROM_LOAD( "u1.bin",  0x1000000, 0x1000100, CRC(d744d326) SHA1(fa3f25d683411c5ba63ed188cfcdba05d9cd9910) )
+	ROM_LOAD( "u4.bin",  0x2000000, 0x1000100, CRC(ac58d81d) SHA1(97a61895f543ee00e1f377af0793ad8f83ac34c4) )
+	ROM_LOAD( "u2.bin",  0x3000000, 0x1000100, CRC(15351d45) SHA1(6e3cbf356f7a4f4adb32f1b216fbd4fe51ac915f) )
+	ROM_LOAD( "u15.bin", 0x4000000, 0x1000100, CRC(1da03c68) SHA1(060b5bad3f79f934c8359a7ae9f9d1bd43c08087) )
+	ROM_LOAD( "u17.bin", 0x5000000, 0x1000100, CRC(77cc6fe6) SHA1(3e0567f80738f83113bd6ac01f2b5fc5cea9fb3d) )
+	ROM_LOAD( "u14.bin", 0x6000000, 0x1000100, CRC(9f33f186) SHA1(d656f3c11dba50620158394866054e08cdc7f4f0) )
+	ROM_LOAD( "u16.bin", 0x7000000, 0x1000100, CRC(5f0a3bd1) SHA1(39c66fce9ef0660491372e1aa4faff5b21524177) )
 
-	ROM_REGION( 4, "rom_key", 0 )	// same as claychal.  lazy!
-    ROM_LOAD( "cckey.bin",    0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_REGION( 4, "rom_key", 0 )   // same as claychal.  lazy!
+	ROM_LOAD( "cckey.bin",    0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 ROM_END
 
 

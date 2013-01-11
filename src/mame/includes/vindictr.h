@@ -12,9 +12,9 @@ public:
 	vindictr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag) { }
 
-	UINT8			m_playfield_tile_bank;
-	UINT16			m_playfield_xscroll;
-	UINT16			m_playfield_yscroll;
+	UINT8           m_playfield_tile_bank;
+	UINT16          m_playfield_xscroll;
+	UINT16          m_playfield_yscroll;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ16_MEMBER(port1_r);

@@ -50,7 +50,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE16_MEMBER(powerins_state::powerins_flipscreen_w)
 {
-	if (ACCESSING_BITS_0_7)	flip_screen_set(data & 1 );
+	if (ACCESSING_BITS_0_7) flip_screen_set(data & 1 );
 }
 
 WRITE16_MEMBER(powerins_state::powerins_tilebank_w)
@@ -59,7 +59,7 @@ WRITE16_MEMBER(powerins_state::powerins_tilebank_w)
 	{
 		if (data != m_tile_bank)
 		{
-			m_tile_bank = data;		// Tiles Bank (VRAM 0)
+			m_tile_bank = data;     // Tiles Bank (VRAM 0)
 			m_tilemap_0->mark_all_dirty();
 		}
 	}
@@ -110,12 +110,12 @@ Offset:
 ***************************************************************************/
 
 /* Layers are made of 256x256 pixel pages */
-#define TILES_PER_PAGE_X	(0x10)
-#define TILES_PER_PAGE_Y	(0x10)
-#define TILES_PER_PAGE		(TILES_PER_PAGE_X * TILES_PER_PAGE_Y)
+#define TILES_PER_PAGE_X    (0x10)
+#define TILES_PER_PAGE_Y    (0x10)
+#define TILES_PER_PAGE      (TILES_PER_PAGE_X * TILES_PER_PAGE_Y)
 
-#define DIM_NX_0			(0x100)
-#define DIM_NY_0			(0x20)
+#define DIM_NX_0            (0x100)
+#define DIM_NY_0            (0x20)
 
 
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
@@ -136,7 +136,7 @@ WRITE16_MEMBER(powerins_state::powerins_vram_0_w)
 
 TILEMAP_MAPPER_MEMBER(powerins_state::powerins_get_memory_offset_0)
 {
-	return	(col * TILES_PER_PAGE_Y) +
+	return  (col * TILES_PER_PAGE_Y) +
 
 			(row % TILES_PER_PAGE_Y) +
 			(row / TILES_PER_PAGE_Y) * (TILES_PER_PAGE * 16);
@@ -155,8 +155,8 @@ Offset:
 
 ***************************************************************************/
 
-#define DIM_NX_1	(0x40)
-#define DIM_NY_1	(0x20)
+#define DIM_NX_1    (0x40)
+#define DIM_NY_1    (0x20)
 
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 {
@@ -245,7 +245,7 @@ Offset:     Format:                 Value:
 
 ------------------------------------------------------------------------ */
 
-#define SIGN_EXTEND_POS(_var_)	{_var_ &= 0x3ff; if (_var_ > 0x1ff) _var_ -= 0x400;}
+#define SIGN_EXTEND_POS(_var_)  {_var_ &= 0x3ff; if (_var_ > 0x1ff) _var_ -= 0x400;}
 
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -261,18 +261,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	{
 		int x,y,inc;
 
-		int	attr	=	source[ 0x0/2 ];
-		int	size	=	source[ 0x2/2 ];
-		int	code	=	source[ 0x6/2 ];
-		int	sx		=	source[ 0x8/2 ];
-		int	sy		=	source[ 0xc/2 ];
-		int	color	=	source[ 0xe/2 ];
+		int attr    =   source[ 0x0/2 ];
+		int size    =   source[ 0x2/2 ];
+		int code    =   source[ 0x6/2 ];
+		int sx      =   source[ 0x8/2 ];
+		int sy      =   source[ 0xc/2 ];
+		int color   =   source[ 0xe/2 ];
 
-		int	flipx	=	size & 0x1000;
-		int	flipy	=	0;	// ??
+		int flipx   =   size & 0x1000;
+		int flipy   =   0;  // ??
 
-		int	dimx	=	((size >> 0) & 0xf ) + 1;
-		int	dimy	=	((size >> 4) & 0xf ) + 1;
+		int dimx    =   ((size >> 0) & 0xf ) + 1;
+		int dimy    =   ((size >> 4) & 0xf ) + 1;
 
 		if (!(attr&1)) continue;
 
@@ -283,13 +283,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (state->flip_screen())
 		{
-			sx = screen_w - sx - dimx*16 - 32;	flipx = !flipx;
-			sy = screen_h - sy - dimy*16;		flipy = !flipy;
-			code += dimx*dimy-1;			inc = -1;
+			sx = screen_w - sx - dimx*16 - 32;  flipx = !flipx;
+			sy = screen_h - sy - dimy*16;       flipy = !flipy;
+			code += dimx*dimy-1;            inc = -1;
 		}
 		else
 		{
-			sx += 32;						inc = +1;
+			sx += 32;                       inc = +1;
 		}
 
 		code = (code & 0x7fff) + ( (size & 0x0100) << 7 );
@@ -335,7 +335,7 @@ UINT32 powerins_state::screen_update_powerins(screen_device &screen, bitmap_ind1
 	m_tilemap_0->set_scrollx(0, scrollx - 0x20);
 	m_tilemap_0->set_scrolly(0, scrolly );
 
-	m_tilemap_1->set_scrollx(0, -0x20);	// fixed offset
+	m_tilemap_1->set_scrollx(0, -0x20); // fixed offset
 	m_tilemap_1->set_scrolly(0,  0x00);
 
 #ifdef MAME_DEBUG
@@ -343,17 +343,17 @@ if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
 //  if (machine().input().code_pressed(KEYCODE_E))    msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
-	if (layers_ctrl&1)		m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-	else					bitmap.fill(0, cliprect);
-	if (layers_ctrl&8)		draw_sprites(machine(),bitmap,cliprect);
-	if (layers_ctrl&2)		m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl&1)      m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+	else                    bitmap.fill(0, cliprect);
+	if (layers_ctrl&8)      draw_sprites(machine(),bitmap,cliprect);
+	if (layers_ctrl&2)      m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

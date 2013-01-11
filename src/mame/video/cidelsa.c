@@ -178,18 +178,18 @@ WRITE8_MEMBER( draco_state::psg_pb_w )
 {
 	/*
 
-      bit   description
+	  bit   description
 
-        0   RELE0
-        1   RELE1
-        2   sound output -> * -> 22K capacitor -> GND
-        3   sound output -> * -> 220K capacitor -> GND
-        4   5V -> 1K resistor -> * -> 10uF capacitor -> GND (volume pot voltage adjustment)
-        5   not connected
-        6   not connected
-        7   not connected
+	    0   RELE0
+	    1   RELE1
+	    2   sound output -> * -> 22K capacitor -> GND
+	    3   sound output -> * -> 220K capacitor -> GND
+	    4   5V -> 1K resistor -> * -> 10uF capacitor -> GND (volume pot voltage adjustment)
+	    5   not connected
+	    6   not connected
+	    7   not connected
 
-    */
+	*/
 }
 
 static const ay8910_interface psg_intf =

@@ -22,12 +22,12 @@
  *************************************/
 
 static UINT16   es5510_dsp_ram[0x200];
-static UINT32	es5510_gpr[0xc0];
+static UINT32   es5510_gpr[0xc0];
 static UINT32   es5510_dram[1<<24];
 static UINT32   es5510_dol_latch;
 static UINT32   es5510_dil_latch;
 static UINT32   es5510_dadr_latch;
-static UINT32	es5510_gpr_latch;
+static UINT32   es5510_gpr_latch;
 static UINT8    es5510_ram_sel;
 static UINT32   *snd_shared_ram;
 
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( en_sound_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK("bank3")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("share1")	// mirror
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("share1")  // mirror
 ADDRESS_MAP_END
 
 
@@ -297,13 +297,13 @@ static void taito_en_duart_irq_handler(device_t *device, int state, UINT8 vector
 static const duart68681_config taito_en_duart68681_config =
 {
 	taito_en_duart_irq_handler,
-	NULL,				/* tx callback */
-	NULL,				/* input port read */
-	NULL,				/* output port write */
-	XTAL_16MHz/2/8,		/* IP2/RxCB clock */
-	XTAL_16MHz/2/16,	/* IP3/TxCA clock */
-	XTAL_16MHz/2/16,	/* IP4/RxCA clock */
-	XTAL_16MHz/2/8,		/* IP5/TxCB clock */
+	NULL,               /* tx callback */
+	NULL,               /* input port read */
+	NULL,               /* output port write */
+	XTAL_16MHz/2/8,     /* IP2/RxCB clock */
+	XTAL_16MHz/2/16,    /* IP3/TxCA clock */
+	XTAL_16MHz/2/16,    /* IP4/RxCA clock */
+	XTAL_16MHz/2/8,     /* IP5/TxCB clock */
 };
 
 static const mb87078_interface taito_en_mb87078_intf =
@@ -313,9 +313,9 @@ static const mb87078_interface taito_en_mb87078_intf =
 
 static const es5505_interface es5505_taito_en_config =
 {
-	"ensoniq.0",	/* Bank 0: Unused by F3 games? */
-	"ensoniq.0",	/* Bank 1: All games seem to use this */
-	NULL			/* IRQ */
+	"ensoniq.0",    /* Bank 0: Unused by F3 games? */
+	"ensoniq.0",    /* Bank 1: All games seem to use this */
+	NULL            /* IRQ */
 };
 
 

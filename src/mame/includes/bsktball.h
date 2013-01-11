@@ -7,10 +7,10 @@
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */
-#define BSKTBALL_NOTE_DATA		NODE_01
-#define BSKTBALL_CROWD_DATA		NODE_02
-#define BSKTBALL_NOISE_EN		NODE_03
-#define BSKTBALL_BOUNCE_EN		NODE_04
+#define BSKTBALL_NOTE_DATA      NODE_01
+#define BSKTBALL_CROWD_DATA     NODE_02
+#define BSKTBALL_NOISE_EN       NODE_03
+#define BSKTBALL_BOUNCE_EN      NODE_04
 
 
 class bsktball_state : public driver_device

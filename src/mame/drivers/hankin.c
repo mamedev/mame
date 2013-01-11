@@ -132,8 +132,8 @@ ROM_START(empsback)
 ROM_END
 
 
-GAME(1978,  fjholden,  0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "FJ Holden",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  howzat,    0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "Howzat!",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  orbit1,    0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "Orbit 1",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  shark,     0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "Shark",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  fjholden,  0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "FJ Holden",            GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  howzat,    0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "Howzat!",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  orbit1,    0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "Orbit 1",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  shark,     0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "Shark",                GAME_IS_SKELETON_MECHANICAL)
 GAME(1981,  empsback,  0,  hankin,  hankin, hankin_state,  hankin,  ROT0,  "Hankin",    "The Empire Strike Back",GAME_IS_SKELETON_MECHANICAL)

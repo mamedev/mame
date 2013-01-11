@@ -96,8 +96,8 @@
 #include "includes/redalert.h"
 
 
-#define MAIN_PCB_CLOCK		(XTAL_12_5MHz)
-#define MAIN_CPU_CLOCK		(MAIN_PCB_CLOCK / 16)
+#define MAIN_PCB_CLOCK      (XTAL_12_5MHz)
+#define MAIN_CPU_CLOCK      (MAIN_PCB_CLOCK / 16)
 
 
 
@@ -207,10 +207,10 @@ static ADDRESS_MAP_START( demoneye_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE(demoneye_audio_command_w)
 	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("video_control")
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_SHARE("bitmap_color")
-	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
-	AM_RANGE(0xc061, 0xc061) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
-	AM_RANGE(0xc062, 0xc062) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)	/* probably not correct */
+	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f80) AM_NOP   /* unknown */
+	AM_RANGE(0xc061, 0xc061) AM_MIRROR(0x0f80) AM_NOP   /* unknown */
+	AM_RANGE(0xc062, 0xc062) AM_MIRROR(0x0f80) AM_NOP   /* unknown */
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w) /* probably not correct */
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -249,21 +249,21 @@ static INPUT_PORTS_START( redalert )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 35 - N.C. */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 36 - N.C. */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )    /* pin 35 - N.C. */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    /* pin 36 - N.C. */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Meter */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Meter */
 
 	PORT_START("C020")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Meter */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Meter */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 33 - N.C. */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	/* pin 34 - N.C. */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )    /* pin 33 - N.C. */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    /* pin 34 - N.C. */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Meter */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Meter */
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
@@ -463,7 +463,7 @@ ROM_START( panther )
 	ROM_LOAD( "q7a.bin",       0x7000, 0x0800, CRC(febd1674) SHA1(e122d0855ab6a352d741f9013c20ec31e0068248) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	ROM_LOAD( "6349-1j-8026.1a",	  0x0000, 0x0200, CRC(ea9c2ada) SHA1(cb720c0d77b24f995e0750b3fa42a68962c7a977) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
+	ROM_LOAD( "6349-1j-8026.1a",      0x0000, 0x0200, CRC(ea9c2ada) SHA1(cb720c0d77b24f995e0750b3fa42a68962c7a977) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
 ROM_END
 
 
@@ -481,7 +481,7 @@ ROM_START( ww3 )
 	ROM_LOAD( "w3s1",         0x7000, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	ROM_LOAD( "m-27sc.1a",	  0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
+	ROM_LOAD( "m-27sc.1a",    0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
 ROM_END
 
 ROM_START( redalert )
@@ -504,7 +504,7 @@ ROM_START( redalert )
 	ROM_LOAD( "ras4",         0x3000, 0x1000, CRC(130e66db) SHA1(385b8f889fee08fddbb2f75a691af569109eacd1) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	ROM_LOAD( "m-257sc.1a",	  0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
+	ROM_LOAD( "m-257sc.1a",   0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* 512*8 74S472 or compatible BPROM like a 82s147 */
 ROM_END
 
 

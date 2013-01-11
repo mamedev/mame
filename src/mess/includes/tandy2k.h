@@ -19,46 +19,46 @@
 #include "video/crt9021.h"
 #include "video/crt9212.h"
 
-#define SCREEN_TAG		"screen"
-#define I80186_TAG		"u76"
-#define I8255A_TAG		"u75"
-#define I8251A_TAG		"u41"
-#define I8253_TAG		"u40"
-#define I8259A_0_TAG	"u42"
-#define I8259A_1_TAG	"u43"
-#define I8272A_TAG		"u121"
-#define CRT9007_TAG		"u16"
-#define CRT9212_0_TAG	"u55"
-#define CRT9212_1_TAG	"u15"
-#define CRT9021B_TAG	"u14"
-#define WD1010_TAG		"u18"
-#define WD1100_11_TAG	"u12"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define I80186_TAG      "u76"
+#define I8255A_TAG      "u75"
+#define I8251A_TAG      "u41"
+#define I8253_TAG       "u40"
+#define I8259A_0_TAG    "u42"
+#define I8259A_1_TAG    "u43"
+#define I8272A_TAG      "u121"
+#define CRT9007_TAG     "u16"
+#define CRT9212_0_TAG   "u55"
+#define CRT9212_1_TAG   "u15"
+#define CRT9021B_TAG    "u14"
+#define WD1010_TAG      "u18"
+#define WD1100_11_TAG   "u12"
+#define CENTRONICS_TAG  "centronics"
 
 class tandy2k_state : public driver_device
 {
 public:
 	tandy2k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I80186_TAG),
-		  m_uart(*this, I8251A_TAG),
-		  m_pit(*this, I8253_TAG),
-		  m_fdc(*this, I8272A_TAG),
-		  m_pic0(*this, I8259A_0_TAG),
-		  m_pic1(*this, I8259A_1_TAG),
-		  m_vpac(*this, CRT9007_TAG),
-		  m_drb0(*this, CRT9212_0_TAG),
-		  m_drb1(*this, CRT9212_1_TAG),
-		  m_vac(*this, CRT9021B_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, I8272A_TAG ":0:525qd"),
-		  m_floppy1(*this, I8272A_TAG ":1:525qd"),
-		  m_kb(*this, TANDY2K_KEYBOARD_TAG),
-		  m_kbdclk(0),
-		  m_hires_ram(*this, "hires_ram"),
-		  m_char_ram(*this, "char_ram")
+			m_maincpu(*this, I80186_TAG),
+			m_uart(*this, I8251A_TAG),
+			m_pit(*this, I8253_TAG),
+			m_fdc(*this, I8272A_TAG),
+			m_pic0(*this, I8259A_0_TAG),
+			m_pic1(*this, I8259A_1_TAG),
+			m_vpac(*this, CRT9007_TAG),
+			m_drb0(*this, CRT9212_0_TAG),
+			m_drb1(*this, CRT9212_1_TAG),
+			m_vac(*this, CRT9021B_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, I8272A_TAG ":0:525qd"),
+			m_floppy1(*this, I8272A_TAG ":1:525qd"),
+			m_kb(*this, TANDY2K_KEYBOARD_TAG),
+			m_kbdclk(0),
+			m_hires_ram(*this, "hires_ram"),
+			m_char_ram(*this, "char_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

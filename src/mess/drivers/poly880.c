@@ -140,9 +140,9 @@ WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z1_w),	/* ZC/TO1 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z0_w),  /* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z1_w),  /* ZC/TO1 callback */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF,z80ctc_device, trg3)    /* ZC/TO2 callback */
 };
 
@@ -152,18 +152,18 @@ WRITE8_MEMBER( poly880_state::pio1_pa_w )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        PA0     SD0     segment E
-        PA1     SD1     segment D
-        PA2     SD2     segment C
-        PA3     SD3     segment P
-        PA4     SD4     segment G
-        PA5     SD5     segment A
-        PA6     SD6     segment F
-        PA7     SD7     segment B
+	    PA0     SD0     segment E
+	    PA1     SD1     segment D
+	    PA2     SD2     segment C
+	    PA3     SD3     segment P
+	    PA4     SD4     segment G
+	    PA5     SD5     segment A
+	    PA6     SD6     segment F
+	    PA7     SD7     segment B
 
-    */
+	*/
 
 	m_segment = BITSWAP8(data, 3, 4, 6, 0, 1, 2, 7, 5);
 
@@ -174,18 +174,18 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        PB0     TTY
-        PB1     MIN     tape input
-        PB2     MOUT    tape output
-        PB3
-        PB4     KI1     key row 1 input
-        PB5     KI2     key row 2 input
-        PB6     SCON
-        PB7     KI3     key row 3 input
+	    PB0     TTY
+	    PB1     MIN     tape input
+	    PB2     MOUT    tape output
+	    PB3
+	    PB4     KI1     key row 1 input
+	    PB5     KI2     key row 2 input
+	    PB6     SCON
+	    PB7     KI3     key row 3 input
 
-    */
+	*/
 
 	UINT8 data = 0xf0 | (((m_cassette)->input() < +0.0) << 1);
 	int i;
@@ -207,18 +207,18 @@ WRITE8_MEMBER( poly880_state::pio1_pb_w )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        PB0     TTY     teletype serial output
-        PB1     MIN
-        PB2     MOUT    tape output
-        PB3
-        PB4     KI1     key row 1 input
-        PB5     KI2     key row 2 input
-        PB6     SCON
-        PB7     KI3     key row 3 input
+	    PB0     TTY     teletype serial output
+	    PB1     MIN
+	    PB2     MOUT    tape output
+	    PB3
+	    PB4     KI1     key row 1 input
+	    PB5     KI2     key row 2 input
+	    PB6     SCON
+	    PB7     KI3     key row 3 input
 
-    */
+	*/
 
 	/* tape output */
 	m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
@@ -226,24 +226,24 @@ WRITE8_MEMBER( poly880_state::pio1_pb_w )
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pa_w),	/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pb_r),	/* port B read callback */
-	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pb_w),	/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pa_w),  /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pb_r),  /* port B read callback */
+	DEVCB_DRIVER_MEMBER(poly880_state, pio1_pb_w),  /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( pio2_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 /* Z80 Daisy Chain */

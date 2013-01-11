@@ -34,17 +34,17 @@ unsigned Xz_WriteVarInt(Byte *buf, UInt64 v);
 
 typedef struct
 {
-  UInt64 id;
-  UInt32 propsSize;
-  Byte props[XZ_FILTER_PROPS_SIZE_MAX];
+	UInt64 id;
+	UInt32 propsSize;
+	Byte props[XZ_FILTER_PROPS_SIZE_MAX];
 } CXzFilter;
 
 typedef struct
 {
-  UInt64 packSize;
-  UInt64 unpackSize;
-  Byte flags;
-  CXzFilter filters[XZ_NUM_FILTERS_MAX];
+	UInt64 packSize;
+	UInt64 unpackSize;
+	Byte flags;
+	CXzFilter filters[XZ_NUM_FILTERS_MAX];
 } CXzBlock;
 
 #define XzBlock_GetNumFilters(p) (((p)->flags & XZ_BF_NUM_FILTERS_MASK) + 1)
@@ -76,10 +76,10 @@ extern Byte XZ_FOOTER_SIG[XZ_FOOTER_SIG_SIZE];
 
 typedef struct
 {
-  int mode;
-  UInt32 crc;
-  UInt64 crc64;
-  CSha256 sha;
+	int mode;
+	UInt32 crc;
+	UInt64 crc64;
+	CSha256 sha;
 } CXzCheck;
 
 void XzCheck_Init(CXzCheck *p, int mode);
@@ -98,17 +98,17 @@ SRes Xz_ReadHeader(CXzStreamFlags *p, ISeqInStream *inStream);
 
 typedef struct
 {
-  UInt64 unpackSize;
-  UInt64 totalSize;
+	UInt64 unpackSize;
+	UInt64 totalSize;
 } CXzBlockSizes;
 
 typedef struct
 {
-  CXzStreamFlags flags;
-  size_t numBlocks;
-  size_t numBlocksAllocated;
-  CXzBlockSizes *blocks;
-  UInt64 startOffset;
+	CXzStreamFlags flags;
+	size_t numBlocks;
+	size_t numBlocksAllocated;
+	CXzBlockSizes *blocks;
+	UInt64 startOffset;
 } CXzStream;
 
 void Xz_Construct(CXzStream *p);
@@ -121,9 +121,9 @@ UInt64 Xz_GetPackSize(const CXzStream *p);
 
 typedef struct
 {
-  size_t num;
-  size_t numAllocated;
-  CXzStream *streams;
+	size_t num;
+	size_t numAllocated;
+	CXzStream *streams;
 } CXzs;
 
 void Xzs_Construct(CXzs *p);
@@ -135,40 +135,40 @@ UInt64 Xzs_GetUnpackSize(const CXzs *p);
 
 typedef enum
 {
-  CODER_STATUS_NOT_SPECIFIED,               /* use main error code instead */
-  CODER_STATUS_FINISHED_WITH_MARK,          /* stream was finished with end mark. */
-  CODER_STATUS_NOT_FINISHED,                /* stream was not finished */
-  CODER_STATUS_NEEDS_MORE_INPUT             /* you must provide more input bytes */
+	CODER_STATUS_NOT_SPECIFIED,               /* use main error code instead */
+	CODER_STATUS_FINISHED_WITH_MARK,          /* stream was finished with end mark. */
+	CODER_STATUS_NOT_FINISHED,                /* stream was not finished */
+	CODER_STATUS_NEEDS_MORE_INPUT             /* you must provide more input bytes */
 } ECoderStatus;
 
 typedef enum
 {
-  CODER_FINISH_ANY,   /* finish at any point */
-  CODER_FINISH_END    /* block must be finished at the end */
+	CODER_FINISH_ANY,   /* finish at any point */
+	CODER_FINISH_END    /* block must be finished at the end */
 } ECoderFinishMode;
 
 typedef struct _IStateCoder
 {
-  void *p;
-  void (*Free)(void *p, ISzAlloc *alloc);
-  SRes (*SetProps)(void *p, const Byte *props, size_t propSize, ISzAlloc *alloc);
-  void (*Init)(void *p);
-  SRes (*Code)(void *p, Byte *dest, SizeT *destLen, const Byte *src, SizeT *srcLen,
-      int srcWasFinished, ECoderFinishMode finishMode, int *wasFinished);
+	void *p;
+	void (*Free)(void *p, ISzAlloc *alloc);
+	SRes (*SetProps)(void *p, const Byte *props, size_t propSize, ISzAlloc *alloc);
+	void (*Init)(void *p);
+	SRes (*Code)(void *p, Byte *dest, SizeT *destLen, const Byte *src, SizeT *srcLen,
+		int srcWasFinished, ECoderFinishMode finishMode, int *wasFinished);
 } IStateCoder;
 
 #define MIXCODER_NUM_FILTERS_MAX 4
 
 typedef struct
 {
-  ISzAlloc *alloc;
-  Byte *buf;
-  int numCoders;
-  int finished[MIXCODER_NUM_FILTERS_MAX - 1];
-  size_t pos[MIXCODER_NUM_FILTERS_MAX - 1];
-  size_t size[MIXCODER_NUM_FILTERS_MAX - 1];
-  UInt64 ids[MIXCODER_NUM_FILTERS_MAX];
-  IStateCoder coders[MIXCODER_NUM_FILTERS_MAX];
+	ISzAlloc *alloc;
+	Byte *buf;
+	int numCoders;
+	int finished[MIXCODER_NUM_FILTERS_MAX - 1];
+	size_t pos[MIXCODER_NUM_FILTERS_MAX - 1];
+	size_t size[MIXCODER_NUM_FILTERS_MAX - 1];
+	UInt64 ids[MIXCODER_NUM_FILTERS_MAX];
+	IStateCoder coders[MIXCODER_NUM_FILTERS_MAX];
 } CMixCoder;
 
 void MixCoder_Construct(CMixCoder *p, ISzAlloc *alloc);
@@ -176,48 +176,48 @@ void MixCoder_Free(CMixCoder *p);
 void MixCoder_Init(CMixCoder *p);
 SRes MixCoder_SetFromMethod(CMixCoder *p, int coderIndex, UInt64 methodId);
 SRes MixCoder_Code(CMixCoder *p, Byte *dest, SizeT *destLen,
-    const Byte *src, SizeT *srcLen, int srcWasFinished,
-    ECoderFinishMode finishMode, ECoderStatus *status);
+	const Byte *src, SizeT *srcLen, int srcWasFinished,
+	ECoderFinishMode finishMode, ECoderStatus *status);
 
 typedef enum
 {
-  XZ_STATE_STREAM_HEADER,
-  XZ_STATE_STREAM_INDEX,
-  XZ_STATE_STREAM_INDEX_CRC,
-  XZ_STATE_STREAM_FOOTER,
-  XZ_STATE_STREAM_PADDING,
-  XZ_STATE_BLOCK_HEADER,
-  XZ_STATE_BLOCK,
-  XZ_STATE_BLOCK_FOOTER
+	XZ_STATE_STREAM_HEADER,
+	XZ_STATE_STREAM_INDEX,
+	XZ_STATE_STREAM_INDEX_CRC,
+	XZ_STATE_STREAM_FOOTER,
+	XZ_STATE_STREAM_PADDING,
+	XZ_STATE_BLOCK_HEADER,
+	XZ_STATE_BLOCK,
+	XZ_STATE_BLOCK_FOOTER
 } EXzState;
 
 typedef struct
 {
-  EXzState state;
-  UInt32 pos;
-  unsigned alignPos;
-  unsigned indexPreSize;
+	EXzState state;
+	UInt32 pos;
+	unsigned alignPos;
+	unsigned indexPreSize;
 
-  CXzStreamFlags streamFlags;
+	CXzStreamFlags streamFlags;
 
-  UInt32 blockHeaderSize;
-  UInt64 packSize;
-  UInt64 unpackSize;
+	UInt32 blockHeaderSize;
+	UInt64 packSize;
+	UInt64 unpackSize;
 
-  UInt64 numBlocks;
-  UInt64 indexSize;
-  UInt64 indexPos;
-  UInt64 padSize;
+	UInt64 numBlocks;
+	UInt64 indexSize;
+	UInt64 indexPos;
+	UInt64 padSize;
 
-  UInt64 numStreams;
+	UInt64 numStreams;
 
-  UInt32 crc;
-  CMixCoder decoder;
-  CXzBlock block;
-  CXzCheck check;
-  CSha256 sha;
-  Byte shaDigest[SHA256_DIGEST_SIZE];
-  Byte buf[XZ_BLOCK_HEADER_SIZE_MAX];
+	UInt32 crc;
+	CMixCoder decoder;
+	CXzBlock block;
+	CXzCheck check;
+	CSha256 sha;
+	Byte shaDigest[SHA256_DIGEST_SIZE];
+	Byte buf[XZ_BLOCK_HEADER_SIZE_MAX];
 } CXzUnpacker;
 
 void XzUnpacker_Construct(CXzUnpacker *p, ISzAlloc *alloc);
@@ -244,8 +244,8 @@ Returns:
 
 
 SRes XzUnpacker_Code(CXzUnpacker *p, Byte *dest, SizeT *destLen,
-    const Byte *src, SizeT *srcLen, /* int srcWasFinished, */ int finishMode,
-    ECoderStatus *status);
+	const Byte *src, SizeT *srcLen, /* int srcWasFinished, */ int finishMode,
+	ECoderStatus *status);
 
 Bool XzUnpacker_IsStreamWasFinished(CXzUnpacker *p);
 

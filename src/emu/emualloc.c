@@ -45,7 +45,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_ALLOCS		(0)
+#define LOG_ALLOCS      (0)
 
 
 
@@ -79,22 +79,22 @@ const int memory_block_alloc_chunk = 256;
 class memory_entry
 {
 public:
-	memory_entry *		m_next;				// link to the next entry
-	memory_entry *		m_prev;				// link to the previous entry
-	size_t				m_size;				// size of the allocation (not including this header)
-	void *				m_base;				// base of the allocation
-	const char *		m_file;				// file the allocation was made from
-	int					m_line;				// line number within that file
-	UINT64				m_id;				// unique id
+	memory_entry *      m_next;             // link to the next entry
+	memory_entry *      m_prev;             // link to the previous entry
+	size_t              m_size;             // size of the allocation (not including this header)
+	void *              m_base;             // base of the allocation
+	const char *        m_file;             // file the allocation was made from
+	int                 m_line;             // line number within that file
+	UINT64              m_id;               // unique id
 
-	static const int	k_hash_prime = 6151;
+	static const int    k_hash_prime = 6151;
 
-	static UINT64		s_curid;			// current ID
-	static osd_lock *	s_lock;				// lock for managing the list
-	static bool			s_lock_alloc;		// set to true temporarily during lock allocation
-	static bool			s_tracking;			// set to true when tracking is live
+	static UINT64       s_curid;            // current ID
+	static osd_lock *   s_lock;             // lock for managing the list
+	static bool         s_lock_alloc;       // set to true temporarily during lock allocation
+	static bool         s_tracking;         // set to true when tracking is live
 	static memory_entry *s_hash[k_hash_prime];// hash table based on pointer
-	static memory_entry *s_freehead;		// pointer to the head of the free list
+	static memory_entry *s_freehead;        // pointer to the head of the free list
 
 	static memory_entry *allocate(size_t size, void *base, const char *file, int line);
 	static memory_entry *find(void *ptr);
@@ -255,10 +255,10 @@ void dump_unfreed_mem()
 
 resource_pool::resource_pool(int hash_size)
 	: m_hash_size(hash_size),
-	  m_listlock(osd_lock_alloc()),
-	  m_hash(new resource_pool_item *[hash_size]),
-	  m_ordered_head(NULL),
-	  m_ordered_tail(NULL)
+		m_listlock(osd_lock_alloc()),
+		m_hash(new resource_pool_item *[hash_size]),
+		m_ordered_head(NULL),
+		m_ordered_tail(NULL)
 {
 	memset(m_hash, 0, hash_size * sizeof(m_hash[0]));
 }

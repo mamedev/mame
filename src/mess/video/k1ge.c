@@ -68,15 +68,15 @@ INLINE k1ge_t *get_safe_token( device_t *device )
 
 READ8_DEVICE_HANDLER( k1ge_r )
 {
-	k1ge_t	*k1ge = get_safe_token( device );
-	UINT8	data = k1ge->vram[offset & 0x7ff];
+	k1ge_t  *k1ge = get_safe_token( device );
+	UINT8   data = k1ge->vram[offset & 0x7ff];
 
 	switch( offset )
 	{
-	case 0x008:		/* RAS.H */
+	case 0x008:     /* RAS.H */
 		data = k1ge->screen->hpos() >> 2;
 		break;
-	case 0x009:		/* RAS.V */
+	case 0x009:     /* RAS.V */
 		data = k1ge->screen->vpos();
 		break;
 	}
@@ -86,7 +86,7 @@ READ8_DEVICE_HANDLER( k1ge_r )
 
 WRITE8_DEVICE_HANDLER( k1ge_w )
 {
-	k1ge_t	*k1ge = get_safe_token( device );
+	k1ge_t  *k1ge = get_safe_token( device );
 
 	switch( offset )
 	{
@@ -849,43 +849,43 @@ static DEVICE_RESET( k1ge )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
-	k1ge->vram[0x000] = 0x00;	/* Interrupt enable */
-	k1ge->vram[0x002] = 0x00;	/* WBA.H */
-	k1ge->vram[0x003] = 0x00;	/* WVA.V */
-	k1ge->vram[0x004] = 0xFF;	/* WSI.H */
-	k1ge->vram[0x005] = 0xFF;	/* WSI.V */
-	k1ge->vram[0x007] = 0xc6;	/* REF */
-	k1ge->vram[0x012] = 0x00;	/* 2D control */
-	k1ge->vram[0x020] = 0x00;	/* PO.H */
-	k1ge->vram[0x021] = 0x00;	/* PO.V */
-	k1ge->vram[0x030] = 0x00;	/* PF */
-	k1ge->vram[0x032] = 0x00;	/* S1SO.H */
-	k1ge->vram[0x033] = 0x00;	/* S1SO.V */
-	k1ge->vram[0x034] = 0x00;	/* S2SO.H */
-	k1ge->vram[0x035] = 0x00;	/* S2SO.V */
-	k1ge->vram[0x101] = 0x07;	/* SPPLT01 */
-	k1ge->vram[0x102] = 0x07;	/* SPPLT02 */
-	k1ge->vram[0x103] = 0x07;	/* SPPLT03 */
-	k1ge->vram[0x105] = 0x07;	/* SPPLT11 */
-	k1ge->vram[0x106] = 0x07;	/* SPPLT12 */
-	k1ge->vram[0x107] = 0x07;	/* SPPLT13 */
-	k1ge->vram[0x109] = 0x07;	/* SC1PLT01 */
-	k1ge->vram[0x10a] = 0x07;	/* SC1PLT02 */
-	k1ge->vram[0x10b] = 0x07;	/* SC1PLT03 */
-	k1ge->vram[0x10d] = 0x07;	/* SC1PLT11 */
-	k1ge->vram[0x10e] = 0x07;	/* SC1PLT12 */
-	k1ge->vram[0x10f] = 0x07;	/* SC1PLT13 */
-	k1ge->vram[0x111] = 0x07;	/* SC2PLT01 */
-	k1ge->vram[0x112] = 0x07;	/* SC2PLT02 */
-	k1ge->vram[0x113] = 0x07;	/* SC2PLT03 */
-	k1ge->vram[0x115] = 0x07;	/* SC2PLT11 */
-	k1ge->vram[0x116] = 0x07;	/* SC2PLT12 */
-	k1ge->vram[0x117] = 0x07;	/* SC2PLT13 */
-	k1ge->vram[0x118] = 0x07;	/* BG */
-	k1ge->vram[0x400] = 0xFF;	/* LED control */
-	k1ge->vram[0x402] = 0x80;	/* LEDFREG */
-	k1ge->vram[0x7e0] = 0x52;	/* RESET */
-	k1ge->vram[0x7e2] = 0x00;	/* MODE */
+	k1ge->vram[0x000] = 0x00;   /* Interrupt enable */
+	k1ge->vram[0x002] = 0x00;   /* WBA.H */
+	k1ge->vram[0x003] = 0x00;   /* WVA.V */
+	k1ge->vram[0x004] = 0xFF;   /* WSI.H */
+	k1ge->vram[0x005] = 0xFF;   /* WSI.V */
+	k1ge->vram[0x007] = 0xc6;   /* REF */
+	k1ge->vram[0x012] = 0x00;   /* 2D control */
+	k1ge->vram[0x020] = 0x00;   /* PO.H */
+	k1ge->vram[0x021] = 0x00;   /* PO.V */
+	k1ge->vram[0x030] = 0x00;   /* PF */
+	k1ge->vram[0x032] = 0x00;   /* S1SO.H */
+	k1ge->vram[0x033] = 0x00;   /* S1SO.V */
+	k1ge->vram[0x034] = 0x00;   /* S2SO.H */
+	k1ge->vram[0x035] = 0x00;   /* S2SO.V */
+	k1ge->vram[0x101] = 0x07;   /* SPPLT01 */
+	k1ge->vram[0x102] = 0x07;   /* SPPLT02 */
+	k1ge->vram[0x103] = 0x07;   /* SPPLT03 */
+	k1ge->vram[0x105] = 0x07;   /* SPPLT11 */
+	k1ge->vram[0x106] = 0x07;   /* SPPLT12 */
+	k1ge->vram[0x107] = 0x07;   /* SPPLT13 */
+	k1ge->vram[0x109] = 0x07;   /* SC1PLT01 */
+	k1ge->vram[0x10a] = 0x07;   /* SC1PLT02 */
+	k1ge->vram[0x10b] = 0x07;   /* SC1PLT03 */
+	k1ge->vram[0x10d] = 0x07;   /* SC1PLT11 */
+	k1ge->vram[0x10e] = 0x07;   /* SC1PLT12 */
+	k1ge->vram[0x10f] = 0x07;   /* SC1PLT13 */
+	k1ge->vram[0x111] = 0x07;   /* SC2PLT01 */
+	k1ge->vram[0x112] = 0x07;   /* SC2PLT02 */
+	k1ge->vram[0x113] = 0x07;   /* SC2PLT03 */
+	k1ge->vram[0x115] = 0x07;   /* SC2PLT11 */
+	k1ge->vram[0x116] = 0x07;   /* SC2PLT12 */
+	k1ge->vram[0x117] = 0x07;   /* SC2PLT13 */
+	k1ge->vram[0x118] = 0x07;   /* BG */
+	k1ge->vram[0x400] = 0xFF;   /* LED control */
+	k1ge->vram[0x402] = 0x80;   /* LEDFREG */
+	k1ge->vram[0x7e0] = 0x52;   /* RESET */
+	k1ge->vram[0x7e2] = 0x00;   /* MODE */
 
 	k1ge->timer->adjust( k1ge->screen->time_until_pos(( k1ge->screen->vpos() + 1 ) % K1GE_SCREEN_HEIGHT, 0 ) );
 }
@@ -949,5 +949,3 @@ void k2ge_device::device_start()
 {
 	DEVICE_START_NAME( k2ge )(this);
 }
-
-

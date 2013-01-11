@@ -201,12 +201,12 @@ void gdrom_device::ExecCommand( int *transferLength )
 				read_type = (command[1] >> 1) & 7;
 				data_select = (command[1]>>4) & 0xf;
 
-				if (read_type != 2)	// mode 1
+				if (read_type != 2) // mode 1
 				{
 					fatalerror("GDROM: Unhandled read_type %d\n", read_type);
 				}
 
-				if (data_select != 2)	// just sector data
+				if (data_select != 2)   // just sector data
 				{
 					fatalerror("GDROM: Unhandled data_select %d\n", data_select);
 				}
@@ -453,18 +453,18 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 
 			memset( data, 0, dataLength );
 
-			data[0] = 0x71;	// deferred error
+			data[0] = 0x71; // deferred error
 
 			cdda = cdda_from_cdrom(machine(), cdrom);
 			if (cdda != NULL && cdda_audio_active(cdda))
 			{
 				data[12] = 0x00;
-				data[13] = 0x11;	// AUDIO PLAY OPERATION IN PROGRESS
+				data[13] = 0x11;    // AUDIO PLAY OPERATION IN PROGRESS
 			}
 			else if (play_err_flag)
 			{
 				play_err_flag = 0;
-				data[12] = 0x64;	// ILLEGAL MODE FOR THIS TRACK
+				data[12] = 0x64;    // ILLEGAL MODE FOR THIS TRACK
 				data[13] = 0x00;
 			}
 			// (else 00/00 means no error to report)
@@ -492,7 +492,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 			logerror("GDROM: READ CAPACITY\n");
 
 			temp = cdrom_get_track_start(cdrom, 0xaa);
-			temp--;	// return the last used block on the disc
+			temp--; // return the last used block on the disc
 
 			data[0] = (temp>>24) & 0xff;
 			data[1] = (temp>>16) & 0xff;
@@ -569,7 +569,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 		case 0x42: // READ SUB-CHANNEL
 			switch (command[3])
 			{
-				case 1:	// return current position
+				case 1: // return current position
 				{
 					int audio_active;
 					int msf;
@@ -589,23 +589,23 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 					{
 						if (cdda_audio_paused(cdda))
 						{
-							data[1] = 0x12;		// audio is paused
+							data[1] = 0x12;     // audio is paused
 						}
 						else
 						{
-							data[1] = 0x11;		// audio in progress
+							data[1] = 0x11;     // audio in progress
 						}
 					}
 					else
 					{
 						if (cdda != NULL && cdda_audio_ended(cdda))
 						{
-							data[1] = 0x13;	// ended successfully
+							data[1] = 0x13; // ended successfully
 						}
 						else
 						{
 //                          data[1] = 0x14;    // stopped due to error
-							data[1] = 0x15;	// No current audio status to return
+							data[1] = 0x15; // No current audio status to return
 						}
 					}
 
@@ -620,11 +620,11 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 					}
 
 					data[2] = 0;
-					data[3] = 12;		// data length
-					data[4] = 0x01;	// sub-channel format code
+					data[3] = 12;       // data length
+					data[4] = 0x01; // sub-channel format code
 					data[5] = 0x10 | (audio_active ? 0 : 4);
-					data[6] = cdrom_get_track(cdrom, last_lba) + 1;	// track
-					data[7] = 0;	// index
+					data[6] = cdrom_get_track(cdrom, last_lba) + 1; // track
+					data[7] = 0;    // index
 
 					last_phys_frame = last_lba;
 
@@ -672,15 +672,15 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 
 		case 0x43: // READ TOC
 			/*
-                Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
-                That makes sense in terms of how real-world CDs are referred to, but
-                our internal routines for tracks use "0" as track 1.  That probably
-                should be fixed...
-            */
+			    Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
+			    That makes sense in terms of how real-world CDs are referred to, but
+			    our internal routines for tracks use "0" as track 1.  That probably
+			    should be fixed...
+			*/
 			logerror("GDROM: READ TOC, format = %d time=%d\n", command[2]&0xf,(command[1]>>1)&1);
 			switch (command[2] & 0x0f)
 			{
-				case 0:		// normal
+				case 0:     // normal
 					{
 						int start_trk;
 						int end_trk;
@@ -753,10 +753,10 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 
 			switch (command[2] & 0x3f)
 			{
-				case 0xe:	// CD Audio control page
-					data[0] = 0x8e;	// page E, parameter is savable
-					data[1] = 0x0e;	// page length
-					data[2] = 0x04;	// IMMED = 1, SOTC = 0
+				case 0xe:   // CD Audio control page
+					data[0] = 0x8e; // page E, parameter is savable
+					data[1] = 0x0e; // page length
+					data[2] = 0x04; // IMMED = 1, SOTC = 0
 					data[3] = data[4] = data[5] = data[6] = data[7] = 0; // reserved
 
 					// connect each audio channel to 1 output port
@@ -795,7 +795,7 @@ void gdrom_device::WriteData( UINT8 *data, int dataLength )
 
 			switch (data[0] & 0x3f)
 			{
-				case 0x0:	// vendor-specific
+				case 0x0:   // vendor-specific
 					// check for SGI extension to force 512-byte blocks
 					if ((data[3] == 8) && (data[10] == 2))
 					{
@@ -810,7 +810,7 @@ void gdrom_device::WriteData( UINT8 *data, int dataLength )
 					}
 					break;
 
-				case 0xe:	// audio page
+				case 0xe:   // audio page
 					logerror("Ch 0 route: %x vol: %x\n", data[8], data[9]);
 					logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
 					logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);

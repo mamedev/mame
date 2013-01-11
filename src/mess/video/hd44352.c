@@ -7,18 +7,18 @@
 #include "emu.h"
 #include "video/hd44352.h"
 
-#define		LCD_BYTE_INPUT			0x01
-#define 	LCD_BYTE_OUTPUT			0x02
-#define 	LCD_CHAR_OUTPUT			0x03
-#define 	LCD_ON_OFF				0x04
-#define 	LCD_CURSOR_GRAPHIC		0x06
-#define 	LCD_CURSOR_CHAR			0x07
-#define 	LCD_SCROLL_CHAR_WIDTH	0x08
-#define 	LCD_CURSOR_STATUS		0x09
-#define 	LCD_USER_CHARACTER		0x0b
-#define 	LCD_CONTRAST			0x0c
-#define 	LCD_IRQ_FREQUENCY		0x0d
-#define 	LCD_CURSOR_POSITION		0x0e
+#define     LCD_BYTE_INPUT          0x01
+#define     LCD_BYTE_OUTPUT         0x02
+#define     LCD_CHAR_OUTPUT         0x03
+#define     LCD_ON_OFF              0x04
+#define     LCD_CURSOR_GRAPHIC      0x06
+#define     LCD_CURSOR_CHAR         0x07
+#define     LCD_SCROLL_CHAR_WIDTH   0x08
+#define     LCD_CURSOR_STATUS       0x09
+#define     LCD_USER_CHARACTER      0x0b
+#define     LCD_CONTRAST            0x0c
+#define     LCD_IRQ_FREQUENCY       0x0d
+#define     LCD_CURSOR_POSITION     0x0e
 
 
 // devices
@@ -250,13 +250,13 @@ void hd44352_device::data_write(UINT8 data)
 
 		switch (m_state)
 		{
-			case 0:		//parameter 0
+			case 0:     //parameter 0
 				m_par[m_state++] = data;
 				break;
-			case 1:		//parameter 1
+			case 1:     //parameter 1
 				m_par[m_state++] = data;
 				break;
-			case 2:		//parameter 2
+			case 2:     //parameter 2
 				m_par[m_state++] = data;
 				break;
 		}
@@ -335,19 +335,19 @@ void hd44352_device::data_write(UINT8 data)
 
 						switch((data>>4) & 0x0f)
 						{
-							case 0x00:		on_timer_rate = 16384;		break;
-							case 0x01:		on_timer_rate = 8;			break;
-							case 0x02:		on_timer_rate = 16;			break;
-							case 0x03:		on_timer_rate = 32;			break;
-							case 0x04:		on_timer_rate = 64;			break;
-							case 0x05:		on_timer_rate = 128;		break;
-							case 0x06:		on_timer_rate = 256;		break;
-							case 0x07:		on_timer_rate = 512;		break;
-							case 0x08:		on_timer_rate = 1024;		break;
-							case 0x09:		on_timer_rate = 2048;		break;
-							case 0x0a:		on_timer_rate = 4096;		break;
-							case 0x0b:		on_timer_rate = 4096;		break;
-							default:		on_timer_rate = 8192;		break;
+							case 0x00:      on_timer_rate = 16384;      break;
+							case 0x01:      on_timer_rate = 8;          break;
+							case 0x02:      on_timer_rate = 16;         break;
+							case 0x03:      on_timer_rate = 32;         break;
+							case 0x04:      on_timer_rate = 64;         break;
+							case 0x05:      on_timer_rate = 128;        break;
+							case 0x06:      on_timer_rate = 256;        break;
+							case 0x07:      on_timer_rate = 512;        break;
+							case 0x08:      on_timer_rate = 1024;       break;
+							case 0x09:      on_timer_rate = 2048;       break;
+							case 0x0a:      on_timer_rate = 4096;       break;
+							case 0x0b:      on_timer_rate = 4096;       break;
+							default:        on_timer_rate = 8192;       break;
 						}
 
 						m_on_timer->adjust(attotime::from_hz(m_clock/on_timer_rate), 0, attotime::from_hz(m_clock/on_timer_rate));
@@ -359,7 +359,7 @@ void hd44352_device::data_write(UINT8 data)
 			case LCD_CURSOR_POSITION:
 				{
 					if (m_state == 1)
-						m_cursor_lcd = BIT(data, 4);	//0:left lcd 1:right lcd;
+						m_cursor_lcd = BIT(data, 4);    //0:left lcd 1:right lcd;
 					else if (m_state == 2)
 						m_cursor_x = ((data>>1)&0x3f) % 48 + (BIT(data,7) * 48);
 					else if (m_state == 3)

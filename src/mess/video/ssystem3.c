@@ -65,8 +65,8 @@ static const char led[]={
 	" ffff        bbbb\r"
 	" ffff        bbbb\r"
 	" fff          bbb\r"
-        " f   gggggggg   b\r"
-        "   gggggggggggg\r"
+		" f   gggggggg   b\r"
+		"   gggggggggggg\r"
 	"   gggggggggggg\r"
 	" e   gggggggg   c\r"
 	" eee          ccc\r"
@@ -78,8 +78,8 @@ static const char led[]={
 	"eeee        cccc\r"
 	"eee  dddddd  ccc\r"
 	"ee  dddddddd  cc\r"
-        "e  dddddddddd  c\r"
-        "  dddddddddddd"
+		"e  dddddddddd  c\r"
+		"  dddddddddddd"
 };
 
 static void ssystem3_draw_7segment(bitmap_ind16 &bitmap,int value, int x, int y)

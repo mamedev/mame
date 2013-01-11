@@ -10,7 +10,7 @@ void socrates_snd_reg3_w(device_t *device, int data);
 void socrates_snd_reg4_w(device_t *device, int data);
 
 class socrates_snd_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -34,4 +34,3 @@ extern const device_type SOCRATES;
 
 
 #endif /* __SOCR_SND_H__ */
-

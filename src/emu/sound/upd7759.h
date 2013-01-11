@@ -13,11 +13,11 @@
    software.
 */
 
-#define UPD7759_STANDARD_CLOCK		XTAL_640kHz
+#define UPD7759_STANDARD_CLOCK      XTAL_640kHz
 
 struct upd7759_interface
 {
-	void (*drqcallback)(device_t *device, int param);	/* drq callback (per chip, slave mode only) */
+	void (*drqcallback)(device_t *device, int param);   /* drq callback (per chip, slave mode only) */
 };
 
 void upd7759_set_bank_base(device_t *device, offs_t base);
@@ -28,7 +28,7 @@ int upd7759_busy_r(device_t *device);
 DECLARE_WRITE8_DEVICE_HANDLER( upd7759_port_w );
 
 class upd7759_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

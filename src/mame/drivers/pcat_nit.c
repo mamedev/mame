@@ -97,8 +97,8 @@ class pcat_nit_state : public driver_device
 public:
 	pcat_nit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_uart(*this, "ns16450_0"),
-		  m_microtouch(*this, "microtouch")
+			m_uart(*this, "ns16450_0"),
+			m_microtouch(*this, "microtouch")
 		{ }
 
 	UINT8 *m_banked_nvram;
@@ -244,7 +244,7 @@ void pcat_nit_state::machine_start()
 
 static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
+	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_nit_io)
 
@@ -273,14 +273,14 @@ MACHINE_CONFIG_END
 ***************************************/
 
 ROM_START(streetg)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-10-0004-01.u6", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
 	ROM_REGION(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
-	ROM_REGION(0x400000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x400000, "game_prg", 0) /* proper game */
 	ROM_LOAD("10-0003-04.u11", 0x000000,0x40000, CRC(1471a728) SHA1(5e12a9230f8130282a1be9a10118a3556bafbc37) )
 	ROM_CONTINUE(0x200000, 0x40000)
 	ROM_LOAD("10-0003-04.u12", 0x040000,0x40000, CRC(5a50f519) SHA1(c07a583b4220d4d5506824def91774fede760e65) )
@@ -296,14 +296,14 @@ ROM_START(streetg)
 ROM_END
 
 ROM_START(streetgr3)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-10-0004-01.u6", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
 	ROM_REGION(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
-	ROM_REGION(0x400000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x400000, "game_prg", 0) /* proper game */
 	ROM_LOAD("10-00003-03.u11", 0x000000,0x40000, CRC(2fbcb12b) SHA1(f6413565fc1289ba32b411de877cdf6526f1fa9d) )
 	ROM_CONTINUE(0x200000, 0x40000)
 	ROM_LOAD("10-00003-03.u12", 0x040000,0x40000, CRC(b37c7dff) SHA1(cf6318bfeca0bd272734f45c7589a0224863b0f1) )
@@ -319,14 +319,14 @@ ROM_START(streetgr3)
 ROM_END
 
 ROM_START(bonanza)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-sx-10-0004-02.u6", 0x00000, 0x10000, CRC(fa545ba8) SHA1(db64548bd87262cd2e82175a1b66f168b5ae072d) )
 
 	ROM_REGION(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("techyosd-isa-bios-v1.2.u8",     0x00000, 0x04000, CRC(6adf7e71) SHA1(2b07d964cc7c2c0aa560625b7c12f38d4537d652) )
 	ROM_CONTINUE(                                    0x00001, 0x04000 )
 
-	ROM_REGION(0x400000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x400000, "game_prg", 0) /* proper game */
 	ROM_LOAD("10-0018-03-090894.u11", 0x000000,0x40000, CRC(32b6c8bc) SHA1(7f4097990dca268915842d4253d4257654de2cfc) )
 	ROM_CONTINUE(0x200000, 0x40000)
 	ROM_LOAD("10-0018-03-090894.u12", 0x040000,0x40000, CRC(d7cb191d) SHA1(2047f3668b0e41ad5347107f4e3446c0374c5bb7) )
@@ -348,14 +348,14 @@ ROM_START(bonanza)
 ROM_END
 
 ROM_START(bonanzar2)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("system-bios-sx-10-0004-02.u6", 0x00000, 0x10000, CRC(fa545ba8) SHA1(db64548bd87262cd2e82175a1b66f168b5ae072d) )
 
 	ROM_REGION(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("techyosd-isa-bios-v1.2.u8",     0x00000, 0x04000, CRC(6adf7e71) SHA1(2b07d964cc7c2c0aa560625b7c12f38d4537d652) )
 	ROM_CONTINUE(                                    0x00001, 0x04000 )
 
-	ROM_REGION(0x400000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x400000, "game_prg", 0) /* proper game */
 	ROM_LOAD("10-0018-02-081794.u11", 0x000000,0x40000, CRC(f87fa935) SHA1(b06144496406231aa63149ae12a048ffab8f77d0) )
 	ROM_CONTINUE(0x200000, 0x40000)
 	ROM_LOAD("10-0018-02-081794.u12", 0x040000,0x40000, CRC(bd892e3e) SHA1(1b9174fe2a6eaa7687b543798099b86b9039c049) )
@@ -377,14 +377,14 @@ ROM_START(bonanzar2)
 ROM_END
 
 ROM_START(streetg2)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("10-0004-01_mb-bios.bin", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
 	ROM_REGION(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
-	ROM_REGION(0x400000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x400000, "game_prg", 0) /* proper game */
 	ROM_LOAD("10-0007-07c_083194_rom4.u11", 0x000000,0x40000, CRC(244c2bfa) SHA1(4f2f0fb6923b4e3f1ab4e607e29a27fb15b39fac) )
 	ROM_CONTINUE(0x200000, 0x40000)
 	ROM_LOAD("10-0007-07c_083194_rom5.u12", 0x040000,0x40000, CRC(c89d5dca) SHA1(212bcbf7a39243f4524b4a855fbedabd387d17f2) )
@@ -400,14 +400,14 @@ ROM_START(streetg2)
 ROM_END
 
 ROM_START(streetg2r5)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("10-0004-01_mb-bios.bin", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
 	ROM_REGION(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
-	ROM_REGION(0x400000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x400000, "game_prg", 0) /* proper game */
 	ROM_LOAD("10-00007-05-032194.u15", 0x000000,0x40000, CRC(cefa230f) SHA1(91fd30a3def381974fae0edb4d42d452acda19bb) )
 	ROM_CONTINUE(0x200000, 0x40000)
 	ROM_LOAD("10-00007-05-032194.u16", 0x040000,0x40000, CRC(0be5dd19) SHA1(d0474ff5156e1fa8b4edb502c49b7e1a2b3f6169) )
@@ -428,9 +428,9 @@ DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
 }
 
-GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, bonanza,    0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1993, bonanzar2,  bonanza,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetg,    0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetg2,   0,		   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NO_SOUND )
+GAME( 1993, streetg2,   0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NO_SOUND )
 GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", GAME_NO_SOUND )

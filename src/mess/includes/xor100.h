@@ -15,35 +15,35 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"5b"
-#define I8251_A_TAG		"12b"
-#define I8251_B_TAG		"14b"
-#define I8255A_TAG		"8a"
-#define COM5016_TAG		"15c"
-#define Z80CTC_TAG		"11b"
-#define WD1795_TAG		"wd1795"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "5b"
+#define I8251_A_TAG     "12b"
+#define I8251_B_TAG     "14b"
+#define I8255A_TAG      "8a"
+#define COM5016_TAG     "15c"
+#define Z80CTC_TAG      "11b"
+#define WD1795_TAG      "wd1795"
+#define CENTRONICS_TAG  "centronics"
 
 class xor100_state : public driver_device
 {
 public:
 	xor100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_dbrg(*this, COM5016_TAG),
-		  m_uart_a(*this, I8251_A_TAG),
-		  m_uart_b(*this, I8251_B_TAG),
-		  m_fdc(*this, WD1795_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_s100(*this, S100_TAG),
-		  m_floppy0(*this, WD1795_TAG":0"),
-		  m_floppy1(*this, WD1795_TAG":1"),
-		  m_floppy2(*this, WD1795_TAG":2"),
-		  m_floppy3(*this, WD1795_TAG":3")
+			m_maincpu(*this, Z80_TAG),
+			m_dbrg(*this, COM5016_TAG),
+			m_uart_a(*this, I8251_A_TAG),
+			m_uart_b(*this, I8251_B_TAG),
+			m_fdc(*this, WD1795_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_ram(*this, RAM_TAG),
+			m_terminal(*this, TERMINAL_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_s100(*this, S100_TAG),
+			m_floppy0(*this, WD1795_TAG":0"),
+			m_floppy1(*this, WD1795_TAG":1"),
+			m_floppy2(*this, WD1795_TAG":2"),
+			m_floppy3(*this, WD1795_TAG":3")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

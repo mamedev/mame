@@ -78,35 +78,35 @@
 //  PARAMETERS
 //============================================================
 
-#define MAX_VIEWS				4
-#define EDGE_WIDTH				3
-#define MAX_EDIT_STRING			256
-#define HISTORY_LENGTH			20
-#define MAX_OTHER_WND			4
+#define MAX_VIEWS               4
+#define EDGE_WIDTH              3
+#define MAX_EDIT_STRING         256
+#define HISTORY_LENGTH          20
+#define MAX_OTHER_WND           4
 
 // debugger window styles
-#define DEBUG_WINDOW_STYLE		(WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX)
-#define DEBUG_WINDOW_STYLE_EX	0
+#define DEBUG_WINDOW_STYLE      (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX)
+#define DEBUG_WINDOW_STYLE_EX   0
 
 // debugger view styles
-#define DEBUG_VIEW_STYLE		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
-#define DEBUG_VIEW_STYLE_EX		0
+#define DEBUG_VIEW_STYLE        WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
+#define DEBUG_VIEW_STYLE_EX     0
 
 // edit box styles
-#define EDIT_BOX_STYLE			WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL
-#define EDIT_BOX_STYLE_EX		0
+#define EDIT_BOX_STYLE          WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL
+#define EDIT_BOX_STYLE_EX       0
 
 // combo box styles
-#define COMBO_BOX_STYLE			WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL
-#define COMBO_BOX_STYLE_EX		0
+#define COMBO_BOX_STYLE         WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL
+#define COMBO_BOX_STYLE_EX      0
 
 // horizontal scroll bar styles
-#define HSCROLL_STYLE			WS_CHILD | WS_VISIBLE | SBS_HORZ
-#define HSCROLL_STYLE_EX		0
+#define HSCROLL_STYLE           WS_CHILD | WS_VISIBLE | SBS_HORZ
+#define HSCROLL_STYLE_EX        0
 
 // vertical scroll bar styles
-#define VSCROLL_STYLE			WS_CHILD | WS_VISIBLE | SBS_VERT
-#define VSCROLL_STYLE_EX		0
+#define VSCROLL_STYLE           WS_CHILD | WS_VISIBLE | SBS_VERT
+#define VSCROLL_STYLE_EX        0
 
 
 enum
@@ -157,11 +157,11 @@ class debugwin_info;
 
 struct debugview_info
 {
-	debugwin_info *			owner;
-	debug_view *			view;
-	HWND					wnd;
-	HWND					hscroll;
-	HWND					vscroll;
+	debugwin_info *         owner;
+	debug_view *            view;
+	HWND                    wnd;
+	HWND                    hscroll;
+	HWND                    vscroll;
 };
 
 
@@ -173,34 +173,34 @@ public:
 
 	running_machine &machine() const { return m_machine; }
 
-	debugwin_info *			next;
-	HWND					wnd;
-	HWND					focuswnd;
-	WNDPROC					handler;
+	debugwin_info *         next;
+	HWND                    wnd;
+	HWND                    focuswnd;
+	WNDPROC                 handler;
 
-	UINT32					minwidth, maxwidth;
-	UINT32					minheight, maxheight;
-	void					(*recompute_children)(debugwin_info *);
-	void					(*update_menu)(debugwin_info *);
+	UINT32                  minwidth, maxwidth;
+	UINT32                  minheight, maxheight;
+	void                    (*recompute_children)(debugwin_info *);
+	void                    (*update_menu)(debugwin_info *);
 
-	int						(*handle_command)(debugwin_info *, WPARAM, LPARAM);
-	int						(*handle_key)(debugwin_info *, WPARAM, LPARAM);
-	UINT16					ignore_char_lparam;
+	int                     (*handle_command)(debugwin_info *, WPARAM, LPARAM);
+	int                     (*handle_key)(debugwin_info *, WPARAM, LPARAM);
+	UINT16                  ignore_char_lparam;
 
-	debugview_info			view[MAX_VIEWS];
+	debugview_info          view[MAX_VIEWS];
 
-	HWND					editwnd;
-	char					edit_defstr[256];
-	void					(*process_string)(debugwin_info *, const char *);
-	WNDPROC 				original_editproc;
-	TCHAR					history[HISTORY_LENGTH][MAX_EDIT_STRING];
-	int						history_count;
-	int						last_history;
+	HWND                    editwnd;
+	char                    edit_defstr[256];
+	void                    (*process_string)(debugwin_info *, const char *);
+	WNDPROC                 original_editproc;
+	TCHAR                   history[HISTORY_LENGTH][MAX_EDIT_STRING];
+	int                     history_count;
+	int                     last_history;
 
-	HWND					otherwnd[MAX_OTHER_WND];
+	HWND                    otherwnd[MAX_OTHER_WND];
 
 private:
-	running_machine &		m_machine;
+	running_machine &       m_machine;
 };
 
 
@@ -403,24 +403,24 @@ void debugwin_init_windows(running_machine &machine)
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName	= TEXT("MAMEDebugWindow");
-		wc.hInstance		= GetModuleHandle(NULL);
-		wc.lpfnWndProc		= debugwin_window_proc;
-		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
-		wc.hIcon			= LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
-		wc.lpszMenuName		= NULL;
-		wc.hbrBackground	= NULL;
-		wc.style			= 0;
-		wc.cbClsExtra		= 0;
-		wc.cbWndExtra		= 0;
+		wc.lpszClassName    = TEXT("MAMEDebugWindow");
+		wc.hInstance        = GetModuleHandle(NULL);
+		wc.lpfnWndProc      = debugwin_window_proc;
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
+		wc.lpszMenuName     = NULL;
+		wc.hbrBackground    = NULL;
+		wc.style            = 0;
+		wc.cbClsExtra       = 0;
+		wc.cbWndExtra       = 0;
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
 			fatalerror("Unable to register debug window class\n");
 
 		// initialize the description of the view class
-		wc.lpszClassName	= TEXT("MAMEDebugView");
-		wc.lpfnWndProc		= debugwin_view_proc;
+		wc.lpszClassName    = TEXT("MAMEDebugView");
+		wc.lpfnWndProc      = debugwin_view_proc;
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
@@ -2423,8 +2423,8 @@ static void image_update_menu(debugwin_info *info)
 		AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount..."));
 
 		/*if (img->is_creatable())
-            AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
-        */
+		    AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
+		*/
 		AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CLOSE, TEXT("Unmount"));
 
 		if (img->device().type() == CASSETTE)
@@ -2432,9 +2432,9 @@ static void image_update_menu(debugwin_info *info)
 			cassette_state state;
 			state = (cassette_state)(img->exists() ? (dynamic_cast<cassette_image_device*>(&img->device())->get_state() & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
 			AppendMenu(devicesubmenu, MF_SEPARATOR, 0, NULL);
-			AppendMenu(devicesubmenu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
-			AppendMenu(devicesubmenu, flags_for_exists	| ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
-			AppendMenu(devicesubmenu, flags_for_writing | ((state == CASSETTE_RECORD)	? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_RECORD, TEXT("Record"));
+			AppendMenu(devicesubmenu, flags_for_exists  | ((state == CASSETTE_STOPPED)  ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, TEXT("Pause/Stop"));
+			AppendMenu(devicesubmenu, flags_for_exists  | ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, TEXT("Play"));
+			AppendMenu(devicesubmenu, flags_for_writing | ((state == CASSETTE_RECORD)   ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_RECORD, TEXT("Record"));
 			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_REWIND, TEXT("Rewind"));
 			AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 		}

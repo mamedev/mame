@@ -36,11 +36,11 @@ class _3x3puzzle_state : public driver_device
 public:
 	_3x3puzzle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoram1(*this, "videoram1"),
-		  m_videoram2(*this, "videoram2"),
-		  m_videoram3(*this, "videoram3"),
-		  m_maincpu(*this, "maincpu"),
-		  m_oki(*this, "oki")
+			m_videoram1(*this, "videoram1"),
+			m_videoram2(*this, "videoram2"),
+			m_videoram3(*this, "videoram3"),
+			m_maincpu(*this, "maincpu"),
+			m_oki(*this, "oki")
 	{ }
 
 	/* memory pointers */
@@ -57,8 +57,8 @@ public:
 
 	/* video-related */
 	tilemap_t   *m_tilemap1;
-	tilemap_t	*m_tilemap2;
-	tilemap_t	*m_tilemap3;
+	tilemap_t   *m_tilemap2;
+	tilemap_t   *m_tilemap3;
 
 	DECLARE_WRITE16_MEMBER(videoram1_w);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
@@ -226,53 +226,53 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_START("VBLANK")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-    PORT_START("DSW01")
-    PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("DSW01")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, "Free Play / Debug mode" )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unused ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Free Play / Debug mode" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout tiles16x16x8_layout =
@@ -348,7 +348,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( 3x3puzzl )
-	ROM_REGION( 0x400000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x400000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "1.bin",    0x000000, 0x20000, CRC(e9c39ee7) SHA1(8557eeaff33ac8e11fd545482bd9e48f9a58eba3) )
 	ROM_LOAD16_BYTE( "2.bin",    0x000001, 0x20000, CRC(524963be) SHA1(05428ccc823c35b6c4d182a1dff1c9aa6b71e616) )
 
@@ -375,7 +375,7 @@ ROM_START( 3x3puzzl )
 ROM_END
 
 ROM_START( 3x3puzzla )
-	ROM_REGION( 0x400000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x400000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "1a.bin",    0x000000, 0x20000, CRC(425c5896) SHA1(78d709b729f160b1e20a61a795361113dbb4fb52) )
 	ROM_LOAD16_BYTE( "2a.bin",    0x000001, 0x20000, CRC(4db710b7) SHA1(df7a3496aac9cfdaee4fd504d88772b07a8fdb2b) )
 

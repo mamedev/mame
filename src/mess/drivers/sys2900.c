@@ -126,4 +126,3 @@ ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY          FULLNAME       FLAGS */
 COMP( 1981, sys2900, 0,      0,       sys2900,   sys2900, sys2900_state, sys2900, "Systems Group", "System 2900", GAME_NOT_WORKING | GAME_NO_SOUND)
-

@@ -527,7 +527,7 @@ INLINE void taitoic_drawscanline( bitmap_ind16 &bitmap, const rectangle &cliprec
 			dstp++;
 		}
 	}
-	else	/* Not transparent case */
+	else    /* Not transparent case */
 	{
 		while (length--)
 		{
@@ -771,7 +771,7 @@ void pc080sn_tilemap_update( device_t *device )
 	if (!pc080sn->dblwidth)
 	{
 		for (j = 0; j < 256; j++)
-			pc080sn->tilemap[0]->set_scrollx((j + pc080sn->bgscrolly[0]) & 0x1ff,	pc080sn->bgscrollx[0] - pc080sn->bgscroll_ram[0][j]);
+			pc080sn->tilemap[0]->set_scrollx((j + pc080sn->bgscrolly[0]) & 0x1ff,   pc080sn->bgscrollx[0] - pc080sn->bgscroll_ram[0][j]);
 
 		for (j = 0; j < 256; j++)
 			pc080sn->tilemap[1]->set_scrollx((j + pc080sn->bgscrolly[1]) & 0x1ff, pc080sn->bgscrollx[1] - pc080sn->bgscroll_ram[1][j]);
@@ -795,35 +795,35 @@ static UINT16 topspeed_get_road_pixel_color( UINT16 pixel, UINT16 color )
 
 	if ((color & 0xffe0) == 0xffe0)
 	{
-		pixel += 10;	/* Tunnel colors */
+		pixel += 10;    /* Tunnel colors */
 		road_body_color += 10;
 		off_road_color  += 10;
 	}
 	else
 	{
 		/* Unsure which way round these bits go */
-		if (color & 0x10)	road_body_color += 5;
-		if (color & 0x02)	off_road_color  += 5;
+		if (color & 0x10)   road_body_color += 5;
+		if (color & 0x02)   off_road_color  += 5;
 	}
 
 	switch (pixel_type)
 	{
-	case 0x01:		/* Center lines */
+	case 0x01:      /* Center lines */
 		if (color & 0x08)
 			pixel = road_body_color;
 		break;
-	case 0x02:		/* Road edge (inner) */
+	case 0x02:      /* Road edge (inner) */
 		if (color & 0x08)
 			pixel = road_body_color;
 		break;
-	case 0x03:		/* Road edge (outer) */
+	case 0x03:      /* Road edge (outer) */
 		if (color & 0x04)
 			pixel = road_body_color;
 		break;
-	case 0x04:		/* Road body */
+	case 0x04:      /* Road body */
 		pixel = road_body_color;
 		break;
-	case 0x05:		/* Off road */
+	case 0x05:      /* Off road */
 		pixel = off_road_color;
 		break;
 	default:
@@ -839,7 +839,7 @@ static void topspeed_custom_draw( device_t *device, bitmap_ind16 &bitmap, const 
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	UINT16 *dst16, *src16;
 	UINT8 *tsrc;
-	UINT16 scanline[1024];	/* won't be called by a wide-screen game, but just in case... */
+	UINT16 scanline[1024];  /* won't be called by a wide-screen game, but just in case... */
 
 	bitmap_ind16 &srcbitmap = pc080sn->tilemap[layer]->pixmap();
 	bitmap_ind8 &flagsbitmap = pc080sn->tilemap[layer]->flagsmap();
@@ -849,21 +849,21 @@ static void topspeed_custom_draw( device_t *device, bitmap_ind16 &bitmap, const 
 	int i, y, y_index, src_y_index, row_index;
 
 	int flip = 0;
-	int machine_flip = 0;	/* for  ROT 180 ? */
+	int machine_flip = 0;   /* for  ROT 180 ? */
 
 	int min_x = cliprect.min_x;
 	int max_x = cliprect.max_x;
 	int min_y = cliprect.min_y;
 	int max_y = cliprect.max_y;
 	int screen_width = max_x - min_x + 1;
-	int width_mask = 0x1ff;	/* underlying tilemap */
+	int width_mask = 0x1ff; /* underlying tilemap */
 
 	if (!flip)
 	{
 		sx = pc080sn->bgscrollx[layer] + 16 - pc080sn->xoffs;
 		y_index = pc080sn->bgscrolly[layer] + min_y - pc080sn->yoffs;
 	}
-	else	// never used
+	else    // never used
 	{
 		sx = 0;
 		y_index = 0;
@@ -876,7 +876,7 @@ static void topspeed_custom_draw( device_t *device, bitmap_ind16 &bitmap, const 
 
 	do
 	{
-		src_y_index = y_index & 0x1ff;	/* tilemaps are 512 px up/down */
+		src_y_index = y_index & 0x1ff;  /* tilemaps are 512 px up/down */
 		row_index = (src_y_index - pc080sn->bgscrolly[layer]) & 0x1ff;
 		color = color_ctrl_ram[(row_index + pc080sn->yoffs - 2) & 0xff];
 
@@ -1003,12 +1003,12 @@ void pc080sn_device::device_start()
 	pc080sn->xoffs = intf->x_offset;
 	pc080sn->yoffs = intf->y_offset;
 
-	if (!pc080sn->dblwidth)	/* standard tilemaps */
+	if (!pc080sn->dblwidth) /* standard tilemaps */
 	{
 		pc080sn->tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 		pc080sn->tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	}
-	else	/* double width tilemaps */
+	else    /* double width tilemaps */
 	{
 		pc080sn->tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 		pc080sn->tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
@@ -1142,20 +1142,20 @@ void pc090oj_draw_sprites( device_t *device, bitmap_ind16 &bitmap, const rectang
 {
 	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
 	int offs, priority = 0;
-	int sprite_colbank = (pc090oj->sprite_ctrl & 0xf) << 4;	/* top nibble */
+	int sprite_colbank = (pc090oj->sprite_ctrl & 0xf) << 4; /* top nibble */
 
 	switch (pri_type)
 	{
 		case 0x00:
-			priority = 0;	/* sprites over top bg layer */
+			priority = 0;   /* sprites over top bg layer */
 			break;
 
 		case 0x01:
-			priority = 1;	/* sprites under top bg layer */
+			priority = 1;   /* sprites under top bg layer */
 			break;
 
 		case 0x02:
-			priority = pc090oj->sprite_ctrl >> 15;	/* variable sprite/tile priority */
+			priority = pc090oj->sprite_ctrl >> 15;  /* variable sprite/tile priority */
 	}
 
 	for (offs = 0; offs < PC090OJ_ACTIVE_RAM_SIZE / 2; offs += 4)
@@ -1177,7 +1177,7 @@ void pc090oj_draw_sprites( device_t *device, bitmap_ind16 &bitmap, const rectang
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		if (!(pc090oj->ctrl & 1))	/* sprites flipscreen */
+		if (!(pc090oj->ctrl & 1))   /* sprites flipscreen */
 		{
 			x = 320 - x - 16;
 			y = 256 - y - 16;
@@ -1223,7 +1223,7 @@ static DEVICE_START( pc090oj )
 	device->save_pointer(NAME(pc090oj->ram), PC090OJ_RAM_SIZE / 2);
 	device->save_pointer(NAME(pc090oj->ram_buffered), PC090OJ_RAM_SIZE / 2);
 	device->save_item(NAME(pc090oj->ctrl));
-	device->save_item(NAME(pc090oj->sprite_ctrl));	// should this be set in intf?!?
+	device->save_item(NAME(pc090oj->sprite_ctrl));  // should this be set in intf?!?
 }
 
 static DEVICE_RESET( pc090oj )
@@ -1342,12 +1342,12 @@ static const int tc0080vco_zoomy_conv_table[] =
 {
 /*      These are hand-tuned values...      */
 /*    +0   +1   +2   +3   +4   +5   +6   +7    +8   +9   +a   +b   +c   +d   +e   +f */
-	0x00,0x01,0x01,0x02,0x02,0x03,0x04,0x05, 0x06,0x06,0x07,0x08,0x09,0x0a,0x0a,0x0b,	/* 0x00 */
+	0x00,0x01,0x01,0x02,0x02,0x03,0x04,0x05, 0x06,0x06,0x07,0x08,0x09,0x0a,0x0a,0x0b,   /* 0x00 */
 	0x0b,0x0c,0x0c,0x0d,0x0e,0x0e,0x0f,0x10, 0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x16,
 	0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e, 0x1f,0x20,0x21,0x22,0x24,0x25,0x26,0x27,
 	0x28,0x2a,0x2b,0x2c,0x2e,0x30,0x31,0x32, 0x34,0x36,0x37,0x38,0x3a,0x3c,0x3e,0x3f,
 
-	0x40,0x41,0x42,0x42,0x43,0x43,0x44,0x44, 0x45,0x45,0x46,0x46,0x47,0x47,0x48,0x49,	/* 0x40 */
+	0x40,0x41,0x42,0x42,0x43,0x43,0x44,0x44, 0x45,0x45,0x46,0x46,0x47,0x47,0x48,0x49,   /* 0x40 */
 	0x4a,0x4a,0x4b,0x4b,0x4c,0x4d,0x4e,0x4f, 0x4f,0x50,0x51,0x51,0x52,0x53,0x54,0x55,
 	0x56,0x57,0x58,0x59,0x5a,0x5b,0x5c,0x5d, 0x5e,0x5f,0x60,0x61,0x62,0x63,0x64,0x66,
 	0x67,0x68,0x6a,0x6b,0x6c,0x6e,0x6f,0x71, 0x72,0x74,0x76,0x78,0x80,0x7b,0x7d,0x7f
@@ -1415,7 +1415,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::tc0080vco_get_tx_tile_info)
 			tc0080vco->tx_gfx,
 			tile,
 			0x40,
-			0);		/* 0x20<<1 as 3bpp */
+			0);     /* 0x20<<1 as 3bpp */
 }
 
 
@@ -1425,9 +1425,9 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::tc0080vco_get_tx_tile_info)
 
 static const gfx_layout tc0080vco_charlayout =
 {
-	8, 8,	/* 8x8 pixels */
-	256,	/* 256 chars */
-	3,		/* 3 bits per pixel */
+	8, 8,   /* 8x8 pixels */
+	256,    /* 256 chars */
+	3,      /* 3 bits per pixel */
 	{ 0x10000*8 + XOR(2)*4, XOR(0)*4, XOR(2)*4 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7 },
@@ -1440,7 +1440,7 @@ static WRITE16_DEVICE_HANDLER( tc0080vco_scrollram_w )
 
 	switch (offset)
 	{
-		case 0x00:			/* screen invert control */
+		case 0x00:          /* screen invert control */
 			tc0080vco->flipscreen = tc0080vco->scroll_ram[0] & 0x0c00;
 
 			tc0080vco->tilemap[0]->set_flip(tc0080vco->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -1453,19 +1453,19 @@ static WRITE16_DEVICE_HANDLER( tc0080vco_scrollram_w )
 			tc0080vco->bg1_scrolly = tc0080vco->scroll_ram[4] & 0x03ff;
 			break;
 
-		case 0x01:			/* BG0 scroll X */
+		case 0x01:          /* BG0 scroll X */
 			tc0080vco->bg0_scrollx = data & 0x03ff;
 			break;
 
-		case 0x02:			/* BG1 scroll X */
+		case 0x02:          /* BG1 scroll X */
 			tc0080vco->bg1_scrollx = data & 0x03ff;
 			break;
 
-		case 0x03:			/* BG0 scroll Y */
+		case 0x03:          /* BG0 scroll Y */
 			tc0080vco->bg0_scrolly = data & 0x03ff;
 			break;
 
-		case 0x04:			/* BG1 scroll Y */
+		case 0x04:          /* BG1 scroll Y */
 			tc0080vco->bg1_scrolly = data & 0x03ff;
 			break;
 
@@ -1499,7 +1499,7 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 		}
 #endif
 	}
-	else if (offset < 0x2000 / 2)	/* fg0 (text layer) */
+	else if (offset < 0x2000 / 2)   /* fg0 (text layer) */
 	{
 		tc0080vco->tilemap[2]->mark_tile_dirty((offset & 0x07ff) * 2);
 		tc0080vco->tilemap[2]->mark_tile_dirty((offset & 0x07ff) * 2 + 1);
@@ -1511,12 +1511,12 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 		}
 #endif
 	}
-	else if (offset < 0xc000 / 2)	/* chain ram */
+	else if (offset < 0xc000 / 2)   /* chain ram */
 	{}
-	else if (offset < 0xe000 / 2)	/* bg0 (0) */
+	else if (offset < 0xe000 / 2)   /* bg0 (0) */
 		tc0080vco->tilemap[0]->mark_tile_dirty((offset & 0xfff));
 
-	else if (offset < 0x10000 / 2)	/* bg1 (0) */
+	else if (offset < 0x10000 / 2)  /* bg1 (0) */
 		tc0080vco->tilemap[1]->mark_tile_dirty((offset & 0xfff));
 
 	else if (offset < 0x11000 / 2)
@@ -1530,24 +1530,24 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 		}
 #endif
 	}
-	else if (offset < 0x12000 / 2)	/* unknown/unused */
+	else if (offset < 0x12000 / 2)  /* unknown/unused */
 	{
 #if 1
 		if (tc0080vco->ram[offset])
 		popmessage("Write non-zero to mystery tc0080vco area\nPlease report to MAMEDEV");
 #endif
 	}
-	else if (offset < 0x1c000 / 2)	/* chain ram */
+	else if (offset < 0x1c000 / 2)  /* chain ram */
 	{}
-	else if (offset < 0x1e000 / 2)	/* bg0 (1) */
+	else if (offset < 0x1e000 / 2)  /* bg0 (1) */
 		tc0080vco->tilemap[0]->mark_tile_dirty((offset & 0xfff));
 
-	else if (offset < 0x20000 / 2)	/* bg1 (1) */
+	else if (offset < 0x20000 / 2)  /* bg1 (1) */
 		tc0080vco->tilemap[1]->mark_tile_dirty((offset & 0xfff));
 
-	else if (offset < 0x20400 / 2)	/* bg0 rowscroll */
+	else if (offset < 0x20400 / 2)  /* bg0 rowscroll */
 	{}
-	else if (offset < 0x20800 / 2)	/* sprite ram */
+	else if (offset < 0x20800 / 2)  /* sprite ram */
 	{}
 	else if (offset < 0x20fff / 2)
 		tc0080vco_scrollram_w(device, space, offset - (0x20800 / 2), tc0080vco->ram[offset], mem_mask);
@@ -1572,7 +1572,7 @@ void tc0080vco_tilemap_update( device_t *device )
 	tc0080vco->tilemap[0]->set_scrolly(0,  tc0080vco->bg0_scrolly);
 	tc0080vco->tilemap[1]->set_scrollx(0, -tc0080vco->bg1_scrollx);
 	tc0080vco->tilemap[1]->set_scrolly(0,  tc0080vco->bg1_scrolly);
-	tc0080vco->tilemap[2]->set_scrollx(0, 0);	/* no scroll (maybe) */
+	tc0080vco->tilemap[2]->set_scrollx(0, 0);   /* no scroll (maybe) */
 	tc0080vco->tilemap[2]->set_scrolly(0, 0);
 }
 
@@ -1588,11 +1588,11 @@ static void tc0080vco_bg0_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, 
 	zx = (zoom & 0xff00) >> 8;
 	zy = zoom & 0x00ff;
 
-	if (zx == 0x3f && zy == 0x7f)		/* normal size */
+	if (zx == 0x3f && zy == 0x7f)       /* normal size */
 	{
 		tc0080vco->tilemap[0]->draw(bitmap, cliprect, flags, priority);
 	}
-	else		/* zoom + rowscroll = custom draw routine */
+	else        /* zoom + rowscroll = custom draw routine */
 	{
 		UINT16 *dst16, *src16;
 		UINT8 *tsrc;
@@ -1606,14 +1606,14 @@ static void tc0080vco_bg0_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, 
 		int x_index, x_step;
 
 		int flip = tc0080vco->flipscreen;
-		int machine_flip = 0;	/* for  ROT 180 ? */
+		int machine_flip = 0;   /* for  ROT 180 ? */
 
 		int min_x = cliprect.min_x;
 		int max_x = cliprect.max_x;
 		int min_y = cliprect.min_y;
 		int max_y = cliprect.max_y;
 		int screen_width = max_x + 1;
-		int width_mask = 0x3ff;	/* underlying tilemap */
+		int width_mask = 0x3ff; /* underlying tilemap */
 
 
 #if 0
@@ -1671,7 +1671,7 @@ static void tc0080vco_bg0_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, 
 
 		do
 		{
-			src_y_index = (y_index >> 16) & 0x3ff;	/* tilemaps are 1024 px up/down */
+			src_y_index = (y_index >> 16) & 0x3ff;  /* tilemaps are 1024 px up/down */
 
 			/* row areas are the same in flipscreen, so we must read in reverse */
 			row_index = (src_y_index & 0x1ff);
@@ -1720,17 +1720,17 @@ static void tc0080vco_bg0_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, 
 }
 
 
-#define PIXEL_OP_COPY_TRANS0_SET_PRIORITY(DEST, PRIORITY, SOURCE)					\
-do																					\
-{																					\
-	UINT32 srcdata = (SOURCE);														\
-	if (srcdata != 0)																\
-	{																				\
-		(DEST) = SOURCE;															\
-		(PRIORITY) = privalue;														\
-	}																				\
-}																					\
-while (0)																			\
+#define PIXEL_OP_COPY_TRANS0_SET_PRIORITY(DEST, PRIORITY, SOURCE)                   \
+do                                                                                  \
+{                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                      \
+	if (srcdata != 0)                                                               \
+	{                                                                               \
+		(DEST) = SOURCE;                                                            \
+		(PRIORITY) = privalue;                                                      \
+	}                                                                               \
+}                                                                                   \
+while (0)                                                                           \
 
 static void tc0080vco_bg1_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
@@ -1746,11 +1746,11 @@ static void tc0080vco_bg1_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, 
 	zoomx = (zoom & 0xff00) >> 8;
 	zoomy =  zoom & 0x00ff;
 
-	if (zoomx == 0x3f && zoomy == 0x7f)		/* normal size */
+	if (zoomx == 0x3f && zoomy == 0x7f)     /* normal size */
 	{
 		tc0080vco->tilemap[layer]->draw(bitmap, cliprect, flags, priority);
 	}
-	else		/* zoomed */
+	else        /* zoomed */
 	{
 		int zx, zy, dx, dy, ex, ey;
 		int sx,sy;
@@ -1821,7 +1821,7 @@ static void tc0080vco_bg1_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, 
 void tc0080vco_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
-	int disable = 0x00;	/* possibly layer disable bits do exist ?? */
+	int disable = 0x00; /* possibly layer disable bits do exist ?? */
 
 #if 0
 	popmessage("layer disable = %x", disable);
@@ -1930,10 +1930,10 @@ void tc0080vco_device::device_start()
 	tc0080vco->bg_gfx = intf->gfxnum;
 	tc0080vco->tx_gfx = intf->txnum;
 
-	tc0080vco->bg_xoffs = intf->bg_xoffs;	/* usually 1 */
-	tc0080vco->bg_yoffs = intf->bg_yoffs;	/* usually 1 */
-	tc0080vco->bg_flip_yoffs = intf->bg_flip_yoffs;	/* usually -2 */
-	tc0080vco->has_tx = intf->has_fg0;	/* for debugging only */
+	tc0080vco->bg_xoffs = intf->bg_xoffs;   /* usually 1 */
+	tc0080vco->bg_yoffs = intf->bg_yoffs;   /* usually 1 */
+	tc0080vco->bg_flip_yoffs = intf->bg_flip_yoffs; /* usually -2 */
+	tc0080vco->has_tx = intf->has_fg0;  /* for debugging only */
 
 	tc0080vco->tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0080vco_device::tc0080vco_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	tc0080vco->tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0080vco_device::tc0080vco_get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -1959,15 +1959,15 @@ void tc0080vco_device::device_start()
 
 	tc0080vco->ram = auto_alloc_array_clear(machine(), UINT16, TC0080VCO_RAM_SIZE / 2);
 
-	tc0080vco->char_ram      = tc0080vco->ram + 0x00000 / 2;	/* continues at +0x10000 */
+	tc0080vco->char_ram      = tc0080vco->ram + 0x00000 / 2;    /* continues at +0x10000 */
 	tc0080vco->tx_ram_0      = tc0080vco->ram + 0x01000 / 2;
-	tc0080vco->chain_ram_0   = tc0080vco->ram + 0x00000 / 2;	/* only used from +0x2000 */
+	tc0080vco->chain_ram_0   = tc0080vco->ram + 0x00000 / 2;    /* only used from +0x2000 */
 
 	tc0080vco->bg0_ram_0     = tc0080vco->ram + 0x0c000 / 2;
 	tc0080vco->bg1_ram_0     = tc0080vco->ram + 0x0e000 / 2;
 
 	tc0080vco->tx_ram_1      = tc0080vco->ram + 0x11000 / 2;
-	tc0080vco->chain_ram_1   = tc0080vco->ram + 0x10000 / 2;	/* only used from +0x12000 */
+	tc0080vco->chain_ram_1   = tc0080vco->ram + 0x10000 / 2;    /* only used from +0x12000 */
 
 	tc0080vco->bg0_ram_1     = tc0080vco->ram + 0x1c000 / 2;
 	tc0080vco->bg1_ram_1     = tc0080vco->ram + 0x1e000 / 2;
@@ -2016,7 +2016,7 @@ struct tc0100scn_state
 	screen_device *screen;
 };
 
-#define TC0100SCN_RAM_SIZE        0x14000	/* enough for double-width tilemaps */
+#define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */
 #define TC0100SCN_TOTAL_CHARS     256
 
 /*****************************************************************************
@@ -2122,13 +2122,13 @@ TILE_GET_INFO_MEMBER(tc0100scn_device::tc0100scn_get_tx_tile_info)
 
 static const gfx_layout tc0100scn_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	2,	/* 2 bits per pixel */
+	8,8,    /* 8*8 characters */
+	256,    /* 256 characters */
+	2,  /* 2 bits per pixel */
 	{ XOR(0)*4, XOR(2)*4 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8	/* every sprite takes 16 consecutive bytes */
+	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
 
@@ -2250,7 +2250,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_word_w )
 		else if (offset >= 0x4000 && offset < 0x6000)
 			tc0100scn->tilemap[1][0]->mark_tile_dirty((offset & 0x1fff) / 2);
 	}
-	else	/* Double-width tilemaps have a different memory map */
+	else    /* Double-width tilemaps have a different memory map */
 	{
 		if (offset < 0x4000)
 			tc0100scn->tilemap[0][1]->mark_tile_dirty(offset / 2);
@@ -2310,7 +2310,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_ctrl_word_w )
 			int old_width = tc0100scn->dblwidth;
 			tc0100scn->dblwidth = (data & 0x10) >> 4;
 
-			if (tc0100scn->dblwidth != old_width)	/* tilemap width is changing */
+			if (tc0100scn->dblwidth != old_width)   /* tilemap width is changing */
 			{
 				/* Reinitialise layer pointers */
 				tc0100scn_set_layer_ptrs(tc0100scn);
@@ -2515,14 +2515,14 @@ void tc0100scn_device::device_start()
 	tc0100scn->screen = machine().device<screen_device>(intf->screen);
 
 	/* Set up clipping for multi-TC0100SCN games. We assume
-       this code won't ever affect single screen games:
-       Thundfox is the only one of those with two chips, and
-       we're safe as it uses single width tilemaps. */
+	   this code won't ever affect single screen games:
+	   Thundfox is the only one of those with two chips, and
+	   we're safe as it uses single width tilemaps. */
 
 	tc0100scn->cliprect = tc0100scn->screen->visible_area();
 
 	/* use the given gfx sets for bg/tx tiles*/
-	tc0100scn->bg_gfx = intf->gfxnum;	/* 2nd/3rd chips will use the same gfx set */
+	tc0100scn->bg_gfx = intf->gfxnum;   /* 2nd/3rd chips will use the same gfx set */
 	tc0100scn->tx_gfx = intf->txnum;
 
 	/* Single width versions */
@@ -2544,8 +2544,8 @@ void tc0100scn_device::device_start()
 	tc0100scn->tilemap[2][1]->set_transparent_pen(0);
 
 	/* Standard width tilemaps. I'm setting the optional chip #2
-       7 bits higher and 2 pixels to the left than chip #1 because
-       that's how thundfox wants it. */
+	   7 bits higher and 2 pixels to the left than chip #1 because
+	   that's how thundfox wants it. */
 
 	xd = (intf->multiscrn_hack == 0) ?  (-intf->x_offset) : (-intf->x_offset - 2);
 	yd = (intf->multiscrn_hack == 0) ?  (8 - intf->y_offset) : (1 - intf->y_offset);
@@ -2558,9 +2558,9 @@ void tc0100scn_device::device_start()
 	tc0100scn->tilemap[2][0]->set_scrolldy(yd,      -intf->flip_text_yoffs - yd);
 
 	/* Double width tilemaps. We must correct offsets for
-       extra chips, as MAME sees offsets from LHS of whole
-       display not from the edges of individual screens.
-       NB flipscreen tilemap offsets are based on Cameltry */
+	   extra chips, as MAME sees offsets from LHS of whole
+	   display not from the edges of individual screens.
+	   NB flipscreen tilemap offsets are based on Cameltry */
 
 	xd = -intf->x_offset - intf->multiscrn_xoffs;
 	yd = 8 - intf->y_offset;
@@ -2577,15 +2577,15 @@ void tc0100scn_device::device_start()
 	tc0100scn->tilemap[0][1]->set_scroll_rows(512);
 	tc0100scn->tilemap[1][1]->set_scroll_rows(512);
 
-	tc0100scn->bg_tilemask = 0xffff;	/* Mjnquest has 0x7fff tilemask */
+	tc0100scn->bg_tilemask = 0xffff;    /* Mjnquest has 0x7fff tilemask */
 
-	tc0100scn->bg_col_mult = 1;	/* multiplier for when bg gfx != 4bpp */
-	tc0100scn->tx_col_mult = 1;	/* multiplier needed when bg gfx is 6bpp */
+	tc0100scn->bg_col_mult = 1; /* multiplier for when bg gfx != 4bpp */
+	tc0100scn->tx_col_mult = 1; /* multiplier needed when bg gfx is 6bpp */
 
-	if (machine().gfx[intf->gfxnum]->granularity() == 2)	/* Yuyugogo, Yesnoj */
+	if (machine().gfx[intf->gfxnum]->granularity() == 2)    /* Yuyugogo, Yesnoj */
 		tc0100scn->bg_col_mult = 8;
 
-	if (machine().gfx[intf->gfxnum]->granularity() == 0x40)	/* Undrfire */
+	if (machine().gfx[intf->gfxnum]->granularity() == 0x40) /* Undrfire */
 		tc0100scn->tx_col_mult = 4;
 
 //logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", machine().gfx[intf->gfxnum]->granularity(), tc0100scn->tx_col_mult);
@@ -2594,7 +2594,7 @@ void tc0100scn_device::device_start()
 
 	tc0100scn_set_layer_ptrs(tc0100scn);
 
-	tc0100scn_set_colbanks(this, 0, 0, 0);	/* standard values, only Wgp & multiscreen games change them */
+	tc0100scn_set_colbanks(this, 0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at VIDEO_START*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
@@ -2618,7 +2618,7 @@ void tc0100scn_device::device_reset()
 
 	tc0100scn->dblwidth = 0;
 	tc0100scn->colbank = 0;
-	tc0100scn->gfxbank = 0;	/* Mjnquest uniquely banks tiles */
+	tc0100scn->gfxbank = 0; /* Mjnquest uniquely banks tiles */
 
 	for (i = 0; i < 8; i++)
 		tc0100scn->ctrl[i] = 0;
@@ -2758,7 +2758,7 @@ static void zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &
 
 	tc0280grd->tilemap->draw_roz(bitmap, cliprect, startx << 4, starty << 4,
 			incxx << 4, incxy << 4, incyx << 4, incyy << 4,
-			1,	/* copy with wraparound */
+			1,  /* copy with wraparound */
 			0, priority);
 }
 
@@ -3041,13 +3041,13 @@ TILE_GET_INFO_MEMBER(tc0480scp_device::tc0480scp_get_tx_tile_info)
 
 static const gfx_layout tc0480scp_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	4,	/* 4 bits per pixel */
+	8,8,    /* 8*8 characters */
+	256,    /* 256 characters */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ XOR(3)*4, XOR(2)*4, XOR(1)*4, XOR(0)*4, XOR(7)*4, XOR(6)*4, XOR(5)*4, XOR(4)*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 
@@ -3065,10 +3065,10 @@ static void tc0480scp_set_layer_ptrs( tc0480scp_state *tc0480scp )
 {
 	if (!tc0480scp->dblwidth)
 	{
-		tc0480scp->bg_ram[0]	   = tc0480scp->ram + 0x0000; //0000
-		tc0480scp->bg_ram[1]	   = tc0480scp->ram + 0x0800; //1000
-		tc0480scp->bg_ram[2]	   = tc0480scp->ram + 0x1000; //2000
-		tc0480scp->bg_ram[3]	   = tc0480scp->ram + 0x1800; //3000
+		tc0480scp->bg_ram[0]       = tc0480scp->ram + 0x0000; //0000
+		tc0480scp->bg_ram[1]       = tc0480scp->ram + 0x0800; //1000
+		tc0480scp->bg_ram[2]       = tc0480scp->ram + 0x1000; //2000
+		tc0480scp->bg_ram[3]       = tc0480scp->ram + 0x1800; //3000
 		tc0480scp->bgscroll_ram[0] = tc0480scp->ram + 0x2000; //4000
 		tc0480scp->bgscroll_ram[1] = tc0480scp->ram + 0x2200; //4400
 		tc0480scp->bgscroll_ram[2] = tc0480scp->ram + 0x2400; //4800
@@ -3077,15 +3077,15 @@ static void tc0480scp_set_layer_ptrs( tc0480scp_state *tc0480scp )
 		tc0480scp->rowzoom_ram[3]  = tc0480scp->ram + 0x3200; //6400
 		tc0480scp->bgcolumn_ram[2] = tc0480scp->ram + 0x3400; //6800
 		tc0480scp->bgcolumn_ram[3] = tc0480scp->ram + 0x3600; //6c00
-		tc0480scp->tx_ram		   = tc0480scp->ram + 0x6000; //c000
-		tc0480scp->char_ram	   = tc0480scp->ram + 0x7000; //e000
+		tc0480scp->tx_ram          = tc0480scp->ram + 0x6000; //c000
+		tc0480scp->char_ram    = tc0480scp->ram + 0x7000; //e000
 	}
 	else
 	{
-		tc0480scp->bg_ram[0]	   = tc0480scp->ram + 0x0000; //0000
-		tc0480scp->bg_ram[1]	   = tc0480scp->ram + 0x1000; //2000
-		tc0480scp->bg_ram[2]	   = tc0480scp->ram + 0x2000; //4000
-		tc0480scp->bg_ram[3]	   = tc0480scp->ram + 0x3000; //6000
+		tc0480scp->bg_ram[0]       = tc0480scp->ram + 0x0000; //0000
+		tc0480scp->bg_ram[1]       = tc0480scp->ram + 0x1000; //2000
+		tc0480scp->bg_ram[2]       = tc0480scp->ram + 0x2000; //4000
+		tc0480scp->bg_ram[3]       = tc0480scp->ram + 0x3000; //6000
 		tc0480scp->bgscroll_ram[0] = tc0480scp->ram + 0x4000; //8000
 		tc0480scp->bgscroll_ram[1] = tc0480scp->ram + 0x4200; //8400
 		tc0480scp->bgscroll_ram[2] = tc0480scp->ram + 0x4400; //8800
@@ -3094,8 +3094,8 @@ static void tc0480scp_set_layer_ptrs( tc0480scp_state *tc0480scp )
 		tc0480scp->rowzoom_ram[3]  = tc0480scp->ram + 0x5200; //a400
 		tc0480scp->bgcolumn_ram[2] = tc0480scp->ram + 0x5400; //a800
 		tc0480scp->bgcolumn_ram[3] = tc0480scp->ram + 0x5600; //ac00
-		tc0480scp->tx_ram		   = tc0480scp->ram + 0x6000; //c000
-		tc0480scp->char_ram	   = tc0480scp->ram + 0x7000; //e000
+		tc0480scp->tx_ram          = tc0480scp->ram + 0x6000; //c000
+		tc0480scp->char_ram    = tc0480scp->ram + 0x7000; //e000
 	}
 }
 
@@ -3218,8 +3218,8 @@ WRITE16_DEVICE_HANDLER( tc0480scp_ctrl_word_w )
 		case 0x0c:   /* fg (text) x */
 
 			/* Text layer can be offset from bg0 (e.g. Metalb) */
-			if (!flip)	data -= tc0480scp->text_xoffs;
-			if (flip)	data += tc0480scp->text_xoffs;
+			if (!flip)  data -= tc0480scp->text_xoffs;
+			if (flip)   data += tc0480scp->text_xoffs;
 
 			tc0480scp->tilemap[4][0]->set_scrollx(0, -data);
 			tc0480scp->tilemap[4][1]->set_scrollx(0, -data);
@@ -3228,8 +3228,8 @@ WRITE16_DEVICE_HANDLER( tc0480scp_ctrl_word_w )
 		case 0x0d:   /* fg (text) y */
 
 			/* Text layer can be offset from bg0 (e.g. Slapshot) */
-			if (!flip)	data -= tc0480scp->text_yoffs;
-			if (flip)	data += tc0480scp->text_yoffs;
+			if (!flip)  data -= tc0480scp->text_yoffs;
+			if (flip)   data += tc0480scp->text_yoffs;
 
 			tc0480scp->tilemap[4][0]->set_scrolly(0, -data);
 			tc0480scp->tilemap[4][1]->set_scrolly(0, -data);
@@ -3257,7 +3257,7 @@ WRITE16_DEVICE_HANDLER( tc0480scp_ctrl_word_w )
 
 			tc0480scp->dblwidth = (tc0480scp->pri_reg & 0x80) >> 7;
 
-			if (tc0480scp->dblwidth != old_width)	/* tilemap width is changing */
+			if (tc0480scp->dblwidth != old_width)   /* tilemap width is changing */
 			{
 				/* Reinitialise layer pointers */
 				tc0480scp_set_layer_ptrs(tc0480scp);
@@ -3330,7 +3330,7 @@ void tc0480scp_tilemap_update( device_t *device )
 		tc0480scp->tilemap[layer][tc0480scp->dblwidth]->set_scrolly(0, tc0480scp->bgscrolly[layer]);
 		zoom = 0x10000 + 0x7f - tc0480scp->ctrl[0x08 + layer];
 
-		if (zoom != 0x10000)	/* can't use scroll rows when zooming */
+		if (zoom != 0x10000)    /* can't use scroll rows when zooming */
 		{
 			tc0480scp->tilemap[layer][tc0480scp->dblwidth]->set_scrollx(0, tc0480scp->bgscrollx[layer]);
 		}
@@ -3389,19 +3389,19 @@ Historical Issues
 static void tc0480scp_bg01_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	/* X-axis zoom offers expansion only: 0 = no zoom, 0xff = max
-       Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
-       (0x1a in Footchmp hiscore = shrunk) */
+	   Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
+	   (0x1a in Footchmp hiscore = shrunk) */
 
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	int zoomx = 0x10000 - (tc0480scp->ctrl[0x08 + layer] & 0xff00);
 	int zoomy = 0x10000 - (((tc0480scp->ctrl[0x08 + layer] & 0xff) - 0x7f) * 512);
 
-	if ((zoomx == 0x10000) && (zoomy == 0x10000))	/* no zoom, simple */
+	if ((zoomx == 0x10000) && (zoomy == 0x10000))   /* no zoom, simple */
 	{
 		/* Prevent bad things */
 		tc0480scp->tilemap[layer][tc0480scp->dblwidth]->draw(bitmap, cliprect, flags, priority);
 	}
-	else	/* zoom */
+	else    /* zoom */
 	{
 		UINT16 *dst16, *src16;
 		UINT8 *tsrc;
@@ -3412,7 +3412,7 @@ static void tc0480scp_bg01_draw( device_t *device, bitmap_ind16 &bitmap, const r
 		int flip = tc0480scp->pri_reg & 0x40;
 		int i, y, y_index, src_y_index, row_index;
 		int x_index, x_step;
-		int machine_flip = 0;	/* for  ROT 180 ? */
+		int machine_flip = 0;   /* for  ROT 180 ? */
 
 		UINT16 screen_width = 512; //cliprect.width();
 		UINT16 min_y = cliprect.min_y;
@@ -3430,7 +3430,7 @@ static void tc0480scp_bg01_draw( device_t *device, bitmap_ind16 &bitmap, const r
 			y_index = (tc0480scp->bgscrolly[layer] << 16) + ((tc0480scp->ctrl[0x14 + layer] & 0xff) << 8);
 			y_index -= (tc0480scp->y_offs - min_y) * zoomy;
 		}
-		else	/* TC0480SCP tiles flipscreen */
+		else    /* TC0480SCP tiles flipscreen */
 		{
 			sx = ((-tc0480scp->bgscrollx[layer] + 15 + layer * 4 + tc0480scp->flip_xoffs ) << 16) + ((255-(tc0480scp->ctrl[0x10 + layer] & 0xff)) << 8);
 			sx += (tc0480scp->x_offs - 15 - layer * 4) * zoomx;
@@ -3548,7 +3548,7 @@ static void tc0480scp_bg23_draw( device_t *device, bitmap_ind16 &bitmap, const r
 	UINT32 zoomx, zoomy;
 	UINT16 scanline[512];
 	int flipscreen = tc0480scp->pri_reg & 0x40;
-	int machine_flip = 0;	/* for  ROT 180 ? */
+	int machine_flip = 0;   /* for  ROT 180 ? */
 
 	UINT16 screen_width = 512; //cliprect.width();
 	UINT16 min_y = cliprect.min_y;
@@ -3559,8 +3559,8 @@ static void tc0480scp_bg23_draw( device_t *device, bitmap_ind16 &bitmap, const r
 		width_mask = 0x3ff;
 
 	/* X-axis zoom offers expansion only: 0 = no zoom, 0xff = max
-       Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
-       (0x1a in Footchmp hiscore = shrunk) */
+	   Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
+	   (0x1a in Footchmp hiscore = shrunk) */
 
 	zoomx = 0x10000 - (tc0480scp->ctrl[0x08 + layer] & 0xff00);
 	zoomy = 0x10000 - (((tc0480scp->ctrl[0x08 + layer] & 0xff) - 0x7f) * 512);
@@ -3573,7 +3573,7 @@ static void tc0480scp_bg23_draw( device_t *device, bitmap_ind16 &bitmap, const r
 		y_index = (tc0480scp->bgscrolly[layer] << 16) + ((tc0480scp->ctrl[0x14 + layer] & 0xff) << 8);
 		y_index -= (tc0480scp->y_offs - min_y) * zoomy;
 	}
-	else	/* TC0480SCP tiles flipscreen */
+	else    /* TC0480SCP tiles flipscreen */
 	{
 		sx = ((-tc0480scp->bgscrollx[layer] + 15 + layer * 4 + tc0480scp->flip_xoffs ) << 16) + ((255 - (tc0480scp->ctrl[0x10 + layer] & 0xff)) << 8);
 		sx += (tc0480scp->x_offs - 15 - layer * 4) * zoomx;
@@ -3592,7 +3592,7 @@ static void tc0480scp_bg23_draw( device_t *device, bitmap_ind16 &bitmap, const r
 	{
 		if (!flipscreen)
 			src_y_index = ((y_index>>16) + tc0480scp->bgcolumn_ram[layer][(y - tc0480scp->y_offs) & 0x1ff]) & 0x1ff;
-		else	/* colscroll area is back to front in flipscreen */
+		else    /* colscroll area is back to front in flipscreen */
 			src_y_index = ((y_index>>16) + tc0480scp->bgcolumn_ram[layer][0x1ff - ((y - tc0480scp->y_offs) & 0x1ff)]) & 0x1ff;
 
 		/* row areas are the same in flipscreen, so we must read in reverse */
@@ -3600,7 +3600,7 @@ static void tc0480scp_bg23_draw( device_t *device, bitmap_ind16 &bitmap, const r
 		if (flipscreen)
 			row_index = 0x1ff - row_index;
 
-		if (tc0480scp->pri_reg & (layer - 1))	/* bit0 enables for BG2, bit1 for BG3 */
+		if (tc0480scp->pri_reg & (layer - 1))   /* bit0 enables for BG2, bit1 for BG3 */
 			row_zoom = tc0480scp->rowzoom_ram[layer][row_index];
 		else
 			row_zoom = 0;
@@ -3613,11 +3613,11 @@ static void tc0480scp_bg23_draw( device_t *device, bitmap_ind16 &bitmap, const r
 /* We used to kludge 270 multiply factor, before adjusting x_index instead */
 
 		x_step = zoomx;
-		if (row_zoom)	/* need to reduce x_step */
+		if (row_zoom)   /* need to reduce x_step */
 		{
 			if (!(row_zoom & 0xff00))
 				x_step -= ((row_zoom * 256) & 0xffff);
-			else	/* Undrfire uses the hi byte, why? */
+			else    /* Undrfire uses the hi byte, why? */
 				x_step -= (((row_zoom & 0xff) * 256) & 0xffff);
 		}
 
@@ -3761,14 +3761,14 @@ static void tc0480scp_postload(tc0480scp_state *tc0480scp)
 	tc0480scp->bgscrolly[3] = reg;
 
 	reg = tc0480scp->ctrl[0x0c];
-	if (!flip)	reg -= tc0480scp->text_xoffs;
-	if (flip)	reg += tc0480scp->text_xoffs;
+	if (!flip)  reg -= tc0480scp->text_xoffs;
+	if (flip)   reg += tc0480scp->text_xoffs;
 	tc0480scp->tilemap[4][0]->set_scrollx(0, -reg);
 	tc0480scp->tilemap[4][1]->set_scrollx(0, -reg);
 
 	reg = tc0480scp->ctrl[0x0d];
-	if (!flip)	reg -= tc0480scp->text_yoffs;
-	if (flip)	reg += tc0480scp->text_yoffs;
+	if (!flip)  reg -= tc0480scp->text_yoffs;
+	if (flip)   reg += tc0480scp->text_yoffs;
 	tc0480scp->tilemap[4][0]->set_scrolly(0, -reg);
 	tc0480scp->tilemap[4][1]->set_scrolly(0, -reg);
 }
@@ -3810,7 +3810,7 @@ void tc0480scp_device::device_start()
 	tc0480scp->tile_colbase = intf->col_base;
 	tc0480scp->text_xoffs = intf->text_xoffs;
 	tc0480scp->text_yoffs = intf->text_yoffs;
-	tc0480scp->flip_xoffs = intf->flip_xoffs;	/* for most games (-1,0) */
+	tc0480scp->flip_xoffs = intf->flip_xoffs;   /* for most games (-1,0) */
 	tc0480scp->flip_yoffs = intf->flip_yoffs;
 	tc0480scp->x_offs = intf->x_offset + intf->pixels;
 	tc0480scp->y_offs = intf->y_offset;
@@ -3842,12 +3842,12 @@ void tc0480scp_device::device_start()
 	yd =  tc0480scp->y_offs;
 
 	/* Metalb and Deadconx have minor screenflip issues: blue planet
-       is off on x axis by 1 and in Deadconx the dark blue screen
-       between stages also seems off by 1 pixel. */
+	   is off on x axis by 1 and in Deadconx the dark blue screen
+	   between stages also seems off by 1 pixel. */
 
 	/* It's not possible to get the text scrolldx calculations
-       harmonised with the other layers: xd-2, 315-xd is the
-       next valid pair:- the numbers diverge from xd, 319-xd */
+	   harmonised with the other layers: xd-2, 315-xd is the
+	   next valid pair:- the numbers diverge from xd, 319-xd */
 
 	/* Single width offsets */
 	tc0480scp->tilemap[0][0]->set_scrolldx(xd,     320 - xd + tc0480scp->flip_xoffs);
@@ -3858,8 +3858,8 @@ void tc0480scp_device::device_start()
 	tc0480scp->tilemap[2][0]->set_scrolldy(yd,     256 - yd + tc0480scp->flip_yoffs);
 	tc0480scp->tilemap[3][0]->set_scrolldx(xd,     320 - xd + tc0480scp->flip_xoffs);
 	tc0480scp->tilemap[3][0]->set_scrolldy(yd,     256 - yd + tc0480scp->flip_yoffs);
-	tc0480scp->tilemap[4][0]->set_scrolldx(xd - 3, 316 - xd);	/* text layer */
-	tc0480scp->tilemap[4][0]->set_scrolldy(yd,     256 - yd);	/* text layer */
+	tc0480scp->tilemap[4][0]->set_scrolldx(xd - 3, 316 - xd);   /* text layer */
+	tc0480scp->tilemap[4][0]->set_scrolldy(yd,     256 - yd);   /* text layer */
 
 	/* Double width offsets */
 	tc0480scp->tilemap[0][1]->set_scrolldx(xd,     320 - xd + tc0480scp->flip_xoffs);
@@ -3870,8 +3870,8 @@ void tc0480scp_device::device_start()
 	tc0480scp->tilemap[2][1]->set_scrolldy(yd,     256 - yd + tc0480scp->flip_yoffs);
 	tc0480scp->tilemap[3][1]->set_scrolldx(xd,     320 - xd + tc0480scp->flip_xoffs);
 	tc0480scp->tilemap[3][1]->set_scrolldy(yd,     256 - yd + tc0480scp->flip_yoffs);
-	tc0480scp->tilemap[4][1]->set_scrolldx(xd - 3, 317 - xd);	/* text layer */
-	tc0480scp->tilemap[4][1]->set_scrolldy(yd,     256 - yd);	/* text layer */
+	tc0480scp->tilemap[4][1]->set_scrolldx(xd - 3, 317 - xd);   /* text layer */
+	tc0480scp->tilemap[4][1]->set_scrolldy(yd,     256 - yd);   /* text layer */
 
 	for (i = 0; i < 2; i++)
 	{
@@ -3922,7 +3922,7 @@ struct tc0150rod_state
 {
 	UINT16 *        ram;
 
-	const char      *gfx_region;	/* gfx region for the road */
+	const char      *gfx_region;    /* gfx region for the road */
 };
 
 #define TC0150ROD_RAM_SIZE 0x2000
@@ -4130,10 +4130,10 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 	tc0150rod_state *tc0150rod = tc0150rod_get_safe_token(device);
 
 #ifdef MAME_DEBUG
-	static int dislayer[6];	/* Road Layer toggles to help get road correct */
+	static int dislayer[6]; /* Road Layer toggles to help get road correct */
 #endif
 
-	int x_offs = 0xa7;	/* Increasing this shifts road to right */
+	int x_offs = 0xa7;  /* Increasing this shifts road to right */
 	UINT16 scanline[512];
 	UINT16 roada_line[512], roadb_line[512];
 	UINT16 *dst16;
@@ -4163,8 +4163,8 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 	int twin_road = 0;
 #endif
 
-	int road_A_address = y_offs * 4 + ((road_ctrl & 0x0300) << 2);	/* Index into roadram for road A */
-	int road_B_address = y_offs * 4 + ((road_ctrl & 0x0c00) << 0);	/* Index into roadram for road B */
+	int road_A_address = y_offs * 4 + ((road_ctrl & 0x0300) << 2);  /* Index into roadram for road A */
+	int road_B_address = y_offs * 4 + ((road_ctrl & 0x0c00) << 0);  /* Index into roadram for road B */
 
 	int priority_switch_line = (road_ctrl & 0x00ff) - y_offs;
 
@@ -4218,13 +4218,13 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 	{
 		line_needs_drawing = 0;
 
-		roadram_index  = road_A_address + y * 4;	/* in case there is some switching mechanism (unlikely) */
+		roadram_index  = road_A_address + y * 4;    /* in case there is some switching mechanism (unlikely) */
 		roadram2_index = road_B_address + y * 4;
 
 		roada = roada_line;
 		roadb = roadb_line;
 
-		for (i = 0; i < screen_width; i++)	/* Default transparency fill */
+		for (i = 0; i < screen_width; i++)  /* Default transparency fill */
 		{
 			*roada++ = 0x8000;
 			*roadb++ = 0x8000;
@@ -4246,14 +4246,14 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 		roadb_bodyctrl = tc0150rod->ram[roadram2_index + 2];
 
 		/* Not very logical, but seems to work */
-		if (roada_bodyctrl & 0x2000)	priorities[2] += 2;
-		if (roadb_bodyctrl & 0x2000)	priorities[2] += 1;
-		if (roada_clipl    & 0x2000)	priorities[3] -= 1;
-		if (roadb_clipl    & 0x2000)	priorities[3] -= 2;
-		if (roada_clipr    & 0x2000)	priorities[4] -= 1;
-		if (roadb_clipr    & 0x2000)	priorities[4] -= 2;
+		if (roada_bodyctrl & 0x2000)    priorities[2] += 2;
+		if (roadb_bodyctrl & 0x2000)    priorities[2] += 1;
+		if (roada_clipl    & 0x2000)    priorities[3] -= 1;
+		if (roadb_clipl    & 0x2000)    priorities[3] -= 2;
+		if (roada_clipr    & 0x2000)    priorities[4] -= 1;
+		if (roadb_clipr    & 0x2000)    priorities[4] -= 2;
 
-		if (priorities[4] == 0)	priorities[4]++;	/* Fixes Aquajack LH edge dropping below background */
+		if (priorities[4] == 0) priorities[4]++;    /* Fixes Aquajack LH edge dropping below background */
 
 #if 0
 		if ((roada_bodyctrl & 0x8000) || (roadb_bodyctrl & 0x8000))
@@ -4262,7 +4262,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 
 		/********************************************************/
 		/*                        ROAD A                        */
-            /********************************************************/
+			/********************************************************/
 
 		palroffs =(roada_clipr & 0x1000) >> 11;
 		palloffs =(roada_clipl & 0x1000) >> 11;
@@ -4274,28 +4274,28 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 		left_over = 0;
 
 		road_center = 0x5ff - ((-xoffset + x_offs) & 0x7ff);
-		left_edge = road_center - (roada_clipl & 0x3ff);		/* start pixel for left edge */
-		right_edge = road_center + 1 + (roada_clipr & 0x3ff);	/* start pixel for right edge */
+		left_edge = road_center - (roada_clipl & 0x3ff);        /* start pixel for left edge */
+		right_edge = road_center + 1 + (roada_clipr & 0x3ff);   /* start pixel for right edge */
 
-		if ((roada_clipl) || (roada_clipr))	line_needs_drawing = 1;
+		if ((roada_clipl) || (roada_clipr)) line_needs_drawing = 1;
 
 		/* Main road line is drawn from 'begin' to 'end'-1 */
 
 		begin = left_edge + 1;
 		if (begin < 0)
 		{
-			begin = 0;	/* can't begin off edge of screen */
+			begin = 0;  /* can't begin off edge of screen */
 		}
 
 		end = right_edge;
 		if (end > screen_width)
 		{
-			end = screen_width;	/* can't end off edge of screen */
+			end = screen_width; /* can't end off edge of screen */
 		}
 
 		/* We need to offset start pixel we draw for road edge when edge of
-           road is partially or wholly offscreen on the opposite side
-           e.g. Contcirc attract */
+		   road is partially or wholly offscreen on the opposite side
+		   e.g. Contcirc attract */
 
 		if (right_edge < 0)
 		{
@@ -4330,17 +4330,17 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 		{
 			for (i = begin; i < end; i++)
 			{
-				if (road_gfx_tilenum)	/* fixes Nightstr round C */
+				if (road_gfx_tilenum)   /* fixes Nightstr round C */
 				{
 					gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 					pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
 					if ((pixel) || !(road_trans))
 					{
-						if (type)	pixel = (pixel - 1) & 3;
+						if (type)   pixel = (pixel - 1) & 3;
 						*roada-- = (color + pixel) | pri;
 					}
-					else	*roada-- = 0xf000;	/* priority transparency, fixes Bshark round 6 + Aquajack */
+					else    *roada-- = 0xf000;  /* priority transparency, fixes Bshark round 6 + Aquajack */
 				}
 				else roada--;
 
@@ -4360,9 +4360,9 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 	if (!dislayer[2])
 #endif
 		{
-		if (background_only)	/* The "road edge" line is entirely off screen so can't be drawn */
+		if (background_only)    /* The "road edge" line is entirely off screen so can't be drawn */
 		{
-			if (roada_clipl & 0x8000)	/* but we may need to fill in the background color */
+			if (roada_clipl & 0x8000)   /* but we may need to fill in the background color */
 			{
 				roada = roada_line;
 				for (i = 0; i < screen_width; i++)
@@ -4386,7 +4386,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 						gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 						pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
-						pixpri = (pixel == 0) ? (0) : (pri);	/* off edge has low priority */
+						pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */
 
 						if ((pixel == 0) && !(roada_clipl & 0x8000))
 						{
@@ -4394,7 +4394,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 						}
 						else
 						{
-							if (type)	pixel = (pixel - 1)&3;
+							if (type)   pixel = (pixel - 1)&3;
 							*roada++ = (color + pixel) | pixpri;
 						}
 
@@ -4429,7 +4429,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 					gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 					pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
-					pixpri = (pixel == 0) ? (0) : (pri);	/* off edge has low priority */
+					pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */
 
 					if ((pixel == 0) && !(roada_clipr & 0x8000))
 					{
@@ -4437,7 +4437,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 					}
 					else
 					{
-						if (type)	pixel = (pixel - 1) & 3;
+						if (type)   pixel = (pixel - 1) & 3;
 						*roada-- = (color + pixel) | pixpri;
 					}
 
@@ -4451,7 +4451,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 
 		/********************************************************/
 		/*                        ROAD B                        */
-            /********************************************************/
+			/********************************************************/
 
 		palroffs = (roadb_clipr & 0x1000) >> 11;
 		palloffs = (roadb_clipl & 0x1000) >> 11;
@@ -4477,33 +4477,33 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 // b6            through    2ce
 // 2a6 through 0 through    5a7 ??
 
-		left_edge = road_center - (roadb_clipl & 0x3ff);		/* start pixel for left edge */
-		right_edge = road_center + 1 + (roadb_clipr & 0x3ff);	/* start pixel for right edge */
+		left_edge = road_center - (roadb_clipl & 0x3ff);        /* start pixel for left edge */
+		right_edge = road_center + 1 + (roadb_clipr & 0x3ff);   /* start pixel for right edge */
 
 		if (((roadb_clipl) || (roadb_clipr)) && ((road_ctrl & 0x800) || (type == 2)))
 		{
 			draw_top_road_line = 1;
 			line_needs_drawing = 1;
 		}
-		else	draw_top_road_line = 0;
+		else    draw_top_road_line = 0;
 
 		/* Main road line is drawn from 'begin' to 'end'-1 */
 
 		begin = left_edge + 1;
 		if (begin < 0)
 		{
-			begin = 0;	/* can't begin off edge of screen */
+			begin = 0;  /* can't begin off edge of screen */
 		}
 
 		end = right_edge;
 		if (end > screen_width)
 		{
-			end = screen_width;	/* can't end off edge of screen */
+			end = screen_width; /* can't end off edge of screen */
 		}
 
 		/* We need to offset start pixel we draw for road edge when edge of
-           road is partially or wholly offscreen on the opposite side
-           e.g. Contcirc attract */
+		   road is partially or wholly offscreen on the opposite side
+		   e.g. Contcirc attract */
 
 		if (right_edge < 0)
 		{
@@ -4532,7 +4532,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 		/* Is this calculation imperfect ?  (0xa0 = screen width/2) */
 		x_index = (-xoffset + x_offs + begin) & 0x7ff;
 
-		if (x_index > 0x3ff)	/* Second half of gfx contains the road body line */
+		if (x_index > 0x3ff)    /* Second half of gfx contains the road body line */
 		{
 			roadb = roadb_line + screen_width - 1 - begin;
 
@@ -4545,10 +4545,10 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 
 					if ((pixel) || !(road_trans))
 					{
-						if (type)	pixel = (pixel - 1) & 3;
+						if (type)   pixel = (pixel - 1) & 3;
 						*roadb-- = (color + pixel) | pri;
 					}
-					else	*roadb-- = 0xf000;	/* high priority transparency, fixes Aquajack */
+					else    *roadb-- = 0xf000;  /* high priority transparency, fixes Aquajack */
 
 					x_index++;
 					x_index &= 0x7ff;
@@ -4567,9 +4567,9 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 	if (!dislayer[5])
 #endif
 		{
-		if (background_only)	/* The "road edge" line is entirely off screen so can't be drawn */
+		if (background_only)    /* The "road edge" line is entirely off screen so can't be drawn */
 		{
-			if ((roadb_clipl & 0x8000) && draw_top_road_line)	/* but we may need to fill in the background color */
+			if ((roadb_clipl & 0x8000) && draw_top_road_line)   /* but we may need to fill in the background color */
 			{
 				roadb = roadb_line;
 				for (i = 0; i < screen_width; i++)
@@ -4586,27 +4586,27 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 
 				roadb = roadb_line + screen_width - 1 - left_edge;
 
-				if (draw_top_road_line)		// rename to draw_roadb_line !?
+				if (draw_top_road_line)     // rename to draw_roadb_line !?
 				{
 					for (i = left_edge; i >= 0; i--)
 					{
 						gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 						pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
-						pixpri = (pixel == 0) ? (0) : (pri);	/* off edge has low priority */
+						pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */
 
-						if ((pixel == 0) && !(roadb_clipl & 0x8000))	/* test for background disabled */
+						if ((pixel == 0) && !(roadb_clipl & 0x8000))    /* test for background disabled */
 						{
 							roadb++;
 						}
 						else
 						{
-							if (type)	pixel = (pixel - 1) & 3;
+							if (type)   pixel = (pixel - 1) & 3;
 							*roadb++ = (color + pixel) | pixpri;
 						}
 
 						x_index--;
-						if (x_index < 0)	break;
+						if (x_index < 0)    break;
 					}
 				}
 			}
@@ -4636,20 +4636,20 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 					gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 					pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
-					pixpri = (pixel == 0) ? (0) : (pri);	/* off edge has low priority */
+					pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */
 
-					if ((pixel == 0) && !(roadb_clipr & 0x8000))	/* test for background disabled */
+					if ((pixel == 0) && !(roadb_clipr & 0x8000))    /* test for background disabled */
 					{
 						roadb--;
 					}
 					else
 					{
-						if (type)	pixel = (pixel - 1) & 3;
+						if (type)   pixel = (pixel - 1) & 3;
 						*roadb-- =  (color + pixel) | pixpri;
 					}
 
 					x_index++;
-					if (x_index > 0x3ff)	break;
+					if (x_index > 0x3ff)    break;
 				}
 			}
 		}
@@ -4664,15 +4664,15 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 
 			for (i = 0; i < screen_width; i++)
 			{
-				if (roada_line[i] == 0x8000)	/* road A pixel transparent */
+				if (roada_line[i] == 0x8000)    /* road A pixel transparent */
 				{
 					*dst16++ = roadb_line[i] & 0x8fff;
 				}
-				else if (roadb_line[i] == 0x8000)	/* road B pixel transparent */
+				else if (roadb_line[i] == 0x8000)   /* road B pixel transparent */
 				{
 					*dst16++ = roada_line[i] & 0x8fff;
 				}
-				else	/* two competing pixels, which has highest priority... */
+				else    /* two competing pixels, which has highest priority... */
 				{
 					if ((roadb_line[i] & 0x7000) > (roada_line[i] & 0x7000))
 					{
@@ -4693,7 +4693,7 @@ void tc0150rod_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 	while (y <= max_y);
 
 #if 0
-	if (twin_road)	// I don't know what this means, actually...
+	if (twin_road)  // I don't know what this means, actually...
 	{
 		char buf2[80];
 		sprintf(buf2, "Road twinned for %04x lines", twin_road);
@@ -4895,7 +4895,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_rbswap_word_w )
 {
 	tc0110pcr_state *tc0110pcr = tc0110pcr_get_safe_token(device);
 
-	tc0110pcr->type = 1;	/* xRRRRRGGGGGBBBBB */
+	tc0110pcr->type = 1;    /* xRRRRRGGGGGBBBBB */
 
 	switch (offset)
 	{
@@ -4920,7 +4920,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w )
 {
 	tc0110pcr_state *tc0110pcr = tc0110pcr_get_safe_token(device);
 
-	tc0110pcr->type = 2;	/* xxxxBBBBGGGGRRRR */
+	tc0110pcr->type = 2;    /* xxxxBBBBGGGGRRRR */
 
 	switch (offset)
 	{
@@ -4964,7 +4964,7 @@ static DEVICE_START( tc0110pcr )
 static DEVICE_RESET( tc0110pcr )
 {
 	tc0110pcr_state *tc0110pcr =  tc0110pcr_get_safe_token(device);
-	tc0110pcr->type = 0;	/* default, xBBBBBGGGGGRRRRR */
+	tc0110pcr->type = 0;    /* default, xBBBBBGGGGGRRRRR */
 }
 
 const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
@@ -5256,7 +5256,7 @@ void tc0180vcu_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const recta
 	assert(tmap_num < 3);
 
 	if (tmap_num == 2)
-		tc0180vcu->tilemap[2]->draw(bitmap, cliprect, 0, 0);	/* not much to do for tx_tilemap */
+		tc0180vcu->tilemap[2]->draw(bitmap, cliprect, 0, 0);    /* not much to do for tx_tilemap */
 	else
 	{
 		/*plane = 0 fg tilemap*/
@@ -5264,8 +5264,8 @@ void tc0180vcu_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const recta
 		rectangle my_clip;
 		int i;
 		int scrollx, scrolly;
-		int lines_per_block;	/* number of lines scrolled by the same amount (per one scroll value) */
-		int number_of_blocks;	/* number of such blocks per _screen_ (256 lines) */
+		int lines_per_block;    /* number of lines scrolled by the same amount (per one scroll value) */
+		int number_of_blocks;   /* number of such blocks per _screen_ (256 lines) */
 
 		lines_per_block = 256 - (tc0180vcu->ctrl[2 + plane] >> 8);
 		number_of_blocks = 256 / lines_per_block;
@@ -5379,5 +5379,3 @@ void tc0180vcu_device::device_reset()
 	tc0180vcu->framebuffer_page = 0;
 	tc0180vcu->video_control = 0;
 }
-
-

@@ -24,7 +24,7 @@ machine_config_constructor ssi2001_device::device_mconfig_additions() const
 }
 
 ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, ISA8_SSI2001, "Innovation SSI-2001 Audio Adapter", tag, owner, clock),
+	device_t(mconfig, ISA8_SSI2001, "Innovation SSI-2001 Audio Adapter", tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_joy(*this, "joy"),
 	m_sid(*this, "sid6581")

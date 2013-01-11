@@ -16,21 +16,21 @@
 
 */
 
-#define POLY_Z		0
-#define POLY_BRI	2
-#define POLY_FOG	1
-#define POLY_U		3
-#define POLY_V		4
-#define POLY_W		5
+#define POLY_Z      0
+#define POLY_BRI    2
+#define POLY_FOG    1
+#define POLY_U      3
+#define POLY_V      4
+#define POLY_W      5
 
-#define POLY_R		3
-#define POLY_G		4
-#define POLY_B		5
-#define POLY_A		2
+#define POLY_R      3
+#define POLY_G      4
+#define POLY_B      5
+#define POLY_A      2
 
-#define ZBUFFER_MAX					10000000000.0f
+#define ZBUFFER_MAX                 10000000000.0f
 
-#define LOG_POLY_FIFO				0
+#define LOG_POLY_FIFO               0
 
 #if LOG_POLY_FIFO
 static int count = 0;
@@ -62,7 +62,7 @@ void gticlub_led_setreg(int offset, UINT8 data)
 /*****************************************************************************/
 /* Konami K001006 Custom 3D Texel Renderer chip (KS10081) */
 
-#define MAX_K001006_CHIPS		2
+#define MAX_K001006_CHIPS       2
 
 static UINT16 *K001006_pal_ram[MAX_K001006_CHIPS];
 static UINT16 *K001006_unknown_ram[MAX_K001006_CHIPS];
@@ -91,19 +91,19 @@ static UINT32 K001006_r(running_machine &machine, int chip, int offset, UINT32 m
 	{
 		switch (K001006_device_sel[chip])
 		{
-			case 0x0b:		// CG Board ROM read
+			case 0x0b:      // CG Board ROM read
 			{
 				UINT16 *rom = (UINT16*)machine.root_device().memregion("gfx1")->base();
 				return rom[K001006_addr[chip] / 2] << 16;
 			}
-			case 0x0d:		// Palette RAM read
+			case 0x0d:      // Palette RAM read
 			{
 				UINT32 addr = K001006_addr[chip];
 
 				K001006_addr[chip] += 2;
 				return K001006_pal_ram[chip][addr>>1];
 			}
-			case 0x0f:		// Unknown RAM read
+			case 0x0f:      // Unknown RAM read
 			{
 				return K001006_unknown_ram[chip][K001006_addr[chip]++];
 			}
@@ -126,7 +126,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 	{
 		switch (K001006_device_sel[chip])
 		{
-			case 0xd:	// Palette RAM write
+			case 0xd:   // Palette RAM write
 			{
 				int r, g, b, a;
 				UINT32 index = K001006_addr[chip];
@@ -145,7 +145,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 				K001006_addr[chip] += 2;
 				break;
 			}
-			case 0xf:	// Unknown RAM write
+			case 0xf:   // Unknown RAM write
 			{
 			//  mame_printf_debug("Unknown RAM %08X = %04X\n", K001006_addr[chip], data & 0xffff);
 				K001006_unknown_ram[chip][K001006_addr[chip]++] = data & 0xffff;
@@ -341,14 +341,14 @@ READ32_HANDLER( K001005_r )
 {
 	switch(offset)
 	{
-		case 0x000:			// FIFO read, high 16 bits
+		case 0x000:         // FIFO read, high 16 bits
 		{
 			UINT16 value = K001005_fifo[K001005_fifo_read_ptr] >> 16;
 		//  mame_printf_debug("FIFO_r0: %08X\n", K001005_fifo_ptr);
 			return value;
 		}
 
-		case 0x001:			// FIFO read, low 16 bits
+		case 0x001:         // FIFO read, low 16 bits
 		{
 			UINT16 value = K001005_fifo[K001005_fifo_read_ptr] & 0xffff;
 		//  mame_printf_debug("FIFO_r1: %08X\n", K001005_fifo_ptr);
@@ -377,10 +377,10 @@ READ32_HANDLER( K001005_r )
 			return value;
 		}
 
-		case 0x11b:			// status ?
+		case 0x11b:         // status ?
 			return 0x8002;
 
-		case 0x11c:			// slave status ?
+		case 0x11c:         // slave status ?
 			return 0x8000;
 
 		case 0x11f:
@@ -404,7 +404,7 @@ WRITE32_HANDLER( K001005_w )
 {
 	switch(offset)
 	{
-		case 0x000:			// FIFO write
+		case 0x000:         // FIFO write
 		{
 			if (K001005_status != 1 && K001005_status != 2)
 			{
@@ -425,7 +425,7 @@ WRITE32_HANDLER( K001005_w )
 				sharc_set_flag_input(space.machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
-	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+		//  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
 			K001005_fifo[K001005_fifo_write_ptr] = data;
 			K001005_fifo_write_ptr++;
 			K001005_fifo_write_ptr &= 0x7ff;
@@ -465,32 +465,32 @@ WRITE32_HANDLER( K001005_w )
 			break;
 		}
 
-		case 0x100:		break;
+		case 0x100:     break;
 
-		case 0x101:		break;		// viewport x and width?
-		case 0x102:		break;		// viewport y and height?
+		case 0x101:     break;      // viewport x and width?
+		case 0x102:     break;      // viewport y and height?
 
-		case 0x104:		break;		// viewport center x? (usually 0xff)
-		case 0x105:		break;		// viewport center y? (usually 0xbf)
+		case 0x104:     break;      // viewport center x? (usually 0xff)
+		case 0x105:     break;      // viewport center y? (usually 0xbf)
 
-		case 0x108:					// far Z value, 4 exponent bits?
+		case 0x108:                 // far Z value, 4 exponent bits?
 			{
 				// this register seems to hold the 4 missing exponent bits...
 				reg_far_z = (reg_far_z & 0x0000ffff) | ((data & 0xf) << 16);
 				UINT32 fz = reg_far_z << 11;
 				far_z = *(float*)&fz;
-				if (far_z == 0.0f)		// just in case...
+				if (far_z == 0.0f)      // just in case...
 					far_z = 1.0f;
 				break;
 			}
 
-		case 0x109:					// far Z value
+		case 0x109:                 // far Z value
 			{
 				// the SHARC code throws away the bottom 11 bits of mantissa and the top 5 bits (to fit in a 16-bit register?)
 				reg_far_z = (reg_far_z & 0xffff0000) | (data & 0xffff);
 				UINT32 fz = reg_far_z << 11;
 				far_z = *(float*)&fz;
-				if (far_z == 0.0f)		// just in case...
+				if (far_z == 0.0f)      // just in case...
 					far_z = 1.0f;
 				break;
 			}
@@ -499,13 +499,13 @@ WRITE32_HANDLER( K001005_w )
 		case 0x10b:     light_g = data & 0xff; break;
 		case 0x10c:     light_b = data & 0xff; break;
 
-		case 0x10d:		ambient_r = data & 0xff; break;
-		case 0x10e:		ambient_g = data & 0xff; break;
-		case 0x10f:		ambient_b = data & 0xff; break;
+		case 0x10d:     ambient_r = data & 0xff; break;
+		case 0x10e:     ambient_g = data & 0xff; break;
+		case 0x10f:     ambient_b = data & 0xff; break;
 
-		case 0x110:		fog_r = data & 0xff; break;
-		case 0x111:		fog_g = data & 0xff; break;
-		case 0x112:		fog_b = data & 0xff; break;
+		case 0x110:     fog_r = data & 0xff; break;
+		case 0x111:     fog_g = data & 0xff; break;
+		case 0x112:     fog_b = data & 0xff; break;
 
 		case 0x11a:
 			K001005_status = data;
@@ -569,7 +569,7 @@ static void draw_scanline_2d(void *dest, INT32 scanline, const poly_extent *exte
 		if (color & 0xff000000)
 		{
 			fb[x] = color;
-			zb[x] = FLT_MAX;		// FIXME
+			zb[x] = FLT_MAX;        // FIXME
 		}
 	}
 }
@@ -614,7 +614,7 @@ static void draw_scanline_2d_tex(void *dest, INT32 scanline, const poly_extent *
 		if (color & 0xff000000)
 		{
 			fb[x] = color;
-			zb[x] = FLT_MAX;		// FIXME
+			zb[x] = FLT_MAX;        // FIXME
 		}
 
 		u += du;
@@ -899,7 +899,7 @@ static void render_polygons(running_machine &machine)
 				x |= ((x & 0x2000) ? 0xffffc000 : 0);
 				y |= ((y & 0x1000) ? 0xffffe000 : 0);
 
-				poly_type = fifo[index] & 0x4000;		// 0 = triangle, 1 = quad
+				poly_type = fifo[index] & 0x4000;       // 0 = triangle, 1 = quad
 				last_vertex = fifo[index] & 0x8000;
 				index++;
 
@@ -954,18 +954,18 @@ static void render_polygons(running_machine &machine)
 			extra->texture_mirror_x = ((cmd & 0x10) ? 0x1 : 0);
 			extra->texture_mirror_y = ((cmd & 0x10) ? 0x1 : 0);
 			extra->color = color;
-			extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
-			extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
-			extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
+			extra->light_r = light_r;       extra->light_g = light_g;       extra->light_b = light_b;
+			extra->ambient_r = ambient_r;   extra->ambient_g = ambient_g;   extra->ambient_b = ambient_b;
+			extra->fog_r = fog_r;           extra->fog_g = fog_g;           extra->fog_b = fog_b;
 			extra->flags = cmd;
 
-			if ((cmd & 0x20) == 0)		// possibly enable flag for gouraud shading (fixes some shading errors)
+			if ((cmd & 0x20) == 0)      // possibly enable flag for gouraud shading (fixes some shading errors)
 			{
 				v[0].p[POLY_BRI] = brightness;
 				v[1].p[POLY_BRI] = brightness;
 			}
 
-			if (poly_type == 0)		// triangle
+			if (poly_type == 0)     // triangle
 			{
 				if (vert_num == 1)
 				{
@@ -992,7 +992,7 @@ static void render_polygons(running_machine &machine)
 				memcpy(&prev_v[2], vertex2, sizeof(poly_vertex));
 				memcpy(&prev_v[3], vertex3, sizeof(poly_vertex));
 			}
-			else					// quad
+			else                    // quad
 			{
 				if (vert_num == 1)
 				{
@@ -1098,12 +1098,12 @@ static void render_polygons(running_machine &machine)
 				extra->texture_mirror_y = ((cmd & 0x10) ? 0x1 : 0);// & ((header & 0x00400000) ? 0x1 : 0);
 
 				extra->color = color;
-				extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
-				extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
-				extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
+				extra->light_r = light_r;       extra->light_g = light_g;       extra->light_b = light_b;
+				extra->ambient_r = ambient_r;   extra->ambient_g = ambient_g;   extra->ambient_b = ambient_b;
+				extra->fog_r = fog_r;           extra->fog_g = fog_g;           extra->fog_b = fog_b;
 				extra->flags = cmd;
 
-				if ((cmd & 0x20) == 0)		// possibly enable flag for gouraud shading (fixes some shading errors)
+				if ((cmd & 0x20) == 0)      // possibly enable flag for gouraud shading (fixes some shading errors)
 				{
 					v[0].p[POLY_BRI] = brightness;
 					v[1].p[POLY_BRI] = brightness;
@@ -1148,7 +1148,7 @@ static void render_polygons(running_machine &machine)
 				x |= ((x & 0x2000) ? 0xffffc000 : 0);
 				y |= ((y & 0x1000) ? 0xffffe000 : 0);
 
-				poly_type = fifo[index] & 0x4000;		// 0 = triangle, 1 = quad
+				poly_type = fifo[index] & 0x4000;       // 0 = triangle, 1 = quad
 				last_vertex = fifo[index] & 0x8000;
 				index++;
 
@@ -1176,18 +1176,18 @@ static void render_polygons(running_machine &machine)
 			index++;
 
 			extra->color = color;
-			extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
-			extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
-			extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
+			extra->light_r = light_r;       extra->light_g = light_g;       extra->light_b = light_b;
+			extra->ambient_r = ambient_r;   extra->ambient_g = ambient_g;   extra->ambient_b = ambient_b;
+			extra->fog_r = fog_r;           extra->fog_g = fog_g;           extra->fog_b = fog_b;
 			extra->flags = cmd;
 
-			if ((cmd & 0x20) == 0)		// possibly enable flag for gouraud shading (fixes some shading errors)
+			if ((cmd & 0x20) == 0)      // possibly enable flag for gouraud shading (fixes some shading errors)
 			{
 				v[0].p[POLY_BRI] = brightness;
 				v[1].p[POLY_BRI] = brightness;
 			}
 
-			if (poly_type == 0)		// triangle
+			if (poly_type == 0)     // triangle
 			{
 				if (vert_num == 1)
 				{
@@ -1214,7 +1214,7 @@ static void render_polygons(running_machine &machine)
 				memcpy(&prev_v[2], vertex2, sizeof(poly_vertex));
 				memcpy(&prev_v[3], vertex3, sizeof(poly_vertex));
 			}
-			else					// quad
+			else                    // quad
 			{
 				if (vert_num == 1)
 				{
@@ -1301,12 +1301,12 @@ static void render_polygons(running_machine &machine)
 				index++;
 
 				extra->color = color;
-				extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
-				extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
-				extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
+				extra->light_r = light_r;       extra->light_g = light_g;       extra->light_b = light_b;
+				extra->ambient_r = ambient_r;   extra->ambient_g = ambient_g;   extra->ambient_b = ambient_b;
+				extra->fog_r = fog_r;           extra->fog_g = fog_g;           extra->fog_b = fog_b;
 				extra->flags = cmd;
 
-				if ((cmd & 0x20) == 0)		// possibly enable flag for gouraud shading (fixes some shading errors)
+				if ((cmd & 0x20) == 0)      // possibly enable flag for gouraud shading (fixes some shading errors)
 				{
 					v[0].p[POLY_BRI] = brightness;
 					v[1].p[POLY_BRI] = brightness;
@@ -1535,13 +1535,13 @@ static void render_polygons(running_machine &machine)
 		else if ((cmd & 0xffff0000) == 0x80000000)
 		{
 			/*
-            mame_printf_debug("Unknown polygon type %08X:\n", fifo[index-1]);
-            for (int i=0; i < 0x20; i++)
-            {
-                mame_printf_debug("  %02X: %08X\n", i, fifo[index+i]);
-            }
-            mame_printf_debug("\n");
-            */
+			mame_printf_debug("Unknown polygon type %08X:\n", fifo[index-1]);
+			for (int i=0; i < 0x20; i++)
+			{
+			    mame_printf_debug("  %02X: %08X\n", i, fifo[index+i]);
+			}
+			mame_printf_debug("\n");
+			*/
 
 			printf("Unknown polygon type %08X:\n", fifo[index-1]);
 			for (int i=0; i < 0x20; i++)
@@ -1602,10 +1602,10 @@ VIDEO_START( gticlub )
 {
 	gticlub_led_reg[0] = gticlub_led_reg[1] = 0x7f;
 	/*
-    tick = 0;
-    debug_tex_page = 0;
-    debug_tex_palette = 0;
-    */
+	tick = 0;
+	debug_tex_page = 0;
+	debug_tex_palette = 0;
+	*/
 
 	K001006_init(machine);
 	K001005_init(machine);
@@ -1648,27 +1648,27 @@ SCREEN_UPDATE_RGB32( gticlub )
 			debug_tex_palette = 0;
 	}
 
-    if (debug_tex_page > 0)
-    {
-        char string[200];
-        int x,y;
-        int index = (debug_tex_page - 1) * 0x40000;
-        int pal = debug_tex_palette & 7;
-        int tp = (debug_tex_palette >> 3) & 1;
-        UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+	if (debug_tex_page > 0)
+	{
+		char string[200];
+		int x,y;
+		int index = (debug_tex_page - 1) * 0x40000;
+		int pal = debug_tex_palette & 7;
+		int tp = (debug_tex_palette >> 3) & 1;
+		UINT8 *rom = machine.root_device().memregion("gfx1")->base();
 
-        for (y=0; y < 384; y++)
-        {
-            for (x=0; x < 512; x++)
-            {
-                UINT8 pixel = rom[index + (y*512) + x];
-                bitmap.pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
-            }
-        }
+		for (y=0; y < 384; y++)
+		{
+			for (x=0; x < 512; x++)
+			{
+				UINT8 pixel = rom[index + (y*512) + x];
+				bitmap.pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
+			}
+		}
 
-        sprintf(string, "Texture page %d\nPalette %d", debug_tex_page, debug_tex_palette);
-        //popmessage("%s", string);
-    }
+		sprintf(string, "Texture page %d\nPalette %d", debug_tex_page, debug_tex_palette);
+		//popmessage("%s", string);
+	}
 #endif
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
@@ -1711,4 +1711,3 @@ SCREEN_UPDATE_RGB32( hangplt )
 
 	return 0;
 }
-

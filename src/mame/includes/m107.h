@@ -7,9 +7,9 @@
 
 struct pf_layer_info
 {
-	tilemap_t *		tmap;
-	UINT16			vram_base;
-	UINT16			control[4];
+	tilemap_t *     tmap;
+	UINT16          vram_base;
+	UINT16          control[4];
 };
 
 class m107_state : public driver_device
@@ -17,9 +17,9 @@ class m107_state : public driver_device
 public:
 	m107_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram"),
-		  m_vram_data(*this, "vram_data"),
-		  m_maincpu(*this, "maincpu")	  { }
+			m_spriteram(*this, "spriteram"),
+			m_vram_data(*this, "vram_data"),
+			m_maincpu(*this, "maincpu")   { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_vram_data;

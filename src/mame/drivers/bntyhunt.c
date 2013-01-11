@@ -14,7 +14,7 @@ class bntyhunt_state : public driver_device
 public:
 	bntyhunt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,7 +64,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START(bntyhunt)
-	ROM_REGION32_LE(0x20000, "maincpu", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x20000, "maincpu", 0)  /* motherboard bios */
 	ROM_LOAD("bntyhunt.pcbios", 0x000000, 0x10000, NO_DUMP )
 
 	DISK_REGION( "disks" )

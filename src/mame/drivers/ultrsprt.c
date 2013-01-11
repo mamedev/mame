@@ -226,13 +226,13 @@ static k054539_interface k054539_config;
 
 static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)     /* PowerPC 403GA 25MHz */
 	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ultrsprt_state,  ultrsprt_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 8000000)		/* Not sure about the frequency */
+	MCFG_CPU_ADD("audiocpu", M68000, 8000000)       /* Not sure about the frequency */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ultrsprt_state, irq5_line_hold,  1)	// ???
+	MCFG_CPU_PERIODIC_INT_DRIVER(ultrsprt_state, irq5_line_hold,  1)    // ???
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -262,16 +262,16 @@ MACHINE_CONFIG_END
 /*****************************************************************************/
 
 ROM_START( fiveside )
-	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
+	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
 	ROM_LOAD32_BYTE("479uaa01.bin", 0x000003, 0x80000, CRC(1bc4893d) SHA1(2c9df38ecb7efa7b686221ee98fa3aad9a63e152))
 	ROM_LOAD32_BYTE("479uaa02.bin", 0x000002, 0x80000, CRC(ae74a6d0) SHA1(6113c2eea1628b22737c7b87af0e673d94984e88))
 	ROM_LOAD32_BYTE("479uaa03.bin", 0x000001, 0x80000, CRC(5c0b176f) SHA1(9560259bc081d4cfd72eb485c3fdcecf484ba7a8))
 	ROM_LOAD32_BYTE("479uaa04.bin", 0x000000, 0x80000, CRC(01a3e4cb) SHA1(819df79909d57fa12481698ffdb32b00586131d8))
 
-	ROM_REGION(0x20000, "audiocpu", 0)		/* M68K program */
+	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD("479_a05.bin", 0x000000, 0x20000, CRC(251ae299) SHA1(5ffd74357e3c6ddb3a208c39a3b32b53fea90282))
 
-	ROM_REGION(0x100000, "konami", 0)	/* Sound roms */
+	ROM_REGION(0x100000, "konami", 0)   /* Sound roms */
 	ROM_LOAD("479_a06.bin", 0x000000, 0x80000, CRC(8d6ac8a2) SHA1(7c4b8bd47cddc766cbdb6a486acc9221be55b579))
 	ROM_LOAD("479_a07.bin", 0x080000, 0x80000, CRC(75835df8) SHA1(105b95c16f2ce6902c2e4c9c2fd9f2f7a848c546))
 

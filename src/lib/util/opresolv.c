@@ -43,10 +43,10 @@ struct option_resolution
 static optreserr_t resolve_single_param(const char *specification, int *param_value,
 	struct OptionRange *range, size_t range_count)
 {
-	int FLAG_IN_RANGE			= 0x01;
-	int FLAG_IN_DEFAULT			= 0x02;
-	int FLAG_DEFAULT_SPECIFIED	= 0x04;
-	int FLAG_HALF_RANGE			= 0x08;
+	int FLAG_IN_RANGE           = 0x01;
+	int FLAG_IN_DEFAULT         = 0x02;
+	int FLAG_DEFAULT_SPECIFIED  = 0x04;
+	int FLAG_HALF_RANGE         = 0x08;
 
 	int last_value = 0;
 	int value = 0;
@@ -547,19 +547,18 @@ const char *option_resolution_error_string(optreserr_t err)
 {
 	static const char *const errors[] =
 	{
-		"The operation completed successfully",		/* OPTIONRESOLUTION_ERROR_SUCCESS */
-		"Out of memory",							/* OPTIONRESOLUTION_ERROR_OUTOFMEMORY */
-		"Parameter out of range",					/* OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE */
-		"Parameter not specified",					/* OPTIONRESOLUTION_ERROR_PARAMNOTSPECIFIED */
-        "Unknown parameter",						/* OPTIONRESOLUTION_ERROR_PARAMNOTFOUND */
-		"Parameter specified multiple times",		/* OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED */
-		"Invalid parameter",						/* OPTIONRESOLUTION_ERROR_BADPARAM */
-		"Syntax error",								/* OPTIONRESOLUTION_ERROR_SYNTAX */
-		"Internal error"							/* OPTIONRESOLTUION_ERROR_INTERNAL */
+		"The operation completed successfully",     /* OPTIONRESOLUTION_ERROR_SUCCESS */
+		"Out of memory",                            /* OPTIONRESOLUTION_ERROR_OUTOFMEMORY */
+		"Parameter out of range",                   /* OPTIONRESOLUTION_ERROR_PARAMOUTOFRANGE */
+		"Parameter not specified",                  /* OPTIONRESOLUTION_ERROR_PARAMNOTSPECIFIED */
+		"Unknown parameter",                        /* OPTIONRESOLUTION_ERROR_PARAMNOTFOUND */
+		"Parameter specified multiple times",       /* OPTIONRESOLUTION_ERROR_PARAMALREADYSPECIFIED */
+		"Invalid parameter",                        /* OPTIONRESOLUTION_ERROR_BADPARAM */
+		"Syntax error",                             /* OPTIONRESOLUTION_ERROR_SYNTAX */
+		"Internal error"                            /* OPTIONRESOLTUION_ERROR_INTERNAL */
 	};
 
 	if ((err < 0) || (err >= ARRAY_LENGTH(errors)))
 		return NULL;
 	return errors[err];
 }
-

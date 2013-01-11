@@ -195,13 +195,13 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 
 static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_NULL,						/* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_a_r),	/* port A read callback */
-	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_a_w),	/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_b_r),	/* port B read callback */
-	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_b_w),	/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_NULL,                     /* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_a_r),   /* port A read callback */
+	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_a_w),   /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_b_r),   /* port B read callback */
+	DEVCB_DRIVER_MEMBER(sc2_state, pio_port_b_w),   /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 static MACHINE_CONFIG_START( sc2, sc2_state )

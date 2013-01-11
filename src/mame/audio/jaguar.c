@@ -150,11 +150,11 @@
 /* Jerry registers */
 enum
 {
-	JPIT1,		DSP0,		JPIT2,		DSP1,
-	JPIT3,		DSP2,		JPIT4,		DSP3,
-	CLK1,		CLK2,		CLK3,
+	JPIT1,      DSP0,       JPIT2,      DSP1,
+	JPIT3,      DSP2,       JPIT4,      DSP3,
+	CLK1,       CLK2,       CLK3,
 	JINTCTRL = 0x20/2,
-	ASIDATA = 0x30/2,	ASICTRL,	ASICLK,
+	ASIDATA = 0x30/2,   ASICTRL,    ASICLK,
 	DSP_REGS
 };
 

@@ -50,18 +50,18 @@ public:
 	// construction/destruction
 	segaybd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_subx(*this, "subx"),
-		  m_suby(*this, "suby"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_bsprites(*this, "bsprites"),
-		  m_ysprites(*this, "ysprites"),
-		  m_pdrift_bank(0),
-		  m_scanline_timer(NULL),
-		  m_irq2_scanline(0),
-		  m_timer_irq_state(0),
-		  m_vblank_irq_state(0),
-		  m_tmp_bitmap(512, 512)
+			m_maincpu(*this, "maincpu"),
+			m_subx(*this, "subx"),
+			m_suby(*this, "suby"),
+			m_soundcpu(*this, "soundcpu"),
+			m_bsprites(*this, "bsprites"),
+			m_ysprites(*this, "ysprites"),
+			m_pdrift_bank(0),
+			m_scanline_timer(NULL),
+			m_irq2_scanline(0),
+			m_timer_irq_state(0),
+			m_vblank_irq_state(0),
+			m_tmp_bitmap(512, 512)
 	{
 		memset(m_analog_data, 0, sizeof(m_analog_data));
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
@@ -128,16 +128,16 @@ protected:
 	required_device<sega_yboard_sprite_device> m_ysprites;
 
 	// configuration
-	output_delegate	m_output_cb1;
-	output_delegate	m_output_cb2;
+	output_delegate m_output_cb1;
+	output_delegate m_output_cb2;
 
 	// internal state
-	UINT16			m_pdrift_bank;
-	emu_timer *		m_scanline_timer;
-	UINT8			m_analog_data[4];
-	int 			m_irq2_scanline;
-	UINT8			m_timer_irq_state;
-	UINT8			m_vblank_irq_state;
-	UINT8			m_misc_io_data[0x10];
-	bitmap_ind16	m_tmp_bitmap;
+	UINT16          m_pdrift_bank;
+	emu_timer *     m_scanline_timer;
+	UINT8           m_analog_data[4];
+	int             m_irq2_scanline;
+	UINT8           m_timer_irq_state;
+	UINT8           m_vblank_irq_state;
+	UINT8           m_misc_io_data[0x10];
+	bitmap_ind16    m_tmp_bitmap;
 };

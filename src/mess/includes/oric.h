@@ -32,7 +32,7 @@ enum
 
 struct telestrat_mem_block
 {
-	int		MemType;
+	int     MemType;
 	unsigned char *ptr;
 };
 
@@ -71,7 +71,7 @@ class oric_state : public driver_device
 public:
 	oric_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ram(*this, "ram") { }
+			m_ram(*this, "ram") { }
 
 	optional_shared_ptr<UINT8> m_ram;
 	bool m_is_telestrat;

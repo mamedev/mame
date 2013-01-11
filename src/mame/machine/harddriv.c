@@ -23,11 +23,11 @@
  *
  *************************************/
 
-#define DS3_TRIGGER			7777
-#define DS3_STRIGGER		5555
+#define DS3_TRIGGER         7777
+#define DS3_STRIGGER        5555
 
 /* debugging tools */
-#define LOG_COMMANDS		0
+#define LOG_COMMANDS        0
 
 
 
@@ -117,7 +117,7 @@ void harddriv_state::update_interrupts()
 	m_maincpu->set_input_line(1, m_msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(2, m_adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(3, m_gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(4, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);	/* /LINKIRQ on STUN Runner */
+	m_maincpu->set_input_line(4, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE); /* /LINKIRQ on STUN Runner */
 	m_maincpu->set_input_line(5, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(6, m_duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -226,23 +226,23 @@ READ16_HANDLER( hd68k_port0_r )
 {
 	/* port is as follows:
 
-        0x0001 = DIAGN
-        0x0002 = /HSYNCB
-        0x0004 = /VSYNCB
-        0x0008 = EOC12
-        0x0010 = EOC8
-        0x0020 = SELF-TEST
-        0x0040 = COIN2
-        0x0080 = COIN1
-        0x0100 = SW1 #8
-        0x0200 = SW1 #7
-            .....
-        0x8000 = SW1 #1
-    */
+	    0x0001 = DIAGN
+	    0x0002 = /HSYNCB
+	    0x0004 = /VSYNCB
+	    0x0008 = EOC12
+	    0x0010 = EOC8
+	    0x0020 = SELF-TEST
+	    0x0040 = COIN2
+	    0x0080 = COIN1
+	    0x0100 = SW1 #8
+	    0x0200 = SW1 #7
+	        .....
+	    0x8000 = SW1 #1
+	*/
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	int temp = (space.machine().root_device().ioport("SW1")->read() << 8) | space.machine().root_device().ioport("IN0")->read();
 	if (state->get_hblank(*space.machine().primary_screen)) temp ^= 0x0002;
-	temp ^= 0x0018;		/* both EOCs always high for now */
+	temp ^= 0x0018;     /* both EOCs always high for now */
 	return temp;
 }
 
@@ -376,16 +376,16 @@ WRITE16_HANDLER( hd68k_wr0_write )
 	offset &= 7;
 	switch (offset)
 	{
-		case 1:	/* SEL1 */
-		case 2:	/* SEL2 */
-		case 3:	/* SEL3 */
-		case 4:	/* SEL4 */
+		case 1: /* SEL1 */
+		case 2: /* SEL2 */
+		case 3: /* SEL3 */
+		case 4: /* SEL4 */
 		default:
 			/* just ignore */
 			break;
 
-		case 6:	/* CC1 */
-		case 7:	/* CC2 */
+		case 6: /* CC1 */
+		case 7: /* CC2 */
 			coin_counter_w(space.machine(), offset - 6, data);
 			break;
 	}
@@ -395,7 +395,7 @@ WRITE16_HANDLER( hd68k_wr0_write )
 WRITE16_HANDLER( hd68k_wr1_write )
 {
 	if (offset == 0) { //   logerror("Shifter Interface Latch = %02X\n", data);
-	} else {				logerror("/WR1(%04X)=%02X\n", offset, data);
+	} else {                logerror("/WR1(%04X)=%02X\n", offset, data);
 	}
 }
 
@@ -403,7 +403,7 @@ WRITE16_HANDLER( hd68k_wr1_write )
 WRITE16_HANDLER( hd68k_wr2_write )
 {
 	if (offset == 0) { //   logerror("Steering Wheel Latch = %02X\n", data);
-	} else {				logerror("/WR2(%04X)=%02X\n", offset, data);
+	} else {                logerror("/WR2(%04X)=%02X\n", offset, data);
 	}
 }
 
@@ -419,26 +419,26 @@ WRITE16_HANDLER( hd68k_nwr_w )
 	offset &= 7;
 	switch (offset)
 	{
-		case 0:	/* CR2 */
-		case 1:	/* CR1 */
+		case 0: /* CR2 */
+		case 1: /* CR1 */
 			set_led_status(space.machine(), offset, data);
 			break;
-		case 2:	/* LC1 */
+		case 2: /* LC1 */
 			break;
-		case 3:	/* LC2 */
+		case 3: /* LC2 */
 			break;
-		case 4:	/* ZP1 */
+		case 4: /* ZP1 */
 			state->m_m68k_zp1 = data;
 			break;
-		case 5:	/* ZP2 */
+		case 5: /* ZP2 */
 			state->m_m68k_zp2 = data;
 			break;
-		case 6:	/* /GSPRES */
+		case 6: /* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
 			if (state->m_gsp != NULL)
 				state->m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
-		case 7:	/* /MSPRES */
+		case 7: /* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
 			if (state->m_msp != NULL)
 				state->m_msp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
@@ -794,19 +794,19 @@ READ16_HANDLER( hdadsp_special_r )
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	switch (offset & 7)
 	{
-		case 0:	/* /SIMBUF */
+		case 0: /* /SIMBUF */
 			if (state->m_adsp_eprom_base + state->m_adsp_sim_address < state->m_sim_memory_size)
 				return state->m_sim_memory[state->m_adsp_eprom_base + state->m_adsp_sim_address++];
 			else
 				return 0xff;
 
-		case 1:	/* /SIMLD */
+		case 1: /* /SIMLD */
 			break;
 
-		case 2:	/* /SOMO */
+		case 2: /* /SOMO */
 			break;
 
-		case 3:	/* /SOMLD */
+		case 3: /* /SOMLD */
 			break;
 
 		default:
@@ -822,29 +822,29 @@ WRITE16_HANDLER( hdadsp_special_w )
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
 	switch (offset & 7)
 	{
-		case 1:	/* /SIMCLK */
+		case 1: /* /SIMCLK */
 			state->m_adsp_sim_address = data;
 			break;
 
-		case 2:	/* SOMLATCH */
+		case 2: /* SOMLATCH */
 			state->m_som_memory[(state->m_m68k_adsp_buffer_bank ^ 1) * 0x2000 + (state->m_adsp_som_address++ & 0x1fff)] = data;
 			break;
 
-		case 3:	/* /SOMCLK */
+		case 3: /* /SOMCLK */
 			state->m_adsp_som_address = data;
 			break;
 
-		case 5:	/* /XOUT */
+		case 5: /* /XOUT */
 			state->m_adsp_xflag = data & 1;
 			break;
 
-		case 6:	/* /GINT */
+		case 6: /* /GINT */
 			logerror("%04X:ADSP signals interrupt\n", space.device().safe_pcbase());
 			state->m_adsp_irq_state = 1;
 			state->update_interrupts();
 			break;
 
-		case 7:	/* /MP */
+		case 7: /* /MP */
 			state->m_adsp_eprom_base = 0x10000 * data;
 			break;
 
@@ -899,7 +899,7 @@ WRITE16_HANDLER( hd68k_ds3_control_w )
 			if (state->m_ds3sdsp)
 			{
 				state->m_ds3sdsp->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
-				state->m_ds3sdsp->load_boot_data(state->m_ds3sdsp->region()->base(), state->m_ds3sdsp_pgm_memory);                
+				state->m_ds3sdsp->load_boot_data(state->m_ds3sdsp->region()->base(), state->m_ds3sdsp_pgm_memory);
 
 				if (val && !state->m_ds3_sreset)
 				{
@@ -1371,7 +1371,7 @@ void hdds3xdsp_timer_enable_callback(adsp21xx_device &device, int enable)
 
 
 /*
-	TODO: The following does not work correctly
+    TODO: The following does not work correctly
 */
 static TIMER_CALLBACK( xsdp_sport1_irq_off_callback )
 {
@@ -1596,25 +1596,25 @@ WRITE16_HANDLER( hd68k_dsk_control_w )
 	int val = (offset >> 3) & 1;
 	switch (offset & 7)
 	{
-		case 0:	/* DSPRESTN */
+		case 0: /* DSPRESTN */
 			state->m_dsp32->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 1:	/* DSPZN */
+		case 1: /* DSPZN */
 			state->m_dsp32->set_input_line(INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 2:	/* ZW1 */
+		case 2: /* ZW1 */
 			break;
 
-		case 3:	/* ZW2 */
+		case 3: /* ZW2 */
 			break;
 
-		case 4:	/* ASIC65 reset */
+		case 4: /* ASIC65 reset */
 			asic65_reset(space.machine(), !val);
 			break;
 
-		case 7:	/* LED */
+		case 7: /* LED */
 			break;
 
 		default:
@@ -1763,7 +1763,7 @@ WRITE16_HANDLER( hddspcom_control_w )
 	int val = (offset >> 3) & 1;
 	switch (offset & 7)
 	{
-		case 2:	/* ASIC65 reset */
+		case 2: /* ASIC65 reset */
 			asic65_reset(space.machine(), !val);
 			break;
 

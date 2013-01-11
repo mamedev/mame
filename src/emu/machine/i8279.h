@@ -61,13 +61,13 @@
 
 struct i8279_interface
 {
-	devcb_write_line	m_out_irq_cb;		// IRQ
-	devcb_write8		m_out_sl_cb;		// Scanlines SL0-3
-	devcb_write8		m_out_disp_cb;		// B0-3,A0-3
-	devcb_write_line	m_out_bd_cb;		// BD
-	devcb_read8		m_in_rl_cb;		// kbd readlines RL0-7
-	devcb_read_line		m_in_shift_cb;		// Shift key
-	devcb_read_line		m_in_ctrl_cb;		// Ctrl-Strobe line
+	devcb_write_line    m_out_irq_cb;       // IRQ
+	devcb_write8        m_out_sl_cb;        // Scanlines SL0-3
+	devcb_write8        m_out_disp_cb;      // B0-3,A0-3
+	devcb_write_line    m_out_bd_cb;        // BD
+	devcb_read8     m_in_rl_cb;     // kbd readlines RL0-7
+	devcb_read_line     m_in_shift_cb;      // Shift key
+	devcb_read_line     m_in_ctrl_cb;       // Ctrl-Strobe line
 };
 
 
@@ -107,17 +107,17 @@ private:
 	void set_irq(bool state);
 	void set_display_mode(UINT8 data);
 
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write8		m_out_sl_func;
-	devcb_resolved_write8		m_out_disp_func;
-	devcb_resolved_write_line	m_out_bd_func;
-	devcb_resolved_read8		m_in_rl_func;
-	devcb_resolved_read_line	m_in_shift_func;
-	devcb_resolved_read_line	m_in_ctrl_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write8       m_out_sl_func;
+	devcb_resolved_write8       m_out_disp_func;
+	devcb_resolved_write_line   m_out_bd_func;
+	devcb_resolved_read8        m_in_rl_func;
+	devcb_resolved_read_line    m_in_shift_func;
+	devcb_resolved_read_line    m_in_ctrl_func;
 
 	emu_timer *m_timer;
 
-	UINT8 m_d_ram[16];		// display ram
+	UINT8 m_d_ram[16];      // display ram
 	UINT8 m_d_ram_ptr;
 	UINT8 m_s_ram[8]; // might be same as fifo ram
 	UINT8 m_s_ram_ptr;

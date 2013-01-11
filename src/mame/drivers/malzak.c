@@ -194,9 +194,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( malzak )
 
 	/* Malzak has an 8-way stick
-       and only one button (firing and bomb dropping on the same button) */
+	   and only one button (firing and bomb dropping on the same button) */
 
-	PORT_START("IN0")		/* I/O port 0x80 */
+	PORT_START("IN0")       /* I/O port 0x80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -217,9 +217,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( malzak2 )
 
 	/* Same as Malzak, but with additional POT switch, and
-       possibly a reset button too. */
+	   possibly a reset button too. */
 
-	PORT_START("IN0")		/* I/O port 0x80 */
+	PORT_START("IN0")       /* I/O port 0x80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( malzak2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
 
-	PORT_START("POT")		/* Fake DIP switch to handle the POT switch */
+	PORT_START("POT")       /* Fake DIP switch to handle the POT switch */
 	PORT_DIPNAME( 0x03, 0x00, "POT switch position" )
 	PORT_DIPSETTING( 0x00, "1" )  // Normal play
 	PORT_DIPSETTING( 0x01, "2" )
@@ -250,7 +250,7 @@ static const gfx_layout charlayout =
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-	  8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 //  { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	16*16
 //  8*8
@@ -276,29 +276,29 @@ void malzak_state::palette_init()
 
 static const sn76477_interface sn76477_intf =
 {
-	0,	/* N/C */		/*  4  noise_res         */
-	0,	/* N/C */		/*  5  filter_res        */
-	0,	/* N/C */		/*  6  filter_cap        */
-	0,	/* N/C */		/*  7  decay_res         */
-	0,	/* N/C */		/*  8  attack_decay_cap  */
-	RES_K(100),			/* 10  attack_res        */
-	RES_K(56),			/* 11  amplitude_res     */
-	RES_K(10),			/* 12  feedback_res      */
-	0,	/* N/C */		/* 16  vco_voltage       */
-	CAP_U(0.1),			/* 17  vco_cap           */
-	RES_K(8.2),			/* 18  vco_res           */
-	5.0,				/* 19  pitch_voltage     */
-	RES_K(120),			/* 20  slf_res           */
-	CAP_U(1.0),			/* 21  slf_cap           */
-	0,	/* N/C */		/* 23  oneshot_cap       */
-	0,	/* N/C */		/* 24  oneshot_res       */
-	0,			        /* 22    vco             */
-	1,			        /* 26 mixer A           */
-	1,			        /* 25 mixer B           */
-	1,			        /* 27 mixer C           */
-	1,			        /* 1  envelope 1        */
-	1,			        /* 28 envelope 2        */
-	1			        /* 9     enable          */
+	0,  /* N/C */       /*  4  noise_res         */
+	0,  /* N/C */       /*  5  filter_res        */
+	0,  /* N/C */       /*  6  filter_cap        */
+	0,  /* N/C */       /*  7  decay_res         */
+	0,  /* N/C */       /*  8  attack_decay_cap  */
+	RES_K(100),         /* 10  attack_res        */
+	RES_K(56),          /* 11  amplitude_res     */
+	RES_K(10),          /* 12  feedback_res      */
+	0,  /* N/C */       /* 16  vco_voltage       */
+	CAP_U(0.1),         /* 17  vco_cap           */
+	RES_K(8.2),         /* 18  vco_res           */
+	5.0,                /* 19  pitch_voltage     */
+	RES_K(120),         /* 20  slf_res           */
+	CAP_U(1.0),         /* 21  slf_cap           */
+	0,  /* N/C */       /* 23  oneshot_cap       */
+	0,  /* N/C */       /* 24  oneshot_res       */
+	0,                  /* 22    vco             */
+	1,                  /* 26 mixer A           */
+	1,                  /* 25 mixer B           */
+	1,                  /* 27 mixer C           */
+	1,                  /* 1  envelope 1        */
+	1,                  /* 28 envelope 2        */
+	1                   /* 9     enable          */
 };
 
 
@@ -306,7 +306,7 @@ static const s2636_interface malzac_s2636_0_config =
 {
 	"screen",
 	0x100,
-	0, -16,	/* -8, -16 */
+	0, -16, /* -8, -16 */
 	"s2636snd_0"
 };
 
@@ -314,7 +314,7 @@ static const s2636_interface malzac_s2636_1_config =
 {
 	"screen",
 	0x100,
-	0, -16,	/* -9, -16 */
+	0, -16, /* -9, -16 */
 	"s2636snd_1"
 };
 
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(480, 512)	/* vert size is a guess */
+	MCFG_SCREEN_SIZE(480, 512)  /* vert size is a guess */
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(malzak_state, screen_update_malzak)
 

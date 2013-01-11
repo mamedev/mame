@@ -27,7 +27,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( ym2612_data_port_b_w );
 
 
 class ym2612_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -60,18 +60,18 @@ struct ym3438_interface
 };
 
 
-#define ym3438_r				ym2612_r
-#define ym3438_w				ym2612_w
+#define ym3438_r                ym2612_r
+#define ym3438_w                ym2612_w
 
-#define ym3438_status_port_a_r	ym2612_status_port_a_r
-#define ym3438_status_port_b_r	ym2612_status_port_b_r
-#define ym3438_data_port_a_r	ym2612_data_port_a_r
-#define ym3438_data_port_b_r	ym2612_data_port_b_r
+#define ym3438_status_port_a_r  ym2612_status_port_a_r
+#define ym3438_status_port_b_r  ym2612_status_port_b_r
+#define ym3438_data_port_a_r    ym2612_data_port_a_r
+#define ym3438_data_port_b_r    ym2612_data_port_b_r
 
-#define ym3438_control_port_a_w	ym2612_control_port_a_w
-#define ym3438_control_port_b_w	ym2612_control_port_b_w
-#define ym3438_data_port_a_w	ym2612_data_port_a_w
-#define ym3438_data_port_b_w	ym2612_data_port_b_w
+#define ym3438_control_port_a_w ym2612_control_port_a_w
+#define ym3438_control_port_b_w ym2612_control_port_b_w
+#define ym3438_data_port_a_w    ym2612_data_port_a_w
+#define ym3438_data_port_b_w    ym2612_data_port_b_w
 
 
 class ym3438_device : public ym2612_device

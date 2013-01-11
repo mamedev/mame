@@ -26,8 +26,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, H63484, "H63484", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
+	: device_t(mconfig, H63484, "H63484", tag, owner, clock),
+		device_memory_interface(mconfig, *this),
 	m_ar(0),
 	m_sr(0),
 	m_fifo_ptr(-1),
@@ -41,7 +41,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_cl0(0),
 	m_cl1(0),
 	m_dcr(0),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
 {
 	m_shortname = "h63484";
 }
@@ -286,44 +286,44 @@ enum
 	COMMAND_RGCPY
 };
 
-#define H63484_COMMAND_ORG		0x0400	//              p: 2
-#define H63484_COMMAND_WPR		0x0800	// & ~0x1f      p: 1
-#define H63484_COMMAND_RPR		0x0c00	// & ~0x1f      p: 0
-#define H63484_COMMAND_WPTN		0x1800	// & ~0xf       p: 1 + n
-#define H63484_COMMAND_RPTN		0x1c00	// & ~0xf       p: 1
-#define H63484_COMMAND_DRD		0x2400	//              p: 2
-#define H63484_COMMAND_DWT		0x2800	//              p: 2
-#define H63484_COMMAND_DMOD		0x2c00	// & ~3         p: 2
-#define H63484_COMMAND_RD		0x4400	//              p: 0
-#define H63484_COMMAND_WT		0x4800	//              p: 1
-#define H63484_COMMAND_MOD		0x4c00	// & ~3         p: 1
-#define H63484_COMMAND_CLR		0x5800	//              p: 3
-#define H63484_COMMAND_SCLR		0x5c00	// & ~3         p: 3
-#define H63484_COMMAND_CPY		0x6000	// & ~0x0f03    p: 4
-#define H63484_COMMAND_SCPY		0x7000	// & ~0x0f03    p: 4
-#define H63484_COMMAND_AMOVE	0x8000	//              p: 2
-#define H63484_COMMAND_RMOVE	0x8400	//              p: 2
-#define H63484_COMMAND_ALINE	0x8800	// & ~0x00ff    p: 2
-#define H63484_COMMAND_RLINE	0x8c00	// & ~0x00ff    p: 2
-#define H63484_COMMAND_ARCT		0x9000	// & ~0x00ff    p: 2
-#define H63484_COMMAND_RRCT		0x9400	// & ~0x00ff    p: 2
-#define H63484_COMMAND_APLL		0x9800	// & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_RPLL		0x9c00	// & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_APLG		0xa000	// & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_RPLG		0xa400	// & ~0x00ff    p: 1 + n
-#define H63484_COMMAND_CRCL		0xa800	// & ~0x01ff    p: 1
-#define H63484_COMMAND_ELPS		0xac00	// & ~0x01ff    p: 3
-#define H63484_COMMAND_AARC		0xb000	// & ~0x01ff    p: 4
-#define H63484_COMMAND_RARC		0xb400	// & ~0x01ff    p: 4
-#define H63484_COMMAND_AEARC	0xb800	// & ~0x01ff    p: 6
-#define H63484_COMMAND_REARC	0xbc00	// & ~0x01ff    p: 6
-#define H63484_COMMAND_AFRCT	0xc000	// & ~0x00ff    p: 2
-#define H63484_COMMAND_RFRCT	0xc400	// & ~0x00ff    p: 2
-#define H63484_COMMAND_PAINT	0xc800	// & ~0x01ff    p: 0
-#define H63484_COMMAND_DOT		0xcc00	// & ~0x00ff    p: 0
-#define H63484_COMMAND_PTN		0xd000	// & ~0x0fff    p: 1
-#define H63484_COMMAND_AGCPY	0xe000	// & ~0x0fff    p: 4
-#define H63484_COMMAND_RGCPY	0xf000	// & ~0x0fff    p: 4
+#define H63484_COMMAND_ORG      0x0400  //              p: 2
+#define H63484_COMMAND_WPR      0x0800  // & ~0x1f      p: 1
+#define H63484_COMMAND_RPR      0x0c00  // & ~0x1f      p: 0
+#define H63484_COMMAND_WPTN     0x1800  // & ~0xf       p: 1 + n
+#define H63484_COMMAND_RPTN     0x1c00  // & ~0xf       p: 1
+#define H63484_COMMAND_DRD      0x2400  //              p: 2
+#define H63484_COMMAND_DWT      0x2800  //              p: 2
+#define H63484_COMMAND_DMOD     0x2c00  // & ~3         p: 2
+#define H63484_COMMAND_RD       0x4400  //              p: 0
+#define H63484_COMMAND_WT       0x4800  //              p: 1
+#define H63484_COMMAND_MOD      0x4c00  // & ~3         p: 1
+#define H63484_COMMAND_CLR      0x5800  //              p: 3
+#define H63484_COMMAND_SCLR     0x5c00  // & ~3         p: 3
+#define H63484_COMMAND_CPY      0x6000  // & ~0x0f03    p: 4
+#define H63484_COMMAND_SCPY     0x7000  // & ~0x0f03    p: 4
+#define H63484_COMMAND_AMOVE    0x8000  //              p: 2
+#define H63484_COMMAND_RMOVE    0x8400  //              p: 2
+#define H63484_COMMAND_ALINE    0x8800  // & ~0x00ff    p: 2
+#define H63484_COMMAND_RLINE    0x8c00  // & ~0x00ff    p: 2
+#define H63484_COMMAND_ARCT     0x9000  // & ~0x00ff    p: 2
+#define H63484_COMMAND_RRCT     0x9400  // & ~0x00ff    p: 2
+#define H63484_COMMAND_APLL     0x9800  // & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_RPLL     0x9c00  // & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_APLG     0xa000  // & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_RPLG     0xa400  // & ~0x00ff    p: 1 + n
+#define H63484_COMMAND_CRCL     0xa800  // & ~0x01ff    p: 1
+#define H63484_COMMAND_ELPS     0xac00  // & ~0x01ff    p: 3
+#define H63484_COMMAND_AARC     0xb000  // & ~0x01ff    p: 4
+#define H63484_COMMAND_RARC     0xb400  // & ~0x01ff    p: 4
+#define H63484_COMMAND_AEARC    0xb800  // & ~0x01ff    p: 6
+#define H63484_COMMAND_REARC    0xbc00  // & ~0x01ff    p: 6
+#define H63484_COMMAND_AFRCT    0xc000  // & ~0x00ff    p: 2
+#define H63484_COMMAND_RFRCT    0xc400  // & ~0x00ff    p: 2
+#define H63484_COMMAND_PAINT    0xc800  // & ~0x01ff    p: 0
+#define H63484_COMMAND_DOT      0xcc00  // & ~0x00ff    p: 0
+#define H63484_COMMAND_PTN      0xd000  // & ~0x0fff    p: 1
+#define H63484_COMMAND_AGCPY    0xe000  // & ~0x0fff    p: 4
+#define H63484_COMMAND_RGCPY    0xf000  // & ~0x0fff    p: 4
 
 
 /*-------------------------------------------------
@@ -547,72 +547,72 @@ int h63484_device::translate_command(UINT16 data)
 	/* annoying switch-case sequence, but it's the only way to get invalid commands ... */
 	switch (data)
 	{
-		case H63484_COMMAND_ORG:	return COMMAND_ORG;
-		case H63484_COMMAND_DRD:	return COMMAND_DRD;
-		case H63484_COMMAND_DWT:	return COMMAND_DWT;
-		case H63484_COMMAND_RD: 	return COMMAND_RD;
-		case H63484_COMMAND_WT: 	return COMMAND_WT;
-		case H63484_COMMAND_CLR:	return COMMAND_CLR;
-		case H63484_COMMAND_AMOVE:	return COMMAND_AMOVE;
-		case H63484_COMMAND_RMOVE:	return COMMAND_RMOVE;
+		case H63484_COMMAND_ORG:    return COMMAND_ORG;
+		case H63484_COMMAND_DRD:    return COMMAND_DRD;
+		case H63484_COMMAND_DWT:    return COMMAND_DWT;
+		case H63484_COMMAND_RD:     return COMMAND_RD;
+		case H63484_COMMAND_WT:     return COMMAND_WT;
+		case H63484_COMMAND_CLR:    return COMMAND_CLR;
+		case H63484_COMMAND_AMOVE:  return COMMAND_AMOVE;
+		case H63484_COMMAND_RMOVE:  return COMMAND_RMOVE;
 	}
 
 	switch(data & ~0x3)
 	{
-		case H63484_COMMAND_DMOD:	return COMMAND_DMOD;
-		case H63484_COMMAND_MOD:	return COMMAND_MOD;
-		case H63484_COMMAND_SCLR:	return COMMAND_SCLR;
+		case H63484_COMMAND_DMOD:   return COMMAND_DMOD;
+		case H63484_COMMAND_MOD:    return COMMAND_MOD;
+		case H63484_COMMAND_SCLR:   return COMMAND_SCLR;
 	}
 
 	switch(data & ~0xf)
 	{
-		case H63484_COMMAND_WPTN:	return COMMAND_WPTN;
-		case H63484_COMMAND_RPTN:	return COMMAND_RPTN;
+		case H63484_COMMAND_WPTN:   return COMMAND_WPTN;
+		case H63484_COMMAND_RPTN:   return COMMAND_RPTN;
 	}
 
 	switch(data & ~0x1f)
 	{
-		case H63484_COMMAND_WPR:	return COMMAND_WPR;
-		case H63484_COMMAND_RPR:	return COMMAND_RPR;
+		case H63484_COMMAND_WPR:    return COMMAND_WPR;
+		case H63484_COMMAND_RPR:    return COMMAND_RPR;
 	}
 
 	switch(data & ~0x0f03)
 	{
-		case H63484_COMMAND_CPY:	return COMMAND_CPY;
-		case H63484_COMMAND_SCPY:	return COMMAND_SCPY;
+		case H63484_COMMAND_CPY:    return COMMAND_CPY;
+		case H63484_COMMAND_SCPY:   return COMMAND_SCPY;
 	}
 
 	switch(data & ~0x00ff)
 	{
-		case H63484_COMMAND_ALINE:	return COMMAND_ALINE;
-		case H63484_COMMAND_RLINE:	return COMMAND_RLINE;
-		case H63484_COMMAND_ARCT:	return COMMAND_ARCT;
-		case H63484_COMMAND_RRCT:	return COMMAND_RRCT;
-		case H63484_COMMAND_APLL:	return COMMAND_APLL;
-		case H63484_COMMAND_RPLL:	return COMMAND_RPLL;
-		case H63484_COMMAND_APLG:	return COMMAND_APLG;
-		case H63484_COMMAND_RPLG:	return COMMAND_RPLG;
-		case H63484_COMMAND_AFRCT:	return COMMAND_AFRCT;
-		case H63484_COMMAND_RFRCT:	return COMMAND_RFRCT;
-		case H63484_COMMAND_DOT:	return COMMAND_DOT;
+		case H63484_COMMAND_ALINE:  return COMMAND_ALINE;
+		case H63484_COMMAND_RLINE:  return COMMAND_RLINE;
+		case H63484_COMMAND_ARCT:   return COMMAND_ARCT;
+		case H63484_COMMAND_RRCT:   return COMMAND_RRCT;
+		case H63484_COMMAND_APLL:   return COMMAND_APLL;
+		case H63484_COMMAND_RPLL:   return COMMAND_RPLL;
+		case H63484_COMMAND_APLG:   return COMMAND_APLG;
+		case H63484_COMMAND_RPLG:   return COMMAND_RPLG;
+		case H63484_COMMAND_AFRCT:  return COMMAND_AFRCT;
+		case H63484_COMMAND_RFRCT:  return COMMAND_RFRCT;
+		case H63484_COMMAND_DOT:    return COMMAND_DOT;
 	}
 
 	switch(data & ~0x01ff)
 	{
-		case H63484_COMMAND_CRCL:	return COMMAND_CRCL;
-		case H63484_COMMAND_ELPS:	return COMMAND_ELPS;
-		case H63484_COMMAND_AARC:	return COMMAND_AARC;
-		case H63484_COMMAND_RARC:	return COMMAND_RARC;
-		case H63484_COMMAND_AEARC:	return COMMAND_AEARC;
-		case H63484_COMMAND_REARC:	return COMMAND_REARC;
-		case H63484_COMMAND_PAINT:	return COMMAND_PAINT;
+		case H63484_COMMAND_CRCL:   return COMMAND_CRCL;
+		case H63484_COMMAND_ELPS:   return COMMAND_ELPS;
+		case H63484_COMMAND_AARC:   return COMMAND_AARC;
+		case H63484_COMMAND_RARC:   return COMMAND_RARC;
+		case H63484_COMMAND_AEARC:  return COMMAND_AEARC;
+		case H63484_COMMAND_REARC:  return COMMAND_REARC;
+		case H63484_COMMAND_PAINT:  return COMMAND_PAINT;
 	}
 
 	switch(data & ~0x0fff)
 	{
-		case H63484_COMMAND_PTN:	return COMMAND_PTN;
-		case H63484_COMMAND_AGCPY:	return COMMAND_AGCPY;
-		case H63484_COMMAND_RGCPY:	return COMMAND_RGCPY;
+		case H63484_COMMAND_PTN:    return COMMAND_PTN;
+		case H63484_COMMAND_AGCPY:  return COMMAND_AGCPY;
+		case H63484_COMMAND_RGCPY:  return COMMAND_RGCPY;
 	}
 
 	return COMMAND_INVALID;
@@ -754,11 +754,11 @@ void h63484_device::command_rct_exec()
 	printf("%d %d\n",dX,dY);
 
 	/*
-    3<-2
-    |  ^
-    v  |
-    0->1
-    */
+	3<-2
+	|  ^
+	v  |
+	0->1
+	*/
 
 	/* 0 -> 1 */
 	for(i=0;i<dX;i+=inc_x)
@@ -1013,12 +1013,12 @@ void h63484_device::video_registers_w(int offset)
 				exec_abort_sequence();
 
 			/*
-            x--- ---- ---- ---- ABorT
-            -x-- ---- ---- ---- PauSE
-            ...
-            ---- -xxx ---- ---- Graphic Bit Mode (bpp)
-            ---- ---- xxxx xxxx irq mask, directly correlated to sr
-            */
+			x--- ---- ---- ---- ABorT
+			-x-- ---- ---- ---- PauSE
+			...
+			---- -xxx ---- ---- Graphic Bit Mode (bpp)
+			---- ---- xxxx xxxx irq mask, directly correlated to sr
+			*/
 			m_ccr = vreg_data;
 			break;
 

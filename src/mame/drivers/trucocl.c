@@ -53,8 +53,8 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 {
 	dac_device *device = machine().device<dac_device>("dac");
 	UINT8 *rom = memregion("maincpu")->base();
-	int	dac_address = ( data & 0xf0 ) << 8;
-	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
+	int dac_address = ( data & 0xf0 ) << 8;
+	int sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
 	if ( m_cur_dac_address != dac_address )
 	{
@@ -106,19 +106,19 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	8,8,		/* 8*8 characters */
-	0x10000/32,	/* 2048 characters */
-	4,			/* 4 bits per pixel */
+	8,8,        /* 8*8 characters */
+	0x10000/32, /* 2048 characters */
+	4,          /* 4 bits per pixel */
 	{ 0, 1,2,3 },
 	{ 0, 4, 0x8000*8+0,0x8000*8+4, 8*8+0, 8*8+4, 0x8000*8+8*8+0,0x8000*8+8*8+4 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8		/* every char takes 16 consecutive bytes */
+	16*8        /* every char takes 16 consecutive bytes */
 };
 
 
 
 static GFXDECODE_START( trucocl )
-	GFXDECODE_ENTRY( "gfx1", 0, 		tilelayout,      0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0,         tilelayout,      0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, tilelayout,      0, 2 )
 GFXDECODE_END
 
@@ -162,7 +162,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( trucocl )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* ROMs + space for additional RAM + samples */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* ROMs + space for additional RAM + samples */
 	ROM_LOAD( "trucocl.01", 0x00000, 0x20000, CRC(c9511c37) SHA1(d6a0fa573c8d2faf1a94a2be26fcaafe631d0699) )
 	ROM_LOAD( "trucocl.03", 0x20000, 0x20000, CRC(b37ce38c) SHA1(00bd506e9a03cb8ed65b0b599514db6b9b0ee5f3) ) /* samples */
 

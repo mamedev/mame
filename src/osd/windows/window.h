@@ -55,9 +55,9 @@
 //  CONSTANTS
 //============================================================
 
-#define RESIZE_STATE_NORMAL		0
-#define RESIZE_STATE_RESIZING	1
-#define RESIZE_STATE_PENDING	2
+#define RESIZE_STATE_NORMAL     0
+#define RESIZE_STATE_RESIZING   1
+#define RESIZE_STATE_PENDING    2
 
 
 
@@ -73,44 +73,44 @@ public:
 
 	running_machine &machine() const { return m_machine; }
 
-	win_window_info *	next;
-	volatile int		init_state;
+	win_window_info *   next;
+	volatile int        init_state;
 
 	// window handle and info
-	HWND				hwnd;
-	char				title[256];
-	RECT				non_fullscreen_bounds;
-	int					startmaximized;
-	int					isminimized;
-	int					ismaximized;
-	int					resize_state;
+	HWND                hwnd;
+	char                title[256];
+	RECT                non_fullscreen_bounds;
+	int                 startmaximized;
+	int                 isminimized;
+	int                 ismaximized;
+	int                 resize_state;
 
 	// monitor info
-	win_monitor_info *	monitor;
-	int					fullscreen;
-	int					fullscreen_safe;
-	int					maxwidth, maxheight;
-	int					refresh;
-	float				aspect;
+	win_monitor_info *  monitor;
+	int                 fullscreen;
+	int                 fullscreen_safe;
+	int                 maxwidth, maxheight;
+	int                 refresh;
+	float               aspect;
 
 	// rendering info
-	osd_lock *			render_lock;
-	render_target *		target;
-	int					targetview;
-	int					targetorient;
-	render_layer_config	targetlayerconfig;
+	osd_lock *          render_lock;
+	render_target *     target;
+	int                 targetview;
+	int                 targetorient;
+	render_layer_config targetlayerconfig;
 	render_primitive_list *primlist;
 
 	// input info
-	DWORD				lastclicktime;
-	int					lastclickx;
-	int					lastclicky;
+	DWORD               lastclicktime;
+	int                 lastclickx;
+	int                 lastclicky;
 
 	// drawing data
-	void *				drawdata;
+	void *              drawdata;
 
 private:
-	running_machine &	m_machine;
+	running_machine &   m_machine;
 };
 
 

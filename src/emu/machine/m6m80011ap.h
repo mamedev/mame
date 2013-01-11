@@ -37,8 +37,8 @@ enum eeprom_cmd_t
 
 // ======================> m6m80011ap_device
 
-class m6m80011ap_device :	public device_t,
-    						public device_nvram_interface
+class m6m80011ap_device :   public device_t,
+							public device_nvram_interface
 {
 public:
 	// construction/destruction

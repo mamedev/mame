@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8021_TAG		"z4"
+#define I8021_TAG       "z4"
 
 
 enum
@@ -237,11 +237,11 @@ ioport_constructor trs80m2_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock),
-	  m_maincpu(*this, I8021_TAG),
-	  m_busy(1),
-	  m_data(1),
-	  m_clk(0)
+	: device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock),
+		m_maincpu(*this, I8021_TAG),
+		m_busy(1),
+		m_data(1),
+		m_clk(0)
 {
 }
 
@@ -253,7 +253,7 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 void trs80m2_keyboard_device::device_start()
 {
 	// resolve callbacks
-    m_out_clock_func.resolve(m_out_clock_cb, *this);
+	m_out_clock_func.resolve(m_out_clock_cb, *this);
 
 	// state saving
 	save_item(NAME(m_busy));
@@ -337,18 +337,18 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DATA
-        1       CLOCK
-        2       LED
-        3
-        4       LED
-        5
-        6
-        7
+	    0       DATA
+	    1       CLOCK
+	    2       LED
+	    3
+	    4       LED
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_data = BIT(data, 0);
 	int clk = BIT(data, 1);
@@ -372,18 +372,18 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       D
-        1       C
-        2       B
-        3       A
-        4
-        5
-        6
-        7
+	    0       D
+	    1       C
+	    2       B
+	    3       A
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_y = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 }

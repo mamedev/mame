@@ -694,7 +694,7 @@ const device_type DIGITALKER = &device_creator<digitalker_device>;
 
 digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(digitalker);
 }
@@ -727,5 +727,3 @@ void digitalker_device::sound_stream_update(sound_stream &stream, stream_sample_
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

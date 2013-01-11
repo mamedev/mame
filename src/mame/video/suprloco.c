@@ -11,14 +11,14 @@
 
 
 
-#define SPR_Y_TOP		0
-#define SPR_Y_BOTTOM	1
-#define SPR_X			2
-#define SPR_COL			3
-#define SPR_SKIP_LO		4
-#define SPR_SKIP_HI		5
-#define SPR_GFXOFS_LO	6
-#define SPR_GFXOFS_HI	7
+#define SPR_Y_TOP       0
+#define SPR_Y_BOTTOM    1
+#define SPR_X           2
+#define SPR_COL         3
+#define SPR_SKIP_LO     4
+#define SPR_SKIP_HI     5
+#define SPR_GFXOFS_LO   6
+#define SPR_GFXOFS_HI   7
 
 
 /***************************************************************************
@@ -177,15 +177,15 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 	UINT8 *spr_reg;
 	UINT8 *gfx2;
 	pen_t pen_base;
-	short skip;	/* bytes to skip before drawing each row (can be negative) */
+	short skip; /* bytes to skip before drawing each row (can be negative) */
 
 
-	spr_reg	= state->m_spriteram + 0x10 * spr_number;
+	spr_reg = state->m_spriteram + 0x10 * spr_number;
 
 	src = spr_reg[SPR_GFXOFS_LO] + (spr_reg[SPR_GFXOFS_HI] << 8);
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
 
-	height		= spr_reg[SPR_Y_BOTTOM] - spr_reg[SPR_Y_TOP];
+	height      = spr_reg[SPR_Y_BOTTOM] - spr_reg[SPR_Y_TOP];
 	pen_base = 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((state->m_control & 0x20)?0x100:0);
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
@@ -218,7 +218,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 
 		while (1)
 		{
-			if (flipx)	/* flip x */
+			if (flipx)  /* flip x */
 			{
 				data = *gfx--;
 				color1 = data & 0x0f;

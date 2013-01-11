@@ -2,8 +2,8 @@
 #include "debugger.h"
 #include "sh2.h"
 
-#define SIGNX8(x)	(((INT32)(x) << 24) >> 24)
-#define SIGNX12(x)	(((INT32)(x) << 20) >> 20)
+#define SIGNX8(x)   (((INT32)(x) << 24) >> 24)
+#define SIGNX12(x)  (((INT32)(x) << 20) >> 20)
 
 #define Rn ((opcode >> 8) & 15)
 #define Rm ((opcode >> 4) & 15)
@@ -582,22 +582,22 @@ unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode)
 
 	switch((opcode >> 12) & 15)
 	{
-	case  0: flags = op0000(buffer,pc,opcode);	  break;
-	case  1: flags = op0001(buffer,pc,opcode);	  break;
-	case  2: flags = op0010(buffer,pc,opcode);	  break;
-	case  3: flags = op0011(buffer,pc,opcode);	  break;
-	case  4: flags = op0100(buffer,pc,opcode);	  break;
-	case  5: flags = op0101(buffer,pc,opcode);	  break;
-	case  6: flags = op0110(buffer,pc,opcode);	  break;
-	case  7: flags = op0111(buffer,pc,opcode);	  break;
-	case  8: flags = op1000(buffer,pc,opcode);	  break;
-	case  9: flags = op1001(buffer,pc,opcode);	  break;
-	case 10: flags = op1010(buffer,pc,opcode);	  break;
-	case 11: flags = op1011(buffer,pc,opcode);	  break;
-	case 12: flags = op1100(buffer,pc,opcode);	  break;
-	case 13: flags = op1101(buffer,pc,opcode);	  break;
-	case 14: flags = op1110(buffer,pc,opcode);	  break;
-	default: flags = op1111(buffer,pc,opcode);	  break;
+	case  0: flags = op0000(buffer,pc,opcode);    break;
+	case  1: flags = op0001(buffer,pc,opcode);    break;
+	case  2: flags = op0010(buffer,pc,opcode);    break;
+	case  3: flags = op0011(buffer,pc,opcode);    break;
+	case  4: flags = op0100(buffer,pc,opcode);    break;
+	case  5: flags = op0101(buffer,pc,opcode);    break;
+	case  6: flags = op0110(buffer,pc,opcode);    break;
+	case  7: flags = op0111(buffer,pc,opcode);    break;
+	case  8: flags = op1000(buffer,pc,opcode);    break;
+	case  9: flags = op1001(buffer,pc,opcode);    break;
+	case 10: flags = op1010(buffer,pc,opcode);    break;
+	case 11: flags = op1011(buffer,pc,opcode);    break;
+	case 12: flags = op1100(buffer,pc,opcode);    break;
+	case 13: flags = op1101(buffer,pc,opcode);    break;
+	case 14: flags = op1110(buffer,pc,opcode);    break;
+	default: flags = op1111(buffer,pc,opcode);    break;
 	}
 	return 2 | flags | DASMFLAG_SUPPORTED;
 }
@@ -606,4 +606,3 @@ CPU_DISASSEMBLE( sh2 )
 {
 	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
 }
-

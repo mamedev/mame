@@ -17,8 +17,3 @@ private:
 };
 
 extern const device_type SKNS_SPRITE;
-
-
-
-
-

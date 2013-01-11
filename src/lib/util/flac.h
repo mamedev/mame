@@ -96,21 +96,21 @@ private:
 	FLAC__StreamEncoderWriteStatus write_callback(const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame);
 
 	// internal state
-	FLAC__StreamEncoder *	m_encoder;				// actual encoder
-	core_file *				m_file;					// output file
-	UINT32					m_compressed_offset;	// current offset with the compressed stream
-	FLAC__byte *			m_compressed_start;		// start of compressed data
-	UINT32					m_compressed_length;	// length of the compressed stream
+	FLAC__StreamEncoder *   m_encoder;              // actual encoder
+	core_file *             m_file;                 // output file
+	UINT32                  m_compressed_offset;    // current offset with the compressed stream
+	FLAC__byte *            m_compressed_start;     // start of compressed data
+	UINT32                  m_compressed_length;    // length of the compressed stream
 
 	// parameters
-	UINT32					m_sample_rate;			// sample rate
-	UINT8					m_channels;				// number of channels
-	UINT32					m_block_size;			// block size
+	UINT32                  m_sample_rate;          // sample rate
+	UINT8                   m_channels;             // number of channels
+	UINT32                  m_block_size;           // block size
 
 	// header stripping
-	bool					m_strip_metadata;		// strip the the metadata?
-	UINT32					m_ignore_bytes;			// how many bytes to ignore when writing
-	bool					m_found_audio;			// have we hit the audio yet?
+	bool                    m_strip_metadata;       // strip the the metadata?
+	UINT32                  m_ignore_bytes;         // how many bytes to ignore when writing
+	bool                    m_found_audio;          // have we hit the audio yet?
 };
 
 
@@ -157,21 +157,21 @@ private:
 	static void error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data);
 
 	// output state
-	FLAC__StreamDecoder *	m_decoder;				// actual encoder
-	core_file *				m_file;					// output file
-	UINT32					m_sample_rate;			// decoded sample rate
-	UINT8					m_channels;				// decoded number of channels
-	UINT8					m_bits_per_sample;		// decoded bits per sample
-	UINT32					m_compressed_offset;	// current offset in compressed data
-	const FLAC__byte *		m_compressed_start;		// start of compressed data
-	UINT32					m_compressed_length;	// length of compressed data
-	const FLAC__byte *		m_compressed2_start;	// start of compressed data
-	UINT32					m_compressed2_length;	// length of compressed data
-	INT16 *					m_uncompressed_start[8];// pointer to start of uncompressed data (up to 8 streams)
-	UINT32					m_uncompressed_offset;	// current position in uncompressed data
-	UINT32					m_uncompressed_length;	// length of uncompressed data
-	bool					m_uncompressed_swap;	// swap uncompressed sample data
-	UINT8					m_custom_header[0x2a];	// custom header
+	FLAC__StreamDecoder *   m_decoder;              // actual encoder
+	core_file *             m_file;                 // output file
+	UINT32                  m_sample_rate;          // decoded sample rate
+	UINT8                   m_channels;             // decoded number of channels
+	UINT8                   m_bits_per_sample;      // decoded bits per sample
+	UINT32                  m_compressed_offset;    // current offset in compressed data
+	const FLAC__byte *      m_compressed_start;     // start of compressed data
+	UINT32                  m_compressed_length;    // length of compressed data
+	const FLAC__byte *      m_compressed2_start;    // start of compressed data
+	UINT32                  m_compressed2_length;   // length of compressed data
+	INT16 *                 m_uncompressed_start[8];// pointer to start of uncompressed data (up to 8 streams)
+	UINT32                  m_uncompressed_offset;  // current position in uncompressed data
+	UINT32                  m_uncompressed_length;  // length of uncompressed data
+	bool                    m_uncompressed_swap;    // swap uncompressed sample data
+	UINT8                   m_custom_header[0x2a];  // custom header
 };
 
 

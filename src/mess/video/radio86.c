@@ -99,11 +99,10 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 static const rgb_t radio86_palette[3] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // black
 	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
-	MAKE_RGB(0xff, 0xff, 0xff)	// highlight
+	MAKE_RGB(0xff, 0xff, 0xff)  // highlight
 };
 
 PALETTE_INIT_MEMBER(radio86_state,radio86)
 {
 	palette_set_colors(machine(), 0, radio86_palette, ARRAY_LENGTH(radio86_palette));
 }
-

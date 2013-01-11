@@ -18,13 +18,13 @@
 
 struct cdrom_interface
 {
-	const char *					m_interface;
-	device_image_display_info_func	m_device_displayinfo;
+	const char *                    m_interface;
+	device_image_display_info_func  m_device_displayinfo;
 };
 
 // ======================> cdrom_image_device
 
-class cdrom_image_device :	public device_t,
+class cdrom_image_device :  public device_t,
 								public cdrom_interface,
 								public device_image_interface
 {
@@ -54,14 +54,14 @@ public:
 	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
 
-	chd_file	m_self_chd;
-	cdrom_file	*m_cdrom_handle;
+	chd_file    m_self_chd;
+	cdrom_file  *m_cdrom_handle;
 	image_device_format m_format;
-	const char	*m_extension_list;
+	const char  *m_extension_list;
 };
 
 // device type definition
@@ -74,6 +74,6 @@ extern const device_type CDROM;
 
 #define MCFG_CDROM_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, CDROM, 0) \
-	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_CONFIG(_config) \
 
 #endif /* CHD_CD_H */

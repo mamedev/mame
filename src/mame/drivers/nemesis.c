@@ -177,12 +177,12 @@ READ16_MEMBER(nemesis_state::konamigt_input_word_r)
 //  if (BIT(data, 4)) ret |= 0x0800;          // turbo/gear?
 //  if (BIT(data, 7)) ret |= 0x0400;          // turbo?
 	if (BIT(data, 5))
-		ret |= 0x0300;			// brake        (0-3)
+		ret |= 0x0300;          // brake        (0-3)
 
 	if (BIT(data, 6))
-		ret |= 0xf000;			// accel        (0-f)
+		ret |= 0xf000;          // accel        (0-f)
 
-	ret |= data2 & 0x7f;					// steering wheel, not exactly sure if DIAL works ok.
+	ret |= data2 & 0x7f;                    // steering wheel, not exactly sure if DIAL works ok.
 
 	return ret;
 }
@@ -190,16 +190,16 @@ READ16_MEMBER(nemesis_state::konamigt_input_word_r)
 WRITE16_MEMBER(nemesis_state::selected_ip_word_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_selected_ip = data & 0xff;	// latch the value
+		m_selected_ip = data & 0xff;    // latch the value
 }
 
 READ16_MEMBER(nemesis_state::selected_ip_word_r)
 {
 	switch (m_selected_ip & 0xf)
-	{												// From WEC Le Mans Schems:
-		case 0xc:  return ioport("ACCEL")->read();	// Accel - Schems: Accelevr
+	{                                               // From WEC Le Mans Schems:
+		case 0xc:  return ioport("ACCEL")->read();  // Accel - Schems: Accelevr
 		case 0:    return ioport("ACCEL")->read();
-		case 0xd:  return ioport("WHEEL")->read();	// Wheel - Schems: Handlevr
+		case 0xd:  return ioport("WHEEL")->read();  // Wheel - Schems: Handlevr
 		case 1:    return ioport("WHEEL")->read();
 
 		default: return ~0;
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
 	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
 	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")		/* VRAM */
+	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
@@ -274,22 +274,22 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)	/* probably */
+	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
 	AM_RANGE(0x05cc06, 0x05cc07) AM_READ_PORT("TEST")
 	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(nemesis_irq_enable_word_w)
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITENOP		/* not used irq */
+	AM_RANGE(0x05e002, 0x05e003) AM_WRITENOP        /* not used irq */
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* not used irq */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP		/* not used irq */
-	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
+	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP        /* not used irq */
+	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP        /* not used irq */
+	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
@@ -298,28 +298,28 @@ static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
 	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
 	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")		/* VRAM */
+	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x057000, 0x057fff) AM_RAM				/* needed for twinbee */
+	AM_RANGE(0x057000, 0x057fff) AM_RAM             /* needed for twinbee */
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
-	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)	/* probably */
+	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w)	/* ?? */
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w) /* ?? */
+	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w) /* ?? */
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* IRQ acknowledge??? */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w)	/* ?? */
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM			/* WORK RAM */
+	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP        /* IRQ acknowledge??? */
+	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w) /* ?? */
+	AM_RANGE(0x060000, 0x07ffff) AM_RAM         /* WORK RAM */
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
 	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
 	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")		/* VRAM */
+	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)	/* probably */
+	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
@@ -349,14 +349,14 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(konamigt_irq_enable_word_w)
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* not used irq */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP		/* not used irq */
-	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
+	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP        /* not used irq */
+	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP        /* not used irq */
+	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
 	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
 	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")		/* VRAM */
+	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
@@ -375,17 +375,17 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
-	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)	/* probably */
+	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w)	/* ?? */
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w) /* ?? */
+	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w) /* ?? */
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP	/* IRQ acknowledge??? */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w)	/* ?? */
-	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
+	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP    /* IRQ acknowledge??? */
+	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w) /* ?? */
+	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
@@ -431,20 +431,20 @@ static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(salamander_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE(watchdog_reset16_w)	/* probably */
-	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
+	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE(watchdog_reset16_w)   /* probably */
+	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
 	AM_RANGE(0x0c2002, 0x0c2003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c2004, 0x0c2005) AM_READ_PORT("IN2")
 	AM_RANGE(0x0c2006, 0x0c2007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")		/* VRAM */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")       /* VRAM */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")		/* more sprite ram ??? */
+	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
 	AM_RANGE(0x190000, 0x191fff) AM_RAM
 	AM_RANGE(0x190000, 0x1903ff) AM_SHARE("xscroll2")
 	AM_RANGE(0x190400, 0x1907ff) AM_SHARE("xscroll1")
@@ -456,15 +456,15 @@ static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE(salamander_palette_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x090000, 0x097fff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
+	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE(watchdog_reset16_w)	/* probably */
-	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
+	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE(watchdog_reset16_w)   /* probably */
+	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
 	AM_RANGE(0x0c2002, 0x0c2003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c2004, 0x0c2005) AM_READ_PORT("IN2")
 	AM_RANGE(0x0c2006, 0x0c2007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1") AM_MIRROR(0x4000)	/* VRAM */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1") AM_MIRROR(0x4000) /* VRAM */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2") AM_MIRROR(0x4000)
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
@@ -474,7 +474,7 @@ static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x180400, 0x1807ff) AM_SHARE("xscroll2")
 	AM_RANGE(0x180f00, 0x180f7f) AM_SHARE("yscroll2")
 	AM_RANGE(0x180f80, 0x180fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x190000, 0x190fff) AM_RAM AM_SHARE("spriteram")		/* more sprite ram ??? */
+	AM_RANGE(0x190000, 0x190fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
@@ -484,15 +484,15 @@ static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0002, 0x0f0003) AM_READ_PORT("IN2")
 	AM_RANGE(0x0f0004, 0x0f0005) AM_READ_PORT("IN1")
-	AM_RANGE(0x0f0006, 0x0f0007) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
+	AM_RANGE(0x0f0006, 0x0f0007) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0f0010, 0x0f0011) AM_WRITE(nemesis_soundlatch_word_w)
-	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(watchdog_reset16_w)	/* probably */
-	AM_RANGE(0x0f0020, 0x0f0021) AM_READ(selected_ip_word_r) AM_WRITENOP	/* WEC Le Mans 24 control? */
-	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
+	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(watchdog_reset16_w)   /* probably */
+	AM_RANGE(0x0f0020, 0x0f0021) AM_READ(selected_ip_word_r) AM_WRITENOP    /* WEC Le Mans 24 control? */
+	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x100000, 0x1bffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x210000, 0x210fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")		/* VRAM */
+	AM_RANGE(0x210000, 0x210fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
 	AM_RANGE(0x211000, 0x211fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
 	AM_RANGE(0x212000, 0x212fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
 	AM_RANGE(0x213000, 0x213fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
@@ -501,7 +501,7 @@ static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x300400, 0x3007ff) AM_SHARE("xscroll2")
 	AM_RANGE(0x300f00, 0x300f7f) AM_SHARE("yscroll2")
 	AM_RANGE(0x300f80, 0x300fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x310000, 0x310fff) AM_RAM AM_SHARE("spriteram")		/* more sprite ram ??? */
+	AM_RANGE(0x310000, 0x310fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
@@ -512,17 +512,17 @@ static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("IN2")
 	AM_RANGE(0x070004, 0x070005) AM_READ_PORT("IN1")
-	AM_RANGE(0x070006, 0x070007) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
+	AM_RANGE(0x070006, 0x070007) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
 	AM_RANGE(0x070008, 0x070009) AM_READ_PORT("DSW0")
 	AM_RANGE(0x070010, 0x070011) AM_WRITE(nemesis_soundlatch_word_w)
-	AM_RANGE(0x070018, 0x070019) AM_WRITE(watchdog_reset16_w)	/* probably */
-	AM_RANGE(0x078000, 0x078001) AM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")		/* VRAM */
+	AM_RANGE(0x070018, 0x070019) AM_WRITE(watchdog_reset16_w)   /* probably */
+	AM_RANGE(0x078000, 0x078001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
 	AM_RANGE(0x201000, 0x201fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
 	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
 	AM_RANGE(0x203000, 0x203fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("spriteram")		/* more sprite ram ??? */
+	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
 	AM_RANGE(0x310000, 0x311fff) AM_RAM
 	AM_RANGE(0x310000, 0x3103ff) AM_SHARE("xscroll1")
 	AM_RANGE(0x310400, 0x3107ff) AM_SHARE("xscroll2")
@@ -577,20 +577,20 @@ static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x040000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(salamander_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("TEST")
-	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE(watchdog_reset16_w)	/* watchdog probably */
+	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE(watchdog_reset16_w)   /* watchdog probably */
 	AM_RANGE(0x0c000a, 0x0c000b) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c2000, 0x0c2001) AM_READ(konamigt_input_word_r)	/* Konami GT control */
+	AM_RANGE(0x0c2000, 0x0c2001) AM_READ(konamigt_input_word_r) /* Konami GT control */
 	AM_RANGE(0x0c2800, 0x0c2801) AM_WRITENOP
 	AM_RANGE(0x0c2802, 0x0c2803) AM_WRITE(gx400_irq2_enable_word_w) // or at 0x0c2804 ?
 	AM_RANGE(0x0c2804, 0x0c2805) AM_WRITENOP
 	AM_RANGE(0x0c4000, 0x0c4001) AM_READ_PORT("IN1") AM_WRITE(selected_ip_word_w)
-	AM_RANGE(0x0c4002, 0x0c4003) AM_READ(selected_ip_word_r) AM_WRITENOP	/* WEC Le Mans 24 control. latches the value read previously */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")		/* VRAM */
+	AM_RANGE(0x0c4002, 0x0c4003) AM_READ(selected_ip_word_r) AM_WRITENOP    /* WEC Le Mans 24 control. latches the value read previously */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")       /* VRAM */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
@@ -621,9 +621,9 @@ static INPUT_PORTS_START( nemesis )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	// power-up
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	// shoot
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	// missile
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    // power-up
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    // shoot
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    // missile
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -641,33 +641,33 @@ static INPUT_PORTS_START( nemesis )
 	/* "None" = coin slot B disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "50k and every 100k" )
 	PORT_DIPSETTING(    0x10, "30k" )
 	PORT_DIPSETTING(    0x08, "50k" )
 	PORT_DIPSETTING(    0x00, "100k" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -679,12 +679,12 @@ static INPUT_PORTS_START( nemesuk )
 	PORT_INCLUDE( nemesis )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20k and every 70k" )
 	PORT_DIPSETTING(    0x10, "30k and every 80k" )
 	PORT_DIPSETTING(    0x08, "20k" )
@@ -722,17 +722,17 @@ static INPUT_PORTS_START( konamigt )
 
 	PORT_START("DSW1")
 	PORT_BIT( 0x4f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -774,17 +774,17 @@ static INPUT_PORTS_START( rf2 )
 	PORT_START("DSW1")
 	PORT_BIT( 0x4f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -812,31 +812,31 @@ static INPUT_PORTS_START( gwarrior )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30k 100k 200k 400k" )
 	PORT_DIPSETTING(    0x10, "40k 120k 240k 480k" )
 	PORT_DIPSETTING(    0x08, "50k 150k 300k 600k" )
 	PORT_DIPSETTING(    0x00, "100k 200k 400k 800k" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -859,31 +859,31 @@ static INPUT_PORTS_START( twinbee )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20k 100k" )
 	PORT_DIPSETTING(    0x10, "30k 120k" )
 	PORT_DIPSETTING(    0x08, "40k 140k" )
 	PORT_DIPSETTING(    0x00, "50k 160k" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -908,33 +908,33 @@ static INPUT_PORTS_START( gradius )
 	/* "None" = coin slot B disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20k and every 70k" )
 	PORT_DIPSETTING(    0x10, "30k and every 80k" )
 	PORT_DIPSETTING(    0x08, "20k only" )
 	PORT_DIPSETTING(    0x00, "30k only" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -949,7 +949,7 @@ static INPUT_PORTS_START( salamand )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:2" )
@@ -963,7 +963,7 @@ static INPUT_PORTS_START( salamand )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
@@ -978,7 +978,7 @@ static INPUT_PORTS_START( salamand )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -998,25 +998,25 @@ static INPUT_PORTS_START( salamand )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, "Coin Slot(s)" )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, "Coin Slot(s)" )          PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x18, 0x00, "Max Credit(s)" )			PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "Max Credit(s)" )         PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "9" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1029,7 +1029,7 @@ static INPUT_PORTS_START( lifefrcj )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:2" )
@@ -1040,10 +1040,10 @@ static INPUT_PORTS_START( lifefrcj )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	// power-up
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	// shoot
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	// missile
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW3:4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    // power-up
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    // shoot
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)    // missile
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
@@ -1062,25 +1062,25 @@ static INPUT_PORTS_START( lifefrcj )
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Coin Slot(s)" )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, "Coin Slot(s)" )          PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "70k and every 200k" )
 	PORT_DIPSETTING(    0x10, "100k and every 300k" )
 	PORT_DIPSETTING(    0x08, "70k only" )
 	PORT_DIPSETTING(    0x00, "100k only" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1092,10 +1092,10 @@ static INPUT_PORTS_START( blkpnthr )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x80, "Continue" )				PORT_DIPLOCATION("SW3:2,3")
+	PORT_DIPNAME( 0xc0, 0x80, "Continue" )              PORT_DIPLOCATION("SW3:2,3")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, "2 Areas" )
 	PORT_DIPSETTING(    0x40, "3 Areas" )
@@ -1126,25 +1126,25 @@ static INPUT_PORTS_START( blkpnthr )
 	/* "None" = coin slot B disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "50k 100k" )
 	PORT_DIPSETTING(    0x10, "20k 50k" )
 	PORT_DIPSETTING(    0x08, "30k 70k" )
 	PORT_DIPSETTING(    0x00, "80k 150k" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1152,17 +1152,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( citybomb )
 	PORT_START("IN0")
 	KONAMI8_SYSTEM_10
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Upright Control" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x40, 0x40, "Upright Control" )       PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:3" )
 
 	PORT_START("IN1")
 	KONAMI8_B123(1)
-	PORT_DIPNAME( 0x80, 0x80, "Device Type" )			PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x80, 0x80, "Device Type" )           PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, "Handle" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Joystick ) )
 
@@ -1176,35 +1176,35 @@ static INPUT_PORTS_START( citybomb )
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x10, "Qualify" )				PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, "Qualify" )               PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "Long" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, "Short" )
 	PORT_DIPSETTING(    0x00, "Very Short" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/* WEC Le Mans 24 specific control? */
-	PORT_START("ACCEL")		/* Accelerator */
+	PORT_START("ACCEL")     /* Accelerator */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("WHEEL")		/* Steering Wheel */
+	PORT_START("WHEEL")     /* Steering Wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nyanpani )
 	PORT_START("IN0")
 	KONAMI8_SYSTEM_10
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW3:2" )
@@ -1221,17 +1221,17 @@ static INPUT_PORTS_START( nyanpani )
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1251,10 +1251,10 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)		// only in WEC Le Mans 24 cabinets
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02)	// player 2?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)        // only in WEC Le Mans 24 cabinets
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02) // player 2?
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	// must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   // must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -1266,30 +1266,30 @@ static INPUT_PORTS_START( hcrash )
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "Konami GT without brake" )
 	PORT_DIPSETTING(    0x02, "WEC Le Mans 24 Upright" )
 	PORT_DIPSETTING(    0x01, "Konami GT with brake" )
 	// 0x00 WEC Le Mans 24 Upright again
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Quantity of Initials" )	PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Quantity of Initials" )  PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "7" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_DIPNAME( 0x08, 0x08, "Speed Unit" )			PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x08, 0x08, "Speed Unit" )            PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x08, "km/h" )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1299,16 +1299,16 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x7f, 0x40, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
 	PORT_START("IN3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)		// only in Konami GT cabinet with brake
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)        // only in Konami GT cabinet with brake
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 
 	/* WEC Le Mans 24 specific control */
-	PORT_START("ACCEL")		/* Accelerator */
+	PORT_START("ACCEL")     /* Accelerator */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("WHEEL")		/* Steering Wheel */
+	PORT_START("WHEEL")     /* Steering Wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -1318,9 +1318,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	2048,	/* 2048 characters (+ blank one) */
-	4,	/* 4 bits per pixel */
+	8,8,    /* 8*8 characters */
+	2048,   /* 2048 characters (+ blank one) */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4) },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
@@ -1329,9 +1329,9 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	512,	/* 512 sprites */
-	4,	/* 4 bits per pixel */
+	16,16,  /* 16*16 sprites */
+	512,    /* 512 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4),
 			XOR(8*4), XOR(9*4), XOR(10*4), XOR(11*4), XOR(12*4), XOR(13*4), XOR(14*4), XOR(15*4) },
@@ -1342,14 +1342,14 @@ static const gfx_layout spritelayout =
 
 static const gfx_layout spritelayout3216 =
 {
-	32,16,	/* 32*16 sprites */
-	256,	/* 256 sprites */
-	4,	/* 4 bits per pixel */
+	32,16,  /* 32*16 sprites */
+	256,    /* 256 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4),
 			XOR(8*4), XOR(9*4), XOR(10*4), XOR(11*4), XOR(12*4), XOR(13*4), XOR(14*4), XOR(15*4),
-		   XOR(16*4),XOR(17*4), XOR(18*4), XOR(19*4), XOR(20*4), XOR(21*4), XOR(22*4), XOR(23*4),
-		   XOR(24*4),XOR(25*4), XOR(26*4), XOR(27*4), XOR(28*4), XOR(29*4), XOR(30*4), XOR(31*4)},
+			XOR(16*4),XOR(17*4), XOR(18*4), XOR(19*4), XOR(20*4), XOR(21*4), XOR(22*4), XOR(23*4),
+			XOR(24*4),XOR(25*4), XOR(26*4), XOR(27*4), XOR(28*4), XOR(29*4), XOR(30*4), XOR(31*4)},
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
 			8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 	256*8     /* every sprite takes 128 consecutive bytes */
@@ -1357,41 +1357,41 @@ static const gfx_layout spritelayout3216 =
 
 static const gfx_layout spritelayout1632 =
 {
-	16,32,	/* 16*32 sprites */
-	256,	/* 256 sprites */
-	4,	/* 4 bits per pixel */
+	16,32,  /* 16*32 sprites */
+	256,    /* 256 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4),
 			XOR(8*4), XOR(9*4), XOR(10*4), XOR(11*4), XOR(12*4), XOR(13*4), XOR(14*4), XOR(15*4)},
 	{ 0*64,  1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-	  8*64,  9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64,
-	 16*64, 17*64, 18*64, 19*64, 20*64, 21*64, 22*64, 23*64,
-	 24*64, 25*64, 26*64, 27*64, 28*64, 29*64, 30*64, 31*64},
+		8*64,  9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64,
+		16*64, 17*64, 18*64, 19*64, 20*64, 21*64, 22*64, 23*64,
+		24*64, 25*64, 26*64, 27*64, 28*64, 29*64, 30*64, 31*64},
 	256*8     /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout spritelayout3232 =
 {
-	32,32,	/* 32*32 sprites */
-	128,	/* 128 sprites */
-	4,	/* 4 bits per pixel */
+	32,32,  /* 32*32 sprites */
+	128,    /* 128 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4),
 			XOR(8*4), XOR(9*4), XOR(10*4), XOR(11*4), XOR(12*4), XOR(13*4), XOR(14*4), XOR(15*4),
-		   XOR(16*4),XOR(17*4), XOR(18*4), XOR(19*4), XOR(20*4), XOR(21*4), XOR(22*4), XOR(23*4),
-		   XOR(24*4),XOR(25*4), XOR(26*4), XOR(27*4), XOR(28*4), XOR(29*4), XOR(30*4), XOR(31*4)},
+			XOR(16*4),XOR(17*4), XOR(18*4), XOR(19*4), XOR(20*4), XOR(21*4), XOR(22*4), XOR(23*4),
+			XOR(24*4),XOR(25*4), XOR(26*4), XOR(27*4), XOR(28*4), XOR(29*4), XOR(30*4), XOR(31*4)},
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
 			8*128,  9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128,
-		   16*128, 17*128, 18*128, 19*128, 20*128, 21*128, 22*128, 23*128,
-		   24*128, 25*128, 26*128, 27*128, 28*128, 29*128, 30*128, 31*128},
+			16*128, 17*128, 18*128, 19*128, 20*128, 21*128, 22*128, 23*128,
+			24*128, 25*128, 26*128, 27*128, 28*128, 29*128, 30*128, 31*128},
 	512*8     /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout spritelayout816 =
 {
-	8,16,	/* 16*16 sprites */
-	1024,	/* 1024 sprites */
-	4,	/* 4 bits per pixel */
+	8,16,   /* 16*16 sprites */
+	1024,   /* 1024 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4)},
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
@@ -1401,9 +1401,9 @@ static const gfx_layout spritelayout816 =
 
 static const gfx_layout spritelayout168 =
 {
-	16,8,	/* 16*8 sprites */
-	1024,	/* 1024 sprites */
-	4,	/* 4 bits per pixel */
+	16,8,   /* 16*8 sprites */
+	1024,   /* 1024 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4),
 			XOR(8*4), XOR(9*4), XOR(10*4), XOR(11*4), XOR(12*4), XOR(13*4), XOR(14*4), XOR(15*4)},
@@ -1438,9 +1438,9 @@ static const UINT32 spritelayout6464_yoffset[64] =
 
 static const gfx_layout spritelayout6464 =
 {
-	64,64,	/* 32*32 sprites */
-	32,	/* 128 sprites */
-	4,	/* 4 bits per pixel */
+	64,64,  /* 32*32 sprites */
+	32, /* 128 sprites */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
@@ -1450,14 +1450,14 @@ static const gfx_layout spritelayout6464 =
 };
 
 static GFXDECODE_START( nemesis )
-    GFXDECODE_ENTRY( NULL, 0x0, charlayout,   0, 0x80 )	/* the game dynamically modifies this */
-    GFXDECODE_ENTRY( NULL, 0x0, spritelayout, 0, 0x80 )	/* the game dynamically modifies this */
-    GFXDECODE_ENTRY( NULL, 0x0, spritelayout3216, 0, 0x80 )	/* the game dynamically modifies this */
-    GFXDECODE_ENTRY( NULL, 0x0, spritelayout816, 0, 0x80 )	/* the game dynamically modifies this */
-    GFXDECODE_ENTRY( NULL, 0x0, spritelayout3232, 0, 0x80 )	/* the game dynamically modifies this */
-    GFXDECODE_ENTRY( NULL, 0x0, spritelayout1632, 0, 0x80 )	/* the game dynamically modifies this */
-    GFXDECODE_ENTRY( NULL, 0x0, spritelayout168, 0, 0x80 )	/* the game dynamically modifies this */
-    GFXDECODE_ENTRY( NULL, 0x0, spritelayout6464, 0, 0x80 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, charlayout,   0, 0x80 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, spritelayout, 0, 0x80 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, spritelayout3216, 0, 0x80 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, spritelayout816, 0, 0x80 )  /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, spritelayout3232, 0, 0x80 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, spritelayout1632, 0, 0x80 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, spritelayout168, 0, 0x80 )  /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( NULL, 0x0, spritelayout6464, 0, 0x80 ) /* the game dynamically modifies this */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -1502,7 +1502,7 @@ static void volume_callback(device_t *device, int v)
 
 static const k007232_interface k007232_config =
 {
-	volume_callback	/* external port callback */
+	volume_callback /* external port callback */
 };
 
 /******************************************************************************/
@@ -1552,12 +1552,12 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)	/* fixed */
+	MCFG_CPU_PROGRAM_MAP(sound_map) /* fixed */
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* ??? */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* ??? */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1572,17 +1572,17 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) /* verified with OST */
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)	/* fixed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	/* verified with OST */
+	MCFG_SOUND_CONFIG(ay8910_interface_2)   /* fixed */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
 
 	MCFG_SOUND_ADD("k007232", K005289, 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)	/* unused */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70) /* unused */
 MACHINE_CONFIG_END
 
 
@@ -1595,12 +1595,12 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1615,17 +1615,17 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) /* verified with OST */
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
 
 	MCFG_SOUND_ADD("k007232", K005289, 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)	/* unused */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70) /* unused */
 MACHINE_CONFIG_END
 
 
@@ -1642,7 +1642,7 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1677,12 +1677,12 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1726,7 +1726,7 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((264-256)*125/2))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1772,7 +1772,7 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1814,7 +1814,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1860,7 +1860,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1904,7 +1904,7 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -2646,12 +2646,12 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
+	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -2666,17 +2666,17 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) /* verified with OST */
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
 
 	MCFG_SOUND_ADD("k007232", K005289, 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)	/* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)	/* unused */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70) /* unused */
 MACHINE_CONFIG_END
 
 

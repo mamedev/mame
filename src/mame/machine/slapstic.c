@@ -190,7 +190,7 @@
  *
  *************************************/
 
-#define LOG_SLAPSTIC	(0)
+#define LOG_SLAPSTIC    (0)
 
 
 
@@ -240,21 +240,21 @@ struct slapstic_data
  *************************************/
 
 #define UNKNOWN 0xffff
-#define NO_BITWISE			\
-	{ UNKNOWN,UNKNOWN },	\
-	{ UNKNOWN,UNKNOWN },	\
-	{ UNKNOWN,UNKNOWN },	\
-	{ UNKNOWN,UNKNOWN },	\
-	{ UNKNOWN,UNKNOWN },	\
+#define NO_BITWISE          \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
 	{ UNKNOWN,UNKNOWN }
-#define NO_ADDITIVE			\
-	{ UNKNOWN,UNKNOWN },	\
-	{ UNKNOWN,UNKNOWN },	\
-	{ UNKNOWN,UNKNOWN },	\
-	{ UNKNOWN,UNKNOWN },	\
+#define NO_ADDITIVE         \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
 	{ UNKNOWN,UNKNOWN }
 
-#define MATCHES_MASK_VALUE(val, maskval)	(((val) & (maskval).mask) == (maskval).value)
+#define MATCHES_MASK_VALUE(val, maskval)    (((val) & (maskval).mask) == (maskval).value)
 
 
 
@@ -291,23 +291,23 @@ enum
 static const struct slapstic_data slapstic101 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0080,0x0090,0x00a0,0x00b0 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,UNKNOWN },				/* 1st mask/value in sequence */
-	{ 0x1fff,0x1dff },				/* 2nd mask/value in sequence */
-	{ 0x1ffc,0x1b5c },				/* 3rd mask/value in sequence */
-	{ 0x1fcf,0x0080 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,UNKNOWN },             /* 1st mask/value in sequence */
+	{ 0x1fff,0x1dff },              /* 2nd mask/value in sequence */
+	{ 0x1ffc,0x1b5c },              /* 3rd mask/value in sequence */
+	{ 0x1fcf,0x0080 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x1ff0,0x1540 },				/* 1st mask/value in sequence */
-	{ 0x1ff3,0x1540 },				/* clear bit 0 value */
-	{ 0x1ff3,0x1541 },				/*   set bit 0 value */
-	{ 0x1ff3,0x1542 },				/* clear bit 1 value */
-	{ 0x1ff3,0x1543 },				/*   set bit 1 value */
-	{ 0x1ff8,0x1550 },				/* final mask/value in sequence */
+	{ 0x1ff0,0x1540 },              /* 1st mask/value in sequence */
+	{ 0x1ff3,0x1540 },              /* clear bit 0 value */
+	{ 0x1ff3,0x1541 },              /*   set bit 0 value */
+	{ 0x1ff3,0x1542 },              /* clear bit 1 value */
+	{ 0x1ff3,0x1543 },              /*   set bit 1 value */
+	{ 0x1ff8,0x1550 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -318,23 +318,23 @@ static const struct slapstic_data slapstic101 =
 static const struct slapstic_data slapstic103 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0040,0x0050,0x0060,0x0070 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x002d },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3d14 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x3d24 },				/* 3rd mask/value in sequence */
-	{ 0x3fcf,0x0040 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x002d },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3d14 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x3d24 },              /* 3rd mask/value in sequence */
+	{ 0x3fcf,0x0040 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x34c0 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x34c0 },				/* clear bit 0 value */
-	{ 0x3ff3,0x34c1 },				/*   set bit 0 value */
-	{ 0x3ff3,0x34c2 },				/* clear bit 1 value */
-	{ 0x3ff3,0x34c3 },				/*   set bit 1 value */
-	{ 0x3ff8,0x34d0 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x34c0 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x34c0 },              /* clear bit 0 value */
+	{ 0x3ff3,0x34c1 },              /*   set bit 0 value */
+	{ 0x3ff3,0x34c2 },              /* clear bit 1 value */
+	{ 0x3ff3,0x34c3 },              /*   set bit 1 value */
+	{ 0x3ff8,0x34d0 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -345,23 +345,23 @@ static const struct slapstic_data slapstic103 =
 static const struct slapstic_data slapstic104 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0020,0x0028,0x0030,0x0038 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x0069 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3735 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x3764 },				/* 3rd mask/value in sequence */
-	{ 0x3fe7,0x0020 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x0069 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3735 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x3764 },              /* 3rd mask/value in sequence */
+	{ 0x3fe7,0x0020 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x3d90 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x3d90 },				/* clear bit 0 value */
-	{ 0x3ff3,0x3d91 },				/*   set bit 0 value */
-	{ 0x3ff3,0x3d92 },				/* clear bit 1 value */
-	{ 0x3ff3,0x3d93 },				/*   set bit 1 value */
-	{ 0x3ff8,0x3da0 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x3d90 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x3d90 },              /* clear bit 0 value */
+	{ 0x3ff3,0x3d91 },              /*   set bit 0 value */
+	{ 0x3ff3,0x3d92 },              /* clear bit 1 value */
+	{ 0x3ff3,0x3d93 },              /*   set bit 1 value */
+	{ 0x3ff8,0x3da0 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -372,23 +372,23 @@ static const struct slapstic_data slapstic104 =
 static const struct slapstic_data slapstic105 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0010,0x0014,0x0018,0x001c },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x003d },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x0092 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x00a4 },				/* 3rd mask/value in sequence */
-	{ 0x3ff3,0x0010 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x003d },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x0092 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x00a4 },              /* 3rd mask/value in sequence */
+	{ 0x3ff3,0x0010 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x35b0 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x35b0 },				/* clear bit 0 value */
-	{ 0x3ff3,0x35b1 },				/*   set bit 0 value */
-	{ 0x3ff3,0x35b2 },				/* clear bit 1 value */
-	{ 0x3ff3,0x35b3 },				/*   set bit 1 value */
-	{ 0x3ff8,0x35c0 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x35b0 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x35b0 },              /* clear bit 0 value */
+	{ 0x3ff3,0x35b1 },              /*   set bit 0 value */
+	{ 0x3ff3,0x35b2 },              /* clear bit 1 value */
+	{ 0x3ff3,0x35b3 },              /*   set bit 1 value */
+	{ 0x3ff8,0x35c0 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -399,23 +399,23 @@ static const struct slapstic_data slapstic105 =
 static const struct slapstic_data slapstic106 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0008,0x000a,0x000c,0x000e },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x002b },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x0052 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x0064 },				/* 3rd mask/value in sequence */
-	{ 0x3ff9,0x0008 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x002b },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x0052 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x0064 },              /* 3rd mask/value in sequence */
+	{ 0x3ff9,0x0008 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x3da0 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x3da0 },				/* clear bit 0 value */
-	{ 0x3ff3,0x3da1 },				/*   set bit 0 value */
-	{ 0x3ff3,0x3da2 },				/* clear bit 1 value */
-	{ 0x3ff3,0x3da3 },				/*   set bit 1 value */
-	{ 0x3ff8,0x3db0 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x3da0 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x3da0 },              /* clear bit 0 value */
+	{ 0x3ff3,0x3da1 },              /*   set bit 0 value */
+	{ 0x3ff3,0x3da2 },              /* clear bit 1 value */
+	{ 0x3ff3,0x3da3 },              /*   set bit 1 value */
+	{ 0x3ff8,0x3db0 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -426,23 +426,23 @@ static const struct slapstic_data slapstic106 =
 static const struct slapstic_data slapstic107 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0018,0x001a,0x001c,0x001e },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x006b },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3d52 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x3d64 },				/* 3rd mask/value in sequence */
-	{ 0x3ff9,0x0018 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x006b },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3d52 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x3d64 },              /* 3rd mask/value in sequence */
+	{ 0x3ff9,0x0018 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x00a0 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x00a0 },				/* clear bit 0 value */
-	{ 0x3ff3,0x00a1 },				/*   set bit 0 value */
-	{ 0x3ff3,0x00a2 },				/* clear bit 1 value */
-	{ 0x3ff3,0x00a3 },				/*   set bit 1 value */
-	{ 0x3ff8,0x00b0 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x00a0 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x00a0 },              /* clear bit 0 value */
+	{ 0x3ff3,0x00a1 },              /*   set bit 0 value */
+	{ 0x3ff3,0x00a2 },              /* clear bit 1 value */
+	{ 0x3ff3,0x00a3 },              /*   set bit 1 value */
+	{ 0x3ff8,0x00b0 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -453,23 +453,23 @@ static const struct slapstic_data slapstic107 =
 static const struct slapstic_data slapstic108 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0028,0x002a,0x002c,0x002e },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x001f },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3772 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x3764 },				/* 3rd mask/value in sequence */
-	{ 0x3ff9,0x0028 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x001f },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3772 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x3764 },              /* 3rd mask/value in sequence */
+	{ 0x3ff9,0x0028 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x0060 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x0060 },				/* clear bit 0 value */
-	{ 0x3ff3,0x0061 },				/*   set bit 0 value */
-	{ 0x3ff3,0x0062 },				/* clear bit 1 value */
-	{ 0x3ff3,0x0063 },				/*   set bit 1 value */
-	{ 0x3ff8,0x0070 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x0060 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x0060 },              /* clear bit 0 value */
+	{ 0x3ff3,0x0061 },              /*   set bit 0 value */
+	{ 0x3ff3,0x0062 },              /* clear bit 1 value */
+	{ 0x3ff3,0x0063 },              /*   set bit 1 value */
+	{ 0x3ff8,0x0070 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -480,23 +480,23 @@ static const struct slapstic_data slapstic108 =
 static const struct slapstic_data slapstic109 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0008,0x000a,0x000c,0x000e },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x002b },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x0052 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x0064 },				/* 3rd mask/value in sequence */
-	{ 0x3ff9,0x0008 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x002b },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x0052 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x0064 },              /* 3rd mask/value in sequence */
+	{ 0x3ff9,0x0008 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x3da0 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x3da0 },				/* clear bit 0 value */
-	{ 0x3ff3,0x3da1 },				/*   set bit 0 value */
-	{ 0x3ff3,0x3da2 },				/* clear bit 1 value */
-	{ 0x3ff3,0x3da3 },				/*   set bit 1 value */
-	{ 0x3ff8,0x3db0 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x3da0 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x3da0 },              /* clear bit 0 value */
+	{ 0x3ff3,0x3da1 },              /*   set bit 0 value */
+	{ 0x3ff3,0x3da2 },              /* clear bit 1 value */
+	{ 0x3ff3,0x3da3 },              /*   set bit 1 value */
+	{ 0x3ff8,0x3db0 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -507,23 +507,23 @@ static const struct slapstic_data slapstic109 =
 static const struct slapstic_data slapstic110 =
 {
 	/* basic banking */
-	3,								/* starting bank */
+	3,                              /* starting bank */
 	{ 0x0040,0x0050,0x0060,0x0070 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x002d },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3d14 },				/* 2nd mask/value in sequence */
-	{ 0x3ffc,0x3d24 },				/* 3rd mask/value in sequence */
-	{ 0x3fcf,0x0040 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x002d },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3d14 },              /* 2nd mask/value in sequence */
+	{ 0x3ffc,0x3d24 },              /* 3rd mask/value in sequence */
+	{ 0x3fcf,0x0040 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x3ff0,0x34c0 },				/* 1st mask/value in sequence */
-	{ 0x3ff3,0x34c0 },				/* clear bit 0 value */
-	{ 0x3ff3,0x34c1 },				/*   set bit 0 value */
-	{ 0x3ff3,0x34c2 },				/* clear bit 1 value */
-	{ 0x3ff3,0x34c3 },				/*   set bit 1 value */
-	{ 0x3ff8,0x34d0 },				/* final mask/value in sequence */
+	{ 0x3ff0,0x34c0 },              /* 1st mask/value in sequence */
+	{ 0x3ff3,0x34c0 },              /* clear bit 0 value */
+	{ 0x3ff3,0x34c1 },              /*   set bit 0 value */
+	{ 0x3ff3,0x34c2 },              /* clear bit 1 value */
+	{ 0x3ff3,0x34c3 },              /*   set bit 1 value */
+	{ 0x3ff8,0x34d0 },              /* final mask/value in sequence */
 
 	/* additive banking */
 	NO_ADDITIVE
@@ -541,25 +541,25 @@ static const struct slapstic_data slapstic110 =
 static const struct slapstic_data slapstic111 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x0042,0x0052,0x0062,0x0072 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x000a },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x28a4 },				/* 2nd mask/value in sequence */
-	{ 0x0784,0x0080 },				/* 3rd mask/value in sequence */
-	{ 0x3fcf,0x0042 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x000a },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x28a4 },              /* 2nd mask/value in sequence */
+	{ 0x0784,0x0080 },              /* 3rd mask/value in sequence */
+	{ 0x3fcf,0x0042 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x00a1 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x00a2 },				/* 2nd mask/value in sequence */
-	{ 0x3c4f,0x284d },				/* +1 mask/value */
-	{ 0x3a5f,0x285d },				/* +2 mask/value */
-	{ 0x3ff8,0x2800 }				/* final mask/value in sequence */
+	{ 0x3fff,0x00a1 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x00a2 },              /* 2nd mask/value in sequence */
+	{ 0x3c4f,0x284d },              /* +1 mask/value */
+	{ 0x3a5f,0x285d },              /* +2 mask/value */
+	{ 0x3ff8,0x2800 }               /* final mask/value in sequence */
 };
 
 
@@ -567,25 +567,25 @@ static const struct slapstic_data slapstic111 =
 static const struct slapstic_data slapstic112 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x002c,0x003c,0x006c,0x007c },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x0014 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x29a0 },				/* 2nd mask/value in sequence */
-	{ 0x0073,0x0010 },				/* 3rd mask/value in sequence */
-	{ 0x3faf,0x002c },				/* 4th mask/value in sequence */
-	2,								/* shift to get bank from 3rd */
+	{ 0x007f,0x0014 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x29a0 },              /* 2nd mask/value in sequence */
+	{ 0x0073,0x0010 },              /* 3rd mask/value in sequence */
+	{ 0x3faf,0x002c },              /* 4th mask/value in sequence */
+	2,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x2dce },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x2dcf },				/* 2nd mask/value in sequence */
-	{ 0x3def,0x15e2 },				/* +1 mask/value */
-	{ 0x3fbf,0x15a2 },				/* +2 mask/value */
-	{ 0x3ffc,0x1450 }				/* final mask/value in sequence */
+	{ 0x3fff,0x2dce },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x2dcf },              /* 2nd mask/value in sequence */
+	{ 0x3def,0x15e2 },              /* +1 mask/value */
+	{ 0x3fbf,0x15a2 },              /* +2 mask/value */
+	{ 0x3ffc,0x1450 }               /* final mask/value in sequence */
 };
 
 
@@ -593,25 +593,25 @@ static const struct slapstic_data slapstic112 =
 static const struct slapstic_data slapstic113 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x0008,0x0018,0x0028,0x0038 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x0059 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x11a5 },				/* 2nd mask/value in sequence */
-	{ 0x0860,0x0800 },				/* 3rd mask/value in sequence */
-	{ 0x3fcf,0x0008 },				/* 4th mask/value in sequence */
-	3,								/* shift to get bank from 3rd */
+	{ 0x007f,0x0059 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x11a5 },              /* 2nd mask/value in sequence */
+	{ 0x0860,0x0800 },              /* 3rd mask/value in sequence */
+	{ 0x3fcf,0x0008 },              /* 4th mask/value in sequence */
+	3,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x049b },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x049c },				/* 2nd mask/value in sequence */
-	{ 0x3fcf,0x3ec7 },				/* +1 mask/value */
-	{ 0x3edf,0x3ed7 },				/* +2 mask/value */
-	{ 0x3fff,0x3fb2 }				/* final mask/value in sequence */
+	{ 0x3fff,0x049b },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x049c },              /* 2nd mask/value in sequence */
+	{ 0x3fcf,0x3ec7 },              /* +1 mask/value */
+	{ 0x3edf,0x3ed7 },              /* +2 mask/value */
+	{ 0x3fff,0x3fb2 }               /* final mask/value in sequence */
 };
 
 
@@ -619,25 +619,25 @@ static const struct slapstic_data slapstic113 =
 static const struct slapstic_data slapstic114 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x0040,0x0048,0x0050,0x0058 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x0016 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x24de },				/* 2nd mask/value in sequence */
-	{ 0x3871,0x0000 },				/* 3rd mask/value in sequence */
-	{ 0x3fe7,0x0040 },				/* 4th mask/value in sequence */
-	1,								/* shift to get bank from 3rd */
+	{ 0x007f,0x0016 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x24de },              /* 2nd mask/value in sequence */
+	{ 0x3871,0x0000 },              /* 3rd mask/value in sequence */
+	{ 0x3fe7,0x0040 },              /* 4th mask/value in sequence */
+	1,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x0ab7 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x0ab8 },				/* 2nd mask/value in sequence */
-	{ 0x3f63,0x0d40 },				/* +1 mask/value */
-	{ 0x3fd9,0x0dc8 },				/* +2 mask/value */
-	{ 0x3fff,0x0ab0 }				/* final mask/value in sequence */
+	{ 0x3fff,0x0ab7 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x0ab8 },              /* 2nd mask/value in sequence */
+	{ 0x3f63,0x0d40 },              /* +1 mask/value */
+	{ 0x3fd9,0x0dc8 },              /* +2 mask/value */
+	{ 0x3fff,0x0ab0 }               /* final mask/value in sequence */
 };
 
 
@@ -645,25 +645,25 @@ static const struct slapstic_data slapstic114 =
 static const struct slapstic_data slapstic115 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x0020,0x0022,0x0024,0x0026 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x0054 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3e01 },				/* 2nd mask/value in sequence */
-	{ 0x3879,0x0029 },				/* 3rd mask/value in sequence */
-	{ 0x3ff9,0x0020 },				/* 4th mask/value in sequence */
-	1,								/* shift to get bank from 3rd */
+	{ 0x007f,0x0054 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3e01 },              /* 2nd mask/value in sequence */
+	{ 0x3879,0x0029 },              /* 3rd mask/value in sequence */
+	{ 0x3ff9,0x0020 },              /* 4th mask/value in sequence */
+	1,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x2591 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x2592 },				/* 2nd mask/value in sequence */
-	{ 0x3fe6,0x3402 },				/* +1 mask/value */
-	{ 0x3fb4,0x3410 },				/* +2 mask/value */
-	{ 0x3fff,0x34a2 }				/* final mask/value in sequence */
+	{ 0x3fff,0x2591 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x2592 },              /* 2nd mask/value in sequence */
+	{ 0x3fe6,0x3402 },              /* +1 mask/value */
+	{ 0x3fb4,0x3410 },              /* +2 mask/value */
+	{ 0x3fff,0x34a2 }               /* final mask/value in sequence */
 };
 
 
@@ -671,25 +671,25 @@ static const struct slapstic_data slapstic115 =
 static const struct slapstic_data slapstic116 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x0044,0x004c,0x0054,0x005c },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x0069 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x2bab },				/* 2nd mask/value in sequence */
-	{ 0x387c,0x0808 },				/* 3rd mask/value in sequence */
-	{ 0x3fe7,0x0044 },				/* 4th mask/value in sequence */
-	0,								/* shift to get bank from 3rd */
+	{ 0x007f,0x0069 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x2bab },              /* 2nd mask/value in sequence */
+	{ 0x387c,0x0808 },              /* 3rd mask/value in sequence */
+	{ 0x3fe7,0x0044 },              /* 4th mask/value in sequence */
+	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x3f7c },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3f7d },				/* 2nd mask/value in sequence */
-	{ 0x3db2,0x3c12 },				/* +1 mask/value */
-	{ 0x3fe3,0x3e43 },				/* +2 mask/value */
-	{ 0x3fff,0x2ba8 }				/* final mask/value in sequence */
+	{ 0x3fff,0x3f7c },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3f7d },              /* 2nd mask/value in sequence */
+	{ 0x3db2,0x3c12 },              /* +1 mask/value */
+	{ 0x3fe3,0x3e43 },              /* +2 mask/value */
+	{ 0x3fff,0x2ba8 }               /* final mask/value in sequence */
 };
 
 
@@ -697,25 +697,25 @@ static const struct slapstic_data slapstic116 =
 static const struct slapstic_data slapstic117 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x0008,0x001a,0x002c,0x003e },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x007d },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x3580 },				/* 2nd mask/value in sequence */
-	{ 0x0079,0x0020 },				/* 3rd mask/value in sequence */
-	{ 0x3fc9,0x0008 },				/* 4th mask/value in sequence */
-	1,								/* shift to get bank from 3rd */
+	{ 0x007f,0x007d },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x3580 },              /* 2nd mask/value in sequence */
+	{ 0x0079,0x0020 },              /* 3rd mask/value in sequence */
+	{ 0x3fc9,0x0008 },              /* 4th mask/value in sequence */
+	1,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x0676 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x0677 },				/* 2nd mask/value in sequence */
-	{ 0x3e62,0x1a42 },				/* +1 mask/value */
-	{ 0x3e35,0x1a11 },				/* +2 mask/value */
-	{ 0x3fff,0x1a42 }				/* final mask/value in sequence */
+	{ 0x3fff,0x0676 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x0677 },              /* 2nd mask/value in sequence */
+	{ 0x3e62,0x1a42 },              /* +1 mask/value */
+	{ 0x3e35,0x1a11 },              /* +2 mask/value */
+	{ 0x3fff,0x1a42 }               /* final mask/value in sequence */
 };
 
 
@@ -723,25 +723,25 @@ static const struct slapstic_data slapstic117 =
 static const struct slapstic_data slapstic118 =
 {
 	/* basic banking */
-	0,								/* starting bank */
+	0,                              /* starting bank */
 	{ 0x0014,0x0034,0x0054,0x0074 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,0x0002 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x1950 },				/* 2nd mask/value in sequence */
-	{ 0x0067,0x0020 },				/* 3rd mask/value in sequence */
-	{ 0x3f9f,0x0014 },				/* 4th mask/value in sequence */
-	3,								/* shift to get bank from 3rd */
+	{ 0x007f,0x0002 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x1950 },              /* 2nd mask/value in sequence */
+	{ 0x0067,0x0020 },              /* 3rd mask/value in sequence */
+	{ 0x3f9f,0x0014 },              /* 4th mask/value in sequence */
+	3,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
 	NO_BITWISE,
 
 	/* additive banking */
-	{ 0x3fff,0x1958 },				/* 1st mask/value in sequence */
-	{ 0x3fff,0x1959 },				/* 2nd mask/value in sequence */
-	{ 0x3f73,0x3052 },				/* +1 mask/value */
-	{ 0x3f67,0x3042 },				/* +2 mask/value */
-	{ 0x3ff8,0x30e0 }				/* final mask/value in sequence */
+	{ 0x3fff,0x1958 },              /* 1st mask/value in sequence */
+	{ 0x3fff,0x1959 },              /* 2nd mask/value in sequence */
+	{ 0x3f73,0x3052 },              /* +1 mask/value */
+	{ 0x3f67,0x3042 },              /* +2 mask/value */
+	{ 0x3ff8,0x30e0 }               /* final mask/value in sequence */
 };
 
 
@@ -755,8 +755,8 @@ static const struct slapstic_data slapstic118 =
 /* master table */
 static const struct slapstic_data *const slapstic_table[] =
 {
-	&slapstic101,	/* NOT confirmed! */
-	NULL,			/* never seen */
+	&slapstic101,   /* NOT confirmed! */
+	NULL,           /* never seen */
 	&slapstic103,
 	&slapstic104,
 	&slapstic105,
@@ -867,11 +867,11 @@ int slapstic_bank(void)
 static int alt2_kludge(address_space &space, offs_t offset)
 {
 	/* Of the 3 alternate addresses, only the middle one needs to actually hit
-       in the slapstic region; the first and third ones can be anywhere in the
-       address space. For this reason, the read/write handlers usually only
-       see the 2nd access. For the 68000-based games, we do the following
-       kludge to examine the opcode that is executing and look for the 1st
-       and 3rd accesses. */
+	   in the slapstic region; the first and third ones can be anywhere in the
+	   address space. For this reason, the read/write handlers usually only
+	   see the 2nd access. For the 68000-based games, we do the following
+	   kludge to examine the opcode that is executing and look for the 1st
+	   and 3rd accesses. */
 
 	if (access_68k)
 	{

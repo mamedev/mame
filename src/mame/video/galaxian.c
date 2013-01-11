@@ -223,8 +223,8 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
  *
  *************************************/
 
-#define STAR_RNG_PERIOD		((1 << 17) - 1)
-#define RGB_MAXIMUM			224
+#define STAR_RNG_PERIOD     ((1 << 17) - 1)
+#define RGB_MAXIMUM         224
 
 
 
@@ -262,32 +262,32 @@ void galaxian_state::palette_init()
 	UINT8 starmap[4];
 
 	/*
-        Sprite/tilemap colors are mapped through a color PROM as follows:
+	    Sprite/tilemap colors are mapped through a color PROM as follows:
 
-          bit 7 -- 220 ohm resistor  -- BLUE
-                -- 470 ohm resistor  -- BLUE
-                -- 220 ohm resistor  -- GREEN
-                -- 470 ohm resistor  -- GREEN
-                -- 1  kohm resistor  -- GREEN
-                -- 220 ohm resistor  -- RED
-                -- 470 ohm resistor  -- RED
-          bit 0 -- 1  kohm resistor  -- RED
+	      bit 7 -- 220 ohm resistor  -- BLUE
+	            -- 470 ohm resistor  -- BLUE
+	            -- 220 ohm resistor  -- GREEN
+	            -- 470 ohm resistor  -- GREEN
+	            -- 1  kohm resistor  -- GREEN
+	            -- 220 ohm resistor  -- RED
+	            -- 470 ohm resistor  -- RED
+	      bit 0 -- 1  kohm resistor  -- RED
 
-        In parallel with these resistors are a pair of 150 ohm and 100 ohm
-        resistors on each R,G,B component that are connected to the star
-        generator.
+	    In parallel with these resistors are a pair of 150 ohm and 100 ohm
+	    resistors on each R,G,B component that are connected to the star
+	    generator.
 
-        And in parallel with the whole mess are a set of 100 ohm resistors
-        on each R,G,B component that are enabled when a shell/missile is
-        enabled.
+	    And in parallel with the whole mess are a set of 100 ohm resistors
+	    on each R,G,B component that are enabled when a shell/missile is
+	    enabled.
 
-        When computing weights, we use RGB_MAXIMUM as the maximum to give
-        headroom for stars and shells/missiles. This is not fully accurate,
-        but if we included all possible sources in parallel, the brightness
-        of the main game would be very low to allow for all the oversaturation
-        of the stars and shells/missiles.
-    */
-	compute_resistor_weights(0,	RGB_MAXIMUM, -1.0,
+	    When computing weights, we use RGB_MAXIMUM as the maximum to give
+	    headroom for stars and shells/missiles. This is not fully accurate,
+	    but if we included all possible sources in parallel, the brightness
+	    of the main game would be very low to allow for all the oversaturation
+	    of the stars and shells/missiles.
+	*/
+	compute_resistor_weights(0, RGB_MAXIMUM, -1.0,
 			3, &rgb_resistances[0], rweights, 470, 0,
 			3, &rgb_resistances[0], gweights, 470, 0,
 			2, &rgb_resistances[1], bweights, 470, 0);
@@ -319,20 +319,20 @@ void galaxian_state::palette_init()
 	}
 
 	/*
-        The maximum sprite/tilemap resistance is ~130 Ohms with all RGB
-        outputs enabled (1/(1/1000 + 1/470 + 1/220)). Since we normalized
-        to RGB_MAXIMUM, this maps RGB_MAXIMUM -> 130 Ohms.
+	    The maximum sprite/tilemap resistance is ~130 Ohms with all RGB
+	    outputs enabled (1/(1/1000 + 1/470 + 1/220)). Since we normalized
+	    to RGB_MAXIMUM, this maps RGB_MAXIMUM -> 130 Ohms.
 
-        The stars are at 150 Ohms for the LSB, and 100 Ohms for the MSB.
-        This means the 3 potential values are:
+	    The stars are at 150 Ohms for the LSB, and 100 Ohms for the MSB.
+	    This means the 3 potential values are:
 
-            150 Ohms -> RGB_MAXIMUM * 130 / 150
-            100 Ohms -> RGB_MAXIMUM * 130 / 100
-             60 Ohms -> RGB_MAXIMUM * 130 / 60
+	        150 Ohms -> RGB_MAXIMUM * 130 / 150
+	        100 Ohms -> RGB_MAXIMUM * 130 / 100
+	         60 Ohms -> RGB_MAXIMUM * 130 / 60
 
-        Since we can't saturate that high, we instead approximate this
-        by compressing the values proportionally into the 194->255 range.
-    */
+	    Since we can't saturate that high, we instead approximate this
+	    by compressing the values proportionally into the 194->255 range.
+	*/
 	minval = RGB_MAXIMUM * 130 / 150;
 	midval = RGB_MAXIMUM * 130 / 100;
 	maxval = RGB_MAXIMUM * 130 / 60;
@@ -874,21 +874,21 @@ static void stars_draw_row(galaxian_state *state, bitmap_rgb32 &bitmap, int maxx
 		UINT8 star;
 
 		/*
-            The RNG clock is the master clock (18MHz) ANDed with the pixel clock (6MHz).
-            The divide-by-3 circuit that produces the pixel clock generates a square wave
-            with a 2/3 duty cycle, so the result of the AND generates a clock like this:
-                        _   _   _   _   _   _   _   _
-              MASTER: _| |_| |_| |_| |_| |_| |_| |_| |
-                        _______     _______     ______
-              PIXEL:  _|       |___|       |___|
-                        _   _       _   _       _   _
-              RNG:    _| |_| |_____| |_| |_____| |_| |
+		    The RNG clock is the master clock (18MHz) ANDed with the pixel clock (6MHz).
+		    The divide-by-3 circuit that produces the pixel clock generates a square wave
+		    with a 2/3 duty cycle, so the result of the AND generates a clock like this:
+		                _   _   _   _   _   _   _   _
+		      MASTER: _| |_| |_| |_| |_| |_| |_| |_| |
+		                _______     _______     ______
+		      PIXEL:  _|       |___|       |___|
+		                _   _       _   _       _   _
+		      RNG:    _| |_| |_____| |_| |_____| |_| |
 
-            Thus for each pixel, there are 3 master clocks and 2 RNG clocks, and the RNG
-            is clocked asymmetrically. To simulate this, we expand the horizontal screen
-            size by 3 and handle the first RNG clock with one pixel and the second RNG
-            clock with two pixels.
-        */
+		    Thus for each pixel, there are 3 master clocks and 2 RNG clocks, and the RNG
+		    is clocked asymmetrically. To simulate this, we expand the horizontal screen
+		    size by 3 and handle the first RNG clock with one pixel and the second RNG
+		    clock with two pixels.
+		*/
 
 		/* first RNG clock: one pixel */
 		star = state->m_stars[star_offs++];
@@ -1034,12 +1034,12 @@ void turtles_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, con
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/*
-        The background color generator is connected this way:
+	    The background color generator is connected this way:
 
-            RED   - 390 ohm resistor
-            GREEN - 470 ohm resistor
-            BLUE  - 390 ohm resistor
-    */
+	        RED   - 390 ohm resistor
+	        GREEN - 470 ohm resistor
+	        BLUE  - 390 ohm resistor
+	*/
 	bitmap.fill(MAKE_RGB(state->m_background_red * 0x55, state->m_background_green * 0x47, state->m_background_blue * 0x55), cliprect);
 }
 
@@ -1082,19 +1082,19 @@ void amidar_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 		if (flip_and_clip(&draw, x * 8, x * 8 + 7, cliprect))
 		{
 			/*
-                The background PROM is connected the following way:
+			    The background PROM is connected the following way:
 
-                   bit 0 = 0 enables the blue gun if BCB is asserted
-                   bit 1 = 0 enables the red gun if BCR is asserted and
-                             the green gun if BCG is asserted
-                   bits 2-7 are unconnected
+			       bit 0 = 0 enables the blue gun if BCB is asserted
+			       bit 1 = 0 enables the red gun if BCR is asserted and
+			                 the green gun if BCG is asserted
+			       bits 2-7 are unconnected
 
-                The background color generator is connected this way:
+			    The background color generator is connected this way:
 
-                    RED   - 270 ohm resistor
-                    GREEN - 560 ohm resistor
-                    BLUE  - 470 ohm resistor
-            */
+			        RED   - 270 ohm resistor
+			        GREEN - 560 ohm resistor
+			        BLUE  - 470 ohm resistor
+			*/
 			UINT8 red = ((~prom[x] & 0x02) && state->m_background_red) ? 0x7c : 0x00;
 			UINT8 green = ((~prom[x] & 0x02) && state->m_background_green) ? 0x3c : 0x00;
 			UINT8 blue = ((~prom[x] & 0x01) && state->m_background_blue) ? 0x47 : 0x00;
@@ -1135,11 +1135,11 @@ void galaxian_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const 
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/*
-        Both "shells" and "missiles" begin displaying when the horizontal counter
-        reaches $FC, and they stop displaying when it reaches $00, resulting in
-        4-pixel-long shots. The first 7 entries are called "shells" and render as
-        white; the final entry is called a "missile" and renders as yellow.
-    */
+	    Both "shells" and "missiles" begin displaying when the horizontal counter
+	    reaches $FC, and they stop displaying when it reaches $00, resulting in
+	    4-pixel-long shots. The first 7 entries are called "shells" and render as
+	    white; the final entry is called a "missile" and renders as yellow.
+	*/
 	x -= 4;
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, state->m_bullet_color[offs]);
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, state->m_bullet_color[offs]);
@@ -1151,10 +1151,10 @@ void galaxian_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const 
 void mshuttle_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	/* verified by schematics:
-        * both "W" and "Y" bullets are 4 pixels long
-        * "W" bullets are enabled when H6 == 0, and are always purple
-        * "Y" bullets are enabled when H6 == 1, and vary in color based on H4,H3,H2
-    */
+	    * both "W" and "Y" bullets are 4 pixels long
+	    * "W" bullets are enabled when H6 == 0, and are always purple
+	    * "Y" bullets are enabled when H6 == 1, and vary in color based on H4,H3,H2
+	*/
 	static const rgb_t colors[8] =
 	{
 		MAKE_RGB(0xff,0xff,0xff),
@@ -1180,10 +1180,10 @@ void mshuttle_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const 
 void scramble_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	/*
-        Scramble only has "shells", which begin displaying when the counter
-        reaches $FA, and stop displaying one pixel clock layer. All shells are
-        rendered as yellow.
-    */
+	    Scramble only has "shells", which begin displaying when the counter
+	    reaches $FA, and stop displaying one pixel clock layer. All shells are
+	    rendered as yellow.
+	*/
 	x -= 6;
 	galaxian_draw_pixel(bitmap, cliprect, y, x, MAKE_RGB(0xff,0xff,0x00));
 }
@@ -1317,7 +1317,7 @@ void mshuttle_extend_sprite_info(running_machine &machine, const UINT8 *base, UI
 void calipso_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
 {
 	/* same as the others, but no sprite flipping, but instead the bits are used
-       as extra sprite code bits, giving 256 sprite images */
+	   as extra sprite code bits, giving 256 sprite images */
 	/* No flips */
 	*code = base[1];
 	*flipx = 0;
@@ -1331,8 +1331,8 @@ void jumpbug_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *col
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	if ((*code & 0xc0) == 0x80 && (state->m_gfxbank[2] & 0x01))
 		*code += 128 + (( state->m_gfxbank[0] & 0x01) << 6) +
-					   (( state->m_gfxbank[1] & 0x01) << 7) +
-					   ((~state->m_gfxbank[4] & 0x01) << 8);
+						(( state->m_gfxbank[1] & 0x01) << 7) +
+						((~state->m_gfxbank[4] & 0x01) << 8);
 }
 
 void jumpbug_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
@@ -1341,7 +1341,7 @@ void jumpbug_extend_sprite_info(running_machine &machine, const UINT8 *base, UIN
 	if ((*code & 0x30) == 0x20 && (state->m_gfxbank[2] & 0x01) != 0)
 	{
 		*code += 32 + (( state->m_gfxbank[0] & 0x01) << 4) +
-					  (( state->m_gfxbank[1] & 0x01) << 5) +
-					  ((~state->m_gfxbank[4] & 0x01) << 6);
+						(( state->m_gfxbank[1] & 0x01) << 5) +
+						((~state->m_gfxbank[4] & 0x01) << 6);
 	}
 }

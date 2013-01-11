@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	MPEG audio support.  Only layer2 and variants for now.
+    MPEG audio support.  Only layer2 and variants for now.
 
 ***************************************************************************/
 
@@ -21,7 +21,7 @@ mpeg_audio::mpeg_audio(const void *_base, unsigned int _accepted, bool lsb_first
 
 
 bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
-							   int &output_samples, int &sample_rate, int &channels)
+								int &output_samples, int &sample_rate, int &channels)
 {
 	if(limit - pos < 16)
 		return false;
@@ -35,7 +35,7 @@ bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 	current_limit = limit;
 	unsigned short sync = do_gb(base, current_pos, 12);
 
- retry_sync:
+	retry_sync:
 	while(sync != 0xfff && current_pos < limit)
 		sync = ((sync << 1) | do_gb(base, current_pos, 1)) & 0xfff;
 

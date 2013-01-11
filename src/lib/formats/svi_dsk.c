@@ -28,7 +28,7 @@ static int svi_get_tracks_per_disk(floppy_image_legacy *floppy)
 }
 
 static UINT64 svi_translate_offset(floppy_image_legacy *floppy,
-	 int track, int head, int sector)
+		int track, int head, int sector)
 {
 	UINT64 o;
 	if ((track==0) && (head==0))
@@ -161,7 +161,7 @@ static FLOPPY_CONSTRUCT(svi_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( svi318 )
-	LEGACY_FLOPPY_OPTION( svi_dsk, "dsk", "SVI-318 floppy disk image",	svi_dsk_identify, svi_dsk_construct, NULL, NULL)
+	LEGACY_FLOPPY_OPTION( svi_dsk, "dsk", "SVI-318 floppy disk image",  svi_dsk_identify, svi_dsk_construct, NULL, NULL)
 	LEGACY_FLOPPY_OPTION( svi_cpm, "dsk", "SVI-728 DSDD CP/M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])

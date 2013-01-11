@@ -37,24 +37,24 @@
 GLOBAL(void)
 jpeg_start_compress (j_compress_ptr cinfo, boolean write_all_tables)
 {
-  if (cinfo->global_state != CSTATE_START)
-    ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
+	if (cinfo->global_state != CSTATE_START)
+	ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
 
-  if (write_all_tables)
-    jpeg_suppress_tables(cinfo, FALSE);	/* mark all tables to be written */
+	if (write_all_tables)
+	jpeg_suppress_tables(cinfo, FALSE); /* mark all tables to be written */
 
-  /* (Re)initialize error mgr and destination modules */
-  (*cinfo->err->reset_error_mgr) ((j_common_ptr) cinfo);
-  (*cinfo->dest->init_destination) (cinfo);
-  /* Perform master selection of active modules */
-  jinit_compress_master(cinfo);
-  /* Set up for the first pass */
-  (*cinfo->master->prepare_for_pass) (cinfo);
-  /* Ready for application to drive first pass through jpeg_write_scanlines
-   * or jpeg_write_raw_data.
-   */
-  cinfo->next_scanline = 0;
-  cinfo->global_state = (cinfo->raw_data_in ? CSTATE_RAW_OK : CSTATE_SCANNING);
+	/* (Re)initialize error mgr and destination modules */
+	(*cinfo->err->reset_error_mgr) ((j_common_ptr) cinfo);
+	(*cinfo->dest->init_destination) (cinfo);
+	/* Perform master selection of active modules */
+	jinit_compress_master(cinfo);
+	/* Set up for the first pass */
+	(*cinfo->master->prepare_for_pass) (cinfo);
+	/* Ready for application to drive first pass through jpeg_write_scanlines
+	* or jpeg_write_raw_data.
+	*/
+	cinfo->next_scanline = 0;
+	cinfo->global_state = (cinfo->raw_data_in ? CSTATE_RAW_OK : CSTATE_SCANNING);
 }
 
 
@@ -75,39 +75,39 @@ jpeg_start_compress (j_compress_ptr cinfo, boolean write_all_tables)
 
 GLOBAL(JDIMENSION)
 jpeg_write_scanlines (j_compress_ptr cinfo, JSAMPARRAY scanlines,
-		      JDIMENSION num_lines)
+				JDIMENSION num_lines)
 {
-  JDIMENSION row_ctr, rows_left;
+	JDIMENSION row_ctr, rows_left;
 
-  if (cinfo->global_state != CSTATE_SCANNING)
-    ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
-  if (cinfo->next_scanline >= cinfo->image_height)
-    WARNMS(cinfo, JWRN_TOO_MUCH_DATA);
+	if (cinfo->global_state != CSTATE_SCANNING)
+	ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
+	if (cinfo->next_scanline >= cinfo->image_height)
+	WARNMS(cinfo, JWRN_TOO_MUCH_DATA);
 
-  /* Call progress monitor hook if present */
-  if (cinfo->progress != NULL) {
-    cinfo->progress->pass_counter = (long) cinfo->next_scanline;
-    cinfo->progress->pass_limit = (long) cinfo->image_height;
-    (*cinfo->progress->progress_monitor) ((j_common_ptr) cinfo);
-  }
+	/* Call progress monitor hook if present */
+	if (cinfo->progress != NULL) {
+	cinfo->progress->pass_counter = (long) cinfo->next_scanline;
+	cinfo->progress->pass_limit = (long) cinfo->image_height;
+	(*cinfo->progress->progress_monitor) ((j_common_ptr) cinfo);
+	}
 
-  /* Give master control module another chance if this is first call to
-   * jpeg_write_scanlines.  This lets output of the frame/scan headers be
-   * delayed so that application can write COM, etc, markers between
-   * jpeg_start_compress and jpeg_write_scanlines.
-   */
-  if (cinfo->master->call_pass_startup)
-    (*cinfo->master->pass_startup) (cinfo);
+	/* Give master control module another chance if this is first call to
+	* jpeg_write_scanlines.  This lets output of the frame/scan headers be
+	* delayed so that application can write COM, etc, markers between
+	* jpeg_start_compress and jpeg_write_scanlines.
+	*/
+	if (cinfo->master->call_pass_startup)
+	(*cinfo->master->pass_startup) (cinfo);
 
-  /* Ignore any extra scanlines at bottom of image. */
-  rows_left = cinfo->image_height - cinfo->next_scanline;
-  if (num_lines > rows_left)
-    num_lines = rows_left;
+	/* Ignore any extra scanlines at bottom of image. */
+	rows_left = cinfo->image_height - cinfo->next_scanline;
+	if (num_lines > rows_left)
+	num_lines = rows_left;
 
-  row_ctr = 0;
-  (*cinfo->main->process_data) (cinfo, scanlines, &row_ctr, num_lines);
-  cinfo->next_scanline += row_ctr;
-  return row_ctr;
+	row_ctr = 0;
+	(*cinfo->main->process_data) (cinfo, scanlines, &row_ctr, num_lines);
+	cinfo->next_scanline += row_ctr;
+	return row_ctr;
 }
 
 
@@ -118,44 +118,44 @@ jpeg_write_scanlines (j_compress_ptr cinfo, JSAMPARRAY scanlines,
 
 GLOBAL(JDIMENSION)
 jpeg_write_raw_data (j_compress_ptr cinfo, JSAMPIMAGE data,
-		     JDIMENSION num_lines)
+				JDIMENSION num_lines)
 {
-  JDIMENSION lines_per_iMCU_row;
+	JDIMENSION lines_per_iMCU_row;
 
-  if (cinfo->global_state != CSTATE_RAW_OK)
-    ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
-  if (cinfo->next_scanline >= cinfo->image_height) {
-    WARNMS(cinfo, JWRN_TOO_MUCH_DATA);
-    return 0;
-  }
+	if (cinfo->global_state != CSTATE_RAW_OK)
+	ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
+	if (cinfo->next_scanline >= cinfo->image_height) {
+	WARNMS(cinfo, JWRN_TOO_MUCH_DATA);
+	return 0;
+	}
 
-  /* Call progress monitor hook if present */
-  if (cinfo->progress != NULL) {
-    cinfo->progress->pass_counter = (long) cinfo->next_scanline;
-    cinfo->progress->pass_limit = (long) cinfo->image_height;
-    (*cinfo->progress->progress_monitor) ((j_common_ptr) cinfo);
-  }
+	/* Call progress monitor hook if present */
+	if (cinfo->progress != NULL) {
+	cinfo->progress->pass_counter = (long) cinfo->next_scanline;
+	cinfo->progress->pass_limit = (long) cinfo->image_height;
+	(*cinfo->progress->progress_monitor) ((j_common_ptr) cinfo);
+	}
 
-  /* Give master control module another chance if this is first call to
-   * jpeg_write_raw_data.  This lets output of the frame/scan headers be
-   * delayed so that application can write COM, etc, markers between
-   * jpeg_start_compress and jpeg_write_raw_data.
-   */
-  if (cinfo->master->call_pass_startup)
-    (*cinfo->master->pass_startup) (cinfo);
+	/* Give master control module another chance if this is first call to
+	* jpeg_write_raw_data.  This lets output of the frame/scan headers be
+	* delayed so that application can write COM, etc, markers between
+	* jpeg_start_compress and jpeg_write_raw_data.
+	*/
+	if (cinfo->master->call_pass_startup)
+	(*cinfo->master->pass_startup) (cinfo);
 
-  /* Verify that at least one iMCU row has been passed. */
-  lines_per_iMCU_row = cinfo->max_v_samp_factor * DCTSIZE;
-  if (num_lines < lines_per_iMCU_row)
-    ERREXIT(cinfo, JERR_BUFFER_SIZE);
+	/* Verify that at least one iMCU row has been passed. */
+	lines_per_iMCU_row = cinfo->max_v_samp_factor * DCTSIZE;
+	if (num_lines < lines_per_iMCU_row)
+	ERREXIT(cinfo, JERR_BUFFER_SIZE);
 
-  /* Directly compress the row. */
-  if (! (*cinfo->coef->compress_data) (cinfo, data)) {
-    /* If compressor did not consume the whole row, suspend processing. */
-    return 0;
-  }
+	/* Directly compress the row. */
+	if (! (*cinfo->coef->compress_data) (cinfo, data)) {
+	/* If compressor did not consume the whole row, suspend processing. */
+	return 0;
+	}
 
-  /* OK, we processed one iMCU row. */
-  cinfo->next_scanline += lines_per_iMCU_row;
-  return lines_per_iMCU_row;
+	/* OK, we processed one iMCU row. */
+	cinfo->next_scanline += lines_per_iMCU_row;
+	return lines_per_iMCU_row;
 }

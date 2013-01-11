@@ -88,18 +88,18 @@ READ8_MEMBER( c80_state::pio1_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     keyboard row 0 input
-        PA1     keyboard row 1 input
-        PA2     keyboard row 2 input
-        PA3
-        PA4     _BSTB input
-        PA5     display enable output (0=enabled, 1=disabled)
-        PA6     tape output
-        PA7     tape input
+	    PA0     keyboard row 0 input
+	    PA1     keyboard row 1 input
+	    PA2     keyboard row 2 input
+	    PA3
+	    PA4     _BSTB input
+	    PA5     display enable output (0=enabled, 1=disabled)
+	    PA6     tape output
+	    PA7     tape input
 
-    */
+	*/
 
 	UINT8 data = !m_pio1_brdy << 4 | 0x07;
 
@@ -124,18 +124,18 @@ WRITE8_MEMBER( c80_state::pio1_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     keyboard row 0 input
-        PA1     keyboard row 1 input
-        PA2     keyboard row 2 input
-        PA3
-        PA4     _BSTB input
-        PA5     display enable output (0=enabled, 1=disabled)
-        PA6     tape output
-        PA7     tape input
+	    PA0     keyboard row 0 input
+	    PA1     keyboard row 1 input
+	    PA2     keyboard row 2 input
+	    PA3
+	    PA4     _BSTB input
+	    PA5     display enable output (0=enabled, 1=disabled)
+	    PA6     tape output
+	    PA7     tape input
 
-    */
+	*/
 
 	m_pio1_a5 = BIT(data, 5);
 
@@ -151,18 +151,18 @@ WRITE8_MEMBER( c80_state::pio1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     VQD30 segment A
-        PB1     VQD30 segment B
-        PB2     VQD30 segment C
-        PB3     VQD30 segment D
-        PB4     VQD30 segment E
-        PB5     VQD30 segment F
-        PB6     VQD30 segment G
-        PB7     VQD30 segment P
+	    PB0     VQD30 segment A
+	    PB1     VQD30 segment B
+	    PB2     VQD30 segment C
+	    PB3     VQD30 segment D
+	    PB4     VQD30 segment E
+	    PB5     VQD30 segment F
+	    PB6     VQD30 segment G
+	    PB7     VQD30 segment P
 
-    */
+	*/
 
 	if (!m_pio1_a5)
 	{
@@ -190,24 +190,24 @@ WRITE_LINE_MEMBER( c80_state::pio1_brdy_w )
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_r),	/* port A read callback */
-	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_w),	/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_DRIVER_MEMBER(c80_state, pio1_pb_w),	/* port B write callback */
-	DEVCB_DRIVER_LINE_MEMBER(c80_state, pio1_brdy_w)			/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_r),  /* port A read callback */
+	DEVCB_DRIVER_MEMBER(c80_state, pio1_pa_w),  /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_DRIVER_MEMBER(c80_state, pio1_pb_w),  /* port B write callback */
+	DEVCB_DRIVER_LINE_MEMBER(c80_state, pio1_brdy_w)            /* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( pio2_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 /* Z80 Daisy Chain */

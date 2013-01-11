@@ -89,9 +89,9 @@ VBlank = 58Hz
 #include "sound/okim6295.h"
 #include "includes/vball.h"
 
-#define MAIN_CLOCK		XTAL_12MHz
-#define CPU_CLOCK			MAIN_CLOCK / 6
-#define PIXEL_CLOCK		MAIN_CLOCK / 2
+#define MAIN_CLOCK      XTAL_12MHz
+#define CPU_CLOCK           MAIN_CLOCK / 6
+#define PIXEL_CLOCK     MAIN_CLOCK / 2
 
 /* Based on ddragon driver */
 INLINE int scanline_to_vcount(int scanline)
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P4")
 	AM_RANGE(0x1008, 0x1008) AM_WRITE(vb_scrollx_hi_w)
 	AM_RANGE(0x1009, 0x1009) AM_WRITE(vb_bankswitch_w)
-	AM_RANGE(0x100a, 0x100b) AM_WRITE(vball_irq_ack_w)	/* is there a scanline counter here? */
+	AM_RANGE(0x100a, 0x100b) AM_WRITE(vball_irq_ack_w)  /* is there a scanline counter here? */
 	AM_RANGE(0x100c, 0x100c) AM_WRITE(vb_scrollx_lo_w)
 	AM_RANGE(0x100d, 0x100d) AM_WRITE(cpu_sound_command_w)
 	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_SHARE("vb_scrolly_lo")
@@ -264,30 +264,30 @@ static INPUT_PORTS_START( vball )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2") /* Verified against Taito's US Vball manual */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:1,2") /* Verified against Taito's US Vball manual */
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Single Player Game Time")	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, "Single Player Game Time")    PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, "1:15")
 	PORT_DIPSETTING(    0x04, "1:30")
 	PORT_DIPSETTING(    0x0c, "1:45")
 	PORT_DIPSETTING(    0x08, "2:00")
-	PORT_DIPNAME( 0x30, 0x00, "Start Buttons (4-player)")	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Start Buttons (4-player)")   PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, "Button A")
 	PORT_DIPSETTING(    0x10, "Button B")
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x40, 0x40, "PL 1&4 (4-player)")		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "PL 1&4 (4-player)")      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Rotate 90")
-	PORT_DIPNAME( 0x80, 0x00, "Player Mode")		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Player Mode")        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "2 Players")
 	PORT_DIPSETTING(    0x00, "4 Players")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( vball )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -305,10 +305,10 @@ static INPUT_PORTS_START( vball )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -339,12 +339,12 @@ static INPUT_PORTS_START (vball2pj)
 	/* The 2-player roms have the game-time in the difficulty spot, and I've assumed vice-versa. (VS the instructions scanned in Naz's dump) */
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, "Single Player Game Time")	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Single Player Game Time")    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "1:30")
 	PORT_DIPSETTING(    0x01, "1:45")
 	PORT_DIPSETTING(    0x03, "2:00")
 	PORT_DIPSETTING(    0x02, "2:15")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4") /* Difficulty order needs to be verified */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,4") /* Difficulty order needs to be verified */
 	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
@@ -380,33 +380,33 @@ static const gfx_layout spritelayout =
 	4,
 	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4 },
 	{ 3, 2, 1, 0, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-		  32*8+3, 32*8+2, 32*8+1, 32*8+0, 48*8+3, 48*8+2, 48*8+1, 48*8+0 },
+			32*8+3, 32*8+2, 32*8+1, 32*8+0, 48*8+3, 48*8+2, 48*8+1, 48*8+0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	64*8
 };
 
 
 static GFXDECODE_START( vb )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )	/* 8x8 chars */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 128, 8 )	/* 16x16 sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )  /* 8x8 chars */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 128, 8 )  /* 16x16 sprites */
 GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( vball, vball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */
+	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* 2 MHz - measured by guru but it makes the game far far too slow ?! */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vball_state, vball_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)	/* based on ddragon driver */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   /* based on ddragon driver */
 	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update_vb)
 
 	MCFG_GFXDECODE(vb)
@@ -436,14 +436,14 @@ MACHINE_CONFIG_END
 ROM_START( vball ) /* US version */
 	ROM_REGION( 0x18000, "maincpu", 0 ) /* Main CPU */
 	ROM_LOAD( "25a2-4.124",   0x10000, 0x08000, CRC(06d0c013) SHA1(e818ae0ffb32bcf97da2651a9b8efbd4859b2f4c) )/* Bankswitched */
-	ROM_CONTINUE(		  0x08000, 0x08000 ) /* Static code  */
+	ROM_CONTINUE(         0x08000, 0x08000 ) /* Static code  */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* region#2: music CPU, 64kb */
 	ROM_LOAD( "25j1-0.47",    0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 
 	/* the original has the image data stored in a special ceramic embedded package made by Toshiba
-    with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
-    there are a few bytes different between the bootleg and the original (the original is correct though!) */
+	with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
+	there are a few bytes different between the bootleg and the original (the original is correct though!) */
 	ROM_REGION(0x80000, "gfx1", 0 ) /* fg tiles */
 	ROM_LOAD( "trj-101.96",   0x00000, 0x80000, CRC(f343eee4) SHA1(1ce95285631f7ec91fe3f6c3d62b13f565d3816a) )
 
@@ -454,7 +454,7 @@ ROM_START( vball ) /* US version */
 	ROM_REGION(0x40000, "oki", 0 ) /* Sound region#1: adpcm */
 	ROM_LOAD( "25j0-0.78",    0x00000, 0x20000, CRC(8e04bdbf) SHA1(baafc5033c9442b83cb332c2c453c13117b31a3b) )
 
-	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
+	ROM_REGION(0x1000, "proms", 0 ) /* color PROMs */
 	ROM_LOAD_NIB_LOW ( "25j5-0.144",   0x0000,  0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
 	ROM_LOAD_NIB_HIGH( "25j6-0.143",   0x0000,  0x00800, CRC(1ff70b4f) SHA1(a469baa0dda844ba307c09ddefb23f239cfe7b5f) )
 	ROM_LOAD(          "25j7-0.160",   0x0800,  0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )
@@ -463,14 +463,14 @@ ROM_END
 ROM_START( vball2pj ) /* Japan version */
 	ROM_REGION( 0x18000, "maincpu", 0 ) /* Main CPU */
 	ROM_LOAD( "25j2-2-5.124", 0x10000, 0x08000,  CRC(432509c4) SHA1(6de50e21d279f4ac9674bc91990ba9535e80908c) )/* Bankswitched */
-	ROM_CONTINUE(		  0x08000, 0x08000 ) /* Static code  */
+	ROM_CONTINUE(         0x08000, 0x08000 ) /* Static code  */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* region#2: music CPU, 64kb */
 	ROM_LOAD( "25j1-0.47",    0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 
 	/* the original has the image data stored in a special ceramic embedded package made by Toshiba
-    with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
-    there are a few bytes different between the bootleg and the original (the original is correct though!) */
+	with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
+	there are a few bytes different between the bootleg and the original (the original is correct though!) */
 	ROM_REGION(0x80000, "gfx1", 0 ) /* fg tiles */
 	ROM_LOAD( "trj-101.96",   0x00000, 0x80000, CRC(f343eee4) SHA1(1ce95285631f7ec91fe3f6c3d62b13f565d3816a) )
 
@@ -481,7 +481,7 @@ ROM_START( vball2pj ) /* Japan version */
 	ROM_REGION(0x40000, "oki", 0 ) /* Sound region#1: adpcm */
 	ROM_LOAD( "25j0-0.78",    0x00000, 0x20000, CRC(8e04bdbf) SHA1(baafc5033c9442b83cb332c2c453c13117b31a3b) )
 
-	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
+	ROM_REGION(0x1000, "proms", 0 ) /* color PROMs */
 	ROM_LOAD_NIB_LOW ( "25j5-0.144",   0x0000,  0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
 	ROM_LOAD_NIB_HIGH( "25j6-0.143",   0x0000,  0x00800, CRC(1ff70b4f) SHA1(a469baa0dda844ba307c09ddefb23f239cfe7b5f) )
 	ROM_LOAD(          "25j7-0.160",   0x0800,  0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )
@@ -490,13 +490,13 @@ ROM_END
 ROM_START( vballb ) /* bootleg */
 	ROM_REGION( 0x18000, "maincpu", 0 ) /* Main CPU: 64k for code */
 	ROM_LOAD( "vball.124",    0x10000, 0x08000, CRC(be04c2b5) SHA1(40fed4ae272719e940f1796ef35420ab451ab7b6) )/* Bankswitched */
-	ROM_CONTINUE(		  0x08000, 0x08000 ) /* Static code  */
+	ROM_CONTINUE(         0x08000, 0x08000 ) /* Static code  */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* region#2: music CPU, 64kb */
 	ROM_LOAD( "25j1-0.47",    0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 
 	/* The bootlegs used standard roms on a daughter card that plugs into the socket for the TOSHIBA TRJ-101 dip rom */
-	ROM_REGION(0x80000, "gfx1", 0 )	 /* fg tiles */
+	ROM_REGION(0x80000, "gfx1", 0 )  /* fg tiles */
 	ROM_LOAD( "13", 0x00000, 0x10000, CRC(f26df8e1) SHA1(72186c1430d07c7fd9211245b539f05a0660bebe) ) /* 0,1,2,3 */
 	ROM_LOAD( "14", 0x10000, 0x10000, CRC(c9798d0e) SHA1(ec156f6c7ecccaa216ce8076f75ad7627ee90945) ) /* 0,1,2,3 */
 	ROM_LOAD( "15", 0x20000, 0x10000, CRC(68e69c4b) SHA1(9870674c91cab7215ad8ed40eb82facdee478fde) ) /* 0,1,2,3 */
@@ -514,7 +514,7 @@ ROM_START( vballb ) /* bootleg */
 	ROM_LOAD( "vball.78a",    0x00000, 0x10000, CRC(f3e63b76) SHA1(da54d1d7d7d55b73e49991e4363bc6f46e0f70eb) ) /* == 1st half of 25j0-0.78 */
 	ROM_LOAD( "vball.78b",    0x10000, 0x10000, CRC(7ad9d338) SHA1(3e3c270fa69bda93b03f07a54145eb5e211ec8ba) ) /* == 2nd half of 25j0-0.78 */
 
-	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
+	ROM_REGION(0x1000, "proms", 0 ) /* color PROMs */
 	ROM_LOAD_NIB_LOW ( "25j5-0.144",   0x0000,  0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
 	ROM_LOAD_NIB_HIGH( "25j6-0.143",   0x0000,  0x00800, CRC(1ff70b4f) SHA1(a469baa0dda844ba307c09ddefb23f239cfe7b5f) )
 	ROM_LOAD(          "25j7-0.160",   0x0800,  0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )
@@ -529,7 +529,7 @@ ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom 
 	ROM_LOAD( "4.ic47", 0x00000, 0x8000,  CRC(534dfbd9) SHA1(d0cb37caf94fa85da4ebdfe15e7a78109084bf91) )
 
 	/* The bootlegs used standard roms on a daughter card that plugs into the socket for the TOSHIBA TRJ-101 dip rom */
-	ROM_REGION(0x80000, "gfx1", 0 )	 /* fg tiles */
+	ROM_REGION(0x80000, "gfx1", 0 )  /* fg tiles */
 	ROM_LOAD( "13", 0x00000, 0x10000, CRC(f26df8e1) SHA1(72186c1430d07c7fd9211245b539f05a0660bebe) ) /* 0,1,2,3 */
 	ROM_LOAD( "14", 0x10000, 0x10000, CRC(c9798d0e) SHA1(ec156f6c7ecccaa216ce8076f75ad7627ee90945) ) /* 0,1,2,3 */
 	ROM_LOAD( "15", 0x20000, 0x10000, CRC(68e69c4b) SHA1(9870674c91cab7215ad8ed40eb82facdee478fde) ) /* 0,1,2,3 */
@@ -549,7 +549,7 @@ ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom 
 	ROM_LOAD( "vball.78a", 0x00000, 0x10000, CRC(f3e63b76) SHA1(da54d1d7d7d55b73e49991e4363bc6f46e0f70eb) ) /* == 1st half of 25j0-0.78    (ROM type 27512) */
 	ROM_LOAD( "3.ic79",    0x10000, 0x08000, CRC(d77349ba) SHA1(5ef25636056607fae7a5463957487b53da0dd310) ) /* == 3rd quarter of 25j0-0.78 (ROM type 27256) */
 
-	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
+	ROM_REGION(0x1000, "proms", 0 ) /* color PROMs */
 	ROM_LOAD_NIB_LOW ( "25j5-0.144",   0x0000,  0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
 	ROM_LOAD_NIB_HIGH( "25j6-0.143",   0x0000,  0x00800, CRC(1ff70b4f) SHA1(a469baa0dda844ba307c09ddefb23f239cfe7b5f) )
 	ROM_LOAD(          "25j7-0.160",   0x0800,  0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )

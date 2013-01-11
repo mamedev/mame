@@ -114,4 +114,3 @@ UINT32 avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 	return 0;
 }
-

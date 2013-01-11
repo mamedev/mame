@@ -58,9 +58,9 @@ const gfx_layout mcr_sprite_layout =
 	4,
 	{ STEP4(0,1) },
 	{ STEP2(RGN_FRAC(0,4)+0,4), STEP2(RGN_FRAC(1,4)+0,4), STEP2(RGN_FRAC(2,4)+0,4), STEP2(RGN_FRAC(3,4)+0,4),
-	  STEP2(RGN_FRAC(0,4)+8,4), STEP2(RGN_FRAC(1,4)+8,4), STEP2(RGN_FRAC(2,4)+8,4), STEP2(RGN_FRAC(3,4)+8,4),
-	  STEP2(RGN_FRAC(0,4)+16,4), STEP2(RGN_FRAC(1,4)+16,4), STEP2(RGN_FRAC(2,4)+16,4), STEP2(RGN_FRAC(3,4)+16,4),
-	  STEP2(RGN_FRAC(0,4)+24,4), STEP2(RGN_FRAC(1,4)+24,4), STEP2(RGN_FRAC(2,4)+24,4), STEP2(RGN_FRAC(3,4)+24,4) },
+		STEP2(RGN_FRAC(0,4)+8,4), STEP2(RGN_FRAC(1,4)+8,4), STEP2(RGN_FRAC(2,4)+8,4), STEP2(RGN_FRAC(3,4)+8,4),
+		STEP2(RGN_FRAC(0,4)+16,4), STEP2(RGN_FRAC(1,4)+16,4), STEP2(RGN_FRAC(2,4)+16,4), STEP2(RGN_FRAC(3,4)+16,4),
+		STEP2(RGN_FRAC(0,4)+24,4), STEP2(RGN_FRAC(1,4)+24,4), STEP2(RGN_FRAC(2,4)+24,4), STEP2(RGN_FRAC(3,4)+24,4) },
 	{ STEP32(0,32) },
 	32*32
 };
@@ -92,19 +92,19 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
 
 Z80CTC_INTERFACE( mcr_ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg1),	/* ZC/TO0 callback */
-	DEVCB_NULL,             	/* ZC/TO1 callback */
-	DEVCB_NULL              	/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg1),   /* ZC/TO0 callback */
+	DEVCB_NULL,                 /* ZC/TO1 callback */
+	DEVCB_NULL                  /* ZC/TO2 callback */
 };
 
 
 Z80CTC_INTERFACE( nflfoot_ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("ipu", INPUT_LINE_IRQ0),  /* interrupt handler */
-	DEVCB_NULL,			/* ZC/TO0 callback */
-	DEVCB_NULL,			/* ZC/TO1 callback */
-	DEVCB_NULL      	/* ZC/TO2 callback */
+	DEVCB_NULL,         /* ZC/TO0 callback */
+	DEVCB_NULL,         /* ZC/TO1 callback */
+	DEVCB_NULL          /* ZC/TO2 callback */
 };
 
 
@@ -128,10 +128,10 @@ WRITE_LINE_MEMBER(mcr_state::ipu_ctc_interrupt)
 
 const z80sio_interface nflfoot_sio_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(mcr_state,ipu_ctc_interrupt),	/* interrupt handler */
-	DEVCB_NULL,					/* DTR changed handler */
-	DEVCB_NULL,					/* RTS changed handler */
-	DEVCB_DRIVER_MEMBER(mcr_state,ipu_break_changed),	/* BREAK changed handler */
+	DEVCB_DRIVER_LINE_MEMBER(mcr_state,ipu_ctc_interrupt),  /* interrupt handler */
+	DEVCB_NULL,                 /* DTR changed handler */
+	DEVCB_NULL,                 /* RTS changed handler */
+	DEVCB_DRIVER_MEMBER(mcr_state,ipu_break_changed),   /* BREAK changed handler */
 	DEVCB_DRIVER_MEMBER16(mcr_state,mcr_ipu_sio_transmit)/* transmit handler */
 };
 

@@ -20,8 +20,8 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_ETHERNET		(0)
-#define DISPLAY_STATS		(0)
+#define LOG_ETHERNET        (0)
+#define DISPLAY_STATS       (0)
 
 
 
@@ -29,63 +29,63 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ETHER_BUFFER_SIZE	(2048)
-#define ETHER_RX_BUFFERS	(4)
+#define ETHER_BUFFER_SIZE   (2048)
+#define ETHER_RX_BUFFERS    (4)
 
 /* Ethernet registers - bank 0 */
-#define EREG_TCR			(0*8 + 0)
-#define EREG_EPH_STATUS		(0*8 + 1)
-#define EREG_RCR			(0*8 + 2)
-#define EREG_COUNTER		(0*8 + 3)
-#define EREG_MIR			(0*8 + 4)
-#define EREG_MCR			(0*8 + 5)
-#define EREG_BANK			(0*8 + 7)
+#define EREG_TCR            (0*8 + 0)
+#define EREG_EPH_STATUS     (0*8 + 1)
+#define EREG_RCR            (0*8 + 2)
+#define EREG_COUNTER        (0*8 + 3)
+#define EREG_MIR            (0*8 + 4)
+#define EREG_MCR            (0*8 + 5)
+#define EREG_BANK           (0*8 + 7)
 
 /* Ethernet registers - bank 1 */
-#define EREG_CONFIG			(1*8 + 0)
-#define EREG_BASE			(1*8 + 1)
-#define EREG_IA0_1			(1*8 + 2)
-#define EREG_IA2_3			(1*8 + 3)
-#define EREG_IA4_5			(1*8 + 4)
-#define EREG_GENERAL_PURP	(1*8 + 5)
-#define EREG_CONTROL		(1*8 + 6)
+#define EREG_CONFIG         (1*8 + 0)
+#define EREG_BASE           (1*8 + 1)
+#define EREG_IA0_1          (1*8 + 2)
+#define EREG_IA2_3          (1*8 + 3)
+#define EREG_IA4_5          (1*8 + 4)
+#define EREG_GENERAL_PURP   (1*8 + 5)
+#define EREG_CONTROL        (1*8 + 6)
 
 /* Ethernet registers - bank 2 */
-#define EREG_MMU_COMMAND	(2*8 + 0)
-#define EREG_PNR_ARR		(2*8 + 1)
-#define EREG_FIFO_PORTS		(2*8 + 2)
-#define EREG_POINTER		(2*8 + 3)
-#define EREG_DATA_0			(2*8 + 4)
-#define EREG_DATA_1			(2*8 + 5)
-#define EREG_INTERRUPT		(2*8 + 6)
+#define EREG_MMU_COMMAND    (2*8 + 0)
+#define EREG_PNR_ARR        (2*8 + 1)
+#define EREG_FIFO_PORTS     (2*8 + 2)
+#define EREG_POINTER        (2*8 + 3)
+#define EREG_DATA_0         (2*8 + 4)
+#define EREG_DATA_1         (2*8 + 5)
+#define EREG_INTERRUPT      (2*8 + 6)
 
 /* Ethernet registers - bank 3 */
-#define EREG_MT0_1			(3*8 + 0)
-#define EREG_MT2_3			(3*8 + 1)
-#define EREG_MT4_5			(3*8 + 2)
-#define EREG_MT6_7			(3*8 + 3)
-#define EREG_MGMT			(3*8 + 4)
-#define EREG_REVISION		(3*8 + 5)
-#define EREG_ERCV			(3*8 + 6)
+#define EREG_MT0_1          (3*8 + 0)
+#define EREG_MT2_3          (3*8 + 1)
+#define EREG_MT4_5          (3*8 + 2)
+#define EREG_MT6_7          (3*8 + 3)
+#define EREG_MGMT           (3*8 + 4)
+#define EREG_REVISION       (3*8 + 5)
+#define EREG_ERCV           (3*8 + 6)
 
 /* Ethernet MMU commands */
-#define ECMD_NOP			0
-#define ECMD_ALLOCATE		1
-#define ECMD_RESET_MMU		2
-#define ECMD_REMOVE			3
-#define ECMD_REMOVE_RELEASE	4
-#define ECMD_RELEASE_PACKET	5
-#define ECMD_ENQUEUE_PACKET	6
-#define ECMD_RESET_FIFOS	7
+#define ECMD_NOP            0
+#define ECMD_ALLOCATE       1
+#define ECMD_RESET_MMU      2
+#define ECMD_REMOVE         3
+#define ECMD_REMOVE_RELEASE 4
+#define ECMD_RELEASE_PACKET 5
+#define ECMD_ENQUEUE_PACKET 6
+#define ECMD_RESET_FIFOS    7
 
 /* Ethernet interrupt bits */
-#define EINT_RCV			0x01
-#define EINT_TX				0x02
-#define EINT_TX_EMPTY		0x04
-#define EINT_ALLOC			0x08
-#define EINT_RX_OVRN		0x10
-#define EINT_EPH			0x20
-#define EINT_ERCV			0x40
+#define EINT_RCV            0x01
+#define EINT_TX             0x02
+#define EINT_TX_EMPTY       0x04
+#define EINT_ALLOC          0x08
+#define EINT_RX_OVRN        0x10
+#define EINT_EPH            0x20
+#define EINT_ERCV           0x40
 
 /* Ethernet register names */
 static const char *const ethernet_regname[64] =
@@ -112,23 +112,23 @@ struct smc91c9x_state
 	smc91c9x_irq_func irq_handler;
 
 	/* raw register data and masks */
-	UINT16			reg[64];
-	UINT16			regmask[64];
+	UINT16          reg[64];
+	UINT16          regmask[64];
 
 	/* IRQ information */
-	UINT8			irq_state;
+	UINT8           irq_state;
 
 	/* allocate information */
-	UINT8			alloc_count;
+	UINT8           alloc_count;
 
 	/* transmit/receive FIFOs */
-	UINT8			fifo_count;
-	UINT8			rx[ETHER_BUFFER_SIZE * ETHER_RX_BUFFERS];
-	UINT8			tx[ETHER_BUFFER_SIZE];
+	UINT8           fifo_count;
+	UINT8           rx[ETHER_BUFFER_SIZE * ETHER_RX_BUFFERS];
+	UINT8           tx[ETHER_BUFFER_SIZE];
 
 	/* counters */
-	UINT32			sent;
-	UINT32			recd;
+	UINT32          sent;
+	UINT32          recd;
 };
 
 
@@ -360,8 +360,8 @@ READ16_DEVICE_HANDLER( smc91c9x_r )
 			}
 			break;
 
-		case EREG_DATA_0:	/* data register */
-		case EREG_DATA_1:	/* data register */
+		case EREG_DATA_0:   /* data register */
+		case EREG_DATA_1:   /* data register */
 		{
 			UINT8 *buffer = (smc->reg[EREG_POINTER] & 0x8000) ? smc->rx : smc->tx;
 			int addr = smc->reg[EREG_POINTER] & 0x7ff;
@@ -405,7 +405,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 	/* handle it */
 	switch (offset)
 	{
-		case EREG_TCR:		/* transmit control register */
+		case EREG_TCR:      /* transmit control register */
 			if (LOG_ETHERNET)
 			{
 				if (data & 0x2000) logerror("   EPH LOOP\n");
@@ -420,7 +420,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 			}
 			break;
 
-		case EREG_RCR:		/* receive control register */
+		case EREG_RCR:      /* receive control register */
 			if (LOG_ETHERNET)
 			{
 				if (data & 0x8000) device->reset();
@@ -434,7 +434,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 			}
 			break;
 
-		case EREG_CONFIG:		/* configuration register */
+		case EREG_CONFIG:       /* configuration register */
 			if (LOG_ETHERNET)
 			{
 				if (data & 0x1000) logerror("   NO WAIT\n");
@@ -448,7 +448,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 			}
 			break;
 
-		case EREG_BASE:		/* base address register */
+		case EREG_BASE:     /* base address register */
 			if (LOG_ETHERNET)
 			{
 				logerror("   base = $%04X\n", (data & 0xe000) | ((data & 0x1f00) >> 3));
@@ -457,7 +457,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 			}
 			break;
 
-		case EREG_CONTROL:		/* control register */
+		case EREG_CONTROL:      /* control register */
 			if (LOG_ETHERNET)
 			{
 				if (data & 0x4000) logerror("   RCV_BAD\n");
@@ -472,12 +472,12 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 			}
 			break;
 
-		case EREG_MMU_COMMAND:	/* command register */
+		case EREG_MMU_COMMAND:  /* command register */
 			process_command(smc, data);
 			break;
 
-		case EREG_DATA_0:	/* data register */
-		case EREG_DATA_1:	/* data register */
+		case EREG_DATA_0:   /* data register */
+		case EREG_DATA_1:   /* data register */
 		{
 			UINT8 *buffer = (smc->reg[EREG_POINTER] & 0x8000) ? smc->rx : smc->tx;
 			int addr = smc->reg[EREG_POINTER] & 0x7ff;
@@ -547,37 +547,37 @@ static DEVICE_RESET( smc91c9x )
 	smc->sent = 0;
 	smc->recd = 0;
 
-	smc->reg[EREG_TCR]			= 0x0000;	smc->regmask[EREG_TCR]			= 0x3d87;
-	smc->reg[EREG_EPH_STATUS]	= 0x0000;	smc->regmask[EREG_EPH_STATUS]	= 0x0000;
-	smc->reg[EREG_RCR]			= 0x0000;	smc->regmask[EREG_RCR]			= 0xc307;
-	smc->reg[EREG_COUNTER]		= 0x0000;	smc->regmask[EREG_COUNTER]		= 0x0000;
-	smc->reg[EREG_MIR]			= 0x1212;	smc->regmask[EREG_MIR]			= 0x0000;
-	smc->reg[EREG_MCR]			= 0x3300;	smc->regmask[EREG_MCR]			= 0x00ff;
-	smc->reg[EREG_BANK]			= 0x3300;	smc->regmask[EREG_BANK]			= 0x0007;
+	smc->reg[EREG_TCR]          = 0x0000;   smc->regmask[EREG_TCR]          = 0x3d87;
+	smc->reg[EREG_EPH_STATUS]   = 0x0000;   smc->regmask[EREG_EPH_STATUS]   = 0x0000;
+	smc->reg[EREG_RCR]          = 0x0000;   smc->regmask[EREG_RCR]          = 0xc307;
+	smc->reg[EREG_COUNTER]      = 0x0000;   smc->regmask[EREG_COUNTER]      = 0x0000;
+	smc->reg[EREG_MIR]          = 0x1212;   smc->regmask[EREG_MIR]          = 0x0000;
+	smc->reg[EREG_MCR]          = 0x3300;   smc->regmask[EREG_MCR]          = 0x00ff;
+	smc->reg[EREG_BANK]         = 0x3300;   smc->regmask[EREG_BANK]         = 0x0007;
 
-	smc->reg[EREG_CONFIG]		= 0x0030;	smc->regmask[EREG_CONFIG]		= 0x17c6;
-	smc->reg[EREG_BASE]			= 0x1866;	smc->regmask[EREG_BASE]			= 0xfffe;
-	smc->reg[EREG_IA0_1]		= 0x0000;	smc->regmask[EREG_IA0_1]		= 0xffff;
-	smc->reg[EREG_IA2_3]		= 0x0000;	smc->regmask[EREG_IA2_3]		= 0xffff;
-	smc->reg[EREG_IA4_5]		= 0x0000;	smc->regmask[EREG_IA4_5]		= 0xffff;
-	smc->reg[EREG_GENERAL_PURP]	= 0x0000;	smc->regmask[EREG_GENERAL_PURP]	= 0xffff;
-	smc->reg[EREG_CONTROL]		= 0x0100;	smc->regmask[EREG_CONTROL]		= 0x68e7;
+	smc->reg[EREG_CONFIG]       = 0x0030;   smc->regmask[EREG_CONFIG]       = 0x17c6;
+	smc->reg[EREG_BASE]         = 0x1866;   smc->regmask[EREG_BASE]         = 0xfffe;
+	smc->reg[EREG_IA0_1]        = 0x0000;   smc->regmask[EREG_IA0_1]        = 0xffff;
+	smc->reg[EREG_IA2_3]        = 0x0000;   smc->regmask[EREG_IA2_3]        = 0xffff;
+	smc->reg[EREG_IA4_5]        = 0x0000;   smc->regmask[EREG_IA4_5]        = 0xffff;
+	smc->reg[EREG_GENERAL_PURP] = 0x0000;   smc->regmask[EREG_GENERAL_PURP] = 0xffff;
+	smc->reg[EREG_CONTROL]      = 0x0100;   smc->regmask[EREG_CONTROL]      = 0x68e7;
 
-	smc->reg[EREG_MMU_COMMAND]	= 0x0000;	smc->regmask[EREG_MMU_COMMAND]	= 0x00e7;
-	smc->reg[EREG_PNR_ARR]		= 0x8000;	smc->regmask[EREG_PNR_ARR]		= 0x00ff;
-	smc->reg[EREG_FIFO_PORTS]	= 0x8080;	smc->regmask[EREG_FIFO_PORTS]	= 0x0000;
-	smc->reg[EREG_POINTER]		= 0x0000;	smc->regmask[EREG_POINTER]		= 0xf7ff;
-	smc->reg[EREG_DATA_0]		= 0x0000;	smc->regmask[EREG_DATA_0]		= 0xffff;
-	smc->reg[EREG_DATA_1]		= 0x0000;	smc->regmask[EREG_DATA_1]		= 0xffff;
-	smc->reg[EREG_INTERRUPT]	= 0x0004;	smc->regmask[EREG_INTERRUPT]	= 0x7f00;
+	smc->reg[EREG_MMU_COMMAND]  = 0x0000;   smc->regmask[EREG_MMU_COMMAND]  = 0x00e7;
+	smc->reg[EREG_PNR_ARR]      = 0x8000;   smc->regmask[EREG_PNR_ARR]      = 0x00ff;
+	smc->reg[EREG_FIFO_PORTS]   = 0x8080;   smc->regmask[EREG_FIFO_PORTS]   = 0x0000;
+	smc->reg[EREG_POINTER]      = 0x0000;   smc->regmask[EREG_POINTER]      = 0xf7ff;
+	smc->reg[EREG_DATA_0]       = 0x0000;   smc->regmask[EREG_DATA_0]       = 0xffff;
+	smc->reg[EREG_DATA_1]       = 0x0000;   smc->regmask[EREG_DATA_1]       = 0xffff;
+	smc->reg[EREG_INTERRUPT]    = 0x0004;   smc->regmask[EREG_INTERRUPT]    = 0x7f00;
 
-	smc->reg[EREG_MT0_1]		= 0x0000;	smc->regmask[EREG_MT0_1]		= 0xffff;
-	smc->reg[EREG_MT2_3]		= 0x0000;	smc->regmask[EREG_MT2_3]		= 0xffff;
-	smc->reg[EREG_MT4_5]		= 0x0000;	smc->regmask[EREG_MT4_5]		= 0xffff;
-	smc->reg[EREG_MT6_7]		= 0x0000;	smc->regmask[EREG_MT6_7]		= 0xffff;
-	smc->reg[EREG_MGMT]			= 0x3030;	smc->regmask[EREG_MGMT]			= 0x0f0f;
-	smc->reg[EREG_REVISION]		= 0x3340;	smc->regmask[EREG_REVISION]		= 0x0000;
-	smc->reg[EREG_ERCV]			= 0x331f;	smc->regmask[EREG_ERCV]			= 0x009f;
+	smc->reg[EREG_MT0_1]        = 0x0000;   smc->regmask[EREG_MT0_1]        = 0xffff;
+	smc->reg[EREG_MT2_3]        = 0x0000;   smc->regmask[EREG_MT2_3]        = 0xffff;
+	smc->reg[EREG_MT4_5]        = 0x0000;   smc->regmask[EREG_MT4_5]        = 0xffff;
+	smc->reg[EREG_MT6_7]        = 0x0000;   smc->regmask[EREG_MT6_7]        = 0xffff;
+	smc->reg[EREG_MGMT]         = 0x3030;   smc->regmask[EREG_MGMT]         = 0x0f0f;
+	smc->reg[EREG_REVISION]     = 0x3340;   smc->regmask[EREG_REVISION]     = 0x0000;
+	smc->reg[EREG_ERCV]         = 0x331f;   smc->regmask[EREG_ERCV]         = 0x009f;
 
 	update_ethernet_irq(smc);
 }
@@ -632,6 +632,3 @@ smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag,
 	: smc91c9x_device(mconfig, SMC91C96, "SMC91C96", tag, owner, clock)
 {
 }
-
-
-

@@ -182,4 +182,3 @@ UINT32 pcw_state::screen_update_pcw_printer(screen_device &screen, bitmap_ind16 
 	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos+1) = 0;
 	return 0;
 }
-

@@ -39,16 +39,16 @@
  *
  *****************************************************************************/
 
-#define VERBOSE					1
+#define VERBOSE                 1
 
 /* if 1, create a .wav file of the sound produced */
-#define LOG_WAV					0
+#define LOG_WAV                 0
 
 /* if 1 and LOG_WAV is 1, only logs to .wav file in chip is enabled */
-#define LOG_WAV_ENABLED_ONLY	0
+#define LOG_WAV_ENABLED_ONLY    0
 
 /* determines what value will be logged in the left channel of the .wav file */
-#define LOG_WAV_VALUE_L			0	/* 0 = OUT voltage */
+#define LOG_WAV_VALUE_L         0   /* 0 = OUT voltage */
 									/* 1 = enable line */
 									/* 2 = one-shot cap voltage */
 									/* 3 = a/d cap voltage */
@@ -58,20 +58,20 @@
 
 /* determines what value will be logged in the right channel of the .wav file
    same values as for the left channel above */
-#define LOG_WAV_VALUE_R			3
+#define LOG_WAV_VALUE_R         3
 
-#define LOG_WAV_GAIN_FACTOR		1000
+#define LOG_WAV_GAIN_FACTOR     1000
 
-#define LOG_WAV_FILE_NAME		"sn76477_%s.wav"
+#define LOG_WAV_FILE_NAME       "sn76477_%s.wav"
 
 
 #define LOG(n,x) do { if (VERBOSE >= (n)) logerror x; } while (0)
 
-#define CHECK_CHIP_NUM					assert(sn != NULL)
-#define CHECK_CHIP_NUM_AND_BOOLEAN		CHECK_CHIP_NUM; assert((state & 0x01) == state)
-#define CHECK_CHIP_NUM_AND_POSITIVE		CHECK_CHIP_NUM; assert(data >= 0.0)
-#define CHECK_CHIP_NUM_AND_VOLTAGE		CHECK_CHIP_NUM; assert((data >= 0.0) && (data <= 5.0))
-#define CHECK_CHIP_NUM_AND_CAP_VOLTAGE	CHECK_CHIP_NUM; assert(((data >= 0.0) && (data <= 5.0)) || (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT))
+#define CHECK_CHIP_NUM                  assert(sn != NULL)
+#define CHECK_CHIP_NUM_AND_BOOLEAN      CHECK_CHIP_NUM; assert((state & 0x01) == state)
+#define CHECK_CHIP_NUM_AND_POSITIVE     CHECK_CHIP_NUM; assert(data >= 0.0)
+#define CHECK_CHIP_NUM_AND_VOLTAGE      CHECK_CHIP_NUM; assert((data >= 0.0) && (data <= 5.0))
+#define CHECK_CHIP_NUM_AND_CAP_VOLTAGE  CHECK_CHIP_NUM; assert(((data >= 0.0) && (data <= 5.0)) || (data == SN76477_EXTERNAL_VOLTAGE_DISCONNECT))
 
 
 
@@ -89,36 +89,36 @@
  *
  *****************************************************************************/
 
-#define TEST_MODE	0
+#define TEST_MODE   0
 
 
 #if TEST_MODE
 
 static const sn76477_interface empty_interface =
 {
-	0,			/*  4 noise_clock_res  */
-	0,			/*  5 filter_res       */
-	0,			/*  6 filter_cap       */
-	0,			/*  7 decay_res        */
-	0,			/*  8 attack_decay_cap */
-	0,			/* 10 attack_res       */
-	0,			/* 11 amplitude_res    */
-	0,			/* 12 feedback_res     */
-	0,			/* 16 vco_voltage      */
-	0,			/* 17 vco_cap          */
-	0,			/* 18 vco_res          */
-	0,			/* 19 pitch_voltage    */
-	0,			/* 20 slf_res          */
-	0,			/* 21 slf_cap          */
-	0,			/* 23 oneshot_cap      */
-	0,			/* 24 oneshot_res      */
-	0,			/* 22 vco              */
-	0,			/* 26 mixer A          */
-	0,			/* 25 mixer B          */
-	0,			/* 27 mixer C          */
-	0,			/* 1  envelope 1       */
-	0,			/* 28 envelope 2       */
-	0			/* 9  enable           */
+	0,          /*  4 noise_clock_res  */
+	0,          /*  5 filter_res       */
+	0,          /*  6 filter_cap       */
+	0,          /*  7 decay_res        */
+	0,          /*  8 attack_decay_cap */
+	0,          /* 10 attack_res       */
+	0,          /* 11 amplitude_res    */
+	0,          /* 12 feedback_res     */
+	0,          /* 16 vco_voltage      */
+	0,          /* 17 vco_cap          */
+	0,          /* 18 vco_res          */
+	0,          /* 19 pitch_voltage    */
+	0,          /* 20 slf_res          */
+	0,          /* 21 slf_cap          */
+	0,          /* 23 oneshot_cap      */
+	0,          /* 24 oneshot_res      */
+	0,          /* 22 vco              */
+	0,          /* 26 mixer A          */
+	0,          /* 25 mixer B          */
+	0,          /* 27 mixer C          */
+	0,          /* 1  envelope 1       */
+	0,          /* 28 envelope 2       */
+	0           /* 9  enable           */
 };
 
 #define test_interface empty_empty_interface
@@ -133,56 +133,56 @@ static const sn76477_interface empty_interface =
  *
  *****************************************************************************/
 
-#define ONE_SHOT_CAP_VOLTAGE_MIN	(0)			/* the voltage at which the one-shot starts from (measured) */
-#define ONE_SHOT_CAP_VOLTAGE_MAX	(2.5)		/* the voltage at which the one-shot finishes (measured) */
-#define ONE_SHOT_CAP_VOLTAGE_RANGE	(ONE_SHOT_CAP_VOLTAGE_MAX - ONE_SHOT_CAP_VOLTAGE_MIN)
+#define ONE_SHOT_CAP_VOLTAGE_MIN    (0)         /* the voltage at which the one-shot starts from (measured) */
+#define ONE_SHOT_CAP_VOLTAGE_MAX    (2.5)       /* the voltage at which the one-shot finishes (measured) */
+#define ONE_SHOT_CAP_VOLTAGE_RANGE  (ONE_SHOT_CAP_VOLTAGE_MAX - ONE_SHOT_CAP_VOLTAGE_MIN)
 
-#define SLF_CAP_VOLTAGE_MIN			(0.33)		/* the voltage at the bottom peak of the SLF triangle wave (measured) */
-#define SLF_CAP_VOLTAGE_MAX			(2.37)		/* the voltage at the top peak of the SLF triangle wave (measured) */
-#define SLF_CAP_VOLTAGE_RANGE		(SLF_CAP_VOLTAGE_MAX - SLF_CAP_VOLTAGE_MIN)
+#define SLF_CAP_VOLTAGE_MIN         (0.33)      /* the voltage at the bottom peak of the SLF triangle wave (measured) */
+#define SLF_CAP_VOLTAGE_MAX         (2.37)      /* the voltage at the top peak of the SLF triangle wave (measured) */
+#define SLF_CAP_VOLTAGE_RANGE       (SLF_CAP_VOLTAGE_MAX - SLF_CAP_VOLTAGE_MIN)
 
-#define VCO_MAX_EXT_VOLTAGE			(2.35)		/* the external voltage at which the VCO saturates and produces no output,
+#define VCO_MAX_EXT_VOLTAGE         (2.35)      /* the external voltage at which the VCO saturates and produces no output,
                                                    also used as the voltage threshold for the SLF */
-#define VCO_TO_SLF_VOLTAGE_DIFF		(0.35)
-#define VCO_CAP_VOLTAGE_MIN			(SLF_CAP_VOLTAGE_MIN)	/* the voltage at the bottom peak of the VCO triangle wave */
-#define VCO_CAP_VOLTAGE_MAX			(SLF_CAP_VOLTAGE_MAX + VCO_TO_SLF_VOLTAGE_DIFF)	/* the voltage at the bottom peak of the VCO triangle wave */
-#define VCO_CAP_VOLTAGE_RANGE		(VCO_CAP_VOLTAGE_MAX - VCO_CAP_VOLTAGE_MIN)
-#define VCO_DUTY_CYCLE_50			(5.0)		/* the high voltage that produces a 50% duty cycle */
-#define VCO_MIN_DUTY_CYCLE			(18)		/* the smallest possible duty cycle, in % */
+#define VCO_TO_SLF_VOLTAGE_DIFF     (0.35)
+#define VCO_CAP_VOLTAGE_MIN         (SLF_CAP_VOLTAGE_MIN)   /* the voltage at the bottom peak of the VCO triangle wave */
+#define VCO_CAP_VOLTAGE_MAX         (SLF_CAP_VOLTAGE_MAX + VCO_TO_SLF_VOLTAGE_DIFF) /* the voltage at the bottom peak of the VCO triangle wave */
+#define VCO_CAP_VOLTAGE_RANGE       (VCO_CAP_VOLTAGE_MAX - VCO_CAP_VOLTAGE_MIN)
+#define VCO_DUTY_CYCLE_50           (5.0)       /* the high voltage that produces a 50% duty cycle */
+#define VCO_MIN_DUTY_CYCLE          (18)        /* the smallest possible duty cycle, in % */
 
-#define NOISE_MIN_CLOCK_RES			RES_K(10)	/* the maximum resistor value that still produces a noise (measured) */
-#define NOISE_MAX_CLOCK_RES			RES_M(3.3)	/* the minimum resistor value that still produces a noise (measured) */
-#define NOISE_CAP_VOLTAGE_MIN		(0)			/* the minimum voltage that the noise filter cap can hold (measured) */
-#define NOISE_CAP_VOLTAGE_MAX		(5.0)		/* the maximum voltage that the noise filter cap can hold (measured) */
-#define NOISE_CAP_VOLTAGE_RANGE		(NOISE_CAP_VOLTAGE_MAX - NOISE_CAP_VOLTAGE_MIN)
-#define NOISE_CAP_HIGH_THRESHOLD	(3.35)		/* the voltage at which the filtered noise bit goes to 0 (measured) */
-#define NOISE_CAP_LOW_THRESHOLD		(0.74)		/* the voltage at which the filtered noise bit goes to 1 (measured) */
+#define NOISE_MIN_CLOCK_RES         RES_K(10)   /* the maximum resistor value that still produces a noise (measured) */
+#define NOISE_MAX_CLOCK_RES         RES_M(3.3)  /* the minimum resistor value that still produces a noise (measured) */
+#define NOISE_CAP_VOLTAGE_MIN       (0)         /* the minimum voltage that the noise filter cap can hold (measured) */
+#define NOISE_CAP_VOLTAGE_MAX       (5.0)       /* the maximum voltage that the noise filter cap can hold (measured) */
+#define NOISE_CAP_VOLTAGE_RANGE     (NOISE_CAP_VOLTAGE_MAX - NOISE_CAP_VOLTAGE_MIN)
+#define NOISE_CAP_HIGH_THRESHOLD    (3.35)      /* the voltage at which the filtered noise bit goes to 0 (measured) */
+#define NOISE_CAP_LOW_THRESHOLD     (0.74)      /* the voltage at which the filtered noise bit goes to 1 (measured) */
 
-#define AD_CAP_VOLTAGE_MIN			(0)			/* the minimum voltage the attack/decay cap can hold (measured) */
-#define AD_CAP_VOLTAGE_MAX			(4.44)		/* the minimum voltage the attack/decay cap can hold (measured) */
-#define AD_CAP_VOLTAGE_RANGE		(AD_CAP_VOLTAGE_MAX - AD_CAP_VOLTAGE_MIN)
+#define AD_CAP_VOLTAGE_MIN          (0)         /* the minimum voltage the attack/decay cap can hold (measured) */
+#define AD_CAP_VOLTAGE_MAX          (4.44)      /* the minimum voltage the attack/decay cap can hold (measured) */
+#define AD_CAP_VOLTAGE_RANGE        (AD_CAP_VOLTAGE_MAX - AD_CAP_VOLTAGE_MIN)
 
-#define OUT_CENTER_LEVEL_VOLTAGE	(2.57)		/* the voltage that gets outputted when the volumne is 0 (measured) */
-#define OUT_HIGH_CLIP_THRESHOLD		(3.51)		/* the maximum voltage that can be put out (measured) */
-#define OUT_LOW_CLIP_THRESHOLD		(0.715)		/* the minimum voltage that can be put out (measured) */
+#define OUT_CENTER_LEVEL_VOLTAGE    (2.57)      /* the voltage that gets outputted when the volumne is 0 (measured) */
+#define OUT_HIGH_CLIP_THRESHOLD     (3.51)      /* the maximum voltage that can be put out (measured) */
+#define OUT_LOW_CLIP_THRESHOLD      (0.715)     /* the minimum voltage that can be put out (measured) */
 
 /* gain factors for OUT voltage in 0.1V increments (measured) */
 static const double out_pos_gain[] =
 {
-	0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.01,	 /* 0.0 - 0.9V */
+	0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.01,  /* 0.0 - 0.9V */
 	0.03, 0.11, 0.15, 0.19, 0.21, 0.23, 0.26, 0.29, 0.31, 0.33,  /* 1.0 - 1.9V */
 	0.36, 0.38, 0.41, 0.43, 0.46, 0.49, 0.52, 0.54, 0.57, 0.60,  /* 2.0 - 2.9V */
 	0.62, 0.65, 0.68, 0.70, 0.73, 0.76, 0.80, 0.82, 0.84, 0.87,  /* 3.0 - 3.9V */
-	0.90, 0.93, 0.96, 0.98, 1.00								 /* 4.0 - 4.4V */
+	0.90, 0.93, 0.96, 0.98, 1.00                                 /* 4.0 - 4.4V */
 };
 
 static const double out_neg_gain[] =
 {
-	 0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00, -0.01,  /* 0.0 - 0.9V */
+		0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00, -0.01,  /* 0.0 - 0.9V */
 	-0.02, -0.09, -0.13, -0.15, -0.17, -0.19, -0.22, -0.24, -0.26, -0.28,  /* 1.0 - 1.9V */
 	-0.30, -0.32, -0.34, -0.37, -0.39, -0.41, -0.44, -0.46, -0.48, -0.51,  /* 2.0 - 2.9V */
 	-0.53, -0.56, -0.58, -0.60, -0.62, -0.65, -0.67, -0.69, -0.72, -0.74,  /* 3.0 - 3.9V */
-	-0.76, -0.78, -0.81, -0.84, -0.85									   /* 4.0 - 4.4V */
+	-0.76, -0.78, -0.81, -0.84, -0.85                                      /* 4.0 - 4.4V */
 };
 
 
@@ -231,31 +231,31 @@ struct sn76477_state
 	double pitch_voltage;
 
 	/* chip's internal state */
-	double one_shot_cap_voltage;		/* voltage on the one-shot cap */
-	UINT32 one_shot_running_ff;			/* 1 = one-shot running, 0 = stopped */
+	double one_shot_cap_voltage;        /* voltage on the one-shot cap */
+	UINT32 one_shot_running_ff;         /* 1 = one-shot running, 0 = stopped */
 
-	double slf_cap_voltage;				/* voltage on the SLF cap */
-	UINT32 slf_out_ff;					/* output of the SLF */
+	double slf_cap_voltage;             /* voltage on the SLF cap */
+	UINT32 slf_out_ff;                  /* output of the SLF */
 
-	double vco_cap_voltage;				/* voltage on the VCO cap */
-	UINT32 vco_out_ff;					/* output of the VCO */
-	UINT32 vco_alt_pos_edge_ff;			/* keeps track of the # of positive edges for VCO Alt envelope */
+	double vco_cap_voltage;             /* voltage on the VCO cap */
+	UINT32 vco_out_ff;                  /* output of the VCO */
+	UINT32 vco_alt_pos_edge_ff;         /* keeps track of the # of positive edges for VCO Alt envelope */
 
-	double noise_filter_cap_voltage;	/* voltage on the noise filter cap */
-	UINT32 real_noise_bit_ff;			/* the current noise bit before filtering */
-	UINT32 filtered_noise_bit_ff;		/* the noise bit after filtering */
-	UINT32 noise_gen_count;				/* noise freq emulation */
+	double noise_filter_cap_voltage;    /* voltage on the noise filter cap */
+	UINT32 real_noise_bit_ff;           /* the current noise bit before filtering */
+	UINT32 filtered_noise_bit_ff;       /* the noise bit after filtering */
+	UINT32 noise_gen_count;             /* noise freq emulation */
 
-	double attack_decay_cap_voltage;	/* voltage on the attack/decay cap */
+	double attack_decay_cap_voltage;    /* voltage on the attack/decay cap */
 
-	UINT32 rng;							/* current value of the random number generator */
+	UINT32 rng;                         /* current value of the random number generator */
 
 	/* others */
-	sound_stream *channel;				/* returned by stream_create() */
-	int sample_rate;					/* from machine.sample_rate() */
+	sound_stream *channel;              /* returned by stream_create() */
+	int sample_rate;                    /* from machine.sample_rate() */
 	device_t *device;
 
-	wav_file *file;						/* handle of the wave file to produce */
+	wav_file *file;                     /* handle of the wave file to produce */
 };
 
 
@@ -301,16 +301,16 @@ static double compute_one_shot_cap_charging_rate(sn76477_state *sn) /* in V/sec 
 {
 	/* this formula was derived using the data points below
 
-     Res (kohms)  Cap (uF)   Time (millisec)
-         47         0.33         11.84
-         47         1.0          36.2
-         47         1.5          52.1
-         47         2.0          76.4
-        100         0.33         24.4
-        100         1.0          75.2
-        100         1.5         108.5
-        100         2.0         158.4
-    */
+	 Res (kohms)  Cap (uF)   Time (millisec)
+	     47         0.33         11.84
+	     47         1.0          36.2
+	     47         1.5          52.1
+	     47         2.0          76.4
+	    100         0.33         24.4
+	    100         1.0          75.2
+	    100         1.5         108.5
+	    100         2.0         158.4
+	*/
 
 	double ret = 0;
 
@@ -321,13 +321,13 @@ static double compute_one_shot_cap_charging_rate(sn76477_state *sn) /* in V/sec 
 	else if (sn->one_shot_cap > 0)
 	{
 		/* if no resistor, there is no current to charge the cap,
-           effectively making the one-shot time effectively infinite */
+		   effectively making the one-shot time effectively infinite */
 		ret = +1e-30;
 	}
 	else if (sn->one_shot_res > 0)
 	{
 		/* if no cap, the voltage changes extremely fast,
-           effectively making the one-shot time 0 */
+		   effectively making the one-shot time 0 */
 		ret = +1e+30;
 	}
 
@@ -339,12 +339,12 @@ static double compute_one_shot_cap_discharging_rate(sn76477_state *sn) /* in V/s
 {
 	/* this formula was derived using the data points below
 
-    Cap (uF)   Time (microsec)
-      0.33           300
-      1.0            850
-      1.5           1300
-      2.0           1900
-    */
+	Cap (uF)   Time (microsec)
+	  0.33           300
+	  1.0            850
+	  1.5           1300
+	  2.0           1900
+	*/
 
 	double ret = 0;
 
@@ -355,7 +355,7 @@ static double compute_one_shot_cap_discharging_rate(sn76477_state *sn) /* in V/s
 	else if (sn->one_shot_res > 0)
 	{
 		/* if no cap, the voltage changes extremely fast,
-           effectively making the one-shot time 0 */
+		   effectively making the one-shot time 0 */
 		ret = +1e+30;
 	}
 
@@ -367,14 +367,14 @@ static double compute_slf_cap_charging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
-    Res (kohms)  Cap (uF)   Time (millisec)
-         47        0.47          14.3
-        120        0.47          35.6
-        200        0.47          59.2
-         47        1.00          28.6
-        120        1.00          71.6
-        200        1.00         119.0
-    */
+	Res (kohms)  Cap (uF)   Time (millisec)
+	     47        0.47          14.3
+	    120        0.47          35.6
+	    200        0.47          59.2
+	     47        1.00          28.6
+	    120        1.00          71.6
+	    200        1.00         119.0
+	*/
 	double ret = 0;
 
 	if ((sn->slf_res > 0) && (sn->slf_cap > 0))
@@ -390,14 +390,14 @@ static double compute_slf_cap_discharging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
-    Res (kohms)  Cap (uF)   Time (millisec)
-         47        0.47          13.32
-        120        0.47          32.92
-        200        0.47          54.4
-         47        1.00          26.68
-        120        1.00          66.2
-        200        1.00         109.6
-    */
+	Res (kohms)  Cap (uF)   Time (millisec)
+	     47        0.47          13.32
+	    120        0.47          32.92
+	    200        0.47          54.4
+	     47        1.00          26.68
+	    120        1.00          66.2
+	    200        1.00         109.6
+	*/
 	double ret = 0;
 
 	if ((sn->slf_res > 0) && (sn->slf_cap > 0))
@@ -424,7 +424,7 @@ static double compute_vco_cap_charging_discharging_rate(sn76477_state *sn) /* in
 
 static double compute_vco_duty_cycle(sn76477_state *sn) /* no measure, just a number */
 {
-	double ret = 0.5;	/* 50% */
+	double ret = 0.5;   /* 50% */
 
 	if ((sn->vco_voltage > 0) && (sn->pitch_voltage != VCO_DUTY_CYCLE_50))
 	{
@@ -441,36 +441,36 @@ static UINT32 compute_noise_gen_freq(sn76477_state *sn) /* in Hz */
 {
 	/* this formula was derived using the data points below
 
-     Res (ohms)   Freq (Hz)
-        10k         97493
-        12k         83333
-        15k         68493
-        22k         49164
-        27k         41166
-        33k         34449
-        36k         31969
-        47k         25126
-        56k         21322
-        68k         17721.5
-        82k         15089.2
-        100k        12712.0
-        150k         8746.4
-        220k         6122.4
-        270k         5101.5
-        330k         4217.2
-        390k         3614.5
-        470k         3081.7
-        680k         2132.7
-        820k         1801.8
-          1M         1459.9
-        2.2M          705.13
-        3.3M          487.59
-    */
+	 Res (ohms)   Freq (Hz)
+	    10k         97493
+	    12k         83333
+	    15k         68493
+	    22k         49164
+	    27k         41166
+	    33k         34449
+	    36k         31969
+	    47k         25126
+	    56k         21322
+	    68k         17721.5
+	    82k         15089.2
+	    100k        12712.0
+	    150k         8746.4
+	    220k         6122.4
+	    270k         5101.5
+	    330k         4217.2
+	    390k         3614.5
+	    470k         3081.7
+	    680k         2132.7
+	    820k         1801.8
+	      1M         1459.9
+	    2.2M          705.13
+	    3.3M          487.59
+	*/
 
 	UINT32 ret = 0;
 
 	if ((sn->noise_clock_res >= NOISE_MIN_CLOCK_RES) &&
-	    (sn->noise_clock_res <= NOISE_MAX_CLOCK_RES))
+		(sn->noise_clock_res <= NOISE_MAX_CLOCK_RES))
 	{
 		ret = 339100000 * pow(sn->noise_clock_res, -0.8849);
 	}
@@ -483,16 +483,16 @@ static double compute_noise_filter_cap_charging_rate(sn76477_state *sn) /* in V/
 {
 	/* this formula was derived using the data points below
 
-     R*C        Time (sec)
-    .000068     .0000184
-    .0001496    .0000378
-    .0002244    .0000548
-    .0003196    .000077
-    .0015       .000248
-    .0033       .000540
-    .00495      .000792
-    .00705      .001096
-    */
+	 R*C        Time (sec)
+	.000068     .0000184
+	.0001496    .0000378
+	.0002244    .0000548
+	.0003196    .000077
+	.0015       .000248
+	.0033       .000540
+	.00495      .000792
+	.00705      .001096
+	*/
 
 	double ret = 0;
 
@@ -503,13 +503,13 @@ static double compute_noise_filter_cap_charging_rate(sn76477_state *sn) /* in V/
 	else if (sn->noise_filter_cap > 0)
 	{
 		/* if no resistor, there is no current to charge the cap,
-           effectively making the filter's output constants */
+		   effectively making the filter's output constants */
 		ret = +1e-30;
 	}
 	else if (sn->noise_filter_res > 0)
 	{
 		/* if no cap, the voltage changes extremely fast,
-           effectively disabling the filter */
+		   effectively disabling the filter */
 		ret = +1e+30;
 	}
 
@@ -521,16 +521,16 @@ static double compute_noise_filter_cap_discharging_rate(sn76477_state *sn) /* in
 {
 	/* this formula was derived using the data points below
 
-     R*C        Time (sec)
-    .000068     .000016
-    .0001496    .0000322
-    .0002244    .0000472
-    .0003196    .0000654
-    .0015       .000219
-    .0033       .000468
-    .00495      .000676
-    .00705      .000948
-    */
+	 R*C        Time (sec)
+	.000068     .000016
+	.0001496    .0000322
+	.0002244    .0000472
+	.0003196    .0000654
+	.0015       .000219
+	.0033       .000468
+	.00495      .000676
+	.00705      .000948
+	*/
 
 	double ret = 0;
 
@@ -541,13 +541,13 @@ static double compute_noise_filter_cap_discharging_rate(sn76477_state *sn) /* in
 	else if (sn->noise_filter_cap > 0)
 	{
 		/* if no resistor, there is no current to charge the cap,
-           effectively making the filter's output constants */
+		   effectively making the filter's output constants */
 		ret = +1e-30;
 	}
 	else if (sn->noise_filter_res > 0)
 	{
 		/* if no cap, the voltage changes extremely fast,
-           effectively disabling the filter */
+		   effectively disabling the filter */
 		ret = +1e+30;
 	}
 
@@ -566,13 +566,13 @@ static double compute_attack_decay_cap_charging_rate(sn76477_state *sn)  /* in V
 	else if (sn->attack_decay_cap > 0)
 	{
 		/* if no resistor, there is no current to charge the cap,
-           effectively making the attack time infinite */
+		   effectively making the attack time infinite */
 		ret = +1e-30;
 	}
 	else if (sn->attack_res > 0)
 	{
 		/* if no cap, the voltage changes extremely fast,
-           effectively making the attack time 0 */
+		   effectively making the attack time 0 */
 		ret = +1e+30;
 	}
 
@@ -591,13 +591,13 @@ static double compute_attack_decay_cap_discharging_rate(sn76477_state *sn)  /* i
 	else if (sn->attack_decay_cap > 0)
 	{
 		/* if no resistor, there is no current to charge the cap,
-           effectively making the decay time infinite */
+		   effectively making the decay time infinite */
 		ret = +1e-30;
 	}
 	else if (sn->attack_res > 0)
 	{
 		/* if no cap, the voltage changes extremely fast,
-           effectively making the decay time 0 */
+		   effectively making the decay time 0 */
 		ret = +1e+30;
 	}
 
@@ -609,17 +609,17 @@ static double compute_center_to_peak_voltage_out(sn76477_state *sn)
 {
 	/* this formula was derived using the data points below
 
-     Ra (kohms)  Rf (kohms)   Voltage
-        150         47          1.28
-        200         47          0.96
-         47         22          1.8
-        100         22          0.87
-        150         22          0.6
-        200         22          0.45
-         47         10          0.81
-        100         10          0.4
-        150         10          0.27
-    */
+	 Ra (kohms)  Rf (kohms)   Voltage
+	    150         47          1.28
+	    200         47          0.96
+	     47         22          1.8
+	    100         22          0.87
+	    150         22          0.6
+	    200         22          0.45
+	     47         10          0.81
+	    100         10          0.4
+	    150         10          0.27
+	*/
 
 	double ret = 0;
 
@@ -950,7 +950,7 @@ INLINE UINT32 generate_next_real_noise_bit(sn76477_state *sn)
 {
 	UINT32 out = ((sn->rng >> 28) & 1) ^ ((sn->rng >> 0) & 1);
 
-	 /* if bits 0-4 and 28 are all zero then force the output to 1 */
+		/* if bits 0-4 and 28 are all zero then force the output to 1 */
 	if ((sn->rng & 0x1000001f) == 0)
 	{
 		out = 1;
@@ -973,7 +973,7 @@ static void _SN76477_enable_w(sn76477_state *sn, UINT32 data)
 {
 	sn->enable = data;
 
-	 /* if falling edge */
+		/* if falling edge */
 	if (!sn->enable)
 	{
 		/* start the attack phase */
@@ -1589,7 +1589,7 @@ WRITE_LINE_DEVICE_HANDLER( sn76477_noise_clock_w )
 		sn->noise_clock = state;
 
 		/* on the rising edge shift generate next value,
-           if external control is enabled */
+		   if external control is enabled */
 		if (sn->noise_clock && sn->noise_clock_ext)
 		{
 			sn->channel->update();
@@ -1987,7 +1987,7 @@ static STREAM_UPDATE( SN76477_update )
 
 
 #if TEST_MODE
-	static int recursing = 0;	/* we need to prevent recursion since enable_w calls device->machine().input().code_pressed_once(KEYCODE_SPACE->update */
+	static int recursing = 0;   /* we need to prevent recursion since enable_w calls device->machine().input().code_pressed_once(KEYCODE_SPACE->update */
 
 	if () && !recursing)
 	{
@@ -2154,20 +2154,20 @@ static STREAM_UPDATE( SN76477_update )
 		/* based on the envelope mode figure out the attack/decay phase we are in */
 		switch (sn->envelope_mode)
 		{
-		case 0:		/* VCO */
+		case 0:     /* VCO */
 			attack_decay_cap_charging = sn->vco_out_ff;
 			break;
 
-		case 1:		/* one-shot */
+		case 1:     /* one-shot */
 			attack_decay_cap_charging = sn->one_shot_running_ff;
 			break;
 
 		case 2:
-		default:	/* mixer only */
-			attack_decay_cap_charging = 1;	/* never a decay phase */
+		default:    /* mixer only */
+			attack_decay_cap_charging = 1;  /* never a decay phase */
 			break;
 
-		case 3:		/* VCO with alternating polarity */
+		case 3:     /* VCO with alternating polarity */
 			attack_decay_cap_charging = sn->vco_out_ff && sn->vco_alt_pos_edge_ff;
 			break;
 		}
@@ -2212,35 +2212,35 @@ static STREAM_UPDATE( SN76477_update )
 			/* enabled */
 			switch (sn->mixer_mode)
 			{
-			case 0:		/* VCO */
+			case 0:     /* VCO */
 				out = sn->vco_out_ff;
 				break;
 
-			case 1:		/* SLF */
+			case 1:     /* SLF */
 				out = sn->slf_out_ff;
 				break;
 
-			case 2:		/* noise */
+			case 2:     /* noise */
 				out = sn->filtered_noise_bit_ff;
 				break;
 
-			case 3:		/* VCO and noise */
+			case 3:     /* VCO and noise */
 				out = sn->vco_out_ff & sn->filtered_noise_bit_ff;
 				break;
 
-			case 4:		/* SLF and noise */
+			case 4:     /* SLF and noise */
 				out = sn->slf_out_ff & sn->filtered_noise_bit_ff;
 				break;
 
-			case 5:		/* VCO, SLF and noise */
+			case 5:     /* VCO, SLF and noise */
 				out = sn->vco_out_ff & sn->slf_out_ff & sn->filtered_noise_bit_ff;
 				break;
 
-			case 6:		/* VCO and SLF */
+			case 6:     /* VCO and SLF */
 				out = sn->vco_out_ff & sn->slf_out_ff;
 				break;
 
-			case 7:		/* inhibit */
+			case 7:     /* inhibit */
 			default:
 				out = 0;
 				break;
@@ -2266,14 +2266,14 @@ static STREAM_UPDATE( SN76477_update )
 
 
 		/* convert it to a signed 16-bit sample,
-           -32767 = OUT_LOW_CLIP_THRESHOLD
-                0 = OUT_CENTER_LEVEL_VOLTAGE
-            32767 = 2 * OUT_CENTER_LEVEL_VOLTAGE + OUT_LOW_CLIP_THRESHOLD
+		   -32767 = OUT_LOW_CLIP_THRESHOLD
+		        0 = OUT_CENTER_LEVEL_VOLTAGE
+		    32767 = 2 * OUT_CENTER_LEVEL_VOLTAGE + OUT_LOW_CLIP_THRESHOLD
 
-                      / Vout - Vmin    \
-            sample = |  ----------- - 1 | * 32767
-                      \ Vcen - Vmin    /
-         */
+		              / Vout - Vmin    \
+		    sample = |  ----------- - 1 | * 32767
+		              \ Vcen - Vmin    /
+		 */
 		*buffer++ = (((voltage_out - OUT_LOW_CLIP_THRESHOLD) / (OUT_CENTER_LEVEL_VOLTAGE - OUT_LOW_CLIP_THRESHOLD)) - 1) * 32767;
 
 		if (LOG_WAV && LOG_WAV_ENABLED_ONLY && !sn->enable)
@@ -2470,7 +2470,7 @@ const device_type SN76477 = &device_creator<sn76477_device>;
 
 sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SN76477, "SN76477", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(sn76477_state);
 }
@@ -2512,5 +2512,3 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

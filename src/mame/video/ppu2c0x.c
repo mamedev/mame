@@ -32,13 +32,13 @@
 ***************************************************************************/
 
 /* constant definitions */
-#define VISIBLE_SCREEN_WIDTH	     (32*8)	/* Visible screen width */
-#define VISIBLE_SCREEN_HEIGHT	     (30*8)	/* Visible screen height */
-#define VIDEOMEM_SIZE			0x1000	/* videomem size */
-#define VIDEOMEM_PAGE_SIZE		0x400	/* videomem page size */
-#define SPRITERAM_SIZE			0x100	/* spriteram size */
-#define SPRITERAM_MASK			(0x100-1)	/* spriteram size */
-#define CHARGEN_NUM_CHARS		512		/* max number of characters handled by the chargen */
+#define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
+#define VISIBLE_SCREEN_HEIGHT        (30*8) /* Visible screen height */
+#define VIDEOMEM_SIZE           0x1000  /* videomem size */
+#define VIDEOMEM_PAGE_SIZE      0x400   /* videomem page size */
+#define SPRITERAM_SIZE          0x100   /* spriteram size */
+#define SPRITERAM_MASK          (0x100-1)   /* spriteram size */
+#define CHARGEN_NUM_CHARS       512     /* max number of characters handled by the chargen */
 
 /* default monochromatic colortable */
 static const pen_t default_colortable_mono[] =
@@ -123,21 +123,21 @@ void ppu2c0x_device::device_config_complete()
 
 ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, type, name, tag, owner, clock),
-				  device_memory_interface(mconfig, *this),
-				  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(ppu2c0x)),
-				  m_scanline(0),	// reset the scanline count
-				  m_refresh_data(0),
-				  m_refresh_latch(0),
-				  m_x_fine(0),
-				  m_toggle(0),
-				  m_add(1),
-				  m_videomem_addr(0),
-				  m_data_latch(0),
-				  m_buffered_data(0),
-				  m_tile_page(0),
-				  m_sprite_page(0),
-				  m_back_color(0),
-				  m_scan_scale(1)	// set the scan scale (this is for dual monitor vertical setups)
+					device_memory_interface(mconfig, *this),
+					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(ppu2c0x)),
+					m_scanline(0),  // reset the scanline count
+					m_refresh_data(0),
+					m_refresh_latch(0),
+					m_x_fine(0),
+					m_toggle(0),
+					m_add(1),
+					m_videomem_addr(0),
+					m_data_latch(0),
+					m_buffered_data(0),
+					m_tile_page(0),
+					m_sprite_page(0),
+					m_back_color(0),
+					m_scan_scale(1) // set the scan scale (this is for dual monitor vertical setups)
 {
 	for (int i = 0; i < PPU_MAX_REG; i++)
 		m_regs[i] = 0;
@@ -176,7 +176,7 @@ ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, d
 // Vs. Unisystem (Ninja Jajamaru Kun)
 ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C05_01, "2C05 PPU", tag, owner, clock)
 {
-	m_security_value = 0x1b;	// game (jajamaru) doesn't seem to ever actually check it
+	m_security_value = 0x1b;    // game (jajamaru) doesn't seem to ever actually check it
 }
 // Vs. Unisystem (Mighty Bomb Jack)
 ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C05_02, "2C05 PPU", tag, owner, clock)
@@ -303,7 +303,7 @@ void ppu2c0x_device::init_palette( running_machine &machine, int first_entry )
 
 	double R, G, B;
 
-	double tint = 0.22;	/* adjust to taste */
+	double tint = 0.22; /* adjust to taste */
 	double hue = 287.0;
 
 	double Kr = 0.2989;
@@ -322,22 +322,22 @@ void ppu2c0x_device::init_palette( running_machine &machine, int first_entry )
 	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)
 	{
 		/*
-        double r_mod = 0.0;
-        double g_mod = 0.0;
-        double b_mod = 0.0;
+		double r_mod = 0.0;
+		double g_mod = 0.0;
+		double b_mod = 0.0;
 
-        switch (color_emphasis)
-        {
-            case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-            case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-            case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-            case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-            case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-            case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-            case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-            case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
-        }
-        */
+		switch (color_emphasis)
+		{
+		    case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+		    case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+		    case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+		    case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+		    case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+		    case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+		    case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+		    case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+		}
+		*/
 
 		/* loop through the 4 intensities */
 		for (color_intensity = 0; color_intensity < 4; color_intensity++)
@@ -431,13 +431,13 @@ void ppu2c0x_device::init_palette_rgb( running_machine &machine, int first_entry
 /* the charlayout we use for the chargen */
 static const gfx_layout ppu_charlayout =
 {
-	8, 8,	/* 8*8 characters */
+	8, 8,   /* 8*8 characters */
 	0,
-	2,		/* 2 bits per pixel */
-	{ 8*8, 0 },	/* the two bitplanes are separated */
+	2,      /* 2 bits per pixel */
+	{ 8*8, 0 }, /* the two bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every char takes 16 consecutive bytes */
+	16*8    /* every char takes 16 consecutive bytes */
 };
 
 /*************************************
@@ -553,7 +553,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 void ppu2c0x_device::draw_background( UINT8 *line_priority )
 {
 	bitmap_ind16 &bitmap = *m_bitmap;
-	int	start_x = (m_x_fine ^ 0x07) - 7;
+	int start_x = (m_x_fine ^ 0x07) - 7;
 	UINT16 back_pen;
 	UINT16 *dest;
 
@@ -1314,4 +1314,3 @@ int ppu2c0x_device::get_pixel( int x, int y )
 
 	return m_bitmap->pix16(y, x);
 }
-

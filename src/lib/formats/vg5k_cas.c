@@ -6,9 +6,9 @@
 #include "vg5k_cas.h"
 
 
-#define SMPLO	-32768
-#define SILENCE	0
-#define SMPHI	32767
+#define SMPLO   -32768
+#define SILENCE 0
+#define SMPHI   32767
 
 
 static int k7_size;
@@ -112,7 +112,7 @@ INLINE int vg5k_k7_synchro(INT16 *buffer, int sample_pos, int len)
 
 static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 {
-	int	data_pos, sample_count;
+	int data_pos, sample_count;
 
 	data_pos = 0;
 	sample_count = 0;
@@ -122,9 +122,9 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 		return -1;
 
 	/* on the entire file*/
-    while( data_pos < k7_size )
+	while( data_pos < k7_size )
 	{
-		UINT16	block_size = 0;
+		UINT16  block_size = 0;
 
 		/* Identify type of block */
 		if (casdata[data_pos] == 0xd3)
@@ -158,17 +158,17 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
 		/* Data samples */
 		for ( ; block_size ; data_pos++, block_size-- )
-        {
-		    /* Make sure there are enough bytes left */
-		    if (data_pos > k7_size)
-			   return -1;
+		{
+			/* Make sure there are enough bytes left */
+			if (data_pos > k7_size)
+				return -1;
 
-    		sample_count += vg5k_cas_byte( buffer, sample_count, casdata[data_pos] );
+			sample_count += vg5k_cas_byte( buffer, sample_count, casdata[data_pos] );
 
 			/* generate the end-byte samples */
 			sample_count += vg5k_cas_eob( buffer, sample_count);
 		}
-    }
+	}
 
 	/* Finish with 10000 samples of silence */
 	sample_count += vg5k_cas_silence(buffer, sample_count, 10000);
@@ -199,13 +199,13 @@ static int vg5k_k7_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller vg5k_legacy_fill_wave =
 {
-	vg5k_k7_fill_wave,						/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	vg5k_k7_to_wav_size,				    /* chunk_sample_calc */
-	44100,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	vg5k_k7_fill_wave,                      /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	vg5k_k7_to_wav_size,                    /* chunk_sample_calc */
+	44100,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 static casserr_t vg5k_k7_identify(cassette_image *cassette, struct CassetteOptions *opts)

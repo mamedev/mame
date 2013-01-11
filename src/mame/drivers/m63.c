@@ -398,7 +398,7 @@ WRITE8_MEMBER(m63_state::snddata_w)
 	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x60)
 		ay8910_address_w(m_ay2, space, 0, offset);
 	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x40)
-		 ay8910_data_w(m_ay2, space, 0, offset);
+			ay8910_data_w(m_ay2, space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
 }
@@ -438,8 +438,8 @@ READ8_MEMBER(m63_state::snddata_r)
 {
 	switch (m_p2 & 0xf0)
 	{
-		case 0x60:	return soundlatch_byte_r(space, 0); ;
-		case 0x70:	return memregion("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
+		case 0x60:  return soundlatch_byte_r(space, 0); ;
+		case 0x70:  return memregion("user1")->base()[((m_p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;
 }
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(m63_palbank_w)
 	AM_RANGE(0xf006, 0xf007) AM_WRITE(coin_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITENOP	/* continues game when in stop mode (cleared by NMI handler) */
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITENOP /* continues game when in stop mode (cleared by NMI handler) */
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf803, 0xf803) AM_WRITE(snd_irq_w)
 	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW2")
@@ -541,27 +541,27 @@ static INPUT_PORTS_START( wilytowr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x0c, 0x00, "Bonus Points Rate" )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, "Bonus Points Rate" )     PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, "x1.2" )
 	PORT_DIPSETTING(    0x08, "x1.4" )
 	PORT_DIPSETTING(    0x0c, "x1.6" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!5,!6") PORT_CONDITION("DSW1",0x04,EQUALS,0x04) /* coin mode 2 */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!5,!6") PORT_CONDITION("DSW1",0x04,EQUALS,0x04) /* coin mode 2 */
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Free_Play ) )	/* Not documented */
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!7,!8") PORT_CONDITION("DSW1",0x04,EQUALS,0x04) /* coin mode 2 */
+	PORT_DIPSETTING(    0x30, DEF_STR( Free_Play ) )    /* Not documented */
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!7,!8") PORT_CONDITION("DSW1",0x04,EQUALS,0x04) /* coin mode 2 */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!5,!6,!7,!8") PORT_CONDITION("DSW1",0x04,EQUALS,0x00) /* coin mode 1 */
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!5,!6,!7,!8") PORT_CONDITION("DSW1",0x04,EQUALS,0x00) /* coin mode 1 */
 	PORT_DIPSETTING(    0x60, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
@@ -580,23 +580,23 @@ static INPUT_PORTS_START( wilytowr )
 	PORT_DIPSETTING(    0xf0, DEF_STR( Free_Play ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	/*  "For cabinets with a single coin selector or 2 coin selectors of the same value, set to Mode 1.
-        For cabinets with coin selectors of two different values, set to Mode 2." */
-	PORT_DIPNAME( 0x04, 0x00, "Coin Mode" )				PORT_DIPLOCATION("SW2:!3")
+	    For cabinets with coin selectors of two different values, set to Mode 2." */
+	PORT_DIPNAME( 0x04, 0x00, "Coin Mode" )             PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(    0x00, "Mode 1" )
 	PORT_DIPSETTING(    0x04, "Mode 2" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:!4" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:!4" )       /* Listed as "Unused" */
 	/* In stop mode, press 1 to stop and 2 to restart */
-	PORT_DIPNAME( 0x10, 0x00, "Stop Mode (Cheat)" )		PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPNAME( 0x10, 0x00, "Stop Mode (Cheat)" )     PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:!6" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:!6" )       /* Listed as "Unused" */
 	PORT_DIPNAME( 0x40, 0x00, "Invulnerability (Cheat)" ) PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	MCFG_CPU_PROGRAM_MAP(m63_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
-	MCFG_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
+	MCFG_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4) /* ????? */
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
@@ -814,7 +814,7 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_CPU_PROGRAM_MAP(fghtbskt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
-	MCFG_CPU_ADD("soundcpu", I8039,XTAL_12MHz/4)	/* ????? */
+	MCFG_CPU_ADD("soundcpu", I8039,XTAL_12MHz/4)    /* ????? */
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
@@ -862,7 +862,7 @@ ROM_START( wilytowr )
 	ROM_LOAD( "wt_a-4m.bin",  0x8000, 0x2000, CRC(c1f8a7d5) SHA1(4307e7604aec728a1f5b0e6a0d6c9f4d37084da3) )
 	ROM_LOAD( "wt_a-4n.bin",  0xa000, 0x2000, CRC(b212f7d2) SHA1(dd1c35559982e8bbcb0e778c733a3afb5b6611df) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* 8039 */
 	ROM_LOAD( "wt4d.bin",     0x0000, 0x1000, CRC(25a171bf) SHA1(7465dbfa8858d0f5822eb748b96d99753d58d243) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -889,10 +889,10 @@ ROM_START( wilytowr )
 
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "wt_a-5s-.bpr", 0x0000, 0x0100, CRC(041950e7) SHA1(8276068bec3f4c5013c773033fca3cd3ed9e82ef) )	/* red */
-	ROM_LOAD( "wt_a-5r-.bpr", 0x0100, 0x0100, CRC(bc04bf25) SHA1(37d0e89296760f51df5a0d434dca390fb60bb052) )	/* green */
-	ROM_LOAD( "wt_a-5p-.bpr", 0x0200, 0x0100, CRC(ed819a19) SHA1(76f13dcf1674f136375738756e175ceec469d545) )	/* blue */
-	ROM_LOAD( "wt_b-9l-.bpr", 0x0300, 0x0020, CRC(d2728744) SHA1(e6b1a570854ca90326414874432ab03ec85b9c8e) )	/* char palette */
+	ROM_LOAD( "wt_a-5s-.bpr", 0x0000, 0x0100, CRC(041950e7) SHA1(8276068bec3f4c5013c773033fca3cd3ed9e82ef) )    /* red */
+	ROM_LOAD( "wt_a-5r-.bpr", 0x0100, 0x0100, CRC(bc04bf25) SHA1(37d0e89296760f51df5a0d434dca390fb60bb052) )    /* green */
+	ROM_LOAD( "wt_a-5p-.bpr", 0x0200, 0x0100, CRC(ed819a19) SHA1(76f13dcf1674f136375738756e175ceec469d545) )    /* blue */
+	ROM_LOAD( "wt_b-9l-.bpr", 0x0300, 0x0020, CRC(d2728744) SHA1(e6b1a570854ca90326414874432ab03ec85b9c8e) )    /* char palette */
 ROM_END
 
 ROM_START( atomboy )
@@ -904,7 +904,7 @@ ROM_START( atomboy )
 	ROM_LOAD( "wt_a-4m.bin",  0x8000, 0x2000, CRC(c1f8a7d5) SHA1(4307e7604aec728a1f5b0e6a0d6c9f4d37084da3) )
 	ROM_LOAD( "wt_a-4n.bin",  0xa000, 0x2000, CRC(b212f7d2) SHA1(dd1c35559982e8bbcb0e778c733a3afb5b6611df) )
 
-	ROM_REGION( 0x2000, "soundcpu", 0 )	/* 8039 */
+	ROM_REGION( 0x2000, "soundcpu", 0 ) /* 8039 */
 	ROM_LOAD( "wt_a-4d-b.bin",  0x0000, 0x2000, CRC(793ea53f) SHA1(9dbff5e011a1f1f48aad68f8e5b02bcdb86c182a) ) /* 2764 ROM, Also had a red dot on label */
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -929,10 +929,10 @@ ROM_START( atomboy )
 	ROM_LOAD( "wt_a-6d.bin",  0x0000, 0x1000, CRC(a5dde29b) SHA1(8f7545d2022da7c98d47112179dce717f6c3c5e2) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "wt_a-5s-b.bpr", 0x0000, 0x0100, CRC(991e2a04) SHA1(a70525948ad85ad898e0d8a25fb6d1639a4ec133) )	/* red    TBP24S10 (read as 82s129) */
-	ROM_LOAD( "wt_a-5r-b.bpr", 0x0100, 0x0100, CRC(fb3822b7) SHA1(bb1ecdd0156acc16bef3c9072e496e4f544b5d9d) )	/* green  TBP24S10 (read as 82s129) */
-	ROM_LOAD( "wt_a-5p-b.bpr", 0x0200, 0x0100, CRC(95849f7d) SHA1(ad031d6035045b19c1cd65ac6a78c5aa4b647cd6) )	/* blue   TBP24S10 (read as 82s129) */
-	ROM_LOAD( "wt_b-9l-.bpr",  0x0300, 0x0020, CRC(d2728744) SHA1(e6b1a570854ca90326414874432ab03ec85b9c8e) )	/* char palette */
+	ROM_LOAD( "wt_a-5s-b.bpr", 0x0000, 0x0100, CRC(991e2a04) SHA1(a70525948ad85ad898e0d8a25fb6d1639a4ec133) )   /* red    TBP24S10 (read as 82s129) */
+	ROM_LOAD( "wt_a-5r-b.bpr", 0x0100, 0x0100, CRC(fb3822b7) SHA1(bb1ecdd0156acc16bef3c9072e496e4f544b5d9d) )   /* green  TBP24S10 (read as 82s129) */
+	ROM_LOAD( "wt_a-5p-b.bpr", 0x0200, 0x0100, CRC(95849f7d) SHA1(ad031d6035045b19c1cd65ac6a78c5aa4b647cd6) )   /* blue   TBP24S10 (read as 82s129) */
+	ROM_LOAD( "wt_b-9l-.bpr",  0x0300, 0x0020, CRC(d2728744) SHA1(e6b1a570854ca90326414874432ab03ec85b9c8e) )   /* char palette */
 ROM_END
 
 ROM_START( atomboya )
@@ -944,7 +944,7 @@ ROM_START( atomboya )
 	ROM_LOAD( "wt_a-4m.bin",  0x8000, 0x2000, CRC(c1f8a7d5) SHA1(4307e7604aec728a1f5b0e6a0d6c9f4d37084da3) )
 	ROM_LOAD( "wt_a-4n.bin",  0xa000, 0x2000, CRC(b212f7d2) SHA1(dd1c35559982e8bbcb0e778c733a3afb5b6611df) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* 8039 */
 	ROM_LOAD( "wt_a-4d.bin",  0x0000, 0x1000, CRC(3d43361e) SHA1(2977df9f90d9d214909c56ab44c40ab45fd90675) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
@@ -970,10 +970,10 @@ ROM_START( atomboya )
 	ROM_LOAD( "wt_a-6d.bin",  0x0000, 0x1000, CRC(a5dde29b) SHA1(8f7545d2022da7c98d47112179dce717f6c3c5e2) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "wt_a-5s-.bpr", 0x0000, 0x0100, CRC(041950e7) SHA1(8276068bec3f4c5013c773033fca3cd3ed9e82ef) )	/* red */
-	ROM_LOAD( "wt_a-5r-.bpr", 0x0100, 0x0100, CRC(bc04bf25) SHA1(37d0e89296760f51df5a0d434dca390fb60bb052) )	/* green */
-	ROM_LOAD( "wt_a-5p-.bpr", 0x0200, 0x0100, CRC(ed819a19) SHA1(76f13dcf1674f136375738756e175ceec469d545) )	/* blue */
-	ROM_LOAD( "wt_b-9l-.bpr", 0x0300, 0x0020, CRC(d2728744) SHA1(e6b1a570854ca90326414874432ab03ec85b9c8e) )	/* char palette */
+	ROM_LOAD( "wt_a-5s-.bpr", 0x0000, 0x0100, CRC(041950e7) SHA1(8276068bec3f4c5013c773033fca3cd3ed9e82ef) )    /* red */
+	ROM_LOAD( "wt_a-5r-.bpr", 0x0100, 0x0100, CRC(bc04bf25) SHA1(37d0e89296760f51df5a0d434dca390fb60bb052) )    /* green */
+	ROM_LOAD( "wt_a-5p-.bpr", 0x0200, 0x0100, CRC(ed819a19) SHA1(76f13dcf1674f136375738756e175ceec469d545) )    /* blue */
+	ROM_LOAD( "wt_b-9l-.bpr", 0x0300, 0x0020, CRC(d2728744) SHA1(e6b1a570854ca90326414874432ab03ec85b9c8e) )    /* char palette */
 ROM_END
 
 ROM_START( fghtbskt )
@@ -984,12 +984,12 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb10.6f",      0x8000, 0x2000, CRC(6b47efba) SHA1(cb55c7a9d5afe748c1c88f87dd1909e106932798) )
 	ROM_LOAD( "fb09.7f",      0xa000, 0x2000, CRC(be69e087) SHA1(be95ecafa494cb0787ee18eb3ecea4ad545a6ae3) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* 8039 */
 	ROM_LOAD( "fb07.0b",      0x0000, 0x1000, CRC(50432dbd) SHA1(35a2218ed243bde47dbe06b5a11a65502ba734ea) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "fb08.12f",     0x0000, 0x1000, CRC(271cd7b8) SHA1(00cfeb6ba429cf6cc59d6542dea8de2ca79155ed) )
-	ROM_FILL(				  0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, 0 )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "fb21.25e",     0x0000, 0x2000, CRC(02843591) SHA1(e38ccc97dcbd642d0ac768837f7baf1573fdb91f) )

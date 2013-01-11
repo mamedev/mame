@@ -115,18 +115,18 @@ void c64_silverrock_cartridge_device::c64_cd_w(address_space &space, offs_t offs
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1
-            2
-            3
-            4       A14
-            5       A15
-            6       A16
-            7       A13
+		    0
+		    1
+		    2
+		    3
+		    4       A14
+		    5       A15
+		    6       A16
+		    7       A13
 
-        */
+		*/
 
 		m_bank = ((data >> 3) & 0x0e) | BIT(data, 7);
 	}

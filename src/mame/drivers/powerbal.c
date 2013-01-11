@@ -21,15 +21,15 @@ Magic Sticks:
 
 static const eeprom_interface eeprom_intf =
 {
-	6,				/* address bits */
-	16,				/* data bits */
-	"*110",			/*  read command */
-	"*101",			/* write command */
-	0,				/* erase command */
-	"*10000xxxx",	/* lock command */
-	"*10011xxxx",	/* unlock command */
-	0,				/* enable_multi_read */
-	5				/* reset_delay (otherwise wbeachvl will hang when saving settings) */
+	6,              /* address bits */
+	16,             /* data bits */
+	"*110",         /*  read command */
+	"*101",         /* write command */
+	0,              /* erase command */
+	"*10000xxxx",   /* lock command */
+	"*10011xxxx",   /* unlock command */
+	0,              /* enable_multi_read */
+	5               /* reset_delay (otherwise wbeachvl will hang when saving settings) */
 };
 
 static WRITE16_DEVICE_HANDLER( magicstk_coin_eeprom_w )
@@ -221,7 +221,7 @@ static INPUT_PORTS_START( magicstk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   /* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -318,7 +318,7 @@ static INPUT_PORTS_START( hotminda )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)   /* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -328,44 +328,44 @@ static INPUT_PORTS_START( hotminda )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Premio" )			PORT_DIPLOCATION("DSW1:7,6")
+	PORT_DIPNAME( 0x06, 0x06, "Premio" )            PORT_DIPLOCATION("DSW1:7,6")
 	PORT_DIPSETTING(    0x00, "1 Premio ogni 10 Vincite" )
 	PORT_DIPSETTING(    0x04, "1 Premio ogni 10 Vincite" )
 	PORT_DIPSETTING(    0x02, "1 Premio ogni 5 Vincite" )
 	PORT_DIPSETTING(    0x06, "Paga 1 Premio ogni Vincita" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B )	)	PORT_DIPLOCATION("DSW1:5,4")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("DSW1:5,4")
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Clear Counters" )	PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x01, 0x01, "Clear Counters" )    PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Ticket" )			PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x02, 0x02, "Ticket" )            PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Hopper" )			PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x04, 0x04, "Hopper" )            PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					PORT_DIPLOCATION("DSW2:4")
-	PORT_DIPNAME( 0xe0, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("DSW2:3,2,1")
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0xe0, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DSW2:3,2,1")
 	PORT_DIPSETTING(    0xa0, "Hard 7" )
 	PORT_DIPSETTING(    0x20, "Very Hard 6" )
 	PORT_DIPSETTING(    0xc0, "Very Hard 5" )
@@ -398,9 +398,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	{
 		int sx, sy, code, color, flipx;
 
-		sy = spriteram[offs + 3 - 4];	/* typical Playmark style... */
+		sy = spriteram[offs + 3 - 4];   /* typical Playmark style... */
 		if (sy & 0x8000)
-			return;	/* end of list marker */
+			return; /* end of list marker */
 
 		flipx = sy & 0x4000;
 		sx = (spriteram[offs + 1] & 0x01ff) - 16 - 7;
@@ -461,8 +461,8 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( powerbal )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )	/* colors 0x100-0x1ff */
-	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )    /* colors 0x100-0x1ff */
+	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )    /* colors 0x000-0x0ff */
 GFXDECODE_END
 
 
@@ -482,7 +482,7 @@ MACHINE_RESET_MEMBER(playmark_state,powerbal)
 static MACHINE_CONFIG_START( powerbal, playmark_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(powerbal_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state, irq2_line_hold)
 
@@ -512,7 +512,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( magicstk, playmark_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(magicstk_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state, irq2_line_hold)
 
@@ -593,7 +593,7 @@ Notes:
 */
 
 ROM_START( powerbal )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "3.u67",  0x00000, 0x40000, CRC(3aecdde4) SHA1(e78373246d55f120e8d94f4606da874df439b823) )
 	ROM_LOAD16_BYTE( "2.u66",  0x00001, 0x40000, CRC(a4552a19) SHA1(88b84daa1fd36d5c683cf0d6dce341aedbc360d1) )
 
@@ -627,7 +627,7 @@ ROM_START( powerbal )
 ROM_END
 
 ROM_START( magicstk )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "12.u67", 0x00000, 0x20000, CRC(70a9c66f) SHA1(0cf4b2d0f796e35881d68adc69eca4360d6ad693) )
 	ROM_LOAD16_BYTE( "11.u66", 0x00001, 0x20000, CRC(a9d7c90e) SHA1(e12517776dc14747b4bbe49f93c4d7e83e8eae01) )
 
@@ -654,7 +654,7 @@ ROM_END
 
 
 ROM_START( hotminda )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "rom1.rom",       0x00001, 0x20000, CRC(33aaceba) SHA1(a914400b081eabd869f1ca2c843a91b03af510b1) )
 	ROM_LOAD16_BYTE( "rom2.rom",       0x00000, 0x20000, CRC(f5accd9f) SHA1(12194ea7c35263be9afd91f0abe2041998528af9) )
 

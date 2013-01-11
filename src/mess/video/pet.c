@@ -109,4 +109,3 @@ MC6845_UPDATE_ROW( pet80_update_row )
 WRITE_LINE_MEMBER(pet_state::pet_display_enable_changed)
 {
 }
-

@@ -444,10 +444,10 @@
 
 **********************************************************************************/
 
-#define MASTER_CLOCK	XTAL_12MHz
-#define CPU_CLOCK		(MASTER_CLOCK / 2)	/* 6 MHz, measured */
-#define OKI_CLOCK		(MASTER_CLOCK / 8)	/* 1.5 MHz, measured */
-#define CRTC_CLOCK		(MASTER_CLOCK / 16)	/* 750 kHz, measured */
+#define MASTER_CLOCK    XTAL_12MHz
+#define CPU_CLOCK       (MASTER_CLOCK / 2)  /* 6 MHz, measured */
+#define OKI_CLOCK       (MASTER_CLOCK / 8)  /* 1.5 MHz, measured */
+#define CRTC_CLOCK      (MASTER_CLOCK / 16) /* 750 kHz, measured */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -462,14 +462,14 @@ class majorpkr_state : public driver_device
 public:
 	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  oki(*this, "oki") { }
+			oki(*this, "oki") { }
 
 	int m_mux_data;
-	int	m_palette_bank;
+	int m_palette_bank;
 	int m_vram_bank;
 	int m_flip_state;
 
-	tilemap_t    *m_bg_tilemap,	*m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap, *m_fg_tilemap;
 
 	UINT8 m_videoram[0x1000];
 
@@ -545,8 +545,8 @@ UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind1
 	rectangle custom_clip;
 
 	/* The following custom_clip is to exclude the last char column (unused)
-       form the render. We need more proof about how the video is working.
-    */
+	   form the render. We need more proof about how the video is working.
+	*/
 	custom_clip = cliprect;
 	custom_clip.max_x -= 16;
 
@@ -656,12 +656,12 @@ WRITE8_MEMBER(majorpkr_state::vidreg_w)
 READ8_MEMBER(majorpkr_state::mux_port_r)
 {
 
-	switch( (m_mux_data & 0xf0) )		/* 00-10-20-30-0F-1F-2F-3F */
+	switch( (m_mux_data & 0xf0) )       /* 00-10-20-30-0F-1F-2F-3F */
 	{
-		case 0x00: return ioport("DSW1")->read();	/* confirmed */
-		case 0x10: return ioport("DSW2")->read();	/* confirmed */
-		case 0x20: return ioport("DSW3")->read();	/* confirmed */
-		case 0x30: return ioport("DSW4")->read();	/* confirmed */
+		case 0x00: return ioport("DSW1")->read();   /* confirmed */
+		case 0x10: return ioport("DSW2")->read();   /* confirmed */
+		case 0x20: return ioport("DSW3")->read();   /* confirmed */
+		case 0x30: return ioport("DSW4")->read();   /* confirmed */
 	}
 
 	return 0xff;
@@ -683,7 +683,7 @@ READ8_MEMBER(majorpkr_state::mux_port2_r)
 WRITE8_MEMBER(majorpkr_state::mux_sel_w)
 {
 
-	m_mux_data = data;	/* 00-10-20-30-0F-1F-2F-3F */
+	m_mux_data = data;  /* 00-10-20-30-0F-1F-2F-3F */
 }
 
 
@@ -706,13 +706,13 @@ WRITE8_MEMBER(majorpkr_state::lamps_a_w)
     -x-- ----   Small lamp.
     x--- ----   Unknown.
 */
-	output_set_lamp_value(0, (data) & 1);		/* Lamp 0: Hold 1 */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* Lamp 1: Hold 2 */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* Lamp 2: Hold 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* Lamp 3: Hold 4 */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* Lamp 4: Hold 5 */
-	output_set_lamp_value(5, (data >> 5) & 1);	/* Lamp 5: Big or Small (need identification) */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* Lamp 6: Big or Small (need identification) */
+	output_set_lamp_value(0, (data) & 1);       /* Lamp 0: Hold 1 */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1: Hold 2 */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2: Hold 3 */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3: Hold 4 */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4: Hold 5 */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5: Big or Small (need identification) */
+	output_set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6: Big or Small (need identification) */
 
 	if (data & 0x80)
 		logerror("Lamps A: Write to 13h: %02x\n", data);
@@ -732,12 +732,12 @@ WRITE8_MEMBER(majorpkr_state::lamps_b_w)
     --x- ----   Fever lamp.
     xx-- ----   Unknown.
 */
-	output_set_lamp_value(7, (data) & 1);		/* Lamp 7: Bet */
-	output_set_lamp_value(8, (data >> 1) & 1);	/* Lamp 8: Draw */
-	output_set_lamp_value(9, (data >> 2) & 1);	/* Lamp 9: Cancel */
-	output_set_lamp_value(10, (data >> 3) & 1);	/* Lamp 10: Take */
-	output_set_lamp_value(11, (data >> 4) & 1);	/* Lamp 11: D-UP */
-	output_set_lamp_value(12, (data >> 5) & 1);	/* Lamp 12: Fever */
+	output_set_lamp_value(7, (data) & 1);       /* Lamp 7: Bet */
+	output_set_lamp_value(8, (data >> 1) & 1);  /* Lamp 8: Draw */
+	output_set_lamp_value(9, (data >> 2) & 1);  /* Lamp 9: Cancel */
+	output_set_lamp_value(10, (data >> 3) & 1); /* Lamp 10: Take */
+	output_set_lamp_value(11, (data >> 4) & 1); /* Lamp 11: D-UP */
+	output_set_lamp_value(12, (data >> 5) & 1); /* Lamp 12: Fever */
 
 	if (data & 0xc0)
 		logerror("Lamps B: Write to 14h: %02x\n", data);
@@ -756,10 +756,10 @@ WRITE8_MEMBER(majorpkr_state::pulses_w)
     ---x ----   Watchdog? (constant writes).
     xxx- ----   Unknown.
 */
-	coin_counter_w(machine(), 3, data & 0x01);		/* Credits Out (all) */
-	coin_counter_w(machine(), 2, data & 0x02);		/* Credits 3 */
-	coin_counter_w(machine(), 0, data & 0x04);		/* Credits 1 */
-	coin_counter_w(machine(), 1, data & 0x08);		/* Credits 2 */
+	coin_counter_w(machine(), 3, data & 0x01);      /* Credits Out (all) */
+	coin_counter_w(machine(), 2, data & 0x02);      /* Credits 3 */
+	coin_counter_w(machine(), 0, data & 0x04);      /* Credits 1 */
+	coin_counter_w(machine(), 1, data & 0x08);      /* Credits 2 */
 
 	if (data & 0xe0)
 		logerror("Pulse: Write to 10h: %02x\n", data);
@@ -774,8 +774,8 @@ static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_ROMBANK("rom_bank")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(paletteram_r, paletteram_w)	/* 4*4 palettes - 4 banks? */
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(vram_r, vram_w)				/* two tilemaps - 2 banks? */
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(paletteram_r, paletteram_w)   /* 4*4 palettes - 4 banks? */
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(vram_r, vram_w)               /* two tilemaps - 2 banks? */
 ADDRESS_MAP_END
 
 /*
@@ -805,22 +805,22 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, majorpkr_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(palette_bank_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(vram_bank_w)
 
-	AM_RANGE(0x10, 0x10) AM_READ(mux_port2_r)	/* muxed set of controls */
-	AM_RANGE(0x10, 0x10) AM_WRITE(pulses_w)		/* kind of watchdog on bit4... mech counters on bits 0-1-2-3 */
+	AM_RANGE(0x10, 0x10) AM_READ(mux_port2_r)   /* muxed set of controls */
+	AM_RANGE(0x10, 0x10) AM_WRITE(pulses_w)     /* kind of watchdog on bit4... mech counters on bits 0-1-2-3 */
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x11, 0x11) AM_WRITE(mux_sel_w)	/* multiplexer selector */
+	AM_RANGE(0x11, 0x11) AM_WRITE(mux_sel_w)    /* multiplexer selector */
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
-	AM_RANGE(0x12, 0x12) AM_WRITE(vidreg_w)		/* video registers: normal or up down screen */
-	AM_RANGE(0x13, 0x13) AM_READ(mux_port_r)	/* all 4 DIP switches banks multiplexed */
-	AM_RANGE(0x13, 0x13) AM_WRITE(lamps_a_w)	/* lamps a out */
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")	/* "freeze" switch */
-	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)	/* lamps b out */
+	AM_RANGE(0x12, 0x12) AM_WRITE(vidreg_w)     /* video registers: normal or up down screen */
+	AM_RANGE(0x13, 0x13) AM_READ(mux_port_r)    /* all 4 DIP switches banks multiplexed */
+	AM_RANGE(0x13, 0x13) AM_WRITE(lamps_a_w)    /* lamps a out */
+	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")   /* "freeze" switch */
+	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)    /* lamps b out */
 
 	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITENOP	/* leftover from a PSG SN76489/96? */
+	AM_RANGE(0x60, 0x60) AM_WRITENOP    /* leftover from a PSG SN76489/96? */
 ADDRESS_MAP_END
 
 
@@ -831,7 +831,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( majorpkr )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )	/* muxed with Key Out */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )   /* muxed with Key Out */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
@@ -840,7 +840,7 @@ static INPUT_PORTS_START( majorpkr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW )   PORT_NAME("Small / DIP Test (In Book Mode)")
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )	/* muxed with HOLD 2 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT ) /* muxed with HOLD 2 */
 	PORT_BIT( 0xfd, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -863,34 +863,34 @@ static INPUT_PORTS_START( majorpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )         PORT_CODE(KEYCODE_5_PAD)  PORT_NAME("UNK 5-PAD")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )         PORT_CODE(KEYCODE_6_PAD)  PORT_NAME("UNK 6-PAD")
 
-	PORT_START("DSW1")	/* multiplexed x4 & inverted */
-	PORT_DIPNAME( 0x01, 0x00, "OFF Fixed" )			PORT_DIPLOCATION("DSW1:1")
+	PORT_START("DSW1")  /* multiplexed x4 & inverted */
+	PORT_DIPNAME( 0x01, 0x00, "OFF Fixed" )         PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Screen Direction" )	PORT_DIPLOCATION("DSW1:2")	/* Activates bit6 at port 0x10 & change CRTC registers */
+	PORT_DIPNAME( 0x02, 0x00, "Screen Direction" )  PORT_DIPLOCATION("DSW1:2")  /* Activates bit6 at port 0x10 & change CRTC registers */
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, "Up Down" )
-	PORT_DIPNAME( 0x04, 0x00, "Payout" )			PORT_DIPLOCATION("DSW1:3")	/* Hopper: No / Yes (in the manual) */
+	PORT_DIPNAME( 0x04, 0x00, "Payout" )            PORT_DIPLOCATION("DSW1:3")  /* Hopper: No / Yes (in the manual) */
 	PORT_DIPSETTING(    0x00, "Automatic" )
 	PORT_DIPSETTING(    0x04, "Manual" )
-	PORT_DIPNAME( 0x08, 0x00, "Hopper SW Active" )	PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Hopper SW Active" )  PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Low ) )
-	PORT_DIPNAME( 0x10, 0x00, "Auto Max Bet" )		PORT_DIPLOCATION("DSW1:5")	/* Coin Payout: Payout SW / Automatic (in the manual) */
+	PORT_DIPNAME( 0x10, 0x00, "Auto Max Bet" )      PORT_DIPLOCATION("DSW1:5")  /* Coin Payout: Payout SW / Automatic (in the manual) */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Hold Cancel" )		PORT_DIPLOCATION("DSW1:6")	/* Inverse from the manual */
+	PORT_DIPNAME( 0x20, 0x20, "Hold Cancel" )       PORT_DIPLOCATION("DSW1:6")  /* Inverse from the manual */
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )			PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Auto Hold" )         PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Fever Mode" )		PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Fever Mode" )        PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	PORT_START("DSW2")	/* multiplexed x4 & inverted */
-	PORT_DIPNAME( 0x07, 0x00, "Payout %" )					PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_START("DSW2")  /* multiplexed x4 & inverted */
+	PORT_DIPNAME( 0x07, 0x00, "Payout %" )                  PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "60%" )
 	PORT_DIPSETTING(    0x06, "65%" )
 	PORT_DIPSETTING(    0x05, "70%" )
@@ -899,22 +899,22 @@ static INPUT_PORTS_START( majorpkr )
 	PORT_DIPSETTING(    0x02, "85%" )
 	PORT_DIPSETTING(    0x01, "90%" )
 	PORT_DIPSETTING(    0x00, "95%" )
-	PORT_DIPNAME( 0x18, 0x00, "Min Bet Size for Fever" )	PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "Min Bet Size for Fever" )    PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x18, "10" )
-	PORT_DIPNAME( 0x60, 0x00, "D-UP Game Difficulty" )		PORT_DIPLOCATION("DSW2:6,7")
+	PORT_DIPNAME( 0x60, 0x00, "D-UP Game Difficulty" )      PORT_DIPLOCATION("DSW2:6,7")
 	PORT_DIPSETTING(    0x00, "0 (Weak)" )
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x60, "3 (Strong)" )
-	PORT_DIPNAME( 0x80, 0x00, "OFF Fixed" )					PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x00, "OFF Fixed" )                 PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW3")	/* multiplexed x4 & inverted */
-	PORT_DIPNAME( 0x07, 0x00, "Key In" )				PORT_DIPLOCATION("DSW3:1,2,3")
+	PORT_START("DSW3")  /* multiplexed x4 & inverted */
+	PORT_DIPNAME( 0x07, 0x00, "Key In" )                PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(    0x01, "5 Credits / Pulse" )
 	PORT_DIPSETTING(    0x02, "10 Credits / Pulse" )
 	PORT_DIPSETTING(    0x03, "20 Credits / Pulse" )
@@ -923,7 +923,7 @@ static INPUT_PORTS_START( majorpkr )
 	PORT_DIPSETTING(    0x00, "50 Credits / Pulse" )
 	PORT_DIPSETTING(    0x06, "60 Credits / Pulse" )
 	PORT_DIPSETTING(    0x07, "100 Credits / Pulse" )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DSW3:4,5,6")
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DSW3:4,5,6")
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
@@ -932,14 +932,14 @@ static INPUT_PORTS_START( majorpkr )
 	PORT_DIPSETTING(    0x28, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x30, "1 Coin/40 Credits" )
 	PORT_DIPSETTING(    0x38, "1 Coin/50 Credits" )
-	PORT_DIPNAME( 0xc0, 0x00, "Credit Limit" )			PORT_DIPLOCATION("DSW3:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, "Credit Limit" )          PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x40, "10000" )
 	PORT_DIPSETTING(    0x80, "20000" )
 	PORT_DIPSETTING(    0xc0, "30000" )
 
-	PORT_START("DSW4")	/* multiplexed x4 & inverted */
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DSW4:1,2,3,4")
+	PORT_START("DSW4")  /* multiplexed x4 & inverted */
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DSW4:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "20 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x0e, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 5C_1C ) )
@@ -956,19 +956,19 @@ static INPUT_PORTS_START( majorpkr )
 	PORT_DIPSETTING(    0x07, "1 Coin/25 Credits" )
 	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
 	PORT_DIPSETTING(    0x08, "1 Coin/100 Credits" )
-	PORT_DIPNAME( 0x30, 0x00, "Max Bet" )				PORT_DIPLOCATION("DSW4:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Max Bet" )               PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 	PORT_DIPSETTING(    0x20, "30" )
 	PORT_DIPSETTING(    0x30, "50" )
-	PORT_DIPNAME( 0xc0, 0x00, "Credit-In Limit" )		PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, "Credit-In Limit" )       PORT_DIPLOCATION("DSW4:7,8")
 	PORT_DIPSETTING(    0x00, "No Limit" )
 	PORT_DIPSETTING(    0x40, "1000" )
 	PORT_DIPSETTING(    0x80, "2000" )
 	PORT_DIPSETTING(    0xc0, "5000" )
 
 	PORT_START("TEST")
-	PORT_DIPNAME( 0x01, 0x00, "Freeze" )		/* Freeze the execution */
+	PORT_DIPNAME( 0x01, 0x00, "Freeze" )        /* Freeze the execution */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1010,16 +1010,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",		/* screen we are acting on */
-	16,				/* number of pixels per video memory address */
-	NULL,			/* before pixel update callback */
-	NULL,			/* row update callback */
-	NULL,			/* after pixel update callback */
-	DEVCB_NULL,		/* callback for display state changes */
-	DEVCB_NULL,		/* callback for cursor state changes */
-	DEVCB_NULL,		/* HSYNC callback */
-	DEVCB_NULL,		/* VSYNC callback */
-	NULL			/* update address callback */
+	"screen",       /* screen we are acting on */
+	16,             /* number of pixels per video memory address */
+	NULL,           /* before pixel update callback */
+	NULL,           /* row update callback */
+	NULL,           /* after pixel update callback */
+	DEVCB_NULL,     /* callback for display state changes */
+	DEVCB_NULL,     /* callback for cursor state changes */
+	DEVCB_NULL,     /* HSYNC callback */
+	DEVCB_NULL,     /* VSYNC callback */
+	NULL            /* update address callback */
 };
 
 
@@ -1029,7 +1029,7 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(map)
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state,  irq0_line_hold)
@@ -1040,7 +1040,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(52.786)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)				/* through CRTC registers: 768 x 296 */
+	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)               /* through CRTC registers: 768 x 296 */
 	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
 
 	MCFG_GFXDECODE(majorpkr)
@@ -1052,7 +1052,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 verified */
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

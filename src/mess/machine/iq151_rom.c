@@ -40,7 +40,7 @@ const device_type IQ151_AMOS3 = &device_creator<iq151_amos3_device>;
 //-------------------------------------------------
 
 iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_iq151cart_interface(mconfig, *this)
 {
 }
@@ -82,7 +82,7 @@ UINT8* iq151_rom_device::get_cart_base()
 //-------------------------------------------------
 
 iq151_basic6_device::iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : iq151_rom_device(mconfig, IQ151_BASIC6, "IQ151 BASIC6", tag, owner, clock)
+		: iq151_rom_device(mconfig, IQ151_BASIC6, "IQ151 BASIC6", tag, owner, clock)
 {
 }
 
@@ -107,7 +107,7 @@ void iq151_basic6_device::read(offs_t offset, UINT8 &data)
 //-------------------------------------------------
 
 iq151_basicg_device::iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : iq151_rom_device(mconfig, IQ151_BASICG, "IQ151 BASICG", tag, owner, clock)
+		: iq151_rom_device(mconfig, IQ151_BASICG, "IQ151 BASICG", tag, owner, clock)
 {
 }
 
@@ -133,8 +133,8 @@ void iq151_basicg_device::read(offs_t offset, UINT8 &data)
 //-------------------------------------------------
 
 iq151_amos1_device::iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : iq151_rom_device(mconfig, IQ151_AMOS1, "IQ151 AMOS cart 1", tag, owner, clock),
-	    m_active(true)
+		: iq151_rom_device(mconfig, IQ151_AMOS1, "IQ151 AMOS cart 1", tag, owner, clock),
+		m_active(true)
 {
 }
 
@@ -167,8 +167,8 @@ void iq151_amos1_device::io_write(offs_t offset, UINT8 data)
 //-------------------------------------------------
 
 iq151_amos2_device::iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : iq151_rom_device(mconfig, IQ151_AMOS2, "IQ151 AMOS cart 2", tag, owner, clock),
-	    m_active(false)
+		: iq151_rom_device(mconfig, IQ151_AMOS2, "IQ151 AMOS cart 2", tag, owner, clock),
+		m_active(false)
 {
 }
 
@@ -201,8 +201,8 @@ void iq151_amos2_device::io_write(offs_t offset, UINT8 data)
 //-------------------------------------------------
 
 iq151_amos3_device::iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : iq151_rom_device(mconfig, IQ151_AMOS3, "IQ151 AMOS cart 3", tag, owner, clock),
-	    m_active(true)
+		: iq151_rom_device(mconfig, IQ151_AMOS3, "IQ151 AMOS cart 3", tag, owner, clock),
+		m_active(true)
 {
 }
 

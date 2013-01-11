@@ -60,9 +60,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define FILE_BUFFER_SIZE		512
+#define FILE_BUFFER_SIZE        512
 
-#define OPEN_FLAG_HAS_CRC		0x10000
+#define OPEN_FLAG_HAS_CRC       0x10000
 
 
 
@@ -72,40 +72,40 @@
 
 enum text_file_type
 {
-	TFT_OSD = 0,	/* OSD depdendent encoding format used when BOMs missing */
-	TFT_UTF8,		/* UTF-8 */
-	TFT_UTF16BE,	/* UTF-16 (big endian) */
-	TFT_UTF16LE,	/* UTF-16 (little endian) */
-	TFT_UTF32BE,	/* UTF-32 (UCS-4) (big endian) */
-	TFT_UTF32LE		/* UTF-32 (UCS-4) (little endian) */
+	TFT_OSD = 0,    /* OSD depdendent encoding format used when BOMs missing */
+	TFT_UTF8,       /* UTF-8 */
+	TFT_UTF16BE,    /* UTF-16 (big endian) */
+	TFT_UTF16LE,    /* UTF-16 (little endian) */
+	TFT_UTF32BE,    /* UTF-32 (UCS-4) (big endian) */
+	TFT_UTF32LE     /* UTF-32 (UCS-4) (little endian) */
 };
 
 
 struct zlib_data
 {
-	z_stream		stream;
-	UINT8			buffer[1024];
-	UINT64			realoffset;
-	UINT64			nextoffset;
+	z_stream        stream;
+	UINT8           buffer[1024];
+	UINT64          realoffset;
+	UINT64          nextoffset;
 };
 
 
 struct core_file
 {
-	osd_file *		file;						/* OSD file handle */
-	zlib_data *		zdata;						/* compression data */
-	UINT32			openflags;					/* flags we were opened with */
-	UINT8			data_allocated;				/* was the data allocated by us? */
-	UINT8 *			data;						/* file data, if RAM-based */
-	UINT64			offset;						/* current file offset */
-	UINT64			length;						/* total file length */
-	text_file_type	text_type;					/* text output format */
-	char			back_chars[UTF8_CHAR_MAX];	/* buffer to hold characters for ungetc */
-	int				back_char_head;				/* head of ungetc buffer */
-	int				back_char_tail;				/* tail of ungetc buffer */
-	UINT64			bufferbase;					/* base offset of internal buffer */
-	UINT32			bufferbytes;				/* bytes currently loaded into buffer */
-	UINT8			buffer[FILE_BUFFER_SIZE];	/* buffer data */
+	osd_file *      file;                       /* OSD file handle */
+	zlib_data *     zdata;                      /* compression data */
+	UINT32          openflags;                  /* flags we were opened with */
+	UINT8           data_allocated;             /* was the data allocated by us? */
+	UINT8 *         data;                       /* file data, if RAM-based */
+	UINT64          offset;                     /* current file offset */
+	UINT64          length;                     /* total file length */
+	text_file_type  text_type;                  /* text output format */
+	char            back_chars[UTF8_CHAR_MAX];  /* buffer to hold characters for ungetc */
+	int             back_char_head;             /* head of ungetc buffer */
+	int             back_char_tail;             /* tail of ungetc buffer */
+	UINT64          bufferbase;                 /* base offset of internal buffer */
+	UINT32          bufferbytes;                /* bytes currently loaded into buffer */
+	UINT8           buffer[FILE_BUFFER_SIZE];   /* buffer data */
 };
 
 
@@ -847,11 +847,11 @@ int core_fputs(core_file *f, const char *s)
 	{
 		if (*s == '\n')
 		{
-			if (CRLF == 1)		/* CR only */
+			if (CRLF == 1)      /* CR only */
 				*pconvbuf++ = 13;
-			else if (CRLF == 2)	/* LF only */
+			else if (CRLF == 2) /* LF only */
 				*pconvbuf++ = 10;
-			else if (CRLF == 3)	/* CR+LF */
+			else if (CRLF == 3) /* CR+LF */
 			{
 				*pconvbuf++ = 13;
 				*pconvbuf++ = 10;
@@ -1079,5 +1079,3 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
 	file->zdata->nextoffset += *actual;
 	return FILERR_NONE;
 }
-
-

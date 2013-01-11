@@ -26,7 +26,7 @@ const device_type S100_SLOT = &device_creator<s100_slot_device>;
 //  s100_slot_device - constructor
 //-------------------------------------------------
 s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, S100_SLOT, "S100 slot", tag, owner, clock),
+		device_t(mconfig, S100_SLOT, "S100 slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -83,24 +83,24 @@ void s100_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-    	memset(&m_out_vi0_cb, 0, sizeof(m_out_vi0_cb));
-    	memset(&m_out_vi1_cb, 0, sizeof(m_out_vi1_cb));
-    	memset(&m_out_vi2_cb, 0, sizeof(m_out_vi2_cb));
-    	memset(&m_out_vi3_cb, 0, sizeof(m_out_vi3_cb));
-    	memset(&m_out_vi4_cb, 0, sizeof(m_out_vi4_cb));
-    	memset(&m_out_vi5_cb, 0, sizeof(m_out_vi5_cb));
-    	memset(&m_out_vi6_cb, 0, sizeof(m_out_vi6_cb));
-    	memset(&m_out_vi7_cb, 0, sizeof(m_out_vi7_cb));
-    	memset(&m_out_dma0_cb, 0, sizeof(m_out_dma0_cb));
-    	memset(&m_out_dma1_cb, 0, sizeof(m_out_dma1_cb));
-    	memset(&m_out_dma2_cb, 0, sizeof(m_out_dma2_cb));
-    	memset(&m_out_dma3_cb, 0, sizeof(m_out_dma3_cb));
-    	memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
-    	memset(&m_out_hold_cb, 0, sizeof(m_out_hold_cb));
-    	memset(&m_out_error_cb, 0, sizeof(m_out_error_cb));
-    	memset(&m_out_terminal_cb, 0, sizeof(m_out_terminal_cb));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_vi0_cb, 0, sizeof(m_out_vi0_cb));
+		memset(&m_out_vi1_cb, 0, sizeof(m_out_vi1_cb));
+		memset(&m_out_vi2_cb, 0, sizeof(m_out_vi2_cb));
+		memset(&m_out_vi3_cb, 0, sizeof(m_out_vi3_cb));
+		memset(&m_out_vi4_cb, 0, sizeof(m_out_vi4_cb));
+		memset(&m_out_vi5_cb, 0, sizeof(m_out_vi5_cb));
+		memset(&m_out_vi6_cb, 0, sizeof(m_out_vi6_cb));
+		memset(&m_out_vi7_cb, 0, sizeof(m_out_vi7_cb));
+		memset(&m_out_dma0_cb, 0, sizeof(m_out_dma0_cb));
+		memset(&m_out_dma1_cb, 0, sizeof(m_out_dma1_cb));
+		memset(&m_out_dma2_cb, 0, sizeof(m_out_dma2_cb));
+		memset(&m_out_dma3_cb, 0, sizeof(m_out_dma3_cb));
+		memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
+		memset(&m_out_hold_cb, 0, sizeof(m_out_hold_cb));
+		memset(&m_out_error_cb, 0, sizeof(m_out_error_cb));
+		memset(&m_out_terminal_cb, 0, sizeof(m_out_terminal_cb));
 	}
 }
 
@@ -115,7 +115,7 @@ void s100_device::device_config_complete()
 //-------------------------------------------------
 
 s100_device::s100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, S100, "S100", tag, owner, clock)
+		device_t(mconfig, S100, "S100", tag, owner, clock)
 {
 }
 

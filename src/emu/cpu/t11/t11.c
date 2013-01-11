@@ -24,15 +24,15 @@
 
 struct t11_state
 {
-	PAIR				ppc;	/* previous program counter */
-    PAIR				reg[8];
-    PAIR				psw;
-    UINT16				initial_pc;
-    UINT8				wait_state;
-    UINT8				irq_state;
-    int					icount;
-	device_irq_acknowledge_callback	irq_callback;
-	legacy_cpu_device *		device;
+	PAIR                ppc;    /* previous program counter */
+	PAIR                reg[8];
+	PAIR                psw;
+	UINT16              initial_pc;
+	UINT8               wait_state;
+	UINT8               irq_state;
+	int                 icount;
+	device_irq_acknowledge_callback irq_callback;
+	legacy_cpu_device *     device;
 	address_space *program;
 	direct_read_data *direct;
 };
@@ -59,11 +59,11 @@ INLINE t11_state *get_safe_token(device_t *device)
 #define REGB(x) reg[x].b.l
 
 /* PC, SP, and PSW definitions */
-#define SP		REGW(6)
-#define PC		REGW(7)
-#define SPD 	REGD(6)
-#define PCD 	REGD(7)
-#define PSW 	psw.b.l
+#define SP      REGW(6)
+#define PC      REGW(7)
+#define SPD     REGD(6)
+#define PCD     REGD(7)
+#define PSW     psw.b.l
 
 
 /*************************************
@@ -168,8 +168,8 @@ INLINE int POP(t11_state *cpustate)
 
 struct irq_table_entry
 {
-	UINT8	priority;
-	UINT8	vector;
+	UINT8   priority;
+	UINT8   vector;
 };
 
 static const struct irq_table_entry irq_table[] =
@@ -358,7 +358,7 @@ static CPU_EXECUTE( t11 )
 	{
 		UINT16 op;
 
-		cpustate->ppc = cpustate->reg[7];	/* copy PC to previous PC */
+		cpustate->ppc = cpustate->reg[7];   /* copy PC to previous PC */
 
 		debugger_instruction_hook(device, cpustate->PCD);
 
@@ -384,22 +384,22 @@ static CPU_SET_INFO( t11 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		set_irq_line(cpustate, T11_IRQ0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		set_irq_line(cpustate, T11_IRQ1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:		set_irq_line(cpustate, T11_IRQ2, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		set_irq_line(cpustate, T11_IRQ3, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:        set_irq_line(cpustate, T11_IRQ0, info->i);      break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:        set_irq_line(cpustate, T11_IRQ1, info->i);      break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:        set_irq_line(cpustate, T11_IRQ2, info->i);      break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:        set_irq_line(cpustate, T11_IRQ3, info->i);      break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + T11_PC:				cpustate->PC = info->i; 						break;
+		case CPUINFO_INT_REGISTER + T11_PC:             cpustate->PC = info->i;                         break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + T11_SP:				cpustate->SP = info->i;							break;
-		case CPUINFO_INT_REGISTER + T11_PSW:			cpustate->PSW = info->i;						break;
-		case CPUINFO_INT_REGISTER + T11_R0:				cpustate->REGW(0) = info->i;					break;
-		case CPUINFO_INT_REGISTER + T11_R1:				cpustate->REGW(1) = info->i;					break;
-		case CPUINFO_INT_REGISTER + T11_R2:				cpustate->REGW(2) = info->i;					break;
-		case CPUINFO_INT_REGISTER + T11_R3:				cpustate->REGW(3) = info->i;					break;
-		case CPUINFO_INT_REGISTER + T11_R4:				cpustate->REGW(4) = info->i;					break;
-		case CPUINFO_INT_REGISTER + T11_R5:				cpustate->REGW(5) = info->i;					break;
+		case CPUINFO_INT_REGISTER + T11_SP:             cpustate->SP = info->i;                         break;
+		case CPUINFO_INT_REGISTER + T11_PSW:            cpustate->PSW = info->i;                        break;
+		case CPUINFO_INT_REGISTER + T11_R0:             cpustate->REGW(0) = info->i;                    break;
+		case CPUINFO_INT_REGISTER + T11_R1:             cpustate->REGW(1) = info->i;                    break;
+		case CPUINFO_INT_REGISTER + T11_R2:             cpustate->REGW(2) = info->i;                    break;
+		case CPUINFO_INT_REGISTER + T11_R3:             cpustate->REGW(3) = info->i;                    break;
+		case CPUINFO_INT_REGISTER + T11_R4:             cpustate->REGW(4) = info->i;                    break;
+		case CPUINFO_INT_REGISTER + T11_R5:             cpustate->REGW(5) = info->i;                    break;
 	}
 }
 
@@ -416,60 +416,60 @@ CPU_GET_INFO( t11 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(t11_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 6;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 12;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 110;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(t11_state);            break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 4;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = -1;                           break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 6;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 12;                           break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 110;                          break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		info->i = (cpustate->irq_state & 1) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		info->i = (cpustate->irq_state & 2) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:		info->i = (cpustate->irq_state & 4) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		info->i = (cpustate->irq_state & 8) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:        info->i = (cpustate->irq_state & 1) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:        info->i = (cpustate->irq_state & 2) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:        info->i = (cpustate->irq_state & 4) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:        info->i = (cpustate->irq_state & 8) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.w.l;			break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->ppc.w.l;            break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + T11_PC:				info->i = cpustate->PCD;				break;
+		case CPUINFO_INT_REGISTER + T11_PC:             info->i = cpustate->PCD;                break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + T11_SP:				info->i = cpustate->SPD;				break;
-		case CPUINFO_INT_REGISTER + T11_PSW:			info->i = cpustate->PSW;				break;
-		case CPUINFO_INT_REGISTER + T11_R0:				info->i = cpustate->REGD(0);			break;
-		case CPUINFO_INT_REGISTER + T11_R1:				info->i = cpustate->REGD(1);			break;
-		case CPUINFO_INT_REGISTER + T11_R2:				info->i = cpustate->REGD(2);			break;
-		case CPUINFO_INT_REGISTER + T11_R3:				info->i = cpustate->REGD(3);			break;
-		case CPUINFO_INT_REGISTER + T11_R4:				info->i = cpustate->REGD(4);			break;
-		case CPUINFO_INT_REGISTER + T11_R5:				info->i = cpustate->REGD(5);			break;
+		case CPUINFO_INT_REGISTER + T11_SP:             info->i = cpustate->SPD;                break;
+		case CPUINFO_INT_REGISTER + T11_PSW:            info->i = cpustate->PSW;                break;
+		case CPUINFO_INT_REGISTER + T11_R0:             info->i = cpustate->REGD(0);            break;
+		case CPUINFO_INT_REGISTER + T11_R1:             info->i = cpustate->REGD(1);            break;
+		case CPUINFO_INT_REGISTER + T11_R2:             info->i = cpustate->REGD(2);            break;
+		case CPUINFO_INT_REGISTER + T11_R3:             info->i = cpustate->REGD(3);            break;
+		case CPUINFO_INT_REGISTER + T11_R4:             info->i = cpustate->REGD(4);            break;
+		case CPUINFO_INT_REGISTER + T11_R5:             info->i = cpustate->REGD(5);            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(t11);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(t11);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(t11);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(t11);         break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(t11);                break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(t11);              break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(t11);          break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(t11);  break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "T11");					break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "DEC T-11");			break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "T11");                 break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "DEC T-11");            break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Aaron Giles"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
@@ -483,17 +483,17 @@ CPU_GET_INFO( t11 )
 				cpustate->psw.b.l & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + T11_PC:				sprintf(info->s, "PC:%04X", cpustate->reg[7].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_SP:				sprintf(info->s, "SP:%04X", cpustate->reg[6].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_PSW:			sprintf(info->s, "PSW:%02X", cpustate->psw.b.l);   break;
-		case CPUINFO_STR_REGISTER + T11_R0:				sprintf(info->s, "R0:%04X", cpustate->reg[0].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R1:				sprintf(info->s, "R1:%04X", cpustate->reg[1].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R2:				sprintf(info->s, "R2:%04X", cpustate->reg[2].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R3:				sprintf(info->s, "R3:%04X", cpustate->reg[3].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R4:				sprintf(info->s, "R4:%04X", cpustate->reg[4].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R5:				sprintf(info->s, "R5:%04X", cpustate->reg[5].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_PC:             sprintf(info->s, "PC:%04X", cpustate->reg[7].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_SP:             sprintf(info->s, "SP:%04X", cpustate->reg[6].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_PSW:            sprintf(info->s, "PSW:%02X", cpustate->psw.b.l);   break;
+		case CPUINFO_STR_REGISTER + T11_R0:             sprintf(info->s, "R0:%04X", cpustate->reg[0].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R1:             sprintf(info->s, "R1:%04X", cpustate->reg[1].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R2:             sprintf(info->s, "R2:%04X", cpustate->reg[2].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R3:             sprintf(info->s, "R3:%04X", cpustate->reg[3].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R4:             sprintf(info->s, "R4:%04X", cpustate->reg[4].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R5:             sprintf(info->s, "R5:%04X", cpustate->reg[5].w.l); break;
 
-		case CPUINFO_IS_OCTAL:							info->i = true;							break;
+		case CPUINFO_IS_OCTAL:                          info->i = true;                         break;
 	}
 }
 

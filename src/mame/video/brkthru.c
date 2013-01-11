@@ -74,10 +74,10 @@ void brkthru_state::palette_init()
 TILE_GET_INFO_MEMBER(brkthru_state::get_bg_tile_info)
 {
 	/* BG RAM format
-        0         1
-        ---- -c-- ---- ---- = Color
-        ---- --xx xxxx xxxx = Code
-    */
+	    0         1
+	    ---- -c-- ---- ---- = Color
+	    ---- --xx xxxx xxxx = Code
+	*/
 
 	int code = (m_videoram[tile_index * 2] | ((m_videoram[tile_index * 2 + 1]) << 8)) & 0x3ff;
 	int region = 1 + (code >> 7);
@@ -121,7 +121,7 @@ void brkthru_state::video_start()
 WRITE8_MEMBER(brkthru_state::brkthru_1800_w)
 {
 
-	if (offset == 0)	/* low 8 bits of scroll */
+	if (offset == 0)    /* low 8 bits of scroll */
 		m_bgscroll = (m_bgscroll & 0x100) | data;
 	else if (offset == 1)
 	{
@@ -169,20 +169,20 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	/* order, to have the correct priorities. */
 
 	/* Sprite RAM format
-        0         1         2         3
-        ccc- ---- ---- ---- ---- ---- ---- ---- = Color
-        ---d ---- ---- ---- ---- ---- ---- ---- = Double Size
-        ---- p--- ---- ---- ---- ---- ---- ---- = Priority
-        ---- -bb- ---- ---- ---- ---- ---- ---- = Bank
-        ---- ---e ---- ---- ---- ---- ---- ---- = Enable/Disable
-        ---- ---- ssss ssss ---- ---- ---- ---- = Sprite code
-        ---- ---- ---- ---- yyyy yyyy ---- ---- = Y position
-        ---- ---- ---- ---- ---- ---- xxxx xxxx = X position
-    */
+	    0         1         2         3
+	    ccc- ---- ---- ---- ---- ---- ---- ---- = Color
+	    ---d ---- ---- ---- ---- ---- ---- ---- = Double Size
+	    ---- p--- ---- ---- ---- ---- ---- ---- = Priority
+	    ---- -bb- ---- ---- ---- ---- ---- ---- = Bank
+	    ---- ---e ---- ---- ---- ---- ---- ---- = Enable/Disable
+	    ---- ---- ssss ssss ---- ---- ---- ---- = Sprite code
+	    ---- ---- ---- ---- yyyy yyyy ---- ---- = Y position
+	    ---- ---- ---- ---- ---- ---- xxxx xxxx = X position
+	*/
 
 	for (offs = 0;offs < state->m_spriteram.bytes(); offs += 4)
 	{
-		if ((state->m_spriteram[offs] & 0x09) == prio)	/* Enable && Low Priority */
+		if ((state->m_spriteram[offs] & 0x09) == prio)  /* Enable && Low Priority */
 		{
 			int sx, sy, code, color;
 
@@ -199,7 +199,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				sy = 240 - sy;
 			}
 
-			if (state->m_spriteram[offs] & 0x10)	/* double height */
+			if (state->m_spriteram[offs] & 0x10)    /* double height */
 			{
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[9],
 						code & ~1,

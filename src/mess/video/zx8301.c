@@ -127,15 +127,15 @@ inline void zx8301_device::writebyte(offs_t address, UINT8 data)
 //-------------------------------------------------
 
 zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301)),
-	  m_dispoff(1),
-	  m_mode8(0),
-	  m_base(0),
-	  m_flash(1),
-	  m_vsync(1),
-	  m_vda(0)
+	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock),
+		device_memory_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301)),
+		m_dispoff(1),
+		m_mode8(0),
+		m_base(0),
+		m_flash(1),
+		m_vsync(1),
+		m_vda(0)
 {
 }
 
@@ -155,7 +155,7 @@ void zx8301_device::device_start()
 	assert(m_screen != NULL);
 
 	// resolve callbacks
-    m_out_vsync_func.resolve(out_vsync_cb, *this);
+	m_out_vsync_func.resolve(out_vsync_cb, *this);
 
 	// allocate timers
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);
@@ -203,18 +203,18 @@ WRITE8_MEMBER( zx8301_device::control_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1       display off
-        2
-        3       graphics mode
-        4
-        5
-        6
-        7       display base address
+	    0
+	    1       display off
+	    2
+	    3       graphics mode
+	    4
+	    5
+	    6
+	    7       display base address
 
-    */
+	*/
 
 	if (LOG) logerror("ZX8301 Control: %02x\n", data);
 

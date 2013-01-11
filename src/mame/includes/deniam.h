@@ -41,7 +41,7 @@ public:
 	UINT16         m_coinctrl;
 
 	/* devices */
-	device_t *m_audio_cpu;	// system 16c does not have sound CPU
+	device_t *m_audio_cpu;  // system 16c does not have sound CPU
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(deniam_videoram_w);

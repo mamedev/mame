@@ -55,8 +55,8 @@ public:
 void murogmbl_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
 	for (i = 0; i < 0x20; ++i)
 	{
@@ -208,15 +208,15 @@ MACHINE_CONFIG_END
 
 ROM_START(murogmbl)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("2532.5e",	0x0000, 0x1000, CRC(093d4560) SHA1(d5401b5f7a2ebe5099fefc5b09f8710886e243b2) )
+	ROM_LOAD("2532.5e", 0x0000, 0x1000, CRC(093d4560) SHA1(d5401b5f7a2ebe5099fefc5b09f8710886e243b2) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD("2532.8b",	0x0000, 0x0800, CRC(4427ffc0) SHA1(45f5fd0ae967cdb6abbf2e6c6d12d787556488ef) )
+	ROM_LOAD("2532.8b", 0x0000, 0x0800, CRC(4427ffc0) SHA1(45f5fd0ae967cdb6abbf2e6c6d12d787556488ef) )
 	ROM_CONTINUE(0x0000, 0x0800)
-	ROM_LOAD("2516.5b", 	0x0800, 0x0800, CRC(496ad48c) SHA1(28380c9d02b64e7d5ef2763de92cd2ca8861eceb) )
+	ROM_LOAD("2516.5b",     0x0800, 0x0800, CRC(496ad48c) SHA1(28380c9d02b64e7d5ef2763de92cd2ca8861eceb) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "74s288.a8",	0x0000, 0x0020, CRC(fc35201c) SHA1(4549e228c48992e0d10957f029b89a547392e72b) )
+	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, CRC(fc35201c) SHA1(4549e228c48992e0d10957f029b89a547392e72b) )
 ROM_END
 
 GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, driver_device, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", GAME_NO_SOUND )

@@ -41,7 +41,7 @@ static void handle_coins(running_machine &machine, int coin)
 
 	//popmessage("Coin %d", state->m_coin);
 
-	if (coin & 1)	// Coin 2 !
+	if (coin & 1)   // Coin 2 !
 	{
 		tmp = (state->ioport("DSW")->read() & 0xc0) >> 6;
 		state->m_coins++;
@@ -54,7 +54,7 @@ static void handle_coins(running_machine &machine, int coin)
 		coin_counter_w(machine,1,1); coin_counter_w(machine,1,0); /* Count slot B */
 	}
 
-	if (coin & 2)	// Coin 1 !
+	if (coin & 2)   // Coin 1 !
 	{
 		tmp = (machine.root_device().ioport("DSW")->read() & 0x30) >> 4;
 		state->m_coins++;
@@ -103,16 +103,16 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 				return m_credits;
 			case 0x92:
 				return ((ioport("P1")->read() & 0x80) >> 7) | ((ioport("P2")->read() & 0x80) >> 6);
-			case 0xe0:	/* reset? */
+			case 0xe0:  /* reset? */
 				m_coins = 0;
 				m_credits = 0;
 				return 0xff;
 			case 0xe1:
 				m_credits--;
 				return 0xff;
-			case 0xfe:	/* Dip Switches 1 to 4 */
+			case 0xfe:  /* Dip Switches 1 to 4 */
 				return ioport("DSW")->read() & 0x0f;
-			case 0xff:	/* Dip Switches 5 to 8 */
+			case 0xff:  /* Dip Switches 5 to 8 */
 				return ioport("DSW")->read() >> 4;
 		}
 	}
@@ -140,11 +140,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, xyonix_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READNOP AM_DEVWRITE("sn1", sn76496_device, write)	/* SN76496 ready signal */
+	AM_RANGE(0x20, 0x20) AM_READNOP AM_DEVWRITE("sn1", sn76496_device, write)   /* SN76496 ready signal */
 	AM_RANGE(0x21, 0x21) AM_READNOP AM_DEVWRITE("sn2", sn76496_device, write)
-	AM_RANGE(0x40, 0x40) AM_WRITENOP		/* NMI ack? */
+	AM_RANGE(0x40, 0x40) AM_WRITENOP        /* NMI ack? */
 	AM_RANGE(0x50, 0x50) AM_WRITE(xyonix_irqack_w)
-	AM_RANGE(0x60, 0x61) AM_WRITENOP		/* mc6845 */
+	AM_RANGE(0x60, 0x61) AM_WRITENOP        /* mc6845 */
 	AM_RANGE(0xe0, 0xe0) AM_READWRITE(xyonix_io_r, xyonix_io_w)
 ADDRESS_MAP_END
 
@@ -159,7 +159,7 @@ static INPUT_PORTS_START( xyonix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )		/* handled by xyonix_io_r() */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )      /* handled by xyonix_io_r() */
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -169,14 +169,14 @@ static INPUT_PORTS_START( xyonix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )		/* handled by xyonix_io_r() */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )      /* handled by xyonix_io_r() */
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )			// DEF_STR( Very_Hard )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          // DEF_STR( Very_Hard )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -223,7 +223,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -232,11 +232,11 @@ static const sn76496_config psg_intf =
 static MACHINE_CONFIG_START( xyonix, xyonix_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,16000000 / 4)		 /* 4 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80,16000000 / 4)        /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", xyonix_state,  nmi_line_pulse)
-	MCFG_CPU_PERIODIC_INT_DRIVER(xyonix_state, irq0_line_assert, 4*60)	/* ?? controls music tempo */
+	MCFG_CPU_PERIODIC_INT_DRIVER(xyonix_state, irq0_line_assert, 4*60)  /* ?? controls music tempo */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

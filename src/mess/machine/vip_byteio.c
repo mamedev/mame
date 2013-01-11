@@ -53,7 +53,7 @@ device_vip_byteio_port_interface::~device_vip_byteio_port_interface()
 //-------------------------------------------------
 
 vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, VIP_BYTEIO_PORT, "VIP byte I/O port", tag, owner, clock),
+		device_t(mconfig, VIP_BYTEIO_PORT, "VIP byte I/O port", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -86,7 +86,7 @@ void vip_byteio_port_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_inst_cb, 0, sizeof(m_out_inst_cb));
+		memset(&m_out_inst_cb, 0, sizeof(m_out_inst_cb));
 	}
 }
 
@@ -127,6 +127,6 @@ WRITE_LINE_MEMBER( vip_byteio_port_device::inst_w ) { m_out_inst_func(state); }
 //-------------------------------------------------
 
 SLOT_INTERFACE_START( vip_byteio_cards )
-    //SLOT_INTERFACE("exp2", VP576_BYTEIO)
-    SLOT_INTERFACE("ascii", VP620)
+	//SLOT_INTERFACE("exp2", VP576_BYTEIO)
+	SLOT_INTERFACE("ascii", VP620)
 SLOT_INTERFACE_END

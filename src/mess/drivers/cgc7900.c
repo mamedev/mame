@@ -41,22 +41,22 @@
     PARAMETERS
 ***************************************************************************/
 
-#define INT_RTC				0x0001
-#define INT_RS449_TXRDY		0x0002
-#define INT_BINT2			0x0004
-#define INT_RS232_TXRDY		0x0008
-#define INT_DISK			0x0010
-#define INT_BINT3			0x0020
-#define INT_BEZEL			0x0040
-#define INT_KEYBOARD		0x0080
-#define INT_RS449_RXRDY		0x0100
-#define INT_LIGHT_PEN		0x0200
-#define INT_BINT4			0x0400
-#define INT_JOYSTICK		0x0800
-#define INT_VSYNC			0x1000
-#define INT_BINT5			0x2000
-#define INT_BINT1			0x4000
-#define INT_RS232_RXRDY		0x8000
+#define INT_RTC             0x0001
+#define INT_RS449_TXRDY     0x0002
+#define INT_BINT2           0x0004
+#define INT_RS232_TXRDY     0x0008
+#define INT_DISK            0x0010
+#define INT_BINT3           0x0020
+#define INT_BEZEL           0x0040
+#define INT_KEYBOARD        0x0080
+#define INT_RS449_RXRDY     0x0100
+#define INT_LIGHT_PEN       0x0200
+#define INT_BINT4           0x0400
+#define INT_JOYSTICK        0x0800
+#define INT_VSYNC           0x1000
+#define INT_BINT5           0x2000
+#define INT_BINT1           0x4000
+#define INT_RS232_RXRDY     0x8000
 
 static const int INT_LEVEL[] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 };
 
@@ -72,26 +72,26 @@ READ16_MEMBER( cgc7900_state::keyboard_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-         0      key data bit 0
-         1      key data bit 1
-         2      key data bit 2
-         3      key data bit 3
-         4      key data bit 4
-         5      key data bit 5
-         6      key data bit 6
-         7      key data bit 7
-         8      SHIFT key
-         9      CTRL key
-        10      M1 key
-        11      M2 key
-        12
-        13
-        14
-        15
+	     0      key data bit 0
+	     1      key data bit 1
+	     2      key data bit 2
+	     3      key data bit 3
+	     4      key data bit 4
+	     5      key data bit 5
+	     6      key data bit 6
+	     7      key data bit 7
+	     8      SHIFT key
+	     9      CTRL key
+	    10      M1 key
+	    11      M2 key
+	    12
+	    13
+	    14
+	    15
 
-    */
+	*/
 
 	return 0;
 }
@@ -104,26 +104,26 @@ WRITE16_MEMBER( cgc7900_state::keyboard_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-         0      LED select bit 0
-         1      LED select bit 1
-         2      LED select bit 2
-         3      LED select bit 3
-         4      LED select bit 4
-         5
-         6
-         7      LED switch (1=on, 0=off)
-         8
-         9
-        10
-        11
-        12
-        13
-        14
-        15
+	     0      LED select bit 0
+	     1      LED select bit 1
+	     2      LED select bit 2
+	     3      LED select bit 3
+	     4      LED select bit 4
+	     5
+	     6
+	     7      LED switch (1=on, 0=off)
+	     8
+	     9
+	    10
+	    11
+	    12
+	    13
+	    14
+	    15
 
-    */
+	*/
 }
 
 /*-------------------------------------------------
@@ -134,26 +134,26 @@ WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-         0      real time clock
-         1      RS-449 Tx ready
-         2      BINT 2
-         3      RS-232 Tx ready
-         4      disk
-         5      BINT 3
-         6      bezel keys
-         7      keyboard
-         8      RS-449 Rx ready
-         9      light pen
-        10      BINT 4
-        11      joystick
-        12      vertical retrace
-        13      BINT 5
-        14      BINT 1
-        15      RS-232 Rx ready
+	     0      real time clock
+	     1      RS-449 Tx ready
+	     2      BINT 2
+	     3      RS-232 Tx ready
+	     4      disk
+	     5      BINT 3
+	     6      bezel keys
+	     7      keyboard
+	     8      RS-449 Rx ready
+	     9      light pen
+	    10      BINT 4
+	    11      joystick
+	    12      vertical retrace
+	    13      BINT 5
+	    14      BINT 1
+	    15      RS-232 Rx ready
 
-    */
+	*/
 
 	m_int_mask = data;
 }
@@ -183,26 +183,26 @@ READ16_MEMBER( cgc7900_state::disk_status_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-         0      _I/O        input/output
-         1      _REQ        request
-         2      _BSY        busy
-         3      C/_D        control/data
-         4      _MSG        message
-         5      _RDY        ready
-         6
-         7
-         8
-         9
-        10
-        11
-        12
-        13
-        14
-        15
+	     0      _I/O        input/output
+	     1      _REQ        request
+	     2      _BSY        busy
+	     3      C/_D        control/data
+	     4      _MSG        message
+	     5      _RDY        ready
+	     6
+	     7
+	     8
+	     9
+	    10
+	    11
+	    12
+	    13
+	    14
+	    15
 
-    */
+	*/
 
 	return 0xffff - 0x04;
 }
@@ -419,18 +419,18 @@ void cgc7900_state::machine_reset()
 
 static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
-    MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
+	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
+	MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
 
 	MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
-    MCFG_CPU_PROGRAM_MAP(keyboard_mem)
-    MCFG_CPU_IO_MAP(keyboard_io)
+	MCFG_CPU_PROGRAM_MAP(keyboard_mem)
+	MCFG_CPU_IO_MAP(keyboard_io)
 	MCFG_DEVICE_DISABLE()
 
 /*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
     MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_FRAGMENT_ADD(cgc7900_video)
 
 	/* sound hardware */
@@ -449,30 +449,30 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( cgc7900 )
-    ROM_REGION16_BE( 0x10000, M68000_TAG, 0 )
-	ROM_LOAD16_BYTE( "210274 800k even a3ee term 1.4.ue24",						0x0000, 0x1000, CRC(5fa8f368) SHA1(120dbcfedce0badd38bf5b23e1fbc99667eb286c) )
-	ROM_LOAD16_BYTE( "210275 800k odd bbb3 term 1.4.uf24",						0x0001, 0x1000, CRC(4d479457) SHA1(5fa96a1eadfd9ba493d28691286e2e001a489a19) )
-	ROM_LOAD16_BYTE( "210276 802k even 0c22 term 1.4.ue22",						0x2000, 0x1000, CRC(c88c44ec) SHA1(f39d8a3cf7aaefd815b4426348965b076c1f2265) )
-	ROM_LOAD16_BYTE( "210277 802k odd b58c term 1.4.uf22",						0x2001, 0x1000, CRC(52ffe01f) SHA1(683aa71c2eb17b7ad639b888487db73d7684901a) )
-	ROM_LOAD16_BYTE( "210278 804k even eaf4 term 1.4.ue21",						0x4000, 0x1000, CRC(7fe326db) SHA1(d39d05e008160fb8afa62e0d4cfb1d813f2296d4) )
-	ROM_LOAD16_BYTE( "210279 804k odd 3f6d term 1.4.uf21",						0x4001, 0x1000, CRC(6c12d81c) SHA1(efe7c20e567c02b9c5b66a2d18e035d5f5f56b28) )
-	ROM_LOAD16_BYTE( "210280 806k even 679d term 1.4.ue20",						0x6000, 0x1000, CRC(70930d74) SHA1(a5ab1c0bd8bd829408961107e01598cd71a97fec) )
-	ROM_LOAD16_BYTE( "210281 1.4 806k odd sum 611e.uf20",						0x6001, 0x1000, CRC(8080aa2a) SHA1(c018a23e6f2158e2d63723cade0a3ad737090921) )
-	ROM_LOAD16_BYTE( "su7700 210282 808k even opmod term 1.4 sum 2550.ue18",	0x8000, 0x1000, CRC(8f5834cd) SHA1(3cd03c82aa85c30cbc8e954f5a9fc4e9034f913b) )
-	ROM_LOAD16_BYTE( "su7700 210283 808k odd opmod term 1.4 sum faca.uf18",		0x8001, 0x1000, CRC(e593b133) SHA1(6c641df844706e0d990b5fd544e98594171080a1) )
-	ROM_LOAD16_BYTE( "210258 80ak even b2f6 mon 1.3.ue15",						0xa000, 0x1000, CRC(ec5a1250) SHA1(ffef73d35f172ac610b35bdf729d51eb6f9346ba) )
-	ROM_LOAD16_BYTE( "210259 80ak odd cd66 mon 1.3.uf15",						0xa001, 0x1000, CRC(61eb43c6) SHA1(baaae0b787798147da453aac1f815589ea4ed921) )
-	ROM_LOAD16_BYTE( "210244 80c even ce40 dos 1.6b.ue13",						0xc000, 0x1000, CRC(3b64e4cb) SHA1(71b28d160b101ea6165e602ff1c54272b7b30ece) )
-	ROM_LOAD16_BYTE( "210245 80c odd 1ac3 dos 1.6b.uf13",						0xc001, 0x1000, CRC(0b6539ca) SHA1(d49e6d3307e5d634a412fd80b59492f31e29f7e0) )
-	ROM_LOAD16_BYTE( "210290 idris even rel3 sum 0cce.ue12",					0xe000, 0x1000, CRC(07065772) SHA1(620ea5d55021e5c38efc010722ddbd852cd49e39) )
-	ROM_LOAD16_BYTE( "210291 idris odd rel3 sum 5d11.uf12",						0xe001, 0x1000, CRC(d81b30da) SHA1(228f9b4e39d430ce4aaa81ea63f4516a51e6d001) )
+	ROM_REGION16_BE( 0x10000, M68000_TAG, 0 )
+	ROM_LOAD16_BYTE( "210274 800k even a3ee term 1.4.ue24",                     0x0000, 0x1000, CRC(5fa8f368) SHA1(120dbcfedce0badd38bf5b23e1fbc99667eb286c) )
+	ROM_LOAD16_BYTE( "210275 800k odd bbb3 term 1.4.uf24",                      0x0001, 0x1000, CRC(4d479457) SHA1(5fa96a1eadfd9ba493d28691286e2e001a489a19) )
+	ROM_LOAD16_BYTE( "210276 802k even 0c22 term 1.4.ue22",                     0x2000, 0x1000, CRC(c88c44ec) SHA1(f39d8a3cf7aaefd815b4426348965b076c1f2265) )
+	ROM_LOAD16_BYTE( "210277 802k odd b58c term 1.4.uf22",                      0x2001, 0x1000, CRC(52ffe01f) SHA1(683aa71c2eb17b7ad639b888487db73d7684901a) )
+	ROM_LOAD16_BYTE( "210278 804k even eaf4 term 1.4.ue21",                     0x4000, 0x1000, CRC(7fe326db) SHA1(d39d05e008160fb8afa62e0d4cfb1d813f2296d4) )
+	ROM_LOAD16_BYTE( "210279 804k odd 3f6d term 1.4.uf21",                      0x4001, 0x1000, CRC(6c12d81c) SHA1(efe7c20e567c02b9c5b66a2d18e035d5f5f56b28) )
+	ROM_LOAD16_BYTE( "210280 806k even 679d term 1.4.ue20",                     0x6000, 0x1000, CRC(70930d74) SHA1(a5ab1c0bd8bd829408961107e01598cd71a97fec) )
+	ROM_LOAD16_BYTE( "210281 1.4 806k odd sum 611e.uf20",                       0x6001, 0x1000, CRC(8080aa2a) SHA1(c018a23e6f2158e2d63723cade0a3ad737090921) )
+	ROM_LOAD16_BYTE( "su7700 210282 808k even opmod term 1.4 sum 2550.ue18",    0x8000, 0x1000, CRC(8f5834cd) SHA1(3cd03c82aa85c30cbc8e954f5a9fc4e9034f913b) )
+	ROM_LOAD16_BYTE( "su7700 210283 808k odd opmod term 1.4 sum faca.uf18",     0x8001, 0x1000, CRC(e593b133) SHA1(6c641df844706e0d990b5fd544e98594171080a1) )
+	ROM_LOAD16_BYTE( "210258 80ak even b2f6 mon 1.3.ue15",                      0xa000, 0x1000, CRC(ec5a1250) SHA1(ffef73d35f172ac610b35bdf729d51eb6f9346ba) )
+	ROM_LOAD16_BYTE( "210259 80ak odd cd66 mon 1.3.uf15",                       0xa001, 0x1000, CRC(61eb43c6) SHA1(baaae0b787798147da453aac1f815589ea4ed921) )
+	ROM_LOAD16_BYTE( "210244 80c even ce40 dos 1.6b.ue13",                      0xc000, 0x1000, CRC(3b64e4cb) SHA1(71b28d160b101ea6165e602ff1c54272b7b30ece) )
+	ROM_LOAD16_BYTE( "210245 80c odd 1ac3 dos 1.6b.uf13",                       0xc001, 0x1000, CRC(0b6539ca) SHA1(d49e6d3307e5d634a412fd80b59492f31e29f7e0) )
+	ROM_LOAD16_BYTE( "210290 idris even rel3 sum 0cce.ue12",                    0xe000, 0x1000, CRC(07065772) SHA1(620ea5d55021e5c38efc010722ddbd852cd49e39) )
+	ROM_LOAD16_BYTE( "210291 idris odd rel3 sum 5d11.uf12",                     0xe001, 0x1000, CRC(d81b30da) SHA1(228f9b4e39d430ce4aaa81ea63f4516a51e6d001) )
 
 	ROM_REGION( 0x800, "i8035", 0 )
 	ROM_LOAD( "keyboard controller i8035", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
-	ROM_LOAD( "norm chrset 4b40.ua13",	0x0000, 0x0400, CRC(55eb7b87) SHA1(768cea80597e7396d9e26f8cd09e6b480a526fce) )
-	ROM_LOAD( "alt 46a7.ua14",			0x0400, 0x0400, CRC(be22b7e4) SHA1(83ef252c7fab33b4d3821a3049b89d044df35de8) )
+	ROM_LOAD( "norm chrset 4b40.ua13",  0x0000, 0x0400, CRC(55eb7b87) SHA1(768cea80597e7396d9e26f8cd09e6b480a526fce) )
+	ROM_LOAD( "alt 46a7.ua14",          0x0400, 0x0400, CRC(be22b7e4) SHA1(83ef252c7fab33b4d3821a3049b89d044df35de8) )
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "rp0a.ub8",  0x0000, 0x0020, NO_DUMP )
@@ -496,4 +496,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1980, cgc7900,	0,		0,		cgc7900,	cgc7900, driver_device,	0,		"Chromatics",	"CGC 7900",	GAME_NOT_WORKING)
+COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, driver_device, 0,      "Chromatics",   "CGC 7900", GAME_NOT_WORKING)

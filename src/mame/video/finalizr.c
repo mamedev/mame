@@ -116,7 +116,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 
 			size = sr[offs + 4] & 0x1c;
 
-			if (size >= 0x10)	/* 32x32 */
+			if (size >= 0x10)   /* 32x32 */
 			{
 				if (flip_screen())
 				{
@@ -157,7 +157,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 					flipy = !flipy;
 				}
 
-				if (size == 0x00)	/* 16x16 */
+				if (size == 0x00)   /* 16x16 */
 				{
 					drawgfx_transpen(bitmap,cliprect,gfx1,
 							code,
@@ -169,7 +169,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 				{
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
 
-					if (size == 0x04)	/* 16x8 */
+					if (size == 0x04)   /* 16x8 */
 					{
 						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code & ~1,
@@ -182,7 +182,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 								flipx,flipy,
 								flipx?sx:sx+8,sy,0);
 					}
-					else if (size == 0x08)	/* 8x16 */
+					else if (size == 0x08)  /* 8x16 */
 					{
 						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code & ~2,
@@ -195,7 +195,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 								flipx,flipy,
 								sx,flipy?sy:sy+8,0);
 					}
-					else if (size == 0x0c)	/* 8x8 */
+					else if (size == 0x0c)  /* 8x8 */
 					{
 						drawgfx_transpen(bitmap,cliprect,gfx2,
 								code,

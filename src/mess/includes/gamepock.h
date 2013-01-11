@@ -2,11 +2,11 @@
 #define _GAMEPOCK_H_
 
 struct HD44102CH {
-	UINT8	enabled;
-	UINT8	start_page;
-	UINT8	address;
-	UINT8	y_inc;
-	UINT8	ram[256];	/* There are actually 50 x 4 x 8 bits. This just makes addressing easier. */
+	UINT8   enabled;
+	UINT8   start_page;
+	UINT8   address;
+	UINT8   y_inc;
+	UINT8   ram[256];   /* There are actually 50 x 4 x 8 bits. This just makes addressing easier. */
 };
 
 class gamepock_state : public driver_device

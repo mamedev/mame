@@ -96,18 +96,18 @@ VIDEO_START_MEMBER(bbusters_state,mechatt)
 /******************************************************************************/
 
 #define ADJUST_4x4 \
-		if ((dx&0x10) && (dy&0x10)) code+=3;	\
-		else if (dy&0x10) code+=2;				\
+		if ((dx&0x10) && (dy&0x10)) code+=3;    \
+		else if (dy&0x10) code+=2;              \
 		else if (dx&0x10) code+=1
 
 #define ADJUST_8x8 \
-		if ((dx&0x20) && (dy&0x20)) code+=12;	\
-		else if (dy&0x20) code+=8;				\
+		if ((dx&0x20) && (dy&0x20)) code+=12;   \
+		else if (dy&0x20) code+=8;              \
 		else if (dx&0x20) code+=4
 
 #define ADJUST_16x16 \
-		if ((dx&0x40) && (dy&0x40)) code+=48;	\
-		else if (dy&0x40) code+=32;				\
+		if ((dx&0x40) && (dy&0x40)) code+=48;   \
+		else if (dy&0x40) code+=32;             \
 		else if (dx&0x40) code+=16
 
 INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int dy, int block)
@@ -205,37 +205,37 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const U
 		int x,y,sprite,colour,fx,fy,scale;
 		int block;
 
-	    sprite=source[offs+1];
-	    colour=source[offs+0];
+		sprite=source[offs+1];
+		colour=source[offs+0];
 
 		if (colour==0xf7 && (sprite==0x3fff || sprite==0xffff))
 			continue;
 
-	    y=source[offs+3];
-	    x=source[offs+2];
+		y=source[offs+3];
+		x=source[offs+2];
 		if (x&0x200) x=-(0x100-(x&0xff));
 
 		/*
-            Source[0]:
-                0xf000: Colour
-                0x0800: FX
-                0x0400: FY?
-                0x0300: Block control
-                0x0080: ?
-                0x007f: scale
+		    Source[0]:
+		        0xf000: Colour
+		        0x0800: FX
+		        0x0400: FY?
+		        0x0300: Block control
+		        0x0080: ?
+		        0x007f: scale
 
-            Scale varies according to block size.
-            Block type 0: 0x70 = no scale, 0x7f == half size - 16 pixel sprite
-            Block type 1: 0x60 = no scale, 0x6f == half size - 32 pixel sprite
-            Block type 2: 0x40 = no scale, 0x5f == half size - 64 pixel sprite
-            Block type 3: 0x00 = no scale, 0x3f == half size - 128 pixel sprite
+		    Scale varies according to block size.
+		    Block type 0: 0x70 = no scale, 0x7f == half size - 16 pixel sprite
+		    Block type 1: 0x60 = no scale, 0x6f == half size - 32 pixel sprite
+		    Block type 2: 0x40 = no scale, 0x5f == half size - 64 pixel sprite
+		    Block type 3: 0x00 = no scale, 0x3f == half size - 128 pixel sprite
 
-        */
+		*/
 		colour=colour>>12;
 		block=(source[offs+0]>>8)&0x3;
 		fy=source[offs+0]&0x400;
 		fx=source[offs+0]&0x800;
-	    sprite=sprite&0x3fff;
+		sprite=sprite&0x3fff;
 
 		if ((colour&colmask)!=colval)
 			continue;

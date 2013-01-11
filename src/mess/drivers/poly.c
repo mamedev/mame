@@ -39,10 +39,10 @@ class poly_state : public driver_device
 public:
 	poly_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_pia0(*this, "pia0"),
-		  m_pia1(*this, "pia1"),
-		  m_videoram(*this, "videoram")
+			m_maincpu(*this, "maincpu"),
+			m_pia0(*this, "pia0"),
+			m_pia1(*this, "pia1"),
+			m_videoram(*this, "videoram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -92,18 +92,18 @@ void poly_state::machine_reset()
 
 static const pia6821_interface poly_pia0_intf=
 {
-	DEVCB_NULL,						/* port A input */
-	DEVCB_NULL,	/* port B input */
+	DEVCB_NULL,                     /* port A input */
+	DEVCB_NULL, /* port B input */
 	DEVCB_NULL, /* CA1 input */
 	DEVCB_NULL, /* CB1 input */
-	DEVCB_NULL,						/* CA2 input */
-	DEVCB_NULL,						/* CB2 input */
-	DEVCB_NULL,	/* port A output */
-	DEVCB_NULL,	/* port B output */
+	DEVCB_NULL,                     /* CA2 input */
+	DEVCB_NULL,                     /* CB2 input */
+	DEVCB_NULL, /* port A output */
+	DEVCB_NULL, /* port B output */
 	DEVCB_NULL, /* CA2 output */
 	DEVCB_NULL, /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),	/* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)		/* IRQB output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
 };
 
 READ8_MEMBER( poly_state::pia1_b_in )
@@ -121,16 +121,16 @@ READ_LINE_MEMBER( poly_state::pia1_cb1_in )
 
 static const pia6821_interface poly_pia1_intf=
 {
-	DEVCB_NULL,		/* port A input */
-	DEVCB_DRIVER_MEMBER(poly_state, pia1_b_in),		/* port B input */
-	DEVCB_NULL,		/* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(poly_state, pia1_cb1_in),		/* CB1 input */
-	DEVCB_NULL,		/* CA2 input */
-	DEVCB_NULL,		/* CB2 input */
-	DEVCB_NULL,		/* port A output */
-	DEVCB_NULL,		/* port B output */
-	DEVCB_NULL,		/* CA2 output */
-	DEVCB_NULL,		/* CB2 output */
+	DEVCB_NULL,     /* port A input */
+	DEVCB_DRIVER_MEMBER(poly_state, pia1_b_in),     /* port B input */
+	DEVCB_NULL,     /* CA1 input */
+	DEVCB_DRIVER_LINE_MEMBER(poly_state, pia1_cb1_in),      /* CB1 input */
+	DEVCB_NULL,     /* CA2 input */
+	DEVCB_NULL,     /* CB2 input */
+	DEVCB_NULL,     /* port A output */
+	DEVCB_NULL,     /* port B output */
+	DEVCB_NULL,     /* CA2 output */
+	DEVCB_NULL,     /* CB2 output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
@@ -140,8 +140,8 @@ static const ptm6840_interface poly_ptm_intf =
 	XTAL_10MHz/10, // not correct
 	{ 0, 0, 0 },
 	{ DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL },
+		DEVCB_NULL,
+		DEVCB_NULL },
 	DEVCB_NULL
 };
 

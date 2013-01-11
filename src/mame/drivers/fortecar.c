@@ -307,10 +307,10 @@
 **************************************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_12MHz
-#define CPU_CLOCK		(MASTER_CLOCK/4)
-#define CRTC_CLOCK		(MASTER_CLOCK/8)
-#define AY_CLOCK		(MASTER_CLOCK/8)
+#define MASTER_CLOCK    XTAL_12MHz
+#define CPU_CLOCK       (MASTER_CLOCK/4)
+#define CRTC_CLOCK      (MASTER_CLOCK/8)
+#define AY_CLOCK        (MASTER_CLOCK/8)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -399,10 +399,10 @@ R = 82 Ohms Pull Down.
 	static const int resistances_b [2] = { 510, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	82,	0,
-			3,	resistances_rg,	weights_g,	82,	0,
-			2,	resistances_b,	weights_b,	82,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rg, weights_r,  82, 0,
+			3,  resistances_rg, weights_g,  82, 0,
+			2,  resistances_b,  weights_b,  82, 0);
 
 	for (i = 0; i < 512; i++)
 	{
@@ -458,13 +458,13 @@ READ8_MEMBER(fortecar_state::ppi0_portc_r)
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	/*  Init with 0x9a... A, B and high C as input
-     Serial Eprom connected to Port C */
-	DEVCB_INPUT_PORT("SYSTEM"),						/* Port A read */
-	DEVCB_NULL,										/* Port A write */
-	DEVCB_INPUT_PORT("INPUT"),						/* Port B read */
-	DEVCB_NULL,										/* Port B write */
-	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_r),	/* Port C read */
-	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_w)	/* Port C write */
+	 Serial Eprom connected to Port C */
+	DEVCB_INPUT_PORT("SYSTEM"),                     /* Port A read */
+	DEVCB_NULL,                                     /* Port A write */
+	DEVCB_INPUT_PORT("INPUT"),                      /* Port B read */
+	DEVCB_NULL,                                     /* Port B write */
+	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_r),   /* Port C read */
+	DEVCB_DRIVER_MEMBER(fortecar_state,ppi0_portc_w)    /* Port C write */
 };
 
 
@@ -515,7 +515,7 @@ trigger a reset.
 Seems to work properly, but must be checked closely...
 
 */
-	if (((data >> 7) & 0x01) == 0)		/* check for bit7 */
+	if (((data >> 7) & 0x01) == 0)      /* check for bit7 */
 	{
 		machine().watchdog_reset();
 	}
@@ -537,16 +537,16 @@ static const ay8910_interface ay8910_config =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -574,7 +574,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)	// pc=444
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)  // pc=444
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
@@ -597,33 +597,33 @@ Error messages:
 */
 
 static INPUT_PORTS_START( fortecar )
-	PORT_START("DSW")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x01, "DSW-1" )				PORT_DIPLOCATION("DSW:1")
+	PORT_START("DSW")   /* 8bit */
+	PORT_DIPNAME( 0x01, 0x01, "DSW-1" )             PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Attract Mode" )		PORT_DIPLOCATION("DSW:2")
+	PORT_DIPNAME( 0x02, 0x02, "Attract Mode" )      PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW-3" )				PORT_DIPLOCATION("DSW:3")
+	PORT_DIPNAME( 0x04, 0x04, "DSW-3" )             PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW-4" )				PORT_DIPLOCATION("DSW:4")
+	PORT_DIPNAME( 0x08, 0x08, "DSW-4" )             PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW-5" )				PORT_DIPLOCATION("DSW:5")
+	PORT_DIPNAME( 0x10, 0x10, "DSW-5" )             PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW-6" )				PORT_DIPLOCATION("DSW:6")
+	PORT_DIPNAME( 0x20, 0x20, "DSW-6" )             PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW-7" )				PORT_DIPLOCATION("DSW:7")
+	PORT_DIPNAME( 0x40, 0x40, "DSW-7" )             PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW-8" )				PORT_DIPLOCATION("DSW:8")
+	PORT_DIPNAME( 0x80, 0x80, "DSW-8" )             PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("INPUT")	/* 8bit */
+	PORT_START("INPUT") /* 8bit */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Red / Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Black")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
@@ -633,7 +633,7 @@ static INPUT_PORTS_START( fortecar )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 
-	PORT_START("SYSTEM")	/* 8bit */
+	PORT_START("SYSTEM")    /* 8bit */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Rear Door")   PORT_CODE(KEYCODE_D)  PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )         PORT_NAME("Coin In")
@@ -687,11 +687,11 @@ void fortecar_state::machine_reset()
 
 static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)		 /* 3 MHz, measured */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
 	MCFG_CPU_IO_MAP(fortecar_ports)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortecar_state,  nmi_line_pulse)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))	/* guess */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -700,7 +700,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)	/* driven by CRTC */
+	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)    /* driven by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
 
 
@@ -714,11 +714,11 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_PALETTE_LENGTH(0x200)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)	/* 1.5 MHz, measured */
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)    /* 1.5 MHz, measured */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)	/* 1.5 MHz, measured */
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -737,7 +737,7 @@ ROM_START( fortecar )
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 
-	ROM_REGION( 0x0200,	"eeprom", 0 )	/* default serial EEPROM */
+	ROM_REGION( 0x0200, "eeprom", 0 )   /* default serial EEPROM */
 	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56_serial_12345678.u13", 0x0000, 0x0100, BAD_DUMP CRC(2fc5961d) SHA1(f958c8b2b4e48cc6e5a607a6751acde5592bd27f) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -753,10 +753,10 @@ ROM_START( fortecrd )
 	ROM_LOAD( "forte_card.u39", 0x10000, 0x10000, CRC(3d9c478e) SHA1(eb86115d1c36038f2c80cd116f5aeddd94036424) )
 	ROM_LOAD( "forte_card.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 
-	ROM_REGION( 0x0200,	"eeprom", 0 )	/* default serial EEPROM */
+	ROM_REGION( 0x0200, "eeprom", 0 )   /* default serial EEPROM */
 	ROM_LOAD16_WORD_SWAP( "forte_card_93cs56_serial_12345678.u13", 0x0000, 0x0100, CRC(2fc5961d) SHA1(f958c8b2b4e48cc6e5a607a6751acde5592bd27f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )

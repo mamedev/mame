@@ -421,9 +421,9 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
-	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP	// irq related?
+	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP    // irq related?
 	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(macrossp_palette_fade_w)	// macrossp palette fade
+	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(macrossp_palette_fade_w)  // macrossp palette fade
 	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
 
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
@@ -551,7 +551,7 @@ static const gfx_layout macrossp_char16x16x4layout =
 	{ 0,1,2,3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28, 32+0,32+4,32+8,32+12,32+16,32+20,32+24,32+28 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64, 10*64,11*64,12*64,13*64,14*64,15*64},
+		8*64, 9*64, 10*64,11*64,12*64,13*64,14*64,15*64},
 	16*64
 };
 
@@ -563,15 +563,15 @@ static const gfx_layout macrossp_char16x16x8layout =
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56, 64+0,64+8,64+16,64+24,64+32,64+40,64+48,64+56 },
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-	  8*128, 9*128, 10*128,11*128,12*128,13*128,14*128,15*128},
+		8*128, 9*128, 10*128,11*128,12*128,13*128,14*128,15*128},
 	16*128
 };
 
 static GFXDECODE_START( macrossp )
-	GFXDECODE_ENTRY( "gfx1", 0, macrossp_char16x16x8layout,   0x000, 0x20 )	/* 8bpp but 6bpp granularity */
-	GFXDECODE_ENTRY( "gfx2", 0, macrossp_char16x16x8layout,   0x800, 0x20 )	/* 8bpp but 6bpp granularity */
-	GFXDECODE_ENTRY( "gfx3", 0, macrossp_char16x16x8layout,   0x800, 0x20 )	/* 8bpp but 6bpp granularity */
-	GFXDECODE_ENTRY( "gfx4", 0, macrossp_char16x16x8layout,   0x800, 0x20 )	/* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( "gfx1", 0, macrossp_char16x16x8layout,   0x000, 0x20 ) /* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( "gfx2", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( "gfx3", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( "gfx4", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx5", 0, macrossp_char16x16x4layout,   0x800, 0x80 )
 GFXDECODE_END
 
@@ -583,7 +583,7 @@ static void irqhandler(device_t *device, int irq)
 	logerror("ES5506 irq %d\n", irq);
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
-    but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
+	but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
 	//  state->m_audiocpu->set_input_line(1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -621,11 +621,11 @@ void macrossp_state::machine_reset()
 static MACHINE_CONFIG_START( macrossp, macrossp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)	/* 25 MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
 	MCFG_CPU_PROGRAM_MAP(macrossp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
 
-	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16 MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(macrossp_sound_map)
 
 

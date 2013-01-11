@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
 	AM_RANGE(0x8000, 0x9fff) AM_READ_LEGACY(trvquest_question_r)
 	AM_RANGE(0xa000, 0xa000) AM_WRITEONLY AM_SHARE("trvquest_q")
-	AM_RANGE(0xa000, 0xa000) AM_READNOP	// bogus read from the game code when reads question roms
+	AM_RANGE(0xa000, 0xa000) AM_READNOP // bogus read from the game code when reads question roms
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -158,8 +158,8 @@ static void via_irq( device_t *device, int state )
 	// from gameplan.c
 
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
-       cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
-       leave time for the program to see the flag change. */
+	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
+	   leave time for the program to see the flag change. */
 	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(via_irq_delayed), state);
 }
 

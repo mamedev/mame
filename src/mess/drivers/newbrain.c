@@ -187,18 +187,18 @@ WRITE8_MEMBER( newbrain_state::enrg1_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       _CLK        enable frame frequency clock interrupts
-        1                   enable user interrupt
-        2       TVP         enable video display
-        3                   enable V24
-        4                   V24 Select Receive Bit 0
-        5                   V24 Select Receive Bit 1
-        6                   V24 Select Transmit Bit 0
-        7                   V24 Select Transmit Bit 1
+	    0       _CLK        enable frame frequency clock interrupts
+	    1                   enable user interrupt
+	    2       TVP         enable video display
+	    3                   enable V24
+	    4                   V24 Select Receive Bit 0
+	    5                   V24 Select Receive Bit 1
+	    6                   V24 Select Transmit Bit 0
+	    7                   V24 Select Transmit Bit 1
 
-    */
+	*/
 
 	m_enrg1 = data;
 }
@@ -207,18 +207,18 @@ WRITE8_MEMBER( newbrain_state::a_enrg1_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       _CLK        Clock Enable
-        1
-        2       TVP         TV Enable
-        3       IOPOWER
-        4       _CTS        Clear to Send V24
-        5       DO          Transmit Data V24
-        6
-        7       PO          Transmit Data Printer
+	    0       _CLK        Clock Enable
+	    1
+	    2       TVP         TV Enable
+	    3       IOPOWER
+	    4       _CTS        Clear to Send V24
+	    5       DO          Transmit Data V24
+	    6
+	    7       PO          Transmit Data Printer
 
-    */
+	*/
 
 	m_enrg1 = data;
 }
@@ -227,18 +227,18 @@ READ8_MEMBER( newbrain_state::ust_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       variable
-        1       variable
-        2       MNS         mains present
-        3       _USRINT0    user status
-        4       _USRINT     user interrupt
-        5       _CLKINT     clock interrupt
-        6       _ACINT      ACIA interrupt
-        7       _COPINT     COP interrupt
+	    0       variable
+	    1       variable
+	    2       MNS         mains present
+	    3       _USRINT0    user status
+	    4       _USRINT     user interrupt
+	    5       _CLKINT     clock interrupt
+	    6       _ACINT      ACIA interrupt
+	    7       _COPINT     COP interrupt
 
-    */
+	*/
 
 	UINT8 data = (m_copint << 7) | (m_aciaint << 6) | (m_clkint << 5) | (m_userint << 4) | 0x04;
 
@@ -308,18 +308,18 @@ READ8_MEMBER( newbrain_state::a_ust_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   +5V
-        1       PWRUP
-        2
-        3
-        4
-        5       _CLKINT     clock interrupt
-        6
-        7       _COPINT     COP interrupt
+	    0                   +5V
+	    1       PWRUP
+	    2
+	    3
+	    4
+	    5       _CLKINT     clock interrupt
+	    6
+	    7       _COPINT     COP interrupt
 
-    */
+	*/
 
 	return (m_copint << 7) | (m_clkint << 5) | (m_pwrup << 1) | 0x01;
 }
@@ -328,18 +328,18 @@ READ8_MEMBER( newbrain_state::user_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       RDDK        Received Data V24
-        1       _CTSD       _Clear to Send V24
-        2
-        3
-        4
-        5       TPIN        Tape in
-        6
-        7       _CTSP       _Clear to Send Printer
+	    0       RDDK        Received Data V24
+	    1       _CTSD       _Clear to Send V24
+	    2
+	    3
+	    4
+	    5       TPIN        Tape in
+	    6
+	    7       _CTSP       _Clear to Send Printer
 
-    */
+	*/
 
 	m_user = 0;
 
@@ -397,14 +397,14 @@ WRITE8_MEMBER( newbrain_state::cop_g_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        G0      _COPINT
-        G1      _TM1
-        G2      not connected
-        G3      _TM2
+	    G0      _COPINT
+	    G1      _TM1
+	    G2      not connected
+	    G3      _TM2
 
-    */
+	*/
 
 	m_copint = BIT(data, 0);
 	check_interrupt();
@@ -419,14 +419,14 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        G0      not connected
-        G1      K9
-        G2      K7
-        G3      K3
+	    G0      not connected
+	    G1      K9
+	    G2      K7
+	    G3      K3
 
-    */
+	*/
 
 	return (BIT(m_keydata, 3) << 3) | (BIT(m_keydata, 0) << 2) | (BIT(m_keydata, 1) << 1);
 }
@@ -434,14 +434,14 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 WRITE8_MEMBER( newbrain_state::cop_d_w )
 {
 	/*
-        bit     description
+	    bit     description
 
-        D0      inverted to K4 -> CD4024 pin 2 (reset)
-        D1      TDO
-        D2      inverted to K6 -> CD4024 pin 1 (clock), CD4076 pin 7 (clock), inverted to DS8881 pin 3 (enable)
-        D3      not connected
+	    D0      inverted to K4 -> CD4024 pin 2 (reset)
+	    D1      TDO
+	    D2      inverted to K6 -> CD4024 pin 1 (clock), CD4076 pin 7 (clock), inverted to DS8881 pin 3 (enable)
+	    D3      not connected
 
-    */
+	*/
 
 	static const char *const keynames[] = {
 		"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7",
@@ -483,14 +483,14 @@ READ8_MEMBER( newbrain_state::cop_in_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        IN0     K8
-        IN1     _RD
-        IN2     _COP
-        IN3     _WR
+	    IN0     K8
+	    IN1     _RD
+	    IN2     _COP
+	    IN3     _WR
 
-    */
+	*/
 
 	return (m_cop_wr << 3) | (m_cop_access << 2) | (m_cop_rd << 1) | BIT(m_keydata, 2);
 }
@@ -548,18 +548,18 @@ WRITE8_MEMBER( newbrain_state::tvctl_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       RV          1 reverses video over entire field, ie. black on white
-        1       FS          0 generates 128 characters and 128 reverse field characters from 8 bit character code. 1 generates 256 characters from 8 bit character code
-        2       32/_40      0 generates 320 or 640 horizontal dots in pixel graphics mode. 1 generates 256 or 512 horizontal dots in pixel graphics mode
-        3       UCR         0 selects 256 characters expressed in an 8x10 matrix, and 25 lines (max) displayed. 1 selects 256 characters in an 8x8 matrix, and 31 lines (max) displayed
-        4
-        5
-        6       80L         0 selects 40 character line length. 1 selects 80 character line length
-        7
+	    0       RV          1 reverses video over entire field, ie. black on white
+	    1       FS          0 generates 128 characters and 128 reverse field characters from 8 bit character code. 1 generates 256 characters from 8 bit character code
+	    2       32/_40      0 generates 320 or 640 horizontal dots in pixel graphics mode. 1 generates 256 or 512 horizontal dots in pixel graphics mode
+	    3       UCR         0 selects 256 characters expressed in an 8x10 matrix, and 25 lines (max) displayed. 1 selects 256 characters in an 8x8 matrix, and 31 lines (max) displayed
+	    4
+	    5
+	    6       80L         0 selects 40 character line length. 1 selects 80 character line length
+	    7
 
-    */
+	*/
 
 	m_tvctl = data;
 }
@@ -570,18 +570,18 @@ WRITE8_MEMBER( newbrain_eim_state::fdc_auxiliary_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       MOTON
-        1       765 RESET
-        2       TC
-        3
-        4
-        5       PA15
-        6
-        7
+	    0       MOTON
+	    1       765 RESET
+	    2       TC
+	    3
+	    4
+	    5       PA15
+	    6
+	    7
 
-    */
+	*/
 
 	m_floppy->mon_w(!BIT(data, 0));
 
@@ -595,18 +595,18 @@ READ8_MEMBER( newbrain_eim_state::fdc_control_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5       FDC INT
-        6       PAGING
-        7       FDC ATT
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5       FDC INT
+	    6       PAGING
+	    7       FDC ATT
 
-    */
+	*/
 
 	return (m_fdc_att << 7) | (m_paging << 6) | (m_fdc_int << 5);
 }
@@ -615,39 +615,39 @@ READ8_MEMBER( newbrain_eim_state::ust2_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       RDDK (V24 RxD)
-        1       _CTSD (V24 Clear to Send)
-        2
-        3
-        4
-        5       TPIN
-        6
-        7       _CTSP (Printer Clear to Send)
+	    0       RDDK (V24 RxD)
+	    1       _CTSD (V24 Clear to Send)
+	    2
+	    3
+	    4
+	    5       TPIN
+	    6
+	    7       _CTSP (Printer Clear to Send)
 
-    */
+	*/
 
 	return 0;
 }
 
-#define NEWBRAIN_COPCMD_NULLCOM		0xd0
-#define NEWBRAIN_COPCMD_DISPCOM		0xa0
+#define NEWBRAIN_COPCMD_NULLCOM     0xd0
+#define NEWBRAIN_COPCMD_DISPCOM     0xa0
 //#define NEWBRAIN_COPCMD_TIMCOM        0x
-#define NEWBRAIN_COPCMD_PDNCOM		0xb8
-#define NEWBRAIN_COPCMD_TAPECOM		0x80
+#define NEWBRAIN_COPCMD_PDNCOM      0xb8
+#define NEWBRAIN_COPCMD_TAPECOM     0x80
 
-#define NEWBRAIN_COP_TAPE_RECORD	0x00
-#define NEWBRAIN_COP_TAPE_PLAYBK	0x04
-#define NEWBRAIN_COP_TAPE_MOTOR1	0x08
-#define NEWBRAIN_COP_TAPE_MOTOR2	0x02
+#define NEWBRAIN_COP_TAPE_RECORD    0x00
+#define NEWBRAIN_COP_TAPE_PLAYBK    0x04
+#define NEWBRAIN_COP_TAPE_MOTOR1    0x08
+#define NEWBRAIN_COP_TAPE_MOTOR2    0x02
 
-#define NEWBRAIN_COP_TIMER0			0x01
+#define NEWBRAIN_COP_TIMER0         0x01
 
-#define NEWBRAIN_COP_NO_DATA		0x01
-#define NEWBRAIN_COP_BREAK_PRESSED	0x02
+#define NEWBRAIN_COP_NO_DATA        0x01
+#define NEWBRAIN_COP_BREAK_PRESSED  0x02
 
-#define NEWBRAIN_COP_REGINT			0x00
+#define NEWBRAIN_COP_REGINT         0x00
 /*#define NEWBRAIN_COP_CASSERR      0x
 #define NEWBRAIN_COP_CASSIN         0x
 #define NEWBRAIN_COP_KBD            0x
@@ -747,18 +747,18 @@ WRITE8_MEMBER( newbrain_eim_state::enrg2_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       _USERP      0 enables user data bus interrupt and also parallel latched data output (or centronics printer) interrupt
-        1       ANP         1 enables ADC conversion complete interrupt and also calling indicator interrupt
-        2       MLTMD       1 enables serial receive clock into multiplier input of DAC and signals data terminal not ready
-        3       MSPD        1 enables 50K Baud serial data rate to be obtained ie. CTC input clock of 800 kHz. 0 selects xxx.692 kHz
-        4       ENOR        1 enables serial receive clock to sound output summer, and also selects serial input from the printer port. 0 selects serial input from the comms port
-        5       ANSW        1 enables second bank of 4 analogue inputs (voltage, non-ratiometric), ie. ch4-7, and enabled sound output, 0 selects ch03
-        6       ENOT        1 enables serial transmit clock to sound ouput summer, and also selects serial output to the printer port. 0 selects serial output to the comms port
-        7                   9th output bit for centronics printer port
+	    0       _USERP      0 enables user data bus interrupt and also parallel latched data output (or centronics printer) interrupt
+	    1       ANP         1 enables ADC conversion complete interrupt and also calling indicator interrupt
+	    2       MLTMD       1 enables serial receive clock into multiplier input of DAC and signals data terminal not ready
+	    3       MSPD        1 enables 50K Baud serial data rate to be obtained ie. CTC input clock of 800 kHz. 0 selects xxx.692 kHz
+	    4       ENOR        1 enables serial receive clock to sound output summer, and also selects serial input from the printer port. 0 selects serial input from the comms port
+	    5       ANSW        1 enables second bank of 4 analogue inputs (voltage, non-ratiometric), ie. ch4-7, and enabled sound output, 0 selects ch03
+	    6       ENOT        1 enables serial transmit clock to sound ouput summer, and also selects serial output to the printer port. 0 selects serial output to the comms port
+	    7                   9th output bit for centronics printer port
 
-    */
+	*/
 
 	m_enrg2 = data;
 }
@@ -767,21 +767,21 @@ WRITE8_MEMBER( newbrain_eim_state::pr_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       HP0
-        1       HP1
-        2       HP2
-        3       HP3
-        4       HP4
-        5       HP5
-        6       HP6
-        7       HP11
+	    0       HP0
+	    1       HP1
+	    2       HP2
+	    3       HP3
+	    4       HP4
+	    5       HP5
+	    6       HP6
+	    7       HP11
 
-        HP0-HP2 are decoded to _ROM0..._ROM7 signals
-        HP3-HP4 are decoded to _CH0..._CH3 signals
+	    HP0-HP2 are decoded to _ROM0..._ROM7 signals
+	    HP3-HP4 are decoded to _CH0..._CH3 signals
 
-    */
+	*/
 
 	int page = (BIT(offset, 12) >> 9) | (BIT(offset, 15) >> 13) | (BIT(offset, 14) >> 13) | (BIT(offset, 13) >> 13);
 	int bank = (BIT(offset, 11) >> 3) | (data & 0x7f);
@@ -828,18 +828,18 @@ READ8_MEMBER( newbrain_eim_state::st0_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   fixed at 1 - indicates excess of 24 or 48, obsolete
-        1       PWRUP       1 indicates power up from 'cold' - necessary in battery machines with power switching
-        2                   1 indicates analogue or calling indicator interrupts
-        3       _USRINT0    0 indicates centronics printer (latched output data) port interrupt
-        4       _USRINT     0 indicates parallel data bus port interrupt
-        5       _CLKINT     0 indicates frame frequency clock interrupt
-        6       _ACINT      0 indicates ACIA interrupt
-        7       _COPINT     0 indicates interrupt from micro-controller COP420M
+	    0                   fixed at 1 - indicates excess of 24 or 48, obsolete
+	    1       PWRUP       1 indicates power up from 'cold' - necessary in battery machines with power switching
+	    2                   1 indicates analogue or calling indicator interrupts
+	    3       _USRINT0    0 indicates centronics printer (latched output data) port interrupt
+	    4       _USRINT     0 indicates parallel data bus port interrupt
+	    5       _CLKINT     0 indicates frame frequency clock interrupt
+	    6       _ACINT      0 indicates ACIA interrupt
+	    7       _COPINT     0 indicates interrupt from micro-controller COP420M
 
-    */
+	*/
 
 	return (m_copint << 7) | (m_aciaint << 6) | (m_clkint << 5) | (m_userint << 4) | (m_userint0 << 3) | (m_pwrup) << 1 | 0x01;
 }
@@ -848,18 +848,18 @@ READ8_MEMBER( newbrain_eim_state::st1_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0
-        1
-        2       N/_RV       1 selects normal video on power up (white on black), 0 selects reversed video (appears as D0 on the first 200 EI's)
-        3       ANCH        1 indicates power is being taken from the mains supply
-        4       40/_80      1 indicates that 40 column video is selected on power up. 0 selects 80 column video
-        5
-        6       TVCNSL      1 indicates that a video display is required on power up
-        7
+	    0
+	    1
+	    2       N/_RV       1 selects normal video on power up (white on black), 0 selects reversed video (appears as D0 on the first 200 EI's)
+	    3       ANCH        1 indicates power is being taken from the mains supply
+	    4       40/_80      1 indicates that 40 column video is selected on power up. 0 selects 80 column video
+	    5
+	    6       TVCNSL      1 indicates that a video display is required on power up
+	    7
 
-    */
+	*/
 
 	return (m_tvcnsl << 6) | 0x10 | 0x08 | 0x04;
 }
@@ -868,18 +868,18 @@ READ8_MEMBER( newbrain_eim_state::st2_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   received serial data from communications port
-        1                   0 indicates 'clear-to-send' condition at communications port
-        2
-        3
-        4
-        5                   logic level tape input
-        6
-        7                   0 indicates 'clear-to-send' condition at printer port
+	    0                   received serial data from communications port
+	    1                   0 indicates 'clear-to-send' condition at communications port
+	    2
+	    3
+	    4
+	    5                   logic level tape input
+	    6
+	    7                   0 indicates 'clear-to-send' condition at printer port
 
-    */
+	*/
 
 	return 0;
 }
@@ -901,18 +901,18 @@ WRITE8_MEMBER( newbrain_eim_state::paging_w )
 
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       PG          1 enables paging circuits
-            1       WPL         unused
-            2       A16         1 sets local A16 to 1 (ie. causes second set of 8 page registers to select addressed memory)
-            3       _MPM        0 selects multi-processing mode. among other effects this extends the page registers from 8 to 12 bits in length
-            4       HISLT       1 isolates the local machine. this is used in multi-processing mode
-            5
-            6
-            7
+		    0       PG          1 enables paging circuits
+		    1       WPL         unused
+		    2       A16         1 sets local A16 to 1 (ie. causes second set of 8 page registers to select addressed memory)
+		    3       _MPM        0 selects multi-processing mode. among other effects this extends the page registers from 8 to 12 bits in length
+		    4       HISLT       1 isolates the local machine. this is used in multi-processing mode
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		m_paging = BIT(data, 0);
 		m_a16 = BIT(data, 2);
@@ -924,18 +924,18 @@ WRITE8_MEMBER( newbrain_eim_state::paging_w )
 
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       PAGING      1 enables paging circuits
-            1
-            2       HA16        1 sets local A16 to 1 (ie. causes second set of 8 page registers to select addressed memory)
-            3       MPM         0 selects multi-processing mode. among other effects this extends the page registers from 8 to 12 bits in length
-            4
-            5       _FDC RESET
-            6
-            7       FDC ATT
+		    0       PAGING      1 enables paging circuits
+		    1
+		    2       HA16        1 sets local A16 to 1 (ie. causes second set of 8 page registers to select addressed memory)
+		    3       MPM         0 selects multi-processing mode. among other effects this extends the page registers from 8 to 12 bits in length
+		    4
+		    5       _FDC RESET
+		    6
+		    7       FDC ATT
 
-        */
+		*/
 
 		m_fdccpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5) ? HOLD_LINE : CLEAR_LINE);
 
@@ -978,7 +978,7 @@ static ADC0808_INTERFACE( adc_intf )
 	newbrain_adc_vref_pos_r,
 	newbrain_adc_vref_neg_r,
 	{ newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r,
-	  newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r }
+		newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r, newbrain_adc_input_r }
 };
 
 /* Memory Maps */
@@ -1209,10 +1209,10 @@ WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( newbrain_ctc_intf )
 {
-	DEVCB_NULL,				/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z1_w),	/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z2_w)	/* ZC/TO2 callback */
+	DEVCB_NULL,             /* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z0_w), /* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z1_w), /* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z2_w)  /* ZC/TO2 callback */
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(newbrain_eim_state::ctc_c2_tick)
@@ -1347,15 +1347,15 @@ static const cassette_interface newbrain_cassette_interface =
 /* F4 Character Displayer */
 static const gfx_layout newbrain_charlayout =
 {
-	8, 10,					/* 8 x 10 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 10,                  /* 8 x 10 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*256*8, 1*256*8, 2*256*8, 3*256*8, 4*256*8, 5*256*8, 6*256*8, 7*256*8, 8*256*8, 9*256*8, 10*256*8, 11*256*8, 12*256*8, 13*256*8, 14*256*8, 15*256*8 },
-	8					/* every char takes 16 x 1 bytes */
+	8                   /* every char takes 16 x 1 bytes */
 };
 
 static GFXDECODE_START( newbrain )
@@ -1434,13 +1434,13 @@ ROM_START( newbrain )
 
 	ROM_SYSTEM_BIOS( 2, "issue3", "Issue 3 (v1.91)" )
 	ROMX_LOAD( "aben191.ic6",  0xa000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(3) )
-	ROMX_LOAD( "cdi3.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
+	ROMX_LOAD( "cdi3.ic7",     0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
 	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 3, "series2", "Series 2 (v?)" )
-	ROMX_LOAD( "abs2.ic6",	   0xa000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(4) )
-	ROMX_LOAD( "cds2.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
-	ROMX_LOAD( "efs2.ic8",	   0xe000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(4) )
+	ROMX_LOAD( "abs2.ic6",     0xa000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(4) )
+	ROMX_LOAD( "cds2.ic7",     0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
+	ROMX_LOAD( "efs2.ic8",     0xe000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 4, "rom20", "? (v2.0)" )
 	ROMX_LOAD( "aben20.rom",   0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(5) )
@@ -1471,13 +1471,13 @@ ROM_START( newbraineim )
 
 	ROM_SYSTEM_BIOS( 2, "issue3", "Issue 3 (v1.91)" )
 	ROMX_LOAD( "aben191.ic6",  0xa000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(3) )
-	ROMX_LOAD( "cdi3.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
+	ROMX_LOAD( "cdi3.ic7",     0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
 	ROMX_LOAD( "ef iss 1.ic8", 0xe000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 3, "series2", "Series 2 (v?)" )
-	ROMX_LOAD( "abs2.ic6",	   0xa000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(4) )
-	ROMX_LOAD( "cds2.ic7",	   0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
-	ROMX_LOAD( "efs2.ic8",	   0xe000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(4) )
+	ROMX_LOAD( "abs2.ic6",     0xa000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(4) )
+	ROMX_LOAD( "cds2.ic7",     0xc000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
+	ROMX_LOAD( "efs2.ic8",     0xe000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 4, "rom20", "? (v2.0)" )
 	ROMX_LOAD( "aben20.rom",   0xa000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(5) )
@@ -1516,7 +1516,7 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,	0,          0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, newbraineim,newbrain,   0,      newbrain_eim,   newbrain, driver_device,   0,      "Grundy Business Systems Ltd",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraina,	newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, newbrainmd,	newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbrain,   0,          0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, newbraineim,newbrain,   0,      newbrain_eim,   newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD with Expansion Interface", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain A",   GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, newbrainmd, newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain MD",  GAME_NOT_WORKING | GAME_NO_SOUND )

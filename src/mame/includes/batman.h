@@ -12,9 +12,9 @@ public:
 	batman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag) { }
 
-	UINT16			m_latch_data;
+	UINT16          m_latch_data;
 
-	UINT8			m_alpha_tile_bank;
+	UINT8           m_alpha_tile_bank;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ16_MEMBER(batman_atarivc_r);

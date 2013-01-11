@@ -81,7 +81,7 @@ const device_type ISA8_MPU401 = &device_creator<isa8_mpu401_device>;
 //-------------------------------------------------
 
 isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, ISA8_MPU401, "Roland MPU-401 Sound Card", tag, owner, clock),
+		: device_t(mconfig, ISA8_MPU401, "Roland MPU-401 Sound Card", tag, owner, clock),
 		device_isa8_card_interface( mconfig, *this )
 {
 }

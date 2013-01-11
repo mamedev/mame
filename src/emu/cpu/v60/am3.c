@@ -814,19 +814,19 @@ static UINT32 (*const AMTable3_G7[32])(v60_state *) =
 	am3PCDisplacement8,
 	am3PCDisplacement16,
 	am3PCDisplacement32,
-  am3DirectAddress,
+	am3DirectAddress,
 	am3Immediate,
 	am3Error2,
 	am3Error2,
 	am3Error2,
-  am3PCDisplacementIndirect8,
-  am3PCDisplacementIndirect16,
-  am3PCDisplacementIndirect32,
+	am3PCDisplacementIndirect8,
+	am3PCDisplacementIndirect16,
+	am3PCDisplacementIndirect32,
 	am3DirectAddressDeferred,
 	am3PCDoubleDisplacement8,
 	am3PCDoubleDisplacement16,
 	am3PCDoubleDisplacement32,
-  am3Error2
+	am3Error2
 };
 
 static UINT32 (*const AMTable3_G6[8])(v60_state *) =
@@ -882,6 +882,3 @@ static UINT32 (*const AMTable3[2][8])(v60_state *) =
 		am3Error1
 	}
 };
-
-
-

@@ -38,7 +38,7 @@
 #include "mecmouse.h"
 
 joyport_device::joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:	device_t(mconfig, JOYPORT, "Joystick port", tag, owner, clock),
+	:   device_t(mconfig, JOYPORT, "Joystick port", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -101,4 +101,3 @@ SLOT_INTERFACE_START( joystick_port_994 )
 SLOT_INTERFACE_END
 
 const device_type JOYPORT = &device_creator<joyport_device>;
-

@@ -55,7 +55,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 
-#define DUNHUANG_DEBUG	0
+#define DUNHUANG_DEBUG  0
 
 
 class dunhuang_state : public driver_device
@@ -66,18 +66,18 @@ public:
 
 	/* video-related */
 	tilemap_t         *m_tmap;
-	tilemap_t		*m_tmap2;
+	tilemap_t       *m_tmap2;
 	int             m_written;
-	int				m_written2;
+	int             m_written2;
 	UINT8           m_pos_x;
-	UINT8			m_pos_y;
-	UINT8			m_clear_y;
+	UINT8           m_pos_y;
+	UINT8           m_clear_y;
 	UINT8           m_block_x;
-	UINT8			m_block_y;
-	UINT8			m_block_w;
-	UINT8			m_block_h;
+	UINT8           m_block_y;
+	UINT8           m_block_w;
+	UINT8           m_block_h;
 	UINT8           m_block_addr_hi;
-	UINT8			m_block_addr_lo;
+	UINT8           m_block_addr_lo;
 	UINT8           m_block_dest;
 	UINT8           m_block_c;
 	UINT8           m_layers;
@@ -90,7 +90,7 @@ public:
 	/* memory */
 	UINT16         m_videoram[0x40 * 0x20];
 	UINT16         m_videoram2[0x40 * 0x8];
-	UINT8	       m_colorram[0x40 * 0x20];
+	UINT8          m_colorram[0x40 * 0x20];
 	UINT8          m_colorram2[0x40 * 0x8];
 	UINT8          m_paldata[3 * 256];
 	DECLARE_WRITE8_MEMBER(dunhuang_pos_x_w);
@@ -167,8 +167,8 @@ UINT32 dunhuang_state::screen_update_dunhuang(screen_device &screen, bitmap_ind1
 if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -177,17 +177,17 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	switch (m_layers)
 	{
-		case 0x04:	// girl select: bg over fg
-			if (layers_ctrl & 2)	m_tmap2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, 0, 0);
+		case 0x04:  // girl select: bg over fg
+			if (layers_ctrl & 2)    m_tmap2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, 0, 0);
 			break;
-		case 0x05:	// dips: must hide fg
-			if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		case 0x05:  // dips: must hide fg
+			if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			break;
-		case 0x07:	// game,demo: fg over bg
+		case 0x07:  // game,demo: fg over bg
 		default:
-			if (layers_ctrl & 1)	m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 2)	m_tmap2->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    m_tmap2->draw(bitmap, cliprect, 0, 0);
 			break;
 	}
 
@@ -229,9 +229,9 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_tile_w)
 	addr = (m_pos_x & 0x3f) + (m_pos_y & 0x1f) * 0x40;
 	switch (offset)
 	{
-		case 0:	m_videoram[addr] = (m_videoram[addr] & 0xff00) | data;		break;
-		case 1:	m_videoram[addr] = (m_videoram[addr] & 0x00ff) | (data<<8);	break;
-		case 2:	m_colorram[addr] = data;												break;
+		case 0: m_videoram[addr] = (m_videoram[addr] & 0xff00) | data;      break;
+		case 1: m_videoram[addr] = (m_videoram[addr] & 0x00ff) | (data<<8); break;
+		case 2: m_colorram[addr] = data;                                                break;
 	}
 	m_tmap->mark_tile_dirty(addr);
 }
@@ -255,9 +255,9 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_tile2_w)
 	addr = (m_pos_x & 0x3f) + (m_pos_y & 0x07) * 0x40;
 	switch (offset)
 	{
-		case 0:	m_videoram2[addr] = (m_videoram2[addr] & 0xff00) | data;		break;
-		case 1:	m_videoram2[addr] = (m_videoram2[addr] & 0x00ff) | (data<<8);	break;
-		case 2:	m_colorram2[addr] = data;											break;
+		case 0: m_videoram2[addr] = (m_videoram2[addr] & 0xff00) | data;        break;
+		case 1: m_videoram2[addr] = (m_videoram2[addr] & 0x00ff) | (data<<8);   break;
+		case 2: m_colorram2[addr] = data;                                           break;
 	}
 	m_tmap2->mark_tile_dirty(addr);
 }
@@ -353,7 +353,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 
 	switch (m_block_dest)
 	{
-		case 0x04:	// write to videoram
+		case 0x04:  // write to videoram
 			for (j = 0; j <= m_block_h; j++)
 			{
 				for (i = 0; i <= m_block_w; i++)
@@ -368,7 +368,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 			}
 			break;
 
-		case 0x08:	// write to videoram2
+		case 0x08:  // write to videoram2
 			for (j = 0; j <= m_block_h; j++)
 			{
 				for (i = 0; i <= m_block_w; i++)
@@ -436,28 +436,28 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_input_w)
 READ8_MEMBER(dunhuang_state::dunhuang_service_r)
 {
 	return ioport("SERVICE")->read()
-	 | ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
-	 | 0x80																// bit 7 low -> tiles block transferrer busy
+		| ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0x00 : 0x08)    // bit 3: hopper sensor
+		| 0x80                                                              // bit 7 low -> tiles block transferrer busy
 	;
 }
 
 READ8_MEMBER(dunhuang_state::dunhuang_dsw_r)
 {
-	if (!(m_input & 0x01))	return ioport("DSW1")->read();
-	if (!(m_input & 0x02))	return ioport("DSW2")->read();
-	if (!(m_input & 0x04))	return ioport("DSW3")->read();
-	if (!(m_input & 0x08))	return ioport("DSW4")->read();
-	if (!(m_input & 0x10))	return ioport("DSW5")->read();
+	if (!(m_input & 0x01))  return ioport("DSW1")->read();
+	if (!(m_input & 0x02))  return ioport("DSW2")->read();
+	if (!(m_input & 0x04))  return ioport("DSW3")->read();
+	if (!(m_input & 0x08))  return ioport("DSW4")->read();
+	if (!(m_input & 0x10))  return ioport("DSW5")->read();
 	logerror("%s: warning, unknown dsw bits read, input = %02x\n", machine().describe_context(), m_input);
 	return 0xff;
 }
 READ8_MEMBER(dunhuang_state::dunhuang_input_r)
 {
-	if (!(m_input & 0x01))	return ioport("IN0")->read();
-	if (!(m_input & 0x02))	return ioport("IN1")->read();
-	if (!(m_input & 0x04))	return ioport("IN2")->read();
-	if (!(m_input & 0x08))	return ioport("IN3")->read();
-	if (!(m_input & 0x10))	return ioport("IN4")->read();
+	if (!(m_input & 0x01))  return ioport("IN0")->read();
+	if (!(m_input & 0x02))  return ioport("IN1")->read();
+	if (!(m_input & 0x04))  return ioport("IN2")->read();
+	if (!(m_input & 0x08))  return ioport("IN3")->read();
+	if (!(m_input & 0x10))  return ioport("IN4")->read();
 	logerror("%s: warning, unknown input bits read, input = %02x\n", machine().describe_context(), m_input);
 	return 0xff;
 }
@@ -471,7 +471,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 	membank("bank1")->set_entry(((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
-	coin_counter_w(machine(), 0,	data & 0x40);
+	coin_counter_w(machine(), 0,    data & 0x40);
 	m_hopper = data & 0x80;
 }
 
@@ -507,8 +507,8 @@ static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 
 	AM_RANGE( 0x001b, 0x001b ) AM_WRITE(dunhuang_block_dest_w )
 
-	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w	)
-	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w		)
+	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w   )
+	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w       )
 
 //  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE(dunhuang_82_w )
 
@@ -533,8 +533,8 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( dunhuang )
-	PORT_START("DSW1")		/* IN0 - DSW1 */
-	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Chance (%)" )	PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_START("DSW1")      /* IN0 - DSW1 */
+	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Chance (%)" )  PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "78" )
 	PORT_DIPSETTING(    0x01, "80" )
 	PORT_DIPSETTING(    0x02, "81" )
@@ -551,63 +551,63 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x0d, "96" )
 	PORT_DIPSETTING(    0x0e, "97" )
 	PORT_DIPSETTING(    0x0f, "98" )
-	PORT_DIPNAME( 0x30, 0x30, "Main Game Rate" )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Main Game Rate" )        PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "A" )
 	PORT_DIPSETTING(    0x20, "B" )
 	PORT_DIPSETTING(    0x10, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
-	PORT_DIPNAME( 0x40, 0x40, "Input Tokens" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Input Tokens" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "Keys" )
 	PORT_DIPSETTING(    0x00, "Coins" )
-	PORT_DIPNAME( 0x80, 0x80, "Output Tokens" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Output Tokens" )         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Keys" )
 	PORT_DIPSETTING(    0x00, "Payout" )
 
-	PORT_START("DSW2")		/* IN1 - DSW2 */
+	PORT_START("DSW2")      /* IN1 - DSW2 */
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
-	PORT_DIPNAME( 0x06, 0x06, "Credits Per Coin" )		PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPNAME( 0x06, 0x06, "Credits Per Coin" )      PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(    0x06, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x18, 0x18, "Credits Per Key-In" )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Credits Per Key-In" )    PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x20, 0x20, "Credits Per Key-Out" )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Credits Per Key-Out" )   PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Credits" )			PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Credits" )           PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x00, "300" )
 	PORT_DIPSETTING(    0x40, "500" )
 	PORT_DIPSETTING(    0x80, "1000" )
 	PORT_DIPSETTING(    0xc0, "3000" )
 
-	PORT_START("DSW3")		/* IN2 - DSW3 */
-	PORT_DIPNAME( 0x03, 0x03, "Min Bet" )				PORT_DIPLOCATION("SW3:1,2")
+	PORT_START("DSW3")      /* IN2 - DSW3 */
+	PORT_DIPNAME( 0x03, 0x03, "Min Bet" )               PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )				PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )               PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x30, 0x30, "Renso Bonus Time" )		PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Renso Bonus Time" )      PORT_DIPLOCATION("SW3:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0xc0, 0xc0, "DonDen Times" )			PORT_DIPLOCATION("SW3:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "DonDen Times" )          PORT_DIPLOCATION("SW3:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0xc0, "6" )
 
-	PORT_START("DSW4")		/* IN3 - DSW4 */
-	PORT_DIPNAME( 0x07, 0x07, "Credits Limit" )			PORT_DIPLOCATION("SW4:1,2,3")
+	PORT_START("DSW4")      /* IN3 - DSW4 */
+	PORT_DIPNAME( 0x07, 0x07, "Credits Limit" )         PORT_DIPLOCATION("SW4:1,2,3")
 	PORT_DIPSETTING(    0x07, "2k" )
 	PORT_DIPSETTING(    0x06, "3k" )
 	PORT_DIPSETTING(    0x05, "5k" )
@@ -616,7 +616,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x02, "30k" )
 	PORT_DIPSETTING(    0x01, "50k" )
 	PORT_DIPSETTING(    0x00, "100k" )
-	PORT_DIPNAME( 0x38, 0x38, "Service-In Limit" )		PORT_DIPLOCATION("SW4:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, "Service-In Limit" )      PORT_DIPLOCATION("SW4:4,5,6")
 	PORT_DIPSETTING(    0x00, "20k" )
 	PORT_DIPSETTING(    0x08, "30k" )
 	PORT_DIPSETTING(    0x10, "40k" )
@@ -625,89 +625,89 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x28, "100k" )
 	PORT_DIPSETTING(    0x30, "200k" )
 	PORT_DIPSETTING(    0x38, "990k" )
-	PORT_DIPNAME( 0x40, 0x40, "Hu Type" )				PORT_DIPLOCATION("SW4:7")
+	PORT_DIPNAME( 0x40, 0x40, "Hu Type" )               PORT_DIPLOCATION("SW4:7")
 	PORT_DIPSETTING(    0x40, "Topple" )
 	PORT_DIPSETTING(    0x00, "Non-Topple" )
-	PORT_DIPNAME( 0x80, 0x80, "Double Up" )				PORT_DIPLOCATION("SW4:8")
+	PORT_DIPNAME( 0x80, 0x80, "Double Up" )             PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START("DSW5")		/* IN4 - DSW5 */
-	PORT_DIPNAME( 0x03, 0x03, "Douple Up Chance (%)" )	PORT_DIPLOCATION("SW5:1,2")
+	PORT_START("DSW5")      /* IN4 - DSW5 */
+	PORT_DIPNAME( 0x03, 0x03, "Douple Up Chance (%)" )  PORT_DIPLOCATION("SW5:1,2")
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "60" )
 	PORT_DIPSETTING(    0x02, "70" )
 	PORT_DIPSETTING(    0x03, "80" )
-	PORT_DIPNAME( 0x04, 0x04, "Chinese Word" )			PORT_DIPLOCATION("SW5:3")
+	PORT_DIPNAME( 0x04, 0x04, "Chinese Word" )          PORT_DIPLOCATION("SW5:3")
 	PORT_DIPSETTING(    0x04, "3..6" )
 	PORT_DIPSETTING(    0x00, "5..10" )
-	PORT_DIPNAME( 0x08, 0x08, "Big Odds Times" )		PORT_DIPLOCATION("SW5:4")
+	PORT_DIPNAME( 0x08, 0x08, "Big Odds Times" )        PORT_DIPLOCATION("SW5:4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPNAME( 0x30, 0x30, "Hu Test Times" )			PORT_DIPLOCATION("SW5:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Hu Test Times" )         PORT_DIPLOCATION("SW5:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x10, "6" )
 	PORT_DIPSETTING(    0x20, "8" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW5:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW5:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Computer Strength" )		PORT_DIPLOCATION("SW5:8")
+	PORT_DIPNAME( 0x80, 0x80, "Computer Strength" )     PORT_DIPLOCATION("SW5:8")
 	PORT_DIPSETTING(    0x80, "Strong" )
 	PORT_DIPSETTING(    0x00, "Weak" )
 
-	PORT_START("SERVICE")		/* IN5 - SERVICE */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE3 )		// clear (during boot)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )		// book
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  )		// test (in game: dips, during boot: service mode)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL  )		// hopper sensor
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE4 )		// payout
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(2)	// "coin jam" otherwise
+	PORT_START("SERVICE")       /* IN5 - SERVICE */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE3 )      // clear (during boot)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )      // book
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  )      // test (in game: dips, during boot: service mode)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL  )      // hopper sensor
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE4 )      // payout
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(2) // "coin jam" otherwise
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )		// 0 = tiles block transferrer busy
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )       // 0 = tiles block transferrer busy
 
-	PORT_START("IN0")		/* IN6 - P1 */
+	PORT_START("IN0")       /* IN6 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )	// gun
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )    // gun
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")		/* IN7 - P1 */
+	PORT_START("IN1")       /* IN7 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )	// tin
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )  // tin
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")		/* IN8 - P1 */
+	PORT_START("IN2")       /* IN8 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )	// eat
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )	// hu
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )    // eat
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )    // hu
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")		/* IN9 - P1 */
+	PORT_START("IN3")       /* IN9 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )	// pon
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )    // pon
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")		/* IN10 - P1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)
+	PORT_START("IN4")       /* IN10 - P1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -759,8 +759,8 @@ static const ay8910_interface dunhuang_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	//  A                   B
-	DEVCB_NULL,							DEVCB_DRIVER_MEMBER(dunhuang_state,dunhuang_dsw_r),	// R
-	DEVCB_DRIVER_MEMBER(dunhuang_state, dunhuang_input_w),	DEVCB_NULL						// W
+	DEVCB_NULL,                         DEVCB_DRIVER_MEMBER(dunhuang_state,dunhuang_dsw_r), // R
+	DEVCB_DRIVER_MEMBER(dunhuang_state, dunhuang_input_w),  DEVCB_NULL                      // W
 };
 
 
@@ -864,7 +864,7 @@ ROM_START( dunhuang )
 	ROM_LOAD( "rom3.u4", 0x00000, 0x80000, CRC(1ff5d35e) SHA1(b808eb4f81be8fc77a58dadd661a9cc2b376a509) )
 	ROM_LOAD( "rom2.u5", 0x80000, 0x40000, CRC(384fa1d3) SHA1(f329db17aacacf1768ebd6ca2cc612503db93fac) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )	// do not dispose
+	ROM_REGION( 0xc0000, "gfx2", 0 )    // do not dispose
 	ROM_LOAD( "rom4.u3", 0x00000, 0x40000, CRC(7db45227) SHA1(2a12a2b8a1e58946ce3e7c770b3ca4803c3c3ccd) )
 	ROM_LOAD( "rom5.u2", 0x40000, 0x80000, CRC(d609880e) SHA1(3d69800e959e8f24ef950fea4312610c4407f6ba) )
 

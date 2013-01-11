@@ -204,7 +204,7 @@ DIP locations verified from manuals for:
 #include "sound/2203intf.h"
 #include "includes/alpha68k.h"
 
-#define SBASEBAL_HACK	0
+#define SBASEBAL_HACK   0
 
 
 /******************************************************************************/
@@ -271,10 +271,10 @@ READ16_MEMBER(alpha68k_state::control_4_r)
 {
 	if (m_invert_controls)
 		return ~((((~(1 << ioport("IN6")->read())) << 4) & 0xf000)
-		 + (((~(1 << ioport("IN5")->read()))) & 0x0f00));
+			+ (((~(1 << ioport("IN5")->read()))) & 0x0f00));
 
 	return (((~(1 << ioport("IN6")->read())) << 4) & 0xf000)
-		 + (((~(1 << ioport("IN5")->read()))) & 0x0f00);
+			+ (((~(1 << ioport("IN5")->read()))) & 0x0f00);
 }
 
 READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
@@ -333,9 +333,9 @@ WRITE16_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 {
 	/* possible jump codes:
-         - Kyros          : 0x22
-         - Super Stingray : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
-    */
+	     - Kyros          : 0x22
+	     - Super Stingray : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
+	*/
 	static const UINT8 coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 	int source = m_shared_ram[offset];
@@ -351,7 +351,7 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 			m_latch = 0;
 		if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 		{
-			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
+			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);    // coinA
 			m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 			m_latch = 1;
 
@@ -367,7 +367,7 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 		}
 		else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 		{
-			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);	// coinB
+			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);  // coinB
 			m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 			m_latch = 1;
 
@@ -383,12 +383,12 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 		}
 		else
 		{
-			if (m_microcontroller_id == 0x00ff)		/* Super Stingry */
+			if (m_microcontroller_id == 0x00ff)     /* Super Stingry */
 			{
-				if (m_trigstate >= 12 || m_game_id == ALPHA68K_JONGBOU)	/* arbitrary value ! */
+				if (m_trigstate >= 12 || m_game_id == ALPHA68K_JONGBOU) /* arbitrary value ! */
 				{
 					m_trigstate = 0;
-					m_microcontroller_data = 0x21;			// timer
+					m_microcontroller_data = 0x21;          // timer
 				}
 				else
 					m_microcontroller_data = 0x00;
@@ -413,10 +413,10 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 {
 	/* possible jump codes:
-         - Time Soldiers : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
-         - Sky Soldiers  : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
-         - Gold Medalist : 0x21,0x23,0x24,0x5b
-    */
+	     - Time Soldiers : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
+	     - Sky Soldiers  : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
+	     - Gold Medalist : 0x21,0x23,0x24,0x5b
+	*/
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
 	int source = m_shared_ram[offset];
@@ -436,7 +436,7 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 				m_latch = 0;
 			if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
+				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);    // coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 				m_latch = 1;
 
@@ -459,7 +459,7 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 			}
 			else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);	// coinB
+				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);  // coinB
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 				m_latch = 1;
 
@@ -482,8 +482,8 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 			}
 			else
 			{
-				if (m_microcontroller_id == 0x8803)		/* Gold Medalist */
-					m_microcontroller_data = 0x21;				// timer
+				if (m_microcontroller_id == 0x8803)     /* Gold Medalist */
+					m_microcontroller_data = 0x21;              // timer
 				else
 					m_microcontroller_data = 0x00;
 				m_shared_ram[0x29] = (source & 0xff00) | m_microcontroller_data;
@@ -507,10 +507,10 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 {
 	/* possible jump codes:
-         - Sky Adventure           : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
-         - Gang Wars               : 0x21,0x23,0x24,0x54
-         - Super Champion Baseball : 0x21,0x23,0x24
-    */
+	     - Sky Adventure           : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
+	     - Gang Wars               : 0x21,0x23,0x24,0x54
+	     - Super Champion Baseball : 0x21,0x23,0x24
+	*/
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 	int source = m_shared_ram[offset];
@@ -528,7 +528,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 				m_latch = 0;
 			if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
+				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);    // coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 				m_latch = 1;
 
@@ -547,7 +547,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 			}
 			else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id>>8);	// coinB
+				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id>>8);    // coinB
 				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
 				m_latch = 1;
 
@@ -586,7 +586,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 				m_latch = 0;
 			if ((ioport("IN2")->read() & 0x1) == 0 && !m_latch)
 			{
-				m_shared_ram[0x1f29] = (source & 0xff00) | (m_coin_id & 0xff);	// coinA
+				m_shared_ram[0x1f29] = (source & 0xff00) | (m_coin_id & 0xff);  // coinA
 				m_shared_ram[0x1f22] = (source & 0xff00) | 0x0;
 				m_latch = 1;
 
@@ -605,7 +605,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 			}
 			else if ((ioport("IN2")->read() & 0x2) == 0 && !m_latch)
 			{
-				m_shared_ram[0x1f29] = (source & 0xff00) | (m_coin_id >> 8);	// coinB
+				m_shared_ram[0x1f29] = (source & 0xff00) | (m_coin_id >> 8);    // coinB
 				m_shared_ram[0x1f22] = (source & 0xff00) | 0x0;
 				m_latch = 1;
 
@@ -629,8 +629,8 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 			}
 
 			/* Gang Wars expects the first dip to appear in RAM at 0x02c6,
-               the microcontroller supplies it (it does for all the other games,
-               but usually to 0x0 in RAM) when 0x21 is read (code at 0x009332) */
+			   the microcontroller supplies it (it does for all the other games,
+			   but usually to 0x0 in RAM) when 0x21 is read (code at 0x009332) */
 			source = m_shared_ram[0x0163];
 			m_shared_ram[0x0163] = (source & 0x00ff) | (ioport("IN4")->read() << 8);
 
@@ -651,7 +651,7 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 /******************************************************************************/
 
 static ADDRESS_MAP_START( kyros_map, AS_PROGRAM, 16, alpha68k_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM						  // main program
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM                       // main program
 	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_SHARE("shared_ram")  // work RAM
 	AM_RANGE(0x040000, 0x041fff) AM_RAM AM_SHARE("spriteram") // sprite RAM
 	AM_RANGE(0x060000, 0x060001) AM_RAM AM_SHARE("videoram")  // MSB: watchdog, LSB: BGC
@@ -661,13 +661,13 @@ static ADDRESS_MAP_START( kyros_map, AS_PROGRAM, 16, alpha68k_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alpha68k_I_map, AS_PROGRAM, 16, alpha68k_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM							// main program
-	AM_RANGE(0x080000, 0x083fff) AM_RAM							// work RAM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")	// video RAM
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM                         // main program
+	AM_RANGE(0x080000, 0x083fff) AM_RAM                         // work RAM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")   // video RAM
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN3") AM_WRITENOP // LSB: DSW0, MSB: watchdog(?)
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("IN4")			// LSB: DSW1
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")			// joy1, joy2
-	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("IN1")			// coin, start, service
+	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("IN4")            // LSB: DSW1
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")            // joy1, joy2
+	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("IN1")            // coin, start, service
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN2") AM_WRITE(paddlema_soundlatch_w) // LSB: sound latch write and RST38 trigger, joy3, joy4
 ADDRESS_MAP_END
 
@@ -865,36 +865,36 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x8000, active, start )
 
 #define ALPHA68K_COINAGE_BITS_0TO2 \
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW2:4,5,6") \
-	PORT_DIPSETTING(    0x07, "A 1C/1C B 1C/1C" )	\
-	PORT_DIPSETTING(    0x06, "A 1C/2C B 2C/1C" )	\
-	PORT_DIPSETTING(    0x05, "A 1C/3C B 3C/1C" )	\
-	PORT_DIPSETTING(    0x04, "A 1C/4C B 4C/1C" )	\
-	PORT_DIPSETTING(    0x03, "A 1C/5C B 5C/1C" )	\
-	PORT_DIPSETTING(    0x02, "A 1C/6C B 6C/1C" )	\
-	PORT_DIPSETTING(    0x01, "A 2C/3C B 7C/1C" )	\
-	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )	\
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:4,5,6") \
+	PORT_DIPSETTING(    0x07, "A 1C/1C B 1C/1C" )   \
+	PORT_DIPSETTING(    0x06, "A 1C/2C B 2C/1C" )   \
+	PORT_DIPSETTING(    0x05, "A 1C/3C B 3C/1C" )   \
+	PORT_DIPSETTING(    0x04, "A 1C/4C B 4C/1C" )   \
+	PORT_DIPSETTING(    0x03, "A 1C/5C B 5C/1C" )   \
+	PORT_DIPSETTING(    0x02, "A 1C/6C B 6C/1C" )   \
+	PORT_DIPSETTING(    0x01, "A 2C/3C B 7C/1C" )   \
+	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )   \
 
 #define ALPHA68K_COINAGE_BITS_1TO3 \
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:4,5,6") \
-	PORT_DIPSETTING(    0x0e, "A 1C/1C B 1C/1C" )	\
-	PORT_DIPSETTING(    0x06, "A 1C/2C B 2C/1C" )	\
-	PORT_DIPSETTING(    0x0a, "A 1C/3C B 3C/1C" )	\
-	PORT_DIPSETTING(    0x02, "A 1C/4C B 4C/1C" )	\
-	PORT_DIPSETTING(    0x0c, "A 1C/5C B 5C/1C" )	\
-	PORT_DIPSETTING(    0x04, "A 1C/6C B 6C/1C" )	\
-	PORT_DIPSETTING(    0x08, "A 2C/3C B 7C/1C" )	\
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:4,5,6") \
+	PORT_DIPSETTING(    0x0e, "A 1C/1C B 1C/1C" )   \
+	PORT_DIPSETTING(    0x06, "A 1C/2C B 2C/1C" )   \
+	PORT_DIPSETTING(    0x0a, "A 1C/3C B 3C/1C" )   \
+	PORT_DIPSETTING(    0x02, "A 1C/4C B 4C/1C" )   \
+	PORT_DIPSETTING(    0x0c, "A 1C/5C B 5C/1C" )   \
+	PORT_DIPSETTING(    0x04, "A 1C/6C B 6C/1C" )   \
+	PORT_DIPSETTING(    0x08, "A 2C/3C B 7C/1C" )   \
 	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )
 
 #define ALPHA68K_COINAGE_BITS_2TO4 \
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW2:2,3,4") \
-	PORT_DIPSETTING(    0x1c, "A 1C/1C B 1C/1C" )	\
-	PORT_DIPSETTING(    0x18, "A 1C/2C B 2C/1C" )	\
-	PORT_DIPSETTING(    0x14, "A 1C/3C B 3C/1C" )	\
-	PORT_DIPSETTING(    0x10, "A 1C/4C B 4C/1C" )	\
-	PORT_DIPSETTING(    0x0c, "A 1C/5C B 5C/1C" )	\
-	PORT_DIPSETTING(    0x08, "A 1C/6C B 6C/1C" )	\
-	PORT_DIPSETTING(    0x04, "A 2C/3C B 7C/1C" )	\
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:2,3,4") \
+	PORT_DIPSETTING(    0x1c, "A 1C/1C B 1C/1C" )   \
+	PORT_DIPSETTING(    0x18, "A 1C/2C B 2C/1C" )   \
+	PORT_DIPSETTING(    0x14, "A 1C/3C B 3C/1C" )   \
+	PORT_DIPSETTING(    0x10, "A 1C/4C B 4C/1C" )   \
+	PORT_DIPSETTING(    0x0c, "A 1C/5C B 5C/1C" )   \
+	PORT_DIPSETTING(    0x08, "A 1C/6C B 6C/1C" )   \
+	PORT_DIPSETTING(    0x04, "A 2C/3C B 7C/1C" )   \
 	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )
 
 #define ALPHA68K_MCU \
@@ -934,11 +934,11 @@ static INPUT_PORTS_START( kyros )
 	ALPHA68K_PLAYER_INPUT_SWAP_LR_MSB( 2, IPT_UNKNOWN, IPT_START2, IP_ACTIVE_HIGH )
 
 	PORT_START("IN1")  /* dipswitches */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	//ALPHA68K_COINAGE_BITS_1TO3
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(    0x0e, "A 1C/1C B 1C/1C" )
 	PORT_DIPSETTING(    0x06, "A 1C/2C B 2C/1C" )
 	PORT_DIPSETTING(    0x0a, "A 1C/3C B 3C/1C" )
@@ -947,15 +947,15 @@ static INPUT_PORTS_START( kyros )
 	PORT_DIPSETTING(    0x04, "A 1C/6C B 6C/1C" )
 	PORT_DIPSETTING(    0x08, "A 2C/3C B 7C/1C" )
 	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
@@ -1005,7 +1005,7 @@ static INPUT_PORTS_START( jongbou )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( paddlema )
-	PORT_START("IN0")	// (bottom players)
+	PORT_START("IN0")   // (bottom players)
 	ALPHA68K_PLAYER_INPUT_LSB( 1, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 	ALPHA68K_PLAYER_INPUT_MSB( 2, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 
@@ -1023,50 +1023,50 @@ static INPUT_PORTS_START( paddlema )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2 )			// "Test" ?
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // "Test" ?
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	// (top players)
+	PORT_START("IN2")   // (top players)
 	ALPHA68K_PLAYER_INPUT_LSB( 3, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 	ALPHA68K_PLAYER_INPUT_MSB( 4, IPT_UNKNOWN, IPT_UNKNOWN, IP_ACTIVE_LOW )
 
 	PORT_START("IN3") //DSW0
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW1:4,3") /* See notes for Game Time / Match Type combos */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:4,3") /* See notes for Game Time / Match Type combos */
 	PORT_DIPSETTING(    0x00, "Defualt Time" )
 	PORT_DIPSETTING(    0x20, "+10 Seconds" )
 	PORT_DIPSETTING(    0x10, "+20 Seconds" )
 	PORT_DIPSETTING(    0x30, "+30 Seconds" )
-	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )		PORT_DIPLOCATION("SW1:2,1") /* Styles are for Upright/Table & Single/Dual controls???? */
-	PORT_DIPSETTING(    0x80, "A to B" )	/* Manual shows "Upright Sytle B" */
-	PORT_DIPSETTING(    0x00, "A to C" )	/* Manual shows "Upright Sytle A" */
-	PORT_DIPSETTING(    0x40, "A to E" )	/* Manual shows "Table Sytle C"   */
+	PORT_DIPNAME( 0xc0, 0x40, "Match Type" )        PORT_DIPLOCATION("SW1:2,1") /* Styles are for Upright/Table & Single/Dual controls???? */
+	PORT_DIPSETTING(    0x80, "A to B" )    /* Manual shows "Upright Sytle B" */
+	PORT_DIPSETTING(    0x00, "A to C" )    /* Manual shows "Upright Sytle A" */
+	PORT_DIPSETTING(    0x40, "A to E" )    /* Manual shows "Table Sytle C"   */
 //  PORT_DIPSETTING(    0xc0, "A to B" )    /* Manual shows "Table Sytle D"   */
 
-	PORT_START("IN4")	// DSW1
+	PORT_START("IN4")   // DSW1
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_HIGH, "SW2:8" )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x01, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x01, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x01, "SW2:5" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )			PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x01, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x01, "SW2:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x01, "SW2:5" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )         PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x20, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x00, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x10, "Win Match Against CPU (Cheat)")
 	PORT_DIPSETTING(    0x30, "Freeze" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:2") /* Manual shows "Off" for this dipswitch */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:2") /* Manual shows "Off" for this dipswitch */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1085,28 +1085,28 @@ static INPUT_PORTS_START( timesold )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )		/* Listed as "Unused" - See notes */
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6") /* Listed in the manual as "Free Play" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )        /* Listed as "Unused" - See notes */
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")    PORT_DIPLOCATION("SW1:6") /* Listed in the manual as "Free Play" */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
 	ALPHA68K_COINAGE_BITS_0TO2
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1135,28 +1135,28 @@ static INPUT_PORTS_START( btlfield )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:4") /* Listed as "Unused". */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:4") /* Listed as "Unused". */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )			/* Listed as "Unused", see notes. */
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:5" )            /* Listed as "Unused", see notes. */
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")        PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
 	ALPHA68K_COINAGE_BITS_0TO2
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1174,7 +1174,7 @@ static INPUT_PORTS_START( btlfieldb )
 	PORT_INCLUDE( btlfield )
 
 	PORT_MODIFY("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x00, "A 1C/1C B 1C/1C" )
 	PORT_DIPSETTING(    0x01, "A 1C/2C B 2C/1C" )
 	PORT_DIPSETTING(    0x02, "A 1C/3C B 3C/1C" )
@@ -1183,7 +1183,7 @@ static INPUT_PORTS_START( btlfieldb )
 	PORT_DIPSETTING(    0x05, "A 1C/6C B 6C/1C" )
 	PORT_DIPSETTING(    0x06, "A 2C/3C B 7C/1C" )
 	PORT_DIPSETTING(    0x07, "A 3C/2C B 8C/1C" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:2" )
@@ -1212,30 +1212,30 @@ static INPUT_PORTS_START( skysoldr )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:4") /* Manual states "Always On" */
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW1:4") /* Manual states "Always On" */
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x40, 0x40, "Manufacturer" )		PORT_DIPLOCATION("SW1:5") /* Manual states "Always Off"  See notes */
+	PORT_DIPNAME( 0x40, 0x40, "Manufacturer" )      PORT_DIPLOCATION("SW1:5") /* Manual states "Always Off"  See notes */
 	PORT_DIPSETTING(    0x40, "SNK" )
 	PORT_DIPSETTING(    0x00, "Romstar" )
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")    PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
 	ALPHA68K_COINAGE_BITS_0TO2
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
@@ -1277,30 +1277,30 @@ static INPUT_PORTS_START( goldmedl )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x00, "Event Select" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x04, 0x00, "Event Select" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:2,6")
+	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:2,6")
 	PORT_DIPSETTING(    0x00, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x80, "Upright 4 Players" )
 	PORT_DIPSETTING(    0x88, DEF_STR( Cocktail ) )
 	//PORT_DIPSETTING(  0x08, DEF_STR( Cocktail ) )     /* Not documented. */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )		PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
-	PORT_DIPNAME( 0x20, 0x20, "Speed For 100M Dash" )	PORT_DIPLOCATION("SW1:4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )     PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
+	PORT_DIPNAME( 0x20, 0x20, "Speed For 100M Dash" )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "10 Beats For Max Speed" )
 	PORT_DIPSETTING(    0x20, "14 Beats For Max Speed" )
-	PORT_DIPNAME( 0x40, 0x40, "Computer Demonstration" )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x40, 0x40, "Computer Demonstration" )    PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	ALPHA68K_COINAGE_BITS_2TO4
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1326,28 +1326,28 @@ static INPUT_PORTS_START( skyadvnt )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:3" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:4,5") // See notes
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:3" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:4,5") // See notes
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:6" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:6" )        /* Listed as "Unused" */
 	ALPHA68K_COINAGE_BITS_1TO3
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x20, "Freeze" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1358,13 +1358,13 @@ static INPUT_PORTS_START( skyadvntu )
 	PORT_INCLUDE( skyadvnt )
 
 	PORT_MODIFY("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )     PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "Same as Start" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1387,39 +1387,39 @@ static INPUT_PORTS_START( gangwarsu )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Timer Speed" )		PORT_DIPLOCATION("SW2:3") // Check code at 0x01923a
-	PORT_DIPSETTING(    0x00, "Slow" )			// 1 second = 0x01ff
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		// 1 second = 0x013f
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x10, 0x00, "Timer Speed" )       PORT_DIPLOCATION("SW2:3") // Check code at 0x01923a
+	PORT_DIPSETTING(    0x00, "Slow" )          // 1 second = 0x01ff
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )       // 1 second = 0x013f
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x01, 0x00, "Price to Continue" )     PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "Same as Start" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x20, "Freeze" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1427,19 +1427,19 @@ INPUT_PORTS_END
 
 /* Same as 'gangwarsu' but bits 0-3 of 2nd set of Dip Switches are different */
 static INPUT_PORTS_START( gangwars )
-	PORT_INCLUDE( gangwarsu )	/* See notes about "IN2" (microcontroller) */
+	PORT_INCLUDE( gangwarsu )   /* See notes about "IN2" (microcontroller) */
 
 	PORT_MODIFY("IN3")
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:1" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:2")
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:1" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 
 	PORT_MODIFY("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x01, 0x00, "Coin Slots" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x01, 0x00, "Coin Slots" )        PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -1462,7 +1462,7 @@ static INPUT_PORTS_START( sbasebal )
 #if SBASEBAL_HACK
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 #else
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )	// COIN2 - unused due to code at 0x0002b4
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // COIN2 - unused due to code at 0x0002b4
 #endif
 
 	PORT_START("IN3")  /* Service + dip */
@@ -1479,7 +1479,7 @@ static INPUT_PORTS_START( sbasebal )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	// Check code at 0x0089e6
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  // Check code at 0x0089e6
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Game_Time ) )
@@ -1496,7 +1496,7 @@ static INPUT_PORTS_START( sbasebal )
 #endif
 
 	PORT_START("IN4") /* A 6 way dip switch */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	// Check code at 0x009d3a
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   // Check code at 0x009d3a
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -1537,46 +1537,46 @@ static INPUT_PORTS_START( tnextspc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" )			 /* Listed as "Unused" */
-	PORT_DIPNAME( 0x04, 0x04, "Additional Bonus Life" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" )             /* Listed as "Unused" */
+	PORT_DIPNAME( 0x04, 0x04, "Additional Bonus Life" )     PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, "2nd Extend ONLY" )
 	PORT_DIPSETTING(    0x00, "Every Extend" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )			 /* Listed as "Unused" */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )             /* Listed as "Unused" */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "A 1C/1C B 1C/2C" )
 	PORT_DIPSETTING(    0x20, "A 2C/1C B 1C/3C" )
 	PORT_DIPSETTING(    0x10, "A 3C/1C B 1C/5C" )
 	PORT_DIPSETTING(    0x00, "A 4C/1C B 1C/6C" )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x08)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )				PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x00)
+	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )             PORT_DIPLOCATION("SW2:3") PORT_CONDITION("DSW2",0x08,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "SW2:3 Demo Sound/Game Mode" )    PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, "Game Mode" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "100000 200000" )
 	PORT_DIPSETTING(    0x20, "150000 300000" )
 	PORT_DIPSETTING(    0x10, "300000 500000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
@@ -1614,9 +1614,9 @@ static const gfx_layout spritelayout =
 	4,      /* 4 bits per pixel */
 	{ 0, 0x80000*8, 0x100000*8, 0x180000*8 },
 	{ 16*8+7, 16*8+6, 16*8+5, 16*8+4, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-	  7, 6, 5, 4, 3, 2, 1, 0 },
+		7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	8*32    /* every sprite takes 32 consecutive bytes */
 };
 
@@ -1627,9 +1627,9 @@ static const gfx_layout spritelayout_V =
 	4,      /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 16*8+7, 16*8+6, 16*8+5, 16*8+4, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-	  7, 6, 5, 4, 3, 2, 1, 0 },
+		7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	8*32    /* every sprite takes 32 consecutive bytes */
 };
 
@@ -1871,7 +1871,7 @@ MACHINE_START_MEMBER(alpha68k_state,common)
 	save_item(NAME(m_trigstate));
 	save_item(NAME(m_deposits1));
 	save_item(NAME(m_deposits2));
-    	save_item(NAME(m_credits));
+		save_item(NAME(m_credits));
 	save_item(NAME(m_coinvalue));
 	save_item(NAME(m_microcontroller_data));
 	save_item(NAME(m_latch));
@@ -1964,7 +1964,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  2*60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
-	MCFG_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
+	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
 //  MCFG_CPU_PROGRAM_MAP(i8748_map)
 	MCFG_CPU_IO_MAP(i8748_portmap)
 	MCFG_DEVICE_DISABLE()
@@ -2003,12 +2003,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kyros, alpha68k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* Verified on bootleg PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* Verified on bootleg PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6) /* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  2*60)
@@ -2033,13 +2033,13 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
+	MCFG_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_DAC_ADD("dac")
@@ -2349,7 +2349,7 @@ ROM_START( sstingry )
 	ROM_LOAD( "ss_01.rom",       0x0000,  0x4000, CRC(fef09a92) SHA1(77b6aded1eed1bd5e6ffb25b56b62b10b7b9a304) )
 	ROM_LOAD( "ss_02.rom",       0x4000,  0x4000, CRC(ab4e8c01) SHA1(d96e7f97945fff48fb7b4661fdb575ac7ff77445) )
 
-	ROM_REGION( 0x0400, "mcu", 0 )	  /* 8748 MCU code */
+	ROM_REGION( 0x0400, "mcu", 0 )    /* 8748 MCU code */
 	ROM_LOAD( "d8748.bin",       0x0000, 0x0400, CRC(7fcbfc30) SHA1(6d087a3d44e475b6c8260a5134952097f26459b7) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
@@ -3161,7 +3161,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,jongbou)
 DRIVER_INIT_MEMBER(alpha68k_state,paddlema)
 {
 	m_microcontroller_id = 0;
-	m_coin_id = 0;				// Not needed !
+	m_coin_id = 0;              // Not needed !
 	m_game_id = 0;
 }
 
@@ -3262,11 +3262,11 @@ DRIVER_INIT_MEMBER(alpha68k_state,sbasebal)
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
-       calculate the ball speed when a strike is scored, notice that current emulation
-       just returns 49 mi/h every time that this event happens.
-       68k reads at [0x4023e], then subtracts this value with [0x41838], presumably it's raw speed minus angle.
-       main CPU then writes the result to RAM location [0x41866], probably just to signal the result to the MCU.
-       */
+	   calculate the ball speed when a strike is scored, notice that current emulation
+	   just returns 49 mi/h every time that this event happens.
+	   68k reads at [0x4023e], then subtracts this value with [0x41838], presumably it's raw speed minus angle.
+	   main CPU then writes the result to RAM location [0x41866], probably just to signal the result to the MCU.
+	   */
 	rom[0xb672/2] = 0x4e71;
 
 	/* And patch the ROM checksums */
@@ -3281,7 +3281,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,sbasebal)
 #endif
 
 	m_invert_controls = 0;
-	m_microcontroller_id = 0x8512;	// Same as 'gangwars' ?
+	m_microcontroller_id = 0x8512;  // Same as 'gangwars' ?
 	m_coin_id = 0x23 | (0x24 << 8);
 	m_game_id = 0;
 }
@@ -3290,7 +3290,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,tnextspc)
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x890a;
-	m_coin_id = 0;				// Not needed !
+	m_coin_id = 0;              // Not needed !
 	m_game_id = 0;
 }
 

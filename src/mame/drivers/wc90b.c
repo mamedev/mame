@@ -229,8 +229,8 @@ static INPUT_PORTS_START( wc90b )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x40, 0x40, "Countdown Speed" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )			// 60/60
-	PORT_DIPSETTING(    0x00, "Fast" )						// 56/60
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )           // 60/60
+	PORT_DIPSETTING(    0x00, "Fast" )                      // 56/60
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -265,60 +265,60 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	2048,	/* 2048 characters */
-	4,	/* 4 bits per pixel */
-	{ 0, 0x4000*8, 0x8000*8, 0xc000*8 },	/* the bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	2048,   /* 2048 characters */
+	4,  /* 4 bits per pixel */
+	{ 0, 0x4000*8, 0x8000*8, 0xc000*8 },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16*16 characters */
-	256,	/* 256 characters */
-	4,	/* 4 bits per pixel */
-	{ 0*0x20000*8, 1*0x20000*8, 2*0x20000*8, 3*0x20000*8 },	/* the bitplanes are separated */
+	16,16,  /* 16*16 characters */
+	256,    /* 256 characters */
+	4,  /* 4 bits per pixel */
+	{ 0*0x20000*8, 1*0x20000*8, 2*0x20000*8, 3*0x20000*8 }, /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		(0x1000*8)+0, (0x1000*8)+1, (0x1000*8)+2, (0x1000*8)+3, (0x1000*8)+4, (0x1000*8)+5, (0x1000*8)+6, (0x1000*8)+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		0x800*8, 0x800*8+1*8, 0x800*8+2*8, 0x800*8+3*8, 0x800*8+4*8, 0x800*8+5*8, 0x800*8+6*8, 0x800*8+7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 32*32 characters */
-	4096,	/* 1024 characters */
-	4,	/* 4 bits per pixel */
-	{ 3*0x20000*8, 2*0x20000*8, 1*0x20000*8, 0*0x20000*8 },	/* the bitplanes are separated */
+	16,16,  /* 32*32 characters */
+	4096,   /* 1024 characters */
+	4,  /* 4 bits per pixel */
+	{ 3*0x20000*8, 2*0x20000*8, 1*0x20000*8, 0*0x20000*8 }, /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		(16*8)+0, (16*8)+1, (16*8)+2, (16*8)+3, (16*8)+4, (16*8)+5, (16*8)+6, (16*8)+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		8*8, 8*8+1*8, 8*8+2*8, 8*8+3*8, 8*8+4*8, 8*8+5*8, 8*8+6*8, 8*8+7*8 },
-	32*8	/* every char takes 128 consecutive bytes */
+	32*8    /* every char takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( wc90b )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   	0x100, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x02000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x04000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x06000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x08000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x0a000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x0c000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x0e000, tilelayout,		0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x10000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x12000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x14000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x16000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x1a000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x1c000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x1e000, tilelayout,		0x300, 0x10 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,		0x000, 0x10 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       0x100, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x02000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x04000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x06000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x08000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x0a000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x0c000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x0e000, tilelayout,       0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x10000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x12000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x14000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x16000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x1a000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x1c000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x1e000, tilelayout,       0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,     0x000, 0x10 ) // sprites
 GFXDECODE_END
 
 
@@ -356,8 +356,8 @@ static void adpcm_int(device_t *device)
 
 static const msm5205_interface msm5205_config =
 {
-	adpcm_int,		/* interrupt function */
-	MSM5205_S96_4B	/* 4KHz 4-bit */
+	adpcm_int,      /* interrupt function */
+	MSM5205_S96_4B  /* 4KHz 4-bit */
 };
 
 static MACHINE_CONFIG_START( wc90b, wc90b_state )
@@ -401,12 +401,12 @@ MACHINE_CONFIG_END
 
 ROM_START( wc90b1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )	/* c000-ffff is not used */
-	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
+	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  /* c000-ffff is not used */
+	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
-	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
-	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )	/* banked at f000-f7ff */
+	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
+	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x18000, "audiocpu", 0 )
 	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
@@ -444,12 +444,12 @@ ROM_END
 
 ROM_START( wc90b2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "a02",          0x00000, 0x10000, CRC(1e6e94c9) SHA1(1731e3e3b5d17ba676a7e42638d7206212a0080d) )	/* c000-ffff is not used */
-	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
+	ROM_LOAD( "a02",          0x00000, 0x10000, CRC(1e6e94c9) SHA1(1731e3e3b5d17ba676a7e42638d7206212a0080d) )  /* c000-ffff is not used */
+	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
-	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
-	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )	/* banked at f000-f7ff */
+	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
+	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x18000, "audiocpu", 0 )
 	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
@@ -498,11 +498,11 @@ probably just a minor text mod from the supported set (only two bytes differs), 
 */
 ROM_START( wc90ba )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )	/* c000-ffff is not used */
-	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
+	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  /* c000-ffff is not used */
+	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
-	ROM_LOAD( "a04.bin",              0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
+	ROM_LOAD( "a04.bin",              0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
 	ROM_LOAD( "el_ic98_27c512_05.bin",0x10000, 0x10000, CRC(c70d8c13) SHA1(365718725ea7d0355c68ba703b7f9624cb1134bc) )
 
 	ROM_REGION( 0x18000, "audiocpu", 0 )

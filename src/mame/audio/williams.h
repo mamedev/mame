@@ -78,7 +78,7 @@ extern const device_type WILLIAMS_ADPCM_SOUND;
 
 // ======================> williams_cvsd_sound_device
 
-class williams_cvsd_sound_device :	public device_t,
+class williams_cvsd_sound_device :  public device_t,
 									public device_mixer_interface
 {
 public:
@@ -118,7 +118,7 @@ private:
 
 // ======================> williams_narc_sound_device
 
-class williams_narc_sound_device :	public device_t,
+class williams_narc_sound_device :  public device_t,
 									public device_mixer_interface
 {
 public:
@@ -176,7 +176,7 @@ private:
 
 // ======================> williams_adpcm_sound_device
 
-class williams_adpcm_sound_device :	public device_t,
+class williams_adpcm_sound_device : public device_t,
 									public device_mixer_interface
 {
 public:
@@ -218,5 +218,3 @@ private:
 	UINT8 m_talkback;
 	UINT8 m_sound_int_state;
 };
-
-

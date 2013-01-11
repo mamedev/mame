@@ -43,7 +43,7 @@ const device_type INS8154 = &device_creator<ins8154_device>;
 //-------------------------------------------------
 
 ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, INS8154, "INS8154", tag, owner, clock)
+	: device_t(mconfig, INS8154, "INS8154", tag, owner, clock)
 {
 
 }
@@ -67,11 +67,11 @@ void ins8154_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_in_a_cb, 0, sizeof(m_in_a_cb));
-    	memset(&m_in_b_cb, 0, sizeof(m_in_b_cb));
-    	memset(&m_out_a_cb, 0, sizeof(m_out_a_cb));
-    	memset(&m_out_b_cb, 0, sizeof(m_out_b_cb));
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_in_a_cb, 0, sizeof(m_in_a_cb));
+		memset(&m_in_b_cb, 0, sizeof(m_in_b_cb));
+		memset(&m_out_a_cb, 0, sizeof(m_out_a_cb));
+		memset(&m_out_b_cb, 0, sizeof(m_out_b_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
 	}
 }
 

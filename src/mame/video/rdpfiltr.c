@@ -60,7 +60,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 			}
 			else
 			{
-                backr[numoffull] = invr[numoffull] = 0;
+				backr[numoffull] = invr[numoffull] = 0;
 				backg[numoffull] = invg[numoffull] = 0;
 				backb[numoffull] = invb[numoffull] = 0;
 			}
@@ -86,7 +86,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 			}
 			else
 			{
-                backr[numoffull] = invr[numoffull] = 0;
+				backr[numoffull] = invr[numoffull] = 0;
 				backg[numoffull] = invg[numoffull] = 0;
 				backb[numoffull] = invb[numoffull] = 0;
 			}
@@ -112,7 +112,7 @@ INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UI
 			}
 			else
 			{
-                backr[numoffull] = invr[numoffull] = 0;
+				backr[numoffull] = invr[numoffull] = 0;
 				backg[numoffull] = invg[numoffull] = 0;
 				backb[numoffull] = invb[numoffull] = 0;
 			}
@@ -501,26 +501,26 @@ INLINE void restore_two(Color* filtered, Color* neighbour)
 
 INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 {
-    int i;
-    int pos = 0;
-    *enb = 0;
-    for(i = 0; i < 7; i++)
-    {
-        if (Pixels[i] > Pixels[pos])
-        {
-            *enb += (1 << i);
-            pos = i;
-        }
-        else if (Pixels[i] < Pixels[pos])
-        {
-            *enb += (1 << i);
-        }
-        else
-        {
-            pos = i;
-        }
-    }
-    *max = Pixels[pos];
+	int i;
+	int pos = 0;
+	*enb = 0;
+	for(i = 0; i < 7; i++)
+	{
+		if (Pixels[i] > Pixels[pos])
+		{
+			*enb += (1 << i);
+			pos = i;
+		}
+		else if (Pixels[i] < Pixels[pos])
+		{
+			*enb += (1 << i);
+		}
+		else
+		{
+			pos = i;
+		}
+	}
+	*max = Pixels[pos];
 }
 
 INLINE UINT32 ge_two(UINT32 enb)

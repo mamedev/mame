@@ -197,7 +197,7 @@ Language:
 
 -->
 
-    <!-- disk mounted as 93020 -->
+	<!-- disk mounted as 93020 -->
 	<software name="incredib">
 		<description>The Incredibles - Mission Incredible (USA)</description>
 		<year>200?</year>
@@ -210,7 +210,7 @@ Language:
 		</part>
 	</software>
 
-    <!-- disk mounted as 93080_001 -->
+	<!-- disk mounted as 93080_001 -->
 	<software name="scoobyaa">
 		<description>Scooby-Doo! Ancient Adventure (USA)</description>
 		<year>200?</year>
@@ -223,7 +223,7 @@ Language:
 		</part>
 	</software>
 
-    <!-- disk mounted as 93060_001 -->
+	<!-- disk mounted as 93060_001 -->
 	<software name="spidey93">
 		<description>The Amazing Spider-Man - Countdown to Doom (USA)</description>
 		<year>200?</year>
@@ -236,7 +236,7 @@ Language:
 		</part>
 	</software>
 
-    <!-- disk mounted as 93120_003 -->
+	<!-- disk mounted as 93120_003 -->
 	<software name="wacky931">
 		<description>Wacky Race on Jumpin' Bean Island (USA)</description>
 		<year>200?</year>

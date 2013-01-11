@@ -6,19 +6,19 @@
 //**************************************************************************
 
 
-#define TIA_PALETTE_LENGTH				128 + 128 * 128
-#define TIA_INPUT_PORT_ALWAYS_ON		0
-#define TIA_INPUT_PORT_ALWAYS_OFF		0xff
-#define TIA_MAX_SCREEN_HEIGHT			342
+#define TIA_PALETTE_LENGTH              128 + 128 * 128
+#define TIA_INPUT_PORT_ALWAYS_ON        0
+#define TIA_INPUT_PORT_ALWAYS_OFF       0xff
+#define TIA_MAX_SCREEN_HEIGHT           342
 
-#define HMOVE_INACTIVE		-200
-#define PLAYER_GFX_SLOTS	4
+#define HMOVE_INACTIVE      -200
+#define PLAYER_GFX_SLOTS    4
 // Per player graphic
 // - pixel number to start drawing from (0-7, from GRPx) / number of pixels drawn from GRPx
 // - display position to start drawing
 // - size to use
 struct player_gfx {
-	int	start_pixel[PLAYER_GFX_SLOTS];
+	int start_pixel[PLAYER_GFX_SLOTS];
 	int start_drawing[PLAYER_GFX_SLOTS];
 	int size[PLAYER_GFX_SLOTS];
 	int skipclip[PLAYER_GFX_SLOTS];
@@ -41,19 +41,19 @@ struct player_gfx {
 
 
 struct tia_interface {
-	devcb_read16	m_read_input_port_cb;
-	devcb_read8		m_databus_contents_cb;
-	devcb_write16	m_vsync_callback_cb;
+	devcb_read16    m_read_input_port_cb;
+	devcb_read8     m_databus_contents_cb;
+	devcb_write16   m_vsync_callback_cb;
 };
 
 // ======================> tia_video_device
 
-class tia_video_device :	public device_t,
+class tia_video_device :    public device_t,
 							public tia_interface
 {
 public:
-    // construction/destruction
-    tia_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	tia_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -61,10 +61,10 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
 	void draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gfx *gfx, UINT8 GRP, UINT8 COLUP, UINT8 REFP);
 	void draw_missile_helper(UINT8* p, UINT8* col, int horz, int skipdelay, int latch, int start, UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM);
@@ -109,9 +109,9 @@ protected:
 
 
 private:
-	devcb_resolved_read16	m_read_input_port_func;
-	devcb_resolved_read8	m_databus_contents_func;
-	devcb_resolved_write16	m_vsync_callback_func;
+	devcb_resolved_read16   m_read_input_port_func;
+	devcb_resolved_read8    m_databus_contents_func;
+	devcb_resolved_write16  m_vsync_callback_func;
 
 	struct player_gfx p0gfx;
 	struct player_gfx p1gfx;
@@ -194,7 +194,7 @@ private:
 	UINT8 HMM0_latch;
 	UINT8 HMM1_latch;
 	UINT8 HMBL_latch;
-	UINT8 REFLECT;		/* Should playfield be reflected or not */
+	UINT8 REFLECT;      /* Should playfield be reflected or not */
 	UINT8 NUSIZx_changed;
 
 	bitmap_ind16 *helper[3];

@@ -37,8 +37,8 @@ const device_type DISKONCHIP_G3 = &device_creator<diskonchip_g3_device>;
 //-------------------------------------------------
 
 diskonchip_g3_device::diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, DISKONCHIP_G3, "DiskOnChip G3", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, DISKONCHIP_G3, "DiskOnChip G3", tag, owner, clock),
+		device_nvram_interface(mconfig, *this)
 {
 }
 

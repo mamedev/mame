@@ -11,42 +11,42 @@
  * mode = MODE_AT, MODE_PS2 or MODE_M30 for the fdcs that have reset-time selection
  */
 
-#define MCFG_UPD765A_ADD(_tag, _ready, _select)	\
-	MCFG_DEVICE_ADD(_tag, UPD765A, 0)			\
-	downcast<upd765a_device *>(device)->set_ready_line_connected(_ready);	\
+#define MCFG_UPD765A_ADD(_tag, _ready, _select) \
+	MCFG_DEVICE_ADD(_tag, UPD765A, 0)           \
+	downcast<upd765a_device *>(device)->set_ready_line_connected(_ready);   \
 	downcast<upd765a_device *>(device)->set_select_lines_connected(_select);
 
-#define MCFG_UPD765B_ADD(_tag, _ready, _select)	\
-	MCFG_DEVICE_ADD(_tag, UPD765B, 0)			\
-	downcast<upd765b_device *>(device)->set_ready_line_connected(_ready);	\
+#define MCFG_UPD765B_ADD(_tag, _ready, _select) \
+	MCFG_DEVICE_ADD(_tag, UPD765B, 0)           \
+	downcast<upd765b_device *>(device)->set_ready_line_connected(_ready);   \
 	downcast<upd765b_device *>(device)->set_select_lines_connected(_select);
 
-#define MCFG_I8272A_ADD(_tag, _ready)	\
-	MCFG_DEVICE_ADD(_tag, I8272A, 0)	\
+#define MCFG_I8272A_ADD(_tag, _ready)   \
+	MCFG_DEVICE_ADD(_tag, I8272A, 0)    \
 	downcast<i8272a_device *>(device)->set_ready_line_connected(_ready);
 
-#define MCFG_UPD72065_ADD(_tag, _ready, _select)	\
-	MCFG_DEVICE_ADD(_tag, UPD72065, 0)				\
-	downcast<upd72065_device *>(device)->set_ready_line_connected(_ready);	\
+#define MCFG_UPD72065_ADD(_tag, _ready, _select)    \
+	MCFG_DEVICE_ADD(_tag, UPD72065, 0)              \
+	downcast<upd72065_device *>(device)->set_ready_line_connected(_ready);  \
 	downcast<upd72065_device *>(device)->set_select_lines_connected(_select);
 
-#define MCFG_SMC37C78_ADD(_tag)	\
+#define MCFG_SMC37C78_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SMC37C78, 0)
 
-#define MCFG_N82077AA_ADD(_tag, _mode)	\
-	MCFG_DEVICE_ADD(_tag, N82077AA, 0)	\
+#define MCFG_N82077AA_ADD(_tag, _mode)  \
+	MCFG_DEVICE_ADD(_tag, N82077AA, 0)  \
 	downcast<n82077aa_device *>(device)->set_mode(_mode);
 
-#define MCFG_PC_FDC_SUPERIO_ADD(_tag)	\
+#define MCFG_PC_FDC_SUPERIO_ADD(_tag)   \
 	MCFG_DEVICE_ADD(_tag, PC_FDC_SUPERIO, 0)
 
-#define MCFG_DP8473_ADD(_tag)	\
+#define MCFG_DP8473_ADD(_tag)   \
 	MCFG_DEVICE_ADD(_tag, DP8473, 0)
 
-#define MCFG_PC8477A_ADD(_tag)	\
+#define MCFG_PC8477A_ADD(_tag)  \
 	MCFG_DEVICE_ADD(_tag, PC8477A, 0)
 
-#define MCFG_WD37C65C_ADD(_tag)	\
+#define MCFG_WD37C65C_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, WD37C65C, 0)
 
 /* Interface required for PC ISA wrapping */
@@ -62,9 +62,9 @@ public:
 	virtual void setup_drq_cb(line_cb cb) = 0;
 
 	/* Note that the address map must cover and handle the whole 0-7
-     * range.  The upd765, while conforming to the rest of the
-     * interface, is not eligible as a result.
-     */
+	 * range.  The upd765, while conforming to the rest of the
+	 * interface, is not eligible as a result.
+	 */
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) = 0;
 

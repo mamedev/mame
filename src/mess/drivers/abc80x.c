@@ -384,18 +384,18 @@ WRITE8_MEMBER( abc806_state::mao_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       physical block address bit 0
-        1       physical block address bit 1
-        2       physical block address bit 2
-        3       physical block address bit 3
-        4       physical block address bit 4
-        5
-        6
-        7       allocate block
+	    0       physical block address bit 0
+	    1       physical block address bit 1
+	    2       physical block address bit 2
+	    3       physical block address bit 3
+	    4       physical block address bit 4
+	    5
+	    6
+	    7       allocate block
 
-    */
+	*/
 
 	int bank = offset >> 12;
 
@@ -661,10 +661,10 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z0_w),	// ZC/TO0 callback
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z1_w),	// ZC/TO1 callback
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z2_w),	// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     // interrupt handler
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z0_w),   // ZC/TO0 callback
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z1_w),   // ZC/TO1 callback
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z2_w),   // ZC/TO2 callback
 };
 
 
@@ -1429,14 +1429,14 @@ ROM_START( abc806 )
 	ROM_LOAD( "abc 36-11.1j",  0x3000, 0x1000, CRC(b50e418e) SHA1(991a59ed7796bdcfed310012b2bec50f0b8df01c) ) // BASIC PROM ABC 36-11 "64 90234-02"
 	ROM_LOAD( "abc 46-11.2m",  0x4000, 0x1000, CRC(17a87c7d) SHA1(49a7c33623642b49dea3d7397af5a8b9dde8185b) ) // BASIC PROM ABC 46-11 "64 90235-02"
 	ROM_LOAD( "abc 56-11.2l",  0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) ) // BASIC PROM ABC 56-11 "64 90236-02"
-	ROM_SYSTEM_BIOS( 0, "v19",		"UFD-DOS v.19" )
+	ROM_SYSTEM_BIOS( 0, "v19",      "UFD-DOS v.19" )
 	ROMX_LOAD( "abc 66-21.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(1) ) // DOS PROM ABC 66-21 "64 90314-01"
-	ROM_SYSTEM_BIOS( 1, "v20",		"UFD-DOS v.20" )
+	ROM_SYSTEM_BIOS( 1, "v20",      "UFD-DOS v.20" )
 	ROMX_LOAD( "abc 66-31.2k", 0x6000, 0x1000, CRC(a2e38260) SHA1(0dad83088222cb076648e23f50fec2fddc968883), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "mica",		"MICA DOS v.20" )
+	ROM_SYSTEM_BIOS( 2, "mica",     "MICA DOS v.20" )
 	ROMX_LOAD( "mica2006.2k",  0x6000, 0x1000, CRC(58bc2aa8) SHA1(0604bd2396f7d15fcf3d65888b4b673f554037c0), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "catnet",	"CAT-NET" )
-	ROMX_LOAD( "cmd8_5.2k",	   0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 3, "catnet",   "CAT-NET" )
+	ROMX_LOAD( "cmd8_5.2k",    0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839), ROM_BIOS(4) )
 	ROM_LOAD_OPTIONAL( "abc 76-11.2j",  0x7000, 0x1000, CRC(3eb5f6a1) SHA1(02d4e38009c71b84952eb3b8432ad32a98a7fe16) ) // Options-PROM ABC 76-11 "64 90238-02"
 	ROM_LOAD( "abc 76-xx.2j",  0x7000, 0x1000, CRC(b364cc49) SHA1(9a2c373778856a31902cdbd2ae3362c200a38e24) ) // Enhanced Options-PROM
 
@@ -1600,7 +1600,7 @@ DRIVER_INIT_MEMBER(abc806_state,driver_init)
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c_state,	driver_init, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m_state,	driver_init, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,	driver_init, "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,	driver_init, "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800c_state,  driver_init, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
+COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800m_state,  driver_init, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   driver_init, "Luxor Datorer AB", "ABC 802",      GAME_SUPPORTS_SAVE )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,   driver_init, "Luxor Datorer AB", "ABC 806",      GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

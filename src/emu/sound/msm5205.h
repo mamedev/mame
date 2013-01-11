@@ -46,7 +46,7 @@ void msm5205_set_volume(device_t *device,int volume);
 void msm5205_change_clock_w(device_t *device, INT32 clock);
 
 class msm5205_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

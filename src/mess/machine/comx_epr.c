@@ -33,9 +33,9 @@ ROM_START( comx_epr )
 	ROM_LOAD( "f&m.eprom.board.1.1.bin", 0x0000, 0x0800, CRC(a042a31a) SHA1(13831a1350aa62a87988bfcc99c4b7db8ef1cf62) )
 
 	ROM_REGION( 0x10000, "eprom", 0 )
-	ROM_LOAD( "f&m.basic.bin",  	0x0000, 0x2000, CRC(22ab7b61) SHA1(68b5770bca37b1ba94083f944086884e612b5a1b) )
+	ROM_LOAD( "f&m.basic.bin",      0x0000, 0x2000, CRC(22ab7b61) SHA1(68b5770bca37b1ba94083f944086884e612b5a1b) )
 	ROM_LOAD( "disk.utilities.bin", 0x2000, 0x2000, CRC(2576c945) SHA1(e80481054c6997a5f418d8a5872ac0110ae7b75a) )
-	ROM_LOAD( "tennismania.bin",	0x4000, 0x2000, CRC(a956cc74) SHA1(8bc914f52f0dd2cf792da74ec4e9e333365619ef) )
+	ROM_LOAD( "tennismania.bin",    0x4000, 0x2000, CRC(a956cc74) SHA1(8bc914f52f0dd2cf792da74ec4e9e333365619ef) )
 ROM_END
 
 

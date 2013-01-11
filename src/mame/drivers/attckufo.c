@@ -51,8 +51,8 @@ class attckufo_state : public driver_device
 public:
 	attckufo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_mos6560(*this, "mos6560") ,
+			m_maincpu(*this, "maincpu"),
+			m_mos6560(*this, "mos6560") ,
 		m_mainram(*this, "mainram"),
 		m_tileram(*this, "tileram"){ }
 
@@ -86,12 +86,12 @@ READ8_MEMBER(attckufo_state::attckufo_io_r)
 WRITE8_MEMBER(attckufo_state::attckufo_io_w)
 {
 	/*
-    offset, data:
-     0   $00,$30
-     1   $00,$04
-     2   $00
-     3   $00,$04
-    */
+	offset, data:
+	 0   $00,$30
+	 1   $00,$04
+	 2   $00
+	 3   $00,$04
+	*/
 }
 
 READ8_MEMBER(attckufo_state::vic_videoram_r)

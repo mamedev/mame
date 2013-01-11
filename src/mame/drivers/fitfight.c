@@ -118,9 +118,9 @@ READ16_MEMBER(fitfight_state::bbprot_700000_r)
 
 WRITE16_MEMBER(fitfight_state::fitfight_700000_w)
 {
-	COMBINE_DATA(&m_fof_700000[offset]);		// needed for scrolling
+	COMBINE_DATA(&m_fof_700000[offset]);        // needed for scrolling
 
-	if (data < 0x0200)				// to avoid considering writes of 0x0200
+	if (data < 0x0200)              // to avoid considering writes of 0x0200
 		m_fof_700000_data = data;
 }
 
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	//written at scanline 5, allways 1. Used by histryma/fitfight @0x0000ec2c/@0x0000f076
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("EXTRA")	// for 'histryma' only
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("EXTRA")  // for 'histryma' only
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM_DSW2")
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3_DSW1")
 
@@ -213,7 +213,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8, fitfight_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")	/* ??? External ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* ??? External ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -264,8 +264,8 @@ INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
 
 static const UPD7810_CONFIG sound_cpu_config =
 {
-    TYPE_7810,
-    0
+	TYPE_7810,
+	0
 };
 
 
@@ -274,7 +274,7 @@ static const UPD7810_CONFIG sound_cpu_config =
 /* I've put the inputs the same way they can be read in the "test mode" */
 
 static INPUT_PORTS_START( fitfight )
-	PORT_START("P1_P2")	// 0x200000.w
+	PORT_START("P1_P2") // 0x200000.w
 	/* players inputs -> 0xe022cc.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -293,18 +293,18 @@ static INPUT_PORTS_START( fitfight )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("EXTRA")	// 0x300000.w (unused)
+	PORT_START("EXTRA") // 0x300000.w (unused)
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM_DSW2")	// 0x400000.w
+	PORT_START("SYSTEM_DSW2")   // 0x400000.w
 	/* LSB : system inputs -> 0xe022cf.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Test"
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Test"
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Fault" (= "Tilt" ?)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Fault" (= "Tilt" ?)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* MSB : SW2 -> 0xe04c26.b (cpl) */
 	PORT_DIPNAME( 0xf800, 0xf800, "Time" ) PORT_DIPLOCATION("SW2:5,4,3,2,1")
@@ -350,7 +350,7 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
 
-	PORT_START("DSW3_DSW1")	// 0x500000.w
+	PORT_START("DSW3_DSW1") // 0x500000.w
 	/* MSB : SW3 -> 0xe04c24.b (cpl) */
 	PORT_DIPNAME( 0xe000, 0xe000, "Next Credit" ) PORT_DIPLOCATION("SW3:3,2,1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
@@ -375,10 +375,10 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	/* LSB : SW1 -> 0xe04c25.b (cpl) */
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")	// To be confirmed
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")    // To be confirmed
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Rounds" ) PORT_DIPLOCATION("SW1:4,3,2")	// see notes
+	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Rounds" ) PORT_DIPLOCATION("SW1:4,3,2")    // see notes
 	PORT_DIPSETTING(      0x0070, "Endless" )
 	PORT_DIPSETTING(      0x0060, "1/2" )
 	PORT_DIPSETTING(      0x0050, "2/3" )
@@ -387,16 +387,16 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0020, "3/6" )
 	PORT_DIPSETTING(      0x0010, "4/7" )
 	PORT_DIPSETTING(      0x0000, "4/8" )
-	PORT_DIPNAME( 0x0008, 0x0000, "Select All Players" ) PORT_DIPLOCATION("SW1:5")		// in a 1 player game
-	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )			// only Ryo and Robert available
+	PORT_DIPNAME( 0x0008, 0x0000, "Select All Players" ) PORT_DIPLOCATION("SW1:5")      // in a 1 player game
+	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )           // only Ryo and Robert available
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )		// must be Off during P.O.S.T. !
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )       // must be Off during P.O.S.T. !
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( histryma )
-	PORT_START("P1_P2")	// 0x200000.w
+	PORT_START("P1_P2") // 0x200000.w
 	/* players inputs -> 0xe02cf2.w and 0xe02cf8.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -415,7 +415,7 @@ static INPUT_PORTS_START( histryma )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("EXTRA")	// 0x300000.w
+	PORT_START("EXTRA") // 0x300000.w
 	/* LSB : players extra inputs -> 0xe02cf5.b and 0xe02cfb.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -428,22 +428,22 @@ static INPUT_PORTS_START( histryma )
 	/* MSB : unused */
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM_DSW2")	// 0x400000.w
+	PORT_START("SYSTEM_DSW2")   // 0x400000.w
 	/* LSB : system inputs -> 0xe02cf7.b and 0xe02cfd.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Test"
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Test"
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Fault" (= "Tilt" ?)
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Test" (duplicated)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Fault" (= "Tilt" ?)
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Test" (duplicated)
 	/* MSB : SW2 -> 0xe05874.b (cpl) */
 	PORT_DIPNAME( 0xf800, 0x0000, "Time" ) PORT_DIPLOCATION("SW2:5,4,3,2,1")
 	#ifndef PRIORITY_EASINESS_TO_PLAY
-	  PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
-	  PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
-	  PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
+		PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
+		PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
+		PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
 	#endif
 	PORT_DIPSETTING(      0xe000, "15" )
 	PORT_DIPSETTING(      0xd800, "18" )
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( histryma )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
 
-	PORT_START("DSW3_DSW1")	// 0x500000.w
+	PORT_START("DSW3_DSW1") // 0x500000.w
 	/* MSB : SW3 -> 0xe05872.b (cpl) */
 	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW3:3,2,1")
 	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )
@@ -509,10 +509,10 @@ static INPUT_PORTS_START( histryma )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW3:8" )
 	/* LSB : SW1 -> 0xe05873.b (cpl) */
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")	// To be confirmed
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")    // To be confirmed
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Points" ) PORT_DIPLOCATION("SW1:4,3,2")	// see notes
+	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Points" ) PORT_DIPLOCATION("SW1:4,3,2")    // see notes
 	PORT_DIPSETTING(      0x0070, "Endless" )               // ends on a draw
 	PORT_DIPSETTING(      0x0060, "1/2" )
 	PORT_DIPSETTING(      0x0050, "2/3" )
@@ -521,11 +521,11 @@ static INPUT_PORTS_START( histryma )
 	PORT_DIPSETTING(      0x0020, "3/6" )
 	PORT_DIPSETTING(      0x0010, "4/7" )
 	PORT_DIPSETTING(      0x0000, "4/8" )
-	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" ) PORT_DIPLOCATION("SW1:5")	// 3 or 6 buttons as default ?
+	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" ) PORT_DIPLOCATION("SW1:5") // 3 or 6 buttons as default ?
 	PORT_DIPSETTING(      0x0008, "3" )
 	PORT_DIPSETTING(      0x0000, "6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )		// must be Off during P.O.S.T. !
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )       // must be Off during P.O.S.T. !
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:8" )
 INPUT_PORTS_END
 
@@ -534,7 +534,7 @@ INPUT_PORTS_END
    (the only difference being that there is no "Needed Points/Maximum Points"
    Dip Switch, the value always being set to "2/3") */
 static INPUT_PORTS_START( bbprot )
-	PORT_START("P1_P2")	// 0x300000.w
+	PORT_START("P1_P2") // 0x300000.w
 	/* players inputs -> 0xe0545e.w and 0xe05464.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -553,7 +553,7 @@ static INPUT_PORTS_START( bbprot )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("EXTRA")	// 0x380000.w
+	PORT_START("EXTRA") // 0x380000.w
 	/* LSB : players extra inputs -> 0xe05461.b and 0xe05467.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -566,22 +566,22 @@ static INPUT_PORTS_START( bbprot )
 	/* MSB : unused */
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM_DSW2")	// 0x400000.w
+	PORT_START("SYSTEM_DSW2")   // 0x400000.w
 	/* LSB : system inputs -> 0xe05463.b and 0xe05469.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Test"
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Test"
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Fault" (= "Tilt" ?)
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Test" (duplicated)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Fault" (= "Tilt" ?)
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )         // "Test" (duplicated)
 	/* MSB : SW2 -> 0xe07e84.b (cpl) */
 	PORT_DIPNAME( 0xf800, 0x0000, "Time" ) PORT_DIPLOCATION("SW2:5,4,3,2,1")
 	#ifndef PRIORITY_EASINESS_TO_PLAY
-	  PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
-	  PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
-	  PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
+		PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
+		PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
+		PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
 	#endif
 	PORT_DIPSETTING(      0xe000, "15" )
 	PORT_DIPSETTING(      0xd800, "18" )
@@ -622,7 +622,7 @@ static INPUT_PORTS_START( bbprot )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
 
-	PORT_START("DSW3_DSW1")	// 0x480000.w
+	PORT_START("DSW3_DSW1") // 0x480000.w
 	/* MSB : SW3 -> 0xe07e82.b (cpl) */
 	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW3:3,2,1")
 	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )
@@ -647,17 +647,17 @@ static INPUT_PORTS_START( bbprot )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW3:8" )
 	/* LSB : SW1 -> 0xe07e83.b (cpl) */
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")	// To be confirmed
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")    // To be confirmed
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:4" )
-	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" ) PORT_DIPLOCATION("SW1:5")	// 3 or 6 buttons as default ?
+	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" ) PORT_DIPLOCATION("SW1:5") // 3 or 6 buttons as default ?
 	PORT_DIPSETTING(      0x0008, "3" )
 	PORT_DIPSETTING(      0x0000, "6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )		// must be Off during P.O.S.T. !
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )       // must be Off during P.O.S.T. !
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:8" )
 INPUT_PORTS_END
 

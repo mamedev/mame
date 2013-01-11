@@ -20,7 +20,7 @@
 #define DSP56K_IRQ_MODA  0
 #define DSP56K_IRQ_MODB  1
 #define DSP56K_IRQ_MODC  2
-#define DSP56K_IRQ_RESET 3	/* Is this needed? */
+#define DSP56K_IRQ_RESET 3  /* Is this needed? */
 
 // Needed for MAME
 DECLARE_LEGACY_CPU_DEVICE(DSP56156, dsp56k);
@@ -179,17 +179,17 @@ struct dsp56k_core
 	// HACK - Bootstrap mode state variable.
 	UINT8 bootstrap_mode;
 
-	UINT8	repFlag;	// Knowing if we're in a 'repeat' state (dunno how the processor does this)
-	UINT32	repAddr;	// The address of the instruction to repeat...
+	UINT8   repFlag;    // Knowing if we're in a 'repeat' state (dunno how the processor does this)
+	UINT32  repAddr;    // The address of the instruction to repeat...
 
 
 	/* MAME internal stuff */
 	int icount;
 
-	UINT32			ppc;
-	UINT32			op;
-	int				interrupt_cycles;
-	void			(*output_pins_changed)(UINT32 pins);
+	UINT32          ppc;
+	UINT32          op;
+	int             interrupt_cycles;
+	void            (*output_pins_changed)(UINT32 pins);
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;

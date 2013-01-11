@@ -53,22 +53,22 @@ public:
 	// construction/destruction
 	segas18_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-		  m_mapper(*this, "mapper"),
-		  m_maincpu(*this, "maincpu"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_mcu(*this, "mcu"),
-		  m_vdp(*this, "gen_vdp"),
-		  m_nvram(*this, "nvram"),
-		  m_sprites(*this, "sprites"),
-		  m_workram(*this, "workram"),
-		  m_romboard(ROM_BOARD_INVALID),
-		  m_has_guns(false),
-		  m_grayscale_enable(false),
-		  m_vdp_enable(false),
-		  m_vdp_mixing(0),
-		  m_mcu_data(0),
-		  m_lghost_value(0),
-		  m_lghost_select(0)
+			m_mapper(*this, "mapper"),
+			m_maincpu(*this, "maincpu"),
+			m_soundcpu(*this, "soundcpu"),
+			m_mcu(*this, "mcu"),
+			m_vdp(*this, "gen_vdp"),
+			m_nvram(*this, "nvram"),
+			m_sprites(*this, "sprites"),
+			m_workram(*this, "workram"),
+			m_romboard(ROM_BOARD_INVALID),
+			m_has_guns(false),
+			m_grayscale_enable(false),
+			m_vdp_enable(false),
+			m_vdp_mixing(0),
+			m_mcu_data(0),
+			m_lghost_value(0),
+			m_lghost_select(0)
 	{
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
 		memset(m_wwally_last_x, 0, sizeof(m_wwally_last_x));
@@ -128,9 +128,9 @@ protected:
 	enum segas18_rom_board
 	{
 		ROM_BOARD_INVALID,
-		ROM_BOARD_171_SHADOW,	// 171-???? -- used by shadow dancer
-		ROM_BOARD_171_5874,		// 171-5874
-		ROM_BOARD_171_5987		// 171-5987
+		ROM_BOARD_171_SHADOW,   // 171-???? -- used by shadow dancer
+		ROM_BOARD_171_5874,     // 171-5874
+		ROM_BOARD_171_5987      // 171-5987
 	};
 
 	// device overrides
@@ -158,22 +158,22 @@ protected:
 	required_shared_ptr<UINT16> m_workram;
 
 	// configuration
-	segas18_rom_board	m_romboard;
-	read16_delegate		m_custom_io_r;
-	write16_delegate	m_custom_io_w;
-	bool				m_has_guns;
+	segas18_rom_board   m_romboard;
+	read16_delegate     m_custom_io_r;
+	write16_delegate    m_custom_io_w;
+	bool                m_has_guns;
 
 	// internal state
-	bool				m_grayscale_enable;
-	bool				m_vdp_enable;
-	UINT8				m_vdp_mixing;
-	bitmap_ind16		m_temp_bitmap;
-	UINT8				m_mcu_data;
-	UINT8				m_misc_io_data[0x10];
+	bool                m_grayscale_enable;
+	bool                m_vdp_enable;
+	UINT8               m_vdp_mixing;
+	bitmap_ind16        m_temp_bitmap;
+	UINT8               m_mcu_data;
+	UINT8               m_misc_io_data[0x10];
 
 	// game-specific state
-	UINT8				m_wwally_last_x[3];
-	UINT8				m_wwally_last_y[3];
-	UINT8				m_lghost_value;
-	UINT8				m_lghost_select;
+	UINT8               m_wwally_last_x[3];
+	UINT8               m_wwally_last_y[3];
+	UINT8               m_lghost_value;
+	UINT8               m_lghost_select;
 };

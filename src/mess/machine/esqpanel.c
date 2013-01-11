@@ -1,5 +1,5 @@
-/* 
-	Ensoniq panel/display device 
+/*
+    Ensoniq panel/display device
 */
 #include "emu.h"
 #include "esqpanel.h"
@@ -32,7 +32,7 @@ esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type
 
 void esqpanel_device::device_config_complete()
 {
-    m_shortname = "esqpanel";
+	m_shortname = "esqpanel";
 
 	// inherit a copy of the static data
 	const esqpanel_interface *intf = reinterpret_cast<const esqpanel_interface *>(static_config());
@@ -53,7 +53,7 @@ void esqpanel_device::device_config_complete()
 
 void esqpanel_device::device_start()
 {
-    m_out_tx_func.resolve(m_out_tx_cb, *this);
+	m_out_tx_func.resolve(m_out_tx_cb, *this);
 }
 
 
@@ -73,27 +73,27 @@ void esqpanel_device::device_reset()
 	m_bCalibSecondByte = false;
 }
 
-void esqpanel_device::rcv_complete()	// Rx completed receiving byte
-{	
+void esqpanel_device::rcv_complete()    // Rx completed receiving byte
+{
 	receive_register_extract();
 	UINT8 data = get_received_char();
 
-//	if (data >= 0xe0) printf("Got %02x from motherboard (second %s)\n", data, m_bCalibSecondByte ? "yes" : "no");
+//  if (data >= 0xe0) printf("Got %02x from motherboard (second %s)\n", data, m_bCalibSecondByte ? "yes" : "no");
 
 	send_to_display(data);
 
 	if (m_bCalibSecondByte)
 	{
-//		printf("second byte is %02x\n", data);
+//      printf("second byte is %02x\n", data);
 		if (data == 0xfd)   // calibration request
 		{
-//			printf("let's send reply!\n");
+//          printf("let's send reply!\n");
 			xmit_char(0xff);   // this is the correct response for "calibration OK"
 		}
 		m_bCalibSecondByte = false;
 	}
 	else if (data == 0xfb)   // request calibration
-	{   		
+	{
 		m_bCalibSecondByte = true;
 	}
 	else
@@ -118,9 +118,9 @@ void esqpanel_device::rcv_complete()	// Rx completed receiving byte
 	}
 }
 
-void esqpanel_device::tra_complete()	// Tx completed sending byte
+void esqpanel_device::tra_complete()    // Tx completed sending byte
 {
-//	printf("panel Tx complete\n");
+//  printf("panel Tx complete\n");
 	// is there more waiting to send?
 	if (m_xmit_read != m_xmit_write)
 	{
@@ -136,7 +136,7 @@ void esqpanel_device::tra_complete()	// Tx completed sending byte
 	}
 }
 
-void esqpanel_device::tra_callback()	// Tx send bit
+void esqpanel_device::tra_callback()    // Tx send bit
 {
 	int bit = transmit_register_get_data_bit();
 	m_out_tx_func(bit);
@@ -148,7 +148,7 @@ void esqpanel_device::input_callback(UINT8 state)
 
 void esqpanel_device::xmit_char(UINT8 data)
 {
-//	printf("Panel: xmit %02x\n", data);
+//  printf("Panel: xmit %02x\n", data);
 
 	// if tx is busy it'll pick this up automatically when it completes
 	if (!m_tx_busy)
@@ -175,10 +175,10 @@ MACHINE_CONFIG_END
 
 machine_config_constructor esqpanel1x22_device::device_mconfig_additions() const
 {
-    return MACHINE_CONFIG_NAME( esqpanel1x22 );
+	return MACHINE_CONFIG_NAME( esqpanel1x22 );
 }
 
-esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	esqpanel_device(mconfig, ESQPANEL1x22, "Ensoniq front panel with 1x22 VFD", tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
@@ -193,10 +193,10 @@ MACHINE_CONFIG_END
 
 machine_config_constructor esqpanel2x40_device::device_mconfig_additions() const
 {
-    return MACHINE_CONFIG_NAME( esqpanel2x40 );
+	return MACHINE_CONFIG_NAME( esqpanel2x40 );
 }
 
-esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	esqpanel_device(mconfig, ESQPANEL2x40, "Ensoniq front panel with 2x40 VFD", tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
@@ -211,13 +211,12 @@ MACHINE_CONFIG_END
 
 machine_config_constructor esqpanel2x40_sq1_device::device_mconfig_additions() const
 {
-    return MACHINE_CONFIG_NAME( esqpanel2x40_sq1 );
+	return MACHINE_CONFIG_NAME( esqpanel2x40_sq1 );
 }
 
-esqpanel2x40_sq1_device::esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+esqpanel2x40_sq1_device::esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	esqpanel_device(mconfig, ESQPANEL2x40, "Ensoniq front panel with 2x16 LCD", tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
 	m_eps_mode = false;
 }
-

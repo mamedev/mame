@@ -93,7 +93,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	}
 
 	/* If VIA T2 starts, reset refresh timer.
-       This is the best strategy for most games. */
+	   This is the best strategy for most games. */
 	state->m_reset_refresh = 1;
 
 	state->m_imager_angles = narrow_escape_angles;
@@ -117,7 +117,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 		state->m_imager_angles = minestorm_3d_angles;
 
 		/* Don't reset T2 each time it's written.
-           This would cause jerking in mine3. */
+		   This would cause jerking in mine3. */
 		state->m_reset_refresh = 0;
 	}
 
@@ -327,10 +327,10 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 		if (wavel < 1)
 		{
 			/* The Vectrex sends a stream of pulses which control the speed of
-               the motor using Pulse Width Modulation. Guessed parameters are MMI
-               (mass moment of inertia) of the color wheel, DAMPC (damping coefficient)
-               of the whole thing and some constants of the motor's torque/speed curve.
-               pwl is the negative pulse width and wavel is the whole wavelength. */
+			   the motor using Pulse Width Modulation. Guessed parameters are MMI
+			   (mass moment of inertia) of the color wheel, DAMPC (damping coefficient)
+			   of the whole thing and some constants of the motor's torque/speed curve.
+			   pwl is the negative pulse width and wavel is the whole wavelength. */
 
 			ang_acc = (50.0 - 1.55 * m_imager_freq) / MMI;
 			m_imager_freq += ang_acc * m_pwl + DAMPC * m_imager_freq / MMI * wavel;
@@ -338,9 +338,9 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 			if (m_imager_freq > 1)
 			{
 				m_imager_timer->adjust(
-									  attotime::from_double(MIN(1.0 / m_imager_freq, m_imager_timer->remaining().as_double())),
-									  2,
-									  attotime::from_double(1.0 / m_imager_freq));
+										attotime::from_double(MIN(1.0 / m_imager_freq, m_imager_timer->remaining().as_double())),
+										2,
+										attotime::from_double(1.0 / m_imager_freq));
 			}
 		}
 	}
@@ -362,11 +362,11 @@ DRIVER_INIT_MEMBER(vectrex_state,vectrex)
 		m_imager_colors[i] = RGB_WHITE;
 
 	/*
-     * Minestorm's PRNG doesn't work with a 0 seed (mines in the first
-     * level are not randomly distributed then). Only patch the seed's
-     * location since initializing all RAM randomly causes problems
-     * with Berzerk.
-     */
+	 * Minestorm's PRNG doesn't work with a 0 seed (mines in the first
+	 * level are not randomly distributed then). Only patch the seed's
+	 * location since initializing all RAM randomly causes problems
+	 * with Berzerk.
+	 */
 	m_gce_vectorram[0x7e] = machine().rand() | 1;
 	m_gce_vectorram[0x7f] = machine().rand() | 1;
 }

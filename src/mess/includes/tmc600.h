@@ -14,26 +14,26 @@
 #include "machine/ram.h"
 #include "sound/cdp1869.h"
 
-#define SCREEN_TAG		"screen"
-#define CDP1802_TAG		"cdp1802"
-#define CDP1869_TAG		"cdp1869"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "cdp1802"
+#define CDP1869_TAG     "cdp1869"
+#define CENTRONICS_TAG  "centronics"
 
-#define TMC600_PAGE_RAM_SIZE	0x400
-#define TMC600_PAGE_RAM_MASK	0x3ff
+#define TMC600_PAGE_RAM_SIZE    0x400
+#define TMC600_PAGE_RAM_MASK    0x3ff
 
 class tmc600_state : public driver_device
 {
 public:
 	tmc600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_vis(*this, CDP1869_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_page_ram(*this, "page_ram"),
-		  m_color_ram(*this, "color_ram")
-	 { }
+			m_maincpu(*this, CDP1802_TAG),
+			m_vis(*this, CDP1869_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG),
+			m_page_ram(*this, "page_ram"),
+			m_color_ram(*this, "color_ram")
+		{ }
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
@@ -58,15 +58,15 @@ public:
 	UINT8 get_color(UINT16 pma);
 
 	// video state
-	int m_vismac_reg_latch;		// video register latch
-	int m_vismac_color_latch;	// color latch
-	int m_vismac_bkg_latch;		// background color latch
-	int m_blink;				// cursor blink
+	int m_vismac_reg_latch;     // video register latch
+	int m_vismac_color_latch;   // color latch
+	int m_vismac_bkg_latch;     // background color latch
+	int m_blink;                // cursor blink
 
 	const UINT8 *m_char_rom;
 
 	// keyboard state
-	int m_keylatch;				// key latch
+	int m_keylatch;             // key latch
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 };
 

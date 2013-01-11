@@ -47,7 +47,7 @@ using namespace uml;
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_RECOVER			(0)
+#define LOG_RECOVER         (0)
 
 
 
@@ -61,17 +61,17 @@ using namespace uml;
 
 drc_hash_table::drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits)
 	: m_cache(cache),
-	  m_modes(modes),
-	  m_nocodeptr(NULL),
-	  m_l1bits((addrbits - ignorebits) / 2),
-	  m_l2bits((addrbits - ignorebits) - m_l1bits),
-	  m_l1shift(ignorebits + m_l2bits),
-	  m_l2shift(ignorebits),
-	  m_l1mask((1 << m_l1bits) - 1),
-	  m_l2mask((1 << m_l2bits) - 1),
-	  m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
-	  m_emptyl1(NULL),
-	  m_emptyl2(NULL)
+		m_modes(modes),
+		m_nocodeptr(NULL),
+		m_l1bits((addrbits - ignorebits) / 2),
+		m_l2bits((addrbits - ignorebits) - m_l1bits),
+		m_l1shift(ignorebits + m_l2bits),
+		m_l2shift(ignorebits),
+		m_l1mask((1 << m_l1bits) - 1),
+		m_l2mask((1 << m_l2bits) - 1),
+		m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
+		m_emptyl1(NULL),
+		m_emptyl2(NULL)
 {
 	reset();
 }
@@ -228,7 +228,7 @@ bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
 
 drc_map_variables::drc_map_variables(drc_cache &cache, UINT64 uniquevalue)
 	: m_cache(cache),
-	  m_uniquevalue(uniquevalue)
+		m_uniquevalue(uniquevalue)
 {
 	memset(m_mapvalue, 0, sizeof(m_mapvalue));
 }
@@ -464,7 +464,7 @@ UINT32 drc_map_variables::get_last_value(UINT32 mapvar)
 
 drc_label_list::drc_label_list(drc_cache &cache)
 	: m_cache(cache),
-	  m_oob_callback_delegate(FUNC(drc_label_list::oob_callback), this)
+		m_oob_callback_delegate(FUNC(drc_label_list::oob_callback), this)
 {
 }
 

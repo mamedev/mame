@@ -23,7 +23,7 @@ Missing:
 struct QuadInfo
 {
 	UINT16 *Dest;
-	UINT32 Pitch;	//in UINT16s
+	UINT32 Pitch;   //in UINT16s
 	UINT32 w,h;
 	UINT32 Tx;
 	UINT32 Ty;
@@ -113,7 +113,7 @@ Pick a rare enough color to disable transparency (that way I save a cmp per loop
 if I must draw transparent or not. The palette build will take this color in account so
 no color in the palette will have this value
 */
-#define NOTRANSCOLOR	0xecda
+#define NOTRANSCOLOR    0xecda
 
 #define RGB32(r,g,b) ((r << 16) | (g << 8) | (b << 0))
 #define RGB16(r,g,b) ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3)
@@ -123,9 +123,9 @@ INLINE UINT16 RGB32TO16(UINT32 rgb)
 	return (((rgb >> (16 + 3)) & 0x1f) << 11) | (((rgb >> (8 + 2)) & 0x3f) << 5) | (((rgb >> (3)) & 0x1f) << 0);
 }
 
-#define EXTRACTR8(Src)	(((Src >> 11) << 3) & 0xff)
-#define EXTRACTG8(Src)	(((Src >>  5) << 2) & 0xff)
-#define EXTRACTB8(Src)	(((Src >>  0) << 3) & 0xff)
+#define EXTRACTR8(Src)  (((Src >> 11) << 3) & 0xff)
+#define EXTRACTG8(Src)  (((Src >>  5) << 2) & 0xff)
+#define EXTRACTB8(Src)  (((Src >>  0) << 3) & 0xff)
 
 INLINE UINT16 Shade(UINT16 Src, UINT32 Shade)
 {
@@ -410,9 +410,9 @@ int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UIN
 	UINT32 Mode = 0;
 	UINT16 Packet0 = Packet(0);
 
-	if (Packet0 & 0x81)	//Sync or ASync flip
+	if (Packet0 & 0x81) //Sync or ASync flip
 	{
-		vr0->LastPalUpdate = 0xffffffff;	//Force update palette next frame
+		vr0->LastPalUpdate = 0xffffffff;    //Force update palette next frame
 		return 1;
 	}
 
@@ -472,14 +472,14 @@ int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UIN
 		{
 			UINT32 p = Pal[i];
 			UINT16 v = RGB32TO16(p);
-			if ((v == Trans && p != vr0->RenderState.TransColor) || v == NOTRANSCOLOR)	//Error due to conversion. caused transparent
+			if ((v == Trans && p != vr0->RenderState.TransColor) || v == NOTRANSCOLOR)  //Error due to conversion. caused transparent
 			{
 				if ((v & 0x1f) != 0x1f)
-					v++;									//Make the color a bit different (blueish) so it's not
+					v++;                                    //Make the color a bit different (blueish) so it's not
 				else
 					v--;
 			}
-			vr0->InternalPalette[i] = v;						//made transparent by mistake
+			vr0->InternalPalette[i] = v;                        //made transparent by mistake
 		}
 		vr0->LastPalUpdate = vr0->RenderState.PalOffset;
 	}
@@ -518,15 +518,15 @@ int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UIN
 		if (Packet0 & 0x10)
 		{
 			Quad.Shade = vr0->RenderState.ShadeColor;
-			if (!Mode)		//Alpha includes Shade
+			if (!Mode)      //Alpha includes Shade
 				Mode = 2;
 			/*
-            //simulate shade with alphablend (SLOW!!!)
-            if (!Quad.SrcAlpha && (Packet0 & 0x8))
-            {
-                Quad.SrcAlpha = 0x21; //1
-                Quad.DstAlpha = 0x01; //0
-            }*/
+			//simulate shade with alphablend (SLOW!!!)
+			if (!Quad.SrcAlpha && (Packet0 & 0x8))
+			{
+			    Quad.SrcAlpha = 0x21; //1
+			    Quad.DstAlpha = 0x01; //0
+			}*/
 		}
 		else
 			Quad.Shade = RGB32(255,255,255);
@@ -537,7 +537,7 @@ int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UIN
 		//Quad.Trans = 0;
 		Quad.Clamp = Packet0 & 0x20;
 
-		if (Packet0 & 0x8)	//Texture Enable
+		if (Packet0 & 0x8)  //Texture Enable
 		{
 			Quad.u.Imageb = TEXTURE + 128 * vr0->RenderState.FontOffset;
 			Quad.Tile = (UINT16*) (TEXTURE + 128 * vr0->RenderState.TileOffset);
@@ -545,7 +545,7 @@ int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UIN
 				Quad.Pal = vr0->InternalPalette + (vr0->RenderState.PaletteBank * 16);
 			else
 				Quad.Pal = vr0->InternalPalette;
-			if (vr0->RenderState.TextureMode)	//Tiled
+			if (vr0->RenderState.TextureMode)   //Tiled
 				DrawTile[vr0->RenderState.PixelFormat + 4 * Mode](&Quad);
 			else
 				DrawImage[vr0->RenderState.PixelFormat + 4 * Mode](&Quad);
@@ -635,5 +635,3 @@ void vr0video_device::device_reset()
 {
 	DEVICE_RESET_NAME( vr0video )(this);
 }
-
-

@@ -65,9 +65,9 @@ void ds2401_device::device_reset()
 		// Ensure the size is correct though
 		if(m_region->bytes() != SIZE_DATA)
 			logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n",
-					 tag(),
-					 SIZE_DATA,
-					 m_region->bytes());
+						tag(),
+						SIZE_DATA,
+						m_region->bytes());
 		else {
 			UINT8 *rb = m_region->base();
 			memcpy(data, rb, SIZE_DATA);

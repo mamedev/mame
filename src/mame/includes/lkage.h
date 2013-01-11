@@ -46,7 +46,7 @@ public:
 
 	/* lkageb fake mcu */
 	UINT8 m_mcu_val;
-	int m_mcu_ready;	/* cpu data/mcu ready status */
+	int m_mcu_ready;    /* cpu data/mcu ready status */
 
 	/* devices */
 	cpu_device *m_maincpu;

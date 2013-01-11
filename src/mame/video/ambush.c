@@ -106,7 +106,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 		sx = m_spriteram[offs + 3];
 
 		if ( (sy == 0) ||
-			 (sy == 0xff) ||
+				(sy == 0xff) ||
 			((sx <  0x40) && (  m_spriteram[offs + 2] & 0x10)) ||
 			((sx >= 0xc0) && (!(m_spriteram[offs + 2] & 0x10))))
 			continue;  /* prevent wraparound */

@@ -59,35 +59,35 @@
 
 
 // MAC
-#define A0			BIT(offset, 0)
-#define A1			BIT(offset, 1)
-#define A2			BIT(offset, 2)
-#define A4			BIT(offset, 4)
-#define A7			BIT(offset, 7)
-#define A8			BIT(offset, 8)
-#define X11			BIT(offset, 11)
-#define X12			BIT(offset, 12)
-#define A17			BIT(offset, 17)
-#define A18			BIT(offset, 18)
-#define A19			BIT(offset, 19)
+#define A0          BIT(offset, 0)
+#define A1          BIT(offset, 1)
+#define A2          BIT(offset, 2)
+#define A4          BIT(offset, 4)
+#define A7          BIT(offset, 7)
+#define A8          BIT(offset, 8)
+#define X11         BIT(offset, 11)
+#define X12         BIT(offset, 12)
+#define A17         BIT(offset, 17)
+#define A18         BIT(offset, 18)
+#define A19         BIT(offset, 19)
 
-#define A10_A9_A8	((offset >> 8) & 0x07)
-#define A2_A1_A0	(offset & 0x07)
-#define A1_A2		((A1 << 1) | A2)
-#define A2_A1		((offset >> 1) & 0x03)
+#define A10_A9_A8   ((offset >> 8) & 0x07)
+#define A2_A1_A0    (offset & 0x07)
+#define A1_A2       ((A1 << 1) | A2)
+#define A2_A1       ((offset >> 1) & 0x03)
 
-#define FC0			BIT(fc, 0)
-#define FC1			BIT(fc, 1)
-#define FC2			BIT(fc, 2)
+#define FC0         BIT(fc, 0)
+#define FC1         BIT(fc, 1)
+#define FC2         BIT(fc, 2)
 
-#define PAGE_WP		BIT(page_data, 14)
-#define PAGE_NONX	BIT(page_data, 15)
+#define PAGE_WP     BIT(page_data, 14)
+#define PAGE_NONX   BIT(page_data, 15)
 
 
 // task register
-#define BOOTE		BIT(m_task, 6)
-#define MAGIC		BIT(m_task, 7)
-#define READ_MAGIC	!MAGIC
+#define BOOTE       BIT(m_task, 6)
+#define MAGIC       BIT(m_task, 7)
+#define READ_MAGIC  !MAGIC
 
 
 // DMA map
@@ -339,18 +339,18 @@ UINT8 abc1600_state::read_external_io(offs_t offset)
 			{
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       1
-                    1       1
-                    2       LXCSB2*
-                    3       LXCSB3*
-                    4       LXCSB4*
-                    5       LXCSB5*
-                    6       LCSB*-0
-                    7       LCSB*-0I
+				    0       1
+				    1       1
+				    2       LXCSB2*
+				    3       LXCSB3*
+				    4       LXCSB4*
+				    5       LXCSB5*
+				    6       LCSB*-0
+				    7       LCSB*-0I
 
-                */
+				*/
 
 				data = (m_csb & 0xfc) | 0x03;
 			}
@@ -358,18 +358,18 @@ UINT8 abc1600_state::read_external_io(offs_t offset)
 			{
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       LCSB*-2
-                    1       LCSB*-1
-                    2       1
-                    3       1
-                    4       1
-                    5       1
-                    6       1
-                    7       1
+				    0       LCSB*-2
+				    1       LCSB*-1
+				    2       1
+				    3       1
+				    4       1
+				    5       1
+				    6       1
+				    7       1
 
-                */
+				*/
 
 				data = 0xfc | (m_csb & 0x03);
 			}
@@ -882,18 +882,18 @@ READ8_MEMBER( abc1600_state::cause_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       RSTBUT
-        1       1
-        2       DMAOK
-        3       X16
-        4       X17
-        5       X18
-        6       X19
-        7       X20
+	    0       RSTBUT
+	    1       1
+	    2       DMAOK
+	    3       X16
+	    4       X17
+	    5       X18
+	    6       X19
+	    7       X20
 
-    */
+	*/
 
 	UINT8 data = 0x02;
 
@@ -914,18 +914,18 @@ WRITE8_MEMBER( abc1600_state::task_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       TASKD0* (inverted SEGA5)
-        1       TASKD1* (inverted SEGA6)
-        2       TASKD2* (inverted SEGA7)
-        3       TASKD3* (inverted SEGA8)
-        4
-        5
-        6       BOOTE*
-        7       MAGIC*
+	    0       TASKD0* (inverted SEGA5)
+	    1       TASKD1* (inverted SEGA6)
+	    2       TASKD2* (inverted SEGA7)
+	    3       TASKD3* (inverted SEGA8)
+	    4
+	    5
+	    6       BOOTE*
+	    7       MAGIC*
 
-    */
+	*/
 
 	m_task = data ^ 0xff;
 
@@ -941,18 +941,18 @@ READ8_MEMBER( abc1600_state::segment_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SEGD0
-        1       SEGD1
-        2       SEGD2
-        3       SEGD3
-        4       SEGD4
-        5       SEGD5
-        6       SEGD6
-        7       READ_MAGIC
+	    0       SEGD0
+	    1       SEGD1
+	    2       SEGD2
+	    3       SEGD3
+	    4       SEGD4
+	    5       SEGD5
+	    6       SEGD6
+	    7       READ_MAGIC
 
-    */
+	*/
 
 	offs_t sega = get_segment_address(offset);
 	UINT8 segd = m_segment_ram[sega];
@@ -969,18 +969,18 @@ WRITE8_MEMBER( abc1600_state::segment_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SEGD0
-        1       SEGD1
-        2       SEGD2
-        3       SEGD3
-        4       SEGD4
-        5       SEGD5
-        6       SEGD6
-        7       0
+	    0       SEGD0
+	    1       SEGD1
+	    2       SEGD2
+	    3       SEGD3
+	    4       SEGD4
+	    5       SEGD5
+	    6       SEGD6
+	    7       0
 
-    */
+	*/
 
 	offs_t sega = get_segment_address(offset);
 
@@ -998,27 +998,27 @@ READ8_MEMBER( abc1600_state::page_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       X11
-        1       X12
-        2       X13
-        3       X14
-        4       X15
-        5       X16
-        6       X17
-        7       X18
+	    0       X11
+	    1       X12
+	    2       X13
+	    3       X14
+	    4       X15
+	    5       X16
+	    6       X17
+	    7       X18
 
-        8       X19
-        9       X20
-        10      X20
-        11      X20
-        12      X20
-        13      X20
-        14      _WP
-        15      NONX
+	    8       X19
+	    9       X20
+	    10      X20
+	    11      X20
+	    12      X20
+	    13      X20
+	    14      _WP
+	    15      NONX
 
-    */
+	*/
 
 	// segment
 	offs_t sega = get_segment_address(offset);
@@ -1053,27 +1053,27 @@ WRITE8_MEMBER( abc1600_state::page_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       X11
-        1       X12
-        2       X13
-        3       X14
-        4       X15
-        5       X16
-        6       X17
-        7       X18
+	    0       X11
+	    1       X12
+	    2       X13
+	    3       X14
+	    4       X15
+	    5       X16
+	    6       X17
+	    7       X18
 
-        8       X19
-        9       X20
-        10
-        11
-        12
-        13
-        14      _WP
-        15      NONX
+	    8       X19
+	    9       X20
+	    10
+	    11
+	    12
+	    13
+	    14      _WP
+	    15      NONX
 
-    */
+	*/
 
 	// segment
 	offs_t sega = get_segment_address(offset);
@@ -1223,18 +1223,18 @@ WRITE8_MEMBER( abc1600_state::dmamap_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       X16
-        1       X17
-        2       X18
-        3       X19
-        4       X20
-        5
-        6
-        7       _R/W
+	    0       X16
+	    1       X17
+	    2       X18
+	    3       X19
+	    4       X20
+	    5
+	    6
+	    7       _R/W
 
-    */
+	*/
 
 	if (LOG) logerror("DMAMAP %u %02x\n", offset & 7, data);
 
@@ -1255,18 +1255,18 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SEL1
-        1       SEL2
-        2       SEL3
-        3       MOTOR
-        4       LC/PC
-        5       LC/PC
-        6
-        7
+	    0       SEL1
+	    1       SEL2
+	    2       SEL3
+	    3       MOTOR
+	    4       LC/PC
+	    5       LC/PC
+	    6
+	    7
 
-    */
+	*/
 
 	if (LOG) logerror("FW0 %02x\n", data);
 
@@ -1292,18 +1292,18 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       MR
-        1       DDEN
-        2       HLT
-        3       MINI
-        4       HLD
-        5       P0
-        6       P1
-        7       P2
+	    0       MR
+	    1       DDEN
+	    2       HLT
+	    3       MINI
+	    4       HLD
+	    5       P0
+	    6       P1
+	    7       P2
 
-    */
+	*/
 
 	if (LOG) logerror("FW1 %02x\n", data);
 
@@ -1560,18 +1560,18 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     BUS2
-        PA1     BUS1
-        PA2     BUS0X*2
-        PA3     BUS0X*3
-        PA4     BUS0X*4
-        PA5     BUS0X*5
-        PA6     BUS0X
-        PA7     BUS0I
+	    PA0     BUS2
+	    PA1     BUS1
+	    PA2     BUS0X*2
+	    PA3     BUS0X*3
+	    PA4     BUS0X*4
+	    PA5     BUS0X*5
+	    PA6     BUS0X
+	    PA7     BUS0I
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -1591,18 +1591,18 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0
-        PB1     POWERFAIL
-        PB2
-        PB3
-        PB4     MINT
-        PB5     _PREN-1
-        PB6     _PREN-0
-        PB7     FINT
+	    PB0
+	    PB1     POWERFAIL
+	    PB2
+	    PB3
+	    PB4     MINT
+	    PB5     _PREN-1
+	    PB6     _PREN-0
+	    PB7     FINT
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -1619,18 +1619,18 @@ WRITE8_MEMBER( abc1600_state::cio_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     PRBR
-        PB1
-        PB2
-        PB3
-        PB4
-        PB5
-        PB6
-        PB7
+	    PB0     PRBR
+	    PB1
+	    PB2
+	    PB3
+	    PB4
+	    PB5
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	// printer baudrate
 	int prbr = BIT(data, 0);
@@ -1643,14 +1643,14 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0     1
-        PC1     DATA IN
-        PC2     1
-        PC3     1
+	    PC0     1
+	    PC1     DATA IN
+	    PC2     1
+	    PC3     1
 
-    */
+	*/
 
 	UINT8 data = 0x0d;
 
@@ -1664,14 +1664,14 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0     CLOCK
-        PC1     DATA OUT
-        PC2     RTC CS
-        PC3     NVRAM CS
+	    PC0     CLOCK
+	    PC1     DATA OUT
+	    PC2     RTC CS
+	    PC3     NVRAM CS
 
-    */
+	*/
 
 	int clock = BIT(data, 0);
 	int data_out = BIT(data, 1);

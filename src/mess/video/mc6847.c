@@ -70,40 +70,40 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define TOP_BORDER				25
-#define	USE_HORIZONTAL_CLIP		false
+#define TOP_BORDER              25
+#define USE_HORIZONTAL_CLIP     false
 
-#define TIMER_HSYNC_PERIOD		(227.5)
-#define TIMER_HSYNC_OFF_TIME	(10.0)
-#define TIMER_HSYNC_ON_TIME		(TIMER_HSYNC_OFF_TIME + 16.5)
-#define TIMER_FSYNC_OFF_TIME	(TIMER_HSYNC_PERIOD * TOP_BORDER + TIMER_HSYNC_ON_TIME)
-#define TIMER_FSYNC_ON_TIME		(TIMER_HSYNC_PERIOD * (TOP_BORDER + 192) + TIMER_HSYNC_ON_TIME)
+#define TIMER_HSYNC_PERIOD      (227.5)
+#define TIMER_HSYNC_OFF_TIME    (10.0)
+#define TIMER_HSYNC_ON_TIME     (TIMER_HSYNC_OFF_TIME + 16.5)
+#define TIMER_FSYNC_OFF_TIME    (TIMER_HSYNC_PERIOD * TOP_BORDER + TIMER_HSYNC_ON_TIME)
+#define TIMER_FSYNC_ON_TIME     (TIMER_HSYNC_PERIOD * (TOP_BORDER + 192) + TIMER_HSYNC_ON_TIME)
 
-#define LOG_SCANLINE			0
-#define LOG_HSYNC				0
-#define LOG_FSYNC				0
+#define LOG_SCANLINE            0
+#define LOG_HSYNC               0
+#define LOG_FSYNC               0
 
 
 const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 {
-	MAKE_RGB(0x07, 0xff, 0x00),	/* GREEN */
-	MAKE_RGB(0xff, 0xff, 0x00),	/* YELLOW */
-	MAKE_RGB(0x3b, 0x08, 0xff),	/* BLUE */
-	MAKE_RGB(0xcc, 0x00, 0x3b),	/* RED */
-	MAKE_RGB(0xff, 0xff, 0xff),	/* BUFF */
-	MAKE_RGB(0x07, 0xe3, 0x99),	/* CYAN */
-	MAKE_RGB(0xff, 0x1c, 0xff),	/* MAGENTA */
-	MAKE_RGB(0xff, 0x81, 0x00),	/* ORANGE */
+	MAKE_RGB(0x07, 0xff, 0x00), /* GREEN */
+	MAKE_RGB(0xff, 0xff, 0x00), /* YELLOW */
+	MAKE_RGB(0x3b, 0x08, 0xff), /* BLUE */
+	MAKE_RGB(0xcc, 0x00, 0x3b), /* RED */
+	MAKE_RGB(0xff, 0xff, 0xff), /* BUFF */
+	MAKE_RGB(0x07, 0xe3, 0x99), /* CYAN */
+	MAKE_RGB(0xff, 0x1c, 0xff), /* MAGENTA */
+	MAKE_RGB(0xff, 0x81, 0x00), /* ORANGE */
 
-	MAKE_RGB(0x00, 0x00, 0x00),	/* BLACK */
-	MAKE_RGB(0x07, 0xff, 0x00),	/* GREEN */
-	MAKE_RGB(0x00, 0x00, 0x00),	/* BLACK */
-	MAKE_RGB(0xff, 0xff, 0xff),	/* BUFF */
+	MAKE_RGB(0x00, 0x00, 0x00), /* BLACK */
+	MAKE_RGB(0x07, 0xff, 0x00), /* GREEN */
+	MAKE_RGB(0x00, 0x00, 0x00), /* BLACK */
+	MAKE_RGB(0xff, 0xff, 0xff), /* BUFF */
 
-	MAKE_RGB(0x00, 0x7c, 0x00),	/* ALPHANUMERIC DARK GREEN */
-	MAKE_RGB(0x07, 0xff, 0x00),	/* ALPHANUMERIC BRIGHT GREEN */
-	MAKE_RGB(0x91, 0x00, 0x00),	/* ALPHANUMERIC DARK ORANGE */
-	MAKE_RGB(0xff, 0x81, 0x00)	/* ALPHANUMERIC BRIGHT ORANGE */
+	MAKE_RGB(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
+	MAKE_RGB(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
+	MAKE_RGB(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
+	MAKE_RGB(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
 };
 
 
@@ -119,7 +119,7 @@ const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
 		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  m_character_map(fontdata, is_mc6847t1)
+		m_character_map(fontdata, is_mc6847t1)
 {
 	m_tpfs = tpfs;
 
@@ -153,9 +153,9 @@ ATTR_FORCE_INLINE emu_timer *mc6847_friend_device::setup_timer(device_timer_id i
 void mc6847_friend_device::device_start(void)
 {
 	/* create the timers */
-	m_frame_timer = setup_timer(	TIMER_FRAME,		0,						m_tpfs * TIMER_HSYNC_PERIOD);
-	m_hsync_on_timer = setup_timer(	TIMER_HSYNC_ON,		TIMER_HSYNC_ON_TIME,	TIMER_HSYNC_PERIOD);
-	m_hsync_off_timer = setup_timer(TIMER_HSYNC_OFF,	TIMER_HSYNC_OFF_TIME,	TIMER_HSYNC_PERIOD);
+	m_frame_timer = setup_timer(    TIMER_FRAME,        0,                      m_tpfs * TIMER_HSYNC_PERIOD);
+	m_hsync_on_timer = setup_timer( TIMER_HSYNC_ON,     TIMER_HSYNC_ON_TIME,    TIMER_HSYNC_PERIOD);
+	m_hsync_off_timer = setup_timer(TIMER_HSYNC_OFF,    TIMER_HSYNC_OFF_TIME,   TIMER_HSYNC_PERIOD);
 	m_fsync_timer = timer_alloc(TIMER_FSYNC);
 
 	m_top_border_scanlines = 0;
@@ -227,10 +227,10 @@ void mc6847_friend_device::device_timer(emu_timer &timer, device_timer_id id, in
 {
 	switch(id)
 	{
-		case TIMER_FRAME:		new_frame();					break;
-		case TIMER_HSYNC_ON:	change_horizontal_sync(true);	break;
-		case TIMER_HSYNC_OFF:	change_horizontal_sync(false);	break;
-		case TIMER_FSYNC:		change_field_sync(param != 0);	break;
+		case TIMER_FRAME:       new_frame();                    break;
+		case TIMER_HSYNC_ON:    change_horizontal_sync(true);   break;
+		case TIMER_HSYNC_OFF:   change_horizontal_sync(false);  break;
+		case TIMER_FSYNC:       change_field_sync(param != 0);  break;
 	}
 }
 
@@ -258,12 +258,12 @@ const char *mc6847_friend_device::scanline_zone_string(scanline_zone zone)
 	const char *result;
 	switch(zone)
 	{
-		case SCANLINE_ZONE_TOP_BORDER:		result = "SCANLINE_ZONE_TOP_BORDER";	break;
-		case SCANLINE_ZONE_BODY:			result = "SCANLINE_ZONE_BODY";			break;
-		case SCANLINE_ZONE_BOTTOM_BORDER:	result = "SCANLINE_ZONE_BOTTOM_BORDER";	break;
-		case SCANLINE_ZONE_RETRACE:			result = "SCANLINE_ZONE_RETRACE";		break;
-		case SCANLINE_ZONE_VBLANK:			result = "SCANLINE_ZONE_VBLANK";		break;
-		case SCANLINE_ZONE_FRAME_END:		result = "SCANLINE_ZONE_FRAME_END";		break;
+		case SCANLINE_ZONE_TOP_BORDER:      result = "SCANLINE_ZONE_TOP_BORDER";    break;
+		case SCANLINE_ZONE_BODY:            result = "SCANLINE_ZONE_BODY";          break;
+		case SCANLINE_ZONE_BOTTOM_BORDER:   result = "SCANLINE_ZONE_BOTTOM_BORDER"; break;
+		case SCANLINE_ZONE_RETRACE:         result = "SCANLINE_ZONE_RETRACE";       break;
+		case SCANLINE_ZONE_VBLANK:          result = "SCANLINE_ZONE_VBLANK";        break;
+		case SCANLINE_ZONE_FRAME_END:       result = "SCANLINE_ZONE_FRAME_END";     break;
 		default:
 			fatalerror("Should not get here\n");
 			break;
@@ -481,7 +481,7 @@ const char *mc6847_friend_device::describe_context(void)
 //-------------------------------------------------
 
 mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs)
-	:	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191)
+	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191)
 {
 	m_palette = s_palette;
 
@@ -544,14 +544,14 @@ void mc6847_base_device::device_start()
 	/* set up fixed mode */
 	m_fixed_mode = 0x00;
 	m_fixed_mode_mask = 0x00;
-	setup_fixed_mode(config->m_in_gm2_func,		MODE_GM2);
-	setup_fixed_mode(config->m_in_gm1_func,		MODE_GM1);
-	setup_fixed_mode(config->m_in_gm0_func,		MODE_GM0);
-	setup_fixed_mode(config->m_in_intext_func,	MODE_INTEXT);
-	setup_fixed_mode(config->m_in_inv_func,		MODE_INV);
-	setup_fixed_mode(config->m_in_as_func,		MODE_AS);
-	setup_fixed_mode(config->m_in_ag_func,		MODE_AG);
-	setup_fixed_mode(config->m_in_css_func,		MODE_CSS);
+	setup_fixed_mode(config->m_in_gm2_func,     MODE_GM2);
+	setup_fixed_mode(config->m_in_gm1_func,     MODE_GM1);
+	setup_fixed_mode(config->m_in_gm0_func,     MODE_GM0);
+	setup_fixed_mode(config->m_in_intext_func,  MODE_INTEXT);
+	setup_fixed_mode(config->m_in_inv_func,     MODE_INV);
+	setup_fixed_mode(config->m_in_as_func,      MODE_AS);
+	setup_fixed_mode(config->m_in_ag_func,      MODE_AG);
+	setup_fixed_mode(config->m_in_css_func,     MODE_CSS);
 
 	/* state save */
 	save_item(NAME(m_dirty));
@@ -804,9 +804,9 @@ mc6847_friend_device::character_map::character_map(const UINT8 *text_fontdata, b
 	// set up font data
 	for (i = 0; i < 64*12; i++)
 	{
-		m_text_fontdata_inverse[i]				= text_fontdata[i] ^ 0xFF;
-		m_text_fontdata_lower_case[i]			= text_fontdata[i + (i < 32*12 ? 64*12 : 0)] ^ (i < 32*12 ? 0xFF : 0x00);
-		m_text_fontdata_lower_case_inverse[i]	= m_text_fontdata_lower_case[i] ^ 0xFF;
+		m_text_fontdata_inverse[i]              = text_fontdata[i] ^ 0xFF;
+		m_text_fontdata_lower_case[i]           = text_fontdata[i + (i < 32*12 ? 64*12 : 0)] ^ (i < 32*12 ? 0xFF : 0x00);
+		m_text_fontdata_lower_case_inverse[i]   = m_text_fontdata_lower_case[i] ^ 0xFF;
 	}
 
 	// loop through all modes
@@ -824,48 +824,48 @@ mc6847_friend_device::character_map::character_map(const UINT8 *text_fontdata, b
 		if ((mode & MODE_INTEXT) && !is_mc6847t1)
 		{
 			// semigraphics 6
-			fontdata			= semigraphics6_fontdata8x12;
-			character_mask		= 0x3F;
-			color_base_0		= 8;
-			color_base_1		= mode & MODE_CSS ? 4 : 0;
-			color_shift_1		= 6;
-			color_mask_1		= 0x03;
+			fontdata            = semigraphics6_fontdata8x12;
+			character_mask      = 0x3F;
+			color_base_0        = 8;
+			color_base_1        = mode & MODE_CSS ? 4 : 0;
+			color_shift_1       = 6;
+			color_mask_1        = 0x03;
 		}
 		else if (mode & MODE_AS)
 		{
 			// semigraphics 4
-			fontdata			= semigraphics4_fontdata8x12;
-			character_mask		= 0x0F;
-			color_base_0		= 8;
-			color_base_1		= 0;
-			color_shift_1		= 4;
-			color_mask_1		= 0x07;
+			fontdata            = semigraphics4_fontdata8x12;
+			character_mask      = 0x0F;
+			color_base_0        = 8;
+			color_base_1        = 0;
+			color_shift_1       = 4;
+			color_mask_1        = 0x07;
 		}
 		else
 		{
 			// text
-			bool is_lower_case	= is_mc6847t1 && ((mode & MODE_INV) == 0) && (mode & MODE_GM0);
-			bool is_inverse1	= (mode & MODE_INV) ? true : false;
-			bool is_inverse2	= is_mc6847t1 && (mode & MODE_GM1);
-			bool is_inverse		= (is_inverse1 && !is_inverse2) || (!is_inverse1 && is_inverse2);
-			fontdata			= is_inverse
+			bool is_lower_case  = is_mc6847t1 && ((mode & MODE_INV) == 0) && (mode & MODE_GM0);
+			bool is_inverse1    = (mode & MODE_INV) ? true : false;
+			bool is_inverse2    = is_mc6847t1 && (mode & MODE_GM1);
+			bool is_inverse     = (is_inverse1 && !is_inverse2) || (!is_inverse1 && is_inverse2);
+			fontdata            = is_inverse
 									? (is_lower_case ? m_text_fontdata_lower_case_inverse : m_text_fontdata_inverse)
 									: (is_lower_case ? m_text_fontdata_lower_case : text_fontdata);
-			character_mask		= 0x3F;
-			color_base_0		= (mode & MODE_CSS ? 14 : 12);
-			color_base_1		= (mode & MODE_CSS ? 15 : 13);
+			character_mask      = 0x3F;
+			color_base_0        = (mode & MODE_CSS ? 14 : 12);
+			color_base_1        = (mode & MODE_CSS ? 15 : 13);
 		}
 
 		// populate the entry
 		memset(&m_entries[mode], 0, sizeof(m_entries[mode]));
-		m_entries[mode].m_fontdata			= fontdata;
-		m_entries[mode].m_character_mask	= character_mask;
-		m_entries[mode].m_color_shift_0		= color_shift_0;
-		m_entries[mode].m_color_shift_1		= color_shift_1;
-		m_entries[mode].m_color_mask_0		= color_mask_0;
-		m_entries[mode].m_color_mask_1		= color_mask_1;
-		m_entries[mode].m_color_base_0		= color_base_0;
-		m_entries[mode].m_color_base_1		= color_base_1;
+		m_entries[mode].m_fontdata          = fontdata;
+		m_entries[mode].m_character_mask    = character_mask;
+		m_entries[mode].m_color_shift_0     = color_shift_0;
+		m_entries[mode].m_color_shift_1     = color_shift_1;
+		m_entries[mode].m_color_mask_0      = color_mask_0;
+		m_entries[mode].m_color_mask_1      = color_mask_1;
+		m_entries[mode].m_color_base_0      = color_base_0;
+		m_entries[mode].m_color_base_1      = color_base_1;
 	}
 }
 
@@ -1460,12 +1460,12 @@ void mc6847_base_device::artifacter::setup_config(device_t *device)
 void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 {
 	/* Boy this code sucks; this code was adapted from the old M6847
-     * artifacting implmentation.  The only reason that it didn't look as
-     * horrible was because the code around it sucked as well.  Now that I
-     * have cleaned everything up, the ugliness is much more prominent.
-     *
-     * Hopefully we will have a generic artifacting algorithm that plugs into
-     * the MESS/MAME core directly so we can chuck this hack */
+	 * artifacting implmentation.  The only reason that it didn't look as
+	 * horrible was because the code around it sucked as well.  Now that I
+	 * have cleaned everything up, the ugliness is much more prominent.
+	 *
+	 * Hopefully we will have a generic artifacting algorithm that plugs into
+	 * the MESS/MAME core directly so we can chuck this hack */
 	static const double artifact_colors[14*3] =
 	{
 		0.157, 0.000, 0.157, /* [ 1] - dk purple   (reverse  2) */
@@ -1486,25 +1486,25 @@ void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 
 	static const UINT8 artifact_correction[128] =
 	{
-		0,  0,		 0,	 0,		 0,  6,		 0,	 2,
-		5,  7,		 5,	 7,		 1,  3,		 1, 11,
-		8,  6,		 8, 14,		 8,  9,		 8,	 9,
-		4,  4,		 4, 15,		12, 12,		12, 15,
+		0,  0,       0,  0,      0,  6,      0,  2,
+		5,  7,       5,  7,      1,  3,      1, 11,
+		8,  6,       8, 14,      8,  9,      8,  9,
+		4,  4,       4, 15,     12, 12,     12, 15,
 
-		5, 13,		 5, 13,		13,  0,		13,	 2,
-		10, 10,		10, 10,		10, 15,		10, 11,
-		3,  1,		 3,	 1,		15,  9,		15,	 9,
-		11, 11,		11, 11,		15, 15,		15, 15,
+		5, 13,       5, 13,     13,  0,     13,  2,
+		10, 10,     10, 10,     10, 15,     10, 11,
+		3,  1,       3,  1,     15,  9,     15,  9,
+		11, 11,     11, 11,     15, 15,     15, 15,
 
-		14,  0,		14,	 0,		14,  6,		14,	 2,
-		0,  7,		 0,	 7,		 1,  3,		 1, 11,
-		9,  6,		 9, 14,		 9,  9,		 9,	 9,
-		15,  4,		15, 15,		12, 12,		12, 15,
+		14,  0,     14,  0,     14,  6,     14,  2,
+		0,  7,       0,  7,      1,  3,      1, 11,
+		9,  6,       9, 14,      9,  9,      9,  9,
+		15,  4,     15, 15,     12, 12,     12, 15,
 
-		2, 13,		 2, 13,		 2,  0,		 2,	 2,
-		10, 10,		10, 10,		10, 15,		10, 11,
-		12,  1,		12,	 1,		12,  9,		12,	 9,
-		15, 11,		15, 11,		15, 15,		15, 15
+		2, 13,       2, 13,      2,  0,      2,  2,
+		10, 10,     10, 10,     10, 15,     10, 11,
+		12,  1,     12,  1,     12,  9,     12,  9,
+		15, 11,     15, 11,     15, 15,     15, 15
 	};
 
 	pixel_t colors[16];
@@ -1522,9 +1522,9 @@ void mc6847_base_device::artifacter::update_colors(pixel_t c0, pixel_t c1)
 		{
 			const double *factors = &artifact_colors[((i - 1) ^ (m_artifacting & 0x01)) * 3];
 
-			colors[i] =	(mix_color(factors[0], c0 >> 16, c1 >> 16) << 16)
-					|	(mix_color(factors[1], c0 >>  8, c1 >>  8) <<  8)
-					|	(mix_color(factors[2], c0 >>  0, c1 >>  0) <<  0);
+			colors[i] = (mix_color(factors[0], c0 >> 16, c1 >> 16) << 16)
+					|   (mix_color(factors[1], c0 >>  8, c1 >>  8) <<  8)
+					|   (mix_color(factors[2], c0 >>  0, c1 >>  0) <<  0);
 		}
 		for (i = 0; i < 128; i++)
 		{
@@ -1622,6 +1622,3 @@ mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const ch
 	: mc6847_base_device(mconfig, MC6847T1_PAL, "MC6847T1_PAL", tag, owner, clock, pal_round_fontdata8x12, 227.0)
 {
 }
-
-
-

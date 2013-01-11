@@ -26,7 +26,7 @@
 // ======================> s100_djdma_device
 
 class s100_djdma_device : public device_t,
-						  public device_s100_card_interface
+							public device_s100_card_interface
 {
 public:
 	// construction/destruction
@@ -40,7 +40,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "djdma"; }
+	virtual void device_config_complete() { m_shortname = "djdma"; }
 
 private:
 	// internal state

@@ -113,18 +113,18 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       palette entry bit 0
-        1       palette entry bit 1
-        2       palette entry bit 2
-        3       palette entry bit 3
-        4       mode select bit 0
-        5       mode select bit 1
-        6       unused
-        7       write color during HBLANK
+	    0       palette entry bit 0
+	    1       palette entry bit 1
+	    2       palette entry bit 2
+	    3       palette entry bit 3
+	    4       mode select bit 0
+	    5       mode select bit 1
+	    6       unused
+	    7       write color during HBLANK
 
-    */
+	*/
 
 	m_mode = data;
 
@@ -141,18 +141,18 @@ WRITE8_MEMBER( tiki100_state::palette_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       blue intensity bit 0
-        1       blue intensity bit 1
-        2       green intensity bit 0
-        3       green intensity bit 1
-        4       green intensity bit 2
-        5       red intensity bit 0
-        6       red intensity bit 1
-        7       red intensity bit 2
+	    0       blue intensity bit 0
+	    1       blue intensity bit 1
+	    2       green intensity bit 0
+	    3       green intensity bit 1
+	    4       green intensity bit 2
+	    5       red intensity bit 0
+	    6       red intensity bit 1
+	    7       red intensity bit 2
 
-    */
+	*/
 
 	m_palette = data;
 }
@@ -161,18 +161,18 @@ WRITE8_MEMBER( tiki100_state::system_w )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        0       DRIS0   drive select 0
-        1       DRIS1   drive select 1
-        2       _ROME   enable ROM at 0000-3fff
-        3       VIRE    enable video RAM at 0000-7fff
-        4       SDEN    single density select (0=DD, 1=SD)
-        5       _LMP0   GRAFIKK key led
-        6       MOTON   floppy motor
-        7       _LMP1   LOCK key led
+	    0       DRIS0   drive select 0
+	    1       DRIS1   drive select 1
+	    2       _ROME   enable ROM at 0000-3fff
+	    3       VIRE    enable video RAM at 0000-7fff
+	    4       SDEN    single density select (0=DD, 1=SD)
+	    5       _LMP0   GRAFIKK key led
+	    6       MOTON   floppy motor
+	    7       _LMP1   LOCK key led
 
-    */
+	*/
 
 	// drive select
 	floppy_image_device *floppy = NULL;
@@ -472,13 +472,13 @@ static Z80DART_INTERFACE( dart_intf )
 
 static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 /* Z80-CTC Interface */
@@ -498,10 +498,10 @@ WRITE_LINE_MEMBER( tiki100_state::ctc_z1_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg2),	/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z1_w),		/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)	/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg2), /* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z1_w),      /* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)  /* ZC/TO2 callback */
 };
 
 /* FD1797 Interface */
@@ -576,18 +576,18 @@ void tiki100_state::machine_start()
 
 static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/4)
-    MCFG_CPU_PROGRAM_MAP(tiki100_mem)
-    MCFG_CPU_IO_MAP(tiki100_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/4)
+	MCFG_CPU_PROGRAM_MAP(tiki100_mem)
+	MCFG_CPU_IO_MAP(tiki100_io)
 	MCFG_CPU_CONFIG(tiki100_daisy_chain)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	/* video hardware */
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(tiki100_state, screen_update)
-    MCFG_SCREEN_SIZE(1024, 256)
-    MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
+	MCFG_SCREEN_SIZE(1024, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
 
 	MCFG_PALETTE_LENGTH(16)
 	// pixel clock 20.01782 MHz
@@ -641,5 +641,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME        FLAGS */
-COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100, driver_device,	0,		"Kontiki Data A/S",	"KONTIKI 100",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100, driver_device,	0,		"Tiki Data A/S",	"TIKI 100",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, driver_device, 0,      "Kontiki Data A/S", "KONTIKI 100",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, driver_device, 0,      "Tiki Data A/S",    "TIKI 100",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

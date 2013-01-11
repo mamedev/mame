@@ -34,13 +34,13 @@
 
 // init functions
 
-#define MODEL_V9938	(0)
-#define MODEL_V9958	(1)
+#define MODEL_V9938 (0)
+#define MODEL_V9958 (1)
 
 // resolutions
-#define RENDER_HIGH	(0)
-#define RENDER_LOW	(1)
-#define RENDER_AUTO	(2)
+#define RENDER_HIGH (0)
+#define RENDER_LOW  (1)
+#define RENDER_AUTO (2)
 
 
 //**************************************************************************
@@ -69,7 +69,7 @@ class v99x8_device : public device_t, public device_memory_interface
 	friend PALETTE_INIT( v9958 );
 
 protected:
-    // construction/destruction
+	// construction/destruction
 	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
 
 public:
@@ -99,8 +99,8 @@ public:
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
 protected:
-	const address_space_config		m_space_config;
-	address_space*					m_vram_space;
+	const address_space_config      m_space_config;
+	address_space*                  m_vram_space;
 
 	int m_model;
 
@@ -188,7 +188,7 @@ private:
 	// general
 	int m_offset_x, m_offset_y, m_visible_y, m_mode;
 	// palette
-	int	m_pal_write_first, m_cmd_write_first;
+	int m_pal_write_first, m_cmd_write_first;
 	UINT8 m_pal_write, m_cmd_write;
 	UINT8 m_pal_reg[32], m_stat_reg[10], m_cont_reg[48], m_read_ahead;
 
@@ -196,13 +196,13 @@ private:
 	UINT16 m_address_latch;
 	int m_vram_size;
 
-    // interrupt
-    UINT8 m_int_state;
-    v99x8_interrupt_delegate m_int_callback;
-    const char *m_int_callback_device_name;
+	// interrupt
+	UINT8 m_int_state;
+	v99x8_interrupt_delegate m_int_callback;
+	const char *m_int_callback_device_name;
 	int m_scanline;
-    // blinking
-    int m_blink, m_blink_count;
+	// blinking
+	int m_blink, m_blink_count;
 	// size
 	int m_size, m_size_old, m_size_auto, m_size_now;
 	// mouse
@@ -253,13 +253,13 @@ private:
 class v9938_device : public v99x8_device
 {
 public:
-    v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class v9958_device : public v99x8_device
 {
 public:
-    v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 PALETTE_INIT( v9938 );

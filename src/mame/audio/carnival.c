@@ -43,7 +43,7 @@
 #include "includes/vicdual.h"
 
 
-#define	PSG_CLOCK		(3579545 / 3)	/* Hz */
+#define PSG_CLOCK       (3579545 / 3)   /* Hz */
 
 
 /* output port 0x01 definitions - sound effect drive outputs */

@@ -66,7 +66,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	int dimension,total_chunks,bad_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
-       while processing sprite ram and then draw them all at the end */
+	   while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->m_spritelist;
 
 	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
@@ -104,8 +104,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		x -= x_offs;
 
 		bad_chunks = 0;
-		dimension = ((dblsize*2) + 2);	// 2 or 4
-		total_chunks = ((dblsize*3) + 1) << 2;	// 4 or 16
+		dimension = ((dblsize*2) + 2);  // 2 or 4
+		total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
 		map_offset = tilenum << 2;
 
 		{
@@ -137,8 +137,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				if (sprites_flipscreen)
 				{
 					/* -zx/y is there to fix zoomed sprite coords in screenflip.
-                       drawgfxzoom does not know to draw from flip-side of sprites when
-                       screen is flipped; so we must correct the coords ourselves. */
+					   drawgfxzoom does not know to draw from flip-side of sprites when
+					   screen is flipped; so we must correct the coords ourselves. */
 
 					curx = 320 - curx - zx;
 					cury = 256 - cury - zy;
@@ -208,16 +208,16 @@ UINT32 superchs_state::screen_update_superchs(screen_device &screen, bitmap_ind1
 	tc0480scp_tilemap_update(tc0480scp);
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
-	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
 	layer[2] = (priority & 0x00f0) >>  4;
-	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
+	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
 	machine().priority_bitmap.fill(0, cliprect);
 
 	/* We have to assume 2nd to bottom layer is always underneath
-       sprites as pdrawgfx cannot yet cope with more than 4 layers */
+	   sprites as pdrawgfx cannot yet cope with more than 4 layers */
 
 #ifdef MAME_DEBUG
 	if (!machine().input().code_pressed (KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
@@ -231,7 +231,7 @@ UINT32 superchs_state::screen_update_superchs(screen_device &screen, bitmap_ind1
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 1);
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 2);
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 4);
-	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 8);	/* text layer */
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 8);    /* text layer */
 	draw_sprites(machine(), bitmap, cliprect, primasks, 48, -116);
 #endif
 	return 0;

@@ -18,8 +18,8 @@ class isa8_com_device :
 		public device_isa8_card_interface
 {
 public:
-        // construction/destruction
-        isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
@@ -27,9 +27,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1) { m_isa->irq4_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2) { m_isa->irq3_w(state); }
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "isa_com"; }
 };
 
@@ -43,8 +43,8 @@ class isa8_com_at_device :
 		public isa8_com_device
 {
 public:
-        // construction/destruction
-        isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;

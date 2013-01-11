@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, irq enable, priority, coin counters, other? */
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(cpuA_ctrl_w)  /* halt cpu B, irq enable, priority, coin counters, other? */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c8002, 0x0c8003) AM_READ_PORT("P1")
 	AM_RANGE(0x0c8004, 0x0c8005) AM_READ_PORT("P2")
@@ -183,13 +183,13 @@ static ADDRESS_MAP_START( gradius3_map2, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE("gfxram")
 	AM_RANGE(0x2c0000, 0x2c000f) AM_READWRITE(k051937_halfword_r, k051937_halfword_w)
 	AM_RANGE(0x2c0800, 0x2c0fff) AM_READWRITE(k051960_halfword_r, k051960_halfword_w)
-	AM_RANGE(0x400000, 0x5fffff) AM_READ(gradius3_gfxrom_r)		/* gfx ROMs are mapped here, and copied to RAM */
+	AM_RANGE(0x400000, 0x5fffff) AM_READ(gradius3_gfxrom_r)     /* gfx ROMs are mapped here, and copied to RAM */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)             /* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -210,7 +210,7 @@ static INPUT_PORTS_START( gradius3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P1")
-	KONAMI8_MONO_B123_UNK						// button1 = power-up, button2 = shoot, button3 = missile
+	KONAMI8_MONO_B123_UNK                       // button1 = power-up, button2 = shoot, button3 = missile
 
 	PORT_START("P2")
 	KONAMI8_COCKTAIL_B123_UNK
@@ -220,37 +220,37 @@ static INPUT_PORTS_START( gradius3 )
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20k and every 70k" )
 	PORT_DIPSETTING(    0x10, "100k and every 100k" )
 	PORT_DIPSETTING(    0x08, "50k only" )
 	PORT_DIPSETTING(    0x00, "100k only" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )			PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )          PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )			/* Manual says it's unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )           /* Manual says it's unused */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -263,7 +263,7 @@ static void volume_callback(device_t *device, int v)
 
 static const k007232_interface k007232_config =
 {
-	volume_callback	/* external port callback */
+	volume_callback /* external port callback */
 };
 
 
@@ -313,11 +313,11 @@ void gradius3_state::machine_reset()
 static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(gradius3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gradius3_state,  cpuA_interrupt)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz */
+	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(gradius3_map2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gradius3_state, gradius3_sub_scanline, "screen", 0, 1)
 																				/* 4 is triggered by cpu A, the others are unknown but */
@@ -386,10 +386,10 @@ ROM_START( gradius3 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_r05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) ) /* Same as 945 M05, but different label */
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )	/* fake */
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )    /* fake */
 	/* gfx data is dynamically generated in RAM */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "945_a02.l3",         0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD16_BYTE( "945_l04a.k6", 0x080000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
 	ROM_LOAD16_BYTE( "945_l04c.m6", 0x080001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
@@ -402,9 +402,9 @@ ROM_START( gradius3 )
 	ROM_LOAD16_BYTE( "945_l03d.h8", 0x1c0001, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )	/* priority encoder (not used) */
+	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "k007232", 0 )	/* 007232 samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 007232 samples */
 	ROM_LOAD( "945_a10.b15",  0x00000, 0x40000, CRC(1d083e10) SHA1(b116f133a7647ef7a6c373aff00e9622d9954b61) )
 	ROM_LOAD( "945_l11a.c18", 0x40000, 0x20000, CRC(6043f4eb) SHA1(1c2e9ace1cfdde504b7b6158e3c3f54dc5ae33d4) )
 	ROM_LOAD( "945_l11b.c20", 0x60000, 0x20000, CRC(89ea3baf) SHA1(8edcbaa7969185cfac48c02559826d1b8b081f3f) )
@@ -428,10 +428,10 @@ ROM_START( gradius3j )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )	/* fake */
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )    /* fake */
 	/* gfx data is dynamically generated in RAM */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "945_a02.l3",         0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD16_BYTE( "945_l04a.k6", 0x080000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
 	ROM_LOAD16_BYTE( "945_l04c.m6", 0x080001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
@@ -444,9 +444,9 @@ ROM_START( gradius3j )
 	ROM_LOAD16_BYTE( "945_l03d.h8", 0x1c0001, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )	/* priority encoder (not used) */
+	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "k007232", 0 )	/* 007232 samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 007232 samples */
 	ROM_LOAD( "945_a10.b15",  0x00000, 0x40000, CRC(1d083e10) SHA1(b116f133a7647ef7a6c373aff00e9622d9954b61) )
 	ROM_LOAD( "945_l11a.c18", 0x40000, 0x20000, CRC(6043f4eb) SHA1(1c2e9ace1cfdde504b7b6158e3c3f54dc5ae33d4) )
 	ROM_LOAD( "945_l11b.c20", 0x60000, 0x20000, CRC(89ea3baf) SHA1(8edcbaa7969185cfac48c02559826d1b8b081f3f) )
@@ -470,10 +470,10 @@ ROM_START( gradius3a )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )	/* fake */
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )    /* fake */
 	/* gfx data is dynamically generated in RAM */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* graphics (addressable by the main CPU) */
 	ROM_LOAD( "945_a02.l3",         0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
 	ROM_LOAD16_BYTE( "945_l04a.k6", 0x080000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
 	ROM_LOAD16_BYTE( "945_l04c.m6", 0x080001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
@@ -486,9 +486,9 @@ ROM_START( gradius3a )
 	ROM_LOAD16_BYTE( "945_l03d.h8", 0x1c0001, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )	/* priority encoder (not used) */
+	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "k007232", 0 )	/* 007232 samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 007232 samples */
 	ROM_LOAD( "945_a10.b15",  0x00000, 0x40000, CRC(1d083e10) SHA1(b116f133a7647ef7a6c373aff00e9622d9954b61) )
 	ROM_LOAD( "945_l11a.c18", 0x40000, 0x20000, CRC(6043f4eb) SHA1(1c2e9ace1cfdde504b7b6158e3c3f54dc5ae33d4) )
 	ROM_LOAD( "945_l11b.c20", 0x60000, 0x20000, CRC(89ea3baf) SHA1(8edcbaa7969185cfac48c02559826d1b8b081f3f) )

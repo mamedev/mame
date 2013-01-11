@@ -60,7 +60,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MC68A52P_TAG		"mc6852"
+#define MC68A52P_TAG        "mc6852"
 
 
 
@@ -169,7 +169,7 @@ c64_tdos_cartridge_device::c64_tdos_cartridge_device(const machine_config &mconf
 	device_t(mconfig, C64_TDOS, "C64 TDOS cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_ssda(*this, MC68A52P_TAG),
-    m_exp(*this, C64_EXPANSION_SLOT_TAG)
+	m_exp(*this, C64_EXPANSION_SLOT_TAG)
 {
 }
 

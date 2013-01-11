@@ -131,7 +131,7 @@ UINT32 trs80_state::screen_update_trs80m4(screen_device &screen, bitmap_ind16 &b
 	UINT8 rows = BIT(m_mode, 2) ? 24 : 16;
 	UINT8 lines = BIT(m_mode, 2) ? 10 : 12;
 	UINT8 s_cols = cols;
-	UINT8 mask = BIT(m_mode, 5) ? 0xff : 0xbf;	/* Select Japanese or extended chars */
+	UINT8 mask = BIT(m_mode, 5) ? 0xff : 0xbf;  /* Select Japanese or extended chars */
 
 	if (m_mode & 1)
 	{
@@ -264,7 +264,7 @@ UINT32 trs80_state::screen_update_ht1080z(screen_device &screen, bitmap_ind16 &b
 					*p++ = BIT(gfx, 5);
 					*p++ = BIT(gfx, 4);
 					*p++ = BIT(gfx, 3);
-					*p++ = 0;	/* fix for ht108064 */
+					*p++ = 0;   /* fix for ht108064 */
 				}
 			}
 		}
@@ -296,7 +296,7 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 
 	switch (m_mode & 0x30)
 	{
-		case 0:					// MODE 0
+		case 0:                 // MODE 0
 			for (y = 0; y < 16; y++)
 			{
 				for (ra = 0; ra < 12; ra++)
@@ -341,7 +341,7 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 			}
 			break;
 
-		case 0x10:					// MODE 1
+		case 0x10:                  // MODE 1
 			for (y = 0; y < 0x400; y+=0x40)
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
@@ -375,9 +375,9 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 			}
 			break;
 
-		case 0x20:					// MODE 2
+		case 0x20:                  // MODE 2
 			/* it seems the text video ram can have an effect in this mode,
-                not explained clearly, so not emulated */
+			    not explained clearly, so not emulated */
 			for (y = 0; y < 0x400; y+=0x40)
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
@@ -401,10 +401,10 @@ UINT32 trs80_state::screen_update_lnw80(screen_device &screen, bitmap_ind16 &bit
 			}
 			break;
 
-		case 0x30:					// MODE 3
+		case 0x30:                  // MODE 3
 			/* the manual does not explain at all how colour is determined
-                for the extended area. Further, the background colour
-                is not mentioned anywhere. Black is assumed. */
+			    for the extended area. Further, the background colour
+			    is not mentioned anywhere. Black is assumed. */
 			for (y = 0; y < 0x400; y+=0x40)
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)

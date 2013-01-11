@@ -73,7 +73,7 @@ READ8_MEMBER(changela_state::changela_68705_port_c_r)
 WRITE8_MEMBER(changela_state::changela_68705_port_c_w)
 {
 	/* PC3 is connected to the CLOCK input of the LS374,
-        so we latch the data on positive going edge of the clock */
+	    so we latch the data on positive going edge of the clock */
 
 /* this is strange because if we do this corectly - it just doesn't work */
 	if ((data & 8) /*& (!(m_port_c_out & 8))*/ )
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 /* U30 */
 READ8_MEMBER(changela_state::changela_24_r)
 {
-	return ((m_port_c_out & 2) << 2) | 7;	/* bits 2,1,0-N/C inputs */
+	return ((m_port_c_out & 2) << 2) | 7;   /* bits 2,1,0-N/C inputs */
 }
 
 READ8_MEMBER(changela_state::changela_25_r)
@@ -122,14 +122,14 @@ READ8_MEMBER(changela_state::changela_25_r)
 
 READ8_MEMBER(changela_state::changela_30_r)
 {
-	return ioport("WHEEL")->read() & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
+	return ioport("WHEEL")->read() & 0x0f;  //wheel control (clocked input) signal on bits 3,2,1,0
 }
 
 READ8_MEMBER(changela_state::changela_31_r)
 {
 	/* If the new value is less than the old value, and it did not wrap around,
-       or if the new value is greater than the old value, and it did wrap around,
-       then we are moving LEFT. */
+	   or if the new value is greater than the old value, and it did wrap around,
+	   then we are moving LEFT. */
 	UINT8 curr_value = ioport("WHEEL")->read();
 
 	if ((curr_value < m_prev_value_31 && (m_prev_value_31 - curr_value) < 0x80)
@@ -204,15 +204,15 @@ WRITE8_MEMBER(changela_state::changela_coin_counter_w)
 static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("spriteram") /* OBJ0 RAM */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("videoram")	/* OBJ1 RAM */
-	AM_RANGE(0xa000, 0xa07f) AM_WRITE(changela_colors_w) AM_SHARE("colorram")	/* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("videoram")    /* OBJ1 RAM */
+	AM_RANGE(0xa000, 0xa07f) AM_WRITE(changela_colors_w) AM_SHARE("colorram")   /* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(changela_mem_device_r, changela_mem_device_w)	/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(changela_mem_device_r, changela_mem_device_w) /* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
 	/* LS138 - U16 */
-	AM_RANGE(0xc800, 0xc800) AM_WRITENOP				/* not connected */
-	AM_RANGE(0xc900, 0xc900) AM_WRITE(changela_mem_device_select_w)	/* selects the memory device to be accessible at 0xc000-0xc7ff */
+	AM_RANGE(0xc800, 0xc800) AM_WRITENOP                /* not connected */
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(changela_mem_device_select_w) /* selects the memory device to be accessible at 0xc000-0xc7ff */
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(changela_slope_rom_addr_hi_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(changela_slope_rom_addr_lo_w)
 
@@ -235,15 +235,15 @@ static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
 	AM_RANGE(0xd030, 0xd030) AM_READWRITE(changela_30_r, mcu_w)
 	AM_RANGE(0xd031, 0xd031) AM_READ(changela_31_r)
 
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(watchdog_reset_w)	/* Watchdog */
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(watchdog_reset_w) /* Watchdog */
 
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM	/* RAM2 (Processor RAM) */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* RAM2 (Processor RAM) */
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( changela )
-	PORT_START("DSWA")	/* DSWA */
-	PORT_DIPNAME( 0x07, 0x01, "Steering Wheel Ratio" )		PORT_DIPLOCATION("SWA:1,2,3")
+	PORT_START("DSWA")  /* DSWA */
+	PORT_DIPNAME( 0x07, 0x01, "Steering Wheel Ratio" )      PORT_DIPLOCATION("SWA:1,2,3")
 	//PORT_DIPSETTING(    0x00, "?" ) /* Not documented */
 	PORT_DIPSETTING(    0x01, "Recommended Setting" )
 	//PORT_DIPSETTING(    0x02, "?" ) /* Not documented */
@@ -252,87 +252,87 @@ static INPUT_PORTS_START( changela )
 	//PORT_DIPSETTING(    0x05, "?" ) /* Not documented */
 	//PORT_DIPSETTING(    0x06, "?" ) /* Not documented */
 	//PORT_DIPSETTING(    0x07, "?" ) /* Not documented */
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SWA:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Ignore Memory Failures" )	PORT_DIPLOCATION("SWA:5")
+	PORT_DIPNAME( 0x10, 0x00, "Ignore Memory Failures" )    PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Controls ) )			PORT_DIPLOCATION("SWA:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Controls ) )         PORT_DIPLOCATION("SWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, "Steering Wheel" )
-	PORT_DIPNAME( 0x40, 0x40, "Diagnostic" )				PORT_DIPLOCATION("SWA:7")
+	PORT_DIPNAME( 0x40, 0x40, "Diagnostic" )                PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Players ) )			PORT_DIPLOCATION("SWA:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Players ) )          PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("DSWB")	/* DSWB */
-	PORT_DIPNAME( 0x03, 0x00, "Max Bonus Fuels" )			PORT_DIPLOCATION("SWB:1,2")
+	PORT_START("DSWB")  /* DSWB */
+	PORT_DIPNAME( 0x03, 0x00, "Max Bonus Fuels" )           PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x00, "99" )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Difficulty" )			PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPNAME( 0x0c, 0x08, "Game Difficulty" )           PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x30, 0x20, "Traffic Difficulty" )		PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPNAME( 0x30, 0x20, "Traffic Difficulty" )        PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x00, "Land Collisions Enabled" )	PORT_DIPLOCATION("SWB:7")
+	PORT_DIPNAME( 0x40, 0x00, "Land Collisions Enabled" )   PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Car Collision Enabled" )		PORT_DIPLOCATION("SWB:8")
+	PORT_DIPNAME( 0x80, 0x00, "Car Collision Enabled" )     PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWC")	/* DSWC - coinage */
-	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SWC:5,6,7,8")
+	PORT_START("DSWC")  /* DSWC - coinage */
+	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWC:5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(	0x90, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0xa0, DEF_STR( 2C_2C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0xb0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 2C_4C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0xd0, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(	0xe0, DEF_STR( 2C_6C ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0xf0, DEF_STR( 2C_7C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0x50, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(	0x60, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(	0x70, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SWC:1,2,3,4")
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_4C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_6C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 2C_7C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_7C ) )
+	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SWC:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(	0x09, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x0a, DEF_STR( 2C_2C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x0b, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 2C_4C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x0d, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(	0x0e, DEF_STR( 2C_6C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x0f, DEF_STR( 2C_7C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(	0x06, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(	0x07, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_4C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_6C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 2C_7C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
 
-	PORT_START("DSWD")	/* DSWD - bonus */
-	PORT_DIPNAME( 0x01, 0x01, "Right Slot" )				PORT_DIPLOCATION("SWD:1")
+	PORT_START("DSWD")  /* DSWD - bonus */
+	PORT_DIPNAME( 0x01, 0x01, "Right Slot" )                PORT_DIPLOCATION("SWD:1")
 	PORT_DIPSETTING(    0x01, "On Right (Bottom) Counter" )
 	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
-	PORT_DIPNAME( 0x02, 0x02, "Left Slot" )					PORT_DIPLOCATION("SWD:2")
+	PORT_DIPNAME( 0x02, 0x02, "Left Slot" )                 PORT_DIPLOCATION("SWD:2")
 	PORT_DIPSETTING(    0x02, "On Right (Bottom) Counter" )
 	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
-	PORT_DIPNAME( 0x1c, 0x00, "Credits For Bonus" )			PORT_DIPLOCATION("SWD:3,4,5")
+	PORT_DIPNAME( 0x1c, 0x00, "Credits For Bonus" )         PORT_DIPLOCATION("SWD:3,4,5")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
@@ -341,11 +341,11 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(    0x14, "5" )
 	PORT_DIPSETTING(    0x18, "6" )
 	PORT_DIPSETTING(    0x1c, "7" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWD:6" )	/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWD:6" )   /* Listed as "Unused" */
 	PORT_DIPNAME( 0x40, 0x00, "'King Of The World' Name Length" )PORT_DIPLOCATION("SWD:7")
 	PORT_DIPSETTING(    0x40, "3 Letters" )
 	PORT_DIPSETTING(    0x00, "Long" )
-	PORT_DIPNAME( 0x80, 0x00, "'King Of The World' Name" )	PORT_DIPLOCATION("SWD:8")
+	PORT_DIPNAME( 0x80, 0x00, "'King Of The World' Name" )  PORT_DIPLOCATION("SWD:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -354,9 +354,9 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x30, 0x30, "Self Test Switch" )			PORT_DIPLOCATION("SWT:1,2")
+	PORT_DIPNAME( 0x30, 0x30, "Self Test Switch" )          PORT_DIPLOCATION("SWT:1,2")
 	//PORT_DIPSETTING(    0x00, "?" )                       /* Not possible, 3-state switch */
-	PORT_DIPSETTING(    0x20, "Free Game" )					/* "Puts a credit on the game without increasing the coin counter." */
+	PORT_DIPSETTING(    0x20, "Free Game" )                 /* "Puts a credit on the game without increasing the coin counter." */
 	PORT_DIPSETTING(    0x10, DEF_STR( Test ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -532,38 +532,38 @@ MACHINE_CONFIG_END
 
 
 ROM_START( changela )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Z80 code */
-	ROM_LOAD( "cl25a",	0x0000, 0x2000, CRC(38530a60) SHA1(0b0ef1abe11c5271fcd1671322b77165217553c3) )
-	ROM_LOAD( "cl24a",	0x2000, 0x2000, CRC(2fcf4a82) SHA1(c33355e2d4d3fab32c8d713a680ec0fceedab341) )
-	ROM_LOAD( "cl23",	0x4000, 0x2000, CRC(08385891) SHA1(d8d66664ec25db067d5a4a6c35ec0ac65b9e0c6a) )
-	ROM_LOAD( "cl22",	0x6000, 0x2000, CRC(796e0abd) SHA1(64dd9fc1f9bc44519a253ef0c02e181dd13904bf) )
-	ROM_LOAD( "cl27",	0xb000, 0x1000, CRC(3668afb8) SHA1(bcfb788baf806edcb129ea9f9dcb1d4260684773) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code */
+	ROM_LOAD( "cl25a",  0x0000, 0x2000, CRC(38530a60) SHA1(0b0ef1abe11c5271fcd1671322b77165217553c3) )
+	ROM_LOAD( "cl24a",  0x2000, 0x2000, CRC(2fcf4a82) SHA1(c33355e2d4d3fab32c8d713a680ec0fceedab341) )
+	ROM_LOAD( "cl23",   0x4000, 0x2000, CRC(08385891) SHA1(d8d66664ec25db067d5a4a6c35ec0ac65b9e0c6a) )
+	ROM_LOAD( "cl22",   0x6000, 0x2000, CRC(796e0abd) SHA1(64dd9fc1f9bc44519a253ef0c02e181dd13904bf) )
+	ROM_LOAD( "cl27",   0xb000, 0x1000, CRC(3668afb8) SHA1(bcfb788baf806edcb129ea9f9dcb1d4260684773) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* 68705U3 */
-	ROM_LOAD( "cl38a",	0x0000, 0x800, CRC(b70156ce) SHA1(c5eab8bbd65c4f587426298da4e22f991ce01dde) )
+	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705U3 */
+	ROM_LOAD( "cl38a",  0x0000, 0x800, CRC(b70156ce) SHA1(c5eab8bbd65c4f587426298da4e22f991ce01dde) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )	/* tile data */
-	ROM_LOAD( "cl111",	0x0000, 0x2000, CRC(41c0149d) SHA1(3ea53a3821b044b3d0451fec1b4ee2c28da393ca) )
-	ROM_LOAD( "cl113",	0x2000, 0x2000, CRC(ddf99926) SHA1(e816b88302c5639c7284f4845d450f232d63a10c) )
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* tile data */
+	ROM_LOAD( "cl111",  0x0000, 0x2000, CRC(41c0149d) SHA1(3ea53a3821b044b3d0451fec1b4ee2c28da393ca) )
+	ROM_LOAD( "cl113",  0x2000, 0x2000, CRC(ddf99926) SHA1(e816b88302c5639c7284f4845d450f232d63a10c) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )	/* obj 1 data */
-	ROM_LOAD( "cl46",	0x0000, 0x1000, CRC(9c0a7d28) SHA1(fac9180ea0d9aeea56a84b35cc0958f0dd86a801) )
+	ROM_REGION( 0x1000, "gfx2", 0 ) /* obj 1 data */
+	ROM_LOAD( "cl46",   0x0000, 0x1000, CRC(9c0a7d28) SHA1(fac9180ea0d9aeea56a84b35cc0958f0dd86a801) )
 
-	ROM_REGION( 0x8000, "user1", 0 )	/* obj 0 data */
-	ROM_LOAD( "cl100",	0x0000, 0x2000, CRC(3fa9e4fa) SHA1(9abd7df5fcf143a0c476bd8c8753c5ea294b9f74) )
-	ROM_LOAD( "cl99",	0x2000, 0x2000, CRC(67b27b9e) SHA1(7df0f93851959359218c8d2272e30d242a77039d) )
-	ROM_LOAD( "cl98",	0x4000, 0x2000, CRC(bffe4149) SHA1(5cf0b98f9d342bd06d575c565ea01bbd79f5e04b) )
-	ROM_LOAD( "cl97",	0x6000, 0x2000, CRC(5abab8f9) SHA1(f5156855bbcdf0740fd44520386318ee53ebbf9a) )
+	ROM_REGION( 0x8000, "user1", 0 )    /* obj 0 data */
+	ROM_LOAD( "cl100",  0x0000, 0x2000, CRC(3fa9e4fa) SHA1(9abd7df5fcf143a0c476bd8c8753c5ea294b9f74) )
+	ROM_LOAD( "cl99",   0x2000, 0x2000, CRC(67b27b9e) SHA1(7df0f93851959359218c8d2272e30d242a77039d) )
+	ROM_LOAD( "cl98",   0x4000, 0x2000, CRC(bffe4149) SHA1(5cf0b98f9d342bd06d575c565ea01bbd79f5e04b) )
+	ROM_LOAD( "cl97",   0x6000, 0x2000, CRC(5abab8f9) SHA1(f5156855bbcdf0740fd44520386318ee53ebbf9a) )
 
-	ROM_REGION( 0x1000, "user2", 0 )	/* math tables: SLOPE ROM (river-tree schematic page 1/3) */
-	ROM_LOAD( "cl44",	0x0000, 0x1000, CRC(160d2bc7) SHA1(2609208c2bd4618ea340923ee01af69278980c36) ) /* first and 2nd half identical */
+	ROM_REGION( 0x1000, "user2", 0 )    /* math tables: SLOPE ROM (river-tree schematic page 1/3) */
+	ROM_LOAD( "cl44",   0x0000, 0x1000, CRC(160d2bc7) SHA1(2609208c2bd4618ea340923ee01af69278980c36) ) /* first and 2nd half identical */
 
-	ROM_REGION( 0x3000, "user3", 0 )	/* math tables: TREE ROM (river-tree schematic page 3/3)*/
-	ROM_LOAD( "cl7",	0x0000, 0x0800, CRC(01e3efca) SHA1(b26203787f105ba32773e37035c39253050f9c82) ) /* fixed bits: 0xxxxxxx */
-	ROM_LOAD( "cl9",	0x1000, 0x2000, CRC(4e53cdd0) SHA1(6255411cfdccbe2c581c83f9127d582623453c3a) )
+	ROM_REGION( 0x3000, "user3", 0 )    /* math tables: TREE ROM (river-tree schematic page 3/3)*/
+	ROM_LOAD( "cl7",    0x0000, 0x0800, CRC(01e3efca) SHA1(b26203787f105ba32773e37035c39253050f9c82) ) /* fixed bits: 0xxxxxxx */
+	ROM_LOAD( "cl9",    0x1000, 0x2000, CRC(4e53cdd0) SHA1(6255411cfdccbe2c581c83f9127d582623453c3a) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "cl88",	0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
+	ROM_LOAD( "cl88",   0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
 ROM_END
 
 GAMEL( 1983, changela, 0, changela, changela, driver_device, 0,   ROT180, "Taito Corporation", "Change Lanes", GAME_SUPPORTS_SAVE, layout_changela )

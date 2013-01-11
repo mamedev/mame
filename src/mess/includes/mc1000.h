@@ -12,29 +12,29 @@
 #include "machine/rescap.h"
 #include "machine/ram.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"u13"
-#define AY8910_TAG		"u21"
-#define MC6845_TAG		"mc6845"
-#define MC6847_TAG		"u19"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "u13"
+#define AY8910_TAG      "u21"
+#define MC6845_TAG      "mc6845"
+#define MC6847_TAG      "u19"
+#define CENTRONICS_TAG  "centronics"
 
-#define MC1000_MC6845_VIDEORAM_SIZE		0x800
-#define MC1000_MC6847_VIDEORAM_SIZE		0x1800
+#define MC1000_MC6845_VIDEORAM_SIZE     0x800
+#define MC1000_MC6847_VIDEORAM_SIZE     0x1800
 
 class mc1000_state : public driver_device
 {
 public:
 	mc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_vdg(*this, MC6847_TAG),
-		  m_crtc(*this, MC6845_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_mc6845_video_ram(*this, "mc6845_vram"),
-		  m_mc6847_video_ram(*this, "mc6847_vram")
+			m_maincpu(*this, Z80_TAG),
+			m_vdg(*this, MC6847_TAG),
+			m_crtc(*this, MC6845_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG),
+			m_mc6845_video_ram(*this, "mc6845_vram"),
+			m_mc6847_video_ram(*this, "mc6847_vram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

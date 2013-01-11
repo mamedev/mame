@@ -39,7 +39,7 @@ const device_type RAMDAC = &device_creator<ramdac_device>;
 
 ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAMDAC, "ramdac", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram))
 {
 
@@ -209,4 +209,3 @@ WRITE8_MEMBER( ramdac_device::ramdac_rgb888_w )
 
 	palette_set_color_rgb(machine(),offset&0xff,m_palram[pal_offs|0x000],m_palram[pal_offs|0x100],m_palram[pal_offs|0x200]);
 }
-

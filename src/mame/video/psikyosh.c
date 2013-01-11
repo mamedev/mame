@@ -76,71 +76,71 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 -------------------------------------------------*/
 
 //#define MAKE_ARGB_RGB(a, rgb) MAKE_ARGB(a, RGB_RED(rgb), RGB_GREEN(rgb), RGB_BLUE(rgb))
-#define MAKE_ARGB_RGB(a, rgb)	((((rgb_t)(a) & 0xff) << 24) | ((rgb) & 0xffffff))
+#define MAKE_ARGB_RGB(a, rgb)   ((((rgb_t)(a) & 0xff) << 24) | ((rgb) & 0xffffff))
 
 /*-------------------------------------------------
     drawgfxm.h like macros
 -------------------------------------------------*/
 
 // combine in 'alpha' when copying to store in ARGB
-#define PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(DEST, PRIORITY, SOURCE)									\
-do																									\
-{																									\
-	UINT32 srcdata = (SOURCE);																		\
-	if (srcdata != 0)																				\
-		(DEST) = MAKE_ARGB_RGB(alpha,paldata[srcdata]);												\
-}																									\
-while (0)																							\
+#define PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(DEST, PRIORITY, SOURCE)                                  \
+do                                                                                                  \
+{                                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                                      \
+	if (srcdata != 0)                                                                               \
+		(DEST) = MAKE_ARGB_RGB(alpha,paldata[srcdata]);                                             \
+}                                                                                                   \
+while (0)                                                                                           \
 
 // combine in 'alphatable' value to store in ARGB
-#define PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(DEST, PRIORITY, SOURCE)								\
-do																									\
-{																									\
-	UINT32 srcdata = (SOURCE);																		\
-	if (srcdata != 0)																				\
-		(DEST) = MAKE_ARGB_RGB(alphatable[srcdata], paldata[srcdata]);								\
-}																									\
-while (0)																							\
+#define PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(DEST, PRIORITY, SOURCE)                             \
+do                                                                                                  \
+{                                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                                      \
+	if (srcdata != 0)                                                                               \
+		(DEST) = MAKE_ARGB_RGB(alphatable[srcdata], paldata[srcdata]);                              \
+}                                                                                                   \
+while (0)                                                                                           \
 
 // take ARGB pixel with stored alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)								\
-do																									\
-{																									\
-	UINT32 srcdata = (SOURCE);																		\
-	if (srcdata != transpen)																		\
-		(DEST) = alpha_blend_r32((DEST), srcdata, RGB_ALPHA(srcdata));								\
-}																									\
-while (0)																							\
+#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)                             \
+do                                                                                                  \
+{                                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                                      \
+	if (srcdata != transpen)                                                                        \
+		(DEST) = alpha_blend_r32((DEST), srcdata, RGB_ALPHA(srcdata));                              \
+}                                                                                                   \
+while (0)                                                                                           \
 
 // take RGB pixel with separate alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)								\
-do																									\
-{																									\
-	UINT32 srcdata = (SOURCE);																		\
-	if (srcdata != transpen)																		\
-		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);								\
-}																									\
-while (0)																							\
+#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)                                \
+do                                                                                                  \
+{                                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                                      \
+	if (srcdata != transpen)                                                                        \
+		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);                               \
+}                                                                                                   \
+while (0)                                                                                           \
 
 // take ARGB pixel with stored alpha and copy in to RGB32 bitmap, scipping BG_TRANSPEN
-#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, PRIORITY, SOURCE)								\
-do																									\
-{																									\
-	UINT32 srcdata = (SOURCE);																		\
-	if (srcdata != transpen)																		\
-		(DEST) = srcdata;																			\
-}																									\
-while (0)																							\
+#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, PRIORITY, SOURCE)                             \
+do                                                                                                  \
+{                                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                                      \
+	if (srcdata != transpen)                                                                        \
+		(DEST) = srcdata;                                                                           \
+}                                                                                                   \
+while (0)                                                                                           \
 
 // drawgfxm.h macro to render alpha into 32-bit buffer
-#define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, PRIORITY, SOURCE)									\
-do																									\
-{																									\
-	UINT32 srcdata = (SOURCE);																		\
-	if (srcdata != 0)																				\
-		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alphatable[srcdata]);					\
-}																									\
-while (0)																							\
+#define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, PRIORITY, SOURCE)                                  \
+do                                                                                                  \
+{                                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                                      \
+	if (srcdata != 0)                                                                               \
+		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alphatable[srcdata]);                    \
+}                                                                                                   \
+while (0)                                                                                           \
 
 /*-------------------------------------------------
     draw_scanline32_alpha - take an RGB-encoded UINT32
@@ -296,7 +296,7 @@ static void draw_bglayer( running_machine &machine, int layer, bitmap_rgb32 &bit
 	if (alphamap) /* alpha values are per-pen */
 		alpha = -1;
 	else
-		alpha = pal6bit(0x3f - alpha);	/* 0x3f-0x00 maps to 0x00-0xff */
+		alpha = pal6bit(0x3f - alpha);  /* 0x3f-0x00 maps to 0x00-0xff */
 
 	if(zoom) {
 		popmessage("draw_bglayer() zoom not implemented\nContact MAMEDEV");
@@ -541,11 +541,11 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 	{
 		int xstart, ystart, xend, yend, xinc, yinc;
 
-		if (flipx)	{ xstart = wide - 1; xend = -1;   xinc = -1; }
-		else		{ xstart = 0;        xend = wide; xinc = +1; }
+		if (flipx)  { xstart = wide - 1; xend = -1;   xinc = -1; }
+		else        { xstart = 0;        xend = wide; xinc = +1; }
 
-		if (flipy)	{ ystart = high - 1; yend = -1;   yinc = -1; }
-		else		{ ystart = 0;        yend = high; yinc = +1; }
+		if (flipy)  { ystart = high - 1; yend = -1;   yinc = -1; }
+		else        { ystart = 0;        yend = high; yinc = +1; }
 
 		/* Start drawing */
 		if (gfx)
@@ -559,11 +559,11 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 
 					int x_index_base, y_index, sx, sy, ex, ey;
 
-					if (flipx)	{ x_index_base = gfx->width() - 1; }
-					else		{ x_index_base = 0; }
+					if (flipx)  { x_index_base = gfx->width() - 1; }
+					else        { x_index_base = 0; }
 
-					if (flipy)	{ y_index = gfx->height()-1; }
-					else		{ y_index = 0; }
+					if (flipy)  { y_index = gfx->height()-1; }
+					else        { y_index = 0; }
 
 					/* start coordinates */
 					sx = offsx + xtile * gfx->width();
@@ -837,11 +837,11 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 
 				int dx, dy;
 
-				if (flipx)	{ x_index_base = (sprite_screen_width - 1) * zoomx; dx = -zoomx; }
-				else		{ x_index_base = 0; dx = zoomx; }
+				if (flipx)  { x_index_base = (sprite_screen_width - 1) * zoomx; dx = -zoomx; }
+				else        { x_index_base = 0; dx = zoomx; }
 
-				if (flipy)	{ y_index = (sprite_screen_height - 1) * zoomy; dy = -zoomy; }
-				else		{ y_index = 0; dy = zoomy; }
+				if (flipy)  { y_index = (sprite_screen_height - 1) * zoomy; dy = -zoomy; }
+				else        { y_index = 0; dy = zoomy; }
 
 				if (sx < myclip.min_x)
 				{ /* clip left */
@@ -1041,36 +1041,36 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
-    0 ---- --yy yyyy yyyy | ---- --xx xxxx xxxx  1  F-?? hhhh ZZZZ ZZZZ | f-PP wwww zzzz zzzz
-    2 pppp pppp -aaa -nnn | nnnn nnnn nnnn nnnn  3  ---- ---- ---- ---- | ---- ---- ---- ----
+	0 ---- --yy yyyy yyyy | ---- --xx xxxx xxxx  1  F-?? hhhh ZZZZ ZZZZ | f-PP wwww zzzz zzzz
+	2 pppp pppp -aaa -nnn | nnnn nnnn nnnn nnnn  3  ---- ---- ---- ---- | ---- ---- ---- ----
 
-    y = ypos
-    x = xpos
+	y = ypos
+	x = xpos
 
-    h = height
-    w = width
+	h = height
+	w = width
 
-    F = flip (y)
-    f = flip (x)
+	F = flip (y)
+	f = flip (x)
 
-    Z = zoom (y)
-    z = zoom (x)
+	Z = zoom (y)
+	z = zoom (x)
 
-    n = tile number
+	n = tile number
 
-    p = palette
+	p = palette
 
-    a = alpha blending, selects which of the 8 alpha values in vid_regs[0-1] to use
+	a = alpha blending, selects which of the 8 alpha values in vid_regs[0-1] to use
 
-    P = priority
-    Points to a 4-bit entry in vid_regs[2] which provides a priority comparable with the bg layer's priorities.
-    However, sprite-sprite priority needs to be preserved.
-    daraku and soldivid only use the lsb
+	P = priority
+	Points to a 4-bit entry in vid_regs[2] which provides a priority comparable with the bg layer's priorities.
+	However, sprite-sprite priority needs to be preserved.
+	daraku and soldivid only use the lsb
 
-    ? = unknown
-    Could be a sprite-sprite priority, tests seem to back this up
+	? = unknown
+	Could be a sprite-sprite priority, tests seem to back this up
 
-    **- End Sprite Format -*/
+	**- End Sprite Format -*/
 	const input_code spr_keys[8] = {KEYCODE_Y, KEYCODE_U, KEYCODE_I, KEYCODE_O};
 	bool spr_debug = false;
 #ifdef DEBUG_KEYS
@@ -1161,8 +1161,8 @@ static void psikyosh_prelineblend( running_machine &machine, bitmap_rgb32 &bitma
 {
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
-       gnbarich sets the 0x000000ff to 0x7f in test mode whilst the others use 0x80.
-       tgm2 sets it to 0x00 on warning screen. Likely has no effect. */
+	   gnbarich sets the 0x000000ff to 0x7f in test mode whilst the others use 0x80.
+	   tgm2 sets it to 0x00 on warning screen. Likely has no effect. */
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	UINT32 *dstline;
 	int bank = (state->m_vidregs[7] & 0xff000000) >> 24; /* bank is always 8 (0x4000) except for daraku/soldivid */
@@ -1242,7 +1242,7 @@ void psikyosh_state::video_start()
 	}
 
 	/* precompute the background zoom table. verified against hardware.
-       unsure of the precision, we use .10 fixed point like the sprites */
+	   unsure of the precision, we use .10 fixed point like the sprites */
 	for(i = 0; i < 0x100; i++) {
 		m_bg_zoom[i] = (64 * 0x400) / (i + 64);
 	}
@@ -1280,10 +1280,10 @@ UINT32 psikyosh_state::screen_update_psikyosh(screen_device &screen, bitmap_rgb3
 
 #ifdef DEBUG_MESSAGE
 popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
-    m_vidregs[0], m_vidregs[1],
-    m_vidregs[2], m_vidregs[3],
-    m_vidregs[4], m_vidregs[5],
-    m_vidregs[6], m_vidregs[7]);
+	m_vidregs[0], m_vidregs[1],
+	m_vidregs[2], m_vidregs[3],
+	m_vidregs[4], m_vidregs[5],
+	m_vidregs[6], m_vidregs[7]);
 #endif
 
 	m_z_bitmap.fill(0, cliprect); /* z-buffer */

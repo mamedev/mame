@@ -2,12 +2,12 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- ZX Spectrum Disc images
-    for +3 machines etc.
+	for +3 machines etc.
 -->
 
 
 <softwarelist name="spectrum_flop" description="ZX Spectrum Disc Images">
-	
+
 	<software name="pacmania" >
 		<description>Pac-Mania (Europe / Australia)</description>
 		<year>1988</year>

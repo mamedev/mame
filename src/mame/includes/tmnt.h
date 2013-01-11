@@ -23,7 +23,7 @@ public:
 	int        m_layer_colorbase[3];
 	int        m_sprite_colorbase;
 	int        m_layerpri[3];
-	int        m_sorted_layer[3];	// this might not be necessary, but tmnt2 uses it in a strange way...
+	int        m_sorted_layer[3];   // this might not be necessary, but tmnt2 uses it in a strange way...
 
 	tilemap_t  *m_roz_tilemap;
 	int        m_glfgreat_roz_rom_bank;
@@ -36,7 +36,7 @@ public:
 	int        m_lastdim;
 	int        m_lasten;
 	int        m_dim_c;
-	int        m_dim_v;	/* lgtnfght, ssriders, tmnt2 only */
+	int        m_dim_v; /* lgtnfght, ssriders, tmnt2 only */
 
 	/* misc */
 	int        m_tmnt_soundlatch;
@@ -44,7 +44,7 @@ public:
 	int        m_cuebrick_nvram_bank;
 	int        m_toggle;
 	int        m_last;
-	UINT16	   m_cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
+	UINT16     m_cuebrick_nvram[0x400 * 0x20];  // 32k paged in a 1k window
 
 	/* devices */
 	cpu_device *m_maincpu;

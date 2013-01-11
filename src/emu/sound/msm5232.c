@@ -12,27 +12,27 @@
 struct VOICE {
 	UINT8 mode;
 
-	int		TG_count_period;
-	int		TG_count;
+	int     TG_count_period;
+	int     TG_count;
 
-	UINT8	TG_cnt;		/* 7 bits binary counter (frequency output) */
-	UINT8	TG_out16;	/* bit number (of TG_cnt) for 16' output */
-	UINT8	TG_out8;	/* bit number (of TG_cnt) for  8' output */
-	UINT8	TG_out4;	/* bit number (of TG_cnt) for  4' output */
-	UINT8	TG_out2;	/* bit number (of TG_cnt) for  2' output */
+	UINT8   TG_cnt;     /* 7 bits binary counter (frequency output) */
+	UINT8   TG_out16;   /* bit number (of TG_cnt) for 16' output */
+	UINT8   TG_out8;    /* bit number (of TG_cnt) for  8' output */
+	UINT8   TG_out4;    /* bit number (of TG_cnt) for  4' output */
+	UINT8   TG_out2;    /* bit number (of TG_cnt) for  2' output */
 
-	int		egvol;
-	int		eg_sect;
-	int		counter;
-	int		eg;
+	int     egvol;
+	int     eg_sect;
+	int     counter;
+	int     eg;
 
-	UINT8	eg_arm;		/* attack/release mode */
+	UINT8   eg_arm;     /* attack/release mode */
 
-	double	ar_rate;
-	double	dr_rate;
-	double	rr_rate;
+	double  ar_rate;
+	double  dr_rate;
+	double  rr_rate;
 
-	int		pitch;			/* current pitch data */
+	int     pitch;          /* current pitch data */
 
 	int GF;
 };
@@ -41,33 +41,33 @@ struct VOICE {
 struct msm5232_state {
 	sound_stream *stream;
 
-	VOICE	voi[8];
+	VOICE   voi[8];
 
-	UINT32 EN_out16[2];	/* enable 16' output masks for both groups (0-disabled ; ~0 -enabled) */
-	UINT32 EN_out8[2];	/* enable 8'  output masks */
-	UINT32 EN_out4[2];	/* enable 4'  output masks */
-	UINT32 EN_out2[2];	/* enable 2'  output masks */
+	UINT32 EN_out16[2]; /* enable 16' output masks for both groups (0-disabled ; ~0 -enabled) */
+	UINT32 EN_out8[2];  /* enable 8'  output masks */
+	UINT32 EN_out4[2];  /* enable 4'  output masks */
+	UINT32 EN_out2[2];  /* enable 2'  output masks */
 
 	int noise_cnt;
 	int noise_step;
 	int noise_rng;
-	int noise_clocks;	/* number of the noise_rng (output) level changes */
+	int noise_clocks;   /* number of the noise_rng (output) level changes */
 
 	unsigned int UpdateStep;
 
 	/* rate tables */
-	double	ar_tbl[8];
-	double	dr_tbl[16];
+	double  ar_tbl[8];
+	double  dr_tbl[16];
 
-	UINT8	control1;
-	UINT8	control2;
+	UINT8   control1;
+	UINT8   control2;
 
-	int		gate;		/* current state of the GATE output */
+	int     gate;       /* current state of the GATE output */
 
-	int		clock;		/* chip clock in Hz */
-	int		rate;		/* sample rate in Hz */
+	int     clock;      /* chip clock in Hz */
+	int     rate;       /* sample rate in Hz */
 
-	double	external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
+	double  external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
 	device_t *device;
 	devcb_resolved_write_line gate_handler;/* callback called when the GATE output pin changes state */
 
@@ -88,13 +88,13 @@ INLINE msm5232_state *get_safe_token(device_t *device)
 
 /* ROM table to convert from pitch data into data for programmable counter and binary counter */
 /* Chip has 88x12bits ROM   (addressing (in hex) from 0x00 to 0x57) */
-#define ROM(counter,bindiv)	(counter|(bindiv<<9))
+#define ROM(counter,bindiv) (counter|(bindiv<<9))
 
 static const UINT16 MSM5232_ROM[88]={
 /* higher values are Programmable Counter data (9 bits) */
 /* lesser values are Binary Counter shift data (3 bits) */
 
-/* 0 */	ROM (506, 7),
+/* 0 */ ROM (506, 7),
 
 /* 1 */ ROM (478, 7),/* 2 */ ROM (451, 7),/* 3 */ ROM (426, 7),/* 4 */ ROM (402, 7),
 /* 5 */ ROM (379, 7),/* 6 */ ROM (358, 7),/* 7 */ ROM (338, 7),/* 8 */ ROM (319, 7),
@@ -131,7 +131,7 @@ static const UINT16 MSM5232_ROM[88]={
 #undef ROM
 
 
-#define STEP_SH	(16)	/* step calculations accuracy */
+#define STEP_SH (16)    /* step calculations accuracy */
 
 
 /* save output as raw 16-bit sample */
@@ -154,8 +154,8 @@ static FILE *sample[9];
  */
 
 
-#define R51 1400	/* charge resistance */
-#define R52 28750	/* discharge resistance */
+#define R51 1400    /* charge resistance */
+#define R52 28750   /* discharge resistance */
 
 #if 0
 /*
@@ -183,7 +183,7 @@ static void msm5232_init_tables( msm5232_state *chip )
 	i = ((double)(1<<STEP_SH) * (double)chip->rate) / (double)chip->clock;
 	chip->UpdateStep = i;
 	/* logerror("clock=%i Hz rate=%i Hz, UpdateStep=%i\n",
-            chip->clock, chip->rate, chip->UpdateStep); */
+	        chip->clock, chip->rate, chip->UpdateStep); */
 
 	scale = ((double)chip->clock) / (double)chip->rate;
 	chip->noise_step = ((1<<STEP_SH)/128.0) * scale; /* step of the rng reg in 16.16 format */
@@ -198,7 +198,7 @@ static void msm5232_init_tables( msm5232_state *chip )
 	for (i=0; i<8; i++)
 	{
 		double clockscale = (double)chip->clock / 2119040.0;
-		double time = (ATBL[i] / 1000.0) / clockscale;	/* attack time in seconds */
+		double time = (ATBL[i] / 1000.0) / clockscale;  /* attack time in seconds */
 		chip->ar_tbl[i] = 0.50 * ( (1.0/time) / (double)chip->rate );
 		/* logerror("ATBL[%i] = %20.16f time = %f s\n",i, chip->ar_tbl[i], time); */
 	}
@@ -206,7 +206,7 @@ static void msm5232_init_tables( msm5232_state *chip )
 	for (i=0; i<16; i++)
 	{
 		double clockscale = (double)chip->clock / 2119040.0;
-		double time = (DTBL[i] / 1000.0) / clockscale;	/* decay time in seconds */
+		double time = (DTBL[i] / 1000.0) / clockscale;  /* decay time in seconds */
 		chip->dr_tbl[i] = 0.50 * ( (1.0/time) / (double)chip->rate );
 		/* logerror("DTBL[%i] = %20.16f time = %f s\n",i, chip->dr_tbl[i], time); */
 	}
@@ -248,11 +248,11 @@ static void msm5232_init_voice(msm5232_state *chip, int i)
 {
 	chip->voi[i].ar_rate= chip->ar_tbl[0] * chip->external_capacity[i];
 	chip->voi[i].dr_rate= chip->dr_tbl[0] * chip->external_capacity[i];
-	chip->voi[i].rr_rate= chip->dr_tbl[0] * chip->external_capacity[i];	/* this is constant value */
+	chip->voi[i].rr_rate= chip->dr_tbl[0] * chip->external_capacity[i]; /* this is constant value */
 	chip->voi[i].eg_sect= -1;
-	chip->voi[i].eg		= 0.0;
-	chip->voi[i].eg_arm	= 0;
-	chip->voi[i].pitch	= -1.0;
+	chip->voi[i].eg     = 0.0;
+	chip->voi[i].eg_arm = 0;
+	chip->voi[i].pitch  = -1.0;
 }
 
 
@@ -278,21 +278,21 @@ static DEVICE_RESET( msm5232 )
 		msm5232_w(device,device->machine().driver_data()->generic_space(),i,0x80);
 		msm5232_w(device,device->machine().driver_data()->generic_space(),i,0x00);
 	}
-	chip->noise_cnt		= 0;
-	chip->noise_rng		= 1;
-	chip->noise_clocks	= 0;
+	chip->noise_cnt     = 0;
+	chip->noise_rng     = 1;
+	chip->noise_clocks  = 0;
 
-	chip->control1		= 0;
-	chip->EN_out16[0]	= 0;
-	chip->EN_out8[0]	= 0;
-	chip->EN_out4[0]	= 0;
-	chip->EN_out2[0]	= 0;
+	chip->control1      = 0;
+	chip->EN_out16[0]   = 0;
+	chip->EN_out8[0]    = 0;
+	chip->EN_out4[0]    = 0;
+	chip->EN_out2[0]    = 0;
 
-	chip->control2		= 0;
-	chip->EN_out16[1]	= 0;
-	chip->EN_out8[1]	= 0;
-	chip->EN_out4[1]	= 0;
-	chip->EN_out2[1]	= 0;
+	chip->control2      = 0;
+	chip->EN_out16[1]   = 0;
+	chip->EN_out8[1]    = 0;
+	chip->EN_out4[1]    = 0;
+	chip->EN_out2[1]    = 0;
 
 	msm5232_gate_update(chip);
 }
@@ -302,7 +302,7 @@ static void msm5232_init(msm5232_state *chip, const msm5232_interface *intf, int
 	int j;
 
 	chip->clock = clock;
-	chip->rate  = rate ? rate : 44100;	/* avoid division by 0 */
+	chip->rate  = rate ? rate : 44100;  /* avoid division by 0 */
 
 	for (j=0; j<8; j++)
 	{
@@ -359,8 +359,8 @@ WRITE8_DEVICE_HANDLER( msm5232_w )
 			if(data >= 0xd8)
 			{
 				/*if ((data&0x7f) != 0x5f) logerror("MSM5232: WRONG PITCH CODE = %2x\n",data&0x7f);*/
-				chip->voi[ch].mode = 1;		/* noise mode */
-				chip->voi[ch].eg_sect = 0;	/* Key On */
+				chip->voi[ch].mode = 1;     /* noise mode */
+				chip->voi[ch].eg_sect = 0;  /* Key On */
 			}
 			else
 			{
@@ -375,7 +375,7 @@ WRITE8_DEVICE_HANDLER( msm5232_w )
 
 					chip->voi[ch].TG_count_period = (pg & 0x1ff) * chip->UpdateStep / 2;
 
-					n = (pg>>9) & 7;	/* n = bit number for 16' output */
+					n = (pg>>9) & 7;    /* n = bit number for 16' output */
 					chip->voi[ch].TG_out16 = 1<<n;
 										/* for 8' it is bit n-1 (bit 0 if n-1<0) */
 										/* for 4' it is bit n-2 (bit 0 if n-2<0) */
@@ -389,16 +389,16 @@ WRITE8_DEVICE_HANDLER( msm5232_w )
 					n = (n>0)? n-1: 0;
 					chip->voi[ch].TG_out2  = 1<<n;
 				}
-				chip->voi[ch].mode = 0;		/* tone mode */
-				chip->voi[ch].eg_sect = 0;	/* Key On */
+				chip->voi[ch].mode = 0;     /* tone mode */
+				chip->voi[ch].eg_sect = 0;  /* Key On */
 			}
 		}
 		else
 		{
-			if ( !chip->voi[ch].eg_arm )	/* arm = 0 */
-				chip->voi[ch].eg_sect = 2;	/* Key Off -> go to release */
-			else							/* arm = 1 */
-				chip->voi[ch].eg_sect = 1;	/* Key Off -> go to decay */
+			if ( !chip->voi[ch].eg_arm )    /* arm = 0 */
+				chip->voi[ch].eg_sect = 2;  /* Key Off -> go to release */
+			else                            /* arm = 1 */
+				chip->voi[ch].eg_sect = 1;  /* Key Off -> go to decay */
 		}
 	}
 	else
@@ -406,33 +406,33 @@ WRITE8_DEVICE_HANDLER( msm5232_w )
 		int i;
 		switch(offset)
 		{
-		case 0x08:	/* group1 attack */
+		case 0x08:  /* group1 attack */
 			for (i=0; i<4; i++)
 				chip->voi[i].ar_rate   = chip->ar_tbl[data&0x7] * chip->external_capacity[i];
 			break;
 
-		case 0x09:	/* group2 attack */
+		case 0x09:  /* group2 attack */
 			for (i=0; i<4; i++)
 				chip->voi[i+4].ar_rate = chip->ar_tbl[data&0x7] * chip->external_capacity[i+4];
 			break;
 
-		case 0x0a:	/* group1 decay */
+		case 0x0a:  /* group1 decay */
 			for (i=0; i<4; i++)
 				chip->voi[i].dr_rate   = chip->dr_tbl[data&0xf] * chip->external_capacity[i];
 			break;
 
-		case 0x0b:	/* group2 decay */
+		case 0x0b:  /* group2 decay */
 			for (i=0; i<4; i++)
 				chip->voi[i+4].dr_rate = chip->dr_tbl[data&0xf] * chip->external_capacity[i+4];
 			break;
 
-		case 0x0c:	/* group1 control */
+		case 0x0c:  /* group1 control */
 
 			/*if (chip->control1 != data)
-                logerror("msm5232: control1 ctrl=%x OE=%x\n", data&0xf0, data&0x0f);*/
+			    logerror("msm5232: control1 ctrl=%x OE=%x\n", data&0xf0, data&0x0f);*/
 
 			/*if (data & 0x10)
-                popmessage("msm5232: control1 ctrl=%2x\n", data);*/
+			    popmessage("msm5232: control1 ctrl=%2x\n", data);*/
 
 			chip->control1 = data;
 
@@ -446,13 +446,13 @@ WRITE8_DEVICE_HANDLER( msm5232_w )
 
 			break;
 
-		case 0x0d:	/* group2 control */
+		case 0x0d:  /* group2 control */
 
 			/*if (chip->control2 != data)
-                logerror("msm5232: control2 ctrl=%x OE=%x\n", data&0xf0, data&0x0f);*/
+			    logerror("msm5232: control2 ctrl=%x OE=%x\n", data&0xf0, data&0x0f);*/
 
 			/*if (data & 0x10)
-                popmessage("msm5232: control2 ctrl=%2x\n", data);*/
+			    popmessage("msm5232: control2 ctrl=%2x\n", data);*/
 
 			chip->control2 = data;
 			msm5232_gate_update(chip);
@@ -472,8 +472,8 @@ WRITE8_DEVICE_HANDLER( msm5232_w )
 
 
 
-#define VMIN	0
-#define VMAX	32768
+#define VMIN    0
+#define VMAX    32768
 
 
 INLINE void EG_voices_advance(msm5232_state *chip)
@@ -487,7 +487,7 @@ INLINE void EG_voices_advance(msm5232_state *chip)
 	{
 		switch(voi->eg_sect)
 		{
-		case 0:	/* attack */
+		case 0: /* attack */
 
 			/* capacitor charge */
 			if (voi->eg < VMAX)
@@ -592,17 +592,17 @@ INLINE void TG_group_advance(msm5232_state *chip, int groupidx)
 
 		out2 = out4 = out8 = out16 = 0;
 
-		if (voi->mode==0)	/* generate square tone */
+		if (voi->mode==0)   /* generate square tone */
 		{
 			int left = 1<<STEP_SH;
 			do
 			{
 				int nextevent = left;
 
-				if (voi->TG_cnt&voi->TG_out16)	out16+=voi->TG_count;
-				if (voi->TG_cnt&voi->TG_out8)	out8 +=voi->TG_count;
-				if (voi->TG_cnt&voi->TG_out4)	out4 +=voi->TG_count;
-				if (voi->TG_cnt&voi->TG_out2)	out2 +=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out16)  out16+=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out8)   out8 +=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out4)   out4 +=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out2)   out2 +=voi->TG_count;
 
 				voi->TG_count -= nextevent;
 
@@ -610,36 +610,36 @@ INLINE void TG_group_advance(msm5232_state *chip, int groupidx)
 				{
 					voi->TG_count += voi->TG_count_period;
 					voi->TG_cnt++;
-					if (voi->TG_cnt&voi->TG_out16)	out16+=voi->TG_count_period;
-					if (voi->TG_cnt&voi->TG_out8 )	out8 +=voi->TG_count_period;
-					if (voi->TG_cnt&voi->TG_out4 )	out4 +=voi->TG_count_period;
-					if (voi->TG_cnt&voi->TG_out2 )	out2 +=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out16)  out16+=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out8 )  out8 +=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out4 )  out4 +=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out2 )  out2 +=voi->TG_count_period;
 
 					if (voi->TG_count > 0)
 						break;
 
 					voi->TG_count += voi->TG_count_period;
 					voi->TG_cnt++;
-					if (voi->TG_cnt&voi->TG_out16)	out16+=voi->TG_count_period;
-					if (voi->TG_cnt&voi->TG_out8 )	out8 +=voi->TG_count_period;
-					if (voi->TG_cnt&voi->TG_out4 )	out4 +=voi->TG_count_period;
-					if (voi->TG_cnt&voi->TG_out2 )	out2 +=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out16)  out16+=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out8 )  out8 +=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out4 )  out4 +=voi->TG_count_period;
+					if (voi->TG_cnt&voi->TG_out2 )  out2 +=voi->TG_count_period;
 				}
-				if (voi->TG_cnt&voi->TG_out16)	out16-=voi->TG_count;
-				if (voi->TG_cnt&voi->TG_out8 )	out8 -=voi->TG_count;
-				if (voi->TG_cnt&voi->TG_out4 )	out4 -=voi->TG_count;
-				if (voi->TG_cnt&voi->TG_out2 )	out2 -=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out16)  out16-=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out8 )  out8 -=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out4 )  out4 -=voi->TG_count;
+				if (voi->TG_cnt&voi->TG_out2 )  out2 -=voi->TG_count;
 
 				left -=nextevent;
 
 			}while (left>0);
 		}
-		else	/* generate noise */
+		else    /* generate noise */
 		{
-			if (chip->noise_clocks&8)	out16+=(1<<STEP_SH);
-			if (chip->noise_clocks&4)	out8 +=(1<<STEP_SH);
-			if (chip->noise_clocks&2)	out4 +=(1<<STEP_SH);
-			if (chip->noise_clocks&1)	out2 +=(1<<STEP_SH);
+			if (chip->noise_clocks&8)   out16+=(1<<STEP_SH);
+			if (chip->noise_clocks&4)   out8 +=(1<<STEP_SH);
+			if (chip->noise_clocks&2)   out4 +=(1<<STEP_SH);
+			if (chip->noise_clocks&1)   out2 +=(1<<STEP_SH);
 		}
 
 		/* calculate signed output */
@@ -668,39 +668,39 @@ INLINE void TG_group_advance(msm5232_state *chip, int groupidx)
 
 /* macro saves feet data to mono file */
 #ifdef SAVE_SEPARATE_CHANNELS
-  #define SAVE_SINGLE_CHANNEL(j,val) \
-  {	signed int pom= val; \
+	#define SAVE_SINGLE_CHANNEL(j,val) \
+	{   signed int pom= val; \
 	if (pom > 32767) pom = 32767; else if (pom < -32768) pom = -32768; \
 	fputc((unsigned short)pom&0xff,sample[j]); \
 	fputc(((unsigned short)pom>>8)&0xff,sample[j]);  }
 #else
-  #define SAVE_SINGLE_CHANNEL(j,val)
+	#define SAVE_SINGLE_CHANNEL(j,val)
 #endif
 
 /* first macro saves all 8 feet outputs to mixed (mono) file */
 /* second macro saves one group into left and the other in right channel */
-#if 1	/*MONO*/
+#if 1   /*MONO*/
 	#ifdef SAVE_SAMPLE
-	  #define SAVE_ALL_CHANNELS \
-	  {	signed int pom = buf1[i] + buf2[i]; \
+		#define SAVE_ALL_CHANNELS \
+		{   signed int pom = buf1[i] + buf2[i]; \
 		fputc((unsigned short)pom&0xff,sample[8]); \
 		fputc(((unsigned short)pom>>8)&0xff,sample[8]); \
-	  }
+		}
 	#else
-	  #define SAVE_ALL_CHANNELS
+		#define SAVE_ALL_CHANNELS
 	#endif
-#else	/*STEREO*/
+#else   /*STEREO*/
 	#ifdef SAVE_SAMPLE
-	  #define SAVE_ALL_CHANNELS \
-	  {	signed int pom = buf1[i]; \
+		#define SAVE_ALL_CHANNELS \
+		{   signed int pom = buf1[i]; \
 		fputc((unsigned short)pom&0xff,sample[8]); \
 		fputc(((unsigned short)pom>>8)&0xff,sample[8]); \
 		pom = buf2[i]; \
 		fputc((unsigned short)pom&0xff,sample[8]); \
 		fputc(((unsigned short)pom>>8)&0xff,sample[8]); \
-	  }
+		}
 	#else
-	  #define SAVE_ALL_CHANNELS
+		#define SAVE_ALL_CHANNELS
 	#endif
 #endif
 
@@ -726,7 +726,7 @@ static STREAM_UPDATE( MSM5232_update_one )
 		/* calculate all voices' envelopes */
 		EG_voices_advance(chip);
 
-		TG_group_advance(chip,0);	/* calculate tones group 1 */
+		TG_group_advance(chip,0);   /* calculate tones group 1 */
 		buf1[i] = o2;
 		buf2[i] = o4;
 		buf3[i] = o8;
@@ -737,7 +737,7 @@ static STREAM_UPDATE( MSM5232_update_one )
 		SAVE_SINGLE_CHANNEL(2,o8)
 		SAVE_SINGLE_CHANNEL(3,o16)
 
-		TG_group_advance(chip,1);	/* calculate tones group 2 */
+		TG_group_advance(chip,1);   /* calculate tones group 2 */
 		buf5[i] = o2;
 		buf6[i] = o4;
 		buf7[i] = o8;
@@ -759,13 +759,13 @@ static STREAM_UPDATE( MSM5232_update_one )
 			chip->noise_cnt &= ((1<<STEP_SH)-1);
 			while (cnt > 0)
 			{
-				int tmp = chip->noise_rng & (1<<16);		/* store current level */
+				int tmp = chip->noise_rng & (1<<16);        /* store current level */
 
 				if (chip->noise_rng&1)
 					chip->noise_rng ^= 0x24000;
 				chip->noise_rng>>=1;
 
-				if ( (chip->noise_rng & (1<<16)) != tmp )	/* level change detect */
+				if ( (chip->noise_rng & (1<<16)) != tmp )   /* level change detect */
 					chip->noise_clocks++;
 
 				cnt--;
@@ -854,7 +854,7 @@ const device_type MSM5232 = &device_creator<msm5232_device>;
 
 msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSM5232, "MSM5232", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(msm5232_state);
 }
@@ -905,5 +905,3 @@ void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

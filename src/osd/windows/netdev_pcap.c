@@ -135,4 +135,3 @@ void deinit_pcap()
 	clear_netdev();
 	FreeLibrary(handle);
 }
-

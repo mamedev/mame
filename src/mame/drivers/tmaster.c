@@ -367,8 +367,8 @@ UINT32 tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 
 	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
@@ -376,8 +376,8 @@ UINT32 tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	if (layers_ctrl & 1)	copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)	copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 1)    copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 2)    copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }
@@ -397,23 +397,23 @@ static void tmaster_draw(running_machine &machine)
 	tmaster_state *state = machine.driver_data<tmaster_state>();
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	state->memregion( "blitter" )->base() + state->m_gfx_offs;
+	UINT8 *gfxdata  =   state->memregion( "blitter" )->base() + state->m_gfx_offs;
 
 	UINT16 pen;
 
-	buffer	=	(state->m_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
-	sw		=	 state->m_regs[0x04/2];
-	sx		=	 state->m_regs[0x06/2];
-	sh		=	 state->m_regs[0x08/2] + 1;
-	sy		=	 state->m_regs[0x0a/2];
-	addr	=	(*state->m_compute_addr)(
-				 state->m_regs[0x0c/2],
-				 state->m_regs[0x0e/2], state->m_addr);
-	mode	=	 state->m_regs[0x10/2];
+	buffer  =   (state->m_regs[0x02/2] >> 8) & 3;   // 1 bit per layer, selects the currently displayed buffer
+	sw      =    state->m_regs[0x04/2];
+	sx      =    state->m_regs[0x06/2];
+	sh      =    state->m_regs[0x08/2] + 1;
+	sy      =    state->m_regs[0x0a/2];
+	addr    =   (*state->m_compute_addr)(
+					state->m_regs[0x0c/2],
+					state->m_regs[0x0e/2], state->m_addr);
+	mode    =    state->m_regs[0x10/2];
 
-	layer	=	(mode >> 7) & 1;	// layer to draw to
-	buffer	=	((mode >> 6) & 1) ^ ((buffer >> layer) & 1);	// bit 6 selects whether to use the opposite buffer to that displayed
-	bitmap_ind16 &bitmap	=	state->m_bitmap[layer][buffer];
+	layer   =   (mode >> 7) & 1;    // layer to draw to
+	buffer  =   ((mode >> 6) & 1) ^ ((buffer >> layer) & 1);    // bit 6 selects whether to use the opposite buffer to that displayed
+	bitmap_ind16 &bitmap    =   state->m_bitmap[layer][buffer];
 
 	addr <<= 1;
 
@@ -428,11 +428,11 @@ static void tmaster_draw(running_machine &machine)
 	flipx = mode & 1;
 	flipy = mode & 2;
 
-	if (flipx)	{ x0 = sw-1;	x1 = -1;	dx = -1;	sx -= sw-1;	}
-	else		{ x0 = 0;		x1 = sw;	dx = +1;	}
+	if (flipx)  { x0 = sw-1;    x1 = -1;    dx = -1;    sx -= sw-1; }
+	else        { x0 = 0;       x1 = sw;    dx = +1;    }
 
-	if (flipy)	{ y0 = sh-1;	y1 = -1;	dy = -1;	sy -= sh-1;	}
-	else		{ y0 = 0;		y1 = sh;	dy = +1;	}
+	if (flipy)  { y0 = sh-1;    y1 = -1;    dy = -1;    sy -= sh-1; }
+	else        { y0 = 0;       y1 = sh;    dy = +1;    }
 
 	sx = (sx & 0x7fff) - (sx & 0x8000);
 	sy = (sy & 0x7fff) - (sy & 0x8000);
@@ -441,7 +441,7 @@ static void tmaster_draw(running_machine &machine)
 
 	switch (mode & 0x20)
 	{
-		case 0x00:							// blit with transparency
+		case 0x00:                          // blit with transparency
 			if (addr > state->m_gfx_size - sw*sh)
 			{
 				logerror("%s: blit error, addr %06x out of bounds\n", machine.describe_context(),addr);
@@ -486,7 +486,7 @@ static void tmaster_draw(running_machine &machine)
 			}
 			break;
 
-		case 0x20:							// solid fill
+		case 0x20:                          // solid fill
 			pen = ((state->m_addr >> 8) & 0xff) + color;
 
 			if ((pen & 0xff) == 0xff)
@@ -519,7 +519,7 @@ WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
 
 READ16_MEMBER(tmaster_state::tmaster_blitter_r)
 {
-	return 0x0000;	// bit 7 = 1 -> blitter busy
+	return 0x0000;  // bit 7 = 1 -> blitter busy
 }
 
 /***************************************************************************
@@ -570,32 +570,32 @@ ADDRESS_MAP_END
 
 // ROM/RAM Banking
 
-#define GALGAMES_BANK_000000_R	"000000_r"
-#define GALGAMES_BANK_000000_W	"000000_w"
-#define GALGAMES_BANK_200000_R	"200000_r"
-#define GALGAMES_BANK_200000_W	"200000_w"
-#define GALGAMES_BANK_240000_R	"240000_r"
+#define GALGAMES_BANK_000000_R  "000000_r"
+#define GALGAMES_BANK_000000_W  "000000_w"
+#define GALGAMES_BANK_200000_R  "200000_r"
+#define GALGAMES_BANK_200000_W  "200000_w"
+#define GALGAMES_BANK_240000_R  "240000_r"
 
-#define GALGAMES_RAM	0
-#define GALGAMES_ROM0	1
-#define GALGAMES_ROM1	2
-#define GALGAMES_ROM2	3
-#define GALGAMES_ROM3	4
+#define GALGAMES_RAM    0
+#define GALGAMES_ROM0   1
+#define GALGAMES_ROM1   2
+#define GALGAMES_ROM2   3
+#define GALGAMES_ROM3   4
 
 
 // NVRAM (5 x EEPROM)
 
 static const eeprom_interface galgames_eeprom_interface =
 {
-	10,					// address bits 10
-	8,					// data bits    8
-	"*1100",			// read         110 0aaaaaaaaaa
-	"*1010",			// write        101 0aaaaaaaaaa dddddddd
-	"*1110",			// erase        111 0aaaaaaaaaa
-	"*10000xxxxxxxxx",	// lock         100 00xxxxxxxxx
-	"*10011xxxxxxxxx",	// unlock       100 11xxxxxxxxx
-	0,					// multi_read
-	1					// reset_delay
+	10,                 // address bits 10
+	8,                  // data bits    8
+	"*1100",            // read         110 0aaaaaaaaaa
+	"*1010",            // write        101 0aaaaaaaaaa dddddddd
+	"*1110",            // erase        111 0aaaaaaaaaa
+	"*10000xxxxxxxxx",  // lock         100 00xxxxxxxxx
+	"*10011xxxxxxxxx",  // unlock       100 11xxxxxxxxx
+	0,                  // multi_read
+	1                   // reset_delay
 };
 
 #define GALGAMES_EEPROM_BIOS  "eeprom_bios"
@@ -677,9 +677,9 @@ static void galgames_update_rombank(running_machine &machine, UINT32 cart)
 	state->m_gfx_offs = 0x200000 * cart;
 
 	if (state->membank(GALGAMES_BANK_000000_R)->entry() == GALGAMES_RAM)
-		state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+		state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);  // rom
 
-	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);  // rom
 }
 
 WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
@@ -692,7 +692,7 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
 
 		switch( data & 0xff )
 		{
-			case 0x07:		// 7 resets the eeprom
+			case 0x07:      // 7 resets the eeprom
 				for (i = 0; i < 5; i++)
 					machine().device<eeprom_device>(galgames_eeprom_names[i])->set_cs_line(ASSERT_LINE);
 				break;
@@ -729,14 +729,14 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
 		// ROM/RAM banking
 		if ((data & 0xf7) == 0x05)
 		{
-			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_RAM);	// ram
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_RAM);   // ram
 			galgames_update_rombank(machine(), m_galgames_cart);
 			logerror("%06x: romram bank = %04x\n", space.device().safe_pc(), data);
 		}
 		else
 		{
-			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
-			membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);	// ram
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);  // rom
+			membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);   // ram
 			logerror("%06x: unknown romram bank = %04x\n", space.device().safe_pc(), data);
 		}
 	}
@@ -753,7 +753,7 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_data_w)
 
 READ16_MEMBER(tmaster_state::dummy_read_01)
 {
-	return 0x3;	// Pass the check at PC = 0xfae & a later one
+	return 0x3; // Pass the check at PC = 0xfae & a later one
 }
 
 static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
@@ -770,7 +770,7 @@ static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x600000, 0x600001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
-	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
+	AM_RANGE( 0x800020, 0x80003f ) AM_NOP   // ?
 	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE(watchdog_reset16_w )
 
 	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
@@ -803,42 +803,42 @@ ADDRESS_MAP_END
 ***************************************************************************/
 static INPUT_PORTS_START( tm )
 	PORT_START("COIN")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN5 )	// "M. Coin 1 Input"
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN6 )	// "M. Coin 2 Input"
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(2)	// "DBV Input"
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN5 )    // "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN6 )    // "M. Coin 2 Input"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(2)    // "DBV Input"
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )	// service coin?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )  // service coin?
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )	// "Calibrate"
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 ) // "Calibrate"
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )	// "E. Coin 1" (ECA?) tmaster defaults to e. coin,
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )	// "E. Coin 2" (ECA?) rather than m. coin
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )	// "E. Coin 3" (ECA?) so they're coin1-coin4
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )	// "E. Coin 4" (ECA?)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )    // "E. Coin 1" (ECA?) tmaster defaults to e. coin,
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )    // "E. Coin 2" (ECA?) rather than m. coin
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )    // "E. Coin 3" (ECA?) so they're coin1-coin4
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )    // "E. Coin 4" (ECA?)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tmaster )
 	PORT_START("COIN")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )	// "M. Coin 1 Input"
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )	// "M. Coin 2 Input"
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(2)	// "DBV Input"
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )    // "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )    // "M. Coin 2 Input"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(2)    // "DBV Input"
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )	// "Calibrate"
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 ) // "Calibrate"
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN3 )	// "E. Coin 1" (ECA mech) The rest of the tm games
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN4 )	// "E. Coin 2" (ECA mech) Default to m. coin
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 )	// "E. Coin 3" (ECA mech) So these are coin3-coin6
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN6 )	// "E. Coin 4" (ECA mech)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN3 )    // "E. Coin 1" (ECA mech) The rest of the tm games
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN4 )    // "E. Coin 2" (ECA mech) Default to m. coin
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 )    // "E. Coin 3" (ECA mech) So these are coin3-coin6
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN6 )    // "E. Coin 4" (ECA mech)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galgames )
@@ -847,8 +847,8 @@ static INPUT_PORTS_START( galgames )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// Button A (right)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	// Button B (left)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   // Button A (right)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   // Button B (left)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -858,16 +858,16 @@ static INPUT_PORTS_START( galgames )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// Button A (right)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	// Button B (left)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1)			// DBA (coin)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // Button A (right)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   // Button B (left)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1)          // DBA (coin)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )	// CS 1 (coin)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )	// CS 2 (coin)
-	PORT_SERVICE( 0x0004, IP_ACTIVE_HIGH )	// System Check
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )    // CS 1 (coin)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )    // CS 2 (coin)
+	PORT_SERVICE( 0x0004, IP_ACTIVE_HIGH )  // System Check
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -965,13 +965,13 @@ MACHINE_RESET_MEMBER(tmaster_state,galgames)
 	m_gfx_offs = 0;
 	m_gfx_size = 0x200000;
 
-	membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
-	membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);		// ram
+	membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);  // rom
+	membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);       // ram
 
-	membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);		// ram
-	membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);		// ram
+	membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);       // ram
+	membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);       // ram
 
-	membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);	// rom
+	membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);  // rom
 
 	galgames_update_rombank(machine(), 0);
 
@@ -1000,7 +1000,7 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
 
-	MCFG_PALETTE_LENGTH(0x1000)	// only 0x100 used
+	MCFG_PALETTE_LENGTH(0x1000) // only 0x100 used
 
 	MCFG_VIDEO_START_OVERRIDE(tmaster_state,galgames)
 
@@ -1049,7 +1049,7 @@ ROM_START( tm )
 	ROM_LOAD16_BYTE( "tmaster_v300_euro.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) ) /* Ver: 3.00 Euro 11-25-96 */
 	ROM_LOAD16_BYTE( "tmaster_v300_euro.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) ) /* Ver: 3.00 Euro 11-25-96 */
 
-	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )	// Blitter gfx
+	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )  // Blitter gfx
 	ROM_LOAD16_BYTE( "tmaster_v21.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) ) /* Marked as Rev 2.1 */
 	ROM_LOAD16_BYTE( "tmaster_v21.u36", 0x100001, 0x080000, CRC(204096ec) SHA1(9239923b7eedb6003c63ef2e8ff224edee657bbc) ) /* Marked as Rev 2.1 */
 	// unused gap
@@ -1066,7 +1066,7 @@ ROM_START( tmdo )
 	ROM_LOAD16_BYTE( "tmaster_v22-01.u51", 0x000000, 0x080000, CRC(12e1b085) SHA1(b01325e0067204991a707db24e3e2036708ebccf) ) /* Ver: 2.2-01 Standard 10-17-96 */
 	ROM_LOAD16_BYTE( "tmaster_v22-01.u52", 0x000001, 0x080000, CRC(6c2c643f) SHA1(8dd7930f4c499483ca46b0b97bde94cb8d6e06aa) ) /* Ver: 2.2-01 Standard 10-17-96 */
 
-	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )	// Blitter gfx
+	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )  // Blitter gfx
 	ROM_LOAD16_BYTE( "tmaster_v21.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) ) /* Marked as Rev 2.1 */
 	ROM_LOAD16_BYTE( "tmaster_v21.u36", 0x100001, 0x080000, CRC(204096ec) SHA1(9239923b7eedb6003c63ef2e8ff224edee657bbc) ) /* Marked as Rev 2.1 */
 	// unused gap
@@ -1115,7 +1115,7 @@ ROM_START( tm2k )
 	ROM_LOAD16_BYTE( "tm2k_v463.u51", 0x000000, 0x100000, CRC(f73fdb23) SHA1(d0a5e98d5de85fd3f29d1efe6b7aebe9e348c59b) ) /* Ver: 4.63 Standard 9-3-97 */
 	ROM_LOAD16_BYTE( "tm2k_v463.u52", 0x000001, 0x100000, CRC(79ac719c) SHA1(7717362ea42fc36009e0fed430f07c946553bfd3) ) /* Ver: 4.63 Standard 9-3-97 */
 
-	ROM_REGION( 0x600000, "blitter", ROMREGION_ERASE )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", ROMREGION_ERASE )  // Blitter gfx
 	ROM_LOAD16_BYTE( "tm2k_graphic.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) ) /* First 4 graphic roms marked as Rev 4.00 */
 	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
@@ -1133,7 +1133,7 @@ ROM_START( tm2ka )
 	ROM_LOAD16_BYTE( "tm2k_v402.u51", 0x000000, 0x080000, CRC(47269aeb) SHA1(6b7ebfde290f7d21a36a72b00dc6523490581edb) ) /* Ver: 4.02 Standard 5-30-97 */
 	ROM_LOAD16_BYTE( "tm2k_v402.u52", 0x000001, 0x080000, CRC(2e3564ac) SHA1(9a71f38841bc17c291cb3f513b18ebe50fc18d9f) ) /* Ver: 4.02 Standard 5-30-97 */
 
-	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )	// Blitter gfx
+	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )  // Blitter gfx
 	ROM_LOAD16_BYTE( "tm2k_graphic.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) ) /* All 4 graphic roms marked as Rev 4.00 */
 	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
@@ -1150,7 +1150,7 @@ ROM_START( tm2kb )
 	ROM_LOAD16_BYTE( "tm2k_v400.u51", 0x000000, 0x080000, CRC(c110502b) SHA1(e9415ed23b9bb0851548e75c208ebcbe6ac2a708) ) /* Ver: 4.00 Standard 5-16-97 */
 	ROM_LOAD16_BYTE( "tm2k_v400.u52", 0x000001, 0x080000, CRC(a17c1d6e) SHA1(5ecb8f27f75469ab9600b3f640eb1acc7a3980e0) ) /* Ver: 4.00 Standard 5-16-97 */
 
-	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )	// Blitter gfx
+	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )  // Blitter gfx
 	ROM_LOAD16_BYTE( "tm2k_graphic.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) ) /* All 4 graphic roms marked as Rev 4.00 */
 	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
@@ -1201,7 +1201,7 @@ ROM_START( tm3k )
 	ROM_LOAD16_BYTE( "tm3k_v502.u51", 0x000000, 0x100000, CRC(6267e2bd) SHA1(c81e5cd059a9ad2f6a36261738e39740a1a3a03f) ) /* TOUCHMASTER 3000 U51 DOMESTIC 5.02 (Standard 11-17-97) (yellow label) */
 	ROM_LOAD16_BYTE( "tm3k_v502.u52", 0x000001, 0x100000, CRC(836fdf1e) SHA1(2ee9c0929950afb72f172b253d6c392e9a698037) ) /* TOUCHMASTER 3000 U52 DOMESTIC 5.02 (Standard 11-17-97) (yellow label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm3k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Labeled TOUCHMASTER U38 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Labeled TOUCHMASTER U36 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u39", 0x200000, 0x100000, CRC(206b56a6) SHA1(09e5e05bffd0a09abd24d668e2c59b56f2c79134) ) /* Labeled TOUCHMASTER U39 STANDARD 5.0 (pink label) */
@@ -1218,7 +1218,7 @@ ROM_START( tm3ka )
 	ROM_LOAD16_BYTE( "tm3k_v501.u51", 0x000000, 0x100000, CRC(c9522279) SHA1(e613b791f831271722f05b7e96c35519fa9fc174) ) /* TOUCHMASTER 3000 U51 DOMESTIC 5.01 (Standard 11-4-97) (yellow label) */
 	ROM_LOAD16_BYTE( "tm3k_v501.u52", 0x000001, 0x100000, CRC(8c6a0db7) SHA1(6b0eae60ea471cd8c4001749ac2677d8d4532567) ) /* TOUCHMASTER 3000 U52 DOMESTIC 5.01 (Standard 11-4-97) (yellow label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm3k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Labeled TOUCHMASTER U38 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Labeled TOUCHMASTER U36 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u39", 0x200000, 0x100000, CRC(206b56a6) SHA1(09e5e05bffd0a09abd24d668e2c59b56f2c79134) ) /* Labeled TOUCHMASTER U39 STANDARD 5.0 (pink label) */
@@ -1267,7 +1267,7 @@ ROM_START( tm4k )
 	ROM_LOAD16_BYTE( "tm4k_v603.u51", 0x000000, 0x100000, CRC(0c88c856) SHA1(4c60c09812ab05f9dccef3038a5ddbd4632dbf4e) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.03 (Standard 6-23-98) */
 	ROM_LOAD16_BYTE( "tm4k_v603.u52", 0x000001, 0x100000, CRC(9320bfe9) SHA1(cc3a51f439c139ca30efe28a817cf4f68679180e) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.03 (Standard 6-23-98) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
@@ -1284,7 +1284,7 @@ ROM_START( tm4ka )
 	ROM_LOAD16_BYTE( "tm4k_v602.u51", 0x000000, 0x100000, CRC(3d8d7848) SHA1(31638f23cdd5e6cfbb2270e953f84fe1bd437950) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.02 (Standard 4-14-98) */
 	ROM_LOAD16_BYTE( "tm4k_v602.u52", 0x000001, 0x100000, CRC(6d412871) SHA1(ae27c7723b292daf6682c53bafac22e4a3cd1ece) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.02 (Standard 4-14-98) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
@@ -1301,7 +1301,7 @@ ROM_START( tm4kca )
 	ROM_LOAD16_BYTE( "tm4k_v602ca.u51", 0x000000, 0x100000, CRC(b355e15e) SHA1(e6a6cd74d3439f589ac0a914ec66962ce2885c00) ) /* TOUCHMASTER 4000 U51 CALIFORNIA  6.02 (CA. 4-14-98) */
 	ROM_LOAD16_BYTE( "tm4k_v602ca.u52", 0x000001, 0x100000, CRC(0adbbfc0) SHA1(4660bd95649bfc65d3e52975d168de4963bd27cb) ) /* TOUCHMASTER 4000 U52 CALIFORNIA  6.02 (CA. 4-14-98) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
@@ -1318,7 +1318,7 @@ ROM_START( tm4kb )
 	ROM_LOAD16_BYTE( "tm4k_v601.u51", 0x000000, 0x100000, CRC(cdcfd064) SHA1(51f022d25411d119a5f16ff7f09f4bed59b937e1) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.01 (Standard 3-23-98) */
 	ROM_LOAD16_BYTE( "tm4k_v601.u52", 0x000001, 0x100000, CRC(e0bf71a9) SHA1(8f5e70dee60cd95aceac4707ff73bdff578a6139) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.01 (Standard 3-23-98) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
@@ -1363,7 +1363,7 @@ ROM_START( tm5k )
 	ROM_LOAD16_BYTE( "tm5k_v7_10.u51", 0x000000, 0x100000, CRC(df0bd25e) SHA1(db1a197ed4c868743397f3823f3f1d42b9329f80) ) /* TOUCHMASTER 5000 U51 DOMESTIC 7.10 (Standard 10-9-98) (tan label) */
 	ROM_LOAD16_BYTE( "tm5k_v7_10.u52", 0x000001, 0x100000, CRC(ddf9e8dc) SHA1(3228f2eba067bdf1bd639116bffc589585ea3e72) ) /* TOUCHMASTER 5000 U52 DOMESTIC 7.10 (Standard 10-9-98) (tan label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm5k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Mask rom labeled 5341-15951-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Mask rom labeled 5341-15951-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u39", 0x200000, 0x100000, CRC(1349fdc7) SHA1(5118983be584455320f0d6006133f38e6a8ee0d8) ) /* Mask rom labeled 5341-15951-05 U39 VIDEO IMAGE */
@@ -1380,7 +1380,7 @@ ROM_START( tm5kca ) /* California only version */
 	ROM_LOAD16_BYTE( "tm5kca_v7_10.u51", 0x000000, 0x100000, CRC(7c03708f) SHA1(e1f8198bc03c1f9d2a00662b589fd66fdcc7a2de) ) /* TOUCHMASTER 5000 U51 CALIFORNIA 7.10 (CA. 10-9-98) (tan label) */
 	ROM_LOAD16_BYTE( "tm5kca_v7_10.u52", 0x000001, 0x100000, CRC(f1413295) SHA1(ad6b57c590bdae063b0e4a1abcb3b13ee52cd6db) ) /* TOUCHMASTER 5000 U52 CALIFORNIA 7.10 (CA. 10-9-98) (tan label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm5k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Mask rom labeled 5341-15951-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Mask rom labeled 5341-15951-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u39", 0x200000, 0x100000, CRC(1349fdc7) SHA1(5118983be584455320f0d6006133f38e6a8ee0d8) ) /* Mask rom labeled 5341-15951-05 U39 VIDEO IMAGE */
@@ -1397,7 +1397,7 @@ ROM_START( tm5ka )
 	ROM_LOAD16_BYTE( "tm5k_v7_01.u51", 0x000000, 0x100000, CRC(3ff68213) SHA1(ec4939899a69f56d2437c806fdd0a5b50e58ec6a) ) /* TOUCHMASTER 5000 U51 DOMESTIC 7.01 (Standard 8-21-98) (pink label) */
 	ROM_LOAD16_BYTE( "tm5k_v7_01.u52", 0x000001, 0x100000, CRC(b3de607c) SHA1(4ede5b8c50177d1934a3b93d311a240ef354c450) ) /* TOUCHMASTER 5000 U52 DOMESTIC 7.01 (Standard 8-21-98) (pink label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm5k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Mask rom labeled 5341-15951-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Mask rom labeled 5341-15951-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u39", 0x200000, 0x100000, CRC(1349fdc7) SHA1(5118983be584455320f0d6006133f38e6a8ee0d8) ) /* Mask rom labeled 5341-15951-05 U39 VIDEO IMAGE */
@@ -1444,7 +1444,7 @@ ROM_START( tm7k )
 	ROM_LOAD16_BYTE( "tm7k_v804.u51", 0x000000, 0x100000, CRC(2461af04) SHA1(9cf37c04db0297ff8f9f316fd476d6d5d1c39acf) ) /* TOUCHMASTER 7000 U51 DOMESTIC 8.04 (Standard 06/02/99) (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_v804.u52", 0x000001, 0x100000, CRC(5d39fad2) SHA1(85e8d110b88e1099117ab7963eaee47dc86ec7c5) ) /* TOUCHMASTER 7000 U52 DOMESTIC 8.04 (Standard 06/02/99) (orange label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm7k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Mask rom labeled 5341-16262-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Mask rom labeled 5341-16262-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u39", 0x200000, 0x100000, CRC(26af8da8) SHA1(02555b1597a4962f1fd0c3ffc89e5c8338aa3085) ) /* Mask rom labeled 5341-16262-05 U39 VIDEO IMAGE */
@@ -1461,7 +1461,7 @@ ROM_START( tm7ka )
 	ROM_LOAD16_BYTE( "tm7k_v800.u51", 0x000000, 0x100000, CRC(83ec3da7) SHA1(37fa7183e7acc2eab35ac431d99cbbfe4862979e) ) /* TOUCHMASTER 7000 U51 DOMESTIC 8.00 (Standard 03/26/99) (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_v800.u52", 0x000001, 0x100000, CRC(e2004282) SHA1(aa73029f31e2062cabedfcd778db97b314624ae8) ) /* TOUCHMASTER 7000 U52 DOMESTIC 8.00 (Standard 03/26/99) (orange label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm7k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Labeled GRAPHIC U38  8.0 (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Labeled GRAPHIC U36  8.0 (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u39", 0x200000, 0x100000, CRC(26af8da8) SHA1(02555b1597a4962f1fd0c3ffc89e5c8338aa3085) ) /* Labeled GRAPHIC U39  8.0 (orange label) */
@@ -1478,7 +1478,7 @@ ROM_START( tm7keval ) /* FREEPLAY ONLY / NOT FOR RELEASE / FOR EVALUATION ONLY *
 	ROM_LOAD16_BYTE( "tm7k_v81x.u51", 0x000000, 0x100000, CRC(57c88287) SHA1(1008bbcd137ede321be4cc2ad22e3982d880471b) ) /* TOUCHMASTER 7000 U51 8.1X (ASI Standard 03/08/99) (white label) */
 	ROM_LOAD16_BYTE( "tm7k_v81x.u52", 0x000001, 0x100000, CRC(e45d69bb) SHA1(9e8a42924a9cd573cbd2f3164d0fb468eee7ff51) ) /* TOUCHMASTER 7000 U52 8.1X (ASI Standard 03/08/99) (white label) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm7k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* TOUCHMASTER EDCE V8.X U38 (white label) */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* TOUCHMASTER DB7F V8.X U36 (white label) */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u39", 0x200000, 0x100000, CRC(26af8da8) SHA1(02555b1597a4962f1fd0c3ffc89e5c8338aa3085) ) /* TOUCHMASTER 2BB6 V8.X U39 (white label) */
@@ -1523,7 +1523,7 @@ ROM_START( tm8k )
 	ROM_LOAD16_BYTE( "tm8k_v904.u51", 0x000000, 0x100000, CRC(28864ec8) SHA1(e703f9ee350dd915102e784bbd04445a95b7d0a5) ) /* TOUCHMASTER 8000 U51 DOMESTIC 9.04 (Standard 04/25/00) */
 	ROM_LOAD16_BYTE( "tm8k_v904.u52", 0x000001, 0x100000, CRC(c123eec2) SHA1(3e9c84755b18a4fd900068f385ee47107771391d) ) /* TOUCHMASTER 8000 U52 DOMESTIC 9.04 (Standard 04/25/00) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm8k_graphic.u38", 0x000000, 0x100000, CRC(2a971d46) SHA1(6ca4067e9fa40053df415e670b2e853915319dbb) ) /* Mask rom labeled 5341-16513-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm8k_graphic.u36", 0x000001, 0x100000, CRC(3bde285e) SHA1(87bf60034665542fb0240b7479adfffb7ba9fad7) ) /* Mask rom labeled 5341-16513-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm8k_graphic.u39", 0x200000, 0x100000, CRC(58c6c1d8) SHA1(cc11863c4ea46bde7ea4775075f4328be6d6c6d1) ) /* Mask rom labeled 5341-16513-05 U39 VIDEO IMAGE */
@@ -1540,7 +1540,7 @@ ROM_START( tm8k902 )
 	ROM_LOAD16_BYTE( "tm8k_v902.u51", 0x000000, 0x100000, CRC(c0d95b2c) SHA1(2240d969047ada856ec2fac6cdf72db722753a6d) ) /* TOUCHMASTER 8000 U51 DOMESTIC 9.02 (Standard 03/17/00) */
 	ROM_LOAD16_BYTE( "tm8k_v902.u52", 0x000001, 0x100000, CRC(5194c1b5) SHA1(28a91d12a022927bfe96afd62b30b268c0ced3ea) ) /* TOUCHMASTER 8000 U52 DOMESTIC 9.02 (Standard 03/17/00) */
 
-	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
 	ROM_LOAD16_BYTE( "tm8k_graphic.u38", 0x000000, 0x100000, CRC(2a971d46) SHA1(6ca4067e9fa40053df415e670b2e853915319dbb) ) /* Mask rom labeled 5341-16513-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm8k_graphic.u36", 0x000001, 0x100000, CRC(3bde285e) SHA1(87bf60034665542fb0240b7479adfffb7ba9fad7) ) /* Mask rom labeled 5341-16513-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm8k_graphic.u39", 0x200000, 0x100000, CRC(58c6c1d8) SHA1(cc11863c4ea46bde7ea4775075f4328be6d6c6d1) ) /* Mask rom labeled 5341-16513-05 U39 VIDEO IMAGE */
@@ -1886,7 +1886,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,galgames)
 {
-	UINT8 *ROM	=	memregion("maincpu")->base();
+	UINT8 *ROM  =   memregion("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff

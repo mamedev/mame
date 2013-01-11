@@ -47,7 +47,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define PRINTF_WHITE_FLAG	0
+#define PRINTF_WHITE_FLAG   0
 
 
 
@@ -55,8 +55,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_SOURCE_WIDTH	1024
-#define MAX_CLOCK_DIFF		3
+#define MAX_SOURCE_WIDTH    1024
+#define MAX_CLOCK_DIFF      3
 
 
 
@@ -249,19 +249,19 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 	}
 
 	/*
-        At this point, there are two approaches that have been tried:
+	    At this point, there are two approaches that have been tried:
 
-        1. Find the peak value and call it white if the peak is above
-           the 90% line
+	    1. Find the peak value and call it white if the peak is above
+	       the 90% line
 
-        2. Ignore the first and last 20% of the line and count how
-           many pixels are above some threshold (75% line was used).
-           Call it white if at least 80% of the pixels are above
-           the threshold.
+	    2. Ignore the first and last 20% of the line and count how
+	       many pixels are above some threshold (75% line was used).
+	       Call it white if at least 80% of the pixels are above
+	       the threshold.
 
-        Both approaches agree 99% of the time, but the first tends to
-        be more correct when there is a discrepancy.
-    */
+	    Both approaches agree 99% of the time, but the first tends to
+	    be more correct when there is a discrepancy.
+	*/
 
 	/* determine where the peak is */
 	peakval = 0;
@@ -403,4 +403,3 @@ void vbi_metadata_unpack(vbi_metadata *vbi, UINT32 *framenum, const UINT8 *sourc
 	vbi->line18 = (source[10] << 16) | (source[11] << 8) | source[12];
 	vbi->line1718 = (source[13] << 16) | (source[14] << 8) | source[15];
 }
-

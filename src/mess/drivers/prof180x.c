@@ -71,7 +71,7 @@ void prof180x_state::ls259_w(int flag, int value)
 		m_c2 = value;
 		break;
 
-	case 3:	// MINI
+	case 3: // MINI
 		break;
 
 	case 4: // MM0
@@ -79,13 +79,13 @@ void prof180x_state::ls259_w(int flag, int value)
 		bankswitch();
 		break;
 
-	case 5:	// RTC
+	case 5: // RTC
 		break;
 
-	case 6:	// PEPS
+	case 6: // PEPS
 		break;
 
-	case 7:	// MM1
+	case 7: // MM1
 		m_mm1 = value;
 		bankswitch();
 		break;
@@ -96,18 +96,18 @@ WRITE8_MEMBER( prof180x_state::flr_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       VAL
-        1       FLG0
-        2       FLG1
-        3       FLG2
-        4
-        5
-        6
-        7
+	    0       VAL
+	    1       FLG0
+	    2       FLG1
+	    3       FLG2
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	int val = BIT(data, 0);
 	int flg = (data >> 1) & 0x07;
@@ -119,18 +119,18 @@ READ8_MEMBER( prof180x_state::status0_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       BUSY
-        1
-        2
-        3
-        4       B-E
-        5       IDX
-        6
-        7       MOT
+	    0       BUSY
+	    1
+	    2
+	    3
+	    4       B-E
+	    5       IDX
+	    6
+	    7       MOT
 
-    */
+	*/
 
 	return 0;
 }
@@ -139,18 +139,18 @@ READ8_MEMBER( prof180x_state::status1_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       FREE
-        1
-        2
-        3
-        4       J18
-        5       J19
-        6
-        7       TDO
+	    0       FREE
+	    1
+	    2
+	    3
+	    4       J18
+	    5       J19
+	    6
+	    7       TDO
 
-    */
+	*/
 
 	return 0;
 }
@@ -214,20 +214,20 @@ void prof180x_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( prof180x, prof180x_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL_9_216MHz) // HD64180
-    MCFG_CPU_PROGRAM_MAP(prof180x_mem)
-    MCFG_CPU_IO_MAP(prof180x_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL_9_216MHz) // HD64180
+	MCFG_CPU_PROGRAM_MAP(prof180x_mem)
+	MCFG_CPU_IO_MAP(prof180x_io)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_UPDATE_DRIVER(prof180x_state, screen_update)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	/* video hardware */
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(prof180x_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* devices */
 	MCFG_UPD765A_ADD(FDC9268_TAG, false, true)
@@ -303,5 +303,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, prof180x,  0,       0,	prof180x,	prof180x, driver_device,	 0,  "Conitec Datensysteme",   "PROF-180X",		GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1992, prof181x,  prof180x,0,	prof180x,	prof180x, driver_device,	 0,  "Conitec Datensysteme",   "PROF-181X",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1986, prof180x,  0,       0,  prof180x,   prof180x, driver_device,     0,  "Conitec Datensysteme",   "PROF-180X",     GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1992, prof181x,  prof180x,0,  prof180x,   prof180x, driver_device,     0,  "Conitec Datensysteme",   "PROF-181X",     GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -98,4 +98,3 @@ UINT32 poly88_state::screen_update_poly88(screen_device &screen, bitmap_ind16 &b
 	}
 	return 0;
 }
-

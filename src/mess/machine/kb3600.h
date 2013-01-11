@@ -66,7 +66,7 @@
 //**************************************************************************
 
 #define MCFG_AY3600_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, AY3600, _clock)	\
+	MCFG_DEVICE_ADD(_tag, AY3600, _clock)   \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -83,56 +83,56 @@
 
 struct ay3600_interface
 {
-	devcb_read16		m_in_x0_cb;
-	devcb_read16		m_in_x1_cb;
-	devcb_read16		m_in_x2_cb;
-	devcb_read16		m_in_x3_cb;
-	devcb_read16		m_in_x4_cb;
-	devcb_read16		m_in_x5_cb;
-	devcb_read16		m_in_x6_cb;
-	devcb_read16		m_in_x7_cb;
-	devcb_read16		m_in_x8_cb;
+	devcb_read16        m_in_x0_cb;
+	devcb_read16        m_in_x1_cb;
+	devcb_read16        m_in_x2_cb;
+	devcb_read16        m_in_x3_cb;
+	devcb_read16        m_in_x4_cb;
+	devcb_read16        m_in_x5_cb;
+	devcb_read16        m_in_x6_cb;
+	devcb_read16        m_in_x7_cb;
+	devcb_read16        m_in_x8_cb;
 
-	devcb_read_line		m_in_shift_cb;
-	devcb_read_line		m_in_control_cb;
+	devcb_read_line     m_in_shift_cb;
+	devcb_read_line     m_in_control_cb;
 
-	devcb_write_line	m_out_data_ready_cb;
-	devcb_write_line	m_out_ako_cb;
+	devcb_write_line    m_out_data_ready_cb;
+	devcb_write_line    m_out_ako_cb;
 };
 
 
 // ======================> ay3600_device
 
-class ay3600_device :	public device_t,
-                        public ay3600_interface
+class ay3600_device :   public device_t,
+						public ay3600_interface
 {
 public:
-    // construction/destruction
-    ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 public:
 	UINT16 b_r();
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_read16		m_in_x_func[9];
+	devcb_resolved_read16       m_in_x_func[9];
 
-	devcb_resolved_read_line	m_in_shift_func;
-	devcb_resolved_read_line	m_in_control_func;
+	devcb_resolved_read_line    m_in_shift_func;
+	devcb_resolved_read_line    m_in_control_func;
 
-	devcb_resolved_write_line	m_out_data_ready_func;
-	devcb_resolved_write_line	m_out_ako_func;
+	devcb_resolved_write_line   m_out_data_ready_func;
+	devcb_resolved_write_line   m_out_ako_func;
 
-	int m_b;					// output buffer
-	int m_ako;					// any key down
+	int m_b;                    // output buffer
+	int m_ako;                  // any key down
 
 	// timers
-	emu_timer *m_scan_timer;	// keyboard scan timer
+	emu_timer *m_scan_timer;    // keyboard scan timer
 };
 
 

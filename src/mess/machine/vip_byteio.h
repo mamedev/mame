@@ -45,7 +45,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define VIP_BYTEIO_PORT_TAG		"byteio"
+#define VIP_BYTEIO_PORT_TAG     "byteio"
 
 
 
@@ -58,8 +58,8 @@
 
 
 #define MCFG_VIP_BYTEIO_PORT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, VIP_BYTEIO_PORT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, VIP_BYTEIO_PORT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -72,7 +72,7 @@
 
 struct vip_byteio_port_interface
 {
-	devcb_write_line	m_out_inst_cb;
+	devcb_write_line    m_out_inst_cb;
 };
 
 
@@ -81,8 +81,8 @@ struct vip_byteio_port_interface
 class device_vip_byteio_port_interface;
 
 class vip_byteio_port_device : public device_t,
-						       public vip_byteio_port_interface,
-						       public device_slot_interface
+								public vip_byteio_port_interface,
+								public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -105,7 +105,7 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-	devcb_resolved_write_line	m_out_inst_func;
+	devcb_resolved_write_line   m_out_inst_func;
 
 	device_vip_byteio_port_interface *m_cart;
 };

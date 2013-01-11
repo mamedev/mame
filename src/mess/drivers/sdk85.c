@@ -112,12 +112,12 @@ READ8_MEMBER( sdk85_state::kbd_r )
 
 static I8279_INTERFACE( sdk85_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST55_LINE),	// irq
-	DEVCB_DRIVER_MEMBER(sdk85_state, scanlines_w),	// scan SL lines
-	DEVCB_DRIVER_MEMBER(sdk85_state, digit_w),		// display A&B
-	DEVCB_NULL,						// BD
-	DEVCB_DRIVER_MEMBER(sdk85_state, kbd_r),		// kbd RL lines
-	DEVCB_LINE_VCC,						// Shift key
+	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST55_LINE),  // irq
+	DEVCB_DRIVER_MEMBER(sdk85_state, scanlines_w),  // scan SL lines
+	DEVCB_DRIVER_MEMBER(sdk85_state, digit_w),      // display A&B
+	DEVCB_NULL,                     // BD
+	DEVCB_DRIVER_MEMBER(sdk85_state, kbd_r),        // kbd RL lines
+	DEVCB_LINE_VCC,                     // Shift key
 	DEVCB_LINE_VCC
 };
 
@@ -144,4 +144,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
 COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, driver_device,     0,  "Intel",   "SDK-85", GAME_NO_SOUND_HW)
-

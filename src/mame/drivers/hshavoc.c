@@ -42,7 +42,7 @@ Unfortunately it's read protected.
 #include "includes/megadriv.h"
 
 static INPUT_PORTS_START( hshavoc )
-	PORT_START("IN0")	/* 16bit */
+	PORT_START("IN0")   /* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -127,20 +127,20 @@ DRIVER_INIT_MEMBER(md_cons_state,hshavoc)
 
 	/* this decryption is wrong / incomplete, maybe it uses slightly different decryption for opcodes / data */
 	/* I think the PIC that exists on the PCB controls a state-based encryption... there is a large amount
-       of code encrypted using the same encryption as the data, but all the startup-code + vectors use additional
-       encryption.. maybe the PIC can also patch the code, I'm also concerned that we may decrypt it and find
-       that it runs as the genesis (no insert coin etc.) version without the PIC, or the PIC supplies additonal
-       code in RAM.. but as of yet we can't know */
+	   of code encrypted using the same encryption as the data, but all the startup-code + vectors use additional
+	   encryption.. maybe the PIC can also patch the code, I'm also concerned that we may decrypt it and find
+	   that it runs as the genesis (no insert coin etc.) version without the PIC, or the PIC supplies additonal
+	   code in RAM.. but as of yet we can't know */
 
 	int rom_size = 0xe8000;
 
 	for (x = 0; x < rom_size / 2; x++)
 	{
 		src[x] = BITSWAP16(src[x],
-                                7, 15,6, 14,
-                                5, 2, 1, 10,
-                                13,4, 12,3,
-                                11,0, 8, 9 );
+								7, 15,6, 14,
+								5, 2, 1, 10,
+								13,4, 12,3,
+								11,0, 8, 9 );
 
 
 		if (typedat[x & 0xf] == 1)
@@ -158,9 +158,9 @@ DRIVER_INIT_MEMBER(md_cons_state,hshavoc)
 				src[x] ^= 0x0004;
 
 			src[x] = BITSWAP16(src[x], 15,14,13,12,
-                                             11,9, 10,8,
-                                             7, 6, 5, 4,
-                                             3, 2, 1, 0 );
+												11,9, 10,8,
+												7, 6, 5, 4,
+												3, 2, 1, 0 );
 		}
 	}
 
@@ -168,16 +168,16 @@ DRIVER_INIT_MEMBER(md_cons_state,hshavoc)
 	for (x = rom_size / 2; x < 0x100000 / 2; x++)
 	{
 		src[x] = BITSWAP16(src[x],
-                                7, 15,6, 14,
-                                5, 2, 1, 10,
-                                13,4, 12,3,
-                                11,0, 8, 9 );
+								7, 15,6, 14,
+								5, 2, 1, 10,
+								13,4, 12,3,
+								11,0, 8, 9 );
 
 		src[x] = BITSWAP16(src[x],
-                                15,14,13,12,
-                                11,10,9, 2,
-                                7, 6, 5, 4,
-                                3, 8, 0, 1 );
+								15,14,13,12,
+								11,10,9, 2,
+								7, 6, 5, 4,
+								3, 8, 0, 1 );
 	}
 	/* EMD e80000 - end */
 
@@ -187,21 +187,21 @@ DRIVER_INIT_MEMBER(md_cons_state,hshavoc)
 	src[3] ^= 0x0707; //? 0701 not 0107 .. conditional 0x600 extra xor?, different 'typemap' ??
 
 	/* I'm pretty sure c42 is where the startup code is located, comparing genesis version
-       and this there is at least one jump in the genesis version to the startup code which
-       has been changed to this address in the arcade version.
+	   and this there is at least one jump in the genesis version to the startup code which
+	   has been changed to this address in the arcade version.
 
-       there are several blocks of code like this, all appear to end with a normal rts instruction
-       tho...
-       */
+	   there are several blocks of code like this, all appear to end with a normal rts instruction
+	   tho...
+	   */
 	for (x = 0xc42 / 2; x < 0xc9a / 2; x++)
 	{
 		src[x] ^= 0x0107; //? seems conditional..
 
 		src[x] = BITSWAP16(src[x],
-                                15,13,14,12,
-                                11,10,9, 0,
-                                8, 6, 5, 4,
-                                3, 2, 1, 7 ); // probably wrong
+								15,13,14,12,
+								11,10,9, 0,
+								8, 6, 5, 4,
+								3, 2, 1, 7 ); // probably wrong
 
 		src[x] ^= 0x0001; // wrong..
 	}

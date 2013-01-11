@@ -88,7 +88,7 @@ Dip locations and factory settings verified from dip listing
 
 WRITE8_MEMBER(buggychl_state::bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x07);	// shall we check if data&7 < # banks?
+	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 < # banks?
 }
 
 TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
@@ -146,13 +146,13 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("DSW3")
-	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("IN0")	/* player inputs */
+	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("IN0")    /* player inputs */
 	AM_RANGE(0xd608, 0xd608) AM_READ_PORT("WHEEL")
-	AM_RANGE(0xd609, 0xd609) AM_READ_PORT("IN1")	/* coin + accelerator */
+	AM_RANGE(0xd609, 0xd609) AM_READ_PORT("IN1")    /* coin + accelerator */
 //  AM_RANGE(0xd60a, 0xd60a) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd618, 0xd618) AM_WRITENOP	/* accelerator clear */
+	AM_RANGE(0xd618, 0xd618) AM_WRITENOP    /* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_SHARE("scrollv")
 	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_SHARE("scrollh")
@@ -166,21 +166,21 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
-	AM_RANGE(0x4820, 0x4820) AM_RAM	/* VOL/BAL   for the 7630 on the MSM5232 output */
-	AM_RANGE(0x4830, 0x4830) AM_RAM	/* TRBL/BASS for the 7630 on the MSM5232 output  */
+	AM_RANGE(0x4820, 0x4820) AM_RAM /* VOL/BAL   for the 7630 on the MSM5232 output */
+	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output  */
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
 //  AM_RANGE(0x5001, 0x5001) AM_READNOP /* is command pending? */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w)
-	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostics ROM */
+	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostics ROM */
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 static INPUT_PORTS_START( buggychl )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" ) PORT_DIPLOCATION("SW1:1,2")	/* Arks/Flags/Fuel */
+	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" ) PORT_DIPLOCATION("SW1:1,2")   /* Arks/Flags/Fuel */
 	PORT_DIPSETTING(    0x03, "2000/1000/50" )
 	PORT_DIPSETTING(    0x02, "1000/500/30" )
 	PORT_DIPSETTING(    0x01, "500/200/10" )
@@ -189,15 +189,15 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )			/* 1300 units of fuel */
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		/* 1200 units of fuel */
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )			/* 1100 units of fuel */
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		/* 1000 units of fuel */
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )         /* 1300 units of fuel */
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )       /* 1200 units of fuel */
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )         /* 1100 units of fuel */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      /* 1000 units of fuel */
 	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Only listed as OFF in the manual */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
@@ -239,11 +239,11 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPNAME( 0x01, 0x01, "Start button needed" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Only listed as OFF in the manual */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
 	PORT_DIPNAME( 0x04, 0x04, "Fuel loss (Cheat)") PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Crash only" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Only listed as OFF in the manual */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
 	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
@@ -261,7 +261,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )	/* shift */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )   /* shift */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_BUTTON1 )	/* accelerator */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_BUTTON1 )   /* accelerator */
 
 	PORT_START("WHEEL") /* wheel */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
@@ -351,7 +351,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 static const msm5232_interface msm5232_config =
 {
-	{ 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6 },	/* default 0.39 uF capacitors (not verified) */
+	{ 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6 }, /* default 0.39 uF capacitors (not verified) */
 	DEVCB_NULL
 };
 
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 60*60)	/* irq is timed, tied to the cpu clock and not to vblank */
+	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 60*60) /* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
 	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
@@ -430,14 +430,14 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -460,10 +460,10 @@ ROM_START( buggychl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "a22-19.31",   0x00000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprites */
+	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprites */
 	ROM_LOAD( "a22-06.111",  0x00000, 0x4000, CRC(1df91b17) SHA1(440d33bf984042fb4eac8f17bb385992ccdc6113) )
 	ROM_LOAD( "a22-07.110",  0x04000, 0x4000, CRC(2f0ab9b7) SHA1(07b98e23d12da834d522e29fe7891503dc258b05) )
 	ROM_LOAD( "a22-08.109",  0x08000, 0x4000, CRC(49cb2134) SHA1(f9998617c097b90be7257ba6fc1e46ff9e1f8916) )
@@ -473,10 +473,10 @@ ROM_START( buggychl )
 	ROM_LOAD( "a22-12.105",  0x18000, 0x4000, CRC(8b365b24) SHA1(a306c1f6fe1f5563602ab424f1b4f6ac17d1e47d) )
 	ROM_LOAD( "a22-13.104",  0x1c000, 0x4000, CRC(2c6d68fe) SHA1(9e1a0e44ae2b9986d0ebff49a0fd4df3e8a7f4e7) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )	/* sprite zoom tables */
-	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) )	/* vertical */
-	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) )	/* horizontal */
-	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) )	/* horizontal */
+	ROM_REGION( 0x4000, "gfx2", 0 ) /* sprite zoom tables */
+	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) ) /* vertical */
+	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
+	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
 ROM_END
 
 ROM_START( buggychlt )
@@ -490,10 +490,10 @@ ROM_START( buggychlt )
 	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "a22-19.31",   0x00000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprites */
+	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprites */
 	ROM_LOAD( "a22-06.111",  0x00000, 0x4000, CRC(1df91b17) SHA1(440d33bf984042fb4eac8f17bb385992ccdc6113) )
 	ROM_LOAD( "a22-07.110",  0x04000, 0x4000, CRC(2f0ab9b7) SHA1(07b98e23d12da834d522e29fe7891503dc258b05) )
 	ROM_LOAD( "a22-08.109",  0x08000, 0x4000, CRC(49cb2134) SHA1(f9998617c097b90be7257ba6fc1e46ff9e1f8916) )
@@ -503,10 +503,10 @@ ROM_START( buggychlt )
 	ROM_LOAD( "a22-12.105",  0x18000, 0x4000, CRC(8b365b24) SHA1(a306c1f6fe1f5563602ab424f1b4f6ac17d1e47d) )
 	ROM_LOAD( "a22-13.104",  0x1c000, 0x4000, CRC(2c6d68fe) SHA1(9e1a0e44ae2b9986d0ebff49a0fd4df3e8a7f4e7) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )	/* sprite zoom tables */
-	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) )	/* vertical */
-	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) )	/* horizontal */
-	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) )	/* horizontal */
+	ROM_REGION( 0x4000, "gfx2", 0 ) /* sprite zoom tables */
+	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) ) /* vertical */
+	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
+	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
 ROM_END
 
 

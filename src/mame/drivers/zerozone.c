@@ -53,11 +53,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, zerozone_state )
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("DSWA")
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(sound_w)
 	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x098000, 0x098001) AM_RAM		/* Watchdog? */
+	AM_RANGE(0x098000, 0x098001) AM_RAM     /* Watchdog? */
 	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("videoram")
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(tilebank_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM		/* Never read from */
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM     /* Never read from */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zerozone_state )
@@ -108,11 +108,11 @@ static INPUT_PORTS_START( zerozone )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0008, "In Game Default" )		// 130, 162 or 255 "lines"
-	PORT_DIPSETTING(      0x0000, "Always Hard" )			// 255 "lines"
+	PORT_DIPSETTING(      0x0008, "In Game Default" )       // 130, 162 or 255 "lines"
+	PORT_DIPSETTING(      0x0000, "Always Hard" )           // 255 "lines"
 	PORT_DIPNAME( 0x0010, 0x0010, "Speed" )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Normal ) )			// Drop every 20 frames
-	PORT_DIPSETTING(      0x0000, "Fast" )				// Drop every 18 frames
+	PORT_DIPSETTING(      0x0010, DEF_STR( Normal ) )           // Drop every 20 frames
+	PORT_DIPSETTING(      0x0000, "Fast" )              // Drop every 18 frames
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
@@ -139,13 +139,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	RGN_FRAC(1,1),	/* 4096 characters */
-	4,	/* 4 bits per pixel */
+	8,8,    /* 8*8 characters */
+	RGN_FRAC(1,1),  /* 4096 characters */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8+0, 8+4, 16+0, 16+4, 24+0, 24+4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 
@@ -167,11 +167,11 @@ void zerozone_state::machine_reset()
 static MACHINE_CONFIG_START( zerozone, zerozone_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zerozone_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 1000000)	/* 1 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 1000000)  /* 1 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))

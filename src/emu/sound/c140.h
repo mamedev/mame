@@ -20,11 +20,11 @@ enum
 };
 
 struct c140_interface {
-    int banking_type;
+	int banking_type;
 };
 
 class c140_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

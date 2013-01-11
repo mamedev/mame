@@ -268,9 +268,9 @@ static const gfx_layout spritelayout =
 	2,
 	{ 0, 256*8*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	 16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8 },
+		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8 },
 	32*8
 };
 
@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 	MCFG_CPU_PROGRAM_MAP(skyarmy_map)
 	MCFG_CPU_IO_MAP(skyarmy_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(skyarmy_state, skyarmy_nmi_source, 650)	/* Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(skyarmy_state, skyarmy_nmi_source, 650)    /* Hz */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

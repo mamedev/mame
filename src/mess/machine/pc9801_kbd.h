@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	PC-9801 Keyboard simulation
+    PC-9801 Keyboard simulation
 
 ***************************************************************************/
 
@@ -30,14 +30,14 @@
 
 struct pc9801_kbd_interface
 {
-	devcb_write_line		m_irq_cb;
+	devcb_write_line        m_irq_cb;
 };
 
 
 // ======================> pc9801_kbd_device
 
 class pc9801_kbd_device : public device_t,
-                          public pc9801_kbd_interface
+							public pc9801_kbd_interface
 {
 public:
 	// construction/destruction
@@ -57,15 +57,15 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
-	devcb_resolved_write_line	m_irq_func;
+	devcb_resolved_write_line   m_irq_func;
 
 	static const device_timer_id RX_TIMER = 1;
-	emu_timer *			m_rxtimer;
-	UINT8 				m_rx_buf[0x80];
-	UINT8				m_keyb_tx;
-	UINT8				m_keyb_rx;
-	UINT8				m_caps_lock_state;
-	UINT8				m_kana_lock_state;
+	emu_timer *         m_rxtimer;
+	UINT8               m_rx_buf[0x80];
+	UINT8               m_keyb_tx;
+	UINT8               m_keyb_rx;
+	UINT8               m_caps_lock_state;
+	UINT8               m_kana_lock_state;
 };
 
 

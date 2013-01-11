@@ -56,10 +56,10 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_PORT_IO					0
-#define LOG_STATUS_CHANGES			0
-#define LOG_FRAMES_SEEN				0
-#define LOG_COMMANDS				0
+#define LOG_PORT_IO                 0
+#define LOG_STATUS_CHANGES          0
+#define LOG_FRAMES_SEEN             0
+#define LOG_COMMANDS                0
 
 
 
@@ -67,10 +67,10 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define SCAN_SPEED						(2000 / 30)			// 2000 frames/second
-#define SEEK_FAST_SPEED					(4000 / 30)			// 4000 frames/second
+#define SCAN_SPEED                      (2000 / 30)         // 2000 frames/second
+#define SEEK_FAST_SPEED                 (4000 / 30)         // 4000 frames/second
 
-#define MULTIJUMP_TRACK_TIME			attotime::from_usec(50)
+#define MULTIJUMP_TRACK_TIME            attotime::from_usec(50)
 
 
 
@@ -171,21 +171,21 @@ ROM_END
 
 pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, PIONEER_LDV1000, "Pioneer LD-V1000", "ldv1000", tag, owner, clock),
-	  m_z80_cpu(*this, "ldv1000"),
-	  m_z80_ctc(*this, "ldvctc"),
-	  m_multitimer(NULL),
-	  m_command(0),
-	  m_status(0),
-	  m_vsync(false),
-	  m_counter_start(0),
-	  m_counter(0),
-	  m_portc0(0),
-	  m_portb1(0),
-	  m_portc1(0),
-	  m_portselect(0),
-	  m_dispindex(0),
-	  m_vbiready(false),
-	  m_vbiindex(0)
+		m_z80_cpu(*this, "ldv1000"),
+		m_z80_ctc(*this, "ldvctc"),
+		m_multitimer(NULL),
+		m_command(0),
+		m_status(0),
+		m_vsync(false),
+		m_counter_start(0),
+		m_counter(0),
+		m_portc0(0),
+		m_portb1(0),
+		m_portc1(0),
+		m_portselect(0),
+		m_dispindex(0),
+		m_vbiready(false),
+		m_vbiindex(0)
 {
 }
 
@@ -403,11 +403,11 @@ WRITE_LINE_MEMBER( pioneer_ldv1000_device::ctc_interrupt )
 WRITE8_MEMBER( pioneer_ldv1000_device::z80_decoder_display_port_w )
 {
 	/*
-        TX/RX = /A0 (A0=0 -> TX, A0=1 -> RX)
+	    TX/RX = /A0 (A0=0 -> TX, A0=1 -> RX)
 
-        Display is 6-bit
-        Decoder is 4-bit
-    */
+	    Display is 6-bit
+	    Decoder is 4-bit
+	*/
 
 	// writes to offset 0 select the target for reads/writes of actual data
 	if (offset == 0)
@@ -506,11 +506,11 @@ READ8_MEMBER( pioneer_ldv1000_device::ppi0_portb_r )
 READ8_MEMBER( pioneer_ldv1000_device::ppi0_portc_r )
 {
 	/*
-        $10 = /VSYNC
-        $20 = IRQ from decoder chip
-        $40 = TRKG LOOP (N24-1)
-        $80 = DUMP (N20-1) -- code reads the state and waits for it to change
-    */
+	    $10 = /VSYNC
+	    $20 = IRQ from decoder chip
+	    $40 = TRKG LOOP (N24-1)
+	    $80 = DUMP (N20-1) -- code reads the state and waits for it to change
+	*/
 
 	UINT8 result = 0x00;
 	if (!m_vsync)
@@ -529,11 +529,11 @@ READ8_MEMBER( pioneer_ldv1000_device::ppi0_portc_r )
 WRITE8_MEMBER( pioneer_ldv1000_device::ppi0_portc_w )
 {
 	/*
-        $01 = preload on up/down counters
-        $02 = /MULTI JUMP TRIG
-        $04 = SCAN MODE
-        $08 = n/c
-    */
+	    $01 = preload on up/down counters
+	    $02 = /MULTI JUMP TRIG
+	    $04 = SCAN MODE
+	    $08 = n/c
+	*/
 
 	// set the new value
 	UINT8 prev = m_portc0;
@@ -565,15 +565,15 @@ WRITE8_MEMBER( pioneer_ldv1000_device::ppi0_portc_w )
 READ8_MEMBER( pioneer_ldv1000_device::ppi1_porta_r )
 {
 	/*
-        $01 = /FOCS LOCK
-        $02 = /SPDL LOCK
-        $04 = INSIDE
-        $08 = OUTSIDE
-        $10 = MOTOR STOP
-        $20 = +5V/test point
-        $40 = /INT LOCK
-        $80 = 8 INCH CHK
-    */
+	    $01 = /FOCS LOCK
+	    $02 = /SPDL LOCK
+	    $04 = INSIDE
+	    $08 = OUTSIDE
+	    $10 = MOTOR STOP
+	    $20 = +5V/test point
+	    $40 = /INT LOCK
+	    $80 = 8 INCH CHK
+	*/
 
 	slider_position sliderpos = get_slider_position();
 	UINT8 result = 0x00;
@@ -615,15 +615,15 @@ READ8_MEMBER( pioneer_ldv1000_device::ppi1_porta_r )
 WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portb_w )
 {
 	/*
-        $01 = /FOCS ON
-        $02 = /SPDL RUN
-        $04 = /JUMP TRIG
-        $08 = /SCAN A
-        $10 = SCAN B
-        $20 = SCAN C
-        $40 = /LASER ON
-        $80 = /SYNC ST0
-    */
+	    $01 = /FOCS ON
+	    $02 = /SPDL RUN
+	    $04 = /JUMP TRIG
+	    $08 = /SCAN A
+	    $10 = SCAN B
+	    $20 = SCAN C
+	    $40 = /LASER ON
+	    $80 = /SYNC ST0
+	*/
 
 	// set the new value
 	UINT8 prev = m_portb1;
@@ -669,15 +669,15 @@ WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portb_w )
 WRITE8_MEMBER( pioneer_ldv1000_device::ppi1_portc_w )
 {
 	/*
-        $01 = AUD 1
-        $02 = AUD 2
-        $04 = AUDIO ENABLE
-        $08 = /VIDEO SQ
-        $10 = COMMAND
-        $20 = STATUS
-        $40 = SIZE 8/12
-        $80 = /LED CAV
-    */
+	    $01 = AUD 1
+	    $02 = AUD 2
+	    $04 = AUDIO ENABLE
+	    $08 = /VIDEO SQ
+	    $10 = COMMAND
+	    $20 = STATUS
+	    $40 = SIZE 8/12
+	    $80 = /LED CAV
+	*/
 
 	// set the new value
 	UINT8 prev = m_portc1;

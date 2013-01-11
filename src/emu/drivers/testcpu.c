@@ -60,8 +60,8 @@ public:
 	// constructor
 	testcpu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_cpu(*this, "maincpu"),
-		  m_ram(*this, "ram")
+			m_cpu(*this, "maincpu"),
+			m_ram(*this, "ram")
 	{
 	}
 
@@ -70,13 +70,13 @@ public:
 	{
 		static const UINT32 sample_instructions[] =
 		{
-			0x3d40f900,		// li r10,0xf9000000
-			0x394af000,		// addi r10,r10,-0x1000
-			0x38600146,		// li r3,0x00000146
-			0x38800004,		// li r4,0x00000004
-			0x7c64572c,		// sthbrx r3,r4,r10
-			0x38600000,		// li r3,0x00000000
-			0x986a0070		// stb r3,0x0070(r10)
+			0x3d40f900,     // li r10,0xf9000000
+			0x394af000,     // addi r10,r10,-0x1000
+			0x38600146,     // li r3,0x00000146
+			0x38800004,     // li r4,0x00000004
+			0x7c64572c,     // sthbrx r3,r4,r10
+			0x38600000,     // li r3,0x00000000
+			0x986a0070      // stb r3,0x0070(r10)
 		};
 
 		// iterate over instructions
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 static const powerpc_config ppc_config =
 {
 	// 603e, Stretch, 1.3
-	66000000		// Multiplier 1, Bus = 66MHz, Core = 66MHz
+	66000000        // Multiplier 1, Bus = 66MHz, Core = 66MHz
 };
 
 static MACHINE_CONFIG_START( testcpu, testcpu_state )

@@ -140,12 +140,12 @@ static INPUT_PORTS_START( goindol )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL  ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x1c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPNAME( 0x1c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(    0x1c, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(    0x18, "Very Very Easy" )
 	PORT_DIPSETTING(    0x14, DEF_STR( Very_Easy) )
@@ -154,16 +154,16 @@ static INPUT_PORTS_START( goindol )
 	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")    PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW1:8" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x04, "30k and every 50k" )
 	PORT_DIPSETTING(    0x05, "50k and every 100k" )
 	PORT_DIPSETTING(    0x06, "50k and every 200k" )
@@ -172,7 +172,7 @@ static INPUT_PORTS_START( goindol )
 	PORT_DIPSETTING(    0x02, "30000 only" )
 	PORT_DIPSETTING(    0x03, "50000 only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -181,10 +181,10 @@ static INPUT_PORTS_START( goindol )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -193,7 +193,7 @@ static INPUT_PORTS_START( homo )
 	PORT_INCLUDE( goindol )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -237,11 +237,11 @@ void goindol_state::machine_reset()
 static MACHINE_CONFIG_START( goindol, goindol_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* XTAL confirmed, divisor is not */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* XTAL confirmed, divisor is not */
 	MCFG_CPU_PROGRAM_MAP(goindol_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goindol_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)	/* XTAL confirmed, divisor is not */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* XTAL confirmed, divisor is not */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(goindol_state, irq0_line_hold, 4*60)
 
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( goindol, goindol_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8)	/* Confirmed pitch from recording */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8)   /* Confirmed pitch from recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -294,9 +294,9 @@ ROM_START( goindol )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
-	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
-	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
+	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) ) /* palette red bits   */
+	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) ) /* palette green bits */
+	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) ) /* palette blue bits  */
 ROM_END
 
 ROM_START( goindolu )
@@ -319,9 +319,9 @@ ROM_START( goindolu )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
-	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
-	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
+	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) ) /* palette red bits   */
+	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) ) /* palette green bits */
+	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) ) /* palette blue bits  */
 ROM_END
 
 ROM_START( goindolk )
@@ -344,9 +344,9 @@ ROM_START( goindolk )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
-	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
-	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
+	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) ) /* palette red bits   */
+	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) ) /* palette green bits */
+	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) ) /* palette blue bits  */
 ROM_END
 
 ROM_START( homo )
@@ -369,9 +369,9 @@ ROM_START( homo )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
-	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
-	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
+	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) ) /* palette red bits   */
+	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) ) /* palette green bits */
+	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) ) /* palette blue bits  */
 ROM_END
 
 
@@ -393,13 +393,13 @@ DRIVER_INIT_MEMBER(goindol_state,goindol)
 //  rom[0x172c] = 0x18; // c423 == 06
 //  rom[0x1779] = 0x00; // c419 == 5b 3f 6d
 //  rom[0x177a] = 0x00; //
-	rom[0x063f] = 0x18;	//->fc55
-	rom[0x0b30] = 0x00;	// verify code at 0601-064b
-	rom[0x1bdf] = 0x18;	//->fc49
+	rom[0x063f] = 0x18; //->fc55
+	rom[0x0b30] = 0x00; // verify code at 0601-064b
+	rom[0x1bdf] = 0x18; //->fc49
 
 	rom[0x04a7] = 0xc9;
 	rom[0x0831] = 0xc9;
-	rom[0x3365] = 0x00;	// verify code at 081d-0876
+	rom[0x3365] = 0x00; // verify code at 081d-0876
 	rom[0x0c13] = 0xc9;
 	rom[0x134e] = 0xc9;
 	rom[0x333d] = 0xc9;

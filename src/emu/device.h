@@ -53,7 +53,7 @@
 //**************************************************************************
 
 // macro for specifying a clock derived from an owning device
-#define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
+#define DERIVED_CLOCK(num, den)     (0xff000000 | ((num) << 12) | ((den) << 0))
 
 
 
@@ -76,13 +76,13 @@
 
 
 // macros for defining read_line/write_line functions
-#define READ_LINE_DEVICE_HANDLER(name)		int  name(ATTR_UNUSED device_t *device)
-#define WRITE_LINE_DEVICE_HANDLER(name) 	void name(ATTR_UNUSED device_t *device, ATTR_UNUSED int state)
+#define READ_LINE_DEVICE_HANDLER(name)      int  name(ATTR_UNUSED device_t *device)
+#define WRITE_LINE_DEVICE_HANDLER(name)     void name(ATTR_UNUSED device_t *device, ATTR_UNUSED int state)
 
-#define DECLARE_READ_LINE_MEMBER(name)		int  name()
-#define READ_LINE_MEMBER(name)				int  name()
-#define DECLARE_WRITE_LINE_MEMBER(name) 	void name(ATTR_UNUSED int state)
-#define WRITE_LINE_MEMBER(name)				void name(ATTR_UNUSED int state)
+#define DECLARE_READ_LINE_MEMBER(name)      int  name()
+#define READ_LINE_MEMBER(name)              int  name()
+#define DECLARE_WRITE_LINE_MEMBER(name)     void name(ATTR_UNUSED int state)
+#define WRITE_LINE_MEMBER(name)             void name(ATTR_UNUSED int state)
 
 
 
@@ -298,38 +298,38 @@ protected:
 	//------------------- end derived class overrides
 
 	// core device properties
-	const device_type		m_type;					// device type
-	astring					m_name;					// name of the device
-	astring					m_shortname;			// short name of the device
-	astring					m_searchpath;			// search path, used for media loading
+	const device_type       m_type;                 // device type
+	astring                 m_name;                 // name of the device
+	astring                 m_shortname;            // short name of the device
+	astring                 m_searchpath;           // search path, used for media loading
 
 	// device relationships
-	device_t *				m_owner;				// device that owns us
-	device_t *				m_next;					// next device by the same owner (of any type/class)
-	simple_list<device_t>	m_subdevice_list;		// list of sub-devices we own
-	mutable tagmap_t<device_t *> m_device_map;		// map of device names looked up and found
+	device_t *              m_owner;                // device that owns us
+	device_t *              m_next;                 // next device by the same owner (of any type/class)
+	simple_list<device_t>   m_subdevice_list;       // list of sub-devices we own
+	mutable tagmap_t<device_t *> m_device_map;      // map of device names looked up and found
 
 	// device interfaces
-	device_interface *		m_interface_list;		// head of interface list
-	device_execute_interface *m_execute;			// pre-cached pointer to execute interface
-	device_memory_interface *m_memory;				// pre-cached pointer to memory interface
-	device_state_interface *m_state;				// pre-cached pointer to state interface
+	device_interface *      m_interface_list;       // head of interface list
+	device_execute_interface *m_execute;            // pre-cached pointer to execute interface
+	device_memory_interface *m_memory;              // pre-cached pointer to memory interface
+	device_state_interface *m_state;                // pre-cached pointer to state interface
 
 	// device clocks
-	UINT32					m_configured_clock;		// originally configured device clock
-	UINT32					m_unscaled_clock;		// current unscaled device clock
-	UINT32					m_clock;				// current device clock, after scaling
-	double					m_clock_scale;			// clock scale factor
-	attoseconds_t			m_attoseconds_per_clock;// period in attoseconds
+	UINT32                  m_configured_clock;     // originally configured device clock
+	UINT32                  m_unscaled_clock;       // current unscaled device clock
+	UINT32                  m_clock;                // current device clock, after scaling
+	double                  m_clock_scale;          // clock scale factor
+	attoseconds_t           m_attoseconds_per_clock;// period in attoseconds
 
-	device_debug *			m_debug;
-	memory_region *			m_region;				// our device-local region
-	const machine_config &	m_machine_config;		// reference to the machine's configuration
-	const void *			m_static_config;		// static device configuration
+	device_debug *          m_debug;
+	memory_region *         m_region;               // our device-local region
+	const machine_config &  m_machine_config;       // reference to the machine's configuration
+	const void *            m_static_config;        // static device configuration
 	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
-	UINT8					m_system_bios;			// the system BIOS we wish to load
-	UINT8					m_default_bios;			// the default system BIOS
+	UINT8                   m_system_bios;          // the system BIOS we wish to load
+	UINT8                   m_default_bios;         // the default system BIOS
 private:
 	// private helpers
 	device_t *add_subdevice(device_type type, const char *tag, UINT32 clock);
@@ -338,13 +338,13 @@ private:
 	device_t *subdevice_slow(const char *tag) const;
 
 	// private state; accessor use required
-	running_machine *		m_machine;
-	save_manager *			m_save;
-	astring 				m_tag;					// full tag for this instance
-	astring 				m_basetag;				// base part of the tag
-	bool					m_config_complete;		// have we completed our configuration?
-	bool					m_started;				// true if the start function has succeeded
-	finder_base *			m_auto_finder_list;		// list of objects to auto-find
+	running_machine *       m_machine;
+	save_manager *          m_save;
+	astring                 m_tag;                  // full tag for this instance
+	astring                 m_basetag;              // base part of the tag
+	bool                    m_config_complete;      // have we completed our configuration?
+	bool                    m_started;              // true if the start function has succeeded
+	finder_base *           m_auto_finder_list;     // list of objects to auto-find
 };
 
 
@@ -385,7 +385,7 @@ public:
 	// construction/destruction
 	object_finder_base(device_t &base, const char *tag)
 		: finder_base(base, tag),
-		  m_target(NULL) { }
+			m_target(NULL) { }
 
 	// operators to make use transparent
 	operator _ObjectClass *() const { return m_target; }
@@ -569,9 +569,9 @@ public:
 	// construction/destruction
 	shared_ptr_finder(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8)
 		: object_finder_base<_PointerType>(base, tag),
-		  m_bytes(0),
-		  m_allocated(false),
-		  m_width(width) { }
+			m_bytes(0),
+			m_allocated(false),
+			m_width(width) { }
 
 	virtual ~shared_ptr_finder() { if (m_allocated) global_free(this->m_target); }
 
@@ -714,8 +714,8 @@ public:
 
 protected:
 	// internal state
-	device_interface *		m_interface_next;
-	device_t &				m_device;
+	device_interface *      m_interface_next;
+	device_t &              m_device;
 };
 
 
@@ -728,9 +728,9 @@ public:
 	// construction
 	device_iterator(device_t &root, int maxdepth = 255)
 		: m_root(&root),
-		  m_current(NULL),
-		  m_curdepth(0),
-		  m_maxdepth(maxdepth) { }
+			m_current(NULL),
+			m_curdepth(0),
+			m_maxdepth(maxdepth) { }
 
 	// getters
 	device_t *current() const { return m_current; }
@@ -808,10 +808,10 @@ public:
 
 private:
 	// internal state
-	device_t *		m_root;
-	device_t *		m_current;
-	int				m_curdepth;
-	int				m_maxdepth;
+	device_t *      m_root;
+	device_t *      m_current;
+	int             m_curdepth;
+	int             m_maxdepth;
 };
 
 
@@ -877,7 +877,7 @@ public:
 
 private:
 	// internal state
-	device_iterator 	m_iterator;
+	device_iterator     m_iterator;
 };
 
 
@@ -892,7 +892,7 @@ public:
 	// construction
 	device_interface_iterator(device_t &root, int maxdepth = 255)
 		: m_iterator(root, maxdepth),
-		  m_current(NULL) { }
+			m_current(NULL) { }
 
 	// getters
 	_InterfaceClass *current() const { return m_current; }
@@ -945,8 +945,8 @@ public:
 
 private:
 	// internal state
-	device_iterator 	m_iterator;
-	_InterfaceClass *	m_current;
+	device_iterator     m_iterator;
+	_InterfaceClass *   m_current;
 };
 
 
@@ -1002,4 +1002,4 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 	return (tag[0] == ':') ? subdevice(tag) : NULL;
 }
 
-#endif	/* __DEVINTRF_H__ */
+#endif  /* __DEVINTRF_H__ */

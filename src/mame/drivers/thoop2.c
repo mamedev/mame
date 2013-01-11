@@ -20,9 +20,9 @@ pf: but some gameplay bugs - sprite positioning is incorrect, no enemies, jump a
 
 static const gfx_layout thoop2_tilelayout =
 {
-	8,8,									/* 8x8 tiles */
-	0x400000/16,							/* number of tiles */
-	4,										/* 4 bpp */
+	8,8,                                    /* 8x8 tiles */
+	0x400000/16,                            /* number of tiles */
+	4,                                      /* 4 bpp */
 	{ 0*0x400000*8+8, 0*0x400000*8, 1*0x400000*8+8, 1*0x400000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
@@ -31,21 +31,21 @@ static const gfx_layout thoop2_tilelayout =
 
 static const gfx_layout thoop2_tilelayout_16 =
 {
-	16,16,									/* 16x16 tiles */
-	0x400000/64,							/* number of tiles */
-	4,										/* 4 bpp */
+	16,16,                                  /* 16x16 tiles */
+	0x400000/64,                            /* number of tiles */
+	4,                                      /* 4 bpp */
 	{ 0*0x400000*8+8, 0*0x400000*8, 1*0x400000*8+8, 1*0x400000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+4, 16*16+5, 16*16+6, 16*16+7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-	  8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	64*8
 };
 
 
 static GFXDECODE_START( thoop2 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout, 0,		64 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout_16, 0,	64 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout, 0,        64 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout_16, 0, 64 )
 GFXDECODE_END
 
 
@@ -62,11 +62,11 @@ WRITE16_MEMBER(thoop2_state::thoop2_coin_w)
 {
 	if (ACCESSING_BITS_0_7){
 		switch ((offset >> 3)){
-			case 0x00:	/* Coin Lockouts */
+			case 0x00:  /* Coin Lockouts */
 			case 0x01:
 				coin_lockout_w(machine(), (offset >> 3) & 0x01, ~data & 0x01);
 				break;
-			case 0x02:	/* Coin Counters */
+			case 0x02:  /* Coin Counters */
 			case 0x03:
 				coin_counter_w(machine(), (offset >> 3) & 0x01, data & 0x01);
 				break;
@@ -81,27 +81,27 @@ WRITE16_MEMBER(thoop2_state::thoop2_coin_w)
 
 READ16_MEMBER(thoop2_state::DS5002FP_R)
 {
-    return 0x55aa;
+	return 0x55aa;
 }
 
 static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop2_vram_w) AM_SHARE("videoram")	/* Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")					/* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset16_w)							/* INT 6 ACK/Watchdog timer */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                 /* ROM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop2_vram_w) AM_SHARE("videoram")   /* Video RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                 /* Video Registers */
+	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset16_w)                           /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")						/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)						/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)					/* OKI6295 data register */
-	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(thoop2_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)                        /* OKI6295 bankswitch */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                  /* OKI6295 data register */
+	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(thoop2_coin_w)                                /* Coin Counters + Coin Lockout */
 	AM_RANGE(0xfeff00, 0xfeff01) AM_READ(DS5002FP_R)
 	AM_RANGE(0xfeff02, 0xfeff03) AM_WRITENOP  /* pf: 0xfeff02 and 0xfeff03 need to remain zero always */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM													/* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                                 /* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 
 
@@ -176,7 +176,7 @@ static INPUT_PORTS_START( thoop2 )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )	/* test button */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   /* test button */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -189,7 +189,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( thoop2, thoop2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(thoop2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
 
@@ -214,17 +214,17 @@ MACHINE_CONFIG_END
 
 
 ROM_START( thoop2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE(	"th2c23.040",	0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
-	ROM_LOAD16_BYTE(	"th2c22.040",	0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE(    "th2c23.040",   0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
+	ROM_LOAD16_BYTE(    "th2c22.040",   0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD( "th2-h8.32m",		0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )
-	ROM_LOAD( "th2-h12.32m",	0x400000, 0x400000, CRC(b25c2d3e) SHA1(d70f3e4e2432d80c2ac87cd81208ada303bac04a) )
+	ROM_LOAD( "th2-h8.32m",     0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )
+	ROM_LOAD( "th2-h12.32m",    0x400000, 0x400000, CRC(b25c2d3e) SHA1(d70f3e4e2432d80c2ac87cd81208ada303bac04a) )
 
-	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "th2-c1.080",		0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
-	ROM_RELOAD(					0x040000, 0x100000 )
+	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "th2-c1.080",     0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
+	ROM_RELOAD(                 0x040000, 0x100000 )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 

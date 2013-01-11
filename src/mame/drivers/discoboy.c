@@ -135,10 +135,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				 code,
-				 color,
-				 flipscreen,0,
-				 sx,sy,15);
+					code,
+					color,
+					flipscreen,0,
+					sx,sy,15);
 	}
 }
 
@@ -362,25 +362,25 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( discoboy )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SWA:6,7,8")
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWA:5")
-	PORT_DIPSETTING(	0x08, "Every 150000" )
-	PORT_DIPSETTING(	0x00, "Every 300000" )
+	PORT_DIPSETTING(    0x08, "Every 150000" )
+	PORT_DIPSETTING(    0x00, "Every 300000" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:4")
-	PORT_DIPSETTING(	0x10, "3" )
-	PORT_DIPSETTING(	0x00, "4" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:2,3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x60, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWA:1" )
 
 	PORT_START("SYSTEM")
@@ -422,8 +422,8 @@ static INPUT_PORTS_START( discoboy )
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWB:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:2" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:1")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -488,19 +488,19 @@ static void yunsung8_adpcm_int( device_t *device )
 
 static const msm5205_interface yunsung8_msm5205_interface =
 {
-	yunsung8_adpcm_int,	/* interrupt function */
-	MSM5205_S96_4B		/* 4KHz, 4 Bits */
+	yunsung8_adpcm_int, /* interrupt function */
+	MSM5205_S96_4B      /* 4KHz, 4 Bits */
 };
 
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(discoboy_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,10000000/2)		 /* 5 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80,10000000/2)         /* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(discoboy_state, nmi_line_pulse, 32*60)
 

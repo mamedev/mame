@@ -365,11 +365,11 @@ void filter_macbinary_getinfo(UINT32 state, union filterinfo *info)
 {
 	switch(state)
 	{
-		case FILTINFO_STR_NAME:			info->s = "macbinary"; break;
-		case FILTINFO_STR_HUMANNAME:	info->s = "MacBinary"; break;
-		case FILTINFO_STR_EXTENSION:	info->s = "bin"; break;
-		case FILTINFO_PTR_READFILE:		info->read_file = macbinary_readfile; break;
-		case FILTINFO_PTR_WRITEFILE:	info->write_file = macbinary_writefile; break;
-		case FILTINFO_PTR_CHECKSTREAM:	info->check_stream = macbinary_checkstream; break;
+		case FILTINFO_STR_NAME:         info->s = "macbinary"; break;
+		case FILTINFO_STR_HUMANNAME:    info->s = "MacBinary"; break;
+		case FILTINFO_STR_EXTENSION:    info->s = "bin"; break;
+		case FILTINFO_PTR_READFILE:     info->read_file = macbinary_readfile; break;
+		case FILTINFO_PTR_WRITEFILE:    info->write_file = macbinary_writefile; break;
+		case FILTINFO_PTR_CHECKSTREAM:  info->check_stream = macbinary_checkstream; break;
 	}
 }

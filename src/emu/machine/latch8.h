@@ -24,21 +24,21 @@
 struct latch8_devread
 {
 	/* only for byte reads, does not affect bit reads and node_map */
-	UINT32					from_bit;
-	const char				*tag;
-	read8_device_func		devread_handler;
-	read8_space_func		read_handler;
+	UINT32                  from_bit;
+	const char              *tag;
+	read8_device_func       devread_handler;
+	read8_space_func        read_handler;
 };
 
 struct latch8_config
 {
 	/* only for byte reads, does not affect bit reads and node_map */
-	UINT32					maskout;
-	UINT32					xorvalue;  /* after mask */
-	UINT32					nosync;
-	UINT32					node_map[8];
-	const char *			node_device[8];
-	latch8_devread			devread[8];
+	UINT32                  maskout;
+	UINT32                  xorvalue;  /* after mask */
+	UINT32                  nosync;
+	UINT32                  node_map[8];
+	const char *            node_device[8];
+	latch8_devread          devread[8];
 };
 
 class latch8_device : public device_t

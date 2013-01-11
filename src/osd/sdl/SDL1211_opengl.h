@@ -27,7 +27,7 @@
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
-#define NOMINMAX	/* Don't defined min() and max() */
+#define NOMINMAX    /* Don't defined min() and max() */
 #endif
 #include <windows.h>
 #endif
@@ -35,14 +35,14 @@
 #define __glext_h_  /* Don't let gl.h include glext.h */
 #endif
 #if defined(__MACOSX__)
-#include <OpenGL/gl.h>	/* Header File For The OpenGL Library */
-#include <OpenGL/glu.h>	/* Header File For The GLU Library */
+#include <OpenGL/gl.h>  /* Header File For The OpenGL Library */
+#include <OpenGL/glu.h> /* Header File For The GLU Library */
 #elif defined(__MACOS__)
-#include <gl.h>		/* Header File For The OpenGL Library */
-#include <glu.h>	/* Header File For The GLU Library */
+#include <gl.h>     /* Header File For The OpenGL Library */
+#include <glu.h>    /* Header File For The GLU Library */
 #else
-#include <GL/gl.h>	/* Header File For The OpenGL Library */
-#include <GL/glu.h>	/* Header File For The GLU Library */
+#include <GL/gl.h>  /* Header File For The OpenGL Library */
+#include <GL/glu.h> /* Header File For The GLU Library */
 #endif
 #ifndef NO_SDL_GLEXT
 #undef __glext_h_
@@ -3099,7 +3099,7 @@ extern "C" {
 #include <stddef.h>
 #ifndef GL_VERSION_2_0
 /* GL type for program/shader text */
-typedef char GLchar;			/* native character */
+typedef char GLchar;            /* native character */
 #endif
 
 #ifndef GL_VERSION_1_5
@@ -3116,8 +3116,8 @@ typedef ptrdiff_t GLsizeiptrARB;
 
 #ifndef GL_ARB_shader_objects
 /* GL types for handling shader object handles and program/shader text */
-typedef char GLcharARB;		/* native character */
-typedef unsigned int GLhandleARB;	/* shader object handle */
+typedef char GLcharARB;     /* native character */
+typedef unsigned int GLhandleARB;   /* shader object handle */
 #endif
 
 /* GL types for "half" precision (s10e5) float data in host memory */

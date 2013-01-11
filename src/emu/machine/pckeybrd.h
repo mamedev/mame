@@ -31,5 +31,3 @@ INPUT_PORTS_EXTERN( pc_keyboard );
 INPUT_PORTS_EXTERN( at_keyboard );
 
 #endif /* PCKEYBRD_H */
-
-

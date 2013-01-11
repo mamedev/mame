@@ -35,7 +35,7 @@ class alg_state : public amiga_state
 public:
 	alg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+			m_laserdisc(*this, "laserdisc") { }
 
 
 	required_device<sony_ldp1450_device> m_laserdisc;
@@ -295,9 +295,9 @@ static ADDRESS_MAP_START( main_map_r1, AS_PROGRAM, 16, alg_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
 
-	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
+	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf54000, 0xf55fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -308,9 +308,9 @@ static ADDRESS_MAP_START( main_map_r2, AS_PROGRAM, 16, alg_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
 
-	AM_RANGE(0xf00000, 0xf3ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
+	AM_RANGE(0xf00000, 0xf3ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf7c000, 0xf7dfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -321,9 +321,9 @@ static ADDRESS_MAP_START( main_map_picmatic, AS_PROGRAM, 16, alg_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
 
-	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
+	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf40000, 0xf41fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -336,44 +336,44 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( alg )
-	PORT_START("JOY0DAT")	/* read by Amiga core */
+	PORT_START("JOY0DAT")   /* read by Amiga core */
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, "P1JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("JOY1DAT")	/* read by Amiga core */
+	PORT_START("JOY1DAT")   /* read by Amiga core */
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, "P2JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("POTGO")		/* read by Amiga core */
+	PORT_START("POTGO")     /* read by Amiga core */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("HVPOS")		/* read by Amiga core */
+	PORT_START("HVPOS")     /* read by Amiga core */
 	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_pos_r, NULL)
 
 	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1JOY")		/* referenced by JOY0DAT */
+	PORT_START("P1JOY")     /* referenced by JOY0DAT */
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("P2JOY")		/* referenced by JOY1DAT */
+	PORT_START("P2JOY")     /* referenced by JOY1DAT */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("GUN1X")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN1X")     /* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("GUN1Y")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN1Y")     /* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -391,13 +391,13 @@ static INPUT_PORTS_START( alg_2p )
 	PORT_MODIFY("P2JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_holster_r, NULL)
 
-	PORT_START("GUN2X")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN2X")     /* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUN2Y")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN2Y")     /* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("TRIGGERS")	/* referenced by lightgun_trigger_r and lightgun_holster_r */
+	PORT_START("TRIGGERS")  /* referenced by lightgun_trigger_r and lightgun_holster_r */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -414,26 +414,26 @@ INPUT_PORTS_END
 
 static const legacy_mos6526_interface cia_0_intf =
 {
-	DEVCB_LINE(amiga_cia_0_irq),								/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_0_irq),                                /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_porta_r),
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_porta_w),	/* port A */
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_porta_w),   /* port A */
 	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_portb_r),
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_portb_w)	/* port B */
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_portb_w)    /* port B */
 };
 
 static const legacy_mos6526_interface cia_1_intf =
 {
-	DEVCB_LINE(amiga_cia_1_irq),								/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_1_irq),                                /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_1_porta_r),
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_1_porta_w),	/* port A */
+	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_1_porta_w),   /* port A */
 	DEVCB_NULL,
-	DEVCB_NULL								/* port B */
+	DEVCB_NULL                              /* port B */
 };
 
 static MACHINE_CONFIG_START( alg_r1, alg_state )
@@ -827,20 +827,20 @@ GAME( 1991, wsjr15,   wsjr, alg_r1,   alg, alg_state,    palr3,    ROT0,  "Ameri
 /* Rev. B board */
 /* PAL R6 */
 GAME( 1990, maddog,   alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog McCree v2.03 board rev.B", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-  /* works ok but uses right player (2) controls only for trigger and holster */
+	/* works ok but uses right player (2) controls only for trigger and holster */
 GAME( 1992, maddog2,  alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.04", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog22, alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.02", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog21, maddog2,  alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v1.0", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-  /* works ok but uses right player (2) controls only for trigger and holster */
+	/* works ok but uses right player (2) controls only for trigger and holster */
 GAME( 1992, spacepir, alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Space Pirates v2.2", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, gallgall, alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Gallagher's Gallery v2.2", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-  /* all good, but no holster */
+	/* all good, but no holster */
 GAME( 1993, crimepat, alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.4", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, crimep2,  alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.3", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, crimep211,crimep2,  alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, lastbh,   alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v0.06", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, fastdraw, alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.3", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-  /* works ok but uses right player (2) controls only for trigger and holster */
+	/* works ok but uses right player (2) controls only for trigger and holster */
 
 /* NOVA games on ALG hardware with own address scramble */
 GAME( 199?, aplatoon, alg_bios, alg_r2,   alg, alg_state,    aplatoon, ROT0,  "Nova?", "Platoon V.?.? US", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )

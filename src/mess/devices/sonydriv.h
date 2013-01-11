@@ -33,7 +33,7 @@ UINT8 sony_read_data(device_t *device);
 void sony_write_data(device_t *device,UINT8 data);
 int sony_read_status(device_t *device);
 
-class sonydriv_floppy_image_device :	public legacy_floppy_image_device
+class sonydriv_floppy_image_device :    public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
@@ -47,22 +47,22 @@ protected:
 // device type definition
 extern const device_type FLOPPY_SONY;
 
-#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_SONY, 0)		\
+#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(_config)   \
+	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)       \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_SONY, 0)       \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_2, FLOPPY_SONY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_3, FLOPPY_SONY, 0)		\
+#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(_config)    \
+	MCFG_DEVICE_ADD(FLOPPY_2, FLOPPY_SONY, 0)       \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(FLOPPY_3, FLOPPY_SONY, 0)       \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
+#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(_config)    \
+	MCFG_DEVICE_MODIFY(FLOPPY_0)        \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_MODIFY(FLOPPY_1)        \
 	MCFG_DEVICE_CONFIG(_config)
 
 

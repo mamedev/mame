@@ -20,9 +20,9 @@
  *
  *************************************/
 
-#define LOG_CUSTOM	0
-#define LOG_CIA		0
-#define LOG_BLITS	0
+#define LOG_CUSTOM  0
+#define LOG_CIA     0
+#define LOG_BLITS   0
 
 
 
@@ -33,10 +33,10 @@
  *************************************/
 
 /* How many CPU cycles we delay until we fire a pending interrupt */
-#define AMIGA_IRQ_DELAY_CYCLES		24
+#define AMIGA_IRQ_DELAY_CYCLES      24
 
 /* How many CPU cycles we wait until we process a blit when the blitter-nasty bit is set */
-#define BLITTER_NASTY_DELAY			16
+#define BLITTER_NASTY_DELAY         16
 
 
 
@@ -49,85 +49,85 @@
 const char *const amiga_custom_names[0x100] =
 {
 	/* 0x000 */
-	"BLTDDAT",		"DMACONR",		"VPOSR",		"VHPOSR",
-	"DSKDATR",		"JOY0DAT",		"JOY1DAT",		"CLXDAT",
-	"ADKCONR",		"POT0DAT",		"POT1DAT",		"POTGOR",
-	"SERDATR",		"DSKBYTR",		"INTENAR",		"INTREQR",
+	"BLTDDAT",      "DMACONR",      "VPOSR",        "VHPOSR",
+	"DSKDATR",      "JOY0DAT",      "JOY1DAT",      "CLXDAT",
+	"ADKCONR",      "POT0DAT",      "POT1DAT",      "POTGOR",
+	"SERDATR",      "DSKBYTR",      "INTENAR",      "INTREQR",
 	/* 0x020 */
-	"DSKPTH",		"DSKPTL",		"DSKLEN",		"DSKDAT",
-	"REFPTR",		"VPOSW",		"VHPOSW",		"COPCON",
-	"SERDAT",		"SERPER",		"POTGO",		"JOYTEST",
-	"STREQU",		"STRVBL",		"STRHOR",		"STRLONG",
+	"DSKPTH",       "DSKPTL",       "DSKLEN",       "DSKDAT",
+	"REFPTR",       "VPOSW",        "VHPOSW",       "COPCON",
+	"SERDAT",       "SERPER",       "POTGO",        "JOYTEST",
+	"STREQU",       "STRVBL",       "STRHOR",       "STRLONG",
 	/* 0x040 */
-	"BLTCON0",		"BLTCON1",		"BLTAFWM",		"BLTALWM",
-	"BLTCPTH",		"BLTCPTL",		"BLTBPTH",		"BLTBPTL",
-	"BLTAPTH",		"BLTAPTL",		"BLTDPTH",		"BLTDPTL",
-	"BLTSIZE",		"BLTCON0L",		"BLTSIZV",		"BLTSIZH",
+	"BLTCON0",      "BLTCON1",      "BLTAFWM",      "BLTALWM",
+	"BLTCPTH",      "BLTCPTL",      "BLTBPTH",      "BLTBPTL",
+	"BLTAPTH",      "BLTAPTL",      "BLTDPTH",      "BLTDPTL",
+	"BLTSIZE",      "BLTCON0L",     "BLTSIZV",      "BLTSIZH",
 	/* 0x060 */
-	"BLTCMOD",		"BLTBMOD",		"BLTAMOD",		"BLTDMOD",
-	"UNK068",		"UNK06A",		"UNK06C",		"UNK06E",
-	"BLTCDAT",		"BLTBDAT",		"BLTADAT",		"UNK076",
-	"SPRHDAT",		"BPLHDAT",		"LISAID",		"DSRSYNC",
+	"BLTCMOD",      "BLTBMOD",      "BLTAMOD",      "BLTDMOD",
+	"UNK068",       "UNK06A",       "UNK06C",       "UNK06E",
+	"BLTCDAT",      "BLTBDAT",      "BLTADAT",      "UNK076",
+	"SPRHDAT",      "BPLHDAT",      "LISAID",       "DSRSYNC",
 	/* 0x080 */
-	"COP1LCH",		"COP1LCL",		"COP2LCH",		"COP2LCL",
-	"COPJMP1",		"COPJMP2",		"COPINS",		"DIWSTRT",
-	"DIWSTOP",		"DDFSTRT",		"DDFSTOP",		"DMACON",
-	"CLXCON",		"INTENA",		"INTREQ",		"ADKCON",
+	"COP1LCH",      "COP1LCL",      "COP2LCH",      "COP2LCL",
+	"COPJMP1",      "COPJMP2",      "COPINS",       "DIWSTRT",
+	"DIWSTOP",      "DDFSTRT",      "DDFSTOP",      "DMACON",
+	"CLXCON",       "INTENA",       "INTREQ",       "ADKCON",
 	/* 0x0A0 */
-	"AUD0LCH",		"AUD0LCL",		"AUD0LEN",		"AUD0PER",
-	"AUD0VOL",		"AUD0DAT",		"UNK0AC",		"UNK0AE",
-	"AUD1LCH",		"AUD1LCL",		"AUD1LEN",		"AUD1PER",
-	"AUD1VOL",		"AUD1DAT",		"UNK0BC",		"UNK0BE",
+	"AUD0LCH",      "AUD0LCL",      "AUD0LEN",      "AUD0PER",
+	"AUD0VOL",      "AUD0DAT",      "UNK0AC",       "UNK0AE",
+	"AUD1LCH",      "AUD1LCL",      "AUD1LEN",      "AUD1PER",
+	"AUD1VOL",      "AUD1DAT",      "UNK0BC",       "UNK0BE",
 	/* 0x0C0 */
-	"AUD2LCH",		"AUD2LCL",		"AUD2LEN",		"AUD2PER",
-	"AUD2VOL",		"AUD2DAT",		"UNK0CC",		"UNK0CE",
-	"AUD3LCH",		"AUD3LCL",		"AUD3LEN",		"AUD3PER",
-	"AUD3VOL",		"AUD3DAT",		"UNK0DC",		"UNK0DE",
+	"AUD2LCH",      "AUD2LCL",      "AUD2LEN",      "AUD2PER",
+	"AUD2VOL",      "AUD2DAT",      "UNK0CC",       "UNK0CE",
+	"AUD3LCH",      "AUD3LCL",      "AUD3LEN",      "AUD3PER",
+	"AUD3VOL",      "AUD3DAT",      "UNK0DC",       "UNK0DE",
 	/* 0x0E0 */
-	"BPL1PTH",		"BPL1PTL",		"BPL2PTH",		"BPL2PTL",
-	"BPL3PTH",		"BPL3PTL",		"BPL4PTH",		"BPL4PTL",
-	"BPL5PTH",		"BPL5PTL",		"BPL6PTH",		"BPL6PTL",
-	"BPL7PTH",		"BPL7PTL",		"BPL8PTH",		"BPL8PTL",
+	"BPL1PTH",      "BPL1PTL",      "BPL2PTH",      "BPL2PTL",
+	"BPL3PTH",      "BPL3PTL",      "BPL4PTH",      "BPL4PTL",
+	"BPL5PTH",      "BPL5PTL",      "BPL6PTH",      "BPL6PTL",
+	"BPL7PTH",      "BPL7PTL",      "BPL8PTH",      "BPL8PTL",
 	/* 0x100 */
-	"BPLCON0",		"BPLCON1",		"BPLCON2",		"BPLCON3",
-	"BPL1MOD",		"BPL2MOD",		"BPLCON4",		"CLXCON2",
-	"BPL1DAT",		"BPL2DAT",		"BPL3DAT",		"BPL4DAT",
-	"BPL5DAT",		"BPL6DAT",		"BPL7DAT",		"BPL8DAT",
+	"BPLCON0",      "BPLCON1",      "BPLCON2",      "BPLCON3",
+	"BPL1MOD",      "BPL2MOD",      "BPLCON4",      "CLXCON2",
+	"BPL1DAT",      "BPL2DAT",      "BPL3DAT",      "BPL4DAT",
+	"BPL5DAT",      "BPL6DAT",      "BPL7DAT",      "BPL8DAT",
 	/* 0x120 */
-	"SPR0PTH",		"SPR0PTL",		"SPR1PTH",		"SPR1PTL",
-	"SPR2PTH",		"SPR2PTL",		"SPR3PTH",		"SPR3PTL",
-	"SPR4PTH",		"SPR4PTL",		"SPR5PTH",		"SPR5PTL",
-	"SPR6PTH",		"SPR6PTL",		"SPR7PTH",		"SPR7PTL",
+	"SPR0PTH",      "SPR0PTL",      "SPR1PTH",      "SPR1PTL",
+	"SPR2PTH",      "SPR2PTL",      "SPR3PTH",      "SPR3PTL",
+	"SPR4PTH",      "SPR4PTL",      "SPR5PTH",      "SPR5PTL",
+	"SPR6PTH",      "SPR6PTL",      "SPR7PTH",      "SPR7PTL",
 	/* 0x140 */
-	"SPR0POS",		"SPR0CTL",		"SPR0DATA", 	"SPR0DATB",
-	"SPR1POS",		"SPR1CTL",		"SPR1DATA", 	"SPR1DATB",
-	"SPR2POS",		"SPR2CTL",		"SPR2DATA", 	"SPR2DATB",
-	"SPR3POS",		"SPR3CTL",		"SPR3DATA", 	"SPR3DATB",
+	"SPR0POS",      "SPR0CTL",      "SPR0DATA",     "SPR0DATB",
+	"SPR1POS",      "SPR1CTL",      "SPR1DATA",     "SPR1DATB",
+	"SPR2POS",      "SPR2CTL",      "SPR2DATA",     "SPR2DATB",
+	"SPR3POS",      "SPR3CTL",      "SPR3DATA",     "SPR3DATB",
 	/* 0x160 */
-	"SPR4POS",		"SPR4CTL",		"SPR4DATA", 	"SPR4DATB",
-	"SPR5POS",		"SPR5CTL",		"SPR5DATA", 	"SPR5DATB",
-	"SPR6POS",		"SPR6CTL",		"SPR6DATA", 	"SPR6DATB",
-	"SPR7POS",		"SPR7CTL",		"SPR7DATA", 	"SPR7DATB",
+	"SPR4POS",      "SPR4CTL",      "SPR4DATA",     "SPR4DATB",
+	"SPR5POS",      "SPR5CTL",      "SPR5DATA",     "SPR5DATB",
+	"SPR6POS",      "SPR6CTL",      "SPR6DATA",     "SPR6DATB",
+	"SPR7POS",      "SPR7CTL",      "SPR7DATA",     "SPR7DATB",
 	/* 0x180 */
-	"COLOR00",		"COLOR01",		"COLOR02",		"COLOR03",
-	"COLOR04",		"COLOR05",		"COLOR06",		"COLOR07",
-	"COLOR08",		"COLOR09",		"COLOR10",		"COLOR11",
-	"COLOR12",		"COLOR13",		"COLOR14",		"COLOR15",
+	"COLOR00",      "COLOR01",      "COLOR02",      "COLOR03",
+	"COLOR04",      "COLOR05",      "COLOR06",      "COLOR07",
+	"COLOR08",      "COLOR09",      "COLOR10",      "COLOR11",
+	"COLOR12",      "COLOR13",      "COLOR14",      "COLOR15",
 	/* 0x1A0 */
-	"COLOR16",		"COLOR17",		"COLOR18",		"COLOR19",
-	"COLOR20",		"COLOR21",		"COLOR22",		"COLOR23",
-	"COLOR24",		"COLOR25",		"COLOR26",		"COLOR27",
-	"COLOR28",		"COLOR29",		"COLOR30",		"COLOR31",
+	"COLOR16",      "COLOR17",      "COLOR18",      "COLOR19",
+	"COLOR20",      "COLOR21",      "COLOR22",      "COLOR23",
+	"COLOR24",      "COLOR25",      "COLOR26",      "COLOR27",
+	"COLOR28",      "COLOR29",      "COLOR30",      "COLOR31",
 	/* 0x1C0 */
-	"HTOTAL",		"HSSTOP",		"HBSTRT",		"HBSTOP",
-	"VTOTAL",		"VSSTOP",		"VBSTRT",		"VBSTOP",
-	"SPRHSTRT",		"SPRHSTOP",		"BPLHSTRT",		"BPLHSTOP",
-	"HHPOSW",		"HHPOSR",		"BEAMCON0",		"HSSTRT",
+	"HTOTAL",       "HSSTOP",       "HBSTRT",       "HBSTOP",
+	"VTOTAL",       "VSSTOP",       "VBSTRT",       "VBSTOP",
+	"SPRHSTRT",     "SPRHSTOP",     "BPLHSTRT",     "BPLHSTOP",
+	"HHPOSW",       "HHPOSR",       "BEAMCON0",     "HSSTRT",
 	/* 0x1E0 */
-	"VSSTRT",		"HCENTER",		"DIWHIGH",		"BPLHMOD",
-	"SPRHPTH",		"SPRHPTL",		"BPLHPTH",		"BPLHPTL",
-	"UNK1F0",		"UNK1F2",		"UNK1F4",		"UNK1F6",
-	"UNK1F8",		"UNK1FA",		"FMODE",		"UNK1FE"
+	"VSSTRT",       "HCENTER",      "DIWHIGH",      "BPLHMOD",
+	"SPRHPTH",      "SPRHPTL",      "BPLHPTH",      "BPLHPTL",
+	"UNK1F0",       "UNK1F2",       "UNK1F4",       "UNK1F6",
+	"UNK1F8",       "UNK1FA",       "FMODE",        "UNK1FE"
 };
 
 
@@ -165,7 +165,7 @@ static UINT16 amiga_chip_ram32_r(amiga_state *state, offs_t offset)
 	if (offset < state->m_chip_ram.bytes())
 	{
 		UINT32 *amiga_chip_ram32 = reinterpret_cast<UINT32 *>(state->m_chip_ram.target());
-		UINT32	dat = amiga_chip_ram32[offset / 4];
+		UINT32  dat = amiga_chip_ram32[offset / 4];
 
 		if ( offset & 2 )
 			return (dat & 0xffff);
@@ -191,7 +191,7 @@ static void amiga_chip_ram32_w(amiga_state *state, offs_t offset, UINT16 data)
 	if (offset < state->m_chip_ram.bytes())
 	{
 		UINT32 *amiga_chip_ram32 = reinterpret_cast<UINT32 *>(state->m_chip_ram.target());
-		UINT32	dat = amiga_chip_ram32[offset / 4];
+		UINT32  dat = amiga_chip_ram32[offset / 4];
 
 		if ( offset & 2 )
 		{
@@ -480,10 +480,10 @@ static UINT32 blit_ascending(amiga_state *state)
 
 			/* apply start/end masks to the A data */
 			tempa = CUSTOM_REG(REG_BLTADAT);
-		    if (x == 0)
-		    	tempa &= CUSTOM_REG(REG_BLTAFWM);
-		    if (x == width - 1)
-		    	tempa &= CUSTOM_REG(REG_BLTALWM);
+			if (x == 0)
+				tempa &= CUSTOM_REG(REG_BLTAFWM);
+			if (x == width - 1)
+				tempa &= CUSTOM_REG(REG_BLTALWM);
 
 			/* update the B accumulator applying shifts */
 			acca = (acca << 16) | (tempa << (16 - shifta));
@@ -605,10 +605,10 @@ static UINT32 blit_descending(amiga_state *state)
 
 			/* apply start/end masks to the A data */
 			tempa = CUSTOM_REG(REG_BLTADAT);
-		    if (x == 0)
-		    	tempa &= CUSTOM_REG(REG_BLTAFWM);
-		    if (x == width - 1)
-		    	tempa &= CUSTOM_REG(REG_BLTALWM);
+			if (x == 0)
+				tempa &= CUSTOM_REG(REG_BLTAFWM);
+			if (x == width - 1)
+				tempa &= CUSTOM_REG(REG_BLTALWM);
 
 			/* update the B accumulator applying shifts */
 			acca = (acca >> 16) | (tempa << shifta);
@@ -916,15 +916,15 @@ TIMER_CALLBACK_MEMBER(amiga_state::amiga_blitter_proc)
 	/* switch off the type of blit */
 	switch (CUSTOM_REG(REG_BLTCON1) & 0x0003)
 	{
-		case 0:	/* ascending */
+		case 0: /* ascending */
 			blitsum = blit_ascending(this);
 			break;
 
-		case 2:	/* descending */
+		case 2: /* descending */
 			blitsum = blit_descending(this);
 			break;
 
-		case 1:	/* line */
+		case 1: /* line */
 		case 3:
 			blitsum = blit_line(this);
 			break;
@@ -1114,7 +1114,7 @@ static void custom_reset(running_machine &machine)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 	int clock = machine.device("maincpu")->unscaled_clock();
-	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
+	UINT16  vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
 	CUSTOM_REG(REG_DDFSTOP) = 0xd8;
@@ -1275,10 +1275,10 @@ WRITE16_HANDLER( amiga_custom_w )
 
 	switch (offset)
 	{
-		case REG_BLTDDAT:	case REG_DMACONR:	case REG_VPOSR:		case REG_VHPOSR:
-		case REG_DSKDATR:	case REG_JOY0DAT:	case REG_JOY1DAT:	case REG_CLXDAT:
-		case REG_ADKCONR:	case REG_POT0DAT:	case REG_POT1DAT:	case REG_POTGOR:
-		case REG_SERDATR:	case REG_DSKBYTR:	case REG_INTENAR:	case REG_INTREQR:
+		case REG_BLTDDAT:   case REG_DMACONR:   case REG_VPOSR:     case REG_VHPOSR:
+		case REG_DSKDATR:   case REG_JOY0DAT:   case REG_JOY1DAT:   case REG_CLXDAT:
+		case REG_ADKCONR:   case REG_POT0DAT:   case REG_POT1DAT:   case REG_POTGOR:
+		case REG_SERDATR:   case REG_DSKBYTR:   case REG_INTENAR:   case REG_INTREQR:
 			/* read-only registers */
 			break;
 
@@ -1323,7 +1323,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			blitter_setup(space);
 			break;
 
-		case REG_BLTSIZV:	/* ECS-AGA only */
+		case REG_BLTSIZV:   /* ECS-AGA only */
 			if ( IS_ECS_OR_AGA(state->m_intf) )
 			{
 				CUSTOM_REG(REG_BLTSIZV) = data & 0x7fff;
@@ -1331,7 +1331,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			}
 			break;
 
-		case REG_BLTSIZH:	/* ECS-AGA only */
+		case REG_BLTSIZH:   /* ECS-AGA only */
 			if ( IS_ECS_OR_AGA(state->m_intf) )
 			{
 				CUSTOM_REG(REG_BLTSIZH) = data & 0x7ff;
@@ -1340,7 +1340,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			}
 			break;
 
-		case REG_BLTCON0L:	/* ECS-AGA only */
+		case REG_BLTCON0L:  /* ECS-AGA only */
 			if ( IS_ECS_OR_AGA(state->m_intf) )
 			{
 				CUSTOM_REG(REG_BLTCON0) &= 0xff00;
@@ -1348,29 +1348,29 @@ WRITE16_HANDLER( amiga_custom_w )
 			}
 			break;
 
-		case REG_SPR0PTH:	case REG_SPR1PTH:	case REG_SPR2PTH:	case REG_SPR3PTH:
-		case REG_SPR4PTH:	case REG_SPR5PTH:	case REG_SPR6PTH:	case REG_SPR7PTH:
+		case REG_SPR0PTH:   case REG_SPR1PTH:   case REG_SPR2PTH:   case REG_SPR3PTH:
+		case REG_SPR4PTH:   case REG_SPR5PTH:   case REG_SPR6PTH:   case REG_SPR7PTH:
 			data &= ( state->m_intf->chip_ram_mask >> 16 );
 			break;
 
-		case REG_SPR0PTL:	case REG_SPR1PTL:	case REG_SPR2PTL:	case REG_SPR3PTL:
-		case REG_SPR4PTL:	case REG_SPR5PTL:	case REG_SPR6PTL:	case REG_SPR7PTL:
+		case REG_SPR0PTL:   case REG_SPR1PTL:   case REG_SPR2PTL:   case REG_SPR3PTL:
+		case REG_SPR4PTL:   case REG_SPR5PTL:   case REG_SPR6PTL:   case REG_SPR7PTL:
 			amiga_sprite_dma_reset(space.machine(), (offset - REG_SPR0PTL) / 2);
 			break;
 
-		case REG_SPR0CTL:	case REG_SPR1CTL:	case REG_SPR2CTL:	case REG_SPR3CTL:
-		case REG_SPR4CTL:	case REG_SPR5CTL:	case REG_SPR6CTL:	case REG_SPR7CTL:
+		case REG_SPR0CTL:   case REG_SPR1CTL:   case REG_SPR2CTL:   case REG_SPR3CTL:
+		case REG_SPR4CTL:   case REG_SPR5CTL:   case REG_SPR6CTL:   case REG_SPR7CTL:
 			/* disable comparitor on writes here */
 			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0CTL) / 4, FALSE);
 			break;
 
-		case REG_SPR0DATA:	case REG_SPR1DATA:	case REG_SPR2DATA:	case REG_SPR3DATA:
-		case REG_SPR4DATA:	case REG_SPR5DATA:	case REG_SPR6DATA:	case REG_SPR7DATA:
+		case REG_SPR0DATA:  case REG_SPR1DATA:  case REG_SPR2DATA:  case REG_SPR3DATA:
+		case REG_SPR4DATA:  case REG_SPR5DATA:  case REG_SPR6DATA:  case REG_SPR7DATA:
 			/* enable comparitor on writes here */
 			amiga_sprite_enable_comparitor(space.machine(), (offset - REG_SPR0DATA) / 4, TRUE);
 			break;
 
-		case REG_COP1LCH:	case REG_COP2LCH:
+		case REG_COP1LCH:   case REG_COP2LCH:
 			data &= ( state->m_intf->chip_ram_mask >> 16 );
 			break;
 
@@ -1447,19 +1447,19 @@ WRITE16_HANDLER( amiga_custom_w )
 			space.machine().device<amiga_fdc>("fdc")->adkcon_set(data);
 			break;
 
-		case REG_AUD0LCL:	case REG_AUD0LCH:	case REG_AUD0LEN:	case REG_AUD0PER:	case REG_AUD0VOL:
-		case REG_AUD1LCL:	case REG_AUD1LCH:	case REG_AUD1LEN:	case REG_AUD1PER:	case REG_AUD1VOL:
-		case REG_AUD2LCL:	case REG_AUD2LCH:	case REG_AUD2LEN:	case REG_AUD2PER:	case REG_AUD2VOL:
-		case REG_AUD3LCL:	case REG_AUD3LCH:	case REG_AUD3LEN:	case REG_AUD3PER:	case REG_AUD3VOL:
+		case REG_AUD0LCL:   case REG_AUD0LCH:   case REG_AUD0LEN:   case REG_AUD0PER:   case REG_AUD0VOL:
+		case REG_AUD1LCL:   case REG_AUD1LCH:   case REG_AUD1LEN:   case REG_AUD1PER:   case REG_AUD1VOL:
+		case REG_AUD2LCL:   case REG_AUD2LCH:   case REG_AUD2LEN:   case REG_AUD2PER:   case REG_AUD2VOL:
+		case REG_AUD3LCL:   case REG_AUD3LCH:   case REG_AUD3LEN:   case REG_AUD3PER:   case REG_AUD3VOL:
 			amiga_audio_update(state->m_sound_device);
 			break;
 
-		case REG_AUD0DAT:	case REG_AUD1DAT:	case REG_AUD2DAT:	case REG_AUD3DAT:
+		case REG_AUD0DAT:   case REG_AUD1DAT:   case REG_AUD2DAT:   case REG_AUD3DAT:
 			amiga_audio_data_w(state->m_sound_device, (offset - REG_AUD0DAT) / 8, data);
 			break;
 
-		case REG_BPL1PTH:	case REG_BPL2PTH:	case REG_BPL3PTH:	case REG_BPL4PTH:
-		case REG_BPL5PTH:	case REG_BPL6PTH:
+		case REG_BPL1PTH:   case REG_BPL2PTH:   case REG_BPL3PTH:   case REG_BPL4PTH:
+		case REG_BPL5PTH:   case REG_BPL6PTH:
 			data &= ( state->m_intf->chip_ram_mask >> 16 );
 			break;
 
@@ -1472,14 +1472,14 @@ WRITE16_HANDLER( amiga_custom_w )
 			}
 			break;
 
-		case REG_COLOR00:	case REG_COLOR01:	case REG_COLOR02:	case REG_COLOR03:
-		case REG_COLOR04:	case REG_COLOR05:	case REG_COLOR06:	case REG_COLOR07:
-		case REG_COLOR08:	case REG_COLOR09:	case REG_COLOR10:	case REG_COLOR11:
-		case REG_COLOR12:	case REG_COLOR13:	case REG_COLOR14:	case REG_COLOR15:
-		case REG_COLOR16:	case REG_COLOR17:	case REG_COLOR18:	case REG_COLOR19:
-		case REG_COLOR20:	case REG_COLOR21:	case REG_COLOR22:	case REG_COLOR23:
-		case REG_COLOR24:	case REG_COLOR25:	case REG_COLOR26:	case REG_COLOR27:
-		case REG_COLOR28:	case REG_COLOR29:	case REG_COLOR30:	case REG_COLOR31:
+		case REG_COLOR00:   case REG_COLOR01:   case REG_COLOR02:   case REG_COLOR03:
+		case REG_COLOR04:   case REG_COLOR05:   case REG_COLOR06:   case REG_COLOR07:
+		case REG_COLOR08:   case REG_COLOR09:   case REG_COLOR10:   case REG_COLOR11:
+		case REG_COLOR12:   case REG_COLOR13:   case REG_COLOR14:   case REG_COLOR15:
+		case REG_COLOR16:   case REG_COLOR17:   case REG_COLOR18:   case REG_COLOR19:
+		case REG_COLOR20:   case REG_COLOR21:   case REG_COLOR22:   case REG_COLOR23:
+		case REG_COLOR24:   case REG_COLOR25:   case REG_COLOR26:   case REG_COLOR27:
+		case REG_COLOR28:   case REG_COLOR29:   case REG_COLOR30:   case REG_COLOR31:
 			if (IS_AGA(state->m_intf))
 			{
 				amiga_aga_palette_write(space.machine(), offset - REG_COLOR00, data);
@@ -1629,18 +1629,18 @@ READ16_HANDLER( amiga_autoconfig_r )
 	switch (offset/2)
 	{
 		/*
-           00/02        1  1  x  x     x  0  0  0 = 8 Megabytes
-                              ^  ^     ^  0  0  1 = 64 Kbytes
-                              |  |     |  0  1  0 = 128 Kbytes
-                              |  |     |  0  1  1 = 256 Kbytes
-                              |  |     |  1  0  0 = 1 Megabyte
-                              |  |     |  1  1  0 = 2 Megabytes
-                              |  |     |  1  1  1 = 4 Megabytes
-                              |  |     |
-                              |  |     `-- 1 = multiple devices on this card
-                              |  `-------- 1 = ROM vector offset is valid
-                              `----------- 1 = link into free memory list
-        */
+		   00/02        1  1  x  x     x  0  0  0 = 8 Megabytes
+		                      ^  ^     ^  0  0  1 = 64 Kbytes
+		                      |  |     |  0  1  0 = 128 Kbytes
+		                      |  |     |  0  1  1 = 256 Kbytes
+		                      |  |     |  1  0  0 = 1 Megabyte
+		                      |  |     |  1  1  0 = 2 Megabytes
+		                      |  |     |  1  1  1 = 4 Megabytes
+		                      |  |     |
+		                      |  |     `-- 1 = multiple devices on this card
+		                      |  `-------- 1 = ROM vector offset is valid
+		                      `----------- 1 = link into free memory list
+		*/
 		case 0x00/4:
 			byte = 0xc0;
 			if (cur_autoconfig->device.link_memory)
@@ -1656,19 +1656,19 @@ READ16_HANDLER( amiga_autoconfig_r )
 			break;
 
 		/*
-           04/06          product number (all bits inverted)
-        */
+		   04/06          product number (all bits inverted)
+		*/
 		case 0x04/4:
 			byte = ~cur_autoconfig->device.product_number;
 			break;
 
 		/*
-           08/0a        x  x  1  1     1  1  1  1
-                        ^  ^
-                        |  |
-                        |  `-- 1 = this board can be shut up
-                        `----- 0 = prefer 8 Meg address space
-        */
+		   08/0a        x  x  1  1     1  1  1  1
+		                ^  ^
+		                |  |
+		                |  `-- 1 = this board can be shut up
+		                `----- 0 = prefer 8 Meg address space
+		*/
 		case 0x08/4:
 			byte = 0x3f;
 			if (!cur_autoconfig->device.prefer_8meg)
@@ -1678,9 +1678,9 @@ READ16_HANDLER( amiga_autoconfig_r )
 			break;
 
 		/*
-           10/12         manufacturers number (high byte, all inverted)
-           14/16                  ''          (low byte, all inverted)
-        */
+		   10/12         manufacturers number (high byte, all inverted)
+		   14/16                  ''          (low byte, all inverted)
+		*/
 		case 0x10/4:
 			byte = ~cur_autoconfig->device.mfr_number >> 8;
 			break;
@@ -1690,11 +1690,11 @@ READ16_HANDLER( amiga_autoconfig_r )
 			break;
 
 		/*
-           18/1a         optional serial number (all bits inverted) byte0
-           1c/1e                              ''                    byte1
-           20/22                              ''                    byte2
-           24/26                              ''                    byte3
-        */
+		   18/1a         optional serial number (all bits inverted) byte0
+		   1c/1e                              ''                    byte1
+		   20/22                              ''                    byte2
+		   24/26                              ''                    byte3
+		*/
 		case 0x18/4:
 			byte = ~cur_autoconfig->device.serial_number >> 24;
 			break;
@@ -1712,9 +1712,9 @@ READ16_HANDLER( amiga_autoconfig_r )
 			break;
 
 		/*
-           28/2a         optional ROM vector offset (all bits inverted) high byte
-           2c/2e                              ''                        low byte
-        */
+		   28/2a         optional ROM vector offset (all bits inverted) high byte
+		   2c/2e                              ''                        low byte
+		*/
 		case 0x28/4:
 			byte = ~cur_autoconfig->device.rom_vector >> 8;
 			break;
@@ -1724,8 +1724,8 @@ READ16_HANDLER( amiga_autoconfig_r )
 			break;
 
 		/*
-           40/42   optional interrupt control and status register
-        */
+		   40/42   optional interrupt control and status register
+		*/
 		case 0x40/4:
 			byte = 0x00;
 			if (cur_autoconfig->device.int_control_r)
@@ -1766,8 +1766,8 @@ WRITE16_HANDLER( amiga_autoconfig_w )
 	switch (offset/2)
 	{
 		/*
-           48/4a        write-only register for base address (A23-A16)
-        */
+		   48/4a        write-only register for base address (A23-A16)
+		*/
 		case 0x48/4:
 			if ((offset & 1) == 0)
 				cur_autoconfig->base = (cur_autoconfig->base & ~0xf00000) | ((data & 0xf000) << 8);
@@ -1777,8 +1777,8 @@ WRITE16_HANDLER( amiga_autoconfig_w )
 			break;
 
 		/*
-           4c/4e        optional write-only 'shutup' trigger
-        */
+		   4c/4e        optional write-only 'shutup' trigger
+		*/
 		case 0x4c/4:
 			cur_autoconfig->base = 0;
 			move_to_next = TRUE;

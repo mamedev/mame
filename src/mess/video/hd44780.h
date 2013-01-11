@@ -32,14 +32,14 @@ typedef void (*hd44780_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap
 
 struct hd44780_interface
 {
-	UINT8 height;			// number of lines
-	UINT8 width;			// chars for line
-	hd44780_pixel_update_func pixel_update_func;	// pixel update callback
+	UINT8 height;           // number of lines
+	UINT8 width;            // chars for line
+	hd44780_pixel_update_func pixel_update_func;    // pixel update callback
 };
 
 // ======================> hd44780_device
 
-class hd44780_device :	public device_t,
+class hd44780_device :  public device_t,
 						public hd44780_interface
 {
 
@@ -77,24 +77,24 @@ protected:
 
 	UINT8 m_busy_flag;
 
-	UINT8 m_ddram[0x80];	//internal display data RAM
-	UINT8 m_cgram[0x40];	//internal chargen RAM
+	UINT8 m_ddram[0x80];    //internal display data RAM
+	UINT8 m_cgram[0x40];    //internal chargen RAM
 
-	INT8 m_ac;				//address counter
-	UINT8 m_ac_mode;		//0=DDRAM 1=CGRAM
-	UINT8 m_data_bus_flag;	//0=none 1=write 2=read
+	INT8 m_ac;              //address counter
+	UINT8 m_ac_mode;        //0=DDRAM 1=CGRAM
+	UINT8 m_data_bus_flag;  //0=none 1=write 2=read
 
-	INT8 m_cursor_pos;		//cursor position
-	UINT8 m_display_on;		//display on/off
-	UINT8 m_cursor_on;		//cursor on/off
-	UINT8 m_blink_on;		//blink on/off
-	UINT8 m_shift_on;		//shift  on/off
-	INT8 m_disp_shift;		//display shift
+	INT8 m_cursor_pos;      //cursor position
+	UINT8 m_display_on;     //display on/off
+	UINT8 m_cursor_on;      //cursor on/off
+	UINT8 m_blink_on;       //blink on/off
+	UINT8 m_shift_on;       //shift  on/off
+	INT8 m_disp_shift;      //display shift
 
-	INT8 m_direction;		//auto increment/decrement
-	UINT8 m_data_len;		//interface data length 4 or 8 bit
-	UINT8 m_num_line;		//number of lines
-	UINT8 m_char_size;		//char size 5x8 or 5x10
+	INT8 m_direction;       //auto increment/decrement
+	UINT8 m_data_len;       //interface data length 4 or 8 bit
+	UINT8 m_num_line;       //number of lines
+	UINT8 m_char_size;      //char size 5x8 or 5x10
 
 	UINT8 m_blink;
 };

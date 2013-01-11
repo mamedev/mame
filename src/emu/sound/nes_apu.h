@@ -46,7 +46,7 @@ DECLARE_READ8_DEVICE_HANDLER( nes_psg_r );
 DECLARE_WRITE8_DEVICE_HANDLER( nes_psg_w );
 
 class nesapu_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

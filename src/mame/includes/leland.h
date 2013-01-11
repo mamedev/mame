@@ -12,8 +12,8 @@
 
 struct vram_state_data
 {
-	UINT16	m_addr;
-	UINT8	m_latch[2];
+	UINT16  m_addr;
+	UINT8   m_latch[2];
 };
 
 
@@ -157,11 +157,11 @@ public:
 
 /*----------- defined in machine/leland.c -----------*/
 
-#define SERIAL_TYPE_NONE		0
-#define SERIAL_TYPE_ADD			1
-#define SERIAL_TYPE_ADD_XOR		2
-#define SERIAL_TYPE_ENCRYPT		3
-#define SERIAL_TYPE_ENCRYPT_XOR	4
+#define SERIAL_TYPE_NONE        0
+#define SERIAL_TYPE_ADD         1
+#define SERIAL_TYPE_ADD_XOR     2
+#define SERIAL_TYPE_ENCRYPT     3
+#define SERIAL_TYPE_ENCRYPT_XOR 4
 
 void cerberus_bankswitch(running_machine &machine);
 void mayhem_bankswitch(running_machine &machine);
@@ -181,7 +181,7 @@ void leland_rotate_memory(running_machine &machine, const char *cpuname);
 /*----------- defined in audio/leland.c -----------*/
 
 class leland_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	leland_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -46,4 +46,3 @@ public:
 	INTERRUPT_GEN_MEMBER(jb_interrupt);
 	INTERRUPT_GEN_MEMBER(jb_interrupt_nmi);
 };
-

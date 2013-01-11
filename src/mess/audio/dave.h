@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 class dave_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	dave_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -39,14 +39,14 @@ private:
 extern const device_type DAVE;
 
 
-#define DAVE_INT_SELECTABLE		0
-#define DAVE_INT_1KHZ_50HZ_TG	1
-#define DAVE_INT_1HZ			2
-#define DAVE_INT_INT1			3
-#define DAVE_INT_INT2			4
+#define DAVE_INT_SELECTABLE     0
+#define DAVE_INT_1KHZ_50HZ_TG   1
+#define DAVE_INT_1HZ            2
+#define DAVE_INT_INT1           3
+#define DAVE_INT_INT2           4
 
-#define DAVE_FIFTY_HZ_COUNTER_RELOAD	20
-#define DAVE_ONE_HZ_COUNTER_RELOAD		1000
+#define DAVE_FIFTY_HZ_COUNTER_RELOAD    20
+#define DAVE_ONE_HZ_COUNTER_RELOAD      1000
 
 /* id's of external ints */
 enum

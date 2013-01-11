@@ -225,25 +225,25 @@ static void towns_update_kanji_offset(running_machine &machine)
 	if(state->m_video.towns_kanji_code_h < 0x30)
 	{
 		state->m_video.towns_kanji_offset = ((state->m_video.towns_kanji_code_l & 0x1f) << 4)
-		                   | (((state->m_video.towns_kanji_code_l - 0x20) & 0x20) << 8)
-		                   | (((state->m_video.towns_kanji_code_l - 0x20) & 0x40) << 6)
-		                   | ((state->m_video.towns_kanji_code_h & 0x07) << 9);
+							| (((state->m_video.towns_kanji_code_l - 0x20) & 0x20) << 8)
+							| (((state->m_video.towns_kanji_code_l - 0x20) & 0x40) << 6)
+							| ((state->m_video.towns_kanji_code_h & 0x07) << 9);
 	}
 	else if(state->m_video.towns_kanji_code_h < 0x70)
 	{
 		state->m_video.towns_kanji_offset = ((state->m_video.towns_kanji_code_l & 0x1f) << 4)
-		                   + (((state->m_video.towns_kanji_code_l - 0x20) & 0x60) << 8)
-		                   + ((state->m_video.towns_kanji_code_h & 0x0f) << 9)
-		                   + (((state->m_video.towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
-		                   + 0x8000;
+							+ (((state->m_video.towns_kanji_code_l - 0x20) & 0x60) << 8)
+							+ ((state->m_video.towns_kanji_code_h & 0x0f) << 9)
+							+ (((state->m_video.towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
+							+ 0x8000;
 	}
 	else
 	{
 		state->m_video.towns_kanji_offset = ((state->m_video.towns_kanji_code_l & 0x1f) << 4)
-		                   | (((state->m_video.towns_kanji_code_l - 0x20) & 0x20) << 8)
-		                   | (((state->m_video.towns_kanji_code_l - 0x20) & 0x40) << 6)
-		                   | ((state->m_video.towns_kanji_code_h & 0x07) << 9)
-		                   | 0x38000;
+							| (((state->m_video.towns_kanji_code_l - 0x20) & 0x20) << 8)
+							| (((state->m_video.towns_kanji_code_l - 0x20) & 0x40) << 6)
+							| ((state->m_video.towns_kanji_code_h & 0x07) << 9)
+							| 0x38000;
 	}
 }
 
@@ -265,10 +265,10 @@ READ8_MEMBER( towns_state::towns_video_cff80_r )
 			else
 				return 0x00;
 		case 0x06:
-          if(m_video.towns_vblank_flag != 0)
-              return 0x10;
-          else
-              return 0x00;
+			if(m_video.towns_vblank_flag != 0)
+				return 0x10;
+			else
+				return 0x00;
 		case 0x16:  // Kanji character data
 			return ROM[(m_video.towns_kanji_offset << 1) + 0x180000];
 		case 0x17:  // Kanji character data
@@ -1678,25 +1678,25 @@ static void render_text_char(running_machine &machine, UINT8 x, UINT8 y, UINT8 a
 		if(code_h < 0x30)
 		{
 			rom_addr = ((code_l & 0x1f) << 4)
-			                   | (((code_l - 0x20) & 0x20) << 8)
-			                   | (((code_l - 0x20) & 0x40) << 6)
-			                   | ((code_h & 0x07) << 9);
+								| (((code_l - 0x20) & 0x20) << 8)
+								| (((code_l - 0x20) & 0x40) << 6)
+								| ((code_h & 0x07) << 9);
 		}
 		else if(code_h < 0x70)
 		{
 			rom_addr = ((code_l & 0x1f) << 4)
-			                   + (((code_l - 0x20) & 0x60) << 8)
-			                   + ((code_h & 0x0f) << 9)
-			                   + (((code_h - 0x30) & 0x70) * 0xc00)
-			                   + 0x8000;
+								+ (((code_l - 0x20) & 0x60) << 8)
+								+ ((code_h & 0x0f) << 9)
+								+ (((code_h - 0x30) & 0x70) * 0xc00)
+								+ 0x8000;
 		}
 		else
 		{
 			rom_addr = ((code_l & 0x1f) << 4)
-			                   | (((code_l - 0x20) & 0x20) << 8)
-			                   | (((code_l - 0x20) & 0x40) << 6)
-			                   | ((code_h & 0x07) << 9)
-			                   | 0x38000;
+								| (((code_l - 0x20) & 0x20) << 8)
+								| (((code_l - 0x20) & 0x40) << 6)
+								| ((code_h & 0x07) << 9)
+								| 0x38000;
 		}
 	}
 	colour = attr & 0x07;
@@ -1861,4 +1861,3 @@ UINT32 towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	return 0;
 }
-

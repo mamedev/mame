@@ -18,10 +18,10 @@
 
 #include "emu.h"
 
-#include "sound/sn76477.h"		/* for sn sound*/
-#include "sound/wave.h"			/* for K7 sound*/
-#include "sound/discrete.h"		/* for 1 Bit sound*/
-#include "machine/upd765.h"		/* for floppy disc controller */
+#include "sound/sn76477.h"      /* for sn sound*/
+#include "sound/wave.h"         /* for K7 sound*/
+#include "sound/discrete.h"     /* for 1 Bit sound*/
+#include "machine/upd765.h"     /* for floppy disc controller */
 #include "formats/hect_dsk.h"
 #include "cpu/z80/z80.h"
 
@@ -77,13 +77,13 @@ void hector_disc2_reset(running_machine &machine)
 	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// Clear the Hardware's buffers
-	state->m_hector_disc2_data_r_ready=0x0;	/* =ff when PC2 = true and data in read buffer (state->m_hector_disc2_data_read) */
-	state->m_hector_disc2_data_w_ready=0x0;	/* =ff when Disc 2 Port 40 had send a data in write buffer (state->m_hector_disc2_data_write) */
-	state->m_hector_disc2_data_read=0;		/* Data send by Hector to Disc 2 when PC2=true */
-	state->m_hector_disc2_data_write=0;		/* Data send by Disc 2 to Hector when Write Port I/O 40 */
-	state->m_hector_disc2_RNMI = 0;			/* State of I/O 50 D5 = authorization for INT / NMI */
-	state->m_IRQ_current_state=0;			/* Clear the IRQ active request */
-	state->m_NMI_current_state=0;			/* Clear the DMA active request */
+	state->m_hector_disc2_data_r_ready=0x0; /* =ff when PC2 = true and data in read buffer (state->m_hector_disc2_data_read) */
+	state->m_hector_disc2_data_w_ready=0x0; /* =ff when Disc 2 Port 40 had send a data in write buffer (state->m_hector_disc2_data_write) */
+	state->m_hector_disc2_data_read=0;      /* Data send by Hector to Disc 2 when PC2=true */
+	state->m_hector_disc2_data_write=0;     /* Data send by Disc 2 to Hector when Write Port I/O 40 */
+	state->m_hector_disc2_RNMI = 0;         /* State of I/O 50 D5 = authorization for INT / NMI */
+	state->m_IRQ_current_state=0;           /* Clear the IRQ active request */
+	state->m_NMI_current_state=0;           /* Clear the DMA active request */
 }
 
 /*****************************************************************************/
@@ -125,18 +125,18 @@ READ8_HANDLER( hector_disc2_io40_port_r)
 {
 	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	/* Read data send by Hector, by Disc2*/
-	state->m_hector_disc2_data_r_ready = 0x00;	/* Clear memory info read ready*/
-	return state->m_hector_disc2_data_read;		/* send the data !*/
+	state->m_hector_disc2_data_r_ready = 0x00;  /* Clear memory info read ready*/
+	return state->m_hector_disc2_data_read;     /* send the data !*/
 }
 
-WRITE8_HANDLER( hector_disc2_io40_port_w)	/* Write data send by Disc2, to Hector*/
+WRITE8_HANDLER( hector_disc2_io40_port_w)   /* Write data send by Disc2, to Hector*/
 {
 	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
-	state->m_hector_disc2_data_write = data;		/* Memorization data*/
-	state->m_hector_disc2_data_w_ready = 0x80;	/* Memorization data write ready in D7*/
+	state->m_hector_disc2_data_write = data;        /* Memorization data*/
+	state->m_hector_disc2_data_w_ready = 0x80;  /* Memorization data write ready in D7*/
 }
 
-READ8_HANDLER( hector_disc2_io50_port_r)	/*Read memory info write ready*/
+READ8_HANDLER( hector_disc2_io50_port_r)    /*Read memory info write ready*/
 {
 	hec2hrp_state *state = space.machine().driver_data<hec2hrp_state>();
 	return state->m_hector_disc2_data_w_ready;
@@ -148,8 +148,8 @@ WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 	upd765a_device *fdc = space.machine().device<upd765a_device>("upd765");
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
-	space.machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(BIT(data, 0));	// Moteur floppy A:
-	space.machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(BIT(data, 1));	// Moteur floppy B:
+	space.machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(BIT(data, 0));    // Moteur floppy A:
+	space.machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(BIT(data, 1));    // Moteur floppy B:
 
 	/* Write bit TC uPD765 on D4 of port I/O 50 */
 	fdc->tc_w(BIT(data, 4));

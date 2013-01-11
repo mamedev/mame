@@ -5,8 +5,8 @@
 
 
 #define pz  p[0]
-#define pu	p[1]
-#define pv	p[2]
+#define pu  p[1]
+#define pv  p[2]
 
 
 
@@ -26,11 +26,11 @@ struct TRIANGLE
 struct cached_texture
 {
 	cached_texture *next;
-	UINT8		width;
-	UINT8		height;
-	UINT8		format;
-	UINT8		alpha;
-	rgb_t		data[1];
+	UINT8       width;
+	UINT8       height;
+	UINT8       format;
+	UINT8       alpha;
+	rgb_t       data[1];
 };
 
 struct poly_extra_data
@@ -43,13 +43,13 @@ struct poly_extra_data
 	int polygon_intensity;
 };
 
-#define TRI_PARAM_TEXTURE_PAGE			0x1
-#define TRI_PARAM_TEXTURE_MIRROR_U		0x2
-#define TRI_PARAM_TEXTURE_MIRROR_V		0x4
-#define TRI_PARAM_TEXTURE_ENABLE		0x8
-#define TRI_PARAM_ALPHA_TEST			0x10
+#define TRI_PARAM_TEXTURE_PAGE          0x1
+#define TRI_PARAM_TEXTURE_MIRROR_U      0x2
+#define TRI_PARAM_TEXTURE_MIRROR_V      0x4
+#define TRI_PARAM_TEXTURE_ENABLE        0x8
+#define TRI_PARAM_ALPHA_TEST            0x10
 
-#define MAX_TRIANGLES		131072
+#define MAX_TRIANGLES       131072
 
 
 /* forward declarations */
@@ -86,7 +86,7 @@ static void invalidate_texture(running_machine &machine, int page, int texx, int
 
 
 /* matrix stack */
-#define MATRIX_STACK_SIZE	256
+#define MATRIX_STACK_SIZE   256
 
 
 #ifdef UNUSED_DEFINITION
@@ -97,12 +97,12 @@ static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
 
 
 
-#define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
+#define BYTE_REVERSE32(x)       (((x >> 24) & 0xff) | \
 								((x >> 8) & 0xff00) | \
 								((x << 8) & 0xff0000) | \
 								((x << 24) & 0xff000000))
 
-#define BYTE_REVERSE16(x)		(((x >> 8) & 0xff) | ((x << 8) & 0xff00))
+#define BYTE_REVERSE16(x)       (((x >> 8) & 0xff) | ((x << 8) & 0xff00))
 
 
 static void model3_exit(running_machine &machine)
@@ -289,7 +289,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap, const rec
 		}
 	}
 
-	if(bitdepth)		/* 4-bit */
+	if(bitdepth)        /* 4-bit */
 	{
 		for(y = cliprect.min_y; y <= cliprect.max_y; y+=8)
 		{
@@ -301,7 +301,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap, const rec
 			}
 		}
 	}
-	else				/* 8-bit */
+	else                /* 8-bit */
 	{
 		for(y = cliprect.min_y; y <= cliprect.max_y; y+=8)
 		{
@@ -433,11 +433,11 @@ READ64_MEMBER(model3_state::model3_vid_reg_r)
 {
 	switch(offset)
 	{
-		case 0x00/8:	return m_vid_reg0;
-		case 0x08/8:	return U64(0xffffffffffffffff);		/* ??? */
-		case 0x20/8:	return (UINT64)m_layer_enable << 52;
-		case 0x40/8:	return ((UINT64)m_layer_modulate1 << 32) | (UINT64)m_layer_modulate2;
-		default:		logerror("read reg %02X\n", offset);break;
+		case 0x00/8:    return m_vid_reg0;
+		case 0x08/8:    return U64(0xffffffffffffffff);     /* ??? */
+		case 0x20/8:    return (UINT64)m_layer_enable << 52;
+		case 0x40/8:    return ((UINT64)m_layer_modulate1 << 32) | (UINT64)m_layer_modulate2;
+		default:        logerror("read reg %02X\n", offset);break;
 	}
 	return 0;
 }
@@ -446,18 +446,18 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 {
 	switch(offset)
 	{
-		case 0x00/8:	logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); m_vid_reg0 = data; break;
-		case 0x08/8:	break;		/* ??? */
-		case 0x10/8:	model3_set_irq_line(machine(), (data >> 56) & 0x0f, CLEAR_LINE); break;		/* VBL IRQ Ack */
+		case 0x00/8:    logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); m_vid_reg0 = data; break;
+		case 0x08/8:    break;      /* ??? */
+		case 0x10/8:    model3_set_irq_line(machine(), (data >> 56) & 0x0f, CLEAR_LINE); break;     /* VBL IRQ Ack */
 
-		case 0x20/8:	m_layer_enable = (data >> 52);	break;
+		case 0x20/8:    m_layer_enable = (data >> 52);  break;
 
-		case 0x40/8:	m_layer_modulate1 = (UINT32)(data >> 32);
+		case 0x40/8:    m_layer_modulate1 = (UINT32)(data >> 32);
 						m_layer_modulate2 = (UINT32)(data);
 						break;
-		case 0x60/8:	COMBINE_DATA(&m_layer_scroll[0]); break;
-		case 0x68/8:	COMBINE_DATA(&m_layer_scroll[1]); break;
-		default:		logerror("model3_vid_reg_w: %02X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data)); break;
+		case 0x60/8:    COMBINE_DATA(&m_layer_scroll[0]); break;
+		case 0x68/8:    COMBINE_DATA(&m_layer_scroll[1]); break;
+		default:        logerror("model3_vid_reg_w: %02X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data)); break;
 	}
 }
 
@@ -546,7 +546,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 
 		switch (format)
 		{
-			case 0:		/* 1-5-5-5 ARGB */
+			case 0:     /* 1-5-5-5 ARGB */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT16 pixdata = texsrc[x];
@@ -554,7 +554,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				}
 				break;
 
-			case 1:		/* 4-bit grayscale in low nibble */
+			case 1:     /* 4-bit grayscale in low nibble */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 0);
@@ -562,7 +562,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				}
 				break;
 
-			case 2:		/* 4-bit grayscale in 2nd nibble */
+			case 2:     /* 4-bit grayscale in 2nd nibble */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 4);
@@ -570,7 +570,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				}
 				break;
 
-			case 3:		/* 4-bit grayscale in 3rd nibble */
+			case 3:     /* 4-bit grayscale in 3rd nibble */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 8);
@@ -578,7 +578,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				}
 				break;
 
-			case 4:		/* 8-bit A4L4 */
+			case 4:     /* 8-bit A4L4 */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 pixdata = texsrc[x / 2] >> ((~x & 1) * 8);
@@ -586,7 +586,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				}
 				break;
 
-			case 5:		/* 8-bit grayscale */
+			case 5:     /* 8-bit grayscale */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = texsrc[x / 2] >> ((~x & 1) * 8);
@@ -594,7 +594,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				}
 				break;
 
-			case 6:		/* 4-bit grayscale in high nibble */
+			case 6:     /* 4-bit grayscale in high nibble */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 12);
@@ -602,7 +602,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				}
 				break;
 
-			case 7:		/* 4-4-4-4 ARGB */
+			case 7:     /* 4-4-4-4 ARGB */
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT16 pixdata = texsrc[x];
@@ -652,8 +652,8 @@ WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
 
 static const UINT8 texture_decode[64] =
 {
-	 0,  1,  4,  5,  8,  9, 12, 13,
-	 2,  3,  6,  7, 10, 11, 14, 15,
+		0,  1,  4,  5,  8,  9, 12, 13,
+		2,  3,  6,  7, 10, 11, 14, 15,
 	16, 17, 20, 21, 24, 25, 28, 29,
 	18, 19, 22, 23, 26, 27, 30, 31,
 	32, 33, 36, 37, 40, 41, 44, 45,
@@ -710,16 +710,16 @@ INLINE void write_texture8(model3_state *state, int xpos, int ypos, int width, i
 static void real3d_upload_texture(running_machine &machine, UINT32 header, UINT32 *data)
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	int width	= 32 << ((header >> 14) & 0x7);
-	int height	= 32 << ((header >> 17) & 0x7);
-	int xpos	= (header & 0x3f) * 32;
-	int ypos	= ((header >> 7) & 0x1f) * 32;
-	int page	= (header >> 20) & 0x1;
+	int width   = 32 << ((header >> 14) & 0x7);
+	int height  = 32 << ((header >> 17) & 0x7);
+	int xpos    = (header & 0x3f) * 32;
+	int ypos    = ((header >> 7) & 0x1f) * 32;
+	int page    = (header >> 20) & 0x1;
 	//int bitdepth = (header >> 23) & 0x1;
 
 	switch(header >> 24)
 	{
-		case 0x00:		/* Texture with mipmaps */
+		case 0x00:      /* Texture with mipmaps */
 			//if(bitdepth) {
 				write_texture16(state, xpos, ypos, width, height, page, (UINT16*)data);
 				invalidate_texture(machine, page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
@@ -729,7 +729,7 @@ static void real3d_upload_texture(running_machine &machine, UINT32 header, UINT3
 				//write_texture8(xpos, ypos, width, height, page, (UINT16*)data);
 			//}
 			break;
-		case 0x01:		/* Texture without mipmaps */
+		case 0x01:      /* Texture without mipmaps */
 			//if(bitdepth) {
 				write_texture16(state, xpos, ypos, width, height, page, (UINT16*)data);
 				invalidate_texture(machine, page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
@@ -739,9 +739,9 @@ static void real3d_upload_texture(running_machine &machine, UINT32 header, UINT3
 				//write_texture8(xpos, ypos, width, height, page, (UINT16*)data);
 			//}
 			break;
-		case 0x02:		/* Only mipmaps */
+		case 0x02:      /* Only mipmaps */
 			break;
-		case 0x80:		/* Gamma-table ? */
+		case 0x80:      /* Gamma-table ? */
 			break;
 		default:
 			fatalerror("Unknown texture type: %02X\n", header >> 24);
@@ -958,10 +958,10 @@ static void translate_matrix_stack(model3_state *state, float x, float y, float 
 {
 	MATRIX tm;
 
-	tm[0][0] = 1.0f;	tm[0][1] = 0.0f;	tm[0][2] = 0.0f;	tm[0][3] = 0.0f;
-	tm[1][0] = 0.0f;	tm[1][1] = 1.0f;	tm[1][2] = 0.0f;	tm[1][3] = 0.0f;
-	tm[2][0] = 0.0f;	tm[2][1] = 0.0f;	tm[2][2] = 1.0f;	tm[2][3] = 0.0f;
-	tm[3][0] = x;		tm[3][1] = y;		tm[3][2] = z;		tm[3][3] = 1.0f;
+	tm[0][0] = 1.0f;    tm[0][1] = 0.0f;    tm[0][2] = 0.0f;    tm[0][3] = 0.0f;
+	tm[1][0] = 0.0f;    tm[1][1] = 1.0f;    tm[1][2] = 0.0f;    tm[1][3] = 0.0f;
+	tm[2][0] = 0.0f;    tm[2][1] = 0.0f;    tm[2][2] = 1.0f;    tm[2][3] = 0.0f;
+	tm[3][0] = x;       tm[3][1] = y;       tm[3][2] = z;       tm[3][3] = 1.0f;
 
 	matrix_multiply(tm, state->m_matrix_stack[state->m_matrix_stack_ptr], &state->m_matrix_stack[state->m_matrix_stack_ptr]);
 }
@@ -1003,12 +1003,12 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 		int v1_in = is_point_inside(v[i].x, v[i].y, v[i].pz, cp);
 		int v2_in = is_point_inside(v[previ].x, v[previ].y, v[previ].pz, cp);
 
-		if (v1_in && v2_in)			/* edge is completely inside the volume */
+		if (v1_in && v2_in)         /* edge is completely inside the volume */
 		{
 			clipv[clip_verts] = v[i];
 			++clip_verts;
 		}
-		else if (!v1_in && v2_in)	/* edge is entering the volume */
+		else if (!v1_in && v2_in)   /* edge is entering the volume */
 		{
 			/* insert vertex at intersection point */
 			t = line_plane_intersection(&v[i], &v[previ], cp);
@@ -1019,7 +1019,7 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 			clipv[clip_verts].pv = v[i].pv + ((v[previ].pv - v[i].pv) * t);
 			++clip_verts;
 		}
-		else if (v1_in && !v2_in)	/* edge is leaving the volume */
+		else if (v1_in && !v2_in)   /* edge is leaving the volume */
 		{
 			/* insert vertex at intersection point */
 			t = line_plane_intersection(&v[i], &v[previ], cp);
@@ -1062,9 +1062,9 @@ static void render_one(running_machine &machine, TRIANGLE *tri)
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * 256.0f;
 
 		extra->texture = get_texture(machine, (tri->param & TRI_PARAM_TEXTURE_PAGE) ? 1 : 0, tri->texture_x, tri->texture_y, tri->texture_width, tri->texture_height, tri->texture_format);
-		extra->texture_param		= tri->param;
+		extra->texture_param        = tri->param;
 		extra->polygon_transparency = tri->transparency;
-		extra->polygon_intensity	= tri->intensity;
+		extra->polygon_intensity    = tri->intensity;
 
 		if (tri->param & TRI_PARAM_ALPHA_TEST)
 			callback = draw_scanline_alpha_test;
@@ -1077,7 +1077,7 @@ static void render_one(running_machine &machine, TRIANGLE *tri)
 	else
 	{
 		extra->polygon_transparency = tri->transparency;
-		extra->polygon_intensity	= tri->intensity;
+		extra->polygon_intensity    = tri->intensity;
 		extra->color                = tri->color;
 
 		poly_render_triangle(state->m_poly, &state->m_bitmap3d, state->m_clip3d, draw_scanline_color, 1, &tri->v[0], &tri->v[1], &tri->v[2]);
@@ -1101,9 +1101,9 @@ static void draw_model(running_machine &machine, UINT32 addr)
 	MATRIX transform_matrix;
 	float center_x, center_y;
 
-	if(state->m_step < 0x15) {	/* position coordinates are 17.15 fixed-point in Step 1.0 */
+	if(state->m_step < 0x15) {  /* position coordinates are 17.15 fixed-point in Step 1.0 */
 		fixed_point_fraction = 1.0f / 32768.0f;
-	} else {					/* 13.19 fixed-point in other Steps */
+	} else {                    /* 13.19 fixed-point in other Steps */
 		fixed_point_fraction = 1.0f / 524288.0f;
 	}
 
@@ -1262,16 +1262,16 @@ static void draw_model(running_machine &machine, UINT32 addr)
 		num_vertices = clip_polygon(clip_vert, num_vertices, state->m_clip_plane[4], clip_vert);
 
 		/* backface culling */
-		if( (header[6] & 0x800000) && (!(header[1] & 0x0010)) )	{
+		if( (header[6] & 0x800000) && (!(header[1] & 0x0010)) ) {
 			if(sn[0]*clip_vert[0].x + sn[1]*clip_vert[0].y + sn[2]*clip_vert[0].pz >0)
 				back_face = 1;
 			else
 				back_face = 0;
 		}
 		else
-			back_face = 0;	//no culling for transparent or two-sided polygons
+			back_face = 0;  //no culling for transparent or two-sided polygons
 
-		if(!back_face)	{
+		if(!back_face)  {
 			/* homogeneous Z-divide, screen-space transformation */
 			for(i=0; i < num_vertices; i++) {
 				float ooz = 1.0f / clip_vert[i].pz;
@@ -1304,20 +1304,20 @@ static void draw_model(running_machine &machine, UINT32 addr)
 				memcpy(&tri.v[0], &clip_vert[0], sizeof(poly_vertex));
 				memcpy(&tri.v[1], &clip_vert[i-1], sizeof(poly_vertex));
 				memcpy(&tri.v[2], &clip_vert[i], sizeof(poly_vertex));
-				tri.texture_x				= ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
-				tri.texture_y				= (header[5] & 0x1f);
-				tri.texture_width			= ((header[3] >> 3) & 0x7);
-				tri.texture_height			= (header[3] & 0x7);
-				tri.texture_format			= (header[6] >> 7) & 0x7;
-				tri.transparency			= polygon_transparency;
-				tri.intensity				= intensity;
-				tri.color					= color;
+				tri.texture_x               = ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
+				tri.texture_y               = (header[5] & 0x1f);
+				tri.texture_width           = ((header[3] >> 3) & 0x7);
+				tri.texture_height          = (header[3] & 0x7);
+				tri.texture_format          = (header[6] >> 7) & 0x7;
+				tri.transparency            = polygon_transparency;
+				tri.intensity               = intensity;
+				tri.color                   = color;
 
-				tri.param	= 0;
-				tri.param	|= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
-				tri.param	|= (header[6] & 0x4000000) ? TRI_PARAM_TEXTURE_ENABLE : 0;
-				tri.param	|= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
-				tri.param	|= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
+				tri.param   = 0;
+				tri.param   |= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
+				tri.param   |= (header[6] & 0x4000000) ? TRI_PARAM_TEXTURE_ENABLE : 0;
+				tri.param   |= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
+				tri.param   |= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
 				tri.param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
 
 				render_one(machine, &tri);
@@ -1352,10 +1352,10 @@ static void load_matrix(model3_state *state, int matrix_num, MATRIX *out)
 {
 	float *matrix = (float *)get_memory_pointer(state, state->m_matrix_base_address + matrix_num * 12);
 
-	(*out)[0][0] = matrix[3];	(*out)[0][1] = matrix[6];	(*out)[0][2] = matrix[9];	(*out)[0][3] = 0.0f;
-	(*out)[1][0] = matrix[4];	(*out)[1][1] = matrix[7];	(*out)[1][2] = matrix[10];	(*out)[1][3] = 0.0f;
-	(*out)[2][0] = matrix[5];	(*out)[2][1] = matrix[8];	(*out)[2][2] = matrix[11];	(*out)[2][3] = 0.0f;
-	(*out)[3][0] = matrix[0];	(*out)[3][1] = matrix[1];	(*out)[3][2] = matrix[2];	(*out)[3][3] = 1.0f;
+	(*out)[0][0] = matrix[3];   (*out)[0][1] = matrix[6];   (*out)[0][2] = matrix[9];   (*out)[0][3] = 0.0f;
+	(*out)[1][0] = matrix[4];   (*out)[1][1] = matrix[7];   (*out)[1][2] = matrix[10];  (*out)[1][3] = 0.0f;
+	(*out)[2][0] = matrix[5];   (*out)[2][1] = matrix[8];   (*out)[2][2] = matrix[11];  (*out)[2][3] = 0.0f;
+	(*out)[3][0] = matrix[0];   (*out)[3][1] = matrix[1];   (*out)[3][2] = matrix[2];   (*out)[3][3] = 1.0f;
 }
 
 static void traverse_list4(running_machine &machine, int lod_num, UINT32 address)
@@ -1411,16 +1411,16 @@ INLINE void process_link(running_machine &machine, UINT32 address, UINT32 link)
 	{
 		switch (link >> 24)
 		{
-			case 0x00:		/* link to another node */
+			case 0x00:      /* link to another node */
 				draw_block(machine, link & 0xffffff);
 				break;
 
 			case 0x01:
-			case 0x03:		/* both of these link to models, is there any difference ? */
+			case 0x03:      /* both of these link to models, is there any difference ? */
 				draw_model(machine, link & 0xffffff);
 				break;
 
-			case 0x04:		/* list of links */
+			case 0x04:      /* list of links */
 				traverse_list(machine, link & 0xffffff);
 				break;
 
@@ -1495,23 +1495,23 @@ static void draw_viewport(running_machine &machine, int pri, UINT32 address)
 		return;
 
 	/* set viewport parameters */
-	state->m_viewport_region_x		= (node[26] & 0xffff) >> 4;			/* 12.4 fixed point */
-	state->m_viewport_region_y		= ((node[26] >> 16) & 0xffff) >> 4;
-	state->m_viewport_region_width	= (node[20] & 0xffff) >> 2;			/* 14.2 fixed point */
-	state->m_viewport_region_height	= ((node[20] >> 16) & 0xffff) >> 2;
+	state->m_viewport_region_x      = (node[26] & 0xffff) >> 4;         /* 12.4 fixed point */
+	state->m_viewport_region_y      = ((node[26] >> 16) & 0xffff) >> 4;
+	state->m_viewport_region_width  = (node[20] & 0xffff) >> 2;         /* 14.2 fixed point */
+	state->m_viewport_region_height = ((node[20] >> 16) & 0xffff) >> 2;
 
 	/* frustum plane angles */
 	//viewport_left         = RADIAN_TO_DEGREE(asin(*(float *)&node[12]));
 	//viewport_right            = RADIAN_TO_DEGREE(asin(*(float *)&node[16]));
-	viewport_top			= RADIAN_TO_DEGREE(asin(*(float *)&node[14]));
-	viewport_bottom			= RADIAN_TO_DEGREE(asin(*(float *)&node[18]));
+	viewport_top            = RADIAN_TO_DEGREE(asin(*(float *)&node[14]));
+	viewport_bottom         = RADIAN_TO_DEGREE(asin(*(float *)&node[18]));
 
 	/* build clipping planes */
-	state->m_clip_plane[0].x = *(float *)&node[13];	state->m_clip_plane[0].y = 0.0f;		state->m_clip_plane[0].z = *(float *)&node[12];	state->m_clip_plane[0].d = 0.0f;
-	state->m_clip_plane[1].x = *(float *)&node[17];	state->m_clip_plane[1].y = 0.0f;		state->m_clip_plane[1].z = *(float *)&node[16];	state->m_clip_plane[1].d = 0.0f;
-	state->m_clip_plane[2].x = 0.0f;		state->m_clip_plane[2].y = *(float *)&node[15];	state->m_clip_plane[2].z = *(float *)&node[14];	state->m_clip_plane[2].d = 0.0f;
-	state->m_clip_plane[3].x = 0.0f;		state->m_clip_plane[3].y = *(float *)&node[19];	state->m_clip_plane[3].z = *(float *)&node[18];	state->m_clip_plane[3].d = 0.0f;
-	state->m_clip_plane[4].x = 0.0f;		state->m_clip_plane[4].y = 0.0f;		state->m_clip_plane[4].z = 1.0f;		state->m_clip_plane[4].d = 1.0f;
+	state->m_clip_plane[0].x = *(float *)&node[13]; state->m_clip_plane[0].y = 0.0f;        state->m_clip_plane[0].z = *(float *)&node[12]; state->m_clip_plane[0].d = 0.0f;
+	state->m_clip_plane[1].x = *(float *)&node[17]; state->m_clip_plane[1].y = 0.0f;        state->m_clip_plane[1].z = *(float *)&node[16]; state->m_clip_plane[1].d = 0.0f;
+	state->m_clip_plane[2].x = 0.0f;        state->m_clip_plane[2].y = *(float *)&node[15]; state->m_clip_plane[2].z = *(float *)&node[14]; state->m_clip_plane[2].d = 0.0f;
+	state->m_clip_plane[3].x = 0.0f;        state->m_clip_plane[3].y = *(float *)&node[19]; state->m_clip_plane[3].z = *(float *)&node[18]; state->m_clip_plane[3].d = 0.0f;
+	state->m_clip_plane[4].x = 0.0f;        state->m_clip_plane[4].y = 0.0f;        state->m_clip_plane[4].z = 1.0f;        state->m_clip_plane[4].d = 1.0f;
 
 	/* compute field of view */
 	//fov_x = viewport_left + viewport_right;
@@ -1548,4 +1548,3 @@ static void real3d_traverse_display_list(running_machine &machine)
 
 	poly_wait(state->m_poly, "real3d_traverse_display_list");
 }
-

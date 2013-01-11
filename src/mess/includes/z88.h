@@ -45,8 +45,8 @@ class z88_state : public driver_device
 public:
 	z88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -81,9 +81,9 @@ public:
 		UINT8 page;
 	} m_bank[4];
 
-	int					  m_bank_type[4];
-	UINT8 *				  m_bios;
-	UINT8 *				  m_ram_base;
+	int                   m_bank_type[4];
+	UINT8 *               m_bios;
+	UINT8 *               m_ram_base;
 	z88cart_slot_device * m_carts[4];
 	virtual void palette_init();
 };

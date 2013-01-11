@@ -677,4 +677,3 @@ static UINT32 (*const tms34010_rfield_functions[64])(tms34010_state *tms, offs_t
 	rfield_s_24, rfield_s_25, rfield_s_26, rfield_s_27, rfield_s_28, rfield_s_29,
 	rfield_s_30, rfield_s_31
 };
-

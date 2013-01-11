@@ -15,13 +15,13 @@
 ***************************************************************************/
 
 /* keep statistics */
-#define KEEP_STATISTICS					0
+#define KEEP_STATISTICS                 0
 
 /* turn this on to log the reasons for any long waits */
-#define LOG_WAITS						0
+#define LOG_WAITS                       0
 
 /* number of profiling ticks before we consider a wait "long" */
-#define LOG_WAIT_THRESHOLD				1000
+#define LOG_WAIT_THRESHOLD              1000
 
 
 
@@ -29,10 +29,10 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SCANLINES_PER_BUCKET			8
-#define CACHE_LINE_SIZE					64			/* this is a general guess */
-#define TOTAL_BUCKETS					(512 / SCANLINES_PER_BUCKET)
-#define UNITS_PER_POLY					(100 / SCANLINES_PER_BUCKET)
+#define SCANLINES_PER_BUCKET            8
+#define CACHE_LINE_SIZE                 64          /* this is a general guess */
+#define TOTAL_BUCKETS                   (512 / SCANLINES_PER_BUCKET)
+#define UNITS_PER_POLY                  (100 / SCANLINES_PER_BUCKET)
 
 
 
@@ -47,50 +47,50 @@ struct polygon_info;
 /* tri_extent describes start/end points for a scanline */
 struct tri_extent
 {
-	INT16		startx;						/* starting X coordinate (inclusive) */
-	INT16		stopx;						/* ending X coordinate (exclusive) */
+	INT16       startx;                     /* starting X coordinate (inclusive) */
+	INT16       stopx;                      /* ending X coordinate (exclusive) */
 };
 
 
 /* single set of polygon per-parameter data */
 struct poly_param
 {
-	float		start;						/* parameter value at starting X,Y */
-	float		dpdx;						/* dp/dx relative to starting X */
-	float		dpdy;						/* dp/dy relative to starting Y */
+	float       start;                      /* parameter value at starting X,Y */
+	float       dpdx;                       /* dp/dx relative to starting X */
+	float       dpdy;                       /* dp/dy relative to starting Y */
 };
 
 
 /* poly edge is used internally for quad rendering */
 struct poly_edge
 {
-	poly_edge *			next;					/* next edge in sequence */
-	int					index;					/* index of this edge */
-	const poly_vertex *	v1;						/* pointer to first vertex */
-	const poly_vertex *	v2;						/* pointer to second vertex */
-	float				dxdy;					/* dx/dy along the edge */
-	float				dpdy[MAX_VERTEX_PARAMS];/* per-parameter dp/dy values */
+	poly_edge *         next;                   /* next edge in sequence */
+	int                 index;                  /* index of this edge */
+	const poly_vertex * v1;                     /* pointer to first vertex */
+	const poly_vertex * v2;                     /* pointer to second vertex */
+	float               dxdy;                   /* dx/dy along the edge */
+	float               dpdy[MAX_VERTEX_PARAMS];/* per-parameter dp/dy values */
 };
 
 
 /* poly section is used internally for quad rendering */
 struct poly_section
 {
-	const poly_edge *	ledge;					/* pointer to left edge */
-	const poly_edge *	redge;					/* pointer to right edge */
-	float				ybottom;				/* bottom of this section */
+	const poly_edge *   ledge;                  /* pointer to left edge */
+	const poly_edge *   redge;                  /* pointer to right edge */
+	float               ybottom;                /* bottom of this section */
 };
 
 
 /* work_unit_shared is a common set of data shared between tris and quads */
 struct work_unit_shared
 {
-	polygon_info *		polygon;				/* pointer to polygon */
-	volatile UINT32		count_next;				/* number of scanlines and index of next item to process */
-	INT16				scanline;				/* starting scanline and count */
-	UINT16				previtem;				/* index of previous item in the same bucket */
+	polygon_info *      polygon;                /* pointer to polygon */
+	volatile UINT32     count_next;             /* number of scanlines and index of next item to process */
+	INT16               scanline;               /* starting scanline and count */
+	UINT16              previtem;               /* index of previous item in the same bucket */
 #ifndef PTR64
-	UINT32				dummy;					/* pad to 16 bytes */
+	UINT32              dummy;                  /* pad to 16 bytes */
 #endif
 };
 
@@ -98,40 +98,40 @@ struct work_unit_shared
 /* tri_work_unit is a triangle-specific work-unit */
 struct tri_work_unit
 {
-	work_unit_shared	shared;					/* shared data */
-	tri_extent			extent[SCANLINES_PER_BUCKET]; /* array of scanline extents */
+	work_unit_shared    shared;                 /* shared data */
+	tri_extent          extent[SCANLINES_PER_BUCKET]; /* array of scanline extents */
 };
 
 
 /* quad_work_unit is a quad-specific work-unit */
 struct quad_work_unit
 {
-	work_unit_shared	shared;					/* shared data */
-	poly_extent			extent[SCANLINES_PER_BUCKET]; /* array of scanline extents */
+	work_unit_shared    shared;                 /* shared data */
+	poly_extent         extent[SCANLINES_PER_BUCKET]; /* array of scanline extents */
 };
 
 
 /* work_unit is a union of the two types */
 union work_unit
 {
-	work_unit_shared	shared;					/* shared data */
-	tri_work_unit		tri;					/* triangle work unit */
-	quad_work_unit		quad;					/* quad work unit */
+	work_unit_shared    shared;                 /* shared data */
+	tri_work_unit       tri;                    /* triangle work unit */
+	quad_work_unit      quad;                   /* quad work unit */
 };
 
 
 /* polygon_info describes a single polygon, which includes the poly_params */
 struct polygon_info
 {
-	poly_manager *		poly;					/* pointer back to the poly manager */
-	void *				dest;					/* pointer to the destination we are rendering to */
-	void *				extra;					/* extra data pointer */
-	UINT8				numparams;				/* number of parameters for this polygon  */
-	UINT8				numverts;				/* number of vertices in this polygon */
-	poly_draw_scanline_func 	callback;				/* callback to handle a scanline's worth of work */
-	INT32				xorigin;				/* X origin for all parameters */
-	INT32				yorigin;				/* Y origin for all parameters */
-	poly_param			param[MAX_VERTEX_PARAMS];/* array of parameter data */
+	poly_manager *      poly;                   /* pointer back to the poly manager */
+	void *              dest;                   /* pointer to the destination we are rendering to */
+	void *              extra;                  /* extra data pointer */
+	UINT8               numparams;              /* number of parameters for this polygon  */
+	UINT8               numverts;               /* number of vertices in this polygon */
+	poly_draw_scanline_func     callback;               /* callback to handle a scanline's worth of work */
+	INT32               xorigin;                /* X origin for all parameters */
+	INT32               yorigin;                /* Y origin for all parameters */
+	poly_param          param[MAX_VERTEX_PARAMS];/* array of parameter data */
 };
 
 
@@ -139,50 +139,50 @@ struct polygon_info
 struct poly_manager
 {
 	/* queue management */
-	osd_work_queue *	queue;					/* work queue */
+	osd_work_queue *    queue;                  /* work queue */
 
 	/* triangle work units */
-	work_unit **		unit;					/* array of work unit pointers */
-	UINT32				unit_next;				/* index of next unit to allocate */
-	UINT32				unit_count;				/* number of work units available */
-	size_t				unit_size;				/* size of each work unit, in bytes */
+	work_unit **        unit;                   /* array of work unit pointers */
+	UINT32              unit_next;              /* index of next unit to allocate */
+	UINT32              unit_count;             /* number of work units available */
+	size_t              unit_size;              /* size of each work unit, in bytes */
 
 	/* quad work units */
-	UINT32				quadunit_next;			/* index of next unit to allocate */
-	UINT32				quadunit_count;			/* number of work units available */
-	size_t				quadunit_size;			/* size of each work unit, in bytes */
+	UINT32              quadunit_next;          /* index of next unit to allocate */
+	UINT32              quadunit_count;         /* number of work units available */
+	size_t              quadunit_size;          /* size of each work unit, in bytes */
 
 	/* poly data */
-	polygon_info **		polygon;				/* array of polygon pointers */
-	UINT32				polygon_next;			/* index of next polygon to allocate */
-	UINT32				polygon_count;			/* number of polygon items available */
-	size_t				polygon_size;			/* size of each polygon, in bytes */
+	polygon_info **     polygon;                /* array of polygon pointers */
+	UINT32              polygon_next;           /* index of next polygon to allocate */
+	UINT32              polygon_count;          /* number of polygon items available */
+	size_t              polygon_size;           /* size of each polygon, in bytes */
 
 	/* extra data */
-	void **				extra;					/* array of extra data pointers */
-	UINT32				extra_next;				/* index of next extra data to allocate */
-	UINT32				extra_count;			/* number of extra data items available */
-	size_t				extra_size;				/* size of each extra data, in bytes */
+	void **             extra;                  /* array of extra data pointers */
+	UINT32              extra_next;             /* index of next extra data to allocate */
+	UINT32              extra_count;            /* number of extra data items available */
+	size_t              extra_size;             /* size of each extra data, in bytes */
 
 	/* misc data */
-	UINT8				flags;					/* flags */
+	UINT8               flags;                  /* flags */
 
 	/* buckets */
-	UINT16				unit_bucket[TOTAL_BUCKETS]; /* buckets for tracking unit usage */
+	UINT16              unit_bucket[TOTAL_BUCKETS]; /* buckets for tracking unit usage */
 
 	/* statistics */
-	UINT32				triangles;				/* number of triangles queued */
-	UINT32				quads;					/* number of quads queued */
-	UINT64				pixels;					/* number of pixels rendered */
+	UINT32              triangles;              /* number of triangles queued */
+	UINT32              quads;                  /* number of quads queued */
+	UINT64              pixels;                 /* number of pixels rendered */
 #if KEEP_STATISTICS
-	UINT32				unit_waits;				/* number of times we waited for a unit */
-	UINT32				unit_max;				/* maximum units used */
-	UINT32				polygon_waits;			/* number of times we waited for a polygon */
-	UINT32				polygon_max;			/* maximum polygons used */
-	UINT32				extra_waits;			/* number of times we waited for an extra data */
-	UINT32				extra_max;				/* maximum extra data used */
-	UINT32				conflicts[WORK_MAX_THREADS]; /* number of conflicts found, per thread */
-	UINT32				resolved[WORK_MAX_THREADS];	/* number of conflicts resolved, per thread */
+	UINT32              unit_waits;             /* number of times we waited for a unit */
+	UINT32              unit_max;               /* maximum units used */
+	UINT32              polygon_waits;          /* number of times we waited for a polygon */
+	UINT32              polygon_max;            /* maximum polygons used */
+	UINT32              extra_waits;            /* number of times we waited for an extra data */
+	UINT32              extra_max;              /* maximum extra data used */
+	UINT32              conflicts[WORK_MAX_THREADS]; /* number of conflicts found, per thread */
+	UINT32              resolved[WORK_MAX_THREADS]; /* number of conflicts resolved, per thread */
 #endif
 };
 

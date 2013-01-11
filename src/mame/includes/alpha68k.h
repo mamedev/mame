@@ -23,24 +23,24 @@ public:
 	/* video-related */
 	tilemap_t     *m_fix_tilemap;
 	int         m_bank_base;
-	int			m_flipscreen;
-	int			m_last_bank;
+	int         m_flipscreen;
+	int         m_last_bank;
 	int         m_buffer_28;
-	int			m_buffer_60;
-	int			m_buffer_68;
+	int         m_buffer_60;
+	int         m_buffer_68;
 
 	/* misc */
 	int         m_invert_controls;
 	int         m_microcontroller_id;
 	int         m_coin_id;
 	unsigned    m_trigstate;
-	unsigned	m_deposits1;
-	unsigned	m_deposits2;
-	unsigned	m_credits;
+	unsigned    m_deposits1;
+	unsigned    m_deposits2;
+	unsigned    m_credits;
 	unsigned    m_coinvalue;
 	unsigned    m_microcontroller_data;
 	int         m_latch;
-	unsigned    m_game_id;	// see below
+	unsigned    m_game_id;  // see below
 
 	/* devices */
 	cpu_device *m_audiocpu;
@@ -110,9 +110,9 @@ public:
 /* game_id - used to deal with a few game specific situations */
 enum
 {
-	ALPHA68K_BTLFIELDB = 1,		// used in alpha_II_trigger_r
-	ALPHA68K_JONGBOU,			// used in kyros_alpha_trigger_r & kyros_draw_sprites
-	ALPHA68K_KYROS			// used in kyros_draw_sprites
+	ALPHA68K_BTLFIELDB = 1,     // used in alpha_II_trigger_r
+	ALPHA68K_JONGBOU,           // used in kyros_alpha_trigger_r & kyros_draw_sprites
+	ALPHA68K_KYROS          // used in kyros_draw_sprites
 };
 
 

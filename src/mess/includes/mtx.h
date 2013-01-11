@@ -13,15 +13,15 @@
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 
-#define Z80_TAG			"z80"
-#define Z80CTC_TAG		"z80ctc"
-#define Z80DART_TAG		"z80dart"
-#define FD1793_TAG		"fd1793" // SDX
-#define FD1791_TAG		"fd1791" // FDX
-#define SN76489A_TAG	"sn76489a"
-#define MC6845_TAG		"mc6845"
-#define SCREEN_TAG		"screen"
-#define CENTRONICS_TAG	"centronics"
+#define Z80_TAG         "z80"
+#define Z80CTC_TAG      "z80ctc"
+#define Z80DART_TAG     "z80dart"
+#define FD1793_TAG      "fd1793" // SDX
+#define FD1791_TAG      "fd1791" // FDX
+#define SN76489A_TAG    "sn76489a"
+#define MC6845_TAG      "mc6845"
+#define SCREEN_TAG      "screen"
+#define CENTRONICS_TAG  "centronics"
 
 class mtx_state : public driver_device
 {

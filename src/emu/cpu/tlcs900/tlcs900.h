@@ -39,10 +39,10 @@ enum
 
 struct tlcs900_interface
 {
-	devcb_write8	to1;
-	devcb_write8	to3;
-	devcb_read8		port_read;
-	devcb_write8	port_write;
+	devcb_write8    to1;
+	devcb_write8    to3;
+	devcb_read8     port_read;
+	devcb_write8    port_write;
 };
 
 

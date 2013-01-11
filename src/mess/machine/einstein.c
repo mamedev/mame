@@ -19,7 +19,7 @@ const device_type EINSTEIN_KEYBOARD_DAISY = &device_creator<einstein_keyboard_da
 
 einstein_keyboard_daisy_device::einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EINSTEIN_KEYBOARD_DAISY, "Einstein keyboard daisy chain", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -82,7 +82,7 @@ const device_type EINSTEIN_ADC_DAISY = &device_creator<einstein_adc_daisy_device
 
 einstein_adc_daisy_device::einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EINSTEIN_ADC_DAISY, "Einstein ADC daisy chain", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -147,7 +147,7 @@ const device_type EINSTEIN_FIRE_DAISY = &device_creator<einstein_fire_daisy_devi
 
 einstein_fire_daisy_device::einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EINSTEIN_FIRE_DAISY, "Einstein fire button daisy chain", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+		device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -170,12 +170,12 @@ void einstein_fire_daisy_device::device_start()
 
 int einstein_fire_daisy_device::z80daisy_irq_state()
 {
-  einstein_state *einstein = device().machine().driver_data<einstein_state>();
+	einstein_state *einstein = device().machine().driver_data<einstein_state>();
 
-  if (einstein->m_interrupt & einstein->m_interrupt_mask & EINSTEIN_FIRE_INT)
-      return Z80_DAISY_INT;
+	if (einstein->m_interrupt & einstein->m_interrupt_mask & EINSTEIN_FIRE_INT)
+		return Z80_DAISY_INT;
 
-  return 0;
+	return 0;
 }
 
 

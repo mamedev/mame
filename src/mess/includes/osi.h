@@ -15,27 +15,27 @@
 #include "sound/discrete.h"
 #include "sound/beep.h"
 
-#define SCREEN_TAG		"screen"
-#define M6502_TAG		"m6502"
-#define DISCRETE_TAG	"discrete"
+#define SCREEN_TAG      "screen"
+#define M6502_TAG       "m6502"
+#define DISCRETE_TAG    "discrete"
 
-#define X1			3932160
-#define UK101_X1	XTAL_8MHz
+#define X1          3932160
+#define UK101_X1    XTAL_8MHz
 
-#define OSI600_VIDEORAM_SIZE	0x400
-#define OSI630_COLORRAM_SIZE	0x400
+#define OSI600_VIDEORAM_SIZE    0x400
+#define OSI630_COLORRAM_SIZE    0x400
 
 class sb2m600_state : public driver_device
 {
 public:
 	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M6502_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_discrete(*this, DISCRETE_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_video_ram(*this, "video_ram"),
-		  m_color_ram(*this, "color_ram")
+			m_maincpu(*this, M6502_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_discrete(*this, DISCRETE_TAG),
+			m_ram(*this, RAM_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_color_ram(*this, "color_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ class c1p_state : public sb2m600_state
 public:
 	c1p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sb2m600_state(mconfig, type, tag),
-		  m_beep(*this, BEEPER_TAG)
+			m_beep(*this, BEEPER_TAG)
 	{ }
 
 	required_device<beep_device> m_beep;
@@ -91,7 +91,7 @@ class c1pmf_state : public c1p_state
 public:
 	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c1p_state(mconfig, type, tag),
-		  m_floppy(*this, FLOPPY_0)
+			m_floppy(*this, FLOPPY_0)
 	{ }
 
 	required_device<legacy_floppy_image_device> m_floppy;

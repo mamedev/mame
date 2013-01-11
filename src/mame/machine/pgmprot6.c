@@ -138,7 +138,7 @@ static WRITE16_HANDLER( olds_w )
 		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",space.device().safe_pc(), state->m_kb_cmd, data);
 		if (state->m_kb_cmd == 0)
 			state->m_kb_reg = data;
-		else if(state->m_kb_cmd == 2)	//a bitswap=
+		else if(state->m_kb_cmd == 2)   //a bitswap=
 		{
 			int reg = 0;
 			if (data & 0x01)
@@ -162,7 +162,7 @@ static WRITE16_HANDLER( olds_w )
 				case 0x64:
 					{
 						UINT16 cmd0 = state->m_sharedprotram[0x3082 / 2];
-						UINT16 val0 = state->m_sharedprotram[0x3050 / 2];	//CMD_FORMAT
+						UINT16 val0 = state->m_sharedprotram[0x3050 / 2];   //CMD_FORMAT
 						{
 							if ((cmd0 & 0xff) == 0x2)
 								olds_write_reg(space.machine(), val0, olds_read_reg(space.machine(), val0) + 0x10000);
@@ -178,16 +178,16 @@ static WRITE16_HANDLER( olds_w )
 		else if (state->m_kb_cmd == 4)
 			state->m_kb_ptr = data;
 		else if(state->m_kb_cmd == 0x20)
-		  state->m_kb_ptr++;
+			state->m_kb_ptr++;
 	}
 }
 
 static READ16_HANDLER( olds_prot_swap_r )
 {
 	pgm_state *state = space.machine().driver_data<pgm_state>();
-	if (space.device().safe_pc() < 0x100000)		//bios
+	if (space.device().safe_pc() < 0x100000)        //bios
 		return state->m_mainram[0x178f4 / 2];
-	else						//game
+	else                        //game
 		return state->m_mainram[0x178d8 / 2];
 
 }
@@ -232,11 +232,11 @@ MACHINE_CONFIG_END
 INPUT_PORTS_START( olds )
 	PORT_INCLUDE ( pgm )
 
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
+	PORT_MODIFY("Region")   /* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
 	/* includes the following regions:
-    1 = taiwan, 2 = china, 3 = japan (title = orlegend special),
-    4 = korea, 5 = hong kong, 6 = world */
+	1 = taiwan, 2 = china, 3 = japan (title = orlegend special),
+	4 = korea, 5 = hong kong, 6 = world */
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Japan ) )

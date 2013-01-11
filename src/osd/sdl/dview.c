@@ -25,8 +25,8 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	if(dv->hs && dv->vs) {
 		gdk_gc_set_foreground(dv->gc, &wdv->style->bg[GTK_STATE_NORMAL]);
 		gdk_draw_rectangle(GDK_DRAWABLE(wdv->window), dv->gc, TRUE,
-						   wdv->allocation.width - dv->vsz, wdv->allocation.height - dv->hsz,
-						   dv->vsz, dv->hsz);
+							wdv->allocation.width - dv->vsz, wdv->allocation.height - dv->hsz,
+							dv->vsz, dv->hsz);
 	}
 
 	viewdata = dv->view->viewdata();
@@ -98,11 +98,11 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	}
 
 	gtk_paint_shadow(wdv->style, wdv->window,
-					 GTK_STATE_NORMAL, GTK_SHADOW_IN,
-					 &event->area, wdv, "scrolled_window",
-					 0, 0,
-					 wdv->allocation.width - (dv->vs ? dv->vsz : 0),
-					 wdv->allocation.height - (dv->hs ? dv->hsz : 0));
+						GTK_STATE_NORMAL, GTK_SHADOW_IN,
+						&event->area, wdv, "scrolled_window",
+						0, 0,
+						wdv->allocation.width - (dv->vs ? dv->vsz : 0),
+						wdv->allocation.height - (dv->hs ? dv->hsz : 0));
 
 	GTK_WIDGET_CLASS(g_type_class_peek_parent(dvc))->expose_event(wdv, event);
 
@@ -241,8 +241,8 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 	if(gtk_widget_get_realized(wdv))
 #endif
 		gdk_window_move_resize(wdv->window,
-							   allocation->x, allocation->y,
-							   allocation->width, allocation->height);
+								allocation->x, allocation->y,
+								allocation->width, allocation->height);
 
 	if(dv->hs) {
 		GtkAllocation al;
@@ -347,26 +347,26 @@ static void dview_forall(GtkContainer *dvc, gboolean include_internals, GtkCallb
 static void dview_class_init(DViewClass *dvc)
 {
 #ifndef SDLMAME_WIN32
-    GConfClient *conf = gconf_client_get_default();
-    char *name = 0;
-    dvc->fixedfont = 0;
+	GConfClient *conf = gconf_client_get_default();
+	char *name = 0;
+	dvc->fixedfont = 0;
 
 	if(conf)
 		name = gconf_client_get_string(conf, "/desktop/gnome/interface/monospace_font_name", 0);
 
-    if(name) {
-        dvc->fixedfont = pango_font_description_from_string(name);
-        g_free(name);
-    }
+	if(name) {
+		dvc->fixedfont = pango_font_description_from_string(name);
+		g_free(name);
+	}
 
-    if(!dvc->fixedfont)
+	if(!dvc->fixedfont)
 #endif
 		dvc->fixedfont = pango_font_description_from_string("Monospace 10");
 
-    if(!dvc->fixedfont) {
+	if(!dvc->fixedfont) {
 		mame_printf_error("Couldn't find a monospace font, aborting\n");
 		abort();
-    }
+	}
 
 	GTK_CONTAINER_CLASS(dvc)->forall = dview_forall;
 	GTK_WIDGET_CLASS(dvc)->expose_event = dview_expose;
@@ -388,7 +388,7 @@ static void dview_init(DView *dv)
 
 		dvc->fixedfont_width = PANGO_PIXELS(pango_font_metrics_get_approximate_char_width(metrics));
 		dvc->fixedfont_height = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics) +
-											 pango_font_metrics_get_descent(metrics));
+												pango_font_metrics_get_descent(metrics));
 	}
 
 	dv->view = 0;

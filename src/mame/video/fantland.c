@@ -65,10 +65,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 {
 	fantland_state *state = machine.driver_data<fantland_state>();
 	UINT8 *spriteram_2 = state->m_spriteram2;
-	UINT8	*indx_ram	=	state->m_spriteram + 0x2000,	// this ram contains indexes into offs_ram
-			*offs_ram	=	state->m_spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
-			*ram		=	state->m_spriteram,			// current sprite pointer in spriteram
-			*ram2		=	indx_ram;			// current sprite pointer in indx_ram
+	UINT8   *indx_ram   =   state->m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
+			*offs_ram   =   state->m_spriteram + 0x2400,    // this ram contains x,y offsets or indexes into spriteram_2
+			*ram        =   state->m_spriteram,         // current sprite pointer in spriteram
+			*ram2       =   indx_ram;           // current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area
 	const rectangle &visarea = machine.primary_screen->visible_area();
@@ -78,22 +78,22 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	{
 		int attr,code,color, x,y,xoffs,yoffs,flipx,flipy, idx;
 
-		attr	=	ram[1];
+		attr    =   ram[1];
 
-		x		=	ram[0];
-		code	=	ram[3] + (ram[2] << 8);
-		y		=	ram[4];
+		x       =   ram[0];
+		code    =   ram[3] + (ram[2] << 8);
+		y       =   ram[4];
 
-		color	=	(attr & 0x03);
-		flipy	=	(attr & 0x10) ? 1 : 0;
-		flipx	=	(attr & 0x20) ? 1 : 0;
+		color   =   (attr & 0x03);
+		flipy   =   (attr & 0x10) ? 1 : 0;
+		flipx   =   (attr & 0x20) ? 1 : 0;
 
-		y		+=	(attr & 0x40) << 2;
-		x		+=	(attr & 0x80) << 1;
+		y       +=  (attr & 0x40) << 2;
+		x       +=  (attr & 0x80) << 1;
 
 		// Index in the table of offsets
 
-		idx		=	ram2[0] * 4;
+		idx     =   ram2[0] * 4;
 
 		// Fetch the offsets
 
@@ -101,39 +101,39 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		{
 			// x,y & code offset is in spriteram_2, this is its index
 
-			idx		=	(((offs_ram[idx + 2] << 8) + offs_ram[idx + 3]) & 0x3fff) * 4;
+			idx     =   (((offs_ram[idx + 2] << 8) + offs_ram[idx + 3]) & 0x3fff) * 4;
 
-			yoffs	=	spriteram_2[idx + 0] + (spriteram_2[idx + 1] << 8);
-			xoffs	=	spriteram_2[idx + 2] + (spriteram_2[idx + 3] << 8);
+			yoffs   =   spriteram_2[idx + 0] + (spriteram_2[idx + 1] << 8);
+			xoffs   =   spriteram_2[idx + 2] + (spriteram_2[idx + 3] << 8);
 
-			code	+=	(yoffs & 0x3e00) >> 9;
-			flipy	^=	(yoffs & 0x4000) ? 1 : 0;
-			flipx	^=	(yoffs & 0x8000) ? 1 : 0;
+			code    +=  (yoffs & 0x3e00) >> 9;
+			flipy   ^=  (yoffs & 0x4000) ? 1 : 0;
+			flipx   ^=  (yoffs & 0x8000) ? 1 : 0;
 		}
 		else
 		{
 			// this is an x,y offset
 
-			yoffs	=	((offs_ram[idx + 3] & 0x01) << 8) + offs_ram[idx + 1];
-			xoffs	=	((offs_ram[idx + 2] & 0x01) << 8) + offs_ram[idx + 0];
+			yoffs   =   ((offs_ram[idx + 3] & 0x01) << 8) + offs_ram[idx + 1];
+			xoffs   =   ((offs_ram[idx + 2] & 0x01) << 8) + offs_ram[idx + 0];
 		}
 
-		yoffs	=	(yoffs & 0xff) - (yoffs & 0x100);
-		xoffs	=	(xoffs & 0x1ff);
+		yoffs   =   (yoffs & 0xff) - (yoffs & 0x100);
+		xoffs   =   (xoffs & 0x1ff);
 
-		if (xoffs >= 0x180)		xoffs -= 0x200;
+		if (xoffs >= 0x180)     xoffs -= 0x200;
 
-		y		+=	yoffs;
-		x		+=	xoffs;
+		y       +=  yoffs;
+		x       +=  xoffs;
 
 		// wheelrun needs y=0xf0 & yoffs=0x50 to be rendered at screen y 0x40
 		if (special && y > 0)
 			y &= 0xff;
 
-		y		=	(y & 0xff) - (y & 0x100);
-		x		=	(x & 0x1ff);
+		y       =   (y & 0xff) - (y & 0x100);
+		x       =   (x & 0x1ff);
 
-		if (x >= 0x180)		x -= 0x200;
+		if (x >= 0x180)     x -= 0x200;
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0], code,color, flipx,flipy, x,y,0);
 	}

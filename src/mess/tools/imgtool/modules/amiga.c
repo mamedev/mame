@@ -244,7 +244,7 @@ static imgtoolerr_t amiga_image_write_sector(imgtool_image* img,
 /* Amiga version of the toupper function */
 static int intl_toupper(int c)
 {
-   return (c>='a' && c<='z') || (c>=224 && c<=254 && c!=247) ? c - ('a'-'A') : c ;
+	return (c>='a' && c<='z') || (c>=224 && c<=254 && c!=247) ? c - ('a'-'A') : c ;
 }
 
 
@@ -282,7 +282,7 @@ static int hash_name(const char *name, int intl)
 /* Returns TRUE if year is a leap year */
 static int is_leap(int year)
 {
-   return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+	return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
 }
 
 
@@ -297,27 +297,27 @@ static time_t amiga_crack_time(amiga_date *date)
 	/* initialize struct */
 	memset(&t, 0, sizeof(t));
 
-    /* first calculate the year */
-    while (day >= year_days)
-    {
-        day -= year_days;
-        year_days = is_leap(++year) ? 366 : 365;
-    }
+	/* first calculate the year */
+	while (day >= year_days)
+	{
+		day -= year_days;
+		year_days = is_leap(++year) ? 366 : 365;
+	}
 
-    /* then the month */
-    while(day >= month_days[month-1])
-    {
-        day -= month_days[month-1];
-        if (month == 2 && is_leap(year))
-           day -= 1;
-        month++;
-    }
+	/* then the month */
+	while(day >= month_days[month-1])
+	{
+		day -= month_days[month-1];
+		if (month == 2 && is_leap(year))
+			day -= 1;
+		month++;
+	}
 
 	/* fill the struct with our calculated values */
-    t.tm_year = year - 1900;
-    t.tm_mon  = month - 1;
-    t.tm_mday = day + 1;
-    t.tm_hour = date->mins / 60;
+	t.tm_year = year - 1900;
+	t.tm_mon  = month - 1;
+	t.tm_mday = day + 1;
+	t.tm_hour = date->mins / 60;
 	t.tm_min  = date->mins % 60;
 	t.tm_sec  = date->ticks / 50;
 
@@ -814,8 +814,8 @@ static int is_ffs(imgtool_image *img)
 	disk_type t = get_disk_type(img);
 
 	return ((t == DT_FFS ||
-			 t == DT_FFS_INTL ||
-			 t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
+				t == DT_FFS_INTL ||
+				t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
 }
 
 
@@ -825,9 +825,9 @@ static int is_intl(imgtool_image *img)
 	disk_type t = get_disk_type(img);
 
 	return ((t == DT_OFS_INTL ||
-			 t == DT_FFS_INTL ||
-			 t == DT_OFS_INTL_DIRC ||
-			 t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
+				t == DT_FFS_INTL ||
+				t == DT_OFS_INTL_DIRC ||
+				t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -837,7 +837,7 @@ static int is_dirc(imgtool_image *img)
 	disk_type t = get_disk_type(img);
 
 	return ((t == DT_OFS_INTL_DIRC ||
-			 t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
+				t == DT_FFS_INTL_DIRC) ? TRUE : FALSE);
 }
 #endif
 
@@ -1040,7 +1040,7 @@ static imgtoolerr_t walk_hash_chain(imgtool_image *img, const char *path, int st
 	}
 
 	/* if we haven't found the right filename but there are linked entries,
-     * walk up the chain */
+	 * walk up the chain */
 	if ((*cmp)(name, path) != 0 && hash_chain != 0)
 	{
 		*prev_block = start_block;

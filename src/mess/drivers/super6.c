@@ -27,7 +27,7 @@ void super6_state::bankswitch()
 	UINT8 *rom = memregion(Z80_TAG)->base();
 
 	// power on jump
-	if (!BIT(m_bank0, 6)) {	program.install_rom(0x0000, 0x07ff, 0, 0xf800, rom); return; }
+	if (!BIT(m_bank0, 6)) { program.install_rom(0x0000, 0x07ff, 0, 0xf800, rom); return; }
 
 	// first 64KB of memory
 	program.install_ram(0x0000, 0xffff, ram);
@@ -92,18 +92,18 @@ WRITE8_MEMBER( super6_state::s100_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       A16
-        1       A17
-        2       A18
-        3       A19
-        4       A20
-        5       A21
-        6       A22
-        7       A23
+	    0       A16
+	    1       A17
+	    2       A18
+	    3       A19
+	    4       A20
+	    5       A21
+	    6       A22
+	    7       A23
 
-    */
+	*/
 
 	m_s100 = data;
 }
@@ -117,18 +117,18 @@ WRITE8_MEMBER( super6_state::bank0_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       memory bank 0 (0000-3fff)
-        1       memory bank 1 (4000-7fff)
-        2       memory bank 2 (8000-bfff)
-        3       memory bank 3 (c000-ffff)
-        4
-        5       PROM enabled (0=enabled, 1=disabled)
-        6       power on jump reset
-        7       parity check enable
+	    0       memory bank 0 (0000-3fff)
+	    1       memory bank 1 (4000-7fff)
+	    2       memory bank 2 (8000-bfff)
+	    3       memory bank 3 (c000-ffff)
+	    4
+	    5       PROM enabled (0=enabled, 1=disabled)
+	    6       power on jump reset
+	    7       parity check enable
 
-    */
+	*/
 
 	m_bank0 = data;
 
@@ -144,18 +144,18 @@ WRITE8_MEMBER( super6_state::bank1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       memory bank 4
-        1       memory bank 5
-        2       memory bank 6
-        3       memory bank 7
-        4       map select 0
-        5       map select 1
-        6       map select 2
-        7
+	    0       memory bank 4
+	    1       memory bank 5
+	    2       memory bank 6
+	    3       memory bank 7
+	    4       map select 0
+	    5       map select 1
+	    6       map select 2
+	    7
 
-    */
+	*/
 
 	m_bank1 = data;
 
@@ -176,20 +176,20 @@ READ8_MEMBER( super6_state::fdc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7       FDC INTRQ
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7       FDC INTRQ
 
-    */
+	*/
 
-    fatalerror("Z80 WAIT not supported by MAME core\n");
+	fatalerror("Z80 WAIT not supported by MAME core\n");
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
 	return !m_fdc->intrq_r() << 7;
@@ -204,18 +204,18 @@ WRITE8_MEMBER( super6_state::fdc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       disk drive select 0
-        1       disk drive select 1
-        2       head select (0=head 1, 1=head 2)
-        3       disk density (0=single, 1=double)
-        4       size select (0=8", 1=5.25")
-        5
-        6
-        7
+	    0       disk drive select 0
+	    1       disk drive select 1
+	    2       head select (0=head 1, 1=head 2)
+	    3       disk density (0=single, 1=double)
+	    4       size select (0=8", 1=5.25")
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	// disk drive select
 	floppy_image_device *m_floppy = NULL;
@@ -242,18 +242,18 @@ WRITE8_MEMBER( super6_state::baud_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SIO channel A baud bit A
-        1       SIO channel A baud bit B
-        2       SIO channel A baud bit C
-        3       SIO channel A baud bit D
-        4       SIO channel B baud bit A
-        5       SIO channel B baud bit B
-        6       SIO channel B baud bit C
-        7       SIO channel B baud bit D
+	    0       SIO channel A baud bit A
+	    1       SIO channel A baud bit B
+	    2       SIO channel A baud bit C
+	    3       SIO channel A baud bit D
+	    4       SIO channel B baud bit A
+	    5       SIO channel B baud bit B
+	    6       SIO channel B baud bit C
+	    7       SIO channel B baud bit D
 
-    */
+	*/
 
 	m_brg->str_w(space, 0, data & 0x0f);
 	m_brg->stt_w(space, 0, data >> 4);
@@ -595,4 +595,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1983, super6,  0,      0,      super6,  super6, driver_device,  0,      "Advanced Digital Corporation",	"Super Six",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1983, super6,  0,      0,      super6,  super6, driver_device,  0,      "Advanced Digital Corporation",   "Super Six",    GAME_NOT_WORKING | GAME_NO_SOUND_HW )

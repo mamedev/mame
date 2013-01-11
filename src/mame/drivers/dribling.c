@@ -180,22 +180,22 @@ WRITE8_MEMBER(dribling_state::iowrite)
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_DRIVER_MEMBER(dribling_state,dsr_r),				/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_DRIVER_MEMBER(dribling_state,input_mux0_r),		/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(dribling_state,misc_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(dribling_state,dsr_r),              /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_DRIVER_MEMBER(dribling_state,input_mux0_r),       /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(dribling_state,misc_w)              /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(dribling_state,sound_w),				/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(dribling_state,pb_w),				/* Port B write */
-	DEVCB_INPUT_PORT("IN0"),			/* Port C read */
-	DEVCB_DRIVER_MEMBER(dribling_state,shr_w)				/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(dribling_state,sound_w),                /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(dribling_state,pb_w),               /* Port B write */
+	DEVCB_INPUT_PORT("IN0"),            /* Port C read */
+	DEVCB_DRIVER_MEMBER(dribling_state,shr_w)               /* Port C write */
 };
 
 

@@ -54,10 +54,10 @@
 // standard state indexes
 enum
 {
-	STATE_GENPC = -1,				// generic program counter (live)
-	STATE_GENPCBASE = -2,			// generic program counter (base of current instruction)
-	STATE_GENSP = -3,				// generic stack pointer
-	STATE_GENFLAGS = -4				// generic flags
+	STATE_GENPC = -1,               // generic program counter (live)
+	STATE_GENPCBASE = -2,           // generic program counter (base of current instruction)
+	STATE_GENSP = -3,               // generic stack pointer
+	STATE_GENFLAGS = -4             // generic flags
 };
 
 
@@ -99,11 +99,11 @@ public:
 
 protected:
 	// device state flags
-	static const UINT8 DSF_NOSHOW =			0x01;	// don't display this entry in the registers view
-	static const UINT8 DSF_IMPORT =			0x02;	// call the import function after writing new data
-	static const UINT8 DSF_IMPORT_SEXT =	0x04;	// sign-extend the data when writing new data
-	static const UINT8 DSF_EXPORT =			0x08;	// call the export function prior to fetching the data
-	static const UINT8 DSF_CUSTOM_STRING =	0x10;	// set if the format has a custom string
+	static const UINT8 DSF_NOSHOW =         0x01;   // don't display this entry in the registers view
+	static const UINT8 DSF_IMPORT =         0x02;   // call the import function after writing new data
+	static const UINT8 DSF_IMPORT_SEXT =    0x04;   // sign-extend the data when writing new data
+	static const UINT8 DSF_EXPORT =         0x08;   // call the export function prior to fetching the data
+	static const UINT8 DSF_CUSTOM_STRING =  0x10;   // set if the format has a custom string
 
 	// helpers
 	bool needs_custom_string() const { return ((m_flags & DSF_CUSTOM_STRING) != 0); }
@@ -120,19 +120,19 @@ protected:
 	void set_value(const char *string) const;
 
 	// statics
-	static const UINT64 k_decimal_divisor[20];		// divisors for outputting decimal values
+	static const UINT64 k_decimal_divisor[20];      // divisors for outputting decimal values
 
 	// public state description
-	device_state_entry *	m_next;					// link to next item
-	UINT32					m_index;				// index by which this item is referred
-	generic_ptr				m_dataptr;				// pointer to where the data lives
-	UINT64					m_datamask;				// mask that applies to the data
-	UINT8					m_datasize;				// size of the data
-	UINT8					m_flags;				// flags for this data
-	astring					m_symbol;				// symbol for display; all lower-case version for expressions
-	astring					m_format;				// supported formats
-	bool					m_default_format;		// true if we are still using default format
-	UINT64					m_sizemask;				// mask derived from the data size
+	device_state_entry *    m_next;                 // link to next item
+	UINT32                  m_index;                // index by which this item is referred
+	generic_ptr             m_dataptr;              // pointer to where the data lives
+	UINT64                  m_datamask;             // mask that applies to the data
+	UINT8                   m_datasize;             // size of the data
+	UINT8                   m_flags;                // flags for this data
+	astring                 m_symbol;               // symbol for display; all lower-case version for expressions
+	astring                 m_format;               // supported formats
+	bool                    m_default_format;       // true if we are still using default format
+	UINT64                  m_sizemask;             // mask derived from the data size
 };
 
 
@@ -170,7 +170,7 @@ public:
 	offs_t safe_pc() { return pc(); }
 	offs_t safe_pcbase() { return pcbase(); }
 
-public:	// protected eventually
+public: // protected eventually
 
 	// add a new state item
 	template<class _ItemType> device_state_entry &state_add(int index, const char *symbol, _ItemType &data)
@@ -193,12 +193,12 @@ protected:
 	const device_state_entry *state_find_entry(int index);
 
 	// constants
-	static const int FAST_STATE_MIN = -4;							// range for fast state
-	static const int FAST_STATE_MAX = 256;							// lookups
+	static const int FAST_STATE_MIN = -4;                           // range for fast state
+	static const int FAST_STATE_MAX = 256;                          // lookups
 
 	// state
-	simple_list<device_state_entry>			m_state_list;			// head of state list
-	device_state_entry *					m_fast_state[FAST_STATE_MAX + 1 - FAST_STATE_MIN];
+	simple_list<device_state_entry>         m_state_list;           // head of state list
+	device_state_entry *                    m_fast_state[FAST_STATE_MAX + 1 - FAST_STATE_MIN];
 																	// fast access to common entries
 };
 
@@ -233,4 +233,4 @@ inline offs_t device_t::safe_pcbase()
 }
 
 
-#endif	/* __DISTATE_H__ */
+#endif  /* __DISTATE_H__ */

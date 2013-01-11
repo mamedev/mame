@@ -33,7 +33,7 @@ class tonton_state : public driver_device
 public:
 	tonton_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_v9938(*this, "v9938") { }
+			m_v9938(*this, "v9938") { }
 
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
@@ -44,21 +44,21 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tonton_interrupt);
 };
 
-#define MAIN_CLOCK		XTAL_21_4772MHz
-#define CPU_CLOCK		MAIN_CLOCK/6
-#define YM2149_CLOCK	MAIN_CLOCK/6/2	// '/SEL' pin tied to GND, so internal divisor x2 is active
+#define MAIN_CLOCK      XTAL_21_4772MHz
+#define CPU_CLOCK       MAIN_CLOCK/6
+#define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
 
-#define HOPPER_PULSE	50			// time between hopper pulses in milliseconds
-#define VDP_MEM			0x30000
+#define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
+#define VDP_MEM         0x30000
 
 
 /* from MSX2 driver, may be not accurate for this HW */
-#define MSX2_XBORDER_PIXELS		16
-#define MSX2_YBORDER_PIXELS		28
-#define MSX2_TOTAL_XRES_PIXELS		256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS		212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
+#define MSX2_XBORDER_PIXELS     16
+#define MSX2_YBORDER_PIXELS     28
+#define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
+#define MSX2_TOTAL_YRES_PIXELS      212 * 2 + (MSX2_YBORDER_PIXELS * 2)
+#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
+#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
 
 /*************************************************
@@ -78,11 +78,11 @@ static void tonton_vdp0_interrupt(device_t *, v99x8_device &device, int i)
 WRITE8_MEMBER(tonton_state::tonton_outport_w)
 {
 	coin_counter_w(machine(), offset, data & 0x01);
-	coin_lockout_global_w(machine(), data & 0x02);	/* Coin Lock */
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x02));	/* Hopper Motor */
+	coin_lockout_global_w(machine(), data & 0x02);  /* Coin Lock */
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x02));    /* Hopper Motor */
 
-//	if(data & 0xfe)
-//		logerror("%02x %02x\n",data,offset);
+//  if(data & 0xfe)
+//      logerror("%02x %02x\n",data,offset);
 	if (data)
 		logerror("tonton_outport_w %02X @ %04X\n", data, space.device().safe_pc());
 }
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x00, 0x00) AM_WRITE(tonton_outport_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x01, 0x01) AM_WRITENOP	// write the same to outport 00h
+	AM_RANGE(0x01, 0x01) AM_WRITENOP    // write the same to outport 00h
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
@@ -134,11 +134,11 @@ static INPUT_PORTS_START( tonton )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Unknown A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// hopper feedback
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x03, "Coinage A (100 Yen)" )	PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x03, "Coinage A (100 Yen)" )   PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
 	PORT_DIPSETTING(    0x06, "1 Coin / 4 Medal" )
 	PORT_DIPSETTING(    0x01, "1 Coin / 5 Medal" )
@@ -147,23 +147,23 @@ static INPUT_PORTS_START( tonton )
 	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
 	PORT_DIPSETTING(    0x04, "1 Coin / 20 Medal" )
 	PORT_DIPSETTING(    0x00, "1 Coin / 50 Medal" )
-	PORT_DIPNAME( 0x18, 0x18, "Coinage B (10 Yen)" )	PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Coinage B (10 Yen)" )    PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(    0x00, "3 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x10, "2 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x18, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x08, "1 Coin / 2 Medal" )
-	PORT_DIPNAME( 0x20, 0x20, "Service Coinage" )		PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Service Coinage" )       PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, "1 Pulse / 1 Medal" )
 	PORT_DIPSETTING(    0x00, "1 Pulse / 2 Medal" )
-	PORT_DIPNAME( 0x40, 0x40, "Coinage A Lock" )		PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Coinage A Lock" )        PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, "Unlocked" )
 	PORT_DIPSETTING(    0x00, "Locked" )
-	PORT_DIPNAME( 0x80, 0x80, "Payout Mode")			PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Payout Mode")            PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x03, "Percentage" )			PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x03, "Percentage" )            PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "50%" )
 	PORT_DIPSETTING(    0x03, "60%" )
 	PORT_DIPSETTING(    0x05, "70%" )
@@ -172,19 +172,19 @@ static INPUT_PORTS_START( tonton )
 	PORT_DIPSETTING(    0x02, "85%" )
 	PORT_DIPSETTING(    0x04, "90%" )
 	PORT_DIPSETTING(    0x00, "95%" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -242,10 +242,10 @@ static const ay8910_interface ay8910_intf =
 */
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,					/* Seems unused */
-	DEVCB_NULL,					/* Seems unused */
-	DEVCB_DRIVER_MEMBER(tonton_state,ay_aout_w),	/* Write all bits twice, and then reset them at boot */
-	DEVCB_DRIVER_MEMBER(tonton_state,ay_bout_w)		/* Write all bits twice, and then reset them at boot */
+	DEVCB_NULL,                 /* Seems unused */
+	DEVCB_NULL,                 /* Seems unused */
+	DEVCB_DRIVER_MEMBER(tonton_state,ay_aout_w),    /* Write all bits twice, and then reset them at boot */
+	DEVCB_DRIVER_MEMBER(tonton_state,ay_bout_w)     /* Write all bits twice, and then reset them at boot */
 };
 
 
@@ -256,7 +256,7 @@ static const ay8910_interface ay8910_intf =
 static MACHINE_CONFIG_START( tonton, tonton_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)	/* Guess. According to other MSX2 based gambling games */
+	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
 	MCFG_CPU_PROGRAM_MAP(tonton_map)
 	MCFG_CPU_IO_MAP(tonton_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tonton_state, tonton_interrupt, "screen", 0, 1)
@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, YM2149_CLOCK)	/* Guess. According to other MSX2 based gambling games */
+	MCFG_SOUND_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END

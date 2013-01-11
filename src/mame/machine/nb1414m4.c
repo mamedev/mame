@@ -107,7 +107,7 @@ static void credit_msg(address_space &space,UINT8 *vram)
 	}
 }
 
-static void	kozure_score_msg(address_space &space,UINT16 dst,UINT8 src_base,UINT8 *vram)
+static void kozure_score_msg(address_space &space,UINT16 dst,UINT8 src_base,UINT8 *vram)
 {
 	int i;
 	UINT8 first_digit;

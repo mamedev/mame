@@ -51,7 +51,7 @@ struct h83xx_state
 	UINT8  h8uflag, h8uiflag;
 	UINT8  incheckirqs;
 
-    bool   has_exr;
+	bool   has_exr;
 
 	device_irq_acknowledge_callback irq_cb;
 	legacy_cpu_device *device;
@@ -76,12 +76,12 @@ struct h83xx_state
 	H8S2XXX_TPU tpu[6];
 	H8S2XXX_SCI sci[3];
 
-    int tpu_max;
+	int tpu_max;
 
-    UINT8 ddrs[H8_MAX_PORTS], drs[H8_MAX_PORTS], pcrs[H8_MAX_PORTS], odrs[H8_MAX_PORTS];
+	UINT8 ddrs[H8_MAX_PORTS], drs[H8_MAX_PORTS], pcrs[H8_MAX_PORTS], odrs[H8_MAX_PORTS];
 
 	int mode_8bit;
-    bool has_h8speriphs;
+	bool has_h8speriphs;
 };
 
 // defined in h8speriph.c
@@ -95,14 +95,14 @@ INLINE h83xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == H83002 ||
-		   device->type() == H83007 ||
-		   device->type() == H83044 ||
-		   device->type() == H83334 ||
-		   device->type() == H8S2241 ||
-		   device->type() == H8S2246 ||
-		   device->type() == H8S2323 ||
-		   device->type() == H8S2394 ||
-           device->type() == H8S2655);
+			device->type() == H83007 ||
+			device->type() == H83044 ||
+			device->type() == H83334 ||
+			device->type() == H8S2241 ||
+			device->type() == H8S2246 ||
+			device->type() == H8S2323 ||
+			device->type() == H8S2394 ||
+			device->type() == H8S2655);
 	return (h83xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 

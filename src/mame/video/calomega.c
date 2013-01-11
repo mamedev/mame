@@ -39,17 +39,17 @@ TILE_GET_INFO_MEMBER(calomega_state::get_bg_tile_info)
 
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
-	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color */
+	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
+	int color = (attr & 0x3c);  /* bits 2-3-4-5 for color */
 
-	if (attr == 0x3a)	/* Is the palette wrong? */
-		color = 0x3b;	/* 0x3b is the best match */
+	if (attr == 0x3a)   /* Is the palette wrong? */
+		color = 0x3b;   /* 0x3b is the best match */
 
-	if (attr == 0x36)	/* Is the palette wrong? */
-		color = 0x3a;	/* 0x3a is the best match */
+	if (attr == 0x36)   /* Is the palette wrong? */
+		color = 0x3a;   /* 0x3a is the best match */
 
-	if (attr == 0x32)	/* Is the palette wrong? */
-		color = 0x39;	/* 0x39 is the best match */
+	if (attr == 0x32)   /* Is the palette wrong? */
+		color = 0x39;   /* 0x39 is the best match */
 
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }

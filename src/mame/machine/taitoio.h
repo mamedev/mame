@@ -153,4 +153,4 @@ DECLARE_READ16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_r );
 DECLARE_WRITE16_DEVICE_HANDLER( tc0640fio_halfword_byteswap_w );
 
 
-#endif	/* __TAITOIO_H__ */
+#endif  /* __TAITOIO_H__ */

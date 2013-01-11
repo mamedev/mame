@@ -186,8 +186,8 @@ struct avi_info
 
 struct metadata_index_info
 {
-	chd_metadata_tag	tag;
-	UINT32				index;
+	chd_metadata_tag    tag;
+	UINT32              index;
 };
 
 
@@ -214,8 +214,8 @@ public:
 	// construction/destruction
 	chd_rawfile_compressor(core_file *file, UINT64 offset = 0, UINT64 maxoffset = ~0)
 		: m_file(file),
-		  m_offset(offset),
-		  m_maxoffset(MIN(maxoffset, (file != NULL) ? core_fsize(file) : 0)) { }
+			m_offset(offset),
+			m_maxoffset(MIN(maxoffset, (file != NULL) ? core_fsize(file) : 0)) { }
 
 	// read interface
 	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
@@ -231,9 +231,9 @@ public:
 
 private:
 	// internal state
-	core_file *		m_file;
-	UINT64			m_offset;
-	UINT64			m_maxoffset;
+	core_file *     m_file;
+	UINT64          m_offset;
+	UINT64          m_maxoffset;
 };
 
 
@@ -245,8 +245,8 @@ public:
 	// construction/destruction
 	chd_chdfile_compressor(chd_file &file, UINT64 offset = 0, UINT64 maxoffset = ~0)
 		: m_file(file),
-		  m_offset(offset),
-		  m_maxoffset(MIN(maxoffset, file.logical_bytes())) { }
+			m_offset(offset),
+			m_maxoffset(MIN(maxoffset, file.logical_bytes())) { }
 
 	// read interface
 	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
@@ -264,9 +264,9 @@ public:
 
 private:
 	// internal state
-	chd_file &		m_file;
-	UINT64			m_offset;
-	UINT64			m_maxoffset;
+	chd_file &      m_file;
+	UINT64          m_offset;
+	UINT64          m_maxoffset;
 };
 
 
@@ -278,8 +278,8 @@ public:
 	// construction/destruction
 	chd_cd_compressor(cdrom_toc &toc, chdcd_track_input_info &info)
 		: m_file(NULL),
-		  m_toc(toc),
-		  m_info(info) { }
+			m_toc(toc),
+			m_info(info) { }
 
 	~chd_cd_compressor()
 	{
@@ -322,25 +322,25 @@ public:
 				UINT32 bytesperframe = trackinfo.datasize + trackinfo.subsize;
 				UINT64 src_track_start = m_info.track[tracknum].offset;
 				UINT64 src_track_end = src_track_start + bytesperframe * trackinfo.frames;
-                UINT64 pad_track_start = src_track_end - (m_toc.tracks[tracknum].padframes * bytesperframe);
-                while (length_remaining != 0 && offset < endoffs)
+				UINT64 pad_track_start = src_track_end - (m_toc.tracks[tracknum].padframes * bytesperframe);
+				while (length_remaining != 0 && offset < endoffs)
 				{
 					// determine start of current frame
 					UINT64 src_frame_start = src_track_start + ((offset - startoffs) / CD_FRAME_SIZE) * bytesperframe;
 					if (src_frame_start < src_track_end)
 					{
 						// read it in, or pad if we're into the padframes
-                        if (src_frame_start >= pad_track_start)
-                        {
-                            memset(dest, 0, bytesperframe);
-                        }
-                        else
-                        {
-                            core_fseek(m_file, src_frame_start, SEEK_SET);
-                            UINT32 count = core_fread(m_file, dest, bytesperframe);
-                            if (count != bytesperframe)
-                                report_error(1, "Error reading input file (%s)'", m_lastfile.cstr());
-                        }
+						if (src_frame_start >= pad_track_start)
+						{
+							memset(dest, 0, bytesperframe);
+						}
+						else
+						{
+							core_fseek(m_file, src_frame_start, SEEK_SET);
+							UINT32 count = core_fread(m_file, dest, bytesperframe);
+							if (count != bytesperframe)
+								report_error(1, "Error reading input file (%s)'", m_lastfile.cstr());
+						}
 
 						// swap if appropriate
 						if (m_info.track[tracknum].swap)
@@ -369,10 +369,10 @@ public:
 
 private:
 	// internal state
-	astring						m_lastfile;
-	core_file *					m_file;
-	cdrom_toc &					m_toc;
-	chdcd_track_input_info &	m_info;
+	astring                     m_lastfile;
+	core_file *                 m_file;
+	cdrom_toc &                 m_toc;
+	chdcd_track_input_info &    m_info;
 };
 
 
@@ -384,12 +384,12 @@ public:
 	// construction/destruction
 	chd_avi_compressor(avi_file &file, avi_info &info, UINT32 first_frame, UINT32 num_frames)
 		: m_file(file),
-		  m_info(info),
-		  m_bitmap(info.width, info.height * (info.interlaced ? 2 : 1)),
-		  m_start_frame(first_frame),
-		  m_frame_count(num_frames),
-		  m_ldframedata(num_frames * VBI_PACKED_BYTES),
-		  m_rawdata(info.bytes_per_frame) { }
+			m_info(info),
+			m_bitmap(info.width, info.height * (info.interlaced ? 2 : 1)),
+			m_start_frame(first_frame),
+			m_frame_count(num_frames),
+			m_ldframedata(num_frames * VBI_PACKED_BYTES),
+			m_rawdata(info.bytes_per_frame) { }
 
 	// getters
 	const dynamic_buffer &ldframedata() const { return m_ldframedata; }
@@ -467,14 +467,14 @@ public:
 
 private:
 	// internal state
-	avi_file &					m_file;
-	avi_info &					m_info;
-	bitmap_yuy16				m_bitmap;
-	UINT32						m_start_frame;
-	UINT32						m_frame_count;
-	dynamic_array<INT16>		m_audio[8];
-	dynamic_buffer				m_ldframedata;
-	dynamic_buffer				m_rawdata;
+	avi_file &                  m_file;
+	avi_info &                  m_info;
+	bitmap_yuy16                m_bitmap;
+	UINT32                      m_start_frame;
+	UINT32                      m_frame_count;
+	dynamic_array<INT16>        m_audio[8];
+	dynamic_buffer              m_ldframedata;
+	dynamic_buffer              m_rawdata;
 };
 
 
@@ -497,32 +497,32 @@ static const chd_codec_type s_default_ld_compression[4] = { CHD_CODEC_AVHUFF };
 // descriptions for each option
 static const option_description s_options[] =
 {
-	{ OPTION_INPUT, 				"i",	true, " <filename>: input file name" },
-	{ OPTION_INPUT_PARENT,			"ip",	true, " <filename>: parent file name for input CHD" },
-	{ OPTION_OUTPUT,				"o",	true, " <filename>: output file name" },
-	{ OPTION_OUTPUT_BIN,			"ob",	true, " <filename>: output file name for binary data" },
-	{ OPTION_OUTPUT_FORCE,			"f",	false, ": force overwriting an existing file" },
-	{ OPTION_OUTPUT_PARENT,			"op",	true, " <filename>: parent file name for output CHD" },
-	{ OPTION_INPUT_START_BYTE,		"isb",	true, " <offset>: starting byte offset within the input" },
-	{ OPTION_INPUT_START_HUNK,		"ish",	true, " <offset>: starting hunk offset within the input" },
-	{ OPTION_INPUT_START_FRAME,		"isf",	true, " <offset>: starting frame within the input" },
-	{ OPTION_INPUT_LENGTH_BYTES,	"ib",	true, " <length>: effective length of input in bytes" },
-	{ OPTION_INPUT_LENGTH_HUNKS,	"ih",	true, " <length>: effective length of input in hunks" },
-	{ OPTION_INPUT_LENGTH_FRAMES,	"if",	true, " <length>: effective length of input in frames" },
-	{ OPTION_HUNK_SIZE,				"hs",	true, " <bytes>: size of each hunk, in bytes" },
-	{ OPTION_UNIT_SIZE,				"us",	true, " <bytes>: size of each unit, in bytes" },
-	{ OPTION_COMPRESSION,			"c",	true, " <none|type1[,type2[,...]]>: which compression codecs to use (up to 4)" },
-	{ OPTION_IDENT,					"id",	true, " <filename>: name of ident file to provide CHS information" },
-	{ OPTION_CHS,					"chs",	true, " <cylinders,heads,sectors>: specifies CHS values directly" },
-	{ OPTION_SECTOR_SIZE,			"ss",	true, " <bytes>: size of each hard disk sector" },
-	{ OPTION_TAG,					"t",	true, " <tag>: 4-character tag for metadata" },
-	{ OPTION_INDEX,					"ix",	true, " <index>: indexed instance of this metadata tag" },
-	{ OPTION_VALUE_TEXT,			"vt",	true, " <text>: text for the metadata" },
-	{ OPTION_VALUE_FILE,			"vf",	true, " <file>: file containing data to add" },
-	{ OPTION_NUMPROCESSORS,			"np",	true, " <processors>: limit the number of processors to use during compression" },
-	{ OPTION_NO_CHECKSUM,			"nocs",	false, ": do not include this metadata information in the overall SHA-1" },
-	{ OPTION_FIX,					"f",	false, ": fix the SHA-1 if it is incorrect" },
-	{ OPTION_VERBOSE,				"v",	false, ": output additional information" },
+	{ OPTION_INPUT,                 "i",    true, " <filename>: input file name" },
+	{ OPTION_INPUT_PARENT,          "ip",   true, " <filename>: parent file name for input CHD" },
+	{ OPTION_OUTPUT,                "o",    true, " <filename>: output file name" },
+	{ OPTION_OUTPUT_BIN,            "ob",   true, " <filename>: output file name for binary data" },
+	{ OPTION_OUTPUT_FORCE,          "f",    false, ": force overwriting an existing file" },
+	{ OPTION_OUTPUT_PARENT,         "op",   true, " <filename>: parent file name for output CHD" },
+	{ OPTION_INPUT_START_BYTE,      "isb",  true, " <offset>: starting byte offset within the input" },
+	{ OPTION_INPUT_START_HUNK,      "ish",  true, " <offset>: starting hunk offset within the input" },
+	{ OPTION_INPUT_START_FRAME,     "isf",  true, " <offset>: starting frame within the input" },
+	{ OPTION_INPUT_LENGTH_BYTES,    "ib",   true, " <length>: effective length of input in bytes" },
+	{ OPTION_INPUT_LENGTH_HUNKS,    "ih",   true, " <length>: effective length of input in hunks" },
+	{ OPTION_INPUT_LENGTH_FRAMES,   "if",   true, " <length>: effective length of input in frames" },
+	{ OPTION_HUNK_SIZE,             "hs",   true, " <bytes>: size of each hunk, in bytes" },
+	{ OPTION_UNIT_SIZE,             "us",   true, " <bytes>: size of each unit, in bytes" },
+	{ OPTION_COMPRESSION,           "c",    true, " <none|type1[,type2[,...]]>: which compression codecs to use (up to 4)" },
+	{ OPTION_IDENT,                 "id",   true, " <filename>: name of ident file to provide CHS information" },
+	{ OPTION_CHS,                   "chs",  true, " <cylinders,heads,sectors>: specifies CHS values directly" },
+	{ OPTION_SECTOR_SIZE,           "ss",   true, " <bytes>: size of each hard disk sector" },
+	{ OPTION_TAG,                   "t",    true, " <tag>: 4-character tag for metadata" },
+	{ OPTION_INDEX,                 "ix",   true, " <index>: indexed instance of this metadata tag" },
+	{ OPTION_VALUE_TEXT,            "vt",   true, " <text>: text for the metadata" },
+	{ OPTION_VALUE_FILE,            "vf",   true, " <file>: file containing data to add" },
+	{ OPTION_NUMPROCESSORS,         "np",   true, " <processors>: limit the number of processors to use during compression" },
+	{ OPTION_NO_CHECKSUM,           "nocs", false, ": do not include this metadata information in the overall SHA-1" },
+	{ OPTION_FIX,                   "f",    false, ": fix the SHA-1 if it is incorrect" },
+	{ OPTION_VERBOSE,               "v",    false, ": output additional information" },
 };
 
 
@@ -1172,135 +1172,135 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 {
 	if (mode == MODE_GDI)
 	{
-        int mode = 0, size = 2048;
+		int mode = 0, size = 2048;
 
-        switch (info.trktype)
-        {
-            case CD_TRACK_MODE1:
-                mode = 0;
-                size = 2048;
-                break;
+		switch (info.trktype)
+		{
+			case CD_TRACK_MODE1:
+				mode = 0;
+				size = 2048;
+				break;
 
-            case CD_TRACK_MODE1_RAW:
-                mode = 4;
-                size = 2352;
-                break;
+			case CD_TRACK_MODE1_RAW:
+				mode = 4;
+				size = 2352;
+				break;
 
-            case CD_TRACK_MODE2:
-                mode = 4;
-                size = 2336;
-                break;
+			case CD_TRACK_MODE2:
+				mode = 4;
+				size = 2336;
+				break;
 
-            case CD_TRACK_MODE2_FORM1:
-                mode = 4;
-                size = 2048;
-                break;
+			case CD_TRACK_MODE2_FORM1:
+				mode = 4;
+				size = 2048;
+				break;
 
-            case CD_TRACK_MODE2_FORM2:
-                mode = 4;
-                size = 2324;
-                break;
+			case CD_TRACK_MODE2_FORM2:
+				mode = 4;
+				size = 2324;
+				break;
 
-            case CD_TRACK_MODE2_FORM_MIX:
-                mode = 4;
-                size = 2336;
-                break;
+			case CD_TRACK_MODE2_FORM_MIX:
+				mode = 4;
+				size = 2336;
+				break;
 
-            case CD_TRACK_MODE2_RAW:
-                mode = 4;
-                size = 2352;
-                break;
+			case CD_TRACK_MODE2_RAW:
+				mode = 4;
+				size = 2352;
+				break;
 
-            case CD_TRACK_AUDIO:
-                mode = 0;
-                size = 2352;
-                break;
-        }
+			case CD_TRACK_AUDIO:
+				mode = 0;
+				size = 2352;
+				break;
+		}
 		core_fprintf(file, "%d %d %d %d %s %" I64FMT "d\n", tracknum+1, frameoffs, mode, size, filename, discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
-    {
-        // first track specifies the file
-        if (tracknum == 0)
-            core_fprintf(file, "FILE \"%s\" BINARY\n", filename);
+	{
+		// first track specifies the file
+		if (tracknum == 0)
+			core_fprintf(file, "FILE \"%s\" BINARY\n", filename);
 
-        // determine submode
-        astring tempstr;
-        switch (info.trktype)
-        {
-            case CD_TRACK_MODE1:
-            case CD_TRACK_MODE1_RAW:
-                tempstr.format("MODE1/%04d", info.datasize);
-                break;
+		// determine submode
+		astring tempstr;
+		switch (info.trktype)
+		{
+			case CD_TRACK_MODE1:
+			case CD_TRACK_MODE1_RAW:
+				tempstr.format("MODE1/%04d", info.datasize);
+				break;
 
-            case CD_TRACK_MODE2:
-            case CD_TRACK_MODE2_FORM1:
-            case CD_TRACK_MODE2_FORM2:
-            case CD_TRACK_MODE2_FORM_MIX:
-            case CD_TRACK_MODE2_RAW:
-                tempstr.format("MODE2/%04d", info.datasize);
-                break;
+			case CD_TRACK_MODE2:
+			case CD_TRACK_MODE2_FORM1:
+			case CD_TRACK_MODE2_FORM2:
+			case CD_TRACK_MODE2_FORM_MIX:
+			case CD_TRACK_MODE2_RAW:
+				tempstr.format("MODE2/%04d", info.datasize);
+				break;
 
-            case CD_TRACK_AUDIO:
-                tempstr.cpy("AUDIO");
-                break;
-        }
+			case CD_TRACK_AUDIO:
+				tempstr.cpy("AUDIO");
+				break;
+		}
 
-        // output TRACK entry
-        core_fprintf(file, "  TRACK %02d %s\n", tracknum + 1, tempstr.cstr());
+		// output TRACK entry
+		core_fprintf(file, "  TRACK %02d %s\n", tracknum + 1, tempstr.cstr());
 
-        // output PREGAP
-        if (info.pregap > 0)
-            core_fprintf(file, "    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
+		// output PREGAP
+		if (info.pregap > 0)
+			core_fprintf(file, "    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
 
-        // output track data
-        core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+		// output track data
+		core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
 
-        // output POSTGAP
-        if (info.postgap > 0)
-            core_fprintf(file, "    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
-    }
-    // non-CUE mode
-    else if (mode == MODE_NORMAL)
-    {
-        // header on the first track
-        if (tracknum == 0)
-            core_fprintf(file, "CD_ROM\n\n\n");
-        core_fprintf(file, "// Track %d\n", tracknum + 1);
+		// output POSTGAP
+		if (info.postgap > 0)
+			core_fprintf(file, "    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
+	}
+	// non-CUE mode
+	else if (mode == MODE_NORMAL)
+	{
+		// header on the first track
+		if (tracknum == 0)
+			core_fprintf(file, "CD_ROM\n\n\n");
+		core_fprintf(file, "// Track %d\n", tracknum + 1);
 
-        // write out the track type
-        astring modesubmode;
-        if (info.subtype != CD_SUB_NONE)
-            modesubmode.format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
-        else
-            modesubmode.format("%s", cdrom_get_type_string(info.trktype));
-        core_fprintf(file, "TRACK %s\n", modesubmode.cstr());
+		// write out the track type
+		astring modesubmode;
+		if (info.subtype != CD_SUB_NONE)
+			modesubmode.format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
+		else
+			modesubmode.format("%s", cdrom_get_type_string(info.trktype));
+		core_fprintf(file, "TRACK %s\n", modesubmode.cstr());
 
-        // write out the attributes
-        core_fprintf(file, "NO COPY\n");
-        if (info.trktype == CD_TRACK_AUDIO)
-        {
-            core_fprintf(file, "NO PRE_EMPHASIS\n");
-            core_fprintf(file, "TWO_CHANNEL_AUDIO\n");
-        }
+		// write out the attributes
+		core_fprintf(file, "NO COPY\n");
+		if (info.trktype == CD_TRACK_AUDIO)
+		{
+			core_fprintf(file, "NO PRE_EMPHASIS\n");
+			core_fprintf(file, "TWO_CHANNEL_AUDIO\n");
+		}
 
-        // output pregap
-        astring tempstr;
-        if (info.pregap > 0)
-            core_fprintf(file, "ZERO %s %s\n", modesubmode.cstr(), msf_string_from_frames(tempstr, info.pregap));
+		// output pregap
+		astring tempstr;
+		if (info.pregap > 0)
+			core_fprintf(file, "ZERO %s %s\n", modesubmode.cstr(), msf_string_from_frames(tempstr, info.pregap));
 
-        // all tracks but the first one have a file offset
-        if (tracknum > 0)
-            core_fprintf(file, "DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, UINT32(discoffs), msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
-        else
-            core_fprintf(file, "DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+		// all tracks but the first one have a file offset
+		if (tracknum > 0)
+			core_fprintf(file, "DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, UINT32(discoffs), msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+		else
+			core_fprintf(file, "DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
 
-        // tracks with pregaps get a START marker too
-        if (info.pregap > 0)
-            core_fprintf(file, "START %s\n", msf_string_from_frames(tempstr, info.pregap));
+		// tracks with pregaps get a START marker too
+		if (info.pregap > 0)
+			core_fprintf(file, "START %s\n", msf_string_from_frames(tempstr, info.pregap));
 
-        core_fprintf(file, "\n\n");
-    }
+		core_fprintf(file, "\n\n");
+	}
 }
 
 
@@ -1429,10 +1429,10 @@ static void do_info(parameters_t &params)
 				const char *name = "Unknown";
 				switch (comptype)
 				{
-					case CHD_CODEC_NONE:		name = "Uncompressed";					break;
-					case CHD_CODEC_SELF:		name = "Copy from self";				break;
-					case CHD_CODEC_PARENT:		name = "Copy from parent";				break;
-					case CHD_CODEC_MINI:		name = "Legacy 8-byte mini";			break;
+					case CHD_CODEC_NONE:        name = "Uncompressed";                  break;
+					case CHD_CODEC_SELF:        name = "Copy from self";                break;
+					case CHD_CODEC_PARENT:      name = "Copy from parent";              break;
+					case CHD_CODEC_MINI:        name = "Legacy 8-byte mini";            break;
 					default:
 						int index = comptype - 1 - CHD_CODEC_MINI;
 						if (index < 4)
@@ -2055,8 +2055,8 @@ static void do_copy(parameters_t &params)
 		else if (input_chd.read_metadata(AV_METADATA_TAG, 0, metadata) == CHDERR_NONE)
 			memcpy(compression, s_default_ld_compression, sizeof(compression));
 		else if (input_chd.read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-				 input_chd.read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-				 input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE)
+					input_chd.read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
+					input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE)
 			memcpy(compression, s_default_cd_compression, sizeof(compression));
 		else
 			memcpy(compression, s_default_raw_compression, sizeof(compression));
@@ -2252,8 +2252,8 @@ static void do_extract_cd(parameters_t &params)
 	int chop = default_name.rchr(0, '.');
 	if (chop != -1)
 		default_name.substr(0, chop);
-    char basename[128];
-    strncpy(basename, default_name.cstr(), 127);
+	char basename[128];
+	strncpy(basename, default_name.cstr(), 127);
 	default_name.cat(".bin");
 	if (output_bin_file_str == NULL)
 		output_bin_file_str = &default_name;
@@ -2270,29 +2270,29 @@ static void do_extract_cd(parameters_t &params)
 	core_file *output_toc_file = NULL;
 	try
 	{
-        int mode = MODE_NORMAL;
+		int mode = MODE_NORMAL;
 
 		if (output_file_str->find(".cue") != -1)
-        {
-            mode = MODE_CUEBIN;
-        }
-        else if (output_file_str->find(".gdi") != -1)
-        {
-            mode = MODE_GDI;
-        }
+		{
+			mode = MODE_CUEBIN;
+		}
+		else if (output_file_str->find(".gdi") != -1)
+		{
+			mode = MODE_GDI;
+		}
 
-        // process output file
-        file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
-        if (filerr != FILERR_NONE)
-            report_error(1, "Unable to open file (%s)", output_file_str->cstr());
+		// process output file
+		file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
+		if (filerr != FILERR_NONE)
+			report_error(1, "Unable to open file (%s)", output_file_str->cstr());
 
 		// process output BIN file
-        if (mode != MODE_GDI)
-        {
-            filerr = core_fopen(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
-            if (filerr != FILERR_NONE)
-                report_error(1, "Unable to open file (%s)", output_bin_file_str->cstr());
-        }
+		if (mode != MODE_GDI)
+		{
+			filerr = core_fopen(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
+			if (filerr != FILERR_NONE)
+				report_error(1, "Unable to open file (%s)", output_bin_file_str->cstr());
+		}
 
 		// determine total frames
 		UINT64 total_bytes = 0;
@@ -2311,56 +2311,56 @@ static void do_extract_cd(parameters_t &params)
 		dynamic_buffer buffer;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 		{
-            astring trackbin_name(basename);
+			astring trackbin_name(basename);
 
-            if (mode == MODE_GDI)
-            {
-                char temp[8];
-                sprintf(temp, "%02d", tracknum+1);
-                trackbin_name.cat(temp);
-                trackbin_name.cat(".bin");
+			if (mode == MODE_GDI)
+			{
+				char temp[8];
+				sprintf(temp, "%02d", tracknum+1);
+				trackbin_name.cat(temp);
+				trackbin_name.cat(".bin");
 
-                if (output_bin_file)
-                {
-                    core_fclose(output_bin_file);
-                    output_bin_file = NULL;
-                }
+				if (output_bin_file)
+				{
+					core_fclose(output_bin_file);
+					output_bin_file = NULL;
+				}
 
-                filerr = core_fopen(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
-                if (filerr != FILERR_NONE)
-                    report_error(1, "Unable to open file (%s)", trackbin_name.cstr());
+				filerr = core_fopen(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
+				if (filerr != FILERR_NONE)
+					report_error(1, "Unable to open file (%s)", trackbin_name.cstr());
 
-                outputoffs = 0;
-            }
+				outputoffs = 0;
+			}
 
 			// output the metadata about the track to the TOC file
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
 			astring temp;
-            if (mode == MODE_GDI)
-            {
-                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,trackbin_name), discoffs, outputoffs);
-            }
-            else
-            {
-                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,*output_bin_file_str), discoffs, outputoffs);
-            }
+			if (mode == MODE_GDI)
+			{
+				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,trackbin_name), discoffs, outputoffs);
+			}
+			else
+			{
+				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,*output_bin_file_str), discoffs, outputoffs);
+			}
 
-            // If this is bin/cue output and the CHD contains subdata, warn the user and don't include
-            // the subdata size in the buffer calculation.
+			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
+			// the subdata size in the buffer calculation.
 			UINT32 output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
-            if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI)))
-            {
-                printf("Warning: Track %d has subcode data.  bin/cue and gdi formats cannot contain subcode data and it will be omitted.\n", tracknum+1);
-                printf("       : This may affect usage of the output image.  Use bin/toc output to keep all data.\n");
-                output_frame_size = trackinfo.datasize;
-            }
+			if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI)))
+			{
+				printf("Warning: Track %d has subcode data.  bin/cue and gdi formats cannot contain subcode data and it will be omitted.\n", tracknum+1);
+				printf("       : This may affect usage of the output image.  Use bin/toc output to keep all data.\n");
+				output_frame_size = trackinfo.datasize;
+			}
 
 			// resize the buffer for the track
 			buffer.resize((TEMP_BUFFER_SIZE / output_frame_size) * output_frame_size);
 
 			// now read and output the actual data
 			UINT32 bufferoffs = 0;
-            UINT32 actualframes = trackinfo.frames - trackinfo.padframes;
+			UINT32 actualframes = trackinfo.frames - trackinfo.padframes;
 			for (UINT32 frame = 0; frame < actualframes; frame++)
 			{
 				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(outputoffs) / double(total_bytes));
@@ -2382,8 +2382,8 @@ static void do_extract_cd(parameters_t &params)
 				// read the subcode data
 				if (trackinfo.subtype != CD_SUB_NONE && (mode == MODE_NORMAL))
 				{
-                    cdrom_read_subcode(cdrom, cdrom_get_track_start_phys(cdrom, tracknum) + frame, &buffer[bufferoffs], true);
-                    bufferoffs += trackinfo.subsize;
+					cdrom_read_subcode(cdrom, cdrom_get_track_start_phys(cdrom, tracknum) + frame, &buffer[bufferoffs], true);
+					bufferoffs += trackinfo.subsize;
 				}
 
 				// write it out if we need to
@@ -2398,11 +2398,11 @@ static void do_extract_cd(parameters_t &params)
 				}
 			}
 
-            discoffs += trackinfo.padframes;
+			discoffs += trackinfo.padframes;
 		}
 
 		// finish up
-        core_fclose(output_bin_file);
+		core_fclose(output_bin_file);
 		core_fclose(output_toc_file);
 		printf("Extraction complete                                    \n");
 	}

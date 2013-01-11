@@ -56,9 +56,9 @@ static void print_des_reg(void)
 
 static void print_src_des_reg(void)
 {
-    print_src_reg();
+	print_src_reg();
 	strcat(buffer, ",");
-    print_des_reg();
+	print_des_reg();
 }
 
 static void print_word_parm(void)
@@ -258,9 +258,9 @@ static unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
 	OP_WORD(op);
 
 	subop = (op & 0x01e0);
-	rs = (op >> 5) & 0x0f;		    /* Source register */
-	rd =  op & 0x0f;		        /* Destination register */
-	rf = ((op & 0x10) ? 'B' : 'A');	/* Register file */
+	rs = (op >> 5) & 0x0f;          /* Source register */
+	rd =  op & 0x0f;                /* Destination register */
+	rf = ((op & 0x10) ? 'B' : 'A'); /* Register file */
 
 	switch (op & 0xfe00)
 	{
@@ -586,8 +586,8 @@ static unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
 		case 0x0140:
 		case 0x0160:
 			sprintf (buffer, "SETF   %Xh,%X,",
-				     (op & 0x1f) ? op & 0x1f : 0x20,
-					 (op >> 5) & 1);
+						(op & 0x1f) ? op & 0x1f : 0x20,
+						(op >> 5) & 1);
 			print_field();
 			break;
 
@@ -811,56 +811,56 @@ static unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
 
 		case 0x0100:
 			sprintf (buffer, "ADDI   ");
-            print_word_parm();
+			print_word_parm();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
 
 		case 0x0120:
 			sprintf (buffer, "ADDI   ");
-            print_long_parm();
+			print_long_parm();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
 
 		case 0x0140:
 			sprintf (buffer, "CMPI   ");
-            print_word_parm_1s_comp();
+			print_word_parm_1s_comp();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
 
 		case 0x0160:
 			sprintf (buffer, "CMPI   ");
-            print_long_parm_1s_comp();
+			print_long_parm_1s_comp();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
 
 		case 0x0180:
 			sprintf (buffer, "ANDI   ");
-            print_long_parm_1s_comp();
+			print_long_parm_1s_comp();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
 
 		case 0x01a0:
 			sprintf (buffer, "ORI    ");
-            print_long_parm();
+			print_long_parm();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
 
 		case 0x01c0:
 			sprintf (buffer, "XORI   ");
-            print_long_parm();
+			print_long_parm();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
 
 		case 0x01e0:
 			sprintf (buffer, "SUBI   ");
-            print_word_parm_1s_comp();
+			print_word_parm_1s_comp();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
@@ -878,7 +878,7 @@ static unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
 			if (is_34020)
 			{
 				sprintf (buffer, "ADDXYI ");
-	            print_long_parm();
+				print_long_parm();
 				strcat(buffer, ",");
 				print_des_reg();
 			}
@@ -895,7 +895,7 @@ static unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
 
 		case 0x0100:
 			sprintf (buffer, "SUBI   ");
-            print_long_parm_1s_comp();
+			print_long_parm_1s_comp();
 			strcat(buffer, ",");
 			print_des_reg();
 			break;
@@ -1757,4 +1757,3 @@ CPU_DISASSEMBLE( tms34020 )
 	pcbase = pc;
 	return Dasm340x0(buffer, pc, 1);
 }
-

@@ -1,4 +1,4 @@
-#define MAX_STARS			250
+#define MAX_STARS           250
 
 struct star {
 	float x,y;
@@ -11,9 +11,9 @@ class gaplus_state : public driver_device
 public:
 	gaplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_customio_3(*this,"customio_3"),
-		  m_videoram(*this,"videoram"),
-		  m_spriteram(*this,"spriteram") { }
+			m_customio_3(*this,"customio_3"),
+			m_videoram(*this,"videoram"),
+			m_spriteram(*this,"spriteram") { }
 
 	required_shared_ptr<UINT8> m_customio_3;
 	required_shared_ptr<UINT8> m_videoram;

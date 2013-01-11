@@ -23,8 +23,8 @@ public:
 	void reset();
 	INT16 clock(UINT8 nibble);
 
-	INT32	m_signal;
-	INT32	m_step;
+	INT32   m_signal;
+	INT32   m_step;
 
 private:
 	static const INT8 s_index_shift[8];
@@ -47,8 +47,8 @@ public:
 	void reset();
 	INT16 clock(UINT8 nibble);
 
-	INT32	m_signal;
-	INT32	m_step;
+	INT32   m_signal;
+	INT32   m_step;
 
 private:
 	static const INT8 s_index_shift[8];

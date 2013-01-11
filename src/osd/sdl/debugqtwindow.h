@@ -11,40 +11,40 @@
 //============================================================
 class WindowQt : public QMainWindow
 {
-    Q_OBJECT
-    
-public:
-    WindowQt(running_machine* machine, QWidget* parent=NULL);
-    virtual ~WindowQt() {}
+	Q_OBJECT
 
-    // The interface to an all-window refresh
-    void refreshAll() { s_refreshAll = true; }
-    bool wantsRefresh() { return s_refreshAll; }
-    void clearRefreshFlag() { s_refreshAll = false; }
+public:
+	WindowQt(running_machine* machine, QWidget* parent=NULL);
+	virtual ~WindowQt() {}
+
+	// The interface to an all-window refresh
+	void refreshAll() { s_refreshAll = true; }
+	bool wantsRefresh() { return s_refreshAll; }
+	void clearRefreshFlag() { s_refreshAll = false; }
 
 
 protected slots:
-    void debugActOpenMemory();
-    void debugActOpenDasm();
-    void debugActOpenLog();
-    void debugActRun();
-    void debugActRunAndHide();
-    void debugActRunToNextCpu();
-    void debugActRunNextInt();
-    void debugActRunNextVBlank();
-    void debugActStepInto();
-    void debugActStepOver();
-    void debugActStepOut();
-    void debugActSoftReset();
-    void debugActHardReset();
-    void debugActClose();
-    void debugActQuit();
+	void debugActOpenMemory();
+	void debugActOpenDasm();
+	void debugActOpenLog();
+	void debugActRun();
+	void debugActRunAndHide();
+	void debugActRunToNextCpu();
+	void debugActRunNextInt();
+	void debugActRunNextVBlank();
+	void debugActStepInto();
+	void debugActStepOver();
+	void debugActStepOut();
+	void debugActSoftReset();
+	void debugActHardReset();
+	void debugActClose();
+	void debugActQuit();
 
 
 protected:
-    running_machine* m_machine;
+	running_machine* m_machine;
 
-    static bool s_refreshAll;
+	static bool s_refreshAll;
 };
 
 

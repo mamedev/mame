@@ -11,43 +11,43 @@
 #define __TI99DEFS__
 
 // TI-99/4(A)
-#define region_grom 	"cons_grom"
-#define region_grom_cart	"cart_grom"
-#define TMS9901_TAG 	"tms9901"
-#define TIBOARD_TAG 	"ti_board"
-#define DATAMUX_TAG 	"datamux_16_8"
+#define region_grom     "cons_grom"
+#define region_grom_cart    "cart_grom"
+#define TMS9901_TAG     "tms9901"
+#define TIBOARD_TAG     "ti_board"
+#define DATAMUX_TAG     "datamux_16_8"
 #define VIDEO_SYSTEM_TAG "video"
-#define SCREEN_TAG		"screen"
+#define SCREEN_TAG      "screen"
 #define TISOUNDCHIP_TAG "soundchip"
-#define TISOUND_TAG 	"tisound"
-#define GROMPORT_TAG	"gromport"
-#define GROM0_TAG		"console_grom_0"
-#define GROM1_TAG		"console_grom_1"
-#define GROM2_TAG		"console_grom_2"
-#define PERIBOX_TAG		"peb"
-#define MECMOUSE_TAG	"mecmouse"
-#define HANDSET_TAG		"handset"
-#define JOYPORT_TAG		"joyport"
-#define VDP_TAG			"vdp"
+#define TISOUND_TAG     "tisound"
+#define GROMPORT_TAG    "gromport"
+#define GROM0_TAG       "console_grom_0"
+#define GROM1_TAG       "console_grom_1"
+#define GROM2_TAG       "console_grom_2"
+#define PERIBOX_TAG     "peb"
+#define MECMOUSE_TAG    "mecmouse"
+#define HANDSET_TAG     "handset"
+#define JOYPORT_TAG     "joyport"
+#define VDP_TAG         "vdp"
 
 #define GROMFREQ 10700000.0/24
 
 // TI-99/8
-#define SRAM_TAG		"sram8"
-#define DRAM_TAG		"dram8"
-#define MAPPER_TAG		"mapper"
-#define SPEECH_TAG		"speech"
+#define SRAM_TAG        "sram8"
+#define DRAM_TAG        "dram8"
+#define MAPPER_TAG      "mapper"
+#define SPEECH_TAG      "speech"
 
 // Geneve
-#define	GKEYBOARD_TAG	"gkeyboard"
-#define GMAPPER_TAG		"gmapper"
-#define GMOUSE_TAG		"gmouse"
-#define GCLOCK_TAG		"mm58274c"
+#define GKEYBOARD_TAG   "gkeyboard"
+#define GMAPPER_TAG     "gmapper"
+#define GMOUSE_TAG      "gmouse"
+#define GCLOCK_TAG      "mm58274c"
 
-#define READ16Z_MEMBER(name)			void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset,  ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask)
-#define DECLARE_READ16Z_MEMBER(name)	void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask = 0xffff)
-#define READ8Z_MEMBER(name)				void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask)
-#define DECLARE_READ8Z_MEMBER(name)		void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask = 0xff)
+#define READ16Z_MEMBER(name)            void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset,  ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask)
+#define DECLARE_READ16Z_MEMBER(name)    void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask = 0xffff)
+#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask)
+#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask = 0xff)
 
 #define GENMOD 0x01
 

@@ -1,7 +1,7 @@
 /***************************************************************************
 
         TIM-100 Terminal
-		Mihajlo Pupin Institute
+        Mihajlo Pupin Institute
 
         21/12/2012 Skeleton driver.
 
@@ -17,7 +17,7 @@ class tim100_state : public driver_device
 public:
 	tim100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") 
+			m_maincpu(*this, "maincpu")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -26,7 +26,7 @@ public:
 
 static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM // 2764 at U16	
+	AM_RANGE(0x0000, 0x1fff) AM_ROM // 2764 at U16
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // 2KB static ram CDM6116A at U15
 
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("i8276", i8275_device, read, write)
@@ -51,7 +51,7 @@ INPUT_PORTS_END
 static const rgb_t tim100_palette[3] = {
 	MAKE_RGB(0x00, 0x00, 0x00), // black
 	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
-	MAKE_RGB(0xff, 0xff, 0xff)	// highlight
+	MAKE_RGB(0xff, 0xff, 0xff)  // highlight
 };
 
 void tim100_state::machine_reset()
@@ -61,14 +61,14 @@ void tim100_state::machine_reset()
 
 const gfx_layout tim100_charlayout =
 {
-	12, 16,				/* 8x16 characters */
-	256,				/* 128 characters */
-	1,				/* 1 bits per pixel */
-	{0},				/* no bitplanes; 1 bit per pixel */
+	12, 16,             /* 8x16 characters */
+	256,                /* 128 characters */
+	1,              /* 1 bits per pixel */
+	{0},                /* no bitplanes; 1 bit per pixel */
 	{0,1,2,3,4,5,0x8000,0x8001,0x8002,0x8003,0x8004,0x8005},
 	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
-	 8 * 8, 9 * 8, 10 * 8, 11 * 8, 12 * 8, 13 * 8, 14 * 8, 15 * 8},
-	8*16				/* space between characters */
+		8 * 8, 9 * 8, 10 * 8, 11 * 8, 12 * 8, 13 * 8, 14 * 8, 15 * 8},
+	8*16                /* space between characters */
 };
 
 static GFXDECODE_START( tim100 )
@@ -89,7 +89,7 @@ static I8275_DISPLAY_PIXELS(tim100_display_pixels)
 	{
 		pixels = 0;
 	}
-	
+
 	if (lten)
 	{
 		pixels = 0xff;
@@ -111,7 +111,7 @@ static const i8275_interface tim100_i8276_interface = {
 	16, //12
 	0,
 	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST65_LINE),
-	DEVCB_NULL,	
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	tim100_display_pixels
@@ -133,10 +133,10 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 
 	MCFG_GFXDECODE( tim100 )
 
-	MCFG_I8275_ADD	( "i8276", tim100_i8276_interface)
-	
+	MCFG_I8275_ADD  ( "i8276", tim100_i8276_interface)
+
 	MCFG_PALETTE_LENGTH(3)
-	
+
 	MCFG_I8251_ADD("uart_u17", default_i8251_interface)
 	MCFG_I8251_ADD("uart_u18", default_i8251_interface)
 MACHINE_CONFIG_END
@@ -144,7 +144,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( tim100 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "tim 100 v.3.2.0.u16",   0x0000, 0x2000, CRC(4de9c8ad) SHA1(b0914d6e8d618e92a87b4b39c35391541251e8cc))  
+	ROM_LOAD( "tim 100 v.3.2.0.u16",   0x0000, 0x2000, CRC(4de9c8ad) SHA1(b0914d6e8d618e92a87b4b39c35391541251e8cc))
 
 	// The first and 2nd halves of these roms are identical, confirmed ok
 	ROM_REGION( 0x2000, "chargen", ROMREGION_INVERT )

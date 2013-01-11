@@ -167,8 +167,8 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 	m_generic_paletteram_16.allocate(0x10000);
 
 	c355_obj_init(
-		0,		/* gfx bank */
-		0xf,	/* reverse palette mapping */
+		0,      /* gfx bank */
+		0xf,    /* reverse palette mapping */
 		namcos2_shared_state::c355_obj_code2tile_delegate() );
 
 }
@@ -202,8 +202,8 @@ UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitma
 
 	update_palette(machine());
 
-	if( machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )	pivot+=1;
-	if( machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) )	pivot-=1;
+	if( machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )    pivot+=1;
+	if( machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) ) pivot-=1;
 
 	for( pri=0; pri<pivot; pri++ )
 	{
@@ -302,9 +302,9 @@ WRITE32_MEMBER(gal3_state::namcos21_video_enable_w)
 READ32_MEMBER(gal3_state::rso_r)
 {
 	/*store $5555 @$0046, and readback @$0000
-    read @$0144 and store at A6_21e & A4_5c
-    Check @$009a==1 to start DEMO
-    HACK*/
+	read @$0144 and store at A6_21e & A4_5c
+	Check @$009a==1 to start DEMO
+	HACK*/
 	offset *= 2;
 	return (m_rso_shared_ram[offset]<<16)|m_rso_shared_ram[offset+1];
 }
@@ -322,34 +322,34 @@ WRITE32_MEMBER(gal3_state::rso_w)
 
 static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_SHARE("nvmem")	//NVRAM
+	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_SHARE("nvmem")   //NVRAM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE_LEGACY() //
-	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_mst"	)
-	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_mst_r) AM_WRITE(led_mst_w)	//LEDs
-	AM_RANGE(0x48000000, 0x48000003) AM_READNOP	//irq1 v-blank ack
-	AM_RANGE(0x4c000000, 0x4c000003) AM_READNOP	//irq3 ack
-	AM_RANGE(0x60000000, 0x60007fff) AM_RAM AM_SHARE("share1")	//CRAM
-	AM_RANGE(0x60010000, 0x60017fff) AM_RAM AM_SHARE("share1")	//Mirror
-	AM_RANGE(0x80000000, 0x8007ffff) AM_RAM	//512K Local RAM
+	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_mst" )
+	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_mst_r) AM_WRITE(led_mst_w) //LEDs
+	AM_RANGE(0x48000000, 0x48000003) AM_READNOP //irq1 v-blank ack
+	AM_RANGE(0x4c000000, 0x4c000003) AM_READNOP //irq3 ack
+	AM_RANGE(0x60000000, 0x60007fff) AM_RAM AM_SHARE("share1")  //CRAM
+	AM_RANGE(0x60010000, 0x60017fff) AM_RAM AM_SHARE("share1")  //Mirror
+	AM_RANGE(0x80000000, 0x8007ffff) AM_RAM //512K Local RAM
 /// AM_RANGE(0xc0000000, 0xc000000b) AM_WRITENOP    //upload?
-	AM_RANGE(0xc000000c, 0xc000000f) AM_READNOP	//irq2 ack
+	AM_RANGE(0xc000000c, 0xc000000f) AM_READNOP //irq2 ack
 /// AM_RANGE(0xd8000000, 0xd800000f) AM_RAM // protection or 68681?
-	AM_RANGE(0xf2800000, 0xf2800fff) AM_READWRITE(rso_r, rso_w)	//RSO PCB
+	AM_RANGE(0xf2800000, 0xf2800fff) AM_READWRITE(rso_r, rso_w) //RSO PCB
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE_LEGACY() //
-	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_slv"	)
-	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_slv_r) AM_WRITE(led_slv_w)	//LEDs
-	AM_RANGE(0x48000000, 0x48000003) AM_READNOP	//irq1 ack
+	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_slv" )
+	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_slv_r) AM_WRITE(led_slv_w) //LEDs
+	AM_RANGE(0x48000000, 0x48000003) AM_READNOP //irq1 ack
 /// AM_RANGE(0x50000000, 0x50000003) AM_READ_LEGACY() AM_WRITE_LEGACY()
 /// AM_RANGE(0x54000000, 0x54000003) AM_READ_LEGACY() AM_WRITE_LEGACY()
 	AM_RANGE(0x60000000, 0x60007fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x60010000, 0x60017fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x80000000, 0x8007ffff) AM_RAM	//512K Local RAM
+	AM_RANGE(0x80000000, 0x8007ffff) AM_RAM //512K Local RAM
 
-	AM_RANGE(0xf1200000, 0xf120ffff) AM_RAM	//DSP RAM
+	AM_RANGE(0xf1200000, 0xf120ffff) AM_RAM //DSP RAM
 /// AM_RANGE(0xf1400000, 0xf1400003) AM_WRITE_LEGACY(pointram_control_w)
 /// AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE_LEGACY(pointram_data_r,pointram_data_w)
 /// AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */
@@ -360,10 +360,10 @@ static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0xf1760000, 0xf1760003) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 
 	AM_RANGE(0xf2200000, 0xf220ffff) AM_RAM
-	AM_RANGE(0xf2700000, 0xf270ffff) AM_RAM	//AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
-	AM_RANGE(0xf2720000, 0xf2720007) AM_RAM	//AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
-	AM_RANGE(0xf2740000, 0xf275ffff) AM_RAM	//AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf2760000, 0xf2760003) AM_RAM	//AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
+	AM_RANGE(0xf2700000, 0xf270ffff) AM_RAM //AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
+	AM_RANGE(0xf2720000, 0xf2720007) AM_RAM //AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
+	AM_RANGE(0xf2740000, 0xf275ffff) AM_RAM //AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf2760000, 0xf2760003) AM_RAM //AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16, gal3_state )
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16, gal3_state )
 	AM_RANGE(0x2c3800, 0x2c3801) AM_RAM //?
 	AM_RANGE(0x2c4000, 0x2c4001) AM_RAM //?
 
-	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("rso_shared_ram")	//shared RAM
+	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("rso_shared_ram")  //shared RAM
 
 	AM_RANGE(0x400000, 0x400017) AM_RAM //MC68681?
 	AM_RANGE(0x480000, 0x480017) AM_RAM //?
@@ -438,11 +438,11 @@ static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 16, gal3_state )
 	AM_RANGE(0x110000, 0x113fff) AM_RAM
 /// AM_RANGE(0x120000, 0x120003) AM_RAM //2ieme byte
 /// AM_RANGE(0x200000, 0x20017f) AM_RAM //C140
-	AM_RANGE(0x200000, 0x2037ff) AM_DEVREADWRITE8_LEGACY("c140_16a", c140_r, c140_w, 0x00ff)	//C140///////////
+	AM_RANGE(0x200000, 0x2037ff) AM_DEVREADWRITE8_LEGACY("c140_16a", c140_r, c140_w, 0x00ff)    //C140///////////
 /// AM_RANGE(0x201000, 0x20117f) AM_RAM //C140
 /// AM_RANGE(0x202000, 0x20217f) AM_RAM //C140
 /// AM_RANGE(0x203000, 0x20317f) AM_RAM //C140
-	AM_RANGE(0x204000, 0x2047ff) AM_DEVREADWRITE8_LEGACY("c140_16g", c140_r, c140_w, 0x00ff)	//C140
+	AM_RANGE(0x204000, 0x2047ff) AM_DEVREADWRITE8_LEGACY("c140_16g", c140_r, c140_w, 0x00ff)    //C140
 /// AM_RANGE(0x090000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( psn_b1_cpu_map, AS_PROGRAM, 16, gal3_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gal3 )
-	PORT_START("DSW_CPU_mst")	//
+	PORT_START("DSW_CPU_mst")   //
 	PORT_DIPNAME( 0x00010000, 0x00010000, "CPU_mst_DIPSW 1-1")
 	PORT_DIPSETTING(      0x00010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -490,10 +490,10 @@ static INPUT_PORTS_START( gal3 )
 	PORT_DIPNAME( 0x08000000, 0x08000000, "DIPSW 2-4")
 	PORT_DIPSETTING(      0x08000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, "DIPSW 2-5")	//on pour zolgear?
+	PORT_DIPNAME( 0x10000000, 0x10000000, "DIPSW 2-5")  //on pour zolgear?
 	PORT_DIPSETTING(      0x10000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x20000000, "DIPSW 2-6")	//on pour zolgear?
+	PORT_DIPNAME( 0x20000000, 0x20000000, "DIPSW 2-6")  //on pour zolgear?
 	PORT_DIPSETTING(      0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40000000, 0x40000000, "DIPSW 2-7")
@@ -503,7 +503,7 @@ static INPUT_PORTS_START( gal3 )
 	PORT_DIPSETTING(      0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
 
-	PORT_START("DSW_CPU_slv")	//
+	PORT_START("DSW_CPU_slv")   //
 	PORT_DIPNAME( 0x00010000, 0x00010000, "CPU_slv_DIPSW 3-1")
 	PORT_DIPSETTING(      0x00010000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -529,10 +529,10 @@ static INPUT_PORTS_START( gal3 )
 	PORT_DIPSETTING(      0x00800000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x01000000, 0x00000000, "DIPSW 4-1")	//on
+	PORT_DIPNAME( 0x01000000, 0x00000000, "DIPSW 4-1")  //on
 	PORT_DIPSETTING(      0x01000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02000000, 0x00000000, "DIPSW 4-2")	//on
+	PORT_DIPNAME( 0x02000000, 0x00000000, "DIPSW 4-2")  //on
 	PORT_DIPSETTING(      0x02000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04000000, 0x04000000, "DIPSW 4-3")
@@ -558,9 +558,9 @@ INPUT_PORTS_END
 static const gfx_layout tile_layout =
 {
 	16,16,
-	RGN_FRAC(1,4),	/* number of tiles */
-	8,		/* bits per pixel */
-	{		/* plane offsets */
+	RGN_FRAC(1,4),  /* number of tiles */
+	8,      /* bits per pixel */
+	{       /* plane offsets */
 		0,1,2,3,4,5,6,7
 	},
 	{ /* x offsets */
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 
 	MCFG_CPU_ADD("rs_cpu", M68000, 49152000/4)
 	MCFG_CPU_PROGRAM_MAP(rs_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq5_line_hold)	/// programmable via 148 IC
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq5_line_hold)  /// programmable via 148 IC
 
 	MCFG_CPU_ADD("sound_cpu", M68000, 12000000) // ??
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
@@ -638,7 +638,7 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("c140_16g", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface)	//to be verified
+	MCFG_SOUND_CONFIG(C140_interface)   //to be verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -788,15 +788,15 @@ ROM_START( gal3 )
 
 	/********* DSP board x2 *********/
 	ROM_REGION32_BE( 0x400000, "dsp_board1", ROMREGION_ERASE ) /* 24bit signed point data */
-	ROM_LOAD32_BYTE( "glc1-dsp-ptoh.2f", 0x000001, 0x80000, CRC(b4213c83) SHA1(9d036b73149656fdc13eed38946a70f532bff3f1) )	/* most significant */
+	ROM_LOAD32_BYTE( "glc1-dsp-ptoh.2f", 0x000001, 0x80000, CRC(b4213c83) SHA1(9d036b73149656fdc13eed38946a70f532bff3f1) )  /* most significant */
 	ROM_LOAD32_BYTE( "glc1-dsp-ptou.2k", 0x000002, 0x80000, CRC(14877cef) SHA1(5ebdccd6db837ceb9473bd219eb211431944cbf0) )
-	ROM_LOAD32_BYTE( "glc1-dsp-ptol.2n", 0x000003, 0x80000, CRC(b318534a) SHA1(6fcf2ead6dd0d5a6f22438520588ba4e33ca39a8) )	/* least significant */
+	ROM_LOAD32_BYTE( "glc1-dsp-ptol.2n", 0x000003, 0x80000, CRC(b318534a) SHA1(6fcf2ead6dd0d5a6f22438520588ba4e33ca39a8) )  /* least significant */
 	/* and 5x C67 (TMS320C25) */
 
 	ROM_REGION32_BE( 0x400000, "dsp_board2", ROMREGION_ERASE ) /* 24bit signed point data */
-	ROM_LOAD32_BYTE( "glc1-dsp-ptoh.2f", 0x000001, 0x80000, CRC(b4213c83) SHA1(9d036b73149656fdc13eed38946a70f532bff3f1) )	/* most significant */
+	ROM_LOAD32_BYTE( "glc1-dsp-ptoh.2f", 0x000001, 0x80000, CRC(b4213c83) SHA1(9d036b73149656fdc13eed38946a70f532bff3f1) )  /* most significant */
 	ROM_LOAD32_BYTE( "glc1-dsp-ptou.2k", 0x000002, 0x80000, CRC(14877cef) SHA1(5ebdccd6db837ceb9473bd219eb211431944cbf0) )
-	ROM_LOAD32_BYTE( "glc1-dsp-ptol.2n", 0x000003, 0x80000, CRC(b318534a) SHA1(6fcf2ead6dd0d5a6f22438520588ba4e33ca39a8) )	/* least significant */
+	ROM_LOAD32_BYTE( "glc1-dsp-ptol.2n", 0x000003, 0x80000, CRC(b318534a) SHA1(6fcf2ead6dd0d5a6f22438520588ba4e33ca39a8) )  /* least significant */
 	/* and 5x C67 (TMS320C25) */
 
 	/********* OBJ board x2 *********/
@@ -861,5 +861,5 @@ ROM_START( gal3 )
 ROM_END
 
 /*    YEAR, NAME,     PARENT, MACHINE,  INPUT,  INIT, MONITOR,  COMPANY,   FULLNAME,                       FLAGS */
-GAMEL( 199?, gal3,    0,	 gal3,    gal3, driver_device,    0,	ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", GAME_NOT_WORKING | GAME_NO_SOUND, layout_dualhsxs )
+GAMEL( 199?, gal3,    0,     gal3,    gal3, driver_device,    0,    ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", GAME_NOT_WORKING | GAME_NO_SOUND, layout_dualhsxs )
 //GAMEL( 199?, gal3zlgr,    0,        gal3,    gal3, driver_device,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 J2 : Attack of The Zolgear", GAME_NOT_WORKING | GAME_NO_SOUND, layout_dualhsxs )

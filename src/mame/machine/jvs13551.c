@@ -160,4 +160,3 @@ bool sega_837_13551::swoutputs(UINT8 id, UINT8 val)
 	logerror("837-13551: output %d, %d\n", id, val);
 	return true;
 }
-

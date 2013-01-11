@@ -141,9 +141,9 @@ const UINT8 naomi_gdrom_board::DES_ROTATE_TABLE[16] = {
 void naomi_gdrom_board::permutate(UINT32 &a, UINT32 &b, UINT32 m, int shift)
 {
 	UINT32 temp;
-    temp = ((a>>shift) ^ b) & m;
-    a ^= temp<<shift;
-    b ^= temp;
+	temp = ((a>>shift) ^ b) & m;
+	a ^= temp<<shift;
+	b ^= temp;
 }
 
 void naomi_gdrom_board::des_generate_subkeys(const UINT64 key, UINT32 *subkeys)
@@ -182,52 +182,52 @@ void naomi_gdrom_board::des_generate_subkeys(const UINT64 key, UINT32 *subkeys)
 
 		subkeys[round*2] =
 			((l << 4)  & DES_MASK_TABLE[0]) |
-		    ((l << 28) & DES_MASK_TABLE[1]) |
-		    ((l << 14) & DES_MASK_TABLE[2]) |
-		    ((l << 18) & DES_MASK_TABLE[3]) |
-		    ((l << 6)  & DES_MASK_TABLE[4]) |
-		    ((l << 9)  & DES_MASK_TABLE[5]) |
-		    ((l >> 1)  & DES_MASK_TABLE[6]) |
-		    ((l << 10) & DES_MASK_TABLE[7]) |
-		    ((l << 2)  & DES_MASK_TABLE[8]) |
-		    ((l >> 10) & DES_MASK_TABLE[9]) |
-		    ((r >> 13) & DES_MASK_TABLE[10])|
-		    ((r >> 4)  & DES_MASK_TABLE[11])|
-		    ((r << 6)  & DES_MASK_TABLE[12])|
-		    ((r >> 1)  & DES_MASK_TABLE[13])|
-		    ((r >> 14) & DES_MASK_TABLE[14])|
-		    ((r >> 0)  & DES_MASK_TABLE[15])|
-		    ((r >> 5)  & DES_MASK_TABLE[16])|
-		    ((r >> 10) & DES_MASK_TABLE[17])|
-		    ((r >> 3)  & DES_MASK_TABLE[18])|
-		    ((r >> 18) & DES_MASK_TABLE[19])|
-		    ((r >> 26) & DES_MASK_TABLE[20])|
-		    ((r >> 24) & DES_MASK_TABLE[21]);
+			((l << 28) & DES_MASK_TABLE[1]) |
+			((l << 14) & DES_MASK_TABLE[2]) |
+			((l << 18) & DES_MASK_TABLE[3]) |
+			((l << 6)  & DES_MASK_TABLE[4]) |
+			((l << 9)  & DES_MASK_TABLE[5]) |
+			((l >> 1)  & DES_MASK_TABLE[6]) |
+			((l << 10) & DES_MASK_TABLE[7]) |
+			((l << 2)  & DES_MASK_TABLE[8]) |
+			((l >> 10) & DES_MASK_TABLE[9]) |
+			((r >> 13) & DES_MASK_TABLE[10])|
+			((r >> 4)  & DES_MASK_TABLE[11])|
+			((r << 6)  & DES_MASK_TABLE[12])|
+			((r >> 1)  & DES_MASK_TABLE[13])|
+			((r >> 14) & DES_MASK_TABLE[14])|
+			((r >> 0)  & DES_MASK_TABLE[15])|
+			((r >> 5)  & DES_MASK_TABLE[16])|
+			((r >> 10) & DES_MASK_TABLE[17])|
+			((r >> 3)  & DES_MASK_TABLE[18])|
+			((r >> 18) & DES_MASK_TABLE[19])|
+			((r >> 26) & DES_MASK_TABLE[20])|
+			((r >> 24) & DES_MASK_TABLE[21]);
 
 		subkeys[round*2+1] =
-		    ((l << 15) & DES_MASK_TABLE[22])|
-		    ((l << 17) & DES_MASK_TABLE[23])|
-		    ((l << 10) & DES_MASK_TABLE[24])|
-		    ((l << 22) & DES_MASK_TABLE[25])|
-		    ((l >> 2)  & DES_MASK_TABLE[26])|
-		    ((l << 1)  & DES_MASK_TABLE[27])|
-		    ((l << 16) & DES_MASK_TABLE[28])|
-		    ((l << 11) & DES_MASK_TABLE[29])|
-		    ((l << 3)  & DES_MASK_TABLE[30])|
-		    ((l >> 6)  & DES_MASK_TABLE[31])|
-		    ((l << 15) & DES_MASK_TABLE[32])|
-		    ((l >> 4)  & DES_MASK_TABLE[33])|
-		    ((r >> 2)  & DES_MASK_TABLE[34])|
-		    ((r << 8)  & DES_MASK_TABLE[35])|
-		    ((r >> 14) & DES_MASK_TABLE[36])|
-		    ((r >> 9)  & DES_MASK_TABLE[37])|
-		    ((r >> 0)  & DES_MASK_TABLE[38])|
-		    ((r << 7)  & DES_MASK_TABLE[39])|
-		    ((r >> 7)  & DES_MASK_TABLE[40])|
-		    ((r >> 3)  & DES_MASK_TABLE[41])|
-		    ((r << 2)  & DES_MASK_TABLE[42])|
-		    ((r >> 21) & DES_MASK_TABLE[43]);
-    }
+			((l << 15) & DES_MASK_TABLE[22])|
+			((l << 17) & DES_MASK_TABLE[23])|
+			((l << 10) & DES_MASK_TABLE[24])|
+			((l << 22) & DES_MASK_TABLE[25])|
+			((l >> 2)  & DES_MASK_TABLE[26])|
+			((l << 1)  & DES_MASK_TABLE[27])|
+			((l << 16) & DES_MASK_TABLE[28])|
+			((l << 11) & DES_MASK_TABLE[29])|
+			((l << 3)  & DES_MASK_TABLE[30])|
+			((l >> 6)  & DES_MASK_TABLE[31])|
+			((l << 15) & DES_MASK_TABLE[32])|
+			((l >> 4)  & DES_MASK_TABLE[33])|
+			((r >> 2)  & DES_MASK_TABLE[34])|
+			((r << 8)  & DES_MASK_TABLE[35])|
+			((r >> 14) & DES_MASK_TABLE[36])|
+			((r >> 9)  & DES_MASK_TABLE[37])|
+			((r >> 0)  & DES_MASK_TABLE[38])|
+			((r << 7)  & DES_MASK_TABLE[39])|
+			((r >> 7)  & DES_MASK_TABLE[40])|
+			((r >> 3)  & DES_MASK_TABLE[41])|
+			((r << 2)  & DES_MASK_TABLE[42])|
+			((r >> 21) & DES_MASK_TABLE[43]);
+	}
 }
 
 UINT64 naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, UINT64 src, const UINT32 *des_subkeys)
@@ -250,34 +250,34 @@ UINT64 naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, UINT64 src, const UI
 	for(int i = 0; i < 32 ; i+=4) {
 		UINT32 temp;
 
-    	temp = ((r<<1) | (r>>31)) ^ des_subkeys[subkey];
-    	l ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
-    	l ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
-    	l ^= DES_SBOX4[ (temp>>16) & 0x3f ];
-    	l ^= DES_SBOX2[ (temp>>24) & 0x3f ];
+		temp = ((r<<1) | (r>>31)) ^ des_subkeys[subkey];
+		l ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
+		l ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
+		l ^= DES_SBOX4[ (temp>>16) & 0x3f ];
+		l ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
 		temp = ((r>>3) | (r<<29)) ^ des_subkeys[subkey];
-    	l ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
-    	l ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
-    	l ^= DES_SBOX3[ (temp>>16) & 0x3f ];
-    	l ^= DES_SBOX1[ (temp>>24) & 0x3f ];
+		l ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
+		l ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
+		l ^= DES_SBOX3[ (temp>>16) & 0x3f ];
+		l ^= DES_SBOX1[ (temp>>24) & 0x3f ];
 		subkey++;
 		if(decrypt)
 			subkey -= 4;
 
-    	temp = ((l<<1) | (l>>31)) ^ des_subkeys[subkey];
-    	r ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
-    	r ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
-    	r ^= DES_SBOX4[ (temp>>16) & 0x3f ];
-    	r ^= DES_SBOX2[ (temp>>24) & 0x3f ];
+		temp = ((l<<1) | (l>>31)) ^ des_subkeys[subkey];
+		r ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
+		r ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
+		r ^= DES_SBOX4[ (temp>>16) & 0x3f ];
+		r ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
 		temp = ((l>>3) | (l<<29)) ^ des_subkeys[subkey];
-    	r ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
-    	r ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
-    	r ^= DES_SBOX3[ (temp>>16) & 0x3f ];
-    	r ^= DES_SBOX1[ (temp>>24) & 0x3f ];
+		r ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
+		r ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
+		r ^= DES_SBOX3[ (temp>>16) & 0x3f ];
+		r ^= DES_SBOX1[ (temp>>24) & 0x3f ];
 		subkey++;
 		if(decrypt)
 			subkey -= 4;
@@ -297,13 +297,13 @@ UINT64 naomi_gdrom_board::rev64(UINT64 src)
 	UINT64 ret;
 
 	ret = ((src & 0x00000000000000ffULL) << 56)
-	    | ((src & 0x000000000000ff00ULL) << 40)
-	    | ((src & 0x0000000000ff0000ULL) << 24)
-	    | ((src & 0x00000000ff000000ULL) << 8 )
-	    | ((src & 0x000000ff00000000ULL) >> 8 )
-	    | ((src & 0x0000ff0000000000ULL) >> 24)
-	    | ((src & 0x00ff000000000000ULL) >> 40)
-	    | ((src & 0xff00000000000000ULL) >> 56);
+		| ((src & 0x000000000000ff00ULL) << 40)
+		| ((src & 0x0000000000ff0000ULL) << 24)
+		| ((src & 0x00000000ff000000ULL) << 8 )
+		| ((src & 0x000000ff00000000ULL) >> 8 )
+		| ((src & 0x0000ff0000000000ULL) >> 24)
+		| ((src & 0x00ff000000000000ULL) >> 40)
+		| ((src & 0xff00000000000000ULL) >> 56);
 
 	return ret;
 }
@@ -366,13 +366,13 @@ void naomi_gdrom_board::find_file(const char *name, const UINT8 *dir_sector, UIN
 		if(fnlen == FILENAME_LENGTH+1) {
 			// start sector and size of file
 			file_start = ((dir_sector[pos+2] << 0) |
-						  (dir_sector[pos+3] << 8) |
-						  (dir_sector[pos+4] << 16) |
-						  (dir_sector[pos+5] << 24));
+							(dir_sector[pos+3] << 8) |
+							(dir_sector[pos+4] << 16) |
+							(dir_sector[pos+5] << 24));
 			file_size =  ((dir_sector[pos+10] << 0) |
-						  (dir_sector[pos+11] << 8) |
-						  (dir_sector[pos+12] << 16) |
-						  (dir_sector[pos+13] << 24));
+							(dir_sector[pos+11] << 8) |
+							(dir_sector[pos+12] << 16) |
+							(dir_sector[pos+13] << 24));
 
 			logerror("start %08x size %08x\n", file_start, file_size);
 			break;
@@ -417,13 +417,13 @@ void naomi_gdrom_board::device_start()
 			memcpy(name+7, picdata+25, 7);
 
 			key =((UINT64(picdata[0x31]) << 56) |
-				  (UINT64(picdata[0x32]) << 48) |
-				  (UINT64(picdata[0x33]) << 40) |
-				  (UINT64(picdata[0x34]) << 32) |
-				  (UINT64(picdata[0x35]) << 24) |
-				  (UINT64(picdata[0x36]) << 16) |
-				  (UINT64(picdata[0x37]) << 8)  |
-				  (UINT64(picdata[0x29]) << 0));
+					(UINT64(picdata[0x32]) << 48) |
+					(UINT64(picdata[0x33]) << 40) |
+					(UINT64(picdata[0x34]) << 32) |
+					(UINT64(picdata[0x35]) << 24) |
+					(UINT64(picdata[0x36]) << 16) |
+					(UINT64(picdata[0x37]) << 8)  |
+					(UINT64(picdata[0x29]) << 0));
 		}
 
 		logerror("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
@@ -435,15 +435,15 @@ void naomi_gdrom_board::device_start()
 		// dimm board firmware starts straight from this frame
 		cdrom_read_data(gdromfile, 0xb06e - 150, buffer, CD_TRACK_MODE1);
 		UINT32 path_table = ((buffer[0x8c+0] << 0) |
-							 (buffer[0x8c+1] << 8) |
-							 (buffer[0x8c+2] << 16) |
-							 (buffer[0x8c+3] << 24));
+								(buffer[0x8c+1] << 8) |
+								(buffer[0x8c+2] << 16) |
+								(buffer[0x8c+3] << 24));
 		// path table
 		cdrom_read_data(gdromfile, path_table, buffer, CD_TRACK_MODE1);
 		UINT32 dir = ((buffer[0x2+0] << 0) |
-					  (buffer[0x2+1] << 8) |
-					  (buffer[0x2+2] << 16) |
-					  (buffer[0x2+3] << 24));
+						(buffer[0x2+1] << 8) |
+						(buffer[0x2+2] << 16) |
+						(buffer[0x2+3] << 24));
 
 		// directory
 		UINT8 dir_sector[2048];

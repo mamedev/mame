@@ -17,9 +17,9 @@
 /* internal structure containing a word index, shift and mask */
 struct atarimo_mask
 {
-	int					word;				/* word index */
-	int					shift;				/* shift amount */
-	int					mask;				/* final mask */
+	int                 word;               /* word index */
+	int                 shift;              /* shift amount */
+	int                 mask;               /* final mask */
 };
 
 /* internal structure containing the state of the motion objects */
@@ -33,89 +33,89 @@ public:
 
 	running_machine &machine() const { return m_machine; }
 
-	UINT32				gfxchanged;			/* true if the gfx info has changed */
-	int					gfxgranularity[MAX_GFX_ELEMENTS];
+	UINT32              gfxchanged;         /* true if the gfx info has changed */
+	int                 gfxgranularity[MAX_GFX_ELEMENTS];
 
-	bitmap_ind16			*bitmap;			/* temporary bitmap to render to */
+	bitmap_ind16            *bitmap;            /* temporary bitmap to render to */
 
-	int					linked;				/* are the entries linked? */
-	int					split;				/* are entries split or together? */
-	int					reverse;			/* render in reverse order? */
-	int					swapxy;				/* render in swapped X/Y order? */
-	UINT8				nextneighbor;		/* does the neighbor bit affect the next object? */
-	int					slipshift;			/* log2(pixels_per_SLIP) */
-	int					slipoffset;			/* pixel offset for SLIP */
+	int                 linked;             /* are the entries linked? */
+	int                 split;              /* are entries split or together? */
+	int                 reverse;            /* render in reverse order? */
+	int                 swapxy;             /* render in swapped X/Y order? */
+	UINT8               nextneighbor;       /* does the neighbor bit affect the next object? */
+	int                 slipshift;          /* log2(pixels_per_SLIP) */
+	int                 slipoffset;         /* pixel offset for SLIP */
 
-	int					entrycount;			/* number of entries per bank */
-	int					entrybits;			/* number of bits needed to represent entrycount */
-	int					bankcount;			/* number of banks */
+	int                 entrycount;         /* number of entries per bank */
+	int                 entrybits;          /* number of bits needed to represent entrycount */
+	int                 bankcount;          /* number of banks */
 
-	int					tilewidth;			/* width of non-rotated tile */
-	int					tileheight;			/* height of non-rotated tile */
-	int					tilexshift;			/* bits to shift X coordinate when drawing */
-	int					tileyshift;			/* bits to shift Y coordinate when drawing */
-	int					bitmapwidth;		/* width of the full playfield bitmap */
-	int					bitmapheight;		/* height of the full playfield bitmap */
-	int					bitmapxmask;		/* x coordinate mask for the playfield bitmap */
-	int					bitmapymask;		/* y coordinate mask for the playfield bitmap */
+	int                 tilewidth;          /* width of non-rotated tile */
+	int                 tileheight;         /* height of non-rotated tile */
+	int                 tilexshift;         /* bits to shift X coordinate when drawing */
+	int                 tileyshift;         /* bits to shift Y coordinate when drawing */
+	int                 bitmapwidth;        /* width of the full playfield bitmap */
+	int                 bitmapheight;       /* height of the full playfield bitmap */
+	int                 bitmapxmask;        /* x coordinate mask for the playfield bitmap */
+	int                 bitmapymask;        /* y coordinate mask for the playfield bitmap */
 
-	int					spriterammask;		/* combined mask when accessing sprite RAM with raw addresses */
-	int					spriteramsize;		/* total size of sprite RAM, in entries */
-	int					sliprammask;		/* combined mask when accessing SLIP RAM with raw addresses */
-	int					slipramsize;		/* total size of SLIP RAM, in entries */
+	int                 spriterammask;      /* combined mask when accessing sprite RAM with raw addresses */
+	int                 spriteramsize;      /* total size of sprite RAM, in entries */
+	int                 sliprammask;        /* combined mask when accessing SLIP RAM with raw addresses */
+	int                 slipramsize;        /* total size of SLIP RAM, in entries */
 
-	UINT32				palettebase;		/* base palette entry */
-	int					maxcolors;			/* maximum number of colors */
-	int					transpen;			/* transparent pen index */
+	UINT32              palettebase;        /* base palette entry */
+	int                 maxcolors;          /* maximum number of colors */
+	int                 transpen;           /* transparent pen index */
 
-	UINT32				bank;				/* current bank number */
-	UINT32				xscroll;			/* current x scroll offset */
-	UINT32				yscroll;			/* current y scroll offset */
+	UINT32              bank;               /* current bank number */
+	UINT32              xscroll;            /* current x scroll offset */
+	UINT32              yscroll;            /* current y scroll offset */
 
-	int					maxperline;			/* maximum number of entries/line */
+	int                 maxperline;         /* maximum number of entries/line */
 
-	atarimo_mask		linkmask;			/* mask for the link */
-	atarimo_mask		gfxmask;			/* mask for the graphics bank */
-	atarimo_mask		codemask;			/* mask for the code index */
-	atarimo_mask		codehighmask;		/* mask for the upper code index */
-	atarimo_mask		colormask;			/* mask for the color */
-	atarimo_mask		xposmask;			/* mask for the X position */
-	atarimo_mask		yposmask;			/* mask for the Y position */
-	atarimo_mask		widthmask;			/* mask for the width, in tiles*/
-	atarimo_mask		heightmask;			/* mask for the height, in tiles */
-	atarimo_mask		hflipmask;			/* mask for the horizontal flip */
-	atarimo_mask		vflipmask;			/* mask for the vertical flip */
-	atarimo_mask		prioritymask;		/* mask for the priority */
-	atarimo_mask		neighbormask;		/* mask for the neighbor */
-	atarimo_mask		absolutemask;		/* mask for absolute coordinates */
+	atarimo_mask        linkmask;           /* mask for the link */
+	atarimo_mask        gfxmask;            /* mask for the graphics bank */
+	atarimo_mask        codemask;           /* mask for the code index */
+	atarimo_mask        codehighmask;       /* mask for the upper code index */
+	atarimo_mask        colormask;          /* mask for the color */
+	atarimo_mask        xposmask;           /* mask for the X position */
+	atarimo_mask        yposmask;           /* mask for the Y position */
+	atarimo_mask        widthmask;          /* mask for the width, in tiles*/
+	atarimo_mask        heightmask;         /* mask for the height, in tiles */
+	atarimo_mask        hflipmask;          /* mask for the horizontal flip */
+	atarimo_mask        vflipmask;          /* mask for the vertical flip */
+	atarimo_mask        prioritymask;       /* mask for the priority */
+	atarimo_mask        neighbormask;       /* mask for the neighbor */
+	atarimo_mask        absolutemask;       /* mask for absolute coordinates */
 
-	atarimo_mask		specialmask;		/* mask for the special value */
-	int					specialvalue;		/* resulting value to indicate "special" */
-	atarimo_special_func specialcb;			/* callback routine for special entries */
-	int					codehighshift;		/* shift count for the upper code */
+	atarimo_mask        specialmask;        /* mask for the special value */
+	int                 specialvalue;       /* resulting value to indicate "special" */
+	atarimo_special_func specialcb;         /* callback routine for special entries */
+	int                 codehighshift;      /* shift count for the upper code */
 
-	atarimo_entry *		spriteram;			/* pointer to sprite RAM */
-	UINT16 *			sprite_ram;			/* pointer to the sprite RAM */
-	UINT16 *			slip_ram;			/* pointer to the SLIP RAM */
-	UINT16 *			codelookup;			/* lookup table for codes */
-	UINT8 *				colorlookup;		/* lookup table for colors */
-	UINT8 *				gfxlookup;			/* lookup table for graphics */
+	atarimo_entry *     spriteram;          /* pointer to sprite RAM */
+	UINT16 *            sprite_ram;         /* pointer to the sprite RAM */
+	UINT16 *            slip_ram;           /* pointer to the SLIP RAM */
+	UINT16 *            codelookup;         /* lookup table for codes */
+	UINT8 *             colorlookup;        /* lookup table for colors */
+	UINT8 *             gfxlookup;          /* lookup table for graphics */
 
-	atarimo_entry *		activelist[ATARIMO_MAXPERBANK];	/* pointers to active motion objects */
-	atarimo_entry **	activelast;			/* pointer to the last pointer in the active list */
+	atarimo_entry *     activelist[ATARIMO_MAXPERBANK]; /* pointers to active motion objects */
+	atarimo_entry **    activelast;         /* pointer to the last pointer in the active list */
 
-	UINT8 *				dirtygrid;			/* grid of dirty rects for blending */
-	int					dirtywidth;			/* width of dirty grid */
-	int					dirtyheight;		/* height of dirty grid */
+	UINT8 *             dirtygrid;          /* grid of dirty rects for blending */
+	int                 dirtywidth;         /* width of dirty grid */
+	int                 dirtyheight;        /* height of dirty grid */
 
-	rectangle			rectlist[ATARIMO_MAXPERBANK];	/* list of bounding rectangles */
-	int					rectcount;
+	rectangle           rectlist[ATARIMO_MAXPERBANK];   /* list of bounding rectangles */
+	int                 rectcount;
 
-	UINT32				last_xpos;			/* (during processing) the previous X position */
-	UINT32				next_xpos;			/* (during processing) the next X position */
+	UINT32              last_xpos;          /* (during processing) the previous X position */
+	UINT32              next_xpos;          /* (during processing) the next X position */
 
 private:
-	running_machine &	m_machine;			/* pointer back to the machine */
+	running_machine &   m_machine;          /* pointer back to the machine */
 };
 
 
@@ -1155,8 +1155,8 @@ WRITE16_HANDLER( atarimo_1_slipram_w )
 
 void atarimo_mark_high_palette(bitmap_ind16 &bitmap, UINT16 *pf, UINT16 *mo, int x, int y)
 {
-	#define START_MARKER	((4 << ATARIMO_PRIORITY_SHIFT) | 2)
-	#define END_MARKER		((4 << ATARIMO_PRIORITY_SHIFT) | 4)
+	#define START_MARKER    ((4 << ATARIMO_PRIORITY_SHIFT) | 2)
+	#define END_MARKER      ((4 << ATARIMO_PRIORITY_SHIFT) | 4)
 	int offnext = 0;
 
 	for ( ; x < bitmap.width(); x++)
@@ -1167,6 +1167,3 @@ void atarimo_mark_high_palette(bitmap_ind16 &bitmap, UINT16 *pf, UINT16 *mo, int
 		offnext = ((mo[x] & END_MARKER) == END_MARKER);
 	}
 }
-
-
-

@@ -16,25 +16,25 @@
 #include "sound/discrete.h"
 #include "video/uv201.h"
 
-#define F3850_TAG			"cd34"
-#define F3853_TAG			"cd5"
-#define F3870_TAG			"f3870"
-#define UV201_TAG			"uv201"
-#define SCREEN_TAG			"screen"
-#define DISCRETE_TAG		"discrete"
-#define DAC_TAG				"dac"
+#define F3850_TAG           "cd34"
+#define F3853_TAG           "cd5"
+#define F3870_TAG           "f3870"
+#define UV201_TAG           "uv201"
+#define SCREEN_TAG          "screen"
+#define DISCRETE_TAG        "discrete"
+#define DAC_TAG             "dac"
 
 class vidbrain_state : public driver_device
 {
 public:
 	vidbrain_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, F3850_TAG),
-		  m_smi(*this, F3853_TAG),
-		  m_uv(*this, UV201_TAG),
-		  m_discrete(*this, DISCRETE_TAG),
-	      m_dac(*this, DAC_TAG),
-	      m_exp(*this, VIDEOBRAIN_EXPANSION_SLOT_TAG)
+			m_maincpu(*this, F3850_TAG),
+			m_smi(*this, F3853_TAG),
+			m_uv(*this, UV201_TAG),
+			m_discrete(*this, DISCRETE_TAG),
+			m_dac(*this, DAC_TAG),
+			m_exp(*this, VIDEOBRAIN_EXPANSION_SLOT_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

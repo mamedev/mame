@@ -119,8 +119,8 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
  *
  *************************************/
 
-#define MC68681_1_CLOCK		3686400
-#define MC68681_2_CLOCK		3686400
+#define MC68681_1_CLOCK     3686400
+#define MC68681_2_CLOCK     3686400
 
 
 /*************************************
@@ -347,17 +347,17 @@ WRITE16_MEMBER(jpmimpct_state::duart_1_w)
 		}
 		case 0xe:
 		{
-		    //old_val = duart_1.OPR;
-		    duart_1.OPR = duart_1.OPR | data;
-		    duart_1.OP = ~duart_1.OPR;
+			//old_val = duart_1.OPR;
+			duart_1.OPR = duart_1.OPR | data;
+			duart_1.OP = ~duart_1.OPR;
 			/* Output port bit set */
 			break;
 		}
 		case 0xf:
 		{
-		    //old_val = duart_1.OPR;
-		    duart_1.OPR = duart_1.OPR &~data;
-		    duart_1.OP = ~duart_1.OPR;
+			//old_val = duart_1.OPR;
+			duart_1.OPR = duart_1.OPR &~data;
+			duart_1.OP = ~duart_1.OPR;
 			/* Output port bit reset */
 			break;
 		}
@@ -689,29 +689,29 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( common )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DSW 0 (toggle to stop alarm)")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "DSW 1")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "DSW 2")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "DSW 3")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "DSW 4")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "DSW 5")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "DSW 6")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "DSW 7")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME( "Back Door" )
@@ -913,10 +913,10 @@ READ8_MEMBER(jpmimpct_state::hopper_b_r)
 	// B3 = 20p Hopper Opto
 
 	// Always return hoppers full
-   retval=0xed; // 1110 1101
+	retval=0xed; // 1110 1101
 
-   if (!m_hopinhibit)//if inhibited, we don't change these flags
-   {
+	if (!m_hopinhibit)//if inhibited, we don't change these flags
+	{
 		if (m_hopper[0] && m_motor[0]) //&& ((m_hopflag1 & 0x20)==0x20))
 		{//100p
 			retval &= ~0x01;
@@ -925,23 +925,23 @@ READ8_MEMBER(jpmimpct_state::hopper_b_r)
 		{
 			retval &= ~0x08;
 		}
-   }
+	}
 
-   return retval;
+	return retval;
 }
 
 READ8_MEMBER(jpmimpct_state::hopper_c_r)
 {
 
 	int retval;
-   // C0-C2 = Alpha
-   // C3
-   // C4 = 20p Hopper Detect
-   // C5 = Hopper Top-Up
-   // C6 = 100p Hopper Detect
-   // C7 = Payout Verif (Slides)
+	// C0-C2 = Alpha
+	// C3
+	// C4 = 20p Hopper Detect
+	// C5 = Hopper Top-Up
+	// C6 = 100p Hopper Detect
+	// C7 = Payout Verif (Slides)
 
-   retval=0xf0; //1111 0000
+	retval=0xf0; //1111 0000
 
 //    if (StatBtns & 0x20) // Top Up switch
 //    retval &= ~0x20;
@@ -1179,7 +1179,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 			{
 				m_slidesout=1;
 			}
-	      // Meters
+			// Meters
 			metno=(data >>8) & 0xff;
 			{
 				switch (metno)
@@ -1246,29 +1246,29 @@ READ16_MEMBER(jpmimpct_state::ump_r)
 INPUT_PORTS_START( tbirds )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DSW 0 (toggle to stop alarm)")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "DSW 1")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "DSW 2")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "DSW 3")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "DSW 4")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "DSW 5")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "DSW 6")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "DSW 7")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("PERCENT")
 	PORT_CONFNAME( 0x0F, 0x00, "Percentage Key" )
@@ -1788,7 +1788,7 @@ ROM_END
 GAME( 1995, cluedo,   0,       jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2D)",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995, cluedod,  cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1995, cluedo2c, cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2C)",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2)",   	 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2)",        GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1996, trivialp, 0,       jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  GAME_SUPPORTS_SAVE )
 GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",GAME_SUPPORTS_SAVE )
 GAME( 1996, trivialpo,trivialp,jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit",  GAME_SUPPORTS_SAVE )
@@ -1798,7 +1798,7 @@ GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM"
 GAME( 1998, hngmnjpmd,hngmnjpm,jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM", "Hangman (JPM) (Protocol)",    GAME_SUPPORTS_SAVE )
 GAME( 1999, coronatn, 0,       jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game", GAME_SUPPORTS_SAVE )
 GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", GAME_SUPPORTS_SAVE )
-GAME( 199?, tqst,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Treasure Quest"			   , GAME_NOT_WORKING) // incomplete (ACE?)
-GAME( 199?, snlad,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Snake & Ladders"			   , GAME_NOT_WORKING) // incomplete
+GAME( 199?, tqst,     0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "JPM", "Treasure Quest"             , GAME_NOT_WORKING) // incomplete (ACE?)
+GAME( 199?, snlad,    0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "JPM", "Snake & Ladders"            , GAME_NOT_WORKING) // incomplete
 GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Buzzundrum (Ace)", GAME_NOT_WORKING )
-GAME( 199?, monspdr	, 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Money Spider (Ace)", GAME_NOT_WORKING )
+GAME( 199?, monspdr , 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Money Spider (Ace)", GAME_NOT_WORKING )

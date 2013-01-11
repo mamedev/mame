@@ -20,48 +20,48 @@
 #include "sound/sid6581.h"
 #include "video/mos6566.h"
 
-#define M6510_TAG		"u7"
-#define MOS6567_TAG		"u19"
-#define MOS6569_TAG		"u19"
-#define MOS6581_TAG		"u18"
-#define MOS6526_1_TAG	"u1"
-#define MOS6526_2_TAG	"u2"
-#define PLA_TAG			"u17"
-#define SCREEN_TAG		"screen"
-#define CONTROL1_TAG	"joy1"
-#define CONTROL2_TAG	"joy2"
+#define M6510_TAG       "u7"
+#define MOS6567_TAG     "u19"
+#define MOS6569_TAG     "u19"
+#define MOS6581_TAG     "u18"
+#define MOS6526_1_TAG   "u1"
+#define MOS6526_2_TAG   "u2"
+#define PLA_TAG         "u17"
+#define SCREEN_TAG      "screen"
+#define CONTROL1_TAG    "joy1"
+#define CONTROL2_TAG    "joy2"
 
 class c64_state : public driver_device
 {
 public:
 	c64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M6510_TAG),
-		  m_pla(*this, PLA_TAG),
-		  m_vic(*this, MOS6569_TAG),
-		  m_sid(*this, MOS6581_TAG),
-		  m_cia1(*this, MOS6526_1_TAG),
-		  m_cia2(*this, MOS6526_2_TAG),
-		  m_iec(*this, CBM_IEC_TAG),
-		  m_joy1(*this, CONTROL1_TAG),
-		  m_joy2(*this, CONTROL2_TAG),
-		  m_exp(*this, C64_EXPANSION_SLOT_TAG),
-		  m_user(*this, C64_USER_PORT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		  m_loram(1),
-		  m_hiram(1),
-		  m_charen(1),
-		  m_color_ram(*this, "color_ram"),
-		  m_va14(1),
-		  m_va15(1),
-		  m_cia1_irq(CLEAR_LINE),
-		  m_cia2_irq(CLEAR_LINE),
-		  m_vic_irq(CLEAR_LINE),
-		  m_exp_irq(CLEAR_LINE),
-		  m_exp_nmi(CLEAR_LINE),
-		  m_cass_rd(1),
-		  m_iec_srq(1)
+			m_maincpu(*this, M6510_TAG),
+			m_pla(*this, PLA_TAG),
+			m_vic(*this, MOS6569_TAG),
+			m_sid(*this, MOS6581_TAG),
+			m_cia1(*this, MOS6526_1_TAG),
+			m_cia2(*this, MOS6526_2_TAG),
+			m_iec(*this, CBM_IEC_TAG),
+			m_joy1(*this, CONTROL1_TAG),
+			m_joy2(*this, CONTROL2_TAG),
+			m_exp(*this, C64_EXPANSION_SLOT_TAG),
+			m_user(*this, C64_USER_PORT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_loram(1),
+			m_hiram(1),
+			m_charen(1),
+			m_color_ram(*this, "color_ram"),
+			m_va14(1),
+			m_va15(1),
+			m_cia1_irq(CLEAR_LINE),
+			m_cia2_irq(CLEAR_LINE),
+			m_vic_irq(CLEAR_LINE),
+			m_exp_irq(CLEAR_LINE),
+			m_exp_nmi(CLEAR_LINE),
+			m_cass_rd(1),
+			m_iec_srq(1)
 	{ }
 
 	required_device<m6510_device> m_maincpu;

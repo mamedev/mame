@@ -98,7 +98,7 @@ RCFLAGS = -O coff -I $(WINSRC) -I $(WINOBJ)
 
 ifdef CYGWIN_BUILD
 CCOMFLAGS += -mno-cygwin
-LDFLAGS	+= -mno-cygwin
+LDFLAGS += -mno-cygwin
 endif
 
 
@@ -279,8 +279,8 @@ LIBS += -lcomdlg32
 #-------------------------------------------------
 
 OSDCOREOBJS = \
-	$(WINOBJ)/main.o	\
-	$(WINOBJ)/strconv.o	\
+	$(WINOBJ)/main.o    \
+	$(WINOBJ)/strconv.o \
 	$(WINOBJ)/windir.o \
 	$(WINOBJ)/winfile.o \
 	$(WINOBJ)/winmisc.o \
@@ -292,7 +292,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winsocket.o \
 	$(WINOBJ)/winwork.o \
 	$(WINOBJ)/winptty.o \
-    $(WINOBJ)/winmidi.o
+	$(WINOBJ)/winmidi.o
 
 
 #-------------------------------------------------
@@ -328,8 +328,8 @@ OSDOBJS += $(WINOBJ)/d3d8intf.o
 endif
 
 # extra dependencies
-$(WINOBJ)/drawdd.o :	$(SRC)/emu/rendersw.c
-$(WINOBJ)/drawgdi.o :	$(SRC)/emu/rendersw.c
+$(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.c
+$(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.c
 $(WINOBJ)/winmidi.o:    $(SRC)/osd/portmedia/pmmidi.c
 
 # add debug-specific files

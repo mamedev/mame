@@ -13,9 +13,9 @@ class undrfire_state : public driver_device
 public:
 	undrfire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ram(*this, "ram"),
-		  m_shared_ram(*this, "shared_ram"),
-		  m_spriteram(*this, "spriteram") { }
+			m_ram(*this, "ram"),
+			m_shared_ram(*this, "shared_ram"),
+			m_spriteram(*this, "spriteram") { }
 
 	UINT16 m_coin_word;
 	UINT16 m_port_sel;

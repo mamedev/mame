@@ -25,9 +25,9 @@ void wolfpack_state::palette_init()
 		rgb_t color = colortable_palette_get_color(machine().colortable, i);
 
 		colortable_palette_set_color(machine().colortable, 4 + i,
-									 MAKE_RGB(RGB_RED(color)   < 0xb8 ? RGB_RED(color)   + 0x48 : 0xff,
-											  RGB_GREEN(color) < 0xb8 ? RGB_GREEN(color) + 0x48 : 0xff,
-											  RGB_BLUE(color)  < 0xb8 ? RGB_BLUE(color)  + 0x48 : 0xff));
+										MAKE_RGB(RGB_RED(color)   < 0xb8 ? RGB_RED(color)   + 0x48 : 0xff,
+												RGB_GREEN(color) < 0xb8 ? RGB_GREEN(color) + 0x48 : 0xff,
+												RGB_BLUE(color)  < 0xb8 ? RGB_BLUE(color)  + 0x48 : 0xff));
 	}
 
 	colortable_entry_set_value(machine().colortable, 0x00, 0);
@@ -250,8 +250,8 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 
 	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(color,color,color));
 	colortable_palette_set_color(machine().colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
-																		  color < 0xb8 ? color + 0x48 : 0xff,
-																		  color < 0xb8 ? color + 0x48 : 0xff));
+																			color < 0xb8 ? color + 0x48 : 0xff,
+																			color < 0xb8 ? color + 0x48 : 0xff));
 
 	bitmap.fill(m_video_invert, cliprect);
 

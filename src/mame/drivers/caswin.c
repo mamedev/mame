@@ -168,12 +168,12 @@ WRITE8_MEMBER(caswin_state::vvillage_output_w)
 WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 {
 	/*
-    ---x ---- lamp button 5
-    ---- x--- lamp button 4
-    ---- -x-- lamp button 3
-    ---- --x- lamp button 2
-    ---- ---x lamp button 1
-    */
+	---x ---- lamp button 5
+	---- x--- lamp button 4
+	---- -x-- lamp button 3
+	---- --x- lamp button 2
+	---- ---x lamp button 1
+	*/
 	set_led_status(machine(), 0, data & 0x01);
 	set_led_status(machine(), 1, data & 0x02);
 	set_led_status(machine(), 2, data & 0x04);
@@ -300,8 +300,8 @@ static const ay8910_interface ay8910_config =
 void caswin_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
 	for (i = 0; i < 0x40; ++i)
 	{
@@ -326,7 +326,7 @@ void caswin_state::palette_init()
 
 static MACHINE_CONFIG_START( vvillage, caswin_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
 	MCFG_CPU_IO_MAP(vvillage_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state,  irq0_line_hold)

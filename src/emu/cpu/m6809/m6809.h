@@ -34,7 +34,7 @@ extern const device_type M6809E;
 
 // Used by core CPU interface
 class m6809_base_device : public cpu_device,
-						  public m6809_config
+							public m6809_config
 {
 public:
 	// construction/destruction
@@ -102,29 +102,29 @@ protected:
 	const address_space_config m_program_config;
 
 	// CPU registers
-	PAIR	m_pc; 		/* Program counter */
-	PAIR	m_ppc;		/* Previous program counter */
-	PAIR	m_d;		/* Accumulator a and b */
-	PAIR	m_dp; 		/* Direct Page register (page in MSB) */
-	PAIR	m_u, m_s;	/* Stack pointers */
-	PAIR	m_x, m_y;	/* Index registers */
-	UINT8	m_cc;
-	UINT8	m_ireg;		/* First opcode */
-	UINT8	m_irq_state[2];
+	PAIR    m_pc;       /* Program counter */
+	PAIR    m_ppc;      /* Previous program counter */
+	PAIR    m_d;        /* Accumulator a and b */
+	PAIR    m_dp;       /* Direct Page register (page in MSB) */
+	PAIR    m_u, m_s;   /* Stack pointers */
+	PAIR    m_x, m_y;   /* Index registers */
+	UINT8   m_cc;
+	UINT8   m_ireg;     /* First opcode */
+	UINT8   m_irq_state[2];
 
-	int 	m_extra_cycles;	/* cycles used up by interrupts */
+	int     m_extra_cycles; /* cycles used up by interrupts */
 
-	PAIR	m_ea;		/* effective address */
+	PAIR    m_ea;       /* effective address */
 
 	// other internal states
-    int 	m_icount;
-	UINT8	m_int_state;	/* SYNC and CWAI flags */
-	UINT8	m_nmi_state;
-	int		m_clock_divider;
+	int     m_icount;
+	UINT8   m_int_state;    /* SYNC and CWAI flags */
+	UINT8   m_nmi_state;
+	int     m_clock_divider;
 
 	// address spaces
-    address_space *m_program;
-    direct_read_data *m_direct;
+	address_space *m_program;
+	direct_read_data *m_direct;
 };
 
 // ======================> m6809_device
@@ -134,7 +134,7 @@ class m6809_device : public m6809_base_device
 public:
 	// construction/destruction
 	m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : m6809_base_device(mconfig, tag, owner, clock, M6809, 1) { }
+		: m6809_base_device(mconfig, tag, owner, clock, M6809, 1) { }
 };
 
 // ======================> m6809e_device
@@ -144,7 +144,7 @@ class m6809e_device : public m6809_base_device
 public:
 	// construction/destruction
 	m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : m6809_base_device(mconfig, tag, owner, clock, M6809E, 4) { }
+		: m6809_base_device(mconfig, tag, owner, clock, M6809E, 4) { }
 };
 
 enum
@@ -153,7 +153,7 @@ enum
 	M6809_DP
 };
 
-#define M6809_IRQ_LINE	0	/* IRQ line number */
+#define M6809_IRQ_LINE  0   /* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
 
 /* M6809e has LIC line to indicate opcode/data fetch */

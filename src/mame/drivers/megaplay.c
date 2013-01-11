@@ -56,11 +56,11 @@ Bugs:
 #include "includes/megadriv.h"
 #include "includes/segamsys.h"
 
-#define MASTER_CLOCK		53693100
+#define MASTER_CLOCK        53693100
 
 extern UINT8 segae_vintpending;
 extern UINT8 segae_hintpending;
-extern UINT8 *segae_vdp_regs[];		/* pointer to vdp's registers */
+extern UINT8 *segae_vdp_regs[];     /* pointer to vdp's registers */
 
 // Interrupt handler - from drivers/segasyse.c
 #if 0
@@ -172,7 +172,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_DIPSETTING( 0x10, "1 coin/1 credit - 2 coins/3 credits" )
 	PORT_DIPSETTING( 0x00, " 1 coin/1 credit" )
 
-	PORT_START("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")  /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off )  )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -190,7 +190,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_sonic )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -201,7 +201,7 @@ static INPUT_PORTS_START ( mp_sonic )
 	PORT_DIPSETTING( 0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING( 0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING( 0x0c, DEF_STR( Normal ) )
-    // Who knows...
+	// Who knows...
 //  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 4") PORT_CODE(KEYCODE_G)
 //  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 5") PORT_CODE(KEYCODE_H)
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 6") PORT_CODE(KEYCODE_J)
@@ -211,7 +211,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_gaxe2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Hard ) )
@@ -224,7 +224,7 @@ static INPUT_PORTS_START ( mp_gaxe2 )
 	PORT_DIPNAME( 0x08, 0x00, "Timer" ) PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING( 0x08, DEF_STR( Off )  )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    // Who knows...
+	// Who knows...
 //  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 4") PORT_CODE(KEYCODE_G)
 //  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 5") PORT_CODE(KEYCODE_H)
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 6") PORT_CODE(KEYCODE_J)
@@ -235,7 +235,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_col3 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( English ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Japanese ) )
@@ -247,7 +247,7 @@ static INPUT_PORTS_START ( mp_col3 )
 	PORT_DIPSETTING( 0x0c, "Middle"  )
 	PORT_DIPSETTING( 0x04, "Fast"  )
 	PORT_DIPSETTING( 0x00, "Max"  )
-    // Who knows...
+	// Who knows...
 //  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 4") PORT_CODE(KEYCODE_G)
 //  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 5") PORT_CODE(KEYCODE_H)
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 6") PORT_CODE(KEYCODE_J)
@@ -258,7 +258,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_twc )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, "Time" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x00, "Short" )
@@ -276,7 +276,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_sor2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -292,7 +292,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_bio )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "5" )
 	PORT_DIPSETTING( 0x01, "4" )
@@ -308,7 +308,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_gslam )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x07, 0x04, DEF_STR ( Game_Time ) ) PORT_DIPLOCATION("SW3:1,2,3")
 	PORT_DIPSETTING( 0x00, "5:00" )
 	PORT_DIPSETTING( 0x01, "4:30" )
@@ -326,7 +326,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_mazin )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x02, "Initial Player" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "2" )
 	PORT_DIPSETTING( 0x01, "1" )
@@ -343,7 +343,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_soni2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players (Normal mode)" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -359,7 +359,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_shnb3 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_MODIFY("DSW1")	/* DSW C  (per game settings) */
+	PORT_MODIFY("DSW1") /* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPSETTING( 0x01, "3" )
@@ -602,9 +602,9 @@ ADDRESS_MAP_END
 /* basically from src/drivers/segasyse.c */
 static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)	/* SN76489 */
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(sms_vdp_data_r, sms_vdp_data_w)	/* VDP */
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(sms_vdp_ctrl_r, sms_vdp_ctrl_w)	/* VDP */
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)  /* SN76489 */
+	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(sms_vdp_data_r, sms_vdp_data_w)    /* VDP */
+	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(sms_vdp_ctrl_r, sms_vdp_ctrl_w)    /* VDP */
 ADDRESS_MAP_END
 
 
@@ -646,7 +646,7 @@ void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( megaplay, mplay_state )
@@ -654,7 +654,7 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
-       which includes an SN76496 for sound */
+	   which includes an SN76496 for sound */
 	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MCFG_CPU_PROGRAM_MAP(megaplay_bios_map)
 	MCFG_CPU_IO_MAP(megaplay_bios_io_map)
@@ -842,7 +842,7 @@ static void mplay_start(running_machine &machine)
 	memmove(src + 0x10000, src + 0x8000, 0x18000); // move bios..
 
 	/* copy game instruction rom to main map.. maybe this should just be accessed
-      through a handler instead?.. */
+	  through a handler instead?.. */
 	for (offs = 0; offs < 0x8000; offs++)
 	{
 		UINT8 dat = instruction_rom[offs];

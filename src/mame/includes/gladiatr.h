@@ -3,13 +3,13 @@ class gladiatr_state : public driver_device
 public:
 	gladiatr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") ,
+			m_nvram(*this, "nvram") ,
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_textram(*this, "textram"){ }
 
-	required_shared_ptr<UINT8>	m_nvram;
+	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;

@@ -71,8 +71,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	{
 		int sx,sy,code,color,flipx;
 
-		sy = spriteram16[offs+3-4];	/* -4? what the... ??? */
-		if (sy == 0x2000) return;	/* end of list marker */
+		sy = spriteram16[offs+3-4]; /* -4? what the... ??? */
+		if (sy == 0x2000) return;   /* end of list marker */
 
 		flipx = sy & 0x4000;
 		sx = (spriteram16[offs+1] & 0x01ff) - 16-7;

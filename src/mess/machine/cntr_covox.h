@@ -17,16 +17,16 @@ class centronics_covox_device :
 		public device_centronics_peripheral_interface
 {
 public:
-    // construction/destruction
-    centronics_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	centronics_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual void write(UINT8 data);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "covox"; }
 private:
 	dac_device *m_dac;
@@ -41,16 +41,16 @@ class centronics_covox_stereo_device :
 		public device_centronics_peripheral_interface
 {
 public:
-    // construction/destruction
-    centronics_covox_stereo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	centronics_covox_stereo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual void write(UINT8 data);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "covox_stereo"; }
 private:
 	dac_device *m_dac_left;

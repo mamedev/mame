@@ -1,10 +1,10 @@
 #include "sound/dac.h"
 
-#define HORZ_RES		32
-#define VERT_RES		24
+#define HORZ_RES        32
+#define VERT_RES        24
 #define HORZ_CHR        8
-#define VERT_CHR		10
-#define VERT_FNT		8
+#define VERT_CHR        10
+#define VERT_FNT        8
 
 #define HORZ_BAR        0x40
 #define VERT_BAR        0x80

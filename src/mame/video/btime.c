@@ -322,8 +322,8 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 color,
-						 UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
-						 UINT8 *sprite_ram, offs_t interleave )
+							UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
+							UINT8 *sprite_ram, offs_t interleave )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 	int i;
@@ -512,7 +512,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 		copyscrollbitmap(bitmap, *m_background_bitmap, 1, &scroll, 0, 0, cliprect);
 
 		/* copy the low priority characters followed by the sprites
-           then the high priority characters */
+		   then the high priority characters */
 		draw_chars(machine(), bitmap, cliprect, TRUE, 0, 1);
 		draw_sprites(machine(), bitmap, cliprect, 0, 0, 0, m_videoram, 0x20);
 		draw_chars(machine(), bitmap, cliprect, TRUE, 0, 0);

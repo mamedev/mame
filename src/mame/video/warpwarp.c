@@ -69,9 +69,9 @@ PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 	double weights_tiles_rg[3], weights_tiles_b[2], weight_ball[1];
 
 	compute_resistor_weights(0, 0xff, -1.0,
-							 3, resistances_tiles_rg, weights_tiles_rg, 150, 0,
-							 2, resistances_tiles_b,  weights_tiles_b,  150, 0,
-							 1, resistance_ball,      weight_ball,      150, 0);
+								3, resistances_tiles_rg, weights_tiles_rg, 150, 0,
+								2, resistances_tiles_b,  weights_tiles_b,  150, 0,
+								1, resistance_ball,      weight_ball,      150, 0);
 
 	for (i = 0; i < 0x100; i++)
 	{

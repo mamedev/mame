@@ -6,9 +6,9 @@ class darkseal_state : public driver_device
 public:
 	darkseal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	      m_deco_tilegen1(*this, "tilegen1"),
-		  m_deco_tilegen2(*this, "tilegen2"),
-		  m_spriteram(*this, "spriteram") ,
+			m_deco_tilegen1(*this, "tilegen1"),
+			m_deco_tilegen2(*this, "tilegen2"),
+			m_spriteram(*this, "spriteram") ,
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"){ }

@@ -274,7 +274,7 @@ WRITE8_MEMBER(dacholer_state::snd_ack_w)
 
 CUSTOM_INPUT_MEMBER(dacholer_state::snd_ack_r)
 {
-	return m_snd_ack;		//guess ...
+	return m_snd_ack;       //guess ...
 }
 
 WRITE8_MEMBER(dacholer_state::snd_irq_w)
@@ -533,7 +533,7 @@ static const gfx_layout spritelayout =
 	{ 0, 1, 2, 3 },
 	{ 4,0,12,8,20,16,28,24,36,32,44,40,52,48,60,56 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	16*16*4
 };
 
@@ -575,8 +575,8 @@ static void adpcm_int( device_t *device )
 
 static const msm5205_interface msm_interface =
 {
-	adpcm_int,			/* interrupt function */
-	MSM5205_S96_4B	/* 1 / 96 = 3906.25Hz playback  - guess */
+	adpcm_int,          /* interrupt function */
+	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
 };
 
 
@@ -649,12 +649,12 @@ void dacholer_state::palette_init()
 static MACHINE_CONFIG_START( dacholer, dacholer_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)	/* ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_19_968MHz/8)	/* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_19_968MHz/8) /* ? */
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)

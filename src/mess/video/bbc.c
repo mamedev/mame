@@ -44,13 +44,13 @@ unsigned int calculate_video_address(bbc_state *state,int ma,int ra)
 	int c1=state->m_b5_video1;
 
 	/* the 4 bit input port b on IC39 are produced by 4 NAND gates.
-    these NAND gates take their
-    inputs from c0 and c1 (from IC32) and ma12 (from the 6845) */
+	these NAND gates take their
+	inputs from c0 and c1 (from IC32) and ma12 (from the 6845) */
 
 	/* get bit m12 from the 6845 */
 	int ma12=(ma>>12)&1;
 
-    // 4 bit input B on IC39 74LS283 (4 bit adder)
+	// 4 bit input B on IC39 74LS283 (4 bit adder)
 	/* 3 input NAND part of IC 36 */
 	int b1=(~(c1 & c0 & ma12)) & 1;
 	/* 2 input NAND part of IC40 (b3 is calculated before b2 and b4 because b3 feed back into b2 and b4) */
@@ -70,8 +70,8 @@ unsigned int calculate_video_address(bbc_state *state,int ma,int ra)
 	int s=(a+b+1)&0xf;
 
 	/* if MA13 (TTXVDU) is low then IC8 and IC9 are used to calculate
-       the memory location required for the hi res video.
-       if MA13 is hight then IC10 and IC11 are used to calculate the memory location for the teletext chip*/
+	   the memory location required for the hi res video.
+	   if MA13 is hight then IC10 and IC11 are used to calculate the memory location for the teletext chip*/
 	unsigned int m;
 	if ((ma>>13)&1)
 	{
@@ -113,9 +113,9 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 	// Make sure vpos is never <0 2008-10-11 PHS.
 	int vpos=machine().primary_screen->vpos();
 	if(vpos==0)
-	  machine().primary_screen->update_partial(vpos);
+		machine().primary_screen->update_partial(vpos);
 	else
-	  machine().primary_screen->update_partial(vpos -1 );
+		machine().primary_screen->update_partial(vpos -1 );
 
 	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,machine().primary_screen->vpos() );
 
@@ -194,7 +194,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	bbc_state *state = device->machine().driver_data<bbc_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
-    logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
+	logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
 
 	if (state->m_videoULA_teletext_normal_select)
 	{
@@ -284,15 +284,15 @@ WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 
 const mc6845_interface bbc_mc6845_intf =
 {
-	"screen",						/* screen number */
-	8,								/* numbers of pixels per video memory address */
-	NULL,							/* begin_update */
-	vid_update_row,					/* update_row */
-	NULL,							/* end_update */
-	DEVCB_NULL,						/* on_de_changed */
-	DEVCB_NULL,						/* on_cur_changed */
-	DEVCB_NULL,						/* on_hsync_changed */
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_vsync),			/* on_vsync_changed */
+	"screen",                       /* screen number */
+	8,                              /* numbers of pixels per video memory address */
+	NULL,                           /* begin_update */
+	vid_update_row,                 /* update_row */
+	NULL,                           /* end_update */
+	DEVCB_NULL,                     /* on_de_changed */
+	DEVCB_NULL,                     /* on_cur_changed */
+	DEVCB_NULL,                     /* on_hsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_vsync),          /* on_vsync_changed */
 	NULL
 };
 

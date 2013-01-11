@@ -21,7 +21,7 @@ void starfire_state::video_start()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starfire_state::starfire_scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
-    /* register for state saving */
+	/* register for state saving */
 	save_item(NAME(m_starfire_vidctrl));
 	save_item(NAME(m_starfire_vidctrl1));
 	save_item(NAME(m_starfire_color));
@@ -37,7 +37,7 @@ void starfire_state::video_start()
 
 WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 {
-    /* handle writes to the pseudo-color RAM */
+	/* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
 	{
 		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
@@ -45,10 +45,10 @@ WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 		/* set RAM regardless */
 		int cl = (m_starfire_vidctrl1 & 0x80) ? m_starfire_color : (data & 0x1f);
 		int cr = (data >> 5) | ((offset & 0x100) >> 5);
-        cr |= (m_starfire_vidctrl1 & 0x80) ? (m_starfire_color & 0x10) : (data & 0x10);
+		cr |= (m_starfire_vidctrl1 & 0x80) ? (m_starfire_color & 0x10) : (data & 0x10);
 
 		m_starfire_colorram[offset & ~0x100] = cl;
-        m_starfire_colorram[offset |  0x100] = cr;
+		m_starfire_colorram[offset |  0x100] = cr;
 
 		m_starfire_color = cl;
 
@@ -74,8 +74,8 @@ READ8_MEMBER(starfire_state::starfire_colorram_r)
 	if ((offset & 0xe0) == 0)
 	{
 		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
-        int cl = m_starfire_colorram[offset & ~0x100];
-        int cr = m_starfire_colorram[offset |  0x100];
+		int cl = m_starfire_colorram[offset & ~0x100];
+		int cr = m_starfire_colorram[offset |  0x100];
 
 		/* don't modify the palette unless the TRANS bit is set */
 		if (m_starfire_vidctrl1 & 0x40)
@@ -121,7 +121,7 @@ WRITE8_MEMBER(starfire_state::starfire_videoram_w)
 	dm = data;
 	if (lr)
 		dm = ((dm & 0x01) << 7) | ((dm & 0x02) << 5) | ((dm & 0x04) << 3) | ((dm & 0x08) << 1) |
-		     ((dm & 0x10) >> 1) | ((dm & 0x20) >> 3) | ((dm & 0x40) >> 5) | ((dm & 0x80) >> 7);
+				((dm & 0x10) >> 1) | ((dm & 0x20) >> 3) | ((dm & 0x40) >> 5) | ((dm & 0x80) >> 7);
 
 	/* shifters 6D/6E */
 	ds = (dm << 8) >> sh;
@@ -143,22 +143,22 @@ WRITE8_MEMBER(starfire_state::starfire_videoram_w)
 	ds &= mask;
 	switch (~m_starfire_vidctrl1 & 15)
 	{
-		case 0:		dalu |= ds ^ mask;				break;
-		case 1:		dalu |= (ds | d0) ^ mask;		break;
-		case 2:		dalu |= (ds ^ mask) & d0;		break;
-		case 3:		dalu |= 0;						break;
-		case 4:		dalu |= (ds & d0) ^ mask;		break;
-		case 5:		dalu |= d0 ^ mask;				break;
-		case 6:		dalu |= ds ^ d0;				break;
-		case 7:		dalu |= ds & (d0 ^ mask);		break;
-		case 8:		dalu |= (ds ^ mask) | d0;		break;
-		case 9:		dalu |= (ds ^ d0) ^ mask;		break;
-		case 10:	dalu |= d0;						break;
-		case 11:	dalu |= ds & d0;				break;
-		case 12:	dalu |= mask;					break;
-		case 13:	dalu |= ds | (d0 ^ mask);		break;
-		case 14:	dalu |= ds | d0;				break;
-		case 15:	dalu |= ds;						break;
+		case 0:     dalu |= ds ^ mask;              break;
+		case 1:     dalu |= (ds | d0) ^ mask;       break;
+		case 2:     dalu |= (ds ^ mask) & d0;       break;
+		case 3:     dalu |= 0;                      break;
+		case 4:     dalu |= (ds & d0) ^ mask;       break;
+		case 5:     dalu |= d0 ^ mask;              break;
+		case 6:     dalu |= ds ^ d0;                break;
+		case 7:     dalu |= ds & (d0 ^ mask);       break;
+		case 8:     dalu |= (ds ^ mask) | d0;       break;
+		case 9:     dalu |= (ds ^ d0) ^ mask;       break;
+		case 10:    dalu |= d0;                     break;
+		case 11:    dalu |= ds & d0;                break;
+		case 12:    dalu |= mask;                   break;
+		case 13:    dalu |= ds | (d0 ^ mask);       break;
+		case 14:    dalu |= ds | d0;                break;
+		case 15:    dalu |= ds;                     break;
 	}
 
 	/* final output */
@@ -216,7 +216,7 @@ READ8_MEMBER(starfire_state::starfire_videoram_r)
 static void get_pens(running_machine &machine, pen_t *pens)
 {
 	offs_t offs;
-    starfire_state *state = machine.driver_data<starfire_state>();
+	starfire_state *state = machine.driver_data<starfire_state>();
 
 	for (offs = 0; offs < STARFIRE_NUM_PENS; offs++)
 	{
@@ -228,7 +228,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 
 TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 {
-    pen_t pens[STARFIRE_NUM_PENS];
+	pen_t pens[STARFIRE_NUM_PENS];
 	int y = param;
 
 	get_pens(machine(), pens);
@@ -261,7 +261,7 @@ TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 
 UINT32 starfire_state::screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-    copybitmap(bitmap, m_starfire_screen, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_starfire_screen, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

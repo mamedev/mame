@@ -63,29 +63,29 @@ struct dmk_tag
  * See WD1711 documentation
  */
 /* DMK file header */
-#define DMK_HEADER_LEN			16			/* DMK header */
+#define DMK_HEADER_LEN          16          /* DMK header */
 	/*  For every track (40) */
-	#define DMK_TOC_LEN				128		/* 64 16-bit relative offsets to IDAMs */
-	#define DMK_GAP1_LEN			32		/* GAP1 (26 bytes 0xFF and 6 bytes 0x00) */
+	#define DMK_TOC_LEN             128     /* 64 16-bit relative offsets to IDAMs */
+	#define DMK_GAP1_LEN            32      /* GAP1 (26 bytes 0xFF and 6 bytes 0x00) */
 
 		/* For every sector (10) 301 bytes */
-		#define DMK_IDAM_LEN			7	/* IDAM (0xFE, Track, 0x00, Sector, 0x00, CRChi, CRClo) */
-		#define DMK_ID_GAP_LEN			17	/* GAP2 (11 bytes 0xFF and 6 bytes 0x00) */
-		#define DMK_DAM_LEN 			1	/* Data Address Mark (0xFB) */
-		#define DMK_DATA_LEN			256 /* Data */
-		#define DMK_DATA_CRC_LEN		2	/* Data CRC (CRChi, CRClo) */
-		#define DMK_DATA_GAP_LEN		18  /* GAP3 (12 bytes 0xFF and 6 bytes 0x00) (not for last sector) */
+		#define DMK_IDAM_LEN            7   /* IDAM (0xFE, Track, 0x00, Sector, 0x00, CRChi, CRClo) */
+		#define DMK_ID_GAP_LEN          17  /* GAP2 (11 bytes 0xFF and 6 bytes 0x00) */
+		#define DMK_DAM_LEN             1   /* Data Address Mark (0xFB) */
+		#define DMK_DATA_LEN            256 /* Data */
+		#define DMK_DATA_CRC_LEN        2   /* Data CRC (CRChi, CRClo) */
+		#define DMK_DATA_GAP_LEN        18  /* GAP3 (12 bytes 0xFF and 6 bytes 0x00) (not for last sector) */
 
-	#define DMK_EXTRA_TRACK_LENGTH	(176)	/* GAP4 (192 bytes 0xFF) */
+	#define DMK_EXTRA_TRACK_LENGTH  (176)   /* GAP4 (192 bytes 0xFF) */
 /* End of DMK file structure */
 
-#define dmk_idam_type(x)			(x)[0]
-#define dmk_idam_track(x)			(x)[1]
-#define dmk_idam_side(x)			(x)[2]
-#define dmk_idam_sector(x)			(x)[3]
-#define dmk_idam_sectorlength(x)	(x)[4]
-#define dmk_idam_crc(x)				(((x)[5] << 8) + (x)[6])
-#define dmk_idam_set_crc(x, crc)	(x)[5] = ((crc) >> 8); (x)[6] = ((crc) >> 0);
+#define dmk_idam_type(x)            (x)[0]
+#define dmk_idam_track(x)           (x)[1]
+#define dmk_idam_side(x)            (x)[2]
+#define dmk_idam_sector(x)          (x)[3]
+#define dmk_idam_sectorlength(x)    (x)[4]
+#define dmk_idam_crc(x)             (((x)[5] << 8) + (x)[6])
+#define dmk_idam_set_crc(x, crc)    (x)[5] = ((crc) >> 8); (x)[6] = ((crc) >> 0);
 
 static const char needle_data[] = "\x00\x00\x00\x00\x00\x00\x00\x00\xFB\xFB";
 static const char needle_deleted_data_fa[] = "\x00\x00\x00\x00\x00\x00\x00\x00\xFA\xFA";
@@ -181,16 +181,16 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	int sector_position;
 	int i;
 
-	sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
-	sector_length	= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
-	interleave		= option_resolution_lookup_int(params, PARAM_INTERLEAVE);
-	first_sector_id	= option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
+	sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
+	sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+	interleave      = option_resolution_lookup_int(params, PARAM_INTERLEAVE);
+	first_sector_id = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
 
 	max_track_size = get_dmk_tag(floppy)->track_size;
 
 	if (sectors > DMK_TOC_LEN/2)
 	{
-        err = FLOPPY_ERROR_INTERNAL;
+		err = FLOPPY_ERROR_INTERNAL;
 		goto done;
 	}
 
@@ -230,11 +230,11 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 
 	/* set up a local physical sector template */
 	local_sector_size = (DMK_IDAM_LEN +
-			             DMK_ID_GAP_LEN +
-			             DMK_DAM_LEN +
-			             sector_length +
-			             DMK_DATA_CRC_LEN +
-			             DMK_DATA_GAP_LEN);
+							DMK_ID_GAP_LEN +
+							DMK_DAM_LEN +
+							sector_length +
+							DMK_DATA_CRC_LEN +
+							DMK_DATA_GAP_LEN);
 	local_sector = (UINT8*)malloc(local_sector_size);
 	if (!local_sector)
 	{
@@ -252,17 +252,17 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	track_position = DMK_TOC_LEN + DMK_GAP1_LEN * 2;
 
 	/*
-     *  prepare template in local sector
-     */
+	 *  prepare template in local sector
+	 */
 
 	/* IDAM */
 	sector_position = 0;
-	dmk_idam_type(				&local_sector[sector_position]) = 0xFE;
-	dmk_idam_track(				&local_sector[sector_position]) = track;
-	dmk_idam_side(				&local_sector[sector_position]) = head;
-	dmk_idam_sector(			&local_sector[sector_position]) = 0;		/* replace in sector instances */
-	dmk_idam_sectorlength(		&local_sector[sector_position]) = compute_log2(sector_length / 128);
-	dmk_idam_set_crc(			&local_sector[sector_position], 0); 		/* replace in sector instances */
+	dmk_idam_type(              &local_sector[sector_position]) = 0xFE;
+	dmk_idam_track(             &local_sector[sector_position]) = track;
+	dmk_idam_side(              &local_sector[sector_position]) = head;
+	dmk_idam_sector(            &local_sector[sector_position]) = 0;        /* replace in sector instances */
+	dmk_idam_sectorlength(      &local_sector[sector_position]) = compute_log2(sector_length / 128);
+	dmk_idam_set_crc(           &local_sector[sector_position], 0);         /* replace in sector instances */
 	sector_position += 7;
 
 	/* GAP2 (ID GAP) */
@@ -286,8 +286,8 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	sector_position += 6;
 
 	/*
-     *  start of track data
-     */
+	 *  start of track data
+	 */
 	while(physical_sector < DMK_TOC_LEN/2)
 	{
 		if (physical_sector >= sectors)
@@ -302,9 +302,9 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 			logical_sector = sector_map[physical_sector];
 
 			/* update IDAM in local sector template */
-			dmk_idam_sector(			&local_sector[0]) = logical_sector;		/* update sector number in sector instance  */
-			crc = ccitt_crc16(0xffff,	&local_sector[0], DMK_IDAM_LEN - 2);	/* and recalculate crc */
-			dmk_idam_set_crc(			&local_sector[0], crc);
+			dmk_idam_sector(            &local_sector[0]) = logical_sector;     /* update sector number in sector instance  */
+			crc = ccitt_crc16(0xffff,   &local_sector[0], DMK_IDAM_LEN - 2);    /* and recalculate crc */
+			dmk_idam_set_crc(           &local_sector[0], crc);
 
 			/* write local sector in track doubling every byte (DMK double density mode) */
 			for(i=0; i<local_sector_size; i++)
@@ -358,23 +358,23 @@ static UINT32 z80ne_dmk_get_track_size(floppy_image_legacy *floppy, int head, in
 static UINT8 * my_memmem(UINT8 *haystack, size_t haystacklen,
 		UINT8 *needle, size_t needlelen)
 {
-        register UINT8 *h = haystack;
-        register UINT8 *n = needle;
-        register size_t hl = haystacklen;
-        register size_t nl = needlelen;
-        register size_t i;
+		register UINT8 *h = haystack;
+		register UINT8 *n = needle;
+		register size_t hl = haystacklen;
+		register size_t nl = needlelen;
+		register size_t i;
 
-        if (nl == 0) return haystack;    /* The first occurrence of the empty string is deemed to occur at
+		if (nl == 0) return haystack;    /* The first occurrence of the empty string is deemed to occur at
                                                      the beginning of the string.  */
-        if (hl < nl)
-        	return NULL;
+		if (hl < nl)
+			return NULL;
 
-        for( i = 0; (i < hl) && (i + nl <= hl ); i++ )
-        	if (h[i] == *n) /* first match */
-        		if ( !memcmp(&h[i]+1, n + 1, nl - 1) )
-        			return (haystack+i);    /* returns a pointer to the substring */
+		for( i = 0; (i < hl) && (i + nl <= hl ); i++ )
+			if (h[i] == *n) /* first match */
+				if ( !memcmp(&h[i]+1, n + 1, nl - 1) )
+					return (haystack+i);    /* returns a pointer to the substring */
 
-        return (UINT8 *)NULL;    /* not found */
+		return (UINT8 *)NULL;    /* not found */
 }
 
 
@@ -403,9 +403,9 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int
 
 	/* set up a local IDAM space */
 	local_idam_size = (DMK_IDAM_LEN +
-			             DMK_ID_GAP_LEN +
-			             DMK_DAM_LEN +
-			             DMK_DATA_GAP_LEN);
+							DMK_ID_GAP_LEN +
+							DMK_DAM_LEN +
+							DMK_DATA_GAP_LEN);
 	local_idam = (UINT8*)malloc(local_idam_size);
 	if (!local_idam)
 	{
@@ -753,10 +753,10 @@ FLOPPY_CONSTRUCT(z80ne_dmk_construct)
 
 	if (params)
 	{
-		heads			= option_resolution_lookup_int(params, PARAM_HEADS);
-		tracks			= option_resolution_lookup_int(params, PARAM_TRACKS);
-		sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
-		sector_length	= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		heads           = option_resolution_lookup_int(params, PARAM_HEADS);
+		tracks          = option_resolution_lookup_int(params, PARAM_TRACKS);
+		sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
+		sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
 
 		track_size = z80ne_dmk_min_track_size(sectors, sector_length);
 
@@ -819,17 +819,17 @@ FLOPPY_IDENTIFY(z80ne_dmk_identify)
 
 LEGACY_FLOPPY_OPTIONS_START( z80ne )
 	/*
-     * Single side
-     * Single density
-     * FM, 125 kbit/s,
-     * 40 tracks, track ID: 0..39
-     * 10 sectors/track, sector ID: 0..9
-     * 256 bytes/sector
-     * Interleave 1 (sector ID sequence on track: 0 5 1 6 2 7 3 8 4 9)
-     * 3125 byte/track unformatted
-     * Rotation speed 300 rpm (5 rps)
-     */
-	LEGACY_FLOPPY_OPTION( z80ne_dmk, "zmk",		"Z80NE DMK disk image",	z80ne_dmk_identify,	z80ne_dmk_construct, NULL,
+	 * Single side
+	 * Single density
+	 * FM, 125 kbit/s,
+	 * 40 tracks, track ID: 0..39
+	 * 10 sectors/track, sector ID: 0..9
+	 * 256 bytes/sector
+	 * Interleave 1 (sector ID sequence on track: 0 5 1 6 2 7 3 8 4 9)
+	 * 3125 byte/track unformatted
+	 * Rotation speed 300 rpm (5 rps)
+	 */
+	LEGACY_FLOPPY_OPTION( z80ne_dmk, "zmk",     "Z80NE DMK disk image", z80ne_dmk_identify, z80ne_dmk_construct, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])

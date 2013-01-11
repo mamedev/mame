@@ -23,7 +23,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LUXOR_4105_TAG		"luxor_4105"
+#define LUXOR_4105_TAG      "luxor_4105"
 
 
 
@@ -34,11 +34,11 @@
 // ======================> luxor_4105_device
 
 class luxor_4105_device :  public device_t,
-						   public device_abc1600bus_card_interface
+							public device_abc1600bus_card_interface
 {
 public:
-    // construction/destruction
-    luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -50,8 +50,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sasi_req_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "luxor_4105"; }
 

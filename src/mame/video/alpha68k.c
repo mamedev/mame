@@ -297,7 +297,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_in
 
 		draw_sprites_V(machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0, 0x8000, 0x7fff);
 	}
-	else	/* gangwars */
+	else    /* gangwars */
 	{
 		draw_sprites_V(machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0x8000, 0, 0x7fff);
 		draw_sprites_V(machine(), bitmap, cliprect, 1, 0x0000, 0x0800, 0x8000, 0, 0x7fff);

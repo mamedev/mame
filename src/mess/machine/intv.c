@@ -4,8 +4,8 @@
 #include "cpu/cp1610/cp1610.h"
 #include "hashfile.h"
 
-#define INTELLIVOICE_MASK	0x02
-#define ECS_MASK			0x01
+#define INTELLIVOICE_MASK   0x02
+#define ECS_MASK            0x01
 
 
 
@@ -16,7 +16,7 @@ WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 	COMBINE_DATA(&m_intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memregion("keyboard")->base();
+	RAM  = memregion("keyboard")->base();
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	m_intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = memregion("keyboard")->base();
+	RAM  = memregion("keyboard")->base();
 	RAM[offset] = data;
 }
 
@@ -85,7 +85,7 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 					rv = 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - Tape? Int Pending\n",rv,offset);
 				break;
-			case 0x060:	/* Keyboard Read */
+			case 0x060: /* Keyboard Read */
 				rv = 0xff;
 				if (m_intvkbd_keyboard_col == 0)
 					rv = ioport("ROW0")->read();
@@ -283,7 +283,7 @@ WRITE16_MEMBER( intv_state::intv_gram_w )
 		m_gram[offset] = data;
 		m_gramdirtybytes[offset] = 1;
 	m_gramdirty = 1;
-   }
+	}
 }
 
 
@@ -395,7 +395,7 @@ WRITE16_MEMBER( intv_state::wsmlb_bank_page_select )
 
 static int intv_load_rom_file(device_image_interface &image)
 {
-    int i,j;
+	int i,j;
 
 	UINT8 temp;
 	UINT8 num_segments;
@@ -416,7 +416,7 @@ static int intv_load_rom_file(device_image_interface &image)
 	/* if it is in .rom format, we enter here */
 	if (!mame_stricmp (filetype, "rom"))
 	{
-		image.fread( &temp, 1);			/* header */
+		image.fread( &temp, 1);         /* header */
 		if (temp != 0xa8)
 		{
 			return IMAGE_INIT_FAIL;
@@ -509,11 +509,11 @@ static int intv_load_rom_file(device_image_interface &image)
 					write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 			}
 			/* For now intellivoice always active
-            if (extra & INTELLIVOICE_MASK)
-            {
-                // tbd
-            }
-         */
+			if (extra & INTELLIVOICE_MASK)
+			{
+			    // tbd
+			}
+			*/
 
 			if (extra & ECS_MASK)
 			{
@@ -826,7 +826,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 	if (strcmp(image.device().tag(),":cart1") == 0) /* Legacy cartridge slot */
 	{
 		/* First, initialize these as empty so that the intellivision
-         * will think that the playcable is not attached */
+		 * will think that the playcable is not attached */
 		UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
 
 		/* assume playcable is absent */

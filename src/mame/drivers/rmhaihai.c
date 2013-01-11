@@ -108,10 +108,10 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 	switch(space.device().safe_pc())
 	{
 		/* read keyboard */
-		case 0x0aba:	// rmhaihai, rmhaisei
-		case 0x0b2a:	// rmhaihib
-		case 0x0ab4:	// rmhaijin
-		case 0x0aea:	// themj
+		case 0x0aba:    // rmhaihai, rmhaisei
+		case 0x0b2a:    // rmhaihib
+		case 0x0ab4:    // rmhaijin
+		case 0x0aea:    // themj
 		{
 			int i;
 
@@ -119,16 +119,16 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 			{
 				if (ioport(keynames[i/16])->read() & (1 << (i & 15))) return i+1;
 			}
-			if (ioport("KEY1")->read() & 0x8000) return 0x80;	// coin
+			if (ioport("KEY1")->read() & 0x8000) return 0x80;   // coin
 			return 0;
 		}
-		case 0x5c7b:	// rmhaihai, rmhaisei, rmhaijin
-		case 0x5950:	// rmhaihib
-		case 0x5bf3:	// themj, but the test is NOPed out!
-			return 0xcc;	/* keyboard_cmd = 0xcb */
+		case 0x5c7b:    // rmhaihai, rmhaisei, rmhaijin
+		case 0x5950:    // rmhaihib
+		case 0x5bf3:    // themj, but the test is NOPed out!
+			return 0xcc;    /* keyboard_cmd = 0xcb */
 
 
-		case 0x13a:	// additional checks done by rmhaijin
+		case 0x13a: // additional checks done by rmhaijin
 			if (m_keyboard_cmd == 0x3b) return 0xdd;
 			if (m_keyboard_cmd == 0x85) return 0xdc;
 			if (m_keyboard_cmd == 0xf2) return 0xd6;
@@ -136,8 +136,8 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 			if (m_keyboard_cmd == 0xd0) return 0x08;
 			return 0;
 
-		case 0x140:	// additional checks done by rmhaisei
-		case 0x155:	// additional checks done by themj, but they are patched out!
+		case 0x140: // additional checks done by rmhaisei
+		case 0x155: // additional checks done by themj, but they are patched out!
 			if (m_keyboard_cmd == 0x11) return 0x57;
 			if (m_keyboard_cmd == 0x3e) return 0xda;
 			if (m_keyboard_cmd == 0x48) return 0x74;
@@ -180,7 +180,7 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 
 	// (data & 0x10) is medal in service mode
 
-	m_gfxbank = (data & 0x40) >> 6;	/* rmhaisei only */
+	m_gfxbank = (data & 0x40) >> 6; /* rmhaisei only */
 }
 
 WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
@@ -204,23 +204,23 @@ static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP	// ??
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// ??
+	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP    // ??
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // ??
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM			/* rmhaisei only */
+	AM_RANGE(0xe000, 0xffff) AM_ROM         /* rmhaisei only */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP	// ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
+	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
+	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
 	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
+	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??
+	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP    // ??
+	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP    // ??
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
@@ -235,21 +235,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( themj_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP	// ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
+	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
+	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
 	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
+	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??
 	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
+	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP    // ??
+	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP    // ??
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( mjctrl )
-	PORT_START("KEY0")		// fake, handled by keyboard_r()
+	PORT_START("KEY0")      // fake, handled by keyboard_r()
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_MAHJONG_DOUBLE_UP )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_MAHJONG_BIG )
@@ -267,7 +267,7 @@ static INPUT_PORTS_START( mjctrl )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
 
-	PORT_START("KEY1")	// fake, handled by keyboard_r()
+	PORT_START("KEY1")  // fake, handled by keyboard_r()
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_MAHJONG_PON )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START1 )
@@ -285,7 +285,7 @@ static INPUT_PORTS_START( mjctrl )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 
-	PORT_START("KEY2")	// fake, handled by keyboard_r()
+	PORT_START("KEY2")  // fake, handled by keyboard_r()
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_MAHJONG_BIG ) PORT_PLAYER(2)
@@ -304,7 +304,7 @@ static INPUT_PORTS_START( mjctrl )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(2)
 
 
-	PORT_START("KEY3")	// fake, handled by keyboard_r()
+	PORT_START("KEY3")  // fake, handled by keyboard_r()
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_MAHJONG_PON ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START2 )
@@ -338,7 +338,7 @@ static INPUT_PORTS_START( rmhaihai )
 	PORT_DIPSETTING(    0xfa, "7" )
 	PORT_DIPSETTING(    0xfc, "8 (Difficult)" )
 
-    PORT_START("DSW1")  /* dsw1 */
+	PORT_START("DSW1")  /* dsw1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -457,8 +457,8 @@ static const ay8910_interface ay8910_config =
 
 static const msm5205_interface msm5205_config =
 {
-	0,				/* interrupt function */
-	MSM5205_SEX_4B	/* vclk input mode    */
+	0,              /* interrupt function */
+	MSM5205_SEX_4B  /* vclk input mode    */
 };
 
 
@@ -466,7 +466,7 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
+	MCFG_CPU_ADD("maincpu",Z80,20000000/4)  /* 5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(rmhaihai_map)
 	MCFG_CPU_IO_MAP(rmhaihai_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
@@ -551,7 +551,7 @@ ROM_START( rmhaihai )
 	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
 	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
@@ -578,7 +578,7 @@ ROM_START( rmhaihib )
 	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
 	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
@@ -605,7 +605,7 @@ ROM_START( rmhaijin )
 	ROM_LOAD( "s4.13a",       0x0100, 0x0100, CRC(5d643e6e) SHA1(df34be9d4cb0129069c2ed40c916c84674b62bb3) )
 	ROM_LOAD( "s6.13c",       0x0200, 0x0100, CRC(fd6ff344) SHA1(cd00985f8bbff1ab5a149a00320d861ac8655bf8) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "s-0-1.5g",     0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
@@ -633,7 +633,7 @@ ROM_START( rmhaisei )
 	ROM_LOAD( "1.bpr",        0x0200, 0x0200, CRC(9b036f82) SHA1(4b14084e5a6674e69bd4bbc3a483c277bfc73808) )
 	ROM_LOAD( "3.bpr",        0x0400, 0x0200, CRC(0fa1a50a) SHA1(9e8a2c9554a61bfdacb434f8c22c1085b1c93aa1) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "sei-7.h5",     0x00000, 0x8000, CRC(3e412c1a) SHA1(bc5e324ea26b8dd1e37c4e8b0d7ba712c1222bc7) )
 ROM_END
 
@@ -660,7 +660,7 @@ ROM_START( themj )
 	ROM_LOAD( "4.bin",        0x0200,  0x0200, CRC(9f81a6d7) SHA1(2735815c0c922d0c81559d792fcaa39bd9615536) )
 	ROM_LOAD( "6.bin",        0x0400,  0x0200, CRC(61373ec7) SHA1(73861914aae29e3996f9991f324c358a29c46969) )
 
-	ROM_REGION( 0x8000, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "t0.bin",       0x00000,  0x8000, CRC(3e412c1a) SHA1(bc5e324ea26b8dd1e37c4e8b0d7ba712c1222bc7) )
 ROM_END
 

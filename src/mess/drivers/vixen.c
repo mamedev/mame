@@ -94,18 +94,18 @@ READ8_MEMBER( vixen_state::status_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       VSYNC enable
-        1       FDINT enable
-        2       VSYNC
-        3       1
-        4       1
-        5       1
-        6       1
-        7       1
+	    0       VSYNC enable
+	    1       FDINT enable
+	    2       VSYNC
+	    3       1
+	    4       1
+	    5       1
+	    6       1
+	    7       1
 
-    */
+	*/
 
 	UINT8 data = 0xf8;
 
@@ -130,18 +130,18 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       VSYNC enable
-        1       FDINT enable
-        2
-        3
-        4
-        5
-        6
-        7
+	    0       VSYNC enable
+	    1       FDINT enable
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 //  logerror("CMD %u\n", data);
 
@@ -169,18 +169,18 @@ READ8_MEMBER( vixen_state::ieee488_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       ATN
-        1       DAV
-        2       NDAC
-        3       NRFD
-        4       EOI
-        5       SRQ
-        6       IFC
-        7       REN
+	    0       ATN
+	    1       DAV
+	    2       NDAC
+	    3       NRFD
+	    4       EOI
+	    5       SRQ
+	    6       IFC
+	    7       REN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -220,18 +220,18 @@ READ8_MEMBER( vixen_state::port3_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       RI
-        1       DCD
-        2       1
-        3       1
-        4       1
-        5       1
-        6       1
-        7       1
+	    0       RI
+	    1       DCD
+	    2       1
+	    3       1
+	    4       1
+	    5       1
+	    6       1
+	    7       1
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 
@@ -426,15 +426,15 @@ UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				UINT8 sync_data = m_sync_rom[sync_addr];
 				int blank = BIT(sync_data, 4);
 				/*
-                int clrchadr = BIT(sync_data, 7);
-                int hsync = BIT(sync_data, 6);
-                int clrtxadr = BIT(sync_data, 5);
-                int vsync = BIT(sync_data, 3);
-                int comp_sync = BIT(sync_data, 2);
+				int clrchadr = BIT(sync_data, 7);
+				int hsync = BIT(sync_data, 6);
+				int clrtxadr = BIT(sync_data, 5);
+				int vsync = BIT(sync_data, 3);
+				int comp_sync = BIT(sync_data, 2);
 
-                logerror("SYNC %03x:%02x TXADR %u SCAN %u CHADR %u : COMPSYNC %u VSYNC %u BLANK %u CLRTXADR %u HSYNC %u CLRCHADR %u\n",
-                    sync_addr,sync_data,txadr,scan,chadr,comp_sync,vsync,blank,clrtxadr,hsync,clrchadr);
-                */
+				logerror("SYNC %03x:%02x TXADR %u SCAN %u CHADR %u : COMPSYNC %u VSYNC %u BLANK %u CLRTXADR %u HSYNC %u CLRCHADR %u\n",
+				    sync_addr,sync_data,txadr,scan,chadr,comp_sync,vsync,blank,clrtxadr,hsync,clrchadr);
+				*/
 
 				int reverse = 0;
 
@@ -519,18 +519,18 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DSEL1/
-        1       DSEL2/
-        2       DDEN/
-        3       ALT CHARSET/
-        4       256 CHARS
-        5       BEEP ENB
-        6
-        7
+	    0       DSEL1/
+	    1       DSEL2/
+	    2       DDEN/
+	    3       ALT CHARSET/
+	    4       256 CHARS
+	    5       BEEP ENB
+	    6
+	    7
 
-    */
+	*/
 
 	// drive select
 	floppy_image_device *floppy = NULL;
@@ -573,18 +573,18 @@ WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     ATN
-        PB1     DAV
-        PB2     NDAC
-        PB3     NRFD
-        PB4     EOI
-        PB5     SRQ
-        PB6     IFC
-        PB7     REN
+	    PB0     ATN
+	    PB1     DAV
+	    PB2     NDAC
+	    PB3     NRFD
+	    PB4     EOI
+	    PB5     SRQ
+	    PB6     IFC
+	    PB7     REN
 
-    */
+	*/
 
 	/* data valid */
 	m_ieee488->atn_w(BIT(data, 0));
@@ -615,18 +615,18 @@ WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0     select internal clock
-        PC1     ENB RING INT
-        PC2     ENB RCV INT
-        PC3     ENB XMT INT
-        PC4     ENB ATN INT
-        PC5     ENB SRQ INT
-        PC6
-        PC7
+	    PC0     select internal clock
+	    PC1     ENB RING INT
+	    PC2     ENB RCV INT
+	    PC3     ENB XMT INT
+	    PC4     ENB ATN INT
+	    PC5     ENB SRQ INT
+	    PC6
+	    PC7
 
-    */
+	*/
 
 	m_int_clk = BIT(data, 0);
 	m_enb_ring_int = BIT(data, 1);
@@ -647,9 +647,9 @@ WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
 
 static I8155_INTERFACE( io_i8155_intf )
 {
-    DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
-    DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pb_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(vixen_state, io_i8155_pc_w),
@@ -812,12 +812,12 @@ void vixen_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( vixen, vixen_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
-    MCFG_CPU_PROGRAM_MAP(vixen_mem)
-    MCFG_CPU_IO_MAP(vixen_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
+	MCFG_CPU_PROGRAM_MAP(vixen_mem)
+	MCFG_CPU_IO_MAP(vixen_io)
 
-    // video hardware
+	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
@@ -857,10 +857,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( vixen )
-    ROM_REGION( 0x1000, Z8400A_TAG, 0 )
+	ROM_REGION( 0x1000, Z8400A_TAG, 0 )
 	ROM_LOAD( "osborne 4 mon rom v1.04 3p40082-03 a0a9.4c", 0x0000, 0x1000, CRC(5f1038ce) SHA1(e6809fac23650bbb4689e58edc768d917d80a2df) ) // OSBORNE 4 MON ROM / V1.04  3P40082-03 / A0A9 (c) OCC 1985
 
-    ROM_REGION( 0x1000, "video", 0 )
+	ROM_REGION( 0x1000, "video", 0 )
 	ROM_LOAD( "v1.10.3j", 0x0000, 0x1000, CRC(1f93e2d7) SHA1(0c479bfd3ac8d9959c285c020d0096930a9c6867) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
@@ -915,4 +915,4 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1984, vixen,  0,       0, 	vixen,	vixen, vixen_state,	 vixen,  "Osborne",   "Vixen",		GAME_NOT_WORKING )
+COMP( 1984, vixen,  0,       0,     vixen,  vixen, vixen_state,  vixen,  "Osborne",   "Vixen",      GAME_NOT_WORKING )

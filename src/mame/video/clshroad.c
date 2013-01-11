@@ -45,9 +45,9 @@ PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 	for (i = 0;i < 256;i++)
-		palette_set_color_rgb(machine(),i,	pal4bit(color_prom[i + 256 * 0]),
-								        pal4bit(color_prom[i + 256 * 1]),
-								        pal4bit(color_prom[i + 256 * 2]));
+		palette_set_color_rgb(machine(),i,  pal4bit(color_prom[i + 256 * 0]),
+										pal4bit(color_prom[i + 256 * 1]),
+										pal4bit(color_prom[i + 256 * 2]));
 }
 
 PALETTE_INIT_MEMBER(clshroad_state,firebatl)
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(clshroad_state,firebatl)
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT8 ctabentry = ((color_prom[(i - 0x200) + 0x000] & 0x0f) << 4) |
-						   (color_prom[(i - 0x200) + 0x100] & 0x0f);
+							(color_prom[(i - 0x200) + 0x100] & 0x0f);
 		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 }
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 {
 	UINT8 code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
-	code	=	m_vram_0[ tile_index * 2 + 0x40 ];
+	code    =   m_vram_0[ tile_index * 2 + 0x40 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x41 ];
 	SET_TILE_INFO_MEMBER(
 			1,
@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 {
 	UINT8 code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
-	code	=	m_vram_0[ tile_index * 2 + 0x00 ];
+	code    =   m_vram_0[ tile_index * 2 + 0x00 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x01 ];
 	SET_TILE_INFO_MEMBER(
 			1,
@@ -135,8 +135,8 @@ WRITE8_MEMBER(clshroad_state::clshroad_vram_0_w)
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
 	m_vram_0[offset] = data;
-	if (tile_index & 0x20)	m_tilemap_0a->mark_tile_dirty(tile);
-	else					m_tilemap_0b->mark_tile_dirty(tile);
+	if (tile_index & 0x20)  m_tilemap_0a->mark_tile_dirty(tile);
+	else                    m_tilemap_0b->mark_tile_dirty(tile);
 }
 
 /***************************************************************************
@@ -161,14 +161,14 @@ Offset:
 TILEMAP_MAPPER_MEMBER(clshroad_state::tilemap_scan_rows_extra)
 {
 	// The leftmost columns come from the bottom rows
-	if (col <= 0x01)	return row + (col + 0x1e) * 0x20;
+	if (col <= 0x01)    return row + (col + 0x1e) * 0x20;
 	// The rightmost columns come from the top rows
-	if (col >= 0x22)	return row + (col - 0x22) * 0x20;
+	if (col >= 0x22)    return row + (col - 0x22) * 0x20;
 
 	// These are not visible, but *must* be mapped to other tiles than
 	// those used by the leftmost and rightmost columns (tilemap "bug"?)
-	if (row <= 0x01)	return 0;
-	if (row >= 0x1e)	return 0;
+	if (row <= 0x01)    return 0;
+	if (row >= 0x1e)    return 0;
 
 	// "normal" layout for the rest.
 	return (col-2) + row * 0x20;
@@ -176,8 +176,8 @@ TILEMAP_MAPPER_MEMBER(clshroad_state::tilemap_scan_rows_extra)
 
 TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 {
-	UINT8 code	=	m_vram_1[ tile_index + 0x000 ];
-	UINT8 color	=	m_vram_1[ tile_index + 0x400 ] & 0x3f;
+	UINT8 code  =   m_vram_1[ tile_index + 0x000 ];
+	UINT8 color =   m_vram_1[ tile_index + 0x400 ] & 0x3f;
 	tileinfo.group = color;
 	SET_TILE_INFO_MEMBER(
 			2,
@@ -188,8 +188,8 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 
 TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 {
-	UINT8 code	=	m_vram_1[ tile_index + 0x000 ];
-	UINT8 color	=	m_vram_1[ tile_index + 0x400 ];
+	UINT8 code  =   m_vram_1[ tile_index + 0x000 ];
+	UINT8 color =   m_vram_1[ tile_index + 0x400 ];
 	SET_TILE_INFO_MEMBER(
 			2,
 			code + ((color & 0xf0)<<4),
@@ -288,13 +288,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	for (i = 0; i < state->m_spriteram.bytes() ; i += 8)
 	{
-		int y		=	 240 - spriteram[i+1];
-		int code	=	(spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);
-		int x		=	 spriteram[i+5]         + (spriteram[i+6] << 8);
-		int attr	=	 spriteram[i+7];
+		int y       =    240 - spriteram[i+1];
+		int code    =   (spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);
+		int x       =    spriteram[i+5]         + (spriteram[i+6] << 8);
+		int attr    =    spriteram[i+7];
 
-		int flipx	=	0;
-		int flipy	=	0;
+		int flipx   =   0;
+		int flipy   =   0;
 
 		x -= 0x4a/2;
 		if (state->flip_screen())
@@ -330,7 +330,7 @@ UINT32 clshroad_state::screen_update_clshroad(screen_device &screen, bitmap_ind1
 	m_tilemap_0a->set_scrollx(0, scrollx);
 	m_tilemap_0b->set_scrollx(0, scrollx);
 
-	m_tilemap_0a->draw(bitmap, cliprect, 0,0);	// Opaque
+	m_tilemap_0a->draw(bitmap, cliprect, 0,0);  // Opaque
 	m_tilemap_0b->draw(bitmap, cliprect, 0,0);
 	draw_sprites(machine(),bitmap,cliprect);
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);

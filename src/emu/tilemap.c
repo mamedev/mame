@@ -365,38 +365,38 @@ inline void tilemap_t::scanline_draw_masked_rgb32_alpha(UINT32 *dest, const UINT
 
 tilemap_t::tilemap_t(tilemap_manager &manager, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
 	: m_next(NULL),
-	  m_rows(rows),
-	  m_cols(cols),
-	  m_tilewidth(tilewidth),
-	  m_tileheight(tileheight),
-	  m_width(cols * tilewidth),
-	  m_height(rows * tileheight),
-	  m_mapper(mapper),
-	  m_memory_to_logical(NULL),
-	  m_max_logical_index(0),
-	  m_logical_to_memory(NULL),
-	  m_max_memory_index(0),
-	  m_tile_get_info(tile_get_info),
-	  m_user_data(NULL),
-	  m_enable(true),
-	  m_attributes(0),
-	  m_all_tiles_dirty(true),
-	  m_all_tiles_clean(false),
-	  m_palette_offset(0),
-	  m_pen_data_offset(0),
-	  m_gfx_used(0),
-	  m_scrollrows(1),
-	  m_scrollcols(1),
-	  m_rowscroll(auto_alloc_array_clear(manager.machine(), INT32, m_height)),
-	  m_colscroll(auto_alloc_array_clear(manager.machine(), INT32, m_width)),
-	  m_dx(0),
-	  m_dx_flipped(0),
-	  m_dy(0),
-	  m_dy_flipped(0),
-	  m_pixmap(m_width, m_height),
-	  m_flagsmap(m_width, m_height),
-	  m_tileflags(NULL),
-	  m_manager(manager)
+		m_rows(rows),
+		m_cols(cols),
+		m_tilewidth(tilewidth),
+		m_tileheight(tileheight),
+		m_width(cols * tilewidth),
+		m_height(rows * tileheight),
+		m_mapper(mapper),
+		m_memory_to_logical(NULL),
+		m_max_logical_index(0),
+		m_logical_to_memory(NULL),
+		m_max_memory_index(0),
+		m_tile_get_info(tile_get_info),
+		m_user_data(NULL),
+		m_enable(true),
+		m_attributes(0),
+		m_all_tiles_dirty(true),
+		m_all_tiles_clean(false),
+		m_palette_offset(0),
+		m_pen_data_offset(0),
+		m_gfx_used(0),
+		m_scrollrows(1),
+		m_scrollcols(1),
+		m_rowscroll(auto_alloc_array_clear(manager.machine(), INT32, m_height)),
+		m_colscroll(auto_alloc_array_clear(manager.machine(), INT32, m_width)),
+		m_dx(0),
+		m_dx_flipped(0),
+		m_dy(0),
+		m_dy_flipped(0),
+		m_pixmap(m_width, m_height),
+		m_flagsmap(m_width, m_height),
+		m_tileflags(NULL),
+		m_manager(manager)
 {
 	// reset internal arrays
 	memset(m_gfx_dirtyseq, 0, sizeof(m_gfx_dirtyseq));
@@ -513,7 +513,7 @@ void tilemap_t::set_transparent_pen(pen_t pen)
 	map_pens_to_layer(0, 0, 0, TILEMAP_PIXEL_LAYER0);
 
 	// set the single pen to transparent
-    map_pen_to_layer(0, pen, TILEMAP_PIXEL_TRANSPARENT);
+	map_pen_to_layer(0, pen, TILEMAP_PIXEL_TRANSPARENT);
 }
 
 
@@ -1001,7 +1001,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		for (int curcol = 0; curcol < m_scrollcols; curcol = nextcol)
 		{
 			// scan forward until we find a non-matching column
-			int scrolly	= effective_colscroll(curcol, height);
+			int scrolly = effective_colscroll(curcol, height);
 			for (nextcol = curcol + 1; nextcol < m_scrollcols; nextcol++)
 				if (effective_colscroll(nextcol, height) != scrolly)
 					break;
@@ -1261,14 +1261,14 @@ void tilemap_t::draw_instance(_BitmapClass &dest, const blit_parameters &blit, i
 //  and zoom
 //-------------------------------------------------
 
-#define ROZ_PLOT_PIXEL(INPUT_VAL)											\
-do {																		\
-	if (sizeof(*dest) == 2)													\
-		*dest = (INPUT_VAL) + (priority >> 16);								\
-	else if (sizeof(*dest) == 4 && alpha >= 0xff)							\
-		*dest = clut[INPUT_VAL];											\
-	else if (sizeof(*dest) == 4)											\
-		*dest = alpha_blend_r32(*dest, clut[INPUT_VAL], alpha);				\
+#define ROZ_PLOT_PIXEL(INPUT_VAL)                                           \
+do {                                                                        \
+	if (sizeof(*dest) == 2)                                                 \
+		*dest = (INPUT_VAL) + (priority >> 16);                             \
+	else if (sizeof(*dest) == 4 && alpha >= 0xff)                           \
+		*dest = clut[INPUT_VAL];                                            \
+	else if (sizeof(*dest) == 4)                                            \
+		*dest = alpha_blend_r32(*dest, clut[INPUT_VAL], alpha);             \
 } while (0)
 
 template<class _BitmapClass>
@@ -1471,7 +1471,7 @@ void tilemap_t::draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly)
 
 tilemap_manager::tilemap_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_instance(0)
+		m_instance(0)
 {
 	if (machine.primary_screen == NULL || machine.primary_screen->width() == 0)
 		return;

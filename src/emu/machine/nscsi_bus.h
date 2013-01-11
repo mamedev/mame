@@ -3,11 +3,11 @@
 
 #include "emu.h"
 
-#define MCFG_NSCSI_BUS_ADD(_tag)		\
+#define MCFG_NSCSI_BUS_ADD(_tag)        \
 	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
 
-#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)	\
-	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)					\
+#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)  \
+	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)                   \
 	MCFG_DEVICE_SLOT_INTERFACE_FULL(_slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)
 
 class nscsi_device;
@@ -46,7 +46,7 @@ private:
 };
 
 class nscsi_connector: public device_t,
-					   public device_slot_interface
+						public device_slot_interface
 {
 public:
 	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -59,7 +59,7 @@ protected:
 };
 
 class nscsi_device : public device_t,
-					 public device_slot_card_interface
+						public device_slot_card_interface
 {
 public:
 	// Here because the biggest users are the devices, not the bus
@@ -339,4 +339,3 @@ extern const device_type NSCSI_BUS;
 extern const device_type NSCSI_CONNECTOR;
 
 #endif
-

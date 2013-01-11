@@ -107,4 +107,3 @@ void dc_controller_device::read(UINT32 *dest)
 		(ioport(port_tag[6])->read_safe(0x80) << 16) |
 		(ioport(port_tag[7])->read_safe(0x80) << 24);
 }
-

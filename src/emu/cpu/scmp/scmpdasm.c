@@ -105,7 +105,7 @@ CPU_DISASSEMBLE( scmp )
 			case 0x9d : case 0x9e : case 0x9f :
 						sprintf (buffer,"jnz %s",aspr); break;
 			// Double-Byte Miscellaneous Instructions
-			case 0x8f:	sprintf (buffer,"dly $%02x",arg); break;
+			case 0x8f:  sprintf (buffer,"dly $%02x",arg); break;
 			// Others are illegal
 			default : sprintf (buffer,"illegal"); pc--; break; // Illegal we consider without param
 		}
@@ -114,36 +114,36 @@ CPU_DISASSEMBLE( scmp )
 		switch (op)
 		{
 			// Extension Register Instructions
-			case 0x40:	sprintf (buffer,"lde"); break;
-			case 0x01:	sprintf (buffer,"xae"); break;
-			case 0x50:	sprintf (buffer,"ane"); break;
-			case 0x58:	sprintf (buffer,"ore"); break;
-			case 0x60:	sprintf (buffer,"xre"); break;
-			case 0x68:	sprintf (buffer,"dae"); break;
-			case 0x70:	sprintf (buffer,"ade"); break;
-			case 0x78:	sprintf (buffer,"cae"); break;
+			case 0x40:  sprintf (buffer,"lde"); break;
+			case 0x01:  sprintf (buffer,"xae"); break;
+			case 0x50:  sprintf (buffer,"ane"); break;
+			case 0x58:  sprintf (buffer,"ore"); break;
+			case 0x60:  sprintf (buffer,"xre"); break;
+			case 0x68:  sprintf (buffer,"dae"); break;
+			case 0x70:  sprintf (buffer,"ade"); break;
+			case 0x78:  sprintf (buffer,"cae"); break;
 			// Pointer Register Move Instructions
-			case 0x30:	case 0x31 :case 0x32: case 0x33:
+			case 0x30:  case 0x31 :case 0x32: case 0x33:
 						sprintf (buffer,"xpal %d",ptr); break;
-			case 0x34:	case 0x35 :case 0x36: case 0x37:
+			case 0x34:  case 0x35 :case 0x36: case 0x37:
 						sprintf (buffer,"xpah %d",ptr); break;
-			case 0x3c:	case 0x3d :case 0x3e: case 0x3f:
+			case 0x3c:  case 0x3d :case 0x3e: case 0x3f:
 						sprintf (buffer,"xppc %d",ptr); break;
 			// Shift, Rotate, Serial I/O Instructions
-			case 0x19:	sprintf (buffer,"sio"); break;
-			case 0x1c:	sprintf (buffer,"sr"); break;
-			case 0x1d:	sprintf (buffer,"srl"); break;
-			case 0x1e:	sprintf (buffer,"rr"); break;
-			case 0x1f:	sprintf (buffer,"rrl"); break;
+			case 0x19:  sprintf (buffer,"sio"); break;
+			case 0x1c:  sprintf (buffer,"sr"); break;
+			case 0x1d:  sprintf (buffer,"srl"); break;
+			case 0x1e:  sprintf (buffer,"rr"); break;
+			case 0x1f:  sprintf (buffer,"rrl"); break;
 			// Single Byte Miscellaneous Instructions
-			case 0x00:	sprintf (buffer,"halt"); break;
-			case 0x02:	sprintf (buffer,"ccl"); break;
-			case 0x03:	sprintf (buffer,"scl"); break;
-			case 0x04:	sprintf (buffer,"dint"); break;
-			case 0x05:	sprintf (buffer,"ien"); break;
-			case 0x06:	sprintf (buffer,"csa"); break;
-			case 0x07:	sprintf (buffer,"cas"); break;
-			case 0x08:	sprintf (buffer,"nop"); break;
+			case 0x00:  sprintf (buffer,"halt"); break;
+			case 0x02:  sprintf (buffer,"ccl"); break;
+			case 0x03:  sprintf (buffer,"scl"); break;
+			case 0x04:  sprintf (buffer,"dint"); break;
+			case 0x05:  sprintf (buffer,"ien"); break;
+			case 0x06:  sprintf (buffer,"csa"); break;
+			case 0x07:  sprintf (buffer,"cas"); break;
+			case 0x08:  sprintf (buffer,"nop"); break;
 			// Others are illegal
 			default : sprintf (buffer,"illegal"); break;
 		}

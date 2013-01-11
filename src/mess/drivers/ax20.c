@@ -136,4 +136,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
 COMP( 1982, ax20,  0,      0,       ax20,     ax20, driver_device,    0,     "Axel",   "AX-20", GAME_NOT_WORKING | GAME_NO_SOUND)
-

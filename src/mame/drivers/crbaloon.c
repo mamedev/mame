@@ -41,7 +41,7 @@
  *
  *************************************/
 
-#define LOG_PC3092		0
+#define LOG_PC3092      0
 
 
 static void pc3092_reset(void)
@@ -104,7 +104,7 @@ CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
  *
  *************************************/
 
-#define LOG_PC3259		0
+#define LOG_PC3259      0
 
 
 static void pc3259_update(void)
@@ -194,8 +194,8 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crbaloon_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 is not decoded */
-	AM_RANGE(0x0000, 0x3fff) AM_ROM		/* not fully populated */
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM     /* not fully populated */
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_colorram_w) AM_SHARE("colorram")
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, crbaloon_state )
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_MASK(0x0c) AM_READ(pc3259_r)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
 
-	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* not connected */
+	AM_RANGE(0x00, 0x00) AM_WRITENOP    /* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x05, 0x05) AM_WRITE(crbaloon_audio_set_music_freq)
@@ -273,7 +273,7 @@ static INPUT_PORTS_START( crbaloon )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* PC3259 */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* PC3259 */
 	PORT_DIPNAME( 0x10, 0x10, "Invulnerability") PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -314,13 +314,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	1,	/* 1 bit per pixel */
+	8,8,    /* 8*8 characters */
+	256,    /* 256 characters */
+	1,  /* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 

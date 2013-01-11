@@ -6,7 +6,7 @@
 	downcast<mb8795_device *>(device)->set_irq_cb(_tx_irq, _rx_irq); \
 	downcast<mb8795_device *>(device)->set_drq_cb(_tx_drq, _rx_drq);
 
-class mb8795_device :	public device_t,
+class mb8795_device :   public device_t,
 						public device_network_interface
 {
 public:

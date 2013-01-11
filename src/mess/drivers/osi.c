@@ -208,12 +208,12 @@ Notes:
 
 static const discrete_dac_r1_ladder osi600_dac =
 {
-	4,			// size of ladder
+	4,          // size of ladder
 	{ 180, 180, 180, 180, 0, 0, 0, 0 }, // R68, R69, R70, R71
-	5,			// 5V
-	RES_K(1),	// R67
-	0,			// no rGnd
-	0			// no cFilter
+	5,          // 5V
+	RES_K(1),   // R67
+	0,          // no rGnd
+	0           // no cFilter
 };
 
 static DISCRETE_SOUND_START( osi600_discrete_interface )
@@ -228,12 +228,12 @@ DISCRETE_SOUND_END
 
 static const discrete_dac_r1_ladder osi600c_dac =
 {
-	8,			// size of ladder
+	8,          // size of ladder
 	{ RES_K(68), RES_K(33), RES_K(16), RES_K(8.2), RES_K(3.9), RES_K(2), RES_K(1), 510 }, // R73, R71, R70, R67, R68, R69, R75, R74
-	5,			// 5V
-	510,		// R86
-	0,			// no rGnd
-	CAP_U(33)	// C63
+	5,          // 5V
+	510,        // R86
+	0,          // no rGnd
+	CAP_U(33)   // C63
 };
 
 static DISCRETE_SOUND_START( osi600c_discrete_interface )
@@ -282,18 +282,18 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 {
 	/*
 
-        bit     signal          description
+	    bit     signal          description
 
-        0       _32             screen size (0=32x32, 1=64x16)
-        1       COLOR EN        color enable
-        2       BK0
-        3       BK1
-        4       DAC DISABLE     DAC sound enable
-        5
-        6
-        7
+	    0       _32             screen size (0=32x32, 1=64x16)
+	    1       COLOR EN        color enable
+	    2       BK0
+	    3       BK1
+	    4       DAC DISABLE     DAC sound enable
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_32 = BIT(data, 0);
 	m_coloren = BIT(data, 1);
@@ -305,18 +305,18 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       AC control enable
-        1       tone generator enable
-        2       modem select (0 = printer, 1 = modem)
-        3
-        4
-        5
-        6
-        7
+	    0       AC control enable
+	    1       tone generator enable
+	    2       modem select (0 = printer, 1 = modem)
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	beep_set_state(m_beep, BIT(data, 1));
 }
@@ -372,18 +372,18 @@ READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
 
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _READY DRIVE 1
-        1       _TRACK 00
-        2       _FAULT
-        3       _SECTOR
-        4       _READY DRIVE 2
-        5       _WRITE PROTECT
-        6
-        7       _INDEX
+	    0       _READY DRIVE 1
+	    1       _TRACK 00
+	    2       _FAULT
+	    3       _SECTOR
+	    4       _READY DRIVE 2
+	    5       _WRITE PROTECT
+	    6
+	    7       _INDEX
 
-    */
+	*/
 
 	return (m_fdc_index << 7);
 }
@@ -392,36 +392,36 @@ WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6       drive select
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6       drive select
+	    7
 
-    */
+	*/
 }
 
 WRITE8_MEMBER( c1pmf_state::osi470_pia_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _WRITE ENABLE
-        1       _ERASE ENABLE
-        2       _STEP IN
-        3       _STEP
-        4       _FAULT RESET
-        5       side select
-        6       _LOW CURRENT
-        7       _HEAD LOAD
+	    0       _WRITE ENABLE
+	    1       _ERASE ENABLE
+	    2       _STEP IN
+	    3       _STEP
+	    4       _FAULT RESET
+	    5       side select
+	    6       _LOW CURRENT
+	    7       _HEAD LOAD
 
-    */
+	*/
 }
 
 WRITE_LINE_MEMBER( c1pmf_state::osi470_pia_cb2_w )
@@ -660,8 +660,8 @@ static ACIA6850_INTERFACE( uk101_acia_intf )
 
 static ACIA6850_INTERFACE( osi470_acia_intf )
 {
-	0,				// clocked in from the floppy drive
-	XTAL_4MHz/8,	// 250 kHz
+	0,              // clocked in from the floppy drive
+	XTAL_4MHz/8,    // 250 kHz
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -753,15 +753,15 @@ static const floppy_interface osi_floppy_interface =
 /* F4 Character Displayer */
 static const gfx_layout osi_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( osi )

@@ -244,7 +244,7 @@ static UINT8 rip_status_in(running_machine &machine)
 	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
 //  UINT8 _hblank = !machine.primary_screen->hblank();
 
-	return	_vblank
+	return  _vblank
 			| (state->m_hblank << 1)
 			| (state->m_12sel << 2)
 			| (state->m_fbsel << 4)
@@ -569,9 +569,9 @@ WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
 		UINT16 dac_data = (m_dac_msb << 8) | data;
 
 		/*
-            The 8-bit DAC modulates the 10-bit DAC.
-            Shift down to prevent clipping.
-        */
+		    The 8-bit DAC modulates the 10-bit DAC.
+		    Shift down to prevent clipping.
+		*/
 		device->write_signed16((m_dac_vol * dac_data) >> 1);
 	}
 }

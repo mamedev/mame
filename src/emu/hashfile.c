@@ -226,7 +226,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 							unknown_attribute_value(state, attributes[0], attributes[1]);
 						else
 						{
-	 //                         device = (iodevice_t) i;
+		//                         device = (iodevice_t) i;
 						}
 					}
 					else

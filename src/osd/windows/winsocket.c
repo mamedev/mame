@@ -43,7 +43,7 @@ bool win_init_sockets()
 
 	/* check for correct version */
 	if ( LOBYTE( wsaData.wVersion ) != 2 ||
-		 HIBYTE( wsaData.wVersion ) != 0 )
+			HIBYTE( wsaData.wVersion ) != 0 )
 	{
 		/* incorrect WinSock version */
 		WSACleanup();

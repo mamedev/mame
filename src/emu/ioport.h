@@ -171,10 +171,10 @@ enum ioport_type
 	IPT_INTERLOCK,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
-	IPT_START,					// MESS only
-	IPT_SELECT,					// MESS only
-	IPT_KEYPAD,					// MESS only
-	IPT_KEYBOARD,				// MESS only
+	IPT_START,                  // MESS only
+	IPT_SELECT,                 // MESS only
+	IPT_KEYPAD,                 // MESS only
+	IPT_KEYBOARD,               // MESS only
 
 	// digital joystick inputs
 	IPT_DIGITAL_JOYSTICK_FIRST,
@@ -238,7 +238,7 @@ enum ioport_type
 		IPT_MAHJONG_KAN,
 		IPT_MAHJONG_PON,
 		IPT_MAHJONG_CHI,
-		IPT_MAHJONG_REACH,	//IPT_MAHJONG_RIICHI,   // REACH is Japanglish
+		IPT_MAHJONG_REACH,  //IPT_MAHJONG_RIICHI,   // REACH is Japanglish
 		IPT_MAHJONG_RON,
 		IPT_MAHJONG_BET,
 		IPT_MAHJONG_LAST_CHANCE,
@@ -269,25 +269,25 @@ enum ioport_type
 	// gambling inputs
 	IPT_GAMBLING_FIRST,
 
-		IPT_GAMBLE_KEYIN,	// attendant
-		IPT_GAMBLE_KEYOUT,	// attendant
-		IPT_GAMBLE_SERVICE,	// attendant
-		IPT_GAMBLE_BOOK,	// attendant
-		IPT_GAMBLE_DOOR,	// attendant
+		IPT_GAMBLE_KEYIN,   // attendant
+		IPT_GAMBLE_KEYOUT,  // attendant
+		IPT_GAMBLE_SERVICE, // attendant
+		IPT_GAMBLE_BOOK,    // attendant
+		IPT_GAMBLE_DOOR,    // attendant
 	//  IPT_GAMBLE_DOOR2,   // many gambling games have several doors.
 	//  IPT_GAMBLE_DOOR3,
 	//  IPT_GAMBLE_DOOR4,
 	//  IPT_GAMBLE_DOOR5,
 
-		IPT_GAMBLE_HIGH,	// player
-		IPT_GAMBLE_LOW,		// player
-		IPT_GAMBLE_HALF,	// player
-		IPT_GAMBLE_DEAL,	// player
-		IPT_GAMBLE_D_UP,	// player
-		IPT_GAMBLE_TAKE,	// player
-		IPT_GAMBLE_STAND,	// player
-		IPT_GAMBLE_BET,		// player
-		IPT_GAMBLE_PAYOUT,	// player
+		IPT_GAMBLE_HIGH,    // player
+		IPT_GAMBLE_LOW,     // player
+		IPT_GAMBLE_HALF,    // player
+		IPT_GAMBLE_DEAL,    // player
+		IPT_GAMBLE_D_UP,    // player
+		IPT_GAMBLE_TAKE,    // player
+		IPT_GAMBLE_STAND,   // player
+		IPT_GAMBLE_BET,     // player
+		IPT_GAMBLE_PAYOUT,  // player
 	//  IPT_GAMBLE_BUTTON1, // player
 	//  IPT_GAMBLE_BUTTON2, // many many gambling games have multi-games and/or multi-function-buttons
 	//  IPT_GAMBLE_BUTTON3, // I suggest to eliminate specific names
@@ -328,27 +328,27 @@ enum ioport_type
 
 		IPT_ANALOG_ABSOLUTE_FIRST,
 
-			IPT_AD_STICK_X,		// absolute // autocenter
-			IPT_AD_STICK_Y,		// absolute // autocenter
-			IPT_AD_STICK_Z,		// absolute // autocenter
-			IPT_PADDLE,			// absolute // autocenter
-			IPT_PADDLE_V,		// absolute // autocenter
-			IPT_PEDAL,			// absolute // autocenter
-			IPT_PEDAL2,			// absolute // autocenter
-			IPT_PEDAL3,			// absolute // autocenter
-			IPT_LIGHTGUN_X,		// absolute
-			IPT_LIGHTGUN_Y,		// absolute
-			IPT_POSITIONAL,		// absolute // autocenter if not wraps
-			IPT_POSITIONAL_V,	// absolute // autocenter if not wraps
+			IPT_AD_STICK_X,     // absolute // autocenter
+			IPT_AD_STICK_Y,     // absolute // autocenter
+			IPT_AD_STICK_Z,     // absolute // autocenter
+			IPT_PADDLE,         // absolute // autocenter
+			IPT_PADDLE_V,       // absolute // autocenter
+			IPT_PEDAL,          // absolute // autocenter
+			IPT_PEDAL2,         // absolute // autocenter
+			IPT_PEDAL3,         // absolute // autocenter
+			IPT_LIGHTGUN_X,     // absolute
+			IPT_LIGHTGUN_Y,     // absolute
+			IPT_POSITIONAL,     // absolute // autocenter if not wraps
+			IPT_POSITIONAL_V,   // absolute // autocenter if not wraps
 
 		IPT_ANALOG_ABSOLUTE_LAST,
 
-		IPT_DIAL,			// relative
-		IPT_DIAL_V,			// relative
-		IPT_TRACKBALL_X,	// relative
-		IPT_TRACKBALL_Y,	// relative
-		IPT_MOUSE_X,		// relative
-		IPT_MOUSE_Y,		// relative
+		IPT_DIAL,           // relative
+		IPT_DIAL_V,         // relative
+		IPT_TRACKBALL_X,    // relative
+		IPT_TRACKBALL_Y,    // relative
+		IPT_MOUSE_X,        // relative
+		IPT_MOUSE_Y,        // relative
 
 	IPT_ANALOG_LAST,
 
@@ -460,21 +460,21 @@ enum
 //  INPUT_STRING_15C_1C,    //  0.066667
 //  INPUT_STRING_10C_1C,    //  0.100000
 #define __input_string_coinage_start INPUT_STRING_9C_1C
-	INPUT_STRING_9C_1C,		//  0.111111
-	INPUT_STRING_8C_1C,		//  0.125000
-	INPUT_STRING_7C_1C,		//  0.142857
-	INPUT_STRING_6C_1C,		//  0.166667
+	INPUT_STRING_9C_1C,     //  0.111111
+	INPUT_STRING_8C_1C,     //  0.125000
+	INPUT_STRING_7C_1C,     //  0.142857
+	INPUT_STRING_6C_1C,     //  0.166667
 //  INPUT_STRING_10C_2C,    //  0.200000
-	INPUT_STRING_5C_1C,		//  0.200000
+	INPUT_STRING_5C_1C,     //  0.200000
 //  INPUT_STRING_9C_2C,     //  0.222222
 //  INPUT_STRING_8C_2C,     //  0.250000
-	INPUT_STRING_4C_1C,		//  0.250000
+	INPUT_STRING_4C_1C,     //  0.250000
 //  INPUT_STRING_7C_2C,     //  0.285714
 //  INPUT_STRING_10C_3C,    //  0.300000
 //  INPUT_STRING_9C_3C,     //  0.333333
 //  INPUT_STRING_6C_2C,     //  0.333333
-	INPUT_STRING_3C_1C,		//  0.333333
-	INPUT_STRING_8C_3C,		//  0.375000
+	INPUT_STRING_3C_1C,     //  0.333333
+	INPUT_STRING_8C_3C,     //  0.375000
 //  INPUT_STRING_10C_4C,    //  0.400000
 //  INPUT_STRING_5C_2C,     //  0.400000
 //  INPUT_STRING_7C_3C,     //  0.428571
@@ -482,20 +482,20 @@ enum
 //  INPUT_STRING_10C_5C,    //  0.500000
 //  INPUT_STRING_8C_4C,     //  0.500000
 //  INPUT_STRING_6C_3C,     //  0.500000
-	INPUT_STRING_4C_2C,		//  0.500000
-	INPUT_STRING_2C_1C,		//  0.500000
+	INPUT_STRING_4C_2C,     //  0.500000
+	INPUT_STRING_2C_1C,     //  0.500000
 //  INPUT_STRING_9C_5C,     //  0.555556
 //  INPUT_STRING_7C_4C,     //  0.571429
 //  INPUT_STRING_10C_6C,    //  0.600000
-	INPUT_STRING_5C_3C,		//  0.600000
+	INPUT_STRING_5C_3C,     //  0.600000
 //  INPUT_STRING_8C_5C,     //  0.625000
 //  INPUT_STRING_9C_6C,     //  0.666667
 //  INPUT_STRING_6C_4C,     //  0.666667
-	INPUT_STRING_3C_2C,		//  0.666667
+	INPUT_STRING_3C_2C,     //  0.666667
 //  INPUT_STRING_10C_7C,    //  0.700000
 //  INPUT_STRING_7C_5C,     //  0.714286
 //  INPUT_STRING_8C_6C,     //  0.750000
-	INPUT_STRING_4C_3C,		//  0.750000
+	INPUT_STRING_4C_3C,     //  0.750000
 //  INPUT_STRING_9C_7C,     //  0.777778
 //  INPUT_STRING_10C_8C,    //  0.800000
 //  INPUT_STRING_5C_4C,     //  0.800000
@@ -510,54 +510,54 @@ enum
 //  INPUT_STRING_7C_7C,     //  1.000000
 //  INPUT_STRING_6C_6C,     //  1.000000
 //  INPUT_STRING_5C_5C,     //  1.000000
-	INPUT_STRING_4C_4C,		//  1.000000
-	INPUT_STRING_3C_3C,		//  1.000000
-	INPUT_STRING_2C_2C,		//  1.000000
-	INPUT_STRING_1C_1C,		//  1.000000
+	INPUT_STRING_4C_4C,     //  1.000000
+	INPUT_STRING_3C_3C,     //  1.000000
+	INPUT_STRING_2C_2C,     //  1.000000
+	INPUT_STRING_1C_1C,     //  1.000000
 //  INPUT_STRING_9C_10C,    //  1.111111
 //  INPUT_STRING_8C_9C,     //  1.125000
 //  INPUT_STRING_7C_8C,     //  1.142857
 //  INPUT_STRING_6C_7C,     //  1.166667
 //  INPUT_STRING_5C_6C,     //  1.200000
 //  INPUT_STRING_8C_10C,    //  1.250000
-	INPUT_STRING_4C_5C,		//  1.250000
+	INPUT_STRING_4C_5C,     //  1.250000
 //  INPUT_STRING_7C_9C,     //  1.285714
 //  INPUT_STRING_6C_8C,     //  1.333333
-	INPUT_STRING_3C_4C,		//  1.333333
+	INPUT_STRING_3C_4C,     //  1.333333
 //  INPUT_STRING_5C_7C,     //  1.400000
 //  INPUT_STRING_7C_10C,    //  1.428571
 //  INPUT_STRING_6C_9C,     //  1.500000
 //  INPUT_STRING_4C_6C,     //  1.500000
-	INPUT_STRING_2C_3C,		//  1.500000
+	INPUT_STRING_2C_3C,     //  1.500000
 //  INPUT_STRING_5C_8C,     //  1.600000
 //  INPUT_STRING_6C_10C,    //  1.666667
 //  INPUT_STRING_3C_5C,     //  1.666667
-	INPUT_STRING_4C_7C,		//  1.750000
+	INPUT_STRING_4C_7C,     //  1.750000
 //  INPUT_STRING_5C_9C,     //  1.800000
 //  INPUT_STRING_5C_10C,    //  2.000000
 //  INPUT_STRING_4C_8C,     //  2.000000
 //  INPUT_STRING_3C_6C,     //  2.000000
-	INPUT_STRING_2C_4C,		//  2.000000
-	INPUT_STRING_1C_2C,		//  2.000000
+	INPUT_STRING_2C_4C,     //  2.000000
+	INPUT_STRING_1C_2C,     //  2.000000
 //  INPUT_STRING_4C_9C,     //  2.250000
 //  INPUT_STRING_3C_7C,     //  2.333333
 //  INPUT_STRING_4C_10C,    //  2.500000
-	INPUT_STRING_2C_5C,		//  2.500000
+	INPUT_STRING_2C_5C,     //  2.500000
 //  INPUT_STRING_3C_8C,     //  2.666667
 //  INPUT_STRING_3C_9C,     //  3.000000
-	INPUT_STRING_2C_6C,		//  3.000000
-	INPUT_STRING_1C_3C,		//  3.000000
+	INPUT_STRING_2C_6C,     //  3.000000
+	INPUT_STRING_1C_3C,     //  3.000000
 //  INPUT_STRING_3C_10C,    //  3.333333
-	INPUT_STRING_2C_7C,		//  3.500000
-	INPUT_STRING_2C_8C,		//  4.000000
-	INPUT_STRING_1C_4C,		//  4.000000
+	INPUT_STRING_2C_7C,     //  3.500000
+	INPUT_STRING_2C_8C,     //  4.000000
+	INPUT_STRING_1C_4C,     //  4.000000
 //  INPUT_STRING_2C_9C,     //  4.500000
 //  INPUT_STRING_2C_10C,    //  5.000000
-	INPUT_STRING_1C_5C,		//  5.000000
-	INPUT_STRING_1C_6C,		//  6.000000
-	INPUT_STRING_1C_7C,		//  7.000000
-	INPUT_STRING_1C_8C,		//  8.000000
-	INPUT_STRING_1C_9C,		//  9.000000
+	INPUT_STRING_1C_5C,     //  5.000000
+	INPUT_STRING_1C_6C,     //  6.000000
+	INPUT_STRING_1C_7C,     //  7.000000
+	INPUT_STRING_1C_8C,     //  8.000000
+	INPUT_STRING_1C_9C,     //  9.000000
 #define __input_string_coinage_end INPUT_STRING_1C_9C
 //  INPUT_STRING_1C_10C,    //  10.000000
 //  INPUT_STRING_1C_11C,    //  11.000000
@@ -707,13 +707,13 @@ typedef delegate<bool ()> ioport_charqueue_empty_delegate;
 // header at the front of INP files
 struct inp_header
 {
-	char						header[8];		// +00: 8 byte header - must be "MAMEINP\0"
-	UINT64						basetime;		// +08: base time of recording
-	UINT8						majversion;		// +10: major INP version
-	UINT8						minversion;		// +11: minor INP version
-	UINT8						reserved[2];	// +12: must be zero
-	char						gamename[12];	// +14: game name string, NULL-terminated
-	char						version[32];	// +20: system version string, NULL-terminated
+	char                        header[8];      // +00: 8 byte header - must be "MAMEINP\0"
+	UINT64                      basetime;       // +08: base time of recording
+	UINT8                       majversion;     // +10: major INP version
+	UINT8                       minversion;     // +11: minor INP version
+	UINT8                       reserved[2];    // +12: must be zero
+	char                        gamename[12];   // +14: game name string, NULL-terminated
+	char                        version[32];    // +20: system version string, NULL-terminated
 };
 
 
@@ -722,9 +722,9 @@ struct inp_header
 // device defined default input settings
 struct input_device_default
 {
-	const char *			tag;			// tag of port to update
-	ioport_value			mask;			// mask to apply to the port
-	ioport_value			defvalue;		// new default value
+	const char *            tag;            // tag of port to update
+	ioport_value            mask;           // mask to apply to the port
+	ioport_value            defvalue;       // new default value
 };
 
 
@@ -756,14 +756,14 @@ public:
 
 private:
 	// internal state
-	input_type_entry *	m_next;				// next description in the list
-	ioport_type			m_type;				// IPT_* for this entry
-	ioport_group		m_group;			// which group the port belongs to
-	UINT8				m_player;			// player number (0 is player 1)
-	const char *		m_token;			// token used to store settings
-	const char *		m_name;				// user-friendly name
-	input_seq			m_defseq[SEQ_TYPE_TOTAL];// default input sequence
-	input_seq			m_seq[SEQ_TYPE_TOTAL];// currently configured sequences
+	input_type_entry *  m_next;             // next description in the list
+	ioport_type         m_type;             // IPT_* for this entry
+	ioport_group        m_group;            // which group the port belongs to
+	UINT8               m_player;           // player number (0 is player 1)
+	const char *        m_token;            // token used to store settings
+	const char *        m_name;             // user-friendly name
+	input_seq           m_defseq[SEQ_TYPE_TOTAL];// default input sequence
+	input_seq           m_seq[SEQ_TYPE_TOTAL];// currently configured sequences
 };
 
 
@@ -810,13 +810,13 @@ public:
 
 private:
 	// internal state
-	digital_joystick *			m_next;											// next joystick in the list
-	int							m_player;										// player number represented
-	int							m_number;										// joystick number represented
-	simple_list<simple_list_wrapper<ioport_field> >	m_field[JOYDIR_COUNT];	// potential input fields for each direction
-	UINT8						m_current;										// current value
-	UINT8						m_current4way;									// current 4-way value
-	UINT8						m_previous;										// previous value
+	digital_joystick *          m_next;                                         // next joystick in the list
+	int                         m_player;                                       // player number represented
+	int                         m_number;                                       // joystick number represented
+	simple_list<simple_list_wrapper<ioport_field> > m_field[JOYDIR_COUNT];  // potential input fields for each direction
+	UINT8                       m_current;                                      // current value
+	UINT8                       m_current4way;                                  // current 4-way value
+	UINT8                       m_previous;                                     // previous value
 };
 DECLARE_ENUM_OPERATORS(digital_joystick::direction_t)
 
@@ -857,8 +857,8 @@ private:
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		unicode_char	ch;
-		ioport_field *	field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
+		unicode_char    ch;
+		ioport_field *  field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
 	};
 
 	// internal helpers
@@ -876,18 +876,18 @@ private:
 	static void execute_dumpkbd(running_machine &machine, int ref, int params, const char *param[]);
 
 	// internal state
-	running_machine &		m_machine;				// reference to our machine
-	UINT32					m_bufbegin;				// index of starting character
-	UINT32					m_bufend;				// index of ending character
-	dynamic_array<unicode_char> m_buffer;			// actual buffer
-	bool					m_status_keydown;		// current keydown status
-	bool					m_last_cr;				// was the last char a CR?
-	emu_timer *				m_timer;				// timer for posting characters
-	attotime				m_current_rate;			// current rate for posting
-	ioport_queue_chars_delegate m_queue_chars;		// queue characters callback
-	ioport_accept_char_delegate m_accept_char;		// accept character callback
+	running_machine &       m_machine;              // reference to our machine
+	UINT32                  m_bufbegin;             // index of starting character
+	UINT32                  m_bufend;               // index of ending character
+	dynamic_array<unicode_char> m_buffer;           // actual buffer
+	bool                    m_status_keydown;       // current keydown status
+	bool                    m_last_cr;              // was the last char a CR?
+	emu_timer *             m_timer;                // timer for posting characters
+	attotime                m_current_rate;         // current rate for posting
+	ioport_queue_chars_delegate m_queue_chars;      // queue characters callback
+	ioport_accept_char_delegate m_accept_char;      // accept character callback
 	ioport_charqueue_empty_delegate m_charqueue_empty; // character queue empty callback
-	dynamic_array<keycode_map_entry> m_keycode_map;	// keycode map
+	dynamic_array<keycode_map_entry> m_keycode_map; // keycode map
 };
 
 
@@ -933,10 +933,10 @@ public:
 
 private:
 	// internal state
-	condition_t		m_condition;	// condition to use
-	const char *	m_tag;			// tag of port whose condition is to be tested
-	ioport_value	m_mask;			// mask to apply to the port
-	ioport_value	m_value;		// value to compare against
+	condition_t     m_condition;    // condition to use
+	const char *    m_tag;          // tag of port whose condition is to be tested
+	ioport_value    m_mask;         // mask to apply to the port
+	ioport_value    m_value;        // value to compare against
 };
 
 
@@ -966,11 +966,11 @@ public:
 
 private:
 	// internal state
-	ioport_setting *	m_next;				// pointer to next setting in sequence
-	ioport_field &		m_field;			// pointer back to the field that owns us
-	ioport_value		m_value;			// value of the bits in this setting
-	const char *		m_name;				// user-friendly name to display
-	ioport_condition	m_condition;		// condition under which this setting is valid
+	ioport_setting *    m_next;             // pointer to next setting in sequence
+	ioport_field &      m_field;            // pointer back to the field that owns us
+	ioport_value        m_value;            // value of the bits in this setting
+	const char *        m_name;             // user-friendly name to display
+	ioport_condition    m_condition;        // condition under which this setting is valid
 };
 
 
@@ -993,10 +993,10 @@ public:
 	bool inverted() const { return m_invert; }
 
 private:
-	ioport_diplocation *	m_next;			// pointer to the next bit
-	astring					m_name;			// name of the physical DIP switch
-	UINT8					m_number;		// physical switch number
-	bool					m_invert;		// is this an active-high DIP?
+	ioport_diplocation *    m_next;         // pointer to the next bit
+	astring                 m_name;         // name of the physical DIP switch
+	UINT8                   m_number;       // physical switch number
+	bool                    m_invert;       // is this an active-high DIP?
 };
 
 
@@ -1011,14 +1011,14 @@ class ioport_field
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static const int FIELD_FLAG_UNUSED = 0x01;		// set if this field is unused but relevant to other games on the same hw
-	static const int FIELD_FLAG_COCKTAIL = 0x02;	// set if this field is relevant only for cocktail cabinets
-	static const int FIELD_FLAG_TOGGLE = 0x04;		// set if this field should behave as a toggle
-	static const int FIELD_FLAG_ROTATED = 0x08;		// set if this field represents a rotated control
-	static const int ANALOG_FLAG_REVERSE = 0x10;	// analog only: reverse the sense of the axis
-	static const int ANALOG_FLAG_RESET = 0x20;		// analog only: always preload in->default for relative axes, returning only deltas
-	static const int ANALOG_FLAG_WRAPS = 0x40;		// analog only: positional count wraps around
-	static const int ANALOG_FLAG_INVERT = 0x80;		// analog only: bitwise invert bits
+	static const int FIELD_FLAG_UNUSED = 0x01;      // set if this field is unused but relevant to other games on the same hw
+	static const int FIELD_FLAG_COCKTAIL = 0x02;    // set if this field is relevant only for cocktail cabinets
+	static const int FIELD_FLAG_TOGGLE = 0x04;      // set if this field should behave as a toggle
+	static const int FIELD_FLAG_ROTATED = 0x08;     // set if this field represents a rotated control
+	static const int ANALOG_FLAG_REVERSE = 0x10;    // analog only: reverse the sense of the axis
+	static const int ANALOG_FLAG_RESET = 0x20;      // analog only: always preload in->default for relative axes, returning only deltas
+	static const int ANALOG_FLAG_WRAPS = 0x40;      // analog only: positional count wraps around
+	static const int ANALOG_FLAG_INVERT = 0x80;     // analog only: bitwise invert bits
 
 public:
 	// construction/destruction
@@ -1099,12 +1099,12 @@ public:
 	// user-controllable settings for a field
 	struct user_settings
 	{
-		ioport_value	value;					// for DIP switches
-		input_seq		seq[SEQ_TYPE_TOTAL];	// sequences of all types
-		INT32			sensitivity;			// for analog controls
-		INT32			delta;					// for analog controls
-		INT32			centerdelta;			// for analog controls
-		bool			reverse;				// for analog controls
+		ioport_value    value;                  // for DIP switches
+		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
+		INT32           sensitivity;            // for analog controls
+		INT32           delta;                  // for analog controls
+		INT32           centerdelta;            // for analog controls
+		bool            reverse;                // for analog controls
 	};
 	void get_user_settings(user_settings &settings);
 	void set_user_settings(const user_settings &settings);
@@ -1113,45 +1113,45 @@ private:
 	void expand_diplocation(const char *location, astring &errorbuf);
 
 	// internal state
-	ioport_field *				m_next;				// pointer to next field in sequence
-	ioport_port &				m_port;				// reference to the port that owns us
-	ioport_field_live *			m_live;				// live state of field (NULL if not live)
-	int							m_modcount;			// modification count
-	simple_list<ioport_setting> m_settinglist;		// list of input_setting_configs
-	simple_list<ioport_diplocation> m_diploclist;	// list of locations for various bits
+	ioport_field *              m_next;             // pointer to next field in sequence
+	ioport_port &               m_port;             // reference to the port that owns us
+	ioport_field_live *         m_live;             // live state of field (NULL if not live)
+	int                         m_modcount;         // modification count
+	simple_list<ioport_setting> m_settinglist;      // list of input_setting_configs
+	simple_list<ioport_diplocation> m_diploclist;   // list of locations for various bits
 
 	// generally-applicable data
-	ioport_value				m_mask;				// mask of bits belonging to the field
-	ioport_value				m_defvalue;			// default value of these bits
-	ioport_condition			m_condition;		// condition under which this field is relevant
-	ioport_type					m_type;				// IPT_* type for this port
-	UINT8						m_player;			// player number (0-based)
-	UINT32						m_flags;			// combination of FIELD_FLAG_* and ANALOG_FLAG_* above
-	UINT8						m_impulse;			// number of frames before reverting to defvalue
-	const char *				m_name;				// user-friendly name to display
-	input_seq					m_seq[SEQ_TYPE_TOTAL];// sequences of all types
-	ioport_field_read_delegate	m_read;				// read callback routine
-	void *						m_read_param;		// parameter for read callback routine
-	ioport_field_write_delegate	m_write;			// write callback routine
-	void *						m_write_param;		// parameter for write callback routine
+	ioport_value                m_mask;             // mask of bits belonging to the field
+	ioport_value                m_defvalue;         // default value of these bits
+	ioport_condition            m_condition;        // condition under which this field is relevant
+	ioport_type                 m_type;             // IPT_* type for this port
+	UINT8                       m_player;           // player number (0-based)
+	UINT32                      m_flags;            // combination of FIELD_FLAG_* and ANALOG_FLAG_* above
+	UINT8                       m_impulse;          // number of frames before reverting to defvalue
+	const char *                m_name;             // user-friendly name to display
+	input_seq                   m_seq[SEQ_TYPE_TOTAL];// sequences of all types
+	ioport_field_read_delegate  m_read;             // read callback routine
+	void *                      m_read_param;       // parameter for read callback routine
+	ioport_field_write_delegate m_write;            // write callback routine
+	void *                      m_write_param;      // parameter for write callback routine
 
 	// data relevant to analog control types
-	ioport_value				m_min;				// minimum value for absolute axes
-	ioport_value				m_max;				// maximum value for absolute axes
-	INT32						m_sensitivity;		// sensitivity (100=normal)
-	INT32						m_delta;			// delta to apply each frame a digital inc/dec key is pressed
-	INT32						m_centerdelta;		// delta to apply each frame no digital inputs are pressed
-	crosshair_axis_t			m_crosshair_axis;	// crosshair axis
-	double						m_crosshair_scale;	// crosshair scale
-	double						m_crosshair_offset;	// crosshair offset
-	double						m_crosshair_altaxis;// crosshair alternate axis value
+	ioport_value                m_min;              // minimum value for absolute axes
+	ioport_value                m_max;              // maximum value for absolute axes
+	INT32                       m_sensitivity;      // sensitivity (100=normal)
+	INT32                       m_delta;            // delta to apply each frame a digital inc/dec key is pressed
+	INT32                       m_centerdelta;      // delta to apply each frame no digital inputs are pressed
+	crosshair_axis_t            m_crosshair_axis;   // crosshair axis
+	double                      m_crosshair_scale;  // crosshair scale
+	double                      m_crosshair_offset; // crosshair offset
+	double                      m_crosshair_altaxis;// crosshair alternate axis value
 	ioport_field_crossmap_delegate m_crosshair_mapper; // crosshair mapping function
-	UINT16						m_full_turn_count;	// number of optical counts for 1 full turn of the original control
-	const ioport_value *		m_remap_table;		// pointer to an array that remaps the port value
+	UINT16                      m_full_turn_count;  // number of optical counts for 1 full turn of the original control
+	const ioport_value *        m_remap_table;      // pointer to an array that remaps the port value
 
 	// data relevant to other specific types
-	UINT8						m_way;				// digital joystick 2/4/8-way descriptions
-	unicode_char				m_chars[4];			// unicode key data
+	UINT8                       m_way;              // digital joystick 2/4/8-way descriptions
+	unicode_char                m_chars[4];         // unicode key data
 };
 
 
@@ -1214,13 +1214,13 @@ private:
 	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, astring &errorbuf);
 
 	// internal state
-	ioport_port *				m_next;			// pointer to next port
-	device_t &					m_device;		// associated device
-	simple_list<ioport_field>	m_fieldlist;	// list of ioport_fields
-	astring						m_tag;			// copy of this port's tag
-	int							m_modcount;		// modification count
-	ioport_value				m_active;		// mask of active bits in the port
-	ioport_port_live *			m_live;			// live state of port (NULL if not live)
+	ioport_port *               m_next;         // pointer to next port
+	device_t &                  m_device;       // associated device
+	simple_list<ioport_field>   m_fieldlist;    // list of ioport_fields
+	astring                     m_tag;          // copy of this port's tag
+	int                         m_modcount;     // modification count
+	ioport_value                m_active;       // mask of active bits in the port
+	ioport_port_live *          m_live;         // live state of port (NULL if not live)
 };
 
 
@@ -1301,27 +1301,27 @@ private:
 	void record_port(ioport_port &port);
 
 	// internal state
-	running_machine &		m_machine;				// reference to owning machine
-	bool					m_safe_to_read;			// clear at start; set after state is loaded
-	ioport_list				m_portlist;				// list of input port configurations
+	running_machine &       m_machine;              // reference to owning machine
+	bool                    m_safe_to_read;         // clear at start; set after state is loaded
+	ioport_list             m_portlist;             // list of input port configurations
 
 	// types
-	simple_list<input_type_entry> m_typelist;		// list of live type states
-	input_type_entry *		m_type_to_entry[IPT_COUNT][MAX_PLAYERS]; // map from type/player to type state
+	simple_list<input_type_entry> m_typelist;       // list of live type states
+	input_type_entry *      m_type_to_entry[IPT_COUNT][MAX_PLAYERS]; // map from type/player to type state
 
 	// specific special global input states
-	simple_list<digital_joystick> m_joystick_list;	// list of digital joysticks
-	natural_keyboard		m_natkeyboard;			// natural keyboard support
+	simple_list<digital_joystick> m_joystick_list;  // list of digital joysticks
+	natural_keyboard        m_natkeyboard;          // natural keyboard support
 
 	// frame time tracking
-	attotime				m_last_frame_time;		// time of the last frame callback
-	attoseconds_t			m_last_delta_nsec;		// nanoseconds that passed since the previous callback
+	attotime                m_last_frame_time;      // time of the last frame callback
+	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file				m_record_file;			// recording file (NULL if not recording)
-	emu_file				m_playback_file;		// playback file (NULL if not recording)
-	UINT64					m_playback_accumulated_speed; // accumulated speed during playback
-	UINT32					m_playback_accumulated_frames; // accumulated frames during playback
+	emu_file                m_record_file;          // recording file (NULL if not recording)
+	emu_file                m_playback_file;        // playback file (NULL if not recording)
+	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
+	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
 };
 
 
@@ -1378,13 +1378,13 @@ public:
 
 private:
 	// internal state
-	device_t &			m_owner;
-	ioport_list &		m_portlist;
-	astring &			m_errorbuf;
+	device_t &          m_owner;
+	ioport_list &       m_portlist;
+	astring &           m_errorbuf;
 
-	ioport_port *		m_curport;
-	ioport_field *		m_curfield;
-	ioport_setting *	m_cursetting;
+	ioport_port *       m_curport;
+	ioport_field *      m_curfield;
+	ioport_setting *    m_cursetting;
 };
 
 
@@ -1393,21 +1393,21 @@ private:
 //  MACROS
 //**************************************************************************
 
-#define UCHAR_MAMEKEY(code)	(UCHAR_MAMEKEY_BEGIN + ITEM_ID_##code)
+#define UCHAR_MAMEKEY(code) (UCHAR_MAMEKEY_BEGIN + ITEM_ID_##code)
 
 // macro for a read callback function (PORT_CUSTOM)
-#define CUSTOM_INPUT(name)	ioport_value name(device_t &device, ioport_field &field, void *param)
-#define CUSTOM_INPUT_MEMBER(name)	ioport_value name(ioport_field &field, void *param)
-#define DECLARE_CUSTOM_INPUT_MEMBER(name)	ioport_value name(ioport_field &field, void *param)
+#define CUSTOM_INPUT(name)  ioport_value name(device_t &device, ioport_field &field, void *param)
+#define CUSTOM_INPUT_MEMBER(name)   ioport_value name(ioport_field &field, void *param)
+#define DECLARE_CUSTOM_INPUT_MEMBER(name)   ioport_value name(ioport_field &field, void *param)
 
 // macro for port write callback functions (PORT_CHANGED)
-#define INPUT_CHANGED_MEMBER(name)	void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
-#define DECLARE_INPUT_CHANGED_MEMBER(name)	void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
+#define INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
+#define DECLARE_INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 
 // macro for port changed callback functions (PORT_CROSSHAIR_MAPPER)
-#define CROSSHAIR_MAPPER(name)	float name(device_t &device, ioport_field &field, float linear_value)
-#define CROSSHAIR_MAPPER_MEMBER(name)	float name(ioport_field &field, float linear_value)
-#define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)	float name(ioport_field &field, float linear_value)
+#define CROSSHAIR_MAPPER(name)  float name(device_t &device, ioport_field &field, float linear_value)
+#define CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
+#define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
 
 // macro for wrapping a default string
 #define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
@@ -1708,4 +1708,4 @@ inline device_t &ioport_setting::device() const { return m_field.device(); }
 inline running_machine &ioport_setting::machine() const { return m_field.machine(); }
 
 
-#endif	// __INPTPORT_H__ */
+#endif  // __INPTPORT_H__ */

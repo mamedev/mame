@@ -104,10 +104,10 @@ void fuuki32_state::video_start()
 	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_tilemap[0]->set_transparent_pen(0xff);	// 8 bits
-	m_tilemap[1]->set_transparent_pen(0xff);	// 8 bits
-	m_tilemap[2]->set_transparent_pen(0x0f);	// 4 bits
-	m_tilemap[3]->set_transparent_pen(0x0f);	// 4 bits
+	m_tilemap[0]->set_transparent_pen(0xff);    // 8 bits
+	m_tilemap[1]->set_transparent_pen(0xff);    // 8 bits
+	m_tilemap[2]->set_transparent_pen(0x0f);    // 4 bits
+	m_tilemap[3]->set_transparent_pen(0x0f);    // 4 bits
 
 	//machine().gfx[1]->set_granularity(16); /* 256 colour tiles with palette selectable on 16 colour boundaries */
 	//machine().gfx[2]->set_granularity(16);
@@ -149,8 +149,8 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 	gfx_element *gfx = screen.machine().gfx[0];
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	const rectangle &visarea = screen.visible_area();
-	int max_x =	visarea.max_x + 1;
-	int max_y =	visarea.max_y + 1;
+	int max_x = visarea.max_x + 1;
+	int max_y = visarea.max_y + 1;
 
 	UINT32 *src = state->m_buf_spriteram2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
 
@@ -187,11 +187,11 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 		switch( (attr >> 6) & 3 )
 		{
-			case 3:	pri_mask = 0xf0 | 0xcc | 0xaa;	break;	// behind all layers
-			case 2:	pri_mask = 0xf0 | 0xcc;			break;	// behind fg + middle layer
-			case 1:	pri_mask = 0xf0;				break;	// behind fg layer
+			case 3: pri_mask = 0xf0 | 0xcc | 0xaa;  break;  // behind all layers
+			case 2: pri_mask = 0xf0 | 0xcc;         break;  // behind fg + middle layer
+			case 1: pri_mask = 0xf0;                break;  // behind fg layer
 			case 0:
-			default:	pri_mask = 0;						// above all
+			default:    pri_mask = 0;                       // above all
 		}
 
 		sx = (sx & 0x1ff) - (sx & 0x200);
@@ -199,22 +199,22 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 		if (state->flip_screen())
 		{
-			flipx = !flipx;		sx = max_x - sx - xnum * 16;
-			flipy = !flipy;		sy = max_y - sy - ynum * 16;
+			flipx = !flipx;     sx = max_x - sx - xnum * 16;
+			flipy = !flipy;     sy = max_y - sy - ynum * 16;
 		}
 
-		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
-		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
+		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
+		else        { xstart = 0;       xend = xnum;  xinc = +1; }
 
-		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
-		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
+		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
+		else        { ystart = 0;       yend = ynum;  yinc = +1; }
 
 #if 0
 		if(!( (screen.machine().input().code_pressed(KEYCODE_V) && (((attr >> 6)&3) == 0))
-		   || (screen.machine().input().code_pressed(KEYCODE_B) && (((attr >> 6)&3) == 1))
-		   || (screen.machine().input().code_pressed(KEYCODE_N) && (((attr >> 6)&3) == 2))
-		   || (screen.machine().input().code_pressed(KEYCODE_M) && (((attr >> 6)&3) == 3))
-		   ))
+			|| (screen.machine().input().code_pressed(KEYCODE_B) && (((attr >> 6)&3) == 1))
+			|| (screen.machine().input().code_pressed(KEYCODE_N) && (((attr >> 6)&3) == 2))
+			|| (screen.machine().input().code_pressed(KEYCODE_M) && (((attr >> 6)&3) == 3))
+			))
 #endif
 
 		for (y = ystart; y != yend; y += yinc)
@@ -228,22 +228,22 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 									flipx, flipy,
 									sx + x * 16, sy + y * 16,
 									priority_bitmap,
-									pri_mask,15	);
+									pri_mask,15 );
 				else
 					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,
 									code++,
 									attr & 0x3f,
 									flipx, flipy,
 									sx + (x * xzoom) / 8, sy + (y * yzoom) / 8,
-									(0x10000/0x10/8) * (xzoom + 8),(0x10000/0x10/8) * (yzoom + 8),	priority_bitmap,// nearest greater integer value to avoid holes
-									pri_mask,15	);
+									(0x10000/0x10/8) * (xzoom + 8),(0x10000/0x10/8) * (yzoom + 8),  priority_bitmap,// nearest greater integer value to avoid holes
+									pri_mask,15 );
 			}
 		}
 
 #ifdef MAME_DEBUG
 #if 0
 if (screen.machine().input().code_pressed(KEYCODE_X))
-{	/* Display some info on each sprite */
+{   /* Display some info on each sprite */
 	char buf[40];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);
 	ui_draw_text(buf, sx, sy);
@@ -295,12 +295,12 @@ static void fuuki32_draw_layer( running_machine &machine, bitmap_ind16 &bitmap, 
 
 	switch( i )
 	{
-		case 2:	if (buffer)	state->m_tilemap[3]->draw(bitmap, cliprect, flag, pri);
-				else		state->m_tilemap[2]->draw(bitmap, cliprect, flag, pri);
+		case 2: if (buffer) state->m_tilemap[3]->draw(bitmap, cliprect, flag, pri);
+				else        state->m_tilemap[2]->draw(bitmap, cliprect, flag, pri);
 				return;
-		case 1:	state->m_tilemap[1]->draw(bitmap, cliprect, flag, pri);
+		case 1: state->m_tilemap[1]->draw(bitmap, cliprect, flag, pri);
 				return;
-		case 0:	state->m_tilemap[0]->draw(bitmap, cliprect, flag, pri);
+		case 0: state->m_tilemap[0]->draw(bitmap, cliprect, flag, pri);
 				return;
 	}
 }
@@ -313,8 +313,8 @@ UINT32 fuuki32_state::screen_update_fuuki32(screen_device &screen, bitmap_ind16 
 	UINT16 scrollx_offs,   scrolly_offs;
 
 	/*
-    It's not independent bits causing layers to switch, that wouldn't make sense with 3 bits.
-    */
+	It's not independent bits causing layers to switch, that wouldn't make sense with 3 bits.
+	*/
 
 	static const int pri_table[6][3] = {
 		{ 0, 1, 2 }, // Special moves 0>1, 0>2 (0,1,2 or 0,2,1)

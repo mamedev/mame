@@ -5,9 +5,9 @@ class bbusters_state : public driver_device
 public:
 	bbusters_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_eprom_data(*this, "eeprom"),
-		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2") ,
+			m_eprom_data(*this, "eeprom"),
+			m_spriteram(*this, "spriteram"),
+			m_spriteram2(*this, "spriteram2") ,
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
 		m_pf1_data(*this, "pf1_data"),

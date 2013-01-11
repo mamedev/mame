@@ -48,9 +48,9 @@
 #include "z8000.h"
 #include "z8000cpu.h"
 
-static int n[16];	/* opcode nibbles */
-static int b[8];	/* opcode bytes */
-static int w[4];	/* opcode words */
+static int n[16];   /* opcode nibbles */
+static int b[8];    /* opcode bytes */
+static int w[4];    /* opcode words */
 
 static void GET_OP(const UINT8 *oprom, int i, unsigned offset)
 {
@@ -93,7 +93,7 @@ CPU_DISASSEMBLE( z8000 )
 	if(z8000_exec == NULL)
 		z8000_init_tables();
 
-    GET_OP(oprom, 0, new_pc - pc);
+	GET_OP(oprom, 0, new_pc - pc);
 	new_pc += 2;
 	switch (pc)
 	{
@@ -102,10 +102,10 @@ CPU_DISASSEMBLE( z8000 )
 			break;
 		case 0x0002:
 			dst += sprintf(dst, ".word   #%%%04x ;RST FCW", w[0]);
-            break;
+			break;
 		case 0x0004:
 			dst += sprintf(dst, ".word   #%%%04x ;RST PC", w[0]);
-            break;
+			break;
 		default:
 			o = &z8000_exec[w[0]];
 			if (o->size > 1) { GET_OP(oprom, 1, new_pc - pc); new_pc += 2; }
@@ -220,11 +220,11 @@ CPU_DISASSEMBLE( z8000 )
 							case 0x1a8: dst += sprintf(dst, "outd  "); break;
 							case 0x1b0: dst += sprintf(dst, "soutd "); break;
 							case 0x1b8: dst += sprintf(dst, "sotdr "); flags = DASMFLAG_STEP_OVER; break;
-                            default:
+							default:
 								dst += sprintf(dst, "unk(0x%x)", tmp);
 						}
-                        break;
-                    case 'a':
+						break;
+					case 'a':
 						/* address */
 						src++;
 						i = *src++ - '0';
@@ -248,7 +248,7 @@ CPU_DISASSEMBLE( z8000 )
 						/* condition code */
 						src++;
 						i = *src++ - '0';
-						if (n[i] == 8) {	/* always? */
+						if (n[i] == 8) {    /* always? */
 							/* skip following comma */
 							if (*src == ',')
 								src++;
@@ -346,4 +346,3 @@ CPU_DISASSEMBLE( z8000 )
 	}
 	return (new_pc - pc) | flags | DASMFLAG_SUPPORTED;
 }
-

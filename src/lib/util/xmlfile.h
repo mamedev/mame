@@ -77,40 +77,40 @@ struct XML_ParserStruct;
 /* a node representing an attribute */
 struct xml_attribute_node
 {
-	xml_attribute_node *	next;			/* pointer to next attribute node */
-	const char *			name;			/* pointer to copy of tag name */
-	const char *			value;			/* pointer to copy of value string */
+	xml_attribute_node *    next;           /* pointer to next attribute node */
+	const char *            name;           /* pointer to copy of tag name */
+	const char *            value;          /* pointer to copy of value string */
 };
 
 
 /* a node representing a data item and its relationships */
 struct xml_data_node
 {
-	xml_data_node *			next;			/* pointer to next sibling node */
-	xml_data_node *			parent;			/* pointer to parent node */
-	xml_data_node *			child;			/* pointer to first child node */
-	const char *			name;			/* pointer to copy of tag name */
-	const char *			value;			/* pointer to copy of value string */
-	xml_attribute_node *	attribute;		/* pointer to array of attribute nodes */
-	int						line;			/* line number for this node's start */
+	xml_data_node *         next;           /* pointer to next sibling node */
+	xml_data_node *         parent;         /* pointer to parent node */
+	xml_data_node *         child;          /* pointer to first child node */
+	const char *            name;           /* pointer to copy of tag name */
+	const char *            value;          /* pointer to copy of value string */
+	xml_attribute_node *    attribute;      /* pointer to array of attribute nodes */
+	int                     line;           /* line number for this node's start */
 };
 
 
 /* extended error information from parsing */
 struct xml_parse_error
 {
-	const char *			error_message;
-	int						error_line;
-	int						error_column;
+	const char *            error_message;
+	int                     error_line;
+	int                     error_column;
 };
 
 
 /* parsing options */
 struct xml_parse_options
 {
-	xml_parse_error *		error;
-	void					(*init_parser)(struct XML_ParserStruct *parser);
-	UINT32					flags;
+	xml_parse_error *       error;
+	void                    (*init_parser)(struct XML_ParserStruct *parser);
+	UINT32                  flags;
 };
 
 
@@ -194,4 +194,4 @@ xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *nam
 /* normalize a string into something that can be written to an XML file */
 const char *xml_normalize_string(const char *string);
 
-#endif	/* __XMLFILE_H__ */
+#endif  /* __XMLFILE_H__ */

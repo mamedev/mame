@@ -33,9 +33,9 @@ const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
 
 software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SOFTWARE_LIST, "Software lists", tag, owner, clock),
-	  m_list_name(NULL),
-	  m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
-	  m_filter(NULL)
+		m_list_name(NULL),
+		m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
+		m_filter(NULL)
 {
 }
 
@@ -181,7 +181,7 @@ INLINE void unknown_attribute_value(software_list *swlist,
     when they are not used anymore.
 -------------------------------------------------*/
 
-#define global_strdup(s)				strcpy(global_alloc_array(char, strlen(s) + 1), s)
+#define global_strdup(s)                strcpy(global_alloc_array(char, strlen(s) + 1), s)
 
 void software_name_split(const char *swlist_swname, char **swlist_name, char **swname, char **swpart )
 {
@@ -1436,8 +1436,8 @@ const software_info *software_list_find(const software_list *swlist, const char 
 software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev)
 {
 	return const_cast<software_info *>(software_list_find(const_cast<const software_list *>(swlist),
-														  look_for,
-														  const_cast<const software_info *>(prev)));
+															look_for,
+															const_cast<const software_info *>(prev)));
 }
 
 /*-------------------------------------------------
@@ -1500,7 +1500,7 @@ const software_part *software_find_part(const software_info *sw, const char *par
 {
 	const software_part *part = sw ? sw->partdata : NULL;
 
-	 /* If neither partname nor interface supplied, then we just return the first entry */
+		/* If neither partname nor interface supplied, then we just return the first entry */
 	if ( partname || interface )
 	{
 		while( part && part->name )
@@ -1581,7 +1581,7 @@ void software_display_matches(const machine_config &config,emu_options &options,
 	if (deviter.first())
 	{
 		mame_printf_error("\n\"%s\" approximately matches the following\n"
-						  "supported software items (best match first):\n\n", name);
+							"supported software items (best match first):\n\n", name);
 	}
 
 	for (software_list_device *swlist = deviter.first(); swlist != NULL; swlist = deviter.next())
@@ -1926,7 +1926,7 @@ const char *software_part_get_feature(const software_part *part, const char *fea
     software_get_default_slot
  -------------------------------------------------*/
 
- const char *software_get_default_slot(const machine_config &config, emu_options &options, const device_image_interface *image, const char* default_card_slot)
+	const char *software_get_default_slot(const machine_config &config, emu_options &options, const device_image_interface *image, const char* default_card_slot)
 {
 	const char* retVal = NULL;
 	const char* path = options.value(image->instance_name());
@@ -2079,7 +2079,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 			/* make sure the driver name is 8 chars or less */
 			if ((is_clone && strlen(swinfo->shortname) > NAME_LEN_CLONE) || ((!is_clone) && strlen(swinfo->shortname) > NAME_LEN_PARENT))
 				mame_printf_error("%s: %s %s driver name must be %d characters or less\n", list->file->filename(), swinfo->shortname,
-								  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
+									is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 
 			/* make sure the year is only digits, '?' or '+' */
 			for (s = swinfo->year; *s; s++)
@@ -2132,18 +2132,18 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 
 bool softlist_contain_interface(const char *interface, const char *part_interface)
 {
-    bool result = FALSE;
+	bool result = FALSE;
 
 	astring interfaces(interface);
 	char *intf = strtok((char*)interfaces.cstr(),",");
 	while (intf != NULL)
 	{
 		if (!strcmp(intf, part_interface))
-        {
-            result = TRUE;
-            break;
-        }
+		{
+			result = TRUE;
+			break;
+		}
 		intf = strtok (NULL, ",");
 	}
-    return result;
+	return result;
 }

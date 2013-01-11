@@ -18,7 +18,7 @@ public:
 
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys83_state )
-	AM_RANGE(0x4000, 0xffff) AM_ROM						// 32K ROM
+	AM_RANGE(0x4000, 0xffff) AM_ROM                     // 32K ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bfmsys83 )
@@ -58,5 +58,5 @@ ROM_START( b83cops ) // was marked as sys85, but I think this is the sys83 set?
 	ROM_LOAD( "cops.p4", 0x8000, 0x2000, CRC(ce573b35) SHA1(f2ba22f0d55f882dd91b37e80e4bb14effd9113a) )
 ROM_END
 
-GAME( 198?, b83catms	, 0			,  bfmsys83		, bfmsys83	, driver_device, 0	, 0,		 "BFM",      "Cat & Mouse (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 198?, b83cops		, 0			,  bfmsys83		, bfmsys83	, driver_device, 0	, 0,		 "BFM",      "Cops & Robbers (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 198?, b83catms    , 0         ,  bfmsys83     , bfmsys83  , driver_device, 0  , 0,         "BFM",      "Cat & Mouse (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 198?, b83cops     , 0         ,  bfmsys83     , bfmsys83  , driver_device, 0  , 0,         "BFM",      "Cops & Robbers (Bellfruit) (System 83)", GAME_IS_SKELETON_MECHANICAL)

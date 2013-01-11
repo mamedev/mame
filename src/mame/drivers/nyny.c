@@ -73,16 +73,16 @@
 #include "machine/nvram.h"
 
 
-#define MAIN_CPU_MASTER_CLOCK		XTAL_11_2MHz
-#define PIXEL_CLOCK					(MAIN_CPU_MASTER_CLOCK / 2)
-#define CRTC_CLOCK					(MAIN_CPU_MASTER_CLOCK / 16)
-#define AUDIO_1_MASTER_CLOCK		XTAL_4MHz
-#define AUDIO_CPU_1_CLOCK			AUDIO_1_MASTER_CLOCK
-#define AUDIO_2_MASTER_CLOCK		XTAL_4MHz
-#define AUDIO_CPU_2_CLOCK			AUDIO_2_MASTER_CLOCK
+#define MAIN_CPU_MASTER_CLOCK       XTAL_11_2MHz
+#define PIXEL_CLOCK                 (MAIN_CPU_MASTER_CLOCK / 2)
+#define CRTC_CLOCK                  (MAIN_CPU_MASTER_CLOCK / 16)
+#define AUDIO_1_MASTER_CLOCK        XTAL_4MHz
+#define AUDIO_CPU_1_CLOCK           AUDIO_1_MASTER_CLOCK
+#define AUDIO_2_MASTER_CLOCK        XTAL_4MHz
+#define AUDIO_CPU_2_CLOCK           AUDIO_2_MASTER_CLOCK
 
 
-#define NUM_PENS	   8
+#define NUM_PENS       8
 
 class nyny_state : public driver_device
 {
@@ -191,18 +191,18 @@ INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
 
 static const pia6821_interface pia_1_intf =
 {
-	DEVCB_INPUT_PORT("IN0"),		/* port A in */
-	DEVCB_INPUT_PORT("IN1"),		/* port B in */
-	DEVCB_NULL,						/* line CA1 in */
-	DEVCB_NULL,						/* line CB1 in */
-	DEVCB_NULL,						/* line CA2 in */
-	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_NULL,						/* port A out */
-	DEVCB_NULL,						/* port B out */
-	DEVCB_NULL,						/* line CA2 out */
-	DEVCB_NULL,						/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)		/* IRQB */
+	DEVCB_INPUT_PORT("IN0"),        /* port A in */
+	DEVCB_INPUT_PORT("IN1"),        /* port B in */
+	DEVCB_NULL,                     /* line CA1 in */
+	DEVCB_NULL,                     /* line CB1 in */
+	DEVCB_NULL,                     /* line CA2 in */
+	DEVCB_NULL,                     /* line CB2 in */
+	DEVCB_NULL,                     /* port A out */
+	DEVCB_NULL,                     /* port B out */
+	DEVCB_NULL,                     /* line CA2 out */
+	DEVCB_NULL,                     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq),      /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)       /* IRQB */
 };
 
 
@@ -235,18 +235,18 @@ WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
 
 static const pia6821_interface pia_2_intf =
 {
-	DEVCB_NULL,						/* port A in */
-	DEVCB_NULL,						/* port B in */
-	DEVCB_NULL,						/* line CA1 in */
-	DEVCB_NULL,						/* line CB1 in */
-	DEVCB_NULL,						/* line CA2 in */
-	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_a_w),	/* port A out */
-	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_b_w),	/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,flipscreen_w),		/* line CA2 out */
-	DEVCB_NULL,						/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_firq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)		/* IRQB */
+	DEVCB_NULL,                     /* port A in */
+	DEVCB_NULL,                     /* port B in */
+	DEVCB_NULL,                     /* line CA1 in */
+	DEVCB_NULL,                     /* line CB1 in */
+	DEVCB_NULL,                     /* line CA2 in */
+	DEVCB_NULL,                     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_a_w), /* port A out */
+	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_b_w), /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,flipscreen_w),      /* line CA2 out */
+	DEVCB_NULL,                     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_firq),     /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)       /* IRQB */
 };
 
 
@@ -271,12 +271,12 @@ WRITE8_MEMBER(nyny_state::ic48_1_74123_output_changed)
 
 static const ttl74123_interface ic48_1_config =
 {
-	TTL74123_GROUNDED,	/* the hook up type */
-	RES_K(22),			/* resistor connected to RCext */
-	CAP_U(0.01),		/* capacitor connected to Cext and RCext */
-	1,					/* A pin - driven by the CRTC */
-	1,					/* B pin - pulled high */
-	1,					/* Clear pin - pulled high */
+	TTL74123_GROUNDED,  /* the hook up type */
+	RES_K(22),          /* resistor connected to RCext */
+	CAP_U(0.01),        /* capacitor connected to Cext and RCext */
+	1,                  /* A pin - driven by the CRTC */
+	1,                  /* B pin - pulled high */
+	1,                  /* Clear pin - pulled high */
 	DEVCB_DRIVER_MEMBER(nyny_state,ic48_1_74123_output_changed)
 };
 
@@ -324,9 +324,9 @@ static MC6845_UPDATE_ROW( update_row )
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 5) & 0x8000) |
-					  ((ma << 3) & 0x1f00) |
-					  ((ra << 5) & 0x00e0) |
-					  ((ma << 0) & 0x001f);
+						((ma << 3) & 0x1f00) |
+						((ra << 5) & 0x00e0) |
+						((ma << 0) & 0x001f);
 
 		if (state->m_flipscreen)
 			offs = offs ^ 0x9fff;
@@ -398,13 +398,13 @@ static MC6845_END_UPDATE( end_update )
 		{
 			/* check if the star status */
 			if (state->m_star_enable &&
-			    (bitmap.pix32(y, x) == pens[0]) &&
-			    ((state->m_star_shift_reg & 0x80ff) == 0x00ff) &&
-			    (((y & 0x01) ^ state->m_flipscreen) ^ (((x & 0x08) >> 3) ^ state->m_flipscreen)))
+				(bitmap.pix32(y, x) == pens[0]) &&
+				((state->m_star_shift_reg & 0x80ff) == 0x00ff) &&
+				(((y & 0x01) ^ state->m_flipscreen) ^ (((x & 0x08) >> 3) ^ state->m_flipscreen)))
 			{
-				UINT8 color = ((state->m_star_shift_reg & 0x0100) >>  8) |	/* R */
-							  ((state->m_star_shift_reg & 0x0400) >>  9) |	/* G */
-							  ((state->m_star_shift_reg & 0x1000) >> 10);		/* B */
+				UINT8 color = ((state->m_star_shift_reg & 0x0100) >>  8) |  /* R */
+								((state->m_star_shift_reg & 0x0400) >>  9) |    /* G */
+								((state->m_star_shift_reg & 0x1000) >> 10);     /* B */
 
 				bitmap.pix32(y, x) = pens[color];
 			}
@@ -426,16 +426,16 @@ WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",				/* screen we are acting on */
-	8,						/* number of pixels per video memory address */
-	begin_update,			/* before pixel update callback */
-	update_row,				/* row update callback */
-	end_update,				/* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,display_enable_changed),	/* callback for display state changes */
-	DEVCB_NULL,				/* callback for cursor state changes */
-	DEVCB_NULL,				/* HSYNC callback */
-	DEVCB_NULL,				/* VSYNC callback */
-	NULL					/* update address callback */
+	"screen",               /* screen we are acting on */
+	8,                      /* number of pixels per video memory address */
+	begin_update,           /* before pixel update callback */
+	update_row,             /* row update callback */
+	end_update,             /* after pixel update callback */
+	DEVCB_DRIVER_LINE_MEMBER(nyny_state,display_enable_changed),    /* callback for display state changes */
+	DEVCB_NULL,             /* callback for cursor state changes */
+	DEVCB_NULL,             /* HSYNC callback */
+	DEVCB_NULL,             /* VSYNC callback */
+	NULL                    /* update address callback */
 };
 
 
@@ -555,7 +555,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
+	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r) AM_WRITE(audio_1_answer_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
@@ -572,7 +572,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
+	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD_LEGACY("ay3", ay8910_r)
@@ -593,76 +593,76 @@ static INPUT_PORTS_START( nyny )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     /* PIA0 PA0 */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )  /* PIA0 PA1 */
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_HIGH)	/* PIA0 PA2 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )	/* PIA0 PA3 */
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_HIGH)    /* PIA0 PA2 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )   /* PIA0 PA3 */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL /* PIA0 PA4 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )	/* PIA0 PA5 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )	/* PIA0 PA6 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )    /* PIA0 PA5 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )    /* PIA0 PA6 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL /* PIA0 PB0 */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL /* PIA0 PB1 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY	/* PIA0 PB2 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY	/* PIA0 PB3 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY   /* PIA0 PB2 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY  /* PIA0 PB3 */
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x03, 0x03, "Bombs from UFO (Screens 3+)" ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(	0x01, "3" )
-	PORT_DIPSETTING(	0x00, "6" )
-	PORT_DIPSETTING(	0x03, "9" )
-	PORT_DIPSETTING(	0x02, "12" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPSETTING(    0x03, "9" )
+	PORT_DIPSETTING(    0x02, "12" )
 	PORT_DIPNAME( 0x04, 0x00, "Bombs from UFO (Screens 1 and 2)" ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(	0x04, "6" )
-	PORT_DIPSETTING(	0x00, "9" )
+	PORT_DIPSETTING(    0x04, "6" )
+	PORT_DIPSETTING(    0x00, "9" )
 	PORT_DIPNAME( 0x80, 0x80, "Voice Volume" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( Low ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( High ) )
 
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x18, 0x00, "Bonus Game" ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(	0x18, "No Bonus Game" )
-	PORT_DIPSETTING(	0x10, "5000" )
-	PORT_DIPSETTING(	0x00, "10000" )
-	PORT_DIPSETTING(	0x08, "15000" )
+	PORT_DIPSETTING(    0x18, "No Bonus Game" )
+	PORT_DIPSETTING(    0x10, "5000" )
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x08, "15000" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(	0x00, "3000" )
-	PORT_DIPSETTING(	0x40, "5000" )
+	PORT_DIPSETTING(    0x00, "3000" )
+	PORT_DIPSETTING(    0x40, "5000" )
 	PORT_DIPNAME( 0x80, 0x80, "Bonus Life Awarded" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
 	PORT_START("SW3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x1c, 0x00, "Vertical Screen Position" ) PORT_DIPLOCATION("SW3:3,4,5")
-	PORT_DIPSETTING(	0x1c, "-1" )
-	PORT_DIPSETTING(	0x18, "-2" )
-	PORT_DIPSETTING(	0x14, "-3" )
-	PORT_DIPSETTING(	0x00, "Neutral" )
-	PORT_DIPSETTING(	0x04, "+1" )
-	PORT_DIPSETTING(	0x08, "+2" )
-	PORT_DIPSETTING(	0x0c, "+3" )
+	PORT_DIPSETTING(    0x1c, "-1" )
+	PORT_DIPSETTING(    0x18, "-2" )
+	PORT_DIPSETTING(    0x14, "-3" )
+	PORT_DIPSETTING(    0x00, "Neutral" )
+	PORT_DIPSETTING(    0x04, "+1" )
+	PORT_DIPSETTING(    0x08, "+2" )
+	PORT_DIPSETTING(    0x0c, "+3" )
 	PORT_DIPNAME( 0xe0, 0x00, "Horizontal Screen Position" ) PORT_DIPLOCATION("SW3:6,7,8")
-	PORT_DIPSETTING(	0xe0, "-1" )
-	PORT_DIPSETTING(	0xc0, "-2" )
-	PORT_DIPSETTING(	0xa0, "-3" )
-	PORT_DIPSETTING(	0x00, "Neutral" )
-	PORT_DIPSETTING(	0x60, "+1" )
-	PORT_DIPSETTING(	0x40, "+2" )
-	PORT_DIPSETTING(	0x20, "+3" )
+	PORT_DIPSETTING(    0xe0, "-1" )
+	PORT_DIPSETTING(    0xc0, "-2" )
+	PORT_DIPSETTING(    0xa0, "-3" )
+	PORT_DIPSETTING(    0x00, "Neutral" )
+	PORT_DIPSETTING(    0x60, "+1" )
+	PORT_DIPSETTING(    0x40, "+2" )
+	PORT_DIPSETTING(    0x20, "+3" )
 
-	PORT_START("CROSS")		/* connected to PIA1 CB1 input */
+	PORT_START("CROSS")     /* connected to PIA1 CB1 input */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS1 (Crosshatch)") PORT_CODE(KEYCODE_F1)
 
 INPUT_PORTS_END
@@ -711,7 +711,7 @@ void nyny_state::machine_reset()
 static MACHINE_CONFIG_START( nyny, nyny_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1400000)	/* 1.40 MHz? The clock signal is generated by analog chips */
+	MCFG_CPU_ADD("maincpu", M6809, 1400000) /* 1.40 MHz? The clock signal is generated by analog chips */
 	MCFG_CPU_PROGRAM_MAP(nyny_main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nyny_state, update_pia_1,  25)
 
@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
@@ -763,7 +763,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( nyny )
-	ROM_REGION(0x10000, "maincpu", 0)	/* main CPU */
+	ROM_REGION(0x10000, "maincpu", 0)   /* main CPU */
 	ROM_LOAD( "nyny01s.100",  0xa800, 0x0800, CRC(a2b76eca) SHA1(e46717e6ad330be4c4e7d9fab4f055f89aa31bcc) )
 	ROM_LOAD( "nyny02s.099",  0xb000, 0x0800, CRC(ef2d4dae) SHA1(718c0ecf7770a780aebb1dc8bf4ca86ea0a5ea28) )
 	ROM_LOAD( "nyny03s.098",  0xb800, 0x0800, CRC(2734c229) SHA1(b028d057d26838bae50b8ddb90a3755b5315b4ee) )
@@ -772,7 +772,7 @@ ROM_START( nyny )
 	ROM_LOAD( "nyny06s.095",  0xf000, 0x0800, CRC(8c073052) SHA1(0ce103ac0e79124ac9f1e097dda1a0664b92b89b) )
 	ROM_LOAD( "nyny07s.094",  0xf800, 0x0800, CRC(d49d7429) SHA1(c12eaae7ba0b1d44c45a584232db03c5731c046a) )
 
-	ROM_REGION(0x10000, "audiocpu", 0)	/* first audio CPU */
+	ROM_REGION(0x10000, "audiocpu", 0)  /* first audio CPU */
 	ROM_LOAD( "nyny08.093",   0x5000, 0x0800, CRC(19ddb6c3) SHA1(0097fad542f9a33849565093c2fb106d90007b1a) )
 	ROM_LOAD( "nyny09.092",   0x6000, 0x0800, CRC(a359c6f1) SHA1(1bc7b487581399908c3cec823733810fb6d944ce) )
 	ROM_LOAD( "nyny10.091",   0x7000, 0x0800, CRC(a72a70fa) SHA1(deed7dec9cc43fa1d6c4854ba18169c894c9a2f0) )
@@ -783,7 +783,7 @@ ROM_END
 
 
 ROM_START( nynyg )
-	ROM_REGION(0x10000, "maincpu", 0)	/* main CPU */
+	ROM_REGION(0x10000, "maincpu", 0)   /* main CPU */
 	ROM_LOAD( "gny1.cpu",     0xa800, 0x0800, CRC(fb5b8f17) SHA1(2202325451dfd4e7c16cba93f0fade46929ffa72) )
 	ROM_LOAD( "gny2.cpu",     0xb000, 0x0800, CRC(d248dd93) SHA1(0c4579698f8917332041c08af6902b8f8acd7d62) )
 	ROM_LOAD( "gny3.cpu",     0xb800, 0x0800, CRC(223a9d09) SHA1(c2b12270d375587489208d6a1b37a4e3ec87bc20) )
@@ -792,7 +792,7 @@ ROM_START( nynyg )
 	ROM_LOAD( "gny6.cpu",     0xf000, 0x0800, CRC(4839d4d2) SHA1(cfd6f2f252ee2f6a4d881496a017c02d7dd77944) )
 	ROM_LOAD( "gny7.cpu",     0xf800, 0x0800, CRC(b7564c5b) SHA1(e1d8fe7f37aa7aa98f18c538fe6e688675cc2de1) )
 
-	ROM_REGION(0x10000, "audiocpu", 0)	/* first audio CPU */
+	ROM_REGION(0x10000, "audiocpu", 0)  /* first audio CPU */
 	ROM_LOAD( "gny8.cpu",     0x5000, 0x0800, CRC(e0bf7d00) SHA1(7afca3affa413179f4f59ce2cad89525cfa5efbc) )
 	ROM_LOAD( "gny9.cpu",     0x6000, 0x0800, CRC(639bc81a) SHA1(91819d49099e438ac8c70920a787aeaed3ed82e9) )
 	ROM_LOAD( "gny10.cpu",    0x7000, 0x0800, CRC(73764021) SHA1(bb2f62130142487afbd8d2540e2d4fe5bb67c4ee) )
@@ -805,7 +805,7 @@ ROM_END
 
 
 ROM_START( warcadia )
-	ROM_REGION(0x10000, "maincpu", 0)	/* main CPU */
+	ROM_REGION(0x10000, "maincpu", 0)   /* main CPU */
 	ROM_LOAD( "ar-01",        0xa800, 0x0800, CRC(7b7e8f27) SHA1(2bb1d07d87ad5b952de9460c840d7e8b59ed1b4a) )
 	ROM_LOAD( "ar-02",        0xb000, 0x0800, CRC(81d9e172) SHA1(4279582f1edf54f0974fa277565d8ade6d9faa50) )
 	ROM_LOAD( "ar-03",        0xb800, 0x0800, CRC(2c5feb05) SHA1(6f8952e7744ba7d7b8b345d67f546b504f7a3b30) )
@@ -814,7 +814,7 @@ ROM_START( warcadia )
 	ROM_LOAD( "ar-06",        0xf000, 0x0800, CRC(27b79cc0) SHA1(2c5c3a9a09069751c5e9c23d0840ee4996006c0b) )
 	ROM_LOAD( "ar-07",        0xf800, 0x0800, CRC(be77a477) SHA1(817c069855634dd844f0068d64bfbf1862980d6b) )
 
-	ROM_REGION(0x10000, "audiocpu", 0)	/* first audio CPU */
+	ROM_REGION(0x10000, "audiocpu", 0)  /* first audio CPU */
 	ROM_LOAD( "ar-08",        0x5000, 0x0800, CRC(38569b25) SHA1(887a9afaa65d0961097f7fb5f1ae390d40e9c164) )
 	ROM_LOAD( "nyny09.092",   0x6000, 0x0800, CRC(a359c6f1) SHA1(1bc7b487581399908c3cec823733810fb6d944ce) )
 	ROM_LOAD( "nyny10.091",   0x7000, 0x0800, CRC(a72a70fa) SHA1(deed7dec9cc43fa1d6c4854ba18169c894c9a2f0) )

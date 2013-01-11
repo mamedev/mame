@@ -438,13 +438,13 @@ Notes:
     0x10000105:
 */
 
-#define LOG_PPC_TO_TLCS_COMMANDS		1
-#define LOG_TLCS_TO_PPC_COMMANDS		1
+#define LOG_PPC_TO_TLCS_COMMANDS        1
+#define LOG_TLCS_TO_PPC_COMMANDS        1
 
-#define LOG_DISPLAY_LIST				0
+#define LOG_DISPLAY_LIST                0
 
-#define PPC_TLCS_COMM_TRIGGER			12345
-#define TLCS_PPC_COMM_TRIGGER			12346
+#define PPC_TLCS_COMM_TRIGGER           12345
+#define TLCS_PPC_COMM_TRIGGER           12346
 
 struct taitotz_polydata
 {
@@ -493,12 +493,12 @@ public:
 private:
 	enum
 	{
-		POLY_Z		= 0,
-		POLY_U		= 1,
-		POLY_V		= 2,
-		POLY_NX		= 3,
-		POLY_NY		= 4,
-		POLY_NZ		= 5,
+		POLY_Z      = 0,
+		POLY_U      = 1,
+		POLY_V      = 2,
+		POLY_NX     = 3,
+		POLY_NY     = 4,
+		POLY_NZ     = 5,
 	};
 
 	//static const float ZBUFFER_MAX = 10000000000.0f;
@@ -620,41 +620,41 @@ public:
 static void taitotz_exit(running_machine &machine)
 {
 	/*
-    taitotz_state *state = machine.driver_data<taitotz_state>();
+	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-    FILE *file;
-    int i;
+	FILE *file;
+	int i;
 
-    file = fopen("screen_ram.bin","wb");
-    for (i=0; i < 0x200000; i++)
-    {
-        fputc((UINT8)(state->m_screen_ram[i] >> 24), file);
-        fputc((UINT8)(state->m_screen_ram[i] >> 16), file);
-        fputc((UINT8)(state->m_screen_ram[i] >> 8), file);
-        fputc((UINT8)(state->m_screen_ram[i] >> 0), file);
-    }
-    fclose(file);
+	file = fopen("screen_ram.bin","wb");
+	for (i=0; i < 0x200000; i++)
+	{
+	    fputc((UINT8)(state->m_screen_ram[i] >> 24), file);
+	    fputc((UINT8)(state->m_screen_ram[i] >> 16), file);
+	    fputc((UINT8)(state->m_screen_ram[i] >> 8), file);
+	    fputc((UINT8)(state->m_screen_ram[i] >> 0), file);
+	}
+	fclose(file);
 
-    file = fopen("frame_ram.bin","wb");
-    for (i=0; i < 0x80000; i++)
-    {
-        fputc((UINT8)(state->m_frame_ram[i] >> 24), file);
-        fputc((UINT8)(state->m_frame_ram[i] >> 16), file);
-        fputc((UINT8)(state->m_frame_ram[i] >> 8), file);
-        fputc((UINT8)(state->m_frame_ram[i] >> 0), file);
-    }
-    fclose(file);
+	file = fopen("frame_ram.bin","wb");
+	for (i=0; i < 0x80000; i++)
+	{
+	    fputc((UINT8)(state->m_frame_ram[i] >> 24), file);
+	    fputc((UINT8)(state->m_frame_ram[i] >> 16), file);
+	    fputc((UINT8)(state->m_frame_ram[i] >> 8), file);
+	    fputc((UINT8)(state->m_frame_ram[i] >> 0), file);
+	}
+	fclose(file);
 
-    file = fopen("texture_ram.bin","wb");
-    for (i=0; i < 0x800000; i++)
-    {
-        fputc((UINT8)(state->m_texture_ram[i] >> 24), file);
-        fputc((UINT8)(state->m_texture_ram[i] >> 16), file);
-        fputc((UINT8)(state->m_texture_ram[i] >> 8), file);
-        fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
-    }
-    fclose(file);
-    */
+	file = fopen("texture_ram.bin","wb");
+	for (i=0; i < 0x800000; i++)
+	{
+	    fputc((UINT8)(state->m_texture_ram[i] >> 24), file);
+	    fputc((UINT8)(state->m_texture_ram[i] >> 16), file);
+	    fputc((UINT8)(state->m_texture_ram[i] >> 8), file);
+	    fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
+	}
+	fclose(file);
+	*/
 }
 
 void taitotz_state::video_start()
@@ -677,8 +677,8 @@ static const float dot3_tex_table[32] =
 {
 	-0.500000f, -0.466666f, -0.433333f, -0.400000f, -0.366666f, -0.333333f, -0.300000f, -0.266666f,
 	-0.233333f, -0.200000f, -0.166666f, -0.133333f, -0.100000f, -0.066666f, -0.033333f, -0.000000f,
-	 0.000000f,  0.033333f,  0.066666f,  0.100000f,  0.133333f,  0.166666f,  0.200000f,  0.233333f,
-	 0.266666f,  0.300000f,  0.333333f,  0.366666f,  0.400000f,  0.433333f,  0.466666f,  0.500000f,
+		0.000000f,  0.033333f,  0.066666f,  0.100000f,  0.133333f,  0.166666f,  0.200000f,  0.233333f,
+		0.266666f,  0.300000f,  0.333333f,  0.366666f,  0.400000f,  0.433333f,  0.466666f,  0.500000f,
 };
 
 INLINE float dot_product_vec3(VECTOR3 a, VECTOR3 b)
@@ -697,9 +697,9 @@ INLINE float finvsqrt(float number)
 	x2 = number * 0.5f;
 	y  = number;
 	i  = *(UINT32*)&y;
-    i  = 0x5f3759df - ( i >> 1 );
-    y  = *(float*)&i;
-    y  = y * ( threehalfs - ( x2 * y * y ) );
+	i  = 0x5f3759df - ( i >> 1 );
+	y  = *(float*)&i;
+	y  = y * ( threehalfs - ( x2 * y * y ) );
 	return y;
 }
 
@@ -742,7 +742,7 @@ void taitotz_renderer::draw_scanline_noz(INT32 scanline, const extent_t &extent,
 
 	UINT32 *texram = &m_texture[extradata.texture * 0x1000];
 
-	int shift = 16;		// TODO: subtexture
+	int shift = 16;     // TODO: subtexture
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -937,12 +937,12 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 		int v1_in = is_point_inside(v[i].x, v[i].y, v[i].p[POLY_Z], cp);
 		int v2_in = is_point_inside(v[previ].x, v[previ].y, v[previ].p[POLY_Z], cp);
 
-		if (v1_in && v2_in)			/* edge is completely inside the volume */
+		if (v1_in && v2_in)         /* edge is completely inside the volume */
 		{
 			clipv[clip_verts] = v[i];
 			++clip_verts;
 		}
-		else if (!v1_in && v2_in)	/* edge is entering the volume */
+		else if (!v1_in && v2_in)   /* edge is entering the volume */
 		{
 			/* insert vertex at intersection point */
 			t = line_plane_intersection(&v[i], &v[previ], cp);
@@ -958,7 +958,7 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 
 			++clip_verts;
 		}
-		else if (v1_in && !v2_in)	/* edge is leaving the volume */
+		else if (v1_in && !v2_in)   /* edge is leaving the volume */
 		{
 			/* insert vertex at intersection point */
 			t = line_plane_intersection(&v[i], &v[previ], cp);
@@ -1038,12 +1038,12 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 			float nz = (float)(inz) / 128.0f;
 
 			// transform
-			v[i].x			= (px * m_matrix[0][0]) + (py * m_matrix[1][0]) + (pz * m_matrix[2][0]) + m_matrix[3][0];
-			v[i].y			= (px * m_matrix[0][1]) + (py * m_matrix[1][1]) + (pz * m_matrix[2][1]) + m_matrix[3][1];
-			v[i].p[POLY_Z]	= (px * m_matrix[0][2]) + (py * m_matrix[1][2]) + (pz * m_matrix[2][2]) + m_matrix[3][2];
+			v[i].x          = (px * m_matrix[0][0]) + (py * m_matrix[1][0]) + (pz * m_matrix[2][0]) + m_matrix[3][0];
+			v[i].y          = (px * m_matrix[0][1]) + (py * m_matrix[1][1]) + (pz * m_matrix[2][1]) + m_matrix[3][1];
+			v[i].p[POLY_Z]  = (px * m_matrix[0][2]) + (py * m_matrix[1][2]) + (pz * m_matrix[2][2]) + m_matrix[3][2];
 
-			v[i].p[POLY_NX]	= (nx * m_matrix[0][0]) + (ny * m_matrix[1][0]) + (nz * m_matrix[2][0]);
-			v[i].p[POLY_NY]	= (nx * m_matrix[0][1]) + (ny * m_matrix[1][1]) + (nz * m_matrix[2][1]);
+			v[i].p[POLY_NX] = (nx * m_matrix[0][0]) + (ny * m_matrix[1][0]) + (nz * m_matrix[2][0]);
+			v[i].p[POLY_NY] = (nx * m_matrix[0][1]) + (ny * m_matrix[1][1]) + (nz * m_matrix[2][1]);
 			v[i].p[POLY_NZ] = (nx * m_matrix[0][2]) + (ny * m_matrix[1][2]) + (nz * m_matrix[2][2]);
 
 			index += 4;
@@ -1261,7 +1261,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 //              UINT16 z = (w[5] & 0xffff);
 
 				v[j].x = x;
-				v[j].y = y;		// batlgear needs -50 modifier here (why?)
+				v[j].y = y;     // batlgear needs -50 modifier here (why?)
 				v[j].p[POLY_U] = tu;
 				v[j].p[POLY_V] = tv;
 			}
@@ -1385,7 +1385,7 @@ UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 
 		for (int i=0; i < 512; i++)
 		{
 			UINT16 p = *screen_src++;
-			if (p & 0x8000)		// draw 2D framebuffer if there's an opaque pixel
+			if (p & 0x8000)     // draw 2D framebuffer if there's an opaque pixel
 			{
 				int r = ((p >> 10) & 0x1f) << (3+16);
 				int g = ((p >> 5) & 0x1f) << (3+8);
@@ -1487,7 +1487,7 @@ static UINT32 video_reg_r(taitotz_state *state, UINT32 reg)
 	{
 		case 0x1:
 		{
-			if (reg == 0x10000105)		// Gets spammed a lot. Probably a status register.
+			if (reg == 0x10000105)      // Gets spammed a lot. Probably a status register.
 			{
 				state->m_reg105 ^= 0xffffffff;
 				return state->m_reg105;
@@ -1548,7 +1548,7 @@ static void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
 {
 	switch ((reg >> 28) & 0xf)
 	{
-	case 0x1:		// Register write?
+	case 0x1:       // Register write?
 		{
 			if (reg == 0x10000105)
 			{
@@ -1560,7 +1560,7 @@ static void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
 			}
 			break;
 		}
-	case 0x2:		// ???
+	case 0x2:       // ???
 		{
 			int subreg = reg & 0xfffffff;
 			if (subreg < 0x10)
@@ -1570,14 +1570,14 @@ static void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
 			logerror("video_reg_w: reg: %08X data: %08X\n", reg, data);
 			break;
 		}
-	case 0x3:		// Draw 16x16 tile
+	case 0x3:       // Draw 16x16 tile
 		{
 			UINT32 pos = (data >> 12) & 0xfff;
 			UINT32 tile = data & 0xfff;
 			draw_tile(state, pos, tile);
 			break;
 		}
-	case 0xb:		// RAM write?
+	case 0xb:       // RAM write?
 		{
 			video_mem_w(state, state->m_video_ram_ptr, data);
 			state->m_video_ram_ptr++;
@@ -1625,7 +1625,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 
 			case 0x10:
 				{
-					r |= (UINT64)(0xff) << 32;		// busy flags? landhigh expects this
+					r |= (UINT64)(0xff) << 32;      // busy flags? landhigh expects this
 					break;
 				}
 
@@ -1898,11 +1898,11 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 		}
 
 		/*
-        if (m_io_share_ram[0xfff] == 0x1010)
-        {
-            printf("   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
-        }
-        */
+		if (m_io_share_ram[0xfff] == 0x1010)
+		{
+		    printf("   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+		}
+		*/
 
 #endif
 
@@ -1968,10 +1968,10 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitotz_state)
 	AM_RANGE(0x00000000, 0x0000001f) AM_READWRITE(video_chip_r, video_chip_w)
 	AM_RANGE(0x10000000, 0x1000001f) AM_READWRITE(video_fifo_r, video_fifo_w)
-	AM_RANGE(0x40000000, 0x40ffffff) AM_RAM AM_SHARE("work_ram")				// Work RAM
-	AM_RANGE(0xa4000000, 0xa40000ff) AM_READWRITE(ieee1394_r, ieee1394_w)		// IEEE1394 network
+	AM_RANGE(0x40000000, 0x40ffffff) AM_RAM AM_SHARE("work_ram")                // Work RAM
+	AM_RANGE(0xa4000000, 0xa40000ff) AM_READWRITE(ieee1394_r, ieee1394_w)       // IEEE1394 network
 	AM_RANGE(0xa8000000, 0xa8003fff) AM_READWRITE(ppc_common_r, ppc_common_w)   // Common RAM (with TLCS-900)
-	AM_RANGE(0xac000000, 0xac0fffff) AM_ROM AM_REGION("user1", 0)				// Apparently this should be flash ROM read/write access
+	AM_RANGE(0xac000000, 0xac0fffff) AM_ROM AM_REGION("user1", 0)               // Apparently this should be flash ROM read/write access
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -2042,16 +2042,16 @@ READ8_MEMBER(taitotz_state::tlcs_rtc_r)
 	switch (offset)
 	{
 		// NOTE: bcd numbers
-		case 0x00:		return m_rtcdata[0];		// milliseconds?
-		case 0x01:		return m_rtcdata[1];		// seconds
-		case 0x02:		return m_rtcdata[2];		// minutes
-		case 0x03:		return m_rtcdata[3];		// hours
-		case 0x04:		return m_rtcdata[4];		// day of the week
-		case 0x05:		return m_rtcdata[5];		// day
-		case 0x06:		return m_rtcdata[6];		// month
-		case 0x07:		return m_rtcdata[7];		// year
+		case 0x00:      return m_rtcdata[0];        // milliseconds?
+		case 0x01:      return m_rtcdata[1];        // seconds
+		case 0x02:      return m_rtcdata[2];        // minutes
+		case 0x03:      return m_rtcdata[3];        // hours
+		case 0x04:      return m_rtcdata[4];        // day of the week
+		case 0x05:      return m_rtcdata[5];        // day
+		case 0x06:      return m_rtcdata[6];        // month
+		case 0x07:      return m_rtcdata[7];        // year
 
-		case 0x0e:		return 0;
+		case 0x0e:      return 0;
 
 		default:
 			printf("tlcs_rtc_r: %02X\n", offset);
@@ -2065,14 +2065,14 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 {
 	switch (offset)
 	{
-		case 0x00:		m_rtcdata[0] = data; break;
-		case 0x01:		m_rtcdata[1] = data; break;
-		case 0x02:		m_rtcdata[2] = data; break;
-		case 0x03:		m_rtcdata[3] = data; break;
-		case 0x04:		m_rtcdata[4] = data; break;
-		case 0x05:		m_rtcdata[5] = data; break;
-		case 0x06:		m_rtcdata[6] = data; break;
-		case 0x07:		m_rtcdata[7] = data; break;
+		case 0x00:      m_rtcdata[0] = data; break;
+		case 0x01:      m_rtcdata[1] = data; break;
+		case 0x02:      m_rtcdata[2] = data; break;
+		case 0x03:      m_rtcdata[3] = data; break;
+		case 0x04:      m_rtcdata[4] = data; break;
+		case 0x05:      m_rtcdata[5] = data; break;
+		case 0x06:      m_rtcdata[6] = data; break;
+		case 0x07:      m_rtcdata[7] = data; break;
 		case 0x0e:
 			break;
 
@@ -2107,7 +2107,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 
 		UINT8 d = ide_bus_r(device, 0, reg);
 		if (reg == 7)
-			d &= ~0x2;		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
+			d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 							// The status check explicitly checks for 0x50 (drive ready, seek complete).
 		return d;
 	}
@@ -2153,7 +2153,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 	if ((offset & 1) == 0)
 	{
 		UINT8 d = ide_bus_r(device, 1, reg);
-		d &= ~0x2;		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
+		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
 		return d;
 	}
@@ -2192,9 +2192,9 @@ READ8_MEMBER(taitotz_state::tlcs900_port_read)
 {
 	switch (offset)
 	{
-		case 0x7: return 0;		// ???
+		case 0x7: return 0;     // ???
 		case 0x9: return ioport("INPUTS1")->read();
-		case 0xa: return 0;		// ???
+		case 0xa: return 0;     // ???
 		case 0xb: return ioport("INPUTS2")->read();
 		case 0xd: return ioport("INPUTS3")->read();
 		case 0xe: return ioport("INPUTS4")->read();
@@ -2265,22 +2265,22 @@ WRITE8_MEMBER(taitotz_state::tlcs900_port_write)
 // 0xfc0ce1:    INTTX1          Serial 1 transmit
 
 static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitotz_state)
-	AM_RANGE(0x010000, 0x02ffff) AM_RAM														// Work RAM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM	AM_SHARE("nvram")									// Backup RAM
+	AM_RANGE(0x010000, 0x02ffff) AM_RAM                                                     // Work RAM
+	AM_RANGE(0x040000, 0x041fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
 	AM_RANGE(0x044000, 0x04400f) AM_READWRITE(tlcs_rtc_r, tlcs_rtc_w)
 	AM_RANGE(0x060000, 0x061fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
-	AM_RANGE(0x064000, 0x064fff) AM_RAM	AM_SHARE("mbox_ram")								// MBox
+	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
 	AM_RANGE(0x068000, 0x06800f) AM_READWRITE(tlcs_ide0_r, tlcs_ide0_w)
 	AM_RANGE(0x06c000, 0x06c00f) AM_READWRITE(tlcs_ide1_r, tlcs_ide1_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( landhigh_tlcs900h_mem, AS_PROGRAM, 8, taitotz_state)
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM														// Work RAM
-	AM_RANGE(0x400000, 0x401fff) AM_RAM	AM_SHARE("nvram")									// Backup RAM
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM                                                     // Work RAM
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("nvram")                                   // Backup RAM
 	AM_RANGE(0x404000, 0x40400f) AM_READWRITE(tlcs_rtc_r, tlcs_rtc_w)
 	AM_RANGE(0x900000, 0x901fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
-	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_SHARE("mbox_ram")								// MBox
+	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("mbox_ram")                                // MBox
 	AM_RANGE(0x908000, 0x90800f) AM_READWRITE(tlcs_ide0_r, tlcs_ide0_w)
 	AM_RANGE(0x918000, 0x91800f) AM_READWRITE(tlcs_ide1_r, tlcs_ide1_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
@@ -2309,8 +2309,8 @@ static INPUT_PORTS_START( taitotz )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )									// Coin A
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )									// Coin B
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin A
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )                                    // Coin B
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2320,21 +2320,21 @@ static INPUT_PORTS_START( taitotz )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(1)		// Trig1 / U
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)	// Trig2 / D
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)	// Trig3 / R
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)	// Trig4 / L
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(1)      // Trig1 / U
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)   // Trig2 / D
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)  // Trig3 / R
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)   // Trig4 / L
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 )									// View 3
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON6 )									// View 4
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON7 )									// View 5
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON8 )									// View 6
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 )									// View 1
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 )									// View 2
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 )									// Select 1
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2 )									// Select 2
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 )                                  // View 3
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON6 )                                  // View 4
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON7 )                                  // View 5
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON8 )                                  // View 6
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // View 1
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 )                                  // View 2
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Select 1
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Select 2
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landhigh )
@@ -2349,7 +2349,7 @@ static INPUT_PORTS_START( landhigh )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )									// Coin
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2360,17 +2360,17 @@ static INPUT_PORTS_START( landhigh )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 )									// Speak
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON4 )									// Help
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON1 )									// Flap Up
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON2 )									// Flap Down
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // Speak
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON4 )                                  // Help
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Flap Up
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Flap Down
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 )									// ID Button
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 )                                  // ID Button
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON6 )									// Lever Sync
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START )									// Start
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON6 )                                  // Lever Sync
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START )                                    // Start
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2404,7 +2404,7 @@ static INPUT_PORTS_START( batlgr2 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )									// Coin
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2415,9 +2415,9 @@ static INPUT_PORTS_START( batlgr2 )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 )									// Shift Down
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 )									// Shift Up
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 )									// View
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Shift Down
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Shift Up
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // View
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2428,16 +2428,16 @@ static INPUT_PORTS_START( batlgr2 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START )									// Start
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START )                                    // Start
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ANALOG1")		// Steering
+	PORT_START("ANALOG1")       // Steering
 	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG2")		// Gas Pedal
+	PORT_START("ANALOG2")       // Gas Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG3")		// Brake Pedal
+	PORT_START("ANALOG3")       // Brake Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -2453,7 +2453,7 @@ static INPUT_PORTS_START( pwrshovl )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )									// Coin A
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin A
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2464,44 +2464,44 @@ static INPUT_PORTS_START( pwrshovl )
 
 	PORT_START("INPUTS3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(1)					// P1-Foot-Sw: Left-Down
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)					// P1-Foot-Sw: Left-Up
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)					// P1-Foot-Sw: Right-Down
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)					// P1-Foot-Sw: Right-Up
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(1)                   // P1-Foot-Sw: Left-Down
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)                  // P1-Foot-Sw: Left-Up
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)                  // P1-Foot-Sw: Right-Down
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)                  // P1-Foot-Sw: Right-Up
 	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS4")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)					// P2-Foot-Sw: Left-Down
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)					// P2-Foot-Sw: Left-Up
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)					// P2-Foot-Sw: Right-Down
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)					// P2-Foot-Sw: Right-Up
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)					// P1 View
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)					// P2 View
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 )									// P1 Start
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START2 )									// P2 Start
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Left-Down
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Left-Up
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Right-Down
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)                  // P2-Foot-Sw: Right-Up
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)                   // P1 View
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)                   // P2 View
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 )                                   // P1 Start
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START2 )                                   // P2 Start
 
-	PORT_START("ANALOG1")		// P1-Lever Left-X
+	PORT_START("ANALOG1")       // P1-Lever Left-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG2")		// P1-Lever Left-Y
+	PORT_START("ANALOG2")       // P1-Lever Left-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG3")		// P1-Lever Right-X
+	PORT_START("ANALOG3")       // P1-Lever Right-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG4")		// P1_Lever Right-Y
+	PORT_START("ANALOG4")       // P1_Lever Right-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG5")		// P2-Lever Left-X
+	PORT_START("ANALOG5")       // P2-Lever Left-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(3) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG6")		// P2-Lever Left-Y
+	PORT_START("ANALOG6")       // P2-Lever Left-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(3) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG7")		// P2-Lever Right-X
+	PORT_START("ANALOG7")       // P2-Lever Right-X
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(4) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG8")		// P2_Lever Right-Y
+	PORT_START("ANALOG8")       // P2_Lever Right-Y
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(4) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -2551,7 +2551,7 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 
 static const powerpc_config ppc603e_config =
 {
-	XTAL_66_6667MHz,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	XTAL_66_6667MHz,        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	NULL,
 	NULL
 };
@@ -2604,7 +2604,7 @@ MACHINE_CONFIG_END
 static void init_taitotz_152(running_machine &machine)
 {
 	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
-    rom[(0x2c87c^4)/4] = 0x38600000;	// skip sound load timeout...
+	rom[(0x2c87c^4)/4] = 0x38600000;    // skip sound load timeout...
 //  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 }
 
@@ -2612,19 +2612,19 @@ static void init_taitotz_152(running_machine &machine)
 static void init_taitotz_111a(running_machine &machine)
 {
 	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
-	rom[(0x2b748^4)/4] = 0x480000b8;	// skip sound load timeout
+	rom[(0x2b748^4)/4] = 0x480000b8;    // skip sound load timeout
 }
 
-static const char LANDHIGH_HDD_SERIAL[] =			// "824915746386        "
+static const char LANDHIGH_HDD_SERIAL[] =           // "824915746386        "
 	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x36, 0x33, 0x38, 0x36, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
-static const char BATLGR2_HDD_SERIAL[] =			// "            05412842"
+static const char BATLGR2_HDD_SERIAL[] =            // "            05412842"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x32, 0x38, 0x34, 0x32 };
 
-static const char BATLGR2A_HDD_SERIAL[] =			// "            05411645"
+static const char BATLGR2A_HDD_SERIAL[] =           // "            05411645"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x31, 0x36, 0x34, 0x35 };
 
-static const char RAIZPIN_HDD_SERIAL[] =			// "691934013492        "
+static const char RAIZPIN_HDD_SERIAL[] =            // "691934013492        "
 	{ 0x36, 0x39, 0x31, 0x39, 0x33, 0x34, 0x30, 0x31, 0x33, 0x34, 0x39, 0x32, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
 DRIVER_INIT_MEMBER(taitotz_state,landhigh)
@@ -2702,13 +2702,13 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 
 
 // Type-Zero System v1.52
-#define TAITOTZ_BIOS_V152	\
-	ROM_LOAD32_WORD_SWAP( "e68-05-1.ic6", 0x000000, 0x080000, CRC(6ad9b006) SHA1(f05a0ae26b6abaeda9c7944aee96c72b08fff7a5) )	\
+#define TAITOTZ_BIOS_V152   \
+	ROM_LOAD32_WORD_SWAP( "e68-05-1.ic6", 0x000000, 0x080000, CRC(6ad9b006) SHA1(f05a0ae26b6abaeda9c7944aee96c72b08fff7a5) )    \
 	ROM_LOAD32_WORD_SWAP( "e68-04-1.ic5", 0x000002, 0x080000, CRC(c7c2dc6b) SHA1(bf88c818166c285130c5c73d6982f009da26e143) )
 
 // Type-Zero System v1.11a (This was obtained from Battle Gear harddisk. An exact copy is also included in pwrshovl harddisk.)
-#define TAITOTZ_BIOS_V111A	\
-	ROM_LOAD32_WORD_SWAP( "ic6", 0x000000, 0x080000, CRC(29654245) SHA1(aaa34ff363eb96cf4a785fa6f9f7fc650b5ee93d) )	\
+#define TAITOTZ_BIOS_V111A  \
+	ROM_LOAD32_WORD_SWAP( "ic6", 0x000000, 0x080000, CRC(29654245) SHA1(aaa34ff363eb96cf4a785fa6f9f7fc650b5ee93d) ) \
 	ROM_LOAD32_WORD_SWAP( "ic5", 0x000002, 0x080000, CRC(8784804a) SHA1(fe9eed5289dcc89f2bc98cb752895b13e44b6097) )
 
 
@@ -2792,8 +2792,8 @@ ROM_START( pwrshovl )
 	TAITOTZ_BIOS_V111A
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
-    ROM_LOAD16_BYTE( "e74-04.ic14",   0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) )
-    ROM_LOAD16_BYTE( "e74-05.ic15",   0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) )
+	ROM_LOAD16_BYTE( "e74-04.ic14",   0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) )
+	ROM_LOAD16_BYTE( "e74-05.ic15",   0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) )
 
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
@@ -2824,4 +2824,3 @@ GAME( 1999, pwrshovl, taitotz, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0
 GAME( 2000, batlgr2,  taitotz, taitotz,  batlgr2, taitotz_state,  batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2a, batlgr2, taitotz,  batlgr2, taitotz_state,  batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, raizpin,  taitotz, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong", GAME_NOT_WORKING | GAME_NO_SOUND )
-

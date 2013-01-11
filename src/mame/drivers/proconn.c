@@ -23,16 +23,16 @@ class proconn_state : public driver_device
 public:
 	proconn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vfd(*this, "vfd"),
-		  m_maincpu(*this, "maincpu"),
-		  m_z80pio_1(*this, "z80pio_1"),
-		  m_z80pio_2(*this, "z80pio_2"),
-		  m_z80pio_3(*this, "z80pio_3"),
-		  m_z80pio_4(*this, "z80pio_4"),
-		  m_z80pio_5(*this, "z80pio_5"),
-		  m_z80ctc(*this, "z80ctc"),
-		  m_z80sio(*this, "z80sio"),
-		  m_ay(*this, "aysnd")
+			m_vfd(*this, "vfd"),
+			m_maincpu(*this, "maincpu"),
+			m_z80pio_1(*this, "z80pio_1"),
+			m_z80pio_2(*this, "z80pio_2"),
+			m_z80pio_3(*this, "z80pio_3"),
+			m_z80pio_4(*this, "z80pio_4"),
+			m_z80pio_5(*this, "z80pio_5"),
+			m_z80ctc(*this, "z80ctc"),
+			m_z80sio(*this, "z80sio"),
+			m_ay(*this, "aysnd")
 	{ }
 
 	optional_device<roc10937_t> m_vfd;
@@ -114,49 +114,49 @@ public:
 
 	/* PIO 1 */
 
-	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_int_w)	{ /* logerror("pio_1_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_1_m_in_pa_r)			{ logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return space.machine().rand(); }
-	DECLARE_WRITE8_MEMBER(pio_1_m_out_pa_w)			{ logerror("pio_1_m_out_pa_w %02x\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_ardy_w)	{ logerror("pio_1_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_1_m_in_pb_r)			{ logerror("pio_1_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_1_m_out_pb_w)			{ logerror("pio_1_m_out_pb_w %02x (REELS)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_brdy_w)	{ logerror("pio_1_m_out_brdy_w %02x\n", state); }
+	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_int_w)    { /* logerror("pio_1_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_1_m_in_pa_r)           { logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return space.machine().rand(); }
+	DECLARE_WRITE8_MEMBER(pio_1_m_out_pa_w)         { logerror("pio_1_m_out_pa_w %02x\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_ardy_w)   { logerror("pio_1_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_1_m_in_pb_r)           { logerror("pio_1_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_1_m_out_pb_w)         { logerror("pio_1_m_out_pb_w %02x (REELS)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_brdy_w)   { logerror("pio_1_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 2 */
-	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_int_w)	{ /* logerror("pio_2_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_2_m_in_pa_r)			{ logerror("pio_2_m_in_pa_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_2_m_out_pa_w)			{ logerror("pio_2_m_out_pa_w %02x\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_ardy_w)	{ logerror("pio_2_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_2_m_in_pb_r)			{ logerror("pio_2_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_2_m_out_pb_w)			{ logerror("pio_2_m_out_pb_w %02x (ALPHA)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_brdy_w)	{ logerror("pio_2_m_out_brdy_w %02x\n", state); }
+	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_int_w)    { /* logerror("pio_2_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_2_m_in_pa_r)           { logerror("pio_2_m_in_pa_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_2_m_out_pa_w)         { logerror("pio_2_m_out_pa_w %02x\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_ardy_w)   { logerror("pio_2_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_2_m_in_pb_r)           { logerror("pio_2_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_2_m_out_pb_w)         { logerror("pio_2_m_out_pb_w %02x (ALPHA)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_brdy_w)   { logerror("pio_2_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 3 */
-	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_int_w)	{ /* logerror("pio_3_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_3_m_in_pa_r)			{ logerror("pio_3_m_in_pa_r (REEL OPTICS)\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_3_m_out_pa_w)			{ logerror("pio_3_m_out_pa_w %02x (STROBE)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_ardy_w)	{ logerror("pio_3_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_3_m_in_pb_r)			{ logerror("pio_3_m_in_pb_r (COIN INPUT)\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_3_m_out_pb_w)			{ logerror("pio_3_m_out_pb_w %02x\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_brdy_w)	{ logerror("pio_3_m_out_brdy_w %02x\n", state); }
+	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_int_w)    { /* logerror("pio_3_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_3_m_in_pa_r)           { logerror("pio_3_m_in_pa_r (REEL OPTICS)\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_3_m_out_pa_w)         { logerror("pio_3_m_out_pa_w %02x (STROBE)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_ardy_w)   { logerror("pio_3_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_3_m_in_pb_r)           { logerror("pio_3_m_in_pb_r (COIN INPUT)\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_3_m_out_pb_w)         { logerror("pio_3_m_out_pb_w %02x\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_brdy_w)   { logerror("pio_3_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 4 */
-	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_int_w)	{ /* logerror("pio_4_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_4_m_in_pa_r)			{ logerror("pio_4_m_in_pa_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_4_m_out_pa_w)			{ logerror("pio_4_m_out_pa_w %02x (TRIAC)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_ardy_w)	{ logerror("pio_4_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_4_m_in_pb_r)			{ logerror("pio_4_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_4_m_out_pb_w)			{ logerror("pio_4_m_out_pb_w %02x (7SEG)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_brdy_w)	{ logerror("pio_4_m_out_brdy_w %02x\n", state); }
+	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_int_w)    { /* logerror("pio_4_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_4_m_in_pa_r)           { logerror("pio_4_m_in_pa_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_4_m_out_pa_w)         { logerror("pio_4_m_out_pa_w %02x (TRIAC)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_ardy_w)   { logerror("pio_4_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_4_m_in_pb_r)           { logerror("pio_4_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_4_m_out_pb_w)         { logerror("pio_4_m_out_pb_w %02x (7SEG)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_brdy_w)   { logerror("pio_4_m_out_brdy_w %02x\n", state); }
 
 	/* PIO 5 */
-	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_int_w)	{ /* logerror("pio_5_m_out_int_w %02x\n", state); */ }
-	DECLARE_READ8_MEMBER(pio_5_m_in_pa_r)			{ logerror("pio_5_m_in_pa_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_5_m_out_pa_w)			{ logerror("pio_5_m_out_pa_w %02x (LAMPS0)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_ardy_w)	{ logerror("pio_5_m_out_ardy_w %02x\n", state); }
-	DECLARE_READ8_MEMBER(pio_5_m_in_pb_r)			{ logerror("pio_5_m_in_pb_r\n"); return 0x00; }
-	DECLARE_WRITE8_MEMBER(pio_5_m_out_pb_w)			{ logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
-	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)	{ logerror("pio_5_m_out_brdy_w %02x\n", state); }
+	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_int_w)    { /* logerror("pio_5_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_5_m_in_pa_r)           { logerror("pio_5_m_in_pa_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_5_m_out_pa_w)         { logerror("pio_5_m_out_pa_w %02x (LAMPS0)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_ardy_w)   { logerror("pio_5_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_5_m_in_pb_r)           { logerror("pio_5_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_5_m_out_pb_w)         { logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)   { logerror("pio_5_m_out_brdy_w %02x\n", state); }
 
 protected:
 
@@ -305,10 +305,10 @@ static Z80PIO_INTERFACE( pio_interface_5 )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL,					// ZC/TO0 callback
-	DEVCB_NULL,					// ZC/TO1 callback
-	DEVCB_NULL					// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_NULL,                 // ZC/TO0 callback
+	DEVCB_NULL,                 // ZC/TO1 callback
+	DEVCB_NULL                  // ZC/TO2 callback
 };
 
 WRITE16_MEMBER(proconn_state::serial_transmit)
@@ -335,12 +335,12 @@ READ16_MEMBER(proconn_state::serial_receive)
 
 static const z80sio_interface sio_intf =
 {
-	DEVCB_NULL,					/* interrupt handler */
-	DEVCB_NULL,					/* DTR changed handler */
-	DEVCB_NULL,					/* RTS changed handler */
-	DEVCB_NULL,					/* BREAK changed handler */
-	DEVCB_DRIVER_MEMBER16(proconn_state,serial_transmit),	/* transmit handler */
-	DEVCB_DRIVER_MEMBER16(proconn_state,serial_receive)		/* receive handler */
+	DEVCB_NULL,                 /* interrupt handler */
+	DEVCB_NULL,                 /* DTR changed handler */
+	DEVCB_NULL,                 /* RTS changed handler */
+	DEVCB_NULL,                 /* BREAK changed handler */
+	DEVCB_DRIVER_MEMBER16(proconn_state,serial_transmit),   /* transmit handler */
+	DEVCB_DRIVER_MEMBER16(proconn_state,serial_receive)     /* receive handler */
 };
 
 static const ay8910_interface ay8910_config =
@@ -361,7 +361,7 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 void proconn_state::machine_reset()
 {
-	m_vfd->reset();	// reset display1
+	m_vfd->reset(); // reset display1
 }
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
@@ -1274,139 +1274,139 @@ DRIVER_INIT_MEMBER(proconn_state,proconn)
 {
 }
 
-GAME( 199?, pr_lday			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "'L' Of A Day (Project) (Cash set) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_ldaya		,pr_lday	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "'L' Of A Day (Project) (Token set) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_5xcsh		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "5x Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvn			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvna		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (10GBP Jackpot) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnb		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (20p 6GBP Jackpot Version 114) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnc		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (10p 3GBP Jackpot Version 380) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnd		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (5p 3GBP Jackpot Version 105) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvne		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 6) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnf		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 7) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvng		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 8) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnh		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 9) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvni		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 10) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnj		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 11) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnk		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 12) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnl		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 13) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnm		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 14) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnn		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 15) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvno		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 16) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnp		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 17) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnq		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 18) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnr		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 19) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvns		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 20) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnt		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 21) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_7hvnu		,pr_7hvn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 22) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_lday         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "'L' Of A Day (Project) (Cash set) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_ldaya        ,pr_lday    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "'L' Of A Day (Project) (Token set) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_5xcsh        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "5x Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvn         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvna        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (10GBP Jackpot) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnb        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (20p 6GBP Jackpot Version 114) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnc        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (10p 3GBP Jackpot Version 380) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnd        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (5p 3GBP Jackpot Version 105) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvne        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 6) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnf        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 7) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvng        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 8) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnh        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 9) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvni        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 10) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnj        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 11) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnk        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 12) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnl        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 13) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnm        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 14) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnn        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 15) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvno        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 16) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnp        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 17) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnq        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 18) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnr        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 19) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvns        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 20) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnt        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 21) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnu        ,pr_7hvn    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "777 Heaven (Project) (set 22) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, pr_alwy9		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"PCP"    , "Always Nine (Pcp) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_alwy9a		,pr_alwy9	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"PCP"    , "Always Nine (Pcp) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_barbl		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bars & Bells (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_batls		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Battleships (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_batlsa		,pr_batls	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Battleships (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_batlsb		,pr_batls	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Battleships (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_btwar		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Beat The Warden (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_btwara		,pr_btwar	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Beat The Warden (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_btwarb		,pr_btwar	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Beat The Warden (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bigdp		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Big Dipper (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bigdpa		,pr_bigdp	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Big Dipper (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bulls		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bullseye (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bullsa		,pr_bulls	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bullseye (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bullsb		,pr_bulls	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bullseye (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bulbn		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bully's Big Night (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bulbna		,pr_bulbn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bully's Big Night (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bulbnb		,pr_bulbn	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bully's Big Night (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_buljp		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bully's Jackpot (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_buljpa		,pr_buljp	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Bully's Jackpot (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_cashb		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Cash Back (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_cas7			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Casino Jackpot 7s (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_chico		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_chicoa		,pr_chico	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_chicob		,pr_chico	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_coolm		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Cool Million (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_coolma		,pr_coolm	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Cool Million (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_coolmb		,pr_coolm	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Cool Million (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_crz77		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Crazy 777s (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_crzbr		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Crazy Bars (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_supbr		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"PCP", 	"Super Bars (PCP) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_alwy9        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"PCP"    , "Always Nine (Pcp) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_alwy9a       ,pr_alwy9   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"PCP"    , "Always Nine (Pcp) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_barbl        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bars & Bells (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_batls        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Battleships (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_batlsa       ,pr_batls   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Battleships (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_batlsb       ,pr_batls   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Battleships (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_btwar        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Beat The Warden (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_btwara       ,pr_btwar   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Beat The Warden (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_btwarb       ,pr_btwar   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Beat The Warden (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bigdp        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Big Dipper (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bigdpa       ,pr_bigdp   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Big Dipper (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bulls        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bullseye (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bullsa       ,pr_bulls   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bullseye (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bullsb       ,pr_bulls   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bullseye (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bulbn        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bully's Big Night (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bulbna       ,pr_bulbn   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bully's Big Night (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bulbnb       ,pr_bulbn   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bully's Big Night (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_buljp        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bully's Jackpot (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_buljpa       ,pr_buljp   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Bully's Jackpot (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_cashb        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Cash Back (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_cas7         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Casino Jackpot 7s (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_chico        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Chico the Bandit (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_chicoa       ,pr_chico   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Chico the Bandit (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_chicob       ,pr_chico   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Chico the Bandit (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coolm        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Cool Million (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coolma       ,pr_coolm   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Cool Million (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coolmb       ,pr_coolm   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Cool Million (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_crz77        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Crazy 777s (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_crzbr        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Crazy Bars (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_supbr        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"PCP",     "Super Bars (PCP) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, pr_coyot		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"PCP"    , "Crazy Coyote (Pcp) (10p) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_coyota		,pr_coyot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"PCP"    , "Crazy Coyote (Pcp) (20p) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coyot        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"PCP"    , "Crazy Coyote (Pcp) (10p) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coyota       ,pr_coyot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"PCP"    , "Crazy Coyote (Pcp) (20p) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, pr_crzpy		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Crazy Pays (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_dblup		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Double Up (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fire			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Fircecracker (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_flshc		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Flash The Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_ftwhl		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Fortune Wheel (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_funrn		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Fun On The Run (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_gogld		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Go For Gold (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_gldnl		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Golden Nile (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_gldng		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Golden Nugget (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_gdft			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Good Fortune (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_happy		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Happy Days (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_heato		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "The Heat Is On (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_hiclm		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Hi Climber (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_hit6			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Hit The Six (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_hotcs		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Hot Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_hotsp		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Hot Spots (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_jkpt7		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Jackpot 7's (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_jkrwd		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Jokers Wild (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_jumpj		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_jumpja		,pr_jumpj	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_medl			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Medalist (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_megmn		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Mega Money (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_nudxs		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Nudge XS (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_qksht		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Maygay", "Quickshot (Maygay) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_rags			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Rags To Riches (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_reflx		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Reflex (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_roadr		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Road Riot (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_roll			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "The Roll (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_sevab		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Seven's Above (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_sevml		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Sevens & Melons (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_theme		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Theme Park (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_ttrai		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Treasure Trail (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_trpx			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Triple X (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 1999, pr_trktr		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Trick or Treat (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 1999, pr_trktp		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Trick or Treat (Protocol?) (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_walls		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Wall Street (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_whlft		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Wheel Of Fortune (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_wldkn		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Wild Kings (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_nifty		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Nifty Fifty (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_upnun		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Project", "Up & Under (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_sptb			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Pcp", "Simply the Best (Pcp) (PROCONN?)",GAME_IS_SKELETON_MECHANICAL ) // not 100% sure this belongs here
+GAME( 199?, pr_crzpy        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Crazy Pays (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_dblup        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Double Up (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fire         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Fircecracker (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_flshc        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Flash The Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_ftwhl        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Fortune Wheel (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_funrn        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Fun On The Run (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gogld        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Go For Gold (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gldnl        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Golden Nile (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gldng        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Golden Nugget (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gdft         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Good Fortune (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_happy        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Happy Days (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_heato        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "The Heat Is On (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_hiclm        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hi Climber (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_hit6         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hit The Six (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_hotcs        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hot Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_hotsp        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hot Spots (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jkpt7        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Jackpot 7's (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jkrwd        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Jokers Wild (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jumpj        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Jumping Jacks (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jumpja       ,pr_jumpj   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Jumping Jacks (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_medl         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Medalist (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_megmn        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Mega Money (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_nudxs        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Nudge XS (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_qksht        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Maygay", "Quickshot (Maygay) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_rags         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Rags To Riches (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_reflx        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Reflex (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_roadr        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Road Riot (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_roll         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "The Roll (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_sevab        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Seven's Above (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_sevml        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Sevens & Melons (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_theme        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Theme Park (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_ttrai        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Treasure Trail (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_trpx         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Triple X (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1999, pr_trktr        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Trick or Treat (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1999, pr_trktp        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Trick or Treat (Protocol?) (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_walls        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Wall Street (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_whlft        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Wheel Of Fortune (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_wldkn        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Wild Kings (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_nifty        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Nifty Fifty (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_upnun        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Up & Under (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_sptb         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Pcp", "Simply the Best (Pcp) (PROCONN?)",GAME_IS_SKELETON_MECHANICAL ) // not 100% sure this belongs here
 
 // Some of these are PC98 hardware.. I don't know how / if that differs
-GAME( 199?, pr_bears		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear Streak (set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearsa		,pr_bears	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear Streak (set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearsb		,pr_bears	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear Streak (set 3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearx		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (Version 2.3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxa		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (Version 2.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxb		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (Version 1.3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxc		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (20p set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxd		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (20p set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxe		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (10p set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxf		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (10p set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxg		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (10p set 3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxh		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (10p set 4?) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxi		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (10p set 5) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxj		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (code 813) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxk		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (8GBP Token?) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxl		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (Version 41) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxlp		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (Version 41, Protocol) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearxm		,pr_bearx	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Bear X (Version 31) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bears        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear Streak (set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearsa       ,pr_bears   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear Streak (set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearsb       ,pr_bears   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear Streak (set 3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearx        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (Version 2.3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxa       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (Version 2.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxb       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (Version 1.3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxc       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (20p set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxd       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (20p set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxe       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (10p set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxf       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (10p set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxg       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (10p set 3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxh       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (10p set 4?) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxi       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (10p set 5) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxj       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (code 813) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxk       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (8GBP Token?) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxl       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (Version 41) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxlp      ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (Version 41, Protocol) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxm       ,pr_bearx   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Bear X (Version 31) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, pr_fspot		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 4.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspota		,pr_fspot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 3.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspotb		,pr_fspot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 2.1, set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspotc		,pr_fspot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 2.1, 20p stake, 82%) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspotd		,pr_fspot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 2.1, 7 button) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspote		,pr_fspot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 1.1, set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspotf		,pr_fspot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 1.1, 20p stake, 82%) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspotg		,pr_fspot	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 1.1, 6 button) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspot        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 4.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspota       ,pr_fspot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 3.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotb       ,pr_fspot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 2.1, set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotc       ,pr_fspot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 2.1, 20p stake, 82%) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotd       ,pr_fspot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 2.1, 7 button) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspote       ,pr_fspot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 1.1, set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotf       ,pr_fspot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 1.1, 20p stake, 82%) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotg       ,pr_fspot   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Fun Spot (Version 1.1, 6 button) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, pr_gnuc			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Golden Nugget (Version 2.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_gnuca		,pr_gnuc	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Golden Nugget (Version 1.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_magln		,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Magic Lines (Version 2.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_maglna		,pr_magln	,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Coinworld", "Magic Lines (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_swop			,0			,proconn	,proconn	, proconn_state,proconn	,ROT0	,"Ace", "Swop It (Ace)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gnuc         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Golden Nugget (Version 2.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gnuca        ,pr_gnuc    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Golden Nugget (Version 1.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_magln        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Magic Lines (Version 2.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_maglna       ,pr_magln   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Magic Lines (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_swop         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Ace", "Swop It (Ace)",GAME_IS_SKELETON_MECHANICAL )

@@ -23,7 +23,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SERIAL_BOX_TAG			"serialbox"
+#define SERIAL_BOX_TAG          "serialbox"
 
 
 
@@ -34,22 +34,22 @@
 // ======================> serial_box_device
 
 class serial_box_device :  public device_t,
-						   public device_cbm_iec_interface
+							public device_cbm_iec_interface
 {
 
 public:
-    // construction/destruction
-    serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "serbox"; }
+	virtual void device_config_complete() { m_shortname = "serbox"; }
 
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state);

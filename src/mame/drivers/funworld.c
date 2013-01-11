@@ -829,7 +829,7 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_16MHz
+#define MASTER_CLOCK    XTAL_16MHz
 
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
@@ -862,17 +862,17 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
     -x-- ----   Hopper Motor (inverted).
     x--- ----   HOLD4 lamp.
 */
-	output_set_lamp_value(0, 1-((data >> 1) & 1));	/* Hold1 (inverted) */
-	output_set_lamp_value(2, 1-((data >> 1) & 1));	/* Hold3 (inverted, see pinouts) */
+	output_set_lamp_value(0, 1-((data >> 1) & 1));  /* Hold1 (inverted) */
+	output_set_lamp_value(2, 1-((data >> 1) & 1));  /* Hold3 (inverted, see pinouts) */
 
-	output_set_lamp_value(1, 1-((data >> 3) & 1));	/* Hold2 / Low (inverted) */
-	output_set_lamp_value(3, (data >> 7) & 1);		/* Hold4 / High */
-	output_set_lamp_value(5, 1-((data >> 5) & 1));	/* Cancel / Collect (inverted) */
+	output_set_lamp_value(1, 1-((data >> 3) & 1));  /* Hold2 / Low (inverted) */
+	output_set_lamp_value(3, (data >> 7) & 1);      /* Hold4 / High */
+	output_set_lamp_value(5, 1-((data >> 5) & 1));  /* Cancel / Collect (inverted) */
 
-	coin_counter_w(machine(), 0, data & 0x01);	/* Credit In counter */
-	coin_counter_w(machine(), 7, data & 0x04);	/* Credit Out counter, mapped as coin 8 */
+	coin_counter_w(machine(), 0, data & 0x01);  /* Credit In counter */
+	coin_counter_w(machine(), 7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
 
-	output_set_lamp_value(7, 1-((data >> 6) & 1));		/* Hopper Motor (inverted) */
+	output_set_lamp_value(7, 1-((data >> 6) & 1));      /* Hopper Motor (inverted) */
 
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
@@ -886,8 +886,8 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
     ---- -x--   Unknown (inverted).
     xxxx x---   Unknown.
 */
-	output_set_lamp_value(4, (data >> 0) & 1);		/* Hold5 / Bet */
-	output_set_lamp_value(6, (data >> 1) & 1);		/* Start / Deal / Draw */
+	output_set_lamp_value(4, (data >> 0) & 1);      /* Hold5 / Bet */
+	output_set_lamp_value(6, (data >> 1) & 1);      /* Start / Deal / Draw */
 
 //  popmessage("Lamps B: %02X", data);
 }
@@ -965,9 +965,9 @@ static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2c00, 0x2cff) AM_RAM	/* range for protection */
-	AM_RANGE(0x3600, 0x36ff) AM_RAM	/* some games use $3603-05 range for protection */
-	AM_RANGE(0x3c00, 0x3cff) AM_RAM	/* range for protection */
+	AM_RANGE(0x2c00, 0x2cff) AM_RAM /* range for protection */
+	AM_RANGE(0x3600, 0x36ff) AM_RAM /* some games use $3603-05 range for protection */
+	AM_RANGE(0x3c00, 0x3cff) AM_RAM /* range for protection */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -981,8 +981,8 @@ static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* some unknown reads */
-	AM_RANGE(0x3e00, 0x3fff) AM_RAM	/* some games use $3e03-05 range for protection */
+	AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads */
+	AM_RANGE(0x3e00, 0x3fff) AM_RAM /* some games use $3e03-05 range for protection */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1037,24 +1037,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funworld )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen (Cancel) / Kassieren (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start) / Gamble (Play)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Halten (Hold) 5 / Half Gamble")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buchhalt (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Halten (Hold) 4 / Hoch (High)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Halten (Hold) 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Loeschen (Cancel) / Kassieren (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Geben (Start) / Gamble (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Halten (Hold) 5 / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buchhalt (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Halten (Hold) 4 / Hoch (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Halten (Hold) 2 / Tief (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Halten (Hold) 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Halten (Hold) 2 / Tief (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Halten (Hold) 3")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreib (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1067,55 +1067,55 @@ static INPUT_PORTS_START( funworld )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Play" )
-	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x04, "10 Points/Coin" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
-	PORT_DIPNAME( 0x10, 0x00, "Insert" )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, "Insert" )            PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Dattl Insert" )
 	PORT_DIPSETTING(    0x10, "TAB Insert" )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolycdcr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Navijanje (Remote)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Ponistavange (Cancel) / Kasiranje (Take) / Autohold")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Djelenje (Start) / Gamble (Play)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Stop (Hold) 5 / Ulog (Bet) / Half Gamble")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Konobar (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Namjestit (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Stop (Hold) 4 / Veca (High)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Navijanje (Remote)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop (Hold) 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Ponistavange (Cancel) / Kasiranje (Take) / Autohold")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Djelenje (Start) / Gamble (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop (Hold) 5 / Ulog (Bet) / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Konobar (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Namjestit (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop (Hold) 4 / Veca (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Stop (Hold) 2 / Manja (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Stop (Hold) 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop (Hold) 2 / Manja (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop (Hold) 3")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Vratiti Nazad (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Vratiti Nazad (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1128,49 +1128,49 @@ static INPUT_PORTS_START( jolycdcr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Play" )
-	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolycdit )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1 / Alta (High)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Doppio (Double) / Autohold")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Stop (Hold) 5 / Half Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop (Hold) 1 / Alta (High)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Doppio (Double) / Autohold")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop (Hold) 5 / Half Gamble")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Stop (Hold) 4 / Accredito (Take)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop (Hold) 4 / Accredito (Take)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Stop (Hold) 2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Stop (Hold) 3 / Bassa (Low)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop (Hold) 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop (Hold) 3 / Bassa (Low)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1189,115 +1189,115 @@ static INPUT_PORTS_START( jolycdit )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Play" )
-	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "50 Points/Pulse" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolycdib )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Autohold / Accredito (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Doppio (Double)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Stop (Hold) 5 / Bet / Half Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop (Hold) 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Autohold / Accredito (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Doppio (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop (Hold) 5 / Bet / Half Gamble")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Stop (Hold) 4 / Alta (High)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop (Hold) 4 / Alta (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Stop (Hold) 2 / Bassa (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Stop (Hold) 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("test1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("test2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("test3") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop (Hold) 2 / Bassa (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop (Hold) 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("test1") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("test2") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("test3") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("test4") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("test4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test5") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test7") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test8") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test9") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test10") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test11") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("test5") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("test6") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("test7") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("test8") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("test9") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("test10") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("test11") PORT_CODE(KEYCODE_R)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )	/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )    /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	/* when is ON, allow the player to activate/deactivate the autohold through CANCEL button */
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   /* when is ON, allow the player to activate/deactivate the autohold through CANCEL button */
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolyc980 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Navijanje (Remote)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop (Hold) 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Ponistavange (Cancel) / Kasiranje (Take) / Autohold")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Djelenje (Start) / Gamble (Play)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Stop (Hold) 5 / Ulog (Bet) / Half Gamble")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Konobar (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Namjestit (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Stop (Hold) 4 / Veca (High)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Navijanje (Remote)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop (Hold) 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Ponistavange (Cancel) / Kasiranje (Take) / Autohold")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Djelenje (Start) / Gamble (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop (Hold) 5 / Ulog (Bet) / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Konobar (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Namjestit (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop (Hold) 4 / Veca (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Stop (Hold) 2 / Manja (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Stop (Hold) 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop (Hold) 2 / Manja (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop (Hold) 3")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Vratiti Nazad (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Vratiti Nazad (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1310,28 +1310,28 @@ static INPUT_PORTS_START( jolyc980 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, "Play" )
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -1339,23 +1339,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( bonuscrd )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 / Red")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Take")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Black / Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 / Red")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Black / Bet")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Hoch (High)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Hoch (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Tief (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Half Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Tief (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 / Half Gamble")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Payout")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Payout")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1371,31 +1371,31 @@ static INPUT_PORTS_START( bonuscrd )
 /*  DIP switch 8 should be left ON by default (all remaining ones in OFF)
     to allow initialization. You can change settings later, after the boot.
 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bonus Type" )	    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Type" )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "Good Luck!" )
 	PORT_DIPSETTING(    0x02, "55/77/99 Bonus" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
-	PORT_DIPNAME( 0x10, 0x00, "D-UP Type" )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, "D-UP Type" )         PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Forced, Red-Low-High-Black" )
 	PORT_DIPSETTING(    0x10, "Classic Hi-Lo" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )	PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -1403,17 +1403,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( bigdeal )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Take")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Stake")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Stake")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Nagy (High)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Nagy (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Icsi (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Half Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Icsi (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 / Half Gamble")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1435,52 +1435,52 @@ static INPUT_PORTS_START( bigdeal )
 /*  DIP switch 8 should be left ON by default (all remaining ones in OFF)
     to allow initialization. You can change settings later, after the boot.
 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bonus Type" )	    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Type" )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "Good Luck!" )
 	PORT_DIPSETTING(    0x02, "55/77/99 Bonus" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
-	PORT_DIPNAME( 0x10, 0x00, "D-UP Type" )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, "D-UP Type" )         PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Forced, Red-Low-High-Black" )
 	PORT_DIPSETTING(    0x10, "Classic Hi-Lo" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )	PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( magicrd2 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Take")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Stake")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Stake")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / High")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / High")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Low")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Low")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
@@ -1496,55 +1496,55 @@ static INPUT_PORTS_START( magicrd2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Play" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")	/* remote credits settings are always 10 points/pulse */
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")   /* remote credits settings are always 10 points/pulse */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x04, "10 Points/Coin" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "With Joker" )
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( royalcrd )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1 / Hoch (High)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen/Gamble (Cancel/Play)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Halten (Hold) 5 / Half Gamble")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buchhalt (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Halten (Hold) 4 / Kassieren (Take)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Halten (Hold) 1 / Hoch (High)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Loeschen/Gamble (Cancel/Play)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Geben (Start)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Halten (Hold) 5 / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buchhalt (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Halten (Hold) 4 / Kassieren (Take)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Halten (Hold) 2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Halten (Hold) 3 / Tief (Low)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Halten (Hold) 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Halten (Hold) 3 / Tief (Low)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("unknown bit 08") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("unknown bit 08") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreib (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1557,51 +1557,51 @@ static INPUT_PORTS_START( royalcrd )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Play" )
-	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )			PORT_DIPLOCATION("SW1:7")	/* listed as 'Coin-C' in some sources */
+	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )          PORT_DIPLOCATION("SW1:7")   /* listed as 'Coin-C' in some sources */
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x04, "10 Points/Coin" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
-	PORT_DIPNAME( 0x10, 0x10, "Insert" )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Insert" )            PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "Dattl Insert" )
 	PORT_DIPSETTING(    0x10, "TAB Insert" )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cuoreuno )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* no remote credits */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop 1 / Switch Bet (1-Max)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Bet / Prendi (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Gioca (Play)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Stop 5 / Half Gamble / Super Game")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no remote credits */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop 1 / Switch Bet (1-Max)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Bet / Prendi (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Gioca (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop 5 / Half Gamble / Super Game")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Stop 4 / Alta (High)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop 4 / Alta (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Stop 2 / Bassa (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Stop 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Ticket") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop 2 / Bassa (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Ticket") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1618,50 +1618,50 @@ static INPUT_PORTS_START( cuoreuno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )					PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )                 PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )	PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )   PORT_DIPLOCATION("SW1:3,2")
 	PORT_DIPSETTING(    0x00, "Manual - User Choice 1" )
 	PORT_DIPSETTING(    0x20, "Manual - Coins" )
 	PORT_DIPSETTING(    0x40, "Manual - Tickets" )
 	PORT_DIPSETTING(    0x60, "Manual - User Choice 2" )
 
 	/* the following one (1st DSW) seems to be disconnected
-    to avoid the use of remote credits or direct payout */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW1:1")
+	to avoid the use of remote credits or direct payout */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )           PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pool10 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* no remote credits */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Stop 1 / Switch Bet (1-Max)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Clear / Bet / Prendi (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Gioca (Play)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Stop 5 / Half Gamble / Super Game")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no remote credits */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop 1 / Switch Bet (1-Max)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Bet / Prendi (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Gioca (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop 5 / Half Gamble / Super Game")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Stop 4 / Alta (High)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop 4 / Alta (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Stop 2 / Bassa (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Stop 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Ticket") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop 2 / Bassa (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Ticket") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1678,53 +1678,53 @@ static INPUT_PORTS_START( pool10 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )					PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )                 PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )	PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )   PORT_DIPLOCATION("SW1:3,2")
 	PORT_DIPSETTING(    0x00, "Manual - User Choice 1" )
 	PORT_DIPSETTING(    0x20, "Manual - Coins" )
 	PORT_DIPSETTING(    0x40, "Manual - Tickets" )
 	PORT_DIPSETTING(    0x60, "Manual - User Choice 2" )
 
 	/* direct payout without play Super Game */
-	PORT_DIPNAME( 0x80, 0x80, "Direct Payout (tickets)" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Direct Payout (tickets)" )   PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolyjokra )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen (Cancel) / Kassieren (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start) / Gamble (Play)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Halten (Hold) 5 / Half Gamble")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buchhalt (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Halten (Hold) 4 / Hoch (High)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Halten (Hold) 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Loeschen (Cancel) / Kassieren (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Geben (Start) / Gamble (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Halten (Hold) 5 / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buchhalt (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Halten (Hold) 4 / Hoch (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Halten (Hold) 2 / Tief (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Halten (Hold) 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Halten (Hold) 2 / Tief (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Halten (Hold) 3")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreib (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1737,56 +1737,56 @@ static INPUT_PORTS_START( jolyjokra )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Play" )
-	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x00, "Remote Value" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x04, "10 Points/Coin" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "disabled" )
 	PORT_DIPSETTING(    0x10, "enabled" )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x40, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
+	to allow the remote credits mode to work */
 
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vegasslw )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Kasiraj (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Kockaj (Double)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Ulog (Bet)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Kasiraj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Kockaj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Ulog (Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Velika (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreiben (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1799,55 +1799,55 @@ static INPUT_PORTS_START( vegasslw )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vegasfst )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Prihoduj (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Dupliraj (Double)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Ulog (Bet)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Prihoduj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Dupliraj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Ulog (Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Velika (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreiben (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1860,55 +1860,55 @@ static INPUT_PORTS_START( vegasfst )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "100 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "1000 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vegasfte )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Kasiraj (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Kockaj (Double)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / +Ulog (Add Bet)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High) / -Ulog (Remove Bet)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Kasiraj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Kockaj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / +Ulog (Add Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Velika (High) / -Ulog (Remove Bet)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreiben (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1921,55 +1921,55 @@ static INPUT_PORTS_START( vegasfte )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "100 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "1000 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vegasmil )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Prihoduj (Take)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Dupliraj (Double)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Ulog (Bet)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Prihoduj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Dupliraj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Ulog (Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Velika (High)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreiben (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1982,31 +1982,31 @@ static INPUT_PORTS_START( vegasmil )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
 
 	/* after nvram init, set the following one to 'manual'
-    to allow the remote credits mode to work */
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -2083,26 +2083,26 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( funquiz )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )	// start?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )	// start?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )	// start?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START4 )	// start or clear?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) // start?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 ) // start?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 ) // start?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START4 ) // start or clear?
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY	// joystick right
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY   // joystick right
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY	// joystick left
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY		// joystick up
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY	// joystick down
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY    // joystick left
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY      // joystick up
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY    // joystick down
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )		// coin 2
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      // coin 2
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )		// coin 1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )      // coin 1
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2122,52 +2122,52 @@ static INPUT_PORTS_START( funquiz )
   7 | Frage wird bei Einsatz angezeigt / Question is shown when bet is made.
   8 | Spiel mit Einsatzwahl / Game with betting.
 */
-	PORT_DIPNAME( 0x01, 0x00, "Game with betting" )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x00, "Game with betting" )     PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Show question in bet stage" )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Show question in bet stage" )    PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Right answer is shown" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Right answer is shown" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "No numbers (Vienna)" )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x20, "No numbers (Vienna)" )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Bookkeeping" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Bookkeeping" )           PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( witchryl )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1 / Hoch (High)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen/Gamble (Cancel/Play)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Halten (Hold) 5 / Half Gamble")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buchhalt (Service1)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Halten (Hold) 4 / Kassieren (Take)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Halten (Hold) 1 / Hoch (High)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Loeschen/Gamble (Cancel/Play)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Geben (Start)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Halten (Hold) 5 / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Buchhalt (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Halten (Hold) 4 / Kassieren (Take)")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Halten (Hold) 2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Halten (Hold) 3 / Tief (Low)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Halten (Hold) 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Halten (Hold) 3 / Tief (Low)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("unknown bit 08") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("unknown bit 08") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Abschreib (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2180,78 +2180,78 @@ static INPUT_PORTS_START( witchryl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "State" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "Keyboard Test" )
 	PORT_DIPSETTING(    0x01, "Game" )
-	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x04, "10 Points/Coin" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
 	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )        /* also enable Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )              PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( novoplay )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Collect (D-UP) / Autohold")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Deal/Draw / Double")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Bet / Half")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Service 1 / Test")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Service 2 / Select")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / High")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Collect (D-UP) / Autohold")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Deal/Draw / Double")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Bet / Half")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service 1 / Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service 2 / Select")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / High")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Low")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Low")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Collect (Payout)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Collect (Payout)")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2264,28 +2264,28 @@ static INPUT_PORTS_START( novoplay )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5 Credits / Coin" )
 	PORT_DIPSETTING(    0x08, "10 Credits / Coin" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Game Type" )			PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Game Type" )         PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, "Multi Card (without Jokers)" )
 	PORT_DIPSETTING(    0x00, "Club Card (with Jokers)" )
-	PORT_DIPNAME( 0x40, 0x40, "Allow Autohold" )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Allow Autohold" )    PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x00, "Payout Mode" )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -2316,11 +2316,11 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( fw1stpal )	/* Adressing the first half of the palette */
+static GFXDECODE_START( fw1stpal )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( fw2ndpal )	/* Adressing the second half of the palette */
+static GFXDECODE_START( fw2ndpal )  /* Adressing the second half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x100, 16 )
 GFXDECODE_END
 
@@ -2388,34 +2388,34 @@ static const pia6821_interface pia0_intf =
 
 */
 {
-	DEVCB_INPUT_PORT("IN0"),	/* port A in */
-	DEVCB_INPUT_PORT("IN1"),	/* port B in */
-	DEVCB_NULL,					/* line CA1 in */
-	DEVCB_NULL,					/* line CB1 in */
-	DEVCB_NULL,					/* line CA2 in */
-	DEVCB_NULL,					/* line CB2 in */
-	DEVCB_NULL,					/* port A out */
-	DEVCB_NULL,					/* port B out */
-	DEVCB_NULL,					/* line CA2 out */
-	DEVCB_NULL,					/* port CB2 out */
-	DEVCB_NULL,					/* IRQA */
-	DEVCB_NULL					/* IRQB */
+	DEVCB_INPUT_PORT("IN0"),    /* port A in */
+	DEVCB_INPUT_PORT("IN1"),    /* port B in */
+	DEVCB_NULL,                 /* line CA1 in */
+	DEVCB_NULL,                 /* line CB1 in */
+	DEVCB_NULL,                 /* line CA2 in */
+	DEVCB_NULL,                 /* line CB2 in */
+	DEVCB_NULL,                 /* port A out */
+	DEVCB_NULL,                 /* port B out */
+	DEVCB_NULL,                 /* line CA2 out */
+	DEVCB_NULL,                 /* port CB2 out */
+	DEVCB_NULL,                 /* IRQA */
+	DEVCB_NULL                  /* IRQB */
 };
 
 static const pia6821_interface pia1_intf =
 {
-	DEVCB_INPUT_PORT("IN2"),	/* port A in */
-	DEVCB_INPUT_PORT("DSW"),	/* port B in */
-	DEVCB_NULL,					/* line CA1 in */
-	DEVCB_NULL,					/* line CB1 in */
-	DEVCB_NULL,					/* line CA2 in */
-	DEVCB_NULL,					/* line CB2 in */
-	DEVCB_NULL,					/* port A out */
-	DEVCB_NULL,					/* port B out */
-	DEVCB_DRIVER_MEMBER(funworld_state, pia1_ca2_w),	/* line CA2 out */
-	DEVCB_NULL,					/* port CB2 out */
-	DEVCB_NULL,					/* IRQA */
-	DEVCB_NULL					/* IRQB */
+	DEVCB_INPUT_PORT("IN2"),    /* port A in */
+	DEVCB_INPUT_PORT("DSW"),    /* port B in */
+	DEVCB_NULL,                 /* line CA1 in */
+	DEVCB_NULL,                 /* line CB1 in */
+	DEVCB_NULL,                 /* line CA2 in */
+	DEVCB_NULL,                 /* line CB2 in */
+	DEVCB_NULL,                 /* port A out */
+	DEVCB_NULL,                 /* port B out */
+	DEVCB_DRIVER_MEMBER(funworld_state, pia1_ca2_w),    /* line CA2 out */
+	DEVCB_NULL,                 /* port CB2 out */
+	DEVCB_NULL,                 /* IRQA */
+	DEVCB_NULL                  /* IRQB */
 };
 
 /* these ports are set to output anyway, but this quietens the log */
@@ -2437,20 +2437,20 @@ static const ay8910_interface ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,							/* portA in  */
-	DEVCB_NULL,							/* portB in  */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),	/* portA out */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)	/* portB out */
+	DEVCB_NULL,                         /* portA in  */
+	DEVCB_NULL,                         /* portB in  */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),  /* portA out */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)   /* portB out */
 };
 
 static const ay8910_interface funquiz_ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_a_r),	/* portA in  */
-	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_b_r),	/* portB in  */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),	/* portA out */
-	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)	/* portB out */
+	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_a_r), /* portA in  */
+	DEVCB_DRIVER_MEMBER(funworld_state,funquiz_ay8910_b_r), /* portB in  */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_a_w),  /* portA out */
+	DEVCB_DRIVER_MEMBER(funworld_state,funworld_lamp_b_w)   /* portB out */
 };
 
 /************************
@@ -2459,16 +2459,16 @@ static const ay8910_interface funquiz_ay8910_intf =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	4,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	4,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -2477,8 +2477,8 @@ static const mc6845_interface mc6845_intf =
 **************************/
 
 static MACHINE_CONFIG_START( fw1stpal, funworld_state )
-    /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
@@ -2487,13 +2487,13 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 	MCFG_PIA6821_ADD("pia1", pia1_intf)
 
-    /* video hardware */
+	/* video hardware */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06 */
+	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 
 	MCFG_GFXDECODE(fw1stpal)
@@ -2502,19 +2502,19 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_PALETTE_INIT_OVERRIDE(funworld_state, funworld)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)	/* 2MHz, veryfied on jollycrd & royalcrd */
+	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */
 
-    /* sound hardware */
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz */
 	MCFG_SOUND_CONFIG(ay8910_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
@@ -2526,11 +2526,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
 //  MCFG_FRAGMENT_ADD(fw2ndpal)
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funquiz_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
-	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz */
 	MCFG_SOUND_CONFIG(funquiz_ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
@@ -2538,48 +2538,48 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
 	MCFG_VIDEO_START_OVERRIDE(funworld_state,magicrd2)
 
-	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz */
 	MCFG_SOUND_CONFIG(ay8910_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)	/* analyzed to avoid clips */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( royalcd1, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* (G65SC02P in pro version) 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( royalcd2, fw2ndpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cuoreuno, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(cuoreuno_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(saloon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( witchryl, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(witchryl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
@@ -2665,11 +2665,11 @@ ROM_START( jollycrd )
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jollycrd_nvram.bin", 0x0000, 0x0800, CRC(8f0a86c9) SHA1(467bd4f601ac6aa818c036f1269c2d43d27854f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -2681,11 +2681,11 @@ ROM_START( jolyc3x3 )
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolyc3x3_nvram.bin", 0x0000, 0x0800, CRC(727c70cf) SHA1(3639b0891514064e21ebdb280791cc9c8f5ba481) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -2746,7 +2746,7 @@ ROM_END
 */
 
 ROM_START( jolycmzs )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* MZS Tech */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* MZS Tech */
 	ROM_LOAD( "mzstech.bin", 0x8000, 0x8000, CRC(cebd1e56) SHA1(24d88b3383cecf3829556d75460053663aab4ef1) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -2757,15 +2757,15 @@ ROM_START( jolycmzs )
     inputs correlated to a code that pops up on the screen.
     This code should be inserted into a PC-DOS program, that program is nowhere to be found right now.
 */
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolycmzs_nvram.bin", 0x0000, 0x0800, CRC(828ffeef) SHA1(6a52282231f1944ba79049f267a9c1941373aea2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 ROM_START( jolyc980 )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Spale Soft */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Spale Soft */
 	ROM_LOAD( "j980.bin", 0x8000, 0x8000, CRC(48249fff) SHA1(390cd0eb3399446a66363dc6760458170e1970fd) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -2776,15 +2776,15 @@ ROM_START( jolyc980 )
     inputs correlated to a code that pops up on the screen.
     This code should be inserted into a PC-DOS program, that program is nowhere to be found right now.
 */
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolyc980_nvram.bin", 0x0000, 0x0800, CRC(ef2c89c7) SHA1(a286001e205dcd16d914e07ba2b7c820335ab9c2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
-ROM_START( jolycdev )	/* Jolly Card (lipa) from Evona */
+ROM_START( jolycdev )   /* Jolly Card (lipa) from Evona */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lipa.bin", 0x8000, 0x8000, CRC(62657c98) SHA1(237466dde26540c119c631c75f51c87ea59d1a91) )
 
@@ -2792,11 +2792,11 @@ ROM_START( jolycdev )	/* Jolly Card (lipa) from Evona */
 	ROM_LOAD( "jollyb.bin", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jollya.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolycdev_nvram.bin", 0x0000, 0x0800, CRC(ae2c2fb8) SHA1(912d673ea8e26ff62520a7b86e702e5260cff4c0) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
@@ -2821,7 +2821,7 @@ ROM_END
     Only remote credits, as can be seen in test mode.
 */
 
-ROM_START( jolyccra )	/* Jolly Card (croatian, set 1) */
+ROM_START( jolyccra )   /* Jolly Card (croatian, set 1) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollyc.bin", 0x8000, 0x8000, CRC(8926d99d) SHA1(dd5d1ac03d30d823dfcfe1349328ecb7afbc37fa) )
 
@@ -2829,15 +2829,15 @@ ROM_START( jolyccra )	/* Jolly Card (croatian, set 1) */
 	ROM_LOAD( "jollyb.bin", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jollya.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolyccra_nvram.bin", 0x0000, 0x0800, CRC(478ab0a9) SHA1(8c5160d2ac8d4a9db0ae1e478d3bb1513a04544f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
-ROM_START( jolyccrb )	/* Jolly Card (croatian, set 2) */
+ROM_START( jolyccrb )   /* Jolly Card (croatian, set 2) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollypkr.003", 0x8000, 0x8000, CRC(ea7340b4) SHA1(7dd468f28a488a4781521809d06db1d7917048ad) )
 
@@ -2845,11 +2845,11 @@ ROM_START( jolyccrb )	/* Jolly Card (croatian, set 2) */
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolyccrb_nvram.bin", 0x0000, 0x0800, CRC(c1d49c88) SHA1(27ffdedfc7f09ff11c3b2537db3681473b776074) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -2875,7 +2875,7 @@ ROM_END
     - 1x trimmer (volume)(missing)
 */
 
-ROM_START( jolycdit )	/* blue TAB PCB, encrypted graphics */
+ROM_START( jolycdit )   /* blue TAB PCB, encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jn.bin", 0x8000, 0x8000, CRC(6ae00ed0) SHA1(5921c2882aeb5eadd0e04a477fa505ad35e9d98c) )
 
@@ -2883,11 +2883,11 @@ ROM_START( jolycdit )	/* blue TAB PCB, encrypted graphics */
 	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) )
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolycdit_nvram.bin", 0x0000, 0x0800, CRC(c55c6706) SHA1(a38ae926f057fb47e48ca841b2d097fc4fd06416) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8b.bin", 0x0000, 0x0117, CRC(3ad712b1) SHA1(54214841fb178e4b59bf6051522718f7667bad28) )
@@ -2925,7 +2925,7 @@ ROM_END
     Only remote credits, as can be seen in test mode.
 */
 
-ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
+ROM_START( jolycdib )   /* bootleg PCB, encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(c76fdc79) SHA1(fc75c274d64fa9c99a546d424f38e79f1acf2576) )
 
@@ -2933,18 +2933,18 @@ ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
 	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) )
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolycdib_nvram.bin", 0x0000, 0x0800, CRC(038a71fe) SHA1(99d3befbee8f9f86ce7f074de7f16fb25053c077) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8b.bin", 0x0000, 0x0117, CRC(3ad712b1) SHA1(54214841fb178e4b59bf6051522718f7667bad28) )
 ROM_END
 
 
-ROM_START( sjcd2kx3 )	/* Super Joly 2000 3x */
+ROM_START( sjcd2kx3 )   /* Super Joly 2000 3x */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sj3.bin", 0x8000, 0x8000, CRC(c530b518) SHA1(36934d8e1e2cb2f71eb44a05b86ec970c9f398cd) )
 
@@ -2952,11 +2952,11 @@ ROM_START( sjcd2kx3 )	/* Super Joly 2000 3x */
 	ROM_LOAD( "sj2.bin", 0x0000, 0x8000, CRC(d7253325) SHA1(ad40e662519da9b11f77690b7d41c5007f74e280) )
 	ROM_LOAD( "sj1.bin", 0x8000, 0x8000, CRC(82741749) SHA1(d0bf3073dff9ba1c4913fd754f965951e9cb5b03) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "sjcd2kx3_nvram.bin", 0x0000, 0x0800, CRC(1141368b) SHA1(b4af2d59b5e8115440e1219a621cfd2fb8c2c978) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
@@ -2964,7 +2964,7 @@ ROM_END
 
 
 ROM_START( jolycdab )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* program is testing/writing RAM in offset $8800-$BFFF (ROM)...?? */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program is testing/writing RAM in offset $8800-$BFFF (ROM)...?? */
 	ROM_LOAD( "ig1poker.run", 0x8000, 0x8000, CRC(c96e6542) SHA1(ed6c0cf9fe8597dba9149b2225320d8d9c39219a) )
 //  ROM_RELOAD(               0x4000, 0x4000 )
 
@@ -2973,7 +2973,7 @@ ROM_START( jolycdab )
 	ROM_LOAD( "jn1poker.ch1", 0x8000, 0x8000, CRC(d0a87f58) SHA1(6b7925557c4e40a1ebe52ecd14391cdd5e00b59a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -3066,15 +3066,15 @@ ROM_END
 
 ROM_START( bonuscrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bonucard.cpu", 0x8000, 0x8000, CRC(da342100) SHA1(451fa6074aad19e9efd148c3d18115a20a3d344a) )	// original program
+	ROM_LOAD( "bonucard.cpu", 0x8000, 0x8000, CRC(da342100) SHA1(451fa6074aad19e9efd148c3d18115a20a3d344a) )    // original program
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "bonuscard_2.bin", 0x0000, 0x8000, CRC(b026823b) SHA1(8d0c80019a9b35104a3782c4fad5c2ca07440a37) )
 	ROM_LOAD( "bonuscard_1.bin", 0x8000, 0x8000, CRC(e07f72de) SHA1(f4bd6bc7a8aabe76d09d48362e32f29932fff4e4) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
-	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board.
+	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
+	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )          // original dump, but doesn't match the cards colors in real board.
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "bonuscrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(9af1ac12) SHA1(2b9770eeca081b8c744ba1250bb99569816d7a85) )
@@ -3083,15 +3083,15 @@ ROM_END
 
 ROM_START( bonuscrda )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bonuscard_3.bin", 0x8000, 0x8000, CRC(c4c6f7af) SHA1(3d0c5c867a9473043fb0b2cde6c6b98c4580ad81) )	// identical to parent, but with 'ATG Electronic' string instead.
+	ROM_LOAD( "bonuscard_3.bin", 0x8000, 0x8000, CRC(c4c6f7af) SHA1(3d0c5c867a9473043fb0b2cde6c6b98c4580ad81) ) // identical to parent, but with 'ATG Electronic' string instead.
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "bonuscard_2.bin", 0x0000, 0x8000, CRC(b026823b) SHA1(8d0c80019a9b35104a3782c4fad5c2ca07440a37) )
 	ROM_LOAD( "bonuscard_1.bin", 0x8000, 0x8000, CRC(e07f72de) SHA1(f4bd6bc7a8aabe76d09d48362e32f29932fff4e4) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
-	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board.
+	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
+	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )          // original dump, but doesn't match the cards colors in real board.
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "bonuscrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(9af1ac12) SHA1(2b9770eeca081b8c744ba1250bb99569816d7a85) )
@@ -3116,7 +3116,7 @@ ROM_START( bigdeal )
 	ROM_LOAD( "poker4.003", 0x0000, 0x8000, CRC(8c33a15f) SHA1(a1c8451c99a23eeffaedb21d1a1b69f54629f8ab) )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
+	ROM_REGION( 0x0200, "proms", 0 )    /* using joker card palette till a correct dump appear */
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -3129,7 +3129,7 @@ ROM_START( bigdealb )
 	ROM_LOAD( "poker4.003", 0x0000, 0x8000, CRC(8c33a15f) SHA1(a1c8451c99a23eeffaedb21d1a1b69f54629f8ab) )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
+	ROM_REGION( 0x0200, "proms", 0 )    /* using joker card palette till a correct dump appear */
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -3164,7 +3164,7 @@ ROM_START( cuoreuno )
 	ROM_LOAD( "cuore1b.u21", 0x0000, 0x8000, CRC(14eca2b8) SHA1(35cba415800c6cd3e6ed9946057f33510ad2bfc9) )
 	ROM_LOAD( "cuore1c.u22", 0x8000, 0x8000, CRC(253fac84) SHA1(1ad104ab8e8d73df6397a840a4b26565b245d7a3) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "cuoreuno_nvram.bin", 0x0000, 0x0800, CRC(b5a1bf25) SHA1(c2996a28c080debf10ab7a7dc47c305aed172a83) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3204,15 +3204,15 @@ ROM_END
 ROM_START( elephfam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "eleph_a.u2",  0x8000, 0x8000, CRC(8392b842) SHA1(74c850c734ca8174167b2f826b9b1ac902669392) )
-	ROM_IGNORE(                      0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                      0x8000 )   /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "eleph_b.u21", 0x0000, 0x8000, CRC(e3612670) SHA1(beb65f7d2bd6d7bc68cfd876af51910cf6417bd0) )
-	ROM_IGNORE(                      0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                      0x8000 )   /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "eleph_c.u22", 0x8000, 0x8000, CRC(4b909bf3) SHA1(a822b12126bc58af6d3f999ab2117370015a039b) )
-	ROM_IGNORE(                      0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                      0x8000 )   /* Identical halves. Discarding 2nd half */
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "elephfam_nvram.bin", 0x0000, 0x0800, CRC(fb9b1100) SHA1(cf15ce55042f1c4399fec480c2f862622905a8b5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3233,7 +3233,7 @@ ROM_START( elephfmb )
 	ROM_LOAD( "elephb.u21", 0x0000, 0x8000, CRC(3c60549c) SHA1(c839b3ea415a877e5eac04e0522c342cce8d6e64) )
 	ROM_LOAD( "elephc.u20", 0x8000, 0x8000, CRC(448ba955) SHA1(2785cbc8cd42a7dda85bd8b81d5fbec01a1ba0bd) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "elephfmb_nvram.bin", 0x0000, 0x0800, CRC(13a0cfea) SHA1(9c8ce509ef1076e88ea853347b64c5591bc2e18c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3352,7 +3352,7 @@ ROM_START( pool10 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "pool10_nvram.bin",  0x0000, 0x0800, CRC(2f2fab43) SHA1(f815b70c171bad99fa6a60c256e4fdc85dd6b290) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3372,19 +3372,19 @@ ROM_END
   u20.bin   1ST AND 2ND HALF IDENTICAL
   u21.bin   1ST AND 2ND HALF IDENTICAL
 */
-	ROM_START( pool10b )	/* this set should be the parent */
+	ROM_START( pool10b )    /* this set should be the parent */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u2.bin", 0x8000, 0x8000, CRC(64fee38e) SHA1(8a624a0b6eb4a3ba09e5b396dc5a01994dfdf294) )
-	ROM_IGNORE(                 0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                 0x8000 )    /* Identical halves. Discarding 2nd half */
 
 	/* GFX ROMs are the same of pool10, but double sized with identical halves. */
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "u21.bin", 0x0000, 0x8000, CRC(581c4878) SHA1(5ae61af090feea1745e22f46b33b2c01e6013fbe) )
-	ROM_IGNORE(                  0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                  0x8000 )   /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "u20.bin", 0x8000, 0x8000, CRC(3bdf1106) SHA1(fa21cbd49bb27ea4a784cf4e4b3fbd52650a285b) )
-	ROM_IGNORE(                  0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                  0x8000 )   /* Identical halves. Discarding 2nd half */
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "pool10b_nvram.bin",   0x0000, 0x0800, CRC(d9f35299) SHA1(2c3608bc9c322a9cc86f74d8fa2f660804a8cf3c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3405,7 +3405,7 @@ ROM_START( pool10c )
 	ROM_LOAD( "b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "c.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "pool10c_nvram.bin", 0x0000, 0x0800, CRC(396aefed) SHA1(066b87ff054dfb37f733a812ad0dc1b1bd2478e6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3426,13 +3426,13 @@ ROM_END
 	ROM_START( pool10d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.50.u2", 0x8000, 0x8000, CRC(4c68e1f4) SHA1(bbab63a18e0c041ce519daa32e12dd1b6a672dce) )
-	ROM_IGNORE(                  0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                  0x8000 )   /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "pool10d_nvram.bin", 0x0000, 0x0800, CRC(6b5984a0) SHA1(156a94e74e33b1a15222cffff9b62e65f6f5f2f5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3529,10 +3529,10 @@ ROM_START( pool10e )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(a0d54044) SHA1(c7be1f12f72095daee32ae41c3554d8ab4f99245) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(55c9fcc8) SHA1(224bdf63ed345b1def4852af3b33f07790fbf123) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "pool10e_nvram.bin", 0x0000, 0x0800, CRC(e20f9a14) SHA1(617ca53263a971c9f835a95737a66fac5b99780f) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* Same as Pool 10, but the 1st half duplicated to cover any PLD addressing */
+	ROM_REGION( 0x0200, "proms", 0 )    /* Same as Pool 10, but the 1st half duplicated to cover any PLD addressing */
 	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
 
 	ROM_REGION( 0x3000, "plds", 0 )
@@ -3571,7 +3571,7 @@ ROM_START( tortufam )
 	ROM_LOAD( "tortu.b.u21", 0x0000, 0x8000, CRC(e7b18584) SHA1(fa1c367469d4ced5d7c83c15a25ec5fd6afcca10) )
 	ROM_LOAD( "tortu.c.u20", 0x8000, 0x8000, CRC(3cda6f73) SHA1(b4f3d2d3c652ebf6973358ae33b7808de5939acd) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "tortufam_nvram.bin", 0x0000, 0x0800, CRC(e5a08b1b) SHA1(6575ed3ec66ef0e42129225fe1679519e5e1c946) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3592,7 +3592,7 @@ ROM_START( potgame )
 	ROM_LOAD( "potg.b.u21", 0x0000, 0x8000, CRC(32fc1d4f) SHA1(cc533a44498338bc0cbb7c7b9c42559ce7ff1337) )
 	ROM_LOAD( "potg.c.u20", 0x8000, 0x8000, CRC(0331eb42) SHA1(a8e838d644fc6d93a9632070b305e44e4242ce94) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "potgame_nvram.bin",  0x0000, 0x0800, CRC(2b07fb37) SHA1(9cbd3d8fb076d683a7853b3dd8a39a27f1c8872b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3613,7 +3613,7 @@ ROM_START( bottle10 )
 	ROM_LOAD( "boat_2.bin", 0x0000, 0x8000, CRC(a6b36c3f) SHA1(90b12d9552ad5dbf11a30fc7451da1f3e6763cc3) )
 	ROM_LOAD( "boat_1.bin", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "bottle10_nvram.bin", 0x0000, 0x0800, CRC(82927c53) SHA1(8cde91588cb53fefc84f0b14fc5c0b26a3a445eb) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3634,7 +3634,7 @@ ROM_START( bottl10b )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(9395c15b) SHA1(e4caefc6f55b07f5c4370a3b8652fa93e08987ce) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "bottl10b_nvram.bin", 0x0000, 0x0800, CRC(59976182) SHA1(f8d26169e86444607bc5a6649f41e7f5c05ddbb4) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3667,7 +3667,7 @@ ROM_START( royalcrd )
 	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(c46d804f) SHA1(b089821c7dae6714b49401d787f8bed859815763) )
 	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrd_nvram.bin", 0x0000, 0x0800, CRC(1c775f61) SHA1(c810421eaa31a72e3f2fe9a1d82858e7cc2f6b93) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3692,7 +3692,7 @@ ROM_START( royalcrda )
 	ROM_LOAD( "r.2", 0x8000, 0x8000, CRC(8a66f22c) SHA1(67d6e8f8f5a0fd979dc498ba2cc67cf707ccdf95) )
 	ROM_IGNORE(              0x8000)
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrda_nvram.bin", 0x0000, 0x0800, CRC(c42dbad4) SHA1(b38552192e3f5f6bc2a4b92bddd2f95ac17ecc8c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3715,7 +3715,7 @@ ROM_START( royalcrdb )
 	ROM_LOAD( "rc_3_pl.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
 	ROM_LOAD( "rc_2_pl.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrdb_nvram.bin", 0x0000, 0x0800, CRC(19bb3dea) SHA1(0965fbcec48ded99c5f6793efffb1d9329cc00eb) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3737,7 +3737,7 @@ ROM_START( royalcrdc )
 	ROM_LOAD( "roj.ic25", 0x8000, 0x10000, CRC(c5b787e8) SHA1(be88aa901c1f96d171af45c3602e0ce72b8fff34) )
 //  ROM_IGNORE(                   0x8000)
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrdc_nvram.bin", 0x0000, 0x0800, CRC(eacb0c7b) SHA1(513816623aa3843dd5d0416fc012060c7a9f6c71) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3777,7 +3777,7 @@ ROM_START( royalcrdd )
 	ROM_LOAD( "2(__royalcrdd).bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
 	ROM_LOAD( "1(__royalcrdd).bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrdd_nvram.bin", 0x0000, 0x0800, CRC(335bfa5a) SHA1(7e9cbb502f450c515ea03ffcf4b7fbae60af4e73) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3810,16 +3810,16 @@ ROM_END
 */
 
 ROM_START( royalcrde ) /* both halves have different programs. we're using the 2nd one */
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 1st half prg is testing RAM in offset $8600-$BF00...?? */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 1st half prg is testing RAM in offset $8600-$BF00...?? */
 	ROM_LOAD( "rc.bin", 0x0000, 0x10000, CRC(8a9a6dd6) SHA1(04c3f9f17d5404ac1414c51ef8f930df54530e72) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2a.bin", 0x0000, 0x8000, CRC(3af71cf8) SHA1(3a0ce0d0abebf386573c5936545dada1d3558e55) )
-	ROM_IGNORE(                 0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                 0x8000 )    /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "1a.bin", 0x8000, 0x8000, CRC(8a66f22c) SHA1(67d6e8f8f5a0fd979dc498ba2cc67cf707ccdf95) )
-	ROM_IGNORE(                 0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                 0x8000 )    /* Identical halves. Discarding 2nd half */
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrde_nvram.bin", 0x0000, 0x0800, CRC(3b03440f) SHA1(49e51b8c9e1404d39c479a2d0619aab43f1a6529) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3849,7 +3849,7 @@ ROM_START( royalcrdt )
 	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "royalcrdt_nv.bin",  0x0000, 0x0800, CRC(67a6e68b) SHA1(d7ab01c4d9bd4fe58b5d0f4a945c00c5c4906008) )
 
-	ROM_REGION( 0x0200, "plds", 0 )	/* Device type is 16L8 */
+	ROM_REGION( 0x0200, "plds", 0 ) /* Device type is 16L8 */
 	ROM_LOAD( "tab01_3.bin",    0x0000, 0x0104, CRC(a13a7a0a) SHA1(28e918ece4dcfa3883d2439c226b2f125d43f386) )
 ROM_END
 
@@ -3877,7 +3877,7 @@ ROM_END
     - 2x 27256 - gfx - "2.bin", "3.bin"
 */
 
-ROM_START( royalcrdf )	/* encrypted program rom */
+ROM_START( royalcrdf )  /* encrypted program rom */
 	ROM_REGION( 0x10000*2, "maincpu", 0 ) // *2 for decrypted opcodes (see init)
 	ROM_LOAD( "rc_1.bin", 0x8000, 0x8000, CRC(8cdcc978) SHA1(489b58760a7c8646399c8cdfb86ec4341823e7dd) )
 
@@ -3889,9 +3889,9 @@ ROM_START( royalcrdf )	/* encrypted program rom */
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(44dbf086) SHA1(43a2d615c00605db75a4fd4d57d9e056c0356f10) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8.bin",    0x0000, 0x0117, NO_DUMP )	/* not present in the set */
-	ROM_LOAD( "1-peel18cv8p.bin", 0x0200, 0x0155, NO_DUMP )	/* not present in the set */
-	ROM_LOAD( "2-peel18cv8p.bin", 0x0400, 0x0155, NO_DUMP )	/* not present in the set */
+	ROM_LOAD( "palce16v8.bin",    0x0000, 0x0117, NO_DUMP ) /* not present in the set */
+	ROM_LOAD( "1-peel18cv8p.bin", 0x0200, 0x0155, NO_DUMP ) /* not present in the set */
+	ROM_LOAD( "2-peel18cv8p.bin", 0x0400, 0x0155, NO_DUMP ) /* not present in the set */
 ROM_END
 
 
@@ -3907,7 +3907,7 @@ ROM_START( royalcrdp )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147a.bin",     0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 
-	ROM_REGION( 0x0200, "plds", 0 )	/* correct PAL dump */
+	ROM_REGION( 0x0200, "plds", 0 ) /* correct PAL dump */
 	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
 ROM_END
 
@@ -3922,7 +3922,7 @@ ROM_START( lluck3x3 )
 	ROM_LOAD( "l2.bin", 0x0000, 0x8000, CRC(8ca90a8f) SHA1(bc3db3f8c097f89eff488e3aca39bf24ff2b5cff) )
 	ROM_LOAD( "l1.bin", 0x8000, 0x8000, CRC(beadc35c) SHA1(8a6a5954a827def8c4c3b904d8ee58a4bde53d85) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "lluck3x3_nvram.bin", 0x0000, 0x0800, CRC(2fe79cff) SHA1(7839c04336b7702c7bdcd2b6917a353f4376f824) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3938,7 +3938,7 @@ ROM_START( lluck4x1 )
 	ROM_LOAD( "l2.bin", 0x0000, 0x8000, CRC(8ca90a8f) SHA1(bc3db3f8c097f89eff488e3aca39bf24ff2b5cff) )
 	ROM_LOAD( "l1.bin", 0x8000, 0x8000, CRC(beadc35c) SHA1(8a6a5954a827def8c4c3b904d8ee58a4bde53d85) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "lluck4x1_nvram.bin", 0x0000, 0x0800, CRC(05d2d7b8) SHA1(1188b2b4835cadd95b1e9160c2948a2e3457afd2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -3975,28 +3975,28 @@ ROM_END
 
 */
 
-ROM_START( magicrd2 )	/* Impera... but seems Bulgarian hack, just for copyright */
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* magicard.004 has extra code, and 2 different NVRAM contents harcoded */
+ROM_START( magicrd2 )   /* Impera... but seems Bulgarian hack, just for copyright */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* magicard.004 has extra code, and 2 different NVRAM contents harcoded */
 	ROM_LOAD( "magicard.004", 0x0000, 0x8000,  CRC(f6e948b8) SHA1(7d5983015a508ab135ccbf69b7f3c526c229e3ef) )
 	ROM_LOAD( "magicard.01",  0x8000, 0x8000,  CRC(c94767d4) SHA1(171ac946bdf2575f9e4a31e534a8e641597af519) ) /* 1st and 2nd half identical */
-	ROM_IGNORE(                       0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                       0x8000 )  /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mc2gr2.bin",   0x0000, 0x8000, CRC(733da697) SHA1(45122c64d5a371ec91cecc67b7faf179078e714d) )
 	ROM_LOAD( "mc2gr1.bin",   0x8000, 0x8000, CRC(2406b8d2) SHA1(e9d7a25562fd5adee351d7ef6ba02fff6aab021a) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "magicrd2_nvram.bin", 0x0000, 0x0800, CRC(343b3162) SHA1(1524959dbbc0c6d7c5c3a4a6b20976382cfbe88f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mc2-82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
+	ROM_LOAD( "mc2-82s147.bin", 0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )	/* Universal GAL */
+	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )  /* Universal GAL */
 ROM_END
 
 
-ROM_START( magicrd2a )	/* Nov (new). Imatic Yugoslavian hack for green TAB or Impera boards */
+ROM_START( magicrd2a )  /* Nov (new). Imatic Yugoslavian hack for green TAB or Impera boards */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "m3_nov.bin", 0x8000, 0x8000,  CRC(ee5468e6) SHA1(f859adbad30e561fca86e60ff5b2e666d8bf4071) )
 
@@ -4004,18 +4004,18 @@ ROM_START( magicrd2a )	/* Nov (new). Imatic Yugoslavian hack for green TAB or Im
 	ROM_LOAD( "m2_nov.bin",   0x0000, 0x8000, CRC(684d71f2) SHA1(e4522844a0406b3e83fa723508a7c05dd21e7fb6) )
 	ROM_LOAD( "m1_nov.bin",   0x8000, 0x8000, CRC(96151034) SHA1(3107d353705c6240a71faf308e11c45a87d95cf4) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM (passed protection) */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM (passed protection) */
 	ROM_LOAD( "mc2_nvram.bin", 0x0000, 0x0800, CRC(2070d63d) SHA1(86c72a2e81651b0138d8551a0cfcd07176f8e7d2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mc2_82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
+	ROM_LOAD( "mc2_82s147.bin", 0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
 ROM_END
 
 
-ROM_START( magicrd2b )	/* Imatic Yugoslavian hack for green TAB or Impera boards */
+ROM_START( magicrd2b )  /* Imatic Yugoslavian hack for green TAB or Impera boards */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
 //  ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )   // there are also pcbs with this program
@@ -4025,14 +4025,14 @@ ROM_START( magicrd2b )	/* Imatic Yugoslavian hack for green TAB or Impera boards
 	ROM_LOAD( "mc2gr1.bin",   0x8000, 0x8000, CRC(2406b8d2) SHA1(e9d7a25562fd5adee351d7ef6ba02fff6aab021a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mc2-82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
+	ROM_LOAD( "mc2-82s147.bin", 0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
 ROM_END
 
 
-ROM_START( magicrd2c )	/* Imatic Yugoslavian hack for blue TAB board (encrypted)*/
+ROM_START( magicrd2c )  /* Imatic Yugoslavian hack for blue TAB board (encrypted)*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
 //  ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )   // there are also pcbs with this program
@@ -4042,7 +4042,7 @@ ROM_START( magicrd2c )	/* Imatic Yugoslavian hack for blue TAB board (encrypted)
 	ROM_LOAD( "mc2gr2b.bin",  0x8000, 0x8000, CRC(d2bf8bde) SHA1(975b8f43a0396c09e357b96d5ae7381b12152b9e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mc2-82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
+	ROM_LOAD( "mc2-82s147.bin", 0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
@@ -4060,10 +4060,10 @@ ROM_START( vegasslw )
 	ROM_LOAD( "v2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "vegasslw_nvram.bin", 0x0000, 0x0800, CRC(1aa043e3) SHA1(c93d071effb2f2fe95e9dc751174c2c765595f74) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_REGION( 0x0200, "proms", 0 )    /* PLD address the 2nd half */
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -4076,39 +4076,39 @@ ROM_START( vegasfst )
 	ROM_LOAD( "v2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "vegasfst_nvram.bin", 0x0000, 0x0800, CRC(5034de7a) SHA1(ab2077a49d94676531c73ad8d8ce9548bbfa2b81) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_REGION( 0x0200, "proms", 0 )    /* PLD address the 2nd half */
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
-ROM_START( vegasfte )	/* Royal Vegas Joker Card (fast deal, english gfx) */
+ROM_START( vegasfte )   /* Royal Vegas Joker Card (fast deal, english gfx) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ch3.bin", 0x8000, 0x8000, CRC(87dfb28d) SHA1(9a06e695e59722b6c97e5a9fd2c8b238661e5a4a) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "ch2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
-	ROM_LOAD( "ch1.bin", 0x8000, 0x8000, CRC(0a3679c0) SHA1(ce8a067e1a2eccf9fabb16733ef3a14e0e8129e5) )	/* X & Y in txt layer */
+	ROM_LOAD( "ch1.bin", 0x8000, 0x8000, CRC(0a3679c0) SHA1(ce8a067e1a2eccf9fabb16733ef3a14e0e8129e5) ) /* X & Y in txt layer */
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "vegasfte_nvram.bin", 0x0000, 0x0800, CRC(166c6055) SHA1(db2143a2a3adc92578bd3707391d2f5030cc6a6f) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_REGION( 0x0200, "proms", 0 )    /* PLD address the 2nd half */
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
 ROM_START( vegasmil )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Mile */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Mile */
 	ROM_LOAD( "mile.bin", 0x8000, 0x8000, CRC(ef7e02e2) SHA1(7432b0e723dc528901c422ab1d7d01fd1bc1eb20) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "v2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "vegasmil_nvram.bin", 0x0000, 0x0800, CRC(d2608e5f) SHA1(ac936df71dbc0bfb811a3ba3c91444a2a3e7b036) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -4200,7 +4200,7 @@ ROM_END
 
 */
 
-ROM_START( jolyjokr )	/* Jolly Joker (98bet, set 1) */
+ROM_START( jolyjokr )   /* Jolly Joker (98bet, set 1) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera3orig.bin", 0x8000, 0x8000, CRC(ceb3a0d5) SHA1(25efae9f225abddfa663e6abcc91801996e5b0ea) )
 
@@ -4208,7 +4208,7 @@ ROM_START( jolyjokr )	/* Jolly Joker (98bet, set 1) */
 	ROM_LOAD( "impera2.bin", 0x0000, 0x8000, CRC(f0fa5941) SHA1(1fcade31ed6893ffcfd4efe97dfaaa31d24283ec) )
 	ROM_LOAD( "impera1.bin", 0x8000, 0x8000, CRC(c3ab44dd) SHA1(e46c0fd94da561f57033647f1703fa135777ece5) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolyjokr_nvram.bin", 0x0000, 0x0800, CRC(f33e66ed) SHA1(7a4b9a1b2f976d5d26f54915a213d5ac5eca0a42) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -4216,7 +4216,7 @@ ROM_START( jolyjokr )	/* Jolly Joker (98bet, set 1) */
 ROM_END
 
 
-ROM_START( jolyjokra )	/* Jolly Joker (98bet, set 2) */
+ROM_START( jolyjokra )  /* Jolly Joker (98bet, set 2) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera50.bin", 0x8000, 0x8000, CRC(7effc044) SHA1(961438e7fb8222296fb959b510cdf646e4ac3226) )
 
@@ -4224,7 +4224,7 @@ ROM_START( jolyjokra )	/* Jolly Joker (98bet, set 2) */
 	ROM_LOAD( "impera2.bin", 0x0000, 0x8000, CRC(f0fa5941) SHA1(1fcade31ed6893ffcfd4efe97dfaaa31d24283ec) )
 	ROM_LOAD( "impera1.bin", 0x8000, 0x8000, CRC(c3ab44dd) SHA1(e46c0fd94da561f57033647f1703fa135777ece5) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolyjokra_nvram.bin", 0x0000, 0x0800, CRC(ed43693c) SHA1(d4aa4e539ab12c97bc9b9b1077997195a11d782b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -4249,22 +4249,22 @@ ROM_END
 
 */
 ROM_START( jolyjokrb )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Two slightly different programs. Using the 1st one...*/
-	ROM_LOAD( "unbekannt.bin", 0x8000, 0x8000, CRC(327fa3d7) SHA1(2435aada2377b2f8f01d059a7aba9bc7a8993537) )	/* 1st prg */
-	ROM_IGNORE(                        0x8000 )	/* Using the 1st program. Discarding 2nd half */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Two slightly different programs. Using the 1st one...*/
+	ROM_LOAD( "unbekannt.bin", 0x8000, 0x8000, CRC(327fa3d7) SHA1(2435aada2377b2f8f01d059a7aba9bc7a8993537) )   /* 1st prg */
+	ROM_IGNORE(                        0x8000 ) /* Using the 1st program. Discarding 2nd half */
 //  ROM_LOAD( "unbekannt.bin", 0x0000, 0x10000, CRC(327fa3d7) SHA1(2435aada2377b2f8f01d059a7aba9bc7a8993537) )  /* 2nd prg */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "ic26.bin", 0x0000, 0x8000, CRC(3e45dfc6) SHA1(8fd0b0cc00cdd96244ae7e7a91f6613b1c144ee0) )
-	ROM_IGNORE(                   0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                   0x8000 )  /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "ic25.bin", 0x8000, 0x8000, CRC(1bd067af) SHA1(9436fe085ba63c00a12ea80903470a84535e3dc1) )
-	ROM_IGNORE(                   0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                   0x8000 )  /* Identical halves. Discarding 2nd half */
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jolyjokrb_nvram.bin", 0x0000, 0x0800, CRC(17007bb5) SHA1(72e08096293ce4fbde205a63b5ecd9641dbee017) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "am27s29_ic40.bin",	 0x0000, 0x0200, CRC(0b671bba) SHA1(92d512e02b50f98b7bc5a60deee4fee722656c4f) )
+	ROM_LOAD( "am27s29_ic40.bin",    0x0000, 0x0200, CRC(0b671bba) SHA1(92d512e02b50f98b7bc5a60deee4fee722656c4f) )
 ROM_END
 
 
@@ -4280,15 +4280,15 @@ ROM_END
 */
 ROM_START( multiwin )
 	ROM_REGION( 0x10000*2, "maincpu", 0 )  // *2 for decrypted opcodes (see init)
-	ROM_LOAD( "multiwin3.bin",	0x8000, 0x8000, CRC(995ca34d) SHA1(4d6ec10810ece493447a01af149ad8387d5f3c2f) )	/* just the 2nd half */
-	ROM_LOAD( "multiwin4.bin",  0x4000, 0x8000, CRC(f062125c) SHA1(93c9aa518810798f3449a28e851eb6433ba7bbf8) )	/* just the 2nd half */
+	ROM_LOAD( "multiwin3.bin",  0x8000, 0x8000, CRC(995ca34d) SHA1(4d6ec10810ece493447a01af149ad8387d5f3c2f) )  /* just the 2nd half */
+	ROM_LOAD( "multiwin4.bin",  0x4000, 0x8000, CRC(f062125c) SHA1(93c9aa518810798f3449a28e851eb6433ba7bbf8) )  /* just the 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "multiwin1.bin",	0x0000, 0x8000, CRC(97589aa6) SHA1(2486116637bd906cb3b32acd86fc861c48a0475e) )
-	ROM_LOAD( "multiwin2.bin",	0x8000, 0x8000, CRC(580b3239) SHA1(362aa85c57ad0bce1d7d15a93b9998daba4d306a) )
+	ROM_LOAD( "multiwin1.bin",  0x0000, 0x8000, CRC(97589aa6) SHA1(2486116637bd906cb3b32acd86fc861c48a0475e) )
+	ROM_LOAD( "multiwin2.bin",  0x8000, 0x8000, CRC(580b3239) SHA1(362aa85c57ad0bce1d7d15a93b9998daba4d306a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "multi_prom.bin",	0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) ) /* using the joker card one */
+	ROM_LOAD( "multi_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) ) /* using the joker card one */
 ROM_END
 
 
@@ -4379,15 +4379,15 @@ ROM_END
 */
 ROM_START( powercrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* need proper decryption */
-	ROM_LOAD( "263a1.bin",	0x8000, 0x8000, CRC(9e5e477d) SHA1(428464a64bea8cb478bc8033859baa47d7de0297) )	/* just the 2nd half */
-	ROM_LOAD( "263a2.bin",  0x4000, 0x8000, CRC(11b1a13f) SHA1(766c1a45c238467d6a292795f5a159187966ceec) )	/* just the 2nd half */
+	ROM_LOAD( "263a1.bin",  0x8000, 0x8000, CRC(9e5e477d) SHA1(428464a64bea8cb478bc8033859baa47d7de0297) )  /* just the 2nd half */
+	ROM_LOAD( "263a2.bin",  0x4000, 0x8000, CRC(11b1a13f) SHA1(766c1a45c238467d6a292795f5a159187966ceec) )  /* just the 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "power_c_zg2.ic11",	0x0000, 0x8000, CRC(108380bb) SHA1(922beffe3c06f391239125e6f4ccc86ec6980c45) )
-	ROM_LOAD( "power_c_zg1.ic10",	0x8000, 0x8000, CRC(dc9e70c6) SHA1(7ac5bdc734d9829ea6349b60817445cb88d7387c) )
+	ROM_LOAD( "power_c_zg2.ic11",   0x0000, 0x8000, CRC(108380bb) SHA1(922beffe3c06f391239125e6f4ccc86ec6980c45) )
+	ROM_LOAD( "power_c_zg1.ic10",   0x8000, 0x8000, CRC(dc9e70c6) SHA1(7ac5bdc734d9829ea6349b60817445cb88d7387c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
+	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "powercrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(b5c0a96d) SHA1(3547700e276326a27009202b2e82bc649abb33db) )
@@ -4447,9 +4447,9 @@ ROM_END
 ROM_START( jokercrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic41.bin",   0x8000,  0x4000, CRC(d36188b3) SHA1(3fb848fabbbde9fbb70875b3dfef62bfb3a8cbcb) )
-	ROM_IGNORE(                      0x4000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                      0x4000 )   /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "ic37.bin",   0xc000,  0x4000, CRC(8e0d70c4) SHA1(018f92631acbe98e5826a41698f0e07b4b46cd71) )
-	ROM_IGNORE(                      0x4000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                      0x4000 )   /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "vesely_zg_1.ic10", 0x0000, 0x8000, CRC(2bbd27ad) SHA1(37d37899398d95beac5f3cbffc4277c97aca1a23) )
@@ -4487,16 +4487,16 @@ ROM_END
 ROM_START( mongolnw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prgteov.2.3m.u16", 0x8000, 0x8000, CRC(996b851a) SHA1(ef4e3d036ca10b33c83749024d04c4d4c09feeb7) )
-	ROM_IGNORE(                           0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                           0x8000 )  /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* TSC87C52-16CB MCU Code */
 	ROM_LOAD( "tsc87c52-mf.u40", 0x0000, 0x02000 , CRC(ae22e778) SHA1(0897e05967d68d7f23489e98717663e3a3176070) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "mong.rc.b2.u3", 0x0000, 0x8000, CRC(5e019b73) SHA1(63a544dccb9589e5a6b938e604c09d4d8fc060fc) )
-	ROM_IGNORE(                        0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                        0x8000 ) /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "mong.rc.c1.u2", 0x8000, 0x8000, CRC(e3fc24c4) SHA1(ea4e67ace63b55a76365f7e11a67c7d420a52dd7) )
-	ROM_IGNORE(                        0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                        0x8000 ) /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29pc_mf.u24", 0x0000, 0x0200, CRC(da9181af) SHA1(1b30d992f3b2a4b3bd81e3f99632311988e2e8d1) )
@@ -4540,16 +4540,16 @@ ROM_END
 ROM_START( soccernw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prgteo2gv2.3.u16", 0x8000, 0x8000, CRC(c61d1937) SHA1(c516f13a108da60b7ccee338b63a025009ef9099) )
-	ROM_IGNORE(                           0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                           0x8000 )  /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* TSC87C52-16CB MCU Code */
 	ROM_LOAD( "tsc87c52-sn.u40", 0x0000, 0x02000 , CRC(af0bd35b) SHA1(c6613a7bcdec2fd6060d6dcf639654568de87e75) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "soccer2.u3", 0x0000, 0x8000, CRC(db09b5bb) SHA1(a12bf2938f5482ea5ebc0db6fd6594e1beb97017) )
-	ROM_IGNORE(                     0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                     0x8000 )    /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "soccer1.u2", 0x8000, 0x8000, CRC(564cc467) SHA1(8f90c4bacd97484623666b25dae77e628908e243) )
-	ROM_IGNORE(                     0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                     0x8000 )    /* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29pc_sn.u24", 0x0000, 0x0200, CRC(d02894fc) SHA1(adcdc912cc0b7a7f67b122fa94fca921c957b282) )
@@ -4597,7 +4597,7 @@ ROM_START( saloon )
 	ROM_LOAD( "2s.bin", 0x0000, 0x8000, CRC(39a792d5) SHA1(45c956a4a33587238a24eed602039115db1bb4b6) )
 	ROM_LOAD( "3s.bin", 0x8000, 0x8000, CRC(babc0964) SHA1(f084465cc34ea7ac19091d3e75ef7d55c48273ae) )
 
-    /* looks strange */
+	/* looks strange */
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147_saloon.bin", 0x0000, 0x0200, CRC(f424ccc1) SHA1(6df1215f58cca786e9f0ea4bf35407cf7fe21d83) )
 ROM_END
@@ -4663,7 +4663,7 @@ ROM_END
   --+-----------------------------------------------------------------------
 
 */
-ROM_START( funquiz )	/* Fun World Quiz */
+ROM_START( funquiz )    /* Fun World Quiz */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kqu_6.bin", 0xc000, 0x4000, CRC(50f0e586) SHA1(85ce5b95283113e2ac94fd882c57ce1b26135ed0) )
 
@@ -4680,8 +4680,8 @@ ROM_START( funquiz )	/* Fun World Quiz */
 
 	/* 01 - Allgemein */
 	ROM_LOAD( "allg_1.bin",  0x00000, 0x8000, CRC(1351cf56) SHA1(50e89c3e6d256bcf7f1d3c0dbef935e4e8561096) )
-	ROM_LOAD( "allg_2.bin",	 0x08000, 0x8000, CRC(021492a4) SHA1(b59e1303f17c9e5af05a808118ae729205690bb2) )
-	ROM_LOAD( "allg_3.bin",	 0x10000, 0x8000, CRC(de8e055f) SHA1(593fce143ee5994087bbac8b51ac7e2d02e8701c) )
+	ROM_LOAD( "allg_2.bin",  0x08000, 0x8000, CRC(021492a4) SHA1(b59e1303f17c9e5af05a808118ae729205690bb2) )
+	ROM_LOAD( "allg_3.bin",  0x10000, 0x8000, CRC(de8e055f) SHA1(593fce143ee5994087bbac8b51ac7e2d02e8701c) )
 	ROM_LOAD( "allg_4.bin",  0x18000, 0x8000, CRC(5c87177a) SHA1(a8a8318165008cb3295e25d4b4d38146f44a32fc) ) // this one has the category in the rom in ALL caps, is it official?
 	ROM_LOAD( "allg_5.bin",  0x20000, 0x8000, CRC(83056686) SHA1(00f14ded371751d54a391bf583d940b32ddeae58) )
 
@@ -4723,11 +4723,11 @@ ROM_START( witchryl )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.u11", 0x0000, 0x8000, CRC(7edc8f44) SHA1(cabad613fa8a72dc12587d19a72bc9c6861486bd) )
-	ROM_IGNORE(                0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                0x8000 ) /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "3.u4",  0x8000, 0x8000, CRC(5e4a0d59) SHA1(08eb9b1a617a7b2e6f87377819dba07082cf38b4) )
-	ROM_IGNORE(                0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_IGNORE(                0x8000 ) /* Identical halves. Discarding 2nd half */
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "witchryl_nvram.bin", 0x0000, 0x0800, CRC(98366bed) SHA1(279a5ce4639b8b2ac29146b32512615253c45991) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -4744,7 +4744,7 @@ ROM_END
 
 */
 
-ROM_START( novoplay )	/* Similar to Royal Vegas Joker Card */
+ROM_START( novoplay )   /* Similar to Royal Vegas Joker Card */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "np1_run.bin", 0x8000, 0x8000, CRC(4078d695) SHA1(d0e39064250733968044aec216040fe62fecc880) )
 
@@ -4752,10 +4752,10 @@ ROM_START( novoplay )	/* Similar to Royal Vegas Joker Card */
 	ROM_LOAD( "np1_ch2.bin", 0x0000, 0x8000, CRC(188d6fad) SHA1(3bc9bab24d8c7beed0c5f491c19a004ca7d719a1) )
 	ROM_LOAD( "np1_ch1.bin", 0x8000, 0x8000, CRC(fdc3bd67) SHA1(0ec2d5e0b1937849934f98e253e18887af0331e8) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "novoplay_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_REGION( 0x0200, "proms", 0 )    /* PLD address the 2nd half */
 	ROM_LOAD( "np1_27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
@@ -4775,7 +4775,7 @@ ROM_END
 
 */
 
-ROM_START( jolycdsp )	/* Encrypted program in a module. Blue TAB PCB encrypted graphics */
+ROM_START( jolycdsp )   /* Encrypted program in a module. Blue TAB PCB encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ct3.bin", 0x8000, 0x8000, CRC(0c9cbae6) SHA1(4f834370229797cac302a5185ed1e77ef2b7cabb) )
 
@@ -4783,11 +4783,11 @@ ROM_START( jolycdsp )	/* Encrypted program in a module. Blue TAB PCB encrypted g
 	ROM_LOAD( "ct2.bin", 0x0000, 0x8000, CRC(7569e719) SHA1(f96e1e72bc13d1888f3868f8d404fd3db94db7b2) )
 	ROM_LOAD( "ct1.bin", 0x8000, 0x8000, CRC(8f438635) SHA1(3200e20f4b28173cc2a68d0f87969627570418dc) )
 
-	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "ctunk_nvram.bin", 0x0000, 0x0800, CRC(c55c6706) SHA1(a38ae926f057fb47e48ca841b2d097fc4fd06416) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* Borrowed from the parent set */
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_REGION( 0x0200, "proms", 0 )    /* Borrowed from the parent set */
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -4822,13 +4822,13 @@ DRIVER_INIT_MEMBER(funworld_state, tabblue)
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
-		na = src[x] & 0xf0;		/* nibble A */
-		nb = src[x] << 4;		/* nibble B */
+		na = src[x] & 0xf0;     /* nibble A */
+		nb = src[x] << 4;       /* nibble B */
 
-			nad = (na ^ (na >> 1)) << 1;			/* nibble A decrypted */
-			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;	/* nibble B decrypted */
+			nad = (na ^ (na >> 1)) << 1;            /* nibble A decrypted */
+			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;   /* nibble B decrypted */
 
-		src[x] = nad + nbd;		/* decrypted byte */
+		src[x] = nad + nbd;     /* decrypted byte */
 	}
 }
 
@@ -4863,13 +4863,13 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
-		na = src[x] & 0xf0;		/* nibble A */
-		nb = src[x] << 4;		/* nibble B */
+		na = src[x] & 0xf0;     /* nibble A */
+		nb = src[x] << 4;       /* nibble B */
 
-			nad = (na ^ (na >> 1)) << 1;			/* nibble A decrypted */
-			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;	/* nibble B decrypted */
+			nad = (na ^ (na >> 1)) << 1;            /* nibble A decrypted */
+			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;   /* nibble B decrypted */
 
-		src[x] = nad + nbd;		/* decrypted byte */
+		src[x] = nad + nbd;     /* decrypted byte */
 	}
 
 	ROM[0xc1c6] = 0x92;
@@ -4930,9 +4930,9 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	UINT8 *buffer;
 	int i, a;
 
-    /*****************************
-    *   Program ROM decryption   *
-    *****************************/
+	/*****************************
+	*   Program ROM decryption   *
+	*****************************/
 
 	/* data lines swap: 76543210 -> 76543012 */
 
@@ -4956,9 +4956,9 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	auto_free(machine(), buffer);
 
 
-    /******************************
-    *   Graphics ROM decryption   *
-    ******************************/
+	/******************************
+	*   Graphics ROM decryption   *
+	******************************/
 
 	buffer = auto_alloc_array(machine(), UINT8, sizeg);
 	memcpy(buffer, gfxrom, sizeg);
@@ -4974,9 +4974,9 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	auto_free(machine(), buffer);
 
 
-    /****************************
-    *   Color PROM decryption   *
-    ****************************/
+	/****************************
+	*   Color PROM decryption   *
+	****************************/
 
 	/* data lines swap: 76543210 -> 23546710 */
 
@@ -5115,9 +5115,9 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	UINT8 *buffer;
 	int i, a;
 
-    /*****************************
-    *   Program ROM decryption   *
-    *****************************/
+	/*****************************
+	*   Program ROM decryption   *
+	*****************************/
 
 	/* data lines swap: 76543210 -> 76543120 */
 
@@ -5141,9 +5141,9 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	auto_free(machine(), buffer);
 
 
-    /******************************
-    *   Graphics ROM decryption   *
-    ******************************/
+	/******************************
+	*   Graphics ROM decryption   *
+	******************************/
 
 	buffer = auto_alloc_array(machine(), UINT8, sizeg);
 	memcpy(buffer, gfxrom, sizeg);
@@ -5175,9 +5175,9 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 	UINT8 *buffer;
 	int i;// a;
 
-    /*****************************
-    *   Program ROM decryption   *
-    *****************************/
+	/*****************************
+	*   Program ROM decryption   *
+	*****************************/
 
 	/* data lines swap: 76543210 -> 56734012 */
 
@@ -5190,9 +5190,9 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 	memcpy(buffer, rom, size);
 
 
-    /*****************************
-    *  Graphics ROMs decryption  *
-    *****************************/
+	/*****************************
+	*  Graphics ROMs decryption  *
+	*****************************/
 
 	int x, na, nb, nad, nbd;
 	UINT8 *src = machine().root_device().memregion( "gfx1" )->base();
@@ -5200,13 +5200,13 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
-		na = src[x] & 0xf0;		/* nibble A */
-		nb = src[x] << 4;		/* nibble B */
+		na = src[x] & 0xf0;     /* nibble A */
+		nb = src[x] << 4;       /* nibble B */
 
-			nad = (na ^ (na >> 1)) << 1;			/* nibble A decrypted */
-			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;	/* nibble B decrypted */
+			nad = (na ^ (na >> 1)) << 1;            /* nibble A decrypted */
+			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;   /* nibble B decrypted */
 
-		src[x] = nad + nbd;		/* decrypted byte */
+		src[x] = nad + nbd;     /* decrypted byte */
 	}
 }
 
@@ -5226,7 +5226,7 @@ GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  driver_device,  0,       
 GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Croatian, set 1)",                    0,                       layout_jollycrd )
 GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "Soft Design",     "Jolly Card (Croatian, set 2)",                    0,                       layout_jollycrd )
 GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, blue TAB board, encrypted)", 0,                       layout_royalcrd )
-GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg)",         0,                       layout_jollycrd )	// not a real TAB blue PCB
+GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg)",         0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       GAME_NOT_WORKING )
 GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
@@ -5236,7 +5236,7 @@ GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,       
 GAMEL( 1986, bonuscrda, bonuscrd, fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      GAME_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
 GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     GAME_IMPERFECT_COLORS,   layout_bonuscrd )
 GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     GAME_IMPERFECT_COLORS,   layout_bonuscrd )
-GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                GAME_NOT_WORKING )							// clone of Bonus Card.
+GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                GAME_NOT_WORKING )                         // clone of Bonus Card.
 
 // CMC Italian jamma PCB's...
 GAMEL( 1996, cuoreuno,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Cuore 1 (Italian)",                               0,                       layout_jollycrd )

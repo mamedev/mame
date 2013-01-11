@@ -24,7 +24,7 @@
 #include "includes/gba.h"
 #include "rendlay.h"
 
-#define VERBOSE_LEVEL	(0)
+#define VERBOSE_LEVEL   (0)
 
 INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
@@ -39,7 +39,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 	}
 }
 
-#define GBA_ATTOTIME_NORMALIZE(a)	do { while ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
+#define GBA_ATTOTIME_NORMALIZE(a)   do { while ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
 
 static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
@@ -129,7 +129,7 @@ TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
 	if (!((ctrl>>9) & 1) || ((ctrl & 0x3000) == 0))
 	{
 //      printf("clear active for ch %d\n", ch);
-		m_dma_regs[(ch*3)+2] &= ~0x80000000;	// clear "active" bit
+		m_dma_regs[(ch*3)+2] &= ~0x80000000;    // clear "active" bit
 	}
 	else
 	{
@@ -176,15 +176,15 @@ static void dma_exec(running_machine &machine, FPTR ch)
 	}
 
 	// override special parameters
-	if ((ctrl & 0x3000) == 0x3000)		// special xfer mode
+	if ((ctrl & 0x3000) == 0x3000)      // special xfer mode
 	{
 		switch (ch)
 		{
-			case 1:			// Ch 1&2 are for audio DMA
+			case 1:         // Ch 1&2 are for audio DMA
 			case 2:
-				dstadd = 2;	// don't increment destination
-				cnt = 4;	// always transfer 4 32-bit words
-				ctrl |= 0x400;	// always 32-bit
+				dstadd = 2; // don't increment destination
+				cnt = 4;    // always transfer 4 32-bit words
+				ctrl |= 0x400;  // always 32-bit
 				break;
 
 			case 3:
@@ -209,29 +209,29 @@ static void dma_exec(running_machine &machine, FPTR ch)
 			space.write_dword(dst, space.read_dword(src));
 			switch (dstadd)
 			{
-				case 0:	// increment
+				case 0: // increment
 					dst += 4;
 					break;
-				case 1:	// decrement
+				case 1: // decrement
 					dst -= 4;
 					break;
-				case 2:	// don't move
+				case 2: // don't move
 					break;
-				case 3:	// increment and reload
+				case 3: // increment and reload
 					dst += 4;
 					break;
 			}
 			switch (srcadd)
 			{
-				case 0:	// increment
+				case 0: // increment
 					src += 4;
 					break;
-				case 1:	// decrement
+				case 1: // decrement
 					src -= 4;
 					break;
-				case 2:	// don't move
+				case 2: // don't move
 					break;
-				case 3:	// not used ("Metal Max 2 Kai" expects no increment/decrement)
+				case 3: // not used ("Metal Max 2 Kai" expects no increment/decrement)
 					break;
 			}
 		}
@@ -244,29 +244,29 @@ static void dma_exec(running_machine &machine, FPTR ch)
 			space.write_word(dst, space.read_word(src));
 			switch (dstadd)
 			{
-				case 0:	// increment
+				case 0: // increment
 					dst += 2;
 					break;
-				case 1:	// decrement
+				case 1: // decrement
 					dst -= 2;
 					break;
-				case 2:	// don't move
+				case 2: // don't move
 					break;
-				case 3:	// increment and reload
+				case 3: // increment and reload
 					dst += 2;
 					break;
 			}
 			switch (srcadd)
 			{
-				case 0:	// increment
+				case 0: // increment
 					src += 2;
 					break;
-				case 1:	// decrement
+				case 1: // decrement
 					src -= 2;
 					break;
-				case 2:	// don't move
+				case 2: // don't move
 					break;
-				case 3:	// not used (see note in 32-bit version above)
+				case 3: // not used (see note in 32-bit version above)
 					break;
 			}
 		}
@@ -829,7 +829,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			break;
 		case 0x00a0/4:
 		case 0x00a4/4:
-			retval = 0;	// (does this actually do anything on real h/w?)
+			retval = 0; // (does this actually do anything on real h/w?)
 			break;
 		case 0x00b0/4:
 		case 0x00b4/4:
@@ -939,7 +939,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0130/4:
-			if( (mem_mask) & 0x0000ffff )	// KEYINPUT
+			if( (mem_mask) & 0x0000ffff )   // KEYINPUT
 			{
 				retval = ioport("IN0")->read();
 			}
@@ -1345,13 +1345,13 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 			}
 			break;
 		case 0x0060/4:
-			if( (mem_mask) & 0x000000ff )	// SOUNDCNTL
+			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
 				gb_sound_w(gb_device, space, 0, data);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(gb_device, space, 1, data>>16);	// SOUND1CNT_H
+				gb_sound_w(gb_device, space, 1, data>>16);  // SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
@@ -1359,13 +1359,13 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 			}
 			break;
 		case 0x0064/4:
-			if( (mem_mask) & 0x000000ff )	// SOUNDCNTL
+			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
 				gb_sound_w(gb_device, space, 3, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 4, data>>8);	// SOUND1CNT_H
+				gb_sound_w(gb_device, space, 4, data>>8);   // SOUND1CNT_H
 			}
 			break;
 		case 0x0068/4:
@@ -1388,14 +1388,14 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				gb_sound_w(gb_device, space, 9, data>>8);
 			}
 			break;
-		case 0x0070/4:	//SND3CNTL and H
-			if( (mem_mask) & 0x000000ff )	// SOUNDCNTL
+		case 0x0070/4:  //SND3CNTL and H
+			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
 				gb_sound_w(gb_device, space, 0xa, data);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(gb_device, space, 0xb, data>>16);	// SOUND1CNT_H
+				gb_sound_w(gb_device, space, 0xb, data>>16);    // SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
@@ -1977,28 +1977,28 @@ static ADDRESS_MAP_START( gbadvance_map, AS_PROGRAM, 32, gba_state )
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
 	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE(gba_io_r, gba_io_w )
-	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE(gba_pram_w) AM_SHARE("gba_pram")	// Palette RAM
-	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE(gba_vram_w) AM_SHARE("gba_vram")	// VRAM
-	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE(gba_oam_w) AM_SHARE("gba_oam")	// OAM
-	AM_RANGE(0x08000000, 0x09ffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 0)
-	AM_RANGE(0x0a000000, 0x0bffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 1)
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_ROM AM_REGION("cartridge", 0)	// final mirror
+	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE(gba_pram_w) AM_SHARE("gba_pram")  // Palette RAM
+	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE(gba_vram_w) AM_SHARE("gba_vram")  // VRAM
+	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE(gba_oam_w) AM_SHARE("gba_oam")    // OAM
+	AM_RANGE(0x08000000, 0x09ffffff) AM_ROM AM_REGION("cartridge", 0)   // cartridge ROM (mirror 0)
+	AM_RANGE(0x0a000000, 0x0bffffff) AM_ROM AM_REGION("cartridge", 0)   // cartridge ROM (mirror 1)
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_ROM AM_REGION("cartridge", 0)   // final mirror
 	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gbadv )
 	PORT_START("IN0")
 	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_UNUSED
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 L") PORT_PLAYER(1)	// L
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 L") PORT_PLAYER(1) // L
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 R") PORT_PLAYER(1) // R
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)	// START
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1)	// SELECT
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B") PORT_PLAYER(1)	// B
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A") PORT_PLAYER(1)	// A
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) // START
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1)    // SELECT
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B") PORT_PLAYER(1)    // B
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A") PORT_PLAYER(1)    // A
 INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
@@ -2144,7 +2144,7 @@ void gba_state::machine_reset()
 	m_dma_timer[2]->adjust(attotime::never, 2);
 	m_dma_timer[3]->adjust(attotime::never, 3);
 
-	m_fifo_a_ptr = m_fifo_b_ptr = 17;	// indicate empty
+	m_fifo_a_ptr = m_fifo_b_ptr = 17;   // indicate empty
 	m_fifo_a_in = m_fifo_b_in = 17;
 
 	// and clear the DACs
@@ -2269,7 +2269,7 @@ READ32_MEMBER(gba_state::eeprom_r)
 	{
 		case EEP_IDLE:
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, m_eeprom_state, activecpu_get_pc(), 1);
-			return 0x00010001;	// "ready"
+			return 0x00010001;  // "ready"
 
 		case EEP_READFIRST:
 			m_eeprom_count--;
@@ -2354,7 +2354,7 @@ WRITE32_MEMBER(gba_state::eeprom_w)
 			m_eeprom_count--;
 			if (!m_eeprom_count)
 			{
-				m_eeprom_addr *= 8;	// each address points to 8 bytes
+				m_eeprom_addr *= 8; // each address points to 8 bytes
 				if (m_eeprom_command == EEP_READFIRST)
 				{
 					m_eeprom_state = EEP_AFTERADDR;
@@ -2411,14 +2411,14 @@ WRITE32_MEMBER(gba_state::eeprom_w)
 	}
 }
 
-#define	GBA_CHIP_EEPROM     (1 << 0)
-#define	GBA_CHIP_SRAM       (1 << 1)
-#define	GBA_CHIP_FLASH      (1 << 2)
-#define	GBA_CHIP_FLASH_1M   (1 << 3)
-#define	GBA_CHIP_RTC        (1 << 4)
-#define	GBA_CHIP_FLASH_512  (1 << 5)
-#define	GBA_CHIP_EEPROM_64K (1 << 6)
-#define	GBA_CHIP_EEPROM_4K  (1 << 7)
+#define GBA_CHIP_EEPROM     (1 << 0)
+#define GBA_CHIP_SRAM       (1 << 1)
+#define GBA_CHIP_FLASH      (1 << 2)
+#define GBA_CHIP_FLASH_1M   (1 << 3)
+#define GBA_CHIP_RTC        (1 << 4)
+#define GBA_CHIP_FLASH_512  (1 << 5)
+#define GBA_CHIP_EEPROM_64K (1 << 6)
+#define GBA_CHIP_EEPROM_4K  (1 << 7)
 
 static UINT32 gba_detect_chip( UINT8 *data, int size)
 {
@@ -2992,7 +2992,7 @@ static const gba_pcb pcb_list[] =
 
 static int gba_get_pcb_id(const char *pcb)
 {
-	int	i;
+	int i;
 
 	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
 	{
@@ -3151,7 +3151,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_CPU_PROGRAM_MAP(gbadvance_map)
 
 
-	MCFG_SCREEN_ADD("gbalcd", RASTER)	// htot hst vwid vtot vst vis
+	MCFG_SCREEN_ADD("gbalcd", RASTER)   // htot hst vwid vtot vst vis
 	MCFG_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)
 	MCFG_SCREEN_UPDATE_DRIVER(gba_state, screen_update)
 
@@ -3162,13 +3162,13 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
 	MCFG_SOUND_ROUTE(0, "spkleft", 0.50)
 	MCFG_SOUND_ROUTE(1, "spkright", 0.50)
-	MCFG_SOUND_ADD("direct_a_left", DAC, 0)			// GBA direct sound A left
+	MCFG_SOUND_ADD("direct_a_left", DAC, 0)         // GBA direct sound A left
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
-	MCFG_SOUND_ADD("direct_a_right", DAC, 0)		// GBA direct sound A right
+	MCFG_SOUND_ADD("direct_a_right", DAC, 0)        // GBA direct sound A right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
-	MCFG_SOUND_ADD("direct_b_left", DAC, 0)			// GBA direct sound B left
+	MCFG_SOUND_ADD("direct_b_left", DAC, 0)         // GBA direct sound B left
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkleft", 0.50)
-	MCFG_SOUND_ADD("direct_b_right", DAC, 0)		// GBA direct sound B right
+	MCFG_SOUND_ADD("direct_b_right", DAC, 0)        // GBA direct sound B right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
 
 	MCFG_PANASONIC_MN63F805MNP_ADD("pflash")

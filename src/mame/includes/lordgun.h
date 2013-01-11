@@ -6,8 +6,8 @@
 
 struct lordgun_gun_data
 {
-	int		scr_x,	scr_y;
-	UINT16	hw_x,	hw_y;
+	int     scr_x,  scr_y;
+	UINT16  hw_x,   hw_y;
 };
 
 class lordgun_state : public driver_device
@@ -15,12 +15,12 @@ class lordgun_state : public driver_device
 public:
 	lordgun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_priority_ram(*this, "priority_ram"),
-		  m_scrollram(*this, "scrollram"),
-	      m_spriteram(*this, "spriteram"),
-	      m_vram(*this, "vram"),
-	      m_scroll_x(*this, "scroll_x"),
-	      m_scroll_y(*this, "scroll_y") { }
+			m_priority_ram(*this, "priority_ram"),
+			m_scrollram(*this, "scrollram"),
+			m_spriteram(*this, "spriteram"),
+			m_vram(*this, "vram"),
+			m_scroll_x(*this, "scroll_x"),
+			m_scroll_y(*this, "scroll_y") { }
 
 	required_shared_ptr<UINT16> m_priority_ram;
 	required_shared_ptr<UINT16> m_scrollram;

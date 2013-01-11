@@ -1,10 +1,10 @@
 #include "emu.h"
 
-#define CGA_PALETTE_SETS 83	/* one for colour, one for mono,
+#define CGA_PALETTE_SETS 83 /* one for colour, one for mono,
                  * 81 for colour composite */
 
-#define CGA_SCREEN_NAME	"screen"
-#define CGA_MC6845_NAME	"mc6845_cga"
+#define CGA_SCREEN_NAME "screen"
+#define CGA_MC6845_NAME "mc6845_cga"
 
 MACHINE_CONFIG_EXTERN( pcvideo_cga );
 MACHINE_CONFIG_EXTERN( pcvideo_cga32k );
@@ -25,4 +25,3 @@ DECLARE_WRITE16_HANDLER( pc1512_16le_w );
 DECLARE_WRITE16_HANDLER( pc1512_videoram16le_w );
 
 MACHINE_CONFIG_EXTERN( pcvideo_poisk2 );
-

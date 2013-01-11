@@ -53,9 +53,9 @@
 
 debug_view_state_source::debug_view_state_source(const char *name, device_t &device)
 	: debug_view_source(name, &device),
-	  m_device(device),
-	  m_stateintf(dynamic_cast<device_state_interface *>(&device)),
-	  m_execintf(dynamic_cast<device_execute_interface *>(&device))
+		m_device(device),
+		m_stateintf(dynamic_cast<device_state_interface *>(&device)),
+		m_execintf(dynamic_cast<device_execute_interface *>(&device))
 {
 }
 
@@ -71,9 +71,9 @@ debug_view_state_source::debug_view_state_source(const char *name, device_t &dev
 
 debug_view_state::debug_view_state(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: debug_view(machine, DVT_STATE, osdupdate, osdprivate),
-	  m_divider(0),
-	  m_last_update(0),
-	  m_state_list(NULL)
+		m_divider(0),
+		m_last_update(0),
+		m_state_list(NULL)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -361,10 +361,10 @@ void debug_view_state::view_update()
 
 debug_view_state::state_item::state_item(int index, const char *name, UINT8 valuechars)
 	: m_next(NULL),
-	  m_lastval(0),
-	  m_currval(0),
-	  m_index(index),
-	  m_vallen(valuechars),
-	  m_symbol(name)
+		m_lastval(0),
+		m_currval(0),
+		m_index(index),
+		m_vallen(valuechars),
+		m_symbol(name)
 {
 }

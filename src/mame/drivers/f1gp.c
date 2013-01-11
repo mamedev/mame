@@ -93,17 +93,17 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
-	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
-	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
-	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_SHARE("spr1cgram")				// SPR-1 CG RAM
-	AM_RANGE(0xe04000, 0xe07fff) AM_RAM AM_SHARE("spr2cgram")				// SPR-2 CG RAM
-	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_SHARE("spr1vram")								// SPR-1 VRAM
-	AM_RANGE(0xf10000, 0xf103ff) AM_RAM AM_SHARE("spr2vram")								// SPR-2 VRAM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM															// WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")		// DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")			// CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// PALETTE
+	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
+	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
+	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_SHARE("spr1cgram")               // SPR-1 CG RAM
+	AM_RANGE(0xe04000, 0xe07fff) AM_RAM AM_SHARE("spr2cgram")               // SPR-2 CG RAM
+	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_SHARE("spr1vram")                                // SPR-1 VRAM
+	AM_RANGE(0xf10000, 0xf103ff) AM_RAM AM_SHARE("spr2vram")                                // SPR-2 VRAM
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                         // WORK RAM-1
+	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")       // DUAL RAM
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")         // CHARACTER
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")    // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
@@ -119,13 +119,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
-	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("sprcgram")									// SPR-1 CG RAM + SPR-2 CG RAM
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")	// BACK VRAM
-	AM_RANGE(0xe00000, 0xe00fff) AM_RAM AM_SHARE("spritelist")							// not checked + SPR-1 VRAM + SPR-2 VRAM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM																// WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")			// DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")				// CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")			// PALETTE
+	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("sprcgram")                                    // SPR-1 CG RAM + SPR-2 CG RAM
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")   // BACK VRAM
+	AM_RANGE(0xe00000, 0xe00fff) AM_RAM AM_SHARE("spritelist")                          // not checked + SPR-1 VRAM + SPR-2 VRAM
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                             // WORK RAM-1
+	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")           // DUAL RAM
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")             // CHARACTER
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")            // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
@@ -150,8 +150,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, f1gp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp2
+	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp2
 	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
@@ -159,26 +159,26 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 {
 	/*
-    static int old=-1;
-    static int old_bank = -1;
-    int new_bank = (data & 0xf0) >> 4; //wrong!
+	static int old=-1;
+	static int old_bank = -1;
+	int new_bank = (data & 0xf0) >> 4; //wrong!
 
-    if(old_bank != new_bank && new_bank < 5)
-    {
-        // oki banking
-        UINT8 *src = memregion("oki")->base() + 0x40000 + 0x10000 * new_bank;
-        UINT8 *dst = memregion("oki")->base() + 0x30000;
-        memcpy(dst, src, 0x10000);
+	if(old_bank != new_bank && new_bank < 5)
+	{
+	    // oki banking
+	    UINT8 *src = memregion("oki")->base() + 0x40000 + 0x10000 * new_bank;
+	    UINT8 *dst = memregion("oki")->base() + 0x30000;
+	    memcpy(dst, src, 0x10000);
 
-        old_bank = new_bank;
-    }
+	    old_bank = new_bank;
+	}
 
-    //data & 0x80 toggles
+	//data & 0x80 toggles
 
-    if((data & 0x7f) != old)
-        printf("misc = %X\n",old=data & 0x7f);
+	if((data & 0x7f) != old)
+	    printf("misc = %X\n",old=data & 0x7f);
 
-    */
+	*/
 }
 
 static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
@@ -188,9 +188,9 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
-	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
-	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
-	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
+	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
+	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
+	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)   /* mirror */
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM //unused
 	AM_RANGE(0xe04000, 0xe07fff) AM_RAM //unused
 	AM_RANGE(0xf00000, 0xf003ff) AM_RAM //unused
@@ -240,8 +240,8 @@ static INPUT_PORTS_START( f1gp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW1:1" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coin_A ) )		PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000) PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW1:1" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coin_A ) )       PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000) PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
@@ -250,7 +250,7 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Coin_B ) )		PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000) PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Coin_B ) )       PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000) PORT_DIPLOCATION("SW1:5,6,7")
 	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x7000, DEF_STR( 1C_1C ) )
@@ -259,45 +259,45 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x7e00, 0x7e00, DEF_STR( Coinage ) )		PORT_CONDITION("DSW1",0x8000,NOTEQUALS,0x8000) PORT_DIPLOCATION("SW1:2,3,4,5,6,7")
+	PORT_DIPNAME( 0x7e00, 0x7e00, DEF_STR( Coinage ) )      PORT_CONDITION("DSW1",0x8000,NOTEQUALS,0x8000) PORT_DIPLOCATION("SW1:2,3,4,5,6,7")
 	PORT_DIPSETTING(      0x7e00, "2 to Start, 1 to Continue" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Continue Coin" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Continue Coin" )         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x8000, "Normal Coinage" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "Game Mode" )			PORT_DIPLOCATION("SW2:3") /* Setting to Multiple results in "ID CHECK   ERROR" then hang */
+	PORT_DIPNAME( 0x0004, 0x0004, "Game Mode" )         PORT_DIPLOCATION("SW2:3") /* Setting to Multiple results in "ID CHECK   ERROR" then hang */
 	PORT_DIPSETTING(      0x0004, DEF_STR( Single ) )
 	PORT_DIPSETTING(      0x0000, "Multiple" )
-	PORT_DIPNAME( 0x0008, 0x0008, "Multi Player Mode" )		PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0008, "Single or Multi Player" )		PORT_CONDITION("DSW1",0x0004,EQUALS,0x0000)
-	PORT_DIPSETTING(      0x0000, "Multi Player Game Only" )		PORT_CONDITION("DSW1",0x0004,EQUALS,0x0000)
-	PORT_DIPSETTING(      0x0008, "Multi Player Off" )			PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
-	PORT_DIPSETTING(      0x0000, "Multi Player Off" )			PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x0008, 0x0008, "Multi Player Mode" )     PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0008, "Single or Multi Player" )        PORT_CONDITION("DSW1",0x0004,EQUALS,0x0000)
+	PORT_DIPSETTING(      0x0000, "Multi Player Game Only" )        PORT_CONDITION("DSW1",0x0004,EQUALS,0x0000)
+	PORT_DIPSETTING(      0x0008, "Multi Player Off" )          PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
+	PORT_DIPSETTING(      0x0000, "Multi Player Off" )          PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("DSW2")
 	PORT_SERVICE_DIPLOC(  0x0100, IP_ACTIVE_LOW, "SW3:1" )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW3:4" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW3:5" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW3:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW3:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW3:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW3:4" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW3:5" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW3:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW3:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW3:8" )        /* Listed as "Unused" */
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x001f, 0x0010, DEF_STR( Region ) )			/* Jumpers?? */
+	PORT_DIPNAME( 0x001f, 0x0010, DEF_STR( Region ) )           /* Jumpers?? */
 	PORT_DIPSETTING(      0x0010, DEF_STR( World ) )
 	PORT_DIPSETTING(      0x0001, "USA & Canada" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japan ) )
@@ -404,12 +404,12 @@ static const ym2610_interface ym2610_config =
 
 static const k053936_interface f1gp_k053936_intf =
 {
-	1, -58, -2	/* wrap, xoff, yoff */
+	1, -58, -2  /* wrap, xoff, yoff */
 };
 
 static const k053936_interface f1gp2_k053936_intf =
 {
-	1, -48, -21	/* wrap, xoff, yoff */
+	1, -48, -21 /* wrap, xoff, yoff */
 };
 
 
@@ -449,15 +449,15 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 static MACHINE_CONFIG_START( f1gp, f1gp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,XTAL_20MHz/2)	/* verified on pcb */
+	MCFG_CPU_ADD("sub", M68000,XTAL_20MHz/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)	/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -504,11 +504,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,10000000)	/* 10 MHz ??? */
+	MCFG_CPU_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,10000000)	/* 10 MHz ??? */
+	MCFG_CPU_ADD("sub", M68000,10000000)    /* 10 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
@@ -565,10 +565,10 @@ MACHINE_CONFIG_END
 
 
 ROM_START( f1gp )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom1-a.3",     0x000000, 0x20000, CRC(2d8f785b) SHA1(6eca42ad2d57a31e055496141c89cb537f284378) )
 
-	ROM_REGION( 0x200000, "user1", 0 )	/* extra ROMs mapped at 100000 */
+	ROM_REGION( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
 	ROM_LOAD16_BYTE( "rom11-a.2",    0x000000, 0x40000, CRC(53df8ea1) SHA1(25d50bb787f3bd35c9a8ae2b0ab9a21e000debb0) )
 	ROM_LOAD16_BYTE( "rom10-a.1",    0x000001, 0x40000, CRC(46a289fb) SHA1(6a8c19e08b6d836fe83378fd77fead82a0b2db7c) )
 	ROM_LOAD16_BYTE( "rom13-a.4",    0x080000, 0x40000, CRC(7d92e1fa) SHA1(c23f5beea85b0804c61ef9e7f131b186d076221f) )
@@ -578,15 +578,15 @@ ROM_START( f1gp )
 	ROM_LOAD16_BYTE( "rom9-a.8",     0x180000, 0x40000, CRC(49286572) SHA1(c5e16bd1ccd43452337a4cd76db70db079ca0706) )
 	ROM_LOAD16_BYTE( "rom8-a.7",     0x180001, 0x40000, CRC(0ed783c7) SHA1(c0c467ede51c08d84999897c6d5cc8b584b23b67) )
 
-	ROM_REGION( 0x200000, "user2", 0 )	/* extra ROMs mapped at a00000 */
+	ROM_REGION( 0x200000, "user2", 0 )  /* extra ROMs mapped at a00000 */
 											/* containing gfx data for the 053936 */
 	ROM_LOAD( "rom2-a.06",    0x000000, 0x100000, CRC(747dd112) SHA1(b9264bec61467ab256cf6cb698b6e0ea8f8006e0) )
 	ROM_LOAD( "rom3-a.05",    0x100000, 0x100000, CRC(264aed13) SHA1(6f0de860d4299befffc530b7a8f19656982a51c4) )
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* 68000 code */
+	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom4-a.4",     0x000000, 0x20000, CRC(8e811d36) SHA1(2b806b50a3a307a21894687f16485ace287a7c4c) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "rom5-a.8",     0x00000, 0x08000, CRC(9ea36e35) SHA1(9254dea8362318d8cfbd5e36e476e0e235e6326a) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 
@@ -602,7 +602,7 @@ ROM_START( f1gp )
 	ROM_LOAD32_WORD( "rom7-b.17",    0x000000, 0x40000, CRC(2aed9003) SHA1(45ff9953ad98063573e7fd7b930ae8b0183cdd04) )
 	ROM_LOAD32_WORD( "rom6-b.16",    0x000002, 0x40000, CRC(6789ef12) SHA1(9b0d1cc6e9c6398ccb7f635c4c148fddd224a21f) )
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )	/* gfx data for the 053936 */
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )    /* gfx data for the 053936 */
 	/* RAM, not ROM - handled at run time */
 
 	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
@@ -617,24 +617,24 @@ ROM_END
  */
 
 ROM_START( f1gpb )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	/* these have extra data at 0x30000 which isn't preset in the f1gp set, is it related to the changed sound hardware? */
 	ROM_LOAD16_BYTE( "1.ic38",     0x000001, 0x20000, CRC(046dd83a) SHA1(ea65fa88f9d9a79664de666e63594a7a7de86650) )
 	ROM_LOAD16_BYTE( "7.ic39",     0x000000, 0x20000, CRC(960f5db4) SHA1(addc461538e2140afae400e8d7364d0bcc42a0cb) )
 
-	ROM_REGION( 0x200000, "user1", 0 )	/* extra ROMs mapped at 100000 */
+	ROM_REGION( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
 	ROM_LOAD16_BYTE( "2.ic48",    0x000000, 0x80000, CRC(b3b315c3) SHA1(568592e450401cd95206dbe439e565dd28499dd1) )
 	ROM_LOAD16_BYTE( "8.ic41",    0x000001, 0x80000, CRC(39af8180) SHA1(aa1577195b1463069870db2d64db3b5e61d6bbe8) )
 	ROM_LOAD16_BYTE( "3.ic165",   0x100000, 0x80000, CRC(b7295a30) SHA1(4120dda38673d59343aea0f030d2f275a0ae3d95) )
 	ROM_LOAD16_BYTE( "9.ic166",   0x100001, 0x80000, CRC(bb596d5b) SHA1(f29ed135e8f09d4a15353360a811c13aba681382) )
 
-	ROM_REGION( 0x200000, "user2", 0 )	/* extra ROMs mapped at a00000 */
+	ROM_REGION( 0x200000, "user2", 0 )  /* extra ROMs mapped at a00000 */
 	ROM_LOAD16_BYTE( "4.ic42",    0x000000, 0x80000, CRC(5dbde98a) SHA1(536553eaad0ebfe219e44a4f50a4707209024469) )
 	ROM_LOAD16_BYTE( "10.ic43",   0x000001, 0x80000, CRC(d60e7706) SHA1(23c383e47e6600a68d6fd8bcfc9552fe0d660630) )
 	ROM_LOAD16_BYTE( "5.ic167",   0x100000, 0x80000, CRC(48c36293) SHA1(2a5d92537ba331a99697d13b4394b8d2737eeaf2) )
 	ROM_LOAD16_BYTE( "11.ic168",  0x100001, 0x80000, CRC(92a28e52) SHA1(dc203486b96fdc1930f7e63021e84f203540a64e) )
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* 68000 code */
+	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "16.u7",     0x000000, 0x10000, CRC(7609d818) SHA1(eb841b8e7b34f1c677f1a79bfeda5dafc1f6849f) )
 	ROM_LOAD16_BYTE( "17.u6",     0x000001, 0x10000, CRC(951befde) SHA1(28754f00ca0fe38fe1d4e68c203a7b401baa9714) )
 
@@ -645,12 +645,12 @@ ROM_START( f1gpb )
 	ROM_LOAD( "14.ic154",    0x180000, 0x080000, CRC(0cd20423) SHA1(cddad02247b898c0a5a2fe061c41f68ecdf04d5c) )
 
 	/*
-    Roms 20 and 21 were missing from the PCB, however the others match perfectly (just with a different data layout)
-    I've reconstructed what should be the correct data for this bootleg.
+	Roms 20 and 21 were missing from the PCB, however the others match perfectly (just with a different data layout)
+	I've reconstructed what should be the correct data for this bootleg.
 
-    Note, the bootleg combines 2 GFX regions into a single set of 4-way interleaved roms, so we load them in a user
-    region and use ROM_COPY.
-    */
+	Note, the bootleg combines 2 GFX regions into a single set of 4-way interleaved roms, so we load them in a user
+	region and use ROM_COPY.
+	*/
 
 	ROM_REGION( 0x200000, "user3", 0 )
 	ROMX_LOAD( "rom21",        0x000003, 0x80000, CRC(7a08c3b7) SHA1(369123348a88513c066c239ed6aa4db5ae4ef0ac), ROM_SKIP(3) )
@@ -664,7 +664,7 @@ ROM_START( f1gpb )
 	ROM_REGION( 0x080000, "gfx3", 0 )
 	ROM_COPY("user3", 0x100000, 0, 0x80000)
 
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )	/* gfx data for the 053936 */
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )    /* gfx data for the 053936 */
 	/* RAM, not ROM - handled at run time */
 
 	ROM_REGION( 0x90000, "oki", 0 ) /* sound samples */
@@ -674,18 +674,18 @@ ROM_END
 
 
 ROM_START( f1gp2 )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "rom12.v1",     0x000000, 0x20000, CRC(c5c5f199) SHA1(56fcbf1d9b15a37204296c578e1585599f76a107) )
 	ROM_LOAD16_BYTE( "rom14.v2",     0x000001, 0x20000, CRC(dd5388e2) SHA1(66e88f86edc2407e5794519f988203a52d65636d) )
 
-	ROM_REGION( 0x200000, "user1", 0 )	/* extra ROMs mapped at 100000 */
+	ROM_REGION( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
 	ROM_LOAD( "rom2",         0x100000, 0x100000, CRC(3b0cfa82) SHA1(ea6803dd8d30aa9f3bd578e113fc26f20c640751) )
 	ROM_CONTINUE(             0x000000, 0x100000 )
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* 68000 code */
+	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom13.v3",     0x000000, 0x20000, CRC(c37aa303) SHA1(0fe09b398191888620fb676ed0f1593be575512d) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "rom5.v4",      0x00000, 0x08000, CRC(6a9398a1) SHA1(e907fe5f9c135c5b10ec650ec0c6d08cb856230c) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 

@@ -98,8 +98,8 @@ WRITE8_MEMBER(spoker_state::fg_color_w)
 void spoker_state::video_start()
 {
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  32,	128, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	128, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -138,12 +138,12 @@ WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(machine(), 3,		data & 0x10);	// coin out mech
+	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
+	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
+	coin_counter_w(machine(), 2,        data & 0x08);   // key in
+	coin_counter_w(machine(), 3,        data & 0x10);   // coin out mech
 
-	set_led_status(machine(), 6,		data & 0x40);	// led for coin out / hopper active
+	set_led_status(machine(), 6,        data & 0x40);   // led for coin out / hopper active
 
 	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -157,11 +157,11 @@ WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
 WRITE8_MEMBER(spoker_state::spoker_video_and_leds_w)
 {
 
-	set_led_status(machine(), 4,	  data & 0x01);	// start?
-	set_led_status(machine(), 5,	  data & 0x04);	// l_bet?
+	set_led_status(machine(), 4,      data & 0x01); // start?
+	set_led_status(machine(), 5,      data & 0x04); // l_bet?
 
-	m_video_enable	=	  data & 0x40;
-	m_hopper			=	(~data)& 0x80;
+	m_video_enable  =     data & 0x40;
+	m_hopper            =   (~data)& 0x80;
 
 	m_out[1] = data;
 	show_out(m_out);
@@ -170,10 +170,10 @@ WRITE8_MEMBER(spoker_state::spoker_video_and_leds_w)
 WRITE8_MEMBER(spoker_state::spoker_leds_w)
 {
 
-	set_led_status(machine(), 0, data & 0x01);	// stop_1
-	set_led_status(machine(), 1, data & 0x02);	// stop_2
-	set_led_status(machine(), 2, data & 0x04);	// stop_3
-	set_led_status(machine(), 3, data & 0x08);	// stop
+	set_led_status(machine(), 0, data & 0x01);  // stop_1
+	set_led_status(machine(), 1, data & 0x02);  // stop_2
+	set_led_status(machine(), 2, data & 0x04);  // stop_3
+	set_led_status(machine(), 3, data & 0x08);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -205,11 +205,11 @@ READ8_MEMBER(spoker_state::spoker_magic_r)
 	switch(m_igs_magic[0])
 	{
 		case 0x00:
-			if ( !(m_igs_magic[1] & 0x01) )	return ioport("DSW1")->read();
-			if ( !(m_igs_magic[1] & 0x02) )	return ioport("DSW2")->read();
-			if ( !(m_igs_magic[1] & 0x04) )	return ioport("DSW3")->read();
-			if ( !(m_igs_magic[1] & 0x08) )	return ioport("DSW4")->read();
-			if ( !(m_igs_magic[1] & 0x10) )	return ioport("DSW5")->read();
+			if ( !(m_igs_magic[1] & 0x01) ) return ioport("DSW1")->read();
+			if ( !(m_igs_magic[1] & 0x02) ) return ioport("DSW2")->read();
+			if ( !(m_igs_magic[1] & 0x04) ) return ioport("DSW3")->read();
+			if ( !(m_igs_magic[1] & 0x08) ) return ioport("DSW4")->read();
+			if ( !(m_igs_magic[1] & 0x10) ) return ioport("DSW5")->read();
 			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", space.device().safe_pc(), m_igs_magic[1]);
 			break;
 
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 
 	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(spoker_magic_r, spoker_magic_w )	// DSW1-5
+	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(spoker_magic_r, spoker_magic_w )    // DSW1-5
 
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
@@ -335,8 +335,8 @@ static INPUT_PORTS_START( spoker )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear")	// stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear") // stats, memory
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")   // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -405,7 +405,7 @@ static INPUT_PORTS_START( 3super8 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")   // hopper sensor
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1   )
@@ -460,8 +460,8 @@ static const gfx_layout layout_8x8x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP8(0,2*8) },
 	8*8*2
@@ -473,8 +473,8 @@ static const gfx_layout layout_8x32x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP32(0,2*8) },
 	8*32*2
@@ -515,9 +515,9 @@ GFXDECODE_END
 void spoker_state::machine_reset()
 {
 
-	m_nmi_ack		=	0;
-	m_hopper			=	0;
-	m_video_enable	=	1;
+	m_nmi_ack       =   0;
+	m_hopper            =   0;
+	m_video_enable  =   1;
 }
 
 INTERRUPT_GEN_MEMBER(spoker_state::spoker_interrupt)
@@ -529,7 +529,7 @@ INTERRUPT_GEN_MEMBER(spoker_state::spoker_interrupt)
 static MACHINE_CONFIG_START( spoker, spoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(spoker_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, spoker_interrupt)
@@ -560,7 +560,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( 3super8, spoker )
 
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_24MHz / 4)	/* z840006, 24/4 MHz? */
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_24MHz / 4)    /* z840006, 24/4 MHz? */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(3super8_portmap)
@@ -602,7 +602,7 @@ ROM_START( spk116it )
 	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
 	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
 	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 
@@ -620,7 +620,7 @@ ROM_START( spk115it )
 	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
 	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x40000, "oki", 0 ) /* expansion rom - contains backgrounds and pictures charmaps */
 	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 

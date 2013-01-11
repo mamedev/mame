@@ -15,7 +15,7 @@
 #include "includes/elf.h"
 #include "elf2.lh"
 
-#define RUN	\
+#define RUN \
 	BIT(ioport("SPECIAL")->read(), 0)
 
 #define LOAD \
@@ -295,12 +295,12 @@ static QUICKLOAD_LOAD( elf )
 
 static MACHINE_CONFIG_START( elf2, elf2_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_579545MHz/2)
-    MCFG_CPU_PROGRAM_MAP(elf2_mem)
-    MCFG_CPU_IO_MAP(elf2_io)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_579545MHz/2)
+	MCFG_CPU_PROGRAM_MAP(elf2_mem)
+	MCFG_CPU_IO_MAP(elf2_io)
 	MCFG_CPU_CONFIG(elf2_config)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_elf2 )
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -330,4 +330,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1978, elf2,	0,		0,		elf2,	elf2, driver_device,	0,		"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE | GAME_NO_SOUND)
+COMP( 1978, elf2,   0,      0,      elf2,   elf2, driver_device,    0,      "Netronics",    "Elf II",   GAME_SUPPORTS_SAVE | GAME_NO_SOUND)

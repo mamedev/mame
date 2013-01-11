@@ -2,12 +2,12 @@
 
         Brandt 8641
 
-		Currency Counter
-		
+        Currency Counter
+
         24/12/2012 Skeleton driver.
-		
-		There seams to be 15 buttons (according to images, I just have board)
-		also there are 8 dips currently set at 00011100 (1 is on)
+
+        There seams to be 15 buttons (according to images, I just have board)
+        also there are 8 dips currently set at 00011100 (1 is on)
 
 ****************************************************************************/
 
@@ -19,7 +19,7 @@ class brandt8641_state : public driver_device
 public:
 	brandt8641_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") 
+			m_maincpu(*this, "maincpu")
 		{ }
 
 	required_device<cpu_device> m_maincpu;

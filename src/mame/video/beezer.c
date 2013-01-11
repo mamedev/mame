@@ -36,15 +36,15 @@ UINT32 beezer_state::screen_update_beezer(screen_device &screen, bitmap_ind16 &b
 WRITE8_MEMBER(beezer_state::beezer_map_w)
 {
 	/*
-      bit 7 -- 330  ohm resistor  -- BLUE
-            -- 560  ohm resistor  -- BLUE
-            -- 330  ohm resistor  -- GREEN
-            -- 560  ohm resistor  -- GREEN
-            -- 1.2 kohm resistor  -- GREEN
-            -- 330  ohm resistor  -- RED
-            -- 560  ohm resistor  -- RED
-      bit 0 -- 1.2 kohm resistor  -- RED
-    */
+	  bit 7 -- 330  ohm resistor  -- BLUE
+	        -- 560  ohm resistor  -- BLUE
+	        -- 330  ohm resistor  -- GREEN
+	        -- 560  ohm resistor  -- GREEN
+	        -- 1.2 kohm resistor  -- GREEN
+	        -- 330  ohm resistor  -- RED
+	        -- 560  ohm resistor  -- RED
+	  bit 0 -- 1.2 kohm resistor  -- RED
+	*/
 
 	int r, g, b, bit0, bit1, bit2;
 
@@ -71,4 +71,3 @@ READ8_MEMBER(beezer_state::beezer_line_r)
 	return machine().primary_screen->vpos();
 //  Note: was (m_scanline & 0xfe) << 1; with scanline % 128
 }
-

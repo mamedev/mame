@@ -61,7 +61,7 @@ device_vip_expansion_card_interface::~device_vip_expansion_card_interface()
 //-------------------------------------------------
 
 vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, VIP_EXPANSION_SLOT, "VIP expansion port", tag, owner, clock),
+		device_t(mconfig, VIP_EXPANSION_SLOT, "VIP expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -94,9 +94,9 @@ void vip_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_interrupt_cb, 0, sizeof(m_out_interrupt_cb));
-    	memset(&m_out_dma_out_cb, 0, sizeof(m_out_dma_out_cb));
-    	memset(&m_out_dma_in_cb, 0, sizeof(m_out_dma_in_cb));
+		memset(&m_out_interrupt_cb, 0, sizeof(m_out_interrupt_cb));
+		memset(&m_out_dma_out_cb, 0, sizeof(m_out_dma_out_cb));
+		memset(&m_out_dma_in_cb, 0, sizeof(m_out_dma_in_cb));
 	}
 }
 
@@ -240,14 +240,14 @@ WRITE_LINE_MEMBER( vip_expansion_slot_device::dma_in_w ) { m_out_dma_in_func(sta
 //-------------------------------------------------
 
 SLOT_INTERFACE_START( vip_expansion_cards )
-    SLOT_INTERFACE("super", VP550)
-    //SLOT_INTERFACE("eprom", VP560)
-    //SLOT_INTERFACE("eprommer", VP565)
-    SLOT_INTERFACE("ram", VP570)
-    SLOT_INTERFACE("exp", VP575)
-    //SLOT_INTERFACE("exp2", VP576_EXP)
-    SLOT_INTERFACE("keypad", VP585)
-    SLOT_INTERFACE("color", VP590)
-    SLOT_INTERFACE("simple", VP595)
-    SLOT_INTERFACE("basic", VP700)
+	SLOT_INTERFACE("super", VP550)
+	//SLOT_INTERFACE("eprom", VP560)
+	//SLOT_INTERFACE("eprommer", VP565)
+	SLOT_INTERFACE("ram", VP570)
+	SLOT_INTERFACE("exp", VP575)
+	//SLOT_INTERFACE("exp2", VP576_EXP)
+	SLOT_INTERFACE("keypad", VP585)
+	SLOT_INTERFACE("color", VP590)
+	SLOT_INTERFACE("simple", VP595)
+	SLOT_INTERFACE("basic", VP700)
 SLOT_INTERFACE_END

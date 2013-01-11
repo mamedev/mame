@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #define NTSC_CLOCK           N2A03_DEFAULTCLOCK     /* 1.789772 MHz */
-#define PAL_CLOCK	           (26601712.0/16)        /* 1.662607 MHz */
+#define PAL_CLOCK              (26601712.0/16)        /* 1.662607 MHz */
 
 #define NES_BATTERY_SIZE 0x2000
 
@@ -90,8 +90,8 @@ public:
 	int     m_disk_expansion;
 
 	UINT8   m_fds_sides;
-	UINT8   *m_fds_data;	// here, we store a copy of the disk
-	UINT8   *m_fds_ram;	// here, we emulate the RAM adapter
+	UINT8   *m_fds_data;    // here, we store a copy of the disk
+	UINT8   *m_fds_ram; // here, we emulate the RAM adapter
 
 	/* Variables which can change */
 	UINT8   m_fds_motor_on;

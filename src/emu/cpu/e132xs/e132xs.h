@@ -26,91 +26,91 @@
     COMPILE-TIME DEFINITIONS
 ***************************************************************************/
 
-#define PC_REGISTER			 0
-#define SR_REGISTER			 1
-#define BCR_REGISTER		20
-#define TPR_REGISTER		21
-#define TCR_REGISTER		22
-#define TR_REGISTER			23
-#define ISR_REGISTER		25
-#define FCR_REGISTER		26
-#define MCR_REGISTER		27
+#define PC_REGISTER          0
+#define SR_REGISTER          1
+#define BCR_REGISTER        20
+#define TPR_REGISTER        21
+#define TCR_REGISTER        22
+#define TR_REGISTER         23
+#define ISR_REGISTER        25
+#define FCR_REGISTER        26
+#define MCR_REGISTER        27
 
-#define X_CODE(val)		 ((val & 0x7000) >> 12)
-#define E_BIT(val)		 ((val & 0x8000) >> 15)
+#define X_CODE(val)      ((val & 0x7000) >> 12)
+#define E_BIT(val)       ((val & 0x8000) >> 15)
 #define S_BIT_CONST(val) ((val & 0x4000) >> 14)
-#define DD(val)			 ((val & 0x3000) >> 12)
+#define DD(val)          ((val & 0x3000) >> 12)
 
 
 /* Extended DSP instructions */
-#define EMUL			0x102
-#define EMULU			0x104
-#define EMULS			0x106
-#define EMAC			0x10a
-#define EMACD			0x10e
-#define EMSUB			0x11a
-#define EMSUBD			0x11e
-#define EHMAC			0x02a
-#define EHMACD			0x02e
-#define EHCMULD			0x046
-#define EHCMACD			0x04e
-#define EHCSUMD			0x086
-#define EHCFFTD			0x096
-#define EHCFFTSD		0x296
+#define EMUL            0x102
+#define EMULU           0x104
+#define EMULS           0x106
+#define EMAC            0x10a
+#define EMACD           0x10e
+#define EMSUB           0x11a
+#define EMSUBD          0x11e
+#define EHMAC           0x02a
+#define EHMACD          0x02e
+#define EHCMULD         0x046
+#define EHCMACD         0x04e
+#define EHCSUMD         0x086
+#define EHCFFTD         0x096
+#define EHCFFTSD        0x296
 
 /* Delay values */
-#define NO_DELAY		0
-#define DELAY_EXECUTE	1
+#define NO_DELAY        0
+#define DELAY_EXECUTE   1
 
 /* IRQ numbers */
-#define IRQ_INT1		0
-#define IRQ_INT2		1
-#define IRQ_INT3		2
-#define IRQ_INT4		3
-#define IRQ_IO1			4
-#define IRQ_IO2			5
-#define IRQ_IO3			6
+#define IRQ_INT1        0
+#define IRQ_INT2        1
+#define IRQ_INT3        2
+#define IRQ_INT4        3
+#define IRQ_IO1         4
+#define IRQ_IO2         5
+#define IRQ_IO3         6
 
 /* Trap numbers */
-#define TRAPNO_IO2					48
-#define TRAPNO_IO1					49
-#define TRAPNO_INT4				50
-#define TRAPNO_INT3				51
-#define TRAPNO_INT2				52
-#define TRAPNO_INT1				53
-#define TRAPNO_IO3					54
-#define TRAPNO_TIMER				55
-#define TRAPNO_RESERVED1			56
-#define TRAPNO_TRACE_EXCEPTION		57
-#define TRAPNO_PARITY_ERROR		58
-#define TRAPNO_EXTENDED_OVERFLOW	59
-#define TRAPNO_RANGE_ERROR			60
-#define TRAPNO_PRIVILEGE_ERROR		TRAPNO_RANGE_ERROR
-#define TRAPNO_FRAME_ERROR			TRAPNO_RANGE_ERROR
-#define TRAPNO_RESERVED2			61
-#define TRAPNO_RESET				62	// reserved if not mapped @ MEM3
-#define TRAPNO_ERROR_ENTRY			63	// for instruction code of all ones
+#define TRAPNO_IO2                  48
+#define TRAPNO_IO1                  49
+#define TRAPNO_INT4             50
+#define TRAPNO_INT3             51
+#define TRAPNO_INT2             52
+#define TRAPNO_INT1             53
+#define TRAPNO_IO3                  54
+#define TRAPNO_TIMER                55
+#define TRAPNO_RESERVED1            56
+#define TRAPNO_TRACE_EXCEPTION      57
+#define TRAPNO_PARITY_ERROR     58
+#define TRAPNO_EXTENDED_OVERFLOW    59
+#define TRAPNO_RANGE_ERROR          60
+#define TRAPNO_PRIVILEGE_ERROR      TRAPNO_RANGE_ERROR
+#define TRAPNO_FRAME_ERROR          TRAPNO_RANGE_ERROR
+#define TRAPNO_RESERVED2            61
+#define TRAPNO_RESET                62  // reserved if not mapped @ MEM3
+#define TRAPNO_ERROR_ENTRY          63  // for instruction code of all ones
 
 /* Trap codes */
-#define	TRAPLE		4
-#define	TRAPGT		5
-#define	TRAPLT		6
-#define	TRAPGE		7
-#define	TRAPSE		8
-#define	TRAPHT		9
-#define	TRAPST		10
-#define	TRAPHE		11
-#define	TRAPE		12
-#define	TRAPNE		13
-#define	TRAPV		14
-#define	TRAP		15
+#define TRAPLE      4
+#define TRAPGT      5
+#define TRAPLT      6
+#define TRAPGE      7
+#define TRAPSE      8
+#define TRAPHT      9
+#define TRAPST      10
+#define TRAPHE      11
+#define TRAPE       12
+#define TRAPNE      13
+#define TRAPV       14
+#define TRAP        15
 
 /* Entry point to get trap locations or emulated code associated */
-#define	E132XS_ENTRY_MEM0	0
-#define	E132XS_ENTRY_MEM1	1
-#define	E132XS_ENTRY_MEM2	2
-#define	E132XS_ENTRY_IRAM	3
-#define	E132XS_ENTRY_MEM3	7
+#define E132XS_ENTRY_MEM0   0
+#define E132XS_ENTRY_MEM1   1
+#define E132XS_ENTRY_MEM2   2
+#define E132XS_ENTRY_IRAM   3
+#define E132XS_ENTRY_MEM3   7
 
 /***************************************************************************
     REGISTER ENUMERATION
@@ -176,28 +176,28 @@ extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, u
 
 /* Memory access */
 /* read byte */
-#define READ_B(addr)         	m_program->read_byte((addr))
+#define READ_B(addr)            m_program->read_byte((addr))
 /* read half-word */
-#define READ_HW(addr)        	m_program->read_word((addr) & ~1)
+#define READ_HW(addr)           m_program->read_word((addr) & ~1)
 /* read word */
-#define READ_W(addr)         	m_program->read_dword((addr) & ~3)
+#define READ_W(addr)            m_program->read_dword((addr) & ~3)
 
 /* write byte */
-#define WRITE_B(addr, data)  	m_program->write_byte(addr, data)
+#define WRITE_B(addr, data)     m_program->write_byte(addr, data)
 /* write half-word */
-#define WRITE_HW(addr, data) 	m_program->write_word((addr) & ~1, data)
+#define WRITE_HW(addr, data)    m_program->write_word((addr) & ~1, data)
 /* write word */
-#define WRITE_W(addr, data)  	m_program->write_dword((addr) & ~3, data)
+#define WRITE_W(addr, data)     m_program->write_dword((addr) & ~3, data)
 
 
 /* I/O access */
 /* read word */
-#define IO_READ_W(addr)      	m_io->read_dword(((addr) >> 11) & 0x7ffc)
+#define IO_READ_W(addr)         m_io->read_dword(((addr) >> 11) & 0x7ffc)
 /* write word */
-#define IO_WRITE_W(addr, data)	m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
+#define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)	       m_direct->read_decrypted_word((addr), m_opcodexor)
+#define READ_OP(addr)          m_direct->read_decrypted_word((addr), m_opcodexor)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -211,7 +211,7 @@ class hyperstone_device : public cpu_device
 public:
 	// construction/destruction
 	hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-					  const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map);
+						const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map);
 
 	// public interfaces
 
@@ -253,30 +253,30 @@ protected:
 	/* Delay information */
 	struct delay_info
 	{
-		INT32	delay_cmd;
-		UINT32	delay_pc;
+		INT32   delay_cmd;
+		UINT32  delay_pc;
 	};
 
 	// CPU registers
-	UINT32	m_global_regs[32];
-	UINT32	m_local_regs[64];
+	UINT32  m_global_regs[32];
+	UINT32  m_local_regs[64];
 
 	/* internal stuff */
-	UINT32	m_ppc;			// previous pc
-	UINT16	m_op;			// opcode
-	UINT32	m_trap_entry; 	// entry point to get trap address
+	UINT32  m_ppc;          // previous pc
+	UINT16  m_op;           // opcode
+	UINT32  m_trap_entry;   // entry point to get trap address
 
-	UINT8	m_clock_scale_mask;
-	UINT8	m_clock_scale;
-	UINT8	m_clock_cycles_1;
-	UINT8	m_clock_cycles_2;
-	UINT8	m_clock_cycles_4;
-	UINT8	m_clock_cycles_6;
+	UINT8   m_clock_scale_mask;
+	UINT8   m_clock_scale;
+	UINT8   m_clock_cycles_1;
+	UINT8   m_clock_cycles_2;
+	UINT8   m_clock_cycles_4;
+	UINT8   m_clock_cycles_6;
 
-	UINT64	m_tr_base_cycles;
-	UINT32	m_tr_base_value;
-	UINT32	m_tr_clocks_per_tick;
-	UINT8	m_timer_int_pending;
+	UINT64  m_tr_base_cycles;
+	UINT32  m_tr_base_value;
+	UINT32  m_tr_clocks_per_tick;
+	UINT8   m_timer_int_pending;
 	emu_timer *m_timer;
 
 	delay_info m_delay;
@@ -287,7 +287,7 @@ protected:
 	INT32 m_intblock;
 
 	// other internal state
-	int		m_icount;
+	int     m_icount;
 
 	typedef void (hyperstone_device::*ophandler)();
 
@@ -298,19 +298,19 @@ protected:
 private:
 	struct regs_decode
 	{
-		UINT8	src, dst;		// destination and source register code
-		UINT32	src_value;      // current source register value
-		UINT32	next_src_value; // current next source register value
-		UINT32	dst_value;      // current destination register value
-		UINT32	next_dst_value; // current next destination register value
-		UINT8	sub_type;		// sub type opcode (for DD and X_CODE bits)
+		UINT8   src, dst;       // destination and source register code
+		UINT32  src_value;      // current source register value
+		UINT32  next_src_value; // current next source register value
+		UINT32  dst_value;      // current destination register value
+		UINT32  next_dst_value; // current next destination register value
+		UINT8   sub_type;       // sub type opcode (for DD and X_CODE bits)
 		union
 		{
 			UINT32 u;
 			INT32  s;
-		} extra;				// extra value such as immediate value, const, pcrel, ...
-		UINT8	src_is_local;
-		UINT8	dst_is_local;
+		} extra;                // extra value such as immediate value, const, pcrel, ...
+		UINT8   src_is_local;
+		UINT8   dst_is_local;
 		UINT8   same_src_dst;
 		UINT8   same_src_dstf;
 		UINT8   same_srcf_dst;
@@ -460,38 +460,38 @@ private:
 
 	void reserved(struct regs_decode *decode);
 
-	void op00();	void op01();	void op02();	void op03();	void op04();	void op05();	void op06();	void op07();
-	void op08();	void op09();	void op0a();	void op0b();	void op0c();	void op0d();	void op0e();	void op0f();
-	void op10();	void op11();	void op12();	void op13();	void op14();	void op15();	void op16();	void op17();
-	void op18();	void op19();	void op1a();	void op1b();	void op1c();	void op1d();	void op1e();	void op1f();
-	void op20();	void op21();	void op22();	void op23();	void op24();	void op25();	void op26();	void op27();
-	void op28();	void op29();	void op2a();	void op2b();	void op2c();	void op2d();	void op2e();	void op2f();
-	void op30();	void op31();	void op32();	void op33();	void op34();	void op35();	void op36();	void op37();
-	void op38();	void op39();	void op3a();	void op3b();	void op3c();	void op3d();	void op3e();	void op3f();
-	void op40();	void op41();	void op42();	void op43();	void op44();	void op45();	void op46();	void op47();
-	void op48();	void op49();	void op4a();	void op4b();	void op4c();	void op4d();	void op4e();	void op4f();
-	void op50();	void op51();	void op52();	void op53();	void op54();	void op55();	void op56();	void op57();
-	void op58();	void op59();	void op5a();	void op5b();	void op5c();	void op5d();	void op5e();	void op5f();
-	void op60();	void op61();	void op62();	void op63();	void op64();	void op65();	void op66();	void op67();
-	void op68();	void op69();	void op6a();	void op6b();	void op6c();	void op6d();	void op6e();	void op6f();
-	void op70();	void op71();	void op72();	void op73();	void op74();	void op75();	void op76();	void op77();
-	void op78();	void op79();	void op7a();	void op7b();	void op7c();	void op7d();	void op7e();	void op7f();
-	void op80();	void op81();	void op82();	void op83();	void op84();	void op85();	void op86();	void op87();
-	void op88();	void op89();	void op8a();	void op8b();	void op8c();	void op8d();	void op8e();	void op8f();
-	void op90();	void op91();	void op92();	void op93();	void op94();	void op95();	void op96();	void op97();
-	void op98();	void op99();	void op9a();	void op9b();	void op9c();	void op9d();	void op9e();	void op9f();
-	void opa0();	void opa1();	void opa2();	void opa3();	void opa4();	void opa5();	void opa6();	void opa7();
-	void opa8();	void opa9();	void opaa();	void opab();	void opac();	void opad();	void opae();	void opaf();
-	void opb0();	void opb1();	void opb2();	void opb3();	void opb4();	void opb5();	void opb6();	void opb7();
-	void opb8();	void opb9();	void opba();	void opbb();	void opbc();	void opbd();	void opbe();	void opbf();
-	void opc0();	void opc1();	void opc2();	void opc3();	void opc4();	void opc5();	void opc6();	void opc7();
-	void opc8();	void opc9();	void opca();	void opcb();	void opcc();	void opcd();	void opce();	void opcf();
-	void opd0();	void opd1();	void opd2();	void opd3();	void opd4();	void opd5();	void opd6();	void opd7();
-	void opd8();	void opd9();	void opda();	void opdb();	void opdc();	void opdd();	void opde();	void opdf();
-	void ope0();	void ope1();	void ope2();	void ope3();	void ope4();	void ope5();	void ope6();	void ope7();
-	void ope8();	void ope9();	void opea();	void opeb();	void opec();	void oped();	void opee();	void opef();
-	void opf0();	void opf1();	void opf2();	void opf3();	void opf4();	void opf5();	void opf6();	void opf7();
-	void opf8();	void opf9();	void opfa();	void opfb();	void opfc();	void opfd();	void opfe();	void opff();
+	void op00();    void op01();    void op02();    void op03();    void op04();    void op05();    void op06();    void op07();
+	void op08();    void op09();    void op0a();    void op0b();    void op0c();    void op0d();    void op0e();    void op0f();
+	void op10();    void op11();    void op12();    void op13();    void op14();    void op15();    void op16();    void op17();
+	void op18();    void op19();    void op1a();    void op1b();    void op1c();    void op1d();    void op1e();    void op1f();
+	void op20();    void op21();    void op22();    void op23();    void op24();    void op25();    void op26();    void op27();
+	void op28();    void op29();    void op2a();    void op2b();    void op2c();    void op2d();    void op2e();    void op2f();
+	void op30();    void op31();    void op32();    void op33();    void op34();    void op35();    void op36();    void op37();
+	void op38();    void op39();    void op3a();    void op3b();    void op3c();    void op3d();    void op3e();    void op3f();
+	void op40();    void op41();    void op42();    void op43();    void op44();    void op45();    void op46();    void op47();
+	void op48();    void op49();    void op4a();    void op4b();    void op4c();    void op4d();    void op4e();    void op4f();
+	void op50();    void op51();    void op52();    void op53();    void op54();    void op55();    void op56();    void op57();
+	void op58();    void op59();    void op5a();    void op5b();    void op5c();    void op5d();    void op5e();    void op5f();
+	void op60();    void op61();    void op62();    void op63();    void op64();    void op65();    void op66();    void op67();
+	void op68();    void op69();    void op6a();    void op6b();    void op6c();    void op6d();    void op6e();    void op6f();
+	void op70();    void op71();    void op72();    void op73();    void op74();    void op75();    void op76();    void op77();
+	void op78();    void op79();    void op7a();    void op7b();    void op7c();    void op7d();    void op7e();    void op7f();
+	void op80();    void op81();    void op82();    void op83();    void op84();    void op85();    void op86();    void op87();
+	void op88();    void op89();    void op8a();    void op8b();    void op8c();    void op8d();    void op8e();    void op8f();
+	void op90();    void op91();    void op92();    void op93();    void op94();    void op95();    void op96();    void op97();
+	void op98();    void op99();    void op9a();    void op9b();    void op9c();    void op9d();    void op9e();    void op9f();
+	void opa0();    void opa1();    void opa2();    void opa3();    void opa4();    void opa5();    void opa6();    void opa7();
+	void opa8();    void opa9();    void opaa();    void opab();    void opac();    void opad();    void opae();    void opaf();
+	void opb0();    void opb1();    void opb2();    void opb3();    void opb4();    void opb5();    void opb6();    void opb7();
+	void opb8();    void opb9();    void opba();    void opbb();    void opbc();    void opbd();    void opbe();    void opbf();
+	void opc0();    void opc1();    void opc2();    void opc3();    void opc4();    void opc5();    void opc6();    void opc7();
+	void opc8();    void opc9();    void opca();    void opcb();    void opcc();    void opcd();    void opce();    void opcf();
+	void opd0();    void opd1();    void opd2();    void opd3();    void opd4();    void opd5();    void opd6();    void opd7();
+	void opd8();    void opd9();    void opda();    void opdb();    void opdc();    void opdd();    void opde();    void opdf();
+	void ope0();    void ope1();    void ope2();    void ope3();    void ope4();    void ope5();    void ope6();    void ope7();
+	void ope8();    void ope9();    void opea();    void opeb();    void opec();    void oped();    void opee();    void opef();
+	void opf0();    void opf1();    void opf2();    void opf3();    void opf4();    void opf5();    void opf6();    void opf7();
+	void opf8();    void opf9();    void opfa();    void opfb();    void opfc();    void opfd();    void opfe();    void opff();
 
 	void set_irq_line(int irqline, int state);
 };

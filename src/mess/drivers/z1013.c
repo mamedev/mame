@@ -292,7 +292,7 @@ WRITE8_MEMBER( z1013_state::z1013_port_b_w )
 
 const z80pio_interface z1013_z80pio_intf =
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -308,7 +308,7 @@ READ8_MEMBER( z1013_state::z1013k7659_port_b_r )
 
 const z80pio_interface z1013k7659_z80pio_intf =
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -349,7 +349,7 @@ SNAPSHOT_LOAD( z1013 )
 	}
 
 	memcpy (image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(startaddr),
-		 data+0x20, endaddr - startaddr + 1);
+			data+0x20, endaddr - startaddr + 1);
 
 	if (runaddr)
 		image.device().machine().device("maincpu")->state().set_state_int(Z80_PC, runaddr);
@@ -365,15 +365,15 @@ SNAPSHOT_LOAD( z1013 )
 /* F4 Character Displayer */
 static const gfx_layout z1013_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	512,					/* 2 x 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	512,                    /* 2 x 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( z1013 )

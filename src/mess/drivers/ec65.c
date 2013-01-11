@@ -70,18 +70,18 @@ ADDRESS_MAP_END
 
 static const pia6821_interface ec65_pia_interface=
 {
-	DEVCB_NULL,		/* port A input */
-	DEVCB_NULL,		/* port B input */
-	DEVCB_NULL,		/* CA1 input */
-	DEVCB_NULL,		/* CB1 input */
-	DEVCB_NULL,		/* CA2 input */
-	DEVCB_NULL,		/* CB2 input */
-	DEVCB_NULL,		/* port A output */
-	DEVCB_NULL,		/* port B output */
-	DEVCB_NULL,		/* CA2 output */
-	DEVCB_NULL,		/* CB2 output */
-	DEVCB_NULL,		/* IRQA output */
-	DEVCB_NULL		/* IRQB output */
+	DEVCB_NULL,     /* port A input */
+	DEVCB_NULL,     /* port B input */
+	DEVCB_NULL,     /* CA1 input */
+	DEVCB_NULL,     /* CB1 input */
+	DEVCB_NULL,     /* CA2 input */
+	DEVCB_NULL,     /* CB2 input */
+	DEVCB_NULL,     /* port A output */
+	DEVCB_NULL,     /* port B output */
+	DEVCB_NULL,     /* CA2 output */
+	DEVCB_NULL,     /* CB2 output */
+	DEVCB_NULL,     /* IRQA output */
+	DEVCB_NULL      /* IRQB output */
 };
 
 static ACIA6850_INTERFACE( ec65_acia_intf )
@@ -229,15 +229,15 @@ static const mc6845_interface ec65_crtc6845_interface =
 /* F4 Character Displayer */
 static const gfx_layout ec65_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( ec65 )
@@ -304,7 +304,7 @@ ROM_START( ec65 )
 	ROM_LOAD( "ec65.ic6", 0xf000, 0x1000, CRC(acd928ed) SHA1(e02a688a057ff77294717cf7b887425fed0b1153))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4))	// Located on VDU card
+	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4)) // Located on VDU card
 ROM_END
 
 ROM_START( ec65k )
@@ -312,11 +312,10 @@ ROM_START( ec65k )
 	ROM_LOAD( "ec65k.ic19",  0xf000, 0x1000, CRC(5e5a890a) SHA1(daa006f2179fd156833e11c73b37881cafe5dede))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4))	// Located on VDU card
+	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4)) // Located on VDU card
 ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1985, ec65,   0,       0,      ec65,      ec65, driver_device,    0,    "Elektor Electronics", "EC-65", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1985, ec65k,  ec65,    0,      ec65k,     ec65, driver_device,    0,    "Elektor Electronics", "EC-65K", GAME_NOT_WORKING | GAME_NO_SOUND)
-

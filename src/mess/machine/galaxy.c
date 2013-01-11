@@ -62,8 +62,8 @@ static IRQ_CALLBACK ( galaxy_irq_callback )
   Snapshot files (GAL)
 ***************************************************************************/
 
-#define GALAXY_SNAPSHOT_V1_SIZE	8268
-#define GALAXY_SNAPSHOT_V2_SIZE	8244
+#define GALAXY_SNAPSHOT_V1_SIZE 8268
+#define GALAXY_SNAPSHOT_V2_SIZE 8244
 
 static void galaxy_setup_snapshot (running_machine &machine, const UINT8 * data, UINT32 size)
 {

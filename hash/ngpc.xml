@@ -548,7 +548,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="kofr2d2" cloneof="kofr2">
-    <!-- This has a Version 2 on the cart label, but it probably refers to Demo Version 2, rather than KOFR2 Version 2, given the title screen is unchanged -->
+	<!-- This has a Version 2 on the cart label, but it probably refers to Demo Version 2, rather than KOFR2 Version 2, given the title screen is unchanged -->
 		<description>Pocket Fighting Series - King of Fighters R-2 (World, Demo Version 2)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>

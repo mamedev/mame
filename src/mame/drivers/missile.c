@@ -396,15 +396,15 @@ public:
 
 
 
-#define MASTER_CLOCK	XTAL_10MHz
+#define MASTER_CLOCK    XTAL_10MHz
 
-#define PIXEL_CLOCK		(MASTER_CLOCK/2)
-#define HTOTAL			(320)
-#define HBSTART			(256)
-#define HBEND			(0)
-#define VTOTAL			(256)
-#define VBSTART			(256)
-#define VBEND			(25)	/* 24 causes a garbage line at the top of the screen */
+#define PIXEL_CLOCK     (MASTER_CLOCK/2)
+#define HTOTAL          (320)
+#define HBSTART         (256)
+#define HBEND           (0)
+#define VTOTAL          (256)
+#define VBSTART         (256)
+#define VBEND           (25)    /* 24 causes a garbage line at the top of the screen */
 
 
 
@@ -417,8 +417,8 @@ public:
 int missile_state::scanline_to_v(int scanline)
 {
 	/* since the vertical sync counter counts backwards when flipped,
-        this function returns the current effective V value, given
-        that vpos() only counts forward */
+	    this function returns the current effective V value, given
+	    that vpos() only counts forward */
 	return m_flipscreen ? (256 - scanline) : scanline;
 }
 
@@ -533,8 +533,8 @@ void missile_state::machine_reset()
 bool missile_state::get_madsel()
 {
 	/* the MADSEL signal disables standard address decoding and routes
-		writes to video RAM; it goes high 5 cycles after an opcode
-		fetch where the low 5 bits are 0x01 and the IRQ signal is clear.
+	    writes to video RAM; it goes high 5 cycles after an opcode
+	    fetch where the low 5 bits are 0x01 and the IRQ signal is clear.
 	*/
 	bool madsel = false;
 
@@ -553,9 +553,9 @@ bool missile_state::get_madsel()
 offs_t missile_state::get_bit3_addr(offs_t pixaddr)
 {
 	/* the 3rd bit of video RAM is scattered about various areas
-        we take a 16-bit pixel address here and convert it into
-        a video RAM address based on logic in the schematics */
-	return	(( pixaddr & 0x0800) >> 1) |
+	    we take a 16-bit pixel address here and convert it into
+	    a video RAM address based on logic in the schematics */
+	return  (( pixaddr & 0x0800) >> 1) |
 			((~pixaddr & 0x0800) >> 2) |
 			(( pixaddr & 0x07f8) >> 2) |
 			(( pixaddr & 0x1000) >> 12);
@@ -767,14 +767,14 @@ READ8_MEMBER(missile_state::missile_r)
 	/* IN0 */
 	else if (offset < 0x4900)
 	{
-		if (m_ctrld)	/* trackball */
+		if (m_ctrld)    /* trackball */
 		{
 			if (!m_flipscreen)
 				result = ((ioport("TRACK0_Y")->read() << 4) & 0xf0) | (ioport("TRACK0_X")->read() & 0x0f);
 			else
 				result = ((ioport("TRACK1_Y")->read() << 4) & 0xf0) | (ioport("TRACK1_X")->read() & 0x0f);
 		}
-		else	/* buttons */
+		else    /* buttons */
 			result = ioport("IN0")->read();
 	}
 
@@ -820,7 +820,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( missile )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -830,7 +830,7 @@ static INPUT_PORTS_START( missile )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")   /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -839,7 +839,7 @@ static INPUT_PORTS_START( missile )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, missile_state,get_vblank, NULL)
 
-	PORT_START("R10")	/* IN2 */
+	PORT_START("R10")   /* IN2 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("R10:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -862,7 +862,7 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("R8")	/* IN3 */
+	PORT_START("R8")    /* IN3 */
 	PORT_DIPNAME( 0x03, 0x00, "Cities" ) PORT_DIPLOCATION("R8:1,2")
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -887,22 +887,22 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("TRACK0_X")	/* FAKE */
+	PORT_START("TRACK0_X")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
 
-	PORT_START("TRACK0_Y")	/* FAKE */
+	PORT_START("TRACK0_Y")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("TRACK1_X")	/* FAKE */
+	PORT_START("TRACK1_X")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START("TRACK1_Y")	/* FAKE */
+	PORT_START("TRACK1_Y")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( suprmatk )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -912,7 +912,7 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")   /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -921,7 +921,7 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, missile_state,get_vblank, NULL)
 
-	PORT_START("R10")	/* IN2 */
+	PORT_START("R10")   /* IN2 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("R10:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -944,7 +944,7 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_DIPSETTING(    0x80, "Reg. Super Missile Attack" )
 	PORT_DIPSETTING(    0xc0, "Hard Super Missile Attack" )
 
-	PORT_START("R8")	/* IN3 */
+	PORT_START("R8")    /* IN3 */
 	PORT_DIPNAME( 0x03, 0x00, "Cities" ) PORT_DIPLOCATION("R8:1,2")
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -969,16 +969,16 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("TRACK0_X")	/* FAKE */
+	PORT_START("TRACK0_X")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
 
-	PORT_START("TRACK0_Y")	/* FAKE */
+	PORT_START("TRACK0_Y")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("TRACK1_X")	/* FAKE */
+	PORT_START("TRACK1_X")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START("TRACK1_Y")	/* FAKE */
+	PORT_START("TRACK1_Y")  /* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
@@ -1206,70 +1206,70 @@ DRIVER_INIT_MEMBER(missile_state,suprmatk)
 
 	for (i = 0; i < 0x40; i++)
 	{
-        rom[0x7CC0+i] = rom[0x8000+i];
-        rom[0x5440+i] = rom[0x8040+i];
-        rom[0x5B00+i] = rom[0x8080+i];
-        rom[0x5740+i] = rom[0x80C0+i];
-        rom[0x6000+i] = rom[0x8100+i];
-        rom[0x6540+i] = rom[0x8140+i];
-        rom[0x7500+i] = rom[0x8180+i];
-        rom[0x7100+i] = rom[0x81C0+i];
-        rom[0x7800+i] = rom[0x8200+i];
-        rom[0x5580+i] = rom[0x8240+i];
-        rom[0x5380+i] = rom[0x8280+i];
-        rom[0x6900+i] = rom[0x82C0+i];
-        rom[0x6E00+i] = rom[0x8300+i];
-        rom[0x6CC0+i] = rom[0x8340+i];
-        rom[0x7DC0+i] = rom[0x8380+i];
-        rom[0x5B80+i] = rom[0x83C0+i];
-        rom[0x5000+i] = rom[0x8400+i];
-        rom[0x7240+i] = rom[0x8440+i];
-        rom[0x7040+i] = rom[0x8480+i];
-        rom[0x62C0+i] = rom[0x84C0+i];
-        rom[0x6840+i] = rom[0x8500+i];
-        rom[0x7EC0+i] = rom[0x8540+i];
-        rom[0x7D40+i] = rom[0x8580+i];
-        rom[0x66C0+i] = rom[0x85C0+i];
-        rom[0x72C0+i] = rom[0x8600+i];
-        rom[0x7080+i] = rom[0x8640+i];
-        rom[0x7D00+i] = rom[0x8680+i];
-        rom[0x5F00+i] = rom[0x86C0+i];
-        rom[0x55C0+i] = rom[0x8700+i];
-        rom[0x5A80+i] = rom[0x8740+i];
-        rom[0x6080+i] = rom[0x8780+i];
-        rom[0x7140+i] = rom[0x87C0+i];
-        rom[0x7000+i] = rom[0x8800+i];
-        rom[0x6100+i] = rom[0x8840+i];
-        rom[0x5400+i] = rom[0x8880+i];
-        rom[0x5BC0+i] = rom[0x88C0+i];
-        rom[0x7E00+i] = rom[0x8900+i];
-        rom[0x71C0+i] = rom[0x8940+i];
-        rom[0x6040+i] = rom[0x8980+i];
-        rom[0x6E40+i] = rom[0x89C0+i];
-        rom[0x5800+i] = rom[0x8A00+i];
-        rom[0x7D80+i] = rom[0x8A40+i];
-        rom[0x7A80+i] = rom[0x8A80+i];
-        rom[0x53C0+i] = rom[0x8AC0+i];
-        rom[0x6140+i] = rom[0x8B00+i];
-        rom[0x6700+i] = rom[0x8B40+i];
-        rom[0x7280+i] = rom[0x8B80+i];
-        rom[0x7F00+i] = rom[0x8BC0+i];
-        rom[0x5480+i] = rom[0x8C00+i];
-        rom[0x70C0+i] = rom[0x8C40+i];
-        rom[0x7F80+i] = rom[0x8C80+i];
-        rom[0x5780+i] = rom[0x8CC0+i];
-        rom[0x6680+i] = rom[0x8D00+i];
-        rom[0x7200+i] = rom[0x8D40+i];
-        rom[0x7E40+i] = rom[0x8D80+i];
-        rom[0x7AC0+i] = rom[0x8DC0+i];
-        rom[0x6300+i] = rom[0x8E00+i];
-        rom[0x7180+i] = rom[0x8E40+i];
-        rom[0x7E80+i] = rom[0x8E80+i];
-        rom[0x6280+i] = rom[0x8EC0+i];
-        rom[0x7F40+i] = rom[0x8F00+i];
-        rom[0x6740+i] = rom[0x8F40+i];
-        rom[0x74C0+i] = rom[0x8F80+i];
-        rom[0x7FC0+i] = rom[0x8FC0+i];
+		rom[0x7CC0+i] = rom[0x8000+i];
+		rom[0x5440+i] = rom[0x8040+i];
+		rom[0x5B00+i] = rom[0x8080+i];
+		rom[0x5740+i] = rom[0x80C0+i];
+		rom[0x6000+i] = rom[0x8100+i];
+		rom[0x6540+i] = rom[0x8140+i];
+		rom[0x7500+i] = rom[0x8180+i];
+		rom[0x7100+i] = rom[0x81C0+i];
+		rom[0x7800+i] = rom[0x8200+i];
+		rom[0x5580+i] = rom[0x8240+i];
+		rom[0x5380+i] = rom[0x8280+i];
+		rom[0x6900+i] = rom[0x82C0+i];
+		rom[0x6E00+i] = rom[0x8300+i];
+		rom[0x6CC0+i] = rom[0x8340+i];
+		rom[0x7DC0+i] = rom[0x8380+i];
+		rom[0x5B80+i] = rom[0x83C0+i];
+		rom[0x5000+i] = rom[0x8400+i];
+		rom[0x7240+i] = rom[0x8440+i];
+		rom[0x7040+i] = rom[0x8480+i];
+		rom[0x62C0+i] = rom[0x84C0+i];
+		rom[0x6840+i] = rom[0x8500+i];
+		rom[0x7EC0+i] = rom[0x8540+i];
+		rom[0x7D40+i] = rom[0x8580+i];
+		rom[0x66C0+i] = rom[0x85C0+i];
+		rom[0x72C0+i] = rom[0x8600+i];
+		rom[0x7080+i] = rom[0x8640+i];
+		rom[0x7D00+i] = rom[0x8680+i];
+		rom[0x5F00+i] = rom[0x86C0+i];
+		rom[0x55C0+i] = rom[0x8700+i];
+		rom[0x5A80+i] = rom[0x8740+i];
+		rom[0x6080+i] = rom[0x8780+i];
+		rom[0x7140+i] = rom[0x87C0+i];
+		rom[0x7000+i] = rom[0x8800+i];
+		rom[0x6100+i] = rom[0x8840+i];
+		rom[0x5400+i] = rom[0x8880+i];
+		rom[0x5BC0+i] = rom[0x88C0+i];
+		rom[0x7E00+i] = rom[0x8900+i];
+		rom[0x71C0+i] = rom[0x8940+i];
+		rom[0x6040+i] = rom[0x8980+i];
+		rom[0x6E40+i] = rom[0x89C0+i];
+		rom[0x5800+i] = rom[0x8A00+i];
+		rom[0x7D80+i] = rom[0x8A40+i];
+		rom[0x7A80+i] = rom[0x8A80+i];
+		rom[0x53C0+i] = rom[0x8AC0+i];
+		rom[0x6140+i] = rom[0x8B00+i];
+		rom[0x6700+i] = rom[0x8B40+i];
+		rom[0x7280+i] = rom[0x8B80+i];
+		rom[0x7F00+i] = rom[0x8BC0+i];
+		rom[0x5480+i] = rom[0x8C00+i];
+		rom[0x70C0+i] = rom[0x8C40+i];
+		rom[0x7F80+i] = rom[0x8C80+i];
+		rom[0x5780+i] = rom[0x8CC0+i];
+		rom[0x6680+i] = rom[0x8D00+i];
+		rom[0x7200+i] = rom[0x8D40+i];
+		rom[0x7E40+i] = rom[0x8D80+i];
+		rom[0x7AC0+i] = rom[0x8DC0+i];
+		rom[0x6300+i] = rom[0x8E00+i];
+		rom[0x7180+i] = rom[0x8E40+i];
+		rom[0x7E80+i] = rom[0x8E80+i];
+		rom[0x6280+i] = rom[0x8EC0+i];
+		rom[0x7F40+i] = rom[0x8F00+i];
+		rom[0x6740+i] = rom[0x8F40+i];
+		rom[0x74C0+i] = rom[0x8F80+i];
+		rom[0x7FC0+i] = rom[0x8FC0+i];
 	}
 }
 

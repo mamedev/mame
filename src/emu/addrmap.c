@@ -50,27 +50,27 @@
 
 address_map_entry::address_map_entry(address_map &map, offs_t start, offs_t end)
 	: m_next(NULL),
-	  m_map(map),
-	  m_addrstart((map.m_globalmask == 0) ? start : start & map.m_globalmask),
-	  m_addrend((map.m_globalmask == 0) ? end : end & map.m_globalmask),
-	  m_addrmirror(0),
-	  m_addrmask(0),
-	  m_share(NULL),
-	  m_region(NULL),
-	  m_rgnoffs(0),
-	  m_rspace8(NULL),
-	  m_rspace16(NULL),
-	  m_rspace32(NULL),
-	  m_rspace64(NULL),
-	  m_wspace8(NULL),
-	  m_wspace16(NULL),
-	  m_wspace32(NULL),
-	  m_wspace64(NULL),
-	  m_memory(NULL),
-	  m_bytestart(0),
-	  m_byteend(0),
-	  m_bytemirror(0),
-	  m_bytemask(0)
+		m_map(map),
+		m_addrstart((map.m_globalmask == 0) ? start : start & map.m_globalmask),
+		m_addrend((map.m_globalmask == 0) ? end : end & map.m_globalmask),
+		m_addrmirror(0),
+		m_addrmask(0),
+		m_share(NULL),
+		m_region(NULL),
+		m_rgnoffs(0),
+		m_rspace8(NULL),
+		m_rspace16(NULL),
+		m_rspace32(NULL),
+		m_rspace64(NULL),
+		m_wspace8(NULL),
+		m_wspace16(NULL),
+		m_wspace32(NULL),
+		m_wspace64(NULL),
+		m_memory(NULL),
+		m_bytestart(0),
+		m_byteend(0),
+		m_bytemirror(0),
+		m_bytemask(0)
 {
 }
 
@@ -560,9 +560,9 @@ address_map_entry64::address_map_entry64(address_map &map, offs_t start, offs_t 
 
 address_map::address_map(device_t &device, address_spacenum spacenum)
 	: m_spacenum(spacenum),
-	  m_databits(0xff),
-	  m_unmapval(0),
-	  m_globalmask(0)
+		m_databits(0xff),
+		m_unmapval(0),
+		m_globalmask(0)
 {
 	// get our memory interface
 	const device_memory_interface *memintf;
@@ -595,9 +595,9 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 
 address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
-	  m_databits(0xff),
-	  m_unmapval(0),
-	  m_globalmask(0)
+		m_databits(0xff),
+		m_unmapval(0),
+		m_globalmask(0)
 {
 	// Retrieve the submap
 	entry->m_submap_delegate.late_bind(device);
@@ -612,9 +612,9 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 
 address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, UINT64 unitmask, device_t &device, address_map_delegate submap_delegate)
 	: m_spacenum(space.spacenum()),
-	  m_databits(space.data_width()),
-	  m_unmapval(space.unmap()),
-	  m_globalmask(space.bytemask())
+		m_databits(space.data_width()),
+		m_unmapval(space.unmap()),
+		m_globalmask(space.bytemask())
 {
 	address_map_entry *e;
 	switch(m_databits) {

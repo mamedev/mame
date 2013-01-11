@@ -91,7 +91,7 @@ INTERRUPT_GEN_MEMBER(mayumi_state::mayumi_interrupt)
 {
 
 	if (m_int_enable)
-		 device.execute().set_input_line(0, HOLD_LINE);
+			device.execute().set_input_line(0, HOLD_LINE);
 }
 
 /*************************************

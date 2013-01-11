@@ -616,10 +616,10 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 
 				{
 					/* 0x18 (24) values in this table, rom data is 0x1800000 long, maybe it has
-                       something to do with that? or 24-address bits?
+					   something to do with that? or 24-address bits?
 
-                       uploaded values appear to be 12-bit, some are repeated
-                    */
+					   uploaded values appear to be 12-bit, some are repeated
+					*/
 
 					{
 
@@ -692,7 +692,7 @@ static WRITE32_HANDLER( decathlt_prot2_w )
 void install_decathlt_protection(running_machine &machine)
 {
 	/* It uploads 2 tables here, then performs what looks like a number of transfers, setting
-       a source address of some kind (scrambled?) and then making many reads from a single address */
+	   a source address of some kind (scrambled?) and then making many reads from a single address */
 	memset(decathlt_protregs, 0, sizeof(decathlt_protregs));
 	decathlt_lastcount = 0;
 	decathlt_prot_uploadmode = 0;

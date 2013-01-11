@@ -15,10 +15,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CDP1862_TAG		"u2"
-#define SCREEN_TAG		":screen"
+#define CDP1862_TAG     "u2"
+#define SCREEN_TAG      ":screen"
 
-#define COLOR_RAM_SIZE	0x100
+#define COLOR_RAM_SIZE  0x100
 
 
 
@@ -54,14 +54,14 @@ static CDP1862_INTERFACE( cgc_intf )
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp590_device, rd_r),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp590_device, bd_r),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp590_device, gd_r),
-	RES_R(510),		// R3
-	RES_R(360),		// R4
-	RES_K(1),		// R5
-	RES_K(1.5),		// R6
-	RES_K(3.9),		// R7
-	RES_K(10),		// R8
-	RES_K(2),		// R9
-	RES_K(3.3)		// R10
+	RES_R(510),     // R3
+	RES_R(360),     // R4
+	RES_K(1),       // R5
+	RES_K(1.5),     // R6
+	RES_K(3.9),     // R7
+	RES_K(10),      // R8
+	RES_K(2),       // R9
+	RES_K(3.3)      // R10
 };
 
 

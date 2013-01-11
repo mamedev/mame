@@ -130,16 +130,16 @@ private:
 
 	UINT16 m_data_index;
 
-	UINT16 m_tape_status;			/* Drive exception flags */
-	UINT16 m_data_error_counter;	/* data error count: nr of blocks rewritten/soft read errors */
-	UINT16 m_underrun_counter;		/* underrun count: nr of times streaming was interrupted */
+	UINT16 m_tape_status;           /* Drive exception flags */
+	UINT16 m_data_error_counter;    /* data error count: nr of blocks rewritten/soft read errors */
+	UINT16 m_underrun_counter;      /* underrun count: nr of times streaming was interrupted */
 
 	UINT32 m_tape_pos;
 	UINT32 m_ctape_block_count;
 	UINT32 m_ctape_block_index;
 	UINT64 m_image_length;
 
-    UINT8 *m_ctape_block_buffer;
+	UINT8 *m_ctape_block_buffer;
 
 	device_image_interface *m_image;
 

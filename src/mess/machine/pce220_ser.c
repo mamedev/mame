@@ -10,11 +10,11 @@
 #include "pce220_ser.h"
 
 // SIO configuration
-#define SIO_BAUD_RATE		1200
-#define SIO_EOT_BYTE		0x1a
-#define SIO_DATA_BIT		8		// number of data bit
-#define SIO_PARITY			0		// 0=none 1=odd 2=even
-#define SIO_STOP_BIT		1		// number of stop bit
+#define SIO_BAUD_RATE       1200
+#define SIO_EOT_BYTE        0x1a
+#define SIO_DATA_BIT        8       // number of data bit
+#define SIO_PARITY          0       // 0=none 1=odd 2=even
+#define SIO_STOP_BIT        1       // number of stop bit
 
 //SIO states
 enum
@@ -42,8 +42,8 @@ const device_type PCE220SERIAL = &device_creator<pce220_serial_device>;
 //-------------------------------------------------
 
 pce220_serial_device::pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, PCE220SERIAL, "Sharp PC-E220 serial", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, PCE220SERIAL, "Sharp PC-E220 serial", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -109,7 +109,7 @@ void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, in
 			switch(m_state)
 			{
 			case SIO_WAIT:
-				m_ack = 1;	//data send request
+				m_ack = 1;  //data send request
 				//waits until is ready to receive
 				if(!m_busy)
 					return;
@@ -303,4 +303,3 @@ int pce220_serial_device::get_next_state()
 		return m_state + 1;
 	}
 }
-

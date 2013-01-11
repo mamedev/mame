@@ -71,15 +71,15 @@ class samples_device;
 
 struct samples_interface
 {
-    UINT8		m_channels;			// number of discrete audio channels needed
-    const char *const *m_names;		// array of sample names
-    void        (*m_start)(samples_device &device); // optional callback
+	UINT8       m_channels;         // number of discrete audio channels needed
+	const char *const *m_names;     // array of sample names
+	void        (*m_start)(samples_device &device); // optional callback
 };
 
 
 // ======================> samples_device
 
-class samples_device :	public device_t,
+class samples_device :  public device_t,
 						public device_sound_interface,
 						public samples_interface
 {
@@ -111,8 +111,8 @@ public:
 		// shouldn't need a copy, but in case it happens, catch it here
 		sample_t &operator=(const sample_t &rhs) { assert(false); return *this; }
 
-	    UINT32			frequency;		// frequency of the sample
-	    dynamic_array<INT16> data;		// 16-bit signed data
+		UINT32          frequency;      // frequency of the sample
+		dynamic_array<INT16> data;      // 16-bit signed data
 	};
 	static bool read_sample(emu_file &file, sample_t &sample);
 
@@ -132,16 +132,16 @@ private:
 	// internal classes
 	struct channel_t
 	{
-		sound_stream *	stream;
-		const INT16 *	source;
-		INT32			source_length;
-		INT32			source_num;
-		UINT32			pos;
-		UINT32			frac;
-		UINT32			step;
-		UINT32			basefreq;
-		bool			loop;
-		bool			paused;
+		sound_stream *  stream;
+		const INT16 *   source;
+		INT32           source_length;
+		INT32           source_num;
+		UINT32          pos;
+		UINT32          frac;
+		UINT32          step;
+		UINT32          basefreq;
+		bool            loop;
+		bool            paused;
 	};
 
 	// internal helpers
@@ -150,8 +150,8 @@ private:
 	void load_samples();
 
 	// internal state
-	dynamic_array<channel_t>	m_channel;
-	dynamic_array<sample_t>		m_sample;
+	dynamic_array<channel_t>    m_channel;
+	dynamic_array<sample_t>     m_sample;
 
 	// internal constants
 	static const UINT8 FRAC_BITS = 24;
@@ -171,7 +171,7 @@ public:
 	// construction/destruction
 	samples_iterator(samples_interface &intf)
 		: m_intf(intf),
-		  m_current(-1) { }
+			m_current(-1) { }
 
 	// getters
 	const char *altbasename() const { return (m_intf.m_names != NULL && m_intf.m_names[0] != NULL && m_intf.m_names[0][0] == '*') ? &m_intf.m_names[0][1] : NULL; }
@@ -207,8 +207,8 @@ public:
 
 private:
 	// internal state
-	samples_interface &		m_intf;
-	int						m_current;
+	samples_interface &     m_intf;
+	int                     m_current;
 };
 
 

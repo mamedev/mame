@@ -10,11 +10,11 @@
 
 /* CPU reference numbers */
 
-#define CPU_MASTER	0
-#define CPU_SLAVE	1
-#define CPU_SOUND	2
-#define CPU_MCU 	3
-#define CPU_GPU 	5
+#define CPU_MASTER  0
+#define CPU_SLAVE   1
+#define CPU_SOUND   2
+#define CPU_MCU     3
+#define CPU_GPU     5
 
 
 /*********************************************/
@@ -94,12 +94,12 @@ class namcos2_shared_state : public driver_device
 public:
 	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_gametype(0),
-		  m_c169_roz_videoram(*this, "rozvideoram", 0),
-		  m_c169_roz_gfxbank(0),
-		  m_c169_roz_mask(NULL),
-		  m_c355_obj_gfxbank(0),
-		  m_c355_obj_palxor(0)
+			m_gametype(0),
+			m_c169_roz_videoram(*this, "rozvideoram", 0),
+			m_c169_roz_gfxbank(0),
+			m_c169_roz_mask(NULL),
+			m_c355_obj_gfxbank(0),
+			m_c355_obj_palxor(0)
 	{ }
 
 	// game type helpers
@@ -189,13 +189,13 @@ class namcos2_state : public namcos2_shared_state
 public:
 	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag),
-		  m_dpram(*this, "dpram"),
-		  m_paletteram(*this, "paletteram"),
-		  m_spriteram(*this, "spriteram"),
-		  m_serial_comms_ram(*this, "serialram"),
-		  m_rozram(*this, "rozram"),
-		  m_roz_ctrl(*this, "rozctrl"),
-		  m_c45_road(*this, "c45_road")
+			m_dpram(*this, "dpram"),
+			m_paletteram(*this, "paletteram"),
+			m_spriteram(*this, "spriteram"),
+			m_serial_comms_ram(*this, "serialram"),
+			m_rozram(*this, "rozram"),
+			m_roz_ctrl(*this, "rozctrl"),
+			m_c45_road(*this, "c45_road")
 	{ }
 	DECLARE_READ16_MEMBER(dpram_word_r);
 	DECLARE_WRITE16_MEMBER(dpram_word_w);
@@ -270,7 +270,7 @@ public:
 
 	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }
 
-	required_shared_ptr<UINT8> m_dpram;	/* 2Kx8 */
+	required_shared_ptr<UINT8> m_dpram; /* 2Kx8 */
 	required_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_serial_comms_ram;
@@ -306,8 +306,8 @@ DECLARE_READ16_HANDLER( namcos2_flap_prot_r );
 /**************************************************************/
 /*  EEPROM memory function handlers                           */
 /**************************************************************/
-#define NAMCOS2_68K_eeprom_W	namcos2_68k_eeprom_w
-#define NAMCOS2_68K_eeprom_R	namcos2_68k_eeprom_r
+#define NAMCOS2_68K_eeprom_W    namcos2_68k_eeprom_w
+#define NAMCOS2_68K_eeprom_R    namcos2_68k_eeprom_r
 DECLARE_WRITE16_HANDLER( namcos2_68k_eeprom_w );
 DECLARE_READ16_HANDLER( namcos2_68k_eeprom_r );
 
@@ -326,14 +326,14 @@ DECLARE_WRITE16_HANDLER( namcos2_68k_key_w );
 /* Non-shared memory custom IO device - IRQ/Inputs/Outputs   */
 /**************************************************************/
 
-#define NAMCOS2_C148_0			0		/* 0x1c0000 */
-#define NAMCOS2_C148_1			1		/* 0x1c2000 */
-#define NAMCOS2_C148_2			2		/* 0x1c4000 */
-#define NAMCOS2_C148_CPUIRQ 	3		/* 0x1c6000 */
-#define NAMCOS2_C148_EXIRQ		4		/* 0x1c8000 */
-#define NAMCOS2_C148_POSIRQ 	5		/* 0x1ca000 */
-#define NAMCOS2_C148_SERIRQ 	6		/* 0x1cc000 */
-#define NAMCOS2_C148_VBLANKIRQ	7		/* 0x1ce000 */
+#define NAMCOS2_C148_0          0       /* 0x1c0000 */
+#define NAMCOS2_C148_1          1       /* 0x1c2000 */
+#define NAMCOS2_C148_2          2       /* 0x1c4000 */
+#define NAMCOS2_C148_CPUIRQ     3       /* 0x1c6000 */
+#define NAMCOS2_C148_EXIRQ      4       /* 0x1c8000 */
+#define NAMCOS2_C148_POSIRQ     5       /* 0x1ca000 */
+#define NAMCOS2_C148_SERIRQ     6       /* 0x1cc000 */
+#define NAMCOS2_C148_VBLANKIRQ  7       /* 0x1ce000 */
 
 DECLARE_WRITE16_HANDLER( namcos2_68k_master_C148_w );
 DECLARE_READ16_HANDLER( namcos2_68k_master_C148_r );
@@ -350,18 +350,18 @@ void namcos2_adjust_posirq_timer( running_machine &machine, int scanline );
 /* MASTER CPU RAM MEMORY                                      */
 /**************************************************************/
 
-#define NAMCOS2_68K_MASTER_RAM	"bank3"
+#define NAMCOS2_68K_MASTER_RAM  "bank3"
 
 /**************************************************************/
 /* SLAVE CPU RAM MEMORY                                       */
 /**************************************************************/
 
-#define NAMCOS2_68K_SLAVE_RAM	"bank4"
+#define NAMCOS2_68K_SLAVE_RAM   "bank4"
 
 /**************************************************************/
 /*                                                            */
 /**************************************************************/
-#define BANKED_SOUND_ROM		"bank6"
+#define BANKED_SOUND_ROM        "bank6"
 
 /**************************************************************/
 /* Sound CPU support handlers - 6809                          */
@@ -385,4 +385,3 @@ DECLARE_READ8_HANDLER( namcos2_mcu_port_d_r );
 DECLARE_READ8_HANDLER( namcos2_input_port_0_r );
 DECLARE_READ8_HANDLER( namcos2_input_port_10_r );
 DECLARE_READ8_HANDLER( namcos2_input_port_12_r );
-

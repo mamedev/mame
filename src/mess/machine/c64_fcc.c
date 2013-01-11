@@ -15,7 +15,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define G65SC02P4_TAG	"g65sc02p4"
+#define G65SC02P4_TAG   "g65sc02p4"
 
 
 //**************************************************************************
@@ -163,7 +163,7 @@ void c64_final_chesscard_device::c64_cd_w(address_space &space, offs_t offset, U
 {
 	if (!io1)
 	{
-		 printf("IO1 %04x %02x\n", offset, data);
+			printf("IO1 %04x %02x\n", offset, data);
 		m_bank = data;
 	}
 

@@ -22,29 +22,29 @@ YMZ294: 0 I/O port
 
 /* Internal resistance at Volume level 7. */
 
-#define AY8910_INTERNAL_RESISTANCE	(356)
-#define YM2149_INTERNAL_RESISTANCE	(353)
+#define AY8910_INTERNAL_RESISTANCE  (356)
+#define YM2149_INTERNAL_RESISTANCE  (353)
 
 /*
  * Default values for resistor loads.
  * The macro should be used in AY8910interface if
  * the real values are unknown.
  */
-#define AY8910_DEFAULT_LOADS		{1000, 1000, 1000}
+#define AY8910_DEFAULT_LOADS        {1000, 1000, 1000}
 
 /*
  * The following is used by all drivers not reviewed yet.
  * This will like the old behaviour, output between
  * 0 and 7FFF
  */
-#define AY8910_LEGACY_OUTPUT		(0x01)
+#define AY8910_LEGACY_OUTPUT        (0x01)
 
 /*
  * Specifing the next define will simulate the special
  * cross channel mixing if outputs are tied together.
  * The driver will only provide one stream in this case.
  */
-#define AY8910_SINGLE_OUTPUT		(0x02)
+#define AY8910_SINGLE_OUTPUT        (0x02)
 
 /*
  * The following define is the default behaviour.
@@ -52,7 +52,7 @@ YMZ294: 0 I/O port
  * Use this to specify that a discrete mixing stage
  * follows.
  */
-#define AY8910_DISCRETE_OUTPUT		(0x04)
+#define AY8910_DISCRETE_OUTPUT      (0x04)
 
 /*
  * The following define causes the driver to output
@@ -62,7 +62,7 @@ YMZ294: 0 I/O port
  * AY-3-8910 together). Do not use it now.
  */
 /* TODO: implement mixing module */
-#define AY8910_RAW_OUTPUT			(0x08)
+#define AY8910_RAW_OUTPUT           (0x08)
 
 /*
  * This define specifies the initial state of YM2149
@@ -70,8 +70,8 @@ YMZ294: 0 I/O port
  * compatible with AY8910.
  */
 /* TODO: make it controllable while it's running (used by any hw???) */
-#define YM2149_PIN26_HIGH			(0x00) /* or N/C */
-#define YM2149_PIN26_LOW			(0x10)
+#define YM2149_PIN26_HIGH           (0x00) /* or N/C */
+#define YM2149_PIN26_LOW            (0x10)
 
 
 #define AY8910_INTERFACE(name) \
@@ -79,12 +79,12 @@ YMZ294: 0 I/O port
 
 struct ay8910_interface
 {
-	int					flags;			/* Flags */
-	int					res_load[3];	/* Load on channel in ohms */
-	devcb_read8			portAread;
-	devcb_read8			portBread;
-	devcb_write8		portAwrite;
-	devcb_write8		portBwrite;
+	int                 flags;          /* Flags */
+	int                 res_load[3];    /* Load on channel in ohms */
+	devcb_read8         portAread;
+	devcb_read8         portBread;
+	devcb_write8        portAwrite;
+	devcb_write8        portBwrite;
 };
 
 
@@ -119,7 +119,7 @@ void ay8910_write_ym(void *chip, int addr, int data);
 int ay8910_read_ym(void *chip);
 
 class ay8910_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

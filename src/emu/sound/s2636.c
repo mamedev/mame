@@ -10,10 +10,10 @@
 
 struct s2636_sound
 {
-    sound_stream *channel;
-    UINT8 reg[1];
-    int size, pos;
-    unsigned level;
+	sound_stream *channel;
+	UINT8 reg[1];
+	int size, pos;
+	unsigned level;
 };
 
 
@@ -78,14 +78,14 @@ static DEVICE_START(s2636_sound)
 {
 	s2636_sound *token = get_token(device);
 	memset(token, 0, sizeof(*token));
-    token->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, s2636_update);
+	token->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, s2636_update);
 }
 
 const device_type S2636_SOUND = &device_creator<s2636_sound_device>;
 
 s2636_sound_device::s2636_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S2636_SOUND, "S2636", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(s2636_sound);
 }
@@ -118,5 +118,3 @@ void s2636_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

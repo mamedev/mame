@@ -23,29 +23,29 @@ static const UINT8 kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x04,
 
 struct i4004_state
 {
-	UINT8	A; // Accumulator
-	UINT8	R[8];
-	PAIR	ADDR[4]; // Address registers
-	PAIR	RAM;
-	UINT8	C; // Carry flag
-	UINT8	TEST; // Test PIN status
-	PAIR	PC; // It is in fact one of ADDR regs
-	UINT8	flags; // used for I/O only
+	UINT8   A; // Accumulator
+	UINT8   R[8];
+	PAIR    ADDR[4]; // Address registers
+	PAIR    RAM;
+	UINT8   C; // Carry flag
+	UINT8   TEST; // Test PIN status
+	PAIR    PC; // It is in fact one of ADDR regs
+	UINT8   flags; // used for I/O only
 
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
 	address_space *data;
 	address_space *io;
-	int					icount;
-	int 				pc_pos; // PC possition in ADDR
-	int					addr_mask;
+	int                 icount;
+	int                 pc_pos; // PC possition in ADDR
+	int                 addr_mask;
 };
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
-#define GET_PC					(cpustate->ADDR[cpustate->pc_pos])
+#define GET_PC                  (cpustate->ADDR[cpustate->pc_pos])
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -165,7 +165,7 @@ static void execute_one(i4004_state *cpustate, int opcode)
 	cpustate->icount -= 8;
 	switch (opcode)
 	{
-		case 0x00:	/* NOP  */
+		case 0x00:  /* NOP  */
 			/* no op */
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -288,9 +288,9 @@ static void execute_one(i4004_state *cpustate, int opcode)
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
 		case 0xcc: case 0xcd: case 0xce: case 0xcf: /*  BBL */
-		    POP_STACK(cpustate);
-		    cpustate->A = opcode & 0x0f;
-		    cpustate->PC = GET_PC;
+			POP_STACK(cpustate);
+			cpustate->A = opcode & 0x0f;
+			cpustate->PC = GET_PC;
 			break;
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
@@ -535,8 +535,8 @@ static CPU_EXPORT_STATE( i4004 )
 	{
 		case STATE_GENFLAGS:
 			cpustate->flags = ((cpustate->A == 0) ? 0x04 : 0x00) |
-							  (cpustate->C ? 0x02 : 0x00) |
-							  (cpustate->TEST ? 0x01 : 0x00);
+								(cpustate->C ? 0x02 : 0x00) |
+								(cpustate->TEST ? 0x01 : 0x00);
 			break;
 	}
 }
@@ -573,50 +573,50 @@ CPU_GET_INFO( i4004 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(i4004_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 8;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(i4004_state);          break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 0;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 8;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 16;                           break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 12;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 0;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 12;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break; // Only lower 4 bits used
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 6;							break; // 4 I/O for each ROM chip and 4 OUT for each RAM
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break; // There could be 4 chips in 16 banks for RAM
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                            break; // Only lower 4 bits used
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 6;                            break; // 4 I/O for each ROM chip and 4 OUT for each RAM
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break; // There could be 4 chips in 16 banks for RAM
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i4004);				break;
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(i4004);						break;
-		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(i4004);					break;
-		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(i4004);				break;
-		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(i4004);		break;
-		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(i4004);		break;
-		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(i4004);		break;
-		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(i4004);	break;
+		case CPUINFO_FCT_SET_INFO:      info->setinfo = CPU_SET_INFO_NAME(i4004);               break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(i4004);                      break;
+		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(i4004);                    break;
+		case CPUINFO_FCT_EXECUTE:       info->execute = CPU_EXECUTE_NAME(i4004);                break;
+		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(i4004);        break;
+		case CPUINFO_FCT_IMPORT_STATE:  info->import_state = CPU_IMPORT_STATE_NAME(i4004);      break;
+		case CPUINFO_FCT_EXPORT_STATE:  info->export_state = CPU_EXPORT_STATE_NAME(i4004);      break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(i4004);    break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;       break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "4004");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Intel 4004");			break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
+		case CPUINFO_STR_NAME:                      strcpy(info->s, "4004");                break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Intel 4004");          break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
+		case CPUINFO_STR_SOURCE_FILE:               strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Miodrag Milanovic"); break;
 
-		case CPUINFO_IS_OCTAL:						info->i = true;							break;
+		case CPUINFO_IS_OCTAL:                      info->i = true;                         break;
 	}
 }
 

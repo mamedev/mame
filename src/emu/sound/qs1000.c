@@ -127,7 +127,7 @@
 #include "qs1000.h"
 
 
-#define LOGGING_ENABLED		0
+#define LOGGING_ENABLED     0
 
 
 // device type definition
@@ -184,12 +184,12 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, QS1000, "QS1000", "qs1000", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
-	  m_stream(NULL),
-	  m_direct(NULL),
-	  m_cpu(*this, "cpu")
+		device_sound_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
+		m_stream(NULL),
+		m_direct(NULL),
+		m_cpu(*this, "cpu")
 {
 	m_shortname = "qs1000";
 	m_address_map[0] = *ADDRESS_MAP_NAME(qs1000);

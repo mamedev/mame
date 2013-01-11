@@ -74,4 +74,4 @@ protected:
 };
 
 
-#endif	/* __DIRTC_H__ */
+#endif  /* __DIRTC_H__ */

@@ -15,10 +15,10 @@ class by133_state : public driver_device
 public:
 	by133_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_videocpu(*this, "videocpu"),
-		  m_audiocpu(*this, "audiocpu"),
-		  m_videopia(*this, "videopia")
+			m_maincpu(*this, "maincpu"),
+			m_videocpu(*this, "videocpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_videopia(*this, "videopia")
 	{ }
 
 	// devices
@@ -140,18 +140,18 @@ WRITE8_MEMBER(by133_state::by133_portb_w)
 
 static const pia6821_interface videopia_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_r),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_cb2),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_r),     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_cb2),        /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq)        /* IRQB */
 };
 
 

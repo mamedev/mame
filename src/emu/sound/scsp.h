@@ -11,8 +11,8 @@
 
 struct scsp_interface
 {
-	int roffset;				/* offset in the region */
-	void (*irq_callback)(device_t *device, int state);	/* irq callback */
+	int roffset;                /* offset in the region */
+	void (*irq_callback)(device_t *device, int state);  /* irq callback */
 	devcb_write_line   main_irq;
 };
 
@@ -29,7 +29,7 @@ DECLARE_READ16_DEVICE_HANDLER( scsp_midi_out_r );
 extern UINT32* stv_scu;
 
 class scsp_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

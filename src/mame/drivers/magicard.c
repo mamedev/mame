@@ -158,9 +158,9 @@
 *******************************************************************************/
 
 
-#define CLOCK_A	XTAL_30MHz
-#define CLOCK_B	XTAL_8MHz
-#define CLOCK_C	XTAL_19_6608MHz
+#define CLOCK_A XTAL_30MHz
+#define CLOCK_B XTAL_8MHz
+#define CLOCK_C XTAL_19_6608MHz
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -254,7 +254,7 @@ TODO: check this register,doesn't seem to be 100% correct.
 
 /*63 at post test,6d all the time.*/
 #define SCC_CSR_VREG    (state->m_pcab_vregs[0x00/2] & 0xffff)
-#define SCC_CG_VREG		((SCC_CSR_VREG & 0x10)>>4)
+#define SCC_CG_VREG     ((SCC_CSR_VREG & 0x10)>>4)
 
 /*
 1fffe2  dcr = display command register
@@ -280,8 +280,8 @@ TODO: check this register,doesn't seem to be 100% correct.
 */
 
 #define SCC_DCR_VREG    (state->m_pcab_vregs[0x02/2] & 0xffff)
-#define SCC_DE_VREG		((SCC_DCR_VREG & 0x8000)>>15)
-#define SCC_FG_VREG		((SCC_DCR_VREG & 0x0080)>>7)
+#define SCC_DE_VREG     ((SCC_DCR_VREG & 0x8000)>>15)
+#define SCC_FG_VREG     ((SCC_DCR_VREG & 0x0080)>>7)
 #define SCC_VSR_VREG_H  ((SCC_DCR_VREG & 0xf)>>0)
 
 /*
@@ -718,7 +718,7 @@ INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 }
 
 static MACHINE_CONFIG_START( magicard, magicard_state )
-	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
+	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)    /* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state,  magicard_irq) /* no interrupts? (it erases the vectors..) */
 
@@ -748,7 +748,7 @@ ROM_START( magicard )
 	ROM_LOAD16_WORD_SWAP( "magicorg.bin", 0x000000, 0x80000, CRC(810edf9f) SHA1(0f1638a789a4be7413aa019b4e198353ba9c12d9) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
-	ROM_LOAD16_WORD_SWAP("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
+	ROM_LOAD16_WORD_SWAP("mgorigee.bin",    0x0000, 0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
 ROM_START( magicarda )
@@ -759,7 +759,7 @@ ROM_START( magicarda )
 	ROM_RELOAD(                           0x40001, 0x20000 )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
-	ROM_LOAD("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
+	ROM_LOAD("mgorigee.bin",    0x0000, 0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
 ROM_START( magicardb )
@@ -768,7 +768,7 @@ ROM_START( magicardb )
 
 	/*bigger than the other sets?*/
 	ROM_REGION( 0x20000, "other", 0 ) /* unknown */
-	ROM_LOAD16_WORD_SWAP("mg_u3.bin",	0x00000,	0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
+	ROM_LOAD16_WORD_SWAP("mg_u3.bin",   0x00000,    0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
 ROM_END
 
 ROM_START( magicardj )
@@ -776,13 +776,13 @@ ROM_START( magicardj )
 	ROM_LOAD16_WORD_SWAP( "27c4002(__magicardj).ic21", 0x00000, 0x80000, CRC(ab2ed583) SHA1(a2d7148b785a8dfce8cff3b15ada293d65561c98) )
 
 	ROM_REGION( 0x0100, "pic16f84", 0 ) /* protected */
-	ROM_LOAD("pic16f84.ic29",	0x0000, 0x0100, BAD_DUMP CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) )
+	ROM_LOAD("pic16f84.ic29",   0x0000, 0x0100, BAD_DUMP CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) )
 
 	ROM_REGION( 0x200000, "other", 0 ) /* unknown contents */
-	ROM_LOAD("29f1610mc.ic30",	0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
-	ROM_LOAD("24c02c.ic26",	0x0000, 0x0100, CRC(b5c86862) SHA1(0debc0f7e7c506e5a4e2cae152548d80ad72fc2e) )
+	ROM_LOAD("24c02c.ic26", 0x0000, 0x0100, CRC(b5c86862) SHA1(0debc0f7e7c506e5a4e2cae152548d80ad72fc2e) )
 ROM_END
 
 /*
@@ -810,10 +810,10 @@ ROM_START( magicarde )
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
 
 	ROM_REGION( 0x0200, "pic16c54", 0 ) /* protected */
-	ROM_LOAD("pic16c54.ic29",	0x0000, 0x0200, BAD_DUMP CRC(73224200) SHA1(c9a1038146647430759d570bb5626047a476a05b) )
+	ROM_LOAD("pic16c54.ic29",   0x0000, 0x0200, BAD_DUMP CRC(73224200) SHA1(c9a1038146647430759d570bb5626047a476a05b) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
-	ROM_LOAD("st24c02.ic26",	0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
 ROM_END
 
 ROM_START( magicle )
@@ -821,13 +821,13 @@ ROM_START( magicle )
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(73328346) SHA1(fca5f8a93f25377e659c2b291674d706ca37400e) )
 
 	ROM_REGION( 0x0100, "pic16f84", 0 ) /* protected */
-	ROM_LOAD("pic16f84.ic29",	0x0000, 0x0100, BAD_DUMP CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) )
+	ROM_LOAD("pic16f84.ic29",   0x0000, 0x0100, BAD_DUMP CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) )
 
 	ROM_REGION( 0x200000, "other", 0 ) /* unknown contents */
-	ROM_LOAD("29f1610mc.ic30",	0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
-	ROM_LOAD("24c04a.ic26",	0x0000, 0x0200, CRC(48c4f473) SHA1(5355313cc96f655096e13bfae78be3ba2dfe8a2d) )
+	ROM_LOAD("24c04a.ic26", 0x0000, 0x0200, CRC(48c4f473) SHA1(5355313cc96f655096e13bfae78be3ba2dfe8a2d) )
 ROM_END
 
 

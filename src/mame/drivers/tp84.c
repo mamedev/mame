@@ -96,24 +96,24 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 
 	/* 76489 #0 */
 	C = 0;
-	if (offset & 0x008) C +=  47000;	/*  47000pF = 0.047uF */
-	if (offset & 0x010) C += 470000;	/* 470000pF = 0.47uF */
+	if (offset & 0x008) C +=  47000;    /*  47000pF = 0.047uF */
+	if (offset & 0x010) C += 470000;    /* 470000pF = 0.47uF */
 	filter_rc_set_RC(machine().device("filter1"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
-	if (offset & 0x020) C +=  47000;	/*  47000pF = 0.047uF */
-	if (offset & 0x040) C += 470000;	/* 470000pF = 0.47uF */
+	if (offset & 0x020) C +=  47000;    /*  47000pF = 0.047uF */
+	if (offset & 0x040) C += 470000;    /* 470000pF = 0.47uF */
 //  filter_rc_set_RC(machine().device("filter2"),1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;
-	if (offset & 0x080) C += 470000;	/* 470000pF = 0.47uF */
+	if (offset & 0x080) C += 470000;    /* 470000pF = 0.47uF */
 	filter_rc_set_RC(machine().device("filter2"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
-	if (offset & 0x100) C += 470000;	/* 470000pF = 0.47uF */
+	if (offset & 0x100) C += 470000;    /* 470000pF = 0.47uF */
 	filter_rc_set_RC(machine().device("filter3"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
@@ -214,25 +214,25 @@ static INPUT_PORTS_START( tp84 )
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "10000 and every 50000" )
 	PORT_DIPSETTING(    0x10, "20000 and every 60000" )
 	PORT_DIPSETTING(    0x08, "30000 and every 70000" )
 	PORT_DIPSETTING(    0x00, "40000 and every 80000" )
-	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // JP default
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )   // US default
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -241,7 +241,7 @@ static INPUT_PORTS_START( tp84a )
 	PORT_INCLUDE( tp84 )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -299,7 +299,7 @@ INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -310,14 +310,14 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 
@@ -374,10 +374,10 @@ ROM_START( tp84 )
 	ROM_LOAD( "388_f06.9j",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
 	ROM_LOAD( "388_07.10j",  0xe000, 0x2000, CRC(a45237c4) SHA1(896e31c59aedf1c7e73e6f30fbe78cc020b457ab) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "388_f08.10d", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) ) /* E08? */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for code of sound cpu Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for code of sound cpu Z80 */
 	ROM_LOAD( "388j13.6a",   0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -405,10 +405,10 @@ ROM_START( tp84a )
 	ROM_LOAD( "388_f06.9j",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
 	ROM_LOAD( "388_f07.10j", 0xe000, 0x2000, CRC(8fbdb4ef) SHA1(e615c4d9964ab00f6776147c54925b4b6100b360) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "388_f08.10d", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) ) /* E08? */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for code of sound cpu Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for code of sound cpu Z80 */
 	ROM_LOAD( "388j13.6a",   0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -435,10 +435,10 @@ ROM_START( tp84b )
 	ROM_LOAD( "388j05.8j",   0x8000, 0x4000, CRC(a59e2fda) SHA1(7d776d5d3fcfbe81d42580cfe93614dc4618a440) )
 	ROM_LOAD( "388j07.10j",  0xc000, 0x4000, CRC(d25d18e6) SHA1(043f515cc66f6af004be81d6a6b5a92b553107ff) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "388j08.10d", 0xe000, 0x2000, CRC(2aea6b42) SHA1(58c3b4852f22a766f440b98904b73c00a31eae01) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for code of sound cpu Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for code of sound cpu Z80 */
 	ROM_LOAD( "388j13.6a", 0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )

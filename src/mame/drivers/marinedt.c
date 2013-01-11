@@ -317,15 +317,15 @@ WRITE8_MEMBER(marinedt_state::marinedt_pf_w)
 static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4400, 0x47ff) AM_RAM				//unused, vram mirror?
+	AM_RANGE(0x4400, 0x47ff) AM_RAM             //unused, vram mirror?
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(tx_tileram_w) AM_SHARE("tx_tileram")
-	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
+	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP    //?? maybe off by one error
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marinedt_io_map, AS_IO, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW0")		//dips coinage
-	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)	//trackball xy muxed
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW0")       //dips coinage
+	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)  //trackball xy muxed
 	AM_RANGE(0x02, 0x02) AM_READWRITE(marinedt_obj1_x_r, marinedt_obj1_a_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN0") AM_WRITE(marinedt_obj1_x_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE(marinedt_obj1_y_w)
@@ -392,7 +392,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x01, "5000" )
 	PORT_DIPSETTING(    0x00, "10000" )
 //cheat?
-	PORT_DIPNAME( 0x02, 0x00, "ignore internal bounce?" )	//maybe die/bounce of rocks/coral?
+	PORT_DIPNAME( 0x02, 0x00, "ignore internal bounce?" )   //maybe die/bounce of rocks/coral?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 //freezes the game before the reset
@@ -413,11 +413,11 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0xc0, "6" )
 
-	PORT_START("TRACKX")	/* FAKE MUXED */
+	PORT_START("TRACKX")    /* FAKE MUXED */
 //check all bits are used
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("TRACKY")	/* FAKE MUXED */
+	PORT_START("TRACKY")    /* FAKE MUXED */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -426,7 +426,7 @@ static const gfx_layout marinedt_charlayout =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },	//maybe 120
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },    //maybe 120
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
 	8*8
@@ -444,7 +444,7 @@ static const gfx_layout marinedt_objlayout =
 };
 
 static GFXDECODE_START( marinedt )
-	GFXDECODE_ENTRY( "gfx1", 0, marinedt_charlayout, 0,  4 )	//really only 1 colour set?
+	GFXDECODE_ENTRY( "gfx1", 0, marinedt_charlayout, 0,  4 )    //really only 1 colour set?
 	GFXDECODE_ENTRY( "gfx2", 0, marinedt_objlayout,  48, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, marinedt_objlayout,  32, 4 )
 GFXDECODE_END
@@ -512,12 +512,12 @@ void marinedt_state::video_start()
 // -----x-- bank
 // ------xx colour
 
-#define OBJ_CODE(a)	((((a) & 0x04) << 1) + (((a) & 0x38) >> 3))
-#define OBJ_COLOR(a)	((a) & 0x03)
-#define OBJ_X(x)	(256 - 32 - (x))
-#define OBJ_Y(y)	(256 - 1 - (y))
-#define OBJ_FLIPX(a)	((m_pf & 0x02) == 0)
-#define OBJ_FLIPY(a)	((a) & 0x80)
+#define OBJ_CODE(a) ((((a) & 0x04) << 1) + (((a) & 0x38) >> 3))
+#define OBJ_COLOR(a)    ((a) & 0x03)
+#define OBJ_X(x)    (256 - 32 - (x))
+#define OBJ_Y(y)    (256 - 1 - (y))
+#define OBJ_FLIPX(a)    ((m_pf & 0x02) == 0)
+#define OBJ_FLIPY(a)    ((a) & 0x80)
 
 UINT32 marinedt_state::screen_update_marinedt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -721,10 +721,10 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg13",     0x0000, 0x1000, CRC(17817044) SHA1(8c9b96620e3c414952e6d85c6e81b0df85c88e7a) )
 
 	ROM_REGION( 0x0080, "proms", 0 )
-	ROM_LOAD( "mg14.bpr", 0x0000, 0x0020, CRC(f75f4e3a) SHA1(36e665987f475c57435fa8c224a2a3ce0c5e672b) )	//char clr
-	ROM_LOAD( "mg15.bpr", 0x0020, 0x0020, CRC(cd3ab489) SHA1(a77478fb94d0cf8f4317f89cc9579def7c294b4f) )	//obj clr
-	ROM_LOAD( "mg16.bpr", 0x0040, 0x0020, CRC(92c868bc) SHA1(483ae6f47845ddacb701528e82bd388d7d66a0fb) )	//?? collisions
-	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) )	//?? table of increasing values
+	ROM_LOAD( "mg14.bpr", 0x0000, 0x0020, CRC(f75f4e3a) SHA1(36e665987f475c57435fa8c224a2a3ce0c5e672b) )    //char clr
+	ROM_LOAD( "mg15.bpr", 0x0020, 0x0020, CRC(cd3ab489) SHA1(a77478fb94d0cf8f4317f89cc9579def7c294b4f) )    //obj clr
+	ROM_LOAD( "mg16.bpr", 0x0040, 0x0020, CRC(92c868bc) SHA1(483ae6f47845ddacb701528e82bd388d7d66a0fb) )    //?? collisions
+	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) )    //?? table of increasing values
 ROM_END
 
 GAME( 1981, marinedt, 0, marinedt, marinedt, driver_device, 0, ROT270, "Taito", "Marine Date", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

@@ -52,11 +52,11 @@ class d6800_state : public driver_device
 public:
 	d6800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_cass(*this, CASSETTE_TAG),
-		  m_pia(*this, "pia"),
-		  m_dac(*this, "dac"),
-		  m_videoram(*this, "videoram") { }
+			m_maincpu(*this, "maincpu"),
+			m_cass(*this, CASSETTE_TAG),
+			m_pia(*this, "pia"),
+			m_dac(*this, "dac"),
+			m_videoram(*this, "videoram") { }
 
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
@@ -199,9 +199,9 @@ READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
 	UINT8 data = ioport("X0")->read()
-	           & ioport("X1")->read()
-	           & ioport("X2")->read()
-	           & ioport("X3")->read();
+				& ioport("X1")->read()
+				& ioport("X2")->read()
+				& ioport("X3")->read();
 
 	m_kbd_s = (data == 15) ? 0 : 1;
 
@@ -221,11 +221,11 @@ WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 READ8_MEMBER( d6800_state::d6800_cassette_r )
 {
 	/*
-    Cassette circuit consists of a 741 op-amp, a 74121 oneshot, and a 74LS74.
-    When a pulse arrives, the oneshot is set. After a preset time, it triggers
-    and the 74LS74 compares this pulse to the output of the 741. Therefore it
-    knows if the tone is 1200 or 2400 Hz. Input to PIA is bit 7.
-    */
+	Cassette circuit consists of a 741 op-amp, a 74121 oneshot, and a 74LS74.
+	When a pulse arrives, the oneshot is set. After a preset time, it triggers
+	and the 74LS74 compares this pulse to the output of the 741. Therefore it
+	knows if the tone is 1200 or 2400 Hz. Input to PIA is bit 7.
+	*/
 
 	return ((m_cass->input() > 0.03) ? 1 : 0) | m_portb;
 }
@@ -233,10 +233,10 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 {
 	/*
-    Cassette circuit consists of a 566 and a transistor. The 556 runs at 2400
-    or 1200 Hz depending on the state of the transistor. This is controlled by
-    bit 0 of the PIA. Bit 6 drives the speaker.
-    */
+	Cassette circuit consists of a 566 and a transistor. The 556 runs at 2400
+	or 1200 Hz depending on the state of the transistor. This is controlled by
+	bit 0 of the PIA. Bit 6 drives the speaker.
+	*/
 
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 
@@ -247,9 +247,9 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 READ8_MEMBER( d6800_state::d6800_keyboard_r )
 {
 	/*
-    This system reads the key matrix one way, then swaps the input and output
-    lines around and reads it another way. This isolates the key that was pressed.
-    */
+	This system reads the key matrix one way, then swaps the input and output
+	lines around and reads it another way. This isolates the key that was pressed.
+	*/
 
 	m_kbd_s++;
 
@@ -266,35 +266,35 @@ WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     keyboard column 0
-        PA1     keyboard column 1
-        PA2     keyboard column 2
-        PA3     keyboard column 3
-        PA4     keyboard row 0
-        PA5     keyboard row 1
-        PA6     keyboard row 2
-        PA7     keyboard row 3
+	    PA0     keyboard column 0
+	    PA1     keyboard column 1
+	    PA2     keyboard column 2
+	    PA3     keyboard column 3
+	    PA4     keyboard row 0
+	    PA5     keyboard row 1
+	    PA6     keyboard row 2
+	    PA7     keyboard row 3
 
-    */
+	*/
 
 }
 
 static const pia6821_interface d6800_mc6821_intf =
 {
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_r),	/* port A input */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_r),	/* port B input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_keydown_r),	/* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_rtc_pulse),	/* CB1 input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_fn_key_r),	/* CA2 input */
-	DEVCB_NULL,						/* CB2 input */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_w),	/* port A output */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_w),	/* port B output */
-	DEVCB_NULL,						/* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_screen_w),	/* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),	/* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB output */
+	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_r), /* port A input */
+	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_r), /* port B input */
+	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_keydown_r), /* CA1 input */
+	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_rtc_pulse), /* CB1 input */
+	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_fn_key_r),  /* CA2 input */
+	DEVCB_NULL,                     /* CB2 input */
+	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_w), /* port A output */
+	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_w), /* port B output */
+	DEVCB_NULL,                     /* CA2 output */
+	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_screen_w),  /* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
 };
 
 /* Machine Initialization */

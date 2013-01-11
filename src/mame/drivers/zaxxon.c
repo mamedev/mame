@@ -268,18 +268,18 @@
  *
  *************************************/
 
-#define MASTER_CLOCK		XTAL_48_66MHz
-#define SOUND_CLOCK			XTAL_4MHz
+#define MASTER_CLOCK        XTAL_48_66MHz
+#define SOUND_CLOCK         XTAL_4MHz
 
-#define PIXEL_CLOCK			(MASTER_CLOCK/8)
+#define PIXEL_CLOCK         (MASTER_CLOCK/8)
 
-#define HTOTAL				(384)
-#define HBEND				(0)
-#define HBSTART				(256)
+#define HTOTAL              (384)
+#define HBEND               (0)
+#define HBSTART             (256)
 
-#define VTOTAL				(264)
-#define VBEND				(16)
-#define VBSTART				(240)
+#define VTOTAL              (264)
+#define VBEND               (16)
+#define VBSTART             (240)
 
 
 
@@ -630,7 +630,7 @@ static INPUT_PORTS_START( futspy )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("DSW02")
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR ( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR ( Coin_A ) )      PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR ( 4C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR ( 3C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR ( 2C_1C ) )
@@ -647,7 +647,7 @@ static INPUT_PORTS_START( futspy )
 	PORT_DIPSETTING(    0x03, DEF_STR ( 1C_4C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR ( 1C_5C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR ( 1C_6C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR ( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR ( Coin_B ) )      PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR ( 4C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR ( 3C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR ( 2C_1C ) )
@@ -666,23 +666,23 @@ static INPUT_PORTS_START( futspy )
 	PORT_DIPSETTING(    0x50, DEF_STR ( 1C_6C ) )
 
 	PORT_MODIFY("DSW03")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "20K 40K 60K" )
 	PORT_DIPSETTING(    0x10, "30K 60K 90K" )
 	PORT_DIPSETTING(    0x20, "40K 70K 100K" )
 	PORT_DIPSETTING(    0x30, "40K 80K 120K" )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
@@ -883,22 +883,22 @@ INPUT_PORTS_END
 
 static I8255A_INTERFACE( zaxxon_ppi_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_a_w),	/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_b_w),	/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_c_w)		/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_a_w),    /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_b_w),    /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, zaxxon_sound_c_w)     /* Port C write */
 };
 
 static I8255A_INTERFACE( congo_ppi_intf )
 {
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),	/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_b_w),	/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_c_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),  /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_b_w), /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_DRIVER_MEMBER(zaxxon_state, congo_sound_c_w)  /* Port C write */
 };
 
 
@@ -927,9 +927,9 @@ static const gfx_layout zaxxon_spritelayout =
 
 
 static GFXDECODE_START( zaxxon )
-	GFXDECODE_ENTRY( "gfx_tx", 0, gfx_8x8x2_planar,	 0, 64*2 )	/* characters */
-	GFXDECODE_ENTRY( "gfx_bg", 0, gfx_8x8x3_planar,	 0, 32*2 )	/* background tiles */
-	GFXDECODE_ENTRY( "gfx_spr", 0, zaxxon_spritelayout,  0, 32*2 )	/* sprites */
+	GFXDECODE_ENTRY( "gfx_tx", 0, gfx_8x8x2_planar,  0, 64*2 )  /* characters */
+	GFXDECODE_ENTRY( "gfx_bg", 0, gfx_8x8x3_planar,  0, 32*2 )  /* background tiles */
+	GFXDECODE_ENTRY( "gfx_spr", 0, zaxxon_spritelayout,  0, 32*2 )  /* sprites */
 GFXDECODE_END
 
 
@@ -946,7 +946,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -1505,20 +1505,20 @@ static void zaxxonj_decode(running_machine &machine, const char *cputag)
 */
 	static const UINT8 data_xortable[2][8] =
 	{
-		{ 0x0a,0x0a,0x22,0x22,0xaa,0xaa,0x82,0x82 },	/* ...............0 */
-		{ 0xa0,0xaa,0x28,0x22,0xa0,0xaa,0x28,0x22 },	/* ...............1 */
+		{ 0x0a,0x0a,0x22,0x22,0xaa,0xaa,0x82,0x82 },    /* ...............0 */
+		{ 0xa0,0xaa,0x28,0x22,0xa0,0xaa,0x28,0x22 },    /* ...............1 */
 	};
 
 	static const UINT8 opcode_xortable[8][8] =
 	{
-		{ 0x8a,0x8a,0x02,0x02,0x8a,0x8a,0x02,0x02 },	/* .......0...0...0 */
-		{ 0x80,0x80,0x08,0x08,0xa8,0xa8,0x20,0x20 },	/* .......0...0...1 */
-		{ 0x8a,0x8a,0x02,0x02,0x8a,0x8a,0x02,0x02 },	/* .......0...1...0 */
-		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 },	/* .......0...1...1 */
-		{ 0x88,0x0a,0x88,0x0a,0xaa,0x28,0xaa,0x28 },	/* .......1...0...0 */
-		{ 0x80,0x80,0x08,0x08,0xa8,0xa8,0x20,0x20 },	/* .......1...0...1 */
-		{ 0x88,0x0a,0x88,0x0a,0xaa,0x28,0xaa,0x28 },	/* .......1...1...0 */
-		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 } 	/* .......1...1...1 */
+		{ 0x8a,0x8a,0x02,0x02,0x8a,0x8a,0x02,0x02 },    /* .......0...0...0 */
+		{ 0x80,0x80,0x08,0x08,0xa8,0xa8,0x20,0x20 },    /* .......0...0...1 */
+		{ 0x8a,0x8a,0x02,0x02,0x8a,0x8a,0x02,0x02 },    /* .......0...1...0 */
+		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 },    /* .......0...1...1 */
+		{ 0x88,0x0a,0x88,0x0a,0xaa,0x28,0xaa,0x28 },    /* .......1...0...0 */
+		{ 0x80,0x80,0x08,0x08,0xa8,0xa8,0x20,0x20 },    /* .......1...0...1 */
+		{ 0x88,0x0a,0x88,0x0a,0xaa,0x28,0xaa,0x28 },    /* .......1...1...0 */
+		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 }     /* .......1...1...1 */
 	};
 
 	int A;

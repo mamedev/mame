@@ -41,13 +41,13 @@
 //**************************************************************************
 
 // keep statistics
-#define KEEP_STATISTICS					0
+#define KEEP_STATISTICS                 0
 
 // turn this on to log the reasons for any long waits
-#define LOG_WAITS						0
+#define LOG_WAITS                       0
 
 // number of profiling ticks before we consider a wait "long"
-#define LOG_WAIT_THRESHOLD				1000
+#define LOG_WAIT_THRESHOLD              1000
 
 
 
@@ -55,14 +55,14 @@
     CONSTANTS
 ***************************************************************************/
 
-#define POLYFLAG_INCLUDE_BOTTOM_EDGE		0x01
-#define POLYFLAG_INCLUDE_RIGHT_EDGE			0x02
-#define POLYFLAG_NO_WORK_QUEUE				0x04
+#define POLYFLAG_INCLUDE_BOTTOM_EDGE        0x01
+#define POLYFLAG_INCLUDE_RIGHT_EDGE         0x02
+#define POLYFLAG_NO_WORK_QUEUE              0x04
 
-#define SCANLINES_PER_BUCKET				8
-#define CACHE_LINE_SIZE						64			// this is a general guess
-#define TOTAL_BUCKETS						(512 / SCANLINES_PER_BUCKET)
-#define UNITS_PER_POLY						(100 / SCANLINES_PER_BUCKET)
+#define SCANLINES_PER_BUCKET                8
+#define CACHE_LINE_SIZE                     64          // this is a general guess
+#define TOTAL_BUCKETS                       (512 / SCANLINES_PER_BUCKET)
+#define UNITS_PER_POLY                      (100 / SCANLINES_PER_BUCKET)
 
 
 
@@ -99,20 +99,20 @@ public:
 		vertex_t() { }
 		vertex_t(_BaseType _x, _BaseType _y) { x = _x; y = _y; }
 
-		_BaseType x, y;							// X, Y coordinates
-		_BaseType p[_MaxParams];				// interpolated parameters
+		_BaseType x, y;                         // X, Y coordinates
+		_BaseType p[_MaxParams];                // interpolated parameters
 	};
 
 	// a single extent describes a span and a list of parameter extents
 	struct extent_t
 	{
-		INT16 startx, stopx;					// starting (inclusive)/ending (exclusive) endpoints
+		INT16 startx, stopx;                    // starting (inclusive)/ending (exclusive) endpoints
 		struct
 		{
-			_BaseType start;					// parameter value at start
-			_BaseType dpdx;						// dp/dx relative to start
+			_BaseType start;                    // parameter value at start
+			_BaseType dpdx;                     // dp/dx relative to start
 		} param[_MaxParams];
-		void *userdata;							// custom per-span data
+		void *userdata;                         // custom per-span data
 	};
 
 	// delegate type for scanline callbacks
@@ -152,22 +152,22 @@ private:
 	// polygon_info describes a single polygon, which includes the poly_params
 	struct polygon_info
 	{
-		poly_manager *		m_owner;				// pointer back to the poly manager
-		_ObjectData *		m_object;				// object data pointer
-		render_delegate 	m_callback;				// callback to handle a scanline's worth of work
+		poly_manager *      m_owner;                // pointer back to the poly manager
+		_ObjectData *       m_object;               // object data pointer
+		render_delegate     m_callback;             // callback to handle a scanline's worth of work
 	};
 
 	// internal unit of work
 	struct work_unit
 	{
-		volatile UINT32		count_next;				// number of scanlines and index of next item to process
-		polygon_info *		polygon;				// pointer to polygon
-		INT16				scanline;				// starting scanline
-		UINT16				previtem;				// index of previous item in the same bucket
+		volatile UINT32     count_next;             // number of scanlines and index of next item to process
+		polygon_info *      polygon;                // pointer to polygon
+		INT16               scanline;               // starting scanline
+		UINT16              previtem;               // index of previous item in the same bucket
 	#ifndef PTR64
-		UINT32				dummy;					// pad to 16 bytes
+		UINT32              dummy;                  // pad to 16 bytes
 	#endif
-		extent_t			extent[SCANLINES_PER_BUCKET]; // array of scanline extents
+		extent_t            extent[SCANLINES_PER_BUCKET]; // array of scanline extents
 	};
 
 	// class for managing an array of items
@@ -181,10 +181,10 @@ private:
 		// construction
 		poly_array(running_machine &machine, poly_manager &manager)
 			: m_manager(manager),
-			  m_base(auto_alloc_array_clear(machine, UINT8, k_itemsize * _Count)),
-			  m_next(0),
-			  m_max(0),
-			  m_waits(0) { }
+				m_base(auto_alloc_array_clear(machine, UINT8, k_itemsize * _Count)),
+				m_next(0),
+				m_max(0),
+				m_waits(0) { }
 
 		// destruction
 		~poly_array() { auto_free(m_manager.machine(), m_base); }
@@ -208,11 +208,11 @@ private:
 
 	private:
 		// internal state
-		poly_manager &		m_manager;
-		UINT8 *				m_base;
-		int					m_next;
-		int					m_max;
-		int					m_waits;
+		poly_manager &      m_manager;
+		UINT8 *             m_base;
+		int                 m_next;
+		int                 m_max;
+		int                 m_waits;
 	};
 
 	// internal array types
@@ -246,28 +246,28 @@ private:
 	void presave() { wait("pre-save"); }
 
 	// queue management
-	running_machine &	m_machine;
-	osd_work_queue *	m_queue;					// work queue
+	running_machine &   m_machine;
+	osd_work_queue *    m_queue;                    // work queue
 
 	// arrays
-	polygon_array		m_polygon;					// array of polygons
-	objectdata_array	m_object;					// array of object data
-	unit_array			m_unit; 					// array of work units
+	polygon_array       m_polygon;                  // array of polygons
+	objectdata_array    m_object;                   // array of object data
+	unit_array          m_unit;                     // array of work units
 
 	// misc data
-	UINT8				m_flags;					// flags
+	UINT8               m_flags;                    // flags
 
 	// buckets
-	UINT16				m_unit_bucket[TOTAL_BUCKETS]; // buckets for tracking unit usage
+	UINT16              m_unit_bucket[TOTAL_BUCKETS]; // buckets for tracking unit usage
 
 	// statistics
-	UINT32				m_tiles;					// number of tiles queued
-	UINT32				m_triangles;				// number of triangles queued
-	UINT32				m_quads;					// number of quads queued
-	UINT64				m_pixels;					// number of pixels rendered
+	UINT32              m_tiles;                    // number of tiles queued
+	UINT32              m_triangles;                // number of triangles queued
+	UINT32              m_quads;                    // number of quads queued
+	UINT64              m_pixels;                   // number of pixels rendered
 #if KEEP_STATISTICS
-	UINT32				m_conflicts[WORK_MAX_THREADS]; // number of conflicts found, per thread
-	UINT32				m_resolved[WORK_MAX_THREADS];	// number of conflicts resolved, per thread
+	UINT32              m_conflicts[WORK_MAX_THREADS]; // number of conflicts found, per thread
+	UINT32              m_resolved[WORK_MAX_THREADS];   // number of conflicts resolved, per thread
 #endif
 };
 
@@ -279,14 +279,14 @@ private:
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(running_machine &machine, UINT8 flags)
 	: m_machine(machine),
-	  m_queue(NULL),
-	  m_polygon(machine, *this),
-	  m_object(machine, *this),
-	  m_unit(machine, *this),
-	  m_flags(flags),
-	  m_triangles(0),
-	  m_quads(0),
-	  m_pixels(0)
+		m_queue(NULL),
+		m_polygon(machine, *this),
+		m_object(machine, *this),
+		m_unit(machine, *this),
+		m_flags(flags),
+		m_triangles(0),
+		m_quads(0),
+		m_pixels(0)
 {
 #if KEEP_STATISTICS
 	memset(m_conflicts, 0, sizeof(m_conflicts));
@@ -690,12 +690,12 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			}
 		}
 	}
-    else    // GCC 4.7.0 incorrectly claims these are uninitialized; humor it by initializing in the (hopefully rare) zero parameter case
-    {
-        param_start[0] = _BaseType(0.0);
-        param_dpdx[0] = _BaseType(0.0);
-        param_dpdy[0] = _BaseType(0.0);
-    }
+	else    // GCC 4.7.0 incorrectly claims these are uninitialized; humor it by initializing in the (hopefully rare) zero parameter case
+	{
+		param_start[0] = _BaseType(0.0);
+		param_dpdx[0] = _BaseType(0.0);
+		param_dpdy[0] = _BaseType(0.0);
+	}
 
 	// compute the X extents for each scanline
 	INT32 pixels = 0;
@@ -941,12 +941,12 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 	// walk forward to build up the forward edge list
 	struct poly_edge
 	{
-		poly_edge *			next;					// next edge in sequence
-		int					index;					// index of this edge
-		const vertex_t *	v1;						// pointer to first vertex
-		const vertex_t *	v2;						// pointer to second vertex
-		_BaseType			dxdy;					// dx/dy along the edge
-		_BaseType			dpdy[_MaxParams];		// per-parameter dp/dy values
+		poly_edge *         next;                   // next edge in sequence
+		int                 index;                  // index of this edge
+		const vertex_t *    v1;                     // pointer to first vertex
+		const vertex_t *    v2;                     // pointer to second vertex
+		_BaseType           dxdy;                   // dx/dy along the edge
+		_BaseType           dpdy[_MaxParams];       // per-parameter dp/dy values
 	};
 	poly_edge fedgelist[_NumVerts - 1];
 	poly_edge *edgeptr = &fedgelist[0];
@@ -1135,4 +1135,4 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 	return nextout - outv;
 }
 
-#endif	// __POLYNEW_H__
+#endif  // __POLYNEW_H__

@@ -198,9 +198,9 @@
 #include "machine/nvram.h"
 
 
-#define MAIN_CPU_MASTER_CLOCK	(11200000)
-#define PIXEL_CLOCK				(MAIN_CPU_MASTER_CLOCK / 2)
-#define CRTC_CLOCK				(MAIN_CPU_MASTER_CLOCK / 16)
+#define MAIN_CPU_MASTER_CLOCK   (11200000)
+#define PIXEL_CLOCK             (MAIN_CPU_MASTER_CLOCK / 2)
+#define CRTC_CLOCK              (MAIN_CPU_MASTER_CLOCK / 16)
 
 
 /*************************************
@@ -227,8 +227,8 @@ WRITE_LINE_MEMBER(spiders_state::main_cpu_irq)
 	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
 	pia6821_device *pia3 = machine().device<pia6821_device>("pia3");
 	int combined_state = pia1->irq_a_state() | pia1->irq_b_state() |
-											      pia2->irq_b_state() |
-						 pia3->irq_a_state() | pia3->irq_b_state();
+													pia2->irq_b_state() |
+							pia3->irq_a_state() | pia3->irq_b_state();
 
 	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -255,18 +255,18 @@ WRITE_LINE_MEMBER(spiders_state::audio_cpu_irq)
 
 static const pia6821_interface pia_1_intf =
 {
-	DEVCB_INPUT_PORT("IN0"),		/* port A in */
-	DEVCB_INPUT_PORT("IN1"),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)		/* IRQB */
+	DEVCB_INPUT_PORT("IN0"),        /* port A in */
+	DEVCB_INPUT_PORT("IN1"),        /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)        /* IRQB */
 };
 
 INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
@@ -296,18 +296,18 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
 
 static const pia6821_interface pia_2_intf =
 {
-	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_intf_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,flipscreen_w),		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_firq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_r),       /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_intf_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,flipscreen_w),       /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_firq),      /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)        /* IRQB */
 };
 
 
@@ -320,18 +320,18 @@ static const pia6821_interface pia_2_intf =
 
 static const pia6821_interface pia_3_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_ctrl_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_command_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_ctrl_w),       /* port A out */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_command_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)        /* IRQB */
 };
 
 
@@ -344,18 +344,18 @@ static const pia6821_interface pia_3_intf =
 
 static const pia6821_interface pia_4_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_a_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_b_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,audio_cpu_irq),		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_a_w),      /* port A out */
+	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_b_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,audio_cpu_irq),      /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -381,12 +381,12 @@ WRITE8_MEMBER(spiders_state::ic60_74123_output_changed)
 
 static const ttl74123_interface ic60_intf =
 {
-	TTL74123_GROUNDED,	/* the hook up type */
-	RES_K(22),			/* resistor connected to RCext */
-	CAP_U(0.01),		/* capacitor connected to Cext and RCext */
-	1,					/* A pin - driven by the CRTC */
-	1,					/* B pin - pulled high */
-	1,					/* Clear pin - pulled high */
+	TTL74123_GROUNDED,  /* the hook up type */
+	RES_K(22),          /* resistor connected to RCext */
+	CAP_U(0.01),        /* capacitor connected to Cext and RCext */
+	1,                  /* A pin - driven by the CRTC */
+	1,                  /* B pin - pulled high */
+	1,                  /* Clear pin - pulled high */
 	DEVCB_DRIVER_MEMBER(spiders_state,ic60_74123_output_changed)
 };
 
@@ -453,8 +453,8 @@ static MC6845_UPDATE_ROW( update_row )
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x3f00) |
-					  ((ra << 5) & 0x00e0) |
-					  ((ma << 0) & 0x001f);
+						((ra << 5) & 0x00e0) |
+						((ma << 0) & 0x001f);
 
 		if (state->m_flipscreen)
 			offs = offs ^ 0x3fff;
@@ -507,16 +507,16 @@ WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",				/* screen we are acting on */
-	8,						/* number of pixels per video memory address */
-	begin_update,			/* before pixel update callback */
-	update_row,				/* row update callback */
-	NULL,					/* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,display_enable_changed),	/* callback for display state changes */
-	DEVCB_NULL,				/* callback for cursor state changes */
-	DEVCB_NULL,				/* HSYNC callback */
-	DEVCB_NULL,				/* VSYNC callback */
-	NULL					/* update address callback */
+	"screen",               /* screen we are acting on */
+	8,                      /* number of pixels per video memory address */
+	begin_update,           /* before pixel update callback */
+	update_row,             /* row update callback */
+	NULL,                   /* after pixel update callback */
+	DEVCB_DRIVER_LINE_MEMBER(spiders_state,display_enable_changed), /* callback for display state changes */
+	DEVCB_NULL,             /* callback for cursor state changes */
+	DEVCB_NULL,             /* HSYNC callback */
+	DEVCB_NULL,             /* VSYNC callback */
+	NULL                    /* update address callback */
 };
 
 
@@ -597,86 +597,86 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( spiders )
-    /* PIA1 PA0 - PA7 */
-    PORT_START("IN0")	/* IN0 */
+	/* PIA1 PA0 - PA7 */
+	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )
-    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-    PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 
 	/* PIA1 PB0 - PB7 */
-    PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")   /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT  ) PORT_2WAY PORT_PLAYER(2)
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-    PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-    PORT_START("DSW1")	/* IN2, DSW1 */
-    PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
-    PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x06, DEF_STR( 4C_5C ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-    PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DSW1")  /* IN2, DSW1 */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("DSW2")	/* IN3, DSW2 */
-    PORT_DIPNAME( 0x03, 0x03, "Play Mode" ) PORT_DIPLOCATION("SW2:1,2")
-    PORT_DIPSETTING(    0x00, "A A'" )
-    PORT_DIPSETTING(    0x01, "A B'" )
-    PORT_DIPSETTING(    0x02, "B A'" )
-    PORT_DIPSETTING(    0x03, "B B'" )
-    PORT_DIPNAME( 0x0c, 0x0c, "Spiders to Complete Belt" ) PORT_DIPLOCATION("SW2:3,4")
-    PORT_DIPSETTING(    0x00, "14" )
-    PORT_DIPSETTING(    0x0c, "16" )
-    PORT_DIPSETTING(    0x04, "20" )
-    PORT_DIPSETTING(    0x08, "26" )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5")
-    PORT_DIPSETTING(    0x10, "3" )
-    PORT_DIPSETTING(    0x00, "4" )
-    PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:6,7")
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-    PORT_DIPSETTING(    0x60, "15K" )
-    PORT_DIPSETTING(    0x20, "20K" )
-    PORT_DIPSETTING(    0x40, "25K" )
-    PORT_DIPNAME( 0x80, 0x00, "Giant Spiders" ) PORT_DIPLOCATION("SW2:8")
-    PORT_DIPSETTING(    0x00, "First Screen" )
-    PORT_DIPSETTING(    0x80, "Every Screen" )
+	PORT_START("DSW2")  /* IN3, DSW2 */
+	PORT_DIPNAME( 0x03, 0x03, "Play Mode" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "A A'" )
+	PORT_DIPSETTING(    0x01, "A B'" )
+	PORT_DIPSETTING(    0x02, "B A'" )
+	PORT_DIPSETTING(    0x03, "B B'" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Spiders to Complete Belt" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "14" )
+	PORT_DIPSETTING(    0x0c, "16" )
+	PORT_DIPSETTING(    0x04, "20" )
+	PORT_DIPSETTING(    0x08, "26" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x60, "15K" )
+	PORT_DIPSETTING(    0x20, "20K" )
+	PORT_DIPSETTING(    0x40, "25K" )
+	PORT_DIPNAME( 0x80, 0x00, "Giant Spiders" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, "First Screen" )
+	PORT_DIPSETTING(    0x80, "Every Screen" )
 
-    PORT_START("DSW3")	/* IN4, DSW3 */
-    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW3:2")
-    PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-    PORT_DIPNAME( 0x1c, 0x00, "Vertical Adjust" ) PORT_DIPLOCATION("SW3:3,4,5")
-    PORT_DIPSETTING(    0x00, "0" )
-    PORT_DIPSETTING(    0x04, "1" )
-    PORT_DIPSETTING(    0x08, "2" )
-    PORT_DIPSETTING(    0x0c, "3" )
-    PORT_DIPSETTING(    0x10, "4" )
-    PORT_DIPSETTING(    0x14, "5" )
-    PORT_DIPSETTING(    0x18, "6" )
-    PORT_DIPSETTING(    0x1c, "7" )
-    PORT_DIPNAME( 0xe0, 0x00, "Horizontal Adjust" ) PORT_DIPLOCATION("SW3:6,7,8")
-    PORT_DIPSETTING(    0x00, "0" )
-    PORT_DIPSETTING(    0x20, "1" )
-    PORT_DIPSETTING(    0x40, "2" )
-    PORT_DIPSETTING(    0x60, "3" )
-    PORT_DIPSETTING(    0x80, "4" )
-    PORT_DIPSETTING(    0xa0, "5" )
-    PORT_DIPSETTING(    0xc0, "6" )
-    PORT_DIPSETTING(    0xe0, "7" )
+	PORT_START("DSW3")  /* IN4, DSW3 */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x1c, 0x00, "Vertical Adjust" ) PORT_DIPLOCATION("SW3:3,4,5")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x14, "5" )
+	PORT_DIPSETTING(    0x18, "6" )
+	PORT_DIPSETTING(    0x1c, "7" )
+	PORT_DIPNAME( 0xe0, 0x00, "Horizontal Adjust" ) PORT_DIPLOCATION("SW3:6,7,8")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x60, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0xa0, "5" )
+	PORT_DIPSETTING(    0xc0, "6" )
+	PORT_DIPSETTING(    0xe0, "7" )
 
-    PORT_START("XHATCH")	/* connected to PIA1 CB1 input */
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS1 (Crosshatch)") PORT_CODE(KEYCODE_F1)
+	PORT_START("XHATCH")    /* connected to PIA1 CB1 input */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS1 (Crosshatch)") PORT_CODE(KEYCODE_F1)
 
 INPUT_PORTS_END
 
@@ -702,7 +702,7 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
@@ -822,4 +822,4 @@ ROM_END
 GAME( 1981, spiders,  0,       spiders, spiders, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1981, spiders2, spiders, spiders, spiders, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1981, spiders3, spiders, spiders, spiders, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1981, spinner,  spiders, spiders, spiders, driver_device, 0, ROT270, "bootleg",				  "Spinner", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1981, spinner,  spiders, spiders, spiders, driver_device, 0, ROT270, "bootleg",                 "Spinner", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)

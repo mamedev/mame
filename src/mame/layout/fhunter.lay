@@ -83,7 +83,7 @@
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
 		<rect state="0">
-		    <color red="0.0" green="0.5" blue="0.0" />
+			<color red="0.0" green="0.5" blue="0.0" />
 		</rect>
 		<text string="SERVICE">
 			<color red="0.0" green="0.0" blue="0.0" />

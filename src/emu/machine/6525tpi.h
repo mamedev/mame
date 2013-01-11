@@ -36,19 +36,19 @@
 
 struct tpi6525_interface
 {
-	devcb_write_line	out_irq_func;
+	devcb_write_line    out_irq_func;
 
-	devcb_read8			in_pa_func;
-	devcb_write8		out_pa_func;
+	devcb_read8         in_pa_func;
+	devcb_write8        out_pa_func;
 
-	devcb_read8			in_pb_func;
-	devcb_write8		out_pb_func;
+	devcb_read8         in_pb_func;
+	devcb_write8        out_pb_func;
 
-	devcb_read8			in_pc_func;
-	devcb_write8		out_pc_func;
+	devcb_read8         in_pc_func;
+	devcb_write8        out_pc_func;
 
-	devcb_write_line	out_ca_func;
-	devcb_write_line	out_cb_func;
+	devcb_write_line    out_ca_func;
+	devcb_write_line    out_cb_func;
 };
 
 

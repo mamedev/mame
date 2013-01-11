@@ -18,18 +18,18 @@ class isa8_mpu401_device :
 {
 public:
 		// construction/destruction
-        isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-        DECLARE_READ8_MEMBER(mpu401_r);
-        DECLARE_WRITE8_MEMBER(mpu401_w);
+		DECLARE_READ8_MEMBER(mpu401_r);
+		DECLARE_WRITE8_MEMBER(mpu401_w);
 		// optional information overrides
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 		virtual void device_config_complete() { m_shortname = "isa_mpu401"; }
 private:
-        // internal state
+		// internal state
 };
 
 

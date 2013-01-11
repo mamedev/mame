@@ -1199,7 +1199,7 @@
 	</software>
 
 	<software name="sorobang" supported="partial">
-        <!-- WSC -->
+		<!-- WSC -->
 		<description>Sorobang</description>
 		<year>2000</year>
 		<publisher>Kaga Tech</publisher>
@@ -1272,7 +1272,7 @@
 	</software>
 
 	<software name="terrors2">
-        <!-- WSC -->
+		<!-- WSC -->
 		<description>Terrors 2</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
@@ -1287,7 +1287,7 @@
 	</software>
 
 	<software name="tetris">
-        <!-- WSC -->
+		<!-- WSC -->
 		<description>Tetris</description>
 		<year>2002</year>
 		<publisher>Vanguard</publisher>
@@ -1302,7 +1302,7 @@
 	</software>
 
 	<software name="tonpuuso" supported="no">   <!-- it freezes -->
-        <!-- WSC -->
+		<!-- WSC -->
 		<description>Tonpuusou</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
@@ -1317,7 +1317,7 @@
 	</software>
 
 	<software name="yamato">
-        <!-- WSC -->
+		<!-- WSC -->
 		<description>Uchuu Senkan Yamato</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
@@ -1332,7 +1332,7 @@
 	</software>
 
 	<software name="ultraman">
-        <!-- WSC only -->
+		<!-- WSC only -->
 		<description>Ultraman - Hikari no Kuni no Shisha</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
@@ -1347,7 +1347,7 @@
 	</software>
 
 	<software name="wclassic">
-        <!-- WSC -->
+		<!-- WSC -->
 		<description>Wonder Classic</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
@@ -1363,7 +1363,7 @@
 	</software>
 
 	<software name="wildcard">
-        <!-- WSC only -->
+		<!-- WSC only -->
 		<description>Wild Card</description>
 		<year>2001</year>
 		<publisher>Square</publisher>
@@ -1379,7 +1379,7 @@
 	</software>
 
 	<software name="withyou">
-        <!-- WSC only -->
+		<!-- WSC only -->
 		<description>With You - Mitsumete Itai</description>
 		<year>2001</year>
 		<publisher>Cocktail Soft / F&amp;C Co.</publisher>
@@ -1394,7 +1394,7 @@
 	</software>
 
 	<software name="wizardry">
-        <!-- WSC -->
+		<!-- WSC -->
 		<description>Wizardry Scenario 1 - Proving Grounds of the Mad Overlord</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
@@ -1410,7 +1410,7 @@
 	</software>
 
 	<software name="xcard">
-        <!-- WSC only -->
+		<!-- WSC only -->
 		<description>X - Card of Fate</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
@@ -1425,7 +1425,7 @@
 	</software>
 
 	<software name="xilittle">
-        <!-- WSC only -->
+		<!-- WSC only -->
 		<description>XI[sai] Little</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>

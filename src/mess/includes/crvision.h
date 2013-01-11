@@ -17,27 +17,27 @@
 #include "video/tms9928a.h"
 #include "machine/ram.h"
 
-#define SCREEN_TAG		"screen"
-#define M6502_TAG		"u2"
-#define TMS9929_TAG		"u3"
-#define PIA6821_TAG		"u21"
-#define SN76489_TAG		"u22"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define M6502_TAG       "u2"
+#define TMS9929_TAG     "u3"
+#define PIA6821_TAG     "u21"
+#define SN76489_TAG     "u22"
+#define CENTRONICS_TAG  "centronics"
 
-#define BANK_ROM1		"bank1"
-#define BANK_ROM2		"bank2"
+#define BANK_ROM1       "bank1"
+#define BANK_ROM2       "bank2"
 
 class crvision_state : public driver_device
 {
 public:
 	crvision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M6502_TAG),
-		  m_pia(*this, PIA6821_TAG),
-		  m_psg(*this, SN76489_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, M6502_TAG),
+			m_pia(*this, PIA6821_TAG),
+			m_psg(*this, SN76489_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

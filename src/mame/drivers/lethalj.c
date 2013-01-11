@@ -214,14 +214,14 @@ static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16, lethalj_state )
 	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x04100000, 0x0410000f) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
-	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP	/* clocks bits through here */
+	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP    /* clocks bits through here */
 	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
-	AM_RANGE(0x04400000, 0x0440000f) AM_WRITENOP	/* clocks bits through here */
+	AM_RANGE(0x04400000, 0x0440000f) AM_WRITENOP    /* clocks bits through here */
 	AM_RANGE(0x04500010, 0x0450001f) AM_READ_PORT("IN0")
 	AM_RANGE(0x04600000, 0x0460000f) AM_READ_PORT("IN1")
 	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP	/* seems to be a bug in their code, one of many. */
+	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP    /* seems to be a bug in their code, one of many. */
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -237,7 +237,7 @@ static INPUT_PORTS_START( lethalj )
 	PORT_START("IN0")
 	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* ??? Seems to be rigged up to the auto scroll, and acts as a fast forward*/
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* ??? Seems to be rigged up to the auto scroll, and acts as a fast forward*/
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -281,16 +281,16 @@ static INPUT_PORTS_START( lethalj )
 	PORT_DIPSETTING(      0x0000, "-2.5" )
 	PORT_DIPSETTING(      0x8000, "+0" )
 
-	PORT_START("LIGHT0_X")			/* fake analog X */
+	PORT_START("LIGHT0_X")          /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("LIGHT0_Y")				/* fake analog Y */
+	PORT_START("LIGHT0_Y")              /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("LIGHT1_X")				/* fake analog X */
+	PORT_START("LIGHT1_X")              /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("LIGHT1_Y")				/* fake analog Y */
+	PORT_START("LIGHT1_Y")              /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -301,7 +301,7 @@ static INPUT_PORTS_START( eggventr )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0070, 0x0000, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:4,3,2")
+	PORT_DIPNAME( 0x0070, 0x0000, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:4,3,2")
 	PORT_DIPSETTING(      0x0040, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 3C_1C ) )
@@ -310,21 +310,21 @@ static INPUT_PORTS_START( eggventr )
 	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0070, DEF_STR( Free_Play ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:1" )					// 4-position switch - switch 1 not used
-	PORT_DIPNAME( 0x0300, 0x0200, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW3:8,7")	// Verified Correct
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:1" )                 // 4-position switch - switch 1 not used
+	PORT_DIPNAME( 0x0300, 0x0200, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW3:8,7") // Verified Correct
 	PORT_DIPSETTING(      0x0000, "3" )
 	PORT_DIPSETTING(      0x0100, "4" )
 	PORT_DIPSETTING(      0x0200, "5" )
 	PORT_DIPSETTING(      0x0300, "6" )
-	PORT_DIPNAME( 0x0c00, 0x0400, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW3:6,5")	// According to info from The Gameroom / Manual
+	PORT_DIPNAME( 0x0c00, 0x0400, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW3:6,5") // According to info from The Gameroom / Manual
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "Slot Machine" )		PORT_DIPLOCATION("SW3:4")	// Verified Correct
+	PORT_DIPNAME( 0x1000, 0x1000, "Slot Machine" )      PORT_DIPLOCATION("SW3:4")   // Verified Correct
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW3:3" )					// Manual says switches 1-3 are reserved
+	PORT_DIPUNUSED_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW3:3" )                 // Manual says switches 1-3 are reserved
 	PORT_DIPUNUSED_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SW3:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW3:1" )
 
@@ -337,16 +337,16 @@ static INPUT_PORTS_START( eggventr )
 	PORT_BIT( 0x7f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("LIGHT0_X")				/* fake analog X */
+	PORT_START("LIGHT0_X")              /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("LIGHT0_Y")				/* fake analog Y */
+	PORT_START("LIGHT0_Y")              /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("LIGHT1_X")				/* fake analog X */
+	PORT_START("LIGHT1_X")              /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("LIGHT1_Y")				/* fake analog Y */
+	PORT_START("LIGHT1_Y")              /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -354,7 +354,7 @@ static INPUT_PORTS_START( eggventr2 )
 	PORT_INCLUDE(eggventr)
 
 	PORT_MODIFY("IN0")
-	PORT_DIPNAME( 0x0300, 0x0200, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW3:8,7")	// Verified Correct - 1 extra life per setting
+	PORT_DIPNAME( 0x0300, 0x0200, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW3:8,7") // Verified Correct - 1 extra life per setting
 	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPSETTING(      0x0100, "5" )
 	PORT_DIPSETTING(      0x0200, "6" )
@@ -365,7 +365,7 @@ static INPUT_PORTS_START( eggvntdx )
 	PORT_INCLUDE(eggventr)
 
 	PORT_MODIFY("IN0")
-	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" )	// Was "Slot Machine" - The slot machince is present in the code as a 'bonus stage'
+	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW3:4" ) // Was "Slot Machine" - The slot machince is present in the code as a 'bonus stage'
 								//  (when the egg reaches Vegas?), but not actually called (EC).
 INPUT_PORTS_END
 
@@ -531,26 +531,26 @@ INPUT_PORTS_END
 
 static const tms34010_config tms_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	VIDEO_CLOCK,					/* pixel clock */
-	1,								/* pixels per clock */
-	lethalj_scanline_update,		/* scanline update */
-	NULL,							/* generate interrupt */
-	NULL,							/* write to shiftreg function */
-	NULL							/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	VIDEO_CLOCK,                    /* pixel clock */
+	1,                              /* pixels per clock */
+	lethalj_scanline_update,        /* scanline update */
+	NULL,                           /* generate interrupt */
+	NULL,                           /* write to shiftreg function */
+	NULL                            /* read from shiftreg function */
 };
 
 static const tms34010_config tms_config_lethalj =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	VIDEO_CLOCK_LETHALJ,			/* pixel clock */
-	1,								/* pixels per clock */
-	lethalj_scanline_update,		/* scanline update */
-	NULL,							/* generate interrupt */
-	NULL,							/* write to shiftreg function */
-	NULL							/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	VIDEO_CLOCK_LETHALJ,            /* pixel clock */
+	1,                              /* pixels per clock */
+	lethalj_scanline_update,        /* scanline update */
+	NULL,                           /* generate interrupt */
+	NULL,                           /* write to shiftreg function */
+	NULL                            /* read from shiftreg function */
 };
 
 
@@ -611,11 +611,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( lethalj )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "vc8",  0x000000, 0x080000, CRC(8d568e1d) SHA1(e4dd3794789f9ccd7be8374978a3336f2b79136f) )
 	ROM_LOAD16_BYTE( "vc9",  0x000001, 0x080000, CRC(8f22add4) SHA1(e773d3ae9cf512810fc266e784d21ed115c8830c) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "gr1",  0x000000, 0x100000, CRC(27f7b244) SHA1(628b29c066e217e1fe54553ea3ed98f86735e262) )
 	ROM_LOAD16_BYTE( "gr2",  0x000001, 0x100000, CRC(1f25d3ab) SHA1(bdb8a3c546cdee9a5630c47b9c5079a956e8a093) )
 	ROM_LOAD16_BYTE( "gr4",  0x200000, 0x100000, CRC(c5838b4c) SHA1(9ad03d0f316eb31fdf0ca6f65c02a27d3406d072) )
@@ -623,25 +623,25 @@ ROM_START( lethalj )
 	ROM_LOAD16_BYTE( "gr6",  0x400000, 0x100000, CRC(51c99b85) SHA1(9a23bf21a73d2884b49c64a8f42c288534c79dc5) )
 	ROM_LOAD16_BYTE( "gr5",  0x400001, 0x100000, CRC(80dda9b5) SHA1(d8a79cad112bc7d9e4ba31a950e4807581f3bf46) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "sound1.u20", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "sound1.u21", 0x00000, 0x40000, CRC(7d3beae0) SHA1(5ec753c5fd5ca0f9492c9e274703a1aa758062a7) )
 
-	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "sound1.u18", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
 ROM_END
 
 
 ROM_START( eggventr )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.10.vc8", 0x000000, 0x020000, CRC(225d1164) SHA1(b0dc55f2e8ded1fe7874de05987fcf879772289e) ) /* Labeled as EVC8.10 */
 	ROM_LOAD16_BYTE( "evc9.10.vc9", 0x000001, 0x020000, CRC(42f6e904) SHA1(11be8e7383a218aac0e1a63236bbdb7cca0993bf) ) /* Labeled as EVC9.10 */
 	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",   0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -649,25 +649,25 @@ ROM_START( eggventr )
 	ROM_LOAD16_BYTE( "egr6.3.gr6", 0x400000, 0x100000, CRC(f299d818) SHA1(abbb333c43675d34c59201b5d297779cfea8b092) ) /* Labeled as EGR6.3 */
 	ROM_LOAD16_BYTE( "egr5.3.gr5", 0x400001, 0x100000, CRC(ebfca07b) SHA1(20465d14b41d99651166f221057737d7b3cc770c) ) /* Labeled as EGR5.3 */
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "eu20.u20", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "eu21.u21", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 ROM_END
 
 
 ROM_START( eggventr8 )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.8.vc8", 0x000000, 0x020000, CRC(5a130c04) SHA1(00408912b436efa003bb02dce90fae4fe33a0180) ) /* Labeled as EVC8.8 */
 	ROM_LOAD16_BYTE( "evc9.8.vc9", 0x000001, 0x020000, CRC(3ac0a95b) SHA1(7f3bd0e6d2d790af4aa6881ea8de8b296a64164a) ) /* Labeled as EVC9.8 */
 	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",   0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -675,25 +675,25 @@ ROM_START( eggventr8 )
 	ROM_LOAD16_BYTE( "egr6.3.gr6", 0x400000, 0x100000, CRC(f299d818) SHA1(abbb333c43675d34c59201b5d297779cfea8b092) ) /* Labeled as EGR6.3 */
 	ROM_LOAD16_BYTE( "egr5.3.gr5", 0x400001, 0x100000, CRC(ebfca07b) SHA1(20465d14b41d99651166f221057737d7b3cc770c) ) /* Labeled as EGR5.3 */
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "eu20.u20", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "eu21.u21", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 ROM_END
 
 
 ROM_START( eggventr7 )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.7.vc8", 0x000000, 0x020000, CRC(99999899) SHA1(e3908600fa711baa7f7562f86498ec7e988a5bea) ) /* Labeled as EVC8.7 */
 	ROM_LOAD16_BYTE( "evc9.7.vc9", 0x000001, 0x020000, CRC(1b608155) SHA1(256dd981515d57f806a3770bdc6ff46b9000f7f3) ) /* Labeled as EVC9.7 */
 	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",   0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -701,23 +701,23 @@ ROM_START( eggventr7 )
 	ROM_LOAD16_BYTE( "egr6.3.gr6", 0x400000, 0x100000, CRC(f299d818) SHA1(abbb333c43675d34c59201b5d297779cfea8b092) ) /* Labeled as EGR6.3 */
 	ROM_LOAD16_BYTE( "egr5.3.gr5", 0x400001, 0x100000, CRC(ebfca07b) SHA1(20465d14b41d99651166f221057737d7b3cc770c) ) /* Labeled as EGR5.3 */
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "eu20.u20", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "eu21.u21", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 ROM_END
 
 
 ROM_START( eggventr2 ) /* Comes from a PCB with an early serial number EV00123, program roms are 27C040 with required data at 0x7ffe0 in each rom */
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "ev_vc8.2.vc8", 0x000000, 0x080000, CRC(ce1da4f7) SHA1(c163041d684dc6a6fab07394e8aac3d82a2ecb52) ) /* Labeled as EV VC8.2 */
 	ROM_LOAD16_BYTE( "ev_vc9.2.vc9", 0x000001, 0x080000, CRC(4b24906b) SHA1(2e9b85a658cb02d76854f3ee5a071e4161d0d0cf) ) /* Labeled as EV VC9.2 */
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",     0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",     0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4",     0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -725,23 +725,23 @@ ROM_START( eggventr2 ) /* Comes from a PCB with an early serial number EV00123, 
 	ROM_LOAD16_BYTE( "ev_gr6.2.gr6", 0x400000, 0x100000, CRC(a4d9d126) SHA1(d5f2bc4bfa7c0462865907dbc39fc0479340e1c8) ) /* Labeled as EV GR6.2 */
 	ROM_LOAD16_BYTE( "ev_gr5.2.gr5", 0x400001, 0x100000, CRC(b5162234) SHA1(3f05c7eb5b00805eb7fc1e3634dea29b1ce3af62) ) /* Labeled as EV GR5.2 */
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "eu20.u20", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "eu21.u21", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 ROM_END
 
 
 ROM_START( eggventra ) /* Allied Leisure Australia, official license? */
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "egr8.vc8", 0x000000, 0x080000, CRC(a62c4143) SHA1(a21d6b7efdba4965285265426ed79f3249a86685) )
 	ROM_LOAD16_BYTE( "egr9.vc9", 0x000001, 0x080000, CRC(bc55bc7a) SHA1(d6e3fc76b4a0a20176af1338a32bb81f0599fdc0) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1", 0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2", 0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.gr4", 0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -749,23 +749,23 @@ ROM_START( eggventra ) /* Allied Leisure Australia, official license? */
 	ROM_LOAD16_BYTE( "egr6.gr6", 0x400000, 0x100000, CRC(0d73dd85) SHA1(d99a95ace89483688bae48021b416fc0a3c531d6) )
 	ROM_LOAD16_BYTE( "egr5.gr5", 0x400001, 0x100000, CRC(6d89c4e3) SHA1(613703a3f194af3ed44a58610d99b7dc99382725) )
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "eu20.u20", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "eu21.u21", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 ROM_END
 
 
 ROM_START( eggventrd )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x080000, CRC(d7f56141) SHA1(3c16b509fd1c763e452c27084fb0e90cde3947f7) )
 	ROM_LOAD16_BYTE( "eggdlx.vc9", 0x000001, 0x080000, CRC(cc5f122e) SHA1(e719a3937378df605cdb86c59a534808473c8f90) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.gr2",   0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "eggdlx.gr4", 0x200000, 0x100000, CRC(cfb1e28b) SHA1(8d535a27158acee893233cf2012b4ab0ffc8dc03) )
@@ -773,23 +773,23 @@ ROM_START( eggventrd )
 	ROM_LOAD16_BYTE( "eggdlx.gr6", 0x400000, 0x100000, CRC(97d02e8a) SHA1(6f9532fb031953c1187782b4fce5a0cfaf9461b3) )
 	ROM_LOAD16_BYTE( "eggdlx.gr5", 0x400001, 0x100000, CRC(387d9176) SHA1(9f26f97cab8baeea1d5e4860a8a35a55bdc601e8) )
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "eu20.u20", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "eu21.u21", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "eu18.u18", 0x00000, 0x80000, CRC(cca5dba0) SHA1(9c750256f0cc0ed8847db85df061be3b000b0b25) )
 ROM_END
 
 
 ROM_START( cclownz )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "cc-v1-vc8.bin", 0x000000, 0x080000, CRC(433fe6ac) SHA1(dea7aede9882ee52be88927418b7395418757d12) )
 	ROM_LOAD16_BYTE( "cc-v1-vc9.bin", 0x000001, 0x080000, CRC(9d1b3dae) SHA1(44a97c38bc9685e97721722c67505832fa06b44d) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "cc-gr1.bin",   0x000000, 0x100000, CRC(17c0ab2a) SHA1(f5ec66f4ac3292ef74f6434fe3ef17f9e977e8f6) )
 	ROM_LOAD16_BYTE( "cc-gr2.bin",   0x000001, 0x100000, CRC(dead9528) SHA1(195ad9f7da61ecb5a364da92ba837aa3fcb3a347) )
 	ROM_LOAD16_BYTE( "cc-gr4.bin",   0x200000, 0x100000, CRC(78cceed8) SHA1(bc8e5bb625072b17a5711402b07a39ea4a87a0f8) )
@@ -797,13 +797,13 @@ ROM_START( cclownz )
 	ROM_LOAD16_BYTE( "cc-gr6.bin",   0x400000, 0x100000, CRC(889d2771) SHA1(3222d7105c3a68e2050f00b07e8d84d57a9f7a19) )
 	ROM_LOAD16_BYTE( "cc-gr5.bin",   0x400001, 0x100000, CRC(2a15ef8f) SHA1(3e33cff2657bb1371acf25641080aff2d8da6c05) )
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "cc-s-u20.bin", 0x00000, 0x80000, CRC(252fc4b5) SHA1(bbc6c3599869f3f46d3df4f3f8d0a8d88d8e0132) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "cc-s-u21.bin", 0x00000, 0x80000, CRC(6c3da4ed) SHA1(f10cbea6e03ada5ac1535041636e96b6224967fa) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "cc-s-u18.bin", 0x00000, 0x80000, CRC(9cdf87af) SHA1(77dfc0bc1d535b5d585071dd4e9deb367003ab2d) )
 
 	ROM_REGION( 0x80000, "user2", 0 ) /* convert these */
@@ -817,11 +817,11 @@ ROM_END
 
 
 ROM_START( ripribit )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "rr_v2-84-vc8.bin", 0x000000, 0x080000, CRC(5ecc432d) SHA1(073062528fbcf63be7e3c6695d60d048430f6e4b) )
 	ROM_LOAD16_BYTE( "rr_v2-84-vc9.bin", 0x000001, 0x080000, CRC(d9bae3f8) SHA1(fcf8099ebe170ad5778aaa533bcfd1e5ead46e6b) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "rr-gr1.bin",   0x000000, 0x100000, CRC(e02c79b7) SHA1(75e352424c449cd5cba1057555928d7ee13ab113) )
 	ROM_LOAD16_BYTE( "rr-gr2.bin",   0x000001, 0x100000, CRC(09f48db7) SHA1(d0156c6e3d05ff81540c0eeb66e9a5e7fc4d053c) )
 	ROM_LOAD16_BYTE( "rr-gr4.bin",   0x200000, 0x100000, CRC(94d0db81) SHA1(aa46c2e5a627cf01c1d57002204ec3419f0d4503) )
@@ -832,7 +832,7 @@ ROM_START( ripribit )
 	ROM_REGION( 0x80000, "oki1", 0 )  /* sound data (music) */
 	ROM_LOAD( "rr-s-u20.bin", 0x00000, 0x80000, CRC(c345b779) SHA1(418058bbda74727ec99ac375982c9cd2c8bc5c86) )
 
-	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )                /* sound data */
 //  ROM_LOAD( "rr-s-u21.bin", 0x00000, 0x80000 ) // not populated
 
 	ROM_REGION( 0x80000, "oki3", 0 ) /* sound data (effects) */
@@ -849,11 +849,11 @@ ROM_END
 
 
 ROM_START( cfarm )
-	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "cf-v2-vc8.bin", 0x000000, 0x080000, CRC(93bcf145) SHA1(134ac3ee4fd837f56fb0b338289cf03108346539) )
 	ROM_LOAD16_BYTE( "cf-v2-vc9.bin", 0x000001, 0x080000, CRC(954421f9) SHA1(bf1faa9b085f066d1e2ff6ee01c468b1c1d945e9) )
 
-	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "cf-gr1.bin",   0x000000, 0x100000, CRC(2241a06e) SHA1(f07a99372bb951dd345378da212b41cb8204e782) )
 	ROM_LOAD16_BYTE( "cf-gr2.bin",   0x000001, 0x100000, CRC(31182263) SHA1(d5d36f9b5d612f681e6aa563831b6704bc05489e) )
 	ROM_LOAD16_BYTE( "cf-gr4.bin",   0x200000, 0x100000, CRC(0883a6f2) SHA1(ef259dcdc7b1325f15a98f6c97ecb965b2b6f9b1) )
@@ -861,13 +861,13 @@ ROM_START( cfarm )
 	ROM_LOAD16_BYTE( "cf-gr6.bin",   0x400000, 0x100000, CRC(8709a62c) SHA1(3691fb055155ae339c78ec8b7f485aa7d576556b) )
 	ROM_LOAD16_BYTE( "cf-gr5.bin",   0x400001, 0x100000, CRC(6de18621) SHA1(9e83f8ed3a2999ee4fdca389c5e792c5b1293717) )
 
-	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )                /* sound data */
 	ROM_LOAD( "cf-s-u20.bin", 0x00000, 0x80000, CRC(715a12dd) SHA1(374185b062853f3e2ea069ea53494cbe3d8dd511) )
 
-	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )                /* sound data */
 	ROM_LOAD( "cf-s-u21.bin", 0x00000, 0x80000, CRC(bc27e3d5) SHA1(a25215b8314fe44974e9efe78cdc10de34f7bfba) )
 
-	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )                /* sound data */
 	ROM_LOAD( "cf-s-u18.bin", 0x00000, 0x80000, CRC(63984658) SHA1(5594965c9304850187859ba730aff26001782f0f) )
 
 	ROM_REGION( 0x80000, "user2", 0 ) /* convert these */

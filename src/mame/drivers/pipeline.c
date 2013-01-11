@@ -159,12 +159,12 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 	}
 	else
 	{
-		 m_palram[offset]=data;
-		 if(offset<0x300)
-		 {
+			m_palram[offset]=data;
+			if(offset<0x300)
+			{
 			offset&=0xff;
 			palette_set_color_rgb(machine(), offset, pal6bit(m_palram[offset]), pal6bit(m_palram[offset+0x100]), pal6bit(m_palram[offset+0x200]));
-		 }
+			}
 	}
 }
 
@@ -251,17 +251,17 @@ static INPUT_PORTS_START( pipeline )
 	PORT_START("DSW1")
 	/* bits 0 to 6 are tested from less to most significant - code at 0x00dd */
 	PORT_DIPNAME( 0x7f, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x07, "10 Coins/1 Credit" )
-	PORT_DIPSETTING(	0x03, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 //  PORT_DIPSETTING(    0x7f, DEF_STR( 1C_1C ) )            /* duplicated setting */
-	PORT_DIPSETTING(	0x0f, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x1f, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x3f, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x1f, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x3f, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x80, "1" )
-	PORT_DIPSETTING(	0x00, "2" )
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
 
 	PORT_START("DSW2")
 	/* bits 0 to 2 are tested from less to most significant - code at 0x0181 */
@@ -276,13 +276,13 @@ static INPUT_PORTS_START( pipeline )
 	PORT_DIPSETTING(    0x08, "Fast" )                      /* 0x0d */
 	PORT_DIPSETTING(    0x00, "Fastest" )                   /* 0x08 */
 	PORT_DIPNAME( 0x20, 0x20, "Continue" )                  /* check code at 0x0ffd - see notes */
-	PORT_DIPSETTING(	0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x00, "Checkpoints" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Checkpoints" )
 	PORT_DIPNAME( 0xc0, 0x00, "Sounds/Music" )              /* check code at 0x1c0a - determine if it really affects music once it is supported */
-	PORT_DIPSETTING(	0xc0, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, "Attract Mode" )
-	PORT_DIPSETTING(	0x80, "Normal Game" )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, "Attract Mode" )
+	PORT_DIPSETTING(    0x80, "Normal Game" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -315,10 +315,10 @@ GFXDECODE_END
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_NULL,					// ZC/TO0 callback
-	DEVCB_NULL,					// ZC/TO1 callback
-	DEVCB_NULL					// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),      // interrupt handler
+	DEVCB_NULL,                 // ZC/TO0 callback
+	DEVCB_NULL,                 // ZC/TO1 callback
+	DEVCB_NULL                  // ZC/TO2 callback
 };
 
 static const z80_daisy_config daisy_chain_sound[] =
@@ -329,32 +329,32 @@ static const z80_daisy_config daisy_chain_sound[] =
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("P1"),				/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */  // related to sound/music : check code at 0x1c0a
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(pipeline_state,vidctrl_w)			/* Port C write */
+	DEVCB_INPUT_PORT("P1"),             /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */  // related to sound/music : check code at 0x1c0a
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(pipeline_state,vidctrl_w)           /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_DRIVER_MEMBER(pipeline_state,protection_r),		/* Port C read */
-	DEVCB_DRIVER_MEMBER(pipeline_state,protection_w)			/* Port C write */
+	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),           /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_DRIVER_MEMBER(pipeline_state,protection_r),       /* Port C read */
+	DEVCB_DRIVER_MEMBER(pipeline_state,protection_w)            /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_2_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static const ym2203_interface ym2203_config =

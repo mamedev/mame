@@ -124,7 +124,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( maygayew, maygayew_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,8000000)	// MC68306FC16 - standard 68000 core + peripherals
+	MCFG_CPU_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals
 	MCFG_CPU_PROGRAM_MAP(maygayew_map)
 MACHINE_CONFIG_END
 
@@ -157,9 +157,9 @@ ROM_START( mg_gbr )
 	ROM_LOAD( "dig1127.u3", 0x000000, 0x080000, CRC(45a2275d) SHA1(8af08b5c007bb2bfe927df53bd167ea6045d8694) )
 	ROM_LOAD( "dig1127.u2", 0x080000, 0x080000, CRC(220b38fe) SHA1(8ff20a9353736cda44ec11a99ac94b36f9db7430) )
 
-	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "16c55.u5", 0x0000, 0x0023ff, CRC(0bd92c3e) SHA1(596f4d0a83ebc879ec64ba3038d2e9448d2f8901) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
 	ROM_LOAD( "16c64.u6", 0x0000, 0x008fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
 ROM_END
 
@@ -191,9 +191,9 @@ ROM_START( mg_risk )
 	ROM_LOAD( "d1g1-145.u3", 0x000000, 0x080000, CRC(a428be45) SHA1(ccce7274ea25423e34c5be35706271501781bd08) )
 	ROM_LOAD( "d1g1-145.u2", 0x080000, 0x080000, CRC(6a3a6e26) SHA1(449eadbbee291c94a0f1f32a860dafd64e6143bb) )
 
-	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, CRC(c1c0bd5b) SHA1(a1364de27f747d5531cb57757852f75cbb0cd520) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
 	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
 ROM_END
 
@@ -225,9 +225,9 @@ ROM_START( mg_bb )
 	ROM_REGION( 0x100000, "snd", 0 )
 	ROM_LOAD( "bigbreaksoudnv3dig1-106.bin", 0x0000, 0x080000, CRC(65790dfa) SHA1(5dbcec93a77dd96e5f4b42db8ab25afed9a27c9e) )
 
-	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
 	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, NO_DUMP )
 ROM_END
 
@@ -344,9 +344,9 @@ ROM_START( mg_lug )
 	ROM_LOAD( "msb.u3", 0x000000, 0x080000, CRC(18fbf244) SHA1(20c6b6b644d24dc477c859a300e357914f2cfe72) )
 	ROM_LOAD( "msb.u2", 0x080000, 0x080000, CRC(d802d345) SHA1(2b5acce2922fee3da924dc1291c2778de947218e) )
 
-	ROM_REGION( 0x100000, "sound_16c55", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "msb.u5", 0x0000, 0x080000, CRC(e0335ce9) SHA1(a4a6d7cc79eaceab8949767860c7849d8b24d7d5) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )	// PIC dump?
+	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
 	ROM_LOAD( "cpu.u6", 0x0000, 0x080000, CRC(24e25be1) SHA1(241f9c217e73586ab590f33ae4c8ec554e312f8c) )
 ROM_END
 
@@ -426,15 +426,15 @@ ROM_START( mg_scl )
 ROM_END
 
 // complete(?) dump
-GAME( 199?, mg_gbr		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Guinness Book Of Records (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_risk		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Risk (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_bb		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Big Break (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_lug		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "London Underground (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_alad		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Aladdin's Cave (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_gbr      , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Guinness Book Of Records (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_risk     , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Risk (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_bb       , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Big Break (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_lug      , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "London Underground (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_alad     , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Aladdin's Cave (Maygay M2)", GAME_IS_SKELETON )
 
 // incomplete dumps
-GAME( 199?, mg_ewg		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Each Way Gambler (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_jv		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Jack & Vera (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_pbw		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Pinball Wizard (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_scl		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Super Clue (Maygay M2)", GAME_IS_SKELETON )
-GAME( 199?, mg_kf		, 0			, maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Krypton Factor (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_ewg      , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Each Way Gambler (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_jv       , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Jack & Vera (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_pbw      , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Pinball Wizard (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_scl      , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Super Clue (Maygay M2)", GAME_IS_SKELETON )
+GAME( 199?, mg_kf       , 0         , maygayew, maygayew, driver_device, 0, ROT0, "Maygay", "Krypton Factor (Maygay M2)", GAME_IS_SKELETON )

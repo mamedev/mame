@@ -120,7 +120,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 		scroll = (8*sy + 256 - state->m_attributesram[2 * sx]) % 256;
 		if (state->m_flipy)
 		{
-		   scroll = (248 - scroll) % 256;
+			scroll = (248 - scroll) % 256;
 		}
 		if (state->m_flipx) sx = 31 - sx;
 
@@ -159,7 +159,7 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 		scroll = (8*sy + 256 - state->m_attributesram2[2 * sx]) % 256;
 		if (state->m_flipy)
 		{
-		   scroll = (248 - scroll) % 256;
+			scroll = (248 - scroll) % 256;
 		}
 		if (state->m_flipx) sx = 31 - sx;
 
@@ -173,8 +173,8 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
-						 const rectangle &cliprect, UINT8* sprite_ram,
-                         int bank)
+							const rectangle &cliprect, UINT8* sprite_ram,
+							int bank)
 {
 	wiz_state *state = machine.driver_data<wiz_state>();
 	int offs;

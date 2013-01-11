@@ -47,7 +47,7 @@ static int cgenie_output_byte(INT16 *buffer, int sample_count, UINT8 data)
 
 static int cgenie_handle_cas(INT16 *buffer, const UINT8 *casdata)
 {
-	int	i, data_pos, sample_count;
+	int i, data_pos, sample_count;
 
 	data_pos = 0;
 	sample_count = 0;
@@ -112,13 +112,13 @@ static int cgenie_cas_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller cgenie_cas_legacy_fill_wave =
 {
-	cgenie_cas_fill_wave,					/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	cgenie_cas_to_wav_size,					/* chunk_sample_calc */
-	2400,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	cgenie_cas_fill_wave,                   /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	cgenie_cas_to_wav_size,                 /* chunk_sample_calc */
+	2400,                                   /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 
@@ -146,4 +146,3 @@ static const struct CassetteFormat cgenie_cas_format =
 CASSETTE_FORMATLIST_START(cgenie_cassette_formats)
 	CASSETTE_FORMAT(cgenie_cas_format)
 CASSETTE_FORMATLIST_END
-

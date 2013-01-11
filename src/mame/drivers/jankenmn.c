@@ -133,7 +133,7 @@
 
 ***************************************************************************/
 
-#define MASTER_CLOCK		XTAL_2_5MHz
+#define MASTER_CLOCK        XTAL_2_5MHz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -260,27 +260,27 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW:7,8")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW:7,8")
 	PORT_DIPSETTING( 0x00, "Lamp Test" )
-	PORT_DIPSETTING( 0x02, DEF_STR( 3C_1C ) )		// or 4 credits on 100 yen
-	PORT_DIPSETTING( 0x01, DEF_STR( 2C_1C ) )		// or 6 credits on 100 yen
-	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )		// or 11 credits on 100 yen
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:6")
+	PORT_DIPSETTING( 0x02, DEF_STR( 3C_1C ) )       // or 4 credits on 100 yen
+	PORT_DIPSETTING( 0x01, DEF_STR( 2C_1C ) )       // or 6 credits on 100 yen
+	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )       // or 11 credits on 100 yen
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -293,8 +293,8 @@ INPUT_PORTS_END
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_NULL,         /* ZC/TO0 callback */
 	DEVCB_NULL,         /* ZC/TO1 callback */
 	DEVCB_NULL          /* ZC/TO2 callback */
 };
@@ -339,7 +339,7 @@ static I8255_INTERFACE (ppi8255_intf_1)
 
 static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* 2.5 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
 	MCFG_CPU_CONFIG(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(jankenmn_map)
 	MCFG_CPU_IO_MAP(jankenmn_port_map)

@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( mekd2_mem , AS_PROGRAM, 8, mekd2_state)
 	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
 	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xa07f) AM_RAM // system ram
-	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)	/* JBUG ROM */
+	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)   /* JBUG ROM */
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -253,46 +253,46 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 
 static const pia6821_interface mekd2_s_mc6821_intf =
 {
-	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_key_r),		/* port A input */
-	DEVCB_NULL,						/* port B input */
-	DEVCB_NULL,						/* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_key40_r),	/* CB1 input */
-	DEVCB_NULL,						/* CA2 input */
-	DEVCB_NULL,						/* CB2 input */
-	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_segment_w),	/* port A output */
-	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_digit_w),	/* port B output */
-	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_nmi_w),	/* CA2 output */
-	DEVCB_NULL,						/* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),	/* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI)		/* IRQB output */
+	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_key_r),      /* port A input */
+	DEVCB_NULL,                     /* port B input */
+	DEVCB_NULL,                     /* CA1 input */
+	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_key40_r),   /* CB1 input */
+	DEVCB_NULL,                     /* CA2 input */
+	DEVCB_NULL,                     /* CB2 input */
+	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_segment_w),  /* port A output */
+	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_digit_w),    /* port B output */
+	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_nmi_w), /* CA2 output */
+	DEVCB_NULL,                     /* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI)     /* IRQB output */
 };
 
 static const pia6821_interface mekd2_u_mc6821_intf =
 {
-	DEVCB_NULL,						/* port A input */
-	DEVCB_NULL,						/* port B input */
-	DEVCB_NULL,						/* CA1 input */
-	DEVCB_NULL,						/* CB1 input */
-	DEVCB_NULL,						/* CA2 input */
-	DEVCB_NULL,						/* CB2 input */
-	DEVCB_NULL,						/* port A output */
-	DEVCB_NULL,						/* port B output */
-	DEVCB_NULL,						/* CA2 output */
-	DEVCB_NULL,						/* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),	/* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB output */
+	DEVCB_NULL,                     /* port A input */
+	DEVCB_NULL,                     /* port B input */
+	DEVCB_NULL,                     /* CA1 input */
+	DEVCB_NULL,                     /* CB1 input */
+	DEVCB_NULL,                     /* CA2 input */
+	DEVCB_NULL,                     /* CB2 input */
+	DEVCB_NULL,                     /* port A output */
+	DEVCB_NULL,                     /* port B output */
+	DEVCB_NULL,                     /* CA2 output */
+	DEVCB_NULL,                     /* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
 };
 
 static ACIA6850_INTERFACE( mekd2_acia_intf )
 {
-	XTAL_MEKD2 / 256,	//connected to cassette circuit /* tx clock 4800Hz */
-	XTAL_MEKD2 / 256,	//connected to cassette circuit /* rx clock varies, controlled by cassette circuit */
+	XTAL_MEKD2 / 256,   //connected to cassette circuit /* tx clock 4800Hz */
+	XTAL_MEKD2 / 256,   //connected to cassette circuit /* rx clock varies, controlled by cassette circuit */
 	DEVCB_NULL,//LINE(cass),//connected to cassette circuit /* in rxd func */
 	DEVCB_NULL,//LINE(cass),//connected to cassette circuit /* out txd func */
-	DEVCB_NULL,						/* in cts func */
-	DEVCB_NULL,		//connected to cassette circuit /* out rts func */
-	DEVCB_NULL,						/* in dcd func */
-	DEVCB_NULL						/* out irq func */
+	DEVCB_NULL,                     /* in cts func */
+	DEVCB_NULL,     //connected to cassette circuit /* out rts func */
+	DEVCB_NULL,                     /* in dcd func */
+	DEVCB_NULL                      /* out irq func */
 };
 
 static DEVICE_IMAGE_LOAD( mekd2_cart )
@@ -370,4 +370,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     INIT    COMPANY     FULLNAME */
-CONS( 1977, mekd2,	0,	0,  mekd2,    mekd2, driver_device,	0,	"Motorola", "MEK6800D2" , GAME_NOT_WORKING )
+CONS( 1977, mekd2,  0,  0,  mekd2,    mekd2, driver_device, 0,  "Motorola", "MEK6800D2" , GAME_NOT_WORKING )

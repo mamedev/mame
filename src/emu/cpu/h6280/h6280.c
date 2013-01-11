@@ -174,28 +174,28 @@ const h6280_device::ophandler h6280_device::s_opcodetable[256] =
 void h6280_device::device_start()
 {
 	// register our state for the debugger
-	state_add(STATE_GENPC,    	"GENPC",		m_pc.w.l).noshow();
-	state_add(STATE_GENFLAGS, 	"GENFLAGS",		m_p).callimport().callexport().formatstr("%8s").noshow();
-	state_add(H6280_PC,       	"PC",    		m_pc.d).mask(0xffff);
-	state_add(H6280_S,        	"S",        	m_sp.b.l).mask(0xff);
-	state_add(H6280_P,        	"P",     		m_p).mask(0xff);
-	state_add(H6280_A,        	"A",        	m_a).mask(0xff);
-	state_add(H6280_X,        	"X",        	m_x).mask(0xff);
-	state_add(H6280_Y,        	"Y",        	m_y).mask(0xff);
-	state_add(H6280_IRQ_MASK, 	"IM",        	m_irq_mask).mask(0xff);
-	state_add(H6280_TIMER_STATE,"TMR",        	m_timer_status).mask(0xff);
-	state_add(H6280_NMI_STATE,  "NMI",        	m_nmi_state).mask(0xf);
+	state_add(STATE_GENPC,      "GENPC",        m_pc.w.l).noshow();
+	state_add(STATE_GENFLAGS,   "GENFLAGS",     m_p).callimport().callexport().formatstr("%8s").noshow();
+	state_add(H6280_PC,         "PC",           m_pc.d).mask(0xffff);
+	state_add(H6280_S,          "S",            m_sp.b.l).mask(0xff);
+	state_add(H6280_P,          "P",            m_p).mask(0xff);
+	state_add(H6280_A,          "A",            m_a).mask(0xff);
+	state_add(H6280_X,          "X",            m_x).mask(0xff);
+	state_add(H6280_Y,          "Y",            m_y).mask(0xff);
+	state_add(H6280_IRQ_MASK,   "IM",           m_irq_mask).mask(0xff);
+	state_add(H6280_TIMER_STATE,"TMR",          m_timer_status).mask(0xff);
+	state_add(H6280_NMI_STATE,  "NMI",          m_nmi_state).mask(0xf);
 	state_add(H6280_IRQ1_STATE, "IRQ1",        m_irq_state[0]).mask(0xf);
 	state_add(H6280_IRQ2_STATE, "IRQ2",        m_irq_state[1]).mask(0xf);
 	state_add(H6280_IRQT_STATE, "IRQT",        m_irq_state[2]).mask(0xf);
-	state_add(H6280_M1,			"M1",        	m_mmr[0]).mask(0xff);
-	state_add(H6280_M2,			"M2",        	m_mmr[1]).mask(0xff);
-	state_add(H6280_M3,			"M3",        	m_mmr[2]).mask(0xff);
-	state_add(H6280_M4,			"M4",        	m_mmr[3]).mask(0xff);
-	state_add(H6280_M5,			"M5",        	m_mmr[4]).mask(0xff);
-	state_add(H6280_M6,			"M6",        	m_mmr[5]).mask(0xff);
-	state_add(H6280_M7,			"M7",        	m_mmr[6]).mask(0xff);
-	state_add(H6280_M8,			"M8",        	m_mmr[7]).mask(0xff);
+	state_add(H6280_M1,         "M1",           m_mmr[0]).mask(0xff);
+	state_add(H6280_M2,         "M2",           m_mmr[1]).mask(0xff);
+	state_add(H6280_M3,         "M3",           m_mmr[2]).mask(0xff);
+	state_add(H6280_M4,         "M4",           m_mmr[3]).mask(0xff);
+	state_add(H6280_M5,         "M5",           m_mmr[4]).mask(0xff);
+	state_add(H6280_M6,         "M6",           m_mmr[5]).mask(0xff);
+	state_add(H6280_M7,         "M7",           m_mmr[6]).mask(0xff);
+	state_add(H6280_M8,         "M8",           m_mmr[7]).mask(0xff);
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -256,21 +256,21 @@ void h6280_device::device_reset()
 	/* set I and B flags */
 	P = _fI | _fB;
 
-    /* stack starts at 0x01ff */
+	/* stack starts at 0x01ff */
 	m_sp.d = 0x1ff;
 
-    /* read the reset vector into PC */
+	/* read the reset vector into PC */
 	PCL = program_read8(H6280_RESET_VEC);
 	PCH = program_read8(H6280_RESET_VEC + 1);
 
 	/* CPU starts in low speed mode */
-    m_clocks_per_cycle = 4;
+	m_clocks_per_cycle = 4;
 
 	/* timer off by default */
 	m_timer_status = 0;
 	m_timer_load = 128 * 1024;
 
-    /* clear pending interrupts */
+	/* clear pending interrupts */
 	for (int i = 0; i < 3; i++)
 	{
 		m_irq_state[i] = CLEAR_LINE;
@@ -426,7 +426,7 @@ void h6280_device::execute_set_input(int inputnum, int state)
 }
 
 /***************************************************************
- *  program_read8		read memory
+ *  program_read8       read memory
  ***************************************************************/
 UINT8 h6280_device::program_read8(offs_t addr)
 {
@@ -435,7 +435,7 @@ UINT8 h6280_device::program_read8(offs_t addr)
 }
 
 /***************************************************************
- *  program_write8		write memory
+ *  program_write8      write memory
  ***************************************************************/
 void h6280_device::program_write8(offs_t addr, UINT8 data)
 {
@@ -444,7 +444,7 @@ void h6280_device::program_write8(offs_t addr, UINT8 data)
 }
 
 /***************************************************************
- *  program_read8z		read memory - zero page
+ *  program_read8z      read memory - zero page
  ***************************************************************/
 UINT8 h6280_device::program_read8z(offs_t addr)
 {
@@ -452,7 +452,7 @@ UINT8 h6280_device::program_read8z(offs_t addr)
 }
 
 /***************************************************************
- *  program_write8z		write memory - zero page
+ *  program_write8z     write memory - zero page
  ***************************************************************/
 void h6280_device::program_write8z(offs_t addr, UINT8 data)
 {
@@ -460,28 +460,28 @@ void h6280_device::program_write8z(offs_t addr, UINT8 data)
 }
 
 /***************************************************************
- *  program_read16		read word from memory
+ *  program_read16      read word from memory
  ***************************************************************/
 UINT16 h6280_device::program_read16(offs_t addr)
 {
 	return m_program->read_byte(TRANSLATED(addr)) |
-		  (m_program->read_byte(TRANSLATED(addr + 1)) << 8);
+			(m_program->read_byte(TRANSLATED(addr + 1)) << 8);
 }
 
 /***************************************************************
- *  program_read16z		read a word from a zero page address
+ *  program_read16z     read a word from a zero page address
  ***************************************************************/
 UINT16 h6280_device::program_read16z(offs_t addr)
 {
 	if ((addr & 0xff) == 0xff)
 	{
 		return m_program->read_byte((m_mmr[1] << 13) | (addr & 0x1fff)) |
-			  (m_program->read_byte((m_mmr[1] << 13) | ((addr - 0xff) & 0x1fff)) << 8);
+				(m_program->read_byte((m_mmr[1] << 13) | ((addr - 0xff) & 0x1fff)) << 8);
 	}
 	else
 	{
 		return m_program->read_byte((m_mmr[1] << 13) | (addr & 0x1fff)) |
-			  (m_program->read_byte((m_mmr[1] << 13) | ((addr + 1) & 0x1fff)) << 8);
+				(m_program->read_byte((m_mmr[1] << 13) | ((addr + 1) & 0x1fff)) << 8);
 	}
 }
 
@@ -504,7 +504,7 @@ void h6280_device::pull(UINT8 &value)
 }
 
 /***************************************************************
- *  read_opcode		read an opcode
+ *  read_opcode     read an opcode
  ***************************************************************/
 UINT8 h6280_device::read_opcode()
 {
@@ -512,7 +512,7 @@ UINT8 h6280_device::read_opcode()
 }
 
 /***************************************************************
- *  read_opcode_arg	read an opcode argument
+ *  read_opcode_arg read an opcode argument
  ***************************************************************/
 UINT8 h6280_device::read_opcode_arg()
 {
@@ -536,7 +536,7 @@ void h6280_device::execute_run()
 
 	/* Execute instructions */
 	do
-    {
+	{
 		m_ppc = m_pc;
 
 		debugger_instruction_hook(this, PCW);
@@ -601,7 +601,7 @@ void h6280_device::set_irq_line(int irqline, int state)
 		if (m_irq_state[irqline] == state)
 			return;
 
-	    m_irq_state[irqline] = state;
+		m_irq_state[irqline] = state;
 
 		CHECK_IRQ_LINES;
 	}
@@ -673,7 +673,7 @@ WRITE8_MEMBER( h6280_device::timer_w )
 
 		case 1: /* Counter enable */
 			if (data & 1)
-			{	/* stop -> start causes reload */
+			{   /* stop -> start causes reload */
 				if(m_timer_status == 0)
 					m_timer_value = m_timer_load;
 			}

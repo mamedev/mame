@@ -25,7 +25,7 @@ void simpsons_tile_callback( running_machine &machine, int layer, int bank, int 
 void simpsons_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
 	simpsons_state *state = machine.driver_data<simpsons_state>();
-	int pri = (*color & 0x0f80) >> 6;	/* ??????? */
+	int pri = (*color & 0x0f80) >> 6;   /* ??????? */
 
 	if (pri <= state->m_layerpri[2])
 		*priority_mask = 0;

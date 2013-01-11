@@ -37,16 +37,16 @@ const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_roml(NULL),
-	  m_romh(NULL),
-	  m_ram(NULL),
-	  m_nvram(NULL),
-	  m_nvram_size(0),
-	  m_roml_mask(0),
-	  m_romh_mask(0),
-	  m_ram_mask(0),
-	  m_game(1),
-	  m_exrom(1)
+		m_roml(NULL),
+		m_romh(NULL),
+		m_ram(NULL),
+		m_nvram(NULL),
+		m_nvram_size(0),
+		m_roml_mask(0),
+		m_romh_mask(0),
+		m_ram_mask(0),
+		m_game(1),
+		m_exrom(1)
 {
 	m_slot = dynamic_cast<c64_expansion_slot_device *>(device.owner());
 }
@@ -140,7 +140,7 @@ UINT8* device_c64_expansion_card_interface::c64_nvram_pointer(running_machine &m
 //-------------------------------------------------
 
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock),
+		device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -174,12 +174,12 @@ void c64_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
-    	memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-    	memset(&m_out_dma_cb, 0, sizeof(m_out_dma_cb));
-    	memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
+		memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
+		memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_dma_cb, 0, sizeof(m_out_dma_cb));
+		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
 	}
 
 	// set brief and instance name

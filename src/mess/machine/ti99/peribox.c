@@ -210,15 +210,15 @@ CRUCLK*  51||52  DBIN
 // TODO: Connect other lines (think about how to propagate to the controller)
 static const floppy_interface ti99_4_floppy_interface =
 {
-	DEVCB_DEVICE_LINE_MEMBER( DEVICE_SELF_OWNER, peribox_device, indexhole ),	// Index hole (floppy out, line)
-	DEVCB_NULL,								// Motor (floppy in, line)
-	DEVCB_NULL,								// Track 0 (out, line)
-	DEVCB_NULL,								// Write protect (out, line)
-	DEVCB_NULL,								// Ready (out, line)
-	FLOPPY_STANDARD_5_25_DSHD,				// type
-	LEGACY_FLOPPY_OPTIONS_NAME(ti99),		// image formats
-	NULL,									// interface
-	NULL									// display info
+	DEVCB_DEVICE_LINE_MEMBER( DEVICE_SELF_OWNER, peribox_device, indexhole ),   // Index hole (floppy out, line)
+	DEVCB_NULL,                             // Motor (floppy in, line)
+	DEVCB_NULL,                             // Track 0 (out, line)
+	DEVCB_NULL,                             // Write protect (out, line)
+	DEVCB_NULL,                             // Ready (out, line)
+	FLOPPY_STANDARD_5_25_DSHD,              // type
+	LEGACY_FLOPPY_OPTIONS_NAME(ti99),       // image formats
+	NULL,                                   // interface
+	NULL                                    // display info
 };
 
 peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -660,5 +660,3 @@ const device_type PERIBOX_SLOT = &device_creator<peribox_slot_device>;
 const device_type PERIBOX_EV = &device_creator<peribox_ev_device>;
 const device_type PERIBOX_SG = &device_creator<peribox_sg_device>;
 const device_type PERIBOX_GEN = &device_creator<peribox_gen_device>;
-
-

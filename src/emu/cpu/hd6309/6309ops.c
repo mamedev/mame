@@ -41,14 +41,14 @@ OP_HANDLER( illegal )
 
 static void IIError(m68_state_t *m68_state)
 {
-	SEII;			// Set illegal Instruction Flag
-	illegal(m68_state);		// Vector to Trap handler
+	SEII;           // Set illegal Instruction Flag
+	illegal(m68_state);     // Vector to Trap handler
 }
 
 static void DZError(m68_state_t *m68_state)
 {
-	SEDZ;			// Set Division by Zero Flag
-	illegal(m68_state);		// Vector to Trap handler
+	SEDZ;           // Set Division by Zero Flag
+	illegal(m68_state);     // Vector to Trap handler
 }
 
 /* $00 NEG direct ?**** */
@@ -65,7 +65,7 @@ OP_HANDLER( neg_di )
 /* $01 OIM direct ?**** */
 OP_HANDLER( oim_di )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	DIRBYTE(t);
 	r = im | t;
@@ -77,7 +77,7 @@ OP_HANDLER( oim_di )
 /* $02 AIM direct */
 OP_HANDLER( aim_di )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	DIRBYTE(t);
 	r = im & t;
@@ -113,7 +113,7 @@ OP_HANDLER( lsr_di )
 /* $05 EIM direct */
 OP_HANDLER( eim_di )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	DIRBYTE(t);
 	r = im ^ t;
@@ -183,7 +183,7 @@ OP_HANDLER( dec_di )
 /* $0B TIM direct */
 OP_HANDLER( tim_di )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	DIRBYTE(t);
 	r = im & t;
@@ -244,10 +244,10 @@ OP_HANDLER( sync )
 	/* SYNC stops processing instructions until an interrupt request happens. */
 	/* This doesn't require the corresponding interrupt to be enabled: if it */
 	/* is disabled, execution continues with the next instruction. */
-	m68_state->int_state |= M6809_SYNC;	 /* HJB 990227 */
+	m68_state->int_state |= M6809_SYNC;  /* HJB 990227 */
 	check_irq_lines(m68_state);
 	/* if M6809_SYNC has not been cleared by check_irq_lines(m68_state),
-     * stop execution until the interrupt lines change. */
+	 * stop execution until the interrupt lines change. */
 	if( m68_state->int_state & M6809_SYNC )
 		if (m68_state->icount > 0) m68_state->icount = 0;
 }
@@ -304,7 +304,7 @@ OP_HANDLER( orcc )
 	UINT8 t;
 	IMMBYTE(t);
 	CC |= t;
-	check_irq_lines(m68_state);	/* HJB 990116 */
+	check_irq_lines(m68_state); /* HJB 990116 */
 }
 
 /* $1B ILLEGAL */
@@ -315,7 +315,7 @@ OP_HANDLER( andcc )
 	UINT8 t;
 	IMMBYTE(t);
 	CC &= t;
-	check_irq_lines(m68_state);	/* HJB 990116 */
+	check_irq_lines(m68_state); /* HJB 990116 */
 }
 
 /* $1D SEX inherent -**-- */
@@ -334,10 +334,10 @@ OP_HANDLER( exg )
 {
 	UINT16 t1,t2;
 	UINT8 tb;
-	int 	promote = FALSE;
+	int     promote = FALSE;
 
 	IMMBYTE(tb);
-	if( (tb^(tb>>4)) & 0x08 )	/* HJB 990225: mixed 8/16 bit case? */
+	if( (tb^(tb>>4)) & 0x08 )   /* HJB 990225: mixed 8/16 bit case? */
 	{
 		promote = TRUE;
 	}
@@ -422,7 +422,7 @@ OP_HANDLER( tfr )
 {
 	UINT8 tb;
 	UINT16 t;
-	int 	promote = FALSE;
+	int     promote = FALSE;
 
 	IMMBYTE(tb);
 	if( (tb^(tb>>4)) & 0x08 )
@@ -478,7 +478,7 @@ OP_HANDLER( bra )
 }
 
 /* $21 BRN relative ----- */
-static UINT8 brn_temp;	// hack around GCC 4.6 error because we need the side effects of IMMBYTE
+static UINT8 brn_temp;  // hack around GCC 4.6 error because we need the side effects of IMMBYTE
 OP_HANDLER( brn )
 {
 	IMMBYTE(brn_temp);
@@ -658,57 +658,57 @@ OP_HANDLER( lble )
 	LBRANCH( (NXORV || (CC&CC_Z)) );
 }
 
-#define REGREG_PREAMBLE														\
-	IMMBYTE(tb);															\
-	if( (tb^(tb>>4)) & 0x08 )												\
-		{promote = TRUE;}													\
-	switch(tb>>4) {															\
-		case  0: src16Reg = &D; large = TRUE;  break;						\
-		case  1: src16Reg = &X; large = TRUE;  break;						\
-		case  2: src16Reg = &Y; large = TRUE;  break;						\
-		case  3: src16Reg = &U; large = TRUE;  break;						\
-		case  4: src16Reg = &S; large = TRUE;  break;						\
-		case  5: src16Reg = &PC; large = TRUE; break;						\
-		case  6: src16Reg = &W; large = TRUE;  break;						\
-		case  7: src16Reg = &V; large = TRUE;  break;						\
-		case  8: if (promote) src16Reg = &D; else src8Reg = &A; break;		\
-		case  9: if (promote) src16Reg = &D; else src8Reg = &B; break;		\
-		case 10: if (promote) src16Reg = &z16; else src8Reg = &CC; break;	\
-		case 11: if (promote) src16Reg = &z16; else src8Reg = &DP; break;	\
-		case 12: if (promote) src16Reg = &z16; else src8Reg = &z8; break;	\
-		case 13: if (promote) src16Reg = &z16; else src8Reg = &z8; break;	\
-		case 14: if (promote) src16Reg = &W; else src8Reg = &E; break;		\
-		default: if (promote) src16Reg = &W; else src8Reg = &F; break;		\
-	}																		\
-	switch(tb&15) {															\
-		case  0: dst16Reg = &D; large = TRUE;  break;						\
-		case  1: dst16Reg = &X; large = TRUE;  break;						\
-		case  2: dst16Reg = &Y; large = TRUE;  break;						\
-		case  3: dst16Reg = &U; large = TRUE;  break;						\
-		case  4: dst16Reg = &S; large = TRUE;  break;						\
-		case  5: dst16Reg = &PC; large = TRUE; break;						\
-		case  6: dst16Reg = &W; large = TRUE;  break;						\
-		case  7: dst16Reg = &V; large = TRUE;  break;						\
-		case  8: if (promote) dst16Reg = &D; else dst8Reg = &A; break;		\
-		case  9: if (promote) dst16Reg = &D; else dst8Reg = &B; break;		\
-		case 10: if (promote) dst16Reg = &z16; else dst8Reg = &CC; break;	\
-		case 11: if (promote) dst16Reg = &z16; else dst8Reg = &DP; break;	\
-		case 12: if (promote) dst16Reg = &z16; else dst8Reg = &z8; break;	\
-		case 13: if (promote) dst16Reg = &z16; else dst8Reg = &z8; break;	\
-		case 14: if (promote) dst16Reg = &W; else dst8Reg = &E; break;		\
-		default: if (promote) dst16Reg = &W; else dst8Reg = &F; break;		\
-	}																		\
+#define REGREG_PREAMBLE                                                     \
+	IMMBYTE(tb);                                                            \
+	if( (tb^(tb>>4)) & 0x08 )                                               \
+		{promote = TRUE;}                                                   \
+	switch(tb>>4) {                                                         \
+		case  0: src16Reg = &D; large = TRUE;  break;                       \
+		case  1: src16Reg = &X; large = TRUE;  break;                       \
+		case  2: src16Reg = &Y; large = TRUE;  break;                       \
+		case  3: src16Reg = &U; large = TRUE;  break;                       \
+		case  4: src16Reg = &S; large = TRUE;  break;                       \
+		case  5: src16Reg = &PC; large = TRUE; break;                       \
+		case  6: src16Reg = &W; large = TRUE;  break;                       \
+		case  7: src16Reg = &V; large = TRUE;  break;                       \
+		case  8: if (promote) src16Reg = &D; else src8Reg = &A; break;      \
+		case  9: if (promote) src16Reg = &D; else src8Reg = &B; break;      \
+		case 10: if (promote) src16Reg = &z16; else src8Reg = &CC; break;   \
+		case 11: if (promote) src16Reg = &z16; else src8Reg = &DP; break;   \
+		case 12: if (promote) src16Reg = &z16; else src8Reg = &z8; break;   \
+		case 13: if (promote) src16Reg = &z16; else src8Reg = &z8; break;   \
+		case 14: if (promote) src16Reg = &W; else src8Reg = &E; break;      \
+		default: if (promote) src16Reg = &W; else src8Reg = &F; break;      \
+	}                                                                       \
+	switch(tb&15) {                                                         \
+		case  0: dst16Reg = &D; large = TRUE;  break;                       \
+		case  1: dst16Reg = &X; large = TRUE;  break;                       \
+		case  2: dst16Reg = &Y; large = TRUE;  break;                       \
+		case  3: dst16Reg = &U; large = TRUE;  break;                       \
+		case  4: dst16Reg = &S; large = TRUE;  break;                       \
+		case  5: dst16Reg = &PC; large = TRUE; break;                       \
+		case  6: dst16Reg = &W; large = TRUE;  break;                       \
+		case  7: dst16Reg = &V; large = TRUE;  break;                       \
+		case  8: if (promote) dst16Reg = &D; else dst8Reg = &A; break;      \
+		case  9: if (promote) dst16Reg = &D; else dst8Reg = &B; break;      \
+		case 10: if (promote) dst16Reg = &z16; else dst8Reg = &CC; break;   \
+		case 11: if (promote) dst16Reg = &z16; else dst8Reg = &DP; break;   \
+		case 12: if (promote) dst16Reg = &z16; else dst8Reg = &z8; break;   \
+		case 13: if (promote) dst16Reg = &z16; else dst8Reg = &z8; break;   \
+		case 14: if (promote) dst16Reg = &W; else dst8Reg = &E; break;      \
+		default: if (promote) dst16Reg = &W; else dst8Reg = &F; break;      \
+	}                                                                       \
 
 /* $1030 addr_r r1 + r2 -> r2 */
 
 OP_HANDLER( addr_r )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -731,12 +731,12 @@ OP_HANDLER( addr_r )
 
 OP_HANDLER( adcr )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -760,12 +760,12 @@ OP_HANDLER( adcr )
 /* $1032 SUBR r1 - r2 -> r2 */
 OP_HANDLER( subr )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -788,12 +788,12 @@ OP_HANDLER( subr )
 /* $1033 SBCR r1 - r2 - C -> r2 */
 OP_HANDLER( sbcr )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -816,12 +816,12 @@ OP_HANDLER( sbcr )
 /* $1034 ANDR r1 & r2 -> r2 */
 OP_HANDLER( andr )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -844,12 +844,12 @@ OP_HANDLER( andr )
 /* $1035 ORR r1 | r2 -> r2 */
 OP_HANDLER( orr )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -872,12 +872,12 @@ OP_HANDLER( orr )
 /* $1036 EORR r1 ^ r2 -> r2 */
 OP_HANDLER( eorr )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -900,12 +900,12 @@ OP_HANDLER( eorr )
 /* $1037 CMPR r1 - r2 */
 OP_HANDLER( cmpr )
 {
-	UINT8	tb, z8 = 0;
-	UINT16	z16 = 0, r8;
-	UINT32	r16;
-	UINT8	*src8Reg = NULL, *dst8Reg = NULL;
-	UINT16	*src16Reg = NULL, *dst16Reg = NULL;
-	int 	promote = FALSE, large = FALSE;
+	UINT8   tb, z8 = 0;
+	UINT16  z16 = 0, r8;
+	UINT32  r16;
+	UINT8   *src8Reg = NULL, *dst8Reg = NULL;
+	UINT16  *src16Reg = NULL, *dst16Reg = NULL;
+	int     promote = FALSE, large = FALSE;
 
 	REGREG_PREAMBLE;
 
@@ -926,7 +926,7 @@ OP_HANDLER( cmpr )
 /* $1138 TFM R0+,R1+ */
 OP_HANDLER( tfmpp )
 {
-	UINT8	tb, srcValue = 0;
+	UINT8   tb, srcValue = 0;
 
 	IMMBYTE(tb);
 
@@ -938,7 +938,7 @@ OP_HANDLER( tfmpp )
 			case  2: srcValue = RM(Y++); break;
 			case  3: srcValue = RM(U++); break;
 			case  4: srcValue = RM(S++); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		switch(tb&15) {
@@ -947,7 +947,7 @@ OP_HANDLER( tfmpp )
 			case  2: WM(Y++, srcValue); break;
 			case  3: WM(U++, srcValue); break;
 			case  4: WM(S++, srcValue); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		PCD = PCD - 3;
@@ -960,7 +960,7 @@ OP_HANDLER( tfmpp )
 /* $1139 TFM R0-,R1- */
 OP_HANDLER( tfmmm )
 {
-	UINT8	tb, srcValue = 0;
+	UINT8   tb, srcValue = 0;
 
 	IMMBYTE(tb);
 
@@ -972,7 +972,7 @@ OP_HANDLER( tfmmm )
 			case  2: srcValue = RM(Y--); break;
 			case  3: srcValue = RM(U--); break;
 			case  4: srcValue = RM(S--); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		switch(tb&15) {
@@ -981,7 +981,7 @@ OP_HANDLER( tfmmm )
 			case  2: WM(Y--, srcValue); break;
 			case  3: WM(U--, srcValue); break;
 			case  4: WM(S--, srcValue); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		PCD = PCD - 3;
@@ -994,7 +994,7 @@ OP_HANDLER( tfmmm )
 /* $113A TFM R0+,R1 */
 OP_HANDLER( tfmpc )
 {
-	UINT8	tb, srcValue = 0;
+	UINT8   tb, srcValue = 0;
 
 	IMMBYTE(tb);
 
@@ -1006,7 +1006,7 @@ OP_HANDLER( tfmpc )
 			case  2: srcValue = RM(Y++); break;
 			case  3: srcValue = RM(U++); break;
 			case  4: srcValue = RM(S++); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		switch(tb&15) {
@@ -1015,7 +1015,7 @@ OP_HANDLER( tfmpc )
 			case  2: WM(Y, srcValue); break;
 			case  3: WM(U, srcValue); break;
 			case  4: WM(S, srcValue); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		PCD = PCD - 3;
@@ -1028,7 +1028,7 @@ OP_HANDLER( tfmpc )
 /* $113B TFM R0,R1+ */
 OP_HANDLER( tfmcp )
 {
-	UINT8	tb, srcValue = 0;
+	UINT8   tb, srcValue = 0;
 
 	IMMBYTE(tb);
 
@@ -1040,7 +1040,7 @@ OP_HANDLER( tfmcp )
 			case  2: srcValue = RM(Y); break;
 			case  3: srcValue = RM(U); break;
 			case  4: srcValue = RM(S); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		switch(tb&15) {
@@ -1049,7 +1049,7 @@ OP_HANDLER( tfmcp )
 			case  2: WM(Y++, srcValue); break;
 			case  3: WM(U++, srcValue); break;
 			case  4: WM(S++, srcValue); break;
-			default: IIError(m68_state); return;		/* reg PC through F */
+			default: IIError(m68_state); return;        /* reg PC through F */
 		}
 
 		PCD = PCD - 3;
@@ -1201,7 +1201,7 @@ OP_HANDLER( rti )
 {
 	UINT8 t;
 	PULLBYTE(CC);
-	t = CC & CC_E;		/* HJB 990225: entire state saved? */
+	t = CC & CC_E;      /* HJB 990225: entire state saved? */
 	if(t)
 	{
 		m68_state->icount -= 9;
@@ -1219,7 +1219,7 @@ OP_HANDLER( rti )
 		PULLWORD(UD);
 	}
 	PULLWORD(PCD);
-	check_irq_lines(m68_state);	/* HJB 990116 */
+	check_irq_lines(m68_state); /* HJB 990116 */
 }
 
 /* $3C CWAI inherent ----1 */
@@ -1229,11 +1229,11 @@ OP_HANDLER( cwai )
 	IMMBYTE(t);
 	CC &= t;
 	/*
-     * CWAI stacks the entire machine state on the hardware stack,
-     * then waits for an interrupt; when the interrupt is taken
-     * later, the state is *not* saved again after CWAI.
-     */
-	CC |= CC_E; 		/* HJB 990225: save entire state */
+	 * CWAI stacks the entire machine state on the hardware stack,
+	 * then waits for an interrupt; when the interrupt is taken
+	 * later, the state is *not* saved again after CWAI.
+	 */
+	CC |= CC_E;         /* HJB 990225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -1247,8 +1247,8 @@ OP_HANDLER( cwai )
 	PUSHBYTE(B);
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
-	m68_state->int_state |= M6809_CWAI;	 /* HJB 990228 */
-	check_irq_lines(m68_state);	  /* HJB 990116 */
+	m68_state->int_state |= M6809_CWAI;  /* HJB 990228 */
+	check_irq_lines(m68_state);   /* HJB 990116 */
 	if( m68_state->int_state & M6809_CWAI )
 		if( m68_state->icount > 0 )
 			m68_state->icount = 0;
@@ -1268,7 +1268,7 @@ OP_HANDLER( mul )
 /* $3F SWI (SWI2 SWI3) absolute indirect ----- */
 OP_HANDLER( swi )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -1282,22 +1282,22 @@ OP_HANDLER( swi )
 	PUSHBYTE(B);
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
-	CC |= CC_IF | CC_II;	/* inhibit FIRQ and IRQ */
+	CC |= CC_IF | CC_II;    /* inhibit FIRQ and IRQ */
 	PCD=RM16(m68_state, 0xfffa);
 }
 
 /* $1130 BAND */
 
-#define decodePB_tReg(n)	(((n) >> 6) & 0x03)
-#define decodePB_src(n) 	(((n) >> 3) & 0x07)
-#define decodePB_dst(n) 	(((n) >> 0) & 0x07)
+#define decodePB_tReg(n)    (((n) >> 6) & 0x03)
+#define decodePB_src(n)     (((n) >> 3) & 0x07)
+#define decodePB_dst(n)     (((n) >> 0) & 0x07)
 
 static const UINT8 bitTable[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
 OP_HANDLER( band )
 {
-	UINT8		pb;
-	UINT16		db;
+	UINT8       pb;
+	UINT16      db;
 
 	IMMBYTE(pb);
 
@@ -1313,8 +1313,8 @@ OP_HANDLER( band )
 
 OP_HANDLER( biand )
 {
-	UINT8		pb;
-	UINT16		db;
+	UINT8       pb;
+	UINT16      db;
 
 	IMMBYTE(pb);
 
@@ -1330,8 +1330,8 @@ OP_HANDLER( biand )
 
 OP_HANDLER( bor )
 {
-	UINT8		pb;
-	UINT16		db;
+	UINT8       pb;
+	UINT16      db;
 
 	IMMBYTE(pb);
 
@@ -1347,8 +1347,8 @@ OP_HANDLER( bor )
 
 OP_HANDLER( bior )
 {
-	UINT8		pb;
-	UINT16		db;
+	UINT8       pb;
+	UINT16      db;
 
 	IMMBYTE(pb);
 
@@ -1364,9 +1364,9 @@ OP_HANDLER( bior )
 
 OP_HANDLER( beor )
 {
-	UINT8		pb;
-	UINT16		db;
-	UINT8		tReg, tMem;
+	UINT8       pb;
+	UINT16      db;
+	UINT8       tReg, tMem;
 
 	IMMBYTE(pb);
 
@@ -1385,9 +1385,9 @@ OP_HANDLER( beor )
 
 OP_HANDLER( bieor )
 {
-	UINT8		pb;
-	UINT16		db;
-	UINT8		tReg, tMem;
+	UINT8       pb;
+	UINT16      db;
+	UINT8       tReg, tMem;
 
 	IMMBYTE(pb);
 
@@ -1406,8 +1406,8 @@ OP_HANDLER( bieor )
 
 OP_HANDLER( ldbt )
 {
-	UINT8		pb;
-	UINT16		db;
+	UINT8       pb;
+	UINT16      db;
 
 	IMMBYTE(pb);
 
@@ -1423,8 +1423,8 @@ OP_HANDLER( ldbt )
 
 OP_HANDLER( stbt )
 {
-	UINT8		pb;
-	UINT16		db;
+	UINT8       pb;
+	UINT16      db;
 
 	IMMBYTE(pb);
 
@@ -1439,7 +1439,7 @@ OP_HANDLER( stbt )
 /* $103F SWI2 absolute indirect ----- */
 OP_HANDLER( swi2 )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -1459,7 +1459,7 @@ OP_HANDLER( swi2 )
 /* $113F SWI3 absolute indirect ----- */
 OP_HANDLER( swi3 )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -1970,7 +1970,7 @@ OP_HANDLER( neg_ix )
 /* $61 OIM indexed */
 OP_HANDLER( oim_ix )
 {
-	UINT8	r,im;
+	UINT8   r,im;
 	IMMBYTE(im);
 	fetch_effective_address(m68_state);
 	r = im | RM(EAD);
@@ -1982,7 +1982,7 @@ OP_HANDLER( oim_ix )
 /* $62 AIM indexed */
 OP_HANDLER( aim_ix )
 {
-	UINT8	r,im;
+	UINT8   r,im;
 	IMMBYTE(im);
 	fetch_effective_address(m68_state);
 	r = im & RM(EAD);
@@ -2018,7 +2018,7 @@ OP_HANDLER( lsr_ix )
 /* $65 EIM indexed */
 OP_HANDLER( eim_ix )
 {
-	UINT8	r,im;
+	UINT8   r,im;
 	IMMBYTE(im);
 	fetch_effective_address(m68_state);
 	r = im ^ RM(EAD);
@@ -2090,7 +2090,7 @@ OP_HANDLER( dec_ix )
 /* $6B TIM indexed */
 OP_HANDLER( tim_ix )
 {
-	UINT8	r,im,m;
+	UINT8   r,im,m;
 	IMMBYTE(im);
 	fetch_effective_address(m68_state);
 	m = RM(EAD);
@@ -2147,7 +2147,7 @@ OP_HANDLER( neg_ex )
 /* $71 OIM extended */
 OP_HANDLER( oim_ex )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	EXTBYTE(t);
 	r = im | t;
@@ -2159,7 +2159,7 @@ OP_HANDLER( oim_ex )
 /* $72 AIM extended */
 OP_HANDLER( aim_ex )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	EXTBYTE(t);
 	r = im & t;
@@ -2189,7 +2189,7 @@ OP_HANDLER( lsr_ex )
 /* $75 EIM extended */
 OP_HANDLER( eim_ex )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	EXTBYTE(t);
 	r = im ^ t;
@@ -2248,7 +2248,7 @@ OP_HANDLER( dec_ex )
 /* $7B TIM extended */
 OP_HANDLER( tim_ex )
 {
-	UINT8	r,t,im;
+	UINT8   r,t,im;
 	IMMBYTE(im);
 	EXTBYTE(t);
 	r = im & t;
@@ -2302,7 +2302,7 @@ OP_HANDLER( suba_im )
 /* $81 CMPA immediate ?**** */
 OP_HANDLER( cmpa_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -2312,7 +2312,7 @@ OP_HANDLER( cmpa_im )
 /* $82 SBCA immediate ?**** */
 OP_HANDLER( sbca_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2510,7 +2510,7 @@ OP_HANDLER( ldx_im )
 /* $CD LDQ immediate -**0- */
 OP_HANDLER( ldq_im )
 {
-	PAIR	q;
+	PAIR    q;
 
 	IMMLONG(q);
 	D = q.w.h;
@@ -2586,8 +2586,8 @@ OP_HANDLER( divd_im )
 /* $118e DIVQ immediate */
 OP_HANDLER( divq_im )
 {
-	PAIR	t,q, oldQ;
-	INT32	v;
+	PAIR    t,q, oldQ;
+	INT32   v;
 
 	IMMWORD( t );
 
@@ -2632,7 +2632,7 @@ OP_HANDLER( divq_im )
 /* $90 SUBA direct ?**** */
 OP_HANDLER( suba_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -2643,7 +2643,7 @@ OP_HANDLER( suba_di )
 /* $91 CMPA direct ?**** */
 OP_HANDLER( cmpa_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -2653,7 +2653,7 @@ OP_HANDLER( cmpa_di )
 /* $92 SBCA direct ?**** */
 OP_HANDLER( sbca_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2859,7 +2859,7 @@ OP_HANDLER( ldx_di )
 /* $119f MULD direct -**0- */
 OP_HANDLER( muld_di )
 {
-	PAIR	t,q;
+	PAIR    t,q;
 
 	DIRWORD(t);
 	q.d = (INT16) D * (INT16)t.w.l;
@@ -2873,7 +2873,7 @@ OP_HANDLER( muld_di )
 /* $119d DIVD direct -**0- */
 OP_HANDLER( divd_di )
 {
-	UINT8	t;
+	UINT8   t;
 	INT16   v, oldD;
 
 	DIRBYTE(t);
@@ -2915,8 +2915,8 @@ OP_HANDLER( divd_di )
 /* $119e DIVQ direct -**0- */
 OP_HANDLER( divq_di )
 {
-	PAIR	t,q, oldQ;
-	INT32	v;
+	PAIR    t,q, oldQ;
+	INT32   v;
 
 	DIRWORD(t);
 
@@ -2960,7 +2960,7 @@ OP_HANDLER( divq_di )
 /* $10dc LDQ direct -**0- */
 OP_HANDLER( ldq_di )
 {
-	PAIR	q;
+	PAIR    q;
 
 	DIRLONG(q);
 	D = q.w.h;
@@ -2990,7 +2990,7 @@ OP_HANDLER( stx_di )
 /* $10dd STQ direct -**0- */
 OP_HANDLER( stq_di )
 {
-	PAIR	q;
+	PAIR    q;
 
 	q.w.h = D;
 	q.w.l = W;
@@ -3036,7 +3036,7 @@ OP_HANDLER( cmpa_ix )
 /* $a2 SBCA indexed ?**** */
 OP_HANDLER( sbca_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = A - t - (CC & CC_C);
@@ -3251,8 +3251,8 @@ OP_HANDLER( ldx_ix )
 /* $11af MULD indexed -**0- */
 OP_HANDLER( muld_ix )
 {
-	PAIR	q;
-	UINT16	t;
+	PAIR    q;
+	UINT16  t;
 
 	fetch_effective_address(m68_state);
 	t=RM16(m68_state, EAD);
@@ -3267,7 +3267,7 @@ OP_HANDLER( muld_ix )
 /* $11ad DIVD indexed -**0- */
 OP_HANDLER( divd_ix )
 {
-	UINT8	t;
+	UINT8   t;
 	INT16   v, oldD;
 
 	fetch_effective_address(m68_state);
@@ -3310,8 +3310,8 @@ OP_HANDLER( divd_ix )
 /* $11ae DIVQ indexed -**0- */
 OP_HANDLER( divq_ix )
 {
-	PAIR	t,q, oldQ;
-	INT32	v;
+	PAIR    t,q, oldQ;
+	INT32   v;
 
 	fetch_effective_address(m68_state);
 	t.w.l=RM16(m68_state, EAD);
@@ -3357,7 +3357,7 @@ OP_HANDLER( divq_ix )
 /* $10ec LDQ indexed -**0- */
 OP_HANDLER( ldq_ix )
 {
-	PAIR	q;
+	PAIR    q;
 
 	fetch_effective_address(m68_state);
 	q.d=RM32(m68_state, EAD);
@@ -3389,7 +3389,7 @@ OP_HANDLER( stx_ix )
 /* $10ed STQ indexed -**0- */
 OP_HANDLER( stq_ix )
 {
-	PAIR	q;
+	PAIR    q;
 
 	q.w.h = D;
 	q.w.l = W;
@@ -3412,7 +3412,7 @@ OP_HANDLER( sty_ix )
 /* $b0 SUBA extended ?**** */
 OP_HANDLER( suba_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -3423,7 +3423,7 @@ OP_HANDLER( suba_ex )
 /* $b1 CMPA extended ?**** */
 OP_HANDLER( cmpa_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -3433,7 +3433,7 @@ OP_HANDLER( cmpa_ex )
 /* $b2 SBCA extended ?**** */
 OP_HANDLER( sbca_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -3638,7 +3638,7 @@ OP_HANDLER( ldx_ex )
 /* $11bf MULD extended -**0- */
 OP_HANDLER( muld_ex )
 {
-	PAIR	t, q;
+	PAIR    t, q;
 
 	EXTWORD(t);
 	q.d = (INT16) D * (INT16)t.w.l;
@@ -3652,7 +3652,7 @@ OP_HANDLER( muld_ex )
 /* $11bd DIVD extended -**0- */
 OP_HANDLER( divd_ex )
 {
-	UINT8	t;
+	UINT8   t;
 	INT16   v, oldD;
 
 	EXTBYTE(t);
@@ -3694,8 +3694,8 @@ OP_HANDLER( divd_ex )
 /* $11be DIVQ extended -**0- */
 OP_HANDLER( divq_ex )
 {
-	PAIR	t,q, oldQ;
-	INT32	v;
+	PAIR    t,q, oldQ;
+	INT32   v;
 
 	EXTWORD(t);
 
@@ -3740,7 +3740,7 @@ OP_HANDLER( divq_ex )
 /* $10fc LDQ extended -**0- */
 OP_HANDLER( ldq_ex )
 {
-	PAIR	q;
+	PAIR    q;
 
 	EXTLONG(q);
 	D = q.w.h;
@@ -3770,7 +3770,7 @@ OP_HANDLER( stx_ex )
 /* $10fd STQ extended -**0- */
 OP_HANDLER( stq_ex )
 {
-	PAIR	q;
+	PAIR    q;
 
 	q.w.h = D;
 	q.w.l = W;
@@ -3793,7 +3793,7 @@ OP_HANDLER( sty_ex )
 /* $c0 SUBB immediate ?**** */
 OP_HANDLER( subb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -3804,7 +3804,7 @@ OP_HANDLER( subb_im )
 /* $1180 SUBE immediate ?**** */
 OP_HANDLER( sube_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = E - t;
 	CLR_NZVC;
@@ -3815,7 +3815,7 @@ OP_HANDLER( sube_im )
 /* $11C0 SUBF immediate ?**** */
 OP_HANDLER( subf_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = F - t;
 	CLR_NZVC;
@@ -3826,7 +3826,7 @@ OP_HANDLER( subf_im )
 /* $c1 CMPB immediate ?**** */
 OP_HANDLER( cmpb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B - t;
 	CLR_NZVC; SET_FLAGS8(B,t,r);
@@ -3835,7 +3835,7 @@ OP_HANDLER( cmpb_im )
 /* $1181 CMPE immediate ?**** */
 OP_HANDLER( cmpe_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = E - t;
 	CLR_NZVC; SET_FLAGS8(E,t,r);
@@ -3844,7 +3844,7 @@ OP_HANDLER( cmpe_im )
 /* $11C1 CMPF immediate ?**** */
 OP_HANDLER( cmpf_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = F - t;
 	CLR_NZVC; SET_FLAGS8(F,t,r);
@@ -3853,7 +3853,7 @@ OP_HANDLER( cmpf_im )
 /* $c2 SBCB immediate ?**** */
 OP_HANDLER( sbcb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -3864,8 +3864,8 @@ OP_HANDLER( sbcb_im )
 /* $1082 SBCD immediate ?**** */
 OP_HANDLER( sbcd_im )
 {
-	PAIR	t;
-	UINT32	 r;
+	PAIR    t;
+	UINT32   r;
 	IMMWORD(t);
 	r = D - t.w.l - (CC & CC_C);
 	CLR_NZVC;
@@ -3956,8 +3956,8 @@ OP_HANDLER( bitb_im )
 /* $1085 BITD immediate -**0- */
 OP_HANDLER( bitd_im )
 {
-	PAIR	t;
-	UINT16	r;
+	PAIR    t;
+	UINT16  r;
 	IMMWORD(t);
 	r = B & t.w.l;
 	CLR_NZV;
@@ -3968,15 +3968,15 @@ OP_HANDLER( bitd_im )
 OP_HANDLER( bitmd_im )
 {
 	/*
-    The following is from Darren A.
+	The following is from Darren A.
 
-    The Z flag is the only condition code that should be affected by BITMD.
-    For example, when the "Divide-By-Zero" flag (bit 7) is set, BITMD should
-    not set the N flag. It should also NOT clear the V flag (unlike the other
-    BIT instructions).
+	The Z flag is the only condition code that should be affected by BITMD.
+	For example, when the "Divide-By-Zero" flag (bit 7) is set, BITMD should
+	not set the N flag. It should also NOT clear the V flag (unlike the other
+	BIT instructions).
 
-    His comments come from experimentation and differ from Chris Burke
-    */
+	His comments come from experimentation and differ from Chris Burke
+	*/
 
 	UINT8 t,r;
 	IMMBYTE(t);
@@ -4054,8 +4054,8 @@ OP_HANDLER( adcb_im )
 /* $1089 ADCD immediate ***** */
 OP_HANDLER( adcd_im )
 {
-	PAIR	t;
-	UINT32	r;
+	PAIR    t;
+	UINT32  r;
 	IMMWORD(t);
 	r = D + t.w.l + (CC & CC_C);
 	CLR_NZVC;
@@ -4098,7 +4098,7 @@ OP_HANDLER( addb_im )
 /* $cC LDD immediate -**0- */
 OP_HANDLER( ldd_im )
 {
-	PAIR	t;
+	PAIR    t;
 
 	IMMWORD(t);
 	D=t.w.l;
@@ -4109,7 +4109,7 @@ OP_HANDLER( ldd_im )
 /* $1086 LDW immediate -**0- */
 OP_HANDLER( ldw_im )
 {
-	PAIR	t;
+	PAIR    t;
 	IMMWORD(t);
 	W=t.w.l;
 	CLR_NZV;
@@ -4136,7 +4136,7 @@ OP_HANDLER( lds_im )
 /* $d0 SUBB direct ?**** */
 OP_HANDLER( subb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -4147,7 +4147,7 @@ OP_HANDLER( subb_di )
 /* $1190 SUBE direct ?**** */
 OP_HANDLER( sube_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = E - t;
 	CLR_NZVC;
@@ -4158,7 +4158,7 @@ OP_HANDLER( sube_di )
 /* $11d0 SUBF direct ?**** */
 OP_HANDLER( subf_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = F - t;
 	CLR_NZVC;
@@ -4169,7 +4169,7 @@ OP_HANDLER( subf_di )
 /* $d1 CMPB direct ?**** */
 OP_HANDLER( cmpb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -4179,7 +4179,7 @@ OP_HANDLER( cmpb_di )
 /* $1191 CMPE direct ?**** */
 OP_HANDLER( cmpe_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = E - t;
 	CLR_NZVC;
@@ -4189,7 +4189,7 @@ OP_HANDLER( cmpe_di )
 /* $11D1 CMPF direct ?**** */
 OP_HANDLER( cmpf_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = F - t;
 	CLR_NZVC;
@@ -4199,7 +4199,7 @@ OP_HANDLER( cmpf_di )
 /* $d2 SBCB direct ?**** */
 OP_HANDLER( sbcb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -4210,8 +4210,8 @@ OP_HANDLER( sbcb_di )
 /* $1092 SBCD direct ?**** */
 OP_HANDLER( sbcd_di )
 {
-	PAIR	t;
-	UINT32	r;
+	PAIR    t;
+	UINT32  r;
 	DIRWORD(t);
 	r = D - t.w.l - (CC & CC_C);
 	CLR_NZVC;
@@ -4302,8 +4302,8 @@ OP_HANDLER( bitb_di )
 /* $1095 BITD direct -**0- */
 OP_HANDLER( bitd_di )
 {
-	PAIR	t;
-	UINT16	r;
+	PAIR    t;
+	UINT16  r;
 	DIRWORD(t);
 	r = B & t.w.l;
 	CLR_NZV;
@@ -4396,8 +4396,8 @@ OP_HANDLER( adcb_di )
 /* $1099 adcd direct ***** */
 OP_HANDLER( adcd_di )
 {
-	UINT32	r;
-	PAIR	t;
+	UINT32  r;
+	PAIR    t;
 
 	DIRWORD(t);
 	r = D + t.w.l + (CC & CC_C);
@@ -4514,7 +4514,7 @@ OP_HANDLER( sts_di )
 /* $e0 SUBB indexed ?**** */
 OP_HANDLER( subb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = B - t;
@@ -4526,7 +4526,7 @@ OP_HANDLER( subb_ix )
 /* $11a0 SUBE indexed ?**** */
 OP_HANDLER( sube_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = E - t;
@@ -4538,7 +4538,7 @@ OP_HANDLER( sube_ix )
 /* $11e0 SUBF indexed ?**** */
 OP_HANDLER( subf_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = F - t;
@@ -4550,7 +4550,7 @@ OP_HANDLER( subf_ix )
 /* $e1 CMPB indexed ?**** */
 OP_HANDLER( cmpb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = B - t;
@@ -4561,7 +4561,7 @@ OP_HANDLER( cmpb_ix )
 /* $11a1 CMPE indexed ?**** */
 OP_HANDLER( cmpe_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = E - t;
@@ -4572,7 +4572,7 @@ OP_HANDLER( cmpe_ix )
 /* $11e1 CMPF indexed ?**** */
 OP_HANDLER( cmpf_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = F - t;
@@ -4583,7 +4583,7 @@ OP_HANDLER( cmpf_ix )
 /* $e2 SBCB indexed ?**** */
 OP_HANDLER( sbcb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address(m68_state);
 	t = RM(EAD);
 	r = B - t - (CC & CC_C);
@@ -4595,7 +4595,7 @@ OP_HANDLER( sbcb_ix )
 /* $10a2 SBCD indexed ?**** */
 OP_HANDLER( sbcd_ix )
 {
-	UINT32	  t,r;
+	UINT32    t,r;
 	fetch_effective_address(m68_state);
 	t = RM16(m68_state, EAD);
 	r = D - t - (CC & CC_C);
@@ -4784,8 +4784,8 @@ OP_HANDLER( adcb_ix )
 /* $10a9 ADCD indexed ***** */
 OP_HANDLER( adcd_ix )
 {
-	UINT32	r;
-	PAIR	t;
+	UINT32  r;
+	PAIR    t;
 	fetch_effective_address(m68_state);
 	t.d = RM16(m68_state, EAD);
 	r = D + t.d + (CC & CC_C);
@@ -4899,7 +4899,7 @@ OP_HANDLER( sts_ix )
 /* $f0 SUBB extended ?**** */
 OP_HANDLER( subb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -4910,7 +4910,7 @@ OP_HANDLER( subb_ex )
 /* $11b0 SUBE extended ?**** */
 OP_HANDLER( sube_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = E - t;
 	CLR_NZVC;
@@ -4921,7 +4921,7 @@ OP_HANDLER( sube_ex )
 /* $11f0 SUBF extended ?**** */
 OP_HANDLER( subf_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = F - t;
 	CLR_NZVC;
@@ -4932,7 +4932,7 @@ OP_HANDLER( subf_ex )
 /* $f1 CMPB extended ?**** */
 OP_HANDLER( cmpb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -4942,7 +4942,7 @@ OP_HANDLER( cmpb_ex )
 /* $11b1 CMPE extended ?**** */
 OP_HANDLER( cmpe_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = E - t;
 	CLR_NZVC;
@@ -4952,7 +4952,7 @@ OP_HANDLER( cmpe_ex )
 /* $11f1 CMPF extended ?**** */
 OP_HANDLER( cmpf_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = F - t;
 	CLR_NZVC;
@@ -4962,7 +4962,7 @@ OP_HANDLER( cmpf_ex )
 /* $f2 SBCB extended ?**** */
 OP_HANDLER( sbcb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -5160,8 +5160,8 @@ OP_HANDLER( adcb_ex )
 /* $10b9 ADCD extended ***** */
 OP_HANDLER( adcd_ex )
 {
-	UINT32	r;
-	PAIR	t;
+	UINT32  r;
+	PAIR    t;
 	EXTWORD(t);
 	r = D + t.w.l + (CC & CC_C);
 	CLR_NZVC;
@@ -5279,135 +5279,135 @@ OP_HANDLER( pref10 )
 #if BIG_SWITCH
 	switch( ireg2 )
 	{
-		case 0x21: lbrn(m68_state);			break;
-		case 0x22: lbhi(m68_state);			break;
-		case 0x23: lbls(m68_state);			break;
-		case 0x24: lbcc(m68_state);			break;
-		case 0x25: lbcs(m68_state);			break;
-		case 0x26: lbne(m68_state);			break;
-		case 0x27: lbeq(m68_state);			break;
-		case 0x28: lbvc(m68_state);			break;
-		case 0x29: lbvs(m68_state);			break;
-		case 0x2a: lbpl(m68_state);			break;
-		case 0x2b: lbmi(m68_state);			break;
-		case 0x2c: lbge(m68_state);			break;
-		case 0x2d: lblt(m68_state);			break;
-		case 0x2e: lbgt(m68_state);			break;
-		case 0x2f: lble(m68_state);			break;
+		case 0x21: lbrn(m68_state);         break;
+		case 0x22: lbhi(m68_state);         break;
+		case 0x23: lbls(m68_state);         break;
+		case 0x24: lbcc(m68_state);         break;
+		case 0x25: lbcs(m68_state);         break;
+		case 0x26: lbne(m68_state);         break;
+		case 0x27: lbeq(m68_state);         break;
+		case 0x28: lbvc(m68_state);         break;
+		case 0x29: lbvs(m68_state);         break;
+		case 0x2a: lbpl(m68_state);         break;
+		case 0x2b: lbmi(m68_state);         break;
+		case 0x2c: lbge(m68_state);         break;
+		case 0x2d: lblt(m68_state);         break;
+		case 0x2e: lbgt(m68_state);         break;
+		case 0x2f: lble(m68_state);         break;
 
-		case 0x30: addr_r(m68_state);		break;
-		case 0x31: adcr(m68_state);			break;
-		case 0x32: subr(m68_state);			break;
-		case 0x33: sbcr(m68_state);			break;
-		case 0x34: andr(m68_state);			break;
-		case 0x35: orr(m68_state);			break;
-		case 0x36: eorr(m68_state);			break;
-		case 0x37: cmpr(m68_state);			break;
-		case 0x38: pshsw(m68_state);		break;
-		case 0x39: pulsw(m68_state);		break;
-		case 0x3a: pshuw(m68_state);		break;
-		case 0x3b: puluw(m68_state);		break;
-		case 0x3f: swi2(m68_state);		    break;
+		case 0x30: addr_r(m68_state);       break;
+		case 0x31: adcr(m68_state);         break;
+		case 0x32: subr(m68_state);         break;
+		case 0x33: sbcr(m68_state);         break;
+		case 0x34: andr(m68_state);         break;
+		case 0x35: orr(m68_state);          break;
+		case 0x36: eorr(m68_state);         break;
+		case 0x37: cmpr(m68_state);         break;
+		case 0x38: pshsw(m68_state);        break;
+		case 0x39: pulsw(m68_state);        break;
+		case 0x3a: pshuw(m68_state);        break;
+		case 0x3b: puluw(m68_state);        break;
+		case 0x3f: swi2(m68_state);         break;
 
-		case 0x40: negd(m68_state);			break;
-		case 0x43: comd(m68_state);			break;
-		case 0x44: lsrd(m68_state);			break;
-		case 0x46: rord(m68_state);			break;
-		case 0x47: asrd(m68_state);			break;
-		case 0x48: asld(m68_state);			break;
-		case 0x49: rold(m68_state);			break;
-		case 0x4a: decd(m68_state);			break;
-		case 0x4c: incd(m68_state);			break;
-		case 0x4d: tstd(m68_state);			break;
-		case 0x4f: clrd(m68_state);			break;
+		case 0x40: negd(m68_state);         break;
+		case 0x43: comd(m68_state);         break;
+		case 0x44: lsrd(m68_state);         break;
+		case 0x46: rord(m68_state);         break;
+		case 0x47: asrd(m68_state);         break;
+		case 0x48: asld(m68_state);         break;
+		case 0x49: rold(m68_state);         break;
+		case 0x4a: decd(m68_state);         break;
+		case 0x4c: incd(m68_state);         break;
+		case 0x4d: tstd(m68_state);         break;
+		case 0x4f: clrd(m68_state);         break;
 
-		case 0x53: comw(m68_state);			break;
-		case 0x54: lsrw(m68_state);			break;
-		case 0x56: rorw(m68_state);			break;
-		case 0x59: rolw(m68_state);			break;
-		case 0x5a: decw(m68_state);			break;
-		case 0x5c: incw(m68_state);			break;
-		case 0x5d: tstw(m68_state);			break;
-		case 0x5f: clrw(m68_state);			break;
+		case 0x53: comw(m68_state);         break;
+		case 0x54: lsrw(m68_state);         break;
+		case 0x56: rorw(m68_state);         break;
+		case 0x59: rolw(m68_state);         break;
+		case 0x5a: decw(m68_state);         break;
+		case 0x5c: incw(m68_state);         break;
+		case 0x5d: tstw(m68_state);         break;
+		case 0x5f: clrw(m68_state);         break;
 
-		case 0x80: subw_im(m68_state);		break;
-		case 0x81: cmpw_im(m68_state);		break;
-		case 0x82: sbcd_im(m68_state);		break;
-		case 0x83: cmpd_im(m68_state);		break;
-		case 0x84: andd_im(m68_state);		break;
-		case 0x85: bitd_im(m68_state);		break;
-		case 0x86: ldw_im(m68_state);		break;
-		case 0x88: eord_im(m68_state);		break;
-		case 0x89: adcd_im(m68_state);		break;
-		case 0x8a: ord_im(m68_state);		break;
-		case 0x8b: addw_im(m68_state);		break;
-		case 0x8c: cmpy_im(m68_state);		break;
-		case 0x8e: ldy_im(m68_state);		break;
+		case 0x80: subw_im(m68_state);      break;
+		case 0x81: cmpw_im(m68_state);      break;
+		case 0x82: sbcd_im(m68_state);      break;
+		case 0x83: cmpd_im(m68_state);      break;
+		case 0x84: andd_im(m68_state);      break;
+		case 0x85: bitd_im(m68_state);      break;
+		case 0x86: ldw_im(m68_state);       break;
+		case 0x88: eord_im(m68_state);      break;
+		case 0x89: adcd_im(m68_state);      break;
+		case 0x8a: ord_im(m68_state);       break;
+		case 0x8b: addw_im(m68_state);      break;
+		case 0x8c: cmpy_im(m68_state);      break;
+		case 0x8e: ldy_im(m68_state);       break;
 
-		case 0x90: subw_di(m68_state);		break;
-		case 0x91: cmpw_di(m68_state);		break;
-		case 0x92: sbcd_di(m68_state);		break;
-		case 0x93: cmpd_di(m68_state);		break;
-		case 0x94: andd_di(m68_state);		break;
-		case 0x95: bitd_di(m68_state);		break;
-		case 0x96: ldw_di(m68_state);		break;
-		case 0x97: stw_di(m68_state);		break;
-		case 0x98: eord_di(m68_state);		break;
-		case 0x99: adcd_di(m68_state);		break;
-		case 0x9a: ord_di(m68_state);		break;
-		case 0x9b: addw_di(m68_state);		break;
-		case 0x9c: cmpy_di(m68_state);		break;
-		case 0x9e: ldy_di(m68_state);		break;
-		case 0x9f: sty_di(m68_state);		break;
+		case 0x90: subw_di(m68_state);      break;
+		case 0x91: cmpw_di(m68_state);      break;
+		case 0x92: sbcd_di(m68_state);      break;
+		case 0x93: cmpd_di(m68_state);      break;
+		case 0x94: andd_di(m68_state);      break;
+		case 0x95: bitd_di(m68_state);      break;
+		case 0x96: ldw_di(m68_state);       break;
+		case 0x97: stw_di(m68_state);       break;
+		case 0x98: eord_di(m68_state);      break;
+		case 0x99: adcd_di(m68_state);      break;
+		case 0x9a: ord_di(m68_state);       break;
+		case 0x9b: addw_di(m68_state);      break;
+		case 0x9c: cmpy_di(m68_state);      break;
+		case 0x9e: ldy_di(m68_state);       break;
+		case 0x9f: sty_di(m68_state);       break;
 
-		case 0xa0: subw_ix(m68_state);		break;
-		case 0xa1: cmpw_ix(m68_state);		break;
-		case 0xa2: sbcd_ix(m68_state);		break;
-		case 0xa3: cmpd_ix(m68_state);		break;
-		case 0xa4: andd_ix(m68_state);		break;
-		case 0xa5: bitd_ix(m68_state);		break;
-		case 0xa6: ldw_ix(m68_state);		break;
-		case 0xa7: stw_ix(m68_state);		break;
-		case 0xa8: eord_ix(m68_state);		break;
-		case 0xa9: adcd_ix(m68_state);		break;
-		case 0xaa: ord_ix(m68_state);		break;
-		case 0xab: addw_ix(m68_state);		break;
-		case 0xac: cmpy_ix(m68_state);		break;
-		case 0xae: ldy_ix(m68_state);		break;
-		case 0xaf: sty_ix(m68_state);		break;
+		case 0xa0: subw_ix(m68_state);      break;
+		case 0xa1: cmpw_ix(m68_state);      break;
+		case 0xa2: sbcd_ix(m68_state);      break;
+		case 0xa3: cmpd_ix(m68_state);      break;
+		case 0xa4: andd_ix(m68_state);      break;
+		case 0xa5: bitd_ix(m68_state);      break;
+		case 0xa6: ldw_ix(m68_state);       break;
+		case 0xa7: stw_ix(m68_state);       break;
+		case 0xa8: eord_ix(m68_state);      break;
+		case 0xa9: adcd_ix(m68_state);      break;
+		case 0xaa: ord_ix(m68_state);       break;
+		case 0xab: addw_ix(m68_state);      break;
+		case 0xac: cmpy_ix(m68_state);      break;
+		case 0xae: ldy_ix(m68_state);       break;
+		case 0xaf: sty_ix(m68_state);       break;
 
-		case 0xb0: subw_ex(m68_state);		break;
-		case 0xb1: cmpw_ex(m68_state);		break;
-		case 0xb2: sbcd_ex(m68_state);		break;
-		case 0xb3: cmpd_ex(m68_state);		break;
-		case 0xb4: andd_ex(m68_state);		break;
-		case 0xb5: bitd_ex(m68_state);		break;
-		case 0xb6: ldw_ex(m68_state);		break;
-		case 0xb7: stw_ex(m68_state);		break;
-		case 0xb8: eord_ex(m68_state);		break;
-		case 0xb9: adcd_ex(m68_state);		break;
-		case 0xba: ord_ex(m68_state);		break;
-		case 0xbb: addw_ex(m68_state);		break;
-		case 0xbc: cmpy_ex(m68_state);		break;
-		case 0xbe: ldy_ex(m68_state);		break;
-		case 0xbf: sty_ex(m68_state);		break;
+		case 0xb0: subw_ex(m68_state);      break;
+		case 0xb1: cmpw_ex(m68_state);      break;
+		case 0xb2: sbcd_ex(m68_state);      break;
+		case 0xb3: cmpd_ex(m68_state);      break;
+		case 0xb4: andd_ex(m68_state);      break;
+		case 0xb5: bitd_ex(m68_state);      break;
+		case 0xb6: ldw_ex(m68_state);       break;
+		case 0xb7: stw_ex(m68_state);       break;
+		case 0xb8: eord_ex(m68_state);      break;
+		case 0xb9: adcd_ex(m68_state);      break;
+		case 0xba: ord_ex(m68_state);       break;
+		case 0xbb: addw_ex(m68_state);      break;
+		case 0xbc: cmpy_ex(m68_state);      break;
+		case 0xbe: ldy_ex(m68_state);       break;
+		case 0xbf: sty_ex(m68_state);       break;
 
-		case 0xce: lds_im(m68_state);		break;
+		case 0xce: lds_im(m68_state);       break;
 
-		case 0xdc: ldq_di(m68_state);		break;
-		case 0xdd: stq_di(m68_state);		break;
-		case 0xde: lds_di(m68_state);		break;
-		case 0xdf: sts_di(m68_state);		break;
+		case 0xdc: ldq_di(m68_state);       break;
+		case 0xdd: stq_di(m68_state);       break;
+		case 0xde: lds_di(m68_state);       break;
+		case 0xdf: sts_di(m68_state);       break;
 
-		case 0xec: ldq_ix(m68_state);		break;
-		case 0xed: stq_ix(m68_state);		break;
-		case 0xee: lds_ix(m68_state);		break;
-		case 0xef: sts_ix(m68_state);		break;
+		case 0xec: ldq_ix(m68_state);       break;
+		case 0xed: stq_ix(m68_state);       break;
+		case 0xee: lds_ix(m68_state);       break;
+		case 0xef: sts_ix(m68_state);       break;
 
-		case 0xfc: ldq_ex(m68_state);		break;
-		case 0xfd: stq_ex(m68_state);		break;
-		case 0xfe: lds_ex(m68_state);		break;
-		case 0xff: sts_ex(m68_state);		break;
+		case 0xfc: ldq_ex(m68_state);       break;
+		case 0xfd: stq_ex(m68_state);       break;
+		case 0xfe: lds_ex(m68_state);       break;
+		case 0xff: sts_ex(m68_state);       break;
 
 		default:  IIError(m68_state);        break;
 	}
@@ -5429,101 +5429,101 @@ OP_HANDLER( pref11 )
 #if BIG_SWITCH
 	switch( ireg2 )
 	{
-		case 0x30: band(m68_state);			break;
-		case 0x31: biand(m68_state);		break;
-		case 0x32: bor(m68_state);			break;
-		case 0x33: bior(m68_state);			break;
-		case 0x34: beor(m68_state);			break;
-		case 0x35: bieor(m68_state);		break;
-		case 0x36: ldbt(m68_state);			break;
-		case 0x37: stbt(m68_state);			break;
-		case 0x38: tfmpp(m68_state);		break;	/* Timing for TFM is actually 6+3n.        */
-		case 0x39: tfmmm(m68_state);		break;	/* To avoid saving the state, I decided    */
-		case 0x3a: tfmpc(m68_state);		break;	/* to push the initial 6 cycles to the end */
-		case 0x3b: tfmcp(m68_state);		break;  /* We will soon see how this fairs!        */
-		case 0x3c: bitmd_im(m68_state);		break;
-		case 0x3d: ldmd_im(m68_state);		break;
-		case 0x3f: swi3(m68_state);			break;
+		case 0x30: band(m68_state);         break;
+		case 0x31: biand(m68_state);        break;
+		case 0x32: bor(m68_state);          break;
+		case 0x33: bior(m68_state);         break;
+		case 0x34: beor(m68_state);         break;
+		case 0x35: bieor(m68_state);        break;
+		case 0x36: ldbt(m68_state);         break;
+		case 0x37: stbt(m68_state);         break;
+		case 0x38: tfmpp(m68_state);        break;  /* Timing for TFM is actually 6+3n.        */
+		case 0x39: tfmmm(m68_state);        break;  /* To avoid saving the state, I decided    */
+		case 0x3a: tfmpc(m68_state);        break;  /* to push the initial 6 cycles to the end */
+		case 0x3b: tfmcp(m68_state);        break;  /* We will soon see how this fairs!        */
+		case 0x3c: bitmd_im(m68_state);     break;
+		case 0x3d: ldmd_im(m68_state);      break;
+		case 0x3f: swi3(m68_state);         break;
 
-		case 0x43: come(m68_state);			break;
-		case 0x4a: dece(m68_state);			break;
-		case 0x4c: ince(m68_state);			break;
-		case 0x4d: tste(m68_state);			break;
-		case 0x4f: clre(m68_state);			break;
+		case 0x43: come(m68_state);         break;
+		case 0x4a: dece(m68_state);         break;
+		case 0x4c: ince(m68_state);         break;
+		case 0x4d: tste(m68_state);         break;
+		case 0x4f: clre(m68_state);         break;
 
-		case 0x53: comf(m68_state);			break;
-		case 0x5a: decf(m68_state);			break;
-		case 0x5c: incf(m68_state);			break;
-		case 0x5d: tstf(m68_state);			break;
-		case 0x5f: clrf(m68_state);			break;
+		case 0x53: comf(m68_state);         break;
+		case 0x5a: decf(m68_state);         break;
+		case 0x5c: incf(m68_state);         break;
+		case 0x5d: tstf(m68_state);         break;
+		case 0x5f: clrf(m68_state);         break;
 
-		case 0x80: sube_im(m68_state);		break;
-		case 0x81: cmpe_im(m68_state);		break;
-		case 0x83: cmpu_im(m68_state);		break;
-		case 0x86: lde_im(m68_state);		break;
-		case 0x8b: adde_im(m68_state);		break;
-		case 0x8c: cmps_im(m68_state);		break;
-		case 0x8d: divd_im(m68_state);		break;
-		case 0x8e: divq_im(m68_state);		break;
-		case 0x8f: muld_im(m68_state);		break;
+		case 0x80: sube_im(m68_state);      break;
+		case 0x81: cmpe_im(m68_state);      break;
+		case 0x83: cmpu_im(m68_state);      break;
+		case 0x86: lde_im(m68_state);       break;
+		case 0x8b: adde_im(m68_state);      break;
+		case 0x8c: cmps_im(m68_state);      break;
+		case 0x8d: divd_im(m68_state);      break;
+		case 0x8e: divq_im(m68_state);      break;
+		case 0x8f: muld_im(m68_state);      break;
 
-		case 0x90: sube_di(m68_state);		break;
-		case 0x91: cmpe_di(m68_state);		break;
-		case 0x93: cmpu_di(m68_state);		break;
-		case 0x96: lde_di(m68_state);		break;
-		case 0x97: ste_di(m68_state);		break;
-		case 0x9b: adde_di(m68_state);		break;
-		case 0x9c: cmps_di(m68_state);		break;
-		case 0x9d: divd_di(m68_state);		break;
-		case 0x9e: divq_di(m68_state);		break;
-		case 0x9f: muld_di(m68_state);		break;
+		case 0x90: sube_di(m68_state);      break;
+		case 0x91: cmpe_di(m68_state);      break;
+		case 0x93: cmpu_di(m68_state);      break;
+		case 0x96: lde_di(m68_state);       break;
+		case 0x97: ste_di(m68_state);       break;
+		case 0x9b: adde_di(m68_state);      break;
+		case 0x9c: cmps_di(m68_state);      break;
+		case 0x9d: divd_di(m68_state);      break;
+		case 0x9e: divq_di(m68_state);      break;
+		case 0x9f: muld_di(m68_state);      break;
 
-		case 0xa0: sube_ix(m68_state);		break;
-		case 0xa1: cmpe_ix(m68_state);		break;
-		case 0xa3: cmpu_ix(m68_state);		break;
-		case 0xa6: lde_ix(m68_state);		break;
-		case 0xa7: ste_ix(m68_state);		break;
-		case 0xab: adde_ix(m68_state);		break;
-		case 0xac: cmps_ix(m68_state);		break;
-		case 0xad: divd_ix(m68_state);		break;
-		case 0xae: divq_ix(m68_state);		break;
-		case 0xaf: muld_ix(m68_state);		break;
+		case 0xa0: sube_ix(m68_state);      break;
+		case 0xa1: cmpe_ix(m68_state);      break;
+		case 0xa3: cmpu_ix(m68_state);      break;
+		case 0xa6: lde_ix(m68_state);       break;
+		case 0xa7: ste_ix(m68_state);       break;
+		case 0xab: adde_ix(m68_state);      break;
+		case 0xac: cmps_ix(m68_state);      break;
+		case 0xad: divd_ix(m68_state);      break;
+		case 0xae: divq_ix(m68_state);      break;
+		case 0xaf: muld_ix(m68_state);      break;
 
-		case 0xb0: sube_ex(m68_state);		break;
-		case 0xb1: cmpe_ex(m68_state);		break;
-		case 0xb3: cmpu_ex(m68_state);		break;
-		case 0xb6: lde_ex(m68_state);		break;
-		case 0xb7: ste_ex(m68_state);		break;
-		case 0xbb: adde_ex(m68_state);		break;
-		case 0xbc: cmps_ex(m68_state);		break;
-		case 0xbd: divd_ex(m68_state);		break;
-		case 0xbe: divq_ex(m68_state);		break;
-		case 0xbf: muld_ex(m68_state);		break;
+		case 0xb0: sube_ex(m68_state);      break;
+		case 0xb1: cmpe_ex(m68_state);      break;
+		case 0xb3: cmpu_ex(m68_state);      break;
+		case 0xb6: lde_ex(m68_state);       break;
+		case 0xb7: ste_ex(m68_state);       break;
+		case 0xbb: adde_ex(m68_state);      break;
+		case 0xbc: cmps_ex(m68_state);      break;
+		case 0xbd: divd_ex(m68_state);      break;
+		case 0xbe: divq_ex(m68_state);      break;
+		case 0xbf: muld_ex(m68_state);      break;
 
-		case 0xc0: subf_im(m68_state);		break;
-		case 0xc1: cmpf_im(m68_state);		break;
-		case 0xc6: ldf_im(m68_state);		break;
-		case 0xcb: addf_im(m68_state);		break;
+		case 0xc0: subf_im(m68_state);      break;
+		case 0xc1: cmpf_im(m68_state);      break;
+		case 0xc6: ldf_im(m68_state);       break;
+		case 0xcb: addf_im(m68_state);      break;
 
-		case 0xd0: subf_di(m68_state);		break;
-		case 0xd1: cmpf_di(m68_state);		break;
-		case 0xd6: ldf_di(m68_state);		break;
-		case 0xd7: stf_di(m68_state);		break;
-		case 0xdb: addf_di(m68_state);		break;
+		case 0xd0: subf_di(m68_state);      break;
+		case 0xd1: cmpf_di(m68_state);      break;
+		case 0xd6: ldf_di(m68_state);       break;
+		case 0xd7: stf_di(m68_state);       break;
+		case 0xdb: addf_di(m68_state);      break;
 
-		case 0xe0: subf_ix(m68_state);		break;
-		case 0xe1: cmpf_ix(m68_state);		break;
-		case 0xe6: ldf_ix(m68_state);		break;
-		case 0xe7: stf_ix(m68_state);		break;
-		case 0xeb: addf_ix(m68_state);		break;
+		case 0xe0: subf_ix(m68_state);      break;
+		case 0xe1: cmpf_ix(m68_state);      break;
+		case 0xe6: ldf_ix(m68_state);       break;
+		case 0xe7: stf_ix(m68_state);       break;
+		case 0xeb: addf_ix(m68_state);      break;
 
-		case 0xf0: subf_ex(m68_state);		break;
-		case 0xf1: cmpf_ex(m68_state);		break;
-		case 0xf6: ldf_ex(m68_state);		break;
-		case 0xf7: stf_ex(m68_state);		break;
-		case 0xfb: addf_ex(m68_state);		break;
+		case 0xf0: subf_ex(m68_state);      break;
+		case 0xf1: cmpf_ex(m68_state);      break;
+		case 0xf6: ldf_ex(m68_state);       break;
+		case 0xf7: stf_ex(m68_state);       break;
+		case 0xfb: addf_ex(m68_state);      break;
 
-		default:   IIError(m68_state);		break;
+		default:   IIError(m68_state);      break;
 	}
 #else
 
@@ -5532,4 +5532,3 @@ OP_HANDLER( pref11 )
 #endif /* BIG_SWITCH */
 	m68_state->icount -= m68_state->cycle_counts_page11[ireg2];
 }
-

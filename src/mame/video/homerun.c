@@ -61,15 +61,15 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 	m_colorram[offset] = data;
 
 	/* from PCB photo:
-        bit 7:  470 ohm resistor \
-        bit 6:  220 ohm resistor -  --> 470 ohm resistor  --> blue
-        bit 5:  470 ohm resistor \
-        bit 4:  220 ohm resistor -  --> 470 ohm resistor  --> green
-        bit 3:  1  kohm resistor /
-        bit 2:  470 ohm resistor \
-        bit 1:  220 ohm resistor -  --> 470 ohm resistor  --> red
-        bit 0:  1  kohm resistor /
-    */
+	    bit 7:  470 ohm resistor \
+	    bit 6:  220 ohm resistor -  --> 470 ohm resistor  --> blue
+	    bit 5:  470 ohm resistor \
+	    bit 4:  220 ohm resistor -  --> 470 ohm resistor  --> green
+	    bit 3:  1  kohm resistor /
+	    bit 2:  470 ohm resistor \
+	    bit 1:  220 ohm resistor -  --> 470 ohm resistor  --> red
+	    bit 0:  1  kohm resistor /
+	*/
 
 	// let's implement it the old fashioned way until it's found out how exactly the resnet is hooked up
 	int r, g, b;

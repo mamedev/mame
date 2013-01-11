@@ -167,10 +167,10 @@ Other references can be found on spies.com:
 */
 #define concat2(a,b) a##b
 
-#define GET_INFO(prefix)			concat2(prefix,_get_info)
-#define RESET_PARAM(prefix)			concat2(prefix,reset_param)
+#define GET_INFO(prefix)            concat2(prefix,_get_info)
+#define RESET_PARAM(prefix)         concat2(prefix,reset_param)
 
-#define TMS99XX_RESET_PARAM			RESET_PARAM(TMS99XX_PREFIX)
+#define TMS99XX_RESET_PARAM         RESET_PARAM(TMS99XX_PREFIX)
 
 
 
@@ -290,7 +290,7 @@ static void field_interrupt(tms99xx_state *cpustate);
 /* These bits are set by arithmetic operations, when it makes sense to update them. */
 #define ST_C   0x1000 /* Carry */
 #define ST_OV  0x0800 /* OVerflow (overflow with operations on signed integers, */
-                      /* and when the result of a 32bits:16bits division cannot fit in a 16-bit word.) */
+						/* and when the result of a 32bits:16bits division cannot fit in a 16-bit word.) */
 
 /* This bit is set by move and arithmetic operations WHEN THEY USE BYTE OPERANDS. */
 #define ST_OP  0x0400 /* Odd Parity */
@@ -367,11 +367,11 @@ a ST_MASK */
 #if (TMS99XX_MODEL == TI990_10_ID)
 
 /* This bit is set in user (i.e. non-supervisor) mode */
-#define EIR_MAPERR	0x0800	/* memory MAPping ERRor */
-#define EIR_MER		0x1000	/* Memory parity ERRor */
-#define EIR_ILLOP	0x2000	/* ILLegal OPcode */
-#define EIR_PRIVOP	0x4000	/* PRiviledged OPeration */
-#define EIR_TIMEOUT	0x8000	/* TILINE TIMEOUT */
+#define EIR_MAPERR  0x0800  /* memory MAPping ERRor */
+#define EIR_MER     0x1000  /* Memory parity ERRor */
+#define EIR_ILLOP   0x2000  /* ILLegal OPcode */
+#define EIR_PRIVOP  0x4000  /* PRiviledged OPeration */
+#define EIR_TIMEOUT 0x8000  /* TILINE TIMEOUT */
 
 #endif
 
@@ -396,8 +396,8 @@ a ST_MASK */
 
 struct map_file_t
 {
-	UINT16 L[3], B[3];			/* actual registers */
-	UINT32 limit[3], bias[3];	/* equivalent in a more convenient form */
+	UINT16 L[3], B[3];          /* actual registers */
+	UINT32 limit[3], bias[3];   /* equivalent in a more convenient form */
 };
 
 struct tms99xx_state
@@ -421,20 +421,20 @@ struct tms99xx_state
 #if (TMS99XX_MODEL == TI990_10_ID) || (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9980_ID)
 	/* On tms9900, we cache the state of INTREQ* and IC0-IC3 here */
 	/* On tms9980/9981, we translate the state of IC0-IC2 to the equivalent state for a tms9900,
-    and store the result here */
-	UINT8 irq_level;	/* when INTREQ* is active, interrupt level on IC0-IC3 ; else always 16 */
-	UINT8 irq_state;	/* nonzero if the INTREQ* line is active (low) */
+	and store the result here */
+	UINT8 irq_level;    /* when INTREQ* is active, interrupt level on IC0-IC3 ; else always 16 */
+	UINT8 irq_state;    /* nonzero if the INTREQ* line is active (low) */
 					/* with TMS9940, bit 0 means INT1, bit 1 decrementer, bit 2 INT2 */
 #elif (TMS99XX_MODEL == TMS9995_ID)
 	/* tms9995 is quite different : it latches the interrupt inputs */
 	UINT8 irq_level;    /* We store the level of the request with the highest level here */
 	UINT8 int_state;    /* interrupt lines state */
-	UINT8 int_latch;	  /* interrupt latches state */
+	UINT8 int_latch;      /* interrupt latches state */
 #endif
 
 	/* interrupt callback */
 	/* note that this callback is used by tms9900_set_irq_line(cpustate) and tms9980a_set_irq_line(cpustate) to
-    retreive the value on IC0-IC3 (non-standard behaviour) */
+	retreive the value on IC0-IC3 (non-standard behaviour) */
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
@@ -445,26 +445,26 @@ struct tms99xx_state
                         special data on CRU bus */
 
 #if HAS_MAPPING
-	UINT8 mapping_on;			/* set by a CRU write */
-	map_file_t map_files[3];	/* internal mapper registers */
-	UINT8 cur_map;			/* equivalent to ST_MF status bit */
-	UINT8 cur_src_map;		/* set to 2 by LDS */
-	UINT8 cur_dst_map;		/* set to 2 by LDD */
+	UINT8 mapping_on;           /* set by a CRU write */
+	map_file_t map_files[3];    /* internal mapper registers */
+	UINT8 cur_map;          /* equivalent to ST_MF status bit */
+	UINT8 cur_src_map;      /* set to 2 by LDS */
+	UINT8 cur_dst_map;      /* set to 2 by LDD */
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	UINT8 reset_maperr;		/* reset mapper error flag line (reset flags in 945417-9701 p. 3-90) */
+	UINT8 reset_maperr;     /* reset mapper error flag line (reset flags in 945417-9701 p. 3-90) */
 
-	UINT32 mapper_address_latch;	/* used to load the map file and for diagnostic purpose */
-	UINT16 mapper_cru_read_register;	/* read register select code for mapper cru interface */
-	UINT8 diaglat;					/* set when diagnostic address latch is done */
-	UINT8 latch_control[3];			/* latch control */
+	UINT32 mapper_address_latch;    /* used to load the map file and for diagnostic purpose */
+	UINT16 mapper_cru_read_register;    /* read register select code for mapper cru interface */
+	UINT8 diaglat;                  /* set when diagnostic address latch is done */
+	UINT8 latch_control[3];         /* latch control */
 
 #endif
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	UINT16 error_interrupt_register;	/* one flag for each interrupt condition */
-	ti99xx_error_interrupt_func	error_interrupt_callback;
+	UINT16 error_interrupt_register;    /* one flag for each interrupt condition */
+	ti99xx_error_interrupt_func error_interrupt_callback;
 #endif
 
 #if (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
@@ -475,13 +475,13 @@ struct tms99xx_state
 	/* on-chip event counter/timer*/
 	UINT8 decrementer_enabled;
 	UINT16 decrementer_interval;
-	UINT16 decrementer_count;	/* used in event counter mode*/
+	UINT16 decrementer_count;   /* used in event counter mode*/
 	emu_timer *timer;  /* used in timer mode */
 #endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	/* additionnal registers */
-	UINT16 flag;	  /* flag register */
+	UINT16 flag;      /* flag register */
 	UINT8 MID_flag;   /* MID flag register */
 
 	/* chip config, which can be set on reset */
@@ -493,20 +493,20 @@ struct tms99xx_state
 #endif
 
 	/* Some instructions (i.e. XOP, BLWP, and MID) disable interrupt recognition until another
-    instruction is executed : so they set this flag */
+	instruction is executed : so they set this flag */
 	UINT8 disable_interrupt_recognition;
 
 	/* notify the driver of changes in IDLE state */
-	ti99xx_idle_func	idle_callback;
+	ti99xx_idle_func    idle_callback;
 
 #if EXTERNAL_INSTRUCTION_CALLBACK
-	ti99xx_rset_func	rset_callback;
-	ti99xx_lrex_func	lrex_callback;
-	ti99xx_ckon_ckof_func	ckon_ckof_callback;
+	ti99xx_rset_func    rset_callback;
+	ti99xx_lrex_func    lrex_callback;
+	ti99xx_ckon_ckof_func   ckon_ckof_callback;
 #endif
 
 	int write_inhibit;
-	int extra_byte;	/* buffer holding the unused byte in a word read */
+	int extra_byte; /* buffer holding the unused byte in a word read */
 };
 
 INLINE tms99xx_state *get_safe_token(device_t *device)
@@ -576,13 +576,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 	static int readwordX(tms99xx_state *cpustate, int addr, int map_file)
 	{
 		if ((map_file == 0) && (addr >= 0xf800))
-		{	/* intercept TPCS and CPU ROM */
+		{   /* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
 				return cpustate->program->read_word(0x1f0000+addr);
 			else
 				/* CPU ROM */
-				return cpustate->program->read_word(0x1f0000+addr);	/* hack... */
+				return cpustate->program->read_word(0x1f0000+addr); /* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
@@ -599,7 +599,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			else if (addr <= cpustate->map_files[map_file].limit[2])
 				map_index = 2;
 			else
-			{	/* mapping error */
+			{   /* mapping error */
 				if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 					cpustate->mapper_address_latch = addr;
 				if ((! cpustate->reset_maperr) && ! (cpustate->error_interrupt_register & EIR_MAPERR))
@@ -621,13 +621,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 	static void writewordX(tms99xx_state *cpustate, int addr, int data, int map_file)
 	{
 		if ((map_file == 0) && (addr >= 0xf800))
-		{	/* intercept TPCS and CPU ROM */
+		{   /* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
 				cpustate->program->write_word(0x1f0000+addr, data);
 			else
 				/* CPU ROM */
-				cpustate->program->write_word(0x1f0000+addr, data);	/* hack... */
+				cpustate->program->write_word(0x1f0000+addr, data); /* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
@@ -644,7 +644,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			else if (addr <= cpustate->map_files[map_file].limit[2])
 				map_index = 2;
 			else
-			{	/* mapping error */
+			{   /* mapping error */
 				if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 					cpustate->mapper_address_latch = addr;
 				if ((! cpustate->reset_maperr) && ! (cpustate->error_interrupt_register & EIR_MAPERR))
@@ -670,13 +670,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 	static int readbyteX(tms99xx_state *cpustate, int addr, int map_file)
 	{
 		if ((map_file == 0) && (addr >= 0xf800))
-		{	/* intercept TPCS and CPU ROM */
+		{   /* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
 				return cpustate->program->read_byte(0x1f0000+addr);
 			else
 				/* CPU ROM */
-				return cpustate->program->read_byte(0x1f0000+addr);	/* hack... */
+				return cpustate->program->read_byte(0x1f0000+addr); /* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
@@ -693,7 +693,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			else if (addr <= cpustate->map_files[map_file].limit[2])
 				map_index = 2;
 			else
-			{	/* mapping error */
+			{   /* mapping error */
 				if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 					cpustate->mapper_address_latch = addr;
 				if ((! cpustate->reset_maperr) && ! (cpustate->error_interrupt_register & EIR_MAPERR))
@@ -715,13 +715,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 	static void writebyteX(tms99xx_state *cpustate, int addr, int data, int map_file)
 	{
 		if ((map_file == 0) && (addr >= 0xf800))
-		{	/* intercept TPCS and CPU ROM */
+		{   /* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
 				cpustate->program->write_byte(0x1f0000+addr, data);
 			else
 				/* CPU ROM */
-				cpustate->program->write_byte(0x1f0000+addr, data);	/* hack... */
+				cpustate->program->write_byte(0x1f0000+addr, data); /* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
@@ -738,7 +738,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			else if (addr <= cpustate->map_files[map_file].limit[2])
 				map_index = 2;
 			else
-			{	/* mapping error */
+			{   /* mapping error */
 				if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 					cpustate->mapper_address_latch = addr;
 				if ((! cpustate->reset_maperr) && ! (cpustate->error_interrupt_register & EIR_MAPERR))
@@ -763,8 +763,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 #elif (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9940_ID)
 	/*16-bit data bus, 16-bit address bus (internal bus in the case of TMS9940)*/
 	/*Note that tms9900 actually never accesses a single byte : when performing byte operations,
-    it reads a 16-bit word, changes the revelant byte, then write a complete word.  You should
-    remember this when writing memory handlers.*/
+	it reads a 16-bit word, changes the revelant byte, then write a complete word.  You should
+	remember this when writing memory handlers.*/
 	/*This does not apply to tms9995 and tms99xxx, but does apply to tms9980 (see below).*/
 
 	#define readword(cs, addr)        (cs)->program->read_word(addr)
@@ -776,8 +776,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 #elif (TMS99XX_MODEL == TMS9980_ID)
 	/*8-bit data bus, 14-bit address*/
 	/*Note that tms9980 never accesses a single byte (however crazy it may seem).  Although this
-    makes memory access slower, I have emulated this feature, because if I did otherwise,
-    there would be some implementation problems in some driver sooner or later.*/
+	makes memory access slower, I have emulated this feature, because if I did otherwise,
+	there would be some implementation problems in some driver sooner or later.*/
 
 	INLINE int readword(tms99xx_state *cpustate, int addr)
 	{
@@ -1164,7 +1164,7 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 	WRITE8_HANDLER(ti990_10_eir_cru_w)
 	{
 		tms99xx_state *cpustate = get_safe_token(&space.device());
-		if (offset < 4)	/* does not work for EIR_MAPERR */
+		if (offset < 4) /* does not work for EIR_MAPERR */
 		{
 			cpustate->error_interrupt_register &= ~ (1 << offset);
 
@@ -1313,7 +1313,7 @@ static CPU_INIT( tms99xx )
 #if (TMS99XX_MODEL == TMS9995_ID)
 	/* we can ask at reset time that the CPU always generates one wait state automatically */
 	if (param == NULL)
-	{	/* if no param, the default is currently "wait state added" */
+	{   /* if no param, the default is currently "wait state added" */
 		cpustate->memory_wait_states_byte = 4;
 		cpustate->memory_wait_states_word = 12;
 			cpustate->is_mp9537 = 0;
@@ -1352,9 +1352,9 @@ static CPU_RESET( tms99xx )
 					cpustate->map_files[i].bias[j] = 0;
 				}
 		}
-		cpustate->cur_map = 0;			/* equivalent to ST_MF status bit */
-		cpustate->cur_src_map = 0;		/* set to 2 by LDS */
-		cpustate->cur_dst_map = 0;		/* set to 2 by LDD */
+		cpustate->cur_map = 0;          /* equivalent to ST_MF status bit */
+		cpustate->cur_src_map = 0;      /* set to 2 by LDS */
+		cpustate->cur_dst_map = 0;      /* set to 2 by LDD */
 
 		cpustate->reset_maperr = 0;
 	#endif
@@ -1410,8 +1410,8 @@ static CPU_EXECUTE( tms99xx )
 	do
 	{
 		/* all TMS9900 chips I know do not honor interrupts after XOP, BLWP or MID (after any
-          interrupt-like instruction, actually), and they do not either after LDS and LDD
-          (There are good reasons for this). */
+		  interrupt-like instruction, actually), and they do not either after LDS and LDD
+		  (There are good reasons for this). */
 		if ((cpustate->interrupt_pending) && (! cpustate->disable_interrupt_recognition))
 		{
 			int level;
@@ -1420,7 +1420,7 @@ static CPU_EXECUTE( tms99xx )
 
 
 			if (cpustate->load_state)
-			{	/* LOAD has the highest priority */
+			{   /* LOAD has the highest priority */
 
 				contextswitchX(cpustate, 0xFFFC);  /* load vector, save PC, WP and ST */
 
@@ -1429,7 +1429,7 @@ static CPU_EXECUTE( tms99xx )
 				/* clear IDLE status if necessary */
 				if (cpustate->IDLE)
 				{
-					cpustate->IDLE = 0;		/* clear IDLE condition */
+					cpustate->IDLE = 0;     /* clear IDLE condition */
 					if (cpustate->idle_callback)
 						(*cpustate->idle_callback)(device, 0);
 				}
@@ -1437,7 +1437,7 @@ static CPU_EXECUTE( tms99xx )
 				CYCLES(6/*to be confirmed*/, 22, 14);
 			}
 			else if (level <= IMASK)
-			{	/* a maskable interrupt is honored only if its level isn't greater than IMASK */
+			{   /* a maskable interrupt is honored only if its level isn't greater than IMASK */
 
 			contextswitchX(cpustate, level*4); /* load vector, save PC, WP and ST */
 
@@ -1457,7 +1457,7 @@ static CPU_EXECUTE( tms99xx )
 				/* clear IDLE status if necessary */
 			if (cpustate->IDLE)
 			{
-				cpustate->IDLE = 0;		/* clear IDLE condition */
+				cpustate->IDLE = 0;     /* clear IDLE condition */
 				if (cpustate->idle_callback)
 					(*cpustate->idle_callback)(device, 0);
 			}
@@ -1466,7 +1466,7 @@ static CPU_EXECUTE( tms99xx )
 				/* Clear bit in latch */
 				/* I think tms9989 does this, too */
 				if (level != 2)
-				{	/* Only do this on level 1, 3, 4 interrupts */
+				{   /* Only do this on level 1, 3, 4 interrupts */
 					int mask = 1 << level;
 					int flag_mask = (level == 1) ? 4 : mask;
 
@@ -1493,16 +1493,16 @@ static CPU_EXECUTE( tms99xx )
 		debugger_instruction_hook(device, cpustate->PC);
 
 		if (cpustate->IDLE)
-		{	/* IDLE instruction has halted execution */
+		{   /* IDLE instruction has halted execution */
 			#if EXTERNAL_INSTRUCTION_DECODING
 				external_instruction_notify(cpustate, 2);
 				CYCLES(Moof!, 2, 2); /* 2 cycles per CRU write */
 			#else
-				cpustate->icount = 0;	/* much simpler... */
+				cpustate->icount = 0;   /* much simpler... */
 			#endif
 		}
 		else
-		{	/* we execute an instruction */
+		{   /* we execute an instruction */
 			cpustate->disable_interrupt_recognition = 0;  /* default value */
 			cpustate->IR = fetch(cpustate);
 			execute(cpustate, cpustate->IR);
@@ -1529,7 +1529,7 @@ static CPU_EXECUTE( tms99xx )
 			#if (HAS_OVERFLOW_INTERRUPT)
 				#if (TMS99XX_MODEL == TMS9995_ID)
 					/* Note that TI had some problem implementing this...  I don't know if this feature works on
-                    a real-world TMS9995. */
+					a real-world TMS9995. */
 					if ((cpustate->STATUS & ST_OVIE) && (cpustate->STATUS & ST_OV) && (cpustate->irq_level > 2))
 						cpustate->irq_level = 2;  /* interrupt request */
 				#else
@@ -1554,7 +1554,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 	else
 	{
 		/*if (cpustate->irq_state == state)
-            return;*/
+		    return;*/
 
 		cpustate->irq_state = state;
 
@@ -1650,7 +1650,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 	else
 	{
 		/*if (cpustate->irq_state == state)
-            return;*/
+		    return;*/
 
 		cpustate->irq_state = state;
 
@@ -1683,7 +1683,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 		int level;
 
 		if (irqline == INPUT_LINE_NMI)
-			level = 2;	/* translate MAME's convention to CPU's representation */
+			level = 2;  /* translate MAME's convention to CPU's representation */
 		else
 			level = (* cpustate->irq_callback)(cpustate->device, 0);
 
@@ -1776,7 +1776,7 @@ static void reset_decrementer(tms99xx_state *cpustate)
 	cpustate->decrementer_enabled = ((cpustate->flag & 2) && (cpustate->decrementer_interval));
 
 	if (cpustate->decrementer_enabled && ! (cpustate->flag & 1))
-	{	/* timer */
+	{   /* timer */
 		attotime period = cpustate->device->cycles_to_attotime(cpustate->decrementer_interval * 16L);
 		cpustate->timer->adjust(period, 0, period);
 	}
@@ -1804,24 +1804,24 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 		int flag_mask = (irqline == 0) ? 0x4 : 0x10;
 
 		if (((cpustate->int_state & mask) != 0) ^ (state != 0))
-		{	/* only if state changes */
+		{   /* only if state changes */
 			if (state)
 			{
 				cpustate->int_state |= mask;
 
 				if ((irqline == 1) && (cpustate->flag & 1))
-				{	/* event counter mode : INT4* triggers no interrupt... */
+				{   /* event counter mode : INT4* triggers no interrupt... */
 					if (cpustate->decrementer_enabled)
-					{	/* decrement, then interrupt if reach 0 */
+					{   /* decrement, then interrupt if reach 0 */
 						if ((-- cpustate->decrementer_count) == 0)
 						{
 							decrementer_callback(cpustate->device->machine(), cpustate, 0);
-							cpustate->decrementer_count = cpustate->decrementer_interval;	/* reload */
+							cpustate->decrementer_count = cpustate->decrementer_interval;   /* reload */
 						}
 					}
 				}
 				else
-				{	/* plain interrupt mode */
+				{   /* plain interrupt mode */
 					cpustate->int_latch |= mask;
 					cpustate->flag |= flag_mask;
 				}
@@ -2102,7 +2102,7 @@ static void write_single_CRU(tms99xx_state *cpustate, int port, int data)
 	case 0xF7D:
 	case 0xF7E:
 	case 0xF7F:
-		{	/* user defined flags */
+		{   /* user defined flags */
 			int mask = 1 << (port - 0xF70);
 			if (data & 0x01)
 				cpustate->flag |= mask;
@@ -2118,9 +2118,9 @@ static void write_single_CRU(tms99xx_state *cpustate, int port, int data)
 	}
 			/* External CRU */
 	/* Even though all the registers above are implemented internally, accesses
-    are passed to the external bus, too, and an external device might respond
-    to a write to these CRU address as well (particularly a write to the user
-    flag registers). */
+	are passed to the external bus, too, and an external device might respond
+	to a write to these CRU address as well (particularly a write to the user
+	flag registers). */
 	WRITEPORT(cpustate, port, (data & 0x01));
 }
 #else
@@ -2390,13 +2390,13 @@ static void load_map_file(tms99xx_state *cpustate, UINT16 src_addr, int src_map_
 
 	/* load mapped address into the memory address register */
 	if ((src_map_file == 0) && (src_addr >= 0xf800))
-	{	/* intercept TPCS and CPU ROM */
+	{   /* intercept TPCS and CPU ROM */
 		if (src_addr < 0xfc00)
 			/* TPCS */
 			cpustate->mapper_address_latch = 0x1f0000+src_addr;
 		else
 			/* CPU ROM */
-			cpustate->mapper_address_latch = 0x1f0000+src_addr;	/* hack... */
+			cpustate->mapper_address_latch = 0x1f0000+src_addr; /* hack... */
 	}
 	else if (! cpustate->mapping_on)
 	{
@@ -2513,7 +2513,7 @@ static UINT16 decipheraddr(tms99xx_state *cpustate, UINT16 opcode)
 		/* Rx */
 		return(reg + cpustate->WP);
 	else if (ts == 0x10)
-	{	/* *Rx */
+	{   /* *Rx */
 		CYCLES(0, 4, 1);
 		return(readword(cpustate, reg + cpustate->WP));
 	}
@@ -2524,18 +2524,18 @@ static UINT16 decipheraddr(tms99xx_state *cpustate, UINT16 opcode)
 		imm = fetch(cpustate);
 
 		if (reg)
-		{	/* @>xxxx(Rx) */
+		{   /* @>xxxx(Rx) */
 			CYCLES(1, 8, 3);
 			return(readword(cpustate, reg + cpustate->WP) + imm);
 		}
 		else
-		{	/* @>xxxx */
+		{   /* @>xxxx */
 			CYCLES(3, 8, 1);
 			return(imm);
 		}
 	}
 	else /*if (ts == 0x30)*/
-	{	/* *Rx+ */
+	{   /* *Rx+ */
 		register UINT16 response;
 
 		reg += cpustate->WP;    /* reg now contains effective address */
@@ -2560,7 +2560,7 @@ static UINT16 decipheraddrbyte(tms99xx_state *cpustate, UINT16 opcode)
 		/* Rx */
 		return(reg + cpustate->WP);
 	else if (ts == 0x10)
-	{	/* *Rx */
+	{   /* *Rx */
 		CYCLES(0, 4, 1);
 		return(readword(cpustate, reg + cpustate->WP));
 	}
@@ -2571,18 +2571,18 @@ static UINT16 decipheraddrbyte(tms99xx_state *cpustate, UINT16 opcode)
 		imm = fetch(cpustate);
 
 		if (reg)
-		{	/* @>xxxx(Rx) */
+		{   /* @>xxxx(Rx) */
 			CYCLES(1, 8, 3);
 			return(readword(cpustate, reg + cpustate->WP) + imm);
 		}
 		else
-		{	/* @>xxxx */
+		{   /* @>xxxx */
 			CYCLES(3, 8, 1);
 			return(imm);
 		}
 	}
 	else /*if (ts == 0x30)*/
-	{	/* *Rx+ */
+	{   /* *Rx+ */
 		register UINT16 response;
 
 		reg += cpustate->WP;    /* reg now contains effective address */
@@ -2601,11 +2601,11 @@ static UINT16 decipheraddrbyte(tms99xx_state *cpustate, UINT16 opcode)
 #if (TMS99XX_MODEL == TI990_10_ID)
 	/* TI990/10 generates an error interrupt */
 	/* timings are unknown */
-	#define HANDLE_ILLEGAL													\
-	{																		\
-		cpustate->error_interrupt_register |= EIR_ILLOP;							\
-		if (cpustate->error_interrupt_callback)										\
-			(*cpustate->error_interrupt_callback)(cpustate->device, 1);								\
+	#define HANDLE_ILLEGAL                                                  \
+	{                                                                       \
+		cpustate->error_interrupt_register |= EIR_ILLOP;                            \
+		if (cpustate->error_interrupt_callback)                                     \
+			(*cpustate->error_interrupt_callback)(cpustate->device, 1);                             \
 	}
 #elif TMS99XX_MODEL <= TMS9989_ID
 	/* TMS9900/TMS9980 merely ignore the instruction */
@@ -2628,11 +2628,11 @@ static UINT16 decipheraddrbyte(tms99xx_state *cpustate, UINT16 opcode)
 	#if (TMS99XX_MODEL == TI990_10_ID)
 		/* TI990/10 generates an error interrupt */
 		/* timings are unknown */
-		#define HANDLE_PRIVILEGE_VIOLATION									\
-		{																	\
-			cpustate->error_interrupt_register |= EIR_PRIVOP;						\
-			if (cpustate->error_interrupt_callback)									\
-				(*cpustate->error_interrupt_callback)(cpustate->device, 1);							\
+		#define HANDLE_PRIVILEGE_VIOLATION                                  \
+		{                                                                   \
+			cpustate->error_interrupt_register |= EIR_PRIVOP;                       \
+			if (cpustate->error_interrupt_callback)                                 \
+				(*cpustate->error_interrupt_callback)(cpustate->device, 1);                         \
 		}
 	#else
 		#define HANDLE_PRIVILEGE_VIOLATION
@@ -2651,7 +2651,7 @@ static void illegal(tms99xx_state *cpustate, UINT16 opcode)
 }
 
 
-#if 0		/* ti990/12 only */
+#if 0       /* ti990/12 only */
 /*==========================================================================
    Additionnal instructions,                                   >0000->002F
    Additionnal single-register instruction,                    >0030->003F
@@ -2667,7 +2667,7 @@ static void illegal(tms99xx_state *cpustate, UINT16 opcode)
 static void h0000(tms99xx_state *cpustate, UINT16 opcode)
 {
 	if (opcode >= 0x30)
-	{	/* STPC STore Program Counter */
+	{   /* STPC STore Program Counter */
 
 	}
 	else
@@ -2765,7 +2765,7 @@ static void h0040(tms99xx_state *cpustate, UINT16 opcode)
 		cpustate->WP = readword(cpustate, addr) & ~1;
 		break;
 
-#if 0	/* 990/12 opcodes */
+#if 0   /* 990/12 opcodes */
 	case 4:
 		/* CS ---- Compare Strings */
 	case 5:
@@ -2821,8 +2821,8 @@ static void h0100(tms99xx_state *cpustate, UINT16 opcode)
 
 	src = decipheraddr(cpustate, opcode) & ~1;
 
-  switch ((opcode & 0xC0) >> 6)
-  {
+	switch ((opcode & 0xC0) >> 6)
+	{
 #if HAS_BIND_OPCODE
 	case 1:   /* BIND */
 		/* BIND -- Branch INDirect */
@@ -2831,7 +2831,7 @@ static void h0100(tms99xx_state *cpustate, UINT16 opcode)
 		break;
 #endif
 
-  case 2:   /* DIVS */
+	case 2:   /* DIVS */
 		/* DIVS -- DIVide Signed */
 		/* R0 = (R0:R1)/S   R1 = (R0:R1)%S */
 		{
@@ -2856,7 +2856,7 @@ static void h0100(tms99xx_state *cpustate, UINT16 opcode)
 		}
 		break;
 
-  case 3:   /* MPYS */
+	case 3:   /* MPYS */
 		/* MPYS -- MultiPlY Signed */
 		/* Results:  R0:R1 = R0*S */
 		{
@@ -2877,7 +2877,7 @@ static void h0100(tms99xx_state *cpustate, UINT16 opcode)
 		CYCLES(Mooof!, Mooof!, 25);
 		break;
 
-#if 0	/* Origin unknown */
+#if 0   /* Origin unknown */
 	case 0:   /* EVAD */
 		/* EVAD -- EValuate ADdress instruction */
 
@@ -2887,7 +2887,7 @@ static void h0100(tms99xx_state *cpustate, UINT16 opcode)
 	default:
 		HANDLE_ILLEGAL;
 		break;
-  }
+	}
 }
 #endif
 
@@ -2907,19 +2907,19 @@ systems with memory mapper: LMF
 static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 {
 	register UINT16 addr;
-	register UINT16 value;	/* used for anything */
+	register UINT16 value;  /* used for anything */
 
 	addr = opcode & 0xF;
 	addr = ((addr + addr) + cpustate->WP) & ~1;
 
 	#if HAS_MAPPING
 	if ((opcode >= 0x0320) && (opcode < 0x0340))
-	{	/* LMF */
+	{   /* LMF */
 		/* LMF --- Load memory Map File */
 			/* Used by the memory mapper on ti990/10 with mapping option, ti990/12, and the TIM99610
-            mapper chip to be associated with tms99000.
-            Syntax: "LMF Rn,m" loads map file m (0 or 1) with six words of memory, starting at address
-            specified in workspace register Rn (0 through 15). */
+			mapper chip to be associated with tms99000.
+			Syntax: "LMF Rn,m" loads map file m (0 or 1) with six words of memory, starting at address
+			specified in workspace register Rn (0 through 15). */
 			#if HAS_PRIVILEGE
 				if (cpustate->STATUS & ST_PR)
 				{
@@ -2952,18 +2952,18 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 #if 0
 		/* tms99110 opcode (not supported by 990/12) */
 		if (opcode == 0x0301)
-		{	/* CR ---- Compare Reals */
+		{   /* CR ---- Compare Reals */
 		}
 		else
 		/* tms99105+tms99110 opcode (not supported by 990/12) */
 		if (opcode == 0x0302)
-		{	/* MM ---- Multiply Multiple */
+		{   /* MM ---- Multiply Multiple */
 		}
 		else
 #endif
-		#if 0	/* ti990/12 only */
+		#if 0   /* ti990/12 only */
 			if (opcode >= 0x03F0)
-			{	/* EP ---- Extended Precision */
+			{   /* EP ---- Extended Precision */
 			}
 			else
 		#endif
@@ -3066,7 +3066,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 	case 10:  /* IDLE */
 		/* IDLE -- IDLE until a reset, interrupt, load */
 		/* The TMS99000 locks until an interrupt happen (like with 68k STOP instruction),
-           and continuously performs a special CRU write (code 2). */
+		   and continuously performs a special CRU write (code 2). */
 		#if HAS_PRIVILEGE
 			if (cpustate->STATUS & ST_PR)
 			{
@@ -3112,7 +3112,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 	case 13:  /* CKON */
 	case 14:  /* CKOF */
 	case 15:  /* LREX */
-		HANDLE_ILLEGAL;	/* These instruction "have been deleted" on the TMS9940 */
+		HANDLE_ILLEGAL; /* These instruction "have been deleted" on the TMS9940 */
 		break;
 
 #else
@@ -3133,7 +3133,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 		field_interrupt(cpustate);  /*IM has been modified.*/
 
 		#if (TMS99XX_MODEL == TMS9995_ID)
-			/*cpustate->MID_flag = 0;*/		/* not sure about this */
+			/*cpustate->MID_flag = 0;*/     /* not sure about this */
 		#endif
 		#if (TMS99XX_MODEL == TI990_10_ID)
 			cpustate->error_interrupt_register = 0;
@@ -3172,7 +3172,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 		/* LREX -- Load or REstart eXecution */
 		/* Perform a special CRU write (code 7). */
 		/* An external circuitery could, for instance, activate the LOAD* line,
-           causing a non-maskable LOAD interrupt (vector -1). */
+		   causing a non-maskable LOAD interrupt (vector -1). */
 		#if HAS_PRIVILEGE
 			if (cpustate->STATUS & ST_PR)
 			{
@@ -3199,7 +3199,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 		/* CKOF -- ClocK OFf */
 		/* Disable the line clock interrupt. */
 		/* We use a callback because the line clock is implemented in machine
-           code, not in the CPU core. */
+		   code, not in the CPU core. */
 		#if HAS_PRIVILEGE
 			if (cpustate->STATUS & ST_PR)
 			{
@@ -3218,7 +3218,7 @@ static void h0200(tms99xx_state *cpustate, UINT16 opcode)
 	case 15:  /* LREX */
 		/* LREX -- Load or REstart eXecution */
 		/* Trigger a LOAD interrupt (vector -1).  (We use a callback, and I
-           have forgotten the reason why.) */
+		   have forgotten the reason why.) */
 		#if HAS_PRIVILEGE
 			if (cpustate->STATUS & ST_PR)
 			{
@@ -3288,7 +3288,7 @@ static void h0400(tms99xx_state *cpustate, UINT16 opcode)
 		/* Executes instruction *S */
 		execute(cpustate, readwordX(cpustate, addr, src_map));
 		/* On tms9900, the X instruction actually takes 8 cycles, but we gain 2 cycles on the next
-        instruction, as we don't need to fetch it. */
+		instruction, as we don't need to fetch it. */
 		CYCLES(1, 6, 2);
 		break;
 	case 3:   /* CLR */
@@ -3450,10 +3450,10 @@ static void h0400(tms99xx_state *cpustate, UINT16 opcode)
 
 #if HAS_MAPPING
 	/* Used by the memory mapper on ti990/10 with mapping option, ti990/12, and the TIM99610
-    mapper chip to be associated with tms99000. */
+	mapper chip to be associated with tms99000. */
 	/* These opcode allow access to another page without the need of switching a page someplace. */
 	/* Note that, if I read the 990/10 schematics correctly, two consecutive LDS or LDD would
-    cause some trouble.  */
+	cause some trouble.  */
 	case 14:  /* LDS */
 		/* LDS --- Long Distance Source */
 
@@ -3560,7 +3560,7 @@ static void h0800(tms99xx_state *cpustate, UINT16 opcode)
 }
 
 
-#if 0	/* 990/12 opcodes */
+#if 0   /* 990/12 opcodes */
 /*==========================================================================
    Additionnal instructions,                                   >0C00->0C0F
    Additionnal single-register instructions,                   >0C10->0C3F
@@ -3644,7 +3644,7 @@ static void h0c00(tms99xx_state *cpustate, UINT16 opcode)
 		case 15:
 			/* XIT --- eXIT from floating point interpreter */
 			/* Generated by some compilers, but equivalent to NOP on TI990/12.  May have been used
-            by some software floating-point emulators. */
+			by some software floating-point emulators. */
 			break;
 
 		default:
@@ -3923,9 +3923,9 @@ static void h1000(tms99xx_state *cpustate, UINT16 opcode)
 
 			/* Set ST_OP bit. */
 			/*if (i & 1)
-                cpustate->STATUS |= ST_OP;
-            else
-                cpustate->STATUS &= ~ ST_OP;*/
+			    cpustate->STATUS |= ST_OP;
+			else
+			    cpustate->STATUS &= ~ ST_OP;*/
 
 			/* Jump accordingly. */
 			if (i & 1)  /*(cpustate->STATUS & ST_OP)*/
@@ -4083,7 +4083,7 @@ static void h2000(tms99xx_state *cpustate, UINT16 opcode)
 }
 
 static void xop(tms99xx_state *cpustate, UINT16 opcode)
-{	/* XOP */
+{   /* XOP */
 	/* XOP --- eXtended OPeration */
 	/* WP = *(40h+D), PC = *(42h+D) */
 	/* New R13=old WP, New R14=Old IP, New R15=Old ST */
@@ -4129,7 +4129,7 @@ static void xop(tms99xx_state *cpustate, UINT16 opcode)
 			writebyte(cpustate, operand, (X << 4) | Y);
 			}
 			break;
-		case 1:	/* DCS */
+		case 1: /* DCS */
 			/* DCS --- Decimal Correct Substraction */
 			operand = decipheraddrbyte(cpustate, opcode);
 			{
@@ -4155,7 +4155,7 @@ static void xop(tms99xx_state *cpustate, UINT16 opcode)
 			/* LIIM - Load Immediate Interrupt Mask */
 			/* Does the same job as LIMI, with a different opcode format. */
 			/* Note that, unlike TMS9900, the interrupt mask is only 2-bit long. */
-		(void)decipheraddr(cpustate, opcode);	/* dummy decode (personnal guess) */
+		(void)decipheraddr(cpustate, opcode);   /* dummy decode (personnal guess) */
 
 		cpustate->STATUS = (cpustate->STATUS & ~ST_IM) | (opcode & ST_IM);
 			break;
@@ -4206,7 +4206,7 @@ static void ldcr_stcr(tms99xx_state *cpustate, UINT16 opcode)
 		addr = decipheraddr(cpustate, opcode) & ~1;
 
 	if (opcode < 0x3400)
-	{	/* LDCR */
+	{   /* LDCR */
 		/* LDCR -- LoaD into CRu */
 		/* CRU R12--CRU R12+D-1 set to S */
 		if (cnt <= 8)
@@ -4246,7 +4246,7 @@ static void ldcr_stcr(tms99xx_state *cpustate, UINT16 opcode)
 		CYCLES(4+cnt, 20 + cnt+cnt, 9 + cnt+cnt);
 	}
 	else
-	{	/* STCR */
+	{   /* STCR */
 		/* STCR -- STore from CRu */
 		/* S = CRU R12--CRU R12+D-1 */
 		if (cnt <= 8)
@@ -4294,7 +4294,7 @@ static void ldcr_stcr(tms99xx_state *cpustate, UINT16 opcode)
 		}
 		else
 		{
-			(void)readwordX(cpustate, addr, src_map);	/*dummy read*/
+			(void)readwordX(cpustate, addr, src_map);   /*dummy read*/
 
 			(void)READREG(cnt+cnt); /*dummy read (reasonnable guess for TMS9995 & TMS9900, ti990/10)*/
 
@@ -4453,9 +4453,9 @@ static void h4000b(tms99xx_state *cpustate, UINT16 opcode)
 		setst_byte_laep(cpustate, value);
 		#if (TMS99XX_MODEL <= TMS9985_ID)
 			/* On ti990/10 and tms9900, MOVB needs to read destination, because it cannot actually
-              read one single byte.  It reads a word, replaces the revelant byte, then write
-              the result.  A tms9980 should not need to do so, but still does, because it is just
-              a tms9900 with a 16 to 8 bit multiplexer (instead of a new chip design, like tms9995). */
+			  read one single byte.  It reads a word, replaces the revelant byte, then write
+			  the result.  A tms9980 should not need to do so, but still does, because it is just
+			  a tms9900 with a 16 to 8 bit multiplexer (instead of a new chip design, like tms9995). */
 			(void)readbyteX(cpustate, dest, dst_map);
 		#endif
 		writebyteX(cpustate, dest, value, dst_map);
@@ -4557,10 +4557,10 @@ static CPU_SET_INFO( tms99xx )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		tms99xx_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + 0:					tms99xx_set_irq_line(cpustate, 0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + 1:					tms99xx_set_irq_line(cpustate, 1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + 2:					tms99xx_set_irq_line(cpustate, 2, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:      tms99xx_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + 0:                   tms99xx_set_irq_line(cpustate, 0, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + 1:                   tms99xx_set_irq_line(cpustate, 1, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + 2:                   tms99xx_set_irq_line(cpustate, 2, info->i);     break;
 
 #if (TMS99XX_MODEL == TI990_10_ID)
 		case CPUINFO_INT_PC:
@@ -4587,15 +4587,15 @@ static CPU_SET_INFO( tms99xx )
 					else
 					{
 						/*if ((info->i < top)
-                                && (info->i > cpustate->map_files[cpustate->cur_map].limit[0])
-                                && (info->i > cpustate->map_files[cpustate->cur_map].limit[1])
-                                && (info->i > cpustate->map_files[cpustate->cur_map].limit[2]))
-                            cpustate->PC = info->i;
-                        else*/
+						        && (info->i > cpustate->map_files[cpustate->cur_map].limit[0])
+						        && (info->i > cpustate->map_files[cpustate->cur_map].limit[1])
+						        && (info->i > cpustate->map_files[cpustate->cur_map].limit[2]))
+						    cpustate->PC = info->i;
+						else*/
 							cpustate->PC = 0;
 					}
 					/*if (info->i >= top)
-                        cpustate->PC = 0;*/
+					    cpustate->PC = 0;*/
 				}
 				cpustate->PC &= 0xfffe;
 			}
@@ -4603,27 +4603,27 @@ static CPU_SET_INFO( tms99xx )
 #else
 		case CPUINFO_INT_PC:
 #endif
-		case CPUINFO_INT_REGISTER + TMS9900_PC:			cpustate->PC = info->i & 0xfffe;				break;
-		case CPUINFO_INT_REGISTER + TMS9900_IR:			cpustate->IR = info->i;							break;
+		case CPUINFO_INT_REGISTER + TMS9900_PC:         cpustate->PC = info->i & 0xfffe;                break;
+		case CPUINFO_INT_REGISTER + TMS9900_IR:         cpustate->IR = info->i;                         break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + TMS9900_WP:			cpustate->WP = info->i & 0xfffe;				break;
-		case CPUINFO_INT_REGISTER + TMS9900_STATUS:		cpustate->STATUS = info->i; getstat(cpustate);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R0:			WRITEREG_DEBUG(cpustate, R0, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R1:			WRITEREG_DEBUG(cpustate, R1, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R2:			WRITEREG_DEBUG(cpustate, R2, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R3:			WRITEREG_DEBUG(cpustate, R3, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R4:			WRITEREG_DEBUG(cpustate, R4, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R5:			WRITEREG_DEBUG(cpustate, R5, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R6:			WRITEREG_DEBUG(cpustate, R6, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R7:			WRITEREG_DEBUG(cpustate, R7, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R8:			WRITEREG_DEBUG(cpustate, R8, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R9:			WRITEREG_DEBUG(cpustate, R9, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R10:		WRITEREG_DEBUG(cpustate, R10, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R11:		WRITEREG_DEBUG(cpustate, R11, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R12:		WRITEREG_DEBUG(cpustate, R12, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R13:		WRITEREG_DEBUG(cpustate, R13, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R14:		WRITEREG_DEBUG(cpustate, R14, info->i);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R15:		WRITEREG_DEBUG(cpustate, R15, info->i);			break;
+		case CPUINFO_INT_REGISTER + TMS9900_WP:         cpustate->WP = info->i & 0xfffe;                break;
+		case CPUINFO_INT_REGISTER + TMS9900_STATUS:     cpustate->STATUS = info->i; getstat(cpustate);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R0:         WRITEREG_DEBUG(cpustate, R0, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R1:         WRITEREG_DEBUG(cpustate, R1, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R2:         WRITEREG_DEBUG(cpustate, R2, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R3:         WRITEREG_DEBUG(cpustate, R3, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R4:         WRITEREG_DEBUG(cpustate, R4, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R5:         WRITEREG_DEBUG(cpustate, R5, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R6:         WRITEREG_DEBUG(cpustate, R6, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R7:         WRITEREG_DEBUG(cpustate, R7, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R8:         WRITEREG_DEBUG(cpustate, R8, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R9:         WRITEREG_DEBUG(cpustate, R9, info->i);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R10:        WRITEREG_DEBUG(cpustate, R10, info->i);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R11:        WRITEREG_DEBUG(cpustate, R11, info->i);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R12:        WRITEREG_DEBUG(cpustate, R12, info->i);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R13:        WRITEREG_DEBUG(cpustate, R13, info->i);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R14:        WRITEREG_DEBUG(cpustate, R14, info->i);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R15:        WRITEREG_DEBUG(cpustate, R15, info->i);         break;
 	}
 }
 
@@ -4639,21 +4639,21 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms99xx_state);					break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 6;/*8 with 990/12, 99105, 99110*/break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;/*TODO: compute this value*/break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(tms99xx_state);                    break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 3;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                   break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 6;/*8 with 990/12, 99105, 99110*/break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 10;/*TODO: compute this value*/break;
 
 #if (USE_16_BIT_ACCESSORS)
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                   break;
 #else
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
 #endif
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:
 #if (TMS99XX_MODEL == TI990_10_ID)
@@ -4670,11 +4670,11 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 			info->i = 16;
 #endif
 			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:
 #if (TMS99XX_MODEL == TI990_10_ID)
 			/* 3 MSBs do exist, although they are not connected (don't ask...) */
@@ -4696,7 +4696,7 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 			info->i = 15;
 #endif
 			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
 /* not implemented */
 /*      case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = get_irq_line(INPUT_LINE_NMI); break;
@@ -4704,7 +4704,7 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
         case CPUINFO_INT_INPUT_STATE + 1:               info->i = get_irq_line(1);              break;
         case CPUINFO_INT_INPUT_STATE + 2:               info->i = get_irq_line(2);              break;*/
 
-		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
+		case CPUINFO_INT_PREVIOUSPC:                    /* not implemented */                   break;
 
 #if (TMS99XX_MODEL == TI990_10_ID)
 		case CPUINFO_INT_PC:
@@ -4735,44 +4735,44 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 #else
 		case CPUINFO_INT_PC:
 #endif
-		case CPUINFO_INT_REGISTER + TMS9900_PC:			info->i = cpustate->PC;							break;
-		case CPUINFO_INT_REGISTER + TMS9900_IR:			info->i = cpustate->IR;							break;
+		case CPUINFO_INT_REGISTER + TMS9900_PC:         info->i = cpustate->PC;                         break;
+		case CPUINFO_INT_REGISTER + TMS9900_IR:         info->i = cpustate->IR;                         break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + TMS9900_WP:			info->i = cpustate->WP;							break;
-		case CPUINFO_INT_REGISTER + TMS9900_STATUS:		setstat(cpustate); info->i = cpustate->STATUS;			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R0:			info->i = READREG_DEBUG(cpustate, R0);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R1:			info->i = READREG_DEBUG(cpustate, R1);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R2:			info->i = READREG_DEBUG(cpustate, R2);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R3:			info->i = READREG_DEBUG(cpustate, R3);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R4:			info->i = READREG_DEBUG(cpustate, R4);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R5:			info->i = READREG_DEBUG(cpustate, R5);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R6:			info->i = READREG_DEBUG(cpustate, R6);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R7:			info->i = READREG_DEBUG(cpustate, R7);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R8:			info->i = READREG_DEBUG(cpustate, R8);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R9:			info->i = READREG_DEBUG(cpustate, R9);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R10:		info->i = READREG_DEBUG(cpustate, R10);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R11:		info->i = READREG_DEBUG(cpustate, R11);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R12:		info->i = READREG_DEBUG(cpustate, R12);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R13:		info->i = READREG_DEBUG(cpustate, R13);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R14:		info->i = READREG_DEBUG(cpustate, R14);			break;
-		case CPUINFO_INT_REGISTER + TMS9900_R15:		info->i = READREG_DEBUG(cpustate, R15);			break;
+		case CPUINFO_INT_REGISTER + TMS9900_WP:         info->i = cpustate->WP;                         break;
+		case CPUINFO_INT_REGISTER + TMS9900_STATUS:     setstat(cpustate); info->i = cpustate->STATUS;          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R0:         info->i = READREG_DEBUG(cpustate, R0);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R1:         info->i = READREG_DEBUG(cpustate, R1);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R2:         info->i = READREG_DEBUG(cpustate, R2);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R3:         info->i = READREG_DEBUG(cpustate, R3);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R4:         info->i = READREG_DEBUG(cpustate, R4);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R5:         info->i = READREG_DEBUG(cpustate, R5);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R6:         info->i = READREG_DEBUG(cpustate, R6);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R7:         info->i = READREG_DEBUG(cpustate, R7);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R8:         info->i = READREG_DEBUG(cpustate, R8);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R9:         info->i = READREG_DEBUG(cpustate, R9);          break;
+		case CPUINFO_INT_REGISTER + TMS9900_R10:        info->i = READREG_DEBUG(cpustate, R10);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R11:        info->i = READREG_DEBUG(cpustate, R11);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R12:        info->i = READREG_DEBUG(cpustate, R12);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R13:        info->i = READREG_DEBUG(cpustate, R13);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R14:        info->i = READREG_DEBUG(cpustate, R14);         break;
+		case CPUINFO_INT_REGISTER + TMS9900_R15:        info->i = READREG_DEBUG(cpustate, R15);         break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms99xx);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(tms99xx);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(tms99xx);			break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(tms99xx);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms99xx);		break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms99xx);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(tms99xx);     break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(tms99xx);                break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(tms99xx);          break;
+		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(tms99xx);                break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(tms99xx);      break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(tms99xx);      break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, TMS99XX_device_get_name);		break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments 9900L"); break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "C TMS9900 emulator by Edward Swartz, initially converted for Mame by M.Coates, updated by R. Nabet"); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, TMS99XX_device_get_name);       break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Texas Instruments 9900L"); break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "C TMS9900 emulator by Edward Swartz, initially converted for Mame by M.Coates, updated by R. Nabet"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
@@ -4794,26 +4794,26 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 				cpustate->WP & 0x0001 ? 'I':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + TMS9900_PC:			sprintf(info->s, "PC :%04X",  cpustate->PC); break;
-		case CPUINFO_STR_REGISTER + TMS9900_IR:			sprintf(info->s, "IR :%04X",  cpustate->IR); break;
-		case CPUINFO_STR_REGISTER + TMS9900_WP:			sprintf(info->s, "WP :%04X",  cpustate->WP); break;
-		case CPUINFO_STR_REGISTER + TMS9900_STATUS:		sprintf(info->s, "ST :%04X",  cpustate->STATUS); break;
+		case CPUINFO_STR_REGISTER + TMS9900_PC:         sprintf(info->s, "PC :%04X",  cpustate->PC); break;
+		case CPUINFO_STR_REGISTER + TMS9900_IR:         sprintf(info->s, "IR :%04X",  cpustate->IR); break;
+		case CPUINFO_STR_REGISTER + TMS9900_WP:         sprintf(info->s, "WP :%04X",  cpustate->WP); break;
+		case CPUINFO_STR_REGISTER + TMS9900_STATUS:     sprintf(info->s, "ST :%04X",  cpustate->STATUS); break;
 
-		case CPUINFO_STR_REGISTER + TMS9900_R0:			sprintf(info->s, "R0 :%04X",  READREG_DEBUG(cpustate, R0)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R1:			sprintf(info->s, "R1 :%04X",  READREG_DEBUG(cpustate, R1)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R2:			sprintf(info->s, "R2 :%04X",  READREG_DEBUG(cpustate, R2)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R3:			sprintf(info->s, "R3 :%04X",  READREG_DEBUG(cpustate, R3)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R4:			sprintf(info->s, "R4 :%04X",  READREG_DEBUG(cpustate, R4)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R5:			sprintf(info->s, "R5 :%04X",  READREG_DEBUG(cpustate, R5)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R6:			sprintf(info->s, "R6 :%04X",  READREG_DEBUG(cpustate, R6)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R7:			sprintf(info->s, "R7 :%04X",  READREG_DEBUG(cpustate, R7)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R8:			sprintf(info->s, "R8 :%04X",  READREG_DEBUG(cpustate, R8)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R9:			sprintf(info->s, "R9 :%04X",  READREG_DEBUG(cpustate, R9)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R10:		sprintf(info->s, "R10:%04X",  READREG_DEBUG(cpustate, R10)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R11:		sprintf(info->s, "R11:%04X",  READREG_DEBUG(cpustate, R11)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R12:		sprintf(info->s, "R12:%04X",  READREG_DEBUG(cpustate, R12)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R13:		sprintf(info->s, "R13:%04X",  READREG_DEBUG(cpustate, R13)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R14:		sprintf(info->s, "R14:%04X",  READREG_DEBUG(cpustate, R14)); break;
-		case CPUINFO_STR_REGISTER + TMS9900_R15:		sprintf(info->s, "R15:%04X",  READREG_DEBUG(cpustate, R15)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R0:         sprintf(info->s, "R0 :%04X",  READREG_DEBUG(cpustate, R0)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R1:         sprintf(info->s, "R1 :%04X",  READREG_DEBUG(cpustate, R1)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R2:         sprintf(info->s, "R2 :%04X",  READREG_DEBUG(cpustate, R2)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R3:         sprintf(info->s, "R3 :%04X",  READREG_DEBUG(cpustate, R3)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R4:         sprintf(info->s, "R4 :%04X",  READREG_DEBUG(cpustate, R4)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R5:         sprintf(info->s, "R5 :%04X",  READREG_DEBUG(cpustate, R5)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R6:         sprintf(info->s, "R6 :%04X",  READREG_DEBUG(cpustate, R6)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R7:         sprintf(info->s, "R7 :%04X",  READREG_DEBUG(cpustate, R7)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R8:         sprintf(info->s, "R8 :%04X",  READREG_DEBUG(cpustate, R8)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R9:         sprintf(info->s, "R9 :%04X",  READREG_DEBUG(cpustate, R9)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R10:        sprintf(info->s, "R10:%04X",  READREG_DEBUG(cpustate, R10)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R11:        sprintf(info->s, "R11:%04X",  READREG_DEBUG(cpustate, R11)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R12:        sprintf(info->s, "R12:%04X",  READREG_DEBUG(cpustate, R12)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R13:        sprintf(info->s, "R13:%04X",  READREG_DEBUG(cpustate, R13)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R14:        sprintf(info->s, "R14:%04X",  READREG_DEBUG(cpustate, R14)); break;
+		case CPUINFO_STR_REGISTER + TMS9900_R15:        sprintf(info->s, "R15:%04X",  READREG_DEBUG(cpustate, R15)); break;
 	}
 }

@@ -19,23 +19,23 @@ public:
 
 	/* sound-related */
 	int      m_sound_nmi_enable;
-	int		 m_pending_nmi;
-	int		 m_sound_status;
+	int      m_pending_nmi;
+	int      m_sound_status;
 
 	/* mcu-related */
 	/* Tokio*/
 	int      m_tokio_prot_count;
 	/* Bubble Bobble MCU */
 	UINT8    m_ddr1;
-	UINT8	 m_ddr2;
-	UINT8	 m_ddr3;
-	UINT8	 m_ddr4;
+	UINT8    m_ddr2;
+	UINT8    m_ddr3;
+	UINT8    m_ddr4;
 	UINT8    m_port1_in;
-	UINT8	 m_port2_in;
-	UINT8	 m_port3_in;
-	UINT8	 m_port4_in;
+	UINT8    m_port2_in;
+	UINT8    m_port3_in;
+	UINT8    m_port4_in;
 	UINT8    m_port1_out;
-	UINT8	 m_port2_out;
+	UINT8    m_port2_out;
 	UINT8    m_port3_out;
 	UINT8    m_port4_out;
 	/* Bubble Bobble 68705 */

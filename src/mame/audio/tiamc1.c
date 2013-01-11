@@ -63,10 +63,10 @@ struct tiamc1_sound_state
 };
 
 
-#define T8253_CHAN0		0
-#define T8253_CHAN1		1
-#define T8253_CHAN2		2
-#define T8253_CWORD		3
+#define T8253_CHAN0     0
+#define T8253_CHAN1     1
+#define T8253_CHAN2     2
+#define T8253_CWORD     3
 
 
 INLINE tiamc1_sound_state *get_safe_token(device_t *device)
@@ -333,7 +333,7 @@ const device_type TIAMC1 = &device_creator<tiamc1_sound_device>;
 
 tiamc1_sound_device::tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIAMC1, "TIA-MC1 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tiamc1_sound_state);
 }
@@ -366,5 +366,3 @@ void tiamc1_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

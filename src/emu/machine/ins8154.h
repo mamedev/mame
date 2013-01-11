@@ -55,11 +55,11 @@
 
 struct ins8154_interface
 {
-	devcb_read8			m_in_a_cb;
-	devcb_write8		m_out_a_cb;
-	devcb_read8			m_in_b_cb;
-	devcb_write8		m_out_b_cb;
-	devcb_write_line	m_out_irq_cb;
+	devcb_read8         m_in_a_cb;
+	devcb_write8        m_out_a_cb;
+	devcb_read8         m_in_b_cb;
+	devcb_write8        m_out_b_cb;
+	devcb_write_line    m_out_irq_cb;
 };
 
 
@@ -67,11 +67,11 @@ struct ins8154_interface
 // ======================> ins8154_device
 
 class ins8154_device :  public device_t,
-                        public ins8154_interface
+						public ins8154_interface
 {
 public:
-    // construction/destruction
-    ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 ins8154_r(UINT32 offset);
 	void ins8154_w(UINT32 offset, UINT8 data);
@@ -80,12 +80,12 @@ public:
 	void ins8154_portb_w(UINT32 offset, UINT8 data);
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_post_load() { }
+	virtual void device_clock_changed() { }
 
 private:
 

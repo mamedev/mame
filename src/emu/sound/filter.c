@@ -20,7 +20,7 @@ void filter_state_reset(filter* f, filter_state* s) {
 
 filter_state* filter_state_alloc(void) {
 	int i;
-        filter_state* s = global_alloc(filter_state);
+		filter_state* s = global_alloc(filter_state);
 	s->prev_mac = 0;
 	for(i=0;i<FILTER_ORDER_MAX;++i)
 		s->xprev[i] = 0;
@@ -135,9 +135,9 @@ void filter2_setup(device_t *device, int type, double fc, double d, double gain,
 					filter2_context *filter2)
 {
 	int sample_rate = device->machine().sample_rate();
-	double w;	/* cutoff freq, in radians/sec */
+	double w;   /* cutoff freq, in radians/sec */
 	double w_squared;
-	double den;	/* temp variable */
+	double den; /* temp variable */
 	double two_over_T = 2*sample_rate;
 	double two_over_T_squared = two_over_T * two_over_T;
 
@@ -193,7 +193,7 @@ void filter2_reset(filter2_context *filter2)
 void filter2_step(filter2_context *filter2)
 {
 	filter2->y0 = -filter2->a1 * filter2->y1 - filter2->a2 * filter2->y2 +
-	                filter2->b0 * filter2->x0 + filter2->b1 * filter2->x1 + filter2->b2 * filter2->x2;
+					filter2->b0 * filter2->x0 + filter2->b1 * filter2->x1 + filter2->b2 * filter2->x2;
 	filter2->x2 = filter2->x1;
 	filter2->x1 = filter2->x0;
 	filter2->y2 = filter2->y1;
@@ -205,12 +205,12 @@ void filter2_step(filter2_context *filter2)
 void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2, double r3, double c1, double c2,
 					filter2_context *filter2)
 {
-	double	r_in, fc, d, gain;
+	double  r_in, fc, d, gain;
 
 	if (r1 == 0)
 	{
 		logerror("filter_opamp_m_bandpass_setup() - r1 can not be 0");
-		return;	/* Filter can not be setup.  Undefined results. */
+		return; /* Filter can not be setup.  Undefined results. */
 	}
 
 	if (r2 == 0)

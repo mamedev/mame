@@ -39,11 +39,11 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
     DEBUGGING
 ***************************************************************************/
 
-#define FORCE_C_BACKEND					(0)
-#define LOG_UML							(0)
-#define LOG_NATIVE						(0)
+#define FORCE_C_BACKEND                 (0)
+#define LOG_UML                         (0)
+#define LOG_NATIVE                      (0)
 
-#define SINGLE_INSTRUCTION_MODE			(0)
+#define SINGLE_INSTRUCTION_MODE         (0)
 
 
 /***************************************************************************
@@ -51,23 +51,23 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 ***************************************************************************/
 
 /* map variables */
-#define MAPVAR_PC						M0
-#define MAPVAR_CYCLES					M1
+#define MAPVAR_PC                       M0
+#define MAPVAR_CYCLES                   M1
 
 /* size of the execution code cache */
-#define CACHE_SIZE						(32 * 1024 * 1024)
+#define CACHE_SIZE                      (32 * 1024 * 1024)
 
 /* compilation boundaries -- how far back/forward does the analysis extend? */
-#define COMPILE_BACKWARDS_BYTES			128
-#define COMPILE_FORWARDS_BYTES			512
-#define COMPILE_MAX_INSTRUCTIONS		((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
-#define COMPILE_MAX_SEQUENCE			64
+#define COMPILE_BACKWARDS_BYTES         128
+#define COMPILE_FORWARDS_BYTES          512
+#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
+#define COMPILE_MAX_SEQUENCE            64
 
 /* exit codes */
-#define EXECUTE_OUT_OF_CYCLES			0
-#define EXECUTE_MISSING_CODE			1
-#define EXECUTE_UNMAPPED_CODE			2
-#define EXECUTE_RESET_CACHE				3
+#define EXECUTE_OUT_OF_CYCLES           0
+#define EXECUTE_MISSING_CODE            1
+#define EXECUTE_UNMAPPED_CODE           2
+#define EXECUTE_RESET_CACHE             3
 
 
 
@@ -75,7 +75,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
     MACROS
 ***************************************************************************/
 
-#define R32(reg)				rsp->impstate->regmap[reg]
+#define R32(reg)                rsp->impstate->regmap[reg]
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
@@ -84,56 +84,56 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 /* fast RAM info */
 struct fast_ram_info
 {
-	offs_t				start;						/* start of the RAM block */
-	offs_t				end;						/* end of the RAM block */
-	UINT8				readonly;					/* TRUE if read-only */
-	void *				base;						/* base in memory where the RAM lives */
+	offs_t              start;                      /* start of the RAM block */
+	offs_t              end;                        /* end of the RAM block */
+	UINT8               readonly;                   /* TRUE if read-only */
+	void *              base;                       /* base in memory where the RAM lives */
 };
 
 
 /* internal compiler state */
 struct compiler_state
 {
-	UINT32				cycles;						/* accumulated cycles */
-	UINT8				checkints;					/* need to check interrupts before next instruction */
-	UINT8				checksoftints;				/* need to check software interrupts before next instruction */
-	code_label	labelnum;					/* index for local labels */
+	UINT32              cycles;                     /* accumulated cycles */
+	UINT8               checkints;                  /* need to check interrupts before next instruction */
+	UINT8               checksoftints;              /* need to check software interrupts before next instruction */
+	code_label  labelnum;                   /* index for local labels */
 };
 
 struct rspimp_state
 {
 	/* core state */
-	drc_cache *			cache;						/* pointer to the DRC code cache */
-	drcuml_state *		drcuml;						/* DRC UML generator state */
-	rsp_frontend *		drcfe;						/* pointer to the DRC front-end state */
-	UINT32				drcoptions;					/* configurable DRC options */
+	drc_cache *         cache;                      /* pointer to the DRC code cache */
+	drcuml_state *      drcuml;                     /* DRC UML generator state */
+	rsp_frontend *      drcfe;                      /* pointer to the DRC front-end state */
+	UINT32              drcoptions;                 /* configurable DRC options */
 
 	/* internal stuff */
-	UINT8				cache_dirty;				/* true if we need to flush the cache */
-	UINT32				jmpdest;					/* destination jump target */
+	UINT8               cache_dirty;                /* true if we need to flush the cache */
+	UINT32              jmpdest;                    /* destination jump target */
 
 	/* parameters for subroutines */
-	UINT64				numcycles;					/* return value from gettotalcycles */
-	const char *		format;						/* format string for print_debug */
-	UINT32				arg0;						/* print_debug argument 1 */
-	UINT32				arg1;						/* print_debug argument 2 */
-	UINT32				arg2;						/* print_debug argument 3 */
-	UINT32				arg3;						/* print_debug argument 4 */
-	UINT32				vres[8];					/* used for temporary vector results */
+	UINT64              numcycles;                  /* return value from gettotalcycles */
+	const char *        format;                     /* format string for print_debug */
+	UINT32              arg0;                       /* print_debug argument 1 */
+	UINT32              arg1;                       /* print_debug argument 2 */
+	UINT32              arg2;                       /* print_debug argument 3 */
+	UINT32              arg3;                       /* print_debug argument 4 */
+	UINT32              vres[8];                    /* used for temporary vector results */
 
 	/* register mappings */
-	parameter	regmap[34];					/* parameter to register mappings for all 32 integer registers */
+	parameter   regmap[34];                 /* parameter to register mappings for all 32 integer registers */
 
 	/* subroutines */
-	code_handle *	entry;						/* entry point */
-	code_handle *	nocode;						/* nocode exception handler */
-	code_handle *	out_of_cycles;				/* out of cycles exception handler */
-	code_handle *	read8;						/* read byte */
-	code_handle *	write8;						/* write byte */
-	code_handle *	read16;						/* read half */
-	code_handle *	write16;					/* write half */
-	code_handle *	read32;						/* read word */
-	code_handle *	write32;					/* write word */
+	code_handle *   entry;                      /* entry point */
+	code_handle *   nocode;                     /* nocode exception handler */
+	code_handle *   out_of_cycles;              /* out of cycles exception handler */
+	code_handle *   read8;                      /* read byte */
+	code_handle *   write8;                     /* write byte */
+	code_handle *   read16;                     /* read half */
+	code_handle *   write16;                    /* write half */
+	code_handle *   read32;                     /* read word */
+	code_handle *   write32;                    /* write word */
 };
 
 /***************************************************************************
@@ -203,36 +203,36 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
     HELPFUL DEFINES
 ***************************************************************************/
 
-#define VDREG						((op >> 6) & 0x1f)
-#define VS1REG						((op >> 11) & 0x1f)
-#define VS2REG						((op >> 16) & 0x1f)
-#define EL							((op >> 21) & 0xf)
+#define VDREG                       ((op >> 6) & 0x1f)
+#define VS1REG                      ((op >> 11) & 0x1f)
+#define VS2REG                      ((op >> 16) & 0x1f)
+#define EL                          ((op >> 21) & 0xf)
 
-#define VREG_B(reg, offset)		rsp->v[(reg)].b[(offset)^1]
-#define W_VREG_S(reg, offset)		rsp->v[(reg)].s[(offset)]
-#define VREG_S(reg, offset)		(INT16)rsp->v[(reg)].s[(offset)]
+#define VREG_B(reg, offset)     rsp->v[(reg)].b[(offset)^1]
+#define W_VREG_S(reg, offset)       rsp->v[(reg)].s[(offset)]
+#define VREG_S(reg, offset)     (INT16)rsp->v[(reg)].s[(offset)]
 
-#define VEC_EL_2(x,z)				(vector_elements_2[(x)][(z)])
+#define VEC_EL_2(x,z)               (vector_elements_2[(x)][(z)])
 
-#define ACCUM(x)		rsp->accum[x].q
-#define ACCUM_H(x)		rsp->accum[((x))].w[3]
-#define ACCUM_M(x)		rsp->accum[((x))].w[2]
-#define ACCUM_L(x)		rsp->accum[((x))].w[1]
+#define ACCUM(x)        rsp->accum[x].q
+#define ACCUM_H(x)      rsp->accum[((x))].w[3]
+#define ACCUM_M(x)      rsp->accum[((x))].w[2]
+#define ACCUM_L(x)      rsp->accum[((x))].w[1]
 
-#define CARRY_FLAG(x)				((rsp->flag[0] & (1 << (x))) ? 1 : 0)
-#define CLEAR_CARRY_FLAGS()			{ rsp->flag[0] &= ~0xff; }
-#define SET_CARRY_FLAG(x)			{ rsp->flag[0] |= (1 << (x)); }
-#define CLEAR_CARRY_FLAG(x)			{ rsp->flag[0] &= ~(1 << (x)); }
+#define CARRY_FLAG(x)               ((rsp->flag[0] & (1 << (x))) ? 1 : 0)
+#define CLEAR_CARRY_FLAGS()         { rsp->flag[0] &= ~0xff; }
+#define SET_CARRY_FLAG(x)           { rsp->flag[0] |= (1 << (x)); }
+#define CLEAR_CARRY_FLAG(x)         { rsp->flag[0] &= ~(1 << (x)); }
 
-#define COMPARE_FLAG(x)				((rsp->flag[1] & (1 << (x))) ? 1 : 0)
-#define CLEAR_COMPARE_FLAGS()		{ rsp->flag[1] &= ~0xff; }
-#define SET_COMPARE_FLAG(x)			{ rsp->flag[1] |= (1 << (x)); }
-#define CLEAR_COMPARE_FLAG(x)		{ rsp->flag[1] &= ~(1 << (x)); }
+#define COMPARE_FLAG(x)             ((rsp->flag[1] & (1 << (x))) ? 1 : 0)
+#define CLEAR_COMPARE_FLAGS()       { rsp->flag[1] &= ~0xff; }
+#define SET_COMPARE_FLAG(x)         { rsp->flag[1] |= (1 << (x)); }
+#define CLEAR_COMPARE_FLAG(x)       { rsp->flag[1] &= ~(1 << (x)); }
 
-#define ZERO_FLAG(x)				((rsp->flag[0] & (0x100 << (x))) ? 1 : 0)
-#define CLEAR_ZERO_FLAGS()			{ rsp->flag[0] &= ~0xff00; }
-#define SET_ZERO_FLAG(x)			{ rsp->flag[0] |= (0x100 << (x)); }
-#define CLEAR_ZERO_FLAG(x)			{ rsp->flag[0] &= ~(0x100 << (x)); }
+#define ZERO_FLAG(x)                ((rsp->flag[0] & (0x100 << (x))) ? 1 : 0)
+#define CLEAR_ZERO_FLAGS()          { rsp->flag[0] &= ~0xff00; }
+#define SET_ZERO_FLAG(x)            { rsp->flag[0] |= (0x100 << (x)); }
+#define CLEAR_ZERO_FLAG(x)          { rsp->flag[0] &= ~(0x100 << (x)); }
 
 INLINE rsp_state *get_safe_token(device_t *device)
 {
@@ -539,49 +539,49 @@ static void unimplemented_opcode(rsp_state *rsp, UINT32 op)
 /* Legacy.  Going forward, this will be transitioned into unrolled opcode decodes. */
 static const int vector_elements_1[16][8] =
 {
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// none
-	{ 0, 1, 2, 3, 4, 5, 6 ,7 },		// ???
-	{ 1, 3, 5, 7, 0, 2, 4, 6 },		// 0q
-	{ 0, 2, 4, 6, 1, 3, 5, 7 },		// 1q
-	{ 1, 2, 3, 5, 6, 7, 0, 4 },		// 0h
-	{ 0, 2, 3, 4, 6, 7, 1, 5 },		// 1h
-	{ 0, 1, 3, 4, 5, 7, 2, 6 },		// 2h
-	{ 0, 1, 2, 4, 5, 6, 3, 7 },		// 3h
-	{ 1, 2, 3, 4, 5, 6, 7, 0 },		// 0
-	{ 0, 2, 3, 4, 5, 6, 7, 1 },		// 1
-	{ 0, 1, 3, 4, 5, 6, 7, 2 },		// 2
-	{ 0, 1, 2, 4, 5, 6, 7, 3 },		// 3
-	{ 0, 1, 2, 3, 5, 6, 7, 4 },		// 4
-	{ 0, 1, 2, 3, 4, 6, 7, 5 },		// 5
-	{ 0, 1, 2, 3, 4, 5, 7, 6 },		// 6
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// 7
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },     // none
+	{ 0, 1, 2, 3, 4, 5, 6 ,7 },     // ???
+	{ 1, 3, 5, 7, 0, 2, 4, 6 },     // 0q
+	{ 0, 2, 4, 6, 1, 3, 5, 7 },     // 1q
+	{ 1, 2, 3, 5, 6, 7, 0, 4 },     // 0h
+	{ 0, 2, 3, 4, 6, 7, 1, 5 },     // 1h
+	{ 0, 1, 3, 4, 5, 7, 2, 6 },     // 2h
+	{ 0, 1, 2, 4, 5, 6, 3, 7 },     // 3h
+	{ 1, 2, 3, 4, 5, 6, 7, 0 },     // 0
+	{ 0, 2, 3, 4, 5, 6, 7, 1 },     // 1
+	{ 0, 1, 3, 4, 5, 6, 7, 2 },     // 2
+	{ 0, 1, 2, 4, 5, 6, 7, 3 },     // 3
+	{ 0, 1, 2, 3, 5, 6, 7, 4 },     // 4
+	{ 0, 1, 2, 3, 4, 6, 7, 5 },     // 5
+	{ 0, 1, 2, 3, 4, 5, 7, 6 },     // 6
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },     // 7
 };
 
 /* Legacy.  Going forward, this will be transitioned into unrolled opcode decodes. */
 static const int vector_elements_2[16][8] =
 {
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// none
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },		// ???
-	{ 0, 0, 2, 2, 4, 4, 6, 6 },		// 0q
-	{ 1, 1, 3, 3, 5, 5, 7, 7 },		// 1q
-	{ 0, 0, 0, 0, 4, 4, 4, 4 },		// 0h
-	{ 1, 1, 1, 1, 5, 5, 5, 5 },		// 1h
-	{ 2, 2, 2, 2, 6, 6, 6, 6 },		// 2h
-	{ 3, 3, 3, 3, 7, 7, 7, 7 },		// 3h
-	{ 0, 0, 0, 0, 0, 0, 0, 0 },		// 0
-	{ 1, 1, 1, 1, 1, 1, 1, 1 },		// 1
-	{ 2, 2, 2, 2, 2, 2, 2, 2 },		// 2
-	{ 3, 3, 3, 3, 3, 3, 3, 3 },		// 3
-	{ 4, 4, 4, 4, 4, 4, 4, 4 },		// 4
-	{ 5, 5, 5, 5, 5, 5, 5, 5 },		// 5
-	{ 6, 6, 6, 6, 6, 6, 6, 6 },		// 6
-	{ 7, 7, 7, 7, 7, 7, 7, 7 },		// 7
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },     // none
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },     // ???
+	{ 0, 0, 2, 2, 4, 4, 6, 6 },     // 0q
+	{ 1, 1, 3, 3, 5, 5, 7, 7 },     // 1q
+	{ 0, 0, 0, 0, 4, 4, 4, 4 },     // 0h
+	{ 1, 1, 1, 1, 5, 5, 5, 5 },     // 1h
+	{ 2, 2, 2, 2, 6, 6, 6, 6 },     // 2h
+	{ 3, 3, 3, 3, 7, 7, 7, 7 },     // 3h
+	{ 0, 0, 0, 0, 0, 0, 0, 0 },     // 0
+	{ 1, 1, 1, 1, 1, 1, 1, 1 },     // 1
+	{ 2, 2, 2, 2, 2, 2, 2, 2 },     // 2
+	{ 3, 3, 3, 3, 3, 3, 3, 3 },     // 3
+	{ 4, 4, 4, 4, 4, 4, 4, 4 },     // 4
+	{ 5, 5, 5, 5, 5, 5, 5, 5 },     // 5
+	{ 6, 6, 6, 6, 6, 6, 6, 6 },     // 6
+	{ 7, 7, 7, 7, 7, 7, 7, 7 },     // 7
 };
 
 static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	int regIdx = 0;
-    int accumIdx;
+	int accumIdx;
 
 	memset(rsp, 0, sizeof(*rsp));
 
@@ -599,7 +599,7 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ac
 	rsp->direct = &rsp->program->direct();
 
 #if 1
-    // Inaccurate.  RSP registers power on to a random state...
+	// Inaccurate.  RSP registers power on to a random state...
 	for(regIdx = 0; regIdx < 32; regIdx++ )
 	{
 		rsp->r[regIdx] = 0;
@@ -686,29 +686,29 @@ static CPU_INIT( rsp )
 		rsp->impstate->regmap[regnum] = (regnum == 0) ? parameter(0) : parameter::make_memory(&rsp->r[regnum]);
 
 	/*
-    drcbe_info beinfo;
-    rsp->impstate->drcuml->get_backend_info(beinfo);
-    if (beinfo.direct_iregs > 2)
-    {
-        rsp->impstate->regmap[30] = I2;
-    }
-    if (beinfo.direct_iregs > 3)
-    {
-        rsp->impstate->regmap[31] = I3;
-    }
-    if (beinfo.direct_iregs > 4)
-    {
-        rsp->impstate->regmap[2] = I4;
-    }
-    if (beinfo.direct_iregs > 5)
-    {
-        rsp->impstate->regmap[3] = I5;
-    }
-    if (beinfo.direct_iregs > 6)
-    {
-        rsp->impstate->regmap[4] = I6;
-    }
-    */
+	drcbe_info beinfo;
+	rsp->impstate->drcuml->get_backend_info(beinfo);
+	if (beinfo.direct_iregs > 2)
+	{
+	    rsp->impstate->regmap[30] = I2;
+	}
+	if (beinfo.direct_iregs > 3)
+	{
+	    rsp->impstate->regmap[31] = I3;
+	}
+	if (beinfo.direct_iregs > 4)
+	{
+	    rsp->impstate->regmap[2] = I4;
+	}
+	if (beinfo.direct_iregs > 5)
+	{
+	    rsp->impstate->regmap[3] = I5;
+	}
+	if (beinfo.direct_iregs > 6)
+	{
+	    rsp->impstate->regmap[4] = I6;
+	}
+	*/
 
 	/* mark the cache dirty so it is updated on next execute */
 	rsp->impstate->cache_dirty = TRUE;
@@ -1133,53 +1133,53 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 	switch ((op >> 11) & 0x1f)
 	{
-		case 0x00:		/* LBV */
+		case 0x00:      /* LBV */
 			//UML_ADD(block, I0, R32(RSREG), offset);
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lbv, rsp);
 			return TRUE;
-		case 0x01:		/* LSV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x01:      /* LSV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lsv, rsp);
 			return TRUE;
-		case 0x02:		/* LLV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x02:      /* LLV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_llv, rsp);
 			return TRUE;
-		case 0x03:		/* LDV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x03:      /* LDV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_ldv, rsp);
 			return TRUE;
-		case 0x04:		/* LQV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x04:      /* LQV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lqv, rsp);
 			return TRUE;
-		case 0x05:		/* LRV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x05:      /* LRV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lrv, rsp);
 			return TRUE;
-		case 0x06:		/* LPV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x06:      /* LPV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lpv, rsp);
 			return TRUE;
-		case 0x07:		/* LUV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x07:      /* LUV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_luv, rsp);
 			return TRUE;
-		case 0x08:		/* LHV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x08:      /* LHV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lhv, rsp);
 			return TRUE;
-		case 0x09:		/* LFV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x09:      /* LFV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lfv, rsp);
 			return TRUE;
-		case 0x0a:		/* LWV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0a:      /* LWV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lwv, rsp);
 			return TRUE;
-		case 0x0b:		/* LTV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0b:      /* LTV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_ltv, rsp);
 			return TRUE;
 
@@ -1476,7 +1476,7 @@ static void cfunc_rsp_shv(void *param)
 	for (i=0; i < 8; i++)
 	{
 		UINT8 d = ((VREG_B(dest, ((index + (i << 1) + 0) & 0xf))) << 1) |
-				  ((VREG_B(dest, ((index + (i << 1) + 1) & 0xf))) >> 7);
+					((VREG_B(dest, ((index + (i << 1) + 1) & 0xf))) >> 7);
 
 		WRITE8(rsp, ea, d);
 		ea += 2;
@@ -1506,7 +1506,7 @@ static void cfunc_rsp_sfv(void *param)
 	//
 	// Stores bits 14-7 of upper or lower quad, with 4-byte stride
 
-	if (index & 0x7)	printf("RSP: SFV: index = %d at %08X\n", index, rsp->ppc);
+	if (index & 0x7)    printf("RSP: SFV: index = %d at %08X\n", index, rsp->ppc);
 
 	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
@@ -1620,52 +1620,52 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 	switch ((op >> 11) & 0x1f)
 	{
-		case 0x00:		/* SBV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x00:      /* SBV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sbv, rsp);
 			return TRUE;
-		case 0x01:		/* SSV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x01:      /* SSV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_ssv, rsp);
 			return TRUE;
-		case 0x02:		/* SLV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x02:      /* SLV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_slv, rsp);
 			return TRUE;
-		case 0x03:		/* SDV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x03:      /* SDV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sdv, rsp);
 			return TRUE;
-		case 0x04:		/* SQV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x04:      /* SQV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sqv, rsp);
 			return TRUE;
-		case 0x05:		/* SRV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x05:      /* SRV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_srv, rsp);
 			return TRUE;
-		case 0x06:		/* SPV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x06:      /* SPV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_spv, rsp);
 			return TRUE;
-		case 0x07:		/* SUV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x07:      /* SUV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_suv, rsp);
 			return TRUE;
-		case 0x08:		/* SHV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x08:      /* SHV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_shv, rsp);
 			return TRUE;
-		case 0x09:		/* SFV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x09:      /* SFV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sfv, rsp);
 			return TRUE;
-		case 0x0a:		/* SWV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0a:      /* SWV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_swv, rsp);
 			return TRUE;
-		case 0x0b:		/* STV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0b:      /* STV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_stv, rsp);
 			return TRUE;
 
@@ -1749,7 +1749,7 @@ INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16
 			}
 			else
 			{
-        		return ACCUM_M(accum);
+				return ACCUM_M(accum);
 			}
 		}
 	}
@@ -1767,7 +1767,7 @@ INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16
 			}
 			else
 			{
-        		return ACCUM_M(accum);
+				return ACCUM_M(accum);
 			}
 		}
 	}
@@ -1776,14 +1776,14 @@ INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16
 }
 
 #define WRITEBACK_RESULT() { \
-		W_VREG_S(VDREG, 0) = vres[0];	\
-		W_VREG_S(VDREG, 1) = vres[1];	\
-		W_VREG_S(VDREG, 2) = vres[2];	\
-		W_VREG_S(VDREG, 3) = vres[3];	\
-		W_VREG_S(VDREG, 4) = vres[4];	\
-		W_VREG_S(VDREG, 5) = vres[5];	\
-		W_VREG_S(VDREG, 6) = vres[6];	\
-		W_VREG_S(VDREG, 7) = vres[7];	\
+		W_VREG_S(VDREG, 0) = vres[0];   \
+		W_VREG_S(VDREG, 1) = vres[1];   \
+		W_VREG_S(VDREG, 2) = vres[2];   \
+		W_VREG_S(VDREG, 3) = vres[3];   \
+		W_VREG_S(VDREG, 4) = vres[4];   \
+		W_VREG_S(VDREG, 5) = vres[5];   \
+		W_VREG_S(VDREG, 6) = vres[6];   \
+		W_VREG_S(VDREG, 7) = vres[7];   \
 }
 
 INLINE void cfunc_rsp_vmulf(void *param)
@@ -1818,8 +1818,8 @@ INLINE void cfunc_rsp_vmulf(void *param)
 		else
 		{
 			r =  s1 * s2 * 2;
-			r += 0x8000;	// rounding ?
-			ACCUM_H(i) = (r < 0) ? 0xffff : 0;		// sign-extend to 48-bit
+			r += 0x8000;    // rounding ?
+			ACCUM_H(i) = (r < 0) ? 0xffff : 0;      // sign-extend to 48-bit
 			ACCUM_M(i) = (INT16)(r >> 16);
 			ACCUM_L(i) = (UINT16)(r);
 			vres[i] = ACCUM_M(i);
@@ -1849,7 +1849,7 @@ INLINE void cfunc_rsp_vmulu(void *param)
 		s1 = (INT32)(INT16)VREG_S(VS1REG, i);
 		s2 = (INT32)(INT16)VREG_S(VS2REG, sel);
 		r = s1 * s2 * 2;
-		r += 0x8000;	// rounding ?
+		r += 0x8000;    // rounding ?
 
 		ACCUM_H(i) = (UINT16)(r >> 32);
 		ACCUM_M(i) = (UINT16)(r >> 16);
@@ -1926,10 +1926,10 @@ INLINE void cfunc_rsp_vmudm(void *param)
 	{
 		sel = VEC_EL_2(EL, i);
 		s1 = (INT32)(INT16)VREG_S(VS1REG, i);
-		s2 = (UINT16)VREG_S(VS2REG, sel);	// not sign-extended
+		s2 = (UINT16)VREG_S(VS2REG, sel);   // not sign-extended
 		r =  s1 * s2;
 
-		ACCUM_H(i) = (r < 0) ? 0xffff : 0;		// sign-extend to 48-bit
+		ACCUM_H(i) = (r < 0) ? 0xffff : 0;      // sign-extend to 48-bit
 		ACCUM_M(i) = (INT16)(r >> 16);
 		ACCUM_L(i) = (UINT16)(r);
 
@@ -1959,11 +1959,11 @@ INLINE void cfunc_rsp_vmudn(void *param)
 	for (int i = 0; i < 8; i++)
 	{
 		sel = VEC_EL_2(EL, i);
-		s1 = (UINT16)VREG_S(VS1REG, i);		// not sign-extended
+		s1 = (UINT16)VREG_S(VS1REG, i);     // not sign-extended
 		s2 = (INT32)(INT16)VREG_S(VS2REG, sel);
 		r = s1 * s2;
 
-		ACCUM_H(i) = (r < 0) ? 0xffff : 0;		// sign-extend to 48-bit
+		ACCUM_H(i) = (r < 0) ? 0xffff : 0;      // sign-extend to 48-bit
 		ACCUM_M(i) = (INT16)(r >> 16);
 		ACCUM_L(i) = (UINT16)(r);
 
@@ -2002,7 +2002,7 @@ INLINE void cfunc_rsp_vmudh(void *param)
 		ACCUM_L(i) = 0;
 
 		if (r < -32768) r = -32768;
-		if (r >  32767)	r = 32767;
+		if (r >  32767) r = 32767;
 		vres[i] = (INT16)(r);
 	}
 	WRITEBACK_RESULT();
@@ -2144,7 +2144,7 @@ INLINE void cfunc_rsp_vmadm(void *param)
 	{
 		sel = VEC_EL_2(EL, i);
 		s1 = (INT32)(INT16)VREG_S(VS1REG, i);
-		s2 = (UINT16)VREG_S(VS2REG, sel);	// not sign-extended
+		s2 = (UINT16)VREG_S(VS2REG, sel);   // not sign-extended
 		r1 = s1 * s2;
 		r2 = (UINT16)ACCUM_L(i) + (UINT16)(r1);
 		r3 = (UINT16)ACCUM_M(i) + (r1 >> 16) + (r2 >> 16);
@@ -2174,7 +2174,7 @@ INLINE void cfunc_rsp_vmadn(void *param)
 	for (int i = 0; i < 8; i++)
 	{
 		sel = VEC_EL_2(EL, i);
-		s1 = (UINT16)VREG_S(VS1REG, i);		// not sign-extended
+		s1 = (UINT16)VREG_S(VS1REG, i);     // not sign-extended
 		s2 = (INT32)(INT16)VREG_S(VS2REG, sel);
 
 		ACCUM(i) += (INT64)(s1*s2)<<16;
@@ -2426,7 +2426,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 
 	switch (EL)
 	{
-		case 0x08:		// VSAWH
+		case 0x08:      // VSAWH
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -2434,7 +2434,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 			}
 			break;
 		}
-		case 0x09:		// VSAWM
+		case 0x09:      // VSAWM
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -2442,7 +2442,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 			}
 			break;
 		}
-		case 0x0a:		// VSAWL
+		case 0x0a:      // VSAWL
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -2450,7 +2450,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 			}
 			break;
 		}
-		default:	fatalerror("RSP: VSAW: el = %d\n", EL);
+		default:    fatalerror("RSP: VSAW: el = %d\n", EL);
 	}
 }
 
@@ -3372,7 +3372,7 @@ INLINE void cfunc_rsp_vrsqh(void *param)
 		ACCUM_L(i) = VREG_S(VS2REG, sel);
 	}
 
-	W_VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);	// store high part
+	W_VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);  // store high part
 }
 
 static void cfunc_sp_set_status_cb(void *param)
@@ -3502,7 +3502,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 
 				/* add a code log entry */
 				if (LOG_UML)
-					block->append_comment("-------------------------");					// comment
+					block->append_comment("-------------------------");                 // comment
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
@@ -3512,20 +3512,20 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
 				if (override || !drcuml->hash_exists(0, seqhead->pc))
-					UML_HASH(block, 0, seqhead->pc);										// hash    mode,pc
+					UML_HASH(block, 0, seqhead->pc);                                        // hash    mode,pc
 
 				/* if we already have a hash, and this is the first sequence, assume that we */
 				/* are recompiling due to being out of sync and allow future overrides */
 				else if (seqhead == desclist)
 				{
 					override = TRUE;
-					UML_HASH(block, 0, seqhead->pc);										// hash    mode,pc
+					UML_HASH(block, 0, seqhead->pc);                                        // hash    mode,pc
 				}
 
 				/* otherwise, redispatch to that fixed PC and skip the rest of the processing */
 				else
 				{
-					UML_LABEL(block, seqhead->pc | 0x80000000);								// label   seqhead->pc
+					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc
 					UML_HASHJMP(block, 0, seqhead->pc, *rsp->impstate->nocode);
 																							// hashjmp <0>,seqhead->pc,nocode
 					continue;
@@ -3537,7 +3537,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 
 				/* label this instruction, if it may be jumped to locally */
 				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
-					UML_LABEL(block, seqhead->pc | 0x80000000);								// label   seqhead->pc
+					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc
 
 				/* iterate over instructions in the sequence and compile them */
 				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
@@ -3552,11 +3552,11 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 					nextpc = seqlast->pc + (seqlast->skipslots + 1) * 4;
 
 				/* count off cycles and go there */
-				generate_update_cycles(rsp, block, &compiler, nextpc, TRUE);			// <subtract cycles>
+				generate_update_cycles(rsp, block, &compiler, nextpc, TRUE);            // <subtract cycles>
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
-					UML_HASHJMP(block, 0, nextpc, *rsp->impstate->nocode);			// hashjmp <mode>,nextpc,nocode
+					UML_HASHJMP(block, 0, nextpc, *rsp->impstate->nocode);          // hashjmp <mode>,nextpc,nocode
 			}
 
 			/* end the sequence */
@@ -3621,13 +3621,13 @@ static void static_generate_entry_point(rsp_state *rsp)
 	alloc_handle(drcuml, &rsp->impstate->nocode, "nocode");
 
 	alloc_handle(drcuml, &rsp->impstate->entry, "entry");
-	UML_HANDLE(block, *rsp->impstate->entry);										// handle  entry
+	UML_HANDLE(block, *rsp->impstate->entry);                                       // handle  entry
 
 	/* load fast integer registers */
 	load_fast_iregs(rsp, block);
 
 	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, 0, mem(&rsp->pc), *rsp->impstate->nocode);					// hashjmp <mode>,<pc>,nocode
+	UML_HASHJMP(block, 0, mem(&rsp->pc), *rsp->impstate->nocode);                   // hashjmp <mode>,<pc>,nocode
 	block->end();
 }
 
@@ -3647,11 +3647,11 @@ static void static_generate_nocode_handler(rsp_state *rsp)
 
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(drcuml, &rsp->impstate->nocode, "nocode");
-	UML_HANDLE(block, *rsp->impstate->nocode);										// handle  nocode
-	UML_GETEXP(block, I0);														// getexp  i0
-	UML_MOV(block, mem(&rsp->pc), I0);											// mov     [pc],i0
+	UML_HANDLE(block, *rsp->impstate->nocode);                                      // handle  nocode
+	UML_GETEXP(block, I0);                                                      // getexp  i0
+	UML_MOV(block, mem(&rsp->pc), I0);                                          // mov     [pc],i0
 	save_fast_iregs(rsp, block);
-	UML_EXIT(block, EXECUTE_MISSING_CODE);										// exit    EXECUTE_MISSING_CODE
+	UML_EXIT(block, EXECUTE_MISSING_CODE);                                      // exit    EXECUTE_MISSING_CODE
 
 	block->end();
 }
@@ -3672,11 +3672,11 @@ static void static_generate_out_of_cycles(rsp_state *rsp)
 
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(drcuml, &rsp->impstate->out_of_cycles, "out_of_cycles");
-	UML_HANDLE(block, *rsp->impstate->out_of_cycles);								// handle  out_of_cycles
-	UML_GETEXP(block, I0);														// getexp  i0
-	UML_MOV(block, mem(&rsp->pc), I0);											// mov     <pc>,i0
+	UML_HANDLE(block, *rsp->impstate->out_of_cycles);                               // handle  out_of_cycles
+	UML_GETEXP(block, I0);                                                      // getexp  i0
+	UML_MOV(block, mem(&rsp->pc), I0);                                          // mov     <pc>,i0
 	save_fast_iregs(rsp, block);
-	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);									// exit    EXECUTE_OUT_OF_CYCLES
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                                 // exit    EXECUTE_OUT_OF_CYCLES
 
 	block->end();
 }
@@ -3698,49 +3698,49 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 
 	/* add a global entry for this */
 	alloc_handle(drcuml, &handleptr, name);
-	UML_HANDLE(block, *handleptr);													// handle  *handleptr
+	UML_HANDLE(block, *handleptr);                                                  // handle  *handleptr
 
 	// write:
 	if (iswrite)
 	{
 		if (size == 1)
 		{
-			UML_MOV(block, mem(&rsp->impstate->arg0), I0);				// mov     [arg0],i0 ; address
-			UML_MOV(block, mem(&rsp->impstate->arg1), I1);				// mov     [arg1],i1 ; data
-			UML_CALLC(block, cfunc_write8, rsp);							// callc   cfunc_write8
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);              // mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg1), I1);              // mov     [arg1],i1 ; data
+			UML_CALLC(block, cfunc_write8, rsp);                            // callc   cfunc_write8
 		}
 		else if (size == 2)
 		{
-			UML_MOV(block, mem(&rsp->impstate->arg0), I0);				// mov     [arg0],i0 ; address
-			UML_MOV(block, mem(&rsp->impstate->arg1), I1);				// mov     [arg1],i1 ; data
-			UML_CALLC(block, cfunc_write16, rsp);							// callc   cfunc_write16
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);              // mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg1), I1);              // mov     [arg1],i1 ; data
+			UML_CALLC(block, cfunc_write16, rsp);                           // callc   cfunc_write16
 		}
 		else if (size == 4)
 		{
-			UML_MOV(block, mem(&rsp->impstate->arg0), I0);				// mov     [arg0],i0 ; address
-			UML_MOV(block, mem(&rsp->impstate->arg1), I1);				// mov     [arg1],i1 ; data
-			UML_CALLC(block, cfunc_write32, rsp);							// callc   cfunc_write32
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);              // mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg1), I1);              // mov     [arg1],i1 ; data
+			UML_CALLC(block, cfunc_write32, rsp);                           // callc   cfunc_write32
 		}
 	}
 	else
 	{
 		if (size == 1)
 		{
-			UML_MOV(block, mem(&rsp->impstate->arg0), I0);			// mov     [arg0],i0 ; address
-			UML_CALLC(block, cfunc_read8, rsp);							// callc   cfunc_printf_debug
-			UML_MOV(block, I0, mem(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);          // mov     [arg0],i0 ; address
+			UML_CALLC(block, cfunc_read8, rsp);                         // callc   cfunc_printf_debug
+			UML_MOV(block, I0, mem(&rsp->impstate->arg0));          // mov     i0,[arg0],i0 ; result
 		}
 		else if (size == 2)
 		{
-			UML_MOV(block, mem(&rsp->impstate->arg0), I0);			// mov     [arg0],i0 ; address
-			UML_CALLC(block, cfunc_read16, rsp);						// callc   cfunc_read16
-			UML_MOV(block, I0, mem(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);          // mov     [arg0],i0 ; address
+			UML_CALLC(block, cfunc_read16, rsp);                        // callc   cfunc_read16
+			UML_MOV(block, I0, mem(&rsp->impstate->arg0));          // mov     i0,[arg0],i0 ; result
 		}
 		else if (size == 4)
 		{
-			UML_MOV(block, mem(&rsp->impstate->arg0), I0);			// mov     [arg0],i0 ; address
-			UML_CALLC(block, cfunc_read32, rsp);						// callc   cfunc_read32
-			UML_MOV(block, I0, mem(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);          // mov     [arg0],i0 ; address
+			UML_CALLC(block, cfunc_read32, rsp);                        // callc   cfunc_read32
+			UML_MOV(block, I0, mem(&rsp->impstate->arg0));          // mov     i0,[arg0],i0 ; result
 		}
 	}
 	UML_RET(block);
@@ -3764,8 +3764,8 @@ static void generate_update_cycles(rsp_state *rsp, drcuml_block *block, compiler
 	/* account for cycles */
 	if (compiler->cycles > 0)
 	{
-		UML_SUB(block, mem(&rsp->icount), mem(&rsp->icount), MAPVAR_CYCLES);		// sub     icount,icount,cycles
-		UML_MAPVAR(block, MAPVAR_CYCLES, 0);										// mapvar  cycles,0
+		UML_SUB(block, mem(&rsp->icount), mem(&rsp->icount), MAPVAR_CYCLES);        // sub     icount,icount,cycles
+		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                        // mapvar  cycles,0
 		UML_EXHc(block, COND_S, *rsp->impstate->out_of_cycles, param);
 	}
 	compiler->cycles = 0;
@@ -3781,7 +3781,7 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 	const opcode_desc *curdesc;
 	if (LOG_UML)
 	{
-		block->append_comment("[Validation for %08X]", seqhead->pc | 0x1000);		// comment
+		block->append_comment("[Validation for %08X]", seqhead->pc | 0x1000);       // comment
 	}
 	/* loose verify or single instruction: just compare and fail */
 	if (!(rsp->impstate->drcoptions & RSPDRC_STRICT_VERIFY) || seqhead->next() == NULL)
@@ -3790,19 +3790,19 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 		{
 			UINT32 sum = seqhead->opptr.l[0];
 			void *base = rsp->direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
-			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);							// load    i0,base,0,dword
+			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                         // load    i0,base,0,dword
 
 			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = rsp->direct->read_decrypted_ptr(seqhead->delay.first()->physpc | 0x1000);
-				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);					// load    i1,base,dword
-				UML_ADD(block, I0, I0, I1);						// add     i0,i0,i1
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
 				sum += seqhead->delay.first()->opptr.l[0];
 			}
 
-			UML_CMP(block, I0, sum);									// cmp     i0,opptr[0]
-			UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));		// exne    nocode,seqhead->pc
+			UML_CMP(block, I0, sum);                                    // cmp     i0,opptr[0]
+			UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));     // exne    nocode,seqhead->pc
 		}
 	}
 
@@ -3811,27 +3811,27 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 	{
 		UINT32 sum = 0;
 		void *base = rsp->direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
-		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);								// load    i0,base,0,dword
+		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = rsp->direct->read_decrypted_ptr(curdesc->physpc | 0x1000);
-				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);						// load    i1,base,dword
-				UML_ADD(block, I0, I0, I1);							// add     i0,i0,i1
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
 				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = rsp->direct->read_decrypted_ptr(curdesc->delay.first()->physpc | 0x1000);
-					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);					// load    i1,base,dword
-					UML_ADD(block, I0, I0, I1);						// add     i0,i0,i1
+					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
+					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
 					sum += curdesc->delay.first()->opptr.l[0];
 				}
 			}
-		UML_CMP(block, I0, sum);											// cmp     i0,sum
-		UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));			// exne    nocode,seqhead->pc
+		UML_CMP(block, I0, sum);                                            // cmp     i0,sum
+		UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));         // exne    nocode,seqhead->pc
 	}
 }
 
@@ -3851,29 +3851,29 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 
 	/* set the PC map variable */
 	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
-	UML_MAPVAR(block, MAPVAR_PC, expc);												// mapvar  PC,expc
+	UML_MAPVAR(block, MAPVAR_PC, expc);                                             // mapvar  PC,expc
 
 	/* accumulate total cycles */
 	compiler->cycles += desc->cycles;
 
 	/* update the icount map variable */
-	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);								// mapvar  CYCLES,compiler->cycles
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
 
 	/* if we are debugging, call the debugger */
 	if ((rsp->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		UML_MOV(block, mem(&rsp->pc), desc->pc);								// mov     [pc],desc->pc
+		UML_MOV(block, mem(&rsp->pc), desc->pc);                                // mov     [pc],desc->pc
 		save_fast_iregs(rsp, block);
-		UML_DEBUG(block, desc->pc);											// debug   desc->pc
+		UML_DEBUG(block, desc->pc);                                         // debug   desc->pc
 	}
 
 	/* if we hit an unmapped address, fatal error */
 #if 0
 	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	{
-		UML_MOV(block, mem(&rsp->pc), desc->pc);							   // mov     [pc],desc->pc
+		UML_MOV(block, mem(&rsp->pc), desc->pc);                               // mov     [pc],desc->pc
 		save_fast_iregs(rsp, block);
-		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);								// exit EXECUTE_UNMAPPED_CODE
+		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                             // exit EXECUTE_UNMAPPED_CODE
 	}
 #endif
 
@@ -3883,9 +3883,9 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 		/* compile the instruction */
 		if (!generate_opcode(rsp, block, compiler, desc))
 		{
-			UML_MOV(block, mem(&rsp->pc), desc->pc);							// mov     [pc],desc->pc
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_unimplemented, rsp);								// callc   cfunc_unimplemented
+			UML_MOV(block, mem(&rsp->pc), desc->pc);                            // mov     [pc],desc->pc
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_unimplemented, rsp);                             // callc   cfunc_unimplemented
 		}
 	}
 }
@@ -3909,19 +3909,19 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	/* set the link if needed -- before the delay slot */
 	if (linkreg != 0)
 	{
-		UML_MOV(block, R32(linkreg), (INT32)(desc->pc + 8));					// mov    <linkreg>,desc->pc + 8
+		UML_MOV(block, R32(linkreg), (INT32)(desc->pc + 8));                    // mov    <linkreg>,desc->pc + 8
 	}
 
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay.first() != NULL);
-	generate_sequence_instruction(rsp, block, &compiler_temp, desc->delay.first());		// <next instruction>
+	generate_sequence_instruction(rsp, block, &compiler_temp, desc->delay.first());     // <next instruction>
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(rsp, block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
+		generate_update_cycles(rsp, block, &compiler_temp, desc->targetpc, TRUE);   // <subtract cycles>
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
-			UML_JMP(block, desc->targetpc | 0x80000000);							// jmp     desc->targetpc
+			UML_JMP(block, desc->targetpc | 0x80000000);                            // jmp     desc->targetpc
 		else
 			UML_HASHJMP(block, 0, desc->targetpc, *rsp->impstate->nocode);
 																					// hashjmp <mode>,desc->targetpc,nocode
@@ -3939,7 +3939,7 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 
 	/* reset the mapvar to the current cycles and account for skipped slots */
 	compiler->cycles += desc->skipslots;
-	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);								// mapvar  CYCLES,compiler->cycles
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
 }
 
 
@@ -3959,198 +3959,198 @@ static int generate_vector_opcode(rsp_state *rsp, drcuml_block *block, compiler_
 
 	switch (op & 0x3f)
 	{
-		case 0x00:		/* VMULF */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x00:      /* VMULF */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmulf, rsp);
 			return TRUE;
 
-		case 0x01:		/* VMULU */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x01:      /* VMULU */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmulu, rsp);
 			return TRUE;
 
-		case 0x04:		/* VMUDL */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x04:      /* VMUDL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudl, rsp);
 			return TRUE;
 
-		case 0x05:		/* VMUDM */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x05:      /* VMUDM */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudm, rsp);
 			return TRUE;
 
-		case 0x06:		/* VMUDN */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x06:      /* VMUDN */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudn, rsp);
 			return TRUE;
 
-		case 0x07:		/* VMUDH */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x07:      /* VMUDH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudh, rsp);
 			return TRUE;
 
-		case 0x08:		/* VMACF */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x08:      /* VMACF */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmacf, rsp);
 			return TRUE;
 
-		case 0x09:		/* VMACU */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x09:      /* VMACU */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmacu, rsp);
 			return TRUE;
 
-		case 0x0c:		/* VMADL */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0c:      /* VMADL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadl, rsp);
 			return TRUE;
 
-		case 0x0d:		/* VMADM */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0d:      /* VMADM */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadm, rsp);
 			return TRUE;
 
-		case 0x0e:		/* VMADN */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0e:      /* VMADN */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadn, rsp);
 			return TRUE;
 
-		case 0x0f:		/* VMADH */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x0f:      /* VMADH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadh, rsp);
 			return TRUE;
 
-		case 0x10:		/* VADD */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x10:      /* VADD */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vadd, rsp);
 			return TRUE;
 
-		case 0x11:		/* VSUB */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x11:      /* VSUB */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsub, rsp);
 			return TRUE;
 
-		case 0x13:		/* VABS */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x13:      /* VABS */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vabs, rsp);
 			return TRUE;
 
-		case 0x14:		/* VADDC */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x14:      /* VADDC */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vaddc, rsp);
 			return TRUE;
 
-		case 0x15:		/* VSUBC */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x15:      /* VSUBC */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsubc, rsp);
 			return TRUE;
 
-		case 0x1d:		/* VSAW */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x1d:      /* VSAW */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsaw, rsp);
 			return TRUE;
 
-		case 0x20:		/* VLT */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x20:      /* VLT */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vlt, rsp);
 			return TRUE;
 
-		case 0x21:		/* VEQ */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x21:      /* VEQ */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_veq, rsp);
 			return TRUE;
 
-		case 0x22:		/* VNE */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x22:      /* VNE */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vne, rsp);
 			return TRUE;
 
-		case 0x23:		/* VGE */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x23:      /* VGE */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vge, rsp);
 			return TRUE;
 
-		case 0x24:		/* VCL */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x24:      /* VCL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vcl, rsp);
 			return TRUE;
 
-		case 0x25:		/* VCH */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x25:      /* VCH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vch, rsp);
 			return TRUE;
 
-		case 0x26:		/* VCR */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x26:      /* VCR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vcr, rsp);
 			return TRUE;
 
-		case 0x27:		/* VMRG */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x27:      /* VMRG */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmrg, rsp);
 			return TRUE;
 
-		case 0x28:		/* VAND */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x28:      /* VAND */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vand, rsp);
 			return TRUE;
 
-		case 0x29:		/* VNAND */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x29:      /* VNAND */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vnand, rsp);
 			return TRUE;
 
-		case 0x2a:		/* VOR */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x2a:      /* VOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vor, rsp);
 			return TRUE;
 
-		case 0x2b:		/* VNOR */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x2b:      /* VNOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vnor, rsp);
 			return TRUE;
 
-		case 0x2c:		/* VXOR */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x2c:      /* VXOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vxor, rsp);
 			return TRUE;
 
-		case 0x2d:		/* VNXOR */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x2d:      /* VNXOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vnxor, rsp);
 			return TRUE;
 
-		case 0x30:		/* VRCP */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x30:      /* VRCP */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrcp, rsp);
 			return TRUE;
 
-		case 0x31:		/* VRCPL */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x31:      /* VRCPL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrcpl, rsp);
 			return TRUE;
 
-		case 0x32:		/* VRCPH */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x32:      /* VRCPH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrcph, rsp);
 			return TRUE;
 
-		case 0x33:		/* VMOV */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x33:      /* VMOV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmov, rsp);
 			return TRUE;
 
-		case 0x35:		/* VRSQL */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x35:      /* VRSQL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsql, rsp);
 			return TRUE;
 
-		case 0x36:		/* VRSQH */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+		case 0x36:      /* VRSQH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsqh, rsp);
 			return TRUE;
 
 		default:
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_unimplemented_opcode, rsp);
 			return FALSE;
 	}
@@ -4167,181 +4167,181 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 	{
 		/* ----- sub-groups ----- */
 
-		case 0x00:	/* SPECIAL - MIPS I */
+		case 0x00:  /* SPECIAL - MIPS I */
 			return generate_special(rsp, block, compiler, desc);
 
-		case 0x01:	/* REGIMM - MIPS I */
+		case 0x01:  /* REGIMM - MIPS I */
 			return generate_regimm(rsp, block, compiler, desc);
 
 		/* ----- jumps and branches ----- */
 
-		case 0x02:	/* J - MIPS I */
-			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
+		case 0x02:  /* J - MIPS I */
+			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);      // <next instruction + hashjmp>
 			return TRUE;
 
-		case 0x03:	/* JAL - MIPS I */
-			generate_delay_slot_and_branch(rsp, block, compiler, desc, 31);		// <next instruction + hashjmp>
+		case 0x03:  /* JAL - MIPS I */
+			generate_delay_slot_and_branch(rsp, block, compiler, desc, 31);     // <next instruction + hashjmp>
 			return TRUE;
 
-		case 0x04:	/* BEQ - MIPS I */
-			UML_CMP(block, R32(RSREG), R32(RTREG));								// cmp    <rsreg>,<rtreg>
-			UML_JMPc(block, COND_NE, skip = compiler->labelnum++);				// jmp    skip,NE
-			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
-			UML_LABEL(block, skip);												// skip:
+		case 0x04:  /* BEQ - MIPS I */
+			UML_CMP(block, R32(RSREG), R32(RTREG));                             // cmp    <rsreg>,<rtreg>
+			UML_JMPc(block, COND_NE, skip = compiler->labelnum++);              // jmp    skip,NE
+			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);      // <next instruction + hashjmp>
+			UML_LABEL(block, skip);                                             // skip:
 			return TRUE;
 
-		case 0x05:	/* BNE - MIPS I */
-			UML_CMP(block, R32(RSREG), R32(RTREG));								// dcmp    <rsreg>,<rtreg>
-			UML_JMPc(block, COND_E, skip = compiler->labelnum++);						// jmp     skip,E
-			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
-			UML_LABEL(block, skip);												// skip:
+		case 0x05:  /* BNE - MIPS I */
+			UML_CMP(block, R32(RSREG), R32(RTREG));                             // dcmp    <rsreg>,<rtreg>
+			UML_JMPc(block, COND_E, skip = compiler->labelnum++);                       // jmp     skip,E
+			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);      // <next instruction + hashjmp>
+			UML_LABEL(block, skip);                                             // skip:
 			return TRUE;
 
-		case 0x06:	/* BLEZ - MIPS I */
+		case 0x06:  /* BLEZ - MIPS I */
 			if (RSREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), 0);								// dcmp    <rsreg>,0
-				UML_JMPc(block, COND_G, skip = compiler->labelnum++);					// jmp     skip,G
-				generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);	// <next instruction + hashjmp>
-				UML_LABEL(block, skip);											// skip:
+				UML_CMP(block, R32(RSREG), 0);                              // dcmp    <rsreg>,0
+				UML_JMPc(block, COND_G, skip = compiler->labelnum++);                   // jmp     skip,G
+				generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);  // <next instruction + hashjmp>
+				UML_LABEL(block, skip);                                         // skip:
 			}
 			else
-				generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);	// <next instruction + hashjmp>
+				generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);  // <next instruction + hashjmp>
 			return TRUE;
 
-		case 0x07:	/* BGTZ - MIPS I */
-			UML_CMP(block, R32(RSREG), 0);									// dcmp    <rsreg>,0
-			UML_JMPc(block, COND_LE, skip = compiler->labelnum++);					// jmp     skip,LE
-			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
-			UML_LABEL(block, skip);												// skip:
+		case 0x07:  /* BGTZ - MIPS I */
+			UML_CMP(block, R32(RSREG), 0);                                  // dcmp    <rsreg>,0
+			UML_JMPc(block, COND_LE, skip = compiler->labelnum++);                  // jmp     skip,LE
+			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);      // <next instruction + hashjmp>
+			UML_LABEL(block, skip);                                             // skip:
 			return TRUE;
 
 
 		/* ----- immediate arithmetic ----- */
 
-		case 0x0f:	/* LUI - MIPS I */
+		case 0x0f:  /* LUI - MIPS I */
 			if (RTREG != 0)
-				UML_MOV(block, R32(RTREG), SIMMVAL << 16);					// dmov    <rtreg>,SIMMVAL << 16
+				UML_MOV(block, R32(RTREG), SIMMVAL << 16);                  // dmov    <rtreg>,SIMMVAL << 16
 			return TRUE;
 
-		case 0x08:	/* ADDI - MIPS I */
-		case 0x09:	/* ADDIU - MIPS I */
+		case 0x08:  /* ADDI - MIPS I */
+		case 0x09:  /* ADDIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_ADD(block, R32(RTREG), R32(RSREG), SIMMVAL);				// add     i0,<rsreg>,SIMMVAL,V
+				UML_ADD(block, R32(RTREG), R32(RSREG), SIMMVAL);                // add     i0,<rsreg>,SIMMVAL,V
 			}
 			return TRUE;
 
-		case 0x0a:	/* SLTI - MIPS I */
+		case 0x0a:  /* SLTI - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), SIMMVAL);							// dcmp    <rsreg>,SIMMVAL
-				UML_SETc(block, COND_L, R32(RTREG));									// dset    <rtreg>,l
+				UML_CMP(block, R32(RSREG), SIMMVAL);                            // dcmp    <rsreg>,SIMMVAL
+				UML_SETc(block, COND_L, R32(RTREG));                                    // dset    <rtreg>,l
 			}
 			return TRUE;
 
-		case 0x0b:	/* SLTIU - MIPS I */
+		case 0x0b:  /* SLTIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), SIMMVAL);							// dcmp    <rsreg>,SIMMVAL
-				UML_SETc(block, COND_B, R32(RTREG));									// dset    <rtreg>,b
+				UML_CMP(block, R32(RSREG), SIMMVAL);                            // dcmp    <rsreg>,SIMMVAL
+				UML_SETc(block, COND_B, R32(RTREG));                                    // dset    <rtreg>,b
 			}
 			return TRUE;
 
 
-		case 0x0c:	/* ANDI - MIPS I */
+		case 0x0c:  /* ANDI - MIPS I */
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), R32(RSREG), UIMMVAL);				// dand    <rtreg>,<rsreg>,UIMMVAL
+				UML_AND(block, R32(RTREG), R32(RSREG), UIMMVAL);                // dand    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
-		case 0x0d:	/* ORI - MIPS I */
+		case 0x0d:  /* ORI - MIPS I */
 			if (RTREG != 0)
-				UML_OR(block, R32(RTREG), R32(RSREG), UIMMVAL);				// dor     <rtreg>,<rsreg>,UIMMVAL
+				UML_OR(block, R32(RTREG), R32(RSREG), UIMMVAL);             // dor     <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
-		case 0x0e:	/* XORI - MIPS I */
+		case 0x0e:  /* XORI - MIPS I */
 			if (RTREG != 0)
-				UML_XOR(block, R32(RTREG), R32(RSREG), UIMMVAL);				// dxor    <rtreg>,<rsreg>,UIMMVAL
+				UML_XOR(block, R32(RTREG), R32(RSREG), UIMMVAL);                // dxor    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		/* ----- memory load operations ----- */
 
-		case 0x20:	/* LB - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *rsp->impstate->read8);									// callh   read8
+		case 0x20:  /* LB - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CALLH(block, *rsp->impstate->read8);                                    // callh   read8
 			if (RTREG != 0)
-				UML_SEXT(block, R32(RTREG), I0, SIZE_BYTE);						// dsext   <rtreg>,i0,byte
+				UML_SEXT(block, R32(RTREG), I0, SIZE_BYTE);                     // dsext   <rtreg>,i0,byte
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x21:	/* LH - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *rsp->impstate->read16);								// callh   read16
+		case 0x21:  /* LH - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CALLH(block, *rsp->impstate->read16);                               // callh   read16
 			if (RTREG != 0)
-				UML_SEXT(block, R32(RTREG), I0, SIZE_WORD);						// dsext   <rtreg>,i0,word
+				UML_SEXT(block, R32(RTREG), I0, SIZE_WORD);                     // dsext   <rtreg>,i0,word
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x23:	/* LW - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *rsp->impstate->read32);								// callh   read32
+		case 0x23:  /* LW - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CALLH(block, *rsp->impstate->read32);                               // callh   read32
 			if (RTREG != 0)
 				UML_MOV(block, R32(RTREG), I0);
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x24:	/* LBU - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *rsp->impstate->read8);									// callh   read8
+		case 0x24:  /* LBU - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CALLH(block, *rsp->impstate->read8);                                    // callh   read8
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), I0, 0xff);					// dand    <rtreg>,i0,0xff
+				UML_AND(block, R32(RTREG), I0, 0xff);                   // dand    <rtreg>,i0,0xff
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x25:	/* LHU - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *rsp->impstate->read16);								// callh   read16
+		case 0x25:  /* LHU - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CALLH(block, *rsp->impstate->read16);                               // callh   read16
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), I0, 0xffff);					// dand    <rtreg>,i0,0xffff
+				UML_AND(block, R32(RTREG), I0, 0xffff);                 // dand    <rtreg>,i0,0xffff
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x32:	/* LWC2 - MIPS I */
+		case 0x32:  /* LWC2 - MIPS I */
 			return generate_lwc2(rsp, block, compiler, desc);
 
 
 		/* ----- memory store operations ----- */
 
-		case 0x28:	/* SB - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, I1, R32(RTREG));									// mov     i1,<rtreg>
-			UML_CALLH(block, *rsp->impstate->write8);								// callh   write8
+		case 0x28:  /* SB - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
+			UML_CALLH(block, *rsp->impstate->write8);                               // callh   write8
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x29:	/* SH - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, I1, R32(RTREG));									// mov     i1,<rtreg>
-			UML_CALLH(block, *rsp->impstate->write16);								// callh   write16
+		case 0x29:  /* SH - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
+			UML_CALLH(block, *rsp->impstate->write16);                              // callh   write16
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x2b:	/* SW - MIPS I */
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, I1, R32(RTREG));									// mov     i1,<rtreg>
-			UML_CALLH(block, *rsp->impstate->write32);								// callh   write32
+		case 0x2b:  /* SW - MIPS I */
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
+			UML_CALLH(block, *rsp->impstate->write32);                              // callh   write32
 			if (!in_delay_slot)
 				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
-		case 0x3a:	/* SWC2 - MIPS I */
+		case 0x3a:  /* SWC2 - MIPS I */
 			return generate_swc2(rsp, block, compiler, desc);
 			//UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);     // mov     [arg0],desc->opptr.l
 			//UML_CALLC(block, cfunc_swc2, rsp);                                        // callc   cfunc_mfc2
@@ -4349,10 +4349,10 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		/* ----- coprocessor instructions ----- */
 
-		case 0x10:	/* COP0 - MIPS I */
+		case 0x10:  /* COP0 - MIPS I */
 			return generate_cop0(rsp, block, compiler, desc);
 
-		case 0x12:	/* COP2 - MIPS I */
+		case 0x12:  /* COP2 - MIPS I */
 			return generate_cop2(rsp, block, compiler, desc);
 			//UML_EXH(block, rsp->impstate->exception[EXCEPTION_INVALIDOP], 0);// exh     invalidop,0
 			//return TRUE;
@@ -4382,42 +4382,42 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 	{
 		/* ----- shift instructions ----- */
 
-		case 0x00:	/* SLL - MIPS I */
+		case 0x00:  /* SLL - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SHL(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
 			return TRUE;
 
-		case 0x02:	/* SRL - MIPS I */
+		case 0x02:  /* SRL - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SHR(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
 			return TRUE;
 
-		case 0x03:	/* SRA - MIPS I */
+		case 0x03:  /* SRA - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SAR(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
 			return TRUE;
 
-		case 0x04:	/* SLLV - MIPS I */
+		case 0x04:  /* SLLV - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SHL(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
 			return TRUE;
 
-		case 0x06:	/* SRLV - MIPS I */
+		case 0x06:  /* SRLV - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SHR(block, R32(RDREG), R32(RTREG), R32(RSREG));
 			}
 			return TRUE;
 
-		case 0x07:	/* SRAV - MIPS I */
+		case 0x07:  /* SRAV - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SAR(block, R32(RDREG), R32(RTREG), R32(RSREG));
@@ -4426,16 +4426,16 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 
 		/* ----- basic arithmetic ----- */
 
-		case 0x20:	/* ADD - MIPS I */
-		case 0x21:	/* ADDU - MIPS I */
+		case 0x20:  /* ADD - MIPS I */
+		case 0x21:  /* ADDU - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_ADD(block, R32(RDREG), R32(RSREG), R32(RTREG));
 			}
 			return TRUE;
 
-		case 0x22:	/* SUB - MIPS I */
-		case 0x23:	/* SUBU - MIPS I */
+		case 0x22:  /* SUB - MIPS I */
+		case 0x23:  /* SUBU - MIPS I */
 			if (RDREG != 0)
 			{
 				UML_SUB(block, R32(RDREG), R32(RSREG), R32(RTREG));
@@ -4444,72 +4444,72 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 
 		/* ----- basic logical ops ----- */
 
-		case 0x24:	/* AND - MIPS I */
+		case 0x24:  /* AND - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_AND(block, R32(RDREG), R32(RSREG), R32(RTREG));				// dand     <rdreg>,<rsreg>,<rtreg>
+				UML_AND(block, R32(RDREG), R32(RSREG), R32(RTREG));             // dand     <rdreg>,<rsreg>,<rtreg>
 			}
 			return TRUE;
 
-		case 0x25:	/* OR - MIPS I */
+		case 0x25:  /* OR - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_OR(block, R32(RDREG), R32(RSREG), R32(RTREG));					// dor      <rdreg>,<rsreg>,<rtreg>
+				UML_OR(block, R32(RDREG), R32(RSREG), R32(RTREG));                  // dor      <rdreg>,<rsreg>,<rtreg>
 			}
 			return TRUE;
 
-		case 0x26:	/* XOR - MIPS I */
+		case 0x26:  /* XOR - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_XOR(block, R32(RDREG), R32(RSREG), R32(RTREG));				// dxor     <rdreg>,<rsreg>,<rtreg>
+				UML_XOR(block, R32(RDREG), R32(RSREG), R32(RTREG));             // dxor     <rdreg>,<rsreg>,<rtreg>
 			}
 			return TRUE;
 
-		case 0x27:	/* NOR - MIPS I */
+		case 0x27:  /* NOR - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_OR(block, I0, R32(RSREG), R32(RTREG));					// dor      i0,<rsreg>,<rtreg>
-				UML_XOR(block, R32(RDREG), I0, (UINT64)~0);				// dxor     <rdreg>,i0,~0
+				UML_OR(block, I0, R32(RSREG), R32(RTREG));                  // dor      i0,<rsreg>,<rtreg>
+				UML_XOR(block, R32(RDREG), I0, (UINT64)~0);             // dxor     <rdreg>,i0,~0
 			}
 			return TRUE;
 
 
 		/* ----- basic comparisons ----- */
 
-		case 0x2a:	/* SLT - MIPS I */
+		case 0x2a:  /* SLT - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), R32(RTREG));							// dcmp    <rsreg>,<rtreg>
-				UML_SETc(block, COND_L, R32(RDREG));									// dset    <rdreg>,l
+				UML_CMP(block, R32(RSREG), R32(RTREG));                         // dcmp    <rsreg>,<rtreg>
+				UML_SETc(block, COND_L, R32(RDREG));                                    // dset    <rdreg>,l
 			}
 			return TRUE;
 
-		case 0x2b:	/* SLTU - MIPS I */
+		case 0x2b:  /* SLTU - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), R32(RTREG));							// dcmp    <rsreg>,<rtreg>
-				UML_SETc(block, COND_B, R32(RDREG));									// dset    <rdreg>,b
+				UML_CMP(block, R32(RSREG), R32(RTREG));                         // dcmp    <rsreg>,<rtreg>
+				UML_SETc(block, COND_B, R32(RDREG));                                    // dset    <rdreg>,b
 			}
 			return TRUE;
 
 
 		/* ----- jumps and branches ----- */
 
-		case 0x08:	/* JR - MIPS I */
-			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
+		case 0x08:  /* JR - MIPS I */
+			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);      // <next instruction + hashjmp>
 			return TRUE;
 
-		case 0x09:	/* JALR - MIPS I */
-			generate_delay_slot_and_branch(rsp, block, compiler, desc, RDREG);	// <next instruction + hashjmp>
+		case 0x09:  /* JALR - MIPS I */
+			generate_delay_slot_and_branch(rsp, block, compiler, desc, RDREG);  // <next instruction + hashjmp>
 			return TRUE;
 
 
 		/* ----- system calls ----- */
 
-		case 0x0d:	/* BREAK - MIPS I */
-			UML_MOV(block, mem(&rsp->impstate->arg0), 3);					// mov     [arg0],3
-			UML_CALLC(block, cfunc_sp_set_status_cb, rsp);						// callc   cfunc_sp_set_status_cb
-			UML_MOV(block, mem(&rsp->icount), 0);						// mov icount, #0
+		case 0x0d:  /* BREAK - MIPS I */
+			UML_MOV(block, mem(&rsp->impstate->arg0), 3);                   // mov     [arg0],3
+			UML_CALLC(block, cfunc_sp_set_status_cb, rsp);                      // callc   cfunc_sp_set_status_cb
+			UML_MOV(block, mem(&rsp->icount), 0);                       // mov icount, #0
 
 			UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
 			return TRUE;
@@ -4532,27 +4532,27 @@ static int generate_regimm(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 	switch (opswitch)
 	{
-		case 0x00:	/* BLTZ */
-		case 0x10:	/* BLTZAL */
+		case 0x00:  /* BLTZ */
+		case 0x10:  /* BLTZAL */
 			if (RSREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), 0);								// dcmp    <rsreg>,0
-				UML_JMPc(block, COND_GE, skip = compiler->labelnum++);				// jmp     skip,GE
+				UML_CMP(block, R32(RSREG), 0);                              // dcmp    <rsreg>,0
+				UML_JMPc(block, COND_GE, skip = compiler->labelnum++);              // jmp     skip,GE
 				generate_delay_slot_and_branch(rsp, block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
 																					// <next instruction + hashjmp>
-				UML_LABEL(block, skip);											// skip:
+				UML_LABEL(block, skip);                                         // skip:
 			}
 			return TRUE;
 
-		case 0x01:	/* BGEZ */
-		case 0x11:	/* BGEZAL */
+		case 0x01:  /* BGEZ */
+		case 0x11:  /* BGEZAL */
 			if (RSREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), 0);								// dcmp    <rsreg>,0
-				UML_JMPc(block, COND_L, skip = compiler->labelnum++);					// jmp     skip,L
+				UML_CMP(block, R32(RSREG), 0);                              // dcmp    <rsreg>,0
+				UML_JMPc(block, COND_L, skip = compiler->labelnum++);                   // jmp     skip,L
 				generate_delay_slot_and_branch(rsp, block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
 																					// <next instruction + hashjmp>
-				UML_LABEL(block, skip);											// skip:
+				UML_LABEL(block, skip);                                         // skip:
 			}
 			else
 				generate_delay_slot_and_branch(rsp, block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
@@ -4574,32 +4574,32 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 	switch (opswitch)
 	{
-		case 0x00:	/* MFCz */
+		case 0x00:  /* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_mfc2, rsp);									// callc   cfunc_mfc2
+				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);    // mov     [arg0],desc->opptr.l
+				UML_CALLC(block, cfunc_mfc2, rsp);                                  // callc   cfunc_mfc2
 				//UML_SEXT(block, R32(RTREG), I0, DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
-		case 0x02:	/* CFCz */
+		case 0x02:  /* CFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_cfc2, rsp);									// callc   cfunc_cfc2
+				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);    // mov     [arg0],desc->opptr.l
+				UML_CALLC(block, cfunc_cfc2, rsp);                                  // callc   cfunc_cfc2
 				//UML_SEXT(block, R32(RTREG), I0, DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
-		case 0x04:	/* MTCz */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_mtc2, rsp);										// callc   cfunc_mtc2
+		case 0x04:  /* MTCz */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_mtc2, rsp);                                      // callc   cfunc_mtc2
 			return TRUE;
 
-		case 0x06:	/* CTCz */
-			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_ctc2, rsp);										// callc   cfunc_ctc2
+		case 0x06:  /* CTCz */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_ctc2, rsp);                                      // callc   cfunc_ctc2
 			return TRUE;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
@@ -4620,12 +4620,12 @@ static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 	switch (opswitch)
 	{
-		case 0x00:	/* MFCz */
+		case 0x00:  /* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&rsp->impstate->arg0), RDREG);				// mov     [arg0],<rdreg>
-				UML_MOV(block, mem(&rsp->impstate->arg1), RTREG);				// mov     [arg1],<rtreg>
-				UML_CALLC(block, cfunc_get_cop0_reg, rsp);							// callc   cfunc_get_cop0_reg
+				UML_MOV(block, mem(&rsp->impstate->arg0), RDREG);               // mov     [arg0],<rdreg>
+				UML_MOV(block, mem(&rsp->impstate->arg1), RTREG);               // mov     [arg1],<rtreg>
+				UML_CALLC(block, cfunc_get_cop0_reg, rsp);                          // callc   cfunc_get_cop0_reg
 				if(RDREG == 2)
 				{
 					generate_update_cycles(rsp, block, compiler, mem(&rsp->pc), TRUE);
@@ -4634,10 +4634,10 @@ static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			}
 			return TRUE;
 
-		case 0x04:	/* MTCz */
-			UML_MOV(block, mem(&rsp->impstate->arg0), RDREG);					// mov     [arg0],<rdreg>
-			UML_MOV(block, mem(&rsp->impstate->arg1), R32(RTREG));					// mov     [arg1],rtreg
-			UML_CALLC(block, cfunc_set_cop0_reg, rsp);								// callc   cfunc_set_cop0_reg
+		case 0x04:  /* MTCz */
+			UML_MOV(block, mem(&rsp->impstate->arg0), RDREG);                   // mov     [arg0],<rdreg>
+			UML_MOV(block, mem(&rsp->impstate->arg1), R32(RTREG));                  // mov     [arg1],rtreg
+			UML_CALLC(block, cfunc_set_cop0_reg, rsp);                              // callc   cfunc_set_cop0_reg
 			return TRUE;
 	}
 
@@ -4703,7 +4703,7 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 #if (LOG_UML)
 	char buffer[100];
 	rsp_dasm_one(buffer, pc, op);
-	block->append_comment("%08X: %s", pc, buffer);									// comment
+	block->append_comment("%08X: %s", pc, buffer);                                  // comment
 #endif
 }
 
@@ -4763,124 +4763,124 @@ CPU_GET_INFO( rsp )
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(rsp_state);					break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 1;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(rsp_state);                    break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;               break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 1;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
+		case CPUINFO_INT_INPUT_STATE:                   info->i = CLEAR_LINE;                   break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = rsp->ppc | 0x04000000;						break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = rsp->ppc | 0x04000000;                        break;
 
-		case CPUINFO_INT_PC:	/* intentional fallthrough */
-		case CPUINFO_INT_REGISTER + RSP_PC:				info->i = rsp->pc | 0x04000000;						break;
+		case CPUINFO_INT_PC:    /* intentional fallthrough */
+		case CPUINFO_INT_REGISTER + RSP_PC:             info->i = rsp->pc | 0x04000000;                     break;
 
-		case CPUINFO_INT_REGISTER + RSP_R0:				info->i = rsp->r[0];						break;
-		case CPUINFO_INT_REGISTER + RSP_R1:				info->i = rsp->r[1];						break;
-		case CPUINFO_INT_REGISTER + RSP_R2:				info->i = rsp->r[2];						break;
-		case CPUINFO_INT_REGISTER + RSP_R3:				info->i = rsp->r[3];						break;
-		case CPUINFO_INT_REGISTER + RSP_R4:				info->i = rsp->r[4];						break;
-		case CPUINFO_INT_REGISTER + RSP_R5:				info->i = rsp->r[5];						break;
-		case CPUINFO_INT_REGISTER + RSP_R6:				info->i = rsp->r[6];						break;
-		case CPUINFO_INT_REGISTER + RSP_R7:				info->i = rsp->r[7];						break;
-		case CPUINFO_INT_REGISTER + RSP_R8:				info->i = rsp->r[8];						break;
-		case CPUINFO_INT_REGISTER + RSP_R9:				info->i = rsp->r[9];						break;
-		case CPUINFO_INT_REGISTER + RSP_R10:			info->i = rsp->r[10];					break;
-		case CPUINFO_INT_REGISTER + RSP_R11:			info->i = rsp->r[11];					break;
-		case CPUINFO_INT_REGISTER + RSP_R12:			info->i = rsp->r[12];					break;
-		case CPUINFO_INT_REGISTER + RSP_R13:			info->i = rsp->r[13];					break;
-		case CPUINFO_INT_REGISTER + RSP_R14:			info->i = rsp->r[14];					break;
-		case CPUINFO_INT_REGISTER + RSP_R15:			info->i = rsp->r[15];					break;
-		case CPUINFO_INT_REGISTER + RSP_R16:			info->i = rsp->r[16];					break;
-		case CPUINFO_INT_REGISTER + RSP_R17:			info->i = rsp->r[17];					break;
-		case CPUINFO_INT_REGISTER + RSP_R18:			info->i = rsp->r[18];					break;
-		case CPUINFO_INT_REGISTER + RSP_R19:			info->i = rsp->r[19];					break;
-		case CPUINFO_INT_REGISTER + RSP_R20:			info->i = rsp->r[20];					break;
-		case CPUINFO_INT_REGISTER + RSP_R21:			info->i = rsp->r[21];					break;
-		case CPUINFO_INT_REGISTER + RSP_R22:			info->i = rsp->r[22];					break;
-		case CPUINFO_INT_REGISTER + RSP_R23:			info->i = rsp->r[23];					break;
-		case CPUINFO_INT_REGISTER + RSP_R24:			info->i = rsp->r[24];					break;
-		case CPUINFO_INT_REGISTER + RSP_R25:			info->i = rsp->r[25];					break;
-		case CPUINFO_INT_REGISTER + RSP_R26:			info->i = rsp->r[26];					break;
-		case CPUINFO_INT_REGISTER + RSP_R27:			info->i = rsp->r[27];					break;
-		case CPUINFO_INT_REGISTER + RSP_R28:			info->i = rsp->r[28];					break;
-		case CPUINFO_INT_REGISTER + RSP_R29:			info->i = rsp->r[29];					break;
-		case CPUINFO_INT_REGISTER + RSP_R30:			info->i = rsp->r[30];					break;
+		case CPUINFO_INT_REGISTER + RSP_R0:             info->i = rsp->r[0];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R1:             info->i = rsp->r[1];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R2:             info->i = rsp->r[2];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R3:             info->i = rsp->r[3];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R4:             info->i = rsp->r[4];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R5:             info->i = rsp->r[5];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R6:             info->i = rsp->r[6];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R7:             info->i = rsp->r[7];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R8:             info->i = rsp->r[8];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R9:             info->i = rsp->r[9];                        break;
+		case CPUINFO_INT_REGISTER + RSP_R10:            info->i = rsp->r[10];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R11:            info->i = rsp->r[11];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R12:            info->i = rsp->r[12];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R13:            info->i = rsp->r[13];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R14:            info->i = rsp->r[14];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R15:            info->i = rsp->r[15];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R16:            info->i = rsp->r[16];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R17:            info->i = rsp->r[17];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R18:            info->i = rsp->r[18];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R19:            info->i = rsp->r[19];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R20:            info->i = rsp->r[20];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R21:            info->i = rsp->r[21];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R22:            info->i = rsp->r[22];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R23:            info->i = rsp->r[23];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R24:            info->i = rsp->r[24];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R25:            info->i = rsp->r[25];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R26:            info->i = rsp->r[26];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R27:            info->i = rsp->r[27];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R28:            info->i = rsp->r[28];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R29:            info->i = rsp->r[29];                   break;
+		case CPUINFO_INT_REGISTER + RSP_R30:            info->i = rsp->r[30];                   break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + RSP_R31:			info->i = rsp->r[31];					 break;
+		case CPUINFO_INT_REGISTER + RSP_R31:            info->i = rsp->r[31];                    break;
 		case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp->sr;                       break;
 		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp->nextpc | 0x04000000;      break;
 		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp->step_count;               break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(rsp);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(rsp);					break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(rsp);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(rsp);					break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(rsp);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(rsp);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &rsp->icount;				break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(rsp);         break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(rsp);                    break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(rsp);              break;
+		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(rsp);                    break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(rsp);          break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(rsp);          break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &rsp->icount;                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "RSP");					break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "RSP");					break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team");	break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "RSP");                 break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "RSP");                 break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 
-		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
+		case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
 
-		case CPUINFO_STR_REGISTER + RSP_PC:				sprintf(info->s, "PC: %08X", rsp->pc | 0x04000000);	break;
+		case CPUINFO_STR_REGISTER + RSP_PC:             sprintf(info->s, "PC: %08X", rsp->pc | 0x04000000); break;
 
-		case CPUINFO_STR_REGISTER + RSP_R0:				sprintf(info->s, "R0: %08X", rsp->r[0]); break;
-		case CPUINFO_STR_REGISTER + RSP_R1:				sprintf(info->s, "R1: %08X", rsp->r[1]); break;
-		case CPUINFO_STR_REGISTER + RSP_R2:				sprintf(info->s, "R2: %08X", rsp->r[2]); break;
-		case CPUINFO_STR_REGISTER + RSP_R3:				sprintf(info->s, "R3: %08X", rsp->r[3]); break;
-		case CPUINFO_STR_REGISTER + RSP_R4:				sprintf(info->s, "R4: %08X", rsp->r[4]); break;
-		case CPUINFO_STR_REGISTER + RSP_R5:				sprintf(info->s, "R5: %08X", rsp->r[5]); break;
-		case CPUINFO_STR_REGISTER + RSP_R6:				sprintf(info->s, "R6: %08X", rsp->r[6]); break;
-		case CPUINFO_STR_REGISTER + RSP_R7:				sprintf(info->s, "R7: %08X", rsp->r[7]); break;
-		case CPUINFO_STR_REGISTER + RSP_R8:				sprintf(info->s, "R8: %08X", rsp->r[8]); break;
-		case CPUINFO_STR_REGISTER + RSP_R9:				sprintf(info->s, "R9: %08X", rsp->r[9]); break;
-		case CPUINFO_STR_REGISTER + RSP_R10:			sprintf(info->s, "R10: %08X", rsp->r[10]); break;
-		case CPUINFO_STR_REGISTER + RSP_R11:			sprintf(info->s, "R11: %08X", rsp->r[11]); break;
-		case CPUINFO_STR_REGISTER + RSP_R12:			sprintf(info->s, "R12: %08X", rsp->r[12]); break;
-		case CPUINFO_STR_REGISTER + RSP_R13:			sprintf(info->s, "R13: %08X", rsp->r[13]); break;
-		case CPUINFO_STR_REGISTER + RSP_R14:			sprintf(info->s, "R14: %08X", rsp->r[14]); break;
-		case CPUINFO_STR_REGISTER + RSP_R15:			sprintf(info->s, "R15: %08X", rsp->r[15]); break;
-		case CPUINFO_STR_REGISTER + RSP_R16:			sprintf(info->s, "R16: %08X", rsp->r[16]); break;
-		case CPUINFO_STR_REGISTER + RSP_R17:			sprintf(info->s, "R17: %08X", rsp->r[17]); break;
-		case CPUINFO_STR_REGISTER + RSP_R18:			sprintf(info->s, "R18: %08X", rsp->r[18]); break;
-		case CPUINFO_STR_REGISTER + RSP_R19:			sprintf(info->s, "R19: %08X", rsp->r[19]); break;
-		case CPUINFO_STR_REGISTER + RSP_R20:			sprintf(info->s, "R20: %08X", rsp->r[20]); break;
-		case CPUINFO_STR_REGISTER + RSP_R21:			sprintf(info->s, "R21: %08X", rsp->r[21]); break;
-		case CPUINFO_STR_REGISTER + RSP_R22:			sprintf(info->s, "R22: %08X", rsp->r[22]); break;
-		case CPUINFO_STR_REGISTER + RSP_R23:			sprintf(info->s, "R23: %08X", rsp->r[23]); break;
-		case CPUINFO_STR_REGISTER + RSP_R24:			sprintf(info->s, "R24: %08X", rsp->r[24]); break;
-		case CPUINFO_STR_REGISTER + RSP_R25:			sprintf(info->s, "R25: %08X", rsp->r[25]); break;
-		case CPUINFO_STR_REGISTER + RSP_R26:			sprintf(info->s, "R26: %08X", rsp->r[26]); break;
-		case CPUINFO_STR_REGISTER + RSP_R27:			sprintf(info->s, "R27: %08X", rsp->r[27]); break;
-		case CPUINFO_STR_REGISTER + RSP_R28:			sprintf(info->s, "R28: %08X", rsp->r[28]); break;
-		case CPUINFO_STR_REGISTER + RSP_R29:			sprintf(info->s, "R29: %08X", rsp->r[29]); break;
-		case CPUINFO_STR_REGISTER + RSP_R30:			sprintf(info->s, "R30: %08X", rsp->r[30]); break;
-		case CPUINFO_STR_REGISTER + RSP_R31:			sprintf(info->s, "R31: %08X", rsp->r[31]); break;
+		case CPUINFO_STR_REGISTER + RSP_R0:             sprintf(info->s, "R0: %08X", rsp->r[0]); break;
+		case CPUINFO_STR_REGISTER + RSP_R1:             sprintf(info->s, "R1: %08X", rsp->r[1]); break;
+		case CPUINFO_STR_REGISTER + RSP_R2:             sprintf(info->s, "R2: %08X", rsp->r[2]); break;
+		case CPUINFO_STR_REGISTER + RSP_R3:             sprintf(info->s, "R3: %08X", rsp->r[3]); break;
+		case CPUINFO_STR_REGISTER + RSP_R4:             sprintf(info->s, "R4: %08X", rsp->r[4]); break;
+		case CPUINFO_STR_REGISTER + RSP_R5:             sprintf(info->s, "R5: %08X", rsp->r[5]); break;
+		case CPUINFO_STR_REGISTER + RSP_R6:             sprintf(info->s, "R6: %08X", rsp->r[6]); break;
+		case CPUINFO_STR_REGISTER + RSP_R7:             sprintf(info->s, "R7: %08X", rsp->r[7]); break;
+		case CPUINFO_STR_REGISTER + RSP_R8:             sprintf(info->s, "R8: %08X", rsp->r[8]); break;
+		case CPUINFO_STR_REGISTER + RSP_R9:             sprintf(info->s, "R9: %08X", rsp->r[9]); break;
+		case CPUINFO_STR_REGISTER + RSP_R10:            sprintf(info->s, "R10: %08X", rsp->r[10]); break;
+		case CPUINFO_STR_REGISTER + RSP_R11:            sprintf(info->s, "R11: %08X", rsp->r[11]); break;
+		case CPUINFO_STR_REGISTER + RSP_R12:            sprintf(info->s, "R12: %08X", rsp->r[12]); break;
+		case CPUINFO_STR_REGISTER + RSP_R13:            sprintf(info->s, "R13: %08X", rsp->r[13]); break;
+		case CPUINFO_STR_REGISTER + RSP_R14:            sprintf(info->s, "R14: %08X", rsp->r[14]); break;
+		case CPUINFO_STR_REGISTER + RSP_R15:            sprintf(info->s, "R15: %08X", rsp->r[15]); break;
+		case CPUINFO_STR_REGISTER + RSP_R16:            sprintf(info->s, "R16: %08X", rsp->r[16]); break;
+		case CPUINFO_STR_REGISTER + RSP_R17:            sprintf(info->s, "R17: %08X", rsp->r[17]); break;
+		case CPUINFO_STR_REGISTER + RSP_R18:            sprintf(info->s, "R18: %08X", rsp->r[18]); break;
+		case CPUINFO_STR_REGISTER + RSP_R19:            sprintf(info->s, "R19: %08X", rsp->r[19]); break;
+		case CPUINFO_STR_REGISTER + RSP_R20:            sprintf(info->s, "R20: %08X", rsp->r[20]); break;
+		case CPUINFO_STR_REGISTER + RSP_R21:            sprintf(info->s, "R21: %08X", rsp->r[21]); break;
+		case CPUINFO_STR_REGISTER + RSP_R22:            sprintf(info->s, "R22: %08X", rsp->r[22]); break;
+		case CPUINFO_STR_REGISTER + RSP_R23:            sprintf(info->s, "R23: %08X", rsp->r[23]); break;
+		case CPUINFO_STR_REGISTER + RSP_R24:            sprintf(info->s, "R24: %08X", rsp->r[24]); break;
+		case CPUINFO_STR_REGISTER + RSP_R25:            sprintf(info->s, "R25: %08X", rsp->r[25]); break;
+		case CPUINFO_STR_REGISTER + RSP_R26:            sprintf(info->s, "R26: %08X", rsp->r[26]); break;
+		case CPUINFO_STR_REGISTER + RSP_R27:            sprintf(info->s, "R27: %08X", rsp->r[27]); break;
+		case CPUINFO_STR_REGISTER + RSP_R28:            sprintf(info->s, "R28: %08X", rsp->r[28]); break;
+		case CPUINFO_STR_REGISTER + RSP_R29:            sprintf(info->s, "R29: %08X", rsp->r[29]); break;
+		case CPUINFO_STR_REGISTER + RSP_R30:            sprintf(info->s, "R30: %08X", rsp->r[30]); break;
+		case CPUINFO_STR_REGISTER + RSP_R31:            sprintf(info->s, "R31: %08X", rsp->r[31]); break;
 		case CPUINFO_STR_REGISTER + RSP_SR:             sprintf(info->s, "SR: %08X",  rsp->sr);    break;
 		case CPUINFO_STR_REGISTER + RSP_NEXTPC:         sprintf(info->s, "NPC: %08X", rsp->nextpc);break;
 		case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp->step_count);  break;

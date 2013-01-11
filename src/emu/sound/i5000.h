@@ -28,7 +28,7 @@
 //**************************************************************************
 
 class i5000snd_device : public device_t,
-                        public device_sound_interface
+						public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -47,37 +47,37 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-    struct channel_t
-    {
-        bool is_playing;
-    	oki_adpcm_state m_adpcm;
+	struct channel_t
+	{
+		bool is_playing;
+		oki_adpcm_state m_adpcm;
 
-        UINT32 address;
-        int freq_timer;
-        int freq_base;
-        int freq_min;
-        UINT16 sample;
-        UINT8 shift_pos;
-        UINT8 shift_amount;
-        UINT8 shift_mask;
-        int vol_r;
-        int vol_l;
-        int output_r;
-        int output_l;
+		UINT32 address;
+		int freq_timer;
+		int freq_base;
+		int freq_min;
+		UINT16 sample;
+		UINT8 shift_pos;
+		UINT8 shift_amount;
+		UINT8 shift_mask;
+		int vol_r;
+		int vol_l;
+		int output_r;
+		int output_l;
 
-    };
+	};
 
-    channel_t m_channels[16];
+	channel_t m_channels[16];
 
 	UINT16 m_regs[0x80];
 
-    UINT16 *m_rom_base;
-    UINT32 m_rom_mask;
+	UINT16 *m_rom_base;
+	UINT32 m_rom_mask;
 
-    int m_lut_volume[0x100];
+	int m_lut_volume[0x100];
 
-    bool read_sample(int ch);
-    void write_reg16(UINT8 reg, UINT16 data);
+	bool read_sample(int ch);
+	void write_reg16(UINT8 reg, UINT16 data);
 };
 
 
@@ -85,4 +85,3 @@ private:
 extern const device_type I5000_SND;
 
 #endif /* __I5000_H__ */
-

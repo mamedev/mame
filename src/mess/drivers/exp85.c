@@ -78,13 +78,13 @@ INPUT_PORTS_END
 
 static I8155_INTERFACE( i8155_intf )
 {
-	DEVCB_NULL,	/* port A read */
-	DEVCB_NULL,	/* port A write */
-	DEVCB_NULL,	/* port B read */
-	DEVCB_NULL,	/* port B write */
-	DEVCB_NULL,	/* port C read */
-	DEVCB_NULL,	/* port C write */
-	DEVCB_NULL	/* timer output */
+	DEVCB_NULL, /* port A read */
+	DEVCB_NULL, /* port A write */
+	DEVCB_NULL, /* port B read */
+	DEVCB_NULL, /* port B write */
+	DEVCB_NULL, /* port C read */
+	DEVCB_NULL, /* port C write */
+	DEVCB_NULL  /* timer output */
 };
 
 /* 8355 Interface */
@@ -93,18 +93,18 @@ READ8_MEMBER( exp85_state::i8355_a_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     tape control
-        PA1     jumper S17 (open=+5V closed=GND)
-        PA2     J5:13
-        PA3
-        PA4     J2:22
-        PA5
-        PA6
-        PA7     speaker output
+	    PA0     tape control
+	    PA1     jumper S17 (open=+5V closed=GND)
+	    PA2     J5:13
+	    PA3
+	    PA4     J2:22
+	    PA5
+	    PA6
+	    PA7     speaker output
 
-    */
+	*/
 
 	return 0x02;
 }
@@ -113,18 +113,18 @@ WRITE8_MEMBER( exp85_state::i8355_a_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     tape control
-        PA1     jumper S17 (open=+5V closed=GND)
-        PA2     J5:13
-        PA3
-        PA4     J2:22
-        PA5
-        PA6
-        PA7     speaker output
+	    PA0     tape control
+	    PA1     jumper S17 (open=+5V closed=GND)
+	    PA2     J5:13
+	    PA3
+	    PA4     J2:22
+	    PA5
+	    PA6
+	    PA7     speaker output
 
-    */
+	*/
 
 	/* tape control */
 	m_tape_control = BIT(data, 0);

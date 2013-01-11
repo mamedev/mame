@@ -35,13 +35,13 @@ typedef void   (*hd61700_port_w_func)(hd61700_cpu_device &device, UINT8 data);
 // device config
 struct hd61700_config
 {
-	hd61700_lcd_control_func	m_lcd_control;		//lcd control
-	hd61700_lcd_data_r_func		m_lcd_data_r;		//lcd data read
-	hd61700_lcd_data_w_func		m_lcd_data_w;		//lcd data write
-	hd61700_kb_r_func			m_kb_r;				//keyboard matrix read
-	hd61700_kb_w_func			m_kb_w;				//keyboard matrix write
-	hd61700_port_r_func			m_port_r;			//8 bit port read
-	hd61700_port_w_func			m_port_w;			//8 bit port write
+	hd61700_lcd_control_func    m_lcd_control;      //lcd control
+	hd61700_lcd_data_r_func     m_lcd_data_r;       //lcd data read
+	hd61700_lcd_data_w_func     m_lcd_data_w;       //lcd data write
+	hd61700_kb_r_func           m_kb_r;             //keyboard matrix read
+	hd61700_kb_w_func           m_kb_w;             //keyboard matrix write
+	hd61700_port_r_func         m_port_r;           //8 bit port read
+	hd61700_port_w_func         m_port_w;           //8 bit port write
 };
 
 
@@ -68,7 +68,7 @@ enum
 // ======================> hd61700_cpu_device
 
 class hd61700_cpu_device : public cpu_device,
-						   public hd61700_config
+							public hd61700_config
 {
 public:
 	// construction/destruction
@@ -135,25 +135,25 @@ protected:
 	UINT16         m_pc;
 	UINT8          m_flags;
 	UINT32         m_fetch_addr;
-	UINT8          m_regsir[3];							// 5bit register (sx, sy, sz)
-	UINT8          m_reg8bit[8];						// 8bit register (pe, pd, ib, ua, ia, ie, tm, tm)
-	UINT16         m_reg16bit[8];						// 16bit register (ix, iy, iz, us, ss, ky, ky, ky)
-	UINT8          m_regmain[0x20];						// main registers
+	UINT8          m_regsir[3];                         // 5bit register (sx, sy, sz)
+	UINT8          m_reg8bit[8];                        // 8bit register (pe, pd, ib, ua, ia, ie, tm, tm)
+	UINT16         m_reg16bit[8];                       // 16bit register (ix, iy, iz, us, ss, ky, ky, ky)
+	UINT8          m_regmain[0x20];                     // main registers
 	UINT8          m_irq_status;
 	UINT8          m_state;
-	UINT8		   prev_ua;
+	UINT8          prev_ua;
 	int            m_lines_status[6];
 	int            m_icount;
 
 	address_space *m_program;
 
 	// flag definitions
-	static const int FLAG_Z		= 0x80;
-	static const int FLAG_C		= 0x40;
-	static const int FLAG_LZ	= 0x20;
-	static const int FLAG_UZ	= 0x10;
-	static const int FLAG_SW	= 0x08;
-	static const int FLAG_APO	= 0x04;
+	static const int FLAG_Z     = 0x80;
+	static const int FLAG_C     = 0x40;
+	static const int FLAG_LZ    = 0x20;
+	static const int FLAG_UZ    = 0x10;
+	static const int FLAG_SW    = 0x08;
+	static const int FLAG_APO   = 0x04;
 };
 
 extern const device_type HD61700;

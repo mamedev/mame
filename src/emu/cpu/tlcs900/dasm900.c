@@ -62,37 +62,37 @@ static const char *const s_mnemonic[] =
 
 enum e_operand
 {
-        O_NONE,
-	O_A,		/* currect register set register A */
-	O_C8,		/* current register set byte */
-	O_C16,		/* current register set word */
-	O_C32,		/* current register set long word */
-	O_MC16,		/* current register set mul/div register word */
-	O_CC,		/* condition */
-	O_CR8,		/* byte control register */
-	O_CR16,		/* word control register */
-	O_CR32,		/* long word control register */
-	O_D8,		/* byte displacement */
-	O_D16,		/* word displacement */
-	O_F,			/* F register */
-	O_I3,		/* immediate 3 bit (part of last byte) */
-	O_I8,		/* immediate byte */
-	O_I16,		/* immediate word */
-	O_I24,		/* immediate 3 byte address */
-	O_I32,		/* immediate long word */
-	O_M,			/* memory location (defined by extension) */
-	O_M8,		/* (8) */
-	O_M16,		/* (i16) */
-	O_R,			/* register */
-	O_SR,		/* status register */
+		O_NONE,
+	O_A,        /* currect register set register A */
+	O_C8,       /* current register set byte */
+	O_C16,      /* current register set word */
+	O_C32,      /* current register set long word */
+	O_MC16,     /* current register set mul/div register word */
+	O_CC,       /* condition */
+	O_CR8,      /* byte control register */
+	O_CR16,     /* word control register */
+	O_CR32,     /* long word control register */
+	O_D8,       /* byte displacement */
+	O_D16,      /* word displacement */
+	O_F,            /* F register */
+	O_I3,       /* immediate 3 bit (part of last byte) */
+	O_I8,       /* immediate byte */
+	O_I16,      /* immediate word */
+	O_I24,      /* immediate 3 byte address */
+	O_I32,      /* immediate long word */
+	O_M,            /* memory location (defined by extension) */
+	O_M8,       /* (8) */
+	O_M16,      /* (i16) */
+	O_R,            /* register */
+	O_SR,       /* status register */
 };
 
 
 struct tlcs900inst
 {
-	e_mnemonics	mnemonic;
-	e_operand	operand1;
-	e_operand	operand2;
+	e_mnemonics mnemonic;
+	e_operand   operand1;
+	e_operand   operand2;
 };
 
 
@@ -1436,10 +1436,10 @@ CPU_DISASSEMBLE( tlcs900 )
 	const tlcs900inst *dasm;
 	char *dst = buffer;
 	char buf[32];
-	UINT8	op, op1;
-	UINT32	imm;
-	int		flags = 0;
-	int		pos = 0;
+	UINT8   op, op1;
+	UINT32  imm;
+	int     flags = 0;
+	int     pos = 0;
 
 	op = oprom[ pos++ ];
 
@@ -1448,8 +1448,8 @@ CPU_DISASSEMBLE( tlcs900 )
 	/* Check for extended addressing modes */
 	switch( dasm->mnemonic )
 	{
-        default:
-                break;
+		default:
+				break;
 	case M_80:
 		sprintf( buf, "%s", s_reg32[op & 0x07] );
 		op = oprom[ pos++ ];
@@ -1505,25 +1505,25 @@ CPU_DISASSEMBLE( tlcs900 )
 	case M_C0:
 		switch( op & 0x07 )
 		{
-		case 0x00:	/* 0xC0 */
+		case 0x00:  /* 0xC0 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "0x%02x", imm );
 			break;
 
-		case 0x01:	/* 0xC1 */
+		case 0x01:  /* 0xC1 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			sprintf( buf, "0x%04x", imm );
 			break;
 
-		case 0x02:	/* 0xC2 */
+		case 0x02:  /* 0xC2 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			imm = imm | ( oprom[ pos++ ] << 16 );
 			sprintf( buf, "0x%06x", imm );
 			break;
 
-		case 0x03:	/* 0xC3 */
+		case 0x03:  /* 0xC3 */
 			imm = oprom[ pos++ ];
 			switch( imm & 0x03 )
 			{
@@ -1567,12 +1567,12 @@ CPU_DISASSEMBLE( tlcs900 )
 			}
 			break;
 
-		case 0x04:	/* 0xC4 */
+		case 0x04:  /* 0xC4 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "-%s", s_allreg32[imm] );
 			break;
 
-		case 0x05:	/* 0xC5 */
+		case 0x05:  /* 0xC5 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "%s+", s_allreg32[imm] );
 			break;
@@ -1598,25 +1598,25 @@ CPU_DISASSEMBLE( tlcs900 )
 	case M_D0:
 		switch( op & 0x07 )
 		{
-		case 0x00:	/* 0xD0 */
+		case 0x00:  /* 0xD0 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "0x%02x", imm );
 			break;
 
-		case 0x01:	/* 0xD1 */
+		case 0x01:  /* 0xD1 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			sprintf( buf, "0x%04x", imm );
 			break;
 
-		case 0x02:	/* 0xD2 */
+		case 0x02:  /* 0xD2 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			imm = imm | ( oprom[ pos++ ] << 16 );
 			sprintf( buf, "0x%06x", imm );
 			break;
 
-		case 0x03:	/* 0xD3 */
+		case 0x03:  /* 0xD3 */
 			imm = oprom[ pos++ ];
 			switch( imm & 0x03 )
 			{
@@ -1660,12 +1660,12 @@ CPU_DISASSEMBLE( tlcs900 )
 			}
 			break;
 
-		case 0x04:	/* 0xD4 */
+		case 0x04:  /* 0xD4 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "-%s", s_allreg32[imm] );
 			break;
 
-		case 0x05:	/* 0xD5 */
+		case 0x05:  /* 0xD5 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "%s+", s_allreg32[imm] );
 			break;
@@ -1692,25 +1692,25 @@ CPU_DISASSEMBLE( tlcs900 )
 	case M_E0:
 		switch( op & 0x07 )
 		{
-		case 0x00:	/* 0xE0 */
+		case 0x00:  /* 0xE0 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "0x%02x", imm );
 			break;
 
-		case 0x01:	/* 0xE1 */
+		case 0x01:  /* 0xE1 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			sprintf( buf, "0x%04x", imm );
 			break;
 
-		case 0x02:	/* 0xE2 */
+		case 0x02:  /* 0xE2 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			imm = imm | ( oprom[ pos++ ] << 16 );
 			sprintf( buf, "0x%06x", imm );
 			break;
 
-		case 0x03:	/* 0xE3 */
+		case 0x03:  /* 0xE3 */
 			imm = oprom[ pos++ ];
 			switch( imm & 0x03 )
 			{
@@ -1754,12 +1754,12 @@ CPU_DISASSEMBLE( tlcs900 )
 			}
 			break;
 
-		case 0x04:	/* 0xE4 */
+		case 0x04:  /* 0xE4 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "-%s", s_allreg32[imm] );
 			break;
 
-		case 0x05:	/* 0xE5 */
+		case 0x05:  /* 0xE5 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "%s+", s_allreg32[imm] );
 			break;
@@ -1785,25 +1785,25 @@ CPU_DISASSEMBLE( tlcs900 )
 	case M_F0:
 		switch( op & 0x07 )
 		{
-		case 0x00:	/* 0xF0 */
+		case 0x00:  /* 0xF0 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "0x%02x", imm );
 			break;
 
-		case 0x01:	/* 0xF1 */
+		case 0x01:  /* 0xF1 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			sprintf( buf, "0x%04x", imm );
 			break;
 
-		case 0x02:	/* 0xF2 */
+		case 0x02:  /* 0xF2 */
 			imm = oprom[ pos++ ];
 			imm = imm | ( oprom[ pos++ ] << 8 );
 			imm = imm | ( oprom[ pos++ ] << 16 );
 			sprintf( buf, "0x%06x", imm );
 			break;
 
-		case 0x03:	/* 0xF3 */
+		case 0x03:  /* 0xF3 */
 			imm = oprom[ pos++ ];
 			switch( imm & 0x03 )
 			{
@@ -1847,12 +1847,12 @@ CPU_DISASSEMBLE( tlcs900 )
 			}
 			break;
 
-		case 0x04:	/* 0xF4 */
+		case 0x04:  /* 0xF4 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "-%s", s_allreg32[imm] );
 			break;
 
-		case 0x05:	/* 0xF5 */
+		case 0x05:  /* 0xF5 */
 			imm = oprom[ pos++ ];
 			sprintf( buf, "%s+", s_allreg32[imm] );
 			break;
@@ -1866,9 +1866,9 @@ CPU_DISASSEMBLE( tlcs900 )
 
 	switch( dasm->mnemonic )
 	{
-        default:
-                /* maybe assert */
-                break;
+		default:
+				/* maybe assert */
+				break;
 	case M_CALL:
 	case M_CALR:
 		flags = DASMFLAG_STEP_OVER;
@@ -1882,8 +1882,8 @@ CPU_DISASSEMBLE( tlcs900 )
 
 	switch( dasm->operand1 )
 	{
-        case O_NONE:
-                break;
+		case O_NONE:
+				break;
 
 	case O_A:
 		dst += sprintf( dst, " A" );
@@ -2068,10 +2068,10 @@ CPU_DISASSEMBLE( tlcs900 )
 
 	switch( dasm->operand2 )
 	{
-        case O_NONE:
-                break;
+		case O_NONE:
+				break;
 
-        case O_A:
+		case O_A:
 		dst += sprintf( dst, ",A" );
 		break;
 

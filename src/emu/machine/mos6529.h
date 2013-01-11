@@ -34,7 +34,7 @@
 //**************************************************************************
 
 #define MCFG_MOS6529_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS6529, 0)	\
+	MCFG_DEVICE_ADD(_tag, MOS6529, 0)   \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MOS6529_INTERFACE(name) \
@@ -50,31 +50,31 @@
 
 struct mos6529_interface
 {
-	devcb_read8				m_in_p_cb;
-	devcb_write8			m_out_p_cb;
+	devcb_read8             m_in_p_cb;
+	devcb_write8            m_out_p_cb;
 };
 
 
 // ======================> mos6529_device
 
-class mos6529_device :	public device_t,
-                        public mos6529_interface
+class mos6529_device :  public device_t,
+						public mos6529_interface
 {
 public:
-    // construction/destruction
-    mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 
 private:
-	devcb_resolved_read8		m_in_p_func;
-	devcb_resolved_write8		m_out_p_func;
+	devcb_resolved_read8        m_in_p_func;
+	devcb_resolved_write8       m_out_p_func;
 };
 
 

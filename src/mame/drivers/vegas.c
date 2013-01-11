@@ -289,14 +289,14 @@
  *
  *************************************/
 
-#define LOG_NILE			(0)
-#define LOG_NILE_IRQS		(0)
-#define LOG_PCI				(0)
-#define LOG_TIMERS			(0)
-#define LOG_TIMEKEEPER		(0)
-#define LOG_SIO				(0)
-#define LOG_DYNAMIC			(0)
-#define PRINTF_SERIAL		(1)
+#define LOG_NILE            (0)
+#define LOG_NILE_IRQS       (0)
+#define LOG_PCI             (0)
+#define LOG_TIMERS          (0)
+#define LOG_TIMEKEEPER      (0)
+#define LOG_SIO             (0)
+#define LOG_DYNAMIC         (0)
+#define PRINTF_SERIAL       (1)
 
 
 
@@ -306,12 +306,12 @@
  *
  *************************************/
 
-#define SYSTEM_CLOCK		100000000
-#define TIMER_PERIOD		attotime::from_hz(SYSTEM_CLOCK)
+#define SYSTEM_CLOCK        100000000
+#define TIMER_PERIOD        attotime::from_hz(SYSTEM_CLOCK)
 
-#define MAX_DYNAMIC_ADDRESSES	32
+#define MAX_DYNAMIC_ADDRESSES   32
 
-#define NOP_HANDLER			((read32_space_func)-1)
+#define NOP_HANDLER         ((read32_space_func)-1)
 
 
 
@@ -322,137 +322,137 @@
  *************************************/
 
 /* NILE 4 registers 0x000-0x0ff */
-#define NREG_SDRAM0			(0x000/4)
-#define NREG_SDRAM1			(0x008/4)
-#define NREG_DCS2			(0x010/4)	/* SIO misc */
-#define NREG_DCS3			(0x018/4)	/* ADC */
-#define NREG_DCS4			(0x020/4)	/* CMOS */
-#define NREG_DCS5			(0x028/4)	/* SIO */
-#define NREG_DCS6			(0x030/4)	/* IOASIC */
-#define NREG_DCS7			(0x038/4)	/* ethernet */
-#define NREG_DCS8			(0x040/4)
-#define NREG_PCIW0			(0x060/4)
-#define NREG_PCIW1			(0x068/4)
-#define NREG_INTCS			(0x070/4)
-#define NREG_BOOTCS			(0x078/4)
-#define NREG_CPUSTAT		(0x080/4)
-#define NREG_INTCTRL		(0x088/4)
-#define NREG_INTSTAT0		(0x090/4)
-#define NREG_INTSTAT1		(0x098/4)
-#define NREG_INTCLR			(0x0A0/4)
-#define NREG_INTPPES		(0x0A8/4)
-#define NREG_PCIERR			(0x0B8/4)
-#define NREG_MEMCTRL		(0x0C0/4)
-#define NREG_ACSTIME		(0x0C8/4)
-#define NREG_CHKERR			(0x0D0/4)
-#define NREG_PCICTRL		(0x0E0/4)
-#define NREG_PCIARB			(0x0E8/4)
-#define NREG_PCIINIT0		(0x0F0/4)
-#define NREG_PCIINIT1		(0x0F8/4)
+#define NREG_SDRAM0         (0x000/4)
+#define NREG_SDRAM1         (0x008/4)
+#define NREG_DCS2           (0x010/4)   /* SIO misc */
+#define NREG_DCS3           (0x018/4)   /* ADC */
+#define NREG_DCS4           (0x020/4)   /* CMOS */
+#define NREG_DCS5           (0x028/4)   /* SIO */
+#define NREG_DCS6           (0x030/4)   /* IOASIC */
+#define NREG_DCS7           (0x038/4)   /* ethernet */
+#define NREG_DCS8           (0x040/4)
+#define NREG_PCIW0          (0x060/4)
+#define NREG_PCIW1          (0x068/4)
+#define NREG_INTCS          (0x070/4)
+#define NREG_BOOTCS         (0x078/4)
+#define NREG_CPUSTAT        (0x080/4)
+#define NREG_INTCTRL        (0x088/4)
+#define NREG_INTSTAT0       (0x090/4)
+#define NREG_INTSTAT1       (0x098/4)
+#define NREG_INTCLR         (0x0A0/4)
+#define NREG_INTPPES        (0x0A8/4)
+#define NREG_PCIERR         (0x0B8/4)
+#define NREG_MEMCTRL        (0x0C0/4)
+#define NREG_ACSTIME        (0x0C8/4)
+#define NREG_CHKERR         (0x0D0/4)
+#define NREG_PCICTRL        (0x0E0/4)
+#define NREG_PCIARB         (0x0E8/4)
+#define NREG_PCIINIT0       (0x0F0/4)
+#define NREG_PCIINIT1       (0x0F8/4)
 
 /* NILE 4 registers 0x100-0x1ff */
-#define NREG_LCNFG			(0x100/4)
-#define NREG_LCST2			(0x110/4)
-#define NREG_LCST3			(0x118/4)
-#define NREG_LCST4			(0x120/4)
-#define NREG_LCST5			(0x128/4)
-#define NREG_LCST6			(0x130/4)
-#define NREG_LCST7			(0x138/4)
-#define NREG_LCST8			(0x140/4)
-#define NREG_DCSFN			(0x150/4)
-#define NREG_DCSIO			(0x158/4)
-#define NREG_BCST			(0x178/4)
-#define NREG_DMACTRL0		(0x180/4)
-#define NREG_DMASRCA0		(0x188/4)
-#define NREG_DMADESA0		(0x190/4)
-#define NREG_DMACTRL1		(0x198/4)
-#define NREG_DMASRCA1		(0x1A0/4)
-#define NREG_DMADESA1		(0x1A8/4)
-#define NREG_T0CTRL			(0x1C0/4)
-#define NREG_T0CNTR			(0x1C8/4)
-#define NREG_T1CTRL			(0x1D0/4)
-#define NREG_T1CNTR			(0x1D8/4)
-#define NREG_T2CTRL			(0x1E0/4)
-#define NREG_T2CNTR			(0x1E8/4)
-#define NREG_T3CTRL			(0x1F0/4)
-#define NREG_T3CNTR			(0x1F8/4)
+#define NREG_LCNFG          (0x100/4)
+#define NREG_LCST2          (0x110/4)
+#define NREG_LCST3          (0x118/4)
+#define NREG_LCST4          (0x120/4)
+#define NREG_LCST5          (0x128/4)
+#define NREG_LCST6          (0x130/4)
+#define NREG_LCST7          (0x138/4)
+#define NREG_LCST8          (0x140/4)
+#define NREG_DCSFN          (0x150/4)
+#define NREG_DCSIO          (0x158/4)
+#define NREG_BCST           (0x178/4)
+#define NREG_DMACTRL0       (0x180/4)
+#define NREG_DMASRCA0       (0x188/4)
+#define NREG_DMADESA0       (0x190/4)
+#define NREG_DMACTRL1       (0x198/4)
+#define NREG_DMASRCA1       (0x1A0/4)
+#define NREG_DMADESA1       (0x1A8/4)
+#define NREG_T0CTRL         (0x1C0/4)
+#define NREG_T0CNTR         (0x1C8/4)
+#define NREG_T1CTRL         (0x1D0/4)
+#define NREG_T1CNTR         (0x1D8/4)
+#define NREG_T2CTRL         (0x1E0/4)
+#define NREG_T2CNTR         (0x1E8/4)
+#define NREG_T3CTRL         (0x1F0/4)
+#define NREG_T3CNTR         (0x1F8/4)
 
 /* NILE 4 registers 0x200-0x2ff */
-#define NREG_VID			(0x200/4)
-#define NREG_DID			(0x202/4)
-#define NREG_PCICMD			(0x204/4)
-#define NREG_PCISTS			(0x206/4)
-#define NREG_REVID			(0x208/4)
-#define NREG_CLASS			(0x209/4)
-#define NREG_CLSIZ			(0x20C/4)
-#define NREG_MLTIM			(0x20D/4)
-#define NREG_HTYPE			(0x20E/4)
-#define NREG_BIST			(0x20F/4)
-#define NREG_BARC			(0x210/4)
-#define NREG_BAR0			(0x218/4)
-#define NREG_BAR1			(0x220/4)
-#define NREG_CIS			(0x228/4)
-#define NREG_SSVID			(0x22C/4)
-#define NREG_SSID			(0x22E/4)
-#define NREG_ROM			(0x230/4)
-#define NREG_INTLIN			(0x23C/4)
-#define NREG_INTPIN			(0x23D/4)
-#define NREG_MINGNT			(0x23E/4)
-#define NREG_MAXLAT			(0x23F/4)
-#define NREG_BAR2			(0x240/4)
-#define NREG_BAR3			(0x248/4)
-#define NREG_BAR4			(0x250/4)
-#define NREG_BAR5			(0x258/4)
-#define NREG_BAR6			(0x260/4)
-#define NREG_BAR7			(0x268/4)
-#define NREG_BAR8			(0x270/4)
-#define NREG_BARB			(0x278/4)
+#define NREG_VID            (0x200/4)
+#define NREG_DID            (0x202/4)
+#define NREG_PCICMD         (0x204/4)
+#define NREG_PCISTS         (0x206/4)
+#define NREG_REVID          (0x208/4)
+#define NREG_CLASS          (0x209/4)
+#define NREG_CLSIZ          (0x20C/4)
+#define NREG_MLTIM          (0x20D/4)
+#define NREG_HTYPE          (0x20E/4)
+#define NREG_BIST           (0x20F/4)
+#define NREG_BARC           (0x210/4)
+#define NREG_BAR0           (0x218/4)
+#define NREG_BAR1           (0x220/4)
+#define NREG_CIS            (0x228/4)
+#define NREG_SSVID          (0x22C/4)
+#define NREG_SSID           (0x22E/4)
+#define NREG_ROM            (0x230/4)
+#define NREG_INTLIN         (0x23C/4)
+#define NREG_INTPIN         (0x23D/4)
+#define NREG_MINGNT         (0x23E/4)
+#define NREG_MAXLAT         (0x23F/4)
+#define NREG_BAR2           (0x240/4)
+#define NREG_BAR3           (0x248/4)
+#define NREG_BAR4           (0x250/4)
+#define NREG_BAR5           (0x258/4)
+#define NREG_BAR6           (0x260/4)
+#define NREG_BAR7           (0x268/4)
+#define NREG_BAR8           (0x270/4)
+#define NREG_BARB           (0x278/4)
 
 /* NILE 4 registers 0x300-0x3ff */
-#define NREG_UARTRBR		(0x300/4)
-#define NREG_UARTTHR		(0x300/4)
-#define NREG_UARTIER		(0x308/4)
-#define NREG_UARTDLL		(0x300/4)
-#define NREG_UARTDLM		(0x308/4)
-#define NREG_UARTIIR		(0x310/4)
-#define NREG_UARTFCR		(0x310/4)
-#define NREG_UARTLCR		(0x318/4)
-#define NREG_UARTMCR		(0x320/4)
-#define NREG_UARTLSR		(0x328/4)
-#define NREG_UARTMSR		(0x330/4)
-#define NREG_UARTSCR		(0x338/4)
+#define NREG_UARTRBR        (0x300/4)
+#define NREG_UARTTHR        (0x300/4)
+#define NREG_UARTIER        (0x308/4)
+#define NREG_UARTDLL        (0x300/4)
+#define NREG_UARTDLM        (0x308/4)
+#define NREG_UARTIIR        (0x310/4)
+#define NREG_UARTFCR        (0x310/4)
+#define NREG_UARTLCR        (0x318/4)
+#define NREG_UARTMCR        (0x320/4)
+#define NREG_UARTLSR        (0x328/4)
+#define NREG_UARTMSR        (0x330/4)
+#define NREG_UARTSCR        (0x338/4)
 
 /* NILE 4 interrupts */
-#define NINT_CPCE			(0)
-#define NINT_CNTD			(1)
-#define NINT_MCE			(2)
-#define NINT_DMA			(3)
-#define NINT_UART			(4)
-#define NINT_WDOG			(5)
-#define NINT_GPT			(6)
-#define NINT_LBRTD			(7)
-#define NINT_INTA			(8)
-#define NINT_INTB			(9)
-#define NINT_INTC			(10)
-#define NINT_INTD			(11)
-#define NINT_INTE			(12)
-#define NINT_RESV			(13)
-#define NINT_PCIS			(14)
-#define NINT_PCIE			(15)
+#define NINT_CPCE           (0)
+#define NINT_CNTD           (1)
+#define NINT_MCE            (2)
+#define NINT_DMA            (3)
+#define NINT_UART           (4)
+#define NINT_WDOG           (5)
+#define NINT_GPT            (6)
+#define NINT_LBRTD          (7)
+#define NINT_INTA           (8)
+#define NINT_INTB           (9)
+#define NINT_INTC           (10)
+#define NINT_INTD           (11)
+#define NINT_INTE           (12)
+#define NINT_RESV           (13)
+#define NINT_PCIS           (14)
+#define NINT_PCIE           (15)
 
 
 
 struct dynamic_address
 {
-	offs_t			start;
-	offs_t			end;
-	read32_space_func	mread;
+	offs_t          start;
+	offs_t          end;
+	read32_space_func   mread;
 	write32_space_func mwrite;
-	read32_device_func	dread;
+	read32_device_func  dread;
 	write32_device_func dwrite;
 	device_t *device;
-	const char *	rdname;
-	const char *	wrname;
+	const char *    rdname;
+	const char *    wrname;
 };
 
 class vegas_state : public driver_device
@@ -460,7 +460,7 @@ class vegas_state : public driver_device
 public:
 	vegas_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_timekeeper(*this, "timekeeper") ,
+			m_timekeeper(*this, "timekeeper") ,
 		m_rambase(*this, "rambase"),
 		m_nile_regs(*this, "nile_regs"),
 		m_rombase(*this, "rombase"){ }
@@ -668,11 +668,11 @@ static READ32_HANDLER( pci_bridge_r )
 
 	switch (offset)
 	{
-		case 0x00:		/* ID register: 0x005a = VRC 5074, 0x1033 = NEC */
+		case 0x00:      /* ID register: 0x005a = VRC 5074, 0x1033 = NEC */
 			result = 0x005a1033;
 			break;
 
-		case 0x02:		/* revision ID register */
+		case 0x02:      /* revision ID register */
 			result = 0x00000004;
 			break;
 	}
@@ -706,11 +706,11 @@ static READ32_HANDLER( pci_ide_r )
 
 	switch (offset)
 	{
-		case 0x00:		/* ID register: 0x0646 = 646 EIDE controller, 0x1095 = CMD */
+		case 0x00:      /* ID register: 0x0646 = 646 EIDE controller, 0x1095 = CMD */
 			result = 0x06461095;
 			break;
 
-		case 0x14:		/* interrupt pending */
+		case 0x14:      /* interrupt pending */
 			result &= 0xffffff00;
 			if (state->m_ide_irq_state)
 				result |= 4;
@@ -730,22 +730,22 @@ static WRITE32_HANDLER( pci_ide_w )
 
 	switch (offset)
 	{
-		case 0x04:		/* address register */
+		case 0x04:      /* address register */
 			state->m_pci_ide_regs[offset] &= 0xfffffff0;
 			remap_dynamic_addresses(space.machine());
 			break;
 
-		case 0x05:		/* address register */
+		case 0x05:      /* address register */
 			state->m_pci_ide_regs[offset] &= 0xfffffffc;
 			remap_dynamic_addresses(space.machine());
 			break;
 
-		case 0x08:		/* address register */
+		case 0x08:      /* address register */
 			state->m_pci_ide_regs[offset] &= 0xfffffff0;
 			remap_dynamic_addresses(space.machine());
 			break;
 
-		case 0x14:		/* interrupt pending */
+		case 0x14:      /* interrupt pending */
 			if (data & 4)
 				state->ide_interrupt(0);
 			break;
@@ -770,22 +770,22 @@ static READ32_HANDLER( pci_3dfx_r )
 
 	switch (offset)
 	{
-		case 0x00:		/* ID register: 0x0002 = SST-2, 0x121a = 3dfx */
+		case 0x00:      /* ID register: 0x0002 = SST-2, 0x121a = 3dfx */
 			if (voodoo_type == TYPE_VOODOO_2)
 				result = 0x0002121a;
 			else
 				result = 0x0003121a;
 			break;
 
-		case 0x02:		/* revision ID register */
+		case 0x02:      /* revision ID register */
 			result = 0x00000002;
 			break;
 
-		case 0x10:		/* fab ID register?? */
+		case 0x10:      /* fab ID register?? */
 			result = 0x00044000;
 			break;
 
-		case 0x15:		/* ???? -- gauntleg wants 0s in the bits below */
+		case 0x15:      /* ???? -- gauntleg wants 0s in the bits below */
 			result &= 0xf000ffff;
 			break;
 	}
@@ -805,7 +805,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 
 	switch (offset)
 	{
-		case 0x04:		/* address register */
+		case 0x04:      /* address register */
 			if (voodoo_type == TYPE_VOODOO_2)
 				state->m_pci_3dfx_regs[offset] &= 0xff000000;
 			else
@@ -813,7 +813,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			remap_dynamic_addresses(space.machine());
 			break;
 
-		case 0x05:		/* address register */
+		case 0x05:      /* address register */
 			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xfe000000;
@@ -821,7 +821,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			}
 			break;
 
-		case 0x06:		/* I/O register */
+		case 0x06:      /* I/O register */
 			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xffffff00;
@@ -829,7 +829,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			}
 			break;
 
-		case 0x0c:		/* romBaseAddr register */
+		case 0x0c:      /* romBaseAddr register */
 			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xffff0000;
@@ -837,7 +837,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			}
 			break;
 
-		case 0x10:		/* initEnable register */
+		case 0x10:      /* initEnable register */
 			voodoo_set_init_enable(state->m_voodoo, data);
 			break;
 
@@ -959,57 +959,57 @@ static READ32_HANDLER( nile_r )
 
 	switch (offset)
 	{
-		case NREG_CPUSTAT+0:	/* CPU status */
-		case NREG_CPUSTAT+1:	/* CPU status */
+		case NREG_CPUSTAT+0:    /* CPU status */
+		case NREG_CPUSTAT+1:    /* CPU status */
 			if (LOG_NILE) logerror("%08X:NILE READ: CPU status(%03X) = %08X\n", space.device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
-		case NREG_INTCTRL+0:	/* Interrupt control */
-		case NREG_INTCTRL+1:	/* Interrupt control */
+		case NREG_INTCTRL+0:    /* Interrupt control */
+		case NREG_INTCTRL+1:    /* Interrupt control */
 			if (LOG_NILE) logerror("%08X:NILE READ: interrupt control(%03X) = %08X\n", space.device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
-		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
-		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
+		case NREG_INTSTAT0+0:   /* Interrupt status 0 */
+		case NREG_INTSTAT0+1:   /* Interrupt status 0 */
 			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 0(%03X) = %08X\n", space.device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
-		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
-		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
+		case NREG_INTSTAT1+0:   /* Interrupt status 1 */
+		case NREG_INTSTAT1+1:   /* Interrupt status 1 */
 			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 1/enable(%03X) = %08X\n", space.device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
-		case NREG_INTCLR+0:		/* Interrupt clear */
-		case NREG_INTCLR+1:		/* Interrupt clear */
+		case NREG_INTCLR+0:     /* Interrupt clear */
+		case NREG_INTCLR+1:     /* Interrupt clear */
 			if (LOG_NILE) logerror("%08X:NILE READ: interrupt clear(%03X) = %08X\n", space.device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
-		case NREG_INTPPES+0:	/* PCI Interrupt control */
-		case NREG_INTPPES+1:	/* PCI Interrupt control */
+		case NREG_INTPPES+0:    /* PCI Interrupt control */
+		case NREG_INTPPES+1:    /* PCI Interrupt control */
 			if (LOG_NILE) logerror("%08X:NILE READ: PCI interrupt control(%03X) = %08X\n", space.device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
-		case NREG_PCIERR+0:		/* PCI error */
-		case NREG_PCIERR+1:		/* PCI error */
-		case NREG_PCICTRL+0:	/* PCI control */
-		case NREG_PCICTRL+1:	/* PCI arbiter */
-		case NREG_PCIINIT0+0:	/* PCI master */
-		case NREG_PCIINIT0+1:	/* PCI master */
-		case NREG_PCIINIT1+0:	/* PCI master */
-		case NREG_PCIINIT1+1:	/* PCI master */
+		case NREG_PCIERR+0:     /* PCI error */
+		case NREG_PCIERR+1:     /* PCI error */
+		case NREG_PCICTRL+0:    /* PCI control */
+		case NREG_PCICTRL+1:    /* PCI arbiter */
+		case NREG_PCIINIT0+0:   /* PCI master */
+		case NREG_PCIINIT0+1:   /* PCI master */
+		case NREG_PCIINIT1+0:   /* PCI master */
+		case NREG_PCIINIT1+1:   /* PCI master */
 			logit = 0;
 			break;
 
-		case NREG_T0CNTR:		/* SDRAM timer control (counter) */
-		case NREG_T1CNTR:		/* bus timeout timer control (counter) */
-		case NREG_T2CNTR:		/* general purpose timer control (counter) */
-		case NREG_T3CNTR:		/* watchdog timer control (counter) */
+		case NREG_T0CNTR:       /* SDRAM timer control (counter) */
+		case NREG_T1CNTR:       /* bus timeout timer control (counter) */
+		case NREG_T2CNTR:       /* general purpose timer control (counter) */
+		case NREG_T3CNTR:       /* watchdog timer control (counter) */
 			which = (offset - NREG_T0CTRL) / 4;
 			if (state->m_nile_regs[offset - 1] & 1)
 			{
@@ -1022,14 +1022,14 @@ static READ32_HANDLER( nile_r )
 			logit = 0;
 			break;
 
-		case NREG_UARTIIR:			/* serial port interrupt ID */
+		case NREG_UARTIIR:          /* serial port interrupt ID */
 			if (state->m_nile_regs[NREG_UARTIER] & 2)
-				result = 0x02;			/* transmitter buffer IRQ pending */
+				result = 0x02;          /* transmitter buffer IRQ pending */
 			else
-				result = 0x01;			/* no IRQ pending */
+				result = 0x01;          /* no IRQ pending */
 			break;
 
-		case NREG_UARTLSR:			/* serial port line status */
+		case NREG_UARTLSR:          /* serial port line status */
 			result = 0x60;
 			logit = 0;
 			break;
@@ -1074,67 +1074,67 @@ static WRITE32_HANDLER( nile_w )
 
 	switch (offset)
 	{
-		case NREG_CPUSTAT+0:	/* CPU status */
-		case NREG_CPUSTAT+1:	/* CPU status */
+		case NREG_CPUSTAT+0:    /* CPU status */
+		case NREG_CPUSTAT+1:    /* CPU status */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
-		case NREG_INTCTRL+0:	/* Interrupt control */
-		case NREG_INTCTRL+1:	/* Interrupt control */
+		case NREG_INTCTRL+0:    /* Interrupt control */
+		case NREG_INTCTRL+1:    /* Interrupt control */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs(space.machine());
 			break;
 
-		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
-		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
+		case NREG_INTSTAT0+0:   /* Interrupt status 0 */
+		case NREG_INTSTAT0+1:   /* Interrupt status 0 */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs(space.machine());
 			break;
 
-		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
-		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
+		case NREG_INTSTAT1+0:   /* Interrupt status 1 */
+		case NREG_INTSTAT1+1:   /* Interrupt status 1 */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs(space.machine());
 			break;
 
-		case NREG_INTCLR+0:		/* Interrupt clear */
-		case NREG_INTCLR+1:		/* Interrupt clear */
+		case NREG_INTCLR+0:     /* Interrupt clear */
+		case NREG_INTCLR+1:     /* Interrupt clear */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			state->m_nile_irq_state &= ~(state->m_nile_regs[offset] & ~0xf00);
 			update_nile_irqs(space.machine());
 			break;
 
-		case NREG_INTPPES+0:	/* PCI Interrupt control */
-		case NREG_INTPPES+1:	/* PCI Interrupt control */
+		case NREG_INTPPES+0:    /* PCI Interrupt control */
+		case NREG_INTPPES+1:    /* PCI Interrupt control */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt control(%03X) = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
-		case NREG_PCIERR+0:		/* PCI error */
-		case NREG_PCIERR+1:		/* PCI error */
-		case NREG_PCICTRL+0:	/* PCI control */
-		case NREG_PCICTRL+1:	/* PCI arbiter */
-		case NREG_PCIINIT0+0:	/* PCI master */
-		case NREG_PCIINIT0+1:	/* PCI master */
-		case NREG_PCIINIT1+1:	/* PCI master */
+		case NREG_PCIERR+0:     /* PCI error */
+		case NREG_PCIERR+1:     /* PCI error */
+		case NREG_PCICTRL+0:    /* PCI control */
+		case NREG_PCICTRL+1:    /* PCI arbiter */
+		case NREG_PCIINIT0+0:   /* PCI master */
+		case NREG_PCIINIT0+1:   /* PCI master */
+		case NREG_PCIINIT1+1:   /* PCI master */
 			logit = 0;
 			break;
 
-		case NREG_PCIINIT1+0:	/* PCI master */
+		case NREG_PCIINIT1+0:   /* PCI master */
 			if (((olddata & 0xe) == 0xa) != ((state->m_nile_regs[offset] & 0xe) == 0xa))
 				remap_dynamic_addresses(space.machine());
 			logit = 0;
 			break;
 
-		case NREG_T0CTRL+1:		/* SDRAM timer control (control bits) */
-		case NREG_T1CTRL+1:		/* bus timeout timer control (control bits) */
-		case NREG_T2CTRL+1:		/* general purpose timer control (control bits) */
-		case NREG_T3CTRL+1:		/* watchdog timer control (control bits) */
+		case NREG_T0CTRL+1:     /* SDRAM timer control (control bits) */
+		case NREG_T1CTRL+1:     /* bus timeout timer control (control bits) */
+		case NREG_T2CTRL+1:     /* general purpose timer control (control bits) */
+		case NREG_T3CTRL+1:     /* watchdog timer control (control bits) */
 			which = (offset - NREG_T0CTRL) / 4;
 			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", space.device().safe_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
@@ -1160,10 +1160,10 @@ static WRITE32_HANDLER( nile_w )
 			}
 			break;
 
-		case NREG_T0CNTR:		/* SDRAM timer control (counter) */
-		case NREG_T1CNTR:		/* bus timeout timer control (counter) */
-		case NREG_T2CNTR:		/* general purpose timer control (counter) */
-		case NREG_T3CNTR:		/* watchdog timer control (counter) */
+		case NREG_T0CNTR:       /* SDRAM timer control (counter) */
+		case NREG_T1CNTR:       /* bus timeout timer control (counter) */
+		case NREG_T2CNTR:       /* general purpose timer control (counter) */
+		case NREG_T3CNTR:       /* watchdog timer control (counter) */
 			which = (offset - NREG_T0CTRL) / 4;
 			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", space.device().safe_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
@@ -1176,11 +1176,11 @@ static WRITE32_HANDLER( nile_w )
 			}
 			break;
 
-		case NREG_UARTTHR:		/* serial port output */
+		case NREG_UARTTHR:      /* serial port output */
 			if (PRINTF_SERIAL) mame_printf_debug("%c", data & 0xff);
 			logit = 0;
 			break;
-		case NREG_UARTIER:		/* serial interrupt enable */
+		case NREG_UARTIER:      /* serial interrupt enable */
 			update_nile_irqs(space.machine());
 			break;
 
@@ -1518,8 +1518,8 @@ static WRITE32_HANDLER( dcs3_fifo_full_w )
  *
  *************************************/
 
-#define add_dynamic_address(st,s,e,r,w)			_add_dynamic_address(st,s,e,r,w,#r,#w)
-#define add_dynamic_device_address(st,d,s,e,r,w)	_add_dynamic_device_address(st,d,s,e,r,w,#r,#w)
+#define add_dynamic_address(st,s,e,r,w)         _add_dynamic_address(st,s,e,r,w,#r,#w)
+#define add_dynamic_device_address(st,d,s,e,r,w)    _add_dynamic_device_address(st,d,s,e,r,w,#r,#w)
 
 INLINE void _add_dynamic_address(vegas_state *state, offs_t start, offs_t end, read32_space_func read, write32_space_func write, const char *rdname, const char *wrname)
 {
@@ -1665,15 +1665,15 @@ static void remap_dynamic_addresses(running_machine &machine)
 		if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 		{
 			base = state->m_pci_3dfx_regs[0x05] & 0xfffffff0;
-            if (base >= state->m_rambase.bytes() && base < 0x20000000)
+			if (base >= state->m_rambase.bytes() && base < 0x20000000)
 				add_dynamic_device_address(state, state->m_voodoo, base + 0x0000000, base + 0x1ffffff, banshee_fb_r, banshee_fb_w);
 
 			base = state->m_pci_3dfx_regs[0x06] & 0xfffffff0;
-            if (base >= state->m_rambase.bytes() && base < 0x20000000)
+			if (base >= state->m_rambase.bytes() && base < 0x20000000)
 				add_dynamic_device_address(state, state->m_voodoo, base + 0x0000000, base + 0x00000ff, banshee_io_r, banshee_io_w);
 
 			base = state->m_pci_3dfx_regs[0x0c] & 0xffff0000;
-            if (base >= state->m_rambase.bytes() && base < 0x20000000)
+			if (base >= state->m_rambase.bytes() && base < 0x20000000)
 				add_dynamic_device_address(state, state->m_voodoo, base + 0x0000000, base + 0x000ffff, banshee_rom_r, NULL);
 		}
 	}
@@ -1918,13 +1918,13 @@ static INPUT_PORTS_START( tenthdeg )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	/* P1 roundhouse */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* P1 fierce */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)	/* P1 forward */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)   /* P1 roundhouse */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)   /* P1 fierce */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)   /* P1 forward */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	/* P2 roundhouse */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)	/* P2 forward */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	/* P2 fierce */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)   /* P2 roundhouse */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)   /* P2 forward */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)   /* P2 fierce */
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1991,13 +1991,13 @@ static INPUT_PORTS_START( roadburn )
 	PORT_DIPSETTING(      0x0200, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" )
 
-	PORT_START("AN0")	/* Steer */
+	PORT_START("AN0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")	/* Accel */
+	PORT_START("AN1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
 	PORT_START("AN3")
@@ -2039,7 +2039,7 @@ static INPUT_PORTS_START( nbashowt )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
 //  PORT_DIPSETTING(      0x0000, "Not Used" )      /* Marked as Unused in the manual */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )	/* Marked as Unused in the manual */
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )  /* Marked as Unused in the manual */
 	PORT_DIPSETTING(      0x0040, "0" )
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPNAME( 0x0080, 0x0080, "Game" )
@@ -2087,13 +2087,13 @@ static INPUT_PORTS_START( sf2049 )
 	PORT_DIPSETTING(      0x0200, "Medium Res 512x384" )
 	PORT_DIPSETTING(      0x0300, "VGA Res 640x480" )
 
-	PORT_START("AN0")	/* Steer */
+	PORT_START("AN0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")	/* Accel */
+	PORT_START("AN1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
 	PORT_START("AN3")
@@ -2118,13 +2118,13 @@ static INPUT_PORTS_START( sf2049se )
 
 	PORT_MODIFY("DIPS")
 
-	PORT_START("AN0")	/* Steer */
+	PORT_START("AN0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")	/* Accel */
+	PORT_START("AN1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
 	PORT_START("AN3")
@@ -2149,13 +2149,13 @@ static INPUT_PORTS_START( sf2049te )
 
 	PORT_MODIFY("DIPS")
 
-	PORT_START("AN0")	/* Steer */
+	PORT_START("AN0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")	/* Accel */
+	PORT_START("AN1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
 	PORT_START("AN3")
@@ -2180,13 +2180,13 @@ static INPUT_PORTS_START( cartfury )
 
 	PORT_MODIFY("DIPS")
 
-	PORT_START("AN0")	/* Steer */
+	PORT_START("AN0")   /* Steer */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START("AN1")	/* Accel */
+	PORT_START("AN1")   /* Accel */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("AN2")	/* Brake */
+	PORT_START("AN2")   /* Brake */
 	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(100)
 
 	PORT_START("AN3")
@@ -2215,9 +2215,9 @@ INPUT_PORTS_END
 
 static const mips3_config r5000_config =
 {
-	16384,			/* code cache size */
-	16384,			/* data cache size */
-	SYSTEM_CLOCK	/* system clock rate */
+	16384,          /* code cache size */
+	16384,          /* data cache size */
+	SYSTEM_CLOCK    /* system clock rate */
 };
 
 static const smc91c9x_config ethernet_intf =
@@ -2334,61 +2334,61 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( gauntleg )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* EPROM 1.5 11/17/1998 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.5 11/17/1998 */
 	ROM_LOAD( "legend15.bin", 0x000000, 0x80000, CRC(a8372d70) SHA1(d8cd4fd4d7007ee38bb58b5a818d0f83043d5a48) )
 
-	DISK_REGION( "drive_0" )	/* Guts 1.5 1/14/1999 Game 1/14/1999 */
+	DISK_REGION( "drive_0" )    /* Guts 1.5 1/14/1999 Game 1/14/1999 */
 	DISK_IMAGE( "gauntleg", 0, SHA1(66eb70e2fba574a7abe54be8bd45310654b24b08) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
 
 ROM_START( gauntleg12 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* EPROM 1.3 9/25/1998 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.3 9/25/1998 */
 	ROM_LOAD( "legend12.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) )
 
-	DISK_REGION( "drive_0" )	/* Guts 1.4 10/22/1998 Main 10/23/1998 */
+	DISK_REGION( "drive_0" )    /* Guts 1.4 10/22/1998 Main 10/23/1998 */
 	DISK_IMAGE( "gauntl12", 0, SHA1(c8208e3ce3b02a271dc6b089efa98dd996b66ce0) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
 
 ROM_START( gauntdl )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* EPROM 1.7 12/14/1999 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.7 12/14/1999 */
 	ROM_LOAD( "gauntdl.bin", 0x000000, 0x80000, CRC(3d631518) SHA1(d7f5a3bc109a19c9c7a711d607ff87e11868b536) )
 
-	DISK_REGION( "drive_0" )	/* Guts: 1.9 3/17/2000 Game 5/9/2000 */
+	DISK_REGION( "drive_0" )    /* Guts: 1.9 3/17/2000 Game 5/9/2000 */
 	DISK_IMAGE( "gauntdl", 0, SHA1(ba3af48171e727c2f7232c06dcf8411cbcf14de8) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
 
 ROM_START( gauntdl24 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* EPROM 1.7 12/14/1999 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.7 12/14/1999 */
 	ROM_LOAD( "gauntdl.bin", 0x000000, 0x80000, CRC(3d631518) SHA1(d7f5a3bc109a19c9c7a711d607ff87e11868b536) )
 
-	DISK_REGION( "drive_0" )	/* Guts: 1.9 3/17/2000 Game 3/19/2000 */
+	DISK_REGION( "drive_0" )    /* Guts: 1.9 3/17/2000 Game 3/19/2000 */
 	DISK_IMAGE( "gauntd24", 0, SHA1(3e055794d23d62680732e906cfaf9154765de698) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
 
 ROM_START( warfa )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* EPROM 1.9 3/25/1999 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.9 3/25/1999 */
 	ROM_LOAD( "warboot.v19", 0x000000, 0x80000, CRC(b0c095cd) SHA1(d3b8cccdca83f0ecb49aa7993864cfdaa4e5c6f0) )
 
-	DISK_REGION( "drive_0" )	/* Guts 1.3 4/20/1999 Game 4/20/1999 */
+	DISK_REGION( "drive_0" )    /* Guts 1.3 4/20/1999 Game 4/20/1999 */
 	DISK_IMAGE( "warfa", 0, SHA1(87f8a8878cd6be716dbd6c68fb1bc7f564ede484) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
@@ -2397,19 +2397,19 @@ ROM_START( tenthdeg )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "tenthdeg.bio", 0x000000, 0x80000, CRC(1cd2191b) SHA1(a40c48f3d6a9e2760cec809a79a35abe762da9ce) )
 
-	DISK_REGION( "drive_0" )	/* Guts 5/26/1998 Main 8/25/1998 */
+	DISK_REGION( "drive_0" )    /* Guts 5/26/1998 Main 8/25/1998 */
 	DISK_IMAGE( "tenthdeg", 0, SHA1(41a1a045a2d118cf6235be2cc40bf16dbb8be5d1) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "tenthdeg.snd", 0x000000, 0x8000, CRC(1c75c1c1) SHA1(02ac1419b0fd4acc3f39676e7dce879e926d998b) )
 ROM_END
 
 
 ROM_START( roadburn )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* EPROM 2.6 4/22/1999 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 2.6 4/22/1999 */
 	ROM_LOAD( "rbmain.bin", 0x000000, 0x80000, CRC(060e1aa8) SHA1(2a1027d209f87249fe143500e721dfde7fb5f3bc) )
 
-	DISK_REGION( "drive_0" )	/* Guts 4/22/1999 Game 4/22/1999 */
+	DISK_REGION( "drive_0" )    /* Guts 4/22/1999 Game 4/22/1999 */
 	DISK_IMAGE( "roadburn", 0, SHA1(a62870cceafa6357d7d3505aca250c3f16087566) )
 ROM_END
 
@@ -2421,7 +2421,7 @@ ROM_START( nbashowt )
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "nbashowt", 0, SHA1(f7c56bc3dcbebc434de58034986179ae01127f87) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
@@ -2434,7 +2434,7 @@ ROM_START( nbanfl )
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "nbanfl", 0, SHA1(f60c627f85f1bf58f2ea674063736a1e516e7e9e) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
@@ -2446,16 +2446,16 @@ ROM_START( cartfury )
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "cartfury", 0, SHA1(4c5bc2803297ea9a191bbd8b002d0e46b4ae1563) )
 
-	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2105 data */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2105 data */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
 
 ROM_START( sf2049 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* EPROM 1.02 7/9/1999 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.02 7/9/1999 */
 	ROM_LOAD( "sf2049.u27", 0x000000, 0x80000, CRC(174ba8fe) SHA1(baba83b811eca659f00514a008a86ef0ac9680ee) )
 
-	DISK_REGION( "drive_0" )	/* Guts 1.03 9/3/1999 Game 9/8/1999 */
+	DISK_REGION( "drive_0" )    /* Guts 1.03 9/3/1999 Game 9/8/1999 */
 	DISK_IMAGE( "sf2049", 0, SHA1(9e0661b8566a6c78d18c59c11cd3a6628d025405) )
 ROM_END
 
@@ -2499,10 +2499,10 @@ DRIVER_INIT_MEMBER(vegas_state,gauntleg)
 	init_common(machine(), MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015430, 0x8CC38060, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015464, 0x3C09801E, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8918, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8890, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015430, 0x8CC38060, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015464, 0x3C09801E, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8918, 0x8FA2004C, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8890, 0x8FA20024, 250);     /* confirmed */
 }
 
 
@@ -2512,10 +2512,10 @@ DRIVER_INIT_MEMBER(vegas_state,gauntdl)
 	init_common(machine(), MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158B8, 0x8CC3CC40, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158EC, 0x3C0C8022, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D40C0, 0x8FA2004C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D4038, 0x8FA20024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158B8, 0x8CC3CC40, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158EC, 0x3C0C8022, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D40C0, 0x8FA2004C, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D4038, 0x8FA20024, 250);     /* confirmed */
 }
 
 
@@ -2525,7 +2525,7 @@ DRIVER_INIT_MEMBER(vegas_state,warfa)
 	init_common(machine(), MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8009436C, 0x0C031663, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8009436C, 0x0C031663, 250);     /* confirmed */
 }
 
 
@@ -2535,16 +2535,16 @@ DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
 	init_common(machine(), MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80051CD8, 0x0C023C15, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8005E674, 0x3C028017, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8002DBCC, 0x8FA2002C, 250);		/* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015930, 0x8FC20244, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80051CD8, 0x0C023C15, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8005E674, 0x3C028017, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x8002DBCC, 0x8FA2002C, 250);     /* confirmed */
+	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015930, 0x8FC20244, 250);     /* confirmed */
 }
 
 
 DRIVER_INIT_MEMBER(vegas_state,roadburn)
 {
-	dcs2_init(machine(), 4, 0);	/* no place to hook :-( */
+	dcs2_init(machine(), 4, 0); /* no place to hook :-( */
 	init_common(machine(), MIDWAY_IOASIC_STANDARD, 325/* others? */);
 }
 

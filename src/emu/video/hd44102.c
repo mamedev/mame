@@ -19,19 +19,19 @@
 #define LOG 0
 
 
-#define CONTROL_DISPLAY_OFF			0x38
-#define CONTROL_DISPLAY_ON			0x39
-#define CONTROL_COUNT_DOWN_MODE		0x3a
-#define CONTROL_COUNT_UP_MODE		0x3b
-#define CONTROL_Y_ADDRESS_MASK		0x3f
-#define CONTROL_X_ADDRESS_MASK		0xc0
-#define CONTROL_DISPLAY_START_PAGE	0x3e
+#define CONTROL_DISPLAY_OFF         0x38
+#define CONTROL_DISPLAY_ON          0x39
+#define CONTROL_COUNT_DOWN_MODE     0x3a
+#define CONTROL_COUNT_UP_MODE       0x3b
+#define CONTROL_Y_ADDRESS_MASK      0x3f
+#define CONTROL_X_ADDRESS_MASK      0xc0
+#define CONTROL_DISPLAY_START_PAGE  0x3e
 
 
-#define STATUS_BUSY					0x80	/* not supported */
-#define STATUS_COUNT_UP				0x40
-#define STATUS_DISPLAY_OFF			0x20
-#define STATUS_RESET				0x10	/* not supported */
+#define STATUS_BUSY                 0x80    /* not supported */
+#define STATUS_COUNT_UP             0x40
+#define STATUS_DISPLAY_OFF          0x20
+#define STATUS_RESET                0x10    /* not supported */
 
 
 // device type definition
@@ -69,11 +69,11 @@ inline void hd44102_device::count_up_or_down()
 //-------------------------------------------------
 
 hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, HD44102, "HD44102", tag, owner, clock),
-	  m_cs2(0),
-	  m_page(0),
-	  m_x(0),
-	  m_y(0)
+	: device_t(mconfig, HD44102, "HD44102", tag, owner, clock),
+		m_cs2(0),
+		m_page(0),
+		m_x(0),
+		m_y(0)
 {
 }
 

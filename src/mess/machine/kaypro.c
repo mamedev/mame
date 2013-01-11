@@ -70,7 +70,7 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 	if (BIT(data, 1))
 		wd17xx_set_drive(m_fdc, 1);
 
-	output_set_value("ledA", BIT(data, 0));		/* LEDs in artwork */
+	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
 	output_set_value("ledB", BIT(data, 1));
 
 	/* CLEAR_LINE means to turn motors on */
@@ -101,32 +101,32 @@ const z80pio_interface kayproii_pio_g_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
-	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,         /* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL			/* portB ready active callback */
+	DEVCB_NULL          /* portB ready active callback */
 };
 
 const z80pio_interface kayproii_pio_s_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),	/* read printer status */
-	DEVCB_DRIVER_MEMBER(kaypro_state, kayproii_pio_system_w),	/* activate various internal devices */
-	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),    /* read printer status */
+	DEVCB_DRIVER_MEMBER(kaypro_state, kayproii_pio_system_w),   /* activate various internal devices */
+	DEVCB_NULL,         /* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL			/* portB ready active callback */
+	DEVCB_NULL          /* portB ready active callback */
 };
 
 const z80pio_interface kaypro4_pio_s_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),	/* read printer status */
-	DEVCB_DRIVER_MEMBER(kaypro_state, kaypro4_pio_system_w),	/* activate various internal devices */
-	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),    /* read printer status */
+	DEVCB_DRIVER_MEMBER(kaypro_state, kaypro4_pio_system_w),    /* activate various internal devices */
+	DEVCB_NULL,         /* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL			/* portB ready active callback */
+	DEVCB_NULL          /* portB ready active callback */
 };
 
 /***********************************************************
@@ -184,7 +184,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 	wd17xx_set_side(m_fdc, BIT(data, 2) ? 0 : 1);
 
-	output_set_value("ledA", BIT(data, 0));		/* LEDs in artwork */
+	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
 	output_set_value("ledB", BIT(data, 1));
 
 	/* CLEAR_LINE means to turn motors on */
@@ -227,12 +227,12 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 const z80sio_interface kaypro_sio_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(kaypro_state,kaypro_interrupt),	/* interrupt handler */
-	DEVCB_NULL,			/* DTR changed handler */
-	DEVCB_NULL,			/* RTS changed handler */
-	DEVCB_NULL,			/* BREAK changed handler */
-	DEVCB_NULL,			/* transmit handler - which channel is this for? */
-	DEVCB_NULL			/* receive handler - which channel is this for? */
+	DEVCB_DRIVER_LINE_MEMBER(kaypro_state,kaypro_interrupt),    /* interrupt handler */
+	DEVCB_NULL,         /* DTR changed handler */
+	DEVCB_NULL,         /* RTS changed handler */
+	DEVCB_NULL,         /* BREAK changed handler */
+	DEVCB_NULL,         /* transmit handler - which channel is this for? */
+	DEVCB_NULL          /* receive handler - which channel is this for? */
 };
 
 READ8_MEMBER(kaypro_state::kaypro_sio_r)
@@ -359,10 +359,10 @@ QUICKLOAD_LOAD( kayproii )
 		RAM[i+0x100] = data;
 	}
 
-	state->common_pio_system_w(space, 0, state->m_system_port & 0x7f);	// switch TPA in
-	RAM[0x80]=0;							// clear out command tail
+	state->common_pio_system_w(space, 0, state->m_system_port & 0x7f);  // switch TPA in
+	RAM[0x80]=0;                            // clear out command tail
 	RAM[0x81]=0;
-	state->m_maincpu->set_pc(0x100);				// start program
+	state->m_maincpu->set_pc(0x100);                // start program
 	return IMAGE_INIT_PASS;
 }
 

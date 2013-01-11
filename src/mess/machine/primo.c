@@ -49,19 +49,19 @@ static void primo_update_memory(running_machine &machine)
 	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	switch (state->m_port_FD & 0x03)
 	{
-		case 0x00:	/* Original ROM */
+		case 0x00:  /* Original ROM */
 			space.unmap_write(0x0000, 0x3fff);
 			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x10000);
 			break;
-		case 0x01:	/* EPROM extension 1 */
+		case 0x01:  /* EPROM extension 1 */
 			space.unmap_write(0x0000, 0x3fff);
 			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x14000);
 			break;
-		case 0x02:	/* RAM */
+		case 0x02:  /* RAM */
 			space.install_write_bank(0x0000, 0x3fff, "bank1");
 			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
 			break;
-		case 0x03:	/* EPROM extension 2 */
+		case 0x03:  /* EPROM extension 2 */
 			space.unmap_write(0x0000, 0x3fff);
 			state->membank("bank1")->set_base(state->memregion("maincpu")->base()+0x18000);
 			break;

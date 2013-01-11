@@ -35,21 +35,21 @@ const device_type UPD3301 = &device_creator<upd3301_device>;
 #define LOG 0
 
 
-#define COMMAND_MASK					0xe0
-#define COMMAND_RESET					0x00
-#define COMMAND_START_DISPLAY			0x20
-#define COMMAND_SET_INTERRUPT_MASK		0x40
-#define COMMAND_READ_LIGHT_PEN			0x60	// not supported
-#define COMMAND_LOAD_CURSOR_POSITION	0x80
-#define COMMAND_RESET_INTERRUPT			0xa0
-#define COMMAND_RESET_COUNTERS			0xc0	// not supported
+#define COMMAND_MASK                    0xe0
+#define COMMAND_RESET                   0x00
+#define COMMAND_START_DISPLAY           0x20
+#define COMMAND_SET_INTERRUPT_MASK      0x40
+#define COMMAND_READ_LIGHT_PEN          0x60    // not supported
+#define COMMAND_LOAD_CURSOR_POSITION    0x80
+#define COMMAND_RESET_INTERRUPT         0xa0
+#define COMMAND_RESET_COUNTERS          0xc0    // not supported
 
 
-#define STATUS_VE						0x10
-#define STATUS_U						0x08	// not supported
-#define STATUS_N						0x04	// not supported
-#define STATUS_E						0x02
-#define STATUS_LP						0x01	// not supported
+#define STATUS_VE                       0x10
+#define STATUS_U                        0x08    // not supported
+#define STATUS_N                        0x04    // not supported
+#define STATUS_E                        0x02
+#define STATUS_LP                       0x01    // not supported
 
 
 enum
@@ -193,17 +193,17 @@ inline void upd3301_device::recompute_parameters()
 //-------------------------------------------------
 
 upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock),
-	  m_status(0),
-	  m_param_count(0),
-	  m_data_fifo_pos(0),
-	  m_attr_fifo_pos(0),
-	  m_input_fifo(0),
-	  m_h(80),
-	  m_l(20),
-	  m_r(10),
-	  m_v(6),
-	  m_z(32)
+	: device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock),
+		m_status(0),
+		m_param_count(0),
+		m_data_fifo_pos(0),
+		m_attr_fifo_pos(0),
+		m_input_fifo(0),
+		m_h(80),
+		m_l(20),
+		m_r(10),
+		m_v(6),
+		m_z(32)
 {
 }
 

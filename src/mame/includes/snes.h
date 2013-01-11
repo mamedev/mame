@@ -21,11 +21,11 @@
     This is because 2 dots are "long" dots that last 6 MC ticks, resulting in 1 extra dot per line.
 */
 
-#define MCLK_NTSC	(21477272)	/* verified */
-#define MCLK_PAL	(21218370)	/* verified */
+#define MCLK_NTSC   (21477272)  /* verified */
+#define MCLK_PAL    (21218370)  /* verified */
 
-#define DOTCLK_NTSC	(MCLK_NTSC/4)
-#define DOTCLK_PAL	(MCLK_PAL/4)
+#define DOTCLK_NTSC (MCLK_NTSC/4)
+#define DOTCLK_PAL  (MCLK_PAL/4)
 
 #define SNES_LAYER_DEBUG  0
 
@@ -37,45 +37,45 @@
 
 /* Debug definitions */
 #ifdef MAME_DEBUG
-/* #define SNES_DBG_GENERAL*/		/* Display general debug info */
-/* #define SNES_DBG_VIDEO */		/* Display video debug info */
-/* #define SNES_DBG_DMA*/			/* Display DMA debug info */
-/* #define SNES_DBG_HDMA*/			/* Display HDMA debug info */
-/* #define SNES_DBG_REG_R*/			/* Display register read info */
-/* #define SNES_DBG_REG_W*/			/* Display register write info */
+/* #define SNES_DBG_GENERAL*/       /* Display general debug info */
+/* #define SNES_DBG_VIDEO */        /* Display video debug info */
+/* #define SNES_DBG_DMA*/           /* Display DMA debug info */
+/* #define SNES_DBG_HDMA*/          /* Display HDMA debug info */
+/* #define SNES_DBG_REG_R*/         /* Display register read info */
+/* #define SNES_DBG_REG_W*/         /* Display register write info */
 #endif /* MAME_DEBUG */
 
 /* Useful definitions */
-#define SNES_SCR_WIDTH        256		/* 32 characters 8 pixels wide */
-#define SNES_SCR_HEIGHT_NTSC  225		/* Can be 224 or 240 height */
-#define SNES_SCR_HEIGHT_PAL   240		/* ??? */
-#define SNES_VTOTAL_NTSC      262		/* Maximum number of lines for NTSC systems */
-#define SNES_VTOTAL_PAL       312		/* Maximum number of lines for PAL systems */
-#define SNES_HTOTAL           341		/* Maximum number pixels per line (incl. hblank) */
-#define SNES_DMA_BASE         0x4300	/* Base DMA register address */
-#define SNES_MODE_20          0x01		/* Lo-ROM cart */
-#define SNES_MODE_21          0x02		/* Hi-ROM cart */
-#define SNES_MODE_22          0x04		/* Extended Lo-ROM cart - SDD-1 */
-#define SNES_MODE_25          0x08		/* Extended Hi-ROM cart */
+#define SNES_SCR_WIDTH        256       /* 32 characters 8 pixels wide */
+#define SNES_SCR_HEIGHT_NTSC  225       /* Can be 224 or 240 height */
+#define SNES_SCR_HEIGHT_PAL   240       /* ??? */
+#define SNES_VTOTAL_NTSC      262       /* Maximum number of lines for NTSC systems */
+#define SNES_VTOTAL_PAL       312       /* Maximum number of lines for PAL systems */
+#define SNES_HTOTAL           341       /* Maximum number pixels per line (incl. hblank) */
+#define SNES_DMA_BASE         0x4300    /* Base DMA register address */
+#define SNES_MODE_20          0x01      /* Lo-ROM cart */
+#define SNES_MODE_21          0x02      /* Hi-ROM cart */
+#define SNES_MODE_22          0x04      /* Extended Lo-ROM cart - SDD-1 */
+#define SNES_MODE_25          0x08      /* Extended Hi-ROM cart */
 #define SNES_MODE_BSX         0x10
 #define SNES_MODE_BSLO        0x20
 #define SNES_MODE_BSHI        0x40
 #define SNES_MODE_ST          0x80
 #define SNES_NTSC             0x00
 #define SNES_PAL              0x10
-#define SNES_VRAM_SIZE        0x20000	/* 128kb of video ram */
-#define SNES_CGRAM_SIZE       0x202		/* 256 16-bit colours + 1 tacked on 16-bit colour for fixed colour */
-#define SNES_OAM_SIZE         0x440		/* 1088 bytes of Object Attribute Memory */
+#define SNES_VRAM_SIZE        0x20000   /* 128kb of video ram */
+#define SNES_CGRAM_SIZE       0x202     /* 256 16-bit colours + 1 tacked on 16-bit colour for fixed colour */
+#define SNES_OAM_SIZE         0x440     /* 1088 bytes of Object Attribute Memory */
 #define SNES_EXROM_START      0x1000000
-#define FIXED_COLOUR          256		/* Position in cgram for fixed colour */
+#define FIXED_COLOUR          256       /* Position in cgram for fixed colour */
 /* Definitions for PPU Memory-Mapped registers */
 #define INIDISP        0x2100
 #define OBSEL          0x2101
 #define OAMADDL        0x2102
 #define OAMADDH        0x2103
 #define OAMDATA        0x2104
-#define BGMODE         0x2105	/* abcdefff = abcd: bg4-1 tile size | e: BG3 high priority | f: mode */
-#define MOSAIC         0x2106	/* xxxxabcd = x: pixel size | abcd: affects bg 1-4 */
+#define BGMODE         0x2105   /* abcdefff = abcd: bg4-1 tile size | e: BG3 high priority | f: mode */
+#define MOSAIC         0x2106   /* xxxxabcd = x: pixel size | abcd: affects bg 1-4 */
 #define BG1SC          0x2107
 #define BG2SC          0x2108
 #define BG3SC          0x2109
@@ -90,16 +90,16 @@
 #define BG3VOFS        0x2112
 #define BG4HOFS        0x2113
 #define BG4VOFS        0x2114
-#define VMAIN          0x2115	/* i---ffrr = i: Increment timing | f: Full graphic | r: increment rate */
-#define VMADDL         0x2116	/* aaaaaaaa = a: LSB of vram address */
-#define VMADDH         0x2117	/* aaaaaaaa = a: MSB of vram address */
-#define VMDATAL        0x2118	/* dddddddd = d: data to be written */
-#define VMDATAH        0x2119	/* dddddddd = d: data to be written */
-#define M7SEL          0x211A	/* ab----yx = a: screen over | y: vertical flip | x: horizontal flip */
-#define M7A            0x211B	/* aaaaaaaa = a: COSINE rotate angle / X expansion */
-#define M7B            0x211C	/* aaaaaaaa = a: SINE rotate angle / X expansion */
-#define M7C            0x211D	/* aaaaaaaa = a: SINE rotate angle / Y expansion */
-#define M7D            0x211E	/* aaaaaaaa = a: COSINE rotate angle / Y expansion */
+#define VMAIN          0x2115   /* i---ffrr = i: Increment timing | f: Full graphic | r: increment rate */
+#define VMADDL         0x2116   /* aaaaaaaa = a: LSB of vram address */
+#define VMADDH         0x2117   /* aaaaaaaa = a: MSB of vram address */
+#define VMDATAL        0x2118   /* dddddddd = d: data to be written */
+#define VMDATAH        0x2119   /* dddddddd = d: data to be written */
+#define M7SEL          0x211A   /* ab----yx = a: screen over | y: vertical flip | x: horizontal flip */
+#define M7A            0x211B   /* aaaaaaaa = a: COSINE rotate angle / X expansion */
+#define M7B            0x211C   /* aaaaaaaa = a: SINE rotate angle / X expansion */
+#define M7C            0x211D   /* aaaaaaaa = a: SINE rotate angle / Y expansion */
+#define M7D            0x211E   /* aaaaaaaa = a: COSINE rotate angle / Y expansion */
 #define M7X            0x211F
 #define M7Y            0x2120
 #define CGADD          0x2121
@@ -107,12 +107,12 @@
 #define W12SEL         0x2123
 #define W34SEL         0x2124
 #define WOBJSEL        0x2125
-#define WH0            0x2126	/* pppppppp = p: Left position of window 1 */
-#define WH1            0x2127	/* pppppppp = p: Right position of window 1 */
-#define WH2            0x2128	/* pppppppp = p: Left position of window 2 */
-#define WH3            0x2129	/* pppppppp = p: Right position of window 2 */
-#define WBGLOG         0x212A	/* aabbccdd = a: BG4 params | b: BG3 params | c: BG2 params | d: BG1 params */
-#define WOBJLOG        0x212B	/* ----ccoo = c: Colour window params | o: Object window params */
+#define WH0            0x2126   /* pppppppp = p: Left position of window 1 */
+#define WH1            0x2127   /* pppppppp = p: Right position of window 1 */
+#define WH2            0x2128   /* pppppppp = p: Left position of window 2 */
+#define WH3            0x2129   /* pppppppp = p: Right position of window 2 */
+#define WBGLOG         0x212A   /* aabbccdd = a: BG4 params | b: BG3 params | c: BG2 params | d: BG1 params */
+#define WOBJLOG        0x212B   /* ----ccoo = c: Colour window params | o: Object window params */
 #define TM             0x212C
 #define TS             0x212D
 #define TMW            0x212E
@@ -264,117 +264,117 @@
 #define A2A7H          0x4379
 #define NTRL7          0x437A
 /* Definitions for sound DSP */
-#define DSP_V0_VOLL		0x00
-#define DSP_V0_VOLR		0x01
-#define DSP_V0_PITCHL	0x02
-#define DSP_V0_PITCHH	0x03
-#define DSP_V0_SRCN		0x04
-#define DSP_V0_ADSR1	0x05	/* gdddaaaa = g:gain enable | d:decay | a:attack */
-#define DSP_V0_ADSR2	0x06	/* llllrrrr = l:sustain left | r:sustain right */
-#define DSP_V0_GAIN		0x07
-#define DSP_V0_ENVX		0x08
-#define DSP_V0_OUTX		0x09
-#define DSP_V1_VOLL		0x10
-#define DSP_V1_VOLR		0x11
-#define DSP_V1_PITCHL	0x12
-#define DSP_V1_PITCHH	0x13
-#define DSP_V1_SRCN		0x14
-#define DSP_V1_ADSR1	0x15
-#define DSP_V1_ADSR2	0x16
-#define DSP_V1_GAIN		0x17
-#define DSP_V1_ENVX		0x18
-#define DSP_V1_OUTX		0x19
-#define DSP_V2_VOLL		0x20
-#define DSP_V2_VOLR		0x21
-#define DSP_V2_PITCHL	0x22
-#define DSP_V2_PITCHH	0x23
-#define DSP_V2_SRCN		0x24
-#define DSP_V2_ADSR1	0x25
-#define DSP_V2_ADSR2	0x26
-#define DSP_V2_GAIN		0x27
-#define DSP_V2_ENVX		0x28
-#define DSP_V2_OUTX		0x29
-#define DSP_V3_VOLL		0x30
-#define DSP_V3_VOLR		0x31
-#define DSP_V3_PITCHL	0x32
-#define DSP_V3_PITCHH	0x33
-#define DSP_V3_SRCN		0x34
-#define DSP_V3_ADSR1	0x35
-#define DSP_V3_ADSR2	0x36
-#define DSP_V3_GAIN		0x37
-#define DSP_V3_ENVX		0x38
-#define DSP_V3_OUTX		0x39
-#define DSP_V4_VOLL		0x40
-#define DSP_V4_VOLR		0x41
-#define DSP_V4_PITCHL	0x42
-#define DSP_V4_PITCHH	0x43
-#define DSP_V4_SRCN		0x44
-#define DSP_V4_ADSR1	0x45
-#define DSP_V4_ADSR2	0x46
-#define DSP_V4_GAIN		0x47
-#define DSP_V4_ENVX		0x48
-#define DSP_V4_OUTX		0x49
-#define DSP_V5_VOLL		0x50
-#define DSP_V5_VOLR		0x51
-#define DSP_V5_PITCHL	0x52
-#define DSP_V5_PITCHH	0x53
-#define DSP_V5_SRCN		0x54
-#define DSP_V5_ADSR1	0x55
-#define DSP_V5_ADSR2	0x56
-#define DSP_V5_GAIN		0x57
-#define DSP_V5_ENVX		0x58
-#define DSP_V5_OUTX		0x59
-#define DSP_V6_VOLL		0x60
-#define DSP_V6_VOLR		0x61
-#define DSP_V6_PITCHL	0x62
-#define DSP_V6_PITCHH	0x63
-#define DSP_V6_SRCN		0x64
-#define DSP_V6_ADSR1	0x65
-#define DSP_V6_ADSR2	0x66
-#define DSP_V6_GAIN		0x67
-#define DSP_V6_ENVX		0x68
-#define DSP_V6_OUTX		0x69
-#define DSP_V7_VOLL		0x70
-#define DSP_V7_VOLR		0x71
-#define DSP_V7_PITCHL	0x72
-#define DSP_V7_PITCHH	0x73
-#define DSP_V7_SRCN		0x74
-#define DSP_V7_ADSR1	0x75
-#define DSP_V7_ADSR2	0x76
-#define DSP_V7_GAIN		0x77
-#define DSP_V7_ENVX		0x78
-#define DSP_V7_OUTX		0x79
-#define DSP_MVOLL		0x0C
-#define DSP_MVOLR		0x1C
-#define DSP_EVOLL		0x2C
-#define DSP_EVOLR		0x3C
-#define DSP_KON			0x4C	/* 01234567 = Key on for voices 0-7 */
-#define DSP_KOF			0x5C	/* 01234567 = Key off for voices 0-7 */
-#define DSP_FLG			0x6C	/* rme--n-- = r:Soft reset | m:Mute | e:External memory through echo | n:Clock of noise generator */
-#define DSP_ENDX		0x7C
-#define DSP_EFB			0x0D	/* sfffffff = s: sign bit | f: feedback */
-#define DSP_PMOD		0x2D
-#define DSP_NON			0x3D
-#define DSP_EON			0x4D
-#define DSP_DIR			0x5D
-#define DSP_ESA			0x6D
-#define DSP_EDL			0x7D	/* ----dddd = d: echo delay */
-#define DSP_FIR_C0		0x0F
-#define DSP_FIR_C1		0x1F
-#define DSP_FIR_C2		0x2F
-#define DSP_FIR_C3		0x3F
-#define DSP_FIR_C4		0x4F
-#define DSP_FIR_C5		0x5F
-#define DSP_FIR_C6		0x6F
-#define DSP_FIR_C7		0x7F
+#define DSP_V0_VOLL     0x00
+#define DSP_V0_VOLR     0x01
+#define DSP_V0_PITCHL   0x02
+#define DSP_V0_PITCHH   0x03
+#define DSP_V0_SRCN     0x04
+#define DSP_V0_ADSR1    0x05    /* gdddaaaa = g:gain enable | d:decay | a:attack */
+#define DSP_V0_ADSR2    0x06    /* llllrrrr = l:sustain left | r:sustain right */
+#define DSP_V0_GAIN     0x07
+#define DSP_V0_ENVX     0x08
+#define DSP_V0_OUTX     0x09
+#define DSP_V1_VOLL     0x10
+#define DSP_V1_VOLR     0x11
+#define DSP_V1_PITCHL   0x12
+#define DSP_V1_PITCHH   0x13
+#define DSP_V1_SRCN     0x14
+#define DSP_V1_ADSR1    0x15
+#define DSP_V1_ADSR2    0x16
+#define DSP_V1_GAIN     0x17
+#define DSP_V1_ENVX     0x18
+#define DSP_V1_OUTX     0x19
+#define DSP_V2_VOLL     0x20
+#define DSP_V2_VOLR     0x21
+#define DSP_V2_PITCHL   0x22
+#define DSP_V2_PITCHH   0x23
+#define DSP_V2_SRCN     0x24
+#define DSP_V2_ADSR1    0x25
+#define DSP_V2_ADSR2    0x26
+#define DSP_V2_GAIN     0x27
+#define DSP_V2_ENVX     0x28
+#define DSP_V2_OUTX     0x29
+#define DSP_V3_VOLL     0x30
+#define DSP_V3_VOLR     0x31
+#define DSP_V3_PITCHL   0x32
+#define DSP_V3_PITCHH   0x33
+#define DSP_V3_SRCN     0x34
+#define DSP_V3_ADSR1    0x35
+#define DSP_V3_ADSR2    0x36
+#define DSP_V3_GAIN     0x37
+#define DSP_V3_ENVX     0x38
+#define DSP_V3_OUTX     0x39
+#define DSP_V4_VOLL     0x40
+#define DSP_V4_VOLR     0x41
+#define DSP_V4_PITCHL   0x42
+#define DSP_V4_PITCHH   0x43
+#define DSP_V4_SRCN     0x44
+#define DSP_V4_ADSR1    0x45
+#define DSP_V4_ADSR2    0x46
+#define DSP_V4_GAIN     0x47
+#define DSP_V4_ENVX     0x48
+#define DSP_V4_OUTX     0x49
+#define DSP_V5_VOLL     0x50
+#define DSP_V5_VOLR     0x51
+#define DSP_V5_PITCHL   0x52
+#define DSP_V5_PITCHH   0x53
+#define DSP_V5_SRCN     0x54
+#define DSP_V5_ADSR1    0x55
+#define DSP_V5_ADSR2    0x56
+#define DSP_V5_GAIN     0x57
+#define DSP_V5_ENVX     0x58
+#define DSP_V5_OUTX     0x59
+#define DSP_V6_VOLL     0x60
+#define DSP_V6_VOLR     0x61
+#define DSP_V6_PITCHL   0x62
+#define DSP_V6_PITCHH   0x63
+#define DSP_V6_SRCN     0x64
+#define DSP_V6_ADSR1    0x65
+#define DSP_V6_ADSR2    0x66
+#define DSP_V6_GAIN     0x67
+#define DSP_V6_ENVX     0x68
+#define DSP_V6_OUTX     0x69
+#define DSP_V7_VOLL     0x70
+#define DSP_V7_VOLR     0x71
+#define DSP_V7_PITCHL   0x72
+#define DSP_V7_PITCHH   0x73
+#define DSP_V7_SRCN     0x74
+#define DSP_V7_ADSR1    0x75
+#define DSP_V7_ADSR2    0x76
+#define DSP_V7_GAIN     0x77
+#define DSP_V7_ENVX     0x78
+#define DSP_V7_OUTX     0x79
+#define DSP_MVOLL       0x0C
+#define DSP_MVOLR       0x1C
+#define DSP_EVOLL       0x2C
+#define DSP_EVOLR       0x3C
+#define DSP_KON         0x4C    /* 01234567 = Key on for voices 0-7 */
+#define DSP_KOF         0x5C    /* 01234567 = Key off for voices 0-7 */
+#define DSP_FLG         0x6C    /* rme--n-- = r:Soft reset | m:Mute | e:External memory through echo | n:Clock of noise generator */
+#define DSP_ENDX        0x7C
+#define DSP_EFB         0x0D    /* sfffffff = s: sign bit | f: feedback */
+#define DSP_PMOD        0x2D
+#define DSP_NON         0x3D
+#define DSP_EON         0x4D
+#define DSP_DIR         0x5D
+#define DSP_ESA         0x6D
+#define DSP_EDL         0x7D    /* ----dddd = d: echo delay */
+#define DSP_FIR_C0      0x0F
+#define DSP_FIR_C1      0x1F
+#define DSP_FIR_C2      0x2F
+#define DSP_FIR_C3      0x3F
+#define DSP_FIR_C4      0x4F
+#define DSP_FIR_C5      0x5F
+#define DSP_FIR_C6      0x6F
+#define DSP_FIR_C7      0x7F
 
 struct snes_cart_info
 {
-	UINT8  mode;		/* ROM memory mode */
-	UINT32 sram;		/* Amount of sram in cart */
-	UINT32 sram_max;	/* Maximum amount sram in cart (based on ROM mode) */
+	UINT8  mode;        /* ROM memory mode */
+	UINT32 sram;        /* Amount of sram in cart */
+	UINT32 sram_max;    /* Maximum amount sram in cart (based on ROM mode) */
 	int    small_sram;
-	int    slot_in_use;	/* this is needed by Sufami Turbo slots (to check if SRAM has to be saved) */
+	int    slot_in_use; /* this is needed by Sufami Turbo slots (to check if SRAM has to be saved) */
 };
 
 struct snes_joypad
@@ -410,9 +410,9 @@ public:
 
 
 	/* misc */
-	UINT16                m_htmult;		/* in 512 wide, we run HTOTAL double and halve it on latching */
-	UINT16                m_cgram_address;	/* CGRAM address */
-	UINT8                 m_vram_read_offset;	/* VRAM read offset */
+	UINT16                m_htmult;     /* in 512 wide, we run HTOTAL double and halve it on latching */
+	UINT16                m_cgram_address;  /* CGRAM address */
+	UINT8                 m_vram_read_offset;   /* VRAM read offset */
 	UINT8                 m_read_ophct;
 	UINT8                 m_read_opvct;
 	UINT16                m_hblank_offset;
@@ -429,8 +429,8 @@ public:
 
 	/* non-SNES HW-specific flags / variables */
 	UINT8                 m_is_nss;
-	UINT8				  m_input_disabled;
-	UINT8				  m_game_over_flag;
+	UINT8                 m_input_disabled;
+	UINT8                 m_game_over_flag;
 	UINT8                 m_joy_flag;
 	UINT8                 m_is_sfcbox;
 
@@ -459,9 +459,9 @@ public:
 
 		int    do_transfer;
 
-		int    dma_disabled;	// used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
+		int    dma_disabled;    // used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
 	}m_dma_channel[8];
-	UINT8                 m_hdmaen;	/* channels enabled for HDMA */
+	UINT8                 m_hdmaen; /* channels enabled for HDMA */
 
 	/* input-related */
 	UINT8                 m_joy1l;
@@ -487,7 +487,7 @@ public:
 	/* cart related */
 	UINT8 m_has_addon_chip;
 	UINT32 m_cart_size;
-	snes_cart_info m_cart[2];	// the second one is used by MESS for Sufami Turbo and, eventually, BS-X
+	snes_cart_info m_cart[2];   // the second one is used by MESS for Sufami Turbo and, eventually, BS-X
 
 	/* devices */
 	_5a22_device *m_maincpu;
@@ -540,9 +540,9 @@ public:
 	DECLARE_WRITE8_MEMBER( snes_cgram_write );
 	DECLARE_READ8_MEMBER( snes_vram_read );
 	DECLARE_WRITE8_MEMBER( snes_vram_write );
-	UINT16 *m_snes_oam;		/* Object Attribute Memory */
-	UINT16 *m_snes_cgram;	/* Palette RAM */
-	UINT8  *m_snes_vram;	/* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
+	UINT16 *m_snes_oam;     /* Object Attribute Memory */
+	UINT16 *m_snes_cgram;   /* Palette RAM */
+	UINT8  *m_snes_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
 
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
@@ -629,11 +629,11 @@ extern DECLARE_WRITE8_HANDLER( superfx_w_bank1 );
 extern DECLARE_WRITE8_HANDLER( superfx_w_bank2 );
 extern DECLARE_WRITE8_HANDLER( superfx_w_bank3 );
 
-extern UINT8  *snes_ram;			/* Main memory */
+extern UINT8  *snes_ram;            /* Main memory */
 
 
 /* (PPU) Video related */
-struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
+struct SNES_PPU_STRUCT  /* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
 {
 	struct
 	{
@@ -649,7 +649,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 		UINT8 tilemap_size;
 
 		UINT8 tile_size;
-		UINT8 mosaic_enabled;	// actually used only for layers 0->3!
+		UINT8 mosaic_enabled;   // actually used only for layers 0->3!
 
 		UINT8 main_window_enabled;
 		UINT8 sub_window_enabled;
@@ -658,7 +658,7 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 
 		UINT16 hoffs;
 		UINT16 voffs;
-	} layer[6];	// this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
+	} layer[6]; // this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
 
 	struct
 	{
@@ -716,9 +716,9 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 sub_add_mode;
 	UINT8 bg3_priority_bit;
 	UINT8 direct_color;
-	UINT8 ppu_last_scroll;		/* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
+	UINT8 ppu_last_scroll;      /* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
                                     'previous' scroll value */
-	UINT8 mode7_last_scroll;	/* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
+	UINT8 mode7_last_scroll;    /* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
 
 	UINT8 ppu1_open_bus, ppu2_open_bus;
 	UINT8 ppu1_version, ppu2_version;

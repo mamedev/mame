@@ -15,11 +15,11 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6510T_TAG		"u2"
-#define M6523_0_TAG		"u3"
-#define M6523_1_TAG		"ci_u2"
-#define C64H156_TAG		"u6"
-#define PLA_TAG			"u1"
+#define M6510T_TAG      "u2"
+#define M6523_0_TAG     "u3"
+#define M6523_1_TAG     "ci_u2"
+#define C64H156_TAG     "u6"
+#define PLA_TAG         "u1"
 
 
 enum
@@ -68,18 +68,18 @@ READ8_MEMBER( c1551_device::port_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0
-        P1
-        P2
-        P3
-        P4      WPS
-        P5
-        P6
-        P7      BYTE LTCHED
+	    P0
+	    P1
+	    P2
+	    P3
+	    P4      WPS
+	    P5
+	    P6
+	    P7      BYTE LTCHED
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -96,18 +96,18 @@ WRITE8_MEMBER( c1551_device::port_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      STP0A
-        P1      STP0B
-        P2      MTR0
-        P3      ACT0
-        P4
-        P5      DS0
-        P6      DS1
-        P7
+	    P0      STP0A
+	    P1      STP0B
+	    P2      MTR0
+	    P3      ACT0
+	    P4
+	    P5      DS0
+	    P6      DS1
+	    P7
 
-    */
+	*/
 
 	// stepper motor
 	m_ga->stp_w(data & 0x03);
@@ -130,18 +130,18 @@ READ8_MEMBER( c1551_device::tcbm_data_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     TCBM PA0
-        PA1     TCBM PA1
-        PA2     TCBM PA2
-        PA3     TCBM PA3
-        PA4     TCBM PA4
-        PA5     TCBM PA5
-        PA6     TCBM PA6
-        PA7     TCBM PA7
+	    PA0     TCBM PA0
+	    PA1     TCBM PA1
+	    PA2     TCBM PA2
+	    PA3     TCBM PA3
+	    PA4     TCBM PA4
+	    PA5     TCBM PA5
+	    PA6     TCBM PA6
+	    PA7     TCBM PA7
 
-    */
+	*/
 
 	return m_tcbm_data;
 }
@@ -150,18 +150,18 @@ WRITE8_MEMBER( c1551_device::tcbm_data_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     TCBM PA0
-        PA1     TCBM PA1
-        PA2     TCBM PA2
-        PA3     TCBM PA3
-        PA4     TCBM PA4
-        PA5     TCBM PA5
-        PA6     TCBM PA6
-        PA7     TCBM PA7
+	    PA0     TCBM PA0
+	    PA1     TCBM PA1
+	    PA2     TCBM PA2
+	    PA3     TCBM PA3
+	    PA4     TCBM PA4
+	    PA5     TCBM PA5
+	    PA6     TCBM PA6
+	    PA7     TCBM PA7
 
-    */
+	*/
 
 	m_tcbm_data = data;
 }
@@ -169,7 +169,7 @@ WRITE8_MEMBER( c1551_device::tcbm_data_w )
 READ8_MEMBER( c1551_device::tpi0_r )
 {
 	UINT8 data = m_tpi0->read(space, offset);
-	
+
 	m_ga->ted_w(0);
 	m_ga->ted_w(1);
 
@@ -188,18 +188,18 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0
-        PC1
-        PC2
-        PC3
-        PC4
-        PC5     JP1
-        PC6     _SYNC
-        PC7     TCBM DAV
+	    PC0
+	    PC1
+	    PC2
+	    PC3
+	    PC4
+	    PC5     JP1
+	    PC6     _SYNC
+	    PC7     TCBM DAV
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -219,18 +219,18 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0     TCBM STATUS0
-        PC1     TCBM STATUS1
-        PC2     TCBM DEV
-        PC3     TCBM ACK
-        PC4     MODE
-        PC5
-        PC6
-        PC7
+	    PC0     TCBM STATUS0
+	    PC1     TCBM STATUS1
+	    PC2     TCBM DEV
+	    PC3     TCBM ACK
+	    PC4     MODE
+	    PC5
+	    PC6
+	    PC7
 
-    */
+	*/
 
 	// TCBM status
 	m_status = data & 0x03;
@@ -267,18 +267,18 @@ READ8_MEMBER( c1551_device::tpi1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     STATUS0
-        PB1     STATUS1
-        PB2
-        PB3
-        PB4
-        PB5
-        PB6
-        PB7
+	    PB0     STATUS0
+	    PB1     STATUS1
+	    PB2
+	    PB3
+	    PB4
+	    PB5
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	return m_status & 0x03;
 }
@@ -287,18 +287,18 @@ READ8_MEMBER( c1551_device::tpi1_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0
-        PC1
-        PC2
-        PC3
-        PC4
-        PC5
-        PC6
-        PC7     TCBM ACK
+	    PC0
+	    PC1
+	    PC2
+	    PC3
+	    PC4
+	    PC5
+	    PC6
+	    PC7     TCBM ACK
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -312,18 +312,18 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0
-        PC1
-        PC2
-        PC3
-        PC4
-        PC5
-        PC6     TCBM DAV
-        PC7
+	    PC0
+	    PC1
+	    PC2
+	    PC3
+	    PC4
+	    PC5
+	    PC6     TCBM DAV
+	    PC7
 
-    */
+	*/
 
 	// TCBM data valid
 	m_dav = BIT(data, 6);
@@ -463,21 +463,21 @@ ioport_constructor c1551_device::device_input_ports() const
 //-------------------------------------------------
 
 c1551_device::c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, C1551, "C1551", tag, owner, clock),
-      device_plus4_expansion_card_interface(mconfig, *this),
-	  m_maincpu(*this, M6510T_TAG),
-	  m_tpi0(*this, M6523_0_TAG),
-	  m_tpi1(*this, M6523_1_TAG),
-	  m_ga(*this, C64H156_TAG),
-	  m_pla(*this, PLA_TAG),
-	  m_image(*this, FLOPPY_0),
-	  m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
-	  m_jp1(*this, "JP1"),
-	  m_tcbm_data(0xff),
-	  m_status(1),
-	  m_dav(1),
-	  m_ack(1),
-	  m_dev(0)
+	: device_t(mconfig, C1551, "C1551", tag, owner, clock),
+		device_plus4_expansion_card_interface(mconfig, *this),
+		m_maincpu(*this, M6510T_TAG),
+		m_tpi0(*this, M6523_0_TAG),
+		m_tpi1(*this, M6523_1_TAG),
+		m_ga(*this, C64H156_TAG),
+		m_pla(*this, PLA_TAG),
+		m_image(*this, FLOPPY_0),
+		m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
+		m_jp1(*this, "JP1"),
+		m_tcbm_data(0xff),
+		m_status(1),
+		m_dav(1),
+		m_ack(1),
+		m_dev(0)
 {
 }
 

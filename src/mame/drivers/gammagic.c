@@ -42,11 +42,11 @@ Additional CD-ROM games: "99 Bottles of Beer"
 #include "machine/pckeybrd.h"
 #include "video/pc_vga.h"
 
-#define ATAPI_CYCLES_PER_SECTOR (5000)	// plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
+#define ATAPI_CYCLES_PER_SECTOR (5000)  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
 #define ATAPI_ERRFEAT_ABRT 0x04
 
-#define ATAPI_STAT_BSY	   0x80
+#define ATAPI_STAT_BSY     0x80
 #define ATAPI_STAT_DRDY    0x40
 #define ATAPI_STAT_DMARDDF 0x20
 #define ATAPI_STAT_SERVDSC 0x10
@@ -58,14 +58,14 @@ Additional CD-ROM games: "99 Bottles of Beer"
 #define ATAPI_INTREASON_IO      0x02
 #define ATAPI_INTREASON_RELEASE 0x04
 
-#define ATAPI_REG_DATA		0
-#define ATAPI_REG_ERRFEAT	1
-#define ATAPI_REG_INTREASON	2
-#define ATAPI_REG_SAMTAG	3
-#define ATAPI_REG_COUNTLOW	4
-#define ATAPI_REG_COUNTHIGH	5
-#define ATAPI_REG_DRIVESEL	6
-#define ATAPI_REG_CMDSTATUS	7
+#define ATAPI_REG_DATA      0
+#define ATAPI_REG_ERRFEAT   1
+#define ATAPI_REG_INTREASON 2
+#define ATAPI_REG_SAMTAG    3
+#define ATAPI_REG_COUNTLOW  4
+#define ATAPI_REG_COUNTHIGH 5
+#define ATAPI_REG_DRIVESEL  6
+#define ATAPI_REG_CMDSTATUS 7
 #define ATAPI_REG_MAX 16
 
 #define ATAPI_DATA_SIZE ( 64 * 1024 )
@@ -77,17 +77,17 @@ class gammagic_state : public driver_device
 public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		  { }
+			{ }
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 
-	device_t	*m_pit8254;
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
-	device_t	*m_dma8237_1;
-	device_t	*m_dma8237_2;
+	device_t    *m_pit8254;
+	device_t    *m_pic8259_1;
+	device_t    *m_pic8259_2;
+	device_t    *m_dma8237_1;
+	device_t    *m_dma8237_2;
 
 	emu_timer *m_atapi_timer;
 	//SCSIInstance *m_inserted_cdrom;
@@ -579,7 +579,7 @@ ADDRESS_MAP_END
 #if 1
 static INPUT_PORTS_START( gammagic )
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
@@ -609,13 +609,13 @@ static INPUT_PORTS_START( gammagic )
 	AT_KEYB_HELPER( 0x0001, "KP 2(DN)",     KEYCODE_2_PAD       ) /* Keypad 2  (Down arrow)      50  D0 */
 
 	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",		KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    	KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",        KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",                      KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 
@@ -727,15 +727,15 @@ static const struct pit8253_config gammagic_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -843,4 +843,3 @@ ROM_END
 /*     YEAR NAME       PARENT    MACHINE   INPUT     INIT       ROT   COMPANY             FULLNAME              FLAGS           */
 GAME( 1999,  gammagic, 0,        gammagic, gammagic, gammagic_state, gammagic , ROT0, "Bally Gaming Co.", "Game Magic",         GAME_IS_SKELETON )
 GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, gammagic , ROT0, "Bally Gaming Co.", "99 Bottles of Beer", GAME_IS_SKELETON )
-

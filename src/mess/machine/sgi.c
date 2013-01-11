@@ -505,7 +505,7 @@ void sgi_mc_init(running_machine &machine)
 	// if Indigo2, ID appropriately
 	if (!strcmp(machine.system().name, "ip244415"))
 	{
-		pMC->nSysID = 0x11;	// rev. B MC, EISA bus present
+		pMC->nSysID = 0x11; // rev. B MC, EISA bus present
 	}
 
 	sgi_mc_timer_init(machine);

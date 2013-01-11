@@ -248,37 +248,37 @@ static INPUT_PORTS_START( gberet )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30K, 70K, Every 70K" )
-	PORT_DIPSETTING(    0x10, "40K, 80K, Every 80K" )	// Japanese default
-	PORT_DIPSETTING(    0x08, "50K, 100K, Every 100K" )	// US default
+	PORT_DIPSETTING(    0x10, "40K, 80K, Every 80K" )   // Japanese default
+	PORT_DIPSETTING(    0x08, "50K, 100K, Every 100K" ) // US default
 	PORT_DIPSETTING(    0x00, "50K, 200K, Every 200K" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )        /* Listed as "Unused" */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gberetb )
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( mrgoemon )
 	PORT_INCLUDE(gberet)
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20K, Every 60K" )
 	PORT_DIPSETTING(    0x10, "30K, Every 70K" )
 	PORT_DIPSETTING(    0x08, "40K, Every 80K" )
@@ -321,50 +321,50 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the four bitplanes are packed in one nibble */
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	4,      /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every char takes 8 consecutive bytes */
+	32*8    /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	512,	/* 512 sprites */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the four bitplanes are packed in one nibble */
+	16,16,  /* 16*16 sprites */
+	512,    /* 512 sprites */
+	4,      /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
 		32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 		64*8+0*32, 64*8+1*32, 64*8+2*32, 64*8+3*32, 64*8+4*32, 64*8+5*32, 64*8+6*32, 64*8+7*32 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout gberetb_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	4,		/* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the four bitplanes are packed in one nibble */
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	4,      /* 4 bits per pixel */
+	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
 	{ 6*4, 7*4, 0*4, 1*4, 2*4, 3*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every char takes 8 consecutive bytes */
+	32*8    /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout gberetb_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	512,	/* 512 sprites */
-	4,		/* 4 bits per pixel */
+	16,16,  /* 16*16 sprites */
+	512,    /* 512 sprites */
+	4,      /* 4 bits per pixel */
 	{ 0*0x4000*8, 1*0x4000*8, 2*0x4000*8, 3*0x4000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( gberet )
@@ -391,7 +391,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -420,7 +420,7 @@ MACHINE_RESET_MEMBER(gberet_state,gberet)
 static MACHINE_CONFIG_START( gberet, gberet_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)		// X1S (generated by a custom IC)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)      // X1S (generated by a custom IC)
 	MCFG_CPU_PROGRAM_MAP(gberet_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gberet_state, gberet_interrupt_tick, "screen", 0, 16)
 
@@ -497,7 +497,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( gberet )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// 64k for code
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 64k for code
 	ROM_LOAD( "577l03.10c",   0x0000, 0x4000, CRC(ae29e4ff) SHA1(5c66de1403c5df5b6647bb37e26070ffd33590e8) )
 	ROM_LOAD( "577l02.8c",    0x4000, 0x4000, CRC(240836a5) SHA1(b76f3789f152198bf8a9a366378d664e683c6c9d) )
 	ROM_LOAD( "577l01.7c",    0x8000, 0x4000, CRC(41fa3e1f) SHA1(90d1463e16b0f52c01078be044ce3672d4acebff) )
@@ -518,7 +518,7 @@ ROM_START( gberet )
 ROM_END
 
 ROM_START( rushatck )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// 64k for code
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 64k for code
 	ROM_LOAD( "577h03.10c",   0x0000, 0x4000, CRC(4d276b52) SHA1(ba5d61c89fd2db4b303b81deccc887561156cbe3) )
 	ROM_LOAD( "577h02.8c",    0x4000, 0x4000, CRC(b5802806) SHA1(0e4698ecfb9eda916703165ea5d55516fdef5fe4) )
 	ROM_LOAD( "577h01.7c",    0x8000, 0x4000, CRC(da7c8f3d) SHA1(eb61eedee169f67db93407ad0fe8a195089b7e3a) )
@@ -539,7 +539,7 @@ ROM_START( rushatck )
 ROM_END
 
 ROM_START( gberetb )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// 64k for code
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 64k for code
 	ROM_LOAD( "2-ic82.10g",   0x0000, 0x8000, CRC(6d6fb494) SHA1(0d01c86ed7a8962ee3e1056a8d41584ad1406f0f) )
 	ROM_LOAD( "3-ic81.10f",   0x8000, 0x4000, CRC(f1520a0a) SHA1(227b2d2e1fc0e81ae02e663a3089e7399612e3cf) )
 
@@ -562,7 +562,7 @@ ROM_START( gberetb )
 ROM_END
 
 ROM_START( mrgoemon )
-	ROM_REGION( 0x14000, "maincpu", 0 )	// 64k for code + banked ROM
+	ROM_REGION( 0x14000, "maincpu", 0 ) // 64k for code + banked ROM
 	ROM_LOAD( "621d01.10c",   0x00000, 0x8000, CRC(b2219c56) SHA1(274160be5dabbbfa61af71d92bddffbb56eadab6) )
 	ROM_LOAD( "621d02.12c",   0x08000, 0x4000, CRC(c3337a97) SHA1(6fd5f365b2624a37f252c202cd97877705b4a6c2) )
 	ROM_CONTINUE(             0x10000, 0x4000 )

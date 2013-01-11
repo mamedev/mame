@@ -15,17 +15,17 @@ class taitof2_state : public driver_device
 public:
 	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_sprite_extension(*this, "sprite_ext"),
-		  m_spriteram(*this, "spriteram"),
-		  m_cchip2_ram(*this, "cchip2_ram"),
-		  m_oki(*this, "oki") { }
+			m_sprite_extension(*this, "sprite_ext"),
+			m_spriteram(*this, "spriteram"),
+			m_cchip2_ram(*this, "cchip2_ram"),
+			m_oki(*this, "oki") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_sprite_extension;
 	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 *        m_spriteram_buffered;
 	UINT16 *        m_spriteram_delayed;
-	optional_shared_ptr<UINT16> m_cchip2_ram;       	// for megablst only
+	optional_shared_ptr<UINT16> m_cchip2_ram;           // for megablst only
 //  UINT16 *        m_paletteram;    // currently this uses generic palette handling
 
 
@@ -38,21 +38,21 @@ public:
 	UINT16          m_spritebank_buffered[8];
 
 	INT32           m_sprites_disabled;
-	INT32			m_sprites_active_area;
-	INT32			m_sprites_master_scrollx;
-	INT32			m_sprites_master_scrolly;
+	INT32           m_sprites_active_area;
+	INT32           m_sprites_master_scrollx;
+	INT32           m_sprites_master_scrolly;
 	/* remember flip status over frames because driftout can fail to set it */
 	INT32           m_sprites_flipscreen;
 
 	/* On the left hand screen edge (assuming horiz screen, no
-       screenflip: in screenflip it is the right hand edge etc.)
-       there may be 0-3 unwanted pixels in both tilemaps *and*
-       sprites. To erase this we use f2_hide_pixels (0 to +3). */
+	   screenflip: in screenflip it is the right hand edge etc.)
+	   there may be 0-3 unwanted pixels in both tilemaps *and*
+	   sprites. To erase this we use f2_hide_pixels (0 to +3). */
 
 	INT32           m_hide_pixels;
-	INT32           m_flip_hide_pixels;	/* Different in some games */
+	INT32           m_flip_hide_pixels; /* Different in some games */
 
-	INT32           m_pivot_xdisp;	/* Needed in games with a pivot layer */
+	INT32           m_pivot_xdisp;  /* Needed in games with a pivot layer */
 	INT32           m_pivot_ydisp;
 
 	INT32           m_game;

@@ -44,9 +44,9 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-#define MASTER_CLOCK		XTAL_24MHz
-#define CPU_CLOCK			MASTER_CLOCK / 2
-#define PIXEL_CLOCK		MASTER_CLOCK / 4
+#define MASTER_CLOCK        XTAL_24MHz
+#define CPU_CLOCK           MASTER_CLOCK / 2
+#define PIXEL_CLOCK     MASTER_CLOCK / 4
 
 /*- in this file -*/
 
@@ -66,10 +66,10 @@
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_SHARE("fg0_videoram")	/* FG0 Ram - 4 bytes per tile */
-	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_SHARE("spriteram")						/* SPR Ram */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfwfest_bg0_videoram_w) AM_SHARE("bg0_videoram")	/* BG0 Ram - 4 bytes per tile */
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(wwfwfest_bg1_videoram_w) AM_SHARE("bg1_videoram")	/* BG1 Ram - 2 bytes per tile */
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_SHARE("spriteram")                       /* SPR Ram */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfwfest_bg0_videoram_w) AM_SHARE("bg0_videoram") /* BG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(wwfwfest_bg1_videoram_w) AM_SHARE("bg1_videoram") /* BG1 Ram - 2 bytes per tile */
 	AM_RANGE(0x100000, 0x100007) AM_WRITE(wwfwfest_scroll_write)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(wwfwfest_irq_ack_w)
@@ -308,27 +308,27 @@ static const gfx_layout tiles8x8_layout =
 
 static const gfx_layout tile_layout =
 {
-	16,16,	/* 16*16 tiles */
-	4096,	/* 8192 tiles */
-	4,	/* 4 bits per pixel */
-	{ 8, 0, 0x40000*8+8 , 0x40000*8+0 },	/* the bitplanes are separated */
+	16,16,  /* 16*16 tiles */
+	4096,   /* 8192 tiles */
+	4,  /* 4 bits per pixel */
+	{ 8, 0, 0x40000*8+8 , 0x40000*8+0 },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 			16*8, 16*9, 16*10, 16*11, 16*12, 16*13, 16*14, 16*15 },
-	64*8	/* every tile takes 64 consecutive bytes */
+	64*8    /* every tile takes 64 consecutive bytes */
 };
 
 static const gfx_layout sprite_layout = {
-	16,16,	/* 16*16 tiles */
+	16,16,  /* 16*16 tiles */
 	RGN_FRAC(1,4),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 0x200000*8, 2*0x200000*8 , 3*0x200000*8 }, /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every tile takes 32 consecutive bytes */
+	32*8    /* every tile takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( wwfwfest )
@@ -369,7 +369,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfwfest_state::wwfwfest_scanline)
 static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)	/* 24 crystal, 12 rated chip */
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  /* 24 crystal, 12 rated chip */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfwfest_state, wwfwfest_scanline, "screen", 0, 1)
 
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(wwfwfest_state, screen_update_wwfwfest)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
@@ -460,7 +460,7 @@ ROM_START( wwfwfest )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
@@ -489,7 +489,7 @@ ROM_START( wwfwfesta )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
@@ -518,7 +518,7 @@ ROM_START( wwfwfestb )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "1",             0x00000, 0x10000, CRC(d9e8cda2) SHA1(754c73cd341d51ffd35cdb62155a3f061416c9ba) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "wf_73a.rom",    0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
@@ -549,7 +549,7 @@ ROM_START( wwfwfestj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */

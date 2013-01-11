@@ -57,36 +57,36 @@ static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
 
 // status register
-#define STATUS_BSY		0x80
-#define STATUS_RDY		0x40
-#define STATUS_WF		0x20
-#define STATUS_SC		0x10
-#define STATUS_DRQ		0x08
-#define STATUS_DWC		0x04
-#define STATUS_CIP		0x02
-#define STATUS_ERR		0x01
+#define STATUS_BSY      0x80
+#define STATUS_RDY      0x40
+#define STATUS_WF       0x20
+#define STATUS_SC       0x10
+#define STATUS_DRQ      0x08
+#define STATUS_DWC      0x04
+#define STATUS_CIP      0x02
+#define STATUS_ERR      0x01
 
 
 // error register
-#define ERROR_BB		0x80
-#define ERROR_CRC_ECC	0x40
-#define ERROR_ID		0x10
-#define ERROR_AC		0x04
-#define ERROR_TK		0x02
-#define ERROR_DM		0x01
+#define ERROR_BB        0x80
+#define ERROR_CRC_ECC   0x40
+#define ERROR_ID        0x10
+#define ERROR_AC        0x04
+#define ERROR_TK        0x02
+#define ERROR_DM        0x01
 
 
 // command register
-#define COMMAND_MASK				0xf0
-#define COMMAND_RESTORE				0x10
-#define COMMAND_SEEK				0x70
-#define COMMAND_READ_SECTOR			0x20
-#define COMMAND_WRITE_SECTOR		0x30
-#define COMMAND_SCAN_ID				0x40
-#define COMMAND_WRITE_FORMAT		0x50
-#define COMMAND_COMPUTE_CORRECTION	0x08
-#define COMMAND_SET_PARAMETER_MASK	0xfe
-#define COMMAND_SET_PARAMETER		0x00
+#define COMMAND_MASK                0xf0
+#define COMMAND_RESTORE             0x10
+#define COMMAND_SEEK                0x70
+#define COMMAND_READ_SECTOR         0x20
+#define COMMAND_WRITE_SECTOR        0x30
+#define COMMAND_SCAN_ID             0x40
+#define COMMAND_WRITE_FORMAT        0x50
+#define COMMAND_COMPUTE_CORRECTION  0x08
+#define COMMAND_SET_PARAMETER_MASK  0xfe
+#define COMMAND_SET_PARAMETER       0x00
 
 
 
@@ -140,7 +140,7 @@ void wd2010_device::device_config_complete()
 //-------------------------------------------------
 
 wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock),
+	: device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock),
 	m_status(0),
 	m_error(0)
 {

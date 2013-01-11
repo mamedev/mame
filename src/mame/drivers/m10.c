@@ -124,7 +124,7 @@ Notes (couriersud)
  *
  *************************************/
 
-#define DEBUG		(0)
+#define DEBUG       (0)
 
 #define LOG(x) do { if (DEBUG) printf x; } while (0)
 
@@ -146,24 +146,24 @@ WRITE8_MEMBER(m10_state::ic8j2_output_changed)
 static const ttl74123_interface ic8j1_intf =
 {
 	/* completely illegible */
-	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
-	RES_K(1),				/* resistor connected to RCext */
-	CAP_U(1),				/* capacitor connected to Cext and RCext */
-	1,					/* A pin - driven by the CRTC */
-	1,					/* B pin - pulled high */
-	1,					/* Clear pin - pulled high */
+	TTL74123_NOT_GROUNDED_DIODE,    /* the hook up type */
+	RES_K(1),               /* resistor connected to RCext */
+	CAP_U(1),               /* capacitor connected to Cext and RCext */
+	1,                  /* A pin - driven by the CRTC */
+	1,                  /* B pin - pulled high */
+	1,                  /* Clear pin - pulled high */
 	DEVCB_DRIVER_MEMBER(m10_state,ic8j1_output_changed)
 };
 
 static const ttl74123_interface ic8j2_intf =
 {
-	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
+	TTL74123_NOT_GROUNDED_DIODE,    /* the hook up type */
 	/* 10k + 20k variable resistor */
-	RES_K(22),				/* resistor connected to RCext */
-	CAP_U(2.2),				/* capacitor connected to Cext and RCext */
-	1,					/* A pin - driven by the CRTC */
-	1,					/* B pin - pulled high */
-	1,					/* Clear pin - pulled high */
+	RES_K(22),              /* resistor connected to RCext */
+	CAP_U(2.2),             /* capacitor connected to Cext and RCext */
+	1,                  /* A pin - driven by the CRTC */
+	1,                  /* B pin - pulled high */
+	1,                  /* Clear pin - pulled high */
 	DEVCB_DRIVER_MEMBER(m10_state,ic8j2_output_changed)
 };
 
@@ -552,10 +552,10 @@ static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8, m10_state )
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_SHARE("chargen") /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa500, 0xa500) AM_WRITE(m10_a500_w)	/* ??? */
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)   /* line at bottom of screen?, sound, flip screen */
+	AM_RANGE(0xa500, 0xa500) AM_WRITE(m10_a500_w)   /* ??? */
 	AM_RANGE(0xa700, 0xa700) AM_READ(m10_a700_r)
-	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
+	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
@@ -567,9 +567,9 @@ static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m11_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(m11_ctrl_w)   /* line at bottom of screen?, sound, flip screen */
 	AM_RANGE(0xa700, 0xa700) AM_READ(m11_a700_r)
-	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
+	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8, m10_state )
@@ -582,8 +582,8 @@ static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8, m10_state )
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("P1")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m15_ctrl_w)	/* sound, flip screen */
-	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(m15_ctrl_w)   /* sound, flip screen */
+	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 /*************************************
@@ -593,14 +593,14 @@ ADDRESS_MAP_END
  *************************************/
 
 #define CAB_PORTENV \
-	/* fake port for cabinet type */					\
-	PORT_START("CAB")								\
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )		\
-	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )		\
-	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )	\
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )		\
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )		\
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )	\
+	/* fake port for cabinet type */                    \
+	PORT_START("CAB")                               \
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )     \
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )     \
+	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )    \
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )     \
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )     \
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )  \
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
@@ -786,13 +786,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	1,	/* 1 bits per pixel */
+	8,8,    /* 8*8 characters */
+	256,    /* 256 characters */
+	1,  /* 1 bits per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 
@@ -809,23 +809,23 @@ GFXDECODE_END
 static const char *const m10_sample_names[] =
 {
 	"*ipminvad",
-	"1",		/* shot/missle */
-	"2",		/* base hit/explosion */
-	"3",		/* invader hit */
-	"4",		/* fleet move 1 */
-	"5",		/* fleet move 2 */
-	"6",		/* fleet move 3 */
-	"7",		/* fleet move 4 */
-	"8",		/* UFO/saucer hit */
-	"9",		/* bonus base */
-	"0",		/* UFO sound */
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
+	"0",        /* UFO sound */
 	0
 };
 
 
 static const samples_interface m10_samples_interface =
 {
-	6,	/* 6 channels */
+	6,  /* 6 channels */
 	m10_sample_names
 };
 
@@ -953,7 +953,7 @@ ROM_START( andromed )//Jumps to an unmapped sub-routine at $2fc9
 	ROM_LOAD( "am2",  0x1400, 0x0400, CRC(dab64957) SHA1(77ced520f8e78bb08ddab4213646cf55d834e63e) )
 	ROM_LOAD( "am3",  0x1800, 0x0400, CRC(f983f35c) SHA1(1bfee6cf7d18b56594831f2efa7dcc53b47d7e30) )
 	ROM_LOAD( "am4",  0x1c00, 0x0400, CRC(09f20717) SHA1(c54c9b7d16b40a7ab49eac255906b43b03939d2b) )
-	ROM_RELOAD(       0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(       0xfc00, 0x0400 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "am5",  0x2000, 0x0400, CRC(518a3b88) SHA1(5e20c905c2190b381a105327e112fcc0a127bb2f) )
 	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
 	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
@@ -970,7 +970,7 @@ ROM_START( ipminvad )
 	ROM_LOAD( "b2r",  0x1400, 0x0400, CRC(af11c1aa) SHA1(6a74fcc7cb1627b1c427a77da89b69ccf3175800) )
 	ROM_LOAD( "b3r",  0x1800, 0x0400, CRC(ed49e481) SHA1(8771a34f432e6d88acc5f7529f16c980a77485db) )
 	ROM_LOAD( "b4r",  0x1c00, 0x0400, CRC(6d5db95b) SHA1(135500fc17524e8608c3bcfe26321144aa0afb91) )
-	ROM_RELOAD(       0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(       0xfc00, 0x0400 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "b5r",  0x2000, 0x0400, CRC(eabba7aa) SHA1(75e47eacd429f48f0a3a4539e5ecb4b1ea7281b1) )
 	ROM_LOAD( "b6r",  0x2400, 0x0400, CRC(3d0e7fa6) SHA1(14903bfc9506cb8e37807fb397be79f5eab99e3b) )
 	ROM_LOAD( "b7r",  0x2800, 0x0400, CRC(cf04864f) SHA1(6fe3ce208334321b63ada779fed69ec7cf4051ad) )
@@ -986,7 +986,7 @@ ROM_START( ipminvad1 )
 	ROM_LOAD( "b2f",  0x1400, 0x0400, CRC(a6aa5879) SHA1(959ab207110785c03e57ca69c0e62356dd974085) )
 	ROM_LOAD( "b3f",  0x1800, 0x0400, CRC(0c09feb9) SHA1(0db43f480162f8e3fb8b61fcceb2884d19ff115b) )
 	ROM_LOAD( "b4f",  0x1c00, 0x0400, CRC(a4d32207) SHA1(ea9a01d09d82b8c27701601f03989735558d975c) )
-	ROM_RELOAD(       0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(       0xfc00, 0x0400 )  /* for the reset and interrupt vectors */
 	ROM_LOAD( "b5f",  0x2000, 0x0400, CRC(192361c7) SHA1(b13e80429a9183ce78c4df52a32070416d4ec988) )
 	ROM_LOAD( "b6f",  0x2400, 0x0400, NO_DUMP )
 	ROM_LOAD( "b7f",  0x2800, 0x0400, CRC(0f5115ab) SHA1(3bdd3fc1cfe6bfacb5820ee12c15f2909d2f58d1) )
@@ -1002,7 +1002,7 @@ ROM_START( skychut )
 	ROM_LOAD( "sc2d",  0x1400, 0x0400, CRC(fd1f4b9e) SHA1(e5606979abe1fa4cc9eae0c4f61516769db35c39) )
 	ROM_LOAD( "sc3d",  0x1800, 0x0400, CRC(67ed201e) SHA1(589b1efdc1bbccff296f6420e2b320cd54b4ac8e) )
 	ROM_LOAD( "sc4d",  0x1c00, 0x0400, CRC(9b23a679) SHA1(a101f9b0fdde927a43e53e9b7d0dffb9dcca9e16) )
-	ROM_RELOAD(        0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(        0xfc00, 0x0400 ) /* for the reset and interrupt vectors */
 	ROM_LOAD( "sc5a",  0x2000, 0x0400, CRC(51d975e6) SHA1(7d345025ef28c8a81f599cde445eeb336c368fce) )
 	ROM_LOAD( "sc6e",  0x2400, 0x0400, CRC(617f302f) SHA1(4277ef97279eb63fc68b6c40f8545b31abaab474) )
 	ROM_LOAD( "sc7",   0x2800, 0x0400, CRC(dd4c8e1a) SHA1(b5a141d8ac256ba6522308e5f194bfaf5c75fa5b) )
@@ -1019,7 +1019,7 @@ ROM_START( spacbeam )
 	ROM_LOAD( "m2b", 0x1400, 0x0400, CRC(a02bd9d7) SHA1(d25dfa66b422bdbb29b1922007c84f1947fe9be1) )
 	ROM_LOAD( "m3b", 0x1800, 0x0400, CRC(78040843) SHA1(0b8a3ab09dff951aa527649f82b8877cf01126c1) )
 	ROM_LOAD( "m4b", 0x1c00, 0x0400, CRC(74705a44) SHA1(8fa9d22a58f08086bf2d89e3d92eca097cdd2cbf) )
-	ROM_RELOAD(      0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(      0xfc00, 0x0400 )   /* for the reset and interrupt vectors */
 	ROM_LOAD( "m5b", 0x2000, 0x0400, CRC(afdf1242) SHA1(e26a8e91edb3d8ba96b3d225813760f42238b003) )
 	ROM_LOAD( "m6b", 0x2400, 0x0400, CRC(12afb0c2) SHA1(bf6ed90cf4815f0fb41d435954d4c346a55098f5) )
 ROM_END
@@ -1030,7 +1030,7 @@ ROM_START( headoni )
 	ROM_LOAD( "e2.9b", 0x1400, 0x0400, CRC(dada26a8) SHA1(1368ade1c0c57d33d15594370cf1edf95fc44fd1) )
 	ROM_LOAD( "e3.9c", 0x1800, 0x0400, CRC(61ff24f5) SHA1(0e68aedd01b765fb2af76f914b3d287ecf30f716) )
 	ROM_LOAD( "e4.9d", 0x1c00, 0x0400, CRC(ce4c5a67) SHA1(8db493d43f311a29127405aad7693bc08b570b14) )
-	ROM_RELOAD(        0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(        0xfc00, 0x0400 ) /* for the reset and interrupt vectors */
 	ROM_LOAD( "e5.9f", 0x2000, 0x0400, CRC(b5232439) SHA1(39b8fb4bbd00a73b9a2b68bc3e88fb45d3f62d7c) )
 	ROM_LOAD( "e6.9g", 0x2400, 0x0400, CRC(99acd1a6) SHA1(799382c1b079aad3034a1cc738dc06954978a0ac) )
 ROM_END
@@ -1041,7 +1041,7 @@ ROM_START( greenber )
 	ROM_LOAD( "gb2", 0x1400, 0x0400, CRC(ea8f2267) SHA1(ad5bb38a80fbc7c70c8fa6f41086a7ade81655bc) ) // ok
 	ROM_LOAD( "gb3", 0x1800, 0x0400, CRC(8f337920) SHA1(ac3d76eb368645ba23f5823b39c04fae49d481e1) ) // ok
 	ROM_LOAD( "gb4", 0x1c00, 0x0400, CRC(7eeac4eb) SHA1(c668ad45ebc4aca558371539031efc4ec3990e44) ) // ok
-	ROM_RELOAD(      0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(      0xfc00, 0x0400 )   /* for the reset and interrupt vectors */
 	ROM_LOAD( "gb5", 0x2000, 0x0400, CRC(b2f8e69a) SHA1(44295e58da890a8c4aba6fe90defe9c578c95592) )
 	ROM_LOAD( "gb6", 0x2400, 0x0400, CRC(50ea8bd3) SHA1(a816c5fcc603b28c2ae59f217871a7e85fb794e1) )
 	ROM_LOAD( "gb7", 0x2800, 0x0400, NO_DUMP ) // 2be8 entry

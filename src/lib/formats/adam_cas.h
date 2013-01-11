@@ -14,4 +14,3 @@
 CASSETTE_FORMATLIST_EXTERN(coleco_adam_cassette_formats);
 
 #endif
-

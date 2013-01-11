@@ -15,7 +15,7 @@
 		<publisher>Video Technology</publisher>
 		<part name="cart" interface="socrates_cart">
 			<dataarea name="rom" size="0x20000">
-				<!-- Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN";	Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"; cart has an orange QC stickse -->
+				<!-- Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"; cart has an orange QC stickse -->
 				<rom name="27-5050-00.u1" size="0x20000" crc="95B84308" sha1="32E065E8F48BAF0126C1B9AA111C291EC644E387" offset="0x00000" />
 			</dataarea>
 		</part>

@@ -7,7 +7,7 @@
 #include "machine/i2cmem.h"
 #include "machine/terminal.h"
 
-#define MAX_CX_TIMERS	16
+#define MAX_CX_TIMERS   16
 
 struct cx_timer_t
 {
@@ -131,7 +131,7 @@ public:
 	UINT32 m_intctrl_regs[0x38/4];
 
 	UINT32 m_ss_regs[0x18/4];
-	UINT8 m_ss_tx_fifo[8];				// 8 entries (size hardcoded to 8 bits per entry - TODO)
+	UINT8 m_ss_tx_fifo[8];              // 8 entries (size hardcoded to 8 bits per entry - TODO)
 
 	UINT32 m_i2c0_regs[0x20/4];
 	UINT32 m_i2c1_regs[0x20/4];
@@ -155,115 +155,115 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_tick);
 };
 
-#define INTDEST			0	// Interrupt destination (1=IRQ, 0=FIQ)
-#define INTENABLE		1	// Enables the interrupt generation
-#define INTIRQ			2	// Normal interrupt
-#define INTFIQ			3	// Fast interrupt
-#define INTSTATCLR		4	// Read: interrupt status, Write: clear pending interrupt
-#define INTSTATSET		5	// Read: interrupt status, Write: sets a pending interrupt
-#define INTGROUP1		0
-#define INTGROUP2		1
+#define INTDEST         0   // Interrupt destination (1=IRQ, 0=FIQ)
+#define INTENABLE       1   // Enables the interrupt generation
+#define INTIRQ          2   // Normal interrupt
+#define INTFIQ          3   // Fast interrupt
+#define INTSTATCLR      4   // Read: interrupt status, Write: clear pending interrupt
+#define INTSTATSET      5   // Read: interrupt status, Write: sets a pending interrupt
+#define INTGROUP1       0
+#define INTGROUP2       1
 
-#define INTREG(group, index)	(((group) << 3) | (index))
+#define INTREG(group, index)    (((group) << 3) | (index))
 
-#define GXA_CMD_RW_REGISTER				0x00
-#define GXA_CMD_QMARK					0x02
-#define GXA_CMD_PALETTE_FETCH			0x03
-#define GXA_CMD_VFILTER_COEFF_FETCH		0x04
-#define GXA_CMD_HFILTER_COEFF_FETCH		0x05
-#define GXA_CMD_BLT_21					0x21
-#define GXA_CMD_BLT_23					0x23
-#define GXA_CMD_BLT_25					0x25
-#define GXA_CMD_BLT_27					0x27
-#define GXA_CMD_BLT_2B					0x2b
-#define GXA_CMD_BLT_2F					0x2f
-#define GXA_CMD_LINE_30					0x30
-#define GXA_CMD_LINE_32					0x32
-#define GXA_CMD_BLT_31					0x31
-#define GXA_CMD_BLT						0x33
-#define GXA_CMD_LINE_34					0x34
-#define GXA_CMD_LINE_36					0x36
-#define GXA_CMD_BLT_35					0x35
-#define GXA_CMD_BLT_37					0x37
-#define GXA_CMD_LINE_3A					0x3a
-#define GXA_CMD_BLT_3B					0x3b
-#define GXA_CMD_LINE_3E					0x3e
-#define GXA_CMD_BLT_3F					0x3f
-#define GXA_CMD_SBLT_ABLEND				0x71
-#define GXA_CMD_SBLT_ROP				0x7b
+#define GXA_CMD_RW_REGISTER             0x00
+#define GXA_CMD_QMARK                   0x02
+#define GXA_CMD_PALETTE_FETCH           0x03
+#define GXA_CMD_VFILTER_COEFF_FETCH     0x04
+#define GXA_CMD_HFILTER_COEFF_FETCH     0x05
+#define GXA_CMD_BLT_21                  0x21
+#define GXA_CMD_BLT_23                  0x23
+#define GXA_CMD_BLT_25                  0x25
+#define GXA_CMD_BLT_27                  0x27
+#define GXA_CMD_BLT_2B                  0x2b
+#define GXA_CMD_BLT_2F                  0x2f
+#define GXA_CMD_LINE_30                 0x30
+#define GXA_CMD_LINE_32                 0x32
+#define GXA_CMD_BLT_31                  0x31
+#define GXA_CMD_BLT                     0x33
+#define GXA_CMD_LINE_34                 0x34
+#define GXA_CMD_LINE_36                 0x36
+#define GXA_CMD_BLT_35                  0x35
+#define GXA_CMD_BLT_37                  0x37
+#define GXA_CMD_LINE_3A                 0x3a
+#define GXA_CMD_BLT_3B                  0x3b
+#define GXA_CMD_LINE_3E                 0x3e
+#define GXA_CMD_BLT_3F                  0x3f
+#define GXA_CMD_SBLT_ABLEND             0x71
+#define GXA_CMD_SBLT_ROP                0x7b
 
-#define GXA_CMD_REG						0x07
+#define GXA_CMD_REG                     0x07
 
-#define GXA_CFG2_REG					0x3f
-#define IRQ_STAT_QMARK					21
-#define IRQ_EN_QMARK					17
+#define GXA_CFG2_REG                    0x3f
+#define IRQ_STAT_QMARK                  21
+#define IRQ_EN_QMARK                    17
 
-#define INT_UART2_BIT					(1<<1)
-#define INT_TIMER_BIT					(1<<7)
-#define INT_PWM_BIT						(1 << 14)
-#define INT_PIO103_BIT					(1 << 15)
+#define INT_UART2_BIT                   (1<<1)
+#define INT_TIMER_BIT                   (1<<7)
+#define INT_PWM_BIT                     (1 << 14)
+#define INT_PIO103_BIT                  (1 << 15)
 
-#define PCI_CFG_ADDR_REG				0
-#define PCI_CFG_DATA_REG				1
+#define PCI_CFG_ADDR_REG                0
+#define PCI_CFG_DATA_REG                1
 
-#define TIMER_VALUE						0
-#define TIMER_LIMIT						1
-#define TIMER_MODE						2
-#define TIMER_TIMEBASE					3
+#define TIMER_VALUE                     0
+#define TIMER_LIMIT                     1
+#define TIMER_MODE                      2
+#define TIMER_TIMEBASE                  3
 
-#define UART_FIFO_REG					0
-#define UART_IRQE_REG					1
-#define UART_IRQE_TIDE_BIT				(1<<6)
-#define UART_BRDL_REG					0
-#define UART_BRDU_REG					1
-#define UART_FIFC_REG					2
-#define UART_FRMC_REG					3
-#define UART_FRMC_BDS_BIT				(1<<7)
-#define UART_STAT_REG					5
-#define UART_STAT_TSR_BIT				(1<<5)
-#define UART_STAT_TID_BIT				(1<<6)
+#define UART_FIFO_REG                   0
+#define UART_IRQE_REG                   1
+#define UART_IRQE_TIDE_BIT              (1<<6)
+#define UART_BRDL_REG                   0
+#define UART_BRDU_REG                   1
+#define UART_FIFC_REG                   2
+#define UART_FRMC_REG                   3
+#define UART_FRMC_BDS_BIT               (1<<7)
+#define UART_STAT_REG                   5
+#define UART_STAT_TSR_BIT               (1<<5)
+#define UART_STAT_TID_BIT               (1<<6)
 
-#define SREG_MPG_0_INTFRAC_REG			0
-#define SREG_MPG_1_INTFRAC_REG			1
-#define SREG_ARM_INTFRAC_REG			2
-#define SREG_MEM_INTFRAC_REG			3
-#define SREG_USB_INTFRAC_REG			4
+#define SREG_MPG_0_INTFRAC_REG          0
+#define SREG_MPG_1_INTFRAC_REG          1
+#define SREG_ARM_INTFRAC_REG            2
+#define SREG_MEM_INTFRAC_REG            3
+#define SREG_USB_INTFRAC_REG            4
 
-#define SREG_DIV_0_REG					0
-#define SREG_DIV_1_REG					1
-#define SREG_DIV_2_REG					2
-#define SREG_DIV_3_REG					3
-#define SREG_DIV_4_REG					4
-#define SREG_DIV_5_REG					5
+#define SREG_DIV_0_REG                  0
+#define SREG_DIV_1_REG                  1
+#define SREG_DIV_2_REG                  2
+#define SREG_DIV_3_REG                  3
+#define SREG_DIV_4_REG                  4
+#define SREG_DIV_5_REG                  5
 
-#define PIN_CONFIG_0_REG				0	// Pin Configuration 0 Register
-#define SREG_MODE_REG					3	// SREG Mode Register
-#define PIN_ALT_FUNC_REG				4	// Alternate Pin Function Select Register
-#define PLL_LOCK_STAT_0_REG				9	// Resource Lock Register
-#define PLL_IO_CTL_REG					20	// IO Control Register
-#define SREG_TEST_REG					28	// Test Register
+#define PIN_CONFIG_0_REG                0   // Pin Configuration 0 Register
+#define SREG_MODE_REG                   3   // SREG Mode Register
+#define PIN_ALT_FUNC_REG                4   // Alternate Pin Function Select Register
+#define PLL_LOCK_STAT_0_REG             9   // Resource Lock Register
+#define PLL_IO_CTL_REG                  20  // IO Control Register
+#define SREG_TEST_REG                   28  // Test Register
 
-#define I2C_MODE_REG					0
-#define I2C_CTRL_REG					1
-#define I2C_STAT_REG					2
-#define I2C_RDATA_REG					3
+#define I2C_MODE_REG                    0
+#define I2C_CTRL_REG                    1
+#define I2C_STAT_REG                    2
+#define I2C_RDATA_REG                   3
 
-#define I2C_WACK_BIT					(1<<1)
-#define I2C_INT_BIT						(1<<0)
+#define I2C_WACK_BIT                    (1<<1)
+#define I2C_INT_BIT                     (1<<0)
 
-#define SS_CNTL_REG						0
-#define SS_FIFC_REG						1
-#define SS_BAUD_REG						2
-#define SS_FIFO_REG						4
-#define SS_STAT_REG						5
+#define SS_CNTL_REG                     0
+#define SS_FIFC_REG                     1
+#define SS_BAUD_REG                     2
+#define SS_FIFO_REG                     4
+#define SS_STAT_REG                     5
 
-#define MC_CFG0							0
-#define MC_CFG1 						1
-#define MC_CFG2 						2
+#define MC_CFG0                         0
+#define MC_CFG1                         1
+#define MC_CFG2                         2
 
-#define DRM_ACTIVE_X_REG				1
-#define DRM_ACTIVE_Y_REG				2
-#define DRM_BCKGND_REG					3
-#define DRM_OSD_PTR_REG					32
+#define DRM_ACTIVE_X_REG                1
+#define DRM_ACTIVE_Y_REG                2
+#define DRM_BCKGND_REG                  3
+#define DRM_OSD_PTR_REG                 32
 
 #endif /* CXHUMAX_H_ */

@@ -92,12 +92,12 @@ protected:
 		okim_voice();
 		void generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples);
 
-		oki_adpcm_state m_adpcm;		// current ADPCM state
-		bool			m_playing;
-		offs_t			m_base_offset;	// pointer to the base memory location
-		UINT32			m_sample;		// current sample number
-		UINT32			m_count;		// total samples to play
-		INT8			m_volume;		// output volume
+		oki_adpcm_state m_adpcm;        // current ADPCM state
+		bool            m_playing;
+		offs_t          m_base_offset;  // pointer to the base memory location
+		UINT32          m_sample;       // current sample number
+		UINT32          m_count;        // total samples to play
+		INT8            m_volume;       // output volume
 	};
 
 	// configuration state
@@ -106,13 +106,13 @@ protected:
 	// internal state
 	static const int OKIM6295_VOICES = 4;
 
-	okim_voice			m_voice[OKIM6295_VOICES];
-	INT32				m_command;
-	bool				m_bank_installed;
-	offs_t				m_bank_offs;
-	sound_stream *		m_stream;
-	UINT8				m_pin7_state;
-	direct_read_data *	m_direct;
+	okim_voice          m_voice[OKIM6295_VOICES];
+	INT32               m_command;
+	bool                m_bank_installed;
+	offs_t              m_bank_offs;
+	sound_stream *      m_stream;
+	UINT8               m_pin7_state;
+	direct_read_data *  m_direct;
 
 	static const UINT8 s_volume_table[16];
 };

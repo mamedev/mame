@@ -35,7 +35,7 @@
 #include "multipcm.h"
 
 //????
-#define MULTIPCM_CLOCKDIV   	(180.0)
+#define MULTIPCM_CLOCKDIV       (180.0)
 
 struct Sample_t
 {
@@ -52,15 +52,15 @@ enum STATE {ATTACK,DECAY1,DECAY2,RELEASE};
 ALLOW_SAVE_TYPE(STATE); // allow save_item on a non-fundamental type
 struct EG_t
 {
-	int volume;	//
+	int volume; //
 	STATE state;
 	int step;
 	//step vals
-	int AR;		//Attack
-	int D1R;	//Decay1
-	int D2R;	//Decay2
-	int RR;		//Release
-	int DL;		//Decay level
+	int AR;     //Attack
+	int D1R;    //Decay1
+	int D2R;    //Decay2
+	int RR;     //Release
+	int DL;     //Decay level
 };
 
 struct LFO_t
@@ -86,14 +86,14 @@ struct SLOT
 	int TLStep;
 	signed int Prev;
 	EG_t EG;
-	LFO_t PLFO;	//Phase lfo
-	LFO_t ALFO;	//AM lfo
+	LFO_t PLFO; //Phase lfo
+	LFO_t ALFO; //AM lfo
 };
 
 struct MultiPCM
 {
 	sound_stream * stream;
-	Sample_t Samples[0x200];		//Max 512 samples
+	Sample_t Samples[0x200];        //Max 512 samples
 	SLOT Slots[28];
 	unsigned int CurSlot;
 	unsigned int Address;
@@ -101,14 +101,14 @@ struct MultiPCM
 	float Rate;
 	INT8 *ROM;
 	//I include these in the chip because they depend on the chip clock
-	unsigned int ARStep[0x40],DRStep[0x40];	//Envelope step table
-	unsigned int FNS_Table[0x400];		//Frequency step table
+	unsigned int ARStep[0x40],DRStep[0x40]; //Envelope step table
+	unsigned int FNS_Table[0x400];      //Frequency step table
 };
 
 
 static signed int LPANTABLE[0x800],RPANTABLE[0x800];
 
-#define FIX(v)	((UINT32) ((float) (1<<SHIFT)*(v)))
+#define FIX(v)  ((UINT32) ((float) (1<<SHIFT)*(v)))
 
 static const int val2chan[] =
 {
@@ -119,10 +119,10 @@ static const int val2chan[] =
 };
 
 
-#define SHIFT		12
+#define SHIFT       12
 
 
-#define MULTIPCM_RATE	44100.0
+#define MULTIPCM_RATE   44100.0
 
 
 INLINE MultiPCM *get_safe_token(device_t *device)
@@ -143,11 +143,11 @@ static const double BaseTimes[64]={0,0,0,0,6222.95,4978.37,4148.66,3556.01,3111.
 777.87,622.31,518.59,444.54,388.93,311.16,259.32,222.27,194.47,155.60,129.66,111.16,97.23,77.82,64.85,55.60,
 48.62,38.91,32.43,27.80,24.31,19.46,16.24,13.92,12.15,9.75,8.12,6.98,6.08,4.90,4.08,3.49,
 3.04,2.49,2.13,1.90,1.72,1.41,1.18,1.04,0.91,0.73,0.59,0.50,0.45,0.45,0.45,0.45};
-#define AR2DR	14.32833
+#define AR2DR   14.32833
 static signed int lin2expvol[0x400];
 static int TLSteps[2];
 
-#define EG_SHIFT	16
+#define EG_SHIFT    16
 
 static int EG_Update(SLOT *slot)
 {
@@ -223,13 +223,13 @@ static void EG_Calc(MultiPCM *ptChip,SLOT *slot)
         LFO  SECTION
 *****************************/
 
-#define LFO_SHIFT	8
+#define LFO_SHIFT   8
 
 
-#define LFIX(v)	((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
+#define LFIX(v) ((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v)	LFIX(pow(10.0,v/20.0))
+#define DB(v)   LFIX(pow(10.0,v/20.0))
 
 //Convert cents to step increment
 #define CENTS(v) LFIX(pow(2.0,v/1200.0))
@@ -237,9 +237,9 @@ static void EG_Calc(MultiPCM *ptChip,SLOT *slot)
 static int PLFO_TRI[256];
 static int ALFO_TRI[256];
 
-static const float LFOFreq[8]={0.168f,2.019f,3.196f,4.206f,5.215f,5.888f,6.224f,7.066f};	//Hz;
-static const float PSCALE[8]={0.0f,3.378f,5.065f,6.750f,10.114f,20.170f,40.180f,79.307f};	//cents
-static const float ASCALE[8]={0.0f,0.4f,0.8f,1.5f,3.0f,6.0f,12.0f,24.0f};					//DB
+static const float LFOFreq[8]={0.168f,2.019f,3.196f,4.206f,5.215f,5.888f,6.224f,7.066f};    //Hz;
+static const float PSCALE[8]={0.0f,3.378f,5.065f,6.750f,10.114f,20.170f,40.180f,79.307f};   //cents
+static const float ASCALE[8]={0.0f,0.4f,0.8f,1.5f,3.0f,6.0f,12.0f,24.0f};                   //DB
 static int PSCALES[8][256];
 static int ASCALES[8][256];
 
@@ -248,8 +248,8 @@ static void LFO_Init(void)
 	int i,s;
 	for(i=0;i<256;++i)
 	{
-		int a;	//amplitude
-		int p;	//phase
+		int a;  //amplitude
+		int p;  //phase
 
 		//Tri
 		if(i<128)
@@ -325,10 +325,10 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 
 	switch(reg)
 	{
-		case 0:	//PANPOT
+		case 0: //PANPOT
 			slot->Pan=(data>>4)&0xf;
 			break;
-		case 1:	//Sample
+		case 1: //Sample
 			//according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
 			//the game should never change the sample while playing.
 			{
@@ -337,7 +337,7 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 				WriteSlot(ptChip,slot,7,Sample->AM);
 			}
 			break;
-		case 2:	//Pitch
+		case 2: //Pitch
 		case 3:
 			{
 				unsigned int oct=((slot->Regs[3]>>4)-1)&0xf;
@@ -350,9 +350,9 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 				slot->step=pitch/ptChip->Rate;
 			}
 			break;
-		case 4:		//KeyOn/Off (and more?)
+		case 4:     //KeyOn/Off (and more?)
 			{
-				if(data&0x80)		//KeyOn
+				if(data&0x80)       //KeyOn
 				{
 					slot->Sample=ptChip->Samples+slot->Regs[1];
 					slot->Playing=1;
@@ -386,21 +386,21 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 				}
 			}
 			break;
-		case 5:	//TL+Interpolation
+		case 5: //TL+Interpolation
 			{
 				slot->DstTL=(data>>1)&0x7f;
-				if(!(data&1))	//Interpolate TL
+				if(!(data&1))   //Interpolate TL
 				{
 					if((slot->TL>>SHIFT)>slot->DstTL)
-						slot->TLStep=TLSteps[0];		//decrease
+						slot->TLStep=TLSteps[0];        //decrease
 					else
-						slot->TLStep=TLSteps[1];		//increase
+						slot->TLStep=TLSteps[1];        //increase
 				}
 				else
 					slot->TL=slot->DstTL<<SHIFT;
 			}
 			break;
-		case 6:	//LFO freq+PLFO
+		case 6: //LFO freq+PLFO
 			{
 				if(data)
 				{
@@ -409,7 +409,7 @@ static void WriteSlot(MultiPCM *ptChip,SLOT *slot,int reg,unsigned char data)
 				}
 			}
 			break;
-		case 7:	//ALFO
+		case 7: //ALFO
 			{
 				if(data)
 				{
@@ -451,7 +451,7 @@ static STREAM_UPDATE( MultiPCM_update )
 				signed int fpart=slot->offset&((1<<SHIFT)-1);
 				sample=(csample*fpart+slot->Prev*((1<<SHIFT)-fpart))>>SHIFT;
 
-				if(slot->Regs[6]&7)	//Vibrato enabled
+				if(slot->Regs[6]&7) //Vibrato enabled
 				{
 					step=step*PLFO_Step(&(slot->PLFO));
 					step>>=SHIFT;
@@ -470,7 +470,7 @@ static STREAM_UPDATE( MultiPCM_update )
 				if((slot->TL>>SHIFT)!=slot->DstTL)
 					slot->TL+=slot->TLStep;
 
-				if(slot->Regs[7]&7)	//Tremolo enabled
+				if(slot->Regs[7]&7) //Tremolo enabled
 				{
 					sample=sample*ALFO_Step(&(slot->ALFO));
 					sample>>=SHIFT;
@@ -649,7 +649,7 @@ WRITE8_DEVICE_HANDLER( multipcm_w )
 	MultiPCM *ptChip = get_safe_token(device);
 	switch(offset)
 	{
-		case 0:		//Data write
+		case 0:     //Data write
 			WriteSlot(ptChip,ptChip->Slots+ptChip->CurSlot,ptChip->Address,data);
 			break;
 		case 1:
@@ -676,7 +676,7 @@ const device_type MULTIPCM = &device_creator<multipcm_device>;
 
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(MultiPCM);
 }
@@ -709,5 +709,3 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

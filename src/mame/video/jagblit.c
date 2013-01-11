@@ -85,32 +85,32 @@
 
 #define READ_RDATA(r,a,f,p) \
 	((((f) & 0x38) == (0 << 3)) ? (READ_RDATA_1(r,a,p)) : \
-	 (((f) & 0x38) == (1 << 3)) ? (READ_RDATA_2(r,a,p)) : \
-	 (((f) & 0x38) == (2 << 3)) ? (READ_RDATA_4(r,a,p)) : \
-	 (((f) & 0x38) == (3 << 3)) ? (READ_RDATA_8(r,a,p)) : \
-	 (((f) & 0x38) == (4 << 3)) ? (READ_RDATA_16(r,a,p)) : \
-	 (((f) & 0x38) == (5 << 3)) ? (READ_RDATA_32(r,a,p)) : 0)
+		(((f) & 0x38) == (1 << 3)) ? (READ_RDATA_2(r,a,p)) : \
+		(((f) & 0x38) == (2 << 3)) ? (READ_RDATA_4(r,a,p)) : \
+		(((f) & 0x38) == (3 << 3)) ? (READ_RDATA_8(r,a,p)) : \
+		(((f) & 0x38) == (4 << 3)) ? (READ_RDATA_16(r,a,p)) : \
+		(((f) & 0x38) == (5 << 3)) ? (READ_RDATA_32(r,a,p)) : 0)
 
 #define READ_PIXEL(a,f) \
 	((((f) & 0x38) == (0 << 3)) ? (READ_PIXEL_1(a)) : \
-	 (((f) & 0x38) == (1 << 3)) ? (READ_PIXEL_2(a)) : \
-	 (((f) & 0x38) == (2 << 3)) ? (READ_PIXEL_4(a)) : \
-	 (((f) & 0x38) == (3 << 3)) ? (READ_PIXEL_8(a)) : \
-	 (((f) & 0x38) == (4 << 3)) ? (READ_PIXEL_16(a)) : \
-	 (((f) & 0x38) == (5 << 3)) ? (READ_PIXEL_32(a)) : 0)
+		(((f) & 0x38) == (1 << 3)) ? (READ_PIXEL_2(a)) : \
+		(((f) & 0x38) == (2 << 3)) ? (READ_PIXEL_4(a)) : \
+		(((f) & 0x38) == (3 << 3)) ? (READ_PIXEL_8(a)) : \
+		(((f) & 0x38) == (4 << 3)) ? (READ_PIXEL_16(a)) : \
+		(((f) & 0x38) == (5 << 3)) ? (READ_PIXEL_32(a)) : 0)
 
 #define READ_ZDATA(a,f) \
 	((((f) & 0x38) == (0 << 3)) ? (READ_ZDATA_1(a)) : \
-	 (((f) & 0x38) == (1 << 3)) ? (READ_ZDATA_2(a)) : \
-	 (((f) & 0x38) == (2 << 3)) ? (READ_ZDATA_4(a)) : \
-	 (((f) & 0x38) == (3 << 3)) ? (READ_ZDATA_8(a)) : \
-	 (((f) & 0x38) == (4 << 3)) ? (READ_ZDATA_16(a)) : \
-	 (((f) & 0x38) == (5 << 3)) ? (READ_ZDATA_32(a)) : 0)
+		(((f) & 0x38) == (1 << 3)) ? (READ_ZDATA_2(a)) : \
+		(((f) & 0x38) == (2 << 3)) ? (READ_ZDATA_4(a)) : \
+		(((f) & 0x38) == (3 << 3)) ? (READ_ZDATA_8(a)) : \
+		(((f) & 0x38) == (4 << 3)) ? (READ_ZDATA_16(a)) : \
+		(((f) & 0x38) == (5 << 3)) ? (READ_ZDATA_32(a)) : 0)
 
 #define WRITE_PIXEL(a,f,d) \
 	do \
 	{ \
-		     if (((f) & 0x38) == (0 << 3)) WRITE_PIXEL_1(a,d); \
+				if (((f) & 0x38) == (0 << 3)) WRITE_PIXEL_1(a,d); \
 		else if (((f) & 0x38) == (1 << 3)) WRITE_PIXEL_2(a,d); \
 		else if (((f) & 0x38) == (2 << 3)) WRITE_PIXEL_4(a,d); \
 		else if (((f) & 0x38) == (3 << 3)) WRITE_PIXEL_8(a,d); \
@@ -121,7 +121,7 @@
 #define WRITE_ZDATA(a,f,d) \
 	do \
 	{ \
-		     if (((f) & 0x38) == (0 << 3)) WRITE_ZDATA_1(a,d); \
+				if (((f) & 0x38) == (0 << 3)) WRITE_ZDATA_1(a,d); \
 		else if (((f) & 0x38) == (1 << 3)) WRITE_ZDATA_2(a,d); \
 		else if (((f) & 0x38) == (2 << 3)) WRITE_ZDATA_4(a,d); \
 		else if (((f) & 0x38) == (3 << 3)) WRITE_ZDATA_8(a,d); \
@@ -168,24 +168,24 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	void *a1_base_mem = memory_base(a1_base);
 	void *a2_base_mem = memory_base(a2_base);
 
-	void *asrc_base_mem =	(COMMAND & 0x00000800) ? a1_base_mem : a2_base_mem;
-	UINT32 asrcflags =		(COMMAND & 0x00000800) ? A1FIXED : A2FIXED;
-	INT32 asrc_x =			(COMMAND & 0x00000800) ? a1_x : a2_x;
-	INT32 asrc_y =			(COMMAND & 0x00000800) ? a1_y : a2_y;
-	INT32 asrc_width =		(COMMAND & 0x00000800) ? a1_width : a2_width;
-	INT32 asrc_pitch =		(COMMAND & 0x00000800) ? a1_pitch : a2_pitch;
-	INT32 asrc_zoffs =		(COMMAND & 0x00000800) ? a1_zoffs : a2_zoffs;
+	void *asrc_base_mem =   (COMMAND & 0x00000800) ? a1_base_mem : a2_base_mem;
+	UINT32 asrcflags =      (COMMAND & 0x00000800) ? A1FIXED : A2FIXED;
+	INT32 asrc_x =          (COMMAND & 0x00000800) ? a1_x : a2_x;
+	INT32 asrc_y =          (COMMAND & 0x00000800) ? a1_y : a2_y;
+	INT32 asrc_width =      (COMMAND & 0x00000800) ? a1_width : a2_width;
+	INT32 asrc_pitch =      (COMMAND & 0x00000800) ? a1_pitch : a2_pitch;
+	INT32 asrc_zoffs =      (COMMAND & 0x00000800) ? a1_zoffs : a2_zoffs;
 	UINT8 asrc_phrase_mode;
 	INT32 asrc_xadd, asrc_xstep, asrc_yadd, asrc_ystep;
 	UINT32 asrc_xmask, asrc_ymask;
 
-	void *adest_base_mem =	(COMMAND & 0x00000800) ? a2_base_mem : a1_base_mem;
-	UINT32 adestflags =		(COMMAND & 0x00000800) ? A2FIXED : A1FIXED;
-	INT32 adest_x =			(COMMAND & 0x00000800) ? a2_x : a1_x;
-	INT32 adest_y =			(COMMAND & 0x00000800) ? a2_y : a1_y;
-	INT32 adest_width =		(COMMAND & 0x00000800) ? a2_width : a1_width;
-	INT32 adest_pitch =		(COMMAND & 0x00000800) ? a2_pitch : a1_pitch;
-	INT32 adest_zoffs =		(COMMAND & 0x00000800) ? a2_zoffs : a1_zoffs;
+	void *adest_base_mem =  (COMMAND & 0x00000800) ? a2_base_mem : a1_base_mem;
+	UINT32 adestflags =     (COMMAND & 0x00000800) ? A2FIXED : A1FIXED;
+	INT32 adest_x =         (COMMAND & 0x00000800) ? a2_x : a1_x;
+	INT32 adest_y =         (COMMAND & 0x00000800) ? a2_y : a1_y;
+	INT32 adest_width =     (COMMAND & 0x00000800) ? a2_width : a1_width;
+	INT32 adest_pitch =     (COMMAND & 0x00000800) ? a2_pitch : a1_pitch;
+	INT32 adest_zoffs =     (COMMAND & 0x00000800) ? a2_zoffs : a1_zoffs;
 	UINT8 adest_phrase_mode;
 	INT32 adest_xadd, adest_xstep, adest_yadd, adest_ystep;
 	UINT32 adest_xmask, adest_ymask;
@@ -257,21 +257,21 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 		a2_ystep = m_blitter_regs[A2_STEP] & 0xffff0000;
 	}
 
-	asrc_phrase_mode	= (COMMAND & 0x00000800) ? a1_phrase_mode : a2_phrase_mode;
-	asrc_xstep			= (COMMAND & 0x00000800) ? a1_xstep : a2_xstep;
-	asrc_ystep			= (COMMAND & 0x00000800) ? a1_ystep : a2_ystep;
-	asrc_xadd			= (COMMAND & 0x00000800) ? a1_xadd : a2_xadd;
-	asrc_yadd			= (COMMAND & 0x00000800) ? a1_yadd : a2_yadd;
-	asrc_xmask			= (COMMAND & 0x00000800) ? a1_xmask : a2_xmask;
-	asrc_ymask			= (COMMAND & 0x00000800) ? a1_ymask : a2_ymask;
+	asrc_phrase_mode    = (COMMAND & 0x00000800) ? a1_phrase_mode : a2_phrase_mode;
+	asrc_xstep          = (COMMAND & 0x00000800) ? a1_xstep : a2_xstep;
+	asrc_ystep          = (COMMAND & 0x00000800) ? a1_ystep : a2_ystep;
+	asrc_xadd           = (COMMAND & 0x00000800) ? a1_xadd : a2_xadd;
+	asrc_yadd           = (COMMAND & 0x00000800) ? a1_yadd : a2_yadd;
+	asrc_xmask          = (COMMAND & 0x00000800) ? a1_xmask : a2_xmask;
+	asrc_ymask          = (COMMAND & 0x00000800) ? a1_ymask : a2_ymask;
 
-	adest_phrase_mode	= (COMMAND & 0x00000800) ? a2_phrase_mode : a1_phrase_mode;
-	adest_xstep			= (COMMAND & 0x00000800) ? a2_xstep : a1_xstep;
-	adest_ystep			= (COMMAND & 0x00000800) ? a2_ystep : a1_ystep;
-	adest_xadd			= (COMMAND & 0x00000800) ? a2_xadd : a1_xadd;
-	adest_yadd			= (COMMAND & 0x00000800) ? a2_yadd : a1_yadd;
-	adest_xmask			= (COMMAND & 0x00000800) ? a2_xmask : a1_xmask;
-	adest_ymask			= (COMMAND & 0x00000800) ? a2_ymask : a1_ymask;
+	adest_phrase_mode   = (COMMAND & 0x00000800) ? a2_phrase_mode : a1_phrase_mode;
+	adest_xstep         = (COMMAND & 0x00000800) ? a2_xstep : a1_xstep;
+	adest_ystep         = (COMMAND & 0x00000800) ? a2_ystep : a1_ystep;
+	adest_xadd          = (COMMAND & 0x00000800) ? a2_xadd : a1_xadd;
+	adest_yadd          = (COMMAND & 0x00000800) ? a2_yadd : a1_yadd;
+	adest_xmask         = (COMMAND & 0x00000800) ? a2_xmask : a1_xmask;
+	adest_ymask         = (COMMAND & 0x00000800) ? a2_ymask : a1_ymask;
 
 	if (LOG_BLITS)
 	{
@@ -469,10 +469,10 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	}
 
 	/* write values back to registers */
-	a1_x =	(COMMAND & 0x00000800) ? asrc_x : adest_x;
-	a1_y =	(COMMAND & 0x00000800) ? asrc_y : adest_y;
-	a2_x =	(COMMAND & 0x00000800) ? adest_x : asrc_x;
-	a2_y =	(COMMAND & 0x00000800) ? adest_y : asrc_y;
+	a1_x =  (COMMAND & 0x00000800) ? asrc_x : adest_x;
+	a1_y =  (COMMAND & 0x00000800) ? asrc_y : adest_y;
+	a2_x =  (COMMAND & 0x00000800) ? adest_x : asrc_x;
+	a2_y =  (COMMAND & 0x00000800) ? adest_y : asrc_y;
 
 	m_blitter_regs[A1_PIXEL] = (a1_y & 0xffff0000) | ((a1_x >> 16) & 0xffff);
 	m_blitter_regs[A1_FPIXEL] = (a1_y << 16) | (a1_x & 0xffff);

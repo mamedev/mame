@@ -38,8 +38,8 @@ void electron_state::electron_tape_stop()
 	m_tape_timer->reset();
 }
 
-#define TAPE_LOW	0x00;
-#define TAPE_HIGH	0xFF;
+#define TAPE_LOW    0x00;
+#define TAPE_HIGH   0xFF;
 
 TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 {
@@ -69,7 +69,7 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 			m_ula.tape_steps = 0;
 			switch( m_ula.bit_count )
 			{
-			case 0:	/* start bit */
+			case 0: /* start bit */
 				m_ula.start_bit = ( ( m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
 				//logerror( "++ Read start bit: %d\n", m_ula.start_bit );
 				if ( m_ula.start_bit )
@@ -157,13 +157,13 @@ READ8_MEMBER(electron_state::electron_ula_r)
 	UINT8 data = ((UINT8 *)machine().root_device().memregion("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
-	case 0x00:	/* Interrupt status */
+	case 0x00:  /* Interrupt status */
 		data = m_ula.interrupt_status;
 		m_ula.interrupt_status &= ~0x02;
 		break;
-	case 0x01:	/* Unknown */
+	case 0x01:  /* Unknown */
 		break;
-	case 0x04:	/* Casette data shift register */
+	case 0x04:  /* Casette data shift register */
 		electron_interrupt_handler(machine(), INT_CLEAR, INT_RECEIVE_FULL );
 		data = m_ula.tape_byte;
 		break;
@@ -182,28 +182,28 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
 	{
-	case 0x00:	/* Interrupt control */
+	case 0x00:  /* Interrupt control */
 		m_ula.interrupt_control = data;
 		break;
-	case 0x01:	/* Unknown */
+	case 0x01:  /* Unknown */
 		break;
-	case 0x02:	/* Screen start address #1 */
+	case 0x02:  /* Screen start address #1 */
 		m_ula.screen_start = ( m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
-	case 0x03:	/* Screen start addres #2 */
+	case 0x03:  /* Screen start addres #2 */
 		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
-	case 0x04:	/* Cassette data shift register */
+	case 0x04:  /* Cassette data shift register */
 		break;
-	case 0x05:	/* Interrupt clear and paging */
+	case 0x05:  /* Interrupt clear and paging */
 		/* rom page requests are honoured when currently bank 0-7 or 12-15 is switched in,
-         * or when 8-11 is currently switched in only switching to bank 8-15 is allowed.
-         *
-         * Rompages 10 and 11 both select the Basic ROM.
-         * Rompages 8 and 9 both select the keyboard.
-         */
+		 * or when 8-11 is currently switched in only switching to bank 8-15 is allowed.
+		 *
+		 * Rompages 10 and 11 both select the Basic ROM.
+		 * Rompages 8 and 9 both select the keyboard.
+		 */
 		if ( ( ( m_ula.rompage & 0x0C ) != 0x08 ) || ( data & 0x08 ) )
 		{
 			m_ula.rompage = data & 0x0f;
@@ -234,29 +234,29 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 		{
 		}
 		break;
-	case 0x06:	/* Counter divider */
+	case 0x06:  /* Counter divider */
 		if ( m_ula.communication_mode == 0x01)
 		{
 			beep_set_frequency( speaker, 1000000 / ( 16 * ( data + 1 ) ) );
 		}
 		break;
-	case 0x07:	/* Misc. */
+	case 0x07:  /* Misc. */
 		m_ula.communication_mode = ( data >> 1 ) & 0x03;
 		switch( m_ula.communication_mode )
 		{
-		case 0x00:	/* cassette input */
+		case 0x00:  /* cassette input */
 			beep_set_state( speaker, 0 );
 			electron_tape_start();
 			break;
-		case 0x01:	/* sound generation */
+		case 0x01:  /* sound generation */
 			beep_set_state( speaker, 1 );
 			electron_tape_stop();
 			break;
-		case 0x02:	/* cassette output */
+		case 0x02:  /* cassette output */
 			beep_set_state( speaker, 0 );
 			electron_tape_stop();
 			break;
-		case 0x03:	/* not used */
+		case 0x03:  /* not used */
 			beep_set_state( speaker, 0 );
 			electron_tape_stop();
 			break;
@@ -349,4 +349,3 @@ void electron_state::machine_start()
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::electron_tape_timer_handler),this));
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(electron_reset),&machine()));
 }
-

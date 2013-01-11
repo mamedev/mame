@@ -18,45 +18,45 @@ class nubus_mac8390_device :
 		public device_nubus_card_interface
 {
 public:
-        // construction/destruction
+		// construction/destruction
 		nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
 
-        void dp_irq_w(int state);
-        DECLARE_READ8_MEMBER(dp_mem_read);
-        DECLARE_WRITE8_MEMBER(dp_mem_write);
+		void dp_irq_w(int state);
+		DECLARE_READ8_MEMBER(dp_mem_read);
+		DECLARE_WRITE8_MEMBER(dp_mem_write);
 
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 
-        DECLARE_READ8_MEMBER(asntm3b_ram_r);
-        DECLARE_WRITE8_MEMBER(asntm3b_ram_w);
-        DECLARE_READ32_MEMBER(en_r);
-        DECLARE_WRITE32_MEMBER(en_w);
+		DECLARE_READ8_MEMBER(asntm3b_ram_r);
+		DECLARE_WRITE8_MEMBER(asntm3b_ram_w);
+		DECLARE_READ32_MEMBER(en_r);
+		DECLARE_WRITE32_MEMBER(en_w);
 
-        required_device<dp8390_device> m_dp83902;
+		required_device<dp8390_device> m_dp83902;
 
 private:
-        UINT8 m_ram[0x20000];
-        UINT8 m_prom[16];
+		UINT8 m_ram[0x20000];
+		UINT8 m_prom[16];
 };
 
 class nubus_asntmc3nb_device : public nubus_mac8390_device
 {
 public:
-    nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class nubus_appleenet_device : public nubus_mac8390_device
 {
 public:
-    nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    virtual const rom_entry *device_rom_region() const;
+	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual const rom_entry *device_rom_region() const;
 };
 
 // device type definition

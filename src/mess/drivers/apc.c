@@ -235,21 +235,21 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					continue;
 
 				/*
-                Addr bus:   C BA98 7654 3210
-                            | |||| |\\\ \\\\- character number bits 0-6
-                            | |||| \--------- y' bit 0
-                            | |||\----------- y' bit 1
-                            | ||\------------ y' bit 2
-                            | |\------------- y' bit 3
-                            | \-------------- character number bit 7
-                            \---------------- y' bit 4
+				Addr bus:   C BA98 7654 3210
+				            | |||| |\\\ \\\\- character number bits 0-6
+				            | |||| \--------- y' bit 0
+				            | |||\----------- y' bit 1
+				            | ||\------------ y' bit 2
+				            | |\------------- y' bit 3
+				            | \-------------- character number bit 7
+				            \---------------- y' bit 4
 
-                y to y' (assumed; this needs hardware tests since there could be one more 'blank' line between all char rows):
-                y  =  0 1 2 3 ... 16 17 18
-                y' = 18 0 1 2 ... 15 16 17
+				y to y' (assumed; this needs hardware tests since there could be one more 'blank' line between all char rows):
+				y  =  0 1 2 3 ... 16 17 18
+				y' = 18 0 1 2 ... 15 16 17
 
-                Data bus: 76543210 = pixels, in left->01234567->right order
-                */
+				Data bus: 76543210 = pixels, in left->01234567->right order
+				*/
 				if(tile_sel == 0x89)// Aux character RAM select TODO: correct triggering?
 				{
 					if(yi & 0x10)
@@ -1065,13 +1065,13 @@ MACHINE_CONFIG_END
 ROM_START( apc )
 	ROM_REGION( 0x2000, "ipl", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pfbu2j.bin",   0x00000, 0x001000, CRC(86970df5) SHA1(be59c5dad3bd8afc21e9f2f1404553d4371978be) )
-    ROM_LOAD16_BYTE( "pfbu2l.bin",   0x00001, 0x001000, CRC(38df2e70) SHA1(a37ccaea00c2b290610d354de08b489fa897ec48) )
+	ROM_LOAD16_BYTE( "pfbu2l.bin",   0x00001, 0x001000, CRC(38df2e70) SHA1(a37ccaea00c2b290610d354de08b489fa897ec48) )
 
 //  ROM_REGION( 0x10000, "file", ROMREGION_ERASE00 )
 //  ROM_LOAD( "sioapc.o", 0, 0x10000, CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
-    ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
+	ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
 
 	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END

@@ -83,15 +83,15 @@
 /* layout */
 static const char layout_thomson[] = "thomson";
 
-#define KEY(pos,name,key)					\
-	PORT_BIT  ( 1<<(pos), IP_ACTIVE_LOW, IPT_KEYBOARD )	\
-	PORT_NAME ( name )					\
+#define KEY(pos,name,key)                   \
+	PORT_BIT  ( 1<<(pos), IP_ACTIVE_LOW, IPT_KEYBOARD ) \
+	PORT_NAME ( name )                  \
 	PORT_CODE ( KEYCODE_##key )
 
-#define PAD(mask,player,name,port,dir,key)				\
-	PORT_BIT    ( mask, IP_ACTIVE_LOW, IPT_##port )			\
-	PORT_NAME   ( "P" #player " " name )				\
-	PORT_CODE( KEYCODE_##key )					\
+#define PAD(mask,player,name,port,dir,key)              \
+	PORT_BIT    ( mask, IP_ACTIVE_LOW, IPT_##port )         \
+	PORT_NAME   ( "P" #player " " name )                \
+	PORT_CODE( KEYCODE_##key )                  \
 	PORT_PLAYER ( player )
 
 
@@ -130,45 +130,45 @@ static const char layout_thomson[] = "thomson";
 static INPUT_PORTS_START( thom_game_port )
 
 /* joysticks, common to CM 90-112 & SX 90-018 */
-     PORT_START ( "game_port_directions" )
-     PAD ( 0x01, 1, UTF8_UP, JOYSTICK_UP,    UP,    UP)
-     PAD ( 0x02, 1, UTF8_DOWN, JOYSTICK_DOWN,  DOWN,  DOWN )
-     PAD ( 0x04, 1, UTF8_LEFT, JOYSTICK_LEFT,  LEFT,  LEFT )
-     PAD ( 0x08, 1, UTF8_RIGHT, JOYSTICK_RIGHT, RIGHT, RIGHT )
-     PAD ( 0x10, 2, UTF8_UP, JOYSTICK_UP,    UP,    8_PAD )
-     PAD ( 0x20, 2, UTF8_DOWN, JOYSTICK_DOWN,  DOWN,  2_PAD )
-     PAD ( 0x40, 2, UTF8_LEFT, JOYSTICK_LEFT,  LEFT,  4_PAD )
-     PAD ( 0x80, 2, UTF8_RIGHT, JOYSTICK_RIGHT, RIGHT, 6_PAD )
+		PORT_START ( "game_port_directions" )
+		PAD ( 0x01, 1, UTF8_UP, JOYSTICK_UP,    UP,    UP)
+		PAD ( 0x02, 1, UTF8_DOWN, JOYSTICK_DOWN,  DOWN,  DOWN )
+		PAD ( 0x04, 1, UTF8_LEFT, JOYSTICK_LEFT,  LEFT,  LEFT )
+		PAD ( 0x08, 1, UTF8_RIGHT, JOYSTICK_RIGHT, RIGHT, RIGHT )
+		PAD ( 0x10, 2, UTF8_UP, JOYSTICK_UP,    UP,    8_PAD )
+		PAD ( 0x20, 2, UTF8_DOWN, JOYSTICK_DOWN,  DOWN,  2_PAD )
+		PAD ( 0x40, 2, UTF8_LEFT, JOYSTICK_LEFT,  LEFT,  4_PAD )
+		PAD ( 0x80, 2, UTF8_RIGHT, JOYSTICK_RIGHT, RIGHT, 6_PAD )
 
-     PORT_START ( "game_port_buttons" )
-     PAD ( 0x40, 1, "Action A", BUTTON1, BUTTON1, LCONTROL )
-     PAD ( 0x80, 2, "Action A", BUTTON1, BUTTON1, RCONTROL )
+		PORT_START ( "game_port_buttons" )
+		PAD ( 0x40, 1, "Action A", BUTTON1, BUTTON1, LCONTROL )
+		PAD ( 0x80, 2, "Action A", BUTTON1, BUTTON1, RCONTROL )
 
 /* joysticks, SX 90-018 specific */
-     PAD ( 0x04, 1, "Action B", BUTTON2, BUTTON2, LALT )
-     PAD ( 0x08, 2, "Action B", BUTTON2, BUTTON2, RALT )
-     PORT_BIT  ( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
-     PORT_BIT  ( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) /* ? */
+		PAD ( 0x04, 1, "Action B", BUTTON2, BUTTON2, LALT )
+		PAD ( 0x08, 2, "Action B", BUTTON2, BUTTON2, RALT )
+		PORT_BIT  ( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
+		PORT_BIT  ( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) /* ? */
 
 /* mouse, SX 90-018 specific */
-     PORT_START ( "mouse_x" )
-     PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_X )
-     PORT_NAME ( "Mouse X" )
-     PORT_SENSITIVITY ( 150 )
-     PORT_PLAYER (1)
+		PORT_START ( "mouse_x" )
+		PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_X )
+		PORT_NAME ( "Mouse X" )
+		PORT_SENSITIVITY ( 150 )
+		PORT_PLAYER (1)
 
-     PORT_START ( "mouse_y" )
-     PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_Y )
-     PORT_NAME ( "Mouse Y" )
-     PORT_SENSITIVITY ( 150 )
-     PORT_PLAYER (1)
+		PORT_START ( "mouse_y" )
+		PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_Y )
+		PORT_NAME ( "Mouse Y" )
+		PORT_SENSITIVITY ( 150 )
+		PORT_PLAYER (1)
 
-     PORT_START ( "mouse_button" )
-     PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-     PORT_NAME ( "Left Mouse Button" )
-     PORT_CODE( MOUSECODE_BUTTON1 )
-     PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-     PORT_NAME ( "Right Mouse Button" )
+		PORT_START ( "mouse_button" )
+		PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+		PORT_NAME ( "Left Mouse Button" )
+		PORT_CODE( MOUSECODE_BUTTON1 )
+		PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+		PORT_NAME ( "Right Mouse Button" )
 
 INPUT_PORTS_END
 
@@ -177,24 +177,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( thom_lightpen )
 
-     PORT_START ( "lightpen_x" )
-     PORT_BIT ( 0xffff, THOM_TOTAL_WIDTH/2, IPT_LIGHTGUN_X )
-     PORT_NAME ( "Lightpen X" )
-     PORT_MINMAX( 0, THOM_TOTAL_WIDTH )
-     PORT_SENSITIVITY( 50 )
-     PORT_CROSSHAIR(X, 1.0, 0.0, 0)
+		PORT_START ( "lightpen_x" )
+		PORT_BIT ( 0xffff, THOM_TOTAL_WIDTH/2, IPT_LIGHTGUN_X )
+		PORT_NAME ( "Lightpen X" )
+		PORT_MINMAX( 0, THOM_TOTAL_WIDTH )
+		PORT_SENSITIVITY( 50 )
+		PORT_CROSSHAIR(X, 1.0, 0.0, 0)
 
-     PORT_START ( "lightpen_y" )
-     PORT_BIT ( 0xffff, THOM_TOTAL_HEIGHT/2, IPT_LIGHTGUN_Y )
-     PORT_NAME ( "Lightpen Y" )
-     PORT_MINMAX ( 0, THOM_TOTAL_HEIGHT )
-     PORT_SENSITIVITY( 50 )
-     PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
+		PORT_START ( "lightpen_y" )
+		PORT_BIT ( 0xffff, THOM_TOTAL_HEIGHT/2, IPT_LIGHTGUN_Y )
+		PORT_NAME ( "Lightpen Y" )
+		PORT_MINMAX ( 0, THOM_TOTAL_HEIGHT )
+		PORT_SENSITIVITY( 50 )
+		PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
-     PORT_START ( "lightpen_button" )
-     PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-     PORT_NAME ( "Lightpen Button" )
-     PORT_CODE( MOUSECODE_BUTTON1 )
+		PORT_START ( "lightpen_button" )
+		PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+		PORT_NAME ( "Lightpen Button" )
+		PORT_CODE( MOUSECODE_BUTTON1 )
 
 INPUT_PORTS_END
 
@@ -305,22 +305,22 @@ public:
 
 static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
-     AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to7_vram_w )
-     AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 1 * 8 KB */
-     AM_RANGE ( 0x8000, 0xbfff ) AM_NOP       /* 16 KB (for extension) */
-     AM_RANGE ( 0xc000, 0xdfff ) AM_NOP       /*  8 KB (for extension) */
-     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
-     AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
-     AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
-     AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
-     AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
+		AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
+		AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to7_vram_w )
+		AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 1 * 8 KB */
+		AM_RANGE ( 0x8000, 0xbfff ) AM_NOP       /* 16 KB (for extension) */
+		AM_RANGE ( 0xc000, 0xdfff ) AM_NOP       /*  8 KB (for extension) */
+		AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
+		AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
+		AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
+		AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+		AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
@@ -338,237 +338,237 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 /* external floppy controllers */
-#define ROM_FLOPPY( base )						\
-     /* no controller */						\
-     ROM_FILL( base, 0x800, 0x39 )					\
-     /* CD 90-015 (5"1/4) */						\
-     ROM_LOAD ( "cd90-015.rom", base+0x800, 0x7c0,			\
-		CRC(821d34c1)						\
-		SHA1(31a6bb81baaeec5fc8de457c97264f9dfa92c18b) )	\
-     /* CD 90-640 (5"1/4) */						\
-     ROM_LOAD ( "cd90-640.rom", base+0x1000, 0x7c0,			\
-		CRC(5114c0a5)						\
-		SHA1(5c72566c22d8160ef0c75959e1863a1309bbbe49) )	\
-     /* CD 90-351 (3"1/2) */						\
-     ROM_LOAD ( "cd-351-0.rom", base+0x1800, 0x7c0,			\
-		CRC(2c0159fd)						\
-		SHA1(bab5395ed8bc7c06f9897897f836054e6546e8e8) )	\
-     ROM_LOAD ( "cd-351-1.rom", base+0x2000, 0x7c0,			\
-		CRC(8e58d159)						\
-		SHA1(dcf992c96e7556b2faee6bacd3f744e56998e6ea) )	\
-     ROM_LOAD ( "cd-351-2.rom", base+0x2800, 0x7c0,			\
-		CRC(c9228b60)						\
-		SHA1(179e10107d5be91e684069dee80f94847b83201f) )	\
-     ROM_LOAD ( "cd-351-3.rom", base+0x3000, 0x7c0,			\
-		CRC(3ca8e5dc)						\
-		SHA1(7118636fb5c597c78c2fce17b02aed5e4ba38635) )	\
-     /* CQ 90-028 (2"8, aka QDD) */					\
-     ROM_LOAD ( "cq90-028.rom", base+0x3800, 0x7c0,			\
-		CRC(ca4dba3d)						\
+#define ROM_FLOPPY( base )                      \
+		/* no controller */                     \
+		ROM_FILL( base, 0x800, 0x39 )                   \
+		/* CD 90-015 (5"1/4) */                     \
+		ROM_LOAD ( "cd90-015.rom", base+0x800, 0x7c0,           \
+		CRC(821d34c1)                       \
+		SHA1(31a6bb81baaeec5fc8de457c97264f9dfa92c18b) )    \
+		/* CD 90-640 (5"1/4) */                     \
+		ROM_LOAD ( "cd90-640.rom", base+0x1000, 0x7c0,          \
+		CRC(5114c0a5)                       \
+		SHA1(5c72566c22d8160ef0c75959e1863a1309bbbe49) )    \
+		/* CD 90-351 (3"1/2) */                     \
+		ROM_LOAD ( "cd-351-0.rom", base+0x1800, 0x7c0,          \
+		CRC(2c0159fd)                       \
+		SHA1(bab5395ed8bc7c06f9897897f836054e6546e8e8) )    \
+		ROM_LOAD ( "cd-351-1.rom", base+0x2000, 0x7c0,          \
+		CRC(8e58d159)                       \
+		SHA1(dcf992c96e7556b2faee6bacd3f744e56998e6ea) )    \
+		ROM_LOAD ( "cd-351-2.rom", base+0x2800, 0x7c0,          \
+		CRC(c9228b60)                       \
+		SHA1(179e10107d5be91e684069dee80f94847b83201f) )    \
+		ROM_LOAD ( "cd-351-3.rom", base+0x3000, 0x7c0,          \
+		CRC(3ca8e5dc)                       \
+		SHA1(7118636fb5c597c78c2fce17b02aed5e4ba38635) )    \
+		/* CQ 90-028 (2"8, aka QDD) */                  \
+		ROM_LOAD ( "cq90-028.rom", base+0x3800, 0x7c0,          \
+		CRC(ca4dba3d)                       \
 		SHA1(949c1f777c892da62c242215d79757d61e71e62b) )
 
 /* external floppy / network controller: 9 banks */
-#define ROM_FLOPPY5( base )				\
-  ROM_FLOPPY( base )					\
-  ROM_LOAD ( "nano5.rom", base+0x4000, 0x7c0,	\
-	     CRC(2f756868)				\
-	     SHA1(b5b7cb6d12493d849330b6b5628efd1a83a4bbf5) )
+#define ROM_FLOPPY5( base )             \
+	ROM_FLOPPY( base )                  \
+	ROM_LOAD ( "nano5.rom", base+0x4000, 0x7c0, \
+			CRC(2f756868)               \
+			SHA1(b5b7cb6d12493d849330b6b5628efd1a83a4bbf5) )
 
-#define ROM_FLOPPY7( base )				\
-  ROM_FLOPPY( base )					\
-  ROM_LOAD ( "nano7.rom", base+0x4000, 0x7c0,	\
-	     CRC(42a1d1a6)				\
-	     SHA1(973209f4baa5e81bf7885c0602949e064bac7862) )
+#define ROM_FLOPPY7( base )             \
+	ROM_FLOPPY( base )                  \
+	ROM_LOAD ( "nano7.rom", base+0x4000, 0x7c0, \
+			CRC(42a1d1a6)               \
+			SHA1(973209f4baa5e81bf7885c0602949e064bac7862) )
 
 
 ROM_START ( to7 )
-     ROM_REGION ( 0x24800, "maincpu", 0 )
-     ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
+		ROM_REGION ( 0x24800, "maincpu", 0 )
+		ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
 		CRC(0e7826da)
 		SHA1(23a2f84b03c01d385cc1923c8ece95c43756297a) )
-     ROM_FILL ( 0x10000, 0x10000, 0x39 )
-     ROM_FLOPPY7 ( 0x20000 )
+		ROM_FILL ( 0x10000, 0x10000, 0x39 )
+		ROM_FLOPPY7 ( 0x20000 )
 ROM_END
 
 ROM_START ( t9000 )
-     ROM_REGION ( 0x24800, "maincpu", 0 )
-     ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
+		ROM_REGION ( 0x24800, "maincpu", 0 )
+		ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
 		CRC(daa8cfbf)
 		SHA1(a5735db1ad4e529804fc46603f838d3f4ccaf5cf) )
-     ROM_FILL ( 0x10000, 0x10000, 0x39 )
-     ROM_FLOPPY7 ( 0x20000 )
+		ROM_FILL ( 0x10000, 0x10000, 0x39 )
+		ROM_FLOPPY7 ( 0x20000 )
 ROM_END
 
 
 /* ------------ inputs   ------------ */
 
 static INPUT_PORTS_START ( to7_config )
-     PORT_START ( "config" )
+		PORT_START ( "config" )
 
-     PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
-     PORT_CONFSETTING ( 0x00, DEF_STR( Joystick ) )
-     PORT_CONFSETTING ( 0x01, "Mouse" )
+		PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
+		PORT_CONFSETTING ( 0x00, DEF_STR( Joystick ) )
+		PORT_CONFSETTING ( 0x01, "Mouse" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to7_vconfig )
-     PORT_START ( "vconfig" )
+		PORT_START ( "vconfig" )
 
-     PORT_CONFNAME ( 0x03, 0x00, "Border" )
-     PORT_CONFSETTING ( 0x00, "Normal (56x47)" )
-     PORT_CONFSETTING ( 0x01, "Small (16x16)" )
-     PORT_CONFSETTING ( 0x02, DEF_STR ( None ) )
+		PORT_CONFNAME ( 0x03, 0x00, "Border" )
+		PORT_CONFSETTING ( 0x00, "Normal (56x47)" )
+		PORT_CONFSETTING ( 0x01, "Small (16x16)" )
+		PORT_CONFSETTING ( 0x02, DEF_STR ( None ) )
 
-     PORT_CONFNAME ( 0x0c, 0x08, "Resolution" )
-     PORT_CONFSETTING ( 0x00, DEF_STR ( Low ) )
-     PORT_CONFSETTING ( 0x04, DEF_STR ( High  ) )
-     PORT_CONFSETTING ( 0x08, "Auto"  )
+		PORT_CONFNAME ( 0x0c, 0x08, "Resolution" )
+		PORT_CONFSETTING ( 0x00, DEF_STR ( Low ) )
+		PORT_CONFSETTING ( 0x04, DEF_STR ( High  ) )
+		PORT_CONFSETTING ( 0x08, "Auto"  )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to7_mconfig )
-     PORT_START ( "mconfig" )
+		PORT_START ( "mconfig" )
 
-     PORT_CONFNAME ( 0x01, 0x01, "E7FE-F port" )
-     PORT_CONFSETTING ( 0x00, "Modem (unemulated)" )
-     PORT_CONFSETTING ( 0x01, "Speech" )
+		PORT_CONFNAME ( 0x01, 0x01, "E7FE-F port" )
+		PORT_CONFSETTING ( 0x00, "Modem (unemulated)" )
+		PORT_CONFSETTING ( 0x01, "Speech" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to7_fconfig )
-     PORT_START ( "fconfig" )
+		PORT_START ( "fconfig" )
 
-     PORT_CONFNAME ( 0x07, 0x03, "Floppy (reset)" )
-     PORT_CONFSETTING ( 0x00, DEF_STR ( None ) )
-     PORT_CONFSETTING ( 0x01, "CD 90-015 (5\"1/4 SD)" )
-     PORT_CONFSETTING ( 0x02, "CD 90-640 (5\"1/4 DD)" )
-     PORT_CONFSETTING ( 0x03, "CD 90-351 (3\"1/2)" )
-     PORT_CONFSETTING ( 0x04, "CQ 90-028 (2\"8 QDD)" )
-     PORT_CONFSETTING ( 0x05, "Network" )
+		PORT_CONFNAME ( 0x07, 0x03, "Floppy (reset)" )
+		PORT_CONFSETTING ( 0x00, DEF_STR ( None ) )
+		PORT_CONFSETTING ( 0x01, "CD 90-015 (5\"1/4 SD)" )
+		PORT_CONFSETTING ( 0x02, "CD 90-640 (5\"1/4 DD)" )
+		PORT_CONFSETTING ( 0x03, "CD 90-351 (3\"1/2)" )
+		PORT_CONFSETTING ( 0x04, "CQ 90-028 (2\"8 QDD)" )
+		PORT_CONFSETTING ( 0x05, "Network" )
 
-     PORT_CONFNAME ( 0xf8, 0x08, "Network ID" )
-     PORT_CONFSETTING ( 0x00, "0 (Master)" )
-     PORT_CONFSETTING ( 0x08, "1" )
-     PORT_CONFSETTING ( 0x10, "2" )
-     PORT_CONFSETTING ( 0x18, "3" )
-     PORT_CONFSETTING ( 0x20, "4" )
-     PORT_CONFSETTING ( 0x28, "5" )
-     PORT_CONFSETTING ( 0x30, "6" )
-     PORT_CONFSETTING ( 0x38, "7" )
-     PORT_CONFSETTING ( 0x40, "8" )
-     PORT_CONFSETTING ( 0x48, "9" )
-     PORT_CONFSETTING ( 0x50, "10" )
-     PORT_CONFSETTING ( 0x58, "11" )
-     PORT_CONFSETTING ( 0x60, "12" )
-     PORT_CONFSETTING ( 0x68, "13" )
-     PORT_CONFSETTING ( 0x70, "14" )
-     PORT_CONFSETTING ( 0x78, "15" )
-     PORT_CONFSETTING ( 0x80, "16" )
-     PORT_CONFSETTING ( 0x88, "17" )
-     PORT_CONFSETTING ( 0x90, "18" )
-     PORT_CONFSETTING ( 0x98, "19" )
-     PORT_CONFSETTING ( 0xa0, "20" )
-     PORT_CONFSETTING ( 0xa8, "21" )
-     PORT_CONFSETTING ( 0xb0, "22" )
-     PORT_CONFSETTING ( 0xb8, "23" )
-     PORT_CONFSETTING ( 0xc0, "24" )
-     PORT_CONFSETTING ( 0xc8, "25" )
-     PORT_CONFSETTING ( 0xd0, "26" )
-     PORT_CONFSETTING ( 0xd8, "27" )
-     PORT_CONFSETTING ( 0xe0, "28" )
-     PORT_CONFSETTING ( 0xe8, "29" )
-     PORT_CONFSETTING ( 0xf0, "30" )
-     PORT_CONFSETTING ( 0xf8, "31" )
+		PORT_CONFNAME ( 0xf8, 0x08, "Network ID" )
+		PORT_CONFSETTING ( 0x00, "0 (Master)" )
+		PORT_CONFSETTING ( 0x08, "1" )
+		PORT_CONFSETTING ( 0x10, "2" )
+		PORT_CONFSETTING ( 0x18, "3" )
+		PORT_CONFSETTING ( 0x20, "4" )
+		PORT_CONFSETTING ( 0x28, "5" )
+		PORT_CONFSETTING ( 0x30, "6" )
+		PORT_CONFSETTING ( 0x38, "7" )
+		PORT_CONFSETTING ( 0x40, "8" )
+		PORT_CONFSETTING ( 0x48, "9" )
+		PORT_CONFSETTING ( 0x50, "10" )
+		PORT_CONFSETTING ( 0x58, "11" )
+		PORT_CONFSETTING ( 0x60, "12" )
+		PORT_CONFSETTING ( 0x68, "13" )
+		PORT_CONFSETTING ( 0x70, "14" )
+		PORT_CONFSETTING ( 0x78, "15" )
+		PORT_CONFSETTING ( 0x80, "16" )
+		PORT_CONFSETTING ( 0x88, "17" )
+		PORT_CONFSETTING ( 0x90, "18" )
+		PORT_CONFSETTING ( 0x98, "19" )
+		PORT_CONFSETTING ( 0xa0, "20" )
+		PORT_CONFSETTING ( 0xa8, "21" )
+		PORT_CONFSETTING ( 0xb0, "22" )
+		PORT_CONFSETTING ( 0xb8, "23" )
+		PORT_CONFSETTING ( 0xc0, "24" )
+		PORT_CONFSETTING ( 0xc8, "25" )
+		PORT_CONFSETTING ( 0xd0, "26" )
+		PORT_CONFSETTING ( 0xd8, "27" )
+		PORT_CONFSETTING ( 0xe0, "28" )
+		PORT_CONFSETTING ( 0xe8, "29" )
+		PORT_CONFSETTING ( 0xf0, "30" )
+		PORT_CONFSETTING ( 0xf8, "31" )
 
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START ( to7_keyboard )
-     PORT_START ( "keyboard_0" )
-     KEY ( 0, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
-     PORT_BIT  ( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
-     PORT_START ( "keyboard_1" )
-     KEY ( 0, "W", W )                PORT_CHAR('W')
-     KEY ( 1, UTF8_UP, UP )    PORT_CHAR(UCHAR_MAMEKEY(UP))
-     KEY ( 2, "C \303\247", C )       PORT_CHAR('C')
-     KEY ( 3, "Clear", ESC )          PORT_CHAR(UCHAR_MAMEKEY(ESC))
-     KEY ( 4, "Enter", ENTER )        PORT_CHAR(13)
-     KEY ( 5, "Control", LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-     KEY ( 6, "Accent", END )         PORT_CHAR(UCHAR_MAMEKEY(END))
-     KEY ( 7, "Stop", TAB )           PORT_CHAR(27)
-     PORT_START ( "keyboard_2" )
-     KEY ( 0, "X", X )                PORT_CHAR('X')
-     KEY ( 1, UTF8_LEFT, LEFT )  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-     KEY ( 2, "V", V )                PORT_CHAR('V')
-     KEY ( 3, "Q", Q )                PORT_CHAR('Q')
-     KEY ( 4, "* :", QUOTE )          PORT_CHAR('*') PORT_CHAR(':')
-     KEY ( 5, "A", A )                PORT_CHAR('A')
-     KEY ( 6, "+ ;", EQUALS )         PORT_CHAR('+') PORT_CHAR(';')
-     KEY ( 7, "1 !", 1 )              PORT_CHAR('1') PORT_CHAR('!')
-     PORT_START ( "keyboard_3" )
-     KEY ( 0, "Space Caps-Lock", SPACE ) PORT_CHAR(' ') PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-     KEY ( 1, UTF8_DOWN, DOWN )  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-     KEY ( 2, "B", B )                PORT_CHAR('B')
-     KEY ( 3, "S", S )                PORT_CHAR('S')
-     KEY ( 4, "/ ?", SLASH )          PORT_CHAR('/') PORT_CHAR('?')
-     KEY ( 5, "Z \305\223", Z)        PORT_CHAR('Z')
-     KEY ( 6, "- =", MINUS )          PORT_CHAR('-') PORT_CHAR('=')
-     KEY ( 7, "2 \" \302\250", 2 )    PORT_CHAR('2') PORT_CHAR('"')
-     PORT_START ( "keyboard_4" )
-     KEY ( 0, "@ \342\206\221", TILDE ) PORT_CHAR('@')
-     KEY ( 1, UTF8_RIGHT, RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-     KEY ( 2, "M", M )                PORT_CHAR('M')
-     KEY ( 3, "D", D )                PORT_CHAR('D')
-     KEY ( 4, "P", P )                PORT_CHAR('P')
-     KEY ( 5, "E", E )                PORT_CHAR('E')
-     KEY ( 6, "0 \140", 0 )           PORT_CHAR('0') PORT_CHAR( 0140 )
-     KEY ( 7, "3 #", 3 )              PORT_CHAR('3') PORT_CHAR('#')
-     PORT_START ( "keyboard_5" )
-     KEY ( 0, ". >", STOP )           PORT_CHAR('.') PORT_CHAR('>')
-     KEY ( 1, "Home", HOME )          PORT_CHAR(UCHAR_MAMEKEY(HOME))
-     KEY ( 2, "L", L )                PORT_CHAR('L')
-     KEY ( 3, "F", F )                PORT_CHAR('F')
-     KEY ( 4, "O", O )                PORT_CHAR('O')
-     KEY ( 5, "R", R )                PORT_CHAR('R')
-     KEY ( 6, "9 )", 9 )              PORT_CHAR('9') PORT_CHAR(')')
-     KEY ( 7, "4 $", 4 )              PORT_CHAR('4') PORT_CHAR('$')
-     PORT_START ( "keyboard_6" )
-     KEY ( 0, ", <", COMMA )          PORT_CHAR(',') PORT_CHAR('<')
-     KEY ( 1, "Insert", INSERT )      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-     KEY ( 2, "K", K )                PORT_CHAR('K')
-     KEY ( 3, "G", G )                PORT_CHAR('G')
-     KEY ( 4, "I", I )                PORT_CHAR('I')
-     KEY ( 5, "T", T )                PORT_CHAR('T')
-     KEY ( 6, "8 (", 8 )              PORT_CHAR('8') PORT_CHAR('(')
-     KEY ( 7, "5 %", 5 )              PORT_CHAR('5') PORT_CHAR('%')
-     PORT_START ( "keyboard_7" )
-     KEY ( 0, "N", N )                PORT_CHAR('N')
-     KEY ( 1, "Delete", DEL )         PORT_CHAR(8)
-     KEY ( 2, "J \305\222", J )       PORT_CHAR('J')
-     KEY ( 3, "H \302\250", H )       PORT_CHAR('H')
-     KEY ( 4, "U", U )                PORT_CHAR('U')
-     KEY ( 5, "Y", Y )                PORT_CHAR('Y')
-     KEY ( 6, "7 ' \302\264", 7 )     PORT_CHAR('7') PORT_CHAR('\'')
-     KEY ( 7, "6 &", 6 )              PORT_CHAR('6') PORT_CHAR('&')
+		PORT_START ( "keyboard_0" )
+		KEY ( 0, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
+		PORT_BIT  ( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_1" )
+		KEY ( 0, "W", W )                PORT_CHAR('W')
+		KEY ( 1, UTF8_UP, UP )    PORT_CHAR(UCHAR_MAMEKEY(UP))
+		KEY ( 2, "C \303\247", C )       PORT_CHAR('C')
+		KEY ( 3, "Clear", ESC )          PORT_CHAR(UCHAR_MAMEKEY(ESC))
+		KEY ( 4, "Enter", ENTER )        PORT_CHAR(13)
+		KEY ( 5, "Control", LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+		KEY ( 6, "Accent", END )         PORT_CHAR(UCHAR_MAMEKEY(END))
+		KEY ( 7, "Stop", TAB )           PORT_CHAR(27)
+		PORT_START ( "keyboard_2" )
+		KEY ( 0, "X", X )                PORT_CHAR('X')
+		KEY ( 1, UTF8_LEFT, LEFT )  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		KEY ( 2, "V", V )                PORT_CHAR('V')
+		KEY ( 3, "Q", Q )                PORT_CHAR('Q')
+		KEY ( 4, "* :", QUOTE )          PORT_CHAR('*') PORT_CHAR(':')
+		KEY ( 5, "A", A )                PORT_CHAR('A')
+		KEY ( 6, "+ ;", EQUALS )         PORT_CHAR('+') PORT_CHAR(';')
+		KEY ( 7, "1 !", 1 )              PORT_CHAR('1') PORT_CHAR('!')
+		PORT_START ( "keyboard_3" )
+		KEY ( 0, "Space Caps-Lock", SPACE ) PORT_CHAR(' ') PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+		KEY ( 1, UTF8_DOWN, DOWN )  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		KEY ( 2, "B", B )                PORT_CHAR('B')
+		KEY ( 3, "S", S )                PORT_CHAR('S')
+		KEY ( 4, "/ ?", SLASH )          PORT_CHAR('/') PORT_CHAR('?')
+		KEY ( 5, "Z \305\223", Z)        PORT_CHAR('Z')
+		KEY ( 6, "- =", MINUS )          PORT_CHAR('-') PORT_CHAR('=')
+		KEY ( 7, "2 \" \302\250", 2 )    PORT_CHAR('2') PORT_CHAR('"')
+		PORT_START ( "keyboard_4" )
+		KEY ( 0, "@ \342\206\221", TILDE ) PORT_CHAR('@')
+		KEY ( 1, UTF8_RIGHT, RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		KEY ( 2, "M", M )                PORT_CHAR('M')
+		KEY ( 3, "D", D )                PORT_CHAR('D')
+		KEY ( 4, "P", P )                PORT_CHAR('P')
+		KEY ( 5, "E", E )                PORT_CHAR('E')
+		KEY ( 6, "0 \140", 0 )           PORT_CHAR('0') PORT_CHAR( 0140 )
+		KEY ( 7, "3 #", 3 )              PORT_CHAR('3') PORT_CHAR('#')
+		PORT_START ( "keyboard_5" )
+		KEY ( 0, ". >", STOP )           PORT_CHAR('.') PORT_CHAR('>')
+		KEY ( 1, "Home", HOME )          PORT_CHAR(UCHAR_MAMEKEY(HOME))
+		KEY ( 2, "L", L )                PORT_CHAR('L')
+		KEY ( 3, "F", F )                PORT_CHAR('F')
+		KEY ( 4, "O", O )                PORT_CHAR('O')
+		KEY ( 5, "R", R )                PORT_CHAR('R')
+		KEY ( 6, "9 )", 9 )              PORT_CHAR('9') PORT_CHAR(')')
+		KEY ( 7, "4 $", 4 )              PORT_CHAR('4') PORT_CHAR('$')
+		PORT_START ( "keyboard_6" )
+		KEY ( 0, ", <", COMMA )          PORT_CHAR(',') PORT_CHAR('<')
+		KEY ( 1, "Insert", INSERT )      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+		KEY ( 2, "K", K )                PORT_CHAR('K')
+		KEY ( 3, "G", G )                PORT_CHAR('G')
+		KEY ( 4, "I", I )                PORT_CHAR('I')
+		KEY ( 5, "T", T )                PORT_CHAR('T')
+		KEY ( 6, "8 (", 8 )              PORT_CHAR('8') PORT_CHAR('(')
+		KEY ( 7, "5 %", 5 )              PORT_CHAR('5') PORT_CHAR('%')
+		PORT_START ( "keyboard_7" )
+		KEY ( 0, "N", N )                PORT_CHAR('N')
+		KEY ( 1, "Delete", DEL )         PORT_CHAR(8)
+		KEY ( 2, "J \305\222", J )       PORT_CHAR('J')
+		KEY ( 3, "H \302\250", H )       PORT_CHAR('H')
+		KEY ( 4, "U", U )                PORT_CHAR('U')
+		KEY ( 5, "Y", Y )                PORT_CHAR('Y')
+		KEY ( 6, "7 ' \302\264", 7 )     PORT_CHAR('7') PORT_CHAR('\'')
+		KEY ( 7, "6 &", 6 )              PORT_CHAR('6') PORT_CHAR('&')
 
-     /* unused */
-     PORT_START ( "keyboard_8" )
-     PORT_START ( "keyboard_9" )
+		/* unused */
+		PORT_START ( "keyboard_8" )
+		PORT_START ( "keyboard_9" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to7 )
-     PORT_INCLUDE ( thom_lightpen )
-     PORT_INCLUDE ( thom_game_port )
-     PORT_INCLUDE ( to7_keyboard )
-     PORT_INCLUDE ( to7_config )
-     PORT_INCLUDE ( to7_fconfig )
-     PORT_INCLUDE ( to7_vconfig )
-     PORT_INCLUDE ( to7_mconfig )
+		PORT_INCLUDE ( thom_lightpen )
+		PORT_INCLUDE ( thom_game_port )
+		PORT_INCLUDE ( to7_keyboard )
+		PORT_INCLUDE ( to7_config )
+		PORT_INCLUDE ( to7_fconfig )
+		PORT_INCLUDE ( to7_vconfig )
+		PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( t9000 )
-     PORT_INCLUDE ( to7 )
+		PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
 static const floppy_interface thomson_floppy_interface =
@@ -623,76 +623,76 @@ const serial_image_interface to7_modem_config =
 
 static MACHINE_CONFIG_START( to7, thomson_state )
 
-     MCFG_MACHINE_START ( to7 )
-     MCFG_MACHINE_RESET ( to7 )
+		MCFG_MACHINE_START ( to7 )
+		MCFG_MACHINE_RESET ( to7 )
 
 /* cpu */
-     MCFG_CPU_ADD ( "maincpu", M6809, 1000000 )
-     MCFG_CPU_PROGRAM_MAP ( to7)
+		MCFG_CPU_ADD ( "maincpu", M6809, 1000000 )
+		MCFG_CPU_PROGRAM_MAP ( to7)
 
 /* video */
-     MCFG_SCREEN_ADD("screen", RASTER)
-     MCFG_SCREEN_REFRESH_RATE ( /*50*/ 1./0.019968 )
-     MCFG_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
-     MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
+		MCFG_SCREEN_ADD("screen", RASTER)
+		MCFG_SCREEN_REFRESH_RATE ( /*50*/ 1./0.019968 )
+		MCFG_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
+		MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
-     MCFG_SCREEN_UPDATE_STATIC ( thom )
-     MCFG_SCREEN_VBLANK_STATIC ( thom )
+		MCFG_SCREEN_UPDATE_STATIC ( thom )
+		MCFG_SCREEN_VBLANK_STATIC ( thom )
 
-     MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
-     MCFG_PALETTE_INIT ( thom )
-     MCFG_VIDEO_START ( thom )
-     MCFG_DEFAULT_LAYOUT( layout_thomson )
+		MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
+		MCFG_PALETTE_INIT ( thom )
+		MCFG_VIDEO_START ( thom )
+		MCFG_DEFAULT_LAYOUT( layout_thomson )
 
 /* sound */
-     MCFG_SPEAKER_STANDARD_MONO("mono")
-     MCFG_SOUND_ADD ( "buzzer", DAC, 0 )
-     MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit buzzer */
-     MCFG_SOUND_ADD ( "dac", DAC, 0 )
-     MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 6-bit game extention DAC */
-     MCFG_SOUND_ADD ( "speech", DAC, 0 )
-     MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
+		MCFG_SPEAKER_STANDARD_MONO("mono")
+		MCFG_SOUND_ADD ( "buzzer", DAC, 0 )
+		MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit buzzer */
+		MCFG_SOUND_ADD ( "dac", DAC, 0 )
+		MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 6-bit game extention DAC */
+		MCFG_SOUND_ADD ( "speech", DAC, 0 )
+		MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 /* printer */
-     MCFG_CENTRONICS_PRINTER_ADD("centronics", to7_centronics_config)
+		MCFG_CENTRONICS_PRINTER_ADD("centronics", to7_centronics_config)
 
 /* cassette */
-     MCFG_CASSETTE_ADD( CASSETTE_TAG, to7_cassette_interface )
+		MCFG_CASSETTE_ADD( CASSETTE_TAG, to7_cassette_interface )
 
 /* timer */
-     MCFG_MC6846_ADD( "mc6846", to7_timer )
+		MCFG_MC6846_ADD( "mc6846", to7_timer )
 
 /* speech synthesis */
-     MCFG_MEA8000_ADD( "mea8000", to7_speech )
+		MCFG_MEA8000_ADD( "mea8000", to7_speech )
 
 /* floppy */
-     MCFG_MC6843_ADD( "mc6843", to7_6843_itf )
-     MCFG_WD2793_ADD( "wd2793", default_wd17xx_interface )
-     MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(thomson_floppy_interface)
+		MCFG_MC6843_ADD( "mc6843", to7_6843_itf )
+		MCFG_WD2793_ADD( "wd2793", default_wd17xx_interface )
+		MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(thomson_floppy_interface)
 
 /* network */
-     MCFG_MC6854_ADD( "mc6854", to7_network_iface )
+		MCFG_MC6854_ADD( "mc6854", to7_network_iface )
 
 /* pia */
-     MCFG_PIA6821_ADD( THOM_PIA_SYS, to7_pia6821_sys )
-     MCFG_PIA6821_ADD( THOM_PIA_IO, to7_pia6821_io )
-     MCFG_PIA6821_ADD( THOM_PIA_GAME, to7_pia6821_game )
-     MCFG_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
+		MCFG_PIA6821_ADD( THOM_PIA_SYS, to7_pia6821_sys )
+		MCFG_PIA6821_ADD( THOM_PIA_IO, to7_pia6821_io )
+		MCFG_PIA6821_ADD( THOM_PIA_GAME, to7_pia6821_game )
+		MCFG_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
 
 /* acia */
-     MCFG_ACIA6551_ADD("acia")
+		MCFG_ACIA6551_ADD("acia")
 
 /* to7 serial io line */
-	 MCFG_TO7_IO_LINE_ADD("to7_io")
+		MCFG_TO7_IO_LINE_ADD("to7_io")
 
 /* modem */
-     MCFG_ACIA6850_ADD( "acia6850", to7_modem )
+		MCFG_ACIA6850_ADD( "acia6850", to7_modem )
 
 /* cartridge */
-     MCFG_CARTSLOT_ADD("cart")
-     MCFG_CARTSLOT_EXTENSION_LIST("m7,rom")
-     MCFG_CARTSLOT_NOT_MANDATORY
-     MCFG_CARTSLOT_LOAD(to7_cartridge)
+		MCFG_CARTSLOT_ADD("cart")
+		MCFG_CARTSLOT_EXTENSION_LIST("m7,rom")
+		MCFG_CARTSLOT_NOT_MANDATORY
+		MCFG_CARTSLOT_LOAD(to7_cartridge)
 
 /* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -764,22 +764,22 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
-     AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-     AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
-     AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 6 * 16 KB */
-     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
-     AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
-     AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to770_gatearray_r, to770_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
-     AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
-     AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
+		AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
+		AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
+		AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
+		AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 6 * 16 KB */
+		AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
+		AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
+		AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
+		AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to770_gatearray_r, to770_gatearray_w )
+		AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+		AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
@@ -797,69 +797,69 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to770 )
-     ROM_REGION ( 0x24800, "maincpu", 0 )
-     ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
+		ROM_REGION ( 0x24800, "maincpu", 0 )
+		ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
 		CRC(89518862)
 		SHA1(cd34474c0bcc758f6d71c90fbd40cef379d61374) )
-     ROM_FLOPPY7 ( 0x20000 )
-     ROM_FILL ( 0x10000, 0x10000, 0x39 )
+		ROM_FLOPPY7 ( 0x20000 )
+		ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( to770a )
-     ROM_REGION ( 0x24800, "maincpu", 0 )
-     ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
+		ROM_REGION ( 0x24800, "maincpu", 0 )
+		ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
 		CRC(378ea808)
 		SHA1(f4575b537dfdb46ff2a0e7cbe8dfe4ba63161b8e) )
-     ROM_FLOPPY7 ( 0x20000 )
-     ROM_FILL ( 0x10000, 0x10000, 0x39 )
+		ROM_FLOPPY7 ( 0x20000 )
+		ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 
 /* ------------ inputs   ------------ */
 
 static INPUT_PORTS_START ( to770 )
-     PORT_INCLUDE ( to7 )
+		PORT_INCLUDE ( to7 )
 
-     PORT_MODIFY ( "keyboard_1" )
-     KEY ( 2, "C \302\250 \303\247", C )   PORT_CHAR('C')
-     PORT_MODIFY ( "keyboard_4" )
-     KEY ( 6, "0 \140 \303\240", 0 )       PORT_CHAR('0') PORT_CHAR( 0140 )
-     PORT_MODIFY ( "keyboard_5" )
-     KEY ( 6, "9 ) \303\247", 9 )          PORT_CHAR('9') PORT_CHAR(')')
-     PORT_MODIFY ( "keyboard_6" )
-     KEY ( 6, "8 ( \303\271", 8 )          PORT_CHAR('8') PORT_CHAR('(')
-     PORT_MODIFY ( "keyboard_7" )
-     KEY ( 6, "7 ' \303\250 \302\264", 7 ) PORT_CHAR('7') PORT_CHAR('\'')
-     KEY ( 7, "6 & \303\251", 6 )          PORT_CHAR('6') PORT_CHAR('&')
+		PORT_MODIFY ( "keyboard_1" )
+		KEY ( 2, "C \302\250 \303\247", C )   PORT_CHAR('C')
+		PORT_MODIFY ( "keyboard_4" )
+		KEY ( 6, "0 \140 \303\240", 0 )       PORT_CHAR('0') PORT_CHAR( 0140 )
+		PORT_MODIFY ( "keyboard_5" )
+		KEY ( 6, "9 ) \303\247", 9 )          PORT_CHAR('9') PORT_CHAR(')')
+		PORT_MODIFY ( "keyboard_6" )
+		KEY ( 6, "8 ( \303\271", 8 )          PORT_CHAR('8') PORT_CHAR('(')
+		PORT_MODIFY ( "keyboard_7" )
+		KEY ( 6, "7 ' \303\250 \302\264", 7 ) PORT_CHAR('7') PORT_CHAR('\'')
+		KEY ( 7, "6 & \303\251", 6 )          PORT_CHAR('6') PORT_CHAR('&')
 
 INPUT_PORTS_END
 
 /* arabic version (QWERTY keyboard) */
 static INPUT_PORTS_START ( to770a )
-     PORT_INCLUDE ( to770 )
+		PORT_INCLUDE ( to770 )
 
-     PORT_MODIFY ( "keyboard_1" )
-     KEY ( 0, "Z", Z )                     PORT_CHAR('Z')
-     PORT_MODIFY ( "keyboard_2" )
-     KEY ( 3, "A", A )                     PORT_CHAR('A')
-     KEY ( 4, "/ ?", QUOTE )               PORT_CHAR('/') PORT_CHAR('?')
-     KEY ( 5, "Q", Q )                     PORT_CHAR('Q')
-     PORT_MODIFY ( "keyboard_3" )
-     KEY ( 4, "* :", SLASH )               PORT_CHAR('*') PORT_CHAR(':')
-     KEY ( 5, "W", W)                      PORT_CHAR('W')
-     PORT_MODIFY ( "keyboard_4" )
-     KEY ( 0, ". >", STOP )                PORT_CHAR('.') PORT_CHAR('>')
-     KEY ( 2, "@ \342\206\221", TILDE )    PORT_CHAR('@') PORT_CHAR('^')
-     KEY ( 6, "0 \302\243 \302\260 \140", 0 )   PORT_CHAR('0') PORT_CHAR( 0140 )
-     PORT_MODIFY ( "keyboard_5" )
-     KEY ( 0, ", <", COMMA )               PORT_CHAR(',') PORT_CHAR('<')
-     KEY ( 6, "9 ) \303\261", 9 )          PORT_CHAR('9') PORT_CHAR(')')
-     PORT_MODIFY ( "keyboard_6" )
-     KEY ( 0, "M", M )                     PORT_CHAR('M')
-     KEY ( 6, "8 ( \303\274", 8 )          PORT_CHAR('8') PORT_CHAR('(')
-     PORT_MODIFY ( "keyboard_7" )
-     KEY ( 6, "7 ' \303\266 \302\264", 7 ) PORT_CHAR('7') PORT_CHAR('\'')
-     KEY ( 7, "6 & \303\244", 6 )          PORT_CHAR('6') PORT_CHAR('&')
+		PORT_MODIFY ( "keyboard_1" )
+		KEY ( 0, "Z", Z )                     PORT_CHAR('Z')
+		PORT_MODIFY ( "keyboard_2" )
+		KEY ( 3, "A", A )                     PORT_CHAR('A')
+		KEY ( 4, "/ ?", QUOTE )               PORT_CHAR('/') PORT_CHAR('?')
+		KEY ( 5, "Q", Q )                     PORT_CHAR('Q')
+		PORT_MODIFY ( "keyboard_3" )
+		KEY ( 4, "* :", SLASH )               PORT_CHAR('*') PORT_CHAR(':')
+		KEY ( 5, "W", W)                      PORT_CHAR('W')
+		PORT_MODIFY ( "keyboard_4" )
+		KEY ( 0, ". >", STOP )                PORT_CHAR('.') PORT_CHAR('>')
+		KEY ( 2, "@ \342\206\221", TILDE )    PORT_CHAR('@') PORT_CHAR('^')
+		KEY ( 6, "0 \302\243 \302\260 \140", 0 )   PORT_CHAR('0') PORT_CHAR( 0140 )
+		PORT_MODIFY ( "keyboard_5" )
+		KEY ( 0, ", <", COMMA )               PORT_CHAR(',') PORT_CHAR('<')
+		KEY ( 6, "9 ) \303\261", 9 )          PORT_CHAR('9') PORT_CHAR(')')
+		PORT_MODIFY ( "keyboard_6" )
+		KEY ( 0, "M", M )                     PORT_CHAR('M')
+		KEY ( 6, "8 ( \303\274", 8 )          PORT_CHAR('8') PORT_CHAR('(')
+		PORT_MODIFY ( "keyboard_7" )
+		KEY ( 6, "7 ' \303\266 \302\264", 7 ) PORT_CHAR('7') PORT_CHAR('\'')
+		KEY ( 7, "6 & \303\244", 6 )          PORT_CHAR('6') PORT_CHAR('&')
 
 INPUT_PORTS_END
 
@@ -867,15 +867,15 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to770, to7 )
-    MCFG_MACHINE_START ( to770 )
-    MCFG_MACHINE_RESET ( to770 )
+	MCFG_MACHINE_START ( to770 )
+	MCFG_MACHINE_RESET ( to770 )
 
-    MCFG_CPU_MODIFY( "maincpu" )
-    MCFG_CPU_PROGRAM_MAP ( to770)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP ( to770)
 
 	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to770_pia6821_sys )
 
-    MCFG_MC6846_MODIFY( "mc6846", to770_timer )
+	MCFG_MC6846_MODIFY( "mc6846", to770_timer )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -952,20 +952,20 @@ Differences include:
 
 static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
-     AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
-     AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo5_ext_w )
-     AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xa7d0, 0xa7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
-     AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo5_gatearray_r, mo5_gatearray_w )
-     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
-     AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
-     AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(mo5_cartridge_w )
-     AM_RANGE ( 0xf000, 0xffff ) AM_ROM       /* system bios */
+		AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
+		AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
+		AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
+		AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo5_ext_w )
+		AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xa7d0, 0xa7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
+		AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
+		AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo5_gatearray_r, mo5_gatearray_w )
+		AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
+		AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(mo5_cartridge_w )
+		AM_RANGE ( 0xf000, 0xffff ) AM_ROM       /* system bios */
 
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
@@ -983,78 +983,78 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5 )
-     ROM_REGION ( 0x24800, "maincpu", 0 )
-     ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
+		ROM_REGION ( 0x24800, "maincpu", 0 )
+		ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
 		CRC(f0ea9140)
 		SHA1(36ce2d3df1866ec2fe368c1c28757e2f5401cf44) )
-     ROM_LOAD ( "basic5.rom", 0x11000, 0x3000,
+		ROM_LOAD ( "basic5.rom", 0x11000, 0x3000,
 		CRC(c2c11b9d)
 		SHA1(512dd40fb45bc2b51a24c84b3723a32bc8e80c06) )
-     ROM_FLOPPY5 ( 0x20000 )
+		ROM_FLOPPY5 ( 0x20000 )
 ROM_END
 
 ROM_START ( mo5e )
-     ROM_REGION ( 0x24800, "maincpu", 0 )
-     ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
+		ROM_REGION ( 0x24800, "maincpu", 0 )
+		ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
 		CRC(6520213a)
 		SHA1(f17a7a59baf2819ec80991b34b204795536a5e01) )
-     ROM_LOAD ( "basic5e.rom", 0x11000, 0x3000,
+		ROM_LOAD ( "basic5e.rom", 0x11000, 0x3000,
 		CRC(934a72b2)
 		SHA1(b37e2b1afbfba368c19be87b3bf61dfe6ad8b0bb) )
-     ROM_FLOPPY5 ( 0x20000 )
+		ROM_FLOPPY5 ( 0x20000 )
 ROM_END
 
 
 /* ------------ inputs  ------------ */
 
 static INPUT_PORTS_START ( mo5 )
-     PORT_INCLUDE ( to770 )
+		PORT_INCLUDE ( to770 )
 
-     PORT_MODIFY ( "keyboard_0" )
-     KEY ( 1, "BASIC", RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
-     PORT_BIT  ( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_MODIFY ( "keyboard_0" )
+		KEY ( 1, "BASIC", RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+		PORT_BIT  ( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
 
 /* QWERTY version */
 static INPUT_PORTS_START ( mo5e )
-     PORT_INCLUDE ( mo5 )
+		PORT_INCLUDE ( mo5 )
 
-     PORT_MODIFY ( "keyboard_1" )
-     KEY ( 0, "Z", Z )                     PORT_CHAR('Z')
-     PORT_MODIFY ( "keyboard_2" )
-     KEY ( 3, "A", A )                     PORT_CHAR('A')
-     KEY ( 5, "Q", Q )                     PORT_CHAR('Q')
-     PORT_MODIFY ( "keyboard_3" )
-     KEY ( 5, "W", W)                      PORT_CHAR('W')
-     PORT_MODIFY ( "keyboard_4" )
-     KEY ( 0, ". >", STOP )                PORT_CHAR('.') PORT_CHAR('>')
-     KEY ( 2, "@ \342\206\221", TILDE )    PORT_CHAR('@') PORT_CHAR('^')
-     KEY ( 6, "0 \302\243 \302\260 \140", 0 )   PORT_CHAR('0') PORT_CHAR( 0140 )
-     PORT_MODIFY ( "keyboard_5" )
-     KEY ( 0, ", <", COMMA )               PORT_CHAR(',') PORT_CHAR('<')
-     KEY ( 6, "9 ) \303\261", 9 )          PORT_CHAR('9') PORT_CHAR(')')
-     PORT_MODIFY ( "keyboard_6" )
-     KEY ( 0, "M", M )                     PORT_CHAR('M')
-     KEY ( 6, "8 ( \303\274", 8 )          PORT_CHAR('8') PORT_CHAR('(')
-     PORT_MODIFY ( "keyboard_7" )
-     KEY ( 6, "7 ' \303\266 \302\264", 7 ) PORT_CHAR('7') PORT_CHAR('\'')
-     KEY ( 7, "6 & \303\244", 6 )          PORT_CHAR('6') PORT_CHAR('&')
+		PORT_MODIFY ( "keyboard_1" )
+		KEY ( 0, "Z", Z )                     PORT_CHAR('Z')
+		PORT_MODIFY ( "keyboard_2" )
+		KEY ( 3, "A", A )                     PORT_CHAR('A')
+		KEY ( 5, "Q", Q )                     PORT_CHAR('Q')
+		PORT_MODIFY ( "keyboard_3" )
+		KEY ( 5, "W", W)                      PORT_CHAR('W')
+		PORT_MODIFY ( "keyboard_4" )
+		KEY ( 0, ". >", STOP )                PORT_CHAR('.') PORT_CHAR('>')
+		KEY ( 2, "@ \342\206\221", TILDE )    PORT_CHAR('@') PORT_CHAR('^')
+		KEY ( 6, "0 \302\243 \302\260 \140", 0 )   PORT_CHAR('0') PORT_CHAR( 0140 )
+		PORT_MODIFY ( "keyboard_5" )
+		KEY ( 0, ", <", COMMA )               PORT_CHAR(',') PORT_CHAR('<')
+		KEY ( 6, "9 ) \303\261", 9 )          PORT_CHAR('9') PORT_CHAR(')')
+		PORT_MODIFY ( "keyboard_6" )
+		KEY ( 0, "M", M )                     PORT_CHAR('M')
+		KEY ( 6, "8 ( \303\274", 8 )          PORT_CHAR('8') PORT_CHAR('(')
+		PORT_MODIFY ( "keyboard_7" )
+		KEY ( 6, "7 ' \303\266 \302\264", 7 ) PORT_CHAR('7') PORT_CHAR('\'')
+		KEY ( 7, "6 & \303\244", 6 )          PORT_CHAR('6') PORT_CHAR('&')
 
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( mo5, to7 )
-     MCFG_MACHINE_START ( mo5 )
-     MCFG_MACHINE_RESET ( mo5 )
+		MCFG_MACHINE_START ( mo5 )
+		MCFG_MACHINE_RESET ( mo5 )
 
-     MCFG_CPU_MODIFY( "maincpu" )
-     MCFG_CPU_PROGRAM_MAP ( mo5)
+		MCFG_CPU_MODIFY( "maincpu" )
+		MCFG_CPU_PROGRAM_MAP ( mo5)
 
-     MCFG_CASSETTE_MODIFY( CASSETTE_TAG, mo5_cassette_interface )
+		MCFG_CASSETTE_MODIFY( CASSETTE_TAG, mo5_cassette_interface )
 
-     MCFG_DEVICE_REMOVE( "mc6846" )
+		MCFG_DEVICE_REMOVE( "mc6846" )
 
 	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, mo5_pia6821_sys )
 
@@ -1150,24 +1150,24 @@ It was replaced quickly with the improved TO9+.
 
 static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to9_cartridge_w )/* 4 * 16 KB */
-     AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
-     AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
-     AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 10 * 16 KB */
-     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
-     AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to9_floppy_r, to9_floppy_w )
-     AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to9_vreg_r, to9_vreg_w )
-     AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE_LEGACY(to9_kbd_r, to9_kbd_w )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to9_gatearray_r, to9_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to9_cartridge_w )/* 4 * 16 KB */
+		AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
+		AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
+		AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 10 * 16 KB */
+		AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
+		AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
+		AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to9_floppy_r, to9_floppy_w )
+		AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to9_vreg_r, to9_vreg_w )
+		AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE_LEGACY(to9_kbd_r, to9_kbd_w )
+		AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to9_gatearray_r, to9_gatearray_w )
+		AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-     AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
-     AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
+		AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+		AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
@@ -1191,203 +1191,203 @@ ADDRESS_MAP_END
  */
 
 ROM_START ( to9 )
-     ROM_REGION ( 0x44800, "maincpu", 0 )
-     ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
+		ROM_REGION ( 0x44800, "maincpu", 0 )
+		ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
 		SHA1(9e99e6ae0285950f007b19161de642a4031fe46e) )
 
-     /* BASIC & software */
-     ROM_LOAD ( "basic9-0.rom", 0x20000, 0x4000,
+		/* BASIC & software */
+		ROM_LOAD ( "basic9-0.rom", 0x20000, 0x4000,
 		CRC(c7bac620)
 		SHA1(4b2a8b30cf437858ce978ba7b0dfa2bbd57eb38a) )
-     ROM_LOAD ( "basic9-1.rom", 0x24000, 0x4000,
+		ROM_LOAD ( "basic9-1.rom", 0x24000, 0x4000,
 		CRC(ea5f3e43)
 		SHA1(5e58a29c2d117fcdb1f5e7ca31dbfffa0f9218f2) )
-     ROM_LOAD ( "basic9-2.rom", 0x28000, 0x4000,
+		ROM_LOAD ( "basic9-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-     ROM_LOAD ( "basic9-3.rom", 0x2c000, 0x4000,
+		ROM_LOAD ( "basic9-3.rom", 0x2c000, 0x4000,
 		CRC(6b5b19e3)
 		SHA1(0e832670c185694d9abbcebcc3ad90e94eed585d) )
-     ROM_LOAD ( "soft9-0a.rom", 0x30000, 0x4000,
+		ROM_LOAD ( "soft9-0a.rom", 0x30000, 0x4000,
 		CRC(8cee157e)
 		SHA1(f32fc39b95890c00571e9f3fbcc2d8e0596fc4a1) )
-     ROM_LOAD ( "soft9-1a.rom", 0x34000, 0x4000,
+		ROM_LOAD ( "soft9-1a.rom", 0x34000, 0x4000,
 		CRC(cf39ac93)
 		SHA1(b97e6b7389398e5706624973c11ee7ddba323ce1) )
-     ROM_LOAD ( "soft9-0b.rom", 0x38000, 0x4000,
+		ROM_LOAD ( "soft9-0b.rom", 0x38000, 0x4000,
 		CRC(033aee3f)
 		SHA1(f3604e500329ec0489b05dbab05530322e9463c5) )
-     ROM_LOAD ( "soft9-1b.rom", 0x3c000, 0x4000,
+		ROM_LOAD ( "soft9-1b.rom", 0x3c000, 0x4000,
 		CRC(214fe527)
 		SHA1(0d8e3f1ca347026e906c3d00a0371e8238c44a60) )
 
-     ROM_FLOPPY7( 0x40000 )
+		ROM_FLOPPY7( 0x40000 )
 
-     ROM_FILL( 0x10000, 0x10000, 0x39 )
+		ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 
 /* ------------ inputs   ------------ */
 
 static INPUT_PORTS_START ( to9_keyboard )
-     PORT_START ( "keyboard_0" )
-     KEY ( 0, "F2 F7", F2 )           PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
-     KEY ( 1, "_ 6", 6 )              PORT_CHAR('_') PORT_CHAR('6')
-     KEY ( 2, "Y", Y )                PORT_CHAR('Y')
-     KEY ( 3, "H \302\250", H )       PORT_CHAR('H')
-     KEY ( 4, UTF8_UP, UP )    PORT_CHAR(UCHAR_MAMEKEY(UP))
-     KEY ( 5, UTF8_RIGHT, RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-     KEY ( 6, "Home Clear", HOME )    PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-     KEY ( 7, "N", N )                PORT_CHAR('N')
-     PORT_START ( "keyboard_1" )
-     KEY ( 0, "F3 F8", F3 )           PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
-     KEY ( 1, "( 5", 5 )              PORT_CHAR('(') PORT_CHAR('5')
-     KEY ( 2, "T", T )                PORT_CHAR('T')
-     KEY ( 3, "G", G )                PORT_CHAR('G')
-     KEY ( 4, "= +", EQUALS )         PORT_CHAR('=') PORT_CHAR('+')
-     KEY ( 5, UTF8_LEFT, LEFT )  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-     KEY ( 6, "Insert", INSERT )      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-     KEY ( 7, "B \302\264", B )       PORT_CHAR('B')
-     PORT_START ( "keyboard_2" )
-     KEY ( 0, "F4 F9", F4 )           PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
-     KEY ( 1, "' 4", 4 )              PORT_CHAR('\'') PORT_CHAR('4')
-     KEY ( 2, "R", R )                PORT_CHAR('R')
-     KEY ( 3, "F", F )                PORT_CHAR('F')
-     KEY ( 4, "Accent", END )         PORT_CHAR(UCHAR_MAMEKEY(END))
-     KEY ( 5, "Keypad 1", 1_PAD )     PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-     KEY ( 6, "Delete Backspace", DEL ) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
-     KEY ( 7, "V", V )                PORT_CHAR('V')
-     PORT_START ( "keyboard_3" )
-     KEY ( 0, "F5 F10", F5 )          PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
-     KEY ( 1, "\" 3", 3 )             PORT_CHAR('"') PORT_CHAR('3')
-     KEY ( 2, "E", E )                PORT_CHAR('E')
-     KEY ( 3, "D", D )                PORT_CHAR('D')
-     KEY ( 4, "Keypad 7", 7_PAD )     PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-     KEY ( 5, "Keypad 4", 4_PAD )     PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-     KEY ( 6, "Keypad 0", 0_PAD )     PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-     KEY ( 7, "C \136", C )           PORT_CHAR('C')
-     PORT_START ( "keyboard_4" )
-     KEY ( 0, "F1 F6", F1 )           PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-     KEY ( 1, "\303\251 2", 2 )       PORT_CHAR( 0xe9 ) PORT_CHAR('2')
-     KEY ( 2, "Z", Z )                PORT_CHAR('Z')
-     KEY ( 3, "S", S )                PORT_CHAR('S')
-     KEY ( 4, "Keypad 8", 8_PAD )     PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-     KEY ( 5, "Keypad 2", 2_PAD )     PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-     KEY ( 6, "Keypad .", DEL_PAD )   PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-     KEY ( 7, "X", X )                PORT_CHAR('X')
-     PORT_START ( "keyboard_5" )
-     KEY ( 0, "# @", TILDE )          PORT_CHAR('#') PORT_CHAR('@')
-     KEY ( 1, "* 1", 1 )              PORT_CHAR('*') PORT_CHAR('1')
-     KEY ( 2, "A \140", A )           PORT_CHAR('A')
-     KEY ( 3, "Q", Q )                PORT_CHAR('Q')
-     KEY ( 4, "[ {", QUOTE )          PORT_CHAR('[') PORT_CHAR('{')
-     KEY ( 5, "Keypad 5", 5_PAD )     PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-     KEY ( 6, "Keypad 6", 6_PAD )     PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-     KEY ( 7, "W", W )                PORT_CHAR('W')
-     PORT_START ( "keyboard_6" )
-     KEY ( 0, "Stop", TAB )           PORT_CHAR(27)
-     KEY ( 1, "\303\250 7", 7 )       PORT_CHAR( 0xe8 ) PORT_CHAR('7')
-     KEY ( 2, "U", U )                PORT_CHAR('U')
-     KEY ( 3, "J", J )                PORT_CHAR('J')
-     KEY ( 4, "Space", SPACE )        PORT_CHAR(' ')
-     KEY ( 5, "Keypad 9", 9_PAD )     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-     KEY ( 6, "Keypad Enter", ENTER_PAD ) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-     KEY ( 7, ", ?", COMMA )          PORT_CHAR(',') PORT_CHAR('?')
-     PORT_START ( "keyboard_7" )
-     KEY ( 0, "Control", LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-     KEY ( 1, "! 8", 8 )              PORT_CHAR('!') PORT_CHAR('8')
-     KEY ( 2, "I", I )                PORT_CHAR('I')
-     KEY ( 3, "K", K )                PORT_CHAR('K')
-     KEY ( 4, "$ &", CLOSEBRACE )     PORT_CHAR('$') PORT_CHAR('&')
-     KEY ( 5, UTF8_DOWN, DOWN )  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-     KEY ( 6, "] }", BACKSLASH )      PORT_CHAR(']') PORT_CHAR('}')
-     KEY ( 7, "; .", STOP )           PORT_CHAR(';') PORT_CHAR('.')
-     PORT_START ( "keyboard_8" )
-     KEY ( 0, "Caps-Lock", CAPSLOCK ) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-     KEY ( 1, "\303\247 9", 9 )       PORT_CHAR( 0xe7 ) PORT_CHAR('9')
-     KEY ( 2, "O", O )                PORT_CHAR('O')
-     KEY ( 3, "L", L )                PORT_CHAR('L')
-     KEY ( 4, "- \\", BACKSPACE )     PORT_CHAR('-') PORT_CHAR('\\')
-     KEY ( 5, "\303\271 %", COLON )   PORT_CHAR( 0xf9 ) PORT_CHAR('%')
-     KEY ( 6, "Enter", ENTER )        PORT_CHAR(13)
-     KEY ( 7, ": /", SLASH )          PORT_CHAR(':') PORT_CHAR('/')
-     PORT_START ( "keyboard_9" )
-     KEY ( 0, "Shift", LSHIFT )  PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
-     KEY ( 1, "\303\240 0", 0 )       PORT_CHAR( 0xe0 ) PORT_CHAR('0')
-     KEY ( 2, "P", P )                PORT_CHAR('P')
-     KEY ( 3, "M", M )                PORT_CHAR('M')
-     KEY ( 4, ") \302\260", MINUS )   PORT_CHAR(')') PORT_CHAR( 0xb0 )
-     KEY ( 5, "\342\206\221 \302\250", OPENBRACE )  PORT_CHAR('^') PORT_CHAR( 0xa8 )
-     KEY ( 6, "Keypad 3", 3_PAD )     PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-     KEY ( 7, "> <", BACKSLASH2 )     PORT_CHAR('>') PORT_CHAR('<')
+		PORT_START ( "keyboard_0" )
+		KEY ( 0, "F2 F7", F2 )           PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
+		KEY ( 1, "_ 6", 6 )              PORT_CHAR('_') PORT_CHAR('6')
+		KEY ( 2, "Y", Y )                PORT_CHAR('Y')
+		KEY ( 3, "H \302\250", H )       PORT_CHAR('H')
+		KEY ( 4, UTF8_UP, UP )    PORT_CHAR(UCHAR_MAMEKEY(UP))
+		KEY ( 5, UTF8_RIGHT, RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		KEY ( 6, "Home Clear", HOME )    PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+		KEY ( 7, "N", N )                PORT_CHAR('N')
+		PORT_START ( "keyboard_1" )
+		KEY ( 0, "F3 F8", F3 )           PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
+		KEY ( 1, "( 5", 5 )              PORT_CHAR('(') PORT_CHAR('5')
+		KEY ( 2, "T", T )                PORT_CHAR('T')
+		KEY ( 3, "G", G )                PORT_CHAR('G')
+		KEY ( 4, "= +", EQUALS )         PORT_CHAR('=') PORT_CHAR('+')
+		KEY ( 5, UTF8_LEFT, LEFT )  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		KEY ( 6, "Insert", INSERT )      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+		KEY ( 7, "B \302\264", B )       PORT_CHAR('B')
+		PORT_START ( "keyboard_2" )
+		KEY ( 0, "F4 F9", F4 )           PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
+		KEY ( 1, "' 4", 4 )              PORT_CHAR('\'') PORT_CHAR('4')
+		KEY ( 2, "R", R )                PORT_CHAR('R')
+		KEY ( 3, "F", F )                PORT_CHAR('F')
+		KEY ( 4, "Accent", END )         PORT_CHAR(UCHAR_MAMEKEY(END))
+		KEY ( 5, "Keypad 1", 1_PAD )     PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+		KEY ( 6, "Delete Backspace", DEL ) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+		KEY ( 7, "V", V )                PORT_CHAR('V')
+		PORT_START ( "keyboard_3" )
+		KEY ( 0, "F5 F10", F5 )          PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
+		KEY ( 1, "\" 3", 3 )             PORT_CHAR('"') PORT_CHAR('3')
+		KEY ( 2, "E", E )                PORT_CHAR('E')
+		KEY ( 3, "D", D )                PORT_CHAR('D')
+		KEY ( 4, "Keypad 7", 7_PAD )     PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+		KEY ( 5, "Keypad 4", 4_PAD )     PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+		KEY ( 6, "Keypad 0", 0_PAD )     PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+		KEY ( 7, "C \136", C )           PORT_CHAR('C')
+		PORT_START ( "keyboard_4" )
+		KEY ( 0, "F1 F6", F1 )           PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
+		KEY ( 1, "\303\251 2", 2 )       PORT_CHAR( 0xe9 ) PORT_CHAR('2')
+		KEY ( 2, "Z", Z )                PORT_CHAR('Z')
+		KEY ( 3, "S", S )                PORT_CHAR('S')
+		KEY ( 4, "Keypad 8", 8_PAD )     PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+		KEY ( 5, "Keypad 2", 2_PAD )     PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+		KEY ( 6, "Keypad .", DEL_PAD )   PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+		KEY ( 7, "X", X )                PORT_CHAR('X')
+		PORT_START ( "keyboard_5" )
+		KEY ( 0, "# @", TILDE )          PORT_CHAR('#') PORT_CHAR('@')
+		KEY ( 1, "* 1", 1 )              PORT_CHAR('*') PORT_CHAR('1')
+		KEY ( 2, "A \140", A )           PORT_CHAR('A')
+		KEY ( 3, "Q", Q )                PORT_CHAR('Q')
+		KEY ( 4, "[ {", QUOTE )          PORT_CHAR('[') PORT_CHAR('{')
+		KEY ( 5, "Keypad 5", 5_PAD )     PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+		KEY ( 6, "Keypad 6", 6_PAD )     PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+		KEY ( 7, "W", W )                PORT_CHAR('W')
+		PORT_START ( "keyboard_6" )
+		KEY ( 0, "Stop", TAB )           PORT_CHAR(27)
+		KEY ( 1, "\303\250 7", 7 )       PORT_CHAR( 0xe8 ) PORT_CHAR('7')
+		KEY ( 2, "U", U )                PORT_CHAR('U')
+		KEY ( 3, "J", J )                PORT_CHAR('J')
+		KEY ( 4, "Space", SPACE )        PORT_CHAR(' ')
+		KEY ( 5, "Keypad 9", 9_PAD )     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+		KEY ( 6, "Keypad Enter", ENTER_PAD ) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+		KEY ( 7, ", ?", COMMA )          PORT_CHAR(',') PORT_CHAR('?')
+		PORT_START ( "keyboard_7" )
+		KEY ( 0, "Control", LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+		KEY ( 1, "! 8", 8 )              PORT_CHAR('!') PORT_CHAR('8')
+		KEY ( 2, "I", I )                PORT_CHAR('I')
+		KEY ( 3, "K", K )                PORT_CHAR('K')
+		KEY ( 4, "$ &", CLOSEBRACE )     PORT_CHAR('$') PORT_CHAR('&')
+		KEY ( 5, UTF8_DOWN, DOWN )  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		KEY ( 6, "] }", BACKSLASH )      PORT_CHAR(']') PORT_CHAR('}')
+		KEY ( 7, "; .", STOP )           PORT_CHAR(';') PORT_CHAR('.')
+		PORT_START ( "keyboard_8" )
+		KEY ( 0, "Caps-Lock", CAPSLOCK ) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+		KEY ( 1, "\303\247 9", 9 )       PORT_CHAR( 0xe7 ) PORT_CHAR('9')
+		KEY ( 2, "O", O )                PORT_CHAR('O')
+		KEY ( 3, "L", L )                PORT_CHAR('L')
+		KEY ( 4, "- \\", BACKSPACE )     PORT_CHAR('-') PORT_CHAR('\\')
+		KEY ( 5, "\303\271 %", COLON )   PORT_CHAR( 0xf9 ) PORT_CHAR('%')
+		KEY ( 6, "Enter", ENTER )        PORT_CHAR(13)
+		KEY ( 7, ": /", SLASH )          PORT_CHAR(':') PORT_CHAR('/')
+		PORT_START ( "keyboard_9" )
+		KEY ( 0, "Shift", LSHIFT )  PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
+		KEY ( 1, "\303\240 0", 0 )       PORT_CHAR( 0xe0 ) PORT_CHAR('0')
+		KEY ( 2, "P", P )                PORT_CHAR('P')
+		KEY ( 3, "M", M )                PORT_CHAR('M')
+		KEY ( 4, ") \302\260", MINUS )   PORT_CHAR(')') PORT_CHAR( 0xb0 )
+		KEY ( 5, "\342\206\221 \302\250", OPENBRACE )  PORT_CHAR('^') PORT_CHAR( 0xa8 )
+		KEY ( 6, "Keypad 3", 3_PAD )     PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+		KEY ( 7, "> <", BACKSLASH2 )     PORT_CHAR('>') PORT_CHAR('<')
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to9_fconfig )
-     PORT_START ( "fconfig" )
+		PORT_START ( "fconfig" )
 
-     PORT_CONFNAME ( 0x07, 0x00, "External floppy (reset)" )
-     PORT_CONFSETTING ( 0x00, "No external" )
-     PORT_CONFSETTING ( 0x01, "CD 90-015 (5\"1/4 SD)" )
-     PORT_CONFSETTING ( 0x02, "CD 90-640 (5\"1/4 DD)" )
-     PORT_CONFSETTING ( 0x03, "CD 90-351 (3\"1/2)" )
-     PORT_CONFSETTING ( 0x04, "CQ 90-028 (2\"8 QDD)" )
-     PORT_CONFSETTING ( 0x05, "Network" )
+		PORT_CONFNAME ( 0x07, 0x00, "External floppy (reset)" )
+		PORT_CONFSETTING ( 0x00, "No external" )
+		PORT_CONFSETTING ( 0x01, "CD 90-015 (5\"1/4 SD)" )
+		PORT_CONFSETTING ( 0x02, "CD 90-640 (5\"1/4 DD)" )
+		PORT_CONFSETTING ( 0x03, "CD 90-351 (3\"1/2)" )
+		PORT_CONFSETTING ( 0x04, "CQ 90-028 (2\"8 QDD)" )
+		PORT_CONFSETTING ( 0x05, "Network" )
 
-     PORT_CONFNAME ( 0xf8, 0x08, "Network ID" )
-     PORT_CONFSETTING ( 0x00, "0 (Master)" )
-     PORT_CONFSETTING ( 0x08, "1" )
-     PORT_CONFSETTING ( 0x10, "2" )
-     PORT_CONFSETTING ( 0x18, "3" )
-     PORT_CONFSETTING ( 0x20, "4" )
-     PORT_CONFSETTING ( 0x28, "5" )
-     PORT_CONFSETTING ( 0x30, "6" )
-     PORT_CONFSETTING ( 0x38, "7" )
-     PORT_CONFSETTING ( 0x40, "8" )
-     PORT_CONFSETTING ( 0x48, "9" )
-     PORT_CONFSETTING ( 0x50, "10" )
-     PORT_CONFSETTING ( 0x58, "11" )
-     PORT_CONFSETTING ( 0x60, "12" )
-     PORT_CONFSETTING ( 0x68, "13" )
-     PORT_CONFSETTING ( 0x70, "14" )
-     PORT_CONFSETTING ( 0x78, "15" )
-     PORT_CONFSETTING ( 0x80, "16" )
-     PORT_CONFSETTING ( 0x88, "17" )
-     PORT_CONFSETTING ( 0x90, "18" )
-     PORT_CONFSETTING ( 0x98, "19" )
-     PORT_CONFSETTING ( 0xa0, "20" )
-     PORT_CONFSETTING ( 0xa8, "21" )
-     PORT_CONFSETTING ( 0xb0, "22" )
-     PORT_CONFSETTING ( 0xb8, "23" )
-     PORT_CONFSETTING ( 0xc0, "24" )
-     PORT_CONFSETTING ( 0xc8, "25" )
-     PORT_CONFSETTING ( 0xd0, "26" )
-     PORT_CONFSETTING ( 0xd8, "27" )
-     PORT_CONFSETTING ( 0xe0, "28" )
-     PORT_CONFSETTING ( 0xe8, "29" )
-     PORT_CONFSETTING ( 0xf0, "30" )
-     PORT_CONFSETTING ( 0xf8, "31" )
+		PORT_CONFNAME ( 0xf8, 0x08, "Network ID" )
+		PORT_CONFSETTING ( 0x00, "0 (Master)" )
+		PORT_CONFSETTING ( 0x08, "1" )
+		PORT_CONFSETTING ( 0x10, "2" )
+		PORT_CONFSETTING ( 0x18, "3" )
+		PORT_CONFSETTING ( 0x20, "4" )
+		PORT_CONFSETTING ( 0x28, "5" )
+		PORT_CONFSETTING ( 0x30, "6" )
+		PORT_CONFSETTING ( 0x38, "7" )
+		PORT_CONFSETTING ( 0x40, "8" )
+		PORT_CONFSETTING ( 0x48, "9" )
+		PORT_CONFSETTING ( 0x50, "10" )
+		PORT_CONFSETTING ( 0x58, "11" )
+		PORT_CONFSETTING ( 0x60, "12" )
+		PORT_CONFSETTING ( 0x68, "13" )
+		PORT_CONFSETTING ( 0x70, "14" )
+		PORT_CONFSETTING ( 0x78, "15" )
+		PORT_CONFSETTING ( 0x80, "16" )
+		PORT_CONFSETTING ( 0x88, "17" )
+		PORT_CONFSETTING ( 0x90, "18" )
+		PORT_CONFSETTING ( 0x98, "19" )
+		PORT_CONFSETTING ( 0xa0, "20" )
+		PORT_CONFSETTING ( 0xa8, "21" )
+		PORT_CONFSETTING ( 0xb0, "22" )
+		PORT_CONFSETTING ( 0xb8, "23" )
+		PORT_CONFSETTING ( 0xc0, "24" )
+		PORT_CONFSETTING ( 0xc8, "25" )
+		PORT_CONFSETTING ( 0xd0, "26" )
+		PORT_CONFSETTING ( 0xd8, "27" )
+		PORT_CONFSETTING ( 0xe0, "28" )
+		PORT_CONFSETTING ( 0xe8, "29" )
+		PORT_CONFSETTING ( 0xf0, "30" )
+		PORT_CONFSETTING ( 0xf8, "31" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to9 )
-     PORT_INCLUDE ( thom_lightpen )
-     PORT_INCLUDE ( thom_game_port )
-     PORT_INCLUDE ( to9_keyboard )
-     PORT_INCLUDE ( to7_config )
-     PORT_INCLUDE ( to9_fconfig )
-     PORT_INCLUDE ( to7_vconfig )
-     PORT_INCLUDE ( to7_mconfig )
+		PORT_INCLUDE ( thom_lightpen )
+		PORT_INCLUDE ( thom_game_port )
+		PORT_INCLUDE ( to9_keyboard )
+		PORT_INCLUDE ( to7_config )
+		PORT_INCLUDE ( to9_fconfig )
+		PORT_INCLUDE ( to7_vconfig )
+		PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to9, to7 )
-     MCFG_MACHINE_START ( to9 )
-     MCFG_MACHINE_RESET ( to9 )
+		MCFG_MACHINE_START ( to9 )
+		MCFG_MACHINE_RESET ( to9 )
 
-     MCFG_CPU_MODIFY( "maincpu" )
-     MCFG_CPU_PROGRAM_MAP ( to9)
+		MCFG_CPU_MODIFY( "maincpu" )
+		MCFG_CPU_PROGRAM_MAP ( to9)
 
 	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to9_pia6821_sys )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
@@ -1395,9 +1395,9 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
-     MCFG_MC6846_MODIFY( "mc6846", to9_timer )
+		MCFG_MC6846_MODIFY( "mc6846", to9_timer )
 
-	 /* internal ram */
+		/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("192K")
 	MCFG_RAM_EXTRA_OPTIONS("128K")
@@ -1472,25 +1472,25 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 
 static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
-     AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-     AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-     AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-     AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-     AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
-     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
-     AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to8_floppy_r, to8_floppy_w )
-     AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to8_vreg_r, to8_vreg_w )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to8_gatearray_r, to8_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
+		AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
+		AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
+		AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
+		AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
+		AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+		AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
+		AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
+		AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to8_floppy_r, to8_floppy_w )
+		AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to8_vreg_r, to8_vreg_w )
+		AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to8_gatearray_r, to8_gatearray_w )
+		AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-     AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
-     AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
+		AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+		AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1505,105 +1505,105 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to8 )
-     ROM_REGION ( 0x38800, "maincpu", 0 )
+		ROM_REGION ( 0x38800, "maincpu", 0 )
 
-     /* BIOS & floppy */
-     ROM_LOAD ( "to8-0.rom", 0x30000, 0x2000,
+		/* BIOS & floppy */
+		ROM_LOAD ( "to8-0.rom", 0x30000, 0x2000,
 		CRC(3c4a640a)
 		SHA1(0a4952f0ca002d82ac83755e1f694d56399413b2) )
-     ROM_LOAD ( "to8-1.rom", 0x32000, 0x2000,
+		ROM_LOAD ( "to8-1.rom", 0x32000, 0x2000,
 		CRC(cb9bae2d)
 		SHA1(a4a55a6e2c74bca15951158c5164970e922fc1c1) )
 
-     /* BASIC */
-     ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
+		/* BASIC */
+		ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-     ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
+		ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
 		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-     ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
+		ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-     ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
+		ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
 		CRC(f552e7e3)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
-     ROM_FLOPPY7( 0x34000 )
+		ROM_FLOPPY7( 0x34000 )
 
-     ROM_FILL( 0x10000, 0x10000, 0x39 )
+		ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( to8d )
-     ROM_REGION ( 0x38800, "maincpu", 0 )
+		ROM_REGION ( 0x38800, "maincpu", 0 )
 
-     /* BIOS & floppy */
-     ROM_LOAD ( "to8d-0.rom", 0x30000, 0x2000,
+		/* BIOS & floppy */
+		ROM_LOAD ( "to8d-0.rom", 0x30000, 0x2000,
 		CRC(30ea4950)
 		SHA1(6705100cd337fffb26ce999302b55fb71557b128) )
-     ROM_LOAD ( "to8d-1.rom", 0x32000, 0x2000,
+		ROM_LOAD ( "to8d-1.rom", 0x32000, 0x2000,
 		CRC(926cf0ca)
 		SHA1(8521613ac00e04dd94b69e771aeaefbf4fe97bf7) )
 
-     /* BASIC */
-     ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
+		/* BASIC */
+		ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-     ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
+		ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
 		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-     ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
+		ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-     ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
+		ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
 		CRC(f552e7e3)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
-     ROM_FLOPPY7( 0x34000 )
+		ROM_FLOPPY7( 0x34000 )
 
-     ROM_FILL( 0x10000, 0x10000, 0x39 )
+		ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 
 /* ------------ inputs   ------------ */
 
 static INPUT_PORTS_START ( to8_config )
-     PORT_START ( "config" )
+		PORT_START ( "config" )
 
-     PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
-     PORT_CONFSETTING ( 0x00, DEF_STR( Joystick ) )
-     PORT_CONFSETTING ( 0x01, "Mouse" )
+		PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
+		PORT_CONFSETTING ( 0x00, DEF_STR( Joystick ) )
+		PORT_CONFSETTING ( 0x01, "Mouse" )
 
-     PORT_CONFNAME ( 0x02, 0x00, "Keyboard" )
-     PORT_CONFSETTING ( 0x00, "Enabled" )
-     PORT_CONFSETTING ( 0x02, "Disabled" )
+		PORT_CONFNAME ( 0x02, 0x00, "Keyboard" )
+		PORT_CONFSETTING ( 0x00, "Enabled" )
+		PORT_CONFSETTING ( 0x02, "Disabled" )
 
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START ( to8 )
-     PORT_INCLUDE ( thom_lightpen )
-     PORT_INCLUDE ( thom_game_port )
-     PORT_INCLUDE ( to9_keyboard )
-     PORT_INCLUDE ( to8_config )
-     PORT_INCLUDE ( to9_fconfig )
-     PORT_INCLUDE ( to7_vconfig )
-     PORT_INCLUDE ( to7_mconfig )
+		PORT_INCLUDE ( thom_lightpen )
+		PORT_INCLUDE ( thom_game_port )
+		PORT_INCLUDE ( to9_keyboard )
+		PORT_INCLUDE ( to8_config )
+		PORT_INCLUDE ( to9_fconfig )
+		PORT_INCLUDE ( to7_vconfig )
+		PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START ( to8d )
-     PORT_INCLUDE ( to8 )
+		PORT_INCLUDE ( to8 )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to8, to7 )
-     MCFG_MACHINE_START ( to8 )
-     MCFG_MACHINE_RESET ( to8 )
+		MCFG_MACHINE_START ( to8 )
+		MCFG_MACHINE_RESET ( to8 )
 
-     MCFG_CPU_MODIFY( "maincpu" )
-     MCFG_CPU_PROGRAM_MAP ( to8)
+		MCFG_CPU_MODIFY( "maincpu" )
+		MCFG_CPU_PROGRAM_MAP ( to8)
 
 	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to8_pia6821_sys )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
@@ -1611,9 +1611,9 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
-     MCFG_MC6846_MODIFY( "mc6846", to8_timer )
+		MCFG_MC6846_MODIFY( "mc6846", to8_timer )
 
-	 /* internal ram */
+		/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("256K")
@@ -1667,26 +1667,26 @@ The differences with the TO8 are:
 
 static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
-     AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-     AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-     AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-     AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-     AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
-     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
-     AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
-     AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to8_floppy_r, to8_floppy_w )
-     AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to8_vreg_r, to8_vreg_w )
-     AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE_LEGACY(to9_kbd_r, to9_kbd_w )
-     AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to8_gatearray_r, to8_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
+		AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
+		AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
+		AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
+		AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
+		AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+		AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
+		AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
+		AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to8_floppy_r, to8_floppy_w )
+		AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to8_vreg_r, to8_vreg_w )
+		AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE_LEGACY(to9_kbd_r, to9_kbd_w )
+		AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to8_gatearray_r, to8_gatearray_w )
+		AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-     AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
-     AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
+		AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+		AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1701,56 +1701,56 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to9p )
-     ROM_REGION ( 0x38800, "maincpu", 0 )
+		ROM_REGION ( 0x38800, "maincpu", 0 )
 
-     /* BIOS & floppy */
-     ROM_LOAD ( "to9p-0.rom", 0x30000, 0x2000,
+		/* BIOS & floppy */
+		ROM_LOAD ( "to9p-0.rom", 0x30000, 0x2000,
 		CRC(a2731296)
 		SHA1(b30e06127d6e99d4ac5a5bb67881df27bbd9a7e5) )
-     ROM_LOAD ( "to9p-1.rom", 0x32000, 0x2000,
+		ROM_LOAD ( "to9p-1.rom", 0x32000, 0x2000,
 		CRC(c52ce315)
 		SHA1(7eacbd796e76bc72b872f9700c9b90414899ea0f) )
 
-     /* BASIC */
-     ROM_LOAD ( "basicp-0.rom", 0x20000, 0x4000,
+		/* BASIC */
+		ROM_LOAD ( "basicp-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
 		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-     ROM_LOAD ( "basicp-1.rom", 0x24000, 0x4000,
+		ROM_LOAD ( "basicp-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
 		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-     ROM_LOAD ( "basicp-2.rom", 0x28000, 0x4000,
+		ROM_LOAD ( "basicp-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
 		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-     ROM_LOAD ( "basicp-3.rom", 0x2c000, 0x4000,
+		ROM_LOAD ( "basicp-3.rom", 0x2c000, 0x4000,
 		CRC(ebe9c8d9)
 		SHA1(b667ad09a1181f65059a2cbb4c95421bc544a334) )
 
-     ROM_FLOPPY7( 0x34000 )
+		ROM_FLOPPY7( 0x34000 )
 
-     ROM_FILL( 0x10000, 0x10000, 0x39 )
+		ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 
 /* ------------ inputs   ------------ */
 
 static INPUT_PORTS_START ( to9p )
-     PORT_INCLUDE ( thom_lightpen )
-     PORT_INCLUDE ( thom_game_port )
-     PORT_INCLUDE ( to9_keyboard )
-     PORT_INCLUDE ( to7_config )
-     PORT_INCLUDE ( to9_fconfig )
-     PORT_INCLUDE ( to7_vconfig )
-     PORT_INCLUDE ( to7_mconfig )
+		PORT_INCLUDE ( thom_lightpen )
+		PORT_INCLUDE ( thom_game_port )
+		PORT_INCLUDE ( to9_keyboard )
+		PORT_INCLUDE ( to7_config )
+		PORT_INCLUDE ( to9_fconfig )
+		PORT_INCLUDE ( to7_vconfig )
+		PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to9p, to7 )
-     MCFG_MACHINE_START ( to9p )
-     MCFG_MACHINE_RESET ( to9p )
+		MCFG_MACHINE_START ( to9p )
+		MCFG_MACHINE_RESET ( to9p )
 
-     MCFG_CPU_MODIFY( "maincpu" )
-     MCFG_CPU_PROGRAM_MAP ( to9p)
+		MCFG_CPU_MODIFY( "maincpu" )
+		MCFG_CPU_PROGRAM_MAP ( to9p)
 
 	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to9p_pia6821_sys )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
@@ -1758,7 +1758,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
-     MCFG_MC6846_MODIFY( "mc6846", to9p_timer )
+		MCFG_MC6846_MODIFY( "mc6846", to9p_timer )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1829,25 +1829,25 @@ a PC XT.
 
 static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-     AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-     AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-     AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-     AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
-     AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo6_ext_w )
-     AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
-     AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE_LEGACY(mo6_vreg_r, mo6_vreg_w )
-     AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo6_gatearray_r, mo6_gatearray_w )
-     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
+		AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
+		AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
+		AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
+		AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+		AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
+		AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo6_ext_w )
+		AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
+		AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE_LEGACY(mo6_vreg_r, mo6_vreg_w )
+		AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo6_gatearray_r, mo6_gatearray_w )
+		AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w )*/
-     AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
-     AM_RANGE ( 0xb000, 0xefff ) AM_ROMBANK   ( THOM_CART_BANK )
-                                 AM_WRITE_LEGACY(mo6_cartridge_w )
-     AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
+		AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
+		AM_RANGE ( 0xb000, 0xefff ) AM_ROMBANK   ( THOM_CART_BANK )
+									AM_WRITE_LEGACY(mo6_cartridge_w )
+		AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
@@ -1861,61 +1861,61 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo6 )
-     ROM_REGION ( 0x34800, "maincpu", 0 )
+		ROM_REGION ( 0x34800, "maincpu", 0 )
 
-     /* BIOS */
-     ROM_LOAD ( "mo6-0.rom", 0x23000, 0x1000,
+		/* BIOS */
+		ROM_LOAD ( "mo6-0.rom", 0x23000, 0x1000,
 		CRC(0446eef6)
 		SHA1(b57fcda69c95f0c97c5cb0605d17c49a0c630300) )
-     ROM_LOAD ( "mo6-1.rom", 0x27000, 0x1000,
+		ROM_LOAD ( "mo6-1.rom", 0x27000, 0x1000,
 		CRC(eb6df8d4)
 		SHA1(24e2232f582ce04f260acd8e9ec710468a81505c) )
 
-     /* BASIC */
-     ROM_LOAD ( "basic6-0.rom", 0x20000, 0x3000,
+		/* BASIC */
+		ROM_LOAD ( "basic6-0.rom", 0x20000, 0x3000,
 		CRC(18789833)
 		SHA1(fccbf69cbc6deba45a767a26cd6454cf0eedfc2b) )
-     ROM_LOAD ( "basic6-1.rom", 0x24000, 0x3000,
+		ROM_LOAD ( "basic6-1.rom", 0x24000, 0x3000,
 		CRC(c9b4d6f4)
 		SHA1(47487d2bc4c9a9c09c733bd89c49693c52e262de) )
-     ROM_LOAD ( "basic6-2.rom", 0x28000, 0x4000,
+		ROM_LOAD ( "basic6-2.rom", 0x28000, 0x4000,
 		CRC(08eac9bb)
 		SHA1(c0231fdb3bcccbbb10c1f93cc529fc3b96dd3f4d) )
-     ROM_LOAD ( "basic6-3.rom", 0x2c000, 0x4000,
+		ROM_LOAD ( "basic6-3.rom", 0x2c000, 0x4000,
 		CRC(19d66dc4)
 		SHA1(301b6366269181b74cb5d7ccdf5455b7290ae99b) )
 
-     ROM_FLOPPY5 ( 0x30000 )
-     ROM_FILL ( 0x10000, 0x10000, 0x39 )
+		ROM_FLOPPY5 ( 0x30000 )
+		ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( pro128 )
-     ROM_REGION ( 0x34800, "maincpu", 0 )
+		ROM_REGION ( 0x34800, "maincpu", 0 )
 
-     /* BIOS */
-     ROM_LOAD ( "pro128-0.rom", 0x23000, 0x1000,
+		/* BIOS */
+		ROM_LOAD ( "pro128-0.rom", 0x23000, 0x1000,
 		CRC(a8aef291)
 		SHA1(2685cca841f405a37ef48b0115f90c865ce79d0f) )
-     ROM_LOAD ( "pro128-1.rom", 0x27000, 0x1000,
+		ROM_LOAD ( "pro128-1.rom", 0x27000, 0x1000,
 		CRC(5b3340ec)
 		SHA1(269f2eb3e3452014b8d1f0f9e1c63fe56375a863) )
 
-     /* BASIC */
-     ROM_LOAD ( "basico-0.rom", 0x20000, 0x3000,
+		/* BASIC */
+		ROM_LOAD ( "basico-0.rom", 0x20000, 0x3000,
 		CRC(98b10d5e)
 		SHA1(d6b77e694fa85e1114293448e5a64f6e2cf46c22) )
-     ROM_LOAD ( "basico-1.rom", 0x24000, 0x3000,
+		ROM_LOAD ( "basico-1.rom", 0x24000, 0x3000,
 		CRC(721d2124)
 		SHA1(51db1cd03b3891e212a24aa6563b09968930d897) )
-     ROM_LOAD ( "basico-2.rom", 0x28000, 0x4000,
+		ROM_LOAD ( "basico-2.rom", 0x28000, 0x4000,
 		CRC(135438ab)
 		SHA1(617d4e4979842bea2c21ef7f8c50f3b08b15239a) )
-     ROM_LOAD ( "basico-3.rom", 0x2c000, 0x4000,
+		ROM_LOAD ( "basico-3.rom", 0x2c000, 0x4000,
 		CRC(2c2befa6)
 		SHA1(3e94e182bacbb55bb07be2af4c76c0b0df47b3bf) )
 
-     ROM_FLOPPY5 ( 0x30000 )
-     ROM_FILL ( 0x10000, 0x10000, 0x39 )
+		ROM_FLOPPY5 ( 0x30000 )
+		ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 
@@ -1923,168 +1923,168 @@ ROM_END
 
 static INPUT_PORTS_START ( mo6_keyboard )
 
-     PORT_START ( "keyboard_0" )
-     KEY ( 0, "N", N )                   PORT_CHAR('N')
-     KEY ( 1, ", ?", COMMA )             PORT_CHAR(',') PORT_CHAR('?')
-     KEY ( 2, "; .", STOP )              PORT_CHAR(';') PORT_CHAR('.')
-     KEY ( 3, "# @", TILDE )             PORT_CHAR('#') PORT_CHAR('@')
-     KEY ( 4, "Space", SPACE )           PORT_CHAR(' ')
-     KEY ( 5, "X", X )                   PORT_CHAR('X')
-     KEY ( 6, "W", W )                   PORT_CHAR('W')
-     KEY ( 7, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
-     PORT_START ( "keyboard_1" )
-     KEY ( 0, "Delete Backspace", DEL )  PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
-     KEY ( 1, "Insert", INSERT )         PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-     KEY ( 2, "> <", BACKSLASH2 )        PORT_CHAR('>') PORT_CHAR('<')
-     KEY ( 3, UTF8_RIGHT, RIGHT )    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-     KEY ( 4, UTF8_DOWN, DOWN )     PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-     KEY ( 5, UTF8_LEFT, LEFT )     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-     KEY ( 6, UTF8_UP, UP )       PORT_CHAR(UCHAR_MAMEKEY(UP))
-     KEY ( 7, "BASIC", RCONTROL )        PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
-     PORT_START ( "keyboard_2" )
-     KEY ( 0, "J", J )                   PORT_CHAR('J')
-     KEY ( 1, "K", K )                   PORT_CHAR('K')
-     KEY ( 2, "L", L )                   PORT_CHAR('L')
-     KEY ( 3, "M", M )                   PORT_CHAR('M')
-     KEY ( 4, "B \302\264", B )          PORT_CHAR('B')
-     KEY ( 5, "V", V )                   PORT_CHAR('V')
-     KEY ( 6, "C \136", C )              PORT_CHAR('C')
-     KEY ( 7, "Caps-Lock", CAPSLOCK )    PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-     PORT_START ( "keyboard_3" )
-     KEY ( 0, "H \302\250", H )          PORT_CHAR('H')
-     KEY ( 1, "G", G )                   PORT_CHAR('G')
-     KEY ( 2, "F", F )                   PORT_CHAR('F')
-     KEY ( 3, "D", D )                   PORT_CHAR('D')
-     KEY ( 4, "S", S )                   PORT_CHAR('S')
-     KEY ( 5, "Q", Q )                   PORT_CHAR('Q')
-     KEY ( 6, "Home Clear", HOME )       PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-     KEY ( 7, "F1 F6", F1 )              PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-     PORT_START ( "keyboard_4" )
-     KEY ( 0, "U", U )                   PORT_CHAR('U')
-     KEY ( 1, "I", I )                   PORT_CHAR('I')
-     KEY ( 2, "O", O )                   PORT_CHAR('O')
-     KEY ( 3, "P", P )                   PORT_CHAR('P')
-     KEY ( 4, ": /", SLASH )             PORT_CHAR(':') PORT_CHAR('/')
-     KEY ( 5, "$ &", CLOSEBRACE )        PORT_CHAR('$') PORT_CHAR('&')
-     KEY ( 6, "Enter", ENTER )           PORT_CHAR(13)
-     KEY ( 7, "F2 F7", F2 )              PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
-     PORT_START ( "keyboard_5" )
-     KEY ( 0, "Y", Y )                   PORT_CHAR('Y')
-     KEY ( 1, "T", T )                   PORT_CHAR('T')
-     KEY ( 2, "R", R )                   PORT_CHAR('R')
-     KEY ( 3, "E", E )                   PORT_CHAR('E')
-     KEY ( 4, "Z", Z )                   PORT_CHAR('Z')
-     KEY ( 5, "A \140", A )              PORT_CHAR('A')
-     KEY ( 6, "Control", LCONTROL )      PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-     KEY ( 7, "F3 F8", F3 )              PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
-     PORT_START ( "keyboard_6" )
-     KEY ( 0, "7 \303\250", 7 )          PORT_CHAR('7') PORT_CHAR( 0xe8 )
-     KEY ( 1, "8 !", 8 )                 PORT_CHAR('8') PORT_CHAR('!')
-     KEY ( 2, "9 \303\247", 9 )          PORT_CHAR('9') PORT_CHAR( 0xe7 )
-     KEY ( 3, "0 \303\240", 0 )          PORT_CHAR('0') PORT_CHAR( 0xe0 )
-     KEY ( 4, "- \\", BACKSPACE )        PORT_CHAR('-') PORT_CHAR('\\')
-     KEY ( 5, "= +", EQUALS )            PORT_CHAR('=') PORT_CHAR('+')
-     KEY ( 6, "Accent", END )            PORT_CHAR(UCHAR_MAMEKEY(END))
-     KEY ( 7, "F4 F9", F4 )              PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
-     PORT_START ( "keyboard_7" )
-     KEY ( 0, "6 _", 6 )                 PORT_CHAR('6') PORT_CHAR('_')
-     KEY ( 1, "5 (", 5 )                 PORT_CHAR('5') PORT_CHAR('(')
-     KEY ( 2, "4 '", 4 )                 PORT_CHAR('4') PORT_CHAR('\'')
-     KEY ( 3, "3 \"", 3 )                PORT_CHAR('3') PORT_CHAR('"')
-     KEY ( 4, "2 \303\251", 2 )          PORT_CHAR('2')  PORT_CHAR( 0xe9 )
-     KEY ( 5, "1 *", 1 )                 PORT_CHAR('1') PORT_CHAR('*')
-     KEY ( 6, "Stop", TAB )              PORT_CHAR(27)
-     KEY ( 7, "F5 F10", F5 )             PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
-     PORT_START ( "keyboard_8" )
-     KEY ( 0, "[ {", QUOTE )             PORT_CHAR('[') PORT_CHAR('{')
-     KEY ( 1, "] }", BACKSLASH )         PORT_CHAR(']') PORT_CHAR('}')
-     KEY ( 2, ") \302\260", MINUS )      PORT_CHAR(')') PORT_CHAR( 0xb0 )
-     KEY ( 3, "\342\206\221 \302\250", OPENBRACE ) PORT_CHAR('^') PORT_CHAR( 0xa8 )
-     KEY ( 4, "\303\271 %", COLON )      PORT_CHAR( 0xf9 ) PORT_CHAR('%')
-     PORT_BIT  ( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_0" )
+		KEY ( 0, "N", N )                   PORT_CHAR('N')
+		KEY ( 1, ", ?", COMMA )             PORT_CHAR(',') PORT_CHAR('?')
+		KEY ( 2, "; .", STOP )              PORT_CHAR(';') PORT_CHAR('.')
+		KEY ( 3, "# @", TILDE )             PORT_CHAR('#') PORT_CHAR('@')
+		KEY ( 4, "Space", SPACE )           PORT_CHAR(' ')
+		KEY ( 5, "X", X )                   PORT_CHAR('X')
+		KEY ( 6, "W", W )                   PORT_CHAR('W')
+		KEY ( 7, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
+		PORT_START ( "keyboard_1" )
+		KEY ( 0, "Delete Backspace", DEL )  PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+		KEY ( 1, "Insert", INSERT )         PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+		KEY ( 2, "> <", BACKSLASH2 )        PORT_CHAR('>') PORT_CHAR('<')
+		KEY ( 3, UTF8_RIGHT, RIGHT )    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		KEY ( 4, UTF8_DOWN, DOWN )     PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		KEY ( 5, UTF8_LEFT, LEFT )     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		KEY ( 6, UTF8_UP, UP )       PORT_CHAR(UCHAR_MAMEKEY(UP))
+		KEY ( 7, "BASIC", RCONTROL )        PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+		PORT_START ( "keyboard_2" )
+		KEY ( 0, "J", J )                   PORT_CHAR('J')
+		KEY ( 1, "K", K )                   PORT_CHAR('K')
+		KEY ( 2, "L", L )                   PORT_CHAR('L')
+		KEY ( 3, "M", M )                   PORT_CHAR('M')
+		KEY ( 4, "B \302\264", B )          PORT_CHAR('B')
+		KEY ( 5, "V", V )                   PORT_CHAR('V')
+		KEY ( 6, "C \136", C )              PORT_CHAR('C')
+		KEY ( 7, "Caps-Lock", CAPSLOCK )    PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+		PORT_START ( "keyboard_3" )
+		KEY ( 0, "H \302\250", H )          PORT_CHAR('H')
+		KEY ( 1, "G", G )                   PORT_CHAR('G')
+		KEY ( 2, "F", F )                   PORT_CHAR('F')
+		KEY ( 3, "D", D )                   PORT_CHAR('D')
+		KEY ( 4, "S", S )                   PORT_CHAR('S')
+		KEY ( 5, "Q", Q )                   PORT_CHAR('Q')
+		KEY ( 6, "Home Clear", HOME )       PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+		KEY ( 7, "F1 F6", F1 )              PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
+		PORT_START ( "keyboard_4" )
+		KEY ( 0, "U", U )                   PORT_CHAR('U')
+		KEY ( 1, "I", I )                   PORT_CHAR('I')
+		KEY ( 2, "O", O )                   PORT_CHAR('O')
+		KEY ( 3, "P", P )                   PORT_CHAR('P')
+		KEY ( 4, ": /", SLASH )             PORT_CHAR(':') PORT_CHAR('/')
+		KEY ( 5, "$ &", CLOSEBRACE )        PORT_CHAR('$') PORT_CHAR('&')
+		KEY ( 6, "Enter", ENTER )           PORT_CHAR(13)
+		KEY ( 7, "F2 F7", F2 )              PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
+		PORT_START ( "keyboard_5" )
+		KEY ( 0, "Y", Y )                   PORT_CHAR('Y')
+		KEY ( 1, "T", T )                   PORT_CHAR('T')
+		KEY ( 2, "R", R )                   PORT_CHAR('R')
+		KEY ( 3, "E", E )                   PORT_CHAR('E')
+		KEY ( 4, "Z", Z )                   PORT_CHAR('Z')
+		KEY ( 5, "A \140", A )              PORT_CHAR('A')
+		KEY ( 6, "Control", LCONTROL )      PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+		KEY ( 7, "F3 F8", F3 )              PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
+		PORT_START ( "keyboard_6" )
+		KEY ( 0, "7 \303\250", 7 )          PORT_CHAR('7') PORT_CHAR( 0xe8 )
+		KEY ( 1, "8 !", 8 )                 PORT_CHAR('8') PORT_CHAR('!')
+		KEY ( 2, "9 \303\247", 9 )          PORT_CHAR('9') PORT_CHAR( 0xe7 )
+		KEY ( 3, "0 \303\240", 0 )          PORT_CHAR('0') PORT_CHAR( 0xe0 )
+		KEY ( 4, "- \\", BACKSPACE )        PORT_CHAR('-') PORT_CHAR('\\')
+		KEY ( 5, "= +", EQUALS )            PORT_CHAR('=') PORT_CHAR('+')
+		KEY ( 6, "Accent", END )            PORT_CHAR(UCHAR_MAMEKEY(END))
+		KEY ( 7, "F4 F9", F4 )              PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
+		PORT_START ( "keyboard_7" )
+		KEY ( 0, "6 _", 6 )                 PORT_CHAR('6') PORT_CHAR('_')
+		KEY ( 1, "5 (", 5 )                 PORT_CHAR('5') PORT_CHAR('(')
+		KEY ( 2, "4 '", 4 )                 PORT_CHAR('4') PORT_CHAR('\'')
+		KEY ( 3, "3 \"", 3 )                PORT_CHAR('3') PORT_CHAR('"')
+		KEY ( 4, "2 \303\251", 2 )          PORT_CHAR('2')  PORT_CHAR( 0xe9 )
+		KEY ( 5, "1 *", 1 )                 PORT_CHAR('1') PORT_CHAR('*')
+		KEY ( 6, "Stop", TAB )              PORT_CHAR(27)
+		KEY ( 7, "F5 F10", F5 )             PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
+		PORT_START ( "keyboard_8" )
+		KEY ( 0, "[ {", QUOTE )             PORT_CHAR('[') PORT_CHAR('{')
+		KEY ( 1, "] }", BACKSLASH )         PORT_CHAR(']') PORT_CHAR('}')
+		KEY ( 2, ") \302\260", MINUS )      PORT_CHAR(')') PORT_CHAR( 0xb0 )
+		KEY ( 3, "\342\206\221 \302\250", OPENBRACE ) PORT_CHAR('^') PORT_CHAR( 0xa8 )
+		KEY ( 4, "\303\271 %", COLON )      PORT_CHAR( 0xf9 ) PORT_CHAR('%')
+		PORT_BIT  ( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-     /* unused */
-     PORT_START ( "keyboard_9" )
+		/* unused */
+		PORT_START ( "keyboard_9" )
 
 INPUT_PORTS_END
 
 /* QWERTY version */
 static INPUT_PORTS_START ( pro128_keyboard )
-     PORT_INCLUDE ( mo6_keyboard )
+		PORT_INCLUDE ( mo6_keyboard )
 
-     PORT_MODIFY ( "keyboard_0" )
-     KEY ( 1, "M", M )                     PORT_CHAR('M')
-     KEY ( 2, ", ;", COMMA )               PORT_CHAR(',') PORT_CHAR(';')
-     KEY ( 3, "[ {", QUOTE  )              PORT_CHAR('[') PORT_CHAR('{')
-     KEY ( 6, "Z", Z )                     PORT_CHAR('Z')
-     KEY ( 7, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
-     PORT_MODIFY ( "keyboard_1" )
-     KEY ( 2, "- _", MINUS )               PORT_CHAR('-') PORT_CHAR('_')
-     PORT_MODIFY ( "keyboard_2" )
-     KEY ( 3, "\303\221", TILDE )          PORT_CHAR( 0xd1 )
-     PORT_MODIFY ( "keyboard_3" )
-     KEY ( 5, "A \140", A )                PORT_CHAR('A')
-     PORT_MODIFY ( "keyboard_4" )
-     KEY ( 4, ". :", STOP )                PORT_CHAR('.') PORT_CHAR(':')
-     KEY ( 5, "+ *", BACKSPACE )           PORT_CHAR('+') PORT_CHAR('*')
-     PORT_MODIFY ( "keyboard_5" )
-     KEY ( 4, "W", W )                     PORT_CHAR('W')
-     KEY ( 5, "Q", Q )                     PORT_CHAR('Q')
-     PORT_MODIFY ( "keyboard_6" )
-     KEY ( 0, "7 /", 7 )                   PORT_CHAR('7') PORT_CHAR('/')
-     KEY ( 1, "8 (", 8 )                   PORT_CHAR('8') PORT_CHAR('(')
-     KEY ( 2, "9 )", 9 )                   PORT_CHAR('9') PORT_CHAR(')')
-     KEY ( 3, "0 =", 0 )                   PORT_CHAR('0') PORT_CHAR('=')
-     KEY ( 4, "' \302\243", CLOSEBRACE )   PORT_CHAR('\'') PORT_CHAR( 0xa3 )
-     KEY ( 5, "] }", BACKSLASH )           PORT_CHAR(']') PORT_CHAR('}')
-     PORT_MODIFY ( "keyboard_7" )
-     KEY ( 0, "6 &", 6 )                   PORT_CHAR('6') PORT_CHAR('&')
-     KEY ( 1, "5 %", 5 )                   PORT_CHAR('5') PORT_CHAR('%')
-     KEY ( 2, "4 $", 4 )                   PORT_CHAR('4') PORT_CHAR('$')
-     KEY ( 3, "3 \302\247", 3 )            PORT_CHAR('3') PORT_CHAR( 0xa7 )
-     KEY ( 4, "2 \"", 2 )                  PORT_CHAR('2') PORT_CHAR('"')
-     KEY ( 5, "1 !", 1 )                   PORT_CHAR('1') PORT_CHAR('!')
-     PORT_MODIFY ( "keyboard_8" )
-     KEY ( 0, "> <", BACKSLASH2 )          PORT_CHAR('>') PORT_CHAR('<')
-     KEY ( 1, "# \342\206\221", EQUALS )   PORT_CHAR('#') PORT_CHAR('^')
-     KEY ( 2, "\303\247 ?", COLON )        PORT_CHAR( 0xe7 ) PORT_CHAR('?')
-     KEY ( 3, "\302\277 @", SLASH )        PORT_CHAR( 0xbf ) PORT_CHAR('@')
-     KEY ( 4, "\302\241 \302\250", OPENBRACE )  PORT_CHAR( 0xa1 ) PORT_CHAR( 0xa8 )
+		PORT_MODIFY ( "keyboard_0" )
+		KEY ( 1, "M", M )                     PORT_CHAR('M')
+		KEY ( 2, ", ;", COMMA )               PORT_CHAR(',') PORT_CHAR(';')
+		KEY ( 3, "[ {", QUOTE  )              PORT_CHAR('[') PORT_CHAR('{')
+		KEY ( 6, "Z", Z )                     PORT_CHAR('Z')
+		KEY ( 7, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
+		PORT_MODIFY ( "keyboard_1" )
+		KEY ( 2, "- _", MINUS )               PORT_CHAR('-') PORT_CHAR('_')
+		PORT_MODIFY ( "keyboard_2" )
+		KEY ( 3, "\303\221", TILDE )          PORT_CHAR( 0xd1 )
+		PORT_MODIFY ( "keyboard_3" )
+		KEY ( 5, "A \140", A )                PORT_CHAR('A')
+		PORT_MODIFY ( "keyboard_4" )
+		KEY ( 4, ". :", STOP )                PORT_CHAR('.') PORT_CHAR(':')
+		KEY ( 5, "+ *", BACKSPACE )           PORT_CHAR('+') PORT_CHAR('*')
+		PORT_MODIFY ( "keyboard_5" )
+		KEY ( 4, "W", W )                     PORT_CHAR('W')
+		KEY ( 5, "Q", Q )                     PORT_CHAR('Q')
+		PORT_MODIFY ( "keyboard_6" )
+		KEY ( 0, "7 /", 7 )                   PORT_CHAR('7') PORT_CHAR('/')
+		KEY ( 1, "8 (", 8 )                   PORT_CHAR('8') PORT_CHAR('(')
+		KEY ( 2, "9 )", 9 )                   PORT_CHAR('9') PORT_CHAR(')')
+		KEY ( 3, "0 =", 0 )                   PORT_CHAR('0') PORT_CHAR('=')
+		KEY ( 4, "' \302\243", CLOSEBRACE )   PORT_CHAR('\'') PORT_CHAR( 0xa3 )
+		KEY ( 5, "] }", BACKSLASH )           PORT_CHAR(']') PORT_CHAR('}')
+		PORT_MODIFY ( "keyboard_7" )
+		KEY ( 0, "6 &", 6 )                   PORT_CHAR('6') PORT_CHAR('&')
+		KEY ( 1, "5 %", 5 )                   PORT_CHAR('5') PORT_CHAR('%')
+		KEY ( 2, "4 $", 4 )                   PORT_CHAR('4') PORT_CHAR('$')
+		KEY ( 3, "3 \302\247", 3 )            PORT_CHAR('3') PORT_CHAR( 0xa7 )
+		KEY ( 4, "2 \"", 2 )                  PORT_CHAR('2') PORT_CHAR('"')
+		KEY ( 5, "1 !", 1 )                   PORT_CHAR('1') PORT_CHAR('!')
+		PORT_MODIFY ( "keyboard_8" )
+		KEY ( 0, "> <", BACKSLASH2 )          PORT_CHAR('>') PORT_CHAR('<')
+		KEY ( 1, "# \342\206\221", EQUALS )   PORT_CHAR('#') PORT_CHAR('^')
+		KEY ( 2, "\303\247 ?", COLON )        PORT_CHAR( 0xe7 ) PORT_CHAR('?')
+		KEY ( 3, "\302\277 @", SLASH )        PORT_CHAR( 0xbf ) PORT_CHAR('@')
+		KEY ( 4, "\302\241 \302\250", OPENBRACE )  PORT_CHAR( 0xa1 ) PORT_CHAR( 0xa8 )
 
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START ( mo6 )
-     PORT_INCLUDE ( thom_lightpen )
-     PORT_INCLUDE ( thom_game_port )
-     PORT_INCLUDE ( mo6_keyboard )
-     PORT_INCLUDE ( to7_config )
-     PORT_INCLUDE ( to7_fconfig )
-     PORT_INCLUDE ( to7_vconfig )
+		PORT_INCLUDE ( thom_lightpen )
+		PORT_INCLUDE ( thom_game_port )
+		PORT_INCLUDE ( mo6_keyboard )
+		PORT_INCLUDE ( to7_config )
+		PORT_INCLUDE ( to7_fconfig )
+		PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( pro128 )
-     PORT_INCLUDE ( thom_lightpen )
-     PORT_INCLUDE ( thom_game_port )
-     PORT_INCLUDE ( pro128_keyboard )
-     PORT_INCLUDE ( to7_config )
-     PORT_INCLUDE ( to7_fconfig )
-     PORT_INCLUDE ( to7_vconfig )
+		PORT_INCLUDE ( thom_lightpen )
+		PORT_INCLUDE ( thom_game_port )
+		PORT_INCLUDE ( pro128_keyboard )
+		PORT_INCLUDE ( to7_config )
+		PORT_INCLUDE ( to7_fconfig )
+		PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( mo6, to7 )
-     MCFG_MACHINE_START ( mo6 )
-     MCFG_MACHINE_RESET ( mo6 )
+		MCFG_MACHINE_START ( mo6 )
+		MCFG_MACHINE_RESET ( mo6 )
 
-     MCFG_CPU_MODIFY( "maincpu" )
-     MCFG_CPU_PROGRAM_MAP ( mo6)
+		MCFG_CPU_MODIFY( "maincpu" )
+		MCFG_CPU_PROGRAM_MAP ( mo6)
 
-     MCFG_CASSETTE_MODIFY( CASSETTE_TAG, mo5_cassette_interface )
+		MCFG_CASSETTE_MODIFY( CASSETTE_TAG, mo5_cassette_interface )
 
-     MCFG_DEVICE_REMOVE( "mc6846" )
+		MCFG_DEVICE_REMOVE( "mc6846" )
 
 	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, mo6_pia6821_sys )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
@@ -2142,27 +2142,27 @@ Here are the differences between the MO6 and MO5NR:
 
 static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
 
-     AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-     AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-     AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-     AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-     AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
-     AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
-     AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo6_ext_w )
-     AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE_LEGACY(mo5nr_net_r, mo5nr_net_w )
-     AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE_LEGACY(mo6_vreg_r, mo6_vreg_w )
-     AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREADWRITE("centronics", centronics_device, read, write)
-     AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE_LEGACY(mo5nr_prn_r, mo5nr_prn_w )
-     AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo6_gatearray_r, mo6_gatearray_w )
-     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
+		AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
+		AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
+		AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
+		AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
+		AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+		AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
+		AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo6_ext_w )
+		AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE_LEGACY(mo5nr_net_r, mo5nr_net_w )
+		AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE_LEGACY(mo6_vreg_r, mo6_vreg_w )
+		AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREADWRITE("centronics", centronics_device, read, write)
+		AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE_LEGACY(mo5nr_prn_r, mo5nr_prn_w )
+		AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo6_gatearray_r, mo6_gatearray_w )
+		AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-     AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
-     AM_RANGE ( 0xa7f8, 0xa7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-     AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
-     AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(mo6_cartridge_w ) /* 4 * 16 KB */
-     AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
+		AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+		AM_RANGE ( 0xa7f8, 0xa7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
+		AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
+		AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(mo6_cartridge_w ) /* 4 * 16 KB */
+		AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
@@ -2176,32 +2176,32 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5nr )
-     ROM_REGION ( 0x34800, "maincpu", 0 )
+		ROM_REGION ( 0x34800, "maincpu", 0 )
 
-     /* BIOS */
-     ROM_LOAD ( "mo5nr-0.rom", 0x23000, 0x1000,
+		/* BIOS */
+		ROM_LOAD ( "mo5nr-0.rom", 0x23000, 0x1000,
 		CRC(06e31115)
 		SHA1(7429cc0c15475398b5ab514cb3d3efdc71cf082f) )
-     ROM_LOAD ( "mo5nr-1.rom", 0x27000, 0x1000,
+		ROM_LOAD ( "mo5nr-1.rom", 0x27000, 0x1000,
 		CRC(7cda17c9)
 		SHA1(2ff6480ce9e30acc4c89b6113d7c8ea6095d90a5) )
 
-     /* BASIC */
-     ROM_LOAD ( "basicn-0.rom", 0x20000, 0x3000,
+		/* BASIC */
+		ROM_LOAD ( "basicn-0.rom", 0x20000, 0x3000,
 		CRC(fae9e691)
 		SHA1(62fbfd6d4ca837f6cb8ed37f828eca97f80e6200) )
-     ROM_LOAD ( "basicn-1.rom", 0x24000, 0x3000,
+		ROM_LOAD ( "basicn-1.rom", 0x24000, 0x3000,
 		CRC(cf134dd7)
 		SHA1(1bd961314e16e460d37a65f5e7f4acf5604fbb17) )
-     ROM_LOAD ( "basicn-2.rom", 0x28000, 0x4000,
+		ROM_LOAD ( "basicn-2.rom", 0x28000, 0x4000,
 		CRC(b69d2e0d)
 		SHA1(ea3220bbae991e08259d38a7ea24533b2bb86418) )
-     ROM_LOAD ( "basicn-3.rom", 0x2c000, 0x4000,
+		ROM_LOAD ( "basicn-3.rom", 0x2c000, 0x4000,
 		CRC(7785610f)
 		SHA1(c38b0be404d8af6f409a1b52cb79a4e10fc33177) )
 
-     ROM_FLOPPY5 ( 0x30000 )
-     ROM_FILL ( 0x10000, 0x10000, 0x39 ) /* TODO: network ROM */
+		ROM_FLOPPY5 ( 0x30000 )
+		ROM_FILL ( 0x10000, 0x10000, 0x39 ) /* TODO: network ROM */
 ROM_END
 
 
@@ -2211,105 +2211,105 @@ ROM_END
 
 static INPUT_PORTS_START ( mo5nr_keyboard )
 
-     PORT_START ( "keyboard_0" )
-     KEY ( 0, "N", N )                   PORT_CHAR('N')
-     KEY ( 1, ", <", COMMA )             PORT_CHAR(',') PORT_CHAR('<')
-     KEY ( 2, ". >", STOP )              PORT_CHAR('.') PORT_CHAR('>')
-     KEY ( 3, "@ \342\206\221", TILDE )  PORT_CHAR('@') PORT_CHAR('^')
-     KEY ( 4, "Space Caps-Lock", SPACE ) PORT_CHAR(' ') PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-     KEY ( 5, "X", X )                   PORT_CHAR('X')
-     KEY ( 6, "W", W )                   PORT_CHAR('W')
-     KEY ( 7, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
-     PORT_START ( "keyboard_1" )
-     KEY ( 0, "Delete Backspace", DEL )  PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
-     KEY ( 1, "Insert", INSERT )         PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-     KEY ( 2, "Home", HOME )             PORT_CHAR(UCHAR_MAMEKEY(HOME))
-     KEY ( 3, UTF8_RIGHT, RIGHT )    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-     KEY ( 4, UTF8_DOWN, DOWN )     PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-     KEY ( 5, UTF8_LEFT, LEFT )     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-     KEY ( 6, UTF8_UP, UP )       PORT_CHAR(UCHAR_MAMEKEY(UP))
-     KEY ( 7, "BASIC", RCONTROL )
-     PORT_START ( "keyboard_2" )
-     KEY ( 0, "J", J )                   PORT_CHAR('J')
-     KEY ( 1, "K", K )                   PORT_CHAR('K')
-     KEY ( 2, "L", L )                   PORT_CHAR('L')
-     KEY ( 3, "M", M )                   PORT_CHAR('M')
-     KEY ( 4, "B \140", B )              PORT_CHAR('B')
-     KEY ( 5, "V", V )                   PORT_CHAR('V')
-     KEY ( 6, "C \136", C )              PORT_CHAR('C')
-     PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-     PORT_START ( "keyboard_3" )
-     KEY ( 0, "H \302\250", H )          PORT_CHAR('H')
-     KEY ( 1, "G", G )                   PORT_CHAR('G')
-     KEY ( 2, "F", F )                   PORT_CHAR('F')
-     KEY ( 3, "D", D )                   PORT_CHAR('D')
-     KEY ( 4, "S", S )                   PORT_CHAR('S')
-     KEY ( 5, "Q", Q )                   PORT_CHAR('Q')
-     KEY ( 6, "Clear", ESC )             PORT_CHAR(UCHAR_MAMEKEY(ESC))
-     PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-     PORT_START ( "keyboard_4" )
-     KEY ( 0, "U", U )                   PORT_CHAR('U')
-     KEY ( 1, "I", I )                   PORT_CHAR('I')
-     KEY ( 2, "O", O )                   PORT_CHAR('O')
-     KEY ( 3, "P", P )                   PORT_CHAR('P')
-     KEY ( 4, "/ ?", SLASH )             PORT_CHAR('/') PORT_CHAR('?')
-     KEY ( 5, "* :", QUOTE )             PORT_CHAR('*') PORT_CHAR(':')
-     KEY ( 6, "Enter", ENTER )           PORT_CHAR(13)
-     PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-     PORT_START ( "keyboard_5" )
-     KEY ( 0, "Y", Y )                   PORT_CHAR('Y')
-     KEY ( 1, "T", T )                   PORT_CHAR('T')
-     KEY ( 2, "R", R )                   PORT_CHAR('R')
-     KEY ( 3, "E", E )                   PORT_CHAR('E')
-     KEY ( 4, "Z", Z )                   PORT_CHAR('Z')
-     KEY ( 5, "A \140", A )              PORT_CHAR('A')
-     KEY ( 6, "Control", LCONTROL )      PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-     PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-     PORT_START ( "keyboard_6" )
-     KEY ( 0, "7 ' \303\250", 7 )          PORT_CHAR('7') PORT_CHAR('\'' )
-     KEY ( 1, "8 ( \303\271", 8 )          PORT_CHAR('8') PORT_CHAR('(')
-     KEY ( 2, "9 ) \303\247", 9 )          PORT_CHAR('9') PORT_CHAR(')')
-     KEY ( 3, "0 \303\240", 0 )            PORT_CHAR('0') PORT_CHAR( 0xe0 )
-     KEY ( 4, "- =", MINUS )               PORT_CHAR('-') PORT_CHAR('=')
-     KEY ( 5, "+ ;", EQUALS )              PORT_CHAR('+') PORT_CHAR(';')
-     KEY ( 6, "Accent", END )              PORT_CHAR(UCHAR_MAMEKEY(END))
-     PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-     PORT_START ( "keyboard_7" )
-     KEY ( 0, "6 & \303\251", 6 )          PORT_CHAR('6') PORT_CHAR('&')
-     KEY ( 1, "5 %", 5 )                   PORT_CHAR('5') PORT_CHAR('%')
-     KEY ( 2, "4 $", 4 )                   PORT_CHAR('4') PORT_CHAR('$')
-     KEY ( 3, "3 #", 3 )                   PORT_CHAR('3') PORT_CHAR('#')
-     KEY ( 4, "2 \"", 2 )                  PORT_CHAR('2') PORT_CHAR('"')
-     KEY ( 5, "1 !", 1 )                   PORT_CHAR('1') PORT_CHAR('!')
-     KEY ( 6, "Stop", TAB )                PORT_CHAR(27)
-     PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_0" )
+		KEY ( 0, "N", N )                   PORT_CHAR('N')
+		KEY ( 1, ", <", COMMA )             PORT_CHAR(',') PORT_CHAR('<')
+		KEY ( 2, ". >", STOP )              PORT_CHAR('.') PORT_CHAR('>')
+		KEY ( 3, "@ \342\206\221", TILDE )  PORT_CHAR('@') PORT_CHAR('^')
+		KEY ( 4, "Space Caps-Lock", SPACE ) PORT_CHAR(' ') PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+		KEY ( 5, "X", X )                   PORT_CHAR('X')
+		KEY ( 6, "W", W )                   PORT_CHAR('W')
+		KEY ( 7, "Shift", LSHIFT ) PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
+		PORT_START ( "keyboard_1" )
+		KEY ( 0, "Delete Backspace", DEL )  PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+		KEY ( 1, "Insert", INSERT )         PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+		KEY ( 2, "Home", HOME )             PORT_CHAR(UCHAR_MAMEKEY(HOME))
+		KEY ( 3, UTF8_RIGHT, RIGHT )    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		KEY ( 4, UTF8_DOWN, DOWN )     PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		KEY ( 5, UTF8_LEFT, LEFT )     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		KEY ( 6, UTF8_UP, UP )       PORT_CHAR(UCHAR_MAMEKEY(UP))
+		KEY ( 7, "BASIC", RCONTROL )
+		PORT_START ( "keyboard_2" )
+		KEY ( 0, "J", J )                   PORT_CHAR('J')
+		KEY ( 1, "K", K )                   PORT_CHAR('K')
+		KEY ( 2, "L", L )                   PORT_CHAR('L')
+		KEY ( 3, "M", M )                   PORT_CHAR('M')
+		KEY ( 4, "B \140", B )              PORT_CHAR('B')
+		KEY ( 5, "V", V )                   PORT_CHAR('V')
+		KEY ( 6, "C \136", C )              PORT_CHAR('C')
+		PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_3" )
+		KEY ( 0, "H \302\250", H )          PORT_CHAR('H')
+		KEY ( 1, "G", G )                   PORT_CHAR('G')
+		KEY ( 2, "F", F )                   PORT_CHAR('F')
+		KEY ( 3, "D", D )                   PORT_CHAR('D')
+		KEY ( 4, "S", S )                   PORT_CHAR('S')
+		KEY ( 5, "Q", Q )                   PORT_CHAR('Q')
+		KEY ( 6, "Clear", ESC )             PORT_CHAR(UCHAR_MAMEKEY(ESC))
+		PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_4" )
+		KEY ( 0, "U", U )                   PORT_CHAR('U')
+		KEY ( 1, "I", I )                   PORT_CHAR('I')
+		KEY ( 2, "O", O )                   PORT_CHAR('O')
+		KEY ( 3, "P", P )                   PORT_CHAR('P')
+		KEY ( 4, "/ ?", SLASH )             PORT_CHAR('/') PORT_CHAR('?')
+		KEY ( 5, "* :", QUOTE )             PORT_CHAR('*') PORT_CHAR(':')
+		KEY ( 6, "Enter", ENTER )           PORT_CHAR(13)
+		PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_5" )
+		KEY ( 0, "Y", Y )                   PORT_CHAR('Y')
+		KEY ( 1, "T", T )                   PORT_CHAR('T')
+		KEY ( 2, "R", R )                   PORT_CHAR('R')
+		KEY ( 3, "E", E )                   PORT_CHAR('E')
+		KEY ( 4, "Z", Z )                   PORT_CHAR('Z')
+		KEY ( 5, "A \140", A )              PORT_CHAR('A')
+		KEY ( 6, "Control", LCONTROL )      PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+		PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_6" )
+		KEY ( 0, "7 ' \303\250", 7 )          PORT_CHAR('7') PORT_CHAR('\'' )
+		KEY ( 1, "8 ( \303\271", 8 )          PORT_CHAR('8') PORT_CHAR('(')
+		KEY ( 2, "9 ) \303\247", 9 )          PORT_CHAR('9') PORT_CHAR(')')
+		KEY ( 3, "0 \303\240", 0 )            PORT_CHAR('0') PORT_CHAR( 0xe0 )
+		KEY ( 4, "- =", MINUS )               PORT_CHAR('-') PORT_CHAR('=')
+		KEY ( 5, "+ ;", EQUALS )              PORT_CHAR('+') PORT_CHAR(';')
+		KEY ( 6, "Accent", END )              PORT_CHAR(UCHAR_MAMEKEY(END))
+		PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+		PORT_START ( "keyboard_7" )
+		KEY ( 0, "6 & \303\251", 6 )          PORT_CHAR('6') PORT_CHAR('&')
+		KEY ( 1, "5 %", 5 )                   PORT_CHAR('5') PORT_CHAR('%')
+		KEY ( 2, "4 $", 4 )                   PORT_CHAR('4') PORT_CHAR('$')
+		KEY ( 3, "3 #", 3 )                   PORT_CHAR('3') PORT_CHAR('#')
+		KEY ( 4, "2 \"", 2 )                  PORT_CHAR('2') PORT_CHAR('"')
+		KEY ( 5, "1 !", 1 )                   PORT_CHAR('1') PORT_CHAR('!')
+		KEY ( 6, "Stop", TAB )                PORT_CHAR(27)
+		PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-     /* unused */
-     PORT_START ( "keyboard_8" )
-     PORT_START ( "keyboard_9" )
+		/* unused */
+		PORT_START ( "keyboard_8" )
+		PORT_START ( "keyboard_9" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mo5nr )
-     PORT_INCLUDE ( thom_lightpen )
-     PORT_INCLUDE ( thom_game_port )
-     PORT_INCLUDE ( mo5nr_keyboard )
-     PORT_INCLUDE ( to7_config )
-     PORT_INCLUDE ( to7_fconfig )
-     PORT_INCLUDE ( to7_vconfig )
+		PORT_INCLUDE ( thom_lightpen )
+		PORT_INCLUDE ( thom_game_port )
+		PORT_INCLUDE ( mo5nr_keyboard )
+		PORT_INCLUDE ( to7_config )
+		PORT_INCLUDE ( to7_fconfig )
+		PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
-     MCFG_MACHINE_START ( mo5nr )
-     MCFG_MACHINE_RESET ( mo5nr )
+		MCFG_MACHINE_START ( mo5nr )
+		MCFG_MACHINE_RESET ( mo5nr )
 
-     MCFG_CPU_MODIFY( "maincpu" )
-     MCFG_CPU_PROGRAM_MAP ( mo5nr)
+		MCFG_CPU_MODIFY( "maincpu" )
+		MCFG_CPU_PROGRAM_MAP ( mo5nr)
 
-     MCFG_DEVICE_REMOVE( "mc6846" )
+		MCFG_DEVICE_REMOVE( "mc6846" )
 
 	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, mo5nr_pia6821_sys )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )

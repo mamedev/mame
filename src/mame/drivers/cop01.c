@@ -58,8 +58,8 @@ Mighty Guy board layout:
 #include "includes/cop01.h"
 
 
-#define MIGHTGUY_HACK	 0
-#define TIMER_RATE       11475	/* unknown, hand-tuned to match audio reference */
+#define MIGHTGUY_HACK    0
+#define TIMER_RATE       11475  /* unknown, hand-tuned to match audio reference */
 
 #define MAINCPU_CLOCK    XTAL_12MHz
 #define AUDIOCPU_CLOCK   XTAL_8MHz
@@ -176,9 +176,9 @@ READ8_MEMBER(cop01_state::kludge)
 static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP	/* 1412M2? */
-	AM_RANGE(0x03, 0x03) AM_WRITENOP	/* 1412M2? */
-	AM_RANGE(0x03, 0x03) AM_READ(kludge)	/* 1412M2? */
+	AM_RANGE(0x02, 0x02) AM_WRITENOP    /* 1412M2? */
+	AM_RANGE(0x03, 0x03) AM_WRITENOP    /* 1412M2? */
+	AM_RANGE(0x03, 0x03) AM_READ(kludge)    /* 1412M2? */
 	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
 ADDRESS_MAP_END
 
@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cop01 )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -201,7 +201,7 @@ static INPUT_PORTS_START( cop01 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -210,7 +210,7 @@ static INPUT_PORTS_START( cop01 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")	/* TEST, COIN, START */
+	PORT_START("SYSTEM")    /* TEST, COIN, START */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -254,14 +254,14 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	/* DP2:3,4,5 defined in manual/test-mode as:
-    PORT_DIPNAME( 0x10, 0x10, "1st Bonus Life" )
-    PORT_DIPSETTING(    0x10, "20000" )
-    PORT_DIPSETTING(    0x00, "30000" )
-    PORT_DIPNAME( 0x60, 0x60, "2nd Bonus Life" )
-    PORT_DIPSETTING(    0x60, "30000" )
-    PORT_DIPSETTING(    0x20, "50000" )
-    PORT_DIPSETTING(    0x40, "100000" )
-    PORT_DIPSETTING(    0x00, "150000" ) */
+	PORT_DIPNAME( 0x10, 0x10, "1st Bonus Life" )
+	PORT_DIPSETTING(    0x10, "20000" )
+	PORT_DIPSETTING(    0x00, "30000" )
+	PORT_DIPNAME( 0x60, 0x60, "2nd Bonus Life" )
+	PORT_DIPSETTING(    0x60, "30000" )
+	PORT_DIPSETTING(    0x20, "50000" )
+	PORT_DIPSETTING(    0x40, "100000" )
+	PORT_DIPSETTING(    0x00, "150000" ) */
 	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x70, "20k 50k 30k+" )
 	PORT_DIPSETTING(    0x30, "20k 70k 50k+" )
@@ -278,7 +278,7 @@ INPUT_PORTS_END
    so DSW1-8 has no effect and you can NOT start a game at areas 5 to 8. */
 static INPUT_PORTS_START( mightguy )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( mightguy )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -309,56 +309,56 @@ static INPUT_PORTS_START( mightguy )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x03, "3" )
-	PORT_DIPSETTING(	0x02, "4" )
-	PORT_DIPSETTING(	0x01, "5" )
-	PORT_DIPSETTING(	0x00, "6" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x04, "Every 200k" )
-	PORT_DIPSETTING(	0x00, "500k only" )
+	PORT_DIPSETTING(    0x04, "Every 200k" )
+	PORT_DIPSETTING(    0x00, "500k only" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x04)	// "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x04)    // "Start Area" - see fake Dip Switch
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x00, "Invincibility")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x01)	// "Start Area" - see fake Dip Switch
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x02)	// "Start Area" - see fake Dip Switch
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, "Invincibility")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x01)    // "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x02)    // "Start Area" - see fake Dip Switch
 
-	PORT_START("FAKE")	/* FAKE Dip Switch */
+	PORT_START("FAKE")  /* FAKE Dip Switch */
 	PORT_DIPNAME( 0x07, 0x07, "Starting Area" )
-	PORT_DIPSETTING(	0x07, "1" )
-	PORT_DIPSETTING(	0x06, "2" )
-	PORT_DIPSETTING(	0x05, "3" )
-	PORT_DIPSETTING(	0x04, "4" )
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
 	/* Not working due to ingame bug (see above) */
 #if MIGHTGUY_HACK
-	PORT_DIPSETTING(	0x03, "5" )
-	PORT_DIPSETTING(	0x02, "6" )
-	PORT_DIPSETTING(	0x01, "7" )
-	PORT_DIPSETTING(	0x00, "8" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
 #endif
 INPUT_PORTS_END
 
@@ -451,12 +451,12 @@ void cop01_state::machine_reset()
 static MACHINE_CONFIG_START( cop01, cop01_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)	/* unknown clock / divider */
+	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
 	MCFG_CPU_PROGRAM_MAP(cop01_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3MHz)	/* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3MHz)    /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
@@ -489,12 +489,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mightguy, cop01_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)	/* unknown divider */
+	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(cop01_map)
 	MCFG_CPU_IO_MAP(mightguy_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2)	/* unknown divider */
+	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
 
@@ -537,14 +537,14 @@ ROM_START( cop01 )
 	ROM_LOAD( "cop16.18b",    0x4000, 0x4000, CRC(56bf6946) SHA1(5414d00c6de96cfb5a3e68c35376333df6c525ee) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "cop14.15g",    0x00000, 0x2000, CRC(066d1c55) SHA1(017a0576799d39b919e6ca9b4a7f106ed04c0f94) )	/* chars */
+	ROM_LOAD( "cop14.15g",    0x00000, 0x2000, CRC(066d1c55) SHA1(017a0576799d39b919e6ca9b4a7f106ed04c0f94) )   /* chars */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "cop04.15c",    0x00000, 0x4000, CRC(622d32e6) SHA1(982b585e9a1115bce25c1788999d34423ccb83ab) )	/* tiles */
+	ROM_LOAD( "cop04.15c",    0x00000, 0x4000, CRC(622d32e6) SHA1(982b585e9a1115bce25c1788999d34423ccb83ab) )   /* tiles */
 	ROM_LOAD( "cop05.16c",    0x04000, 0x4000, CRC(c6ac5a35) SHA1(dab3500981663ee19abac5bfeaaf6a07a3953d75) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "cop06.3g",     0x00000, 0x2000, CRC(f1c1f4a5) SHA1(139aa23416e71361fe62ce336e3f0529a21acb81) )	/* sprites */
+	ROM_LOAD( "cop06.3g",     0x00000, 0x2000, CRC(f1c1f4a5) SHA1(139aa23416e71361fe62ce336e3f0529a21acb81) )   /* sprites */
 	ROM_LOAD( "cop07.5g",     0x02000, 0x2000, CRC(11db7b72) SHA1(47a1223ed3e7b294d7e59c05d119488ef6b3dc7a) )
 	ROM_LOAD( "cop08.6g",     0x04000, 0x2000, CRC(a63ddda6) SHA1(59aaa1fe0c023c4f0d4cfbdb9ca922182201c145) )
 	ROM_LOAD( "cop09.8g",     0x06000, 0x2000, CRC(855a2ec3) SHA1(8a54c0ceedeeafd7c1a6a35b4efab28046967951) )
@@ -554,11 +554,11 @@ ROM_START( cop01 )
 	ROM_LOAD( "cop13.8e",     0x0e000, 0x2000, CRC(07c4ea66) SHA1(12665c0fb648fd208805e81d056ab377d65b267a) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "copproma.13d", 0x0000, 0x0100, CRC(97f68a7a) SHA1(010eaca95eeb5caec083bd184ec31e0f433fff8c) )	/* red */
-	ROM_LOAD( "coppromb.14d", 0x0100, 0x0100, CRC(39a40b4c) SHA1(456b7f97fbd1cb4beb756033ec76a89ffe8de168) )	/* green */
-	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )	/* blue */
-	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )	/* tile lookup table */
-	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )	/* sprite lookup table */
+	ROM_LOAD( "copproma.13d", 0x0000, 0x0100, CRC(97f68a7a) SHA1(010eaca95eeb5caec083bd184ec31e0f433fff8c) )    /* red */
+	ROM_LOAD( "coppromb.14d", 0x0100, 0x0100, CRC(39a40b4c) SHA1(456b7f97fbd1cb4beb756033ec76a89ffe8de168) )    /* green */
+	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )    /* blue */
+	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )    /* tile lookup table */
+	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )    /* sprite lookup table */
 	ROM_LOAD( "13b",          0x0500, 0x0100, NO_DUMP ) /* state machine data used for video signals generation (not used in emulation)*/
 ROM_END
 
@@ -573,14 +573,14 @@ ROM_START( cop01a )
 	ROM_LOAD( "cop01alt.016", 0x4000, 0x4000, CRC(c20bf649) SHA1(a719ad6bf35811957ad32e6f07494bb00f256965) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "cop01alt.014", 0x00000, 0x2000, CRC(edd8a474) SHA1(42f0655535f1e10840da383129da69627d67ff8a) )	/* chars */
+	ROM_LOAD( "cop01alt.014", 0x00000, 0x2000, CRC(edd8a474) SHA1(42f0655535f1e10840da383129da69627d67ff8a) )   /* chars */
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "cop04.15c",    0x00000, 0x4000, CRC(622d32e6) SHA1(982b585e9a1115bce25c1788999d34423ccb83ab) )	/* tiles */
+	ROM_LOAD( "cop04.15c",    0x00000, 0x4000, CRC(622d32e6) SHA1(982b585e9a1115bce25c1788999d34423ccb83ab) )   /* tiles */
 	ROM_LOAD( "cop05.16c",    0x04000, 0x4000, CRC(c6ac5a35) SHA1(dab3500981663ee19abac5bfeaaf6a07a3953d75) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "cop01alt.006", 0x00000, 0x2000, CRC(cac7dac8) SHA1(25990ac4614de2ae61d663323bd67acc137bbc4a) )	/* sprites */
+	ROM_LOAD( "cop01alt.006", 0x00000, 0x2000, CRC(cac7dac8) SHA1(25990ac4614de2ae61d663323bd67acc137bbc4a) )   /* sprites */
 	ROM_LOAD( "cop07.5g",     0x02000, 0x2000, CRC(11db7b72) SHA1(47a1223ed3e7b294d7e59c05d119488ef6b3dc7a) )
 	ROM_LOAD( "cop08.6g",     0x04000, 0x2000, CRC(a63ddda6) SHA1(59aaa1fe0c023c4f0d4cfbdb9ca922182201c145) )
 	ROM_LOAD( "cop09.8g",     0x06000, 0x2000, CRC(855a2ec3) SHA1(8a54c0ceedeeafd7c1a6a35b4efab28046967951) )
@@ -590,11 +590,11 @@ ROM_START( cop01a )
 	ROM_LOAD( "cop13.8e",     0x0e000, 0x2000, CRC(07c4ea66) SHA1(12665c0fb648fd208805e81d056ab377d65b267a) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "copproma.13d", 0x0000, 0x0100, CRC(97f68a7a) SHA1(010eaca95eeb5caec083bd184ec31e0f433fff8c) )	/* red */
-	ROM_LOAD( "coppromb.14d", 0x0100, 0x0100, CRC(39a40b4c) SHA1(456b7f97fbd1cb4beb756033ec76a89ffe8de168) )	/* green */
-	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )	/* blue */
-	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )	/* tile lookup table */
-	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )	/* sprite lookup table */
+	ROM_LOAD( "copproma.13d", 0x0000, 0x0100, CRC(97f68a7a) SHA1(010eaca95eeb5caec083bd184ec31e0f433fff8c) )    /* red */
+	ROM_LOAD( "coppromb.14d", 0x0100, 0x0100, CRC(39a40b4c) SHA1(456b7f97fbd1cb4beb756033ec76a89ffe8de168) )    /* green */
+	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )    /* blue */
+	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )    /* tile lookup table */
+	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )    /* sprite lookup table */
 	ROM_LOAD( "13b",          0x0500, 0x0100, NO_DUMP ) /* state machine data used for video signals generation (not used in emulation)*/
 ROM_END
 
@@ -643,11 +643,11 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
 {
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
-       "Starting Area" fake Dip Switch */
+	   "Starting Area" fake Dip Switch */
 	UINT8 *RAM = (UINT8 *)machine().root_device().memregion("maincpu")->base();
-	RAM[0x00e4] = 0x07;	// rlca
-	RAM[0x00e5] = 0x07;	// rlca
-	RAM[0x00e6] = 0x07;	// rlca
+	RAM[0x00e4] = 0x07; // rlca
+	RAM[0x00e5] = 0x07; // rlca
+	RAM[0x00e6] = 0x07; // rlca
 	/* To avoid checksum error */
 	RAM[0x027f] = 0x00;
 	RAM[0x0280] = 0x00;

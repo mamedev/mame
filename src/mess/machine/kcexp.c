@@ -106,7 +106,7 @@
 #include "kcexp.h"
 #include "emuopts.h"
 
-#define  LOG	0
+#define  LOG    0
 
 
 /***************************************************************************
@@ -152,13 +152,13 @@ device_kcexp_interface::~device_kcexp_interface()
 //  kcexp_slot_device - constructor
 //-------------------------------------------------
 kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, KCEXP_SLOT, "KC85 Expansion Slot", tag, owner, clock),
+		device_t(mconfig, KCEXP_SLOT, "KC85 Expansion Slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
 
 kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -211,8 +211,8 @@ void kcexp_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
 		memset(&m_out_halt_cb, 0, sizeof(m_out_halt_cb));
 	}
 }
@@ -316,7 +316,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
 //  kccart_slot_device - constructor
 //-------------------------------------------------
 kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        kcexp_slot_device(mconfig, KCCART_SLOT, "KC85 Cartridge Slot", tag, owner, clock),
+		kcexp_slot_device(mconfig, KCCART_SLOT, "KC85 Cartridge Slot", tag, owner, clock),
 		device_image_interface(mconfig, *this)
 {
 }

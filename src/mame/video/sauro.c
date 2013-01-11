@@ -87,10 +87,10 @@ VIDEO_START_MEMBER(sauro_state,sauro)
 {
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_fg),this), TILEMAP_SCAN_COLS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_palette_bank = 0;
@@ -159,7 +159,7 @@ VIDEO_START_MEMBER(sauro_state,trckydoc)
 {
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 }
 
 static void trckydoc_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

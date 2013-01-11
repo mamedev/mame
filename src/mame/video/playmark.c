@@ -300,15 +300,15 @@ WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 
 	switch (offset)
 	{
-		case 0: 	m_tx_tilemap->set_scrollx(0, data + 2); break;
-		case 1: 	m_tx_tilemap->set_scrolly(0, data);   break;
-		case 2: 	m_bgscrollx = -(data + 4);                    break;
-		case 3: 	m_bgscrolly = (-data) & 0x1ff;
+		case 0:     m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1:     m_tx_tilemap->set_scrolly(0, data);   break;
+		case 2:     m_bgscrollx = -(data + 4);                    break;
+		case 3:     m_bgscrolly = (-data) & 0x1ff;
 				m_bg_enable = data & 0x0200;
 				m_bg_full_size = data & 0x0400;
 				break;
-		case 4: 	m_fg_tilemap->set_scrollx(0, data + 6); break;
-		case 5: 	m_fg_tilemap->set_scrolly(0, data);   break;
+		case 4:     m_fg_tilemap->set_scrollx(0, data + 6); break;
+		case 5:     m_fg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
@@ -319,14 +319,14 @@ WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
 
 	switch (offset)
 	{
-		case 0: 	m_tx_tilemap->set_scrollx(0, data + 2); break;
-		case 1: 	m_tx_tilemap->set_scrolly(0, data);   break;
-		case 2: 	m_fgscrollx = data + 4;break;
-		case 3: 	m_fg_tilemap->set_scrolly(0, data & 0x3ff);
+		case 0:     m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1:     m_tx_tilemap->set_scrolly(0, data);   break;
+		case 2:     m_fgscrollx = data + 4;break;
+		case 3:     m_fg_tilemap->set_scrolly(0, data & 0x3ff);
 				m_fg_rowscroll_enable = data & 0x0800;
 				break;
-		case 4: 	m_bg_tilemap->set_scrollx(0, data + 6); break;
-		case 5: 	m_bg_tilemap->set_scrolly(0, data);   break;
+		case 4:     m_bg_tilemap->set_scrollx(0, data + 6); break;
+		case 5:     m_bg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
@@ -337,15 +337,15 @@ WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
 
 	switch (offset)
 	{
-		case 0:	m_tx_tilemap->set_scrollx(0, data + 2); break;
-		case 1: 	m_tx_tilemap->set_scrolly(0, data);   break;
-		case 2: 	m_bgscrollx = -data;	break;
-		case 3: 	m_bgscrolly = (-data + 2)& 0x1ff;
+		case 0: m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1:     m_tx_tilemap->set_scrolly(0, data);   break;
+		case 2:     m_bgscrollx = -data;    break;
+		case 3:     m_bgscrolly = (-data + 2)& 0x1ff;
 				m_bg_enable = data & 0x0200;
 				m_bg_full_size = data & 0x0400;
 				break;
-		case 4:	m_fg_tilemap->set_scrollx(0, data + 6); break;
-		case 5:	m_fg_tilemap->set_scrolly(0, data);   break;
+		case 4: m_fg_tilemap->set_scrollx(0, data + 6); break;
+		case 5: m_fg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
@@ -393,7 +393,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	{
 		int sx, sy, code, color, flipx, pri;
 
-		sy = spriteram[offs + 3 - 4];	/* -4? what the... ??? */
+		sy = spriteram[offs + 3 - 4];   /* -4? what the... ??? */
 
 		flipx = sy & 0x4000;
 		sx = (spriteram[offs + 1] & 0x01ff) - 16 - 7;
@@ -406,11 +406,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			pri = 2;
 
 		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				 code,
-				 color,
-				 flipx,0,
-				 sx + state->m_xoffset,sy + state->m_yoffset,
-				 machine.priority_bitmap,state->m_pri_masks[pri],0);
+					code,
+					color,
+					flipx,0,
+					sx + state->m_xoffset,sy + state->m_yoffset,
+					machine.priority_bitmap,state->m_pri_masks[pri],0);
 	}
 }
 
@@ -436,7 +436,7 @@ static void bigtwinb_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	{
 		int sx, sy, code, color, flipx;
 
-		sy = spriteram[offs + 3 - 4];	/* -4? what the... ??? */
+		sy = spriteram[offs + 3 - 4];   /* -4? what the... ??? */
 
 		flipx = sy & 0x4000;
 		sx = (spriteram[offs + 1] & 0x01ff) - 16 - 7;
@@ -445,10 +445,10 @@ static void bigtwinb_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		color = ((spriteram[offs + 1] & 0xf000) >> 12);
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				 code,
-				 color,
-				 flipx,0,
-				 sx + state->m_xoffset,sy + state->m_yoffset, 0);
+					code,
+					color,
+					flipx,0,
+					sx + state->m_xoffset,sy + state->m_yoffset, 0);
 	}
 }
 

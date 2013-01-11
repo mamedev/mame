@@ -45,59 +45,59 @@ enum
 // baud rate
 enum
 {
-	 BAUD_19200				= 0x00,
-	 BAUD_9600				= 0x01,
-	 BAUD_4800				= 0x02,
-	 BAUD_2400				= 0x03,
-	 BAUD_1200				= 0x04,
-	 BAUD_600				= 0x05,
-	 BAUD_300				= 0x06,
-	 BAUD_75				= 0x07,
-	 BAUD_MASK				= 0x07,
+		BAUD_19200              = 0x00,
+		BAUD_9600               = 0x01,
+		BAUD_4800               = 0x02,
+		BAUD_2400               = 0x03,
+		BAUD_1200               = 0x04,
+		BAUD_600                = 0x05,
+		BAUD_300                = 0x06,
+		BAUD_75             = 0x07,
+		BAUD_MASK               = 0x07,
 };
 
 // transmit mode
 enum
 {
-	 MODE_SER1				= 0x00,
-	 MODE_SER2				= 0x08,
-	 MODE_MDV				= 0x10,
-	 MODE_NET				= 0x18,
-	 MODE_MASK				= 0x18,
+		MODE_SER1               = 0x00,
+		MODE_SER2               = 0x08,
+		MODE_MDV                = 0x10,
+		MODE_NET                = 0x18,
+		MODE_MASK               = 0x18,
 };
 
 // interrupts
 enum
 {
-	 INT_GAP				= 0x01,
-	 INT_INTERFACE			= 0x02,
-	 INT_TRANSMIT			= 0x04,
-	 INT_FRAME				= 0x08,
-	 INT_EXTERNAL			= 0x10,
+		INT_GAP             = 0x01,
+		INT_INTERFACE           = 0x02,
+		INT_TRANSMIT            = 0x04,
+		INT_FRAME               = 0x08,
+		INT_EXTERNAL            = 0x10,
 };
 
 // status register
 enum
 {
-	 STATUS_NETWORK_PORT	= 0x01,
-	 STATUS_TX_BUFFER_FULL	= 0x02,
-	 STATUS_RX_BUFFER_FULL	= 0x04,
-	 STATUS_MICRODRIVE_GAP	= 0x08,
+		STATUS_NETWORK_PORT = 0x01,
+		STATUS_TX_BUFFER_FULL   = 0x02,
+		STATUS_RX_BUFFER_FULL   = 0x04,
+		STATUS_MICRODRIVE_GAP   = 0x08,
 };
 
 // transmit bits
 enum
 {
-	 TXD_START				= 0,
-	 TXD_STOP				= 9,
-	 TXD_STOP2				= 10,
+		TXD_START               = 0,
+		TXD_STOP                = 9,
+		TXD_STOP2               = 10,
 };
 
 
 // Monday 1st January 1979 00:00:00 UTC
 enum
 {
-	 RTC_BASE_ADJUST		= 283996800,
+		RTC_BASE_ADJUST     = 283996800,
 };
 
 
@@ -169,28 +169,28 @@ inline void zx8302_device::transmit_ipc_data()
 {
 	/*
 
-        IPC <-> ZX8302 serial link protocol
-        ***********************************
+	    IPC <-> ZX8302 serial link protocol
+	    ***********************************
 
-        Send bit to IPC
-        ---------------
+	    Send bit to IPC
+	    ---------------
 
-        1. ZX start bit (COMDATA = 0)
-        2. IPC clock (COMCTL = 0, COMTL = 1)
-        3. ZX data bit (COMDATA = 0/1)
-        4. IPC clock (COMCTL = 0, COMTL = 1)
-        5. ZX stop bit (COMDATA = 1)
+	    1. ZX start bit (COMDATA = 0)
+	    2. IPC clock (COMCTL = 0, COMTL = 1)
+	    3. ZX data bit (COMDATA = 0/1)
+	    4. IPC clock (COMCTL = 0, COMTL = 1)
+	    5. ZX stop bit (COMDATA = 1)
 
-        Receive bit from IPC
-        --------------------
+	    Receive bit from IPC
+	    --------------------
 
-        1. ZX start bit (COMDATA = 0)
-        2. IPC clock (COMCTL = 0, COMTL = 1)
-        3. IPC data bit (COMDATA = 0/1)
-        4. IPC clock (COMCTL = 0, COMTL = 1)
-        5. IPC stop bit (COMDATA = 1)
+	    1. ZX start bit (COMDATA = 0)
+	    2. IPC clock (COMCTL = 0, COMTL = 1)
+	    3. IPC data bit (COMDATA = 0/1)
+	    4. IPC clock (COMCTL = 0, COMTL = 1)
+	    5. IPC stop bit (COMDATA = 1)
 
-    */
+	*/
 
 	switch (m_ipc_state)
 	{
@@ -297,17 +297,17 @@ inline void zx8302_device::transmit_serial_data()
 //  zx8302_device - constructor
 //-------------------------------------------------
 zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock),
-	  m_idr(1),
-	  m_irq(0),
-	  m_ctr(time(NULL) + RTC_BASE_ADJUST),
-	  m_status(0),
-	  m_comdata(1),
-	  m_comctl(1),
-	  m_ipc_state(0),
-	  m_ipc_rx(0),
-	  m_ipc_busy(0),
-	  m_track(0)
+	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock),
+		m_idr(1),
+		m_irq(0),
+		m_ctr(time(NULL) + RTC_BASE_ADJUST),
+		m_status(0),
+		m_comdata(1),
+		m_comctl(1),
+		m_ipc_state(0),
+		m_ipc_rx(0),
+		m_ipc_busy(0),
+		m_track(0)
 {
 }
 
@@ -482,18 +482,18 @@ READ8_MEMBER( zx8302_device::status_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Network port
-        1       Transmit buffer full
-        2       Receive buffer full
-        3       Microdrive GAP
-        4       SER1 DTR
-        5       SER2 CTS
-        6       IPC busy
-        7       COMDATA
+	    0       Network port
+	    1       Transmit buffer full
+	    2       Receive buffer full
+	    3       Microdrive GAP
+	    4       SER1 DTR
+	    5       SER2 CTS
+	    6       IPC busy
+	    7       COMDATA
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -545,18 +545,18 @@ WRITE8_MEMBER( zx8302_device::mdv_control_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       MDSELDH
-        1       MDSELCKH
-        2       MDRDWL
-        3       ERASE
-        4
-        5
-        6
-        7
+	    0       MDSELDH
+	    1       MDSELCKH
+	    2       MDRDWL
+	    3       ERASE
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	if (LOG) logerror("ZX8302 '%s' Microdrive Control: %02x\n", tag(), data);
 

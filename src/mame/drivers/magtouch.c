@@ -86,8 +86,8 @@ class magtouch_state : public driver_device
 public:
 	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_uart(*this, "ns16450_0"),
-		  m_microtouch(*this, "microtouch")
+			m_uart(*this, "ns16450_0"),
+			m_microtouch(*this, "microtouch")
 	{ }
 
 	required_device<ns16450_device> m_uart;
@@ -213,7 +213,7 @@ void magtouch_state::machine_start()
 
 static MACHINE_CONFIG_START( magtouch, magtouch_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
+	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(magtouch_map)
 	MCFG_CPU_IO_MAP(magtouch_io)
 
@@ -234,14 +234,14 @@ MACHINE_CONFIG_END
 
 
 ROM_START(magtouch)
-	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("mtouch.u13", 0x00000, 0x10000, CRC(e74fb144) SHA1(abc99e84832c30606374da542fd94f0fbc8cbaa6) )
 
 	ROM_REGION(0x08000, "video_bios", 0)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
-	ROM_REGION(0x400000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x400000, "game_prg", 0) /* proper game */
 	ROM_LOAD("mtouch.u20", 0x000000,0x100000, CRC(fb7b529b) SHA1(ecf8792ce7b6b2f59c2178dc1524c3830a4b4ebc) )
 	ROM_LOAD("mtouch.u21", 0x100000,0x100000, CRC(af1491a6) SHA1(2d09506a3368fd64b1081017c58065635be5a62f) )
 	ROM_LOAD("mtouch.u22", 0x200000,0x100000, CRC(da39c860) SHA1(7648e063ec68575abd808d5dea933f292197a2c2) )

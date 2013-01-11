@@ -40,7 +40,7 @@ extern const via6522_interface b_via_1_interface;
 /*----------- defined in audio/beezer.c -----------*/
 
 class beezer_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -69,5 +69,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( beezer_sh6840_w );
 DECLARE_WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w );
 DECLARE_WRITE8_DEVICE_HANDLER( beezer_timer1_w );
 DECLARE_READ8_DEVICE_HANDLER( beezer_noise_r );
-
-

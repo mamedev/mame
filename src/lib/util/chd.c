@@ -61,45 +61,45 @@ const char *CDROM_TRACK_METADATA2_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%
 const char *GDROM_TRACK_METADATA_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d PAD:%d PREGAP:%d PGTYPE:%s PGSUB:%s POSTGAP:%d";
 const char *AV_METADATA_FORMAT = "FPS:%d.%06d WIDTH:%d HEIGHT:%d INTERLACED:%d CHANNELS:%d SAMPLERATE:%d";
 
-static const UINT32 METADATA_HEADER_SIZE = 16;			// metadata header size
+static const UINT32 METADATA_HEADER_SIZE = 16;          // metadata header size
 
-static const UINT8 V34_MAP_ENTRY_FLAG_TYPE_MASK	= 0x0f;		// what type of hunk
-static const UINT8 V34_MAP_ENTRY_FLAG_NO_CRC = 0x10;		// no CRC is present
+static const UINT8 V34_MAP_ENTRY_FLAG_TYPE_MASK = 0x0f;     // what type of hunk
+static const UINT8 V34_MAP_ENTRY_FLAG_NO_CRC = 0x10;        // no CRC is present
 
 
 
 // V3-V4 entry types
 enum
 {
-	V34_MAP_ENTRY_TYPE_INVALID = 0,				// invalid type
-	V34_MAP_ENTRY_TYPE_COMPRESSED = 1,			// standard compression
-	V34_MAP_ENTRY_TYPE_UNCOMPRESSED = 2,		// uncompressed data
-	V34_MAP_ENTRY_TYPE_MINI = 3,				// mini: use offset as raw data
-	V34_MAP_ENTRY_TYPE_SELF_HUNK = 4,			// same as another hunk in this file
-	V34_MAP_ENTRY_TYPE_PARENT_HUNK = 5,			// same as a hunk in the parent file
-	V34_MAP_ENTRY_TYPE_2ND_COMPRESSED = 6		// compressed with secondary algorithm (usually FLAC CDDA)
+	V34_MAP_ENTRY_TYPE_INVALID = 0,             // invalid type
+	V34_MAP_ENTRY_TYPE_COMPRESSED = 1,          // standard compression
+	V34_MAP_ENTRY_TYPE_UNCOMPRESSED = 2,        // uncompressed data
+	V34_MAP_ENTRY_TYPE_MINI = 3,                // mini: use offset as raw data
+	V34_MAP_ENTRY_TYPE_SELF_HUNK = 4,           // same as another hunk in this file
+	V34_MAP_ENTRY_TYPE_PARENT_HUNK = 5,         // same as a hunk in the parent file
+	V34_MAP_ENTRY_TYPE_2ND_COMPRESSED = 6       // compressed with secondary algorithm (usually FLAC CDDA)
 };
 
 // V5 compression types
 enum
 {
 	// these types are live when running
-	COMPRESSION_TYPE_0 = 0,						// codec #0
-	COMPRESSION_TYPE_1 = 1,						// codec #1
-	COMPRESSION_TYPE_2 = 2,						// codec #2
-	COMPRESSION_TYPE_3 = 3,						// codec #3
-	COMPRESSION_NONE = 4,						// no compression; implicit length = hunkbytes
-	COMPRESSION_SELF = 5,						// same as another block in this chd
-	COMPRESSION_PARENT = 6,						// same as a hunk's worth of units in the parent chd
+	COMPRESSION_TYPE_0 = 0,                     // codec #0
+	COMPRESSION_TYPE_1 = 1,                     // codec #1
+	COMPRESSION_TYPE_2 = 2,                     // codec #2
+	COMPRESSION_TYPE_3 = 3,                     // codec #3
+	COMPRESSION_NONE = 4,                       // no compression; implicit length = hunkbytes
+	COMPRESSION_SELF = 5,                       // same as another block in this chd
+	COMPRESSION_PARENT = 6,                     // same as a hunk's worth of units in the parent chd
 
 	// these additional pseudo-types are used for compressed encodings:
-	COMPRESSION_RLE_SMALL,						// start of small RLE run (4-bit length)
-	COMPRESSION_RLE_LARGE,						// start of large RLE run (8-bit length)
-	COMPRESSION_SELF_0,							// same as the last COMPRESSION_SELF block
-	COMPRESSION_SELF_1,							// same as the last COMPRESSION_SELF block + 1
-	COMPRESSION_PARENT_SELF,					// same block in the parent
-	COMPRESSION_PARENT_0,						// same as the last COMPRESSION_PARENT block
-	COMPRESSION_PARENT_1						// same as the last COMPRESSION_PARENT block + 1
+	COMPRESSION_RLE_SMALL,                      // start of small RLE run (4-bit length)
+	COMPRESSION_RLE_LARGE,                      // start of large RLE run (8-bit length)
+	COMPRESSION_SELF_0,                         // same as the last COMPRESSION_SELF block
+	COMPRESSION_SELF_1,                         // same as the last COMPRESSION_SELF block + 1
+	COMPRESSION_PARENT_SELF,                    // same block in the parent
+	COMPRESSION_PARENT_0,                       // same as the last COMPRESSION_PARENT block
+	COMPRESSION_PARENT_1                        // same as the last COMPRESSION_PARENT block + 1
 };
 
 
@@ -113,12 +113,12 @@ enum
 // description of where a metadata entry lives within the file
 struct chd_file::metadata_entry
 {
-	UINT64					offset;			// offset within the file of the header
-	UINT64					next;			// offset within the file of the next header
-	UINT64					prev;			// offset within the file of the previous header
-	UINT32					length;			// length of the metadata
-	UINT32					metatag;		// metadata tag
-	UINT8					flags;			// flag bits
+	UINT64                  offset;         // offset within the file of the header
+	UINT64                  next;           // offset within the file of the next header
+	UINT64                  prev;           // offset within the file of the previous header
+	UINT32                  length;         // length of the metadata
+	UINT32                  metatag;        // metadata tag
+	UINT8                   flags;          // flag bits
 };
 
 
@@ -126,8 +126,8 @@ struct chd_file::metadata_entry
 
 struct chd_file::metadata_hash
 {
-	UINT8					tag[4];			// tag of the metadata in big-endian
-	sha1_t					sha1;			// hash data
+	UINT8                   tag[4];         // tag of the metadata in big-endian
+	sha1_t                  sha1;           // hash data
 };
 
 
@@ -297,7 +297,7 @@ inline UINT8 chd_file::bits_for_value(UINT64 value)
 
 chd_file::chd_file()
 	: m_file(NULL),
-      m_owns_file(false)
+		m_owns_file(false)
 {
 	// reset state
 	memset(m_decompressor, 0, sizeof(m_decompressor));
@@ -1382,39 +1382,39 @@ const char *chd_file::error_string(chd_error err)
 {
 	switch (err)
 	{
-		case CHDERR_NONE:						return "no error";
-		case CHDERR_NO_INTERFACE:				return "no drive interface";
-		case CHDERR_OUT_OF_MEMORY:				return "out of memory";
-		case CHDERR_NOT_OPEN:					return "file not open";
-		case CHDERR_ALREADY_OPEN:				return "file already open";
-		case CHDERR_INVALID_FILE:				return "invalid file";
-		case CHDERR_INVALID_PARAMETER:			return "invalid parameter";
-		case CHDERR_INVALID_DATA:				return "invalid data";
-		case CHDERR_FILE_NOT_FOUND:				return "file not found";
-		case CHDERR_REQUIRES_PARENT:			return "requires parent";
-		case CHDERR_FILE_NOT_WRITEABLE:			return "file not writeable";
-		case CHDERR_READ_ERROR:					return "read error";
-		case CHDERR_WRITE_ERROR:				return "write error";
-		case CHDERR_CODEC_ERROR:				return "codec error";
-		case CHDERR_INVALID_PARENT:				return "invalid parent";
-		case CHDERR_HUNK_OUT_OF_RANGE:			return "hunk out of range";
-		case CHDERR_DECOMPRESSION_ERROR:		return "decompression error";
-		case CHDERR_COMPRESSION_ERROR:			return "compression error";
-		case CHDERR_CANT_CREATE_FILE:			return "can't create file";
-		case CHDERR_CANT_VERIFY:				return "can't verify file";
-		case CHDERR_NOT_SUPPORTED:				return "operation not supported";
-		case CHDERR_METADATA_NOT_FOUND:			return "can't find metadata";
-		case CHDERR_INVALID_METADATA_SIZE:		return "invalid metadata size";
-		case CHDERR_UNSUPPORTED_VERSION:		return "mismatched DIFF and CHD or unsupported CHD version";
-		case CHDERR_VERIFY_INCOMPLETE:			return "incomplete verify";
-		case CHDERR_INVALID_METADATA:			return "invalid metadata";
-		case CHDERR_INVALID_STATE:				return "invalid state";
-		case CHDERR_OPERATION_PENDING:			return "operation pending";
-		case CHDERR_UNSUPPORTED_FORMAT:			return "unsupported format";
-		case CHDERR_UNKNOWN_COMPRESSION:		return "unknown compression type";
-		case CHDERR_WALKING_PARENT:				return "currently examining parent";
-		case CHDERR_COMPRESSING:				return "currently compressing";
-		default:								return "undocumented error";
+		case CHDERR_NONE:                       return "no error";
+		case CHDERR_NO_INTERFACE:               return "no drive interface";
+		case CHDERR_OUT_OF_MEMORY:              return "out of memory";
+		case CHDERR_NOT_OPEN:                   return "file not open";
+		case CHDERR_ALREADY_OPEN:               return "file already open";
+		case CHDERR_INVALID_FILE:               return "invalid file";
+		case CHDERR_INVALID_PARAMETER:          return "invalid parameter";
+		case CHDERR_INVALID_DATA:               return "invalid data";
+		case CHDERR_FILE_NOT_FOUND:             return "file not found";
+		case CHDERR_REQUIRES_PARENT:            return "requires parent";
+		case CHDERR_FILE_NOT_WRITEABLE:         return "file not writeable";
+		case CHDERR_READ_ERROR:                 return "read error";
+		case CHDERR_WRITE_ERROR:                return "write error";
+		case CHDERR_CODEC_ERROR:                return "codec error";
+		case CHDERR_INVALID_PARENT:             return "invalid parent";
+		case CHDERR_HUNK_OUT_OF_RANGE:          return "hunk out of range";
+		case CHDERR_DECOMPRESSION_ERROR:        return "decompression error";
+		case CHDERR_COMPRESSION_ERROR:          return "compression error";
+		case CHDERR_CANT_CREATE_FILE:           return "can't create file";
+		case CHDERR_CANT_VERIFY:                return "can't verify file";
+		case CHDERR_NOT_SUPPORTED:              return "operation not supported";
+		case CHDERR_METADATA_NOT_FOUND:         return "can't find metadata";
+		case CHDERR_INVALID_METADATA_SIZE:      return "invalid metadata size";
+		case CHDERR_UNSUPPORTED_VERSION:        return "mismatched DIFF and CHD or unsupported CHD version";
+		case CHDERR_VERIFY_INCOMPLETE:          return "incomplete verify";
+		case CHDERR_INVALID_METADATA:           return "invalid metadata";
+		case CHDERR_INVALID_STATE:              return "invalid state";
+		case CHDERR_OPERATION_PENDING:          return "operation pending";
+		case CHDERR_UNSUPPORTED_FORMAT:         return "unsupported format";
+		case CHDERR_UNKNOWN_COMPRESSION:        return "unknown compression type";
+		case CHDERR_WALKING_PARENT:             return "currently examining parent";
+		case CHDERR_COMPRESSING:                return "currently compressing";
+		default:                                return "undocumented error";
 	}
 }
 
@@ -1474,10 +1474,10 @@ void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
 	// determine compression
 	switch (be_read(&rawheader[20], 4))
 	{
-		case 0:	m_compression[0] = CHD_CODEC_NONE;		break;
-		case 1:	m_compression[0] = CHD_CODEC_ZLIB;		break;
-		case 2:	m_compression[0] = CHD_CODEC_ZLIB;		break;
-		case 3:	m_compression[0] = CHD_CODEC_AVHUFF;	break;
+		case 0: m_compression[0] = CHD_CODEC_NONE;      break;
+		case 1: m_compression[0] = CHD_CODEC_ZLIB;      break;
+		case 2: m_compression[0] = CHD_CODEC_ZLIB;      break;
+		case 3: m_compression[0] = CHD_CODEC_AVHUFF;    break;
 		default: throw CHDERR_UNKNOWN_COMPRESSION;
 	}
 	m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC_NONE;
@@ -1527,10 +1527,10 @@ void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
 	// determine compression
 	switch (be_read(&rawheader[20], 4))
 	{
-		case 0:	m_compression[0] = CHD_CODEC_NONE;		break;
-		case 1:	m_compression[0] = CHD_CODEC_ZLIB;		break;
-		case 2:	m_compression[0] = CHD_CODEC_ZLIB;		break;
-		case 3:	m_compression[0] = CHD_CODEC_AVHUFF;	break;
+		case 0: m_compression[0] = CHD_CODEC_NONE;      break;
+		case 1: m_compression[0] = CHD_CODEC_ZLIB;      break;
+		case 2: m_compression[0] = CHD_CODEC_ZLIB;      break;
+		case 3: m_compression[0] = CHD_CODEC_AVHUFF;    break;
 		default: throw CHDERR_UNKNOWN_COMPRESSION;
 	}
 	m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC_NONE;
@@ -1787,7 +1787,7 @@ chd_error chd_file::compress_v5_map()
 		compressed[12] = lengthbits;
 		compressed[13] = selfbits;
 		compressed[14] = parentbits;
-        compressed[15] = 0;
+		compressed[15] = 0;
 
 		// write the result
 		m_mapoffset = file_append(compressed, complen + 16);
@@ -2052,10 +2052,10 @@ chd_error chd_file::open_common(bool writeable)
 		sha1_t parentsha1 = sha1_t::null;
 		switch (m_version)
 		{
-			case 3:		parse_v3_header(rawheader, parentsha1);	break;
-			case 4:		parse_v4_header(rawheader, parentsha1);	break;
-			case 5:		parse_v5_header(rawheader, parentsha1);	break;
-			default:	throw CHDERR_UNSUPPORTED_VERSION;
+			case 3:     parse_v3_header(rawheader, parentsha1); break;
+			case 4:     parse_v4_header(rawheader, parentsha1); break;
+			case 5:     parse_v5_header(rawheader, parentsha1); break;
+			default:    throw CHDERR_UNSUPPORTED_VERSION;
 		}
 
 		if (writeable && !m_allow_writes)
@@ -2335,14 +2335,14 @@ int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *ele
 
 chd_file_compressor::chd_file_compressor()
 	: m_walking_parent(false),
-	  m_total_in(0),
-	  m_total_out(0),
-	  m_read_queue(NULL),
-	  m_read_queue_offset(0),
-	  m_read_done_offset(0),
-	  m_read_error(false),
-	  m_work_queue(NULL),
-	  m_write_hunk(0)
+		m_total_in(0),
+		m_total_out(0),
+		m_read_queue(NULL),
+		m_read_queue_offset(0),
+		m_read_done_offset(0),
+		m_read_error(false),
+		m_work_queue(NULL),
+		m_write_hunk(0)
 {
 	// zap arrays
 	memset(m_work_item, 0, sizeof(m_work_item));

@@ -9,11 +9,11 @@
 
 
 /* Avalanche Discrete Sound Input Nodes */
-#define AVALNCHE_AUD0_EN			NODE_01
-#define AVALNCHE_AUD1_EN			NODE_02
-#define AVALNCHE_AUD2_EN			NODE_03
-#define AVALNCHE_SOUNDLVL_DATA		NODE_04
-#define AVALNCHE_ATTRACT_EN			NODE_05
+#define AVALNCHE_AUD0_EN            NODE_01
+#define AVALNCHE_AUD1_EN            NODE_02
+#define AVALNCHE_AUD2_EN            NODE_03
+#define AVALNCHE_SOUNDLVL_DATA      NODE_04
+#define AVALNCHE_ATTRACT_EN         NODE_05
 
 
 /***************************************************************************
@@ -36,15 +36,15 @@ WRITE8_MEMBER(avalnche_state::avalnche_audio_w)
 
 	switch (offset & 0x07)
 	{
-	case 0x00:		/* AUD0 */
+	case 0x00:      /* AUD0 */
 		discrete_sound_w(m_discrete, space, AVALNCHE_AUD0_EN, bit);
 		break;
 
-	case 0x01:		/* AUD1 */
+	case 0x01:      /* AUD1 */
 		discrete_sound_w(m_discrete, space, AVALNCHE_AUD1_EN, bit);
 		break;
 
-	case 0x02:		/* AUD2 */
+	case 0x02:      /* AUD2 */
 	default:
 		discrete_sound_w(m_discrete, space, AVALNCHE_AUD2_EN, bit);
 		break;
@@ -58,23 +58,23 @@ WRITE8_MEMBER(avalnche_state::avalnche_audio_w)
 
 static const discrete_lfsr_desc avalnche_lfsr={
 	DISC_CLK_IS_FREQ,
-	16,			/* Bit Length */
-	0,			/* Reset Value */
-	0,			/* Use Bit 0 as XOR input 0 */
-	14,			/* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,		/* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,		/* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,	/* Feedback stage3 replaces the shifted register contents */
-	0x000001,		/* Everything is shifted into the first bit only */
-	0,			/* Output is already inverted by XNOR */
-	15			/* Output bit */
+	16,         /* Bit Length */
+	0,          /* Reset Value */
+	0,          /* Use Bit 0 as XOR input 0 */
+	14,         /* Use Bit 14 as XOR input 1 */
+	DISC_LFSR_XNOR,     /* Feedback stage1 is XNOR */
+	DISC_LFSR_OR,       /* Feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
+	0x000001,       /* Everything is shifted into the first bit only */
+	0,          /* Output is already inverted by XNOR */
+	15          /* Output bit */
 };
 
 /* Nodes - Sounds */
-#define AVALNCHE_NOISE				NODE_10
-#define AVALNCHE_AUD1_SND			NODE_11
-#define AVALNCHE_AUD2_SND			NODE_12
-#define AVALNCHE_SOUNDLVL_AUD0_SND	NODE_13
+#define AVALNCHE_NOISE              NODE_10
+#define AVALNCHE_AUD1_SND           NODE_11
+#define AVALNCHE_AUD2_SND           NODE_12
+#define AVALNCHE_SOUNDLVL_AUD0_SND  NODE_13
 
 DISCRETE_SOUND_START(avalnche)
 	/************************************************/
@@ -102,7 +102,7 @@ DISCRETE_SOUND_START(avalnche)
 	/* Aud1 = 32V = HSYNC/64 = 15750/64             */
 	/* Aud2 = 8V  = HSYNC/16 = 15750/16             */
 	/************************************************/
-	DISCRETE_SQUAREWFIX(NODE_20, AVALNCHE_AUD0_EN, 15750.0/4,  725.6, 50.0, 0, 0.0)	// Aud0
+	DISCRETE_SQUAREWFIX(NODE_20, AVALNCHE_AUD0_EN, 15750.0/4,  725.6, 50.0, 0, 0.0) // Aud0
 	DISCRETE_SQUAREWFIX(AVALNCHE_AUD1_SND, AVALNCHE_AUD1_EN, 15750.0/64, 750.2, 50.0, 0, 0.0)
 	DISCRETE_SQUAREWFIX(AVALNCHE_AUD2_SND, AVALNCHE_AUD2_EN, 15750.0/16, 750.2, 50.0, 0, 0.0)
 
@@ -131,5 +131,5 @@ DISCRETE_SOUND_END
 WRITE8_MEMBER(avalnche_state::catch_audio_w)
 {
 	/* Different from avalnche, it plays a sound (offset 0/1/2) on data bit 0 rising edge.
-    There's no indication that the game silences sound, it's probably done automatically. */
+	There's no indication that the game silences sound, it's probably done automatically. */
 }

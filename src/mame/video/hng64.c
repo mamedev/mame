@@ -5,7 +5,7 @@
 #define MAKE_MAME_REEEEAAALLLL_SLOW 0
 
 
-static void clear3d(running_machine &machine);	// TODO: Inline
+static void clear3d(running_machine &machine);  // TODO: Inline
 
 
 static void hng64_mark_all_tiles_dirty( hng64_state *state, int tilemap )
@@ -65,15 +65,15 @@ static void hng64_mark_tile_dirty( hng64_state *state, int tilemap, int tile_ind
 }
 
 
-#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE)					\
-do																					\
-{																					\
-	UINT32 srcdata = (SOURCE);														\
-	if (srcdata != transpen)														\
-	{																				\
-		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)								\
-		{																			\
-			UINT32 srcdata2 = paldata[srcdata];										\
+#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE)                  \
+do                                                                                  \
+{                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                      \
+	if (srcdata != transpen)                                                        \
+	{                                                                               \
+		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
+		{                                                                           \
+			UINT32 srcdata2 = paldata[srcdata];                                     \
 																					\
 			UINT32 add;                                                             \
 			add = (srcdata2 & 0x00ff0000) + (DEST & 0x00ff0000);                    \
@@ -85,11 +85,11 @@ do																					\
 			add = (srcdata2 & 0x0000ff00) + (DEST & 0x0000ff00);                    \
 			if (add & 0x00010000) DEST = (DEST & 0xffff00ff) | (0x0000ff00);        \
 			else DEST = (DEST & 0xffff00ff) | (add & 0x0000ff00);                   \
-		}																			\
-		(PRIORITY) = 31;															\
-	}																				\
-}																					\
-while (0)																			\
+		}                                                                           \
+		(PRIORITY) = 31;                                                            \
+	}                                                                               \
+}                                                                                   \
+while (0)                                                                           \
 
 
 static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
@@ -531,19 +531,19 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 {                                                                              \
 	UINT16 tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                 \
 	int tileno,pal, flip;                                                      \
-                                                                               \
+																				\
 	tileno = m_videoram[tile_index+(offset/4)];                            \
-                                                                               \
+																				\
 	pal = (tileno&0xff000000)>>24;                                             \
 	flip =(tileno&0x00c00000)>>22;                                             \
-                                                                               \
+																				\
 	if (tileno&0x200000)                                                       \
 	{                                                                          \
 		tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];     \
 	}                                                                          \
-                                                                               \
+																				\
 	tileno &= 0x1fffff;                                                        \
-                                                                               \
+																				\
 	if (size==0)                                                               \
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
@@ -567,7 +567,7 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 		}                                                                      \
 	}                                                                          \
 }                                                                              \
-	                                                                           \
+																				\
 
 TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_8x8_info)
 {
@@ -691,13 +691,13 @@ enum hng64trans_t
 
 struct blit_parameters
 {
-	bitmap_rgb32 *			bitmap;
-	rectangle			cliprect;
-	UINT32				tilemap_priority_code;
-	UINT8				mask;
-	UINT8				value;
-	UINT8				alpha;
-	hng64trans_t		drawformat;
+	bitmap_rgb32 *          bitmap;
+	rectangle           cliprect;
+	UINT32              tilemap_priority_code;
+	UINT8               mask;
+	UINT8               value;
+	UINT8               alpha;
+	hng64trans_t        drawformat;
 };
 
 
@@ -721,7 +721,7 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 
 	/* tile priority; unless otherwise specified, draw anything in layer 0 */
 	blit->mask = TILEMAP_PIXEL_CATEGORY_MASK;
-	blit->value	= flags & TILEMAP_PIXEL_CATEGORY_MASK;
+	blit->value = flags & TILEMAP_PIXEL_CATEGORY_MASK;
 
 	/* if no layers specified, draw layer 0 */
 	if ((flags & (TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_LAYER2)) == 0)
@@ -768,14 +768,14 @@ INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
     and zoom
 -------------------------------------------------*/
 
-#define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)											        \
-do {																		        \
-	if (blit->drawformat == HNG64_TILEMAP_NORMAL)									\
-		*(UINT32 *)dest = clut[INPUT_VAL];									        \
-	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)			                \
-		*(UINT32 *)dest = alpha_additive_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
-	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)		                        \
-		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
+#define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)                                                 \
+do {                                                                                \
+	if (blit->drawformat == HNG64_TILEMAP_NORMAL)                                   \
+		*(UINT32 *)dest = clut[INPUT_VAL];                                          \
+	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)                            \
+		*(UINT32 *)dest = alpha_additive_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);  \
+	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)                               \
+		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha); \
 } while (0)
 
 static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tmap, const blit_parameters *blit,
@@ -1020,12 +1020,12 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap0_16x16;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap0_16x16;
 			else tilemap = state->m_tilemap0_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap0_16x16_alt;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap0_16x16_alt;
 			else tilemap = state->m_tilemap0_8x8; // _alt
 		}
 	}
@@ -1036,12 +1036,12 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap1_16x16;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap1_16x16;
 			else tilemap = state->m_tilemap1_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap1_16x16_alt;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap1_16x16_alt;
 			else tilemap = state->m_tilemap1_8x8; // _alt
 		}
 	}
@@ -1052,12 +1052,12 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap2_16x16;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap2_16x16;
 			else tilemap = state->m_tilemap2_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap2_16x16_alt;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap2_16x16_alt;
 			else tilemap = state->m_tilemap2_8x8; // _alt
 		}
 	}
@@ -1068,12 +1068,12 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap3_16x16;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap3_16x16;
 			else tilemap = state->m_tilemap3_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->m_tilemap3_16x16_alt;
+			if (tileregs&0x0200)    tilemap = state->m_tilemap3_16x16_alt;
 			else tilemap = state->m_tilemap3_8x8; // _alt
 		}
 	}
@@ -1094,8 +1094,8 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 	if ((tileregs & 0x0800)==0x0000) // floor mode
 	{
 		/* Floor mode - per pixel simple / complex modes? -- every other line?
-          (there doesn't seem to be enough data in Buriki for every line at least)
-        */
+		  (there doesn't seem to be enough data in Buriki for every line at least)
+		*/
 		//if ((tileregs&0xf000) == 0x1000)
 		//{
 		//  popmessage("Floor is Active");
@@ -1112,18 +1112,18 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
 			/* logic would dictate that this should be the 'complex' scroll register layout,
-               but per-line.  That doesn't work however.
+			   but per-line.  That doesn't work however.
 
-               You only have line data for the number of lines on the screen, not enough for
-               the complex register layout
+			   You only have line data for the number of lines on the screen, not enough for
+			   the complex register layout
 
-               HOWEVER, using the code below doesn't work either.  This might be because
-               they have mosaic turned on, and it adopts a new meaning in linescroll modes?
+			   HOWEVER, using the code below doesn't work either.  This might be because
+			   they have mosaic turned on, and it adopts a new meaning in linescroll modes?
 
-               The code below could also be wrong, and rowscroll simply acts the same in all
-               modes, this is hard to know because ss64_2 barely uses it.
+			   The code below could also be wrong, and rowscroll simply acts the same in all
+			   modes, this is hard to know because ss64_2 barely uses it.
 
-            */
+			*/
 
 			popmessage("Unhandled rowscroll %02x", tileregs>>12);
 		}
@@ -1136,9 +1136,9 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 				if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
 				{
 					/* If this bit is active the scroll registers don't seem valid at all?
-                       It either disables zooming, or disables use of the scroll registers completely
-                       - used at startup
-                   */
+					   It either disables zooming, or disables use of the scroll registers completely
+					   - used at startup
+					*/
 
 					xtopleft = 0;
 					xmiddle = 256<<16;
@@ -1176,17 +1176,17 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 		{
 			/* complex zoom mode? */
 			/* with this scroll register layout rotation effects are possible
-               the most obvious use of rotation is the Buriki One logo after
-               attract mode; the text around the outside of the logo is rotated
-               onto the screen
+			   the most obvious use of rotation is the Buriki One logo after
+			   attract mode; the text around the outside of the logo is rotated
+			   onto the screen
 
-               see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
+			   see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
 
-               Xtreme Rally seems to have an issue with this mode on the communication check
-               screen at startup, but according to videos that should scroll, and no scroll
-               values are updated, so it might be an unrelated bug.
+			   Xtreme Rally seems to have an issue with this mode on the communication check
+			   screen at startup, but according to videos that should scroll, and no scroll
+			   values are updated, so it might be an unrelated bug.
 
-            */
+			*/
 
 			INT32 xtopleft,xmiddle, xalt;
 			INT32 ytopleft,ymiddle, yalt;
@@ -1280,7 +1280,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 		{
 			/* simple zoom mode? - only 4 regs? */
 			/* in this mode they can only specify the top left and middle screen points for each tilemap,
-               this allows simple zooming, but not rotation */
+			   this allows simple zooming, but not rotation */
 
 			INT32 xtopleft,xmiddle;
 			INT32 ytopleft,ymiddle;
@@ -1297,9 +1297,9 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 			if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
 			{
 				/* If this bit is active the scroll registers don't seem valid at all?
-                   It either disables zooming, or disables use of the scroll registers completely
-                   - used at startup
-               */
+				   It either disables zooming, or disables use of the scroll registers completely
+				   - used at startup
+				*/
 
 				xtopleft = 0;
 				xmiddle = 256<<16;
@@ -1559,8 +1559,8 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 
 	if (0)
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
-	 hng64_videoregs[0x00],
-	 hng64_videoregs[0x01],
+		hng64_videoregs[0x00],
+		hng64_videoregs[0x01],
 	(hng64_videoregs[0x02]>>16)&0xf9ff, // ----  bits we're sure about are masked out
 	(hng64_videoregs[0x02]>>0)&0xf9ff,  //  ss64_2 debug mode indicates that 0x0040 is enable!
 	(hng64_videoregs[0x03]>>16)&0xf9ff, //   buriki agrees (debug data on text layer) xrally agress (pink layer)
@@ -1569,15 +1569,15 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	(hng64_videoregs[0x04]>>0)&0xffff,
 	(hng64_videoregs[0x05]>>16)&0xffff,
 	(hng64_videoregs[0x05]>>0)&0xffff,
-	 hng64_videoregs[0x06],
-	 hng64_videoregs[0x07],
-	 hng64_videoregs[0x08],
-	 hng64_videoregs[0x09],
-	 hng64_videoregs[0x0a],
-	 hng64_videoregs[0x0b],
-	 hng64_videoregs[0x0c],
-	 hng64_videoregs[0x0d],
-	 hng64_videoregs[0x0e]);
+		hng64_videoregs[0x06],
+		hng64_videoregs[0x07],
+		hng64_videoregs[0x08],
+		hng64_videoregs[0x09],
+		hng64_videoregs[0x0a],
+		hng64_videoregs[0x0b],
+		hng64_videoregs[0x0c],
+		hng64_videoregs[0x0d],
+		hng64_videoregs[0x0e]);
 
 	if (0)
 	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
@@ -1701,34 +1701,34 @@ void hng64_state::video_start()
 
 struct polyVert
 {
-	float worldCoords[4];	// World space coordinates (X Y Z 1.0)
+	float worldCoords[4];   // World space coordinates (X Y Z 1.0)
 
-	float texCoords[4];		// Texture coordinates (U V 0 1.0) -> OpenGL style...
+	float texCoords[4];     // Texture coordinates (U V 0 1.0) -> OpenGL style...
 
-	float normal[4];		// Normal (X Y Z 1.0)
-	float clipCoords[4];	// Homogeneous screen space coordinates (X Y Z W)
+	float normal[4];        // Normal (X Y Z 1.0)
+	float clipCoords[4];    // Homogeneous screen space coordinates (X Y Z W)
 
-	float light[3];			// The intensity of the illumination at this point
+	float light[3];         // The intensity of the illumination at this point
 };
 
 struct polygon
 {
-	int n;						// Number of sides
-	struct polyVert vert[10];	// Vertices (maximum number per polygon is 10 -> 3+6)
+	int n;                      // Number of sides
+	struct polyVert vert[10];   // Vertices (maximum number per polygon is 10 -> 3+6)
 
-	float faceNormal[4];		// Normal of the face overall - for calculating visibility and flat-shading...
-	int visible;				// Polygon visibility in scene
+	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
+	int visible;                // Polygon visibility in scene
 
-	UINT8 texIndex;				// Which texture to draw from (0x00-0x0f)
-	UINT8 texType;				// How to index into the texture
+	UINT8 texIndex;             // Which texture to draw from (0x00-0x0f)
+	UINT8 texType;              // How to index into the texture
 	UINT8 texPageSmall;         // Does this polygon use 'small' texture pages?
 	UINT8 texPageHorizOffset;   // If it does use small texture pages, how far is this page horizontally offset?
 	UINT8 texPageVertOffset;    // If it does use small texture pages, how far is this page vertically offset?
 
-	UINT32 palOffset;			// The base offset where this object's palette starts.
-	UINT32 palPageSize;			// The size of the palette page that is being pointed to.
+	UINT32 palOffset;           // The base offset where this object's palette starts.
+	UINT32 palPageSize;         // The size of the palette page that is being pointed to.
 
-	UINT32 debugColor;			// Will go away someday.  Used to explicitly color polygons for debugging.
+	UINT32 debugColor;          // Will go away someday.  Used to explicitly color polygons for debugging.
 };
 
 static void setIdentity(float *matrix);
@@ -1785,24 +1785,24 @@ static void setCameraTransformation(hng64_state *state, const UINT16* packet)
 	float *cameraMatrix = state->m_cameraMatrix;
 
 	/*//////////////
-    // PACKET FORMAT
-    // [0]  - 0001 ... ID
-    // [1]  - xxxx ... Extrinsic camera matrix
-    // [2]  - xxxx ... Extrinsic camera matrix
-    // [3]  - xxxx ... Extrinsic camera matrix
-    // [4]  - xxxx ... Extrinsic camera matrix
-    // [5]  - xxxx ... Extrinsic camera matrix
-    // [6]  - xxxx ... Extrinsic camera matrix
-    // [7]  - xxxx ... Extrinsic camera matrix
-    // [8]  - xxxx ... Extrinsic camera matrix
-    // [9]  - xxxx ... Extrinsic camera matrix
-    // [10] - xxxx ... Extrinsic camera matrix
-    // [11] - xxxx ... Extrinsic camera matrix
-    // [12] - xxxx ... Extrinsic camera matrix
-    // [13] - ???? ... ? Flips per-frame during fatfurwa 'HNG64'
-    // [14] - ???? ... ? Could be some floating-point values during buriki 'door run'
-    // [15] - ???? ... ? Same as 13 & 14
-    ////////////*/
+	// PACKET FORMAT
+	// [0]  - 0001 ... ID
+	// [1]  - xxxx ... Extrinsic camera matrix
+	// [2]  - xxxx ... Extrinsic camera matrix
+	// [3]  - xxxx ... Extrinsic camera matrix
+	// [4]  - xxxx ... Extrinsic camera matrix
+	// [5]  - xxxx ... Extrinsic camera matrix
+	// [6]  - xxxx ... Extrinsic camera matrix
+	// [7]  - xxxx ... Extrinsic camera matrix
+	// [8]  - xxxx ... Extrinsic camera matrix
+	// [9]  - xxxx ... Extrinsic camera matrix
+	// [10] - xxxx ... Extrinsic camera matrix
+	// [11] - xxxx ... Extrinsic camera matrix
+	// [12] - xxxx ... Extrinsic camera matrix
+	// [13] - ???? ... ? Flips per-frame during fatfurwa 'HNG64'
+	// [14] - ???? ... ? Could be some floating-point values during buriki 'door run'
+	// [15] - ???? ... ? Same as 13 & 14
+	////////////*/
 	// CAMERA TRANSFORMATION MATRIX
 	cameraMatrix[0]  = uToF(packet[1]);
 	cameraMatrix[4]  = uToF(packet[2]);
@@ -1832,24 +1832,24 @@ static void setLighting(hng64_state *state, const UINT16* packet)
 	float *lightVector = state->m_lightVector;
 
 	/*//////////////
-    // PACKET FORMAT
-    // [0]  - 0010 ... ID
-    // [1]  - ???? ... ? Always zero
-    // [2]  - ???? ... ? Always zero
-    // [3]  - xxxx ... X light vector direction
-    // [4]  - xxxx ... Y light vector direction
-    // [5]  - xxxx ... Z light vector direction
-    // [6]  - ???? ... ? Seems to be another light vector ?
-    // [7]  - ???? ... ? Seems to be another light vector ?
-    // [8]  - ???? ... ? Seems to be another light vector ?
-    // [9]  - xxxx ... Strength according to sams64_2 [0000,01ff]
-    // [10] - ???? ... ? Used in fatfurwa
-    // [11] - ???? ... ? Used in fatfurwa
-    // [12] - ???? ... ? Used in fatfurwa
-    // [13] - ???? ... ? Used in fatfurwa
-    // [14] - ???? ... ? Used in fatfurwa
-    // [15] - ???? ... ? Used in fatfurwa
-    ////////////*/
+	// PACKET FORMAT
+	// [0]  - 0010 ... ID
+	// [1]  - ???? ... ? Always zero
+	// [2]  - ???? ... ? Always zero
+	// [3]  - xxxx ... X light vector direction
+	// [4]  - xxxx ... Y light vector direction
+	// [5]  - xxxx ... Z light vector direction
+	// [6]  - ???? ... ? Seems to be another light vector ?
+	// [7]  - ???? ... ? Seems to be another light vector ?
+	// [8]  - ???? ... ? Seems to be another light vector ?
+	// [9]  - xxxx ... Strength according to sams64_2 [0000,01ff]
+	// [10] - ???? ... ? Used in fatfurwa
+	// [11] - ???? ... ? Used in fatfurwa
+	// [12] - ???? ... ? Used in fatfurwa
+	// [13] - ???? ... ? Used in fatfurwa
+	// [14] - ???? ... ? Used in fatfurwa
+	// [15] - ???? ... ? Used in fatfurwa
+	////////////*/
 	if (packet[1] != 0x0000) printf("ZOMG!  packet[1] in setLighting function is non-zero!\n");
 	if (packet[2] != 0x0000) printf("ZOMG!  packet[2] in setLighting function is non-zero!\n");
 
@@ -1864,24 +1864,24 @@ static void setLighting(hng64_state *state, const UINT16* packet)
 static void set3dFlags(hng64_state *state, const UINT16* packet)
 {
 	/*//////////////
-    // PACKET FORMAT
-    // [0]  - 0011 ... ID
-    // [1]  - ???? ...
-    // [2]  - ???? ...
-    // [3]  - ???? ...
-    // [4]  - ???? ...
-    // [5]  - ???? ...
-    // [6]  - ???? ...
-    // [7]  - ???? ...
-    // [8]  - xx?? ... Palette offset & ??
-    // [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
-    // [10] - ???? ... ? ''  ''
-    // [11] - ???? ... ? ''  ''
-    // [12] - ???? ... ? ''  ''
-    // [13] - ???? ... ? ''  ''
-    // [14] - ???? ... ? ''  ''
-    // [15] - ???? ... ? ''  ''
-    ////////////*/
+	// PACKET FORMAT
+	// [0]  - 0011 ... ID
+	// [1]  - ???? ...
+	// [2]  - ???? ...
+	// [3]  - ???? ...
+	// [4]  - ???? ...
+	// [5]  - ???? ...
+	// [6]  - ???? ...
+	// [7]  - ???? ...
+	// [8]  - xx?? ... Palette offset & ??
+	// [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
+	// [10] - ???? ... ? ''  ''
+	// [11] - ???? ... ? ''  ''
+	// [12] - ???? ... ? ''  ''
+	// [13] - ???? ... ? ''  ''
+	// [14] - ???? ... ? ''  ''
+	// [15] - ???? ... ? ''  ''
+	////////////*/
 	state->m_paletteState3d = (packet[8] & 0xff00) >> 8;
 }
 
@@ -1892,24 +1892,24 @@ static void setCameraProjectionMatrix(hng64_state *state, const UINT16* packet)
 	float *projectionMatrix = state->m_projectionMatrix;
 
 	/*//////////////
-    // PACKET FORMAT
-    // [0]  - 0012 ... ID
-    // [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-    // [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-    // [3]  - ???? ... ? Contains a value
-    // [4]  - xxxx ... Camera projection near scale
-    // [5]  - xxxx ... Camera projection near height(?)
-    // [6]  - xxxx ... Camera projection near width(?)
-    // [7]  - xxxx ... Camera projection far scale
-    // [8]  - xxxx ... Camera projection far height(?)
-    // [9]  - xxxx ... Camera projection far width(?)
-    // [10] - xxxx ... Camera projection right
-    // [11] - xxxx ... Camera projection left
-    // [12] - xxxx ... Camera projection top
-    // [13] - xxxx ... Camera projection bottom
-    // [14] - ???? ... ? Gets data during buriki door-run
-    // [15] - ???? ... ? Gets data during buriki door-run
-    ////////////*/
+	// PACKET FORMAT
+	// [0]  - 0012 ... ID
+	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
+	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
+	// [3]  - ???? ... ? Contains a value
+	// [4]  - xxxx ... Camera projection near scale
+	// [5]  - xxxx ... Camera projection near height(?)
+	// [6]  - xxxx ... Camera projection near width(?)
+	// [7]  - xxxx ... Camera projection far scale
+	// [8]  - xxxx ... Camera projection far height(?)
+	// [9]  - xxxx ... Camera projection far width(?)
+	// [10] - xxxx ... Camera projection right
+	// [11] - xxxx ... Camera projection left
+	// [12] - xxxx ... Camera projection top
+	// [13] - xxxx ... Camera projection bottom
+	// [14] - ???? ... ? Gets data during buriki door-run
+	// [15] - ???? ... ? Gets data during buriki door-run
+	////////////*/
 
 	// Heisted from GLFrustum - 6 parameters...
 	float left, right, top, bottom, near_, far_;
@@ -1948,48 +1948,48 @@ static void setCameraProjectionMatrix(hng64_state *state, const UINT16* packet)
 static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, struct polygon* polys, int* numPolys)
 {
 	/*//////////////
-    // PACKET FORMAT
-    // [0]  - 0100 ... ID
-    // [1]  - ?--- ... Flags [?000 = ???
-    //                        0?00 = ???
-    //                        00?0 = ???
-    //                        000? = ???]
-    // [1]  - -?-- ... Flags [?000 = ???
-    //                        0?00 = ???
-    //                        00?0 = ???
-    //                        000x = Dynamic palette bit]
-    // [1]  - --?- ... Flags [?000 = ???
-    //                        0?00 = ???
-    //                        00?0 = ???
-    //                        000? = ???]
-    // [1]  - ---? ... Flags [x000 = Apply lighting bit
-    //                        0?00 = ???
-    //                        00?0 = ???
-    //                        000? = ???]
-    // [2]  - xxxx ... offset into ROM
-    // [3]  - xxxx ... offset into ROM
-    // [4]  - xxxx ... Transformation matrix
-    // [5]  - xxxx ... Transformation matrix
-    // [6]  - xxxx ... Transformation matrix
-    // [7]  - xxxx ... Transformation matrix
-    // [8]  - xxxx ... Transformation matrix
-    // [9]  - xxxx ... Transformation matrix
-    // [10] - xxxx ... Transformation matrix
-    // [11] - xxxx ... Transformation matrix
-    // [12] - xxxx ... Transformation matrix
-    // [13] - xxxx ... Transformation matrix
-    // [14] - xxxx ... Transformation matrix
-    // [15] - xxxx ... Transformation matrix
-    ////////////*/
+	// PACKET FORMAT
+	// [0]  - 0100 ... ID
+	// [1]  - ?--- ... Flags [?000 = ???
+	//                        0?00 = ???
+	//                        00?0 = ???
+	//                        000? = ???]
+	// [1]  - -?-- ... Flags [?000 = ???
+	//                        0?00 = ???
+	//                        00?0 = ???
+	//                        000x = Dynamic palette bit]
+	// [1]  - --?- ... Flags [?000 = ???
+	//                        0?00 = ???
+	//                        00?0 = ???
+	//                        000? = ???]
+	// [1]  - ---? ... Flags [x000 = Apply lighting bit
+	//                        0?00 = ???
+	//                        00?0 = ???
+	//                        000? = ???]
+	// [2]  - xxxx ... offset into ROM
+	// [3]  - xxxx ... offset into ROM
+	// [4]  - xxxx ... Transformation matrix
+	// [5]  - xxxx ... Transformation matrix
+	// [6]  - xxxx ... Transformation matrix
+	// [7]  - xxxx ... Transformation matrix
+	// [8]  - xxxx ... Transformation matrix
+	// [9]  - xxxx ... Transformation matrix
+	// [10] - xxxx ... Transformation matrix
+	// [11] - xxxx ... Transformation matrix
+	// [12] - xxxx ... Transformation matrix
+	// [13] - xxxx ... Transformation matrix
+	// [14] - xxxx ... Transformation matrix
+	// [15] - xxxx ... Transformation matrix
+	////////////*/
 
 	hng64_state *state = machine.driver_data<hng64_state>();
 	UINT32 size[4];
 	UINT32 address[4];
 	UINT32 megaOffset;
-	float eyeCoords[4];		// ObjectCoords transformed by the modelViewMatrix
+	float eyeCoords[4];     // ObjectCoords transformed by the modelViewMatrix
 //  float clipCoords[4];    // EyeCoords transformed by the projectionMatrix
-	float ndCoords[4];		// Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
-	float windowCoords[4];	// Mapped ndCoordinates to screen space
+	float ndCoords[4];      // Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
+	float windowCoords[4];  // Mapped ndCoordinates to screen space
 	float cullRay[4];
 
 	float objectMatrix[16];
@@ -2027,29 +2027,29 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 	// EXTRACT DATA FROM THE ADDRESS POINTED TO IN THE FILE //
 	//////////////////////////////////////////////////////////
 	/*//////////////////////////////////////////////
-    // DIRECTLY-POINTED-TO FORMAT (7 words x 3 ROMs)
-    // [0]  - lower word of sub-address 1
-    // [1]  - lower word of sub-address 2
-    // [2]  - upper word of all sub-addresses
-    // [3]  - lower word of sub-address 3
-    // [4]  - lower word of sub-address 4
-    // [5]  - ???? always 0 ????
-    // [6]  - number of chunks in sub-address 1 block
-    // [7]  - number of chunks in sub-address 2 block
-    // [8]  - ???? always 0 ????
-    // [9]  - number of chunks in sub-address 3 block
-    // [10] - number of chunks in sub-address 4 block
-    // [11] - ? definitely used.
-    // [12] - ? definitely used.
-    // [13] - ? definitely used.
-    // [14] - ? definitely used.
-    // [15] - ???? always 0 ????
-    // [16] - ???? always 0 ????
-    // [17] - ???? always 0 ????
-    // [18] - ???? always 0 ????
-    // [19] - ???? always 0 ????
-    // [20] - ???? always 0 ????
-    //////////////////////////////////////////////*/
+	// DIRECTLY-POINTED-TO FORMAT (7 words x 3 ROMs)
+	// [0]  - lower word of sub-address 1
+	// [1]  - lower word of sub-address 2
+	// [2]  - upper word of all sub-addresses
+	// [3]  - lower word of sub-address 3
+	// [4]  - lower word of sub-address 4
+	// [5]  - ???? always 0 ????
+	// [6]  - number of chunks in sub-address 1 block
+	// [7]  - number of chunks in sub-address 2 block
+	// [8]  - ???? always 0 ????
+	// [9]  - number of chunks in sub-address 3 block
+	// [10] - number of chunks in sub-address 4 block
+	// [11] - ? definitely used.
+	// [12] - ? definitely used.
+	// [13] - ? definitely used.
+	// [14] - ? definitely used.
+	// [15] - ???? always 0 ????
+	// [16] - ???? always 0 ????
+	// [17] - ???? always 0 ????
+	// [18] - ???? always 0 ????
+	// [19] - ???? always 0 ????
+	// [20] - ???? always 0 ????
+	//////////////////////////////////////////////*/
 
 	// 3d ROM Offset
 	UINT16* threeDRoms = (UINT16*)(machine.root_device().memregion("verts")->base());
@@ -2165,9 +2165,9 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 			// TEXTURE
 			/* There may be more than just high & low res texture types, so I'm keeping texType as a UINT8. */
 			if (chunkOffset[1] & 0x1000) polys[*numPolys].texType = 0x1;
-			else						 polys[*numPolys].texType = 0x0;
+			else                         polys[*numPolys].texType = 0x0;
 
-			polys[*numPolys].texPageSmall       = (chunkOffset[2] & 0x8000) >> 15;	// Just a guess.
+			polys[*numPolys].texPageSmall       = (chunkOffset[2] & 0x8000) >> 15;  // Just a guess.
 			polys[*numPolys].texPageHorizOffset = (chunkOffset[2] & 0x3000) >> 12;
 			polys[*numPolys].texPageVertOffset  = (chunkOffset[2] & 0x0060) >> 5;
 
@@ -2179,8 +2179,8 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 			polys[*numPolys].palPageSize = 0x100;
 
 			/* FIXME: This isn't correct.
-                      Buriki & Xrally need this line.  Roads Edge needs it removed.
-                      So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
+			          Buriki & Xrally need this line.  Roads Edge needs it removed.
+			          So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
 			if (state->m_3dregs[0x00/4] & 0x2000)
 			{
 				if (strcmp(machine.basename(), "roadedge"))
@@ -2209,20 +2209,20 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 			switch(chunkType)
 			{
 			/*/////////////////////////
-            // CHUNK TYPE BITS - These are very likely incorrect.
-            // x--- ---- - 1 = Has only 1 vertex (part of a triangle fan/strip)
-            // -x-- ---- -
-            // --x- ---- -
-            // ---x ---- -
-            // ---- x--- -
-            // ---- -x-- - 1 = Has per-vert UVs
-            // ---- --x- -
-            // ---- ---x - 1 = Has per-vert normals
-            /////////////////////////*/
+			// CHUNK TYPE BITS - These are very likely incorrect.
+			// x--- ---- - 1 = Has only 1 vertex (part of a triangle fan/strip)
+			// -x-- ---- -
+			// --x- ---- -
+			// ---x ---- -
+			// ---- x--- -
+			// ---- -x-- - 1 = Has per-vert UVs
+			// ---- --x- -
+			// ---- ---x - 1 = Has per-vert normals
+			/////////////////////////*/
 
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
-			case 0x05:	// 0000 0101
-			case 0x0f:	// 0000 1111
+			case 0x05:  // 0000 0101
+			case 0x0f:  // 0000 1111
 				for (int m = 0; m < 3; m++)
 				{
 					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
@@ -2254,10 +2254,10 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 
 
 			// 24 word chunk, 3 vertices, per-vertex UVs
-			case 0x04:	// 0000 0100
-			case 0x0e:	// 0000 1110
-			case 0x24:	// 0010 0100
-			case 0x2e:	// 0010 1110
+			case 0x04:  // 0000 0100
+			case 0x0e:  // 0000 1110
+			case 0x24:  // 0010 0100
+			case 0x2e:  // 0010 1110
 				for (int m = 0; m < 3; m++)
 				{
 					polys[*numPolys].vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
@@ -2289,10 +2289,10 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 
 
 			// 15 word chunk, 1 vertex, per-vertex UVs & normals, face normal
-			case 0x87:	// 1000 0111
-			case 0x97:	// 1001 0111
-			case 0xd7:	// 1101 0111
-			case 0xc7:	// 1100 0111
+			case 0x87:  // 1000 0111
+			case 0x97:  // 1001 0111
+			case 0xd7:  // 1101 0111
+			case 0xc7:  // 1100 0111
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
 				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
@@ -2325,11 +2325,11 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 
 
 			// 12 word chunk, 1 vertex, per-vertex UVs
-			case 0x86:	// 1000 0110
-			case 0x96:	// 1001 0110
-			case 0xb6:	// 1011 0110
-			case 0xc6:	// 1100 0110
-			case 0xd6:	// 1101 0110
+			case 0x86:  // 1000 0110
+			case 0x96:  // 1001 0110
+			case 0xb6:  // 1011 0110
+			case 0xc6:  // 1100 0110
+			case 0xd6:  // 1101 0110
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
 				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
@@ -2459,7 +2459,7 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, state->m_modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
-			if (cullRay[2] > 0.0f)				// Camera is pointing down -Z
+			if (cullRay[2] > 0.0f)              // Camera is pointing down -Z
 			{
 				polys[*numPolys].visible = 0;
 			}
@@ -2493,7 +2493,7 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea.max_y) / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
 
-						windowCoords[1] = (float)visarea.max_y - windowCoords[1];		// Flip Y
+						windowCoords[1] = (float)visarea.max_y - windowCoords[1];       // Flip Y
 
 						// Store the points in a list for later use...
 						polys[*numPolys].vert[m].clipCoords[0] = windowCoords[0];
@@ -2523,30 +2523,30 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 	//printf("packet type : %04x\n", packet[0]);
 	switch (packet[0])
 	{
-	case 0x0000:	// Appears to be a NOP.
+	case 0x0000:    // Appears to be a NOP.
 		break;
 
-	case 0x0001:	// Camera transformation.
+	case 0x0001:    // Camera transformation.
 		setCameraTransformation(state, packet);
 		break;
 
-	case 0x0010:	// Lighting information.
+	case 0x0010:    // Lighting information.
 		//if (packet[9]) printPacket(packet, 1);
 		setLighting(state, packet);
 		break;
 
-	case 0x0011:	// Palette / Model flags?
+	case 0x0011:    // Palette / Model flags?
 		//printPacket(packet, 1); printf("\n");
 		set3dFlags(state, packet);
 		break;
 
-	case 0x0012:	// Projection Matrix
+	case 0x0012:    // Projection Matrix
 		//printPacket(packet, 1);
 		setCameraProjectionMatrix(state, packet);
 		break;
 
 	case 0x0100:
-	case 0x0101:	// Geometry with full transformations
+	case 0x0101:    // Geometry with full transformations
 		// HACK.  Masks out a piece of geo bbust2's drawShaded() crashes on.
 		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && state->m_mcu_type == SHOOT_MCU)
 			break;
@@ -2554,7 +2554,7 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
 		break;
 
-	case 0x0102:	// Geometry with only translation
+	case 0x0102:    // Geometry with only translation
 		// HACK.  Give up on strange calls to 0102.
 		if (packet[8] != 0x0102)
 		{
@@ -2581,11 +2581,11 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 		recoverPolygonBlock(machine, miniPacket, polys, &numPolys);
 		break;
 
-	case 0x1000:	// Unknown: Some sort of global flags?
+	case 0x1000:    // Unknown: Some sort of global flags?
 		//printPacket(packet, 1); printf("\n");
 		break;
 
-	case 0x1001:	// Unknown: Some sort of global flags (a group of 4, actually)?
+	case 0x1001:    // Unknown: Some sort of global flags (a group of 4, actually)?
 		//printPacket(packet, 1);
 		break;
 
@@ -2851,19 +2851,19 @@ static void performFrustumClip(struct polygon *p)
 
 			tv = &temp.vert[temp.n];
 
-			if (Inside(v0, j) && Inside(v1, j))							// Edge is completely inside the volume...
+			if (Inside(v0, j) && Inside(v1, j))                         // Edge is completely inside the volume...
 			{
 				memcpy(tv, v1, sizeof(struct polyVert));
 				temp.n++;
 			}
 
-			else if (Inside(v0, j) && !Inside(v1, j))					// Edge goes from in to out...
+			else if (Inside(v0, j) && !Inside(v1, j))                   // Edge goes from in to out...
 			{
 				Intersect(v0, v1, tv, j);
 				temp.n++;
 			}
 
-			else if (!Inside(v0, j) && Inside(v1, j))					// Edge goes from out to in...
+			else if (!Inside(v0, j) && Inside(v1, j))                   // Edge goes from out to in...
 			{
 				Intersect(v0, v1, tv, j);
 				memcpy(&temp.vert[temp.n+1], v1, sizeof(struct polyVert));
@@ -2905,13 +2905,13 @@ static void drawline2d(running_machine &machine, INT32 x0, INT32 y0, INT32 x1, I
 	INT32 e;
 
 	/*
-    * inline swap. On some architectures, the XOR trick may be faster
-    */
+	* inline swap. On some architectures, the XOR trick may be faster
+	*/
 	INT32 tmpswap;
 
 	/*
-    * optimize for vertical and horizontal lines here
-    */
+	* optimize for vertical and horizontal lines here
+	*/
 
 	dx = abs(x1 - x0);
 	sx = ((x1 - x0) > 0) ? 1 : -1;
@@ -2999,11 +2999,11 @@ struct polygonRasterOptions
 /**     Output: none                                                **/
 /*********************************************************************/
 INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
-										  const polygonRasterOptions& prOptions,
-										  int x_start, int x_end, int y, float z_start, float z_delta,
-										  float w_start, float w_delta, float r_start, float r_delta,
-										  float g_start, float g_delta, float b_start, float b_delta,
-										  float s_start, float s_delta, float t_start, float t_delta)
+											const polygonRasterOptions& prOptions,
+											int x_start, int x_end, int y, float z_start, float z_delta,
+											float w_start, float w_delta, float r_start, float r_delta,
+											float g_start, float g_delta, float b_start, float b_delta,
+											float s_start, float s_delta, float t_start, float t_delta)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	float*  db = &(state->m_depthBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
@@ -3466,6 +3466,3 @@ static void drawShaded(running_machine &machine, struct polygon *p)
 										prOptions);
 	}
 }
-
-
-

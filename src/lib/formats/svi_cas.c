@@ -1,10 +1,10 @@
 #include "svi_cas.h"
 
-#define CAS_PERIOD_0		(37)
-#define CAS_PERIOD_1		(18)
+#define CAS_PERIOD_0        (37)
+#define CAS_PERIOD_1        (18)
 #define CAS_HEADER_PERIODS (1600)
 #define CAS_EMPTY_SAMPLES (24220)
-#define CAS_INIT_SAMPLES	(200)
+#define CAS_INIT_SAMPLES    (200)
 
 static const UINT8 CasHeader[17] =
 {
@@ -12,8 +12,8 @@ static const UINT8 CasHeader[17] =
 	0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x7f
 };
 
-#define SMPLO	-32768
-#define SMPHI	32767
+#define SMPLO   -32768
+#define SMPHI   32767
 
 static int cas_size;
 
@@ -124,7 +124,7 @@ static int svi_cas_to_wav_size(const UINT8 *casdata, int caslen)
 	while (cas_pos < caslen)
 	{
 		size = CAS_HEADER_PERIODS * ( CAS_PERIOD_0 + CAS_PERIOD_1 ) +
-			   ( CAS_HEADER_PERIODS / 4 ) * 3;
+				( CAS_HEADER_PERIODS / 4 ) * 3;
 
 		samples_pos += size;
 
@@ -169,13 +169,13 @@ static int svi_cas_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller svi_legacy_fill_wave =
 {
-	svi_cas_fill_wave,						/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	svi_cas_to_wav_size,					/* chunk_sample_calc */
-	44100,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	svi_cas_fill_wave,                      /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	svi_cas_to_wav_size,                    /* chunk_sample_calc */
+	44100,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 

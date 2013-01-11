@@ -69,7 +69,7 @@ PALETTE_INIT_MEMBER(pacman_state,pacman)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances[0], rweights, 0, 0,
 			3, &resistances[0], gweights, 0, 0,
 			2, &resistances[1], bweights, 0, 0);
@@ -297,7 +297,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 			drawgfx_transmask(bitmap,spriteclip,machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
-					fy,fx,			//FIXME: flipping bits are really supposed to be inverted here?
+					fy,fx,          //FIXME: flipping bits are really supposed to be inverted here?
 					sx - 256,sy + m_xoffsethack,
 					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color & 0x3f, 0));
 		}

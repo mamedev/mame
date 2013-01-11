@@ -117,7 +117,7 @@
 //**************************************************************************
 
 // turn this on to enable removing duplicate cheats; not sure if we should
-#define REMOVE_DUPLICATE_CHEATS	0
+#define REMOVE_DUPLICATE_CHEATS 0
 
 
 
@@ -166,7 +166,7 @@ inline const char *number_and_format::format(astring &string) const
 
 cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &paramnode)
 	: m_value(0),
-	  m_itemlist(manager.machine().respool())
+		m_itemlist(manager.machine().respool())
 {
 	// read the core attributes
 	m_minval = number_and_format(xml_get_attribute_int(&paramnode, "min", 0), xml_get_attribute_int_format(&paramnode, "min"));
@@ -347,7 +347,7 @@ bool cheat_parameter::set_next_state()
 
 cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &scriptnode)
 	: m_entrylist(manager.machine().respool()),
-	  m_state(SCRIPT_STATE_RUN)
+		m_state(SCRIPT_STATE_RUN)
 {
 	// read the core attributes
 	const char *state = xml_get_attribute_string(&scriptnode, "state", "run");
@@ -407,11 +407,11 @@ void cheat_script::save(emu_file &cheatfile) const
 	cheatfile.printf("\t\t<script");
 	switch (m_state)
 	{
-		case SCRIPT_STATE_OFF:		cheatfile.printf(" state=\"off\"");		break;
-		case SCRIPT_STATE_ON:		cheatfile.printf(" state=\"on\"");		break;
+		case SCRIPT_STATE_OFF:      cheatfile.printf(" state=\"off\"");     break;
+		case SCRIPT_STATE_ON:       cheatfile.printf(" state=\"on\"");      break;
 		default:
-		case SCRIPT_STATE_RUN:		cheatfile.printf(" state=\"run\"");		break;
-		case SCRIPT_STATE_CHANGE:	cheatfile.printf(" state=\"change\"");	break;
+		case SCRIPT_STATE_RUN:      cheatfile.printf(" state=\"run\"");     break;
+		case SCRIPT_STATE_CHANGE:   cheatfile.printf(" state=\"change\"");  break;
 	}
 	cheatfile.printf(">\n");
 
@@ -430,9 +430,9 @@ void cheat_script::save(emu_file &cheatfile) const
 
 cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction)
 	: m_next(NULL),
-	  m_condition(&symbols),
-	  m_expression(&symbols),
-	  m_arglist(manager.machine().respool())
+		m_condition(&symbols),
+		m_expression(&symbols),
+		m_arglist(manager.machine().respool())
 {
 	const char *expression = NULL;
 	try
@@ -641,8 +641,8 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 
 cheat_script::script_entry::output_argument::output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode)
 	: m_next(NULL),
-	  m_expression(&symbols),
-	  m_count(0)
+		m_expression(&symbols),
+		m_count(0)
 {
 	// first extract attributes
 	m_count = xml_get_attribute_int(&argnode, "count", 1);
@@ -712,16 +712,16 @@ void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) cons
 
 cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode)
 	: m_manager(manager),
-	  m_next(NULL),
-	  m_parameter(NULL),
-	  m_on_script(NULL),
-	  m_off_script(NULL),
-	  m_change_script(NULL),
-	  m_run_script(NULL),
-	  m_symbols(&manager.machine(), &globaltable),
-	  m_state(SCRIPT_STATE_OFF),
-	  m_numtemp(DEFAULT_TEMP_VARIABLES),
-	  m_argindex(0)
+		m_next(NULL),
+		m_parameter(NULL),
+		m_on_script(NULL),
+		m_off_script(NULL),
+		m_change_script(NULL),
+		m_run_script(NULL),
+		m_symbols(&manager.machine(), &globaltable),
+		m_state(SCRIPT_STATE_OFF),
+		m_numtemp(DEFAULT_TEMP_VARIABLES),
+		m_argindex(0)
 {
 	// reset scripts
 	try
@@ -1067,11 +1067,11 @@ cheat_script *&cheat_entry::script_for_state(script_state state)
 {
 	switch (state)
 	{
-		case SCRIPT_STATE_ON:		return m_on_script;
-		case SCRIPT_STATE_OFF:		return m_off_script;
-		case SCRIPT_STATE_CHANGE:	return m_change_script;
+		case SCRIPT_STATE_ON:       return m_on_script;
+		case SCRIPT_STATE_OFF:      return m_off_script;
+		case SCRIPT_STATE_CHANGE:   return m_change_script;
 		default:
-		case SCRIPT_STATE_RUN:		return m_run_script;
+		case SCRIPT_STATE_RUN:      return m_run_script;
 	}
 }
 
@@ -1087,9 +1087,9 @@ cheat_script *&cheat_entry::script_for_state(script_state state)
 
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_cheatlist(machine.respool()),
-	  m_disabled(true),
-	  m_symtable(&machine)
+		m_cheatlist(machine.respool()),
+		m_disabled(true),
+		m_symtable(&machine)
 {
 	// if the cheat engine is disabled, we're done
 	if (!machine.options().cheat())
@@ -1104,7 +1104,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 	m_symtable.add("tobcd", NULL, 1, 1, execute_tobcd);
 
 	// we rely on the debugger expression callbacks; if the debugger isn't
-    // enabled, we must jumpstart them manually
+	// enabled, we must jumpstart them manually
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		debug_cpu_init(machine);
 
@@ -1172,8 +1172,8 @@ void cheat_manager::reload()
 	m_disabled = false;
 
 	// load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
-    // and MAME will load gamename.xml
-    image_interface_iterator iter(machine().root_device());
+	// and MAME will load gamename.xml
+	image_interface_iterator iter(machine().root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 		if (image->exists())
 		{

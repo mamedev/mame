@@ -12,32 +12,32 @@
 
 INLINE unsp_state *get_safe_token(device_t *device)
 {
-    assert(device != NULL);
-    assert(device->type() == UNSP);
-    return (unsp_state *)downcast<legacy_cpu_device *>(device)->token();
+	assert(device != NULL);
+	assert(device->type() == UNSP);
+	return (unsp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
 
 /*****************************************************************************/
 
-#define OP0		(op >> 12)
-#define OPA		((op >> 9) & 7)
-#define OP1		((op >> 6) & 7)
-#define OPN		((op >> 3) & 7)
-#define OPB		(op & 7)
-#define OPIMM	(op & 0x3f)
+#define OP0     (op >> 12)
+#define OPA     ((op >> 9) & 7)
+#define OP1     ((op >> 6) & 7)
+#define OPN     ((op >> 3) & 7)
+#define OPB     (op & 7)
+#define OPIMM   (op & 0x3f)
 
-#define UNSP_LPC			(((UNSP_REG(SR) & 0x3f) << 16) | UNSP_REG(PC))
+#define UNSP_LPC            (((UNSP_REG(SR) & 0x3f) << 16) | UNSP_REG(PC))
 
-#define UNSP_REG(reg)		unsp->r[UNSP_##reg - 1]
-#define UNSP_REG_I(reg)		unsp->r[reg]
-#define UNSP_LREG_I(reg)	(((UNSP_REG(SR) << 6) & 0x3f0000) | UNSP_REG_I(reg))
+#define UNSP_REG(reg)       unsp->r[UNSP_##reg - 1]
+#define UNSP_REG_I(reg)     unsp->r[reg]
+#define UNSP_LREG_I(reg)    (((UNSP_REG(SR) << 6) & 0x3f0000) | UNSP_REG_I(reg))
 
-#define UNSP_N	0x0200
-#define UNSP_Z	0x0100
-#define UNSP_S	0x0080
-#define UNSP_C	0x0040
+#define UNSP_N  0x0200
+#define UNSP_Z  0x0100
+#define UNSP_S  0x0080
+#define UNSP_C  0x0040
 
 #define STANDARD_ALU_CASES \
 		case 0: \
@@ -91,7 +91,7 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
 
 static void unimplemented_opcode(unsp_state *unsp, UINT16 op)
 {
-    fatalerror("UNSP: unknown opcode %04x at %04x\n", op, UNSP_LPC << 1);
+	fatalerror("UNSP: unknown opcode %04x at %04x\n", op, UNSP_LPC << 1);
 }
 
 /*****************************************************************************/
@@ -110,21 +110,21 @@ INLINE void WRITE16(unsp_state *unsp, UINT32 address, UINT16 data)
 
 static CPU_INIT( unsp )
 {
-    unsp_state *unsp = get_safe_token(device);
-    memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
+	unsp_state *unsp = get_safe_token(device);
+	memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
-    unsp->device = device;
-    unsp->program = &device->space(AS_PROGRAM);
+	unsp->device = device;
+	unsp->program = &device->space(AS_PROGRAM);
 }
 
 static CPU_RESET( unsp )
 {
-    unsp_state *unsp = get_safe_token(device);
-    memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
+	unsp_state *unsp = get_safe_token(device);
+	memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
-    UNSP_REG(PC) = READ16(unsp, 0xfff7);
-    unsp->irq = 0;
-    unsp->fiq = 0;
+	UNSP_REG(PC) = READ16(unsp, 0xfff7);
+	unsp->irq = 0;
+	unsp->fiq = 0;
 }
 
 /*****************************************************************************/
@@ -169,17 +169,17 @@ static UINT16 unsp_pop(unsp_state *unsp, UINT16 *reg)
 
 static CPU_EXECUTE( unsp )
 {
-    unsp_state *unsp = get_safe_token(device);
-    UINT32 op;
-    UINT32 lres;
-    UINT16 r0, r1;
+	unsp_state *unsp = get_safe_token(device);
+	UINT32 op;
+	UINT32 lres;
+	UINT16 r0, r1;
 	lres = 0;
 
-    while (unsp->icount > 0)
-    {
-        debugger_instruction_hook(device, UNSP_LPC<<1);
+	while (unsp->icount > 0)
+	{
+		debugger_instruction_hook(device, UNSP_LPC<<1);
 
-        op = READ16(unsp, UNSP_LPC);
+		op = READ16(unsp, UNSP_LPC);
 
 		UNSP_REG(PC)++;
 
@@ -744,7 +744,7 @@ static CPU_EXECUTE( unsp )
 
 		unsp->icount -= 5;
 		unsp->icount = MAX(unsp->icount, 0);
-    }
+	}
 }
 
 
@@ -814,10 +814,10 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state)
 
 static CPU_SET_INFO( unsp )
 {
-    unsp_state *unsp = get_safe_token(device);
+	unsp_state *unsp = get_safe_token(device);
 
-    switch (state)
-    {
+	switch (state)
+	{
 		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ0_LINE:
 		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ1_LINE:
 		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ2_LINE:
@@ -831,94 +831,94 @@ static CPU_SET_INFO( unsp )
 			unsp_set_irq_line(unsp, state - CPUINFO_INT_INPUT_STATE, (int)info->i);
 			break;
 
-        case CPUINFO_INT_REGISTER + UNSP_SP:            UNSP_REG(SP) = info->i; 	break;
-        case CPUINFO_INT_REGISTER + UNSP_R1:            UNSP_REG(R1) = info->i;     break;
-        case CPUINFO_INT_REGISTER + UNSP_R2:            UNSP_REG(R2) = info->i;     break;
-        case CPUINFO_INT_REGISTER + UNSP_R3:            UNSP_REG(R3) = info->i;     break;
-        case CPUINFO_INT_REGISTER + UNSP_R4:            UNSP_REG(R4) = info->i; 	break;
-        case CPUINFO_INT_REGISTER + UNSP_BP:            UNSP_REG(BP) = info->i;     break;
-        case CPUINFO_INT_REGISTER + UNSP_SR:            UNSP_REG(SR) = info->i;     break;
-        case CPUINFO_INT_PC: /* Intentional fallthrough */
-        case CPUINFO_INT_REGISTER + UNSP_PC:
-        	UNSP_REG(PC) = (info->i & 0x0001fffe) >> 1;
-        	UNSP_REG(SR) = (UNSP_REG(SR) & 0xffc0) | ((info->i & 0x007e0000) >> 17);
-        	break;
-        case CPUINFO_INT_REGISTER + UNSP_IRQ:           unsp->irq = info->i;    	break;
-        case CPUINFO_INT_REGISTER + UNSP_FIQ:           unsp->fiq = info->i;        break;
-        case CPUINFO_INT_REGISTER + UNSP_SB:            unsp->sb = info->i; 	    break;
-    }
+		case CPUINFO_INT_REGISTER + UNSP_SP:            UNSP_REG(SP) = info->i;     break;
+		case CPUINFO_INT_REGISTER + UNSP_R1:            UNSP_REG(R1) = info->i;     break;
+		case CPUINFO_INT_REGISTER + UNSP_R2:            UNSP_REG(R2) = info->i;     break;
+		case CPUINFO_INT_REGISTER + UNSP_R3:            UNSP_REG(R3) = info->i;     break;
+		case CPUINFO_INT_REGISTER + UNSP_R4:            UNSP_REG(R4) = info->i;     break;
+		case CPUINFO_INT_REGISTER + UNSP_BP:            UNSP_REG(BP) = info->i;     break;
+		case CPUINFO_INT_REGISTER + UNSP_SR:            UNSP_REG(SR) = info->i;     break;
+		case CPUINFO_INT_PC: /* Intentional fallthrough */
+		case CPUINFO_INT_REGISTER + UNSP_PC:
+			UNSP_REG(PC) = (info->i & 0x0001fffe) >> 1;
+			UNSP_REG(SR) = (UNSP_REG(SR) & 0xffc0) | ((info->i & 0x007e0000) >> 17);
+			break;
+		case CPUINFO_INT_REGISTER + UNSP_IRQ:           unsp->irq = info->i;        break;
+		case CPUINFO_INT_REGISTER + UNSP_FIQ:           unsp->fiq = info->i;        break;
+		case CPUINFO_INT_REGISTER + UNSP_SB:            unsp->sb = info->i;         break;
+	}
 }
 
 CPU_GET_INFO( unsp )
 {
-    unsp_state *unsp = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+	unsp_state *unsp = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
-    switch(state)
-    {
-        case CPUINFO_INT_CONTEXT_SIZE:          info->i = sizeof(unsp_state);   break;
-        case CPUINFO_INT_INPUT_LINES:           info->i = 0;                    break;
-        case CPUINFO_INT_DEFAULT_IRQ_VECTOR:    info->i = 0;                    break;
-        case CPUINFO_INT_ENDIANNESS:            info->i = ENDIANNESS_BIG;   	break;
-        case CPUINFO_INT_CLOCK_MULTIPLIER:      info->i = 1;                    break;
-        case CPUINFO_INT_CLOCK_DIVIDER:         info->i = 1;                    break;
-        case CPUINFO_INT_MIN_INSTRUCTION_BYTES: info->i = 2;                    break;
-        case CPUINFO_INT_MAX_INSTRUCTION_BYTES: info->i = 4;                    break;
-        case CPUINFO_INT_MIN_CYCLES:            info->i = 5;                    break;
-        case CPUINFO_INT_MAX_CYCLES:            info->i = 5;                    break;
+	switch(state)
+	{
+		case CPUINFO_INT_CONTEXT_SIZE:          info->i = sizeof(unsp_state);   break;
+		case CPUINFO_INT_INPUT_LINES:           info->i = 0;                    break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:    info->i = 0;                    break;
+		case CPUINFO_INT_ENDIANNESS:            info->i = ENDIANNESS_BIG;       break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:      info->i = 1;                    break;
+		case CPUINFO_INT_CLOCK_DIVIDER:         info->i = 1;                    break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES: info->i = 2;                    break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES: info->i = 4;                    break;
+		case CPUINFO_INT_MIN_CYCLES:            info->i = 5;                    break;
+		case CPUINFO_INT_MAX_CYCLES:            info->i = 5;                    break;
 
-        case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM: info->i = 16;                   break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 23;                   break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH + AS_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:      info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM: info->i = 16;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 23;                   break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:    info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:    info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:    info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:      info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:      info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:      info->i = 0;                    break;
 
-        case CPUINFO_INT_REGISTER + UNSP_SP:	info->i = UNSP_REG(SP);			break;
-        case CPUINFO_INT_REGISTER + UNSP_R1:	info->i = UNSP_REG(R1);			break;
-        case CPUINFO_INT_REGISTER + UNSP_R2:	info->i = UNSP_REG(R2);			break;
-        case CPUINFO_INT_REGISTER + UNSP_R3:	info->i = UNSP_REG(R3);			break;
-        case CPUINFO_INT_REGISTER + UNSP_R4:	info->i = UNSP_REG(R4);			break;
-        case CPUINFO_INT_REGISTER + UNSP_BP:	info->i = UNSP_REG(BP);			break;
-        case CPUINFO_INT_REGISTER + UNSP_SR:	info->i = UNSP_REG(SR);			break;
-        case CPUINFO_INT_PC:	/* Intentional fallthrough */
-        case CPUINFO_INT_REGISTER + UNSP_PC:	info->i = UNSP_LPC << 1;		break;
-        case CPUINFO_INT_REGISTER + UNSP_IRQ:	info->i = unsp->irq;			break;
-        case CPUINFO_INT_REGISTER + UNSP_FIQ:	info->i = unsp->fiq;			break;
-        case CPUINFO_INT_REGISTER + UNSP_SB:	info->i = unsp->sb;				break;
+		case CPUINFO_INT_REGISTER + UNSP_SP:    info->i = UNSP_REG(SP);         break;
+		case CPUINFO_INT_REGISTER + UNSP_R1:    info->i = UNSP_REG(R1);         break;
+		case CPUINFO_INT_REGISTER + UNSP_R2:    info->i = UNSP_REG(R2);         break;
+		case CPUINFO_INT_REGISTER + UNSP_R3:    info->i = UNSP_REG(R3);         break;
+		case CPUINFO_INT_REGISTER + UNSP_R4:    info->i = UNSP_REG(R4);         break;
+		case CPUINFO_INT_REGISTER + UNSP_BP:    info->i = UNSP_REG(BP);         break;
+		case CPUINFO_INT_REGISTER + UNSP_SR:    info->i = UNSP_REG(SR);         break;
+		case CPUINFO_INT_PC:    /* Intentional fallthrough */
+		case CPUINFO_INT_REGISTER + UNSP_PC:    info->i = UNSP_LPC << 1;        break;
+		case CPUINFO_INT_REGISTER + UNSP_IRQ:   info->i = unsp->irq;            break;
+		case CPUINFO_INT_REGISTER + UNSP_FIQ:   info->i = unsp->fiq;            break;
+		case CPUINFO_INT_REGISTER + UNSP_SB:    info->i = unsp->sb;             break;
 
-        /* --- the following bits of info are returned as pointers to data or functions --- */
-        case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(unsp);        break;
-        case CPUINFO_FCT_INIT:                  info->init = CPU_INIT_NAME(unsp);               break;
-        case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(unsp);             break;
-        case CPUINFO_FCT_EXECUTE:               info->execute = CPU_EXECUTE_NAME(unsp);         break;
-        case CPUINFO_FCT_BURN:                  info->burn = NULL;                              break;
-        case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(unsp); break;
-        case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &unsp->icount;               	break;
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(unsp);        break;
+		case CPUINFO_FCT_INIT:                  info->init = CPU_INIT_NAME(unsp);               break;
+		case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(unsp);             break;
+		case CPUINFO_FCT_EXECUTE:               info->execute = CPU_EXECUTE_NAME(unsp);         break;
+		case CPUINFO_FCT_BURN:                  info->burn = NULL;                              break;
+		case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(unsp); break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &unsp->icount;                   break;
 
-        /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case CPUINFO_STR_NAME:                  strcpy(info->s, "u'nSP");           	break;
-        case CPUINFO_STR_FAMILY:                strcpy(info->s, "u'nSP");               	break;
-        case CPUINFO_STR_VERSION:               strcpy(info->s, "1.0");                 		break;
-        case CPUINFO_STR_SOURCE_FILE:           strcpy(info->s, __FILE__);              break;
-        case CPUINFO_STR_CREDITS:           	strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:                  strcpy(info->s, "u'nSP");               break;
+		case CPUINFO_STR_FAMILY:                strcpy(info->s, "u'nSP");                   break;
+		case CPUINFO_STR_VERSION:               strcpy(info->s, "1.0");                         break;
+		case CPUINFO_STR_SOURCE_FILE:           strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:               strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 
-        case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
+		case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
 
-		case CPUINFO_STR_REGISTER + UNSP_SP:			sprintf(info->s, "SP: %04x", UNSP_REG(SP)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R1:			sprintf(info->s, "R1: %04x", UNSP_REG(R1)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R2:			sprintf(info->s, "R2: %04x", UNSP_REG(R2)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R3:			sprintf(info->s, "R3: %04x", UNSP_REG(R3)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R4:			sprintf(info->s, "R4: %04x", UNSP_REG(R4)); break;
-		case CPUINFO_STR_REGISTER + UNSP_BP:			sprintf(info->s, "BP: %04x", UNSP_REG(BP)); break;
-		case CPUINFO_STR_REGISTER + UNSP_SR:			sprintf(info->s, "SR: %04x", UNSP_REG(SR)); break;
-		case CPUINFO_STR_REGISTER + UNSP_PC:			sprintf(info->s, "PC: %06x (%06x)", UNSP_LPC, UNSP_LPC << 1); break;
-		case CPUINFO_STR_REGISTER + UNSP_IRQ:			sprintf(info->s, "IRQ: %d", unsp->irq);     break;
-		case CPUINFO_STR_REGISTER + UNSP_FIQ:			sprintf(info->s, "FIQ: %d", unsp->fiq);     break;
-		case CPUINFO_STR_REGISTER + UNSP_SB:			sprintf(info->s, "SB: %d", unsp->sb);       break;
-    }
+		case CPUINFO_STR_REGISTER + UNSP_SP:            sprintf(info->s, "SP: %04x", UNSP_REG(SP)); break;
+		case CPUINFO_STR_REGISTER + UNSP_R1:            sprintf(info->s, "R1: %04x", UNSP_REG(R1)); break;
+		case CPUINFO_STR_REGISTER + UNSP_R2:            sprintf(info->s, "R2: %04x", UNSP_REG(R2)); break;
+		case CPUINFO_STR_REGISTER + UNSP_R3:            sprintf(info->s, "R3: %04x", UNSP_REG(R3)); break;
+		case CPUINFO_STR_REGISTER + UNSP_R4:            sprintf(info->s, "R4: %04x", UNSP_REG(R4)); break;
+		case CPUINFO_STR_REGISTER + UNSP_BP:            sprintf(info->s, "BP: %04x", UNSP_REG(BP)); break;
+		case CPUINFO_STR_REGISTER + UNSP_SR:            sprintf(info->s, "SR: %04x", UNSP_REG(SR)); break;
+		case CPUINFO_STR_REGISTER + UNSP_PC:            sprintf(info->s, "PC: %06x (%06x)", UNSP_LPC, UNSP_LPC << 1); break;
+		case CPUINFO_STR_REGISTER + UNSP_IRQ:           sprintf(info->s, "IRQ: %d", unsp->irq);     break;
+		case CPUINFO_STR_REGISTER + UNSP_FIQ:           sprintf(info->s, "FIQ: %d", unsp->fiq);     break;
+		case CPUINFO_STR_REGISTER + UNSP_SB:            sprintf(info->s, "SB: %d", unsp->sb);       break;
+	}
 }
 
 DEFINE_LEGACY_CPU_DEVICE(UNSP, unsp);

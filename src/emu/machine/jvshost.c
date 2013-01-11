@@ -154,4 +154,3 @@ void jvs_host::decode(UINT8 *buffer, UINT32 &size)
 	}
 	size = pos;
 }
-

@@ -13,8 +13,8 @@
 enum kbdc8042_type_t
 {
 	KBDC8042_STANDARD,
-	KBDC8042_PS2,		/* another timing of integrated controller */
-	KBDC8042_AT386		/* hack for at386 driver */
+	KBDC8042_PS2,       /* another timing of integrated controller */
+	KBDC8042_AT386      /* hack for at386 driver */
 };
 
 
@@ -38,4 +38,3 @@ DECLARE_READ8_HANDLER(kbdc8042_8_r);
 DECLARE_WRITE8_HANDLER(kbdc8042_8_w);
 
 #endif /* KBDC8042_H */
-

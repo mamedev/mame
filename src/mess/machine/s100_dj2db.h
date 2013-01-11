@@ -27,7 +27,7 @@
 // ======================> s100_dj2db_device
 
 class s100_dj2db_device : public device_t,
-						  public device_s100_card_interface
+							public device_s100_card_interface
 {
 public:
 	// construction/destruction
@@ -46,7 +46,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "dj2db"; }
+	virtual void device_config_complete() { m_shortname = "dj2db"; }
 
 	// device_s100_card_interface overrides
 	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset);
@@ -70,15 +70,15 @@ private:
 	optional_shared_ptr<UINT8> m_ram;
 
 	// floppy state
-	int m_drive;				// selected drive
-	int m_head;					// head loaded
-	int m_int_enbl;				// interrupt enable
+	int m_drive;                // selected drive
+	int m_head;                 // head loaded
+	int m_int_enbl;             // interrupt enable
 
 	// S-100 bus state
 	const UINT8 *m_rom;
-	int m_access_enbl;			// access enable
-	int m_board_enbl;			// board enable
-	int m_phantom;				// phantom
+	int m_access_enbl;          // access enable
+	int m_board_enbl;           // board enable
+	int m_phantom;              // phantom
 };
 
 

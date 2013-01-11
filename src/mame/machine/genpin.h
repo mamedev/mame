@@ -17,7 +17,7 @@ static const char *const genpin_sample_names[] =
 	"coinin",
 	"hole",
 	"knocker",
-	0	/* end of array */
+	0   /* end of array */
 };
 
 static const samples_interface genpin_samples_intf =

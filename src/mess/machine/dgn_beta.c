@@ -102,8 +102,8 @@ static void cpu1_recalc_firq(running_machine &machine, int state);
 
 //static int DMA_NMI;               /* DMA cpu has received an NMI */
 
-#define INVALID_KEYROW	-1			/* no ketrow selected */
-#define NO_KEY_PRESSED	0x7F			/* retrurned by hardware if no key pressed */
+#define INVALID_KEYROW  -1          /* no ketrow selected */
+#define NO_KEY_PRESSED  0x7F            /* retrurned by hardware if no key pressed */
 
 const pia6821_interface dgnbeta_pia_intf[] =
 {
@@ -170,9 +170,9 @@ const pia6821_interface dgnbeta_pia_intf[] =
 // Info for bank switcher
 struct bank_info_entry
 {
-	write8_delegate func;	// Pointer to write handler
-	offs_t start;		// Offset of start of block
-	offs_t end;		// offset of end of block
+	write8_delegate func;   // Pointer to write handler
+	offs_t start;       // Offset of start of block
+	offs_t end;     // offset of end of block
 };
 
 static const struct bank_info_entry bank_info[] =
@@ -218,11 +218,11 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	address_space &space_0 = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
 	address_space &space_1 = machine.device(DMACPU_TAG)->memory().space(AS_PROGRAM);
-	int		            Page;
-	UINT8		        *readbank;
-	int		            bank_start;
-	int		            bank_end;
-	int		            MapPage;
+	int                 Page;
+	UINT8               *readbank;
+	int                 bank_start;
+	int                 bank_end;
+	int                 MapPage;
 	char                page_num[10];
 
 	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,space_0.device().safe_pc()));
@@ -230,19 +230,19 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 	{
 		sprintf(page_num,"bank%d",Page+1);
 
-		bank_start	= bank_info[Page].start;
-		bank_end	= bank_info[Page].end;
+		bank_start  = bank_info[Page].start;
+		bank_end    = bank_info[Page].end;
 
-        // bank16 and bank17 are mapped to the same page with a hole for the IO memory
+		// bank16 and bank17 are mapped to the same page with a hole for the IO memory
 		if (!is_last_page(Page))
-			MapPage	= state->m_PageRegs[state->m_TaskReg][Page].value;
+			MapPage = state->m_PageRegs[state->m_TaskReg][Page].value;
 		else
 			MapPage = state->m_PageRegs[state->m_TaskReg][LastPage].value;
 
 		//
 		// Map block, $00-$BF are ram, $FC-$FF are Boot ROM
 		//
-		if ((MapPage*4) < ((machine.device<ram_device>(RAM_TAG)->size() / 1024)-1))		// Block is ram
+		if ((MapPage*4) < ((machine.device<ram_device>(RAM_TAG)->size() / 1024)-1))     // Block is ram
 		{
 			if (!is_last_page(Page))
 			{
@@ -260,7 +260,7 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 			space_0.install_write_handler(bank_start, bank_end, func);
 			space_1.install_write_handler(bank_start, bank_end, func);
 		}
-		else					// Block is rom, or undefined
+		else                    // Block is rom, or undefined
 		{
 			if (MapPage>0xfB)
 			{
@@ -292,7 +292,7 @@ static void SetDefaultTask(running_machine &machine)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 //  UINT8 *videoram = state->m_videoram;
-	int		Idx;
+	int     Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
 	//if (VERBOSE) debug_console_printf(machine)->set_base("Set Default task\n");
@@ -464,25 +464,25 @@ the beta_test rom works, and it does not break the OS-9 driver :)
 */
 static int SelectedKeyrow(dgn_beta_state *state, int Rows)
 {
-	int	Idx;
-	int	Row;	/* Row selected */
-	int	Mask;	/* Mask to test row */
-	int	Found;	/* Set true when found */
+	int Idx;
+	int Row;    /* Row selected */
+	int Mask;   /* Mask to test row */
+	int Found;  /* Set true when found */
 
-	Row=INVALID_KEYROW;	/* Pretend no rows selected */
-	Mask=0x200;		/* Start with row 9 */
-	Found=0;		/* Start with not found */
+	Row=INVALID_KEYROW; /* Pretend no rows selected */
+	Mask=0x200;     /* Start with row 9 */
+	Found=0;        /* Start with not found */
 	Idx=9;
 
 	while ((Mask>0) && !Found)
 	{
 		if((~Rows & Mask) && !Found)
 		{
-			Row=Idx;		/* Get row */
-			Found=1;		/* Mark as found */
+			Row=Idx;        /* Get row */
+			Found=1;        /* Mark as found */
 		}
-		Idx=Idx-1;			/* Decrement row count */
-		Mask=Mask>>1;			/* Select next bit */
+		Idx=Idx-1;          /* Decrement row count */
+		Mask=Mask>>1;           /* Select next bit */
 	}
 
 	return Row;
@@ -493,9 +493,9 @@ static int SelectedKeyrow(dgn_beta_state *state, int Rows)
 static int GetKeyRow(dgn_beta_state *state, int RowNo)
 {
 	if(RowNo==INVALID_KEYROW)
-		return NO_KEY_PRESSED;	/* row is invalid, so return no key down */
+		return NO_KEY_PRESSED;  /* row is invalid, so return no key down */
 	else
-		return state->m_Keyboard[RowNo];	/* Else return keyboard data */
+		return state->m_Keyboard[RowNo];    /* Else return keyboard data */
 }
 
 /*********************************** PIA Handlers ************************/
@@ -551,7 +551,7 @@ READ8_MEMBER(dgn_beta_state::d_pia0_pb_r)
 				m_KAny_next = 1;
 		}
 	}
-	else	/* Just scan current row, from previously read values */
+	else    /* Just scan current row, from previously read values */
 	{
 		if(GetKeyRow(this, Selected) != NO_KEY_PRESSED)
 			m_KAny_next = 1;
@@ -566,12 +566,12 @@ READ8_MEMBER(dgn_beta_state::d_pia0_pb_r)
 
 WRITE8_MEMBER(dgn_beta_state::d_pia0_pb_w)
 {
-	int	InClkState;
+	int InClkState;
 	//int   OutClkState;
 
 	LOG_KEYBOARD(("PB Write\n"));
 
-	InClkState	= data & KInClk;
+	InClkState  = data & KInClk;
 	//OutClkState   = data & KOutClk;
 
 	LOG_KEYBOARD(("InClkState=$%02X OldInClkState=$%02X Keyrow=$%02X ",InClkState,(m_d_pia0_pb_last & KInClk),m_Keyrow));
@@ -593,7 +593,7 @@ WRITE8_MEMBER(dgn_beta_state::d_pia0_pb_w)
 
 WRITE8_MEMBER(dgn_beta_state::d_pia0_cb2_w)
 {
-	int	RowNo;
+	int RowNo;
 	LOG_KEYBOARD(("\nCB2 Write\n"));
 
 	/* load keyrow on rising edge of CB2 */
@@ -641,7 +641,7 @@ READ8_MEMBER(dgn_beta_state::d_pia1_pa_r)
 
 WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
 {
-	int	HALT_DMA;
+	int HALT_DMA;
 	device_t *fdc = machine().device(FDC_TAG);
 
 	/* Only play with halt line if halt bit changed since last write */
@@ -678,7 +678,7 @@ READ8_MEMBER(dgn_beta_state::d_pia1_pb_r)
 
 WRITE8_MEMBER(dgn_beta_state::d_pia1_pb_w)
 {
-	int	HALT_CPU;
+	int HALT_CPU;
 
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x02) != m_d_pia1_pb_last)
@@ -743,14 +743,14 @@ WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
 		{
 			machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("device_yield()\n");
-			machine().device(DMACPU_TAG)->execute().yield();	/* Let DMA CPU run */
+			machine().device(DMACPU_TAG)->execute().yield();    /* Let DMA CPU run */
 		}
 		else
 		{
 			machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		}
 
-		m_DMA_NMI_LAST = NMI;	/* Save it for next time */
+		m_DMA_NMI_LAST = NMI;   /* Save it for next time */
 	}
 
 	OldEnableMap = m_EnableMapRegs;
@@ -866,8 +866,8 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_intrq_w)
 {
 	device_t *device = machine().device(PIA_2_TAG);
 	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
-    if(m_wd2797_written)
-       downcast<pia6821_device *>(device)->ca1_w(state);
+	if(m_wd2797_written)
+		downcast<pia6821_device *>(device)->ca1_w(state);
 }
 
 /* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
@@ -916,9 +916,9 @@ WRITE8_MEMBER(dgn_beta_state::dgnbeta_wd2797_w)
 {
 	device_t *fdc = space.machine().device(FDC_TAG);
 
-    m_wd2797_written=1;
+	m_wd2797_written=1;
 
-    switch(offset & 0x3)
+	switch(offset & 0x3)
 	{
 		case 0:
 			/* disk head is encoded in the command byte */
@@ -946,8 +946,8 @@ static void ScanInKeyboard(void)
 {
 #if 0
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	int	Idx;
-	int	Row;
+	int Idx;
+	int Row;
 	static const char *const keynames[] = {
 		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4",
 		"KEY5", "KEY6", "KEY7", "KEY8", "KEY9"
@@ -979,11 +979,11 @@ void dgn_beta_frame_interrupt (running_machine &machine, int data)
 {
 	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
 
-    /* Set PIA line, so it recognises inturrupt */
-    if (!data)
-        pia_2->cb2_w(ASSERT_LINE);
-    else
-        pia_2->cb2_w(CLEAR_LINE);
+	/* Set PIA line, so it recognises inturrupt */
+	if (!data)
+		pia_2->cb2_w(ASSERT_LINE);
+	else
+		pia_2->cb2_w(CLEAR_LINE);
 
 //    LOG_VIDEO(("Vblank\n"));
 	ScanInKeyboard();
@@ -1014,7 +1014,7 @@ static void dgnbeta_reset(running_machine &machine)
 	pia6821_device *pia_1 = machine.device<pia6821_device>( PIA_1_TAG );
 	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
 
-    logerror("MACHINE_RESET( dgnbeta )\n");
+	logerror("MACHINE_RESET( dgnbeta )\n");
 
 	state->m_system_rom = state->memregion(MAINCPU_TAG)->base();
 
@@ -1027,7 +1027,7 @@ static void dgnbeta_reset(running_machine &machine)
 	state->m_TaskReg = 0;
 	state->m_PIATaskReg = 0;
 	state->m_EnableMapRegs = 0;
-	memset(state->m_PageRegs, 0, sizeof(state->m_PageRegs));	/* Reset page registers to 0 */
+	memset(state->m_PageRegs, 0, sizeof(state->m_PageRegs));    /* Reset page registers to 0 */
 	SetDefaultTask(machine);
 
 	/* Set pullups on all PIA port A, to match what hardware does */
@@ -1037,24 +1037,24 @@ static void dgnbeta_reset(running_machine &machine)
 
 	state->m_d_pia1_pa_last = 0x00;
 	state->m_d_pia1_pb_last = 0x00;
-	state->m_RowShifter = 0x00;			/* shift register to select row */
-	state->m_Keyrow = 0x00;				/* Keyboard row being shifted out */
-	state->m_d_pia0_pb_last = 0x00;		/* Last byte output to pia0 port b */
-	state->m_d_pia0_cb2_last = 0x00;		/* Last state of CB2 */
+	state->m_RowShifter = 0x00;         /* shift register to select row */
+	state->m_Keyrow = 0x00;             /* Keyboard row being shifted out */
+	state->m_d_pia0_pb_last = 0x00;     /* Last byte output to pia0 port b */
+	state->m_d_pia0_cb2_last = 0x00;        /* Last state of CB2 */
 
-	state->m_KInDat_next = 0x00;			/* Next data bit to input */
-	state->m_KAny_next = 0x00;			/* Next value for KAny */
+	state->m_KInDat_next = 0x00;            /* Next data bit to input */
+	state->m_KAny_next = 0x00;          /* Next value for KAny */
 
-	state->m_DMA_NMI_LAST = 0x80;		/* start with DMA NMI inactive, as pulled up */
+	state->m_DMA_NMI_LAST = 0x80;       /* start with DMA NMI inactive, as pulled up */
 //  DMA_NMI = CLEAR_LINE;       /* start with DMA NMI inactive */
 
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	state->m_videoram.set_target(machine.device<ram_device>(RAM_TAG)->pointer(),state->m_videoram.bytes());		/* Point video ram at the start of physical ram */
+	state->m_videoram.set_target(machine.device<ram_device>(RAM_TAG)->pointer(),state->m_videoram.bytes());     /* Point video ram at the start of physical ram */
 
-    wd17xx_reset(fdc);
-    state->m_wd2797_written=0;
+	wd17xx_reset(fdc);
+	state->m_wd2797_written=0;
 }
 
 void dgn_beta_state::machine_start()

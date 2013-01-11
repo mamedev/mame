@@ -22,7 +22,7 @@ const device_type K033906 = &device_creator<k033906_device>;
 //-------------------------------------------------
 
 k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, K033906, "Konami 033906", tag, owner, clock)
+	: device_t(mconfig, K033906, "Konami 033906", tag, owner, clock)
 {
 
 }
@@ -78,10 +78,10 @@ UINT32 k033906_device::k033906_reg_r(int reg)
 {
 	switch (reg)
 	{
-		case 0x00:		return 0x0001121a;			// PCI Vendor ID (0x121a = 3dfx), Device ID (0x0001 = Voodoo)
-		case 0x02:		return 0x04000000;			// Revision ID
-		case 0x04:		return m_reg[0x04];			// memBaseAddr
-		case 0x0f:		return m_reg[0x0f];			// interrupt_line, interrupt_pin, min_gnt, max_lat
+		case 0x00:      return 0x0001121a;          // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0001 = Voodoo)
+		case 0x02:      return 0x04000000;          // Revision ID
+		case 0x04:      return m_reg[0x04];         // memBaseAddr
+		case 0x0f:      return m_reg[0x0f];         // interrupt_line, interrupt_pin, min_gnt, max_lat
 
 		default:
 			fatalerror("%s: k033906_reg_r: %08X\n", machine().describe_context(), reg);
@@ -96,10 +96,10 @@ void k033906_device::k033906_reg_w(int reg, UINT32 data)
 		case 0x00:
 			break;
 
-		case 0x01:		// command register
+		case 0x01:      // command register
 			break;
 
-		case 0x04:		// memBaseAddr
+		case 0x04:      // memBaseAddr
 		{
 			if (data == 0xffffffff)
 			{
@@ -112,23 +112,23 @@ void k033906_device::k033906_reg_w(int reg, UINT32 data)
 			break;
 		}
 
-		case 0x0f:		// interrupt_line, interrupt_pin, min_gnt, max_lat
+		case 0x0f:      // interrupt_line, interrupt_pin, min_gnt, max_lat
 		{
 			m_reg[0x0f] = data;
 			break;
 		}
 
-		case 0x10:		// initEnable
+		case 0x10:      // initEnable
 		{
 			voodoo_set_init_enable(m_voodoo, data);
 			break;
 		}
 
-		case 0x11:		// busSnoop0
-		case 0x12:		// busSnoop1
+		case 0x11:      // busSnoop0
+		case 0x12:      // busSnoop1
 			break;
 
-		case 0x38:		// ???
+		case 0x38:      // ???
 			break;
 
 		default:

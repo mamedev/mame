@@ -22,35 +22,35 @@
 #include "m6800.h"
 
 enum addr_mode {
-	inh,	/* inherent */
-	rel,	/* relative */
-	imb,	/* immediate (byte) */
-	imw,	/* immediate (word) */
-	dir,	/* direct address */
-	imd,	/* HD63701YO: immediate, direct address */
-	ext,	/* extended address */
-	idx,	/* x + byte offset */
-	imx,	/* HD63701YO: immediate, x + byte offset */
-	sx1 	/* HD63701YO: undocumented opcodes: byte from (s+1) */
+	inh,    /* inherent */
+	rel,    /* relative */
+	imb,    /* immediate (byte) */
+	imw,    /* immediate (word) */
+	dir,    /* direct address */
+	imd,    /* HD63701YO: immediate, direct address */
+	ext,    /* extended address */
+	idx,    /* x + byte offset */
+	imx,    /* HD63701YO: immediate, x + byte offset */
+	sx1     /* HD63701YO: undocumented opcodes: byte from (s+1) */
 };
 
 enum op_names {
-	aba=0,	abx,	adca,	adcb,	adda,	addb,	addd,	aim,
-	anda,	andb,	asl,	asla,	aslb,	asld,	asr,	asra,
-	asrb,	bcc,	bcs,	beq,	bge,	bgt,	bhi,	bita,
-	bitb,	ble,	bls,	blt,	bmi,	bne,	bpl,	bra,
-	brn,	bsr,	bvc,	bvs,	cba,	clc,	cli,	clr,
-	clra,	clrb,	clv,	cmpa,	cmpb,	cmpx,	com,	coma,
-	comb,	daa,	dec,	deca,	decb,	des,	dex,	eim,
-	eora,	eorb,	ill,	inc,	inca,	incb,	ins,	inx,
-	jmp,	jsr,	lda,	ldb,	ldd,	lds,	ldx,	lsr,
-	lsra,	lsrb,	lsrd,	mul,	neg,	nega,	negb,	nop,
-	oim,	ora,	orb,	psha,	pshb,	pshx,	pula,	pulb,
-	pulx,	rol,	rola,	rolb,	ror,	rora,	rorb,	rti,
-	rts,	sba,	sbca,	sbcb,	sec,	sev,	sta,	stb,
-	_std,	sei,	sts,	stx,	suba,	subb,	subd,	swi,
-	wai,	tab,	tap,	tba,	tim,	tpa,	tst,	tsta,
-	tstb,	tsx,	txs,	asx1,	asx2,	xgdx,	addx,	adcx
+	aba=0,  abx,    adca,   adcb,   adda,   addb,   addd,   aim,
+	anda,   andb,   asl,    asla,   aslb,   asld,   asr,    asra,
+	asrb,   bcc,    bcs,    beq,    bge,    bgt,    bhi,    bita,
+	bitb,   ble,    bls,    blt,    bmi,    bne,    bpl,    bra,
+	brn,    bsr,    bvc,    bvs,    cba,    clc,    cli,    clr,
+	clra,   clrb,   clv,    cmpa,   cmpb,   cmpx,   com,    coma,
+	comb,   daa,    dec,    deca,   decb,   des,    dex,    eim,
+	eora,   eorb,   ill,    inc,    inca,   incb,   ins,    inx,
+	jmp,    jsr,    lda,    ldb,    ldd,    lds,    ldx,    lsr,
+	lsra,   lsrb,   lsrd,   mul,    neg,    nega,   negb,   nop,
+	oim,    ora,    orb,    psha,   pshb,   pshx,   pula,   pulb,
+	pulx,   rol,    rola,   rolb,   ror,    rora,   rorb,   rti,
+	rts,    sba,    sbca,   sbcb,   sec,    sev,    sta,    stb,
+	_std,   sei,    sts,    stx,    suba,   subb,   subd,   swi,
+	wai,    tab,    tap,    tba,    tim,    tpa,    tst,    tsta,
+	tstb,   tsx,    txs,    asx1,   asx2,   xgdx,   addx,   adcx
 };
 
 static const char *const op_name_str[] = {
@@ -156,7 +156,7 @@ static const UINT8 table[0x102][3] = {
 #define OP      oprom[0]
 #define ARG1    opram[1]
 #define ARG2    opram[2]
-#define ARGW	(opram[1]<<8) + opram[2]
+#define ARGW    (opram[1]<<8) + opram[2]
 
 static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *oprom, const UINT8 *opram)
 {
@@ -197,7 +197,7 @@ static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *opro
 	else if (opcode == rti || opcode == rts)
 		flags = DASMFLAG_STEP_OUT;
 
-	if ( invalid & invalid_mask )	/* invalid for this cpu type ? */
+	if ( invalid & invalid_mask )   /* invalid for this cpu type ? */
 	{
 		strcpy(buf, "illegal");
 		return 1 | flags | DASMFLAG_SUPPORTED;
@@ -218,7 +218,7 @@ static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *opro
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case idx:  /* indexed + byte offset */
 			sprintf (buf, "(x+$%02X)", ARG1 );
-            return 2 | flags | DASMFLAG_SUPPORTED;
+			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imx:  /* immediate, indexed + byte offset */
 			sprintf (buf, "#$%02X,(x+$%02x)", ARG1, ARG2 );
 			return 3 | flags | DASMFLAG_SUPPORTED;
@@ -227,14 +227,14 @@ static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *opro
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imd:  /* immediate, direct address */
 			sprintf (buf, "#$%02X,$%02X", ARG1, ARG2);
-            return 3 | flags | DASMFLAG_SUPPORTED;
+			return 3 | flags | DASMFLAG_SUPPORTED;
 		case ext:  /* extended address */
 			sprintf (buf, "$%04X", ARGW);
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case sx1:  /* byte from address (s + 1) */
-            sprintf (buf, "(s+1)");
-            return 1 | flags | DASMFLAG_SUPPORTED;
-        default:
+			sprintf (buf, "(s+1)");
+			return 1 | flags | DASMFLAG_SUPPORTED;
+		default:
 			return 1 | flags | DASMFLAG_SUPPORTED;
 	}
 }

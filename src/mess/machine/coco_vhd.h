@@ -17,7 +17,7 @@
 
 // ======================> coco_vhd_image_device
 
-class coco_vhd_image_device :	public device_t,
+class coco_vhd_image_device :   public device_t,
 								public device_image_interface
 {
 public:
@@ -47,17 +47,17 @@ public:
 
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 
 	void coco_vhd_readwrite(UINT8 data);
 
 private:
-	cpu_device *			m_cpu;
-	address_space *			m_cpu_space;
-	UINT32					m_logical_record_number;
-	UINT32					m_buffer_address;
-	UINT8					m_status;
+	cpu_device *            m_cpu;
+	address_space *         m_cpu_space;
+	UINT32                  m_logical_record_number;
+	UINT32                  m_buffer_address;
+	UINT8                   m_status;
 };
 
 // device type definition

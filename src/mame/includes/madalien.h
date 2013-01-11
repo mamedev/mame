@@ -9,7 +9,7 @@
 #include "sound/discrete.h"
 
 
-#define MADALIEN_MAIN_CLOCK		XTAL_10_595MHz
+#define MADALIEN_MAIN_CLOCK     XTAL_10_595MHz
 
 
 class madalien_state : public driver_device
@@ -73,5 +73,5 @@ MACHINE_CONFIG_EXTERN( madalien_video );
 DISCRETE_SOUND_EXTERN( madalien );
 
 /* Discrete Sound Input Nodes */
-#define MADALIEN_8910_PORTA			NODE_01
-#define MADALIEN_8910_PORTB			NODE_02
+#define MADALIEN_8910_PORTA         NODE_01
+#define MADALIEN_8910_PORTB         NODE_02

@@ -10,25 +10,25 @@
 ****************************************************************************/
 #include "emu.h"
 
-#define APPNAME					"UME"
-#define APPNAME_LOWER			"ume"
-#define CONFIGNAME				"ume"
-#define APPLONGNAME				"U.M.E."
-#define FULLLONGNAME			"Universal Machine Emulator"
-#define CAPGAMENOUN				"GAME"
-#define CAPSTARTGAMENOUN		"Game"
-#define GAMENOUN				"game"
-#define GAMESNOUN				"games"
-#define COPYRIGHT				"Copyright Nicola Salmoria\nand the MAME and MESS teams"
-#define COPYRIGHT_INFO			"Copyright Nicola Salmoria and the MAME and MESS teams"
-#define DISCLAIMER				"This is promo build of combined MAME and MESS emulators made in order to\n" \
+#define APPNAME                 "UME"
+#define APPNAME_LOWER           "ume"
+#define CONFIGNAME              "ume"
+#define APPLONGNAME             "U.M.E."
+#define FULLLONGNAME            "Universal Machine Emulator"
+#define CAPGAMENOUN             "GAME"
+#define CAPSTARTGAMENOUN        "Game"
+#define GAMENOUN                "game"
+#define GAMESNOUN               "games"
+#define COPYRIGHT               "Copyright Nicola Salmoria\nand the MAME and MESS teams"
+#define COPYRIGHT_INFO          "Copyright Nicola Salmoria and the MAME and MESS teams"
+#define DISCLAIMER              "This is promo build of combined MAME and MESS emulators made in order to\n" \
 								"promote both projects and show possibilities to new potential users.\n\n" \
 								"Note that bugs noticed in this build should not be forwarded to development\n"\
 								"teams unless those are confirmed in original builds as well.\n"
-#define USAGE					"Usage:  %s [%s] [media] [software] [options]"
-#define XML_ROOT			    "mame"
-#define XML_TOP 				"game"
-#define STATE_MAGIC_NUM			"MAMESAVE"
+#define USAGE                   "Usage:  %s [%s] [media] [software] [options]"
+#define XML_ROOT                "mame"
+#define XML_TOP                 "game"
+#define STATE_MAGIC_NUM         "MAMESAVE"
 
 const char * emulator_info::get_appname() { return APPNAME;}
 const char * emulator_info::get_appname_lower() { return APPNAME_LOWER;}

@@ -87,7 +87,7 @@ static const rgb_t pk8000_palette[16] = {
 	MAKE_RGB(0xc0, 0x00, 0xc0), // C
 	MAKE_RGB(0xff, 0x00, 0xff), // D
 	MAKE_RGB(0xc0, 0xc0, 0xc0), // E
-	MAKE_RGB(0xff, 0xff, 0xff),	// F
+	MAKE_RGB(0xff, 0xff, 0xff), // F
 };
 
 PALETTE_INIT( pk8000 )
@@ -170,5 +170,5 @@ UINT32 pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const re
 		// Disabled video
 		bitmap.fill(0, my_rect);
 	}
-    return 0;
+	return 0;
 }

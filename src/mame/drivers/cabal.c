@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w)	// fix coin insertion
+	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END
 
@@ -308,14 +308,14 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )	/* Left blank in the manual */
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )   /* Left blank in the manual */
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)	/* read through sound cpu */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)	/* read through sound cpu */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4) /* read through sound cpu */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4) /* read through sound cpu */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cabalt )
@@ -354,11 +354,11 @@ static INPUT_PORTS_START( cabalj )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Since the Trackball version was produced first, and it doesn't use
-       the third button,  Pin 24 of the JAMMA connector ('JAMMA button 3')
-       has no trace on the pcb.  To work around this design issue the
-       manufacturer had to use pin 15 which is usually the test / service
-       button
-    */
+	   the third button,  Pin 24 of the JAMMA connector ('JAMMA button 3')
+	   has no trace on the pcb.  To work around this design issue the
+	   manufacturer had to use pin 15 which is usually the test / service
+	   button
+	*/
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -371,7 +371,7 @@ static INPUT_PORTS_START( cabalj )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
 	/* The joystick version has a PCB marked "Joystick sub" containing a 74ls245. It plugs in the
-       sockets of the two D4701AC */
+	   sockets of the two D4701AC */
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -573,13 +573,13 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 MACHINE_CONFIG_END
 
 ROM_START( cabal )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "13.7h",    0x00000, 0x10000, CRC(00abbe0c) SHA1(bacf17444abfb4f56248ff56e37b0aa2b1a3800d) )
 	ROM_LOAD16_BYTE( "11.6h",    0x00001, 0x10000, CRC(44736281) SHA1(1d6da95ef96d9c02aea70791e1cb87b70097d5ed) )
 	ROM_LOAD16_BYTE( "12.7j",    0x20000, 0x10000, CRC(d763a47c) SHA1(146d8082a404b6eddaf2dc9ba41a997949c17f8a) )
 	ROM_LOAD16_BYTE( "10.6j",    0x20001, 0x10000, CRC(96d5e8af) SHA1(ed7d854f08e87db5ae6cf526eafa029dfd2bfb9f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "3-3p",         0x8000, 0x8000, CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
 
@@ -587,7 +587,7 @@ ROM_START( cabal )
 	ROM_LOAD( "5-6s",           0x00000, 0x04000, CRC(6a76955a) SHA1(733cb4b862b5dac97c2641b58f2362471e62fcf2) ) /* characters */
 
 	/* The Joystick versions use a sub-board instead of the mask roms
-       the content is the same as the mask roms */
+	   the content is the same as the mask roms */
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "bg_rom1.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
 	ROM_LOAD16_BYTE( "bg_rom2.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
@@ -608,15 +608,15 @@ ROM_START( cabal )
 	ROM_LOAD16_BYTE( "sp_rom7.bin",   0x60000, 0x10000, CRC(55c44764) SHA1(7fad1f2084664b5b4d1384c8081371b0c79c4f5e) )
 	ROM_LOAD16_BYTE( "sp_rom8.bin",   0x60001, 0x10000, CRC(702735c9) SHA1(e4ac799dc85ff5b7c8e578611605989c78f9e8b3) )
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm1", 0 )  /* Samples */
 	ROM_LOAD( "2-1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
 
-	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 ROM_END
 
 ROM_START( cabala )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "epr-a-9.7h",    0x00000, 0x10000, CRC(00abbe0c) SHA1(bacf17444abfb4f56248ff56e37b0aa2b1a3800d) )
 	ROM_LOAD16_BYTE( "epr-a-7.6h",    0x00001, 0x10000, CRC(c89608db) SHA1(a56e77526227af5b693eea9ef74da0d9d57cc55c) )
 	ROM_LOAD16_BYTE( "epr-a-8.7k",    0x20000, 0x08000, CRC(fe84788a) SHA1(29c49ebbe62357c27befcdcc4c19841a8bf32b2d) )
@@ -624,7 +624,7 @@ ROM_START( cabala )
 	ROM_LOAD16_BYTE( "epr-a-6.6k",    0x20001, 0x08000, CRC(81eb1355) SHA1(bbf926d40164d78319e982da0e8fb8ec4d4f8b87) )
 	ROM_RELOAD(0x30001,0x08000)
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "epr-a-4.3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "epr-a-3.3p",         0x8000, 0x4000, CRC(c0097c55) SHA1(874f813c1b466dab2d15a707e340b9bdb200246c) )
 
@@ -637,21 +637,21 @@ ROM_START( cabala )
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm1", 0 )  /* Samples */
 	ROM_LOAD( "epr-a-2.1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
 
-	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "epr-a-1.1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 ROM_END
 
 ROM_START( cabalus )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "h7_512.bin",      0x00000, 0x10000, CRC(8fe16fb4) SHA1(fedb2d0c6c21516f68cfa99093772fe8fa862389) )
 	ROM_LOAD16_BYTE( "h6_512.bin",      0x00001, 0x10000, CRC(6968101c) SHA1(d65005ac235dae5c32bbcd182cb365e8fa067fe7) )
 	ROM_LOAD16_BYTE( "k7_512.bin",      0x20000, 0x10000, CRC(562031a2) SHA1(ed5ef50a66c7797a7f345e479162cf83d6777f7c) )
 	ROM_LOAD16_BYTE( "k6_512.bin",      0x20001, 0x10000, CRC(4fda2856) SHA1(a213cb7443cdccbad3f2610e8d42b2e149cbedb9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "3-3p",         0x8000, 0x8000, CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
 
@@ -664,25 +664,25 @@ ROM_START( cabalus )
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples? */
+	ROM_REGION( 0x10000, "adpcm1", 0 )  /* Samples? */
 	ROM_LOAD( "2-1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
 
-	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* unknown */
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
 	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
 	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
 
 ROM_START( cabalus2 )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "9-7h",            0x00000, 0x10000, CRC(ebbb9484) SHA1(2c77d5b4acdc37720dc7ccab526862981bf8da51) )
 	ROM_LOAD16_BYTE( "7-6h",            0x00001, 0x10000, CRC(51aeb49e) SHA1(df38dc58d8c6fa3d35904bf34e29111e7bd523ad) )
 	ROM_LOAD16_BYTE( "8-7k",            0x20000, 0x10000, CRC(4c24ed9a) SHA1(f0fc25c3e7dc8ac71fdad3e91ab618cd7a037123) )
 	ROM_LOAD16_BYTE( "6-6k",            0x20001, 0x10000, CRC(681620e8) SHA1(c9eacfb55059986dbecc2fae1339069a852f917b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "4-3n",         0x0000, 0x2000, CRC(4038eff2) SHA1(0bcafc1b78c3bef9a0e9b822c482ea4a942fd180) )
 	ROM_LOAD( "3-3p",         0x8000, 0x8000, CRC(d9defcbf) SHA1(f26b10b1dbe5aa6446f70fd18e5f1379455578ec) )
 
@@ -695,13 +695,13 @@ ROM_START( cabalus2 )
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm1", 0 )  /* Samples */
 	ROM_LOAD( "2-1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
 
-	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* unknown */
+	ROM_REGION( 0x0200, "proms", 0 )    /* unknown */
 	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
 	ROM_LOAD( "prom10.4j",      0x0100, 0x0100, CRC(261c93bc) SHA1(942470198143d584d3766f28587d1879abd912c1) )
 ROM_END
@@ -743,20 +743,20 @@ Note: The bootleg has *3* Z80s
 */
 
 ROM_START( cabalbl )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "cabal_24.bin",    0x00000, 0x10000, CRC(00abbe0c) SHA1(bacf17444abfb4f56248ff56e37b0aa2b1a3800d) )
 	ROM_LOAD16_BYTE( "cabal_22.bin",    0x00001, 0x10000, CRC(78c4af27) SHA1(31049d1ec76d76284682de7a0592f63d97019240) )
 	ROM_LOAD16_BYTE( "cabal_23.bin",    0x20000, 0x10000, CRC(d763a47c) SHA1(146d8082a404b6eddaf2dc9ba41a997949c17f8a) )
 	ROM_LOAD16_BYTE( "cabal_21.bin",    0x20001, 0x10000, CRC(96d5e8af) SHA1(ed7d854f08e87db5ae6cf526eafa029dfd2bfb9f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "cabal_11.bin",    0x0000, 0x10000, CRC(d308a543) SHA1(4f45db42512f83266001daee55d06f49e7908e35) )
 
 	ROM_REGION( 0x8000,  "gfx1", 0 )
 	ROM_LOAD( "cabal_20.bin",           0x00000, 0x08000, CRC(189033fd) SHA1(814f0cbc5f72345c04922d6d7c986f99d57335fa) ) /* characters */
 
 	/* The bootleg versions use a sub-board instead of the mask roms
-       the content is the same as the mask roms */
+	   the content is the same as the mask roms */
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "cabal_15.bin",   0x00000, 0x10000, CRC(1023319b) SHA1(38fcc8159776b82779b3163329b07c61be939fae) )
 	ROM_LOAD16_BYTE( "cabal_17.bin",   0x00001, 0x10000, CRC(3b6d2b09) SHA1(4cdcd22836dce4ee6348c4e6df7c6360d12ef912) )
@@ -791,13 +791,13 @@ ROM_END
 // based on stickers present on the board it appears to have been manufactured by 'TAB-Austria' and is marked 'CA02'
 
 ROM_START( cabalbl2 )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "c9.bin",    0x00000, 0x10000, CRC(00abbe0c) SHA1(bacf17444abfb4f56248ff56e37b0aa2b1a3800d) )
 	ROM_LOAD16_BYTE( "c7.bin",    0x00001, 0x10000, CRC(44736281) SHA1(1d6da95ef96d9c02aea70791e1cb87b70097d5ed) )
 	ROM_LOAD16_BYTE( "c8.bin",    0x20000, 0x10000, CRC(d763a47c) SHA1(146d8082a404b6eddaf2dc9ba41a997949c17f8a) )
 	ROM_LOAD16_BYTE( "c6.bin",    0x20001, 0x10000, CRC(96d5e8af) SHA1(ed7d854f08e87db5ae6cf526eafa029dfd2bfb9f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "c4.bin",    0x2000, 0x2000, CRC(82f9f296) SHA1(2769ffdc28f003684e77d4806be07b87d50be31c) )
 	ROM_CONTINUE(0x0000,0x2000)
 	ROM_IGNORE(0x4000)
@@ -827,10 +827,10 @@ ROM_START( cabalbl2 )
 	ROM_LOAD16_BYTE( "c21.bin",   0x60000, 0x10000, CRC(55c44764) SHA1(7fad1f2084664b5b4d1384c8081371b0c79c4f5e) )
 	ROM_LOAD16_BYTE( "c25.bin",   0x60001, 0x10000, CRC(702735c9) SHA1(e4ac799dc85ff5b7c8e578611605989c78f9e8b3) )
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm1", 0 )  /* Samples */
 	ROM_LOAD( "c2.bin",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
 
-	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm2", 0 )  /* Samples */
 	ROM_LOAD( "c1.bin",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 ROM_END
 

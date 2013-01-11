@@ -123,14 +123,14 @@ READ32_HANDLER( m68340_internal_sim_cs_r )
 
 		switch (offset<<2)
 		{
-			case m68340SIM_AM_CS0:	return sim->m_am[0];
-			case m68340SIM_BA_CS0:	return sim->m_ba[0];
-			case m68340SIM_AM_CS1:	return sim->m_am[1];
-			case m68340SIM_BA_CS1:	return sim->m_ba[1];
-			case m68340SIM_AM_CS2:	return sim->m_am[2];
-			case m68340SIM_BA_CS2:	return sim->m_ba[2];
-			case m68340SIM_AM_CS3:	return sim->m_am[3];
-			case m68340SIM_BA_CS3:	return sim->m_ba[3];
+			case m68340SIM_AM_CS0:  return sim->m_am[0];
+			case m68340SIM_BA_CS0:  return sim->m_ba[0];
+			case m68340SIM_AM_CS1:  return sim->m_am[1];
+			case m68340SIM_BA_CS1:  return sim->m_ba[1];
+			case m68340SIM_AM_CS2:  return sim->m_am[2];
+			case m68340SIM_BA_CS2:  return sim->m_ba[2];
+			case m68340SIM_AM_CS3:  return sim->m_am[3];
+			case m68340SIM_BA_CS3:  return sim->m_ba[3];
 
 			default:
 				logerror("%08x m68340_internal_sim_r %08x, (%08x)\n", pc, offset*4,mem_mask);

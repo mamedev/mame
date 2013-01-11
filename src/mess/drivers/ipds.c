@@ -111,15 +111,15 @@ const i8275_interface ipds_i8275_interface =
 /* F4 Character Displayer */
 static const gfx_layout ipds_charlayout =
 {
-	8, 11,					/* 8 x 11 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 11,                  /* 8 x 11 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( ipds )
@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
 
-	MCFG_I8275_ADD	( "i8275", ipds_i8275_interface)
+	MCFG_I8275_ADD  ( "i8275", ipds_i8275_interface)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
@@ -174,5 +174,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1982, ipds,  0,       0,	     ipds,	ipds, driver_device,	 0, 	"Intel",   "iPDS",	GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1982, ipds,  0,       0,       ipds,  ipds, driver_device,     0,     "Intel",   "iPDS",  GAME_NOT_WORKING | GAME_NO_SOUND)

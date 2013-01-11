@@ -32,7 +32,7 @@ enum
 
 // ======================> mb90082_device
 
-class mb90082_device :	public device_t,
+class mb90082_device :  public device_t,
 						public device_memory_interface
 {
 public:
@@ -66,7 +66,7 @@ private:
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);
 
-	const address_space_config		m_space_config;
+	const address_space_config      m_space_config;
 };
 
 

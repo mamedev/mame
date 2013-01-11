@@ -7,7 +7,7 @@ class inder_state : public driver_device
 public:
 	inder_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -166,12 +166,12 @@ ROM_START(metalman)
 	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(4d9f5ed2) SHA1(bc6b7c70369c25eddddac5304497f30cee7675d4))
 ROM_END
 
-GAME(1992,	ind250cc,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"250 CC",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1991,	atleta,		0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Atleta",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,	brvteam,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Brave Team",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,	canasta,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Canasta '86'",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1988,	pinclown,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Clown (Inder)",		GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,	corsario,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Corsario",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,	mundial,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Mundial 90",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,	metalman,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Metal Man",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,	lapbylap,	0,		inder,	inder, inder_state,	inder,	ROT0,	"Inder",		"Lap By Lap",			GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  ind250cc,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "250 CC",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  atleta,     0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Atleta",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  brvteam,    0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Brave Team",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  canasta,    0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Canasta '86'",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1988,  pinclown,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Clown (Inder)",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  corsario,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Corsario",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  mundial,    0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Mundial 90",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  metalman,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Metal Man",            GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  lapbylap,   0,      inder,  inder, inder_state, inder,  ROT0,   "Inder",        "Lap By Lap",           GAME_IS_SKELETON_MECHANICAL)

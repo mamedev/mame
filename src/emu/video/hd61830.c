@@ -40,12 +40,12 @@ static const int CYCLES[] =
 	4, 4, 4, 4, 4, -1, -1, -1, 4, 4, 4, 4, 6, 6, 36, 36
 };
 
-const int MODE_EXTERNAL_CG		= 0x01;
-const int MODE_GRAPHIC			= 0x02;
-const int MODE_CURSOR			= 0x04;
-const int MODE_BLINK			= 0x08;
-const int MODE_MASTER			= 0x10;
-const int MODE_DISPLAY_ON		= 0x20;
+const int MODE_EXTERNAL_CG      = 0x01;
+const int MODE_GRAPHIC          = 0x02;
+const int MODE_CURSOR           = 0x04;
+const int MODE_BLINK            = 0x08;
+const int MODE_MASTER           = 0x10;
+const int MODE_DISPLAY_ON       = 0x20;
 
 
 
@@ -106,11 +106,11 @@ inline void hd61830_device::writebyte(offs_t address, UINT8 data)
 //-------------------------------------------------
 
 hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, HD61830, "Hitachi HD61830", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_bf(false),
-	  m_blink(0),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830))
+	: device_t(mconfig, HD61830, "Hitachi HD61830", tag, owner, clock),
+		device_memory_interface(mconfig, *this),
+		m_bf(false),
+		m_blink(0),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830))
 {
 	m_shortname = "hd61830";
 }
@@ -157,7 +157,7 @@ void hd61830_device::device_start()
 	m_busy_timer = timer_alloc();
 
 	// resolve callbacks
-    m_in_rd_func.resolve(m_in_rd_cb, *this);
+	m_in_rd_func.resolve(m_in_rd_cb, *this);
 
 	m_screen = machine().device<screen_device>(screen_tag);
 

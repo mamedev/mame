@@ -9,7 +9,7 @@
 
 
 
-#define RGB_MAX		191
+#define RGB_MAX     191
 
 
 void grchamp_state::palette_init()
@@ -20,10 +20,10 @@ void grchamp_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	RGB_MAX, -1.0,
-			3,	&resistances[0], rweights, 0, 100,
-			3,	&resistances[0], gweights, 0, 100,
-			2,	&resistances[0], bweights, 0, 100);
+	compute_resistor_weights(0, RGB_MAX, -1.0,
+			3,  &resistances[0], rweights, 0, 100,
+			3,  &resistances[0], gweights, 0, 100,
+			2,  &resistances[0], bweights, 0, 100);
 
 	/* initialize the palette with these colors */
 	for (i = 0; i < 0x20; i++)
@@ -148,13 +148,13 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 					{
 						result = 1; /* flag collision */
 						/*  wipe this pixel, so collision checks with the
-                        **  next layer work */
+						**  next layer work */
 						bitmap.pix16(sy, sx) = bgcolor;
 					}
 				}
 			}
 
-        }
+		}
 	}
 	return result?(1<<which):0;
 }
@@ -252,12 +252,12 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 	for (num = 0; num < 16; num++)
 	{
 		/*
-            Each sprite is 4 bytes. The logic reads one byte every 2H:
-                5C,7D,5E,7F, 5C,5D,5E,5F, 58,79,5A,7B, 58,59,5A,5B,
-                54,75,56,77, 54,55,56,57, 50,71,52,73, 50,51,52,53,
-                4C,6D,4E,6F, 4C,4D,4E,4F, 48,69,4A,6B, 48,49,4A,4B,
-                44,65,46,67, 44,45,46,47, 40,61,42,63, 40,41,42,43,
-        */
+		    Each sprite is 4 bytes. The logic reads one byte every 2H:
+		        5C,7D,5E,7F, 5C,5D,5E,5F, 58,79,5A,7B, 58,59,5A,5B,
+		        54,75,56,77, 54,55,56,57, 50,71,52,73, 50,51,52,53,
+		        4C,6D,4E,6F, 4C,4D,4E,4F, 48,69,4A,6B, 48,49,4A,4B,
+		        44,65,46,67, 44,45,46,47, 40,61,42,63, 40,41,42,43,
+		*/
 		int dataoffs = ((~num & 0x0e) << 1) | ((~num & 0x01) << 5);
 
 		/* the first of the 4 bytes is the Y position; this is used to match the scanline */
@@ -304,12 +304,12 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 	for (num = 0; num < 32; num++)
 	{
 		/*
-            The logic reads one byte every 4H, 64 bytes total:
-                3E,3F,3C,3D, 3A,3B,38,39, 36,37,34,35, 32,33,30,31,
-                2E,2F,2C,2D, 2A,2B,28,29, 26,27,24,25, 22,23,20,21,
-                1E,1F,1C,1D, 1A,1B,18,19, 16,17,14,15, 12,13,10,11,
-                0E,0F,0C,0D, 0A,0B,08,09, 06,07,04,05, 02,03,00,01
-        */
+		    The logic reads one byte every 4H, 64 bytes total:
+		        3E,3F,3C,3D, 3A,3B,38,39, 36,37,34,35, 32,33,30,31,
+		        2E,2F,2C,2D, 2A,2B,28,29, 26,27,24,25, 22,23,20,21,
+		        1E,1F,1C,1D, 1A,1B,18,19, 16,17,14,15, 12,13,10,11,
+		        0E,0F,0C,0D, 0A,0B,08,09, 06,07,04,05, 02,03,00,01
+		*/
 		int hprime = num ^ 0x1f;
 		int dataoffs = hprime << 1;
 		int sy = state->m_spriteram[0x00 + dataoffs];
@@ -448,7 +448,7 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 				int bits = pldata[(mydh >> 2) | (mydv << 3) | (plbase << 8)] >> (~mydh & 0x03);
 				if (bits & 0x01)
 				{
-					objpix |= 4;	/* MYCAR(A) */
+					objpix |= 4;    /* MYCAR(A) */
 
 					/* handle collision detection between MYCARRED and MVID/OBJECT */
 
@@ -468,7 +468,7 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 					}
 				}
 				if (bits & 0x10)
-					objpix |= 3;	/* MYCAR(B) */
+					objpix |= 3;    /* MYCAR(B) */
 			}
 
 			/* if rain is enabled, it ORs against the bits */
@@ -496,23 +496,23 @@ mame_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
 
 	/*
 
-    OBJECT LAYER:
+	OBJECT LAYER:
 
-        R = REDA | MYRADAR | MYCAR(A) | RADARVID | AMEOUT
-        G = GREENA | MYCAR(B) | RADARVID | AMEOUT
-        B = BLUEA | MYCAR(B) | RADARVID | AMEOUT
+	    R = REDA | MYRADAR | MYCAR(A) | RADARVID | AMEOUT
+	    G = GREENA | MYCAR(B) | RADARVID | AMEOUT
+	    B = BLUEA | MYCAR(B) | RADARVID | AMEOUT
 
-        if (R | G | B) display object,
-        else display background
-    */
+	    if (R | G | B) display object,
+	    else display background
+	*/
 
 
 	/* still to do:
-        collision detection
-        myradar
-        fog
-        real headlamp effect
-    */
+	    collision detection
+	    myradar
+	    fog
+	    real headlamp effect
+	*/
 
 			/* if the object data is non-zero, it gets priority */
 			if ((objpix & 7) != 0)

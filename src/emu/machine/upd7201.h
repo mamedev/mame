@@ -44,7 +44,7 @@
 //**************************************************************************
 
 #define MCFG_UPD7201_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), UPD7201, _clock)	\
+	MCFG_DEVICE_ADD((_tag), UPD7201, _clock)    \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define UPD7201_INTERFACE(name) \
@@ -60,26 +60,26 @@
 
 struct upd7201_interface
 {
-	devcb_write_line	m_out_int_cb;
+	devcb_write_line    m_out_int_cb;
 
 	struct
 	{
-		int	m_rx_clock;
-		int	m_tx_clock;
+		int m_rx_clock;
+		int m_tx_clock;
 
-		devcb_write_line	m_out_drqrx_cb;
-		devcb_write_line	m_out_drqtx_cb;
+		devcb_write_line    m_out_drqrx_cb;
+		devcb_write_line    m_out_drqtx_cb;
 
-		devcb_read_line		m_in_rxd_cb;
-		devcb_write_line	m_out_txd_cb;
+		devcb_read_line     m_in_rxd_cb;
+		devcb_write_line    m_out_txd_cb;
 
-		devcb_read_line		m_in_cts_cb;
-		devcb_read_line		m_in_dcd_cb;
-		devcb_write_line	m_out_rts_cb;
-		devcb_write_line	m_out_dtr_cb;
+		devcb_read_line     m_in_cts_cb;
+		devcb_read_line     m_in_dcd_cb;
+		devcb_write_line    m_out_rts_cb;
+		devcb_write_line    m_out_dtr_cb;
 
-		devcb_write_line	m_out_wait_cb;
-		devcb_write_line	m_out_sync_cb;
+		devcb_write_line    m_out_wait_cb;
+		devcb_write_line    m_out_sync_cb;
 	} m_channel[2];
 };
 
@@ -87,12 +87,12 @@ struct upd7201_interface
 
 // ======================> upd7201_device
 
-class upd7201_device :	public device_t,
-                        public upd7201_interface
+class upd7201_device :  public device_t,
+						public upd7201_interface
 {
 public:
-    // construction/destruction
-    upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( cd_ba_r );
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
@@ -118,10 +118,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( txcb_w );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr);
 
 private:
@@ -133,7 +133,7 @@ private:
 	inline void receive(int channel);
 	inline void transmit(int channel);
 
-	devcb_resolved_write_line		m_out_int_func;
+	devcb_resolved_write_line       m_out_int_func;
 
 	// timers
 	emu_timer *m_rx_a_timer;

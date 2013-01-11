@@ -126,13 +126,13 @@ ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const ch
 
 ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, TI99_RS232_DEV, "Serial attached device", tag, owner, clock),
-  device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this)
 {
 }
 
 ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, TI99_PIO_DEV, "Parallel attached device", tag, owner, clock),
-  device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this)
 {
 }
 
@@ -235,7 +235,7 @@ bool ti_pio_attached_device::call_load()
 	card->m_pio_writable = !is_readonly();
 
 	if (card->m_pio_write && card->m_pio_writable)
-		card->m_pio_handshakein = false;	/* receiver ready */
+		card->m_pio_handshakein = false;    /* receiver ready */
 	else
 		card->m_pio_handshakein = true;
 
@@ -250,7 +250,7 @@ void ti_pio_attached_device::call_unload()
 	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
 	card->m_pio_writable = false;
-	card->m_pio_handshakein = true;	/* receiver not ready */
+	card->m_pio_handshakein = true; /* receiver not ready */
 	card->m_pio_sparein = false;
 }
 
@@ -266,15 +266,15 @@ void ti_rs232_pio_device::crureadz(offs_t offset, UINT8 *value)
 		if ((offset & 0x00c0)==0x0000)
 		{
 			UINT8 reply = 0x00;
-			if (m_pio_direction_in) 		reply |= 0x02;
-			if (m_pio_handshakein)			reply |= 0x04;
-			if (m_pio_sparein)				reply |= 0x08;
-			if (m_flag0)					reply |= 0x10;
+			if (m_pio_direction_in)         reply |= 0x02;
+			if (m_pio_handshakein)          reply |= 0x04;
+			if (m_pio_sparein)              reply |= 0x08;
+			if (m_flag0)                    reply |= 0x10;
 			// The CTS line is realized as CRU bits
 			// Mind that this line is handled as an output going to the remote CTS
-			if ((m_signals[0] & CTS)!=0)	reply |= 0x20;
-			if ((m_signals[1] & CTS)!=0)	reply |= 0x40;
-			if (m_led)						reply |= 0x80;
+			if ((m_signals[0] & CTS)!=0)    reply |= 0x20;
+			if ((m_signals[1] & CTS)!=0)    reply |= 0x40;
+			if (m_led)                      reply |= 0x80;
 			*value = reply;
 			return;
 		}
@@ -327,9 +327,9 @@ void ti_rs232_pio_device::cruwrite(offs_t offset, UINT8 data)
 			{
 				m_pio_handshakeout = (data!=0);
 				if (m_pio_write && m_pio_writable && (!m_pio_direction_in))
-				{	/* PIO in output mode */
+				{   /* PIO in output mode */
 					if (!m_pio_handshakeout)
-					{	/* write data strobe */
+					{   /* write data strobe */
 						/* write data and acknowledge */
 						UINT8 buf = m_pio_out_buffer;
 						int ret = image->fwrite(&buf, 1);
@@ -344,9 +344,9 @@ void ti_rs232_pio_device::cruwrite(offs_t offset, UINT8 data)
 					}
 				}
 				if ((!m_pio_write) && m_pio_readable /*&& pio_direction_in*/)
-				{	/* PIO in input mode */
+				{   /* PIO in input mode */
 					if (!m_pio_handshakeout)
-					{	/* receiver ready */
+					{   /* receiver ready */
 						/* send data and strobe */
 						UINT8 buf;
 						if (image->fread(&buf, 1))
@@ -757,8 +757,8 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 			// Exception states: BRK, FRMERR, PARERR
 			m_uart[uartind]->rcv_break(((buffer & BRK)!=0));
 
-			if (buffer & FRMERR)	m_uart[uartind]->rcv_framing_error();
-			if (buffer & PARERR)	m_uart[uartind]->rcv_parity_error();
+			if (buffer & FRMERR)    m_uart[uartind]->rcv_framing_error();
+			if (buffer & PARERR)    m_uart[uartind]->rcv_parity_error();
 		}
 		else
 		{
@@ -853,8 +853,8 @@ void ti_rs232_pio_device::set_bit(int uartind, int line, int value)
 		}
 	}
 
-	if (value!=0)	m_signals[uartind] |= line;
-	else			m_signals[uartind] &= ~line;
+	if (value!=0)   m_signals[uartind] |= line;
+	else            m_signals[uartind] &= ~line;
 }
 
 /*
@@ -934,7 +934,7 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::int0_callback )
 {
 	int senila_bit = SENILA_0_BIT;
 
-	if (state==ASSERT_LINE)	m_ila |= senila_bit;
+	if (state==ASSERT_LINE) m_ila |= senila_bit;
 	else m_ila &= ~senila_bit;
 
 	m_slot->set_inta(state);
@@ -944,7 +944,7 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::int1_callback )
 {
 	int senila_bit = SENILA_1_BIT;
 
-	if (state==ASSERT_LINE)	m_ila |= senila_bit;
+	if (state==ASSERT_LINE) m_ila |= senila_bit;
 	else m_ila &= ~senila_bit;
 
 	m_slot->set_inta(state);
@@ -1009,17 +1009,17 @@ WRITE8_MEMBER( ti_rs232_pio_device::ctrl1_callback )
 
 static const tms9902_interface tms9902_params0 =
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, int0_callback),			/* called when interrupt pin state changes */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, rcv0_callback),			/* called when a character is received */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, xmit0_callback),			/* called when a character is transmitted */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, int0_callback),            /* called when interrupt pin state changes */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, rcv0_callback),            /* called when a character is received */
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, xmit0_callback),            /* called when a character is transmitted */
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, ctrl0_callback)
 };
 
 static const tms9902_interface tms9902_params1 =
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, int1_callback),			/* called when interrupt pin state changes */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, rcv1_callback),			/* called when a character is received */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, xmit1_callback),			/* called when a character is transmitted */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, int1_callback),            /* called when interrupt pin state changes */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, rcv1_callback),            /* called when a character is received */
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, xmit1_callback),            /* called when a character is transmitted */
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_rs232_pio_device, ctrl1_callback)
 };
 
@@ -1071,11 +1071,11 @@ void ti_rs232_pio_device::device_reset()
 		// the wider address. The next lines perform this soldering job
 		// automagically.
 		/* if (device->machine().root_device().ioport("MODE")->read()==GENMOD)
-        {
-            // GenMod card modification
-            card->select_mask = 0x1fe000;
-            card->select_value = 0x174000;
-        }*/
+		{
+		    // GenMod card modification
+		    card->select_mask = 0x1fe000;
+		    card->select_value = 0x174000;
+		}*/
 }
 
 static MACHINE_CONFIG_FRAGMENT( ti_rs232 )
@@ -1092,10 +1092,10 @@ ROM_START( ti_rs232 )
 ROM_END
 
 INPUT_PORTS_START( ti_rs232 )
-	PORT_START(	"CRURS232"	)
+	PORT_START( "CRURS232"  )
 	PORT_DIPNAME( 0x01, 0x00, "TI-RS232 CRU base" )
-		PORT_DIPSETTING(	0x00, "1300" )
-		PORT_DIPSETTING(	0x00, "1500" )
+		PORT_DIPSETTING(    0x00, "1300" )
+		PORT_DIPSETTING(    0x00, "1500" )
 
 	PORT_START( "SERIALMAP" )
 	PORT_CONFNAME( 0x03, 0x00, "Serial cable pin mapping" )
@@ -1122,4 +1122,3 @@ ioport_constructor ti_rs232_pio_device::device_input_ports() const
 const device_type TI99_RS232 = &device_creator<ti_rs232_pio_device>;
 const device_type TI99_RS232_DEV = &device_creator<ti_rs232_attached_device>;
 const device_type TI99_PIO_DEV = &device_creator<ti_pio_attached_device>;
-

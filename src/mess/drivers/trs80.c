@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( trs80_io, AS_IO, 8, trs80_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8, trs80_state )
-	AM_RANGE(0x0000, 0x377f) AM_ROM	// sys80,ht1080 needs up to 375F
+	AM_RANGE(0x0000, 0x377f) AM_ROM // sys80,ht1080 needs up to 375F
 	AM_RANGE(0x37de, 0x37de) AM_READWRITE(sys80_f9_r, sys80_f8_w)
 	AM_RANGE(0x37df, 0x37df) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
 	AM_RANGE(0x37e0, 0x37e3) AM_READWRITE(trs80_irq_status_r, trs80_motor_w)
@@ -329,48 +329,48 @@ NB4: when it was added a 15-key keypad, there were
 
 static INPUT_PORTS_START( trs80 )
 	PORT_START("CONFIG") /* IN0 */
-	PORT_CONFNAME(	  0x80, 0x00,	"Floppy Disc Drives")
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(	0x80, DEF_STR( On ) )
+	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x80, DEF_STR( On ) )
 	PORT_BIT(0x7f, 0x7f, IPT_UNUSED)
 
 	PORT_START("LINE0") /* KEY ROW 0 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE)		PORT_CHAR('@')
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)				PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)			PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)			PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)			PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)			PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)			PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)			PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE)      PORT_CHAR('@')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)              PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
 
 	PORT_START("LINE1") /* KEY ROW 1 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)			PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)			PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)			PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)			PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)			PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)			PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)			PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)			PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
 
 	PORT_START("LINE2") /* KEY ROW 2 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)			PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)			PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)			PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)			PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)			PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)			PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)			PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)			PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
 
 	PORT_START("LINE3") /* KEY ROW 3 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)			PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)			PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)			PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 	/* on Model I and Model III keyboards, there are only 53 keys (+ 12 keypad keys) and these are not connected:
-    on Model I, they produce arrows and '_', on Model III either produce garbage or overlap with other keys;
-    on Model 4 (which has a 15-key with 3 function keys) here are mapped 'F1', 'F2', 'F3'    */
+	on Model I, they produce arrows and '_', on Model III either produce garbage or overlap with other keys;
+	on Model 4 (which has a 15-key with 3 function keys) here are mapped 'F1', 'F2', 'F3'    */
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("(n/c)")
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("(n/c)")
 	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("(n/c)")
@@ -378,40 +378,40 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("(n/c)")
 
 	PORT_START("LINE4") /* KEY ROW 4 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)				PORT_CHAR('0') PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)			PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)			PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)			PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)			PORT_CHAR('4') PORT_CHAR('$') PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)			PORT_CHAR('5') PORT_CHAR('%') PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)			PORT_CHAR('6') PORT_CHAR('&') PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)			PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)              PORT_CHAR('0') PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!') PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"') PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#') PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$') PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%') PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&') PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 
 	PORT_START("LINE5") /* KEY ROW 5 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)			PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)			PORT_CHAR('9') PORT_CHAR(')') PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME(": *") PORT_CODE(KEYCODE_MINUS)		PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("; +") PORT_CODE(KEYCODE_COLON)		PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)		PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("- =") PORT_CODE(KEYCODE_EQUALS)		PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP)		PORT_CHAR('.') PORT_CHAR('>') PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH)		PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')') PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME(": *") PORT_CODE(KEYCODE_MINUS)        PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("; +") PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("- =") PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP)     PORT_CHAR('.') PORT_CHAR('>') PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("LINE6") /* KEY ROW 6 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)							PORT_CHAR(13) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_HOME)		PORT_CHAR(UCHAR_MAMEKEY(F8)) // 3rd line, 1st key from right
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END)		PORT_CHAR(UCHAR_MAMEKEY(F9)) // 1st line, 1st key from right
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)	PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)				PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)                          PORT_CHAR(13) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(F8)) // 3rd line, 1st key from right
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(F9)) // 1st line, 1st key from right
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)                PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	/* backspace do the same as cursor left */
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)				PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)				PORT_CHAR(' ')
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)              PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)              PORT_CHAR(' ')
 
 	PORT_START("LINE7") /* KEY ROW 7 */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)				PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)                PORT_CHAR(UCHAR_SHIFT_1)
 	/* These keys are only on a Model 4. The one marked CTL seems to be another shift key (4 in total). */
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)				PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)               PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("CTL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
@@ -422,7 +422,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( trs80m3 )
 	PORT_INCLUDE (trs80)
-	PORT_START("E9")	// these are the power-on uart settings
+	PORT_START("E9")    // these are the power-on uart settings
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x88, 0x08, "Parity")
 	PORT_DIPSETTING(    0x08, DEF_STR(None))
@@ -442,80 +442,80 @@ INPUT_PORTS_END
 /**************************** F4 CHARACTER DISPLAYER ***********************************************************/
 static const gfx_layout trs80_charlayout =
 {
-	8, 8,			/* 8 x 8 characters */
-	128,			/* 128 characters */
-	1,			/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes */
+	8, 8,           /* 8 x 8 characters */
+	128,            /* 128 characters */
+	1,          /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8		   /* every char takes 8 bytes */
+	8*8        /* every char takes 8 bytes */
 };
 
 static const gfx_layout ht1080z_charlayout =
 {
-	5, 12,			/* 5 x 12 characters */
-	128,			/* 128 characters */
-	1,			/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes */
+	5, 12,          /* 5 x 12 characters */
+	128,            /* 128 characters */
+	1,          /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16		   /* every char takes 16 bytes */
+	8*16           /* every char takes 16 bytes */
 };
 
 static const gfx_layout trs80m4_charlayout =
 {
-	8, 8,			/* 8 x 8 characters */
-	256,			/* 256 characters */
-	1,			/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes */
+	8, 8,           /* 8 x 8 characters */
+	256,            /* 256 characters */
+	1,          /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8		   /* every char takes 8 bytes */
+	8*8        /* every char takes 8 bytes */
 };
 
 static const gfx_layout lnw80_charlayout =
 {
-	8, 8,			/* 8 x 8 characters */
-	128,			/* 128 characters */
-	1,			/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes */
+	8, 8,           /* 8 x 8 characters */
+	128,            /* 128 characters */
+	1,          /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
 	/* x offsets */
 	{ 7, 5, 6, 1, 0, 2, 4, 3 },
 	/* y offsets */
 	{  0*8, 512*8, 256*8, 768*8, 1*8, 513*8, 257*8, 769*8 },
-	8*2		   /* every char takes 8 bytes */
+	8*2        /* every char takes 8 bytes */
 };
 
 static const gfx_layout radionic_charlayout =
 {
-	8, 16,			/* 8 x 16 characters */
-	256,			/* 256 characters */
-	1,			/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes */
+	8, 16,          /* 8 x 16 characters */
+	256,            /* 256 characters */
+	1,          /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
 	/* x offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* y offsets */
 	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
-	8*8		   /* every char takes 16 bytes */
+	8*8        /* every char takes 16 bytes */
 };
 
 static const gfx_layout meritum_charlayout =
 {
-	6, 11,			/* 8 x 16 characters */
-	256,			/* 256 characters */
-	1,			/* 1 bits per pixel */
-	{ 0 },			/* no bitplanes */
+	6, 11,          /* 8 x 16 characters */
+	256,            /* 256 characters */
+	1,          /* 1 bits per pixel */
+	{ 0 },          /* no bitplanes */
 	/* x offsets */
 	{ 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 },
-	8*16		   /* every char takes 16 bytes (unused scanlines are blank) */
+	8*16           /* every char takes 16 bytes (unused scanlines are blank) */
 };
 
 static GFXDECODE_START(trs80)
@@ -575,7 +575,7 @@ static const floppy_interface trs80_floppy_interface =
 	NULL
 };
 
-static MACHINE_CONFIG_START( trs80, trs80_state )		// the original model I, level I, with no extras
+static MACHINE_CONFIG_START( trs80, trs80_state )       // the original model I, level I, with no extras
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1796000)        /* 1.796 MHz */
 	MCFG_CPU_PROGRAM_MAP(trs80_map)
@@ -606,7 +606,7 @@ static MACHINE_CONFIG_START( trs80, trs80_state )		// the original model I, leve
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( model1, trs80 )		// model I, level II
+static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( model1_map)
 	MCFG_CPU_IO_MAP( model1_io)
@@ -792,7 +792,7 @@ Note: Be careful when dumping rom C: if dumped on the trs-80 m3 with software, b
 	ROM_SYSTEM_BIOS(3, "trs80m3_l1", "Level 1 bios")
 	ROMX_LOAD("8040032.u104", 0x0000, 0x1000, CRC(6418d641) SHA1(f823ab6ceb102588d27e5f5c751e31175289291c), ROM_BIOS(4) ) // Label: "8040032 // (M) QQ8028 // SCM91616P"; Silkscreen: "TANDY // (C) '80"; (Level 1 bios)
 
-	ROM_REGION(0x00800, "chargen",0)	/* correct for later systems; the trs80m3_l1 bios uses the non-a version of this rom, dump is pending */
+	ROM_REGION(0x00800, "chargen",0)    /* correct for later systems; the trs80m3_l1 bios uses the non-a version of this rom, dump is pending */
 	ROM_LOAD("8044316.u36", 0x0000, 0x0800, NO_DUMP) // Label: "(M) // SCM91665P // 8044316 // QQ8029" ('no-letter' revision)
 	ROM_LOAD("8044316a.u36", 0x0000, 0x0800, CRC(444c8b60) SHA1(c52ee41439bd5e57c3b113ebfd61c951e2af4446)) // Label: "Tandy (C) 81 // 8044316A // 8206" (rev A)
 ROM_END

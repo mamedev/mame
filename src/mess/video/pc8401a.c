@@ -24,15 +24,15 @@ UINT32 pc8500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 //  m_lcdc->screen_update(screen, bitmap, cliprect);
 
 	/*
-    if (strcmp(screen.tag(), SCREEN_TAG) == 0)
-    {
-        sed1330_update(m_lcdc, &bitmap, cliprect);
-    }
-    else
-    {
-        m_crtc->update(bitmap, cliprect);
-    }
-    */
+	if (strcmp(screen.tag(), SCREEN_TAG) == 0)
+	{
+	    sed1330_update(m_lcdc, &bitmap, cliprect);
+	}
+	else
+	{
+	    m_crtc->update(bitmap, cliprect);
+	}
+	*/
 
 	return 0;
 }

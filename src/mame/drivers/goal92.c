@@ -189,7 +189,7 @@ static INPUT_PORTS_START( goal92 )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	  0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x000c, 0x0000, "Players / Coin Mode" )
@@ -198,7 +198,7 @@ static INPUT_PORTS_START( goal92 )
 	PORT_DIPSETTING(      0x0008, "4 Players / 2 Coin Slots" )
 	PORT_DIPSETTING(      0x000c, "2 Players" )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
@@ -239,8 +239,8 @@ static void goal92_adpcm_int( device_t *device )
 
 static const msm5205_interface msm5205_config =
 {
-	goal92_adpcm_int,	/* interrupt function */
-	MSM5205_S96_4B		/* 4KHz 4-bit */
+	goal92_adpcm_int,   /* interrupt function */
+	MSM5205_S96_4B      /* 4KHz 4-bit */
 };
 
 static const gfx_layout layout_8x8x4 =
@@ -281,11 +281,11 @@ static const gfx_layout layout_16x16x4_2 =
 #endif
 
 static GFXDECODE_START( goal92 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,		   0*16, 8*16 ) // Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,		  48*16,   16 ) // Text Layer
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,		   0*16,   16 ) // BG Layer
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,		  16*16,   16 ) // Mid Layer
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,		  32*16,   16 ) // FG Layer
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,        0*16, 8*16 ) // Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,         48*16,   16 ) // Text Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,        0*16,   16 ) // BG Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,       16*16,   16 ) // Mid Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,       32*16,   16 ) // FG Layer
 GFXDECODE_END
 
 
@@ -394,7 +394,7 @@ ROM_START( goal92 )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x80000, CRC(db0a6c7c) SHA1(b609db7806b99bc921806d8b3e5e515b4651c375) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x80000, CRC(e4c45dee) SHA1(542749bd1ff51220a151fe66acdadac83df8f0ee) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )	/* Z80 code */
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "1.bin",        0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 

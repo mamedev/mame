@@ -30,9 +30,9 @@
  *
  *************************************/
 
-#define RSHIFT		16
-#define GSHIFT		8
-#define BSHIFT		0
+#define RSHIFT      16
+#define GSHIFT      8
+#define BSHIFT      0
 
 
 

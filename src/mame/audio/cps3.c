@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "includes/cps3.h"
 
-#define CPS3_VOICES		16
+#define CPS3_VOICES     16
 
 struct cps3_voice
 {
@@ -20,7 +20,7 @@ struct cps3_sound_state
 	sound_stream *m_stream;
 	cps3_voice m_voice[CPS3_VOICES];
 	UINT16     m_key;
-	INT8*	   m_base;
+	INT8*      m_base;
 };
 
 INLINE cps3_sound_state *get_safe_token(device_t *device)
@@ -173,7 +173,7 @@ const device_type CPS3 = &device_creator<cps3_sound_device>;
 
 cps3_sound_device::cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CPS3, "CPS3 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(cps3_sound_state);
 }
@@ -206,5 +206,3 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

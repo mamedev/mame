@@ -10,16 +10,16 @@
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"z80"
-#define Z80PIO_TAG		"z80pio"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "z80"
+#define Z80PIO_TAG      "z80pio"
 
 class vcs80_state : public driver_device
 {
 public:
 	vcs80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_pio(*this, Z80PIO_TAG)
+			m_pio(*this, Z80PIO_TAG)
 	{ }
 
 	required_device<z80pio_device> m_pio;

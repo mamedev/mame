@@ -18,13 +18,13 @@
     CONSTANTS
 ***************************************************************************/
 
-#define EVENT_QUEUE_SIZE		128
+#define EVENT_QUEUE_SIZE        128
 
 enum
 {
-	SEQ_PRESSED_FALSE = 0,		/* not pressed */
-	SEQ_PRESSED_TRUE,			/* pressed */
-	SEQ_PRESSED_RESET			/* reset -- converted to FALSE once detected as not pressed */
+	SEQ_PRESSED_FALSE = 0,      /* not pressed */
+	SEQ_PRESSED_TRUE,           /* pressed */
+	SEQ_PRESSED_RESET           /* reset -- converted to FALSE once detected as not pressed */
 };
 
 
@@ -37,19 +37,19 @@ enum
 struct ui_input_private
 {
 	/* pressed states; retrieved with ui_input_pressed() */
-	osd_ticks_t					next_repeat[IPT_COUNT];
-	UINT8						seqpressed[IPT_COUNT];
+	osd_ticks_t                 next_repeat[IPT_COUNT];
+	UINT8                       seqpressed[IPT_COUNT];
 
 	/* mouse position/info */
-	render_target *				current_mouse_target;
-	INT32						current_mouse_x;
-	INT32						current_mouse_y;
-	int							current_mouse_down;
+	render_target *             current_mouse_target;
+	INT32                       current_mouse_x;
+	INT32                       current_mouse_y;
+	int                         current_mouse_down;
 
 	/* popped states; ring buffer of ui_events */
-	ui_event					events[EVENT_QUEUE_SIZE];
-	int							events_start;
-	int							events_end;
+	ui_event                    events[EVENT_QUEUE_SIZE];
+	int                         events_start;
+	int                         events_end;
 };
 
 

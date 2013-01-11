@@ -103,8 +103,8 @@ static floppy_image_format_t *find_format_by_identify(io_generic *image)
 static void display_usage()
 {
 	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "		floptool.exe identify <inputfile> [<inputfile> ...]\n");
-	fprintf(stderr, "		floptool.exe convert [input_format|auto] output_format <inputfile> <outputfile>\n");
+	fprintf(stderr, "       floptool.exe identify <inputfile> [<inputfile> ...]\n");
+	fprintf(stderr, "       floptool.exe convert [input_format|auto] output_format <inputfile> <outputfile>\n");
 }
 
 static void display_formats()

@@ -46,8 +46,8 @@ enum
 //  MACROS
 //============================================================
 
-#define IS_OPAQUE(a)		(a >= 1.0f)
-#define IS_TRANSPARENT(a)	(a <  0.0001f)
+#define IS_OPAQUE(a)        (a >= 1.0f)
+#define IS_TRANSPARENT(a)   (a <  0.0001f)
 
 #define MAX4(a, b, c, d) MAX(a, MAX(b, MAX(c, d)))
 #define MIN4(a, b, c, d) MIN(a, MIN(b, MIN(c, d)))
@@ -60,9 +60,9 @@ enum
 
 struct quad_setup_data
 {
-	INT32			dudx, dvdx, dudy, dvdy;
-	INT32			startu, startv;
-	INT32			rotwidth, rotheight;
+	INT32           dudx, dvdx, dudy, dvdy;
+	INT32           startu, startv;
+	INT32           rotwidth, rotheight;
 };
 
 struct texture_info;
@@ -70,73 +70,73 @@ struct texture_info;
 typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
 
 struct copy_info {
-	int 				src_fmt;
-	Uint32				dst_fmt;
-	int					dst_bpp;
-	int					rotate;
-	texture_copy_func	func;
-	Uint32				bm_mask;
-	const char			*srcname;
-	const char			*dstname;
+	int                 src_fmt;
+	Uint32              dst_fmt;
+	int                 dst_bpp;
+	int                 rotate;
+	texture_copy_func   func;
+	Uint32              bm_mask;
+	const char          *srcname;
+	const char          *dstname;
 	/* Statistics */
-	UINT64				pixel_count;
-	INT64				time;
-	int					samples;
-	int					perf;
+	UINT64              pixel_count;
+	INT64               time;
+	int                 samples;
+	int                 perf;
 	/* list */
-	copy_info			*next;
+	copy_info           *next;
 };
 
 /* texture_info holds information about a texture */
 struct texture_info
 {
-	texture_info *		next;				// next texture in the list
+	texture_info *      next;               // next texture in the list
 
-	HashT				hash;				// hash value for the texture (must be >= pointer size)
-	UINT32				flags;				// rendering flags
-	render_texinfo		texinfo;			// copy of the texture info
+	HashT               hash;               // hash value for the texture (must be >= pointer size)
+	UINT32              flags;              // rendering flags
+	render_texinfo      texinfo;            // copy of the texture info
 
-	int					rawwidth, rawheight;// raw width/height of the texture
+	int                 rawwidth, rawheight;// raw width/height of the texture
 
-	int					format;				// texture format
-	void				*pixels;			// pixels for the texture
-	int					pitch;
-	int					pixels_own;			// do we own / allocated it ?
+	int                 format;             // texture format
+	void                *pixels;            // pixels for the texture
+	int                 pitch;
+	int                 pixels_own;         // do we own / allocated it ?
 
-	SDL_Texture			*texture_id;
+	SDL_Texture         *texture_id;
 
-	copy_info			*copyinfo;
-	Uint32				sdl_access;
-	SDL_BlendMode		sdl_blendmode;
-	quad_setup_data		setup;
-	int					is_rotated;
+	copy_info           *copyinfo;
+	Uint32              sdl_access;
+	SDL_BlendMode       sdl_blendmode;
+	quad_setup_data     setup;
+	int                 is_rotated;
 
-	osd_ticks_t			last_access;
+	osd_ticks_t         last_access;
 };
 
 /* sdl_info is the information about SDL for the current screen */
 struct sdl_info
 {
-	INT32			blittimer;
-	UINT32			extra_flags;
+	INT32           blittimer;
+	UINT32          extra_flags;
 
-	SDL_Renderer	*sdl_renderer;
-	texture_info *	texlist;				// list of active textures
-	INT32			texture_max_width;  	// texture maximum width
-	INT32			texture_max_height; 	// texture maximum height
+	SDL_Renderer    *sdl_renderer;
+	texture_info *  texlist;                // list of active textures
+	INT32           texture_max_width;      // texture maximum width
+	INT32           texture_max_height;     // texture maximum height
 
-	float			last_hofs;
-	float			last_vofs;
+	float           last_hofs;
+	float           last_vofs;
 
 	// resize information
 
-	UINT8			resize_pending;
-	UINT32			resize_width;
-	UINT32			resize_height;
+	UINT8           resize_pending;
+	UINT32          resize_width;
+	UINT32          resize_height;
 
 	// Stats
-	INT64			last_blit_time;
-	INT64			last_blit_pixels;
+	INT64           last_blit_time;
+	INT64           last_blit_pixels;
 };
 
 //============================================================
@@ -189,78 +189,78 @@ static texture_info * texture_update(sdl_window_info *window, const render_primi
 static copy_info blit_info_default[] =
 {
 	/* no rotation */
-	ENTRY(ARGB32,			ARGB8888,	4, 0, NULL),
-	ENTRY_LR(ARGB32,		RGB888, 	4, 0, argb32_rgb32),
+	ENTRY(ARGB32,           ARGB8888,   4, 0, NULL),
+	ENTRY_LR(ARGB32,        RGB888,     4, 0, argb32_rgb32),
 	/* Entry for primarily for directfb */
-	ENTRY_BM(ARGB32,		RGB888, 	4, 0, argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,		RGB888, 	4, 0, argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,		RGB888, 	4, 0, argb32_rgb32, SDL_BLENDMODE_NONE),
+	ENTRY_BM(ARGB32,        RGB888,     4, 0, argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        RGB888,     4, 0, argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        RGB888,     4, 0, argb32_rgb32, SDL_BLENDMODE_NONE),
 
-	ENTRY(RGB32,			ARGB8888,	4, 0, rgb32_argb32),
-	ENTRY(RGB32,			RGB888, 	4, 0, NULL),
+	ENTRY(RGB32,            ARGB8888,   4, 0, rgb32_argb32),
+	ENTRY(RGB32,            RGB888,     4, 0, NULL),
 
-	ENTRY(RGB32_PALETTED,	ARGB8888,	4, 0, rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,	RGB888, 	4, 0, rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   ARGB8888,   4, 0, rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   RGB888,     4, 0, rgb32pal_argb32),
 
-	ENTRY(YUY16,			UYVY,		2, 0, NULL /* yuv16_uyvy*/),
-	ENTRY(YUY16,			YUY2,		2, 0, yuv16_yuy2),
-	ENTRY(YUY16,			YVYU,		2, 0, yuv16_yvyu),
-	ENTRY(YUY16,			ARGB8888,	4, 0, yuv16_argb32),
-	ENTRY(YUY16,			RGB888,		4, 0, yuv16pal_argb32),
+	ENTRY(YUY16,            UYVY,       2, 0, NULL /* yuv16_uyvy*/),
+	ENTRY(YUY16,            YUY2,       2, 0, yuv16_yuy2),
+	ENTRY(YUY16,            YVYU,       2, 0, yuv16_yvyu),
+	ENTRY(YUY16,            ARGB8888,   4, 0, yuv16_argb32),
+	ENTRY(YUY16,            RGB888,     4, 0, yuv16pal_argb32),
 
-	ENTRY(YUY16_PALETTED,	UYVY,		2, 0, yuv16pal_uyvy),
-	ENTRY(YUY16_PALETTED,	YUY2,		2, 0, yuv16pal_yuy2),
-	ENTRY(YUY16_PALETTED,	YVYU,		2, 0, yuv16pal_yvyu),
-	ENTRY(YUY16_PALETTED,	ARGB8888,	4, 0, yuv16pal_argb32),
-	ENTRY(YUY16_PALETTED,	RGB888, 	4, 0, yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   UYVY,       2, 0, yuv16pal_uyvy),
+	ENTRY(YUY16_PALETTED,   YUY2,       2, 0, yuv16pal_yuy2),
+	ENTRY(YUY16_PALETTED,   YVYU,       2, 0, yuv16pal_yvyu),
+	ENTRY(YUY16_PALETTED,   ARGB8888,   4, 0, yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   RGB888,     4, 0, yuv16pal_argb32),
 
-	ENTRY(PALETTE16,		ARGB8888,	4, 0, pal16_argb32),
-	ENTRY(PALETTE16,		RGB888, 	4, 0, pal16_argb32),
+	ENTRY(PALETTE16,        ARGB8888,   4, 0, pal16_argb32),
+	ENTRY(PALETTE16,        RGB888,     4, 0, pal16_argb32),
 
-	ENTRY(RGB15,			RGB555, 	2, 0, NULL /* rgb15_argb1555 */),
-	ENTRY(RGB15,			ARGB1555,	2, 0, rgb15_argb1555),
-	ENTRY(RGB15,			ARGB8888,	4, 0, rgb15_argb32),
-	ENTRY(RGB15,			RGB888, 	4, 0, rgb15_argb32),
+	ENTRY(RGB15,            RGB555,     2, 0, NULL /* rgb15_argb1555 */),
+	ENTRY(RGB15,            ARGB1555,   2, 0, rgb15_argb1555),
+	ENTRY(RGB15,            ARGB8888,   4, 0, rgb15_argb32),
+	ENTRY(RGB15,            RGB888,     4, 0, rgb15_argb32),
 
-	ENTRY(RGB15_PALETTED,	ARGB8888,	4, 0, rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,	RGB888, 	4, 0, rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   ARGB8888,   4, 0, rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   RGB888,     4, 0, rgb15pal_argb32),
 
-	ENTRY(PALETTE16A,		ARGB8888,	4, 0, pal16a_argb32),
-	ENTRY(PALETTE16A,		RGB888, 	4, 0, pal16a_rgb32),
+	ENTRY(PALETTE16A,       ARGB8888,   4, 0, pal16a_argb32),
+	ENTRY(PALETTE16A,       RGB888,     4, 0, pal16a_rgb32),
 
 	/* rotation */
-	ENTRY(ARGB32,			ARGB8888,	4, 1, rot_argb32_argb32),
-	ENTRY_LR(ARGB32,		RGB888, 	4, 1, rot_argb32_rgb32),
+	ENTRY(ARGB32,           ARGB8888,   4, 1, rot_argb32_argb32),
+	ENTRY_LR(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32),
 	/* Entry for primarily for directfb */
-	ENTRY_BM(ARGB32,		RGB888, 	4, 1, rot_argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,		RGB888, 	4, 1, rot_argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,		RGB888, 	4, 1, rot_argb32_rgb32, SDL_BLENDMODE_NONE),
+	ENTRY_BM(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32, SDL_BLENDMODE_NONE),
 
-	ENTRY(RGB32,			ARGB8888,	4, 1, rot_rgb32_argb32),
-	ENTRY(RGB32,			RGB888, 	4, 1, rot_argb32_argb32),
+	ENTRY(RGB32,            ARGB8888,   4, 1, rot_rgb32_argb32),
+	ENTRY(RGB32,            RGB888,     4, 1, rot_argb32_argb32),
 
-	ENTRY(RGB32_PALETTED,	ARGB8888,	4, 1, rot_rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,	RGB888, 	4, 1, rot_rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   ARGB8888,   4, 1, rot_rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   RGB888,     4, 1, rot_rgb32pal_argb32),
 
-	ENTRY(YUY16,			ARGB8888,	4, 1, rot_yuv16_argb32),
-	ENTRY(YUY16,			RGB888,		4, 1, rot_yuv16_argb32),
+	ENTRY(YUY16,            ARGB8888,   4, 1, rot_yuv16_argb32),
+	ENTRY(YUY16,            RGB888,     4, 1, rot_yuv16_argb32),
 
-	ENTRY(YUY16_PALETTED,	ARGB8888,	4, 1, rot_yuv16pal_argb32),
-	ENTRY(YUY16_PALETTED,	RGB888,		4, 1, rot_yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   ARGB8888,   4, 1, rot_yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   RGB888,     4, 1, rot_yuv16pal_argb32),
 
-	ENTRY(PALETTE16,		ARGB8888,	4, 1, rot_pal16_argb32),
-	ENTRY(PALETTE16,		RGB888, 	4, 1, rot_pal16_argb32),
+	ENTRY(PALETTE16,        ARGB8888,   4, 1, rot_pal16_argb32),
+	ENTRY(PALETTE16,        RGB888,     4, 1, rot_pal16_argb32),
 
-	ENTRY(RGB15,			RGB555, 	2, 1, rot_rgb15_argb1555),
-	ENTRY(RGB15,			ARGB1555,	2, 1, rot_rgb15_argb1555),
-	ENTRY(RGB15,			ARGB8888,	4, 1, rot_rgb15_argb32),
-	ENTRY(RGB15,			RGB888, 	4, 1, rot_rgb15_argb32),
+	ENTRY(RGB15,            RGB555,     2, 1, rot_rgb15_argb1555),
+	ENTRY(RGB15,            ARGB1555,   2, 1, rot_rgb15_argb1555),
+	ENTRY(RGB15,            ARGB8888,   4, 1, rot_rgb15_argb32),
+	ENTRY(RGB15,            RGB888,     4, 1, rot_rgb15_argb32),
 
-	ENTRY(RGB15_PALETTED,	ARGB8888,	4, 1, rot_rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,	RGB888, 	4, 1, rot_rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   ARGB8888,   4, 1, rot_rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   RGB888,     4, 1, rot_rgb15pal_argb32),
 
-	ENTRY(PALETTE16A,		ARGB8888,	4, 1, rot_pal16a_argb32),
-	ENTRY(PALETTE16A,		RGB888, 	4, 1, rot_pal16a_rgb32),
+	ENTRY(PALETTE16A,       ARGB8888,   4, 1, rot_pal16a_argb32),
+	ENTRY(PALETTE16A,       RGB888,     4, 1, rot_pal16a_rgb32),
 
 { -1 },
 };
@@ -268,18 +268,18 @@ static copy_info blit_info_default[] =
 static copy_info blit_info_16bpp[] =
 {
 	/* no rotation */
-	ENTRY(PALETTE16,		RGB555, 	2, 0, pal16_argb1555),
-	ENTRY(PALETTE16,		ARGB1555,	2, 0, pal16_argb1555),
+	ENTRY(PALETTE16,        RGB555,     2, 0, pal16_argb1555),
+	ENTRY(PALETTE16,        ARGB1555,   2, 0, pal16_argb1555),
 
-	ENTRY(RGB15_PALETTED,	RGB555, 	2, 0, rgb15pal_argb1555),
-	ENTRY(RGB15_PALETTED,	ARGB1555,	2, 0, rgb15pal_argb1555),
+	ENTRY(RGB15_PALETTED,   RGB555,     2, 0, rgb15pal_argb1555),
+	ENTRY(RGB15_PALETTED,   ARGB1555,   2, 0, rgb15pal_argb1555),
 
 	/* rotation */
-	ENTRY(PALETTE16,		RGB555, 	2, 1, rot_pal16_argb1555),
-	ENTRY(PALETTE16,		ARGB1555,	2, 1, rot_pal16_argb1555),
+	ENTRY(PALETTE16,        RGB555,     2, 1, rot_pal16_argb1555),
+	ENTRY(PALETTE16,        ARGB1555,   2, 1, rot_pal16_argb1555),
 
-	ENTRY(RGB15_PALETTED,	RGB555, 	2, 1, rot_rgb15pal_argb1555),
-	ENTRY(RGB15_PALETTED,	ARGB1555,	2, 1, rot_rgb15pal_argb1555),
+	ENTRY(RGB15_PALETTED,   RGB555,     2, 1, rot_rgb15pal_argb1555),
+	ENTRY(RGB15_PALETTED,   ARGB1555,   2, 1, rot_rgb15pal_argb1555),
 
 { -1 },
 };
@@ -288,8 +288,8 @@ static copy_info *blit_info[SDL_TEXFORMAT_LAST+1];
 
 static struct
 {
-	Uint32	format;
-	int		status;
+	Uint32  format;
+	int     status;
 } fmt_support[30] = { { 0, 0 } };
 
 
@@ -326,7 +326,7 @@ INLINE SDL_BlendMode map_blendmode(int blendmode)
 	return SDL_BLENDMODE_NONE;
 }
 
-INLINE void set_coloralphamode(SDL_Texture	*texture_id, const render_color *color)
+INLINE void set_coloralphamode(SDL_Texture  *texture_id, const render_color *color)
 {
 	UINT32 sr = (UINT32)(255.0f * color->r);
 	UINT32 sg = (UINT32)(255.0f * color->g);
@@ -360,7 +360,7 @@ INLINE void set_coloralphamode(SDL_Texture	*texture_id, const render_color *colo
 
 INLINE void render_quad(sdl_info *sdl, texture_info *texture, render_primitive *prim, int x, int y)
 {
-	SDL_Texture	*texture_id;
+	SDL_Texture *texture_id;
 	SDL_Rect target_rect;
 
 	target_rect.x = x;
@@ -412,10 +412,10 @@ INLINE void render_quad(sdl_info *sdl, texture_info *texture, render_primitive *
 #if 0
 static int RendererSupportsFormat(Uint32 format, Uint32 access, const char *sformat)
 {
-    struct SDL_RendererInfo render_info;
+	struct SDL_RendererInfo render_info;
 	int i;
 
-    SDL_GetRendererInfo(&render_info);
+	SDL_GetRendererInfo(&render_info);
 
 	for (i=0; i < render_info.num_texture_formats; i++)
 	{
@@ -470,7 +470,7 @@ static void add_list(copy_info **head, copy_info *element, Uint32 bm)
 
 static void expand_copy_info(copy_info *list)
 {
-	copy_info	*bi;
+	copy_info   *bi;
 
 	for (bi = list; bi->src_fmt != -1; bi++)
 	{
@@ -605,10 +605,10 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 				mame_printf_warning("Ignoring depth %d\n", window->depth);
 			}
 		}
-		SDL_SetWindowDisplayMode(window->sdl_window, &mode);	// Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
 	}
 	else
-		SDL_SetWindowDisplayMode(window->sdl_window, NULL);	// Use desktop
+		SDL_SetWindowDisplayMode(window->sdl_window, NULL); // Use desktop
 
 	// create renderer
 
@@ -622,7 +622,7 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 		fatalerror("Error on creating renderer: %s\n", SDL_GetError());
 	}
 
-    //SDL_SelectRenderer(window->sdl_window);
+	//SDL_SelectRenderer(window->sdl_window);
 
 	SDL_ShowWindow(window->sdl_window);
 	//SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
@@ -713,7 +713,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		return 0;
 	}
 
-    if (sdl->resize_pending)
+	if (sdl->resize_pending)
 	{
 		SDL_SetWindowSize(window->sdl_window, sdl->resize_width, sdl->resize_height);
 		SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
@@ -721,7 +721,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		SDL_RenderSetViewport(sdl->sdl_renderer, NULL);
 	}
 
-    //SDL_SelectRenderer(window->sdl_window);
+	//SDL_SelectRenderer(window->sdl_window);
 
 	if (sdl->blittimer > 0)
 	{
@@ -916,7 +916,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-            texture->format = texsource->palette ? SDL_TEXFORMAT_RGB32_PALETTED : SDL_TEXFORMAT_RGB32;
+			texture->format = texsource->palette ? SDL_TEXFORMAT_RGB32_PALETTED : SDL_TEXFORMAT_RGB32;
 			break;
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
@@ -960,8 +960,8 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 	if ( (texture->copyinfo->func != NULL) && (texture->sdl_access == SDL_TEXTUREACCESS_STATIC))
 	{
 		texture->pixels = osd_malloc_array(texture->setup.rotwidth * texture->setup.rotheight * texture->copyinfo->dst_bpp);
-	 texture->pixels_own=TRUE;
- }
+		texture->pixels_own=TRUE;
+	}
 	/* add us to the texture list */
 	texture->next = sdl->texlist;
 	sdl->texlist = texture;
@@ -981,10 +981,10 @@ static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_
 	if (texture->sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
 		if ( texture->copyinfo->func )
-	    {
+		{
 			texture->pitch = texture->setup.rotwidth * texture->copyinfo->dst_bpp;
 			texture->copyinfo->func(texture, texsource);
-	    }
+		}
 		else
 		{
 			texture->pixels = texsource->base;
@@ -1130,11 +1130,11 @@ static texture_info * texture_update(sdl_window_info *window, const render_primi
 
 	// if we didn't find one, create a new texture
 	if (texture == NULL && prim->texture.base != NULL)
-    {
-        texture = texture_create(window, &prim->texture, &setup, prim->flags);
-    }
+	{
+		texture = texture_create(window, &prim->texture, &setup, prim->flags);
+	}
 
-    if (texture != NULL)
+	if (texture != NULL)
 	{
 		if (prim->texture.base != NULL && texture->texinfo.seqid != prim->texture.seqid)
 		{
@@ -1144,7 +1144,7 @@ static texture_info * texture_update(sdl_window_info *window, const render_primi
 		}
 
 	}
-    return texture;
+	return texture;
 }
 
 static void draw13_destroy_texture(sdl_info *sdl, texture_info *texture)
@@ -1163,7 +1163,7 @@ static void draw13_destroy_texture(sdl_info *sdl, texture_info *texture)
 		if (p->next == texture)
 			break;
 	if (p == NULL)
-	    sdl->texlist = NULL;
+		sdl->texlist = NULL;
 	else
 		p->next = texture->next;
 	osd_free(texture);

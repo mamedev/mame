@@ -91,4 +91,3 @@ UINT32 iqblock_state::screen_update_iqblock(screen_device &screen, bitmap_ind16 
 
 	return 0;
 }
-

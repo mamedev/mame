@@ -21,7 +21,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define APRICOT_KEYBOARD_TAG	"aprikb"
+#define APRICOT_KEYBOARD_TAG    "aprikb"
 
 
 
@@ -30,7 +30,7 @@
 //**************************************************************************
 
 #define MCFG_APRICOT_KEYBOARD_ADD(_config) \
-    MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0) \
+	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -47,18 +47,18 @@
 
 struct apricot_keyboard_interface
 {
-	devcb_write_line	m_out_txd_cb;
+	devcb_write_line    m_out_txd_cb;
 };
 
 
 // ======================> apricot_keyboard_device
 
 class apricot_keyboard_device :  public device_t,
-								 public apricot_keyboard_interface
+									public apricot_keyboard_interface
 {
 public:
-    // construction/destruction
-    apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -77,13 +77,13 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_yc_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line	m_out_txd_func;
+	devcb_resolved_write_line   m_out_txd_func;
 
 	UINT16 m_kb_y;
 };

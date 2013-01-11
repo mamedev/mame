@@ -50,18 +50,18 @@ static void update_optic(int which);
 struct stepper
 {
 	const stepper_interface *intf;
-	UINT8	 pattern,	/* coil pattern */
-		 old_pattern,	/* old coil pattern */
-		   initphase,
-		       phase,	/* motor phase */
-		   old_phase,	/* old phase */
-			    type;	/* reel type */
-	INT16	step_pos,	/* step position 0 - max_steps */
-			max_steps;	/* maximum step position */
+	UINT8    pattern,   /* coil pattern */
+			old_pattern,    /* old coil pattern */
+			initphase,
+				phase,  /* motor phase */
+			old_phase,  /* old phase */
+				type;   /* reel type */
+	INT16   step_pos,   /* step position 0 - max_steps */
+			max_steps;  /* maximum step position */
 
-	INT16 index_start,	/* start position of index (in half steps) */
-			index_end,	/* end position of index (in half steps) */
-			index_patt;	/* pattern needed on coils (0=don't care) */
+	INT16 index_start,  /* start position of index (in half steps) */
+			index_end,  /* end position of index (in half steps) */
+			index_patt; /* pattern needed on coils (0=don't care) */
 
 	UINT8 optic;
 };
@@ -117,9 +117,9 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 
 	step[which].type = intf->type;
 	step[which].index_start = intf->index_start;/* location of first index value in half steps */
-	step[which].index_end	= intf->index_end;	/* location of last index value in half steps */
-	step[which].index_patt	= intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
-	step[which].initphase	= intf->initphase; /* Phase at 0 steps, for alignment) */
+	step[which].index_end   = intf->index_end;  /* location of last index value in half steps */
+	step[which].index_patt  = intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
+	step[which].initphase   = intf->initphase; /* Phase at 0 steps, for alignment) */
 
 
 	step[which].pattern     = 0;
@@ -130,7 +130,7 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 
 
 	switch ( step[which].type )
-	{	default:
+	{   default:
 		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
 		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
 		case MPU3_48STEP_REEL :
@@ -245,21 +245,21 @@ int stepper_update(int which, UINT8 pattern)
 	int changed = 0;
 
 	/* This code probably makes more sense if you visualise what is being emulated, namely
-    a spinning drum with two electromagnets inside. Essentially, the CPU
-    activates a pair of windings on these magnets leads as necessary to attract and repel the drum to pull it round and
-    display as appropriate. To attempt to visualise the rotation effect, take a look at the compass rose below, representing a side on view of the reel,
-    the numbers indicate the phase information as used
+	a spinning drum with two electromagnets inside. Essentially, the CPU
+	activates a pair of windings on these magnets leads as necessary to attract and repel the drum to pull it round and
+	display as appropriate. To attempt to visualise the rotation effect, take a look at the compass rose below, representing a side on view of the reel,
+	the numbers indicate the phase information as used
 
-        7
-        N
-    1 W   E 5
-        S
-        3
+	    7
+	    N
+	1 W   E 5
+	    S
+	    3
 
-    For sake of accuracy, we're representing all possible phases of the motor, effectively moving the motor one half step at a time, so a 48 step motor becomes
-    96 half steps. This is necessary because of some programs running the wiring in series with a distinct delay between the pair being completed. This causes
-    a small movement that may trigger the optic tab.
-    */
+	For sake of accuracy, we're representing all possible phases of the motor, effectively moving the motor one half step at a time, so a 48 step motor becomes
+	96 half steps. This is necessary because of some programs running the wiring in series with a distinct delay between the pair being completed. This causes
+	a small movement that may trigger the optic tab.
+	*/
 
 	int pos,steps=0;
 	step[which].pattern = pattern;
@@ -301,7 +301,7 @@ int stepper_update(int which, UINT8 pattern)
 			case 0x0A://  1     0     1     0
 			step[which].phase = 0;
 			break;
-            //          Black  Blue  Red  Yellow
+			//          Black  Blue  Red  Yellow
 			case 0x03://  0     0     1     1
 			{
 				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
@@ -336,7 +336,7 @@ int stepper_update(int which, UINT8 pattern)
 		//Gamesman 48 step uses this pattern shifted one place forward, though this shouldn't matter
 		switch (pattern)
 		{
-		 //             Yellow   Brown  Orange Black
+			//             Yellow   Brown  Orange Black
 			case 0x01://  0        0      0      1
 			step[which].phase = 7;
 			break;
@@ -363,7 +363,7 @@ int stepper_update(int which, UINT8 pattern)
 			break;
 
 			// The below values should not be used by anything sane, as they effectively ignore one stator side entirely
-		    //          Yellow   Brown  Orange Black
+			//          Yellow   Brown  Orange Black
 			case 0x05://   0       1       0     1
 			{
 				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
@@ -394,9 +394,9 @@ int stepper_update(int which, UINT8 pattern)
 
 		case MPU3_48STEP_REEL :
 		/* The MPU3 interface is actually the same as the MPU4 setup, but with two active lines instead of four
-           Inverters are used so if a pin is low, the higher bit of the pair is activated, and if high the lower bit is activated.
-           TODO:Check this, 2 and 1 could be switched over.
-         */
+		   Inverters are used so if a pin is low, the higher bit of the pair is activated, and if high the lower bit is activated.
+		   TODO:Check this, 2 and 1 could be switched over.
+		 */
 		switch (pattern)
 		{
 		//             Yellow(2)   Brown(1)  Orange(!2) Black(!1)

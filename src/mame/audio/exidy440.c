@@ -12,29 +12,29 @@
 #include "audio/exidy440.h"
 
 
-#define	SOUND_LOG		0
-#define	FADE_TO_ZERO	1
+#define SOUND_LOG       0
+#define FADE_TO_ZERO    1
 
 
-#define EXIDY440_AUDIO_CLOCK	(XTAL_12_9792MHz / 16)
-#define EXIDY440_MC3418_CLOCK	(EXIDY440_AUDIO_CLOCK / 16)
-#define EXIDY440_MC3417_CLOCK	(EXIDY440_AUDIO_CLOCK / 32)
+#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 16)
+#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 16)
+#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 32)
 
 
 /* internal caching */
-#define	MAX_CACHE_ENTRIES		1024				/* maximum separate samples we expect to ever see */
-#define	SAMPLE_BUFFER_LENGTH	1024				/* size of temporary decode buffer on the stack */
+#define MAX_CACHE_ENTRIES       1024                /* maximum separate samples we expect to ever see */
+#define SAMPLE_BUFFER_LENGTH    1024                /* size of temporary decode buffer on the stack */
 
 /* FIR digital filter parameters */
-#define	FIR_HISTORY_LENGTH		57					/* number of FIR coefficients */
+#define FIR_HISTORY_LENGTH      57                  /* number of FIR coefficients */
 
 /* CVSD decoding parameters */
-#define	INTEGRATOR_LEAK_TC		(10e3 * 0.1e-6)
-#define	FILTER_DECAY_TC			((18e3 + 3.3e3) * 0.33e-6)
-#define	FILTER_CHARGE_TC		(18e3 * 0.33e-6)
-#define	FILTER_MIN				0.0416
-#define	FILTER_MAX				1.0954
-#define	SAMPLE_GAIN				10000.0
+#define INTEGRATOR_LEAK_TC      (10e3 * 0.1e-6)
+#define FILTER_DECAY_TC         ((18e3 + 3.3e3) * 0.33e-6)
+#define FILTER_CHARGE_TC        (18e3 * 0.33e-6)
+#define FILTER_MIN              0.0416
+#define FILTER_MAX              1.0954
+#define SAMPLE_GAIN             10000.0
 
 
 /* channel_data structure holds info about each 6844 DMA channel */
@@ -105,8 +105,8 @@ struct exidy440_audio_state
 /* constant channel parameters */
 static const int channel_bits[4] =
 {
-	4, 4,									/* channels 0 and 1 are MC3418s, 4-bit CVSD */
-	3, 3									/* channels 2 and 3 are MC3417s, 3-bit CVSD */
+	4, 4,                                   /* channels 0 and 1 are MC3418s, 4-bit CVSD */
+	3, 3                                    /* channels 2 and 3 are MC3417s, 3-bit CVSD */
 };
 
 
@@ -125,7 +125,7 @@ static void fir_filter(device_t *device, INT32 *input, INT16 *output, int count)
 
 
 class exidy440_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -158,9 +158,9 @@ extern const device_type EXIDY440;
 INLINE exidy440_audio_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-        assert(device->type() == EXIDY440);
+		assert(device->type() == EXIDY440);
 
-        return (exidy440_audio_state *)downcast<exidy440_sound_device *>(device)->token();
+		return (exidy440_audio_state *)downcast<exidy440_sound_device *>(device)->token();
 }
 
 static DEVICE_START( exidy440_sound )
@@ -543,9 +543,9 @@ static READ8_DEVICE_HANDLER( m6844_r )
 			/* update the global DMA end flag */
 			state->m6844_interrupt &= ~0x80;
 			state->m6844_interrupt |= (m6844_channel[0].control & 0x80) |
-			                   (m6844_channel[1].control & 0x80) |
-			                   (m6844_channel[2].control & 0x80) |
-			                   (m6844_channel[3].control & 0x80);
+								(m6844_channel[1].control & 0x80) |
+								(m6844_channel[2].control & 0x80) |
+								(m6844_channel[3].control & 0x80);
 
 			result = state->m6844_interrupt;
 			break;
@@ -993,7 +993,7 @@ const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
 
 exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(exidy440_audio_state);
 }

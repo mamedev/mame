@@ -7,7 +7,7 @@ class alvg_state : public driver_device
 public:
 	alvg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -241,11 +241,11 @@ ROM_START(usafootb)
 ROM_END
 
 
-GAME(1991,	agsoccer,	0,			alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"A.G. Soccer Ball",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,	wrldtour,	0,			alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"Al's Garage Band Goes On A World Tour",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,	wrldtour2,	wrldtour,	alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"Al's Garage Band Goes On A World Tour R02b",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	usafootb,	0,			alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"U.S.A. Football",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	mystcast,	0,			alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"Mystery Castle",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	pstlpkr,	0,			alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"Pistol Poker",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	punchy,		0,			alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"Punchy The Clown",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1993,	dinoeggs,	0,			alvg,	alvg, alvg_state,	alvg,	ROT0,	"Alvin G",				"Dinosaur Eggs",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1991,  agsoccer,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "A.G. Soccer Ball",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  wrldtour,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "Al's Garage Band Goes On A World Tour",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,  wrldtour2,  wrldtour,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "Al's Garage Band Goes On A World Tour R02b",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  usafootb,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "U.S.A. Football",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  mystcast,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "Mystery Castle",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  pstlpkr,    0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "Pistol Poker",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  punchy,     0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "Punchy The Clown",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1993,  dinoeggs,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",              "Dinosaur Eggs",                GAME_IS_SKELETON_MECHANICAL)

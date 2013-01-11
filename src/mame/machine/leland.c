@@ -21,14 +21,14 @@
  *************************************/
 
 /* define these to 0 to disable, or to 1 to enable */
-#define LOG_KEYCARDS		0
-#define LOG_KEYCARDS_FULL	0
-#define LOG_BANKSWITCHING_M	0
-#define LOG_BANKSWITCHING_S	0
-#define LOG_SOUNDPORT		0
-#define LOG_EEPROM			0
-#define LOG_BATTERY_RAM		0
-#define LOG_XROM			0
+#define LOG_KEYCARDS        0
+#define LOG_KEYCARDS_FULL   0
+#define LOG_BANKSWITCHING_M 0
+#define LOG_BANKSWITCHING_S 0
+#define LOG_SOUNDPORT       0
+#define LOG_EEPROM          0
+#define LOG_BATTERY_RAM     0
+#define LOG_XROM            0
 
 
 
@@ -639,31 +639,31 @@ void leland_init_eeprom(running_machine &machine, UINT8 default_val, const UINT1
 	UINT32 serial;
 
 	/*
-        NOTE: This code is just illustrative, and explains how to generate the
-        serial numbers for the classic Leland games. We currently load default
-        EEPROM data from the ROMs rather than generating it.
+	    NOTE: This code is just illustrative, and explains how to generate the
+	    serial numbers for the classic Leland games. We currently load default
+	    EEPROM data from the ROMs rather than generating it.
 
-        Here are the input parameters for various games:
+	    Here are the input parameters for various games:
 
-            game        default_val     serial_offset   serial_type
-            cerberus    0x00            0               SERIAL_TYPE_NONE
-            mayhem      0x00            0x28            SERIAL_TYPE_ADD
-            powrplay    0xff            0x2d            SERIAL_TYPE_ADD_XOR
-            wseries     0xff            0x12            SERIAL_TYPE_ENCRYPT_XOR
-            alleymas    0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
-            upyoural    0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
-            dangerz     0xff            0x10            SERIAL_TYPE_ENCRYPT_XOR
-            basebal2    0xff            0x12            SERIAL_TYPE_ENCRYPT_XOR
-            dblplay     0xff            0x11            SERIAL_TYPE_ENCRYPT_XOR
-            strkzone    0xff            0x0f            SERIAL_TYPE_ENCRYPT_XOR
-            redlin2p    0xff            0x18            SERIAL_TYPE_ENCRYPT_XOR
-            quarterb    0xff            0x24            SERIAL_TYPE_ENCRYPT_XOR
-            viper       0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
-            teamqb      0xff            0x1a            SERIAL_TYPE_ENCRYPT_XOR
-            aafb        0xff            0x1a            SERIAL_TYPE_ENCRYPT_XOR
-            offroad     0xff            0x00            SERIAL_TYPE_ENCRYPT_XOR
-            pigout      0xff            0x00            SERIAL_TYPE_ENCRYPT
-    */
+	        game        default_val     serial_offset   serial_type
+	        cerberus    0x00            0               SERIAL_TYPE_NONE
+	        mayhem      0x00            0x28            SERIAL_TYPE_ADD
+	        powrplay    0xff            0x2d            SERIAL_TYPE_ADD_XOR
+	        wseries     0xff            0x12            SERIAL_TYPE_ENCRYPT_XOR
+	        alleymas    0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
+	        upyoural    0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
+	        dangerz     0xff            0x10            SERIAL_TYPE_ENCRYPT_XOR
+	        basebal2    0xff            0x12            SERIAL_TYPE_ENCRYPT_XOR
+	        dblplay     0xff            0x11            SERIAL_TYPE_ENCRYPT_XOR
+	        strkzone    0xff            0x0f            SERIAL_TYPE_ENCRYPT_XOR
+	        redlin2p    0xff            0x18            SERIAL_TYPE_ENCRYPT_XOR
+	        quarterb    0xff            0x24            SERIAL_TYPE_ENCRYPT_XOR
+	        viper       0xff            0x0c            SERIAL_TYPE_ENCRYPT_XOR
+	        teamqb      0xff            0x1a            SERIAL_TYPE_ENCRYPT_XOR
+	        aafb        0xff            0x1a            SERIAL_TYPE_ENCRYPT_XOR
+	        offroad     0xff            0x00            SERIAL_TYPE_ENCRYPT_XOR
+	        pigout      0xff            0x00            SERIAL_TYPE_ENCRYPT
+	*/
 
 	/* initialize everything to the default value */
 	memset(eeprom_data, default_val, sizeof(eeprom_data));
@@ -679,9 +679,9 @@ void leland_init_eeprom(running_machine &machine, UINT8 default_val, const UINT1
 
 	/* pick a serial number -- examples of real serial numbers:
 
-        Team QB:      21101957
-        AAFB:         26101119 and 26101039
-    */
+	    Team QB:      21101957
+	    AAFB:         26101119 and 26101039
+	*/
 	serial = 0x12345678;
 
 	/* switch off the serial number type */
@@ -751,10 +751,10 @@ void ataxx_init_eeprom(running_machine &machine, const UINT16 *data)
 	UINT32 serial;
 
 	/*
-        NOTE: This code is just illustrative, and explains how to generate the
-        serial numbers for the classic Leland games. We currently load default
-        EEPROM data from the ROMs rather than generating it.
-    */
+	    NOTE: This code is just illustrative, and explains how to generate the
+	    serial numbers for the classic Leland games. We currently load default
+	    EEPROM data from the ROMs rather than generating it.
+	*/
 
 	/* initialize everything to the default value */
 	memset(eeprom_data, default_val, sizeof(eeprom_data));
@@ -770,9 +770,9 @@ void ataxx_init_eeprom(running_machine &machine, const UINT16 *data)
 
 	/* pick a serial number -- examples of real serial numbers:
 
-        WSF:         30101190
-        Indy Heat:   31201339
-    */
+	    WSF:         30101190
+	    Indy Heat:   31201339
+	*/
 	serial = 0x12345678;
 
 	/* encrypt the serial number */
@@ -931,7 +931,7 @@ static int keycard_r(running_machine &machine)
 		/* clock in new data */
 		if (state->m_keycard_bit == 1)
 		{
-			state->m_keycard_shift = 0xff;	/* no data, but this is where we would clock it in */
+			state->m_keycard_shift = 0xff;  /* no data, but this is where we would clock it in */
 			if (LOG_KEYCARDS) logerror("  (clocked in %02X)\n", state->m_keycard_shift);
 		}
 
@@ -1024,16 +1024,16 @@ READ8_MEMBER(leland_state::leland_master_analog_key_r)
 
 	switch (offset)
 	{
-		case 0x00:	/* FD = analog data read */
+		case 0x00:  /* FD = analog data read */
 			result = m_analog_result;
 			break;
 
-		case 0x01:	/* FE = analog status read */
+		case 0x01:  /* FE = analog status read */
 			/* bit 7 indicates the analog input is busy for some games */
 			result = 0x00;
 			break;
 
-		case 0x02:	/* FF = keycard serial data read */
+		case 0x02:  /* FF = keycard serial data read */
 			result = keycard_r(machine());
 
 			/* bit 7 indicates the analog input is busy for some games */
@@ -1051,10 +1051,10 @@ WRITE8_MEMBER(leland_state::leland_master_analog_key_w)
 
 	switch (offset)
 	{
-		case 0x00:	/* FD = analog port trigger */
+		case 0x00:  /* FD = analog port trigger */
 			break;
 
-		case 0x01:	/* FE = analog port select/bankswitch */
+		case 0x01:  /* FE = analog port select/bankswitch */
 			m_analog_result = ioport(portnames[data & 15])->read();
 
 			/* update top board banking for some games */
@@ -1065,7 +1065,7 @@ WRITE8_MEMBER(leland_state::leland_master_analog_key_w)
 			(*m_update_master_bank)(machine());
 			break;
 
-		case 0x02:	/* FF = keycard data write */
+		case 0x02:  /* FF = keycard data write */
 			keycard_w(machine(), data);
 			break;
 	}
@@ -1085,31 +1085,31 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 
 	switch (offset)
 	{
-		case 0x00:	/* /GIN0 */
+		case 0x00:  /* /GIN0 */
 			result = ioport("IN0")->read();
 			break;
 
-		case 0x01:	/* /GIN1 */
+		case 0x01:  /* /GIN1 */
 			result = ioport("IN1")->read();
 			if (machine().device("slave")->state().state_int(Z80_HALT))
 				result ^= 0x01;
 			break;
 
-		case 0x02:	/* /GIN2 */
+		case 0x02:  /* /GIN2 */
 		case 0x12:
 			machine().device("master")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
-		case 0x03:	/* /IGID */
+		case 0x03:  /* /IGID */
 		case 0x13:
 			result = ay8910_r(machine().device("ay8910.1"), space, offset);
 			break;
 
-		case 0x10:	/* /GIN0 */
+		case 0x10:  /* /GIN0 */
 			result = ioport("IN2")->read();
 			break;
 
-		case 0x11:	/* /GIN1 */
+		case 0x11:  /* /GIN1 */
 			result = ioport("IN3")->read();
 			if (LOG_EEPROM) logerror("%04X:EE read\n", space.device().safe_pc());
 			break;
@@ -1128,7 +1128,7 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 
 	switch (offset)
 	{
-		case 0x09:	/* /MCONT */
+		case 0x09:  /* /MCONT */
 			machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			m_wcol_enable = (data & 0x02);
 			machine().device("slave")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
@@ -1142,15 +1142,15 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 			eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
-		case 0x0a:	/* /OGIA */
-		case 0x0b:	/* /OGID */
+		case 0x0a:  /* /OGIA */
+		case 0x0b:  /* /OGID */
 			ay8910_address_data_w(machine().device("ay8910.1"), space, offset, data);
 			break;
 
-		case 0x0c:	/* /BKXL */
-		case 0x0d:	/* /BKXH */
-		case 0x0e:	/* /BKYL */
-		case 0x0f:	/* /BKYH */
+		case 0x0c:  /* /BKXL */
+		case 0x0d:  /* /BKXH */
+		case 0x0e:  /* /BKYL */
+		case 0x0f:  /* /BKYH */
 			leland_scroll_w(space, offset - 0x0c, data);
 			break;
 
@@ -1167,11 +1167,11 @@ READ8_MEMBER(leland_state::ataxx_master_input_r)
 
 	switch (offset)
 	{
-		case 0x06:	/* /GIN0 */
+		case 0x06:  /* /GIN0 */
 			result = ioport("IN0")->read();
 			break;
 
-		case 0x07:	/* /SLVBLK */
+		case 0x07:  /* /SLVBLK */
 			result = ioport("IN1")->read();
 			if (machine().device("slave")->state().state_int(Z80_HALT))
 				result ^= 0x01;
@@ -1189,14 +1189,14 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 {
 	switch (offset)
 	{
-		case 0x00:	/* /BKXL */
-		case 0x01:	/* /BKXH */
-		case 0x02:	/* /BKYL */
-		case 0x03:	/* /BKYH */
+		case 0x00:  /* /BKXL */
+		case 0x01:  /* /BKXH */
+		case 0x02:  /* /BKYL */
+		case 0x03:  /* /BKYH */
 			leland_scroll_w(space, offset, data);
 			break;
 
-		case 0x04:	/* /MBNK */
+		case 0x04:  /* /MBNK */
 			if (LOG_BANKSWITCHING_M)
 				if ((m_master_bank ^ data) & 0xff)
 					logerror("%04X:master_bank = %02X\n", space.device().safe_pc(), data & 0xff);
@@ -1204,13 +1204,13 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 			ataxx_bankswitch(machine());
 			break;
 
-		case 0x05:	/* /SLV0 */
+		case 0x05:  /* /SLV0 */
 			machine().device("slave")->execute().set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			machine().device("slave")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 0x08:	/*  */
+		case 0x08:  /*  */
 			m_master_int_timer->adjust(machine().primary_screen->time_until_pos(data + 1), data + 1);
 			break;
 

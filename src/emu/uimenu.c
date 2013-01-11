@@ -24,8 +24,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define UI_MENU_POOL_SIZE		65536
-#define UI_MENU_ALLOC_ITEMS		256
+#define UI_MENU_POOL_SIZE       65536
+#define UI_MENU_ALLOC_ITEMS     256
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -546,7 +546,7 @@ void ui_menu::draw(bool customonly)
 			if (linenum == 0 && top_line != 0)
 			{
 				container->add_quad(
-						            0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
 									line_y + 0.25f * line_height,
 									0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
 									line_y + 0.75f * line_height,
@@ -655,9 +655,9 @@ void ui_menu::draw(bool customonly)
 
 		/* add a box around that */
 		ui_draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
-						 target_y - UI_BOX_TB_BORDER,
-						 target_x + target_width + UI_BOX_LR_BORDER,
-						 target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+							target_y - UI_BOX_TB_BORDER,
+							target_x + target_width + UI_BOX_LR_BORDER,
+							target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		ui_draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 	}
@@ -716,9 +716,9 @@ void ui_menu::draw_text_box()
 
 	/* add a box around that */
 	ui_draw_outlined_box(container, target_x - UI_BOX_LR_BORDER - gutter_width,
-					 target_y - UI_BOX_TB_BORDER,
-					 target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-					 target_y + target_height + UI_BOX_TB_BORDER, (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
+						target_y - UI_BOX_TB_BORDER,
+						target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
+						target_y + target_height + UI_BOX_TB_BORDER, (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	ui_draw_text_full(container, text, target_x, target_y, target_width,
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 

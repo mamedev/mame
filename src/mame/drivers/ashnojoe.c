@@ -82,7 +82,7 @@ Coin B is not used
 READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 {
 	/* If it returns 1 there's no sound. Is it used to sync the game and sound?
-    or just a debug enable/disable register? */
+	or just a debug enable/disable register? */
 	return 0;
 }
 
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
 	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_SHARE("tilemap_reg")
 	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
-	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)	// ??
+	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)  // ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)
 	AM_RANGE(0x04a020, 0x04a029) AM_WRITE(joe_tilemaps_yscroll_w)
 	AM_RANGE(0x04c000, 0x04ffff) AM_RAM
@@ -255,9 +255,9 @@ static const gfx_layout tiles16x16_layout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
-	 32,36,40, 44, 48, 52, 56, 60 },
+		32,36,40, 44, 48, 52, 56, 60 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+		8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
 	16*64
 };
 

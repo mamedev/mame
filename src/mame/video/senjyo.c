@@ -95,14 +95,14 @@ void senjyo_state::video_start()
 	if (m_is_senjyo)
 	{
 		m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::senjyo_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
-		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
+		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);   /* only 16x32 used by Star Force */
+		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);   /* only 16x32 used by Star Force */
 	}
 	else
 	{
 		m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::starforc_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
-		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
+		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
 	}
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -169,7 +169,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_ind16 &bitmap,const r
 	int x,y,pen,strwid,count;
 
 
-	if (state->m_bgstripes == 0xff)	/* off */
+	if (state->m_bgstripes == 0xff) /* off */
 		bitmap.fill(0, cliprect);
 	else
 	{
@@ -237,9 +237,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (((spriteram[offs+1] & 0x30) >> 4) == priority)
 		{
-			if (state->m_is_senjyo)	/* Senjyo */
+			if (state->m_is_senjyo) /* Senjyo */
 				big = (spriteram[offs] & 0x80);
-			else	/* Star Force */
+			else    /* Star Force */
 				big = ((spriteram[offs] & 0xc0) == 0xc0);
 			sx = spriteram[offs+3];
 			if (big)
@@ -282,8 +282,8 @@ UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &b
 
 
 	/* two colors for the radar dots (verified on the real board) */
-	palette_set_color(machine(),512,MAKE_RGB(0xff,0x00,0x00));	/* red for enemies */
-	palette_set_color(machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
+	palette_set_color(machine(),512,MAKE_RGB(0xff,0x00,0x00));  /* red for enemies */
+	palette_set_color(machine(),513,MAKE_RGB(0xff,0xff,0x00));  /* yellow for player */
 
 	{
 		int flip = flip_screen();
@@ -301,7 +301,7 @@ UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &b
 
 		scrollx = m_scrollx2[0];
 		scrolly = m_scrolly2[0] + 256 * m_scrolly2[1];
-		if (m_scrollhack)	/* Star Force, but NOT the encrypted version */
+		if (m_scrollhack)   /* Star Force, but NOT the encrypted version */
 		{
 			scrollx = m_scrollx1[0];
 			scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];

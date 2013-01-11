@@ -176,12 +176,12 @@ INLINE void set_fregval_d (i860s *cpustate, int fr, double d)
 
 /* Control register numbers.  */
 enum {
-    CR_FIR     = 0,
-    CR_PSR     = 1,
-    CR_DIRBASE = 2,
-    CR_DB      = 3,
-    CR_FSR     = 4,
-    CR_EPSR    = 5
+	CR_FIR     = 0,
+	CR_PSR     = 1,
+	CR_DIRBASE = 2,
+	CR_DB      = 3,
+	CR_FSR     = 4,
+	CR_EPSR    = 5
 };
 
 /* A mask for all the trap bits of the PSR (FT, DAT, IAT, IN, IT, or
@@ -326,8 +326,8 @@ void i860_set_pin (device_t *device, int pin, int val)
 void i860_gen_interrupt (i860s *cpustate)
 {
 	/* If interrupts are enabled, then set PSR.IN and prepare for trap.
-       Otherwise, the external interrupt is ignored.  We also set
-       bit EPSR.INT (which tracks the INT pin).  */
+	   Otherwise, the external interrupt is ignored.  We also set
+	   bit EPSR.INT (which tracks the INT pin).  */
 	if (GET_PSR_IM ())
 	{
 		SET_PSR_IN (1);
@@ -340,7 +340,7 @@ void i860_gen_interrupt (i860s *cpustate)
 	if (GET_PSR_IM ())
 		fprintf (stderr, "[PSR.IN set, preparing to trap]\n");
 	else
-		fprintf	(stderr, "[ignored (interrupts disabled)]\n");
+		fprintf (stderr, "[ignored (interrupts disabled)]\n");
 #endif
 }
 
@@ -356,7 +356,7 @@ static UINT32 ifetch (i860s *cpustate, UINT32 pc)
 	/* If virtual mode, get translation.  */
 	if (GET_DIRBASE_ATE ())
 	{
-		phys_pc = get_address_translation (cpustate, pc, 0	/* is_dataref */, 0	/* is_write */);
+		phys_pc = get_address_translation (cpustate, pc, 0  /* is_dataref */, 0 /* is_write */);
 		cpustate->exiting_ifetch = 0;
 		if (cpustate->pending_trap && (GET_PSR_DAT () || GET_PSR_IAT ()))
 		{
@@ -365,10 +365,10 @@ static UINT32 ifetch (i860s *cpustate, UINT32 pc)
 		}
 	}
 	else
-		phys_pc	= pc;
+		phys_pc = pc;
 
 	/* Since i860 instructions are always stored LSB first (regardless of
-       the BE bit), we need to adjust the instruction below on MSB hosts.  */
+	   the BE bit), we need to adjust the instruction below on MSB hosts.  */
 	w1 = cpustate->program->read_dword(phys_pc);
 #ifdef HOST_MSB
 	BYTE_REV32 (w1);
@@ -419,7 +419,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 		if (is_dataref)
 			SET_PSR_DAT (1);
 		else
-			SET_PSR_IAT	(1);
+			SET_PSR_IAT (1);
 		cpustate->pending_trap = 1;
 
 		/* Dummy return.  */
@@ -428,7 +428,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 
 	/* PDE Check for write protection violations.  */
 	if (is_write && is_dataref
-		&& !(pg_dir_entry & 2)					/* W = 0.  */
+		&& !(pg_dir_entry & 2)                  /* W = 0.  */
 		&& (GET_PSR_U () || GET_EPSR_WP ()))   /* PSR_U = 1 or EPSR_WP = 1.  */
 	{
 		SET_PSR_DAT (1);
@@ -439,12 +439,12 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 
 	/* PDE Check for user-mode access to supervisor pages.  */
 	if (GET_PSR_U ()
-		&& !(pg_dir_entry & 4))					/* U = 0.  */
+		&& !(pg_dir_entry & 4))                 /* U = 0.  */
 	{
 		if (is_dataref)
 			SET_PSR_DAT (1);
 		else
-			SET_PSR_IAT	(1);
+			SET_PSR_IAT (1);
 		cpustate->pending_trap = 1;
 		/* Dummy return.  */
 		return 0;
@@ -467,7 +467,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 		if (is_dataref)
 			SET_PSR_DAT (1);
 		else
-			SET_PSR_IAT	(1);
+			SET_PSR_IAT (1);
 		cpustate->pending_trap = 1;
 
 		/* Dummy return.  */
@@ -476,7 +476,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 
 	/* PTE Check for write protection violations.  */
 	if (is_write && is_dataref
-		&& !(pg_tbl_entry & 2)					/* W = 0.  */
+		&& !(pg_tbl_entry & 2)                  /* W = 0.  */
 		&& (GET_PSR_U () || GET_EPSR_WP ()))   /* PSR_U = 1 or EPSR_WP = 1.  */
 	{
 		SET_PSR_DAT (1);
@@ -487,12 +487,12 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 
 	/* PTE Check for user-mode access to supervisor pages.  */
 	if (GET_PSR_U ()
-		&& !(pg_tbl_entry & 4))					/* U = 0.  */
+		&& !(pg_tbl_entry & 4))                 /* U = 0.  */
 	{
 		if (is_dataref)
 			SET_PSR_DAT (1);
 		else
-			SET_PSR_IAT	(1);
+			SET_PSR_IAT (1);
 		cpustate->pending_trap = 1;
 		/* Dummy return.  */
 		return 0;
@@ -511,7 +511,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 	if (is_write && is_dataref && (pg_tbl_entry & 0x40) == 0)
 	{
 		/* fprintf(stderr, "DAT trap on write without dirty bit v0x%08x/p0x%08x\n",
-           vaddr, (pg_tbl_entry & ~0xfff)|voffset); */
+		   vaddr, (pg_tbl_entry & ~0xfff)|voffset); */
 		SET_PSR_DAT (1);
 		cpustate->pending_trap = 1;
 		/* Dummy return.  */
@@ -523,7 +523,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 
 #ifdef TRACE_ADDR_TRANSLATION
 	fprintf (stderr, "get_address_translation: virt(0x%08x) -> phys(0x%08x)\n",
-			 vaddr, ret);
+				vaddr, ret);
 #endif
 
 	return ret;
@@ -537,7 +537,7 @@ static UINT32 readmemi_emu (i860s *cpustate, UINT32 addr, int size)
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "readmemi_emu: (ATE=%d) addr = 0x%08x, size = %d\n",
-			 GET_DIRBASE_ATE (), addr, size);
+				GET_DIRBASE_ATE (), addr, size);
 #endif
 
 	/* If virtual mode, do translation.  */
@@ -548,7 +548,7 @@ static UINT32 readmemi_emu (i860s *cpustate, UINT32 addr, int size)
 		{
 #ifdef TRACE_PAGE_FAULT
 			fprintf (stderr, "0x%08x: ## Page fault (readmemi_emu).\n",
-					 cpustate->pc);
+						cpustate->pc);
 #endif
 			cpustate->exiting_readmem = 1;
 			return 0;
@@ -601,7 +601,7 @@ static void writememi_emu (i860s *cpustate, UINT32 addr, int size, UINT32 data)
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "writememi_emu: (ATE=%d) addr = 0x%08x, size = %d, data = 0x%08x\n",
-			 GET_DIRBASE_ATE (), addr, size, data);
+				GET_DIRBASE_ATE (), addr, size, data);
 #endif
 
 	/* If virtual mode, do translation.  */
@@ -612,7 +612,7 @@ static void writememi_emu (i860s *cpustate, UINT32 addr, int size, UINT32 data)
 		{
 #ifdef TRACE_PAGE_FAULT
 			fprintf (stderr, "0x%08x: ## Page fault (writememi_emu).\n",
-					 cpustate->pc);
+						cpustate->pc);
 #endif
 			cpustate->exiting_readmem = 2;
 			return;
@@ -658,7 +658,7 @@ static void fp_readmem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *dest)
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "fp_readmem_emu: (ATE=%d) addr = 0x%08x, size = %d\n",
-			 GET_DIRBASE_ATE (), addr, size);
+				GET_DIRBASE_ATE (), addr, size);
 #endif
 
 	assert (size == 4 || size == 8 || size == 16);
@@ -671,7 +671,7 @@ static void fp_readmem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *dest)
 		{
 #ifdef TRACE_PAGE_FAULT
 			fprintf (stderr, "0x%08x: ## Page fault (fp_readmem_emu).\n",
-					 cpustate->pc);
+						cpustate->pc);
 #endif
 			cpustate->exiting_readmem = 3;
 			return;
@@ -725,7 +725,7 @@ static void fp_writemem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *data
 {
 #ifdef TRACE_RDWR_MEM
 	fprintf (stderr, "fp_writemem_emu: (ATE=%d) addr = 0x%08x, size = %d\n",
-			 GET_DIRBASE_ATE (), addr, size);
+				GET_DIRBASE_ATE (), addr, size);
 #endif
 
 	assert (size == 4 || size == 8 || size == 16);
@@ -738,7 +738,7 @@ static void fp_writemem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *data
 		{
 #ifdef TRACE_PAGE_FAULT
 			fprintf (stderr, "0x%08x: ## Page fault (fp_writememi_emu).\n",
-					 cpustate->pc);
+						cpustate->pc);
 #endif
 			cpustate->exiting_readmem = 4;
 			return;
@@ -820,10 +820,10 @@ static void dump_pipe (i860s *cpustate, int type)
 		{
 			if (cpustate->A[i].stat.arp)
 				fprintf (stderr, "[%dd] 0x%016llx ", i + 1,
-						 *(UINT64 *)(&cpustate->A[i].val.d));
+							*(UINT64 *)(&cpustate->A[i].val.d));
 			else
-				fprintf	(stderr, "[%ds] 0x%08x ", i + 1,
-						 *(UINT32 *)(&cpustate->A[i].val.s));
+				fprintf (stderr, "[%ds] 0x%08x ", i + 1,
+							*(UINT32 *)(&cpustate->A[i].val.s));
 		}
 		fprintf (stderr, "\n");
 	}
@@ -837,10 +837,10 @@ static void dump_pipe (i860s *cpustate, int type)
 		{
 			if (cpustate->M[i].stat.mrp)
 				fprintf (stderr, "[%dd] 0x%016llx ", i + 1,
-						 *(UINT64 *)(&cpustate->M[i].val.d));
+							*(UINT64 *)(&cpustate->M[i].val.d));
 			else
-				fprintf	(stderr, "[%ds] 0x%08x ", i + 1,
-						 *(UINT32 *)(&cpustate->M[i].val.s));
+				fprintf (stderr, "[%ds] 0x%08x ", i + 1,
+							*(UINT32 *)(&cpustate->M[i].val.s));
 		}
 		fprintf (stderr, "\n");
 	}
@@ -853,10 +853,10 @@ static void dump_pipe (i860s *cpustate, int type)
 		{
 			if (cpustate->L[i].stat.lrp)
 				fprintf (stderr, "[%dd] 0x%016llx ", i + 1,
-						 *(UINT64 *)(&cpustate->L[i].val.d));
+							*(UINT64 *)(&cpustate->L[i].val.d));
 			else
-				fprintf	(stderr, "[%ds] 0x%08x ", i + 1,
-						 *(UINT32 *)(&cpustate->L[i].val.s));
+				fprintf (stderr, "[%ds] 0x%08x ", i + 1,
+							*(UINT32 *)(&cpustate->L[i].val.s));
 		}
 		fprintf (stderr, "\n");
 	}
@@ -867,10 +867,10 @@ static void dump_pipe (i860s *cpustate, int type)
 		fprintf (stderr, "  I: ");
 		if (cpustate->G.stat.irp)
 			fprintf (stderr, "[1d] 0x%016llx\n",
-					 *(UINT64 *)(&cpustate->G.val.d));
+						*(UINT64 *)(&cpustate->G.val.d));
 		else
-			fprintf	(stderr, "[1s] 0x%08x\n",
-					 *(UINT32 *)(&cpustate->G.val.s));
+			fprintf (stderr, "[1s] 0x%08x\n",
+						*(UINT32 *)(&cpustate->G.val.s));
 	}
 }
 
@@ -900,16 +900,16 @@ static void dump_state (i860s *cpustate)
 	fprintf (stderr, "\n");
 
 	fprintf (stderr, " psr: CC = %d, LCC = %d, SC = %d, IM = %d, U = %d\n",
-			 GET_PSR_CC (), GET_PSR_LCC (), GET_PSR_SC (), GET_PSR_IM (),
-			 GET_PSR_U ());
+				GET_PSR_CC (), GET_PSR_LCC (), GET_PSR_SC (), GET_PSR_IM (),
+				GET_PSR_U ());
 	fprintf (stderr, "      IT/FT/IAT/DAT/IN = %d/%d/%d/%d/%d\n",
-			 GET_PSR_IT (), GET_PSR_FT (), GET_PSR_IAT (),
-			 GET_PSR_DAT (), GET_PSR_IN ());
+				GET_PSR_IT (), GET_PSR_FT (), GET_PSR_IAT (),
+				GET_PSR_DAT (), GET_PSR_IN ());
 	fprintf (stderr, "epsr: INT = %d, OF = %d, BE = %d\n",
-			 GET_EPSR_INT (), GET_EPSR_OF (), GET_EPSR_BE ());
+				GET_EPSR_INT (), GET_EPSR_OF (), GET_EPSR_BE ());
 	fprintf (stderr, " fir: 0x%08x  dirbase: 0x%08x  fsr: 0x%08x\n",
-			 cpustate->cregs[CR_FIR], cpustate->cregs[CR_DIRBASE],
-			 cpustate->cregs[CR_FSR]);
+				cpustate->cregs[CR_FIR], cpustate->cregs[CR_DIRBASE],
+				cpustate->cregs[CR_FSR]);
 	fprintf (stderr, "  pc: 0x%08x\n", cpustate->pc);
 }
 #endif
@@ -946,8 +946,8 @@ static void insn_ld_ctrl (i860s *cpustate, UINT32 insn)
 #endif
 
 	/* If this is a load of the fir, then there are two cases:
-       1. First load of fir after a trap = usual value.
-       2. Not first load of fir after a trap = address of the ld.c insn.  */
+	   1. First load of fir after a trap = usual value.
+	   2. Not first load of fir after a trap = address of the ld.c insn.  */
 	if (csrc2 == CR_FIR)
 	{
 		if (cpustate->fir_gets_trap_addr)
@@ -960,7 +960,7 @@ static void insn_ld_ctrl (i860s *cpustate, UINT32 insn)
 		cpustate->fir_gets_trap_addr = 0;
 	}
 	else
-		set_iregval	(idest, cpustate->cregs[csrc2]);
+		set_iregval (idest, cpustate->cregs[csrc2]);
 }
 
 
@@ -980,11 +980,11 @@ static void insn_st_ctrl (i860s *cpustate, UINT32 insn)
 #endif
 
 	/* Look for ITI bit turned on (but it never actually is written --
-       it always appears to be 0).  */
+	   it always appears to be 0).  */
 	if (csrc2 == CR_DIRBASE && (get_iregval (isrc1) & 0x20))
 	{
 		/* NOTE: The actual icache and TLB flush are unimplemented for
-           the MAME version.  */
+		   the MAME version.  */
 
 		/* Make sure ITI isn't actually written.  */
 		set_iregval (isrc1, (get_iregval (isrc1) & ~0x20));
@@ -1001,8 +1001,8 @@ static void insn_st_ctrl (i860s *cpustate, UINT32 insn)
 	{
 		UINT32 enew = 0, tmp = 0;
 		/* Make sure unchangeable EPSR bits stay unchanged (DCS, stepping,
-           and type).  Also, some bits are only writeable in supervisor
-           mode.  */
+		   and type).  Also, some bits are only writeable in supervisor
+		   mode.  */
 		if (GET_PSR_U ())
 		{
 			enew = get_iregval (isrc1) & ~(0x003e1fff | 0x00c06000);
@@ -1067,13 +1067,13 @@ static void insn_ldx (i860s *cpustate, UINT32 insn)
 		eff = (UINT32)(immsrc1 + (INT32)(get_iregval (isrc2)));
 	}
 	else
-		eff	= get_iregval (isrc1) + get_iregval (isrc2);
+		eff = get_iregval (isrc1) + get_iregval (isrc2);
 
 #ifdef TRACE_UNALIGNED_MEM
 	if (eff & (size - 1))
 	{
 		fprintf (stderr, "0x%08x: Unaligned access detected (0x%08x).\n",
-				 cpustate->pc, eff);
+					cpustate->pc, eff);
 		SET_PSR_DAT (1);
 		cpustate->pending_trap = 1;
 		return;
@@ -1082,9 +1082,9 @@ static void insn_ldx (i860s *cpustate, UINT32 insn)
 
 	/* The i860 sign-extends 8- or 16-bit integer loads.
 
-       Below, the readmemi_emu() needs to happen outside of the
-       set_iregval macro (otherwise the readmem won't occur if r0
-       is the target register).  */
+	   Below, the readmemi_emu() needs to happen outside of the
+	   set_iregval macro (otherwise the readmem won't occur if r0
+	   is the target register).  */
 	if (size < 4)
 	{
 		UINT32 readval = sign_ext (readmemi_emu (cpustate, eff, size), size * 8);
@@ -1160,7 +1160,7 @@ static void insn_fsty (i860s *cpustate, UINT32 insn)
 	form_disp_reg = (insn & 0x04000000);
 
 	/* FIXME: Check for undefined behavior, non-even or non-quad
-       register operands for fst.d and fst.q respectively.  */
+	   register operands for fst.d and fst.q respectively.  */
 
 	/* Get effective address depending on disp+reg or reg+reg form.  */
 	if (form_disp_reg)
@@ -1170,13 +1170,13 @@ static void insn_fsty (i860s *cpustate, UINT32 insn)
 		eff = (UINT32)(immsrc1 + (INT32)(get_iregval (isrc2)));
 	}
 	else
-		eff	= get_iregval (isrc1) + get_iregval (isrc2);
+		eff = get_iregval (isrc1) + get_iregval (isrc2);
 
 #ifdef TRACE_UNALIGNED_MEM
 	if (eff & (size - 1))
 	{
 		fprintf (stderr, "0x%08x: Unaligned access detected (0x%08x).\n",
-				 cpustate->pc, eff);
+					cpustate->pc, eff);
 		SET_PSR_DAT (1);
 		cpustate->pending_trap = 1;
 		return;
@@ -1204,7 +1204,7 @@ static void insn_fsty (i860s *cpustate, UINT32 insn)
 	else if (size == 8)
 		fp_writemem_emu (cpustate, eff, size, (UINT8 *)(&cpustate->frg[4 * (31 - (fdest + 1))]), 0xff);
 	else
-		fp_writemem_emu	(cpustate, eff, size, (UINT8 *)(&cpustate->frg[4 * (31 - (fdest + 3))]), 0xff);
+		fp_writemem_emu (cpustate, eff, size, (UINT8 *)(&cpustate->frg[4 * (31 - (fdest + 3))]), 0xff);
 
 }
 
@@ -1240,7 +1240,7 @@ static void insn_fldy (i860s *cpustate, UINT32 insn)
 	}
 
 	/* FIXME: Check for undefined behavior, non-even or non-quad
-       register operands for fld.d and fld.q respectively.  */
+	   register operands for fld.d and fld.q respectively.  */
 
 	/* Get effective address depending on disp+reg or reg+reg form.  */
 	if (form_disp_reg)
@@ -1250,7 +1250,7 @@ static void insn_fldy (i860s *cpustate, UINT32 insn)
 		eff = (UINT32)(immsrc1 + (INT32)(get_iregval (isrc2)));
 	}
 	else
-		eff	= get_iregval (isrc1) + get_iregval (isrc2);
+		eff = get_iregval (isrc1) + get_iregval (isrc2);
 
 	/* Do (post) auto-increment.  */
 	if (auto_inc)
@@ -1271,7 +1271,7 @@ static void insn_fldy (i860s *cpustate, UINT32 insn)
 	if (eff & (size - 1))
 	{
 		fprintf (stderr, "0x%08x: Unaligned access detected (0x%08x).\n",
-				 cpustate->pc, eff);
+					cpustate->pc, eff);
 		SET_PSR_DAT (1);
 		cpustate->pending_trap = 1;
 		return;
@@ -1284,7 +1284,7 @@ static void insn_fldy (i860s *cpustate, UINT32 insn)
 	{
 		/* Scalar version writes the current result to fdest.  */
 		/* Read data at 'eff' into freg 'fdest' (reads to f0 or f1 are
-           thrown away).  */
+		   thrown away).  */
 		if (fdest > 1)
 		{
 			if (size == 4)
@@ -1298,17 +1298,17 @@ static void insn_fldy (i860s *cpustate, UINT32 insn)
 	else
 	{
 		/* Read the data into a temp space first.  This way we can test
-           for any traps before updating the pipeline.  The pipeline must
-           stay unaffected after a trap so that the instruction can be
-           properly restarted.  */
+		   for any traps before updating the pipeline.  The pipeline must
+		   stay unaffected after a trap so that the instruction can be
+		   properly restarted.  */
 		UINT8 bebuf[8];
 		fp_readmem_emu (cpustate, eff, size, bebuf);
 		if (cpustate->pending_trap && cpustate->exiting_readmem)
 			goto ab_op;
 
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the LRP
-           bit of the stage's result-status bits.  */
+		   stage of the pipeline, with precision specified by the LRP
+		   bit of the stage's result-status bits.  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 		/* Copy 3rd stage LRP to FSR.  */
 		if (cpustate->L[1 /* 2 */].stat.lrp)
@@ -1368,7 +1368,7 @@ static void insn_pstd (i860s *cpustate, UINT32 insn)
 	int orig_pm = pm;
 
 	/* Get the pixel size, where:
-       PS: 0 = 8 bits, 1 = 16 bits, 2 = 32-bits.  */
+	   PS: 0 = 8 bits, 1 = 16 bits, 2 = 32-bits.  */
 	int ps = GET_PSR_PS ();
 
 #ifdef TRACE_UNDEFINED_I860
@@ -1378,7 +1378,7 @@ static void insn_pstd (i860s *cpustate, UINT32 insn)
 
 #ifdef TRACE_UNDEFINED_I860
 	/* Bits 2 and 1 determine the operand size, which must always be
-       zero (indicating a 64-bit operand).  */
+	   zero (indicating a 64-bit operand).  */
 	if (insn & 0x6)
 	{
 		/* Undefined i860XR behavior.  */
@@ -1396,7 +1396,7 @@ static void insn_pstd (i860s *cpustate, UINT32 insn)
 	if (eff & (8 - 1))
 	{
 		fprintf (stderr, "0x%08x: Unaligned access detected (0x%08x).\n",
-				 cpustate->pc, eff);
+					cpustate->pc, eff);
 		SET_PSR_DAT (1);
 		cpustate->pending_trap = 1;
 		return;
@@ -1408,7 +1408,7 @@ static void insn_pstd (i860s *cpustate, UINT32 insn)
 		set_iregval (isrc2, eff);
 
 	/* Update the the pixel mask depending on the pixel size.  Shift PM
-       right by 8/2^ps bits.  */
+	   right by 8/2^ps bits.  */
 	if (ps == 0)
 		pm = (pm >> 8) & 0x00;
 	else if (ps == 1)
@@ -1418,8 +1418,8 @@ static void insn_pstd (i860s *cpustate, UINT32 insn)
 	SET_PSR_PM (pm);
 
 	/* Write data (value of freg fdest) to memory at eff-- but only those
-       bytes that are enabled by the bits in PSR.PM.  Bit 0 of PM selects
-       the pixel at the lowest address.  */
+	   bytes that are enabled by the bits in PSR.PM.  Bit 0 of PM selects
+	   the pixel at the lowest address.  */
 	wmask = 0;
 	for (i = 0; i < 8; )
 	{
@@ -1478,15 +1478,15 @@ static void insn_addu (i860s *cpustate, UINT32 insn)
 	src1val = get_iregval (get_isrc1 (insn));
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val + get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For unsigned:
-         OF = bit 31 carry
-         CC = bit 31 carry.
-     */
+	   For unsigned:
+	     OF = bit 31 carry
+	     CC = bit 31 carry.
+	 */
 	tmp = (UINT64)src1val + (UINT64)(get_iregval (isrc2));
 	if ((tmp >> 32) & 1)
 	{
@@ -1516,15 +1516,15 @@ static void insn_addu_imm (i860s *cpustate, UINT32 insn)
 	src1val = sign_ext (get_imm16 (insn), 16);
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val + get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For unsigned:
-         OF = bit 31 carry
-         CC = bit 31 carry.
-     */
+	   For unsigned:
+	     OF = bit 31 carry
+	     CC = bit 31 carry.
+	 */
 	tmp = (UINT64)src1val + (UINT64)(get_iregval (isrc2));
 	if ((tmp >> 32) & 1)
 	{
@@ -1554,23 +1554,23 @@ static void insn_adds (i860s *cpustate, UINT32 insn)
 	src1val = get_iregval (get_isrc1 (insn));
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val + get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For signed:
-         OF = standard signed overflow.
-         CC set   if isrc2 < -isrc1
-         CC clear if isrc2 >= -isrc1
-     */
+	   For signed:
+	     OF = standard signed overflow.
+	     CC set   if isrc2 < -isrc1
+	     CC clear if isrc2 >= -isrc1
+	 */
 	sa = src1val & 0x80000000;
 	sb = get_iregval (isrc2) & 0x80000000;
 	sres = tmp_dest_val & 0x80000000;
 	if (sa != sb && sa != sres)
 		SET_EPSR_OF (1);
 	else
-		SET_EPSR_OF	(0);
+		SET_EPSR_OF (0);
 
 	if ((INT32)get_iregval (isrc2) < -(INT32)(src1val))
 		SET_PSR_CC (1);
@@ -1594,23 +1594,23 @@ static void insn_adds_imm (i860s *cpustate, UINT32 insn)
 	src1val = sign_ext (get_imm16 (insn), 16);
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val + get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For signed:
-         OF = standard signed overflow.
-         CC set   if isrc2 < -isrc1
-         CC clear if isrc2 >= -isrc1
-     */
+	   For signed:
+	     OF = standard signed overflow.
+	     CC set   if isrc2 < -isrc1
+	     CC clear if isrc2 >= -isrc1
+	 */
 	sa = src1val & 0x80000000;
 	sb = get_iregval (isrc2) & 0x80000000;
 	sres = tmp_dest_val & 0x80000000;
 	if (sa != sb && sa != sres)
 		SET_EPSR_OF (1);
 	else
-		SET_EPSR_OF	(0);
+		SET_EPSR_OF (0);
 
 	if ((INT32)get_iregval (isrc2) < -(INT32)(src1val))
 		SET_PSR_CC (1);
@@ -1633,17 +1633,17 @@ static void insn_subu (i860s *cpustate, UINT32 insn)
 	src1val = get_iregval (get_isrc1 (insn));
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val - get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For unsigned:
-         OF = NOT(bit 31 carry)
-         CC = bit 31 carry.
-         (i.e. CC set   if isrc2 <= isrc1
-               CC clear if isrc2 > isrc1
-     */
+	   For unsigned:
+	     OF = NOT(bit 31 carry)
+	     CC = bit 31 carry.
+	     (i.e. CC set   if isrc2 <= isrc1
+	           CC clear if isrc2 > isrc1
+	 */
 	if ((UINT32)get_iregval (isrc2) <= (UINT32)src1val)
 	{
 		SET_PSR_CC (1);
@@ -1671,17 +1671,17 @@ static void insn_subu_imm (i860s *cpustate, UINT32 insn)
 	src1val = sign_ext (get_imm16 (insn), 16);
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val - get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For unsigned:
-         OF = NOT(bit 31 carry)
-         CC = bit 31 carry.
-         (i.e. CC set   if isrc2 <= isrc1
-               CC clear if isrc2 > isrc1
-     */
+	   For unsigned:
+	     OF = NOT(bit 31 carry)
+	     CC = bit 31 carry.
+	     (i.e. CC set   if isrc2 <= isrc1
+	           CC clear if isrc2 > isrc1
+	 */
 	if ((UINT32)get_iregval (isrc2) <= (UINT32)src1val)
 	{
 		SET_PSR_CC (1);
@@ -1710,23 +1710,23 @@ static void insn_subs (i860s *cpustate, UINT32 insn)
 	src1val = get_iregval (get_isrc1 (insn));
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val - get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For signed:
-         OF = standard signed overflow.
-         CC set   if isrc2 > isrc1
-         CC clear if isrc2 <= isrc1
-     */
+	   For signed:
+	     OF = standard signed overflow.
+	     CC set   if isrc2 > isrc1
+	     CC clear if isrc2 <= isrc1
+	 */
 	sa = src1val & 0x80000000;
 	sb = get_iregval (isrc2) & 0x80000000;
 	sres = tmp_dest_val & 0x80000000;
 	if (sa != sb && sa != sres)
 		SET_EPSR_OF (1);
 	else
-		SET_EPSR_OF	(0);
+		SET_EPSR_OF (0);
 
 	if ((INT32)get_iregval (isrc2) > (INT32)(src1val))
 		SET_PSR_CC (1);
@@ -1750,23 +1750,23 @@ static void insn_subs_imm (i860s *cpustate, UINT32 insn)
 	src1val = sign_ext (get_imm16 (insn), 16);
 
 	/* We don't update the actual idest register now because below we
-       need to test the original src1 and src2 if either happens to
-       be the destination register.  */
+	   need to test the original src1 and src2 if either happens to
+	   be the destination register.  */
 	tmp_dest_val = src1val - get_iregval (isrc2);
 
 	/* Set OF and CC flags.
-       For signed:
-         OF = standard signed overflow.
-         CC set   if isrc2 > isrc1
-         CC clear if isrc2 <= isrc1
-     */
+	   For signed:
+	     OF = standard signed overflow.
+	     CC set   if isrc2 > isrc1
+	     CC clear if isrc2 <= isrc1
+	 */
 	sa = src1val & 0x80000000;
 	sb = get_iregval (isrc2) & 0x80000000;
 	sres = tmp_dest_val & 0x80000000;
 	if (sa != sb && sa != sres)
 		SET_EPSR_OF (1);
 	else
-		SET_EPSR_OF	(0);
+		SET_EPSR_OF (0);
 
 	if ((INT32)get_iregval (isrc2) > (INT32)(src1val))
 		SET_PSR_CC (1);
@@ -1874,7 +1874,7 @@ static void insn_shrd (i860s *cpustate, UINT32 insn)
 	UINT32 tmp;
 
 	/* Do the operation:
-       idest = low_32(isrc1ni:isrc2 >> sc).  */
+	   idest = low_32(isrc1ni:isrc2 >> sc).  */
 	if (sc == 0)
 		tmp = get_iregval (isrc2);
 	else
@@ -2202,7 +2202,7 @@ static void insn_bte_imm (i860s *cpustate, UINT32 insn)
 	INT32 sbroff = 0;
 	int res = 0;
 
-	src1val = (insn >> 11) & 0x1f;	/* 5-bit field, zero-extended.  */
+	src1val = (insn >> 11) & 0x1f;  /* 5-bit field, zero-extended.  */
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
@@ -2258,7 +2258,7 @@ static void insn_btne_imm (i860s *cpustate, UINT32 insn)
 	INT32 sbroff = 0;
 	int res = 0;
 
-	src1val = (insn >> 11) & 0x1f;	/* 5-bit field, zero-extended.  */
+	src1val = (insn >> 11) & 0x1f;  /* 5-bit field, zero-extended.  */
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
@@ -2316,7 +2316,7 @@ static void insn_bnc (i860s *cpustate, UINT32 insn)
 	res = (GET_PSR_CC () == 0);
 
 	/* Branch routines always update the PC, since pc_updated is set
-       in the decode routine.  */
+	   in the decode routine.  */
 	if (res)
 		cpustate->pc = target_addr;
 	else
@@ -2342,7 +2342,7 @@ static void insn_bct (i860s *cpustate, UINT32 insn)
 	res = (GET_PSR_CC () == 1);
 
 	/* Careful. Unlike bla, the delay slot instruction is only executed
-       if the branch is taken.  */
+	   if the branch is taken.  */
 	if (res)
 	{
 		/* Execute delay slot instruction.  */
@@ -2357,7 +2357,7 @@ static void insn_bct (i860s *cpustate, UINT32 insn)
 	}
 
 	/* Since this branch is delayed, we must jump 2 instructions if
-       if isn't taken.  */
+	   if isn't taken.  */
 	if (res)
 		cpustate->pc = target_addr;
 	else
@@ -2386,7 +2386,7 @@ static void insn_bnct (i860s *cpustate, UINT32 insn)
 	res = (GET_PSR_CC () == 0);
 
 	/* Careful. Unlike bla, the delay slot instruction is only executed
-       if the branch is taken.  */
+	   if the branch is taken.  */
 	if (res)
 	{
 		/* Execute delay slot instruction.  */
@@ -2401,7 +2401,7 @@ static void insn_bnct (i860s *cpustate, UINT32 insn)
 	}
 
 	/* Since this branch is delayed, we must jump 2 instructions if
-       if isn't taken.  */
+	   if isn't taken.  */
 	if (res)
 		cpustate->pc = target_addr;
 	else
@@ -2502,10 +2502,10 @@ static void insn_bri (i860s *cpustate, UINT32 insn)
 	}
 
 	/* If any trap bits are set, we need to do the return from
-       trap work.  Note, we must use the PSR value that existed
-       before the delay slot instruction was executed since the
-       delay slot instruction might itself cause a trap bit to
-       be set.  */
+	   trap work.  Note, we must use the PSR value that existed
+	   before the delay slot instruction was executed since the
+	   delay slot instruction might itself cause a trap bit to
+	   be set.  */
 	if (orig_psr & PSR_ALL_TRAP_BITS_MASK)
 	{
 		/* Restore U and IM from their previous copies.  */
@@ -2605,7 +2605,7 @@ static void insn_bla (i860s *cpustate, UINT32 insn)
 	else
 	{
 		/* Since this branch is delayed, we must jump 2 instructions if
-           if isn't taken.  */
+		   if isn't taken.  */
 		cpustate->pc += 8;
 	}
 	SET_PSR_LCC (lcc_tmp);
@@ -2624,14 +2624,14 @@ static void insn_flush (i860s *cpustate, UINT32 insn)
 	UINT32 eff = 0;
 
 	/* Technically, idest should be encoded as r0 because idest
-       is undefined after the instruction.  We don't currently
-       check for this.
+	   is undefined after the instruction.  We don't currently
+	   check for this.
 
-       Flush D$ block at address #const+isrc2.  Block is undefined
-       after.  The effective address must be 16-byte aligned.
+	   Flush D$ block at address #const+isrc2.  Block is undefined
+	   after.  The effective address must be 16-byte aligned.
 
-       FIXME: Need to examine RB and RC and do this right.
-      */
+	   FIXME: Need to examine RB and RC and do this right.
+	  */
 
 	/* Chop off lower bits of displacement to 16-byte alignment.  */
 	src1val &= ~(16-1);
@@ -2643,8 +2643,8 @@ static void insn_flush (i860s *cpustate, UINT32 insn)
 	if (GET_PSR_U () == 0)
 	{
 		/* If line is dirty, write it to memory and invalidate.
-           NOTE: The actual dirty write is unimplemented in the MAME version
-           as we don't emulate the dcache.  */
+		   NOTE: The actual dirty write is unimplemented in the MAME version
+		   as we don't emulate the dcache.  */
 	}
 }
 
@@ -2659,9 +2659,9 @@ static void insn_fmul (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	float sgl_tmp_dest = 0.0;
 	double dbl_last_stage_contents = 0.0;
@@ -2684,28 +2684,28 @@ static void insn_fmul (i860s *cpustate, UINT32 insn)
 	}
 
 	/* For pipelined version, retrieve the contents of the last stage
-       of the pipeline, whose precision is specified by the MRP bit
-       of the stage's result-status bits.  Note for pfmul, the number
-       of stages is determined by the source precision of the current
-       operation.  */
+	   of the pipeline, whose precision is specified by the MRP bit
+	   of the stage's result-status bits.  Note for pfmul, the number
+	   of stages is determined by the source precision of the current
+	   operation.  */
 	if (piped)
 	{
 		if (cpustate->M[num_stages - 1].stat.mrp)
 			dbl_last_stage_contents = cpustate->M[num_stages - 1].val.d;
 		else
-			sgl_last_stage_contents	= cpustate->M[num_stages - 1].val.s;
+			sgl_last_stage_contents = cpustate->M[num_stages - 1].val.s;
 	}
 
 	/* Do the operation, being careful about source and result
-       precision.  */
+	   precision.  */
 	if (src_prec)
 	{
 		double v1 = get_fregval_d (cpustate, fsrc1);
 		double v2 = get_fregval_d (cpustate, fsrc2);
 
 		/* For pipelined mul, if fsrc2 is the same as fdest, then the last
-           stage is bypassed to fsrc2 (rather than using the value in fsrc2).
-           This bypass is not available for fsrc1, and is undefined behavior.  */
+		   stage is bypassed to fsrc2 (rather than using the value in fsrc2).
+		   This bypass is not available for fsrc1, and is undefined behavior.  */
 		if (0 && piped && fdest != 0 && fsrc1 == fdest)
 			v1 = dbl_last_stage_contents;
 		if (piped && fdest != 0 && fsrc2 == fdest)
@@ -2722,8 +2722,8 @@ static void insn_fmul (i860s *cpustate, UINT32 insn)
 		float v2 = get_fregval_s (cpustate, fsrc2);
 
 		/* For pipelined mul, if fsrc2 is the same as fdest, then the last
-           stage is bypassed to fsrc2 (rather than using the value in fsrc2).
-           This bypass is not available for fsrc1, and is undefined behavior.  */
+		   stage is bypassed to fsrc2 (rather than using the value in fsrc2).
+		   This bypass is not available for fsrc1, and is undefined behavior.  */
 		if (0 && piped && fdest != 0 && fsrc1 == fdest)
 			v1 = sgl_last_stage_contents;
 		if (piped && fdest != 0 && fsrc2 == fdest)
@@ -2736,13 +2736,13 @@ static void insn_fmul (i860s *cpustate, UINT32 insn)
 	}
 
 	/* FIXME: Set result-status bits besides MRP. And copy to fsr from
-              last stage.  */
+	          last stage.  */
 	/* FIXME: Scalar version flows through all stages.  */
 	/* FIXME: Mixed precision (only weird for pfmul).  */
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, with precision specified by the R bit.  */
+		   register, with precision specified by the R bit.  */
 		if (res_prec)
 			set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 		else
@@ -2751,10 +2751,10 @@ static void insn_fmul (i860s *cpustate, UINT32 insn)
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline.  */
+		   stage of the pipeline.  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 		/* Copy 3rd stage MRP to FSR.  */
-		if (cpustate->M[num_stages - 2	/* 1 */].stat.mrp)
+		if (cpustate->M[num_stages - 2  /* 1 */].stat.mrp)
 			cpustate->cregs[CR_FSR] |= 0x10000000;
 		else
 			cpustate->cregs[CR_FSR] &= ~0x10000000;
@@ -2766,14 +2766,14 @@ static void insn_fmul (i860s *cpustate, UINT32 insn)
 			set_fregval_s (cpustate, fdest, sgl_last_stage_contents);
 
 		/* Now advance pipeline and write current calculation to
-           first stage.  */
+		   first stage.  */
 		if (num_stages == 3)
 		{
 			cpustate->M[2] = cpustate->M[1];
 			cpustate->M[1] = cpustate->M[0];
 		}
 		else
-			cpustate->M[1]	= cpustate->M[0];
+			cpustate->M[1]  = cpustate->M[0];
 
 		if (res_prec)
 		{
@@ -2810,9 +2810,9 @@ static void insn_fmlow (i860s *cpustate, UINT32 insn)
 	}
 
 	/* The lower 32-bits are obvious.  What exactly goes in the upper
-       bits?
-       Technically, the upper-most 10 bits are undefined, but i'd like
-       to be undefined in the same way as the real i860 if possible.  */
+	   bits?
+	   Technically, the upper-most 10 bits are undefined, but i'd like
+	   to be undefined in the same way as the real i860 if possible.  */
 
 	/* Keep lower 53 bits of multiply.  */
 	tmp = i1 * i2;
@@ -2828,10 +2828,10 @@ static void insn_fadd_sub (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
-	int is_sub = insn & 1;			 /* 1 = sub, 0 = add.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
+	int is_sub = insn & 1;           /* 1 = sub, 0 = add.  */
 	double dbl_tmp_dest = 0.0;
 	float sgl_tmp_dest = 0.0;
 	double dbl_last_stage_contents = 0.0;
@@ -2845,27 +2845,27 @@ static void insn_fadd_sub (i860s *cpustate, UINT32 insn)
 	}
 
 	/* For pipelined version, retrieve the contents of the last stage
-       of the pipeline, whose precision is specified by the ARP bit
-       of the stage's result-status bits.  There are always three stages
-       for pfadd/pfsub.  */
+	   of the pipeline, whose precision is specified by the ARP bit
+	   of the stage's result-status bits.  There are always three stages
+	   for pfadd/pfsub.  */
 	if (piped)
 	{
 		if (cpustate->A[2].stat.arp)
 			dbl_last_stage_contents = cpustate->A[2].val.d;
 		else
-			sgl_last_stage_contents	= cpustate->A[2].val.s;
+			sgl_last_stage_contents = cpustate->A[2].val.s;
 	}
 
 	/* Do the operation, being careful about source and result
-       precision.  */
+	   precision.  */
 	if (src_prec)
 	{
 		double v1 = get_fregval_d (cpustate, fsrc1);
 		double v2 = get_fregval_d (cpustate, fsrc2);
 
 		/* For pipelined add/sub, if fsrc1 is the same as fdest, then the last
-           stage is bypassed to fsrc1 (rather than using the value in fsrc1).
-           Likewise for fsrc2.  */
+		   stage is bypassed to fsrc1 (rather than using the value in fsrc1).
+		   Likewise for fsrc2.  */
 		if (piped && fdest != 0 && fsrc1 == fdest)
 			v1 = dbl_last_stage_contents;
 		if (piped && fdest != 0 && fsrc2 == fdest)
@@ -2882,8 +2882,8 @@ static void insn_fadd_sub (i860s *cpustate, UINT32 insn)
 		float v2 = get_fregval_s (cpustate, fsrc2);
 
 		/* For pipelined add/sub, if fsrc1 is the same as fdest, then the last
-           stage is bypassed to fsrc1 (rather than using the value in fsrc1).
-           Likewise for fsrc2.  */
+		   stage is bypassed to fsrc1 (rather than using the value in fsrc1).
+		   Likewise for fsrc2.  */
 		if (piped && fdest != 0 && fsrc1 == fdest)
 			v1 = sgl_last_stage_contents;
 		if (piped && fdest != 0 && fsrc2 == fdest)
@@ -2896,12 +2896,12 @@ static void insn_fadd_sub (i860s *cpustate, UINT32 insn)
 	}
 
 	/* FIXME: Set result-status bits besides ARP. And copy to fsr from
-              last stage.  */
+	          last stage.  */
 	/* FIXME: Scalar version flows through all stages.  */
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, with precision specified by the R bit.  */
+		   register, with precision specified by the R bit.  */
 		if (res_prec)
 			set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 		else
@@ -2910,8 +2910,8 @@ static void insn_fadd_sub (i860s *cpustate, UINT32 insn)
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the ARP
-           bit of the stage's result-status bits.  */
+		   stage of the pipeline, with precision specified by the ARP
+		   bit of the stage's result-status bits.  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 		/* Copy 3rd stage ARP to FSR.  */
 		if (cpustate->A[1 /* 2 */].stat.arp)
@@ -2925,7 +2925,7 @@ static void insn_fadd_sub (i860s *cpustate, UINT32 insn)
 			set_fregval_s (cpustate, fdest, sgl_last_stage_contents);
 
 		/* Now advance pipeline and write current calculation to
-           first stage.  */
+		   first stage.  */
 		cpustate->A[2] = cpustate->A[1];
 		cpustate->A[1] = cpustate->A[0];
 		if (res_prec)
@@ -3081,10 +3081,10 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
-	int is_pfam = insn & 0x400;		 /* 1 = pfam, 0 = pfmam.  */
-	int is_sub = insn & 0x10;		 /* 1 = pf[m]sm, 0 = pf[m]am.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
+	int is_pfam = insn & 0x400;      /* 1 = pfam, 0 = pfmam.  */
+	int is_sub = insn & 0x10;        /* 1 = pf[m]sm, 0 = pf[m]am.  */
 	double dbl_tmp_dest_mul = 0.0;
 	float sgl_tmp_dest_mul = 0.0;
 	double dbl_tmp_dest_add = 0.0;
@@ -3120,7 +3120,7 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 		}
 
 		/* PFMAM table adjustments (M_unit_op1 is never a pipe stage,
-           so no adjustment made for it).   */
+		   so no adjustment made for it).   */
 		M_unit_op2 = (M_unit_op2 & FLAGM) ? OP_MPIPE : M_unit_op2;
 		A_unit_op1 = (A_unit_op1 & FLAGM) ? OP_MPIPE : A_unit_op1;
 		A_unit_op2 = (A_unit_op2 & FLAGM) ? OP_MPIPE : A_unit_op2;
@@ -3129,9 +3129,9 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 	/* FIXME: Check for fsrc1/fdest overlap for some mul DPC combinations.  */
 
 	/* Retrieve the contents of the last stage of the multiplier pipeline,
-       whose precision is specified by the MRP bit of the stage's result-
-       status bits.  Note for multiply, the number of stages is determined
-       by the source precision of the current operation.  */
+	   whose precision is specified by the MRP bit of the stage's result-
+	   status bits.  Note for multiply, the number of stages is determined
+	   by the source precision of the current operation.  */
 	if (cpustate->M[num_mul_stages - 1].stat.mrp)
 		dbl_last_Mstage_contents = cpustate->M[num_mul_stages - 1].val.d;
 	else
@@ -3144,15 +3144,15 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 		sgl_last_Astage_contents = cpustate->A[2].val.s;
 
 	/* Do the mul operation, being careful about source and result
-       precision.  */
+	   precision.  */
 	if (src_prec)
 	{
 		double v1 = get_fval_from_optype_d (cpustate, insn, M_unit_op1);
 		double v2 = get_fval_from_optype_d (cpustate, insn, M_unit_op2);
 
 		/* For mul, if fsrc2 is the same as fdest, then the last stage
-           is bypassed to fsrc2 (rather than using the value in fsrc2).
-           This bypass is not available for fsrc1, and is undefined behavior.  */
+		   is bypassed to fsrc2 (rather than using the value in fsrc2).
+		   This bypass is not available for fsrc1, and is undefined behavior.  */
 		if (0 && M_unit_op1 == OP_SRC1 && fdest != 0 && fsrc1 == fdest)
 			v1 = is_pfam ? dbl_last_Astage_contents : dbl_last_Mstage_contents;
 		if (M_unit_op2 == OP_SRC2 && fdest != 0 && fsrc2 == fdest)
@@ -3169,8 +3169,8 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 		float v2 = get_fval_from_optype_s (cpustate, insn, M_unit_op2);
 
 		/* For mul, if fsrc2 is the same as fdest, then the last stage
-           is bypassed to fsrc2 (rather than using the value in fsrc2).
-           This bypass is not available for fsrc1, and is undefined behavior.  */
+		   is bypassed to fsrc2 (rather than using the value in fsrc2).
+		   This bypass is not available for fsrc1, and is undefined behavior.  */
 		if (0 && M_unit_op1 == OP_SRC1 && fdest != 0 && fsrc1 == fdest)
 			v1 = is_pfam ? sgl_last_Astage_contents : sgl_last_Mstage_contents;
 		if (M_unit_op2 == OP_SRC2 && fdest != 0 && fsrc2 == fdest)
@@ -3183,16 +3183,16 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 	}
 
 	/* Do the add operation, being careful about source and result
-       precision.  Remember, the R bit indicates source and result precision
-       here.  */
+	   precision.  Remember, the R bit indicates source and result precision
+	   here.  */
 	if (res_prec)
 	{
 		double v1 = get_fval_from_optype_d (cpustate, insn, A_unit_op1);
 		double v2 = get_fval_from_optype_d (cpustate, insn, A_unit_op2);
 
 		/* For add/sub, if fsrc1 is the same as fdest, then the last stage
-           is bypassed to fsrc1 (rather than using the value in fsrc1).
-           Likewise for fsrc2.  */
+		   is bypassed to fsrc1 (rather than using the value in fsrc1).
+		   Likewise for fsrc2.  */
 		if (A_unit_op1 == OP_SRC1 && fdest != 0 && fsrc1 == fdest)
 			v1 = is_pfam ? dbl_last_Astage_contents : dbl_last_Mstage_contents;
 		if (A_unit_op2 == OP_SRC2 && fdest != 0 && fsrc2 == fdest)
@@ -3209,8 +3209,8 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 		float v2 = get_fval_from_optype_s (cpustate, insn, A_unit_op2);
 
 		/* For add/sub, if fsrc1 is the same as fdest, then the last stage
-           is bypassed to fsrc1 (rather than using the value in fsrc1).
-           Likewise for fsrc2.  */
+		   is bypassed to fsrc1 (rather than using the value in fsrc1).
+		   Likewise for fsrc2.  */
 		if (A_unit_op1 == OP_SRC1 && fdest != 0 && fsrc1 == fdest)
 			v1 = is_pfam ? sgl_last_Astage_contents : sgl_last_Mstage_contents;
 		if (A_unit_op2 == OP_SRC2 && fdest != 0 && fsrc2 == fdest)
@@ -3241,26 +3241,26 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 			if (src_prec)
 				cpustate->KI.d = get_fregval_d (cpustate, fsrc1);
 			else
-				cpustate->KI.s	= get_fregval_s (cpustate, fsrc1);
+				cpustate->KI.s  = get_fregval_s (cpustate, fsrc1);
 		}
 		else if (M_unit_op1 == OP_KR)
 		{
 			if (src_prec)
 				cpustate->KR.d = get_fregval_d (cpustate, fsrc1);
 			else
-				cpustate->KR.s	= get_fregval_s (cpustate, fsrc1);
+				cpustate->KR.s  = get_fregval_s (cpustate, fsrc1);
 		}
 		else
 			assert (0);
 	}
 
 	/* Now update fdest (either from adder pipe or multiplier pipe,
-       depending on whether the instruction is pfam or pfmam).  */
+	   depending on whether the instruction is pfam or pfmam).  */
 	if (is_pfam)
 	{
 		/* Update fdest with the result from the last stage of the
-           adder pipeline, with precision specified by the ARP
-           bit of the stage's result-status bits.  */
+		   adder pipeline, with precision specified by the ARP
+		   bit of the stage's result-status bits.  */
 		if (cpustate->A[2].stat.arp)
 			set_fregval_d (cpustate, fdest, dbl_last_Astage_contents);
 		else
@@ -3269,8 +3269,8 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 	else
 	{
 		/* Update fdest with the result from the last stage of the
-           multiplier pipeline, with precision specified by the MRP
-           bit of the stage's result-status bits.  */
+		   multiplier pipeline, with precision specified by the MRP
+		   bit of the stage's result-status bits.  */
 		if (cpustate->M[num_mul_stages - 1].stat.mrp)
 			set_fregval_d (cpustate, fdest, dbl_last_Mstage_contents);
 		else
@@ -3278,25 +3278,25 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 	}
 
 	/* FIXME: Set result-status bits besides MRP. And copy to fsr from
-              last stage.  */
+	          last stage.  */
 	/* FIXME: Mixed precision (only weird for pfmul).  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 	/* Copy 3rd stage MRP to FSR.  */
-	if (cpustate->M[num_mul_stages - 2	/* 1 */].stat.mrp)
+	if (cpustate->M[num_mul_stages - 2  /* 1 */].stat.mrp)
 		cpustate->cregs[CR_FSR] |= 0x10000000;
 	else
 		cpustate->cregs[CR_FSR] &= ~0x10000000;
 #endif
 
 	/* Now advance multiplier pipeline and write current calculation to
-       first stage.  */
+	   first stage.  */
 	if (num_mul_stages == 3)
 	{
 		cpustate->M[2] = cpustate->M[1];
 		cpustate->M[1] = cpustate->M[0];
 	}
 	else
-		cpustate->M[1]	= cpustate->M[0];
+		cpustate->M[1]  = cpustate->M[0];
 
 	if (res_prec)
 	{
@@ -3310,7 +3310,7 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 	}
 
 	/* FIXME: Set result-status bits besides ARP. And copy to fsr from
-              last stage.  */
+	          last stage.  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 	/* Copy 3rd stage ARP to FSR.  */
 	if (cpustate->A[1 /* 2 */].stat.arp)
@@ -3320,7 +3320,7 @@ static void insn_dualop (i860s *cpustate, UINT32 insn)
 #endif
 
 	/* Now advance adder pipeline and write current calculation to
-       first stage.  */
+	   first stage.  */
 	cpustate->A[2] = cpustate->A[1];
 	cpustate->A[1] = cpustate->A[0];
 	if (res_prec)
@@ -3341,11 +3341,11 @@ static void insn_frcp (i860s *cpustate, UINT32 insn)
 {
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 
 	/* Do the operation, being careful about source and result
-       precision.  */
+	   precision.  */
 	if (src_prec)
 	{
 		double v = get_fregval_d (cpustate, fsrc2);
@@ -3364,7 +3364,7 @@ static void insn_frcp (i860s *cpustate, UINT32 insn)
 		else
 		{
 			/* Real i860 isn't a precise as a real divide, but this should
-               be okay.  */
+			   be okay.  */
 			SET_FSR_SE (0);
 			*((UINT64 *)&v) &= 0xfffff00000000000ULL;
 			res = (double)1.0/v;
@@ -3393,7 +3393,7 @@ static void insn_frcp (i860s *cpustate, UINT32 insn)
 		else
 		{
 			/* Real i860 isn't a precise as a real divide, but this should
-               be okay.  */
+			   be okay.  */
 			SET_FSR_SE (0);
 			*((UINT32 *)&v) &= 0xffff8000;
 			res = (float)1.0/v;
@@ -3412,8 +3412,8 @@ static void insn_frsqr (i860s *cpustate, UINT32 insn)
 {
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
 
 	/* Check for invalid .ds combination.  */
 	if ((insn & 0x180) == 0x100)
@@ -3430,7 +3430,7 @@ static void insn_frsqr (i860s *cpustate, UINT32 insn)
 	}
 
 	/* Do the operation, being careful about source and result
-       precision.  */
+	   precision.  */
 	if (src_prec)
 	{
 		double v = get_fregval_d (cpustate, fsrc2);
@@ -3513,9 +3513,9 @@ static void insn_ftrunc (i860s *cpustate, UINT32 insn)
 {
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 
 	/* Check for invalid .ds or .ss combinations.  */
 	if ((insn & 0x080) == 0)
@@ -3525,14 +3525,14 @@ static void insn_ftrunc (i860s *cpustate, UINT32 insn)
 	}
 
 	/* Do the operation, being careful about source and result
-       precision.  Operation: fdest = integer part of fsrc1 in
-       lower 32-bits.  */
+	   precision.  Operation: fdest = integer part of fsrc1 in
+	   lower 32-bits.  */
 	if (src_prec)
 	{
 		double v1 = get_fregval_d (cpustate, fsrc1);
 		INT32 iv = (INT32)v1;
 		/* We always write a single, since the lower 32-bits of fdest
-           get the result (and the even numbered reg is the lower).  */
+		   get the result (and the even numbered reg is the lower).  */
 		set_fregval_s (cpustate, fdest, *(float *)&iv);
 	}
 	else
@@ -3540,7 +3540,7 @@ static void insn_ftrunc (i860s *cpustate, UINT32 insn)
 		float v1 = get_fregval_s (cpustate, fsrc1);
 		INT32 iv = (INT32)v1;
 		/* We always write a single, since the lower 32-bits of fdest
-           get the result (and the even numbered reg is the lower).  */
+		   get the result (and the even numbered reg is the lower).  */
 		set_fregval_s (cpustate, fdest, *(float *)&iv);
 	}
 
@@ -3562,14 +3562,14 @@ static void insn_famov (i860s *cpustate, UINT32 insn)
 {
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	double sgl_tmp_dest = 0.0;
 
 	/* Do the operation, being careful about source and result
-       precision.  */
+	   precision.  */
 	if (src_prec)
 	{
 		double v1 = get_fregval_d (cpustate, fsrc1);
@@ -3588,12 +3588,12 @@ static void insn_famov (i860s *cpustate, UINT32 insn)
 	}
 
 	/* FIXME: Set result-status bits besides ARP. And copy to fsr from
-              last stage.  */
+	          last stage.  */
 	/* FIXME: Scalar version flows through all stages.  */
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, with precision specified by the R bit.  */
+		   register, with precision specified by the R bit.  */
 		if (res_prec)
 			set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 		else
@@ -3602,8 +3602,8 @@ static void insn_famov (i860s *cpustate, UINT32 insn)
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the ARP
-           bit of the stage's result-status bits.  */
+		   stage of the pipeline, with precision specified by the ARP
+		   bit of the stage's result-status bits.  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 		/* Copy 3rd stage ARP to FSR.  */
 		if (cpustate->A[1 /* 2 */].stat.arp)
@@ -3617,7 +3617,7 @@ static void insn_famov (i860s *cpustate, UINT32 insn)
 			set_fregval_s (cpustate, fdest, cpustate->A[2].val.s);
 
 		/* Now advance pipeline and write current calculation to
-           first stage.  */
+		   first stage.  */
 		cpustate->A[2] = cpustate->A[1];
 		cpustate->A[1] = cpustate->A[0];
 		if (res_prec)
@@ -3640,10 +3640,10 @@ static void insn_fiadd_sub (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
-	int res_prec = insn & 0x080;	 /* 1 = double, 0 = single.  */
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
-	int is_sub = insn & 0x4;		 /* 1 = sub, 0 = add.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
+	int res_prec = insn & 0x080;     /* 1 = double, 0 = single.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
+	int is_sub = insn & 0x4;         /* 1 = sub, 0 = add.  */
 	double dbl_tmp_dest = 0.0;
 	float sgl_tmp_dest = 0.0;
 
@@ -3656,7 +3656,7 @@ static void insn_fiadd_sub (i860s *cpustate, UINT32 insn)
 	}
 
 	/* Do the operation, being careful about source and result
-       precision.  */
+	   precision.  */
 	if (src_prec)
 	{
 		double v1 = get_fregval_d (cpustate, fsrc1);
@@ -3671,7 +3671,7 @@ static void insn_fiadd_sub (i860s *cpustate, UINT32 insn)
 		if (res_prec)
 			dbl_tmp_dest = *(double *)&r;
 		else
-			assert (0);	   /* .ds not allowed.  */
+			assert (0);    /* .ds not allowed.  */
 	}
 	else
 	{
@@ -3685,7 +3685,7 @@ static void insn_fiadd_sub (i860s *cpustate, UINT32 insn)
 		else
 			r = (UINT32)(iv1 + iv2);
 		if (res_prec)
-			assert (0);	   /* .sd not allowed.  */
+			assert (0);    /* .sd not allowed.  */
 		else
 			sgl_tmp_dest = *(float *)&r;
 	}
@@ -3695,7 +3695,7 @@ static void insn_fiadd_sub (i860s *cpustate, UINT32 insn)
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, with precision specified by the R bit.  */
+		   register, with precision specified by the R bit.  */
 		if (res_prec)
 			set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 		else
@@ -3704,8 +3704,8 @@ static void insn_fiadd_sub (i860s *cpustate, UINT32 insn)
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the IRP
-           bit of the stage's result-status bits.  */
+		   stage of the pipeline, with precision specified by the IRP
+		   bit of the stage's result-status bits.  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 		/* Copy stage IRP to FSR.  */
 		if (res_prec)
@@ -3713,7 +3713,7 @@ static void insn_fiadd_sub (i860s *cpustate, UINT32 insn)
 		else
 			cpustate->cregs[CR_FSR] &= ~0x08000000;
 #endif
-		if (cpustate->G.stat.irp)	/* 1st (and last) stage.  */
+		if (cpustate->G.stat.irp)   /* 1st (and last) stage.  */
 			set_fregval_d (cpustate, fdest, cpustate->G.val.d);
 		else
 			set_fregval_s (cpustate, fdest, cpustate->G.val.s);
@@ -3740,7 +3740,7 @@ static void insn_fcmp (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int src_prec = insn & 0x100;	 /* 1 = double, 0 = single.  */
+	int src_prec = insn & 0x100;     /* 1 = double, 0 = single.  */
 	double dbl_tmp_dest = 0.0;
 	double sgl_tmp_dest = 0.0;
 	/* int is_eq = insn & 1; */
@@ -3748,41 +3748,41 @@ static void insn_fcmp (i860s *cpustate, UINT32 insn)
 	int is_le = ((insn & 0x81) == 0x80);
 
 	/* Do the operation.  Source and result precision must be the same.
-         pfgt: CC set     if fsrc1 > fsrc2, else cleared.
-         pfle: CC cleared if fsrc1 <= fsrc2, else set.
-         pfeq: CC set     if fsrc1 = fsrc2, else cleared.
+	     pfgt: CC set     if fsrc1 > fsrc2, else cleared.
+	     pfle: CC cleared if fsrc1 <= fsrc2, else set.
+	     pfeq: CC set     if fsrc1 = fsrc2, else cleared.
 
-       Note that the compares write an undefined (but non-exceptional)
-       result into the first stage of the adder pipeline.  We'll model
-       this by just pushing in dbl_ or sgl_tmp_dest which equal 0.0.  */
+	   Note that the compares write an undefined (but non-exceptional)
+	   result into the first stage of the adder pipeline.  We'll model
+	   this by just pushing in dbl_ or sgl_tmp_dest which equal 0.0.  */
 	if (src_prec)
 	{
 		double v1 = get_fregval_d (cpustate, fsrc1);
 		double v2 = get_fregval_d (cpustate, fsrc2);
-		if (is_gt)				  /* gt.  */
+		if (is_gt)                /* gt.  */
 			SET_PSR_CC (v1 > v2 ? 1 : 0);
-		else if (is_le)			  /* le.  */
+		else if (is_le)           /* le.  */
 			SET_PSR_CC (v1 <= v2 ? 0 : 1);
-		else					  /* eq.  */
+		else                      /* eq.  */
 			SET_PSR_CC (v1 == v2 ? 1 : 0);
 	}
 	else
 	{
 		float v1 = get_fregval_s (cpustate, fsrc1);
 		float v2 = get_fregval_s (cpustate, fsrc2);
-		if (is_gt)				  /* gt.  */
+		if (is_gt)                /* gt.  */
 			SET_PSR_CC (v1 > v2 ? 1 : 0);
-		else if (is_le)			  /* le.  */
+		else if (is_le)           /* le.  */
 			SET_PSR_CC (v1 <= v2 ? 0 : 1);
-		else					  /* eq.  */
+		else                      /* eq.  */
 			SET_PSR_CC (v1 == v2 ? 1 : 0);
 	}
 
 	/* FIXME: Set result-status bits besides ARP. And copy to fsr from
-              last stage.  */
+	          last stage.  */
 	/* These write fdest with the result from the last
-       stage of the pipeline, with precision specified by the ARP
-       bit of the stage's result-status bits.  */
+	   stage of the pipeline, with precision specified by the ARP
+	   bit of the stage's result-status bits.  */
 #if 1 /* FIXME: WIP on FSR update.  This may not be correct.  */
 	/* Copy 3rd stage ARP to FSR.  */
 	if (cpustate->A[1 /* 2 */].stat.arp)
@@ -3796,7 +3796,7 @@ static void insn_fcmp (i860s *cpustate, UINT32 insn)
 		set_fregval_s (cpustate, fdest, cpustate->A[2].val.s);
 
 	/* Now advance pipeline and write current calculation to
-       first stage.  */
+	   first stage.  */
 	cpustate->A[2] = cpustate->A[1];
 	cpustate->A[1] = cpustate->A[0];
 	if (src_prec)
@@ -3819,8 +3819,8 @@ static void insn_fzchk (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
-	int is_fzchks = insn & 8;		 /* 1 = fzchks, 0 = fzchkl.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
+	int is_fzchks = insn & 8;        /* 1 = fzchks, 0 = fzchkl.  */
 	double dbl_tmp_dest = 0.0;
 	int i;
 	double v1 = get_fregval_d (cpustate, fsrc1);
@@ -3838,8 +3838,8 @@ static void insn_fzchk (i860s *cpustate, UINT32 insn)
 	}
 
 	/* Do the operation.  The fzchks version operates in parallel on
-       four 16-bit pixels, while the fzchkl operates on two 32-bit
-       pixels (pixels are unsigned ordinals in this context).  */
+	   four 16-bit pixels, while the fzchkl operates on two 32-bit
+	   pixels (pixels are unsigned ordinals in this context).  */
 	if (is_fzchks)
 	{
 		pm = (pm >> 4) & 0x0f;
@@ -3888,15 +3888,15 @@ static void insn_fzchk (i860s *cpustate, UINT32 insn)
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, always with double precision.  */
+		   register, always with double precision.  */
 		set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 	}
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the IRP
-           bit of the stage's result-status bits.  */
-		if (cpustate->G.stat.irp)	/* 1st (and last) stage.  */
+		   stage of the pipeline, with precision specified by the IRP
+		   bit of the stage's result-status bits.  */
+		if (cpustate->G.stat.irp)   /* 1st (and last) stage.  */
 			set_fregval_d (cpustate, fdest, cpustate->G.val.d);
 		else
 			set_fregval_s (cpustate, fdest, cpustate->G.val.s);
@@ -3914,7 +3914,7 @@ static void insn_form (i860s *cpustate, UINT32 insn)
 {
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	double v1 = get_fregval_d (cpustate, fsrc1);
 	UINT64 iv1 = *(UINT64 *)&v1;
@@ -3935,15 +3935,15 @@ static void insn_form (i860s *cpustate, UINT32 insn)
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, always with double precision.  */
+		   register, always with double precision.  */
 		set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 	}
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the IRP
-           bit of the stage's result-status bits.  */
-		if (cpustate->G.stat.irp)	/* 1st (and last) stage.  */
+		   stage of the pipeline, with precision specified by the IRP
+		   bit of the stage's result-status bits.  */
+		if (cpustate->G.stat.irp)   /* 1st (and last) stage.  */
 			set_fregval_d (cpustate, fdest, cpustate->G.val.d);
 		else
 			set_fregval_s (cpustate, fdest, cpustate->G.val.s);
@@ -3961,7 +3961,7 @@ static void insn_faddp (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	double v1 = get_fregval_d (cpustate, fsrc1);
 	double v2 = get_fregval_d (cpustate, fsrc2);
@@ -3974,7 +3974,7 @@ static void insn_faddp (i860s *cpustate, UINT32 insn)
 	dbl_tmp_dest = *(double *)&r;
 
 	/* Update the merge register depending on the pixel size.
-       PS: 0 = 8 bits, 1 = 16 bits, 2 = 32-bits.  */
+	   PS: 0 = 8 bits, 1 = 16 bits, 2 = 32-bits.  */
 	if (ps == 0)
 	{
 		cpustate->merge = ((cpustate->merge >> 8) & ~0xff00ff00ff00ff00ULL);
@@ -3992,7 +3992,7 @@ static void insn_faddp (i860s *cpustate, UINT32 insn)
 	}
 #ifdef TRACE_UNDEFINED_I860
 	else
-		fprintf	(stderr, "insn_faddp: Undefined i860XR behavior, invalid value %d for pixel size.\n", ps);
+		fprintf (stderr, "insn_faddp: Undefined i860XR behavior, invalid value %d for pixel size.\n", ps);
 #endif
 
 	/* FIXME: Copy result-status bit IRP to fsr from last stage.  */
@@ -4000,15 +4000,15 @@ static void insn_faddp (i860s *cpustate, UINT32 insn)
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, always with double precision.  */
+		   register, always with double precision.  */
 		set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 	}
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the IRP
-           bit of the stage's result-status bits.  */
-		if (cpustate->G.stat.irp)	/* 1st (and last) stage.  */
+		   stage of the pipeline, with precision specified by the IRP
+		   bit of the stage's result-status bits.  */
+		if (cpustate->G.stat.irp)   /* 1st (and last) stage.  */
 			set_fregval_d (cpustate, fdest, cpustate->G.val.d);
 		else
 			set_fregval_s (cpustate, fdest, cpustate->G.val.s);
@@ -4026,7 +4026,7 @@ static void insn_faddz (i860s *cpustate, UINT32 insn)
 	UINT32 fsrc1 = get_fsrc1 (insn);
 	UINT32 fsrc2 = get_fsrc2 (insn);
 	UINT32 fdest = get_fdest (insn);
-	int piped = insn & 0x400;		 /* 1 = pipelined, 0 = scalar.  */
+	int piped = insn & 0x400;        /* 1 = pipelined, 0 = scalar.  */
 	double dbl_tmp_dest = 0.0;
 	double v1 = get_fregval_d (cpustate, fsrc1);
 	double v2 = get_fregval_d (cpustate, fsrc2);
@@ -4046,15 +4046,15 @@ static void insn_faddz (i860s *cpustate, UINT32 insn)
 	if (!piped)
 	{
 		/* Scalar version writes the current calculation to the fdest
-           register, always with double precision.  */
+		   register, always with double precision.  */
 		set_fregval_d (cpustate, fdest, dbl_tmp_dest);
 	}
 	else
 	{
 		/* Pipelined version writes fdest with the result from the last
-           stage of the pipeline, with precision specified by the IRP
-           bit of the stage's result-status bits.  */
-		if (cpustate->G.stat.irp)	/* 1st (and last) stage.  */
+		   stage of the pipeline, with precision specified by the IRP
+		   bit of the stage's result-status bits.  */
+		if (cpustate->G.stat.irp)   /* 1st (and last) stage.  */
 			set_fregval_d (cpustate, fdest, cpustate->G.val.d);
 		else
 			set_fregval_s (cpustate, fdest, cpustate->G.val.s);
@@ -4085,8 +4085,8 @@ struct decode_tbl_t {
 /* First-level decode table (i.e., for the 6 primary opcode bits).  */
 static const decode_tbl_t decode_tbl[64] = {
 	/* A slight bit of decoding for loads and stores is done in the
-       execution routines (operand size and addressing mode), which
-       is why their respective entries are identical.  */
+	   execution routines (operand size and addressing mode), which
+	   is why their respective entries are identical.  */
 	{ insn_ldx,         DEC_DECODED}, /* ld.b isrc1(isrc2),idest.  */
 	{ insn_ldx,         DEC_DECODED}, /* ld.b #const(isrc2),idest.  */
 	{ insn_ixfr,        DEC_DECODED}, /* ixfr isrc1ni,fdest.  */
@@ -4157,23 +4157,23 @@ static const decode_tbl_t decode_tbl[64] = {
 /* Second-level decode table (i.e., for the 3 core escape opcode bits).  */
 static const decode_tbl_t core_esc_decode_tbl[8] = {
 	{ 0,                0},
-	{ 0,                0},	/* lock  (FIXME: unimplemented).  */
+	{ 0,                0}, /* lock  (FIXME: unimplemented).  */
 	{ insn_calli,       DEC_DECODED}, /* calli isrc1ni.                 */
 	{ 0,                0},
 	{ insn_intovr,      DEC_DECODED}, /* intovr.                        */
 	{ 0,                0},
 	{ 0,                0},
-	{ 0,                0},	/* unlock (FIXME: unimplemented). */
+	{ 0,                0}, /* unlock (FIXME: unimplemented). */
 };
 
 
 /* Second-level decode table (i.e., for the 7 FP extended opcode bits).  */
 static const decode_tbl_t fp_decode_tbl[128] = {
 	/* Floating point instructions.  The least significant 7 bits are
-       the (extended) opcode and bits 10:7 are P,D,S,R respectively
-       ([p]ipelined, [d]ual, [s]ource prec., [r]esult prec.).
-       For some operations, I defer decoding the P,S,R bits to the
-       emulation routine for them.  */
+	   the (extended) opcode and bits 10:7 are P,D,S,R respectively
+	   ([p]ipelined, [d]ual, [s]ource prec., [r]esult prec.).
+	   For some operations, I defer decoding the P,S,R bits to the
+	   emulation routine for them.  */
 	{ insn_dualop,      DEC_DECODED}, /* 0x00 pf[m]am */
 	{ insn_dualop,      DEC_DECODED}, /* 0x01 pf[m]am */
 	{ insn_dualop,      DEC_DECODED}, /* 0x02 pf[m]am */
@@ -4211,97 +4211,97 @@ static const decode_tbl_t fp_decode_tbl[128] = {
 	{ insn_frcp,        DEC_DECODED}, /* 0x22 frcp.{ss,sd,dd} */
 	{ insn_frsqr,       DEC_DECODED}, /* 0x23 frsqr.{ss,sd,dd} */
 	{ insn_fmul,        DEC_DECODED}, /* 0x24 pfmul3.dd */
-	{ 0,                0},	/* 0x25 */
-	{ 0,                0},	/* 0x26 */
-	{ 0,                0},	/* 0x27 */
-	{ 0,                0},	/* 0x28 */
-	{ 0,                0},	/* 0x29 */
-	{ 0,                0},	/* 0x2A */
-	{ 0,                0},	/* 0x2B */
-	{ 0,                0},	/* 0x2C */
-	{ 0,                0},	/* 0x2D */
-	{ 0,                0},	/* 0x2E */
-	{ 0,                0},	/* 0x2F */
+	{ 0,                0}, /* 0x25 */
+	{ 0,                0}, /* 0x26 */
+	{ 0,                0}, /* 0x27 */
+	{ 0,                0}, /* 0x28 */
+	{ 0,                0}, /* 0x29 */
+	{ 0,                0}, /* 0x2A */
+	{ 0,                0}, /* 0x2B */
+	{ 0,                0}, /* 0x2C */
+	{ 0,                0}, /* 0x2D */
+	{ 0,                0}, /* 0x2E */
+	{ 0,                0}, /* 0x2F */
 	{ insn_fadd_sub,    DEC_DECODED}, /* 0x30, [p]fadd.{ss,sd,dd} */
 	{ insn_fadd_sub,    DEC_DECODED}, /* 0x31, [p]fsub.{ss,sd,dd} */
-	{ 0,                0},	/* 0x32, [p]fix.{ss,sd,dd}  FIXME: nyi. */
+	{ 0,                0}, /* 0x32, [p]fix.{ss,sd,dd}  FIXME: nyi. */
 	{ insn_famov,       DEC_DECODED}, /* 0x33, [p]famov.{ss,sd,ds,dd} */
 	{ insn_fcmp,        DEC_DECODED}, /* 0x34, pf{gt,le}.{ss,dd} */
 	{ insn_fcmp,        DEC_DECODED}, /* 0x35, pfeq.{ss,dd} */
-	{ 0,                0},	/* 0x36 */
-	{ 0,                0},	/* 0x37 */
-	{ 0,                0},	/* 0x38 */
-	{ 0,                0},	/* 0x39 */
+	{ 0,                0}, /* 0x36 */
+	{ 0,                0}, /* 0x37 */
+	{ 0,                0}, /* 0x38 */
+	{ 0,                0}, /* 0x39 */
 	{ insn_ftrunc,      DEC_DECODED}, /* 0x3A, [p]ftrunc.{ss,sd,dd} */
-	{ 0,                0},	/* 0x3B */
-	{ 0,                0},	/* 0x3C */
-	{ 0,                0},	/* 0x3D */
-	{ 0,                0},	/* 0x3E */
-	{ 0,                0},	/* 0x3F */
+	{ 0,                0}, /* 0x3B */
+	{ 0,                0}, /* 0x3C */
+	{ 0,                0}, /* 0x3D */
+	{ 0,                0}, /* 0x3E */
+	{ 0,                0}, /* 0x3F */
 	{ insn_fxfr,        DEC_DECODED}, /* 0x40, fxfr */
-	{ 0,                0},	/* 0x41 */
-	{ 0,                0},	/* 0x42 */
-	{ 0,                0},	/* 0x43 */
-	{ 0,                0},	/* 0x44 */
-	{ 0,                0},	/* 0x45 */
-	{ 0,                0},	/* 0x46 */
-	{ 0,                0},	/* 0x47 */
-	{ 0,                0},	/* 0x48 */
+	{ 0,                0}, /* 0x41 */
+	{ 0,                0}, /* 0x42 */
+	{ 0,                0}, /* 0x43 */
+	{ 0,                0}, /* 0x44 */
+	{ 0,                0}, /* 0x45 */
+	{ 0,                0}, /* 0x46 */
+	{ 0,                0}, /* 0x47 */
+	{ 0,                0}, /* 0x48 */
 	{ insn_fiadd_sub,   DEC_DECODED}, /* 0x49, [p]fiadd.{ss,dd} */
-	{ 0,                0},	/* 0x4A */
-	{ 0,                0},	/* 0x4B */
-	{ 0,                0},	/* 0x4C */
+	{ 0,                0}, /* 0x4A */
+	{ 0,                0}, /* 0x4B */
+	{ 0,                0}, /* 0x4C */
 	{ insn_fiadd_sub,   DEC_DECODED}, /* 0x4D, [p]fisub.{ss,dd} */
-	{ 0,                0},	/* 0x4E */
-	{ 0,                0},	/* 0x4F */
+	{ 0,                0}, /* 0x4E */
+	{ 0,                0}, /* 0x4F */
 	{ insn_faddp,       DEC_DECODED}, /* 0x50, [p]faddp */
 	{ insn_faddz,       DEC_DECODED}, /* 0x51, [p]faddz */
-	{ 0,                0},	/* 0x52 */
-	{ 0,                0},	/* 0x53 */
-	{ 0,                0},	/* 0x54 */
-	{ 0,                0},	/* 0x55 */
-	{ 0,                0},	/* 0x56 */
+	{ 0,                0}, /* 0x52 */
+	{ 0,                0}, /* 0x53 */
+	{ 0,                0}, /* 0x54 */
+	{ 0,                0}, /* 0x55 */
+	{ 0,                0}, /* 0x56 */
 	{ insn_fzchk,       DEC_DECODED}, /* 0x57, [p]fzchkl */
-	{ 0,                0},	/* 0x58 */
-	{ 0,                0},	/* 0x59 */
+	{ 0,                0}, /* 0x58 */
+	{ 0,                0}, /* 0x59 */
 	{ insn_form,        DEC_DECODED}, /* 0x5A, [p]form.dd */
-	{ 0,                0},	/* 0x5B */
-	{ 0,                0},	/* 0x5C */
-	{ 0,                0},	/* 0x5D */
-	{ 0,                0},	/* 0x5E */
+	{ 0,                0}, /* 0x5B */
+	{ 0,                0}, /* 0x5C */
+	{ 0,                0}, /* 0x5D */
+	{ 0,                0}, /* 0x5E */
 	{ insn_fzchk,       DEC_DECODED}, /* 0x5F, [p]fzchks */
-	{ 0,                0},	/* 0x60 */
-	{ 0,                0},	/* 0x61 */
-	{ 0,                0},	/* 0x62 */
-	{ 0,                0},	/* 0x63 */
-	{ 0,                0},	/* 0x64 */
-	{ 0,                0},	/* 0x65 */
-	{ 0,                0},	/* 0x66 */
-	{ 0,                0},	/* 0x67 */
-	{ 0,                0},	/* 0x68 */
-	{ 0,                0},	/* 0x69 */
-	{ 0,                0},	/* 0x6A */
-	{ 0,                0},	/* 0x6B */
-	{ 0,                0},	/* 0x6C */
-	{ 0,                0},	/* 0x6D */
-	{ 0,                0},	/* 0x6E */
-	{ 0,                0},	/* 0x6F */
-	{ 0,                0},	/* 0x70 */
-	{ 0,                0},	/* 0x71 */
-	{ 0,                0},	/* 0x72 */
-	{ 0,                0},	/* 0x73 */
-	{ 0,                0},	/* 0x74 */
-	{ 0,                0},	/* 0x75 */
-	{ 0,                0},	/* 0x76 */
-	{ 0,                0},	/* 0x77 */
-	{ 0,                0},	/* 0x78 */
-	{ 0,                0},	/* 0x79 */
-	{ 0,                0},	/* 0x7A */
-	{ 0,                0},	/* 0x7B */
-	{ 0,                0},	/* 0x7C */
-	{ 0,                0},	/* 0x7D */
-	{ 0,                0},	/* 0x7E */
-	{ 0,                0},	/* 0x7F */
+	{ 0,                0}, /* 0x60 */
+	{ 0,                0}, /* 0x61 */
+	{ 0,                0}, /* 0x62 */
+	{ 0,                0}, /* 0x63 */
+	{ 0,                0}, /* 0x64 */
+	{ 0,                0}, /* 0x65 */
+	{ 0,                0}, /* 0x66 */
+	{ 0,                0}, /* 0x67 */
+	{ 0,                0}, /* 0x68 */
+	{ 0,                0}, /* 0x69 */
+	{ 0,                0}, /* 0x6A */
+	{ 0,                0}, /* 0x6B */
+	{ 0,                0}, /* 0x6C */
+	{ 0,                0}, /* 0x6D */
+	{ 0,                0}, /* 0x6E */
+	{ 0,                0}, /* 0x6F */
+	{ 0,                0}, /* 0x70 */
+	{ 0,                0}, /* 0x71 */
+	{ 0,                0}, /* 0x72 */
+	{ 0,                0}, /* 0x73 */
+	{ 0,                0}, /* 0x74 */
+	{ 0,                0}, /* 0x75 */
+	{ 0,                0}, /* 0x76 */
+	{ 0,                0}, /* 0x77 */
+	{ 0,                0}, /* 0x78 */
+	{ 0,                0}, /* 0x79 */
+	{ 0,                0}, /* 0x7A */
+	{ 0,                0}, /* 0x7B */
+	{ 0,                0}, /* 0x7C */
+	{ 0,                0}, /* 0x7D */
+	{ 0,                0}, /* 0x7E */
+	{ 0,                0}, /* 0x7F */
 };
 
 
@@ -4360,7 +4360,7 @@ static void decode_exec (i860s *cpustate, UINT32 insn, UINT32 non_shadow)
 		unrecog_opcode (cpustate->pc, insn);
 
 	/* For now, just treat every instruction as taking the same number of
-       clocks-- a major oversimplification.  */
+	   clocks-- a major oversimplification.  */
 	cpustate->icount -= 9;
 }
 
@@ -4370,22 +4370,22 @@ void reset_i860 (i860s *cpustate)
 {
 	int i;
 	/* On power-up/reset, i860 has values:
-         PC = 0xffffff00.
-         Integer registers: r0 = 0, others = undefined.
-         FP registers:      f0:f1 = 0, others undefined.
-         psr: U = IM = BR = BW = 0; others = undefined.
-         epsr: IL = WP = PBM = BE = 0; processor type, stepping, and
-               DCS are proper and read-only; others = undefined.
-         db: undefined.
-         dirbase: DPS, BL, ATE = 0
-         fir, fsr, KR, KI, MERGE: undefined. (what about T?)
+	     PC = 0xffffff00.
+	     Integer registers: r0 = 0, others = undefined.
+	     FP registers:      f0:f1 = 0, others undefined.
+	     psr: U = IM = BR = BW = 0; others = undefined.
+	     epsr: IL = WP = PBM = BE = 0; processor type, stepping, and
+	           DCS are proper and read-only; others = undefined.
+	     db: undefined.
+	     dirbase: DPS, BL, ATE = 0
+	     fir, fsr, KR, KI, MERGE: undefined. (what about T?)
 
-         I$: flushed.
-         D$: undefined (all modified bits = 0).
-         TLB: flushed.
+	     I$: flushed.
+	     D$: undefined (all modified bits = 0).
+	     TLB: flushed.
 
-       Note that any undefined values are set to 0x55aa55aa patterns to
-       try to detect defective i860 software.  */
+	   Note that any undefined values are set to 0x55aa55aa patterns to
+	   try to detect defective i860 software.  */
 
 	/* PC is at trap address after reset.  */
 	cpustate->pc = 0xffffff00;
@@ -4401,19 +4401,19 @@ void reset_i860 (i860s *cpustate)
 	set_fregval_s (cpustate, 1, 0.0);
 
 	/* Set whole psr to 0.  This sets the proper bits to 0 as specified
-       above, and zeroes the undefined bits.  */
+	   above, and zeroes the undefined bits.  */
 	cpustate->cregs[CR_PSR] = 0;
 
 	/* Set most of the epsr bits to 0 (as specified above), leaving
-       undefined as zero as well.  Then properly set processor type,
-       step, and DCS. Type = EPSR[7..0], step = EPSR[12..8],
-       DCS = EPSR[21..18] (2^[12+dcs] = cache size).
-       We'll pretend to be stepping D0, since it has the fewest bugs
-       (and I don't want to emulate the many defects in the earlier
-       steppings).
-       Proc type: 1 = XR, 2 = XP   (XR has 8KB data cache -> DCS = 1).
-       Steppings (XR): 3,4,5,6,7 = (B2, C0, B3, C1, D0 respectively).
-       Steppings (XP): 0, 2, 3, 4 = (A0, B0, B1, B2) (any others?).  */
+	   undefined as zero as well.  Then properly set processor type,
+	   step, and DCS. Type = EPSR[7..0], step = EPSR[12..8],
+	   DCS = EPSR[21..18] (2^[12+dcs] = cache size).
+	   We'll pretend to be stepping D0, since it has the fewest bugs
+	   (and I don't want to emulate the many defects in the earlier
+	   steppings).
+	   Proc type: 1 = XR, 2 = XP   (XR has 8KB data cache -> DCS = 1).
+	   Steppings (XR): 3,4,5,6,7 = (B2, C0, B3, C1, D0 respectively).
+	   Steppings (XP): 0, 2, 3, 4 = (A0, B0, B1, B2) (any others?).  */
 	cpustate->cregs[CR_EPSR] = 0x00040701;
 
 	/* Set DPS, BL, ATE = 0 and the undefined parts also to 0.  */
@@ -4444,7 +4444,7 @@ static CPU_EXECUTE( i860 )
 	i860_state_t *cpustate = get_safe_token(device);
 
 	/* Check if the data bus is held by another device, and bail if so.
-       Also check for reset.  */
+	   Also check for reset.  */
 	if (cpustate->pin_reset)
 		reset_i860 (cpustate);
 	if (cpustate->pin_bus_hold)
@@ -4471,7 +4471,7 @@ static CPU_EXECUTE( i860 )
 			cpustate->single_stepping = 0;
 		}
 		else if (cpustate->pc == 0xfffc0384 ||
-				 cpustate->pc == 0xfffc03b8)
+					cpustate->pc == 0xfffc03b8)
 		{
 			fprintf(stderr, "(%s) 0x%08x: passed 0x20000000\n", cpustate->device->tag(), cpustate->pc);
 			cpustate->single_stepping = 0;
@@ -4479,7 +4479,7 @@ static CPU_EXECUTE( i860 )
 #endif
 
 		savepc = cpustate->pc;
-        debugger_instruction_hook(cpustate->device, cpustate->pc);
+		debugger_instruction_hook(cpustate->device, cpustate->pc);
 		decode_exec (cpustate, ifetch (cpustate, cpustate->pc), 1);
 
 		cpustate->exiting_ifetch = 0;
@@ -4488,8 +4488,8 @@ static CPU_EXECUTE( i860 )
 		if (cpustate->pending_trap)
 		{
 			/* If we need to trap, change PC to trap address.
-               Also set supervisor mode, copy U and IM to their
-               previous versions, clear IM.  */
+			   Also set supervisor mode, copy U and IM to their
+			   previous versions, clear IM.  */
 			if ((cpustate->pending_trap & TRAP_WAS_EXTERNAL) || (GET_EPSR_INT () && GET_PSR_IN ()))
 			{
 				if (!cpustate->pc_updated)
@@ -4517,12 +4517,12 @@ static CPU_EXECUTE( i860 )
 		else if (!cpustate->pc_updated)
 		{
 			/* If the PC wasn't updated by a control flow instruction, just
-               bump to next sequential instruction.  */
+			   bump to next sequential instruction.  */
 			cpustate->pc += 4;
 		}
 
 		/*if (cpustate->single_stepping)
-            debugger (cpustate); */
+		    debugger (cpustate); */
 	}
 }
 /*=================================================================*/
@@ -4547,10 +4547,10 @@ static void disasm (i860s *cpustate, UINT32 addr, int len)
 		char buf[256];
 		UINT32 phys_addr = addr;
 		if (GET_DIRBASE_ATE ())
-			phys_addr = get_address_translation (cpustate, addr, 1	/* is_dataref */, 0	/* is_write */);
+			phys_addr = get_address_translation (cpustate, addr, 1  /* is_dataref */, 0 /* is_write */);
 
 		/* Note that we print the incoming (possibly virtual) address as the
-           PC rather than the translated address.  */
+		   PC rather than the translated address.  */
 		fprintf (stderr, "  (%s) 0x%08x: ", cpustate->device->tag(), addr);
 		insn = cpustate->program->read_dword(phys_addr);
 #ifdef HOST_MSB
@@ -4576,13 +4576,13 @@ static void dbg_db (i860s *cpustate, UINT32 addr, int len)
 	while (len > 0)
 	{
 		/* Note that we print the incoming (possibly virtual) address
-           rather than the translated address.  */
+		   rather than the translated address.  */
 		fprintf (stderr, "0x%08x: ", addr);
 		for (i = 0; i < 16; i++)
 		{
 			UINT32 phys_addr = addr;
 			if (GET_DIRBASE_ATE ())
-				phys_addr = get_address_translation (cpustate, addr, 1	/* is_dataref */, 0	/* is_write */);
+				phys_addr = get_address_translation (cpustate, addr, 1  /* is_dataref */, 0 /* is_write */);
 
 			b[i] = cpustate->program->read_byte(phys_addr);
 			fprintf (stderr, "%02x ", b[i]);
@@ -4594,7 +4594,7 @@ static void dbg_db (i860s *cpustate, UINT32 addr, int len)
 			if (isprint (b[i]))
 				fprintf (stderr, "%c", b[i]);
 			else
-				fprintf	(stderr, ".");
+				fprintf (stderr, ".");
 		}
 		fprintf (stderr, "\n");
 		len -= 16;
@@ -4623,7 +4623,7 @@ void debugger (i860s *cpustate)
 			disasm (cpustate, cpustate->pc + 4, 1);
 	}
 	else
-		fprintf	(stderr, "\nEmulator: internal debugger started (? for help).\n");
+		fprintf (stderr, "\nEmulator: internal debugger started (? for help).\n");
 
 	fflush (stdin);
 
@@ -4657,8 +4657,8 @@ void debugger (i860s *cpustate)
 				break;
 			buf[1] = 0;
 			fprintf (stderr, "go until pc = 0x%08x.\n",
-					 cpustate->single_stepping);
-			cpustate->single_stepping = 0;	  /* HACK */
+						cpustate->single_stepping);
+			cpustate->single_stepping = 0;    /* HACK */
 		}
 		else if (buf[0] == 'r')
 			dump_state (cpustate);
@@ -4693,9 +4693,9 @@ void debugger (i860s *cpustate)
 			sscanf (buf + 1, "%x", &v);
 			if (GET_DIRBASE_ATE ())
 				fprintf (stderr, "vma 0x%08x ==> phys 0x%08x\n", v,
-						 get_address_translation (cpustate, v, 1, 0));
+							get_address_translation (cpustate, v, 1, 0));
 			else
-				fprintf	(stderr, "not in virtual address mode.\n");
+				fprintf (stderr, "not in virtual address mode.\n");
 		}
 		else if (buf[0] == 'B')
 		{
@@ -4707,7 +4707,7 @@ void debugger (i860s *cpustate)
 			fprintf (stderr, "  db: dump bytes (db[0xaddress])\n   r: dump registers\n   s: single-step\n   g: go back to emulator (g[0xaddress])\n   u: disassemble (u[0xaddress])\n   p: dump pipelines (p{0-4} for all, add, mul, load, graphics)\n   l: load an ELF binary (lpath)\n   x: give virt->phys translation (x{0xaddress})\n");
 		}
 		else
-			fprintf	(stderr, "Bad command '%s'.\n", buf);
+			fprintf (stderr, "Bad command '%s'.\n", buf);
 	}
 
 	/* Less noise when single-stepping.  */

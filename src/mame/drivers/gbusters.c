@@ -106,8 +106,8 @@ WRITE8_MEMBER(gbusters_state::gbusters_sh_irqtrigger_w)
 WRITE8_MEMBER(gbusters_state::gbusters_snd_bankswitch_w)
 {
 	device_t *device = machine().device("k007232");
-	int bank_B = BIT(data, 2);	/* ?? */
-	int bank_A = BIT(data, 0);		/* ?? */
+	int bank_B = BIT(data, 2);  /* ?? */
+	int bank_A = BIT(data, 0);      /* ?? */
 	k007232_set_bank(device, bank_A, bank_B );
 
 #if 0
@@ -149,33 +149,33 @@ WRITE8_MEMBER(gbusters_state::k052109_051960_w)
 
 
 static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, gbusters_state )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)						/* coin counters */
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)									/* sound code # */
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)								/* watchdog reset */
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)                      /* coin counters */
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)                                    /* sound code # */
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)                     /* cause interrupt on audio CPU */
+	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)                             /* watchdog reset */
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)								/* enable gfx ROM read through VRAM */
-	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)							/* ??? */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
-	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")	/* palette + work RAM (RAM D16 & C16) */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")											/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
+	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)                              /* enable gfx ROM read through VRAM */
+	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)                           /* ??? */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)       /* tiles + sprites (RAM H21, G21 & H6) */
+	AM_RANGE(0x4000, 0x57ff) AM_RAM                                                 /* RAM I12 */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram") /* palette + work RAM (RAM D16 & C16) */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")                                            /* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                                                 /* ROM 878n02.rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8, gbusters_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM													/* ROM 878h01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM													/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)									/* soundlatch_byte_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ymsnd", ym2151_device, status_r)					/* YM 2151 */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)				/* YM 2151 */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM                                                 /* ROM 878h01.rom */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM                                                 /* RAM */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)                                 /* soundlatch_byte_r */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)        /* 007232 registers */
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ymsnd", ym2151_device, status_r)                   /* YM 2151 */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)               /* YM 2151 */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(gbusters_snd_bankswitch_w)        /* 007232 bankswitch? */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -190,30 +190,30 @@ static INPUT_PORTS_START( gbusters )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x04, "Bullets" )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Bullets" )           PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "50" )
 	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "50k, 200k, Every 400k" )
 	PORT_DIPSETTING(    0x10, "70k, 250k, Every 500k" )
 	PORT_DIPSETTING(    0x08, "50k Only" )
 	PORT_DIPSETTING(    0x00, "70k Only" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" ) /* Listed as "Unused" */
@@ -246,7 +246,7 @@ static void volume_callback( device_t *device, int v )
 
 static const k007232_interface k007232_config =
 {
-	volume_callback	/* external port callback */
+	volume_callback /* external port callback */
 };
 
 static const k052109_interface gbusters_k052109_intf =
@@ -300,11 +300,11 @@ void gbusters_state::machine_reset()
 static MACHINE_CONFIG_START( gbusters, gbusters_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)	/* Konami custom 052526 */
+	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Konami custom 052526 */
 	MCFG_CPU_PROGRAM_MAP(gbusters_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gbusters_state,  gbusters_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)      /* ? */
 	MCFG_CPU_PROGRAM_MAP(gbusters_sound_map)
 
 
@@ -406,8 +406,8 @@ ROM_START( crazycop )
 	ROM_LOAD( "878c08.k27", 0x40000, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) ) /* tiles */
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* graphics (addressable by the main CPU) */
-	ROM_LOAD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) )	/* sprites */
-	ROM_LOAD( "878c06.k5", 0x40000, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) )	/* sprites */
+	ROM_LOAD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) ) /* sprites */
+	ROM_LOAD( "878c06.k5", 0x40000, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) ) /* sprites */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "878a09.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) ) /* priority encoder (not used) */

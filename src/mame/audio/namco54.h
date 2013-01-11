@@ -7,8 +7,8 @@
 
 struct namco_54xx_config
 {
-	const char *discrete;	/* name of the discrete sound device */
-	int			firstnode;	/* index of the first node */
+	const char *discrete;   /* name of the discrete sound device */
+	int         firstnode;  /* index of the first node */
 };
 
 
@@ -44,10 +44,10 @@ extern const device_type NAMCO_54XX;
 
 
 /* discrete nodes */
-#define NAMCO_54XX_0_DATA(base)		(NODE_RELATIVE(base, 0))
-#define NAMCO_54XX_1_DATA(base)		(NODE_RELATIVE(base, 1))
-#define NAMCO_54XX_2_DATA(base)		(NODE_RELATIVE(base, 2))
-#define NAMCO_54XX_P_DATA(base)		(NODE_RELATIVE(base, 3))
+#define NAMCO_54XX_0_DATA(base)     (NODE_RELATIVE(base, 0))
+#define NAMCO_54XX_1_DATA(base)     (NODE_RELATIVE(base, 1))
+#define NAMCO_54XX_2_DATA(base)     (NODE_RELATIVE(base, 2))
+#define NAMCO_54XX_P_DATA(base)     (NODE_RELATIVE(base, 3))
 
 
-#endif	/* NAMCO54_H */
+#endif  /* NAMCO54_H */

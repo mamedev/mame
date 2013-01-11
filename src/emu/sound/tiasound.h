@@ -42,5 +42,4 @@ void tia_sound_free(void *chip);
 void tia_process (void *chip, stream_sample_t *buffer, int length);
 void tia_write(void *chip, offs_t offset, UINT8 data);
 
-#endif	/* __TIASOUND_H__ */
-
+#endif  /* __TIASOUND_H__ */

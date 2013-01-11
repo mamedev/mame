@@ -68,8 +68,8 @@ static INPUT_PORTS_START( micro3d )
 
 	PORT_START("VGB_SW")
 	PORT_DIPNAME( 0x0008, 0x0008, "VGB Monitor Mode")
-	PORT_DIPSETTING(	0x0008, DEF_STR(Off) )
-	PORT_DIPSETTING(	0x0000, DEF_STR(On) )
+	PORT_DIPSETTING(    0x0008, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x0000, DEF_STR(On) )
 
 	PORT_START("SOUND_SW")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
@@ -112,7 +112,7 @@ static INPUT_PORTS_START( botss )
 	PORT_MODIFY("INPUTS_A_B")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, micro3d_state, botss_hwchk_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME("Shield")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Shield")
 	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0x7800, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -138,7 +138,7 @@ static INPUT_PORTS_START( botss11 )
 
 	PORT_MODIFY("INPUTS_A_B")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME("Shield")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Shield")
 	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( hostmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x960000, 0x960001) AM_WRITE(micro3d_reset_w)
 	AM_RANGE(0x980000, 0x980001) AM_READWRITE(micro3d_adc_r, micro3d_adc_w)
 	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(micro3d_tms_host_r, micro3d_tms_host_w)
-	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP					/* Lamps */
+	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP                 /* Lamps */
 	AM_RANGE(0x9e0000, 0x9e002f) AM_DEVREADWRITE8("mc68901", mc68901_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
 	AM_RANGE(0xa20000, 0xa20001) AM_READ(micro3d_encoder_h_r)
@@ -289,13 +289,13 @@ ADDRESS_MAP_END
 
 static const tms34010_config vgb_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	XTAL_40MHz / 8,					/* pixel clock */
-	4,								/* pixels per clock */
-	micro3d_scanline_update,		/* scanline updater (indexed16) */
-	NULL,							/* scanline updater (rgb32) */
-	micro3d_tms_interrupt,			/* Generate interrupt */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	XTAL_40MHz / 8,                 /* pixel clock */
+	4,                              /* pixels per clock */
+	micro3d_scanline_update,        /* scanline updater (indexed16) */
+	NULL,                           /* scanline updater (rgb32) */
+	micro3d_tms_interrupt,          /* Generate interrupt */
 	NULL,
 	NULL
 };
@@ -310,18 +310,18 @@ static const duart68681_config micro3d_duart68681_config =
 
 static MC68901_INTERFACE( mfp_intf )
 {
-	4000000,											/* timer clock */
-	0,													/* receive clock */
-	0,													/* transmit clock */
-	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),		/* interrupt */
-	DEVCB_NULL,											/* GPIO read */
-	DEVCB_NULL,											/* GPIO write */
-	DEVCB_NULL,											/* TAO */
-	DEVCB_NULL,											/* TBO */
-	DEVCB_NULL,											/* TCO */
-	DEVCB_NULL,											/* TDO */
-	DEVCB_NULL,											/* serial input */
-	DEVCB_NULL											/* serial output */
+	4000000,                                            /* timer clock */
+	0,                                                  /* receive clock */
+	0,                                                  /* transmit clock */
+	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),        /* interrupt */
+	DEVCB_NULL,                                         /* GPIO read */
+	DEVCB_NULL,                                         /* GPIO write */
+	DEVCB_NULL,                                         /* TAO */
+	DEVCB_NULL,                                         /* TBO */
+	DEVCB_NULL,                                         /* TCO */
+	DEVCB_NULL,                                         /* TDO */
+	DEVCB_NULL,                                         /* serial input */
+	DEVCB_NULL                                          /* serial output */
 };
 
 

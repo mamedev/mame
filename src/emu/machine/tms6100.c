@@ -62,16 +62,16 @@
 #include "emu.h"
 #include "tms6100.h"
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 
-#if	VERBOSE
-#define LOG(x)		logerror x
+#if VERBOSE
+#define LOG(x)      logerror x
 #else
-#define	LOG(x)
+#define LOG(x)
 #endif
 
-#define TMS6100_READ_PENDING		0x01
-#define TMS6100_NEXT_READ_IS_DUMMY	0x02
+#define TMS6100_READ_PENDING        0x01
+#define TMS6100_NEXT_READ_IS_DUMMY  0x02
 
 struct tms6100_state
 {
@@ -316,5 +316,3 @@ void m58819_device::device_start()
 {
 	DEVICE_START_NAME( m58819 )(this);
 }
-
-

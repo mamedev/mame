@@ -51,9 +51,9 @@
 
 devcb2_base::devcb2_base(device_t &device, UINT64 defmask)
 	: m_device(device),
-	  m_rshift(0),
-	  m_mask(defmask),
-	  m_xor(0)
+		m_rshift(0),
+		m_mask(defmask),
+		m_xor(0)
 {
 	reset();
 }

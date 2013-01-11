@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	53c7xx.h
-	
-	NCR 53C700 SCSI I/O Processor
+    53c7xx.h
+
+    NCR 53C700 SCSI I/O Processor
 
 *********************************************************************/
 
@@ -16,66 +16,66 @@
 //  REGISTER DEFINES (INCOMPLETE)
 //**************************************************************************
 
-#define SCNTL0_TRG			0x01
-#define SCNTL0_AAP			0x02
-#define SCNTL0_EPG			0x04
-#define SCNTL0_EPC			0x08
-#define SCNTL0_WATN			0x10
-#define SCNTL0_START		0x20
-#define SCNTL0_ARB_MASK		3
-#define SCNTL0_ARB_SHIFT	6
+#define SCNTL0_TRG          0x01
+#define SCNTL0_AAP          0x02
+#define SCNTL0_EPG          0x04
+#define SCNTL0_EPC          0x08
+#define SCNTL0_WATN         0x10
+#define SCNTL0_START        0x20
+#define SCNTL0_ARB_MASK     3
+#define SCNTL0_ARB_SHIFT    6
 
-#define SSTAT0_PAR			0x01
-#define SSTAT0_RST			0x02
-#define SSTAT0_UDC			0x04
-#define SSTAT0_SGE			0x08
-#define SSTAT0_SEL			0x10
-#define SSTAT0_STO			0x20
-#define SSTAT0_CMP			0x40
-#define SSTAT0_MA			0x80
+#define SSTAT0_PAR          0x01
+#define SSTAT0_RST          0x02
+#define SSTAT0_UDC          0x04
+#define SSTAT0_SGE          0x08
+#define SSTAT0_SEL          0x10
+#define SSTAT0_STO          0x20
+#define SSTAT0_CMP          0x40
+#define SSTAT0_MA           0x80
 
-#define SSTAT1_SDP			0x01
-#define SSTAT1_RST			0x02
-#define SSTAT1_WOA			0x04
-#define SSTAT1_LOA			0x08
-#define SSTAT1_AIP			0x10
-#define SSTAT1_ORF			0x20
-#define SSTAT1_OLF			0x40
-#define SSTAT1_ILF			0x80
+#define SSTAT1_SDP          0x01
+#define SSTAT1_RST          0x02
+#define SSTAT1_WOA          0x04
+#define SSTAT1_LOA          0x08
+#define SSTAT1_AIP          0x10
+#define SSTAT1_ORF          0x20
+#define SSTAT1_OLF          0x40
+#define SSTAT1_ILF          0x80
 
-#define ISTAT_DIP			0x01
-#define ISTAT_SIP			0x02
-#define ISTAT_PRE			0x04
-#define ISTAT_CON			0x08
-#define ISTAT_ABRT			0x80
+#define ISTAT_DIP           0x01
+#define ISTAT_SIP           0x02
+#define ISTAT_PRE           0x04
+#define ISTAT_CON           0x08
+#define ISTAT_ABRT          0x80
 
-#define DSTAT_OPC			0x01
-#define DSTAT_WTD			0x02
-#define DSTAT_SIR			0x04
-#define DSTAT_SSI			0x08
-#define DSTAT_ABRT			0x10
-#define DSTAT_DFE			0x80
+#define DSTAT_OPC           0x01
+#define DSTAT_WTD           0x02
+#define DSTAT_SIR           0x04
+#define DSTAT_SSI           0x08
+#define DSTAT_ABRT          0x10
+#define DSTAT_DFE           0x80
 
 
 struct NCR53C7XXinterface
 {
-	devcb_write_line	m_out_irq_cb;
-	UINT32				(*host_r)(running_machine &machine, bool io, offs_t addr);
-	void				(*host_w)(running_machine &machine, bool io, offs_t addr, UINT32 data, UINT32 mem_mask);
+	devcb_write_line    m_out_irq_cb;
+	UINT32              (*host_r)(running_machine &machine, bool io, offs_t addr);
+	void                (*host_w)(running_machine &machine, bool io, offs_t addr, UINT32 data, UINT32 mem_mask);
 };
 
 
 class ncr53c7xx_device : public nscsi_device,
-						 public device_execute_interface,
-					     public NCR53C7XXinterface
+							public device_execute_interface,
+							public NCR53C7XXinterface
 {
 public:
 	// construction/destruction
 	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// our API
-    DECLARE_READ32_MEMBER(read);
-    DECLARE_WRITE32_MEMBER(write);
+	DECLARE_READ32_MEMBER(read);
+	DECLARE_WRITE32_MEMBER(write);
 
 
 protected:
@@ -83,7 +83,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
-    virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void execute_run();
 
 	int m_icount;
@@ -120,7 +120,7 @@ private:
 		INIT_XFER,
 		INIT_XFER_WAIT_REQ,
 		INIT_XFER_SEND_BYTE,
-		INIT_XFER_RECV_PAD,	
+		INIT_XFER_RECV_PAD,
 		INIT_XFER_RECV_BYTE_ACK,
 		INIT_XFER_RECV_BYTE_NACK,
 		SEND_WAIT_REQ_0,
@@ -146,7 +146,7 @@ private:
 		SCRIPTS_FETCH,
 		SCRIPTS_EXECUTE,
 	};
-	
+
 	void set_scripts_state(scripts_state state);
 	void scripts_yield();
 	void scripts_decode_bm(void);
@@ -174,49 +174,49 @@ private:
 
 
 	// SCSI registers
-	UINT8	m_scntl[2];
-	UINT8	m_sdid;
-	UINT8	m_sien;
-	UINT8	m_scid;
-	UINT8	m_sxfer;
-	UINT8	m_sodl;
-	UINT8	m_socl;
-	UINT8	m_sfbr;
-	UINT8	m_sidl;
-	UINT8	m_sbdl;
-	UINT8	m_sbcl;
-	UINT8	m_dstat;
-	UINT8	m_sstat[3];
-	UINT8	m_ctest[8];
-	UINT32	m_temp;
-	UINT8	m_dfifo;
-	UINT8	m_istat;
-	UINT32	m_dbc;
-	UINT8	m_dcmd;
-	UINT32	m_dnad;
-	UINT32	m_dsp;
-	UINT32	m_dsps;
-	UINT8	m_dmode;
-	UINT8	m_dien;
-	UINT8	m_dwt;
-	UINT8	m_dcntl;
+	UINT8   m_scntl[2];
+	UINT8   m_sdid;
+	UINT8   m_sien;
+	UINT8   m_scid;
+	UINT8   m_sxfer;
+	UINT8   m_sodl;
+	UINT8   m_socl;
+	UINT8   m_sfbr;
+	UINT8   m_sidl;
+	UINT8   m_sbdl;
+	UINT8   m_sbcl;
+	UINT8   m_dstat;
+	UINT8   m_sstat[3];
+	UINT8   m_ctest[8];
+	UINT32  m_temp;
+	UINT8   m_dfifo;
+	UINT8   m_istat;
+	UINT32  m_dbc;
+	UINT8   m_dcmd;
+	UINT32  m_dnad;
+	UINT32  m_dsp;
+	UINT32  m_dsps;
+	UINT8   m_dmode;
+	UINT8   m_dien;
+	UINT8   m_dwt;
+	UINT8   m_dcntl;
 
 
 	// other state
-	int		m_scsi_state;
-	bool	m_connected;
-	bool	m_finished;
-	UINT8	m_last_data;
-	UINT32	m_xfr_phase;
-    emu_timer *m_tm;	
+	int     m_scsi_state;
+	bool    m_connected;
+	bool    m_finished;
+	UINT8   m_last_data;
+	UINT32  m_xfr_phase;
+	emu_timer *m_tm;
 
-	int		m_scripts_state;
-	int		m_scripts_substate;
-	void	(ncr53c7xx_device::*m_scripts_op)();
+	int     m_scripts_state;
+	int     m_scripts_substate;
+	void    (ncr53c7xx_device::*m_scripts_op)();
 
 	// callbacks
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_drq_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_drq_func;
 };
 
 // device type definition

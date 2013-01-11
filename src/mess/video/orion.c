@@ -44,38 +44,38 @@ UINT32 orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16 &
 					case 0 : color = ((code1 >> b) & 0x01) ? 10 : 0; break;
 					case 1 : color = ((code1 >> b) & 0x01) ? 17 : 16; break;
 					case 4 : val = (((code1 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
-							 switch(val) {
+								switch(val) {
 								case 0 : color = 0; break; // black
 								case 1 : color = 4; break; // red
 								case 2 : color = 2; break; // green
 								case 3 : color = 1; break; // blue
-							 }
-							 break;
+								}
+								break;
 					case 5 : val = (((code1 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
-							 switch(val) {
+								switch(val) {
 								case 0 : color = 7; break; // white
 								case 1 : color = 4; break; // red
 								case 2 : color = 2; break; // green
 								case 3 : color = 1; break; // blue
-							 }
-							 break;
+								}
+								break;
 					case 6 :
 					case 7 :
 					case 14 :
 					case 15 :
-							 color = ((code1 >> b) & 0x01) ? (code2 & 0x0f) : (code2 >> 4); break;
+								color = ((code1 >> b) & 0x01) ? (code2 & 0x0f) : (code2 >> 4); break;
 
 					default:
 						switch(m_orion128_video_mode & m_video_mode_mask & 20) {
 							case 16 :
-									 color = (((code1 >> b) & 0x01) << 2) + (((code3 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
-									 break;
+										color = (((code1 >> b) & 0x01) << 2) + (((code3 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
+										break;
 							case 20 :
-									 color = (((code1 >> b) & 0x01) << 2) + (((code3 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
-									 if ((((code4 >> b) & 0x01)==1) && (color!=0)) {
+										color = (((code1 >> b) & 0x01) << 2) + (((code3 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
+										if ((((code4 >> b) & 0x01)==1) && (color!=0)) {
 										color += 8;
-									 }
-									 break;
+										}
+										break;
 						}
 				}
 				bitmap.pix16(y, x*8+(7-b)) = color;
@@ -102,14 +102,12 @@ static const rgb_t orion128_palette[18] = {
 	MAKE_RGB(0xff, 0x00, 0x00), // C
 	MAKE_RGB(0xff, 0x00, 0xff), // D
 	MAKE_RGB(0xff, 0xff, 0x00), // E
-	MAKE_RGB(0xff, 0xff, 0xff),	// F
-	MAKE_RGB(0xc8, 0xb4, 0x28),	// 10
-	MAKE_RGB(0x32, 0xfa, 0xfa)	// 11
+	MAKE_RGB(0xff, 0xff, 0xff), // F
+	MAKE_RGB(0xc8, 0xb4, 0x28), // 10
+	MAKE_RGB(0x32, 0xfa, 0xfa)  // 11
 };
 
 PALETTE_INIT_MEMBER(orion_state,orion128 )
 {
 	palette_set_colors(machine(), 0, orion128_palette, ARRAY_LENGTH(orion128_palette));
 }
-
-

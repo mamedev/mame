@@ -35,9 +35,9 @@ protected:
 	const rom_entry *device_rom_region(void) const;
 
 private:
-	UINT8*	m_ram;
-	int		m_mapper[16];
-	bool	m_map_mode;
-	bool	m_access_mapper;
+	UINT8*  m_ram;
+	int     m_mapper[16];
+	bool    m_map_mode;
+	bool    m_access_mapper;
 };
 #endif

@@ -27,16 +27,16 @@ struct snes_bsx_state
 	// we don't emulate the base unit yet
 
 	// cart regs
-    UINT8 cart_regs[16];
+	UINT8 cart_regs[16];
 
 	// flash regs
-    UINT32 command;
-    UINT8 write_old;
-    UINT8 write_new;
+	UINT32 command;
+	UINT8 write_old;
+	UINT8 write_new;
 
-    int flash_enable;
-    int read_enable;
-    int write_enable;
+	int flash_enable;
+	int read_enable;
+	int write_enable;
 
 	UINT8 *pram;
 	int ram_source;
@@ -249,4 +249,3 @@ static WRITE8_HANDLER( bsx_flash_write )
 }
 
 #endif
-

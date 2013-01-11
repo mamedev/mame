@@ -65,7 +65,7 @@
 #include "cirrus.h"
 #include "video/pc_vga.h"
 
-#define LOG_PCIACCESS	0
+#define LOG_PCIACCESS   0
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -82,8 +82,8 @@ const device_type CIRRUS = &device_creator<cirrus_device>;
 //-------------------------------------------------
 
 cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-     : device_t(mconfig, CIRRUS, "CIRRUS", tag, owner, clock),
-	   pci_device_interface( mconfig, *this )
+		: device_t(mconfig, CIRRUS, "CIRRUS", tag, owner, clock),
+		pci_device_interface( mconfig, *this )
 {
 }
 
@@ -115,7 +115,7 @@ UINT32 cirrus_device::pci_read(pci_bus_device *pcibus, int function, int offset,
 	{
 		switch(offset)
 		{
-			case 0x00:	/* vendor/device ID */
+			case 0x00:  /* vendor/device ID */
 				result = 0x00A01013;
 				break;
 

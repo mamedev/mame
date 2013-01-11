@@ -191,10 +191,10 @@ UINT32 atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_ind1
 	/* copy the motion objects on top */
 	{
 		bitmap_ind16 *mo_bitmap = atarirle_get_vram(m_rle, 0);
-		int left	= cliprect.min_x;
-		int top		= cliprect.min_y;
-		int right	= cliprect.max_x + 1;
-		int bottom	= cliprect.max_y + 1;
+		int left    = cliprect.min_x;
+		int top     = cliprect.min_y;
+		int right   = cliprect.max_x + 1;
+		int bottom  = cliprect.max_y + 1;
 		int x, y;
 
 		/* now blend with the playfield */

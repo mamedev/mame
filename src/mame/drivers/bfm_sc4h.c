@@ -306,7 +306,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 					}
 
 					if (mem_mask&0x00ff)
-					{	// lamps
+					{   // lamps
 						mux_output_w(space, (addr & 0x01f0)>>4, data);
 					}
 
@@ -319,7 +319,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 					}
 
 					if (mem_mask&0x00ff)
-					{	// lamps
+					{   // lamps
 						mux_output2_w(space, (addr & 0x01f0)>>4, data);
 					}
 				}
@@ -618,7 +618,7 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 
 	for ( int n = 0; n < reels; n++ )
 	{
-		 if (m_reel_setup[n]) stepper_config(machine(), n, m_reel_setup[n]);
+			if (m_reel_setup[n]) stepper_config(machine(), n, m_reel_setup[n]);
 	}
 }
 
@@ -687,10 +687,10 @@ static const duart68681_config bfm_sc4_duart68681_config =
 	bfm_sc4_duart_input_r,
 	bfm_sc4_duart_output_w,
 	// TODO: What are the actual frequencies?
-	XTAL_16MHz/2/8,		/* IP2/RxCB clock */
-	XTAL_16MHz/2/16,	/* IP3/TxCA clock */
-	XTAL_16MHz/2/16,	/* IP4/RxCA clock */
-	XTAL_16MHz/2/8,		/* IP5/TxCB clock */
+	XTAL_16MHz/2/8,     /* IP2/RxCB clock */
+	XTAL_16MHz/2/16,    /* IP3/TxCA clock */
+	XTAL_16MHz/2/16,    /* IP4/RxCA clock */
+	XTAL_16MHz/2/8,     /* IP5/TxCB clock */
 };
 
 
@@ -740,7 +740,7 @@ static const duart68681_config m68307_duart68681_config =
 
 
 MACHINE_CONFIG_START( sc4, sc4_state )
-	MCFG_CPU_ADD("maincpu", M68307, 16000000)	 // 68307! (EC000 core)
+	MCFG_CPU_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 
 	// internal duart of the 68307... paired in machine start
@@ -775,7 +775,7 @@ MACHINE_START_MEMBER(sc4_adder4_state,adder4)
 }
 
 MACHINE_CONFIG_DERIVED_CLASS( sc4_adder4, sc4, sc4_adder4_state )
-	MCFG_CPU_ADD("adder4", M68340, 25175000)	 // 68340 (CPU32 core)
+	MCFG_CPU_ADD("adder4", M68340, 25175000)     // 68340 (CPU32 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_adder4_map)
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_adder4_state, adder4 )
@@ -785,9 +785,9 @@ MACHINE_CONFIG_DERIVED_CLASS( sc4dmd, sc4, sc4_state )
 	/* video hardware */
 
 	MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
-	MCFG_CPU_ADD("matrix", M6809, 2000000 )				/* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
+	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
-	MCFG_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )			/* generate 1500 NMI's per second ?? what is the exact freq?? */
+	MCFG_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 MACHINE_CONFIG_END
@@ -972,7 +972,3 @@ INPUT_PORTS_START( sc4_base )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 INPUT_PORTS_END
-
-
-
-

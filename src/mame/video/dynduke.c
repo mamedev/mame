@@ -197,13 +197,13 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 			UINT16 srcdat = src[realx];
 
 			/* 0x01 - data bits
-               0x02
-               0x04
-               0x08
-               0x10 - extra colour bit? (first boss)
-               0x20 - priority over sprites
-               the old driver also had 'bg_palbase' but I don't see what it's for?
-            */
+			   0x02
+			   0x04
+			   0x08
+			   0x10 - extra colour bit? (first boss)
+			   0x20 - priority over sprites
+			   the old driver also had 'bg_palbase' but I don't see what it's for?
+			*/
 
 			if ((srcdat & 0x20) == pri)
 			{

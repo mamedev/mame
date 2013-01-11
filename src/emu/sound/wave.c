@@ -17,7 +17,7 @@
 #include "imagedev/cassette.h"
 #include "wave.h"
 
-#define ALWAYS_PLAY_SOUND	0
+#define ALWAYS_PLAY_SOUND   0
 
 static STREAM_UPDATE( wave_sound_update )
 {
@@ -86,7 +86,7 @@ const device_type WAVE = &device_creator<wave_device>;
 
 wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WAVE, "Cassette", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -118,5 +118,3 @@ void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

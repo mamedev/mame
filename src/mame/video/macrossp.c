@@ -177,13 +177,13 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 		/*
 
-         --hh hhyy yyyy yyyy   CCww wwxx xxxx xxxx
+		 --hh hhyy yyyy yyyy   CCww wwxx xxxx xxxx
 
-         ---- --zz zzzz zzzz   ---- --ZZ ZZZZ ZZZZ
+		 ---- --zz zzzz zzzz   ---- --ZZ ZZZZ ZZZZ
 
-         fFa- pp-- cccc c---   tttt tttt tttt tttt
+		 fFa- pp-- cccc c---   tttt tttt tttt tttt
 
-         */
+		 */
 
 
 		int wide = (source[0] & 0x00003c00) >> 10;
@@ -336,7 +336,7 @@ static void draw_layer( running_machine &machine, bitmap_rgb32 &bitmap, const re
 			break;
 	}
 
-	if ((vr[2] & 0xf0000000) == 0xe0000000)	/* zoom enable (guess, surely wrong) */
+	if ((vr[2] & 0xf0000000) == 0xe0000000) /* zoom enable (guess, surely wrong) */
 	{
 		int startx, starty, inc;
 
@@ -351,7 +351,7 @@ static void draw_layer( running_machine &machine, bitmap_rgb32 &bitmap, const re
 
 		tm->draw_roz(bitmap, cliprect,
 				startx,starty,inc,0,0,inc,
-				1,	/* wraparound */
+				1,  /* wraparound */
 				0,0);
 	}
 	else
@@ -403,7 +403,7 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 
 #if 0
-popmessage	("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",
+popmessage  ("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",
 m_scra_videoregs[0]&0xffff33ff, // yyyyxxxx
 m_scra_videoregs[1], // ??? more scrolling?
 m_scra_videoregs[2], // 08 - 0b

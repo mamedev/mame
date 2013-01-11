@@ -95,7 +95,7 @@ static const POCKETC_FIGURE busy={
 	"1 1 11    1e"
 };
 
- READ8_HANDLER(pc1251_lcd_read)
+	READ8_HANDLER(pc1251_lcd_read)
 {
 	pc1251_state *state = space.machine().driver_data<pc1251_state>();
 	int data;
@@ -159,8 +159,7 @@ UINT32 pc1251_state::screen_update_pc1251(screen_device &screen, bitmap_ind16 &b
 						m_reg[0x3e] & 0x04 ? color[1] : color[0]);
 
 	/* 0x3c 1 def?, 4 g, 8 de
-       0x3d 2 shift, 4 rad, 8 error
-       0x3e 1 pro?, 2 run?, 4rsv?*/
+	   0x3d 2 shift, 4 rad, 8 error
+	   0x3e 1 pro?, 2 run?, 4rsv?*/
 	return 0;
 }
-

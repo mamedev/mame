@@ -371,8 +371,8 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_
 			UINT32 flipy = (attributes & 2);
 
 			UINT32 color = source[2];
-			UINT32 sizex = 1 << ((color >> 0) & 3);						/* 1,2,4,8 */
-			UINT32 sizey = 1 << ((color >> state->m_sprite_sizey) & 3);	/* 1,2,4,8 */
+			UINT32 sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
+			UINT32 sizey = 1 << ((color >> state->m_sprite_sizey) & 3); /* 1,2,4,8 */
 
 			/* raiga needs something like this */
 			UINT32 number = (source[1] & (sizex > 2 ? 0x7ff8 : 0x7ffc));
@@ -406,10 +406,10 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_
 			switch( priority )
 			{
 				default:
-				case 0x0: priority_mask = 0;					break;
-				case 0x1: priority_mask = 0xf0;					break;	/* obscured by text layer */
-				case 0x2: priority_mask = 0xf0 | 0xcc;			break;	/* obscured by foreground */
-				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;	break;	/* obscured by bg and fg  */
+				case 0x0: priority_mask = 0;                    break;
+				case 0x1: priority_mask = 0xf0;                 break;  /* obscured by text layer */
+				case 0x2: priority_mask = 0xf0 | 0xcc;          break;  /* obscured by foreground */
+				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;   break;  /* obscured by bg and fg  */
 			}
 
 
@@ -493,8 +493,8 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_b
 			UINT32 flipy = (attributes & 2);
 
 			UINT32 color = source[2];
-			UINT32 sizex = 1 << ((color >> 0) & 3);						/* 1,2,4,8 */
-			UINT32 sizey = 1 << ((color >> state->m_sprite_sizey) & 3);	/* 1,2,4,8 */
+			UINT32 sizex = 1 << ((color >> 0) & 3);                     /* 1,2,4,8 */
+			UINT32 sizey = 1 << ((color >> state->m_sprite_sizey) & 3); /* 1,2,4,8 */
 
 			/* raiga needs something like this */
 			UINT32 number = (source[1] & (sizex > 2 ? 0x7ff8 : 0x7ffc));
@@ -528,10 +528,10 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_b
 			switch( priority )
 			{
 				default:
-				case 0x0: priority_mask = 0;					break;
-				case 0x1: priority_mask = 0xf0;					break;	/* obscured by text layer */
-				case 0x2: priority_mask = 0xf0 | 0xcc;			break;	/* obscured by foreground */
-				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;	break;	/* obscured by bg and fg  */
+				case 0x0: priority_mask = 0;                    break;
+				case 0x1: priority_mask = 0xf0;                 break;  /* obscured by text layer */
+				case 0x2: priority_mask = 0xf0 | 0xcc;          break;  /* obscured by foreground */
+				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;   break;  /* obscured by bg and fg  */
 			}
 
 			/* blending */
@@ -653,7 +653,7 @@ UINT32 gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &b
 	m_background->draw(m_tile_bitmap_bg, cliprect, 0, 1);
 	m_foreground->draw(m_tile_bitmap_fg, cliprect, 0, 2);
 	/* draw the blended tiles at a lower priority
-       so sprites covered by them will still be drawn */
+	   so sprites covered by them will still be drawn */
 	m_foreground->draw(m_tile_bitmap_fg, cliprect, 1, 0);
 	m_text_layer->draw(m_tile_bitmap_fg, cliprect, 0, 4);
 
@@ -678,7 +678,7 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	m_background->draw(m_tile_bitmap_bg, cliprect, 0, 1);
 	m_foreground->draw(m_tile_bitmap_fg, cliprect, 0, 2);
 	/* draw the blended tiles at a lower priority
-       so sprites covered by them will still be drawn */
+	   so sprites covered by them will still be drawn */
 	m_foreground->draw(m_tile_bitmap_fg, cliprect, 1, 0);
 	m_text_layer->draw(m_tile_bitmap_fg, cliprect, 0, 4);
 

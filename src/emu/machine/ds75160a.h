@@ -34,7 +34,7 @@
 ///*************************************************************************
 
 #define MCFG_DS75160A_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, DS75160A, 0)	\
+	MCFG_DEVICE_ADD(_tag, DS75160A, 0)  \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -51,34 +51,34 @@
 
 struct ds75160a_interface
 {
-	devcb_read8		m_in_bus_cb;
-	devcb_write8	m_out_bus_cb;
+	devcb_read8     m_in_bus_cb;
+	devcb_write8    m_out_bus_cb;
 };
 
 
 // ======================> ds75160a_device
 
-class ds75160a_device :	public device_t,
-                        public ds75160a_interface
+class ds75160a_device : public device_t,
+						public ds75160a_interface
 {
 public:
-    // construction/destruction
-    ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
-    DECLARE_WRITE_LINE_MEMBER( te_w );
-    DECLARE_WRITE_LINE_MEMBER( pe_w );
+	DECLARE_WRITE_LINE_MEMBER( te_w );
+	DECLARE_WRITE_LINE_MEMBER( pe_w );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 
 private:
-	devcb_resolved_read8	m_in_bus_func;
-	devcb_resolved_write8	m_out_bus_func;
+	devcb_resolved_read8    m_in_bus_func;
+	devcb_resolved_write8   m_out_bus_func;
 
 	UINT8 m_data;
 

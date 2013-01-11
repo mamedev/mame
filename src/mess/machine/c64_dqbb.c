@@ -101,18 +101,18 @@ void c64_dqbb_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UI
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1
-            2       GAME
-            3
-            4       WE
-            5
-            6       EXROM
-            7       _CS
+		    0
+		    1
+		    2       GAME
+		    3
+		    4       WE
+		    5
+		    6       EXROM
+		    7       _CS
 
-        */
+		*/
 
 		m_exrom = !BIT(data, 6);
 		m_game = !BIT(data, 2);

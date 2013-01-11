@@ -78,9 +78,9 @@ TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
 	tileinfo.category = code >> 4 & 0xf;
 
 	/* the hardware has two character sets, one normal and one flipped. When
-       screen is flipped, character flip is done by selecting the 2nd character set.
-       We reproduce this here, but since the tilemap system automatically flips
-       characters when screen is flipped, we have to flip them back. */
+	   screen is flipped, character flip is done by selecting the 2nd character set.
+	   We reproduce this here, but since the tilemap system automatically flips
+	   characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO_MEMBER(
 			0,
 			code | (flip_screen() ? 0x100 : 0),
@@ -211,7 +211,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		}
 
 		sy -= 16 * sizey;
-		sy = (sy & 0xff) - 32;	// fix wraparound
+		sy = (sy & 0xff) - 32;  // fix wraparound
 
 		for (y = 0;y <= sizey;y++)
 		{

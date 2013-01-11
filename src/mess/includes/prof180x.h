@@ -3,12 +3,12 @@
 #ifndef __PROF180X__
 #define __PROF180X__
 
-#define HD64180_TAG				"hd64180"
-#define FDC9268_TAG				"fdc9268"
-#define FDC9229_TAG				"fdc9229"
-#define MK3835_TAG				"mk3835"
-#define SCREEN_TAG				"screen"
-#define CENTRONICS_TAG			"centronics"
+#define HD64180_TAG             "hd64180"
+#define FDC9268_TAG             "fdc9268"
+#define FDC9229_TAG             "fdc9229"
+#define MK3835_TAG              "mk3835"
+#define SCREEN_TAG              "screen"
+#define CENTRONICS_TAG          "centronics"
 
 class prof180x_state : public driver_device
 {

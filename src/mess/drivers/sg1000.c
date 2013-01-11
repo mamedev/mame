@@ -306,16 +306,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( omv )
 	PORT_START("C0")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("C1")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("9 #") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("0 *") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -323,16 +323,16 @@ static INPUT_PORTS_START( omv )
 
 	PORT_START("C2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("C3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("C4")
@@ -534,17 +534,17 @@ static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
 READ8_MEMBER( sc3000_state::ppi_pa_r )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PA0     Keyboard input
-        PA1     Keyboard input
-        PA2     Keyboard input
-        PA3     Keyboard input
-        PA4     Keyboard input
-        PA5     Keyboard input
-        PA6     Keyboard input
-        PA7     Keyboard input
-    */
+	    PA0     Keyboard input
+	    PA1     Keyboard input
+	    PA2     Keyboard input
+	    PA3     Keyboard input
+	    PA4     Keyboard input
+	    PA5     Keyboard input
+	    PA6     Keyboard input
+	    PA7     Keyboard input
+	*/
 
 	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
@@ -554,17 +554,17 @@ READ8_MEMBER( sc3000_state::ppi_pa_r )
 READ8_MEMBER( sc3000_state::ppi_pb_r )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PB0     Keyboard input
-        PB1     Keyboard input
-        PB2     Keyboard input
-        PB3     Keyboard input
-        PB4     /CONT input from cartridge terminal B-11
-        PB5     FAULT input from printer
-        PB6     BUSY input from printer
-        PB7     Cassette tape input
-    */
+	    PB0     Keyboard input
+	    PB1     Keyboard input
+	    PB2     Keyboard input
+	    PB3     Keyboard input
+	    PB4     /CONT input from cartridge terminal B-11
+	    PB5     FAULT input from printer
+	    PB6     BUSY input from printer
+	    PB7     Cassette tape input
+	*/
 
 	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
@@ -586,17 +586,17 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 WRITE8_MEMBER( sc3000_state::ppi_pc_w )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PC0     Keyboard raster output
-        PC1     Keyboard raster output
-        PC2     Keyboard raster output
-        PC3     not connected
-        PC4     Cassette tape output
-        PC5     DATA to printer
-        PC6     /RESET to printer
-        PC7     /FEED to printer
-    */
+	    PC0     Keyboard raster output
+	    PC1     Keyboard raster output
+	    PC2     Keyboard raster output
+	    PC3     not connected
+	    PC4     Cassette tape output
+	    PC5     DATA to printer
+	    PC6     /RESET to printer
+	    PC7     /FEED to printer
+	*/
 
 	/* keyboard */
 	m_keylatch = data & 0x07;
@@ -609,12 +609,12 @@ WRITE8_MEMBER( sc3000_state::ppi_pc_w )
 
 I8255_INTERFACE( sc3000_ppi_intf )
 {
-	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pa_r),	// Port A read
-	DEVCB_NULL,										// Port A write
-	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pb_r),	// Port B read
-	DEVCB_NULL,										// Port B write
-	DEVCB_NULL,										// Port C read
-	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pc_w),	// Port C write
+	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pa_r),    // Port A read
+	DEVCB_NULL,                                     // Port A write
+	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pb_r),    // Port B read
+	DEVCB_NULL,                                     // Port B write
+	DEVCB_NULL,                                     // Port C read
+	DEVCB_DRIVER_MEMBER(sc3000_state, ppi_pc_w),    // Port C write
 };
 
 /*-------------------------------------------------
@@ -881,17 +881,17 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 READ8_MEMBER( sf7000_state::ppi_pa_r )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PA0     INT from FDC
-        PA1     BUSY from Centronics printer
-        PA2     INDEX from FDD
-        PA3
-        PA4
-        PA5
-        PA6
-        PA7
-    */
+	    PA0     INT from FDC
+	    PA1     BUSY from Centronics printer
+	    PA2     INDEX from FDD
+	    PA3
+	    PA4
+	    PA5
+	    PA6
+	    PA7
+	*/
 
 	UINT8 data = 0;
 
@@ -905,22 +905,22 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PC0     /INUSE signal to FDD
-        PC1     /MOTOR ON signal to FDD
-        PC2     TC signal to FDC
-        PC3     RESET signal to FDC
-        PC4     not connected
-        PC5     not connected
-        PC6     /ROM SEL (switch between IPL ROM and RAM)
-        PC7     /STROBE to Centronics printer
-    */
+	    PC0     /INUSE signal to FDD
+	    PC1     /MOTOR ON signal to FDD
+	    PC2     TC signal to FDC
+	    PC3     RESET signal to FDC
+	    PC4     not connected
+	    PC5     not connected
+	    PC6     /ROM SEL (switch between IPL ROM and RAM)
+	    PC7     /STROBE to Centronics printer
+	*/
 
-    if (!BIT(data, 0))
-    	m_fdc->set_floppy(m_floppy0);
-    else
-    	m_fdc->set_floppy(NULL);
+	if (!BIT(data, 0))
+		m_fdc->set_floppy(m_floppy0);
+	else
+		m_fdc->set_floppy(NULL);
 
 	/* floppy motor */
 	m_floppy0->mon_w(BIT(data, 1));
@@ -943,12 +943,12 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 
 static I8255_INTERFACE( sf7000_ppi_intf )
 {
-	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pa_r),				// Port A read
-	DEVCB_NULL,													// Port A write
-	DEVCB_NULL,													// Port B read
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),	// Port B write
-	DEVCB_NULL,													// Port C read
-	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pc_w)					// Port C write
+	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pa_r),                // Port A read
+	DEVCB_NULL,                                                 // Port A write
+	DEVCB_NULL,                                                 // Port B read
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  // Port B write
+	DEVCB_NULL,                                                 // Port C read
+	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pc_w)                 // Port C write
 };
 
 /*-------------------------------------------------
@@ -1067,7 +1067,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_CPU_PROGRAM_MAP(sg1000_map)
 	MCFG_CPU_IO_MAP(sg1000_io_map)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
@@ -1121,7 +1121,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_CPU_PROGRAM_MAP(sc3000_map)
 	MCFG_CPU_IO_MAP(sc3000_io_map)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
@@ -1162,7 +1162,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_CPU_PROGRAM_MAP(sf7000_map)
 	MCFG_CPU_IO_MAP(sf7000_io_map)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
@@ -1212,7 +1212,7 @@ ROM_END
 
 ROM_START( omv1000 )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
-	ROM_LOAD( "omvbios.bin", 0x0000, 0x4000, BAD_DUMP CRC(c5a67b95) SHA1(6d7c64dd60dee4a33061d3d3a7c2ed190d895cdb) )	// The BIOS comes from a Multivision FG-2000. It is still unknown if the FG-1000 BIOS differs
+	ROM_LOAD( "omvbios.bin", 0x0000, 0x4000, BAD_DUMP CRC(c5a67b95) SHA1(6d7c64dd60dee4a33061d3d3a7c2ed190d895cdb) )    // The BIOS comes from a Multivision FG-2000. It is still unknown if the FG-1000 BIOS differs
 ROM_END
 
 ROM_START( omv2000 )
@@ -1225,10 +1225,10 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT    COMPANY             FULLNAME                                    FLAGS */
-CONS( 1983,	sg1000,     0,          0,          sg1000,     sg1000, driver_device,     0,      "Sega",             "SG-1000",                                  GAME_SUPPORTS_SAVE )
-CONS( 1984,	sg1000m2,   sg1000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SG-1000 II",                               GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000,     0,          sg1000,     sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000",                                  GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000h,    sc3000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000H",                                 GAME_SUPPORTS_SAVE )
-COMP( 1983,	sf7000,     sc3000,     0,          sf7000,     sf7000, driver_device,     0,      "Sega",             "SC-3000/Super Control Station SF-7000",    GAME_SUPPORTS_SAVE )
-CONS( 1984,	omv1000,    sg1000,     0,          omv,        omv, driver_device,        0,      "Tsukuda Original", "Othello Multivision FG-1000",              GAME_SUPPORTS_SAVE )
-CONS( 1984,	omv2000,    sg1000,     0,          omv,        omv, driver_device,        0,      "Tsukuda Original", "Othello Multivision FG-2000",              GAME_SUPPORTS_SAVE )
+CONS( 1983, sg1000,     0,          0,          sg1000,     sg1000, driver_device,     0,      "Sega",             "SG-1000",                                  GAME_SUPPORTS_SAVE )
+CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SG-1000 II",                               GAME_SUPPORTS_SAVE )
+COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000",                                  GAME_SUPPORTS_SAVE )
+COMP( 1983, sc3000h,    sc3000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000H",                                 GAME_SUPPORTS_SAVE )
+COMP( 1983, sf7000,     sc3000,     0,          sf7000,     sf7000, driver_device,     0,      "Sega",             "SC-3000/Super Control Station SF-7000",    GAME_SUPPORTS_SAVE )
+CONS( 1984, omv1000,    sg1000,     0,          omv,        omv, driver_device,        0,      "Tsukuda Original", "Othello Multivision FG-1000",              GAME_SUPPORTS_SAVE )
+CONS( 1984, omv2000,    sg1000,     0,          omv,        omv, driver_device,        0,      "Tsukuda Original", "Othello Multivision FG-2000",              GAME_SUPPORTS_SAVE )

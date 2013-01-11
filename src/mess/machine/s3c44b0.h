@@ -18,8 +18,8 @@
 #define S3C44B0_TAG "s3c44b0"
 
 #define MCFG_S3C44B0_ADD(_tag, _clock, _config) \
-    MCFG_DEVICE_ADD(_tag, S3C44B0, _clock) \
-    MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_ADD(_tag, S3C44B0, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define S3C44B0_INTERFACE(name) \
 	const s3c44b0_interface(name) =
@@ -352,10 +352,10 @@ void s3c44b0_request_eint( device_t *device, UINT32 number);
 #define S3C44B0_INT_EINT1     24
 #define S3C44B0_INT_EINT0     25
 
-#define S3C44B0_MODESEL_01		0
-#define S3C44B0_MODESEL_02		1
-#define S3C44B0_MODESEL_04		2
-#define S3C44B0_MODESEL_08		3
+#define S3C44B0_MODESEL_01      0
+#define S3C44B0_MODESEL_02      1
+#define S3C44B0_MODESEL_04      2
+#define S3C44B0_MODESEL_08      3
 
 #define S3C44B0_PNRMODE_STN_04_DS  0
 #define S3C44B0_PNRMODE_STN_04_SS  1

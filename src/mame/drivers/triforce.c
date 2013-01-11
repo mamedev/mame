@@ -448,7 +448,7 @@ static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 64, triforce_state )
 	AM_RANGE(0x00000000, 0x017fffff) AM_RAM
 	AM_RANGE(0x0c003000, 0x0c003fff) AM_READWRITE(gc_pi_r, gc_pi_w)
 	AM_RANGE(0x0c006800, 0x0c0068ff) AM_READWRITE(gc_exi_r, gc_exi_w)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")  /* Program ROM */
 ADDRESS_MAP_END
 
 
@@ -472,11 +472,11 @@ static void descrambler(UINT8* data, UINT32 size)
 	UINT8 acc = 0;
 	UINT8 nacc = 0;
 
-    UINT16 t = 0x2953;
-    UINT16 u = 0xd9c2;
-    UINT16 v = 0x3ff1;
+	UINT16 t = 0x2953;
+	UINT16 u = 0xd9c2;
+	UINT16 v = 0x3ff1;
 
-    UINT8 x = 1;
+	UINT8 x = 1;
 
 	for (UINT32 it = 0; it < size;)
 	{
@@ -776,14 +776,14 @@ ROM_END
 ROM_START( mkartagp )
 	TRIFORCE_BIOS
 
-    ROM_REGION(0x19000000, "rom_board", 0)
-    ROM_LOAD( "ic9_29lv400t",    0x00000000, 0x0080000, CRC(f1ba67b2) SHA1(212fe4b28b6f9590bff200a6680bf7ee381780c7) )
-    ROM_LOAD( "ic1_k9f1208u0b",  0x01000000, 0x4200000, CRC(7edb6ff2) SHA1(c544c09fc0441f940623c7368919e46153d49c20) )
-    ROM_LOAD( "ic2_k9f1208u0b",  0x04200000, 0x4200000, CRC(beb58594) SHA1(826ddc3db46f7644b08488618453917430bb16a1) )
-    ROM_LOAD( "ic5_k9f1208u0b",  0x08400000, 0x4200000, CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) )
-    ROM_LOAD( "ic6_k9f1208u0b",  0x0c600000, 0x4200000, CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) )
-    ROM_LOAD( "ic35_k9f1208u0b", 0x10800000, 0x4200000, CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) )
-    ROM_LOAD( "ic45_k9f1208u0b", 0x14c00000, 0x4200000, CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) )
+	ROM_REGION(0x19000000, "rom_board", 0)
+	ROM_LOAD( "ic9_29lv400t",    0x00000000, 0x0080000, CRC(f1ba67b2) SHA1(212fe4b28b6f9590bff200a6680bf7ee381780c7) )
+	ROM_LOAD( "ic1_k9f1208u0b",  0x01000000, 0x4200000, CRC(7edb6ff2) SHA1(c544c09fc0441f940623c7368919e46153d49c20) )
+	ROM_LOAD( "ic2_k9f1208u0b",  0x04200000, 0x4200000, CRC(beb58594) SHA1(826ddc3db46f7644b08488618453917430bb16a1) )
+	ROM_LOAD( "ic5_k9f1208u0b",  0x08400000, 0x4200000, CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) )
+	ROM_LOAD( "ic6_k9f1208u0b",  0x0c600000, 0x4200000, CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) )
+	ROM_LOAD( "ic35_k9f1208u0b", 0x10800000, 0x4200000, CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) )
+	ROM_LOAD( "ic45_k9f1208u0b", 0x14c00000, 0x4200000, CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) )
 ROM_END
 
 
@@ -803,4 +803,3 @@ GAME( 2006, vs42006,  triforce, triforcegd,    triforce, driver_device,    0, RO
 
 // ROM games
 GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device,    0, ROT0, "Namco",          "Mario Kart Arcade GP", GAME_IS_SKELETON )
-

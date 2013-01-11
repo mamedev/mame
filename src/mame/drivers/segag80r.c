@@ -123,19 +123,19 @@
  *
  *************************************/
 
-#define CPU_CLOCK			8000000		/* not used when video board is connected */
-#define VIDEO_CLOCK			15468000
+#define CPU_CLOCK           8000000     /* not used when video board is connected */
+#define VIDEO_CLOCK         15468000
 #define SINDBADM_SOUND_CLOCK 8000000
 
-#define PIXEL_CLOCK			(VIDEO_CLOCK/3)
+#define PIXEL_CLOCK         (VIDEO_CLOCK/3)
 
-#define HTOTAL				(328)
-#define HBEND				(0)
-#define HBSTART				(256)
+#define HTOTAL              (328)
+#define HBEND               (0)
+#define HBSTART             (256)
 
-#define VTOTAL				(262)
-#define VBEND				(0)
-#define VBSTART				(224)
+#define VTOTAL              (262)
+#define VBEND               (0)
+#define VBSTART             (224)
 
 
 
@@ -201,9 +201,9 @@ WRITE8_MEMBER(segag80r_state::usb_ram_w){ device_t *device = machine().device("u
 INLINE UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
-		   ((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
-		   ((d3d2 << 3) & 0x08) | ((d3d2 >> 2) & 0x04) |
-		   ((d1d0 << 1) & 0x02) | ((d1d0 >> 4) & 0x01);
+			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
+			((d3d2 << 3) & 0x08) | ((d3d2 >> 2) & 0x04) |
+			((d1d0 << 1) & 0x02) | ((d1d0 >> 4) & 0x01);
 }
 
 
@@ -260,8 +260,8 @@ READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
 	if (upright)
 	{
 		fc = (fc & ~0x03) |
-				((fc & 0x02) >> 1) |	/* IPT_JOYSTICK_RIGHT */
-				((fc & 0x01) << 1);		/* IPT_JOYSTICK_LEFT */
+				((fc & 0x02) >> 1) |    /* IPT_JOYSTICK_RIGHT */
+				((fc & 0x01) << 1);     /* IPT_JOYSTICK_LEFT */
 		fc &= 0x07;
 	}
 	return fc;
@@ -318,12 +318,12 @@ WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
 
 static I8255A_INTERFACE( sindbadm_ppi_intf )
 {
-	DEVCB_NULL,								/* Port A read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_soundport_w),	/* Port A write */
-	DEVCB_INPUT_PORT("FC"),					/* Port B read */
-	DEVCB_NULL,								/* Port B write */
-	DEVCB_NULL,								/* Port C read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_misc_w)			/* Port C write */
+	DEVCB_NULL,                             /* Port A read */
+	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_soundport_w),   /* Port A write */
+	DEVCB_INPUT_PORT("FC"),                 /* Port B read */
+	DEVCB_NULL,                             /* Port B write */
+	DEVCB_NULL,                             /* Port C read */
+	DEVCB_DRIVER_MEMBER(segag80r_state,sindbadm_misc_w)         /* Port C write */
 };
 
 
@@ -335,9 +335,9 @@ static I8255A_INTERFACE( sindbadm_ppi_intf )
 
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
-	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
-	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
+	AM_RANGE(0x0000, 0x07ff) AM_ROM     /* CPU board ROM */
+	AM_RANGE(0x0800, 0x7fff) AM_ROM     /* PROM board ROM area */
+	AM_RANGE(0x8000, 0xbfff) AM_ROM     /* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -397,24 +397,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( g80r_generic )
 	PORT_START("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)	/* P1.5 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)	/* P1.8 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.13 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.14 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)  /* P1.5 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)  /* P1.8 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.13 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.14 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
 
 	PORT_START("D5D4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )				/* P1.10 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )					/* P1.15 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.16 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.17 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.18 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )					/* P1.19 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.20 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.21 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )               /* P1.10 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                 /* P1.15 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.16 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.17 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.18 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )                 /* P1.19 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.20 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.21 */
 
 	PORT_START("D3D2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) /* Listed as "Unused" (astrob) */
@@ -428,49 +428,49 @@ static INPUT_PORTS_START( g80r_generic )
 
 	PORT_START("D1D0")
 	PORT_DIPNAME( 0x0f, 0x03, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW2:8,7,6,5")
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(	0x09, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(	0x0a, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(	0x0b, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(	0x0c, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(	0x0d, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(	0x0e, "1 Coin/2 Credits 5/11" )
-	PORT_DIPSETTING(	0x0f, "1 Coin/2 Credits 4/9" )
-	PORT_DIPSETTING(	0x05, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(	0x06, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(	0x07, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x09, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x0a, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x0b, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x0c, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x0d, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x0e, "1 Coin/2 Credits 5/11" )
+	PORT_DIPSETTING(    0x0f, "1 Coin/2 Credits 4/9" )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ))
 	PORT_DIPNAME( 0xf0, 0x30, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW2:4,3,2,1")
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(	0x10, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(	0x90, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(	0xa0, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(	0x30, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(	0xb0, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(	0xc0, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(	0xd0, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(	0xe0, "1 Coin/2 Credits 5/11" )
-	PORT_DIPSETTING(	0xf0, "1 Coin/2 Credits 4/9" )
-	PORT_DIPSETTING(	0x50, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(	0x60, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(	0x70, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x90, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0xa0, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0xb0, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0xc0, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0xd0, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0xe0, "1 Coin/2 Credits 5/11" )
+	PORT_DIPSETTING(    0xf0, "1 Coin/2 Credits 4/9" )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_6C ))
 
 	PORT_START("FC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.23 */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.24 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.25 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.26 */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.27 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.28 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.29 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.30 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.23 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.24 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.25 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.26 */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.27 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.28 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.29 */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.30 */
 
 	PORT_START("SERVICESW")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, segag80r_state,service_switch, 0)
@@ -521,8 +521,8 @@ static INPUT_PORTS_START( astrob2 )
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives )) PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
-  //PORT_DIPSETTING(    0x02, "3" )
-  //PORT_DIPSETTING(    0x03, "3" )
+	//PORT_DIPSETTING(    0x02, "3" )
+	//PORT_DIPSETTING(    0x03, "3" )
 INPUT_PORTS_END
 
 
@@ -827,7 +827,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -1150,7 +1150,7 @@ ROM_START( 005 )
 	ROM_LOAD( "epr-1286.sound-16", 0x0000, 0x0800, CRC(fbe0d501) SHA1(bfa277689790f835d8a43be4beee0581e1096bcc) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6331.sound-u8",     0x0000, 0x0020, BAD_DUMP CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) )	/* missing sound PROM! */
+	ROM_LOAD( "6331.sound-u8",     0x0000, 0x0020, BAD_DUMP CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) )  /* missing sound PROM! */
 ROM_END
 
 
@@ -1300,7 +1300,7 @@ ROM_START( monsterb2 )
 	ROM_REGION( 0x0020, "prom", 0 )
 	ROM_LOAD( "pr-1542.31",   0x0000, 0x0020, CRC(414ebe9b) SHA1(3df8694e3d26635d19fd4cdf02bd0998e8538b5b) )
 
-	ROM_REGION( 0x2000, "user2", 0 )		      /* other proms (unused) */
+	ROM_REGION( 0x2000, "user2", 0 )              /* other proms (unused) */
 	ROM_LOAD( "pr-1535.118",  0x0000, 0x0020, CRC(087df496) SHA1(b6905626595f7a5587a0fd5db0d0bbf7f1fdf695) )
 	ROM_LOAD( "pr-1536.128",  0x0000, 0x0020, CRC(57c65534) SHA1(5714720ddb3c90f10fd880faa9c18990c7947a0d) )
 	ROM_LOAD( "pr-1537.156",  0x0000, 0x0020, CRC(e4451c6c) SHA1(8a4290fccca37564db3a4415057602c7f530947f) )
@@ -1374,10 +1374,10 @@ ROM_START( pignewta )
 	ROM_LOAD( "1904a.bg",      0x0000, 0x2000, BAD_DUMP CRC(e9de2c8b) SHA1(a8957585911422e07a17ec67430b30a24a6ed16c) )
 	ROM_LOAD( "1905a.bg",      0x2000, 0x2000, BAD_DUMP CRC(af7cfe0b) SHA1(e8a64564596d7e6e6bce00546379bd01a5b9b3d9) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )		      /* background charmaps */
+	ROM_REGION( 0x4000, "gfx2", 0 )           /* background charmaps */
 	/* NOTE: No background ROMs for set A have been dumped, so the
-    ROMs from set C have been copied and renamed. This is to
-    provide a reminder that these ROMs still need to be dumped. */
+	ROMs from set C have been copied and renamed. This is to
+	provide a reminder that these ROMs still need to be dumped. */
 	ROM_LOAD( "1906a.bg",  0x0000, 0x1000, BAD_DUMP CRC(c79d33ce) SHA1(8a5332a801d0db6e5f33c0d39d165819f9914e65)  ) /* ??? */
 	ROM_LOAD( "1907a.bg",  0x1000, 0x1000, BAD_DUMP CRC(bc839d3c) SHA1(80b1c96cac7c51e49ca40a1c5fbc156b12529d2f)  ) /* ??? */
 	ROM_LOAD( "1908a.bg",  0x2000, 0x1000, BAD_DUMP CRC(92cb14da) SHA1(257db7bb2758d579bcf171cda410acff1877122c)  ) /* ??? */

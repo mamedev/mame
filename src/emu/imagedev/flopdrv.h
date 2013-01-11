@@ -9,14 +9,14 @@
 #include "formats/flopimg.h"
 
 #define FLOPPY_TYPE_REGULAR 0
-#define FLOPPY_TYPE_APPLE	1
-#define FLOPPY_TYPE_SONY	2
+#define FLOPPY_TYPE_APPLE   1
+#define FLOPPY_TYPE_SONY    2
 
-#define FLOPPY_DRIVE_2_8_INCH	1
-#define FLOPPY_DRIVE_3_INCH		2
-#define FLOPPY_DRIVE_3_5_INCH	3
-#define FLOPPY_DRIVE_5_25_INCH	4
-#define FLOPPY_DRIVE_8_INCH		5
+#define FLOPPY_DRIVE_2_8_INCH   1
+#define FLOPPY_DRIVE_3_INCH     2
+#define FLOPPY_DRIVE_3_5_INCH   3
+#define FLOPPY_DRIVE_5_25_INCH  4
+#define FLOPPY_DRIVE_8_INCH     5
 
 // Maximum supported density
 #define FLOPPY_DRIVE_SD 1
@@ -73,7 +73,7 @@ struct floppy_interface
 	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;
 	const char *interface;
-	device_image_display_info_func	device_displayinfo;
+	device_image_display_info_func  device_displayinfo;
 };
 
 struct chrn_id
@@ -82,14 +82,14 @@ struct chrn_id
 	unsigned char H;
 	unsigned char R;
 	unsigned char N;
-	int data_id;			// id for read/write data command
+	int data_id;            // id for read/write data command
 	unsigned long flags;
 };
 
 /* set if drive is ready */
-#define FLOPPY_DRIVE_READY						0x0010
+#define FLOPPY_DRIVE_READY                      0x0010
 /* set if index has just occurred */
-#define FLOPPY_DRIVE_INDEX						0x0020
+#define FLOPPY_DRIVE_INDEX                      0x0020
 
 /* a callback which will be executed if the ready state of the drive changes e.g. not ready->ready, ready->not ready */
 void floppy_drive_set_ready_state_change_callback(device_t *img, void (*callback)(device_t *controller,device_t *img, int state));
@@ -178,7 +178,7 @@ READ_LINE_DEVICE_HANDLER( floppy_index_r );
 // drive ready
 READ_LINE_DEVICE_HANDLER( floppy_ready_r );
 
-class legacy_floppy_image_device :	public device_t,
+class legacy_floppy_image_device :  public device_t,
 									public device_image_interface
 {
 public:
@@ -188,7 +188,7 @@ public:
 	~legacy_floppy_image_device();
 
 	virtual bool call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) {	return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) {   return load_software(swlist, swname, start_entry); }
 	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display_info();
@@ -212,7 +212,7 @@ protected:
 	virtual void device_start();
 
 	void *m_token;
-	char			m_extension_list[256];
+	char            m_extension_list[256];
 };
 
 // device type definition
@@ -227,54 +227,54 @@ extern const device_type LEGACY_FLOPPY;
 #define FLOPPY_3 "floppy3"
 
 
-#define MCFG_LEGACY_FLOPPY_DRIVE_ADD(_tag, _config)	\
-	MCFG_DEVICE_ADD(_tag, LEGACY_FLOPPY, 0)			\
+#define MCFG_LEGACY_FLOPPY_DRIVE_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, LEGACY_FLOPPY, 0)         \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_DRIVE_MODIFY(_tag, _config)	\
-	MCFG_DEVICE_MODIFY(_tag)		\
+#define MCFG_LEGACY_FLOPPY_DRIVE_MODIFY(_tag, _config)  \
+	MCFG_DEVICE_MODIFY(_tag)        \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)		\
+#define MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(_config)    \
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)     \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)     \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_4_DRIVES_MODIFY(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_2)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_3)		\
+#define MCFG_LEGACY_FLOPPY_4_DRIVES_MODIFY(_config) \
+	MCFG_DEVICE_MODIFY(FLOPPY_0)        \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_MODIFY(FLOPPY_1)        \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_MODIFY(FLOPPY_2)        \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_MODIFY(FLOPPY_3)        \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_4_DRIVES_REMOVE()	\
-	MCFG_DEVICE_REMOVE(FLOPPY_0)		\
-	MCFG_DEVICE_REMOVE(FLOPPY_1)		\
-	MCFG_DEVICE_REMOVE(FLOPPY_2)		\
+#define MCFG_LEGACY_FLOPPY_4_DRIVES_REMOVE()    \
+	MCFG_DEVICE_REMOVE(FLOPPY_0)        \
+	MCFG_DEVICE_REMOVE(FLOPPY_1)        \
+	MCFG_DEVICE_REMOVE(FLOPPY_2)        \
 	MCFG_DEVICE_REMOVE(FLOPPY_3)
 
-#define MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)		\
+#define MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(_config)    \
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)     \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_2_DRIVES_MODIFY(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_0)		\
-	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_DEVICE_MODIFY(FLOPPY_1)		\
+#define MCFG_LEGACY_FLOPPY_2_DRIVES_MODIFY(_config) \
+	MCFG_DEVICE_MODIFY(FLOPPY_0)        \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_MODIFY(FLOPPY_1)        \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_LEGACY_FLOPPY_2_DRIVES_REMOVE()	\
-	MCFG_DEVICE_REMOVE(FLOPPY_0)		\
+#define MCFG_LEGACY_FLOPPY_2_DRIVES_REMOVE()    \
+	MCFG_DEVICE_REMOVE(FLOPPY_0)        \
 	MCFG_DEVICE_REMOVE(FLOPPY_1)
 
 #endif /* __FLOPDRV_H__ */

@@ -85,7 +85,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 
 #endif
 
-#define CISCHEAT_VREG_SCROLL(_n_, _dir_)	m_scroll##_dir_[_n_] = new_data
+#define CISCHEAT_VREG_SCROLL(_n_, _dir_)    m_scroll##_dir_[_n_] = new_data
 
 
 #define cischeat_tmap_SET_SCROLL(_n_) \
@@ -135,7 +135,7 @@ INLINE void scrollram_w(address_space &space, offs_t offset, UINT16 data, UINT16
 	COMBINE_DATA(&state->m_scrollram[which][offset]);
 	if (offset < 0x40000/2 && state->m_tmap[which])
 	{
-		if (state->m_scroll_flag[which] & 0x10)	/* tiles are 8x8 */
+		if (state->m_scroll_flag[which] & 0x10) /* tiles are 8x8 */
 		{
 			state->m_tmap[which]->mark_tile_dirty(offset);
 		}
@@ -156,15 +156,15 @@ WRITE16_MEMBER(cischeat_state::cischeat_scrollram_2_w){ scrollram_w(space, offse
 TILEMAP_MAPPER_MEMBER(cischeat_state::cischeat_scan_8x8)
 {
 	return (col * TILES_PER_PAGE_Y) +
-		   (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE * (num_cols / TILES_PER_PAGE_X) +
-		   (row % TILES_PER_PAGE_Y);
+			(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE * (num_cols / TILES_PER_PAGE_X) +
+			(row % TILES_PER_PAGE_Y);
 }
 
 TILEMAP_MAPPER_MEMBER(cischeat_state::cischeat_scan_16x16)
 {
 	return ( ((col / 2) * (TILES_PER_PAGE_Y / 2)) +
-			 ((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
-			 ((row / 2) % (TILES_PER_PAGE_Y / 2)) )*4 + (row&1) + (col&1)*2;
+				((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
+				((row / 2) % (TILES_PER_PAGE_Y / 2)) )*4 + (row&1) + (col&1)*2;
 }
 
 TILE_GET_INFO_MEMBER(cischeat_state::cischeat_get_scroll_tile_info_8x8)
@@ -190,23 +190,23 @@ static void create_tilemaps(running_machine &machine)
 	{
 		/* 16x16 tilemaps */
 		state->m_tilemap[layer][0][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
+									8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
 		state->m_tilemap[layer][0][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
+									8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
 		state->m_tilemap[layer][0][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
+									8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
 		state->m_tilemap[layer][0][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
+									8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
 
 		/* 8x8 tilemaps */
 		state->m_tilemap[layer][1][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
+									8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
 		state->m_tilemap[layer][1][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+									8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		state->m_tilemap[layer][1][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+									8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		state->m_tilemap[layer][1][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
+									8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
 
 		/* set user data and transparency */
 		for (i = 0; i < 8; i++)
@@ -295,27 +295,27 @@ READ16_MEMBER(cischeat_state::bigrun_vregs_r)
 {
 	switch (offset)
 	{
-		case 0x0000/2 : return ioport("IN1")->read();	// Coins
-		case 0x0002/2 : return ioport("IN2")->read();	// Buttons
-		case 0x0004/2 : return ioport("IN3")->read();	// Motor Limit Switches
-		case 0x0006/2 : return ioport("IN4")->read();	// DSW 1 & 2
+		case 0x0000/2 : return ioport("IN1")->read();   // Coins
+		case 0x0002/2 : return ioport("IN2")->read();   // Buttons
+		case 0x0004/2 : return ioport("IN3")->read();   // Motor Limit Switches
+		case 0x0006/2 : return ioport("IN4")->read();   // DSW 1 & 2
 
-		case 0x0008/2 :	return soundlatch2_word_r(space,0,0xffff);	// From sound cpu
+		case 0x0008/2 : return soundlatch2_word_r(space,0,0xffff);  // From sound cpu
 
 		case 0x0010/2 :
 			switch (m_ip_select & 0x3)
 			{
-				case 0 : return ioport("IN6")->read();		// Driving Wheel
-				case 1 : return 0xffff;					// Cockpit: Up / Down Position
-				case 2 : return 0xffff;					// Cockpit: Left / Right Position?
-				case 3 : return ioport("PEDAL")->read();	// Accelerator (Pedal)
+				case 0 : return ioport("IN6")->read();      // Driving Wheel
+				case 1 : return 0xffff;                 // Cockpit: Up / Down Position
+				case 2 : return 0xffff;                 // Cockpit: Left / Right Position?
+				case 3 : return ioport("PEDAL")->read();    // Accelerator (Pedal)
 				default: return 0xffff;
 			}
 
 
-		case 0x2200/2 : return ioport("IN5")->read();	// DSW 3 (4 bits)
+		case 0x2200/2 : return ioport("IN5")->read();   // DSW 3 (4 bits)
 
-		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
+		default:    SHOW_READ_ERROR("vreg %04X read!",offset*2);
 					return m_vregs[offset];
 	}
 }
@@ -327,53 +327,53 @@ WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 
 	switch (offset)
 	{
-		case 0x0000/2   :	// leds
+		case 0x0000/2   :   // leds
 			if (ACCESSING_BITS_0_7)
 			{
 				coin_counter_w(machine(), 0,new_data & 0x01);
 				coin_counter_w(machine(), 1,new_data & 0x02);
-				set_led_status(machine(), 0,new_data & 0x10);	// start button
-				set_led_status(machine(), 1,new_data & 0x20);	// ?
+				set_led_status(machine(), 0,new_data & 0x10);   // start button
+				set_led_status(machine(), 1,new_data & 0x20);   // ?
 			}
 			break;
 
-		case 0x0002/2   :	// ?? 91/1/91/1 ...
+		case 0x0002/2   :   // ?? 91/1/91/1 ...
 			break;
 
-		case 0x0004/2   :	// motor (seat?)
+		case 0x0004/2   :   // motor (seat?)
 			if (ACCESSING_BITS_0_7)
 				set_led_status(machine(), 2, (new_data != old_data) ? 1 : 0);
 			break;
 
-		case 0x0006/2   :	// motor (wheel?)
+		case 0x0006/2   :   // motor (wheel?)
 			break;
 
-		case 0x000a/2   :	// to sound cpu
+		case 0x000a/2   :   // to sound cpu
 			soundlatch_word_w(space,0,new_data,0xffff);
 			break;
 
-		case 0x000c/2   :	break;	// ??
+		case 0x000c/2   :   break;  // ??
 
-		case 0x0010/2   : m_ip_select = new_data;	break;
-		case 0x0012/2   : m_ip_select = new_data+1;	break; // value above + 1
+		case 0x0010/2   : m_ip_select = new_data;   break;
+		case 0x0012/2   : m_ip_select = new_data+1; break; // value above + 1
 
-		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
-		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
+		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);        break;
+		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);        break;
 		case 0x2000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
-		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);		break;
-		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);		break;
+		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);        break;
+		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);        break;
 		case 0x2008/2+2 : cischeat_set_vreg_flag(1,new_data);break;
 
-		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
-		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
+		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);        break;
+		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);        break;
 		case 0x2100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
-		case 0x2108/2   : break;	// ? written with 0 only
-		case 0x2208/2   : break;	// watchdog reset
+		case 0x2108/2   : break;    // ? written with 0 only
+		case 0x2208/2   : break;    // watchdog reset
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :	machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :   machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
@@ -391,24 +391,24 @@ READ16_MEMBER(cischeat_state::cischeat_vregs_r)
 {
 	switch (offset)
 	{
-		case 0x0000/2 : return ioport("IN1")->read();	// Coins
-		case 0x0002/2 : return ioport("IN2")->read();	// Buttons
-		case 0x0004/2 : return ioport("IN3")->read();	// Motor Limit Switches
-		case 0x0006/2 : return ioport("IN4")->read();	// DSW 1 & 2
+		case 0x0000/2 : return ioport("IN1")->read();   // Coins
+		case 0x0002/2 : return ioport("IN2")->read();   // Buttons
+		case 0x0004/2 : return ioport("IN3")->read();   // Motor Limit Switches
+		case 0x0006/2 : return ioport("IN4")->read();   // DSW 1 & 2
 
 		case 0x0010/2 :
 			switch (m_ip_select & 0x3)
 			{
-				case 0 : return ioport("IN6")->read();	// Driving Wheel
-				case 1 : return ~0;					// Cockpit: Up / Down Position?
-				case 2 : return ~0;					// Cockpit: Left / Right Position?
+				case 0 : return ioport("IN6")->read();  // Driving Wheel
+				case 1 : return ~0;                 // Cockpit: Up / Down Position?
+				case 2 : return ~0;                 // Cockpit: Left / Right Position?
 				default: return ~0;
 			}
 
-		case 0x2200/2 : return ioport("IN5")->read();	// DSW 3 (4 bits)
-		case 0x2300/2 : return soundlatch2_byte_r(space,0);	// From sound cpu
+		case 0x2200/2 : return ioport("IN5")->read();   // DSW 3 (4 bits)
+		case 0x2300/2 : return soundlatch2_byte_r(space,0); // From sound cpu
 
-		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
+		default:    SHOW_READ_ERROR("vreg %04X read!",offset*2);
 					return m_vregs[offset];
 	}
 }
@@ -420,52 +420,52 @@ WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 
 	switch (offset)
 	{
-		case 0x0000/2   :	// leds
+		case 0x0000/2   :   // leds
 			if (ACCESSING_BITS_0_7)
 			{
 				coin_counter_w(machine(), 0,new_data & 0x01);
 				coin_counter_w(machine(), 1,new_data & 0x02);
-				set_led_status(machine(), 0,new_data & 0x10);	// start button
-				set_led_status(machine(), 1,new_data & 0x20);	// ?
+				set_led_status(machine(), 0,new_data & 0x10);   // start button
+				set_led_status(machine(), 1,new_data & 0x20);   // ?
 			}
 			break;
 
-		case 0x0002/2   :	// ?? 91/1/91/1 ...
+		case 0x0002/2   :   // ?? 91/1/91/1 ...
 			break;
 
-		case 0x0004/2   :	// motor (seat?)
+		case 0x0004/2   :   // motor (seat?)
 			if (ACCESSING_BITS_0_7)
 				set_led_status(machine(), 2, (new_data != old_data) ? 1 : 0);
 			break;
 
-		case 0x0006/2   :	// motor (wheel?)
+		case 0x0006/2   :   // motor (wheel?)
 			break;
 
-		case 0x0010/2   : m_ip_select = new_data;	break;
+		case 0x0010/2   : m_ip_select = new_data;   break;
 		case 0x0012/2   : break; // value above + 1
 
-		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
-		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
+		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);        break;
+		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);        break;
 		case 0x2000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
-		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);		break;
-		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);		break;
+		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);        break;
+		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);        break;
 		case 0x2008/2+2 : cischeat_set_vreg_flag(1,new_data);break;
 
-		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
-		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
+		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);        break;
+		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);        break;
 		case 0x2100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
-		case 0x2108/2   : break;	// ? written with 0 only
-		case 0x2208/2   : break;	// watchdog reset
+		case 0x2108/2   : break;    // ? written with 0 only
+		case 0x2208/2   : break;    // watchdog reset
 
-		case 0x2300/2   :	/* Sound CPU: reads latch during int 4, and stores command */
+		case 0x2300/2   :   /* Sound CPU: reads latch during int 4, and stores command */
 							soundlatch_word_w(space, 0, new_data, 0xffff);
 							machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);
 							break;
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :	machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :   machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
@@ -484,22 +484,22 @@ READ16_MEMBER(cischeat_state::f1gpstar_vregs_r)
 {
 	switch (offset)
 	{
-		case 0x0000/2 :	return ioport("IN1")->read();	// DSW 1 & 2
+		case 0x0000/2 : return ioport("IN1")->read();   // DSW 1 & 2
 
 //      case 0x0002/2 : return 0xFFFF;
 
-		case 0x0004/2 :	return ioport("IN2")->read();	// Buttons
+		case 0x0004/2 : return ioport("IN2")->read();   // Buttons
 
-		case 0x0006/2 :	return ioport("IN3")->read();	// ? Read at boot only
+		case 0x0006/2 : return ioport("IN3")->read();   // ? Read at boot only
 
-		case 0x0008/2 :	return soundlatch2_byte_r(space,0);		// From sound cpu
+		case 0x0008/2 : return soundlatch2_byte_r(space,0);     // From sound cpu
 
-		case 0x000c/2 :	return ioport("IN4")->read();	// DSW 3
+		case 0x000c/2 : return ioport("IN4")->read();   // DSW 3
 
-		case 0x0010/2 :	// Accel + Driving Wheel
+		case 0x0010/2 : // Accel + Driving Wheel
 			return (ioport("PEDAL")->read() & 0xff) + ((ioport("IN5")->read() & 0xff)<<8);
 
-		default:		SHOW_READ_ERROR("vreg %04X read!",offset*2);
+		default:        SHOW_READ_ERROR("vreg %04X read!",offset*2);
 						return m_vregs[offset];
 	}
 }
@@ -530,13 +530,13 @@ READ16_MEMBER(cischeat_state::wildplt_vregs_r)
 
 	switch (offset)
 	{
-		case 0x0000/2 :	return ioport("IN0")->read(); // DSW 1 & 2
+		case 0x0000/2 : return ioport("IN0")->read(); // DSW 1 & 2
 
-		case 0x0004/2 :	return ioport("IN1")->read(); // Buttons
+		case 0x0004/2 : return ioport("IN1")->read(); // Buttons
 
-		case 0x0008/2 :	return soundlatch2_byte_r(space,0); // From sound cpu
+		case 0x0008/2 : return soundlatch2_byte_r(space,0); // From sound cpu
 
-		case 0x0010/2 :	// X, Y
+		case 0x0010/2 : // X, Y
 			return ioport("IN2")->read() | (ioport("IN3")->read()<<8);
 
 		case 0x0018/2 :
@@ -566,42 +566,42 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 			{
 				coin_counter_w(machine(), 0,new_data & 0x01);
 				coin_counter_w(machine(), 1,new_data & 0x02);
-				set_led_status(machine(), 0,new_data & 0x04);	// start button
-				set_led_status(machine(), 1,new_data & 0x20);	// ?
+				set_led_status(machine(), 0,new_data & 0x04);   // start button
+				set_led_status(machine(), 1,new_data & 0x20);   // ?
 				// wheel | seat motor
 				set_led_status(machine(), 2, ((new_data >> 3) | (new_data >> 4)) & 1 );
 			}
 			break;
-		case 0x0014/2   :	break;
+		case 0x0014/2   :   break;
 
 		/* Usually written in sequence, but not always */
-		case 0x0008/2   :	soundlatch_word_w(space, 0, new_data, 0xffff);	break;
-		case 0x0018/2   :	machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);	break;
+		case 0x0008/2   :   soundlatch_word_w(space, 0, new_data, 0xffff);  break;
+		case 0x0018/2   :   machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);   break;
 
-		case 0x0010/2   :	break;
+		case 0x0010/2   :   break;
 
-		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
-		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
+		case 0x2000/2+0 : CISCHEAT_VREG_SCROLL(0,x);        break;
+		case 0x2000/2+1 : CISCHEAT_VREG_SCROLL(0,y);        break;
 		case 0x2000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
-		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);		break;
-		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);		break;
+		case 0x2008/2+0 : CISCHEAT_VREG_SCROLL(1,x);        break;
+		case 0x2008/2+1 : CISCHEAT_VREG_SCROLL(1,y);        break;
 		case 0x2008/2+2 : cischeat_set_vreg_flag(1,new_data);break;
 
-		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
-		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
+		case 0x2100/2+0 : CISCHEAT_VREG_SCROLL(2,x);        break;
+		case 0x2100/2+1 : CISCHEAT_VREG_SCROLL(2,y);        break;
 		case 0x2100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
-		case 0x2108/2   : break;	// ? written with 0 only
-		case 0x2208/2   : break;	// watchdog reset
+		case 0x2108/2   : break;    // ? written with 0 only
+		case 0x2208/2   : break;    // watchdog reset
 
 		/* Not sure about this one. Values: $10 then 0, $7 then 0 */
-		case 0x2308/2   :	machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :   machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 4) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
-		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
+		default:        SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}
 }
 
@@ -642,8 +642,8 @@ WRITE16_MEMBER(cischeat_state::scudhamm_vregs_w)
 
 	switch (offset)
 	{
-		case 0x000/2+0 : CISCHEAT_VREG_SCROLL(0,x);		break;
-		case 0x000/2+1 : CISCHEAT_VREG_SCROLL(0,y);		break;
+		case 0x000/2+0 : CISCHEAT_VREG_SCROLL(0,x);     break;
+		case 0x000/2+1 : CISCHEAT_VREG_SCROLL(0,y);     break;
 		case 0x000/2+2 : cischeat_set_vreg_flag(0,new_data);break;
 
 //      UNUSED LAYER
@@ -652,11 +652,11 @@ WRITE16_MEMBER(cischeat_state::scudhamm_vregs_w)
 		case 0x008/2+2 :
 			break;
 
-		case 0x100/2+0 : CISCHEAT_VREG_SCROLL(2,x);		break;
-		case 0x100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
+		case 0x100/2+0 : CISCHEAT_VREG_SCROLL(2,x);     break;
+		case 0x100/2+1 : CISCHEAT_VREG_SCROLL(2,y);     break;
 		case 0x100/2+2 : cischeat_set_vreg_flag(2,new_data);break;
 
-		case 0x208/2   : watchdog_reset_w(space,0,0);	break;
+		case 0x208/2   : watchdog_reset_w(space,0,0);   break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}
@@ -707,18 +707,18 @@ static void cischeat_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 	int curr_code,sx,sy;
 	int min_priority, max_priority;
 
-	rectangle rect		=	cliprect;
-	gfx_element *gfx		=	machine.gfx[(road_num & 1)?5:4];
+	rectangle rect      =   cliprect;
+	gfx_element *gfx        =   machine.gfx[(road_num & 1)?5:4];
 
-	UINT16 *roadram			=	state->m_roadram[road_num & 1];
+	UINT16 *roadram         =   state->m_roadram[road_num & 1];
 
 	int min_y = rect.min_y;
 	int max_y = rect.max_y;
 
 	int max_x = rect.max_x;
 
-	if (priority1 < priority2)	{	min_priority = priority1;	max_priority = priority2; }
-	else						{	min_priority = priority2;	max_priority = priority1; }
+	if (priority1 < priority2)  {   min_priority = priority1;   max_priority = priority2; }
+	else                        {   min_priority = priority2;   max_priority = priority1; }
 
 	/* Move the priority values in place */
 	min_priority = (min_priority & 7) * 0x100;
@@ -727,9 +727,9 @@ static void cischeat_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 	/* Let's draw from the top to the bottom of the visible screen */
 	for (sy = min_y ; sy <= max_y ; sy ++)
 	{
-		int code	= roadram[ sy * 4 + 0 ];
+		int code    = roadram[ sy * 4 + 0 ];
 		int xscroll = roadram[ sy * 4 + 1 ];
-		int attr	= roadram[ sy * 4 + 2 ];
+		int attr    = roadram[ sy * 4 + 2 ];
 
 		/* high byte is a priority information */
 		if ( ((attr & 0x700) < min_priority) || ((attr & 0x700) > max_priority) )
@@ -751,7 +751,7 @@ static void cischeat_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 					transparency ? 15 : -1);
 
 			/* wrap around */
-			if (curr_code%(X_SIZE/TILE_SIZE)==0)	curr_code = code;
+			if (curr_code%(X_SIZE/TILE_SIZE)==0)    curr_code = code;
 		}
 	}
 
@@ -798,18 +798,18 @@ static void f1gpstar_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 	int xstart;
 	int min_priority, max_priority;
 
-	rectangle rect		=	cliprect;
-	gfx_element *gfx		=	machine.gfx[(road_num & 1)?5:4];
+	rectangle rect      =   cliprect;
+	gfx_element *gfx        =   machine.gfx[(road_num & 1)?5:4];
 
-	UINT16 *roadram			=	state->m_roadram[road_num & 1];
+	UINT16 *roadram         =   state->m_roadram[road_num & 1];
 
 	int min_y = rect.min_y;
 	int max_y = rect.max_y;
 
-	int max_x = rect.max_x << 16;	// use fixed point values (16.16), for accuracy
+	int max_x = rect.max_x << 16;   // use fixed point values (16.16), for accuracy
 
-	if (priority1 < priority2)	{	min_priority = priority1;	max_priority = priority2; }
-	else						{	min_priority = priority2;	max_priority = priority1; }
+	if (priority1 < priority2)  {   min_priority = priority1;   max_priority = priority2; }
+	else                        {   min_priority = priority2;   max_priority = priority1; }
 
 	/* Move the priority values in place */
 	min_priority = (min_priority & 7) * 0x1000;
@@ -820,10 +820,10 @@ static void f1gpstar_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 	{
 		int xscale, xdim;
 
-		int xscroll	= roadram[ sy * 4 + 0 ];
-		int xzoom	= roadram[ sy * 4 + 1 ];
-		int attr	= roadram[ sy * 4 + 2 ];
-		int code	= roadram[ sy * 4 + 3 ];
+		int xscroll = roadram[ sy * 4 + 0 ];
+		int xzoom   = roadram[ sy * 4 + 1 ];
+		int attr    = roadram[ sy * 4 + 2 ];
+		int code    = roadram[ sy * 4 + 3 ];
 
 		/* highest nibble is a priority information */
 		if ( ((xscroll & 0x7000) < min_priority) || ((xscroll & 0x7000) > max_priority) )
@@ -833,7 +833,7 @@ static void f1gpstar_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 		xscale = ( ((xzoom & 0x3ff)+1) << (16+1) ) / 0x400;
 
 		/* line number converted to tile number (each tile is TILE_SIZE x 1) */
-		code	= code * (X_SIZE/TILE_SIZE);
+		code    = code * (X_SIZE/TILE_SIZE);
 
 		/* dimension of a tile after zoom */
 		xdim = TILE_SIZE * xscale;
@@ -844,7 +844,7 @@ static void f1gpstar_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 		xstart -= (X_SIZE * xscale) / 2;
 
 		/* let's approximate to the nearest greater integer value
-           to avoid holes in between tiles */
+		   to avoid holes in between tiles */
 		xscale += (1<<16)/TILE_SIZE;
 
 		/* Draw the line */
@@ -859,7 +859,7 @@ static void f1gpstar_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 						transparency ? 15 : -1);
 
 			/* stop when the end of the line of gfx is reached */
-			if ((code % (X_SIZE/TILE_SIZE)) == 0)	break;
+			if ((code % (X_SIZE/TILE_SIZE)) == 0)   break;
 		}
 
 	}
@@ -916,8 +916,8 @@ static void cischeat_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 	int min_priority, max_priority, high_sprites;
 
-	UINT16		*source	=	state->m_spriteram;
-	const UINT16	*finish	=	source + 0x1000/2;
+	UINT16      *source =   state->m_spriteram;
+	const UINT16    *finish =   source + 0x1000/2;
 
 
 	/* Move the priority values in place */
@@ -925,27 +925,27 @@ static void cischeat_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	priority1 = (priority1 & 0x0f) * 0x100;
 	priority2 = (priority2 & 0x0f) * 0x100;
 
-	if (priority1 < priority2)	{	min_priority = priority1;	max_priority = priority2; }
-	else						{	min_priority = priority2;	max_priority = priority1; }
+	if (priority1 < priority2)  {   min_priority = priority1;   max_priority = priority2; }
+	else                        {   min_priority = priority2;   max_priority = priority1; }
 
 	for (; source < finish; source += 0x10/2 )
 	{
-		size	=	source[ 0 ];
-		if (size & 0x1000)	continue;
+		size    =   source[ 0 ];
+		if (size & 0x1000)  continue;
 
 		/* number of tiles */
-		xnum	=	( (size & 0x0f) >> 0 ) + 1;
-		ynum	=	( (size & 0xf0) >> 4 ) + 1;
+		xnum    =   ( (size & 0x0f) >> 0 ) + 1;
+		ynum    =   ( (size & 0xf0) >> 4 ) + 1;
 
-		xzoom	=	source[ 1 ];
-		yzoom	=	source[ 2 ];
-		flipx	=	xzoom & 0x1000;
-		flipy	=	yzoom & 0x1000;
+		xzoom   =   source[ 1 ];
+		yzoom   =   source[ 2 ];
+		flipx   =   xzoom & 0x1000;
+		flipy   =   yzoom & 0x1000;
 
-		sx		=	source[ 3 ];
-		sy		=	source[ 4 ];
-		sx		=	(sx & 0x1ff) - (sx & 0x200);
-		sy		=	(sy & 0x1ff) - (sy & 0x200);
+		sx      =   source[ 3 ];
+		sy      =   source[ 4 ];
+		sx      =   (sx & 0x1ff) - (sx & 0x200);
+		sy      =   (sy & 0x1ff) - (sy & 0x200);
 
 		/* use fixed point values (16.16), for accuracy */
 		sx <<= 16;
@@ -955,26 +955,26 @@ static void cischeat_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 #ifdef MAME_DEBUG
 		if ( machine.input().code_pressed(KEYCODE_Z) && machine.input().code_pressed(KEYCODE_M) )
 		{
-			xdim	=	16 << 16;
-			ydim	=	16 << 16;
+			xdim    =   16 << 16;
+			ydim    =   16 << 16;
 		}
 		else
 #endif
 		{
-			xdim	=	SHRINK(16,xzoom);
-			ydim	=	SHRINK(16,yzoom);
+			xdim    =   SHRINK(16,xzoom);
+			ydim    =   SHRINK(16,yzoom);
 		}
 
-		if ( ( (xdim / 0x10000) == 0 ) || ( (ydim / 0x10000) == 0) )	continue;
+		if ( ( (xdim / 0x10000) == 0 ) || ( (ydim / 0x10000) == 0) )    continue;
 
 		/* the y pos passed to the hardware is the that of the last line,
-           we need the y pos of the first line  */
+		   we need the y pos of the first line  */
 		sy -= (ydim * ynum);
 
-		code	=	source[ 6 ];
-		attr	=	source[ 7 ];
-		color	=	attr & 0x007f;
-		shadow	=	attr & 0x1000;
+		code    =   source[ 6 ];
+		attr    =   source[ 7 ];
+		color   =   attr & 0x007f;
+		shadow  =   attr & 0x1000;
 
 		/* high byte is a priority information */
 		if ( ((attr & 0x700) < min_priority) || ((attr & 0x700) > max_priority) )
@@ -984,7 +984,7 @@ static void cischeat_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 			continue;
 
 #ifdef MAME_DEBUG
-if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites-1) ) )	{ continue; };
+if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites-1) ) ) { continue; };
 #endif
 
 		xscale = xdim / 16;
@@ -992,16 +992,16 @@ if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites
 
 
 		/* let's approximate to the nearest greater integer value
-           to avoid holes in between tiles */
-		if (xscale & 0xffff)	xscale += (1<<16)/16;
-		if (yscale & 0xffff)	yscale += (1<<16)/16;
+		   to avoid holes in between tiles */
+		if (xscale & 0xffff)    xscale += (1<<16)/16;
+		if (yscale & 0xffff)    yscale += (1<<16)/16;
 
 
-		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
-		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
+		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
+		else        { xstart = 0;       xend = xnum;  xinc = +1; }
 
-		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
-		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
+		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
+		else        { ystart = 0;       yend = ynum;  yinc = +1; }
 
 		state->m_drawmode_table[ 0] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
@@ -1020,13 +1020,13 @@ if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites
 #ifdef MAME_DEBUG
 #if 0
 if (machine.input().code_pressed(KEYCODE_X))
-{	/* Display some info on each sprite */
+{   /* Display some info on each sprite */
 	sprintf(buf, "%04x",attr);
 	ui_draw_text(buf, sx>>16, sy>>16);
 }
 #endif
 #endif
-	}	/* end sprite loop */
+	}   /* end sprite loop */
 }
 
 
@@ -1072,37 +1072,37 @@ static void bigrun_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap ,
 
 	int min_priority, max_priority, high_sprites;
 
-	UINT16		*source	=	state->m_spriteram;
-	const UINT16	*finish	=	source + 0x1000/2;
+	UINT16      *source =   state->m_spriteram;
+	const UINT16    *finish =   source + 0x1000/2;
 
 	/* Move the priority values in place */
 	high_sprites = (priority1 >= 16) | (priority2 >= 16);
 	priority1 = (priority1 & 0x0f) * 0x100;
 	priority2 = (priority2 & 0x0f) * 0x100;
 
-	if (priority1 < priority2)	{	min_priority = priority1;	max_priority = priority2; }
-	else						{	min_priority = priority2;	max_priority = priority1; }
+	if (priority1 < priority2)  {   min_priority = priority1;   max_priority = priority2; }
+	else                        {   min_priority = priority2;   max_priority = priority1; }
 
 	for (; source < finish; source += 0x10/2 )
 	{
-		size	=	source[ 0 ];
-		if (size & 0x1000)	continue;
+		size    =   source[ 0 ];
+		if (size & 0x1000)  continue;
 
 		/* number of tiles */
-		xnum	=	( (size & 0x0f) >> 0 ) + 1;
-		ynum	=	( (size & 0xf0) >> 4 ) + 1;
+		xnum    =   ( (size & 0x0f) >> 0 ) + 1;
+		ynum    =   ( (size & 0xf0) >> 4 ) + 1;
 
-		yzoom	=	(source[ 1 ] >> 8) & 0xff;
-		xzoom	=	(source[ 1 ] >> 0) & 0xff;
+		yzoom   =   (source[ 1 ] >> 8) & 0xff;
+		xzoom   =   (source[ 1 ] >> 0) & 0xff;
 
-		sx		=	source[ 2 ];
-		sy		=	source[ 3 ];
-		flipx	=	sx & 0x1000;
-		flipy	=	sy & 0x1000;
+		sx      =   source[ 2 ];
+		sy      =   source[ 3 ];
+		flipx   =   sx & 0x1000;
+		flipy   =   sy & 0x1000;
 //      sx      =   (sx & 0x1ff) - (sx & 0x200);
 //      sy      =   (sy & 0x1ff) - (sy & 0x200);
-		sx		=	(sx & 0x0ff) - (sx & 0x100);
-		sy		=	(sy & 0x0ff) - (sy & 0x100);
+		sx      =   (sx & 0x0ff) - (sx & 0x100);
+		sy      =   (sy & 0x0ff) - (sy & 0x100);
 
 		/* use fixed point values (16.16), for accuracy */
 		sx <<= 16;
@@ -1112,24 +1112,24 @@ static void bigrun_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap ,
 #ifdef MAME_DEBUG
 		if ( machine.input().code_pressed(KEYCODE_Z) && machine.input().code_pressed(KEYCODE_M) )
 		{
-			xdim	=	16 << 16;
-			ydim	=	16 << 16;
+			xdim    =   16 << 16;
+			ydim    =   16 << 16;
 		}
 		else
 #endif
 		{
-			xdim	=	SHRINK(16,xzoom);
-			ydim	=	SHRINK(16,yzoom);
+			xdim    =   SHRINK(16,xzoom);
+			ydim    =   SHRINK(16,yzoom);
 		}
 
-		if ( ( (xdim / 0x10000) == 0 ) || ( (ydim / 0x10000) == 0) )	continue;
+		if ( ( (xdim / 0x10000) == 0 ) || ( (ydim / 0x10000) == 0) )    continue;
 
 //      sy -= (ydim * ynum);
 
-		code	=	source[ 6 ];
-		attr	=	source[ 7 ];
-		color	=	attr & 0x007f;
-		shadow	=	attr & 0x1000;
+		code    =   source[ 6 ];
+		attr    =   source[ 7 ];
+		color   =   attr & 0x007f;
+		shadow  =   attr & 0x1000;
 
 		/* high byte is a priority information */
 		if ( ((attr & 0x700) < min_priority) || ((attr & 0x700) > max_priority) )
@@ -1139,7 +1139,7 @@ static void bigrun_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap ,
 			continue;
 
 #ifdef MAME_DEBUG
-if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites-1) ) )	{ continue; };
+if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites-1) ) ) { continue; };
 #endif
 
 		xscale = xdim / 16;
@@ -1147,16 +1147,16 @@ if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites
 
 
 		/* let's approximate to the nearest greater integer value
-           to avoid holes in between tiles */
-		if (xscale & 0xffff)	xscale += (1<<16)/16;
-		if (yscale & 0xffff)	yscale += (1<<16)/16;
+		   to avoid holes in between tiles */
+		if (xscale & 0xffff)    xscale += (1<<16)/16;
+		if (yscale & 0xffff)    yscale += (1<<16)/16;
 
 
-		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
-		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
+		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
+		else        { xstart = 0;       xend = xnum;  xinc = +1; }
 
-		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
-		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
+		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
+		else        { ystart = 0;       yend = ynum;  yinc = +1; }
 
 		state->m_drawmode_table[ 0] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
@@ -1175,13 +1175,13 @@ if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites
 #ifdef MAME_DEBUG
 #if 0
 if (machine.input().code_pressed(KEYCODE_X))
-{	/* Display some info on each sprite */
+{   /* Display some info on each sprite */
 	sprintf(buf, "%04x",attr);
 	ui_draw_text(buf, sx>>16, sy>>16);
 }
 #endif
 #endif
-	}	/* end sprite loop */
+	}   /* end sprite loop */
 }
 
 
@@ -1199,16 +1199,16 @@ m_debugsprites = 0; \
 if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) ) \
 { \
 	int msk = 0; \
-	if (machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x01;} \
-	if (machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x02;} \
-	if (machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x04;} \
-	if (machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x08; m_debugsprites = 1;} \
-	if (machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x08; m_debugsprites = 2;} \
-	if (machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x08; m_debugsprites = 3;} \
-	if (machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x08; m_debugsprites = 4;} \
-	if (machine().input().code_pressed(KEYCODE_R))	{ msk |= 0x10;} \
-	if (machine().input().code_pressed(KEYCODE_T))	{ msk |= 0x20;} \
- \
+	if (machine().input().code_pressed(KEYCODE_Q))  { msk |= 0x01;} \
+	if (machine().input().code_pressed(KEYCODE_W))  { msk |= 0x02;} \
+	if (machine().input().code_pressed(KEYCODE_E))  { msk |= 0x04;} \
+	if (machine().input().code_pressed(KEYCODE_A))  { msk |= 0x08; m_debugsprites = 1;} \
+	if (machine().input().code_pressed(KEYCODE_S))  { msk |= 0x08; m_debugsprites = 2;} \
+	if (machine().input().code_pressed(KEYCODE_D))  { msk |= 0x08; m_debugsprites = 3;} \
+	if (machine().input().code_pressed(KEYCODE_F))  { msk |= 0x08; m_debugsprites = 4;} \
+	if (machine().input().code_pressed(KEYCODE_R))  { msk |= 0x10;} \
+	if (machine().input().code_pressed(KEYCODE_T))  { msk |= 0x20;} \
+	\
 	if (msk != 0) m_active_layers &= msk; \
 } \
 \
@@ -1235,7 +1235,7 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
 #ifdef MAME_DEBUG
 	/* FAKE Videoreg */
 	m_active_layers = m_vregs[0x2400/2];
-	if (m_active_layers == 0)	m_active_layers = 0x3f;
+	if (m_active_layers == 0)   m_active_layers = 0x3f;
 #else
 	m_active_layers = 0x3f;
 #endif
@@ -1253,9 +1253,9 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
 	bitmap.fill(0, cliprect);
 
 	for (i = 7; i >= 4; i--)
-	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,i,i,FALSE);
-		if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,i,i,TRUE);
+	{                                           /* bitmap, road, min_priority, max_priority, transparency */
+		if (m_active_layers & 0x10) cischeat_draw_road(machine(),bitmap,cliprect,0,i,i,FALSE);
+		if (m_active_layers & 0x20) cischeat_draw_road(machine(),bitmap,cliprect,1,i,i,TRUE);
 	}
 
 	flag = 0;
@@ -1263,12 +1263,12 @@ UINT32 cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 
 	cischeat_tmap_DRAW(1)
 
 	for (i = 3; i >= 0; i--)
-	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,i,i,TRUE);
-		if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,i,i,TRUE);
+	{                                           /* bitmap, road, min_priority, max_priority, transparency */
+		if (m_active_layers & 0x10) cischeat_draw_road(machine(),bitmap,cliprect,0,i,i,TRUE);
+		if (m_active_layers & 0x20) cischeat_draw_road(machine(),bitmap,cliprect,1,i,i,TRUE);
 	}
 
-	if (m_active_layers & 0x08)	bigrun_draw_sprites(machine(),bitmap,cliprect,15,0);
+	if (m_active_layers & 0x08) bigrun_draw_sprites(machine(),bitmap,cliprect,15,0);
 
 	cischeat_tmap_DRAW(2)
 
@@ -1288,7 +1288,7 @@ UINT32 cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	/* FAKE Videoreg */
 	m_active_layers = m_vregs[0x2400/2];
-	if (m_active_layers == 0)	m_active_layers = 0x3f;
+	if (m_active_layers == 0)   m_active_layers = 0x3f;
 #else
 	m_active_layers = 0x3f;
 #endif
@@ -1306,25 +1306,25 @@ UINT32 cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_ind1
 	bitmap.fill(0, cliprect);
 
 										/* bitmap, road, priority, transparency */
-	if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,7,5,FALSE);
-	if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,7,5,TRUE);
+	if (m_active_layers & 0x10) cischeat_draw_road(machine(),bitmap,cliprect,0,7,5,FALSE);
+	if (m_active_layers & 0x20) cischeat_draw_road(machine(),bitmap,cliprect,1,7,5,TRUE);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
 //  else bitmap.fill(0, cliprect);
 	cischeat_tmap_DRAW(1)
 
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,15,3);
-	if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,4,1,TRUE);
-	if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,4,1,TRUE);
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,2,2);
-	if (m_active_layers & 0x10)	cischeat_draw_road(machine(),bitmap,cliprect,0,0,0,TRUE);
-	if (m_active_layers & 0x20)	cischeat_draw_road(machine(),bitmap,cliprect,1,0,0,TRUE);
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,1,0);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,15,3);
+	if (m_active_layers & 0x10) cischeat_draw_road(machine(),bitmap,cliprect,0,4,1,TRUE);
+	if (m_active_layers & 0x20) cischeat_draw_road(machine(),bitmap,cliprect,1,4,1,TRUE);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,2,2);
+	if (m_active_layers & 0x10) cischeat_draw_road(machine(),bitmap,cliprect,0,0,0,TRUE);
+	if (m_active_layers & 0x20) cischeat_draw_road(machine(),bitmap,cliprect,1,0,0,TRUE);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,1,0);
 	cischeat_tmap_DRAW(2)
 
 	/* for the map screen */
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,0+16,0+16);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,0+16,0+16);
 
 
 	m_active_layers = active_layers1;
@@ -1344,7 +1344,7 @@ UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	/* FAKE Videoreg */
 	m_active_layers = m_vregs[0x2400/2];
-	if (m_active_layers == 0)	m_active_layers = 0x3f;
+	if (m_active_layers == 0)   m_active_layers = 0x3f;
 #else
 	m_active_layers = 0x3f;
 #endif
@@ -1363,28 +1363,28 @@ UINT32 cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_ind1
 
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
-	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (m_active_layers & 0x20)	f1gpstar_draw_road(machine(),bitmap,cliprect,1,6,7,TRUE);
-	if (m_active_layers & 0x10)	f1gpstar_draw_road(machine(),bitmap,cliprect,0,6,7,TRUE);
+	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
+	if (m_active_layers & 0x20) f1gpstar_draw_road(machine(),bitmap,cliprect,1,6,7,TRUE);
+	if (m_active_layers & 0x10) f1gpstar_draw_road(machine(),bitmap,cliprect,0,6,7,TRUE);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
 //  else bitmap.fill(0, cliprect);
 	cischeat_tmap_DRAW(1)
 
-	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (m_active_layers & 0x20)	f1gpstar_draw_road(machine(),bitmap,cliprect,1,1,5,TRUE);
-	if (m_active_layers & 0x10)	f1gpstar_draw_road(machine(),bitmap,cliprect,0,1,5,TRUE);
+	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
+	if (m_active_layers & 0x20) f1gpstar_draw_road(machine(),bitmap,cliprect,1,1,5,TRUE);
+	if (m_active_layers & 0x10) f1gpstar_draw_road(machine(),bitmap,cliprect,0,1,5,TRUE);
 
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,15,2);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,15,2);
 
-	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (m_active_layers & 0x20)	f1gpstar_draw_road(machine(),bitmap,cliprect,1,0,0,TRUE);
-	if (m_active_layers & 0x10)	f1gpstar_draw_road(machine(),bitmap,cliprect,0,0,0,TRUE);
+	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
+	if (m_active_layers & 0x20) f1gpstar_draw_road(machine(),bitmap,cliprect,1,0,0,TRUE);
+	if (m_active_layers & 0x10) f1gpstar_draw_road(machine(),bitmap,cliprect,0,0,0,TRUE);
 
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,1,1);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,1,1);
 	cischeat_tmap_DRAW(2)
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,0,0);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,0,0);
 
 
 	m_active_layers = active_layers1;
@@ -1408,13 +1408,13 @@ m_debugsprites = 0;
 if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) )
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x1;}
-	if (machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x2;}
-	if (machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x4;}
-	if (machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x8; m_debugsprites = 1;}
-	if (machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x8; m_debugsprites = 2;}
-	if (machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x8; m_debugsprites = 3;}
-	if (machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x8; m_debugsprites = 4;}
+	if (machine().input().code_pressed(KEYCODE_Q))  { msk |= 0x1;}
+	if (machine().input().code_pressed(KEYCODE_W))  { msk |= 0x2;}
+	if (machine().input().code_pressed(KEYCODE_E))  { msk |= 0x4;}
+	if (machine().input().code_pressed(KEYCODE_A))  { msk |= 0x8; m_debugsprites = 1;}
+	if (machine().input().code_pressed(KEYCODE_S))  { msk |= 0x8; m_debugsprites = 2;}
+	if (machine().input().code_pressed(KEYCODE_D))  { msk |= 0x8; m_debugsprites = 3;}
+	if (machine().input().code_pressed(KEYCODE_F))  { msk |= 0x8; m_debugsprites = 4;}
 
 	if (msk != 0) m_active_layers &= msk;
 #if 1
@@ -1440,10 +1440,9 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	flag = 0;
 	cischeat_tmap_DRAW(0)
 	// no layer 1
-	if (m_active_layers & 0x08)	cischeat_draw_sprites(machine(),bitmap,cliprect,0,15);
+	if (m_active_layers & 0x08) cischeat_draw_sprites(machine(),bitmap,cliprect,0,15);
 	cischeat_tmap_DRAW(2)
 
 	m_active_layers = active_layers1;
 	return 0;
 }
-

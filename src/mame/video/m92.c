@@ -80,7 +80,7 @@ WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
 		m_sprite_buffer_busy = 0;
 
 		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
-        spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
+		spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
 		machine().scheduler().timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, timer_expired_delegate(FUNC(m92_state::spritebuffer_callback),this));
 	}
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",space.device().safe_pc(),offset,data);
@@ -90,35 +90,35 @@ WRITE16_MEMBER(m92_state::m92_videocontrol_w)
 {
 	COMBINE_DATA(&m_videocontrol);
 	/*
-        Many games write:
-            0x2000
-            0x201b in alternate frames.
+	    Many games write:
+	        0x2000
+	        0x201b in alternate frames.
 
-        Some games write to this both before and after the sprite buffer
-        register - perhaps some kind of acknowledge bit is in there?
+	    Some games write to this both before and after the sprite buffer
+	    register - perhaps some kind of acknowledge bit is in there?
 
-        Lethal Thunder fails it's RAM test with the upper palette bank
-        enabled.  This was one of the earlier games and could actually
-        be a different motherboard revision (most games use M92-A-B top
-        pcb, a M92-A-A revision could exist...).
-    */
+	    Lethal Thunder fails it's RAM test with the upper palette bank
+	    enabled.  This was one of the earlier games and could actually
+	    be a different motherboard revision (most games use M92-A-B top
+	    pcb, a M92-A-A revision could exist...).
+	*/
 
-    /*
-        fedc ba98 7654 3210
-        .x.. x... .xx. ....   always 0?
-        x... .... .... ....   disable tiles?? (but that breaks mysticri)
-        ..xx .... .... ....   ? only written at POST - otherwise always 2
-        .... .xxx .... ....   ? only written at POST - otherwise always 0
-        .... .... x... ....   disable sprites??
-        .... .... ...x ....   ?
-        .... .... .... x...   ?
-        .... .... .... .x..   ? maybe more palette banks?
-        .... .... .... ..x.   palette bank
-        .... .... .... ...x   ?
-    */
+	/*
+	    fedc ba98 7654 3210
+	    .x.. x... .xx. ....   always 0?
+	    x... .... .... ....   disable tiles?? (but that breaks mysticri)
+	    ..xx .... .... ....   ? only written at POST - otherwise always 2
+	    .... .xxx .... ....   ? only written at POST - otherwise always 0
+	    .... .... x... ....   disable sprites??
+	    .... .... ...x ....   ?
+	    .... .... .... x...   ?
+	    .... .... .... .x..   ? maybe more palette banks?
+	    .... .... .... ..x.   palette bank
+	    .... .... .... ...x   ?
+	*/
 
 	/* Access to upper palette bank */
-    m_palette_bank = (m_videocontrol >> 1) & 1;
+	m_palette_bank = (m_videocontrol >> 1) & 1;
 
 //  logerror("%04x: m92_videocontrol_w %d = %02x\n",space.device().safe_pc(),offset,data);
 }
@@ -465,19 +465,19 @@ static void m92_update_scroll_positions(running_machine &machine)
 	int i;
 
 	/*  Playfield 3 rowscroll data is 0xdfc00 - 0xdffff
-        Playfield 2 rowscroll data is 0xdf800 - 0xdfbff
-        Playfield 1 rowscroll data is 0xdf400 - 0xdf7ff
+	    Playfield 2 rowscroll data is 0xdf800 - 0xdfbff
+	    Playfield 1 rowscroll data is 0xdf400 - 0xdf7ff
 
-        It appears to be hardwired to those locations.
+	    It appears to be hardwired to those locations.
 
-        In addition, each playfield is staggered 2 pixels horizontally from the
-        previous one.  This is most obvious in Hook & Blademaster.
+	    In addition, each playfield is staggered 2 pixels horizontally from the
+	    previous one.  This is most obvious in Hook & Blademaster.
 
-    */
+	*/
 
-    for (laynum = 0; laynum < 3; laynum++)
-    {
-    	pf_layer_info *layer = &state->m_pf_layer[laynum];
+	for (laynum = 0; laynum < 3; laynum++)
+	{
+		pf_layer_info *layer = &state->m_pf_layer[laynum];
 
 		if (state->m_pf_master_control[laynum] & 0x40)
 		{

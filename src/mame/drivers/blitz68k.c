@@ -55,20 +55,20 @@ class blitz68k_state : public driver_device
 public:
 	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram"),
-		  m_frame_buffer(*this, "frame_buffer"),
-		  m_blit_romaddr(*this, "blit_romaddr"),
-		  m_blit_attr1_ram(*this, "blit_attr1_ram"),
-		  m_blit_dst_ram_loword(*this, "blitram_loword"),
-		  m_blit_attr2_ram(*this, "blit_attr2_ram"),
-		  m_blit_dst_ram_hiword(*this, "blitram_hiword"),
-		  m_blit_vregs(*this, "blit_vregs"),
-		  m_blit_transpen(*this, "blit_transpen"),
-		  m_leds0(*this, "leds0"),
-		  m_leds1(*this, "leds1"),
-		  m_leds2(*this, "leds2") { }
+			m_nvram(*this, "nvram"),
+			m_frame_buffer(*this, "frame_buffer"),
+			m_blit_romaddr(*this, "blit_romaddr"),
+			m_blit_attr1_ram(*this, "blit_attr1_ram"),
+			m_blit_dst_ram_loword(*this, "blitram_loword"),
+			m_blit_attr2_ram(*this, "blit_attr2_ram"),
+			m_blit_dst_ram_hiword(*this, "blitram_hiword"),
+			m_blit_vregs(*this, "blit_vregs"),
+			m_blit_transpen(*this, "blit_transpen"),
+			m_leds0(*this, "leds0"),
+			m_leds1(*this, "leds1"),
+			m_leds2(*this, "leds2") { }
 
-	optional_shared_ptr<UINT16>	m_nvram;
+	optional_shared_ptr<UINT16> m_nvram;
 	UINT8 *m_blit_buffer;
 	optional_shared_ptr<UINT16> m_frame_buffer;
 	optional_shared_ptr<UINT16> m_blit_romaddr;
@@ -279,7 +279,7 @@ WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 	logerror("blit copy %04x %04x %04x %04x %04x\n", m_blit_romaddr[0], m_blit_attr1_ram[0], m_blit_dst_ram_loword[0], m_blit_attr2_ram[0], m_blit_dst_ram_hiword[0] );
 	logerror("blit vregs %04x %04x %04x %04x\n",m_blit_vregs[0/2],m_blit_vregs[2/2],m_blit_vregs[4/2],m_blit_vregs[6/2]);
 	logerror("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",m_blit_transpen[0/2],m_blit_transpen[2/2],m_blit_transpen[4/2],m_blit_transpen[6/2],
-	                                                               m_blit_transpen[8/2],m_blit_transpen[10/2],m_blit_transpen[12/2],m_blit_transpen[14/2]);
+																	m_blit_transpen[8/2],m_blit_transpen[10/2],m_blit_transpen[12/2],m_blit_transpen[14/2]);
 
 	blit_dst_xpos = (m_blit_dst_ram_loword[0] & 0x00ff)*2;
 	blit_dst_ypos = ((m_blit_dst_ram_loword[0] & 0xff00)>>8);
@@ -332,7 +332,7 @@ WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 
 READ8_MEMBER(blitz68k_state::blit_status_r)
 {
-	return 0;	// bit 0 = blitter busy
+	return 0;   // bit 0 = blitter busy
 }
 
 WRITE8_MEMBER(blitz68k_state::blit_x_w)
@@ -449,10 +449,10 @@ WRITE8_MEMBER(blitz68k_state::blit_flags_w)
 {
 	switch(offset)
 	{
-		case 0:	blit_flipx_w(space, offset, data);	break;
-		case 1:	blit_flipy_w(space, offset, data);	break;
-		case 2:	blit_solid_w(space, offset, data);	break;
-		case 3:	blit_trans_w(space, offset, data);	break;
+		case 0: blit_flipx_w(space, offset, data);  break;
+		case 1: blit_flipy_w(space, offset, data);  break;
+		case 2: blit_solid_w(space, offset, data);  break;
+		case 3: blit_trans_w(space, offset, data);  break;
 	}
 }
 
@@ -469,7 +469,7 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 				blit.x,  blit.y, blit.w, blit.h,
 				blit.addr[2], blit.addr[1], blit.addr[0],
 				blit.pen[0], blit.pen[1], blit.pen[2], blit.pen[3],
-				blit.flag[0], blit.flag[1], blit.flipx, blit.flipy,		blit.solid, blit.trans, blit.flag[6], blit.flag[7]
+				blit.flag[0], blit.flag[1], blit.flipx, blit.flipy,     blit.solid, blit.trans, blit.flag[6], blit.flag[7]
 	);
 
 	x_size = (blit.w + 1) * 2;
@@ -528,14 +528,14 @@ WRITE8_MEMBER(blitz68k_state::blit_hwyxa_draw_w)
 {
 	switch (offset)
 	{
-		case 0:	blit_h_w		(space, offset, data);	break;
-		case 1:	blit_w_w		(space, offset, data);	break;
-		case 2:	blit_y_w		(space, offset, data);	break;
-		case 3:	blit_x_w		(space, offset, data);	break;
-		case 4:	blit_addr2_w	(space, offset, data);	break;
-		case 5:	blit_addr1_w	(space, offset, data);	break;
-		case 6:	blit_addr0_w	(space, offset, data);	break;
-		case 7:	blit_draw_w		(space, offset, data);	break;
+		case 0: blit_h_w        (space, offset, data);  break;
+		case 1: blit_w_w        (space, offset, data);  break;
+		case 2: blit_y_w        (space, offset, data);  break;
+		case 3: blit_x_w        (space, offset, data);  break;
+		case 4: blit_addr2_w    (space, offset, data);  break;
+		case 5: blit_addr1_w    (space, offset, data);  break;
+		case 6: blit_addr0_w    (space, offset, data);  break;
+		case 7: blit_draw_w     (space, offset, data);  break;
 	}
 }
 
@@ -589,7 +589,7 @@ WRITE16_MEMBER(blitz68k_state::irq_callback_w)
 WRITE16_MEMBER(blitz68k_state::sound_write_w)
 {
 	popmessage("%02x",data);
-	dac_data_w(0, data & 0x0f);		/* Sound DAC? */
+	dac_data_w(0, data & 0x0f);     /* Sound DAC? */
 }
 #endif
 
@@ -660,25 +660,25 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::bankrob_mcu1_r)
 {
-	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::bankrob_mcu2_r)
 {
-	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 READ8_MEMBER(blitz68k_state::bankrob_mcu_status_read_r)
 {
-	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
+	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
 READ8_MEMBER(blitz68k_state::bankrob_mcu_status_write_r)
 {
-	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
+	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
 WRITE8_MEMBER(blitz68k_state::bankrob_mcu1_w)
@@ -716,7 +716,7 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x280000, 0x280001) AM_READ(blitter_status_r)
 
-	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP	// 1->0
+	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP    // 1->0
 
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE8(blit_flag0_w, 0xff00)
 	AM_RANGE(0x2e0002, 0x2e0003) AM_WRITE8(blit_flag1_w, 0xff00)
@@ -737,7 +737,7 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x400004, 0x400005) AM_READWRITE8(bankrob_mcu1_r, bankrob_mcu1_w, 0x00ff)
 	AM_RANGE(0x400006, 0x400007) AM_READWRITE8(bankrob_mcu2_r, bankrob_mcu2_w, 0xff00)
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)    // triggered by MCU?
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
@@ -746,24 +746,24 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::bankroba_mcu1_r)
 {
-	UINT8 ret = machine().rand();	// machine().rand() gives "interesting" results
+	UINT8 ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::bankroba_mcu2_r)
 {
-	UINT8 ret = machine().rand();	// machine().rand() gives "interesting" results
+	UINT8 ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 READ8_MEMBER(blitz68k_state::bankroba_mcu1_status_write_r)
 {
-	return 0x00;	// bit 0 = MCU1. Active low.
+	return 0x00;    // bit 0 = MCU1. Active low.
 }
 READ8_MEMBER(blitz68k_state::bankroba_mcu2_status_write_r)
 {
-	return 0x01;	// bit 0 = MCU2. Active high.
+	return 0x01;    // bit 0 = MCU2. Active high.
 }
 
 WRITE8_MEMBER(blitz68k_state::bankroba_mcu1_w)
@@ -779,10 +779,10 @@ static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x800000, 0x800001) AM_READ8(bankroba_mcu1_r, 0x00ff)	// lev 4
+	AM_RANGE(0x800000, 0x800001) AM_READ8(bankroba_mcu1_r, 0x00ff)  // lev 4
 	AM_RANGE(0x840000, 0x840001) AM_WRITE8(bankroba_mcu1_w, 0x00ff)
 
-	AM_RANGE(0x880000, 0x880001) AM_READ8(bankroba_mcu2_r, 0x00ff)	// lev 3
+	AM_RANGE(0x880000, 0x880001) AM_READ8(bankroba_mcu2_r, 0x00ff)  // lev 3
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE8(bankroba_mcu2_w, 0x00ff)
 
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
@@ -837,14 +837,14 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
-		set_led_status(machine(), 0, data & 0x0200);	// win???
+		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
+		set_led_status(machine(), 0, data & 0x0200);    // win???
 //                                     1  data & 0x0400     // win???
-		set_led_status(machine(), 2, data & 0x0800);	// small
-		set_led_status(machine(), 3, data & 0x1000);	// big
-		set_led_status(machine(), 4, data & 0x2000);	// take
-		set_led_status(machine(), 5, data & 0x4000);	// double up
-		set_led_status(machine(), 6, data & 0x8000);	// cancel
+		set_led_status(machine(), 2, data & 0x0800);    // small
+		set_led_status(machine(), 3, data & 0x1000);    // big
+		set_led_status(machine(), 4, data & 0x2000);    // take
+		set_led_status(machine(), 5, data & 0x4000);    // double up
+		set_led_status(machine(), 6, data & 0x8000);    // cancel
 		show_leds123();
 	}
 }
@@ -854,14 +854,14 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(),  7, data & 0x0100);	// start
-		set_led_status(machine(),  8, data & 0x0200);	// bet
-		set_led_status(machine(),  9, data & 0x0400);	// hold 5
-		set_led_status(machine(), 10, data & 0x0800);	// hold 4
-		set_led_status(machine(), 11, data & 0x1000);	// hold 3
-		set_led_status(machine(), 12, data & 0x2000);	// hold 2
-		set_led_status(machine(), 13, data & 0x4000);	// collect
-		set_led_status(machine(), 14, data & 0x8000);	// call attendant
+		set_led_status(machine(),  7, data & 0x0100);   // start
+		set_led_status(machine(),  8, data & 0x0200);   // bet
+		set_led_status(machine(),  9, data & 0x0400);   // hold 5
+		set_led_status(machine(), 10, data & 0x0800);   // hold 4
+		set_led_status(machine(), 11, data & 0x1000);   // hold 3
+		set_led_status(machine(), 12, data & 0x2000);   // hold 2
+		set_led_status(machine(), 13, data & 0x4000);   // collect
+		set_led_status(machine(), 14, data & 0x8000);   // call attendant
 		show_leds123();
 	}
 }
@@ -871,8 +871,8 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(), 15, data & 0x0100);	// hopper coins?
-		set_led_status(machine(), 16, data & 0x0400);	// coin out?
+		set_led_status(machine(), 15, data & 0x0100);   // hopper coins?
+		set_led_status(machine(), 16, data & 0x0400);   // coin out?
 		show_leds123();
 	}
 }
@@ -908,7 +908,7 @@ WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 // MCU simulation (to be done)
 READ16_MEMBER(blitz68k_state::cjffruit_mcu_r)
 {
-	UINT8 ret = 0x00;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
@@ -948,9 +948,9 @@ static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x8fa000, 0x8fa001) AM_WRITE(cjffruit_leds2_w) AM_SHARE("leds1")
 	AM_RANGE(0x8fc000, 0x8fc001) AM_WRITE(cjffruit_leds3_w) AM_SHARE("leds2")
 
-	AM_RANGE(0x8fe000, 0x8fe003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
+	AM_RANGE(0x8fe000, 0x8fe003) AM_WRITE8(blit_flags_w, 0xffff)    // flipx,y,solid,trans
 	AM_RANGE(0x8fe004, 0x8fe005) AM_WRITEONLY
-	AM_RANGE(0x8fe006, 0x8fe007) AM_WRITE(crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
+	AM_RANGE(0x8fe006, 0x8fe007) AM_WRITE(crtc_lpen_w)  // 0x8fe006: 0->1, 0x8fe007: 1->0
 
 	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
@@ -962,7 +962,7 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ16_MEMBER(blitz68k_state::deucesw2_mcu_r)
 {
-	UINT8 ret = 0x00;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
@@ -977,14 +977,14 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
-		set_led_status(machine(), 0, data & 0x0200);	// win???
+		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
+		set_led_status(machine(), 0, data & 0x0200);    // win???
 //                                     1  data & 0x0400     // win???
-		set_led_status(machine(), 2, data & 0x0800);	// small
-		set_led_status(machine(), 3, data & 0x1000);	// big
-		set_led_status(machine(), 4, data & 0x2000);	// take
-		set_led_status(machine(), 5, data & 0x4000);	// double up
-		set_led_status(machine(), 6, data & 0x8000);	// cancel
+		set_led_status(machine(), 2, data & 0x0800);    // small
+		set_led_status(machine(), 3, data & 0x1000);    // big
+		set_led_status(machine(), 4, data & 0x2000);    // take
+		set_led_status(machine(), 5, data & 0x4000);    // double up
+		set_led_status(machine(), 6, data & 0x8000);    // cancel
 		show_leds123();
 	}
 }
@@ -994,14 +994,14 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(),  7, data & 0x0100);	// start
-		set_led_status(machine(),  8, data & 0x0200);	// bet
-		set_led_status(machine(),  9, data & 0x0400);	// hold 5
-		set_led_status(machine(), 10, data & 0x0800);	// hold 4
-		set_led_status(machine(), 11, data & 0x1000);	// hold 3
-		set_led_status(machine(), 12, data & 0x2000);	// hold 2
-		set_led_status(machine(), 13, data & 0x4000);	// hold 1
-		set_led_status(machine(), 14, data & 0x8000);	// call attendant
+		set_led_status(machine(),  7, data & 0x0100);   // start
+		set_led_status(machine(),  8, data & 0x0200);   // bet
+		set_led_status(machine(),  9, data & 0x0400);   // hold 5
+		set_led_status(machine(), 10, data & 0x0800);   // hold 4
+		set_led_status(machine(), 11, data & 0x1000);   // hold 3
+		set_led_status(machine(), 12, data & 0x2000);   // hold 2
+		set_led_status(machine(), 13, data & 0x4000);   // hold 1
+		set_led_status(machine(), 14, data & 0x8000);   // call attendant
 		show_leds123();
 	}
 }
@@ -1011,8 +1011,8 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(), 15, data & 0x0100);	// hopper coins?
-		set_led_status(machine(), 16, data & 0x0400);	// coin out?
+		set_led_status(machine(), 15, data & 0x0100);   // hopper coins?
+		set_led_status(machine(), 16, data & 0x0400);   // coin out?
 		show_leds123();
 	}
 }
@@ -1047,9 +1047,9 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x89a000, 0x89a001) AM_WRITE(deucesw2_leds2_w) AM_SHARE("leds1")
 	AM_RANGE(0x89c000, 0x89c001) AM_WRITE(deucesw2_leds3_w) AM_SHARE("leds2")
 
-	AM_RANGE(0x89e000, 0x89e003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
+	AM_RANGE(0x89e000, 0x89e003) AM_WRITE8(blit_flags_w, 0xffff)    // flipx,y,solid,trans
 	AM_RANGE(0x89e004, 0x89e005) AM_WRITEONLY
-	AM_RANGE(0x89e006, 0x89e007) AM_WRITE(crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
+	AM_RANGE(0x89e006, 0x89e007) AM_WRITE(crtc_lpen_w)  // 0x89e006: 0->1, 0x89e007: 1->0
 
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
@@ -1061,25 +1061,25 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::dualgame_mcu1_r)
 {
-	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::dualgame_mcu2_r)
 {
-	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 READ8_MEMBER(blitz68k_state::dualgame_mcu_status_read_r)
 {
-	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
+	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
 READ8_MEMBER(blitz68k_state::dualgame_mcu_status_write_r)
 {
-	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
+	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
 WRITE8_MEMBER(blitz68k_state::dualgame_mcu1_w)
@@ -1120,14 +1120,14 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(crtc_lpen_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP
 
-	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP	// 1->0 (MCU related?)
+	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP    // 1->0 (MCU related?)
 
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE8(blit_flag0_w, 0xff00)
 	AM_RANGE(0x2e0002, 0x2e0003) AM_WRITE8(blit_flag1_w, 0xff00)
-	AM_RANGE(0x2e0004, 0x2e0005) AM_WRITE8(blit_flipx_w, 0xff00)	// flipx
-	AM_RANGE(0x2e0006, 0x2e0007) AM_WRITE8(blit_flipy_w, 0xff00)	// flipy
-	AM_RANGE(0x2e0008, 0x2e0009) AM_WRITE8(blit_solid_w, 0xff00)	// solid
-	AM_RANGE(0x2e000a, 0x2e000b) AM_WRITE8(blit_trans_w, 0xff00)	// transparency
+	AM_RANGE(0x2e0004, 0x2e0005) AM_WRITE8(blit_flipx_w, 0xff00)    // flipx
+	AM_RANGE(0x2e0006, 0x2e0007) AM_WRITE8(blit_flipy_w, 0xff00)    // flipy
+	AM_RANGE(0x2e0008, 0x2e0009) AM_WRITE8(blit_solid_w, 0xff00)    // solid
+	AM_RANGE(0x2e000a, 0x2e000b) AM_WRITE8(blit_trans_w, 0xff00)    // transparency
 	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8(blit_flag6_w, 0xff00)
 	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8(blit_flag7_w, 0xff00)
 
@@ -1152,7 +1152,7 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ16_MEMBER(blitz68k_state::hermit_mcu_r)
 {
-	UINT8 ret = 0x00;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
@@ -1167,7 +1167,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
+		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
 		show_leds12();
 	}
 }
@@ -1177,7 +1177,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(),  7, data & 0x0100);	// button
+		set_led_status(machine(),  7, data & 0x0100);   // button
 		show_leds12();
 	}
 }
@@ -1221,11 +1221,11 @@ static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x9e0000, 0x9e0001) AM_WRITE(hermit_leds1_w) AM_SHARE("leds0")
 	AM_RANGE(0x9e8000, 0x9e8001) AM_WRITE(hermit_leds2_w) AM_SHARE("leds1")
 
-	AM_RANGE(0x9f0000, 0x9f0003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
+	AM_RANGE(0x9f0000, 0x9f0003) AM_WRITE8(blit_flags_w, 0xffff)    // flipx,y,solid,trans
 	AM_RANGE(0x9f0004, 0x9f0005) AM_WRITEONLY
-	AM_RANGE(0x9f0006, 0x9f0007) AM_WRITE(crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
+	AM_RANGE(0x9f0006, 0x9f0007) AM_WRITE(crtc_lpen_w)  // 0x9f0006: 0->1, 0x9f0007: 1->0
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)	// triggered by MCU?
+	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)  // triggered by MCU?
 
 	AM_RANGE(0xc80000, 0xc80007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 ADDRESS_MAP_END
@@ -1237,25 +1237,25 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 READ8_MEMBER(blitz68k_state::maxidbl_mcu1_r)
 {
-	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(blitz68k_state::maxidbl_mcu2_r)
 {
-	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	UINT8 ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_read_r)
 {
-	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
+	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
 READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_write_r)
 {
-	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
+	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
 WRITE8_MEMBER(blitz68k_state::maxidbl_mcu1_w)
@@ -1273,8 +1273,8 @@ static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16, blitz68k_state )
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("frame_buffer")
 
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP	// 0->1 (IRQ3 ack.?)
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITENOP	// 1->0 (MCU related?)
+	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP    // 0->1 (IRQ3 ack.?)
+	AM_RANGE(0x30000e, 0x30000f) AM_WRITENOP    // 1->0 (MCU related?)
 
 	AM_RANGE(0x500000, 0x500001) AM_READ8(maxidbl_mcu_status_write_r, 0x00ff)
 	AM_RANGE(0x500002, 0x500003) AM_READ8(maxidbl_mcu_status_read_r,  0x00ff)
@@ -1282,7 +1282,7 @@ static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE8(maxidbl_mcu1_r, maxidbl_mcu1_w, 0x00ff)
 	AM_RANGE(0x500006, 0x500007) AM_READWRITE8(maxidbl_mcu2_r, maxidbl_mcu2_w, 0xff00)
 
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)    // triggered by MCU?
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
@@ -1297,16 +1297,16 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bankrob )
 	// not hooked up
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
-	PORT_DIPNAME( 0x0200, 0x0200, "Clock?" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x0200, 0x0200, "Clock?" )                PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0000, "10 MHz" )
 	PORT_DIPSETTING(      0x0200, "11 MHz" )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1344,10 +1344,10 @@ static INPUT_PORTS_START( cjffruit )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_NAME("Call Attendant")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
-	PORT_DIPNAME( 0x0e00, 0x0800, "Pinout" )				PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x0e00, 0x0800, "Pinout" )                PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x0e00, "8L6 (Cherry Master)" )
 	PORT_DIPSETTING(      0x0c00, "8L7"  )
 	PORT_DIPSETTING(      0x0a00, "8L10" )
@@ -1357,7 +1357,7 @@ static INPUT_PORTS_START( cjffruit )
 	PORT_DIPSETTING(      0x0200, "Invalid #1" )
 	PORT_DIPSETTING(      0x0000, "Invalid #2" )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
-	PORT_DIPNAME( 0x2000, 0x2000, "Factory Default" )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x2000, 0x2000, "Factory Default" )       PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
@@ -1367,9 +1367,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( deucesw2 )
 	// Inputs for L74 pinout
 	PORT_START("IN0")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5)	// coin 1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2         ) PORT_IMPULSE(5)	// coin 2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3         ) PORT_IMPULSE(5)	// coin 3
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5)    // coin 1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2         ) PORT_IMPULSE(5)    // coin 2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3         ) PORT_IMPULSE(5)    // coin 3
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW      ) // menu
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // collect
@@ -1397,12 +1397,12 @@ static INPUT_PORTS_START( deucesw2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_NAME("Call Attendant")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door")  PORT_CODE(KEYCODE_O) PORT_TOGGLE
-	PORT_DIPNAME( 0x3800, 0x2000, "Pinout" )				PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x3800, 0x2000, "Pinout" )                PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x3800, "8L6 (Cherry Master)" )
 	PORT_DIPSETTING(      0x3000, "8L7"   )
 	PORT_DIPSETTING(      0x2800, "8L10"  )
@@ -1411,10 +1411,10 @@ static INPUT_PORTS_START( deucesw2 )
 	PORT_DIPSETTING(      0x1000, "Invalid #2" )
 	PORT_DIPSETTING(      0x0800, "Invalid #3" )
 	PORT_DIPSETTING(      0x0000, "Invalid #4" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Factory Default" )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Factory Default" )       PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1422,23 +1422,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dualgame )
 	// not hooked up
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
-	PORT_DIPNAME( 0x0200, 0x0200, "Clock?" )				PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x0200, 0x0200, "Clock?" )                PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0000, "10 MHz" )
 	PORT_DIPSETTING(      0x0200, "11 MHz" )
-	PORT_DIPNAME( 0x0400, 0x0400, "V-Sync" )				PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0400, 0x0400, "V-Sync" )                PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0000, "V-" )
 	PORT_DIPSETTING(      0x0400, "V+" )
-	PORT_DIPNAME( 0x0800, 0x0800, "H-Sync" )				PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x0800, 0x0800, "H-Sync" )                PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0000, "H-" )
 	PORT_DIPSETTING(      0x0800, "H+" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hermit )
 	PORT_START("IN0")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1        ) PORT_IMPULSE(5)	// coin 1
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1        ) PORT_IMPULSE(5) // coin 1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN      ) // -
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN      ) // -
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW     ) // menu
@@ -1458,36 +1458,36 @@ static INPUT_PORTS_START( hermit )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN     ) // -
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
-	PORT_DIPNAME( 0x0200, 0x0200, "Clock?" )				PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0200, 0x0200, "Clock?" )                PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0000, "20 MHz" )
 	PORT_DIPSETTING(      0x0200, "22 MHz" )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Trackball Alt #1" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x2000, 0x2000, "Trackball Alt #1" )      PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Trackball Alt #2" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x4000, 0x4000, "Trackball Alt #2" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Factory Default" )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Factory Default" )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("TRACK_X")
-    PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_RESET
+	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_RESET
 
 	PORT_START("TRACK_Y")
-    PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_RESET
+	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_RESET
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ilpag )
@@ -1573,30 +1573,30 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( maxidbl )
 	// not hooked up
 	PORT_START("DSW_SUB")
-	PORT_DIPNAME( 0x0100, 0x0100, "V-Sync" )				PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "V-Sync" )                PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "V-" )
 	PORT_DIPSETTING(      0x0100, "V+" )
-	PORT_DIPNAME( 0x0200, 0x0200, "H-Sync" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x0200, 0x0200, "H-Sync" )                PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0000, "H-" )
 	PORT_DIPSETTING(      0x0800, "H+" )
-	PORT_DIPNAME( 0x0400, 0x0400, "Comp" )					PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0400, 0x0400, "Comp" )                  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "En-V" )					PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0800, 0x0800, "En-V" )                  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1664,44 +1664,44 @@ WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
 
 const mc6845_interface mc6845_intf_irq1 =
 {
-	"screen",	/* screen we are acting on */
-	4,			/* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq1),	/* VSYNC callback */
-	crtc_addr				/* update address callback */
+	"screen",   /* screen we are acting on */
+	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq1),   /* VSYNC callback */
+	crtc_addr               /* update address callback */
 };
 
 const mc6845_interface mc6845_intf_irq3 =
 {
-	"screen",	/* screen we are acting on */
-	4,			/* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq3),	/* VSYNC callback */
-	crtc_addr				/* update address callback */
+	"screen",   /* screen we are acting on */
+	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq3),   /* VSYNC callback */
+	crtc_addr               /* update address callback */
 };
 
 const mc6845_interface mc6845_intf_irq5 =
 {
-	"screen",	/* screen we are acting on */
-	4,			/* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq5),	/* VSYNC callback */
-	crtc_addr				/* update address callback */
+	"screen",   /* screen we are acting on */
+	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(blitz68k_state,crtc_vsync_irq5),   /* VSYNC callback */
+	crtc_addr               /* update address callback */
 };
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, blitz68k_state )
@@ -1714,7 +1714,7 @@ static RAMDAC_INTERFACE( ramdac_intf )
 };
 
 static MACHINE_CONFIG_START( ilpag, blitz68k_state )
-	MCFG_CPU_ADD("maincpu", M68000, 11059200 )	// ?
+	MCFG_CPU_ADD("maincpu", M68000, 11059200 )  // ?
 	MCFG_CPU_PROGRAM_MAP(ilpag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
 
@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(bankrob_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1847,7 +1847,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(bankroba_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
 
 	// MC68HC705C8P (MCU)
@@ -1937,7 +1937,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2 )
 	MCFG_CPU_PROGRAM_MAP(hermit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
 
 	// MC68HC705C8P (MCU)
 
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)	// protection prevents correct irq frequency by crtc
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -2048,11 +2048,11 @@ ROM_START( bankrob )
 	ROM_LOAD16_BYTE( "unknown_label.u21", 0x00000, 0x20000, CRC(a043a651) SHA1(798f7b7b04bf6ef5333b07d329fadc0264da00e9) )
 	ROM_LOAD16_BYTE( "unknown_label.u20", 0x00001, 0x20000, CRC(31dcfd41) SHA1(d23f6a6d57d917ba1c4e202c341b35ab0eeaef42) )
 
-	ROM_REGION( 0x2000, "mcu1", 0 )	// 68HC705C8P code
-	ROM_LOAD( "xpi-1_2.6.u6", 0x0000, 0x2000, NO_DUMP )	// missing label
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
+	ROM_LOAD( "xpi-1_2.6.u6", 0x0000, 0x2000, NO_DUMP ) // missing label
 
-	ROM_REGION( 0x2000, "mcu2", 0 )	// 68HC705C8P code
-	ROM_LOAD( "xpi-2_2.6.u7", 0x0000, 0x2000, NO_DUMP )	// "for SPI & MPI 06/08/1995"
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
+	ROM_LOAD( "xpi-2_2.6.u7", 0x0000, 0x2000, NO_DUMP ) // "for SPI & MPI 06/08/1995"
 
 	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "unknown_label.u70", 0x00000, 0x80000, CRC(35225bf6) SHA1(cd3176ab43c0678c6b9a92b9fafea116babdd534) )
@@ -2060,15 +2060,15 @@ ROM_START( bankrob )
 
 //  ROM_REGION( 0x20000, "samples", 0 ) // 8 bit unsigned
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "palce16v8h.u10", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u18", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u33", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u34", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u39", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u60", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u10", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u18", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u33", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u34", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u39", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u60", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2116,33 +2116,33 @@ ROM_START( bankroba )
 	ROM_LOAD16_BYTE( "dkbkus_2.64-b.u32", 0x00000, 0x20000, CRC(03ddde43) SHA1(c24ed9419726ca7bd96a92651705043da545512f) )
 	ROM_LOAD16_BYTE( "dkbkus_2.64-a.u31", 0x00001, 0x20000, CRC(8906f5b6) SHA1(b9dbecfac299bdd1dba5fe22cda3485b3202e074) )
 
-	ROM_REGION( 0x2000, "mcu1", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
 	ROM_LOAD( "c8-bank_2.51.u2", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "mcu2", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "bankroba_sub.mcu", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "dkbkus_2.31-c.u46", 0x00000, 0x80000, CRC(d94a3ead) SHA1(e599b8d110bae16f83b3969834aa9b01076e2310) )
 	ROM_LOAD( "dkbkus_2.31-d.u51", 0x80000, 0x80000, CRC(834b63bb) SHA1(da6b5e2fc1626044ecddf438c696e606a72d6164) )
 
-	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
 	ROM_LOAD( "unknown_label.u18", 0x00000, 0x80000, CRC(37f5862d) SHA1(8053c9ea30bb304982ef7e2c67d94454df520dfd) ) // = bank_2.31-g.u17 (dualgame)
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "pal20x6acns.u12",  0x000, 0x0cc, NO_DUMP )	// size?
-    ROM_LOAD( "palce16v8h.u22",   0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "pal20x10acns.u40", 0x000, 0x0cc, NO_DUMP )	// size?
-    ROM_LOAD( "pal20x6acns.u43",  0x000, 0x0cc, NO_DUMP )	// size?
-    ROM_LOAD( "palce16v8h.u44",   0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "pal20x6acns.u48",  0x000, 0x0cc, NO_DUMP )	// size?
-    ROM_LOAD( "pal20x6acns.u52",  0x000, 0x0cc, NO_DUMP )	// size?
-    ROM_LOAD( "palce16v8h.u53",   0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u56",   0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u57",   0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u69",   0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u71",   0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u72",   0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pal20x6acns.u12",  0x000, 0x0cc, NO_DUMP )   // size?
+	ROM_LOAD( "palce16v8h.u22",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "pal20x10acns.u40", 0x000, 0x0cc, NO_DUMP )   // size?
+	ROM_LOAD( "pal20x6acns.u43",  0x000, 0x0cc, NO_DUMP )   // size?
+	ROM_LOAD( "palce16v8h.u44",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "pal20x6acns.u48",  0x000, 0x0cc, NO_DUMP )   // size?
+	ROM_LOAD( "pal20x6acns.u52",  0x000, 0x0cc, NO_DUMP )   // size?
+	ROM_LOAD( "palce16v8h.u53",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u56",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u57",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u69",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u71",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u72",   0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2186,7 +2186,7 @@ ROM_START( cj3play )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD( "cjtripleply-cj_1.10-a.u65", 0x00000, 0x80000, CRC(69ae3fd3) SHA1(50eed5130905b710f48b2086173448e999dc96e8) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )	// 68HC705C8A code
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8A code
 	ROM_LOAD( "cj-tripleplay_2.4.c8", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
@@ -2195,7 +2195,7 @@ ROM_START( cj3play )
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-f.u51", 0x100000, 0x80000, CRC(c8ccf1a7) SHA1(7a7b0f68d6ed5894fb4deb93fbf8053aff4fdb35) )
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-e.u61", 0x100001, 0x80000, CRC(ff59f0ae) SHA1(b9f9cdc90f44f75ace079ec08ab5d71b21ce98dd) )
 
-	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
 	ROM_LOAD( "cjtripleply-cj_1.10-g.u50", 0x00000, 0x80000, CRC(8129f700) SHA1(fc09e1e4694757b08570cc46c9536340fbce0ded) )
 
 	ROM_REGION( 0x117, "plds", 0 )
@@ -2246,7 +2246,7 @@ ROM_START( cjffruit )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD( "cjfunfruit-cj_1.13-a.u65", 0x00000, 0x80000, CRC(3a74d769) SHA1(fc8804d49cc31dadf10027ed1e2458cae96d6355) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
 	ROM_LOAD( "cjfunfruit_2.3.c8", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
@@ -2255,7 +2255,7 @@ ROM_START( cjffruit )
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-f.u51", 0x100000, 0x80000, CRC(f5de1072) SHA1(943a82899ca6a07991fa4031d2ff96f625c9d6f5) )
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-e.u61", 0x100001, 0x80000, CRC(7acaef9d) SHA1(5031dc22e787dc4d8dffe67382068b9926c24bef) )
 
-	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
 	ROM_LOAD( "cjfunfruit-cj_1.13-g.u50", 0x00000, 0x80000, CRC(5fb53d3e) SHA1(f4a37b00a9417440685d198f1375b615848e7fb6) )
 
 	ROM_REGION( 0x117, "plds", 0 )
@@ -2309,16 +2309,16 @@ Other:
 
 ROM_START( deucesw2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD( "cb2wild-ah-2.02f-a.u92", 0x00000, 0x40000, CRC(723140ef) SHA1(8ab9c89663ce0dd736b6e9f701f16dbf5ebb9527) )	// "for CBC ($6F6D)"
+	ROM_LOAD( "cb2wild-ah-2.02f-a.u92", 0x00000, 0x40000, CRC(723140ef) SHA1(8ab9c89663ce0dd736b6e9f701f16dbf5ebb9527) )    // "for CBC ($6F6D)"
 
-	ROM_REGION( 0x2000, "mcu", 0 )	// 68HC705C8P code
-	ROM_LOAD( "cbc-8l_2.0.u31", 0x0000, 0x2000, NO_DUMP )	// "for CBC-8L REV..." (label is only partially readable)
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "cbc-8l_2.0.u31", 0x0000, 0x2000, NO_DUMP )   // "for CBC-8L REV..." (label is only partially readable)
 
 	ROM_REGION( 0x80000, "blitter", 0 ) // data for the blitter
-	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-d.u87", 0x00000, 0x40000, CRC(7ab3ea30) SHA1(5e435f2a6ea169b827ae0f3da6a8afda0b636d7e) )	// "for CBC ($AA97)"
-	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-c.u94", 0x00001, 0x40000, CRC(5b465430) SHA1(df428e3309732376d0999ad75567e264b7db9a1c) )	// "for CBC ($465A)"
+	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-d.u87", 0x00000, 0x40000, CRC(7ab3ea30) SHA1(5e435f2a6ea169b827ae0f3da6a8afda0b636d7e) ) // "for CBC ($AA97)"
+	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-c.u94", 0x00001, 0x40000, CRC(5b465430) SHA1(df428e3309732376d0999ad75567e264b7db9a1c) ) // "for CBC ($465A)"
 
-	ROM_REGION( 0x20000, "samples", 0 )	// 8 bit unsigned
+	ROM_REGION( 0x20000, "samples", 0 ) // 8 bit unsigned
 	ROM_LOAD( "cb2wild-ah-2.02f-k.u54", 0x00000, 0x20000, CRC(1eea618b) SHA1(65f3513d1a93a8afbfaeff27ebea5f0b5348e54b) )
 
 	ROM_REGION( 0x117, "plds", 0 )
@@ -2383,21 +2383,21 @@ Other:
 
 ROM_START( dualgame )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "mpduga_0.01-a.u27", 0x00000, 0x20000, CRC(57b87596) SHA1(b31d83f5dbd0ad25564c876e2995bba61e1f425f) )	// "for MPI/MPM 09/05/1995"
-	ROM_LOAD16_BYTE( "mpduga_0.01-b.u28", 0x00001, 0x20000, CRC(e441d895) SHA1(c026b6ebeaedece303b9361bd92c69150ea63b0a) )	// ""
+	ROM_LOAD16_BYTE( "mpduga_0.01-a.u27", 0x00000, 0x20000, CRC(57b87596) SHA1(b31d83f5dbd0ad25564c876e2995bba61e1f425f) )  // "for MPI/MPM 09/05/1995"
+	ROM_LOAD16_BYTE( "mpduga_0.01-b.u28", 0x00001, 0x20000, CRC(e441d895) SHA1(c026b6ebeaedece303b9361bd92c69150ea63b0a) )  // ""
 
-	ROM_REGION( 0x2000, "mcu1", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
 	ROM_LOAD( "dualgame.u8", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "mcu2", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "dualgame.u9", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "mpduga_0.01-d.u69", 0x00000, 0x80000, CRC(2f65e87e) SHA1(ded9d75ebb46e061615dac408f86dad14df9d30b) )
 	ROM_LOAD16_BYTE( "mpduga_0.01-c.u68", 0x00001, 0x80000, CRC(bc5b4738) SHA1(69bcc15d3e7524ba26dad0e29919461fbd0a8736) )
 
-	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
-	ROM_LOAD( "bank_2.31-g.u17", 0x00000, 0x80000, CRC(37f5862d) SHA1(8053c9ea30bb304982ef7e2c67d94454df520dfd) )	// "for DK-B or DAB 03/04/1995" (hand-written: Demo)
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "bank_2.31-g.u17", 0x00000, 0x80000, CRC(37f5862d) SHA1(8053c9ea30bb304982ef7e2c67d94454df520dfd) )   // "for DK-B or DAB 03/04/1995" (hand-written: Demo)
 ROM_END
 
 /*************************************************************************************************************
@@ -2442,21 +2442,21 @@ ROM_START( hermit )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD( "unknown_label.u69", 0x00000, 0x40000, CRC(5e1a37c1) SHA1(76ec6ef75ddda848d466e20a4a8bfb3e1647e876) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )	// 68HC705C8P code
-	ROM_LOAD( "lc-hermit_1.00.u51", 0x0000, 0x2000, NO_DUMP )	// "for LC-8L 26/04/1995"
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "lc-hermit_1.00.u51", 0x0000, 0x2000, NO_DUMP )   // "for LC-8L 26/04/1995"
 
 	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "unknown_label.u2", 0x00000, 0x80000, CRC(fc8b9ec6) SHA1(c7515cf78d68a1ae7f2e8e50fe3083db2547c314) )
 	ROM_LOAD16_BYTE( "unknown_label.u3", 0x00001, 0x80000, CRC(0a621d76) SHA1(66cabf4e233dc784851c9fb07f18658c10744cd7) )
 
-	ROM_REGION( 0x80000, "samples", 0 )	// 8 bit unsigned
-	ROM_LOAD( "lcherm_1.00-g.u48", 0x00000, 0x80000, CRC(1ad999de) SHA1(02beb744a0a6fb92e225c1de10672c852151eb6b) )	// "for LC-8L 26/04/1995"
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "lcherm_1.00-g.u48", 0x00000, 0x80000, CRC(1ad999de) SHA1(02beb744a0a6fb92e225c1de10672c852151eb6b) ) // "for LC-8L 26/04/1995"
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "palce16v8h.u34", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u45", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u46", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u56", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u34", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u45", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u46", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u56", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2566,21 +2566,21 @@ ROM_START( maxidbl )
 	ROM_LOAD16_BYTE( "spm_maxi_1.1-b.u25", 0x00000, 0x20000, CRC(b0c754c2) SHA1(a664386d1813b1e06be0d9f41fc3569dfc20e395) )
 	ROM_LOAD16_BYTE( "sp_maxi_1.1-a.u24",  0x00001, 0x20000, CRC(adec27b6) SHA1(3dabe86eae9781e6d8fe20e160351e5e757faeda) )
 
-	ROM_REGION( 0x2000, "mcu1", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
 	ROM_LOAD( "c8_pi-2.u5", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "mcu2", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "c8_spi-maxi.u6", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "mcu3", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu3", 0 ) // 68HC705C8P code
 	ROM_LOAD( "sub8l74_846.u18", 0x0000, 0x2000, NO_DUMP )
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "16as15hb1.u2",  0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "16as15hb1.u13", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "16as15hb1.u14", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "16as15hb1.u15", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "16as15hb1.u19", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "16as15hb1.u2",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "16as15hb1.u13", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "16as15hb1.u14", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "16as15hb1.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "16as15hb1.u19", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2631,21 +2631,21 @@ ROM_START( megadble )
 	ROM_LOAD16_BYTE( "spmegasp_1.62-b.u25", 0x00000, 0x20000, CRC(4562a181) SHA1(82f1034a0631f83236b163c0c1d6fed5d365bf9c) )
 	ROM_LOAD16_BYTE( "spmegasp_1.62-a.u24", 0x00001, 0x20000, CRC(292fdacc) SHA1(fd8e117586569abb094d3b0ebd41292565f18c2a) )
 
-	ROM_REGION( 0x2000, "mcu1", 0 )	// 68HC705C8P code
-	ROM_LOAD( "xpi-2_2.6.u5", 0x0000, 0x2000, NO_DUMP )	// C8-#2
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
+	ROM_LOAD( "xpi-2_2.6.u5", 0x0000, 0x2000, NO_DUMP ) // C8-#2
 
-	ROM_REGION( 0x2000, "mcu2", 0 )	// 68HC705C8P code
-	ROM_LOAD( "xpi-1_2.6.u6", 0x0000, 0x2000, NO_DUMP )	// C8-#1, no label
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
+	ROM_LOAD( "xpi-1_2.6.u6", 0x0000, 0x2000, NO_DUMP ) // C8-#1, no label
 
-	ROM_REGION( 0x2000, "mcu3", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu3", 0 ) // 68HC705C8P code
 	ROM_LOAD( "hilo_sk-b_4.01.u18", 0x0000, 0x2000, NO_DUMP )
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "palce16v8h.u2",  0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u13", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u14", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u2",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u13", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u14", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2670,21 +2670,21 @@ ROM_START( megadblj )
 	ROM_LOAD16_BYTE( "spmegajk_1.26-b.u25", 0x00000, 0x20000, CRC(de206213) SHA1(35d886c805424fe7b364b49f301ff8467e30c26b) )
 	ROM_LOAD16_BYTE( "spmegajk_1.26-a.u24", 0x00001, 0x20000, CRC(fa0ccaea) SHA1(562324119e08d44228ac754acbf763d0781ab891) )
 
-	ROM_REGION( 0x2000, "mcu1", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
 	ROM_LOAD( "c8_pi-2.u5", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "mcu2", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "c8_spi-megajk.u6", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "mcu3", 0 )	// 68HC705C8P code
+	ROM_REGION( 0x2000, "mcu3", 0 ) // 68HC705C8P code
 	ROM_LOAD( "megadblj_sub.mcu", 0x0000, 0x2000, NO_DUMP )
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "palce16v8h.u2",  0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u13", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u14", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u2",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u13", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u14", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2709,18 +2709,18 @@ ROM_START( poker52 )
 	ROM_LOAD16_BYTE( "unknown_label.u25", 0x00000, 0x20000, CRC(63e0dd69) SHA1(970e6363ade714a2b9a844c5683ab1365193457a) )
 	ROM_LOAD16_BYTE( "unknown_label.u24", 0x00001, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "mcu1", 0 )	// 68HC705C8P code
-	ROM_LOAD( "xpi-2_2.3.u5", 0x0000, 0x2000, NO_DUMP )	// C8-#2, "for SPI or MPI 09/02/1995" (partially readable)
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
+	ROM_LOAD( "xpi-2_2.3.u5", 0x0000, 0x2000, NO_DUMP ) // C8-#2, "for SPI or MPI 09/02/1995" (partially readable)
 
-	ROM_REGION( 0x2000, "mcu2", 0 )	// 68HC705C8P code
-	ROM_LOAD( "spi-pk52_1.6.u6", 0x0000, 0x2000, NO_DUMP )	// C8-#2
+	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
+	ROM_LOAD( "spi-pk52_1.6.u6", 0x0000, 0x2000, NO_DUMP )  // C8-#2
 
-    ROM_REGION( 0x117, "plds", 0 )
-    ROM_LOAD( "palce16v8h.u2",  0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u13", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u14", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
-    ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u2",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u13", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u14", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u19", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /*************************************************************************************************************
@@ -2910,15 +2910,15 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadble)
 
 
 GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl, blitz68k_state,  maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_WRONG_COLORS )
-GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl, blitz68k_state,  megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // JUNE 28TH, 1993
+GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl, blitz68k_state,  megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // JUNE 28TH, 1993
 GAME( 1990,  megadble, 0,       maxidbl,  maxidbl, blitz68k_state,  megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_WRONG_COLORS ) // NOVEMBER 1994
 GAME( 1993,  steaser,  0,       steaser,  steaser, driver_device,  0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
-GAME( 1993,  bankrob,  0,       bankrob,  bankrob, blitz68k_state,  bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // BLITZ SYSTEM INC APRIL 1995
-GAME( 1993,  bankroba, bankrob, bankroba, bankrob, blitz68k_state,  bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl, driver_device,  0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // MARCH 10TH, 1994
+GAME( 1993,  bankrob,  0,       bankrob,  bankrob, blitz68k_state,  bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
+GAME( 1993,  bankroba, bankrob, bankroba, bankrob, blitz68k_state,  bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl, driver_device,  0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                  // MARCH 10TH, 1994
 GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, dualgame, ROT0,  "Labtronix Technologies",         "Dual Games (prototype)",                         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // SEPTEMBER 5TH, 1995
-GAME( 1995,  hermit,   0,       hermit,   hermit, blitz68k_state,   hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // APRIL 1995
-GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )	                 // APRIL 10TH, 1997
+GAME( 1995,  hermit,   0,       hermit,   hermit, blitz68k_state,   hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // APRIL 1995
+GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // APRIL 10TH, 1997
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, cj3play,  ROT0,  "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )                     // APRIL 21ST, 1999
 GAME( 199?,  ilpag,    0,       ilpag,    ilpag, driver_device,    0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )

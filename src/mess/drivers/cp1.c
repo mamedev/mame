@@ -73,11 +73,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cp1_io , AS_IO, 8, cp1_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( MCS48_PORT_P1,	MCS48_PORT_P1)	AM_READWRITE( getp1, putp1 )
-	AM_RANGE( MCS48_PORT_P2,	MCS48_PORT_P2)	AM_READWRITE( getp2, putp2 )
-	AM_RANGE( MCS48_PORT_BUS,	MCS48_PORT_BUS)	AM_READWRITE( getbus, putbus )
-	AM_RANGE( MCS48_PORT_T0,	MCS48_PORT_T0)  AM_READ( t0_r )
-	AM_RANGE( MCS48_PORT_T1,	MCS48_PORT_T1)	AM_READ( t1_r )
+	AM_RANGE( MCS48_PORT_P1,    MCS48_PORT_P1)  AM_READWRITE( getp1, putp1 )
+	AM_RANGE( MCS48_PORT_P2,    MCS48_PORT_P2)  AM_READWRITE( getp2, putp2 )
+	AM_RANGE( MCS48_PORT_BUS,   MCS48_PORT_BUS) AM_READWRITE( getbus, putbus )
+	AM_RANGE( MCS48_PORT_T0,    MCS48_PORT_T0)  AM_READ( t0_r )
+	AM_RANGE( MCS48_PORT_T1,    MCS48_PORT_T1)  AM_READ( t1_r )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -85,10 +85,10 @@ INPUT_PORTS_START( cp1 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( cp1, cp1_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8048, XTAL_6MHz)
-    MCFG_CPU_PROGRAM_MAP(cp1_mem)
-    MCFG_CPU_IO_MAP(cp1_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8048, XTAL_6MHz)
+	MCFG_CPU_PROGRAM_MAP(cp1_mem)
+	MCFG_CPU_IO_MAP(cp1_io)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -99,7 +99,7 @@ MACHINE_CONFIG_END
 */
 
 ROM_START( cp1 )
-    ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "b", "b" )
 	ROMX_LOAD( "cp1-kosmos-b.rom", 0x0000, 0x0800, CRC(fea8a2b2) SHA1(c987b79a7b90fcbd58b66a69e95913f2655a1f0d), ROM_BIOS(1))
 	// This is from 2716 eprom that was on board with I8039 instead of I8049
@@ -110,5 +110,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, cp1,  0,       0,	cp1,	cp1, driver_device,	 0,   "Kosmos",   "CP1 / Computer Praxis",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1980, cp1,  0,       0,   cp1,    cp1, driver_device,  0,   "Kosmos",   "CP1 / Computer Praxis",      GAME_NOT_WORKING | GAME_NO_SOUND)

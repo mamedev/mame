@@ -25,27 +25,27 @@
  * 256VF is not being used, so counting is from 248...255, 0...255, ....
  */
 
-#define MASTER_CLOCK			XTAL_61_44MHz
-#define CLOCK_1H				(MASTER_CLOCK / 5 / 4)
-#define CLOCK_16H				(CLOCK_1H / 16)
-#define CLOCK_1VF				((CLOCK_16H) / 12 / 2)
-#define CLOCK_2VF				((CLOCK_1VF) / 2)
+#define MASTER_CLOCK            XTAL_61_44MHz
+#define CLOCK_1H                (MASTER_CLOCK / 5 / 4)
+#define CLOCK_16H               (CLOCK_1H / 16)
+#define CLOCK_1VF               ((CLOCK_16H) / 12 / 2)
+#define CLOCK_2VF               ((CLOCK_1VF) / 2)
 
-#define PIXEL_CLOCK				(MASTER_CLOCK/10)
-#define HTOTAL					(384)
-#define HBSTART					(256)
-#define HBEND					(0)
-#define VTOTAL					(264)
-#define VBSTART					(240)
-#define VBEND					(16)
+#define PIXEL_CLOCK             (MASTER_CLOCK/10)
+#define HTOTAL                  (384)
+#define HBSTART                 (256)
+#define HBEND                   (0)
+#define VTOTAL                  (264)
+#define VBSTART                 (240)
+#define VBEND                   (16)
 
-#define I8035_CLOCK				(XTAL_6MHz)
+#define I8035_CLOCK             (XTAL_6MHz)
 
 /****************************************************************************
  * CONSTANTS
  ****************************************************************************/
 
-#define HARDWARE_TYPE_TAG		"HARDWARE_TYPE"
+#define HARDWARE_TYPE_TAG       "HARDWARE_TYPE"
 
 enum
 {
@@ -70,10 +70,10 @@ enum
 	DK2650_SPCLFORC
 };
 
-#define DK2B_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
-#define DK4B_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
-#define DK3_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
-#define RS_PALETTE_LENGTH		(256+256+8+1)
+#define DK2B_PALETTE_LENGTH     (256+256+8+1) /*  (256) */
+#define DK4B_PALETTE_LENGTH     (256+256+8+1) /*  (256) */
+#define DK3_PALETTE_LENGTH      (256+256+8+1) /*  (256) */
+#define RS_PALETTE_LENGTH       (256+256+8+1)
 
 class dkong_state : public driver_device
 {
@@ -93,12 +93,12 @@ public:
 	/* devices */
 	device_t *m_dev_n2a03a;
 	device_t *m_dev_n2a03b;
-	device_t *m_dev_vp2;		/* virtual port 2 */
+	device_t *m_dev_vp2;        /* virtual port 2 */
 	device_t *m_dev_6h;
 
 	/* machine states */
-	UINT8	            m_hardware_type;
-	UINT8				m_nmi_mask;
+	UINT8               m_hardware_type;
+	UINT8               m_nmi_mask;
 
 	/* sound state */
 	const UINT8       *m_snd_rom;
@@ -109,7 +109,7 @@ public:
 	bitmap_ind16  m_bg_bits;
 	const UINT8 *     m_color_codes;
 	emu_timer *       m_scanline_timer;
-	INT8              m_vidhw;			/* Selected video hardware RS Conversion / TKG04 */
+	INT8              m_vidhw;          /* Selected video hardware RS Conversion / TKG04 */
 
 	optional_device<discrete_device> m_discrete;
 	/* radar scope */
@@ -119,7 +119,7 @@ public:
 	int               m_gfx3_len;
 
 	UINT8             m_sig30Hz;
-	UINT8			  m_lfsr_5I;
+	UINT8             m_lfsr_5I;
 	UINT8             m_grid_sig;
 	UINT8             m_rflip_sig;
 	UINT8             m_star_ff;
@@ -140,7 +140,7 @@ public:
 	UINT8             m_gfx_bank;
 	UINT8             m_palette_bank;
 	UINT8             m_grid_on;
-	UINT16	      m_grid_col;
+	UINT16        m_grid_col;
 	UINT8             m_sprite_bank;
 	UINT8             m_dma_latch;
 	UINT8             m_flip;

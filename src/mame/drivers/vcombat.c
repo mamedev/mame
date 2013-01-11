@@ -160,7 +160,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const r
 			for (i = 0; i < 2; ++i)
 			{
 				/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
-                Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
+				Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
 
 				/* Combine the two layers */
 				if ((m68k_pix & 0xff) == 0)
@@ -275,7 +275,7 @@ READ16_MEMBER(vcombat_state::sound_resetmain_r)
 WRITE64_MEMBER(vcombat_state::v0_fb_w)
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
-       i860 uses a 64-bit data bus.  Adjust accordingly.  */
+	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
 	char *p = (char *)(m_i860_framebuffer[0][0]);
 	int m = mem_mask;
 	int o = (offset << 2);
@@ -298,7 +298,7 @@ WRITE64_MEMBER(vcombat_state::v0_fb_w)
 WRITE64_MEMBER(vcombat_state::v1_fb_w)
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
-       i860 uses a 64-bit data bus.  Adjust accordingly.  */
+	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
 	char *p = (char *)(m_i860_framebuffer[1][0]);
 	int m = mem_mask;
 	int o = (offset << 2);
@@ -343,19 +343,19 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(main_video_write)
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("vid_0_ram")	/* First i860 shared RAM */
-	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE("share6")		/* M0->P0 i860 #1 com 1 */
-	AM_RANGE(0x480000, 0x480003) AM_RAM AM_SHARE("share7")		/* M0<-P0 i860 #1 com 2 */
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE(wiggle_i860p0_pins_w)	/* i860 #1 stop/start/reset */
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("vid_0_ram")   /* First i860 shared RAM */
+	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE("share6")      /* M0->P0 i860 #1 com 1 */
+	AM_RANGE(0x480000, 0x480003) AM_RAM AM_SHARE("share7")      /* M0<-P0 i860 #1 com 2 */
+	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE(wiggle_i860p0_pins_w) /* i860 #1 stop/start/reset */
 
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("vid_1_ram")	/* Second i860 shared RAM */
-	AM_RANGE(0x540000, 0x540003) AM_RAM AM_SHARE("share8")		/* M0->P1 i860 #2 com 1 */
-	AM_RANGE(0x580000, 0x580003) AM_RAM AM_SHARE("share9")		/* M0<-P1 i860 #2 com 2 */
-	AM_RANGE(0x5c0000, 0x5c0003) AM_WRITE(wiggle_i860p1_pins_w)	/* i860 #2 stop/start/reset */
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("vid_1_ram")   /* Second i860 shared RAM */
+	AM_RANGE(0x540000, 0x540003) AM_RAM AM_SHARE("share8")      /* M0->P1 i860 #2 com 1 */
+	AM_RANGE(0x580000, 0x580003) AM_RAM AM_SHARE("share9")      /* M0<-P1 i860 #2 com 2 */
+	AM_RANGE(0x5c0000, 0x5c0003) AM_WRITE(wiggle_i860p1_pins_w) /* i860 #2 stop/start/reset */
 
-	AM_RANGE(0x600000, 0x600001) AM_READ(control_1_r)	/* IN0 port */
-	AM_RANGE(0x600004, 0x600005) AM_RAM AM_SHARE("share5")		/* M0<-M1 */
-	AM_RANGE(0x600008, 0x600009) AM_READ(control_2_r)	/* IN1 port */
+	AM_RANGE(0x600000, 0x600001) AM_READ(control_1_r)   /* IN0 port */
+	AM_RANGE(0x600004, 0x600005) AM_RAM AM_SHARE("share5")      /* M0<-M1 */
+	AM_RANGE(0x600008, 0x600009) AM_READ(control_2_r)   /* IN1 port */
 	AM_RANGE(0x60001c, 0x60001d) AM_NOP
 
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(crtc_w)
@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x701000, 0x701001) AM_READ(main_irqiack_r)
 	AM_RANGE(0x702000, 0x702001) AM_READ(control_3_r)
-	AM_RANGE(0x705000, 0x705001) AM_RAM AM_SHARE("share4")		/* M1->M0 */
+	AM_RANGE(0x705000, 0x705001) AM_RAM AM_SHARE("share4")      /* M1->M0 */
 
 	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
 	//AM_RANGE(0x704000, 0x704001)      /* Headset rotation axis? */
@@ -374,23 +374,23 @@ ADDRESS_MAP_END
 
 /* The first i860 - middle board */
 static ADDRESS_MAP_START( vid_0_map, AS_PROGRAM, 64, vcombat_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)		/* Shared framebuffer - half of the bits lost to 32-bit bus */
-	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share6")		/* M0<-P0 com 1 (0x440000 in 68k-land) */
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)      /* Shared framebuffer - half of the bits lost to 32-bit bus */
+	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share6")      /* M0<-P0 com 1 (0x440000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share7")		/* M0->P0 com 2 (0x480000 in 68k-land) */
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP     				/* Dummy D$ flush page. */
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("vid_0_ram")			/* Shared RAM with main */
+	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share7")      /* M0->P0 com 2 (0x480000 in 68k-land) */
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP                     /* Dummy D$ flush page. */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("vid_0_ram")           /* Shared RAM with main */
 ADDRESS_MAP_END
 
 
 /* The second i860 - top board */
 static ADDRESS_MAP_START( vid_1_map, AS_PROGRAM, 64, vcombat_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v1_fb_w)		/* Half of the bits lost to 32-bit bus */
-	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share8")		/* M0->P1 com 1 (0x540000 in 68k-land) */
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v1_fb_w)      /* Half of the bits lost to 32-bit bus */
+	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share8")      /* M0->P1 com 1 (0x540000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share9")			/* M0<-P1 com 2      (0x580000 in 68k-land) */
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP     				/* Dummy D$ flush page. */
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("vid_1_ram")			/* Shared RAM with main */
+	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share9")          /* M0<-P1 com 2      (0x580000 in 68k-land) */
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP                     /* Dummy D$ flush page. */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("vid_1_ram")           /* Shared RAM with main */
 ADDRESS_MAP_END
 
 
@@ -467,18 +467,18 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 	m_i860_framebuffer[1][1] = auto_alloc_array(machine(), UINT16, 0x8000);
 
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
-       I think what is happening here is that M0 snags the first time
-       it hits this point based on a counter test just above this
-       instruction.  That counter gets updated just past this instruction.
-       However, the only way this can be passed is if the M0 CPU is
-       reset (the IPL=7, but irq 7 is a nop).  I am almost sure that M1
-       reads a latch, which resets M0 (probably to ensure M0 and M1 are
-       both alive) and gets passed this snag.  I tried to hook up a reset
-       which should work, but asserting the reset line on the m68k doesn't
-       seem to do anything.  Maybe the 68k emulator doesn't respond to
-       that, or I didn't do it correctly.  But I think that is what needs
-       to be done.  But it isn't crucial for emulation.  Shadow does not
-       have this snag. */
+	   I think what is happening here is that M0 snags the first time
+	   it hits this point based on a counter test just above this
+	   instruction.  That counter gets updated just past this instruction.
+	   However, the only way this can be passed is if the M0 CPU is
+	   reset (the IPL=7, but irq 7 is a nop).  I am almost sure that M1
+	   reads a latch, which resets M0 (probably to ensure M0 and M1 are
+	   both alive) and gets passed this snag.  I tried to hook up a reset
+	   which should work, but asserting the reset line on the m68k doesn't
+	   seem to do anything.  Maybe the 68k emulator doesn't respond to
+	   that, or I didn't do it correctly.  But I think that is what needs
+	   to be done.  But it isn't crucial for emulation.  Shadow does not
+	   have this snag. */
 	ROM[0x4017] = 0x66;
 }
 
@@ -566,16 +566,16 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",					/* screen we are acting on */
-	16,							/* number of pixels per video memory address */
-	NULL,						/* before pixel update callback */
-	NULL,						/* row update callback */
-	NULL,						/* after pixel update callback */
-	DEVCB_NULL,					/* callback for display state changes */
-	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_DRIVER_LINE_MEMBER(vcombat_state,sound_update),	/* HSYNC callback */
-	DEVCB_NULL,					/* VSYNC callback */
-	NULL						/* update address callback */
+	"screen",                   /* screen we are acting on */
+	16,                         /* number of pixels per video memory address */
+	NULL,                       /* before pixel update callback */
+	NULL,                       /* row update callback */
+	NULL,                       /* after pixel update callback */
+	DEVCB_NULL,                 /* callback for display state changes */
+	DEVCB_NULL,                 /* callback for cursor state changes */
+	DEVCB_DRIVER_LINE_MEMBER(vcombat_state,sound_update),   /* HSYNC callback */
+	DEVCB_NULL,                 /* VSYNC callback */
+	NULL                        /* update address callback */
 };
 
 
@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	/* Sound CPU */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000)	/* Remove this if MC6845 is enabled */
+	MCFG_CPU_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
@@ -701,7 +701,7 @@ ROM_START( shadfgtr )
 	ROM_LOAD16_BYTE( "shadfgtr.b41", 0x00000, 0x80000, CRC(9e4b4df3) SHA1(8101197275e9f728acdeef85737eecbdec132b27) )
 	ROM_LOAD16_BYTE( "shadfgtr.b37", 0x00001, 0x80000, CRC(98446ba2) SHA1(1c8cc0d9c5de54d9e53699a5ab281579d15edc96) )
 
-	ROM_REGION( 0x800, "user1", 0 )	/* The SRAM module */
+	ROM_REGION( 0x800, "user1", 0 ) /* The SRAM module */
 	ROM_LOAD( "shadfgtr.b53", 0x000, 0x800, CRC(e766a3ab) SHA1(e7696ec08d5c86f64d768480f43edbd19ded162d) )
 
 	ROM_REGION( 0x200000, "gfx", 0 )

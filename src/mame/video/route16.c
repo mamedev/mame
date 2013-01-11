@@ -88,7 +88,7 @@ UINT32 route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 
 		for (i = 0; i < 4; i++)
 		{
 			UINT8 color1 = color_prom1[((m_palette_1 << 6) & 0x80) |
-									    (m_palette_1 << 2) |
+										(m_palette_1 << 2) |
 										((data1 >> 3) & 0x02) |
 										((data1 >> 0) & 0x01)];
 
@@ -123,8 +123,8 @@ UINT32 route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 
  */
 
 static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32 &bitmap,
-										  const rectangle &cliprect,
-										  pen_t (*make_pen)(UINT8))
+											const rectangle &cliprect,
+											pen_t (*make_pen)(UINT8))
 {
 	route16_state *state = machine.driver_data<route16_state>();
 	offs_t offs;
@@ -145,14 +145,14 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32
 		for (i = 0; i < 4; i++)
 		{
 			UINT8 color1 = color_prom1[(state->m_palette_1 << 2) |
-									   ((data1 >> 3) & 0x02) |
-									   ((data1 >> 0) & 0x01)];
+										((data1 >> 3) & 0x02) |
+										((data1 >> 0) & 0x01)];
 
 			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 (verified) */
 			UINT8 color2 = color_prom2[(((data1 << 3) & 0x80) | ((data1 << 7) & 0x80)) |
-									   (state->m_palette_2 << 2) |
-									   ((data2 >> 3) & 0x02) |
-									   ((data2 >> 0) & 0x01)];
+										(state->m_palette_2 << 2) |
+										((data2 >> 3) & 0x02) |
+										((data2 >> 0) & 0x01)];
 
 			/* the final color is the OR of the two colors */
 			UINT8 final_color = color1 | color2;

@@ -18,11 +18,11 @@
 
 
 static OPTION_GUIDE_START(hd_option_guide)
-	OPTION_INT('C', "cylinders",		"Cylinders")
-	OPTION_INT('H', "heads",			"Heads")
-	OPTION_INT('S', "sectors",			"Sectors")
-	OPTION_INT('L', "sectorlength",		"Sector Bytes")
-	OPTION_INT('K', "hunksize",			"Hunk Bytes")
+	OPTION_INT('C', "cylinders",        "Cylinders")
+	OPTION_INT('H', "heads",            "Heads")
+	OPTION_INT('S', "sectors",          "Sectors")
+	OPTION_INT('L', "sectorlength",     "Sector Bytes")
+	OPTION_INT('K', "hunksize",         "Hunk Bytes")
 OPTION_GUIDE_END
 
 static const char *hd_option_spec =
@@ -37,10 +37,10 @@ const device_type HARDDISK = &device_creator<harddisk_image_device>;
 //-------------------------------------------------
 
 harddisk_image_device::harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, HARDDISK, "Harddisk", tag, owner, clock),
-	  device_image_interface(mconfig, *this),
-	  m_chd(NULL),
-	  m_hard_disk_handle(NULL)
+	: device_t(mconfig, HARDDISK, "Harddisk", tag, owner, clock),
+		device_image_interface(mconfig, *this),
+		m_chd(NULL),
+		m_hard_disk_handle(NULL)
 {
 
 }
@@ -76,12 +76,12 @@ void harddisk_image_device::device_config_complete()
 	}
 
 	image_device_format *format = global_alloc_clear(image_device_format);;
-	format->m_index 	  = 0;
+	format->m_index       = 0;
 	format->m_name        = "chd";
 	format->m_description = "CHD Hard drive";
 	format->m_extensions  = "chd,hd";
 	format->m_optspec     = hd_option_spec;
-	format->m_next		  = NULL;
+	format->m_next        = NULL;
 
 	m_formatlist = format;
 
@@ -143,11 +143,11 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 	UINT32 cylinders, heads, sectors, totalsectors;
 	astring metadata;
 
-	cylinders	= option_resolution_lookup_int(create_args, 'C');
-	heads		= option_resolution_lookup_int(create_args, 'H');
-	sectors		= option_resolution_lookup_int(create_args, 'S');
-	sectorsize	= option_resolution_lookup_int(create_args, 'L');
-	hunksize	= option_resolution_lookup_int(create_args, 'K');
+	cylinders   = option_resolution_lookup_int(create_args, 'C');
+	heads       = option_resolution_lookup_int(create_args, 'H');
+	sectors     = option_resolution_lookup_int(create_args, 'S');
+	sectorsize  = option_resolution_lookup_int(create_args, 'L');
+	hunksize    = option_resolution_lookup_int(create_args, 'K');
 
 	totalsectors = cylinders * heads * sectors;
 

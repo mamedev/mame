@@ -24,10 +24,10 @@
 /* if DOUBLE_WIDTH set, the horizontal resolution is doubled */
 #define TMS3556_DOUBLE_WIDTH 1
 
-#define TMS3556_MODE_OFF	0
-#define TMS3556_MODE_TEXT	1
-#define TMS3556_MODE_BITMAP	2
-#define TMS3556_MODE_MIXED	3
+#define TMS3556_MODE_OFF    0
+#define TMS3556_MODE_TEXT   1
+#define TMS3556_MODE_BITMAP 2
+#define TMS3556_MODE_MIXED  3
 
 
 ///*************************************************************************
@@ -44,12 +44,12 @@
 
 // ======================> tms3556_device
 
-class tms3556_device :	public device_t,
+class tms3556_device :  public device_t,
 						public device_memory_interface
 {
 public:
-    // construction/destruction
-    tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
@@ -61,14 +61,14 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
-    // address space configurations
-	const address_space_config		m_space_config;
+	// address space configurations
+	const address_space_config      m_space_config;
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
@@ -93,14 +93,14 @@ private:
 	int m_reg_access_phase;
 	int m_magical_mystery_flag;
 
-	int m_scanline;				// scanline counter
-	int m_blink, m_blink_count;	// blinking
-	int m_bg_color;				// background color for current line
-	int m_name_offset;			// current offset in name table
-	int m_cg_flag;				// c/g flag (mixed mode only)
-	int m_char_line_counter;	// character line counter (decrements from 10, 0 when we have reached
+	int m_scanline;             // scanline counter
+	int m_blink, m_blink_count; // blinking
+	int m_bg_color;             // background color for current line
+	int m_name_offset;          // current offset in name table
+	int m_cg_flag;              // c/g flag (mixed mode only)
+	int m_char_line_counter;    // character line counter (decrements from 10, 0 when we have reached
 								// last line of character row)
-	int m_dbl_h_phase[40];		// double height phase flags (one per horizontal character position)
+	int m_dbl_h_phase[40];      // double height phase flags (one per horizontal character position)
 
 	bitmap_ind16 m_bitmap;
 };

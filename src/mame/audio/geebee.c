@@ -50,28 +50,28 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
 	if( state->m_sound_latch & 8 )
 	{
 		/*
-         * R24 is 10k, Rb is 0, C57 is 1uF
-         * charge time t1 = 0.693 * (R24 + Rb) * C57 -> 0.22176s
-         * discharge time t2 = 0.693 * (Rb) * C57 -> 0
-         * Then C33 is only charged via D6 (1N914), not discharged!
-         * Decay:
-         * discharge C33 (1uF) through R50 (22k) -> 0.14058s
-         */
+		 * R24 is 10k, Rb is 0, C57 is 1uF
+		 * charge time t1 = 0.693 * (R24 + Rb) * C57 -> 0.22176s
+		 * discharge time t2 = 0.693 * (Rb) * C57 -> 0
+		 * Then C33 is only charged via D6 (1N914), not discharged!
+		 * Decay:
+		 * discharge C33 (1uF) through R50 (22k) -> 0.14058s
+		 */
 		attotime period = attotime::from_hz(32768) * 14058 / 100000;
 		state->m_volume_timer->adjust(period, 0, period);
 	}
 	else
 	{
 		/*
-         * discharge only after R49 (100k) in the amplifier section,
-         * so the volume shouldn't very fast and only when the signal
-         * is gated through 6N (4066).
-         * I can only guess here that the decay should be slower,
-         * maybe half as fast?
-         */
+		 * discharge only after R49 (100k) in the amplifier section,
+		 * so the volume shouldn't very fast and only when the signal
+		 * is gated through 6N (4066).
+		 * I can only guess here that the decay should be slower,
+		 * maybe half as fast?
+		 */
 		attotime period = attotime::from_hz(32768) * 29060 / 100000;
 		state->m_volume_timer->adjust(period, 0, period);
-    }
+	}
 }
 
 static STREAM_UPDATE( geebee_sound_update )
@@ -147,7 +147,7 @@ const device_type GEEBEE = &device_creator<geebee_sound_device>;
 
 geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GEEBEE, "Gee Bee Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(geebee_sound_state);
 }
@@ -180,5 +180,3 @@ void geebee_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

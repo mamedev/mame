@@ -49,7 +49,7 @@
 #include "sound/ay8910.h"
 
 /* constants */
-#define MAIN_OSC		XTAL_12MHz
+#define MAIN_OSC        XTAL_12MHz
 
 
 /*************************************
@@ -62,12 +62,12 @@ WRITE8_MEMBER(arabian_state::ay8910_porta_w)
 {
 
 	/*
-        bit 7 = ENA
-        bit 6 = ENB
-        bit 5 = /ABHF
-        bit 4 = /AGHF
-        bit 3 = /ARHF
-    */
+	    bit 7 = ENA
+	    bit 6 = ENB
+	    bit 5 = /ABHF
+	    bit 4 = /AGHF
+	    bit 3 = /ARHF
+	*/
 	m_video_control = data;
 }
 
@@ -75,11 +75,11 @@ WRITE8_MEMBER(arabian_state::ay8910_porta_w)
 WRITE8_MEMBER(arabian_state::ay8910_portb_w)
 {
 	/*
-        bit 5 = /IREQ to custom CPU
-        bit 4 = /SRES to custom CPU
-        bit 1 = coin 2 counter
-        bit 0 = coin 1 counter
-    */
+	    bit 5 = /IREQ to custom CPU
+	    bit 4 = /SRES to custom CPU
+	    bit 1 = coin 2 counter
+	    bit 0 = coin 1 counter
+	*/
 
 	machine().device("mcu")->execute().set_input_line(MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( arabian )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* IN3 : "AUX-S" */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )  /* IN3 : "AUX-S" */
 
 	PORT_START("COM1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -273,9 +273,9 @@ static INPUT_PORTS_START( arabian )
 
 	PORT_START("COM2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* IN9 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* IN10 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* IN11 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN9 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN10 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN11 */
 
 	PORT_START("COM3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -285,9 +285,9 @@ static INPUT_PORTS_START( arabian )
 
 	PORT_START("COM4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* IN17 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* IN18 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* IN19 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN17 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN18 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* IN19 */
 
 	PORT_START("COM5")
 	PORT_DIPNAME( 0x01, 0x01, "Coin Counters" )             PORT_DIPLOCATION("SW2:!1")

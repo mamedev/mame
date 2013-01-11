@@ -6,17 +6,17 @@
 #include "emu.h"
 
 #define MCFG_PSXCARD_ADD(_tag) \
-    MCFG_DEVICE_ADD(_tag, PSXCARD, 0)
+	MCFG_DEVICE_ADD(_tag, PSXCARD, 0)
 
 struct psxcard_interface
 {
 };
 
 class psxcard_device : public device_t,
-                       public psxcard_interface
+						public psxcard_interface
 {
 public:
-    psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
 	unsigned char pkt[0x8b], pkt_ptr, pkt_sz, cmd, *cache;

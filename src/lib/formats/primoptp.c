@@ -4,23 +4,23 @@
 #include "primoptp.h"
 
 
-#define PRIMO_WAVEENTRY_LOW		-32768
-#define PRIMO_WAVEENTRY_HIGH		32767
-#define PRIMO_WAVEENTRY_ZERO		0
+#define PRIMO_WAVEENTRY_LOW     -32768
+#define PRIMO_WAVEENTRY_HIGH        32767
+#define PRIMO_WAVEENTRY_ZERO        0
 
-#define PRIMO_WAV_FREQUENCY		22050
-#define PRIMO_BIT_1_PERIOD		(312*2*0.000001)
+#define PRIMO_WAV_FREQUENCY     22050
+#define PRIMO_BIT_1_PERIOD      (312*2*0.000001)
 #define PRIMO_BIT_0_PERIOD              (3*PRIMO_BIT_1_PERIOD)
 
-#define PRIMO_BIT_1_LENGTH		(PRIMO_BIT_1_PERIOD*PRIMO_WAV_FREQUENCY)
-#define PRIMO_BIT_0_LENGTH		(PRIMO_BIT_0_PERIOD*PRIMO_WAV_FREQUENCY)
+#define PRIMO_BIT_1_LENGTH      (PRIMO_BIT_1_PERIOD*PRIMO_WAV_FREQUENCY)
+#define PRIMO_BIT_0_LENGTH      (PRIMO_BIT_0_PERIOD*PRIMO_WAV_FREQUENCY)
 /*
 #define PRIMO_BIT_1_LENGTH      6
 #define PRIMO_BIT_0_LENGTH      16
 */
-#define PRIMO_PAUSE_LENGTH		2000
-#define PRIMO_FILE_PILOT_LENGTH		((4*PRIMO_BIT_1_LENGTH + 4*PRIMO_BIT_0_LENGTH)*512)
-#define PRIMO_BLOCK_PILOT_LENGTH	((8*PRIMO_BIT_1_LENGTH)*96 + (5*PRIMO_BIT_1_LENGTH + 3*PRIMO_BIT_0_LENGTH)*3)
+#define PRIMO_PAUSE_LENGTH      2000
+#define PRIMO_FILE_PILOT_LENGTH     ((4*PRIMO_BIT_1_LENGTH + 4*PRIMO_BIT_0_LENGTH)*512)
+#define PRIMO_BLOCK_PILOT_LENGTH    ((8*PRIMO_BIT_1_LENGTH)*96 + (5*PRIMO_BIT_1_LENGTH + 3*PRIMO_BIT_0_LENGTH)*3)
 
 static UINT32 primo_tape_image_length;
 
@@ -28,7 +28,7 @@ static INT16 *primo_emit_level(INT16 *p, int count, int level)
 {
 	int i;
 
-	for (i=0; i<count; i++)	*(p++) = level;
+	for (i=0; i<count; i++) *(p++) = level;
 
 	return p;
 }
@@ -45,7 +45,7 @@ static INT16* primo_output_bit(INT16 *p, UINT8 bit)
 		p = primo_emit_level (p, PRIMO_BIT_0_LENGTH/2, PRIMO_WAVEENTRY_HIGH);
 		p = primo_emit_level (p, PRIMO_BIT_0_LENGTH/2, PRIMO_WAVEENTRY_LOW);
 	}
-    	return p;
+		return p;
 }
 
 static INT16* primo_output_byte(INT16 *p, UINT8 byte)
@@ -101,7 +101,7 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 		LOG_FORMATS ("File size (with header): %u\n", file_size);
 
 		/* b is now set on the first data byte of file
-           it means first byte (type) of block */
+		   it means first byte (type) of block */
 
 		j = 0;
 		while (j < file_size-3)
@@ -172,7 +172,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 		LOG_FORMATS ("File size: %u\n", file_size);
 
 		/* b is now set on the first data byte of file
-           it means first byte (block type) of block header */
+		   it means first byte (block type) of block header */
 
 		j = 0;
 		while (j < file_size-3)
@@ -215,13 +215,13 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller primo_legacy_fill_wave =
 {
-	primo_cassette_fill_wave,			/* fill_wave */
-	-1,											/* chunk_size */
-	0,											/* chunk_samples */
-	primo_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	PRIMO_WAV_FREQUENCY,										/* sample_frequency */
-	0,											/* header_samples */
-	0											/* trailer_samples */
+	primo_cassette_fill_wave,           /* fill_wave */
+	-1,                                         /* chunk_size */
+	0,                                          /* chunk_samples */
+	primo_cassette_calculate_size_in_samples,   /* chunk_sample_calc */
+	PRIMO_WAV_FREQUENCY,                                        /* sample_frequency */
+	0,                                          /* header_samples */
+	0                                           /* trailer_samples */
 };
 
 static casserr_t primo_ptp_identify(cassette_image *cassette, struct CassetteOptions *opts)

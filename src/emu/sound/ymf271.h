@@ -8,16 +8,16 @@
 
 struct ymf271_interface
 {
-	devcb_read8 ext_read;		/* external memory read */
-	devcb_write8 ext_write;	/* external memory write */
-	void (*irq_callback)(device_t *device, int state);	/* irq callback */
+	devcb_read8 ext_read;       /* external memory read */
+	devcb_write8 ext_write; /* external memory write */
+	void (*irq_callback)(device_t *device, int state);  /* irq callback */
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ymf271_r );
 DECLARE_WRITE8_DEVICE_HANDLER( ymf271_w );
 
 class ymf271_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -156,7 +156,7 @@ static int coco_jvc_decode_header(floppy_image_legacy *floppy, UINT64 size,
 	/* byte offset 4 - sector attribute flag */
 	sector_attribute_flag = (header_size > 4) ? header[4] : 0;
 	if (sector_attribute_flag != 0)
-		return -1;	/* we do not support sector attribute flags */
+		return -1;  /* we do not support sector attribute flags */
 
 	physical_bytes_per_sector = geometry->sector_length;
 	if (sector_attribute_flag)
@@ -197,11 +197,11 @@ static FLOPPY_CONSTRUCT(coco_jvc_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.heads				= option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks				= option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
-		geometry.first_sector_id	= option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
-		geometry.sector_length		= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		geometry.heads              = option_resolution_lookup_int(params, PARAM_HEADS);
+		geometry.tracks             = option_resolution_lookup_int(params, PARAM_TRACKS);
+		geometry.sectors            = option_resolution_lookup_int(params, PARAM_SECTORS);
+		geometry.first_sector_id    = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
+		geometry.sector_length      = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
 
 		header[0] = (UINT8) geometry.sectors;
 		header[1] = (UINT8) geometry.heads;
@@ -330,9 +330,9 @@ static floperr_t coco_os9_post_format(floppy_image_legacy *floppy, option_resolu
 	struct tm *ltime;
 	int heads, tracks, sectors, total_sectors;
 
-	heads	= option_resolution_lookup_int(params, PARAM_HEADS);
-	tracks	= option_resolution_lookup_int(params, PARAM_TRACKS);
-	sectors	= option_resolution_lookup_int(params, PARAM_SECTORS);
+	heads   = option_resolution_lookup_int(params, PARAM_HEADS);
+	tracks  = option_resolution_lookup_int(params, PARAM_TRACKS);
+	sectors = option_resolution_lookup_int(params, PARAM_SECTORS);
 	total_sectors = heads * tracks * sectors;
 
 	/* write the initial header */
@@ -436,11 +436,11 @@ static FLOPPY_CONSTRUCT(coco_os9_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.heads				= option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks				= option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
-		geometry.first_sector_id	= option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
-		geometry.sector_length		= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		geometry.heads              = option_resolution_lookup_int(params, PARAM_HEADS);
+		geometry.tracks             = option_resolution_lookup_int(params, PARAM_TRACKS);
+		geometry.sectors            = option_resolution_lookup_int(params, PARAM_SECTORS);
+		geometry.first_sector_id    = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
+		geometry.sector_length      = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
 	}
 	else
 	{
@@ -617,20 +617,20 @@ struct dmk_tag
 	UINT32 track_size;
 };
 
-#define DMK_HEADER_LEN			16
-#define DMK_TOC_LEN				64
-#define DMK_IDAM_LENGTH			7
-#define DMK_DATA_GAP			80
-#define DMK_LEAD_IN				32
-#define DMK_EXTRA_TRACK_LENGTH	156
+#define DMK_HEADER_LEN          16
+#define DMK_TOC_LEN             64
+#define DMK_IDAM_LENGTH         7
+#define DMK_DATA_GAP            80
+#define DMK_LEAD_IN             32
+#define DMK_EXTRA_TRACK_LENGTH  156
 
-#define dmk_idam_type(x)			(x)[0]
-#define dmk_idam_track(x)			(x)[1]
-#define dmk_idam_side(x)			(x)[2]
-#define dmk_idam_sector(x)			(x)[3]
-#define dmk_idam_sectorlength(x)	(x)[4]
-#define dmk_idam_crc(x)				(((x)[5] << 8) + (x)[6])
-#define dmk_idam_set_crc(x, crc)	(x)[5] = ((crc) >> 8); (x)[6] = ((crc) >> 0);
+#define dmk_idam_type(x)            (x)[0]
+#define dmk_idam_track(x)           (x)[1]
+#define dmk_idam_side(x)            (x)[2]
+#define dmk_idam_sector(x)          (x)[3]
+#define dmk_idam_sectorlength(x)    (x)[4]
+#define dmk_idam_crc(x)             (((x)[5] << 8) + (x)[6])
+#define dmk_idam_set_crc(x, crc)    (x)[5] = ((crc) >> 8); (x)[6] = ((crc) >> 0);
 
 
 static struct dmk_tag *get_dmk_tag(floppy_image_legacy *floppy)
@@ -720,16 +720,16 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	UINT32 max_track_size;
 	int *sector_map = NULL;
 
-	sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
-	sector_length	= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
-	interleave		= option_resolution_lookup_int(params, PARAM_INTERLEAVE);
-	first_sector_id	= option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
+	sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
+	sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+	interleave      = option_resolution_lookup_int(params, PARAM_INTERLEAVE);
+	first_sector_id = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
 
 	max_track_size = get_dmk_tag(floppy)->track_size;
 
 	if (sectors > DMK_TOC_LEN)
 	{
-        err = FLOPPY_ERROR_INTERNAL;
+		err = FLOPPY_ERROR_INTERNAL;
 		goto done;
 	}
 
@@ -790,13 +790,13 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 			track_position += 3;
 
 			idam_offset = track_position | 0x8000;
-			dmk_idam_type(				&track_data[track_position]) = 0xFE;
-			dmk_idam_track(				&track_data[track_position]) = track;
-			dmk_idam_side(				&track_data[track_position]) = head;
-			dmk_idam_sector(			&track_data[track_position]) = logical_sector;
-			dmk_idam_sectorlength(		&track_data[track_position]) = compute_log2(sector_length / 128);
-			crc = ccitt_crc16(0xcdb4,	&track_data[track_position], DMK_IDAM_LENGTH - 2);
-			dmk_idam_set_crc(			&track_data[track_position], crc);
+			dmk_idam_type(              &track_data[track_position]) = 0xFE;
+			dmk_idam_track(             &track_data[track_position]) = track;
+			dmk_idam_side(              &track_data[track_position]) = head;
+			dmk_idam_sector(            &track_data[track_position]) = logical_sector;
+			dmk_idam_sectorlength(      &track_data[track_position]) = compute_log2(sector_length / 128);
+			crc = ccitt_crc16(0xcdb4,   &track_data[track_position], DMK_IDAM_LENGTH - 2);
+			dmk_idam_set_crc(           &track_data[track_position], crc);
 			track_position += DMK_IDAM_LENGTH;
 
 			memset(&track_data[track_position], 0x4E, 22);
@@ -1106,10 +1106,10 @@ FLOPPY_CONSTRUCT(coco_dmk_construct)
 
 	if (params)
 	{
-		heads			= option_resolution_lookup_int(params, PARAM_HEADS);
-		tracks			= option_resolution_lookup_int(params, PARAM_TRACKS);
-		sectors			= option_resolution_lookup_int(params, PARAM_SECTORS);
-		sector_length	= option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		heads           = option_resolution_lookup_int(params, PARAM_HEADS);
+		tracks          = option_resolution_lookup_int(params, PARAM_TRACKS);
+		sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
+		sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
 
 		track_size = coco_dmk_min_track_size(sectors, sector_length) + DMK_EXTRA_TRACK_LENGTH;
 
@@ -1170,25 +1170,25 @@ FLOPPY_IDENTIFY(coco_dmk_identify)
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( coco )
-	LEGACY_FLOPPY_OPTION( coco_jvc, "dsk",			"CoCo JVC disk image",	coco_jvc_identify,	coco_jvc_construct, NULL,
+	LEGACY_FLOPPY_OPTION( coco_jvc, "dsk",          "CoCo JVC disk image",  coco_jvc_identify,  coco_jvc_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[18]-255)
 		SECTOR_LENGTH(128/[256]/512/1024)
 		FIRST_SECTOR_ID(0-[1]))
-	LEGACY_FLOPPY_OPTION( coco_os9, "os9",			"CoCo OS-9 disk image",	coco_os9_identify,	coco_os9_construct, NULL,
+	LEGACY_FLOPPY_OPTION( coco_os9, "os9",          "CoCo OS-9 disk image", coco_os9_identify,  coco_os9_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[18]-255)
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( coco_vdk, "vdk",			"CoCo VDK disk image",	coco_vdk_identify,	coco_vdk_construct, NULL,
+	LEGACY_FLOPPY_OPTION( coco_vdk, "vdk",          "CoCo VDK disk image",  coco_vdk_identify,  coco_vdk_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS([18])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( coco_dmk, "dsk,dmk",	"CoCo DMK disk image",	coco_dmk_identify,	coco_dmk_construct, NULL,
+	LEGACY_FLOPPY_OPTION( coco_dmk, "dsk,dmk",  "CoCo DMK disk image",  coco_dmk_identify,  coco_dmk_construct, NULL,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[18])

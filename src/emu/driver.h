@@ -105,50 +105,50 @@
 //**************************************************************************
 
 // macros to wrap legacy callbacks
-#define MACHINE_START_NAME(name)	machine_start_##name
-#define MACHINE_START(name)			void MACHINE_START_NAME(name)(running_machine &machine)
-#define MACHINE_START_CALL(name)	MACHINE_START_NAME(name)(machine)
-#define MACHINE_START_CALL_MEMBER(name)	MACHINE_START_NAME(name)()
-#define MACHINE_START_CALL_LEGACY(name)	MACHINE_START_NAME(name)(machine())
-#define DECLARE_MACHINE_START(name)	void MACHINE_START_NAME(name)()
+#define MACHINE_START_NAME(name)    machine_start_##name
+#define MACHINE_START(name)         void MACHINE_START_NAME(name)(running_machine &machine)
+#define MACHINE_START_CALL(name)    MACHINE_START_NAME(name)(machine)
+#define MACHINE_START_CALL_MEMBER(name) MACHINE_START_NAME(name)()
+#define MACHINE_START_CALL_LEGACY(name) MACHINE_START_NAME(name)(machine())
+#define DECLARE_MACHINE_START(name) void MACHINE_START_NAME(name)()
 #define MACHINE_START_MEMBER(cls,name) void cls::MACHINE_START_NAME(name)()
 
-#define MACHINE_RESET_NAME(name)	machine_reset_##name
-#define MACHINE_RESET(name)			void MACHINE_RESET_NAME(name)(running_machine &machine)
-#define MACHINE_RESET_CALL(name)	MACHINE_RESET_NAME(name)(machine)
-#define MACHINE_RESET_CALL_MEMBER(name)	MACHINE_RESET_NAME(name)()
-#define MACHINE_RESET_CALL_LEGACY(name)	MACHINE_RESET_NAME(name)(machine())
-#define DECLARE_MACHINE_RESET(name)	void MACHINE_RESET_NAME(name)()
+#define MACHINE_RESET_NAME(name)    machine_reset_##name
+#define MACHINE_RESET(name)         void MACHINE_RESET_NAME(name)(running_machine &machine)
+#define MACHINE_RESET_CALL(name)    MACHINE_RESET_NAME(name)(machine)
+#define MACHINE_RESET_CALL_MEMBER(name) MACHINE_RESET_NAME(name)()
+#define MACHINE_RESET_CALL_LEGACY(name) MACHINE_RESET_NAME(name)(machine())
+#define DECLARE_MACHINE_RESET(name) void MACHINE_RESET_NAME(name)()
 #define MACHINE_RESET_MEMBER(cls,name) void cls::MACHINE_RESET_NAME(name)()
 
-#define SOUND_START_NAME(name)		sound_start_##name
-#define SOUND_START(name)			void SOUND_START_NAME(name)(running_machine &machine)
-#define SOUND_START_CALL(name)		SOUND_START_NAME(name)(machine)
+#define SOUND_START_NAME(name)      sound_start_##name
+#define SOUND_START(name)           void SOUND_START_NAME(name)(running_machine &machine)
+#define SOUND_START_CALL(name)      SOUND_START_NAME(name)(machine)
 
-#define SOUND_RESET_NAME(name)		sound_reset_##name
-#define SOUND_RESET(name)			void SOUND_RESET_NAME(name)(running_machine &machine)
-#define SOUND_RESET_CALL(name)		SOUND_RESET_NAME(name)(machine)
+#define SOUND_RESET_NAME(name)      sound_reset_##name
+#define SOUND_RESET(name)           void SOUND_RESET_NAME(name)(running_machine &machine)
+#define SOUND_RESET_CALL(name)      SOUND_RESET_NAME(name)(machine)
 
-#define PALETTE_INIT_NAME(name)		palette_init_##name
-#define PALETTE_INIT(name)			void PALETTE_INIT_NAME(name)(running_machine &machine)
-#define PALETTE_INIT_CALL(name)		PALETTE_INIT_NAME(name)(machine)
-#define PALETTE_INIT_CALL_MEMBER(name)		PALETTE_INIT_NAME(name)()
-#define DECLARE_PALETTE_INIT(name)	void PALETTE_INIT_NAME(name)()
+#define PALETTE_INIT_NAME(name)     palette_init_##name
+#define PALETTE_INIT(name)          void PALETTE_INIT_NAME(name)(running_machine &machine)
+#define PALETTE_INIT_CALL(name)     PALETTE_INIT_NAME(name)(machine)
+#define PALETTE_INIT_CALL_MEMBER(name)      PALETTE_INIT_NAME(name)()
+#define DECLARE_PALETTE_INIT(name)  void PALETTE_INIT_NAME(name)()
 #define PALETTE_INIT_MEMBER(cls,name) void cls::PALETTE_INIT_NAME(name)()
 
-#define VIDEO_START_NAME(name)		video_start_##name
-#define VIDEO_START(name)			void VIDEO_START_NAME(name)(running_machine &machine)
-#define VIDEO_START_CALL(name)		VIDEO_START_NAME(name)(machine)
-#define VIDEO_START_CALL_MEMBER(name)		VIDEO_START_NAME(name)()
-#define VIDEO_START_CALL_LEGACY(name)		VIDEO_START_NAME(name)(machine())
-#define DECLARE_VIDEO_START(name)	void VIDEO_START_NAME(name)()
+#define VIDEO_START_NAME(name)      video_start_##name
+#define VIDEO_START(name)           void VIDEO_START_NAME(name)(running_machine &machine)
+#define VIDEO_START_CALL(name)      VIDEO_START_NAME(name)(machine)
+#define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
+#define VIDEO_START_CALL_LEGACY(name)       VIDEO_START_NAME(name)(machine())
+#define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)()
 #define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()
 
-#define VIDEO_RESET_NAME(name)		video_reset_##name
-#define VIDEO_RESET(name)			void VIDEO_RESET_NAME(name)(running_machine &machine)
-#define VIDEO_RESET_CALL(name)		VIDEO_RESET_NAME(name)(machine)
-#define VIDEO_RESET_CALL_MEMBER(name)		VIDEO_RESET_NAME(name)()
-#define DECLARE_VIDEO_RESET(name)	void VIDEO_RESET_NAME(name)()
+#define VIDEO_RESET_NAME(name)      video_reset_##name
+#define VIDEO_RESET(name)           void VIDEO_RESET_NAME(name)(running_machine &machine)
+#define VIDEO_RESET_CALL(name)      VIDEO_RESET_NAME(name)(machine)
+#define VIDEO_RESET_CALL_MEMBER(name)       VIDEO_RESET_NAME(name)()
+#define DECLARE_VIDEO_RESET(name)   void VIDEO_RESET_NAME(name)()
 #define VIDEO_RESET_MEMBER(cls,name) void cls::VIDEO_RESET_NAME(name)()
 
 
@@ -166,7 +166,7 @@ typedef void   (*legacy_callback_func)(running_machine &machine);
 // ======================> driver_device
 
 // base class for machine driver-specific devices
-class driver_device :	public device_t,
+class driver_device :   public device_t,
 						public device_memory_interface
 {
 public:
@@ -457,18 +457,18 @@ private:
 	const address_space_config  m_space_config;
 
 	// internal state
-	const game_driver *		m_system;					// pointer to the game driver
-	driver_callback_delegate m_callbacks[CB_COUNT];		// start/reset callbacks
-	legacy_callback_func	m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
+	const game_driver *     m_system;                   // pointer to the game driver
+	driver_callback_delegate m_callbacks[CB_COUNT];     // start/reset callbacks
+	legacy_callback_func    m_legacy_callbacks[CB_COUNT]; // legacy start/reset callbacks
 
 	// generic audio
-	UINT16					m_latch_clear_value;
-	UINT16					m_latched_value[4];
-	UINT8					m_latch_read[4];
+	UINT16                  m_latch_clear_value;
+	UINT16                  m_latched_value[4];
+	UINT8                   m_latch_read[4];
 
 	// generic video
-	UINT32					m_flip_screen_x;
-	UINT32					m_flip_screen_y;
+	UINT32                  m_flip_screen_x;
+	UINT32                  m_flip_screen_y;
 };
 
 
@@ -602,4 +602,4 @@ WRITE32_MEMBER(driver_device::palette_32bit_dword_w)
 	palette_set_color_rgb(machine(), offset, palexpand<_RedBits>(paldata >> _RedShift), palexpand<_GreenBits>(paldata >> _GreenShift), palexpand<_BlueBits>(paldata >> _BlueShift));
 }
 
-#endif	/* __DRIVER_H__ */
+#endif  /* __DRIVER_H__ */

@@ -48,7 +48,7 @@ public:
 	int       m_sprite_xoffs;
 	int       m_sprite_yoffs;
 	int       m_sprite_yoffs_sub;
-	UINT8 *	  m_expanded_gfx1;
+	UINT8 *   m_expanded_gfx1;
 
 	/* misc */
 	emu_timer *m_magerror_irq_timer;

@@ -510,16 +510,16 @@ READ8_MEMBER(snk_state::snk_sound_status_r)
 
 WRITE8_MEMBER(snk_state::snk_sound_status_w)
 {
-	if (~data & 0x10)	// ack YM1 irq
+	if (~data & 0x10)   // ack YM1 irq
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
 
-	if (~data & 0x20)	// ack YM2 irq
+	if (~data & 0x20)   // ack YM2 irq
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM2IRQ_CLEAR);
 
-	if (~data & 0x40)	// clear busy flag
+	if (~data & 0x40)   // clear busy flag
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 
-	if (~data & 0x80)	// ack command from main cpu
+	if (~data & 0x80)   // ack command from main cpu
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
 }
 
@@ -851,12 +851,12 @@ static ADDRESS_MAP_START( marvins_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_WRITE(marvins_flipscreen_w)
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("spriteram")	// + work ram
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("spriteram")   // + work ram
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(marvins_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("share5")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xf900, 0xf900) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(snk_fg_scrolly_w)
@@ -904,7 +904,7 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(marvins_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("share5")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0xff) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xf900, 0xf900) AM_MIRROR(0xff) AM_WRITE(snk_bg_scrollx_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0xff) AM_WRITE(snk_sprite_split_point_w)
@@ -916,9 +916,9 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8, snk_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( madcrash_cpuB_map, AS_PROGRAM, 8, snk_state )
-	AM_RANGE(0x8700, 0x8700) AM_WRITE(snk_cpuB_nmi_ack_w)	// vangrd2
+	AM_RANGE(0x8700, 0x8700) AM_WRITE(snk_cpuB_nmi_ack_w)   // vangrd2
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)	// madcrash
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)   // madcrash
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(marvins_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share5")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")
@@ -965,7 +965,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( madcrush_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")	// + work ram
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")   // + work ram
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE(marvins_palette_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(marvins_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share5")
@@ -991,7 +991,7 @@ static ADDRESS_MAP_START( jcross_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)	// flip screen, bg palette bank
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)    // flip screen, bg palette bank
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(jcross_scroll_msb_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(snk_sp16_scrolly_w)
@@ -1000,8 +1000,8 @@ static ADDRESS_MAP_START( jcross_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xd700, 0xd700) AM_WRITE(snk_bg_scrollx_w)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("spriteram") // + work ram
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
-	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	// simply a program patch to not write to two not existing video registers?
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
+	AM_RANGE(0xffff, 0xffff) AM_WRITENOP    // simply a program patch to not write to two not existing video registers?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jcross_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1021,9 +1021,9 @@ static ADDRESS_MAP_START( sgladiat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)	// flip screen, bg palette bank
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)    // flip screen, bg palette bank
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xd200, 0xd200) AM_WRITENOP	// unknown
+	AM_RANGE(0xd200, 0xd200) AM_WRITENOP    // unknown
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(sgladiat_scroll_msb_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xd500, 0xd500) AM_WRITE(snk_sp16_scrollx_w)
@@ -1032,16 +1032,16 @@ static ADDRESS_MAP_START( sgladiat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("spriteram") // + work ram
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgladiat_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)	// flip screen, bg palette bank
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)    // flip screen, bg palette bank
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xda00, 0xda00) AM_WRITENOP	// unknown
+	AM_RANGE(0xda00, 0xda00) AM_WRITENOP    // unknown
 	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(sgladiat_scroll_msb_w)
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xdd00, 0xdd00) AM_WRITE(snk_sp16_scrollx_w)
@@ -1059,7 +1059,7 @@ static ADDRESS_MAP_START( hal21_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(hal21_flipscreen_w)	// flip screen, bg tile and palette bank
+	AM_RANGE(0xc600, 0xc600) AM_WRITE(hal21_flipscreen_w)   // flip screen, bg tile and palette bank
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(jcross_scroll_msb_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(snk_sp16_scrolly_w)
@@ -1068,7 +1068,7 @@ static ADDRESS_MAP_START( hal21_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xd700, 0xd700) AM_WRITE(snk_bg_scrollx_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram") // + work ram
 	AM_RANGE(0xe800, 0xf7ff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1089,17 +1089,17 @@ static ADDRESS_MAP_START( aso_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(aso_videoattrs_w)	// flip screen, scroll msb
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(aso_videoattrs_w) // flip screen, scroll msb
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(snk_bg_scrollx_w)
-	AM_RANGE(0xce00, 0xce00) AM_WRITENOP	// always 05?
-	AM_RANGE(0xcf00, 0xcf00) AM_WRITE(aso_bg_bank_w)	// tile and palette bank
+	AM_RANGE(0xce00, 0xce00) AM_WRITENOP    // always 05?
+	AM_RANGE(0xcf00, 0xcf00) AM_WRITE(aso_bg_bank_w)    // tile and palette bank
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")	// + work ram
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")   // + work ram
 	AM_RANGE(0xe800, 0xf7ff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aso_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1124,21 +1124,21 @@ static ADDRESS_MAP_START( tnk3_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(tnk3_videoattrs_w)	// flip screen, char bank, scroll msb
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(tnk3_videoattrs_w)    // flip screen, char bank, scroll msb
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(snk_bg_scrollx_w)
-	AM_RANGE(0xcf00, 0xcf00) AM_WRITENOP	// fitegolf/countryc only. Either 0 or 1. Video related?
+	AM_RANGE(0xcf00, 0xcf00) AM_WRITENOP    // fitegolf/countryc only. Either 0 or 1. Video related?
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram") // + work ram
 	AM_RANGE(0xd800, 0xf7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnk3_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tnk3, athena
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fitegolf
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)   // tnk3, athena
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)   // fitegolf
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd000, 0xefff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -1151,7 +1151,7 @@ static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)	// ikarijp doesn't use the coin counter
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w) // ikarijp doesn't use the coin counter
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
@@ -1177,8 +1177,8 @@ static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xcee0, 0xcee0) AM_READ(hardflags7_r)
 	// note the mirror. ikari and victroad use d800, ikarijp uses d000
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE("bg_videoram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")   // + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikari_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1213,8 +1213,8 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE(snk_bg_scrollx_w)
-	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
-	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)   // flip screen, scroll msb
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xc940, 0xc940) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
@@ -1241,8 +1241,8 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xccf0, 0xccf0) AM_READ(turbocheck32_4_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")   // + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bermudat_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1250,8 +1250,8 @@ static ADDRESS_MAP_START( bermudat_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE(snk_bg_scrollx_w)
-	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
-	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)   // flip screen, scroll msb
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xc940, 0xc940) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
@@ -1276,25 +1276,25 @@ static ADDRESS_MAP_START( gwar_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE(snk_bg_scrollx_w)
-	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwar_videoattrs_w)	// flip screen, scroll msb
-	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwar_videoattrs_w)    // flip screen, scroll msb
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xc940, 0xc940) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
 	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
-	AM_RANGE(0xca00, 0xca00) AM_WRITENOP	// always 0?
-	AM_RANGE(0xca40, 0xca40) AM_WRITENOP	// always 0?
+	AM_RANGE(0xca00, 0xca00) AM_WRITENOP    // always 0?
+	AM_RANGE(0xca40, 0xca40) AM_WRITENOP    // always 0?
 	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(snk_sprite_split_point_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")   // + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gwar_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
-	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")
@@ -1312,14 +1312,14 @@ static ADDRESS_MAP_START( gwara_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")	// + work ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")   // + work ram
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xf840, 0xf840) AM_WRITE(snk_bg_scrollx_w)
-	AM_RANGE(0xf880, 0xf880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
-	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xf880, 0xf880) AM_WRITE(gwara_videoattrs_w)   // flip screen, scroll msb
+	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 	AM_RANGE(0xf900, 0xf900) AM_WRITE(snk_sp16_scrolly_w)
 	AM_RANGE(0xf940, 0xf940) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xf980, 0xf980) AM_WRITE(snk_sp32_scrolly_w)
@@ -1334,8 +1334,8 @@ static ADDRESS_MAP_START( gwara_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")	// + work ram
-	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("spriteram")   // + work ram
+	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 ADDRESS_MAP_END
 
 
@@ -1358,22 +1358,22 @@ static ADDRESS_MAP_START( tdfever_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE(snk_bg_scrollx_w)
-	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
-	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)   // flip screen, scroll msb
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(tdfever_sp_scroll_msb_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
 	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(tdfever_spriteram_w) AM_SHARE("spriteram")	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(tdfever_spriteram_w) AM_SHARE("spriteram")    // + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("tx_videoram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdfever_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tdfever, tdfever2
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fsoccer
-	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)   // tdfever, tdfever2
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)   // fsoccer
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)   // char and palette bank
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(tdfever_spriteram_w) AM_SHARE("spriteram")
@@ -1394,7 +1394,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marvins_sound_portmap, AS_IO, 8, snk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READNOP	// read on startup, then the Z80 automatically pulls down the IORQ pin to ack irq
+	AM_RANGE(0x00, 0x00) AM_READNOP // read on startup, then the Z80 automatically pulls down the IORQ pin to ack irq
 ADDRESS_MAP_END
 
 
@@ -1404,7 +1404,7 @@ static ADDRESS_MAP_START( jcross_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITENOP	// ? always FFFF, snkwave leftover?
+	AM_RANGE(0xe002, 0xe003) AM_WRITENOP    // ? always FFFF, snkwave leftover?
 	AM_RANGE(0xe004, 0xe005) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
@@ -1426,7 +1426,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_sound_portmap, AS_IO, 8, snk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READNOP	// read on startup, then the Z80 automatically pulls down the IORQ pin to ack irq
+	AM_RANGE(0x00, 0x00) AM_READNOP // read on startup, then the Z80 automatically pulls down the IORQ pin to ack irq
 ADDRESS_MAP_END
 
 
@@ -1513,7 +1513,7 @@ static INPUT_PORTS_START( marvins )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, NULL) /* sound CPU status */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )	// service switch according to schematics, see code at 0x0453. Goes to garbage.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )   // service switch according to schematics, see code at 0x0453. Goes to garbage.
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1536,15 +1536,15 @@ static INPUT_PORTS_START( marvins )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME(0x04,  0x04, "Infinite Lives (Cheat)")	PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME(0x04,  0x04, "Infinite Lives (Cheat)") PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DSW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 2C_1C ) )
@@ -1553,15 +1553,15 @@ static INPUT_PORTS_START( marvins )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )				PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, "1st Bonus Life" )		PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x00, "1st Bonus Life" )        PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x01, "20000" )
 	PORT_DIPSETTING(    0x02, "30000" )
@@ -1570,18 +1570,18 @@ static INPUT_PORTS_START( marvins )
 	PORT_DIPSETTING(    0x05, "60000" )
 	PORT_DIPSETTING(    0x06, "70000" )
 	PORT_DIPSETTING(    0x07, "80000" )
-	PORT_DIPNAME( 0x18, 0x08, "2nd Bonus Life" )		PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPNAME( 0x18, 0x08, "2nd Bonus Life" )        PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(    0x08, "1st bonus*2" )
 	PORT_DIPSETTING(    0x10, "1st bonus*3" )
 	PORT_DIPSETTING(    0x18, "1st bonus*4" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1619,7 +1619,7 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )			PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -1628,7 +1628,7 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("DSW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW1:4,5,6")
 	PORT_DIPSETTING(    0x38, "30000" )
 	PORT_DIPSETTING(    0x30, "40000" )
 	PORT_DIPSETTING(    0x28, "50000" )
@@ -1637,35 +1637,35 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_DIPSETTING(    0x10, "80000" )
 	PORT_DIPSETTING(    0x08, "90000" )
 	PORT_DIPSETTING(    0x00, "100000" )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Lives ) )			PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0xc0, "5" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Freeze" )					PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPNAME( 0x02, 0x02, "Freeze" )                    PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )			PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )         PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bonus Life Occurrence" )		PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bonus Life Occurrence" )     PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x00, "Every bonus" )
 	PORT_DIPSETTING(    0x10, "Bonus only" )
-	PORT_DIPNAME( 0x20, 0x20, "Infinite Lives (Cheat)")		PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Infinite Lives (Cheat)")     PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1703,14 +1703,14 @@ static INPUT_PORTS_START( madcrash )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPUNUSED_DIPLOC(0x01, IP_ACTIVE_LOW, "DSW1:1")	/* Listed as Unused */
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPUNUSED_DIPLOC(0x01, IP_ACTIVE_LOW, "DSW1:1")    /* Listed as Unused */
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )		PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )        PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DSW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:4,5,6")
 //  PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
@@ -1719,33 +1719,33 @@ static INPUT_PORTS_START( madcrash )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0xc0, "20000 60000" )
 	PORT_DIPSETTING(    0x80, "40000 90000" )
 	PORT_DIPSETTING(    0x40, "50000 120000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "Bonus Life Occurrence" )		PORT_DIPLOCATION("DSW2:1")
-	PORT_DIPSETTING(    0x01, "1st, 2nd, then every 2nd" )	/* Check the "Non Bugs" page */
+	PORT_DIPNAME( 0x01, 0x00, "Bonus Life Occurrence" )     PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, "1st, 2nd, then every 2nd" )  /* Check the "Non Bugs" page */
 	PORT_DIPSETTING(    0x00, "1st and 2nd only" )
-	PORT_DIPNAME( 0x06, 0x04, "Scroll Speed" )				PORT_DIPLOCATION("DSW2:2,3")
+	PORT_DIPNAME( 0x06, 0x04, "Scroll Speed" )              PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, "Slow" )//DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, "Fast" )//DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, "Faster" )
-	PORT_DIPNAME( 0x18, 0x10, "Game mode" )					PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, "Game mode" )                 PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(    0x18, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x10, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x08, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )				/* Check the "Non Bugs" page */
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )               /* Check the "Non Bugs" page */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPUNKNOWN_DIPLOC(0x80, IP_ACTIVE_LOW, "DSW2:8")	/* Listed as Unused, it is actually tested in many places */
+	PORT_DIPUNKNOWN_DIPLOC(0x80, IP_ACTIVE_LOW, "DSW2:8")   /* Listed as Unused, it is actually tested in many places */
 INPUT_PORTS_END
 
 
@@ -2348,7 +2348,7 @@ static INPUT_PORTS_START( fitegolf )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x045b */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )	        /* same as the dip switch */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START2 )
@@ -2433,7 +2433,7 @@ static INPUT_PORTS_START( countryc )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0450 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )	        /* same as the dip switch */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START2 )
@@ -3331,7 +3331,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fsoccer )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )	        /* same as the dip switch / also reset - code at 0x00cc */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch / also reset - code at 0x00cc */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x677f */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -3622,18 +3622,18 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( marvins, snk_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3360000)	/* 3.36 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
 	MCFG_CPU_PROGRAM_MAP(marvins_cpuA_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 3360000)	/* 3.36 MHz */
+	MCFG_CPU_ADD("sub", Z80, 3360000)   /* 3.36 MHz */
 	MCFG_CPU_PROGRAM_MAP(marvins_cpuB_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on schematics */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
 	MCFG_CPU_PROGRAM_MAP(marvins_sound_map)
 	MCFG_CPU_IO_MAP(marvins_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, nmi_line_assert,  244)	// schematics show a separate 244Hz timer
+	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, nmi_line_assert,  244)  // schematics show a separate 244Hz timer
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3655,13 +3655,13 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)	/* verified on schematics */
+	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)	/* verified on schematics */
+	MCFG_SOUND_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SNKWAVE_ADD("wave", 8000000)	/* verified on schematics */
+	MCFG_SNKWAVE_ADD("wave", 8000000)   /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -3702,7 +3702,7 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* NOT verified */
 	MCFG_CPU_PROGRAM_MAP(jcross_sound_map)
 	MCFG_CPU_IO_MAP(jcross_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, irq0_line_assert,  244)	// Marvin's frequency, sounds ok
+	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, irq0_line_assert,  244) // Marvin's frequency, sounds ok
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3724,10 +3724,10 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)	/* NOT verified */
+	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* NOT verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)	/* NOT verified */
+	MCFG_SOUND_ADD("ay2", AY8910, 2000000)  /* NOT verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
@@ -3743,7 +3743,7 @@ static MACHINE_CONFIG_DERIVED( sgladiat, jcross )
 
 	/* video hardware */
 	/* visible area is correct. Debug info is shown in the black bars at the sides
-       of the screen when the Debug dip switch is on */
+	   of the screen when the Debug dip switch is on */
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,sgladiat)
 MACHINE_CONFIG_END
@@ -4073,15 +4073,15 @@ MACHINE_CONFIG_END
 /***********************************************************************/
 
 ROM_START( marvins )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for CPUA code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for CPUA code */
 	ROM_LOAD( "pa1",   0x0000, 0x2000, CRC(0008d791) SHA1(6ffb174b2d680314f74efeef83da9f3ee3e0c753) )
 	ROM_LOAD( "pa2",   0x2000, 0x2000, CRC(9457003c) SHA1(05ecd5c638a12163e2a65bdfcc09875618f792e1) )
 	ROM_LOAD( "pa3",   0x4000, 0x2000, CRC(54c33ecb) SHA1(cfbf9ffc125fbc51f2abef180f36781f9e748bbd) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for CPUB code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for CPUB code */
 	ROM_LOAD( "pb1",   0x0000, 0x2000, CRC(3b6941a5) SHA1(9c29870196eaed87f34456fdb06bf7b69c8f489d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
 	ROM_LOAD( "m1",    0x0000, 0x2000, CRC(2314c696) SHA1(1b84a0c82a4dcff648752f53aa1f0abf5357c5d1) )
 	ROM_LOAD( "m2",    0x2000, 0x2000, CRC(74ba5799) SHA1(c278b0e5c4134f6077d4ae7b51e3c5cba28af1a8) )
 
@@ -4108,19 +4108,19 @@ ROM_END
 /***********************************************************************/
 
 ROM_START( madcrash )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for CPUA code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for CPUA code */
 	ROM_LOAD( "p8",    0x0000, 0x2000, CRC(ecb2fdc9) SHA1(7dd79fbbe286a9f18ed2cae45b1bfab765e549a1) )
 	ROM_LOAD( "p9",    0x2000, 0x2000, CRC(0a87df26) SHA1(327710452bdc5dbb931abc853957225814f224c5) )
 	ROM_LOAD( "p10",   0x4000, 0x2000, CRC(6eb8a87c) SHA1(375377df22b331175aaf1f9eb8d8ad83e8e146f6) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for CPUB code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for CPUB code */
 	ROM_LOAD( "p4",   0x0000, 0x2000, CRC(5664d699) SHA1(5bfa57a0f8d718d522003da6513a70d7ca3a87a3) )
 	ROM_LOAD( "p5",   0x2000, 0x2000, CRC(dea2865a) SHA1(0807281e35159ee29fbe2d1aa087b57804f1a14f) )
 	ROM_LOAD( "p6",   0x4000, 0x2000, CRC(e25a9b9c) SHA1(26853611e3898907239e15f1a00f62290889f89b) )
 	ROM_LOAD( "p7",   0x6000, 0x2000, CRC(55b14a36) SHA1(7d5566a6ba285af92ddf560efda60a79f1da84c2) )
 	ROM_LOAD( "p3",   0x8000, 0x2000, CRC(e3c8c2cb) SHA1(b3e39eacd2609ff0fa0f511bff0fc83e6b3970d4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
 	ROM_LOAD( "p1",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) )
 	ROM_LOAD( "p2",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) )
 
@@ -4145,12 +4145,12 @@ ROM_START( madcrash )
 ROM_END
 
 ROM_START( madcrush )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for CPUA code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for CPUA code */
 	ROM_LOAD( "p3.a8",   0x0000, 0x2000, CRC(fbd3eda1) SHA1(23fb06978fe51ec409f1ebdbcc70d1b3b73f08ca) ) /* These 3 roms are located on the A2003 UP02-03 PCB */
 	ROM_LOAD( "p4.a9",   0x2000, 0x2000, CRC(1bc67cab) SHA1(7d667c234d9eac34c0e90df7f68e9f5aa2726e8c) )
 	ROM_LOAD( "p5.a10",  0x4000, 0x2000, CRC(d905ff79) SHA1(5b45e63d10191544ff6ca8c3ecb517484d70d5e3) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for CPUB code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for CPUB code */
 	ROM_LOAD( "p6.a11",   0x0000, 0x2000, CRC(432b5743) SHA1(d3c86c9983ee2174c58becc1e250d94426e6fc70) ) /* These 3 roms are located on the A2003 UP02-03 PCB */
 	ROM_LOAD( "p7.a13",   0x2000, 0x2000, CRC(dea2865a) SHA1(0807281e35159ee29fbe2d1aa087b57804f1a14f) ) /* Same as Mad Crasher, but different label */
 	ROM_LOAD( "p8.a14",   0x4000, 0x2000, CRC(e25a9b9c) SHA1(26853611e3898907239e15f1a00f62290889f89b) ) /* Same as Mad Crasher, but different label */
@@ -4158,7 +4158,7 @@ ROM_START( madcrush )
 	ROM_LOAD( "p10.bin",  0x6000, 0x2000, CRC(55b14a36) SHA1(7d5566a6ba285af92ddf560efda60a79f1da84c2) ) /* Same as Mad Crasher, but different label */
 	ROM_LOAD( "p9.bin",   0x8000, 0x2000, CRC(e3c8c2cb) SHA1(b3e39eacd2609ff0fa0f511bff0fc83e6b3970d4) ) /* Same as Mad Crasher, but different label */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
 	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 duaghtercard PCB */
 	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 duaghtercard PCB */
 
@@ -4196,7 +4196,7 @@ ROM_START( vangrd2 )
 	ROM_LOAD( "p6.6a", 0x2000, 0x2000, CRC(894ff00d) SHA1(1c66f327d8e94dc6ac386e11fcc5eb17c9081434) )
 	ROM_LOAD( "p7.7a", 0x4000, 0x2000, CRC(40b4d069) SHA1(56c464bd055125ffc2da02d70137aa5efe5cd8f6) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
 	ROM_LOAD( "p8.6a", 0x0000, 0x2000, CRC(a3daa438) SHA1(4e659ac7e3ebaf85bc3ce5c9946fcf0af23083b4) )
 	ROM_LOAD( "p9.8a", 0x2000, 0x2000, CRC(9345101a) SHA1(b99ad1c2a79df50b0a60fdd43ca466f6cb38445b) )
 
@@ -4262,23 +4262,23 @@ ROM_END
 
 ROM_START( sgladiat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "glad.005",	0x0000, 0x4000, CRC(4bc60f0b) SHA1(19baf7533b8fc6bab372f1d35603068a6b93627c) )
-	ROM_LOAD( "glad.004",	0x4000, 0x4000, CRC(db557f46) SHA1(dc3565096c95a20d2c64dd4f5d0b465fbd85e041) )
-	ROM_LOAD( "glad.003",	0x8000, 0x2000, CRC(55ce82b4) SHA1(703f017a8501e4dd5166b5717b244aa6b1e7dc0a) )
+	ROM_LOAD( "glad.005",   0x0000, 0x4000, CRC(4bc60f0b) SHA1(19baf7533b8fc6bab372f1d35603068a6b93627c) )
+	ROM_LOAD( "glad.004",   0x4000, 0x4000, CRC(db557f46) SHA1(dc3565096c95a20d2c64dd4f5d0b465fbd85e041) )
+	ROM_LOAD( "glad.003",   0x8000, 0x2000, CRC(55ce82b4) SHA1(703f017a8501e4dd5166b5717b244aa6b1e7dc0a) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "glad.002",	0x0000, 0x4000, CRC(8350261c) SHA1(046099128d5d941b3a37dce559ff5f0aa7f61683) )
-	ROM_LOAD( "glad.001",	0x4000, 0x4000, CRC(5ee9d3fb) SHA1(6c8d8db7a966d3d3a2e8c46fd779e12e1f1e3716) )
+	ROM_LOAD( "glad.002",   0x0000, 0x4000, CRC(8350261c) SHA1(046099128d5d941b3a37dce559ff5f0aa7f61683) )
+	ROM_LOAD( "glad.001",   0x4000, 0x4000, CRC(5ee9d3fb) SHA1(6c8d8db7a966d3d3a2e8c46fd779e12e1f1e3716) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "glad.007",  0x0000, 0x2000, CRC(c25b6731) SHA1(519c6844bfec958b9bb65f148b3527b41fe38b99) )
 	ROM_LOAD( "glad.006",  0x2000, 0x2000, CRC(2024d716) SHA1(6ff069fc53524d13c386e8e714ba3056509adc4d) )
 
 	ROM_REGION( 0x2000, "tx_tiles", 0 )
-	ROM_LOAD( "glad.011",	0x0000, 0x2000, CRC(305bb294) SHA1(e148571a581b12ff9502a65ec428e4d19bc757cb) )
+	ROM_LOAD( "glad.011",   0x0000, 0x2000, CRC(305bb294) SHA1(e148571a581b12ff9502a65ec428e4d19bc757cb) )
 
 	ROM_REGION( 0x2000, "bg_tiles", 0 )
-	ROM_LOAD( "glad.012",	0x0000, 0x2000, CRC(b7dd519f) SHA1(7bd760e54712648105d1049e678fa6b9effa600b) )
+	ROM_LOAD( "glad.012",   0x0000, 0x2000, CRC(b7dd519f) SHA1(7bd760e54712648105d1049e678fa6b9effa600b) )
 
 	ROM_REGION( 0x6000, "sp16_tiles", 0 )
 	ROM_LOAD( "glad.008", 0x0000, 0x2000, CRC(bcf42587) SHA1(1546fe903fbc6dc0b410c83ab51887c33c91ec2d) )
@@ -4631,12 +4631,12 @@ ROM_START( fitegolfu )
 	ROM_LOAD( "mn45.256", 0x4000, 0x8000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "gu6",    0x0000, 0x4000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) )	// NP8.256
-	ROM_LOAD( "gu5",    0x4000, 0x8000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) )	// MN8.256
+	ROM_LOAD( "gu6",    0x0000, 0x4000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) )  // NP8.256
+	ROM_LOAD( "gu5",    0x4000, 0x8000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) )  // MN8.256
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gu3",    0x0000, 0x4000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )	// FG67.256
-	ROM_LOAD( "gu4",    0x4000, 0x8000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )	// K67.256
+	ROM_LOAD( "gu3",    0x0000, 0x4000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )  // FG67.256
+	ROM_LOAD( "gu4",    0x4000, 0x8000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )  // K67.256
 
 	ROM_REGION( 0x0c00, "proms", 0 )
 	ROM_LOAD( "82s137.2c",  0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) )
@@ -4644,15 +4644,15 @@ ROM_START( fitegolfu )
 	ROM_LOAD( "82s137.1c",  0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) )
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
-	ROM_LOAD( "gu8",   0x0000, 0x4000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )		// D2.128
+	ROM_LOAD( "gu8",   0x0000, 0x4000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )       // D2.128
 
 	ROM_REGION( 0x8000, "bg_tiles", 0 )
-	ROM_LOAD( "gu7",  0x0000, 0x8000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) )		// BC2.256
+	ROM_LOAD( "gu7",  0x0000, 0x8000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) )        // BC2.256
 
 	ROM_REGION( 0x18000, "sp16_tiles", 0 )
-	ROM_LOAD( "gu9",   0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )	// P2.256
-	ROM_LOAD( "gu10",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )	// R2.256
-	ROM_LOAD( "gu11",  0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )	// S2.256
+	ROM_LOAD( "gu9",   0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )  // P2.256
+	ROM_LOAD( "gu10",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )  // R2.256
+	ROM_LOAD( "gu11",  0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )  // S2.256
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16r6a.6c", 0x0000, 0x0104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) )
@@ -4793,8 +4793,8 @@ ROM_START( ikaria )
 	ROM_LOAD( "p4",  0x4000, 0x8000, CRC(f4101cb4) SHA1(cee0eb1cae9f584fb5a866d3a8725f6a3feba912) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ik5",  0x0000, 0x4000, CRC(863448fa) SHA1(19cad05dc9c4495f36e0d8627927ea6d0a971824) )	// p5
-	ROM_LOAD( "ik6",  0x4000, 0x8000, CRC(9b16aa57) SHA1(69866ce41c587721702c92ac2e9ba3f6645004cf) )	// p6
+	ROM_LOAD( "ik5",  0x0000, 0x4000, CRC(863448fa) SHA1(19cad05dc9c4495f36e0d8627927ea6d0a971824) )    // p5
+	ROM_LOAD( "ik6",  0x4000, 0x8000, CRC(9b16aa57) SHA1(69866ce41c587721702c92ac2e9ba3f6645004cf) )    // p6
 
 	ROM_REGION( 0x0c00, "proms", 0 )
 	ROM_LOAD( "7122er.prm",  0x000, 0x400, CRC(b9bf2c2c) SHA1(8eb62152dcb04f463baf6ec2a66148eb947403ef) )
@@ -4802,7 +4802,7 @@ ROM_START( ikaria )
 	ROM_LOAD( "7122eb.prm",  0x800, 0x400, CRC(0a11cdde) SHA1(faae17398341317e7afbd06b903b8e9e65967bf1) )
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
-	ROM_LOAD( "7.rom",    0x00000, 0x4000, CRC(a7eb4917) SHA1(6c07323cc243df4c5c30bc0daedbff3887309f65) )	// p7
+	ROM_LOAD( "7.rom",    0x00000, 0x4000, CRC(a7eb4917) SHA1(6c07323cc243df4c5c30bc0daedbff3887309f65) )   // p7
 
 	ROM_REGION( 0x20000, "bg_tiles", 0 )
 	ROM_LOAD( "17.rom", 0x00000, 0x8000, CRC(e0dba976) SHA1(5a8f14f7a199b5fb1862debda0bceee42cddac59) )
@@ -4811,9 +4811,9 @@ ROM_START( ikaria )
 	ROM_LOAD( "20.rom", 0x18000, 0x8000, CRC(5da7ec1a) SHA1(4b212c1dfe4c18eced90ee3a783e7edf8d23c906) )
 
 	ROM_REGION( 0x18000, "sp16_tiles", 0 )
-	ROM_LOAD( "8.rom",  0x00000, 0x8000, CRC(9827c14a) SHA1(b54dcee95c6f6e46c187a117b4e7aaf1c0ece6c6) )	// p8
-	ROM_LOAD( "9.rom",  0x08000, 0x8000, CRC(545c790c) SHA1(7738738f4a1343b04efd029ecaefac74010451f0) )	// p9
-	ROM_LOAD( "10.rom", 0x10000, 0x8000, CRC(ec9ba07e) SHA1(6b492b2cd7b8cca948ce39c3450f1cc153f41d90) )	// p10
+	ROM_LOAD( "8.rom",  0x00000, 0x8000, CRC(9827c14a) SHA1(b54dcee95c6f6e46c187a117b4e7aaf1c0ece6c6) ) // p8
+	ROM_LOAD( "9.rom",  0x08000, 0x8000, CRC(545c790c) SHA1(7738738f4a1343b04efd029ecaefac74010451f0) ) // p9
+	ROM_LOAD( "10.rom", 0x10000, 0x8000, CRC(ec9ba07e) SHA1(6b492b2cd7b8cca948ce39c3450f1cc153f41d90) ) // p10
 
 	ROM_REGION( 0x30000, "sp32_tiles", 0 )
 	ROM_LOAD( "11.rom", 0x00000, 0x8000, CRC(5c75ea8f) SHA1(4e8ee56a2dbeb9ac2dd74bc584dba29433d91ae0) )
@@ -4834,8 +4834,8 @@ ROM_START( ikarinc )
 	ROM_LOAD( "p4",  0x4000, 0x8000, CRC(f4101cb4) SHA1(cee0eb1cae9f584fb5a866d3a8725f6a3feba912) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ik5",  0x0000, 0x4000, CRC(863448fa) SHA1(19cad05dc9c4495f36e0d8627927ea6d0a971824) )	// p5
-	ROM_LOAD( "ik6",  0x4000, 0x8000, CRC(9b16aa57) SHA1(69866ce41c587721702c92ac2e9ba3f6645004cf) )	// p6
+	ROM_LOAD( "ik5",  0x0000, 0x4000, CRC(863448fa) SHA1(19cad05dc9c4495f36e0d8627927ea6d0a971824) )    // p5
+	ROM_LOAD( "ik6",  0x4000, 0x8000, CRC(9b16aa57) SHA1(69866ce41c587721702c92ac2e9ba3f6645004cf) )    // p6
 
 	ROM_REGION( 0x0c00, "proms", 0 )
 	ROM_LOAD( "7122er.prm",  0x000, 0x400, CRC(b9bf2c2c) SHA1(8eb62152dcb04f463baf6ec2a66148eb947403ef) )
@@ -4843,7 +4843,7 @@ ROM_START( ikarinc )
 	ROM_LOAD( "7122eb.prm",  0x800, 0x400, CRC(0a11cdde) SHA1(faae17398341317e7afbd06b903b8e9e65967bf1) )
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
-	ROM_LOAD( "7.rom",    0x00000, 0x4000, CRC(a7eb4917) SHA1(6c07323cc243df4c5c30bc0daedbff3887309f65) )	// p7
+	ROM_LOAD( "7.rom",    0x00000, 0x4000, CRC(a7eb4917) SHA1(6c07323cc243df4c5c30bc0daedbff3887309f65) )   // p7
 
 	ROM_REGION( 0x20000, "bg_tiles", 0 )
 	ROM_LOAD( "17.rom", 0x00000, 0x8000, CRC(e0dba976) SHA1(5a8f14f7a199b5fb1862debda0bceee42cddac59) )
@@ -4852,9 +4852,9 @@ ROM_START( ikarinc )
 	ROM_LOAD( "20.rom", 0x18000, 0x8000, CRC(5da7ec1a) SHA1(4b212c1dfe4c18eced90ee3a783e7edf8d23c906) )
 
 	ROM_REGION( 0x18000, "sp16_tiles", 0 )
-	ROM_LOAD( "8.rom",  0x00000, 0x8000, CRC(9827c14a) SHA1(b54dcee95c6f6e46c187a117b4e7aaf1c0ece6c6) )	// p8
-	ROM_LOAD( "9.rom",  0x08000, 0x8000, CRC(545c790c) SHA1(7738738f4a1343b04efd029ecaefac74010451f0) )	// p9
-	ROM_LOAD( "10.rom", 0x10000, 0x8000, CRC(ec9ba07e) SHA1(6b492b2cd7b8cca948ce39c3450f1cc153f41d90) )	// p10
+	ROM_LOAD( "8.rom",  0x00000, 0x8000, CRC(9827c14a) SHA1(b54dcee95c6f6e46c187a117b4e7aaf1c0ece6c6) ) // p8
+	ROM_LOAD( "9.rom",  0x08000, 0x8000, CRC(545c790c) SHA1(7738738f4a1343b04efd029ecaefac74010451f0) ) // p9
+	ROM_LOAD( "10.rom", 0x10000, 0x8000, CRC(ec9ba07e) SHA1(6b492b2cd7b8cca948ce39c3450f1cc153f41d90) ) // p10
 
 	ROM_REGION( 0x30000, "sp32_tiles", 0 )
 	ROM_LOAD( "11.rom", 0x00000, 0x8000, CRC(5c75ea8f) SHA1(4e8ee56a2dbeb9ac2dd74bc584dba29433d91ae0) )
@@ -4920,7 +4920,7 @@ ROM_END
 
 ROM_START( ikarijpb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ik1",	  0x00000, 0x4000, CRC(2ef87dce) SHA1(4b52567fee81018f7a4b33bac79ea521c7d19d52) )
+	ROM_LOAD( "ik1",      0x00000, 0x4000, CRC(2ef87dce) SHA1(4b52567fee81018f7a4b33bac79ea521c7d19d52) )
 	ROM_LOAD( "up03_k4.rom",  0x04000, 0x8000, CRC(26948850) SHA1(bfeba5f7019f6eaacf2a5464756d9cb283c5f5a2) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -5871,8 +5871,8 @@ ROM_START( choppera )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
 	ROM_LOAD( "kk_10.rom",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "11a.rom",	0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) )
-	ROM_LOAD( "12a.rom",	0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) )
+	ROM_LOAD( "11a.rom",    0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) )
+	ROM_LOAD( "12a.rom",    0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) )
 	ROM_LOAD( "kk_13.rom",  0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
@@ -6101,7 +6101,7 @@ ROM_END
 
 ROM_START( fsoccerba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "fs3.c6", 0x00000, 0x10000, CRC(e644d207) SHA1(efd5a6cf99461a0dc6cec6c8e2c16d82c6630132) )
+	ROM_LOAD( "fs3.c6", 0x00000, 0x10000, CRC(e644d207) SHA1(efd5a6cf99461a0dc6cec6c8e2c16d82c6630132) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "fs1_ver4.bin",  0x00000, 0x10000, CRC(97830108) SHA1(dab241baf8d889c768e1fbe25f1e5059b3cbbab6) )

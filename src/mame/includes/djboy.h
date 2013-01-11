@@ -19,24 +19,24 @@ public:
 	required_shared_ptr<UINT8> m_paletteram;
 
 	/* ROM banking */
-	UINT8		m_bankxor;
+	UINT8       m_bankxor;
 
 	/* video-related */
-	tilemap_t	*m_background;
-	UINT8		m_videoreg;
+	tilemap_t   *m_background;
+	UINT8       m_videoreg;
 	UINT8       m_scrollx;
 	UINT8       m_scrolly;
 
 	/* Kaneko BEAST state */
-	UINT8		m_data_to_beast;
-	UINT8		m_data_to_z80;
-	UINT8		m_beast_to_z80_full;
-	UINT8		m_z80_to_beast_full;
-	UINT8		m_beast_int0_l;
-	UINT8		m_beast_p0;
-	UINT8		m_beast_p1;
-	UINT8		m_beast_p2;
-	UINT8		m_beast_p3;
+	UINT8       m_data_to_beast;
+	UINT8       m_data_to_z80;
+	UINT8       m_beast_to_z80_full;
+	UINT8       m_z80_to_beast_full;
+	UINT8       m_beast_int0_l;
+	UINT8       m_beast_p0;
+	UINT8       m_beast_p1;
+	UINT8       m_beast_p2;
+	UINT8       m_beast_p3;
 
 	/* devices */
 	cpu_device *m_maincpu;

@@ -29,11 +29,11 @@ Memo:
 #include "machine/nvram.h"
 
 
-#define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
+#define SIGNED_DAC  0       // 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
-#define DAC_WRITE	write_signed8
+#define DAC_WRITE   write_signed8
 #else
-#define DAC_WRITE	write_unsigned8
+#define DAC_WRITE   write_unsigned8
 #endif
 
 
@@ -199,14 +199,14 @@ static INPUT_PORTS_START( pastelg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nb1413m3_busyflag_r, NULL)	// DRAW BUSY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )			//
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE4 )		// CREDIT CLEAR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nb1413m3_busyflag_r, NULL)    // DRAW BUSY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE4 )       // CREDIT CLEAR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -219,91 +219,91 @@ CUSTOM_INPUT_MEMBER(pastelg_state::nb1413m3_hackbusyflag_r)
 
 static INPUT_PORTS_START( threeds )
 	PORT_START("DSWA")
-    PORT_DIPNAME( 0x01,   0x01, "0" )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04,   0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01,   0x01, "0" )
+	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04,   0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-    PORT_DIPNAME( 0x01,   0x01, "1" )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04,   0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01,   0x01, "1" )
+	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04,   0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_START("DSWC")
-    PORT_DIPNAME( 0x01,   0x01, "2" )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04,   0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01,   0x01, "2" )
+	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04,   0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_START("KEY0_PL1")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("1P Start / Deal")
 	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
-    PORT_DIPNAME( 0x40,   0x40, "1P-Side Character Test Mode" ) //only combined with the service mode
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x40,   0x40, "1P-Side Character Test Mode" ) //only combined with the service mode
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY1_PL1")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -336,10 +336,10 @@ static INPUT_PORTS_START( threeds )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("2P Start / Deal")
 	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
-    PORT_DIPNAME( 0x40,   0x40, "2P-Side Character Test Mode" ) //only combined with the service mode
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x40,   0x40, "2P-Side Character Test Mode" ) //only combined with the service mode
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY1_PL2")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -369,13 +369,13 @@ static INPUT_PORTS_START( threeds )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state,nb1413m3_hackbusyflag_r, NULL)	// DRAW BUSY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE4 )		// CREDIT CLEAR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state,nb1413m3_hackbusyflag_r, NULL)  // DRAW BUSY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE4 )       // CREDIT CLEAR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 INPUT_PORTS_END
 
 
@@ -385,12 +385,12 @@ static INPUT_PORTS_START( galds )
 
 	PORT_MODIFY("SYSTEM")
 	// this increases the tip? (has this feature been ripped out of the parent set? there is strange corruption of the line under the 'tip' display)
-    PORT_DIPNAME( 0x01,   0x01, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01,   0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const ay8910_interface ay8910_config =
@@ -407,7 +407,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( pastelg, pastelg_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
 	MCFG_CPU_PROGRAM_MAP(pastelg_map)
 	MCFG_CPU_IO_MAP(pastelg_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
@@ -464,7 +464,7 @@ Note
 static MACHINE_CONFIG_START( threeds, pastelg_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
 	MCFG_CPU_PROGRAM_MAP(pastelg_map)
 	MCFG_CPU_IO_MAP(threeds_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)

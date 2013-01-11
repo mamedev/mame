@@ -159,101 +159,101 @@ Notes:
 /****************************************************/
 
 static const char *const Formats[] = {
-	FMT("0000_0000", "NOP"),				// 00
-	FMT("0000_0001", "RRCA"),				// 01
-	FMT("0000_0010", "RLCA"),				// 02
-	FMT("0000_0011", "INC  RXB"),			// 03 : shougi $360 to $377; splndrbt
-	FMT("0000_0100", "DEC  RXB"),			// 04 : not found
-	FMT("0000_0101", "INC  A"),				// 05
-	FMT("0000_0110", "DEC  A"),				// 06
-	FMT("0000_0111", "CPL  A"),				// 07
-	FMT("0000_1aaa", "LD   A,(IX0+%X)"),	// 08-0F
-	FMT("0001_0aaa", "LD   A,(IX1+%X)"),	// 10-17
-	FMT("0001_1aaa", "LD   (IX2+%X),A"),	// 18-1F
+	FMT("0000_0000", "NOP"),                // 00
+	FMT("0000_0001", "RRCA"),               // 01
+	FMT("0000_0010", "RLCA"),               // 02
+	FMT("0000_0011", "INC  RXB"),           // 03 : shougi $360 to $377; splndrbt
+	FMT("0000_0100", "DEC  RXB"),           // 04 : not found
+	FMT("0000_0101", "INC  A"),             // 05
+	FMT("0000_0110", "DEC  A"),             // 06
+	FMT("0000_0111", "CPL  A"),             // 07
+	FMT("0000_1aaa", "LD   A,(IX0+%X)"),    // 08-0F
+	FMT("0001_0aaa", "LD   A,(IX1+%X)"),    // 10-17
+	FMT("0001_1aaa", "LD   (IX2+%X),A"),    // 18-1F
 	FMT("0010_0aaa", "LD   (RXB),(IX0+%X)"),// 20-27 : shougi $360 to $377
 	FMT("0010_1aaa", "LD   (RXB),(IX1+%X)"),// 28-2f : not found
 	FMT("0011_0aaa", "LD   (IX2+%X),(RXB)"),// 30-37 : not found
-	FMT("0011_1aaa", "BIT  R0.%d"),			// 38-3F ZF = R0.a (bit test)
-	FMT("0100_aaa0", "LD   A,R%X"),			// 40-4E
-	FMT("0100_aaa1", "LD   R%X,A"),			// 41-4F
-	FMT("0101_aaa0", "ADD  A,R%X"),			// 50-5E
-	FMT("0101_aaa1", "SUB  A,R%X"),			// 51-5F
-	FMT("0110_aaa0", "AND  A,R%X"),			// 60-6E
-	FMT("0110_aaa1", "OR   A,R%X"),			// 61-6F
-	FMT("0111_aaaa", "ADD  IX0,$%X"),		// 70-7f
-	FMT("1000_aaaa", "ADD  IX1,$%X"),		// 80-8f
-	FMT("1001_aaaa", "ADD  IX2,$%X"),		// 90-9f
-	FMT("1010_aaaa", "LD   RB,%X"),			// A0-AF
-	FMT("1011_x0aa", "LD   MB,%X"),			// B0-B3 (+ mirrors)
-	FMT("1011_x1xx", "STOP"),				// B4 (+ mirrors)
+	FMT("0011_1aaa", "BIT  R0.%d"),         // 38-3F ZF = R0.a (bit test)
+	FMT("0100_aaa0", "LD   A,R%X"),         // 40-4E
+	FMT("0100_aaa1", "LD   R%X,A"),         // 41-4F
+	FMT("0101_aaa0", "ADD  A,R%X"),         // 50-5E
+	FMT("0101_aaa1", "SUB  A,R%X"),         // 51-5F
+	FMT("0110_aaa0", "AND  A,R%X"),         // 60-6E
+	FMT("0110_aaa1", "OR   A,R%X"),         // 61-6F
+	FMT("0111_aaaa", "ADD  IX0,$%X"),       // 70-7f
+	FMT("1000_aaaa", "ADD  IX1,$%X"),       // 80-8f
+	FMT("1001_aaaa", "ADD  IX2,$%X"),       // 90-9f
+	FMT("1010_aaaa", "LD   RB,%X"),         // A0-AF
+	FMT("1011_x0aa", "LD   MB,%X"),         // B0-B3 (+ mirrors)
+	FMT("1011_x1xx", "STOP"),               // B4 (+ mirrors)
 
-	FMT("1100_0000 I", "LD   IX0,$%02X"),	// C0
-	FMT("1100_0001 I", "LD   IX1,$%02X"),	// C1
-	FMT("1100_0010 I", "LD   IX2,$%02X"),	// C2
-	FMT("1100_0011 I", "LD   A,$%02X"),		// C3
-	FMT("1100_0100 I", "LD   LP0,$%02X"),	// C4
-	FMT("1100_0101 I", "LD   LP1,$%02X"),	// C5
-	FMT("1100_0110 I", "LD   LP2,$%02X"),	// C6
-	FMT("1100_0111 I", "LD   RXB,$%02X"),	// C7 : shougi, splndrbt, equites
-	FMT("1100_1000 I", "ADD  A,$%02X"),		// C8
-	FMT("1100_1001 I", "SUB  A,$%02X"),		// C9
-	FMT("1100_1010 I", "AND  A,$%02X"),		// CA
-	FMT("1100_1011 I", "OR   A,$%02X"),		// CB
-	FMT("1100_1100 I", "DJNZ LP0,$%02X"),	// CC
-	FMT("1100_1101 I", "DJNZ LP1,$%02X"),	// CD
-	FMT("1100_1110 I", "DJNZ LP2,$%02X"),	// CE
-	FMT("1100_1111 I", "JNZ  $%02X"),		// CF
-	FMT("1101_0000 I", "JNC  $%02X"),		// D0
-	FMT("1101_0001 I", "JZ   $%02X"),		// D1
-	FMT("1101_001x I", "J    $%02X"),		// D2 (+ mirror)
+	FMT("1100_0000 I", "LD   IX0,$%02X"),   // C0
+	FMT("1100_0001 I", "LD   IX1,$%02X"),   // C1
+	FMT("1100_0010 I", "LD   IX2,$%02X"),   // C2
+	FMT("1100_0011 I", "LD   A,$%02X"),     // C3
+	FMT("1100_0100 I", "LD   LP0,$%02X"),   // C4
+	FMT("1100_0101 I", "LD   LP1,$%02X"),   // C5
+	FMT("1100_0110 I", "LD   LP2,$%02X"),   // C6
+	FMT("1100_0111 I", "LD   RXB,$%02X"),   // C7 : shougi, splndrbt, equites
+	FMT("1100_1000 I", "ADD  A,$%02X"),     // C8
+	FMT("1100_1001 I", "SUB  A,$%02X"),     // C9
+	FMT("1100_1010 I", "AND  A,$%02X"),     // CA
+	FMT("1100_1011 I", "OR   A,$%02X"),     // CB
+	FMT("1100_1100 I", "DJNZ LP0,$%02X"),   // CC
+	FMT("1100_1101 I", "DJNZ LP1,$%02X"),   // CD
+	FMT("1100_1110 I", "DJNZ LP2,$%02X"),   // CE
+	FMT("1100_1111 I", "JNZ  $%02X"),       // CF
+	FMT("1101_0000 I", "JNC  $%02X"),       // D0
+	FMT("1101_0001 I", "JZ   $%02X"),       // D1
+	FMT("1101_001x I", "J    $%02X"),       // D2 (+ mirror)
 
 	/* -------------- 830x only ------------- */
 
-	FMT("1101_0100 I", "LD   A,(R77:$%02X)"),	// D4 : 8303+ only. exctscc2, bullfgtr
-	FMT("1101_0101 I", "LD   (R77:$%02X),A"),	// D5 : 8303+ only. exctscc2, bullfgtr, kouyakyu
-	FMT("1101_0110 I", "LD   LP0,(R77:$%02X)"),	// D6 : 8303+ only. kouyakyu
-	FMT("1101_0111 I", "LD   (R77:$%02X),LP0"),	// D7 : 8303+ only. hvoltage
-	FMT("1101_1000 I", "LD   A,($%02X)"),		// D8 : equites
-	FMT("1101_1001 I", "LD   ($%02X),A"),		// D9 : equites
-	FMT("1101_1010 I", "CMP  A,$%02X"),			// DA :
-	FMT("1101_1011 I", "XOR  A,$%02X"),			// DB : equites splndrbt
-	FMT("1101_1100 I", "LD   A,R($%02X)"),		// DC : not found
-	FMT("1101_1101 I", "LD   R($%02X),A"),		// DD : equites, splndrbt
-	FMT("1101_1110 I", "JC   $%02X"),			// DE : not found
-	FMT("1101_1111 I", "CALL $%02X"),			// DF :
+	FMT("1101_0100 I", "LD   A,(R77:$%02X)"),   // D4 : 8303+ only. exctscc2, bullfgtr
+	FMT("1101_0101 I", "LD   (R77:$%02X),A"),   // D5 : 8303+ only. exctscc2, bullfgtr, kouyakyu
+	FMT("1101_0110 I", "LD   LP0,(R77:$%02X)"), // D6 : 8303+ only. kouyakyu
+	FMT("1101_0111 I", "LD   (R77:$%02X),LP0"), // D7 : 8303+ only. hvoltage
+	FMT("1101_1000 I", "LD   A,($%02X)"),       // D8 : equites
+	FMT("1101_1001 I", "LD   ($%02X),A"),       // D9 : equites
+	FMT("1101_1010 I", "CMP  A,$%02X"),         // DA :
+	FMT("1101_1011 I", "XOR  A,$%02X"),         // DB : equites splndrbt
+	FMT("1101_1100 I", "LD   A,R($%02X)"),      // DC : not found
+	FMT("1101_1101 I", "LD   R($%02X),A"),      // DD : equites, splndrbt
+	FMT("1101_1110 I", "JC   $%02X"),           // DE : not found
+	FMT("1101_1111 I", "CALL $%02X"),           // DF :
 
-	FMT("1110_0000", "EXG  A,IX0"),			// E0 : exctsccr
-	FMT("1110_0001", "EXG  A,IX1"),			// E1 : not found
-	FMT("1110_0010", "EXG  A,IX2"),			// E2 : not found
-	FMT("1110_0011", "EXG  A,LP1"),			// E3 : exctsccr in pair with EB
-	FMT("1110_0100", "EXG  A,LP2"),			// E4 : not found
-	FMT("1110_0101", "EXG  A,RXB"),			// E5 : splndrbt
-	FMT("1110_0110", "EXG  A,LP0"),			// E6 : splndrbt, bullfgtr, kouyakyu. EXG, not LD: see splndrbt $3ba to $3d3
-	FMT("1110_0111", "EXG  A,RB"),			// E7 : not found
-	FMT("1110_1000", "LD   IX0,A"),			// E8 :
-	FMT("1110_1001", "LD   IX1,A"),			// E9 : not found
-	FMT("1110_1010", "LD   IX2,A"),			// EA :
-	FMT("1110_1011", "LD   LP1,A"),			// EB : exctsccr in pair with E3
-	FMT("1110_1100", "LP   LP2,A"),			// EC : not found
-	FMT("1110_1101", "LD   RXB,A"),			// ED : splndrbt
-	FMT("1110_1110", "LD   LP0,A"),			// EE : splndrbt, bullfgtr
-	FMT("1110_1111", "LD   RB,A"),			// EF : not found
-	FMT("1111_0000", "EXG  IX0,IX1"),		// F0 : not found
-	FMT("1111_0001", "EXG  IX0,IX2"),		// F1 : splndrbt $2e to $38, equites $40 to $4a
+	FMT("1110_0000", "EXG  A,IX0"),         // E0 : exctsccr
+	FMT("1110_0001", "EXG  A,IX1"),         // E1 : not found
+	FMT("1110_0010", "EXG  A,IX2"),         // E2 : not found
+	FMT("1110_0011", "EXG  A,LP1"),         // E3 : exctsccr in pair with EB
+	FMT("1110_0100", "EXG  A,LP2"),         // E4 : not found
+	FMT("1110_0101", "EXG  A,RXB"),         // E5 : splndrbt
+	FMT("1110_0110", "EXG  A,LP0"),         // E6 : splndrbt, bullfgtr, kouyakyu. EXG, not LD: see splndrbt $3ba to $3d3
+	FMT("1110_0111", "EXG  A,RB"),          // E7 : not found
+	FMT("1110_1000", "LD   IX0,A"),         // E8 :
+	FMT("1110_1001", "LD   IX1,A"),         // E9 : not found
+	FMT("1110_1010", "LD   IX2,A"),         // EA :
+	FMT("1110_1011", "LD   LP1,A"),         // EB : exctsccr in pair with E3
+	FMT("1110_1100", "LP   LP2,A"),         // EC : not found
+	FMT("1110_1101", "LD   RXB,A"),         // ED : splndrbt
+	FMT("1110_1110", "LD   LP0,A"),         // EE : splndrbt, bullfgtr
+	FMT("1110_1111", "LD   RB,A"),          // EF : not found
+	FMT("1111_0000", "EXG  IX0,IX1"),       // F0 : not found
+	FMT("1111_0001", "EXG  IX0,IX2"),       // F1 : splndrbt $2e to $38, equites $40 to $4a
 	FMT("1111_0010", "REP  LD (IX2),(RXB)"),// F2 : splndrbt  LD (IX2),(RXB); INC RXB; DJNZ LP0
 	FMT("1111_0011", "REP  LD (RXB),(IX0)"),// F3 : not found LD (RXB),(IX0); INC RXB; DJNZ LP0
-	FMT("1111_0100", "SAVE ZC"),			// F4 : not found
-	FMT("1111_0101", "REST ZC"),			// F5 : not found
-	FMT("1111_0110", "LD   (RXB),A"),		// F6 : exctsccr
-	FMT("1111_0111", "LD   A,(RXB)"),		// F7 : not found
-	FMT("1111_1000", "CMP  A,(RXB)"),		// F8 : exctsccr
-	FMT("1111_1001", "XOR  A,(RXB)"),		// F9 : exctsccr
-	FMT("1111_1010", "ADD  A,CF"),			// FA :
-	FMT("1111_1011", "SUB  A,!CF"),			// FB : not found
-	FMT("1111_1100", "TST  A"),				// FC :
-	FMT("1111_1101", "CLR  A"),				// FD :
-	FMT("1111_1110", "LD   A,(IX0+A)"),		// FE :
-	FMT("1111_1111", "RET"),				// FF :
+	FMT("1111_0100", "SAVE ZC"),            // F4 : not found
+	FMT("1111_0101", "REST ZC"),            // F5 : not found
+	FMT("1111_0110", "LD   (RXB),A"),       // F6 : exctsccr
+	FMT("1111_0111", "LD   A,(RXB)"),       // F7 : not found
+	FMT("1111_1000", "CMP  A,(RXB)"),       // F8 : exctsccr
+	FMT("1111_1001", "XOR  A,(RXB)"),       // F9 : exctsccr
+	FMT("1111_1010", "ADD  A,CF"),          // FA :
+	FMT("1111_1011", "SUB  A,!CF"),         // FB : not found
+	FMT("1111_1100", "TST  A"),             // FC :
+	FMT("1111_1101", "CLR  A"),             // FD :
+	FMT("1111_1110", "LD   A,(IX0+A)"),     // FE :
+	FMT("1111_1111", "RET"),                // FF :
 	NULL
 };
 
@@ -347,7 +347,7 @@ CPU_DISASSEMBLE( alpha8201 )
 	if (!OpInizialized) InitDasm8201();
 
 	code = oprom[0];
-	op = -1;	/* no matching opcode */
+	op = -1;    /* no matching opcode */
 	for ( i = 0; i < MAX_OPS; i++)
 	{
 		if( (code & Op[i].mask) == Op[i].bits )

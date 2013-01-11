@@ -2,28 +2,28 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-  Undumped games
+	Undumped games
 
-  - Game de check! Koutsuu Anzen
-  - Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a
-  BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
-  - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or
-  131 games)
-  - a few other pirate multigame carts (two versions of 4 in 1 carts)
+	- Game de check! Koutsuu Anzen
+	- Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a
+	BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
+	- Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or
+	131 games)
+	- a few other pirate multigame carts (two versions of 4 in 1 carts)
 
 -->
 <!--
-  Taiwanese releases for the Aaronix Mark III
-  - White Gold Cartridges
-  GB1301 - Fantasy Zone / Kuàilè xiǎo fēidié (快樂小飛碟)  [dumped]
-  GB1303 - Hokuto no Ken / Běidǒu shén quán (北斗神拳)  [dumped]
-  GB1310 - Space Harrier / ???  [verified to be the same as the Jpn release]
-  GB1314 - Double Target / Shí miàn máifú (十面埋伏)  [verified to be the same as the Jpn release]
-  - Yellow Gold Cartridges
-  K307 - Great Soccer / Shìjiè bēi zúqiú sài (世界杯足球賽)  [dumped]
-  K313 - F-16 Fighting Falcon / F-16  [dumped]
-  K317 - Comical Machine Gun Joe / Dàzhàn hēishǒu dǎng (大戰黑手黨)  [dumped]
-  K321 - Spy Vs. Spy / Dié duì dié (諜對諜)  [dumped]
+	Taiwanese releases for the Aaronix Mark III
+	- White Gold Cartridges
+	GB1301 - Fantasy Zone / Kuàilè xiǎo fēidié (快樂小飛碟)  [dumped]
+	GB1303 - Hokuto no Ken / Běidǒu shén quán (北斗神拳)  [dumped]
+	GB1310 - Space Harrier / ???  [verified to be the same as the Jpn release]
+	GB1314 - Double Target / Shí miàn máifú (十面埋伏)  [verified to be the same as the Jpn release]
+	- Yellow Gold Cartridges
+	K307 - Great Soccer / Shìjiè bēi zúqiú sài (世界杯足球賽)  [dumped]
+	K313 - F-16 Fighting Falcon / F-16  [dumped]
+	K317 - Comical Machine Gun Joe / Dàzhàn hēishǒu dǎng (大戰黑手黨)  [dumped]
+	K321 - Spy Vs. Spy / Dié duì dié (諜對諜)  [dumped]
 -->
 
 <softwarelist name="sms" description="Sega Master System cartridges">
@@ -333,7 +333,7 @@
 		<description>Alibaba and 40 Thieves (Kor)</description>
 		<year>1989</year>
 		<publisher>HiCom</publisher>
-        <info name="alt_title" value="아리바바"/>
+		<info name="alt_title" value="아리바바"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="alibaba and 40 thieves (kr).sms" size="32768" crc="08bf3de3" sha1="bd177dd3bc7f3175bd89458535222ac87022a318" offset="0" />
@@ -576,7 +576,7 @@
 		</part>
 	</software>
 
-    <!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
+	<!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
 	<software name="astrofl1" cloneof="transbot">
 		<description>Astro Flash (Jpn, Pirate)</description>
 		<year>1985</year>
@@ -4357,8 +4357,8 @@
 		</part>
 	</software>
 
-    <!-- This is the MegaDrive version (released in 1994), also included in "Phantasy Star Collection" for the Sega Saturn -->
-    <!-- It currently does not work in the megadrij driver -->
+	<!-- This is the MegaDrive version (released in 1994), also included in "Phantasy Star Collection" for the Sega Saturn -->
+	<!-- It currently does not work in the megadrij driver -->
 	<software name="pstarjmd" cloneof="pstar">
 		<description>Phantasy Star (Jpn, MD / Saturn Collection CD)</description>
 		<year>1994</year>
@@ -6316,8 +6316,8 @@
 		</part>
 	</software>
 
-    <!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to
-    Pause the game by pressing LEFT+RIGHT+Button 2 on joypad 1 (a combination that cannot be done on a normal SMS joypad). -->
+	<!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to
+	Pause the game by pressing LEFT+RIGHT+Button 2 on joypad 1 (a combination that cannot be done on a normal SMS joypad). -->
 	<software name="wboymlnda" cloneof="wboymlnd">
 		<description>Wonder Boy in Monster Land (Euro, USA, Hacked?)</description>
 		<year>1988</year>
@@ -6771,7 +6771,7 @@
 
 
 <!-- The next items have been compiled from original source code written by Jeroen Tel.
-  It is unsure if Probe has ever written any game code for these licensed titles -->
+	It is unsure if Probe has ever written any game code for these licensed titles -->
 
 	<software name="sn_ateam">
 		<description>The A-Team (Music prototype)</description>

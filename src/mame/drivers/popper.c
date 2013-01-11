@@ -171,24 +171,24 @@ static ADDRESS_MAP_START( popper_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0xe000, 0xe007) AM_READ(popper_input_ports_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(popper_flipscreen_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(popper_e002_w)				//?? seems to be graphic related
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(popper_e002_w)                //?? seems to be graphic related
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(popper_gfx_bank_w)
-	AM_RANGE(0xe004, 0xe007) AM_WRITENOP					//?? range cleared once when the SP is set
+	AM_RANGE(0xe004, 0xe007) AM_WRITENOP                    //?? range cleared once when the SP is set
 	AM_RANGE(0xe400, 0xe400) AM_READ(popper_soundcpu_nmi_r)
-	AM_RANGE(0xf800, 0xf800) AM_READNOP					//?? read once at startup
-	AM_RANGE(0xfc00, 0xfc00) AM_READNOP					//?? possibly watchdog
+	AM_RANGE(0xf800, 0xf800) AM_READNOP                 //?? read once at startup
+	AM_RANGE(0xfc00, 0xfc00) AM_READNOP                 //?? possibly watchdog
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popper_sound_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_READNOP					//?? all read once at startup and the
-	AM_RANGE(0x8002, 0x8002) AM_WRITENOP				//?? same writes as 0x8000 (mostly)
-	AM_RANGE(0x8003, 0x8003) AM_READNOP					//?? result ignored, looks like part
+	AM_RANGE(0x8002, 0x8002) AM_READNOP                 //?? all read once at startup and the
+	AM_RANGE(0x8002, 0x8002) AM_WRITENOP                //?? same writes as 0x8000 (mostly)
+	AM_RANGE(0x8003, 0x8003) AM_READNOP                 //?? result ignored, looks like part
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_READNOP					//?? of AY8910 initialisation
-	AM_RANGE(0xa002, 0xa002) AM_WRITENOP				//?? same writes as 0xa000
+	AM_RANGE(0xa002, 0xa002) AM_READNOP                 //?? of AY8910 initialisation
+	AM_RANGE(0xa002, 0xa002) AM_WRITENOP                //?? same writes as 0xa000
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( popper )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )			//ignored if held for 12 or more frames
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )         //ignored if held for 12 or more frames
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 
 	PORT_START("IN1")
@@ -214,7 +214,7 @@ static INPUT_PORTS_START( popper )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )			//ignored if held for 12 or more frames
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )         //ignored if held for 12 or more frames
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -222,51 +222,51 @@ static INPUT_PORTS_START( popper )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("DSW1")	/* FAKE DSW1 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )		//SW1:1-2
+	PORT_START("DSW1")  /* FAKE DSW1 */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )       //SW1:1-2
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Coin_B ) )		//SW1:3-4
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Coin_B ) )       //SW1:3-4
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )		//SW1:5-6
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )        //SW1:5-6
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )	//SW1:7-8
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )   //SW1:7-8
 	PORT_DIPSETTING(    0x00, "20k, then every 70k" )
 	PORT_DIPSETTING(    0x40, "30k, then every 70k" )
 	PORT_DIPSETTING(    0x80, "40k, then every 70k" )
 	PORT_DIPSETTING(    0xc0, "50k, then every 70k" )
 
-	PORT_START("DSW2")	/* FAKE DSW2 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )	//SW2:1
+	PORT_START("DSW2")  /* FAKE DSW2 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )  //SW2:1
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Allow_Continue ) )		//SW2:2 (stored in 0xd987, never read)
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Allow_Continue ) )       //SW2:2 (stored in 0xd987, never read)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Free_Play ) )	//SW2:3
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Free_Play ) )    //SW2:3
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Pass (Unlimited Lives) (Cheat)")	//SW2:4
+	PORT_DIPNAME( 0x08, 0x00, "Pass (Unlimited Lives) (Cheat)") //SW2:4
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )	//SW2:5
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )  //SW2:5
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )		//SW2:6
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )      //SW2:6
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, "Clear (Current Level) (Cheat)")	//SW2:7
+	PORT_DIPNAME( 0x40, 0x00, "Clear (Current Level) (Cheat)")  //SW2:7
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Stop" )					//SW2:8
+	PORT_DIPNAME( 0x80, 0x00, "Stop" )                  //SW2:8
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( popper, popper_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/12)
 	MCFG_CPU_PROGRAM_MAP(popper_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(popper_state, irq0_line_hold, 4*60)		//NMIs caused by the main CPU
+	MCFG_CPU_PERIODIC_INT_DRIVER(popper_state, irq0_line_hold, 4*60)        //NMIs caused by the main CPU
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800))
 

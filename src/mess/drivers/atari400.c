@@ -252,7 +252,7 @@ public:
 
 
 static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
-	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
+	AM_RANGE(0x0000, 0x9fff) AM_NOP /* RAM installed at runtime */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
@@ -282,8 +282,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)	/* self test */
-	AM_RANGE(0xa000, 0xbfff) AM_ROM	/* BASIC */
+	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)    /* self test */
+	AM_RANGE(0xa000, 0xbfff) AM_ROM /* BASIC */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -345,8 +345,8 @@ ADDRESS_MAP_END
  **************************************************************/
 
 
-#define JOYSTICK_DELTA			10
-#define JOYSTICK_SENSITIVITY	200
+#define JOYSTICK_DELTA          10
+#define JOYSTICK_SENSITIVITY    200
 
 static INPUT_PORTS_START( atari_artifacting )
 	PORT_START("artifacts")
@@ -367,7 +367,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( atari_digital_joystick2 )
-	PORT_START("djoy_0_1")	/* IN1 digital joystick #1 + #2 (PIA port A) */
+	PORT_START("djoy_0_1")  /* IN1 digital joystick #1 + #2 (PIA port A) */
 	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(1)
 	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1)
 	PORT_BIT(0x04, 0x04, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(1)
@@ -377,7 +377,7 @@ static INPUT_PORTS_START( atari_digital_joystick2 )
 	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(2)
 	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
 
-	PORT_START("djoy_2_3")	/* IN2 digital joystick #3 + #4 (PIA port B) */
+	PORT_START("djoy_2_3")  /* IN2 digital joystick #3 + #4 (PIA port B) */
 	PORT_BIT(0x01, 0x01, IPT_UNUSED)
 	PORT_BIT(0x02, 0x02, IPT_UNUSED)
 	PORT_BIT(0x04, 0x04, IPT_UNUSED)
@@ -387,7 +387,7 @@ static INPUT_PORTS_START( atari_digital_joystick2 )
 	PORT_BIT(0x40, 0x40, IPT_UNUSED)
 	PORT_BIT(0x80, 0x80, IPT_UNUSED)
 
-	PORT_START("djoy_b")	/* IN3 digital joystick buttons (GTIA button bits) */
+	PORT_START("djoy_b")    /* IN3 digital joystick buttons (GTIA button bits) */
 	PORT_BIT(0x01, 0x01, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_UNUSED)
@@ -401,7 +401,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( atari_digital_joystick4 )
-	PORT_START("djoy_0_1")	/* digital joystick #1 + #2 (PIA port A) */
+	PORT_START("djoy_0_1")  /* digital joystick #1 + #2 (PIA port A) */
 	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(1)
 	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1)
 	PORT_BIT(0x04, 0x04, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(1)
@@ -411,7 +411,7 @@ static INPUT_PORTS_START( atari_digital_joystick4 )
 	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(2)
 	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
 
-	PORT_START("djoy_2_3")	/* digital joystick #3 + #4 (PIA port B) */
+	PORT_START("djoy_2_3")  /* digital joystick #3 + #4 (PIA port B) */
 	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP)    PORT_CODE(KEYCODE_8_PAD) PORT_CODE(JOYCODE_Y_UP_SWITCH)    PORT_PLAYER(3)
 	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN)  PORT_CODE(KEYCODE_2_PAD) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(3)
 	PORT_BIT(0x04, 0x04, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(3)
@@ -421,7 +421,7 @@ static INPUT_PORTS_START( atari_digital_joystick4 )
 	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT)  PORT_CODE(KEYCODE_4_PAD) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(4)
 	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(4)
 
-	PORT_START("djoy_b")	/* digital joystick buttons (GTIA button bits) */
+	PORT_START("djoy_b")    /* digital joystick buttons (GTIA button bits) */
 	PORT_BIT(0x01, 0x01, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_BUTTON1) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON3) PORT_PLAYER(3)
@@ -578,7 +578,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( a5200 )
 	PORT_INCLUDE( atari_artifacting )
 
-	PORT_START("djoy_b")	/* lower/upper buttons */
+	PORT_START("djoy_b")    /* lower/upper buttons */
 	PORT_BIT(0x01, 0x01, IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_BUTTON1) PORT_PLAYER(3)
@@ -589,7 +589,7 @@ static INPUT_PORTS_START( a5200 )
 	PORT_BIT(0x80, 0x80, IPT_BUTTON2) PORT_PLAYER(4)
 
 	PORT_START("keypad_0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("(Break)") PORT_CODE(KEYCODE_PAUSE)	// is this correct?
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("(Break)") PORT_CODE(KEYCODE_PAUSE)    // is this correct?
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("[#]") PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("[0]") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("[*]") PORT_CODE(KEYCODE_PLUS_PAD)
@@ -943,82 +943,82 @@ static const pokey_interface atari_pokey_interface =
 
 static const pia6821_interface atari_pia_interface =
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 static const pia6821_interface a600xl_pia_interface =
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DEVICE_HANDLER("pia", a600xl_pia_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DEVICE_HANDLER("pia", a600xl_pia_pb_w),       /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 static const pia6821_interface a1200xl_pia_interface =
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(a400_state, a1200xl_pia_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(a400_state, a1200xl_pia_pb_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 static const pia6821_interface a800xl_pia_interface =
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(a400_state,a800xl_pia_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(a400_state,a800xl_pia_pb_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 static const pia6821_interface xegs_pia_interface =
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(a400_state,xegs_pia_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(a400_state,xegs_pia_pb_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 // FIXME: should there be anything connected where other system have the fdc?
@@ -1035,24 +1035,24 @@ static const pokey_interface a5200_pokey_interface =
 		DEVCB_INPUT_PORT("analog_7")
 	},
 	DEVCB_NULL,
-	DEVCB_NULL,	// FIXME: is there anything connected here?
-	DEVCB_NULL	// FIXME: is there anything connected here?
+	DEVCB_NULL, // FIXME: is there anything connected here?
+	DEVCB_NULL  // FIXME: is there anything connected here?
 };
 
 static const pia6821_interface a5200_pia_interface =
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */	// FIXME: is there anything connected here
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */  // FIXME: is there anything connected here
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -1204,12 +1204,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(a600xl_mem)	// FIXME?
+	MCFG_CPU_PROGRAM_MAP(a600xl_mem)    // FIXME?
 	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_PIA6821_MODIFY( "pia", a600xl_pia_interface )
 
-	MCFG_MACHINE_START( a800xl )	// FIXME?
+	MCFG_MACHINE_START( a800xl )    // FIXME?
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
@@ -1336,11 +1336,11 @@ ROM_START(a400)
 	ROM_REGION(0x14000, "maincpu", 0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
 	ROM_SYSTEM_BIOS(0, "default", "OS Rev. B")
-	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(1) )	// CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(1) )	// CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(1) )    // CRC and label waiting for confirmation
 	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
-	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )	// CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )	// CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )    // CRC and label waiting for confirmation
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
@@ -1348,8 +1348,8 @@ ROM_END
 ROM_START(a400pal)
 	ROM_REGION(0x14000, "maincpu", 0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
-	ROM_LOAD( "co15199.rom", 0xe000, 0x1000, BAD_DUMP CRC(8e547f56) SHA1(1bd746ea798b723bfb18495a7facca113183d713) )	// Rev. A - CRC and label waiting for confirmation
-	ROM_LOAD( "co15299.rom", 0xf000, 0x1000, BAD_DUMP CRC(be55b413) SHA1(d88afae49b08e75943d0258cb580e5d34756414a) )	// Rev. A - CRC and label waiting for confirmation
+	ROM_LOAD( "co15199.rom", 0xe000, 0x1000, BAD_DUMP CRC(8e547f56) SHA1(1bd746ea798b723bfb18495a7facca113183d713) )    // Rev. A - CRC and label waiting for confirmation
+	ROM_LOAD( "co15299.rom", 0xf000, 0x1000, BAD_DUMP CRC(be55b413) SHA1(d88afae49b08e75943d0258cb580e5d34756414a) )    // Rev. A - CRC and label waiting for confirmation
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
@@ -1358,11 +1358,11 @@ ROM_START(a800)
 	ROM_REGION(0x14000, "maincpu", 0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
 	ROM_SYSTEM_BIOS(0, "default", "OS Rev. B")
-	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(1) )	// CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(1) )	// CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499b.rom",  0xe000, 0x1000, BAD_DUMP CRC(d818f3e8) SHA1(bcdec2188f6a6a5bfc1df4e383bd828d34b5c4ac), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599b.rom",  0xf000, 0x1000, BAD_DUMP CRC(c1690a9b) SHA1(c5248e8565574fd39ae1c3f4f356aa4cac07df95), ROM_BIOS(1) )    // CRC and label waiting for confirmation
 	ROM_SYSTEM_BIOS(1, "reva", "OS Rev. A")
-	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )	// CRC and label waiting for confirmation
-	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )	// CRC and label waiting for confirmation
+	ROMX_LOAD( "co12499a.rom",  0xe000, 0x1000, BAD_DUMP CRC(29f64e17) SHA1(abf7ec488c6b600f1b7f30bdc7f8a2bf6a727675), ROM_BIOS(2) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co14599a.rom",  0xf000, 0x1000, BAD_DUMP CRC(bc533f0c) SHA1(e217148495fa747fe5488132d8d22533e68c7e58), ROM_BIOS(2) )    // CRC and label waiting for confirmation
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 
@@ -1372,8 +1372,8 @@ ROM_END
 ROM_START(a800pal)
 	ROM_REGION(0x14000, "maincpu", 0) /* 64K for the CPU + 2 * 8K for cartridges */
 	ROM_LOAD( "co12399b.rom", 0xd800, 0x0800, CRC(6a5d766e) SHA1(01a6044f7a81d409c938e7dfde0a1af5832229d2) )
-	ROM_LOAD( "co15199.rom", 0xe000, 0x1000, BAD_DUMP CRC(8e547f56) SHA1(1bd746ea798b723bfb18495a7facca113183d713) )	// Rev. A - CRC and label waiting for confirmation
-	ROM_LOAD( "co15299.rom", 0xf000, 0x1000, BAD_DUMP CRC(be55b413) SHA1(d88afae49b08e75943d0258cb580e5d34756414a) )	// Rev. A - CRC and label waiting for confirmation
+	ROM_LOAD( "co15199.rom", 0xe000, 0x1000, BAD_DUMP CRC(8e547f56) SHA1(1bd746ea798b723bfb18495a7facca113183d713) )    // Rev. A - CRC and label waiting for confirmation
+	ROM_LOAD( "co15299.rom", 0xf000, 0x1000, BAD_DUMP CRC(be55b413) SHA1(d88afae49b08e75943d0258cb580e5d34756414a) )    // Rev. A - CRC and label waiting for confirmation
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 
@@ -1383,19 +1383,19 @@ ROM_END
 ROM_START(a1200xl)
 	ROM_REGION(0x18000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "default", "OS Rev. 11")
-	ROMX_LOAD( "co60616b.rom", 0x14000, 0x2000, BAD_DUMP CRC(6e29ec8d) SHA1(3f9c06d6b4d261f3d5bf4354e3cff0c17b9347b9), ROM_BIOS(1) )	// CRC and label waiting for confirmation
-	ROMX_LOAD( "co60617b.rom", 0x16000, 0x2000, BAD_DUMP CRC(d73ce29a) SHA1(64790242d902643fe0c40dd842749f1fe461831b), ROM_BIOS(1) )	// CRC and label waiting for confirmation
+	ROMX_LOAD( "co60616b.rom", 0x14000, 0x2000, BAD_DUMP CRC(6e29ec8d) SHA1(3f9c06d6b4d261f3d5bf4354e3cff0c17b9347b9), ROM_BIOS(1) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co60617b.rom", 0x16000, 0x2000, BAD_DUMP CRC(d73ce29a) SHA1(64790242d902643fe0c40dd842749f1fe461831b), ROM_BIOS(1) )    // CRC and label waiting for confirmation
 	ROM_SYSTEM_BIOS(1, "rev10", "OS Rev. 10")
-	ROMX_LOAD( "co60616a.rom", 0x14000, 0x2000, BAD_DUMP CRC(0391386b) SHA1(7c176657c88b89b8a69bf021fa8e0939efc0dff2), ROM_BIOS(2) )	// CRC and label waiting for confirmation
-	ROMX_LOAD( "co60617a.rom", 0x16000, 0x2000, BAD_DUMP CRC(b502f1e7) SHA1(6688db57d97fa570aef5c15cef3e5fb2688879c2), ROM_BIOS(2) )	// CRC and label waiting for confirmation
+	ROMX_LOAD( "co60616a.rom", 0x14000, 0x2000, BAD_DUMP CRC(0391386b) SHA1(7c176657c88b89b8a69bf021fa8e0939efc0dff2), ROM_BIOS(2) )    // CRC and label waiting for confirmation
+	ROMX_LOAD( "co60617a.rom", 0x16000, 0x2000, BAD_DUMP CRC(b502f1e7) SHA1(6688db57d97fa570aef5c15cef3e5fb2688879c2), ROM_BIOS(2) )    // CRC and label waiting for confirmation
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a600xl)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "co60302a.rom", 0xa000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6) )	// Rev. B
-	ROM_LOAD( "co62024.rom",  0xc000, 0x4000, CRC(643bcc98) SHA1(881d030656b40bbe48f15a696b28f22c0b752ab0) )	// Rev. 1
+	ROM_LOAD( "co60302a.rom", 0xa000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6) )    // Rev. B
+	ROM_LOAD( "co62024.rom",  0xc000, 0x4000, CRC(643bcc98) SHA1(881d030656b40bbe48f15a696b28f22c0b752ab0) )    // Rev. 1
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
@@ -1403,8 +1403,8 @@ ROM_END
 ROM_START(a800xl)
 	ROM_REGION(0x18000, "maincpu", 0)
 	ROM_FILL( 0, 0x10000, 0x00 )
-	ROM_LOAD( "co60302a.rom", 0x10000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6) )	// Rev. B
-	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )	// Rev. 2
+	ROM_LOAD( "co60302a.rom", 0x10000, 0x2000, CRC(f0202fb3) SHA1(7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6) )   // Rev. B
+	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )   // Rev. 2
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
@@ -1413,40 +1413,40 @@ ROM_END
 
 ROM_START(a65xe)
 	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )	// Rev. C
-	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )	// Rev. 2
+	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )   // Rev. C
+	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )   // Rev. 2
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a65xea)
 	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD( "basic_ar.rom", 0x10000, 0x2000, CRC(c899f4d6) SHA1(043df191d1fe402e792266a108e147ffcda35130) )	// is this correct? or shall we use Rev. C?
+	ROM_LOAD( "basic_ar.rom", 0x10000, 0x2000, CRC(c899f4d6) SHA1(043df191d1fe402e792266a108e147ffcda35130) )   // is this correct? or shall we use Rev. C?
 //  ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(7f9a76c8) SHA1(57eb6d87850a763f11767f53d4eaede186f831a2) )   // this was from Savetz and has wrong bits!
-	ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(45f47988) SHA1(a36b8b20f657580f172749bb0625c08706ed824c) )	// Rev. 3B ?
+	ROM_LOAD( "c101700.rom",  0x14000, 0x4000, CRC(45f47988) SHA1(a36b8b20f657580f172749bb0625c08706ed824c) )   // Rev. 3B ?
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a130xe)
 	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )	// Rev. C
-	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )	// Rev. 2
+	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )   // Rev. C
+	ROM_LOAD( "co61598b.rom", 0x14000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55) )   // Rev. 2
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(a800xe)
 	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )	// Rev. C
-	ROM_LOAD( "c300717.rom",  0x14000, 0x4000, CRC(29f133f7) SHA1(f03b9b93000ee84abb9cf8d6367241006f172182) )	// Rev. 3
+	ROM_LOAD( "co24947a.rom", 0x10000, 0x2000, CRC(7d684184) SHA1(3693c9cb9bf3b41bae1150f7a8264992468fc8c0) )   // Rev. C
+	ROM_LOAD( "c300717.rom",  0x14000, 0x4000, CRC(29f133f7) SHA1(f03b9b93000ee84abb9cf8d6367241006f172182) )   // Rev. 3
 
 	ROM_REGION(0x10000, "lslot", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(xegs)
 	ROM_REGION(0x1a000, "maincpu", 0)
-	ROM_LOAD( "c101687.rom", 0x10000, 0x8000, CRC(d50260d1) SHA1(0e0625ab2473f8431640df3ac8af61925760b9b9) )	// Rev. C + Rev. 4 + Missile Command
+	ROM_LOAD( "c101687.rom", 0x10000, 0x8000, CRC(d50260d1) SHA1(0e0625ab2473f8431640df3ac8af61925760b9b9) )    // Rev. C + Rev. 4 + Missile Command
 
 	ROM_REGION(0x20000, "user1", ROMREGION_ERASE00)
 ROM_END
@@ -1493,14 +1493,14 @@ COMP ( 1979, a400,     0,        0,     a400,       a800, driver_device,    0,  
 COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800, driver_device,    0,      "Atari",   "Atari 400 (PAL)",  0)
 COMP ( 1979, a800,     0,        0,     a800,       a800, driver_device,    0,      "Atari",   "Atari 800 (NTSC)", 0)
 COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800, driver_device,    0,      "Atari",   "Atari 800 (PAL)",  0)
-COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl, a400_state,  a800xl, "Atari",   "Atari 1200XL",     GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl, a400_state,  a600xl, "Atari",   "Atari 600XL",      GAME_NOT_WORKING )		// 16k RAM
-COMP ( 1983, a800xl,   0,		 0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 800XL (NTSC)",GAME_IMPERFECT_GRAPHICS )		// 64k RAM
-COMP ( 1983, a800xlp,  a800xl,	 0,     a800xlpal,  a800xl, a400_state,  a800xl, "Atari",   "Atari 800XL (PAL)", GAME_IMPERFECT_GRAPHICS )		// 64k RAM
-COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 65XE",       GAME_NOT_WORKING )		// 64k RAM
+COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl, a400_state,  a800xl, "Atari",   "Atari 1200XL",     GAME_NOT_WORKING )      // 64k RAM
+COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl, a400_state,  a600xl, "Atari",   "Atari 600XL",      GAME_NOT_WORKING )      // 16k RAM
+COMP ( 1983, a800xl,   0,        0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 800XL (NTSC)",GAME_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP ( 1983, a800xlp,  a800xl,   0,     a800xlpal,  a800xl, a400_state,  a800xl, "Atari",   "Atari 800XL (PAL)", GAME_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 65XE",       GAME_NOT_WORKING )      // 64k RAM
 COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 65XE (Arabic)", GAME_NOT_WORKING )
-COMP ( 1986, a130xe,   a800xl,   0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 130XE",      GAME_NOT_WORKING )		// 128k RAM
-COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 800XE",      GAME_NOT_WORKING )		// 64k RAM
-COMP ( 1987, xegs,     0,        0,     xegs,       a800xl, a400_state,  xegs,   "Atari",   "Atari XE Game System", GAME_NOT_WORKING )	// 64k RAM
+COMP ( 1986, a130xe,   a800xl,   0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 130XE",      GAME_NOT_WORKING )      // 128k RAM
+COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl, a400_state,  a800xl, "Atari",   "Atari 800XE",      GAME_NOT_WORKING )      // 64k RAM
+COMP ( 1987, xegs,     0,        0,     xegs,       a800xl, a400_state,  xegs,   "Atari",   "Atari XE Game System", GAME_NOT_WORKING )  // 64k RAM
 
 CONS ( 1982, a5200,    0,        0,     a5200,      a5200, driver_device,   0,      "Atari",   "Atari 5200",       0)

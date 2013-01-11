@@ -591,4 +591,3 @@ void nes_carts_state::set_nt_mirroring(int mirroring)
 
 /* Include emulation of iNES Mappers for .nes files */
 #include "machine/nes_ines.c"
-

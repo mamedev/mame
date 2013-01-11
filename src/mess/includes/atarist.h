@@ -19,46 +19,46 @@
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
 
-#define M68000_TAG		"m68000"
-#define HD6301V1_TAG	"hd6301"
-#define YM2149_TAG		"ym2149"
-#define MC6850_0_TAG	"mc6850_0"
-#define MC6850_1_TAG	"mc6850_1"
-#define Z8530_TAG		"z8530"
-#define COP888_TAG		"u703"
-#define RP5C15_TAG		"rp5c15"
-#define YM3439_TAG		"ym3439"
-#define MC68901_TAG		"mc68901"
-#define LMC1992_TAG		"lmc1992"
-#define WD1772_TAG		"wd1772"
-#define SCREEN_TAG		"screen"
-#define CENTRONICS_TAG	"centronics"
-#define RS232_TAG		"rs232"
+#define M68000_TAG      "m68000"
+#define HD6301V1_TAG    "hd6301"
+#define YM2149_TAG      "ym2149"
+#define MC6850_0_TAG    "mc6850_0"
+#define MC6850_1_TAG    "mc6850_1"
+#define Z8530_TAG       "z8530"
+#define COP888_TAG      "u703"
+#define RP5C15_TAG      "rp5c15"
+#define YM3439_TAG      "ym3439"
+#define MC68901_TAG     "mc68901"
+#define LMC1992_TAG     "lmc1992"
+#define WD1772_TAG      "wd1772"
+#define SCREEN_TAG      "screen"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_TAG       "rs232"
 
 // Atari ST
 
-#define Y1		XTAL_2_4576MHz
+#define Y1      XTAL_2_4576MHz
 
 // STBook
 
-#define U517	XTAL_16MHz
-#define Y200	XTAL_2_4576MHz
-#define Y700	XTAL_10MHz
+#define U517    XTAL_16MHz
+#define Y200    XTAL_2_4576MHz
+#define Y700    XTAL_10MHz
 
-#define DMA_STATUS_DRQ				0x04
-#define DMA_STATUS_SECTOR_COUNT		0x02
-#define DMA_STATUS_ERROR			0x01
+#define DMA_STATUS_DRQ              0x04
+#define DMA_STATUS_SECTOR_COUNT     0x02
+#define DMA_STATUS_ERROR            0x01
 
-#define DMA_MODE_READ_WRITE			0x100
-#define DMA_MODE_FDC_HDC_ACK		0x080
-#define DMA_MODE_ENABLED			0x040
-#define DMA_MODE_SECTOR_COUNT		0x010
-#define DMA_MODE_FDC_HDC_CS			0x008
-#define DMA_MODE_A1					0x004
-#define DMA_MODE_A0					0x002
-#define DMA_MODE_ADDRESS_MASK		0x006
+#define DMA_MODE_READ_WRITE         0x100
+#define DMA_MODE_FDC_HDC_ACK        0x080
+#define DMA_MODE_ENABLED            0x040
+#define DMA_MODE_SECTOR_COUNT       0x010
+#define DMA_MODE_FDC_HDC_CS         0x008
+#define DMA_MODE_A1                 0x004
+#define DMA_MODE_A0                 0x002
+#define DMA_MODE_ADDRESS_MASK       0x006
 
-#define DMA_SECTOR_SIZE				512
+#define DMA_SECTOR_SIZE             512
 
 enum
 {
@@ -72,19 +72,19 @@ class st_state : public driver_device
 public:
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M68000_TAG),
-		  m_fdc(*this, WD1772_TAG),
-		  m_mfp(*this, MC68901_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_acia_ikbd_irq(1),
-		  m_acia_midi_irq(1),
-		  m_ikbd_mouse_x(0),
-		  m_ikbd_mouse_y(0),
-		  m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
-		  m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
-		  m_ikbd_mouse_pc(0),
-		  m_ikbd_joy(1)
+			m_maincpu(*this, M68000_TAG),
+			m_fdc(*this, WD1772_TAG),
+			m_mfp(*this, MC68901_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ram(*this, RAM_TAG),
+			m_acia_ikbd_irq(1),
+			m_acia_midi_irq(1),
+			m_ikbd_mouse_x(0),
+			m_ikbd_mouse_y(0),
+			m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
+			m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
+			m_ikbd_mouse_pc(0),
+			m_ikbd_joy(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -293,7 +293,7 @@ class ste_state : public st_state
 public:
 	ste_state(const machine_config &mconfig, device_type type, const char *tag)
 		: st_state(mconfig, type, tag),
-		  m_lmc1992(*this, LMC1992_TAG)
+			m_lmc1992(*this, LMC1992_TAG)
 	{ }
 
 	optional_device<lmc1992_device> m_lmc1992;

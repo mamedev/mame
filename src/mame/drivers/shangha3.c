@@ -110,7 +110,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);	/* RST 38h */
+		machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);  /* RST 38h */
 	}
 }
 
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_w, 0x00ff)
 	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram")	/* gfx & work ram */
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 ADDRESS_MAP_END
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(shangha3_irq_ack_w)
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITE(heberpop_sound_command_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram")	/* gfx & work ram */
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram")	/* gfx & work ram */
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( heberpop )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")	/* vblank?? has to toggle */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") /* vblank?? has to toggle */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( heberpop )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")	/* vblank?? has to toggle */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") /* vblank?? has to toggle */
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -350,7 +350,7 @@ static INPUT_PORTS_START( blocken )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")	/* vblank?? has to toggle */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") /* vblank?? has to toggle */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -358,7 +358,7 @@ static INPUT_PORTS_START( blocken )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")	/* vblank?? has to toggle */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") /* vblank?? has to toggle */
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -366,7 +366,7 @@ static INPUT_PORTS_START( blocken )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )	/* keeping this pressed on boot generates "BAD DIPSW" */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )  /* keeping this pressed on boot generates "BAD DIPSW" */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -509,9 +509,9 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_CPU_PROGRAM_MAP(heberpop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	/* 6 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000)  /* 6 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_CPU_IO_MAP(heberpop_sound_io_map)	/* NMI triggered by YM3438 */
+	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -549,9 +549,9 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_CPU_PROGRAM_MAP(blocken_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, BLOCKEN_MASTER_CLOCK/8)	/* 6 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, BLOCKEN_MASTER_CLOCK/8)   /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_CPU_IO_MAP(heberpop_sound_io_map)	/* NMI triggered by YM3438 */
+	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -597,7 +597,7 @@ ROM_START( shangha3 )
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "s3j_ic43.chr", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* samples for M6295 */
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "s3j_ic75.v10", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) )
 ROM_END
 
@@ -618,7 +618,7 @@ ROM_START( heberpop )
 	ROM_LOAD( "hbpic103.bin", 0x280000, 0x80000, CRC(efa0e745) SHA1(fc1d52d35b3c902d8b25403b0e13f86a04039bc4) )
 	ROM_LOAD( "hbpic104.bin", 0x300000, 0x80000, CRC(bb896bbb) SHA1(4311876628beb82cbacdab4d055c3738e74241b0) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* samples for M6295 */
+	ROM_REGION( 0x80000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "hbpic53.bin",  0x0000, 0x80000, CRC(a4483aa0) SHA1(be301d8ac6d69f5c3fdbcb85bd557090e46da1ff) )
 ROM_END
 
@@ -637,7 +637,7 @@ ROM_START( blocken )
 	ROM_LOAD( "ic100j.bin",   0x200000, 0x80000, CRC(a34786fd) SHA1(7d4879cbaa055c2ddbe6d20dd946bf0e3e069d4d) )
 	/* 280000-37ffff empty */
 
-	ROM_REGION( 0x80000, "samples", 0 )	/* samples for M6295 */
+	ROM_REGION( 0x80000, "samples", 0 ) /* samples for M6295 */
 	ROM_LOAD( "ic53.bin",     0x0000, 0x80000, CRC(86108c56) SHA1(aa405fa2eec5cc178ef6226f229a12dac09504f0) )
 
 	ROM_REGION( 0x100000, "oki", 0 )

@@ -90,7 +90,7 @@ extern void mtlog_add(const char *event);
 //  CONSTANTS
 //============================================================
 
-#define ENABLE_BORDER_PIX	(1)
+#define ENABLE_BORDER_PIX   (1)
 
 enum
 {
@@ -113,7 +113,7 @@ enum
 //  GLOBALS
 //============================================================
 
-static d3d_base *				d3dintf; // FIX ME
+static d3d_base *               d3dintf; // FIX ME
 
 static const line_aa_step line_aa_1step[] =
 {
@@ -165,26 +165,26 @@ INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 {
 	/* original equations:
 
-        C = Y - 16
-        D = Cb - 128
-        E = Cr - 128
+	    C = Y - 16
+	    D = Cb - 128
+	    E = Cr - 128
 
-        R = clip(( 298 * C           + 409 * E + 128) >> 8)
-        G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
-        B = clip(( 298 * C + 516 * D           + 128) >> 8)
+	    R = clip(( 298 * C           + 409 * E + 128) >> 8)
+	    G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
+	    B = clip(( 298 * C + 516 * D           + 128) >> 8)
 
-        R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
-        G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
-        B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
+	    R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
+	    G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
+	    B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
 
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
 
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
-    */
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+	*/
 	int r, g, b, common;
 
 	common = 298 * y - 298 * 16;
@@ -286,10 +286,10 @@ INLINE void set_blendmode(d3d_info *d3d, int blendmode)
 	switch (blendmode)
 	{
 		default:
-		case BLENDMODE_NONE:			blendenable = FALSE;	blendop = D3DBLENDOP_ADD;	blendsrc = D3DBLEND_SRCALPHA;	blenddst = D3DBLEND_INVSRCALPHA;	break;
-		case BLENDMODE_ALPHA:			blendenable = TRUE;		blendop = D3DBLENDOP_ADD;	blendsrc = D3DBLEND_SRCALPHA;	blenddst = D3DBLEND_INVSRCALPHA;	break;
-		case BLENDMODE_RGB_MULTIPLY:	blendenable = TRUE;		blendop = D3DBLENDOP_ADD;	blendsrc = D3DBLEND_DESTCOLOR;	blenddst = D3DBLEND_ZERO;			break;
-		case BLENDMODE_ADD:				blendenable = TRUE;		blendop = D3DBLENDOP_ADD;	blendsrc = D3DBLEND_SRCALPHA;	blenddst = D3DBLEND_ONE;			break;
+		case BLENDMODE_NONE:            blendenable = FALSE;    blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_SRCALPHA;   blenddst = D3DBLEND_INVSRCALPHA;    break;
+		case BLENDMODE_ALPHA:           blendenable = TRUE;     blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_SRCALPHA;   blenddst = D3DBLEND_INVSRCALPHA;    break;
+		case BLENDMODE_RGB_MULTIPLY:    blendenable = TRUE;     blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_DESTCOLOR;  blenddst = D3DBLEND_ZERO;           break;
+		case BLENDMODE_ADD:             blendenable = TRUE;     blendop = D3DBLENDOP_ADD;   blendsrc = D3DBLEND_SRCALPHA;   blenddst = D3DBLEND_ONE;            break;
 	}
 
 	// adjust the bits that changed
@@ -721,19 +721,19 @@ try_again:
 
 	// initialize the D3D presentation parameters
 	memset(&d3d->presentation, 0, sizeof(d3d->presentation));
-	d3d->presentation.BackBufferWidth				= d3d->width;
-	d3d->presentation.BackBufferHeight				= d3d->height;
-	d3d->presentation.BackBufferFormat				= d3d->pixformat;
-	d3d->presentation.BackBufferCount				= video_config.triplebuf ? 2 : 1;
-	d3d->presentation.MultiSampleType				= D3DMULTISAMPLE_NONE;
-	d3d->presentation.SwapEffect					= D3DSWAPEFFECT_DISCARD;
-	d3d->presentation.hDeviceWindow					= window->hwnd;
-	d3d->presentation.Windowed						= !window->fullscreen || win_has_menu(window);
-	d3d->presentation.EnableAutoDepthStencil		= FALSE;
-	d3d->presentation.AutoDepthStencilFormat		= D3DFMT_D16;
-	d3d->presentation.Flags							= 0;
-	d3d->presentation.FullScreen_RefreshRateInHz	= d3d->refresh;
-	d3d->presentation.PresentationInterval			= ((video_config.triplebuf && window->fullscreen) || video_config.waitvsync || video_config.syncrefresh) ?
+	d3d->presentation.BackBufferWidth               = d3d->width;
+	d3d->presentation.BackBufferHeight              = d3d->height;
+	d3d->presentation.BackBufferFormat              = d3d->pixformat;
+	d3d->presentation.BackBufferCount               = video_config.triplebuf ? 2 : 1;
+	d3d->presentation.MultiSampleType               = D3DMULTISAMPLE_NONE;
+	d3d->presentation.SwapEffect                    = D3DSWAPEFFECT_DISCARD;
+	d3d->presentation.hDeviceWindow                 = window->hwnd;
+	d3d->presentation.Windowed                      = !window->fullscreen || win_has_menu(window);
+	d3d->presentation.EnableAutoDepthStencil        = FALSE;
+	d3d->presentation.AutoDepthStencilFormat        = D3DFMT_D16;
+	d3d->presentation.Flags                         = 0;
+	d3d->presentation.FullScreen_RefreshRateInHz    = d3d->refresh;
+	d3d->presentation.PresentationInterval          = ((video_config.triplebuf && window->fullscreen) || video_config.waitvsync || video_config.syncrefresh) ?
 														D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	// create the D3D device
@@ -789,7 +789,7 @@ try_again:
 
 	int ret = d3d->hlsl->create_resources(false);
 	if (ret != 0)
-	    return ret;
+		return ret;
 
 	return device_create_resources(d3d);
 }
@@ -2345,9 +2345,9 @@ static void texture_set_data(d3d_info *d3d, d3d_texture_info *texture, const ren
 	switch (texture->type)
 	{
 		default:
-		case TEXTURE_TYPE_PLAIN:	result = (*d3dintf->texture.lock_rect)(texture->d3dtex, 0, &rect, NULL, 0);					break;
-		case TEXTURE_TYPE_DYNAMIC:	result = (*d3dintf->texture.lock_rect)(texture->d3dtex, 0, &rect, NULL, D3DLOCK_DISCARD);	break;
-		case TEXTURE_TYPE_SURFACE:	result = (*d3dintf->surface.lock_rect)(texture->d3dsurface, &rect, NULL, D3DLOCK_DISCARD);	break;
+		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.lock_rect)(texture->d3dtex, 0, &rect, NULL, 0);                 break;
+		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.lock_rect)(texture->d3dtex, 0, &rect, NULL, D3DLOCK_DISCARD);   break;
+		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.lock_rect)(texture->d3dsurface, &rect, NULL, D3DLOCK_DISCARD);  break;
 	}
 	if (result != D3D_OK)
 		return;
@@ -2398,9 +2398,9 @@ static void texture_set_data(d3d_info *d3d, d3d_texture_info *texture, const ren
 	switch (texture->type)
 	{
 		default:
-		case TEXTURE_TYPE_PLAIN:	result = (*d3dintf->texture.unlock_rect)(texture->d3dtex, 0);	break;
-		case TEXTURE_TYPE_DYNAMIC:	result = (*d3dintf->texture.unlock_rect)(texture->d3dtex, 0);	break;
-		case TEXTURE_TYPE_SURFACE:	result = (*d3dintf->surface.unlock_rect)(texture->d3dsurface);	break;
+		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.unlock_rect)(texture->d3dtex, 0);   break;
+		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.unlock_rect)(texture->d3dtex, 0);   break;
+		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.unlock_rect)(texture->d3dsurface);  break;
 	}
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
 
@@ -2598,10 +2598,10 @@ static d3d_texture_info *texture_find(d3d_info *d3d, const render_primitive *pri
 
 			// Clear our old texture reference
 			if (texture->hash == texhash &&
-			    texture->texinfo.base == prim->texture.base &&
-			    ((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
-			    (texture->texinfo.width != prim->texture.width ||
-			     texture->texinfo.height != prim->texture.height))
+				texture->texinfo.base == prim->texture.base &&
+				((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
+				(texture->texinfo.width != prim->texture.width ||
+					texture->texinfo.height != prim->texture.height))
 			{
 				d3d->hlsl->remove_render_target(texture);
 				break;
@@ -2694,7 +2694,7 @@ d3d_render_target::~d3d_render_target()
 		prescaletexture = NULL;
 	}
 	if (prescaletarget != NULL)
- 	{
+	{
 		(*d3dintf->surface.release)(prescaletarget);
 		prescaletarget = NULL;
 	}

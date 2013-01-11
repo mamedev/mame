@@ -340,12 +340,12 @@ GFXDECODE_END
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),						/* Port A read */
-	DEVCB_NULL,			/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),                        /* Port A read */
+	DEVCB_NULL,         /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)

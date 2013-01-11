@@ -230,8 +230,8 @@ static const gime_interface coco_gime_config =
 	RAM_TAG,
 	CARTRIDGE_TAG,
 
-	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, ca1_w),	/* horizontal sync */
-	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, cb1_w),	/* field sync */
+	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, ca1_w),  /* horizontal sync */
+	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, cb1_w),  /* field sync */
 	DEVCB_DRIVER_LINE_MEMBER(coco3_state, gime_irq_w),
 	DEVCB_DRIVER_LINE_MEMBER(coco3_state, gime_firq_w),
 	DEVCB_DRIVER_MEMBER(coco_state, floating_bus_read)
@@ -305,15 +305,15 @@ MACHINE_CONFIG_END
 
 ROM_START(coco3)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("coco3.rom",	0x0000, 0x8000, CRC(b4c88d6c) SHA1(e0d82953fb6fd03768604933df1ce8bc51fc427d))
+	ROM_LOAD("coco3.rom",   0x0000, 0x8000, CRC(b4c88d6c) SHA1(e0d82953fb6fd03768604933df1ce8bc51fc427d))
 ROM_END
 
 ROM_START(coco3p)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("coco3p.rom",	0x0000, 0x8000, CRC(ff050d80) SHA1(631e383068b1f52a8f419f4114b69501b21cf379))
+	ROM_LOAD("coco3p.rom",  0x0000, 0x8000, CRC(ff050d80) SHA1(631e383068b1f52a8f419f4114b69501b21cf379))
 ROM_END
 
-#define rom_coco3h	rom_coco3
+#define rom_coco3h  rom_coco3
 
 
 
@@ -321,6 +321,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, driver_device,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC)", 0)
-COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, driver_device,     0,      "Tandy Radio Shack",	         "Color Computer 3 (PAL)", 0)
-COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, driver_device,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC; HD6309)", GAME_UNOFFICIAL)
+COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC)", 0)
+COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (PAL)", 0)
+COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC; HD6309)", GAME_UNOFFICIAL)

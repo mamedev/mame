@@ -68,28 +68,28 @@ Address  Function Register  R/W  When Reset          Remarks
 /* CPU Structure */
 struct spc700i_cpu
 {
-	uint a;		/* Accumulator */
-	uint x;		/* Index Register X */
-	uint y;		/* Index Register Y */
-	uint s;		/* Stack Pointer */
-	uint pc;	/* Program Counter */
-	uint ppc;	/* Previous Program Counter */
-	uint flag_n;	/* Negative Flag */
-	uint flag_z;	/* Zero flag */
-	uint flag_v;	/* Overflow Flag */
-	uint flag_p;	/* Direct Page Flag */
-	uint flag_b;	/* BRK Instruction Flag */
-	uint flag_h;	/* Half-carry Flag */
-	uint flag_i;	/* Interrupt Mask Flag */
-	uint flag_c;	/* Carry Flag */
-	uint line_irq;	/* Status of the IRQ line */
-	uint line_nmi;	/* Status of the NMI line */
-	uint line_rst;	/* Status of the RESET line */
-	uint ir;		/* Instruction Register */
+	uint a;     /* Accumulator */
+	uint x;     /* Index Register X */
+	uint y;     /* Index Register Y */
+	uint s;     /* Stack Pointer */
+	uint pc;    /* Program Counter */
+	uint ppc;   /* Previous Program Counter */
+	uint flag_n;    /* Negative Flag */
+	uint flag_z;    /* Zero flag */
+	uint flag_v;    /* Overflow Flag */
+	uint flag_p;    /* Direct Page Flag */
+	uint flag_b;    /* BRK Instruction Flag */
+	uint flag_h;    /* Half-carry Flag */
+	uint flag_i;    /* Interrupt Mask Flag */
+	uint flag_c;    /* Carry Flag */
+	uint line_irq;  /* Status of the IRQ line */
+	uint line_nmi;  /* Status of the NMI line */
+	uint line_rst;  /* Status of the RESET line */
+	uint ir;        /* Instruction Register */
 	device_irq_acknowledge_callback int_ack;
 	legacy_cpu_device *device;
 	address_space *program;
-	uint stopped;	/* stopped status */
+	uint stopped;   /* stopped status */
 	int ICount;
 	uint source;
 	uint destination;
@@ -135,85 +135,85 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ======================================================================== */
 
 /* Bits */
-#define BIT_0		0x01
-#define BIT_1		0x02
-#define BIT_2		0x04
-#define BIT_3		0x08
-#define BIT_4		0x10
-#define BIT_5		0x20
-#define BIT_6		0x40
-#define BIT_7		0x80
-#define BIT_8		0x100
+#define BIT_0       0x01
+#define BIT_1       0x02
+#define BIT_2       0x04
+#define BIT_3       0x08
+#define BIT_4       0x10
+#define BIT_5       0x20
+#define BIT_6       0x40
+#define BIT_7       0x80
+#define BIT_8       0x100
 
 /* Flag positions in Processor Status Register */
-#define FLAGPOS_N		BIT_7		/* Negative             */
-#define FLAGPOS_V		BIT_6		/* Overflow             */
-#define FLAGPOS_P		BIT_5		/* Direct Page Selector */
-#define FLAGPOS_B		BIT_4		/* Break                */
-#define FLAGPOS_H		BIT_3		/* Half-carry           */
-#define FLAGPOS_I		BIT_2		/* Interrupt            */
-#define FLAGPOS_Z		BIT_1		/* Zero                 */
-#define FLAGPOS_C		BIT_0		/* Carry                */
+#define FLAGPOS_N       BIT_7       /* Negative             */
+#define FLAGPOS_V       BIT_6       /* Overflow             */
+#define FLAGPOS_P       BIT_5       /* Direct Page Selector */
+#define FLAGPOS_B       BIT_4       /* Break                */
+#define FLAGPOS_H       BIT_3       /* Half-carry           */
+#define FLAGPOS_I       BIT_2       /* Interrupt            */
+#define FLAGPOS_Z       BIT_1       /* Zero                 */
+#define FLAGPOS_C       BIT_0       /* Carry                */
 
-#define NFLAG_SET		FLAGPOS_N
-#define VFLAG_SET		BIT_7
-#define PFLAG_SET		BIT_8
-#define BFLAG_SET		FLAGPOS_B
-#define HFLAG_SET		BIT_3
-#define IFLAG_SET		FLAGPOS_I
-#define ZFLAG_SET		0
-#define CFLAG_SET		BIT_8
-#define NZFLAG_CLEAR	1
-#define VFLAG_CLEAR		0
-#define PFLAG_CLEAR		0
-#define BFLAG_CLEAR		0
-#define HFLAG_CLEAR		0
-#define IFLAG_CLEAR		0
-#define CFLAG_CLEAR 	0
+#define NFLAG_SET       FLAGPOS_N
+#define VFLAG_SET       BIT_7
+#define PFLAG_SET       BIT_8
+#define BFLAG_SET       FLAGPOS_B
+#define HFLAG_SET       BIT_3
+#define IFLAG_SET       FLAGPOS_I
+#define ZFLAG_SET       0
+#define CFLAG_SET       BIT_8
+#define NZFLAG_CLEAR    1
+#define VFLAG_CLEAR     0
+#define PFLAG_CLEAR     0
+#define BFLAG_CLEAR     0
+#define HFLAG_CLEAR     0
+#define IFLAG_CLEAR     0
+#define CFLAG_CLEAR     0
 
-#define NMI_SET		1
-#define NMI_CLEAR	0
-#define IRQ_SET		IFLAG_CLEAR
-#define IRQ_CLEAR	IFLAG_SET
+#define NMI_SET     1
+#define NMI_CLEAR   0
+#define IRQ_SET     IFLAG_CLEAR
+#define IRQ_CLEAR   IFLAG_SET
 
-#define STACK_PAGE	0x100				/* Stack Page Offset */
+#define STACK_PAGE  0x100               /* Stack Page Offset */
 
-#define VECTOR_RST	0xfffe				/* Reset */
-#define VECTOR_BRK	0xffde				/* Break Instruction */
-#define VECTOR_IRQ	0xfffc				/* IRQ ??? what is real vector? */
-#define VECTOR_NMI	0xfffa				/* NMI ??? what is real vector? */
+#define VECTOR_RST  0xfffe              /* Reset */
+#define VECTOR_BRK  0xffde              /* Break Instruction */
+#define VECTOR_IRQ  0xfffc              /* IRQ ??? what is real vector? */
+#define VECTOR_NMI  0xfffa              /* NMI ??? what is real vector? */
 
-#define REG_A		cpustate->a		/* Accumulator */
-#define REG_X		cpustate->x		/* Index X Register */
-#define REG_Y		cpustate->y		/* Index Y Register */
-#define REG_S		cpustate->s		/* Stack Pointer */
-#define REG_PC		cpustate->pc		/* Program Counter */
-#define REG_PPC		cpustate->ppc		/* Previous Program Counter */
-#define REG_P		cpustate->p		/* Processor Status Register */
-#define FLAG_NZ		cpustate->flag_n = cpustate->flag_z	/* Negative Flag and inverted Zero flag */
-#define FLAG_N		cpustate->flag_n	/* Negative flag */
-#define FLAG_Z		cpustate->flag_z	/* Inverted Zero flag */
-#define FLAG_V		cpustate->flag_v	/* Overflow Flag */
-#define FLAG_P		cpustate->flag_p	/* Direct Page Flag */
-#define FLAG_B		cpustate->flag_b	/* BRK Instruction Flag */
-#define FLAG_H		cpustate->flag_h	/* Decimal Mode Flag */
-#define FLAG_I		cpustate->flag_i	/* Interrupt Mask Flag */
-#define FLAG_C		cpustate->flag_c	/* Carry Flag */
-#define LINE_IRQ	cpustate->line_irq	/* Status of the IRQ line */
-#define LINE_NMI	cpustate->line_nmi	/* Status of the NMI line */
-#define REG_IR		cpustate->ir		/* Instruction Register */
-#define INT_ACK		cpustate->int_ack	/* Interrupt Acknowledge function pointer */
-#define CLOCKS		cpustate->ICount    	/* Clock cycles remaining */
-#define CPU_STOPPED	cpustate->stopped	/* Stopped status */
+#define REG_A       cpustate->a     /* Accumulator */
+#define REG_X       cpustate->x     /* Index X Register */
+#define REG_Y       cpustate->y     /* Index Y Register */
+#define REG_S       cpustate->s     /* Stack Pointer */
+#define REG_PC      cpustate->pc        /* Program Counter */
+#define REG_PPC     cpustate->ppc       /* Previous Program Counter */
+#define REG_P       cpustate->p     /* Processor Status Register */
+#define FLAG_NZ     cpustate->flag_n = cpustate->flag_z /* Negative Flag and inverted Zero flag */
+#define FLAG_N      cpustate->flag_n    /* Negative flag */
+#define FLAG_Z      cpustate->flag_z    /* Inverted Zero flag */
+#define FLAG_V      cpustate->flag_v    /* Overflow Flag */
+#define FLAG_P      cpustate->flag_p    /* Direct Page Flag */
+#define FLAG_B      cpustate->flag_b    /* BRK Instruction Flag */
+#define FLAG_H      cpustate->flag_h    /* Decimal Mode Flag */
+#define FLAG_I      cpustate->flag_i    /* Interrupt Mask Flag */
+#define FLAG_C      cpustate->flag_c    /* Carry Flag */
+#define LINE_IRQ    cpustate->line_irq  /* Status of the IRQ line */
+#define LINE_NMI    cpustate->line_nmi  /* Status of the NMI line */
+#define REG_IR      cpustate->ir        /* Instruction Register */
+#define INT_ACK     cpustate->int_ack   /* Interrupt Acknowledge function pointer */
+#define CLOCKS      cpustate->ICount        /* Clock cycles remaining */
+#define CPU_STOPPED cpustate->stopped   /* Stopped status */
 
-#define SRC		cpustate->source	/* Source Operand */
-#define DST		cpustate->destination	/* Destination Operand */
-#define TMP1		cpustate->temp1	/* temporary result 1 */
-#define TMP2		cpustate->temp2	/* temporary result 2 */
-#define TMP3		cpustate->temp3	/* temporary result 3 */
+#define SRC     cpustate->source    /* Source Operand */
+#define DST     cpustate->destination   /* Destination Operand */
+#define TMP1        cpustate->temp1 /* temporary result 1 */
+#define TMP2        cpustate->temp2 /* temporary result 2 */
+#define TMP3        cpustate->temp3 /* temporary result 3 */
 
-#define STOP_LEVEL_STOP		1
-#define STOP_LEVEL_SLEEP	2
+#define STOP_LEVEL_STOP     1
+#define STOP_LEVEL_SLEEP    2
 
 
 /* ======================================================================== */
@@ -221,14 +221,14 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ======================================================================== */
 
 /* Codition code tests */
-#define COND_CC()	(!(FLAG_C&0x100))	/* Carry Clear */
-#define COND_CS()	(FLAG_C&0x100)		/* Carry Set */
-#define COND_EQ()	(!FLAG_Z)   		/* Equal */
-#define COND_NE()	(FLAG_Z)    		/* Not Equal */
-#define COND_MI()	(FLAG_N&0x80)		/* Minus */
-#define COND_PL()	(!(FLAG_N&0x80))	/* Plus */
-#define COND_VC()	(!(FLAG_V&0x80))	/* Overflow Clear */
-#define COND_VS()	(FLAG_V&0x80)		/* Overflow Set */
+#define COND_CC()   (!(FLAG_C&0x100))   /* Carry Clear */
+#define COND_CS()   (FLAG_C&0x100)      /* Carry Set */
+#define COND_EQ()   (!FLAG_Z)           /* Equal */
+#define COND_NE()   (FLAG_Z)            /* Not Equal */
+#define COND_MI()   (FLAG_N&0x80)       /* Minus */
+#define COND_PL()   (!(FLAG_N&0x80))    /* Plus */
+#define COND_VC()   (!(FLAG_V&0x80))    /* Overflow Clear */
+#define COND_VS()   (FLAG_V&0x80)       /* Overflow Set */
 
 /* Set Overflow flag in math operations */
 #define VFLAG_ADD_8(S, D, R)   ((S^R) & (D^R))
@@ -334,100 +334,100 @@ INLINE void write_16_direct(spc700i_cpu *cpustate, uint address, uint value)
 }
 
 /* Low level memory access macros */
-#define read_8_NORM(A)		read_8_normal(cpustate, A)
-#define read_8_IMM(A)		read_8_immediate(cpustate, A)
-#define read_8_ABS(A)		read_8_normal(cpustate, A)
-#define read_8_ABX(A)		read_8_normal(cpustate, A)
-#define read_8_ABY(A)		read_8_normal(cpustate, A)
-#define read_8_AXI(A)		read_8_normal(cpustate, A)
-#define read_8_DP(A)		read_8_direct(cpustate, A)
-#define read_8_DPX(A)		read_8_direct(cpustate, A)
-#define read_8_DPY(A)		read_8_direct(cpustate, A)
-#define read_8_DPI(A)		read_8_normal(cpustate, A)
-#define read_8_DXI(A)		read_8_normal(cpustate, A)
-#define read_8_DIY(A)		read_8_normal(cpustate, A)
-#define read_8_STK(A)		read_8_normal(cpustate, A)
-#define read_8_XI(A)		read_8_direct(cpustate, A)
-#define read_8_XII(A)		read_8_direct(cpustate, A)
-#define read_8_YI(A)		read_8_direct(cpustate, A)
+#define read_8_NORM(A)      read_8_normal(cpustate, A)
+#define read_8_IMM(A)       read_8_immediate(cpustate, A)
+#define read_8_ABS(A)       read_8_normal(cpustate, A)
+#define read_8_ABX(A)       read_8_normal(cpustate, A)
+#define read_8_ABY(A)       read_8_normal(cpustate, A)
+#define read_8_AXI(A)       read_8_normal(cpustate, A)
+#define read_8_DP(A)        read_8_direct(cpustate, A)
+#define read_8_DPX(A)       read_8_direct(cpustate, A)
+#define read_8_DPY(A)       read_8_direct(cpustate, A)
+#define read_8_DPI(A)       read_8_normal(cpustate, A)
+#define read_8_DXI(A)       read_8_normal(cpustate, A)
+#define read_8_DIY(A)       read_8_normal(cpustate, A)
+#define read_8_STK(A)       read_8_normal(cpustate, A)
+#define read_8_XI(A)        read_8_direct(cpustate, A)
+#define read_8_XII(A)       read_8_direct(cpustate, A)
+#define read_8_YI(A)        read_8_direct(cpustate, A)
 
 
-#define read_16_NORM(A)		read_16_normal(cpustate, A)
-#define read_16_IMM(A)		read_16_immediate(cpustate, A)
-#define read_16_ABS(A)		read_16_absolute(cpustate, A)
-#define read_16_ABX(A)		read_16_normal(cpustate, A)
-#define read_16_DP(A)		read_16_direct(cpustate, A)
-#define read_16_DPX(A)		read_16_direct(cpustate, A)
-#define read_16_DPY(A)		read_16_direct(cpustate, A)
-#define read_16_DPI(A)		read_16_normal(cpustate, A)
-#define read_16_VEC(A)		read_16_normal(cpustate, A)
-#define read_16_XI(A)		read_16_direct(cpustate, A)
-#define read_16_XII(A)		read_16_direct(cpustate, A)
-#define read_16_YI(A)		read_16_direct(cpustate, A)
+#define read_16_NORM(A)     read_16_normal(cpustate, A)
+#define read_16_IMM(A)      read_16_immediate(cpustate, A)
+#define read_16_ABS(A)      read_16_absolute(cpustate, A)
+#define read_16_ABX(A)      read_16_normal(cpustate, A)
+#define read_16_DP(A)       read_16_direct(cpustate, A)
+#define read_16_DPX(A)      read_16_direct(cpustate, A)
+#define read_16_DPY(A)      read_16_direct(cpustate, A)
+#define read_16_DPI(A)      read_16_normal(cpustate, A)
+#define read_16_VEC(A)      read_16_normal(cpustate, A)
+#define read_16_XI(A)       read_16_direct(cpustate, A)
+#define read_16_XII(A)      read_16_direct(cpustate, A)
+#define read_16_YI(A)       read_16_direct(cpustate, A)
 
-#define write_8_NORM(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_IMM(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_ABS(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_ABX(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_ABY(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_AXI(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_DP(A, V)	write_8_direct(cpustate, A, V)
-#define write_8_DPX(A, V)	write_8_direct(cpustate, A, V)
-#define write_8_DPY(A, V)	write_8_direct(cpustate, A, V)
-#define write_8_DPI(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_DXI(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_DIY(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_STK(A, V)	write_8_normal(cpustate, A, V)
-#define write_8_XI(A, V)	write_8_direct(cpustate, A, V)
-#define write_8_XII(A, V)	write_8_direct(cpustate, A, V)
-#define write_8_YI(A, V)	write_8_direct(cpustate, A, V)
+#define write_8_NORM(A, V)  write_8_normal(cpustate, A, V)
+#define write_8_IMM(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_ABS(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_ABX(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_ABY(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_AXI(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_DP(A, V)    write_8_direct(cpustate, A, V)
+#define write_8_DPX(A, V)   write_8_direct(cpustate, A, V)
+#define write_8_DPY(A, V)   write_8_direct(cpustate, A, V)
+#define write_8_DPI(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_DXI(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_DIY(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_STK(A, V)   write_8_normal(cpustate, A, V)
+#define write_8_XI(A, V)    write_8_direct(cpustate, A, V)
+#define write_8_XII(A, V)   write_8_direct(cpustate, A, V)
+#define write_8_YI(A, V)    write_8_direct(cpustate, A, V)
 
-#define write_16_NORM(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_ABS(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_ABX(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_ABY(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_AXI(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_DP(A, V)	write_16_direct(cpustate, A, V)
-#define write_16_DPX(A, V)	write_16_direct(cpustate, A, V)
-#define write_16_DPY(A, V)	write_16_direct(cpustate, A, V)
-#define write_16_DPI(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_DXI(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_DIY(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_STK(A, V)	write_16_normal(cpustate, A, V)
-#define write_16_XI(A, V)	write_16_direct(cpustate, A, V)
-#define write_16_XII(A, V)	write_16_direct(cpustate, A, V)
-#define write_16_YI(A, V)	write_16_direct(cpustate, A, V)
+#define write_16_NORM(A, V) write_16_normal(cpustate, A, V)
+#define write_16_ABS(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_ABX(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_ABY(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_AXI(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_DP(A, V)   write_16_direct(cpustate, A, V)
+#define write_16_DPX(A, V)  write_16_direct(cpustate, A, V)
+#define write_16_DPY(A, V)  write_16_direct(cpustate, A, V)
+#define write_16_DPI(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_DXI(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_DIY(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_STK(A, V)  write_16_normal(cpustate, A, V)
+#define write_16_XI(A, V)   write_16_direct(cpustate, A, V)
+#define write_16_XII(A, V)  write_16_direct(cpustate, A, V)
+#define write_16_YI(A, V)   write_16_direct(cpustate, A, V)
 
 
-#define OPER_8_IMM(cpustate)	read_8_IMM(EA_IMM(cpustate))
-#define OPER_8_ABS(cpustate)	read_8_ABS(EA_ABS(cpustate))
-#define OPER_8_ABX(cpustate)	read_8_ABX(EA_ABX(cpustate))
-#define OPER_8_ABY(cpustate)	read_8_ABY(EA_ABY(cpustate))
-#define OPER_8_AXI(cpustate)	read_8_IND(EA_IND(cpustate))
-#define OPER_8_DP(cpustate)	read_8_DP(EA_DP(cpustate))
-#define OPER_8_DPX(cpustate)	read_8_DPX(EA_DPX(cpustate))
-#define OPER_8_DPY(cpustate)	read_8_DPY(EA_DPY(cpustate))
-#define OPER_8_DPI(cpustate)	read_8_DPI(EA_DPI(cpustate))
-#define OPER_8_DXI(cpustate)	read_8_DXI(EA_DXI(cpustate))
-#define OPER_8_DIY(cpustate)	read_8_DIY(EA_DIY(cpustate))
-#define OPER_8_XI(cpustate)	read_8_XI(EA_XI(cpustate))
-#define OPER_8_XII(cpustate)	read_8_XI(EA_XII(cpustate))
-#define OPER_8_YI(cpustate)	read_8_YI(EA_YI(cpustate))
+#define OPER_8_IMM(cpustate)    read_8_IMM(EA_IMM(cpustate))
+#define OPER_8_ABS(cpustate)    read_8_ABS(EA_ABS(cpustate))
+#define OPER_8_ABX(cpustate)    read_8_ABX(EA_ABX(cpustate))
+#define OPER_8_ABY(cpustate)    read_8_ABY(EA_ABY(cpustate))
+#define OPER_8_AXI(cpustate)    read_8_IND(EA_IND(cpustate))
+#define OPER_8_DP(cpustate) read_8_DP(EA_DP(cpustate))
+#define OPER_8_DPX(cpustate)    read_8_DPX(EA_DPX(cpustate))
+#define OPER_8_DPY(cpustate)    read_8_DPY(EA_DPY(cpustate))
+#define OPER_8_DPI(cpustate)    read_8_DPI(EA_DPI(cpustate))
+#define OPER_8_DXI(cpustate)    read_8_DXI(EA_DXI(cpustate))
+#define OPER_8_DIY(cpustate)    read_8_DIY(EA_DIY(cpustate))
+#define OPER_8_XI(cpustate) read_8_XI(EA_XI(cpustate))
+#define OPER_8_XII(cpustate)    read_8_XI(EA_XII(cpustate))
+#define OPER_8_YI(cpustate) read_8_YI(EA_YI(cpustate))
 
-#define OPER_16_IMM(cpustate)	read_16_IMM(EA_IMM16(cpustate))
-#define OPER_16_ABS(cpustate)	read_16_ABS(EA_ABS(cpustate))
-#define OPER_16_ABX(cpustate)	read_16_ABX(EA_ABX(cpustate))
-#define OPER_16_ABY(cpustate)	read_16_ABY(EA_ABY(cpustate))
-#define OPER_16_AXI(cpustate)	read_16_IND(EA_IND(cpustate))
-#define OPER_16_DP(cpustate)	read_16_DP(EA_DP(cpustate))
-#define OPER_16_DPX(cpustate)	read_16_DPX(EA_DPX(cpustate))
-#define OPER_16_DPY(cpustate)	read_16_DPY(EA_DPY(cpustate))
-#define OPER_16_DPI(cpustate)	read_16_DPI(EA_DXI(cpustate))
-#define OPER_16_DXI(cpustate)	read_16_DXI(EA_DXI(cpustate))
-#define OPER_16_DIY(cpustate)	read_16_DIY(EA_DIY(cpustate))
-#define OPER_16_XI(cpustate)	read_16_XI(EA_XI(cpustate))
-#define OPER_16_XII(cpustate)	read_16_XI(EA_XII(cpustate))
-#define OPER_16_YI(cpustate)	read_16_YI(EA_YI(cpustate))
+#define OPER_16_IMM(cpustate)   read_16_IMM(EA_IMM16(cpustate))
+#define OPER_16_ABS(cpustate)   read_16_ABS(EA_ABS(cpustate))
+#define OPER_16_ABX(cpustate)   read_16_ABX(EA_ABX(cpustate))
+#define OPER_16_ABY(cpustate)   read_16_ABY(EA_ABY(cpustate))
+#define OPER_16_AXI(cpustate)   read_16_IND(EA_IND(cpustate))
+#define OPER_16_DP(cpustate)    read_16_DP(EA_DP(cpustate))
+#define OPER_16_DPX(cpustate)   read_16_DPX(EA_DPX(cpustate))
+#define OPER_16_DPY(cpustate)   read_16_DPY(EA_DPY(cpustate))
+#define OPER_16_DPI(cpustate)   read_16_DPI(EA_DXI(cpustate))
+#define OPER_16_DXI(cpustate)   read_16_DXI(EA_DXI(cpustate))
+#define OPER_16_DIY(cpustate)   read_16_DIY(EA_DIY(cpustate))
+#define OPER_16_XI(cpustate)    read_16_XI(EA_XI(cpustate))
+#define OPER_16_XII(cpustate)   read_16_XI(EA_XII(cpustate))
+#define OPER_16_YI(cpustate)    read_16_YI(EA_YI(cpustate))
 
 /* Effective Address Caluclations */
 INLINE uint EA_IMM(spc700i_cpu *cpustate)   {return REG_PC++;}
@@ -470,35 +470,35 @@ INLINE void SET_REG_YA(spc700i_cpu *cpustate, uint value)
 }
 
 /* Get the Processor Status Register */
-#define GET_REG_P()				\
-	((FLAG_N & 0x80)		|	\
-	((FLAG_V & 0x80) >> 1)	|	\
-	(FLAG_P>>3)				|	\
-	FLAG_B					|	\
-	(FLAG_H& HFLAG_SET)		|	\
-	FLAG_I					|	\
-	((!FLAG_Z) << 1)		|	\
+#define GET_REG_P()             \
+	((FLAG_N & 0x80)        |   \
+	((FLAG_V & 0x80) >> 1)  |   \
+	(FLAG_P>>3)             |   \
+	FLAG_B                  |   \
+	(FLAG_H& HFLAG_SET)     |   \
+	FLAG_I                  |   \
+	((!FLAG_Z) << 1)        |   \
 	CFLAG_AS_1())
 
 /* Get Processor Status Register with B flag set (when executing BRK instruction) */
-#define GET_REG_P_BRK()			\
-	((FLAG_N & 0x80)		|	\
-	((FLAG_V & 0x80) >> 1)	|	\
-	(FLAG_P>>3)				|	\
-	FLAGPOS_B				|	\
-	(FLAG_H & HFLAG_SET)		|	\
-	FLAG_I					|	\
-	((!FLAG_Z) << 1)		|	\
+#define GET_REG_P_BRK()         \
+	((FLAG_N & 0x80)        |   \
+	((FLAG_V & 0x80) >> 1)  |   \
+	(FLAG_P>>3)             |   \
+	FLAGPOS_B               |   \
+	(FLAG_H & HFLAG_SET)        |   \
+	FLAG_I                  |   \
+	((!FLAG_Z) << 1)        |   \
 	CFLAG_AS_1())
 
 /* Get Processor Status Register with B flag cleared (when servicing an interrupt) */
-#define GET_REG_P_INT()			\
-	((FLAG_N & 0x80)		|	\
-	((FLAG_V & 0x80) >> 1)	|	\
-	(FLAG_P>>3)				|	\
-	(FLAG_H & HFLAG_SET)		|	\
-	FLAG_I					|	\
-	((!FLAG_Z) << 1)		|	\
+#define GET_REG_P_INT()         \
+	((FLAG_N & 0x80)        |   \
+	((FLAG_V & 0x80) >> 1)  |   \
+	(FLAG_P>>3)             |   \
+	(FLAG_H & HFLAG_SET)        |   \
+	FLAG_I                  |   \
+	((!FLAG_Z) << 1)        |   \
 	CFLAG_AS_1())
 
 INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value);
@@ -561,683 +561,683 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 /* =========================== OPERATION MACROS =========================== */
 /* ======================================================================== */
 
-#define SUBOP_ADC(A, B)						\
-	cpustate->spc_int16 = (A) + (B) + CFLAG_AS_1();			\
-	TMP1 = ((A) & 0x0f) + (CFLAG_AS_1());			\
-	FLAG_C  = (cpustate->spc_int16 > 0xff) ? CFLAG_SET : 0;		\
+#define SUBOP_ADC(A, B)                     \
+	cpustate->spc_int16 = (A) + (B) + CFLAG_AS_1();         \
+	TMP1 = ((A) & 0x0f) + (CFLAG_AS_1());           \
+	FLAG_C  = (cpustate->spc_int16 > 0xff) ? CFLAG_SET : 0;     \
 	FLAG_V =  (~((A) ^ (B))) & (((A) ^ cpustate->spc_int16) & 0x80); \
-	FLAG_H = (((cpustate->spc_int16 & 0x0f) - TMP1) & 0x10) >> 1;	\
+	FLAG_H = (((cpustate->spc_int16 & 0x0f) - TMP1) & 0x10) >> 1;   \
 	FLAG_NZ = (UINT8)cpustate->spc_int16
 
 
 /* Add With Carry */
-#define OP_ADC(BCLK, MODE)					\
-			CLK(BCLK);				\
-			SRC     = OPER_8_##MODE(cpustate);		\
-			SUBOP_ADC(SRC, REG_A);			\
+#define OP_ADC(BCLK, MODE)                  \
+			CLK(BCLK);              \
+			SRC     = OPER_8_##MODE(cpustate);      \
+			SUBOP_ADC(SRC, REG_A);          \
 			REG_A = (UINT8)cpustate->spc_int16;
 
 
 /* Add With Carry to memory */
-#define OP_ADCM(BCLK, SMODE, DMODE)				\
-			CLK(BCLK);				\
-			SRC     = OPER_8_##SMODE(cpustate);		\
-			DST     = EA_##DMODE(cpustate);			\
-			SUBOP_ADC(SRC, read_8_##DMODE(DST));	\
+#define OP_ADCM(BCLK, SMODE, DMODE)             \
+			CLK(BCLK);              \
+			SRC     = OPER_8_##SMODE(cpustate);     \
+			DST     = EA_##DMODE(cpustate);         \
+			SUBOP_ADC(SRC, read_8_##DMODE(DST));    \
 			write_8_##DMODE(DST, (UINT8)cpustate->spc_int16)
 
 /* Add word */
-#define OP_ADDW(BCLK)						\
-			CLK(BCLK);				\
-			SRC = OPER_16_DP(cpustate);			\
-			DST = GET_REG_YA();			\
-			TMP1 = ((SRC) & 0xff) + ((DST) & 0xff);	\
-			TMP2 = (TMP1 > 0xff) ? 1 : 0;		\
-			TMP3 = ((SRC) >> 8) + ((DST) >> 8) + TMP2;	\
-			cpustate->spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;	\
-			FLAG_C = (TMP3 > 0xff) ? CFLAG_SET : 0;	\
+#define OP_ADDW(BCLK)                       \
+			CLK(BCLK);              \
+			SRC = OPER_16_DP(cpustate);         \
+			DST = GET_REG_YA();         \
+			TMP1 = ((SRC) & 0xff) + ((DST) & 0xff); \
+			TMP2 = (TMP1 > 0xff) ? 1 : 0;       \
+			TMP3 = ((SRC) >> 8) + ((DST) >> 8) + TMP2;  \
+			cpustate->spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;   \
+			FLAG_C = (TMP3 > 0xff) ? CFLAG_SET : 0; \
 			FLAG_H = ((unsigned) ((((DST) >> 8) & 0x0F) + \
 				(((SRC) >> 8) & 0x0F) + TMP2)) > 0x0F ? HFLAG_SET : 0; \
 			FLAG_V = (~((DST) ^ (SRC)) & ((SRC) ^ (UINT16) cpustate->spc_int16) & 0x8000) ? VFLAG_SET : 0; \
-			FLAG_Z = (cpustate->spc_int16 != 0);		\
-			FLAG_N = (cpustate->spc_int16>>8);		\
+			FLAG_Z = (cpustate->spc_int16 != 0);        \
+			FLAG_N = (cpustate->spc_int16>>8);      \
 			SET_REG_YA(cpustate, cpustate->spc_int16);
 
 /* Logical AND with accumulator */
-#define OP_AND(BCLK, MODE)													\
-			CLK(BCLK);														\
+#define OP_AND(BCLK, MODE)                                                  \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = REG_A &= OPER_8_##MODE(cpustate)
 
 /* Logical AND operand */
-#define OP_ANDM(BCLK, SMODE, DMODE)											\
-			CLK(BCLK);														\
-			FLAG_NZ = OPER_8_##SMODE(cpustate);										\
-			DST     = EA_##DMODE(cpustate);											\
-			FLAG_NZ &= read_8_##DMODE(DST);									\
+#define OP_ANDM(BCLK, SMODE, DMODE)                                         \
+			CLK(BCLK);                                                      \
+			FLAG_NZ = OPER_8_##SMODE(cpustate);                                     \
+			DST     = EA_##DMODE(cpustate);                                         \
+			FLAG_NZ &= read_8_##DMODE(DST);                                 \
 			write_8_##DMODE(DST, FLAG_NZ)
 
 /* Logical AND bit to C */
-#define OP_AND1(BCLK)														\
-			CLK(BCLK);														\
-			DST = EA_IMM16(cpustate);												\
-			if(FLAG_C & CFLAG_SET)											\
-			{																\
-				DST = read_16_IMM(DST);										\
-				SRC = 1 << (DST >> 13);										\
-				DST &= 0x1fff;												\
-				if(!(read_8_NORM(DST) & SRC))								\
-					FLAG_C = CFLAG_CLEAR;									\
+#define OP_AND1(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			DST = EA_IMM16(cpustate);                                               \
+			if(FLAG_C & CFLAG_SET)                                          \
+			{                                                               \
+				DST = read_16_IMM(DST);                                     \
+				SRC = 1 << (DST >> 13);                                     \
+				DST &= 0x1fff;                                              \
+				if(!(read_8_NORM(DST) & SRC))                               \
+					FLAG_C = CFLAG_CLEAR;                                   \
 			}
 
 /* AND negated bit to C */
-#define OP_ANDN1(BCLK)														\
-			CLK(BCLK);														\
-			DST = EA_IMM16(cpustate);												\
-			if(FLAG_C & CFLAG_SET)											\
-			{																\
-				DST = read_16_IMM(DST);										\
-				SRC = 1 << (DST >> 13);										\
-				DST &= 0x1fff;												\
-				if(read_8_NORM(DST) & SRC)									\
-					FLAG_C = CFLAG_CLEAR;									\
+#define OP_ANDN1(BCLK)                                                      \
+			CLK(BCLK);                                                      \
+			DST = EA_IMM16(cpustate);                                               \
+			if(FLAG_C & CFLAG_SET)                                          \
+			{                                                               \
+				DST = read_16_IMM(DST);                                     \
+				SRC = 1 << (DST >> 13);                                     \
+				DST &= 0x1fff;                                              \
+				if(read_8_NORM(DST) & SRC)                                  \
+					FLAG_C = CFLAG_CLEAR;                                   \
 			}
 
 /* Arithmetic Shift Left accumulator */
-#define OP_ASL(BCLK)														\
-			CLK(BCLK);														\
-			FLAG_C  = REG_A << 1;											\
+#define OP_ASL(BCLK)                                                        \
+			CLK(BCLK);                                                      \
+			FLAG_C  = REG_A << 1;                                           \
 			FLAG_NZ = REG_A = MAKE_UINT_8(FLAG_C)
 
 /* Arithmetic Shift Left operand */
-#define OP_ASLM(BCLK, MODE)													\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_C  = read_8_##MODE(DST) << 1;								\
-			FLAG_NZ = MAKE_UINT_8(FLAG_C);									\
+#define OP_ASLM(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_C  = read_8_##MODE(DST) << 1;                              \
+			FLAG_NZ = MAKE_UINT_8(FLAG_C);                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Branch if Bit Reset */
-#define OP_BBC(BCLK, BIT)													\
-			CLK(BCLK);														\
-			SRC     = OPER_8_DP(cpustate);											\
-			DST     = OPER_8_IMM(cpustate);											\
-			if(!(SRC & BIT))												\
-			{																\
-				CLK(2);														\
-				BRANCH(cpustate, DST);												\
+#define OP_BBC(BCLK, BIT)                                                   \
+			CLK(BCLK);                                                      \
+			SRC     = OPER_8_DP(cpustate);                                          \
+			DST     = OPER_8_IMM(cpustate);                                         \
+			if(!(SRC & BIT))                                                \
+			{                                                               \
+				CLK(2);                                                     \
+				BRANCH(cpustate, DST);                                              \
 			}
 
 /* Branch if Bit Set */
-#define OP_BBS(BCLK, BIT)													\
-			CLK(BCLK);														\
-			SRC     = OPER_8_DP(cpustate);											\
-			DST     = OPER_8_IMM(cpustate);											\
-			if(SRC & BIT)													\
-			{																\
-				CLK(2);														\
-				BRANCH(cpustate, DST);												\
+#define OP_BBS(BCLK, BIT)                                                   \
+			CLK(BCLK);                                                      \
+			SRC     = OPER_8_DP(cpustate);                                          \
+			DST     = OPER_8_IMM(cpustate);                                         \
+			if(SRC & BIT)                                                   \
+			{                                                               \
+				CLK(2);                                                     \
+				BRANCH(cpustate, DST);                                              \
 			}
 
 /* Branch on Condition Code */
-#define OP_BCC(BCLK, COND)													\
-			CLK(BCLK);														\
-			DST     = OPER_8_IMM(cpustate);											\
-			if(COND)														\
-			{																\
-				CLK(2);														\
-				BRANCH(cpustate, DST);												\
+#define OP_BCC(BCLK, COND)                                                  \
+			CLK(BCLK);                                                      \
+			DST     = OPER_8_IMM(cpustate);                                         \
+			if(COND)                                                        \
+			{                                                               \
+				CLK(2);                                                     \
+				BRANCH(cpustate, DST);                                              \
 			}
 
 /* Branch Unconditional */
 /* speed up busy loops */
-#define OP_BRA(BCLK)														\
-			CLK(BCLK);														\
-			BRANCH(cpustate, OPER_8_IMM(cpustate));											\
-			if(REG_PC == REG_PPC)											\
+#define OP_BRA(BCLK)                                                        \
+			CLK(BCLK);                                                      \
+			BRANCH(cpustate, OPER_8_IMM(cpustate));                                         \
+			if(REG_PC == REG_PPC)                                           \
 				CLK_ALL()
 
 /* Cause a Break interrupt */
-#define OP_BRK(BCLK)														\
-			CLK(BCLK);														\
-			PUSH_16(cpustate, REG_PC);												\
-			PUSH_8(cpustate, GET_REG_P_BRK());										\
-			FLAG_B |= FLAGPOS_B;												\
-			FLAG_I = IFLAG_CLEAR;												\
+#define OP_BRK(BCLK)                                                        \
+			CLK(BCLK);                                                      \
+			PUSH_16(cpustate, REG_PC);                                              \
+			PUSH_8(cpustate, GET_REG_P_BRK());                                      \
+			FLAG_B |= FLAGPOS_B;                                                \
+			FLAG_I = IFLAG_CLEAR;                                               \
 			JUMP(cpustate, read_16_VEC(VECTOR_BRK))
 
 /* Call subroutine */
-#define OP_CALL(BCLK)														\
-			CLK(BCLK);														\
-			DST     = EA_ABS(cpustate);												\
-			PUSH_16(cpustate, REG_PC);												\
+#define OP_CALL(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			DST     = EA_ABS(cpustate);                                             \
+			PUSH_16(cpustate, REG_PC);                                              \
 			JUMP(cpustate, DST)
 
 /* Compare accumulator and branch if not equal */
-#define OP_CBNE(BCLK, MODE)													\
-			CLK(BCLK);														\
-			SRC     = OPER_8_##MODE(cpustate);										\
-			DST     = EA_IMM(cpustate);												\
-			if(SRC != REG_A)												\
-			{																\
-				CLK(2);														\
-				BRANCH(cpustate, read_8_IMM(DST));									\
+#define OP_CBNE(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			SRC     = OPER_8_##MODE(cpustate);                                      \
+			DST     = EA_IMM(cpustate);                                             \
+			if(SRC != REG_A)                                                \
+			{                                                               \
+				CLK(2);                                                     \
+				BRANCH(cpustate, read_8_IMM(DST));                                  \
 			}
 
 /* Clear Carry flag */
-#define OP_CLRC(BCLK)														\
-			CLK(BCLK);														\
+#define OP_CLRC(BCLK)                                                       \
+			CLK(BCLK);                                                      \
 			FLAG_C  = CFLAG_CLEAR
 
 /* Clear Memory Bit */
-#define OP_CLR(BCLK, BIT)													\
-			CLK(BCLK);														\
-			DST     = EA_DP(cpustate);												\
-			SRC     = read_8_DP(DST) & ~BIT;								\
+#define OP_CLR(BCLK, BIT)                                                   \
+			CLK(BCLK);                                                      \
+			DST     = EA_DP(cpustate);                                              \
+			SRC     = read_8_DP(DST) & ~BIT;                                \
 			write_8_DP(DST, SRC)
 
 /* Clear Overflow flag (also clears half-carry) */
-#define OP_CLRV(BCLK)														\
-			CLK(BCLK);		\
-			FLAG_V = VFLAG_CLEAR;	\
+#define OP_CLRV(BCLK)                                                       \
+			CLK(BCLK);      \
+			FLAG_V = VFLAG_CLEAR;   \
 			FLAG_H = 0;
 
 /* Clear the Page flag */
-#define OP_CLRP(BCLK)														\
-			CLK(BCLK);														\
+#define OP_CLRP(BCLK)                                                       \
+			CLK(BCLK);                                                      \
 			FLAG_P  = PFLAG_CLEAR
 
 /* Compare operand to register */
-#define OP_CMPR(BCLK, REG, MODE)											\
-			CLK(BCLK);				\
-			SRC     = OPER_8_##MODE(cpustate);		\
-			cpustate->spc_int16 = (short)REG - (short)SRC;	\
-			FLAG_C  = (cpustate->spc_int16 >= 0) ? CFLAG_SET : 0;	\
+#define OP_CMPR(BCLK, REG, MODE)                                            \
+			CLK(BCLK);              \
+			SRC     = OPER_8_##MODE(cpustate);      \
+			cpustate->spc_int16 = (short)REG - (short)SRC;  \
+			FLAG_C  = (cpustate->spc_int16 >= 0) ? CFLAG_SET : 0;   \
 			FLAG_NZ = MAKE_UINT_8(cpustate->spc_int16);
 
 /* Compare memory */
-#define OP_CMPM(BCLK, SMODE, DMODE)											\
-			CLK(BCLK);				\
-			SRC     = OPER_8_##SMODE(cpustate);		\
-			cpustate->spc_int16 = (short)OPER_8_##DMODE(cpustate) - (short)SRC;	\
-			FLAG_C  = (cpustate->spc_int16 >= 0) ? CFLAG_SET : 0;	 \
+#define OP_CMPM(BCLK, SMODE, DMODE)                                         \
+			CLK(BCLK);              \
+			SRC     = OPER_8_##SMODE(cpustate);     \
+			cpustate->spc_int16 = (short)OPER_8_##DMODE(cpustate) - (short)SRC; \
+			FLAG_C  = (cpustate->spc_int16 >= 0) ? CFLAG_SET : 0;    \
 			FLAG_NZ = MAKE_UINT_8(cpustate->spc_int16);
 
 /* Compare word */
-#define OP_CMPW(BCLK, MODE)													\
-			CLK(BCLK);														\
-			SRC     = OPER_16_##MODE(cpustate);										\
-			cpustate->spc_int32 = (int)GET_REG_YA() - (int)SRC;								\
-			FLAG_C  = (cpustate->spc_int32 >= 0) ? CFLAG_SET : 0;									\
+#define OP_CMPW(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			SRC     = OPER_16_##MODE(cpustate);                                     \
+			cpustate->spc_int32 = (int)GET_REG_YA() - (int)SRC;                             \
+			FLAG_C  = (cpustate->spc_int32 >= 0) ? CFLAG_SET : 0;                                   \
 			FLAG_NZ = NZFLAG_16(cpustate->spc_int32);
 
 /* Decimal adjust for addition */
-#define OP_DAA(BCLK)					\
-			CLK(BCLK);  			\
-			SRC = REG_A;			\
-			if (((SRC & 0x0f) > 9) || (FLAG_H & HFLAG_SET))	\
-			{				\
-				REG_A += 6;		\
-				if (REG_A < 6)		\
-				{			\
-					FLAG_C = CFLAG_SET;	\
-				}			\
-			}				\
-			if ((SRC > 0x99) || (FLAG_C & CFLAG_SET))	\
-			{				\
-				REG_A += 0x60;		\
-				FLAG_C = CFLAG_SET;	\
-			}				\
+#define OP_DAA(BCLK)                    \
+			CLK(BCLK);              \
+			SRC = REG_A;            \
+			if (((SRC & 0x0f) > 9) || (FLAG_H & HFLAG_SET)) \
+			{               \
+				REG_A += 6;     \
+				if (REG_A < 6)      \
+				{           \
+					FLAG_C = CFLAG_SET; \
+				}           \
+			}               \
+			if ((SRC > 0x99) || (FLAG_C & CFLAG_SET))   \
+			{               \
+				REG_A += 0x60;      \
+				FLAG_C = CFLAG_SET; \
+			}               \
 			FLAG_NZ = REG_A = MAKE_UINT_8(REG_A);
 
 /* Decimal adjust for subtraction */
-#define OP_DAS(BCLK)														\
-			CLK(BCLK);			\
-			SRC = REG_A;			\
-			if (!(FLAG_H & HFLAG_SET) || ((SRC & 0xf) > 9))	\
-			{				\
-				REG_A -= 6;		\
-			}				\
-			if (!(FLAG_C & CFLAG_SET) || (SRC > 0x99))	\
-			{				\
-				REG_A -= 0x60;		\
-				FLAG_C = 0;		\
-			}				\
+#define OP_DAS(BCLK)                                                        \
+			CLK(BCLK);          \
+			SRC = REG_A;            \
+			if (!(FLAG_H & HFLAG_SET) || ((SRC & 0xf) > 9)) \
+			{               \
+				REG_A -= 6;     \
+			}               \
+			if (!(FLAG_C & CFLAG_SET) || (SRC > 0x99))  \
+			{               \
+				REG_A -= 0x60;      \
+				FLAG_C = 0;     \
+			}               \
 			FLAG_NZ = REG_A = MAKE_UINT_8(REG_A)
 
 /* Decrement register and branch if not zero */
 /* speed up busy loops */
-#define OP_DBNZR(BCLK)														\
-			CLK(BCLK);														\
-			REG_Y  = MAKE_UINT_8(REG_Y - 1);								\
-			DST    = EA_IMM(cpustate);												\
-			if(REG_Y != 0)													\
-			{																\
-				CLK(2);														\
-				BRANCH(cpustate, read_8_IMM(DST));									\
+#define OP_DBNZR(BCLK)                                                      \
+			CLK(BCLK);                                                      \
+			REG_Y  = MAKE_UINT_8(REG_Y - 1);                                \
+			DST    = EA_IMM(cpustate);                                              \
+			if(REG_Y != 0)                                                  \
+			{                                                               \
+				CLK(2);                                                     \
+				BRANCH(cpustate, read_8_IMM(DST));                                  \
 			}
 
 /* Decrement operand and branch if not zero */
 /* Speed up busy loops but do reads/writes for compatibility */
-#define OP_DBNZM(BCLK)														\
-			CLK(BCLK);														\
-			DST     = EA_DP(cpustate);												\
-			SRC     = MAKE_UINT_8(read_8_DP(DST) - 1);						\
-			write_8_DP(DST, SRC);											\
-			DST = EA_IMM(cpustate);													\
-			if(SRC != 0)													\
-			{																\
-				CLK(2);														\
-				BRANCH(cpustate, read_8_IMM(DST));									\
+#define OP_DBNZM(BCLK)                                                      \
+			CLK(BCLK);                                                      \
+			DST     = EA_DP(cpustate);                                              \
+			SRC     = MAKE_UINT_8(read_8_DP(DST) - 1);                      \
+			write_8_DP(DST, SRC);                                           \
+			DST = EA_IMM(cpustate);                                                 \
+			if(SRC != 0)                                                    \
+			{                                                               \
+				CLK(2);                                                     \
+				BRANCH(cpustate, read_8_IMM(DST));                                  \
 			}
 
 /* Decrement register */
-#define OP_DECR(BCLK, REG)													\
-			CLK(BCLK);														\
+#define OP_DECR(BCLK, REG)                                                  \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = REG = MAKE_UINT_8(REG - 1)
 
 /* Decrement operand */
-#define OP_DECM(BCLK, MODE)													\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_NZ = MAKE_UINT_8(read_8_##MODE(DST) - 1);					\
+#define OP_DECM(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_NZ = MAKE_UINT_8(read_8_##MODE(DST) - 1);                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Decrement word */
-#define OP_DECW(BCLK)														\
-			CLK(BCLK);														\
-			DST     = EA_DP(cpustate);												\
-			FLAG_NZ = MAKE_UINT_16(read_16_DP(DST) - 1);					\
-			write_16_DP(DST, FLAG_Z);										\
+#define OP_DECW(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			DST     = EA_DP(cpustate);                                              \
+			FLAG_NZ = MAKE_UINT_16(read_16_DP(DST) - 1);                    \
+			write_16_DP(DST, FLAG_Z);                                       \
 			FLAG_NZ = NZFLAG_16(FLAG_Z)
 
 /* Disable interrupts */
-#define OP_DI(BCLK)															\
-			CLK(BCLK);														\
+#define OP_DI(BCLK)                                                         \
+			CLK(BCLK);                                                      \
 			FLAG_I  = IFLAG_CLEAR
 
 /* Divide - should be almost exactly how the hardware works */
-#define OP_DIV(BCLK)														\
-			CLK(BCLK);		\
-			TMP1 = SRC = GET_REG_YA();	\
-			TMP2 = (REG_X << 9);	\
-			FLAG_H = 0;	\
-			if ((REG_Y & 0xf) >= (REG_X & 0xf)) FLAG_H = HFLAG_SET;	\
-			for (TMP3 = 0; TMP3 < 9; TMP3++)	\
-			{			\
-				TMP1 <<= 1;	\
-				if (TMP1 & 0x20000) TMP1 = (TMP1 & 0x1ffff) | 1;	\
-				if (TMP1 >= TMP2) TMP1 ^= 1;	\
-				if (TMP1 & 1) TMP1 = ((TMP1 - TMP2) & 0x1ffff);	\
-			}			\
-			FLAG_V = (TMP1 & 0x100) ? VFLAG_SET : 0;	\
-			SET_REG_YA(cpustate, (((TMP1 >> 9) & 0xff) << 8) + (TMP1 & 0xff));	\
+#define OP_DIV(BCLK)                                                        \
+			CLK(BCLK);      \
+			TMP1 = SRC = GET_REG_YA();  \
+			TMP2 = (REG_X << 9);    \
+			FLAG_H = 0; \
+			if ((REG_Y & 0xf) >= (REG_X & 0xf)) FLAG_H = HFLAG_SET; \
+			for (TMP3 = 0; TMP3 < 9; TMP3++)    \
+			{           \
+				TMP1 <<= 1; \
+				if (TMP1 & 0x20000) TMP1 = (TMP1 & 0x1ffff) | 1;    \
+				if (TMP1 >= TMP2) TMP1 ^= 1;    \
+				if (TMP1 & 1) TMP1 = ((TMP1 - TMP2) & 0x1ffff); \
+			}           \
+			FLAG_V = (TMP1 & 0x100) ? VFLAG_SET : 0;    \
+			SET_REG_YA(cpustate, (((TMP1 >> 9) & 0xff) << 8) + (TMP1 & 0xff));  \
 			FLAG_NZ = MAKE_UINT_8(GET_REG_YA());
 
 /* Enable interrupts */
-#define OP_EI(BCLK)															\
-			CLK(BCLK);														\
+#define OP_EI(BCLK)                                                         \
+			CLK(BCLK);                                                      \
 			FLAG_I  = IFLAG_SET
 
 /* Exclusive Or operand to accumulator */
-#define OP_EOR(BCLK, MODE)													\
-			CLK(BCLK);														\
+#define OP_EOR(BCLK, MODE)                                                  \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = REG_A ^= OPER_8_##MODE(cpustate)
 
 /* Logical EOR operand */
-#define OP_EORM(BCLK, SMODE, DMODE)											\
-			CLK(BCLK);														\
-			FLAG_NZ = OPER_8_##SMODE(cpustate);										\
-			DST     = EA_##DMODE(cpustate);											\
-			FLAG_NZ ^= read_8_##DMODE(DST);									\
+#define OP_EORM(BCLK, SMODE, DMODE)                                         \
+			CLK(BCLK);                                                      \
+			FLAG_NZ = OPER_8_##SMODE(cpustate);                                     \
+			DST     = EA_##DMODE(cpustate);                                         \
+			FLAG_NZ ^= read_8_##DMODE(DST);                                 \
 			write_8_##DMODE(DST, FLAG_NZ)
 
 /* Exclusive OR bit to C */
-#define OP_EOR1(BCLK)														\
-			CLK(BCLK);														\
-			DST     = OPER_16_IMM(cpustate);										\
-			SRC     = 1 << (DST >> 13);										\
-			DST     &= 0x1fff;												\
-			if(read_8_NORM(DST) & SRC)										\
+#define OP_EOR1(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			DST     = OPER_16_IMM(cpustate);                                        \
+			SRC     = 1 << (DST >> 13);                                     \
+			DST     &= 0x1fff;                                              \
+			if(read_8_NORM(DST) & SRC)                                      \
 				FLAG_C = ~FLAG_C
 
 /* Increment register */
-#define OP_INCR(BCLK, REG)													\
-			CLK(BCLK);														\
+#define OP_INCR(BCLK, REG)                                                  \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = REG = MAKE_UINT_8(REG + 1)
 
 /* Increment operand */
-#define OP_INCM(BCLK, MODE)													\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_NZ = MAKE_UINT_8(read_8_##MODE(DST) + 1);					\
+#define OP_INCM(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_NZ = MAKE_UINT_8(read_8_##MODE(DST) + 1);                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Increment word */
-#define OP_INCW(BCLK)														\
-			CLK(BCLK);														\
-			DST     = EA_DP(cpustate);												\
-			FLAG_NZ = MAKE_UINT_16(read_16_DP(DST) + 1);					\
-			write_16_DP(DST, FLAG_Z);										\
+#define OP_INCW(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			DST     = EA_DP(cpustate);                                              \
+			FLAG_NZ = MAKE_UINT_16(read_16_DP(DST) + 1);                    \
+			write_16_DP(DST, FLAG_Z);                                       \
 			FLAG_NZ = NZFLAG_16(FLAG_Z)
 
 /* Jump */
 /* If we're in a busy loop, eat all clock cycles */
-#define OP_JMP(BCLK, MODE)													\
-			CLK(BCLK);														\
-			JUMP(cpustate, EA_##MODE(cpustate));												\
-			if(REG_PC == REG_PPC)											\
+#define OP_JMP(BCLK, MODE)                                                  \
+			CLK(BCLK);                                                      \
+			JUMP(cpustate, EA_##MODE(cpustate));                                                \
+			if(REG_PC == REG_PPC)                                           \
 				CLK_ALL()
 
 /* Jump to Subroutine */
-#define OP_JSR(BCLK, MODE)													\
-			CLK(BCLK);														\
-			PUSH_16(cpustate, REG_PC);												\
+#define OP_JSR(BCLK, MODE)                                                  \
+			CLK(BCLK);                                                      \
+			PUSH_16(cpustate, REG_PC);                                              \
 			JUMP(cpustate, EA_##MODE(cpustate))
 
 /* Logical Shift Right accumulator */
-#define OP_LSR(BCLK)														\
-			CLK(BCLK);														\
-			FLAG_C = REG_A << 8;											\
+#define OP_LSR(BCLK)                                                        \
+			CLK(BCLK);                                                      \
+			FLAG_C = REG_A << 8;                                            \
 			FLAG_NZ = REG_A >>= 1
 
 /* Logical Shift Right operand */
-#define OP_LSRM(BCLK, MODE)													\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_NZ = read_8_##MODE(DST);									\
-			FLAG_C  = FLAG_NZ << 8;											\
-			FLAG_NZ >>= 1;													\
+#define OP_LSRM(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_NZ = read_8_##MODE(DST);                                   \
+			FLAG_C  = FLAG_NZ << 8;                                         \
+			FLAG_NZ >>= 1;                                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Move from register to register */
-#define OP_MOVRR(BCLK, SREG, DREG)											\
-			CLK(BCLK);														\
+#define OP_MOVRR(BCLK, SREG, DREG)                                          \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = DREG = SREG
 
 /* Move from register to memory */
-#define OP_MOVRM(BCLK, SREG, DMODE)											\
-			CLK(BCLK);														\
+#define OP_MOVRM(BCLK, SREG, DMODE)                                         \
+			CLK(BCLK);                                                      \
 			write_8_##DMODE(EA_##DMODE(cpustate), SREG)
 
 /* Move from memory to register */
-#define OP_MOVMR(BCLK, SMODE, DREG)											\
-			CLK(BCLK);														\
+#define OP_MOVMR(BCLK, SMODE, DREG)                                         \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = DREG = OPER_8_##SMODE(cpustate)
 
 /* Move from memory to memory */
-#define OP_MOVMM(BCLK, SMODE, DMODE)										\
-			CLK(BCLK);														\
-			SRC     = OPER_8_##SMODE(cpustate);										\
-			DST     = EA_##DMODE(cpustate);											\
+#define OP_MOVMM(BCLK, SMODE, DMODE)                                        \
+			CLK(BCLK);                                                      \
+			SRC     = OPER_8_##SMODE(cpustate);                                     \
+			DST     = EA_##DMODE(cpustate);                                         \
 			write_8_##DMODE(DST, SRC)
 
 /* Move word register to memory */
-#define OP_MOVWRM(BCLK)														\
-			CLK(BCLK);														\
+#define OP_MOVWRM(BCLK)                                                     \
+			CLK(BCLK);                                                      \
 			write_16_DP(EA_DP(cpustate), GET_REG_YA())
 
 /* Move word memory to register */
-#define OP_MOVWMR(BCLK)														\
-			CLK(BCLK);														\
-			FLAG_NZ = OPER_16_DP(cpustate);											\
-			SET_REG_YA(cpustate, FLAG_Z);											\
+#define OP_MOVWMR(BCLK)                                                     \
+			CLK(BCLK);                                                      \
+			FLAG_NZ = OPER_16_DP(cpustate);                                         \
+			SET_REG_YA(cpustate, FLAG_Z);                                           \
 			FLAG_NZ = NZFLAG_16(FLAG_Z)
 
 /* Move from Stack pointer to X */
-#define OP_MOVSX(BCLK)														\
-			CLK(BCLK);														\
+#define OP_MOVSX(BCLK)                                                      \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = REG_X = REG_S
 
 /* Move from X to Stack pointer */
-#define OP_MOVXS(BCLK)														\
-			CLK(BCLK);														\
+#define OP_MOVXS(BCLK)                                                      \
+			CLK(BCLK);                                                      \
 			REG_S  = REG_X
 
 /* Move bit from memory to C */
-#define OP_MOV1C(BCLK)														\
-			CLK(BCLK);														\
-			DST     = OPER_16_IMM(cpustate);										\
-			SRC     = 1 << (DST >> 13);										\
-			DST     &= 0x1fff;												\
+#define OP_MOV1C(BCLK)                                                      \
+			CLK(BCLK);                                                      \
+			DST     = OPER_16_IMM(cpustate);                                        \
+			SRC     = 1 << (DST >> 13);                                     \
+			DST     &= 0x1fff;                                              \
 			FLAG_C  = ((read_8_NORM(DST) & SRC) != 0) << 8
 
 /* Move bit from C to memory */
-#define OP_MOV1M(BCLK)														\
-			CLK(BCLK);														\
-			DST     = OPER_16_IMM(cpustate);										\
-			SRC     = 1 << (DST >> 13);										\
-			DST     &= 0x1fff;												\
-			if(FLAG_C & CFLAG_SET)											\
-				write_8_NORM(DST, read_8_NORM(DST) | SRC);					\
-			else															\
+#define OP_MOV1M(BCLK)                                                      \
+			CLK(BCLK);                                                      \
+			DST     = OPER_16_IMM(cpustate);                                        \
+			SRC     = 1 << (DST >> 13);                                     \
+			DST     &= 0x1fff;                                              \
+			if(FLAG_C & CFLAG_SET)                                          \
+				write_8_NORM(DST, read_8_NORM(DST) | SRC);                  \
+			else                                                            \
 				write_8_NORM(DST, read_8_NORM(DST) & ~SRC)
 
 
 /* Multiply A and Y and store result in YA */
-#define OP_MUL(BCLK)														\
-			CLK(BCLK);			\
-			SRC = REG_Y * REG_A;		\
-			REG_A = MAKE_UINT_8(SRC);	\
+#define OP_MUL(BCLK)                                                        \
+			CLK(BCLK);          \
+			SRC = REG_Y * REG_A;        \
+			REG_A = MAKE_UINT_8(SRC);   \
 			FLAG_NZ = REG_Y = SRC >> 8;
 
 /* No Operation */
-#define OP_NOP(BCLK)														\
+#define OP_NOP(BCLK)                                                        \
 			CLK(BCLK)
 
 /* Invert the C flag */
-#define OP_NOTC(BCLK)														\
-			CLK(BCLK);														\
+#define OP_NOTC(BCLK)                                                       \
+			CLK(BCLK);                                                      \
 			FLAG_C  = ~FLAG_C
 
 /* NOT bit */
-#define OP_NOT1(BCLK)														\
-			CLK(BCLK);														\
-			DST     = OPER_16_IMM(cpustate);										\
-			SRC     = 1 << (DST >> 13);										\
-			DST     &= 0x1fff;												\
+#define OP_NOT1(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			DST     = OPER_16_IMM(cpustate);                                        \
+			SRC     = 1 << (DST >> 13);                                     \
+			DST     &= 0x1fff;                                              \
 			write_8_NORM(DST, read_8_NORM(DST) ^ SRC)
 
 /* Logical OR operand to accumulator */
-#define OP_OR(BCLK, MODE)													\
-			CLK(BCLK);														\
+#define OP_OR(BCLK, MODE)                                                   \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = REG_A |= OPER_8_##MODE(cpustate)
 
 /* Logical OR operand */
-#define OP_ORM(BCLK, SMODE, DMODE)											\
-			CLK(BCLK);														\
-			FLAG_NZ = OPER_8_##SMODE(cpustate);										\
-			DST     = EA_##DMODE(cpustate);											\
-			FLAG_NZ |= read_8_##DMODE(DST);									\
+#define OP_ORM(BCLK, SMODE, DMODE)                                          \
+			CLK(BCLK);                                                      \
+			FLAG_NZ = OPER_8_##SMODE(cpustate);                                     \
+			DST     = EA_##DMODE(cpustate);                                         \
+			FLAG_NZ |= read_8_##DMODE(DST);                                 \
 			write_8_##DMODE(DST, FLAG_NZ)
 
 /* Logical OR bit to C */
-#define OP_OR1(BCLK)														\
-			CLK(BCLK);														\
-			DST = EA_IMM16(cpustate);												\
-			if(!(FLAG_C & CFLAG_SET))										\
-			{																\
-				DST = read_16_IMM(DST);										\
-				SRC = 1 << (DST >> 13);										\
-				DST &= 0x1fff;												\
-				if(read_8_NORM(DST) & SRC)									\
-					FLAG_C = CFLAG_SET;										\
+#define OP_OR1(BCLK)                                                        \
+			CLK(BCLK);                                                      \
+			DST = EA_IMM16(cpustate);                                               \
+			if(!(FLAG_C & CFLAG_SET))                                       \
+			{                                                               \
+				DST = read_16_IMM(DST);                                     \
+				SRC = 1 << (DST >> 13);                                     \
+				DST &= 0x1fff;                                              \
+				if(read_8_NORM(DST) & SRC)                                  \
+					FLAG_C = CFLAG_SET;                                     \
 			}
 
 /* OR negated bit to C */
-#define OP_ORN1(BCLK)														\
-			CLK(BCLK);														\
-			DST = EA_IMM16(cpustate);												\
-			if(!(FLAG_C & CFLAG_SET))										\
-			{																\
-				DST = read_16_IMM(DST);										\
-				SRC = 1 << (DST >> 13);										\
-				DST &= 0x1fff;												\
-				if(!(read_8_NORM(DST) & SRC))								\
-					FLAG_C = CFLAG_SET;										\
+#define OP_ORN1(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			DST = EA_IMM16(cpustate);                                               \
+			if(!(FLAG_C & CFLAG_SET))                                       \
+			{                                                               \
+				DST = read_16_IMM(DST);                                     \
+				SRC = 1 << (DST >> 13);                                     \
+				DST &= 0x1fff;                                              \
+				if(!(read_8_NORM(DST) & SRC))                               \
+					FLAG_C = CFLAG_SET;                                     \
 			}
 
 /* UPage Call */
-#define OP_PCALL(BCLK)														\
-			CLK(BCLK);														\
-			DST     = EA_DP(cpustate);												\
-			PUSH_16(cpustate, REG_PC);												\
+#define OP_PCALL(BCLK)                                                      \
+			CLK(BCLK);                                                      \
+			DST     = EA_DP(cpustate);                                              \
+			PUSH_16(cpustate, REG_PC);                                              \
 			JUMP(cpustate, 0xff00 | DST)
 
 /* Push a register to the stack */
-#define OP_PUSH(BCLK, REG)													\
-			CLK(BCLK);														\
+#define OP_PUSH(BCLK, REG)                                                  \
+			CLK(BCLK);                                                      \
 			PUSH_8(cpustate, REG)
 
 /* Push the Processor Status Register to the stack */
-#define OP_PHP(BCLK)														\
-			CLK(BCLK);														\
+#define OP_PHP(BCLK)                                                        \
+			CLK(BCLK);                                                      \
 			PUSH_8(cpustate, GET_REG_P())
 
 /* Pull a register from the stack */
-#define OP_PULL(BCLK, REG)													\
-			CLK(BCLK);														\
+#define OP_PULL(BCLK, REG)                                                  \
+			CLK(BCLK);                                                      \
 			REG     = PULL_8(cpustate)
 
 /* Pull the Processor Status Register from the stack */
-#define OP_PLP(BCLK)														\
-			CLK(BCLK);														\
+#define OP_PLP(BCLK)                                                        \
+			CLK(BCLK);                                                      \
 			SET_REG_P(cpustate, PULL_8(cpustate))
 
 /* Return from Subroutine */
-#define OP_RET(BCLK)														\
-			CLK(BCLK);														\
+#define OP_RET(BCLK)                                                        \
+			CLK(BCLK);                                                      \
 			JUMP(cpustate, PULL_16(cpustate))
 
 /* Return from Interrupt */
-#define OP_RETI(BCLK)														\
-			CLK(BCLK);														\
-			SET_REG_P(cpustate, PULL_8(cpustate));											\
+#define OP_RETI(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			SET_REG_P(cpustate, PULL_8(cpustate));                                          \
 			JUMP(cpustate, PULL_16(cpustate))
 
 /* Rotate Left the accumulator */
-#define OP_ROL(BCLK)														\
-			CLK(BCLK);														\
-			FLAG_C  = (REG_A<<1) | CFLAG_AS_1();							\
+#define OP_ROL(BCLK)                                                        \
+			CLK(BCLK);                                                      \
+			FLAG_C  = (REG_A<<1) | CFLAG_AS_1();                            \
 			FLAG_NZ = REG_A = MAKE_UINT_8(FLAG_C)
 
 /* Rotate Left an operand */
-#define OP_ROLM(BCLK, MODE)													\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_C  = (read_8_##MODE(DST)<<1) | CFLAG_AS_1();				\
-			FLAG_NZ = MAKE_UINT_8(FLAG_C);									\
+#define OP_ROLM(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_C  = (read_8_##MODE(DST)<<1) | CFLAG_AS_1();               \
+			FLAG_NZ = MAKE_UINT_8(FLAG_C);                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Rotate Right the accumulator */
-#define OP_ROR(BCLK)														\
-			CLK(BCLK);														\
-			REG_A   |= FLAG_C & 0x100;										\
-			FLAG_C  = REG_A << 8;											\
+#define OP_ROR(BCLK)                                                        \
+			CLK(BCLK);                                                      \
+			REG_A   |= FLAG_C & 0x100;                                      \
+			FLAG_C  = REG_A << 8;                                           \
 			FLAG_NZ = REG_A >>= 1
 
 /* Rotate Right an operand */
-#define OP_RORM(BCLK, MODE)													\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_NZ = read_8_##MODE(DST) | (FLAG_C & 0x100);				\
-			FLAG_C  = FLAG_NZ << 8;											\
-			FLAG_NZ >>= 1;													\
+#define OP_RORM(BCLK, MODE)                                                 \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_NZ = read_8_##MODE(DST) | (FLAG_C & 0x100);                \
+			FLAG_C  = FLAG_NZ << 8;                                         \
+			FLAG_NZ >>= 1;                                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Subtract with Carry */
-#define OP_SBC(BCLK, MODE)					\
-			CLK(BCLK);				\
-			SRC     = OPER_8_##MODE(cpustate);		\
+#define OP_SBC(BCLK, MODE)                  \
+			CLK(BCLK);              \
+			SRC     = OPER_8_##MODE(cpustate);      \
 			TMP2 = REG_A - SRC - (CFLAG_AS_1() ^ 1); \
-			SUBOP_ADC(REG_A, ~SRC);			\
+			SUBOP_ADC(REG_A, ~SRC);         \
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
 			REG_A = (UINT8)cpustate->spc_int16;
 
 /* Subtract With Carry to memory */
-#define OP_SBCM(BCLK, SMODE, DMODE)				\
-			CLK(BCLK);				\
-			SRC     = OPER_8_##SMODE(cpustate);		\
-			DST     = EA_##DMODE(cpustate);			\
-			TMP3 = read_8_##DMODE(DST);		\
-			TMP2 = TMP3 - SRC - (CFLAG_AS_1() ^ 1);	\
-			SUBOP_ADC(~SRC, TMP3);			\
+#define OP_SBCM(BCLK, SMODE, DMODE)             \
+			CLK(BCLK);              \
+			SRC     = OPER_8_##SMODE(cpustate);     \
+			DST     = EA_##DMODE(cpustate);         \
+			TMP3 = read_8_##DMODE(DST);     \
+			TMP2 = TMP3 - SRC - (CFLAG_AS_1() ^ 1); \
+			SUBOP_ADC(~SRC, TMP3);          \
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
 			write_8_##DMODE(DST, (UINT8)cpustate->spc_int16)
 
 /* Set Carry flag */
-#define OP_SETC(BCLK)														\
-			CLK(BCLK);														\
+#define OP_SETC(BCLK)                                                       \
+			CLK(BCLK);                                                      \
 			FLAG_C  = CFLAG_SET
 
 /* Set Page flag */
-#define OP_SETP(BCLK)														\
-			CLK(BCLK);														\
+#define OP_SETP(BCLK)                                                       \
+			CLK(BCLK);                                                      \
 			FLAG_P  = PFLAG_SET
 
 /* Set Memory Bit */
-#define OP_SET(BCLK, BIT)													\
-			CLK(BCLK);														\
-			DST    = EA_DP(cpustate);												\
-			SRC    = read_8_DP(DST) | BIT;									\
+#define OP_SET(BCLK, BIT)                                                   \
+			CLK(BCLK);                                                      \
+			DST    = EA_DP(cpustate);                                               \
+			SRC    = read_8_DP(DST) | BIT;                                  \
 			write_8_DP(DST, SRC)
 
 /* Put the CPU to sleep */
-#define OP_SLEEP(BCLK)														\
-			CLK(BCLK);														\
-			CPU_STOPPED |= STOP_LEVEL_SLEEP;								\
+#define OP_SLEEP(BCLK)                                                      \
+			CLK(BCLK);                                                      \
+			CPU_STOPPED |= STOP_LEVEL_SLEEP;                                \
 			CLK_ALL()
 
 /* Stop the CPU */
-#define OP_STOP(BCLK)														\
-			CLK(BCLK);														\
-			CPU_STOPPED |= STOP_LEVEL_STOP;									\
+#define OP_STOP(BCLK)                                                       \
+			CLK(BCLK);                                                      \
+			CPU_STOPPED |= STOP_LEVEL_STOP;                                 \
 			CLK_ALL()
 
 /* Subtract word */
-#define OP_SUBW(BCLK)						\
-			CLK(BCLK);				\
-			SRC = OPER_16_DP(cpustate);			\
-			DST = GET_REG_YA();			\
-			TMP1 = ((DST) & 0xff) - ((SRC) & 0xff);	\
-			TMP2 = (TMP1 > 0xff) ? 1 : 0;		\
-			TMP3 = ((DST) >> 8) - ((SRC) >> 8) - TMP2;	\
-			cpustate->spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;	\
-			FLAG_C = (TMP3 <= 0xff) ? CFLAG_SET : 0;	\
+#define OP_SUBW(BCLK)                       \
+			CLK(BCLK);              \
+			SRC = OPER_16_DP(cpustate);         \
+			DST = GET_REG_YA();         \
+			TMP1 = ((DST) & 0xff) - ((SRC) & 0xff); \
+			TMP2 = (TMP1 > 0xff) ? 1 : 0;       \
+			TMP3 = ((DST) >> 8) - ((SRC) >> 8) - TMP2;  \
+			cpustate->spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;   \
+			FLAG_C = (TMP3 <= 0xff) ? CFLAG_SET : 0;    \
 			FLAG_H = ((unsigned) ((((DST) >> 8) & 0x0F) - \
 				(((SRC) >> 8) & 0x0F) - TMP2)) > 0x0F ?  0: HFLAG_SET; \
 			FLAG_V = (((DST) ^ (SRC)) & ((DST) ^ (UINT16) cpustate->spc_int16) & 0x8000) ? VFLAG_SET : 0; \
-			FLAG_Z = (cpustate->spc_int16 != 0);		\
-			FLAG_N = (cpustate->spc_int16>>8);		\
+			FLAG_Z = (cpustate->spc_int16 != 0);        \
+			FLAG_N = (cpustate->spc_int16>>8);      \
 			SET_REG_YA(cpustate, cpustate->spc_int16);
 
 /* Table Call */
-#define OP_TCALL(BCLK, NUM)													\
-			CLK(BCLK);														\
-			PUSH_16(cpustate, REG_PC);												\
+#define OP_TCALL(BCLK, NUM)                                                 \
+			CLK(BCLK);                                                      \
+			PUSH_16(cpustate, REG_PC);                                              \
 			JUMP(cpustate, read_16_NORM(0xffc0 + ((15-NUM)<<1)))
 
 /* Test and Clear Bits */
-#define OP_TCLR1(BCLK, MODE)												\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_NZ = read_8_##MODE(DST);									\
-			write_8_##MODE(DST, FLAG_NZ & ~REG_A);							\
+#define OP_TCLR1(BCLK, MODE)                                                \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_NZ = read_8_##MODE(DST);                                   \
+			write_8_##MODE(DST, FLAG_NZ & ~REG_A);                          \
 			FLAG_NZ &= REG_A
 
 /* Test and Set Bits */
-#define OP_TSET1(BCLK, MODE)												\
-			CLK(BCLK);														\
-			DST     = EA_##MODE(cpustate);											\
-			FLAG_NZ = read_8_##MODE(DST);									\
-			write_8_##MODE(DST, FLAG_NZ | REG_A);							\
+#define OP_TSET1(BCLK, MODE)                                                \
+			CLK(BCLK);                                                      \
+			DST     = EA_##MODE(cpustate);                                          \
+			FLAG_NZ = read_8_##MODE(DST);                                   \
+			write_8_##MODE(DST, FLAG_NZ | REG_A);                           \
 			FLAG_NZ &= REG_A
 
 /* Exchange high and low nybbles of accumulator */
-#define OP_XCN(BCLK)														\
-			CLK(BCLK);														\
+#define OP_XCN(BCLK)                                                        \
+			CLK(BCLK);                                                      \
 			FLAG_NZ = REG_A = MAKE_UINT_8((REG_A<<4) | (REG_A>>4))
 
-#define OP_ILLEGAL(BCLK)													\
+#define OP_ILLEGAL(BCLK)                                                    \
 			CLK(BCLK)
 
 
@@ -1697,17 +1697,17 @@ static CPU_SET_INFO( spc700 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:			spc700_set_irq_line(cpustate, 0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		spc700_set_nmi_line(cpustate, info->i);			break;
+		case CPUINFO_INT_INPUT_STATE + 0:           spc700_set_irq_line(cpustate, 0, info->i);      break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:      spc700_set_nmi_line(cpustate, info->i);         break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SPC700_PC:			REG_PC = MAKE_UINT_16(info->i);			break;
+		case CPUINFO_INT_REGISTER + SPC700_PC:          REG_PC = MAKE_UINT_16(info->i);         break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + SPC700_S:			REG_S = MAKE_UINT_8(info->i);			break;
-		case CPUINFO_INT_REGISTER + SPC700_P:			SET_REG_P(cpustate, info->i);						break;
-		case CPUINFO_INT_REGISTER + SPC700_A:			REG_A = MAKE_UINT_8(info->i);			break;
-		case CPUINFO_INT_REGISTER + SPC700_X:			REG_X = MAKE_UINT_8(info->i);			break;
-		case CPUINFO_INT_REGISTER + SPC700_Y:			REG_Y = MAKE_UINT_8(info->i);			break;
+		case CPUINFO_INT_REGISTER + SPC700_S:           REG_S = MAKE_UINT_8(info->i);           break;
+		case CPUINFO_INT_REGISTER + SPC700_P:           SET_REG_P(cpustate, info->i);                       break;
+		case CPUINFO_INT_REGISTER + SPC700_A:           REG_A = MAKE_UINT_8(info->i);           break;
+		case CPUINFO_INT_REGISTER + SPC700_X:           REG_X = MAKE_UINT_8(info->i);           break;
+		case CPUINFO_INT_REGISTER + SPC700_Y:           REG_Y = MAKE_UINT_8(info->i);           break;
 	}
 }
 
@@ -1724,69 +1724,69 @@ CPU_GET_INFO( spc700 )
 
 	if (cpustate != NULL)
 	{
-		p = ((cpustate->flag_n & 0x80)			|
-					((cpustate->flag_v & 0x80) >> 1)	|
-					cpustate->flag_p>>3				|
-					cpustate->flag_b					|
-					(cpustate->flag_h & HFLAG_SET)	|
-					cpustate->flag_i					|
-					((!cpustate->flag_z) << 1)		|
+		p = ((cpustate->flag_n & 0x80)          |
+					((cpustate->flag_v & 0x80) >> 1)    |
+					cpustate->flag_p>>3             |
+					cpustate->flag_b                    |
+					(cpustate->flag_h & HFLAG_SET)  |
+					cpustate->flag_i                    |
+					((!cpustate->flag_z) << 1)      |
 					((cpustate->flag_c >> 8)&1));
 	}
 
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(spc700i_cpu);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 3;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(spc700i_cpu);          break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 3;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 8;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;				break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (LINE_IRQ == IRQ_SET) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + 0:               info->i = (LINE_IRQ == IRQ_SET) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = REG_PPC;			break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = REG_PPC;          break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SPC700_PC:				info->i = REG_PC;			break;
+		case CPUINFO_INT_REGISTER + SPC700_PC:              info->i = REG_PC;           break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + SPC700_S:	    			info->i = REG_S + STACK_PAGE;		break;
-		case CPUINFO_INT_REGISTER + SPC700_P:	    			info->i = GET_REG_P();			break;
-		case CPUINFO_INT_REGISTER + SPC700_A:	    			info->i = REG_A;			break;
-		case CPUINFO_INT_REGISTER + SPC700_X:				info->i = REG_X;			break;
-		case CPUINFO_INT_REGISTER + SPC700_Y:				info->i = REG_Y;			break;
+		case CPUINFO_INT_REGISTER + SPC700_S:                   info->i = REG_S + STACK_PAGE;       break;
+		case CPUINFO_INT_REGISTER + SPC700_P:                   info->i = GET_REG_P();          break;
+		case CPUINFO_INT_REGISTER + SPC700_A:                   info->i = REG_A;            break;
+		case CPUINFO_INT_REGISTER + SPC700_X:               info->i = REG_X;            break;
+		case CPUINFO_INT_REGISTER + SPC700_Y:               info->i = REG_Y;            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(spc700);		break;
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(spc700);			break;
-		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(spc700);			break;
-		case CPUINFO_FCT_EXIT:						info->exit = CPU_EXIT_NAME(spc700);			break;
-		case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(spc700);		break;
-		case CPUINFO_FCT_BURN:						info->burn = NULL;					break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(spc700);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->ICount;				break;
+		case CPUINFO_FCT_SET_INFO:                  info->setinfo = CPU_SET_INFO_NAME(spc700);      break;
+		case CPUINFO_FCT_INIT:                      info->init = CPU_INIT_NAME(spc700);         break;
+		case CPUINFO_FCT_RESET:                     info->reset = CPU_RESET_NAME(spc700);           break;
+		case CPUINFO_FCT_EXIT:                      info->exit = CPU_EXIT_NAME(spc700);         break;
+		case CPUINFO_FCT_EXECUTE:                   info->execute = CPU_EXECUTE_NAME(spc700);       break;
+		case CPUINFO_FCT_BURN:                      info->burn = NULL;                  break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(spc700);   break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->ICount;               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "SPC700");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Sony SPC700");				break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.1");					break;
-		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME team, all rights reserved."); break;
+		case CPUINFO_STR_NAME:                      strcpy(info->s, "SPC700");              break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Sony SPC700");             break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.1");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Nicola Salmoria and the MAME team, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
@@ -1800,12 +1800,12 @@ CPU_GET_INFO( spc700 )
 				p & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + SPC700_PC:			sprintf(info->s, "PC:%04X", cpustate->pc); break;
-		case CPUINFO_STR_REGISTER + SPC700_S:			sprintf(info->s, "S:%02X", cpustate->s); break;
-		case CPUINFO_STR_REGISTER + SPC700_P:			sprintf(info->s, "P:%02X", p); break;
-		case CPUINFO_STR_REGISTER + SPC700_A:			sprintf(info->s, "A:%02X", cpustate->a); break;
-		case CPUINFO_STR_REGISTER + SPC700_X:			sprintf(info->s, "X:%02X", cpustate->x); break;
-		case CPUINFO_STR_REGISTER + SPC700_Y:			sprintf(info->s, "Y:%02X", cpustate->y); break;
+		case CPUINFO_STR_REGISTER + SPC700_PC:          sprintf(info->s, "PC:%04X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + SPC700_S:           sprintf(info->s, "S:%02X", cpustate->s); break;
+		case CPUINFO_STR_REGISTER + SPC700_P:           sprintf(info->s, "P:%02X", p); break;
+		case CPUINFO_STR_REGISTER + SPC700_A:           sprintf(info->s, "A:%02X", cpustate->a); break;
+		case CPUINFO_STR_REGISTER + SPC700_X:           sprintf(info->s, "X:%02X", cpustate->x); break;
+		case CPUINFO_STR_REGISTER + SPC700_Y:           sprintf(info->s, "Y:%02X", cpustate->y); break;
 	}
 }
 

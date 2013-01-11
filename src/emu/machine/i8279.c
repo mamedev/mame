@@ -88,7 +88,7 @@ const device_type I8279 = &device_creator<i8279_device>;
 //-------------------------------------------------
 
 i8279_device::i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, I8279, "Intel 8279", tag, owner, clock)
+	: device_t(mconfig, I8279, "Intel 8279", tag, owner, clock)
 {
 }
 
@@ -110,13 +110,13 @@ void i8279_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_sl_cb, 0, sizeof(m_out_sl_cb));
-    	memset(&m_out_disp_cb, 0, sizeof(m_out_disp_cb));
-    	memset(&m_out_bd_cb, 0, sizeof(m_out_bd_cb));
-    	memset(&m_in_rl_cb, 0, sizeof(m_in_rl_cb));
-    	memset(&m_in_shift_cb, 0, sizeof(m_in_shift_cb));
-    	memset(&m_in_ctrl_cb, 0, sizeof(m_in_ctrl_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_sl_cb, 0, sizeof(m_out_sl_cb));
+		memset(&m_out_disp_cb, 0, sizeof(m_out_disp_cb));
+		memset(&m_out_bd_cb, 0, sizeof(m_out_bd_cb));
+		memset(&m_in_rl_cb, 0, sizeof(m_in_rl_cb));
+		memset(&m_in_shift_cb, 0, sizeof(m_in_shift_cb));
+		memset(&m_in_ctrl_cb, 0, sizeof(m_in_ctrl_cb));
 	}
 }
 
@@ -337,7 +337,7 @@ void i8279_device::timer_mainloop()
 						if (decoded)
 							for (addr=0; !BIT(m_scanner, addr); addr++);
 
-						rl ^= 0xff;		// inverted
+						rl ^= 0xff;     // inverted
 						if (m_s_ram[addr] != rl)
 						{
 							m_s_ram[addr] = rl;
@@ -505,4 +505,3 @@ WRITE8_MEMBER( i8279_device::data_w )
 	}
 	m_d_ram_ptr &= 15;
 }
-

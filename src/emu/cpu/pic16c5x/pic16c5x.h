@@ -1,13 +1,13 @@
- /**************************************************************************\
- *                      Microchip PIC16C5x Emulator                         *
- *                                                                          *
- *                    Copyright Tony La Porta                               *
- *                 Originally written for the MAME project.                 *
- *                                                                          *
- *                                                                          *
- *      Addressing architecture is based on the Harvard addressing scheme.  *
- *                                                                          *
- \**************************************************************************/
+	/**************************************************************************\
+	*                      Microchip PIC16C5x Emulator                         *
+	*                                                                          *
+	*                    Copyright Tony La Porta                               *
+	*                 Originally written for the MAME project.                 *
+	*                                                                          *
+	*                                                                          *
+	*      Addressing architecture is based on the Harvard addressing scheme.  *
+	*                                                                          *
+	\**************************************************************************/
 
 #pragma once
 
@@ -34,7 +34,7 @@ enum
 	PIC16C5x_PSCL
 };
 
-#define PIC16C5x_T0		0x10
+#define PIC16C5x_T0     0x10
 
 
 /****************************************************************************
@@ -57,4 +57,4 @@ DECLARE_LEGACY_CPU_DEVICE(PIC16C58, pic16c58);
 CPU_DISASSEMBLE( pic16c5x );
 
 
-#endif	/* __PIC16C5X_H__ */
+#endif  /* __PIC16C5X_H__ */

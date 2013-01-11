@@ -13,45 +13,45 @@
 CPU_DISASSEMBLE( jaguargpu );
 CPU_DISASSEMBLE( jaguardsp );
 
-#define LOG_GPU_IO		0
-#define LOG_DSP_IO		0
+#define LOG_GPU_IO      0
+#define LOG_DSP_IO      0
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-#define ZFLAG					0x00001
-#define CFLAG					0x00002
-#define NFLAG					0x00004
-#define IFLAG					0x00008
-#define EINT0FLAG				0x00010
-#define EINT1FLAG				0x00020
-#define EINT2FLAG				0x00040
-#define EINT3FLAG				0x00080
-#define EINT4FLAG				0x00100
-#define EINT04FLAGS				(EINT0FLAG | EINT1FLAG | EINT2FLAG | EINT3FLAG | EINT4FLAG)
-#define CINT0FLAG				0x00200
-#define CINT1FLAG				0x00400
-#define CINT2FLAG				0x00800
-#define CINT3FLAG				0x01000
-#define CINT4FLAG				0x02000
-#define CINT04FLAGS				(CINT0FLAG | CINT1FLAG | CINT2FLAG | CINT3FLAG | CINT4FLAG)
-#define RPAGEFLAG				0x04000
-#define DMAFLAG					0x08000
-#define EINT5FLAG				0x10000		/* DSP only */
-#define CINT5FLAG				0x20000		/* DSP only */
+#define ZFLAG                   0x00001
+#define CFLAG                   0x00002
+#define NFLAG                   0x00004
+#define IFLAG                   0x00008
+#define EINT0FLAG               0x00010
+#define EINT1FLAG               0x00020
+#define EINT2FLAG               0x00040
+#define EINT3FLAG               0x00080
+#define EINT4FLAG               0x00100
+#define EINT04FLAGS             (EINT0FLAG | EINT1FLAG | EINT2FLAG | EINT3FLAG | EINT4FLAG)
+#define CINT0FLAG               0x00200
+#define CINT1FLAG               0x00400
+#define CINT2FLAG               0x00800
+#define CINT3FLAG               0x01000
+#define CINT4FLAG               0x02000
+#define CINT04FLAGS             (CINT0FLAG | CINT1FLAG | CINT2FLAG | CINT3FLAG | CINT4FLAG)
+#define RPAGEFLAG               0x04000
+#define DMAFLAG                 0x08000
+#define EINT5FLAG               0x10000     /* DSP only */
+#define CINT5FLAG               0x20000     /* DSP only */
 
-#define CLR_Z(J)				((J)->FLAGS &= ~ZFLAG)
-#define CLR_ZN(J)				((J)->FLAGS &= ~(ZFLAG | NFLAG))
-#define CLR_ZNC(J)				((J)->FLAGS &= ~(CFLAG | ZFLAG | NFLAG))
-#define SET_Z(J,r)				((J)->FLAGS |= ((r) == 0))
-#define SET_C_ADD(J,a,b)		((J)->FLAGS |= ((UINT32)(b) > (UINT32)(~(a))) << 1)
-#define SET_C_SUB(J,a,b)		((J)->FLAGS |= ((UINT32)(b) > (UINT32)(a)) << 1)
-#define SET_N(J,r)				((J)->FLAGS |= (((UINT32)(r) >> 29) & 4))
-#define SET_ZN(J,r)				SET_N(J,r); SET_Z(J,r)
-#define SET_ZNC_ADD(J,a,b,r)	SET_N(J,r); SET_Z(J,r); SET_C_ADD(J,a,b)
-#define SET_ZNC_SUB(J,a,b,r)	SET_N(J,r); SET_Z(J,r); SET_C_SUB(J,a,b)
+#define CLR_Z(J)                ((J)->FLAGS &= ~ZFLAG)
+#define CLR_ZN(J)               ((J)->FLAGS &= ~(ZFLAG | NFLAG))
+#define CLR_ZNC(J)              ((J)->FLAGS &= ~(CFLAG | ZFLAG | NFLAG))
+#define SET_Z(J,r)              ((J)->FLAGS |= ((r) == 0))
+#define SET_C_ADD(J,a,b)        ((J)->FLAGS |= ((UINT32)(b) > (UINT32)(~(a))) << 1)
+#define SET_C_SUB(J,a,b)        ((J)->FLAGS |= ((UINT32)(b) > (UINT32)(a)) << 1)
+#define SET_N(J,r)              ((J)->FLAGS |= (((UINT32)(r) >> 29) & 4))
+#define SET_ZN(J,r)             SET_N(J,r); SET_Z(J,r)
+#define SET_ZNC_ADD(J,a,b,r)    SET_N(J,r); SET_Z(J,r); SET_C_ADD(J,a,b)
+#define SET_ZNC_SUB(J,a,b,r)    SET_N(J,r); SET_Z(J,r); SET_C_SUB(J,a,b)
 
 
 
@@ -59,18 +59,18 @@ CPU_DISASSEMBLE( jaguardsp );
     MACROS
 ***************************************************************************/
 
-#define PC					ctrl[G_PC]
-#define FLAGS				ctrl[G_FLAGS]
+#define PC                  ctrl[G_PC]
+#define FLAGS               ctrl[G_FLAGS]
 
-#define CONDITION(x)		condition_table[(x) + ((jaguar->FLAGS & 7) << 5)]
+#define CONDITION(x)        condition_table[(x) + ((jaguar->FLAGS & 7) << 5)]
 
-#define READBYTE(J,a)		(J)->program->read_byte(a)
-#define READWORD(J,a)		(J)->program->read_word(a)
-#define READLONG(J,a)		(J)->program->read_dword(a)
+#define READBYTE(J,a)       (J)->program->read_byte(a)
+#define READWORD(J,a)       (J)->program->read_word(a)
+#define READLONG(J,a)       (J)->program->read_dword(a)
 
-#define WRITEBYTE(J,a,v)	(J)->program->write_byte(a, v)
-#define WRITEWORD(J,a,v)	(J)->program->write_word(a, v)
-#define WRITELONG(J,a,v)	(J)->program->write_dword(a, v)
+#define WRITEBYTE(J,a,v)    (J)->program->write_byte(a, v)
+#define WRITEWORD(J,a,v)    (J)->program->write_word(a, v)
+#define WRITELONG(J,a,v)    (J)->program->write_dword(a, v)
 
 
 
@@ -82,21 +82,21 @@ CPU_DISASSEMBLE( jaguardsp );
 struct jaguar_cpu_state
 {
 	/* core registers */
-	UINT32		r[32];
-	UINT32		a[32];
-	UINT32 *	b0;
-	UINT32 *	b1;
+	UINT32      r[32];
+	UINT32      a[32];
+	UINT32 *    b0;
+	UINT32 *    b1;
 
 	/* control registers */
-	UINT32		ctrl[G_CTRLMAX];
-	UINT32		ppc;
-	UINT64		accum;
+	UINT32      ctrl[G_CTRLMAX];
+	UINT32      ppc;
+	UINT64      accum;
 
 	/* internal stuff */
-	int			isdsp;
-	int			icount;
-	int			bankswitch_icount;
-	void		(*const *table)(jaguar_cpu_state *jaguar, UINT16 op);
+	int         isdsp;
+	int         icount;
+	int         bankswitch_icount;
+	void        (*const *table)(jaguar_cpu_state *jaguar, UINT16 op);
 	device_irq_acknowledge_callback irq_callback;
 	jaguar_int_func cpu_interrupt;
 	legacy_cpu_device *device;
@@ -110,9 +110,9 @@ struct jaguar_cpu_state
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
 
-static UINT32		table_refcount;
-static UINT16 *		mirror_table;
-static UINT8 *		condition_table;
+static UINT32       table_refcount;
+static UINT16 *     mirror_table;
+static UINT8 *      condition_table;
 
 static const UINT32 convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
@@ -127,7 +127,7 @@ static void abs_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void add_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void addc_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void addq_n_rn(jaguar_cpu_state *jaguar, UINT16 op);
-static void addqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op);	/* DSP only */
+static void addqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op);  /* DSP only */
 static void addqt_n_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void and_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void bclr_n_rn(jaguar_cpu_state *jaguar, UINT16 op);
@@ -149,8 +149,8 @@ static void load_r14rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void load_r15rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void loadb_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void loadw_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
-static void loadp_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);	/* GPU only */
-static void mirror_rn(jaguar_cpu_state *jaguar, UINT16 op);	/* DSP only */
+static void loadp_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);   /* GPU only */
+static void mirror_rn(jaguar_cpu_state *jaguar, UINT16 op); /* DSP only */
 static void mmult_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void move_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void move_pc_rn(jaguar_cpu_state *jaguar, UINT16 op);
@@ -165,15 +165,15 @@ static void nop(jaguar_cpu_state *jaguar, UINT16 op);
 static void normi_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void not_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void or_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
-static void pack_rn(jaguar_cpu_state *jaguar, UINT16 op);		/* GPU only */
+static void pack_rn(jaguar_cpu_state *jaguar, UINT16 op);       /* GPU only */
 static void resmac_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void ror_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void rorq_n_rn(jaguar_cpu_state *jaguar, UINT16 op);
-static void sat8_rn(jaguar_cpu_state *jaguar, UINT16 op);		/* GPU only */
-static void sat16_rn(jaguar_cpu_state *jaguar, UINT16 op);		/* GPU only */
-static void sat16s_rn(jaguar_cpu_state *jaguar, UINT16 op);		/* DSP only */
-static void sat24_rn(jaguar_cpu_state *jaguar, UINT16 op);			/* GPU only */
-static void sat32s_rn(jaguar_cpu_state *jaguar, UINT16 op);		/* DSP only */
+static void sat8_rn(jaguar_cpu_state *jaguar, UINT16 op);       /* GPU only */
+static void sat16_rn(jaguar_cpu_state *jaguar, UINT16 op);      /* GPU only */
+static void sat16s_rn(jaguar_cpu_state *jaguar, UINT16 op);     /* DSP only */
+static void sat24_rn(jaguar_cpu_state *jaguar, UINT16 op);          /* GPU only */
+static void sat32s_rn(jaguar_cpu_state *jaguar, UINT16 op);     /* DSP only */
 static void sh_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void sha_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void sharq_n_rn(jaguar_cpu_state *jaguar, UINT16 op);
@@ -186,52 +186,52 @@ static void store_rn_r14rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void store_rn_r15rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void storeb_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void storew_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
-static void storep_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);	/* GPU only */
+static void storep_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);  /* GPU only */
 static void sub_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void subc_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void subq_n_rn(jaguar_cpu_state *jaguar, UINT16 op);
-static void subqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op);	/* DSP only */
+static void subqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op);  /* DSP only */
 static void subqt_n_rn(jaguar_cpu_state *jaguar, UINT16 op);
 static void xor_rn_rn(jaguar_cpu_state *jaguar, UINT16 op);
 
 static void (*const gpu_op_table[64])(jaguar_cpu_state *jaguar, UINT16 op) =
 {
-	/* 00-03 */	add_rn_rn,		addc_rn_rn,		addq_n_rn,		addqt_n_rn,
-	/* 04-07 */	sub_rn_rn,		subc_rn_rn,		subq_n_rn,		subqt_n_rn,
-	/* 08-11 */	neg_rn,			and_rn_rn,		or_rn_rn,		xor_rn_rn,
-	/* 12-15 */	not_rn,			btst_n_rn,		bset_n_rn,		bclr_n_rn,
-	/* 16-19 */	mult_rn_rn,		imult_rn_rn,	imultn_rn_rn,	resmac_rn,
-	/* 20-23 */	imacn_rn_rn,	div_rn_rn,		abs_rn,			sh_rn_rn,
-	/* 24-27 */	shlq_n_rn,		shrq_n_rn,		sha_rn_rn,		sharq_n_rn,
-	/* 28-31 */	ror_rn_rn,		rorq_n_rn,		cmp_rn_rn,		cmpq_n_rn,
-	/* 32-35 */	sat8_rn,		sat16_rn,		move_rn_rn,		moveq_n_rn,
-	/* 36-39 */	moveta_rn_rn,	movefa_rn_rn,	movei_n_rn,		loadb_rn_rn,
-	/* 40-43 */	loadw_rn_rn,	load_rn_rn,		loadp_rn_rn,	load_r14n_rn,
-	/* 44-47 */	load_r15n_rn,	storeb_rn_rn,	storew_rn_rn,	store_rn_rn,
-	/* 48-51 */	storep_rn_rn,	store_rn_r14n,	store_rn_r15n,	move_pc_rn,
-	/* 52-55 */	jump_cc_rn,		jr_cc_n,		mmult_rn_rn,	mtoi_rn_rn,
-	/* 56-59 */	normi_rn_rn,	nop,			load_r14rn_rn,	load_r15rn_rn,
-	/* 60-63 */	store_rn_r14rn,	store_rn_r15rn,	sat24_rn,		pack_rn
+	/* 00-03 */ add_rn_rn,      addc_rn_rn,     addq_n_rn,      addqt_n_rn,
+	/* 04-07 */ sub_rn_rn,      subc_rn_rn,     subq_n_rn,      subqt_n_rn,
+	/* 08-11 */ neg_rn,         and_rn_rn,      or_rn_rn,       xor_rn_rn,
+	/* 12-15 */ not_rn,         btst_n_rn,      bset_n_rn,      bclr_n_rn,
+	/* 16-19 */ mult_rn_rn,     imult_rn_rn,    imultn_rn_rn,   resmac_rn,
+	/* 20-23 */ imacn_rn_rn,    div_rn_rn,      abs_rn,         sh_rn_rn,
+	/* 24-27 */ shlq_n_rn,      shrq_n_rn,      sha_rn_rn,      sharq_n_rn,
+	/* 28-31 */ ror_rn_rn,      rorq_n_rn,      cmp_rn_rn,      cmpq_n_rn,
+	/* 32-35 */ sat8_rn,        sat16_rn,       move_rn_rn,     moveq_n_rn,
+	/* 36-39 */ moveta_rn_rn,   movefa_rn_rn,   movei_n_rn,     loadb_rn_rn,
+	/* 40-43 */ loadw_rn_rn,    load_rn_rn,     loadp_rn_rn,    load_r14n_rn,
+	/* 44-47 */ load_r15n_rn,   storeb_rn_rn,   storew_rn_rn,   store_rn_rn,
+	/* 48-51 */ storep_rn_rn,   store_rn_r14n,  store_rn_r15n,  move_pc_rn,
+	/* 52-55 */ jump_cc_rn,     jr_cc_n,        mmult_rn_rn,    mtoi_rn_rn,
+	/* 56-59 */ normi_rn_rn,    nop,            load_r14rn_rn,  load_r15rn_rn,
+	/* 60-63 */ store_rn_r14rn, store_rn_r15rn, sat24_rn,       pack_rn
 };
 
 static void (*const dsp_op_table[64])(jaguar_cpu_state *jaguar, UINT16 op) =
 {
-	/* 00-03 */	add_rn_rn,		addc_rn_rn,		addq_n_rn,		addqt_n_rn,
-	/* 04-07 */	sub_rn_rn,		subc_rn_rn,		subq_n_rn,		subqt_n_rn,
-	/* 08-11 */	neg_rn,			and_rn_rn,		or_rn_rn,		xor_rn_rn,
-	/* 12-15 */	not_rn,			btst_n_rn,		bset_n_rn,		bclr_n_rn,
-	/* 16-19 */	mult_rn_rn,		imult_rn_rn,	imultn_rn_rn,	resmac_rn,
-	/* 20-23 */	imacn_rn_rn,	div_rn_rn,		abs_rn,			sh_rn_rn,
-	/* 24-27 */	shlq_n_rn,		shrq_n_rn,		sha_rn_rn,		sharq_n_rn,
-	/* 28-31 */	ror_rn_rn,		rorq_n_rn,		cmp_rn_rn,		cmpq_n_rn,
-	/* 32-35 */	subqmod_n_rn,	sat16s_rn,		move_rn_rn,		moveq_n_rn,
-	/* 36-39 */	moveta_rn_rn,	movefa_rn_rn,	movei_n_rn,		loadb_rn_rn,
-	/* 40-43 */	loadw_rn_rn,	load_rn_rn,		sat32s_rn,		load_r14n_rn,
-	/* 44-47 */	load_r15n_rn,	storeb_rn_rn,	storew_rn_rn,	store_rn_rn,
-	/* 48-51 */	mirror_rn,		store_rn_r14n,	store_rn_r15n,	move_pc_rn,
-	/* 52-55 */	jump_cc_rn,		jr_cc_n,		mmult_rn_rn,	mtoi_rn_rn,
-	/* 56-59 */	normi_rn_rn,	nop,			load_r14rn_rn,	load_r15rn_rn,
-	/* 60-63 */	store_rn_r14rn,	store_rn_r15rn,	illegal,		addqmod_n_rn
+	/* 00-03 */ add_rn_rn,      addc_rn_rn,     addq_n_rn,      addqt_n_rn,
+	/* 04-07 */ sub_rn_rn,      subc_rn_rn,     subq_n_rn,      subqt_n_rn,
+	/* 08-11 */ neg_rn,         and_rn_rn,      or_rn_rn,       xor_rn_rn,
+	/* 12-15 */ not_rn,         btst_n_rn,      bset_n_rn,      bclr_n_rn,
+	/* 16-19 */ mult_rn_rn,     imult_rn_rn,    imultn_rn_rn,   resmac_rn,
+	/* 20-23 */ imacn_rn_rn,    div_rn_rn,      abs_rn,         sh_rn_rn,
+	/* 24-27 */ shlq_n_rn,      shrq_n_rn,      sha_rn_rn,      sharq_n_rn,
+	/* 28-31 */ ror_rn_rn,      rorq_n_rn,      cmp_rn_rn,      cmpq_n_rn,
+	/* 32-35 */ subqmod_n_rn,   sat16s_rn,      move_rn_rn,     moveq_n_rn,
+	/* 36-39 */ moveta_rn_rn,   movefa_rn_rn,   movei_n_rn,     loadb_rn_rn,
+	/* 40-43 */ loadw_rn_rn,    load_rn_rn,     sat32s_rn,      load_r14n_rn,
+	/* 44-47 */ load_r15n_rn,   storeb_rn_rn,   storew_rn_rn,   store_rn_rn,
+	/* 48-51 */ mirror_rn,      store_rn_r14n,  store_rn_r15n,  move_pc_rn,
+	/* 52-55 */ jump_cc_rn,     jr_cc_n,        mmult_rn_rn,    mtoi_rn_rn,
+	/* 56-59 */ normi_rn_rn,    nop,            load_r14rn_rn,  load_r15rn_rn,
+	/* 60-63 */ store_rn_r14rn, store_rn_r15rn, illegal,        addqmod_n_rn
 };
 
 
@@ -240,7 +240,7 @@ static void (*const dsp_op_table[64])(jaguar_cpu_state *jaguar, UINT16 op) =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(J,pc)		((J)->direct->read_decrypted_word(pc, WORD_XOR_BE(0)))
+#define ROPCODE(J,pc)       ((J)->direct->read_decrypted_word(pc, WORD_XOR_BE(0)))
 
 
 
@@ -252,7 +252,7 @@ INLINE jaguar_cpu_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == JAGUARGPU ||
-		   device->type() == JAGUARDSP);
+			device->type() == JAGUARDSP);
 	return (jaguar_cpu_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -371,13 +371,13 @@ static void init_tables(void)
 	mirror_table = global_alloc_array(UINT16, 65536);
 	for (i = 0; i < 65536; i++)
 		mirror_table[i] = ((i >> 15) & 0x0001) | ((i >> 13) & 0x0002) |
-		                  ((i >> 11) & 0x0004) | ((i >> 9)  & 0x0008) |
-		                  ((i >> 7)  & 0x0010) | ((i >> 5)  & 0x0020) |
-		                  ((i >> 3)  & 0x0040) | ((i >> 1)  & 0x0080) |
-		                  ((i << 1)  & 0x0100) | ((i << 3)  & 0x0200) |
-		                  ((i << 5)  & 0x0400) | ((i << 7)  & 0x0800) |
-		                  ((i << 9)  & 0x1000) | ((i << 11) & 0x2000) |
-		                  ((i << 13) & 0x4000) | ((i << 15) & 0x8000);
+							((i >> 11) & 0x0004) | ((i >> 9)  & 0x0008) |
+							((i >> 7)  & 0x0010) | ((i >> 5)  & 0x0020) |
+							((i >> 3)  & 0x0040) | ((i >> 1)  & 0x0080) |
+							((i << 1)  & 0x0100) | ((i << 3)  & 0x0200) |
+							((i << 5)  & 0x0400) | ((i << 7)  & 0x0800) |
+							((i << 9)  & 0x1000) | ((i << 11) & 0x2000) |
+							((i << 13) & 0x4000) | ((i << 15) & 0x8000);
 
 	/* fill in the condition table */
 	condition_table = global_alloc_array(UINT8, 32 * 8);
@@ -598,7 +598,7 @@ void addq_n_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	CLR_ZNC(jaguar); SET_ZNC_ADD(jaguar, r2, r1, res);
 }
 
-void addqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op)	/* DSP only */
+void addqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op)  /* DSP only */
 {
 	int dreg = op & 31;
 	UINT32 r1 = convert_zero[(op >> 5) & 31];
@@ -751,7 +751,7 @@ void jr_cc_n(jaguar_cpu_state *jaguar, UINT16 op)
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);
 
-		jaguar->icount -= 3;	/* 3 wait states guaranteed */
+		jaguar->icount -= 3;    /* 3 wait states guaranteed */
 	}
 }
 
@@ -768,7 +768,7 @@ void jump_cc_rn(jaguar_cpu_state *jaguar, UINT16 op)
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);
 
-		jaguar->icount -= 3;	/* 3 wait states guaranteed */
+		jaguar->icount -= 3;    /* 3 wait states guaranteed */
 	}
 }
 
@@ -814,14 +814,14 @@ void loadw_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	jaguar->r[op & 31] = READWORD(jaguar, r1);
 }
 
-void loadp_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)	/* GPU only */
+void loadp_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)   /* GPU only */
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
 	jaguar->ctrl[G_HIDATA] = READWORD(jaguar, r1);
 	jaguar->r[op & 31] = READWORD(jaguar, r1+4);
 }
 
-void mirror_rn(jaguar_cpu_state *jaguar, UINT16 op)	/* DSP only */
+void mirror_rn(jaguar_cpu_state *jaguar, UINT16 op) /* DSP only */
 {
 	int dreg = op & 31;
 	UINT32 r1 = jaguar->r[dreg];
@@ -959,15 +959,15 @@ void or_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	CLR_ZN(jaguar); SET_ZN(jaguar, res);
 }
 
-void pack_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* GPU only */
+void pack_rn(jaguar_cpu_state *jaguar, UINT16 op)       /* GPU only */
 {
 	int dreg = op & 31;
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
 	UINT32 r2 = jaguar->r[dreg];
 	UINT32 res;
-	if (r1 == 0)	/* PACK */
+	if (r1 == 0)    /* PACK */
 		res = ((r2 >> 10) & 0xf000) | ((r2 >> 5) & 0x0f00) | (r2 & 0xff);
-	else			/* UNPACK */
+	else            /* UNPACK */
 		res = ((r2 & 0xf000) << 10) | ((r2 & 0x0f00) << 5) | (r2 & 0xff);
 	jaguar->r[dreg] = res;
 	CLR_ZN(jaguar); SET_ZN(jaguar, res);
@@ -998,7 +998,7 @@ void rorq_n_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	CLR_ZNC(jaguar); SET_ZN(jaguar, res); jaguar->FLAGS |= (r2 >> 30) & 2;
 }
 
-void sat8_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* GPU only */
+void sat8_rn(jaguar_cpu_state *jaguar, UINT16 op)       /* GPU only */
 {
 	int dreg = op & 31;
 	INT32 r2 = jaguar->r[dreg];
@@ -1007,7 +1007,7 @@ void sat8_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* GPU only */
 	CLR_ZN(jaguar); SET_ZN(jaguar, res);
 }
 
-void sat16_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* GPU only */
+void sat16_rn(jaguar_cpu_state *jaguar, UINT16 op)      /* GPU only */
 {
 	int dreg = op & 31;
 	INT32 r2 = jaguar->r[dreg];
@@ -1016,7 +1016,7 @@ void sat16_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* GPU only */
 	CLR_ZN(jaguar); SET_ZN(jaguar, res);
 }
 
-void sat16s_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* DSP only */
+void sat16s_rn(jaguar_cpu_state *jaguar, UINT16 op)     /* DSP only */
 {
 	int dreg = op & 31;
 	INT32 r2 = jaguar->r[dreg];
@@ -1025,7 +1025,7 @@ void sat16s_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* DSP only */
 	CLR_ZN(jaguar); SET_ZN(jaguar, res);
 }
 
-void sat24_rn(jaguar_cpu_state *jaguar, UINT16 op)			/* GPU only */
+void sat24_rn(jaguar_cpu_state *jaguar, UINT16 op)          /* GPU only */
 {
 	int dreg = op & 31;
 	INT32 r2 = jaguar->r[dreg];
@@ -1034,7 +1034,7 @@ void sat24_rn(jaguar_cpu_state *jaguar, UINT16 op)			/* GPU only */
 	CLR_ZN(jaguar); SET_ZN(jaguar, res);
 }
 
-void sat32s_rn(jaguar_cpu_state *jaguar, UINT16 op)		/* DSP only */
+void sat32s_rn(jaguar_cpu_state *jaguar, UINT16 op)     /* DSP only */
 {
 	int dreg = op & 31;
 	INT32 r2 = (UINT32)jaguar->r[dreg];
@@ -1160,7 +1160,7 @@ void storew_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	WRITEWORD(jaguar, r1, jaguar->r[op & 31]);
 }
 
-void storep_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)	/* GPU only */
+void storep_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)  /* GPU only */
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
 	WRITELONG(jaguar, r1, jaguar->ctrl[G_HIDATA]);
@@ -1197,7 +1197,7 @@ void subq_n_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	CLR_ZNC(jaguar); SET_ZNC_SUB(jaguar, r2, r1, res);
 }
 
-void subqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op)	/* DSP only */
+void subqmod_n_rn(jaguar_cpu_state *jaguar, UINT16 op)  /* DSP only */
 {
 	int dreg = op & 31;
 	UINT32 r1 = convert_zero[(op >> 5) & 31];
@@ -1434,49 +1434,49 @@ static CPU_SET_INFO( jaguargpu )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ0:		set_irq_line(jaguar, JAGUAR_IRQ0, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ1:		set_irq_line(jaguar, JAGUAR_IRQ1, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ2:		set_irq_line(jaguar, JAGUAR_IRQ2, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ3:		set_irq_line(jaguar, JAGUAR_IRQ3, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ4:		set_irq_line(jaguar, JAGUAR_IRQ4, info->i);			break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ0:     set_irq_line(jaguar, JAGUAR_IRQ0, info->i);         break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ1:     set_irq_line(jaguar, JAGUAR_IRQ1, info->i);         break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ2:     set_irq_line(jaguar, JAGUAR_IRQ2, info->i);         break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ3:     set_irq_line(jaguar, JAGUAR_IRQ3, info->i);         break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ4:     set_irq_line(jaguar, JAGUAR_IRQ4, info->i);         break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + JAGUAR_PC:			jaguar->PC = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_FLAGS:		jaguar->FLAGS = info->i;							break;
+		case CPUINFO_INT_REGISTER + JAGUAR_PC:          jaguar->PC = info->i;                               break;
+		case CPUINFO_INT_REGISTER + JAGUAR_FLAGS:       jaguar->FLAGS = info->i;                            break;
 
-		case CPUINFO_INT_REGISTER + JAGUAR_R0:			jaguar->r[0] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R1:			jaguar->r[1] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R2:			jaguar->r[2] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R3:			jaguar->r[3] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R4:			jaguar->r[4] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R5:			jaguar->r[5] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R6:			jaguar->r[6] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R7:			jaguar->r[7] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R8:			jaguar->r[8] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R9:			jaguar->r[9] = info->i;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R10:			jaguar->r[10] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R11:			jaguar->r[11] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R12:			jaguar->r[12] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R13:			jaguar->r[13] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R14:			jaguar->r[14] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R15:			jaguar->r[15] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R16:			jaguar->r[16] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R17:			jaguar->r[17] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R18:			jaguar->r[18] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R19:			jaguar->r[19] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R20:			jaguar->r[20] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R21:			jaguar->r[21] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R22:			jaguar->r[22] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R23:			jaguar->r[23] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R24:			jaguar->r[24] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R25:			jaguar->r[25] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R26:			jaguar->r[26] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R27:			jaguar->r[27] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R28:			jaguar->r[28] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R29:			jaguar->r[29] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R30:			jaguar->r[30] = info->i;							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R31:			jaguar->r[31] = info->i;							break;
-		case CPUINFO_INT_SP:							jaguar->b0[31] = info->i;							break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R0:          jaguar->r[0] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R1:          jaguar->r[1] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R2:          jaguar->r[2] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R3:          jaguar->r[3] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R4:          jaguar->r[4] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R5:          jaguar->r[5] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R6:          jaguar->r[6] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R7:          jaguar->r[7] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R8:          jaguar->r[8] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R9:          jaguar->r[9] = info->i;                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R10:         jaguar->r[10] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R11:         jaguar->r[11] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R12:         jaguar->r[12] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R13:         jaguar->r[13] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R14:         jaguar->r[14] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R15:         jaguar->r[15] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R16:         jaguar->r[16] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R17:         jaguar->r[17] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R18:         jaguar->r[18] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R19:         jaguar->r[19] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R20:         jaguar->r[20] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R21:         jaguar->r[21] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R22:         jaguar->r[22] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R23:         jaguar->r[23] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R24:         jaguar->r[24] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R25:         jaguar->r[25] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R26:         jaguar->r[26] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R27:         jaguar->r[27] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R28:         jaguar->r[28] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R29:         jaguar->r[29] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R30:         jaguar->r[30] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R31:         jaguar->r[31] = info->i;                            break;
+		case CPUINFO_INT_SP:                            jaguar->b0[31] = info->i;                           break;
 	}
 }
 
@@ -1492,85 +1492,85 @@ CPU_GET_INFO( jaguargpu )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(jaguar_cpu_state);						break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 5;										break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;										break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;								break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;										break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;										break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;										break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 6;										break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;										break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 1;										break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(jaguar_cpu_state);                     break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 5;                                        break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                                        break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                               break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                                        break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                                        break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                                        break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 6;                                        break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                                        break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 1;                                        break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;								break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;								break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;								break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                               break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;                              break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                               break;
 
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ0:		info->i = (jaguar->ctrl[G_CTRL] & 0x40) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ1:		info->i = (jaguar->ctrl[G_CTRL] & 0x80) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ2:		info->i = (jaguar->ctrl[G_CTRL] & 0x100) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ3:		info->i = (jaguar->ctrl[G_CTRL] & 0x200) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ4:		info->i = (jaguar->ctrl[G_CTRL] & 0x400) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ0:     info->i = (jaguar->ctrl[G_CTRL] & 0x40) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ1:     info->i = (jaguar->ctrl[G_CTRL] & 0x80) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ2:     info->i = (jaguar->ctrl[G_CTRL] & 0x100) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ3:     info->i = (jaguar->ctrl[G_CTRL] & 0x200) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ4:     info->i = (jaguar->ctrl[G_CTRL] & 0x400) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = jaguar->ppc;								break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = jaguar->ppc;                              break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + JAGUAR_PC:			info->i = jaguar->PC;								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_FLAGS:		info->i = jaguar->FLAGS;							break;
+		case CPUINFO_INT_REGISTER + JAGUAR_PC:          info->i = jaguar->PC;                               break;
+		case CPUINFO_INT_REGISTER + JAGUAR_FLAGS:       info->i = jaguar->FLAGS;                            break;
 
-		case CPUINFO_INT_REGISTER + JAGUAR_R0:			info->i = jaguar->r[0];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R1:			info->i = jaguar->r[1];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R2:			info->i = jaguar->r[2];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R3:			info->i = jaguar->r[3];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R4:			info->i = jaguar->r[4];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R5:			info->i = jaguar->r[5];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R6:			info->i = jaguar->r[6];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R7:			info->i = jaguar->r[7];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R8:			info->i = jaguar->r[8];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R9:			info->i = jaguar->r[9];								break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R10:			info->i = jaguar->r[10];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R11:			info->i = jaguar->r[11];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R12:			info->i = jaguar->r[12];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R13:			info->i = jaguar->r[13];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R14:			info->i = jaguar->r[14];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R15:			info->i = jaguar->r[15];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R16:			info->i = jaguar->r[16];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R17:			info->i = jaguar->r[17];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R18:			info->i = jaguar->r[18];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R19:			info->i = jaguar->r[19];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R20:			info->i = jaguar->r[20];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R21:			info->i = jaguar->r[21];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R22:			info->i = jaguar->r[22];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R23:			info->i = jaguar->r[23];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R24:			info->i = jaguar->r[24];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R25:			info->i = jaguar->r[25];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R26:			info->i = jaguar->r[26];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R27:			info->i = jaguar->r[27];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R28:			info->i = jaguar->r[28];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R29:			info->i = jaguar->r[29];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R30:			info->i = jaguar->r[30];							break;
-		case CPUINFO_INT_REGISTER + JAGUAR_R31:			info->i = jaguar->r[31];							break;
-		case CPUINFO_INT_SP:							info->i = jaguar->b0[31];							break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R0:          info->i = jaguar->r[0];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R1:          info->i = jaguar->r[1];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R2:          info->i = jaguar->r[2];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R3:          info->i = jaguar->r[3];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R4:          info->i = jaguar->r[4];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R5:          info->i = jaguar->r[5];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R6:          info->i = jaguar->r[6];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R7:          info->i = jaguar->r[7];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R8:          info->i = jaguar->r[8];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R9:          info->i = jaguar->r[9];                             break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R10:         info->i = jaguar->r[10];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R11:         info->i = jaguar->r[11];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R12:         info->i = jaguar->r[12];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R13:         info->i = jaguar->r[13];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R14:         info->i = jaguar->r[14];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R15:         info->i = jaguar->r[15];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R16:         info->i = jaguar->r[16];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R17:         info->i = jaguar->r[17];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R18:         info->i = jaguar->r[18];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R19:         info->i = jaguar->r[19];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R20:         info->i = jaguar->r[20];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R21:         info->i = jaguar->r[21];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R22:         info->i = jaguar->r[22];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R23:         info->i = jaguar->r[23];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R24:         info->i = jaguar->r[24];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R25:         info->i = jaguar->r[25];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R26:         info->i = jaguar->r[26];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R27:         info->i = jaguar->r[27];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R28:         info->i = jaguar->r[28];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R29:         info->i = jaguar->r[29];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R30:         info->i = jaguar->r[30];                            break;
+		case CPUINFO_INT_REGISTER + JAGUAR_R31:         info->i = jaguar->r[31];                            break;
+		case CPUINFO_INT_SP:                            info->i = jaguar->b0[31];                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguargpu);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(jaguargpu);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(jaguar);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(jaguar);					break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguargpu);		break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguargpu);break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &jaguar->icount;						break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(jaguargpu);       break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(jaguargpu);              break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(jaguar);               break;
+		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(jaguar);                 break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(jaguargpu);        break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                                  break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(jaguargpu);break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &jaguar->icount;                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Jaguar GPU");						break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Atari Jaguar");					break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Jaguar GPU");                      break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Atari Jaguar");                    break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                             break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                          break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Aaron Giles");           break;
 
-		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c",
+		case CPUINFO_STR_FLAGS:                         sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c",
 															jaguar->FLAGS & 0x8000 ? 'D':'.',
 															jaguar->FLAGS & 0x4000 ? 'A':'.',
 															jaguar->FLAGS & 0x0100 ? '4':'.',
@@ -1581,42 +1581,42 @@ CPU_GET_INFO( jaguargpu )
 															jaguar->FLAGS & 0x0008 ? 'I':'.',
 															jaguar->FLAGS & 0x0004 ? 'N':'.',
 															jaguar->FLAGS & 0x0002 ? 'C':'.',
-															jaguar->FLAGS & 0x0001 ? 'Z':'.');				break;
+															jaguar->FLAGS & 0x0001 ? 'Z':'.');              break;
 
-		case CPUINFO_STR_REGISTER + JAGUAR_PC:  		sprintf(info->s, "PC: %08X", jaguar->PC);			break;
-		case CPUINFO_STR_REGISTER + JAGUAR_FLAGS:		sprintf(info->s, "FLAGS: %08X", jaguar->FLAGS); 	break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R0:			sprintf(info->s, "R0: %08X", jaguar->r[0]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R1:			sprintf(info->s, "R1: %08X", jaguar->r[1]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R2:			sprintf(info->s, "R2: %08X", jaguar->r[2]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R3:			sprintf(info->s, "R3: %08X", jaguar->r[3]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R4:			sprintf(info->s, "R4: %08X", jaguar->r[4]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R5:			sprintf(info->s, "R5: %08X", jaguar->r[5]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R6:			sprintf(info->s, "R6: %08X", jaguar->r[6]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R7:			sprintf(info->s, "R7: %08X", jaguar->r[7]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R8:			sprintf(info->s, "R8: %08X", jaguar->r[8]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R9:			sprintf(info->s, "R9: %08X", jaguar->r[9]); 		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R10:			sprintf(info->s, "R10:%08X", jaguar->r[10]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R11:			sprintf(info->s, "R11:%08X", jaguar->r[11]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R12:			sprintf(info->s, "R12:%08X", jaguar->r[12]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R13:			sprintf(info->s, "R13:%08X", jaguar->r[13]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R14:			sprintf(info->s, "R14:%08X", jaguar->r[14]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R15:			sprintf(info->s, "R15:%08X", jaguar->r[15]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R16:			sprintf(info->s, "R16:%08X", jaguar->r[16]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R17:			sprintf(info->s, "R17:%08X", jaguar->r[17]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R18:			sprintf(info->s, "R18:%08X", jaguar->r[18]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R19:			sprintf(info->s, "R19:%08X", jaguar->r[19]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R20:			sprintf(info->s, "R20:%08X", jaguar->r[20]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R21:			sprintf(info->s, "R21:%08X", jaguar->r[21]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R22:			sprintf(info->s, "R22:%08X", jaguar->r[22]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R23:			sprintf(info->s, "R23:%08X", jaguar->r[23]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R24:			sprintf(info->s, "R24:%08X", jaguar->r[24]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R25:			sprintf(info->s, "R25:%08X", jaguar->r[25]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R26:			sprintf(info->s, "R26:%08X", jaguar->r[26]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R27:			sprintf(info->s, "R27:%08X", jaguar->r[27]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R28:			sprintf(info->s, "R28:%08X", jaguar->r[28]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R29:			sprintf(info->s, "R29:%08X", jaguar->r[29]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R30:			sprintf(info->s, "R30:%08X", jaguar->r[30]);		break;
-		case CPUINFO_STR_REGISTER + JAGUAR_R31:			sprintf(info->s, "R31:%08X", jaguar->r[31]);		break;
+		case CPUINFO_STR_REGISTER + JAGUAR_PC:          sprintf(info->s, "PC: %08X", jaguar->PC);           break;
+		case CPUINFO_STR_REGISTER + JAGUAR_FLAGS:       sprintf(info->s, "FLAGS: %08X", jaguar->FLAGS);     break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R0:          sprintf(info->s, "R0: %08X", jaguar->r[0]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R1:          sprintf(info->s, "R1: %08X", jaguar->r[1]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R2:          sprintf(info->s, "R2: %08X", jaguar->r[2]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R3:          sprintf(info->s, "R3: %08X", jaguar->r[3]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R4:          sprintf(info->s, "R4: %08X", jaguar->r[4]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R5:          sprintf(info->s, "R5: %08X", jaguar->r[5]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R6:          sprintf(info->s, "R6: %08X", jaguar->r[6]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R7:          sprintf(info->s, "R7: %08X", jaguar->r[7]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R8:          sprintf(info->s, "R8: %08X", jaguar->r[8]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R9:          sprintf(info->s, "R9: %08X", jaguar->r[9]);         break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R10:         sprintf(info->s, "R10:%08X", jaguar->r[10]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R11:         sprintf(info->s, "R11:%08X", jaguar->r[11]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R12:         sprintf(info->s, "R12:%08X", jaguar->r[12]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R13:         sprintf(info->s, "R13:%08X", jaguar->r[13]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R14:         sprintf(info->s, "R14:%08X", jaguar->r[14]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R15:         sprintf(info->s, "R15:%08X", jaguar->r[15]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R16:         sprintf(info->s, "R16:%08X", jaguar->r[16]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R17:         sprintf(info->s, "R17:%08X", jaguar->r[17]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R18:         sprintf(info->s, "R18:%08X", jaguar->r[18]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R19:         sprintf(info->s, "R19:%08X", jaguar->r[19]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R20:         sprintf(info->s, "R20:%08X", jaguar->r[20]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R21:         sprintf(info->s, "R21:%08X", jaguar->r[21]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R22:         sprintf(info->s, "R22:%08X", jaguar->r[22]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R23:         sprintf(info->s, "R23:%08X", jaguar->r[23]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R24:         sprintf(info->s, "R24:%08X", jaguar->r[24]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R25:         sprintf(info->s, "R25:%08X", jaguar->r[25]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R26:         sprintf(info->s, "R26:%08X", jaguar->r[26]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R27:         sprintf(info->s, "R27:%08X", jaguar->r[27]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R28:         sprintf(info->s, "R28:%08X", jaguar->r[28]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R29:         sprintf(info->s, "R29:%08X", jaguar->r[29]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R30:         sprintf(info->s, "R30:%08X", jaguar->r[30]);        break;
+		case CPUINFO_STR_REGISTER + JAGUAR_R31:         sprintf(info->s, "R31:%08X", jaguar->r[31]);        break;
 	}
 }
 
@@ -1631,11 +1631,11 @@ static CPU_SET_INFO( jaguardsp )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ5:		set_irq_line(jaguar, JAGUAR_IRQ5, info->i);			break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ5:     set_irq_line(jaguar, JAGUAR_IRQ5, info->i);         break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 
-		default:										CPU_SET_INFO_CALL(jaguargpu);						break;
+		default:                                        CPU_SET_INFO_CALL(jaguargpu);                       break;
 	}
 }
 
@@ -1645,19 +1645,19 @@ CPU_GET_INFO( jaguardsp )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 6;										break;
-		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ5:		info->i = (jaguar->ctrl[G_CTRL] & 0x10000) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 6;                                        break;
+		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ5:     info->i = (jaguar->ctrl[G_CTRL] & 0x10000) ? ASSERT_LINE : CLEAR_LINE; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguardsp);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(jaguardsp);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguardsp);		break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguardsp);break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(jaguardsp);       break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(jaguardsp);              break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(jaguardsp);        break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(jaguardsp);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Jaguar DSP");						break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Jaguar DSP");                      break;
 
-		default:										CPU_GET_INFO_CALL(jaguargpu);						break;
+		default:                                        CPU_GET_INFO_CALL(jaguargpu);                       break;
 	}
 }
 

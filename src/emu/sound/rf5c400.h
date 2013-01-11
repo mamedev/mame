@@ -11,7 +11,7 @@ DECLARE_READ16_DEVICE_HANDLER( rf5c400_r );
 DECLARE_WRITE16_DEVICE_HANDLER( rf5c400_w );
 
 class rf5c400_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -13,36 +13,36 @@
 /* Video Hardware Addresses */
 
 /* Square Generator (13 bytes each) */
-#define LINEV	0x1403	// LINES VERTICAL START
-#define LINEVS	0x1483	// LINES VERT STOP
-#define LINEH	0x1083	// LINES HORIZ START
-#define LINEC	0x1283	// LINE COLOR, 4 BITS D0-D3
-#define LINESH	0x1203	// LINES SLOPE 4 BITS D0-D3 (signed)
+#define LINEV   0x1403  // LINES VERTICAL START
+#define LINEVS  0x1483  // LINES VERT STOP
+#define LINEH   0x1083  // LINES HORIZ START
+#define LINEC   0x1283  // LINE COLOR, 4 BITS D0-D3
+#define LINESH  0x1203  // LINES SLOPE 4 BITS D0-D3 (signed)
 /* LINESH was used for rotation effects in an older version of the game */
 
 /* Shell Object0 */
-#define SHEL0H	0x1800	// SHELL H POSITON (NORMAL SCREEN)
-#define SHL0V	0x1400	// SHELL V START(NORMAL SCREEN)
-#define SHL0VS	0x1480	// SHELL V STOP (NORMAL SCREEN)
-#define SHL0ST	0x1200	// SHELL VSTRETCH (LIKE MST OBJ STRECTH)
-#define SHL0PC	0x1280	// SHELL PICTURE CODE (D3-D0)
+#define SHEL0H  0x1800  // SHELL H POSITON (NORMAL SCREEN)
+#define SHL0V   0x1400  // SHELL V START(NORMAL SCREEN)
+#define SHL0VS  0x1480  // SHELL V STOP (NORMAL SCREEN)
+#define SHL0ST  0x1200  // SHELL VSTRETCH (LIKE MST OBJ STRECTH)
+#define SHL0PC  0x1280  // SHELL PICTURE CODE (D3-D0)
 
 /* Shell Object1 (see above) */
-#define SHEL1H	0x1A00
-#define SHL1V	0x1401
-#define SHL1VS	0x1481
-#define SHL1ST	0x1201
-#define SHL1PC	0x1281
+#define SHEL1H  0x1A00
+#define SHL1V   0x1401
+#define SHL1VS  0x1481
+#define SHL1ST  0x1201
+#define SHL1PC  0x1281
 
 /* Motion Object RAM */
-#define MOBJV	0x1C00	// V POSITION (SCREEN ON SIDE)
-#define MOBVS	0x1482	// V STOP OF MOTION OBJECT (NORMAL SCREEN)
-#define MOBJH	0x1402	// H POSITON (SCREEN ON SIDE) (VSTART - NORMAL SCREEN)
-#define MOBST	0x1082	// STARTING LINE FOR RAM SCAN ON MOBJ
-#define VSTRLO	0x1202	// VERT (SCREEN ON SIDE) STRETCH MOJ OBJ
-#define MOTT	0x2C00	// MOTION OBJECT RAM (00-0F NOT USED, BYT CLEARED)
-#define MOBSC0	0x1080	// SCAN ROM START FOR MOBJ (unused?)
-#define MOBSC1	0x1081	// (unused?)
+#define MOBJV   0x1C00  // V POSITION (SCREEN ON SIDE)
+#define MOBVS   0x1482  // V STOP OF MOTION OBJECT (NORMAL SCREEN)
+#define MOBJH   0x1402  // H POSITON (SCREEN ON SIDE) (VSTART - NORMAL SCREEN)
+#define MOBST   0x1082  // STARTING LINE FOR RAM SCAN ON MOBJ
+#define VSTRLO  0x1202  // VERT (SCREEN ON SIDE) STRETCH MOJ OBJ
+#define MOTT    0x2C00  // MOTION OBJECT RAM (00-0F NOT USED, BYT CLEARED)
+#define MOBSC0  0x1080  // SCAN ROM START FOR MOBJ (unused?)
+#define MOBSC1  0x1081  // (unused?)
 
 
 
@@ -68,10 +68,10 @@ TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
 void tunhunt_state::video_start()
 {
 	/*
-    Motion Object RAM contains 64 lines of run-length encoded data.
-    We keep track of dirty lines and cache the expanded bitmap.
-    With max RLE expansion, bitmap size is 256x64.
-    */
+	Motion Object RAM contains 64 lines of run-length encoded data.
+	We keep track of dirty lines and cache the expanded bitmap.
+	With max RLE expansion, bitmap size is 256x64.
+	*/
 
 	m_tmpbitmap.allocate(256, 64, machine().primary_screen->format());
 
@@ -86,9 +86,9 @@ void tunhunt_state::palette_init()
 	int i;
 
 	/* Tunnel Hunt uses a combination of color proms and palette RAM to specify a 16 color
-     * palette.  Here, we manage only the mappings for alphanumeric characters and SHELL
-     * graphics, which are unpacked ahead of time and drawn using MAME's drawgfx primitives.
-     */
+	 * palette.  Here, we manage only the mappings for alphanumeric characters and SHELL
+	 * graphics, which are unpacked ahead of time and drawn using MAME's drawgfx primitives.
+	 */
 
 	/* allocate the colortable */
 	machine().colortable = colortable_alloc(machine(), 0x10);
@@ -98,10 +98,10 @@ void tunhunt_state::palette_init()
 		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* AlphaNumerics (1bpp)
-     *  2 bits of hilite select from 4 different background colors
-     *  Foreground color is always pen#4
-     *  Background color is mapped as follows:
-     */
+	 *  2 bits of hilite select from 4 different background colors
+	 *  Foreground color is always pen#4
+	 *  Background color is mapped as follows:
+	 */
 
 	/* alpha hilite#0 */
 	colortable_entry_set_value(machine().colortable, 0x10, 0x0); /* background color#0 (transparent) */
@@ -120,8 +120,8 @@ void tunhunt_state::palette_init()
 	colortable_entry_set_value(machine().colortable, 0x17, 0x4); /* foreground color */
 
 	/* shell graphics; these are either 1bpp (2 banks) or 2bpp.  It isn't clear which.
-     * In any event, the following pens are associated with the shell graphics:
-     */
+	 * In any event, the following pens are associated with the shell graphics:
+	 */
 	colortable_entry_set_value(machine().colortable, 0x18, 0);
 	colortable_entry_set_value(machine().colortable, 0x19, 4);//1;
 }
@@ -190,9 +190,9 @@ static void set_pens(running_machine &machine)
 
 	/* combine color components with shade value (0..0xf) */
 		#define APPLY_SHADE( C,S ) ((C*S)/0xf)
-		red		= APPLY_SHADE(red,shade);
-		green	= APPLY_SHADE(green,shade);
-		blue	= APPLY_SHADE(blue,shade);
+		red     = APPLY_SHADE(red,shade);
+		green   = APPLY_SHADE(green,shade);
+		blue    = APPLY_SHADE(blue,shade);
 
 		colortable_palette_set_color( machine.colortable,i,MAKE_RGB(red,green,blue) );
 	}
@@ -352,20 +352,20 @@ static void draw_shell(running_machine &machine,
 	}
 	else
 	/*
-        vstretch is normally 0x01
+	    vstretch is normally 0x01
 
-        targeting cursor:
-            hposition   = 0x78
-            vstart      = 0x90
-            vstop       = 0x80
+	    targeting cursor:
+	        hposition   = 0x78
+	        vstart      = 0x90
+	        vstop       = 0x80
 
-        during grid test:
-            vstretch    = 0xff
-            hposition   = 0xff
-            vstart      = 0xff
-            vstop       = 0x00
+	    during grid test:
+	        vstretch    = 0xff
+	        hposition   = 0xff
+	        vstart      = 0xff
+	        vstop       = 0x00
 
-    */
+	*/
 	drawgfx_transpen( bitmap, cliprect,
 			machine.gfx[1],
 			picture_code,
@@ -383,19 +383,19 @@ UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 
 	draw_motion_object(machine(), bitmap, cliprect);
 
 	draw_shell(machine(), bitmap, cliprect,
-		m_workram[SHL0PC],	/* picture code */
-		m_workram[SHEL0H],	/* hposition */
-		m_workram[SHL0V],	/* vstart */
-		m_workram[SHL0VS],	/* vstop */
-		m_workram[SHL0ST],	/* vstretch */
+		m_workram[SHL0PC],  /* picture code */
+		m_workram[SHEL0H],  /* hposition */
+		m_workram[SHL0V],   /* vstart */
+		m_workram[SHL0VS],  /* vstop */
+		m_workram[SHL0ST],  /* vstretch */
 		m_control&0x08 ); /* hstretch */
 
 	draw_shell(machine(), bitmap, cliprect,
-		m_workram[SHL1PC],	/* picture code */
-		m_workram[SHEL1H],	/* hposition */
-		m_workram[SHL1V],	/* vstart */
-		m_workram[SHL1VS],	/* vstop */
-		m_workram[SHL1ST],	/* vstretch */
+		m_workram[SHL1PC],  /* picture code */
+		m_workram[SHEL1H],  /* hposition */
+		m_workram[SHL1V],   /* vstart */
+		m_workram[SHL1VS],  /* vstop */
+		m_workram[SHL1ST],  /* vstretch */
 		m_control&0x10 ); /* hstretch */
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

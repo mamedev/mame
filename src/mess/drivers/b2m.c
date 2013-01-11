@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( b2m_io, AS_IO, 8, b2m_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-    AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
+	AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
 	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8, b2m_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-    AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
+	AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
 	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
@@ -149,7 +149,7 @@ static INPUT_PORTS_START( b2m )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('?') PORT_CHAR('/')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\"') PORT_CHAR(':')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)	PORT_CHAR('>') PORT_CHAR('.')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)    PORT_CHAR('>') PORT_CHAR('.')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PgUp") PORT_CODE(KEYCODE_PGUP)
@@ -167,8 +167,8 @@ static INPUT_PORTS_START( b2m )
 
 	PORT_START("MONITOR")
 	PORT_CONFNAME(0x01, 0x01, "Monitor")
-	PORT_CONFSETTING(	0x01, "Color")
-	PORT_CONFSETTING(	0x00, "B/W")
+	PORT_CONFSETTING(   0x01, "Color")
+	PORT_CONFSETTING(   0x00, "B/W")
 INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER( b2m_state::b2m_floppy_formats )
@@ -182,14 +182,14 @@ SLOT_INTERFACE_END
 
 /* Machine driver */
 static MACHINE_CONFIG_START( b2m, b2m_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8080, 2000000)
-    MCFG_CPU_PROGRAM_MAP(b2m_mem)
-    MCFG_CPU_IO_MAP(b2m_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8080, 2000000)
+	MCFG_CPU_PROGRAM_MAP(b2m_mem)
+	MCFG_CPU_IO_MAP(b2m_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", b2m_state,  b2m_vblank_interrupt)
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 
 	/* sound */
-    MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -231,26 +231,26 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( b2mrom, b2m )
-    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(b2m_rom_io)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 
 ROM_START( b2m )
-    ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "b2m.rom", 0x10000, 0x2000, CRC(3f3214d6) SHA1(dd93e7fbabf14d1aed6777fe1ccfe0a3ca8fcaf2) )
+	ROM_REGION( 0x12000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "b2m.rom", 0x10000, 0x2000, CRC(3f3214d6) SHA1(dd93e7fbabf14d1aed6777fe1ccfe0a3ca8fcaf2) )
 ROM_END
 
 ROM_START( b2mrom )
-    ROM_REGION( 0x22000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "bios2.rom",  0x10000, 0x2000, CRC(c22a98b7) SHA1(7de91e653bf4b191ded62cf21532578268e4a2c1) )
-    ROM_LOAD( "ramdos.sys", 0x12000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
+	ROM_REGION( 0x22000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios2.rom",  0x10000, 0x2000, CRC(c22a98b7) SHA1(7de91e653bf4b191ded62cf21532578268e4a2c1) )
+	ROM_LOAD( "ramdos.sys", 0x12000, 0x60c0, CRC(91ed6df0) SHA1(4fd040f2647a6b7930c330c75560a035027d0606) )
 ROM_END
 
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT               INIT     COMPANY   FULLNAME   FLAGS */
-COMP( 1989, b2m,	0,		0,		b2m,		b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
-COMP( 1989, b2mrom,	b2m,	0,		b2mrom,		b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)
+COMP( 1989, b2m,    0,      0,      b2m,        b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M",   GAME_SUPPORTS_SAVE)
+COMP( 1989, b2mrom, b2m,    0,      b2mrom,     b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M ROM-disk",  GAME_SUPPORTS_SAVE)

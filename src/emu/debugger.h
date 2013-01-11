@@ -137,4 +137,4 @@ INLINE int debugger_within_instruction_hook(running_machine &machine)
 }
 
 
-#endif	/* __DEBUGGER_H__ */
+#endif  /* __DEBUGGER_H__ */

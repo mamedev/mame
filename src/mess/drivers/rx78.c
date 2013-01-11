@@ -151,9 +151,9 @@ UINT32 rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 READ8_MEMBER( rx78_state::key_r )
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-	                                        "KEY4", "KEY5", "KEY6", "KEY7",
-	                                        "KEY8", "JOY1P_0","JOY1P_1","JOY1P_2",
-	                                        "JOY2P_0", "JOY2P_1", "JOY2P_2", "UNUSED" };
+											"KEY4", "KEY5", "KEY6", "KEY7",
+											"KEY8", "JOY1P_0","JOY1P_1","JOY1P_2",
+											"JOY2P_0", "JOY2P_1", "JOY2P_2", "UNUSED" };
 
 	if(m_key_mux == 0x30) //status read
 	{
@@ -434,15 +434,15 @@ static DEVICE_IMAGE_LOAD( rx78_cart )
 /* F4 Character Displayer */
 static const gfx_layout rx78_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	187,					/* 187 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	187,                    /* 187 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( rx78 )
@@ -462,7 +462,7 @@ static const sn76496_config psg_intf =
 
 static MACHINE_CONFIG_START( rx78, rx78_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7)	// unknown divider
+	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
 	MCFG_CPU_PROGRAM_MAP(rx78_mem)
 	MCFG_CPU_IO_MAP(rx78_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)

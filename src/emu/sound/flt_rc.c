@@ -4,10 +4,10 @@
 struct filter_rc_state
 {
 	device_t *device;
-	sound_stream *	stream;
-	int				k;
-	int				memory;
-	int				type;
+	sound_stream *  stream;
+	int             k;
+	int             memory;
+	int             type;
 };
 
 INLINE filter_rc_state *get_safe_token(device_t *device)
@@ -114,7 +114,7 @@ const device_type FILTER_RC = &device_creator<filter_rc_device>;
 
 filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FILTER_RC, "RC Filter", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(filter_rc_state);
 }
@@ -147,5 +147,3 @@ void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

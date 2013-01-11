@@ -52,7 +52,7 @@ struct dave_t
 	/* bit 1: 50kHz timer irq */
 	int timer_irq;
 	/* 1khz timer - divided into 1kHz, 50Hz and 1Hz timer */
-	emu_timer	*int_timer;
+	emu_timer   *int_timer;
 	/* state of 1kHz timer */
 	unsigned long one_khz_state;
 	/* state of 50Hz timer */
@@ -67,15 +67,15 @@ struct dave_t
 	/* SOUND SYNTHESIS */
 	int Period[4];
 	int Count[4];
-	int	level[4];
+	int level[4];
 
 	/* these are used to force channels on/off */
 	/* if one of the or values is 0x0ff, this means
-    the volume will be forced on,else it is dependant on
-    the state of the wave */
+	the volume will be forced on,else it is dependant on
+	the state of the wave */
 	int level_or[8];
 	/* if one of the values is 0x00, this means the
-    volume is forced off, else it is dependant on the wave */
+	volume is forced off, else it is dependant on the wave */
 	int level_and[8];
 
 	/* these are the current channel volumes in MAME form */
@@ -164,7 +164,7 @@ static DEVICE_START( dave_sound )
 	}
 
 	/* dave has 3 tone channels and 1 noise channel.
-    the volumes are mixed internally and output as left and right volume */
+	the volumes are mixed internally and output as left and right volume */
 
 	/* 3 tone channels + 1 noise channel */
 	dave->sound_stream_var = device->machine().sound().stream_alloc(*device, 0, 2, device->machine().sample_rate(), NULL, dave_update_sound);
@@ -321,9 +321,9 @@ static STREAM_UPDATE( dave_update_sound )
 	dave_t *dave = get_token(device);
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,
-    2 = channel 1 left volume, 3 = channel 1 right volume,
-    4 = channel 2 left volume, 5 = channel 2 right volume
-    6 = noise channel left volume, 7 = noise channel right volume */
+	2 = channel 1 left volume, 3 = channel 1 right volume,
+	4 = channel 2 left volume, 5 = channel 2 right volume
+	6 = noise channel left volume, 7 = noise channel right volume */
 	int output_volumes[8];
 	int left_volume;
 	int right_volume;
@@ -486,11 +486,11 @@ static WRITE8_DEVICE_HANDLER(dave_sound_w)
 		case 7:
 		{
 			/*  force => the value of this register is forced regardless of the wave
-                    state,
-                remove => this value is force to zero so that it has no influence over
-                    the final volume calculation, regardless of wave state
-                use => the volume value is dependant on the wave state and is included
-                    in the final volume calculation */
+			        state,
+			    remove => this value is force to zero so that it has no influence over
+			        the final volume calculation, regardless of wave state
+			    use => the volume value is dependant on the wave state and is included
+			        in the final volume calculation */
 
 			logerror("selectable int ");
 			switch ((data>>5) & 0x03)
@@ -821,7 +821,7 @@ const device_type DAVE = &device_creator<dave_sound_device>;
 
 dave_sound_device::dave_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DAVE, "Dave", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(dave_t);
 }
@@ -863,5 +863,3 @@ void dave_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define UPD7507C_TAG	"ic2"
+#define UPD7507C_TAG    "ic2"
 
 
 
@@ -269,7 +269,7 @@ ioport_constructor apricot_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock)
+	: device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock)
 {
 }
 
@@ -281,7 +281,7 @@ apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, 
 void apricot_keyboard_device::device_start()
 {
 	// resolve callbacks
-    m_out_txd_func.resolve(m_out_txd_cb, *this);
+	m_out_txd_func.resolve(m_out_txd_cb, *this);
 }
 
 
@@ -348,13 +348,13 @@ READ8_MEMBER( apricot_keyboard_device::kb_p6_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P60
-        P61     SHIFT
-        P62     CONTROL
+	    P60
+	    P61     SHIFT
+	    P62     CONTROL
 
-    */
+	*/
 
 	UINT8 modifiers = ioport("MODIFIERS")->read();
 

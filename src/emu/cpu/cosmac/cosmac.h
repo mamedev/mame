@@ -119,18 +119,18 @@ typedef void (*cosmac_out_sc_func)(device_t *device, cosmac_state_code sc);
 
 struct cosmac_interface
 {
-	devcb_read_line		m_in_wait_cb;
-	devcb_read_line		m_in_clear_cb;
-	devcb_read_line		m_in_ef1_cb;
-	devcb_read_line		m_in_ef2_cb;
-	devcb_read_line		m_in_ef3_cb;
-	devcb_read_line		m_in_ef4_cb;
-	devcb_write_line	m_out_q_cb;
-	devcb_read8			m_in_dma_cb;
-	devcb_write8		m_out_dma_cb;
-	cosmac_out_sc_func	m_out_sc_cb;
-	devcb_write_line	m_out_tpa_cb;
-	devcb_write_line	m_out_tpb_cb;
+	devcb_read_line     m_in_wait_cb;
+	devcb_read_line     m_in_clear_cb;
+	devcb_read_line     m_in_ef1_cb;
+	devcb_read_line     m_in_ef2_cb;
+	devcb_read_line     m_in_ef3_cb;
+	devcb_read_line     m_in_ef4_cb;
+	devcb_write_line    m_out_q_cb;
+	devcb_read8         m_in_dma_cb;
+	devcb_write8        m_out_dma_cb;
+	cosmac_out_sc_func  m_out_sc_cb;
+	devcb_write_line    m_out_tpa_cb;
+	devcb_write_line    m_out_tpb_cb;
 };
 
 #define COSMAC_INTERFACE(name) \
@@ -140,7 +140,7 @@ struct cosmac_interface
 // ======================> cosmac_device
 
 class cosmac_device : public cpu_device,
-					  public cosmac_interface
+						public cosmac_interface
 {
 public:
 	// construction/destruction
@@ -303,19 +303,19 @@ protected:
 	void out();
 	void inp();
 
-	const address_space_config		m_program_config;
-	const address_space_config		m_io_config;
+	const address_space_config      m_program_config;
+	const address_space_config      m_io_config;
 
 	// device callbacks
-	devcb_resolved_read_line	m_in_wait_func;
-	devcb_resolved_read_line	m_in_clear_func;
-	devcb_resolved_read_line	m_in_ef_func[4];
-	devcb_resolved_write_line	m_out_q_func;
-	devcb_resolved_read8		m_in_dma_func;
-	devcb_resolved_write8		m_out_dma_func;
-	cosmac_out_sc_func			m_out_sc_func;
-	devcb_resolved_write_line	m_out_tpa_func;
-	devcb_resolved_write_line	m_out_tpb_func;
+	devcb_resolved_read_line    m_in_wait_func;
+	devcb_resolved_read_line    m_in_clear_func;
+	devcb_resolved_read_line    m_in_ef_func[4];
+	devcb_resolved_write_line   m_out_q_func;
+	devcb_resolved_read8        m_in_dma_func;
+	devcb_resolved_write8       m_out_dma_func;
+	cosmac_out_sc_func          m_out_sc_func;
+	devcb_resolved_write_line   m_out_tpa_func;
+	devcb_resolved_write_line   m_out_tpb_func;
 
 	// control modes
 	enum cosmac_mode
@@ -339,37 +339,37 @@ protected:
 	};
 
 	// internal state
-	UINT16				m_pc;				// fake program counter
-	UINT8				m_op;				// current opcode
-	UINT8				m_flagsio;			// flags storage for state saving
-	cosmac_state		m_state;			// state
-	cosmac_mode			m_mode;				// control mode
-	cosmac_mode			m_pmode;			// previous control mode
-	int					m_irq;				// interrupt request
-	int					m_dmain;			// DMA input request
-	int					m_dmaout;			// DMA output request
-	int					m_ef[4];			// external flags
+	UINT16              m_pc;               // fake program counter
+	UINT8               m_op;               // current opcode
+	UINT8               m_flagsio;          // flags storage for state saving
+	cosmac_state        m_state;            // state
+	cosmac_mode         m_mode;             // control mode
+	cosmac_mode         m_pmode;            // previous control mode
+	int                 m_irq;              // interrupt request
+	int                 m_dmain;            // DMA input request
+	int                 m_dmaout;           // DMA output request
+	int                 m_ef[4];            // external flags
 
 	// registers
-	UINT8				m_d;				// data register (accumulator)
-	UINT8				m_b;				// auxiliary holding register
-	UINT16				m_r[16];			// scratchpad registers
-	UINT8				m_p;				// designates which register is Program Counter
-	UINT8				m_x;				// designates which register is Data Pointer
-	UINT8				m_n;				// low-order instruction digit
-	UINT8				m_i;				// high-order instruction digit
-	UINT8				m_t;				// temporary register
+	UINT8               m_d;                // data register (accumulator)
+	UINT8               m_b;                // auxiliary holding register
+	UINT16              m_r[16];            // scratchpad registers
+	UINT8               m_p;                // designates which register is Program Counter
+	UINT8               m_x;                // designates which register is Data Pointer
+	UINT8               m_n;                // low-order instruction digit
+	UINT8               m_i;                // high-order instruction digit
+	UINT8               m_t;                // temporary register
 
 	// flags
-	int					m_df;				// data flag (ALU carry)
-	int					m_ie;				// interrupt enable
-	int					m_q;				// output flip-flop
+	int                 m_df;               // data flag (ALU carry)
+	int                 m_ie;               // interrupt enable
+	int                 m_q;                // output flip-flop
 
 	// internal stuff
-	int					m_icount;
-	address_space *		m_program;
-	address_space *		m_io;
-	direct_read_data *	m_direct;
+	int                 m_icount;
+	address_space *     m_program;
+	address_space *     m_io;
+	direct_read_data *  m_direct;
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();

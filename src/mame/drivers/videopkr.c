@@ -276,10 +276,10 @@
 **************************************************************************/
 
 
-#define CPU_CLOCK		(XTAL_6MHz)			/* main cpu clock */
-#define CPU_CLOCK_ALT	(XTAL_8MHz)			/* alternative main cpu clock for newer games */
-#define SOUND_CLOCK		(XTAL_8MHz)			/* sound cpu clock */
-#define VIDEO_CLOCK		(XTAL_7.8643MHz)
+#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
+#define CPU_CLOCK_ALT   (XTAL_8MHz)         /* alternative main cpu clock for newer games */
+#define SOUND_CLOCK     (XTAL_8MHz)         /* sound cpu clock */
+#define VIDEO_CLOCK     (XTAL_7.8643MHz)
 
 
 #include "emu.h"
@@ -542,29 +542,29 @@ READ8_MEMBER(videopkr_state::videopkr_io_r)
 
 	switch (m_p2)
 	{
-		case 0xef:	/* inputs are multiplexed through a diode matrix */
+		case 0xef:  /* inputs are multiplexed through a diode matrix */
 		{
-			hf = ((ioport("IN1")->read() & 0x10 ) >> 4) & 1;			/* Hopper full detection */
-			co = 0x10 * ((ioport("IN1")->read() & 0x20 ) >> 5);		/* Coin Out detection */
+			hf = ((ioport("IN1")->read() & 0x10 ) >> 4) & 1;            /* Hopper full detection */
+			co = 0x10 * ((ioport("IN1")->read() & 0x20 ) >> 5);     /* Coin Out detection */
 			kbdin = ((ioport("IN1")->read() & 0xaf ) << 8) + ioport("IN0")->read();
 
 			switch (kbdin)
 			{
 				case 0x0000: valor = 0x00; break;
-				case 0x0001: valor = 0x01; break;	/* Door */
+				case 0x0001: valor = 0x01; break;   /* Door */
 				case 0x4000: valor = 0x02; break;
-				case 0x8000: valor = 0x03; break;	/* Hand Pay */
-				case 0x0002: valor = 0x04; break;	/* Books */
-				case 0x0004: valor = 0x05; break;	/* Coin In */
-				case 0x0008: valor = 0x07; break;	/* Start */
-				case 0x0010: valor = 0x08; break;	/* Discard */
-				case 0x0020: valor = 0x09; break;	/* Cancel */
-				case 0x0040: valor = 0x0a; break;	/* Hold 1 */
-				case 0x0080: valor = 0x0b; break;	/* Hold 2 */
-				case 0x0100: valor = 0x0c; break;	/* Hold 3 */
-				case 0x0200: valor = 0x0d; break;	/* Hold 4 */
-				case 0x0400: valor = 0x0e; break;	/* Hold 5 */
-				case 0x0800: valor = 0x06; break;	/* Bet */
+				case 0x8000: valor = 0x03; break;   /* Hand Pay */
+				case 0x0002: valor = 0x04; break;   /* Books */
+				case 0x0004: valor = 0x05; break;   /* Coin In */
+				case 0x0008: valor = 0x07; break;   /* Start */
+				case 0x0010: valor = 0x08; break;   /* Discard */
+				case 0x0020: valor = 0x09; break;   /* Cancel */
+				case 0x0040: valor = 0x0a; break;   /* Hold 1 */
+				case 0x0080: valor = 0x0b; break;   /* Hold 2 */
+				case 0x0100: valor = 0x0c; break;   /* Hold 3 */
+				case 0x0200: valor = 0x0d; break;   /* Hold 4 */
+				case 0x0400: valor = 0x0e; break;   /* Hold 5 */
+				case 0x0800: valor = 0x06; break;   /* Bet */
 			}
 
 			if ((valor == 0x00) & hf )
@@ -658,16 +658,16 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 			break;
 		}
 
-		case 0xef:	/* Port 2.4 */
+		case 0xef:  /* Port 2.4 */
 		{
-			output_set_lamp_value(0, (data & 1));			/* L_1 */
-			output_set_lamp_value(1, ((data >> 1)& 1));		/* L_2 */
-			output_set_lamp_value(2, ((data >> 2) & 1));	/* L_3 */
-			output_set_lamp_value(3, ((data >> 3) & 1));	/* L_4 */
-			output_set_lamp_value(4, ((data >> 4) & 1));	/* Coin */
-			output_set_lamp_value(5, ((data >> 5) & 1));	/* Hopper_1 */
-			output_set_lamp_value(6, ((data >> 6) & 1));	/* Hopper_2 */
-			output_set_lamp_value(7, ((data >> 7) & 1));	/* Diverter */
+			output_set_lamp_value(0, (data & 1));           /* L_1 */
+			output_set_lamp_value(1, ((data >> 1)& 1));     /* L_2 */
+			output_set_lamp_value(2, ((data >> 2) & 1));    /* L_3 */
+			output_set_lamp_value(3, ((data >> 3) & 1));    /* L_4 */
+			output_set_lamp_value(4, ((data >> 4) & 1));    /* Coin */
+			output_set_lamp_value(5, ((data >> 5) & 1));    /* Hopper_1 */
+			output_set_lamp_value(6, ((data >> 6) & 1));    /* Hopper_2 */
+			output_set_lamp_value(7, ((data >> 7) & 1));    /* Diverter */
 			m_p24_data = data;
 			m_hp_1 = (~m_p24_data >> 6) & 1;
 			m_hp_2 = (~m_p24_data >> 5) & 1;
@@ -677,7 +677,7 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 
 		case 0xff:
 		{
-			m_t0_latch = m_t0_latch ^ 0x01;		/* fix the bookkeeping mode */
+			m_t0_latch = m_t0_latch ^ 0x01;     /* fix the bookkeeping mode */
 			break;
 		}
 	}
@@ -697,33 +697,33 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 {
 	m_p1 = data;
 
-	output_set_lamp_value(8, (data & 1));			/* Aux_0 - Jackpot mech. counter (Baby Games)*/
-	output_set_lamp_value(9, ((data >> 1) & 1));	/* Aux_1 - */
-	output_set_lamp_value(10, ((data >> 2) & 1));	/* Aux_2 - */
-	output_set_lamp_value(11, ((data >> 3) & 1));	/* Aux_3 - */
-	output_set_lamp_value(12, ((data >> 4) & 1));	/* Aux_4 - Bell */
-	output_set_lamp_value(13, ((data >> 5) & 1));	/* Aux_5 - /CIO */
+	output_set_lamp_value(8, (data & 1));           /* Aux_0 - Jackpot mech. counter (Baby Games)*/
+	output_set_lamp_value(9, ((data >> 1) & 1));    /* Aux_1 - */
+	output_set_lamp_value(10, ((data >> 2) & 1));   /* Aux_2 - */
+	output_set_lamp_value(11, ((data >> 3) & 1));   /* Aux_3 - */
+	output_set_lamp_value(12, ((data >> 4) & 1));   /* Aux_4 - Bell */
+	output_set_lamp_value(13, ((data >> 5) & 1));   /* Aux_5 - /CIO */
 
 	m_jckp = m_p1 & 1;
 
 	if ((~m_c_io & 1) & m_ant_cio & m_hp_1 & m_hp_2)
 	{
-		++m_count1;	/* Decoded Coin In Mech. Counter*/
+		++m_count1; /* Decoded Coin In Mech. Counter*/
 	}
 
 	if ((~m_c_io & 1) & m_ant_cio & (~m_hp_1 & 1) & (~m_hp_2 & 1))
 	{
-		++m_count2;	/* Decoded Coind Out Mech. Counter */
+		++m_count2; /* Decoded Coind Out Mech. Counter */
 	}
 
 	if (~m_c_io & m_ant_cio & m_hp_1 & m_hp_2 & ~m_dvrt)
 	{
-		++m_count3;	/* Decoded Coin to Drop Mech. Counter */
+		++m_count3; /* Decoded Coin to Drop Mech. Counter */
 	}
 
 	if (~m_jckp & m_ant_jckp)
 	{
-		++m_count4;	/* Decoded Jackpot Mech. Counter */
+		++m_count4; /* Decoded Jackpot Mech. Counter */
 	}
 
 	count_7dig(m_count1, 0);
@@ -748,7 +748,7 @@ READ8_MEMBER(videopkr_state::videopkr_t0_latch)
 WRITE8_MEMBER(videopkr_state::prog_w)
 {
 	if (!data)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);	/* clear interrupt FF */
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
 }
 
 /*************************
@@ -831,8 +831,8 @@ WRITE8_MEMBER(videopkr_state::sound_p2_w)
 	{
 		case 0x5f:
 		{
-			m_te_40103 = 0;	/* p2.7 LOW */
-			m_ld_40103 = 0;	/* p2.5 LOW */
+			m_te_40103 = 0; /* p2.7 LOW */
+			m_ld_40103 = 0; /* p2.5 LOW */
 			break;
 		}
 
@@ -919,14 +919,14 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 
 	switch (ay_intf)
 	{
-		case 0x00:	break;
-		case 0x01:	break;
-		case 0x02:	break;
-		case 0x03:	ay8910_data_w(device, space, 1, m_sbp0); break;
-		case 0x04:	break;
-		case 0x05:	m_sbp0 = ay8910_r(device, space, m_sbp0); break;
-		case 0x06:	break;
-		case 0x07:	ay8910_address_w(device, space, 0, m_sbp0); break;
+		case 0x00:  break;
+		case 0x01:  break;
+		case 0x02:  break;
+		case 0x03:  ay8910_data_w(device, space, 1, m_sbp0); break;
+		case 0x04:  break;
+		case 0x05:  m_sbp0 = ay8910_r(device, space, m_sbp0); break;
+		case 0x06:  break;
+		case 0x07:  ay8910_address_w(device, space, 0, m_sbp0); break;
 	}
 }
 
@@ -1011,7 +1011,7 @@ static INPUT_PORTS_START( videopkr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 
@@ -1038,7 +1038,7 @@ static INPUT_PORTS_START( blckjack )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 INPUT_PORTS_END
@@ -1065,7 +1065,7 @@ static INPUT_PORTS_START( videodad )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 INPUT_PORTS_END
@@ -1092,7 +1092,7 @@ static INPUT_PORTS_START( videocba )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 INPUT_PORTS_END
@@ -1120,7 +1120,7 @@ static INPUT_PORTS_START( babypkr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 
@@ -1145,10 +1145,10 @@ static INPUT_PORTS_START( babydad )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 
@@ -1205,8 +1205,8 @@ GFXDECODE_END
 
 void videopkr_state::machine_start()
 {
-	m_vp_sound_p2 = 0xff;	/* default P2 latch value */
-	m_sound_latch = 0xff;	/* default sound data latch value */
+	m_vp_sound_p2 = 0xff;   /* default P2 latch value */
+	m_sound_latch = 0xff;   /* default sound data latch value */
 	m_p24_data = 0xff;
 	m_p1 = 0xff;
 	m_ant_cio = 0;
@@ -1332,108 +1332,108 @@ MACHINE_CONFIG_END
 
 ROM_START( videopkr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "vpoker.c5",		0x0000, 0x0800,	CRC(200d21e4) SHA1(d991c9f10a36a02491bb0aba32129675fed77a10) )
-	ROM_LOAD( "vpoker.c7",		0x0800, 0x0800,	CRC(f72c2a90) SHA1(e9c54d1f895cde0aaca4121a252da40594195a25) )
+	ROM_LOAD( "vpoker.c5",      0x0000, 0x0800, CRC(200d21e4) SHA1(d991c9f10a36a02491bb0aba32129675fed77a10) )
+	ROM_LOAD( "vpoker.c7",      0x0800, 0x0800, CRC(f72c2a90) SHA1(e9c54d1f895cde0aaca4121a252da40594195a25) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
-	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
-	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound cpu program */
+	ROM_LOAD( "vpsona3.pbj",    0x0000, 0x0800, CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
+	ROM_LOAD( "vpsona2.pbj",    0x0800, 0x0800, CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
 
 	ROM_REGION( 0x1000, "tiles", 0 )
-    ROM_LOAD( "vpbj_b15.org",	0x0000, 0x0800,	CRC(67468e3a) SHA1(761766f0fb92693d32179a914e11da517cc5747d) )
-    ROM_LOAD( "vpbj_b12.org",	0x0800, 0x0800,	CRC(4aba166e) SHA1(930cea2216a39b5d72021d1b449db018a121adce) )
+	ROM_LOAD( "vpbj_b15.org",   0x0000, 0x0800, CRC(67468e3a) SHA1(761766f0fb92693d32179a914e11da517cc5747d) )
+	ROM_LOAD( "vpbj_b12.org",   0x0800, 0x0800, CRC(4aba166e) SHA1(930cea2216a39b5d72021d1b449db018a121adce) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "vpbjorg.col",	0x0000, 0x0100,	CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
+	ROM_LOAD( "vpbjorg.col",    0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
 	ROM_END
 
 ROM_START( blckjack )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bjc5org.old",	0x0000, 0x0800,	CRC(e266a28a) SHA1(1f90c85a2a817f1927c9ab2cbf79cfa2dd116dc8) )
-	ROM_LOAD( "bjc7org.old",	0x0800, 0x0800,	CRC(c60c565f) SHA1(c9ed232301750288bd000ac4e2dcf2253745ff0a) )
+	ROM_LOAD( "bjc5org.old",    0x0000, 0x0800, CRC(e266a28a) SHA1(1f90c85a2a817f1927c9ab2cbf79cfa2dd116dc8) )
+	ROM_LOAD( "bjc7org.old",    0x0800, 0x0800, CRC(c60c565f) SHA1(c9ed232301750288bd000ac4e2dcf2253745ff0a) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
-	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
-	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound cpu program */
+	ROM_LOAD( "vpsona3.pbj",    0x0000, 0x0800, CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
+	ROM_LOAD( "vpsona2.pbj",    0x0800, 0x0800, CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
 
 	ROM_REGION( 0x1000, "tiles", 0 )
-	ROM_LOAD( "vpbj_b15.org",	0x0000, 0x0800,	CRC(67468e3a) SHA1(761766f0fb92693d32179a914e11da517cc5747d) )
-	ROM_LOAD( "vpbj_b12.org",	0x0800, 0x0800,	CRC(4aba166e) SHA1(930cea2216a39b5d72021d1b449db018a121adce) )
+	ROM_LOAD( "vpbj_b15.org",   0x0000, 0x0800, CRC(67468e3a) SHA1(761766f0fb92693d32179a914e11da517cc5747d) )
+	ROM_LOAD( "vpbj_b12.org",   0x0800, 0x0800, CRC(4aba166e) SHA1(930cea2216a39b5d72021d1b449db018a121adce) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "vpbjorg.col",	0x0000, 0x0100,	CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
+	ROM_LOAD( "vpbjorg.col",    0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
 ROM_END
 
 ROM_START( videodad )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dac5org.old",	0x0000, 0x0800,	CRC(b373c8e9) SHA1(7a99d6aa152f8e6adeddbfdfd13278edeaa529bc) )
-	ROM_LOAD( "dac7org.old",	0x0800, 0x0800,	CRC(afabae30) SHA1(c4198ba8de6811e3367b0154ff479f6738721bfa) )
+	ROM_LOAD( "dac5org.old",    0x0000, 0x0800, CRC(b373c8e9) SHA1(7a99d6aa152f8e6adeddbfdfd13278edeaa529bc) )
+	ROM_LOAD( "dac7org.old",    0x0800, 0x0800, CRC(afabae30) SHA1(c4198ba8de6811e3367b0154ff479f6738721bfa) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
-	ROM_LOAD( "vdsona3.dad",	0x0000, 0x0800,	CRC(13f7a462) SHA1(2e2e904637ca7873a2ed67d7ab1524e51b324660) )
-	ROM_LOAD( "vdsona2.dad",	0x0800, 0x0800,	CRC(120e4512) SHA1(207748d4f5793180305bb115af877042517d901f) )
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound cpu program */
+	ROM_LOAD( "vdsona3.dad",    0x0000, 0x0800, CRC(13f7a462) SHA1(2e2e904637ca7873a2ed67d7ab1524e51b324660) )
+	ROM_LOAD( "vdsona2.dad",    0x0800, 0x0800, CRC(120e4512) SHA1(207748d4f5793180305bb115af877042517d901f) )
 
 	ROM_REGION( 0x2000, "tiles", 0 )
-	ROM_LOAD( "vdadob15.bin",	0x0000, 0x0800,	CRC(caa6a4b0) SHA1(af99da30b8ee63d54ac1f1e6737ed707501a5a25) )
-	ROM_LOAD( "vdadob14.bin",	0x0800, 0x0800,	CRC(eabfae6b) SHA1(189b38da5e9c99f99c5425cdfefccc6991e3f85e) )
-	ROM_LOAD( "vdadob12.bin",	0x1000, 0x0800,	CRC(176f7b31) SHA1(613521ed9caf904db22860686e0424d0c0e0cba6) )
-	ROM_LOAD( "vdadob11.bin",	0x1800, 0x0800,	CRC(259492c7) SHA1(003cc40a88f2b9fad0089574963e7e654211bb16) )
+	ROM_LOAD( "vdadob15.bin",   0x0000, 0x0800, CRC(caa6a4b0) SHA1(af99da30b8ee63d54ac1f1e6737ed707501a5a25) )
+	ROM_LOAD( "vdadob14.bin",   0x0800, 0x0800, CRC(eabfae6b) SHA1(189b38da5e9c99f99c5425cdfefccc6991e3f85e) )
+	ROM_LOAD( "vdadob12.bin",   0x1000, 0x0800, CRC(176f7b31) SHA1(613521ed9caf904db22860686e0424d0c0e0cba6) )
+	ROM_LOAD( "vdadob11.bin",   0x1800, 0x0800, CRC(259492c7) SHA1(003cc40a88f2b9fad0089574963e7e654211bb16) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "vdvcorg.col",	0x0000, 0x0100,	CRC(741b1a22) SHA1(50983ea37f0479793ba38a112a0266c2edc4b5ef) )
+	ROM_LOAD( "vdvcorg.col",    0x0000, 0x0100, CRC(741b1a22) SHA1(50983ea37f0479793ba38a112a0266c2edc4b5ef) )
 ROM_END
 
 ROM_START( videocba )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "vcc5org.old",	0x0000, 0x0800,	CRC(96d72283) SHA1(056197a9e2ad40d1d6610bbe8a1855b81c0a6715) )
-	ROM_LOAD( "vcc7org.old",	0x0800, 0x0800,	CRC(fdec55c1) SHA1(19b740f3b7f2acaa0fc09f4c0a2fe69721ebbcaf) )
+	ROM_LOAD( "vcc5org.old",    0x0000, 0x0800, CRC(96d72283) SHA1(056197a9e2ad40d1d6610bbe8a1855b81c0a6715) )
+	ROM_LOAD( "vcc7org.old",    0x0800, 0x0800, CRC(fdec55c1) SHA1(19b740f3b7f2acaa0fc09f4c0a2fe69721ebbcaf) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
-	ROM_LOAD( "vcsona3.rod",	0x0000, 0x0800,	CRC(b0948d6c) SHA1(6c45d350288f69b4b2b5ac16ab2b418f14c6eded) )
-	ROM_LOAD( "vcsona2.rod",	0x0800, 0x0800,	CRC(44ff9e85) SHA1(5d7988d2d3bca932b77e014dc61f7a2347b01603) )
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound cpu program */
+	ROM_LOAD( "vcsona3.rod",    0x0000, 0x0800, CRC(b0948d6c) SHA1(6c45d350288f69b4b2b5ac16ab2b418f14c6eded) )
+	ROM_LOAD( "vcsona2.rod",    0x0800, 0x0800, CRC(44ff9e85) SHA1(5d7988d2d3bca932b77e014dc61f7a2347b01603) )
 
 	ROM_REGION( 0x2000, "tiles", 0 )
-	ROM_LOAD( "vcbab15.bin",	0x0000, 0x0800,	CRC(fce8c772) SHA1(f9736b724b620d60a17d77f6b773f39b99b47190) )
-	ROM_LOAD( "vcbab14.bin",	0x0800, 0x0800,	CRC(6fd66330) SHA1(0ee3b3329b94ded81f028ebb687e580787c74ded) )
-	ROM_LOAD( "vcbab12.bin",	0x1000, 0x0800,	CRC(e534d6c3) SHA1(7a93c6c07b5a28558ee005fed2098dc2933c3252) )
-	ROM_LOAD( "vcbab11.bin",	0x1800, 0x0800,	CRC(e2069a6d) SHA1(2d4e71f2838451215e6f9629e2d1a35808510353) )
+	ROM_LOAD( "vcbab15.bin",    0x0000, 0x0800, CRC(fce8c772) SHA1(f9736b724b620d60a17d77f6b773f39b99b47190) )
+	ROM_LOAD( "vcbab14.bin",    0x0800, 0x0800, CRC(6fd66330) SHA1(0ee3b3329b94ded81f028ebb687e580787c74ded) )
+	ROM_LOAD( "vcbab12.bin",    0x1000, 0x0800, CRC(e534d6c3) SHA1(7a93c6c07b5a28558ee005fed2098dc2933c3252) )
+	ROM_LOAD( "vcbab11.bin",    0x1800, 0x0800, CRC(e2069a6d) SHA1(2d4e71f2838451215e6f9629e2d1a35808510353) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "vdcbaorg.col",	0x0000, 0x0100,	CRC(6cdca5ae) SHA1(f7430af1adfa24fdd68a026ee431ead7d47ba269) )
+	ROM_LOAD( "vdcbaorg.col",   0x0000, 0x0100, CRC(6cdca5ae) SHA1(f7430af1adfa24fdd68a026ee431ead7d47ba269) )
 ROM_END
 
 ROM_START( babypkr )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "pok8039.old",	0x0000, 0x4000,	CRC(c5400ef1) SHA1(1f27c92d2979319070a695f71ed494f6d47fe88f) )
+	ROM_LOAD( "pok8039.old",    0x0000, 0x4000, CRC(c5400ef1) SHA1(1f27c92d2979319070a695f71ed494f6d47fe88f) )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 )
-	ROM_LOAD( "dadvpbj.son",	0x0000, 0x1000,	CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
+	ROM_LOAD( "dadvpbj.son",    0x0000, 0x1000, CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
 
 	ROM_REGION( 0x20000, "tiles", 0 )
-	ROM_LOAD( "vpbjep15.mme",	0x00000, 0x8000,CRC(cad0f7cf) SHA1(0721b8b30dbf2a5da2967b0cfce24b4cd62d3f9d) )
-	ROM_LOAD( "vpbjep14.mme",	0x08000, 0x8000,CRC(96f512fa) SHA1(f5344aeb57f53c43156e923fb7f0d8d37c73dbe9) )
-	ROM_LOAD( "vpbjep12.mme",	0x10000, 0x8000,CRC(cfdca530) SHA1(609a5ad6f34e6b5c1c35584ddc62d4ff87546415) )
-	ROM_LOAD( "vpbjep11.mme",	0x18000, 0x8000,CRC(44e6c489) SHA1(ca211cb3807c476cd8c5ac98b0d18b4b2724df45) )
+	ROM_LOAD( "vpbjep15.mme",   0x00000, 0x8000,CRC(cad0f7cf) SHA1(0721b8b30dbf2a5da2967b0cfce24b4cd62d3f9d) )
+	ROM_LOAD( "vpbjep14.mme",   0x08000, 0x8000,CRC(96f512fa) SHA1(f5344aeb57f53c43156e923fb7f0d8d37c73dbe9) )
+	ROM_LOAD( "vpbjep12.mme",   0x10000, 0x8000,CRC(cfdca530) SHA1(609a5ad6f34e6b5c1c35584ddc62d4ff87546415) )
+	ROM_LOAD( "vpbjep11.mme",   0x18000, 0x8000,CRC(44e6c489) SHA1(ca211cb3807c476cd8c5ac98b0d18b4b2724df45) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "babypok.col",	0x0000, 0x0100,	CRC(2b98e88a) SHA1(bb22ef090e9e5dddc5c160d41a5f52df0db6feb6) )
+	ROM_LOAD( "babypok.col",    0x0000, 0x0100, CRC(2b98e88a) SHA1(bb22ef090e9e5dddc5c160d41a5f52df0db6feb6) )
 ROM_END
 
 ROM_START( babydad )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "da400org.old",	0x0000, 0x4000,	CRC(cbca3a0c) SHA1(5d9428f26edf2c5531398a6ae36b4e9169b2c1c1) )
+	ROM_LOAD( "da400org.old",   0x0000, 0x4000, CRC(cbca3a0c) SHA1(5d9428f26edf2c5531398a6ae36b4e9169b2c1c1) )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 )
-	ROM_LOAD( "dadvpbj.son",	0x0000, 0x1000,	CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
+	ROM_LOAD( "dadvpbj.son",    0x0000, 0x1000, CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
 
 	ROM_REGION( 0x20000, "tiles", 0 )
-	ROM_LOAD( "ep15dad.dad",	0x00000, 0x8000,CRC(21bd102d) SHA1(52788d09dbe38fa29b8ff044a1c5249cad3d45b4) )
-	ROM_LOAD( "ep14dad.dad",	0x08000, 0x8000,CRC(b6e2c8a2) SHA1(352d88e1d764da5133de2be9987d4875f0c9237f) )
-	ROM_LOAD( "ep12dad.dad",	0x10000, 0x8000,CRC(98702beb) SHA1(6d42ea48df7546932570da1e9b0be7a1f01f930c) )
-	ROM_LOAD( "ep11dad.dad",	0x18000, 0x8000,CRC(90aac63b) SHA1(8b312f2313334b4b5b0344b786aa1a7a4979ea92) )
+	ROM_LOAD( "ep15dad.dad",    0x00000, 0x8000,CRC(21bd102d) SHA1(52788d09dbe38fa29b8ff044a1c5249cad3d45b4) )
+	ROM_LOAD( "ep14dad.dad",    0x08000, 0x8000,CRC(b6e2c8a2) SHA1(352d88e1d764da5133de2be9987d4875f0c9237f) )
+	ROM_LOAD( "ep12dad.dad",    0x10000, 0x8000,CRC(98702beb) SHA1(6d42ea48df7546932570da1e9b0be7a1f01f930c) )
+	ROM_LOAD( "ep11dad.dad",    0x18000, 0x8000,CRC(90aac63b) SHA1(8b312f2313334b4b5b0344b786aa1a7a4979ea92) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "babydad.col",	0x0000, 0x0100,	CRC(b3358b3f) SHA1(d499a08fefaa3566de2e6fcddd237d6dfa840d8a) )
+	ROM_LOAD( "babydad.col",    0x0000, 0x0100, CRC(b3358b3f) SHA1(d499a08fefaa3566de2e6fcddd237d6dfa840d8a) )
 ROM_END
 
 /*
@@ -1522,7 +1522,7 @@ ROM_START( bpoker )
 	ROM_LOAD( "conf_11_poker_ver_1.00_9055.bin", 0x18000, 0x8000, CRC(b8abc965) SHA1(61a6cdcfd4cd65d4a7ce02c6a2c4216ab6da095c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "babypok.col",	0x0000, 0x0100,	BAD_DUMP CRC(2b98e88a) SHA1(bb22ef090e9e5dddc5c160d41a5f52df0db6feb6) )
+	ROM_LOAD( "babypok.col",    0x0000, 0x0100, BAD_DUMP CRC(2b98e88a) SHA1(bb22ef090e9e5dddc5c160d41a5f52df0db6feb6) )
 ROM_END
 
 ROM_START( fortune1 )
@@ -1531,12 +1531,12 @@ ROM_START( fortune1 )
 	ROM_LOAD( "pk485-s-800-fff.c7",   0x0800, 0x0800, CRC(490da6b0) SHA1(4b7afd058aeda929821d62c58e234769d64339e1) )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 )
-	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
-	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
+	ROM_LOAD( "vpsona3.pbj",    0x0000, 0x0800, CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
+	ROM_LOAD( "vpsona2.pbj",    0x0800, 0x0800, CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
 
 	ROM_REGION( 0x1000, "tiles", 0 )
-	ROM_LOAD( "cg073-cg0-a.b12",	 0x0000, 0x0800, CRC(fff2d7aa) SHA1(935b8623fda5b4b25ba1aaea869ebb2baded515c) )
-	ROM_LOAD( "cg073-cg1-a.b15",	 0x0800, 0x0800, CRC(a7cb05c4) SHA1(7cd76ade7cf9c50421b054ee525108829c31307c) )
+	ROM_LOAD( "cg073-cg0-a.b12",     0x0000, 0x0800, CRC(fff2d7aa) SHA1(935b8623fda5b4b25ba1aaea869ebb2baded515c) )
+	ROM_LOAD( "cg073-cg1-a.b15",     0x0800, 0x0800, CRC(a7cb05c4) SHA1(7cd76ade7cf9c50421b054ee525108829c31307c) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "3140-cap8.b8", 0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )

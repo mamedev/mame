@@ -182,7 +182,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			fprintf(stderr,"Actual rpm based on index: %f\n", ((double)clock_rate/(double)onerev_time)*60);
 		}
 
-        rpm += 0;   // HACK: prevent GCC 4.6+ from warning "variable set but unused"
+		rpm += 0;   // HACK: prevent GCC 4.6+ from warning "variable set but unused"
 
 		if(!index_time)
 			index_time = total_time;

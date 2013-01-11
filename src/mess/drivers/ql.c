@@ -89,8 +89,8 @@
 #include "machine/wd17xx.h"
 #include "debugger.h"
 
-#define LOG_DISK_WRITE	0
-#define LOG_DISK_READ	0
+#define LOG_DISK_WRITE  0
+#define LOG_DISK_READ   0
 
 //**************************************************************************
 //  INTELLIGENT PERIPHERAL CONTROLLER
@@ -115,18 +115,18 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Keyboard column output (KBO0)
-        1       Keyboard column output (KBO1)
-        2       Keyboard column output (KBO2)
-        3       Keyboard column output (KBO3)
-        4       Keyboard column output (KBO4)
-        5       Keyboard column output (KBO5)
-        6       Keyboard column output (KBO6)
-        7       Keyboard column output (KBO7)
+	    0       Keyboard column output (KBO0)
+	    1       Keyboard column output (KBO1)
+	    2       Keyboard column output (KBO2)
+	    3       Keyboard column output (KBO3)
+	    4       Keyboard column output (KBO4)
+	    5       Keyboard column output (KBO5)
+	    6       Keyboard column output (KBO6)
+	    7       Keyboard column output (KBO7)
 
-    */
+	*/
 
 	m_keylatch = data;
 }
@@ -140,18 +140,18 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Serial data input (SER2 RxD, SER1 TxD)
-        1       Speaker output
-        2       Interrupt output (IPL0-2)
-        3       Interrupt output (IPL1)
-        4       Serial Clear-to-Send output (SER1 CTS)
-        5       Serial Data Terminal Ready output (SER2 DTR)
-        6       not connected
-        7       ZX8302 serial link input/output (COMDATA)
+	    0       Serial data input (SER2 RxD, SER1 TxD)
+	    1       Speaker output
+	    2       Interrupt output (IPL0-2)
+	    3       Interrupt output (IPL1)
+	    4       Serial Clear-to-Send output (SER1 CTS)
+	    5       Serial Data Terminal Ready output (SER2 DTR)
+	    6       not connected
+	    7       ZX8302 serial link input/output (COMDATA)
 
-    */
+	*/
 
 	// speaker
 	speaker_level_w(m_speaker, BIT(data, 1));
@@ -163,10 +163,10 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 	{
 		switch (ipl)
 		{
-		case 0:	m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);	break;
-		case 1:	m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);	break; // CTRL-ALT-7 pressed
-		case 2:	m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);	break;
-		case 3:	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);	break;
+		case 0: m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE); break;
+		case 1: m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE); break; // CTRL-ALT-7 pressed
+		case 2: m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); break;
+		case 3: m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);  break;
 		}
 
 		m_ipl = ipl;
@@ -193,18 +193,18 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Serial data input (SER2 RxD, SER1 TxD)
-        1       Speaker output
-        2       Interrupt output (IPL0-2)
-        3       Interrupt output (IPL1)
-        4       Serial Clear-to-Send output (SER2 CTS)
-        5       Serial Data Terminal Ready output (SER1 DTR)
-        6       not connected
-        7       ZX8302 serial link input/output (COMDATA)
+	    0       Serial data input (SER2 RxD, SER1 TxD)
+	    1       Speaker output
+	    2       Interrupt output (IPL0-2)
+	    3       Interrupt output (IPL1)
+	    4       Serial Clear-to-Send output (SER2 CTS)
+	    5       Serial Data Terminal Ready output (SER1 DTR)
+	    6       not connected
+	    7       ZX8302 serial link input/output (COMDATA)
 
-    */
+	*/
 
 //  int irq = (m_ser2_rxd | m_ser1_txd);
 
@@ -232,18 +232,18 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Keyboard row input (KBI0)
-        1       Keyboard row input (KBI1)
-        2       Keyboard row input (KBI2)
-        3       Keyboard row input (KBI3)
-        4       Keyboard row input (KBI4)
-        5       Keyboard row input (KBI5)
-        6       Keyboard row input (KBI6)
-        7       Keyboard row input (KBI7)
+	    0       Keyboard row input (KBI0)
+	    1       Keyboard row input (KBI1)
+	    2       Keyboard row input (KBI2)
+	    3       Keyboard row input (KBI3)
+	    4       Keyboard row input (KBI4)
+	    5       Keyboard row input (KBI5)
+	    6       Keyboard row input (KBI6)
+	    7       Keyboard row input (KBI7)
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -261,18 +261,18 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 READ8_MEMBER( ql_state::disk_io_r )
 {
-	UINT8	result = 0;
+	UINT8   result = 0;
 
 	if(LOG_DISK_READ)
 		logerror("%s DiskIO:Read of %08X\n",machine().describe_context(),m_disk_io_base+offset);
 
 	switch (offset)
 	{
-		case 0x0000	: result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0001	: result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0002	: result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0003	: result=wd17xx_r(m_fdc, space, offset); break;
-		default		: logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
+		case 0x0000 : result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0001 : result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0002 : result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0003 : result=wd17xx_r(m_fdc, space, offset); break;
+		default     : logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
 	}
 
 	return result;
@@ -285,17 +285,17 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 
 	switch (offset)
 	{
-		case 0x0000	: wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0001	: wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0002	: wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0003	: wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0000 : wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0001 : wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0002 : wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0003 : wd17xx_w(m_fdc, space, offset, data); break;
 		case 0x0004 : if(m_disk_type==DISK_TYPE_SANDY)
 						sandy_set_control(data);break;
 		case 0x0008 : if(m_disk_type==DISK_TYPE_SANDY)
-					    m_printer_char=data;
-		case 0x2000	: if(m_disk_type==DISK_TYPE_TRUMP)
+						m_printer_char=data;
+		case 0x2000 : if(m_disk_type==DISK_TYPE_TRUMP)
 						trump_card_set_control(data);break;
-		default		: logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;
+		default     : logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;
 	}
 }
 
@@ -392,9 +392,9 @@ WRITE_LINE_MEMBER(ql_state::disk_io_drq_w)
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
-	AM_RANGE(0x000000, 0x00bfff) AM_ROM	// 48K System ROM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP 						// 16K Cartridge ROM
-	AM_RANGE(0x010000, 0x017fff) AM_UNMAP									// Trump card ROM is mapped in here
+	AM_RANGE(0x000000, 0x00bfff) AM_ROM // 48K System ROM
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_WRITENOP                         // 16K Cartridge ROM
+	AM_RANGE(0x010000, 0x017fff) AM_UNMAP                                   // Trump card ROM is mapped in here
 	AM_RANGE(0x018000, 0x018003) AM_DEVREAD(ZX8302_TAG, zx8302_device, rtc_r)
 	AM_RANGE(0x018000, 0x018001) AM_DEVWRITE(ZX8302_TAG, zx8302_device, rtc_w)
 	AM_RANGE(0x018002, 0x018002) AM_DEVWRITE(ZX8302_TAG, zx8302_device, control_w)
@@ -404,7 +404,7 @@ static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
 	AM_RANGE(0x018022, 0x018022) AM_DEVREADWRITE(ZX8302_TAG, zx8302_device, mdv_track_r, data_w)
 	AM_RANGE(0x018023, 0x018023) AM_DEVREAD(ZX8302_TAG, zx8302_device, mdv_track_r) AM_WRITENOP
 	AM_RANGE(0x018063, 0x018063) AM_DEVWRITE(ZX8301_TAG, zx8301_device, control_w)
-	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP									// 16K Expansion I/O
+	AM_RANGE(0x01c000, 0x01ffff) AM_UNMAP                                   // 16K Expansion I/O
 	AM_RANGE(0x020000, 0x03ffff) AM_DEVREADWRITE(ZX8301_TAG, zx8301_device, data_r, data_w)
 	AM_RANGE(0x040000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -515,31 +515,31 @@ static INPUT_PORTS_START( ql )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
 	PORT_START("JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F4)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(1) PORT_8WAY PORT_CODE(KEYCODE_F3)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(1) PORT_CODE(KEYCODE_F5)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )       PORT_PLAYER(1) PORT_CODE(KEYCODE_F5)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOY1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_UP)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )		PORT_PLAYER(2) PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )	PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )       PORT_PLAYER(2) PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY PORT_CODE(KEYCODE_DOWN)
 
 
 	PORT_START(QL_CONFIG_PORT)
 	PORT_DIPNAME( DISK_TYPE_MASK, DISK_TYPE_NONE, "Disk interface select")
-	PORT_DIPSETTING(DISK_TYPE_NONE,		DEF_STR( None ))
-	PORT_DIPSETTING(DISK_TYPE_TRUMP,	"Miracle Trump card")
-	PORT_DIPSETTING(DISK_TYPE_SANDY,	"Sandy Superdisk")
+	PORT_DIPSETTING(DISK_TYPE_NONE,     DEF_STR( None ))
+	PORT_DIPSETTING(DISK_TYPE_TRUMP,    "Miracle Trump card")
+	PORT_DIPSETTING(DISK_TYPE_SANDY,    "Sandy Superdisk")
 
 INPUT_PORTS_END
 
@@ -905,7 +905,7 @@ void ql_state::machine_start()
 
 void ql_state::machine_reset()
 {
-	address_space	&program	= m_maincpu->space(AS_PROGRAM);
+	address_space   &program    = m_maincpu->space(AS_PROGRAM);
 
 	m_disk_type=ioport(QL_CONFIG_PORT)->read() & DISK_TYPE_MASK;
 	logerror("disktype=%d\n",m_disk_type);
@@ -1064,31 +1064,31 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( ql )
-    ROM_REGION( 0x1C000, M68008_TAG, 0 )
+	ROM_REGION( 0x1C000, M68008_TAG, 0 )
 	ROM_DEFAULT_BIOS("js")
 	ROM_SYSTEM_BIOS( 0, "fb", "v1.00 (FB)" )
-    ROMX_LOAD( "fb.ic33", 0x0000, 0x8000, NO_DUMP, ROM_BIOS(1) )
-    ROMX_LOAD( "fb.ic34", 0x8000, 0x4000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "fb.ic33", 0x0000, 0x8000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "fb.ic34", 0x8000, 0x4000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "pm", "v1.01 (PM)" )
 	ROMX_LOAD( "pm.ic33", 0x0000, 0x8000, NO_DUMP, ROM_BIOS(2) )
-    ROMX_LOAD( "pm.ic34", 0x8000, 0x4000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "pm.ic34", 0x8000, 0x4000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ah", "v1.02 (AH)" )
 	ROMX_LOAD( "ah.ic33.1", 0x0000, 0x4000, BAD_DUMP CRC(a9b4d2df) SHA1(142d6f01a9621aff5e0ad678bd3cbf5cde0db801), ROM_BIOS(3) )
-    ROMX_LOAD( "ah.ic33.2", 0x4000, 0x4000, BAD_DUMP CRC(36488e4e) SHA1(ff6f597b30ea03ce480a3d6728fd1d858da34d6a), ROM_BIOS(3) )
+	ROMX_LOAD( "ah.ic33.2", 0x4000, 0x4000, BAD_DUMP CRC(36488e4e) SHA1(ff6f597b30ea03ce480a3d6728fd1d858da34d6a), ROM_BIOS(3) )
 	ROMX_LOAD( "ah.ic34",   0x8000, 0x4000, BAD_DUMP CRC(61259d4c) SHA1(bdd10d111e7ba488551a27c8d3b2743917ff1307), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "jm", "v1.03 (JM)" )
 	ROMX_LOAD( "ql.jm 0000.ic33", 0x0000, 0x8000, CRC(1f8e840a) SHA1(7929e716dfe88318bbe99e34f47d039957fe3cc0), ROM_BIOS(4) )
-    ROMX_LOAD( "ql.jm 8000.ic34", 0x8000, 0x4000, CRC(9168a2e9) SHA1(1e7c47a59fc40bd96dfefc2f4d86827c15f0199e), ROM_BIOS(4) )
+	ROMX_LOAD( "ql.jm 8000.ic34", 0x8000, 0x4000, CRC(9168a2e9) SHA1(1e7c47a59fc40bd96dfefc2f4d86827c15f0199e), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "tb", "v1.0? (TB)" )
 	ROMX_LOAD( "tb.ic33", 0x0000, 0x8000, BAD_DUMP CRC(1c86d688) SHA1(7df8028e6671afc4ebd5f65bf6c2d6019181f239), ROM_BIOS(5) )
-    ROMX_LOAD( "tb.ic34", 0x8000, 0x4000, BAD_DUMP CRC(de7f9669) SHA1(9d6bc0b794541a4cec2203256ae92c7e68d1011d), ROM_BIOS(5) )
+	ROMX_LOAD( "tb.ic34", 0x8000, 0x4000, BAD_DUMP CRC(de7f9669) SHA1(9d6bc0b794541a4cec2203256ae92c7e68d1011d), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 5, "js", "v1.10 (JS)" )
 	ROMX_LOAD( "ql.js 0000.ic33", 0x0000, 0x8000, CRC(1bbad3b8) SHA1(59fd4372771a630967ee102760f4652904d7d5fa), ROM_BIOS(6) )
-    ROMX_LOAD( "ql.js 8000.ic34", 0x8000, 0x4000, CRC(c970800e) SHA1(b8c9203026a7de6a44bd0942ec9343e8b222cb41), ROM_BIOS(6) )
+	ROMX_LOAD( "ql.js 8000.ic34", 0x8000, 0x4000, CRC(c970800e) SHA1(b8c9203026a7de6a44bd0942ec9343e8b222cb41), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "tyche", "v2.05 (Tyche)" )
-    ROMX_LOAD( "tyche.rom", 0x0000, 0x010000, CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_BIOS(7) )
+	ROMX_LOAD( "tyche.rom", 0x0000, 0x010000, CRC(8724b495) SHA1(5f33a1bc3f23fd09c31844b65bc3aca7616f180a), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "min189", "Minerva v1.89" )
-    ROMX_LOAD( "minerva.rom", 0x0000, 0x00c000, BAD_DUMP CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
+	ROMX_LOAD( "minerva.rom", 0x0000, 0x00c000, BAD_DUMP CRC(930befe3) SHA1(84a99c4df13b97f90baf1ec8cb6c2e52e3e1bb4d), ROM_BIOS(8) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_LOAD( "trumpcard-125.rom", TRUMP_ROM_BASE, 0x08000, CRC(938eaa46) SHA1(9b3458cf3a279ed86ba395dc45c8f26939d6c44d))
@@ -1098,7 +1098,7 @@ ROM_START( ql )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1107,16 +1107,16 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_us )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_LOAD( "jsu.ic33", 0x0000, 0x8000, BAD_DUMP CRC(e397f49f) SHA1(c06f92eabaf3e6dd298c51cb7f7535d8ef0ef9c5) )
-    ROM_LOAD( "jsu.ic34", 0x8000, 0x4000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
+	ROM_LOAD( "jsu.ic34", 0x8000, 0x4000, BAD_DUMP CRC(3debbacc) SHA1(9fbc3e42ec463fa42f9c535d63780ff53a9313ec) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1125,16 +1125,16 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_es )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_LOAD( "mge.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
-    ROM_LOAD( "mge.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
+	ROM_LOAD( "mge.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a694f8d7) SHA1(bd2868656008de85d7c191598588017ae8aa3339) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1143,16 +1143,16 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_fr )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_LOAD( "mgf.ic33", 0x0000, 0x8000, NO_DUMP )
-    ROM_LOAD( "mgf.ic34", 0x8000, 0x4000, NO_DUMP )
+	ROM_LOAD( "mgf.ic34", 0x8000, 0x4000, NO_DUMP )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1161,13 +1161,13 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_de )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "mg", "v1.10 (MG)" )
-    ROMX_LOAD( "mgg.ic33", 0x0000, 0x8000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e), ROM_BIOS(1) )
-    ROMX_LOAD( "mgg.ic34", 0x8000, 0x4000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f), ROM_BIOS(1) )
+	ROMX_LOAD( "mgg.ic33", 0x0000, 0x8000, BAD_DUMP CRC(b4e468fd) SHA1(cd02a3cd79af90d48b65077d0571efc2f12f146e), ROM_BIOS(1) )
+	ROMX_LOAD( "mgg.ic34", 0x8000, 0x4000, BAD_DUMP CRC(54959d40) SHA1(ffc0be9649f26019d7be82925c18dc699259877f), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "mf", "v1.14 (MF)" )
-    ROMX_LOAD( "mf.ic33", 0x0000, 0x8000, BAD_DUMP CRC(49c40563) SHA1(d3bcd0614cf9b52e9d7fc2832e11463e5030476b), ROM_BIOS(2) )
-    ROMX_LOAD( "mf.ic34", 0x8000, 0x4000, BAD_DUMP CRC(5974616b) SHA1(c3603768c08535c25f077eed02fb80128aff13d9), ROM_BIOS(2) )
+	ROMX_LOAD( "mf.ic33", 0x0000, 0x8000, BAD_DUMP CRC(49c40563) SHA1(d3bcd0614cf9b52e9d7fc2832e11463e5030476b), ROM_BIOS(2) )
+	ROMX_LOAD( "mf.ic34", 0x8000, 0x4000, BAD_DUMP CRC(5974616b) SHA1(c3603768c08535c25f077eed02fb80128aff13d9), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ultramg", "Ultrasoft" )
 	ROMX_LOAD( "ultramg.rom", 0x0000, 0x00c000, BAD_DUMP CRC(ad12463b) SHA1(0561b3bc7ce090f3101b2142ee957c18c250eefa), ROM_BIOS(3) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
@@ -1176,7 +1176,7 @@ ROM_START( ql_de )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1185,16 +1185,16 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_it )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_LOAD( "mgi.ic33", 0x0000, 0x8000, BAD_DUMP CRC(d5293bde) SHA1(bf5af7e53a472d4e9871f182210787d601db0634) )
-    ROM_LOAD( "mgi.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
+	ROM_LOAD( "mgi.ic34", 0x8000, 0x4000, BAD_DUMP CRC(a2fdfb83) SHA1(162b1052737500f3c13497cdf0f813ba006bdae9) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1203,16 +1203,16 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_se )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_LOAD( "mgs.ic33", 0x0000, 0x8000, NO_DUMP )
-    ROM_LOAD( "mgs.ic34", 0x8000, 0x4000, NO_DUMP )
+	ROM_LOAD( "mgs.ic34", 0x8000, 0x4000, NO_DUMP )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1221,16 +1221,16 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_gr )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_LOAD( "efp.ic33", 0x0000, 0x8000, BAD_DUMP CRC(eb181641) SHA1(43c1e0215cf540cbbda240b1048910ff55681059) )
-    ROM_LOAD( "efp.ic34", 0x8000, 0x4000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
+	ROM_LOAD( "efp.ic34", 0x8000, 0x4000, BAD_DUMP CRC(4c3b34b7) SHA1(f9dc571d2d4f68520b306ecc7516acaeea69ec0d) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1239,9 +1239,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( ql_dk )
-    ROM_REGION( 0x18000, M68008_TAG, 0 )
+	ROM_REGION( 0x18000, M68008_TAG, 0 )
 	ROM_LOAD( "mgd.ic33",  0x0000, 0x8000, BAD_DUMP CRC(f57755eb) SHA1(dc57939ffb8741e17967a1d2479c339750ec7ff6) )
-    ROM_LOAD( "mgd.ic34",  0x8000, 0x4000, BAD_DUMP CRC(1892465a) SHA1(0ff3046b5276da6639d3fe79b22ae25cc265d540) )
+	ROM_LOAD( "mgd.ic34",  0x8000, 0x4000, BAD_DUMP CRC(1892465a) SHA1(0ff3046b5276da6639d3fe79b22ae25cc265d540) )
 	ROM_CART_LOAD("cart", 0xc000, 0x4000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_REGION( 0x4000, "extra", 0 )
@@ -1251,7 +1251,7 @@ ROM_START( ql_dk )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-    ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -1260,19 +1260,19 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( tonto )
-    ROM_REGION( 0x400000, M68008_TAG, 0 )
+	ROM_REGION( 0x400000, M68008_TAG, 0 )
 	ROM_LOAD( "bios-1.rom", 0x000000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-2.rom", 0x008000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-3.rom", 0x010000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-4.rom", 0x018000, 0x008000, NO_DUMP )
 
-    ROM_REGION( 0x10000, I8051_TAG, 0 )
+	ROM_REGION( 0x10000, I8051_TAG, 0 )
 	ROM_LOAD( "8051-1.rom", 0x000000, 0x010000, NO_DUMP )
 
-    ROM_REGION( 0x10000, "tms5220", 0 )
+	ROM_REGION( 0x10000, "tms5220", 0 )
 	ROM_LOAD( "tms5220.rom", 0x000000, 0x004000, NO_DUMP )
 
-    ROM_REGION( 0x400000, "rompack", 0 )
+	ROM_REGION( 0x400000, "rompack", 0 )
 	ROM_LOAD( "rompack-1.rom", 0x000000, 0x008000, NO_DUMP )
 	ROM_LOAD( "rompack-2.rom", 0x008000, 0x008000, NO_DUMP )
 	ROM_LOAD( "rompack-3.rom", 0x010000, 0x008000, NO_DUMP )
@@ -1286,19 +1286,19 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( megaopd )
-    ROM_REGION( 0x400000, M68008_TAG, 0 )
+	ROM_REGION( 0x400000, M68008_TAG, 0 )
 	ROM_LOAD( "bios-1.rom", 0x000000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-2.rom", 0x008000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-3.rom", 0x010000, 0x008000, NO_DUMP )
 	ROM_LOAD( "bios-4.rom", 0x018000, 0x008000, NO_DUMP )
 
-    ROM_REGION( 0x10000, I8051_TAG, 0 )
+	ROM_REGION( 0x10000, I8051_TAG, 0 )
 	ROM_LOAD( "8051-1.rom", 0x000000, 0x010000, NO_DUMP )
 
-    ROM_REGION( 0x10000, "tms5220", 0 )
+	ROM_REGION( 0x10000, "tms5220", 0 )
 	ROM_LOAD( "tms5220.rom", 0x000000, 0x004000, NO_DUMP )
 
-    ROM_REGION( 0x400000, "rompack", 0 )
+	ROM_REGION( 0x400000, "rompack", 0 )
 	ROM_LOAD( "rompack-1.rom", 0x000000, 0x008000, NO_DUMP )
 	ROM_LOAD( "rompack-2.rom", 0x008000, 0x008000, NO_DUMP )
 	ROM_LOAD( "rompack-3.rom", 0x010000, 0x008000, NO_DUMP )

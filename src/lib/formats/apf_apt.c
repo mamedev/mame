@@ -9,7 +9,7 @@
 #define WAVEENTRY_NULL  0
 
 /* frequency of wave */
-#define APF_WAV_FREQUENCY	11050
+#define APF_WAV_FREQUENCY   11050
 
 #define APF_APT_BIT_0_LENGTH ((int)(APF_WAV_FREQUENCY*0.0005))
 #define APF_APT_BIT_1_LENGTH ((int)(APF_WAV_FREQUENCY*0.001))
@@ -117,13 +117,13 @@ static int apf_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller apf_legacy_fill_wave =
 {
-	apf_cassette_fill_wave,					/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	apf_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	APF_WAV_FREQUENCY,						/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	apf_cassette_fill_wave,                 /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	apf_cassette_calculate_size_in_samples, /* chunk_sample_calc */
+	APF_WAV_FREQUENCY,                      /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 

@@ -18,8 +18,8 @@
 
 
 
-#define SPECTAR_MAXFREQ		525000
-#define TARG_MAXFREQ		125000
+#define SPECTAR_MAXFREQ     525000
+#define TARG_MAXFREQ        125000
 
 
 static int max_freq;
@@ -34,7 +34,7 @@ static UINT8 tone_pointer;
 
 static const INT16 sine_wave[32] =
 {
-	 0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,  0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
+		0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,  0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
 	-0x191a, -0x2122, -0x1e1f, -0x191a, -0x1314, -0x191a, -0x1819, -0x1819, -0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1e1f, -0x1e1f, -0x1819
 };
 
@@ -182,7 +182,7 @@ static SAMPLES_START( targ_audio_start )
 
 static const samples_interface spectar_samples_interface =
 {
-	4,	/* number of channel */
+	4,  /* number of channel */
 	sample_names,
 	spectar_audio_start
 };
@@ -190,7 +190,7 @@ static const samples_interface spectar_samples_interface =
 
 static const samples_interface targ_samples_interface =
 {
-	4,	/* number of channel */
+	4,  /* number of channel */
 	sample_names,
 	targ_audio_start
 };

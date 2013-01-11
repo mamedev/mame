@@ -9,7 +9,7 @@
 #include "asic65.h"
 
 
-#define LOG_ASIC		0
+#define LOG_ASIC        0
 
 
 /*************************************
@@ -20,94 +20,94 @@
 
 static struct _asic65_t
 {
-	UINT8	type;
-	int 	command;
-	UINT16	param[32];
-	UINT16	yorigin;
-	UINT8	param_index;
-	UINT8	result_index;
-	UINT8	reset_state;
-	UINT8	last_bank;
+	UINT8   type;
+	int     command;
+	UINT16  param[32];
+	UINT16  yorigin;
+	UINT8   param_index;
+	UINT8   result_index;
+	UINT8   reset_state;
+	UINT8   last_bank;
 
 	/* ROM-based interface states */
 	device_t *cpu;
-	UINT8	tfull;
-	UINT8	_68full;
-	UINT8	cmd;
-	UINT8	xflg;
-	UINT16	_68data;
-	UINT16	tdata;
+	UINT8   tfull;
+	UINT8   _68full;
+	UINT8   cmd;
+	UINT8   xflg;
+	UINT16  _68data;
+	UINT16  tdata;
 
 	FILE * log;
 } asic65;
 
 
-#define PARAM_WRITE		0
-#define COMMAND_WRITE	1
-#define DATA_READ		2
+#define PARAM_WRITE     0
+#define COMMAND_WRITE   1
+#define DATA_READ       2
 
-#define OP_UNKNOWN		0
-#define OP_REFLECT		1
-#define OP_CHECKSUM		2
-#define OP_VERSION		3
-#define OP_RAMTEST		4
-#define OP_RESET		5
-#define OP_SIN			6
-#define OP_COS			7
-#define OP_ATAN			8
-#define OP_TMATRIXMULT	9
-#define OP_MATRIXMULT	10
-#define OP_TRANSFORM	11
-#define OP_YORIGIN		12
-#define OP_INITBANKS	13
-#define OP_SETBANK		14
-#define OP_VERIFYBANK	15
+#define OP_UNKNOWN      0
+#define OP_REFLECT      1
+#define OP_CHECKSUM     2
+#define OP_VERSION      3
+#define OP_RAMTEST      4
+#define OP_RESET        5
+#define OP_SIN          6
+#define OP_COS          7
+#define OP_ATAN         8
+#define OP_TMATRIXMULT  9
+#define OP_MATRIXMULT   10
+#define OP_TRANSFORM    11
+#define OP_YORIGIN      12
+#define OP_INITBANKS    13
+#define OP_SETBANK      14
+#define OP_VERIFYBANK   15
 
-#define MAX_COMMANDS	0x2b
+#define MAX_COMMANDS    0x2b
 
 static const UINT8 command_map[3][MAX_COMMANDS] =
 {
 	{
 		/* standard version */
-		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM,	OP_VERSION,		/* 00-03 */
-		OP_RAMTEST,		OP_UNKNOWN,		OP_UNKNOWN,		OP_RESET,		/* 04-07 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 08-0b */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_TMATRIXMULT,	OP_UNKNOWN,		/* 0c-0f */
-		OP_MATRIXMULT,	OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 10-13 */
-		OP_SIN,			OP_COS,			OP_YORIGIN,		OP_TRANSFORM,	/* 14-17 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 18-1b */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 1c-1f */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 20-23 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 24-27 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN						/* 28-2a */
+		OP_UNKNOWN,     OP_REFLECT,     OP_CHECKSUM,    OP_VERSION,     /* 00-03 */
+		OP_RAMTEST,     OP_UNKNOWN,     OP_UNKNOWN,     OP_RESET,       /* 04-07 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 08-0b */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_TMATRIXMULT, OP_UNKNOWN,     /* 0c-0f */
+		OP_MATRIXMULT,  OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 10-13 */
+		OP_SIN,         OP_COS,         OP_YORIGIN,     OP_TRANSFORM,   /* 14-17 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 18-1b */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 1c-1f */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 20-23 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 24-27 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN                      /* 28-2a */
 	},
 	{
 		/* Steel Talons version */
-		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM,	OP_VERSION,		/* 00-03 */
-		OP_RAMTEST,		OP_UNKNOWN,		OP_UNKNOWN,		OP_RESET,		/* 04-07 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 08-0b */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 0c-0f */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 10-13 */
-		OP_TMATRIXMULT,	OP_UNKNOWN,		OP_MATRIXMULT,	OP_UNKNOWN,		/* 14-17 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 18-1b */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_SIN,			OP_COS,			/* 1c-1f */
-		OP_ATAN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 20-23 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 24-27 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN						/* 28-2a */
+		OP_UNKNOWN,     OP_REFLECT,     OP_CHECKSUM,    OP_VERSION,     /* 00-03 */
+		OP_RAMTEST,     OP_UNKNOWN,     OP_UNKNOWN,     OP_RESET,       /* 04-07 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 08-0b */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 0c-0f */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 10-13 */
+		OP_TMATRIXMULT, OP_UNKNOWN,     OP_MATRIXMULT,  OP_UNKNOWN,     /* 14-17 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 18-1b */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_SIN,         OP_COS,         /* 1c-1f */
+		OP_ATAN,        OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 20-23 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 24-27 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN                      /* 28-2a */
 	},
 	{
 		/* Guardians version */
-		OP_UNKNOWN,		OP_REFLECT,		OP_CHECKSUM,	OP_VERSION,		/* 00-03 */
-		OP_RAMTEST,		OP_UNKNOWN,		OP_UNKNOWN,		OP_RESET,		/* 04-07 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 08-0b */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_INITBANKS,	OP_SETBANK,		/* 0c-0f */
-		OP_VERIFYBANK,	OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 10-13 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 14-17 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 18-1b */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 1c-1f */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 20-23 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN,		/* 24-27 */
-		OP_UNKNOWN,		OP_UNKNOWN,		OP_UNKNOWN						/* 28-2a */
+		OP_UNKNOWN,     OP_REFLECT,     OP_CHECKSUM,    OP_VERSION,     /* 00-03 */
+		OP_RAMTEST,     OP_UNKNOWN,     OP_UNKNOWN,     OP_RESET,       /* 04-07 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 08-0b */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_INITBANKS,   OP_SETBANK,     /* 0c-0f */
+		OP_VERIFYBANK,  OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 10-13 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 14-17 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 18-1b */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 1c-1f */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 20-23 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN,     /* 24-27 */
+		OP_UNKNOWN,     OP_UNKNOWN,     OP_UNKNOWN                      /* 28-2a */
 	}
 };
 
@@ -237,42 +237,42 @@ READ16_HANDLER( asic65_r )
 	/* update results */
 	switch (command)
 	{
-		case OP_UNKNOWN:	/* return bogus data */
+		case OP_UNKNOWN:    /* return bogus data */
 			popmessage("ASIC65: Unknown cmd %02X", asic65.command);
 			break;
 
-		case OP_REFLECT:	/* reflect data */
+		case OP_REFLECT:    /* reflect data */
 			if (asic65.param_index >= 1)
 				result = asic65.param[--asic65.param_index];
 			break;
 
-		case OP_CHECKSUM:	/* compute checksum (should be XX27) */
+		case OP_CHECKSUM:   /* compute checksum (should be XX27) */
 			result = 0x0027;
 			break;
 
-		case OP_VERSION:	/* get version (returns 1.3) */
+		case OP_VERSION:    /* get version (returns 1.3) */
 			result = 0x0013;
 			break;
 
-		case OP_RAMTEST:	/* internal RAM test (result should be 0) */
+		case OP_RAMTEST:    /* internal RAM test (result should be 0) */
 			result = 0;
 			break;
 
-		case OP_RESET:	/* reset */
+		case OP_RESET:  /* reset */
 			asic65.result_index = asic65.param_index = 0;
 			break;
 
-		case OP_SIN:	/* sin */
+		case OP_SIN:    /* sin */
 			if (asic65.param_index >= 1)
 				result = (int)(16384. * sin(M_PI * (double)(INT16)asic65.param[0] / 32768.));
 			break;
 
-		case OP_COS:	/* cos */
+		case OP_COS:    /* cos */
 			if (asic65.param_index >= 1)
 				result = (int)(16384. * cos(M_PI * (double)(INT16)asic65.param[0] / 32768.));
 			break;
 
-		case OP_ATAN:	/* vector angle */
+		case OP_ATAN:   /* vector angle */
 			if (asic65.param_index >= 4)
 			{
 				INT32 xint = (INT32)((asic65.param[0] << 16) | asic65.param[1]);
@@ -282,7 +282,7 @@ READ16_HANDLER( asic65_r )
 			}
 			break;
 
-		case OP_TMATRIXMULT:	/* matrix multiply by transpose */
+		case OP_TMATRIXMULT:    /* matrix multiply by transpose */
 			/* if this is wrong, the labels on the car selection screen */
 			/* in Race Drivin' will be off */
 			if (asic65.param_index >= 9+6)
@@ -296,20 +296,20 @@ READ16_HANDLER( asic65_r )
 				{
 					case 0:
 						result64 = (INT64)v0 * (INT16)asic65.param[0] +
-								   (INT64)v1 * (INT16)asic65.param[3] +
-								   (INT64)v2 * (INT16)asic65.param[6];
+									(INT64)v1 * (INT16)asic65.param[3] +
+									(INT64)v2 * (INT16)asic65.param[6];
 						break;
 
 					case 1:
 						result64 = (INT64)v0 * (INT16)asic65.param[1] +
-								   (INT64)v1 * (INT16)asic65.param[4] +
-								   (INT64)v2 * (INT16)asic65.param[7];
+									(INT64)v1 * (INT16)asic65.param[4] +
+									(INT64)v2 * (INT16)asic65.param[7];
 						break;
 
 					case 2:
 						result64 = (INT64)v0 * (INT16)asic65.param[2] +
-								   (INT64)v1 * (INT16)asic65.param[5] +
-								   (INT64)v2 * (INT16)asic65.param[8];
+									(INT64)v1 * (INT16)asic65.param[5] +
+									(INT64)v2 * (INT16)asic65.param[8];
 						break;
 				}
 
@@ -320,7 +320,7 @@ READ16_HANDLER( asic65_r )
 			}
 			break;
 
-		case OP_MATRIXMULT:	/* matrix multiply???? */
+		case OP_MATRIXMULT: /* matrix multiply???? */
 			if (asic65.param_index >= 9+6)
 			{
 				INT32 v0 = (INT32)((asic65.param[9] << 16) | asic65.param[10]);
@@ -332,20 +332,20 @@ READ16_HANDLER( asic65_r )
 				{
 					case 0:
 						result64 = (INT64)v0 * (INT16)asic65.param[0] +
-								   (INT64)v1 * (INT16)asic65.param[1] +
-								   (INT64)v2 * (INT16)asic65.param[2];
+									(INT64)v1 * (INT16)asic65.param[1] +
+									(INT64)v2 * (INT16)asic65.param[2];
 						break;
 
 					case 1:
 						result64 = (INT64)v0 * (INT16)asic65.param[3] +
-								   (INT64)v1 * (INT16)asic65.param[4] +
-								   (INT64)v2 * (INT16)asic65.param[5];
+									(INT64)v1 * (INT16)asic65.param[4] +
+									(INT64)v2 * (INT16)asic65.param[5];
 						break;
 
 					case 2:
 						result64 = (INT64)v0 * (INT16)asic65.param[6] +
-								   (INT64)v1 * (INT16)asic65.param[7] +
-								   (INT64)v2 * (INT16)asic65.param[8];
+									(INT64)v1 * (INT16)asic65.param[7] +
+									(INT64)v2 * (INT16)asic65.param[8];
 						break;
 				}
 
@@ -361,7 +361,7 @@ READ16_HANDLER( asic65_r )
 				asic65.yorigin = asic65.param[asic65.param_index - 1];
 			break;
 
-		case OP_TRANSFORM:	/* 3d transform */
+		case OP_TRANSFORM:  /* 3d transform */
 			if (asic65.param_index >= 2)
 			{
 				/* param 0 == 1/z */
@@ -392,11 +392,11 @@ READ16_HANDLER( asic65_r )
 			}
 			break;
 
-		case OP_INITBANKS:	/* initialize banking */
+		case OP_INITBANKS:  /* initialize banking */
 			asic65.last_bank = 0;
 			break;
 
-		case OP_SETBANK:	/* set a bank */
+		case OP_SETBANK:    /* set a bank */
 		{
 			static const UINT8 banklist[] =
 			{
@@ -422,7 +422,7 @@ READ16_HANDLER( asic65_r )
 			break;
 		}
 
-		case OP_VERIFYBANK:	/* verify a bank */
+		case OP_VERIFYBANK: /* verify a bank */
 		{
 			static const UINT16 bankverify[] =
 			{

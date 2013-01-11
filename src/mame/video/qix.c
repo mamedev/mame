@@ -19,7 +19,7 @@
  *
  *************************************/
 
-#define MC6845_TAG		("vid_u18")
+#define MC6845_TAG      ("vid_u18")
 
 
 
@@ -119,7 +119,7 @@ WRITE8_MEMBER(qix_state::qix_videoram_w)
 {
 
 	/* update the screen in case the game is writing "behind" the beam -
-       Zookeeper likes to do this */
+	   Zookeeper likes to do this */
 	machine().primary_screen->update_now();
 
 	/* add in the upper bit of the address latch */
@@ -134,7 +134,7 @@ WRITE8_MEMBER(qix_state::slither_videoram_w)
 {
 
 	/* update the screen in case the game is writing "behind" the beam -
-       Zookeeper likes to do this */
+	   Zookeeper likes to do this */
 	machine().primary_screen->update_now();
 
 	/* add in the upper bit of the address latch */
@@ -216,7 +216,7 @@ WRITE8_MEMBER(qix_state::qix_paletteram_w)
 
 	/* trigger an update if a currently visible pen has changed */
 	if (((offset >> 8) == m_palette_bank) &&
-	    (old_data != data))
+		(old_data != data))
 		machine().primary_screen->update_now();
 }
 
@@ -245,22 +245,22 @@ static void get_pens(qix_state *state, pen_t *pens)
 	/* in the same screen are barely visible, as the manual requires. */
 	static const UINT8 table[16] =
 	{
-		0x00,	/* value = 0, intensity = 0 */
-		0x12,	/* value = 0, intensity = 1 */
-		0x24,	/* value = 0, intensity = 2 */
-		0x49,	/* value = 0, intensity = 3 */
-		0x12,	/* value = 1, intensity = 0 */
-		0x24,	/* value = 1, intensity = 1 */
-		0x49,	/* value = 1, intensity = 2 */
-		0x92,	/* value = 1, intensity = 3 */
-		0x5b,	/* value = 2, intensity = 0 */
-		0x6d,	/* value = 2, intensity = 1 */
-		0x92,	/* value = 2, intensity = 2 */
-		0xdb,	/* value = 2, intensity = 3 */
-		0x7f,	/* value = 3, intensity = 0 */
-		0x91,	/* value = 3, intensity = 1 */
-		0xb6,	/* value = 3, intensity = 2 */
-		0xff	/* value = 3, intensity = 3 */
+		0x00,   /* value = 0, intensity = 0 */
+		0x12,   /* value = 0, intensity = 1 */
+		0x24,   /* value = 0, intensity = 2 */
+		0x49,   /* value = 0, intensity = 3 */
+		0x12,   /* value = 1, intensity = 0 */
+		0x24,   /* value = 1, intensity = 1 */
+		0x49,   /* value = 1, intensity = 2 */
+		0x92,   /* value = 1, intensity = 3 */
+		0x5b,   /* value = 2, intensity = 0 */
+		0x6d,   /* value = 2, intensity = 1 */
+		0x92,   /* value = 2, intensity = 2 */
+		0xdb,   /* value = 2, intensity = 3 */
+		0x7f,   /* value = 3, intensity = 0 */
+		0x91,   /* value = 3, intensity = 1 */
+		0xb6,   /* value = 3, intensity = 2 */
+		0xff    /* value = 3, intensity = 3 */
 	};
 
 	for (offs = state->m_palette_bank << 8; offs < (state->m_palette_bank << 8) + NUM_PENS; offs++)
@@ -395,36 +395,36 @@ ADDRESS_MAP_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",							/* screen we are acting on */
-	8,									/* number of pixels per video memory address */
-	begin_update,						/* before pixel update callback */
-	update_row,							/* row update callback */
-	NULL,								/* after pixel update callback */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,display_enable_changed),	/* callback for display state changes */
-	DEVCB_NULL,							/* callback for cursor state changes */
-	DEVCB_NULL,							/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_vsync_changed),		/* VSYNC callback */
-	NULL								/* update address callback */
+	"screen",                           /* screen we are acting on */
+	8,                                  /* number of pixels per video memory address */
+	begin_update,                       /* before pixel update callback */
+	update_row,                         /* row update callback */
+	NULL,                               /* after pixel update callback */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,display_enable_changed), /* callback for display state changes */
+	DEVCB_NULL,                         /* callback for cursor state changes */
+	DEVCB_NULL,                         /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_vsync_changed),      /* VSYNC callback */
+	NULL                                /* update address callback */
 };
 
 
 static const m6809_config encryption_config =
 {
-	TRUE,		/* encrypt only the first byte in 10 xx and 11 xx opcodes */
+	TRUE,       /* encrypt only the first byte in 10 xx and 11 xx opcodes */
 };
 
 
 MACHINE_CONFIG_FRAGMENT( qix_video )
-	MCFG_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
+	MCFG_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(qix_video_map)
-	MCFG_CPU_CONFIG(encryption_config)	// for kram3
+	MCFG_CPU_CONFIG(encryption_config)  // for kram3
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, QIX_CHARACTER_CLOCK, mc6845_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100)	/* from CRTC */
+	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 MACHINE_CONFIG_END
 
@@ -437,6 +437,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( slither_video )
 	MCFG_CPU_MODIFY("videocpu")
-	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
+	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
 	MCFG_CPU_PROGRAM_MAP(slither_video_map)
 MACHINE_CONFIG_END

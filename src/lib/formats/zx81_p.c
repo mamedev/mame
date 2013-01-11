@@ -32,24 +32,24 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 #include "zx81_p.h"
 
 
-#define WAVEENTRY_LOW	-32768
-#define WAVEENTRY_HIGH	 32767
-#define WAVEENTRY_ZERO	     0
+#define WAVEENTRY_LOW   -32768
+#define WAVEENTRY_HIGH   32767
+#define WAVEENTRY_ZERO       0
 
-#define ZX81_WAV_FREQUENCY	44100
+#define ZX81_WAV_FREQUENCY  44100
 
 /* all following are in samples */
-#define ZX81_PULSE_LENGTH	16
-#define ZX81_PAUSE_LENGTH	56
-#define ZX81_PILOT_LENGTH	220500
+#define ZX81_PULSE_LENGTH   16
+#define ZX81_PAUSE_LENGTH   56
+#define ZX81_PILOT_LENGTH   220500
 
-#define ZX81_LOW_BIT_LENGTH	(ZX81_PULSE_LENGTH*4+ZX81_PAUSE_LENGTH)
-#define ZX81_HIGH_BIT_LENGTH	(ZX81_PULSE_LENGTH*9+ZX81_PAUSE_LENGTH)
+#define ZX81_LOW_BIT_LENGTH (ZX81_PULSE_LENGTH*4+ZX81_PAUSE_LENGTH)
+#define ZX81_HIGH_BIT_LENGTH    (ZX81_PULSE_LENGTH*9+ZX81_PAUSE_LENGTH)
 
-#define ZX81_START_LOAD_ADDRESS	0x4009
-#define ZX80_START_LOAD_ADDRESS	0x4000
-#define ZX81_DATA_LENGTH_OFFSET	0x0b
-#define ZX80_DATA_LENGTH_OFFSET	0x04
+#define ZX81_START_LOAD_ADDRESS 0x4009
+#define ZX80_START_LOAD_ADDRESS 0x4000
+#define ZX81_DATA_LENGTH_OFFSET 0x0b
+#define ZX80_DATA_LENGTH_OFFSET 0x04
 
 static UINT8 zx_file_name[128];
 static UINT16 real_data_length = 0;
@@ -61,7 +61,7 @@ static INT16 *zx81_emit_level(INT16 *p, int count, int level)
 {
 	int i;
 
-	for (i=0; i<count; i++)	*(p++) = level;
+	for (i=0; i<count; i++) *(p++) = level;
 
 	return p;
 }
@@ -100,7 +100,7 @@ static INT16* zx81_output_bit(INT16 *p, UINT8 bit)
 
 	p = zx81_emit_pause(p);
 
-    	return p;
+		return p;
 }
 
 static INT16* zx81_output_byte(INT16 *p, UINT8 byte)
@@ -129,22 +129,22 @@ static UINT16 zx81_cassette_calculate_number_of_1(const UINT8 *bytes, UINT16 len
 /* ZX-81 functions */
 
 static const UINT8 zx81_chars[]={
-		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*00h-07h*/
-		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*08h-0fh*/
-		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*10h-17h*/
-		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*18h-1fh*/
-		     0x00, 0x00, 0x0b, 0x00, 0x0d, 0x00, 0x00, 0x00, /*20h-27h*/
-		     0x10, 0x11, 0x17, 0x15, 0x1a, 0x16, 0x1b, 0x18, /*28h-2fh*/
-		     0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, /*30h-37h*/
-		     0x24, 0x25, 0x0e, 0x19, 0x13, 0x14, 0x12, 0x0f, /*38h-3fh*/
-		     0x00, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, /*40h-47h*/
-		     0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, /*48h-4fh*/
-		     0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, /*50h-57h*/
-		     0x3d, 0x3e, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, /*58h-5fh*/
-		     0x00, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, /*60h-67h*/
-		     0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, /*68h-6fh*/
-		     0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, /*70h-77h*/
-		     0x3d, 0x3e, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, /*78h-7fh*/
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*00h-07h*/
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*08h-0fh*/
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*10h-17h*/
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*18h-1fh*/
+				0x00, 0x00, 0x0b, 0x00, 0x0d, 0x00, 0x00, 0x00, /*20h-27h*/
+				0x10, 0x11, 0x17, 0x15, 0x1a, 0x16, 0x1b, 0x18, /*28h-2fh*/
+				0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, /*30h-37h*/
+				0x24, 0x25, 0x0e, 0x19, 0x13, 0x14, 0x12, 0x0f, /*38h-3fh*/
+				0x00, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, /*40h-47h*/
+				0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, /*48h-4fh*/
+				0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, /*50h-57h*/
+				0x3d, 0x3e, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, /*58h-5fh*/
+				0x00, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, /*60h-67h*/
+				0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, /*68h-6fh*/
+				0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, /*70h-77h*/
+				0x3d, 0x3e, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, /*78h-7fh*/
 };
 
 static void zx81_fill_file_name(const char* name)
@@ -193,13 +193,13 @@ static int zx81_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller zx81_legacy_fill_wave =
 {
-	zx81_cassette_fill_wave,			/* fill_wave */
-	-1,						/* chunk_size */
-	0,						/* chunk_samples */
-	zx81_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	ZX81_WAV_FREQUENCY,				/* sample_frequency */
-	0,						/* header_samples */
-	0						/* trailer_samples */
+	zx81_cassette_fill_wave,            /* fill_wave */
+	-1,                     /* chunk_size */
+	0,                      /* chunk_samples */
+	zx81_cassette_calculate_size_in_samples,    /* chunk_sample_calc */
+	ZX81_WAV_FREQUENCY,             /* sample_frequency */
+	0,                      /* header_samples */
+	0                       /* trailer_samples */
 };
 
 static casserr_t zx81_p_identify(cassette_image *cassette, struct CassetteOptions *opts)
@@ -210,9 +210,9 @@ static casserr_t zx81_p_identify(cassette_image *cassette, struct CassetteOption
 static casserr_t zx81_p_load(cassette_image *cassette)
 {
 	/* The filename of the file is used to create the wave stream for the emulated machine. Why is this information not
-       part of the image file itself?
-       Hardcoding this to "cassette".
-    */
+	   part of the image file itself?
+	   Hardcoding this to "cassette".
+	*/
 	zx81_fill_file_name ("cassette" /*image_basename_noext(device_list_find_by_tag( Machine->config->m_devicelist, CASSETTE, "cassette" ))*/ );
 	return cassette_legacy_construct(cassette, &zx81_legacy_fill_wave);
 }
@@ -261,13 +261,13 @@ static int zx80_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller zx80_legacy_fill_wave =
 {
-	zx80_cassette_fill_wave,			/* fill_wave */
-	-1,											/* chunk_size */
-	0,											/* chunk_samples */
-	zx80_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	ZX81_WAV_FREQUENCY,										/* sample_frequency */
-	0,											/* header_samples */
-	0											/* trailer_samples */
+	zx80_cassette_fill_wave,            /* fill_wave */
+	-1,                                         /* chunk_size */
+	0,                                          /* chunk_samples */
+	zx80_cassette_calculate_size_in_samples,    /* chunk_sample_calc */
+	ZX81_WAV_FREQUENCY,                                     /* sample_frequency */
+	0,                                          /* header_samples */
+	0                                           /* trailer_samples */
 };
 
 static casserr_t zx80_o_identify(cassette_image *cassette, struct CassetteOptions *opts)

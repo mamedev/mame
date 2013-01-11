@@ -65,7 +65,7 @@ device_ieee488_interface::~device_ieee488_interface()
 //-------------------------------------------------
 
 ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock),
+		device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -173,14 +173,14 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 	{
 		switch (signal)
 		{
-		case EOI:	m_out_eoi_func(state);	break;
-		case DAV:	m_out_dav_func(state);	break;
-		case NRFD:	m_out_nrfd_func(state);	break;
-		case NDAC:	m_out_ndac_func(state);	break;
-		case IFC:	m_out_ifc_func(state);	break;
-		case SRQ:	m_out_srq_func(state);	break;
-		case ATN:	m_out_atn_func(state);	break;
-		case REN:	m_out_ren_func(state);	break;
+		case EOI:   m_out_eoi_func(state);  break;
+		case DAV:   m_out_dav_func(state);  break;
+		case NRFD:  m_out_nrfd_func(state); break;
+		case NDAC:  m_out_ndac_func(state); break;
+		case IFC:   m_out_ifc_func(state);  break;
+		case SRQ:   m_out_srq_func(state);  break;
+		case ATN:   m_out_atn_func(state);  break;
+		case REN:   m_out_ren_func(state);  break;
 		}
 
 		daisy_entry *entry = m_device_list.first();
@@ -324,8 +324,8 @@ inline UINT8 ieee488_device::get_data()
 //-------------------------------------------------
 
 ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock),
-	  m_dio(0xff)
+	: device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock),
+		m_dio(0xff)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{
@@ -341,14 +341,14 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 void ieee488_device::device_start()
 {
 	// resolve callbacks
-    m_out_eoi_func.resolve(m_out_eoi_cb, *this);
-    m_out_dav_func.resolve(m_out_dav_cb, *this);
-    m_out_nrfd_func.resolve(m_out_nrfd_cb, *this);
-    m_out_ndac_func.resolve(m_out_ndac_cb, *this);
-    m_out_ifc_func.resolve(m_out_ifc_cb, *this);
-    m_out_srq_func.resolve(m_out_srq_cb, *this);
-    m_out_atn_func.resolve(m_out_atn_cb, *this);
-    m_out_ren_func.resolve(m_out_ren_cb, *this);
+	m_out_eoi_func.resolve(m_out_eoi_cb, *this);
+	m_out_dav_func.resolve(m_out_dav_cb, *this);
+	m_out_nrfd_func.resolve(m_out_nrfd_cb, *this);
+	m_out_ndac_func.resolve(m_out_ndac_cb, *this);
+	m_out_ifc_func.resolve(m_out_ifc_cb, *this);
+	m_out_srq_func.resolve(m_out_srq_cb, *this);
+	m_out_atn_func.resolve(m_out_atn_cb, *this);
+	m_out_ren_func.resolve(m_out_ren_cb, *this);
 }
 
 //-------------------------------------------------
@@ -382,9 +382,9 @@ void ieee488_device::add_device(device_t *target, int address)
 
 ieee488_device::daisy_entry::daisy_entry(device_t *device)
 	: m_next(NULL),
-	  m_device(device),
-	  m_interface(NULL),
-	  m_dio(0xff)
+		m_device(device),
+		m_interface(NULL),
+		m_dio(0xff)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{

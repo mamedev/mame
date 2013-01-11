@@ -24,14 +24,14 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_GFX_PLANES			8
-#define MAX_GFX_SIZE			32
-#define MAX_ABS_GFX_SIZE		1024
+#define MAX_GFX_PLANES          8
+#define MAX_GFX_SIZE            32
+#define MAX_ABS_GFX_SIZE        1024
 
-#define EXTENDED_XOFFS			{ 0 }
-#define EXTENDED_YOFFS			{ 0 }
+#define EXTENDED_XOFFS          { 0 }
+#define EXTENDED_YOFFS          { 0 }
 
-#define GFX_RAW 				0x12345678
+#define GFX_RAW                 0x12345678
 // When planeoffset[0] is set to GFX_RAW, the gfx data is left as-is, with no conversion.
 // No buffer is allocated for the decoded data, and gfxdata is set to point to the source
 // data.
@@ -58,24 +58,24 @@ enum
 
 // these macros describe gfx_layouts in terms of fractions of a region
 // they can be used for total, planeoffset, xoffset, yoffset
-#define RGN_FRAC(num,den)		(0x80000000 | (((num) & 0x0f) << 27) | (((den) & 0x0f) << 23))
-#define IS_FRAC(offset)			((offset) & 0x80000000)
-#define FRAC_NUM(offset)		(((offset) >> 27) & 0x0f)
-#define FRAC_DEN(offset)		(((offset) >> 23) & 0x0f)
-#define FRAC_OFFSET(offset)		((offset) & 0x007fffff)
+#define RGN_FRAC(num,den)       (0x80000000 | (((num) & 0x0f) << 27) | (((den) & 0x0f) << 23))
+#define IS_FRAC(offset)         ((offset) & 0x80000000)
+#define FRAC_NUM(offset)        (((offset) >> 27) & 0x0f)
+#define FRAC_DEN(offset)        (((offset) >> 23) & 0x0f)
+#define FRAC_OFFSET(offset)     ((offset) & 0x007fffff)
 
 // these macros are useful in gfx_layouts
-#define STEP2(START,STEP)		(START),(START)+(STEP)
-#define STEP4(START,STEP)		STEP2(START,STEP),STEP2((START)+2*(STEP),STEP)
-#define STEP8(START,STEP)		STEP4(START,STEP),STEP4((START)+4*(STEP),STEP)
-#define STEP16(START,STEP)		STEP8(START,STEP),STEP8((START)+8*(STEP),STEP)
-#define STEP32(START,STEP)		STEP16(START,STEP),STEP16((START)+16*(STEP),STEP)
-#define STEP64(START,STEP)		STEP32(START,STEP),STEP32((START)+32*(STEP),STEP)
-#define STEP128(START,STEP)		STEP64(START,STEP),STEP64((START)+64*(STEP),STEP)
-#define STEP256(START,STEP)		STEP128(START,STEP),STEP128((START)+128*(STEP),STEP)
-#define STEP512(START,STEP)		STEP256(START,STEP),STEP256((START)+256*(STEP),STEP)
-#define STEP1024(START,STEP)	STEP512(START,STEP),STEP512((START)+512*(STEP),STEP)
-#define STEP2048(START,STEP)	STEP1024(START,STEP),STEP1024((START)+1024*(STEP),STEP)
+#define STEP2(START,STEP)       (START),(START)+(STEP)
+#define STEP4(START,STEP)       STEP2(START,STEP),STEP2((START)+2*(STEP),STEP)
+#define STEP8(START,STEP)       STEP4(START,STEP),STEP4((START)+4*(STEP),STEP)
+#define STEP16(START,STEP)      STEP8(START,STEP),STEP8((START)+8*(STEP),STEP)
+#define STEP32(START,STEP)      STEP16(START,STEP),STEP16((START)+16*(STEP),STEP)
+#define STEP64(START,STEP)      STEP32(START,STEP),STEP32((START)+32*(STEP),STEP)
+#define STEP128(START,STEP)     STEP64(START,STEP),STEP64((START)+64*(STEP),STEP)
+#define STEP256(START,STEP)     STEP128(START,STEP),STEP128((START)+128*(STEP),STEP)
+#define STEP512(START,STEP)     STEP256(START,STEP),STEP256((START)+256*(STEP),STEP)
+#define STEP1024(START,STEP)    STEP512(START,STEP),STEP512((START)+512*(STEP),STEP)
+#define STEP2048(START,STEP)    STEP1024(START,STEP),STEP1024((START)+1024*(STEP),STEP)
 
 
 // these macros are used for declaring gfx_decode_entry_entry info arrays.
@@ -101,16 +101,16 @@ struct gfx_layout
 	UINT32 xoffs(int x) const { return (extxoffs != NULL) ? extxoffs[x] : xoffset[x]; }
 	UINT32 yoffs(int y) const { return (extyoffs != NULL) ? extyoffs[y] : yoffset[y]; }
 
-	UINT16			width;				// pixel width of each element
-	UINT16			height;				// pixel height of each element
-	UINT32			total;				// total number of elements, or RGN_FRAC()
-	UINT16			planes;				// number of bitplanes
-	UINT32			planeoffset[MAX_GFX_PLANES]; // bit offset of each bitplane
-	UINT32			xoffset[MAX_GFX_SIZE]; // bit offset of each horizontal pixel
-	UINT32			yoffset[MAX_GFX_SIZE]; // bit offset of each vertical pixel
-	UINT32			charincrement;		// distance between two consecutive elements (in bits)
-	const UINT32 *	extxoffs;			// extended X offset array for really big layouts
-	const UINT32 *	extyoffs;			// extended Y offset array for really big layouts
+	UINT16          width;              // pixel width of each element
+	UINT16          height;             // pixel height of each element
+	UINT32          total;              // total number of elements, or RGN_FRAC()
+	UINT16          planes;             // number of bitplanes
+	UINT32          planeoffset[MAX_GFX_PLANES]; // bit offset of each bitplane
+	UINT32          xoffset[MAX_GFX_SIZE]; // bit offset of each horizontal pixel
+	UINT32          yoffset[MAX_GFX_SIZE]; // bit offset of each vertical pixel
+	UINT32          charincrement;      // distance between two consecutive elements (in bits)
+	const UINT32 *  extxoffs;           // extended X offset array for really big layouts
+	const UINT32 *  extyoffs;           // extended Y offset array for really big layouts
 };
 
 
@@ -169,50 +169,50 @@ public:
 
 private:
 	// internal state
-	UINT16			m_width;				// current pixel width of each element (changeble with source clipping)
-	UINT16			m_height;				// current pixel height of each element (changeble with source clipping)
-	UINT16			m_startx;				// current source clip X offset
-	UINT16			m_starty;				// current source clip Y offset
+	UINT16          m_width;                // current pixel width of each element (changeble with source clipping)
+	UINT16          m_height;               // current pixel height of each element (changeble with source clipping)
+	UINT16          m_startx;               // current source clip X offset
+	UINT16          m_starty;               // current source clip Y offset
 
-	UINT16			m_origwidth;			// starting pixel width of each element
-	UINT16			m_origheight;			// staring pixel height of each element
-	UINT32			m_total_elements;		// total number of decoded elements
+	UINT16          m_origwidth;            // starting pixel width of each element
+	UINT16          m_origheight;           // staring pixel height of each element
+	UINT32          m_total_elements;       // total number of decoded elements
 
-	UINT32			m_color_base;			// base color for rendering
-	UINT16			m_color_depth;			// number of colors each pixel can represent
-	UINT16			m_color_granularity;	// number of colors for each color code
-	UINT32			m_total_colors;			// number of color codes
+	UINT32          m_color_base;           // base color for rendering
+	UINT16          m_color_depth;          // number of colors each pixel can represent
+	UINT16          m_color_granularity;    // number of colors for each color code
+	UINT32          m_total_colors;         // number of color codes
 
-	UINT32			m_line_modulo;			// bytes between each row of data
-	UINT32			m_char_modulo;			// bytes between each element
-	const UINT8 *	m_srcdata;				// pointer to the source data for decoding
-	UINT32			m_dirtyseq;				// sequence number; incremented each time a tile is dirtied
+	UINT32          m_line_modulo;          // bytes between each row of data
+	UINT32          m_char_modulo;          // bytes between each element
+	const UINT8 *   m_srcdata;              // pointer to the source data for decoding
+	UINT32          m_dirtyseq;             // sequence number; incremented each time a tile is dirtied
 
-	UINT8 *			m_gfxdata;				// pointer to decoded pixel data, 8bpp
-	dynamic_buffer	m_gfxdata_allocated;	// allocated decoded pixel data, 8bpp
-	dynamic_buffer	m_dirty;				// dirty array for detecting chars that need decoding
-	dynamic_array<UINT32> m_pen_usage;		// bitmask of pens that are used (pens 0-31 only)
+	UINT8 *         m_gfxdata;              // pointer to decoded pixel data, 8bpp
+	dynamic_buffer  m_gfxdata_allocated;    // allocated decoded pixel data, 8bpp
+	dynamic_buffer  m_dirty;                // dirty array for detecting chars that need decoding
+	dynamic_array<UINT32> m_pen_usage;      // bitmask of pens that are used (pens 0-31 only)
 
-	bool			m_layout_is_raw;		// raw layout?
-	UINT8			m_layout_planes;		// bit planes in the layout
-	UINT32			m_layout_charincrement;	// per-character increment in source data
+	bool            m_layout_is_raw;        // raw layout?
+	UINT8           m_layout_planes;        // bit planes in the layout
+	UINT32          m_layout_charincrement; // per-character increment in source data
 	dynamic_array<UINT32> m_layout_planeoffset;// plane offsets
-	dynamic_array<UINT32> m_layout_xoffset;	// X offsets
-	dynamic_array<UINT32> m_layout_yoffset;	// Y offsets
+	dynamic_array<UINT32> m_layout_xoffset; // X offsets
+	dynamic_array<UINT32> m_layout_yoffset; // Y offsets
 
-	running_machine &m_machine;				// pointer to the owning machine
+	running_machine &m_machine;             // pointer to the owning machine
 };
 
 
 struct gfx_decode_entry
 {
-	const char *	memory_region;		// memory region where the data resides
-	UINT32			start;				// offset of beginning of data to decode
-	const gfx_layout *gfxlayout;		// pointer to gfx_layout describing the layout; NULL marks the end of the array
-	UINT16			color_codes_start;	// offset in the color lookup table where color codes start
-	UINT16			total_color_codes;	// total number of color codes
-	UINT8			xscale;				// optional horizontal scaling factor; 0 means 1x
-	UINT8			yscale;				// optional vertical scaling factor; 0 means 1x
+	const char *    memory_region;      // memory region where the data resides
+	UINT32          start;              // offset of beginning of data to decode
+	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; NULL marks the end of the array
+	UINT16          color_codes_start;  // offset in the color lookup table where color codes start
+	UINT16          total_color_codes;  // total number of color codes
+	UINT8           xscale;             // optional horizontal scaling factor; 0 means 1x
+	UINT8           yscale;             // optional vertical scaling factor; 0 means 1x
 };
 
 
@@ -411,8 +411,8 @@ inline UINT32 alpha_blend_r16(UINT32 d, UINT32 s, UINT8 level)
 {
 	int alphad = 256 - level;
 	return ((((s & 0x001f) * level + (d & 0x001f) * alphad) >> 8)) |
-		   ((((s & 0x03e0) * level + (d & 0x03e0) * alphad) >> 8) & 0x03e0) |
-		   ((((s & 0x7c00) * level + (d & 0x7c00) * alphad) >> 8) & 0x7c00);
+			((((s & 0x03e0) * level + (d & 0x03e0) * alphad) >> 8) & 0x03e0) |
+			((((s & 0x7c00) * level + (d & 0x7c00) * alphad) >> 8) & 0x7c00);
 }
 
 
@@ -425,9 +425,9 @@ inline UINT32 alpha_blend_r32(UINT32 d, UINT32 s, UINT8 level)
 {
 	int alphad = 256 - level;
 	return ((((s & 0x0000ff) * level + (d & 0x0000ff) * alphad) >> 8)) |
-		   ((((s & 0x00ff00) * level + (d & 0x00ff00) * alphad) >> 8) & 0x00ff00) |
-		   ((((s & 0xff0000) * level + (d & 0xff0000) * alphad) >> 8) & 0xff0000);
+			((((s & 0x00ff00) * level + (d & 0x00ff00) * alphad) >> 8) & 0x00ff00) |
+			((((s & 0xff0000) * level + (d & 0xff0000) * alphad) >> 8) & 0xff0000);
 }
 
 
-#endif	// __DRAWGFX_H__
+#endif  // __DRAWGFX_H__

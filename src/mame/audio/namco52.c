@@ -152,7 +152,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 	// asserted for one clock cycle ~= 21us.
 
 	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
-       a timer interrupt, so we need to ensure the IRQ line is held long enough */
+	   a timer interrupt, so we need to ensure the IRQ line is held long enough */
 	space.machine().scheduler().timer_set(attotime::from_usec(5*21), FUNC(namco_52xx_irq_clear), 0, (void *)device);
 }
 
@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( namco_52xx )
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
+	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
 	MCFG_CPU_IO_MAP(namco_52xx_map_io)
 MACHINE_CONFIG_END
 
@@ -270,5 +270,3 @@ const rom_entry *namco_52xx_device::device_rom_region() const
 {
 	return ROM_NAME(namco_52xx );
 }
-
-

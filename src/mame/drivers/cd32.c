@@ -43,8 +43,8 @@
 
 
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
-#define MGPREM11_USE_JOY	1
-#define MGNUMBER_USE_JOY	1
+#define MGPREM11_USE_JOY    1
+#define MGNUMBER_USE_JOY    1
 
 
 static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra);
@@ -132,9 +132,9 @@ static ADDRESS_MAP_START( cd32_map, AS_PROGRAM, 32, cd32_state )
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("user1", 0x80000)	/* CD32 Extended ROM */
+	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("user1", 0x80000) /* CD32 Extended ROM */
 	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)		/* Kickstart */
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)     /* Kickstart */
 ADDRESS_MAP_END
 
 /*************************************
@@ -740,20 +740,20 @@ INPUT_PORTS_END
 
 static const legacy_mos6526_interface cia_0_intf =
 {
-	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_0_irq),                                    /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("CIA0PORTA"),
-	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_porta_w),		/* port A */
+	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_porta_w),     /* port A */
 	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_portb_r),
-	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_portb_w)		/* port B */
+	DEVCB_DRIVER_MEMBER(cd32_state,cd32_cia_0_portb_w)      /* port B */
 };
 
 static const legacy_mos6526_interface cia_1_intf =
 {
-	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_1_irq),                                    /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -762,8 +762,8 @@ static const legacy_mos6526_interface cia_1_intf =
 	DEVCB_NULL
 };
 
-#define	NVRAM_SIZE 1024
-#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
+#define NVRAM_SIZE 1024
+#define NVRAM_PAGE_SIZE 16  /* max size of one write request */
 
 static const i2cmem_interface i2cmem_interface =
 {
@@ -1489,7 +1489,7 @@ DRIVER_INIT_MEMBER(cd32_state,odeontw2)
 /***************************************************************************************************/
 
 // these are clones of the cd32 SYSTEM because they run on a stock retail unit, with additional HW
-GAME( 1993, cd32bios, 0,		cd32base, cd32, 	cd32_state, cd32,    ROT0, "Commodore Business Machines", "CD32 Bios",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND | GAME_IS_BIOS_ROOT )
+GAME( 1993, cd32bios, 0,        cd32base, cd32,     cd32_state, cd32,    ROT0, "Commodore Business Machines", "CD32 Bios",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND | GAME_IS_BIOS_ROOT )
 GAME( 1995, cndypuzl, cd32bios, cd32base, cndypuzl, cd32_state, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, haremchl, cd32bios, cd32base, haremchl, cd32_state, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, lsrquiz,  cd32bios, cd32base, lsrquiz,  cd32_state,  lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */

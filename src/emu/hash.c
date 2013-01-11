@@ -64,16 +64,16 @@ const char *hash_collection::HASH_TYPES_ALL = "RS";
 
 hash_collection::hash_collection()
 	: m_has_crc32(false),
-	  m_has_sha1(false),
-	  m_creator(NULL)
+		m_has_sha1(false),
+		m_creator(NULL)
 {
 }
 
 
 hash_collection::hash_collection(const char *string)
 	: m_has_crc32(false),
-	  m_has_sha1(false),
-	  m_creator(NULL)
+		m_has_sha1(false),
+		m_creator(NULL)
 {
 	from_internal_string(string);
 }
@@ -81,8 +81,8 @@ hash_collection::hash_collection(const char *string)
 
 hash_collection::hash_collection(const hash_collection &src)
 	: m_has_crc32(false),
-	  m_has_sha1(false),
-	  m_creator(NULL)
+		m_has_sha1(false),
+		m_creator(NULL)
 {
 	copyfrom(src);
 }

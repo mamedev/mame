@@ -56,11 +56,11 @@ static void get_pens( running_machine &machine, pen_t *pens )
 WRITE8_MEMBER(epos_state::epos_port_1_w)
 {
 	/* D0 - start light #1
-       D1 - start light #2
-       D2 - coin counter
-       D3 - palette select
-       D4-D7 - unused
-     */
+	   D1 - start light #2
+	   D2 - coin counter
+	   D3 - palette select
+	   D4-D7 - unused
+	 */
 
 	set_led_status(machine(), 0, (data >> 0) & 0x01);
 	set_led_status(machine(), 1, (data >> 1) & 0x01);

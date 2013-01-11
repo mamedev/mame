@@ -19,17 +19,17 @@ class duartn68681_device;
 
 struct duartn68681_config
 {
-	devcb_write_line	m_out_irq_cb;
-	devcb_write_line	m_out_a_tx_cb;
-	devcb_write_line	m_out_b_tx_cb;
-	devcb_read8			m_in_port_cb;
-	devcb_write8		m_out_port_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_a_tx_cb;
+	devcb_write_line    m_out_b_tx_cb;
+	devcb_read8         m_in_port_cb;
+	devcb_write8        m_out_port_cb;
 
 	/* clocks for external baud rates */
 	INT32 ip3clk, ip4clk, ip5clk, ip6clk;
 };
 
-#define MC68681_RX_FIFO_SIZE				3
+#define MC68681_RX_FIFO_SIZE                3
 
 // forward declaration
 class duartn68681_device;
@@ -45,9 +45,9 @@ public:
 	virtual void device_reset();
 
 	// device_serial overrides
-	virtual void rcv_complete();	// Rx completed receiving byte
-	virtual void tra_complete();	// Tx completed sending byte
-	virtual void tra_callback();	// Tx send bit
+	virtual void rcv_complete();    // Rx completed receiving byte
+	virtual void tra_complete();    // Tx completed sending byte
+	virtual void tra_callback();    // Tx send bit
 	void input_callback(UINT8 state);
 
 	UINT8 read_chan_reg(int reg);
@@ -75,7 +75,7 @@ private:
 	int   rx_fifo_write_ptr;
 	int   rx_fifo_num;
 
-	int	m_ch;
+	int m_ch;
 
 	/* Transmitter */
 	UINT8 tx_enabled;
@@ -113,7 +113,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-    virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
 	TIMER_CALLBACK_MEMBER( duart_timer_callback );
@@ -145,15 +145,14 @@ private:
 
 	duart68681_channel *get_channel(int chan);
 
-	devcb_resolved_write_line	m_out_irq_func;
-    devcb_resolved_write_line	m_out_a_tx_func;
-    devcb_resolved_write_line	m_out_b_tx_func;
-	devcb_resolved_read8		m_in_port_func;
-    devcb_resolved_write8		m_out_port_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_a_tx_func;
+	devcb_resolved_write_line   m_out_b_tx_func;
+	devcb_resolved_read8        m_in_port_func;
+	devcb_resolved_write8       m_out_port_func;
 };
 
 extern const device_type DUARTN68681;
 extern const device_type DUART68681CHANNEL;
 
 #endif //_N68681_H
-

@@ -76,9 +76,9 @@ static int nbmj9195_blitter_r(address_space &space, int offset, int vram)
 
 	switch (offset)
 	{
-		case 0x00:	ret = 0xfe | ((state->m_nb19010_busyflag & 0x01) ^ 0x01); break;	// NB19010 Busy Flag
-		case 0x01:	ret = GFXROM[state->m_blitter_src_addr[vram]]; break;			// NB19010 GFX-ROM Read
-		default:	ret = 0xff; break;
+		case 0x00:  ret = 0xfe | ((state->m_nb19010_busyflag & 0x01) ^ 0x01); break;    // NB19010 Busy Flag
+		case 0x01:  ret = GFXROM[state->m_blitter_src_addr[vram]]; break;           // NB19010 GFX-ROM Read
+		default:    ret = 0xff; break;
 	}
 
 	return ret;
@@ -91,7 +91,7 @@ static void nbmj9195_blitter_w(address_space &space, int offset, int data, int v
 
 	switch (offset)
 	{
-		case 0x00:	state->m_blitter_direction_x[vram] = (data & 0x01) ? 1 : 0;
+		case 0x00:  state->m_blitter_direction_x[vram] = (data & 0x01) ? 1 : 0;
 					state->m_blitter_direction_y[vram] = (data & 0x02) ? 1 : 0;
 					state->m_clutmode[vram] = (data & 0x04) ? 1 : 0;
 				//  if (data & 0x08) popmessage("Unknown GFX Flag!! (0x08)");
@@ -101,8 +101,8 @@ static void nbmj9195_blitter_w(address_space &space, int offset, int data, int v
 					state->m_dispflag[vram] = (data & 0x80) ? 1 : 0;
 					nbmj9195_vramflip(space.machine(), vram);
 					break;
-		case 0x01:	state->m_scrollx[vram] = (state->m_scrollx[vram] & 0x0100) | data; break;
-		case 0x02:	state->m_scrollx[vram] = (state->m_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
+		case 0x01:  state->m_scrollx[vram] = (state->m_scrollx[vram] & 0x0100) | data; break;
+		case 0x02:  state->m_scrollx[vram] = (state->m_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
 					new_line = space.machine().primary_screen->vpos();
 					if (state->m_flipscreen[vram])
 					{
@@ -115,20 +115,20 @@ static void nbmj9195_blitter_w(address_space &space, int offset, int data, int v
 							state->m_scrollx_raster[vram][(state->m_scanline[vram] ^ 0x1ff)] = (((-state->m_scrollx[vram]) - 0x4e)  & 0x1ff) << 1;
 					}
 					break;
-		case 0x03:	state->m_scrolly[vram] = (state->m_scrolly[vram] & 0x0100) | data; break;
-		case 0x04:	state->m_scrolly[vram] = (state->m_scrolly[vram] & 0x00ff) | ((data << 8) & 0x0100); break;
-		case 0x05:	state->m_blitter_src_addr[vram] = (state->m_blitter_src_addr[vram] & 0xffff00) | data; break;
-		case 0x06:	state->m_blitter_src_addr[vram] = (state->m_blitter_src_addr[vram] & 0xff00ff) | (data << 8); break;
-		case 0x07:	state->m_blitter_src_addr[vram] = (state->m_blitter_src_addr[vram] & 0x00ffff) | (data << 16); break;
-		case 0x08:	state->m_blitter_sizex[vram] = data; break;
-		case 0x09:	state->m_blitter_sizey[vram] = data; break;
-		case 0x0a:	state->m_blitter_destx[vram] = (state->m_blitter_destx[vram]  & 0xff00) | data; break;
-		case 0x0b:	state->m_blitter_destx[vram] = (state->m_blitter_destx[vram]  & 0x00ff) | (data << 8); break;
-		case 0x0c:	state->m_blitter_desty[vram] = (state->m_blitter_desty[vram]  & 0xff00) | data; break;
-		case 0x0d:	state->m_blitter_desty[vram] = (state->m_blitter_desty[vram]  & 0x00ff) | (data << 8);
+		case 0x03:  state->m_scrolly[vram] = (state->m_scrolly[vram] & 0x0100) | data; break;
+		case 0x04:  state->m_scrolly[vram] = (state->m_scrolly[vram] & 0x00ff) | ((data << 8) & 0x0100); break;
+		case 0x05:  state->m_blitter_src_addr[vram] = (state->m_blitter_src_addr[vram] & 0xffff00) | data; break;
+		case 0x06:  state->m_blitter_src_addr[vram] = (state->m_blitter_src_addr[vram] & 0xff00ff) | (data << 8); break;
+		case 0x07:  state->m_blitter_src_addr[vram] = (state->m_blitter_src_addr[vram] & 0x00ffff) | (data << 16); break;
+		case 0x08:  state->m_blitter_sizex[vram] = data; break;
+		case 0x09:  state->m_blitter_sizey[vram] = data; break;
+		case 0x0a:  state->m_blitter_destx[vram] = (state->m_blitter_destx[vram]  & 0xff00) | data; break;
+		case 0x0b:  state->m_blitter_destx[vram] = (state->m_blitter_destx[vram]  & 0x00ff) | (data << 8); break;
+		case 0x0c:  state->m_blitter_desty[vram] = (state->m_blitter_desty[vram]  & 0xff00) | data; break;
+		case 0x0d:  state->m_blitter_desty[vram] = (state->m_blitter_desty[vram]  & 0x00ff) | (data << 8);
 					nbmj9195_gfxdraw(space.machine(), vram);
 					break;
-		default:	break;
+		default:    break;
 	}
 }
 

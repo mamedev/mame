@@ -38,7 +38,7 @@ PALETTE_INIT_MEMBER(mappy_state,superpac)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances[0], rweights, 0, 0,
 			3, &resistances[0], gweights, 0, 0,
 			2, &resistances[1], bweights, 0, 0);
@@ -98,7 +98,7 @@ PALETTE_INIT_MEMBER(mappy_state,mappy)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances[0], rweights, 0, 0,
 			3, &resistances[0], gweights, 0, 0,
 			2, &resistances[1], bweights, 0, 0);
@@ -170,7 +170,7 @@ PALETTE_INIT_MEMBER(mappy_state,phozon)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, &resistances[0], rweights, 0, 0,
 			4, &resistances[0], gweights, 0, 0,
 			4, &resistances[0], bweights, 0, 0);
@@ -258,10 +258,10 @@ TILEMAP_MAPPER_MEMBER(mappy_state::mappy_tilemap_scan)
 	if (col & 0x20)
 	{
 		/* in the following code, note the +2 followed by & 0x0f. This causes unintuitive
-           mapping from logical to hardware coordinates, which is true to the hardware.
-           Not doing it that way would cause missing tiles in motos and todruaga */
+		   mapping from logical to hardware coordinates, which is true to the hardware.
+		   Not doing it that way would cause missing tiles in motos and todruaga */
 		if (row & 0x20)
-			offs = 0x7ff;	// outside visible area
+			offs = 0x7ff;   // outside visible area
 		else
 			offs = ((row + 2) & 0x0f) + (row & 0x10) + ((col & 3) << 5) + 0x780;
 	}
@@ -415,7 +415,7 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 			int sprite = spriteram[offs];
 			int color = spriteram[offs+1];
 			int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 40 + xoffs;
-			int sy = 256 - spriteram_2[offs] + yoffs + 1;	// sprites are buffered and delayed by one scanline
+			int sy = 256 - spriteram_2[offs] + yoffs + 1;   // sprites are buffered and delayed by one scanline
 			int flipx = (spriteram_3[offs] & 0x01);
 			int flipy = (spriteram_3[offs] & 0x02) >> 1;
 			int sizex = (spriteram_3[offs] & 0x04) >> 2;
@@ -426,7 +426,7 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 			sprite &= ~(sizey << 1);
 
 			sy -= 16 * sizey;
-			sy = (sy & 0xff) - 32;	// fix wraparound
+			sy = (sy & 0xff) - 32;  // fix wraparound
 
 			if (state->flip_screen())
 			{
@@ -487,7 +487,7 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 		/* is it on? */
 		if ((spriteram_3[offs+1] & 2) == 0)
 		{
-			static const UINT8 size[4] = { 1, 0, 3, 0 };	/* 16, 8, 32 pixels; fourth combination unused? */
+			static const UINT8 size[4] = { 1, 0, 3, 0 };    /* 16, 8, 32 pixels; fourth combination unused? */
 			static const UINT8 gfx_offs[4][4] =
 			{
 				{ 0, 1, 4, 5 },
@@ -506,7 +506,7 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 			int x,y;
 
 			sy -= 8 * sizey;
-			sy = (sy & 0xff) - 32;	// fix wraparound
+			sy = (sy & 0xff) - 32;  // fix wraparound
 
 			if (state->flip_screen())
 			{

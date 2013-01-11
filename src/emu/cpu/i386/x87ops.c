@@ -25,45 +25,45 @@
  *
  *************************************/
 
-#define X87_SW_IE				0x0001
-#define X87_SW_DE				0x0002
-#define X87_SW_ZE				0x0004
-#define X87_SW_OE				0x0008
-#define X87_SW_UE				0x0010
-#define X87_SW_PE				0x0020
-#define X87_SW_SF				0x0040
-#define X87_SW_ES				0x0080
-#define X87_SW_C0				0x0100
-#define X87_SW_C1				0x0200
-#define X87_SW_C2				0x0400
-#define X87_SW_TOP_SHIFT		11
-#define X87_SW_TOP_MASK			7
-#define X87_SW_C3				0x4000
-#define X87_SW_BUSY				0x8000
+#define X87_SW_IE               0x0001
+#define X87_SW_DE               0x0002
+#define X87_SW_ZE               0x0004
+#define X87_SW_OE               0x0008
+#define X87_SW_UE               0x0010
+#define X87_SW_PE               0x0020
+#define X87_SW_SF               0x0040
+#define X87_SW_ES               0x0080
+#define X87_SW_C0               0x0100
+#define X87_SW_C1               0x0200
+#define X87_SW_C2               0x0400
+#define X87_SW_TOP_SHIFT        11
+#define X87_SW_TOP_MASK         7
+#define X87_SW_C3               0x4000
+#define X87_SW_BUSY             0x8000
 
-#define X87_CW_IM				0x0001
-#define X87_CW_DM				0x0002
-#define X87_CW_ZM				0x0004
-#define X87_CW_OM				0x0008
-#define X87_CW_UM				0x0010
-#define X87_CW_PM				0x0020
-#define X87_CW_PC_SHIFT			8
-#define X87_CW_PC_MASK			3
-#define X87_CW_PC_SINGLE		0
-#define X87_CW_PC_DOUBLE		2
-#define X87_CW_PC_EXTEND		3
-#define X87_CW_RC_SHIFT			10
-#define X87_CW_RC_MASK			3
-#define X87_CW_RC_NEAREST		0
-#define X87_CW_RC_DOWN			1
-#define X87_CW_RC_UP			2
-#define X87_CW_RC_ZERO			3
+#define X87_CW_IM               0x0001
+#define X87_CW_DM               0x0002
+#define X87_CW_ZM               0x0004
+#define X87_CW_OM               0x0008
+#define X87_CW_UM               0x0010
+#define X87_CW_PM               0x0020
+#define X87_CW_PC_SHIFT         8
+#define X87_CW_PC_MASK          3
+#define X87_CW_PC_SINGLE        0
+#define X87_CW_PC_DOUBLE        2
+#define X87_CW_PC_EXTEND        3
+#define X87_CW_RC_SHIFT         10
+#define X87_CW_RC_MASK          3
+#define X87_CW_RC_NEAREST       0
+#define X87_CW_RC_DOWN          1
+#define X87_CW_RC_UP            2
+#define X87_CW_RC_ZERO          3
 
-#define X87_TW_MASK				3
-#define X87_TW_VALID			0
-#define X87_TW_ZERO				1
-#define X87_TW_SPECIAL			2
-#define X87_TW_EMPTY			3
+#define X87_TW_MASK             3
+#define X87_TW_VALID            0
+#define X87_TW_ZERO             1
+#define X87_TW_SPECIAL          2
+#define X87_TW_EMPTY            3
 
 
 /*************************************
@@ -72,15 +72,15 @@
  *
  *************************************/
 
-#define ST_TO_PHYS(x)			(((cpustate->x87_sw >> X87_SW_TOP_SHIFT) + (x)) & X87_SW_TOP_MASK)
-#define ST(x)					(cpustate->x87_reg[ST_TO_PHYS(x)])
-#define X87_TW_FIELD_SHIFT(x)	((x) << 1)
-#define X87_TAG(x)				((cpustate->x87_tw >> X87_TW_FIELD_SHIFT(x)) & X87_TW_MASK)
-#define X87_RC					((cpustate->x87_cw >> X87_CW_RC_SHIFT) & X87_CW_RC_MASK)
-#define X87_IS_ST_EMPTY(x)		(X87_TAG(ST_TO_PHYS(x)) == X87_TW_EMPTY)
-#define X87_SW_C3_0				X87_SW_C0
+#define ST_TO_PHYS(x)           (((cpustate->x87_sw >> X87_SW_TOP_SHIFT) + (x)) & X87_SW_TOP_MASK)
+#define ST(x)                   (cpustate->x87_reg[ST_TO_PHYS(x)])
+#define X87_TW_FIELD_SHIFT(x)   ((x) << 1)
+#define X87_TAG(x)              ((cpustate->x87_tw >> X87_TW_FIELD_SHIFT(x)) & X87_TW_MASK)
+#define X87_RC                  ((cpustate->x87_cw >> X87_CW_RC_SHIFT) & X87_CW_RC_MASK)
+#define X87_IS_ST_EMPTY(x)      (X87_TAG(ST_TO_PHYS(x)) == X87_TW_EMPTY)
+#define X87_SW_C3_0             X87_SW_C0
 
-#define UNIMPLEMENTED			fatalerror("Unimplemented x87 op: %s (PC:%x)\n", __FUNCTION__, cpustate->pc)
+#define UNIMPLEMENTED           fatalerror("Unimplemented x87 op: %s (PC:%x)\n", __FUNCTION__, cpustate->pc)
 
 
 /*************************************
@@ -89,19 +89,19 @@
  *
  *************************************/
 
-static const floatx80 fx80_zero =	{ 0x0000, U64(0x0000000000000000) };
-static const floatx80 fx80_one =	{ 0x3fff, U64(0x8000000000000000) };
+static const floatx80 fx80_zero =   { 0x0000, U64(0x0000000000000000) };
+static const floatx80 fx80_one =    { 0x3fff, U64(0x8000000000000000) };
 
-static const floatx80 fx80_ninf	=	{ 0xffff, U64(0x8000000000000000) };
-static const floatx80 fx80_inan	=	{ 0xffff, U64(0xc000000000000000) };
+static const floatx80 fx80_ninf =   { 0xffff, U64(0x8000000000000000) };
+static const floatx80 fx80_inan =   { 0xffff, U64(0xc000000000000000) };
 
 /* Maps x87 round modes to SoftFloat round modes */
 static const int x87_to_sf_rc[4] =
 {
-    float_round_nearest_even,
-    float_round_down,
-    float_round_up,
-    float_round_to_zero,
+	float_round_nearest_even,
+	float_round_down,
+	float_round_up,
+	float_round_to_zero,
 };
 
 
@@ -2028,7 +2028,7 @@ void x87_fsqrt(i386_state *cpustate, UINT8 modrm)
 		floatx80 value = ST(0);
 
 		if ((!floatx80_is_zero(value) && (value.high & 0x8000)) ||
-			 floatx80_is_denormal(value))
+				floatx80_is_denormal(value))
 		{
 			cpustate->x87_sw |= X87_SW_IE;
 			result = fx80_inan;
@@ -4327,28 +4327,28 @@ void build_x87_opcode_table_d8(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fadd_m32real;	break;
-				case 0x01: ptr = x87_fmul_m32real;	break;
-				case 0x02: ptr = x87_fcom_m32real;	break;
-				case 0x03: ptr = x87_fcomp_m32real;	break;
-				case 0x04: ptr = x87_fsub_m32real;	break;
-				case 0x05: ptr = x87_fsubr_m32real;	break;
-				case 0x06: ptr = x87_fdiv_m32real;	break;
-				case 0x07: ptr = x87_fdivr_m32real;	break;
+				case 0x00: ptr = x87_fadd_m32real;  break;
+				case 0x01: ptr = x87_fmul_m32real;  break;
+				case 0x02: ptr = x87_fcom_m32real;  break;
+				case 0x03: ptr = x87_fcomp_m32real; break;
+				case 0x04: ptr = x87_fsub_m32real;  break;
+				case 0x05: ptr = x87_fsubr_m32real; break;
+				case 0x06: ptr = x87_fdiv_m32real;  break;
+				case 0x07: ptr = x87_fdivr_m32real; break;
 			}
 		}
 		else
 		{
 			switch (modrm)
 			{
-				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_fadd_st_sti;	break;
-				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fmul_st_sti;	break;
-				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = x87_fcom_sti;		break;
-				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = x87_fcomp_sti;	break;
-				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fsub_st_sti;	break;
-				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fsubr_st_sti;	break;
-				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = x87_fdiv_st_sti;	break;
-				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: ptr = x87_fdivr_st_sti;	break;
+				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_fadd_st_sti;  break;
+				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fmul_st_sti;  break;
+				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = x87_fcom_sti;     break;
+				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = x87_fcomp_sti;    break;
+				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fsub_st_sti;  break;
+				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fsubr_st_sti; break;
+				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = x87_fdiv_st_sti;  break;
+				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: ptr = x87_fdivr_st_sti; break;
 			}
 		}
 
@@ -4369,13 +4369,13 @@ void build_x87_opcode_table_d9(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fld_m32real;	break;
-				case 0x02: ptr = x87_fst_m32real;	break;
-				case 0x03: ptr = x87_fstp_m32real;	break;
-				case 0x04: ptr = x87_fldenv;		break;
-				case 0x05: ptr = x87_fldcw;			break;
-				case 0x06: ptr = x87_fstenv;		break;
-				case 0x07: ptr = x87_fstcw;			break;
+				case 0x00: ptr = x87_fld_m32real;   break;
+				case 0x02: ptr = x87_fst_m32real;   break;
+				case 0x03: ptr = x87_fstp_m32real;  break;
+				case 0x04: ptr = x87_fldenv;        break;
+				case 0x05: ptr = x87_fldcw;         break;
+				case 0x06: ptr = x87_fstenv;        break;
+				case 0x07: ptr = x87_fstcw;         break;
 			}
 		}
 		else
@@ -4389,7 +4389,7 @@ void build_x87_opcode_table_d9(i386_state *cpustate)
 				case 0xc4:
 				case 0xc5:
 				case 0xc6:
-				case 0xc7: ptr = x87_fld_sti;	break;
+				case 0xc7: ptr = x87_fld_sti;   break;
 
 				case 0xc8:
 				case 0xc9:
@@ -4398,36 +4398,36 @@ void build_x87_opcode_table_d9(i386_state *cpustate)
 				case 0xcc:
 				case 0xcd:
 				case 0xce:
-				case 0xcf: ptr = x87_fxch_sti;	break;
+				case 0xcf: ptr = x87_fxch_sti;  break;
 
-				case 0xd0: ptr = x87_fnop;		break;
-				case 0xe0: ptr = x87_fchs;		break;
-				case 0xe1: ptr = x87_fabs;		break;
-				case 0xe4: ptr = x87_ftst;		break;
-				case 0xe5: ptr = x87_fxam;		break;
-				case 0xe8: ptr = x87_fld1;		break;
-				case 0xe9: ptr = x87_fldl2t;	break;
-				case 0xea: ptr = x87_fldl2e;	break;
-				case 0xeb: ptr = x87_fldpi;		break;
-				case 0xec: ptr = x87_fldlg2;	break;
-				case 0xed: ptr = x87_fldln2;	break;
-				case 0xee: ptr = x87_fldz;		break;
-				case 0xf0: ptr = x87_f2xm1;		break;
-				case 0xf1: ptr = x87_fyl2x;		break;
-				case 0xf2: ptr = x87_fptan;		break;
-				case 0xf3: ptr = x87_fpatan;	break;
-				case 0xf4: ptr = x87_fxtract;	break;
-				case 0xf5: ptr = x87_fprem1;	break;
-				case 0xf6: ptr = x87_fdecstp;	break;
-				case 0xf7: ptr = x87_fincstp;	break;
-				case 0xf8: ptr = x87_fprem;		break;
-				case 0xf9: ptr = x87_fyl2xp1;	break;
-				case 0xfa: ptr = x87_fsqrt;		break;
-				case 0xfb: ptr = x87_fsincos;	break;
-				case 0xfc: ptr = x87_frndint;	break;
-				case 0xfd: ptr = x87_fscale;	break;
-				case 0xfe: ptr = x87_fsin;		break;
-				case 0xff: ptr = x87_fcos;		break;
+				case 0xd0: ptr = x87_fnop;      break;
+				case 0xe0: ptr = x87_fchs;      break;
+				case 0xe1: ptr = x87_fabs;      break;
+				case 0xe4: ptr = x87_ftst;      break;
+				case 0xe5: ptr = x87_fxam;      break;
+				case 0xe8: ptr = x87_fld1;      break;
+				case 0xe9: ptr = x87_fldl2t;    break;
+				case 0xea: ptr = x87_fldl2e;    break;
+				case 0xeb: ptr = x87_fldpi;     break;
+				case 0xec: ptr = x87_fldlg2;    break;
+				case 0xed: ptr = x87_fldln2;    break;
+				case 0xee: ptr = x87_fldz;      break;
+				case 0xf0: ptr = x87_f2xm1;     break;
+				case 0xf1: ptr = x87_fyl2x;     break;
+				case 0xf2: ptr = x87_fptan;     break;
+				case 0xf3: ptr = x87_fpatan;    break;
+				case 0xf4: ptr = x87_fxtract;   break;
+				case 0xf5: ptr = x87_fprem1;    break;
+				case 0xf6: ptr = x87_fdecstp;   break;
+				case 0xf7: ptr = x87_fincstp;   break;
+				case 0xf8: ptr = x87_fprem;     break;
+				case 0xf9: ptr = x87_fyl2xp1;   break;
+				case 0xfa: ptr = x87_fsqrt;     break;
+				case 0xfb: ptr = x87_fsincos;   break;
+				case 0xfc: ptr = x87_frndint;   break;
+				case 0xfd: ptr = x87_fscale;    break;
+				case 0xfe: ptr = x87_fsin;      break;
+				case 0xff: ptr = x87_fcos;      break;
 			}
 		}
 
@@ -4447,21 +4447,21 @@ void build_x87_opcode_table_da(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fiadd_m32int;	break;
-				case 0x01: ptr = x87_fimul_m32int;	break;
-				case 0x02: ptr = x87_ficom_m32int;	break;
-				case 0x03: ptr = x87_ficomp_m32int;	break;
-				case 0x04: ptr = x87_fisub_m32int;	break;
-				case 0x05: ptr = x87_fisubr_m32int;	break;
-				case 0x06: ptr = x87_fidiv_m32int;	break;
-				case 0x07: ptr = x87_fidivr_m32int;	break;
+				case 0x00: ptr = x87_fiadd_m32int;  break;
+				case 0x01: ptr = x87_fimul_m32int;  break;
+				case 0x02: ptr = x87_ficom_m32int;  break;
+				case 0x03: ptr = x87_ficomp_m32int; break;
+				case 0x04: ptr = x87_fisub_m32int;  break;
+				case 0x05: ptr = x87_fisubr_m32int; break;
+				case 0x06: ptr = x87_fidiv_m32int;  break;
+				case 0x07: ptr = x87_fidivr_m32int; break;
 			}
 		}
 		else
 		{
 			switch (modrm)
 			{
-				case 0xe9: ptr = x87_fucompp;		break;
+				case 0xe9: ptr = x87_fucompp;       break;
 			}
 		}
 
@@ -4482,22 +4482,22 @@ void build_x87_opcode_table_db(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fild_m32int;	break;
-				case 0x02: ptr = x87_fist_m32int;	break;
-				case 0x03: ptr = x87_fistp_m32int;	break;
-				case 0x05: ptr = x87_fld_m80real;	break;
-				case 0x07: ptr = x87_fstp_m80real;	break;
+				case 0x00: ptr = x87_fild_m32int;   break;
+				case 0x02: ptr = x87_fist_m32int;   break;
+				case 0x03: ptr = x87_fistp_m32int;  break;
+				case 0x05: ptr = x87_fld_m80real;   break;
+				case 0x07: ptr = x87_fstp_m80real;  break;
 			}
 		}
 		else
 		{
 			switch (modrm)
 			{
-				case 0xe0: ptr = x87_fnop;			break; /* FENI */
-				case 0xe1: ptr = x87_fnop;			break; /* FDISI */
-				case 0xe2: ptr = x87_fclex;			break;
-				case 0xe3: ptr = x87_finit;			break;
-				case 0xe4: ptr = x87_fnop;			break; /* FSETPM */
+				case 0xe0: ptr = x87_fnop;          break; /* FENI */
+				case 0xe1: ptr = x87_fnop;          break; /* FDISI */
+				case 0xe2: ptr = x87_fclex;         break;
+				case 0xe3: ptr = x87_finit;         break;
+				case 0xe4: ptr = x87_fnop;          break; /* FSETPM */
 			}
 		}
 
@@ -4518,26 +4518,26 @@ void build_x87_opcode_table_dc(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fadd_m64real;	break;
-				case 0x01: ptr = x87_fmul_m64real;	break;
-				case 0x02: ptr = x87_fcom_m64real;	break;
-				case 0x03: ptr = x87_fcomp_m64real;	break;
-				case 0x04: ptr = x87_fsub_m64real;	break;
-				case 0x05: ptr = x87_fsubr_m64real;	break;
-				case 0x06: ptr = x87_fdiv_m64real;	break;
-				case 0x07: ptr = x87_fdivr_m64real;	break;
+				case 0x00: ptr = x87_fadd_m64real;  break;
+				case 0x01: ptr = x87_fmul_m64real;  break;
+				case 0x02: ptr = x87_fcom_m64real;  break;
+				case 0x03: ptr = x87_fcomp_m64real; break;
+				case 0x04: ptr = x87_fsub_m64real;  break;
+				case 0x05: ptr = x87_fsubr_m64real; break;
+				case 0x06: ptr = x87_fdiv_m64real;  break;
+				case 0x07: ptr = x87_fdivr_m64real; break;
 			}
 		}
 		else
 		{
 			switch (modrm)
 			{
-				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_fadd_sti_st;	break;
-				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fmul_sti_st;	break;
-				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fsubr_sti_st;	break;
-				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fsub_sti_st;	break;
-				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = x87_fdivr_sti_st;	break;
-				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: ptr = x87_fdiv_sti_st;	break;
+				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_fadd_sti_st;  break;
+				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fmul_sti_st;  break;
+				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fsubr_sti_st; break;
+				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fsub_sti_st;  break;
+				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = x87_fdivr_sti_st; break;
+				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: ptr = x87_fdiv_sti_st;  break;
 			}
 		}
 
@@ -4558,24 +4558,24 @@ void build_x87_opcode_table_dd(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fld_m64real;	break;
-				case 0x02: ptr = x87_fst_m64real;	break;
-				case 0x03: ptr = x87_fstp_m64real;	break;
-				case 0x04: ptr = x87_frstor;		break;
-				case 0x06: ptr = x87_fsave;			break;
-				case 0x07: ptr = x87_fstsw_m2byte;	break;
+				case 0x00: ptr = x87_fld_m64real;   break;
+				case 0x02: ptr = x87_fst_m64real;   break;
+				case 0x03: ptr = x87_fstp_m64real;  break;
+				case 0x04: ptr = x87_frstor;        break;
+				case 0x06: ptr = x87_fsave;         break;
+				case 0x07: ptr = x87_fstsw_m2byte;  break;
 			}
 		}
 		else
 		{
 			switch (modrm)
 			{
-				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_ffree;		break;
-				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fxch_sti;		break;
-				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = x87_fst_sti;		break;
-				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = x87_fstp_sti;		break;
-				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fucom_sti;	break;
-				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fucomp_sti;	break;
+				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_ffree;        break;
+				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fxch_sti;     break;
+				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = x87_fst_sti;      break;
+				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = x87_fstp_sti;     break;
+				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fucom_sti;    break;
+				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fucomp_sti;   break;
 			}
 		}
 
@@ -4596,27 +4596,27 @@ void build_x87_opcode_table_de(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fiadd_m16int;	break;
-				case 0x01: ptr = x87_fimul_m16int;	break;
-				case 0x02: ptr = x87_ficom_m16int;	break;
-				case 0x03: ptr = x87_ficomp_m16int;	break;
-				case 0x04: ptr = x87_fisub_m16int;	break;
-				case 0x05: ptr = x87_fisubr_m16int;	break;
-				case 0x06: ptr = x87_fidiv_m16int;	break;
-				case 0x07: ptr = x87_fidivr_m16int;	break;
+				case 0x00: ptr = x87_fiadd_m16int;  break;
+				case 0x01: ptr = x87_fimul_m16int;  break;
+				case 0x02: ptr = x87_ficom_m16int;  break;
+				case 0x03: ptr = x87_ficomp_m16int; break;
+				case 0x04: ptr = x87_fisub_m16int;  break;
+				case 0x05: ptr = x87_fisubr_m16int; break;
+				case 0x06: ptr = x87_fidiv_m16int;  break;
+				case 0x07: ptr = x87_fidivr_m16int; break;
 			}
 		}
 		else
 		{
 			switch (modrm)
 			{
-				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_faddp;	break;
-				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fmulp;	break;
+				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = x87_faddp;    break;
+				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = x87_fmulp;    break;
 				case 0xd9: ptr = x87_fcompp; break;
-				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fsubrp;	break;
-				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fsubp;	break;
-				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = x87_fdivrp;	break;
-				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: ptr = x87_fdivp;	break;
+				case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: ptr = x87_fsubrp;   break;
+				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = x87_fsubp;    break;
+				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = x87_fdivrp;   break;
+				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: ptr = x87_fdivp;    break;
 			}
 		}
 
@@ -4637,20 +4637,20 @@ void build_x87_opcode_table_df(i386_state *cpustate)
 		{
 			switch ((modrm >> 3) & 0x7)
 			{
-				case 0x00: ptr = x87_fild_m16int;	break;
-				case 0x02: ptr = x87_fist_m16int;	break;
-				case 0x03: ptr = x87_fistp_m16int;	break;
-				case 0x04: ptr = x87_fbld;			break;
-				case 0x05: ptr = x87_fild_m64int;	break;
-				case 0x06: ptr = x87_fbstp;			break;
-				case 0x07: ptr = x87_fistp_m64int;	break;
+				case 0x00: ptr = x87_fild_m16int;   break;
+				case 0x02: ptr = x87_fist_m16int;   break;
+				case 0x03: ptr = x87_fistp_m16int;  break;
+				case 0x04: ptr = x87_fbld;          break;
+				case 0x05: ptr = x87_fild_m64int;   break;
+				case 0x06: ptr = x87_fbstp;         break;
+				case 0x07: ptr = x87_fistp_m64int;  break;
 			}
 		}
 		else
 		{
 			switch (modrm)
 			{
-				case 0xe0: ptr = x87_fstsw_ax;		break;
+				case 0xe0: ptr = x87_fstsw_ax;      break;
 			}
 		}
 
@@ -4669,4 +4669,3 @@ void build_x87_opcode_table(i386_state *cpustate)
 	build_x87_opcode_table_de(cpustate);
 	build_x87_opcode_table_df(cpustate);
 }
-

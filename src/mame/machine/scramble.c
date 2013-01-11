@@ -35,13 +35,13 @@ MACHINE_RESET_MEMBER(scramble_state,explorer)
 CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
 {
 	static const UINT8 remap[] = {0x03, 0x02, 0x00, 0x01, 0x21, 0x20, 0x22, 0x23,
-							  0x33, 0x32, 0x30, 0x31, 0x11, 0x10, 0x12, 0x13,
-							  0x17, 0x16, 0x14, 0x15, 0x35, 0x34, 0x36, 0x37,
-							  0x3f, 0x3e, 0x3c, 0x3d, 0x1d, 0x1c, 0x1e, 0x1f,
-							  0x1b, 0x1a, 0x18, 0x19, 0x39, 0x38, 0x3a, 0x3b,
-							  0x2b, 0x2a, 0x28, 0x29, 0x09, 0x08, 0x0a, 0x0b,
-							  0x0f, 0x0e, 0x0c, 0x0d, 0x2d, 0x2c, 0x2e, 0x2f,
-							  0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
+								0x33, 0x32, 0x30, 0x31, 0x11, 0x10, 0x12, 0x13,
+								0x17, 0x16, 0x14, 0x15, 0x35, 0x34, 0x36, 0x37,
+								0x3f, 0x3e, 0x3c, 0x3d, 0x1d, 0x1c, 0x1e, 0x1f,
+								0x1b, 0x1a, 0x18, 0x19, 0x39, 0x38, 0x3a, 0x3b,
+								0x2b, 0x2a, 0x28, 0x29, 0x09, 0x08, 0x0a, 0x0b,
+								0x0f, 0x0e, 0x0c, 0x0d, 0x2d, 0x2c, 0x2e, 0x2f,
+								0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
 	UINT8 val = ioport((const char *)param)->read();
 
 	return remap[val >> 2];
@@ -105,8 +105,8 @@ static void cavelon_banksw(running_machine &machine)
 {
 	scramble_state *state = machine.driver_data<scramble_state>();
 	/* any read/write access in the 0x8000-0xffff region causes a bank switch.
-       Only the lower 0x2000 is switched but we switch the whole region
-       to keep the CPU core happy at the boundaries */
+	   Only the lower 0x2000 is switched but we switch the whole region
+	   to keep the CPU core happy at the boundaries */
 
 	state->m_cavelon_bank = !state->m_cavelon_bank;
 	state->membank("bank1")->set_entry(state->m_cavelon_bank);
@@ -266,7 +266,7 @@ DRIVER_INIT_MEMBER(scramble_state,mars)
 DRIVER_INIT_MEMBER(scramble_state,hotshock)
 {
 	/* protection??? The game jumps into never-neverland here. I think
-       it just expects a RET there */
+	   it just expects a RET there */
 	machine().root_device().memregion("maincpu")->base()[0x2ef9] = 0xc9;
 }
 
@@ -282,7 +282,7 @@ DRIVER_INIT_MEMBER(scramble_state,cavelon)
 	/* A15 switches memory banks */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(cavelon_banksw_r), FUNC(cavelon_banksw_w));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x2000, 0x2000);	/* ??? */
+	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x2000, 0x2000);  /* ??? */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x3800, 0x3801);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(machine(), m_cavelon_bank);
@@ -358,9 +358,9 @@ DRIVER_INIT_MEMBER(scramble_state,anteater)
 	DRIVER_INIT_CALL(scobra);
 
 	/*
-    *   Code To Decode Lost Tomb by Mirko Buffoni
-    *   Optimizations done by Fabio Buffoni
-    */
+	*   Code To Decode Lost Tomb by Mirko Buffoni
+	*   Optimizations done by Fabio Buffoni
+	*/
 
 	RAM = machine().root_device().memregion("gfx1")->base();
 	len = machine().root_device().memregion("gfx1")->bytes();
@@ -396,9 +396,9 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 	DRIVER_INIT_CALL(scobra);
 
 	/*
-    *   Code To Decode Lost Tomb by Mirko Buffoni
-    *   Optimizations done by Fabio Buffoni
-    */
+	*   Code To Decode Lost Tomb by Mirko Buffoni
+	*   Optimizations done by Fabio Buffoni
+	*/
 
 	RAM = machine().root_device().memregion("gfx1")->base();
 	len = machine().root_device().memregion("gfx1")->bytes();
@@ -433,8 +433,8 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 	DRIVER_INIT_CALL(scobra);
 
 	/*
-    *   Code To Decode Minefield by Mike Balfour and Nicola Salmoria
-    */
+	*   Code To Decode Minefield by Mike Balfour and Nicola Salmoria
+	*/
 
 	RAM = machine().root_device().memregion("gfx1")->base();
 	len = machine().root_device().memregion("gfx1")->bytes();
@@ -451,7 +451,7 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 		j  = i & 0xd5f;
 		j |= ( bit(i,3) ^ bit(i,7) ) << 5;
 		j |= ( bit(i,2) ^ bit(i,9) ^ ( bit(i,0) & bit(i,5) ) ^
-			 ( bit(i,3) & bit(i,7) & ( bit(i,0) ^ bit(i,5) ))) << 7;
+				( bit(i,3) & bit(i,7) & ( bit(i,0) ^ bit(i,5) ))) << 7;
 		j |= ( bit(i,0) ^ bit(i,5) ^ ( bit(i,3) & bit(i,7) ) ) << 9;
 
 		RAM[i] = scratch[j];
@@ -471,9 +471,9 @@ DRIVER_INIT_MEMBER(scramble_state,losttomb)
 	DRIVER_INIT_CALL(scramble);
 
 	/*
-    *   Code To Decode Lost Tomb by Mirko Buffoni
-    *   Optimizations done by Fabio Buffoni
-    */
+	*   Code To Decode Lost Tomb by Mirko Buffoni
+	*   Optimizations done by Fabio Buffoni
+	*/
 
 	RAM = machine().root_device().memregion("gfx1")->base();
 	len = machine().root_device().memregion("gfx1")->bytes();
@@ -647,16 +647,16 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
 		int bank;
 		switch (m_harem_decrypt_mode)
 		{
-			case 0x03:	bank = 0;	break;
-			case 0x09:	bank = 1;	break;
-			case 0x0a:	bank = 2;	break;
+			case 0x03:  bank = 0;   break;
+			case 0x09:  bank = 1;   break;
+			case 0x0a:  bank = 2;   break;
 			default:
 				logerror("%s: warning, unknown decrypt mode = %02x\n", machine().describe_context(), m_harem_decrypt_mode);
 				bank = 0;
 		}
 
-		membank("rombank")->set_base			(m_harem_decrypted_data		+ 0x2000 * bank);
-		membank("rombank")->set_base_decrypted	(m_harem_decrypted_opcodes	+ 0x2000 * bank);
+		membank("rombank")->set_base            (m_harem_decrypted_data     + 0x2000 * bank);
+		membank("rombank")->set_base_decrypted  (m_harem_decrypted_opcodes  + 0x2000 * bank);
 
 //      logerror("%s: decrypt mode = %02x (bank %x) active\n", machine().describe_context(), m_harem_decrypt_mode, bank);
 
@@ -675,36 +675,36 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
 
 DRIVER_INIT_MEMBER(scramble_state,harem)
 {
-	UINT8 *ROM		=	machine().root_device().memregion("maincpu")->base() + 0x8000;
-	size_t size		=	0x2000;
+	UINT8 *ROM      =   machine().root_device().memregion("maincpu")->base() + 0x8000;
+	size_t size     =   0x2000;
 
-	UINT8 *data		=	m_harem_decrypted_data		= auto_alloc_array(machine(), UINT8, size * 3);
-	UINT8 *opcodes	=	m_harem_decrypted_opcodes	= auto_alloc_array(machine(), UINT8, size * 3);
+	UINT8 *data     =   m_harem_decrypted_data      = auto_alloc_array(machine(), UINT8, size * 3);
+	UINT8 *opcodes  =   m_harem_decrypted_opcodes   = auto_alloc_array(machine(), UINT8, size * 3);
 
 	// decryption 03
 	for (int i = 0; i < size; i++)
 	{
 		UINT8 x = ROM[i];
-		opcodes[size * 0 + i]	=	BITSWAP8(x, 7,0,5,2,3,4,1,6);
-		data   [size * 0 + i]	=	BITSWAP8(x, 7,6,5,0,3,4,1,2);
+		opcodes[size * 0 + i]   =   BITSWAP8(x, 7,0,5,2,3,4,1,6);
+		data   [size * 0 + i]   =   BITSWAP8(x, 7,6,5,0,3,4,1,2);
 	}
 
 	// decryption 09
 	for (int i = 0; i < size; i++)
 	{
 		UINT8 x = ROM[i];
-		opcodes[size * 1 + i]	=	BITSWAP8(x, 7,0,5,6,3,2,1,4);
-		data   [size * 1 + i]	=	BITSWAP8(x, 7,4,5,0,3,6,1,2);
+		opcodes[size * 1 + i]   =   BITSWAP8(x, 7,0,5,6,3,2,1,4);
+		data   [size * 1 + i]   =   BITSWAP8(x, 7,4,5,0,3,6,1,2);
 	}
 
 	// decryption 0a
 	for (int i = 0; i < size; i++)
 	{
 		UINT8 x = ROM[i];
-		opcodes[size * 2 + i]	=	BITSWAP8(x, 7,2,5,6,3,0,1,4);
-		data   [size * 2 + i]	=	BITSWAP8(x, 7,2,5,4,3,0,1,6);
+		opcodes[size * 2 + i]   =   BITSWAP8(x, 7,2,5,6,3,0,1,4);
+		data   [size * 2 + i]   =   BITSWAP8(x, 7,2,5,4,3,0,1,6);
 	}
 
-	membank("rombank")->set_base			(m_harem_decrypted_data);
-	membank("rombank")->set_base_decrypted	(m_harem_decrypted_opcodes);
+	membank("rombank")->set_base            (m_harem_decrypted_data);
+	membank("rombank")->set_base_decrypted  (m_harem_decrypted_opcodes);
 }

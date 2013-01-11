@@ -3,59 +3,59 @@
 <softwarelist name="pcw" description="Amstrad PCW disk images">
 
 <!--
- Known undumped games (partial list, compiled from http://ciberia.ya.com/jevicac/ )
+	Known undumped games (partial list, compiled from http://ciberia.ya.com/jevicac/ )
 
- * 500 c.c. Championship
- * Acheton
- * After Shock Absorver
- * Annals Of Rome
- * La Aventura Espacial
- * Avon
- * Bobby Bearing
- * Bridge Player
- * Castle Blackstar
- * Chichen Itza
- * Classic Games 4
- * Clock Chess ´89
- * Corruption
- * Countdown to Doom
- * Crusoe
- * Cubik-road
- * Cutthroats
- * Cyberbig
- * La Diosa Cozumel
- * Distractions
- * Elektra Glide
- * Fish!
- * The Fourth Protocol
- * Giant Killer
- * Graham Gooch's Test Cricket
- * Hezarin
- * Kingdom of Hamil
- * The Last Days Of Doom
- * Lords of Time
- * Mindfighter
- * Monsters of Murdac
- * Mr. Gas
- * Pack Alligata
- * Pack Erbe PCW
- * Philosopher's Quest
- * The Price Of Magik
- * Red Moon
- * Return to Doom
- * Robot Scape
- * The Secret Diary of Adrian Mole
- * Silicom Dreams
- * Sirwood
- * Space Combat
- * Spitfire 40
- * SpySnatcher
- * Star Byte
- * Terracom
- * The Very Big Cave Adventure
- * Twin Disk Simulation!!
- * The Very Big Cave Adventure
- * Wonderland
+	* 500 c.c. Championship
+	* Acheton
+	* After Shock Absorver
+	* Annals Of Rome
+	* La Aventura Espacial
+	* Avon
+	* Bobby Bearing
+	* Bridge Player
+	* Castle Blackstar
+	* Chichen Itza
+	* Classic Games 4
+	* Clock Chess ´89
+	* Corruption
+	* Countdown to Doom
+	* Crusoe
+	* Cubik-road
+	* Cutthroats
+	* Cyberbig
+	* La Diosa Cozumel
+	* Distractions
+	* Elektra Glide
+	* Fish!
+	* The Fourth Protocol
+	* Giant Killer
+	* Graham Gooch's Test Cricket
+	* Hezarin
+	* Kingdom of Hamil
+	* The Last Days Of Doom
+	* Lords of Time
+	* Mindfighter
+	* Monsters of Murdac
+	* Mr. Gas
+	* Pack Alligata
+	* Pack Erbe PCW
+	* Philosopher's Quest
+	* The Price Of Magik
+	* Red Moon
+	* Return to Doom
+	* Robot Scape
+	* The Secret Diary of Adrian Mole
+	* Silicom Dreams
+	* Sirwood
+	* Space Combat
+	* Spitfire 40
+	* SpySnatcher
+	* Star Byte
+	* Terracom
+	* The Very Big Cave Adventure
+	* Twin Disk Simulation!!
+	* The Very Big Cave Adventure
+	* Wonderland
 
 -->
 
@@ -734,7 +734,7 @@
 		</part>
 	</software>
 
-    <!-- Launch DISK.COM -->
+	<!-- Launch DISK.COM -->
 	<software name="chec">
 		<description>The Complete Home Entertainment Centre (UK)</description>
 		<year>1990</year>
@@ -913,7 +913,7 @@
 		</part>
 	</software>
 
-    <!-- needs passwords -->
+	<!-- needs passwords -->
 	<software name="goldbask">
 		<description>Golden Basket (Spa)</description>
 		<year>1990</year>
@@ -1077,7 +1077,7 @@
 		</part>
 	</software>
 
-    <!-- needs passwords -->
+	<!-- needs passwords -->
 	<software name="jaialai">
 		<description>Jai Alai (Spa)</description>
 		<year>1991</year>
@@ -1423,7 +1423,7 @@
 		</part>
 	</software>
 
-    <!-- needs passwords -->
+	<!-- needs passwords -->
 	<software name="polidiaz">
 		<description>Poli Díaz Boxeo (Spa)</description>
 		<year>1991</year>
@@ -1458,7 +1458,7 @@
 		</part>
 	</software>
 
-    <!-- needs passwords -->
+	<!-- needs passwords -->
 	<software name="rescateg">
 		<description>Rescate en el Golfo (Spa)</description>
 		<year>1990</year>
@@ -1645,7 +1645,7 @@
 		</part>
 	</software>
 
-    <!-- needs passwords -->
+	<!-- needs passwords -->
 	<software name="starglid">
 		<description>Starglider (UK)</description>
 		<year>1986</year>

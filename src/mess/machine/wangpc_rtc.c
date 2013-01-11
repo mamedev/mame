@@ -15,13 +15,13 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define OPTION_ID		0x1c
+#define OPTION_ID       0x1c
 
-#define Z80_TAG			"z80"
-#define AM9517A_TAG		"am9517"
-#define Z80CTC_0_TAG	"z80ctc_0"
-#define Z80CTC_1_TAG	"z80ctc_1"
-#define Z80SIO_TAG		"z80sio"
+#define Z80_TAG         "z80"
+#define AM9517A_TAG     "am9517"
+#define Z80CTC_0_TAG    "z80ctc_0"
+#define Z80CTC_1_TAG    "z80ctc_1"
+#define Z80SIO_TAG      "z80sio"
 
 
 
@@ -111,17 +111,17 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	{ DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL, },
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL, },
 	{ DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL, },
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL, },
 	{ DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL }
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL }
 };
 
 

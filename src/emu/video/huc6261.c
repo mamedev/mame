@@ -15,10 +15,10 @@
 #include "profiler.h"
 #include "huc6261.h"
 
-#define LOG	0
+#define LOG 0
 
-#define HUC6261_HSYNC_LENGTH	237
-#define HUC6261_HSYNC_START		( HUC6261_WPF - HUC6261_HSYNC_LENGTH )
+#define HUC6261_HSYNC_LENGTH    237
+#define HUC6261_HSYNC_START     ( HUC6261_WPF - HUC6261_HSYNC_LENGTH )
 
 
 const device_type HUC6261 = &device_creator<huc6261_device>;
@@ -106,7 +106,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		switch( h )
 		{
-		case HUC6261_HSYNC_START:		/* Start of HSync */
+		case HUC6261_HSYNC_START:       /* Start of HSync */
 			m_huc6270_a->hsync_changed( 0 );
 			m_huc6270_b->hsync_changed( 0 );
 //          if ( v == 0 )
@@ -128,7 +128,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //          }
 			break;
 
-		case 0:		/* End of HSync */
+		case 0:     /* End of HSync */
 			m_huc6270_a->hsync_changed( 1 );
 			m_huc6270_b->hsync_changed( 1 );
 			m_pixel_clock = 0;
@@ -136,7 +136,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			bitmap_line = &m_bmp->pix32(v);
 			break;
 
-		case HUC6261_HSYNC_START + 30:		/* End/Start of VSync */
+		case HUC6261_HSYNC_START + 30:      /* End/Start of VSync */
 			if ( v>= m_height - 4 )
 			{
 				int vsync = ( v >= m_height - 4 && v < m_height - 1 ) ? 0 : 1;
@@ -444,4 +444,3 @@ void huc6261_device::device_reset()
 	m_last_h = m_screen->hpos();
 	m_timer->adjust( m_screen->time_until_pos( ( m_screen->vpos() + 1 ) % 263, 0 ) );
 }
-

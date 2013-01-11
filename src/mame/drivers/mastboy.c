@@ -445,12 +445,12 @@ class mastboy_state : public driver_device
 public:
 	mastboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") ,
+			m_nvram(*this, "nvram") ,
 		m_workram(*this, "workram"),
 		m_tileram(*this, "tileram"),
 		m_colram(*this, "colram"){ }
 
-	required_shared_ptr<UINT8>	m_nvram;
+	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_workram;
 	required_shared_ptr<UINT8> m_tileram;
 	required_shared_ptr<UINT8> m_colram;
@@ -628,7 +628,7 @@ WRITE8_MEMBER(mastboy_state::mastboy_backupram_w)
 WRITE8_MEMBER(mastboy_state::backupram_enable_w)
 {
 	/* This is some kind of enable / disable control for backup ram (see Charles's notes) but I'm not
-       sure how it works in practice, if we use it then it writes a lot of data with it disabled */
+	   sure how it works in practice, if we use it then it writes a lot of data with it disabled */
 	m_backupram_enabled = data&1;
 }
 
@@ -681,8 +681,8 @@ static void mastboy_adpcm_int(device_t *device)
 
 static const msm5205_interface msm5205_config =
 {
-	mastboy_adpcm_int,	/* interrupt function */
-	MSM5205_SEX_4B		/* 4KHz 4-bit */
+	mastboy_adpcm_int,  /* interrupt function */
+	MSM5205_SEX_4B      /* 4KHz 4-bit */
 };
 
 /* Interrupt Handling */
@@ -885,7 +885,7 @@ void mastboy_state::machine_reset()
 
 
 static MACHINE_CONFIG_START( mastboy, mastboy_state )
-	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
+	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  mastboy_interrupt)

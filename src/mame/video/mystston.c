@@ -24,15 +24,15 @@
  *
  *************************************/
 
-#define PIXEL_CLOCK		(MYSTSTON_MASTER_CLOCK / 2)
-#define HTOTAL			(0x180)
-#define HBEND			(0x000)
-#define HBSTART			(0x100)
-#define VTOTAL			(0x110)	 /* counts from 0x08-0xff, then from 0xe8-0xff */
-#define VBEND			(0x008)
-#define VBSTART			(0x0f8)
-#define FIRST_INT_VPOS	(0x008)
-#define INT_HPOS		(0x100)
+#define PIXEL_CLOCK     (MYSTSTON_MASTER_CLOCK / 2)
+#define HTOTAL          (0x180)
+#define HBEND           (0x000)
+#define HBSTART         (0x100)
+#define VTOTAL          (0x110)  /* counts from 0x08-0xff, then from 0xe8-0xff */
+#define VBEND           (0x008)
+#define VBSTART         (0x0f8)
+#define FIRST_INT_VPOS  (0x008)
+#define INT_HPOS        (0x100)
 
 
 
@@ -76,7 +76,7 @@ static void set_palette(running_machine &machine, mystston_state *state)
 
 	UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 4700,
 			2, resistances_b,  weights_b,  0, 4700,
 			0, 0, 0, 0, 0);
@@ -293,9 +293,9 @@ static const gfx_layout spritelayout =
 	3,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-	  16*0+0, 16*0+1, 16*0+2, 16*0+3, 16*0+4, 16*0+5, 16*0+6, 16*0+7 },
+		16*0+0, 16*0+1, 16*0+2, 16*0+3, 16*0+4, 16*0+5, 16*0+6, 16*0+7 },
 	{ 0*8, 1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	32*8
 };
 

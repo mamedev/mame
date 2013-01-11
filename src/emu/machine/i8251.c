@@ -16,7 +16,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -59,8 +59,8 @@ const device_type I8251 = &device_creator<i8251_device>;
 //-------------------------------------------------
 
 i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, I8251, "I8251", tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+	: device_t(mconfig, I8251, "I8251", tag, owner, clock),
+		device_serial_interface(mconfig, *this)
 {
 }
 
@@ -241,10 +241,10 @@ void i8251_device::update_tx_ready()
 	int tx_ready;
 
 	/* tx ready output is set if:
-        DB Buffer Empty &
-        CTS is set &
-        Transmit enable is 1
-    */
+	    DB Buffer Empty &
+	    CTS is set &
+	    Transmit enable is 1
+	*/
 
 	tx_ready = 0;
 
@@ -362,28 +362,28 @@ WRITE8_MEMBER(i8251_device::control_w)
 			{
 				/*  Asynchronous
 
-                    bit 7,6: stop bit length
-                        0 = inhibit
-                        1 = 1 bit
-                        2 = 1.5 bits
-                        3 = 2 bits
-                    bit 5: parity type
-                        0 = parity odd
-                        1 = parity even
-                    bit 4: parity test enable
-                        0 = disable
-                        1 = enable
-                    bit 3,2: character length
-                        0 = 5 bits
-                        1 = 6 bits
-                        2 = 7 bits
-                        3 = 8 bits
-                    bit 1,0: baud rate factor
-                        0 = defines command byte for synchronous or asynchronous
-                        1 = x1
-                        2 = x16
-                        3 = x64
-                */
+				    bit 7,6: stop bit length
+				        0 = inhibit
+				        1 = 1 bit
+				        2 = 1.5 bits
+				        3 = 2 bits
+				    bit 5: parity type
+				        0 = parity odd
+				        1 = parity even
+				    bit 4: parity test enable
+				        0 = disable
+				        1 = enable
+				    bit 3,2: character length
+				        0 = 5 bits
+				        1 = 6 bits
+				        2 = 7 bits
+				        3 = 8 bits
+				    bit 1,0: baud rate factor
+				        0 = defines command byte for synchronous or asynchronous
+				        1 = x1
+				        2 = x16
+				        3 = x64
+				*/
 
 				LOG(("I8251: Asynchronous operation\n"));
 
@@ -483,24 +483,24 @@ WRITE8_MEMBER(i8251_device::control_w)
 			else
 			{
 				/*  bit 7: Number of sync characters
-                        0 = 1 character
-                        1 = 2 character
-                    bit 6: Synchronous mode
-                        0 = Internal synchronisation
-                        1 = External synchronisation
-                    bit 5: parity type
-                        0 = parity odd
-                        1 = parity even
-                    bit 4: parity test enable
-                        0 = disable
-                        1 = enable
-                    bit 3,2: character length
-                        0 = 5 bits
-                        1 = 6 bits
-                        2 = 7 bits
-                        3 = 8 bits
-                    bit 1,0 = 0
-                */
+				        0 = 1 character
+				        1 = 2 character
+				    bit 6: Synchronous mode
+				        0 = Internal synchronisation
+				        1 = External synchronisation
+				    bit 5: parity type
+				        0 = parity odd
+				        1 = parity even
+				    bit 4: parity test enable
+				        0 = disable
+				        1 = enable
+				    bit 3,2: character length
+				        0 = 5 bits
+				        1 = 6 bits
+				        2 = 7 bits
+				        3 = 8 bits
+				    bit 1,0 = 0
+				*/
 				LOG(("I8251: Synchronous operation\n"));
 
 				/* setup for sync byte(s) */
@@ -570,30 +570,30 @@ WRITE8_MEMBER(i8251_device::control_w)
 
 
 		/*  bit 7:
-                0 = normal operation
-                1 = hunt mode
-            bit 6:
-                0 = normal operation
-                1 = internal reset
-            bit 5:
-                0 = /RTS set to 1
-                1 = /RTS set to 0
-            bit 4:
-                0 = normal operation
-                1 = reset error flag
-            bit 3:
-                0 = normal operation
-                1 = send break character
-            bit 2:
-                0 = receive disable
-                1 = receive enable
-            bit 1:
-                0 = /DTR set to 1
-                1 = /DTR set to 0
-            bit 0:
-                0 = transmit disable
-                1 = transmit enable
-        */
+		        0 = normal operation
+		        1 = hunt mode
+		    bit 6:
+		        0 = normal operation
+		        1 = internal reset
+		    bit 5:
+		        0 = /RTS set to 1
+		        1 = /RTS set to 0
+		    bit 4:
+		        0 = normal operation
+		        1 = reset error flag
+		    bit 3:
+		        0 = normal operation
+		        1 = send break character
+		    bit 2:
+		        0 = receive disable
+		        1 = receive enable
+		    bit 1:
+		        0 = /DTR set to 1
+		        1 = /DTR set to 0
+		    bit 0:
+		        0 = transmit disable
+		        1 = transmit enable
+		*/
 
 		m_connection_state &=~SERIAL_STATE_RTS;
 		if (data & (1<<5))
@@ -625,9 +625,9 @@ WRITE8_MEMBER(i8251_device::control_w)
 
 		if (data & (1<<6))
 		{
-            // datasheet says "returns to mode format", not
-            // completely resets the chip.  behavior of DEC Rainbow
-            // backs this up.
+			// datasheet says "returns to mode format", not
+			// completely resets the chip.  behavior of DEC Rainbow
+			// backs this up.
 			m_flags |= I8251_EXPECTING_MODE;
 		}
 

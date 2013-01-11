@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #ifndef __USE_BSD
-#define __USE_BSD	// to get DT_xxx on Linux
+#define __USE_BSD   // to get DT_xxx on Linux
 #endif
 #undef _POSIX_C_SOURCE  // to get DT_xxx on OS X
 #include <dirent.h>
@@ -213,4 +213,3 @@ void osd_closedir(osd_directory *dir)
 	osd_free(dir->path);
 	osd_free(dir);
 }
-

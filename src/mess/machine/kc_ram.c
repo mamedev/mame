@@ -41,13 +41,13 @@ const device_type KC_M036 = &device_creator<kc_m036_device>;
 //-------------------------------------------------
 
 kc_m011_device::kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, KC_M011, "M011 64KB RAM", tag, owner, clock),
+		: device_t(mconfig, KC_M011, "M011 64KB RAM", tag, owner, clock),
 		device_kcexp_interface( mconfig, *this )
 {
 }
 
 kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, type, name, tag, owner, clock),
+		: device_t(mconfig, type, name, tag, owner, clock),
 		device_kcexp_interface( mconfig, *this )
 {
 }
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER( kc_m011_device::mei_w )
 //-------------------------------------------------
 
 kc_m022_device::kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_m011_device(mconfig, KC_M022, "M022 16KB RAM", tag, owner, clock)
+		: kc_m011_device(mconfig, KC_M022, "M022 16KB RAM", tag, owner, clock)
 {
 }
 
@@ -191,7 +191,7 @@ void kc_m022_device::write(offs_t offset, UINT8 data)
 //-------------------------------------------------
 
 kc_m032_device::kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_m011_device(mconfig, KC_M032, "M032 256KB segmented RAM", tag, owner, clock)
+		: kc_m011_device(mconfig, KC_M032, "M032 256KB segmented RAM", tag, owner, clock)
 {
 }
 
@@ -260,7 +260,7 @@ void kc_m032_device::write(offs_t offset, UINT8 data)
 //-------------------------------------------------
 
 kc_m034_device::kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_m011_device(mconfig, KC_M034, "M034 512KB segmented RAM", tag, owner, clock)
+		: kc_m011_device(mconfig, KC_M034, "M034 512KB segmented RAM", tag, owner, clock)
 {
 }
 
@@ -329,7 +329,7 @@ void kc_m034_device::write(offs_t offset, UINT8 data)
 //-------------------------------------------------
 
 kc_m035_device::kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_m011_device(mconfig, KC_M035, "M035 1MB segmented RAM", tag, owner, clock)
+		: kc_m011_device(mconfig, KC_M035, "M035 1MB segmented RAM", tag, owner, clock)
 {
 }
 
@@ -387,7 +387,7 @@ void kc_m035_device::write(offs_t offset, UINT8 data)
 //-------------------------------------------------
 
 kc_m036_device::kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_m011_device(mconfig, KC_M036, "M036 128KB segmented RAM", tag, owner, clock)
+		: kc_m011_device(mconfig, KC_M036, "M036 128KB segmented RAM", tag, owner, clock)
 {
 }
 

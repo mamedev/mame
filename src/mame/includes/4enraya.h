@@ -12,7 +12,7 @@ public:
 		m_snd_latch_bit(4) { }
 
 	/* memory pointers */
-	UINT8	   m_videoram[0x1000];
+	UINT8      m_videoram[0x1000];
 	UINT8      m_workram[0x1000];
 
 	/* video-related */
@@ -22,7 +22,7 @@ public:
 	int        m_soundlatch;
 	int        m_last_snd_ctrl;
 
-	int 				m_snd_latch_bit;
+	int                 m_snd_latch_bit;
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_READ8_MEMBER(fenraya_custom_map_r);
 	DECLARE_WRITE8_MEMBER(fenraya_custom_map_w);

@@ -46,25 +46,25 @@ enum
 
 enum
 {
-	reg_A_UIP	= 0x80,
-	reg_A_DV	= 0x70,
-	reg_A_RS	= 0x0F,
+	reg_A_UIP   = 0x80,
+	reg_A_DV    = 0x70,
+	reg_A_RS    = 0x0F,
 
-	reg_B_SET	= 0x80,
-	reg_B_PIE	= 0x40,
-	reg_B_AIE	= 0x20,
-	reg_B_UIE	= 0x10,
-	reg_B_SQW	= 0x08,
-	reg_B_DM	= 0x04,
-	reg_B_24h	= 0x02,
-	reg_B_DSE	= 0x01,
+	reg_B_SET   = 0x80,
+	reg_B_PIE   = 0x40,
+	reg_B_AIE   = 0x20,
+	reg_B_UIE   = 0x10,
+	reg_B_SQW   = 0x08,
+	reg_B_DM    = 0x04,
+	reg_B_24h   = 0x02,
+	reg_B_DSE   = 0x01,
 
-	reg_C_IRQF	= 0x80,
-	reg_C_PF	= 0x40,
-	reg_C_AF	= 0x20,
-	reg_C_UF	= 0x10,
+	reg_C_IRQF  = 0x80,
+	reg_C_PF    = 0x40,
+	reg_C_AF    = 0x20,
+	reg_C_UF    = 0x10,
 
-	reg_D_VRT	= 0x80
+	reg_D_VRT   = 0x80
 };
 
 static const int SQW_freq_table[16] =
@@ -163,7 +163,7 @@ void rtc65271_device::nvram_default()
 	memset(m_regs,0, sizeof(m_regs));
 	memset(m_xram,0, sizeof(m_xram));
 
-	m_regs[reg_B] |= reg_B_DM;	// Firebeat assumes the chip factory defaults to non-BCD mode (or maybe Konami programs it that way?)
+	m_regs[reg_B] |= reg_B_DM;  // Firebeat assumes the chip factory defaults to non-BCD mode (or maybe Konami programs it that way?)
 }
 
 //-------------------------------------------------
@@ -205,7 +205,7 @@ void rtc65271_device::nvram_read(emu_file &file)
 	if (file.read(m_xram, 4096) != 4096)
 		return;
 
-	m_regs[reg_D] |= reg_D_VRT;	/* the data was backed up successfully */
+	m_regs[reg_D] |= reg_D_VRT; /* the data was backed up successfully */
 	/*m_dirty = FALSE;*/
 
 	{
@@ -221,7 +221,7 @@ void rtc65271_device::nvram_read(emu_file &file)
 			/* 24-hour mode */
 			m_regs[reg_hour] = systime.local_time.hour;
 		else
-		{	/* 12-hour mode */
+		{   /* 12-hour mode */
 			if (systime.local_time.hour >= 12)
 			{
 				m_regs[reg_hour] = 0x80;
@@ -240,7 +240,7 @@ void rtc65271_device::nvram_read(emu_file &file)
 		m_regs[reg_month] = systime.local_time.month + 1;
 		m_regs[reg_year] = systime.local_time.year % 100;
 		if (! (m_regs[reg_B] & reg_B_DM))
-		{	/* BCD mode */
+		{   /* BCD mode */
 			m_regs[reg_second] = binary_to_BCD(m_regs[reg_second]);
 			m_regs[reg_minute] = binary_to_BCD(m_regs[reg_minute]);
 			m_regs[reg_hour] = (m_regs[reg_hour] & 0x80) | binary_to_BCD(m_regs[reg_hour] & 0x7f);
@@ -319,7 +319,7 @@ UINT8 rtc65271_device::read(int xramsel, offs_t offset)
 			{
 			case reg_A:
 				reply = m_regs[m_cur_reg] & ~reg_A_DV;
-				reply |= 0x20;	// indicate normal RTC operation
+				reply |= 0x20;  // indicate normal RTC operation
 				break;
 
 			case reg_C:
@@ -329,7 +329,7 @@ UINT8 rtc65271_device::read(int xramsel, offs_t offset)
 				break;
 			case reg_D:
 				reply = m_regs[m_cur_reg];
-				m_regs[m_cur_reg] = /*0*/reg_D_VRT;	/* set VRT flag so that the computer does not complain that the battery is low */
+				m_regs[m_cur_reg] = /*0*/reg_D_VRT; /* set VRT flag so that the computer does not complain that the battery is low */
 				break;
 
 			default:
@@ -379,7 +379,7 @@ void rtc65271_device::write(int xramsel, offs_t offset, UINT8 data)
 			{
 			case reg_second:
 				/* the data sheet says bit 7 is read-only.  (I have no idea of
-                the reason why it is.) */
+				the reason why it is.) */
 				m_regs[reg_second] = data & 0x7f;
 				break;
 
@@ -399,7 +399,7 @@ void rtc65271_device::write(int xramsel, offs_t offset, UINT8 data)
 					}
 					else
 					{
-						m_SQW_internal_state = 0;	/* right??? */
+						m_SQW_internal_state = 0;   /* right??? */
 
 						/* Stop the divider used for SQW and periodic interrupts. */
 						m_SQW_timer->adjust(attotime::never);
@@ -415,7 +415,7 @@ void rtc65271_device::write(int xramsel, offs_t offset, UINT8 data)
 				{
 					/* if we are in SET mode, clear update cycle */
 					m_regs[reg_A] &= ~reg_A_UIP;
-					m_regs[reg_B] &= ~reg_B_UIE;	/* the data sheet tells this, but I wonder how much sense it makes */
+					m_regs[reg_B] &= ~reg_B_UIE;    /* the data sheet tells this, but I wonder how much sense it makes */
 					field_interrupts();
 				}
 				break;
@@ -466,19 +466,19 @@ void rtc65271_device::field_interrupts()
 */
 TIMER_CALLBACK( rtc65271_device::rtc_SQW_callback )
 {
-    rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
+	rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
 	rtc->rtc_SQW_cb();
 }
 
 TIMER_CALLBACK( rtc65271_device::rtc_begin_update_callback )
 {
-    rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
+	rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
 	rtc->rtc_begin_update_cb();
 }
 
 TIMER_CALLBACK( rtc65271_device::rtc_end_update_callback )
 {
-    rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
+	rtc65271_device *rtc = reinterpret_cast<rtc65271_device *>(ptr);
 	rtc->rtc_end_update_cb();
 }
 /*
@@ -671,8 +671,8 @@ const device_type RTC65271 = &device_creator<rtc65271_device>;
 //-------------------------------------------------
 
 rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, RTC65271, "RTC65271", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, RTC65271, "RTC65271", tag, owner, clock),
+		device_nvram_interface(mconfig, *this)
 {
 }
 
@@ -712,4 +712,3 @@ void rtc65271_device::device_start()
 	save_item(NAME(m_cur_xram_page));
 	save_item(NAME(m_SQW_internal_state));
 }
-

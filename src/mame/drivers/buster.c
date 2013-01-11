@@ -308,16 +308,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 void buster_state::palette_init()
@@ -331,7 +331,7 @@ void buster_state::palette_init()
 
 static MACHINE_CONFIG_START( buster, buster_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)        /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
 

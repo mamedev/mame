@@ -10,37 +10,37 @@
 #include "emu.h"
 
 
-#define MCFG_HUC6202_ADD( _tag, _intrf )	\
-	MCFG_DEVICE_ADD( _tag, HUC6202, 0 )		\
+#define MCFG_HUC6202_ADD( _tag, _intrf )    \
+	MCFG_DEVICE_ADD( _tag, HUC6202, 0 )     \
 	MCFG_DEVICE_CONFIG( _intrf )
 
 
 struct huc6202_interface
 {
 	/* First gfx input device */
-	devcb_read16				device_0_next_pixel;
+	devcb_read16                device_0_next_pixel;
 
 	/* TODO: Choose proper types */
 	/* Callback function to get time until next event */
-	devcb_read16				get_time_til_next_event_0;
+	devcb_read16                get_time_til_next_event_0;
 
-	devcb_write_line			vsync_0_changed;
-	devcb_write_line			hsync_0_changed;
-	devcb_read8					read_0;
-	devcb_write8				write_0;
+	devcb_write_line            vsync_0_changed;
+	devcb_write_line            hsync_0_changed;
+	devcb_read8                 read_0;
+	devcb_write8                write_0;
 
 
 	/* Second gfx input device */
-	devcb_read16				device_1_next_pixel;
+	devcb_read16                device_1_next_pixel;
 
 	/* TODO: Choose proper types */
 	/* Callback function to get time until next event */
-	devcb_read16				get_time_til_next_event_1;
+	devcb_read16                get_time_til_next_event_1;
 
-	devcb_write_line			vsync_1_changed;
-	devcb_write_line			hsync_1_changed;
-	devcb_read8					read_1;
-	devcb_write8				write_1;
+	devcb_write_line            vsync_1_changed;
+	devcb_write_line            hsync_1_changed;
+	devcb_read8                 read_1;
+	devcb_write8                write_1;
 };
 
 
@@ -67,30 +67,30 @@ protected:
 
 private:
 	/* callbacks */
-	devcb_resolved_read16		m_next_pixel_0;
-	devcb_resolved_read16		m_get_time_til_next_event_0;
-	devcb_resolved_write_line	m_hsync_changed_0;
-	devcb_resolved_write_line	m_vsync_changed_0;
-	devcb_resolved_read8		m_read_0;
-	devcb_resolved_write8		m_write_0;
-	devcb_resolved_read16		m_next_pixel_1;
-	devcb_resolved_read16		m_get_time_til_next_event_1;
-	devcb_resolved_write_line	m_hsync_changed_1;
-	devcb_resolved_write_line	m_vsync_changed_1;
-	devcb_resolved_read8		m_read_1;
-	devcb_resolved_write8		m_write_1;
+	devcb_resolved_read16       m_next_pixel_0;
+	devcb_resolved_read16       m_get_time_til_next_event_0;
+	devcb_resolved_write_line   m_hsync_changed_0;
+	devcb_resolved_write_line   m_vsync_changed_0;
+	devcb_resolved_read8        m_read_0;
+	devcb_resolved_write8       m_write_0;
+	devcb_resolved_read16       m_next_pixel_1;
+	devcb_resolved_read16       m_get_time_til_next_event_1;
+	devcb_resolved_write_line   m_hsync_changed_1;
+	devcb_resolved_write_line   m_vsync_changed_1;
+	devcb_resolved_read8        m_read_1;
+	devcb_resolved_write8       m_write_1;
 
 	struct {
-		UINT8	prio_type;
-		UINT8	dev0_enabled;
-		UINT8	dev1_enabled;
+		UINT8   prio_type;
+		UINT8   dev0_enabled;
+		UINT8   dev1_enabled;
 	} m_prio[4];
-	UINT16	m_window1;
-	UINT16	m_window2;
-	int		m_io_device;
-	int		m_map_index;
-	int		m_map_dirty;
-	UINT8	m_prio_map[512];
+	UINT16  m_window1;
+	UINT16  m_window2;
+	int     m_io_device;
+	int     m_map_index;
+	int     m_map_dirty;
+	UINT8   m_prio_map[512];
 
 };
 
@@ -99,4 +99,3 @@ extern const device_type HUC6202;
 
 
 #endif
-

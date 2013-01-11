@@ -72,7 +72,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, stadhero_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(stadhero_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)							/* text layer */
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)                          /* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READWRITE(stadhero_control_r, stadhero_control_w)
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( stadhero )
-	PORT_START("INPUTS")	/* 0x30c000 - 0x30c001 */
+	PORT_START("INPUTS")    /* 0x30c000 - 0x30c001 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -113,7 +113,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("DSW")	/* 0x30c004 - 0x30c005 */
+	PORT_START("DSW")   /* 0x30c004 - 0x30c005 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
-	PORT_START("COIN")	/* 0x30c002 & 0x30c003 */
+	PORT_START("COIN")  /* 0x30c002 & 0x30c003 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
 
@@ -169,13 +169,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 chars */
+	8,8,    /* 8*8 chars */
 	4096,
-	3,		/* 4 bits per pixel  */
+	3,      /* 4 bits per pixel  */
 	{ 0x00000*8,0x8000*8,0x10000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tile_3bpp =
@@ -205,9 +205,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( stadhero )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_3bpp,    512, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 256, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile_3bpp,    512, 16 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 256, 16 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -280,16 +280,16 @@ ROM_START( stadhero )
 	ROM_LOAD( "ef18.7f",  0x08000, 0x08000, CRC(20fd9668) SHA1(058e34a0ebfc372aaa9230c2bc9164ee2e85e217) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "ef08.2j",  0x00000, 0x10000, CRC(e84752fe) SHA1(9af2140ddbb44be793ab5b39787bac27f5b1c1f2) )	/* chars */
+	ROM_LOAD( "ef08.2j",  0x00000, 0x10000, CRC(e84752fe) SHA1(9af2140ddbb44be793ab5b39787bac27f5b1c1f2) )  /* chars */
 	ROM_LOAD( "ef09.4j",  0x10000, 0x08000, CRC(2ade874d) SHA1(5c884535214438a4ea79fd262700a346bc12ad81) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "ef10.11j", 0x00000, 0x10000, CRC(dca3d599) SHA1(2b97a70065f3065e7fbb54fb53cb120d9e5013b3) )	/* tiles */
+	ROM_LOAD( "ef10.11j", 0x00000, 0x10000, CRC(dca3d599) SHA1(2b97a70065f3065e7fbb54fb53cb120d9e5013b3) )  /* tiles */
 	ROM_LOAD( "ef11.13j", 0x10000, 0x10000, CRC(af563e96) SHA1(c88eaff4a1ea133d708f4511bb1dbc99ef066eed) )
 	ROM_LOAD( "ef12.14j", 0x20000, 0x10000, CRC(9a1bf51c) SHA1(e733c193b305496878551fc6eefc21587ba75c82) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
-	ROM_LOAD( "ef00.2a",  0x00000, 0x10000, CRC(94ed257c) SHA1(caa4a4c8bf3b34d2288e117cfc704cca4c6f913b) )	/* sprites */
+	ROM_LOAD( "ef00.2a",  0x00000, 0x10000, CRC(94ed257c) SHA1(caa4a4c8bf3b34d2288e117cfc704cca4c6f913b) )  /* sprites */
 	ROM_LOAD( "ef01.4a",  0x10000, 0x10000, CRC(6eb9a721) SHA1(0f9dce614e67e57612e3a4ce187f0f9c12b78281) )
 	ROM_LOAD( "ef02.5a",  0x20000, 0x10000, CRC(850cb771) SHA1(ccb54036191674d76965270a5831fba3e62f47c0) )
 	ROM_LOAD( "ef03.7a",  0x30000, 0x10000, CRC(24338b96) SHA1(7730486bd0b84ba0a69b5547e348ee0058d4e7f1) )
@@ -302,7 +302,7 @@ ROM_START( stadhero )
 	ROM_LOAD( "ef17.1e",  0x00000, 0x10000, CRC(07c78358) SHA1(ce82b429eec0193fd9665b717336756a514db144) )
 
 	ROM_REGION( 0x00200, "proms", 0 )
-	ROM_LOAD( "ef19.3d",  0x00000, 0x00200, CRC(852ff668) SHA1(d3053b68f86dcc81c3c3be280f75a4acd0b05be2) )	// ?
+	ROM_LOAD( "ef19.3d",  0x00000, 0x00200, CRC(852ff668) SHA1(d3053b68f86dcc81c3c3be280f75a4acd0b05be2) )  // ?
 ROM_END
 
 /******************************************************************************/

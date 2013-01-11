@@ -28,9 +28,9 @@ class deco156_state : public driver_device
 public:
 	deco156_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_deco_tilegen1(*this, "tilegen1"),
-		  m_oki2(*this, "oki2") { }
+			m_maincpu(*this, "maincpu"),
+			m_deco_tilegen1(*this, "tilegen1"),
+			m_oki2(*this, "oki2") { }
 
 	/* devices */
 	required_device<arm_device> m_maincpu;
@@ -129,7 +129,7 @@ READ32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_r){ return m_pf2_rowscroll[of
 READ32_MEMBER(deco156_state::wcvol95_spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
 WRITE32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
 WRITE32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::wcvol95_spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&m_spriteram[offset]); }
+WRITE32_MEMBER(deco156_state::wcvol95_spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
@@ -266,7 +266,7 @@ static const gfx_layout charlayout =
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8	/* every char takes 8 consecutive bytes */
+	16*8    /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
@@ -296,9 +296,9 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( hvysmsh )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
 
@@ -328,9 +328,9 @@ static const deco16ic_interface deco156_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	deco156_bank_callback,
 	deco156_bank_callback,
 	0,1,
@@ -626,11 +626,11 @@ static void descramble_sound( running_machine &machine, const char *tag )
 		UINT32 addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
-		                    19,18,17,16,
-		                    15,14,13,12,
-		                    11,10,9, 8,
-		                    7, 6, 5, 4,
-		                    3, 2, 1 );
+							19,18,17,16,
+							15,14,13,12,
+							11,10,9, 8,
+							7, 6, 5, 4,
+							3, 2, 1 );
 
 		buf1[addr] = rom[x];
 	}

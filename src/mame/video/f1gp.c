@@ -214,7 +214,7 @@ UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitma
 UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	if (m_gfxctrl & 4)	/* blank screen */
+	if (m_gfxctrl & 4)  /* blank screen */
 		bitmap.fill(get_black_pen(machine()), cliprect);
 	else
 	{
@@ -346,4 +346,3 @@ UINT32 f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitm
 
 	return 0;
 }
-

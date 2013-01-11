@@ -50,17 +50,17 @@ enum imgtoolerr_t
  *
  * Note - drivers should not use these modifiers
  */
-#define IMGTOOLERR_SRC_MODULE			0x1000
-#define	IMGTOOLERR_SRC_FUNCTIONALITY	0x2000
-#define	IMGTOOLERR_SRC_IMAGEFILE		0x3000
-#define	IMGTOOLERR_SRC_FILEONIMAGE		0x4000
-#define	IMGTOOLERR_SRC_NATIVEFILE		0x5000
+#define IMGTOOLERR_SRC_MODULE           0x1000
+#define IMGTOOLERR_SRC_FUNCTIONALITY    0x2000
+#define IMGTOOLERR_SRC_IMAGEFILE        0x3000
+#define IMGTOOLERR_SRC_FILEONIMAGE      0x4000
+#define IMGTOOLERR_SRC_NATIVEFILE       0x5000
 
-#define ERRORCODE(err)		((err) & 0x0fff)
-#define ERRORSOURCE(err)	((err) & 0xf000)
-#define ERRORPARAM(err)		(((err) & 0xf0000) / 0x10000)
+#define ERRORCODE(err)      ((err) & 0x0fff)
+#define ERRORSOURCE(err)    ((err) & 0xf000)
+#define ERRORPARAM(err)     (((err) & 0xf0000) / 0x10000)
 
-#define PARAM_TO_ERROR(errcode, param)	((errcode) | ((param) * 0x10000))
+#define PARAM_TO_ERROR(errcode, param)  ((errcode) | ((param) * 0x10000))
 
 
 const char *imgtool_error(imgtoolerr_t err);

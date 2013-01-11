@@ -25,15 +25,15 @@
 
 enum e_mnemonics
 {
-	zADC  ,zADD  ,zAND	,zBIT  ,zCALL ,zCCF  ,zCP	,zCPD  ,
-	zCPDR ,zCPI  ,zCPIR ,zCPL  ,zDAA  ,zDB	 ,zDEC	,zDI   ,
-	zDJNZ ,zEI	 ,zEX	,zEXX  ,zHLT  ,zIM	 ,zIN	,zINC  ,
-	zIND  ,zINDR ,zINI	,zINIR ,zJP   ,zJR	 ,zLD	,zLDD  ,
-	zLDDR ,zLDI  ,zLDIR ,zNEG  ,zNOP  ,zOR	 ,zOTDR ,zOTIR ,
-	zOUT  ,zOUTD ,zOUTI ,zPOP  ,zPUSH ,zRES  ,zRET	,zRETI ,
-	zRETN ,zRL	 ,zRLA	,zRLC  ,zRLCA ,zRLD  ,zRR	,zRRA  ,
-	zRRC  ,zRRCA ,zRRD	,zRST  ,zSBC  ,zSCF  ,zSET	,zSLA  ,
-	zSLL  ,zSRA  ,zSRL	,zSUB  ,zXOR
+	zADC  ,zADD  ,zAND  ,zBIT  ,zCALL ,zCCF  ,zCP   ,zCPD  ,
+	zCPDR ,zCPI  ,zCPIR ,zCPL  ,zDAA  ,zDB   ,zDEC  ,zDI   ,
+	zDJNZ ,zEI   ,zEX   ,zEXX  ,zHLT  ,zIM   ,zIN   ,zINC  ,
+	zIND  ,zINDR ,zINI  ,zINIR ,zJP   ,zJR   ,zLD   ,zLDD  ,
+	zLDDR ,zLDI  ,zLDIR ,zNEG  ,zNOP  ,zOR   ,zOTDR ,zOTIR ,
+	zOUT  ,zOUTD ,zOUTI ,zPOP  ,zPUSH ,zRES  ,zRET  ,zRETI ,
+	zRETN ,zRL   ,zRLA  ,zRLC  ,zRLCA ,zRLD  ,zRR   ,zRRA  ,
+	zRRC  ,zRRCA ,zRRD  ,zRST  ,zSBC  ,zSCF  ,zSET  ,zSLA  ,
+	zSLL  ,zSRA  ,zSRL  ,zSUB  ,zXOR
 };
 
 static const char *const s_mnemonic[] =
@@ -226,7 +226,7 @@ static const z80dasm mnemonic_ed[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zIN,"b,(c)"},  {zOUT,"(c),b"}, {zSBC,"hl,bc"}, {zLD,"(W),bc"},
-	{zNEG,0},		{zRETN,0},		{zIM,"0"},      {zLD,"i,a"},
+	{zNEG,0},       {zRETN,0},      {zIM,"0"},      {zLD,"i,a"},
 	{zIN,"c,(c)"},  {zOUT,"(c),c"}, {zADC,"hl,bc"}, {zLD,"bc,(W)"},
 	{zNEG,"*"},     {zRETI,0},      {zIM,"0"},      {zLD,"r,a"},
 	{zIN,"d,(c)"},  {zOUT,"(c),d"}, {zSBC,"hl,de"}, {zLD,"(W),de"},
@@ -249,13 +249,13 @@ static const z80dasm mnemonic_ed[256] =
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDI,0},		{zCPI,0},		{zINI,0},		{zOUTI,0},
+	{zLDI,0},       {zCPI,0},       {zINI,0},       {zOUTI,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDD,0},		{zCPD,0},		{zIND,0},		{zOUTD,0},
+	{zLDD,0},       {zCPD,0},       {zIND,0},       {zOUTD,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDIR,0},		{zCPIR,0},		{zINIR,0},		{zOTIR,0},
+	{zLDIR,0},      {zCPIR,0},      {zINIR,0},      {zOTIR,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDDR,0},		{zCPDR,0},		{zINDR,0},		{zOTDR,0},
+	{zLDDR,0},      {zCPDR,0},      {zINDR,0},      {zOTDR,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -345,7 +345,7 @@ static const z80dasm mnemonic_xx[256] =
 
 static const z80dasm mnemonic_main[256] =
 {
-	{zNOP,0},		{zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
+	{zNOP,0},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,0},
 	{zEX,"af,af'"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
 	{zINC,"c"},     {zDEC,"c"},     {zLD,"c,B"},    {zRRCA,0},
@@ -427,7 +427,7 @@ static int offs(INT8 offset)
  ****************************************************************************/
 CPU_DISASSEMBLE( z80 )
 {
-    const z80dasm *d;
+	const z80dasm *d;
 	const char *src, *ixy;
 	char *dst;
 	INT8 offset = 0;

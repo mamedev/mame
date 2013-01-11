@@ -42,26 +42,26 @@
  *
  * Jan 2004, D Renaud.
  ************************************************************************/
-#define DSS_COUNTER__ENABLE		DISCRETE_INPUT(0)
-#define DSS_COUNTER__RESET		DISCRETE_INPUT(1)
-#define DSS_COUNTER__CLOCK		DISCRETE_INPUT(2)
-#define DSS_COUNTER__MIN		DISCRETE_INPUT(3)
-#define DSS_COUNTER__MAX		DISCRETE_INPUT(4)
-#define DSS_COUNTER__DIR		DISCRETE_INPUT(5)
-#define DSS_COUNTER__INIT		DISCRETE_INPUT(6)
-#define DSS_COUNTER__CLOCK_TYPE	DISCRETE_INPUT(7)
-#define DSS_7492__CLOCK_TYPE	 DSS_COUNTER__MIN
+#define DSS_COUNTER__ENABLE     DISCRETE_INPUT(0)
+#define DSS_COUNTER__RESET      DISCRETE_INPUT(1)
+#define DSS_COUNTER__CLOCK      DISCRETE_INPUT(2)
+#define DSS_COUNTER__MIN        DISCRETE_INPUT(3)
+#define DSS_COUNTER__MAX        DISCRETE_INPUT(4)
+#define DSS_COUNTER__DIR        DISCRETE_INPUT(5)
+#define DSS_COUNTER__INIT       DISCRETE_INPUT(6)
+#define DSS_COUNTER__CLOCK_TYPE DISCRETE_INPUT(7)
+#define DSS_7492__CLOCK_TYPE     DSS_COUNTER__MIN
 
 static const int disc_7492_count[6] = {0x00, 0x01, 0x02, 0x04, 0x05, 0x06};
 
 DISCRETE_STEP(dss_counter)
 {
-	double	cycles;
-	double	ds_clock;
-	int		clock = 0, inc = 0;
-	UINT32	last_count = m_last_count;	/* it is different then output in 7492 */
-	double	x_time = 0;
-	UINT32	count = last_count;
+	double  cycles;
+	double  ds_clock;
+	int     clock = 0, inc = 0;
+	UINT32  last_count = m_last_count;  /* it is different then output in 7492 */
+	double  x_time = 0;
+	UINT32  count = last_count;
 
 	ds_clock = DSS_COUNTER__CLOCK;
 	if (UNEXPECTED(m_clock_type == DISC_CLK_IS_FREQ))
@@ -89,9 +89,9 @@ DISCRETE_STEP(dss_counter)
 	}
 
 	/*
-     * Only count if module is enabled.
-     * This has the effect of holding the output at it's current value.
-     */
+	 * Only count if module is enabled.
+	 * This has the effect of holding the output at it's current value.
+	 */
 	if (EXPECTED(DSS_COUNTER__ENABLE))
 	{
 		double v_out;
@@ -210,12 +210,12 @@ DISCRETE_RESET(dss_counter)
  * also passed dss_lfsr_context structure
  *
  ************************************************************************/
-#define DSS_LFSR_NOISE__ENABLE	DISCRETE_INPUT(0)
-#define DSS_LFSR_NOISE__RESET	DISCRETE_INPUT(1)
-#define DSS_LFSR_NOISE__CLOCK	DISCRETE_INPUT(2)
-#define DSS_LFSR_NOISE__AMP		DISCRETE_INPUT(3)
-#define DSS_LFSR_NOISE__FEED	DISCRETE_INPUT(4)
-#define DSS_LFSR_NOISE__BIAS	DISCRETE_INPUT(5)
+#define DSS_LFSR_NOISE__ENABLE  DISCRETE_INPUT(0)
+#define DSS_LFSR_NOISE__RESET   DISCRETE_INPUT(1)
+#define DSS_LFSR_NOISE__CLOCK   DISCRETE_INPUT(2)
+#define DSS_LFSR_NOISE__AMP     DISCRETE_INPUT(3)
+#define DSS_LFSR_NOISE__FEED    DISCRETE_INPUT(4)
+#define DSS_LFSR_NOISE__BIAS    DISCRETE_INPUT(5)
 
 INLINE int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1, int bitmask)
 {
@@ -237,15 +237,15 @@ INLINE int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1,
 			break;
 		case DISC_LFSR_XNOR:
 			retval = in0 ^ in1;
-			retval = retval ^ bitmask;	/* Invert output */
+			retval = retval ^ bitmask;  /* Invert output */
 			break;
 		case DISC_LFSR_NOR:
 			retval = in0 | in1;
-			retval = retval ^ bitmask;	/* Invert output */
+			retval = retval ^ bitmask;  /* Invert output */
 			break;
 		case DISC_LFSR_NAND:
 			retval = in0 & in1;
-			retval = retval ^ bitmask;	/* Invert output */
+			retval = retval ^ bitmask;  /* Invert output */
 			break;
 		case DISC_LFSR_IN0:
 			retval = in0;
@@ -437,10 +437,10 @@ DISCRETE_RESET(dss_lfsr_noise)
  * input3    - DC Bias value
  *
  ************************************************************************/
-#define DSS_NOISE__ENABLE	DISCRETE_INPUT(0)
-#define DSS_NOISE__FREQ		DISCRETE_INPUT(1)
-#define DSS_NOISE__AMP		DISCRETE_INPUT(2)
-#define DSS_NOISE__BIAS		DISCRETE_INPUT(3)
+#define DSS_NOISE__ENABLE   DISCRETE_INPUT(0)
+#define DSS_NOISE__FREQ     DISCRETE_INPUT(1)
+#define DSS_NOISE__AMP      DISCRETE_INPUT(2)
+#define DSS_NOISE__BIAS     DISCRETE_INPUT(3)
 
 DISCRETE_STEP(dss_noise)
 {
@@ -500,19 +500,19 @@ DISCRETE_RESET(dss_noise)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
- #define DSS_NOTE__ENABLE		DISCRETE_INPUT(0)
- #define DSS_NOTE__CLOCK		DISCRETE_INPUT(1)
- #define DSS_NOTE__DATA			DISCRETE_INPUT(2)
- #define DSS_NOTE__MAX1			DISCRETE_INPUT(3)
- #define DSS_NOTE__MAX2			DISCRETE_INPUT(4)
- #define DSS_NOTE__CLOCK_TYPE	DISCRETE_INPUT(5)
+	#define DSS_NOTE__ENABLE        DISCRETE_INPUT(0)
+	#define DSS_NOTE__CLOCK     DISCRETE_INPUT(1)
+	#define DSS_NOTE__DATA          DISCRETE_INPUT(2)
+	#define DSS_NOTE__MAX1          DISCRETE_INPUT(3)
+	#define DSS_NOTE__MAX2          DISCRETE_INPUT(4)
+	#define DSS_NOTE__CLOCK_TYPE    DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dss_note)
 {
-	double	cycles;
-	int		clock  = 0, last_count2, inc = 0;
-	double	x_time = 0;
-	double	v_out;
+	double  cycles;
+	int     clock  = 0, last_count2, inc = 0;
+	double  x_time = 0;
+	double  v_out;
 
 	if (m_clock_type == DISC_CLK_IS_FREQ)
 	{
@@ -625,26 +625,26 @@ DISCRETE_RESET(dss_note)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSS_OP_AMP_OSC__ENABLE	DISCRETE_INPUT(0)
-#define DSS_OP_AMP_OSC__VMOD1	DISCRETE_INPUT(1)
-#define DSS_OP_AMP_OSC__VMOD2	DISCRETE_INPUT(2)
+#define DSS_OP_AMP_OSC__ENABLE  DISCRETE_INPUT(0)
+#define DSS_OP_AMP_OSC__VMOD1   DISCRETE_INPUT(1)
+#define DSS_OP_AMP_OSC__VMOD2   DISCRETE_INPUT(2)
 
 /* The inputs on a norton op-amp are (info->vP - OP_AMP_NORTON_VBE) */
 /* which is the same as the output high voltage.  We will define them */
 /* the same to save a calculation step */
-#define DSS_OP_AMP_OSC_NORTON_VP_IN		m_v_out_high
+#define DSS_OP_AMP_OSC_NORTON_VP_IN     m_v_out_high
 
 DISCRETE_STEP(dss_op_amp_osc)
 {
 	DISCRETE_DECLARE_INFO(discrete_op_amp_osc_info)
 
-	double i = 0;				/* Charging current created by vIn */
-	double v = 0;			/* all input voltages mixed */
-	double dt;				/* change in time */
-	double v_cap;			/* Current voltage on capacitor, before dt */
-	double v_cap_next = 0;	/* Voltage on capacitor, after dt */
+	double i = 0;               /* Charging current created by vIn */
+	double v = 0;           /* all input voltages mixed */
+	double dt;              /* change in time */
+	double v_cap;           /* Current voltage on capacitor, before dt */
+	double v_cap_next = 0;  /* Voltage on capacitor, after dt */
 	double charge[2]  = {0};
-	double x_time  = 0;		/* time since change happened */
+	double x_time  = 0;     /* time since change happened */
 	double exponent;
 	UINT8 force_charge = 0;
 	UINT8 enable = DSS_OP_AMP_OSC__ENABLE;
@@ -655,8 +655,8 @@ DISCRETE_STEP(dss_op_amp_osc)
 
 	double v_out = 0;
 
-	dt = this->sample_time();	/* Change in time */
-	v_cap = m_v_cap;	/* Set to voltage before change */
+	dt = this->sample_time();   /* Change in time */
+	v_cap = m_v_cap;    /* Set to voltage before change */
 
 	/* work out the charge currents/voltages. */
 	switch (m_type)
@@ -819,7 +819,7 @@ DISCRETE_STEP(dss_op_amp_osc)
 				}
 			}
 		}
-		else	/* non-linear charge */
+		else    /* non-linear charge */
 		{
 			if (update_exponent)
 				exponent = RC_CHARGE_EXP_DT(m_charge_rc[flip_flop], dt);
@@ -896,7 +896,7 @@ DISCRETE_STEP(dss_op_amp_osc)
 	m_flip_flop = flip_flop;
 }
 
-#define DIODE_DROP	0.7
+#define DIODE_DROP  0.7
 
 DISCRETE_RESET(dss_op_amp_osc)
 {
@@ -905,8 +905,8 @@ DISCRETE_RESET(dss_op_amp_osc)
 	const double *r_info_ptr;
 	int loop;
 
-	double i1 = 0;	/* inverting input current */
-	double i2 = 0;	/* non-inverting input current */
+	double i1 = 0;  /* inverting input current */
+	double i2 = 0;  /* non-inverting input current */
 
 	/* link to resistor static or node values */
 	r_info_ptr    = &info->r1;
@@ -943,9 +943,9 @@ DISCRETE_RESET(dss_op_amp_osc)
 			/* There is no charge on the cap so the schmitt goes high at init. */
 			m_flip_flop = 1;
 			/* Setup some commonly used stuff */
-			m_temp1 = info->r5 / (info->r2 + info->r5);			/* voltage ratio across r5 */
-			m_temp2 = info->r6 / (info->r1 + info->r6);			/* voltage ratio across r6 */
-			m_temp3 = 1.0 / (1.0 / info->r1 + 1.0 / info->r6);	/* input resistance when r6 switched in */
+			m_temp1 = info->r5 / (info->r2 + info->r5);         /* voltage ratio across r5 */
+			m_temp2 = info->r6 / (info->r1 + info->r6);         /* voltage ratio across r6 */
+			m_temp3 = 1.0 / (1.0 / info->r1 + 1.0 / info->r6);  /* input resistance when r6 switched in */
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
@@ -1088,12 +1088,12 @@ DISCRETE_RESET(dss_op_amp_osc)
  * input5    - Initial Phase
  *
  ************************************************************************/
-#define DSS_SAWTOOTHWAVE__ENABLE	DISCRETE_INPUT(0)
-#define DSS_SAWTOOTHWAVE__FREQ		DISCRETE_INPUT(1)
-#define DSS_SAWTOOTHWAVE__AMP		DISCRETE_INPUT(2)
-#define DSS_SAWTOOTHWAVE__BIAS		DISCRETE_INPUT(3)
-#define DSS_SAWTOOTHWAVE__GRAD		DISCRETE_INPUT(4)
-#define DSS_SAWTOOTHWAVE__PHASE		DISCRETE_INPUT(5)
+#define DSS_SAWTOOTHWAVE__ENABLE    DISCRETE_INPUT(0)
+#define DSS_SAWTOOTHWAVE__FREQ      DISCRETE_INPUT(1)
+#define DSS_SAWTOOTHWAVE__AMP       DISCRETE_INPUT(2)
+#define DSS_SAWTOOTHWAVE__BIAS      DISCRETE_INPUT(3)
+#define DSS_SAWTOOTHWAVE__GRAD      DISCRETE_INPUT(4)
+#define DSS_SAWTOOTHWAVE__PHASE     DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dss_sawtoothwave)
 {
@@ -1151,9 +1151,9 @@ DISCRETE_RESET(dss_sawtoothwave)
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DSS_SCHMITT_OSC__ENABLE	(int)DISCRETE_INPUT(0)
-#define DSS_SCHMITT_OSC__VIN	DISCRETE_INPUT(1)
-#define DSS_SCHMITT_OSC__AMP	DISCRETE_INPUT(2)
+#define DSS_SCHMITT_OSC__ENABLE (int)DISCRETE_INPUT(0)
+#define DSS_SCHMITT_OSC__VIN    DISCRETE_INPUT(1)
+#define DSS_SCHMITT_OSC__AMP    DISCRETE_INPUT(2)
 
 DISCRETE_STEP(dss_schmitt_osc)
 {
@@ -1171,11 +1171,11 @@ DISCRETE_STEP(dss_schmitt_osc)
 	{
 		t = 0;
 		/* The charging voltage to the cap is the sum of the input voltage and the gate
-         * output voltage in the ratios determined by their resistors in a divider network.
-         * The input voltage is selectable as straight voltage in or logic level that will
-         * use vGate as its voltage.  Note that ration_in is just the ratio of the total
-         * voltage and needs to be multipled by the input voltage.  ratio_feedback has
-         * already been multiplied by vGate to save time because that voltage never changes. */
+		 * output voltage in the ratios determined by their resistors in a divider network.
+		 * The input voltage is selectable as straight voltage in or logic level that will
+		 * use vGate as its voltage.  Note that ration_in is just the ratio of the total
+		 * voltage and needs to be multipled by the input voltage.  ratio_feedback has
+		 * already been multiplied by vGate to save time because that voltage never changes. */
 		supply   = m_input_is_voltage ? m_ration_in * DSS_SCHMITT_OSC__VIN : (DSS_SCHMITT_OSC__VIN ? m_ration_in * info->vGate : 0);
 		supply  += (m_state ? m_ratio_feedback : 0);
 		new_vCap = v_cap + ((supply - v_cap) * exponent);
@@ -1240,12 +1240,12 @@ DISCRETE_RESET(dss_schmitt_osc)
 	m_input_is_voltage = (info->options & DISC_SCHMITT_OSC_IN_IS_VOLTAGE) ? 1 : 0;
 
 	/* The 2 resistors make a voltage divider, so their ratios add together
-     * to make the charging voltage. */
+	 * to make the charging voltage. */
 	m_ration_in      = info->rFeedback / (info->rIn + info->rFeedback);
 	m_ratio_feedback = info->rIn / (info->rIn + info->rFeedback) * info->vGate;
 
 	/* The voltage source resistance works out to the 2 resistors in parallel.
-     * So use this for the RC charge constant. */
+	 * So use this for the RC charge constant. */
 	rSource     = 1.0 / ((1.0 / info->rIn) + (1.0 / info->rFeedback));
 	m_rc = rSource * info->c;
 	m_exponent = RC_CHARGE_EXP(m_rc);
@@ -1269,11 +1269,11 @@ DISCRETE_RESET(dss_schmitt_osc)
  * input4    - Starting phase
  *
  ************************************************************************/
-#define DSS_SINEWAVE__ENABLE	DISCRETE_INPUT(0)
-#define DSS_SINEWAVE__FREQ		DISCRETE_INPUT(1)
-#define DSS_SINEWAVE__AMPL		DISCRETE_INPUT(2)
-#define DSS_SINEWAVE__BIAS		DISCRETE_INPUT(3)
-#define DSS_SINEWAVE__PHASE		DISCRETE_INPUT(4)
+#define DSS_SINEWAVE__ENABLE    DISCRETE_INPUT(0)
+#define DSS_SINEWAVE__FREQ      DISCRETE_INPUT(1)
+#define DSS_SINEWAVE__AMPL      DISCRETE_INPUT(2)
+#define DSS_SINEWAVE__BIAS      DISCRETE_INPUT(3)
+#define DSS_SINEWAVE__PHASE     DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dss_sinewave)
 {
@@ -1323,12 +1323,12 @@ DISCRETE_RESET(dss_sinewave)
  * input5    - Start Phase
  *
  ************************************************************************/
-#define DSS_SQUAREWAVE__ENABLE	DISCRETE_INPUT(0)
-#define DSS_SQUAREWAVE__FREQ	DISCRETE_INPUT(1)
-#define DSS_SQUAREWAVE__AMP		DISCRETE_INPUT(2)
-#define DSS_SQUAREWAVE__DUTY	DISCRETE_INPUT(3)
-#define DSS_SQUAREWAVE__BIAS	DISCRETE_INPUT(4)
-#define DSS_SQUAREWAVE__PHASE	DISCRETE_INPUT(5)
+#define DSS_SQUAREWAVE__ENABLE  DISCRETE_INPUT(0)
+#define DSS_SQUAREWAVE__FREQ    DISCRETE_INPUT(1)
+#define DSS_SQUAREWAVE__AMP     DISCRETE_INPUT(2)
+#define DSS_SQUAREWAVE__DUTY    DISCRETE_INPUT(3)
+#define DSS_SQUAREWAVE__BIAS    DISCRETE_INPUT(4)
+#define DSS_SQUAREWAVE__PHASE   DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dss_squarewave)
 {
@@ -1384,12 +1384,12 @@ DISCRETE_RESET(dss_squarewave)
  * input5    - Start Phase
  *
  ************************************************************************/
-#define DSS_SQUAREWFIX__ENABLE	DISCRETE_INPUT(0)
-#define DSS_SQUAREWFIX__FREQ	DISCRETE_INPUT(1)
-#define DSS_SQUAREWFIX__AMP		DISCRETE_INPUT(2)
-#define DSS_SQUAREWFIX__DUTY	DISCRETE_INPUT(3)
-#define DSS_SQUAREWFIX__BIAS	DISCRETE_INPUT(4)
-#define DSS_SQUAREWFIX__PHASE	DISCRETE_INPUT(5)
+#define DSS_SQUAREWFIX__ENABLE  DISCRETE_INPUT(0)
+#define DSS_SQUAREWFIX__FREQ    DISCRETE_INPUT(1)
+#define DSS_SQUAREWFIX__AMP     DISCRETE_INPUT(2)
+#define DSS_SQUAREWFIX__DUTY    DISCRETE_INPUT(3)
+#define DSS_SQUAREWFIX__BIAS    DISCRETE_INPUT(4)
+#define DSS_SQUAREWFIX__PHASE   DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dss_squarewfix)
 {
@@ -1406,7 +1406,7 @@ DISCRETE_STEP(dss_squarewfix)
 	{
 		/* Add gain and DC Bias component */
 
-		m_t_off  = 1.0 / DSS_SQUAREWFIX__FREQ;	/* cycle time */
+		m_t_off  = 1.0 / DSS_SQUAREWFIX__FREQ;  /* cycle time */
 		m_t_on   = m_t_off * (DSS_SQUAREWFIX__DUTY / 100.0);
 		m_t_off -= m_t_on;
 
@@ -1424,10 +1424,10 @@ DISCRETE_RESET(dss_squarewfix)
 	m_flip_flop   = 1;
 
 	/* Do the intial time shift and convert freq to off/on times */
-	m_t_off   = 1.0 / DSS_SQUAREWFIX__FREQ;	/* cycle time */
-	m_t_left  = DSS_SQUAREWFIX__PHASE / 360.0;	/* convert start phase to % */
-	m_t_left  = m_t_left - (int)m_t_left;	/* keep % between 0 & 1 */
-	m_t_left  = (m_t_left < 0) ? 1.0 + m_t_left : m_t_left;	/* if - then flip to + phase */
+	m_t_off   = 1.0 / DSS_SQUAREWFIX__FREQ; /* cycle time */
+	m_t_left  = DSS_SQUAREWFIX__PHASE / 360.0;  /* convert start phase to % */
+	m_t_left  = m_t_left - (int)m_t_left;   /* keep % between 0 & 1 */
+	m_t_left  = (m_t_left < 0) ? 1.0 + m_t_left : m_t_left; /* if - then flip to + phase */
 	m_t_left *= m_t_off;
 	m_t_on    = m_t_off * (DSS_SQUAREWFIX__DUTY / 100.0);
 	m_t_off  -= m_t_on;
@@ -1458,12 +1458,12 @@ DISCRETE_RESET(dss_squarewfix)
  * input5    - Initial Time Shift
  *
  ************************************************************************/
-#define DSS_SQUAREWAVE2__ENABLE	DISCRETE_INPUT(0)
-#define DSS_SQUAREWAVE2__AMP	DISCRETE_INPUT(1)
-#define DSS_SQUAREWAVE2__T_OFF	DISCRETE_INPUT(2)
-#define DSS_SQUAREWAVE2__T_ON	DISCRETE_INPUT(3)
-#define DSS_SQUAREWAVE2__BIAS	DISCRETE_INPUT(4)
-#define DSS_SQUAREWAVE2__SHIFT	DISCRETE_INPUT(5)
+#define DSS_SQUAREWAVE2__ENABLE DISCRETE_INPUT(0)
+#define DSS_SQUAREWAVE2__AMP    DISCRETE_INPUT(1)
+#define DSS_SQUAREWAVE2__T_OFF  DISCRETE_INPUT(2)
+#define DSS_SQUAREWAVE2__T_ON   DISCRETE_INPUT(3)
+#define DSS_SQUAREWAVE2__BIAS   DISCRETE_INPUT(4)
+#define DSS_SQUAREWAVE2__SHIFT  DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dss_squarewave2)
 {
@@ -1559,7 +1559,7 @@ DISCRETE_STEP(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(description)
 	double diff, vG1, vG2, vG3, vI;
 	double vMix, rMix;
-	int	clamped;
+	int clamped;
 	double v_out;
 
 	/* Get new state */
@@ -1617,8 +1617,8 @@ DISCRETE_STEP(dss_inverter_osc)
 			{
 				double ratio = mc_rp / (mc_rp + mc_r1);
 				diff = vG3 * (ratio)
-				     - (mc_v_cap + vG2)
-				     + vI * (1.0 - ratio);
+						- (mc_v_cap + vG2)
+						+ vI * (1.0 - ratio);
 				diff = diff - diff * mc_wc;
 			}
 			else
@@ -1710,11 +1710,11 @@ DISCRETE_RESET(dss_inverter_osc)
  * input4    - Initial Phase
  *
  ************************************************************************/
-#define DSS_TRIANGLEWAVE__ENABLE	DISCRETE_INPUT(0)
-#define DSS_TRIANGLEWAVE__FREQ		DISCRETE_INPUT(1)
-#define DSS_TRIANGLEWAVE__AMP		DISCRETE_INPUT(2)
-#define DSS_TRIANGLEWAVE__BIAS		DISCRETE_INPUT(3)
-#define DSS_TRIANGLEWAVE__PHASE		DISCRETE_INPUT(4)
+#define DSS_TRIANGLEWAVE__ENABLE    DISCRETE_INPUT(0)
+#define DSS_TRIANGLEWAVE__FREQ      DISCRETE_INPUT(1)
+#define DSS_TRIANGLEWAVE__AMP       DISCRETE_INPUT(2)
+#define DSS_TRIANGLEWAVE__BIAS      DISCRETE_INPUT(3)
+#define DSS_TRIANGLEWAVE__PHASE     DISCRETE_INPUT(4)
 
 DISCRETE_STEP(dss_trianglewave)
 {
@@ -1765,7 +1765,7 @@ DISCRETE_RESET(dss_trianglewave)
  * input2    - gain scaling factor
  *
  ************************************************************************/
-#define DSS_ADSR__ENABLE	DISCRETE_INPUT(0)
+#define DSS_ADSR__ENABLE    DISCRETE_INPUT(0)
 
 DISCRETE_STEP(dss_adsrenv)
 {

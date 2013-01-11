@@ -99,21 +99,21 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 
 
-#define X2_CLOCK_PAL	59000000
-#define X2_CLOCK_NTSC	49090000
-#define X601_CLOCK		XTAL_16_9344MHz
+#define X2_CLOCK_PAL    59000000
+#define X2_CLOCK_NTSC   49090000
+#define X601_CLOCK      XTAL_16_9344MHz
 
 
 static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_SHARE("dram")						/* DRAM */
-	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_SHARE("vram")									/* VRAM */
-	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
-	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM													/* Brooktree? */
-	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE8(_3do_nvarea_r, _3do_nvarea_w, 0x000000ff)				/* NVRAM */
-	AM_RANGE(0x03180000, 0x031BFFFF) AM_READWRITE(_3do_slow2_r, _3do_slow2_w)				/* Slow bus - additional expansion */
-	AM_RANGE(0x03200000, 0x0320FFFF) AM_READWRITE(_3do_svf_r, _3do_svf_w)					/* special vram access1 */
-	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(_3do_madam_r, _3do_madam_w)				/* address decoder */
-	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(_3do_clio_r, _3do_clio_w)					/* io controller */
+	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_SHARE("dram")                       /* DRAM */
+	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM AM_SHARE("vram")                                    /* VRAM */
+	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")                                    /* BIOS */
+	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM                                                 /* Brooktree? */
+	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE8(_3do_nvarea_r, _3do_nvarea_w, 0x000000ff)                /* NVRAM */
+	AM_RANGE(0x03180000, 0x031BFFFF) AM_READWRITE(_3do_slow2_r, _3do_slow2_w)               /* Slow bus - additional expansion */
+	AM_RANGE(0x03200000, 0x0320FFFF) AM_READWRITE(_3do_svf_r, _3do_svf_w)                   /* special vram access1 */
+	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(_3do_madam_r, _3do_madam_w)               /* address decoder */
+	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(_3do_clio_r, _3do_clio_w)                 /* io controller */
 ADDRESS_MAP_END
 
 
@@ -243,20 +243,20 @@ ROM_START(3dobios)
 ROM_END
 
 ROM_START(3do_pal)
-    ROM_REGION32_BE( 0x200000, "user1", 0 )
-    ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
-    ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
-    ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(2) )
-    ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" )
-    ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(3) )
+	ROM_REGION32_BE( 0x200000, "user1", 0 )
+	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
+	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
+	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" )
+	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(3) )
 ROM_END
 
 ROM_START(orbatak)
 	NTSC_BIOS
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
 ROM_END
 
 /***************************************************************************
@@ -266,8 +266,8 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-CONS( 1991, 3do,        0,      0,      3do,        3do,	driver_device, 0,      "3DO",  "3DO (NTSC)",   GAME_NOT_WORKING | GAME_NO_SOUND )
-CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    3do,	driver_device, 0,      "3DO",  "3DO (PAL)",    GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 1991, 3do,        0,      0,      3do,        3do,    driver_device, 0,      "3DO",  "3DO (NTSC)",   GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    3do,    driver_device, 0,      "3DO",  "3DO (PAL)",    GAME_NOT_WORKING | GAME_NO_SOUND )
 
 GAME( 1991, 3dobios,    0,      3do,    3do, driver_device, 0, ROT0,     "3DO",  "3DO Bios",   GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT )
 GAME( 199?, orbatak,    3dobios,3do,    3do, driver_device, 0, ROT0,     "<unknown>", "Orbatak (prototype)", GAME_NOT_WORKING | GAME_NO_SOUND )

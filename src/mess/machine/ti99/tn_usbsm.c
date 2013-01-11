@@ -64,25 +64,25 @@ UINT16 nouspikel_usb_smartmedia_device::usbsm_mem_16_r(offs_t offset)
 	UINT16 reply = 0;
 
 	if (offset < 0x2800)
-	{	/* 0x4000-0x4fff range */
+	{   /* 0x4000-0x4fff range */
 		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x27f8))
-		{	/* SmartMedia interface */
+		{   /* SmartMedia interface */
 			if (offset == 0)
 				reply = m_smartmedia->data_r() << 8;
 		}
 		else
-		{	/* FEEPROM */
+		{   /* FEEPROM */
 			if (!(m_cru_register & FEEPROM_WRITE_ENABLE))
 				reply = strataflash_16_r(m_strata, offset);
 		}
 	}
 	else
-	{	/* 0x5000-0x5fff range */
+	{   /* 0x5000-0x5fff range */
 		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x2ff8))
-		{	/* USB controller */
+		{   /* USB controller */
 		}
 		else
-		{	/* SRAM */
+		{   /* SRAM */
 			reply = m_ram[m_sram_page*0x800+(offset-0x2800)];
 		}
 	}
@@ -95,9 +95,9 @@ UINT16 nouspikel_usb_smartmedia_device::usbsm_mem_16_r(offs_t offset)
 void nouspikel_usb_smartmedia_device::usbsm_mem_16_w(offs_t offset, UINT16 data)
 {
 	if (offset < 0x2800)
-	{	/* 0x4000-0x4fff range */
+	{   /* 0x4000-0x4fff range */
 		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x27f8))
-		{	/* SmartMedia interface */
+		{   /* SmartMedia interface */
 			switch (offset & 3)
 			{
 			case 0:
@@ -115,18 +115,18 @@ void nouspikel_usb_smartmedia_device::usbsm_mem_16_w(offs_t offset, UINT16 data)
 			}
 		}
 		else
-		{	/* FEEPROM */
+		{   /* FEEPROM */
 			if (m_cru_register & FEEPROM_WRITE_ENABLE)
 				strataflash_16_w(m_strata, offset, data);
 		}
 	}
 	else
-	{	/* 0x5000-0x5fff range */
+	{   /* 0x5000-0x5fff range */
 		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x2ff8))
-		{	/* USB controller */
+		{   /* USB controller */
 		}
 		else
-		{	/* SRAM */
+		{   /* SRAM */
 			m_ram[m_sram_page*0x800+(offset-0x2800)] = data;
 		}
 	}
@@ -183,16 +183,16 @@ void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, UINT8 data)
 			m_selected = data;
 			break;
 
-		case 1:			/* enable I/O registers */
-		case 2:			/* enable interrupts */
-		case 3:			/* enable SmartMedia card */
-		case 4:			/* enable FEEPROM writes (and disable reads) */
+		case 1:         /* enable I/O registers */
+		case 2:         /* enable interrupts */
+		case 3:         /* enable SmartMedia card */
+		case 4:         /* enable FEEPROM writes (and disable reads) */
 			if (data)
 				m_cru_register |= 1 << bit;
 			else
 				m_cru_register &= ~ (1 << bit);
 			break;
-		case 5:			/* FEEPROM page */
+		case 5:         /* FEEPROM page */
 		case 6:
 		case 7:
 		case 8:
@@ -209,7 +209,7 @@ void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, UINT8 data)
 				m_feeprom_page &= ~ (1 << (bit-5));
 			break;
 
-		case 16:		/* SRAM page */
+		case 16:        /* SRAM page */
 		case 17:
 		case 18:
 		case 19:
@@ -235,7 +235,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		if (m_tms9995_mode ? (!(offset & 1)) : (offset & 1))
-		{	/* first read triggers 16-bit read cycle */
+		{   /* first read triggers 16-bit read cycle */
 			m_input_latch = usbsm_mem_16_r((offset >> 1)&0xffff);
 		}
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 			m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
 
 		if ((m_tms9995_mode)? (offset & 1) : (!(offset & 1)))
-		{	/* second write triggers 16-bit write cycle */
+		{   /* second write triggers 16-bit write cycle */
 			usbsm_mem_16_w((offset >> 1)&0xffff, m_output_latch);
 		}
 	}
@@ -341,4 +341,3 @@ ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 }
 
 const device_type TI99_USBSM = &device_creator<nouspikel_usb_smartmedia_device>;
-

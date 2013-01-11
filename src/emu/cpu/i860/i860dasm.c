@@ -64,49 +64,49 @@ CPU_DISASSEMBLE( i860 )
 		case 0x00:
 		case 0x01:
 		case 0x04:
-		case 0x05: i860_dasm_ldx(op, tempB);		break;
+		case 0x05: i860_dasm_ldx(op, tempB);        break;
 
 		case 0x03:
-		case 0x07: i860_dasm_stx(op, tempB);		break;
+		case 0x07: i860_dasm_stx(op, tempB);        break;
 
-		case 0x02: i860_dasm_ixfr(op, tempB);		break;
+		case 0x02: i860_dasm_ixfr(op, tempB);       break;
 
-		case 0x06: sprintf(tempB, "(reserved)");	break;
+		case 0x06: sprintf(tempB, "(reserved)");    break;
 
 		case 0x08:
 		case 0x09:
 		case 0x0a:
-		case 0x0b: i860_dasm_fid_fst(op, tempB);	break;
+		case 0x0b: i860_dasm_fid_fst(op, tempB);    break;
 
-		case 0x0d: i860_dasm_flush(op, tempB);		break;
+		case 0x0d: i860_dasm_flush(op, tempB);      break;
 
-		case 0x0f: i860_dasm_pstd(op, tempB);		break;
+		case 0x0f: i860_dasm_pstd(op, tempB);       break;
 
 		case 0x0c:
-		case 0x0e: i860_dasm_ldc_sdc(op, tempB);	break;
+		case 0x0e: i860_dasm_ldc_sdc(op, tempB);    break;
 
-		case 0x10: i860_dasm_bri(op, tempB);		break;
+		case 0x10: i860_dasm_bri(op, tempB);        break;
 
-		case 0x11: i860_dasm_trap(op, tempB);		break;
+		case 0x11: i860_dasm_trap(op, tempB);       break;
 
-		case 0x12: i860_dasm_floating_point_dasm(op, tempB); break;	/* Floating point operation sub-group */
+		case 0x12: i860_dasm_floating_point_dasm(op, tempB); break; /* Floating point operation sub-group */
 
-		case 0x13: i860_dasm_core_dasm(op, tempB);	 break;			/* Core operation sub-group */
+		case 0x13: i860_dasm_core_dasm(op, tempB);   break;         /* Core operation sub-group */
 
 		case 0x14:
 		case 0x15:
 		case 0x16:
-		case 0x17: i860_dasm_bte_btne(op, tempB);	break;
+		case 0x17: i860_dasm_bte_btne(op, tempB);   break;
 
 		case 0x18:
-		case 0x19: i860_dasm_pfidy(op, tempB);		break;
+		case 0x19: i860_dasm_pfidy(op, tempB);      break;
 
 		case 0x1a:
 		case 0x1b:
 		case 0x1c:
 		case 0x1d:
 		case 0x1e:
-		case 0x1f: i860_dasm_CTRL_dasm(op, tempB);  break;			/* CTRL operation sub-group */
+		case 0x1f: i860_dasm_CTRL_dasm(op, tempB);  break;          /* CTRL operation sub-group */
 
 		case 0x20:
 		case 0x21:
@@ -115,24 +115,24 @@ CPU_DISASSEMBLE( i860 )
 		case 0x24:
 		case 0x25:
 		case 0x26:
-		case 0x27: i860_dasm_addu_subu(op, tempB);	break;
+		case 0x27: i860_dasm_addu_subu(op, tempB);  break;
 
 		case 0x28:
 		case 0x29:
 		case 0x2a:
-		case 0x2b: i860_dasm_shl_shr(op, tempB);	break;
+		case 0x2b: i860_dasm_shl_shr(op, tempB);    break;
 
-		case 0x2c: i860_dasm_shrd(op, tempB);		break;
+		case 0x2c: i860_dasm_shrd(op, tempB);       break;
 
-		case 0x2d: i860_dasm_bla(op, tempB);		break;
+		case 0x2d: i860_dasm_bla(op, tempB);        break;
 
 		case 0x2e:
-		case 0x2f: i860_dasm_shra(op, tempB);		break;
+		case 0x2f: i860_dasm_shra(op, tempB);       break;
 
 		case 0x30:
 		case 0x31:
 		case 0x32:
-		case 0x33: i860_dasm_and_andh(op, tempB);	break;
+		case 0x33: i860_dasm_and_andh(op, tempB);   break;
 
 		case 0x34:
 		case 0x35:
@@ -142,14 +142,14 @@ CPU_DISASSEMBLE( i860 )
 		case 0x38:
 		case 0x39:
 		case 0x3a:
-		case 0x3b: i860_dasm_or_orh(op, tempB); 	break;
+		case 0x3b: i860_dasm_or_orh(op, tempB);     break;
 
 		case 0x3c:
 		case 0x3d:
 		case 0x3e:
-		case 0x3f: i860_dasm_xor_xorh(op, tempB);	break;
+		case 0x3f: i860_dasm_xor_xorh(op, tempB);   break;
 
-		default: sprintf(tempB, "(reserved)");		break;
+		default: sprintf(tempB, "(reserved)");      break;
 	}
 
 	/* More Debug */
@@ -183,12 +183,12 @@ static void i860_dasm_core_dasm(const UINT32 op, char* buffer)
 
 	switch(op & 0x0000001f)
 	{
-		case 0x01: i860_dasm_CORE_lock(op, buffer);	  break;
+		case 0x01: i860_dasm_CORE_lock(op, buffer);   break;
 		case 0x02: i860_dasm_CORE_calli(op, buffer);  break;
 		case 0x04: i860_dasm_CORE_intovr(op, buffer); break;
 		case 0x07: i860_dasm_CORE_unlock(op, buffer); break;
 
-		default: sprintf(buffer, "(reserved)");		  break;
+		default: sprintf(buffer, "(reserved)");       break;
 	}
 }
 
@@ -203,12 +203,12 @@ static void i860_dasm_CTRL_dasm(const UINT32 op, char* buffer)
 
 	switch(opc)
 	{
-		case 0x02:			  i860_dasm_CTRL_br(op, buffer);	   break;
-		case 0x03:			  i860_dasm_CTRL_call(op, buffer);	   break;
+		case 0x02:            i860_dasm_CTRL_br(op, buffer);       break;
+		case 0x03:            i860_dasm_CTRL_call(op, buffer);     break;
 		case 0x04: case 0x05: i860_dasm_CTRL_bc_bct(op, buffer);   break;
 		case 0x06: case 0x07: i860_dasm_CTRL_bnc_bnct(op, buffer); break;
 
-		default: sprintf(buffer, "(reserved)");					   break;
+		default: sprintf(buffer, "(reserved)");                    break;
 	}
 }
 
@@ -374,4 +374,3 @@ static void i860_dasm_CTRL_bnc_bnct(const UINT32 op, char* buffer)
 /*******************************/
 /* Floating-Point Instructions */
 /*******************************/
-

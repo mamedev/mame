@@ -20,9 +20,9 @@
 
 static int verbose = VERBOSE;
 
-#define LOG(x)	{ logerror ("%s: ", m_device->cpu_context()); logerror x; logerror ("\n"); }
-#define LOG1(x)	{ if (verbose > 0) LOG(x)}
-#define LOG2(x)	{ if (verbose > 1) LOG(x)}
+#define LOG(x)  { logerror ("%s: ", m_device->cpu_context()); logerror x; logerror ("\n"); }
+#define LOG1(x) { if (verbose > 0) LOG(x)}
+#define LOG2(x) { if (verbose > 1) LOG(x)}
 
 #define  MAINCPU "maincpu"
 
@@ -182,8 +182,8 @@ const device_type THREECOM3C505 = &device_creator<threecom3c505_device>;
 //-------------------------------------------------
 
 threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, THREECOM3C505, "Threecom 3C505", tag, owner, clock),
-	  device_network_interface(mconfig, *this, 10.0f)
+	: device_t(mconfig, THREECOM3C505, "Threecom 3C505", tag, owner, clock),
+		device_network_interface(mconfig, *this, 10.0f)
 {
 	memset(static_cast<threecom3c505_interface *>(this), 0, sizeof(threecom3c505_interface));
 }
@@ -207,10 +207,10 @@ void threecom3c505_device::device_start()
 	m_device = this;
 	LOG1(("start 3COM 3C505"));
 
-	 m_rx_fifo.start(this, RX_FIFO_SIZE, ETH_BUFFER_SIZE);
-	 m_rx_data_buffer.start(this, ETH_BUFFER_SIZE);
-	 m_tx_data_buffer.start(this, ETH_BUFFER_SIZE);
-	 m_program_buffer.start(this, PGM_BUFFER_SIZE);
+		m_rx_fifo.start(this, RX_FIFO_SIZE, ETH_BUFFER_SIZE);
+		m_rx_data_buffer.start(this, ETH_BUFFER_SIZE);
+		m_tx_data_buffer.start(this, ETH_BUFFER_SIZE);
+		m_program_buffer.start(this, PGM_BUFFER_SIZE);
 
 	if (tx_init != NULL)
 	{
@@ -339,7 +339,7 @@ void threecom3c505_device::data_buffer::log(const char * title) const
 	if (verbose > 0)
 	{
 		int i;
-		logerror("%s: %s (length=%02x)", m_device->cpu_context(),	title, m_length);
+		logerror("%s: %s (length=%02x)", m_device->cpu_context(),   title, m_length);
 		for (i = 0; i < m_length; i++)
 		{
 			logerror(" %02x", m_data[i]);
@@ -549,7 +549,7 @@ void threecom3c505_device::log_command()
 		switch (m_command_buffer[0])
 		{
 		case CMD_MC_F9: // 0xf9
-           logerror(" (%02x, length=00)", m_command_buffer[0]);
+			logerror(" (%02x, length=00)", m_command_buffer[0]);
 			break;
 
 		default:
@@ -1438,8 +1438,8 @@ WRITE8_DEVICE_HANDLER( threecom3c505_w )
 
 int threecom3c505_receive(device_t *device, const UINT8 data[], int length)
 {
-	 downcast<threecom3c505_device *> (device)->recv_cb((UINT8 *)data,length);
-	 return 1;
+		downcast<threecom3c505_device *> (device)->recv_cb((UINT8 *)data,length);
+		return 1;
 }
 
 void threecom3c505_set_verbose(int on_off)

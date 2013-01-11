@@ -17,16 +17,16 @@ class btoads_state : public driver_device
 public:
 	btoads_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_audiocpu(*this, "audiocpu"),
-		  m_bsmt(*this, "bsmt"),
-		  m_tlc34076(*this, "tlc34076"),
-		  m_vram_fg0(*this, "vram_fg0", 16),
-		  m_vram_fg1(*this, "vram_fg1", 16),
-		  m_vram_fg_data(*this, "vram_fg_data"),
-		  m_vram_bg0(*this, "vram_bg0"),
-		  m_vram_bg1(*this, "vram_bg1"),
-		  m_sprite_scale(*this, "sprite_scale"),
-		  m_sprite_control(*this, "sprite_control") { }
+			m_audiocpu(*this, "audiocpu"),
+			m_bsmt(*this, "bsmt"),
+			m_tlc34076(*this, "tlc34076"),
+			m_vram_fg0(*this, "vram_fg0", 16),
+			m_vram_fg1(*this, "vram_fg1", 16),
+			m_vram_fg_data(*this, "vram_fg_data"),
+			m_vram_bg0(*this, "vram_bg0"),
+			m_vram_bg1(*this, "vram_bg1"),
+			m_sprite_scale(*this, "sprite_scale"),
+			m_sprite_control(*this, "sprite_control") { }
 
 	// in drivers/btoads
 	DECLARE_WRITE16_MEMBER( main_sound_w );

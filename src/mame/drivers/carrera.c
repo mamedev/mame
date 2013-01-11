@@ -44,7 +44,7 @@ TODO:
 
 */
 
-#define MASTER_CLOCK	XTAL_22_1184MHz
+#define MASTER_CLOCK    XTAL_22_1184MHz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, carrera_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( carrera )
-	PORT_START("IN0")	/* Port 0 */
+	PORT_START("IN0")   /* Port 0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT  )
@@ -104,7 +104,7 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")	/* Port 1 */
+	PORT_START("IN1")   /* Port 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	/* unused / unknown inputs, not dips */
@@ -128,7 +128,7 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/* I suspect the 4 below are the 4xDSWs */
-	PORT_START("IN2")	/* Port 2 */
+	PORT_START("IN2")   /* Port 2 */
 	PORT_DIPNAME( 0x01, 0x01, "2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -154,7 +154,7 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")	/* Port 3 */
+	PORT_START("IN3")   /* Port 3 */
 	PORT_DIPNAME( 0x01, 0x01, "3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN4")	/* Port 4 */
+	PORT_START("IN4")   /* Port 4 */
 	PORT_DIPNAME( 0x01, 0x01, "4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -206,7 +206,7 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN5")	/* Port 5 */
+	PORT_START("IN5")   /* Port 5 */
 	PORT_DIPNAME( 0x01, 0x01, "5" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -287,7 +287,7 @@ void carrera_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int br_bit0, br_bit1, bit0, bit1, r, g, b;
-	int	i;
+	int i;
 
 	for (i = 0; i < 0x20; ++i)
 	{
@@ -312,16 +312,16 @@ void carrera_state::palette_init()
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -371,4 +371,3 @@ ROM_END
 
 
 GAME( 19??, carrera, 0, carrera, carrera, driver_device,0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )
-

@@ -1,7 +1,7 @@
-#define	VRAM_MAX	2
+#define VRAM_MAX    2
 
-#define	SCANLINE_MIN	0
-#define	SCANLINE_MAX	512
+#define SCANLINE_MIN    0
+#define SCANLINE_MAX    512
 
 
 class nbmj9195_state : public driver_device

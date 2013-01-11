@@ -58,22 +58,22 @@
 
 struct z80pio_interface
 {
-	devcb_write_line	m_out_int_cb;
+	devcb_write_line    m_out_int_cb;
 
-	devcb_read8			m_in_pa_cb;
-	devcb_write8		m_out_pa_cb;
-	devcb_write_line	m_out_ardy_cb;
+	devcb_read8         m_in_pa_cb;
+	devcb_write8        m_out_pa_cb;
+	devcb_write_line    m_out_ardy_cb;
 
-	devcb_read8			m_in_pb_cb;
-	devcb_write8		m_out_pb_cb;
-	devcb_write_line	m_out_brdy_cb;
+	devcb_read8         m_in_pb_cb;
+	devcb_write8        m_out_pb_cb;
+	devcb_write_line    m_out_brdy_cb;
 };
 
 
 
 // ======================> z80pio_device
 
-class z80pio_device :	public device_t,
+class z80pio_device :   public device_t,
 						public device_z80daisy_interface,
 						public z80pio_interface
 {
@@ -170,34 +170,34 @@ private:
 	private:
 		void check_interrupts() { m_device->check_interrupts(); }
 
-		z80pio_device *				m_device;
-		int							m_index;
+		z80pio_device *             m_device;
+		int                         m_index;
 
-		devcb_resolved_read8		m_in_p_func;
-		devcb_resolved_write8		m_out_p_func;
-		devcb_resolved_write_line	m_out_rdy_func;
+		devcb_resolved_read8        m_in_p_func;
+		devcb_resolved_write8       m_out_p_func;
+		devcb_resolved_write_line   m_out_rdy_func;
 
-		int m_mode;					// mode register
-		int m_next_control_word;	// next control word
-		UINT8 m_input;				// input latch
-		UINT8 m_output;				// output latch
-		UINT8 m_ior;				// input/output register
-		bool m_rdy;					// ready
-		bool m_stb;					// strobe
+		int m_mode;                 // mode register
+		int m_next_control_word;    // next control word
+		UINT8 m_input;              // input latch
+		UINT8 m_output;             // output latch
+		UINT8 m_ior;                // input/output register
+		bool m_rdy;                 // ready
+		bool m_stb;                 // strobe
 
 		// interrupts
-		bool m_ie;					// interrupt enabled
-		bool m_ip;					// interrupt pending
-		bool m_ius;					// interrupt under service
-		UINT8 m_icw;				// interrupt control word
-		UINT8 m_vector;				// interrupt vector
-		UINT8 m_mask;				// interrupt mask
-		bool m_match;				// logic equation match
+		bool m_ie;                  // interrupt enabled
+		bool m_ip;                  // interrupt pending
+		bool m_ius;                 // interrupt under service
+		UINT8 m_icw;                // interrupt control word
+		UINT8 m_vector;             // interrupt vector
+		UINT8 m_mask;               // interrupt mask
+		bool m_match;               // logic equation match
 	};
 
 	// internal state
-	pio_port					m_port[2];
-	devcb_resolved_write_line	m_out_int_func;
+	pio_port                    m_port[2];
+	devcb_resolved_write_line   m_out_int_func;
 };
 
 

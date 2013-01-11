@@ -16,8 +16,8 @@
 #include "emu.h"
 #include "video/vic4567.h"
 
-#define SPRITE_BASE_X_SIZE		24
-#define SPRITE_BASE_Y_SIZE		21
+#define SPRITE_BASE_X_SIZE      24
+#define SPRITE_BASE_Y_SIZE      21
 
 struct vic3_sprite
 {
@@ -35,12 +35,12 @@ struct vic3_state
 {
 	vic3_type  type;
 
-	screen_device *main_screen;			// screen which sets bitmap properties
+	screen_device *main_screen;         // screen which sets bitmap properties
 
 	device_t *cpu;
 
 	UINT8 reg[0x80];
-	int on;								/* rastering of the screen */
+	int on;                             /* rastering of the screen */
 
 	int lines;
 
@@ -110,100 +110,100 @@ struct vic3_state
 		} \
 	} while (0)
 
-#define VREFRESHINLINES			28
+#define VREFRESHINLINES         28
 
-#define VIC2_YPOS				50
-#define RASTERLINE_2_C64(a)		(a)
-#define C64_2_RASTERLINE(a)		(a)
-#define XPOS				(VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE) / 2)
-#define YPOS				(VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE) / 2 */)
-#define FIRSTLINE				10 /* 36 ((VIC2_VISIBLELINES - VIC2_VSIZE)/2) */
-#define FIRSTCOLUMN			50
+#define VIC2_YPOS               50
+#define RASTERLINE_2_C64(a)     (a)
+#define C64_2_RASTERLINE(a)     (a)
+#define XPOS                (VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE) / 2)
+#define YPOS                (VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE) / 2 */)
+#define FIRSTLINE               10 /* 36 ((VIC2_VISIBLELINES - VIC2_VSIZE)/2) */
+#define FIRSTCOLUMN         50
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
-#define LIGHTPEN_BUTTON		(vic3->lightpen_button_cb(machine))
-#define LIGHTPEN_X_VALUE	(vic3->lightpen_x_cb(machine))
-#define LIGHTPEN_Y_VALUE	(vic3->lightpen_y_cb(machine))
+#define LIGHTPEN_BUTTON     (vic3->lightpen_button_cb(machine))
+#define LIGHTPEN_X_VALUE    (vic3->lightpen_x_cb(machine))
+#define LIGHTPEN_Y_VALUE    (vic3->lightpen_y_cb(machine))
 
 /* lightpen delivers values from internal counters; they do not start with the visual area or frame area */
-#define VIC2_MAME_XPOS			0
-#define VIC2_MAME_YPOS			0
-#define VIC6567_X_BEGIN			38
-#define VIC6567_Y_BEGIN			-6			   /* first 6 lines after retrace not for lightpen! */
-#define VIC6569_X_BEGIN			38
-#define VIC6569_Y_BEGIN			-6
-#define VIC2_X_BEGIN			((vic3->type == VIC4567_PAL) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
-#define VIC2_Y_BEGIN			((vic3->type == VIC4567_PAL) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
-#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE + VIC2_X_BEGIN + VIC2_MAME_XPOS) / 2)
-#define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE + VIC2_Y_BEGIN + VIC2_MAME_YPOS))
+#define VIC2_MAME_XPOS          0
+#define VIC2_MAME_YPOS          0
+#define VIC6567_X_BEGIN         38
+#define VIC6567_Y_BEGIN         -6             /* first 6 lines after retrace not for lightpen! */
+#define VIC6569_X_BEGIN         38
+#define VIC6569_Y_BEGIN         -6
+#define VIC2_X_BEGIN            ((vic3->type == VIC4567_PAL) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
+#define VIC2_Y_BEGIN            ((vic3->type == VIC4567_PAL) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
+#define VIC2_X_VALUE            ((LIGHTPEN_X_VALUE + VIC2_X_BEGIN + VIC2_MAME_XPOS) / 2)
+#define VIC2_Y_VALUE            ((LIGHTPEN_Y_VALUE + VIC2_Y_BEGIN + VIC2_MAME_YPOS))
 
-#define VIC2E_K0_LEVEL			(vic3->reg[0x2f] & 0x01)
-#define VIC2E_K1_LEVEL			(vic3->reg[0x2f] & 0x02)
-#define VIC2E_K2_LEVEL			(vic3->reg[0x2f] & 0x04)
+#define VIC2E_K0_LEVEL          (vic3->reg[0x2f] & 0x01)
+#define VIC2E_K1_LEVEL          (vic3->reg[0x2f] & 0x02)
+#define VIC2E_K2_LEVEL          (vic3->reg[0x2f] & 0x04)
 
 /*#define VIC3_P5_LEVEL (vic3->reg[0x30] & 0x20) */
-#define VIC3_BITPLANES			(vic3->reg[0x31] & 0x10)
-#define VIC3_80COLUMNS			(vic3->reg[0x31] & 0x80)
-#define VIC3_LINES			((vic3->reg[0x31] & 0x19) == 0x19 ? 400 : 200)
-#define VIC3_BITPLANES_WIDTH		(vic3->reg[0x31] & 0x80 ? 640 : 320)
+#define VIC3_BITPLANES          (vic3->reg[0x31] & 0x10)
+#define VIC3_80COLUMNS          (vic3->reg[0x31] & 0x80)
+#define VIC3_LINES          ((vic3->reg[0x31] & 0x19) == 0x19 ? 400 : 200)
+#define VIC3_BITPLANES_WIDTH        (vic3->reg[0x31] & 0x80 ? 640 : 320)
 
 /*#define VIC2E_TEST (vic2[0x30] & 2) */
-#define DOUBLE_CLOCK			(vic3->reg[0x30] & 0x01)
+#define DOUBLE_CLOCK            (vic3->reg[0x30] & 0x01)
 
 /* sprites 0 .. 7 */
-#define SPRITEON(nr)			(vic3->reg[0x15] & (1 << nr))
-#define SPRITE_Y_EXPAND(nr)		(vic3->reg[0x17] & (1 << nr))
-#define SPRITE_Y_SIZE(nr)		(SPRITE_Y_EXPAND(nr) ? 2 * 21 : 21)
-#define SPRITE_X_EXPAND(nr)		(vic3->reg[0x1d] & (1 << nr))
-#define SPRITE_X_SIZE(nr)		(SPRITE_X_EXPAND(nr) ? 2 * 24 : 24)
-#define SPRITE_X_POS(nr)		((vic3->reg[(nr) * 2] | (vic3->reg[0x10] & (1 <<(nr)) ? 0x100 : 0)) - 24 + XPOS)
-#define SPRITE_X_POS2(nr)		(vic3->reg[(nr) * 2] | (vic3->reg[0x10] & (1 <<(nr)) ? 0x100 : 0))
-#define SPRITE_Y_POS(nr)		(vic3->reg[1+2*(nr)] - 50 + YPOS)
-#define SPRITE_Y_POS2(nr)		(vic3->reg[1 + 2 *(nr)])
-#define SPRITE_MULTICOLOR(nr)		(vic3->reg[0x1c] & (1 << nr))
-#define SPRITE_PRIORITY(nr)		(vic3->reg[0x1b] & (1 << nr))
-#define SPRITE_MULTICOLOR1		(vic3->reg[0x25] & 0x0f)
-#define SPRITE_MULTICOLOR2		(vic3->reg[0x26] & 0x0f)
-#define SPRITE_COLOR(nr)		(vic3->reg[0x27+nr] & 0x0f)
-#define SPRITE_ADDR(nr)			(vic3->videoaddr | 0x3f8 | nr)
-#define SPRITE_BG_COLLISION(nr)	(vic3->reg[0x1f] & (1 << nr))
-#define SPRITE_COLLISION(nr)		(vic3->reg[0x1e] & (1 << nr))
+#define SPRITEON(nr)            (vic3->reg[0x15] & (1 << nr))
+#define SPRITE_Y_EXPAND(nr)     (vic3->reg[0x17] & (1 << nr))
+#define SPRITE_Y_SIZE(nr)       (SPRITE_Y_EXPAND(nr) ? 2 * 21 : 21)
+#define SPRITE_X_EXPAND(nr)     (vic3->reg[0x1d] & (1 << nr))
+#define SPRITE_X_SIZE(nr)       (SPRITE_X_EXPAND(nr) ? 2 * 24 : 24)
+#define SPRITE_X_POS(nr)        ((vic3->reg[(nr) * 2] | (vic3->reg[0x10] & (1 <<(nr)) ? 0x100 : 0)) - 24 + XPOS)
+#define SPRITE_X_POS2(nr)       (vic3->reg[(nr) * 2] | (vic3->reg[0x10] & (1 <<(nr)) ? 0x100 : 0))
+#define SPRITE_Y_POS(nr)        (vic3->reg[1+2*(nr)] - 50 + YPOS)
+#define SPRITE_Y_POS2(nr)       (vic3->reg[1 + 2 *(nr)])
+#define SPRITE_MULTICOLOR(nr)       (vic3->reg[0x1c] & (1 << nr))
+#define SPRITE_PRIORITY(nr)     (vic3->reg[0x1b] & (1 << nr))
+#define SPRITE_MULTICOLOR1      (vic3->reg[0x25] & 0x0f)
+#define SPRITE_MULTICOLOR2      (vic3->reg[0x26] & 0x0f)
+#define SPRITE_COLOR(nr)        (vic3->reg[0x27+nr] & 0x0f)
+#define SPRITE_ADDR(nr)         (vic3->videoaddr | 0x3f8 | nr)
+#define SPRITE_BG_COLLISION(nr) (vic3->reg[0x1f] & (1 << nr))
+#define SPRITE_COLLISION(nr)        (vic3->reg[0x1e] & (1 << nr))
 #define SPRITE_SET_BG_COLLISION(nr) (vic3->reg[0x1f] |= (1 << nr))
-#define SPRITE_SET_COLLISION(nr)	(vic3->reg[0x1e] |= (1 << nr))
-#define SPRITE_COLL			(vic3->reg[0x1e])
-#define SPRITE_BG_COLL			(vic3->reg[0x1f])
+#define SPRITE_SET_COLLISION(nr)    (vic3->reg[0x1e] |= (1 << nr))
+#define SPRITE_COLL         (vic3->reg[0x1e])
+#define SPRITE_BG_COLL          (vic3->reg[0x1f])
 
-#define GFXMODE				((vic3->reg[0x11] & 0x60) | (vic3->reg[0x16] & 0x10)) >> 4
-#define SCREENON				(vic3->reg[0x11] & 0x10)
-#define VERTICALPOS			(vic3->reg[0x11] & 0x07)
-#define HORIZONTALPOS			(vic3->reg[0x16] & 0x07)
-#define ECMON				(vic3->reg[0x11] & 0x40)
-#define HIRESON				(vic3->reg[0x11] & 0x20)
-#define MULTICOLORON			(vic3->reg[0x16] & 0x10)
-#define LINES25				(vic3->reg[0x11] & 0x08)		   /* else 24 Lines */
-#define LINES				(LINES25 ? 25 : 24)
-#define YSIZE				(LINES * 8)
-#define COLUMNS40				(vic3->reg[0x16] & 0x08)		   /* else 38 Columns */
-#define COLUMNS				(COLUMNS40 ? 40 : 38)
-#define XSIZE				(COLUMNS * 8)
+#define GFXMODE             ((vic3->reg[0x11] & 0x60) | (vic3->reg[0x16] & 0x10)) >> 4
+#define SCREENON                (vic3->reg[0x11] & 0x10)
+#define VERTICALPOS         (vic3->reg[0x11] & 0x07)
+#define HORIZONTALPOS           (vic3->reg[0x16] & 0x07)
+#define ECMON               (vic3->reg[0x11] & 0x40)
+#define HIRESON             (vic3->reg[0x11] & 0x20)
+#define MULTICOLORON            (vic3->reg[0x16] & 0x10)
+#define LINES25             (vic3->reg[0x11] & 0x08)           /* else 24 Lines */
+#define LINES               (LINES25 ? 25 : 24)
+#define YSIZE               (LINES * 8)
+#define COLUMNS40               (vic3->reg[0x16] & 0x08)           /* else 38 Columns */
+#define COLUMNS             (COLUMNS40 ? 40 : 38)
+#define XSIZE               (COLUMNS * 8)
 
-#define VIDEOADDR				((vic3->reg[0x18] & 0xf0) << (10 - 4))
-#define CHARGENADDR			((vic3->reg[0x18] & 0x0e) << 10)
-#define BITMAPADDR			((data & 0x08) << 10)
+#define VIDEOADDR               ((vic3->reg[0x18] & 0xf0) << (10 - 4))
+#define CHARGENADDR         ((vic3->reg[0x18] & 0x0e) << 10)
+#define BITMAPADDR          ((data & 0x08) << 10)
 
-#define RASTERLINE			(((vic3->reg[0x11] & 0x80) << 1) | vic3->reg[0x12])
+#define RASTERLINE          (((vic3->reg[0x11] & 0x80) << 1) | vic3->reg[0x12])
 
-#define FRAMECOLOR			(vic3->reg[0x20] & 0x0f)
-#define BACKGROUNDCOLOR			(vic3->reg[0x21] & 0x0f)
-#define MULTICOLOR1			(vic3->reg[0x22] & 0x0f)
-#define MULTICOLOR2			(vic3->reg[0x23] & 0x0f)
-#define FOREGROUNDCOLOR			(vic3->reg[0x24] & 0x0f)
+#define FRAMECOLOR          (vic3->reg[0x20] & 0x0f)
+#define BACKGROUNDCOLOR         (vic3->reg[0x21] & 0x0f)
+#define MULTICOLOR1         (vic3->reg[0x22] & 0x0f)
+#define MULTICOLOR2         (vic3->reg[0x23] & 0x0f)
+#define FOREGROUNDCOLOR         (vic3->reg[0x24] & 0x0f)
 
 
-#define VIC2_LINES		(vic3->type == VIC4567_PAL ? VIC6569_LINES : VIC6567_LINES)
-#define VIC2_VISIBLELINES	(vic3->type == VIC4567_PAL ? VIC6569_VISIBLELINES : VIC6567_VISIBLELINES)
-#define VIC2_VISIBLECOLUMNS	(vic3->type == VIC4567_PAL ? VIC6569_VISIBLECOLUMNS : VIC6567_VISIBLECOLUMNS)
+#define VIC2_LINES      (vic3->type == VIC4567_PAL ? VIC6569_LINES : VIC6567_LINES)
+#define VIC2_VISIBLELINES   (vic3->type == VIC4567_PAL ? VIC6569_VISIBLELINES : VIC6567_VISIBLELINES)
+#define VIC2_VISIBLECOLUMNS (vic3->type == VIC4567_PAL ? VIC6569_VISIBLECOLUMNS : VIC6567_VISIBLECOLUMNS)
 #define VIC2_STARTVISIBLELINES ((VIC2_LINES - VIC2_VISIBLELINES)/2)
 #define VIC2_FIRSTRASTERLINE  (vic3->type == VIC4567_PAL ? VIC6569_FIRSTRASTERLINE : VIC6567_FIRSTRASTERLINE)
 #define VIC2_COLUMNS          (vic3->type == VIC4567_PAL ? VIC6569_COLUMNS : VIC6567_COLUMNS)
@@ -286,7 +286,7 @@ static TIMER_CALLBACK(vic3_timer_timeout)
 	//DBG_LOG(3, "vic3 ", ("timer %d timeout\n", which));
 	switch (which)
 	{
-	case 1:						   /* light pen */
+	case 1:                        /* light pen */
 		/* and diode must recognize light */
 		if (1)
 		{
@@ -853,7 +853,7 @@ static void vic3_drawlines( device_t *device, int first, int last, int start_x, 
 				}
 			}
 			else if (SPRITEON(i) && (yoff + ybegin <= SPRITE_Y_POS(i))
-					 && (yoff + yend >= SPRITE_Y_POS(i)))
+						&& (yoff + yend >= SPRITE_Y_POS(i)))
 			{
 				syend = yend;
 				if (SPRITE_Y_EXPAND(i))
@@ -1068,7 +1068,7 @@ static void vic2_drawlines( device_t *device, int first, int last, int start_x, 
 				else
 					vic3_draw_sprite(device, i, 0, 0 , syend, start_x, end_x);
 			}
-			else if 	(SPRITEON (i) &&
+			else if     (SPRITEON (i) &&
 					(yoff + ybegin >= SPRITE_Y_POS (i)) &&
 					(yoff + ybegin - SPRITE_Y_POS (i) < (SPRITE_Y_EXPAND (i)? 21 * 2 : 21 )) &&
 					(SPRITE_Y_POS (i) >= 0))
@@ -1206,7 +1206,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x10:							/* sprite x positions */
+	case 0x10:                          /* sprite x positions */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1221,28 +1221,28 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x17:							/* sprite y size */
+	case 0x17:                          /* sprite y size */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
 		}
 		break;
 
-	case 0x1d:							/* sprite x size */
+	case 0x1d:                          /* sprite x size */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
 		}
 		break;
 
-	case 0x1b:							/* sprite background priority */
+	case 0x1b:                          /* sprite background priority */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
 		}
 		break;
 
-	case 0x1c:							/* sprite multicolor mode select */
+	case 0x1c:                          /* sprite multicolor mode select */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1264,7 +1264,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x25:							/* sprite multicolor */
+	case 0x25:                          /* sprite multicolor */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1272,7 +1272,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x26:							/* sprite multicolor */
+	case 0x26:                          /* sprite multicolor */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1284,9 +1284,9 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		vic3_clear_interrupt(space.machine(), data & 0x0f, vic3);
 		break;
 
-	case 0x1a:							/* irq mask */
+	case 0x1a:                          /* irq mask */
 		vic3->reg[offset] = data;
-		vic3_set_interrupt(space.machine(), 0, vic3);	// beamrider needs this
+		vic3_set_interrupt(space.machine(), 0, vic3);   // beamrider needs this
 		break;
 
 	case 0x11:
@@ -1332,7 +1332,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x21:							/* background color */
+	case 0x21:                          /* background color */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1340,7 +1340,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x22:							/* background color 1 */
+	case 0x22:                          /* background color 1 */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1348,7 +1348,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x23:							/* background color 2 */
+	case 0x23:                          /* background color 2 */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1356,7 +1356,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x24:							/* background color 3 */
+	case 0x24:                          /* background color 3 */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1364,7 +1364,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		}
 		break;
 
-	case 0x20:							/* framecolor */
+	case 0x20:                          /* framecolor */
 		if (vic3->reg[offset] != data)
 		{
 			vic3->reg[offset] = data;
@@ -1448,7 +1448,7 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 		val = vic3->reg[offset] | 0x01;
 		break;
 
-	case 0x19:							/* interrupt flag register */
+	case 0x19:                          /* interrupt flag register */
 		/* vic2_clear_interrupt(0xf); */
 		val = vic3->reg[offset] | 0x70;
 		break;
@@ -1457,13 +1457,13 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 		val = vic3->reg[offset] | 0xf0;
 		break;
 
-	case 0x1e:							/* sprite to sprite collision detect */
+	case 0x1e:                          /* sprite to sprite collision detect */
 		val = vic3->reg[offset];
 		vic3->reg[offset] = 0;
 		vic3_clear_interrupt(space.machine(), 4, vic3);
 		break;
 
-	case 0x1f:							/* sprite to background collision detect */
+	case 0x1f:                          /* sprite to background collision detect */
 		val = vic3->reg[offset];
 		vic3->reg[offset] = 0;
 		vic3_clear_interrupt(space.machine(), 2, vic3);
@@ -1530,7 +1530,7 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 	case 0x3c:
 	case 0x3d:
 	case 0x3e:
-	case 0x3f:						   /* not used */
+	case 0x3f:                         /* not used */
 		val = vic3->reg[offset];
 		DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
 		break;
@@ -1552,70 +1552,70 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 
 
 #define VIC3_MASK(M)                                            \
-    if (M)                                                      \
-    {                                                           \
-        if (M & 0x01)                                           \
-            colors[0] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(0) + offset);        \
-        if (M & 0x02)                                           \
-            colors[1] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(1) + offset) << 1;     \
-        if (M & 0x04)                                           \
-            colors[2] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(2) + offset) << 2;     \
-        if (M & 0x08)                                           \
-            colors[3] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(3) + offset) << 3;     \
-        if (M & 0x10)                                           \
-            colors[4] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(4) + offset) << 4;     \
-        if (M & 0x20)                                           \
-            colors[5] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(5) + offset) << 5;     \
-        if (M & 0x40)                                           \
-            colors[6] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(6) + offset) << 6;     \
-        if (M & 0x80)                                           \
-            colors[7] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(7) + offset) << 7;     \
-        for (i = 7; i >= 0; i--)                                \
-        {                                                       \
-            p = 0;                                              \
-            if (M & 0x01)                                       \
-            {                                                   \
-                p = colors[0] & 0x01;                           \
-                colors[0] >>= 1;                                \
-            }                                                   \
-            if (M & 0x02)                                       \
-            {                                                   \
-                p |= colors[1] & 0x02;                          \
-                colors[1] >>= 1;                                \
-            }                                                   \
-            if (M & 0x04)                                       \
-            {                                                   \
-                p |= colors[2] & 0x04;                          \
-                colors[2] >>= 1;                                \
-            }                                                   \
-            if (M & 0x08)                                       \
-            {                                                   \
-                p |= colors[3] & 0x08;                          \
-                colors[3] >>= 1;                                \
-            }                                                   \
-            if (M & 0x10)                                       \
-            {                                                   \
-                p |= colors[4] & 0x10;                          \
-                colors[4] >>= 1;                                \
-            }                                                   \
-            if (M & 0x20)                                       \
-            {                                                   \
-                p |= colors[5] & 0x20;                          \
-                colors[5] >>= 1;                                \
-            }                                                   \
-            if (M & 0x40)                                       \
-            {                                                   \
-                p |= colors[6] & 0x40;                          \
-                colors[6] >>= 1;                                \
-            }                                                   \
-            if (M & 0x80)                                       \
-            {                                                   \
-                p |= colors[7] & 0x80;                          \
-                colors[7] >>= 1;                                \
-            }                                                   \
-            vic3->bitmap->pix16(YPOS + y, XPOS + x + i) = p; \
-        }                                                       \
-    }
+	if (M)                                                      \
+	{                                                           \
+		if (M & 0x01)                                           \
+			colors[0] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(0) + offset);        \
+		if (M & 0x02)                                           \
+			colors[1] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(1) + offset) << 1;     \
+		if (M & 0x04)                                           \
+			colors[2] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(2) + offset) << 2;     \
+		if (M & 0x08)                                           \
+			colors[3] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(3) + offset) << 3;     \
+		if (M & 0x10)                                           \
+			colors[4] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(4) + offset) << 4;     \
+		if (M & 0x20)                                           \
+			colors[5] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(5) + offset) << 5;     \
+		if (M & 0x40)                                           \
+			colors[6] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(6) + offset) << 6;     \
+		if (M & 0x80)                                           \
+			colors[7] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(7) + offset) << 7;     \
+		for (i = 7; i >= 0; i--)                                \
+		{                                                       \
+			p = 0;                                              \
+			if (M & 0x01)                                       \
+			{                                                   \
+				p = colors[0] & 0x01;                           \
+				colors[0] >>= 1;                                \
+			}                                                   \
+			if (M & 0x02)                                       \
+			{                                                   \
+				p |= colors[1] & 0x02;                          \
+				colors[1] >>= 1;                                \
+			}                                                   \
+			if (M & 0x04)                                       \
+			{                                                   \
+				p |= colors[2] & 0x04;                          \
+				colors[2] >>= 1;                                \
+			}                                                   \
+			if (M & 0x08)                                       \
+			{                                                   \
+				p |= colors[3] & 0x08;                          \
+				colors[3] >>= 1;                                \
+			}                                                   \
+			if (M & 0x10)                                       \
+			{                                                   \
+				p |= colors[4] & 0x10;                          \
+				colors[4] >>= 1;                                \
+			}                                                   \
+			if (M & 0x20)                                       \
+			{                                                   \
+				p |= colors[5] & 0x20;                          \
+				colors[5] >>= 1;                                \
+			}                                                   \
+			if (M & 0x40)                                       \
+			{                                                   \
+				p |= colors[6] & 0x40;                          \
+				colors[6] >>= 1;                                \
+			}                                                   \
+			if (M & 0x80)                                       \
+			{                                                   \
+				p |= colors[7] & 0x80;                          \
+				colors[7] >>= 1;                                \
+			}                                                   \
+			vic3->bitmap->pix16(YPOS + y, XPOS + x + i) = p; \
+		}                                                       \
+	}
 
 #define VIC3_ADDR(a) VIC3_BITPLANE_IADDR(a)
 static void vic3_interlace_draw_block( device_t *device, int x, int y, int offset )
@@ -1673,9 +1673,9 @@ static void vic3_interlace_draw_block( device_t *device, int x, int y, int offse
 		{
 			vic3->bitmap->pix16(YPOS + y, XPOS + x + i) =
 				(colors[0] & 0x01) | (colors[1] & 0x02)
-							 | (colors[2] & 0x04) | (colors[3] & 0x08)
-							 | (colors[4] & 0x10) | (colors[5] & 0x20)
-							 | (colors[6] & 0x40) | (colors[7] & 0x80);
+								| (colors[2] & 0x04) | (colors[3] & 0x08)
+								| (colors[4] & 0x10) | (colors[5] & 0x20)
+								| (colors[6] & 0x40) | (colors[7] & 0x80);
 			colors[0] >>= 1;
 			colors[1] >>= 1;
 			colors[2] >>= 1;
@@ -1745,9 +1745,9 @@ static void vic3_draw_block( device_t *device, int x, int y, int offset )
 		{
 			vic3->bitmap->pix16(YPOS + y, XPOS + x + i) =
 				(colors[0] & 0x01) | (colors[1] & 0x02)
-							 | (colors[2] & 0x04) | (colors[3] & 0x08)
-							 | (colors[4] & 0x10) | (colors[5] & 0x20)
-							 | (colors[6] & 0x40) | (colors[7] & 0x80);
+								| (colors[2] & 0x04) | (colors[3] & 0x08)
+								| (colors[4] & 0x10) | (colors[5] & 0x20)
+								| (colors[6] & 0x40) | (colors[7] & 0x80);
 			colors[0] >>= 1;
 			colors[1] >>= 1;
 			colors[2] >>= 1;
@@ -2184,5 +2184,3 @@ void vic3_device::device_reset()
 {
 	DEVICE_RESET_NAME( vic3 )(this);
 }
-
-

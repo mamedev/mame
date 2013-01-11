@@ -107,10 +107,10 @@ WRITE16_MEMBER( cesclassic_state::lamps_w )
 WRITE16_MEMBER( cesclassic_state::outputs_w )
 {
 	/*
-    -x-- ---- OKI bankswitch
-    --x- ---- probably screen enable
-    ---- --x- coin counter
-    */
+	-x-- ---- OKI bankswitch
+	--x- ---- probably screen enable
+	---- --x- coin counter
+	*/
 	m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 	coin_counter_w(machine(), 0, data & 2);
 	if(data & ~0x62)

@@ -5,7 +5,7 @@ class armedf_state : public driver_device
 public:
 	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") ,
+			m_spriteram(*this, "spriteram") ,
 		m_spr_pal_clut(*this, "spr_pal_clut"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"){ }
@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT16> m_spr_pal_clut;
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_bg_videoram;
-	UINT16 m_legion_cmd[4];	// legiono only!
+	UINT16 m_legion_cmd[4]; // legiono only!
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
@@ -93,8 +93,8 @@ public:
 
 	/* misc */
 	int           m_read_latch;
-	UINT8		  m_mcu_input_snippet;
-	UINT8		  m_mcu_jsr_snippet;
+	UINT8         m_mcu_input_snippet;
+	UINT8         m_mcu_jsr_snippet;
 
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);

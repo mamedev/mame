@@ -56,7 +56,7 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
-	UINT8						m_gfxregion;
+	UINT8                       m_gfxregion;
 	decospr_priority_callback_func m_pricallback;
 	decospr_colour_callback_func m_colcallback;
 	bitmap_ind16 m_sprite_bitmap;// optional sprite bitmap (should be INDEXED16)
@@ -76,8 +76,3 @@ private:
 };
 
 extern const device_type DECO_SPRITE;
-
-
-
-
-

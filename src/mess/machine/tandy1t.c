@@ -160,7 +160,7 @@ static struct
 {
 	UINT8 data[8];
 
-	UINT8 bios_bank;	/* I/O port FFEAh */
+	UINT8 bios_bank;    /* I/O port FFEAh */
 } tandy={ {0}};
 
 WRITE8_HANDLER ( pc_t1t_p37x_w )
@@ -177,11 +177,11 @@ WRITE8_HANDLER ( pc_t1t_p37x_w )
 	}
 }
 
- READ8_HANDLER ( pc_t1t_p37x_r )
+	READ8_HANDLER ( pc_t1t_p37x_r )
 {
 	int data = tandy.data[offset];
 //  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", space.device().safe_pc( ), offset, data));
-    return data;
+	return data;
 }
 
 /* this is for tandy1000hx
@@ -205,7 +205,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		tandy_ppi.portb = data;
 		pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
 		pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
-		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict 
+		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict
 		pc_keyb_set_clock(data&0x48);
 		if ( data & 0x80 )
 		{
@@ -222,7 +222,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	}
 }
 
- READ8_HANDLER(tandy1000_pio_r)
+	READ8_HANDLER(tandy1000_pio_r)
 {
 	int data=0xff;
 	switch (offset)
@@ -266,7 +266,7 @@ READ8_HANDLER( tandy1000_bank_r )
 
 	switch( offset )
 	{
-	case 0x00:	/* FFEA */
+	case 0x00:  /* FFEA */
 		data = tandy.bios_bank;
 		break;
 	}
@@ -281,7 +281,7 @@ WRITE8_HANDLER( tandy1000_bank_w )
 
 	switch( offset )
 	{
-	case 0x00:	/* FFEA */
+	case 0x00:  /* FFEA */
 		tandy.bios_bank = data;
 		tandy1000_set_bios_bank(space.machine());
 		break;
@@ -292,7 +292,7 @@ WRITE8_HANDLER( tandy1000_bank_w )
 
 INPUT_PORTS_START( t1000_keyboard )
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) /* Esc                         01  81 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) /* 1                           02  82 */
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) /* 2                           03  83 */

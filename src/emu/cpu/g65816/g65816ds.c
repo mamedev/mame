@@ -49,28 +49,28 @@ enum
 
 enum
 {
-  ADC ,  AND ,  ASL ,  BCC ,  BCS ,  BEQ ,  BIT ,  BMI ,  BNE ,  BPL ,  BRA ,
-  BRK ,  BRL ,  BVC ,  BVS ,  CLC ,  CLD ,  CLI ,  CLV ,  CMP ,  COP ,  CPX ,
-  CPY ,  DEA ,  DEC ,  DEX ,  DEY ,  EOR ,  INA ,  INC ,  INX ,  INY ,  JML ,
-  JMP ,  JSL ,  JSR ,  LDA ,  LDX ,  LDY ,  LSR ,  MVN ,  MVP ,  NOP ,  ORA ,
-  PEA ,  PEI ,  PER ,  PHA ,  PHB ,  PHD ,  PHK ,  PHP ,  PHX ,  PHY ,  PLA ,
-  PLB ,  PLD ,  PLP ,  PLX ,  PLY ,  REP ,  ROL ,  ROR ,  RTI ,  RTL ,  RTS ,
-  SBC ,  SEC ,  SED ,  SEI ,  SEP ,  STA ,  STP ,  STX ,  STY ,  STZ ,  TAX ,
-  TAY ,  TCS ,  TCD ,  TDC ,  TRB ,  TSB ,  TSC ,  TSX ,  TXA ,  TXS ,  TXY ,
-  TYA ,  TYX ,  WAI ,  WDM ,  XBA ,  XCE
+	ADC ,  AND ,  ASL ,  BCC ,  BCS ,  BEQ ,  BIT ,  BMI ,  BNE ,  BPL ,  BRA ,
+	BRK ,  BRL ,  BVC ,  BVS ,  CLC ,  CLD ,  CLI ,  CLV ,  CMP ,  COP ,  CPX ,
+	CPY ,  DEA ,  DEC ,  DEX ,  DEY ,  EOR ,  INA ,  INC ,  INX ,  INY ,  JML ,
+	JMP ,  JSL ,  JSR ,  LDA ,  LDX ,  LDY ,  LSR ,  MVN ,  MVP ,  NOP ,  ORA ,
+	PEA ,  PEI ,  PER ,  PHA ,  PHB ,  PHD ,  PHK ,  PHP ,  PHX ,  PHY ,  PLA ,
+	PLB ,  PLD ,  PLP ,  PLX ,  PLY ,  REP ,  ROL ,  ROR ,  RTI ,  RTL ,  RTS ,
+	SBC ,  SEC ,  SED ,  SEI ,  SEP ,  STA ,  STP ,  STX ,  STY ,  STZ ,  TAX ,
+	TAY ,  TCS ,  TCD ,  TDC ,  TRB ,  TSB ,  TSC ,  TSX ,  TXA ,  TXS ,  TXY ,
+	TYA ,  TYX ,  WAI ,  WDM ,  XBA ,  XCE
 };
 
 static const char *const g_opnames[] =
 {
- "ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
- "BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",
- "CPY", "DEA", "DEC", "DEX", "DEY", "EOR", "INA", "INC", "INX", "INY", "JML",
- "JMP", "JSL", "JSR", "LDA", "LDX", "LDY", "LSR", "MVN", "MVP", "NOP", "ORA",
- "PEA", "PEI", "PER", "PHA", "PHB", "PHD", "PHK", "PHP", "PHX", "PHY", "PLA",
- "PLB", "PLD", "PLP", "PLX", "PLY", "REP", "ROL", "ROR", "RTI", "RTL", "RTS",
- "SBC", "SEC", "SED", "SEI", "SEP", "STA", "STP", "STX", "STY", "STZ", "TAX",
- "TAY", "TCS", "TCD", "TDC", "TRB", "TSB", "TSC", "TSX", "TXA", "TXS", "TXY",
- "TYA", "TYX", "WAI", "WDM", "XBA", "XCE"
+	"ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
+	"BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",
+	"CPY", "DEA", "DEC", "DEX", "DEY", "EOR", "INA", "INC", "INX", "INY", "JML",
+	"JMP", "JSL", "JSR", "LDA", "LDX", "LDY", "LSR", "MVN", "MVP", "NOP", "ORA",
+	"PEA", "PEI", "PER", "PHA", "PHB", "PHD", "PHK", "PHP", "PHX", "PHY", "PLA",
+	"PLB", "PLD", "PLP", "PLX", "PLY", "REP", "ROL", "ROR", "RTI", "RTL", "RTS",
+	"SBC", "SEC", "SED", "SEI", "SEP", "STA", "STP", "STX", "STY", "STZ", "TAX",
+	"TAY", "TCS", "TCD", "TDC", "TRB", "TSB", "TSC", "TSX", "TXA", "TXS", "TXY",
+	"TYA", "TYX", "WAI", "WDM", "XBA", "XCE"
 };
 
 static const opcode_struct g_opcodes[256] =
@@ -165,30 +165,30 @@ INLINE unsigned int read_24(unsigned int address)
 
 INLINE char* int_8_str(unsigned int val)
 {
-   static char str[20];
+	static char str[20];
 
-   val &= 0xff;
+	val &= 0xff;
 
-   if(val & 0x80)
-      sprintf(str, "-$%x", (0-val) & 0x7f);
-   else
-      sprintf(str, "$%x", val & 0x7f);
+	if(val & 0x80)
+		sprintf(str, "-$%x", (0-val) & 0x7f);
+	else
+		sprintf(str, "$%x", val & 0x7f);
 
-   return str;
+	return str;
 }
 
 INLINE char* int_16_str(unsigned int val)
 {
-   static char str[20];
+	static char str[20];
 
-   val &= 0xffff;
+	val &= 0xffff;
 
-   if(val & 0x8000)
-      sprintf(str, "-$%x", (0-val) & 0x7fff);
-   else
-      sprintf(str, "$%x", val & 0x7fff);
+	if(val & 0x8000)
+		sprintf(str, "-$%x", (0-val) & 0x7fff);
+	else
+		sprintf(str, "$%x", val & 0x7fff);
 
-   return str;
+	return str;
 }
 
 

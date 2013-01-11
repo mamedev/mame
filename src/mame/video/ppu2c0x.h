@@ -25,7 +25,7 @@
 #define PPU_MIRROR_HORZ       2
 #define PPU_MIRROR_HIGH       3
 #define PPU_MIRROR_LOW        4
-#define PPU_MIRROR_4SCREEN    5	// Same effect as NONE, but signals that we should never mirror
+#define PPU_MIRROR_4SCREEN    5 // Same effect as NONE, but signals that we should never mirror
 
 // registers definition
 enum
@@ -128,21 +128,21 @@ struct ppu2c0x_interface
 {
 	const char        *cpu_tag;
 	const char        *screen_tag;
-	int               gfx_layout_number;		/* gfx layout number used by each chip */
-	int               color_base;				/* color base to use per ppu */
-	int               mirroring;				/* mirroring options (PPU_MIRROR_* flag) */
-	ppu2c0x_nmi_cb    nmi_handler;			/* NMI handler */
+	int               gfx_layout_number;        /* gfx layout number used by each chip */
+	int               color_base;               /* color base to use per ppu */
+	int               mirroring;                /* mirroring options (PPU_MIRROR_* flag) */
+	ppu2c0x_nmi_cb    nmi_handler;          /* NMI handler */
 };
 
 
 // ======================> ppu2c0x_device
 
-class ppu2c0x_device :	public device_t,
+class ppu2c0x_device :  public device_t,
 						public device_memory_interface,
 						public ppu2c0x_interface
 {
 public:
-    // construction/destruction
+	// construction/destruction
 	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( read );
@@ -156,7 +156,7 @@ public:
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	// address space configurations
-	const address_space_config		m_space_config;
+	const address_space_config      m_space_config;
 
 
 	/* routines */
@@ -174,7 +174,7 @@ public:
 
 	int get_colorbase() { return m_color_base; };
 	int get_current_scanline() { return m_scanline; };
-	int is_sprite_8x16() { return BIT(m_regs[0], 5); };	// MMC5 has to be able to check this
+	int is_sprite_8x16() { return BIT(m_regs[0], 5); }; // MMC5 has to be able to check this
 	void set_scanline_callback( ppu2c0x_scanline_cb cb ) { if (cb != NULL) m_scanline_callback_proc = cb; };
 	void set_hblank_callback( ppu2c0x_scanline_cb cb ) { if (cb != NULL) m_hblank_callback_proc = cb; };
 	void set_vidaccess_callback( ppu2c0x_vidaccess_cb cb ) { if (cb != NULL) m_vidaccess_callback_proc = cb; };
@@ -185,40 +185,40 @@ public:
 
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
-	cpu_device					*m_cpu;
-	screen_device				*m_screen;
-	bitmap_ind16				*m_bitmap;			/* target bitmap */
-	UINT8                       *m_spriteram;			/* sprite ram */
-	pen_t                       *m_colortable;			/* color table modified at run time */
-	pen_t                       *m_colortable_mono;		/* monochromatic color table modified at run time */
-	int                         m_scanline;			/* scanline count */
-	ppu2c0x_scanline_cb         m_scanline_callback_proc;	/* optional scanline callback */
-	ppu2c0x_hblank_cb           m_hblank_callback_proc;	/* optional hblank callback */
-	ppu2c0x_vidaccess_cb        m_vidaccess_callback_proc;	/* optional video access callback */
-	ppu2c0x_nmi_cb              m_nmi_callback_proc;		/* nmi access callback from interface */
-	int                         m_regs[PPU_MAX_REG];		/* registers */
-	int                         m_refresh_data;			/* refresh-related */
-	int                         m_refresh_latch;		/* refresh-related */
-	int                         m_x_fine;				/* refresh-related */
-	int                         m_toggle;				/* used to latch hi-lo scroll */
-	int                         m_add;				/* vram increment amount */
-	int                         m_videomem_addr;		/* videomem address pointer */
-	int                         m_data_latch;			/* latched videomem data */
+	cpu_device                  *m_cpu;
+	screen_device               *m_screen;
+	bitmap_ind16                *m_bitmap;          /* target bitmap */
+	UINT8                       *m_spriteram;           /* sprite ram */
+	pen_t                       *m_colortable;          /* color table modified at run time */
+	pen_t                       *m_colortable_mono;     /* monochromatic color table modified at run time */
+	int                         m_scanline;         /* scanline count */
+	ppu2c0x_scanline_cb         m_scanline_callback_proc;   /* optional scanline callback */
+	ppu2c0x_hblank_cb           m_hblank_callback_proc; /* optional hblank callback */
+	ppu2c0x_vidaccess_cb        m_vidaccess_callback_proc;  /* optional video access callback */
+	ppu2c0x_nmi_cb              m_nmi_callback_proc;        /* nmi access callback from interface */
+	int                         m_regs[PPU_MAX_REG];        /* registers */
+	int                         m_refresh_data;         /* refresh-related */
+	int                         m_refresh_latch;        /* refresh-related */
+	int                         m_x_fine;               /* refresh-related */
+	int                         m_toggle;               /* used to latch hi-lo scroll */
+	int                         m_add;              /* vram increment amount */
+	int                         m_videomem_addr;        /* videomem address pointer */
+	int                         m_data_latch;           /* latched videomem data */
 	int                         m_buffered_data;
-	int                         m_tile_page;			/* current tile page */
-	int                         m_sprite_page;			/* current sprite page */
-	int                         m_back_color;			/* background color */
+	int                         m_tile_page;            /* current tile page */
+	int                         m_sprite_page;          /* current sprite page */
+	int                         m_back_color;           /* background color */
 	int                         m_color_base;
-	UINT8                       m_palette_ram[0x20];		/* shouldn't be in main memory! */
-	int                         m_scan_scale;			/* scan scale */
-	int                         m_scanlines_per_frame;	/* number of scanlines per frame */
-	int                         m_security_value;		/* 2C05 protection */
+	UINT8                       m_palette_ram[0x20];        /* shouldn't be in main memory! */
+	int                         m_scan_scale;           /* scan scale */
+	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
+	int                         m_security_value;       /* 2C05 protection */
 	void (*m_latch)( device_t *device, offs_t offset );
 
 	// timers
-	emu_timer                   *m_hblank_timer;		/* hblank period at end of each scanline */
-	emu_timer                   *m_nmi_timer;			/* NMI timer */
-	emu_timer                   *m_scanline_timer;		/* scanline timer */
+	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
+	emu_timer                   *m_nmi_timer;           /* NMI timer */
+	emu_timer                   *m_scanline_timer;      /* scanline timer */
 
 	const char        *m_cpu_tag;
 	const char        *m_screen_tag;
@@ -275,14 +275,14 @@ public:
 
 // device type definition
 //extern const device_type PPU_2C0X;
-extern const device_type PPU_2C02;	// NTSC NES
-extern const device_type PPU_2C03B;	// Playchoice 10
-extern const device_type PPU_2C04;	// Vs. Unisystem
-extern const device_type PPU_2C07;	// PAL NES
-extern const device_type PPU_2C05_01;	// Vs. Unisystem (Ninja Jajamaru Kun)
-extern const device_type PPU_2C05_02;	// Vs. Unisystem (Mighty Bomb Jack)
-extern const device_type PPU_2C05_03;	// Vs. Unisystem (Gumshoe)
-extern const device_type PPU_2C05_04;	// Vs. Unisystem (Top Gun)
+extern const device_type PPU_2C02;  // NTSC NES
+extern const device_type PPU_2C03B; // Playchoice 10
+extern const device_type PPU_2C04;  // Vs. Unisystem
+extern const device_type PPU_2C07;  // PAL NES
+extern const device_type PPU_2C05_01;   // Vs. Unisystem (Ninja Jajamaru Kun)
+extern const device_type PPU_2C05_02;   // Vs. Unisystem (Mighty Bomb Jack)
+extern const device_type PPU_2C05_03;   // Vs. Unisystem (Gumshoe)
+extern const device_type PPU_2C05_04;   // Vs. Unisystem (Top Gun)
 
 
 #endif

@@ -3,10 +3,10 @@ static void ppc_dsa(UINT32 op)
 	UINT32 msr = ppc_get_msr();
 
 	msr &= ~(MSR_SA | MSR_EE | MSR_PR | MSR_AP);
-	if (ppc.esasrr & 0x8)	msr |= MSR_PR;
-	if (ppc.esasrr & 0x4)	msr |= MSR_AP;
-	if (ppc.esasrr & 0x2)	msr |= MSR_SA;
-	if (ppc.esasrr & 0x1)	msr |= MSR_EE;
+	if (ppc.esasrr & 0x8)   msr |= MSR_PR;
+	if (ppc.esasrr & 0x4)   msr |= MSR_AP;
+	if (ppc.esasrr & 0x2)   msr |= MSR_SA;
+	if (ppc.esasrr & 0x1)   msr |= MSR_EE;
 
 	ppc_set_msr(msr);
 }
@@ -46,7 +46,7 @@ void ppc602_exception(int exception)
 {
 	switch( exception )
 	{
-		case EXCEPTION_IRQ:		/* External Interrupt */
+		case EXCEPTION_IRQ:     /* External Interrupt */
 			if( ppc_get_msr() & MSR_EE ) {
 				UINT32 msr = ppc_get_msr();
 
@@ -69,7 +69,7 @@ void ppc602_exception(int exception)
 			}
 			break;
 
-		case EXCEPTION_DECREMENTER:		/* Decrementer overflow exception */
+		case EXCEPTION_DECREMENTER:     /* Decrementer overflow exception */
 			if( ppc_get_msr() & MSR_EE ) {
 				UINT32 msr = ppc_get_msr();
 
@@ -92,12 +92,12 @@ void ppc602_exception(int exception)
 			}
 			break;
 
-		case EXCEPTION_TRAP:			/* Program exception / Trap */
+		case EXCEPTION_TRAP:            /* Program exception / Trap */
 			{
 				UINT32 msr = ppc_get_msr();
 
 				SRR0 = ppc.pc;
-				SRR1 = (msr & 0xff73) | 0x20000;	/* 0x20000 = TRAP bit */
+				SRR1 = (msr & 0xff73) | 0x20000;    /* 0x20000 = TRAP bit */
 
 				msr &= ~(MSR_POW | MSR_EE | MSR_PR | MSR_FP | MSR_FE0 | MSR_SE | MSR_BE | MSR_FE1 | MSR_IR | MSR_DR | MSR_RI);
 				if( msr & MSR_ILE )
@@ -112,7 +112,7 @@ void ppc602_exception(int exception)
 			}
 			break;
 
-		case EXCEPTION_SYSTEM_CALL:		/* System call */
+		case EXCEPTION_SYSTEM_CALL:     /* System call */
 			{
 				UINT32 msr = ppc_get_msr();
 
@@ -253,11 +253,11 @@ static CPU_EXECUTE( ppc602 )
 		ppc.npc = ppc.pc + 4;
 		switch(opcode >> 26)
 		{
-			case 19:	ppc.optable19[(opcode >> 1) & 0x3ff](opcode); break;
-			case 31:	ppc.optable31[(opcode >> 1) & 0x3ff](opcode); break;
-			case 59:	ppc.optable59[(opcode >> 1) & 0x3ff](opcode); break;
-			case 63:	ppc.optable63[(opcode >> 1) & 0x3ff](opcode); break;
-			default:	ppc.optable[opcode >> 26](opcode); break;
+			case 19:    ppc.optable19[(opcode >> 1) & 0x3ff](opcode); break;
+			case 31:    ppc.optable31[(opcode >> 1) & 0x3ff](opcode); break;
+			case 59:    ppc.optable59[(opcode >> 1) & 0x3ff](opcode); break;
+			case 63:    ppc.optable63[(opcode >> 1) & 0x3ff](opcode); break;
+			default:    ppc.optable[opcode >> 26](opcode); break;
 		}
 
 		ppc_icount--;
@@ -276,4 +276,4 @@ static CPU_EXECUTE( ppc602 )
 	// update decrementer
 	DEC -= ((ppc_dec_base_icount - ppc_icount) / (bus_freq_multiplier * 2));
 }
-#endif	// PPC_DRC
+#endif  // PPC_DRC

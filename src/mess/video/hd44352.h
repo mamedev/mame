@@ -23,7 +23,7 @@
 
 struct hd44352_interface
 {
-    devcb_write_line	m_on_cb;		// ON line
+	devcb_write_line    m_on_cb;        // ON line
 };
 
 // ======================> hd44352_device
@@ -70,7 +70,7 @@ private:
 	UINT8 m_scroll;
 	UINT32 m_contrast;
 
-	UINT8 m_custom_char[4][8];		// 4 chars * 8 bytes
+	UINT8 m_custom_char[4][8];      // 4 chars * 8 bytes
 	UINT8 m_byte_count;
 	UINT8 m_cursor_status;
 	UINT8 m_cursor[8];
@@ -78,7 +78,7 @@ private:
 	UINT8 m_cursor_y;
 	UINT8 m_cursor_lcd;
 
-	devcb_resolved_write_line m_on;			// ON line callback
+	devcb_resolved_write_line m_on;         // ON line callback
 };
 
 // device type definition

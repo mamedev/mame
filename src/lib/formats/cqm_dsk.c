@@ -180,11 +180,11 @@ FLOPPY_CONSTRUCT( cqm_dsk_construct )
 
 	tag->sector_size      = (header[0x04] << 8) + header[0x03];
 	tag->sector_per_track = header[0x10];
-	tag->heads			  = header[0x12];
-	tag->tracks			  = header[0x5b];
-	tag->sector_base	  = header[0x71] + 1;
-	tag->interleave		  = header[0x74];
-	tag->skew			  = header[0x75];
+	tag->heads            = header[0x12];
+	tag->tracks           = header[0x5b];
+	tag->sector_base      = header[0x71] + 1;
+	tag->interleave       = header[0x74];
+	tag->skew             = header[0x75];
 
 	// header + comment size to position on first data block
 
@@ -225,4 +225,3 @@ FLOPPY_CONSTRUCT( cqm_dsk_construct )
 
 	return FLOPPY_ERROR_SUCCESS;
 }
-

@@ -51,9 +51,9 @@
 //**************************************************************************
 
 // these options are passed into drcuml_alloc() and control global behaviors
-const UINT32 DRCUML_OPTION_USE_C		= 0x0001;		// always use the C back-end
-const UINT32 DRCUML_OPTION_LOG_UML		= 0x0002;		// generate a UML disassembly of each block
-const UINT32 DRCUML_OPTION_LOG_NATIVE	= 0x0004;		// tell the back-end to generate a native disassembly of each block
+const UINT32 DRCUML_OPTION_USE_C        = 0x0001;       // always use the C back-end
+const UINT32 DRCUML_OPTION_LOG_UML      = 0x0002;       // generate a UML disassembly of each block
+const UINT32 DRCUML_OPTION_LOG_NATIVE   = 0x0004;       // tell the back-end to generate a native disassembly of each block
 
 
 
@@ -79,11 +79,11 @@ class drcuml_state;
 union drcuml_ireg
 {
 #ifdef LSB_FIRST
-	struct { UINT32	l,h; } w;				// 32-bit low, high parts of the register
+	struct { UINT32 l,h; } w;               // 32-bit low, high parts of the register
 #else
-	struct { UINT32 h,l; } w;				// 32-bit low, high parts of the register
+	struct { UINT32 h,l; } w;               // 32-bit low, high parts of the register
 #endif
-	UINT64				d;					// 64-bit full register
+	UINT64              d;                  // 64-bit full register
 };
 
 
@@ -91,30 +91,30 @@ union drcuml_ireg
 union drcuml_freg
 {
 #ifdef LSB_FIRST
-	struct { float l,h; } s;				// 32-bit low, high parts of the register
+	struct { float l,h; } s;                // 32-bit low, high parts of the register
 #else
-	struct { float h,l;	} s;				// 32-bit low, high parts of the register
+	struct { float h,l; } s;                // 32-bit low, high parts of the register
 #endif
-	double				d;					// 64-bit full register
+	double              d;                  // 64-bit full register
 };
 
 
 // the collected machine state of a system
 struct drcuml_machine_state
 {
-	drcuml_ireg			r[uml::REG_I_COUNT];	// integer registers
-	drcuml_freg			f[uml::REG_F_COUNT];	// floating-point registers
-	UINT32				exp;				// exception parameter register
-	UINT8				fmod;				// fmod (floating-point mode) register
-	UINT8				flags;				// flags state
+	drcuml_ireg         r[uml::REG_I_COUNT];    // integer registers
+	drcuml_freg         f[uml::REG_F_COUNT];    // floating-point registers
+	UINT32              exp;                // exception parameter register
+	UINT8               fmod;               // fmod (floating-point mode) register
+	UINT8               flags;              // flags state
 };
 
 
 // hints and information about the back-end
 struct drcbe_info
 {
-	UINT8				direct_iregs;		// number of direct-mapped integer registers
-	UINT8				direct_fregs;		// number of direct-mapped floating point registers
+	UINT8               direct_iregs;       // number of direct-mapped integer registers
+	UINT8               direct_fregs;       // number of direct-mapped floating point registers
 };
 
 
@@ -156,12 +156,12 @@ private:
 	const char *get_comment_text(const uml::instruction &inst, astring &comment);
 
 	// internal state
-	drcuml_state &			m_drcuml;			// pointer back to the owning UML
-	drcuml_block *			m_next;				// pointer to next block
-	UINT32					m_nextinst;			// next instruction to fill in the cache
-	UINT32					m_maxinst;			// maximum number of instructions
-	uml::instruction *		m_inst;				// pointer to the instruction list
-	bool					m_inuse;			// this block is in use
+	drcuml_state &          m_drcuml;           // pointer back to the owning UML
+	drcuml_block *          m_next;             // pointer to next block
+	UINT32                  m_nextinst;         // next instruction to fill in the cache
+	UINT32                  m_maxinst;          // maximum number of instructions
+	uml::instruction *      m_inst;             // pointer to the instruction list
+	bool                    m_inuse;            // this block is in use
 };
 
 
@@ -182,12 +182,12 @@ public:
 
 protected:
 	// internal state
-	drcuml_state &			m_drcuml;			// pointer back to our owner
-	drc_cache &				m_cache;			// pointer to the cache
-	device_t &				m_device;			// CPU device we are associated with
-	address_space *			m_space[ADDRESS_SPACES];// pointers to CPU's address space
-	drcuml_machine_state &	m_state;			// state of the machine (in near cache)
-	data_accessors *		m_accessors;		// memory accessors (in near cache)
+	drcuml_state &          m_drcuml;           // pointer back to our owner
+	drc_cache &             m_cache;            // pointer to the cache
+	device_t &              m_device;           // CPU device we are associated with
+	address_space *         m_space[ADDRESS_SPACES];// pointers to CPU's address space
+	drcuml_machine_state &  m_state;            // state of the machine (in near cache)
+	data_accessors *        m_accessors;        // memory accessors (in near cache)
 };
 
 
@@ -237,9 +237,9 @@ private:
 		// construction/destruction
 		symbol(void *base, UINT32 length, const char *name)
 			: m_next(NULL),
-			  m_base(drccodeptr(base)),
-			  m_length(length),
-			  m_name(name) { }
+				m_base(drccodeptr(base)),
+				m_length(length),
+				m_name(name) { }
 
 	public:
 		// getters
@@ -247,20 +247,20 @@ private:
 
 	private:
 		// internal state
-		symbol *				m_next;				// link to the next symbol
-		drccodeptr				m_base;				// base of the symbol
-		UINT32					m_length;			// length of the region covered
-		astring					m_name;				// name of the symbol
+		symbol *                m_next;             // link to the next symbol
+		drccodeptr              m_base;             // base of the symbol
+		UINT32                  m_length;           // length of the region covered
+		astring                 m_name;             // name of the symbol
 	};
 
 	// internal state
-	device_t &					m_device;			// CPU device we are associated with
-	drc_cache &					m_cache;			// pointer to the codegen cache
-	drcbe_interface &			m_beintf;			// backend interface pointer
-	FILE *						m_umllog;			// handle to the UML logfile
-	simple_list<drcuml_block>	m_blocklist;		// list of active blocks
-	simple_list<uml::code_handle> m_handlelist;		// list of active handles
-	simple_list<symbol>			m_symlist;			// list of symbols
+	device_t &                  m_device;           // CPU device we are associated with
+	drc_cache &                 m_cache;            // pointer to the codegen cache
+	drcbe_interface &           m_beintf;           // backend interface pointer
+	FILE *                      m_umllog;           // handle to the UML logfile
+	simple_list<drcuml_block>   m_blocklist;        // list of active blocks
+	simple_list<uml::code_handle> m_handlelist;     // list of active handles
+	simple_list<symbol>         m_symlist;          // list of symbols
 };
 
 

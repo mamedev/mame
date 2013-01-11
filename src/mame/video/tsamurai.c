@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 {
 	UINT8 attributes = m_bg_videoram[2*tile_index+1];
 	int tile_number = m_bg_videoram[2*tile_index];
-	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;	 /* legacy */
+	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
 	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
 	SET_TILE_INFO_MEMBER(
 			0,
@@ -199,13 +199,13 @@ UINT32 tsamurai_state::screen_update_tsamurai(screen_device &screen, bitmap_ind1
 /* end of column scroll code */
 
 	/*
-        This following isn't particularly efficient.  We'd be better off to
-        dynamically change every 8th palette to the background color, so we
-        could draw the background as an opaque tilemap.
+	    This following isn't particularly efficient.  We'd be better off to
+	    dynamically change every 8th palette to the background color, so we
+	    could draw the background as an opaque tilemap.
 
-        Note that the background color register isn't well understood
-        (screenshots would be helpful)
-    */
+	    Note that the background color register isn't well understood
+	    (screenshots would be helpful)
+	*/
 	bitmap.fill(m_bgcolor, cliprect);
 	m_background->draw(bitmap, cliprect, 0,0);
 	draw_sprites(machine(), bitmap,cliprect);

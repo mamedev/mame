@@ -62,18 +62,18 @@
 
 const pia6821_interface apple1_pia0 =
 {
-	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_kbdin),				/* Port A input (keyboard) */
-	DEVCB_NULL,										/* Port B input (display status) */
-	DEVCB_NULL,										/* CA1 input (key pressed) */
-	DEVCB_NULL,										/* CB1 input (display ready) */
-	DEVCB_NULL,										/* CA2 not used as input */
-	DEVCB_NULL,										/* CB2 not used as input */
-	DEVCB_NULL,										/* Port A not used as output */
-	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dspout),				/* Port B output (display) */
-	DEVCB_NULL,										/* CA2 not used as output */
-	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dsp_write_signal),	/* CB2 output (display write) */
-	DEVCB_NULL,										/* IRQA not connected */
-	DEVCB_NULL										/* IRQB not connected */
+	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_kbdin),                /* Port A input (keyboard) */
+	DEVCB_NULL,                                     /* Port B input (display status) */
+	DEVCB_NULL,                                     /* CA1 input (key pressed) */
+	DEVCB_NULL,                                     /* CB1 input (display ready) */
+	DEVCB_NULL,                                     /* CA2 not used as input */
+	DEVCB_NULL,                                     /* CB2 not used as input */
+	DEVCB_NULL,                                     /* Port A not used as output */
+	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dspout),               /* Port B output (display) */
+	DEVCB_NULL,                                     /* CA2 not used as output */
+	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dsp_write_signal), /* CB2 output (display write) */
+	DEVCB_NULL,                                     /* IRQA not connected */
+	DEVCB_NULL                                      /* IRQB not connected */
 };
 
 /* Use the same keyboard mapping as on a modern keyboard.  This is not
@@ -86,7 +86,7 @@ const pia6821_interface apple1_pia0 =
    characters, rather than backspace, and back-arrow is an earlier
    form of the underscore. */
 
-#define ESCAPE	'\x1b'
+#define ESCAPE  '\x1b'
 
 static const UINT8 apple1_unshifted_keymap[] =
 {
@@ -139,15 +139,15 @@ DRIVER_INIT_MEMBER(apple1_state,apple1)
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
 	/* Poll the keyboard input ports periodically.  These include both
-       ordinary keys and the RESET and CLEAR SCREEN pushbutton
-       switches.  We can't handle these switches in a VBLANK_INT or
-       PERIODIC_INT because both switches need to be monitored even
-       while the CPU is suspended during RESET; VBLANK_INT and
-       PERIODIC_INT callbacks aren't run while the CPU is in this
-       state.
+	   ordinary keys and the RESET and CLEAR SCREEN pushbutton
+	   switches.  We can't handle these switches in a VBLANK_INT or
+	   PERIODIC_INT because both switches need to be monitored even
+	   while the CPU is suspended during RESET; VBLANK_INT and
+	   PERIODIC_INT callbacks aren't run while the CPU is in this
+	   state.
 
-       A 120-Hz poll rate seems to be fast enough to ensure no
-       keystrokes are missed. */
+	   A 120-Hz poll rate seems to be fast enough to ensure no
+	   keystrokes are missed. */
 	machine().scheduler().timer_pulse(attotime::from_hz(120), timer_expired_delegate(FUNC(apple1_state::apple1_kbd_poll),this));
 }
 
@@ -188,7 +188,7 @@ static int apple1_verify_header (UINT8 *data)
 	}
 }
 
-#define SNAP_HEADER_LEN			12
+#define SNAP_HEADER_LEN         12
 
 /*****************************************************************************
 **  snapshot_load_apple1
@@ -237,14 +237,14 @@ SNAPSHOT_LOAD(apple1)
 		|| end_addr > 0xEFFF)
 	{
 		logerror("apple1 - Snapshot won't fit in this memory configuration;\n"
-			   "needs memory from $%04X to $%04X.\n", start_addr, end_addr);
+				"needs memory from $%04X to $%04X.\n", start_addr, end_addr);
 		return IMAGE_INIT_FAIL;
 	}
 
 	/* Copy the data into memory space. */
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
-		 addr <= end_addr;
-		 addr++, snapptr++)
+			addr <= end_addr;
+			addr++, snapptr++)
 		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr, *snapptr);
 
 
@@ -276,7 +276,7 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_poll)
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
-       seen during the last scan. */
+	   seen during the last scan. */
 
 	/* First we check the RESET and CLEAR SCREEN pushbutton switches. */
 
@@ -313,8 +313,8 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_poll)
 	}
 
 	/* Now we scan all the input ports for ordinary keys, recording
-       new keypresses while ignoring keys that were already pressed in
-       the last scan. */
+	   new keypresses while ignoring keys that were already pressed in
+	   the last scan. */
 
 	m_kbd_data = 0;
 	key_pressed = 0;
@@ -339,10 +339,10 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_poll)
 				if (newkeys & 1)
 				{
 					m_kbd_data = (ctrlkeys)
-					  ? apple1_control_keymap[port*16 + bit]
-					  : (shiftkeys)
-					  ? apple1_shifted_keymap[port*16 + bit]
-					  : apple1_unshifted_keymap[port*16 + bit];
+						? apple1_control_keymap[port*16 + bit]
+						: (shiftkeys)
+						? apple1_shifted_keymap[port*16 + bit]
+						: apple1_unshifted_keymap[port*16 + bit];
 				}
 				newkeys >>= 1;
 			}
@@ -353,7 +353,7 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_poll)
 	if (key_pressed)
 	{
 		/* The keyboard will pulse its strobe line when a key is
-           pressed.  A 10-usec pulse is typical. */
+		   pressed.  A 10-usec pulse is typical. */
 		pia->ca1_w(1);
 		machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(apple1_state::apple1_kbd_strobe_end),this));
 	}
@@ -374,7 +374,7 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_strobe_end)
 READ8_MEMBER(apple1_state::apple1_pia0_kbdin)
 {
 	/* Bit 7 of the keyboard input is permanently wired high.  This is
-       what the ROM Monitor software expects. */
+	   what the ROM Monitor software expects. */
 	return m_kbd_data | 0x80;
 }
 
@@ -388,19 +388,19 @@ WRITE8_MEMBER(apple1_state::apple1_pia0_dsp_write_signal)
 {
 	device_t *device = machine().device("pia");
 	/* PIA output CB2 is inverted to become the DA signal, used to
-       signal a display write to the video hardware. */
+	   signal a display write to the video hardware. */
 
 	/* DA is directly connected to PIA input PB7, so the processor can
-       read bit 7 of port B to test whether the display has completed
-       a write. */
-    pia6821_device *pia = downcast<pia6821_device *>(device);
+	   read bit 7 of port B to test whether the display has completed
+	   a write. */
+	pia6821_device *pia = downcast<pia6821_device *>(device);
 	pia->portb_w((!data) << 7);
 
 	/* Once DA is asserted, the display will wait until it can perform
-       the write, when the cursor position is about to be refreshed.
-       Only then will it assert \RDA to signal readiness for another
-       write.  Thus the write delay depends on the cursor position and
-       where the display is in the refresh cycle. */
+	   the write, when the cursor position is about to be refreshed.
+	   Only then will it assert \RDA to signal readiness for another
+	   write.  Thus the write delay depends on the cursor position and
+	   where the display is in the refresh cycle. */
 	if (!data)
 		machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(machine()), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_start),this));
 }
@@ -410,9 +410,9 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_start)
 	pia6821_device *pia = machine().device<pia6821_device>("pia");
 
 	/* When the display asserts \RDA to signal it is ready, it
-       triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
-       input CB1.  The end of this pulse will tell the PIA that the
-       display is ready for another write. */
+	   triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
+	   input CB1.  The end of this pulse will tell the PIA that the
+	   display is ready for another write. */
 	pia->cb1_w(0);
 	machine().scheduler().timer_set(attotime::from_nsec(3500), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_end),this));
 }
@@ -422,7 +422,7 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_end)
 	pia6821_device *pia = machine().device<pia6821_device>("pia");
 
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
-       another display write. */
+	   another display write. */
 	pia->cb1_w(1);
 }
 
@@ -502,27 +502,27 @@ READ8_MEMBER(apple1_state::apple1_cassette_r)
 	if (offset <= 0x7f)
 	{
 		/* If the access is to address range $C000-$C07F, the cassette
-           input signal is ignored .  In this case the value read
-           always comes from the corresponding cassette ROM location
-           in $C100-$C17F. */
+		   input signal is ignored .  In this case the value read
+		   always comes from the corresponding cassette ROM location
+		   in $C100-$C17F. */
 
 		return space.read_byte(0xc100 + offset);
 	}
-    else
+	else
 	{
 		/* For accesses to address range $C080-$C0FF, the cassette
-           input signal is enabled.  If the signal is low, the value
-           read comes from the corresponding cassette ROM location in
-           $C180-$C1FF.  If the signal is high, the low bit of the
-           address is masked before the corresponding cassette ROM
-           location is accessed; e.g., a read from $C081 would return
-           the ROM byte at $C180.  The cassette ROM routines detect
-           changes in the cassette input signal by repeatedly reading
-           from $C081 and comparing the values read. */
+		   input signal is enabled.  If the signal is low, the value
+		   read comes from the corresponding cassette ROM location in
+		   $C180-$C1FF.  If the signal is high, the low bit of the
+		   address is masked before the corresponding cassette ROM
+		   location is accessed; e.g., a read from $C081 would return
+		   the ROM byte at $C180.  The cassette ROM routines detect
+		   changes in the cassette input signal by repeatedly reading
+		   from $C081 and comparing the values read. */
 
 		/* (Don't try putting a non-zero "noise threshhold" here,
-           because it can cause tape header bits on real cassette
-           images to be misread as data bits.) */
+		   because it can cause tape header bits on real cassette
+		   images to be misread as data bits.) */
 		if (cassette_device_image(machine())->input() > 0.0)
 			return space.read_byte(0xc100 + (offset & ~1));
 		else
@@ -533,11 +533,11 @@ READ8_MEMBER(apple1_state::apple1_cassette_r)
 WRITE8_MEMBER(apple1_state::apple1_cassette_w)
 {
 	/* Writes toggle the output flip-flop in the same way that reads
-       do; other than that they have no effect.  Any repeated accesses
-       to the cassette I/O address range can be used to write data to
-       cassette, and the cassette ROM always uses reads to do this.
-       However, we still have to handle writes, since they may be done
-       by user code. */
+	   do; other than that they have no effect.  Any repeated accesses
+	   to the cassette I/O address range can be used to write data to
+	   cassette, and the cassette ROM always uses reads to do this.
+	   However, we still have to handle writes, since they may be done
+	   by user code. */
 
 	cassette_toggle_output(machine());
 }

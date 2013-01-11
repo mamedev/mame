@@ -217,9 +217,9 @@ READ8_MEMBER(gridlee_state::analog_port_r)
 
 #define POLY17_BITS 17
 #define POLY17_SIZE ((1 << POLY17_BITS) - 1)
-#define POLY17_SHL	7
-#define POLY17_SHR	10
-#define POLY17_ADD	0x18000
+#define POLY17_SHL  7
+#define POLY17_SHR  10
+#define POLY17_ADD  0x18000
 
 static void poly17_init(running_machine &machine)
 {
@@ -330,24 +330,24 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( gridlee )
-	PORT_START("TRACK0_Y")	/* 9500 (fake) */
+	PORT_START("TRACK0_Y")  /* 9500 (fake) */
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8)
 
-	PORT_START("TRACK0_X")	/* 9501 (fake) */
+	PORT_START("TRACK0_X")  /* 9501 (fake) */
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE
 
-	PORT_START("TRACK1_Y")	/* 9500 (fake) */
+	PORT_START("TRACK1_Y")  /* 9500 (fake) */
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_COCKTAIL
 
-	PORT_START("TRACK1_X")	/* 9501 (fake) */
+	PORT_START("TRACK1_X")  /* 9501 (fake) */
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START("IN0")		/* 9502 */
+	PORT_START("IN0")       /* 9502 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")		/* 9503 */
+	PORT_START("IN1")       /* 9503 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -358,7 +358,7 @@ static INPUT_PORTS_START( gridlee )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ))
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW")		/* 9600 */
+	PORT_START("DSW")       /* 9600 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ))
 	PORT_DIPSETTING(    0x00, "8000 points" )
 	PORT_DIPSETTING(    0x01, "10000 points" )
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( gridlee )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ))
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 
-	PORT_START("IN2")		/* 9700 */
+	PORT_START("IN2")       /* 9700 */
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -402,12 +402,12 @@ static const char *const sample_names[] =
 	"*gridlee",
 	"bounce1",
 	"bounce2",
-	0	/* end of array */
+	0   /* end of array */
 };
 
 static const samples_interface gridlee_samples_interface =
 {
-	8,	/* 8 channels */
+	8,  /* 8 channels */
 	sample_names
 };
 

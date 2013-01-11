@@ -55,18 +55,18 @@
  *
  *************************************/
 
-#define MASTER_CLOCK		(18432000)
-#define SOUND_CLOCK			(6000000)
+#define MASTER_CLOCK        (18432000)
+#define SOUND_CLOCK         (6000000)
 
-#define PIXEL_CLOCK			(MASTER_CLOCK/3)
+#define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
-#define HTOTAL				(384)
-#define HBEND				(0)
-#define HBSTART				(256)
+#define HTOTAL              (384)
+#define HBEND               (0)
+#define HBSTART             (256)
 
-#define VTOTAL				(264)
-#define VBEND				(16)
-#define VBSTART				(240)
+#define VTOTAL              (264)
+#define VBEND               (16)
+#define VBSTART             (240)
 
 
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 
 	switch (offset)
 	{
-		case 0x00:	/* OUT0 */
+		case 0x00:  /* OUT0 */
 
 			/* bit 0: low = clear IRQ on main CPU */
 			/* bit 1: /HTCLR = clear collision detect */
@@ -134,33 +134,33 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 				m_collide = m_collmode = 0;
 			break;
 
-		case 0x01:	/* OUT1 */
+		case 0x01:  /* OUT1 */
 			/* connects to pc3259, pin 23 (read collision data?) */
 			m_collmode++;
 			break;
 
-		case 0x02:	/* OUT2 */
+		case 0x02:  /* OUT2 */
 			/* bit 0-7: MYDH (car X position) */
 			break;
 
-		case 0x03:	/* OUT3 */
+		case 0x03:  /* OUT3 */
 			/* bit 0-7: MYDV (car Y position) */
 			break;
 
-		case 0x04:	/* OUT4 */
+		case 0x04:  /* OUT4 */
 			/* bit 0-3: player car tile select */
 			/* bit 4-7: rain tile select */
 			break;
 
-		case 0x07:	/* OUT7 */
+		case 0x07:  /* OUT7 */
 			/* bit 0-7: rain Y position */
 			break;
 
-		case 0x08:	/* OUT8 */
+		case 0x08:  /* OUT8 */
 			/* bit 0-7: rain X position */
 			break;
 
-		case 0x09:	/* OUT9 */
+		case 0x09:  /* OUT9 */
 			/* bit 0-3: n/c */
 			/* bit 4:   coin lockout */
 			/* bit 5:   Game Over lamp */
@@ -169,7 +169,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			output_set_value("led0", (~data >> 5) & 1);
 			break;
 
-		case 0x0a:	/* OUT10 */
+		case 0x0a:  /* OUT10 */
 			/* bit 0: n/c */
 			/* bit 1: G-12 */
 			/* bit 2: G-S */
@@ -181,11 +181,11 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 				mame_printf_debug("OUT10=%02X\n", data);
 			break;
 
-		case 0x0d:	/* OUT13 */
+		case 0x0d:  /* OUT13 */
 			machine().watchdog_reset();
 			break;
 
-		case 0x0e:	/* OUT14 */
+		case 0x0e:  /* OUT14 */
 			/* O-21 connector */
 			soundlatch_byte_w(space, 0, data);
 			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -217,15 +217,15 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
 			m_ledram[m_ledaddr & 0x07] = m_ledlatch;
 			output_set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
 			/*
-                ledram[0] & 0x0f = score LSD
-                ledram[1] & 0x0f = score
-                ledram[2] & 0x0f = score
-                ledram[3] & 0x0f = score
-                ledram[4] & 0x0f = score MSD
-                ledram[5] & 0x0f = time LSD
-                ledram[6] & 0x0f = time MSD
-                ledram[7] & 0x0f = ???
-            */
+			    ledram[0] & 0x0f = score LSD
+			    ledram[1] & 0x0f = score
+			    ledram[2] & 0x0f = score
+			    ledram[3] & 0x0f = score
+			    ledram[4] & 0x0f = score MSD
+			    ledram[5] & 0x0f = time LSD
+			    ledram[6] & 0x0f = time MSD
+			    ledram[7] & 0x0f = ???
+			*/
 			break;
 	}
 }
@@ -246,54 +246,54 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 
 	switch (offset)
 	{
-		case 0x00:	/* OUT0 */
+		case 0x00:  /* OUT0 */
 			/* bit 0-7: left/right synk bus xscroll LSBs */
 			break;
 
-		case 0x01:	/* OUT1 */
+		case 0x01:  /* OUT1 */
 			/* bit 0: left/right synk bus xscroll MSB */
 			break;
 
-		case 0x02:	/* OUT2 */
+		case 0x02:  /* OUT2 */
 			/* bit 0-7: left synk bus yscroll */
 			break;
 
-		case 0x03:	/* OUT3 */
+		case 0x03:  /* OUT3 */
 			/* bit 0-3: analog tachometer output */
 			/* bit 4:   palette MSB */
 			/* bit 5:   disable the 256H line in the center tilemap */
 			break;
 
-		case 0x04:	/* OUT4 */
+		case 0x04:  /* OUT4 */
 			/* bit 0:   interrupt enable for CPU 1 */
 			if ((diff & 0x01) && !(data & 0x01))
 				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
-		case 0x05:	/* OUT5 - unused */
+		case 0x05:  /* OUT5 - unused */
 			break;
 
-		case 0x06:	/* OUT6 - unused */
+		case 0x06:  /* OUT6 - unused */
 			break;
 
-		case 0x07:	/* OUT7 */
+		case 0x07:  /* OUT7 */
 			/* bit 0-7: right synk bus yscroll */
 			break;
 
-		case 0x08:	/* OUT8 */
+		case 0x08:  /* OUT8 */
 			/* bit 0-7: latches data to main CPU input port 2 */
 			m_comm_latch = data;
 			break;
 
-		case 0x09:	/* OUT9 */
+		case 0x09:  /* OUT9 */
 			/* bit 0-7: center synk bus xscroll LSBs */
 			break;
 
-		case 0x0a:	/* OUTA */
+		case 0x0a:  /* OUTA */
 			/* bit 0: center synk bus xscroll MSB */
 			break;
 
-		case 0x0b:	/* OUTB */
+		case 0x0b:  /* OUTB */
 			/* bit 0-7: center synk bus yscroll */
 			break;
 
@@ -491,11 +491,11 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( grchamp )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,	0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,		0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,		0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0x0000, tile_layout,		0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,		0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,  0, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,       0, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,       0, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0x0000, tile_layout,       0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,     0, 32 )
 GFXDECODE_END
 
 
@@ -577,13 +577,13 @@ static INPUT_PORTS_START( grchamp )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	/* High Score reset switch */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE	/* High Gear */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   /* High Score reset switch */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE   /* High Gear */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )		/* Tilt */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* Service */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )		/* Coin A */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )		/* Coin B */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )       /* Tilt */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )   /* Service */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )      /* Coin A */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )      /* Coin B */
 
 	PORT_START("ACCEL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CODE_INC(KEYCODE_LCONTROL)
@@ -594,7 +594,7 @@ static INPUT_PORTS_START( grchamp )
 	//mask,default,type,sensitivity,delta,min,max
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
@@ -611,7 +611,7 @@ static INPUT_PORTS_START( grchamp )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
@@ -630,25 +630,25 @@ static INPUT_PORTS_START( grchamp )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x02, "Extra Race" )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, "Extra Race" )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "4th" )
 	PORT_DIPSETTING(    0x02, "5th" )
 	PORT_DIPSETTING(    0x01, "6th" )
 	PORT_DIPSETTING(    0x03, "7th" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SW2:3" )	/* Listed as "Unused and should remain in the OFF position" */
-	PORT_DIPNAME( 0x08, 0x00, "RAM Test" )			PORT_DIPLOCATION("SW2:4")
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SW2:3" )  /* Listed as "Unused and should remain in the OFF position" */
+	PORT_DIPNAME( 0x08, 0x00, "RAM Test" )          PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Coin System" )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x00, "Coin System" )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "1 Way" )
 	PORT_DIPSETTING(    0x00, "2 Way" )
-	PORT_DIPNAME( 0x20, 0x00, "Display '1981'" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x00, "Display '1981'" )        PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Display Score" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Display Score" )     PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, "LEDs" )
 	PORT_DIPSETTING(    0x40, "On Screen" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -696,14 +696,14 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)	/* 3B */
+	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)	/* 1B */
+	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
 	MCFG_SOUND_CONFIG(ay8910_interface_3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
@@ -724,43 +724,43 @@ ROM_START( grchamp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gm03",   0x0000, 0x1000, CRC(47fda76e) SHA1(fd5f1a651481669d64e5e0799369c22472265535) )
 	ROM_LOAD( "gm04",   0x1000, 0x1000, CRC(07a623dc) SHA1(bb8a6531d95e996148c06fd336db4054eb1d28dd) )
-	ROM_LOAD( "gm05",	0x2000, 0x1000, CRC(716e1fba) SHA1(fe596873c932513227b982cd23af440d31612de9) )
-	ROM_LOAD( "gm06",	0x3000, 0x1000, CRC(157db30b) SHA1(a74314d3aef4659ea96ed659e5db2883e7ae1cb1) )
+	ROM_LOAD( "gm05",   0x2000, 0x1000, CRC(716e1fba) SHA1(fe596873c932513227b982cd23af440d31612de9) )
+	ROM_LOAD( "gm06",   0x3000, 0x1000, CRC(157db30b) SHA1(a74314d3aef4659ea96ed659e5db2883e7ae1cb1) )
 
 	ROM_REGION( 0x8000, "sub", 0 )
-	ROM_LOAD( "gm09",	0x0000, 0x1000, CRC(d57bd109) SHA1(d1cb5ba783eaceda45893f6404fe9dbac740a2de) )
-	ROM_LOAD( "gm10",	0x1000, 0x1000, CRC(41ba07f1) SHA1(103eeacdd36b4347fc62debb6b5f4163083313f4) )
-	ROM_LOAD( "gr16",	0x5000, 0x1000, CRC(885d708e) SHA1(d5d2978a0eeca167ec1fb9f6f981388de46fbf81) )
-	ROM_LOAD( "gr15",	0x6000, 0x1000, CRC(a822430b) SHA1(4d29612489362d2dc3f3a9eab609902a50c34aff) )
+	ROM_LOAD( "gm09",   0x0000, 0x1000, CRC(d57bd109) SHA1(d1cb5ba783eaceda45893f6404fe9dbac740a2de) )
+	ROM_LOAD( "gm10",   0x1000, 0x1000, CRC(41ba07f1) SHA1(103eeacdd36b4347fc62debb6b5f4163083313f4) )
+	ROM_LOAD( "gr16",   0x5000, 0x1000, CRC(885d708e) SHA1(d5d2978a0eeca167ec1fb9f6f981388de46fbf81) )
+	ROM_LOAD( "gr15",   0x6000, 0x1000, CRC(a822430b) SHA1(4d29612489362d2dc3f3a9eab609902a50c34aff) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gm07",	0x0000, 0x1000, CRC(65dcc572) SHA1(c9b19af365fa7ade2698be0bb892591ba281ecb0) )
-	ROM_LOAD( "gm08",	0x1000, 0x1000, CRC(224d880c) SHA1(68aaaa0213d09cf34ba50c91d8c031d041f8a76f) )
+	ROM_LOAD( "gm07",   0x0000, 0x1000, CRC(65dcc572) SHA1(c9b19af365fa7ade2698be0bb892591ba281ecb0) )
+	ROM_LOAD( "gm08",   0x1000, 0x1000, CRC(224d880c) SHA1(68aaaa0213d09cf34ba50c91d8c031d041f8a76f) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) /* characters/sprites */
-	ROM_LOAD( "gm01",	0x0000, 0x1000, CRC(846f8e89) SHA1(346bfd69268606fde27643b4d135b481536b73b1) )
-	ROM_LOAD( "gm02",	0x1000, 0x1000, CRC(5911948d) SHA1(6f3a9a7f8d6a04b8e6d83756764c9c4185983d9b) )
+	ROM_LOAD( "gm01",   0x0000, 0x1000, CRC(846f8e89) SHA1(346bfd69268606fde27643b4d135b481536b73b1) )
+	ROM_LOAD( "gm02",   0x1000, 0x1000, CRC(5911948d) SHA1(6f3a9a7f8d6a04b8e6d83756764c9c4185983d9b) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 ) /* left tiles */
-	ROM_LOAD( "gr20",	0x0000, 0x1000, CRC(88ba2c03) SHA1(4dfd136f122663223043c6cd79566f8eeec72681) )
-	ROM_LOAD( "gr19",	0x1000, 0x1000, CRC(ff34b444) SHA1(51c67a1691da3a2d8ddcff5fd8fa816b1f9c60c0) )
+	ROM_LOAD( "gr20",   0x0000, 0x1000, CRC(88ba2c03) SHA1(4dfd136f122663223043c6cd79566f8eeec72681) )
+	ROM_LOAD( "gr19",   0x1000, 0x1000, CRC(ff34b444) SHA1(51c67a1691da3a2d8ddcff5fd8fa816b1f9c60c0) )
 
 	ROM_REGION( 0x2000, "gfx3", 0 ) /* right tiles */
-	ROM_LOAD( "gr21",	0x0000, 0x1000, CRC(2f77a9f3) SHA1(9e20a776c5e8c7577c3e8467d4f8ac7ac909901f) )
-	ROM_LOAD( "gr22",	0x1000, 0x1000, CRC(31bb5fc7) SHA1(9f638e632e7c72461bedecb710ac9b30f015eebf) )
+	ROM_LOAD( "gr21",   0x0000, 0x1000, CRC(2f77a9f3) SHA1(9e20a776c5e8c7577c3e8467d4f8ac7ac909901f) )
+	ROM_LOAD( "gr22",   0x1000, 0x1000, CRC(31bb5fc7) SHA1(9f638e632e7c72461bedecb710ac9b30f015eebf) )
 
 	ROM_REGION( 0x2000, "gfx4", 0 ) /* center tiles */
-	ROM_LOAD( "gr13",	0x0000, 0x1000, CRC(d5e19ebd) SHA1(d0ca553eec87619ec489f7ba6238f1fdde7c480b) )
-	ROM_LOAD( "gr14",	0x1000, 0x1000, CRC(d129b8e4) SHA1(db25bfde2a48e14d38a43133d88d479c3cc1397a) )
+	ROM_LOAD( "gr13",   0x0000, 0x1000, CRC(d5e19ebd) SHA1(d0ca553eec87619ec489f7ba6238f1fdde7c480b) )
+	ROM_LOAD( "gr14",   0x1000, 0x1000, CRC(d129b8e4) SHA1(db25bfde2a48e14d38a43133d88d479c3cc1397a) )
 
 	ROM_REGION( 0x0800, "gfx5", 0 ) /* rain */
-	ROM_LOAD( "gr10",	0x0000, 0x0800, CRC(b1f0a873) SHA1(f7ef1a16556ae3e7d70209bcb38ea3ae94208789) )
+	ROM_LOAD( "gr10",   0x0000, 0x0800, CRC(b1f0a873) SHA1(f7ef1a16556ae3e7d70209bcb38ea3ae94208789) )
 
 	ROM_REGION( 0x0800, "gfx6", 0 ) /* headlights */
-	ROM_LOAD( "gr12",	0x0000, 0x0800, CRC(f3bc599e) SHA1(3ec19584896a0bf10b9c5750f3c78ad3e722cc49) )
+	ROM_LOAD( "gr12",   0x0000, 0x0800, CRC(f3bc599e) SHA1(3ec19584896a0bf10b9c5750f3c78ad3e722cc49) )
 
 	ROM_REGION( 0x1000, "gfx7", 0 ) /* player */
-	ROM_LOAD( "gr11",	0x0000, 0x1000, CRC(54eb3ec9) SHA1(22739240f53c708d8e53094d96916778e12beeed) )
+	ROM_LOAD( "gr11",   0x0000, 0x1000, CRC(54eb3ec9) SHA1(22739240f53c708d8e53094d96916778e12beeed) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "gr23.bpr", 0x00, 0x20, CRC(41c6c48d) SHA1(8bd14b5f02f9da0a68e3125955be18462b57401d) ) /* background colors */

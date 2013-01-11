@@ -236,7 +236,7 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		if (x > 0x1f0) x -= 0x200;
 
 		/* sprites use color 0 for background pen and 8 for the 'under tile' pen.
-            The color 8 is used to cover over other sprites. */
+		    The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
 		pdrawgfx_transmask(bitmap, sprite_clip, machine.gfx[1], code, color, flipx, flipy, x, y,
@@ -294,7 +294,7 @@ static void zwackery_update_sprites(running_machine &machine, bitmap_ind16 &bitm
 		if (x <= -32) x += 512;
 
 		/* sprites use color 0 for background pen and 8 for the 'under tile' pen.
-            The color 8 is used to cover over other sprites. */
+		    The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
 		pdrawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, x, y,
@@ -322,7 +322,7 @@ UINT32 mcr68_state::screen_update_mcr68(screen_device &screen, bitmap_ind16 &bit
 	/* draw the low-priority sprites */
 	mcr68_update_sprites(machine(), bitmap, cliprect, 0);
 
-    /* redraw tiles with priority over sprites */
+	/* redraw tiles with priority over sprites */
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 
 	/* draw the high-priority sprites */
@@ -339,7 +339,7 @@ UINT32 mcr68_state::screen_update_zwackery(screen_device &screen, bitmap_ind16 &
 	/* draw the low-priority sprites */
 	zwackery_update_sprites(machine(), bitmap, cliprect, 0);
 
-    /* redraw tiles with priority over sprites */
+	/* redraw tiles with priority over sprites */
 	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
 
 	/* draw the high-priority sprites */

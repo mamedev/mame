@@ -11,8 +11,8 @@
 #include "emu.h"
 #include "ncr539x.h"
 
-#define VERBOSE			(0)
-#define VERBOSE_READS	(0)
+#define VERBOSE         (0)
+#define VERBOSE_READS   (0)
 
 enum
 {
@@ -21,42 +21,42 @@ enum
 	TIMER_539X_END
 };
 
-#define MAIN_STATUS_INTERRUPT		0x80
-#define MAIN_STATUS_ILLEGAL_OPER	0x40
-#define MAIN_STATUS_PARITY_ERROR	0x20
-#define MAIN_STATUS_COUNT_TO_ZERO	0x10
-#define MAIN_STATUS_GROUP_VALID		0x08
-#define MAIN_STATUS_MESSAGE			0x04
-#define MAIN_STATUS_CMD_DATA		0x02
-#define MAIN_STATUS_IO				0x01
+#define MAIN_STATUS_INTERRUPT       0x80
+#define MAIN_STATUS_ILLEGAL_OPER    0x40
+#define MAIN_STATUS_PARITY_ERROR    0x20
+#define MAIN_STATUS_COUNT_TO_ZERO   0x10
+#define MAIN_STATUS_GROUP_VALID     0x08
+#define MAIN_STATUS_MESSAGE         0x04
+#define MAIN_STATUS_CMD_DATA        0x02
+#define MAIN_STATUS_IO              0x01
 
-#define IRQ_STATUS_RESET			0x80
-#define IRQ_STATUS_INVALID_COMMAND	0x40
-#define IRQ_STATUS_DISCONNECTED		0x20
-#define IRQ_STATUS_SERVICE_REQUEST	0x10
-#define IRQ_STATUS_SUCCESS			0x08
-#define IRQ_STATUS_RESELECTED		0x04			// we were reselected as a target
-#define IRQ_STATUS_SELECTED_WITH_ATN	0x02		// we were selected as a target with ATN steps
-#define IRQ_STATUS_SELECTED			0x01			// we were selected as a target
+#define IRQ_STATUS_RESET            0x80
+#define IRQ_STATUS_INVALID_COMMAND  0x40
+#define IRQ_STATUS_DISCONNECTED     0x20
+#define IRQ_STATUS_SERVICE_REQUEST  0x10
+#define IRQ_STATUS_SUCCESS          0x08
+#define IRQ_STATUS_RESELECTED       0x04            // we were reselected as a target
+#define IRQ_STATUS_SELECTED_WITH_ATN    0x02        // we were selected as a target with ATN steps
+#define IRQ_STATUS_SELECTED         0x01            // we were selected as a target
 
-#define CR2_ALIGN_ENABLE			0x80
-#define CR2_FEATURES_ENABLE			0x40
-#define CR2_BYTE_ORDER				0x20
-#define CR2_TRISTATE_DMA			0x10
-#define CR2_SCSI2_ENABLE			0x08
-#define CR2_ABORT_ON_PARITY_ERROR	0x04
-#define CR2_GENERATE_REGISTER_PARITY	0x02
-#define CR2_GENERATE_DATA_PARITY	0x01
+#define CR2_ALIGN_ENABLE            0x80
+#define CR2_FEATURES_ENABLE         0x40
+#define CR2_BYTE_ORDER              0x20
+#define CR2_TRISTATE_DMA            0x10
+#define CR2_SCSI2_ENABLE            0x08
+#define CR2_ABORT_ON_PARITY_ERROR   0x04
+#define CR2_GENERATE_REGISTER_PARITY    0x02
+#define CR2_GENERATE_DATA_PARITY    0x01
 
 #if VERBOSE
 #if VERBOSE_READS
 static const char *rdregs[16] = {
-	"Transfer count LSB",	// 0
+	"Transfer count LSB",   // 0
 	"Transfer count MSB",   // 1
-	"FIFO", 				// 2
-	"Command",  			// 3
-	"Status",   			// 4
-	"Interrupt Status", 	// 5
+	"FIFO",                 // 2
+	"Command",              // 3
+	"Status",               // 4
+	"Interrupt Status",     // 5
 	"Internal State",
 	"Current FIFO/Internal State",
 	"Control Register 1",
@@ -138,7 +138,7 @@ const device_type NCR539X = &device_creator<ncr539x_device>;
 //-------------------------------------------------
 
 ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, NCR539X, "539x SCSI", tag, owner, clock)
+	: device_t(mconfig, NCR539X, "539x SCSI", tag, owner, clock)
 {
 }
 
@@ -238,12 +238,12 @@ void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 
 			switch (m_command & 0x7f)
 			{
-				case 0x41:	// select without ATN steps
+				case 0x41:  // select without ATN steps
 					if (m_scsi_devices[m_last_id])
 					{
 						m_irq_status |= IRQ_STATUS_SERVICE_REQUEST | IRQ_STATUS_SUCCESS;
 						// we should now be in the command phase
-						m_status &= ~7;	// clear bus phases
+						m_status &= ~7; // clear bus phases
 						m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_COMMAND;
 						m_fifo_ptr = 0;
 						m_selected = true;
@@ -270,12 +270,12 @@ void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x42:	// Select with ATN steps
+				case 0x42:  // Select with ATN steps
 					if (m_scsi_devices[m_last_id])
 					{
 						m_irq_status |= IRQ_STATUS_SERVICE_REQUEST | IRQ_STATUS_SUCCESS;
 						// we should now be in the command phase
-						m_status &= ~7;	// clear bus phases
+						m_status &= ~7; // clear bus phases
 						m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_COMMAND;
 						m_fifo_ptr = 0;
 						m_selected = true;
@@ -301,26 +301,26 @@ void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x11:	// initiator command complete
+				case 0x11:  // initiator command complete
 					#if VERBOSE
 					printf("Initiator command complete\n");
 					#endif
 					m_irq_status = IRQ_STATUS_SERVICE_REQUEST;
-					m_status &= ~7;	// clear phase bits
-					m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_DATAIN;	// go to data in phase (?)
+					m_status &= ~7; // clear phase bits
+					m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_DATAIN;  // go to data in phase (?)
 					m_out_irq_func(ASSERT_LINE);
 
 					// this puts status and message bytes into the FIFO (todo: what are these?)
 					m_fifo_ptr = 0;
 					m_xfer_count = 2;
 					m_buffer_remaining = m_total_data = 0;
-					m_fifo[0] = 0;	// status byte
-					m_fifo[1] = 0;	// message byte
+					m_fifo[0] = 0;  // status byte
+					m_fifo[1] = 0;  // message byte
 					m_selected = false;
 					update_fifo_internal_state(2);
 					break;
 
-				case 0x12:	// message accepted
+				case 0x12:  // message accepted
 					#if VERBOSE
 					printf("Message accepted\n");
 					#endif
@@ -405,7 +405,7 @@ READ8_MEMBER( ncr539x_device::read )
 							printf("FIFO empty, asserting service request (buffer_remaining %x)\n", m_buffer_remaining);
 							#endif
 							m_irq_status = IRQ_STATUS_SERVICE_REQUEST;
-							m_status &= 0x7;	// clear everything but the phase bits
+							m_status &= 0x7;    // clear everything but the phase bits
 							m_status |= MAIN_STATUS_INTERRUPT | MAIN_STATUS_COUNT_TO_ZERO;
 							m_out_irq_func(ASSERT_LINE);
 
@@ -468,7 +468,7 @@ READ8_MEMBER( ncr539x_device::read )
 			{
 				if (m_chipid_available)
 				{
-					rv = 0xa2;	// 0x12 for CF94, 0xa2 for CF96
+					rv = 0xa2;  // 0x12 for CF94, 0xa2 for CF96
 				}
 				else
 				{
@@ -512,7 +512,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 
 			switch (data & 0x7f)
 			{
-				case 0x00:	// NOP
+				case 0x00:  // NOP
 					m_irq_status = IRQ_STATUS_SUCCESS;
 					m_status |= MAIN_STATUS_INTERRUPT;
 					m_out_irq_func(ASSERT_LINE);
@@ -524,7 +524,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					}
 					break;
 
-				case 0x01:	// Clear FIFO (must not change buffer state)
+				case 0x01:  // Clear FIFO (must not change buffer state)
 					m_fifo_ptr = 0;
 					update_fifo_internal_state(0);
 					m_irq_status = IRQ_STATUS_SUCCESS;
@@ -532,7 +532,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x02:	// Reset device
+				case 0x02:  // Reset device
 					device_reset();
 
 					m_irq_status = IRQ_STATUS_SUCCESS;
@@ -540,15 +540,15 @@ WRITE8_MEMBER( ncr539x_device::write )
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x03:	// Reset SCSI bus
+				case 0x03:  // Reset SCSI bus
 					m_status = 0;
 					m_irq_status = IRQ_STATUS_SUCCESS;
 					m_status |= MAIN_STATUS_INTERRUPT;
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x10:	// information transfer (must happen immediately)
-					m_status &= 0x7;	// clear everything but the phase bits
+				case 0x10:  // information transfer (must happen immediately)
+					m_status &= 0x7;    // clear everything but the phase bits
 					m_status |= MAIN_STATUS_INTERRUPT;
 					m_irq_status = IRQ_STATUS_SUCCESS;
 
@@ -559,7 +559,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					printf("Information transfer: phase %d buffer remaining %x\n", phase, m_buffer_remaining);
 					#endif
 
-					if (phase == SCSI_PHASE_DATAIN)	// target -> initiator transfer
+					if (phase == SCSI_PHASE_DATAIN) // target -> initiator transfer
 					{
 						int amtToGet = m_buffer_size;
 
@@ -638,7 +638,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x24:	// Terminate steps
+				case 0x24:  // Terminate steps
 					#if VERBOSE
 					printf("Terminate steps\n");
 					#endif
@@ -649,7 +649,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					update_fifo_internal_state(0);
 					break;
 
-				case 0x27:	// Disconnect
+				case 0x27:  // Disconnect
 					#if VERBOSE
 					printf("Disconnect\n");
 					#endif
@@ -658,7 +658,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x44:	// Enable selection/reselection
+				case 0x44:  // Enable selection/reselection
 					#if VERBOSE
 					printf("Enable selection/reselection\n");
 					#endif
@@ -667,12 +667,12 @@ WRITE8_MEMBER( ncr539x_device::write )
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				case 0x47:	// Reselect with ATN3 steps
+				case 0x47:  // Reselect with ATN3 steps
 					if (m_scsi_devices[m_last_id])
 					{
 						m_irq_status |= IRQ_STATUS_SERVICE_REQUEST | IRQ_STATUS_SUCCESS;
 						// we should now be in the command phase
-						m_status &= ~7;	// clear bus phases
+						m_status &= ~7; // clear bus phases
 						m_status |= MAIN_STATUS_INTERRUPT | SCSI_PHASE_COMMAND;
 						m_fifo_ptr = 0;
 						m_selected = true;
@@ -698,7 +698,7 @@ WRITE8_MEMBER( ncr539x_device::write )
 					m_out_irq_func(ASSERT_LINE);
 					break;
 
-				default:	// other commands are not instantaneous
+				default:    // other commands are not instantaneous
 					#if VERBOSE
 					printf("Setting timer for command %02x\n", data);
 					#endif
@@ -787,8 +787,8 @@ void ncr539x_device::exec_fifo()
 	m_buffer_remaining = 0;
 	m_total_data = length;
 
-	m_status &= ~7;	// clear bus phases
-	m_status |= (phase & 7);	// set the phase reported by the device
+	m_status &= ~7; // clear bus phases
+	m_status |= (phase & 7);    // set the phase reported by the device
 }
 
 void ncr539x_device::check_fifo_executable()
@@ -815,7 +815,7 @@ void ncr539x_device::fifo_write(UINT8 data)
 			check_fifo_executable();
 		}
 	}
-	else	// phase is DATAOUT
+	else    // phase is DATAOUT
 	{
 		m_buffer[m_buffer_offset++] = data;
 		m_xfer_count--;

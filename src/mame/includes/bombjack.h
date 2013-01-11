@@ -19,14 +19,14 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
-	tilemap_t	*m_fg_tilemap;
-	tilemap_t	*m_bg_tilemap;
-	UINT8		m_background_image;
+	tilemap_t   *m_fg_tilemap;
+	tilemap_t   *m_bg_tilemap;
+	UINT8       m_background_image;
 
 	/* sound-related */
-	UINT8		m_latch;
+	UINT8       m_latch;
 
-	UINT8		m_nmi_mask;
+	UINT8       m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(bombjack_soundlatch_w);
 	DECLARE_READ8_MEMBER(bombjack_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);

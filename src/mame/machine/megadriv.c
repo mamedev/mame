@@ -191,7 +191,7 @@ void (*megadrive_io_write_data_port_ptr)(running_machine &machine, int offset, U
 */
 
 INPUT_PORTS_START( md_common )
-	PORT_START("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_START("PAD1")      /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -201,7 +201,7 @@ INPUT_PORTS_START( md_common )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") // a
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 START") // start
 
-	PORT_START("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY */
+	PORT_START("PAD2")      /* Joypad 2 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -216,20 +216,20 @@ INPUT_PORTS_END
 INPUT_PORTS_START( megadriv )
 	PORT_INCLUDE( md_common )
 
-	PORT_START("RESET")		/* Buttons on Genesis Console */
+	PORT_START("RESET")     /* Buttons on Genesis Console */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( megadri6 )
 	PORT_INCLUDE( megadriv )
 
-	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Z") // z
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Y") // y
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 X") // x
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 MODE") // mode
 
-	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Z") // z
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Y") // y
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 X") // x
@@ -395,16 +395,16 @@ READ16_HANDLER( megadriv_68k_io_read )
 	UINT8 retdata;
 
 	retdata = 0;
-      /* Charles MacDonald ( http://cgfm2.emuviews.com/ )
-          D7 : Console is 1= Export (USA, Europe, etc.) 0= Domestic (Japan)
-          D6 : Video type is 1= PAL, 0= NTSC
-          D5 : Sega CD unit is 1= not present, 0= connected.
-          D4 : Unused (always returns zero)
-          D3 : Bit 3 of version number
-          D2 : Bit 2 of version number
-          D1 : Bit 1 of version number
-          D0 : Bit 0 of version number
-      */
+		/* Charles MacDonald ( http://cgfm2.emuviews.com/ )
+		  D7 : Console is 1= Export (USA, Europe, etc.) 0= Domestic (Japan)
+		  D6 : Video type is 1= PAL, 0= NTSC
+		  D5 : Sega CD unit is 1= not present, 0= connected.
+		  D4 : Unused (always returns zero)
+		  D3 : Bit 3 of version number
+		  D2 : Bit 2 of version number
+		  D1 : Bit 1 of version number
+		  D0 : Bit 0 of version number
+		*/
 
 	//return (space.machine().rand()&0x0f0f)|0xf0f0;//0x0000;
 	switch (offset)
@@ -412,13 +412,13 @@ READ16_HANDLER( megadriv_68k_io_read )
 		case 0:
 			logerror("%06x read version register\n", space.device().safe_pc());
 			retdata = megadrive_region_export<<7 | // Export
-			          megadrive_region_pal<<6 | // NTSC
-			          (sega_cd_connected?0x00:0x20) | // 0x20 = no sega cd
-			          0x00 | // Unused (Always 0)
-			          0x00 | // Bit 3 of Version Number
-			          0x00 | // Bit 2 of Version Number
-			          0x00 | // Bit 1 of Version Number
-			          0x01 ; // Bit 0 of Version Number
+						megadrive_region_pal<<6 | // NTSC
+						(sega_cd_connected?0x00:0x20) | // 0x20 = no sega cd
+						0x00 | // Unused (Always 0)
+						0x00 | // Bit 3 of Version Number
+						0x00 | // Bit 2 of Version Number
+						0x00 | // Bit 1 of Version Number
+						0x01 ; // Bit 0 of Version Number
 			break;
 
 		/* Joystick Port Registers */
@@ -631,12 +631,12 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 	UINT16 retvalue;
 
 	/* Double Dragon, Shadow of the Beast, Super Off Road, and Time Killers have buggy
-       sound programs.  They request the bus, then have a loop which waits for the bus
-       to be unavailable, checking for a 0 value due to bad coding.  The real hardware
-       appears to return bits of the next instruction in the unused bits, thus meaning
-       the value is never zero.  Time Killers is the most fussy, and doesn't like the
-       read_next_instruction function from system16, so I just return a random value
-       in the unused bits */
+	   sound programs.  They request the bus, then have a loop which waits for the bus
+	   to be unavailable, checking for a 0 value due to bad coding.  The real hardware
+	   appears to return bits of the next instruction in the unused bits, thus meaning
+	   the value is never zero.  Time Killers is the most fussy, and doesn't like the
+	   read_next_instruction function from system16, so I just return a random value
+	   in the unused bits */
 	UINT16 nextvalue = space.machine().rand();//read_next_instruction(space)&0xff00;
 
 
@@ -860,7 +860,7 @@ ADDRESS_MAP_END
 
 // smaller ROM region because some bootlegs check for RAM there
 static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_base_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM	/* Cartridge Program Rom */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
@@ -1137,7 +1137,7 @@ static const sega315_5124_interface sms_vdp_pal_intf =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -1381,21 +1381,21 @@ static void megadriv_init_common(running_machine &machine)
 	// the drivers which need 6 buttons pad set this to 1 in their init befare calling the megadrive init
 	if (megadrive_6buttons_pad)
 	{
-		megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_6button;
+		megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_6button;
 		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_6button;
 		mame_printf_debug("6 button game\n");
 	}
 	else
 	{
-		megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_3button;
+		megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_3button;
 		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_3button;
 		mame_printf_debug("3 button game\n");
 	}
 
 	{
 		/* only really useful on official games, ea games etc. don't bother
-          some games specify a single address, (start 200001, end 200001)
-          this usually means there is serial eeprom instead */
+		  some games specify a single address, (start 200001, end 200001)
+		  this usually means there is serial eeprom instead */
 		int i;
 		UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
@@ -1461,7 +1461,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 DRIVER_INIT_MEMBER(md_base_state,mpnew)
 {
 	DRIVER_INIT_CALL(megadrij);
-	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_3button;
+	megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_3button;
 	megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_3button;
 }
 

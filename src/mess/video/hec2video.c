@@ -140,4 +140,3 @@ UINT32 hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 
 		}
 	return 0;
 }
-

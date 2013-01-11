@@ -11,7 +11,7 @@
 #include "machine/rescap.h"
 
 
-#define	LOG		(0)
+#define LOG     (0)
 
 
 
@@ -130,7 +130,7 @@ attotime ttl74123_device::compute_duration()
 int ttl74123_device::timer_running()
 {
 	return (m_timer->remaining() > attotime::zero) &&
-		   (m_timer->remaining() != attotime::never);
+			(m_timer->remaining() != attotime::never);
 }
 
 
@@ -279,7 +279,7 @@ void ttl74123_device::clear_w(UINT8 data)
 	{
 		start_pulse();
 	}
-	else if (!data)	 /* clear the output  */
+	else if (!data)  /* clear the output  */
 	{
 		m_timer->adjust(attotime::zero);
 

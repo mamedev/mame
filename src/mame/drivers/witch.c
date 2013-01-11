@@ -384,8 +384,8 @@ READ8_MEMBER(witch_state::read_a00x)
 		case 0x02: return m_reg_a002;
 		case 0x04: return ioport("A004")->read();
 		case 0x05: return ioport("A005")->read();
-		case 0x0c: return ioport("SERVICE")->read();	// stats / reset
-		case 0x0e: return ioport("A00E")->read();		// coin/reset
+		case 0x0c: return ioport("SERVICE")->read();    // stats / reset
+		case 0x0e: return ioport("A00E")->read();       // coin/reset
 	}
 
 	if(offset == 0x00) //muxed with A002?
@@ -393,9 +393,9 @@ READ8_MEMBER(witch_state::read_a00x)
 		switch(m_reg_a002 & 0x3f)
 		{
 		case 0x3b:
-			return ioport("UNK")->read();	//bet10 / pay out
+			return ioport("UNK")->read();   //bet10 / pay out
 		case 0x3e:
-			return ioport("INPUTS")->read();	//TODO : trace f564
+			return ioport("INPUTS")->read();    //TODO : trace f564
 		case 0x3d:
 			return ioport("A005")->read();
 		default:
@@ -446,8 +446,8 @@ READ8_MEMBER(witch_state::prot_read_700x)
     Otherwise later in game some I/O (controls) reads are skipped.
 */
 
-  switch(space.device().safe_pc())
-  {
+	switch(space.device().safe_pc())
+	{
 	case 0x23f:
 	case 0x246:
 	case 0x24c:
@@ -455,15 +455,15 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	case 0x258:
 	case 0x25e:
 		return offset;//enough to pass...
-  }
-  return memregion("sub")->base()[0x7000+offset];
+	}
+	return memregion("sub")->base()[0x7000+offset];
 }
 
 /*
  * Status from ES8712?
  * BIT1 is zero when no sample is playing?
  */
-READ8_MEMBER(witch_state::read_8010){	return 0x00; }
+READ8_MEMBER(witch_state::read_8010){   return 0x00; }
 
 WRITE8_MEMBER(witch_state::xscroll_w)
 {
@@ -530,7 +530,7 @@ static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( witch )
-	PORT_START("SERVICE")	/* DSW */
+	PORT_START("SERVICE")   /* DSW */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -551,7 +551,7 @@ static INPUT_PORTS_START( witch )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("A00E")	/* DSW */
+	PORT_START("A00E")  /* DSW */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Key In")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset ?")
@@ -569,7 +569,7 @@ static INPUT_PORTS_START( witch )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("UNK")	/* Not a DSW */
+	PORT_START("UNK")   /* Not a DSW */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -595,7 +595,7 @@ static INPUT_PORTS_START( witch )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("INPUTS")	/* Inputs */
+	PORT_START("INPUTS")    /* Inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small")
@@ -611,8 +611,8 @@ F180 kkkbbppp ; Read onPORT 0xA005
  bb   = MAX BET | 20 ; 30 ; 40 ; 60
  kkk  = KEY IN  | 1-10 ; 1-20 ; 1-40 ; 1-50 ; 1-100 ; 1-200 ; 1-250 ; 1-500
 */
-	PORT_START("A005")	/* DSW "SW2" */
-	PORT_DIPNAME( 0x07, 0x07, "PAY OUT" )	PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_START("A005")  /* DSW "SW2" */
+	PORT_DIPNAME( 0x07, 0x07, "PAY OUT" )   PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "60" )
 	PORT_DIPSETTING(    0x06, "65" )
 	PORT_DIPSETTING(    0x05, "70" )
@@ -621,12 +621,12 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x02, "85" )
 	PORT_DIPSETTING(    0x01, "90" )
 	PORT_DIPSETTING(    0x00, "95" )
-	PORT_DIPNAME( 0x18, 0x00, "MAX BET" )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "MAX BET" )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20" )
 	PORT_DIPSETTING(    0x10, "30" )
 	PORT_DIPSETTING(    0x08, "40" )
 	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPNAME( 0xe0, 0xe0, "KEY IN" )	PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPNAME( 0xe0, 0xe0, "KEY IN" )    PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0xE0, "1-10"  )
 	PORT_DIPSETTING(    0xC0, "1-20"  )
 	PORT_DIPSETTING(    0xA0, "1-40"  )
@@ -640,14 +640,14 @@ F180 kkkbbppp ; Read onPORT 0xA005
  d    = DOUBLE UP | ON ; OFF
  cccc = COIN IN1 | 1-1 ; 1-2 ; 1-3 ; 1-4 ; 1-5 ; 1-6 ; 1-7 ; 1-8 ; 1-9 ; 1-10 ; 1-15 ; 1-20 ; 1-25 ; 1-30 ; 1-40 ; 1-50
 */
-	PORT_START("A004")	/* DSW "SW3" Switches 2-4 not defined in manual */
-	PORT_DIPNAME( 0x01, 0x00, "DOUBLE UP" )		PORT_DIPLOCATION("SW3:1")
+	PORT_START("A004")  /* DSW "SW3" Switches 2-4 not defined in manual */
+	PORT_DIPNAME( 0x01, 0x00, "DOUBLE UP" )     PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPNAME( 0xf0, 0xf0, "COIN IN1" )		PORT_DIPLOCATION("SW3:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, "COIN IN1" )      PORT_DIPLOCATION("SW3:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, "1-1" )
 	PORT_DIPSETTING(    0xe0, "1-2" )
 	PORT_DIPSETTING(    0xd0, "1-3" )
@@ -672,8 +672,8 @@ F180 kkkbbppp ; Read onPORT 0xA005
  tt   = TIME | 40 ; 45 ; 50 ; 55
  s    = DEMO SOUND | ON ; OFF
 */
-	PORT_START("YM_PortA")	/* DSW "SW4" */
-	PORT_DIPNAME( 0x0f, 0x0f, "COIN IN2" )		PORT_DIPLOCATION("SW4:1,2,3,4")
+	PORT_START("YM_PortA")  /* DSW "SW4" */
+	PORT_DIPNAME( 0x0f, 0x0f, "COIN IN2" )      PORT_DIPLOCATION("SW4:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "1-1" )
 	PORT_DIPSETTING(    0x0e, "1-2" )
 	PORT_DIPSETTING(    0x0d, "1-3" )
@@ -690,15 +690,15 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x02, "5-1" )
 	PORT_DIPSETTING(    0x01, "6-1" )
 	PORT_DIPSETTING(    0x00, "10-1" )
-	PORT_DIPNAME( 0x10, 0x00, "PAYOUT SWITCH" )	PORT_DIPLOCATION("SW4:5")
+	PORT_DIPNAME( 0x10, 0x00, "PAYOUT SWITCH" ) PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x00, "TIME" )		PORT_DIPLOCATION("SW4:6,7")
+	PORT_DIPNAME( 0x60, 0x00, "TIME" )      PORT_DIPLOCATION("SW4:6,7")
 	PORT_DIPSETTING(    0x60, "40" )
 	PORT_DIPSETTING(    0x40, "45" )
 	PORT_DIPSETTING(    0x20, "50" )
 	PORT_DIPSETTING(    0x00, "55" )
-	PORT_DIPNAME( 0x80, 0x00, "DEMO SOUND" )	PORT_DIPLOCATION("SW4:8")
+	PORT_DIPNAME( 0x80, 0x00, "DEMO SOUND" )    PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -708,21 +708,21 @@ F180 kkkbbppp ; Read onPORT 0xA005
  ll   = GAME LIMIT | 500 ; 1000 ; 5000 ; 990000
  h    = HOPPER ACTIVE | LOW ; HIGH
 */
-	PORT_START("YM_PortB")	/* DSW "SW5" Switches 5, 6 & 8 undefined in manual */
-	PORT_DIPNAME( 0x01, 0x01, "AUTO BET" )		PORT_DIPLOCATION("SW5:1")
+	PORT_START("YM_PortB")  /* DSW "SW5" Switches 5, 6 & 8 undefined in manual */
+	PORT_DIPNAME( 0x01, 0x01, "AUTO BET" )      PORT_DIPLOCATION("SW5:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "GAME LIMIT" )	PORT_DIPLOCATION("SW5:2,3")
+	PORT_DIPNAME( 0x06, 0x06, "GAME LIMIT" )    PORT_DIPLOCATION("SW5:2,3")
 	PORT_DIPSETTING(    0x06, "500" )
 	PORT_DIPSETTING(    0x04, "1000" )
 	PORT_DIPSETTING(    0x02, "5000" )
 	PORT_DIPSETTING(    0x00, "990000" ) /* 10000 as defined in the Excellent System version manual */
-	PORT_DIPNAME( 0x08, 0x08, "HOPPER" )		PORT_DIPLOCATION("SW5:4")
+	PORT_DIPNAME( 0x08, 0x08, "HOPPER" )        PORT_DIPLOCATION("SW5:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(Low) )
 	PORT_DIPSETTING(    0x00, DEF_STR(High) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW5:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW5:6" )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown Use" )	PORT_DIPLOCATION("SW5:7") /* As defined in the Excellent System version manual */
+	PORT_DIPNAME( 0x40, 0x40, "Unknown Use" )   PORT_DIPLOCATION("SW5:7") /* As defined in the Excellent System version manual */
 	PORT_DIPSETTING(    0x40, "Matrix" )
 	PORT_DIPSETTING(    0x00, "Straight (Normal)" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW5:8" )
@@ -831,12 +831,12 @@ INTERRUPT_GEN_MEMBER(witch_state::witch_sub_interrupt)
 
 static MACHINE_CONFIG_START( witch, witch_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)	/* 3MHz?? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)    /* 3MHz?? */
 	MCFG_CPU_PROGRAM_MAP(map_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_main_interrupt)
 
 	/* 2nd z80 */
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 4)	/* 3MHz?? */
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 4)    /* 3MHz?? */
 	MCFG_CPU_PROGRAM_MAP(map_sub)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_sub_interrupt)
 
@@ -860,11 +860,11 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_SOUND_ADD("essnd", ES8712, 8000) /* ?? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)	/* 1.5MHz?? */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)   /* 1.5MHz?? */
 	MCFG_SOUND_CONFIG(ym2203_interface_0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz / 8)	/* 1.5MHz?? */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz / 8)   /* 1.5MHz?? */
 	MCFG_SOUND_CONFIG(ym2203_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 

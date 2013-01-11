@@ -400,8 +400,8 @@ static FLAC__StreamDecoderInitStatus init_stream_internal_(
 #endif
 
 	/*
-     * get the CPU info and set the function pointers
-     */
+	 * get the CPU info and set the function pointers
+	 */
 	FLAC__cpu_info(&decoder->private_->cpuinfo);
 	/* first default to the non-asm routines */
 	decoder->private_->local_lpc_restore_signal = FLAC__lpc_restore_signal;
@@ -549,10 +549,10 @@ static FLAC__StreamDecoderInitStatus init_FILE_internal_(
 		return decoder->protected_->state = FLAC__STREAM_DECODER_INIT_STATUS_INVALID_CALLBACKS;
 
 	/*
-     * To make sure that our file does not go unclosed after an error, we
-     * must assign the FILE pointer before any further error can occur in
-     * this routine.
-     */
+	 * To make sure that our file does not go unclosed after an error, we
+	 * must assign the FILE pointer before any further error can occur in
+	 * this routine.
+	 */
 	if(file == stdin)
 		file = get_binary_stdin_(); /* just to be safe */
 
@@ -612,10 +612,10 @@ static FLAC__StreamDecoderInitStatus init_file_internal_(
 	FLAC__ASSERT(0 != decoder);
 
 	/*
-     * To make sure that our file does not go unclosed after an error, we
-     * have to do the same entrance checks here that are later performed
-     * in FLAC__stream_decoder_init_FILE() before the FILE* is assigned.
-     */
+	 * To make sure that our file does not go unclosed after an error, we
+	 * have to do the same entrance checks here that are later performed
+	 * in FLAC__stream_decoder_init_FILE() before the FILE* is assigned.
+	 */
 	if(decoder->protected_->state != FLAC__STREAM_DECODER_UNINITIALIZED)
 		return decoder->protected_->state = FLAC__STREAM_DECODER_INIT_STATUS_ALREADY_INITIALIZED;
 
@@ -667,8 +667,8 @@ FLAC_API FLAC__bool FLAC__stream_decoder_finish(FLAC__StreamDecoder *decoder)
 		return true;
 
 	/* see the comment in FLAC__seekable_stream_decoder_reset() as to why we
-     * always call FLAC__MD5Final()
-     */
+	 * always call FLAC__MD5Final()
+	 */
 	FLAC__MD5Final(decoder->private_->computed_md5sum, &decoder->private_->md5context);
 
 	if(decoder->private_->has_seek_table && 0 != decoder->private_->seek_table.data.seek_table.points) {
@@ -679,11 +679,11 @@ FLAC_API FLAC__bool FLAC__stream_decoder_finish(FLAC__StreamDecoder *decoder)
 	FLAC__bitreader_free(decoder->private_->input);
 	for(i = 0; i < FLAC__MAX_CHANNELS; i++) {
 		/* WATCHOUT:
-         * FLAC__lpc_restore_signal_asm_ia32_mmx() requires that the
-         * output arrays have a buffer of up to 3 zeroes in front
-         * (at negative indices) for alignment purposes; we use 4
-         * to keep the data well-aligned.
-         */
+		 * FLAC__lpc_restore_signal_asm_ia32_mmx() requires that the
+		 * output arrays have a buffer of up to 3 zeroes in front
+		 * (at negative indices) for alignment purposes; we use 4
+		 * to keep the data well-aligned.
+		 */
 		if(0 != decoder->private_->output[i]) {
 			free(decoder->private_->output[i]-4);
 			decoder->private_->output[i] = 0;
@@ -987,10 +987,10 @@ FLAC_API FLAC__bool FLAC__stream_decoder_reset(FLAC__StreamDecoder *decoder)
 #endif
 
 	/* Rewind if necessary.  If FLAC__stream_decoder_init() is calling us,
-     * (internal_reset_hack) don't try to rewind since we are already at
-     * the beginning of the stream and don't want to fail if the input is
-     * not seekable.
-     */
+	 * (internal_reset_hack) don't try to rewind since we are already at
+	 * the beginning of the stream and don't want to fail if the input is
+	 * not seekable.
+	 */
 	if(!decoder->private_->internal_reset_hack) {
 		if(decoder->private_->file == stdin)
 			return false; /* can't rewind stdin, reset fails */
@@ -1010,17 +1010,17 @@ FLAC_API FLAC__bool FLAC__stream_decoder_reset(FLAC__StreamDecoder *decoder)
 	}
 	decoder->private_->do_md5_checking = decoder->protected_->md5_checking;
 	/*
-     * This goes in reset() and not flush() because according to the spec, a
-     * fixed-blocksize stream must stay that way through the whole stream.
-     */
+	 * This goes in reset() and not flush() because according to the spec, a
+	 * fixed-blocksize stream must stay that way through the whole stream.
+	 */
 	decoder->private_->fixed_block_size = decoder->private_->next_fixed_block_size = 0;
 
 	/* We initialize the FLAC__MD5Context even though we may never use it.  This
-     * is because md5 checking may be turned on to start and then turned off if
-     * a seek occurs.  So we init the context here and finalize it in
-     * FLAC__stream_decoder_finish() to make sure things are always cleaned up
-     * properly.
-     */
+	 * is because md5 checking may be turned on to start and then turned off if
+	 * a seek occurs.  So we init the context here and finalize it in
+	 * FLAC__stream_decoder_finish() to make sure things are always cleaned up
+	 * properly.
+	 */
 	FLAC__MD5Init(&decoder->private_->md5context);
 
 	decoder->private_->first_frame_offset = 0;
@@ -1276,11 +1276,11 @@ void set_defaults_(FLAC__StreamDecoder *decoder)
  */
 FILE *get_binary_stdin_(void)
 {
-    #if 0
+	#if 0
 	/* if something breaks here it is probably due to the presence or
-     * absence of an underscore before the identifiers 'setmode',
-     * 'fileno', and/or 'O_BINARY'; check your system header files.
-     */
+	 * absence of an underscore before the identifiers 'setmode',
+	 * 'fileno', and/or 'O_BINARY'; check your system header files.
+	 */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdin), _O_BINARY);
 #elif defined __CYGWIN__
@@ -1289,7 +1289,7 @@ FILE *get_binary_stdin_(void)
 #elif defined __EMX__
 	setmode(fileno(stdin), O_BINARY);
 #endif
-    #endif
+	#endif
 	return stdin;
 }
 
@@ -1316,11 +1316,11 @@ FLAC__bool allocate_output_(FLAC__StreamDecoder *decoder, unsigned size, unsigne
 
 	for(i = 0; i < channels; i++) {
 		/* WATCHOUT:
-         * FLAC__lpc_restore_signal_asm_ia32_mmx() requires that the
-         * output arrays have a buffer of up to 3 zeroes in front
-         * (at negative indices) for alignment purposes; we use 4
-         * to keep the data well-aligned.
-         */
+		 * FLAC__lpc_restore_signal_asm_ia32_mmx() requires that the
+		 * output arrays have a buffer of up to 3 zeroes in front
+		 * (at negative indices) for alignment purposes; we use 4
+		 * to keep the data well-aligned.
+		 */
 		tmp = (FLAC__int32*)safe_malloc_muladd2_(sizeof(FLAC__int32), /*times (*/size, /*+*/4/*)*/);
 		if(tmp == 0) {
 			decoder->protected_->state = FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR;
@@ -1330,8 +1330,8 @@ FLAC__bool allocate_output_(FLAC__StreamDecoder *decoder, unsigned size, unsigne
 		decoder->private_->output[i] = tmp + 4;
 
 		/* WATCHOUT:
-         * minimum of quadword alignment for PPC vector optimizations is REQUIRED:
-         */
+		 * minimum of quadword alignment for PPC vector optimizations is REQUIRED:
+		 */
 		if(!FLAC__memory_alloc_aligned_int32_array(size, &decoder->private_->residual_unaligned[i], &decoder->private_->residual[i])) {
 			decoder->protected_->state = FLAC__STREAM_DECODER_MEMORY_ALLOCATION_ERROR;
 			return false;
@@ -2012,8 +2012,8 @@ FLAC__bool read_frame_(FLAC__StreamDecoder *decoder, FLAC__bool *got_a_frame, FL
 		return false;
 	for(channel = 0; channel < decoder->private_->frame.header.channels; channel++) {
 		/*
-         * first figure the correct bits-per-sample of the subframe
-         */
+		 * first figure the correct bits-per-sample of the subframe
+		 */
 		unsigned bps = decoder->private_->frame.header.bits_per_sample;
 		switch(decoder->private_->frame.header.channel_assignment) {
 			case FLAC__CHANNEL_ASSIGNMENT_INDEPENDENT:
@@ -2038,8 +2038,8 @@ FLAC__bool read_frame_(FLAC__StreamDecoder *decoder, FLAC__bool *got_a_frame, FL
 				FLAC__ASSERT(0);
 		}
 		/*
-         * now read it
-         */
+		 * now read it
+		 */
 		if(!read_subframe_(decoder, channel, bps, do_full_decode))
 			return false;
 		if(decoder->protected_->state == FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC) /* means bad sync or got corruption */
@@ -2051,8 +2051,8 @@ FLAC__bool read_frame_(FLAC__StreamDecoder *decoder, FLAC__bool *got_a_frame, FL
 		return true;
 
 	/*
-     * Read the frame CRC-16 from the footer and check
-     */
+	 * Read the frame CRC-16 from the footer and check
+	 */
 	frame_crc = FLAC__bitreader_get_read_crc16(decoder->private_->input);
 	if(!FLAC__bitreader_read_raw_uint32(decoder->private_->input, &x, FLAC__FRAME_FOOTER_CRC_LEN))
 		return false; /* read_callback_ sets the state for us */
@@ -2154,27 +2154,27 @@ FLAC__bool read_frame_header_(FLAC__StreamDecoder *decoder)
 		is_unparseable = true;
 
 	/*
-     * Note that along the way as we read the header, we look for a sync
-     * code inside.  If we find one it would indicate that our original
-     * sync was bad since there cannot be a sync code in a valid header.
-     *
-     * Three kinds of things can go wrong when reading the frame header:
-     *  1) We may have sync'ed incorrectly and not landed on a frame header.
-     *     If we don't find a sync code, it can end up looking like we read
-     *     a valid but unparseable header, until getting to the frame header
-     *     CRC.  Even then we could get a false positive on the CRC.
-     *  2) We may have sync'ed correctly but on an unparseable frame (from a
-     *     future encoder).
-     *  3) We may be on a damaged frame which appears valid but unparseable.
-     *
-     * For all these reasons, we try and read a complete frame header as
-     * long as it seems valid, even if unparseable, up until the frame
-     * header CRC.
-     */
+	 * Note that along the way as we read the header, we look for a sync
+	 * code inside.  If we find one it would indicate that our original
+	 * sync was bad since there cannot be a sync code in a valid header.
+	 *
+	 * Three kinds of things can go wrong when reading the frame header:
+	 *  1) We may have sync'ed incorrectly and not landed on a frame header.
+	 *     If we don't find a sync code, it can end up looking like we read
+	 *     a valid but unparseable header, until getting to the frame header
+	 *     CRC.  Even then we could get a false positive on the CRC.
+	 *  2) We may have sync'ed correctly but on an unparseable frame (from a
+	 *     future encoder).
+	 *  3) We may be on a damaged frame which appears valid but unparseable.
+	 *
+	 * For all these reasons, we try and read a complete frame header as
+	 * long as it seems valid, even if unparseable, up until the frame
+	 * header CRC.
+	 */
 
 	/*
-     * read in the raw header as bytes so we can CRC it, and parse it on the way
-     */
+	 * read in the raw header as bytes so we can CRC it, and parse it on the way
+	 */
 	for(i = 0; i < 2; i++) {
 		if(!FLAC__bitreader_read_raw_uint32(decoder->private_->input, &x, 8))
 			return false; /* read_callback_ sets the state for us */
@@ -2465,8 +2465,8 @@ FLAC__bool read_subframe_(FLAC__StreamDecoder *decoder, unsigned channel, unsign
 		decoder->private_->frame.subframes[channel].wasted_bits = 0;
 
 	/*
-     * Lots of magic numbers here
-     */
+	 * Lots of magic numbers here
+	 */
 	if(x & 0x80) {
 		send_error_to_client_(decoder, FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC);
 		decoder->protected_->state = FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC;
@@ -2666,8 +2666,8 @@ FLAC__bool read_subframe_lpc_(FLAC__StreamDecoder *decoder, unsigned channel, un
 	if(do_full_decode) {
 		memcpy(decoder->private_->output[channel], subframe->warmup, sizeof(FLAC__int32) * order);
 		/*@@@@@@ technically not pessimistic enough, should be more like
-        if( (FLAC__uint64)order * ((((FLAC__uint64)1)<<bps)-1) * ((1<<subframe->qlp_coeff_precision)-1) < (((FLAC__uint64)-1) << 32) )
-        */
+		if( (FLAC__uint64)order * ((((FLAC__uint64)1)<<bps)-1) * ((1<<subframe->qlp_coeff_precision)-1) < (((FLAC__uint64)-1) << 32) )
+		*/
 		if(bps + subframe->qlp_coeff_precision + FLAC__bitmath_ilog2(order) <= 32)
 			if(bps <= 16 && subframe->qlp_coeff_precision <= 16) {
 				if(order <= 8)
@@ -2796,15 +2796,15 @@ FLAC__bool read_callback_(FLAC__byte buffer[], size_t *bytes, void *client_data)
 	}
 	else if(*bytes > 0) {
 		/* While seeking, it is possible for our seek to land in the
-         * middle of audio data that looks exactly like a frame header
-         * from a future version of an encoder.  When that happens, our
-         * error callback will get an
-         * FLAC__STREAM_DECODER_UNPARSEABLE_STREAM and increment its
-         * unparseable_frame_count.  But there is a remote possibility
-         * that it is properly synced at such a "future-codec frame",
-         * so to make sure, we wait to see many "unparseable" errors in
-         * a row before bailing out.
-         */
+		 * middle of audio data that looks exactly like a frame header
+		 * from a future version of an encoder.  When that happens, our
+		 * error callback will get an
+		 * FLAC__STREAM_DECODER_UNPARSEABLE_STREAM and increment its
+		 * unparseable_frame_count.  But there is a remote possibility
+		 * that it is properly synced at such a "future-codec frame",
+		 * so to make sure, we wait to see many "unparseable" errors in
+		 * a row before bailing out.
+		 */
 		if(decoder->private_->is_seeking && decoder->private_->unparseable_frame_count > 20) {
 			decoder->protected_->state = FLAC__STREAM_DECODER_ABORTED;
 			return false;
@@ -2848,15 +2848,15 @@ FLAC__bool read_callback_(FLAC__byte buffer[], size_t *bytes, void *client_data)
 		return false;
 	}
 	/* [1] @@@ HACK NOTE: The end-of-stream checking has to be hacked around
-     * for Ogg FLAC.  This is because the ogg decoder aspect can lose sync
-     * and at the same time hit the end of the stream (for example, seeking
-     * to a point that is after the beginning of the last Ogg page).  There
-     * is no way to report an Ogg sync loss through the callbacks (see note
-     * in read_callback_ogg_aspect_()) so it returns CONTINUE with *bytes==0.
-     * So to keep the decoder from stopping at this point we gate the call
-     * to the eof_callback and let the Ogg decoder aspect set the
-     * end-of-stream state when it is needed.
-     */
+	 * for Ogg FLAC.  This is because the ogg decoder aspect can lose sync
+	 * and at the same time hit the end of the stream (for example, seeking
+	 * to a point that is after the beginning of the last Ogg page).  There
+	 * is no way to report an Ogg sync loss through the callbacks (see note
+	 * in read_callback_ogg_aspect_()) so it returns CONTINUE with *bytes==0.
+	 * So to keep the decoder from stopping at this point we gate the call
+	 * to the eof_callback and let the Ogg decoder aspect set the
+	 * end-of-stream state when it is needed.
+	 */
 }
 
 #if FLAC__HAS_OGG
@@ -2866,9 +2866,9 @@ FLAC__StreamDecoderReadStatus read_callback_ogg_aspect_(const FLAC__StreamDecode
 		case FLAC__OGG_DECODER_ASPECT_READ_STATUS_OK:
 			return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 		/* we don't really have a way to handle lost sync via read
-         * callback so we'll let it pass and let the underlying
-         * FLAC decoder catch the error
-         */
+		 * callback so we'll let it pass and let the underlying
+		 * FLAC decoder catch the error
+		 */
 		case FLAC__OGG_DECODER_ASPECT_READ_STATUS_LOST_SYNC:
 			return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 		case FLAC__OGG_DECODER_ASPECT_READ_STATUS_END_OF_STREAM:
@@ -2944,9 +2944,9 @@ FLAC__StreamDecoderWriteStatus write_audio_frame_to_client_(FLAC__StreamDecoder 
 	}
 	else {
 		/*
-         * If we never got STREAMINFO, turn off MD5 checking to save
-         * cycles since we don't have a sum to compare to anyway
-         */
+		 * If we never got STREAMINFO, turn off MD5 checking to save
+		 * cycles since we don't have a sum to compare to anyway
+		 */
 		if(!decoder->private_->has_stream_info)
 			decoder->private_->do_md5_checking = false;
 		if(decoder->private_->do_md5_checking) {
@@ -2992,11 +2992,11 @@ FLAC__bool seek_to_absolute_sample_(FLAC__StreamDecoder *decoder, FLAC__uint64 s
 	if(max_framesize > 0)
 		approx_bytes_per_frame = (max_framesize + min_framesize) / 2 + 1;
 	/*
-     * Check if it's a known fixed-blocksize stream.  Note that though
-     * the spec doesn't allow zeroes in the STREAMINFO block, we may
-     * never get a STREAMINFO block when decoding so the value of
-     * min_blocksize might be zero.
-     */
+	 * Check if it's a known fixed-blocksize stream.  Note that though
+	 * the spec doesn't allow zeroes in the STREAMINFO block, we may
+	 * never get a STREAMINFO block when decoding so the value of
+	 * min_blocksize might be zero.
+	 */
 	else if(min_blocksize == max_blocksize && min_blocksize > 0) {
 		/* note there are no () around 'bps/8' to keep precision up since it's an integer calulation */
 		approx_bytes_per_frame = min_blocksize * channels * bps/8 + 64;
@@ -3005,24 +3005,24 @@ FLAC__bool seek_to_absolute_sample_(FLAC__StreamDecoder *decoder, FLAC__uint64 s
 		approx_bytes_per_frame = 4096 * channels * bps/8 + 64;
 
 	/*
-     * First, we set an upper and lower bound on where in the
-     * stream we will search.  For now we assume the worst case
-     * scenario, which is our best guess at the beginning of
-     * the first frame and end of the stream.
-     */
+	 * First, we set an upper and lower bound on where in the
+	 * stream we will search.  For now we assume the worst case
+	 * scenario, which is our best guess at the beginning of
+	 * the first frame and end of the stream.
+	 */
 	lower_bound = first_frame_offset;
 	lower_bound_sample = 0;
 	upper_bound = stream_length;
 	upper_bound_sample = total_samples > 0 ? total_samples : target_sample /*estimate it*/;
 
 	/*
-     * Now we refine the bounds if we have a seektable with
-     * suitable points.  Note that according to the spec they
-     * must be ordered by ascending sample number.
-     *
-     * Note: to protect against invalid seek tables we will ignore points
-     * that have frame_samples==0 or sample_number>=total_samples
-     */
+	 * Now we refine the bounds if we have a seektable with
+	 * suitable points.  Note that according to the spec they
+	 * must be ordered by ascending sample number.
+	 *
+	 * Note: to protect against invalid seek tables we will ignore points
+	 * that have frame_samples==0 or sample_number>=total_samples
+	 */
 	if(seek_table) {
 		FLAC__uint64 new_lower_bound = lower_bound;
 		FLAC__uint64 new_upper_bound = upper_bound;
@@ -3069,14 +3069,14 @@ FLAC__bool seek_to_absolute_sample_(FLAC__StreamDecoder *decoder, FLAC__uint64 s
 
 	FLAC__ASSERT(upper_bound_sample >= lower_bound_sample);
 	/* there are 2 insidious ways that the following equality occurs, which
-     * we need to fix:
-     *  1) total_samples is 0 (unknown) and target_sample is 0
-     *  2) total_samples is 0 (unknown) and target_sample happens to be
-     *     exactly equal to the last seek point in the seek table; this
-     *     means there is no seek point above it, and upper_bound_samples
-     *     remains equal to the estimate (of target_samples) we made above
-     * in either case it does not hurt to move upper_bound_sample up by 1
-     */
+	 * we need to fix:
+	 *  1) total_samples is 0 (unknown) and target_sample is 0
+	 *  2) total_samples is 0 (unknown) and target_sample happens to be
+	 *     exactly equal to the last seek point in the seek table; this
+	 *     means there is no seek point above it, and upper_bound_samples
+	 *     remains equal to the estimate (of target_samples) we made above
+	 * in either case it does not hurt to move upper_bound_sample up by 1
+	 */
 	if(upper_bound_sample == lower_bound_sample)
 		upper_bound_sample++;
 
@@ -3114,11 +3114,11 @@ FLAC__bool seek_to_absolute_sample_(FLAC__StreamDecoder *decoder, FLAC__uint64 s
 			return false;
 		}
 		/* Now we need to get a frame.  First we need to reset our
-         * unparseable_frame_count; if we get too many unparseable
-         * frames in a row, the read callback will return
-         * FLAC__STREAM_DECODER_READ_STATUS_ABORT, causing
-         * FLAC__stream_decoder_process_single() to return false.
-         */
+		 * unparseable_frame_count; if we get too many unparseable
+		 * frames in a row, the read callback will return
+		 * FLAC__STREAM_DECODER_READ_STATUS_ABORT, causing
+		 * FLAC__stream_decoder_process_single() to return false.
+		 */
 		decoder->private_->unparseable_frame_count = 0;
 		if(!FLAC__stream_decoder_process_single(decoder)) {
 			decoder->protected_->state = FLAC__STREAM_DECODER_SEEK_ERROR;
@@ -3190,20 +3190,20 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 	unsigned iteration = 0;
 
 	/* In the first iterations, we will calculate the target byte position
-     * by the distance from the target sample to left_sample and
-     * right_sample (let's call it "proportional search").  After that, we
-     * will switch to binary search.
-     */
+	 * by the distance from the target sample to left_sample and
+	 * right_sample (let's call it "proportional search").  After that, we
+	 * will switch to binary search.
+	 */
 	unsigned BINARY_SEARCH_AFTER_ITERATION = 2;
 
 	/* We will switch to a linear search once our current sample is less
-     * than this number of samples ahead of the target sample
-     */
+	 * than this number of samples ahead of the target sample
+	 */
 	static const FLAC__uint64 LINEAR_SEARCH_WITHIN_SAMPLES = FLAC__MAX_BLOCK_SIZE * 2;
 
 	/* If the total number of samples is unknown, use a large value, and
-     * force binary search immediately.
-     */
+	 * force binary search immediately.
+	 */
 	if(right_sample == 0) {
 		right_sample = (FLAC__uint64)(-1);
 		BINARY_SEARCH_AFTER_ITERATION = 0;
@@ -3231,10 +3231,10 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 					pos = (FLAC__int64)((((target_sample-left_sample)>>8) * ((right_pos-left_pos)>>8)) / ((right_sample-left_sample)>>16));
 #endif
 				/* @@@ TODO: might want to limit pos to some distance
-                 * before EOF, to make sure we land before the last frame,
-                 * thereby getting a this_frame_sample and so having a better
-                 * estimate.
-                 */
+				 * before EOF, to make sure we land before the last frame,
+				 * thereby getting a this_frame_sample and so having a better
+				 * estimate.
+				 */
 			}
 
 			/* physical seek */
@@ -3259,16 +3259,16 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 		if(!decoder->private_->got_a_frame) {
 			if(did_a_seek) {
 				/* this can happen if we seek to a point after the last frame; we drop
-                 * to binary search right away in this case to avoid any wasted
-                 * iterations of proportional search.
-                 */
+				 * to binary search right away in this case to avoid any wasted
+				 * iterations of proportional search.
+				 */
 				right_pos = pos;
 				BINARY_SEARCH_AFTER_ITERATION = 0;
 			}
 			else {
 				/* this can probably only happen if total_samples is unknown and the
-                 * target_sample is past the end of the stream
-                 */
+				 * target_sample is past the end of the stream
+				 */
 				decoder->protected_->state = FLAC__STREAM_DECODER_SEEK_ERROR;
 				return false;
 			}
@@ -3284,11 +3284,11 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 			if (did_a_seek) {
 				if (this_frame_sample <= target_sample) {
 					/* The 'equal' case should not happen, since
-                     * FLAC__stream_decoder_process_single()
-                     * should recognize that it has hit the
-                     * target sample and we would exit through
-                     * the 'break' above.
-                     */
+					 * FLAC__stream_decoder_process_single()
+					 * should recognize that it has hit the
+					 * target sample and we would exit through
+					 * the 'break' above.
+					 */
 					FLAC__ASSERT(this_frame_sample != target_sample);
 
 					left_sample = this_frame_sample;

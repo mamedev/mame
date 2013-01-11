@@ -16,17 +16,17 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ADC083X_CH0		0
-#define ADC083X_CH1		1
-#define ADC083X_CH2		2
-#define ADC083X_CH3		3
-#define ADC083X_CH4		4
-#define ADC083X_CH5		5
-#define ADC083X_CH6		6
-#define ADC083X_CH7		7
-#define ADC083X_COM		8
-#define ADC083X_AGND	9
-#define ADC083X_VREF	10
+#define ADC083X_CH0     0
+#define ADC083X_CH1     1
+#define ADC083X_CH2     2
+#define ADC083X_CH3     3
+#define ADC083X_CH4     4
+#define ADC083X_CH5     5
+#define ADC083X_CH6     6
+#define ADC083X_CH7     7
+#define ADC083X_COM     8
+#define ADC083X_AGND    9
+#define ADC083X_VREF    10
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -118,4 +118,4 @@ extern WRITE_LINE_DEVICE_HANDLER( adc083x_se_write );
 extern READ_LINE_DEVICE_HANDLER( adc083x_sars_read );
 extern READ_LINE_DEVICE_HANDLER( adc083x_do_read );
 
-#endif	/* __ADC083X_H__ */
+#endif  /* __ADC083X_H__ */

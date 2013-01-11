@@ -163,7 +163,7 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-        /* See notes about this DIP */
+		/* See notes about this DIP */
 	PORT_DIPNAME( 0x01, 0x00, "Continue after Game Over (Cheat)" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -263,8 +263,8 @@ static const gfx_layout sprite_layout1 =
 		0x8000+3,0x8000+3,0x8000+2,0x8000+2,0x8000+1,0x8000+1,0x8000+0,0x8000+0
 	},
 	{
-		 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		 8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8,
+			0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8,
 		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
 		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8
 	},
@@ -283,8 +283,8 @@ static const gfx_layout sprite_layout2 =
 		0x8000+3,0x8000+3,0x8000+2,0x8000+2,0x8000+1,0x8000+1,0x8000+0,0x8000+0
 	},
 	{
-		 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		 8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8,
+			0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8,
 		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
 		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8
 	},
@@ -292,10 +292,10 @@ static const gfx_layout sprite_layout2 =
 };
 
 static GFXDECODE_START( mnchmobl )
-	GFXDECODE_ENTRY( "gfx1", 0,      char_layout,      0,  4 )	/* colors   0- 63 */
-	GFXDECODE_ENTRY( "gfx2", 0x1000, tile_layout,     64,  4 )	/* colors  64-127 */
-	GFXDECODE_ENTRY( "gfx3", 0,      sprite_layout1, 128, 16 )	/* colors 128-255 */
-	GFXDECODE_ENTRY( "gfx4", 0,      sprite_layout2, 128, 16 )	/* colors 128-255 */
+	GFXDECODE_ENTRY( "gfx1", 0,      char_layout,      0,  4 )  /* colors   0- 63 */
+	GFXDECODE_ENTRY( "gfx2", 0x1000, tile_layout,     64,  4 )  /* colors  64-127 */
+	GFXDECODE_ENTRY( "gfx3", 0,      sprite_layout1, 128, 16 )  /* colors 128-255 */
+	GFXDECODE_ENTRY( "gfx4", 0,      sprite_layout2, 128, 16 )  /* colors 128-255 */
 GFXDECODE_END
 
 /*************************************
@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-        /* AY clock speeds confirmed to match known recording */
+		/* AY clock speeds confirmed to match known recording */
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_15MHz/4/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -371,23 +371,23 @@ ROM_START( joyfulr )
 	ROM_LOAD( "m2j.10d", 0x2000, 0x2000, CRC(b144b9a6) SHA1(efed5fd6ba941b2baa7c8a17fe7323172c8fb17c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "mu.2j",	 0x0000, 0x2000, CRC(420adbd4) SHA1(3da18cda97ca604dc074b50c4f36287e0679224a) )
+	ROM_LOAD( "mu.2j",   0x0000, 0x2000, CRC(420adbd4) SHA1(3da18cda97ca604dc074b50c4f36287e0679224a) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "s1.10a",	 0x0000, 0x1000, CRC(c0bcc301) SHA1(b8961e7bbced4dfe9c72f839ea9b89d3f2e629b2) )	/* characters */
-	ROM_LOAD( "s2.10b",	 0x1000, 0x1000, CRC(96aa11ca) SHA1(84438d6b27d520e95b8706c91c5c20de1785604c) )
+	ROM_LOAD( "s1.10a",  0x0000, 0x1000, CRC(c0bcc301) SHA1(b8961e7bbced4dfe9c72f839ea9b89d3f2e629b2) ) /* characters */
+	ROM_LOAD( "s2.10b",  0x1000, 0x1000, CRC(96aa11ca) SHA1(84438d6b27d520e95b8706c91c5c20de1785604c) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "b1.2c",	 0x0000, 0x1000, CRC(8ce3a403) SHA1(eec5813076c31bb8534f7d1f83f2a397e552ed69) )	/* tile layout */
-	ROM_LOAD( "b2.2b",	 0x1000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) )	/* 4x8 tiles */
+	ROM_LOAD( "b1.2c",   0x0000, 0x1000, CRC(8ce3a403) SHA1(eec5813076c31bb8534f7d1f83f2a397e552ed69) ) /* tile layout */
+	ROM_LOAD( "b2.2b",   0x1000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) ) /* 4x8 tiles */
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
-	ROM_LOAD( "f1j.1g",	 0x0000, 0x2000, CRC(93c3c17e) SHA1(902f458c4efe74187a58a3c1ecd146e343657977) )	/* sprites */
-	ROM_LOAD( "f2j.3g",	 0x2000, 0x2000, CRC(b3fb5bd2) SHA1(51ff8b0bec092c9404944d6069c4493049604cb8) )
-	ROM_LOAD( "f3j.5g",	 0x4000, 0x2000, CRC(772a7527) SHA1(fe561d5323472e79051614a374e92aab17636055) )
+	ROM_LOAD( "f1j.1g",  0x0000, 0x2000, CRC(93c3c17e) SHA1(902f458c4efe74187a58a3c1ecd146e343657977) ) /* sprites */
+	ROM_LOAD( "f2j.3g",  0x2000, 0x2000, CRC(b3fb5bd2) SHA1(51ff8b0bec092c9404944d6069c4493049604cb8) )
+	ROM_LOAD( "f3j.5g",  0x4000, 0x2000, CRC(772a7527) SHA1(fe561d5323472e79051614a374e92aab17636055) )
 
 	ROM_REGION( 0x2000, "gfx4", 0 )
-	ROM_LOAD( "h",		 0x0000, 0x2000, CRC(332584de) SHA1(9ef75a77e6cc298a315d80b7f2d24414827c7063) )	/* monochrome sprites */
+	ROM_LOAD( "h",       0x0000, 0x2000, CRC(332584de) SHA1(9ef75a77e6cc298a315d80b7f2d24414827c7063) ) /* monochrome sprites */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "a2001.clr", 0x0000, 0x0100, CRC(1b16b907) SHA1(fc362174af128827b0b8119fdc1b5569598c087a) ) /* color prom */
@@ -395,27 +395,27 @@ ROM_END
 
 ROM_START( mnchmobl )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for CPUA */
-	ROM_LOAD( "m1.10e",	 0x0000, 0x2000, CRC(a4bebc6a) SHA1(7c13b2b87168dee3c1b8e931487a56d0a528386e) )
-	ROM_LOAD( "m2.10d",	 0x2000, 0x2000, CRC(f502d466) SHA1(4da5a32b3903fb7fbef38fc385408b9390b5f57f) )
+	ROM_LOAD( "m1.10e",  0x0000, 0x2000, CRC(a4bebc6a) SHA1(7c13b2b87168dee3c1b8e931487a56d0a528386e) )
+	ROM_LOAD( "m2.10d",  0x2000, 0x2000, CRC(f502d466) SHA1(4da5a32b3903fb7fbef38fc385408b9390b5f57f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "mu.2j",	 0x0000, 0x2000, CRC(420adbd4) SHA1(3da18cda97ca604dc074b50c4f36287e0679224a) )
+	ROM_LOAD( "mu.2j",   0x0000, 0x2000, CRC(420adbd4) SHA1(3da18cda97ca604dc074b50c4f36287e0679224a) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "s1.10a",	 0x0000, 0x1000, CRC(c0bcc301) SHA1(b8961e7bbced4dfe9c72f839ea9b89d3f2e629b2) )	/* characters */
-	ROM_LOAD( "s2.10b",	 0x1000, 0x1000, CRC(96aa11ca) SHA1(84438d6b27d520e95b8706c91c5c20de1785604c) )
+	ROM_LOAD( "s1.10a",  0x0000, 0x1000, CRC(c0bcc301) SHA1(b8961e7bbced4dfe9c72f839ea9b89d3f2e629b2) ) /* characters */
+	ROM_LOAD( "s2.10b",  0x1000, 0x1000, CRC(96aa11ca) SHA1(84438d6b27d520e95b8706c91c5c20de1785604c) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "b1.2c",	 0x0000, 0x1000, CRC(8ce3a403) SHA1(eec5813076c31bb8534f7d1f83f2a397e552ed69) )	/* tile layout */
-	ROM_LOAD( "b2.2b",	 0x1000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) )	/* 4x8 tiles */
+	ROM_LOAD( "b1.2c",   0x0000, 0x1000, CRC(8ce3a403) SHA1(eec5813076c31bb8534f7d1f83f2a397e552ed69) ) /* tile layout */
+	ROM_LOAD( "b2.2b",   0x1000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) ) /* 4x8 tiles */
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
-	ROM_LOAD( "f1.1g",	 0x0000, 0x2000, CRC(b75411d4) SHA1(d058a6c219676f8ba4e498215f5716c630bb1d20) )	/* sprites */
-	ROM_LOAD( "f2.3g",	 0x2000, 0x2000, CRC(539a43ba) SHA1(a7b30c41d9fdb420ec8f0c6441432c1b2b69c4be) )
-	ROM_LOAD( "f3.5g",	 0x4000, 0x2000, CRC(ec996706) SHA1(e71e99061ce83068b0ec60ae97759a9d78c7cdf9) )
+	ROM_LOAD( "f1.1g",   0x0000, 0x2000, CRC(b75411d4) SHA1(d058a6c219676f8ba4e498215f5716c630bb1d20) ) /* sprites */
+	ROM_LOAD( "f2.3g",   0x2000, 0x2000, CRC(539a43ba) SHA1(a7b30c41d9fdb420ec8f0c6441432c1b2b69c4be) )
+	ROM_LOAD( "f3.5g",   0x4000, 0x2000, CRC(ec996706) SHA1(e71e99061ce83068b0ec60ae97759a9d78c7cdf9) )
 
 	ROM_REGION( 0x2000, "gfx4", 0 )
-	ROM_LOAD( "h",		 0x0000, 0x2000, CRC(332584de) SHA1(9ef75a77e6cc298a315d80b7f2d24414827c7063) )	/* monochrome sprites */
+	ROM_LOAD( "h",       0x0000, 0x2000, CRC(332584de) SHA1(9ef75a77e6cc298a315d80b7f2d24414827c7063) ) /* monochrome sprites */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "a2001.clr", 0x0000, 0x0100, CRC(1b16b907) SHA1(fc362174af128827b0b8119fdc1b5569598c087a) ) /* color prom */

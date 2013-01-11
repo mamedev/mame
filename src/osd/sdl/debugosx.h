@@ -82,9 +82,9 @@ typedef float CGFloat;
 
 @interface MAMEDebugCommandHistory : NSObject
 {
-	NSInteger		length, position;
-	NSString		*current;
-	NSMutableArray	*history;
+	NSInteger       length, position;
+	NSString        *current;
+	NSMutableArray  *history;
 }
 
 + (NSInteger)defaultLength;
@@ -105,14 +105,14 @@ typedef float CGFloat;
 
 @interface MAMEDebugView : NSView
 {
-	int				type;
-	running_machine	*machine;
-	debug_view		*view;
+	int             type;
+	running_machine *machine;
+	debug_view      *view;
 
-	debug_view_xy	*totalSize, *topLeft;
+	debug_view_xy   *totalSize, *topLeft;
 
-	NSFont			*font;
-	CGFloat			fontWidth, fontHeight, fontAscent;
+	NSFont          *font;
+	CGFloat         fontWidth, fontHeight, fontAscent;
 }
 
 + (NSFont *)defaultFont;
@@ -161,7 +161,7 @@ typedef float CGFloat;
 
 @interface MAMEDisassemblyView : MAMEDebugView <MAMEDebugViewSubviewSupport, MAMEDebugViewExpressionSupport>
 {
-	BOOL	useConsole;
+	BOOL    useConsole;
 }
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m useConsole:(BOOL)uc;
@@ -224,8 +224,8 @@ typedef float CGFloat;
 
 @interface MAMEDebugWindowHandler : NSObject <NSWindowDelegate>
 {
-	NSWindow		*window;
-	running_machine	*machine;
+	NSWindow        *window;
+	running_machine *machine;
 }
 
 + (void)addCommonActionItems:(NSMenu *)menu;
@@ -258,13 +258,13 @@ typedef float CGFloat;
 
 @interface MAMEDebugConsole : MAMEDebugWindowHandler <NSTextFieldDelegate, NSSplitViewDelegate>
 {
-	MAMEDebugCommandHistory	*history;
-	NSMutableArray			*auxiliaryWindows;
+	MAMEDebugCommandHistory *history;
+	NSMutableArray          *auxiliaryWindows;
 
-	MAMERegistersView		*regView;
-	MAMEDisassemblyView		*dasmView;
-	MAMEDebugView			*consoleView;
-	NSTextField				*commandField;
+	MAMERegistersView       *regView;
+	MAMEDisassemblyView     *dasmView;
+	MAMEDebugView           *consoleView;
+	NSTextField             *commandField;
 }
 
 - (id)initWithMachine:(running_machine &)m;
@@ -294,7 +294,7 @@ typedef float CGFloat;
 
 @interface MAMEAuxiliaryDebugWindowHandler : MAMEDebugWindowHandler
 {
-	MAMEDebugConsole	*console;
+	MAMEDebugConsole    *console;
 }
 
 + (void)cascadeWindow:(NSWindow *)window;
@@ -314,8 +314,8 @@ typedef float CGFloat;
 
 @interface MAMEExpressionAuxiliaryDebugWindowHandler : MAMEAuxiliaryDebugWindowHandler <NSTextFieldDelegate>
 {
-	MAMEDebugCommandHistory	*history;
-	NSTextField				*expressionField;
+	MAMEDebugCommandHistory *history;
+	NSTextField             *expressionField;
 }
 
 - (id)initWithMachine:(running_machine &)m title:(NSString *)t console:(MAMEDebugConsole *)c;
@@ -331,7 +331,7 @@ typedef float CGFloat;
 
 @interface MAMEMemoryViewer : MAMEExpressionAuxiliaryDebugWindowHandler
 {
-	MAMEMemoryView	*memoryView;
+	MAMEMemoryView  *memoryView;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
@@ -343,7 +343,7 @@ typedef float CGFloat;
 
 @interface MAMEDisassemblyViewer : MAMEExpressionAuxiliaryDebugWindowHandler
 {
-	MAMEDisassemblyView	*dasmView;
+	MAMEDisassemblyView *dasmView;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
@@ -355,7 +355,7 @@ typedef float CGFloat;
 
 @interface MAMEErrorLogViewer : MAMEAuxiliaryDebugWindowHandler
 {
-	MAMEErrorLogView	*logView;
+	MAMEErrorLogView    *logView;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;

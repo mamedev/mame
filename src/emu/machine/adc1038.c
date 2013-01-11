@@ -89,16 +89,16 @@ WRITE_LINE_DEVICE_HANDLER( adc1038_clk_write )
 	{
 		//printf("ADC CLK, DI = %d, cycle = %d\n", adc1038->data_in, adc1038->cycle);
 
-		if (adc1038->cycle == 0)			// A2
+		if (adc1038->cycle == 0)            // A2
 		{
 			adc1038->adr = 0;
 			adc1038->adr |= (adc1038->data_in << 2);
 		}
-		else if (adc1038->cycle == 1)	// A1
+		else if (adc1038->cycle == 1)   // A1
 		{
 			adc1038->adr |= (adc1038->data_in << 1);
 		}
-		else if (adc1038->cycle == 2)	// A0
+		else if (adc1038->cycle == 2)   // A0
 		{
 			adc1038->adr |= (adc1038->data_in << 0);
 		}
@@ -192,5 +192,3 @@ void adc1038_device::device_reset()
 {
 	DEVICE_RESET_NAME( adc1038 )(this);
 }
-
-

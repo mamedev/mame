@@ -22,7 +22,7 @@ class jpmsru_state : public driver_device
 public:
 	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -101,7 +101,7 @@ ROM_START( j_ews )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ews13c1.bin", 0x0000, 0x000400, CRC(2eec7c4d) SHA1(a1740d27e60192659392ba7602b9b62947c4f6db) )
 	ROM_LOAD( "ews13b2.bin", 0x0400, 0x000400, CRC(b84b7858) SHA1(90fd64881d52e1f4362ccbcb9434dbf7b25b97f9) )
-	ROM_LOAD( "ews13.3",	 0x0800, 0x000400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
+	ROM_LOAD( "ews13.3",     0x0800, 0x000400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
 ROM_END
 
 ROM_START( j_ews8a )
@@ -145,16 +145,16 @@ ROM_START( j_luck2 )
 ROM_END
 
 
-GAME(198?, j_ewnud	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ewnda	,j_ewnud	,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ewnd20	,j_ewnud	,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 3, version 20?)",			GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ews	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 1, version 16)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ews8a	,j_ews		,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 2, version 8a)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnud  ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnda  ,j_ewnud    ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",                       GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ewnd20 ,j_ewnud    ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 3, version 20?)",          GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ews    ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 1, version 16)",                      GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_ews8a  ,j_ews      ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Shifter (Barcrest?, set 2, version 8a)",                      GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_luckac	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_super2	,0			,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Super 2 (JPM)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_luckac ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Aces (Unk)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_super2 ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Super 2 (JPM)",                      GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_luck2	,0			,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Twos?",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_luck2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Twos?",                        GAME_IS_SKELETON_MECHANICAL )
 
 // this one is different again?
-GAME(198?, j_plus2	,0			,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Plus 2 (JPM)",						GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_plus2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Plus 2 (JPM)",                     GAME_IS_SKELETON_MECHANICAL )

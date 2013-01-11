@@ -16,11 +16,11 @@
     DEBUG STATE & STRUCTURES
 ***************************************************************************/
 
-#define VERBOSE 			0
-#define LOG_CONTROL_REGS	0
-#define LOG_GRAPHICS_OPS	0
+#define VERBOSE             0
+#define LOG_CONTROL_REGS    0
+#define LOG_GRAPHICS_OPS    0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -42,31 +42,31 @@ struct XY
 
 struct tms34010_state
 {
-	UINT32				pc;
-	UINT32				ppc;
-	UINT32				st;
+	UINT32              pc;
+	UINT32              ppc;
+	UINT32              st;
 	void (*pixel_write)(tms34010_state *tms, offs_t offset, UINT32 data);
 	UINT32 (*pixel_read)(tms34010_state *tms, offs_t offset);
 	UINT32 (*raster_op)(tms34010_state *tms, UINT32 newpix, UINT32 oldpix);
-	UINT32				convsp;
-	UINT32				convdp;
-	UINT32				convmp;
-	UINT16 *			shiftreg;
-	INT32				gfxcycles;
-	UINT8				pixelshift;
-	UINT8				is_34020;
-	UINT8				reset_deferred;
-	UINT8				hblank_stable;
-	UINT8				external_host_access;
-	UINT8				executing;
-	device_irq_acknowledge_callback	irq_callback;
+	UINT32              convsp;
+	UINT32              convdp;
+	UINT32              convmp;
+	UINT16 *            shiftreg;
+	INT32               gfxcycles;
+	UINT8               pixelshift;
+	UINT8               is_34020;
+	UINT8               reset_deferred;
+	UINT8               hblank_stable;
+	UINT8               external_host_access;
+	UINT8               executing;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
 	const tms34010_config *config;
 	screen_device *screen;
-	emu_timer *			scantimer;
-	int					icount;
+	emu_timer *         scantimer;
+	int                 icount;
 
 	/* A registers 0-15 map to regs[0]-regs[15] */
 	/* B registers 0-15 map to regs[30]-regs[15] */
@@ -83,7 +83,7 @@ INLINE tms34010_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS34010 ||
-		   device->type() == TMS34020);
+			device->type() == TMS34020);
 	return (tms34010_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -112,87 +112,87 @@ static void tms34010_state_postload(tms34010_state *tms);
 ***************************************************************************/
 
 /* status register definitions */
-#define STBIT_N			(1 << 31)
-#define STBIT_C			(1 << 30)
-#define STBIT_Z			(1 << 29)
-#define STBIT_V			(1 << 28)
-#define STBIT_P			(1 << 25)
-#define STBIT_IE		(1 << 21)
-#define STBIT_FE1		(1 << 11)
-#define STBITS_F1		(0x1f << 6)
-#define STBIT_FE0		(1 << 5)
-#define STBITS_F0		(0x1f << 0)
+#define STBIT_N         (1 << 31)
+#define STBIT_C         (1 << 30)
+#define STBIT_Z         (1 << 29)
+#define STBIT_V         (1 << 28)
+#define STBIT_P         (1 << 25)
+#define STBIT_IE        (1 << 21)
+#define STBIT_FE1       (1 << 11)
+#define STBITS_F1       (0x1f << 6)
+#define STBIT_FE0       (1 << 5)
+#define STBITS_F0       (0x1f << 0)
 
 /* register definitions and shortcuts */
-#define N_FLAG(T)		((T)->st & STBIT_N)
-#define Z_FLAG(T)		((T)->st & STBIT_Z)
-#define C_FLAG(T)		((T)->st & STBIT_C)
-#define V_FLAG(T)		((T)->st & STBIT_V)
-#define P_FLAG(T)		((T)->st & STBIT_P)
-#define IE_FLAG(T)		((T)->st & STBIT_IE)
-#define FE0_FLAG(T)		((T)->st & STBIT_FE0)
-#define FE1_FLAG(T)		((T)->st & STBIT_FE1)
+#define N_FLAG(T)       ((T)->st & STBIT_N)
+#define Z_FLAG(T)       ((T)->st & STBIT_Z)
+#define C_FLAG(T)       ((T)->st & STBIT_C)
+#define V_FLAG(T)       ((T)->st & STBIT_V)
+#define P_FLAG(T)       ((T)->st & STBIT_P)
+#define IE_FLAG(T)      ((T)->st & STBIT_IE)
+#define FE0_FLAG(T)     ((T)->st & STBIT_FE0)
+#define FE1_FLAG(T)     ((T)->st & STBIT_FE1)
 
 /* register file access */
-#define AREG(T,i)		((T)->regs[i].reg)
-#define AREG_XY(T,i)	((T)->regs[i].xy)
-#define AREG_X(T,i)		((T)->regs[i].xy.x)
-#define AREG_Y(T,i)		((T)->regs[i].xy.y)
-#define BREG(T,i)		((T)->regs[30 - (i)].reg)
-#define BREG_XY(T,i)	((T)->regs[30 - (i)].xy)
-#define BREG_X(T,i)		((T)->regs[30 - (i)].xy.x)
-#define BREG_Y(T,i)		((T)->regs[30 - (i)].xy.y)
-#define SP(T)			AREG(T,15)
-#define FW(T,i)			(((T)->st >> (i ? 6 : 0)) & 0x1f)
-#define FWEX(T,i)		(((T)->st >> (i ? 6 : 0)) & 0x3f)
+#define AREG(T,i)       ((T)->regs[i].reg)
+#define AREG_XY(T,i)    ((T)->regs[i].xy)
+#define AREG_X(T,i)     ((T)->regs[i].xy.x)
+#define AREG_Y(T,i)     ((T)->regs[i].xy.y)
+#define BREG(T,i)       ((T)->regs[30 - (i)].reg)
+#define BREG_XY(T,i)    ((T)->regs[30 - (i)].xy)
+#define BREG_X(T,i)     ((T)->regs[30 - (i)].xy.x)
+#define BREG_Y(T,i)     ((T)->regs[30 - (i)].xy.y)
+#define SP(T)           AREG(T,15)
+#define FW(T,i)         (((T)->st >> (i ? 6 : 0)) & 0x1f)
+#define FWEX(T,i)       (((T)->st >> (i ? 6 : 0)) & 0x3f)
 
 /* opcode decode helpers */
-#define SRCREG(O)		(((O) >> 5) & 0x0f)
-#define DSTREG(O)		((O) & 0x0f)
-#define SKIP_WORD(T)	((T)->pc += (2 << 3))
-#define SKIP_LONG(T)	((T)->pc += (4 << 3))
-#define PARAM_K(O)		(((O) >> 5) & 0x1f)
-#define PARAM_N(O)		((O) & 0x1f)
-#define PARAM_REL8(O)	((INT8)(O))
+#define SRCREG(O)       (((O) >> 5) & 0x0f)
+#define DSTREG(O)       ((O) & 0x0f)
+#define SKIP_WORD(T)    ((T)->pc += (2 << 3))
+#define SKIP_LONG(T)    ((T)->pc += (4 << 3))
+#define PARAM_K(O)      (((O) >> 5) & 0x1f)
+#define PARAM_N(O)      ((O) & 0x1f)
+#define PARAM_REL8(O)   ((INT8)(O))
 
 /* memory I/O */
-#define WFIELD0(T,a,b)	(*tms34010_wfield_functions[FW(T,0)])(T,a,b)
-#define WFIELD1(T,a,b)	(*tms34010_wfield_functions[FW(T,1)])(T,a,b)
-#define RFIELD0(T,a)	(*tms34010_rfield_functions[FWEX(T,0)])(T,a)
-#define RFIELD1(T,a)	(*tms34010_rfield_functions[FWEX(T,1)])(T,a)
-#define WPIXEL(T,a,b)	(*(T)->pixel_write)(T,a,b)
-#define RPIXEL(T,a)		(*(T)->pixel_read)(T,a)
+#define WFIELD0(T,a,b)  (*tms34010_wfield_functions[FW(T,0)])(T,a,b)
+#define WFIELD1(T,a,b)  (*tms34010_wfield_functions[FW(T,1)])(T,a,b)
+#define RFIELD0(T,a)    (*tms34010_rfield_functions[FWEX(T,0)])(T,a)
+#define RFIELD1(T,a)    (*tms34010_rfield_functions[FWEX(T,1)])(T,a)
+#define WPIXEL(T,a,b)   (*(T)->pixel_write)(T,a,b)
+#define RPIXEL(T,a)     (*(T)->pixel_read)(T,a)
 
 /* Implied Operands */
-#define SADDR(T)		BREG(T,0)
-#define SADDR_X(T)		BREG_X(T,0)
-#define SADDR_Y(T)		BREG_Y(T,0)
-#define SADDR_XY(T)		BREG_XY(T,0)
-#define SPTCH(T)		BREG(T,1)
-#define DADDR(T)		BREG(T,2)
-#define DADDR_X(T)		BREG_X(T,2)
-#define DADDR_Y(T)		BREG_Y(T,2)
-#define DADDR_XY(T)		BREG_XY(T,2)
-#define DPTCH(T)		BREG(T,3)
-#define OFFSET(T)		BREG(T,4)
-#define WSTART_X(T)		BREG_X(T,5)
-#define WSTART_Y(T)		BREG_Y(T,5)
-#define WEND_X(T)		BREG_X(T,6)
-#define WEND_Y(T)		BREG_Y(T,6)
-#define DYDX_X(T)		BREG_X(T,7)
-#define DYDX_Y(T)		BREG_Y(T,7)
-#define COLOR0(T)		BREG(T,8)
-#define COLOR1(T)		BREG(T,9)
-#define COUNT(T)		BREG(T,10)
-#define INC1_X(T)		BREG_X(T,11)
-#define INC1_Y(T)		BREG_Y(T,11)
-#define INC2_X(T)		BREG_X(T,12)
-#define INC2_Y(T)		BREG_Y(T,12)
-#define PATTRN(T)		BREG(T,13)
-#define TEMP(T)			BREG(T,14)
+#define SADDR(T)        BREG(T,0)
+#define SADDR_X(T)      BREG_X(T,0)
+#define SADDR_Y(T)      BREG_Y(T,0)
+#define SADDR_XY(T)     BREG_XY(T,0)
+#define SPTCH(T)        BREG(T,1)
+#define DADDR(T)        BREG(T,2)
+#define DADDR_X(T)      BREG_X(T,2)
+#define DADDR_Y(T)      BREG_Y(T,2)
+#define DADDR_XY(T)     BREG_XY(T,2)
+#define DPTCH(T)        BREG(T,3)
+#define OFFSET(T)       BREG(T,4)
+#define WSTART_X(T)     BREG_X(T,5)
+#define WSTART_Y(T)     BREG_Y(T,5)
+#define WEND_X(T)       BREG_X(T,6)
+#define WEND_Y(T)       BREG_Y(T,6)
+#define DYDX_X(T)       BREG_X(T,7)
+#define DYDX_Y(T)       BREG_Y(T,7)
+#define COLOR0(T)       BREG(T,8)
+#define COLOR1(T)       BREG(T,9)
+#define COUNT(T)        BREG(T,10)
+#define INC1_X(T)       BREG_X(T,11)
+#define INC1_Y(T)       BREG_Y(T,11)
+#define INC2_X(T)       BREG_X(T,12)
+#define INC2_Y(T)       BREG_Y(T,12)
+#define PATTRN(T)       BREG(T,13)
+#define TEMP(T)         BREG(T,14)
 
 /* I/O registers */
-#define WINDOW_CHECKING(T)	((IOREG(T, REG_CONTROL) >> 6) & 0x03)
+#define WINDOW_CHECKING(T)  ((IOREG(T, REG_CONTROL) >> 6) & 0x03)
 
 
 
@@ -293,8 +293,8 @@ INLINE INT32 POP(tms34010_state *tms)
     PIXEL READS
 ***************************************************************************/
 
-#define RP(T,m1,m2) 											\
-	/* TODO: Plane masking */								\
+#define RP(T,m1,m2)                                             \
+	/* TODO: Plane masking */                               \
 	return (TMS34010_RDMEM_WORD(T, TOBYTE(offset & 0xfffffff0)) >> (offset & m1)) & m2;
 
 static UINT32 read_pixel_1(tms34010_state *tms, offs_t offset) { RP(tms,0x0f,0x01) }
@@ -329,55 +329,55 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 ***************************************************************************/
 
 /* No Raster Op + No Transparency */
-#define WP(T,m1,m2) 																		\
-	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
-	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
-	UINT32 shiftcount = offset & m1;														\
+#define WP(T,m1,m2)                                                                         \
+	UINT32 a = TOBYTE(offset & 0xfffffff0);                                                 \
+	UINT32 pix = TMS34010_RDMEM_WORD(T,a);                                                  \
+	UINT32 shiftcount = offset & m1;                                                        \
 																							\
-	/* TODO: plane masking */																\
-	data &= m2;																				\
-	pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);								\
-	TMS34010_WRMEM_WORD(T, a, pix);															\
+	/* TODO: plane masking */                                                               \
+	data &= m2;                                                                             \
+	pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);                               \
+	TMS34010_WRMEM_WORD(T, a, pix);                                                         \
 
 /* No Raster Op + Transparency */
-#define WP_T(T,m1,m2)																		\
-	/* TODO: plane masking */																\
-	data &= m2;																				\
-	if (data)																				\
-	{																						\
-		UINT32 a = TOBYTE(offset & 0xfffffff0);												\
-		UINT32 pix = TMS34010_RDMEM_WORD(T,a);												\
-		UINT32 shiftcount = offset & m1;													\
+#define WP_T(T,m1,m2)                                                                       \
+	/* TODO: plane masking */                                                               \
+	data &= m2;                                                                             \
+	if (data)                                                                               \
+	{                                                                                       \
+		UINT32 a = TOBYTE(offset & 0xfffffff0);                                             \
+		UINT32 pix = TMS34010_RDMEM_WORD(T,a);                                              \
+		UINT32 shiftcount = offset & m1;                                                    \
 																							\
-		/* TODO: plane masking */															\
-		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);							\
-		TMS34010_WRMEM_WORD(T, a, pix);														\
-	}																						\
+		/* TODO: plane masking */                                                           \
+		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);                           \
+		TMS34010_WRMEM_WORD(T, a, pix);                                                     \
+	}                                                                                       \
 
 /* Raster Op + No Transparency */
-#define WP_R(T,m1,m2)																		\
-	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
-	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
-	UINT32 shiftcount = offset & m1;														\
+#define WP_R(T,m1,m2)                                                                       \
+	UINT32 a = TOBYTE(offset & 0xfffffff0);                                                 \
+	UINT32 pix = TMS34010_RDMEM_WORD(T,a);                                                  \
+	UINT32 shiftcount = offset & m1;                                                        \
 																							\
-	/* TODO: plane masking */																\
-	data = (*(T)->raster_op)(tms, data & m2, (pix >> shiftcount) & m2) & m2;				\
-	pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);								\
-	TMS34010_WRMEM_WORD(T, a, pix);															\
+	/* TODO: plane masking */                                                               \
+	data = (*(T)->raster_op)(tms, data & m2, (pix >> shiftcount) & m2) & m2;                \
+	pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);                               \
+	TMS34010_WRMEM_WORD(T, a, pix);                                                         \
 
 /* Raster Op + Transparency */
-#define WP_R_T(T,m1,m2) 																	\
-	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
-	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
-	UINT32 shiftcount = offset & m1;														\
+#define WP_R_T(T,m1,m2)                                                                     \
+	UINT32 a = TOBYTE(offset & 0xfffffff0);                                                 \
+	UINT32 pix = TMS34010_RDMEM_WORD(T,a);                                                  \
+	UINT32 shiftcount = offset & m1;                                                        \
 																							\
-	/* TODO: plane masking */																\
-	data = (*(T)->raster_op)(tms, data & m2, (pix >> shiftcount) & m2) & m2;				\
-	if (data)																				\
-	{																						\
-		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);							\
-		TMS34010_WRMEM_WORD(T, a, pix);														\
-	}																						\
+	/* TODO: plane masking */                                                               \
+	data = (*(T)->raster_op)(tms, data & m2, (pix >> shiftcount) & m2) & m2;                \
+	if (data)                                                                               \
+	{                                                                                       \
+		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);                           \
+		TMS34010_WRMEM_WORD(T, a, pix);                                                     \
+	}                                                                                       \
 
 
 /* No Raster Op + No Transparency */
@@ -831,7 +831,7 @@ static void (*const pixel_write_ops[4][6])(tms34010_state *tms, offs_t offset, U
 {
 	{ write_pixel_1,     write_pixel_2,     write_pixel_4,     write_pixel_8,     write_pixel_16,     write_pixel_32     },
 	{ write_pixel_r_1,   write_pixel_r_2,   write_pixel_r_4,   write_pixel_r_8,   write_pixel_r_16,   write_pixel_r_32   },
-	{ write_pixel_t_1,   write_pixel_t_2,   write_pixel_t_4,   write_pixel_t_8,   write_pixel_t_16,	  write_pixel_t_32   },
+	{ write_pixel_t_1,   write_pixel_t_2,   write_pixel_t_4,   write_pixel_t_8,   write_pixel_t_16,   write_pixel_t_32   },
 	{ write_pixel_r_t_1, write_pixel_r_t_2, write_pixel_r_t_4, write_pixel_r_t_8, write_pixel_r_t_16, write_pixel_r_t_32 }
 };
 
@@ -881,14 +881,14 @@ static void set_pixel_function(tms34010_state *tms)
 
 static UINT32 (*const raster_ops[32]) (tms34010_state *tms, UINT32 newpix, UINT32 oldpix) =
 {
-	           0, raster_op_1 , raster_op_2 , raster_op_3,
+				0, raster_op_1 , raster_op_2 , raster_op_3,
 	raster_op_4 , raster_op_5 , raster_op_6 , raster_op_7,
 	raster_op_8 , raster_op_9 , raster_op_10, raster_op_11,
 	raster_op_12, raster_op_13, raster_op_14, raster_op_15,
 	raster_op_16, raster_op_17, raster_op_18, raster_op_19,
 	raster_op_20, raster_op_21,            0,            0,
-	           0,            0,            0,            0,
-	           0,            0,            0,            0,
+				0,            0,            0,            0,
+				0,            0,            0,            0,
 };
 
 
@@ -977,8 +977,8 @@ static TIMER_CALLBACK( scanline_callback )
 				if (visarea.min_x < visarea.max_x && visarea.max_x <= width && visarea.min_y < visarea.max_y && visarea.max_y <= height)
 				{
 					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
-                       if they are the only thing that has changed, unless they are stable for a couple
-                       of frames */
+					   if they are the only thing that has changed, unless they are stable for a couple
+					   of frames */
 					int current_width  = tms->screen->width();
 					int current_height = tms->screen->height();
 
@@ -1678,7 +1678,7 @@ int tms34010_host_r(device_t *cpu, int reg)
 			result = TMS34010_RDMEM_WORD(tms, TOBYTE(addr & 0xfffffff0));
 
 			/* optional postincrement (it says preincrement, but data is preloaded, so it
-               is effectively a postincrement */
+			   is effectively a postincrement */
 			if (IOREG(tms, REG_HSTCTLH) & 0x1000)
 			{
 				addr += 0x10;
@@ -1714,8 +1714,8 @@ static CPU_SET_INFO( tms34010 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(tms, 0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(tms, 1, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + 0:               set_irq_line(tms, 0, info->i);      break;
+		case CPUINFO_INT_INPUT_STATE + 1:               set_irq_line(tms, 1, info->i);      break;
 	}
 }
 
@@ -1762,43 +1762,43 @@ CPU_GET_INFO( tms34010 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms34010_state);	break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 2;						break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;						break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;		break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;						break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 8;						break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;						break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;						break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;						break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 10000;					break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(tms34010_state);   break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 2;                        break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                        break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;        break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                        break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 8;                        break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                        break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 10;                       break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                        break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 10000;                    break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 3;						break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 16;                       break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 32;                       break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 3;                        break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT1) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT2) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + 0:               info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT1) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + 1:               info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT2) ? ASSERT_LINE : CLEAR_LINE; break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(tms34010);		break;
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(tms34010);				break;
-		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(tms34010);				break;
-		case CPUINFO_FCT_EXIT:			info->exit = CPU_EXIT_NAME(tms34010);				break;
-		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(tms34010);			break;
-		case CPUINFO_FCT_BURN:			info->burn = NULL;									break;
-		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms34010);	break;
-		case CPUINFO_FCT_EXPORT_STRING:	info->export_string = CPU_EXPORT_STRING_NAME(tms34010);	break;
+		case CPUINFO_FCT_SET_INFO:      info->setinfo = CPU_SET_INFO_NAME(tms34010);        break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(tms34010);               break;
+		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(tms34010);             break;
+		case CPUINFO_FCT_EXIT:          info->exit = CPU_EXIT_NAME(tms34010);               break;
+		case CPUINFO_FCT_EXECUTE:       info->execute = CPU_EXECUTE_NAME(tms34010);         break;
+		case CPUINFO_FCT_BURN:          info->burn = NULL;                                  break;
+		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(tms34010); break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(tms34010); break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms->icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &tms->icount;        break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34010");		break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments 340x0"); break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");				break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);			break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Alex Pasadyn/Zsolt Vasvari\nParts based on code by Aaron Giles"); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS34010");        break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Texas Instruments 340x0"); break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");             break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);          break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Alex Pasadyn/Zsolt Vasvari\nParts based on code by Aaron Giles"); break;
 	}
 }
 
@@ -1812,16 +1812,16 @@ CPU_GET_INFO( tms34020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;						break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 4;                        break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(tms34020);				break;
-		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms34020);	break;
+		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(tms34020);             break;
+		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(tms34020); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34020");		break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "TMS34020");        break;
 
-		default:										CPU_GET_INFO_CALL(tms34010);		break;
+		default:                                        CPU_GET_INFO_CALL(tms34010);        break;
 	}
 }
 

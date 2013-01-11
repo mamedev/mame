@@ -143,7 +143,7 @@ void skimaxx_state::video_start()
 	m_blitter_gfx = (UINT16 *) memregion( "blitter" )->base();
 	m_blitter_gfx_len = memregion( "blitter" )->bytes() / 2;
 
-	m_bg_buffer = auto_alloc_array(machine(), UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
+	m_bg_buffer = auto_alloc_array(machine(), UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2); // 2 buffers
 	m_bg_buffer_back  = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
 	m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
 	membank("bank1")->configure_entry(0, m_bg_buffer_back);
@@ -324,23 +324,23 @@ static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x10000000, 0x10000003) AM_WRITE(skimaxx_sub_ctrl_w )
 	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE(m68k_tms_r, m68k_tms_w)//AM_NOP
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")	// above 10188000 accessed at level end (game bug?)
-	AM_RANGE(0x20000000, 0x20000003) AM_READNOP	// watchdog_r?
+	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")  // above 10188000 accessed at level end (game bug?)
+	AM_RANGE(0x20000000, 0x20000003) AM_READNOP // watchdog_r?
 
-	AM_RANGE(0x20000010, 0x20000013) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// left
-	AM_RANGE(0x20000014, 0x20000017) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)	// left
-	AM_RANGE(0x20000018, 0x2000001b) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff)	// right
-	AM_RANGE(0x2000001c, 0x2000001f) AM_DEVREADWRITE8("oki4", okim6295_device, read, write, 0x00ff)	// right
+	AM_RANGE(0x20000010, 0x20000013) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // left
+	AM_RANGE(0x20000014, 0x20000017) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff) // left
+	AM_RANGE(0x20000018, 0x2000001b) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff) // right
+	AM_RANGE(0x2000001c, 0x2000001f) AM_DEVREADWRITE8("oki4", okim6295_device, read, write, 0x00ff) // right
 
-	AM_RANGE(0x20000020, 0x20000023) AM_READ(skimaxx_unk1_r )	// units linking?
-	AM_RANGE(0x20000024, 0x20000027) AM_WRITE(skimaxx_unk1_w )	// ""
+	AM_RANGE(0x20000020, 0x20000023) AM_READ(skimaxx_unk1_r )   // units linking?
+	AM_RANGE(0x20000024, 0x20000027) AM_WRITE(skimaxx_unk1_w )  // ""
 
-	AM_RANGE(0x20000040, 0x20000043) AM_RAM	// write
+	AM_RANGE(0x20000040, 0x20000043) AM_RAM // write
 	AM_RANGE(0x20000044, 0x20000047) AM_READ_PORT( "DSW" )
 	AM_RANGE(0x20000048, 0x2000004b) AM_READ_PORT( "COIN" )
-	AM_RANGE(0x2000004c, 0x2000004f) AM_READ(unk_r)	// bit 7, bit 0
+	AM_RANGE(0x2000004c, 0x2000004f) AM_READ(unk_r) // bit 7, bit 0
 
-	AM_RANGE(0x20000050, 0x20000057) AM_READ(skimaxx_analog_r ) AM_WRITENOP	// read (0-1f), write motor?
+	AM_RANGE(0x20000050, 0x20000057) AM_READ(skimaxx_analog_r ) AM_WRITENOP // read (0-1f), write motor?
 
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_MIRROR(0x00020000)
 ADDRESS_MAP_END
@@ -355,17 +355,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 
-	AM_RANGE(0x20000000, 0x2007ffff) AM_READ(skimaxx_blitter_r )	// do blit
+	AM_RANGE(0x20000000, 0x2007ffff) AM_READ(skimaxx_blitter_r )    // do blit
 	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE(skimaxx_blitter_w ) AM_SHARE("blitter_regs")
 
 	AM_RANGE(0x40000000, 0x40000003) AM_WRITE(skimaxx_fpga_ctrl_w ) AM_SHARE("fpga_ctrl")
 
-	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK("bank1")	// background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
+	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK("bank1")    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE("share1")
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
-	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM				// HACK
-	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE("share1")	// HACK
+	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
+	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE("share1")  // HACK
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -434,7 +434,7 @@ GFXDECODE_END
  *************************************/
 
 static INPUT_PORTS_START( skimaxx )
-	PORT_START("DSW")	// 20000044.l & 0xff
+	PORT_START("DSW")   // 20000044.l & 0xff
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x05, "12" )
 	PORT_DIPSETTING(    0x04, "17" )
@@ -457,18 +457,18 @@ static INPUT_PORTS_START( skimaxx )
 	PORT_DIPSETTING(    0x60, "20" )
 	PORT_DIPSETTING(    0x70, "30" )
 	PORT_DIPNAME( 0x80, 0x80, "Time For Super Course" )
-	PORT_DIPSETTING(    0x80, "50 s" )	// 3000
-	PORT_DIPSETTING(    0x00, "60 s" )	// 3600
+	PORT_DIPSETTING(    0x80, "50 s" )  // 3000
+	PORT_DIPSETTING(    0x00, "60 s" )  // 3600
 
-	PORT_START("COIN")	// 20000048.l & 0xff
+	PORT_START("COIN")  // 20000048.l & 0xff
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )	// ?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1   )	// coin
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2   )	// coin
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1  )	// start
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    // ?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1   )    // coin
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2   )    // coin
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1  )    // start
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )	// change course / letter
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    // change course / letter
 
 	PORT_START("X")
 	PORT_BIT( 0x1f, 0x10, IPT_AD_STICK_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_MINMAX(0x00,0x1e) PORT_INVERT
@@ -498,7 +498,7 @@ static const tms34010_config tms_config =
 	50000000/8,                /* pixel clock */
 	2,                         /* pixels per clock */
 	skimaxx_scanline_update,   /* scanline updater (indexed16) */
-	NULL,					   /* scanline updater (rgb32) */
+	NULL,                      /* scanline updater (rgb32) */
 	skimaxx_tms_irq,           /* generate interrupt */
 	skimaxx_to_shiftreg,       /* write to shiftreg function */
 	skimaxx_from_shiftreg      /* read from shiftreg function */
@@ -525,7 +525,7 @@ void skimaxx_state::machine_reset()
 static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_CPU_ADD("maincpu", M68EC030, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(68030_1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)	// 1,3,7 are identical, rest is RTE
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE
 
 	MCFG_CPU_ADD("subcpu", M68EC030, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(68030_2_map)
@@ -554,16 +554,16 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_4MHz, OKIM6295_PIN7_LOW)		// ?
+	MCFG_OKIM6295_ADD("oki1", XTAL_4MHz, OKIM6295_PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)	// ?
+	MCFG_OKIM6295_ADD("oki2", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki3", XTAL_4MHz, OKIM6295_PIN7_LOW)		// ?
+	MCFG_OKIM6295_ADD("oki3", XTAL_4MHz, OKIM6295_PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki4", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)	// ?
+	MCFG_OKIM6295_ADD("oki4", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -607,13 +607,13 @@ ROM_START( skimaxx )
 	ROM_LOAD( "main2_0.u3", 0x000000, 0x80000, CRC(24d8c6ad) SHA1(06f51a4c380c91c930d646826246f62c4e1f9cda) )
 
 	ROM_REGION( 0x80000, "oki2", 0 )
-	ROM_LOAD( "main2_0.u2", 0x000000, 0x80000, CRC(c84b3c46) SHA1(b956358518495aa822a5b699cbad1abac212dd09) )	// identical to main2_0.u4
+	ROM_LOAD( "main2_0.u2", 0x000000, 0x80000, CRC(c84b3c46) SHA1(b956358518495aa822a5b699cbad1abac212dd09) )   // identical to main2_0.u4
 
 	ROM_REGION( 0x80000, "oki3", 0 )
 	ROM_LOAD( "main2_0.u5", 0x000000, 0x80000, CRC(e2ba07ad) SHA1(cf82753975f7b6756cca4e10b5372e00135440bf) )
 
 	ROM_REGION( 0x80000, "oki4", 0 )
-	ROM_LOAD( "main2_0.u4", 0x000000, 0x80000, CRC(c84b3c46) SHA1(b956358518495aa822a5b699cbad1abac212dd09) )	// identical to main2_0.u2
+	ROM_LOAD( "main2_0.u4", 0x000000, 0x80000, CRC(c84b3c46) SHA1(b956358518495aa822a5b699cbad1abac212dd09) )   // identical to main2_0.u2
 ROM_END
 
 

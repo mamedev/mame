@@ -359,7 +359,7 @@ int imd_format::identify(io_generic *io, UINT32 form_factor)
 	if(h[7] == ':') {
 		h[30] = 0;
 		for(int i=0; i != 30; i++)
-			if(h[i] >= '0' && h[i] <= '9')		\
+			if(h[i] >= '0' && h[i] <= '9')      \
 				h[i] = '0';
 
 		fixnum(h+ 9, h+11);
@@ -374,7 +374,7 @@ int imd_format::identify(io_generic *io, UINT32 form_factor)
 	} else {
 		h[31] = 0;
 		for(int i=0; i != 31; i++)
-			if(h[i] >= '0' && h[i] <= '9')		\
+			if(h[i] >= '0' && h[i] <= '9')      \
 				h[i] = '0';
 
 		fixnum(h+10, h+12);

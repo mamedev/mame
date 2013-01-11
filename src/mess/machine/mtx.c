@@ -61,18 +61,18 @@ static void bankswitch(running_machine &machine, UINT8 data)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       P0
-        1       P1
-        2       P2
-        3       P3
-        4       R0
-        5       R1
-        6       R2
-        7       RELCPMH
+	    0       P0
+	    1       P1
+	    2       P2
+	    3       P3
+	    4       R0
+	    5       R1
+	    6       R2
+	    7       RELCPMH
 
-    */
+	*/
 	mtx_state *state = machine.driver_data<mtx_state>();
 	address_space &program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 	ram_device *messram = machine.device<ram_device>(RAM_TAG);
@@ -148,18 +148,18 @@ READ8_MEMBER(mtx_state::mtx_prt_r)
 
 	/*
 
-        bit     description
+	    bit     description
 
-        0       BUSY
-        1       ERROR
-        2       PE
-        3       SLCT
-        4
-        5
-        6
-        7
+	    0       BUSY
+	    1       ERROR
+	    2       PE
+	    3       SLCT
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -240,35 +240,35 @@ WRITE8_MEMBER(mtx_state::hrx_address_w)
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       A8
-            1       A9
-            2       A10
-            3
-            4
-            5       attribute memory write enable
-            6       ASCII memory write enable
-            7       cycle (0=read/1=write)
+		    0       A8
+		    1       A9
+		    2       A10
+		    3
+		    4
+		    5       attribute memory write enable
+		    6       ASCII memory write enable
+		    7       cycle (0=read/1=write)
 
-        */
+		*/
 	}
 	else
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       A0
-            1       A1
-            2       A2
-            3       A3
-            4       A4
-            5       A5
-            6       A6
-            7       A7
+		    0       A0
+		    1       A1
+		    2       A2
+		    3       A3
+		    4       A4
+		    5       A5
+		    6       A6
+		    7       A7
 
-        */
+		*/
 	}
 }
 
@@ -306,18 +306,18 @@ WRITE8_MEMBER(mtx_state::hrx_attr_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 }
 
 /***************************************************************************

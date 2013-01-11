@@ -16,7 +16,7 @@
 #define PROCOLOR816_SCREEN_NAME "cb264_screen"
 #define PROCOLOR816_ROM_REGION  "cb264_rom"
 
-#define VRAM_SIZE	(0x200000)  // 2 megs?
+#define VRAM_SIZE   (0x200000)  // 2 megs?
 
 MACHINE_CONFIG_FRAGMENT( procolor816 )
 	MCFG_SCREEN_ADD( PROCOLOR816_SCREEN_NAME, RASTER)
@@ -28,7 +28,7 @@ MACHINE_CONFIG_END
 
 ROM_START( procolor816 )
 	ROM_REGION(0x8000, PROCOLOR816_ROM_REGION, 0)
-    ROM_LOAD( "procolor_ver60590.bin", 0x000000, 0x008000, CRC(ebef6168) SHA1(e41ecc7d12fc13bc74f9223ca02920e8a7eb072b) )
+	ROM_LOAD( "procolor_ver60590.bin", 0x000000, 0x008000, CRC(ebef6168) SHA1(e41ecc7d12fc13bc74f9223ca02920e8a7eb072b) )
 ROM_END
 
 //**************************************************************************
@@ -66,14 +66,14 @@ const rom_entry *nubus_procolor816_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PDS030_PROCOLOR816, "Lapis ProColor Server 8*16", tag, owner, clock),
+		device_t(mconfig, PDS030_PROCOLOR816, "Lapis ProColor Server 8*16", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "pd3_pc16";
 }
 
 nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "pd3_pc16";
@@ -103,7 +103,7 @@ void nubus_procolor816_device::device_start()
 	m_nubus->install_device(slotspace+0xf00000, slotspace+0xff7fff, read32_delegate(FUNC(nubus_procolor816_device::procolor816_r), this), write32_delegate(FUNC(nubus_procolor816_device::procolor816_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -165,14 +165,14 @@ UINT32 nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb
 				{
 					pixels = vram[(y * 640/8) + (BYTE4_XOR_BE(x))];
 
-                    *scanline++ = m_palette[(pixels&0x80)];
-                    *scanline++ = m_palette[((pixels<<1)&0x80)];
-                    *scanline++ = m_palette[((pixels<<2)&0x80)];
-                    *scanline++ = m_palette[((pixels<<3)&0x80)];
-                    *scanline++ = m_palette[((pixels<<4)&0x80)];
-                    *scanline++ = m_palette[((pixels<<5)&0x80)];
-                    *scanline++ = m_palette[((pixels<<6)&0x80)];
-                    *scanline++ = m_palette[((pixels<<7)&0x80)];
+					*scanline++ = m_palette[(pixels&0x80)];
+					*scanline++ = m_palette[((pixels<<1)&0x80)];
+					*scanline++ = m_palette[((pixels<<2)&0x80)];
+					*scanline++ = m_palette[((pixels<<3)&0x80)];
+					*scanline++ = m_palette[((pixels<<4)&0x80)];
+					*scanline++ = m_palette[((pixels<<5)&0x80)];
+					*scanline++ = m_palette[((pixels<<6)&0x80)];
+					*scanline++ = m_palette[((pixels<<7)&0x80)];
 				}
 			}
 			break;
@@ -221,22 +221,22 @@ UINT32 nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb
 			}
 			break;
 
-        case 4:	// 15 bpp
-            {
-                UINT16 *vram16 = (UINT16 *)m_vram;
-                UINT16 pixels;
+		case 4: // 15 bpp
+			{
+				UINT16 *vram16 = (UINT16 *)m_vram;
+				UINT16 pixels;
 
-                for (y = 0; y < 480; y++)
-                {
-                    scanline = &bitmap.pix32(y);
-                    for (x = 0; x < 640; x++)
-                    {
-                        pixels = vram16[(y * 640) + (x^1)];
-                        *scanline++ = MAKE_RGB(((pixels>>10) & 0x1f)<<3, ((pixels>>5) & 0x1f)<<3, (pixels & 0x1f)<<3);
-                    }
-                }
-            }
-            break;
+				for (y = 0; y < 480; y++)
+				{
+					scanline = &bitmap.pix32(y);
+					for (x = 0; x < 640; x++)
+					{
+						pixels = vram16[(y * 640) + (x^1)];
+						*scanline++ = MAKE_RGB(((pixels>>10) & 0x1f)<<3, ((pixels>>5) & 0x1f)<<3, (pixels & 0x1f)<<3);
+					}
+				}
+			}
+			break;
 
 		default:
 			fatalerror("procolor816: unknown video mode %d\n", m_mode);
@@ -247,76 +247,76 @@ UINT32 nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb
 
 WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 {
-    switch (offset)
+	switch (offset)
 	{
-        case 0x3d805:			// mode
-            if (mem_mask == 0xff)
-            {
-                switch (data & 0xff)
-                {
-                    case 0x13:
-                        m_mode = 0;
-                        break;
+		case 0x3d805:           // mode
+			if (mem_mask == 0xff)
+			{
+				switch (data & 0xff)
+				{
+					case 0x13:
+						m_mode = 0;
+						break;
 
-                    case 0x17:
-                        m_mode = 1;
-                        break;
+					case 0x17:
+						m_mode = 1;
+						break;
 
-                    case 0x1b:
-                        m_mode = 2;
-                        break;
+					case 0x1b:
+						m_mode = 2;
+						break;
 
-                    case 0x1e:
-                        m_mode = 3;
-                        break;
+					case 0x1e:
+						m_mode = 3;
+						break;
 
-                    case 0x0a:
-                        m_mode = 4;
-                        break;
-                }
-            }
+					case 0x0a:
+						m_mode = 4;
+						break;
+				}
+			}
 			break;
 
-        case 0x3d800:
-            if (mem_mask == 0x00ff0000)
-            {
-        //          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
-                    m_clutoffs = BITSWAP8((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
-            }
-            else if (mem_mask == 0x000000ff)
-            {
-                    m_colors[m_count++] = (data & 0xff);
+		case 0x3d800:
+			if (mem_mask == 0x00ff0000)
+			{
+		//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+					m_clutoffs = BITSWAP8((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+			}
+			else if (mem_mask == 0x000000ff)
+			{
+					m_colors[m_count++] = (data & 0xff);
 
-                    if (m_count == 3)
-                    {
+					if (m_count == 3)
+					{
 //                        printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
-                        m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
-                        m_clutoffs++;
-                        if (m_clutoffs > 255)
-                        {
-                            m_clutoffs = 0;
-                        }
-                        m_count = 0;
-                    }
-            }
+						m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+						m_clutoffs++;
+						if (m_clutoffs > 255)
+						{
+							m_clutoffs = 0;
+						}
+						m_count = 0;
+					}
+			}
 			break;
 
-    case 0x3dc00:	// VBL control
-            if (mem_mask == 0xff000000)
-            {
-                if (data & 0x04000000)
-                {
-                    m_vbl_disable = 0;
-                    lower_slot_irq();
-                }
-                else
-                {
-                    m_vbl_disable = 1;
-                }
-            }
+	case 0x3dc00:   // VBL control
+			if (mem_mask == 0xff000000)
+			{
+				if (data & 0x04000000)
+				{
+					m_vbl_disable = 0;
+					lower_slot_irq();
+				}
+				else
+				{
+					m_vbl_disable = 1;
+				}
+			}
 			break;
 
-        default:
+		default:
 //            printf("procolor816_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
@@ -324,19 +324,19 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 
 READ32_MEMBER( nubus_procolor816_device::procolor816_r )
 {
-    if (offset == 0x3dc00)
-    {
-        m_toggle ^= 0xffffffff;
-        return m_toggle;
-    }
-    else if (offset == 0x3d807)
-    {
-        return 0;
-    }
-    else
-    {
-        printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
-    }
+	if (offset == 0x3dc00)
+	{
+		m_toggle ^= 0xffffffff;
+		return m_toggle;
+	}
+	else if (offset == 0x3d807)
+	{
+		return 0;
+	}
+	else
+	{
+		printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
+	}
 
 	return 0;
 }
@@ -350,4 +350,3 @@ READ32_MEMBER( nubus_procolor816_device::vram_r )
 {
 	return m_vram32[offset];
 }
-

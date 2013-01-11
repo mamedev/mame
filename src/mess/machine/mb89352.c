@@ -111,17 +111,17 @@ const device_type MB89352A = &device_creator<mb89352_device>;
 
 void mb89352_device::device_config_complete()
 {
-    // copy static configuration if present
+	// copy static configuration if present
 	const mb89352_interface *intf = reinterpret_cast<const mb89352_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<mb89352_interface *>(this) = *intf;
 
-    // otherwise, initialize it to defaults
-    else
-    {
+	// otherwise, initialize it to defaults
+	else
+	{
 		memset(&irq_callback,0,sizeof(irq_callback));
 		memset(&drq_callback,0,sizeof(drq_callback));
-    }
+	}
 }
 
 /*
@@ -129,29 +129,29 @@ void mb89352_device::device_config_complete()
  */
 
 mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MB89352A, "MB89352A", tag, owner, clock)
+	: device_t(mconfig, MB89352A, "MB89352A", tag, owner, clock)
 {
 }
 
 void mb89352_device::device_start()
 {
 	m_phase = SCSI_PHASE_BUS_FREE;
-    m_target = 0;
-    m_command_index = 0;
-    m_line_status = 0x00;
-    m_spc_status = 0x01;  // presumably the data reg is empty to start with
-    m_error_status = 0x00;
-    if(m_transfer_count == 0)
-    	m_spc_status |= SSTS_TC_ZERO;
-    m_ints = 0x00;
+	m_target = 0;
+	m_command_index = 0;
+	m_line_status = 0x00;
+	m_spc_status = 0x01;  // presumably the data reg is empty to start with
+	m_error_status = 0x00;
+	if(m_transfer_count == 0)
+		m_spc_status |= SSTS_TC_ZERO;
+	m_ints = 0x00;
 
-    m_irq_func.resolve(irq_callback,*this);
-    m_drq_func.resolve(drq_callback,*this);
+	m_irq_func.resolve(irq_callback,*this);
+	m_drq_func.resolve(drq_callback,*this);
 
-    memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
+	memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
-    // allocate read timer
-    m_transfer_timer = timer_alloc(TIMER_TRANSFER);
+	// allocate read timer
+	m_transfer_timer = timer_alloc(TIMER_TRANSFER);
 
 	// try to open the devices
 	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
@@ -166,13 +166,13 @@ void mb89352_device::device_start()
 
 void mb89352_device::device_reset()
 {
-    m_phase = SCSI_PHASE_BUS_FREE;
-    m_target = 0;
-    m_command_index = 0;
-    m_line_status = 0x00;
-    m_error_status = 0x00;
-    m_transfer_count = 0;
-    m_spc_status = 0x05;  // presumably the data reg is empty to start with
+	m_phase = SCSI_PHASE_BUS_FREE;
+	m_target = 0;
+	m_command_index = 0;
+	m_line_status = 0x00;
+	m_error_status = 0x00;
+	m_transfer_count = 0;
+	m_spc_status = 0x05;  // presumably the data reg is empty to start with
 }
 
 void mb89352_device::device_stop()
@@ -300,11 +300,11 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 		return m_spc_status;
 	case 0x07:  // SERR - SPC Error Status
 		/*  #define SERR_SCSI_PAR   0x80
-            #define SERR_SPC_PAR    0x40
-            #define SERR_TC_PAR     0x08
-            #define SERR_PHASE_ERR  0x04
-            #define SERR_SHORT_XFR  0x02
-            #define SERR_OFFSET     0x01*/
+		    #define SERR_SPC_PAR    0x40
+		    #define SERR_TC_PAR     0x08
+		    #define SERR_PHASE_ERR  0x04
+		    #define SERR_SHORT_XFR  0x02
+		    #define SERR_OFFSET     0x01*/
 		return 0;
 	case 0x08:  // PCTL - Phase Control
 		return ((m_busfree_int_enable) ? (m_line_status & 0x07) | 0x80 : (m_line_status & 0x07));
@@ -403,15 +403,15 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 		break;
 	case 0x02:  // SCMD - Command
 		/* From NetBSD/x68k source
-        #define SCMD_BUS_REL    0x00
-        #define SCMD_SELECT     0x20
-        #define SCMD_RST_ATN    0x40
-        #define SCMD_SET_ATN    0x60
-        #define SCMD_XFR        0x80
-        #define SCMD_XFR_PAUSE  0xa0
-        #define SCMD_RST_ACK    0xc0
-        #define SCMD_SET_ACK    0xe0
-         */
+		#define SCMD_BUS_REL    0x00
+		#define SCMD_SELECT     0x20
+		#define SCMD_RST_ATN    0x40
+		#define SCMD_SET_ATN    0x60
+		#define SCMD_XFR        0x80
+		#define SCMD_XFR_PAUSE  0xa0
+		#define SCMD_RST_ACK    0xc0
+		#define SCMD_SET_ACK    0xe0
+		 */
 		m_scmd = data;
 		switch((data & 0xe0) >> 5)
 		{
@@ -459,11 +459,11 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				m_irq_func(1);
 			logerror("mb89352: SCMD: Selection (SCSI ID%i)\n",m_target);
 			break;
-		case 0x02:	// Reset ATN
+		case 0x02:  // Reset ATN
 			m_line_status &= ~MB89352_LINE_ATN;
 			logerror("mb89352: SCMD: Reset ATN\n");
 			break;
-		case 0x03:	// Set ATN
+		case 0x03:  // Set ATN
 			m_line_status |= MB89352_LINE_ATN;
 			logerror("mb89352: SCMD: Set ATN\n");
 			break;
@@ -620,26 +620,26 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 		break;
 	case 0x0c:  // TCH - Transfer Counter High
 		m_transfer_count = (m_transfer_count & 0x0000ffff) | (data << 16);
-	    if(m_transfer_count == 0)
-	    	m_spc_status |= SSTS_TC_ZERO;
-	    else
-	    	m_spc_status &= ~SSTS_TC_ZERO;
+		if(m_transfer_count == 0)
+			m_spc_status |= SSTS_TC_ZERO;
+		else
+			m_spc_status &= ~SSTS_TC_ZERO;
 		logerror("mb89352: TCH: Write %02x [%06x]\n",data,m_transfer_count);
 		break;
 	case 0x0d:  // TCM - Transfer Counter Mid
 		m_transfer_count = (m_transfer_count & 0x00ff00ff) | (data << 8);
-	    if(m_transfer_count == 0)
-	    	m_spc_status |= SSTS_TC_ZERO;
-	    else
-	    	m_spc_status &= ~SSTS_TC_ZERO;
+		if(m_transfer_count == 0)
+			m_spc_status |= SSTS_TC_ZERO;
+		else
+			m_spc_status &= ~SSTS_TC_ZERO;
 		logerror("mb89352: TCM: Write %02x [%06x]\n",data,m_transfer_count);
 		break;
 	case 0x0e:  // TCL - Transfer Counter Low
 		m_transfer_count = (m_transfer_count & 0x00ffff00) | data;
-	    if(m_transfer_count == 0)
-	    	m_spc_status |= SSTS_TC_ZERO;
-	    else
-	    	m_spc_status &= ~SSTS_TC_ZERO;
+		if(m_transfer_count == 0)
+			m_spc_status |= SSTS_TC_ZERO;
+		else
+			m_spc_status &= ~SSTS_TC_ZERO;
 		logerror("mb89352: TCL: Write %02x [%06x]\n",data,m_transfer_count);
 		break;
 	default:

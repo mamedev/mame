@@ -47,9 +47,9 @@ READ16_HANDLER( jcart_ctrl_r )
 	else
 	{
 		joy[0] = ((state->ioport("JCART3_3B")->read_safe(0) & 0xc0) >> 2) |
-		  (state->ioport("JCART3_3B")->read_safe(0) & 0x03);
+			(state->ioport("JCART3_3B")->read_safe(0) & 0x03);
 		joy[1] = ((state->ioport("JCART4_3B")->read_safe(0) & 0xc0) >> 2) |
-		  (state->ioport("JCART4_3B")->read_safe(0) & 0x03);
+			(state->ioport("JCART4_3B")->read_safe(0) & 0x03);
 		retdata = (state->m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 	}
 	return retdata;
@@ -211,7 +211,7 @@ static void mess_md_io_write_data_port(running_machine &machine, int portnum, UI
 
 
 static INPUT_PORTS_START( md )
-	PORT_START("CTRLSEL")	/* Controller selection */
+	PORT_START("CTRLSEL")   /* Controller selection */
 	PORT_CONFNAME( 0x0f, 0x00, "Player 1 Controller" )
 	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
 	PORT_CONFSETTING( 0x01, "Joystick 6 Buttons" )
@@ -231,7 +231,7 @@ static INPUT_PORTS_START( md )
 	PORT_CONFNAME( 0xf000, 0x00, "Player 4 Controller (J-Cart)" )
 	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
 
-	PORT_START("PAD1_3B")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_START("PAD1_3B")       /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
@@ -241,7 +241,7 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
 
-	PORT_START("PAD2_3B")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY */
+	PORT_START("PAD2_3B")       /* Joypad 2 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
 
-	PORT_START("JCART3_3B")		/* Joypad 3 on J-Cart (3 button + start) */
+	PORT_START("JCART3_3B")     /* Joypad 3 on J-Cart (3 button + start) */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3) PORT_CONDITION("CTRLSEL", 0xf00, EQUALS, 0x00)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3) PORT_CONDITION("CTRLSEL", 0xf00, EQUALS, 0x00)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3) PORT_CONDITION("CTRLSEL", 0xf00, EQUALS, 0x00)
@@ -261,7 +261,7 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A") PORT_CONDITION("CTRLSEL", 0xf00, EQUALS, 0x00)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(3) PORT_CONDITION("CTRLSEL", 0xf00, EQUALS, 0x00)
 
-	PORT_START("JCART4_3B")		/* Joypad 4 on J-Cart (3 button + start) */
+	PORT_START("JCART4_3B")     /* Joypad 4 on J-Cart (3 button + start) */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4) PORT_CONDITION("CTRLSEL", 0xf000, EQUALS, 0x00)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4) PORT_CONDITION("CTRLSEL", 0xf000, EQUALS, 0x00)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4) PORT_CONDITION("CTRLSEL", 0xf000, EQUALS, 0x00)
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A") PORT_CONDITION("CTRLSEL", 0xf000, EQUALS, 0x00)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(4) PORT_CONDITION("CTRLSEL", 0xf000, EQUALS, 0x00)
 
-	PORT_START("PAD1_6B")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("PAD1_6B")       /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
@@ -281,13 +281,13 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 
-	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Z") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Y") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 X") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Mode") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
 
-	PORT_START("PAD2_6B")		/* Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("PAD2_6B")       /* Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
@@ -297,13 +297,13 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 
-	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Z") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Y") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 X") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Mode") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
 
-	PORT_START("RESET")		/* Buttons on Genesis Console */
+	PORT_START("RESET")     /* Buttons on Genesis Console */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 INPUT_PORTS_END
 
@@ -695,15 +695,15 @@ ROM_END
 
 */
 
-#define PICO_PENX	1
-#define PICO_PENY	2
+#define PICO_PENX   1
+#define PICO_PENY   2
 
 static UINT16 pico_read_penpos(running_machine &machine, int pen)
 {
 	UINT16 penpos = 0;
 
 	switch (pen)
-    {
+	{
 		case PICO_PENX:
 			penpos = machine.root_device().ioport("PENX")->read_safe(0);
 			penpos |= 0x6;
@@ -716,7 +716,7 @@ static UINT16 pico_read_penpos(running_machine &machine, int pen)
 			penpos = penpos * 251 / 255;
 			penpos += 0x1fc;
 			break;
-    }
+	}
 
 	return penpos;
 }
@@ -728,7 +728,7 @@ static READ16_HANDLER( pico_68k_io_read )
 
 	switch (offset)
 	{
-		case 0:	/* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
+		case 0: /* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
 			retdata = (megadrive_region_export << 6) | (megadrive_region_pal << 5);
 			break;
 		case 1:
@@ -736,16 +736,16 @@ static READ16_HANDLER( pico_68k_io_read )
 			break;
 
 			/*
-           Still notes from notaz for the pen :
+			Still notes from notaz for the pen :
 
-           The pen can be used to 'draw' either on the drawing pad or on the storyware
-           itself. Both storyware and drawing pad are mapped on single virtual plane, where
-           coordinates range:
+			The pen can be used to 'draw' either on the drawing pad or on the storyware
+			itself. Both storyware and drawing pad are mapped on single virtual plane, where
+			coordinates range:
 
-           x: 0x03c - 0x17c
-           y: 0x1fc - 0x2f7 (drawing pad)
-              0x2f8 - 0x3f3 (storyware)
-           */
+			x: 0x03c - 0x17c
+			y: 0x1fc - 0x2f7 (drawing pad)
+			  0x2f8 - 0x3f3 (storyware)
+			*/
 		case 2:
 			retdata = pico_read_penpos(space.machine(), PICO_PENX) >> 8;
 			break;
@@ -759,11 +759,11 @@ static READ16_HANDLER( pico_68k_io_read )
 			retdata = pico_read_penpos(space.machine(), PICO_PENY) & 0x00ff;
 			break;
 		case 6:
-	    /* Page register :
-           00 - storyware closed
-           01, 03, 07, 0f, 1f, 3f - pages 1-6
-           either page 5 or page 6 is often unused.
-        */
+		/* Page register :
+		   00 - storyware closed
+		   01, 03, 07, 0f, 1f, 3f - pages 1-6
+		   either page 5 or page 6 is often unused.
+		*/
 			{
 				UINT8 tmp = state->ioport("PAGE")->read_safe(0);
 				if (tmp == 2 && state->m_page_register != 0x3f)
@@ -781,10 +781,10 @@ static READ16_HANDLER( pico_68k_io_read )
 			retdata = 0x00;
 			break;
 		case 8:
-	    /*
-           For reads, if bit 15 is cleared, it means PCM is 'busy' or
-           something like that, as games sometimes wait for it to become 1.
-        */
+		/*
+		   For reads, if bit 15 is cleared, it means PCM is 'busy' or
+		   something like that, as games sometimes wait for it to become 1.
+		*/
 			retdata = 0x00;
 	}
 
@@ -911,7 +911,7 @@ CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md, md_cons_state,  
 CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,	   genesis,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
 
 // this is a standalone system based on the md-like hardware (same vdp etc.)
 

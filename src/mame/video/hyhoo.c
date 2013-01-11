@@ -18,23 +18,23 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_blitter_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data;
+		case 0x00:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data;
 					nb1413m3_gfxradr_l_w(space, 0, data); break;
-		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8);
+		case 0x01:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8);
 					nb1413m3_gfxradr_h_w(space, 0, data); break;
-		case 0x02:	m_blitter_destx = data; break;
-		case 0x03:	m_blitter_desty = data; break;
-		case 0x04:	m_blitter_sizex = data; break;
-		case 0x05:	m_blitter_sizey = data;
+		case 0x02:  m_blitter_destx = data; break;
+		case 0x03:  m_blitter_desty = data; break;
+		case 0x04:  m_blitter_sizex = data; break;
+		case 0x05:  m_blitter_sizey = data;
 					/* writing here also starts the blit */
 					hyhoo_gfxdraw(machine());
 					break;
-		case 0x06:	m_blitter_direction_x = (data >> 0) & 0x01;
+		case 0x06:  m_blitter_direction_x = (data >> 0) & 0x01;
 					m_blitter_direction_y = (data >> 1) & 0x01;
 					m_flipscreen = (~data >> 2) & 0x01;
 					m_dispflag = (~data >> 3) & 0x01;
 					break;
-		case 0x07:	break;
+		case 0x07:  break;
 	}
 }
 

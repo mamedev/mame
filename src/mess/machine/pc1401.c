@@ -136,11 +136,11 @@ DRIVER_INIT_MEMBER(pc1401_state,pc1401)
 #if 0
 	static const char sucker[]={
 		/* this routine dump the memory (start 0)
-           in an endless loop,
-           the pc side must be started before this
-           its here to allow verification of the decimal data
-           in mame disassembler
-        */
+		   in an endless loop,
+		   the pc side must be started before this
+		   its here to allow verification of the decimal data
+		   in mame disassembler
+		*/
 #if 1
 		18,4,/*lip xl */
 		2,0,/*lia 0 startaddress low */

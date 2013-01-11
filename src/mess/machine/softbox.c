@@ -15,10 +15,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG			"z80"
-#define I8251_TAG		"i8251"
-#define I8255_0_TAG		"ic17"
-#define I8255_1_TAG		"ic16"
+#define Z80_TAG         "z80"
+#define I8251_TAG       "i8251"
+#define I8255_0_TAG     "ic17"
+#define I8255_1_TAG     "ic16"
 
 
 
@@ -100,12 +100,12 @@ static const i8251_interface usart_intf =
 
 static I8255A_INTERFACE( ppi0_intf )
 {
-	DEVCB_NULL,	// Port A read
-	DEVCB_NULL,	// Port A write
-	DEVCB_NULL,	// Port B read
-	DEVCB_NULL,	// Port B write
-	DEVCB_NULL,	// Port C read
-	DEVCB_NULL	// Port C write
+	DEVCB_NULL, // Port A read
+	DEVCB_NULL, // Port A write
+	DEVCB_NULL, // Port B read
+	DEVCB_NULL, // Port B write
+	DEVCB_NULL, // Port C read
+	DEVCB_NULL  // Port C write
 };
 
 
@@ -115,12 +115,12 @@ static I8255A_INTERFACE( ppi0_intf )
 
 static I8255A_INTERFACE( ppi1_intf )
 {
-	DEVCB_NULL,	// Port A read
-	DEVCB_NULL,	// Port A write
-	DEVCB_NULL,	// Port B read
-	DEVCB_NULL,	// Port B write
-	DEVCB_NULL,	// Port C read
-	DEVCB_NULL	// Port C write
+	DEVCB_NULL, // Port A read
+	DEVCB_NULL, // Port A write
+	DEVCB_NULL, // Port B read
+	DEVCB_NULL, // Port B write
+	DEVCB_NULL, // Port C read
+	DEVCB_NULL  // Port C write
 };
 
 
@@ -160,9 +160,9 @@ machine_config_constructor softbox_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SOFTBOX, "SoftBox", tag, owner, clock),
-	  device_ieee488_interface(mconfig, *this),
-	  m_maincpu(*this, Z80_TAG)
+	: device_t(mconfig, SOFTBOX, "SoftBox", tag, owner, clock),
+		device_ieee488_interface(mconfig, *this),
+		m_maincpu(*this, Z80_TAG)
 {
 }
 

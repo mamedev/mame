@@ -15,7 +15,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MOS6525_TAG		"u3"
+#define MOS6525_TAG     "u3"
 
 
 
@@ -34,18 +34,18 @@ READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0
-        PA1
-        PA2     REN
-        PA3     ATN
-        PA4     DAV
-        PA5     EOI
-        PA6     NDAC
-        PA7     NRFD
+	    PA0
+	    PA1
+	    PA2     REN
+	    PA3     ATN
+	    PA4     DAV
+	    PA5     EOI
+	    PA6     NDAC
+	    PA7     NRFD
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -63,18 +63,18 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     U4 DC
-        PA1     U4/U5 TE
-        PA2     REN
-        PA3     ATN
-        PA4     DAV
-        PA5     EOI
-        PA6     NDAC
-        PA7     NRFD
+	    PA0     U4 DC
+	    PA1     U4/U5 TE
+	    PA2     REN
+	    PA3     ATN
+	    PA4     DAV
+	    PA5     EOI
+	    PA6     NDAC
+	    PA7     NRFD
 
-    */
+	*/
 
 	m_bus->ren_w(BIT(data, 2));
 	m_bus->atn_w(BIT(data, 3));
@@ -88,18 +88,18 @@ READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0     IFC
-        PC1     SRQ
-        PC2
-        PC3
-        PC4
-        PC5
-        PC6
-        PC7     slot _EXROM
+	    PC0     IFC
+	    PC1     SRQ
+	    PC2
+	    PC3
+	    PC4
+	    PC5
+	    PC6
+	    PC7     slot _EXROM
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -115,18 +115,18 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0     IFC
-        PC1     SRQ
-        PC2
-        PC3     C64 _EXROM
-        PC4     _ROML select
-        PC5
-        PC6
-        PC7
+	    PC0     IFC
+	    PC1     SRQ
+	    PC2
+	    PC3     C64 _EXROM
+	    PC4     _ROML select
+	    PC5
+	    PC6
+	    PC7
 
-    */
+	*/
 
 	m_bus->ifc_w(BIT(data, 0));
 	m_bus->srq_w(BIT(data, 1));
@@ -247,8 +247,8 @@ c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char
 	device_t(mconfig, C64_IEEE488, "IEEE-488", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_tpi(*this, MOS6525_TAG),
-    m_bus(*this, IEEE488_TAG),
-    m_exp(*this, C64_EXPANSION_SLOT_TAG),
+	m_bus(*this, IEEE488_TAG),
+	m_exp(*this, C64_EXPANSION_SLOT_TAG),
 	m_roml_sel(1)
 {
 }

@@ -16,7 +16,7 @@ class neptunp2_state : public driver_device
 public:
 	neptunp2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	DECLARE_READ8_MEMBER(test_r);
@@ -75,13 +75,13 @@ INPUT_PORTS_END
 #if 0
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	RGN_FRAC(1,3),	/* 1024 characters */
-	3,	/* 3 bits per pixel */
-	{ RGN_FRAC(1,3), RGN_FRAC(2,3), RGN_FRAC(0,3) },	/* the bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	RGN_FRAC(1,3),  /* 1024 characters */
+	3,  /* 3 bits per pixel */
+	{ RGN_FRAC(1,3), RGN_FRAC(2,3), RGN_FRAC(0,3) },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 #endif
 

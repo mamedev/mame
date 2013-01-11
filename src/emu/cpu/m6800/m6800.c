@@ -88,7 +88,7 @@ TODO:
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 #if 0
 /* CPU subtypes, needed for extra insn after TAP/CLI/SEI */
@@ -109,78 +109,78 @@ enum
 struct m6800_state
 {
 //  int     subtype;        /* CPU subtype */
-	PAIR	ppc;			/* Previous program counter */
-	PAIR	pc; 			/* Program counter */
-	PAIR	s;				/* Stack pointer */
-	PAIR	x;				/* Index register */
-	PAIR	d;				/* Accumulators */
-	UINT8	cc; 			/* Condition codes */
-	UINT8	wai_state;		/* WAI opcode state ,(or sleep opcode state) */
-	UINT8	nmi_state;		/* NMI line state */
-	UINT8	nmi_pending;	/* NMI pending */
-	UINT8	irq_state[3];	/* IRQ line state [IRQ1,TIN,SC1] */
-	UINT8	ic_eddge;		/* InputCapture eddge , b.0=fall,b.1=raise */
-	int		sc1_state;
+	PAIR    ppc;            /* Previous program counter */
+	PAIR    pc;             /* Program counter */
+	PAIR    s;              /* Stack pointer */
+	PAIR    x;              /* Index register */
+	PAIR    d;              /* Accumulators */
+	UINT8   cc;             /* Condition codes */
+	UINT8   wai_state;      /* WAI opcode state ,(or sleep opcode state) */
+	UINT8   nmi_state;      /* NMI line state */
+	UINT8   nmi_pending;    /* NMI pending */
+	UINT8   irq_state[3];   /* IRQ line state [IRQ1,TIN,SC1] */
+	UINT8   ic_eddge;       /* InputCapture eddge , b.0=fall,b.1=raise */
+	int     sc1_state;
 
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 
 	/* Memory spaces */
-    address_space *program;
-    direct_read_data *direct;
-    address_space *data;
-    address_space *io;
+	address_space *program;
+	direct_read_data *direct;
+	address_space *data;
+	address_space *io;
 
-	void	(* const * insn)(m6800_state *);	/* instruction table */
-	const UINT8 *cycles;			/* clock cycle of instruction table */
+	void    (* const * insn)(m6800_state *);    /* instruction table */
+	const UINT8 *cycles;            /* clock cycle of instruction table */
 	/* internal registers */
-	UINT8	port1_ddr;
-	UINT8	port2_ddr;
-	UINT8	port3_ddr;
-	UINT8	port4_ddr;
-	UINT8	port1_data;
-	UINT8	port2_data;
-	UINT8	port3_data;
-	UINT8	port4_data;
-	UINT8	p3csr;			// Port 3 Control/Status Register
-	UINT8	tcsr;			/* Timer Control and Status Register */
-	UINT8	pending_tcsr;	/* pending IRQ flag for clear IRQflag process */
-	UINT8	irq2;			/* IRQ2 flags */
-	UINT8	ram_ctrl;
-	PAIR	counter;		/* free running counter */
-	PAIR	output_compare;	/* output compare       */
-	UINT16	input_capture;	/* input capture        */
-	int		p3csr_is3_flag_read;
-	int		port3_latched;
+	UINT8   port1_ddr;
+	UINT8   port2_ddr;
+	UINT8   port3_ddr;
+	UINT8   port4_ddr;
+	UINT8   port1_data;
+	UINT8   port2_data;
+	UINT8   port3_data;
+	UINT8   port4_data;
+	UINT8   p3csr;          // Port 3 Control/Status Register
+	UINT8   tcsr;           /* Timer Control and Status Register */
+	UINT8   pending_tcsr;   /* pending IRQ flag for clear IRQflag process */
+	UINT8   irq2;           /* IRQ2 flags */
+	UINT8   ram_ctrl;
+	PAIR    counter;        /* free running counter */
+	PAIR    output_compare; /* output compare       */
+	UINT16  input_capture;  /* input capture        */
+	int     p3csr_is3_flag_read;
+	int     port3_latched;
 
-	int		clock;
-	UINT8	trcsr, rmcr, rdr, tdr, rsr, tsr;
-	int		rxbits, txbits, txstate, trcsr_read_tdre, trcsr_read_orfe, trcsr_read_rdrf, tx;
-	int		port2_written;
+	int     clock;
+	UINT8   trcsr, rmcr, rdr, tdr, rsr, tsr;
+	int     rxbits, txbits, txstate, trcsr_read_tdre, trcsr_read_orfe, trcsr_read_rdrf, tx;
+	int     port2_written;
 
-	int		icount;
-	int		latch09;
+	int     icount;
+	int     latch09;
 
-	PAIR	timer_over;
+	PAIR    timer_over;
 	emu_timer *sci_timer;
-	PAIR ea;		/* effective address */
+	PAIR ea;        /* effective address */
 
-	devcb_resolved_write_line	out_sc2_func;
+	devcb_resolved_write_line   out_sc2_func;
 };
 
 INLINE m6800_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M6800 ||
-		   device->type() == M6801 ||
-		   device->type() == M6802 ||
-		   device->type() == M6803 ||
-		   device->type() == M6808 ||
-		   device->type() == HD6301 ||
-		   device->type() == HD63701 ||
-		   device->type() == NSC8105 ||
-		   device->type() == HD6303R ||
-		   device->type() == HD6303Y);
+			device->type() == M6801 ||
+			device->type() == M6802 ||
+			device->type() == M6803 ||
+			device->type() == M6808 ||
+			device->type() == HD6301 ||
+			device->type() == HD63701 ||
+			device->type() == NSC8105 ||
+			device->type() == HD6303R ||
+			device->type() == HD6303Y);
 	return (m6800_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -188,33 +188,33 @@ INLINE m6800_state *get_safe_token(device_t *device)
 static void hd63701_trap_pc(m6800_state *cpustate);
 #endif
 
-#define	pPPC	cpustate->ppc
-#define pPC 	cpustate->pc
-#define pS		cpustate->s
-#define pX		cpustate->x
-#define pD		cpustate->d
+#define pPPC    cpustate->ppc
+#define pPC     cpustate->pc
+#define pS      cpustate->s
+#define pX      cpustate->x
+#define pD      cpustate->d
 
-#define PC		cpustate->pc.w.l
-#define PCD		cpustate->pc.d
-#define S		cpustate->s.w.l
-#define SD		cpustate->s.d
-#define X		cpustate->x.w.l
-#define D		cpustate->d.w.l
-#define A		cpustate->d.b.h
-#define B		cpustate->d.b.l
-#define CC		cpustate->cc
+#define PC      cpustate->pc.w.l
+#define PCD     cpustate->pc.d
+#define S       cpustate->s.w.l
+#define SD      cpustate->s.d
+#define X       cpustate->x.w.l
+#define D       cpustate->d.w.l
+#define A       cpustate->d.b.h
+#define B       cpustate->d.b.l
+#define CC      cpustate->cc
 
-#define CT		cpustate->counter.w.l
-#define CTH		cpustate->counter.w.h
-#define CTD		cpustate->counter.d
-#define OC		cpustate->output_compare.w.l
-#define OCH		cpustate->output_compare.w.h
-#define OCD		cpustate->output_compare.d
-#define TOH		cpustate->timer_over.w.l
-#define TOD		cpustate->timer_over.d
+#define CT      cpustate->counter.w.l
+#define CTH     cpustate->counter.w.h
+#define CTD     cpustate->counter.d
+#define OC      cpustate->output_compare.w.l
+#define OCH     cpustate->output_compare.w.h
+#define OCD     cpustate->output_compare.d
+#define TOH     cpustate->timer_over.w.l
+#define TOD     cpustate->timer_over.d
 
-#define EAD 	cpustate->ea.d
-#define EA		cpustate->ea.w.l
+#define EAD     cpustate->ea.d
+#define EA      cpustate->ea.w.l
 
 /* point of next timer event */
 static UINT32 timer_next;
@@ -246,34 +246,34 @@ static UINT32 timer_next;
 #define M_RDOP_ARG(Addr) ((unsigned)cpustate->direct->read_raw_byte(Addr))
 
 /* macros to access memory */
-#define IMMBYTE(b)	b = M_RDOP_ARG(PCD); PC++
-#define IMMWORD(w)	w.d = (M_RDOP_ARG(PCD)<<8) | M_RDOP_ARG((PCD+1)&0xffff); PC+=2
+#define IMMBYTE(b)  b = M_RDOP_ARG(PCD); PC++
+#define IMMWORD(w)  w.d = (M_RDOP_ARG(PCD)<<8) | M_RDOP_ARG((PCD+1)&0xffff); PC+=2
 
 #define PUSHBYTE(b) WM(SD,b); --S
 #define PUSHWORD(w) WM(SD,w.b.l); --S; WM(SD,w.b.h); --S
 #define PULLBYTE(b) S++; b = RM(SD)
 #define PULLWORD(w) S++; w.d = RM(SD)<<8; S++; w.d |= RM(SD)
 
-#define MODIFIED_tcsr {	\
+#define MODIFIED_tcsr { \
 	cpustate->irq2 = (cpustate->tcsr&(cpustate->tcsr<<3))&(TCSR_ICF|TCSR_OCF|TCSR_TOF); \
 }
 
-#define SET_TIMER_EVENT {					\
-	timer_next = (OCD - CTD < TOD - CTD) ? OCD : TOD;	\
+#define SET_TIMER_EVENT {                   \
+	timer_next = (OCD - CTD < TOD - CTD) ? OCD : TOD;   \
 }
 
 /* cleanup high-word of counters */
-#define CLEANUP_COUNTERS() {						\
-	OCH -= CTH;									\
-	TOH -= CTH;									\
-	CTH = 0;									\
-	SET_TIMER_EVENT;							\
+#define CLEANUP_COUNTERS() {                        \
+	OCH -= CTH;                                 \
+	TOH -= CTH;                                 \
+	CTH = 0;                                    \
+	SET_TIMER_EVENT;                            \
 }
 
 /* when change freerunningcounter or outputcapture */
-#define MODIFIED_counters {						\
-	OCH = (OC >= CT) ? CTH : CTH+1;				\
-	SET_TIMER_EVENT;							\
+#define MODIFIED_counters {                     \
+	OCH = (OC >= CT) ? CTH : CTH+1;             \
+	SET_TIMER_EVENT;                            \
 }
 
 // I/O registers
@@ -316,34 +316,34 @@ enum
 
 // serial I/O
 
-#define M6800_RMCR_SS_MASK		0x03 // Speed Select
-#define M6800_RMCR_SS_4096		0x03 // E / 4096
-#define M6800_RMCR_SS_1024		0x02 // E / 1024
-#define M6800_RMCR_SS_128		0x01 // E / 128
-#define M6800_RMCR_SS_16		0x00 // E / 16
-#define M6800_RMCR_CC_MASK		0x0c // Clock Control/Format Select
+#define M6800_RMCR_SS_MASK      0x03 // Speed Select
+#define M6800_RMCR_SS_4096      0x03 // E / 4096
+#define M6800_RMCR_SS_1024      0x02 // E / 1024
+#define M6800_RMCR_SS_128       0x01 // E / 128
+#define M6800_RMCR_SS_16        0x00 // E / 16
+#define M6800_RMCR_CC_MASK      0x0c // Clock Control/Format Select
 
-#define M6800_TRCSR_RDRF		0x80 // Receive Data Register Full
-#define M6800_TRCSR_ORFE		0x40 // Over Run Framing Error
-#define M6800_TRCSR_TDRE		0x20 // Transmit Data Register Empty
-#define M6800_TRCSR_RIE			0x10 // Receive Interrupt Enable
-#define M6800_TRCSR_RE			0x08 // Receive Enable
-#define M6800_TRCSR_TIE			0x04 // Transmit Interrupt Enable
-#define M6800_TRCSR_TE			0x02 // Transmit Enable
-#define M6800_TRCSR_WU			0x01 // Wake Up
+#define M6800_TRCSR_RDRF        0x80 // Receive Data Register Full
+#define M6800_TRCSR_ORFE        0x40 // Over Run Framing Error
+#define M6800_TRCSR_TDRE        0x20 // Transmit Data Register Empty
+#define M6800_TRCSR_RIE         0x10 // Receive Interrupt Enable
+#define M6800_TRCSR_RE          0x08 // Receive Enable
+#define M6800_TRCSR_TIE         0x04 // Transmit Interrupt Enable
+#define M6800_TRCSR_TE          0x02 // Transmit Enable
+#define M6800_TRCSR_WU          0x01 // Wake Up
 
-#define M6800_PORT2_IO4			0x10
-#define M6800_PORT2_IO3			0x08
+#define M6800_PORT2_IO4         0x10
+#define M6800_PORT2_IO3         0x08
 
-#define M6801_P3CSR_LE			0x08
-#define M6801_P3CSR_OSS			0x10
-#define M6801_P3CSR_IS3_ENABLE	0x40
-#define M6801_P3CSR_IS3_FLAG	0x80
+#define M6801_P3CSR_LE          0x08
+#define M6801_P3CSR_OSS         0x10
+#define M6801_P3CSR_IS3_ENABLE  0x40
+#define M6801_P3CSR_IS3_FLAG    0x80
 
 static const int M6800_RMCR_SS[] = { 16, 128, 1024, 4096 };
 
-#define M6800_SERIAL_START		0
-#define M6800_SERIAL_STOP		9
+#define M6800_SERIAL_START      0
+#define M6800_SERIAL_STOP       9
 
 enum
 {
@@ -359,40 +359,40 @@ enum
 #define TAKE_TRAP enter_interrupt(cpustate, "M6800 '%s' take TRAP\n",0xffee)
 
 /* operate one instruction for */
-#define ONE_MORE_INSN() {		\
-	UINT8 ireg; 							\
-	pPPC = pPC; 							\
-	debugger_instruction_hook(cpustate->device, PCD);						\
-	ireg=M_RDOP(PCD);						\
-	PC++;									\
-	(*cpustate->insn[ireg])(cpustate);					\
-	increment_counter(cpustate, cpustate->cycles[ireg]);	\
+#define ONE_MORE_INSN() {       \
+	UINT8 ireg;                             \
+	pPPC = pPC;                             \
+	debugger_instruction_hook(cpustate->device, PCD);                       \
+	ireg=M_RDOP(PCD);                       \
+	PC++;                                   \
+	(*cpustate->insn[ireg])(cpustate);                  \
+	increment_counter(cpustate, cpustate->cycles[ireg]);    \
 }
 
 /* CC masks                       HI NZVC
                                 7654 3210   */
-#define CLR_HNZVC	CC&=0xd0
-#define CLR_NZV 	CC&=0xf1
-#define CLR_HNZC	CC&=0xd2
-#define CLR_NZVC	CC&=0xf0
-#define CLR_Z		CC&=0xfb
-#define CLR_NZC 	CC&=0xf2
-#define CLR_ZC		CC&=0xfa
-#define CLR_C		CC&=0xfe
+#define CLR_HNZVC   CC&=0xd0
+#define CLR_NZV     CC&=0xf1
+#define CLR_HNZC    CC&=0xd2
+#define CLR_NZVC    CC&=0xf0
+#define CLR_Z       CC&=0xfb
+#define CLR_NZC     CC&=0xf2
+#define CLR_ZC      CC&=0xfa
+#define CLR_C       CC&=0xfe
 
 /* macros for CC -- CC bits affected should be reset before calling */
-#define SET_Z(a)		if(!(a))SEZ
-#define SET_Z8(a)		SET_Z((UINT8)(a))
-#define SET_Z16(a)		SET_Z((UINT16)(a))
-#define SET_N8(a)		CC|=(((a)&0x80)>>4)
-#define SET_N16(a)		CC|=(((a)&0x8000)>>12)
-#define SET_H(a,b,r)	CC|=((((a)^(b)^(r))&0x10)<<1)
-#define SET_C8(a)		CC|=(((a)&0x100)>>8)
-#define SET_C16(a)		CC|=(((a)&0x10000)>>16)
-#define SET_V8(a,b,r)	CC|=((((a)^(b)^(r)^((r)>>1))&0x80)>>6)
-#define SET_V16(a,b,r)	CC|=((((a)^(b)^(r)^((r)>>1))&0x8000)>>14)
+#define SET_Z(a)        if(!(a))SEZ
+#define SET_Z8(a)       SET_Z((UINT8)(a))
+#define SET_Z16(a)      SET_Z((UINT16)(a))
+#define SET_N8(a)       CC|=(((a)&0x80)>>4)
+#define SET_N16(a)      CC|=(((a)&0x8000)>>12)
+#define SET_H(a,b,r)    CC|=((((a)^(b)^(r))&0x10)<<1)
+#define SET_C8(a)       CC|=(((a)&0x100)>>8)
+#define SET_C16(a)      CC|=(((a)&0x10000)>>16)
+#define SET_V8(a,b,r)   CC|=((((a)^(b)^(r)^((r)>>1))&0x80)>>6)
+#define SET_V16(a,b,r)  CC|=((((a)^(b)^(r)^((r)>>1))&0x8000)>>14)
 
-static const UINT8 flags8i[256]=	 /* increment */
+static const UINT8 flags8i[256]=     /* increment */
 {
 0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -430,14 +430,14 @@ static const UINT8 flags8d[256]= /* decrement */
 0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,
 0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08
 };
-#define SET_FLAGS8I(a)		{CC|=flags8i[(a)&0xff];}
-#define SET_FLAGS8D(a)		{CC|=flags8d[(a)&0xff];}
+#define SET_FLAGS8I(a)      {CC|=flags8i[(a)&0xff];}
+#define SET_FLAGS8D(a)      {CC|=flags8d[(a)&0xff];}
 
 /* combos */
-#define SET_NZ8(a)			{SET_N8(a);SET_Z8(a);}
-#define SET_NZ16(a)			{SET_N16(a);SET_Z16(a);}
-#define SET_FLAGS8(a,b,r)	{SET_N8(r);SET_Z8(r);SET_V8(a,b,r);SET_C8(r);}
-#define SET_FLAGS16(a,b,r)	{SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
+#define SET_NZ8(a)          {SET_N8(a);SET_Z8(a);}
+#define SET_NZ16(a)         {SET_N16(a);SET_Z16(a);}
+#define SET_FLAGS8(a,b,r)   {SET_N8(r);SET_Z8(r);SET_V8(a,b,r);SET_C8(r);}
+#define SET_FLAGS16(a,b,r)  {SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
 
 /* for treating an UINT8 as a signed INT16 */
 #define SIGNED(b) ((INT16)(b&0x80?b|0xff00:b))
@@ -489,8 +489,8 @@ static const UINT8 flags8d[256]= /* decrement */
 #define BRANCH(f) {IMMBYTE(t);if(f){PC+=SIGNED(t);}}
 #define NXORV  ((CC&0x08)^((CC&0x02)<<2))
 
-#define M6800_WAI		8			/* set when WAI is waiting for an interrupt */
-#define M6800_SLP		0x10		/* HD63701 only */
+#define M6800_WAI       8           /* set when WAI is waiting for an interrupt */
+#define M6800_SLP       0x10        /* HD63701 only */
 
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
@@ -580,16 +580,16 @@ static const UINT8 cycles_nsc8105[] =
 };
 #undef XX // /invalid opcode unknown cc
 
-#define EAT_CYCLES													\
-{																	\
-	int cycles_to_eat;												\
+#define EAT_CYCLES                                                  \
+{                                                                   \
+	int cycles_to_eat;                                              \
 																	\
-	cycles_to_eat = timer_next - CTD;								\
-	if( cycles_to_eat > cpustate->icount) cycles_to_eat = cpustate->icount;	\
-	if (cycles_to_eat > 0)											\
-	{																\
-		increment_counter(cpustate, cycles_to_eat);							\
-	}																\
+	cycles_to_eat = timer_next - CTD;                               \
+	if( cycles_to_eat > cpustate->icount) cycles_to_eat = cpustate->icount; \
+	if (cycles_to_eat > 0)                                          \
+	{                                                               \
+		increment_counter(cpustate, cycles_to_eat);                         \
+	}                                                               \
 }
 
 INLINE UINT32 RM16(m6800_state *cpustate, UINT32 Addr )
@@ -646,8 +646,8 @@ static void m6800_check_irq2(m6800_state *cpustate)
 		TAKE_TOI;
 	}
 	else if (((cpustate->trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) == (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) ||
-			 ((cpustate->trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) == (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) ||
-			 ((cpustate->trcsr & (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)) == (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)))
+				((cpustate->trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) == (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) ||
+				((cpustate->trcsr & (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)) == (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)))
 	{
 		//logerror("M6800 '%s' SCI interrupt\n", cpustate->device->tag());
 		TAKE_SCI;
@@ -671,7 +671,7 @@ INLINE void CHECK_IRQ_LINES(m6800_state *cpustate)
 	else
 	{
 		if( cpustate->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
-		{	/* standard IRQ */
+		{   /* standard IRQ */
 			if(cpustate->wai_state & M6800_SLP)
 				cpustate->wai_state &= ~M6800_SLP;
 
@@ -694,7 +694,7 @@ static void check_timer_event(m6800_state *cpustate)
 	/* OCI */
 	if( CTD >= OCD)
 	{
-		OCH++;	// next IRQ point
+		OCH++;  // next IRQ point
 		cpustate->tcsr |= TCSR_OCF;
 		cpustate->pending_tcsr |= TCSR_OCF;
 		MODIFIED_tcsr;
@@ -706,7 +706,7 @@ static void check_timer_event(m6800_state *cpustate)
 	/* TOI */
 	if( CTD >= TOD)
 	{
-		TOH++;	// next IRQ point
+		TOH++;  // next IRQ point
 #if 0
 		CLEANUP_COUNTERS();
 #endif
@@ -763,7 +763,7 @@ INLINE void write_port2(m6800_state *cpustate)
 
 	if ((ddr != 0x1f) && ddr)
 	{
-		data = (cpustate->port2_data & ddr)	| (ddr ^ 0xff);
+		data = (cpustate->port2_data & ddr) | (ddr ^ 0xff);
 	}
 
 	if (cpustate->trcsr & M6800_TRCSR_TE)
@@ -981,7 +981,7 @@ static void serial_receive(m6800_state *cpustate)
 
 static TIMER_CALLBACK( sci_tick )
 {
-    m6800_state *cpustate = (m6800_state *)ptr;
+	m6800_state *cpustate = (m6800_state *)ptr;
 
 	serial_transmit(cpustate);
 	serial_receive(cpustate);
@@ -1064,7 +1064,7 @@ static CPU_RESET( m6800 )
 	m6800_state *cpustate = get_safe_token(device);
 
 	cpustate->cc = 0xc0;
-	SEI;				/* IRQ disabled */
+	SEI;                /* IRQ disabled */
 	PCD = RM16(cpustate,  0xfffe );
 
 	cpustate->wai_state = 0;
@@ -1732,13 +1732,13 @@ WRITE8_HANDLER( m6801_io_w )
 	case IO_CH:
 		//logerror("M6801 '%s' Counter High Register: %02x\n", space.device().tag(), data);
 
-		cpustate->latch09 = data & 0xff;	/* 6301 only */
+		cpustate->latch09 = data & 0xff;    /* 6301 only */
 		CT  = 0xfff8;
 		TOH = CTH;
 		MODIFIED_counters;
 		break;
 
-	case IO_CL:	/* 6301 only */
+	case IO_CL: /* 6301 only */
 		//logerror("M6801 '%s' Counter Low Register: %02x\n", space.device().tag(), data);
 
 		CT = (cpustate->latch09 << 8) | (data & 0xff);
@@ -1848,19 +1848,19 @@ static CPU_SET_INFO( m6800 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	set_irq_line(cpustate, M6800_IRQ_LINE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + M6801_TIN_LINE:	set_irq_line(cpustate, M6801_TIN_LINE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + M6801_SC1_LINE:	set_irq_line(cpustate, M6801_SC1_LINE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:  set_irq_line(cpustate, M6800_IRQ_LINE, info->i);    break;
+		case CPUINFO_INT_INPUT_STATE + M6801_TIN_LINE:  set_irq_line(cpustate, M6801_TIN_LINE, info->i);    break;
+		case CPUINFO_INT_INPUT_STATE + M6801_SC1_LINE:  set_irq_line(cpustate, M6801_SC1_LINE, info->i);    break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  set_irq_line(cpustate, INPUT_LINE_NMI, info->i);    break;
 
-		case CPUINFO_INT_PC:							PC = info->i;								break;
-		case CPUINFO_INT_REGISTER + M6800_PC:			cpustate->pc.w.l = info->i;					break;
-		case CPUINFO_INT_SP:							S = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6800_S:			cpustate->s.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6800_CC:			cpustate->cc = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6800_A:			cpustate->d.b.h = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6800_B:			cpustate->d.b.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6800_X:			cpustate->x.w.l = info->i;					break;
+		case CPUINFO_INT_PC:                            PC = info->i;                               break;
+		case CPUINFO_INT_REGISTER + M6800_PC:           cpustate->pc.w.l = info->i;                 break;
+		case CPUINFO_INT_SP:                            S = info->i;                            break;
+		case CPUINFO_INT_REGISTER + M6800_S:            cpustate->s.w.l = info->i;                  break;
+		case CPUINFO_INT_REGISTER + M6800_CC:           cpustate->cc = info->i;                     break;
+		case CPUINFO_INT_REGISTER + M6800_A:            cpustate->d.b.h = info->i;                  break;
+		case CPUINFO_INT_REGISTER + M6800_B:            cpustate->d.b.l = info->i;                  break;
+		case CPUINFO_INT_REGISTER + M6800_X:            cpustate->x.w.l = info->i;                  break;
 	}
 }
 
@@ -1876,60 +1876,60 @@ CPU_GET_INFO( m6800 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6800_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 12;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(m6800_state);          break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 2;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;               break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 12;                           break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	info->i = cpustate->irq_state[M6800_IRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + M6801_TIN_LINE:	info->i = cpustate->irq_state[M6801_TIN_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + M6801_SC1_LINE:	info->i = cpustate->irq_state[M6801_SC1_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;				break;
+		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:  info->i = cpustate->irq_state[M6800_IRQ_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + M6801_TIN_LINE:  info->i = cpustate->irq_state[M6801_TIN_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + M6801_SC1_LINE:  info->i = cpustate->irq_state[M6801_SC1_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = cpustate->nmi_state;              break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.w.l;				break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->ppc.w.l;                break;
 
-		case CPUINFO_INT_PC:							info->i = PC;							break;
-		case CPUINFO_INT_REGISTER + M6800_PC:			info->i = cpustate->pc.w.l;					break;
-		case CPUINFO_INT_SP:							info->i = S;							break;
-		case CPUINFO_INT_REGISTER + M6800_S:			info->i = cpustate->s.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6800_CC:			info->i = cpustate->cc;						break;
-		case CPUINFO_INT_REGISTER + M6800_A:			info->i = cpustate->d.b.h;					break;
-		case CPUINFO_INT_REGISTER + M6800_B:			info->i = cpustate->d.b.l;					break;
-		case CPUINFO_INT_REGISTER + M6800_X:			info->i = cpustate->x.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6800_WAI_STATE:	info->i = cpustate->wai_state;				break;
+		case CPUINFO_INT_PC:                            info->i = PC;                           break;
+		case CPUINFO_INT_REGISTER + M6800_PC:           info->i = cpustate->pc.w.l;                 break;
+		case CPUINFO_INT_SP:                            info->i = S;                            break;
+		case CPUINFO_INT_REGISTER + M6800_S:            info->i = cpustate->s.w.l;                  break;
+		case CPUINFO_INT_REGISTER + M6800_CC:           info->i = cpustate->cc;                     break;
+		case CPUINFO_INT_REGISTER + M6800_A:            info->i = cpustate->d.b.h;                  break;
+		case CPUINFO_INT_REGISTER + M6800_B:            info->i = cpustate->d.b.l;                  break;
+		case CPUINFO_INT_REGISTER + M6800_X:            info->i = cpustate->x.w.l;                  break;
+		case CPUINFO_INT_REGISTER + M6800_WAI_STATE:    info->i = cpustate->wai_state;              break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6800);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6800);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6800);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m6800);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6800);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6800);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(m6800);           break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(m6800);              break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(m6800);                break;
+		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(m6800);              break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(m6800);            break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(m6800);            break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6800");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Motorola 6800");		break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.1");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "The MAME team.");		break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "M6800");               break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Motorola 6800");       break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.1");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "The MAME team.");      break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
@@ -1943,13 +1943,13 @@ CPU_GET_INFO( m6800 )
 				cpustate->cc & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M6800_A:			sprintf(info->s, "A:%02X", cpustate->d.b.h); break;
-		case CPUINFO_STR_REGISTER + M6800_B:			sprintf(info->s, "B:%02X", cpustate->d.b.l); break;
-		case CPUINFO_STR_REGISTER + M6800_PC:			sprintf(info->s, "PC:%04X", cpustate->pc.w.l); break;
-		case CPUINFO_STR_REGISTER + M6800_S:			sprintf(info->s, "S:%04X", cpustate->s.w.l); break;
-		case CPUINFO_STR_REGISTER + M6800_X:			sprintf(info->s, "X:%04X", cpustate->x.w.l); break;
-		case CPUINFO_STR_REGISTER + M6800_CC:			sprintf(info->s, "CC:%02X", cpustate->cc); break;
-		case CPUINFO_STR_REGISTER + M6800_WAI_STATE:	sprintf(info->s, "WAI:%X", cpustate->wai_state); break;
+		case CPUINFO_STR_REGISTER + M6800_A:            sprintf(info->s, "A:%02X", cpustate->d.b.h); break;
+		case CPUINFO_STR_REGISTER + M6800_B:            sprintf(info->s, "B:%02X", cpustate->d.b.l); break;
+		case CPUINFO_STR_REGISTER + M6800_PC:           sprintf(info->s, "PC:%04X", cpustate->pc.w.l); break;
+		case CPUINFO_STR_REGISTER + M6800_S:            sprintf(info->s, "S:%04X", cpustate->s.w.l); break;
+		case CPUINFO_STR_REGISTER + M6800_X:            sprintf(info->s, "X:%04X", cpustate->x.w.l); break;
+		case CPUINFO_STR_REGISTER + M6800_CC:           sprintf(info->s, "CC:%02X", cpustate->cc); break;
+		case CPUINFO_STR_REGISTER + M6800_WAI_STATE:    sprintf(info->s, "WAI:%X", cpustate->wai_state); break;
 	}
 }
 
@@ -1963,18 +1963,18 @@ CPU_GET_INFO( m6801 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                         info->i = 4;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 9;                    break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6801);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6801);			break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(m6801);              break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(m6801);            break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6801");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "M6801");               break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -1988,16 +1988,16 @@ CPU_GET_INFO( m6802 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 4;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6802);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6802);			break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(m6802);              break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(m6802);            break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6802");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "M6802");               break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2011,20 +2011,20 @@ CPU_GET_INFO( m6803 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                         info->i = 4;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 9;                    break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6803);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6803);			break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(m6803);              break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(m6803);            break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(m6803_mem); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6803");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "M6803");               break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2038,16 +2038,16 @@ CPU_GET_INFO( m6808 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 4;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6808);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6808);			break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(m6808);              break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(m6808);            break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6808");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "M6808");               break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2061,18 +2061,18 @@ CPU_GET_INFO( hd6301 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                         info->i = 4;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 9;                    break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd6301);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);		break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(hd6301);             break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);       break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HD6301");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "HD6301");              break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2086,18 +2086,18 @@ CPU_GET_INFO( hd6303r )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                         info->i = 4;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 9;                    break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd6301);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);		break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(hd6301);             break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);       break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HD6303R");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "HD6303R");             break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2112,18 +2112,18 @@ CPU_GET_INFO( hd6303y )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                         info->i = 4;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 9;                    break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd6301);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);		break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(hd6301);             break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);       break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HD6303Y");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "HD6303Y");             break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2136,18 +2136,18 @@ CPU_GET_INFO( hd63701 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 9;					break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                         info->i = 4;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 9;                    break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd63701);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd63701);		break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(hd63701);                break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(hd63701);      break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63701");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "HD63701");             break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2161,16 +2161,16 @@ CPU_GET_INFO( nsc8105 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 4;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(nsc8105);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nsc8105);		break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(nsc8105);                break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(nsc8105);      break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "NSC8105");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "NSC8105");             break;
 
-		default:										CPU_GET_INFO_CALL(m6800);				break;
+		default:                                        CPU_GET_INFO_CALL(m6800);               break;
 	}
 }
 
@@ -2193,6 +2193,3 @@ DEFINE_LEGACY_CPU_DEVICE(HD6303R, hd6303r);
 // FP-64A package: HD6303YH,  HD63A03YH,  HD63B03YH,  HD63C03YH
 // CP-68  package: HD6303YCP, HD63A03YCP, HD63B03YCP, HD63C03YCP
 DEFINE_LEGACY_CPU_DEVICE(HD6303Y, hd6303y);
-
-
-

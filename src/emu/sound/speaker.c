@@ -92,20 +92,20 @@ struct speaker_state
 	int level;
 
 	/* The volume of a composed sample grows incrementally each time the speaker is over-sampled.
-     * That is in effect a basic average filter.
-     * Another filter can and will be applied to the array of composed samples.
-     */
-	double        composed_volume[FILTER_LENGTH];	/* integrator(s) */
-	int           composed_sample_index;			/* array index for composed_volume */
-	attoseconds_t channel_sample_period;			/* in as */
-	double        channel_sample_period_secfrac;	/* in fraction of second */
+	 * That is in effect a basic average filter.
+	 * Another filter can and will be applied to the array of composed samples.
+	 */
+	double        composed_volume[FILTER_LENGTH];   /* integrator(s) */
+	int           composed_sample_index;            /* array index for composed_volume */
+	attoseconds_t channel_sample_period;            /* in as */
+	double        channel_sample_period_secfrac;    /* in fraction of second */
 	attotime      channel_last_sample_time;
 	attotime      channel_next_sample_time;
 	attoseconds_t interm_sample_period;
 	double        interm_sample_period_secfrac;
 	attotime      next_interm_sample_time;
-	int           interm_sample_index;				/* counts interm. samples between stream samples */
-	attotime      last_update_time;					/* internal timestamp */
+	int           interm_sample_index;              /* counts interm. samples between stream samples */
+	attotime      last_update_time;                 /* internal timestamp */
 };
 
 
@@ -168,30 +168,30 @@ static DEVICE_START( speaker )
 	sp->next_interm_sample_time = sp->channel_last_sample_time + attotime(0, sp->interm_sample_period);
 	sp->interm_sample_index = 0;
 	/* Note: To avoid time drift due to floating point inaccuracies,
-     * it is good if the speaker time synchronizes itself with the stream timing regularly.
-     */
+	 * it is good if the speaker time synchronizes itself with the stream timing regularly.
+	 */
 
 	/* Compute filter kernel; */
 	/* (Done for each device though the data is shared...
-     *  No problem really, but should be done as part of system init if I knew how)
-     */
+	 *  No problem really, but should be done as part of system init if I knew how)
+	 */
 #if 1
 	/* This is an approximated sinc (a perfect sinc makes an ideal low-pass filter).
-     * FILTER_STEP determines the cutoff frequency,
-     * which should be below the Nyquist freq, i.e. half the sample rate.
-     * Smaller step => kernel extends in time domain => lower cutoff freq
-     * In this case, with sinc, filter step PI corresponds to the Nyq. freq.
-     * Since we do not get a perfect filter => must lower the cutoff freq some more.
-     * For example, step PI/(2*RATE_MULTIPLIER) corresponds to cutoff freq = sample rate / 4;
-     *    With -samplerate 48000, cutoff freq is ca 12kHz while the Nyq. freq is 24kHz.
-     *    With -samplerate 96000, cutoff freq is ca 24kHz while the Nyq. freq is 48kHz.
-     * For a steeper, more efficient filter, increase FILTER_LENGTH at the expense of CPU usage.
-     */
+	 * FILTER_STEP determines the cutoff frequency,
+	 * which should be below the Nyquist freq, i.e. half the sample rate.
+	 * Smaller step => kernel extends in time domain => lower cutoff freq
+	 * In this case, with sinc, filter step PI corresponds to the Nyq. freq.
+	 * Since we do not get a perfect filter => must lower the cutoff freq some more.
+	 * For example, step PI/(2*RATE_MULTIPLIER) corresponds to cutoff freq = sample rate / 4;
+	 *    With -samplerate 48000, cutoff freq is ca 12kHz while the Nyq. freq is 24kHz.
+	 *    With -samplerate 96000, cutoff freq is ca 24kHz while the Nyq. freq is 48kHz.
+	 * For a steeper, more efficient filter, increase FILTER_LENGTH at the expense of CPU usage.
+	 */
 	#define FILTER_STEP  (M_PI / 2 / RATE_MULTIPLIER)
 	/* Distribute symmetrically on x axis; center has x=0 if length is odd */
-	for (i = 0, 			x = (0.5 - FILTER_LENGTH / 2.) * FILTER_STEP;
-	     i < FILTER_LENGTH;
-		 i++,				x += FILTER_STEP)
+	for (i = 0,             x = (0.5 - FILTER_LENGTH / 2.) * FILTER_STEP;
+			i < FILTER_LENGTH;
+			i++,                x += FILTER_STEP)
 	{
 		if (x == 0)
 			ampl[i] = 1;
@@ -200,9 +200,9 @@ static DEVICE_START( speaker )
 	}
 #else
 	/* Trivial average filter with poor frequency cutoff properties;
-     * First zero (frequency where amplification=0) = sample rate / filter length
-     * Cutoff frequency approx <= first zero / 2
-     */
+	 * First zero (frequency where amplification=0) = sample rate / filter length
+	 * Cutoff frequency approx <= first zero / 2
+	 */
 	for (i = 0, i < FILTER_LENGTH; i++)
 		ampl[i] = 1;
 #endif
@@ -228,9 +228,9 @@ static STREAM_UPDATE( speaker_sound_update )
 			sampled_time *= samples;
 
 		/* Note: since the stream is in the process of being updated,
-         * stream->sample_time() will return the time before the update! (MAME 0.130)
-         * Avoid using it here in order to avoid a subtle dependence on the stream implementation.
-         */
+		 * stream->sample_time() will return the time before the update! (MAME 0.130)
+		 * Avoid using it here in order to avoid a subtle dependence on the stream implementation.
+		 */
 	}
 
 	if (samples-- > 0)
@@ -286,16 +286,16 @@ void speaker_level_w(device_t *device, int new_level)
 		return;
 	}
 	/* Reaching here means such time has passed since last stream update
-     * that we can add at least one complete sample to the stream.
-     * The details have to be handled by speaker_sound_update()
-     */
+	 * that we can add at least one complete sample to the stream.
+	 * The details have to be handled by speaker_sound_update()
+	 */
 
 	/* Force streams.c to update sound until this point in time now */
 	sp->channel->update();
 
 	/* This is redundant because time update has to be done within speaker_sound_update() anyway,
-     * however this ensures synchronization between the speaker and stream timing:
-     */
+	 * however this ensures synchronization between the speaker and stream timing:
+	 */
 	sp->channel_last_sample_time = sp->channel->sample_time();
 	sp->channel_next_sample_time = sp->channel_last_sample_time + attotime(0, sp->channel_sample_period);
 	sp->next_interm_sample_time = sp->channel_last_sample_time + attotime(0, sp->interm_sample_period);
@@ -325,9 +325,9 @@ static void update_interm_samples(speaker_state *sp, attotime time, int volume)
 		init_next_interm_sample(sp);
 	}
 	/* Depending on status above:
-     * a) Add latest fraction to unfinished composed sample
-     * b) The overshooting fraction of time will start a new composed sample
-     */
+	 * a) Add latest fraction to unfinished composed sample
+	 * b) The overshooting fraction of time will start a new composed sample
+	 */
 	fraction = make_fraction(time, sp->last_update_time, sp->interm_sample_period_secfrac);
 	sp->composed_volume[sp->composed_sample_index] += volume * fraction;
 	sp->last_update_time = time;
@@ -367,8 +367,8 @@ static void finalize_interm_sample(speaker_state *sp, int volume)
 
 	/* Fill the composed sample up if it was incomplete */
 	fraction = make_fraction(sp->next_interm_sample_time,
-	                         sp->last_update_time,
-	                         sp->interm_sample_period_secfrac);
+								sp->last_update_time,
+								sp->interm_sample_period_secfrac);
 	sp->composed_volume[sp->composed_sample_index] += volume * fraction;
 	/* Update time state */
 	sp->last_update_time = sp->next_interm_sample_time;
@@ -421,7 +421,7 @@ const device_type SPEAKER_SOUND = &device_creator<speaker_sound_device>;
 
 speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SPEAKER_SOUND, "Speaker", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(speaker_state);
 }
@@ -454,5 +454,3 @@ void speaker_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

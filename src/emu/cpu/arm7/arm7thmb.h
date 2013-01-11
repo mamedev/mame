@@ -101,4 +101,3 @@ const void tg0e_0(arm_state *cpustate, UINT32 pc, UINT32 insn);
 const void tg0e_1(arm_state *cpustate, UINT32 pc, UINT32 insn);
 const void tg0f_0(arm_state *cpustate, UINT32 pc, UINT32 insn);
 const void tg0f_1(arm_state *cpustate, UINT32 pc, UINT32 insn);
-

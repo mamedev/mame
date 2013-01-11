@@ -10,9 +10,9 @@
 #include "video/s2636.h"
 #include "includes/galaxia.h"
 
-#define SPRITE_PEN_BASE		(0x10)
-#define STAR_PEN			(0x18)
-#define BULLET_PEN			(0x19)
+#define SPRITE_PEN_BASE     (0x10)
+#define STAR_PEN            (0x18)
+#define BULLET_PEN          (0x19)
 
 
 // Colors are 1bpp, but how they are generated is a mystery
@@ -158,7 +158,7 @@ UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 
 				if (background)
 				{
 					/* bit4 causes problems on 2nd level
-                    if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10; */
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10; */
 					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
 					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
 				}

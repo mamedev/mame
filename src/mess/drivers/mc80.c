@@ -150,11 +150,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc80_state::mc8020_kbd)
 // this is a guess there is no information available
 static const z80_daisy_config mc8030_daisy_chain[] =
 {
-	{ "asp_ctc" },		/* System ctc */
-	{ "asp_pio" },		/* System pio */
-	{ "asp_sio" },		/* sio */
-	{ "zve_pio" },		/* User pio */
-	{ "zve_ctc" },		/* User ctc */
+	{ "asp_ctc" },      /* System ctc */
+	{ "asp_pio" },      /* System pio */
+	{ "asp_sio" },      /* sio */
+	{ "zve_pio" },      /* User pio */
+	{ "zve_ctc" },      /* User ctc */
 	{ NULL }
 };
 

@@ -210,7 +210,7 @@ static void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &clipr
 	{
 		int sy    = 240 - sprite[offs + 0];
 		int code  = (sprite[offs + 1] >> 2) + ((sprite[offs + 2] >> 5) & 0x07) * 0x40;
-		int color = sprite[offs + 2] & 0x0f;	/* TODO: bit 4 toggles continuously, what is it? */
+		int color = sprite[offs + 2] & 0x0f;    /* TODO: bit 4 toggles continuously, what is it? */
 		int sx    = sprite[offs + 3];
 		int flipx = sprite[offs + 1] & 0x01;
 
@@ -242,7 +242,7 @@ static void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &clip
 	{
 		int sy    = 240 - sprite[offs + 0];
 		int code  = 0x200 + (sprite[offs + 1] >> 2) + ((sprite[offs + 2] >> 5) & 0x07) * 0x40;
-		int color = sprite[offs + 2] & 0x0f;	/* TODO: bit 4 toggles continuously, what is it? */
+		int color = sprite[offs + 2] & 0x0f;    /* TODO: bit 4 toggles continuously, what is it? */
 		int sx    = sprite[offs + 3];
 		int flipx = sprite[offs + 1] & 0x01;
 
@@ -269,7 +269,7 @@ UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (m_priority == 0)	/* fg behind sprites */
+	if (m_priority == 0)    /* fg behind sprites */
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
@@ -288,7 +288,7 @@ UINT32 appoooh_state::screen_update_appoooh(screen_device &screen, bitmap_ind16 
 		appoooh_draw_sprites(bitmap, cliprect, machine().gfx[2], m_spriteram);
 	}
 
-	if (m_priority != 0)	/* fg in front of sprites */
+	if (m_priority != 0)    /* fg in front of sprites */
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -298,7 +298,7 @@ UINT32 appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (m_priority == 0)	/* fg behind sprites */
+	if (m_priority == 0)    /* fg behind sprites */
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
@@ -317,7 +317,7 @@ UINT32 appoooh_state::screen_update_robowres(screen_device &screen, bitmap_ind16
 		robowres_draw_sprites(bitmap, cliprect, machine().gfx[2], m_spriteram);
 	}
 
-	if (m_priority != 0)	/* fg in front of sprites */
+	if (m_priority != 0)    /* fg in front of sprites */
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

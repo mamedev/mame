@@ -256,9 +256,9 @@ WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
 MACHINE_RESET_MEMBER(nycaptor_state,ta7630)
 {
 	int i;
-	double db			= 0.0;
-	double db_step		= 0.50;	/* 0.50 dB step (at least, maybe more) */
-	double db_step_inc	= 0.275;
+	double db           = 0.0;
+	double db_step      = 0.50; /* 0.50 dB step (at least, maybe more) */
+	double db_step_inc  = 0.275;
 
 	for (i = 0; i < 16; i++)
 	{
@@ -317,7 +317,7 @@ static const ay8910_interface ay8910_config =
 
 static const msm5232_interface msm5232_config =
 {
-	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 },	/* 0.65 (???) uF capacitors (match the sample, not verified) */
+	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }, /* 0.65 (???) uF capacitors (match the sample, not verified) */
 	DEVCB_NULL
 };
 
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(nycaptor_mcu_r, nycaptor_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
-	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, nycaptor_generic_control_w)	/* bit 3 - memory bank at 0x8000-0xbfff */
+	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, nycaptor_generic_control_w)   /* bit 3 - memory bank at 0x8000-0xbfff */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READNOP
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
@@ -542,88 +542,88 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( nycaptor )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       /* table at 0x00e5 in CPU1 - see notes for 'colt' */
-	PORT_DIPSETTING(	0x02, "20k 80k 80k+" )
-	PORT_DIPSETTING(	0x03, "50k 150k 200k+" )
-	PORT_DIPSETTING(	0x01, "100k 300k 300k+" )
-	PORT_DIPSETTING(	0x00, "150k 300k 300k+" )
+	PORT_DIPSETTING(    0x02, "20k 80k 80k+" )
+	PORT_DIPSETTING(    0x03, "50k 150k 200k+" )
+	PORT_DIPSETTING(    0x01, "100k 300k 300k+" )
+	PORT_DIPSETTING(    0x00, "150k 300k 300k+" )
 	PORT_DIPNAME( 0x04, 0x04, "Infinite Bullets")           /* see notes */
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            /* values are read from the MCU */
-	PORT_DIPSETTING(	0x08, "1" )
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x18, "3" )
-	PORT_DIPSETTING(	0x10, "5" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x0f, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(	0x0e, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(	0x0d, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(	0x0b, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(	0x0a, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x09, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(	0x06, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(	0x07, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
 	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0xf0, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(	0xe0, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(	0xd0, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(	0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(	0xa0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x90, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(	0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(	0x60, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(	0x70, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSWC")
 	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Training Spot" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "Reset Damage" )
-	PORT_DIPSETTING(	0x20, "Every Stage" )
-	PORT_DIPSETTING(	0x00, "Every 4 Stages" )
+	PORT_DIPSETTING(    0x20, "Every Stage" )
+	PORT_DIPSETTING(    0x00, "Every 4 Stages" )
 	PORT_DIPNAME( 0x40, 0x40, "No Hit (Cheat)")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x80, "2" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -652,10 +652,10 @@ static INPUT_PORTS_START( colt )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            /* see notes */
-	PORT_DIPSETTING(	0x08, "1" )
-	PORT_DIPSETTING(	0x10, "2" )
-	PORT_DIPSETTING(	0x18, "3" )
-	PORT_DIPSETTING(	0x00, "100" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x00, "100" )
 INPUT_PORTS_END
 
 
@@ -670,19 +670,19 @@ static INPUT_PORTS_START( cyclshtg )
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )       /* table at 0x100f - see notes for 'bronx' */
-	PORT_DIPSETTING(	0x0c, "150k 350k 200k+" )
-	PORT_DIPSETTING(	0x08, "200k 500k 300k+" )
-	PORT_DIPSETTING(	0x04, "300k 700k 400k+" )
-	PORT_DIPSETTING(	0x00, "400k 900k 500k+" )
+	PORT_DIPSETTING(    0x0c, "150k 350k 200k+" )
+	PORT_DIPSETTING(    0x08, "200k 500k 300k+" )
+	PORT_DIPSETTING(    0x04, "300k 700k 400k+" )
+	PORT_DIPSETTING(    0x00, "400k 900k 500k+" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            /* see notes */
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x30, "3" )
-	PORT_DIPSETTING(	0x10, "4" )
-	PORT_DIPSETTING(	0x20, "5" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x80, 0x80, "Reset Damage (Cheat)" )      /* see notes */
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWC")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
@@ -690,8 +690,8 @@ static INPUT_PORTS_START( cyclshtg )
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x10, "Infinite Bullets" )          /* see notes */
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
@@ -723,10 +723,10 @@ static INPUT_PORTS_START( bronx )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            /* see notes */
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x30, "2" )
-	PORT_DIPSETTING(	0x10, "4" )
-	PORT_DIPSETTING(	0x20, "5" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
 INPUT_PORTS_END
 
 
@@ -829,22 +829,22 @@ void nycaptor_state::machine_reset()
 static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)		/* ??? */
+	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* ??? */
 	MCFG_CPU_PROGRAM_MAP(nycaptor_master_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(nycaptor_slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)	/* IRQ generated by ??? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)   /* IRQ generated by ??? */
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(nycaptor_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)	/* IRQ generated by ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)  /* IRQ generated by ??? */
 
 	MCFG_CPU_ADD("mcu", M68705,2000000)
 	MCFG_CPU_PROGRAM_MAP(nycaptor_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
 
 	/* video hardware */
@@ -872,14 +872,14 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -929,14 +929,14 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -983,14 +983,14 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -1185,7 +1185,7 @@ ROM_START( bronx )
 	ROM_LOAD( "a80_11.u11",   0x00000, 0x4000, CRC(29e1293b) SHA1(106204ec46fae5d3b5e4a4d423bc0e886a637c61) )
 	ROM_LOAD( "a80_10.u10",   0x04000, 0x4000, CRC(345f576c) SHA1(fee5b2167bcd0fdc21c0a7b22ffdf7506a24baee) )
 	ROM_LOAD( "a80_09.u9",    0x08000, 0x4000, CRC(3ef06dff) SHA1(99bbd32ae89a6becac9e1bb8a34a834d81890444) )
-	ROM_LOAD( "8.bin",  		0x0c000, 0x4000, CRC(2b778d24) SHA1(caca7a18743a4bb657a7c5691d93de0ccb867003) )
+	ROM_LOAD( "8.bin",          0x0c000, 0x4000, CRC(2b778d24) SHA1(caca7a18743a4bb657a7c5691d93de0ccb867003) )
 
 	ROM_LOAD( "a80_15.u39",   0x10000, 0x4000, CRC(2cefb47d) SHA1(3bef20c9c0c4f9237a327da3cbc9a7bbf63771ea) )
 	ROM_LOAD( "a80_14.u34",   0x14000, 0x4000, CRC(91642de8) SHA1(531974fc147d25e9feada89bc82d5df62ec9d446) )

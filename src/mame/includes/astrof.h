@@ -37,8 +37,8 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
-	samples_device *m_samples;	// astrof & abattle
-	device_t *m_sn;	// tomahawk
+	samples_device *m_samples;  // astrof & abattle
+	device_t *m_sn; // tomahawk
 	DECLARE_READ8_MEMBER(irq_clear_r);
 	DECLARE_WRITE8_MEMBER(astrof_videoram_w);
 	DECLARE_WRITE8_MEMBER(tomahawk_videoram_w);

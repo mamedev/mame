@@ -34,8 +34,8 @@ typedef int (*upd7810_io_callback)(device_t *device, int ioline, int state);
 
 // use it as reset parameter in the Machine struct
 struct UPD7810_CONFIG {
-    UPD7810_TYPE type;
-    upd7810_io_callback io_callback;
+	UPD7810_TYPE type;
+	upd7810_io_callback io_callback;
 };
 
 enum
@@ -66,9 +66,9 @@ enum
 };
 
 /* IRQ lines */
-#define UPD7810_INTF1		0
-#define UPD7810_INTF2		1
-#define UPD7810_INTF0		2
+#define UPD7810_INTF1       0
+#define UPD7810_INTF2       1
+#define UPD7810_INTF0       2
 #define UPD7810_INTFE1      4
 
 DECLARE_LEGACY_CPU_DEVICE(UPD7810, upd7810);

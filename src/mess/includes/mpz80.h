@@ -14,31 +14,31 @@
 #include "machine/s100_wunderbus.h"
 #include "machine/terminal.h"
 
-#define Z80_TAG			"17a"
-#define AM9512_TAG		"17d"
-#define TERMINAL_TAG	"terminal"
+#define Z80_TAG         "17a"
+#define AM9512_TAG      "17d"
+#define TERMINAL_TAG    "terminal"
 
 class mpz80_state : public driver_device
 {
 public:
 	mpz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_s100(*this, S100_TAG),
-		  m_map_ram(*this, "map_ram"),
-		  m_nmi(1),
-		  m_pint(1),
-		  m_int_pend(0),
-		  m_pretrap(0),
-		  m_trap(0),
-		  m_trap_reset(0),
-		  m_trap_void(1),
-		  m_trap_halt(1),
-		  m_trap_int(1),
-		  m_trap_stop(1),
-		  m_trap_aux(1)
+			m_maincpu(*this, Z80_TAG),
+			m_ram(*this, RAM_TAG),
+			m_terminal(*this, TERMINAL_TAG),
+			m_s100(*this, S100_TAG),
+			m_map_ram(*this, "map_ram"),
+			m_nmi(1),
+			m_pint(1),
+			m_int_pend(0),
+			m_pretrap(0),
+			m_trap(0),
+			m_trap_reset(0),
+			m_trap_void(1),
+			m_trap_halt(1),
+			m_trap_int(1),
+			m_trap_stop(1),
+			m_trap_aux(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

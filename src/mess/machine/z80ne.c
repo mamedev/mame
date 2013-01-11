@@ -116,23 +116,23 @@ DRIVER_INIT_MEMBER(z80ne_state,z80netf)
 TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
 {
 	/*
-     * NE555 is connected to a 74LS93 binary counter
-     * 74LS93 output:
-     *   QA-QC: column index for LEDs and keyboard
-     *   QD:    keyboard row select
-     *
-     * Port F0 input bit assignment:
-     *   0  QA  bits 0..3 of row counter
-     *   1  QB
-     *   2  QC
-     *   3  QD
-     *   4  Control button pressed, active high
-     *   5  Always low
-     *   6  Always low
-     *   7  Selected button pressed, active low
-     *
-     *
-     */
+	 * NE555 is connected to a 74LS93 binary counter
+	 * 74LS93 output:
+	 *   QA-QC: column index for LEDs and keyboard
+	 *   QD:    keyboard row select
+	 *
+	 * Port F0 input bit assignment:
+	 *   0  QA  bits 0..3 of row counter
+	 *   1  QB
+	 *   2  QC
+	 *   3  QD
+	 *   4  Control button pressed, active high
+	 *   5  Always low
+	 *   6  Always low
+	 *   7  Selected button pressed, active low
+	 *
+	 *
+	 */
 
 	UINT16 key_bits;
 	UINT8 ctrl; //, rst;
@@ -184,9 +184,9 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 {
 	address_space &space = machine().device("z80ne")->memory().space(AS_PROGRAM);
 	/*
-     * TODO: when debugger is active, his memory access causes this callback
-     *
-     */
+	 * TODO: when debugger is active, his memory access causes this callback
+	 *
+	 */
 	if(!space.debugger_access())
 		m_reset_delay_counter--;
 
@@ -214,8 +214,8 @@ static void reset_lx382_banking(running_machine &machine)
 	address_space &space = machine.device("z80ne")->memory().space(AS_PROGRAM);
 
 	/* switch to ROM bank at address 0x0000 */
-    state->membank("bank1")->set_entry(1);
-    state->membank("bank2")->set_entry(0);  /* ep382 at 0x8000 */
+	state->membank("bank1")->set_entry(1);
+	state->membank("bank2")->set_entry(0);  /* ep382 at 0x8000 */
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	state->m_reset_delay_counter = 2;
@@ -232,55 +232,55 @@ static void reset_lx390_banking(running_machine &machine)
 	case 0x01: /* EP382 Hex Monitor */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep382\n");
-	    state->membank("bank1")->set_entry(4);  /* ep382 at 0x0000 for 3 cycles, then RAM */
-	    state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400 */
-	    state->membank("bank3")->set_entry(1);  /* ep382 at 0x8000 */
-	    state->membank("bank4")->set_entry(0);  /* RAM   at 0xF000 */
+		state->membank("bank1")->set_entry(4);  /* ep382 at 0x0000 for 3 cycles, then RAM */
+		state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400 */
+		state->membank("bank3")->set_entry(1);  /* ep382 at 0x8000 */
+		state->membank("bank4")->set_entry(0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		state->m_reset_delay_counter = 2;
 		space.set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), state));
-	    break;
+		break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep548\n");
-	    state->membank("bank1")->set_entry(5);  /* ep548 at 0x0000-0x03FF */
-	    state->membank("bank2")->set_entry(1);  /* ep548 at 0x0400-0x3FFF */
-	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
-	    state->membank("bank4")->set_entry(0);  /* RAM   at 0xF000 */
+		state->membank("bank1")->set_entry(5);  /* ep548 at 0x0000-0x03FF */
+		state->membank("bank2")->set_entry(1);  /* ep548 at 0x0400-0x3FFF */
+		state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
+		state->membank("bank4")->set_entry(0);  /* RAM   at 0xF000 */
 		machine.device("z80ne")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
-	    break;
+		break;
 	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep390\n");
-	    state->membank("bank1")->set_entry(1);  /* ep390 at 0x0000-0 x03FF for 3 cycles, then RAM */
-	    state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
-	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
-	    state->membank("bank4")->set_entry(1);  /* ep390 at 0xF000 */
+		state->membank("bank1")->set_entry(1);  /* ep390 at 0x0000-0 x03FF for 3 cycles, then RAM */
+		state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
+		state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
+		state->membank("bank4")->set_entry(1);  /* ep390 at 0xF000 */
 		machine.device("z80ne")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
-	    break;
+		break;
 	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep1390\n");
-	    state->membank("bank1")->set_entry(2);  /* ep1390 at 0x0000-0x03FF for 3 cycles, then RAM */
-	    state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
-	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
-	    state->membank("bank4")->set_entry(2);  /* ep1390 at 0xF000 */
+		state->membank("bank1")->set_entry(2);  /* ep1390 at 0x0000-0x03FF for 3 cycles, then RAM */
+		state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
+		state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
+		state->membank("bank4")->set_entry(2);  /* ep1390 at 0xF000 */
 		machine.device("z80ne")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
-	    break;
+		break;
 	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
 		if (VERBOSE)
 			logerror("reset_lx390_banking: banking ep2390\n");
-	    state->membank("bank1")->set_entry(3);  /* ep2390 at 0x0000-0x03FF for 3 cycles, then RAM */
-	    state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
-	    state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
-	    state->membank("bank4")->set_entry(3);  /* ep2390 at 0xF000 */
+		state->membank("bank1")->set_entry(3);  /* ep2390 at 0x0000-0x03FF for 3 cycles, then RAM */
+		state->membank("bank2")->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
+		state->membank("bank3")->set_entry(0);  /* RAM   at 0x8000 */
+		state->membank("bank4")->set_entry(3);  /* ep2390 at 0xF000 */
 		machine.device("z80ne")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), state));
-	    break;
+		break;
 	}
 
-    /* TODO: in real hardware the ENH bus line is pulled down
-     * until a I/O read is performed on a address with A0 address bit low and A1 or A2 address bit high
-     */
+	/* TODO: in real hardware the ENH bus line is pulled down
+	 * until a I/O read is performed on a address with A0 address bit low and A1 or A2 address bit high
+	 */
 }
 
 MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
@@ -291,9 +291,9 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	LOG(("In MACHINE_RESET z80ne_base\n"));
 
 	for ( i=0; i<LX383_KEYS; i++)
-    	m_lx383_key[i] = 0xf0 | i;
-    m_lx383_scan_counter = 0x0f;
-    m_lx383_downsampler = LX383_DOWNSAMPLING;
+		m_lx383_key[i] = 0xf0 | i;
+	m_lx383_scan_counter = 0x0f;
+	m_lx383_downsampler = LX383_DOWNSAMPLING;
 
 	/* Initialize cassette interface */
 	switch(machine().root_device().ioport("LX.385")->read() & 0x07)
@@ -427,57 +427,57 @@ MACHINE_START_MEMBER(z80ne_state,z80netf)
 READ8_MEMBER(z80ne_state::lx383_r)
 {
 	/*
-     * Keyboard scanning
-     *
-     * IC14 NE555 astable oscillator
-     * IC13 74LS93 binary counter
-     * IC5  74LS240 tri-state buffer
-     *
-     * l'oscillatore NE555 alimenta il clock del contatore 74LS93
-     *      D0 - Q(A) --\
-     *      D1 - Q(B)    |-- column
-     *      D2 - Q(C) --/
-     *      D3 - Q(D)        row
-     *      D4 - CTRL
-     *      D5 - 0
-     *      D6 - 0
-     *      D7 - ~KEY Pressed
-     */
-    return m_lx383_key[m_lx383_scan_counter];
+	 * Keyboard scanning
+	 *
+	 * IC14 NE555 astable oscillator
+	 * IC13 74LS93 binary counter
+	 * IC5  74LS240 tri-state buffer
+	 *
+	 * l'oscillatore NE555 alimenta il clock del contatore 74LS93
+	 *      D0 - Q(A) --\
+	 *      D1 - Q(B)    |-- column
+	 *      D2 - Q(C) --/
+	 *      D3 - Q(D)        row
+	 *      D4 - CTRL
+	 *      D5 - 0
+	 *      D6 - 0
+	 *      D7 - ~KEY Pressed
+	 */
+	return m_lx383_key[m_lx383_scan_counter];
 }
 
 WRITE8_MEMBER(z80ne_state::lx383_w)
 {
 	/*
-     * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
-     * The 1KHz NE-555 astable oscillator circuit drive
-     * a 4-bit 74LS93 binary counter.
-     * The 3 least sigificant bits of the counter are connected
-     * both to the read addres of the dual-port ram and to
-     * a 74LS156 3 to 8 binary decoder driving the cathode
-     * of 8 7-segments LEDS.
-     * The data output of the dual-port ram drive the anodes
-     * of the LEDS through 74LS07 buffers.
-     * LED segments - dual-port RAM bit:
-     *   A   0x01
-     *   B   0x02
-     *   C   0x04
-     *   D   0x08
-     *   E   0x10
-     *   F   0x20
-     *   G   0x40
-     *   P   0x80 (represented by DP in original schematics)
-     *
-     *   A write in the range F0-FF starts a 74LS90 counter
-     *   that trigger the NMI line of the CPU afther 2 instruction
-     *   fetch cycles for single step execution.
-     */
+	 * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
+	 * The 1KHz NE-555 astable oscillator circuit drive
+	 * a 4-bit 74LS93 binary counter.
+	 * The 3 least sigificant bits of the counter are connected
+	 * both to the read addres of the dual-port ram and to
+	 * a 74LS156 3 to 8 binary decoder driving the cathode
+	 * of 8 7-segments LEDS.
+	 * The data output of the dual-port ram drive the anodes
+	 * of the LEDS through 74LS07 buffers.
+	 * LED segments - dual-port RAM bit:
+	 *   A   0x01
+	 *   B   0x02
+	 *   C   0x04
+	 *   D   0x08
+	 *   E   0x10
+	 *   F   0x20
+	 *   G   0x40
+	 *   P   0x80 (represented by DP in original schematics)
+	 *
+	 *   A write in the range F0-FF starts a 74LS90 counter
+	 *   that trigger the NMI line of the CPU afther 2 instruction
+	 *   fetch cycles for single step execution.
+	 */
 
 	if ( offset < 8 )
-    	output_set_digit_value( offset, data ^ 0xff );
-    else
-    	/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
-    	m_nmi_delay_counter = 1;
+		output_set_digit_value( offset, data ^ 0xff );
+	else
+		/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
+		m_nmi_delay_counter = 1;
 		machine().device("z80ne")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_nmi_delay_count), this));
 }
 
@@ -557,12 +557,12 @@ WRITE8_MEMBER(z80ne_state::lx385_data_w)
 WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 {
 	/* Translate data to control signals
-     *     0 bit1=0, bit0=0   UART Reset pulse
-     *     1 bit1=0, bit0=1   UART RDAV (Reset Data Available) pulse
-     *     2 UART Tx Clock Enable (active high)
-     *     3 *TAPEA Enable (active low) (at reset: low)
-     *     4 *TAPEB Enable (active low) (at reset: low)
-     */
+	 *     0 bit1=0, bit0=0   UART Reset pulse
+	 *     1 bit1=0, bit0=1   UART RDAV (Reset Data Available) pulse
+	 *     2 UART Tx Clock Enable (active high)
+	 *     3 *TAPEA Enable (active low) (at reset: low)
+	 *     4 *TAPEB Enable (active low) (at reset: low)
+	 */
 	UINT8 uart_reset, uart_rdav, uart_tx_clock;
 	UINT8 motor_a, motor_b;
 	UINT8 changed_bits = (m_lx385_ctrl ^ data) & 0x1C;
@@ -650,16 +650,16 @@ READ8_MEMBER(z80ne_state::lx388_read_field_sync)
 WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 {
 	/* Selection of drive and parameters
-     A write also causes the selected drive motor to turn on for about 3 seconds.
-     When the motor turns off, the drive is deselected.
-        d7 Unused             (trs80: 1=MFM, 0=FM)
-        d6 (trs80: 1=Wait)
-        d5 0=Side 0, 1=Side 1 (trs80: 1=Write Precompensation enabled)
-        d4 Unused             (trs80: 0=Side 0, 1=Side 1)
-        d3 1=select drive 3
-        d2 1=select drive 2
-        d1 1=select drive 1
-        d0 1=select drive 0 */
+	 A write also causes the selected drive motor to turn on for about 3 seconds.
+	 When the motor turns off, the drive is deselected.
+	    d7 Unused             (trs80: 1=MFM, 0=FM)
+	    d6 (trs80: 1=Wait)
+	    d5 0=Side 0, 1=Side 1 (trs80: 1=Write Precompensation enabled)
+	    d4 Unused             (trs80: 0=Side 0, 1=Side 1)
+	    d3 1=select drive 3
+	    d2 1=select drive 2
+	    d1 1=select drive 1
+	    d0 1=select drive 0 */
 
 		UINT8 drive = 255;
 

@@ -93,7 +93,7 @@ Notes:
 #include "includes/midwunit.h"
 
 
-#define PIXEL_CLOCK		(8000000)
+#define PIXEL_CLOCK     (8000000)
 
 
 /*************************************
@@ -615,15 +615,15 @@ INPUT_PORTS_END
 
 static const tms34010_config tms_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	PIXEL_CLOCK,					/* pixel clock */
-	1,								/* pixels per clock */
-	midtunit_scanline_update,		/* scanline updater (indexed16) */
-	NULL,							/* scanline updater (rgb32) */
-	NULL,							/* generate interrupt */
-	midtunit_to_shiftreg,			/* write to shiftreg function */
-	midtunit_from_shiftreg			/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	PIXEL_CLOCK,                    /* pixel clock */
+	1,                              /* pixels per clock */
+	midtunit_scanline_update,       /* scanline updater (indexed16) */
+	NULL,                           /* scanline updater (rgb32) */
+	NULL,                           /* generate interrupt */
+	midtunit_to_shiftreg,           /* write to shiftreg function */
+	midtunit_from_shiftreg          /* read from shiftreg function */
 };
 
 
@@ -665,13 +665,13 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( mk3 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "mk3-u2.bin", 0x000000, 0x100000, CRC(5273436f) SHA1(e1735842a0159eafe79d878d44e3828df9bfa5bb) )
 	ROM_LOAD16_BYTE( "mk3-u3.bin", 0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "mk3-u4.bin", 0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "mk3-u5.bin", 0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "mk321u54.bin",  0x00000, 0x80000, CRC(9e344401) SHA1(5760b355f0a5c27c9746f33abfdedf4302f1af38) )
 	ROM_LOAD16_BYTE( "mk321u63.bin",  0x00001, 0x80000, CRC(64d34776) SHA1(d8f09e1e946dc13fec5e9f83fdaf61d4076ba9ea) )
 
@@ -704,13 +704,13 @@ ROM_END
 
 
 ROM_START( mk3r20 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "mk3-u2.bin", 0x000000, 0x100000, CRC(5273436f) SHA1(e1735842a0159eafe79d878d44e3828df9bfa5bb) )
 	ROM_LOAD16_BYTE( "mk3-u3.bin", 0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "mk3-u4.bin", 0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "mk3-u5.bin", 0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "mk320u54.bin",  0x00000, 0x80000, CRC(453da302) SHA1(d9a4814e7abb49ac0eb306ad05adcceac68df6a5) )
 	ROM_LOAD16_BYTE( "mk320u63.bin",  0x00001, 0x80000, CRC(f8dc0600) SHA1(6eb689d92619c751252155b40af119ad47e94cfa) )
 
@@ -743,13 +743,13 @@ ROM_END
 
 
 ROM_START( mk3r10 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "mk3-u2.bin", 0x000000, 0x100000, CRC(5273436f) SHA1(e1735842a0159eafe79d878d44e3828df9bfa5bb) )
 	ROM_LOAD16_BYTE( "mk3-u3.bin", 0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "mk3-u4.bin", 0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "mk3-u5.bin", 0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "mk310u54.bin",  0x00000, 0x80000, CRC(41829228) SHA1(5686b50a08b528d41b28ef578cfb171da9905c45) )
 	ROM_LOAD16_BYTE( "mk310u63.bin",  0x00001, 0x80000, CRC(b074e1e8) SHA1(fe1a6f622614b1ebd8edc3edeec442d39ba2924c) )
 
@@ -782,13 +782,13 @@ ROM_END
 
 
 ROM_START( mk3p40 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "mk3-u2.bin", 0x000000, 0x100000, CRC(5273436f) SHA1(e1735842a0159eafe79d878d44e3828df9bfa5bb) )
 	ROM_LOAD16_BYTE( "mk3-u3.bin", 0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "mk3-u4.bin", 0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "mk3-u5.bin", 0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "mk3p40.u54",  0x00000, 0x80000, CRC(4dfb0748) SHA1(8c628a51642c940de8abb795be36123e4008ce15) )
 	ROM_LOAD16_BYTE( "mk3p40.u63",  0x00001, 0x80000, CRC(f25a8083) SHA1(ff11462d23d9e16f6ee0d77bf85caa996df32618) )
 
@@ -820,13 +820,13 @@ ROM_START( mk3p40 )
 ROM_END
 
 ROM_START( umk3 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "umk3-u2.bin", 0x000000, 0x100000, CRC(3838cfe5) SHA1(e3d2901f3bae1362742fc6ee0aa31c9f63b4dfa3) )
 	ROM_LOAD16_BYTE( "mk3-u3.bin",  0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "mk3-u4.bin",  0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "mk3-u5.bin",  0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "um312u54.bin",  0x00000, 0x80000, CRC(712b4db6) SHA1(7015a55f3d745c6aeb8630903e2d5cd9554b2766) )
 	ROM_LOAD16_BYTE( "um312u63.bin",  0x00001, 0x80000, CRC(6d301faf) SHA1(18a8e29cc3e8ce5cc0e10f8386d43e7f44fd7b75) )
 
@@ -859,13 +859,13 @@ ROM_END
 
 
 ROM_START( umk3r11 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "umk3-u2.bin", 0x000000, 0x100000, CRC(3838cfe5) SHA1(e3d2901f3bae1362742fc6ee0aa31c9f63b4dfa3) )
 	ROM_LOAD16_BYTE( "mk3-u3.bin",  0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "mk3-u4.bin",  0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "mk3-u5.bin",  0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "um311u54.bin",  0x00000, 0x80000, CRC(8bb27659) SHA1(a3ffe3d8f21c261b36c7510d620d691a8bbf665b) )
 	ROM_LOAD16_BYTE( "um311u63.bin",  0x00001, 0x80000, CRC(ea731783) SHA1(2915626090650c4b5adf5b26e736c3ec91ce81a6) )
 
@@ -898,13 +898,13 @@ ROM_END
 
 
 ROM_START( umk3r10 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "umk3-u2.bin", 0x000000, 0x100000, CRC(3838cfe5) SHA1(e3d2901f3bae1362742fc6ee0aa31c9f63b4dfa3) )
 	ROM_LOAD16_BYTE( "mk3-u3.bin",  0x200000, 0x100000, CRC(856fe411) SHA1(6165ebecfce7500e948d84492ffa19eed7f47091) )
 	ROM_LOAD16_BYTE( "mk3-u4.bin",  0x400000, 0x100000, CRC(428a406f) SHA1(e70ec83cd054de0da1e178720ed0035b8887f797) )
 	ROM_LOAD16_BYTE( "mk3-u5.bin",  0x600000, 0x100000, CRC(3b98a09f) SHA1(edf1d02a56dcf3349e6b4bb4097acfe7592305f4) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "um310u54.bin",  0x00000, 0x80000, CRC(dfd735da) SHA1(bcb6d80dbde407d0042ec2f225b2f98740a79203) )
 	ROM_LOAD16_BYTE( "um310u63.bin",  0x00001, 0x80000, CRC(2dff0c83) SHA1(8942ffa3addf134085ea8d77d56e82593312e7a5) )
 
@@ -937,13 +937,13 @@ ROM_END
 
 
 ROM_START( openice )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "open_ice_l1.u2", 0x000000, 0x100000, CRC(8adb5aab) SHA1(4c25bc051c90947f3366f83ac5ca8dc78e26b8a4) ) /* These 4 are labeled as L1 */
 	ROM_LOAD16_BYTE( "open_ice_l1.u3", 0x200000, 0x100000, CRC(11c61ad6) SHA1(324621d6b486399b6d5ede1fed39d4e448cdeb32) )
 	ROM_LOAD16_BYTE( "open_ice_l1.u4", 0x400000, 0x100000, CRC(04279290) SHA1(daf1e57137ae1c3434194054e69809bfe3ed1fc3) )
 	ROM_LOAD16_BYTE( "open_ice_l1.u5", 0x600000, 0x100000, CRC(e90ad61f) SHA1(59eeabcae7e0e70cdb4472cde64b8a28b07ede98) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "open_ice_l1.21.u54", 0x00000, 0x80000, CRC(e4225284) SHA1(d5e267cf35826c106bb0a800363849ed4d489e56) ) /* Labeled as L1.21 */
 	ROM_LOAD16_BYTE( "open_ice_l1.21.u63", 0x00001, 0x80000, CRC(97d308a3) SHA1(0a517fab77bc2277884587c7e29e392bb360d27b) ) /* Labeled as L1.21 */
 
@@ -971,13 +971,13 @@ ROM_END
 
 
 ROM_START( nbahangt )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "mhtu2.bin",  0x000000, 0x100000, CRC(3f0b0d0a) SHA1(e3b8a264686ce7359d86e4926237d8cf17612991) )
 	ROM_LOAD16_BYTE( "mhtu3.bin",  0x200000, 0x100000, CRC(ec1db988) SHA1(1cf06d0b75f20ded7db648070e85c056043765bb) )
 	ROM_LOAD16_BYTE( "mhtu4.bin",  0x400000, 0x100000, CRC(c7f847a3) SHA1(c50175dffa3563ccd5792c59a6b44523f4014544) )
 	ROM_LOAD16_BYTE( "mhtu5.bin",  0x600000, 0x100000, CRC(ef19316a) SHA1(d41ae87ab45630a37c73684de42f7f6e0ed8f13b) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "htime54.bin",  0x00000, 0x80000, CRC(c2875d98) SHA1(3f88f6f5c15ae03bedda39f71a1deaf549a55516) )
 	ROM_LOAD16_BYTE( "htime63.bin",  0x00001, 0x80000, CRC(6f4728c3) SHA1(c059f4aa72cc5c3edc41e72428b3ebba97cc9417) )
 
@@ -1010,13 +1010,13 @@ ROM_END
 
 
 ROM_START( nbamht )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "mhtu2.bin",  0x000000, 0x100000, CRC(3f0b0d0a) SHA1(e3b8a264686ce7359d86e4926237d8cf17612991) )
 	ROM_LOAD16_BYTE( "mhtu3.bin",  0x200000, 0x100000, CRC(ec1db988) SHA1(1cf06d0b75f20ded7db648070e85c056043765bb) )
 	ROM_LOAD16_BYTE( "mhtu4.bin",  0x400000, 0x100000, CRC(c7f847a3) SHA1(c50175dffa3563ccd5792c59a6b44523f4014544) )
 	ROM_LOAD16_BYTE( "mhtu5.bin",  0x600000, 0x100000, CRC(ef19316a) SHA1(d41ae87ab45630a37c73684de42f7f6e0ed8f13b) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "mhtu54_v103.bin",  0x00000, 0x80000, CRC(21b0d9e1) SHA1(34fa928bdb222fba1fec2a9f37b853f77922250f) )
 	ROM_LOAD16_BYTE( "mhtu63_v103.bin",  0x00001, 0x80000, CRC(c6fdbb97) SHA1(e6cf0c6a94441befdde40b620a182877c11582a5) )
 
@@ -1048,13 +1048,13 @@ ROM_START( nbamht )
 ROM_END
 
 ROM_START( nbamht1 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "mhtu2.bin",  0x000000, 0x100000, CRC(3f0b0d0a) SHA1(e3b8a264686ce7359d86e4926237d8cf17612991) )
 	ROM_LOAD16_BYTE( "mhtu3.bin",  0x200000, 0x100000, CRC(ec1db988) SHA1(1cf06d0b75f20ded7db648070e85c056043765bb) )
 	ROM_LOAD16_BYTE( "mhtu4.bin",  0x400000, 0x100000, CRC(c7f847a3) SHA1(c50175dffa3563ccd5792c59a6b44523f4014544) )
 	ROM_LOAD16_BYTE( "mhtu5.bin",  0x600000, 0x100000, CRC(ef19316a) SHA1(d41ae87ab45630a37c73684de42f7f6e0ed8f13b) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "mhtu54_v10.bin",  0x00000, 0x80000, CRC(dfb6b3ae) SHA1(1dc59a2d89bf9764a47cebf71b9657c6ae7ce959) )
 	ROM_LOAD16_BYTE( "mhtu63_v10.bin",  0x00001, 0x80000, CRC(78da472c) SHA1(b4573ff19dc0d8a99f1bceace872e4999d53317a) )
 
@@ -1087,13 +1087,13 @@ ROM_END
 
 
 ROM_START( rmpgwt )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "rwt.2",  0x000000, 0x100000, CRC(0e82f83d) SHA1(215eebb6c229ef9ad0fcbcbc6e4e07300c05654f) )
 	ROM_LOAD16_BYTE( "rwt.3",  0x200000, 0x100000, CRC(3ff54d15) SHA1(827805602091313ec68ea1bccf667bd3b3fc6b8b) )
 	ROM_LOAD16_BYTE( "rwt.4",  0x400000, 0x100000, CRC(5c7f5656) SHA1(6c9d692bad539fec8b5aa0bfb56de3ef3719c68a) )
 	ROM_LOAD16_BYTE( "rwt.5",  0x600000, 0x100000, CRC(fd9aaf24) SHA1(d60dc076e72618c99ecac9d081d8c49d337b90c7) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "rwtr13.54",  0x00000, 0x80000, CRC(2a8f6e1e) SHA1(7a87ad37fa1d1228c4cdd4704ff0aee42e9c86cb) )
 	ROM_LOAD16_BYTE( "rwtr13.63",  0x00001, 0x80000, CRC(403ae41e) SHA1(c08d9352efe63849f5d10c1bd1efe2b9dd7382e0) )
 
@@ -1121,13 +1121,13 @@ ROM_END
 
 
 ROM_START( rmpgwt11 )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "rwt.2",  0x000000, 0x100000, CRC(0e82f83d) SHA1(215eebb6c229ef9ad0fcbcbc6e4e07300c05654f) )
 	ROM_LOAD16_BYTE( "rwt.3",  0x200000, 0x100000, CRC(3ff54d15) SHA1(827805602091313ec68ea1bccf667bd3b3fc6b8b) )
 	ROM_LOAD16_BYTE( "rwt.4",  0x400000, 0x100000, CRC(5c7f5656) SHA1(6c9d692bad539fec8b5aa0bfb56de3ef3719c68a) )
 	ROM_LOAD16_BYTE( "rwt.5",  0x600000, 0x100000, CRC(fd9aaf24) SHA1(d60dc076e72618c99ecac9d081d8c49d337b90c7) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "rwtr11.54",  0x00000, 0x80000, CRC(3aa514eb) SHA1(4ed8db55f257da6d872586d0f9f0cdf1c30e0d22) )
 	ROM_LOAD16_BYTE( "rwtr11.63",  0x00001, 0x80000, CRC(031c908f) SHA1(531669b13c33921ff199be1e841dd337c86fec50) )
 
@@ -1155,13 +1155,13 @@ ROM_END
 
 
 ROM_START( wwfmania )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "wwf.2",  0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) )
 	ROM_LOAD16_BYTE( "wwf.3",  0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
 	ROM_LOAD16_BYTE( "wwf.4",  0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
 	ROM_LOAD16_BYTE( "wwf.5",  0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "wwf.54",  0x00000, 0x80000, CRC(eeb7bf58) SHA1(d93df59aed1672ab38af231d909d9df1a8e30f44) )
 	ROM_LOAD16_BYTE( "wwf.63",  0x00001, 0x80000, CRC(09759529) SHA1(cf548ff199428a93b9bc5f4fc1347c4a3cbdf106) )
 
@@ -1189,13 +1189,13 @@ ROM_END
 
 
 ROM_START( wwfmaniab )
-	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
 	ROM_LOAD16_BYTE( "wwf.2",  0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) )
 	ROM_LOAD16_BYTE( "wwf.3",  0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
 	ROM_LOAD16_BYTE( "wwf.4",  0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
 	ROM_LOAD16_BYTE( "wwf.5",  0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
 
-	ROM_REGION16_LE( 0x100000, "maincpu", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "u54.bin",  0x00000, 0x80000, CRC(1b2dce48) SHA1(f70b6c5b56f9fc15cedfd8e0a95f983f3ea6dbb7) )
 	ROM_LOAD16_BYTE( "u63.bin",  0x00001, 0x80000, CRC(1262f0bb) SHA1(e97a5939f10532f7815d08b1a7d63a7554d47d4f) )
 

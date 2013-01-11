@@ -49,4 +49,3 @@ public:
 	UINT32 screen_update_spdodgeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_interrupt);
 };
-

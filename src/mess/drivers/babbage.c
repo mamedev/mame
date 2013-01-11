@@ -151,10 +151,10 @@ WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( babbage_ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z1_w),	/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z2_w)	/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z0_w),  /* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z1_w),  /* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z2_w)   /* ZC/TO2 callback */
 };
 
 /* Z80-PIO Interface */
@@ -173,13 +173,13 @@ WRITE8_MEMBER( babbage_state::pio1_b_w )
 
 static Z80PIO_INTERFACE( babbage_z80pio1_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* int callback */
-	DEVCB_NULL,	/* port a read */
-	DEVCB_NULL,	/* port a write */
-	DEVCB_NULL,	/* ready a */
-	DEVCB_NULL,	/* port b read */
-	DEVCB_DRIVER_MEMBER(babbage_state, pio1_b_w),	/* port b write */
-	DEVCB_NULL	/* ready b */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* int callback */
+	DEVCB_NULL, /* port a read */
+	DEVCB_NULL, /* port a write */
+	DEVCB_NULL, /* ready a */
+	DEVCB_NULL, /* port b read */
+	DEVCB_DRIVER_MEMBER(babbage_state, pio1_b_w),   /* port b write */
+	DEVCB_NULL  /* ready b */
 };
 
 READ8_MEMBER( babbage_state::pio2_a_r )
@@ -204,13 +204,13 @@ WRITE8_MEMBER( babbage_state::pio2_b_w )
 
 static Z80PIO_INTERFACE( babbage_z80pio2_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* int callback */
-	DEVCB_DRIVER_MEMBER(babbage_state, pio2_a_r),	/* port a read */
-	DEVCB_NULL,	/* port a write */
-	DEVCB_NULL,	/* ready a */
-	DEVCB_NULL,	/* port b read */
-	DEVCB_DRIVER_MEMBER(babbage_state, pio2_b_w),	/* port b write */
-	DEVCB_NULL	/* ready b */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* int callback */
+	DEVCB_DRIVER_MEMBER(babbage_state, pio2_a_r),   /* port a read */
+	DEVCB_NULL, /* port a write */
+	DEVCB_NULL, /* ready a */
+	DEVCB_NULL, /* port b read */
+	DEVCB_DRIVER_MEMBER(babbage_state, pio2_b_w),   /* port b write */
+	DEVCB_NULL  /* ready b */
 };
 
 static const z80_daisy_config babbage_daisy_chain[] =

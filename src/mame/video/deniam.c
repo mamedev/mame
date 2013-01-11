@@ -228,10 +228,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		primask = 8;
 		switch (state->m_spriteram[offs + 4] & 0xc0)
 		{
-			case 0x00: primask |= 4 | 2 | 1; break;	/* below everything */
-			case 0x40: primask |= 4 | 2;     break;	/* below fg and tx */
-			case 0x80: primask |= 4;         break;	/* below tx */
-			case 0xc0:                       break;	/* above everything */
+			case 0x00: primask |= 4 | 2 | 1; break; /* below everything */
+			case 0x40: primask |= 4 | 2;     break; /* below fg and tx */
+			case 0x80: primask |= 4;         break; /* below tx */
+			case 0xc0:                       break; /* above everything */
 		}
 
 
@@ -243,9 +243,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			int drawing = 0;
 			int i = 0;
 
-			rom += 2 * width;	/* note that the first line is skipped */
+			rom += 2 * width;   /* note that the first line is skipped */
 			x = 0;
-			while (i < 512)	/* safety check */
+			while (i < 512) /* safety check */
 			{
 				if (flipx)
 				{
@@ -368,7 +368,7 @@ UINT32 deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &b
 	int page;
 
 	if (!m_display_enable)
-		return 0;	/* don't update (freeze display) */
+		return 0;   /* don't update (freeze display) */
 
 	bg_scrollx = m_textram[m_bg_scrollx_reg] - m_bg_scrollx_offs;
 	bg_scrolly = (m_textram[m_bg_scrolly_reg] & 0xff) - m_bg_scrolly_offs;

@@ -38,7 +38,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_1_w)
 		if (m_engine_sound_playing == 0)
 		{
 			m_engine_sound_playing = 1;
-			samples->start(0, 0, true);	/* engine sample */
+			samples->start(0, 0, true); /* engine sample */
 		}
 	}
 	else
@@ -56,8 +56,8 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
 	samples_device *samples = machine().device<samples_device>("samples");
 
 	m_s2_sprite = data&0x1f;
-	set_led_status(machine(), 2,~data & 0x80);			/* game over lamp */
-	coin_counter_w(machine(), 0, ((data&0x40)>>6)^0x01);	/* coin counter */
+	set_led_status(machine(), 2,~data & 0x80);          /* game over lamp */
+	coin_counter_w(machine(), 0, ((data&0x40)>>6)^0x01);    /* coin counter */
 	m_engine2_on = ((data&0x20)>>5)^0x01;
 
 	if (m_engine1_on || m_engine2_on)
@@ -65,7 +65,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
 		if (m_engine_sound_playing == 0)
 		{
 			m_engine_sound_playing = 1;
-			samples->start(0, 0, true);	/* engine sample */
+			samples->start(0, 0, true); /* engine sample */
 		}
 	}
 	else
@@ -92,7 +92,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 		if (m_explode_sound_playing == 0)
 		{
 			m_explode_sound_playing = 1;
-			samples->start(1,1, true);	/* explosion initial sample */
+			samples->start(1,1, true);  /* explosion initial sample */
 		}
 	}
 	else
@@ -100,7 +100,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 		if (m_explode_sound_playing == 1)
 		{
 			m_explode_sound_playing = 0;
-			samples->start(1,2);	/* explosion ending sample */
+			samples->start(1,2);    /* explosion ending sample */
 		}
 	}
 
@@ -109,7 +109,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 		if (m_launch1_sound_playing == 0)
 		{
 			m_launch1_sound_playing = 1;
-			samples->start(2,3);	/* launch sample */
+			samples->start(2,3);    /* launch sample */
 		}
 	}
 	else
@@ -131,7 +131,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
 		if (m_explode_sound_playing == 0)
 		{
 			m_explode_sound_playing = 1;
-			samples->start(1,1, true);	/* explosion initial sample */
+			samples->start(1,1, true);  /* explosion initial sample */
 		}
 	}
 	else
@@ -139,7 +139,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
 		if (m_explode_sound_playing == 1)
 		{
 			m_explode_sound_playing = 0;
-			samples->start(1,2);	/* explosion ending sample */
+			samples->start(1,2);    /* explosion ending sample */
 		}
 	}
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
 		if (m_launch2_sound_playing == 0)
 		{
 			m_launch2_sound_playing = 1;
-			samples->start(3,3);	/* launch sample */
+			samples->start(3,3);    /* launch sample */
 		}
 	}
 	else
@@ -209,7 +209,7 @@ static int collision_check_p1p2(running_machine &machine)
 
 	/* if both are scores, return */
 	if ( ((state->m_p1_sprite & 0x08) == 0) &&
-		 ((state->m_p2_sprite & 0x08) == 0) )
+			((state->m_p2_sprite & 0x08) == 0) )
 	{
 		return 0;
 	}
@@ -222,7 +222,7 @@ static int collision_check_p1p2(running_machine &machine)
 	org_x = state->m_p1_x;
 	org_y = state->m_p1_y;
 
-	if (state->m_p1_sprite & 0x08)	/* if p1 is a projectile */
+	if (state->m_p1_sprite & 0x08)  /* if p1 is a projectile */
 	{
 		/* Draw score/projectile 1 */
 		drawgfx_opaque(*state->m_proj1_vid,
@@ -234,7 +234,7 @@ static int collision_check_p1p2(running_machine &machine)
 				state->m_p1_x-org_x, state->m_p1_y-org_y);
 	}
 
-	if (state->m_p2_sprite & 0x08)	/* if p2 is a projectile */
+	if (state->m_p2_sprite & 0x08)  /* if p2 is a projectile */
 	{
 		/* Draw score/projectile 2 */
 		drawgfx_opaque(*state->m_proj2_vid,
@@ -265,7 +265,7 @@ static int collision_check_s1p1p2(running_machine &machine)
 
 	/* if both are scores, return */
 	if ( ((state->m_p1_sprite & 0x08) == 0) &&
-		 ((state->m_p2_sprite & 0x08) == 0) )
+			((state->m_p2_sprite & 0x08) == 0) )
 	{
 		return 0;
 	}
@@ -288,7 +288,7 @@ static int collision_check_s1p1p2(running_machine &machine)
 			(state->m_s1_sprite&0x08)>>3, (state->m_s1_sprite&0x10)>>4,
 			state->m_s1_x-org_x, state->m_s1_y-org_y);
 
-	if (state->m_p1_sprite & 0x08)	/* if p1 is a projectile */
+	if (state->m_p1_sprite & 0x08)  /* if p1 is a projectile */
 	{
 		/* Draw projectile 1 */
 		drawgfx_opaque(*state->m_proj1_vid,
@@ -300,7 +300,7 @@ static int collision_check_s1p1p2(running_machine &machine)
 				state->m_p1_x-org_x, state->m_p1_y-org_y);
 	}
 
-	if (state->m_p2_sprite & 0x08)	/* if p2 is a projectile */
+	if (state->m_p2_sprite & 0x08)  /* if p2 is a projectile */
 	{
 		/* Draw projectile 2 */
 		drawgfx_opaque(*state->m_proj2_vid,
@@ -337,7 +337,7 @@ static int collision_check_s2p1p2(running_machine &machine)
 
 	/* if both are scores, return */
 	if ( ((state->m_p1_sprite & 0x08) == 0) &&
-		 ((state->m_p2_sprite & 0x08) == 0) )
+			((state->m_p2_sprite & 0x08) == 0) )
 	{
 		return 0;
 	}
@@ -360,7 +360,7 @@ static int collision_check_s2p1p2(running_machine &machine)
 			(state->m_s2_sprite&0x08)>>3, (state->m_s2_sprite&0x10)>>4,
 			state->m_s2_x-org_x, state->m_s2_y-org_y);
 
-	if (state->m_p1_sprite & 0x08)	/* if p1 is a projectile */
+	if (state->m_p1_sprite & 0x08)  /* if p1 is a projectile */
 	{
 		/* Draw projectile 1 */
 		drawgfx_opaque(*state->m_proj1_vid,
@@ -372,7 +372,7 @@ static int collision_check_s2p1p2(running_machine &machine)
 				state->m_p1_x-org_x, state->m_p1_y-org_y);
 	}
 
-	if (state->m_p2_sprite & 0x08)	/* if p2 is a projectile */
+	if (state->m_p2_sprite & 0x08)  /* if p2 is a projectile */
 	{
 		/* Draw projectile 2 */
 		drawgfx_opaque(*state->m_proj2_vid,

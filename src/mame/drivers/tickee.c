@@ -62,9 +62,9 @@ public:
 };
 
 
-#define CPU_CLOCK			XTAL_40MHz
-#define VIDEO_CLOCK			XTAL_14_31818MHz
-#define OKI_CLOCK			XTAL_1MHz
+#define CPU_CLOCK           XTAL_40MHz
+#define VIDEO_CLOCK         XTAL_14_31818MHz
+#define OKI_CLOCK           XTAL_1MHz
 
 
 /*************************************
@@ -280,10 +280,10 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
 
 	/* offsets:
 
-        2 = palette flash (0 normally, 1 when trigger is pressed)
-        3 = ticket motor (bit 3 = 0 for left motor, bit 2 = 0 for right motor)
-        6 = lamps? (changing all the time)
-    */
+	    2 = palette flash (0 normally, 1 when trigger is pressed)
+	    3 = ticket motor (bit 3 = 0 for left motor, bit 2 = 0 for right motor)
+	    6 = lamps? (changing all the time)
+	*/
 
 	COMBINE_DATA(&m_control[offset]);
 
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
+	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x04300100, 0x0430011f) AM_DEVWRITE8_LEGACY("ym2", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
+	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2") // ?
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
+	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -493,7 +493,7 @@ static INPUT_PORTS_START( tickee )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -509,16 +509,16 @@ static INPUT_PORTS_START( tickee )
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("GUNX1")			/* fake analog X */
+	PORT_START("GUNX1")         /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("GUNY1")			/* fake analog Y */
+	PORT_START("GUNY1")         /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("GUNX2")			/* fake analog X */
+	PORT_START("GUNX2")         /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUNY2")			/* fake analog Y */
+	PORT_START("GUNY2")         /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -550,8 +550,8 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)	/* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)  /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -566,44 +566,44 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)	/* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)  /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("GUNX1")			/* fake analog X */
+	PORT_START("GUNX1")         /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("GUNY1")			/* fake analog Y */
+	PORT_START("GUNY1")         /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("GUNX2")			/* fake analog X */
+	PORT_START("GUNX2")         /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUNY2")			/* fake analog Y */
+	PORT_START("GUNY2")         /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mouseatk )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x03, "Number of Extra Cheese" )	PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPNAME( 0x03, 0x03, "Number of Extra Cheese" )    PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x01, "1 Extra Cheese" )
 	PORT_DIPSETTING(    0x02, "2 Extra Cheese" )
 	PORT_DIPSETTING(    0x03, "3 Extra Cheese" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Number of Mice & Cheese" )	PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, "Number of Mice & Cheese" )   PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x00, "4 Mice - 5 Cheese" )
 	PORT_DIPSETTING(    0x04, "5 Mice - 6 Cheese" )
 	PORT_DIPSETTING(    0x08, "6 Mice - 7 Cheese" )
 	PORT_DIPSETTING(    0x0c, "7 Mice - 8 Cheese" )
-	PORT_DIPNAME( 0x10, 0x10, "Bonus Ticket Game" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Bonus Ticket Game" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Ticket Payout" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Ticket Payout" )     PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Double" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -612,7 +612,7 @@ static INPUT_PORTS_START( mouseatk )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -677,16 +677,16 @@ static INPUT_PORTS_START( rapidfir )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Yes ))
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("GUNX1")			/* fake analog X */
+	PORT_START("GUNX1")         /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("GUNY1")			/* fake analog Y */
+	PORT_START("GUNY1")         /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("GUNX2")			/* fake analog X */
+	PORT_START("GUNX2")         /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUNY2")			/* fake analog Y */
+	PORT_START("GUNY2")         /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -728,29 +728,29 @@ static const ay8910_interface ay8910_interface_2 =
 
 static const tms34010_config tms_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	VIDEO_CLOCK/2,					/* pixel clock */
-	1,								/* pixels per clock */
-	NULL,							/* scanline callback (indexed16) */
-	scanline_update,				/* scanline callback (rgb32) */
-	NULL,							/* generate interrupt */
-	NULL,							/* write to shiftreg function */
-	NULL							/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	VIDEO_CLOCK/2,                  /* pixel clock */
+	1,                              /* pixels per clock */
+	NULL,                           /* scanline callback (indexed16) */
+	scanline_update,                /* scanline callback (rgb32) */
+	NULL,                           /* generate interrupt */
+	NULL,                           /* write to shiftreg function */
+	NULL                            /* read from shiftreg function */
 };
 
 
 static const tms34010_config rapidfir_tms_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	VIDEO_CLOCK/2,					/* pixel clock */
-	1,								/* pixels per clock */
-	NULL,							/* scanline callback (indexed16) */
-	rapidfir_scanline_update,		/* scanline callback (rgb32) */
-	NULL,							/* generate interrupt */
-	rapidfir_to_shiftreg,			/* write to shiftreg function */
-	rapidfir_from_shiftreg			/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	VIDEO_CLOCK/2,                  /* pixel clock */
+	1,                              /* pixels per clock */
+	NULL,                           /* scanline callback (indexed16) */
+	rapidfir_scanline_update,       /* scanline callback (rgb32) */
+	NULL,                           /* generate interrupt */
+	rapidfir_to_shiftreg,           /* write to shiftreg function */
+	rapidfir_from_shiftreg          /* read from shiftreg function */
 };
 
 
@@ -898,7 +898,7 @@ ds1220y.ic1  NVRAM       located near ic2
 */
 
 ROM_START( tickee )
-	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "3.ic4",  0x000000, 0x80000, CRC(5b1e399c) SHA1(681608f06bbaf3d258e9f4768a8a6c5047ad08ec) )
 	ROM_LOAD16_BYTE( "2.ic3",  0x000001, 0x80000, CRC(1b26d4bb) SHA1(40266ec0fe5897eba85072e5bb39973d34f97546) )
 	ROM_LOAD16_BYTE( "1.ic2",  0x100000, 0x80000, CRC(f7f0309e) SHA1(4a93e0e203f5a340a56b770a40b9ab00e131644d) )
@@ -961,7 +961,7 @@ Notes:
 */
 
 ROM_START( ghoshunt )
-	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "ghosthun.7g",  0x000001, 0x80000, CRC(d59716c2) SHA1(717a1a1c5c559569f9e7bc4ae4356d112f0cf4eb) )
 	ROM_LOAD16_BYTE( "ghosthun.7h",  0x000000, 0x80000, CRC(ef38bfc8) SHA1(12b8f29f4da120f14126cbcdf4019bedd97063c3) )
 	ROM_LOAD16_BYTE( "ghosthun.7j",  0x100001, 0x80000, CRC(763d7c79) SHA1(f0dec99feeeefeddda6a88276dc306a30a58f4e4) )
@@ -970,7 +970,7 @@ ROM_END
 
 
 ROM_START( tutstomb )
-	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "tutstomb.7g",  0x000001, 0x80000, CRC(b74d3cf2) SHA1(2221b565362183a97a959389e8a0a026ca89e0ce) )
 	ROM_LOAD16_BYTE( "tutstomb.7h",  0x000000, 0x80000, CRC(177f3afb) SHA1(845f982a66a8b69b0ea0045399102e8bb33f7fbf) )
 	ROM_LOAD16_BYTE( "tutstomb.7j",  0x100001, 0x80000, CRC(69094f31) SHA1(eadae8847d0ff1568e63f71bf09a84dc443fdc1c))
@@ -1005,7 +1005,7 @@ DB25 and DB15 are not populated.
 */
 
 ROM_START( mouseatk )
-	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "ms-attk2-rev.a1.u8",  0x000000, 0x80000, CRC(a150525c) SHA1(a6be8524ae435502eeeeeaafa856dc812121d4e3) )
 	ROM_LOAD16_BYTE( "ms-attk3-rev.a1.u9",  0x000001, 0x80000, CRC(f060091d) SHA1(b3a2099d5ca5a658a7a87bb11a20c27a6a2f11f2) )
 	ROM_LOAD16_BYTE( "ms-attk4-rev.a1.u10", 0x100000, 0x80000, CRC(19806349) SHA1(3431dc70897f50e1be7578dd4ef99fa9be4450cf) )
@@ -1073,7 +1073,7 @@ ROMs  : RF11.U2     27C040      \
 */
 
 ROM_START( rapidfir ) /* Version 1.1, test menu shows "Build 239" */
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "rf11.u8",  0x000000, 0x80000, CRC(f7d8df33) SHA1(0abd54bbccfa90d830cbbdbcf2058197af980981) )
 	ROM_LOAD16_BYTE( "rf11.u9",  0x000001, 0x80000, CRC(a72af935) SHA1(ed0deb6f51681f70e07ad7c05a92f6a0f2063f7a) )
 	ROM_LOAD16_BYTE( "rf10.u6",  0x100000, 0x80000, CRC(e8d2e5d2) SHA1(db93014598f7b76785e0fd5c0ac8808a3be06435) ) /* Can be labeled V1.0 or V1.1 */
@@ -1089,7 +1089,7 @@ ROM_START( rapidfir ) /* Version 1.1, test menu shows "Build 239" */
 ROM_END
 
 ROM_START( rapidfira ) /* Version 1.1, test menu shows "Build 238" */
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "rf11.u8",  0x000000, 0x80000, CRC(f7d8df33) SHA1(0abd54bbccfa90d830cbbdbcf2058197af980981) )
 	ROM_LOAD16_BYTE( "rf11.u9",  0x000001, 0x80000, CRC(a72af935) SHA1(ed0deb6f51681f70e07ad7c05a92f6a0f2063f7a) )
 	ROM_LOAD16_BYTE( "rf10.u6",  0x100000, 0x80000, CRC(e8d2e5d2) SHA1(db93014598f7b76785e0fd5c0ac8808a3be06435) ) /* Can be labeled V1.0 or V1.1 */
@@ -1106,7 +1106,7 @@ ROM_END
 
 
 ROM_START( rapidfire ) /* Version 1.0, test menu shows "Build 236" */
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "rf10.u8",  0x000000, 0x80000, CRC(71d42125) SHA1(e34bdb08aa1b85ba4dd219b7f6de6f99a1ed8758) )
 	ROM_LOAD16_BYTE( "rf10.u9",  0x000001, 0x80000, CRC(d70e67c2) SHA1(e0876027f58584dae949a4f3c9391bd013912ee8) )
 	ROM_LOAD16_BYTE( "rf10.u6",  0x100000, 0x80000, CRC(e8d2e5d2) SHA1(db93014598f7b76785e0fd5c0ac8808a3be06435) )
@@ -1133,7 +1133,7 @@ Same exact PCB as Rapid Fire
 
 
 ROM_START( maletmad ) /* Version 2.1 */
-	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
 	/* U8 & U9 not populated */
 	ROM_LOAD16_BYTE( "malletmadness_v2.1.u6",  0x100000, 0x80000, CRC(83309174) SHA1(d387c8bc4d3c640f16525241892cc8d5d5da7f60) )
 	ROM_LOAD16_BYTE( "malletmadness_v2.1.u7",  0x100001, 0x80000, CRC(4642587e) SHA1(076eda538d570074028e9b4394f1a8a459678137) )
@@ -1162,4 +1162,3 @@ GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Ha
 GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
 GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
 GAME( 1999, maletmad,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1", 0 )
-

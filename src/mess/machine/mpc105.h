@@ -11,7 +11,7 @@
 
 #include "machine/pci.h"
 
-#define MPC105_MEMORYBANK_COUNT		8
+#define MPC105_MEMORYBANK_COUNT     8
 
 // ======================> mpc105_interface
 
@@ -24,20 +24,20 @@ struct mpc105_interface
 // ======================> mpc105_device
 
 class mpc105_device : public device_t,
-					  public pci_device_interface,
-					  public mpc105_interface
+						public pci_device_interface,
+						public mpc105_interface
 {
 public:
-    // construction/destruction
-    mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete();
 
 	void update_memory();

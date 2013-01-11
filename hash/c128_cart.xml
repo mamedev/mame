@@ -46,11 +46,11 @@ Missing dumps:
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="c128diag.bin" size="0x2000" crc="b11107be" sha1="c7149ed420d95faa1ab2ecb4a536f5e6effd45e3" offset="0" />
 			</dataarea>

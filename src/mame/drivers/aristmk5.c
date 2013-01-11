@@ -90,67 +90,67 @@ public:
 
 TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
 {
-    m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
+	m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
 	m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
 WRITE32_MEMBER(aristmk5_state::Ns5w48)
 {
 
-    /*
-    There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
-    taken from bits 16 to 19 of the word being written. The register is cleared whenever the chip is reset. The
-    register controls part of the video system. Bit 3(from data bus bit 19) controls the eorv output. If the bit is
-    one, eorv outputs the NV/CSYNC signal from VIDC. If the bit is zero, eorv outputs inverted NV/CSYNC. Bit 2 of
-    the register controls the eorh output. If the bit is zero, eorh is the NHSYNC output of VIDC. If the bit is one,
-    eorh is inverted NHSYNC. Bits 1 and 0 control what is fed to the vidclk output as follows:
+	/*
+	There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
+	taken from bits 16 to 19 of the word being written. The register is cleared whenever the chip is reset. The
+	register controls part of the video system. Bit 3(from data bus bit 19) controls the eorv output. If the bit is
+	one, eorv outputs the NV/CSYNC signal from VIDC. If the bit is zero, eorv outputs inverted NV/CSYNC. Bit 2 of
+	the register controls the eorh output. If the bit is zero, eorh is the NHSYNC output of VIDC. If the bit is one,
+	eorh is inverted NHSYNC. Bits 1 and 0 control what is fed to the vidclk output as follows:
 
-         Bit1     Bit0     vidclk
-         0        0        24 Mhz clock
-         0        1        25 Mhz clock ;// external video crystal
-         1        0        36 Mhz clock
-         1        1        24 Mhz clock
+	     Bit1     Bit0     vidclk
+	     0        0        24 Mhz clock
+	     0        1        25 Mhz clock ;// external video crystal
+	     1        0        36 Mhz clock
+	     1        1        24 Mhz clock
 
 
-    */
+	*/
 
-    /*
-    Golden Pyramids disassembly
+	/*
+	Golden Pyramids disassembly
 
-    MOV     R0, #0x3200000
-    ROM:03400948                 MOV     R1, #8
-    ROM:0340094C                 STRB    R1, [R0,#0x14]  ; clear vsync
-    ROM:03400950                 LDR     R2, =0xC350     ; 50000
-    ROM:03400954
-    ROM:03400954 loc_3400954                             ; CODE XREF: sub_3400944+18?j
-    ROM:03400954                 NOP
-    ROM:03400958                 SUBS    R2, R2, #1
-    ROM:0340095C                 BNE     loc_3400954     ; does this 50000 times, presumably to wait for vsync
-    ROM:03400960                 MOV     R0, #0x3200000
-    ROM:03400964                 LDRB    R1, [R0,#0x10]  ; reads the irq status a
-    ROM:03400968                 TST     R1, #8          ; test vsync
-    */
+	MOV     R0, #0x3200000
+	ROM:03400948                 MOV     R1, #8
+	ROM:0340094C                 STRB    R1, [R0,#0x14]  ; clear vsync
+	ROM:03400950                 LDR     R2, =0xC350     ; 50000
+	ROM:03400954
+	ROM:03400954 loc_3400954                             ; CODE XREF: sub_3400944+18?j
+	ROM:03400954                 NOP
+	ROM:03400958                 SUBS    R2, R2, #1
+	ROM:0340095C                 BNE     loc_3400954     ; does this 50000 times, presumably to wait for vsync
+	ROM:03400960                 MOV     R0, #0x3200000
+	ROM:03400964                 LDRB    R1, [R0,#0x10]  ; reads the irq status a
+	ROM:03400968                 TST     R1, #8          ; test vsync
+	*/
 
 
 	m_ioc_regs[IRQ_STATUS_A] &= ~0x08;
 
 	/*          bit 1              bit 0 */
 	if((data &~(0x02)) && (data & (0x01))) // external video crystal is enabled. 25 mhz
-    {
-	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure but see above
-    }
-    if((data &~(0x02)) && (data &~(0x01))) // video clock is enabled. 24 mhz
-    {
-	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
-    }
-    if((data & (0x02)) && (data &~(0x01))) // video clock is enabled. 36 mhz
-    {
-	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
-    }
-    if((data &(0x02)) && (data &(0x01))) // video clock is enabled. 24 mhz
-    {
-	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
-    }
+	{
+			m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure but see above
+	}
+	if((data &~(0x02)) && (data &~(0x01))) // video clock is enabled. 24 mhz
+	{
+			m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
+	}
+	if((data & (0x02)) && (data &~(0x01))) // video clock is enabled. 36 mhz
+	{
+			m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
+	}
+	if((data &(0x02)) && (data &(0x01))) // video clock is enabled. 24 mhz
+	{
+			m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
+	}
 }
 
 TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
@@ -162,29 +162,29 @@ TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
 
 READ32_MEMBER(aristmk5_state::Ns5x58)
 {
-    /*
-        1953.125 Hz for the operating system timer interrupt
+	/*
+	    1953.125 Hz for the operating system timer interrupt
 
-    The pintr pin ( printer interrupt ) is connected to an interrupt latch in IOEB.
-    A rising edge on pintr causes an interrupt to be latched in IOEB. The latch output
-    is connected to the NIL[6] interrupt input on IOC and goes low when the rising edge is detected.
-    The interrupt is cleared (NIL[6] is set high) by resetting the chip or by the NS5x58
-    strobe.
+	The pintr pin ( printer interrupt ) is connected to an interrupt latch in IOEB.
+	A rising edge on pintr causes an interrupt to be latched in IOEB. The latch output
+	is connected to the NIL[6] interrupt input on IOC and goes low when the rising edge is detected.
+	The interrupt is cleared (NIL[6] is set high) by resetting the chip or by the NS5x58
+	strobe.
 
-    NIL[6] IOEB/1pintr - Interrupt Input ( OS Tick Interrput )
+	NIL[6] IOEB/1pintr - Interrupt Input ( OS Tick Interrput )
 
-    Rising edge signal
-    010101010101  .-------.   logic 0      .-------------.
-    ------------->|pint   |---1pintr------>|NIL[6]       |
-                  | IOEB  |                |     IOC     |
-                  `-------'                `-------------'
-    */
+	Rising edge signal
+	010101010101  .-------.   logic 0      .-------------.
+	------------->|pint   |---1pintr------>|NIL[6]       |
+	              | IOEB  |                |     IOC     |
+	              `-------'                `-------------'
+	*/
 
 
 	// reset 2KHz timer
-    m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
-    m_ioc_regs[IRQ_STATUS_A] &= ~0x01;
-    machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+	m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
+	m_ioc_regs[IRQ_STATUS_A] &= ~0x01;
+	machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 	return 0xffffffff;
 }
 
@@ -239,61 +239,61 @@ READ32_MEMBER(aristmk5_state::Ns5r50)
 
 WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 {
-    /*
+	/*
 
-    The Main Board provides 32 kbytes of Static Random Access Memory (SRAM) with
-    battery back-up for the electronic meters.
-    The SRAM contains machine metering information, recording money in/out and
-    game history etc. It is critical that this data is preserved reliably, and various
-    jurisdictions require multiple backups of the data.
-    Three standard low power SRAMs are fitted to the board. The data is usually
-    replicated three times, so that each chip contains identical data. Each memory is
-    checked against the other to verify that the stored data is correct.
-    Each chip is mapped to the same address, and the chip selected depends on the bank
-    select register. Access is mutually exclusive, increasing security with only one chip
-    visible in the CPU address &space at a time. If the CPU crashes and overwrites
-    memory only one of the three devices can be corrupted. On reset the bank select
-    register selects bank 0, which does not exist. The SRAMs are at banks 1,2,3.
-    Each of the SRAM chips may be powered from a separate battery, further reducing
-    the possibility of losing data. For the US Gaming Machine, a single battery provides
-    power for all three SRAMs. This battery also powers the Real Time Clock
-
-
-    CHIP SELECT & SRAM BANKING
-
-    write: 03010420 40  select bank 1
-    write: 3220000 01   store 0x01 @ 3220000
-    write: 03010420 80  select bank 2
-    write: 3220000 02   store 0x02 @ 3220000
-    write: 03010420 C0  ...
-    write: 3220000 03   ...
-    write: 03010420 00  ...
-    write: 3220000 00   ...
-    write: 03010420 40  select the first SRAM chip
-    read:  3220000 01   read the value 0x1 back hopefully
-    write: 03010420 80  ...
-    read:  3220000 02   ...
-    write: 03010420 C0  ...
-    read:  3220000 03   ...
-    write: 03010420 00  select bank 0
+	The Main Board provides 32 kbytes of Static Random Access Memory (SRAM) with
+	battery back-up for the electronic meters.
+	The SRAM contains machine metering information, recording money in/out and
+	game history etc. It is critical that this data is preserved reliably, and various
+	jurisdictions require multiple backups of the data.
+	Three standard low power SRAMs are fitted to the board. The data is usually
+	replicated three times, so that each chip contains identical data. Each memory is
+	checked against the other to verify that the stored data is correct.
+	Each chip is mapped to the same address, and the chip selected depends on the bank
+	select register. Access is mutually exclusive, increasing security with only one chip
+	visible in the CPU address &space at a time. If the CPU crashes and overwrites
+	memory only one of the three devices can be corrupted. On reset the bank select
+	register selects bank 0, which does not exist. The SRAMs are at banks 1,2,3.
+	Each of the SRAM chips may be powered from a separate battery, further reducing
+	the possibility of losing data. For the US Gaming Machine, a single battery provides
+	power for all three SRAMs. This battery also powers the Real Time Clock
 
 
-         Bit 0 - Page 1
-         Bit 1 - Page 2
-         Bit 2 - Page 3
-         NC
-         NC
-         NC
-         Bit 6 - SRAM 1
-         Bit 7 - SRAM 2
+	CHIP SELECT & SRAM BANKING
 
-         Bit 1 and 2 on select Page 4.
-         Bit 6 and 7 on select SRAM 3.
+	write: 03010420 40  select bank 1
+	write: 3220000 01   store 0x01 @ 3220000
+	write: 03010420 80  select bank 2
+	write: 3220000 02   store 0x02 @ 3220000
+	write: 03010420 C0  ...
+	write: 3220000 03   ...
+	write: 03010420 00  ...
+	write: 3220000 00   ...
+	write: 03010420 40  select the first SRAM chip
+	read:  3220000 01   read the value 0x1 back hopefully
+	write: 03010420 80  ...
+	read:  3220000 02   ...
+	write: 03010420 C0  ...
+	read:  3220000 03   ...
+	write: 03010420 00  select bank 0
 
-         4 pages of 32k for each sram chip.
-    */
-    membank("sram_bank")->set_entry((data & 0xc0) >> 6);
-    membank("sram_bank_nz")->set_entry((data & 0xc0) >> 6);
+
+	     Bit 0 - Page 1
+	     Bit 1 - Page 2
+	     Bit 2 - Page 3
+	     NC
+	     NC
+	     NC
+	     Bit 6 - SRAM 1
+	     Bit 7 - SRAM 2
+
+	     Bit 1 and 2 on select Page 4.
+	     Bit 6 and 7 on select SRAM 3.
+
+	     4 pages of 32k for each sram chip.
+	*/
+	membank("sram_bank")->set_entry((data & 0xc0) >> 6);
+	membank("sram_bank_nz")->set_entry((data & 0xc0) >> 6);
 }
 
 /* U.S games have no dram emulator enabled */
@@ -411,8 +411,8 @@ void aristmk5_state::machine_reset()
 }
 
 #if 0
-#define	NVRAM_SIZE 256
-#define	NVRAM_PAGE_SIZE	0	/* max size of one write request */
+#define NVRAM_SIZE 256
+#define NVRAM_PAGE_SIZE 0   /* max size of one write request */
 
 static const i2cmem_interface i2cmem_interface =
 {
@@ -430,7 +430,7 @@ static AAKART_INTERFACE( kart_interface )
 static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_CPU_ADD("maincpu", ARM, 12000000)
 	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
-    MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))	/* 1.6 - 2 seconds */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
 //  MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 	MCFG_AAKART_ADD("kart", 12000000/128, kart_interface) // TODO: frequency
@@ -474,7 +474,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
 	MCFG_CPU_ADD("maincpu", ARM, 12000000)
 	MCFG_CPU_PROGRAM_MAP(aristmk5_map)
-    MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))	/* 1.6 - 2 seconds */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
 //  MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
@@ -741,17 +741,17 @@ ROM_END
 GAME( 1995, aristmk5, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "MKV Set/Clear Chips (USA)", GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 // Dates listed below are for the combination (reel layout), not release dates
-GAME( 1995, enchfrst, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (0400122V, Local)",                   GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 570/3,  E - 23/06/95
-GAME( 1995, swthrt2v, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",                GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 577/1,  C - 07/09/95
-GAME( 1996, dolphntr, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",                 GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 602/1,  B - 06/12/96
-GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",                 GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 602/1,  B - 06/12/96
-GAME( 1997, goldprmd, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (MV4091, USA)",                        GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// MV4091, B - 13/05/97
-GAME( 1997, qotn,     0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",                GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 602/4,  B - 13/05/97
-GAME( 1997, dmdtouch, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (0400433V, Local)",                      GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 604,    E - 30/06/97
-GAME( 1998, adonis,   0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0200751V, NSW/ACT)",                           GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 602/9,  A - 25/05/98
-GAME( 1998, reelrock, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",                    GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 628,    A - 13/07/98
-GAME( 1998, indiandr, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (0100845V, Local)",                    GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 628/1,  B - 15/12/98
-GAME( 1999, wtiger,   0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",              GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 638/1,  B - 08/07/99
-GAME( 2000, magicmsk, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export)",                          GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// MV4115, A - 09/05/2000
-GAME( 2000, margmgc,  0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// JB005,  A - 07/07/2000
-GAME( 2001, geishanz, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",                       GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// MV4127, A - 05/03/01
+GAME( 1995, enchfrst, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (0400122V, Local)",                   GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 570/3,  E - 23/06/95
+GAME( 1995, swthrt2v, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (01J01986, Venezuela)",                GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 577/1,  C - 07/09/95
+GAME( 1996, dolphntr, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0200424V, NSW/ACT)",                 GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96
+GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (0100424V, NSW/ACT)",                 GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 602/1,  B - 06/12/96
+GAME( 1997, goldprmd, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (MV4091, USA)",                        GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // MV4091, B - 13/05/97
+GAME( 1997, qotn,     0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",                GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 602/4,  B - 13/05/97
+GAME( 1997, dmdtouch, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (0400433V, Local)",                      GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 604,    E - 30/06/97
+GAME( 1998, adonis,   0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Adonis (0200751V, NSW/ACT)",                           GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 602/9,  A - 25/05/98
+GAME( 1998, reelrock, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (0100779V, Local)",                    GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 628,    A - 13/07/98
+GAME( 1998, indiandr, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (0100845V, Local)",                    GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 628/1,  B - 15/12/98
+GAME( 1999, wtiger,   0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "White Tiger Classic (0200954V, NSW/ACT)",              GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // 638/1,  B - 08/07/99
+GAME( 2000, magicmsk, aristmk5, aristmk5_usa, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Magic Mask (MV4115, Export)",                          GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // MV4115, A - 09/05/2000
+GAME( 2000, margmgc,  0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // JB005,  A - 07/07/2000
+GAME( 2001, geishanz, 0,        aristmk5, aristmk5, aristmk5_state, aristmk5, ROT0,  "Aristocrat", "Geisha (0101408V, New Zealand)",                       GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )  // MV4127, A - 05/03/01

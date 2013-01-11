@@ -174,5 +174,3 @@ void decocomn_device::device_reset()
 {
 	DEVICE_RESET_NAME( decocomn )(this);
 }
-
-

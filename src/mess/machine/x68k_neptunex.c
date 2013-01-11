@@ -32,7 +32,7 @@ machine_config_constructor x68k_neptune_device::device_mconfig_additions() const
 }
 
 x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-        : device_t(mconfig, X68K_NEPTUNEX, "Neptune-X", tag, owner, clock),
+		: device_t(mconfig, X68K_NEPTUNEX, "Neptune-X", tag, owner, clock),
 		device_x68k_expansion_card_interface(mconfig, *this),
 		m_dp8390(*this, "dp8390d")
 {
@@ -71,7 +71,7 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 	{
 		m_dp8390->dp8390_cs(CLEAR_LINE);
 		return (m_dp8390->dp8390_r(space, offset, 0xff) << 8)|
-			   m_dp8390->dp8390_r(space, offset+1, 0xff);
+				m_dp8390->dp8390_r(space, offset+1, 0xff);
 	}
 	//if(mem_mask == 0x00ff) offset++;
 	switch(offset)
@@ -150,4 +150,3 @@ WRITE_LINE_MEMBER(x68k_neptune_device::x68k_neptune_irq_w)
 	m_slot->irq2_w(state);
 	logerror("Neptune: IRQ2 set to %i\n",state);
 }
-

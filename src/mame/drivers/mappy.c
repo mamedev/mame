@@ -559,18 +559,18 @@ TODO:
  *
  *************************************/
 
-#define MASTER_CLOCK		(18432000)
+#define MASTER_CLOCK        (18432000)
 
-#define PIXEL_CLOCK			(MASTER_CLOCK/3)
+#define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
 /* H counts from 128->511, HBLANK starts at 144 and ends at 240 */
-#define HTOTAL				(384)
-#define HBEND				(0)		/*(96+16)*/
-#define HBSTART				(288)	/*(16)*/
+#define HTOTAL              (384)
+#define HBEND               (0)     /*(96+16)*/
+#define HBSTART             (288)   /*(16)*/
 
-#define VTOTAL				(264)
-#define VBEND				(0)		/*(16)*/
-#define VBSTART				(224)	/*(224+16)*/
+#define VTOTAL              (264)
+#define VBEND               (0)     /*(16)*/
+#define VBSTART             (224)   /*(224+16)*/
 
 
 
@@ -585,38 +585,38 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 
 	switch (offset & 0x0e)
 	{
-		case 0x00:	/* INT ON 2 */
+		case 0x00:  /* INT ON 2 */
 			m_sub_irq_mask = bit;
 			if (!bit)
 				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
-		case 0x02:	/* INT ON */
+		case 0x02:  /* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
 				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
-		case 0x04:	/* n.c. */
+		case 0x04:  /* n.c. */
 			break;
 
-		case 0x06:	/* SOUND ON */
+		case 0x06:  /* SOUND ON */
 			mappy_sound_enable(machine().device("namco"), bit);
 			break;
 
-		case 0x08:	/* 4 RESET */
+		case 0x08:  /* 4 RESET */
 			namcoio_set_reset_line(namcoio_1, bit ? CLEAR_LINE : ASSERT_LINE);
 			namcoio_set_reset_line(namcoio_2, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 0x0a:	/* SUB RESET */
+		case 0x0a:  /* SUB RESET */
 			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 0x0c:	/* n.c. */
+		case 0x0c:  /* n.c. */
 			break;
 
-		case 0x0e:	/* n.c. */
+		case 0x0e:  /* n.c. */
 			break;
 	}
 }
@@ -677,39 +677,39 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 
 	switch (offset & 0x0e)
 	{
-		case 0x00:	/* INT ON 2 */
+		case 0x00:  /* INT ON 2 */
 			m_sub_irq_mask = bit;
 			if (!bit)
 				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
-		case 0x02:	/* INT ON */
+		case 0x02:  /* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
 				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
-		case 0x04:	/* FLIP */
+		case 0x04:  /* FLIP */
 			flip_screen_set(bit);
 			break;
 
-		case 0x06:	/* SOUND ON */
+		case 0x06:  /* SOUND ON */
 			mappy_sound_enable(machine().device("namco"), bit);
 			break;
 
-		case 0x08:	/* 4 RESET */
+		case 0x08:  /* 4 RESET */
 			namcoio_set_reset_line(namcoio_1, bit ? CLEAR_LINE : ASSERT_LINE);
 			namcoio_set_reset_line(namcoio_2, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 0x0a:	/* SUB RESET */
+		case 0x0a:  /* SUB RESET */
 			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 0x0c:	/* n.c. */
+		case 0x0c:  /* n.c. */
 			break;
 
-		case 0x0e:	/* n.c. */
+		case 0x0e:  /* n.c. */
 			break;
 	}
 }
@@ -771,10 +771,10 @@ INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
 	if (m_main_irq_mask)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::superpac_io_run),this));
 
-	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_2))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::superpac_io_run),this), 1);
 }
 
@@ -802,10 +802,10 @@ INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
 	if (m_main_irq_mask)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::pacnpal_io_run),this));
 
-	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_2))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::pacnpal_io_run),this), 1);
 }
 
@@ -833,10 +833,10 @@ INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
 	if (m_main_irq_mask)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::phozon_io_run),this));
 
-	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_2))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::phozon_io_run),this), 1);
 }
 
@@ -864,10 +864,10 @@ INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
 	if(m_main_irq_mask)
 		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::mappy_io_run),this));
 
-	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
+	if (!namcoio_read_reset_line(namcoio_2))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::mappy_io_run),this), 1);
 }
 
@@ -886,77 +886,77 @@ INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
 }
 
 static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8, mappy_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("videoram")	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")		/* work RAM with embedded sprite RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("videoram") /* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")       /* work RAM with embedded sprite RAM */
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(superpac_flipscreen_r, superpac_flipscreen_w)
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the sound CPU */
-	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE(superpac_latch_w)				/* various control bits */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with the sound CPU */
+	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)      /* custom I/O chips interface */
+	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)      /* custom I/O chips interface */
+	AM_RANGE(0x5000, 0x500f) AM_WRITE(superpac_latch_w)             /* various control bits */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phozon_cpu1_map, AS_PROGRAM, 8, mappy_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("videoram")	/* video RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("videoram") /* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram") /* shared RAM with CPU #2/sprite RAM*/
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the sound CPU */
-	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE(phozon_latch_w)				/* various control bits */
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)				/* watchdog reset */
-	AM_RANGE(0x8000, 0xffff) AM_ROM									/* ROM */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with the sound CPU */
+	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)      /* custom I/O chips interface */
+	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)      /* custom I/O chips interface */
+	AM_RANGE(0x5000, 0x500f) AM_WRITE(phozon_latch_w)               /* various control bits */
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)             /* watchdog reset */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                                 /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mappy_cpu1_map, AS_PROGRAM, 8, mappy_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(mappy_videoram_w) AM_SHARE("videoram")		/* video RAM */
-	AM_RANGE(0x1000, 0x27ff) AM_RAM AM_SHARE("spriteram")		/* work RAM with embedded sprite RAM */
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(mappy_scroll_w)				/* scroll */
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the sound CPU */
-	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE(mappy_latch_w)				/* various control bits */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)				/* watchdog reset */
-	AM_RANGE(0x8000, 0xffff) AM_ROM									/* ROM code (only a000-ffff in Mappy) */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(mappy_videoram_w) AM_SHARE("videoram")        /* video RAM */
+	AM_RANGE(0x1000, 0x27ff) AM_RAM AM_SHARE("spriteram")       /* work RAM with embedded sprite RAM */
+	AM_RANGE(0x3800, 0x3fff) AM_WRITE(mappy_scroll_w)               /* scroll */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with the sound CPU */
+	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)      /* custom I/O chips interface */
+	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)      /* custom I/O chips interface */
+	AM_RANGE(0x5000, 0x500f) AM_WRITE(mappy_latch_w)                /* various control bits */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)             /* watchdog reset */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                                 /* ROM code (only a000-ffff in Mappy) */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( superpac_cpu2_map, AS_PROGRAM, 8, mappy_state )
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU (also sound registers) */
+	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with the main CPU (also sound registers) */
 	AM_RANGE(0x2000, 0x200f) AM_WRITE(superpac_latch_w)                   /* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phozon_cpu2_map, AS_PROGRAM, 8, mappy_state )
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
-	AM_RANGE(0xe000, 0xffff) AM_ROM											/* ROM */
+	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with the main CPU + sound registers */
+	AM_RANGE(0xe000, 0xffff) AM_ROM                                         /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mappy_cpu2_map, AS_PROGRAM, 8, mappy_state )
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU (also sound registers) */
-	AM_RANGE(0x2000, 0x200f) AM_WRITE(mappy_latch_w)						/* various control bits */
-	AM_RANGE(0xe000, 0xffff) AM_ROM											/* ROM code */
+	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with the main CPU (also sound registers) */
+	AM_RANGE(0x2000, 0x200f) AM_WRITE(mappy_latch_w)                        /* various control bits */
+	AM_RANGE(0xe000, 0xffff) AM_ROM                                         /* ROM code */
 ADDRESS_MAP_END
 
 
 /* extra CPU only present in Phozon */
 static ADDRESS_MAP_START( phozon_cpu3_map, AS_PROGRAM, 8, mappy_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("videoram")	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")			/* shared RAM with CPU #2/sprite RAM*/
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with CPU #2 */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* RAM */
-	AM_RANGE(0xe000, 0xffff) AM_ROM							/* ROM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("videoram") /* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")           /* shared RAM with CPU #2/sprite RAM*/
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)  /* shared RAM with CPU #2 */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM                         /* RAM */
+	AM_RANGE(0xe000, 0xffff) AM_ROM                         /* ROM */
 ADDRESS_MAP_END
 
 
 
 #define NAMCO_56IN0\
-	PORT_START("P1")	/* 56XX #0 pins 22-29 */\
+	PORT_START("P1")    /* 56XX #0 pins 22-29 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY\
-	PORT_START("P2")	/* 56XX #0 pins 22-29 */\
+	PORT_START("P2")    /* 56XX #0 pins 22-29 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL\
@@ -975,19 +975,19 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 #define NAMCO_56IN1\
-	PORT_START("BUTTONS")	/* 56XX #0 pins 30-33 and 38-41 */\
+	PORT_START("BUTTONS")   /* 56XX #0 pins 30-33 and 38-41 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )\
-	PORT_START("COINS")	/* 56XX #0 pins 30-33 and 38-41 */\
+	PORT_START("COINS") /* 56XX #0 pins 30-33 and 38-41 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 #define NAMCO_56DSW0\
-	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */\
+	PORT_START("DSW0")  /* 56XX #1 pins 30-33 */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )\
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )\
@@ -1000,8 +1000,8 @@ static INPUT_PORTS_START( superpac )
 	NAMCO_56IN1
 	NAMCO_56DSW0
 
-	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_START("DSW1")  /* 56XX #1 pins 22-29 */
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "Rank 0-Normal" )
 	PORT_DIPSETTING(    0x0e, "Rank 1-Easiest" )
 	PORT_DIPSETTING(    0x0d, "Rank 2" )
@@ -1018,20 +1018,20 @@ static INPUT_PORTS_START( superpac )
 	PORT_DIPSETTING(    0x02, "Rank D-Auto" )
 	PORT_DIPSETTING(    0x01, "Rank E-Auto" )
 	PORT_DIPSETTING(    0x00, "Rank F-Hard Auto" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )            PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* 56XX #1 pins 38-41 multiplexed */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -1040,23 +1040,23 @@ static INPUT_PORTS_START( superpac )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5,6")
-	PORT_DIPSETTING(    0x08, "30k Only" )			PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "30k & 80k Only" )		PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "30k, 80k & Every 80k" )	PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x38, "30k & 100k Only" )		PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k, 100k & Every 100k" )	PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "30k & 120k Only" )		PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "30k, 120k & Every 120k" )	PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(    0x08, "30k Only" )          PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "30k & 80k Only" )        PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k, 80k & Every 80k" )  PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x38, "30k & 100k Only" )       PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "30k & 120k Only" )       PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "30k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x10, "30k Only" )			PORT_CONDITION("DSW2",0xc0,EQUALS,0x00) /* Manual shows 100k only, Test Mode shows 30k which is what we use */
-	PORT_DIPSETTING(    0x38, "30k & 100k Only" )		PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "30k, 100k & Every 100k" )	PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "30k & 120k Only" )		PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "40k Only" )			PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "40k & 120k Only" )		PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "40k, 120k & Every 120k" )	PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x10, "30k Only" )          PORT_CONDITION("DSW2",0xc0,EQUALS,0x00) /* Manual shows 100k only, Test Mode shows 30k which is what we use */
+	PORT_DIPSETTING(    0x38, "30k & 100k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "30k & 120k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "40k Only" )          PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "40k & 120k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "40k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
@@ -1069,8 +1069,8 @@ static INPUT_PORTS_START( pacnpal )
 	NAMCO_56IN1
 	NAMCO_56DSW0
 
-	PORT_START("DSW1")	/* ???? #1 pins ??-?? */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_START("DSW1")  /* ???? #1 pins ??-?? */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -1079,35 +1079,35 @@ static INPUT_PORTS_START( pacnpal )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4,5,6")
-	PORT_DIPSETTING(    0x20, "20k & 70k Only" )		PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "20k, 70k & Every 70k" )	PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "30k Only" )			PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k & 70k Only" )		PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "30k & 80k Only" )		PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "30k, 100k & Every 80k" )	PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "30k & 100k Only" )		PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "30k Only" )			PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "40k Only" )			PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "30k & 80k Only" )		PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "30k, 80k & Every 80k" )	PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k & 100k Only" )		PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "40k & 120k Only" )		PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "40k, 100k & Every 100k" )	PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x20, "20k & 70k Only" )        PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "20k, 70k & Every 70k" )  PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x00, "30k Only" )          PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "30k & 70k Only" )        PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "30k & 80k Only" )        PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "30k, 100k & Every 80k" ) PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "30k & 100k Only" )       PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "30k Only" )          PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, "40k Only" )          PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k & 80k Only" )        PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "30k, 80k & Every 80k" )  PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "30k & 100k Only" )       PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "40k & 120k Only" )       PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "40k, 100k & Every 100k" )    PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
 	PORT_DIPSETTING(    0x38, DEF_STR( None ) )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_START("DSW2")	/* ???? #1 pins ??-?? */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_START("DSW2")  /* ???? #1 pins ??-?? */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "Rank A" )
 	PORT_DIPSETTING(    0x08, "Rank B" )
 	PORT_DIPSETTING(    0x04, "Rank C" )
@@ -1123,17 +1123,17 @@ static INPUT_PORTS_START( grobda )
 	NAMCO_5XIN0
 	NAMCO_56IN1
 
-	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
+	PORT_START("DSW0")  /* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	// service mode again
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    // service mode again
 
-	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
+	PORT_START("DSW1")  /* 56XX #1 pins 22-29 */
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPNAME( 0x0e, 0x08, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPNAME( 0x0e, 0x08, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
@@ -1142,7 +1142,7 @@ static INPUT_PORTS_START( grobda )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x70, 0x40, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPNAME( 0x70, 0x40, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:5,6,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
@@ -1151,29 +1151,29 @@ static INPUT_PORTS_START( grobda )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )            PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* 56XX #1 pins 38-41 multiplexed */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "Rank A" )
 	PORT_DIPSETTING(    0x08, "Rank B" )
 	PORT_DIPSETTING(    0x04, "Rank C" )
 	PORT_DIPSETTING(    0x00, "Rank D" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Level_Select ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "10k, 50k & Every 50k" )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x00, "10k, 50k & Every 50k" )  PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x40, "10k & 30k Only" )
 	PORT_DIPSETTING(    0xc0, "10k Only" )
 	PORT_DIPSETTING(    0x80, DEF_STR( None ) )
@@ -1185,11 +1185,11 @@ static INPUT_PORTS_START( phozon )
 	NAMCO_56IN1
 	NAMCO_56DSW0
 
-	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_START("DSW1")  /* 56XX #1 pins 22-29 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(    0x0e, "Rank 0" )
 	PORT_DIPSETTING(    0x0c, "Rank 1" )
 	PORT_DIPSETTING(    0x0a, "Rank 2" )
@@ -1199,42 +1199,42 @@ static INPUT_PORTS_START( phozon )
 	PORT_DIPSETTING(    0x02, "Rank 6" )
 	PORT_DIPSETTING(    0x00, "Rank 7" )
 	// when level select is on, press P1 start during the game and move joystick to select level to jump to
-	PORT_DIPNAME( 0x10, 0x10, "Level Select (Cheat)" )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Level Select (Cheat)" )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// when stop mode is on, press P1 start to pause the game
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode (Cheat)" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Stop Mode (Cheat)" )     PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START("DSW2")	/* 56XX #1 pins 38-41 multiplexed */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4,5")
-	PORT_DIPSETTING(    0x08, "20k & 80k Only" )		PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "20k, 80k & Every 80k" )	PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x04, "30k Only" )			PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k & 60k Only" )		PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x1c, "30k & 100k Only" )		PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4,5")
+	PORT_DIPSETTING(    0x08, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "20k, 80k & Every 80k" )  PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x04, "30k Only" )          PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "30k & 60k Only" )        PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x1c, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
 //  PORT_DIPSETTING(    0x14, "30k 100k" )  // repeated         PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x0c, "30k, 120k & Every 120k" )	PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x0c, "20k & 80k Only" )		PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "30k" )			PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "30k, 100k & Every 100k" )	PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x1c, "30k & 100k Only" )		PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_DIPSETTING(    0x0c, "30k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0x02,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x0c, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "30k" )           PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_DIPSETTING(    0x1c, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
 //  PORT_DIPSETTING(    0x14, "30k 100k" )  // repeated     PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "40k & 80k Only" )		PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
-	PORT_DIPSETTING(    0x04, "100k Only" )			PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "40k & 80k Only" )        PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
+	PORT_DIPSETTING(    0x04, "100k Only" )         PORT_CONDITION("DSW2",0x02,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
@@ -1247,13 +1247,13 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mappy )
-	PORT_START("P1")	/* 58XX #0 pins 22-29 */
+	PORT_START("P1")    /* 58XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
-	PORT_START("P2")	/* 58XX #0 pins 22-29 */
+	PORT_START("P2")    /* 58XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1262,9 +1262,9 @@ static INPUT_PORTS_START( mappy )
 	NAMCO_56IN1
 	NAMCO_56DSW0
 
-	PORT_START("DSW1")	/* 58XX #1 pins 22-29 */
+	PORT_START("DSW1")  /* 58XX #1 pins 22-29 */
 /* According to the manual, 0x04, 0x08 and 0x10 should always be off, but... */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty )  )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty )  )      PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, "Rank A" )
 	PORT_DIPSETTING(    0x06, "Rank B" )
 	PORT_DIPSETTING(    0x05, "Rank C" )
@@ -1273,23 +1273,23 @@ static INPUT_PORTS_START( mappy )
 	PORT_DIPSETTING(    0x02, "Rank F" )
 	PORT_DIPSETTING(    0x01, "Rank G" )
 	PORT_DIPSETTING(    0x00, "Rank H" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)   PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* 58XX #1 pins 38-41 multiplexed */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_START("DSW2")  /* 58XX #1 pins 38-41 multiplexed */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_2C ) )
@@ -1298,23 +1298,23 @@ static INPUT_PORTS_START( mappy )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:4,5,6")
-	PORT_DIPSETTING(    0x18, "20k Only" )			PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
-	PORT_DIPSETTING(    0x30, "20k & 60k Only" )		PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
-	PORT_DIPSETTING(    0x38, "20k & 70k Only" )		PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
-	PORT_DIPSETTING(    0x10, "20k, 70k & Every 70k" )	PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
-	PORT_DIPSETTING(    0x28, "20k & 80k Only" )		PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
-	PORT_DIPSETTING(    0x08, "20k, 80k & Every 80k" )	PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
-	PORT_DIPSETTING(    0x20, "30k & 100k Only" )		PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
-	PORT_DIPSETTING(    0x20, "30k Only" )			PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
-	PORT_DIPSETTING(    0x38, "30k & 80k Only" )		PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
-	PORT_DIPSETTING(    0x30, "30k & 100k Only" )		PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
-	PORT_DIPSETTING(    0x10, "30k, 100k & Every 100k" )	PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
-	PORT_DIPSETTING(    0x28, "30k & 120k Only" )		PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
-	PORT_DIPSETTING(    0x18, "40k Only" )			PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
-	PORT_DIPSETTING(    0x08, "40k, 120k & Every 120k" )	PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(    0x18, "20k Only" )          PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
+	PORT_DIPSETTING(    0x30, "20k & 60k Only" )        PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
+	PORT_DIPSETTING(    0x38, "20k & 70k Only" )        PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
+	PORT_DIPSETTING(    0x10, "20k, 70k & Every 70k" )  PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
+	PORT_DIPSETTING(    0x28, "20k & 80k Only" )        PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
+	PORT_DIPSETTING(    0x08, "20k, 80k & Every 80k" )  PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
+	PORT_DIPSETTING(    0x20, "30k & 100k Only" )       PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x80)
+	PORT_DIPSETTING(    0x20, "30k Only" )          PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
+	PORT_DIPSETTING(    0x38, "30k & 80k Only" )        PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
+	PORT_DIPSETTING(    0x30, "30k & 100k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
+	PORT_DIPSETTING(    0x10, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
+	PORT_DIPSETTING(    0x28, "30k & 120k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
+	PORT_DIPSETTING(    0x18, "40k Only" )          PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
+	PORT_DIPSETTING(    0x08, "40k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0xc0,EQUALS,0x80)
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
@@ -1326,36 +1326,36 @@ static INPUT_PORTS_START( todruaga )
 	NAMCO_56IN0
 	NAMCO_56IN1
 
-	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
+	PORT_START("DSW0")  /* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	// service mode again
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    // service mode again
 
-	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_START("DSW1")  /* 56XX #1 pins 22-29 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze" )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Freeze" )            PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x20, IP_ACTIVE_LOW, "SW1:6" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 
-	PORT_START("DSW2")	/* 56XX #1 pins 38-41 multiplexed */
+	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
@@ -1371,37 +1371,37 @@ static INPUT_PORTS_START( digdug2 )
 	NAMCO_56IN0
 	NAMCO_56IN1
 
-	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
+	PORT_START("DSW0")  /* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	// service mode again
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    // service mode again
 
-	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
+	PORT_START("DSW1")  /* 56XX #1 pins 22-29 */
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "30k 80k and ..." )
 	PORT_DIPSETTING(    0x20, "30k 100k and ..." )
 	PORT_DIPSETTING(    0x10, "30k 120k and ..." )
 	PORT_DIPSETTING(    0x00, "30k 150k and..." )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Level_Select ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )            PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* 56XX #1 pins 38-41 multiplexed */
+	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
@@ -1417,37 +1417,37 @@ static INPUT_PORTS_START( motos )
 	NAMCO_5XIN0
 	NAMCO_56IN1
 
-	PORT_START("DSW0")	/* 56XX #1 pins 30-33 */
+	PORT_START("DSW0")  /* 56XX #1 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	// service mode again
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    // service mode again
 
-	PORT_START("DSW1")	/* 56XX #1 pins 22-29 */
+	PORT_START("DSW1")  /* 56XX #1 pins 22-29 */
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "Rank A" )
 	PORT_DIPSETTING(    0x00, "Rank B" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, "10k 30k and every 50k" )
 	PORT_DIPSETTING(    0x40, "20k and every 50k" )
 	PORT_DIPSETTING(    0x20, "30k and every 70k" )
 	PORT_DIPSETTING(    0x00, "20k 70k" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* 56XX #1 pins 38-41 multiplexed */
+	PORT_START("DSW2")  /* 56XX #1 pins 38-41 multiplexed */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
@@ -1540,8 +1540,8 @@ GFXDECODE_END
 
 static const namco_interface namco_config =
 {
-	8,				/* number of voices */
-	0				/* stereo */
+	8,              /* number of voices */
+	0               /* stereo */
 };
 
 
@@ -1551,8 +1551,8 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-READ8_MEMBER(mappy_state::dipA_l){ return machine().root_device().ioport("DSW1")->read(); }		// dips A
-READ8_MEMBER(mappy_state::dipA_h){ return machine().root_device().ioport("DSW1")->read() >> 4; }	// dips A
+READ8_MEMBER(mappy_state::dipA_l){ return machine().root_device().ioport("DSW1")->read(); }     // dips A
+READ8_MEMBER(mappy_state::dipA_h){ return machine().root_device().ioport("DSW1")->read() >> 4; }    // dips A
 
 READ8_MEMBER(mappy_state::dipB_mux)// dips B
 {
@@ -1584,30 +1584,30 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 /* chip #0: player inputs, buttons, coins */
 static const namcoio_interface intf0 =
 {
-	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
-	{ DEVCB_NULL, DEVCB_NULL },					/* port write handlers */
+	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
+	{ DEVCB_NULL, DEVCB_NULL },                 /* port write handlers */
 	NULL
 };
 
 static const namcoio_interface intf0_lamps =
 {
-	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") },	/* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(mappy_state,out_lamps), DEVCB_NULL },					/* port write handlers */
+	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,out_lamps), DEVCB_NULL },                 /* port write handlers */
 	NULL
 };
 
 /* chip #1: dip switches, test/cocktail, optional buttons */
 static const namcoio_interface intf1 =
 {
-	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_mux), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },					/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_mux), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") },  /* port read handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },                   /* port write handlers */
 	NULL
 };
 
 static const namcoio_interface intf1_interleave =
 {
-	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_muxi), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") },	/* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },					/* port write handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_muxi), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") }, /* port read handlers */
+	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },                   /* port write handlers */
 	NULL
 };
 
@@ -1623,11 +1623,11 @@ MACHINE_START_MEMBER(mappy_state,mappy)
 static MACHINE_CONFIG_START( superpac, mappy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  superpac_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  superpac_main_vblank_irq)    // also update the custom I/O chips
 
-	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
@@ -1663,7 +1663,7 @@ static MACHINE_CONFIG_DERIVED( pacnpal, superpac )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  pacnpal_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  pacnpal_main_vblank_irq) // also update the custom I/O chips
 
 	MCFG_DEVICE_REMOVE("namcoio_1")
 	MCFG_DEVICE_REMOVE("namcoio_2")
@@ -1676,7 +1676,7 @@ static MACHINE_CONFIG_DERIVED( grobda, superpac )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)  // also update the custom I/O chips
 
 	MCFG_DEVICE_REMOVE("namcoio_1")
 	MCFG_DEVICE_REMOVE("namcoio_2")
@@ -1692,15 +1692,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( phozon, mappy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
+	MCFG_CPU_ADD("maincpu", M6809,  PIXEL_CLOCK/4)  /* MAIN CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)  // also update the custom I/O chips
 
-	MCFG_CPU_ADD("sub", M6809,	PIXEL_CLOCK/4)	/* SOUND CPU */
+	MCFG_CPU_ADD("sub", M6809,  PIXEL_CLOCK/4)  /* SOUND CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("sub2", M6809,	PIXEL_CLOCK/4)	/* SUB CPU */
+	MCFG_CPU_ADD("sub2", M6809, PIXEL_CLOCK/4)  /* SUB CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub2_vblank_irq)
 
@@ -1736,11 +1736,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mappy, mappy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  mappy_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  mappy_main_vblank_irq)   // also update the custom I/O chips
 
-	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MCFG_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
@@ -1776,7 +1776,7 @@ static MACHINE_CONFIG_DERIVED( digdug2, mappy )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)  // also update the custom I/O chips
 
 	MCFG_WATCHDOG_VBLANK_INIT(0)
 
@@ -1790,7 +1790,7 @@ static MACHINE_CONFIG_DERIVED( todruaga, mappy )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  phozon_main_vblank_irq)  // also update the custom I/O chips
 
 	MCFG_DEVICE_REMOVE("namcoio_1")
 	MCFG_DEVICE_REMOVE("namcoio_2")
@@ -1806,7 +1806,7 @@ static MACHINE_CONFIG_DERIVED( motos, mappy )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  superpac_main_vblank_irq)	// also update the custom I/O chips
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  superpac_main_vblank_irq)    // also update the custom I/O chips
 
 	MCFG_DEVICE_REMOVE("namcoio_1")
 	MCFG_DEVICE_REMOVE("namcoio_2")
@@ -1821,7 +1821,7 @@ ROM_START( superpac )
 	ROM_LOAD( "sp1-2.1c",     0xc000, 0x2000, CRC(4bb33d9c) SHA1(dd87f71b4db090a32a6b791079eedd17580cc741) )
 	ROM_LOAD( "sp1-1.1b",     0xe000, 0x2000, CRC(846fbb4a) SHA1(f6bf90281986b9b7a3ef1dbbeddb722182e84d7c) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "spc-3.1k",     0xf000, 0x1000, CRC(04445ddb) SHA1(ce7d14963d5ddaefdeaf433a6f82c43cd1611d9b) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -1835,7 +1835,7 @@ ROM_START( superpac )
 	ROM_LOAD( "superpac.4e",  0x0020, 0x0100, CRC(1253c5c1) SHA1(df46a90170e9761d45c90fbd04ef2aa1e8c9944b) ) /* chars */
 	ROM_LOAD( "superpac.3l",  0x0120, 0x0100, CRC(d4d7026f) SHA1(a486573437c54bfb503424574ad82655491e85e1) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "superpac.3m",  0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
 ROM_END
 
@@ -1844,7 +1844,7 @@ ROM_START( superpacm )
 	ROM_LOAD( "spc-2.1c",     0xc000, 0x2000, CRC(1a38c30e) SHA1(ae0ee9f3df0991a80698fe745a7a853a4bb60710) )
 	ROM_LOAD( "spc-1.1b",     0xe000, 0x2000, CRC(730e95a9) SHA1(ca73c8bcb03c2f5c05968c707a5d3f7f9956b886) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "spc-3.1k",     0xf000, 0x1000, CRC(04445ddb) SHA1(ce7d14963d5ddaefdeaf433a6f82c43cd1611d9b) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -1858,7 +1858,7 @@ ROM_START( superpacm )
 	ROM_LOAD( "superpac.4e",  0x0020, 0x0100, CRC(1253c5c1) SHA1(df46a90170e9761d45c90fbd04ef2aa1e8c9944b) ) /* chars */
 	ROM_LOAD( "superpac.3l",  0x0120, 0x0100, CRC(d4d7026f) SHA1(a486573437c54bfb503424574ad82655491e85e1) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "superpac.3m",  0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
 ROM_END
 
@@ -1868,7 +1868,7 @@ ROM_START( pacnpal )
 	ROM_LOAD( "pap1-2b.1c",    0xc000, 0x2000, CRC(15308bcf) SHA1(334603f8904f8968d05edc420b5f9e3b483ee86d) )
 	ROM_LOAD( "pap3-1.1b",     0xe000, 0x2000, CRC(3cac401c) SHA1(38a14228469fa4a20cbc5d862198dc901842682e) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "pap1-4.1k",     0xf000, 0x1000, CRC(330e20de) SHA1(5b23e5dcc38dc644a36efc8b03eba34cea540bea) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -1882,7 +1882,7 @@ ROM_START( pacnpal )
 	ROM_LOAD( "pap1-5.4e",     0x0020, 0x0100, CRC(ac46203c) SHA1(3f47f1991aab9640c0d5f70fad85d20d6cf2ea3d) ) /* chars */
 	ROM_LOAD( "pap1-4.3l",     0x0120, 0x0100, CRC(686bde84) SHA1(541d08b43dbfb789c2867955635d2c9e051fedd9) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "pap1-3.3m",     0x0000, 0x0100, CRC(94782db5) SHA1(ac0114f0611c81dfac9469253048ae0214d570ee) )
 ROM_END
 
@@ -1892,7 +1892,7 @@ ROM_START( pacnpal2 )
 	ROM_LOAD( "pap1-2.1c",    0xc000, 0x2000, CRC(0245396e) SHA1(7e8467e317879621a7b31bc922b5187f20fcea78) )
 	ROM_LOAD( "pap1-1.1b",    0xe000, 0x2000, CRC(7f046b58) SHA1(2024019e5fafb698bb5775075c9b88c5ed35f7ba) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "pap1-4.1k",     0xf000, 0x1000, CRC(330e20de) SHA1(5b23e5dcc38dc644a36efc8b03eba34cea540bea) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -1906,7 +1906,7 @@ ROM_START( pacnpal2 )
 	ROM_LOAD( "pap1-5.4e",     0x0020, 0x0100, CRC(ac46203c) SHA1(3f47f1991aab9640c0d5f70fad85d20d6cf2ea3d) ) /* chars */
 	ROM_LOAD( "pap1-4.3l",     0x0120, 0x0100, CRC(686bde84) SHA1(541d08b43dbfb789c2867955635d2c9e051fedd9) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "pap1-3.3m",     0x0000, 0x0100, CRC(94782db5) SHA1(ac0114f0611c81dfac9469253048ae0214d570ee) )
 ROM_END
 
@@ -1918,7 +1918,7 @@ ROM_START( pacnchmp )
 	ROM_LOAD( "pap3-2.1c",      0xc000, 0x2000, CRC(505bae56) SHA1(590ce9f0e92115a71eb76b71ab4eac16ffa2a28e) )
 	ROM_LOAD( "pap3-1.1b",      0xe000, 0x2000, CRC(3cac401c) SHA1(38a14228469fa4a20cbc5d862198dc901842682e) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "pap1-4.1k",     0xf000, 0x1000, CRC(330e20de) SHA1(5b23e5dcc38dc644a36efc8b03eba34cea540bea) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -1932,7 +1932,7 @@ ROM_START( pacnchmp )
 	ROM_LOAD( "pap2-5.4e",     0x0020, 0x0100, CRC(875b49bb) SHA1(34b4622eecefd9fe0e9d883246d5c0e0c7f9ad43)  ) /* chars */
 	ROM_LOAD( "pap2-4.3l",     0x0120, 0x0100, CRC(23701566) SHA1(afa22f5b9eb77679b5d5c2ed27d6590776a59f6f)  ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "pap1-3.3m",     0x0000, 0x0100, CRC(94782db5) SHA1(ac0114f0611c81dfac9469253048ae0214d570ee) )
 ROM_END
 
@@ -1946,18 +1946,18 @@ ROM_START( grobda )
 	ROM_LOAD( "gr1-4.1k",  0xe000, 0x2000, CRC(3fe78c08) SHA1(dd49a96e613e0ced5b82eafcaf935e136e7db53a) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )	/* characters */
+	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )   /* characters */
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )	/* sprites */
-	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )	/* sprites */
+	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )   /* sprites */
+	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )   /* sprites */
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "gr1-6.4c",  0x0000, 0x0020, CRC(c65efa77) SHA1(ead74917744cb11556153bd6c09a987bc9c6ef08) )	/* palette */
-	ROM_LOAD( "gr1-5.4e",  0x0020, 0x0100, CRC(a0f66911) SHA1(e08a56327055994e3d9e2c3816d57a3cc2434c88) )	/* characters */
-	ROM_LOAD( "gr1-4.3l",  0x0120, 0x0100, CRC(f1f2c234) SHA1(d59879e7a598a363d8d9ac9e630ae698f14833f7) )	/* sprites */
+	ROM_LOAD( "gr1-6.4c",  0x0000, 0x0020, CRC(c65efa77) SHA1(ead74917744cb11556153bd6c09a987bc9c6ef08) )   /* palette */
+	ROM_LOAD( "gr1-5.4e",  0x0020, 0x0100, CRC(a0f66911) SHA1(e08a56327055994e3d9e2c3816d57a3cc2434c88) )   /* characters */
+	ROM_LOAD( "gr1-4.3l",  0x0120, 0x0100, CRC(f1f2c234) SHA1(d59879e7a598a363d8d9ac9e630ae698f14833f7) )   /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "gr1-3.3m",  0x0000, 0x0100, CRC(66eb1467) SHA1(02b99ced4afd9ac139f634739769f7bf353274f9) )
 ROM_END
 
@@ -1971,18 +1971,18 @@ ROM_START( grobda2 )
 	ROM_LOAD( "gr1-4.1k",  0xe000, 0x2000, CRC(3fe78c08) SHA1(dd49a96e613e0ced5b82eafcaf935e136e7db53a) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )	/* characters */
+	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )   /* characters */
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )	/* sprites */
-	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )	/* sprites */
+	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )   /* sprites */
+	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )   /* sprites */
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "gr1-6.4c",  0x0000, 0x0020, CRC(c65efa77) SHA1(ead74917744cb11556153bd6c09a987bc9c6ef08) )	/* palette */
-	ROM_LOAD( "gr1-5.4e",  0x0020, 0x0100, CRC(a0f66911) SHA1(e08a56327055994e3d9e2c3816d57a3cc2434c88) )	/* characters */
-	ROM_LOAD( "gr1-4.3l",  0x0120, 0x0100, CRC(f1f2c234) SHA1(d59879e7a598a363d8d9ac9e630ae698f14833f7) )	/* sprites */
+	ROM_LOAD( "gr1-6.4c",  0x0000, 0x0020, CRC(c65efa77) SHA1(ead74917744cb11556153bd6c09a987bc9c6ef08) )   /* palette */
+	ROM_LOAD( "gr1-5.4e",  0x0020, 0x0100, CRC(a0f66911) SHA1(e08a56327055994e3d9e2c3816d57a3cc2434c88) )   /* characters */
+	ROM_LOAD( "gr1-4.3l",  0x0120, 0x0100, CRC(f1f2c234) SHA1(d59879e7a598a363d8d9ac9e630ae698f14833f7) )   /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "gr1-3.3m",  0x0000, 0x0100, CRC(66eb1467) SHA1(02b99ced4afd9ac139f634739769f7bf353274f9) )
 ROM_END
 
@@ -1996,18 +1996,18 @@ ROM_START( grobda3 )
 	ROM_LOAD( "gr1-4.1k",  0xe000, 0x2000, CRC(3fe78c08) SHA1(dd49a96e613e0ced5b82eafcaf935e136e7db53a) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )	/* characters */
+	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )   /* characters */
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )	/* sprites */
-	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )	/* sprites */
+	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )   /* sprites */
+	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )   /* sprites */
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "gr1-6.4c",  0x0000, 0x0020, CRC(c65efa77) SHA1(ead74917744cb11556153bd6c09a987bc9c6ef08) )	/* palette */
-	ROM_LOAD( "gr1-5.4e",  0x0020, 0x0100, CRC(a0f66911) SHA1(e08a56327055994e3d9e2c3816d57a3cc2434c88) )	/* characters */
-	ROM_LOAD( "gr1-4.3l",  0x0120, 0x0100, CRC(f1f2c234) SHA1(d59879e7a598a363d8d9ac9e630ae698f14833f7) )	/* sprites */
+	ROM_LOAD( "gr1-6.4c",  0x0000, 0x0020, CRC(c65efa77) SHA1(ead74917744cb11556153bd6c09a987bc9c6ef08) )   /* palette */
+	ROM_LOAD( "gr1-5.4e",  0x0020, 0x0100, CRC(a0f66911) SHA1(e08a56327055994e3d9e2c3816d57a3cc2434c88) )   /* characters */
+	ROM_LOAD( "gr1-4.3l",  0x0120, 0x0100, CRC(f1f2c234) SHA1(d59879e7a598a363d8d9ac9e630ae698f14833f7) )   /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
 	ROM_LOAD( "gr1-3.3m",  0x0000, 0x0100, CRC(66eb1467) SHA1(02b99ced4afd9ac139f634739769f7bf353274f9) )
 ROM_END
 
@@ -2040,204 +2040,204 @@ ROM_START( phozon )
 	ROM_LOAD( "sprite.prm",  0x0400, 0x0100, CRC(9061db07) SHA1(4305d37e613e1d15d37539b152c948648189c2cd) ) /* sprites */
 	ROM_LOAD( "palette.prm", 0x0500, 0x0020, CRC(60e856ed) SHA1(dcc9a2dfc728b9ca1ab895008de07e20ebed9da3) ) /* unused - timing? */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound PROMs */
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "sound.prm", 0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
 ROM_END
 
 
 ROM_START( mappy )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "mpx_3.1d",	0xa000, 0x2000, CRC(52e6c708) SHA1(b9722941438e93325e84691ada4e95620bec73b2) )
-	ROM_LOAD( "mp1_2.1c",	0xc000, 0x2000, CRC(a958a61c) SHA1(e5198703cdf47b2cd7fc9f2a5fde7bf4ab2275db) )
-	ROM_LOAD( "mpx_1.1b",	0xe000, 0x2000, CRC(203766d4) SHA1(1dbc4f42d4c16a08240a221bec27dcc3a8dd7461) )
+	ROM_LOAD( "mpx_3.1d",   0xa000, 0x2000, CRC(52e6c708) SHA1(b9722941438e93325e84691ada4e95620bec73b2) )
+	ROM_LOAD( "mp1_2.1c",   0xc000, 0x2000, CRC(a958a61c) SHA1(e5198703cdf47b2cd7fc9f2a5fde7bf4ab2275db) )
+	ROM_LOAD( "mpx_1.1b",   0xe000, 0x2000, CRC(203766d4) SHA1(1dbc4f42d4c16a08240a221bec27dcc3a8dd7461) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "mp1_4.1k",	0xe000, 0x2000, CRC(8182dd5b) SHA1(f36b57f7f1e79f00b3f07afe1960bca5f5325ee2) )
+	ROM_LOAD( "mp1_4.1k",   0xe000, 0x2000, CRC(8182dd5b) SHA1(f36b57f7f1e79f00b3f07afe1960bca5f5325ee2) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "mp1_5.3b",	0x0000, 0x1000, CRC(16498b9f) SHA1(76610149c65f955484fef1c033ddc3fed3f4e568) )
+	ROM_LOAD( "mp1_5.3b",   0x0000, 0x1000, CRC(16498b9f) SHA1(76610149c65f955484fef1c033ddc3fed3f4e568) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "mp1_6.3m",	0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
-	ROM_LOAD( "mp1_7.3n",	0x2000, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
+	ROM_LOAD( "mp1_6.3m",   0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
+	ROM_LOAD( "mp1_7.3n",   0x2000, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "mp1-5.5b",	0x0000, 0x0020, CRC(56531268) SHA1(2e356706c07f43eeb67783fb122bdc7fed1b3589) ) /* palette */
-	ROM_LOAD( "mp1-6.4c",	0x0020, 0x0100, CRC(50765082) SHA1(f578e14f15783acb2073644db4a2f0d196cc0957) ) /* characters */
-	ROM_LOAD( "mp1-7.5k",	0x0120, 0x0100, CRC(5396bd78) SHA1(2e387e5d8b8cab005f67f821b4db65d0ae8bd362) ) /* sprites */
+	ROM_LOAD( "mp1-5.5b",   0x0000, 0x0020, CRC(56531268) SHA1(2e356706c07f43eeb67783fb122bdc7fed1b3589) ) /* palette */
+	ROM_LOAD( "mp1-6.4c",   0x0020, 0x0100, CRC(50765082) SHA1(f578e14f15783acb2073644db4a2f0d196cc0957) ) /* characters */
+	ROM_LOAD( "mp1-7.5k",   0x0120, 0x0100, CRC(5396bd78) SHA1(2e387e5d8b8cab005f67f821b4db65d0ae8bd362) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "mp1-3.3m",	0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "mp1-3.3m",   0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
 ROM_START( mappyj )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "mp1_3.1d",	0xa000, 0x2000, CRC(db9d5ab5) SHA1(32a0190f96f9c00c541b24dd17d6ad487938a8bf) )
-	ROM_LOAD( "mp1_2.1c",	0xc000, 0x2000, CRC(a958a61c) SHA1(e5198703cdf47b2cd7fc9f2a5fde7bf4ab2275db) )
-	ROM_LOAD( "mp1_1.1b",	0xe000, 0x2000, CRC(77c0b492) SHA1(631b73560ac59c3612e692fa59558773639ceda7) )
+	ROM_LOAD( "mp1_3.1d",   0xa000, 0x2000, CRC(db9d5ab5) SHA1(32a0190f96f9c00c541b24dd17d6ad487938a8bf) )
+	ROM_LOAD( "mp1_2.1c",   0xc000, 0x2000, CRC(a958a61c) SHA1(e5198703cdf47b2cd7fc9f2a5fde7bf4ab2275db) )
+	ROM_LOAD( "mp1_1.1b",   0xe000, 0x2000, CRC(77c0b492) SHA1(631b73560ac59c3612e692fa59558773639ceda7) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "mp1_4.1k",	0xe000, 0x2000, CRC(8182dd5b) SHA1(f36b57f7f1e79f00b3f07afe1960bca5f5325ee2) )
+	ROM_LOAD( "mp1_4.1k",   0xe000, 0x2000, CRC(8182dd5b) SHA1(f36b57f7f1e79f00b3f07afe1960bca5f5325ee2) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "mp1_5.3b",	0x0000, 0x1000, CRC(16498b9f) SHA1(76610149c65f955484fef1c033ddc3fed3f4e568) )
+	ROM_LOAD( "mp1_5.3b",   0x0000, 0x1000, CRC(16498b9f) SHA1(76610149c65f955484fef1c033ddc3fed3f4e568) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "mp1_6.3m",	0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
-	ROM_LOAD( "mp1_7.3n",	0x2000, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
+	ROM_LOAD( "mp1_6.3m",   0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
+	ROM_LOAD( "mp1_7.3n",   0x2000, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "mp1-5.5b",	0x0000, 0x0020, CRC(56531268) SHA1(2e356706c07f43eeb67783fb122bdc7fed1b3589) ) /* palette */
-	ROM_LOAD( "mp1-6.4c",	0x0020, 0x0100, CRC(50765082) SHA1(f578e14f15783acb2073644db4a2f0d196cc0957) ) /* characters */
-	ROM_LOAD( "mp1-7.5k",	0x0120, 0x0100, CRC(5396bd78) SHA1(2e387e5d8b8cab005f67f821b4db65d0ae8bd362) ) /* sprites */
+	ROM_LOAD( "mp1-5.5b",   0x0000, 0x0020, CRC(56531268) SHA1(2e356706c07f43eeb67783fb122bdc7fed1b3589) ) /* palette */
+	ROM_LOAD( "mp1-6.4c",   0x0020, 0x0100, CRC(50765082) SHA1(f578e14f15783acb2073644db4a2f0d196cc0957) ) /* characters */
+	ROM_LOAD( "mp1-7.5k",   0x0120, 0x0100, CRC(5396bd78) SHA1(2e387e5d8b8cab005f67f821b4db65d0ae8bd362) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "mp1-3.3m",	0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "mp1-3.3m",   0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
 ROM_START( todruaga )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "td2_3.1d",	0x8000, 0x4000, CRC(fbf16299) SHA1(9abbaaaf0a53aff38df8287f62d091b13146cf13) )
-	ROM_LOAD( "td2_1.1b",	0xc000, 0x4000, CRC(b238d723) SHA1(ab8eadd45638ff1ab2dacbd5ab2c6870b9f79086) )
+	ROM_LOAD( "td2_3.1d",   0x8000, 0x4000, CRC(fbf16299) SHA1(9abbaaaf0a53aff38df8287f62d091b13146cf13) )
+	ROM_LOAD( "td2_1.1b",   0xc000, 0x4000, CRC(b238d723) SHA1(ab8eadd45638ff1ab2dacbd5ab2c6870b9f79086) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "td1_4.1k",	0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
+	ROM_LOAD( "td1_4.1k",   0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "td1_5.3b",	0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
+	ROM_LOAD( "td1_5.3b",   0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "td1_6.3m",	0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
-	ROM_LOAD( "td1_7.3n",	0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
+	ROM_LOAD( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
+	ROM_LOAD( "td1_7.3n",   0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
 
 	ROM_REGION( 0x0520, "proms", 0 )
-	ROM_LOAD( "td1-5.5b",	0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) ) /* palette */
-	ROM_LOAD( "td1-6.4c",	0x0020, 0x0100, CRC(8c661d6a) SHA1(1340e4f657f4f2c4ef651a441c3b51632e757d0b) ) /* characters */
-	ROM_LOAD( "td1-7.5k",	0x0120, 0x0400, CRC(a86c74dd) SHA1(dfd7d6b2740761c3bcab4c7999d2699d920843e7) ) /* sprites */
+	ROM_LOAD( "td1-5.5b",   0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) ) /* palette */
+	ROM_LOAD( "td1-6.4c",   0x0020, 0x0100, CRC(8c661d6a) SHA1(1340e4f657f4f2c4ef651a441c3b51632e757d0b) ) /* characters */
+	ROM_LOAD( "td1-7.5k",   0x0120, 0x0400, CRC(a86c74dd) SHA1(dfd7d6b2740761c3bcab4c7999d2699d920843e7) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "td1-3.3m",	0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "td1-3.3m",   0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
 ROM_END
 
 ROM_START( todruagao )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "td1_3.1d",	0x8000, 0x4000, CRC(7ab4f5b2) SHA1(65035a5ecdff14bf23e01fe0f5e0935d156d94ff) )
-	ROM_LOAD( "td1_1.1b",	0xc000, 0x4000, CRC(8c20ef10) SHA1(12ea4875ce4d4590b88862139d3379ab9f5cec03) )
+	ROM_LOAD( "td1_3.1d",   0x8000, 0x4000, CRC(7ab4f5b2) SHA1(65035a5ecdff14bf23e01fe0f5e0935d156d94ff) )
+	ROM_LOAD( "td1_1.1b",   0xc000, 0x4000, CRC(8c20ef10) SHA1(12ea4875ce4d4590b88862139d3379ab9f5cec03) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "td1_4.1k",	0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
+	ROM_LOAD( "td1_4.1k",   0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "td1_5.3b",	0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
+	ROM_LOAD( "td1_5.3b",   0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "td1_6.3m",	0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
-	ROM_LOAD( "td1_7.3n",	0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
+	ROM_LOAD( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
+	ROM_LOAD( "td1_7.3n",   0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
 
 	ROM_REGION( 0x0520, "proms", 0 )
-	ROM_LOAD( "td1-5.5b",	0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) ) /* palette */
-	ROM_LOAD( "td1-6.4c",	0x0020, 0x0100, CRC(8c661d6a) SHA1(1340e4f657f4f2c4ef651a441c3b51632e757d0b) ) /* characters */
-	ROM_LOAD( "td1-7.5k",	0x0120, 0x0400, CRC(a86c74dd) SHA1(dfd7d6b2740761c3bcab4c7999d2699d920843e7) ) /* sprites */
+	ROM_LOAD( "td1-5.5b",   0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) ) /* palette */
+	ROM_LOAD( "td1-6.4c",   0x0020, 0x0100, CRC(8c661d6a) SHA1(1340e4f657f4f2c4ef651a441c3b51632e757d0b) ) /* characters */
+	ROM_LOAD( "td1-7.5k",   0x0120, 0x0400, CRC(a86c74dd) SHA1(dfd7d6b2740761c3bcab4c7999d2699d920843e7) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "td1-3.3m",	0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "td1-3.3m",   0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
 ROM_END
 
 ROM_START( todruagas )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "3b.bin",	0x8000, 0x4000, CRC(85d052d9) SHA1(03d4d4b5b0cd49d2a4acd8479bc9975a5fde6c4c) )
-	ROM_LOAD( "1b.bin",	0xc000, 0x4000, CRC(a5db267a) SHA1(f140fd7b4d7e939f3a20ca5a15c16e5b8999c47d) )
+	ROM_LOAD( "3b.bin", 0x8000, 0x4000, CRC(85d052d9) SHA1(03d4d4b5b0cd49d2a4acd8479bc9975a5fde6c4c) )
+	ROM_LOAD( "1b.bin", 0xc000, 0x4000, CRC(a5db267a) SHA1(f140fd7b4d7e939f3a20ca5a15c16e5b8999c47d) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "td1_4.1k",	0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
+	ROM_LOAD( "td1_4.1k",   0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "td1_5.3b",	0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
+	ROM_LOAD( "td1_5.3b",   0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "td1_6.3m",	0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
-	ROM_LOAD( "td1_7.3n",	0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
+	ROM_LOAD( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
+	ROM_LOAD( "td1_7.3n",   0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
 
 	ROM_REGION( 0x0520, "proms", 0 )
-	ROM_LOAD( "td1-5.5b",	0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) ) /* palette */
-	ROM_LOAD( "td1-6.4c",	0x0020, 0x0100, CRC(8c661d6a) SHA1(1340e4f657f4f2c4ef651a441c3b51632e757d0b) ) /* characters */
-	ROM_LOAD( "td1-7.5k",	0x0120, 0x0400, CRC(a86c74dd) SHA1(dfd7d6b2740761c3bcab4c7999d2699d920843e7) ) /* sprites */
+	ROM_LOAD( "td1-5.5b",   0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) ) /* palette */
+	ROM_LOAD( "td1-6.4c",   0x0020, 0x0100, CRC(8c661d6a) SHA1(1340e4f657f4f2c4ef651a441c3b51632e757d0b) ) /* characters */
+	ROM_LOAD( "td1-7.5k",   0x0120, 0x0400, CRC(a86c74dd) SHA1(dfd7d6b2740761c3bcab4c7999d2699d920843e7) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "td1-3.3m",	0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "td1-3.3m",   0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
 ROM_END
 
 ROM_START( digdug2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "d23_3.1d",	0x8000, 0x4000, CRC(cc155338) SHA1(d6796479ebb00081e9ae281380a4ce75f730766e) )
-	ROM_LOAD( "d23_1.1b",	0xc000, 0x4000, CRC(40e46af8) SHA1(698a5c425e23627331d85216a4edee9c391e5749) )
+	ROM_LOAD( "d23_3.1d",   0x8000, 0x4000, CRC(cc155338) SHA1(d6796479ebb00081e9ae281380a4ce75f730766e) )
+	ROM_LOAD( "d23_1.1b",   0xc000, 0x4000, CRC(40e46af8) SHA1(698a5c425e23627331d85216a4edee9c391e5749) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "d21_4.1k",	0xe000, 0x2000, CRC(737443b1) SHA1(0e46204089cc6e5ffab0d2a62f9a1728f8c35948) )
+	ROM_LOAD( "d21_4.1k",   0xe000, 0x2000, CRC(737443b1) SHA1(0e46204089cc6e5ffab0d2a62f9a1728f8c35948) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "d21_5.3b",	0x0000, 0x1000, CRC(afcb4509) SHA1(c9a54df22b0b92efbe7417a00200587225906b46) )
+	ROM_LOAD( "d21_5.3b",   0x0000, 0x1000, CRC(afcb4509) SHA1(c9a54df22b0b92efbe7417a00200587225906b46) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "d21_6.3m",	0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
-	ROM_LOAD( "d21_7.3n",	0x4000, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
+	ROM_LOAD( "d21_6.3m",   0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
+	ROM_LOAD( "d21_7.3n",   0x4000, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "d21-5.5b",	0x0000, 0x0020, CRC(9b169db5) SHA1(77e840d10ab59708a051c3b15305b33d431ee06d) ) /* palette */
-	ROM_LOAD( "d21-6.4c",	0x0020, 0x0100, CRC(55a88695) SHA1(bd6bd641c9f220b6a2cc414a1117d5c089571400) ) /* characters */
-	ROM_LOAD( "d21-7.5k",	0x0120, 0x0100, CRC(9c55feda) SHA1(30a4593726f5a4791e0812fd593e592087e730e3) ) /* sprites */
+	ROM_LOAD( "d21-5.5b",   0x0000, 0x0020, CRC(9b169db5) SHA1(77e840d10ab59708a051c3b15305b33d431ee06d) ) /* palette */
+	ROM_LOAD( "d21-6.4c",   0x0020, 0x0100, CRC(55a88695) SHA1(bd6bd641c9f220b6a2cc414a1117d5c089571400) ) /* characters */
+	ROM_LOAD( "d21-7.5k",   0x0120, 0x0100, CRC(9c55feda) SHA1(30a4593726f5a4791e0812fd593e592087e730e3) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "d21-3.3m",	0x0000, 0x0100, CRC(e0074ee2) SHA1(f4f02977130110be52f4dd82fc3c0d02f45778b9) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "d21-3.3m",   0x0000, 0x0100, CRC(e0074ee2) SHA1(f4f02977130110be52f4dd82fc3c0d02f45778b9) )
 ROM_END
 
 ROM_START( digdug2o )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "d21_3.1d",	0x8000, 0x4000, CRC(be7ec80b) SHA1(a053274ffbf3200e9b89a8be1bd91744acb4a823) )
-	ROM_LOAD( "d21_1.1b",	0xc000, 0x4000, CRC(5c77c0d4) SHA1(56709e5db1686fd996d21c1005accf34e2d863e1) )
+	ROM_LOAD( "d21_3.1d",   0x8000, 0x4000, CRC(be7ec80b) SHA1(a053274ffbf3200e9b89a8be1bd91744acb4a823) )
+	ROM_LOAD( "d21_1.1b",   0xc000, 0x4000, CRC(5c77c0d4) SHA1(56709e5db1686fd996d21c1005accf34e2d863e1) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "d21_4.1k",	0xe000, 0x2000, CRC(737443b1) SHA1(0e46204089cc6e5ffab0d2a62f9a1728f8c35948) )
+	ROM_LOAD( "d21_4.1k",   0xe000, 0x2000, CRC(737443b1) SHA1(0e46204089cc6e5ffab0d2a62f9a1728f8c35948) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "d21_5.3b",	0x0000, 0x1000, CRC(afcb4509) SHA1(c9a54df22b0b92efbe7417a00200587225906b46) )
+	ROM_LOAD( "d21_5.3b",   0x0000, 0x1000, CRC(afcb4509) SHA1(c9a54df22b0b92efbe7417a00200587225906b46) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "d21_6.3m",	0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
-	ROM_LOAD( "d21_7.3n",	0x4000, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
+	ROM_LOAD( "d21_6.3m",   0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
+	ROM_LOAD( "d21_7.3n",   0x4000, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "d21-5.5b",	0x0000, 0x0020, CRC(9b169db5) SHA1(77e840d10ab59708a051c3b15305b33d431ee06d) ) /* palette */
-	ROM_LOAD( "d21-6.4c",	0x0020, 0x0100, CRC(55a88695) SHA1(bd6bd641c9f220b6a2cc414a1117d5c089571400) ) /* characters */
-	ROM_LOAD( "d2x-7.5k",	0x0120, 0x0100, CRC(1525a4d1) SHA1(bbedb0cf5957671fca1229d38cb33086356813e1) ) /* sprites */
+	ROM_LOAD( "d21-5.5b",   0x0000, 0x0020, CRC(9b169db5) SHA1(77e840d10ab59708a051c3b15305b33d431ee06d) ) /* palette */
+	ROM_LOAD( "d21-6.4c",   0x0020, 0x0100, CRC(55a88695) SHA1(bd6bd641c9f220b6a2cc414a1117d5c089571400) ) /* characters */
+	ROM_LOAD( "d2x-7.5k",   0x0120, 0x0100, CRC(1525a4d1) SHA1(bbedb0cf5957671fca1229d38cb33086356813e1) ) /* sprites */
 	/* the sprite lookup table is different from the other set, could be a bad dump */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "d21-3.3m",	0x0000, 0x0100, CRC(e0074ee2) SHA1(f4f02977130110be52f4dd82fc3c0d02f45778b9) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "d21-3.3m",   0x0000, 0x0100, CRC(e0074ee2) SHA1(f4f02977130110be52f4dd82fc3c0d02f45778b9) )
 ROM_END
 
 ROM_START( motos )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
-	ROM_LOAD( "mo1_3.1d",	0x8000, 0x4000, CRC(1104abb2) SHA1(ade809a73ac24494b9f95f65b7592df5f86dce60) )
-	ROM_LOAD( "mo1_1.1b",	0xc000, 0x4000, CRC(57b157e2) SHA1(b050495fcc4a4d93551b29d4f05e49f64017c870) )
+	ROM_LOAD( "mo1_3.1d",   0x8000, 0x4000, CRC(1104abb2) SHA1(ade809a73ac24494b9f95f65b7592df5f86dce60) )
+	ROM_LOAD( "mo1_1.1b",   0xc000, 0x4000, CRC(57b157e2) SHA1(b050495fcc4a4d93551b29d4f05e49f64017c870) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
-	ROM_LOAD( "mo1_4.1k",	0xe000, 0x2000, CRC(55e45d21) SHA1(a8b195acfec542734751de29c9dafc2b165a5881) )
+	ROM_LOAD( "mo1_4.1k",   0xe000, 0x2000, CRC(55e45d21) SHA1(a8b195acfec542734751de29c9dafc2b165a5881) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "mo1_5.3b",	0x0000, 0x1000, CRC(5d4a2a22) SHA1(4af9bf2ae9bb78d2d029ef38809181ffa3c0eb66) )
+	ROM_LOAD( "mo1_5.3b",   0x0000, 0x1000, CRC(5d4a2a22) SHA1(4af9bf2ae9bb78d2d029ef38809181ffa3c0eb66) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "mo1_6.3m",	0x0000, 0x4000, CRC(2f0e396e) SHA1(664679f9d3d74a3fccb086af910392b4fe40c9bc) )
-	ROM_LOAD( "mo1_7.3n",	0x4000, 0x4000, CRC(cf8a3b86) SHA1(2b49cdec516e23783f2a291633d81ab8bd0245fc) )
+	ROM_LOAD( "mo1_6.3m",   0x0000, 0x4000, CRC(2f0e396e) SHA1(664679f9d3d74a3fccb086af910392b4fe40c9bc) )
+	ROM_LOAD( "mo1_7.3n",   0x4000, 0x4000, CRC(cf8a3b86) SHA1(2b49cdec516e23783f2a291633d81ab8bd0245fc) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "mo1-5.5b",	0x0000, 0x0020, CRC(71972383) SHA1(66b0619affcc5168b099108800a941d6e2416ab0) ) /* palette */
-	ROM_LOAD( "mo1-6.4c",	0x0020, 0x0100, CRC(730ba7fb) SHA1(24eb167266752b064689662e3ef0f62d0407ac26) ) /* characters */
-	ROM_LOAD( "mo1-7.5k",	0x0120, 0x0100, CRC(7721275d) SHA1(543adb5348db81ea82a5c039451001ebd82735e3) ) /* sprites */
+	ROM_LOAD( "mo1-5.5b",   0x0000, 0x0020, CRC(71972383) SHA1(66b0619affcc5168b099108800a941d6e2416ab0) ) /* palette */
+	ROM_LOAD( "mo1-6.4c",   0x0020, 0x0100, CRC(730ba7fb) SHA1(24eb167266752b064689662e3ef0f62d0407ac26) ) /* characters */
+	ROM_LOAD( "mo1-7.5k",   0x0120, 0x0100, CRC(7721275d) SHA1(543adb5348db81ea82a5c039451001ebd82735e3) ) /* sprites */
 
-	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
-	ROM_LOAD( "mo1-3.3m",	0x0000, 0x0100, CRC(2accdfb4) SHA1(e21a0618c0f8e35ce26666b6850ac9c0d95d7971) )
+	ROM_REGION( 0x0100, "namco", 0 )    /* sound prom */
+	ROM_LOAD( "mo1-3.3m",   0x0000, 0x0100, CRC(2accdfb4) SHA1(e21a0618c0f8e35ce26666b6850ac9c0d95d7971) )
 ROM_END
 
 
@@ -2251,13 +2251,13 @@ WRITE8_MEMBER(mappy_state::grobda_DAC_w)
 DRIVER_INIT_MEMBER(mappy_state,grobda)
 {
 	/* I think the speech in Grobda is not a standard Namco sound feature, but rather a hack.
-       The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
-       probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
-       to locations not used by the sound hardware).
-       The program writes the same value to 0x02, 0x12, 0x22 and 0x32.
-       However, removing the 15XX from the board causes sound to disappear completely, so
-       the DAC might be built-in after all.
-      */
+	   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
+	   probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
+	   to locations not used by the sound hardware).
+	   The program writes the same value to 0x02, 0x12, 0x22 and 0x32.
+	   However, removing the 15XX from the board causes sound to disappear completely, so
+	   the DAC might be built-in after all.
+	  */
 	machine().device("sub")->memory().space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
 }
 

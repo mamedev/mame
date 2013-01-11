@@ -377,8 +377,8 @@ Notes:
 
 ***************************************************************************/
 
-#define DEBUG_DSP				0
-#define DEBUG_BLOCK_MOVES		0
+#define DEBUG_DSP               0
+#define DEBUG_BLOCK_MOVES       0
 
 READ32_MEMBER(taitojc_state::dsp_shared_r)
 {
@@ -545,15 +545,15 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 		if ((data & 0x80000) == 0)
 		{
 			/*
-            All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
+			All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
 
-            0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
-            0008C376: 33FC 0000 0660 0000                                 move.w  #$0, $6600000.l
-            0008C37E: 66F0                                                bne     $8c370
+			0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
+			0008C376: 33FC 0000 0660 0000                                 move.w  #$0, $6600000.l
+			0008C37E: 66F0                                                bne     $8c370
 
-            Problem is: that move.w in the middle makes the SR to always return a zero flag result,
-            hence it never branches like it should. CPU bug?
-            */
+			Problem is: that move.w in the middle makes the SR to always return a zero flag result,
+			hence it never branches like it should. CPU bug?
+			*/
 			if (!m_first_dsp_reset || !m_has_dsp_hack)
 			{
 				m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -1022,7 +1022,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x6a01, 0x6a02) AM_WRITE(dsp_unk2_w)
-	AM_RANGE(0x6a11, 0x6a12) AM_NOP		// same as 0x6a01..02 for the second renderer chip?
+	AM_RANGE(0x6a11, 0x6a12) AM_NOP     // same as 0x6a01..02 for the second renderer chip?
 	AM_RANGE(0x6b20, 0x6b20) AM_WRITE(dsp_polygon_fifo_w)
 	AM_RANGE(0x6b22, 0x6b22) AM_WRITE(dsp_texture_w)
 	AM_RANGE(0x6b23, 0x6b23) AM_READWRITE(dsp_texaddr_r, dsp_texaddr_w)
@@ -1111,11 +1111,11 @@ static INPUT_PORTS_START( dendego )
 	PORT_MODIFY("UNUSED")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn Pedal")
 
-	PORT_MODIFY("BUTTONS")	// Throttle Lever at left, move down to speed up, 6 positions
+	PORT_MODIFY("BUTTONS")  // Throttle Lever at left, move down to speed up, 6 positions
 	PORT_BIT( 0x77, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(6) PORT_REMAP_TABLE(dendego_mascon_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Throttle Lever")
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ANALOG1")	// Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
+	PORT_START("ANALOG1")   // Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xef) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
 INPUT_PORTS_END
 
@@ -1125,13 +1125,13 @@ static INPUT_PORTS_START( landgear )
 	PORT_MODIFY("UNUSED")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("View Switch")
 
-	PORT_START("ANALOG1")		// Lever X
+	PORT_START("ANALOG1")       // Lever X
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
-	PORT_START("ANALOG2")		// Lever Y
+	PORT_START("ANALOG2")       // Lever Y
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START("ANALOG3")		// Throttle
+	PORT_START("ANALOG3")       // Throttle
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -1148,13 +1148,13 @@ static INPUT_PORTS_START( sidebs )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
 
-	PORT_START("ANALOG1")		// Steering
+	PORT_START("ANALOG1")       // Steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 
-	PORT_START("ANALOG2")		// Acceleration
+	PORT_START("ANALOG2")       // Acceleration
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Gas Pedal")
 
-	PORT_START("ANALOG3")		// Brake
+	PORT_START("ANALOG3")       // Brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
@@ -1172,13 +1172,13 @@ static INPUT_PORTS_START( dangcurv )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
 
-	PORT_START("ANALOG1")		// Steering
+	PORT_START("ANALOG1")       // Steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_REVERSE PORT_NAME("Steering Wheel")
 
-	PORT_START("ANALOG2")		// Acceleration
+	PORT_START("ANALOG2")       // Acceleration
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Gas Pedal")
 
-	PORT_START("ANALOG3")		// Brake
+	PORT_START("ANALOG3")       // Brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
@@ -1230,9 +1230,9 @@ static const tc0640fio_interface taitojc_io_intf =
 
 static const hc11_config taitojc_hc11_config =
 {
-	1,		// has extended I/O
-	1280,	// internal RAM size
-	0x00	// INIT defaults to 0x00
+	1,      // has extended I/O
+	1280,   // internal RAM size
+	0x00    // INIT defaults to 0x00
 };
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
@@ -1348,17 +1348,17 @@ DRIVER_INIT_MEMBER(taitojc_state,dangcurv)
 /**************************************************************************/
 
 ROM_START( sidebs )
-	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
+	ROM_REGION(0x200000, "maincpu", 0)      /* 68040 code */
 	ROM_LOAD32_BYTE( "e23-19.ic36", 0x000000, 0x80000, CRC(7b75481b) SHA1(47332e045f92b31e4f35c38e6880a7287b9a5c2c) )
 	ROM_LOAD32_BYTE( "e23-20.ic37", 0x000001, 0x80000, CRC(cbd857dd) SHA1(ae33ad8b0c3559a3a9096351e9aa07782d3cb841) )
 	ROM_LOAD32_BYTE( "e23-21.ic38", 0x000002, 0x80000, CRC(357f2e10) SHA1(226922f2649d9ac78d253200f5bbff4fb3ac74c8) )
 	ROM_LOAD32_BYTE( "e23-22.ic39", 0x000003, 0x80000, CRC(c793ba43) SHA1(0ddbf625320968b4e18309d8e732ce4a2b9f4bce) )
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e23-23.ic30", 0x100001, 0x40000, CRC(cffbffe5) SHA1(c01ac44390dacab4b49bb066a46d81a184b07a1e) )
 	ROM_LOAD16_BYTE( "e23-24.ic31", 0x100000, 0x40000, CRC(64bae246) SHA1(f929f664881487615b1259db43a0721135830274) )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
@@ -1372,7 +1372,7 @@ ROM_START( sidebs )
 	ROM_LOAD32_WORD( "e23-07.ic12",  0x1400002, 0x200000, CRC(90f2a87c) SHA1(770bb89fa42cb2a1d5a58525b8d72ed7df3f93ed) )
 	ROM_LOAD32_WORD( "e23-14.ic25",  0x1400000, 0x200000, CRC(1bc5a914) SHA1(92f82a4e2fbac73dbb3293726fc09022bd11a8fe) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e23-01.ic5",   0x0000000, 0x200000, CRC(2cbe4bbd) SHA1(ed6fe4344c86d50914b5ddbc720dd15544f4d07f) )
 	ROM_LOAD( "e23-02.ic6",   0x0200000, 0x200000, CRC(7ebada03) SHA1(d75c992aa33dd7f71de6a6d09aac471012b0daa3) )
 	ROM_LOAD( "e23-03.ic7",   0x0400000, 0x200000, CRC(5bf1f30b) SHA1(6e0c07b9f92962eec55ee444732a10ac78f8b050) )
@@ -1390,20 +1390,20 @@ ROM_START( sidebs )
 ROM_END
 
 ROM_START( sidebs2 )
-	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
+	ROM_REGION(0x200000, "maincpu", 0)      /* 68040 code */
 	ROM_LOAD32_BYTE( "sbs2_p0.ic36", 0x000000, 0x80000, CRC(2dd78d09) SHA1(f0a0105c3f2827c8b55d1bc58ebeea0f71150fed) )
 	ROM_LOAD32_BYTE( "sbs2_p1.ic37", 0x000001, 0x80000, CRC(befeda1d) SHA1(3171c87b0872f3206653900e3dbd210ea9beba61) )
 	ROM_LOAD32_BYTE( "sbs2_p2.ic38", 0x000002, 0x80000, CRC(ade07d7e) SHA1(a5200ea3ddbfef37d302e7cb27015b6f6aa8a7c1) )
 	ROM_LOAD32_BYTE( "sbs2_p3.ic39", 0x000003, 0x80000, CRC(94e943d6) SHA1(2bc7332526b969e5084b9d73063f1c0d18ec5181) )
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e38-19.ic30",  0x100001, 0x40000, CRC(3f50cb7b) SHA1(76af65c9b74ede843a3182f79cecda8c3e3febe6) )
 	ROM_LOAD16_BYTE( "e38-20.ic31",  0x100000, 0x40000, CRC(d01340e7) SHA1(76ee48d644dc1ec415d47e0df4864c64ac928b9d) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1416,7 +1416,7 @@ ROM_START( sidebs2 )
 	ROM_LOAD32_WORD( "e38-08.ic12", 0x1400002, 0x200000, CRC(9c513b32) SHA1(fe26e39d3d65073d23d525bc17771f0c244a38c2) )
 	ROM_LOAD32_WORD( "e38-16.ic25", 0x1400000, 0x200000, CRC(fceafae2) SHA1(540ecd5d1aa64c0428a08ea1e4e634e00f7e6bd6) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e38-01.ic5",  0x0000000, 0x200000, CRC(a3c2e2c7) SHA1(538208534f996782167e4cf0d157ad93ce2937bd) )
 	ROM_LOAD( "e38-02.ic6",  0x0200000, 0x200000, CRC(ecdfb75a) SHA1(85e7afa321846816fa3bd9074ad9dec95abe23fe) )
 	ROM_LOAD( "e38-03.ic7",  0x0400000, 0x200000, CRC(28e9cb59) SHA1(a2651fd81a1263573f868864ee049f8fc4177ffa) )
@@ -1439,37 +1439,37 @@ ROM_START( sidebs2 )
 	ROM_LOAD16_BYTE( "e38-21.ic35", 0xc00000, 0x200000, CRC(25373c5f) SHA1(ab9f917dbde7c808be2cd836ce2d3fc558e290f1) )
 
 	/* PALS
-    e23-28.ic18    NOT A ROM
-    e23-27.ic13    NOT A ROM
-    e23-26.ic4     NOT A ROM
-    e23-25-1.ic3   NOT A ROM
-    e23-30.ic40    NOT A ROM
-    e23-29.ic39    NOT A ROM
-    e23-31.ic46    NOT A ROM
-    e23-32-1.ic51  NOT A ROM
-    e23-34.ic72    NOT A ROM
-    e23-33.ic53    NOT A ROM
-    e23-35.ic110   NOT A ROM
-    e23-38.ic73    NOT A ROM
-    e23-37.ic69    NOT A ROM
-    */
+	e23-28.ic18    NOT A ROM
+	e23-27.ic13    NOT A ROM
+	e23-26.ic4     NOT A ROM
+	e23-25-1.ic3   NOT A ROM
+	e23-30.ic40    NOT A ROM
+	e23-29.ic39    NOT A ROM
+	e23-31.ic46    NOT A ROM
+	e23-32-1.ic51  NOT A ROM
+	e23-34.ic72    NOT A ROM
+	e23-33.ic53    NOT A ROM
+	e23-35.ic110   NOT A ROM
+	e23-38.ic73    NOT A ROM
+	e23-37.ic69    NOT A ROM
+	*/
 ROM_END
 
 ROM_START( sidebs2j )
-	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
+	ROM_REGION(0x200000, "maincpu", 0)      /* 68040 code */
 	ROM_LOAD32_BYTE( "e38-23.ic36", 0x000000, 0x80000, CRC(b3d8e2d9) SHA1(6de6a51c3d9ace532fa03517bab93101b5a3eaae) )
 	ROM_LOAD32_BYTE( "e38-24.ic37", 0x000001, 0x80000, CRC(2a47d80d) SHA1(41b889e4a1397c7f0d4f6ef136ed8abfd7e1ed86) )
 	ROM_LOAD32_BYTE( "e38-25.ic38", 0x000002, 0x80000, CRC(f1a8a4df) SHA1(e4cf75969fb0503df2290522194b097f5cb983a3) )
 	ROM_LOAD32_BYTE( "e38-26.ic39", 0x000003, 0x80000, CRC(b550fbf2) SHA1(a0a461af7e71c6ad6468cfdee2bc7161ae31bbfb) )
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e38-19.ic30", 0x100001, 0x040000, CRC(3f50cb7b) SHA1(76af65c9b74ede843a3182f79cecda8c3e3febe6) )
 	ROM_LOAD16_BYTE( "e38-20.ic31", 0x100000, 0x040000, CRC(d01340e7) SHA1(76ee48d644dc1ec415d47e0df4864c64ac928b9d) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1482,7 +1482,7 @@ ROM_START( sidebs2j )
 	ROM_LOAD32_WORD( "e38-08.ic12", 0x1400002, 0x200000, CRC(9c513b32) SHA1(fe26e39d3d65073d23d525bc17771f0c244a38c2) )
 	ROM_LOAD32_WORD( "e38-16.ic25", 0x1400000, 0x200000, CRC(fceafae2) SHA1(540ecd5d1aa64c0428a08ea1e4e634e00f7e6bd6) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e38-01.ic5",  0x0000000, 0x200000, CRC(a3c2e2c7) SHA1(538208534f996782167e4cf0d157ad93ce2937bd) )
 	ROM_LOAD( "e38-02.ic6",  0x0200000, 0x200000, CRC(ecdfb75a) SHA1(85e7afa321846816fa3bd9074ad9dec95abe23fe) )
 	ROM_LOAD( "e38-03.ic7",  0x0400000, 0x200000, CRC(28e9cb59) SHA1(a2651fd81a1263573f868864ee049f8fc4177ffa) )
@@ -1505,37 +1505,37 @@ ROM_START( sidebs2j )
 	ROM_LOAD16_BYTE( "e38-21.ic35", 0xc00000, 0x200000, CRC(25373c5f) SHA1(ab9f917dbde7c808be2cd836ce2d3fc558e290f1) )
 
 	/* PALS
-    e23-28.ic18    NOT A ROM
-    e23-27.ic13    NOT A ROM
-    e23-26.ic4     NOT A ROM
-    e23-25-1.ic3   NOT A ROM
-    e23-30.ic40    NOT A ROM
-    e23-29.ic39    NOT A ROM
-    e23-31.ic46    NOT A ROM
-    e23-32-1.ic51  NOT A ROM
-    e23-34.ic72    NOT A ROM
-    e23-33.ic53    NOT A ROM
-    e23-35.ic110   NOT A ROM
-    e23-38.ic73    NOT A ROM
-    e23-37.ic69    NOT A ROM
-    */
+	e23-28.ic18    NOT A ROM
+	e23-27.ic13    NOT A ROM
+	e23-26.ic4     NOT A ROM
+	e23-25-1.ic3   NOT A ROM
+	e23-30.ic40    NOT A ROM
+	e23-29.ic39    NOT A ROM
+	e23-31.ic46    NOT A ROM
+	e23-32-1.ic51  NOT A ROM
+	e23-34.ic72    NOT A ROM
+	e23-33.ic53    NOT A ROM
+	e23-35.ic110   NOT A ROM
+	e23-38.ic73    NOT A ROM
+	e23-37.ic69    NOT A ROM
+	*/
 ROM_END
 
 ROM_START( dendego )
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e35-21.ic36", 0x000000, 0x80000, CRC(bc70ca97) SHA1(724a24da9d6f163c26e7528ee2c15bd06f2c4382) )
 	ROM_LOAD32_BYTE( "e35-22.ic37", 0x000001, 0x80000, CRC(83b17de8) SHA1(538ddc16727e08e9a2a8ff6b4f030dc044993aa0) )
 	ROM_LOAD32_BYTE( "e35-23.ic38", 0x000002, 0x80000, CRC(1da4acd6) SHA1(2ce11c5f37287526bb1d39185f793d79fc73d5b5) )
 	ROM_LOAD32_BYTE( "e35-24.ic39", 0x000003, 0x80000, CRC(0318afb0) SHA1(9c86330c85536fb1a093ed40610b1c3ddb7813c3) )
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e35-25.ic30", 0x100001, 0x40000, CRC(8104de13) SHA1(e518fbaf91704cf5cb8ffbb4833e3adba8c18658) )
 	ROM_LOAD16_BYTE( "e35-26.ic31", 0x100000, 0x40000, CRC(61821cc9) SHA1(87cd5bd3bb22c9f4ca4b6d96f75434d48418321b) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )	/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )    /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1548,7 +1548,7 @@ ROM_START( dendego )
 	ROM_LOAD32_WORD( "e35-08.ic12",  0x1400002, 0x200000, CRC(99425ff6) SHA1(3bd6fe7204dece55459392170b42d4c6a9d3ef5b) )
 	ROM_LOAD32_WORD( "e35-16.ic25",  0x1400000, 0x200000, CRC(161481b6) SHA1(cc3c2939ac8911c197e9930580d316066f345772) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e35-01.ic5",   0x0000000, 0x200000, CRC(bd1975cb) SHA1(a08c6f4a84f9d4c2a5aa67cc2045aedd4580b8dc) )
 	ROM_LOAD( "e35-02.ic6",   0x0200000, 0x200000, CRC(e5caa459) SHA1(c38d795b96fff193223cd3df9f51ebdc2971b719) )
 	ROM_LOAD( "e35-03.ic7",   0x0400000, 0x200000, CRC(86ea5bcf) SHA1(1cee7f677b786b2fa9f50e723decd08cd69fbdef) )
@@ -1558,7 +1558,7 @@ ROM_START( dendego )
 	ROM_LOAD( "e35-11.ic20",  0x0c00000, 0x200000, CRC(dc8f5e88) SHA1(e311252db8a7232a5325a3eff5c1890d20bd3f8f) )
 	ROM_LOAD( "e35-12.ic21",  0x0e00000, 0x200000, CRC(039b604c) SHA1(7e394e7cddc6bf42f3834d5331203e8496597a90) )
 
-	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1569,20 +1569,20 @@ ROM_START( dendego )
 ROM_END
 
 ROM_START( dendegox )
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e35-30.ic36", 0x000000, 0x80000, CRC(57ee0975) SHA1(c7741a7e0e9c1fdebc6b942587d7ac5a6f26f66d) ) //ex
 	ROM_LOAD32_BYTE( "e35-31.ic37", 0x000001, 0x80000, CRC(bd5f2651) SHA1(73b760df351170ace019e4b61c82d8c6296a3632) ) //ex
 	ROM_LOAD32_BYTE( "e35-32.ic38", 0x000002, 0x80000, CRC(66be29d5) SHA1(e73937f5bda709a606d5cdf7316b26051317c22f) ) //ex
 	ROM_LOAD32_BYTE( "e35-33.ic39", 0x000003, 0x80000, CRC(76a6bde2) SHA1(ca456ec3f0410777362e3eb977ae156866271bd5) ) //ex
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e35-25.ic30", 0x100001, 0x40000, CRC(8104de13) SHA1(e518fbaf91704cf5cb8ffbb4833e3adba8c18658) )
 	ROM_LOAD16_BYTE( "e35-26.ic31", 0x100000, 0x40000, CRC(61821cc9) SHA1(87cd5bd3bb22c9f4ca4b6d96f75434d48418321b) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1595,7 +1595,7 @@ ROM_START( dendegox )
 	ROM_LOAD32_WORD( "e35-08.ic12",  0x1400002, 0x200000, CRC(99425ff6) SHA1(3bd6fe7204dece55459392170b42d4c6a9d3ef5b) )
 	ROM_LOAD32_WORD( "e35-16.ic25",  0x1400000, 0x200000, CRC(161481b6) SHA1(cc3c2939ac8911c197e9930580d316066f345772) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e35-01.ic5",   0x0000000, 0x200000, CRC(bd1975cb) SHA1(a08c6f4a84f9d4c2a5aa67cc2045aedd4580b8dc) )
 	ROM_LOAD( "e35-02.ic6",   0x0200000, 0x200000, CRC(e5caa459) SHA1(c38d795b96fff193223cd3df9f51ebdc2971b719) )
 	ROM_LOAD( "e35-03.ic7",   0x0400000, 0x200000, CRC(86ea5bcf) SHA1(1cee7f677b786b2fa9f50e723decd08cd69fbdef) )
@@ -1605,7 +1605,7 @@ ROM_START( dendegox )
 	ROM_LOAD( "e35-11.ic20",  0x0c00000, 0x200000, CRC(dc8f5e88) SHA1(e311252db8a7232a5325a3eff5c1890d20bd3f8f) )
 	ROM_LOAD( "e35-12.ic21",  0x0e00000, 0x200000, CRC(039b604c) SHA1(7e394e7cddc6bf42f3834d5331203e8496597a90) )
 
-	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1616,20 +1616,20 @@ ROM_START( dendegox )
 ROM_END
 
 ROM_START( dendego2 )
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e52-25-1.ic36", 0x000000, 0x80000, CRC(fadf5b4c) SHA1(48f3e1425bb9552d472a2720e1c9a752db2b43ed) )
 	ROM_LOAD32_BYTE( "e52-26-1.ic37", 0x000001, 0x80000, CRC(7cf5230d) SHA1(b3416886d7cfc88520f6bf378529086bf0095db5) )
 	ROM_LOAD32_BYTE( "e52-27-1.ic38", 0x000002, 0x80000, CRC(25f0d81d) SHA1(c33c3e6b1ad49b63b31a2f1227d43141faef4eab) )
 	ROM_LOAD32_BYTE( "e52-28-1.ic39", 0x000003, 0x80000, CRC(e76ff6a1) SHA1(674c00f19df034de8134d48a8c2d2e42f7eb1be7) )
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e52-29.ic30",   0x100001, 0x40000, CRC(6010162a) SHA1(f14920b26887f5387b3e261b63573d850195982a) )
 	ROM_LOAD16_BYTE( "e52-30.ic31",   0x100000, 0x40000, CRC(2881af4a) SHA1(5918f6508b3cd3bef3751e3bda2a48152569c1cd) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1646,7 +1646,7 @@ ROM_START( dendego2 )
 	ROM_LOAD32_WORD( "e52-08.ic12",  0x1400002, 0x200000, CRC(d52e6b9c) SHA1(382a5fd4533ab641a09321208464d83f72e161e3) )
 	ROM_LOAD32_WORD( "e52-16.ic25",  0x1400000, 0x200000, CRC(db6dd6e2) SHA1(d345dbd745514d4777d52c4360787ea8c462ffb1) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e52-01.ic5",   0x0000000, 0x200000, CRC(8db39c3c) SHA1(74b3305ebdf679ae274c73b7b32d2adea602bedc) )
 	ROM_LOAD( "e52-02.ic6",   0x0200000, 0x200000, CRC(b8d6f066) SHA1(99553ad66643ebf7fc71a9aee526d8f206b41dcc) )
 	ROM_LOAD( "e52-03.ic7",   0x0400000, 0x200000, CRC(a37d164b) SHA1(767a7d2de8b91a00c5fe74710937457e8568a422) )
@@ -1656,7 +1656,7 @@ ROM_START( dendego2 )
 	ROM_LOAD( "e52-11.ic20",  0x0c00000, 0x200000, CRC(1bc22680) SHA1(1f71db88d6df3b4bdf090b77bc83a67906bb31da) )
 	ROM_LOAD( "e52-12.ic21",  0x0e00000, 0x200000, CRC(a8bb91c5) SHA1(959a9fedb7839e1e4e7658d920bd5da4fd8cae48) )
 
-	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1667,20 +1667,20 @@ ROM_START( dendego2 )
 ROM_END
 
 ROM_START( dendego23k )
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e52-35.ic36", 0x000000, 0x80000, CRC(d5b33eb8) SHA1(e05ad73986741827b7bbeac72af0a8324384bf6b) ) //2ex
 	ROM_LOAD32_BYTE( "e52-36.ic37", 0x000001, 0x80000, CRC(f3f3fabd) SHA1(4f88080091af2208d671c491284d992b5036908c) ) //2ex
 	ROM_LOAD32_BYTE( "e52-37.ic38", 0x000002, 0x80000, CRC(65b8ef31) SHA1(b61b391b160e81715ff355aeef65026d7e4dd9af) ) //2ex
 	ROM_LOAD32_BYTE( "e52-38.ic39", 0x000003, 0x80000, CRC(cf61f321) SHA1(c8493d2499afba673174b26044aca537e384916c) ) //2ex
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e52-29.ic30", 0x100001, 0x40000, CRC(6010162a) SHA1(f14920b26887f5387b3e261b63573d850195982a) )
 	ROM_LOAD16_BYTE( "e52-30.ic31", 0x100000, 0x40000, CRC(2881af4a) SHA1(5918f6508b3cd3bef3751e3bda2a48152569c1cd) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1697,7 +1697,7 @@ ROM_START( dendego23k )
 	ROM_LOAD32_WORD( "e52-08.ic12",  0x1400002, 0x200000, CRC(d52e6b9c) SHA1(382a5fd4533ab641a09321208464d83f72e161e3) )
 	ROM_LOAD32_WORD( "e52-16.ic25",  0x1400000, 0x200000, CRC(db6dd6e2) SHA1(d345dbd745514d4777d52c4360787ea8c462ffb1) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e52-01.ic5",   0x0000000, 0x200000, CRC(8db39c3c) SHA1(74b3305ebdf679ae274c73b7b32d2adea602bedc) )
 	ROM_LOAD( "e52-02.ic6",   0x0200000, 0x200000, CRC(b8d6f066) SHA1(99553ad66643ebf7fc71a9aee526d8f206b41dcc) )
 	ROM_LOAD( "e52-03.ic7",   0x0400000, 0x200000, CRC(a37d164b) SHA1(767a7d2de8b91a00c5fe74710937457e8568a422) )
@@ -1707,7 +1707,7 @@ ROM_START( dendego23k )
 	ROM_LOAD( "e52-11.ic20",  0x0c00000, 0x200000, CRC(1bc22680) SHA1(1f71db88d6df3b4bdf090b77bc83a67906bb31da) )
 	ROM_LOAD( "e52-12.ic21",  0x0e00000, 0x200000, CRC(a8bb91c5) SHA1(959a9fedb7839e1e4e7658d920bd5da4fd8cae48) )
 
-	ROM_REGION( 0x40000, "oki", 0 )		/* train board, OKI6295 sound samples */
+	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
 	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
@@ -1724,20 +1724,20 @@ E17-28 through E17-31 (E17-32 is a PAL)
 */
 
 ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e17-37.ic36", 0x000000, 0x80000, CRC(e6dda113) SHA1(786cbfae420b6ee820a93731e59da3442245b6b8) )
 	ROM_LOAD32_BYTE( "e17-38.ic37", 0x000001, 0x80000, CRC(86fa29bd) SHA1(f711528143c042cdc4a26d9e6965a882a73f397c) )
 	ROM_LOAD32_BYTE( "e17-39.ic38", 0x000002, 0x80000, CRC(ccbbcc7b) SHA1(52d91fcaa1683d2679ed4f14ebc11dc487527898) )
 	ROM_LOAD32_BYTE( "e17-40.ic39", 0x000003, 0x80000, CRC(ce9231d2) SHA1(d2c3955d910dbd0cac95862047c58791af626722) ) /* 0x7ffff == 03 - One byte difference from E17-36.ic39 */
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e17-21.ic30", 0x100001, 0x40000, CRC(8b54f46c) SHA1(c6d16197ab7768945becf9b49b6d286113b4d1cc) )
 	ROM_LOAD16_BYTE( "e17-22.ic31", 0x100000, 0x40000, CRC(b96f6cd7) SHA1(0bf086e5dc6d524cd00e33df3e3d2a8b9231eb72) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1750,7 +1750,7 @@ ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )      /* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1762,7 +1762,7 @@ ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
 	ROM_LOAD16_BYTE( "e17-16.ic35",  0xc00000, 0x200000, CRC(6cf9f277) SHA1(03ca51fadc6b0b6502804346f18eeb55ab87b0e7) )
 
-	ROM_REGION( 0x1000, "pals", 0 )	/* PALCE 16V8, saved in Jedec format (unused now) */
+	ROM_REGION( 0x1000, "pals", 0 ) /* PALCE 16V8, saved in Jedec format (unused now) */
 	ROM_LOAD( "e07-02.ic4",    0x0000, 0x0bac, CRC(b10110e0) SHA1(574dfa70cbdc910973f4b47a9534f22839baf76d) )
 	ROM_LOAD( "e07-03.ic50",   0x0000, 0x0bac, CRC(3fe03710) SHA1(bbccddea0cccb50ea361721e51a0489f6686312c) )
 	ROM_LOAD( "e07-04.ic115",  0x0000, 0x0bac, CRC(6c83e648) SHA1(7ed4001d8f27933b31c09d98421dac5bdc265ff4) )
@@ -1778,20 +1778,20 @@ ROM_START( landgear ) /* Landing Gear Ver 4.2 O */
 ROM_END
 
 ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e17-33.ic36", 0x000000, 0x80000, CRC(e6dda113) SHA1(786cbfae420b6ee820a93731e59da3442245b6b8) ) /* matches E17-37.ic36, verified correct */
 	ROM_LOAD32_BYTE( "e17-34.ic37", 0x000001, 0x80000, CRC(86fa29bd) SHA1(f711528143c042cdc4a26d9e6965a882a73f397c) ) /* matches E17-38.ic37, verified correct */
 	ROM_LOAD32_BYTE( "e17-35.ic38", 0x000002, 0x80000, CRC(ccbbcc7b) SHA1(52d91fcaa1683d2679ed4f14ebc11dc487527898) ) /* matches E17-39.ic38, verified correct */
 	ROM_LOAD32_BYTE( "e17-36.ic39", 0x000003, 0x80000, CRC(209c50fe) SHA1(42e0eaa182730e260ee4361d936b133ed85f8221) ) /* 0x7ffff == 01 - One byte difference from E17-40.ic39 */
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e17-21.ic30", 0x100001, 0x40000, CRC(8b54f46c) SHA1(c6d16197ab7768945becf9b49b6d286113b4d1cc) )
 	ROM_LOAD16_BYTE( "e17-22.ic31", 0x100000, 0x40000, CRC(b96f6cd7) SHA1(0bf086e5dc6d524cd00e33df3e3d2a8b9231eb72) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1804,7 +1804,7 @@ ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )      /* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1816,7 +1816,7 @@ ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
 	ROM_LOAD16_BYTE( "e17-16.ic35",  0xc00000, 0x200000, CRC(6cf9f277) SHA1(03ca51fadc6b0b6502804346f18eeb55ab87b0e7) )
 
-	ROM_REGION( 0x1000, "pals", 0 )	/* PALCE 16V8, saved in Jedec format (unused now) */
+	ROM_REGION( 0x1000, "pals", 0 ) /* PALCE 16V8, saved in Jedec format (unused now) */
 	ROM_LOAD( "e07-02.ic4",    0x0000, 0x0bac, CRC(b10110e0) SHA1(574dfa70cbdc910973f4b47a9534f22839baf76d) )
 	ROM_LOAD( "e07-03.ic50",   0x0000, 0x0bac, CRC(3fe03710) SHA1(bbccddea0cccb50ea361721e51a0489f6686312c) )
 	ROM_LOAD( "e07-04.ic115",  0x0000, 0x0bac, CRC(6c83e648) SHA1(7ed4001d8f27933b31c09d98421dac5bdc265ff4) )
@@ -1832,20 +1832,20 @@ ROM_START( landgearj ) /* Landing Gear Ver 4.2 J */
 ROM_END
 
 ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set without the "*" on the labels? */
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e17-24+.ic36", 0x000000, 0x80000, CRC(6907e451) SHA1(330eecb5898942514b40e67cf3c9dcb82d4cafab) ) /* Actually labeled E17-24* */
 	ROM_LOAD32_BYTE( "e17-25+.ic37", 0x000001, 0x80000, CRC(ecbc8875) SHA1(5f5e4850cbdbdfff4a7f0b781edb2e983c166962) ) /* Actually labeled E17-25* */
 	ROM_LOAD32_BYTE( "e17-26+.ic38", 0x000002, 0x80000, CRC(3032bbe7) SHA1(201c61f236c81928f50815d8ad12e312a3c7427b) ) /* Actually labeled E17-26* */
 	ROM_LOAD32_BYTE( "e17-27+.ic39", 0x000003, 0x80000, CRC(e936224c) SHA1(8699cbb756844d12b7585e66198b7faed2af8e24) ) /* Actually labeled E17-27* */
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e17-21.ic30",  0x100001, 0x40000, CRC(8b54f46c) SHA1(c6d16197ab7768945becf9b49b6d286113b4d1cc) )
 	ROM_LOAD16_BYTE( "e17-22.ic31",  0x100000, 0x40000, CRC(b96f6cd7) SHA1(0bf086e5dc6d524cd00e33df3e3d2a8b9231eb72) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1858,7 +1858,7 @@ ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set with
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )      /* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1870,7 +1870,7 @@ ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set with
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
 	ROM_LOAD16_BYTE( "e17-16.ic35",  0xc00000, 0x200000, CRC(6cf9f277) SHA1(03ca51fadc6b0b6502804346f18eeb55ab87b0e7) )
 
-	ROM_REGION( 0x1000, "pals", 0 )	/* PALCE 16V8, saved in Jedec format (unused now) */
+	ROM_REGION( 0x1000, "pals", 0 ) /* PALCE 16V8, saved in Jedec format (unused now) */
 	ROM_LOAD( "e07-02.ic4",    0x0000, 0x0bac, CRC(b10110e0) SHA1(574dfa70cbdc910973f4b47a9534f22839baf76d) )
 	ROM_LOAD( "e07-03.ic50",   0x0000, 0x0bac, CRC(3fe03710) SHA1(bbccddea0cccb50ea361721e51a0489f6686312c) )
 	ROM_LOAD( "e07-04.ic115",  0x0000, 0x0bac, CRC(6c83e648) SHA1(7ed4001d8f27933b31c09d98421dac5bdc265ff4) )
@@ -1886,20 +1886,20 @@ ROM_START( landgeara ) /* Landing Gear Ver 3.1 O, is there an alternate set with
 ROM_END
 
 ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set without the "*" on the labels? */
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e17-17+.ic36", 0x000000, 0x80000, CRC(653e9c43) SHA1(b43c4baf1b3114977faa310c0815ea0940d548b3) ) /* Actually labeled E17-17* */
 	ROM_LOAD32_BYTE( "e17-18+.ic37", 0x000001, 0x80000, CRC(4d90b321) SHA1(a919f15dcc105eaa12d7c9816aff4f0daffbb7a1) ) /* Actually labeled E17-18* */
 	ROM_LOAD32_BYTE( "e17-19+.ic38", 0x000002, 0x80000, CRC(1c487204) SHA1(f6c8ddd80c57ed63b0785b240c4b00416a1a87f3) ) /* Actually labeled E17-19* */
 	ROM_LOAD32_BYTE( "e17-20+.ic39", 0x000003, 0x80000, CRC(1311234f) SHA1(5211cae0d6dc1710bc669bcf81a247b01f8aebff) ) /* Actually labeled E17-20* */
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e17-21.ic30",  0x100001, 0x40000, CRC(8b54f46c) SHA1(c6d16197ab7768945becf9b49b6d286113b4d1cc) )
 	ROM_LOAD16_BYTE( "e17-22.ic31",  0x100000, 0x40000, CRC(b96f6cd7) SHA1(0bf086e5dc6d524cd00e33df3e3d2a8b9231eb72) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1912,7 +1912,7 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 	ROM_LOAD32_WORD( "e17-06.ic12",  0x1400002, 0x200000, CRC(107ff481) SHA1(2a48cedec9641ff08776e5d8b1bf1f5b250d4179) )
 	ROM_LOAD32_WORD( "e17-12.ic25",  0x1400000, 0x200000, CRC(0727ddfa) SHA1(68bf83a3c46cd042a7ad27a530c8bed6360d8492) )
 
-	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", ROMREGION_ERASE00 )      /* only accessible to the TMS */
 	ROM_LOAD( "e17-01.ic5",   0x0000000, 0x200000, CRC(42aa56a6) SHA1(945c338515ceb946c01480919546869bb8c3d323) )
 	ROM_LOAD( "e17-02.ic8",   0x0600000, 0x200000, CRC(df7e2405) SHA1(684d6fc398791c48101e6cb63acbf0d691ed863c) )
 	ROM_LOAD( "e17-07.ic18",  0x0800000, 0x200000, CRC(0f180eb0) SHA1(5e1dd920f110a62a029bace6f4cb80fee0fdaf03) )
@@ -1924,7 +1924,7 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 	ROM_LOAD16_BYTE( "e17-15.ic34",  0x800000, 0x200000, CRC(41d7a7d0) SHA1(f5a8b79c1d47611e93d46aaf921107b52090bb5f) )
 	ROM_LOAD16_BYTE( "e17-16.ic35",  0xc00000, 0x200000, CRC(6cf9f277) SHA1(03ca51fadc6b0b6502804346f18eeb55ab87b0e7) )
 
-	ROM_REGION( 0x1000, "pals", 0 )	/* PALCE 16V8, saved in Jedec format (unused now) */
+	ROM_REGION( 0x1000, "pals", 0 ) /* PALCE 16V8, saved in Jedec format (unused now) */
 	ROM_LOAD( "e07-02.ic4",    0x0000, 0x0bac, CRC(b10110e0) SHA1(574dfa70cbdc910973f4b47a9534f22839baf76d) )
 	ROM_LOAD( "e07-03.ic50",   0x0000, 0x0bac, CRC(3fe03710) SHA1(bbccddea0cccb50ea361721e51a0489f6686312c) )
 	ROM_LOAD( "e07-04.ic115",  0x0000, 0x0bac, CRC(6c83e648) SHA1(7ed4001d8f27933b31c09d98421dac5bdc265ff4) )
@@ -1940,20 +1940,20 @@ ROM_START( landgearja ) /* Landing Gear Ver 3.0 J, is there an alternate set wit
 ROM_END
 
 ROM_START( dangcurv )
-	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68040 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e09-23.ic36", 0x000000, 0x80000, CRC(b4cdadd6) SHA1(84bd1d055ff15afb5438cd5151abf78b0000cebc) )
 	ROM_LOAD32_BYTE( "e09-24.ic37", 0x000001, 0x80000, CRC(fb2fc795) SHA1(2f58d043ab9fc0269a5b6827009777cd7ab832fc) )
 	ROM_LOAD32_BYTE( "e09-25.ic38", 0x000002, 0x80000, CRC(aa233404) SHA1(a2b14e54eb1b5f6d4ed9f289b30ecfa654f21c87) )
 	ROM_LOAD32_BYTE( "e09-26.ic39", 0x000003, 0x80000, CRC(78337271) SHA1(bd29de6a5b6db3baddecf82c3b6c8b366c64289e) )
 
-	ROM_REGION( 0x180000, "audiocpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e09-27.ic30", 0x100001, 0x40000, CRC(6d54839c) SHA1(a28c9b0727128b82bb0fa71dc951e3f03ee45e1b) )
 	ROM_LOAD16_BYTE( "e09-28.ic31", 0x100000, 0x40000, CRC(566d7d83) SHA1(92661ccb631f843bf704c50d54fae28f6b5b272b) )
 
 	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
 	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x010000, "sub", 0 )		/* MC68HC11M0 code */
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
 	ROM_LOAD( "e09-29.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
@@ -1966,7 +1966,7 @@ ROM_START( dangcurv )
 	ROM_LOAD32_WORD( "e09-08.ic12",  0x1400002, 0x200000, CRC(5c080485) SHA1(c950cd00df5b6d2d0a119ba318fa8b0a3f471b29) )
 	ROM_LOAD32_WORD( "e09-16.ic25",  0x1400000, 0x200000, CRC(35cb8346) SHA1(c2ecedd3c2a28213ef83e776f3007c974128189b) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )		/* only accessible to the TMS */
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
 	ROM_LOAD( "e09-01.ic5",   0x0000000, 0x200000, CRC(22a6a53d) SHA1(6efa89151cd5ec43ab9bfa9b92694eb0018dd227) )
 	ROM_LOAD( "e09-02.ic6",   0x0200000, 0x200000, CRC(405e2969) SHA1(376b9dd548d876af6798553a6da5deed4de00b76) )
 	ROM_LOAD( "e09-03.ic7",   0x0400000, 0x200000, CRC(15327754) SHA1(bf08ab80875b400700241a66715e229dae6752d1) )

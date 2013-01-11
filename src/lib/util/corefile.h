@@ -53,12 +53,12 @@
     ADDITIONAL OPEN FLAGS
 ***************************************************************************/
 
-#define OPEN_FLAG_NO_BOM		0x0100		/* don't output BOM */
+#define OPEN_FLAG_NO_BOM        0x0100      /* don't output BOM */
 
-#define FCOMPRESS_NONE			0			/* no compression */
-#define FCOMPRESS_MIN			1			/* minimal compression */
-#define FCOMPRESS_MEDIUM		6			/* standard compression */
-#define FCOMPRESS_MAX			9			/* maximum compression */
+#define FCOMPRESS_NONE          0           /* no compression */
+#define FCOMPRESS_MIN           1           /* minimal compression */
+#define FCOMPRESS_MEDIUM        6           /* standard compression */
+#define FCOMPRESS_MAX           9           /* maximum compression */
 
 
 
@@ -157,4 +157,4 @@ astring &core_filename_extract_base(astring &result, const char *name, bool stri
 int core_filename_ends_with(const char *filename, const char *extension);
 
 
-#endif	/* __COREFILE_H__ */
+#endif  /* __COREFILE_H__ */

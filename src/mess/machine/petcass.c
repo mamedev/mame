@@ -53,7 +53,7 @@ device_pet_datassette_port_interface::~device_pet_datassette_port_interface()
 //-------------------------------------------------
 
 pet_datassette_port_device::pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PET_DATASSETTE_PORT, "Datassette Port", tag, owner, clock),
+		device_t(mconfig, PET_DATASSETTE_PORT, "Datassette Port", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -86,7 +86,7 @@ void pet_datassette_port_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_read_cb, 0, sizeof(m_out_read_cb));
+		memset(&m_out_read_cb, 0, sizeof(m_out_read_cb));
 	}
 }
 

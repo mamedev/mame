@@ -75,7 +75,7 @@ void ay3600_device::device_config_complete()
 //-------------------------------------------------
 
 ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, AY3600, "AY-5-3600", tag, owner, clock)
+	: device_t(mconfig, AY3600, "AY-5-3600", tag, owner, clock)
 {
 }
 

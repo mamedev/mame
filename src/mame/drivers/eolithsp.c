@@ -21,8 +21,8 @@ static int eolith_scanline = 0;
 void eolith_speedup_read(address_space &space)
 {
 	/* for debug */
-  //if ((space.device().safe_pc()!=eolith_speedup_address) && (eolith_vblank!=1) )
-  //    printf("%s:eolith speedup_read data %02x\n",space.machine().describe_context(), eolith_vblank);
+	//if ((space.device().safe_pc()!=eolith_speedup_address) && (eolith_vblank!=1) )
+	//    printf("%s:eolith speedup_read data %02x\n",space.machine().describe_context(), eolith_vblank);
 
 	if (eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{

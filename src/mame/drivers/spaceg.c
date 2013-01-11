@@ -207,21 +207,21 @@ void spaceg_state::palette_init()
 		palette_set_color (machine(), i, MAKE_RGB(0x00,0x00,0x00));
 
 	// proms are currently undumped...
-	palette_set_color (machine(), 0, MAKE_RGB(0x00,0x00,0x00));	//ok czarny
+	palette_set_color (machine(), 0, MAKE_RGB(0x00,0x00,0x00)); //ok czarny
 	palette_set_color (machine(), 1, MAKE_RGB(0x7f,0x00,0x00));//???
-	palette_set_color (machine(), 2, MAKE_RGB(0xff,0xff,0xff));	//ok+ bialy
-	palette_set_color (machine(), 3, MAKE_RGB(0xff,0x00,0x00));	//ok j.czerw.
-	palette_set_color (machine(), 4, MAKE_RGB(0x3f,0x3f,0xff));	//ok j.niebieski
-	palette_set_color (machine(), 5, MAKE_RGB(0x3f,0xff,0x3f));	//ok j.zielony
-	palette_set_color (machine(), 6, MAKE_RGB(0xff,0xbf,0xbf));	//ok+ 'majtki'
-	palette_set_color (machine(), 7, MAKE_RGB(0xff,0xff,0x00));	//ok+ zolty
+	palette_set_color (machine(), 2, MAKE_RGB(0xff,0xff,0xff)); //ok+ bialy
+	palette_set_color (machine(), 3, MAKE_RGB(0xff,0x00,0x00)); //ok j.czerw.
+	palette_set_color (machine(), 4, MAKE_RGB(0x3f,0x3f,0xff)); //ok j.niebieski
+	palette_set_color (machine(), 5, MAKE_RGB(0x3f,0xff,0x3f)); //ok j.zielony
+	palette_set_color (machine(), 6, MAKE_RGB(0xff,0xbf,0xbf)); //ok+ 'majtki'
+	palette_set_color (machine(), 7, MAKE_RGB(0xff,0xff,0x00)); //ok+ zolty
 
-	palette_set_color (machine(), 8, MAKE_RGB(0xff,0x7f,0x00));	//ok+ pomaranczowy
-	palette_set_color (machine(), 9, MAKE_RGB(0x3f,0xbf,0xff));	//ok j.niebieski (ciemniejszy od 13)
-	palette_set_color (machine(), 10, MAKE_RGB(0x3f,0xbf,0x3f));	//ok+ c.zielony
-	palette_set_color (machine(), 11, MAKE_RGB(0x00,0xff,0x00));	//ok j.zielony
-	palette_set_color (machine(), 12, MAKE_RGB(0x7f,0x00,0x00));	//ok brazowy (c.czerw)
-	palette_set_color (machine(), 13, MAKE_RGB(0x7f,0xbf,0xff));	//ok j.niebieski (jasniejszy od 9)
+	palette_set_color (machine(), 8, MAKE_RGB(0xff,0x7f,0x00)); //ok+ pomaranczowy
+	palette_set_color (machine(), 9, MAKE_RGB(0x3f,0xbf,0xff)); //ok j.niebieski (ciemniejszy od 13)
+	palette_set_color (machine(), 10, MAKE_RGB(0x3f,0xbf,0x3f));    //ok+ c.zielony
+	palette_set_color (machine(), 11, MAKE_RGB(0x00,0xff,0x00));    //ok j.zielony
+	palette_set_color (machine(), 12, MAKE_RGB(0x7f,0x00,0x00));    //ok brazowy (c.czerw)
+	palette_set_color (machine(), 13, MAKE_RGB(0x7f,0xbf,0xff));    //ok j.niebieski (jasniejszy od 9)
 	palette_set_color (machine(), 14, MAKE_RGB(0x00,0xff,0xff));//???
 	palette_set_color (machine(), 15, MAKE_RGB(0x7f,0x7f,0x7f));//???
 }
@@ -339,11 +339,11 @@ static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8, spaceg_state )
 	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_SHARE("io9400") /* gfx ctrl */
 	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_SHARE("io9401") /* gfx ctrl */
 	/* 9402 -
-        bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
-        bit 2 - unknown -
-        bit 3 is probably a flip screen
-        bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
-    */
+	    bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
+	    bit 2 - unknown -
+	    bit 3 is probably a flip screen
+	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
+	*/
 	AM_RANGE(0x9402, 0x9407) AM_RAM     /* surely wrong */
 
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("9800")
@@ -426,9 +426,9 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( spaceg, spaceg_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,2500000)		 /* 2.5 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(spaceg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spaceg_state,  nmi_line_pulse)	/* 60 Hz NMIs (verified) */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spaceg_state,  nmi_line_pulse) /* 60 Hz NMIs (verified) */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

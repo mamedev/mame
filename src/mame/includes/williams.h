@@ -20,7 +20,7 @@ public:
 		m_williams2_tileram(*this, "williams2_tile")
 	{ }
 
-	required_shared_ptr<UINT8>	m_nvram;
+	required_shared_ptr<UINT8>  m_nvram;
 	UINT8 *m_mayday_protection;
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_blaster_palette_0;
@@ -184,11 +184,10 @@ extern const pia6821_interface joust2_pia_1_intf;
 
 /*----------- defined in video/williams.c -----------*/
 
-#define WILLIAMS_BLITTER_NONE		0		/* no blitter */
-#define WILLIAMS_BLITTER_SC01		1		/* SC-01 blitter */
-#define WILLIAMS_BLITTER_SC02		2		/* SC-02 "fixed" blitter */
+#define WILLIAMS_BLITTER_NONE       0       /* no blitter */
+#define WILLIAMS_BLITTER_SC01       1       /* SC-01 blitter */
+#define WILLIAMS_BLITTER_SC02       2       /* SC-02 "fixed" blitter */
 
-#define WILLIAMS_TILEMAP_MYSTICM	0		/* IC79 is a 74LS85 comparator */
-#define WILLIAMS_TILEMAP_TSHOOT		1		/* IC79 is a 74LS157 selector jumpered to be enabled */
-#define WILLIAMS_TILEMAP_JOUST2		2		/* IC79 is a 74LS157 selector jumpered to be disabled */
-
+#define WILLIAMS_TILEMAP_MYSTICM    0       /* IC79 is a 74LS85 comparator */
+#define WILLIAMS_TILEMAP_TSHOOT     1       /* IC79 is a 74LS157 selector jumpered to be enabled */
+#define WILLIAMS_TILEMAP_JOUST2     2       /* IC79 is a 74LS157 selector jumpered to be disabled */

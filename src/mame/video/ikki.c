@@ -76,7 +76,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int color = spriteram[offs + 2] & 0x3f;
 
 		int x = spriteram[offs + 3];
-		    y = spriteram[offs + 0];
+			y = spriteram[offs + 0];
 
 		if (state->m_flipscreen)
 			x = 240 - x;

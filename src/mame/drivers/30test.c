@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
 	AM_RANGE(0x007e, 0x007e) AM_READWRITE(hc11_okibank_r,hc11_okibank_w)
 	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
-	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there
+	AM_RANGE(0x0d80, 0x0dbf) AM_RAM // EEPROM read-back data goes there
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	/* 0x401e-0x401f: time */
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(namco_30test_led_w) // 7-seg leds
@@ -234,7 +234,7 @@ void namco_30test_state::machine_reset()
 
 static const hc11_config namco_30test_config =
 {
-	0,	   //has extended internal I/O
+	0,     //has extended internal I/O
 	768,   //internal RAM size
 	0x00   //registers are at 0-0x100
 };

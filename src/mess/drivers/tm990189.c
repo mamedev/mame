@@ -156,7 +156,7 @@ private:
 };
 
 
-#define displayena_duration attotime::from_usec(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
+#define displayena_duration attotime::from_usec(4500)   /* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
 MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
 {
@@ -216,7 +216,7 @@ TIMER_CALLBACK_MEMBER(tm990189_state::clear_load)
 void tm990189_state::hold_load()
 {
 	m_load_state = TRUE;
-	m_ic_state = 2;		// LOAD interrupt
+	m_ic_state = 2;     // LOAD interrupt
 	m_tms9980a->set_input_line(0, ASSERT_LINE);
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
 }
@@ -248,8 +248,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 {
 	UINT8 i;
 	char ledname[8];
-    // since the segment data is cleared after being used, the old_segment is there
-    // in case the segment data hasn't been refreshed yet.
+	// since the segment data is cleared after being used, the old_segment is there
+	// in case the segment data hasn't been refreshed yet.
 	for (i = 0; i < 10; i++)
 	{
 		m_old_segment_state[i] |= m_segment_state[i];
@@ -432,7 +432,7 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
 	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state ? +1.0 : -1.0);
 }
 
-class tm990_189_rs232_image_device :	public device_t,
+class tm990_189_rs232_image_device :    public device_t,
 									public device_image_interface
 {
 public:
@@ -457,15 +457,15 @@ public:
 	virtual void call_unload();
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 };
 
 const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
 
 tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -508,7 +508,7 @@ void tm990_189_rs232_image_device::call_unload()
 	tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
 	tms9902->rcv_dsr(CLEAR_LINE);
 
-	state->m_rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
+	state->m_rs232_input_timer->reset();    /* FIXME - timers should only be allocated once */
 }
 
 #define MCFG_TM990_189_RS232_ADD(_tag) \
@@ -525,7 +525,7 @@ void tm990_189_rs232_image_device::call_unload()
 WRITE8_MEMBER( tm990189_state::xmit_callback )
 {
 	UINT8 buf = data;
-	if (m_rs232_fp)	m_rs232_fp->fwrite(&buf, 1);
+	if (m_rs232_fp) m_rs232_fp->fwrite(&buf, 1);
 }
 
 /*
@@ -541,7 +541,7 @@ WRITE8_MEMBER( tm990189_state::external_operation )
 		else
 			m_LED_state &= ~0x40;
 		break;
-	case 3:	// RSET
+	case 3: // RSET
 		// Not used on the default board
 		break;
 	case 5: // CKON: set DECKCONTROL
@@ -569,18 +569,18 @@ READ8_MEMBER( tm990189_state::video_vdp_r )
 	int reply = 0;
 
 	/* When the tms9980 reads @>2000 or @>2001, it actually does a word access:
-    it reads @>2000 first, then @>2001.  According to schematics, both access
-    are decoded to the VDP: read accesses are therefore bogus, all the more so
-    since the two reads are too close (1us) for the VDP to be able to reload
-    the read buffer: the read address pointer is probably incremented by 2, but
-    only the first byte is valid.  There is a work around for this problem: all
-    you need is reloading the address pointer before each read.  However,
-    software always uses the second byte, which is very weird, particularly
-    for the status port.  Presumably, since the read buffer has not been
-    reloaded, the second byte read from the memory read port is equal to the
-    first; however, this explanation is not very convincing for the status
-    port.  Still, I do not have any better explanation, so I will stick with
-    it. */
+	it reads @>2000 first, then @>2001.  According to schematics, both access
+	are decoded to the VDP: read accesses are therefore bogus, all the more so
+	since the two reads are too close (1us) for the VDP to be able to reload
+	the read buffer: the read address pointer is probably incremented by 2, but
+	only the first byte is valid.  There is a work around for this problem: all
+	you need is reloading the address pointer before each read.  However,
+	software always uses the second byte, which is very weird, particularly
+	for the status port.  Presumably, since the read buffer has not been
+	reloaded, the second byte read from the memory read port is equal to the
+	first; however, this explanation is not very convincing for the status
+	port.  Still, I do not have any better explanation, so I will stick with
+	it. */
 
 	if (offset & 2)
 		reply = m_tms9918->register_read(space, 0);
@@ -636,7 +636,7 @@ WRITE8_MEMBER( tm990189_state::video_joy_w )
 /* user tms9901 setup */
 static const tms9901_interface usr9901reset_param =
 {
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,	/* only input pins whose state is always known */
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,    /* only input pins whose state is always known */
 
 	/* Read handler. Covers all input lines (see tms9901.h) */
 	DEVCB_NULL,
@@ -668,7 +668,7 @@ static const tms9901_interface usr9901reset_param =
 /* system tms9901 setup */
 static const tms9901_interface sys9901reset_param =
 {
-	0,	/* only input pins whose state is always known */
+	0,  /* only input pins whose state is always known */
 
 	/* Read handler. Covers all input lines (see tms9901.h) */
 	DEVCB_DRIVER_MEMBER(tm990189_state, sys9901_r),
@@ -727,29 +727,29 @@ static const tms9901_interface sys9901reset_param =
 // MZ: needs to be fixed once the RS232 support is complete
 static const tms9902_interface tms9902_params =
 {
-	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
-	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
-	DEVCB_DRIVER_MEMBER(tm990189_state, xmit_callback),			/* called when a character is transmitted */
-	DEVCB_NULL				/* called for setting interface parameters and line states */
+	DEVCB_NULL,             /*int_callback,*/   /* called when interrupt pin state changes */
+	DEVCB_NULL,             /*rcv_callback,*/   /* called when a character shall be received  */
+	DEVCB_DRIVER_MEMBER(tm990189_state, xmit_callback),         /* called when a character is transmitted */
+	DEVCB_NULL              /* called for setting interface parameters and line states */
 };
 
 static ADDRESS_MAP_START( tm990_189_memmap, AS_PROGRAM, 8, tm990189_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM									/* RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_ROM									/* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
-	AM_RANGE(0x1000, 0x2fff) AM_NOP									/* reserved for expansion (RAM and/or tms9918 video controller) */
-	AM_RANGE(0x3000, 0x3fff) AM_ROM									/* main ROM - unibug or university basic */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM                                 /* RAM */
+	AM_RANGE(0x0800, 0x0fff) AM_ROM                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
+	AM_RANGE(0x1000, 0x2fff) AM_NOP                                 /* reserved for expansion (RAM and/or tms9918 video controller) */
+	AM_RANGE(0x3000, 0x3fff) AM_ROM                                 /* main ROM - unibug or university basic */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tm990_189_v_memmap, AS_PROGRAM, 8, tm990189_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM									/* RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_ROM									/* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM                                 /* RAM */
+	AM_RANGE(0x0800, 0x0fff) AM_ROM                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 
-	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_WRITENOP		/* video board ROM 1 */
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_WRITE(video_joy_w)	/* video board ROM 2 and joystick write port*/
-	AM_RANGE(0x2000, 0x27ff) AM_READ(video_vdp_r) AM_WRITENOP	/* video board tms9918 read ports (bogus) */
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(video_joy_r, video_vdp_w)	/* video board joystick read port and tms9918 write ports */
+	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_WRITENOP     /* video board ROM 1 */
+	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_WRITE(video_joy_w)   /* video board ROM 2 and joystick write port*/
+	AM_RANGE(0x2000, 0x27ff) AM_READ(video_vdp_r) AM_WRITENOP   /* video board tms9918 read ports (bogus) */
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(video_joy_r, video_vdp_w) /* video board joystick read port and tms9918 write ports */
 
-	AM_RANGE(0x3000, 0x3fff) AM_ROM									/* main ROM - unibug or university basic */
+	AM_RANGE(0x3000, 0x3fff) AM_ROM                                 /* main ROM - unibug or university basic */
 ADDRESS_MAP_END
 
 /*
@@ -809,23 +809,23 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD("tms9901_0", tms9901_device, read)		/* user I/O tms9901 */
-	AM_RANGE(0x0040, 0x006f) AM_DEVREAD("tms9901_1", tms9901_device, read)		/* system I/O tms9901 */
-	AM_RANGE(0x0080, 0x00cf) AM_DEVREAD("tms9902", tms9902_device, cruread)		/* optional tms9902 */
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD("tms9901_0", tms9901_device, read)      /* user I/O tms9901 */
+	AM_RANGE(0x0040, 0x006f) AM_DEVREAD("tms9901_1", tms9901_device, read)      /* system I/O tms9901 */
+	AM_RANGE(0x0080, 0x00cf) AM_DEVREAD("tms9902", tms9902_device, cruread)     /* optional tms9902 */
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901_0", tms9901_device, write)	/* user I/O tms9901 */
-	AM_RANGE(0x0200, 0x03ff) AM_DEVWRITE("tms9901_1", tms9901_device, write)	/* system I/O tms9901 */
-	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)	/* optional tms9902 */
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901_0", tms9901_device, write)    /* user I/O tms9901 */
+	AM_RANGE(0x0200, 0x03ff) AM_DEVWRITE("tms9901_1", tms9901_device, write)    /* system I/O tms9901 */
+	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)   /* optional tms9902 */
 ADDRESS_MAP_END
 
 static TMS99xx_CONFIG( cpuconf )
 {
 	DEVCB_DRIVER_MEMBER(tm990189_state, external_operation),
 	DEVCB_DRIVER_MEMBER(tm990189_state, interrupt_level),
-	DEVCB_NULL,		// Instruction acquisition
-	DEVCB_NULL,		// Clock out
-	DEVCB_NULL,		// wait
-	DEVCB_NULL		// Hold acknowledge
+	DEVCB_NULL,     // Instruction acquisition
+	DEVCB_NULL,     // Clock out
+	DEVCB_NULL,     // wait
+	DEVCB_NULL      // Hold acknowledge
 };
 
 static MACHINE_CONFIG_START( tm990_189, tm990189_state )
@@ -874,14 +874,14 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)	/* one two-level buzzer */
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)   /* one two-level buzzer */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param, 2000000)
 	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param, 2000000)
-	MCFG_TMS9902_ADD("tms9902", tms9902_params,	2000000)
+	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
@@ -917,11 +917,11 @@ ROM_START(990189v)
 
 	/* boot ROM */
 	ROM_LOAD("990-469.u33", 0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9))
-	/*ROM_LOAD("unibasic.bin", 0x3000, 0x1000, CRC(de4d9744))*/	/* older, partial dump of university BASIC */
+	/*ROM_LOAD("unibasic.bin", 0x3000, 0x1000, CRC(de4d9744))*/ /* older, partial dump of university BASIC */
 ROM_END
 
-#define JOYSTICK_DELTA			10
-#define JOYSTICK_SENSITIVITY	100
+#define JOYSTICK_DELTA          10
+#define JOYSTICK_SENSITIVITY    100
 
 static INPUT_PORTS_START(tm990_189)
 
@@ -931,83 +931,83 @@ static INPUT_PORTS_START(tm990_189)
 	/* 45-key calculator-like alphanumeric keyboard... */
 	PORT_START("LINE0")    /* row 0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sp *") PORT_CODE(KEYCODE_SPACE)	PORT_CHAR(' ')	PORT_CHAR('*')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ret '") PORT_CODE(KEYCODE_ENTER)	PORT_CHAR(13)	PORT_CHAR('\'')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("$ =") PORT_CODE(KEYCODE_STOP)	PORT_CHAR('$')	PORT_CHAR('=')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)	PORT_CHAR(',')	PORT_CHAR('<')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sp *") PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')  PORT_CHAR('*')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ret '") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)   PORT_CHAR('\'')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("$ =") PORT_CODE(KEYCODE_STOP)    PORT_CHAR('$')  PORT_CHAR('=')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)   PORT_CHAR(',')  PORT_CHAR('<')
 
 	PORT_START("LINE1")    /* row 1 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ (") PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR('+')	PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- )") PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR('-')	PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@ /") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('@')	PORT_CHAR('/')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("> %") PORT_CODE(KEYCODE_EQUALS)	PORT_CHAR('>')	PORT_CHAR('%')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 ^") PORT_CODE(KEYCODE_0)	PORT_CHAR('0')	PORT_CHAR('^')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ (") PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('+')  PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- )") PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR('-')  PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@ /") PORT_CODE(KEYCODE_MINUS)   PORT_CHAR('@')  PORT_CHAR('/')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("> %") PORT_CODE(KEYCODE_EQUALS)  PORT_CHAR('>')  PORT_CHAR('%')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 ^") PORT_CODE(KEYCODE_0)   PORT_CHAR('0')  PORT_CHAR('^')
 
 	PORT_START("LINE2")    /* row 2 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 .") PORT_CODE(KEYCODE_1)	PORT_CHAR('1')	PORT_CHAR('.')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 ;") PORT_CODE(KEYCODE_2)	PORT_CHAR('2')	PORT_CHAR(';')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 :") PORT_CODE(KEYCODE_3)	PORT_CHAR('3')	PORT_CHAR(':')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 ?") PORT_CODE(KEYCODE_4)	PORT_CHAR('4')	PORT_CHAR('?')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 !") PORT_CODE(KEYCODE_5)	PORT_CHAR('5')	PORT_CHAR('!')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 .") PORT_CODE(KEYCODE_1)   PORT_CHAR('1')  PORT_CHAR('.')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 ;") PORT_CODE(KEYCODE_2)   PORT_CHAR('2')  PORT_CHAR(';')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 :") PORT_CODE(KEYCODE_3)   PORT_CHAR('3')  PORT_CHAR(':')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 ?") PORT_CODE(KEYCODE_4)   PORT_CHAR('4')  PORT_CHAR('?')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 !") PORT_CODE(KEYCODE_5)   PORT_CHAR('5')  PORT_CHAR('!')
 
 	PORT_START("LINE3")    /* row 3 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 _") PORT_CODE(KEYCODE_6)	PORT_CHAR('6')	PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \"") PORT_CODE(KEYCODE_7)	PORT_CHAR('7')	PORT_CHAR('\"')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 #") PORT_CODE(KEYCODE_8)	PORT_CHAR('8')	PORT_CHAR('#')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (ESC)") PORT_CODE(KEYCODE_9)	PORT_CHAR('9')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A (SOH)") PORT_CODE(KEYCODE_A)	PORT_CHAR('A')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 _") PORT_CODE(KEYCODE_6)   PORT_CHAR('6')  PORT_CHAR('_')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \"") PORT_CODE(KEYCODE_7)  PORT_CHAR('7')  PORT_CHAR('\"')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 #") PORT_CODE(KEYCODE_8)   PORT_CHAR('8')  PORT_CHAR('#')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (ESC)") PORT_CODE(KEYCODE_9)   PORT_CHAR('9')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A (SOH)") PORT_CODE(KEYCODE_A)   PORT_CHAR('A')
 
 	PORT_START("LINE4")    /* row 4 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B (STH)") PORT_CODE(KEYCODE_B)	PORT_CHAR('B')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C (ETX)") PORT_CODE(KEYCODE_C)	PORT_CHAR('C')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D (EOT)") PORT_CODE(KEYCODE_D)	PORT_CHAR('D')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E (ENQ)") PORT_CODE(KEYCODE_E)	PORT_CHAR('E')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F (ACK)") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B (STH)") PORT_CODE(KEYCODE_B)   PORT_CHAR('B')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C (ETX)") PORT_CODE(KEYCODE_C)   PORT_CHAR('C')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D (EOT)") PORT_CODE(KEYCODE_D)   PORT_CHAR('D')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E (ENQ)") PORT_CODE(KEYCODE_E)   PORT_CHAR('E')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F (ACK)") PORT_CODE(KEYCODE_F)   PORT_CHAR('F')
 
 	PORT_START("LINE5")    /* row 5 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G (BEL)") PORT_CODE(KEYCODE_G)	PORT_CHAR('G')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H (BS)") PORT_CODE(KEYCODE_H)	PORT_CHAR('H')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I (HT)") PORT_CODE(KEYCODE_I)	PORT_CHAR('I')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J (LF)") PORT_CODE(KEYCODE_J)	PORT_CHAR('J')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K (VT)") PORT_CODE(KEYCODE_K)	PORT_CHAR('K')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G (BEL)") PORT_CODE(KEYCODE_G)   PORT_CHAR('G')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H (BS)") PORT_CODE(KEYCODE_H)    PORT_CHAR('H')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I (HT)") PORT_CODE(KEYCODE_I)    PORT_CHAR('I')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J (LF)") PORT_CODE(KEYCODE_J)    PORT_CHAR('J')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K (VT)") PORT_CODE(KEYCODE_K)    PORT_CHAR('K')
 
 	PORT_START("LINE6")    /* row 6 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L (FF)") PORT_CODE(KEYCODE_L)	PORT_CHAR('L')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M (DEL)") PORT_CODE(KEYCODE_M)	PORT_CHAR('M')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N (SO)") PORT_CODE(KEYCODE_N)	PORT_CHAR('N')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O (SI)") PORT_CODE(KEYCODE_O)	PORT_CHAR('O')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P (DLE)") PORT_CODE(KEYCODE_P)	PORT_CHAR('P')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L (FF)") PORT_CODE(KEYCODE_L)    PORT_CHAR('L')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M (DEL)") PORT_CODE(KEYCODE_M)   PORT_CHAR('M')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N (SO)") PORT_CODE(KEYCODE_N)    PORT_CHAR('N')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O (SI)") PORT_CODE(KEYCODE_O)    PORT_CHAR('O')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P (DLE)") PORT_CODE(KEYCODE_P)   PORT_CHAR('P')
 
 	PORT_START("LINE7")    /* row 7 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q (DC1)") PORT_CODE(KEYCODE_Q)	PORT_CHAR('Q')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R (DC2)") PORT_CODE(KEYCODE_R)	PORT_CHAR('R')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S (DC3)") PORT_CODE(KEYCODE_S)	PORT_CHAR('S')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T (DC4)") PORT_CODE(KEYCODE_T)	PORT_CHAR('T')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U (NAK)") PORT_CODE(KEYCODE_U)	PORT_CHAR('U')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q (DC1)") PORT_CODE(KEYCODE_Q)   PORT_CHAR('Q')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R (DC2)") PORT_CODE(KEYCODE_R)   PORT_CHAR('R')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S (DC3)") PORT_CODE(KEYCODE_S)   PORT_CHAR('S')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T (DC4)") PORT_CODE(KEYCODE_T)   PORT_CHAR('T')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U (NAK)") PORT_CODE(KEYCODE_U)   PORT_CHAR('U')
 
 	PORT_START("LINE8")    /* row 8 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V <-D") PORT_CODE(KEYCODE_V)		PORT_CHAR('V')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W (ETB)") PORT_CODE(KEYCODE_W)	PORT_CHAR('W')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X (CAN)") PORT_CODE(KEYCODE_X)	PORT_CHAR('X')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y (EM)") PORT_CODE(KEYCODE_Y)	PORT_CHAR('Y')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z ->D") PORT_CODE(KEYCODE_Z)		PORT_CHAR('Z')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V <-D") PORT_CODE(KEYCODE_V)     PORT_CHAR('V')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W (ETB)") PORT_CODE(KEYCODE_W)   PORT_CHAR('W')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X (CAN)") PORT_CODE(KEYCODE_X)   PORT_CHAR('X')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y (EM)") PORT_CODE(KEYCODE_Y)    PORT_CHAR('Y')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z ->D") PORT_CODE(KEYCODE_Z)     PORT_CHAR('Z')
 
 	/* analog joysticks (video board only) */
 
-	PORT_START("BUTTONS")	/* joystick 1 & 2 buttons */
+	PORT_START("BUTTONS")   /* joystick 1 & 2 buttons */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
 
-	PORT_START("JOY1_X")	/* joystick 1, X axis */
+	PORT_START("JOY1_X")    /* joystick 1, X axis */
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(1)
 
-	PORT_START("JOY1_Y")	/* joystick 1, Y axis */
+	PORT_START("JOY1_Y")    /* joystick 1, Y axis */
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(1) PORT_REVERSE
 
-	PORT_START("JOY2_X")	/* joystick 2, X axis */
+	PORT_START("JOY2_X")    /* joystick 2, X axis */
 	PORT_BIT( 0x3ff, 0x180,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x180 ) PORT_PLAYER(2)
 
-	PORT_START("JOY2_Y")	/* joystick 2, Y axis */
+	PORT_START("JOY2_Y")    /* joystick 2, Y axis */
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 

@@ -195,7 +195,7 @@ static INPUT_PORTS_START( quizdna )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gakupara )
-    PORT_START("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )

@@ -166,13 +166,13 @@ UINT32 ti990_10_state::screen_update_ti990_10(screen_device &screen, bitmap_ind1
 
 static ADDRESS_MAP_START(ti990_10_memmap, AS_PROGRAM, 16, ti990_10_state )
 
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM		/* let's say we have 1MB of RAM */
-	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP		/* free TILINE space */
-	AM_RANGE(0x1ff800, 0x1ff81f) AM_READWRITE_LEGACY(ti990_hdc_r, ti990_hdc_w)	/* disk controller TPCS */
-	AM_RANGE(0x1ff820, 0x1ff87f) AM_NOP		/* free TPCS */
-	AM_RANGE(0x1ff880, 0x1ff89f) AM_DEVREADWRITE_LEGACY("tpc",ti990_tpc_r, ti990_tpc_w)	/* tape controller TPCS */
-	AM_RANGE(0x1ff8a0, 0x1ffbff) AM_NOP		/* free TPCS */
-	AM_RANGE(0x1ffc00, 0x1fffff) AM_ROM		/* LOAD ROM */
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM     /* let's say we have 1MB of RAM */
+	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP     /* free TILINE space */
+	AM_RANGE(0x1ff800, 0x1ff81f) AM_READWRITE_LEGACY(ti990_hdc_r, ti990_hdc_w)  /* disk controller TPCS */
+	AM_RANGE(0x1ff820, 0x1ff87f) AM_NOP     /* free TPCS */
+	AM_RANGE(0x1ff880, 0x1ff89f) AM_DEVREADWRITE_LEGACY("tpc",ti990_tpc_r, ti990_tpc_w) /* tape controller TPCS */
+	AM_RANGE(0x1ff8a0, 0x1ffbff) AM_NOP     /* free TPCS */
+	AM_RANGE(0x1ffc00, 0x1fffff) AM_ROM     /* LOAD ROM */
 
 ADDRESS_MAP_END
 
@@ -278,7 +278,7 @@ ROM_START(ti990_10)
 	ROM_LOAD16_BYTE("ti2025-7", 0x1FFC00, 0x1000, CRC(4824f89c))
 	ROM_LOAD16_BYTE("ti2025-8", 0x1FFC01, 0x1000, CRC(51fef543))
 	/* the other half of this ROM is not loaded - it makes no sense as TI990/12 machine code, as
-    it is microcode... */
+	it is microcode... */
 
 #endif
 
@@ -304,4 +304,4 @@ static INPUT_PORTS_START(ti990_10)
 INPUT_PORTS_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10, ti990_10_state,	ti990_10,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )
+COMP( 1975, ti990_10,   0,      0,      ti990_10,   ti990_10, ti990_10_state,   ti990_10,   "Texas Instruments",    "TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )

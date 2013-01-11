@@ -10,7 +10,7 @@
 
 /*----------- defined in machine/ps2.c -----------*/
 
- DECLARE_READ8_HANDLER(ps2_pos_r);
+	DECLARE_READ8_HANDLER(ps2_pos_r);
 DECLARE_WRITE8_HANDLER(ps2_pos_w);
 
 

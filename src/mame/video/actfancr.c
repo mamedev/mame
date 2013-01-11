@@ -37,4 +37,3 @@ UINT32 actfancr_state::screen_update_actfancr(screen_device &screen, bitmap_ind1
 
 	return 0;
 }
-

@@ -4,7 +4,7 @@
 <!--
 
 To investigate:
-  - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
+	- Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
 
 Undumped:
 - 102 Dalmatas Cachorros Al Rescate CGB-B99S-ESP
@@ -18,11 +18,11 @@ nointro guys also list the following
 - The New Adventures of Mary-Kate &amp; Ashley (Euro)
 
 Undumped GBC protos:
-  - Jet Force Gemini
+	- Jet Force Gemini
 
 
 Undumped Pirates:
-  -  Sachen EB-004 Street Hero
+	-  Sachen EB-004 Street Hero
 
 -->
 
@@ -21897,7 +21897,7 @@ Undumped Pirates:
 <!-- GOWIN games -->
 <!--
 
-  see list of games in gameboy.xml
+	see list of games in gameboy.xml
 
 -->
 
@@ -21916,7 +21916,7 @@ Undumped Pirates:
 	</software>
 
 <!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
-     the real card, so it can be removed once we properly emulate the parent -->
+		the real card, so it can be removed once we properly emulate the parent -->
 	<software name="leinujsh" cloneof="leinujs">
 		<description>Lei Nu Ji Shen (Tw, Hacked)</description>
 		<year>2000</year>
@@ -21974,30 +21974,30 @@ Undumped Pirates:
 
 <!-- Sintax games -->
 <!--
-  * ST-0206002E Harry Boy Second Edition: The secretx of the chamber of secrets (english)
-  * ST-0206003E True Thre Kingdoms (english)
-  * ST-0206005E Donkey Kong 5: The journey of over time and space (english)
-  * ST-0206007 指环王 (Lord of the Rings) (Chinese)
-  * ST-0210010C 真三國無雙II (True Three Kingdoms II) (chinese)
-  * SAT-0212014C Tai Kong Bao Bei (Lilo and Stitch) [Jump Technology]
-  * JP-0301018C Crash Bandicoot 2003 [Jump Technology]
-  * ST-0301019C Lion King 3
-  * ST-0301020C Quan Ba Tian Xia
-  * ST-0210021C Super Robot War X
-  * ST-0211022E 2003 Pocket Monster Carbuncle (english)
-  * ST-0304027C 神鬼帝國之惡魔城 ("Castlevania of the Ghost Empire" or something) (Chinese)
-  * ST-0306030C 重装机兵/METAL MAXⅡ
-  * ST-0306034C Dragon Ball Z3
-  * ST-0310041C 大话西游/Saiyuuki
-  * ST-0425072C 口袋宝贝火红/Pocket Monstor-Red (Fire Red)
-  * 0405073C Pokemon Leaf Green
-  * ST-0405075C Metal Slug II
-  * ST-0405077C 越南战役3 (Metal Slug 3) (chinese)
-  * ST-0409078C Super Sonik II (chinese)
-  * ST-0409084C 口袋妖怪-白金版/Pocketmon-platina
-  * ST-0409085C 口袋妖怪-绿宝石/pocketmon-emerald
-  * ST-0502092C 勇者斗恶龙/Dragon Quest
-  * ST-0504093C 口袋宝贝-珍珠/Poketmon-pearl
+	* ST-0206002E Harry Boy Second Edition: The secretx of the chamber of secrets (english)
+	* ST-0206003E True Thre Kingdoms (english)
+	* ST-0206005E Donkey Kong 5: The journey of over time and space (english)
+	* ST-0206007 指环王 (Lord of the Rings) (Chinese)
+	* ST-0210010C 真三國無雙II (True Three Kingdoms II) (chinese)
+	* SAT-0212014C Tai Kong Bao Bei (Lilo and Stitch) [Jump Technology]
+	* JP-0301018C Crash Bandicoot 2003 [Jump Technology]
+	* ST-0301019C Lion King 3
+	* ST-0301020C Quan Ba Tian Xia
+	* ST-0210021C Super Robot War X
+	* ST-0211022E 2003 Pocket Monster Carbuncle (english)
+	* ST-0304027C 神鬼帝國之惡魔城 ("Castlevania of the Ghost Empire" or something) (Chinese)
+	* ST-0306030C 重装机兵/METAL MAXⅡ
+	* ST-0306034C Dragon Ball Z3
+	* ST-0310041C 大话西游/Saiyuuki
+	* ST-0425072C 口袋宝贝火红/Pocket Monstor-Red (Fire Red)
+	* 0405073C Pokemon Leaf Green
+	* ST-0405075C Metal Slug II
+	* ST-0405077C 越南战役3 (Metal Slug 3) (chinese)
+	* ST-0409078C Super Sonik II (chinese)
+	* ST-0409084C 口袋妖怪-白金版/Pocketmon-platina
+	* ST-0409085C 口袋妖怪-绿宝石/pocketmon-emerald
+	* ST-0502092C 勇者斗恶龙/Dragon Quest
+	* ST-0504093C 口袋宝贝-珍珠/Poketmon-pearl
 -->
 
 	<software name="hpotter">
@@ -23297,9 +23297,9 @@ Undumped Pirates:
 		</part>
 	</software>
 
-    <!-- This is usually referred to as 'Vietnamese bootleg' of pokecrys
-    (apparently it got sent to US by a Vietnamese guy back in the 2000)
-    it can be seen on youtube. -->
+	<!-- This is usually referred to as 'Vietnamese bootleg' of pokecrys
+	(apparently it got sent to US by a Vietnamese guy back in the 2000)
+	it can be seen on youtube. -->
 	<software name="pokecrysb" cloneof="pokecrys">
 		<!-- Notes: GBC only -->
 		<description>Pocket Monsters - Crystal Version (Bootleg)</description>
@@ -23432,7 +23432,7 @@ Undumped Pirates:
 	</software>
 
 <!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
-     the real card, so it can be removed once we properly emulate the parent -->
+		the real card, so it can be removed once we properly emulate the parent -->
 	<software name="digimn2h" cloneof="digimn2">
 		<description>Digimon 2 (Chi, Hacked)</description>
 		<year>20??</year>
@@ -23471,7 +23471,7 @@ Undumped Pirates:
 	</software>
 
 <!-- This version bypasses the protection, but I think it's been hacked by whoever dumped
-     the real card, so it can be removed once we properly emulate the parent -->
+		the real card, so it can be removed once we properly emulate the parent -->
 	<software name="digimn4h" cloneof="digimn4">
 		<description>Digimon 02 4 (Chi, Hacked)</description>
 		<year>20??</year>

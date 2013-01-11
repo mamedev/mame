@@ -135,8 +135,8 @@ static INPUT_PORTS_START( canyon )
 	PORT_DIPSETTING(    0x01, DEF_STR( Spanish ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( German ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW:3" )	/* Manual says these are unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW:4" )	/* Manual says these are unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW:3" )    /* Manual says these are unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW:4" )    /* Manual says these are unused */
 	PORT_DIPNAME( 0x30, 0x00, "Misses Per Play" ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -285,7 +285,7 @@ ROM_START( canyon )
 	ROM_LOAD_NIB_HIGH( "9505-01.n5", 0x0000, 0x0100, CRC(60507c07) SHA1(fcb76890cbaa37e02392bf8b97f7be9a6fe6a721) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* sync (not used) */
+	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* sync (not used) */
 ROM_END
 
 
@@ -304,7 +304,7 @@ ROM_START( canyonp )
 	ROM_LOAD_NIB_HIGH( "9505-01.n5", 0x0000, 0x0100, CRC(60507c07) SHA1(fcb76890cbaa37e02392bf8b97f7be9a6fe6a721) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* sync (not used) */
+	ROM_LOAD( "9491-01.j6", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* sync (not used) */
 ROM_END
 
 

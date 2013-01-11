@@ -75,11 +75,11 @@ SNAPSHOT_LOAD( ace )
 		return IMAGE_INIT_FAIL;
 	}
 
-        // patch CPU registers
-        // Some games do not follow the standard, and have rubbish in the CPU area. So,
-        // we check that some other bytes are correct.
-        // 2080 = memory size of original machine, should be 0000 or 8000 or C000.
-        // 2118 = new stack pointer, do not use if between 8000 and FF00.
+		// patch CPU registers
+		// Some games do not follow the standard, and have rubbish in the CPU area. So,
+		// we check that some other bytes are correct.
+		// 2080 = memory size of original machine, should be 0000 or 8000 or C000.
+		// 2118 = new stack pointer, do not use if between 8000 and FF00.
 
 	ace_index = RAM[0x2080] | (RAM[0x2081] << 8);
 

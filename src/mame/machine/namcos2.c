@@ -178,7 +178,7 @@ READ16_MEMBER( namcos2_state::serial_comms_ctrl_r )
 
 	switch(offset){
 	case 0x00:
-		retval |= 0x0004;	/* Set READY? status bit */
+		retval |= 0x0004;   /* Set READY? status bit */
 		break;
 
 	default:
@@ -248,14 +248,14 @@ READ16_HANDLER( namcos2_68k_key_r )
 		{
 			case 4: return 0x15a;
 		}
-	    break;
+		break;
 
 	case NAMCOS2_MIRAI_NINJA:
 		switch(offset)
 		{
 		case 7: return 0xB1;
 		}
-	    break;
+		break;
 
 	case NAMCOS2_PHELIOS:
 		switch(offset)
@@ -268,7 +268,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 		case 5: return 0xF00F;
 		case 7: return 0xB2;
 		}
-	    break;
+		break;
 
 	case NAMCOS2_DIRT_FOX_JP:
 		switch(offset)
@@ -282,7 +282,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 		{
 		case 7: return 0xBC;
 		}
-	    break;
+		break;
 
 	case NAMCOS2_BURNING_FORCE:
 		switch(offset)
@@ -300,7 +300,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 		case 6: return 0x1001;
 		case 7: return (sendval==1)?0xBE:1;
 		}
-	    break;
+		break;
 
 	case NAMCOS2_DRAGON_SABER:
 		switch(offset)
@@ -314,14 +314,14 @@ READ16_HANDLER( namcos2_68k_key_r )
 		{
 		case 4:
 			if( sendval == 1 ){
-		        sendval = 0;
-		        return 0x13F;
+				sendval = 0;
+				return 0x13F;
 			}
 			break;
 		case 7:
 			if( sendval == 1 ){
-			    sendval = 0;
-			    return 0x13F;
+				sendval = 0;
+				return 0x13F;
 			}
 			break;
 		case 2: return 0;
@@ -426,9 +426,9 @@ WRITE16_HANDLER( namcos2_68k_key_w )
 /* 68000 Interrupt/IO Handlers - CUSTOM 148 - NOT SHARED     */
 /*************************************************************/
 
-#define NO_OF_LINES 	256
-#define FRAME_TIME		(1.0/60.0)
-#define LINE_LENGTH 	(FRAME_TIME/NO_OF_LINES)
+#define NO_OF_LINES     256
+#define FRAME_TIME      (1.0/60.0)
+#define LINE_LENGTH     (FRAME_TIME/NO_OF_LINES)
 
 static UINT16  namcos2_68k_master_C148[0x20];
 static UINT16  namcos2_68k_slave_C148[0x20];
@@ -521,7 +521,7 @@ ReadWriteC148( address_space &space, offs_t offset, UINT16 data, int bWrite )
 		{
 			// mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
 			/* Dubious to assert IRQ for other CPU here, but Starblade seems to rely on it.
-               It fails to show large polygons otherwise. */
+			   It fails to show large polygons otherwise. */
 			altcpu->execute().set_input_line(pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
 		}
 		break;
@@ -710,7 +710,7 @@ WRITE8_HANDLER( namcos2_sound_bankselect_w )
 {
 	UINT8 *RAM=space.machine().root_device().memregion("audiocpu")->base();
 	UINT32 max = (space.machine().root_device().memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
-	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
+	int bank = ( data >> 4 ) % max; /* 991104.CAB */
 	space.machine().root_device().membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }
 

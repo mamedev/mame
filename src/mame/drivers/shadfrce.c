@@ -145,9 +145,9 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "includes/shadfrce.h"
 
 
-#define MASTER_CLOCK		XTAL_28MHz
-#define CPU_CLOCK			MASTER_CLOCK / 2
-#define PIXEL_CLOCK		MASTER_CLOCK / 4
+#define MASTER_CLOCK        XTAL_28MHz
+#define CPU_CLOCK           MASTER_CLOCK / 2
+#define PIXEL_CLOCK     MASTER_CLOCK / 4
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_flip_screen)
 {
@@ -283,8 +283,8 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_irq_ack_w)
 WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
 {
 
-	m_irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
-	m_video_enable = data & 8;	/* probably */
+	m_irqs_enable = data & 1;   /* maybe, it's set/unset inside every trap instruction which is executed */
+	m_video_enable = data & 8;  /* probably */
 
 	/* check if there's a high transition to enable the raster IRQ */
 	if((~m_prev_value & 4) && (data & 4))
@@ -304,7 +304,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
 WRITE16_MEMBER(shadfrce_state::shadfrce_scanline_w)
 {
 
-	m_raster_scanline = data;	/* guess, 0 is always written */
+	m_raster_scanline = data;   /* guess, 0 is always written */
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
@@ -317,7 +317,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 		m_vblank = 0;
 	}
 	/* Hack */
-	else if (scanline == (248-1))		/* -1 is an hack needed to avoid deadlocks */
+	else if (scanline == (248-1))       /* -1 is an hack needed to avoid deadlocks */
 	{
 		m_vblank = 4;
 	}
@@ -379,7 +379,7 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(shadfrce_irq_ack_w)
 	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(shadfrce_irq_w)
 	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(shadfrce_scanline_w)
-	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(shadfrce_sound_brt_w)	/* sound command + screen brightness */
+	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(shadfrce_sound_brt_w)  /* sound command + screen brightness */
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
@@ -422,13 +422,13 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( shadfrce )
-	PORT_START("P1")		/* Fake IN0 (player 1 inputs) */
+	PORT_START("P1")        /* Fake IN0 (player 1 inputs) */
 	SHADFRCE_PLAYER_INPUT( 1, IPT_START1 )
 
-	PORT_START("P2")		/* Fake IN1 (player 2 inputs) */
+	PORT_START("P2")        /* Fake IN1 (player 2 inputs) */
 	SHADFRCE_PLAYER_INPUT( 2, IPT_START2 )
 
-	PORT_START("EXTRA")	/* Fake IN2 (players 1 & 2 extra inputs */
+	PORT_START("EXTRA") /* Fake IN2 (players 1 & 2 extra inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -438,21 +438,21 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("OTHER")	/* Fake IN3 (other extra inputs ?) */
+	PORT_START("OTHER") /* Fake IN3 (other extra inputs ?) */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM")	/* Fake IN4 (system inputs) */
+	PORT_START("SYSTEM")    /* Fake IN4 (system inputs) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )			/* only in "test mode" ? */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )			/* only in "test mode" ? */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )          /* only in "test mode" ? */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* only in "test mode" ? */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("MISC")	/* Fake IN5 (misc) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )			/* guess */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
+	PORT_START("MISC")  /* Fake IN5 (misc) */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )            /* guess */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")	/* Fake IN6 (DIP1) */
+	PORT_START("DSW1")  /* Fake IN6 (DIP1) */
 	PORT_DIPNAME( 0x01, 0x01, "Unused DIP 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -475,7 +475,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")	/* Fake IN7 (DIP2) */
+	PORT_START("DSW2")  /* Fake IN7 (DIP2) */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -545,15 +545,15 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)			/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, shadfrce_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)			/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update_shadfrce)
 	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof_shadfrce)
 
@@ -564,12 +564,12 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)		/* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, OKIM6295_PIN7_HIGH)	/* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

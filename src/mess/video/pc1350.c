@@ -95,7 +95,7 @@ static const POCKETC_FIGURE busy={
 	"1 1 11    1e"
 };
 
- READ8_HANDLER(pc1350_lcd_read)
+	READ8_HANDLER(pc1350_lcd_read)
 {
 	pc1350_state *state = space.machine().driver_data<pc1350_state>();
 	int data;

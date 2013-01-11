@@ -5,7 +5,7 @@
 */
 static const unsigned char US_key_translate[4][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -115,7 +115,7 @@ static const unsigned char US_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -225,7 +225,7 @@ static const unsigned char US_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -335,7 +335,7 @@ static const unsigned char US_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,
@@ -453,7 +453,7 @@ static const unsigned char US_key_translate[4][91] =
 */
 static const unsigned char French_key_translate[4][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -563,7 +563,7 @@ static const unsigned char French_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -673,7 +673,7 @@ static const unsigned char French_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -783,7 +783,7 @@ static const unsigned char French_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,
@@ -901,7 +901,7 @@ static const unsigned char French_key_translate[4][91] =
 */
 static const unsigned char German_key_translate[4][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -1011,7 +1011,7 @@ static const unsigned char German_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -1121,7 +1121,7 @@ static const unsigned char German_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -1200,7 +1200,7 @@ static const unsigned char German_key_translate[4][91] =
 		0x5C,
 		0x5B,
 		0x3A,
-		0x83,	/* 945423-9701 rev. B says 0x85, but it must be a mistake */
+		0x83,   /* 945423-9701 rev. B says 0x85, but it must be a mistake */
 
 		0x31,
 		0x32,
@@ -1231,7 +1231,7 @@ static const unsigned char German_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,
@@ -1349,7 +1349,7 @@ static const unsigned char German_key_translate[4][91] =
 */
 static const unsigned char Swedish_key_translate[4][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -1459,7 +1459,7 @@ static const unsigned char Swedish_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -1569,7 +1569,7 @@ static const unsigned char Swedish_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -1648,7 +1648,7 @@ static const unsigned char Swedish_key_translate[4][91] =
 		0x5C,
 		0x5B,
 		0x3A,
-		0x83,	/* 945423-9701 rev. B says 0x85, but it must be a mistake */
+		0x83,   /* 945423-9701 rev. B says 0x85, but it must be a mistake */
 
 		0x31,
 		0x32,
@@ -1679,7 +1679,7 @@ static const unsigned char Swedish_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,
@@ -1797,7 +1797,7 @@ static const unsigned char Swedish_key_translate[4][91] =
 */
 static const unsigned char Norwegian_key_translate[4][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -1907,7 +1907,7 @@ static const unsigned char Norwegian_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -2017,7 +2017,7 @@ static const unsigned char Norwegian_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -2071,8 +2071,8 @@ static const unsigned char Norwegian_key_translate[4][91] =
 		0x4F,
 		0x50,
 		0x5D,
-		0x8A,	/* 945423-9701 rev. B says 0x88, but it must be a mistake */
-		0x8C,	/* 945423-9701 rev. B says 0x87, but it must be a mistake */
+		0x8A,   /* 945423-9701 rev. B says 0x88, but it must be a mistake */
+		0x8C,   /* 945423-9701 rev. B says 0x87, but it must be a mistake */
 
 		0x34,
 		0x35,
@@ -2127,7 +2127,7 @@ static const unsigned char Norwegian_key_translate[4][91] =
 		0x20,
 		0x0D
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,
@@ -2181,8 +2181,8 @@ static const unsigned char Norwegian_key_translate[4][91] =
 		0x0F,
 		0x10,
 		0x00,
-		0x88,	/* 945423-9701 rev. B says 0x8A, but it must be a mistake */
-		0x87,	/* 945423-9701 rev. B says 0x8C, but it must be a mistake */
+		0x88,   /* 945423-9701 rev. B says 0x8A, but it must be a mistake */
+		0x87,   /* 945423-9701 rev. B says 0x8C, but it must be a mistake */
 
 		0x34,
 		0x35,
@@ -2245,7 +2245,7 @@ static const unsigned char Norwegian_key_translate[4][91] =
 */
 static const unsigned char Japanese_key_translate[6][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -2355,7 +2355,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -2465,7 +2465,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -2575,7 +2575,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,
@@ -2605,7 +2605,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0x7E,
 		0x1D,
 		0x7F,
-		0x5C,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays the back quote character, whereas it actually display the Yen symbol) */
+		0x5C,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays the back quote character, whereas it actually display the Yen symbol) */
 		0x1B,
 
 		0x37,
@@ -2685,7 +2685,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* katakana */
+	{   /* katakana */
 		0x92,
 		0x93,
 		0x94,
@@ -2716,7 +2716,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0xCE,
 		0xCD,
 		0xDB,
-		0x1B,	/* 945423-9701 rev. B says 0x00, but it must be a mistake */
+		0x1B,   /* 945423-9701 rev. B says 0x00, but it must be a mistake */
 
 		0x37,
 		0x38,
@@ -2738,9 +2738,9 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0xC6,
 		0xD7,
 		0xBE,
-		0x88,	/* 945423-9701 rev. B says 0x00, but it must be a mistake */
-		0x87,	/* 945423-9701 rev. B says 0x00, but it must be a mistake */
-		0x0D,	/* 945423-9701 rev. B says 0x00, but it must be a mistake */
+		0x88,   /* 945423-9701 rev. B says 0x00, but it must be a mistake */
+		0x87,   /* 945423-9701 rev. B says 0x00, but it must be a mistake */
+		0x0D,   /* 945423-9701 rev. B says 0x00, but it must be a mistake */
 
 		0x34,
 		0x35,
@@ -2760,7 +2760,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0xB8,
 		0xCF,
 		0xC9,
-		0xD8,	/* 945423-9701 rev. B says 0xC8, but it must be a mistake */
+		0xD8,   /* 945423-9701 rev. B says 0xC8, but it must be a mistake */
 		0xDA,
 		0xB9,
 		0xD1,
@@ -2795,7 +2795,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* shifted katakana */
+	{   /* shifted katakana */
 		0x92,
 		0x93,
 		0x94,
@@ -2914,7 +2914,7 @@ static const unsigned char Japanese_key_translate[6][91] =
 */
 static const unsigned char Arabic_key_translate[6][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -3024,7 +3024,7 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -3134,7 +3134,7 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -3244,7 +3244,7 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,
@@ -3354,7 +3354,7 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0x20,
 		0
 	},
-	{	/* arabic */
+	{   /* arabic */
 		0x92,
 		0x93,
 		0x94,
@@ -3387,9 +3387,9 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0xDB,
 		0x1B,
 
-		0x37,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x38,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x39,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x37,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x38,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x39,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 
 
 		0x9A,
@@ -3411,9 +3411,9 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0x87,
 		0x0D,
 
-		0x34,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x35,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x36,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x34,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x35,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x36,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 
 
 		0x88,
@@ -3435,9 +3435,9 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0xD1,
 		0x85,
 
-		0x31,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x32,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x33,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x31,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x32,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x33,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 
 
 		0x86,
@@ -3457,14 +3457,14 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0xD2,
 		0,
 
-		0x30,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x30,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 		0x2E,
 
 		0,
 		0x20,
 		0
 	},
-	{	/* shifted arabic */
+	{   /* shifted arabic */
 		0x92,
 		0x93,
 		0x94,
@@ -3497,9 +3497,9 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0xB0,
 		0x1B,
 
-		0x37,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x38,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x39,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x37,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x38,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x39,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 
 
 		0x9A,
@@ -3521,9 +3521,9 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0x8C,
 		0x0D,
 
-		0x34,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x35,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x36,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x34,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x35,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x36,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 
 
 		0x88,
@@ -3545,9 +3545,9 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0xA3,
 		0x83,
 
-		0x31,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x32,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
-		0x33,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x31,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x32,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x33,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 
 
 		0x86,
@@ -3567,7 +3567,7 @@ static const unsigned char Arabic_key_translate[6][91] =
 		0xA5,
 		0,
 
-		0x30,	/* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
+		0x30,   /* 945423-9701 rev. B says so, but it might be a mistake (it claims it displays arabic-style digits, whereas it actually displays western-style digits) */
 		0x2E,
 
 		0,
@@ -3583,7 +3583,7 @@ static const unsigned char Arabic_key_translate[6][91] =
 */
 static const unsigned char FrenchWP_key_translate[4][91] =
 {
-	{	/* lower case */
+	{   /* lower case */
 		0x92,
 		0x93,
 		0x94,
@@ -3693,7 +3693,7 @@ static const unsigned char FrenchWP_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* upper case */
+	{   /* upper case */
 		0x92,
 		0x93,
 		0x94,
@@ -3803,7 +3803,7 @@ static const unsigned char FrenchWP_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* shifted */
+	{   /* shifted */
 		0x92,
 		0x93,
 		0x94,
@@ -3913,7 +3913,7 @@ static const unsigned char FrenchWP_key_translate[4][91] =
 		0x20,
 		0
 	},
-	{	/* control */
+	{   /* control */
 		0x92,
 		0x93,
 		0x94,

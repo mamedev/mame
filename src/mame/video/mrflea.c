@@ -24,7 +24,7 @@ WRITE8_MEMBER(mrflea_state::mrflea_videoram_w)
 	m_videoram[offset] = data;
 	m_videoram[offset + 0x400] = bank;
 	/* the address range that tile data is written to sets one bit of
-      the bank select.  The remaining bits are from a video register. */
+	  the bank select.  The remaining bits are from a video register. */
 }
 
 WRITE8_MEMBER(mrflea_state::mrflea_spriteram_w)

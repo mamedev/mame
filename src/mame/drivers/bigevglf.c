@@ -210,7 +210,7 @@ WRITE8_MEMBER(bigevglf_state::beg_port08_w)
 
 
 static INPUT_PORTS_START( bigevglf )
-	PORT_START("PORT00")		/* port 00 on sub cpu */
+	PORT_START("PORT00")        /* port 00 on sub cpu */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -220,11 +220,11 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START("PORT04")		/* port 04 on sub cpu - bit 0 and bit 1 are coin inputs */
+	PORT_START("PORT04")        /* port 04 on sub cpu - bit 0 and bit 1 are coin inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("DSW1")			/* port 05 on sub cpu */
+	PORT_START("DSW1")          /* port 05 on sub cpu */
 	PORT_DIPNAME( 0x01,   0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x01, DEF_STR( Cocktail ) )
@@ -241,7 +241,7 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0xa0, DEF_STR( 1C_2C ) )
 
-	PORT_START("DSW2")			/* port 06 on sub cpu */
+	PORT_START("DSW2")          /* port 06 on sub cpu */
 	PORT_DIPNAME( 0x03,   0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
@@ -265,16 +265,16 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x20, "9" )
 	PORT_DIPSETTING(      0x00, "10" )
 
-	PORT_START("P1X")	/* port 02 on sub cpu - muxed port 0 */
+	PORT_START("P1X")   /* port 02 on sub cpu - muxed port 0 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("P1Y")	/* port 03 on sub cpu - muxed port 0 */
+	PORT_START("P1Y")   /* port 03 on sub cpu - muxed port 0 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("P2X")	/* port 02 on sub cpu - muxed port 1 */
+	PORT_START("P2X")   /* port 02 on sub cpu - muxed port 1 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_COCKTAIL
 
-	PORT_START("P2Y")	/* port 03 on sub cpu - muxed port 1 */
+	PORT_START("P2Y")   /* port 03 on sub cpu - muxed port 1 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
@@ -304,12 +304,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_portmap, AS_IO, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* video ram enable ???*/
+	AM_RANGE(0x00, 0x00) AM_WRITENOP    /* video ram enable ???*/
 	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
 	AM_RANGE(0x02, 0x02) AM_WRITE(beg_banking_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(beg13_a_set_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(beg13_b_clr_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(bigevglf_vidram_addr_w)	/* video banking (256 banks) for f000-f0ff area */
+	AM_RANGE(0x05, 0x05) AM_WRITE(bigevglf_vidram_addr_w)   /* video banking (256 banks) for f000-f0ff area */
 	AM_RANGE(0x06, 0x06) AM_READ(beg_status_r)
 ADDRESS_MAP_END
 
@@ -327,13 +327,13 @@ ADDRESS_MAP_END
 READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 {
 	/*
-            bit 0 and bit 1 = coin inputs
-            bit 3 and bit 4 = MCU status
-            bit 5           = must toggle, vblank ?
+	        bit 0 and bit 1 = coin inputs
+	        bit 3 and bit 4 = MCU status
+	        bit 5           = must toggle, vblank ?
 
-    */
+	*/
 	m_mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(space, 0) | (ioport("PORT04")->read() & 3) | m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
+	return bigevglf_mcu_status_r(space, 0) | (ioport("PORT04")->read() & 3) | m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
@@ -369,11 +369,11 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
 	AM_RANGE(0xce00, 0xce00) AM_WRITENOP
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(sound_command_r, beg_fromsound_w)	/* write to D800 sets bit 1 in status */
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(sound_command_r, beg_fromsound_w) /* write to D800 sets bit 1 in status */
 	AM_RANGE(0xda00, 0xda00) AM_READWRITE(soundstate_r, nmi_enable_w)
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xde00, 0xde00) AM_WRITENOP
-	AM_RANGE(0xe000, 0xefff) AM_READNOP		/* space for diagnostics ROM */
+	AM_RANGE(0xe000, 0xefff) AM_READNOP     /* space for diagnostics ROM */
 ADDRESS_MAP_END
 
 
@@ -410,7 +410,7 @@ GFXDECODE_END
 
 static const msm5232_interface msm5232_config =
 {
-	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 },	/* 0.65 (???) uF capacitors */
+	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }, /* 0.65 (???) uF capacitors */
 	DEVCB_NULL
 };
 
@@ -488,26 +488,26 @@ void bigevglf_state::machine_reset()
 static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,10000000/2)		/* 5 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80,10000000/2)     /* 5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(bigevglf_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)	/* vblank */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)   /* vblank */
 
-	MCFG_CPU_ADD("sub", Z80,10000000/2)		/* 5 MHz ? */
+	MCFG_CPU_ADD("sub", Z80,10000000/2)     /* 5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(bigevglf_sub_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)	/* vblank */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigevglf_state,  irq0_line_hold)   /* vblank */
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ? */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bigevglf_state, irq0_line_hold, 2*60)	/* IRQ generated by ???;
+	MCFG_CPU_PERIODIC_INT_DRIVER(bigevglf_state, irq0_line_hold, 2*60)  /* IRQ generated by ???;
         2 irqs/frame give good music tempo but also SOUND ERROR in test mode,
         4 irqs/frame give SOUND OK in test mode but music seems to be running too fast */
 
-	MCFG_CPU_ADD("mcu", M68705,2000000)	/* ??? */
+	MCFG_CPU_ADD("mcu", M68705,2000000) /* ??? */
 	MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - interleaving is forced on the fly */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - interleaving is forced on the fly */
 
 
 	/* video hardware */
@@ -529,14 +529,14 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped

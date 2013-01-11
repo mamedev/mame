@@ -9,14 +9,14 @@
 #include "emu.h"
 #include "machine/nubus_image.h"
 
-#define IMAGE_ROM_REGION	"image_rom"
-#define IMAGE_DISK0_TAG 	"nb_disk"
+#define IMAGE_ROM_REGION    "image_rom"
+#define IMAGE_DISK0_TAG     "nb_disk"
 
 #define MESSIMG_DISK_SECTOR_SIZE (512)
 
 // messimg_disk_image_device
 
-class messimg_disk_image_device :	public device_t,
+class messimg_disk_image_device :   public device_t,
 								public device_image_interface
 {
 public:
@@ -41,7 +41,7 @@ public:
 	disk_data *token() { return &m_token; }
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -54,8 +54,8 @@ extern const device_type MESSIMG_DISK;
 const device_type MESSIMG_DISK = &device_creator<messimg_disk_image_device>;
 
 messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -177,14 +177,14 @@ const rom_entry *nubus_image_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_IMAGE, "Disk Image Pseudo-Card", tag, owner, clock),
+		device_t(mconfig, NUBUS_IMAGE, "Disk Image Pseudo-Card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_image";
 }
 
 nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_image";
@@ -265,4 +265,3 @@ READ32_MEMBER( nubus_image_device::image_super_r )
 	UINT32 data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }
-

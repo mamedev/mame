@@ -47,11 +47,11 @@ class miragemi_state : public driver_device
 public:
 	miragemi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_deco_tilegen1(*this, "tilegen1"),
-		  m_oki_sfx(*this, "oki_sfx"),
-		  m_oki_bgm(*this, "oki_bgm"),
-		  m_spriteram(*this, "spriteram") ,
+			m_maincpu(*this, "maincpu"),
+			m_deco_tilegen1(*this, "tilegen1"),
+			m_oki_sfx(*this, "oki_sfx"),
+			m_oki_bgm(*this, "oki_bgm"),
+			m_spriteram(*this, "spriteram") ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"){ }
 
@@ -274,14 +274,14 @@ static const gfx_layout spritelayout =
 	{ 24,8,16,0 },
 	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
 	32*32
 };
 
 static GFXDECODE_START( mirage )
-	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)	/* Tiles (8x8) */
-	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)	/* Tiles (16x16) */
-	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)	/* Sprites (16x16) */
+	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)  /* Tiles (8x8) */
+	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)  /* Tiles (16x16) */
+	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)  /* Sprites (16x16) */
 GFXDECODE_END
 
 
@@ -294,9 +294,9 @@ static const deco16ic_interface mirage_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	mirage_bank_callback,
 	mirage_bank_callback,
 	0,1,
@@ -374,7 +374,7 @@ ROM_START( mirage )
 	ROM_COPY( "oki_bgm_data", 0x080000, 0x100000, 0x080000 ) // /
 	ROM_COPY( "oki_bgm_data", 0x180000, 0x180000, 0x080000 )
 
-	ROM_REGION( 0x100000, "oki_sfx", 0 )	/* M6295 samples */
+	ROM_REGION( 0x100000, "oki_sfx", 0 )    /* M6295 samples */
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 

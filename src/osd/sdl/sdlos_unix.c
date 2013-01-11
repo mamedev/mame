@@ -220,8 +220,8 @@ char *osd_get_clipboard_text(void)
 
 		/* get property & check its type */
 		if ( XGetWindowProperty( display, our_win, types[i], 0, 65536, False, types[i],
-					 &data_type, &data_format, &nitems, &bytes_remaining, &prop )
-		     != Success )
+						&data_type, &data_format, &nitems, &bytes_remaining, &prop )
+				!= Success )
 			continue;
 		if ( ! prop )
 			continue;

@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8, marineb_state )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(marineb_flipscreen_x_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* also watchdog */
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM") AM_WRITENOP     /* also watchdog */
 ADDRESS_MAP_END
 
 
@@ -234,10 +234,10 @@ static INPUT_PORTS_START( hoccer )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
-    PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( wanted )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")	/* we use same tags as above, to simplify reads */
+	PORT_START("SYSTEM")    /* we use same tags as above, to simplify reads */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -370,7 +370,7 @@ static INPUT_PORTS_START( bcruzm12 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")	/* we use same tags as above, to simplify reads */
+	PORT_START("SYSTEM")    /* we use same tags as above, to simplify reads */
 	PORT_DIPNAME( 0x03, 0x01, "2nd Bonus Life" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x01, "60000" )
@@ -402,95 +402,95 @@ INPUT_PORTS_END
 
 static const gfx_layout marineb_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	2,	    /* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },	/* bits are packed in groups of four */
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	2,      /* 2 bits per pixel */
+	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, /* bits are packed in groups of four */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every char takes 16 bytes */
+	16*8    /* every char takes 16 bytes */
 };
 
 static const gfx_layout wanted_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	2,	    /* 2 bits per pixel */
-	{ 4, 0 },	/* the two bitplanes for 4 pixels are packed into one byte */
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },	/* bits are packed in groups of four */
+	8,8,    /* 8*8 characters */
+	1024,   /* 1024 characters */
+	2,      /* 2 bits per pixel */
+	{ 4, 0 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, /* bits are packed in groups of four */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every char takes 16 bytes */
+	16*8    /* every char takes 16 bytes */
 };
 
 static const gfx_layout hopprobo_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	2,	    /* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },	/* bits are packed in groups of four */
+	8,8,    /* 8*8 characters */
+	1024,   /* 1024 characters */
+	2,      /* 2 bits per pixel */
+	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 }, /* bits are packed in groups of four */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every char takes 16 bytes */
+	16*8    /* every char takes 16 bytes */
 };
 
 static const gfx_layout marineb_small_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	64,	    /* 64 sprites */
-	2,	    /* 2 bits per pixel */
-	{ 0, 256*32*8 },	/* the two bitplanes are separated */
+	16,16,  /* 16*16 sprites */
+	64,     /* 64 sprites */
+	2,      /* 2 bits per pixel */
+	{ 0, 256*32*8 },    /* the two bitplanes are separated */
 	{     0,     1,     2,     3,     4,     5,     6,     7,
-	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout marineb_big_spritelayout =
 {
-	32,32,	/* 32*32 sprites */
-	64,	    /* 64 sprites */
-	2,	    /* 2 bits per pixel */
-	{ 0, 256*32*8 },	/* the two bitplanes are separated */
+	32,32,  /* 32*32 sprites */
+	64,     /* 64 sprites */
+	2,      /* 2 bits per pixel */
+	{ 0, 256*32*8 },    /* the two bitplanes are separated */
 	{      0,      1,      2,      3,      4,      5,      6,      7,
-	   8*8+0,  8*8+1,  8*8+2,  8*8+3,  8*8+4,  8*8+5,  8*8+6,  8*8+7,
-	  32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-	  40*8+0, 40*8+1, 40*8+2, 40*8+3, 40*8+4, 40*8+5, 40*8+6, 40*8+7 },
+		8*8+0,  8*8+1,  8*8+2,  8*8+3,  8*8+4,  8*8+5,  8*8+6,  8*8+7,
+		32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
+		40*8+0, 40*8+1, 40*8+2, 40*8+3, 40*8+4, 40*8+5, 40*8+6, 40*8+7 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
-	  64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
-	  80*8, 81*8, 82*8, 83*8, 84*8, 85*8, 86*8, 87*8 },
-	4*32*8	/* every sprite takes 128 consecutive bytes */
+		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
+		64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
+		80*8, 81*8, 82*8, 83*8, 84*8, 85*8, 86*8, 87*8 },
+	4*32*8  /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout changes_small_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	64,	    /* 64 sprites */
-	2,	    /* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
+	16,16,  /* 16*16 sprites */
+	64,     /* 64 sprites */
+	2,      /* 2 bits per pixel */
+	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
 	{      0,      1,      2,      3,  8*8+0,  8*8+1,  8*8+2,  8*8+3,
-	  16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
+		16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+		32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static const gfx_layout changes_big_spritelayout =
 {
-	32,32,	/* 32*3 sprites */
-	16,	    /* 32 sprites */
-	2,	    /* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
+	32,32,  /* 32*3 sprites */
+	16,     /* 32 sprites */
+	2,      /* 2 bits per pixel */
+	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
 	{      0,      1,      2,      3,  8*8+0,  8*8+1,  8*8+2,  8*8+3,
-	  16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3,
-	  64*8+0, 64*8+1, 64*8+2, 64*8+3, 72*8+0, 72*8+1, 72*8+2, 72*8+3,
-	  80*8+0, 80*8+1, 80*8+2, 80*8+3, 88*8+0, 88*8+1, 88*8+2, 88*8+3 },
+		16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3,
+		64*8+0, 64*8+1, 64*8+2, 64*8+3, 72*8+0, 72*8+1, 72*8+2, 72*8+3,
+		80*8+0, 80*8+1, 80*8+2, 80*8+3, 88*8+0, 88*8+1, 88*8+2, 88*8+3 },
 	{   0*8,   1*8,   2*8,   3*8,   4*8,   5*8,   6*8,   7*8,
-	   32*8,  33*8,  34*8,  35*8,  36*8,  37*8,  38*8,  39*8,
-	  128*8, 129*8, 130*8, 131*8, 132*8, 133*8, 134*8, 135*8,
-	  160*8, 161*8, 162*8, 163*8, 164*8, 165*8, 166*8, 167*8 },
-	4*64*8	/* every sprite takes 256 consecutive bytes */
+		32*8,  33*8,  34*8,  35*8,  36*8,  37*8,  38*8,  39*8,
+		128*8, 129*8, 130*8, 131*8, 132*8, 133*8, 134*8, 135*8,
+		160*8, 161*8, 162*8, 163*8, 164*8, 165*8, 166*8, 167*8 },
+	4*64*8  /* every sprite takes 256 consecutive bytes */
 };
 
 
@@ -513,8 +513,8 @@ static GFXDECODE_START( changes )
 GFXDECODE_END
 
 static GFXDECODE_START( hoccer )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 16 )	/* no palette banks */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, changes_small_spritelayout,  0, 16 )	/* no palette banks */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, marineb_charlayout,          0, 16 )   /* no palette banks */
+	GFXDECODE_ENTRY( "gfx2", 0x0000, changes_small_spritelayout,  0, 16 )   /* no palette banks */
 GFXDECODE_END
 
 static GFXDECODE_START( hopprobo )
@@ -541,7 +541,7 @@ INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
 static MACHINE_CONFIG_START( marineb, marineb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(marineb_map)
 	MCFG_CPU_IO_MAP(marineb_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", marineb_state,  marineb_vblank_irq)
@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000)	/* frames per second, vblank duration */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000)   /* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
@@ -781,21 +781,21 @@ ROM_END
 
 ROM_START( wanted )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "prg-1",		   0x0000, 0x2000, CRC(2dd90aed) SHA1(3982d47a66f653a046a95e38648a7c5a2bfe1470) )
-	ROM_LOAD( "prg-2",		   0x2000, 0x2000, CRC(67ac0210) SHA1(29fd01289c9ba5a3a992ac6740badbf2e37f05ac) )
-	ROM_LOAD( "prg-3",		   0x4000, 0x2000, CRC(373c7d82) SHA1(e68e1fd1d5e48c709280a714d7df330fc29df03a) )
+	ROM_LOAD( "prg-1",         0x0000, 0x2000, CRC(2dd90aed) SHA1(3982d47a66f653a046a95e38648a7c5a2bfe1470) )
+	ROM_LOAD( "prg-2",         0x2000, 0x2000, CRC(67ac0210) SHA1(29fd01289c9ba5a3a992ac6740badbf2e37f05ac) )
+	ROM_LOAD( "prg-3",         0x4000, 0x2000, CRC(373c7d82) SHA1(e68e1fd1d5e48c709280a714d7df330fc29df03a) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "vram-1",		   0x0000, 0x2000, CRC(c4226e54) SHA1(4eb59db4d9688f62ecbaee7dde4cf3117e8f942d) )
-	ROM_LOAD( "vram-2",		   0x2000, 0x2000, CRC(2a9b1e36) SHA1(daaf90753477f22dba8f9a9d28799c63622351a5) )
+	ROM_LOAD( "vram-1",        0x0000, 0x2000, CRC(c4226e54) SHA1(4eb59db4d9688f62ecbaee7dde4cf3117e8f942d) )
+	ROM_LOAD( "vram-2",        0x2000, 0x2000, CRC(2a9b1e36) SHA1(daaf90753477f22dba8f9a9d28799c63622351a5) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "obj-a",		   0x0000, 0x2000, CRC(90b60771) SHA1(67cf20fa47439a16f9ebe07aa128cb267b256704) )
-	ROM_LOAD( "obj-b",		   0x2000, 0x2000, CRC(e14ee689) SHA1(797985c9b5b9a2c39c98defae56d119ce41714d6) )
+	ROM_LOAD( "obj-a",         0x0000, 0x2000, CRC(90b60771) SHA1(67cf20fa47439a16f9ebe07aa128cb267b256704) )
+	ROM_LOAD( "obj-b",         0x2000, 0x2000, CRC(e14ee689) SHA1(797985c9b5b9a2c39c98defae56d119ce41714d6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "wanted.k7",	   0x0000, 0x0100, CRC(2ba90a00) SHA1(ec545b4682be2875f4e6440a28306a36c6f1771d) )	/* palette low 4 bits */
-	ROM_LOAD( "wanted.k6",	   0x0100, 0x0100, CRC(a93d87cc) SHA1(73920a2a2842efc8678f280e3b30177f4ca6ea9c) )	/* palette high 4 bits */
+	ROM_LOAD( "wanted.k7",     0x0000, 0x0100, CRC(2ba90a00) SHA1(ec545b4682be2875f4e6440a28306a36c6f1771d) )   /* palette low 4 bits */
+	ROM_LOAD( "wanted.k6",     0x0100, 0x0100, CRC(a93d87cc) SHA1(73920a2a2842efc8678f280e3b30177f4ca6ea9c) )   /* palette high 4 bits */
 ROM_END
 
 /*
@@ -830,21 +830,21 @@ AY-3-8912    AY-3-8912                                             BCM12COL.K7
 
 ROM_START( bcruzm12 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d-84_3.12c",	   0x0000, 0x2000, CRC(132baa3d) SHA1(79f7a1dc49b6e45e68f4008f3ee4e383846f75d5) )
-	ROM_LOAD( "d-84_2.12b",	   0x2000, 0x2000, CRC(1a788d1f) SHA1(5029f93f45d328a282d56e010eee68287b6b9306) )
+	ROM_LOAD( "d-84_3.12c",    0x0000, 0x2000, CRC(132baa3d) SHA1(79f7a1dc49b6e45e68f4008f3ee4e383846f75d5) )
+	ROM_LOAD( "d-84_2.12b",    0x2000, 0x2000, CRC(1a788d1f) SHA1(5029f93f45d328a282d56e010eee68287b6b9306) )
 	ROM_LOAD( "d-84_1.12ab",   0x4000, 0x2000, CRC(9d5b3017) SHA1(bced3f39faf94ce25cba382010f2c2ed322e9d7b) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "d-84_5.17f",	   0x0000, 0x2000, CRC(2e963f6a) SHA1(dcc32ab4a4fa241b6f4a211642d00f6e0438f466) )
+	ROM_LOAD( "d-84_5.17f",    0x0000, 0x2000, CRC(2e963f6a) SHA1(dcc32ab4a4fa241b6f4a211642d00f6e0438f466) )
 	ROM_LOAD( "d-84_4.17ef",   0x2000, 0x2000, CRC(fe186459) SHA1(3b0ee1fe98c835271f5b67de5ca0507827e25d71) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "d-84_7.17h",	   0x0000, 0x2000, CRC(a5be90ef) SHA1(6037d924296ba62999aafe665396fef142d73df2) )
+	ROM_LOAD( "d-84_7.17h",    0x0000, 0x2000, CRC(a5be90ef) SHA1(6037d924296ba62999aafe665396fef142d73df2) )
 	ROM_LOAD( "d-84_6.17fh",   0x2000, 0x2000, CRC(1337dc01) SHA1(c55bfc6dd15a499dd71da0acc5016035a7c51f16) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "bcm12col.7k",   0x0000, 0x0100, CRC(bf4f2671) SHA1(dde6da568ecf0121910f4b507c83fe6230b07c8d) )	/* palette low 4 bits */
-	ROM_LOAD( "bcm12col.6k",   0x0100, 0x0100, CRC(59f955f6) SHA1(6d6d784971569e0af7cec8bd36659f24a652cd6a) )	/* palette high 4 bits */
+	ROM_LOAD( "bcm12col.7k",   0x0000, 0x0100, CRC(bf4f2671) SHA1(dde6da568ecf0121910f4b507c83fe6230b07c8d) )   /* palette low 4 bits */
+	ROM_LOAD( "bcm12col.6k",   0x0100, 0x0100, CRC(59f955f6) SHA1(6d6d784971569e0af7cec8bd36659f24a652cd6a) )   /* palette high 4 bits */
 ROM_END
 
 ROM_START( hopprobo )
@@ -858,7 +858,7 @@ ROM_START( hopprobo )
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "hopper06.5c",   0x0000, 0x2000, CRC(68f79bc8) SHA1(17a9891c98c34935831493e27bd0cf3239644de0) )
 	ROM_LOAD( "hopper07.5d",   0x2000, 0x1000, CRC(33d82411) SHA1(b112d76c9d35a2dbd051825e7818e894e8d9259f) )
-	ROM_RELOAD(				   0x3000, 0x1000 )
+	ROM_RELOAD(                0x3000, 0x1000 )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
 	ROM_LOAD( "hopper09.6k",   0x0000, 0x2000, CRC(047921c7) SHA1(8ef4722a98be540e4b5c67965599c400511b4a52) )
@@ -877,7 +877,7 @@ GAME( 1982, changesa, changes, changes,  changes, driver_device, 0, ROT0,   "Orc
 GAME( 1982, looper,   changes, changes,  changes, driver_device, 0, ROT0,   "Orca", "Looper", GAME_SUPPORTS_SAVE )
 GAME( 1982, springer, 0,       springer, marineb, driver_device, 0, ROT270, "Orca", "Springer", GAME_SUPPORTS_SAVE )
 GAME( 1983, hoccer,   0,       hoccer,   hoccer, driver_device,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer, driver_device,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , GAME_SUPPORTS_SAVE )	/* earlier */
+GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer, driver_device,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , GAME_SUPPORTS_SAVE )  /* earlier */
 GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12, driver_device,0, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", GAME_SUPPORTS_SAVE )
 GAME( 1983, hopprobo, 0,       hopprobo, marineb, driver_device, 0, ROT90,  "Sega", "Hopper Robo", GAME_SUPPORTS_SAVE )
 GAME( 1984, wanted,   0,       wanted,   wanted, driver_device,  0, ROT90,  "Sigma Enterprises Inc.", "Wanted", GAME_SUPPORTS_SAVE )

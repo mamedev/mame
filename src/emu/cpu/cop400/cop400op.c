@@ -475,34 +475,34 @@ INSTRUCTION( camq )
 {
 	/*
 
-        Excerpt from the COP410L data sheet:
+	    Excerpt from the COP410L data sheet:
 
-        False states may be generated on L0-L7 during the execution of the CAMQ instruction.
-        The L-ports should not be used as clocks for edge sensitive devices such as flip-flops,
-        counters, shift registers, etc. the following short program that illustrates this situation.
+	    False states may be generated on L0-L7 during the execution of the CAMQ instruction.
+	    The L-ports should not be used as clocks for edge sensitive devices such as flip-flops,
+	    counters, shift registers, etc. the following short program that illustrates this situation.
 
-        START:
-            CLRA        ;ENABLE THE Q
-            LEI 4       ;REGISTER TO L LINES
-            LBI TEST
-            STII 3
-            AISC 12
-        LOOP:
-            LBI TEST    ;LOAD Q WITH X'C3
-            CAMQ
-            JP LOOP
+	    START:
+	        CLRA        ;ENABLE THE Q
+	        LEI 4       ;REGISTER TO L LINES
+	        LBI TEST
+	        STII 3
+	        AISC 12
+	    LOOP:
+	        LBI TEST    ;LOAD Q WITH X'C3
+	        CAMQ
+	        JP LOOP
 
-        In this program the internal Q register is enabled onto the L lines and a steady bit
-        pattern of logic highs is output on L0, L1, L6, L7, and logic lows on L2-L5 via the
-        two-byte CAMQ instruction. Timing constraints on the device are such that the Q
-        register may be temporarily loaded with the second byte of the CAMQ opcode (3C) prior
-        to receiving the valid data pattern. If this occurs, the opcode will ripple onto the L
-        lines and cause negative-going glitches on L0, L1, L6, L7, and positive glitches on
-        L2-L5. Glitch durations are under 2 ms, although the exact value may vary due to data
-        patterns, processing parameters, and L line loading. These false states are peculiar
-        only to the CAMQ instruction and the L lines.
+	    In this program the internal Q register is enabled onto the L lines and a steady bit
+	    pattern of logic highs is output on L0, L1, L6, L7, and logic lows on L2-L5 via the
+	    two-byte CAMQ instruction. Timing constraints on the device are such that the Q
+	    register may be temporarily loaded with the second byte of the CAMQ opcode (3C) prior
+	    to receiving the valid data pattern. If this occurs, the opcode will ripple onto the L
+	    lines and cause negative-going glitches on L0, L1, L6, L7, and positive glitches on
+	    L2-L5. Glitch durations are under 2 ms, although the exact value may vary due to data
+	    patterns, processing parameters, and L line loading. These false states are peculiar
+	    only to the CAMQ instruction and the L lines.
 
-    */
+	*/
 
 	UINT8 data = (A << 4) | RAM_R(B);
 

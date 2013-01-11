@@ -263,20 +263,20 @@ static HRESULT d3d_get_caps_dword(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE dev
 	HRESULT result = IDirect3D9_GetDeviceCaps(d3d9, adapter, devtype, &caps);
 	switch (which)
 	{
-		case CAPS_PRESENTATION_INTERVALS:	*value = caps.PresentationIntervals;	break;
-		case CAPS_CAPS2:					*value = caps.Caps2;					break;
-		case CAPS_DEV_CAPS:					*value = caps.DevCaps;					break;
-		case CAPS_SRCBLEND_CAPS:			*value = caps.SrcBlendCaps;				break;
-		case CAPS_DSTBLEND_CAPS:			*value = caps.DestBlendCaps;			break;
-		case CAPS_TEXTURE_CAPS:				*value = caps.TextureCaps;				break;
-		case CAPS_TEXTURE_FILTER_CAPS:		*value = caps.TextureFilterCaps;		break;
-		case CAPS_TEXTURE_ADDRESS_CAPS:		*value = caps.TextureAddressCaps;		break;
-		case CAPS_TEXTURE_OP_CAPS:			*value = caps.TextureOpCaps;			break;
-		case CAPS_MAX_TEXTURE_ASPECT:		*value = caps.MaxTextureAspectRatio;	break;
-		case CAPS_MAX_TEXTURE_WIDTH:		*value = caps.MaxTextureWidth;			break;
-		case CAPS_MAX_TEXTURE_HEIGHT:		*value = caps.MaxTextureHeight;			break;
-		case CAPS_STRETCH_RECT_FILTER:		*value = caps.StretchRectFilterCaps;	break;
-		case CAPS_MAX_PS30_INSN_SLOTS:		*value = caps.MaxPixelShader30InstructionSlots; break;
+		case CAPS_PRESENTATION_INTERVALS:   *value = caps.PresentationIntervals;    break;
+		case CAPS_CAPS2:                    *value = caps.Caps2;                    break;
+		case CAPS_DEV_CAPS:                 *value = caps.DevCaps;                  break;
+		case CAPS_SRCBLEND_CAPS:            *value = caps.SrcBlendCaps;             break;
+		case CAPS_DSTBLEND_CAPS:            *value = caps.DestBlendCaps;            break;
+		case CAPS_TEXTURE_CAPS:             *value = caps.TextureCaps;              break;
+		case CAPS_TEXTURE_FILTER_CAPS:      *value = caps.TextureFilterCaps;        break;
+		case CAPS_TEXTURE_ADDRESS_CAPS:     *value = caps.TextureAddressCaps;       break;
+		case CAPS_TEXTURE_OP_CAPS:          *value = caps.TextureOpCaps;            break;
+		case CAPS_MAX_TEXTURE_ASPECT:       *value = caps.MaxTextureAspectRatio;    break;
+		case CAPS_MAX_TEXTURE_WIDTH:        *value = caps.MaxTextureWidth;          break;
+		case CAPS_MAX_TEXTURE_HEIGHT:       *value = caps.MaxTextureHeight;         break;
+		case CAPS_STRETCH_RECT_FILTER:      *value = caps.StretchRectFilterCaps;    break;
+		case CAPS_MAX_PS30_INSN_SLOTS:      *value = caps.MaxPixelShader30InstructionSlots; break;
 	}
 	return result;
 }

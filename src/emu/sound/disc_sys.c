@@ -120,4 +120,3 @@ DISCRETE_RESET( dso_wavlog )
 {
 	this->step();
 }
-

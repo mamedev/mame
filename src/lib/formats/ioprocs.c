@@ -211,6 +211,3 @@ UINT64 io_generic_size(struct io_generic *generic)
 {
 	return generic->procs->filesizeproc(generic->file);
 }
-
-
-

@@ -57,4 +57,3 @@ public:
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */
 #define CHR2_OFST   0x10  /* palette page of char set #2 */
-

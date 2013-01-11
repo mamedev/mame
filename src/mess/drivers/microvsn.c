@@ -21,7 +21,7 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "rendlay.h"
 
 
-#define LOG	0
+#define LOG 0
 
 enum cpu_type
 {
@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tms1100_write_o);
 	DECLARE_WRITE16_MEMBER(tms1100_write_r);
 
-	cpu_type	m_cpu_type;
+	cpu_type    m_cpu_type;
 
 protected:
 	required_device<dac_device> m_dac;
@@ -73,22 +73,22 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// i8021 variables
-	UINT8	m_p0;
-	UINT8	m_p2;
-	UINT8	m_t1;
+	UINT8   m_p0;
+	UINT8   m_p2;
+	UINT8   m_t1;
 
 	// tms1100 variables
-	UINT16	m_r;
-	UINT16	m_o;
+	UINT16  m_r;
+	UINT16  m_o;
 
 	// generic variables
-	void	lcd_write(UINT8 control, UINT8 data);
-	void	speaker_write(UINT8 speaker);
+	void    lcd_write(UINT8 control, UINT8 data);
+	void    speaker_write(UINT8 speaker);
 
-	UINT8	m_lcd_latch[8];
-	UINT8	m_lcd_latch_index;
-	UINT8	m_lcd[16][16];
-	UINT8	m_lcd_control_old;
+	UINT8   m_lcd_latch[8];
+	UINT8   m_lcd_latch_index;
+	UINT8   m_lcd[16][16];
+	UINT8   m_lcd_control_old;
 };
 
 
@@ -265,7 +265,7 @@ void microvision_state::device_timer(emu_timer &timer, device_timer_id id, int p
  -x-- ---- KEY4
  --x- ---- KEY5
  ---x ---- KEY6
- ---- x--- 
+ ---- x---
  ---- -x-- KEY0
  ---- --x- KEY1
  ---- ---x KEY2
@@ -373,7 +373,7 @@ READ8_MEMBER( microvision_state::tms1100_read_k )
 
 	if ( m_r & 0x100 )
 	{
-		data |= ioport("COL0")->read(); 
+		data |= ioport("COL0")->read();
 	}
 	if ( m_r & 0x200 )
 	{
@@ -522,9 +522,9 @@ static const tms0980_config microvision_tms0980_config =
 
 
 static MACHINE_CONFIG_START( microvision, microvision_state )
-	MCFG_CPU_ADD("maincpu1", I8021, 2000000)	// approximately
+	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
 	MCFG_CPU_IO_MAP( microvision_8021_io )
-	MCFG_CPU_ADD("maincpu2", TMS1100, 500000)	// most games seem to be running at approximately this speed
+	MCFG_CPU_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
 	MCFG_CPU_CONFIG( microvision_tms0980_config )
 
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -565,4 +565,3 @@ ROM_END
 
 
 CONS( 1979, microvsn, 0, 0, microvision, microvision, driver_device, 0, "Milton Bradley", "MicroVision", GAME_NOT_WORKING )
-

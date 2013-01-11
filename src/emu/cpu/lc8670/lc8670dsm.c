@@ -10,82 +10,82 @@
 
 const lc8670_cpu_device::dasm_entry lc8670_cpu_device::s_dasm_table[] =
 {
-	{ "NOP" ,   OP_NULL,   OP_NULL, 0 },		// 0x0*
+	{ "NOP" ,   OP_NULL,   OP_NULL, 0 },        // 0x0*
 	{ "BR"  ,   OP_R8  ,   OP_NULL, 0 },
 	{ "LD"  ,   OP_D9  ,   OP_NULL, 0 },
 	{ "LD"  ,   OP_RI  ,   OP_NULL, 0 },
 	{ "CALL",   OP_A12 ,   OP_NULL, 0 },
-	{ "CALLR",  OP_R16 ,   OP_NULL, 0 },		// 0x1*
+	{ "CALLR",  OP_R16 ,   OP_NULL, 0 },        // 0x1*
 	{ "BRF" ,   OP_R16 ,   OP_NULL, 0 },
 	{ "ST"  ,   OP_D9  ,   OP_NULL, 0 },
 	{ "ST"  ,   OP_RI  ,   OP_NULL, 0 },
 	{ "CALL",   OP_A12 ,   OP_NULL, 0 },
-	{ "CALLF",  OP_A16 ,   OP_NULL, 0 },		// 0x2*
+	{ "CALLF",  OP_A16 ,   OP_NULL, 0 },        // 0x2*
 	{ "JMPF",   OP_A16 ,   OP_NULL, 0 },
 	{ "MOV" ,   OP_D9  ,   OP_I8  , 1 },
 	{ "MOV" ,   OP_RI  ,   OP_I8  , 1 },
 	{ "JMP" ,   OP_A12 ,   OP_NULL, 0 },
-	{ "MUL" ,   OP_NULL,   OP_NULL, 0 },		// 0x3*
+	{ "MUL" ,   OP_NULL,   OP_NULL, 0 },        // 0x3*
 	{ "BE"  ,   OP_I8  ,   OP_R8  , 0 },
 	{ "BE"  ,   OP_D9  ,   OP_R8  , 0 },
 	{ "BE"  ,   OP_RII8,   OP_R8  , 0 },
 	{ "JMP" ,   OP_A12 ,   OP_NULL, 0 },
-	{ "DIV" ,   OP_NULL,   OP_NULL, 0 },		// 0x4*
+	{ "DIV" ,   OP_NULL,   OP_NULL, 0 },        // 0x4*
 	{ "BNE" ,   OP_I8  ,   OP_R8  , 0 },
 	{ "BNE" ,   OP_D9  ,   OP_R8  , 0 },
 	{ "BNE" ,   OP_RII8,   OP_R8  , 0 },
 	{ "BPC" ,   OP_D9B3,   OP_R8  , 0 },
-	{ "LDF" ,   OP_NULL,   OP_NULL, 0 },		// 0x5*
+	{ "LDF" ,   OP_NULL,   OP_NULL, 0 },        // 0x5*
 	{ "STF" ,   OP_NULL,   OP_NULL, 0 },
 	{ "DBNZ",   OP_D9  ,   OP_R8  , 0 },
 	{ "DBNZ",   OP_RI  ,   OP_R8RI, 0 },
 	{ "BPC" ,   OP_D9B3,   OP_R8  , 0 },
-	{ "PUSH",   OP_D9  ,   OP_NULL, 0 },		// 0x6*
+	{ "PUSH",   OP_D9  ,   OP_NULL, 0 },        // 0x6*
 	{ "PUSH",   OP_D9  ,   OP_NULL, 0 },
 	{ "INC" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "INC" ,   OP_RI  ,   OP_NULL, 0 },
 	{ "BP"  ,   OP_D9B3,   OP_R8  , 0 },
-	{ "POP" ,   OP_D9  ,   OP_NULL, 0 },		// 0x7*
+	{ "POP" ,   OP_D9  ,   OP_NULL, 0 },        // 0x7*
 	{ "POP" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "DEC" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "DEC" ,   OP_RI  ,   OP_NULL, 0 },
 	{ "BP"  ,   OP_D9B3,   OP_R8  , 0 },
-	{ "BZ"  ,   OP_R8  ,   OP_NULL, 0 },		// 0x8*
+	{ "BZ"  ,   OP_R8  ,   OP_NULL, 0 },        // 0x8*
 	{ "ADD" ,   OP_I8  ,   OP_NULL, 0 },
 	{ "ADD" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "ADD" ,   OP_RI  ,   OP_NULL, 0 },
 	{ "BN"  ,   OP_D9B3,   OP_R8  , 0 },
-	{ "BNZ" ,   OP_R8  ,   OP_NULL, 0 },		// 0x9*
+	{ "BNZ" ,   OP_R8  ,   OP_NULL, 0 },        // 0x9*
 	{ "ADDC",   OP_I8  ,   OP_NULL, 0 },
 	{ "ADDC",   OP_D9  ,   OP_NULL, 0 },
 	{ "ADDC",   OP_RI  ,   OP_NULL, 0 },
 	{ "BN"  ,   OP_D9B3,   OP_R8  , 0 },
-	{ "RET" ,   OP_NULL,   OP_NULL, 0 },		// 0xa*
+	{ "RET" ,   OP_NULL,   OP_NULL, 0 },        // 0xa*
 	{ "SUB" ,   OP_I8  ,   OP_NULL, 0 },
 	{ "SUB" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "SUB" ,   OP_RI  ,   OP_NULL, 0 },
 	{ "NOT1",   OP_D9B3,   OP_NULL, 0 },
-	{ "RETI",   OP_NULL,   OP_NULL, 0 },		// 0xb*
+	{ "RETI",   OP_NULL,   OP_NULL, 0 },        // 0xb*
 	{ "SUBC",   OP_I8  ,   OP_NULL, 0 },
 	{ "SUBC",   OP_D9  ,   OP_NULL, 0 },
 	{ "SUBC",   OP_RI  ,   OP_NULL, 0 },
 	{ "NOT1",   OP_D9B3,   OP_NULL, 0 },
-	{ "ROR" ,   OP_NULL,   OP_NULL, 0 },		// 0xc*
+	{ "ROR" ,   OP_NULL,   OP_NULL, 0 },        // 0xc*
 	{ "LDC" ,   OP_NULL,   OP_NULL, 0 },
 	{ "XCH" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "XCH" ,   OP_RI  ,   OP_NULL, 0 },
 	{ "CLR1",   OP_D9B3,   OP_NULL, 0 },
-	{ "RORC",   OP_NULL,   OP_NULL, 0 },		// 0xd*
+	{ "RORC",   OP_NULL,   OP_NULL, 0 },        // 0xd*
 	{ "OR"  ,   OP_I8  ,   OP_NULL, 0 },
 	{ "OR"  ,   OP_D9  ,   OP_NULL, 0 },
 	{ "OR"  ,   OP_RI  ,   OP_NULL, 0 },
 	{ "CLR1",   OP_D9B3,   OP_NULL, 0 },
-	{ "ROL" ,   OP_NULL,   OP_NULL, 0 },		// 0xe*
+	{ "ROL" ,   OP_NULL,   OP_NULL, 0 },        // 0xe*
 	{ "AND" ,   OP_I8  ,   OP_NULL, 0 },
 	{ "AND" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "AND" ,   OP_RI  ,   OP_NULL, 0 },
 	{ "SET1",   OP_D9B3,   OP_NULL, 0 },
-	{ "ROLC",   OP_NULL,   OP_NULL, 0 },		// 0xf*
+	{ "ROLC",   OP_NULL,   OP_NULL, 0 },        // 0xf*
 	{ "XOR" ,   OP_I8  ,   OP_NULL, 0 },
 	{ "XOR" ,   OP_D9  ,   OP_NULL, 0 },
 	{ "XOR" ,   OP_RI  ,   OP_NULL, 0 },

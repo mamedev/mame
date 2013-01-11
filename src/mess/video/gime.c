@@ -88,13 +88,13 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define	USE_HORIZONTAL_CLIP		false
-#define GIME_TYPE_1987			0
-#define NO_ATTRIBUTE			0x80
+#define USE_HORIZONTAL_CLIP     false
+#define GIME_TYPE_1987          0
+#define NO_ATTRIBUTE            0x80
 
-#define LOG_INT_MASKING			0
-#define LOG_GIME				0
-#define LOG_TIMER				0
+#define LOG_INT_MASKING         0
+#define LOG_GIME                0
+#define LOG_TIMER               0
 
 
 
@@ -107,7 +107,7 @@
 //-------------------------------------------------
 
 gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata)
-	:	mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3)
+	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3)
 {
 }
 
@@ -201,54 +201,54 @@ void gime_base_device::device_start(void)
 ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::get_composite_color(int color)
 {
 	/* CMP colors
-     *
-     * These colors are of the format IICCCC, where II is the intensity and
-     * CCCC is the base color.  There is some weirdness because intensity
-     * is often different for each base color.
-     *
-     * The code below is based on an algorithm specified in the following
-     * CoCo BASIC program was used to approximate composite colors.
-     * (Program by SockMaster):
-     *
-     * 10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
-     * 20 SAT=92:CON=70:BRI=-50:L(0)=0:L(1)=47:L(2)=120:L(3)=255
-     * 30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
-     * 40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
-     * 50 G(P)=(COS(S)*SAT)*1+BRI:B(P)=(COS(D)*SAT)*1+BRI:P=P+1
-     * 55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
-     * 60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
-     * 70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
-     * 80 IFG<0THENG=0
-     * 90 IFB<0THENB=0
-     * 91 IFR>255THENR=255
-     * 92 IFG>255THENG=255
-     * 93 IFB>255THENB=255
-     * 100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
-     * 110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
-     * 115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
-     * 120 NEXT
-     *
-     *  At one point, we used a different SockMaster program, but the colors
-     *  produced were too dark for people's taste
-     *
-     *  10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
-     *  20 SAT=92:CON=53:BRI=-16:L(0)=0:L(1)=47:L(2)=120:L(3)=255
-     *  30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
-     *  40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
-     *  50 G(P)=(COS(S)*SAT)*.50+BRI:B(P)=(COS(D)*SAT)*1.9+BRI:P=P+1
-     *  55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
-     *  60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
-     *  70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
-     *  80 IFG<0THENG=0
-     *  90 IFB<0THENB=0
-     *  91 IFR>255THENR=255
-     *  92 IFG>255THENG=255
-     *  93 IFB>255THENB=255
-     *  100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
-     *  110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
-     *  115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
-     *  120 NEXT
-     */
+	 *
+	 * These colors are of the format IICCCC, where II is the intensity and
+	 * CCCC is the base color.  There is some weirdness because intensity
+	 * is often different for each base color.
+	 *
+	 * The code below is based on an algorithm specified in the following
+	 * CoCo BASIC program was used to approximate composite colors.
+	 * (Program by SockMaster):
+	 *
+	 * 10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
+	 * 20 SAT=92:CON=70:BRI=-50:L(0)=0:L(1)=47:L(2)=120:L(3)=255
+	 * 30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
+	 * 40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
+	 * 50 G(P)=(COS(S)*SAT)*1+BRI:B(P)=(COS(D)*SAT)*1+BRI:P=P+1
+	 * 55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
+	 * 60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
+	 * 70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
+	 * 80 IFG<0THENG=0
+	 * 90 IFB<0THENB=0
+	 * 91 IFR>255THENR=255
+	 * 92 IFG>255THENG=255
+	 * 93 IFB>255THENB=255
+	 * 100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
+	 * 110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
+	 * 115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
+	 * 120 NEXT
+	 *
+	 *  At one point, we used a different SockMaster program, but the colors
+	 *  produced were too dark for people's taste
+	 *
+	 *  10 POKE65497,0:DIMR(63),G(63),B(63):WIDTH80:PALETTE0,0:PALETTE8,54:CLS1
+	 *  20 SAT=92:CON=53:BRI=-16:L(0)=0:L(1)=47:L(2)=120:L(3)=255
+	 *  30 W=.4195456981879*1.01:A=W*9.2:S=A+W*5:D=S+W*5:P=0:FORH=0TO3:P=P+1
+	 *  40 BRI=BRI+CON:FORG=1TO15:R(P)=COS(A)*SAT+BRI
+	 *  50 G(P)=(COS(S)*SAT)*.50+BRI:B(P)=(COS(D)*SAT)*1.9+BRI:P=P+1
+	 *  55 A=A+W:S=S+W:D=D+W:NEXT:R(P-16)=L(H):G(P-16)=L(H):B(P-16)=L(H)
+	 *  60 NEXT:R(63)=R(48):G(63)=G(48):B(63)=B(48)
+	 *  70 FORH=0TO63STEP1:R=INT(R(H)):G=INT(G(H)):B=INT(B(H)):IFR<0THENR=0
+	 *  80 IFG<0THENG=0
+	 *  90 IFB<0THENB=0
+	 *  91 IFR>255THENR=255
+	 *  92 IFG>255THENG=255
+	 *  93 IFB>255THENB=255
+	 *  100 PRINTRIGHT$(STR$(H),2);" $";:R=R+256:G=G+256:B=B+256
+	 *  110 PRINTRIGHT$(HEX$(R),2);",$";RIGHT$(HEX$(G),2);",$";RIGHT$(HEX$(B),2)
+	 *  115 IF(H AND15)=15 THENIFINKEY$=""THEN115ELSEPRINT
+	 *  120 NEXT
+	 */
 
 	double saturation, brightness, contrast;
 	int offset;
@@ -312,9 +312,9 @@ ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::get_composite_colo
 
 ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::get_rgb_color(int color)
 {
-	return	(((color >> 4) & 2) | ((color >> 2) & 1)) * 0x550000
-		|	(((color >> 3) & 2) | ((color >> 1) & 1)) * 0x005500
-		|	(((color >> 2) & 2) | ((color >> 0) & 1)) * 0x000055;
+	return  (((color >> 4) & 2) | ((color >> 2) & 1)) * 0x550000
+		|   (((color >> 3) & 2) | ((color >> 1) & 1)) * 0x005500
+		|   (((color >> 2) & 2) | ((color >> 0) & 1)) * 0x000055;
 }
 
 
@@ -484,9 +484,9 @@ void gime_base_device::reset_timer(void)
 	if (m_timer_value > 0)
 	{
 		if (GIME_TYPE_1987)
-			m_timer_value += 1;	/* the 1987 GIME reset to the value plus one */
+			m_timer_value += 1; /* the 1987 GIME reset to the value plus one */
 		else
-			m_timer_value += 2;	/* the 1986 GIME reset to the value plus two */
+			m_timer_value += 2; /* the 1986 GIME reset to the value plus two */
 	}
 
 	attotime duration;
@@ -679,7 +679,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 	UINT8 result;
 	switch(offset)
 	{
-		case 2:	/* Read pending IRQs */
+		case 2: /* Read pending IRQs */
 			result = m_irq;
 			if (result != 0x00)
 			{
@@ -688,7 +688,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 			}
 			break;
 
-		case 3:	/* Read pending FIRQs */
+		case 3: /* Read pending FIRQs */
 			result = m_firq;
 			if (result != 0x00)
 			{
@@ -697,11 +697,11 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 			}
 			break;
 
-		case 4:	/* Timer MSB/LSB; these arn't readable */
+		case 4: /* Timer MSB/LSB; these arn't readable */
 		case 5:
 			/* JK tells me that these values are indeterminate; and $7E appears
-             * to be the value most commonly returned
-             */
+			 * to be the value most commonly returned
+			 */
 			result = 0x7E;
 			break;
 
@@ -809,28 +809,28 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 	{
 		case 0x00:
 			// $FF90 Initialization register 0
-            //        Bit 7 COCO 1=CoCo compatible mode
-            //        Bit 6 MMUEN 1=MMU enabled
-            //        Bit 5 IEN 1 = GIME chip IRQ enabled
-            //        Bit 4 FEN 1 = GIME chip FIRQ enabled
-            //        Bit 3 MC3 1 = RAM at FEXX is constant
-            //        Bit 2 MC2 1 = standard SCS (Spare Chip Select)
-            //        Bit 1 MC1 ROM map control
-            //        Bit 0 MC0 ROM map control
+			//        Bit 7 COCO 1=CoCo compatible mode
+			//        Bit 6 MMUEN 1=MMU enabled
+			//        Bit 5 IEN 1 = GIME chip IRQ enabled
+			//        Bit 4 FEN 1 = GIME chip FIRQ enabled
+			//        Bit 3 MC3 1 = RAM at FEXX is constant
+			//        Bit 2 MC2 1 = standard SCS (Spare Chip Select)
+			//        Bit 1 MC1 ROM map control
+			//        Bit 0 MC0 ROM map control
 			if (xorval & 0x4B)
 				update_memory();
-            break;
+			break;
 
 		case 0x01:
 			//  $FF91 Initialization register 1
-            //        Bit 7 Unused
-            //        Bit 6 Unused
-            //        Bit 5 TINS Timer input select; 1 = 280 nsec, 0 = 63.5 usec
-            //        Bit 4 Unused
-            //        Bit 3 Unused
-            //        Bit 2 Unused
-            //        Bit 1 Unused
-            //        Bit 0 TR Task register select
+			//        Bit 7 Unused
+			//        Bit 6 Unused
+			//        Bit 5 TINS Timer input select; 1 = 280 nsec, 0 = 63.5 usec
+			//        Bit 4 Unused
+			//        Bit 3 Unused
+			//        Bit 2 Unused
+			//        Bit 1 Unused
+			//        Bit 0 TR Task register select
 			if (xorval & 0x01)
 				update_memory();
 
@@ -838,18 +838,18 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 			// with the _original_ value.  This is probably not correct.
 			if (xorval & 0x20)
 				reset_timer();
-            break;
+			break;
 
 		case 0x02:
 			//  $FF92 Interrupt request enable register
-            //        Bit 7 Unused
-            //        Bit 6 Unused
-            //        Bit 5 TMR Timer interrupt
-            //        Bit 4 HBORD Horizontal border interrupt
-            //        Bit 3 VBORD Vertical border interrupt
-            //      ! Bit 2 EI2 Serial data interrupt
-            //        Bit 1 EI1 Keyboard interrupt
-            //        Bit 0 EI0 Cartridge interrupt
+			//        Bit 7 Unused
+			//        Bit 6 Unused
+			//        Bit 5 TMR Timer interrupt
+			//        Bit 4 HBORD Horizontal border interrupt
+			//        Bit 3 VBORD Vertical border interrupt
+			//      ! Bit 2 EI2 Serial data interrupt
+			//        Bit 1 EI1 Keyboard interrupt
+			//        Bit 0 EI0 Cartridge interrupt
 			if (LOG_INT_MASKING)
 			{
 				logerror("%s: GIME IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
@@ -861,18 +861,18 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
-            break;
+			break;
 
 		case 0x03:
 			//  $FF93 Fast interrupt request enable register
-            //        Bit 7 Unused
-            //        Bit 6 Unused
-            //        Bit 5 TMR Timer interrupt
-            //        Bit 4 HBORD Horizontal border interrupt
-            //        Bit 3 VBORD Vertical border interrupt
-            //      ! Bit 2 EI2 Serial data interrupt
-            //        Bit 1 EI1 Keyboard interrupt
-            //        Bit 0 EI0 Cartridge interrupt
+			//        Bit 7 Unused
+			//        Bit 6 Unused
+			//        Bit 5 TMR Timer interrupt
+			//        Bit 4 HBORD Horizontal border interrupt
+			//        Bit 3 VBORD Vertical border interrupt
+			//      ! Bit 2 EI2 Serial data interrupt
+			//        Bit 1 EI1 Keyboard interrupt
+			//        Bit 0 EI0 Cartridge interrupt
 			if (LOG_INT_MASKING)
 			{
 				logerror("%s: GIME FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
@@ -884,12 +884,12 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
-            break;
+			break;
 
 		case 0x04:
 			//  $FF94 Timer register MSB
-            //        Bits 4-7 Unused
-            //        Bits 0-3 High order four bits of the timer
+			//        Bits 4-7 Unused
+			//        Bits 0-3 High order four bits of the timer
 			reset_timer();
 			break;
 
@@ -914,42 +914,42 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 
 		case 0x08:
 			//  $FF98 Video Mode Register
-            //        Bit 7 BP 0 = Text modes, 1 = Graphics modes
-            //        Bit 6 Unused
-            //      ! Bit 5 BPI Burst Phase Invert (Color Set)
-            //        Bit 4 MOCH 1 = Monochrome on Composite
-            //      ! Bit 3 H50 1 = 50 Hz power, 0 = 60 Hz power
-            //        Bits 0-2 LPR Lines per row
+			//        Bit 7 BP 0 = Text modes, 1 = Graphics modes
+			//        Bit 6 Unused
+			//      ! Bit 5 BPI Burst Phase Invert (Color Set)
+			//        Bit 4 MOCH 1 = Monochrome on Composite
+			//      ! Bit 3 H50 1 = 50 Hz power, 0 = 60 Hz power
+			//        Bits 0-2 LPR Lines per row
 			break;
 
 		case 0x09:
 			//  $FF99 Video Resolution Register
-            //        Bit 7 Undefined
-            //        Bits 5-6 LPF Lines per Field (Number of Rows)
-            //        Bits 2-4 HRES Horizontal Resolution
-            //                     000=16 bytes per row
-            //                     001=20 bytes per row
-            //                     010=32 bytes per row
-            //                     011=40 bytes per row
-            //                     100=64 bytes per row
-            //                     101=80 bytes per row
-            //                     110=128 bytes per row
-            //                     111=160 bytes per row
-            //        Bits 0-1 CRES Color Resolution
+			//        Bit 7 Undefined
+			//        Bits 5-6 LPF Lines per Field (Number of Rows)
+			//        Bits 2-4 HRES Horizontal Resolution
+			//                     000=16 bytes per row
+			//                     001=20 bytes per row
+			//                     010=32 bytes per row
+			//                     011=40 bytes per row
+			//                     100=64 bytes per row
+			//                     101=80 bytes per row
+			//                     110=128 bytes per row
+			//                     111=160 bytes per row
+			//        Bits 0-1 CRES Color Resolution
 			if (xorval & 0x60)
 				update_geometry();
 			break;
 
 		case 0x0A:
 			//  $FF9A Border Register
-            //        Bits 6,7 Unused
-            //        Bits 0-5 BRDR Border color
+			//        Bits 6,7 Unused
+			//        Bits 0-5 BRDR Border color
 			break;
 
 		case 0x0C:
 			//  $FF9C Vertical Scroll Register
-            //        Bits 4-7 Reserved
-            //        Bits 0-3 VSC Vertical Scroll bits
+			//        Bits 4-7 Reserved
+			//        Bits 0-3 VSC Vertical Scroll bits
 			break;
 
 		case 0x0B:
@@ -960,24 +960,24 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 			// alone won't affect the MMU; writes to $FFAx are required to "latch"
 			// in the $FF9B value.
 			//
-            // The reason that $FF9B is not mentioned in offical documentation
-            // is because it is only meaningful in CoCo 3's with the 2MB upgrade
+			// The reason that $FF9B is not mentioned in offical documentation
+			// is because it is only meaningful in CoCo 3's with the 2MB upgrade
 			break;
 
 		case 0x0D:
 		case 0x0E:
 			//  $FF9B,$FF9D,$FF9E Vertical Offset Registers
 			//
-            //  According to JK, if an odd value is placed in $FF9E on the 1986
-            //  GIME, the GIME crashes
-            break;
+			//  According to JK, if an odd value is placed in $FF9E on the 1986
+			//  GIME, the GIME crashes
+			break;
 
 		case 0x0F:
-            //  $FF9F Horizontal Offset Register
-            //       Bit 7 HVEN Horizontal Virtual Enable
-            //       Bits 0-6 X0-X6 Horizontal Offset Address
+			//  $FF9F Horizontal Offset Register
+			//       Bit 7 HVEN Horizontal Virtual Enable
+			//       Bits 0-6 X0-X6 Horizontal Offset Address
 			//
-            //  Unline $FF9D-E, this value can be modified mid frame
+			//  Unline $FF9D-E, this value can be modified mid frame
 			//
 			//  Note that the FF9F offset is shifted by one bit (e.g. - $FF9F=$03 will
 			//  be a six byte offset).  Also note that scanlines wrap at 256 byte boundaries
@@ -1141,9 +1141,9 @@ ATTR_FORCE_INLINE offs_t gime_base_device::get_video_base(void)
 		ff9e_mask = 0xFF;
 	}
 
-	result += ((offs_t) (m_gime_registers[0x0E] & ff9e_mask)	* 0x00008)
-			| ((offs_t) (m_gime_registers[0x0D] & ff9d_mask)	* 0x00800)
-			| ((offs_t) (m_gime_registers[0x0B] & 0x0F)			* 0x80000);
+	result += ((offs_t) (m_gime_registers[0x0E] & ff9e_mask)    * 0x00008)
+			| ((offs_t) (m_gime_registers[0x0D] & ff9d_mask)    * 0x00800)
+			| ((offs_t) (m_gime_registers[0x0B] & 0x0F)         * 0x80000);
 	return result;
 }
 
@@ -1216,16 +1216,16 @@ void gime_base_device::update_border(UINT16 physical_scanline)
 		switch(border_value(m_ff22_value, true))
 		{
 			case BORDER_COLOR_GREEN:
-				border = 0x12;		/* green */
+				border = 0x12;      /* green */
 				break;
 			case BORDER_COLOR_WHITE:
-				border = 0x3F;		/* white */
+				border = 0x3F;      /* white */
 				break;
 			case BORDER_COLOR_BLACK:
-				border = 0x00;		/* black */
+				border = 0x00;      /* black */
 				break;
 			case BORDER_COLOR_ORANGE:
-				border = 0x26;		/* orange */
+				border = 0x26;      /* orange */
 				break;
 			default:
 				fatalerror("Should not get here\n");
@@ -1490,14 +1490,14 @@ void gime_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 log
 			/* graphics */
 			switch(m_gime_registers[0x09] & 0x1C)
 			{
-				case 0x00:	pitch = record_scanline_res< 16, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
-				case 0x04:	pitch = record_scanline_res< 20, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
-				case 0x08:	pitch = record_scanline_res< 32, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
-				case 0x0C:	pitch = record_scanline_res< 40, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
-				case 0x10:	pitch = record_scanline_res< 64, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
-				case 0x14:	pitch = record_scanline_res< 80, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
-				case 0x18:	pitch = record_scanline_res<128, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
-				case 0x1C:	pitch = record_scanline_res<160, &gime_base_device::get_data_without_attributes, false>(physical_scanline);	break;
+				case 0x00:  pitch = record_scanline_res< 16, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x04:  pitch = record_scanline_res< 20, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x08:  pitch = record_scanline_res< 32, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x0C:  pitch = record_scanline_res< 40, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x10:  pitch = record_scanline_res< 64, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x14:  pitch = record_scanline_res< 80, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x18:  pitch = record_scanline_res<128, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x1C:  pitch = record_scanline_res<160, &gime_base_device::get_data_without_attributes, false>(physical_scanline); break;
 				default:
 					fatalerror("Should not get here\n");
 					return;
@@ -1508,14 +1508,14 @@ void gime_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 log
 			/* text */
 			switch(m_gime_registers[0x09] & 0x15)
 			{
-				case 0x00:	pitch = record_scanline_res< 32, &gime_base_device::get_data_without_attributes, true>(physical_scanline);	break;
-				case 0x01:	pitch = record_scanline_res< 32, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);	break;
-				case 0x04:	pitch = record_scanline_res< 40, &gime_base_device::get_data_without_attributes, true>(physical_scanline);	break;
-				case 0x05:	pitch = record_scanline_res< 40, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);	break;
-				case 0x10:	pitch = record_scanline_res< 64, &gime_base_device::get_data_without_attributes, true>(physical_scanline);	break;
-				case 0x11:	pitch = record_scanline_res< 64, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);	break;
-				case 0x14:	pitch = record_scanline_res< 80, &gime_base_device::get_data_without_attributes, true>(physical_scanline);	break;
-				case 0x15:	pitch = record_scanline_res< 80, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);	break;
+				case 0x00:  pitch = record_scanline_res< 32, &gime_base_device::get_data_without_attributes, true>(physical_scanline);  break;
+				case 0x01:  pitch = record_scanline_res< 32, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);  break;
+				case 0x04:  pitch = record_scanline_res< 40, &gime_base_device::get_data_without_attributes, true>(physical_scanline);  break;
+				case 0x05:  pitch = record_scanline_res< 40, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);  break;
+				case 0x10:  pitch = record_scanline_res< 64, &gime_base_device::get_data_without_attributes, true>(physical_scanline);  break;
+				case 0x11:  pitch = record_scanline_res< 64, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);  break;
+				case 0x14:  pitch = record_scanline_res< 80, &gime_base_device::get_data_without_attributes, true>(physical_scanline);  break;
+				case 0x15:  pitch = record_scanline_res< 80, &gime_base_device::get_data_with_attributes,    true>(physical_scanline);  break;
 				default:
 					fatalerror("Should not get here\n");
 					return;
@@ -1662,15 +1662,15 @@ ATTR_FORCE_INLINE UINT32 gime_base_device::emit_gime_text_samples(const scanline
 	if ((attribute != NO_ATTRIBUTE) && (attribute & 0x40))
 	{
 		/* to quote SockMaster:
-        *
-        * The underline attribute will light up the bottom scan line of the character
-        * if the lines are set to 8 or 9.  Not appear at all when less, or appear on
-        * the 2nd to bottom scan line if set higher than 9.  Further exception being
-        * the $x7 setting where the whole screen is filled with only one line of data
-        * - but it's glitched - the line repeats over and over again every 16 scan
-        * lines..  Nobody will use this mode, but that's what happens if you want to
-        * make things really authentic :)
-        */
+		*
+		* The underline attribute will light up the bottom scan line of the character
+		* if the lines are set to 8 or 9.  Not appear at all when less, or appear on
+		* the 2nd to bottom scan line if set higher than 9.  Further exception being
+		* the $x7 setting where the whole screen is filled with only one line of data
+		* - but it's glitched - the line repeats over and over again every 16 scan
+		* lines..  Nobody will use this mode, but that's what happens if you want to
+		* make things really authentic :)
+		*/
 		switch(scanline->m_ff98_value & 0x07)
 		{
 			case 0x03:
@@ -1823,38 +1823,38 @@ bool gime_base_device::update_screen(bitmap_rgb32 &bitmap, const rectangle &clip
 			/* GIME graphics */
 			switch(scanline->m_ff99_value & 0x1F)
 			{
-				case 0x00:	render_scanline< 16, &gime_base_device::emit_gime_graphics_samples< 4, 1> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x01:	render_scanline< 16, &gime_base_device::emit_gime_graphics_samples< 8, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x00:  render_scanline< 16, &gime_base_device::emit_gime_graphics_samples< 4, 1> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x01:  render_scanline< 16, &gime_base_device::emit_gime_graphics_samples< 8, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x02:
-				case 0x03:	render_scanline< 16, &gime_base_device::emit_gime_graphics_samples<16, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x04:	render_scanline< 20, &gime_base_device::emit_gime_graphics_samples< 4, 1> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x05:	render_scanline< 20, &gime_base_device::emit_gime_graphics_samples< 8, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x03:  render_scanline< 16, &gime_base_device::emit_gime_graphics_samples<16, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x04:  render_scanline< 20, &gime_base_device::emit_gime_graphics_samples< 4, 1> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x05:  render_scanline< 20, &gime_base_device::emit_gime_graphics_samples< 8, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x06:
-				case 0x07:	render_scanline< 20, &gime_base_device::emit_gime_graphics_samples<16, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x08:	render_scanline< 32, &gime_base_device::emit_gime_graphics_samples< 2, 1> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x09:	render_scanline< 32, &gime_base_device::emit_gime_graphics_samples< 4, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x07:  render_scanline< 20, &gime_base_device::emit_gime_graphics_samples<16, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x08:  render_scanline< 32, &gime_base_device::emit_gime_graphics_samples< 2, 1> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x09:  render_scanline< 32, &gime_base_device::emit_gime_graphics_samples< 4, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x0A:
-				case 0x0B:	render_scanline< 32, &gime_base_device::emit_gime_graphics_samples< 8, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x0C:	render_scanline< 40, &gime_base_device::emit_gime_graphics_samples< 2, 1> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x0D:	render_scanline< 40, &gime_base_device::emit_gime_graphics_samples< 4, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x0B:  render_scanline< 32, &gime_base_device::emit_gime_graphics_samples< 8, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x0C:  render_scanline< 40, &gime_base_device::emit_gime_graphics_samples< 2, 1> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x0D:  render_scanline< 40, &gime_base_device::emit_gime_graphics_samples< 4, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x0E:
-				case 0x0F:	render_scanline< 40, &gime_base_device::emit_gime_graphics_samples< 8, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x10:	render_scanline< 64, &gime_base_device::emit_gime_graphics_samples< 1, 1> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x11:	render_scanline< 64, &gime_base_device::emit_gime_graphics_samples< 2, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x0F:  render_scanline< 40, &gime_base_device::emit_gime_graphics_samples< 8, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x10:  render_scanline< 64, &gime_base_device::emit_gime_graphics_samples< 1, 1> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x11:  render_scanline< 64, &gime_base_device::emit_gime_graphics_samples< 2, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x12:
-				case 0x13:	render_scanline< 64, &gime_base_device::emit_gime_graphics_samples< 4, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x14:	render_scanline< 80, &gime_base_device::emit_gime_graphics_samples< 1, 1> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x15:	render_scanline< 80, &gime_base_device::emit_gime_graphics_samples< 2, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x13:  render_scanline< 64, &gime_base_device::emit_gime_graphics_samples< 4, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x14:  render_scanline< 80, &gime_base_device::emit_gime_graphics_samples< 1, 1> >(scanline, pixels, min_x, max_x, &resolver); break;
+				case 0x15:  render_scanline< 80, &gime_base_device::emit_gime_graphics_samples< 2, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x16:
-				case 0x17:	render_scanline< 80, &gime_base_device::emit_gime_graphics_samples< 4, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x17:  render_scanline< 80, &gime_base_device::emit_gime_graphics_samples< 4, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x18:
-				case 0x19:	render_scanline<128, &gime_base_device::emit_gime_graphics_samples< 1, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x19:  render_scanline<128, &gime_base_device::emit_gime_graphics_samples< 1, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x1A:
-				case 0x1B:	render_scanline<128, &gime_base_device::emit_gime_graphics_samples< 2, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x1B:  render_scanline<128, &gime_base_device::emit_gime_graphics_samples< 2, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x1C:
-				case 0x1D:	render_scanline<160, &gime_base_device::emit_gime_graphics_samples< 1, 2> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x1D:  render_scanline<160, &gime_base_device::emit_gime_graphics_samples< 1, 2> >(scanline, pixels, min_x, max_x, &resolver); break;
 				case 0x1E:
-				case 0x1F:	render_scanline<160, &gime_base_device::emit_gime_graphics_samples< 2, 4> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x1F:  render_scanline<160, &gime_base_device::emit_gime_graphics_samples< 2, 4> >(scanline, pixels, min_x, max_x, &resolver); break;
 			}
 		}
 		else
@@ -1862,10 +1862,10 @@ bool gime_base_device::update_screen(bitmap_rgb32 &bitmap, const rectangle &clip
 			/* GIME text */
 			switch(scanline->m_ff99_value & 0x14)
 			{
-				case 0x00:	render_scanline<32, &gime_base_device::emit_gime_text_samples<2> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x04:	render_scanline<40, &gime_base_device::emit_gime_text_samples<2> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x10:	render_scanline<64, &gime_base_device::emit_gime_text_samples<1> >(scanline, pixels, min_x, max_x, &resolver);	break;
-				case 0x14:	render_scanline<80, &gime_base_device::emit_gime_text_samples<1> >(scanline, pixels, min_x, max_x, &resolver);	break;
+				case 0x00:  render_scanline<32, &gime_base_device::emit_gime_text_samples<2> >(scanline, pixels, min_x, max_x, &resolver);  break;
+				case 0x04:  render_scanline<40, &gime_base_device::emit_gime_text_samples<2> >(scanline, pixels, min_x, max_x, &resolver);  break;
+				case 0x10:  render_scanline<64, &gime_base_device::emit_gime_text_samples<1> >(scanline, pixels, min_x, max_x, &resolver);  break;
+				case 0x14:  render_scanline<80, &gime_base_device::emit_gime_text_samples<1> >(scanline, pixels, min_x, max_x, &resolver);  break;
 			}
 		}
 	}

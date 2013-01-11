@@ -96,76 +96,76 @@ WRITE8_MEMBER(taxidriv_state::p8910_0b_w)
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0a_r),				/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0b_w),				/* Port B write */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_r),				/* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_w)				/* Port C write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0a_r),              /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0b_w),              /* Port B write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_r),              /* Port C read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p0c_w)               /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1a_w),				/* Port A write */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1b_r),				/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_r),				/* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_w)				/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1a_w),              /* Port A write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1b_r),              /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_r),              /* Port C read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p1c_w)               /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_2_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p2a_w),				/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p2b_w),				/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p2c_w)				/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p2a_w),              /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p2b_w),              /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p2c_w)               /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_3_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p3a_w),				/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p3b_w),				/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p3c_w)				/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p3a_w),              /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p3b_w),              /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p3c_w)               /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_4_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p4a_w),				/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p4b_w),				/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(taxidriv_state,p4c_w)				/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p4a_w),              /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p4b_w),              /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(taxidriv_state,p4c_w)               /* Port C write */
 };
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM	/* ??? */
-	AM_RANGE(0x9000, 0x9fff) AM_RAM	/* ??? */
-	AM_RANGE(0xa000, 0xafff) AM_RAM	/* ??? */
-	AM_RANGE(0xb000, 0xbfff) AM_RAM	/* ??? */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("vram4")			/* radar bitmap */
-	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_SHARE("vram5")	/* "sprite1" bitmap */
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_SHARE("vram6")	/* "sprite2" bitmap */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("vram7")			/* "sprite3" bitmap */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM /* ??? */
+	AM_RANGE(0x9000, 0x9fff) AM_RAM /* ??? */
+	AM_RANGE(0xa000, 0xafff) AM_RAM /* ??? */
+	AM_RANGE(0xb000, 0xbfff) AM_RAM /* ??? */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("vram4")           /* radar bitmap */
+	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_SHARE("vram5") /* "sprite1" bitmap */
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_SHARE("vram6") /* "sprite2" bitmap */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("vram7")           /* "sprite3" bitmap */
 	AM_RANGE(0xe000, 0xf3ff) AM_READONLY
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_SHARE("vram1")	/* car tilemap */
-	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_SHARE("vram2")	/* bg1 tilemap */
-	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_SHARE("vram0")	/* fg tilemap */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("vram3")	/* bg2 tilemap */
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_SHARE("vram1") /* car tilemap */
+	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_SHARE("vram2") /* bg1 tilemap */
+	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_SHARE("vram0") /* fg tilemap */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("vram3") /* bg2 tilemap */
 	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* "sprite1" placement */
-	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)	/* "sprite2" placement */
-	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE("ppi8255_4", i8255_device, read, write)	/* "sprite3" placement */
+	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* "sprite1" placement */
+	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)    /* "sprite2" placement */
+	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE("ppi8255_4", i8255_device, read, write)    /* "sprite3" placement */
 	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
-	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_SHARE("scroll")	/* bg scroll (three copies always identical) */
+	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_SHARE("scroll")    /* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* irq ack? */
+	AM_RANGE(0x2000, 0x2000) AM_READNOP /* irq ack? */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -304,7 +304,7 @@ static INPUT_PORTS_START( taxidriv )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 
 	PORT_START("SERVCOIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* handled by p1c_r() */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   /* handled by p1c_r() */
 INPUT_PORTS_END
 
 
@@ -366,7 +366,7 @@ void taxidriv_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int bit0, bit1, r, g, b;
-	int	i;
+	int i;
 
 	/* TODO: resistors, 1k & 470*/
 
@@ -390,20 +390,20 @@ void taxidriv_state::palette_init()
 static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("maincpu", Z80,4000000)    /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("sub", Z80,4000000)    /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)	/* ??? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 	MCFG_CPU_IO_MAP(cpu3_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)	/* ??? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taxidriv_state,  irq0_line_hold)   /* ??? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
@@ -472,7 +472,7 @@ ROM_START( taxidriv )
 	ROM_REGION( 0x2000, "gfx4", 0 )
 	ROM_LOAD( "10.40.ic99",   0x0000, 0x2000, CRC(c370b177) SHA1(4b3f73f764ff95cc7777fe01333558201658cead) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* not used?? */
+	ROM_REGION( 0x4000, "gfx5", 0 ) /* not used?? */
 	ROM_LOAD( "12.21.ic88",   0x0000, 0x2000, CRC(684b7bb0) SHA1(d83c45ff3adf94c649340227794020482231399f) )
 	ROM_LOAD( "13.20.ic89",   0x2000, 0x2000, CRC(d1ef110e) SHA1(e34b6b4b70c783a8cf1296a05d3cec6af5820d0c) )
 

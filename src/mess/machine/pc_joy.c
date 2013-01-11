@@ -55,22 +55,22 @@ WRITE8_HANDLER ( pc_JOY_w )
 
 INPUT_PORTS_START( pc_joystick_none )
 	PORT_START("pc_joy")
-    PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
+	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 	PORT_START("pc_joy_1")
-    PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
+	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 	PORT_START("pc_joy_2")
-    PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
+	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 	PORT_START("pc_joy_3")
-    PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
+	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 	PORT_START("pc_joy_4")
-    PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
+	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 
 INPUT_PORTS_START( pc_joystick )
 	PORT_START("pc_joy")
-	PORT_BIT ( 0xf, 0xf,	 IPT_UNUSED )
+	PORT_BIT ( 0xf, 0xf,     IPT_UNUSED )
 	PORT_BIT( 0x0010, 0x0000, IPT_BUTTON1) PORT_NAME("Joystick 1 Button 1")
 	PORT_BIT( 0x0020, 0x0000, IPT_BUTTON2) PORT_NAME("Joystick 1 Button 2")
 	PORT_BIT( 0x0040, 0x0000, IPT_BUTTON1) PORT_NAME("Joystick 2 Button 1") PORT_CODE(JOYCODE_BUTTON1) PORT_PLAYER(2)

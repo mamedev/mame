@@ -105,13 +105,13 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( battlex )
-	PORT_START("DSW1")		/* IN0 */
+	PORT_START("DSW1")      /* IN0 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )	// Not on 1st stage
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )   // Not on 1st stage
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
@@ -126,7 +126,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SYSTEM")	/* IN1 */
+	PORT_START("SYSTEM")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(4)
@@ -136,7 +136,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("INPUTS")	/* IN2 */
+	PORT_START("INPUTS")    /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("DSW2")		/* IN3 */
+	PORT_START("DSW2")      /* IN3 */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPSETTING(    0x20, "10000" )
 	PORT_DIPSETTING(    0x40, "15000" )
 	PORT_DIPSETTING(    0x60, "20000" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )		// See notes
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )        // See notes
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -246,10 +246,10 @@ void battlex_state::machine_reset()
 static MACHINE_CONFIG_START( battlex, battlex_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_10MHz/4 )		// ?
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_10MHz/4 )      // ?
 	MCFG_CPU_PROGRAM_MAP(battlex_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(battlex_state, battlex_interrupt, 400)	/* controls game speed? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(battlex_state, battlex_interrupt, 400) /* controls game speed? */
 
 
 	/* video hardware */
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/8)	// ?
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/8)   // ?
 	MCFG_SOUND_CONFIG(battlex_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
@@ -291,12 +291,12 @@ ROM_START( battlex )
 	ROM_LOAD( "1a_h.6h",     0x1000, 0x1000, CRC(9f4c3bdd) SHA1(e921ecafefe54c033d05d9cd289808e971ac7940) )
 	ROM_LOAD( "1a_j.6j",     0x2000, 0x1000, CRC(c1345b05) SHA1(17194c8ec961990222bd295ff1d036a64f497b0e) )
 
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_ERASE00 )	// filled in later
+	ROM_REGION( 0x3000, "gfx1", ROMREGION_ERASE00 ) // filled in later
 
-	ROM_REGION( 0x1000, "user2", 0 )				// gfx1 1bpp gfxdata
+	ROM_REGION( 0x1000, "user2", 0 )                // gfx1 1bpp gfxdata
 	ROM_LOAD( "1a_e.6e",     0x0000, 0x1000, CRC(126842b7) SHA1(2da4f64e077232c1dd0853d07d801f9781517850) )
 
-	ROM_REGION( 0x1000, "user1", 0 )				// gfx1 colormask, bad?
+	ROM_REGION( 0x1000, "user1", 0 )                // gfx1 colormask, bad?
 	ROM_LOAD( "1a_d.6d",     0x0000, 0x1000, CRC(750a46ef) SHA1(b6ab93e084ab0b7c6ad90ee6431bc1b7ab9ed46d) )
 ROM_END
 

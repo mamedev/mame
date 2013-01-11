@@ -49,4 +49,4 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 void x86log_printf(x86log_context *log, const char *format, ...) ATTR_PRINTF(2, 3);
 
 
-#endif	/* __X86LOG_H__ */
+#endif  /* __X86LOG_H__ */

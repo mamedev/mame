@@ -30,95 +30,95 @@ TODO:
  *
  *************************************/
 
-#define XTAL					18432000
+#define XTAL                    18432000
 
-#define SOUND_CLOCK 			(XTAL/6/2)			/* 1.536 MHz */
-#define RNG_RATE				(XTAL/3*2)			/* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
+#define SOUND_CLOCK             (XTAL/6/2)          /* 1.536 MHz */
+#define RNG_RATE                (XTAL/3*2)          /* RNG clock is XTAL/3*2 see Aaron's note in video/galaxian.c */
 
 /* 74LS259 */
-#define GAL_INP_BG_DAC			NODE_10		/* at 9M Q4 to Q7 in schematics */
+#define GAL_INP_BG_DAC          NODE_10     /* at 9M Q4 to Q7 in schematics */
 
-#define GAL_INP_FS1				NODE_20		/* FS1 9L Q0 */
-#define GAL_INP_FS2				NODE_21		/* FS2 9L Q1 */
-#define GAL_INP_FS3				NODE_22		/* FS3 9L Q2 */
-#define GAL_INP_HIT				NODE_23		/* HIT 9L Q3 */
+#define GAL_INP_FS1             NODE_20     /* FS1 9L Q0 */
+#define GAL_INP_FS2             NODE_21     /* FS2 9L Q1 */
+#define GAL_INP_FS3             NODE_22     /* FS3 9L Q2 */
+#define GAL_INP_HIT             NODE_23     /* HIT 9L Q3 */
 //#define GAL_9L_Q4             NODE_24
-#define GAL_INP_FIRE			NODE_25		/* FIRE 9L Q5 */
-#define GAL_INP_VOL1			NODE_26		/* VOL1 9L Q6 */
-#define GAL_INP_VOL2			NODE_27		/* VOL2 9L Q7 */
+#define GAL_INP_FIRE            NODE_25     /* FIRE 9L Q5 */
+#define GAL_INP_VOL1            NODE_26     /* VOL1 9L Q6 */
+#define GAL_INP_VOL2            NODE_27     /* VOL2 9L Q7 */
 
-#define GAL_INP_PITCH			NODE_28		/* at 6T in schematics */
+#define GAL_INP_PITCH           NODE_28     /* at 6T in schematics */
 
-#define TTL_OUT					(4.0)
+#define TTL_OUT                 (4.0)
 
-#define GAL_R15					RES_K(100)
-#define GAL_R16					RES_K(220)
-#define GAL_R17					RES_K(470)
-#define GAL_R18					RES_K(1000)
-#define GAL_R19					RES_K(330)
+#define GAL_R15                 RES_K(100)
+#define GAL_R16                 RES_K(220)
+#define GAL_R17                 RES_K(470)
+#define GAL_R18                 RES_K(1000)
+#define GAL_R19                 RES_K(330)
 
-#define GAL_R20					RES_K(15)
-#define GAL_R21					RES_K(100)
-#define GAL_R22					RES_K(100)
-#define GAL_R23					RES_K(470)
-#define GAL_R24					RES_K(10)
-#define GAL_R25					RES_K(100)
-#define GAL_R26					RES_K(330)
-#define GAL_R27					RES_K(10)
-#define GAL_R28					RES_K(100)
-#define GAL_R29					RES_K(220)
+#define GAL_R20                 RES_K(15)
+#define GAL_R21                 RES_K(100)
+#define GAL_R22                 RES_K(100)
+#define GAL_R23                 RES_K(470)
+#define GAL_R24                 RES_K(10)
+#define GAL_R25                 RES_K(100)
+#define GAL_R26                 RES_K(330)
+#define GAL_R27                 RES_K(10)
+#define GAL_R28                 RES_K(100)
+#define GAL_R29                 RES_K(220)
 
-#define GAL_R30					RES_K(10)
-#define GAL_R31					RES_K(47)
-#define GAL_R32					RES_K(47)
-#define GAL_R33					RES_K(10)
+#define GAL_R30                 RES_K(10)
+#define GAL_R31                 RES_K(47)
+#define GAL_R32                 RES_K(47)
+#define GAL_R33                 RES_K(10)
 /*
  * R34 is given twice on galaxian board and both times as 5.1k. On moon cresta
  * it is only listed once and given as 15k. This is more in line with recordings
  */
-#define GAL_R34					RES_K(5.1)
-#define MCRST_R34					RES_K(15)
+#define GAL_R34                 RES_K(5.1)
+#define MCRST_R34                   RES_K(15)
 
-#define GAL_R35					RES_K(150)
-#define GAL_R36					RES_K(22)
-#define GAL_R37					RES_K(470)
-#define GAL_R38					RES_K(33)
-#define GAL_R39					RES_K(22)
+#define GAL_R35                 RES_K(150)
+#define GAL_R36                 RES_K(22)
+#define GAL_R37                 RES_K(470)
+#define GAL_R38                 RES_K(33)
+#define GAL_R39                 RES_K(22)
 
 /* The hit sound is too low compared with recordings
  * There may be an issue with the op-amp band filter
  */
-#define GAL_R40					(RES_K(2.2)*0.6)	/* Volume adjust */
-#define GAL_R41					RES_K(100)
-#define GAL_R43					RES_K(2.2)
-#define GAL_R44					RES_K(10)
-#define GAL_R45					RES_K(22)
-#define GAL_R46					RES_K(10)
-#define GAL_R47					RES_K(2.2)
-#define GAL_R48					RES_K(2.2)
-#define GAL_R49					RES_K(10)
+#define GAL_R40                 (RES_K(2.2)*0.6)    /* Volume adjust */
+#define GAL_R41                 RES_K(100)
+#define GAL_R43                 RES_K(2.2)
+#define GAL_R44                 RES_K(10)
+#define GAL_R45                 RES_K(22)
+#define GAL_R46                 RES_K(10)
+#define GAL_R47                 RES_K(2.2)
+#define GAL_R48                 RES_K(2.2)
+#define GAL_R49                 RES_K(10)
 
-#define GAL_R50					RES_K(22)
-#define GAL_R51					RES_K(33)
-#define GAL_R52					RES_K(15)
+#define GAL_R50                 RES_K(22)
+#define GAL_R51                 RES_K(33)
+#define GAL_R52                 RES_K(15)
 
-#define GAL_R91					RES_K(10)
+#define GAL_R91                 RES_K(10)
 
-#define GAL_C15					CAP_U(1)
-#define GAL_C17					CAP_U(0.01)
-#define GAL_C18					CAP_U(0.01)
-#define GAL_C19					CAP_U(0.01)
+#define GAL_C15                 CAP_U(1)
+#define GAL_C17                 CAP_U(0.01)
+#define GAL_C18                 CAP_U(0.01)
+#define GAL_C19                 CAP_U(0.01)
 
-#define GAL_C20					CAP_U(0.1)
-#define GAL_C21					CAP_U(2.2)
-#define GAL_C22					CAP_U(0.01)
-#define GAL_C23					CAP_U(0.01)
-#define GAL_C25					CAP_U(1)
-#define GAL_C26					CAP_U(0.01)
-#define GAL_C27					CAP_U(0.01)
-#define GAL_C28					CAP_U(47)
+#define GAL_C20                 CAP_U(0.1)
+#define GAL_C21                 CAP_U(2.2)
+#define GAL_C22                 CAP_U(0.01)
+#define GAL_C23                 CAP_U(0.01)
+#define GAL_C25                 CAP_U(1)
+#define GAL_C26                 CAP_U(0.01)
+#define GAL_C27                 CAP_U(0.01)
+#define GAL_C28                 CAP_U(47)
 
-#define GAL_C46					CAP_U(0.1)
+#define GAL_C46                 CAP_U(0.1)
 
 
 /*************************************
@@ -130,20 +130,20 @@ TODO:
 
 static const discrete_dac_r1_ladder galaxian_bck_dac =
 {
-	4,			// size of ladder
+	4,          // size of ladder
 	{GAL_R18, GAL_R17, GAL_R16, GAL_R15, 0,0,0,0},
-	4.4,		// 5V - diode junction (0.6V)
-	GAL_R20,	// rBIAS
-	GAL_R19,	// rGnd
-	0			// no C
+	4.4,        // 5V - diode junction (0.6V)
+	GAL_R20,    // rBIAS
+	GAL_R19,    // rGnd
+	0           // no C
 };
 
 static const discrete_555_cc_desc galaxian_bck_vco =
 {
 	DISC_555_OUT_DC | DISC_555_OUT_CAP,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES,
-	0.7		// Q2 junction voltage
+	0.7     // Q2 junction voltage
 };
 
 static const discrete_555_desc galaxian_555_vco_desc =
@@ -151,7 +151,7 @@ static const discrete_555_desc galaxian_555_vco_desc =
 	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
 	5.0,
 	DEFAULT_555_CHARGE,
-	(5.0 - 0.5)			// 10k means no real load
+	(5.0 - 0.5)         // 10k means no real load
 };
 
 static const discrete_555_desc galaxian_555_fire_vco_desc =
@@ -177,22 +177,22 @@ static const discrete_mixer_desc galaxian_bck_mixer_desc =
 static const discrete_lfsr_desc galaxian_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	17,			        	/* Bit Length */
-	0,			        	/* Reset Value */
-	4,			        	/* Use Bit 10 (QC of second LS164) as F0 input 0 */
-	16,			        	/* Use Bit 23 (QH of third LS164) as F0 input 1 */
-	DISC_LFSR_XOR_INV_IN1,	/* F0 is XOR */
-	DISC_LFSR_IN0,			/* F1 is inverted F0*/
-	DISC_LFSR_REPLACE,		/* F2 replaces the shifted register contents */
-	0x000001,		    	/* Everything is shifted into the first bit only */
+	17,                     /* Bit Length */
+	0,                      /* Reset Value */
+	4,                      /* Use Bit 10 (QC of second LS164) as F0 input 0 */
+	16,                     /* Use Bit 23 (QH of third LS164) as F0 input 1 */
+	DISC_LFSR_XOR_INV_IN1,  /* F0 is XOR */
+	DISC_LFSR_IN0,          /* F1 is inverted F0*/
+	DISC_LFSR_REPLACE,      /* F2 replaces the shifted register contents */
+	0x000001,               /* Everything is shifted into the first bit only */
 	DISC_LFSR_FLAG_OUTPUT_F0, /* Output is result of F0 */
-	0			        	/* Output bit */
+	0                       /* Output bit */
 };
 
 static const discrete_mixer_desc galaxian_mixerpre_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{GAL_R51, 0, GAL_R50, 0, GAL_R34},		/* A, C, C, D */
+	{GAL_R51, 0, GAL_R50, 0, GAL_R34},      /* A, C, C, D */
 	{0, GAL_INP_VOL1, 0, GAL_INP_VOL2, 0},
 	{0,0,0,0,0},
 	0, 0,
@@ -204,7 +204,7 @@ static const discrete_mixer_desc galaxian_mixerpre_desc =
 static const discrete_mixer_desc galaxian_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{GAL_R34, GAL_R40, GAL_R43},		/* A, C, C, D */
+	{GAL_R34, GAL_R40, GAL_R43},        /* A, C, C, D */
 	{0, 0, 0},
 	{0,0,GAL_C26},
 	0, GAL_R91,
@@ -218,7 +218,7 @@ static const discrete_mixer_desc galaxian_mixer_desc =
 static const discrete_mixer_desc mooncrst_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{GAL_R51, 0, GAL_R50, 0, MCRST_R34, GAL_R40, GAL_R43},		/* A, C, C, D */
+	{GAL_R51, 0, GAL_R50, 0, MCRST_R34, GAL_R40, GAL_R43},      /* A, C, C, D */
 	{0, GAL_INP_VOL1, 0, GAL_INP_VOL2, 0, 0, 0},
 	{0,0,0,0,0,0,GAL_C26},
 	0, 0*GAL_R91,
@@ -270,14 +270,14 @@ static DISCRETE_SOUND_START(galaxian)
 
 	DISCRETE_TASK_START(0)
 
-	    /************************************************/
+		/************************************************/
 		/* NOISE                                        */
 		/************************************************/
 
-	    /* since only a sample of the LFSR is latched @V2 we let the lfsr
-         * run at a lower speed
-         */
-	    DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
+		/* since only a sample of the LFSR is latched @V2 we let the lfsr
+		 * run at a lower speed
+		 */
+		DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE/100, 1.0, 0, 0.5, &galaxian_lfsr)
 		DISCRETE_SQUAREWFIX(NODE_151,1,60*264/2,1.0,50,0.5,0)  /* 2V signal */
 		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,NODE_151,NODE_150)
 	DISCRETE_TASK_END()
@@ -307,31 +307,31 @@ static DISCRETE_SOUND_START(galaxian)
 		/************************************************/
 
 		/* two cascaded LS164 which are reset to pitch latch value,
-         * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
-         *
-         * One possibility to implement this is
-         * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
-         * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 0, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
-         * but there is a native choice:
-         */
-	    DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK, GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
+		 * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
+		 *
+		 * One possibility to implement this is
+		 * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
+		 * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 0, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
+		 * but there is a native choice:
+		 */
+		DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK, GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
 
-	    /* from the 74393 (counter 2 above) only QA, QC, QD are used.
-         * We decode three here and use SUB_NODE(133,x) below to access.
-         */
-	    DISCRETE_BITS_DECODE(NODE_133, NODE_132, 0, 3, TTL_OUT)		/* QA-QD 74393 */
+		/* from the 74393 (counter 2 above) only QA, QC, QD are used.
+		 * We decode three here and use SUB_NODE(133,x) below to access.
+		 */
+		DISCRETE_BITS_DECODE(NODE_133, NODE_132, 0, 3, TTL_OUT)     /* QA-QD 74393 */
 
-    /* End of this task */
-    DISCRETE_TASK_END()
+	/* End of this task */
+	DISCRETE_TASK_END()
 
-    DISCRETE_TASK_START(1)
+	DISCRETE_TASK_START(1)
 
-	    /************************************************/
+		/************************************************/
 		/* HIT                                          */
 		/************************************************/
 
 		/* Not 100% correct - switching causes high impedance input for node_157
-         * this is not emulated */
+		 * this is not emulated */
 		DISCRETE_RCDISC5(NODE_155, NODE_152, GAL_INP_HIT, (GAL_R35 + GAL_R36), GAL_C21)
 		DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_155, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &galaxian_bandpass_desc)
 	DISCRETE_TASK_END()
@@ -449,25 +449,25 @@ WRITE8_DEVICE_HANDLER( galaxian_sound_w )
 	data &= 0x01;
 	switch (offset & 7)
 	{
-		case 0:		/* FS1 (controls 555 timer at 8R) */
-		case 1:		/* FS2 (controls 555 timer at 8S) */
-		case 2:		/* FS3 (controls 555 timer at 8T) */
+		case 0:     /* FS1 (controls 555 timer at 8R) */
+		case 1:     /* FS2 (controls 555 timer at 8S) */
+		case 2:     /* FS3 (controls 555 timer at 8T) */
 			galaxian_background_enable_w(device, space, offset, data);
 			break;
 
-		case 3:		/* HIT */
+		case 3:     /* HIT */
 			galaxian_noise_enable_w(device, space, 0, data);
 			break;
 
-		case 4:		/* n/c */
+		case 4:     /* n/c */
 			break;
 
-		case 5:		/* FIRE */
+		case 5:     /* FIRE */
 			galaxian_shoot_enable_w(device, space, 0, data);
 			break;
 
-		case 6:		/* VOL1 */
-		case 7:		/* VOL2 */
+		case 6:     /* VOL1 */
+		case 7:     /* VOL2 */
 			galaxian_vol_w(device, space, offset & 1, data);
 			break;
 	}

@@ -141,7 +141,7 @@ const device_type AHA1542 = &device_creator<aha1542_device>;
 READ8_MEMBER( aha1542_device::aha1542_r )
 {
 	printf("aha1542_r(): pc=0x%08x offset=%d\n", (unsigned) machine().firstcpu->pc(), offset);
-        return 0xff;
+		return 0xff;
 }
 
 WRITE8_MEMBER( aha1542_device::aha1542_w )
@@ -154,7 +154,7 @@ WRITE8_MEMBER( aha1542_device::aha1542_w )
 //-------------------------------------------------
 
 ROM_START( aha1542 )
-    ROM_REGION( 0x8000, "aha1542", 0 )
+	ROM_REGION( 0x8000, "aha1542", 0 )
 	ROM_LOAD( "553601-00.u16", 0x0000, 0x8000, CRC(AB22FC02) SHA1(f9f783e0272fc14ba3de32316997f1f6cadc67d0) ) /* Adaptec 1540CF/1542CF BIOS v2.01 */
 
 	ROM_REGION( 0x8000, Z84C0010_TAG, 0 )
@@ -185,7 +185,7 @@ machine_config_constructor aha1542_device::device_mconfig_additions() const
 }
 
 aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, AHA1542, "AHA1542 SCSI Controller", tag, owner, clock),
+	device_t(mconfig, AHA1542, "AHA1542 SCSI Controller", tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this)
 {
 }
@@ -207,4 +207,3 @@ void aha1542_device::device_start()
 void aha1542_device::device_reset()
 {
 }
-

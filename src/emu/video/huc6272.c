@@ -65,8 +65,8 @@ inline void huc6272_device::write_dword(offs_t address, UINT32 data)
 
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, huc6272, "huc6272", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, NULL, *ADDRESS_MAP_NAME(huc6272_vram))
+		device_memory_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, NULL, *ADDRESS_MAP_NAME(huc6272_vram))
 {
 
 }
@@ -112,21 +112,21 @@ READ32_MEMBER( huc6272_device::read )
 	if((offset & 1) == 0)
 	{
 		/*
-        xxxx xxxx ---- ---- ---- ---- ---- ---- Sub Channel Buffer
-        ---- ---- x--- ---- ---- ---- ---- ---- SCSI RST flag
-        ---- ---- -x-- ---- ---- ---- ---- ---- SCSI BUSY flag
-        ---- ---- --x- ---- ---- ---- ---- ---- SCSI REQ flag
-        ---- ---- ---x ---- ---- ---- ---- ---- SCSI MSG flag
-        ---- ---- ---- x--- ---- ---- ---- ---- SCSI CD flag
-        ---- ---- ---- -x-- ---- ---- ---- ---- SCSI IO flag
-        ---- ---- ---- --x- ---- ---- ---- ---- SCSI SEL flag
-        ---- ---- ---- ---- -x-- ---- ---- ---- SCSI IRQ pending
-        ---- ---- ---- ---- --x- ---- ---- ---- DMA IRQ pending
-        ---- ---- ---- ---- ---x ---- ---- ---- CD Sub Channel IRQ pending
-        ---- ---- ---- ---- ---- x--- ---- ---- Raster IRQ pending
-        ---- ---- ---- ---- ---- -x-- ---- ---- ADPCM IRQ pending
-        ---- ---- ---- ---- ---- ---- -xxx xxxx register read-back
-        */
+		xxxx xxxx ---- ---- ---- ---- ---- ---- Sub Channel Buffer
+		---- ---- x--- ---- ---- ---- ---- ---- SCSI RST flag
+		---- ---- -x-- ---- ---- ---- ---- ---- SCSI BUSY flag
+		---- ---- --x- ---- ---- ---- ---- ---- SCSI REQ flag
+		---- ---- ---x ---- ---- ---- ---- ---- SCSI MSG flag
+		---- ---- ---- x--- ---- ---- ---- ---- SCSI CD flag
+		---- ---- ---- -x-- ---- ---- ---- ---- SCSI IO flag
+		---- ---- ---- --x- ---- ---- ---- ---- SCSI SEL flag
+		---- ---- ---- ---- -x-- ---- ---- ---- SCSI IRQ pending
+		---- ---- ---- ---- --x- ---- ---- ---- DMA IRQ pending
+		---- ---- ---- ---- ---x ---- ---- ---- CD Sub Channel IRQ pending
+		---- ---- ---- ---- ---- x--- ---- ---- Raster IRQ pending
+		---- ---- ---- ---- ---- -x-- ---- ---- ADPCM IRQ pending
+		---- ---- ---- ---- ---- ---- -xxx xxxx register read-back
+		*/
 		res = m_register & 0x7f;
 		res |= (0) << 16;
 	}
@@ -135,8 +135,8 @@ READ32_MEMBER( huc6272_device::read )
 		switch(m_register)
 		{
 			/*
-            x--- ---- ---- ---- ----
-            */
+			x--- ---- ---- ---- ----
+			*/
 			case 0x0c: // KRAM load address
 				res = (m_kram_addr_r & 0x3ffff) | ((m_kram_inc_r & 0x1ff) << 18) | ((m_kram_page_r & 1) << 31);
 				break;
@@ -179,8 +179,8 @@ WRITE32_MEMBER( huc6272_device::write )
 				//printf("%08x DMA STATUS\n",data);
 				break;
 			/*
-            ---- ---- ---- ---- ----
-            */
+			---- ---- ---- ---- ----
+			*/
 			case 0x0c: // KRAM load address
 				m_kram_addr_r = (data & 0x0003ffff);
 				m_kram_inc_r =  (data & 0x07fc0000) >> 18;
@@ -199,11 +199,11 @@ WRITE32_MEMBER( huc6272_device::write )
 				break;
 
 			/*
-            ---x ---- ---- ---- ADPCM page setting
-            ---- ---x ---- ---- RAINBOW page setting
-            ---- ---- ---x ---- BG page setting
-            ---- ---- ---- ---x SCSI page setting
-            */
+			---x ---- ---- ---- ADPCM page setting
+			---- ---x ---- ---- RAINBOW page setting
+			---- ---- ---x ---- BG page setting
+			---- ---- ---- ---x SCSI page setting
+			*/
 			case 0x0f:
 				m_page_setting = data;
 				break;

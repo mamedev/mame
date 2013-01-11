@@ -36,14 +36,14 @@
 #define LOG(x) printf x
 #endif
 
-#define MAX_VIEWS		(4)
+#define MAX_VIEWS       (4)
 
 enum {
-	WIN_TYPE_MAIN		= 0x01,
-	WIN_TYPE_MEMORY 	= 0x02,
-	WIN_TYPE_DISASM 	= 0x04,
-	WIN_TYPE_LOG		= 0x08,
-	WIN_TYPE_ALL		= 0x0f
+	WIN_TYPE_MAIN       = 0x01,
+	WIN_TYPE_MEMORY     = 0x02,
+	WIN_TYPE_DISASM     = 0x04,
+	WIN_TYPE_LOG        = 0x08,
+	WIN_TYPE_ALL        = 0x0f
 };
 
 //============================================================
@@ -68,39 +68,39 @@ struct edit {
 };
 
 struct win_i {
-	int 					type;
-	win_i *					next;
-	GtkWidget *				win;
-	edit					ed;
-	running_machine *		machine;	// machine
-	DView *					views[MAX_VIEWS];
-	device_t *		cpu;	// current CPU
+	int                     type;
+	win_i *                 next;
+	GtkWidget *             win;
+	edit                    ed;
+	running_machine *       machine;    // machine
+	DView *                 views[MAX_VIEWS];
+	device_t *      cpu;    // current CPU
 };
 
 struct windowState
 {
-    windowState() : type(0),
-                    sizeX(-1), sizeY(-1),
-                    positionX(-1), positionY(-1) { }
-    ~windowState() { }
+	windowState() : type(0),
+					sizeX(-1), sizeY(-1),
+					positionX(-1), positionY(-1) { }
+	~windowState() { }
 
-    void loadFromXmlDataNode(xml_data_node* wnode)
-    {
-        if (!wnode) return;
+	void loadFromXmlDataNode(xml_data_node* wnode)
+	{
+		if (!wnode) return;
 
-        type = xml_get_attribute_int(wnode, "type", type);
+		type = xml_get_attribute_int(wnode, "type", type);
 
-        sizeX = xml_get_attribute_int(wnode, "size_x", sizeX);
-        sizeY = xml_get_attribute_int(wnode, "size_y", sizeY);
-        positionX = xml_get_attribute_int(wnode, "position_x", positionX);
-        positionY = xml_get_attribute_int(wnode, "position_y", positionY);
-    }
+		sizeX = xml_get_attribute_int(wnode, "size_x", sizeX);
+		sizeY = xml_get_attribute_int(wnode, "size_y", sizeY);
+		positionX = xml_get_attribute_int(wnode, "position_x", positionX);
+		positionY = xml_get_attribute_int(wnode, "position_y", positionY);
+	}
 
-    int type;
-    int sizeX;
-    int sizeY;
-    int positionX;
-    int positionY;
+	int type;
+	int sizeX;
+	int sizeY;
+	int positionX;
+	int positionY;
 };
 windowState windowStateArray[64];
 int windowStateCount = 0;
@@ -577,7 +577,7 @@ void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 		for (int i = 0; i < windowStateCount; i++)
 		{
 			if (!windowStateArray[i].type || windowStateArray[i].type == WIN_TYPE_MAIN)
-			    continue;
+				continue;
 
 			switch (windowStateArray[i].type)
 			{
@@ -655,7 +655,7 @@ static void debugmain_init(running_machine &machine)
 	dmain = add_win_i(machine, WIN_TYPE_MAIN);
 	dmain->win = create_debugmain();
 
-	dmain->views[0]	  = DVIEW(lookup_widget(dmain->win, "console"));
+	dmain->views[0]   = DVIEW(lookup_widget(dmain->win, "console"));
 	dmain->views[1]   = DVIEW(lookup_widget(dmain->win, "disasm"));
 	dmain->views[2]   = DVIEW(lookup_widget(dmain->win, "registers"));
 
@@ -765,7 +765,7 @@ static void memorywin_new(running_machine &machine)
 	win_i *mem;
 	int item; //, cursel;
 	device_t *curcpu = debug_cpu_get_visible_cpu(machine);
-	GtkComboBox *		zone_w;
+	GtkComboBox *       zone_w;
 
 	mem = add_win_i(machine, WIN_TYPE_MEMORY);
 	mem->win = create_memorywin();
@@ -860,7 +860,7 @@ static void disasmwin_new(running_machine &machine)
 	win_i *dis;
 	int item; //, cursel;
 	device_t *curcpu = debug_cpu_get_visible_cpu(machine);
-	GtkComboBox 		*cpu_w;
+	GtkComboBox         *cpu_w;
 	astring title;
 
 	dis = add_win_i(machine, WIN_TYPE_DISASM);
@@ -1169,8 +1169,8 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 
 gboolean
 on_disasm_button_press_event(GtkWidget       *widget,
-                             GdkEventButton  *event,
-                             gpointer         user_data)
+								GdkEventButton  *event,
+								gpointer         user_data)
 {
 	DView *info = (DView *) widget;
 	LOG(("gef %f %f %p %p\n", event->x, event->y, info, widget));
@@ -1191,16 +1191,16 @@ on_disasm_button_press_event(GtkWidget       *widget,
 
 gboolean
 on_memoryview_button_press_event(GtkWidget       *widget,
-                                 GdkEventButton  *event,
-                                 gpointer         user_data)
+									GdkEventButton  *event,
+									gpointer         user_data)
 {
 	return on_disasm_button_press_event(widget, event, user_data);
 }
 
 gboolean
 on_memoryview_key_press_event(GtkWidget   *widget,
-                              GdkEventKey *event,
-                              gpointer     user_data)
+								GdkEventKey *event,
+								gpointer     user_data)
 {
 	DView *info = (DView *) widget;
 	//printf("%s\n", event->string);
@@ -1281,7 +1281,7 @@ on_memoryview_key_press_event(GtkWidget   *widget,
 #include "osdepend.h"
 #include "osdsdl.h"
 
- // win32 stubs for linking
+	// win32 stubs for linking
 void sdl_osd_interface::init_debugger()
 {
 }

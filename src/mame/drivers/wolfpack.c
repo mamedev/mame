@@ -52,7 +52,7 @@ READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 	/* BIT7 => VBLANK      */
 
 	if (!s14001a_bsy_r(device))
-        val |= 0x01;
+		val |= 0x01;
 
 	if (!m_collision)
 		val |= 0x10;
@@ -78,16 +78,16 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_audamp_w){}
 WRITE8_MEMBER(wolfpack_state::wolfpack_word_w)
 {
 	device_t *device = machine().device("speech");
-       /* latch word from bus into temp register, and place on s14001a input bus */
-       /* there is no real need for a temp register at all, since the bus 'register' acts as one */
-        s14001a_reg_w(device, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
+		/* latch word from bus into temp register, and place on s14001a input bus */
+		/* there is no real need for a temp register at all, since the bus 'register' acts as one */
+		s14001a_reg_w(device, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
 {
 	device_t *device = machine().device("speech");
-        s14001a_set_volume(device, 15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
-        s14001a_rst_w(device, data&1);
+		s14001a_set_volume(device, 15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
+		s14001a_rst_w(device, data&1);
 }
 
 
@@ -151,8 +151,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)0)	/* dial connects here */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)1)	/* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)0)    /* dial connects here */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)1)    /* dial connects here */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )

@@ -337,7 +337,7 @@ static void irqhandler(device_t *device, int linestate)
 
 static const ym3812_interface ym3812_config =
 {
-	irqhandler	/* IRQ Line */
+	irqhandler  /* IRQ Line */
 };
 
 /*************************************
@@ -359,12 +359,12 @@ void onetwo_state::machine_start()
 static MACHINE_CONFIG_START( onetwo, onetwo_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
 	MCFG_CPU_IO_MAP(main_cpu_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", onetwo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)	/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
 	MCFG_CPU_IO_MAP(sound_cpu_io)
 

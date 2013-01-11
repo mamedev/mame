@@ -11,7 +11,7 @@
 #include "includes/micro3d.h"
 
 
-#define MM5837_CLOCK		100000
+#define MM5837_CLOCK        100000
 
 
 /*************************************
@@ -22,8 +22,8 @@
 
 struct biquad
 {
-	double a0, a1, a2;		/* Numerator coefficients */
-	double b0, b1, b2;		/* Denominator coefficients */
+	double a0, a1, a2;      /* Numerator coefficients */
+	double b0, b1, b2;      /* Denominator coefficients */
 };
 
 struct lp_filter
@@ -36,8 +36,8 @@ struct lp_filter
 
 struct filter_state
 {
-	double		capval;
-	double		exponent;
+	double      capval;
+	double      exponent;
 };
 
 struct noise_state
@@ -54,14 +54,14 @@ struct noise_state
 		UINT8 dac[4];
 	};
 
-	float				gain;
-	UINT32				noise_shift;
-	UINT8				noise_value;
-	UINT8				noise_subcount;
+	float               gain;
+	UINT32              noise_shift;
+	UINT8               noise_value;
+	UINT8               noise_subcount;
 
-	filter_state		noise_filters[4];
-	lp_filter			filter;
-	sound_stream		*stream;
+	filter_state        noise_filters[4];
+	lp_filter           filter;
+	sound_stream        *stream;
 };
 
 
@@ -133,8 +133,8 @@ static void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
 }
 
 static void bilinear(double a0, double a1, double a2,
-			  double b0, double b1, double b2,
-			  double *k, double fs, float *coef)
+				double b0, double b1, double b2,
+				double *k, double fs, float *coef)
 {
 	double ad, bd;
 
@@ -387,9 +387,9 @@ READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 {
 	switch (offset)
 	{
-		case 0x01:	return (m_sound_port_latch[offset] & 0x7f) | ioport("SOUND_SW")->read();
-		case 0x03:	return (m_sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(machine().device("upd7759")) ? 0x08 : 0);
-		default:	return 0;
+		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | ioport("SOUND_SW")->read();
+		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(machine().device("upd7759")) ? 0x08 : 0);
+		default:    return 0;
 	}
 }
 
@@ -406,7 +406,7 @@ const device_type MICRO3D = &device_creator<micro3d_sound_device>;
 
 micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MICRO3D, "Microprose Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(noise_state);
 }
@@ -448,5 +448,3 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

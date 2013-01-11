@@ -111,12 +111,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			ypos = 512-ypos;
 
 			drawgfx_transpen( bitmap,
-					 cliprect,
-					 gfx,
-					 num,
-					 64+attr,
-					 0,0,
-					 xpos+state->m_sprxoffs,ypos,0 );
+						cliprect,
+						gfx,
+						num,
+						64+attr,
+						0,0,
+						xpos+state->m_sprxoffs,ypos,0 );
 		}
 
 		source += 0x4;

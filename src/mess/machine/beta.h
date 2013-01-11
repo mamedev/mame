@@ -16,7 +16,7 @@ void betadisk_enable(device_t *device);
 void betadisk_disable(device_t *device);
 void betadisk_clear_status(device_t *device);
 
-#define BETA_DISK_TAG	"beta"
+#define BETA_DISK_TAG   "beta"
 
 class beta_disk_device : public device_t
 {
@@ -44,8 +44,8 @@ extern const device_type BETA_DISK;
 #define MCFG_BETA_DISK_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, BETA_DISK, 0)
 
-#define MCFG_BETA_DISK_REMOVE(_tag)		\
-    MCFG_DEVICE_REMOVE(_tag)
+#define MCFG_BETA_DISK_REMOVE(_tag)     \
+	MCFG_DEVICE_REMOVE(_tag)
 
 DECLARE_READ8_DEVICE_HANDLER(betadisk_status_r);
 DECLARE_READ8_DEVICE_HANDLER(betadisk_track_r);

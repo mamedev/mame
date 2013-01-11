@@ -17,7 +17,7 @@ public:
 	struct format {
 		UINT32 form_factor;      // See floppy_image for possible values
 		UINT32 variant;          // See floppy_image for possible values
-		UINT32 encoding;		 // See floppy_image for possible values
+		UINT32 encoding;         // See floppy_image for possible values
 
 		int cell_size;           // See floppy_image_format_t for details
 		int sector_count;

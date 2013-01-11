@@ -7,10 +7,10 @@
 /* macro to convert 4-bit unsigned samples to 16-bit signed samples */
 #define SAMPLE_CONV4(a) (0x1111*((a&0x0f))-0x8000)
 
-#define SND_CLOCK 3072000	/* 3.072 MHz */
+#define SND_CLOCK 3072000   /* 3.072 MHz */
 
 
-static INT16 *samplebuf;	/* buffer to decode samples at run time */
+static INT16 *samplebuf;    /* buffer to decode samples at run time */
 
 
 static SAMPLES_START( cclimber_sh_start )
@@ -66,7 +66,7 @@ WRITE8_HANDLER( cclimber_sample_rate_w )
 
 WRITE8_HANDLER( cclimber_sample_volume_w )
 {
-	sample_volume = data & 0x1f;	/* range 0-31 */
+	sample_volume = data & 0x1f;    /* range 0-31 */
 }
 
 WRITE8_HANDLER( cclimber_sample_trigger_w )

@@ -1,15 +1,15 @@
- /**************************************************************************\
- *                 Texas Instruments TMS32010 DSP Emulator                  *
- *                                                                          *
- *                  Copyright Tony La Porta                                 *
- *      You are not allowed to distribute this software commercially.       *
- *                      Written for the MAME project.                       *
- *                                                                          *
- *                                                                          *
- *      Note :  This is a word based microcontroller, with addressing       *
- *              architecture based on the Harvard addressing scheme.        *
- *                                                                          *
- \**************************************************************************/
+	/**************************************************************************\
+	*                 Texas Instruments TMS32010 DSP Emulator                  *
+	*                                                                          *
+	*                  Copyright Tony La Porta                                 *
+	*      You are not allowed to distribute this software commercially.       *
+	*                      Written for the MAME project.                       *
+	*                                                                          *
+	*                                                                          *
+	*      Note :  This is a word based microcontroller, with addressing       *
+	*              architecture based on the Harvard addressing scheme.        *
+	*                                                                          *
+	\**************************************************************************/
 
 #pragma once
 
@@ -25,11 +25,11 @@
  *  AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_bio_line_r)
  */
 
-#define TMS32010_BIO			0x10		/* BIO input */
+#define TMS32010_BIO            0x10        /* BIO input */
 
 
-#define TMS32010_INT_PENDING	0x80000000
-#define TMS32010_INT_NONE		0
+#define TMS32010_INT_PENDING    0x80000000
+#define TMS32010_INT_NONE       0
 
 
 enum
@@ -51,4 +51,4 @@ DECLARE_LEGACY_CPU_DEVICE(TMS32016, tms32016);
 
 CPU_DISASSEMBLE( tms32010 );
 
-#endif	/* __TMS32010_H__ */
+#endif  /* __TMS32010_H__ */

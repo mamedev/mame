@@ -115,9 +115,9 @@ class speglsht_state : public st0016_state
 public:
 	speglsht_state(const machine_config &mconfig, device_type type, const char *tag)
 		: st0016_state(mconfig, type, tag),
-		  m_shared(*this, "shared"),
-		  m_framebuffer(*this, "framebuffer"),
-		  m_cop_ram(*this, "cop_ram") { }
+			m_shared(*this, "shared"),
+			m_framebuffer(*this, "framebuffer"),
+			m_cop_ram(*this, "cop_ram") { }
 
 	required_shared_ptr<UINT8> m_shared;
 	required_shared_ptr<UINT32> m_framebuffer;
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( speglsht )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x00000007, 0x00000007, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x00000007, 0x00000007, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(          0x00000003, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(          0x00000004, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(          0x00000007, DEF_STR( 1C_1C ) )
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( speglsht )
 	PORT_DIPSETTING(          0x00000006, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(          0x00000005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(          0x00000000, "2C Start/1C Continue" )
-	PORT_DIPNAME( 0x00000038, 0x00000038, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x00000038, 0x00000038, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(          0x00000018, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(          0x00000020, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(          0x00000038, DEF_STR( 1C_1C ) )
@@ -279,26 +279,26 @@ static INPUT_PORTS_START( speglsht )
 	PORT_DIPSETTING(          0x00000028, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(          0x00000000, "2C Start/1C Continue" )
 	PORT_DIPUNUSED_DIPLOC( 0x00000040, 0x00000040, "SW1:7" )
-	PORT_DIPNAME( 0x00000080, 0x00000080, "Bonus for PAR Play" )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x00000080, 0x00000080, "Bonus for PAR Play" )    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(          0x00000080, DEF_STR( None ) )
 	PORT_DIPSETTING(          0x00000000, "Extra Hole" )
-	PORT_DIPNAME( 0x00000300, 0x00000300, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x00000300, 0x00000300, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(          0x00000300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(          0x00000200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(          0x00000100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x00000c00, 0x00000c00, "Number of Players" )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x00000c00, 0x00000c00, "Number of Players" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(          0x00000c00, "3" )
 	PORT_DIPSETTING(          0x00000800, "4" )
 	PORT_DIPSETTING(          0x00000400, "2" )
 	PORT_DIPSETTING(          0x00000000, "1" )
-	PORT_DIPNAME( 0x00001000, 0x00000000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x00001000, 0x00000000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(          0x00001000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00002000, 0x00000000, "Control Panel" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x00002000, 0x00000000, "Control Panel" )     PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(          0x00002000, "Double" )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Single ) )
-	PORT_DIPNAME( 0x00004000, 0x00000000, "Country" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x00004000, 0x00000000, "Country" )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(          0x00004000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( USA ) )
 	PORT_DIPUNUSED_DIPLOC( 0x00008000, 0x00008000, "SW2:8" )
@@ -329,8 +329,8 @@ static const st0016_interface st0016_config =
 static const r3000_cpu_core r3000_config =
 {
 	0,
-	4096,	/* code cache size */
-	2048	/* data cache size */
+	4096,   /* code cache size */
+	2048    /* data cache size */
 };
 
 MACHINE_RESET_MEMBER(speglsht_state,speglsht)
@@ -344,7 +344,7 @@ VIDEO_START_MEMBER(speglsht_state,speglsht)
 	VIDEO_START_CALL_MEMBER(st0016);
 }
 
-#define PLOT_PIXEL_RGB(x,y,r,g,b)	if(y>=0 && x>=0 && x<512 && y<512) \
+#define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
 { \
 		bitmap.pix32(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }

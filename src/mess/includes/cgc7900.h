@@ -12,22 +12,22 @@
 #include "machine/i8251.h"
 #include "sound/ay8910.h"
 
-#define M68000_TAG		"uh8"
-#define INS8251_0_TAG	"uc10"
-#define INS8251_1_TAG	"uc8"
-#define MM58167_TAG		"uc6"
-#define AY8910_TAG		"uc4"
-#define K1135A_TAG		"uc11"
-#define I8035_TAG		"i8035"
-#define AM2910_TAG		"11d"
-#define SCREEN_TAG		"screen"
+#define M68000_TAG      "uh8"
+#define INS8251_0_TAG   "uc10"
+#define INS8251_1_TAG   "uc8"
+#define MM58167_TAG     "uc6"
+#define AY8910_TAG      "uc4"
+#define K1135A_TAG      "uc11"
+#define I8035_TAG       "i8035"
+#define AM2910_TAG      "11d"
+#define SCREEN_TAG      "screen"
 
 class cgc7900_state : public driver_device
 {
 public:
 	cgc7900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M68000_TAG),
+			m_maincpu(*this, M68000_TAG),
 		m_chrom_ram(*this, "chrom_ram"),
 		m_plane_ram(*this, "plane_ram"),
 		m_clut_ram(*this, "clut_ram"),

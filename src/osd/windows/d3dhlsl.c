@@ -85,7 +85,7 @@
 
 static hlsl_options g_hlsl_presets[4] =
 {
-	{	// 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
+	{   // 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.03f, 0.03f,
@@ -106,7 +106,7 @@ static hlsl_options g_hlsl_presets[4] =
 		1.2f,
 		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0
 	},
-	{	// 25% Shadow mask, 0% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
+	{   // 25% Shadow mask, 0% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.03f, 0.03f,
@@ -127,7 +127,7 @@ static hlsl_options g_hlsl_presets[4] =
 		1.2f,
 		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0
 	},
-	{	// 25% Shadow mask, 0% Scanlines, 0% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
+	{   // 25% Shadow mask, 0% Scanlines, 0% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.0f, 0.0f,
@@ -148,7 +148,7 @@ static hlsl_options g_hlsl_presets[4] =
 		1.2f,
 		false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0
 	},
-	{	// 25% Shadow mask, 100% Scanlines, 15% Pincushion, 3 defocus, 24-degree Tint Out, 1.5 Exponent, 5% Floor, 70% Phosphor Return, 80% Saturation, Bad Convergence
+	{   // 25% Shadow mask, 100% Scanlines, 15% Pincushion, 3 defocus, 24-degree Tint Out, 1.5 Exponent, 5% Floor, 70% Phosphor Return, 80% Saturation, Bad Convergence
 		true,
 		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
 		0.15f, 0.15f,
@@ -2805,5 +2805,5 @@ static file_error open_next(d3d_info *d3d, emu_file &file, const char *templ, co
 
 	// create the final file
 	file.set_openflags(origflags);
-    return file.open(fname);
+	return file.open(fname);
 }

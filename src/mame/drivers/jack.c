@@ -242,42 +242,42 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jack )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "Every 10000" )
 	PORT_DIPSETTING(    0x20, "10000 Only" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Start on Level 1" )
 	PORT_DIPSETTING(    0x40, "Start on Level 13" )
-	PORT_DIPNAME( 0x80, 0x00, "Per Bean/Bullets" )		PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Per Bean/Bullets" )      PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )				PORT_DIPLOCATION("SW2:!6")
-	PORT_DIPNAME( 0x40, 0x00, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW2:!7")
+	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability (Cheat)")    PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "255 Lives (Cheat)")		PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "255 Lives (Cheat)")      PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -316,12 +316,12 @@ static INPUT_PORTS_START( jack2 )
 	PORT_INCLUDE( jack )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_3C ) )
@@ -334,12 +334,12 @@ static INPUT_PORTS_START( jack3 )
 	PORT_INCLUDE( jack )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -352,10 +352,10 @@ static INPUT_PORTS_START( treahunt )
 	PORT_INCLUDE( jack )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Start on Level 1" )
 	PORT_DIPSETTING(    0x40, "Start on Level 6" )
-	PORT_DIPNAME( 0x80, 0x00, "Per Bean/Bullets" )		PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Per Bean/Bullets" )      PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x80, "20" )
 INPUT_PORTS_END
@@ -363,50 +363,50 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( zzyzzyxx )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x08, 0x00, "2 Credits on Reset" )	PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPNAME( 0x08, 0x00, "2 Credits on Reset" )    PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )				PORT_DIPLOCATION("SW1:!7")
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:!8")
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x00, "10000 50000" )
 	PORT_DIPSETTING(    0x01, "25000 100000" )
 	PORT_DIPSETTING(    0x03, "100000 300000" )
-	PORT_DIPNAME( 0x04, 0x04, "2nd Bonus Given" )		PORT_DIPLOCATION("SW2:!3")
+	PORT_DIPNAME( 0x04, 0x04, "2nd Bonus Given" )       PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Starting Laps" )			PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPNAME( 0x08, 0x00, "Starting Laps" )         PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPNAME( 0x10, 0x00, "Difficulty of Pleasing Lola" )	PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPNAME( 0x10, 0x00, "Difficulty of Pleasing Lola" )   PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x00, "Show Intermissions" )	PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPNAME( 0x20, 0x00, "Show Intermissions" )    PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xc0, 0x40, "Extra Lives" )			PORT_DIPLOCATION("SW2:!7,!8")
+	PORT_DIPNAME( 0xc0, 0x40, "Extra Lives" )           PORT_DIPLOCATION("SW2:!7,!8")
 	PORT_DIPSETTING(    0x00, "3 under 4000 pts" )
 	PORT_DIPSETTING(    0x80, "5 under 4000 pts" )
-	PORT_DIPSETTING(    0x40, DEF_STR( None ) )			// 3 under 0 pts
+	PORT_DIPSETTING(    0x40, DEF_STR( None ) )         // 3 under 0 pts
 //  PORT_DIPSETTING(    0xc0, DEF_STR( None ) )         // 5 under 0 pts
 
 	PORT_START("IN0")
@@ -436,22 +436,22 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( freeze )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_SERVICE( 0x02, IP_ACTIVE_HIGH )				PORT_DIPLOCATION("SW1:!2")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:!3")
+	PORT_SERVICE( 0x02, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x10, "10000 & Every 40000" )
 	PORT_DIPSETTING(    0x20, "10000 & Every 60000" )
 	PORT_DIPSETTING(    0x30, "20000 & Every 100000" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
@@ -511,18 +511,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sucasino )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )		// bit 5-8, Check code at 0xf700
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )      // bit 5-8, Check code at 0xf700
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
@@ -557,12 +557,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tripool )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -616,10 +616,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( striv )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x02, 0x00, "Monitor" )				PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPNAME( 0x02, 0x00, "Monitor" )               PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x02, "Horizontal" )
 	PORT_DIPSETTING(    0x00, "Vertical" )
-	PORT_DIPNAME( 0x05, 0x05, "Gaming Option Number" )	PORT_DIPLOCATION("SW1:!1,!3")
+	PORT_DIPNAME( 0x05, 0x05, "Gaming Option Number" )  PORT_DIPLOCATION("SW1:!1,!3")
 	PORT_DIPSETTING(    0x01, "2" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x05, "3" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, "4" ) PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
@@ -628,19 +628,19 @@ static INPUT_PORTS_START( striv )
 	PORT_DIPSETTING(    0x05, "5" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, "6" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
 	PORT_DIPSETTING(    0x04, "7" ) PORT_CONDITION("DSW1", 0x20, NOTEQUALS, 0x20)
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x20, "Gaming Option" )			PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x20, "Gaming Option" )         PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x20, "Number of Wrong Answer" )
 	PORT_DIPSETTING(    0x00, "Number of Questions" )
-	PORT_DIPNAME( 0x40, 0x40, "Show Correct Answer" )	PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x40, "Show Correct Answer" )   PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )					PORT_DIPLOCATION("SW1:!8")
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                 PORT_DIPLOCATION("SW1:!8")
 
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )
@@ -683,27 +683,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( joinem )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "Every 30000" )
 	PORT_DIPSETTING(    0x20, "30000 Only" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW2:!2" )
@@ -712,7 +712,7 @@ static INPUT_PORTS_START( joinem )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
 	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_HIGH, "SW2:!6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:!7" )
-	PORT_DIPNAME( 0x80, 0x00, "255 Lives (Cheat)" )		PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPNAME( 0x80, 0x00, "255 Lives (Cheat)" )     PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -765,7 +765,7 @@ static INPUT_PORTS_START( loverboy )
 	PORT_INCLUDE( joinem )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 4C_2C ) )
@@ -783,13 +783,13 @@ static INPUT_PORTS_START( loverboy )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x20, "30000" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
@@ -1068,7 +1068,7 @@ ROM_END
 
 
 ROM_START( treahunt )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "thunt-1.f2",   0x0000, 0x1000, CRC(0b35858c) SHA1(b8f80c69fcbce71e1b85c8f39599f8bebfeb2585) )
 	ROM_LOAD( "thunt-2.f3",   0x1000, 0x1000, CRC(67305a51) SHA1(c00b9592c4e146892313e8d32261338957a6a04a) )
 	ROM_LOAD( "thunt-3.4f",   0x2000, 0x1000, CRC(d7a969c3) SHA1(7edcbc90836e32aff4a26b0c55a76bbc9bb488fe) )
@@ -1182,22 +1182,22 @@ ROM_END
 
 ROM_START( sucasino )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1",      	  0x0000, 0x1000, CRC(e116e979) SHA1(99b0c783ace93e643738a1a924cafb690d2c1127) )
-	ROM_LOAD( "2",      	  0x1000, 0x1000, CRC(2a2635f5) SHA1(e3b70942adc4eab81000287c8da67d3732ddda70) )
-	ROM_LOAD( "3",      	  0x2000, 0x1000, CRC(69864d90) SHA1(244eaf4079b90f367c671e00e8081d885f26e26d) )
-	ROM_LOAD( "4",      	  0x3000, 0x1000, CRC(174c9373) SHA1(070175bf1b7b14f34549d03a8288c8ff1f2f4eaa) )
-	ROM_LOAD( "5",      	  0xc000, 0x1000, CRC(115bcb1e) SHA1(9b50e1dcb77db1b60ab5fd7d9843261e25580647) )
-	ROM_LOAD( "6",      	  0xd000, 0x1000, CRC(434caa17) SHA1(2f537063db14cfdfb771dece2ea33841c874c708) )
-	ROM_LOAD( "7",      	  0xe000, 0x1000, CRC(67c68b82) SHA1(b5d3977bf1f1337a96ae7bb60fe11e6ca9e87485) )
-	ROM_LOAD( "8",      	  0xf000, 0x1000, CRC(f5b63006) SHA1(a069fb9b9b6d47ac3f0fbbd9b2c89da31d6b1202) )
+	ROM_LOAD( "1",            0x0000, 0x1000, CRC(e116e979) SHA1(99b0c783ace93e643738a1a924cafb690d2c1127) )
+	ROM_LOAD( "2",            0x1000, 0x1000, CRC(2a2635f5) SHA1(e3b70942adc4eab81000287c8da67d3732ddda70) )
+	ROM_LOAD( "3",            0x2000, 0x1000, CRC(69864d90) SHA1(244eaf4079b90f367c671e00e8081d885f26e26d) )
+	ROM_LOAD( "4",            0x3000, 0x1000, CRC(174c9373) SHA1(070175bf1b7b14f34549d03a8288c8ff1f2f4eaa) )
+	ROM_LOAD( "5",            0xc000, 0x1000, CRC(115bcb1e) SHA1(9b50e1dcb77db1b60ab5fd7d9843261e25580647) )
+	ROM_LOAD( "6",            0xd000, 0x1000, CRC(434caa17) SHA1(2f537063db14cfdfb771dece2ea33841c874c708) )
+	ROM_LOAD( "7",            0xe000, 0x1000, CRC(67c68b82) SHA1(b5d3977bf1f1337a96ae7bb60fe11e6ca9e87485) )
+	ROM_LOAD( "8",            0xf000, 0x1000, CRC(f5b63006) SHA1(a069fb9b9b6d47ac3f0fbbd9b2c89da31d6b1202) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "9",      	  0x0000, 0x1000, CRC(67cf8aec) SHA1(95be671d5f7526610b175fc4121459e0ffc3649b) )
+	ROM_LOAD( "9",            0x0000, 0x1000, CRC(67cf8aec) SHA1(95be671d5f7526610b175fc4121459e0ffc3649b) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "11",     	  0x0000, 0x1000, CRC(f92c4c5b) SHA1(a415c8f55d1792e79d05ece223ef423f8578f896) )
+	ROM_LOAD( "11",           0x0000, 0x1000, CRC(f92c4c5b) SHA1(a415c8f55d1792e79d05ece223ef423f8578f896) )
 	ROM_FILL(                 0x1000, 0x1000, 0 )
-	ROM_LOAD( "10",     	  0x2000, 0x1000, CRC(3b0783ce) SHA1(880f258351a8b0d76abe433cc77d95b991ae1adc) )
+	ROM_LOAD( "10",           0x2000, 0x1000, CRC(3b0783ce) SHA1(880f258351a8b0d76abe433cc77d95b991ae1adc) )
 	ROM_FILL(                 0x3000, 0x1000, 0 )
 ROM_END
 
@@ -1459,13 +1459,13 @@ static void treahunt_decode( running_machine &machine )
 		{
 			/* unencrypted = D0 D2 D5 D1 D3 D6 D4 D7 */
 			decrypt[A] =
-				 ((data & 0x01) << 7) |
-				 ((data & 0x02) << 3) |
-				 ((data & 0x04) << 4) |
-				  (data & 0x28) |
-				 ((data & 0x10) >> 3) |
-				 ((data & 0x40) >> 4) |
-				 ((data & 0x80) >> 7);
+					((data & 0x01) << 7) |
+					((data & 0x02) << 3) |
+					((data & 0x04) << 4) |
+					(data & 0x28) |
+					((data & 0x10) >> 3) |
+					((data & 0x40) >> 4) |
+					((data & 0x80) >> 7);
 
 			if ((A & 0x04) == 0)
 			/* unencrypted = !D0 D2 D5 D1 D3 D6 D4 !D7 */
@@ -1478,7 +1478,7 @@ static void treahunt_decode( running_machine &machine )
 					(~data & 0x81) |
 					((data & 0x02) << 3) |
 					((data & 0x04) << 4) |
-					 (data & 0x28) |
+						(data & 0x28) |
 					((data & 0x10) >> 3) |
 					((data & 0x40) >> 4);
 		}
@@ -1495,16 +1495,16 @@ DRIVER_INIT_MEMBER(jack_state,treahunt)
 DRIVER_INIT_MEMBER(jack_state,loverboy)
 {
 	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
-       I replace the startup jump with another jump to what appears to be
-       the start of the game code.
+	   I replace the startup jump with another jump to what appears to be
+	   the start of the game code.
 
-       ToDo: Figure out what's really going on
-       EDIT: this is fun, it's in im0 and trips ei ... my best guess is that
-       there's a protection device enabled at 0xf000-0xf001-0xf002-0xf008 that
-       sends a custom irq (either ld hl,$019d or jp $019d). After the initial
-       code, the protection device is disabled or changes behaviour via
-       writes at 0xf000 and 0xf008. -AS
-    */
+	   ToDo: Figure out what's really going on
+	   EDIT: this is fun, it's in im0 and trips ei ... my best guess is that
+	   there's a protection device enabled at 0xf000-0xf001-0xf002-0xf008 that
+	   sends a custom irq (either ld hl,$019d or jp $019d). After the initial
+	   code, the protection device is disabled or changes behaviour via
+	   writes at 0xf000 and 0xf008. -AS
+	*/
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;

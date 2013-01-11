@@ -181,8 +181,8 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 	{
 		flip_screen_set(data & 0x0100);
 
-		m_bg_tilemap->enable(data & 0x2000);	/* guess */
-		m_fg_tilemap->enable(data & 0x1000);	/* guess */
+		m_bg_tilemap->enable(data & 0x2000);    /* guess */
+		m_fg_tilemap->enable(data & 0x1000);    /* guess */
 
 		coin_counter_w(machine(), 0, data & 0x8000);
 		coin_counter_w(machine(), 1, data & 0x4000);
@@ -213,8 +213,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			int color = (attr & 0x3c) >> 2;
 			int flipx = attr & 0x02;
 			int flipy = 0;
-			int sx = (INT16)buffered_spriteram[offs + 3];	/* signed */
-			int sy = (INT16)buffered_spriteram[offs + 2];	/* signed */
+			int sx = (INT16)buffered_spriteram[offs + 3];   /* signed */
+			int sy = (INT16)buffered_spriteram[offs + 2];   /* signed */
 
 			if (sy > 512 - 16)
 				sy -= 512;
@@ -240,7 +240,7 @@ UINT32 bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 
 {
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	m_fg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);	/* nothing in FRONT */
+	m_fg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(machine(), bitmap, cliprect);

@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_bg_tile_info)
 
 
 #if 0
-	if (attr&0x08)	//priority bg/sprites (1 = this bg tile on top of sprites)
+	if (attr&0x08)  //priority bg/sprites (1 = this bg tile on top of sprites)
 	{
 		color = ((int)rand()) & 0x0f;
 	}
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_bg_tile_info)
 	/* priority bg/sprites (1 = this bg tile on top of sprites) */
 	tileinfo.category = (attr & 0x08) >> 3;
 
-	SET_TILE_INFO_MEMBER(	1,
+	SET_TILE_INFO_MEMBER(   1,
 			code,
 			(color&4) | ((color&2)>>1) | ((color&1)<<1),
 			0);
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_txt_tile_info)
 	int code = m_txtram[tile_index];
 	int color = ((code>>6) & 0x03);
 
-	SET_TILE_INFO_MEMBER(	2,
+	SET_TILE_INFO_MEMBER(   2,
 			code & 0x3f,
 			((color&2)>>1) | ((color&1)<<1),
 			0);
@@ -209,7 +209,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		}
 #endif
 
-		if ((spriteram[offs+1]!=4))	//otherwise - ghost sprites
+		if ((spriteram[offs+1]!=4)) //otherwise - ghost sprites
 		{
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],

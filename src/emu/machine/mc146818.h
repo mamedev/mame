@@ -36,12 +36,12 @@
 
 struct mc146818_interface
 {
-	devcb_write_line	m_out_irq_cb;
+	devcb_write_line    m_out_irq_cb;
 };
 
 // ======================> mc146818_device
 
-class mc146818_device :	public device_t,
+class mc146818_device : public device_t,
 						public device_rtc_interface,
 						public device_nvram_interface,
 						public mc146818_interface
@@ -85,20 +85,20 @@ protected:
 	void set_base_datetime();
 
 	// internal state
-	static const int MC146818_DATA_SIZE	= 0x80;
+	static const int MC146818_DATA_SIZE = 0x80;
 
-	mc146818_type	m_type;
+	mc146818_type   m_type;
 
-	UINT8			m_index;
-	UINT8			m_data[MC146818_DATA_SIZE];
+	UINT8           m_index;
+	UINT8           m_data[MC146818_DATA_SIZE];
 
-	UINT16			m_eindex;
-	UINT8			m_edata[0x2000];
+	UINT16          m_eindex;
+	UINT8           m_edata[0x2000];
 
-	bool			m_updated;  /* update ended interrupt flag */
+	bool            m_updated;  /* update ended interrupt flag */
 
-	attotime		m_last_refresh;
-	attotime		m_period;
+	attotime        m_last_refresh;
+	attotime        m_period;
 
 	static const device_timer_id TIMER_CLOCK = 0;
 	static const device_timer_id TIMER_PERIODIC = 1;

@@ -50,19 +50,19 @@ machine_config_constructor a2bus_softcard_device::device_mconfig_additions() con
 //**************************************************************************
 
 a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, type, name, tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this),
-    m_z80(*this, Z80_TAG),
-    m_6502space(NULL)
+	device_t(mconfig, type, name, tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_z80(*this, Z80_TAG),
+	m_6502space(NULL)
 {
 	m_shortname = "a2softcard";
 }
 
 a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, A2BUS_SOFTCARD, "Microsoft SoftCard", tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this),
-    m_z80(*this, Z80_TAG),
-    m_6502space(NULL)
+	device_t(mconfig, A2BUS_SOFTCARD, "Microsoft SoftCard", tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_z80(*this, Z80_TAG),
+	m_6502space(NULL)
 {
 	m_shortname = "a2softcard";
 }
@@ -82,71 +82,71 @@ void a2bus_softcard_device::device_start()
 
 void a2bus_softcard_device::device_reset()
 {
-    m_bEnabled = false;
-    m_6502space = NULL;
-    m_FirstZ80Boot = true;
-    m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_bEnabled = false;
+	m_6502space = NULL;
+	m_FirstZ80Boot = true;
+	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 void a2bus_softcard_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
 {
 	apple2_state *state = machine().driver_data<apple2_state>();
 
-    if (!m_bEnabled)
-    {
-        // steal the 6502's address space
-        m_6502space = &space;
+	if (!m_bEnabled)
+	{
+		// steal the 6502's address space
+		m_6502space = &space;
 
-        m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-        state->m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-        if (m_FirstZ80Boot)
-        {
-            m_FirstZ80Boot = false;
-            m_z80->reset();
-        }
+		if (m_FirstZ80Boot)
+		{
+			m_FirstZ80Boot = false;
+			m_z80->reset();
+		}
 
-        m_bEnabled = true;
-    }
-    else
-    {
-        m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-        state->m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-        m_bEnabled = false;
-    }
+		m_bEnabled = true;
+	}
+	else
+	{
+		m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_bEnabled = false;
+	}
 }
 
 READ8_MEMBER( a2bus_softcard_device::dma_r )
 {
-    if (m_6502space)
-    {
-        if (offset <= 0xafff)
-        {
-            return m_6502space->read_byte(offset+0x1000);
-        }
-        else if (offset <= 0xbfff)  // LC bank 2 d000-dfff
-        {
-            return m_6502space->read_byte((offset&0xfff) + 0xd000);
-        }
-        else if (offset <= 0xcfff)  // LC e000-efff
-        {
-            return m_6502space->read_byte((offset&0xfff) + 0xe000);
-        }
-        else if (offset <= 0xdfff)  // LC f000-ffff (or ROM?)
-        {
-            return m_6502space->read_byte((offset&0xfff) + 0xf000);
-        }
-        else if (offset <= 0xefff)  // I/O space c000-cfff
-        {
-            return m_6502space->read_byte((offset&0xfff) + 0xc000);
-        }
-        else    // zero page
-        {
-            return m_6502space->read_byte(offset&0xfff);
-        }
-    }
+	if (m_6502space)
+	{
+		if (offset <= 0xafff)
+		{
+			return m_6502space->read_byte(offset+0x1000);
+		}
+		else if (offset <= 0xbfff)  // LC bank 2 d000-dfff
+		{
+			return m_6502space->read_byte((offset&0xfff) + 0xd000);
+		}
+		else if (offset <= 0xcfff)  // LC e000-efff
+		{
+			return m_6502space->read_byte((offset&0xfff) + 0xe000);
+		}
+		else if (offset <= 0xdfff)  // LC f000-ffff (or ROM?)
+		{
+			return m_6502space->read_byte((offset&0xfff) + 0xf000);
+		}
+		else if (offset <= 0xefff)  // I/O space c000-cfff
+		{
+			return m_6502space->read_byte((offset&0xfff) + 0xc000);
+		}
+		else    // zero page
+		{
+			return m_6502space->read_byte(offset&0xfff);
+		}
+	}
 
-    return 0xff;
+	return 0xff;
 }
 
 
@@ -156,37 +156,36 @@ READ8_MEMBER( a2bus_softcard_device::dma_r )
 
 WRITE8_MEMBER( a2bus_softcard_device::dma_w )
 {
-    if (m_6502space)
-    {
-        if (offset <= 0xafff)
-        {
-            m_6502space->write_byte(offset+0x1000, data);
-        }
-        else if (offset <= 0xbfff)  // LC bank 2 d000-dfff
-        {
-            m_6502space->write_byte((offset&0xfff) + 0xd000, data);
-        }
-        else if (offset <= 0xcfff)  // LC e000-efff
-        {
-            m_6502space->write_byte((offset&0xfff) + 0xe000, data);
-        }
-        else if (offset <= 0xdfff)  // LC f000-ffff (or ROM?)
-        {
-            m_6502space->write_byte((offset&0xfff) + 0xf000, data);
-        }
-        else if (offset <= 0xefff)  // I/O space c000-cfff
-        {
-            m_6502space->write_byte((offset&0xfff) + 0xc000, data);
-        }
-        else    // zero page
-        {
-            m_6502space->write_byte(offset&0xfff, data);
-        }
-    }
+	if (m_6502space)
+	{
+		if (offset <= 0xafff)
+		{
+			m_6502space->write_byte(offset+0x1000, data);
+		}
+		else if (offset <= 0xbfff)  // LC bank 2 d000-dfff
+		{
+			m_6502space->write_byte((offset&0xfff) + 0xd000, data);
+		}
+		else if (offset <= 0xcfff)  // LC e000-efff
+		{
+			m_6502space->write_byte((offset&0xfff) + 0xe000, data);
+		}
+		else if (offset <= 0xdfff)  // LC f000-ffff (or ROM?)
+		{
+			m_6502space->write_byte((offset&0xfff) + 0xf000, data);
+		}
+		else if (offset <= 0xefff)  // I/O space c000-cfff
+		{
+			m_6502space->write_byte((offset&0xfff) + 0xc000, data);
+		}
+		else    // zero page
+		{
+			m_6502space->write_byte(offset&0xfff, data);
+		}
+	}
 }
 
 bool a2bus_softcard_device::take_c800()
 {
-    return false;
+	return false;
 }
-

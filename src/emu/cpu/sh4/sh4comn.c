@@ -21,122 +21,122 @@ static const int daysmonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 
 
 static const UINT32 exception_priority_default[] = {
-	EXPPRI(1,1,0,0),			 /* Power-on Reset */
-	EXPPRI(1,2,0,1),			 /* Manual Reset */
-	EXPPRI(1,1,0,2),			 /* H-UDI Reset */
-	EXPPRI(1,3,0,3),			 /* Inst TLB Multiple Hit */
-	EXPPRI(1,4,0,4),			 /* Data TLB Multiple Hit */
+	EXPPRI(1,1,0,0),             /* Power-on Reset */
+	EXPPRI(1,2,0,1),             /* Manual Reset */
+	EXPPRI(1,1,0,2),             /* H-UDI Reset */
+	EXPPRI(1,3,0,3),             /* Inst TLB Multiple Hit */
+	EXPPRI(1,4,0,4),             /* Data TLB Multiple Hit */
 
-	EXPPRI(2,0,0,5),			/* User break Before Instruction */
-	EXPPRI(2,1,0,6),			/* Inst Address Error */
-	EXPPRI(2,2,0,7),			/* Inst TLB Miss */
-	EXPPRI(2,3,0,8),			/* Inst TLB Protection Violation */
-	EXPPRI(2,4,0,9),			/* Illegal Instruction */
-	EXPPRI(2,4,0,10),			/* Slot Illegal Instruction */
-	EXPPRI(2,4,0,11),			/* FPU Disable */
-	EXPPRI(2,4,0,12),			/* Slot FPU Disable */
-	EXPPRI(2,5,0,13),			/* Data Address Error (Read) */
-	EXPPRI(2,5,0,14),			/* Data Address Error (Write) */
-	EXPPRI(2,6,0,15),			/* Data TBL Miss Read */
-	EXPPRI(2,6,0,16),			/* Data TBL Miss Write */
-	EXPPRI(2,7,0,17),			/* Data TBL Protection Violation Read */
-	EXPPRI(2,7,0,18),			/* Data TBL Protection Violation Write */
-	EXPPRI(2,8,0,19),			/* FPU Exception */
-	EXPPRI(2,9,0,20),			/* Initial Page Write exception */
+	EXPPRI(2,0,0,5),            /* User break Before Instruction */
+	EXPPRI(2,1,0,6),            /* Inst Address Error */
+	EXPPRI(2,2,0,7),            /* Inst TLB Miss */
+	EXPPRI(2,3,0,8),            /* Inst TLB Protection Violation */
+	EXPPRI(2,4,0,9),            /* Illegal Instruction */
+	EXPPRI(2,4,0,10),           /* Slot Illegal Instruction */
+	EXPPRI(2,4,0,11),           /* FPU Disable */
+	EXPPRI(2,4,0,12),           /* Slot FPU Disable */
+	EXPPRI(2,5,0,13),           /* Data Address Error (Read) */
+	EXPPRI(2,5,0,14),           /* Data Address Error (Write) */
+	EXPPRI(2,6,0,15),           /* Data TBL Miss Read */
+	EXPPRI(2,6,0,16),           /* Data TBL Miss Write */
+	EXPPRI(2,7,0,17),           /* Data TBL Protection Violation Read */
+	EXPPRI(2,7,0,18),           /* Data TBL Protection Violation Write */
+	EXPPRI(2,8,0,19),           /* FPU Exception */
+	EXPPRI(2,9,0,20),           /* Initial Page Write exception */
 
-	EXPPRI(2,4,0,21),			/* Unconditional TRAP */
-	EXPPRI(2,10,0,22),			/* User break After Instruction */
+	EXPPRI(2,4,0,21),           /* Unconditional TRAP */
+	EXPPRI(2,10,0,22),          /* User break After Instruction */
 
-	EXPPRI(3,0,16,SH4_INTC_NMI)	/* NMI */
+	EXPPRI(3,0,16,SH4_INTC_NMI) /* NMI */
 	/* This is copied to a table, and the IRQ priorities filled in later */
 };
 
 static const int exception_codes[] =
 
 { 0x000, /* Power-on Reset */
-  0x020, /* Manual Reset */
-  0x000, /* H-UDI Reset */
-  0x140, /* Inst TLB Multiple Hit */
-  0x140, /* Data TLB Multiple Hit */
+	0x020, /* Manual Reset */
+	0x000, /* H-UDI Reset */
+	0x140, /* Inst TLB Multiple Hit */
+	0x140, /* Data TLB Multiple Hit */
 
-  0x1E0, /* User break Before Instruction */
-  0x0E0, /* Inst Address Error */
-  0x040, /* Inst TLB Miss */
-  0x0A0, /* Inst TLB Protection Violation */
-  0x180, /* Illegal Instruction */
-  0x1A0, /* Slot Illegal Instruction */
-  0x800, /* FPU Disable */
-  0x820, /* Slot FPU Disable */
-  0x0E0, /* Data Address Error (Read) */
-  0x100, /* Data Address Error (Write) */
-  0x040, /* Data TBL Miss Read */
-  0x060, /* Data TBL Miss Write */
-  0x0A0, /* Data TBL Protection Violation Read */
-  0x0C0, /* Data TBL Protection Violation Write */
-  0x120, /* FPU Exception */
-  0x080, /* Initial Page Write exception */
+	0x1E0, /* User break Before Instruction */
+	0x0E0, /* Inst Address Error */
+	0x040, /* Inst TLB Miss */
+	0x0A0, /* Inst TLB Protection Violation */
+	0x180, /* Illegal Instruction */
+	0x1A0, /* Slot Illegal Instruction */
+	0x800, /* FPU Disable */
+	0x820, /* Slot FPU Disable */
+	0x0E0, /* Data Address Error (Read) */
+	0x100, /* Data Address Error (Write) */
+	0x040, /* Data TBL Miss Read */
+	0x060, /* Data TBL Miss Write */
+	0x0A0, /* Data TBL Protection Violation Read */
+	0x0C0, /* Data TBL Protection Violation Write */
+	0x120, /* FPU Exception */
+	0x080, /* Initial Page Write exception */
 
-  0x160, /* Unconditional TRAP */
-  0x1E0, /* User break After Instruction */
+	0x160, /* Unconditional TRAP */
+	0x1E0, /* User break After Instruction */
 
-  0x1C0, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+	0x1C0, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
 
-  0x200, /* EX Irq 0 */
-  0x220, /*        1 */
-  0x240, /*        2 */
-  0x260, /*        3 */
-  0x280, /*        4 */
-  0x2A0, /*        5 */
-  0x2C0, /*        6 */
-  0x2E0, /*        7 */
-  0x300, /*        8 */
-  0x320, /*        9 */
-  0x340, /*        A */
-  0x360, /*        B */
-  0x380, /*        C */
-  0x3A0, /*        D */
-  0x3C0, /*        E */
+	0x200, /* EX Irq 0 */
+	0x220, /*        1 */
+	0x240, /*        2 */
+	0x260, /*        3 */
+	0x280, /*        4 */
+	0x2A0, /*        5 */
+	0x2C0, /*        6 */
+	0x2E0, /*        7 */
+	0x300, /*        8 */
+	0x320, /*        9 */
+	0x340, /*        A */
+	0x360, /*        B */
+	0x380, /*        C */
+	0x3A0, /*        D */
+	0x3C0, /*        E */
 
-  0x240, /* SH4_INTC_IRL0 */
-  0x2A0, /* SH4_INTC_IRL1 */
-  0x300, /* SH4_INTC_IRL2 */
-  0x360, /* SH4_INTC_IRL3 */
+	0x240, /* SH4_INTC_IRL0 */
+	0x2A0, /* SH4_INTC_IRL1 */
+	0x300, /* SH4_INTC_IRL2 */
+	0x360, /* SH4_INTC_IRL3 */
 
-  0x600, /* HUDI */
-  0x620, /* SH4_INTC_GPOI */
-  0x640, /* SH4_INTC_DMTE0 */
-  0x660, /* SH4_INTC_DMTE1 */
-  0x680, /* SH4_INTC_DMTE2 */
-  0x6A0, /* SH4_INTC_DMTE3 */
+	0x600, /* HUDI */
+	0x620, /* SH4_INTC_GPOI */
+	0x640, /* SH4_INTC_DMTE0 */
+	0x660, /* SH4_INTC_DMTE1 */
+	0x680, /* SH4_INTC_DMTE2 */
+	0x6A0, /* SH4_INTC_DMTE3 */
 
-  0x780, /* SH4_INTC_DMTE4 */
-  0x7A0, /* SH4_INTC_DMTE5 */
-  0x7C0, /* SH4_INTC_DMTE6 */
-  0x7E0, /* SH4_INTC_DMTE7 */
+	0x780, /* SH4_INTC_DMTE4 */
+	0x7A0, /* SH4_INTC_DMTE5 */
+	0x7C0, /* SH4_INTC_DMTE6 */
+	0x7E0, /* SH4_INTC_DMTE7 */
 
-  0x6C0, /* SH4_INTC_DMAE */
+	0x6C0, /* SH4_INTC_DMAE */
 
-  0xB00, /* SH4_INTC_TUNI3 */
-  0xB80, /* SH4_INTC_TUNI4 */
-  0x400, /* SH4_INTC_TUNI0 */
-  0x420, /* SH4_INTC_TUNI1 */
-  0x440, /* SH4_INTC_TUNI2 */
-  0x460, /* SH4_INTC_TICPI2 */
-  0x480, /* SH4_INTC_ATI */
-  0x4A0, /* SH4_INTC_PRI */
-  0x4C0, /* SH4_INTC_CUI */
-  0x4E0, /* SH4_INTC_SCI1ERI */
-  0x500, /* SH4_INTC_SCI1RXI */
-  0x520, /* SH4_INTC_SCI1TXI */
-  0x540, /* SH4_INTC_SCI1TEI */
+	0xB00, /* SH4_INTC_TUNI3 */
+	0xB80, /* SH4_INTC_TUNI4 */
+	0x400, /* SH4_INTC_TUNI0 */
+	0x420, /* SH4_INTC_TUNI1 */
+	0x440, /* SH4_INTC_TUNI2 */
+	0x460, /* SH4_INTC_TICPI2 */
+	0x480, /* SH4_INTC_ATI */
+	0x4A0, /* SH4_INTC_PRI */
+	0x4C0, /* SH4_INTC_CUI */
+	0x4E0, /* SH4_INTC_SCI1ERI */
+	0x500, /* SH4_INTC_SCI1RXI */
+	0x520, /* SH4_INTC_SCI1TXI */
+	0x540, /* SH4_INTC_SCI1TEI */
 
-  0x700, /* SH4_INTC_SCIFERI */
-  0x720, /* SH4_INTC_SCIFRXI */
-  0x740, /* SH4_INTC_SCIFBRI */
-  0x760, /* SH4_INTC_SCIFTXI */
-  0x560, /* SH4_INTC_ITI */
-  0x580, /* SH4_INTC_RCMI */
-  0x5A0 /* SH4_INTC_ROVI */
+	0x700, /* SH4_INTC_SCIFERI */
+	0x720, /* SH4_INTC_SCIFRXI */
+	0x740, /* SH4_INTC_SCIFBRI */
+	0x760, /* SH4_INTC_SCIFTXI */
+	0x560, /* SH4_INTC_ITI */
+	0x580, /* SH4_INTC_RCMI */
+	0x5A0 /* SH4_INTC_ROVI */
 };
 
 /* SH3 INTEVT2 uses a different table - values of -1 aren't filled in yet, some may not exist on the sh3. */
@@ -145,90 +145,90 @@ static const int exception_codes[] =
 static const int sh3_intevt2_exception_codes[] =
 
 { 0x000, /* Power-on Reset */
-  -1, /* Manual Reset */
-  -1, /* H-UDI Reset */
-  -1, /* Inst TLB Multiple Hit */
-  -1, /* Data TLB Multiple Hit */
+	-1, /* Manual Reset */
+	-1, /* H-UDI Reset */
+	-1, /* Inst TLB Multiple Hit */
+	-1, /* Data TLB Multiple Hit */
 
-  -1, /* User break Before Instruction */
-  -1, /* Inst Address Error */
-  -1, /* Inst TLB Miss */
-  -1, /* Inst TLB Protection Violation */
-  -1, /* Illegal Instruction */
-  -1, /* Slot Illegal Instruction */
-  -1, /* FPU Disable */
-  -1, /* Slot FPU Disable */
-  -1, /* Data Address Error (Read) */
-  -1, /* Data Address Error (Write) */
-  -1, /* Data TBL Miss Read */
-  -1, /* Data TBL Miss Write */
-  -1, /* Data TBL Protection Violation Read */
-  -1, /* Data TBL Protection Violation Write */
-  -1, /* FPU Exception */
-  -1, /* Initial Page Write exception */
+	-1, /* User break Before Instruction */
+	-1, /* Inst Address Error */
+	-1, /* Inst TLB Miss */
+	-1, /* Inst TLB Protection Violation */
+	-1, /* Illegal Instruction */
+	-1, /* Slot Illegal Instruction */
+	-1, /* FPU Disable */
+	-1, /* Slot FPU Disable */
+	-1, /* Data Address Error (Read) */
+	-1, /* Data Address Error (Write) */
+	-1, /* Data TBL Miss Read */
+	-1, /* Data TBL Miss Write */
+	-1, /* Data TBL Protection Violation Read */
+	-1, /* Data TBL Protection Violation Write */
+	-1, /* FPU Exception */
+	-1, /* Initial Page Write exception */
 
-  -1, /* Unconditional TRAP */
-  -1, /* User break After Instruction */
+	-1, /* Unconditional TRAP */
+	-1, /* User break After Instruction */
 
-  -1, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+	-1, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
 
-  -1, /* EX Irq 0 */
-  -1, /*        1 */
-  -1, /*        2 */
-  -1, /*        3 */
-  -1, /*        4 */
-  -1, /*        5 */
-  -1, /*        6 */
-  -1, /*        7 */
-  -1, /*        8 */
-  -1, /*        9 */
-  -1, /*        A */
-  -1, /*        B */
-  -1, /*        C */
-  -1, /*        D */
-  -1, /*        E */
+	-1, /* EX Irq 0 */
+	-1, /*        1 */
+	-1, /*        2 */
+	-1, /*        3 */
+	-1, /*        4 */
+	-1, /*        5 */
+	-1, /*        6 */
+	-1, /*        7 */
+	-1, /*        8 */
+	-1, /*        9 */
+	-1, /*        A */
+	-1, /*        B */
+	-1, /*        C */
+	-1, /*        D */
+	-1, /*        E */
 
-  0x600, /* SH4_INTC_IRL0 */
-  0x620, /* SH4_INTC_IRL1 */
-  0x640, /* SH4_INTC_IRL2 */
-  0x660, /* SH4_INTC_IRL3 */
-    /* todo: SH3 should have lines 4+5 too? */
+	0x600, /* SH4_INTC_IRL0 */
+	0x620, /* SH4_INTC_IRL1 */
+	0x640, /* SH4_INTC_IRL2 */
+	0x660, /* SH4_INTC_IRL3 */
+	/* todo: SH3 should have lines 4+5 too? */
 
-  -1, /* HUDI */
-  -1, /* SH4_INTC_GPOI */
-  -1, /* SH4_INTC_DMTE0 */
-  -1, /* SH4_INTC_DMTE1 */
-  -1, /* SH4_INTC_DMTE2 */
-  -1, /* SH4_INTC_DMTE3 */
+	-1, /* HUDI */
+	-1, /* SH4_INTC_GPOI */
+	-1, /* SH4_INTC_DMTE0 */
+	-1, /* SH4_INTC_DMTE1 */
+	-1, /* SH4_INTC_DMTE2 */
+	-1, /* SH4_INTC_DMTE3 */
 
-  -1, /* SH4_INTC_DMTE4 */
-  -1, /* SH4_INTC_DMTE5 */
-  -1, /* SH4_INTC_DMTE6 */
-  -1, /* SH4_INTC_DMTE7 */
+	-1, /* SH4_INTC_DMTE4 */
+	-1, /* SH4_INTC_DMTE5 */
+	-1, /* SH4_INTC_DMTE6 */
+	-1, /* SH4_INTC_DMTE7 */
 
-  -1, /* SH4_INTC_DMAE */
+	-1, /* SH4_INTC_DMAE */
 
-  -1, /* SH4_INTC_TUNI3 */
-  -1, /* SH4_INTC_TUNI4 */
-  0x400, /* SH4_INTC_TUNI0 */
-  0x420, /* SH4_INTC_TUNI1 */
-  0x440, /* SH4_INTC_TUNI2 */
-  0x460, /* SH4_INTC_TICPI2 */
-  -1, /* SH4_INTC_ATI */
-  -1, /* SH4_INTC_PRI */
-  -1, /* SH4_INTC_CUI */
-  -1, /* SH4_INTC_SCI1ERI */
-  -1, /* SH4_INTC_SCI1RXI */
-  -1, /* SH4_INTC_SCI1TXI */
-  -1, /* SH4_INTC_SCI1TEI */
+	-1, /* SH4_INTC_TUNI3 */
+	-1, /* SH4_INTC_TUNI4 */
+	0x400, /* SH4_INTC_TUNI0 */
+	0x420, /* SH4_INTC_TUNI1 */
+	0x440, /* SH4_INTC_TUNI2 */
+	0x460, /* SH4_INTC_TICPI2 */
+	-1, /* SH4_INTC_ATI */
+	-1, /* SH4_INTC_PRI */
+	-1, /* SH4_INTC_CUI */
+	-1, /* SH4_INTC_SCI1ERI */
+	-1, /* SH4_INTC_SCI1RXI */
+	-1, /* SH4_INTC_SCI1TXI */
+	-1, /* SH4_INTC_SCI1TEI */
 
-  -1, /* SH4_INTC_SCIFERI */
-  -1, /* SH4_INTC_SCIFRXI */
-  -1, /* SH4_INTC_SCIFBRI */
-  -1, /* SH4_INTC_SCIFTXI */
-  -1, /* SH4_INTC_ITI */
-  -1, /* SH4_INTC_RCMI */
-  -1 /* SH4_INTC_ROVI */
+	-1, /* SH4_INTC_SCIFERI */
+	-1, /* SH4_INTC_SCIFRXI */
+	-1, /* SH4_INTC_SCIFBRI */
+	-1, /* SH4_INTC_SCIFTXI */
+	-1, /* SH4_INTC_ITI */
+	-1, /* SH4_INTC_RCMI */
+	-1 /* SH4_INTC_ROVI */
 };
 
 
@@ -778,8 +778,8 @@ WRITE32_HANDLER( sh4_internal_w )
 /*********************************************************************************************************************
         TMU (Timer Unit)
 *********************************************************************************************************************/
-	case SH4_TSTR_ADDR:	sh4_handle_tstr_addr_w(sh4,data,mem_mask);   break;
-	case SH4_TCR0_ADDR:	sh4_handle_tcr0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_TSTR_ADDR: sh4_handle_tstr_addr_w(sh4,data,mem_mask);   break;
+	case SH4_TCR0_ADDR: sh4_handle_tcr0_addr_w(sh4,data,mem_mask);   break;
 	case SH4_TCR1_ADDR: sh4_handle_tcr1_addr_w(sh4,data,mem_mask);   break;
 	case SH4_TCR2_ADDR: sh4_handle_tcr2_addr_w(sh4,data,mem_mask);   break;
 	case SH4_TCOR0_ADDR: sh4_handle_tcor0_addr_w(sh4,data,mem_mask); break;
@@ -910,11 +910,11 @@ READ32_HANDLER( sh4_internal_r )
 	switch( offset )
 	{
 	case VERSION:
-		return PVR_SH7091;	// 0x040205c1, this is what a real SH7091 in a Dreamcast returns - the later Naomi BIOSes check and care!
+		return PVR_SH7091;  // 0x040205c1, this is what a real SH7091 in a Dreamcast returns - the later Naomi BIOSes check and care!
 	case PRR:
 		return 0;
 	case IPRD:
-		return 0x00000000;	// SH7750 ignores writes here and always returns zero
+		return 0x00000000;  // SH7750 ignores writes here and always returns zero
 	case RTCNT:
 		if ((sh4->m[RTCSR] >> 3) & 7)
 		{ // activated
@@ -1280,4 +1280,3 @@ WRITE64_HANDLER( sh4_tlb_w )
 		sh4->sh4_tlb_address[i] = data&0xffffffff;
 	}
 }
-

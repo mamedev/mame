@@ -89,13 +89,13 @@ inline void msm5832_device::write_counter(int counter, int value)
 //-------------------------------------------------
 
 msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MSM5832, "MSM5832", tag, owner, clock),
-	  device_rtc_interface(mconfig, *this),
-	  m_hold(0),
-	  m_address(0),
-	  m_read(0),
-	  m_write(0),
-	  m_cs(0)
+	: device_t(mconfig, MSM5832, "MSM5832", tag, owner, clock),
+		device_rtc_interface(mconfig, *this),
+		m_hold(0),
+		m_address(0),
+		m_read(0),
+		m_write(0),
+		m_cs(0)
 {
 	for (int i = 0; i < 13; i++)
 		m_reg[i] = 0;

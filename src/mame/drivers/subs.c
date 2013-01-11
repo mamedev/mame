@@ -119,10 +119,10 @@ static INPUT_PORTS_START( subs )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("DIAL2")	/* IN3 */
+	PORT_START("DIAL2") /* IN3 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
 
-	PORT_START("DIAL1")	/* IN4 */
+	PORT_START("DIAL1") /* IN4 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
 INPUT_PORTS_END
@@ -154,17 +154,17 @@ static const gfx_layout motion_layout =
 	1,
 	{ 0 },
 	{ 3 + 0x400*8, 2 + 0x400*8, 1 + 0x400*8, 0 + 0x400*8,
-	  7 + 0x400*8, 6 + 0x400*8, 5 + 0x400*8, 4 + 0x400*8,
-	  3, 2, 1, 0, 7, 6, 5, 4 },
+		7 + 0x400*8, 6 + 0x400*8, 5 + 0x400*8, 4 + 0x400*8,
+		3, 2, 1, 0, 7, 6, 5, 4 },
 	{ 0, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	16*8
 };
 
 
 static GFXDECODE_START( subs )
-	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 )	/* playfield graphics */
-	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 )	/* motion graphics */
+	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 )    /* playfield graphics */
+	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 )    /* motion graphics */
 GFXDECODE_END
 
 
@@ -177,7 +177,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( subs, subs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
+	MCFG_CPU_ADD("maincpu", M6502,12096000/16)      /* clock input is the "4H" signal */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(subs_state, subs_interrupt, 4*57)
 
@@ -221,20 +221,20 @@ MACHINE_CONFIG_END
 
 ROM_START( subs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD_NIB_HIGH( "34196.e2",     0x2000, 0x0100, CRC(7c7a04c3) SHA1(269d9f7573cc5da4412f53d647127c4884435353) )	/* ROM 0 D4-D7 */
-	ROM_LOAD_NIB_LOW ( "34194.e1",     0x2000, 0x0100, CRC(6b1c4acc) SHA1(3a743b721d9e7e9bdc4533aeeab294eb0ea27500) )	/* ROM 0 D0-D3 */
+	ROM_LOAD_NIB_HIGH( "34196.e2",     0x2000, 0x0100, CRC(7c7a04c3) SHA1(269d9f7573cc5da4412f53d647127c4884435353) )   /* ROM 0 D4-D7 */
+	ROM_LOAD_NIB_LOW ( "34194.e1",     0x2000, 0x0100, CRC(6b1c4acc) SHA1(3a743b721d9e7e9bdc4533aeeab294eb0ea27500) )   /* ROM 0 D0-D3 */
 	ROM_LOAD( "34190.p1",     0x2800, 0x0800, CRC(a88aef21) SHA1(3811c137041ca43a6e49fbaf7d9d8ef37ba190a2) )
 	ROM_LOAD( "34191.p2",     0x3000, 0x0800, CRC(2c652e72) SHA1(097b665e803cbc57b5a828403a8d9a258c19e97f) )
 	ROM_LOAD( "34192.n2",     0x3800, 0x0800, CRC(3ce63d33) SHA1(a413cb3e0d03dc40a50f5b03b76a4edbe7906f3e) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "34211.m4",     0x0000, 0x0800, CRC(fa8d4409) SHA1(a83b7a835212d31fe421d537fa0d78f234c26f5b) )	/* Playfield */
+	ROM_LOAD( "34211.m4",     0x0000, 0x0800, CRC(fa8d4409) SHA1(a83b7a835212d31fe421d537fa0d78f234c26f5b) )    /* Playfield */
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "34216.d7",     0x0000, 0x0200, CRC(941d28b4) SHA1(89388ec06546dc567aa5dbc6a7898974f2871ecc) )	/* Motion */
-	ROM_LOAD( "34218.e7",     0x0200, 0x0200, CRC(f4f4d874) SHA1(d99ad9a74611f9851f6bfa6000ebd70e1a364f5d) )	/* Motion */
-	ROM_LOAD( "34217.d8",     0x0400, 0x0200, CRC(a7a60da3) SHA1(34fc21cc1ca69d58d3907094dc0a3faaf6f461b3) )	/* Motion */
-	ROM_LOAD( "34219.e8",     0x0600, 0x0200, CRC(99a5a49b) SHA1(2cb429f8de73c7d78dc83e47f1448ea4340c333d) )	/* Motion */
+	ROM_LOAD( "34216.d7",     0x0000, 0x0200, CRC(941d28b4) SHA1(89388ec06546dc567aa5dbc6a7898974f2871ecc) )    /* Motion */
+	ROM_LOAD( "34218.e7",     0x0200, 0x0200, CRC(f4f4d874) SHA1(d99ad9a74611f9851f6bfa6000ebd70e1a364f5d) )    /* Motion */
+	ROM_LOAD( "34217.d8",     0x0400, 0x0200, CRC(a7a60da3) SHA1(34fc21cc1ca69d58d3907094dc0a3faaf6f461b3) )    /* Motion */
+	ROM_LOAD( "34219.e8",     0x0600, 0x0200, CRC(99a5a49b) SHA1(2cb429f8de73c7d78dc83e47f1448ea4340c333d) )    /* Motion */
 ROM_END
 
 

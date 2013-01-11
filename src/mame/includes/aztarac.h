@@ -9,10 +9,10 @@ class aztarac_state : public driver_device
 public:
 	aztarac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") ,
+			m_nvram(*this, "nvram") ,
 		m_vectorram(*this, "vectorram"){ }
 
-	required_shared_ptr<UINT16>	m_nvram;
+	required_shared_ptr<UINT16> m_nvram;
 	int m_sound_status;
 	required_shared_ptr<UINT16> m_vectorram;
 	int m_xcenter;

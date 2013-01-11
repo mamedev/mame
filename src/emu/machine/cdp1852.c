@@ -65,7 +65,7 @@ void cdp1852_device::set_sr_line(int state)
 //-------------------------------------------------
 
 cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CDP1852, "CDP1852", tag, owner, clock)
+	: device_t(mconfig, CDP1852, "CDP1852", tag, owner, clock)
 {
 }
 

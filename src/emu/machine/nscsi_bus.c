@@ -40,31 +40,31 @@ void nscsi_bus_device::regen_ctrl(int refid)
 
 	if(0) {
 		logerror("%s: ctrl %c%c%c%c%c%c%c%c%c %s %04x -",
-				 tag(),
-				 ctrl & nscsi_device::S_RST ? 'R' : '.',
-				 ctrl & nscsi_device::S_ATN ? 'A' : '.',
-				 ctrl & nscsi_device::S_ACK ? 'K' : '.',
-				 ctrl & nscsi_device::S_REQ ? 'Q' : '.',
-				 ctrl & nscsi_device::S_SEL ? 'S' : '.',
-				 ctrl & nscsi_device::S_BSY ? 'B' : '.',
-				 ctrl & nscsi_device::S_MSG ? 'M' : '.',
-				 ctrl & nscsi_device::S_CTL ? 'C' : '.',
-				 ctrl & nscsi_device::S_INP ? 'I' : '.',
-				 phase[ctrl & 7],
-				 data);
+					tag(),
+					ctrl & nscsi_device::S_RST ? 'R' : '.',
+					ctrl & nscsi_device::S_ATN ? 'A' : '.',
+					ctrl & nscsi_device::S_ACK ? 'K' : '.',
+					ctrl & nscsi_device::S_REQ ? 'Q' : '.',
+					ctrl & nscsi_device::S_SEL ? 'S' : '.',
+					ctrl & nscsi_device::S_BSY ? 'B' : '.',
+					ctrl & nscsi_device::S_MSG ? 'M' : '.',
+					ctrl & nscsi_device::S_CTL ? 'C' : '.',
+					ctrl & nscsi_device::S_INP ? 'I' : '.',
+					phase[ctrl & 7],
+					data);
 		for(int i=0; i<devcnt; i++)
 			if(dev[i].ctrl) {
 				logerror(" %d=", i);
 				logerror("%s%s%s%s%s%s%s%s%s",
-						 dev[i].ctrl & nscsi_device::S_RST ? "R" : "",
-						 dev[i].ctrl & nscsi_device::S_ATN ? "A" : "",
-						 dev[i].ctrl & nscsi_device::S_ACK ? "K" : "",
-						 dev[i].ctrl & nscsi_device::S_REQ ? "Q" : "",
-						 dev[i].ctrl & nscsi_device::S_MSG ? "M" : "",
-						 dev[i].ctrl & nscsi_device::S_INP ? "I" : "",
-						 dev[i].ctrl & nscsi_device::S_CTL ? "C" : "",
-						 dev[i].ctrl & nscsi_device::S_SEL ? "S" : "",
-						 dev[i].ctrl & nscsi_device::S_BSY ? "B" : "");
+							dev[i].ctrl & nscsi_device::S_RST ? "R" : "",
+							dev[i].ctrl & nscsi_device::S_ATN ? "A" : "",
+							dev[i].ctrl & nscsi_device::S_ACK ? "K" : "",
+							dev[i].ctrl & nscsi_device::S_REQ ? "Q" : "",
+							dev[i].ctrl & nscsi_device::S_MSG ? "M" : "",
+							dev[i].ctrl & nscsi_device::S_INP ? "I" : "",
+							dev[i].ctrl & nscsi_device::S_CTL ? "C" : "",
+							dev[i].ctrl & nscsi_device::S_SEL ? "S" : "",
+							dev[i].ctrl & nscsi_device::S_BSY ? "B" : "");
 			}
 		logerror("\n");
 	}
@@ -209,8 +209,8 @@ void nscsi_full_device::step(bool timeout)
 
 	if(0)
 		logerror("%s: state=%d.%d %s\n",
-				 tag(), scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT,
-				 timeout ? "timeout" : "change");
+					tag(), scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT,
+					timeout ? "timeout" : "change");
 
 	switch(scsi_state & SUB_MASK ? scsi_state & SUB_MASK : scsi_state & STATE_MASK) {
 	case IDLE:
@@ -372,8 +372,8 @@ void nscsi_full_device::step(bool timeout)
 
 	default:
 		logerror("%s: step() unexpected state %d.%d\n",
-				 tag(),
-				 scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT);
+					tag(),
+					scsi_state & STATE_MASK, (scsi_state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
 	}
 }
@@ -675,4 +675,3 @@ attotime nscsi_full_device::scsi_fast_negation_period()
 {
 	return attotime::from_nsec(30);
 }
-

@@ -35,12 +35,12 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_1_w)
 {
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	sn76477_enable_w(m_sn, !(data & 0x01));			/* SAUCER SOUND */
+	sn76477_enable_w(m_sn, !(data & 0x01));         /* SAUCER SOUND */
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);		/* MISSLE SOUND */
-	if (rising_bits & 0x04) m_samples->start(1, 1);		/* EXPLOSION */
-	if (rising_bits & 0x08) m_samples->start(2, 2);		/* INVADER HIT */
-	if (rising_bits & 0x10) m_samples->start(5, 8);		/* BONUS MISSILE BASE */
+	if (rising_bits & 0x02) m_samples->start(0, 0);     /* MISSLE SOUND */
+	if (rising_bits & 0x04) m_samples->start(1, 1);     /* EXPLOSION */
+	if (rising_bits & 0x08) m_samples->start(2, 2);     /* INVADER HIT */
+	if (rising_bits & 0x10) m_samples->start(5, 8);     /* BONUS MISSILE BASE */
 
 	m_screen_red = data & 0x04;
 
@@ -53,18 +53,18 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 {
 	/* FLEET (movement)
 
-       DO = 20K + 20K
-       D1 = 68K
-       D2 = 82K
-       D3 = 100K */
+	   DO = 20K + 20K
+	   D1 = 68K
+	   D2 = 82K
+	   D3 = 100K */
 
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 3);		/* FLEET */
-	if (rising_bits & 0x02) m_samples->start(4, 4);		/* FLEET */
-	if (rising_bits & 0x04) m_samples->start(4, 5);		/* FLEET */
-	if (rising_bits & 0x08) m_samples->start(4, 6);		/* FLEET */
-	if (rising_bits & 0x10) m_samples->start(3, 7);		/* SAUCER HIT */
+	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
+	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
+	if (rising_bits & 0x04) m_samples->start(4, 5);     /* FLEET */
+	if (rising_bits & 0x08) m_samples->start(4, 6);     /* FLEET */
+	if (rising_bits & 0x10) m_samples->start(3, 7);     /* SAUCER HIT */
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -83,11 +83,11 @@ WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
 {
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 3);		/* FLEET */
-	if (rising_bits & 0x02) m_samples->start(4, 4);		/* FLEET */
-	if (rising_bits & 0x04) m_samples->start(4, 5);		/* FLEET */
-	if (rising_bits & 0x08) m_samples->start(4, 6);		/* FLEET */
-	if (rising_bits & 0x10) m_samples->start(3, 7);		/* SAUCER HIT */
+	if (rising_bits & 0x01) m_samples->start(4, 3);     /* FLEET */
+	if (rising_bits & 0x02) m_samples->start(4, 4);     /* FLEET */
+	if (rising_bits & 0x04) m_samples->start(4, 5);     /* FLEET */
+	if (rising_bits & 0x08) m_samples->start(4, 6);     /* FLEET */
+	if (rising_bits & 0x10) m_samples->start(3, 7);     /* SAUCER HIT */
 
 	m_flip_screen = BIT(~data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -104,13 +104,13 @@ WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
 {
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	sn76477_enable_w(m_sn, !(data & 0x01));			/* Saucer Sound */
+	sn76477_enable_w(m_sn, !(data & 0x01));         /* Saucer Sound */
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(1, 1);		/* Base Hit */
-	if (rising_bits & 0x08) m_samples->start(2, 2);		/* Invader Hit */
+	if (rising_bits & 0x02) m_samples->start(0, 0);     /* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(1, 1);     /* Base Hit */
+	if (rising_bits & 0x08) m_samples->start(2, 2);     /* Invader Hit */
 
-	speaker_level_w(m_speaker, (data & 0x10) ? 1 : 0);		/* Various bitstream tunes */
+	speaker_level_w(m_speaker, (data & 0x10) ? 1 : 0);      /* Various bitstream tunes */
 
 	m_port_1_last_extra = data;
 }
@@ -140,7 +140,7 @@ static const char *const lrescue_sample_names[] =
 
 const samples_interface lrescue_samples_interface =
 {
-	4,	/* 4 channels */
+	4,  /* 4 channels */
 	lrescue_sample_names
 };
 
@@ -148,11 +148,11 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
 {
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(0, 3);		/* Thrust */
-	if (rising_bits & 0x02) m_samples->start(1, 2);		/* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(0, 1);		/* Death */
-	if (rising_bits & 0x08) m_samples->start(1, 0);		/* Alien Hit */
-	if (rising_bits & 0x10) m_samples->start(2, 5);		/* Bonus Ship (not confirmed) */
+	if (rising_bits & 0x01) m_samples->start(0, 3);     /* Thrust */
+	if (rising_bits & 0x02) m_samples->start(1, 2);     /* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(0, 1);     /* Death */
+	if (rising_bits & 0x08) m_samples->start(1, 0);     /* Alien Hit */
+	if (rising_bits & 0x10) m_samples->start(2, 5);     /* Bonus Ship (not confirmed) */
 
 	machine().sound().system_enable(data & 0x20);
 
@@ -165,14 +165,14 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 {
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 8);		/* Footstep high tone */
-	if (rising_bits & 0x02) m_samples->start(1, 7);		/* Footstep low tone */
-	if (rising_bits & 0x04) m_samples->start(1, 4);		/* Bonus when counting men saved */
+	if (rising_bits & 0x01) m_samples->start(1, 8);     /* Footstep high tone */
+	if (rising_bits & 0x02) m_samples->start(1, 7);     /* Footstep low tone */
+	if (rising_bits & 0x04) m_samples->start(1, 4);     /* Bonus when counting men saved */
 
-	speaker_level_w(m_speaker, (data & 0x08) ? 1 : 0);		/* Bitstream tunes - endlevel and bonus1 */
+	speaker_level_w(m_speaker, (data & 0x08) ? 1 : 0);      /* Bitstream tunes - endlevel and bonus1 */
 
-	if (rising_bits & 0x10) m_samples->start(3, 6);		/* Shooting Star and Rescue Ship sounds */
-	if ((~data & 0x10) && (m_port_2_last_extra & 0x10)) m_samples->stop(3);	/* This makes the rescue ship sound beep on and off */
+	if (rising_bits & 0x10) m_samples->start(3, 6);     /* Shooting Star and Rescue Ship sounds */
+	if ((~data & 0x10) && (m_port_2_last_extra & 0x10)) m_samples->stop(3); /* This makes the rescue ship sound beep on and off */
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -212,12 +212,12 @@ WRITE8_MEMBER(_8080bw_state::cosmo_sh_port_2_w)
 static const discrete_dac_r1_ladder ballbomb_music_dac =
 	{3, {0, RES_K(47), RES_K(12)}, 0, 0, 0, CAP_U(0.1)};
 
-#define BALLBOMB_MUSIC_CLK		(3993.6*2*2*2)
+#define BALLBOMB_MUSIC_CLK      (3993.6*2*2*2)
 
 /* Nodes - Inputs */
-#define BALLBOMB_MUSIC_DATA		NODE_01
+#define BALLBOMB_MUSIC_DATA     NODE_01
 /* Nodes - Sounds */
-#define BALLBOMB_MUSIC			NODE_11
+#define BALLBOMB_MUSIC          NODE_11
 
 DISCRETE_SOUND_START(ballbomb)
 
@@ -255,11 +255,11 @@ WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
 {
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 2);		/* Hit a balloon */
-	if (rising_bits & 0x02) m_samples->start(2, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(2, 1);		/* Base Hit */
-	if (rising_bits & 0x08) m_samples->start(1, 7);		/* Hit a Bomb */
-	if (rising_bits & 0x10) m_samples->start(3, 8);		/* Bonus Base at 1500 points */
+	if (rising_bits & 0x01) m_samples->start(1, 2);     /* Hit a balloon */
+	if (rising_bits & 0x02) m_samples->start(2, 0);     /* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(2, 1);     /* Base Hit */
+	if (rising_bits & 0x08) m_samples->start(1, 7);     /* Hit a Bomb */
+	if (rising_bits & 0x10) m_samples->start(3, 8);     /* Bonus Base at 1500 points */
 
 	machine().sound().system_enable(data & 0x20);
 
@@ -272,9 +272,9 @@ WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
 {
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (data & 0x01) m_samples->start(0, 7);		/* Indicates plane will drop bombs */
-	if (data & 0x04) m_samples->start(0, 4);		/* Plane is dropping new balloons at start of level */
-	if (rising_bits & 0x10) m_samples->start(2, 2);		/* Balloon hit and bomb drops */
+	if (data & 0x01) m_samples->start(0, 7);        /* Indicates plane will drop bombs */
+	if (data & 0x04) m_samples->start(0, 4);        /* Plane is dropping new balloons at start of level */
+	if (rising_bits & 0x10) m_samples->start(2, 2);     /* Balloon hit and bomb drops */
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -292,12 +292,12 @@ WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
 static const discrete_dac_r1_ladder indianbt_music_dac =
 	{3, {0, RES_K(47), RES_K(12)}, 0, 0, 0, CAP_U(0.1)};
 
-#define INDIANBT_MUSIC_CLK		(7680.0*2*2*2)
+#define INDIANBT_MUSIC_CLK      (7680.0*2*2*2)
 
 /* Nodes - Inputs */
-#define INDIANBT_MUSIC_DATA		NODE_01
+#define INDIANBT_MUSIC_DATA     NODE_01
 /* Nodes - Sounds */
-#define INDIANBT_MUSIC			NODE_11
+#define INDIANBT_MUSIC          NODE_11
 
 DISCRETE_SOUND_START(indianbt)
 
@@ -331,10 +331,10 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
 	/* bit 4 occurs every 5.25 seconds during gameplay */
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 7);		/* Death */
-	if (rising_bits & 0x02) m_samples->start(0, 1);		/* Shot Sound */
-	if (rising_bits & 0x04) m_samples->start(2, 3);		/* Move */
-	if (rising_bits & 0x08) m_samples->start(3, 2);		/* Hit */
+	if (rising_bits & 0x01) m_samples->start(1, 7);     /* Death */
+	if (rising_bits & 0x02) m_samples->start(0, 1);     /* Shot Sound */
+	if (rising_bits & 0x04) m_samples->start(2, 3);     /* Move */
+	if (rising_bits & 0x08) m_samples->start(3, 2);     /* Hit */
 
 	machine().sound().system_enable(data & 0x20);
 
@@ -347,10 +347,10 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 {
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 0);		/* Bird dropped an egg, Lasso used */
-	if (rising_bits & 0x02) m_samples->start(4, 2);		/* Egg hatches, egg shot */
-	if (rising_bits & 0x08) m_samples->start(5, 0);		/* Grabber, Lasso caught something */
-	if (rising_bits & 0x10) m_samples->start(3, 7);		/* Lasso sound */
+	if (rising_bits & 0x01) m_samples->start(4, 0);     /* Bird dropped an egg, Lasso used */
+	if (rising_bits & 0x02) m_samples->start(4, 2);     /* Egg hatches, egg shot */
+	if (rising_bits & 0x08) m_samples->start(5, 0);     /* Grabber, Lasso caught something */
+	if (rising_bits & 0x10) m_samples->start(3, 7);     /* Lasso sound */
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -376,16 +376,16 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 
 static const discrete_lfsr_desc polaris_lfsr={
 	DISC_CLK_IS_FREQ,
-	17,			/* Bit Length */
-	0,			/* Reset Value */
-	4,			/* Use Bit 4 as XOR input 0 */
-	16,			/* Use Bit 16 as XOR input 1 */
-	DISC_LFSR_XOR,		/* Feedback stage1 is XOR */
-	DISC_LFSR_OR,		/* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,	/* Feedback stage3 replaces the shifted register contents */
-	0x000001,		/* Everything is shifted into the first bit only */
-	0,			/* Output is not inverted */
-	12			/* Output bit */
+	17,         /* Bit Length */
+	0,          /* Reset Value */
+	4,          /* Use Bit 4 as XOR input 0 */
+	16,         /* Use Bit 16 as XOR input 1 */
+	DISC_LFSR_XOR,      /* Feedback stage1 is XOR */
+	DISC_LFSR_OR,       /* Feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
+	0x000001,       /* Everything is shifted into the first bit only */
+	0,          /* Output is not inverted */
+	12          /* Output bit */
 };
 
 static const discrete_dac_r1_ladder polaris_music_dac =
@@ -438,14 +438,14 @@ static const discrete_op_amp_osc_info polaris_plane_vco_info =
 static const discrete_mixer_desc polaris_mixer_vr1_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(66), RES_K(43), RES_K(20), RES_K(43)},
-		{0},	// no variable resistors
+		{0},    // no variable resistors
 		{CAP_U(1), CAP_U(1), CAP_U(1), CAP_U(1)},
 		0, RES_K(50), 0, 0, 0, 1};
 
 static const discrete_mixer_desc polaris_mixer_vr2_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(66), RES_K(110)},
-		{0},	// no variable resistors
+		{0},    // no variable resistors
 		{CAP_U(1), CAP_U(1)},
 		0, RES_K(50), 0, 0, 0, 1};
 
@@ -455,37 +455,37 @@ static const discrete_mixer_desc polaris_mixer_vr2_desc =
 static const discrete_mixer_desc polaris_mixer_vr4_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(22), RES_K(20), RES_K(22), RES_K(22)},
-		{0},	// no variable resistors
+		{0},    // no variable resistors
 		{0, CAP_U(1), 0, 0},
 		0, RES_K(50), 0, CAP_U(1), 0, 40000};
 
 /* Nodes - Inputs */
-#define POLARIS_MUSIC_DATA		NODE_01
-#define POLARIS_SX0_EN			NODE_02
-#define POLARIS_SX1_EN			NODE_03
-#define POLARIS_SX2_EN			NODE_04
-#define POLARIS_SX3_EN			NODE_05
-#define POLARIS_SX5_EN			NODE_06
-#define POLARIS_SX6_EN			NODE_07
-#define POLARIS_SX7_EN			NODE_08
-#define POLARIS_SX9_EN			NODE_09
-#define POLARIS_SX10_EN			NODE_10
+#define POLARIS_MUSIC_DATA      NODE_01
+#define POLARIS_SX0_EN          NODE_02
+#define POLARIS_SX1_EN          NODE_03
+#define POLARIS_SX2_EN          NODE_04
+#define POLARIS_SX3_EN          NODE_05
+#define POLARIS_SX5_EN          NODE_06
+#define POLARIS_SX6_EN          NODE_07
+#define POLARIS_SX7_EN          NODE_08
+#define POLARIS_SX9_EN          NODE_09
+#define POLARIS_SX10_EN         NODE_10
 /* Nodes - Sounds */
-#define POLARIS_MUSIC			NODE_11
-#define POLARIS_NOISE_LO		NODE_12
-#define POLARIS_NOISE_LO_FILT	NODE_13
-#define POLARIS_NOISE_HI_FILT	NODE_14
-#define POLARIS_SHOTSND			NODE_15
-#define POLARIS_SHIP_HITSND		NODE_16
-#define POLARIS_SHIPSND			NODE_17
-#define POLARIS_EXPLOSIONSND	NODE_18
-#define POLARIS_PLANESND		NODE_19
-#define POLARIS_HITSND			NODE_20
-#define POLARIS_SONARSND		NODE_21
+#define POLARIS_MUSIC           NODE_11
+#define POLARIS_NOISE_LO        NODE_12
+#define POLARIS_NOISE_LO_FILT   NODE_13
+#define POLARIS_NOISE_HI_FILT   NODE_14
+#define POLARIS_SHOTSND         NODE_15
+#define POLARIS_SHIP_HITSND     NODE_16
+#define POLARIS_SHIPSND         NODE_17
+#define POLARIS_EXPLOSIONSND    NODE_18
+#define POLARIS_PLANESND        NODE_19
+#define POLARIS_HITSND          NODE_20
+#define POLARIS_SONARSND        NODE_21
 /* Nodes - Adjust */
-#define POLARIS_ADJ_VR1			NODE_23
-#define POLARIS_ADJ_VR2			NODE_24
-#define POLARIS_ADJ_VR3			NODE_25
+#define POLARIS_ADJ_VR1         NODE_23
+#define POLARIS_ADJ_VR2         NODE_24
+#define POLARIS_ADJ_VR3         NODE_25
 
 DISCRETE_SOUND_START(polaris)
 
@@ -554,10 +554,10 @@ DISCRETE_SOUND_START(polaris)
  * makes a one shot pulse of approx. 15ms to keep the noise working.
  *
  ******************************************************************************/
-	DISCRETE_SQUAREWFIX(NODE_40, 1, 60.0/16, 1, 50, 1.0/2, 0)	// IC 5L, pin 6
-	DISCRETE_COUNTER(NODE_41, 1, 0, NODE_40, 0, 31, 1, 0, DISC_CLK_ON_F_EDGE)	// IC 5L & 5F
-	DISCRETE_TRANSFORM2(NODE_42, NODE_41, 4, "01&")			// IC 5L, pin 9
-	DISCRETE_TRANSFORM2(NODE_43, NODE_41, 16, "01&!")		// IC 5F, pin 8
+	DISCRETE_SQUAREWFIX(NODE_40, 1, 60.0/16, 1, 50, 1.0/2, 0)   // IC 5L, pin 6
+	DISCRETE_COUNTER(NODE_41, 1, 0, NODE_40, 0, 31, 1, 0, DISC_CLK_ON_F_EDGE)   // IC 5L & 5F
+	DISCRETE_TRANSFORM2(NODE_42, NODE_41, 4, "01&")         // IC 5L, pin 9
+	DISCRETE_TRANSFORM2(NODE_43, NODE_41, 16, "01&!")       // IC 5F, pin 8
 	DISCRETE_ONESHOT(NODE_44, NODE_43, 1, 0.0015, DISC_ONESHOT_REDGE | DISC_ONESHOT_NORETRIG | DISC_OUT_ACTIVE_HIGH)
 
 	DISCRETE_LOGIC_OR(NODE_45, NODE_42, POLARIS_SX3_EN)
@@ -580,7 +580,7 @@ DISCRETE_SOUND_START(polaris)
 	// Filtered Lo noise.  7K pin 5.
 	DISCRETE_OP_AMP_FILTER(POLARIS_NOISE_LO_FILT, 1, POLARIS_NOISE_LO, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON, &polaris_nol_op_amp_filt_info)
 
-	DISCRETE_LFSR_NOISE(NODE_50, 1, 1, 23396, (12.0 - OP_AMP_NORTON_VBE), NODE_44, (12.0 - OP_AMP_NORTON_VBE)/2, &polaris_lfsr)	// 7K pin 10
+	DISCRETE_LFSR_NOISE(NODE_50, 1, 1, 23396, (12.0 - OP_AMP_NORTON_VBE), NODE_44, (12.0 - OP_AMP_NORTON_VBE)/2, &polaris_lfsr) // 7K pin 10
 	// Filtered Hi noise.  6B pin 10. - This does not really do much.  Sample rates of 98k+ are needed for this high of filtering.
 	DISCRETE_OP_AMP_FILTER(POLARIS_NOISE_HI_FILT, 1, NODE_50, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON, &polaris_noh_op_amp_filt_info)
 
@@ -745,51 +745,51 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
  *
  *  for 4V, it's double at 2294.12Hz
  */
-#define SCHASER_HSYNC	18352.94
-#define SCHASER_4V		SCHASER_HSYNC /2 /4
-#define SCHASER_8V		SCHASER_HSYNC /2 /8
+#define SCHASER_HSYNC   18352.94
+#define SCHASER_4V      SCHASER_HSYNC /2 /4
+#define SCHASER_8V      SCHASER_HSYNC /2 /8
 
 const sn76477_interface schaser_sn76477_interface =
 {
-	RES_K( 47),	/*  4 noise_res         */
-	RES_K(330),	/*  5 filter_res        */
-	CAP_P(470),	/*  6 filter_cap        */
-	RES_M(2.2),	/*  7 decay_res         */
-	CAP_U(1.0),	/*  8 attack_decay_cap  */
-	RES_K(4.7),	/* 10 attack_res        */
-	0,			/* 11 amplitude_res (variable)  */
-	RES_K(33),	/* 12 feedback_res      */
-	0,			/* 16 vco_voltage       */
-	CAP_U(0.1),	/* 17 vco_cap           */
-	RES_K(39),	/* 18 vco_res           */
-	5.0,		/* 19 pitch_voltage     */
-	RES_K(120),	/* 20 slf_res           */
-	CAP_U(1.0),	/* 21 slf_cap           */
-	CAP_U(0.1),	/* 23 oneshot_cap       */
+	RES_K( 47), /*  4 noise_res         */
+	RES_K(330), /*  5 filter_res        */
+	CAP_P(470), /*  6 filter_cap        */
+	RES_M(2.2), /*  7 decay_res         */
+	CAP_U(1.0), /*  8 attack_decay_cap  */
+	RES_K(4.7), /* 10 attack_res        */
+	0,          /* 11 amplitude_res (variable)  */
+	RES_K(33),  /* 12 feedback_res      */
+	0,          /* 16 vco_voltage       */
+	CAP_U(0.1), /* 17 vco_cap           */
+	RES_K(39),  /* 18 vco_res           */
+	5.0,        /* 19 pitch_voltage     */
+	RES_K(120), /* 20 slf_res           */
+	CAP_U(1.0), /* 21 slf_cap           */
+	CAP_U(0.1), /* 23 oneshot_cap       */
 	RES_K(220), /* 24 oneshot_res       */
-	1,			/* 22 vco               */
-	0,			/* 26 mixer A           */
-	0,			/* 25 mixer B           */
-	0,			/* 27 mixer C           */
-	1,			/* 1  envelope 1        */
-	0,			/* 28 envelope 2        */
-	1			/* 9  enable (variable) */
+	1,          /* 22 vco               */
+	0,          /* 26 mixer A           */
+	0,          /* 25 mixer B           */
+	0,          /* 27 mixer C           */
+	1,          /* 1  envelope 1        */
+	0,          /* 28 envelope 2        */
+	1           /* 9  enable (variable) */
 };
 
 /* Nodes - Inputs */
-#define SCHASER_DOT_EN		NODE_01
-#define SCHASER_DOT_SEL		NODE_02
-#define SCHASER_EXP_STREAM	NODE_03
-#define SCHASER_MUSIC_BIT	NODE_04
-#define SCHASER_SND_EN		NODE_05
+#define SCHASER_DOT_EN      NODE_01
+#define SCHASER_DOT_SEL     NODE_02
+#define SCHASER_EXP_STREAM  NODE_03
+#define SCHASER_MUSIC_BIT   NODE_04
+#define SCHASER_SND_EN      NODE_05
 /* Nodes - Adjusters */
-#define SCHASER_VR1			NODE_07
-#define SCHASER_VR2			NODE_08
-#define SCHASER_VR3			NODE_09
+#define SCHASER_VR1         NODE_07
+#define SCHASER_VR2         NODE_08
+#define SCHASER_VR3         NODE_09
 /* Nodes - Sounds */
-#define SCHASER_DOT_SND		NODE_10
-#define SCHASER_EXP_SND		NODE_11
-#define SCHASER_MUSIC_SND	NODE_12
+#define SCHASER_DOT_SND     NODE_10
+#define SCHASER_EXP_SND     NODE_11
+#define SCHASER_MUSIC_SND   NODE_12
 
 DISCRETE_SOUND_START(schaser)
 	/************************************************/
@@ -860,24 +860,24 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 	int effect;
 
 	/* bit 0 - Dot Sound Enable (SX0)
-       bit 1 - Dot Sound Pitch (SX1)
-       bit 2 - Effect Sound A (SX2)
-       bit 3 - Effect Sound B (SX3)
-       bit 4 - Effect Sound C (SX4)
-       bit 5 - Explosion (SX5)
+	   bit 1 - Dot Sound Pitch (SX1)
+	   bit 2 - Effect Sound A (SX2)
+	   bit 3 - Effect Sound B (SX3)
+	   bit 4 - Effect Sound C (SX4)
+	   bit 5 - Explosion (SX5)
 
-        Note that the schematic has SX2 and SX4 the wrong way around.
-        See MT 2662 for video proof. */
+	    Note that the schematic has SX2 and SX4 the wrong way around.
+	    See MT 2662 for video proof. */
 
 	discrete_sound_w(m_discrete, space, SCHASER_DOT_EN, data & 0x01);
 	discrete_sound_w(m_discrete, space, SCHASER_DOT_SEL, data & 0x02);
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
-     * select the frequency.  Because of the diode voltage drop, we can not use the
-     * standard 555 time formulas.  Also, when effect=0, the charge resistor
-     * is disconnected.  This causes the charge on the cap to slowly bleed off, but
-     * but the bleed time is so long, that we can just cheat and put the time on hold
-     * when effect = 0. */
+	 * select the frequency.  Because of the diode voltage drop, we can not use the
+	 * standard 555 time formulas.  Also, when effect=0, the charge resistor
+	 * is disconnected.  This causes the charge on the cap to slowly bleed off, but
+	 * but the bleed time is so long, that we can just cheat and put the time on hold
+	 * when effect = 0. */
 	effect = (data >> 2) & 0x07;
 	if (m_schaser_last_effect != effect)
 	{
@@ -925,11 +925,11 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 {
 	/* bit 0 - Music (DAC) (SX6)
-       bit 1 - Sound Enable (SX7)
-       bit 2 - Coin Lockout (SX8)
-       bit 3 - Field Control A (SX9)
-       bit 4 - Field Control B (SX10)
-       bit 5 - Flip Screen */
+	   bit 1 - Sound Enable (SX7)
+	   bit 2 - Coin Lockout (SX8)
+	   bit 3 - Field Control A (SX9)
+	   bit 4 - Field Control B (SX10)
+	   bit 5 - Flip Screen */
 
 	discrete_sound_w(m_discrete, space, SCHASER_MUSIC_BIT, BIT(data, 0));
 
@@ -1018,16 +1018,16 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_1_w)
 WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
 {
 	/*
-        00 - normal play
-        0A, 0E - alternate during play/attract at about once per second (invrvngegw only) purpose unknown
-        01 - briefly at boot time
-        10 - different colour map (or screen red) when you die
-        20 - flip screen */
+	    00 - normal play
+	    0A, 0E - alternate during play/attract at about once per second (invrvngegw only) purpose unknown
+	    01 - briefly at boot time
+	    10 - different colour map (or screen red) when you die
+	    20 - flip screen */
 
 	m_screen_red = BIT(data, 4);
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
-        // no sound-related writes?
+		// no sound-related writes?
 }
 
 
@@ -1042,9 +1042,9 @@ WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
 {
 	UINT8 rising_bits = data & ~m_port_3_last_extra;
 
-	if (rising_bits & 0x02) m_samples->start(4, 0);	/* Steering */
-	if (rising_bits & 0x04) m_samples->start(0, 1);	/* Collision */
-	if (rising_bits & 0x10) m_samples->start(1, 8);	/* Computer car is starting to move */
+	if (rising_bits & 0x02) m_samples->start(4, 0); /* Steering */
+	if (rising_bits & 0x04) m_samples->start(0, 1); /* Collision */
+	if (rising_bits & 0x10) m_samples->start(1, 8); /* Computer car is starting to move */
 
 	m_port_3_last_extra = data;
 }
@@ -1058,48 +1058,48 @@ WRITE8_MEMBER(_8080bw_state::rollingc_sh_port_w)
 
 const sn76477_interface lupin3_sn76477_interface =
 {
-	0,			/*  4 noise_res (N/C)        */
-	0,			/*  5 filter_res (N/C)       */
-	0,			/*  6 filter_cap (N/C)       */
-	0,			/*  7 decay_res (N/C)        */
-	0,			/*  8 attack_decay_cap (N/C) */
+	0,          /*  4 noise_res (N/C)        */
+	0,          /*  5 filter_res (N/C)       */
+	0,          /*  6 filter_cap (N/C)       */
+	0,          /*  7 decay_res (N/C)        */
+	0,          /*  8 attack_decay_cap (N/C) */
 	RES_K(100), /* 10 attack_res             */
-	RES_K(56),	/* 11 amplitude_res          */
-	RES_K(10),	/* 12 feedback_res           */
-	0,			/* 16 vco_voltage (N/C)      */
-	CAP_U(0.1),	/* 17 vco_cap                */
-	RES_K(8.2),	/* 18 vco_res                */
-	5.0,		/* 19 pitch_voltage          */
-	RES_K(120),	/* 20 slf_res                */
-	CAP_U(1.0),	/* 21 slf_cap                */
-	0,			/* 23 oneshot_cap (N/C)      */
-	0,			/* 24 oneshot_res (N/C)      */
-	1,			/* 22 vco                    */
-	0,			/* 26 mixer A                */
-	0,			/* 25 mixer B                */
-	0,			/* 27 mixer C                */
-	1,			/* 1  envelope 1             */
-	0,			/* 28 envelope 2             */
-	1			/* 9  enable (variable)      */
+	RES_K(56),  /* 11 amplitude_res          */
+	RES_K(10),  /* 12 feedback_res           */
+	0,          /* 16 vco_voltage (N/C)      */
+	CAP_U(0.1), /* 17 vco_cap                */
+	RES_K(8.2), /* 18 vco_res                */
+	5.0,        /* 19 pitch_voltage          */
+	RES_K(120), /* 20 slf_res                */
+	CAP_U(1.0), /* 21 slf_cap                */
+	0,          /* 23 oneshot_cap (N/C)      */
+	0,          /* 24 oneshot_res (N/C)      */
+	1,          /* 22 vco                    */
+	0,          /* 26 mixer A                */
+	0,          /* 25 mixer B                */
+	0,          /* 27 mixer C                */
+	1,          /* 1  envelope 1             */
+	0,          /* 28 envelope 2             */
+	1           /* 9  enable (variable)      */
 };
 
 static const char *const lupin3_sample_names[] =
 {
 	"*lupin3",
-	"cap",		/* go to jail */
-	"bark",		/* dog barking */
-	"walk1",		/* walk, get money */
-	"walk2",		/* walk, get money */
-	"warp",		/* translocate, deposit money */
-	"extend",		/* bonus man */
-	"kick",		/* lands on top of building, wife kicks man */
+	"cap",      /* go to jail */
+	"bark",     /* dog barking */
+	"walk1",        /* walk, get money */
+	"walk2",        /* walk, get money */
+	"warp",     /* translocate, deposit money */
+	"extend",       /* bonus man */
+	"kick",     /* lands on top of building, wife kicks man */
 	0
 };
 
 
 const samples_interface lupin3_samples_interface =
 {
-	4,	/* 4 channels */
+	4,  /* 4 channels */
 	lupin3_sample_names
 };
 
@@ -1115,15 +1115,15 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
 
 	if (rising_bits & 0x01)
 	{
-		m_samples->start(0, lupin3_step);			/* Walking, steal money */
+		m_samples->start(0, lupin3_step);           /* Walking, steal money */
 		lupin3_step ^= 1;
 	}
 
-	sn76477_enable_w(m_sn, data & 0x02 ? 0:1);			/* Helicopter */
+	sn76477_enable_w(m_sn, data & 0x02 ? 0:1);          /* Helicopter */
 
-	if (rising_bits & 0x04) m_samples->start(1, 4);		/* Translocate */
-	if (rising_bits & 0x08) m_samples->start(0, 0);		/* Jail */
-	if (rising_bits & 0x10) m_samples->start(2, 5);		/* Bonus Man */
+	if (rising_bits & 0x04) m_samples->start(1, 4);     /* Translocate */
+	if (rising_bits & 0x08) m_samples->start(0, 0);     /* Jail */
+	if (rising_bits & 0x10) m_samples->start(2, 5);     /* Bonus Man */
 
 	//machine().sound().system_enable(data & 0x20);
 
@@ -1136,7 +1136,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 {
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(0, 6);		/* Lands on top of building, wife kicks man */
+	if (rising_bits & 0x01) m_samples->start(0, 6);     /* Lands on top of building, wife kicks man */
 	//if (rising_bits & 0x02) m_samples->start(3, 7);       /* deposit money, start intermission, end game */
 	//if (rising_bits & 0x04) m_samples->start(4, 7);       /* deposit money, start intermission, Slides down rope */
 	//if (rising_bits & 0x08) m_samples->start(5, 7);       /* start intermission, end game */
@@ -1159,20 +1159,20 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 {
 	/* bit 2 = 2nd speedup
-       bit 3 = 1st speedup
-       Death is a stream of ff's with some fe's thrown in */
+	   bit 3 = 1st speedup
+	   Death is a stream of ff's with some fe's thrown in */
 
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x02) m_samples->start(1, 6);		/* Ran over a dot */
-	if (rising_bits & 0x10) m_samples->start(0, 1);		/* Death */
+	if (rising_bits & 0x02) m_samples->start(1, 6);     /* Ran over a dot */
+	if (rising_bits & 0x10) m_samples->start(0, 1);     /* Death */
 
 	m_port_1_last_extra = data;
 }
 
 WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 {
-	speaker_level_w(m_speaker, (data & 0x01) ? 1 : 0);		/* End-of-Level */
+	speaker_level_w(m_speaker, (data & 0x01) ? 1 : 0);      /* End-of-Level */
 
 	machine().sound().system_enable(data & 0x10);
 
@@ -1190,11 +1190,11 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_1_w)
 {
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(0, 3);			/* Game Over */
-	if (rising_bits & 0x02) m_samples->start(2, 0);			/* Bird dead */
-	if (rising_bits & 0x04) m_samples->start(0, 1);			/* Rifle being fired */
-	if (rising_bits & 0x08) m_samples->start(1, 2);			/* Man dead */
-	if (rising_bits & 0x10) m_samples->start(5, 8);			/* Bonus Man? */
+	if (rising_bits & 0x01) m_samples->start(0, 3);         /* Game Over */
+	if (rising_bits & 0x02) m_samples->start(2, 0);         /* Bird dead */
+	if (rising_bits & 0x04) m_samples->start(0, 1);         /* Rifle being fired */
+	if (rising_bits & 0x08) m_samples->start(1, 2);         /* Man dead */
+	if (rising_bits & 0x10) m_samples->start(5, 8);         /* Bonus Man? */
 
 	machine().sound().system_enable(data & 0x20);
 
@@ -1205,12 +1205,12 @@ WRITE8_MEMBER(_8080bw_state::yosakdon_sh_port_2_w)
 {
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(1, 6);			/* Ready? , Game Over */
-	if (rising_bits & 0x04) m_samples->start(3, 7);			/* Big bird dead */
+	if (rising_bits & 0x01) m_samples->start(1, 6);         /* Ready? , Game Over */
+	if (rising_bits & 0x04) m_samples->start(3, 7);         /* Big bird dead */
 
-	sn76477_enable_w(m_sn, data & 0x08 ? 0:1);				/* Big bird */
+	sn76477_enable_w(m_sn, data & 0x08 ? 0:1);              /* Big bird */
 
-	if (rising_bits & 0x10) m_samples->start(2, 7);			/* Game Over */
+	if (rising_bits & 0x10) m_samples->start(2, 7);         /* Game Over */
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
@@ -1229,10 +1229,10 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_1_w)
 	/* bit 3 is high while you are alive and playing */
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x01) m_samples->start(4, 4);			/* Fleet move */
-	if (rising_bits & 0x02) m_samples->start(5, 8);			/* Extra Tank */
+	if (rising_bits & 0x01) m_samples->start(4, 4);         /* Fleet move */
+	if (rising_bits & 0x02) m_samples->start(5, 8);         /* Extra Tank */
 
-	sn76477_enable_w(m_sn, data & 0x04 ? 0:1);				/* UFO */
+	sn76477_enable_w(m_sn, data & 0x04 ? 0:1);              /* UFO */
 
 	m_port_1_last_extra = data;
 }
@@ -1242,19 +1242,19 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
 	switch (data)
 	{
 		case 0x23:
-			m_samples->start(2, 2);				/* Hit */
+			m_samples->start(2, 2);             /* Hit */
 			break;
 
 		case 0x2b:
-			m_samples->start(0, 0);				/* Shoot */
+			m_samples->start(0, 0);             /* Shoot */
 			break;
 
 		case 0xa3:
-			m_samples->start(3, 7);				/* Hit UFO */
+			m_samples->start(3, 7);             /* Hit UFO */
 			break;
 
 		case 0xab:
-			m_samples->start(1, 1);				/* Death */
+			m_samples->start(1, 1);             /* Death */
 			break;
 	}
 }
@@ -1276,18 +1276,18 @@ WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
 
 	machine().sound().system_enable(data & 0x01);
 
-	if (rising_bits & 0x02) m_samples->start(0, 0);		/* Shoot */
-	if (rising_bits & 0x04) m_samples->start(3, 7);		/* Hit UFO */
-	if (rising_bits & 0x10) m_samples->start(5, 8);		/* Bonus */
+	if (rising_bits & 0x02) m_samples->start(0, 0);     /* Shoot */
+	if (rising_bits & 0x04) m_samples->start(3, 7);     /* Hit UFO */
+	if (rising_bits & 0x10) m_samples->start(5, 8);     /* Bonus */
 
-	sn76477_enable_w(m_sn, data & 0x20 ? 0:1);			/* UFO */
+	sn76477_enable_w(m_sn, data & 0x20 ? 0:1);          /* UFO */
 
-	if (rising_bits & 0x40) m_samples->start(1, 1);		/* Death */
-	if (rising_bits & 0x80) m_samples->start(2, 2);		/* Hit */
+	if (rising_bits & 0x40) m_samples->start(1, 1);     /* Death */
+	if (rising_bits & 0x80) m_samples->start(2, 2);     /* Hit */
 
 	if (rising_bits & 0x08)
 	{
-		m_samples->start(4, m_fleet_step);			/* Fleet move in 4 steps */
+		m_samples->start(4, m_fleet_step);          /* Fleet move in 4 steps */
 		m_fleet_step++;
 		if (m_fleet_step > 6) m_fleet_step = 3;
 	}
@@ -1313,12 +1313,12 @@ WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
 static const discrete_dac_r1_ladder galactic_music_dac =
 	{3, {0, RES_K(47), RES_K(12)}, 0, 0, 0, CAP_U(0.1)};
 
-#define GALACTIC_MUSIC_CLK		(150000)
+#define GALACTIC_MUSIC_CLK      (150000)
 
 /* Nodes - Inputs */
-#define GALACTIC_MUSIC_DATA		NODE_01
+#define GALACTIC_MUSIC_DATA     NODE_01
 /* Nodes - Sounds */
-#define GALACTIC_MUSIC			NODE_11
+#define GALACTIC_MUSIC          NODE_11
 
 DISCRETE_SOUND_START(galactic)
 
@@ -1356,8 +1356,8 @@ WRITE8_MEMBER(_8080bw_state::galactic_sh_port_1_w)
 {
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
 
-	if (rising_bits & 0x02) m_samples->start(2, 2);		/* Killed an enemy */
-	if (rising_bits & 0x04) m_samples->start(1, 1);		/* Lost a life */
+	if (rising_bits & 0x02) m_samples->start(2, 2);     /* Killed an enemy */
+	if (rising_bits & 0x04) m_samples->start(1, 1);     /* Lost a life */
 
 	m_port_1_last_extra = data;
 }
@@ -1367,11 +1367,9 @@ WRITE8_MEMBER(_8080bw_state::galactic_sh_port_2_w)
 {
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
-	if (rising_bits & 0x10) m_samples->start(0, 0);		/* Shoot */
+	if (rising_bits & 0x10) m_samples->start(0, 0);     /* Shoot */
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
 	m_port_2_last_extra = data;
 }
-
-

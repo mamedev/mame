@@ -34,29 +34,29 @@ class mpeg_audio;
 
 class ymz770_device : public device_t, public device_sound_interface
 {
-    struct ymz_channel
-    {
-        UINT8 phrase;
-        UINT8 pan;
-        UINT8 volume;
-        UINT8 control;
+	struct ymz_channel
+	{
+		UINT8 phrase;
+		UINT8 pan;
+		UINT8 volume;
+		UINT8 control;
 
-        bool is_playing, last_block;
+		bool is_playing, last_block;
 
-        mpeg_audio *decoder;
+		mpeg_audio *decoder;
 
-        INT16 output_data[1152];
-        int output_remaining;
-        int output_ptr;
+		INT16 output_data[1152];
+		int output_remaining;
+		int output_ptr;
 		int pptr;
 
-    	UINT8 sequence;
-    	UINT8 seqcontrol;
-    	UINT8 seqdelay;
-    	UINT8 *seqdata;
-    	bool is_seq_playing;
+		UINT8 sequence;
+		UINT8 seqcontrol;
+		UINT8 seqdelay;
+		UINT8 *seqdata;
+		bool is_seq_playing;
 
-    };
+	};
 
 
 public:
@@ -76,14 +76,14 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-    void internal_reg_write(int offset, UINT8 data);
+	void internal_reg_write(int offset, UINT8 data);
 
-    // data
-    UINT8 cur_reg;
-    UINT8 *rom_base;
+	// data
+	UINT8 cur_reg;
+	UINT8 *rom_base;
 	int rom_size;
 
-    ymz_channel channels[8];
+	ymz_channel channels[8];
 };
 
 
@@ -91,4 +91,3 @@ protected:
 extern const device_type YMZ770;
 
 #endif /* __ymz770_H__ */
-

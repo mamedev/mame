@@ -26,35 +26,35 @@ WRITE32_MEMBER(deco32_state::deco32_ace_ram_w)
 {
 	/* Some notes pieced together from Tattoo Assassins info:
 
-        Bytes 0 to 0x58 - object alpha control?
-        Bytes 0x5c to 0x7c - tilemap alpha control
+	    Bytes 0 to 0x58 - object alpha control?
+	    Bytes 0x5c to 0x7c - tilemap alpha control
 
-        0 = opaque, 0x10 = 50% transparent, 0x20 = fully transparent
+	    0 = opaque, 0x10 = 50% transparent, 0x20 = fully transparent
 
-        Byte 0x00: ACEO000P0
-                            P8
-                            1P0
-                            1P8
-                            O010C1
-                            o010C8
-                            ??
+	    Byte 0x00: ACEO000P0
+	                        P8
+	                        1P0
+	                        1P8
+	                        O010C1
+	                        o010C8
+	                        ??
 
-        Hardware fade registers:
+	    Hardware fade registers:
 
-        Byte 0x80: fadeptred
-        Byte 0x84: fadeptgreen
-        Byte 0x88: fadeptblue
-        Byte 0x8c: fadestred
-        Byte 0x90: fadestgreen
-        Byte 0x94: fadestblue
-        Byte 0x98: fadetype
+	    Byte 0x80: fadeptred
+	    Byte 0x84: fadeptgreen
+	    Byte 0x88: fadeptblue
+	    Byte 0x8c: fadestred
+	    Byte 0x90: fadestgreen
+	    Byte 0x94: fadestblue
+	    Byte 0x98: fadetype
 
-        The 'ST' value lerps between the 'PT' value and the palette entries.  So, if PT==0,
-        then ST ranging from 0 to 255 will cause a fade to black (when ST==255 the palette
-        becomes zero).
+	    The 'ST' value lerps between the 'PT' value and the palette entries.  So, if PT==0,
+	    then ST ranging from 0 to 255 will cause a fade to black (when ST==255 the palette
+	    becomes zero).
 
-        'fadetype' - 1100 for multiplicative fade, 1000 for additive
-    */
+	    'fadetype' - 1100 for multiplicative fade, 1000 for additive
+	*/
 	if (offset>=(0x80/4) && (data!=m_ace_ram[offset]))
 		m_ace_ram_dirty=1;
 
@@ -157,11 +157,11 @@ INLINE void dragngun_drawgfxzoom(
 	if (!scalex || !scaley) return;
 
 	/*
-    scalex and scaley are 16.16 fixed point numbers
-    1<<15 : shrink to 50%
-    1<<16 : uniform scale
-    1<<17 : double to 200%
-    */
+	scalex and scaley are 16.16 fixed point numbers
+	1<<15 : shrink to 50%
+	1<<16 : uniform scale
+	1<<17 : double to 200%
+	*/
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
@@ -340,49 +340,49 @@ static void dragngun_draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap
 	int offs;
 
 	/*
-        Sprites are built from main control ram, which references tile
-        layout ram, which finally references tile lookup ram which holds
-        the actual tile indices to draw and index into the banking
-        control.  Tile lookup and tile layout ram are double buffered.
+	    Sprites are built from main control ram, which references tile
+	    layout ram, which finally references tile lookup ram which holds
+	    the actual tile indices to draw and index into the banking
+	    control.  Tile lookup and tile layout ram are double buffered.
 
 
-        Main sprite control ram, 8 * 32 bit words per sprite, so
+	    Main sprite control ram, 8 * 32 bit words per sprite, so
 
-        Word 0:
-            0x0400 - Banking control for tile layout RAM + tile lookup ram
-            0x0200 - ?
-            0x01ff - Index into tile layout RAM
-        Word 1 :
-        Word 2 : X base position
-        Word 3 : Y base position
-        Word 4 :
-            0x8000: X flip
-            0x03ff: X size of block in pixels (for scaling)
-        Word 5 :
-            0x8000: Y flip
-            0x03ff: Y size of block in pixels (for scaling)
-        Word 6 :
-            0x1f - colour.
-            0x20 - ?  Used for background at 'frog' boss and title screen dragon.
-            0x40 - ?  priority?
-            0x80 - Alpha blending enable
-        Word 7 :
+	    Word 0:
+	        0x0400 - Banking control for tile layout RAM + tile lookup ram
+	        0x0200 - ?
+	        0x01ff - Index into tile layout RAM
+	    Word 1 :
+	    Word 2 : X base position
+	    Word 3 : Y base position
+	    Word 4 :
+	        0x8000: X flip
+	        0x03ff: X size of block in pixels (for scaling)
+	    Word 5 :
+	        0x8000: Y flip
+	        0x03ff: Y size of block in pixels (for scaling)
+	    Word 6 :
+	        0x1f - colour.
+	        0x20 - ?  Used for background at 'frog' boss and title screen dragon.
+	        0x40 - ?  priority?
+	        0x80 - Alpha blending enable
+	    Word 7 :
 
 
-        Tile layout ram, 4 * 32 bit words per sprite, so
+	    Tile layout ram, 4 * 32 bit words per sprite, so
 
-        Word 0:
-            0x2000 - Selector for tile lookup bank!?!?!?!?!?!?
-            0x1fff - Index into tile lookup ram (16 bit word based, NOT 32)
-        Word 1:
-            0xff00 - ?
-            0x00f0 - Width
-            0x000f - Height
-        Word 2:
-            0x01ff - X block offset
-        Word 3:
-            0x01ff - Y block offset
-    */
+	    Word 0:
+	        0x2000 - Selector for tile lookup bank!?!?!?!?!?!?
+	        0x1fff - Index into tile lookup ram (16 bit word based, NOT 32)
+	    Word 1:
+	        0xff00 - ?
+	        0x00f0 - Width
+	        0x000f - Height
+	    Word 2:
+	        0x01ff - X block offset
+	    Word 3:
+	        0x01ff - Y block offset
+	*/
 
 	/* Sprite global disable bit */
 	if (state->m_dragngun_sprite_ctrl&0x40000000)
@@ -462,7 +462,7 @@ static void dragngun_draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap
 				}
 
 				/* Because of the unusual interleaved rom layout, we have to mangle the bank bits
-                even further to suit our gfx decode */
+				even further to suit our gfx decode */
 				switch (sprite&0xf000) {
 				case 0x0000: sprite=0xc000 | (sprite&0xfff); break;
 				case 0x1000: sprite=0xd000 | (sprite&0xfff); break;
@@ -723,13 +723,13 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			if ((priColAlphaPal0&0xff)!=0)
 			{
 				/*
-                    Sprite 0 priority rules:
+				    Sprite 0 priority rules:
 
-                    0 = Sprite above all layers
-                    1 = Sprite under top playfield
-                    2 = Sprite under top two playfields
-                    3 = Sprite under all playfields
-                */
+				    0 = Sprite above all layers
+				    1 = Sprite under top playfield
+				    2 = Sprite under top two playfields
+				    3 = Sprite under all playfields
+				*/
 				if ((pri0&0x3)==0 || (pri0&0x3)==1 || ((pri0&0x3)==2 && mixAlphaTilemap)) // Spri0 on top of everything, or under alpha playfield
 				{
 					destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->granularity() * col0)];
@@ -753,13 +753,13 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				if (alpha1)
 				{
 					/*
-                        Alpha rules:
+					    Alpha rules:
 
-                        Pri 0 - Over all tilemaps, but under sprite 0 pri 0, pri 1, pri 2
-                        Pri 1 -
-                        Pri 2 -
-                        Pri 3 -
-                    */
+					    Pri 0 - Over all tilemaps, but under sprite 0 pri 0, pri 1, pri 2
+					    Pri 1 -
+					    Pri 2 -
+					    Pri 3 -
+					*/
 
 					/* Alpha values are tied to ACE ram... */
 					//int alpha=((state->m_ace_ram[0x0 + (((priColAlphaPal1&0xf0)>>4)/2)]) * 8)-1;
@@ -767,7 +767,7 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					//  alpha=0;
 
 					/* I don't really understand how object ACE ram is really hooked up,
-                        the only obvious place in Night Slashers is the stagecoach in level 2 */
+					    the only obvious place in Night Slashers is the stagecoach in level 2 */
 
 					if (pri1==0 && (((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0 && (pri0&0x3)!=1 && (pri0&0x3)!=2))))
 					{
@@ -784,10 +784,10 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				else
 				{
 					/*
-                        Non alpha rules:
+					    Non alpha rules:
 
-                        Pri 0 - Under sprite 0 pri 0, over all tilemaps
-                    */
+					    Pri 0 - Under sprite 0 pri 0, over all tilemaps
+					*/
 					if (pri1==0 && ((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0)))
 						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
 					else if (pri1==1) // todo

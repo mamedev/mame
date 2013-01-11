@@ -34,7 +34,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		tilenum = data & 0x7fff;
 
 		data = spriteram[offs + 0];
-		y = (-(data & 0x1ff) - 24) & 0x1ff;	/* (inverted y adjusted for vis area) */
+		y = (-(data & 0x1ff) - 24) & 0x1ff; /* (inverted y adjusted for vis area) */
 		flipy = (data & 0x200) >> 9;
 
 		data2 = spriteram[offs + 2];
@@ -65,11 +65,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (y > 0x180) y -= 0x200;
 
 		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				 tilenum,
-				 color,
-				 flipx,flipy,
-				 x,y,
-				 machine.priority_bitmap,pri_mask,0);
+					tilenum,
+					color,
+					flipx,flipy,
+					x,y,
+					machine.priority_bitmap,pri_mask,0);
 	}
 
 #ifdef MAME_DEBUG
@@ -98,7 +98,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
-	nodraw  = tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);	/* left */
+	nodraw  = tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);    /* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)

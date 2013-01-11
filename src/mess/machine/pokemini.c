@@ -390,19 +390,19 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 
 	switch( offset )
 	{
-	case 0x00:	/* start-up contrast
+	case 0x00:  /* start-up contrast
                Bit 0-1 R/W Must be 1(?)
                Bit 2-7 R/W Start up contrast (doesn't affect contrast until after reboot)
             */
-	case 0x01:	/* CPU related?
+	case 0x01:  /* CPU related?
                Bit 0-7 R/W Unknown
             */
-	case 0x02:	/* CPU related?
+	case 0x02:  /* CPU related?
                Bit 0-7 R/W Unknown
             */
 		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
 		break;
-	case 0x08:	/* Seconds-timer control
+	case 0x08:  /* Seconds-timer control
                Bit 0   R/W Timer enable
                Bit 1   W   Timer reset
                Bit 2-7     Unused
@@ -415,26 +415,26 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			data &= ~0x02;
 		}
 		break;
-	case 0x09:	/* Seconds-timer (low), read only
+	case 0x09:  /* Seconds-timer (low), read only
                Bit 0-7 R   Seconds timer bit 0-7
             */
 		return;
-	case 0x0A:	/* Seconds-timer (mid), read only
+	case 0x0A:  /* Seconds-timer (mid), read only
                Bit 0-7 R   Seconds timer bit 8-15
             */
 		return;
-	case 0x0B:	/* Seconds-timer (high), read only
+	case 0x0B:  /* Seconds-timer (high), read only
                Bit 0-7 R   Seconds timer bit 16-23
             */
 		return;
-	case 0x10:	/* Low power detector
+	case 0x10:  /* Low power detector
                Bit 0-4 R/W Unknown
                Bit 5   R   Battery status: 0 - battery OK, 1 - battery low
                Bit 6-7     Unused
             */
 		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
 		break;
-	case 0x18:	/* Timer 1 pre-scale + enable
+	case 0x18:  /* Timer 1 pre-scale + enable
                Bit 0-2 R/W low timer 1 prescaler select
                            000 - 2 or 128 cycles
                            001 - 8 or 256 cycles
@@ -468,8 +468,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 
 		/* Check if timer1 low should be enabled */
 		if ( ( data & 0x08 ) && ( m_pm_reg[0x30] & 0x04 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x01 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x01 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x01 ) ) ||
+				( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x01 ) ) ) )
 		{
 			m_timers.timer1->enable( 1 );
 		}
@@ -480,8 +480,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 
 		/* Check if timer1 high should be enabled */
 		if ( ( data & 0x80 ) && ( m_pm_reg[0x31] & 0x04 ) && ! ( m_pm_reg[0x30] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x02 ) ) ) )
 		{
 			m_timers.timer1_hi->enable( 1 );
 		}
@@ -490,7 +490,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer1_hi->enable( 0 );
 		}
 		break;
-	case 0x19:	/* Timers 1 speed
+	case 0x19:  /* Timers 1 speed
                Bit 0   R/W Select slow timer for timer 1 lo
                Bit 1   R/W Select slow timer for timer 1 hi
                Bit 2-3     Unused
@@ -563,7 +563,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer3_hi->enable( timer3_hi_enable );
 		}
 		break;
-	case 0x1A:	/* Timer 2 pre-scale + enable
+	case 0x1A:  /* Timer 2 pre-scale + enable
                Bit 0-2 R/W low timer 2 prescaler select
                            000 - 2 or 128 cycles
                            001 - 8 or 256 cycles
@@ -597,8 +597,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 
 		/* Check if timer2 low should be enabled */
 		if ( ( data & 0x08 ) && ( m_pm_reg[0x38] & 0x04 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x01 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x01 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x01 ) ) ||
+				( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x01 ) ) ) )
 		{
 			m_timers.timer2->enable( 1 );
 		}
@@ -609,8 +609,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 
 		/* Check if timer2 high should be enabled */
 		if ( ( data & 0x80 ) && ( m_pm_reg[0x39] & 0x04 ) && ! ( m_pm_reg[0x38] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x02 ) ) ) )
 		{
 			m_timers.timer2_hi->enable( 1 );
 		}
@@ -619,7 +619,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer2_hi->enable( 0 );
 		}
 		break;
-	case 0x1B:	/* Timer 2 speeds
+	case 0x1B:  /* Timer 2 speeds
                Bit 0   R/W Select slow timer for timer 2 lo
                Bit 1   R/W Select slow timer for timer 2 hi
             */
@@ -632,8 +632,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer2->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( m_pm_reg[0x1A] & 0x08 ) && ( m_pm_reg[0x38] & 0x04 ) &&
-			     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
-			       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x01 ) ) ) )
+					( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
+					( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x01 ) ) ) )
 			{
 				m_timers.timer2->enable( 1 );
 			}
@@ -652,8 +652,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer2_hi->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( m_pm_reg[0x1A] & 0x80 ) && ( m_pm_reg[0x39] & 0x04 ) && ! ( m_pm_reg[0x38] & 0x80 ) &&
-			     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
-			       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x02 ) ) ) )
+					( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
+					( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x02 ) ) ) )
 			{
 				m_timers.timer2_hi->enable( 1 );
 			}
@@ -663,7 +663,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			}
 		}
 		break;
-	case 0x1C:	/* Timer 3 pre-scale + enable
+	case 0x1C:  /* Timer 3 pre-scale + enable
                Bit 0-2 R/W low timer 3 prescaler select
                            000 - 2 or 128 cycles
                            001 - 8 or 256 cycles
@@ -697,8 +697,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 
 		/* Check if timer2 low should be enabled */
 		if ( ( data & 0x08 ) && ( m_pm_reg[0x48] & 0x04 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x01 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x01 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x01 ) ) ||
+				( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x01 ) ) ) )
 		{
 			m_timers.timer3->enable( 1 );
 		}
@@ -709,8 +709,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 
 		/* Check if timer2 high should be enabled */
 		if ( ( data & 0x80 ) && ( m_pm_reg[0x49] & 0x04 ) && ! ( m_pm_reg[0x48] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x02 ) ) ) )
 		{
 			m_timers.timer3_hi->enable( 1 );
 		}
@@ -719,7 +719,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer3_hi->enable( 0 );
 		}
 		break;
-	case 0x1D:	/* Timer 3 speeds
+	case 0x1D:  /* Timer 3 speeds
                Bit 0   R/W Select slow timer for timer 3 lo
                Bit 1   R/W Select slow timer for timer 3 hi
             */
@@ -732,8 +732,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer3->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( m_pm_reg[0x1C] & 0x08 ) && ( m_pm_reg[0x48] & 0x04 ) &&
-			     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
-			       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x01 ) ) ) )
+					( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x01 ) ) ||
+					( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x01 ) ) ) )
 			{
 				m_timers.timer3->enable( 1 );
 			}
@@ -752,8 +752,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer3_hi->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(cycles));
 
 			if ( ( m_pm_reg[0x1C] & 0x80 ) && ( m_pm_reg[0x49] & 0x04 ) && ! ( m_pm_reg[0x48] & 0x80 ) &&
-			     ( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
-			       ( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x02 ) ) ) )
+					( ( ( m_pm_reg[0x19] & 0x10 ) && ( data & 0x02 ) ) ||
+					( ( m_pm_reg[0x19] & 0x20 ) && ! ( data & 0x02 ) ) ) )
 			{
 				m_timers.timer3_hi->enable( 1 );
 			}
@@ -763,7 +763,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			}
 		}
 		break;
-	case 0x20:	/* Event #1-#8 priority
+	case 0x20:  /* Event #1-#8 priority
                Bit 0-1 R/W Timer 3 overflow Interrupt #7-#8
                Bit 2-3 R/W Timer 1 overflow Interrupt #5-#6
                Bit 4-5 R/W Timer 2 overflow Interrupt #3-#4
@@ -772,7 +772,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x20] = data;
 		pokemini_check_irqs(machine());
 		break;
-	case 0x21:	/* Event #15-#22 priority
+	case 0x21:  /* Event #15-#22 priority
                Bit 0-1 R/W Unknown
                Bit 2-3 R/W All keypad interrupts - Interrupt #15-#22
                Bit 4-7 R/W Unknown
@@ -780,14 +780,14 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x21] = data;
 		pokemini_check_irqs(machine());
 		break;
-	case 0x22:	/* Event #9-#14 priority
+	case 0x22:  /* Event #9-#14 priority
                Bit 0-1 R/W All #9 - #14 events - Interrupt #9-#14
                Bit 2-7     Unused
             */
 		m_pm_reg[0x22] = data;
 		pokemini_check_irqs(machine());
 		break;
-	case 0x23:	/* Event #1-#8 enable
+	case 0x23:  /* Event #1-#8 enable
                Bit 0   R/W Timer 3 overflow (mirror) - Enable Interrupt #8
                Bit 1   R/W Timer 3 overflow - Enable Interrupt #7
                Bit 2   R/W Not called... - Enable Interrupt #6
@@ -800,14 +800,14 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x23] = data;
 		pokemini_check_irqs(machine());
 		break;
-	case 0x24:	/* Event #9-#12 enable
+	case 0x24:  /* Event #9-#12 enable
                Bit 0-5 R/W Unknown
                Bit 6-7     Unused
             */
 		m_pm_reg[0x24] = data;
 		pokemini_check_irqs(machine());
 		break;
-	case 0x25:	/* Event #15-#22 enable
+	case 0x25:  /* Event #15-#22 enable
                Bit 0   R/W Press key "A" event - Enable interrupt #22
                Bit 1   R/W Press key "B" event - Enable interrupt #21
                Bit 2   R/W Press key "C" event - Enable interrupt #20
@@ -820,7 +820,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x25] = data;
 		pokemini_check_irqs(machine());
 		break;
-	case 0x26:	/* Event #13-#14 enable
+	case 0x26:  /* Event #13-#14 enable
                Bit 0-2 R/W Unknown
                Bit 3       Unused
                Bit 4-5 R/W Unknown
@@ -830,7 +830,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x26] = data;
 		pokemini_check_irqs(machine());
 		break;
-	case 0x27:	/* Interrupt active flag #1-#8
+	case 0x27:  /* Interrupt active flag #1-#8
                Bit 0       Timer 3 overflow (mirror) / Clear interrupt #8
                Bit 1       Timer 3 overflow / Clear interrupt #7
                Bit 2       Not called ... / Clear interrupt #6
@@ -843,7 +843,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x27] &= ~data;
 		pokemini_check_irqs(machine());
 		return;
-	case 0x28:	/* Interrupt active flag #9-#12
+	case 0x28:  /* Interrupt active flag #9-#12
                Bit 0-1     Unknown
                Bit 2       Unknown / Clear interrupt #12
                Bit 3       Unknown / Clear interrupt #11
@@ -854,7 +854,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x28] &= ~data;
 		pokemini_check_irqs(machine());
 		return;
-	case 0x29:	/* Interrupt active flag #15-#22
+	case 0x29:  /* Interrupt active flag #15-#22
                Bit 0       Press key "A" event / Clear interrupt #22
                Bit 1       Press key "B" event / Clear interrupt #21
                Bit 2       Press key "C" event / Clear interrupt #20
@@ -867,7 +867,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x29] &= ~data;
 		pokemini_check_irqs(machine());
 		return;
-	case 0x2A:	/* Interrupt active flag #13-#14
+	case 0x2A:  /* Interrupt active flag #13-#14
                Bit 0-5     Unknown
                Bit 6       Shock detector trigger / Clear interrupt #14
                Bit 7       Unknown / Clear interrupt #13
@@ -875,7 +875,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x2A] &= ~data;
 		pokemini_check_irqs(machine());
 		return;
-	case 0x30:	/* Timer 1 control 1
+	case 0x30:  /* Timer 1 control 1
                Bit 0   R/W Unknown
                Bit 1   W   Reset low counter
                Bit 2   R/W Enable high counter
@@ -890,8 +890,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		}
 
 		if ( ( data & 0x04 ) && ( m_pm_reg[0x18] & 0x08 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x01 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x01 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x01 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x01 ) ) ) )
 		{
 			m_timers.timer1->enable( 1 );
 		}
@@ -901,8 +901,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		}
 
 		if ( ( m_pm_reg[0x31] & 0x04 ) && ! ( data & 0x80 ) && ( m_pm_reg[0x18] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x02 ) ) ) )
 		{
 			m_timers.timer1_hi->enable( 1 );
 		}
@@ -911,7 +911,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer1_hi->enable( 0 );
 		}
 		break;
-	case 0x31:	/* Timer 1 control 2
+	case 0x31:  /* Timer 1 control 2
                Bit 0   R/W Unknown
                Bit 1   W   Reset hi counter
                Bit 2   R/W Enable high counter
@@ -925,8 +925,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		}
 
 		if ( ( data & 0x04 ) && ! ( m_pm_reg[0x30] & 0x80 ) && ( m_pm_reg[0x18] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x19] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x19] & 0x02 ) ) ) )
 		{
 			m_timers.timer1_hi->enable( 1 );
 		}
@@ -935,27 +935,27 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer1_hi->enable( 0 );
 		}
 		break;
-	case 0x32:	/* Timer 1 preset value (low)
+	case 0x32:  /* Timer 1 preset value (low)
                Bit 0-7 R/W Timer 1 preset value bit 0-7
             */
 		break;
-	case 0x33:	/* Timer 1 preset value (high)
+	case 0x33:  /* Timer 1 preset value (high)
                Bit 0-7 R/W Timer 1 preset value bit 8-15
             */
 		break;
-	case 0x34:	/* Timer 1 sound-pivot (low, unused)
+	case 0x34:  /* Timer 1 sound-pivot (low, unused)
             */
-	case 0x35:	/* Timer 1 sound-pivot (high, unused)
+	case 0x35:  /* Timer 1 sound-pivot (high, unused)
             */
 		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
 		break;
-	case 0x36:	/* Timer 1 counter (low), read only
+	case 0x36:  /* Timer 1 counter (low), read only
             */
 		return;
-	case 0x37:	/* Timer 1 counter (high), read only
+	case 0x37:  /* Timer 1 counter (high), read only
             */
 		return;
-	case 0x38:	/* Timer 2 control 1
+	case 0x38:  /* Timer 2 control 1
                Bit 0   R/W Unknown
                Bit 1   W   Reset low counter
                Bit 2   R/W Enable high counter
@@ -970,8 +970,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		}
 
 		if ( ( data & 0x04 ) && ( m_pm_reg[0x1A] & 0x08 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1A] & 0x01 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1A] & 0x01 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1A] & 0x01 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1A] & 0x01 ) ) ) )
 		{
 			m_timers.timer2->enable( 1 );
 		}
@@ -980,8 +980,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer2->enable( 0 );
 		}
 		if ( ( m_pm_reg[0x39] & 0x04 ) && ! ( data & 0x80 ) && ( m_pm_reg[0x1A] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x02 ) ) ) )
 		{
 			m_timers.timer2_hi->enable( 1 );
 		}
@@ -990,7 +990,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer2_hi->enable( 0 );
 		}
 		break;
-	case 0x39:	/* Timer 2 control 2
+	case 0x39:  /* Timer 2 control 2
                Bit 0   R/W Unknown
                Bit 1   W   Reset hi counter
                Bit 2   R/W Enable high counter
@@ -1004,8 +1004,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		}
 
 		if ( ( data & 0x04 ) && ! ( m_pm_reg[0x38] & 0x80 ) && ( m_pm_reg[0x1A] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1B] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1B] & 0x02 ) ) ) )
 		{
 			m_timers.timer2_hi->enable( 1 );
 		}
@@ -1014,29 +1014,29 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer2_hi->enable( 0 );
 		}
 		break;
-	case 0x3A:	/* Timer 2 preset value (low)
+	case 0x3A:  /* Timer 2 preset value (low)
                Bit 0-7 R/W Timer 2 preset value bit 0-7
             */
 		break;
-	case 0x3B:	/* Timer 2 preset value (high)
+	case 0x3B:  /* Timer 2 preset value (high)
                Bit 0-7 R/W Timer 2 preset value bit 8-15
             */
 		break;
-	case 0x3C:	/* Timer 2 sound-pivot (low, unused)
+	case 0x3C:  /* Timer 2 sound-pivot (low, unused)
             */
-	case 0x3D:	/* Timer 2 sound-pivot (high, unused)
+	case 0x3D:  /* Timer 2 sound-pivot (high, unused)
             */
 		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
 		break;
-	case 0x3E:	/* Timer 2 counter (low), read only
+	case 0x3E:  /* Timer 2 counter (low), read only
                Bit 0-7 R/W Timer 2 counter value bit 0-7
             */
 		return;
-	case 0x3F:	/* Timer 2 counter (high), read only
+	case 0x3F:  /* Timer 2 counter (high), read only
                Bit 0-7 R/W Timer 2 counter value bit 8-15
             */
 		return;
-	case 0x40:	/* 256Hz timer control
+	case 0x40:  /* 256Hz timer control
                Bit 0   R/W Enable Timer
                Bit 1   W   Reset Timer
                Bit 2-7     Unused
@@ -1047,11 +1047,11 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			data &= ~0x02;
 		}
 		break;
-	case 0x41:	/* 256Hz timer counter
+	case 0x41:  /* 256Hz timer counter
                Bit 0-7 R   256Hz timer counter
             */
 		return;
-	case 0x48:	/* Timer 3 control 1
+	case 0x48:  /* Timer 3 control 1
                Bit 0   R/W Unknown
                Bit 1   W   Reset low counter
                Bit 2   R/W Enable high counter
@@ -1066,8 +1066,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		}
 
 		if ( ( data & 0x04 ) && ( m_pm_reg[0x1C] & 0x08 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x01 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x01 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x01 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x01 ) ) ) )
 		{
 			m_timers.timer3->enable( 1 );
 		}
@@ -1076,8 +1076,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_timers.timer3->enable( 0 );
 		}
 		if ( ( m_pm_reg[0x49] & 0x04 ) && ! ( data & 0x80 ) && ( m_pm_reg[0x1C] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x02 ) ) ) )
 		{
 			m_timers.timer3_hi->enable( 1 );
 		}
@@ -1088,7 +1088,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x48] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x49:	/* Timer 3 control 2
+	case 0x49:  /* Timer 3 control 2
                Bit 0   R/W Unknown
                Bit 1   W   Reset hi counter
                Bit 2   R/W Enable high counter
@@ -1102,8 +1102,8 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		}
 
 		if ( ( data & 0x04 ) && ! ( m_pm_reg[0x48] & 0x80 ) && ( m_pm_reg[0x1C] & 0x80 ) &&
-		     ( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x02 ) ) ||
-		       ( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x02 ) ) ) )
+				( ( ( m_pm_reg[0x19] & 0x20 ) && ! ( m_pm_reg[0x1D] & 0x02 ) ) ||
+				( ( m_pm_reg[0x19] & 0x10 ) && ( m_pm_reg[0x1D] & 0x02 ) ) ) )
 		{
 			m_timers.timer3_hi->enable( 1 );
 		}
@@ -1114,25 +1114,25 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x49] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x4A:	/* Timer 3 preset value (low)
+	case 0x4A:  /* Timer 3 preset value (low)
                Bit 0-7 R/W Timer 3 preset value bit 0-7
             */
 		m_pm_reg[0x4A] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x4B:	/* Timer 3 preset value (high)
+	case 0x4B:  /* Timer 3 preset value (high)
                Bit 0-7 R/W Timer 3 preset value bit 8-15
             */
 		m_pm_reg[0x4B] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x4C:	/* Timer 3 sound-pivot (low)
+	case 0x4C:  /* Timer 3 sound-pivot (low)
                Bit 0-7 R/W Timer 3 sound-pivot value bit 0-7
             */
 		m_pm_reg[0x4C] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x4D:	/* Timer 3 sound-pivot (high)
+	case 0x4D:  /* Timer 3 sound-pivot (high)
                Bit 0-7 R/W Timer 3 sound-pivot value bit 8-15
 
                Sound-pivot location:
@@ -1143,15 +1143,15 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x4D] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x4E:	/* Timer 3 counter (low), read only
+	case 0x4E:  /* Timer 3 counter (low), read only
                Bit 0-7 R/W Timer 3 counter value bit 0-7
             */
 		return;
-	case 0x4F:	/* Timer 3 counter (high), read only
+	case 0x4F:  /* Timer 3 counter (high), read only
                Bit 0-7 R/W Timer 3 counter value bit 8-15
             */
 		return;
-	case 0x52:	/* Keypad status
+	case 0x52:  /* Keypad status
                Bit 0   R   Key "A"
                Bit 1   R   Key "B"
                Bit 2   R   Key "C"
@@ -1162,7 +1162,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7   R   Power button
             */
 		return;
-	case 0x60:	/* I/O peripheral circuit select
+	case 0x60:  /* I/O peripheral circuit select
                Bit 0   R/W Unknown
                bit 1   R/W IR receive / transmit
                Bit 2   R/W EEPROM / RTC data
@@ -1173,7 +1173,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7   R/W Unknown
             */
 		break;
-	case 0x61:	/* I/O peripheral status control
+	case 0x61:  /* I/O peripheral status control
                Bit 0   R/W IR received bit (if device not selected: 0)
                Bit 1   R/W IR transmit (if device not selected: 0)
                Bit 2   R/W EEPROM / RTC data (if device not selected: 1)
@@ -1189,11 +1189,11 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		if ( m_pm_reg[0x60] & 0x08 )
 			i2cmem_scl_write(machine().device("i2cmem"), ( data & 0x08 ) ? 1 : 0 );
 		break;
-	case 0x70:	/* Sound related */
+	case 0x70:  /* Sound related */
 		m_pm_reg[0x70] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x71:	/* Sound volume
+	case 0x71:  /* Sound volume
                Bit 0-1 R/W Sound volume
                            00 - 0%
                            01 - 50%
@@ -1205,7 +1205,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 		m_pm_reg[0x71] = data;
 		pokemini_update_sound(machine());
 		break;
-	case 0x80:	/* LCD control
+	case 0x80:  /* LCD control
                Bit 0   R/W Invert colors; 0 - normal, 1 - inverted
                Bit 1   R/W Enable rendering of background
                Bit 2   R/W Enable rendering of sprites
@@ -1233,7 +1233,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 			m_prc.map_size_x = 24; break;
 		}
 		break;
-	case 0x81:	/* LCD render refresh rate
+	case 0x81:  /* LCD render refresh rate
                Bit 0   R/W Unknown
                Bit 1-3 R/W LCD refresh rate divider
                            000 - 60Hz / 3 = 20Hz (0 - 2)
@@ -1248,43 +1248,43 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
             */
 		switch ( data & 0x0E )
 		{
-		case 0x00:	m_prc.max_frame_count = 3; break;
-		case 0x02:	m_prc.max_frame_count = 6; break;
-		case 0x04:	m_prc.max_frame_count = 9; break;
-		case 0x06:	m_prc.max_frame_count = 12; break;
-		case 0x08:	m_prc.max_frame_count = 2; break;
-		case 0x0A:	m_prc.max_frame_count = 4; break;
-		case 0x0C:	m_prc.max_frame_count = 6; break;
-		case 0x0E:	m_prc.max_frame_count = 8; break;
+		case 0x00:  m_prc.max_frame_count = 3; break;
+		case 0x02:  m_prc.max_frame_count = 6; break;
+		case 0x04:  m_prc.max_frame_count = 9; break;
+		case 0x06:  m_prc.max_frame_count = 12; break;
+		case 0x08:  m_prc.max_frame_count = 2; break;
+		case 0x0A:  m_prc.max_frame_count = 4; break;
+		case 0x0C:  m_prc.max_frame_count = 6; break;
+		case 0x0E:  m_prc.max_frame_count = 8; break;
 		}
 		break;
-	case 0x82:	/* BG tile data memory offset (low)
+	case 0x82:  /* BG tile data memory offset (low)
                Bit 0-2     Always "0"
                Bit 3-7 R/W BG tile data memory offset bit 3-7
             */
 		data &= 0xF8;
 		m_prc.bg_tiles = ( m_prc.bg_tiles & 0xFFFF00 ) | data;
 		break;
-	case 0x83:	/* BG tile data memory offset (mid)
+	case 0x83:  /* BG tile data memory offset (mid)
                Bit 0-7 R/W BG tile data memory offset bit 8-15
             */
 		m_prc.bg_tiles = ( m_prc.bg_tiles & 0xFF00FF ) | ( data << 8 );
 		break;
-	case 0x84:	/* BG tile data memory offset (high)
+	case 0x84:  /* BG tile data memory offset (high)
                Bit 0-4 R/W BG tile data memory offset bit 16-20
                Bit 5-7     Unused
             */
 		data &= 0x1F;
 		m_prc.bg_tiles = ( m_prc.bg_tiles & 0x00FFFF ) | ( data << 16 );
 		break;
-	case 0x85:	/* BG vertical move
+	case 0x85:  /* BG vertical move
                Bit 0-6 R/W Move the background up, move range:
                            Map size 0: 0x00 to 0x40
                            Map size 1: 0x00 to 0x20
                            Map size 2: move ignored
                Bit 7       Unused
             */
-	case 0x86:	/* BG horizontal move
+	case 0x86:  /* BG horizontal move
                Bit 0-6 R/W Move the background left, move range:
                            Map size 0: move ignored
                            Map size 1: 0x00 to 0x20
@@ -1293,26 +1293,26 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
             */
 		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
 		break;
-	case 0x87:	/* Sprite tile data memory offset (low)
+	case 0x87:  /* Sprite tile data memory offset (low)
                Bit 0-5     Always "0"
                Bit 6-7 R/W Sprite tile data memory offset bit 6-7
             */
 		data &= 0xC0;
 		m_prc.spr_tiles = ( m_prc.spr_tiles & 0xFFFF00 ) | data;
 		break;
-	case 0x88:	/* Sprite tile data memory offset (med)
+	case 0x88:  /* Sprite tile data memory offset (med)
                Bit 0-7 R/W Sprite tile data memory offset bit 8-15
             */
 		m_prc.spr_tiles = ( m_prc.spr_tiles & 0xFF00FF ) | ( data << 8 );
 		break;
-	case 0x89:	/* Sprite tile data memory offset (high)
+	case 0x89:  /* Sprite tile data memory offset (high)
                Bit 0-4 R/W Sprite tile data memory offset bit 16-20
                Bit 5-7     Unused
             */
 		data &= 0x1F;
 		m_prc.spr_tiles = ( m_prc.spr_tiles & 0x00FFFF ) | ( data << 16 );
 		break;
-	case 0x8A:	/* LCD status
+	case 0x8A:  /* LCD status
                Bit 0   R   Unknown
                Bit 1   R   Unknown
                Bit 2   R   Unknown
@@ -1321,12 +1321,12 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 5   R   Unknown
                Bit 6-7     Unused
             */
-	case 0xFE:	/* Direct LCD control / data
+	case 0xFE:  /* Direct LCD control / data
                Bit 0-7 R/W Direct LCD command or data
             */
 //      lcd_command_w( data );
 		break;
-	case 0xFF:	/* Direct LCD data
+	case 0xFF:  /* Direct LCD data
                Bit 0-7 R/W Direct LCD data
             */
 //      lcd_data_w( data );
@@ -1344,7 +1344,7 @@ READ8_MEMBER(pokemini_state::pokemini_hwreg_r)
 
 	switch( offset )
 	{
-	case 0x52:	return ioport("INPUTS")->read();
+	case 0x52:  return ioport("INPUTS")->read();
 	case 0x61:
 		if ( ! ( m_pm_reg[0x60] & 0x04 ) )
 		{
@@ -1356,8 +1356,8 @@ READ8_MEMBER(pokemini_state::pokemini_hwreg_r)
 			data &= ~0x08;
 		}
 		break;
-	case 0x81:	return ( m_pm_reg[offset] & 0x0F ) | ( m_prc.frame_count << 4 );
-	case 0x8A:	return m_prc.count;
+	case 0x81:  return ( m_pm_reg[offset] & 0x0F ) | ( m_prc.frame_count << 4 );
+	case 0x8A:  return m_prc.count;
 	}
 	return data;
 }
@@ -1366,7 +1366,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 {
 	if (image.software_entry() == NULL)
 	{
-		int	size = image.length();
+		int size = image.length();
 
 		/* Verify that the image is big enough */
 		if (size <= 0x2100)
@@ -1438,27 +1438,27 @@ TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_prc_counter_callback)
 			/* Check if the sprites should be drawn */
 			if ( m_prc.sprites_enabled )
 			{
-				UINT16	spr;
+				UINT16  spr;
 
 				for ( spr = 0x35C; spr >= 0x300; spr -= 4 )
 				{
-					int		spr_x = ( m_p_ram[ spr + 0 ] & 0x7F ) - 16;
-					int		spr_y = ( m_p_ram[ spr + 1 ] & 0x7F ) - 16;
-					UINT8	spr_tile = m_p_ram[ spr + 2 ];
-					UINT8	spr_flag = m_p_ram[ spr + 3 ];
+					int     spr_x = ( m_p_ram[ spr + 0 ] & 0x7F ) - 16;
+					int     spr_y = ( m_p_ram[ spr + 1 ] & 0x7F ) - 16;
+					UINT8   spr_tile = m_p_ram[ spr + 2 ];
+					UINT8   spr_flag = m_p_ram[ spr + 3 ];
 
 					if ( spr_flag & 0x08 )
 					{
-						UINT16	gfx, mask;
-						UINT32	spr_base = m_prc.spr_tiles + spr_tile * 64;
-						int		i, j;
+						UINT16  gfx, mask;
+						UINT32  spr_base = m_prc.spr_tiles + spr_tile * 64;
+						int     i, j;
 
 						for ( i = 0; i < 16; i++ )
 						{
 							if ( spr_x + i >= 0 && spr_x + i < 96 )
 							{
 								int rel_x = ( spr_flag & 0x01 ) ? 15 - i : i;
-								UINT32	s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
+								UINT32  s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
 
 								mask = ~ ( space.read_byte( s ) | ( space.read_byte( s + 8 ) << 8 ) );
 								gfx = space.read_byte( s + 16 ) | ( space.read_byte( s + 24 ) << 8 );
@@ -1473,7 +1473,7 @@ TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_prc_counter_callback)
 								{
 									if ( spr_y + j >= 0 && spr_y + j < 64 )
 									{
-										UINT16	ram_addr = ( ( ( spr_y + j ) >> 3 ) * 96 ) + spr_x + i;
+										UINT16  ram_addr = ( ( ( spr_y + j ) >> 3 ) * 96 ) + spr_x + i;
 
 										if ( spr_flag & 0x02 )
 										{
@@ -1516,7 +1516,7 @@ TIMER_CALLBACK_MEMBER(pokemini_state::pokemini_prc_counter_callback)
 			/* Check if the rendered data should be copied to the LCD */
 			if ( m_prc.copy_enabled )
 			{
-				int	x, y;
+				int x, y;
 
 				for( y = 0; y < 64; y += 8 ) {
 					for( x = 0; x < 96; x++ ) {
@@ -1571,4 +1571,3 @@ void pokemini_state::machine_start()
 	m_prc.count_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::pokemini_prc_counter_callback),this));
 	m_prc.count_timer->adjust( attotime::zero, 0, m_maincpu->cycles_to_attotime(55640 / 65) );
 }
-

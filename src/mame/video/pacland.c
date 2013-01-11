@@ -96,7 +96,7 @@ void pacland_state::palette_init()
 	/* allocate the colortable */
 	machine().colortable = colortable_alloc(machine(), 256);
 
-	m_color_prom = color_prom;	/* we'll need this later */
+	m_color_prom = color_prom;  /* we'll need this later */
 	/* skip the palette data, it will be initialized later */
 	color_prom += 2 * 0x400;
 	/* color_prom now points to the beginning of the lookup table */
@@ -132,7 +132,7 @@ void pacland_state::palette_init()
 			UINT32 mask = colortable_get_transpen_mask(machine().colortable, machine().gfx[2], i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
-               $00-$7F are opaque, and others are transparent */
+			   $00-$7F are opaque, and others are transparent */
 			if (palentry >= 0x80)
 				m_transmask[0][i] |= mask;
 
@@ -141,7 +141,7 @@ void pacland_state::palette_init()
 				m_transmask[1][i] |= mask;
 
 			/* transmask[2] is a mask of the topmost priority sprite pixels; thus pens $F0-$FE are
-               opaque, and others are transparent */
+			   opaque, and others are transparent */
 			if (palentry < 0xf0 || palentry == 0xff)
 				m_transmask[2][i] |= mask;
 		}
@@ -202,7 +202,7 @@ void pacland_state::video_start()
 	m_fg_tilemap->set_scroll_rows(32);
 
 	/* create one group per color code; for each group, set the transparency mask
-       to correspond to the pens that are 0x7f or 0xff */
+	   to correspond to the pens that are 0x7f or 0xff */
 	assert(machine().gfx[0]->colors() <= TILEMAP_NUM_GROUPS);
 	for (color = 0; color < machine().gfx[0]->colors(); color++)
 	{
@@ -307,7 +307,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		}
 
 		sy -= 16 * sizey;
-		sy = (sy & 0xff) - 32;	// fix wraparound
+		sy = (sy & 0xff) - 32;  // fix wraparound
 
 		for (y = 0;y <= sizey;y++)
 		{
@@ -338,8 +338,8 @@ static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 	int y, x;
 
 	/* draw tilemap transparently over it; this will leave invalid pens (0xffff)
-       anywhere where the fg_tilemap should be transparent; note that we assume
-       the fg_bitmap has been pre-erased to 0xffff */
+	   anywhere where the fg_tilemap should be transparent; note that we assume
+	   the fg_bitmap has been pre-erased to 0xffff */
 	state->m_fg_tilemap->draw(state->m_fg_bitmap, cliprect, priority, 0);
 
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
@@ -350,7 +350,7 @@ static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 		UINT16 *dst = &bitmap.pix16(y);
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
-           source pixel is not the invalid pen; also clear to 0xffff when finished */
+		   source pixel is not the invalid pen; also clear to 0xffff when finished */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 pix = src[x];
@@ -374,8 +374,8 @@ UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? m_scroll1-4 : m_scroll1-3);
 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
-       wherever there is a high-priority pixel; note that we draw to the bitmap
-       which is safe because the bg_tilemap draw will overwrite everything */
+	   wherever there is a high-priority pixel; note that we draw to the bitmap
+	   which is safe because the bg_tilemap draw will overwrite everything */
 	machine().priority_bitmap.fill(0x00, cliprect);
 	draw_sprites(machine(), bitmap, cliprect, 0);
 

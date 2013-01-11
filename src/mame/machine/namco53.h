@@ -6,9 +6,9 @@
 
 struct namco_53xx_interface
 {
-	devcb_read8		k;			/* read handlers for K port */
-	devcb_read8 	in[4];		/* read handlers for ports A-D */
-	devcb_write8	p;			/* write handler for P port */
+	devcb_read8     k;          /* read handlers for K port */
+	devcb_read8     in[4];      /* read handlers for ports A-D */
+	devcb_write8    p;          /* write handler for P port */
 };
 
 
@@ -44,4 +44,4 @@ extern const device_type NAMCO_53XX;
 
 
 
-#endif	/* NAMCO53_H */
+#endif  /* NAMCO53_H */

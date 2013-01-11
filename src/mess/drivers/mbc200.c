@@ -135,10 +135,10 @@ MC6845_UPDATE_ROW( mbc200_update_row )
 }
 
 static const mc6845_interface mbc200_crtc = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	mbc200_update_row,		/* handler to display a scanline */
+	mbc200_update_row,      /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -183,12 +183,12 @@ UINT32 mbc200_state::screen_update_mbc200(screen_device &screen, bitmap_ind16 &b
 
 static I8255_INTERFACE( mbc200_ppi8255_interface_1 )
 {
-	DEVCB_NULL,	/* port A read */
-	DEVCB_NULL,	/* port A write */
-	DEVCB_NULL,	/* port B read */
-	DEVCB_NULL,	/* port B write */
-	DEVCB_NULL,	/* port C read */
-	DEVCB_NULL	/* port C write */
+	DEVCB_NULL, /* port A read */
+	DEVCB_NULL, /* port A write */
+	DEVCB_NULL, /* port B read */
+	DEVCB_NULL, /* port B write */
+	DEVCB_NULL, /* port C read */
+	DEVCB_NULL  /* port C write */
 };
 
 
@@ -202,12 +202,12 @@ WRITE8_MEMBER( mbc200_state::porta_w )
 
 static I8255_INTERFACE( mbc200_ppi8255_interface_2 )
 {
-	DEVCB_NULL,	/* port A read */
-	DEVCB_DRIVER_MEMBER(mbc200_state,porta_w),	/* port A write */
-	DEVCB_NULL,	/* port B read */
-	DEVCB_NULL,	/* port B write */
-	DEVCB_NULL,	/* port C read */
-	DEVCB_NULL	/* port C write */
+	DEVCB_NULL, /* port A read */
+	DEVCB_DRIVER_MEMBER(mbc200_state,porta_w),  /* port A write */
+	DEVCB_NULL, /* port B read */
+	DEVCB_NULL, /* port B write */
+	DEVCB_NULL, /* port C read */
+	DEVCB_NULL  /* port C write */
 };
 
 
@@ -220,14 +220,14 @@ static const wd17xx_interface mbc200_mb8876_interface =
 };
 static const floppy_interface mbc200_floppy_interface =
 {
-    DEVCB_NULL,
 	DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_SSDD_40,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_SSDD_40,
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
+	"floppy_5_25",
 	NULL
 };
 
@@ -248,25 +248,25 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( mbc200, mbc200_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz/2) // NEC D780C-1
-    MCFG_CPU_PROGRAM_MAP(mbc200_mem)
-    MCFG_CPU_IO_MAP(mbc200_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz/2) // NEC D780C-1
+	MCFG_CPU_PROGRAM_MAP(mbc200_mem)
+	MCFG_CPU_IO_MAP(mbc200_io)
 
-    MCFG_CPU_ADD("subcpu",Z80, XTAL_8MHz/2) // NEC D780C-1
-    MCFG_CPU_PROGRAM_MAP(mbc200_sub_mem)
-    MCFG_CPU_IO_MAP(mbc200_sub_io)
+	MCFG_CPU_ADD("subcpu",Z80, XTAL_8MHz/2) // NEC D780C-1
+	MCFG_CPU_PROGRAM_MAP(mbc200_sub_mem)
+	MCFG_CPU_IO_MAP(mbc200_sub_io)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_SIZE(640, 400)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbc200_state, screen_update_mbc200)
 	MCFG_GFXDECODE(mbc200)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_8MHz / 4, mbc200_crtc) // HD46505SP
@@ -280,7 +280,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mbc200 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "d2732a.bin",  0x0000, 0x1000, CRC(bf364ce8) SHA1(baa3a20a5b01745a390ef16628dc18f8d682d63b))
 	ROM_REGION( 0x10000, "subcpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m5l2764.bin", 0x0000, 0x2000, CRC(377300a2) SHA1(8563172f9e7f84330378a8d179f4138be5fda099))
@@ -289,5 +289,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, mbc200,  0,       0,	mbc200, 	mbc200, driver_device,	 0,	 "Sanyo",   "MBC-200",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1982, mbc200,  0,       0,    mbc200,     mbc200, driver_device,   0,  "Sanyo",   "MBC-200",      GAME_NOT_WORKING | GAME_NO_SOUND)

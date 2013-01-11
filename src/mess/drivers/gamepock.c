@@ -14,7 +14,7 @@ static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	AM_RANGE(0x1000,0x3fff) AM_NOP
 	AM_RANGE(0x4000,0xBfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xC000,0xC7ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0xff80,0xffff) AM_RAM				/* 128 bytes microcontroller RAM */
+	AM_RANGE(0xff80,0xffff) AM_RAM              /* 128 bytes microcontroller RAM */
 ADDRESS_MAP_END
 
 
@@ -76,7 +76,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 
 
 static MACHINE_CONFIG_START( gamepock, gamepock_state )
-	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)	/* uPD78C06AG */
+	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)    /* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
 	MCFG_CPU_IO_MAP( gamepock_io)
 	MCFG_CPU_CONFIG( gamepock_cpu_config )
@@ -118,4 +118,3 @@ ROM_END
 
 
 CONS( 1984, gamepock, 0, 0, gamepock, gamepock, driver_device, 0, "Epoch", "Game Pocket Computer", 0 )
-

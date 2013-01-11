@@ -57,10 +57,10 @@
 #include "coco_pak.h"
 #include "coco_fdc.h"
 
-#define SLOT1_TAG			"slot1"
-#define SLOT2_TAG			"slot2"
-#define SLOT3_TAG			"slot3"
-#define SLOT4_TAG			"slot4"
+#define SLOT1_TAG           "slot1"
+#define SLOT2_TAG           "slot2"
+#define SLOT3_TAG           "slot3"
+#define SLOT4_TAG           "slot4"
 
 
 
@@ -131,7 +131,7 @@ const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 //-------------------------------------------------
 
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock),
+		: device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock),
 		device_cococart_interface( mconfig, *this )
 {
 }

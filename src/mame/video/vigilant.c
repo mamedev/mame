@@ -175,9 +175,9 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 		int color = attributes & 0x0F;
 		int tile_number = videoram[offs] | ((attributes & 0xF0) << 4);
 
-		if (priority)	 /* foreground */
+		if (priority)    /* foreground */
 		{
-			if ((color & 0x0c) == 0x0c)	/* mask sprites */
+			if ((color & 0x0c) == 0x0c) /* mask sprites */
 			{
 				if (sy >= 48)
 				{
@@ -191,7 +191,7 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 				}
 			}
 		}
-		else	 /* background */
+		else     /* background */
 		{
 			if (sy >= 48)
 				sx = (sx + scroll) & 0x1ff;
@@ -308,7 +308,7 @@ UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind1
 		palette_set_color(machine(),512 + 16 + i,MAKE_RGB(r,g,b));
 	}
 
-	if (m_rear_disable)	 /* opaque foreground */
+	if (m_rear_disable)  /* opaque foreground */
 	{
 		draw_foreground(machine(),bitmap,cliprect,0,1);
 		draw_sprites(machine(),bitmap,bottomvisiblearea);

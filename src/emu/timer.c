@@ -46,7 +46,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -63,18 +63,18 @@ const device_type TIMER = &device_creator<timer_device>;
 
 timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIMER, "Timer", tag, owner, clock),
-	  m_type(TIMER_TYPE_GENERIC),
-	  m_callback(timer_device_expired_delegate()),
-	  m_ptr(NULL),
-	  m_start_delay(attotime::zero),
-	  m_period(attotime::zero),
-	  m_param(0),
-	  m_screen_tag(NULL),
-	  m_screen(NULL),
-	  m_first_vpos(0),
-	  m_increment(0),
-	  m_timer(NULL),
-	  m_first_time(true)
+		m_type(TIMER_TYPE_GENERIC),
+		m_callback(timer_device_expired_delegate()),
+		m_ptr(NULL),
+		m_start_delay(attotime::zero),
+		m_period(attotime::zero),
+		m_param(0),
+		m_screen_tag(NULL),
+		m_screen(NULL),
+		m_first_vpos(0),
+		m_increment(0),
+		m_timer(NULL),
+		m_first_time(true)
 {
 }
 
@@ -305,7 +305,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					(m_callback)(*this, m_ptr, vpos);
 
 				// advance by the increment only if we will still be within the screen bounds
-		        if (m_increment != 0 && (vpos + m_increment) < m_screen->height())
+				if (m_increment != 0 && (vpos + m_increment) < m_screen->height())
 					next_vpos = vpos + m_increment;
 			}
 			m_first_time = false;

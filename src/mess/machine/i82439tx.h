@@ -23,21 +23,21 @@ struct i82439tx_interface
 // ======================> i82439tx_device
 
 class i82439tx_device :  public northbridge_device,
-						 public pci_device_interface,
-						 public i82439tx_interface
+							public pci_device_interface,
+							public i82439tx_interface
 {
 public:
-    // construction/destruction
-    i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 
 	void i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t end);
 

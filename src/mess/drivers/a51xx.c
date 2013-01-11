@@ -91,15 +91,15 @@ UINT32 a51xx_state::screen_update_a5130(screen_device &screen, bitmap_ind16 &bit
 /* F4 Character Displayer */
 static const gfx_layout a51xx_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 1024*8, 1025*8, 1026*8, 1027*8, 1028*8, 1029*8, 1030*8, 1031*8 },
-	8*8					/* every char takes 2 x 8 bytes */
+	8*8                 /* every char takes 2 x 8 bytes */
 };
 
 static GFXDECODE_START( a51xx )

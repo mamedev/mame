@@ -113,16 +113,16 @@ READ8_MEMBER(dmndrby_state::input_r)
 WRITE8_MEMBER(dmndrby_state::output_w)
 {
 	/*
-    ---- x--- refill meter [4]
-    ---- x--- token out meter [5]
-    ---- x--- token in meter [6]
-    ---- x--- cash out meter [7]
-    ---- -x-- coin out (meter) [0-3]
-    ---- -x-- coin lockout token [4]
-    ---- -x-- coin counter (meter) [5]
-    ---- --x- coin lockout [0-3]
-    ---- ---x lamp [0-6]
-    */
+	---- x--- refill meter [4]
+	---- x--- token out meter [5]
+	---- x--- token in meter [6]
+	---- x--- cash out meter [7]
+	---- -x-- coin out (meter) [0-3]
+	---- -x-- coin lockout token [4]
+	---- -x-- coin counter (meter) [5]
+	---- --x- coin lockout [0-3]
+	---- ---x lamp [0-6]
+	*/
 	m_io_port[offset] = data;
 //  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",m_io_port[0],m_io_port[1],m_io_port[2],m_io_port[3],m_io_port[4],m_io_port[5],m_io_port[6],m_io_port[7]);
 }
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8, dmndrby_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dderby )
-    PORT_START("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_DIPNAME( 0x0002, 0x0002, "Out Coin 1" )//out coin 1
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -162,7 +162,7 @@ static INPUT_PORTS_START( dderby )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("BET Horse 5")  PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_DIPNAME( 0x0002, 0x0002, "Out Coin 2" )//out coin 2
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -170,7 +170,7 @@ static INPUT_PORTS_START( dderby )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("BET Horse 6")  PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x0002, 0x0002, "Out Coin 3" )//out coin 3
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -178,26 +178,26 @@ static INPUT_PORTS_START( dderby )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Collect")  PORT_CODE(KEYCODE_2_PAD) //to get coins
 	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN3")
+	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Refill Key")  PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("BET Horse 4")  PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN5")
+	PORT_START("IN5")
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("BET Horse 3")  PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN6")
+	PORT_START("IN6")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Back Door")  PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("BET Horse 2")  PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN7")
+	PORT_START("IN7")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Token Coin")  PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("BET Horse 1")  PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -215,21 +215,21 @@ static INPUT_PORTS_START( dderby )
 	PORT_DIPSETTING(    0x04, "480p (cash + tokens)" )
 	PORT_DIPSETTING(    0x00, "600p (cash + tokens)" )
 	PORT_DIPNAME( 0x30, 0x00, "Percentage Payout" )
-	PORT_DIPSETTING(    0x00, "76%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "80%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "88%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x00, "78%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "82%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "90%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x00, "76%" )   PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "80%" )   PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )   PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "88%" )   PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x00, "78%" )   PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "82%" )   PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )   PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "90%" )   PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
 	PORT_DIPNAME( 0xc0, 0x80, "Price Per Game" )
 	PORT_DIPSETTING(    0x00, "2p" )
 	PORT_DIPSETTING(    0x40, "5p" )
 	PORT_DIPSETTING(    0x80, "10p" )
 	PORT_DIPSETTING(    0xc0, "20p" )
 
-	PORT_START("DSW2")	/* 8bit */
+	PORT_START("DSW2")  /* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, "Show Results")
 	PORT_DIPSETTING(    0x01, "Last Race" )
 	PORT_DIPSETTING(    0x00, "Last 6 Races" )
@@ -258,7 +258,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dderbya )
 	PORT_INCLUDE( dderby )
-	PORT_MODIFY("DSW1")	/* 8bit */
+	PORT_MODIFY("DSW1") /* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, "Price Per Play")
 	PORT_DIPSETTING(    0x01, "5p" )
 	PORT_DIPSETTING(    0x00, "10p" )
@@ -296,13 +296,13 @@ static const gfx_layout tiles8x8_layout =
 
 static const gfx_layout tiles16x16_layout =
 {
-	16,16,	/* 16*16 sprites */
-	RGN_FRAC(1,3),	/* 256 sprites */
-	3,		/* 3 bits per pixel */
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },	// the three bitplanes are separated
+	16,16,  /* 16*16 sprites */
+	RGN_FRAC(1,3),  /* 256 sprites */
+	3,      /* 3 bits per pixel */
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    // the three bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,  16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	// every sprite takes 32 consecutive bytes
+	32*8    // every sprite takes 32 consecutive bytes
 
 };
 
@@ -454,7 +454,7 @@ void dmndrby_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 470, 0,
 			3, &resistances_rg[0], gweights, 470, 0,
 			2, &resistances_b[0],  bweights, 470, 0);
@@ -512,12 +512,12 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 
 static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on schematics */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
 	MCFG_CPU_PROGRAM_MAP(dderby_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))

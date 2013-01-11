@@ -24,7 +24,7 @@
 // ======================> adamlink_device
 
 class adamlink_device :  public device_t,
-						 public device_adam_expansion_slot_card_interface
+							public device_adam_expansion_slot_card_interface
 {
 public:
 	// construction/destruction

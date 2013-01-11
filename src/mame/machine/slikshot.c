@@ -72,7 +72,7 @@
 #include "includes/itech8.h"
 
 
-#define MINDY			100
+#define MINDY           100
 
 
 /*************************************

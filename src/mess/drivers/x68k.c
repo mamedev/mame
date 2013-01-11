@@ -147,19 +147,19 @@
 #ifdef UNUSED_FUNCTION
 static attotime prescale(int val)
 {
-    switch(val)
-    {
-        case 0: return attotime::from_nsec(0);
-        case 1: return attotime::from_nsec(1000);
-        case 2: return attotime::from_nsec(2500);
-        case 3: return attotime::from_nsec(4000);
-        case 4: return attotime::from_nsec(12500);
-        case 5: return attotime::from_nsec(16000);
-        case 6: return attotime::from_nsec(25000);
-        case 7: return attotime::from_nsec(50000);
-        default:
-            fatalerror("out of range\n");
-    }
+	switch(val)
+	{
+		case 0: return attotime::from_nsec(0);
+		case 1: return attotime::from_nsec(1000);
+		case 2: return attotime::from_nsec(2500);
+		case 3: return attotime::from_nsec(4000);
+		case 4: return attotime::from_nsec(12500);
+		case 5: return attotime::from_nsec(16000);
+		case 6: return attotime::from_nsec(25000);
+		case 7: return attotime::from_nsec(50000);
+		default:
+			fatalerror("out of range\n");
+	}
 }
 #endif
 
@@ -171,141 +171,141 @@ void x68k_state::mfp_init()
 	m_mfp.current_irq = -1;  // No current interrupt
 
 #if 0
-    mfp_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_a_callback),this));
-    mfp_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_b_callback),this));
-    mfp_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_c_callback),this));
-    mfp_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_d_callback),this));
-    mfp_irq = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_update_irq),this));
-    mfp_irq->adjust(attotime::zero, 0, attotime::from_usec(32));
+	mfp_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_a_callback),this));
+	mfp_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_b_callback),this));
+	mfp_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_c_callback),this));
+	mfp_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_d_callback),this));
+	mfp_irq = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_update_irq),this));
+	mfp_irq->adjust(attotime::zero, 0, attotime::from_usec(32));
 #endif
 }
 
 #ifdef UNUSED_FUNCTION
 TIMER_CALLBACK_MEMBER(x68k_state::mfp_update_irq)
 {
-    int x;
+	int x;
 
-    if((m_ioc.irqstatus & 0xc0) != 0)
-        return;
+	if((m_ioc.irqstatus & 0xc0) != 0)
+		return;
 
-    // check for pending IRQs, in priority order
-    if(m_mfp.ipra != 0)
-    {
-        for(x=7;x>=0;x--)
-        {
-            if((m_mfp.ipra & (1 << x)) && (m_mfp.imra & (1 << x)))
-            {
-                m_current_irq_line = m_mfp.irqline;
-                m_mfp.current_irq = x + 8;
-                // assert IRQ line
+	// check for pending IRQs, in priority order
+	if(m_mfp.ipra != 0)
+	{
+		for(x=7;x>=0;x--)
+		{
+			if((m_mfp.ipra & (1 << x)) && (m_mfp.imra & (1 << x)))
+			{
+				m_current_irq_line = m_mfp.irqline;
+				m_mfp.current_irq = x + 8;
+				// assert IRQ line
 //              if(m_mfp.iera & (1 << x))
-                {
-                    m_current_vector[6] = (m_mfp.vr & 0xf0) | (x+8);
-                    machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | (x + 8));
+				{
+					m_current_vector[6] = (m_mfp.vr & 0xf0) | (x+8);
+					machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | (x + 8));
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | (x+8),m_mfp.irqline);
-                    return;  // one at a time only
-                }
-            }
-        }
-    }
-    if(m_mfp.iprb != 0)
-    {
-        for(x=7;x>=0;x--)
-        {
-            if((m_mfp.iprb & (1 << x)) && (m_mfp.imrb & (1 << x)))
-            {
-                m_current_irq_line = m_mfp.irqline;
-                m_mfp.current_irq = x;
-                // assert IRQ line
+					return;  // one at a time only
+				}
+			}
+		}
+	}
+	if(m_mfp.iprb != 0)
+	{
+		for(x=7;x>=0;x--)
+		{
+			if((m_mfp.iprb & (1 << x)) && (m_mfp.imrb & (1 << x)))
+			{
+				m_current_irq_line = m_mfp.irqline;
+				m_mfp.current_irq = x;
+				// assert IRQ line
 //              if(m_mfp.ierb & (1 << x))
-                {
-                    m_current_vector[6] = (m_mfp.vr & 0xf0) | x;
-                    machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | x);
+				{
+					m_current_vector[6] = (m_mfp.vr & 0xf0) | x;
+					machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | x);
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | x,m_mfp.irqline);
-                    return;  // one at a time only
-                }
-            }
-        }
-    }
+					return;  // one at a time only
+				}
+			}
+		}
+	}
 }
 
 void mfp_trigger_irq(running_machine &machine, int irq)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-    // check if interrupt is enabled
-    if(irq > 7)
-    {
-        if(!(state->m_mfp.iera & (1 << (irq-8))))
-            return;  // not enabled, no action taken
-    }
-    else
-    {
-        if(!(state->m_mfp.ierb & (1 << irq)))
-            return;  // not enabled, no action taken
-    }
+	// check if interrupt is enabled
+	if(irq > 7)
+	{
+		if(!(state->m_mfp.iera & (1 << (irq-8))))
+			return;  // not enabled, no action taken
+	}
+	else
+	{
+		if(!(state->m_mfp.ierb & (1 << irq)))
+			return;  // not enabled, no action taken
+	}
 
-    // set requested IRQ as pending
-    if(irq > 7)
-        state->m_mfp.ipra |= (1 << (irq-8));
-    else
-        state->m_mfp.iprb |= (1 << irq);
+	// set requested IRQ as pending
+	if(irq > 7)
+		state->m_mfp.ipra |= (1 << (irq-8));
+	else
+		state->m_mfp.iprb |= (1 << irq);
 
-    // check for IRQs to be called
+	// check for IRQs to be called
 //  mfp_update_irq(0);
 
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_a_callback)
 {
-    m_mfp.timer[0].counter--;
-    if(m_mfp.timer[0].counter == 0)
-    {
-        m_mfp.timer[0].counter = m_mfp.tadr;
-        mfp_trigger_irq(MFP_IRQ_TIMERA);
-    }
+	m_mfp.timer[0].counter--;
+	if(m_mfp.timer[0].counter == 0)
+	{
+		m_mfp.timer[0].counter = m_mfp.tadr;
+		mfp_trigger_irq(MFP_IRQ_TIMERA);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_b_callback)
 {
-    m_mfp.timer[1].counter--;
-    if(m_mfp.timer[1].counter == 0)
-    {
-        m_mfp.timer[1].counter = m_mfp.tbdr;
-            mfp_trigger_irq(MFP_IRQ_TIMERB);
-    }
+	m_mfp.timer[1].counter--;
+	if(m_mfp.timer[1].counter == 0)
+	{
+		m_mfp.timer[1].counter = m_mfp.tbdr;
+			mfp_trigger_irq(MFP_IRQ_TIMERB);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_c_callback)
 {
-    m_mfp.timer[2].counter--;
-    if(m_mfp.timer[2].counter == 0)
-    {
-        m_mfp.timer[2].counter = m_mfp.tcdr;
-            mfp_trigger_irq(MFP_IRQ_TIMERC);
-    }
+	m_mfp.timer[2].counter--;
+	if(m_mfp.timer[2].counter == 0)
+	{
+		m_mfp.timer[2].counter = m_mfp.tcdr;
+			mfp_trigger_irq(MFP_IRQ_TIMERC);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_d_callback)
 {
-    m_mfp.timer[3].counter--;
-    if(m_mfp.timer[3].counter == 0)
-    {
-        m_mfp.timer[3].counter = m_mfp.tddr;
-            mfp_trigger_irq(MFP_IRQ_TIMERD);
-    }
+	m_mfp.timer[3].counter--;
+	if(m_mfp.timer[3].counter == 0)
+	{
+		m_mfp.timer[3].counter = m_mfp.tddr;
+			mfp_trigger_irq(MFP_IRQ_TIMERD);
+	}
 }
 
 void mfp_set_timer(int timer, unsigned char data)
 {
-    if((data & 0x07) == 0x0000)
-    {  // Timer stop
-        mfp_timer[timer]->adjust(attotime::zero);
-        logerror("MFP: Timer #%i stopped. \n",timer);
-        return;
-    }
+	if((data & 0x07) == 0x0000)
+	{  // Timer stop
+		mfp_timer[timer]->adjust(attotime::zero);
+		logerror("MFP: Timer #%i stopped. \n",timer);
+		return;
+	}
 
-    mfp_timer[timer]->adjust(attotime::zero, 0, prescale(data & 0x07));
-    logerror("MFP: Timer #%i set to %2.1fus\n",timer, prescale(data & 0x07).as_double() * 1000000);
+	mfp_timer[timer]->adjust(attotime::zero, 0, prescale(data & 0x07));
+	logerror("MFP: Timer #%i set to %2.1fus\n",timer, prescale(data & 0x07).as_double() * 1000000);
 
 }
 #endif
@@ -347,36 +347,36 @@ READ16_MEMBER(x68k_state::x68k_dmac_r)
 void x68k_state::x68k_keyboard_ctrl_w(int data)
 {
 	/* Keyboard control commands:
-       00xxxxxx - TV Control
-                  Not of much use as yet
+	   00xxxxxx - TV Control
+	              Not of much use as yet
 
-       01000xxy - y = Mouse control signal
+	   01000xxy - y = Mouse control signal
 
-       01001xxy - y = Keyboard enable
+	   01001xxy - y = Keyboard enable
 
-       010100xy - y = Sharp X1 display compatibility mode
+	   010100xy - y = Sharp X1 display compatibility mode
 
-       010101xx - xx = LED brightness (00 = bright, 11 = dark)
+	   010101xx - xx = LED brightness (00 = bright, 11 = dark)
 
-       010110xy - y = Display control enable
+	   010110xy - y = Display control enable
 
-       010111xy - y = Display control via the Opt. 2 key enable
+	   010111xy - y = Display control via the Opt. 2 key enable
 
-       0110xxxx - xxxx = Key delay (default 500ms)
-                         100 * (delay time) + 200ms
+	   0110xxxx - xxxx = Key delay (default 500ms)
+	                     100 * (delay time) + 200ms
 
-       0111xxxx - xxxx = Key repeat rate  (default 110ms)
-                         (repeat rate)^2*5 + 30ms
+	   0111xxxx - xxxx = Key repeat rate  (default 110ms)
+	                     (repeat rate)^2*5 + 30ms
 
-       1xxxxxxx - xxxxxxx = keyboard LED status
-                  b6 = "full size"
-                  b5 = hiragana
-                  b4 = insert
-                  b3 = caps
-                  b2 = code input
-                  b1 = romaji input
-                  b0 = kana
-    */
+	   1xxxxxxx - xxxxxxx = keyboard LED status
+	              b6 = "full size"
+	              b5 = hiragana
+	              b4 = insert
+	              b3 = caps
+	              b2 = code input
+	              b1 = romaji input
+	              b0 = kana
+	*/
 
 	if(data & 0x80)  // LED status
 	{
@@ -1224,168 +1224,168 @@ READ16_MEMBER(x68k_state::x68k_mfp_r)
 {
 
 	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
-    // MFP Timer C, and the power switch
+	// MFP Timer C, and the power switch
 //  logerror("MFP: [%08x] Reading offset %i\n",space.device().safe_pc(),offset);
-    switch(offset)
-    {
+	switch(offset)
+	{
 #if 0
-    case 0x00:  // GPIP - General purpose I/O register (read-only)
-        ret = 0x23;
-        if(machine.primary_screen->vpos() == m_crtc.reg[9])
-            ret |= 0x40;
-        if(m_crtc.vblank == 0)
-            ret |= 0x10;  // Vsync signal (low if in vertical retrace)
+	case 0x00:  // GPIP - General purpose I/O register (read-only)
+		ret = 0x23;
+		if(machine.primary_screen->vpos() == m_crtc.reg[9])
+			ret |= 0x40;
+		if(m_crtc.vblank == 0)
+			ret |= 0x10;  // Vsync signal (low if in vertical retrace)
 //      if(m_mfp.isrb & 0x08)
 //          ret |= 0x08;  // FM IRQ signal
-        if(machine.primary_screen->hpos() > m_crtc.width - 32)
-            ret |= 0x80;  // Hsync signal
+		if(machine.primary_screen->hpos() > m_crtc.width - 32)
+			ret |= 0x80;  // Hsync signal
 //      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",space.device().safe_pc(),offset,ret);
-        return ret;  // bit 5 is always 1
-    case 3:
-        return m_mfp.iera;
-    case 4:
-        return m_mfp.ierb;
-    case 5:
-        return m_mfp.ipra;
-    case 6:
-        return m_mfp.iprb;
-    case 7:
-        if(m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
-            return 0;
-        else
-            return m_mfp.isra;
-    case 8:
-        if(m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
-            return 0;
-        else
-            return m_mfp.isrb;
-    case 9:
-        return m_mfp.imra;
-    case 10:
-        return m_mfp.imrb;
-    case 15:  // TADR
-        return m_mfp.timer[0].counter;  // Timer data registers return their main counter values
-    case 16:  // TBDR
-        return m_mfp.timer[1].counter;
-    case 17:  // TCDR
-        return m_mfp.timer[2].counter;
-    case 18:  // TDDR
-        return m_mfp.timer[3].counter;
+		return ret;  // bit 5 is always 1
+	case 3:
+		return m_mfp.iera;
+	case 4:
+		return m_mfp.ierb;
+	case 5:
+		return m_mfp.ipra;
+	case 6:
+		return m_mfp.iprb;
+	case 7:
+		if(m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
+			return 0;
+		else
+			return m_mfp.isra;
+	case 8:
+		if(m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
+			return 0;
+		else
+			return m_mfp.isrb;
+	case 9:
+		return m_mfp.imra;
+	case 10:
+		return m_mfp.imrb;
+	case 15:  // TADR
+		return m_mfp.timer[0].counter;  // Timer data registers return their main counter values
+	case 16:  // TBDR
+		return m_mfp.timer[1].counter;
+	case 17:  // TCDR
+		return m_mfp.timer[2].counter;
+	case 18:  // TDDR
+		return m_mfp.timer[3].counter;
 #endif
-    case 21:  // RSR
-        return m_mfp.rsr;
-    case 22:  // TSR
-        return m_mfp.tsr | 0x80;  // buffer is typically empty?
-    case 23:
-        return x68k_keyboard_pop_scancode();
-    default:
+	case 21:  // RSR
+		return m_mfp.rsr;
+	case 22:  // TSR
+		return m_mfp.tsr | 0x80;  // buffer is typically empty?
+	case 23:
+		return x68k_keyboard_pop_scancode();
+	default:
 		if (ACCESSING_BITS_0_7) return m_mfpdev->read(space, offset);
-    }
-    return 0xffff;
+	}
+	return 0xffff;
 }
 
 WRITE16_MEMBER(x68k_state::x68k_mfp_w)
 {
 
 	/* For the Interrupt registers, the bits are set out as such:
-       Reg A - bit 7: GPIP7 (HSync)
-               bit 6: GPIP6 (CRTC CIRQ)
-               bit 5: Timer A
-               bit 4: Receive buffer full
-               bit 3: Receive error
-               bit 2: Transmit buffer empty
-               bit 1: Transmit error
-               bit 0: Timer B
-       Reg B - bit 7: GPIP5 (Unused, always 1)
-               bit 6: GPIP4 (VSync)
-               bit 5: Timer C
-               bit 4: Timer D
-               bit 3: GPIP3 (FM IRQ)
-               bit 2: GPIP2 (Power switch)
-               bit 1: GPIP1 (EXPON)
-               bit 0: GPIP0 (Alarm)
-    */
+	   Reg A - bit 7: GPIP7 (HSync)
+	           bit 6: GPIP6 (CRTC CIRQ)
+	           bit 5: Timer A
+	           bit 4: Receive buffer full
+	           bit 3: Receive error
+	           bit 2: Transmit buffer empty
+	           bit 1: Transmit error
+	           bit 0: Timer B
+	   Reg B - bit 7: GPIP5 (Unused, always 1)
+	           bit 6: GPIP4 (VSync)
+	           bit 5: Timer C
+	           bit 4: Timer D
+	           bit 3: GPIP3 (FM IRQ)
+	           bit 2: GPIP2 (Power switch)
+	           bit 1: GPIP1 (EXPON)
+	           bit 0: GPIP0 (Alarm)
+	*/
 	switch(offset)
 	{
 #if 0
-    case 0:  // GPDR
-        // All bits are inputs generally, so no action taken.
-        break;
-    case 1:  // AER
-        m_mfp.aer = data;
-        break;
-    case 2:  // DDR
-        m_mfp.ddr = data;  // usually all bits are 0 (input)
-        break;
-    case 3:  // IERA
-        m_mfp.iera = data;
-        break;
-    case 4:  // IERB
-        m_mfp.ierb = data;
-        break;
-    case 5:  // IPRA
-        m_mfp.ipra = data;
-        break;
-    case 6:  // IPRB
-        m_mfp.iprb = data;
-        break;
-    case 7:
-        m_mfp.isra = data;
-        break;
-    case 8:
-        m_mfp.isrb = data;
-        break;
-    case 9:
-        m_mfp.imra = data;
+	case 0:  // GPDR
+		// All bits are inputs generally, so no action taken.
+		break;
+	case 1:  // AER
+		m_mfp.aer = data;
+		break;
+	case 2:  // DDR
+		m_mfp.ddr = data;  // usually all bits are 0 (input)
+		break;
+	case 3:  // IERA
+		m_mfp.iera = data;
+		break;
+	case 4:  // IERB
+		m_mfp.ierb = data;
+		break;
+	case 5:  // IPRA
+		m_mfp.ipra = data;
+		break;
+	case 6:  // IPRB
+		m_mfp.iprb = data;
+		break;
+	case 7:
+		m_mfp.isra = data;
+		break;
+	case 8:
+		m_mfp.isrb = data;
+		break;
+	case 9:
+		m_mfp.imra = data;
 //      mfp_update_irq(0);
 //      logerror("MFP: IRQ Mask A write: %02x\n",data);
-        break;
-    case 10:
-        m_mfp.imrb = data;
+		break;
+	case 10:
+		m_mfp.imrb = data;
 //      mfp_update_irq(0);
 //      logerror("MFP: IRQ Mask B write: %02x\n",data);
-        break;
-    case 11:  // VR
-        m_mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
-        m_mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
-        if(m_mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
-        {
-            m_mfp.isra = 0;
-            m_mfp.isrb = 0;
-        }
-        break;
-    case 12:  // TACR
-        m_mfp.tacr = data;
-        mfp_set_timer(0,data & 0x0f);
-        break;
-    case 13:  // TBCR
-        m_mfp.tbcr = data;
-        mfp_set_timer(1,data & 0x0f);
-        break;
-    case 14:  // TCDCR
-        m_mfp.tcdcr = data;
-        mfp_set_timer(2,(data & 0x70)>>4);
-        mfp_set_timer(3,data & 0x07);
-        break;
-    case 15:  // TADR
-        m_mfp.tadr = data;
-        m_mfp.timer[0].counter = data;
-        break;
-    case 16:  // TBDR
-        m_mfp.tbdr = data;
-        m_mfp.timer[1].counter = data;
-        break;
-    case 17:  // TCDR
-        m_mfp.tcdr = data;
-        m_mfp.timer[2].counter = data;
-        break;
-    case 18:  // TDDR
-        m_mfp.tddr = data;
-        m_mfp.timer[3].counter = data;
-        break;
-    case 20:
-        m_mfp.ucr = data;
-        break;
+		break;
+	case 11:  // VR
+		m_mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
+		m_mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
+		if(m_mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
+		{
+			m_mfp.isra = 0;
+			m_mfp.isrb = 0;
+		}
+		break;
+	case 12:  // TACR
+		m_mfp.tacr = data;
+		mfp_set_timer(0,data & 0x0f);
+		break;
+	case 13:  // TBCR
+		m_mfp.tbcr = data;
+		mfp_set_timer(1,data & 0x0f);
+		break;
+	case 14:  // TCDCR
+		m_mfp.tcdcr = data;
+		mfp_set_timer(2,(data & 0x70)>>4);
+		mfp_set_timer(3,data & 0x07);
+		break;
+	case 15:  // TADR
+		m_mfp.tadr = data;
+		m_mfp.timer[0].counter = data;
+		break;
+	case 16:  // TBDR
+		m_mfp.tbdr = data;
+		m_mfp.timer[1].counter = data;
+		break;
+	case 17:  // TCDR
+		m_mfp.tcdr = data;
+		m_mfp.timer[2].counter = data;
+		break;
+	case 18:  // TDDR
+		m_mfp.tddr = data;
+		m_mfp.timer[3].counter = data;
+		break;
+	case 20:
+		m_mfp.ucr = data;
+		break;
 #endif
 	case 21:
 		if(data & 0x01)
@@ -1625,7 +1625,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
 READ16_MEMBER(x68k_state::x68k_rom0_r)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
-       then access causes a bus error */
+	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
 //  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
@@ -1642,7 +1642,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
-       then access causes a bus error */
+	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
 //  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
@@ -1658,7 +1658,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 READ16_MEMBER(x68k_state::x68k_emptyram_r)
 {
 	/* this location is unused RAM, access here causes a bus error
-       Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
+	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
 //  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
@@ -1675,7 +1675,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 {
 	/* this location is unused RAM, access here causes a bus error
-       Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
+	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
 //  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
@@ -1991,18 +1991,18 @@ WRITE_LINE_MEMBER( x68k_state::mfp_tdo_w )
 
 static MC68901_INTERFACE( mfp_interface )
 {
-	4000000,											/* timer clock */
-	0,													/* receive clock */
-	0,													/* transmit clock */
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,mfp_irq_callback),						/* interrupt */
-	DEVCB_DRIVER_MEMBER(x68k_state, mfp_gpio_r),		/* GPIO read */
-	DEVCB_NULL,											/* GPIO write */
-	DEVCB_NULL,											/* TAO */
-	DEVCB_NULL,											/* TBO */
-	DEVCB_NULL,											/* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tdo_w),	/* TDO */
-	DEVCB_NULL,											/* serial input */
-	DEVCB_NULL,											/* serial output */
+	4000000,                                            /* timer clock */
+	0,                                                  /* receive clock */
+	0,                                                  /* transmit clock */
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state,mfp_irq_callback),                      /* interrupt */
+	DEVCB_DRIVER_MEMBER(x68k_state, mfp_gpio_r),        /* GPIO read */
+	DEVCB_NULL,                                         /* GPIO write */
+	DEVCB_NULL,                                         /* TAO */
+	DEVCB_NULL,                                         /* TBO */
+	DEVCB_NULL,                                         /* TCO */
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tdo_w),    /* TDO */
+	DEVCB_NULL,                                         /* serial input */
+	DEVCB_NULL,                                         /* serial output */
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -2058,23 +2058,23 @@ static INPUT_PORTS_START( x68000 )
 // TODO: Sharp Cyber Stick (CZ-8NJ2) support
 
 	PORT_START( "joy1" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)    PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)  PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
 
 	PORT_START( "joy2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)    PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
 
 	PORT_START( "key1" )
@@ -2203,14 +2203,14 @@ static INPUT_PORTS_START( x68000 )
 
 	PORT_START("options")
 	PORT_CONFNAME( 0x01, 0x01, "Enable keyboard hack")
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(	0x01, DEF_STR( On ))
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(   0x01, DEF_STR( On ))
 	PORT_CONFNAME( 0x02, 0x02, "Enable fake bus errors")
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(	0x02, DEF_STR( On ))
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(   0x02, DEF_STR( On ))
 	PORT_CONFNAME( 0x04, 0x04, "Enable partial updates on each HSync")
-	PORT_CONFSETTING(	0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(	0x04, DEF_STR( On ))
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(   0x04, DEF_STR( On ))
 
 	PORT_START("mouse1")  // mouse buttons
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -2415,8 +2415,8 @@ SLOT_INTERFACE_END
 MACHINE_RESET_MEMBER(x68k_state,x68000)
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
-       Just copying the inital stack pointer and program counter should
-       more or less do the same job */
+	   Just copying the inital stack pointer and program counter should
+	   more or less do the same job */
 
 	int drive;
 	UINT8* romdata = memregion("user2")->base();
@@ -2625,7 +2625,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68030)
 }
 
 FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
-    FLOPPY_XDF_FORMAT
+	FLOPPY_XDF_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( x68k_floppies )

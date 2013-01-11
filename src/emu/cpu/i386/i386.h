@@ -3,7 +3,7 @@
 #ifndef __I386INTF_H__
 #define __I386INTF_H__
 
-#define INPUT_LINE_A20		1
+#define INPUT_LINE_A20      1
 
 
 // mingw has this defined for 32-bit compiles

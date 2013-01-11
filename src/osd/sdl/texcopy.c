@@ -6,26 +6,26 @@ INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 {
 	/* original equations:
 
-        C = Y - 16
-        D = Cb - 128
-        E = Cr - 128
+	    C = Y - 16
+	    D = Cb - 128
+	    E = Cr - 128
 
-        R = clip(( 298 * C           + 409 * E + 128) >> 8)
-        G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
-        B = clip(( 298 * C + 516 * D           + 128) >> 8)
+	    R = clip(( 298 * C           + 409 * E + 128) >> 8)
+	    G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
+	    B = clip(( 298 * C + 516 * D           + 128) >> 8)
 
-        R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
-        G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
-        B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
+	    R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
+	    G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
+	    B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
 
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
 
-        R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
-        G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
-        B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
-    */
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+	*/
 	//int r, g, b, common;
 	unsigned int r, g, b, common;
 
@@ -68,7 +68,7 @@ static void init_clamp(void)
 	}
 }
 
-INLINE int clamp(int x)	{	return (const int) clamp_lu[(x >> 8) + 128] ; }
+INLINE int clamp(int x) {   return (const int) clamp_lu[(x >> 8) + 128] ; }
 
 INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 {

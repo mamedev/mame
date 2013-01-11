@@ -145,7 +145,7 @@ void gottlieb_state::video_start()
 	/* compute palette information */
 	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
 	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0);
@@ -171,7 +171,7 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 	/* compute palette information */
 	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
 	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0);
@@ -203,11 +203,11 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	rectangle clip = cliprect;
-    int offs;
+	int offs;
 
-    /* this is a temporary guess until the sprite hardware is better understood */
-    /* there is some additional clipping, but this may not be it */
-    clip.min_x = 8;
+	/* this is a temporary guess until the sprite hardware is better understood */
+	/* there is some additional clipping, but this may not be it */
+	clip.min_x = 8;
 
 	for (offs = 0; offs < 256; offs += 4)
 	{

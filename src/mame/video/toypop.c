@@ -234,7 +234,7 @@ void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangl
 			int sprite = spriteram[offs];
 			int color = spriteram[offs+1];
 			int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 40 + xoffs;
-			int sy = 256 - spriteram_2[offs] + yoffs + 1;	// sprites are buffered and delayed by one scanline
+			int sy = 256 - spriteram_2[offs] + yoffs + 1;   // sprites are buffered and delayed by one scanline
 			int flipx = (spriteram_3[offs] & 0x01);
 			int flipy = (spriteram_3[offs] & 0x02) >> 1;
 			int sizex = (spriteram_3[offs] & 0x04) >> 2;
@@ -244,7 +244,7 @@ void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangl
 			sprite &= ~(sizey << 1);
 
 			sy -= 16 * sizey;
-			sy = (sy & 0xff) - 32;	// fix wraparound
+			sy = (sy & 0xff) - 32;  // fix wraparound
 
 			if (state->flip_screen())
 			{

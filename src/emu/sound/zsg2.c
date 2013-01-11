@@ -82,30 +82,30 @@ static STREAM_UPDATE( update_stereo )
 
 static void chan_w(zsg2_state *info, int chan, int reg, UINT16 data)
 {
-  info->zc[chan].v[reg] = data;
-  //  log_event("ZOOMCHAN", "chan %02x reg %x = %04x", chan, reg, data);
+	info->zc[chan].v[reg] = data;
+	//  log_event("ZOOMCHAN", "chan %02x reg %x = %04x", chan, reg, data);
 }
 
 static UINT16 chan_r(zsg2_state *info, int chan, int reg)
 {
-  //  log_event("ZOOMCHAN", "chan %02x read reg %x: %04x", chan, reg, zc[chan].v[reg]);
-  return info->zc[chan].v[reg];
+	//  log_event("ZOOMCHAN", "chan %02x read reg %x: %04x", chan, reg, zc[chan].v[reg]);
+	return info->zc[chan].v[reg];
 }
 
 static void check_channel(zsg2_state *info, int chan)
 {
-  //  log_event("ZOOM", "chan %02x e=%04x f=%04x", chan, zc[chan].v[14], zc[chan].v[15]);
+	//  log_event("ZOOM", "chan %02x e=%04x f=%04x", chan, zc[chan].v[14], zc[chan].v[15]);
 }
 
 static void keyon(zsg2_state *info, int chan)
 {
 #if 0
-  log_event("ZOOM", "keyon %02x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",
-	    chan,
-	    info->zc[chan].v[0x0], info->zc[chan].v[0x1], info->zc[chan].v[0x2], info->zc[chan].v[0x3],
-	    info->zc[chan].v[0x4], info->zc[chan].v[0x5], info->zc[chan].v[0x6], info->zc[chan].v[0x7],
-	    info->zc[chan].v[0x8], info->zc[chan].v[0x9], info->zc[chan].v[0xa], info->zc[chan].v[0xb],
-	    info->zc[chan].v[0xc], info->zc[chan].v[0xd], info->zc[chan].v[0xe], info->zc[chan].v[0xf]);
+	log_event("ZOOM", "keyon %02x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",
+		chan,
+		info->zc[chan].v[0x0], info->zc[chan].v[0x1], info->zc[chan].v[0x2], info->zc[chan].v[0x3],
+		info->zc[chan].v[0x4], info->zc[chan].v[0x5], info->zc[chan].v[0x6], info->zc[chan].v[0x7],
+		info->zc[chan].v[0x8], info->zc[chan].v[0x9], info->zc[chan].v[0xa], info->zc[chan].v[0xb],
+		info->zc[chan].v[0xc], info->zc[chan].v[0xd], info->zc[chan].v[0xe], info->zc[chan].v[0xf]);
 #endif
 }
 
@@ -176,7 +176,7 @@ WRITE16_DEVICE_HANDLER( zsg2_w )
 	zsg2_state *info = get_safe_token(device);
 	int adr = offset * 2;
 
-	assert(mem_mask == 0xffff);	// we only support full 16-bit accesses
+	assert(mem_mask == 0xffff); // we only support full 16-bit accesses
 
 	info->stream->update();
 
@@ -198,7 +198,7 @@ READ16_DEVICE_HANDLER( zsg2_r )
 	zsg2_state *info = get_safe_token(device);
 	int adr = offset * 2;
 
-	assert(mem_mask == 0xffff);	// we only support full 16-bit accesses
+	assert(mem_mask == 0xffff); // we only support full 16-bit accesses
 
 	if (adr < 0x600)
 	{
@@ -233,7 +233,7 @@ const device_type ZSG2 = &device_creator<zsg2_device>;
 
 zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(zsg2_state);
 }
@@ -266,5 +266,3 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

@@ -5,22 +5,22 @@
     PARAMETERS
 ***************************************************************************/
 
-#define OVERLAY_CUR					BIT(cell, 31)	/* places a cursor in the cell if SET */
-#define OVERLAY_BLK					BIT(cell, 30)	/* blinks the foreground character in the cell if SET */
-#define OVERLAY_VF					BIT(cell, 28)	/* makes the foreground visible if SET (else transparent) */
-#define OVERLAY_VB					BIT(cell, 27)	/* makes the background visible if SET (else transparent) */
-#define OVERLAY_PL					BIT(cell, 24)	/* uses bits 0-7 as PLOT DOT descriptor if SET (else ASCII) */
-#define OVERLAY_BR					BIT(cell, 18)	/* turns on Red in background if SET */
-#define OVERLAY_BG					BIT(cell, 17)	/* turns on Green in background if SET */
-#define OVERLAY_BB					BIT(cell, 16)	/* turns on Blue in background if SET */
-#define OVERLAY_FR					BIT(cell, 10)	/* turns on Red in foreground if SET */
-#define OVERLAY_FG					BIT(cell, 9)	/* turns on Green in foreground if SET */
-#define OVERLAY_FB					BIT(cell, 8)	/* turns on Blue in background if SET */
-#define OVERLAY_DATA				(cell & 0xff)	/* ASCII or Plot Dot character */
+#define OVERLAY_CUR                 BIT(cell, 31)   /* places a cursor in the cell if SET */
+#define OVERLAY_BLK                 BIT(cell, 30)   /* blinks the foreground character in the cell if SET */
+#define OVERLAY_VF                  BIT(cell, 28)   /* makes the foreground visible if SET (else transparent) */
+#define OVERLAY_VB                  BIT(cell, 27)   /* makes the background visible if SET (else transparent) */
+#define OVERLAY_PL                  BIT(cell, 24)   /* uses bits 0-7 as PLOT DOT descriptor if SET (else ASCII) */
+#define OVERLAY_BR                  BIT(cell, 18)   /* turns on Red in background if SET */
+#define OVERLAY_BG                  BIT(cell, 17)   /* turns on Green in background if SET */
+#define OVERLAY_BB                  BIT(cell, 16)   /* turns on Blue in background if SET */
+#define OVERLAY_FR                  BIT(cell, 10)   /* turns on Red in foreground if SET */
+#define OVERLAY_FG                  BIT(cell, 9)    /* turns on Green in foreground if SET */
+#define OVERLAY_FB                  BIT(cell, 8)    /* turns on Blue in background if SET */
+#define OVERLAY_DATA                (cell & 0xff)   /* ASCII or Plot Dot character */
 
-#define IMAGE_SELECT				BIT(m_roll_overlay[0], 13)
-#define OVERLAY_CURSOR_BLINK		BIT(m_roll_overlay[0], 12)
-#define OVERLAY_CHARACTER_BLINK		BIT(m_roll_overlay[0], 11)
+#define IMAGE_SELECT                BIT(m_roll_overlay[0], 13)
+#define OVERLAY_CURSOR_BLINK        BIT(m_roll_overlay[0], 12)
+#define OVERLAY_CHARACTER_BLINK     BIT(m_roll_overlay[0], 11)
 
 static const rgb_t PALETTE[] =
 {
@@ -71,26 +71,26 @@ READ16_MEMBER( cgc7900_state::sync_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-         0      _VERT       vertical retrace (0=vblank)
-         1                  interlace (1=first field, 0=second field)
-         2      _HG         horizontal retrace (0=hblank)
-         3      1
-         4      1
-         5      1
-         6      1
-         7      1
-         8      1
-         9      1
-        10      1
-        11      1
-        12      1
-        13      1
-        14      1
-        15      1
+	     0      _VERT       vertical retrace (0=vblank)
+	     1                  interlace (1=first field, 0=second field)
+	     2      _HG         horizontal retrace (0=hblank)
+	     3      1
+	     4      1
+	     5      1
+	     6      1
+	     7      1
+	     8      1
+	     9      1
+	    10      1
+	    11      1
+	    12      1
+	    13      1
+	    14      1
+	    15      1
 
-    */
+	*/
 
 	return 0xffff;
 }
@@ -198,7 +198,7 @@ UINT32 cgc7900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	draw_bitmap(&screen, bitmap);
 	draw_overlay(&screen, bitmap);
 
-    return 0;
+	return 0;
 }
 
 /*-------------------------------------------------
@@ -233,12 +233,12 @@ GFXDECODE_END
 -------------------------------------------------*/
 
 MACHINE_CONFIG_FRAGMENT( cgc7900_video )
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_UPDATE_DRIVER(cgc7900_state, screen_update)
-    MCFG_SCREEN_SIZE(1024, 768)
-    MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(cgc7900_state, screen_update)
+	MCFG_SCREEN_SIZE(1024, 768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 
 	MCFG_GFXDECODE(cgc7900)
 

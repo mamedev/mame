@@ -96,8 +96,8 @@ class esrip_device;
 
 struct esrip_config
 {
-	read16_device_func	fdt_r;
-	write16_device_func	fdt_w;
+	read16_device_func  fdt_r;
+	write16_device_func fdt_w;
 	UINT8 (*status_in)(running_machine &machine);
 	int (*draw)(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
 	const char* lbrm_prom;
@@ -110,7 +110,7 @@ extern const device_type ESRIP;
 
 // Used by core CPU interface
 class esrip_device : public cpu_device,
-					 public esrip_config
+						public esrip_config
 {
 public:
 	// construction/destruction
@@ -152,60 +152,60 @@ protected:
 	const address_space_config m_program_config;
 
 	// CPU registers
-	UINT16	m_ram[32];
-	UINT16	m_acc;
-	UINT16	m_d_latch;
-	UINT16	m_i_latch;
-	UINT16	m_result;
-	UINT8	m_new_status;
-	UINT8	m_status;
-	UINT16	m_inst;
-	UINT8	m_immflag;
-	UINT8	m_ct;
-	UINT8	m_t;
+	UINT16  m_ram[32];
+	UINT16  m_acc;
+	UINT16  m_d_latch;
+	UINT16  m_i_latch;
+	UINT16  m_result;
+	UINT8   m_new_status;
+	UINT8   m_status;
+	UINT16  m_inst;
+	UINT8   m_immflag;
+	UINT8   m_ct;
+	UINT8   m_t;
 
 	/* Instruction latches - current and previous values */
-	UINT8	m_l1, m_pl1;
-	UINT8	m_l2, m_pl2;
-	UINT8	m_l3, m_pl3;
-	UINT8	m_l4, m_pl4;
-	UINT8	m_l5, m_pl5;
-	UINT8	m_l6, m_pl6;
-	UINT8	m_l7, m_pl7;
+	UINT8   m_l1, m_pl1;
+	UINT8   m_l2, m_pl2;
+	UINT8   m_l3, m_pl3;
+	UINT8   m_l4, m_pl4;
+	UINT8   m_l5, m_pl5;
+	UINT8   m_l6, m_pl6;
+	UINT8   m_l7, m_pl7;
 
-	UINT8	m_pc;
-	UINT16	m_rip_pc;
-	UINT8	m_status_out;
+	UINT8   m_pc;
+	UINT16  m_rip_pc;
+	UINT8   m_status_out;
 
-	UINT8	m_x_scale;
-	UINT8	m_y_scale;
-	UINT8	m_img_bank;
-	UINT8	m_line_latch;
-	UINT16	m_fig_latch;
-	UINT16	m_attr_latch;
-	UINT16	m_adl_latch;
-	UINT16	m_adr_latch;
-	UINT16	m_iaddr_latch;
-	UINT8	m_c_latch;
+	UINT8   m_x_scale;
+	UINT8   m_y_scale;
+	UINT8   m_img_bank;
+	UINT8   m_line_latch;
+	UINT16  m_fig_latch;
+	UINT16  m_attr_latch;
+	UINT16  m_adl_latch;
+	UINT16  m_adr_latch;
+	UINT16  m_iaddr_latch;
+	UINT8   m_c_latch;
 
-	UINT16	m_fdt_cnt;
-	UINT16	m_ipt_cnt;
+	UINT16  m_fdt_cnt;
+	UINT16  m_ipt_cnt;
 
-	UINT8	m_fig;
-	UINT16	m_fig_cycles;
+	UINT8   m_fig;
+	UINT16  m_fig_cycles;
 
-	UINT8	m_optable[65536];
+	UINT8   m_optable[65536];
 
-	UINT16	*m_ipt_ram;
-	UINT8	*m_lbrm;
+	UINT16  *m_ipt_ram;
+	UINT8   *m_lbrm;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 
-	int		m_icount;
+	int     m_icount;
 
-	read16_device_func	m_fdt_r;
-	write16_device_func	m_fdt_w;
+	read16_device_func  m_fdt_r;
+	write16_device_func m_fdt_w;
 	UINT8 (*m_status_in)(running_machine &machine);
 	int (*m_draw)(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
 

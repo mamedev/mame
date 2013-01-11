@@ -75,32 +75,32 @@ struct YMF278BChip;
 
 struct YMF278BSlot
 {
-	INT16 wave;		/* wavetable number */
-	INT16 F_NUMBER;	/* frequency */
-	INT8 octave;	/* octave */
-	INT8 preverb;	/* pseudo-reverb */
-	INT8 DAMP;		/* damping */
-	INT8 CH;		/* output channel */
-	INT8 LD;		/* level direct */
-	INT8 TL;		/* total level */
-	INT8 pan;		/* panpot */
-	INT8 LFO;		/* LFO */
-	INT8 VIB;		/* vibrato */
-	INT8 AM;		/* tremolo */
+	INT16 wave;     /* wavetable number */
+	INT16 F_NUMBER; /* frequency */
+	INT8 octave;    /* octave */
+	INT8 preverb;   /* pseudo-reverb */
+	INT8 DAMP;      /* damping */
+	INT8 CH;        /* output channel */
+	INT8 LD;        /* level direct */
+	INT8 TL;        /* total level */
+	INT8 pan;       /* panpot */
+	INT8 LFO;       /* LFO */
+	INT8 VIB;       /* vibrato */
+	INT8 AM;        /* tremolo */
 
-	INT8 AR;		/* attack rate */
-	INT8 D1R;		/* decay 1 rate */
-	INT8 DL;		/* decay level */
-	INT8 D2R;		/* decay 2 rate */
-	INT8 RC;		/* rate correction */
-	INT8 RR;		/* release rate */
+	INT8 AR;        /* attack rate */
+	INT8 D1R;       /* decay 1 rate */
+	INT8 DL;        /* decay level */
+	INT8 D2R;       /* decay 2 rate */
+	INT8 RC;        /* rate correction */
+	INT8 RR;        /* release rate */
 
-	UINT32 step;	/* fixed-point frequency step */
-	UINT64 stepptr;	/* fixed-point pointer into the sample */
+	UINT32 step;    /* fixed-point frequency step */
+	UINT64 stepptr; /* fixed-point pointer into the sample */
 
-	INT8 active;	/* channel is playing */
-	INT8 KEY_ON;	/* slot keyed on */
-	INT8 bits;		/* width of the samples */
+	INT8 active;    /* channel is playing */
+	INT8 KEY_ON;    /* slot keyed on */
+	INT8 bits;      /* width of the samples */
 	UINT32 startaddr;
 	UINT32 loopaddr;
 	UINT32 endaddr;
@@ -111,8 +111,8 @@ struct YMF278BSlot
 	UINT32 env_vol_lim;
 	INT8 env_preverb;
 
-	int num;		/* slot number (for debug only) */
-	YMF278BChip *chip;	/* pointer back to parent chip */
+	int num;        /* slot number (for debug only) */
+	YMF278BChip *chip;  /* pointer back to parent chip */
 };
 
 struct YMF278BChip
@@ -146,10 +146,10 @@ struct YMF278BChip
 	int clock;
 
 	// precomputed tables
-	UINT32 lut_ar[64];				// attack rate
-	UINT32 lut_dr[64];				// decay rate
-	INT32 volume[256*4];			// precalculated attenuation values with some margin for envelope and pan levels
-	int pan_left[16],pan_right[16];	// pan volume offsets
+	UINT32 lut_ar[64];              // attack rate
+	UINT32 lut_dr[64];              // decay rate
+	INT32 volume[256*4];            // precalculated attenuation values with some margin for envelope and pan levels
+	int pan_left[16],pan_right[16]; // pan volume offsets
 	INT32 mix_level[8];
 
 	sound_stream * stream;
@@ -696,7 +696,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
 				// LFO and vibrato level, not hooked up yet
 				slot->LFO = (data>>3)&0x7;
 				slot->VIB = data&0x7;
-		    	break;
+				break;
 
 			case 6:
 				slot->AR = data>>4;
@@ -929,8 +929,8 @@ static DEVICE_RESET( ymf278b )
 
 	chip->timer_a->reset();
 	chip->timer_b->reset();
-	chip->timer_busy->reset();	chip->status_busy = 0;
-	chip->timer_ld->reset();	chip->status_ld = 0;
+	chip->timer_busy->reset();  chip->status_busy = 0;
+	chip->timer_ld->reset();    chip->status_ld = 0;
 
 	chip->irq_line = CLEAR_LINE;
 }
@@ -1091,7 +1091,7 @@ const device_type YMF278B = &device_creator<ymf278b_device>;
 
 ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(YMF278BChip);
 }
@@ -1133,5 +1133,3 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

@@ -7,12 +7,12 @@
 #include "emu.h"
 #include "includes/galaxold.h"
 
-#define STARS_COLOR_BASE_LEGACY	(machine.root_device().memregion("proms")->bytes())
-#define STARS_COLOR_BASE		(machine().root_device().memregion("proms")->bytes())
-#define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
-#define BULLETS_COLOR_BASE_LEGACY		(STARS_COLOR_BASE_LEGACY + 64)
-#define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
-#define BACKGROUND_COLOR_BASE_LEGACY	(BULLETS_COLOR_BASE_LEGACY + 2)
+#define STARS_COLOR_BASE_LEGACY (machine.root_device().memregion("proms")->bytes())
+#define STARS_COLOR_BASE        (machine().root_device().memregion("proms")->bytes())
+#define BULLETS_COLOR_BASE      (STARS_COLOR_BASE + 64)
+#define BULLETS_COLOR_BASE_LEGACY       (STARS_COLOR_BASE_LEGACY + 64)
+#define BACKGROUND_COLOR_BASE   (BULLETS_COLOR_BASE + 2)
+#define BACKGROUND_COLOR_BASE_LEGACY    (BULLETS_COLOR_BASE_LEGACY + 2)
 
 
 
@@ -35,9 +35,9 @@ static void drivfrcg_modify_color(UINT8 *color);
 
 
 
-       void galaxold_init_stars(running_machine &machine, int colors_offset);
+		void galaxold_init_stars(running_machine &machine, int colors_offset);
 static void     noop_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-       void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+		void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 static void scrambold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 static void   rescue_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 static void  mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -156,9 +156,9 @@ PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 
 	/*  The background color generator is connected this way:
 
-        RED   - 270 ohm resistor
-        GREEN - 560 ohm resistor
-        BLUE  - 470 ohm resistor */
+	    RED   - 270 ohm resistor
+	    GREEN - 560 ohm resistor
+	    BLUE  - 470 ohm resistor */
 
 	for (i = 0; i < 8; i++)
 	{
@@ -321,10 +321,10 @@ PALETTE_INIT_MEMBER(galaxold_state,mariner)
 
 	/* 16 shades of blue - the 4 bits are connected to the following resistors:
 
-        bit 0 -- 4.7 kohm resistor
-              -- 2.2 kohm resistor
-              -- 1   kohm resistor
-        bit 0 -- .47 kohm resistor */
+	    bit 0 -- 4.7 kohm resistor
+	          -- 2.2 kohm resistor
+	          -- 1   kohm resistor
+	    bit 0 -- .47 kohm resistor */
 
 	for (i = 0; i < 16; i++)
 	{
@@ -380,12 +380,12 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 	palette_set_color(machine(),BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
 
 	/*
-    Assumption (not clear from the schematics):
-    The background color generator is connected this way:
+	Assumption (not clear from the schematics):
+	The background color generator is connected this way:
 
-        RED   - 470 ohm resistor
-        GREEN - 470 ohm resistor
-        BLUE  - 470 ohm resistor */
+	    RED   - 470 ohm resistor
+	    GREEN - 470 ohm resistor
+	    BLUE  - 470 ohm resistor */
 
 
 	for (i = 0; i < 8; i++)
@@ -409,9 +409,9 @@ PALETTE_INIT_MEMBER(galaxold_state,turtles)
 
 	/*  The background color generator is connected this way:
 
-        RED   - 390 ohm resistor
-        GREEN - 470 ohm resistor
-        BLUE  - 390 ohm resistor */
+	    RED   - 390 ohm resistor
+	    GREEN - 470 ohm resistor
+	    BLUE  - 390 ohm resistor */
 
 	for (i = 0; i < 8; i++)
 	{
@@ -502,8 +502,8 @@ VIDEO_START_MEMBER(galaxold_state,scrambold)
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
 	/* FIXME: This most probably needs to be adjusted
-     * again when RAW video params are added to scramble
-     */
+	 * again when RAW video params are added to scramble
+	 */
 	m_bg_tilemap->set_scrolldx(0, 0);
 
 	m_draw_stars = scrambold_draw_stars;
@@ -674,7 +674,7 @@ static void rockclim_draw_background(running_machine &machine, bitmap_ind16 &bit
 static void rockclim_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_gfxbank[2])	*code|=0x40;
+	if (state->m_gfxbank[2])    *code|=0x40;
 }
 
 VIDEO_START_MEMBER(galaxold_state,rockclim)
@@ -773,7 +773,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::harem_get_tile_info)
 	int code = m_videoram[tile_index];
 	UINT8 x = tile_index & 0x1f;
 	UINT8 color = m_attributesram[(x << 1) | 1] & 7;
-	UINT8 bank = BIT(m_racknrol_tiles_bank[0], x/4);	// 1 bit every 4 columns
+	UINT8 bank = BIT(m_racknrol_tiles_bank[0], x/4);    // 1 bit every 4 columns
 
 	code  |= bank * 0x200;
 
@@ -1003,9 +1003,9 @@ WRITE8_MEMBER(galaxold_state::rockclim_scroll_w)
 	switch(offset&3)
 	{
 		case 0: m_rockclim_h=(m_rockclim_h&0xff00)|data;m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
-		case 1:	m_rockclim_h=(m_rockclim_h&0xff)|(data<<8);m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
-		case 2:	m_rockclim_v=(m_rockclim_v&0xff00)|data;m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
-		case 3:	m_rockclim_v=(m_rockclim_v&0xff)|(data<<8);m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
+		case 1: m_rockclim_h=(m_rockclim_h&0xff)|(data<<8);m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
+		case 2: m_rockclim_v=(m_rockclim_v&0xff00)|data;m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
+		case 3: m_rockclim_v=(m_rockclim_v&0xff)|(data<<8);m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
 	}
 
 }
@@ -1072,11 +1072,11 @@ static void mariner_modify_charcode(running_machine &machine, UINT16 *code, UINT
 static void dambustr_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_dambustr_char_bank == 0) {	// text mode
+	if (state->m_dambustr_char_bank == 0) { // text mode
 		*code |= 0x0300;
 	}
-	else {				// graphics mode
-		if (x == 28)		// only line #28 stays in text mode
+	else {              // graphics mode
+		if (x == 28)        // only line #28 stays in text mode
 			*code |= 0x0300;
 		else
 			*code &= 0x00ff;
@@ -1246,10 +1246,10 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bit
 
 	/* the background PROM is connected the following way:
 
-       bit 0 = 0 enables the blue gun if BCB is asserted
-       bit 1 = 0 enables the red gun if BCR is asserted and
-                 the green gun if BCG is asserted
-       bits 2-7 are unconnected */
+	   bit 0 = 0 enables the blue gun if BCB is asserted
+	   bit 1 = 0 enables the red gun if BCR is asserted and
+	             the green gun if BCG is asserted
+	   bits 2-7 are unconnected */
 
 	prom = state->memregion("user1")->base();
 
@@ -1323,8 +1323,8 @@ static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitm
 
 
 	/* the background PROM contains the color codes for each 8 pixel
-       line (column) of the screen.  The first 0x20 bytes for unflipped,
-       and the 2nd 0x20 bytes for flipped screen. */
+	   line (column) of the screen.  The first 0x20 bytes for unflipped,
+	   and the 2nd 0x20 bytes for flipped screen. */
 
 	prom = state->memregion("user1")->base();
 
@@ -1740,8 +1740,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *
 		int flipx,flipy,code;
 
 
-		sx = spriteram[offs + 3] + 1;	/* the existence of +1 is supported by a LOT of games */
-		sy = spriteram[offs];			/* Anteater, Mariner, for example */
+		sx = spriteram[offs + 3] + 1;   /* the existence of +1 is supported by a LOT of games */
+		sy = spriteram[offs];           /* Anteater, Mariner, for example */
 		flipx = spriteram[offs + 1] & 0x40;
 		flipy = spriteram[offs + 1] & 0x80;
 		code = spriteram[offs + 1] & 0x3f;

@@ -335,5 +335,3 @@ void upd4701_device::device_reset()
 {
 	DEVICE_RESET_NAME( upd4701 )(this);
 }
-
-

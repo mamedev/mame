@@ -103,4 +103,4 @@ public:
 };
 
 
-#endif	/* __DEVDELEGATE_H__ */
+#endif  /* __DEVDELEGATE_H__ */

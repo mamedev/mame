@@ -34,7 +34,7 @@
 #include "imagedev/cartslot.h"
 #include "sound/dac.h"
 
-#define MAX_PS_TIMERS	3
+#define MAX_PS_TIMERS   3
 
 struct ps_ftlb_regs_t
 {
@@ -74,7 +74,7 @@ struct ps_clock_regs_t
 	UINT32 control;
 };
 
-#define PS_CLOCK_STEADY		0x10
+#define PS_CLOCK_STEADY     0x10
 
 struct ps_rtc_regs_t
 {
@@ -129,7 +129,7 @@ public:
 };
 
 
-#define DEFAULT_CLOCK	2000000
+#define DEFAULT_CLOCK   2000000
 
 static const int CPU_FREQ[16] =
 {
@@ -151,9 +151,9 @@ static const int CPU_FREQ[16] =
 	0x7a0000
 };
 
-#define VERBOSE_LEVEL		(0)
+#define VERBOSE_LEVEL       (0)
 
-#define ENABLE_VERBOSE_LOG	(0)
+#define ENABLE_VERBOSE_LOG  (0)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -198,23 +198,23 @@ static void ps_timer_start(running_machine &machine, int index);
 
 
 
-#define PS_INT_BTN_ACTION		0x00000001 // "Action button"
-#define PS_INT_BTN_RIGHT		0x00000002 // "Right button"
-#define PS_INT_BTN_LEFT			0x00000004 // "Left button"
-#define PS_INT_BTN_DOWN			0x00000008 // "Down button"
-#define PS_INT_BTN_UP			0x00000010 // "Up button"
-#define PS_INT_UNKNOWN			0x00000020 // "Unknown"
-#define PS_INT_COM				0x00000040 // "COM" ???
-#define PS_INT_TIMER0			0x00000080 // "Timer 0"
-#define PS_INT_TIMER1			0x00000100 // "Timer 1"
-#define PS_INT_RTC				0x00000200 // "RTC"
-#define PS_INT_BATTERY			0x00000400 // "Battery Monitor"
-#define PS_INT_IOP				0x00000800 // "IOP"
-#define PS_INT_IRDA				0x00001000 // "IrDA"
-#define PS_INT_TIMER2			0x00002000 // "Timer 2"
-#define PS_INT_IRQ_MASK			0x00001fbf
-#define PS_INT_FIQ_MASK			0x00002040
-#define PS_INT_STATUS_MASK		0x0000021f
+#define PS_INT_BTN_ACTION       0x00000001 // "Action button"
+#define PS_INT_BTN_RIGHT        0x00000002 // "Right button"
+#define PS_INT_BTN_LEFT         0x00000004 // "Left button"
+#define PS_INT_BTN_DOWN         0x00000008 // "Down button"
+#define PS_INT_BTN_UP           0x00000010 // "Up button"
+#define PS_INT_UNKNOWN          0x00000020 // "Unknown"
+#define PS_INT_COM              0x00000040 // "COM" ???
+#define PS_INT_TIMER0           0x00000080 // "Timer 0"
+#define PS_INT_TIMER1           0x00000100 // "Timer 1"
+#define PS_INT_RTC              0x00000200 // "RTC"
+#define PS_INT_BATTERY          0x00000400 // "Battery Monitor"
+#define PS_INT_IOP              0x00000800 // "IOP"
+#define PS_INT_IRDA             0x00001000 // "IrDA"
+#define PS_INT_TIMER2           0x00002000 // "Timer 2"
+#define PS_INT_IRQ_MASK         0x00001fbf
+#define PS_INT_FIQ_MASK         0x00002040
+#define PS_INT_STATUS_MASK      0x0000021f
 
 READ32_MEMBER(pockstat_state::ps_ftlb_r)
 {
@@ -776,10 +776,10 @@ INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 	UINT32 buttons = machine().root_device().ioport("BUTTONS")->read();
 
 	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_RIGHT,	(buttons &  2) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_LEFT,	(buttons &  4) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_DOWN,	(buttons &  8) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_UP,	(buttons & 16) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_RIGHT, (buttons &  2) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_LEFT,  (buttons &  4) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_DOWN,  (buttons &  8) ? 1 : 0);
+	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_UP,    (buttons & 16) ? 1 : 0);
 }
 
 READ32_MEMBER(pockstat_state::ps_rombank_r)
@@ -862,11 +862,11 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( pockstat )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)		PORT_NAME("Action Button")	PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")			PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)	PORT_NAME("Left")			PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)	PORT_NAME("Down")			PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)	PORT_NAME("Up")				PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_NAME("Action Button")  PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")          PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_NAME("Left")           PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_NAME("Down")           PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_NAME("Up")             PORT_CHANGED_MEMBER(DEVICE_SELF, pockstat_state, input_update, 0)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -999,9 +999,9 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_SOUND_ADD("dac", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

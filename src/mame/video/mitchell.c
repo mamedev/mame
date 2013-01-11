@@ -303,10 +303,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			sy = 240 - sy;
 		}
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-				 code,
-				 color,
-				 state->m_flipscreen, state->m_flipscreen,
-				 sx,sy,15);
+					code,
+					color,
+					state->m_flipscreen, state->m_flipscreen,
+					sx,sy,15);
 	}
 }
 

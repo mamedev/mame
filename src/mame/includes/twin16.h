@@ -5,7 +5,7 @@ class twin16_state : public driver_device
 public:
 	twin16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") ,
+			m_spriteram(*this, "spriteram") ,
 		m_text_ram(*this, "text_ram"),
 		m_videoram(*this, "videoram"),
 		m_tile_gfx_ram(*this, "tile_gfx_ram"),

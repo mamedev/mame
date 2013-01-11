@@ -76,20 +76,20 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 READ8_MEMBER(gunsmoke_state::gunsmoke_protection_r)
 {
-    /*
-        The routine at 0x0e69 tries to read data starting at 0xc4c9.
-        If this value is zero, it interprets the next two bytes as a
-        jump address.
+	/*
+	    The routine at 0x0e69 tries to read data starting at 0xc4c9.
+	    If this value is zero, it interprets the next two bytes as a
+	    jump address.
 
-        This was resulting in a reboot which happens at the end of level 3
-        if you go too far to the right of the screen when fighting the level boss.
+	    This was resulting in a reboot which happens at the end of level 3
+	    if you go too far to the right of the screen when fighting the level boss.
 
-        A non-zero for the first byte seems to be harmless
-        (although it may not be the correct behaviour).
+	    A non-zero for the first byte seems to be harmless
+	    (although it may not be the correct behaviour).
 
-        This could be some devious protection or it could be a bug in the
-        arcade game.  It's hard to tell without pulling the code apart.
-    */
+	    This could be some devious protection or it could be a bug in the
+	    arcade game.  It's hard to tell without pulling the code apart.
+	*/
 
 	static const UINT8 gunsmoke_fixed_data[] = { 0xff, 0x00, 0x00 };
 	return gunsmoke_fixed_data[offset];
@@ -107,13 +107,13 @@ static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc4c9, 0xc4cb) AM_READ(gunsmoke_protection_r)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(gunsmoke_c804_w)	// ROM bank switch, screen flip
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(gunsmoke_c804_w)  // ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xd800, 0xd801) AM_RAM AM_SHARE("scrollx")
 	AM_RANGE(0xd802, 0xd802) AM_RAM AM_SHARE("scrolly")
-	AM_RANGE(0xd806, 0xd806) AM_WRITE(gunsmoke_d806_w)	// sprites and bg enable
+	AM_RANGE(0xd806, 0xd806) AM_WRITE(gunsmoke_d806_w)  // sprites and bg enable
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -133,7 +133,7 @@ static INPUT_PORTS_START( gunsmoke )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )	// VBLANK
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    // VBLANK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( gunsmoke )
 	PORT_DIPNAME( 0x40, 0x40, "Freeze" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )	// Also "debug mode"
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) // Also "debug mode"
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
@@ -222,13 +222,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	2,	/* 2 bits per pixel */
+	8,8,    /* 8*8 characters */
+	1024,   /* 1024 characters */
+	2,  /* 2 bits per pixel */
 	{ 4, 0 },
 	{ 8+3, 8+2, 8+1, 8+0, 3, 2, 1, 0 },
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
-	16*8	/* every char takes 16 consecutive bytes */
+	16*8    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
@@ -245,20 +245,20 @@ static const gfx_layout tilelayout =
 			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16,
 			16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16,
 			24*16, 25*16, 26*16, 27*16, 28*16, 29*16, 30*16, 31*16 },
-	256*8	/* every tile takes 256 consecutive bytes */
+	256*8   /* every tile takes 256 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	2048,	/* 2048 sprites */
+	16,16,  /* 16*16 sprites */
+	2048,   /* 2048 sprites */
 	4,      /* 4 bits per pixel */
 	{ 2048*64*8+4, 2048*64*8+0, 4, 0 },
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
 			32*8+0, 32*8+1, 32*8+2, 32*8+3, 33*8+0, 33*8+1, 33*8+2, 33*8+3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
 /* Graphics Decode Info */
@@ -295,11 +295,11 @@ void gunsmoke_state::machine_reset()
 static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	// 4 MHz
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(gunsmoke_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunsmoke_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	// 3 MHz
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(gunsmoke_state, irq0_line_hold,  4*60)
 
@@ -366,20 +366,20 @@ ROM_START( gunsmoke )
 	ROM_LOAD( "03l_gs16.bin", 0x30000, 0x8000, CRC(0d99c3b3) SHA1(436c566b76f632242448671e3b6319f7d9f65322) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "01l_gs15.bin", 0x38000, 0x8000, CRC(7f14270e) SHA1(dd06c333c2ea097e25185a1423cd61e1b7afc42b) ) /* Sprites planes 0-1 */
 
-	ROM_REGION( 0x8000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "11c_gs14.bin", 0x00000, 0x8000, CRC(0af4f7eb) SHA1(24a98fdeedeeaf1035b4af52d5a8dd5e47a5e62d) )
 
 	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )	/* red component */
-	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )	/* green component */
-	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )	/* blue component */
-	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )	/* char lookup table */
-	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )	/* tile lookup table */
-	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )	/* tile palette bank */
-	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )	/* sprite lookup table */
-	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )	/* sprite palette bank */
-	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
-	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )	/* priority? (not used) */
+	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )    /* red component */
+	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )    /* green component */
+	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )    /* blue component */
+	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )    /* char lookup table */
+	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )    /* tile lookup table */
+	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )    /* tile palette bank */
+	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )    /* sprite lookup table */
+	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )    /* sprite palette bank */
+	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )    /* priority? (not used) */
 ROM_END
 
 ROM_START( gunsmokej )
@@ -414,20 +414,20 @@ ROM_START( gunsmokej )
 	ROM_LOAD( "03l_gs16.bin", 0x30000, 0x8000, CRC(0d99c3b3) SHA1(436c566b76f632242448671e3b6319f7d9f65322) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "01l_gs15.bin", 0x38000, 0x8000, CRC(7f14270e) SHA1(dd06c333c2ea097e25185a1423cd61e1b7afc42b) ) /* Sprites planes 0-1 */
 
-	ROM_REGION( 0x8000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "11c_gs14.bin", 0x00000, 0x8000, CRC(0af4f7eb) SHA1(24a98fdeedeeaf1035b4af52d5a8dd5e47a5e62d) )
 
 	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )	/* red component */
-	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )	/* green component */
-	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )	/* blue component */
-	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )	/* char lookup table */
-	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )	/* tile lookup table */
-	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )	/* tile palette bank */
-	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )	/* sprite lookup table */
-	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )	/* sprite palette bank */
-	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
-	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )	/* priority? (not used) */
+	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )    /* red component */
+	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )    /* green component */
+	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )    /* blue component */
+	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )    /* char lookup table */
+	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )    /* tile lookup table */
+	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )    /* tile palette bank */
+	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )    /* sprite lookup table */
+	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )    /* sprite palette bank */
+	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )    /* priority? (not used) */
 ROM_END
 
 ROM_START( gunsmokeu )
@@ -462,20 +462,20 @@ ROM_START( gunsmokeu )
 	ROM_LOAD( "03l_gs16.bin", 0x30000, 0x8000, CRC(0d99c3b3) SHA1(436c566b76f632242448671e3b6319f7d9f65322) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "01l_gs15.bin", 0x38000, 0x8000, CRC(7f14270e) SHA1(dd06c333c2ea097e25185a1423cd61e1b7afc42b) ) /* Sprites planes 0-1 */
 
-	ROM_REGION( 0x8000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "11c_gs14.bin", 0x00000, 0x8000, CRC(0af4f7eb) SHA1(24a98fdeedeeaf1035b4af52d5a8dd5e47a5e62d) )
 
 	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )	/* red component */
-	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )	/* green component */
-	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )	/* blue component */
-	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )	/* char lookup table */
-	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )	/* tile lookup table */
-	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )	/* tile palette bank */
-	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )	/* sprite lookup table */
-	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )	/* sprite palette bank */
-	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
-	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )	/* priority? (not used) */
+	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )    /* red component */
+	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )    /* green component */
+	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )    /* blue component */
+	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )    /* char lookup table */
+	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )    /* tile lookup table */
+	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )    /* tile palette bank */
+	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )    /* sprite lookup table */
+	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )    /* sprite palette bank */
+	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )    /* priority? (not used) */
 ROM_END
 
 ROM_START( gunsmokeua )
@@ -510,20 +510,20 @@ ROM_START( gunsmokeua )
 	ROM_LOAD( "03l_gs16.bin", 0x30000, 0x8000, CRC(0d99c3b3) SHA1(436c566b76f632242448671e3b6319f7d9f65322) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "01l_gs15.bin", 0x38000, 0x8000, CRC(7f14270e) SHA1(dd06c333c2ea097e25185a1423cd61e1b7afc42b) ) /* Sprites planes 0-1 */
 
-	ROM_REGION( 0x8000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "11c_gs14.bin", 0x00000, 0x8000, CRC(0af4f7eb) SHA1(24a98fdeedeeaf1035b4af52d5a8dd5e47a5e62d) )
 
 	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )	/* red component */
-	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )	/* green component */
-	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )	/* blue component */
-	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )	/* char lookup table */
-	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )	/* tile lookup table */
-	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )	/* tile palette bank */
-	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )	/* sprite lookup table */
-	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )	/* sprite palette bank */
-	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
-	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )	/* priority? (not used) */
+	ROM_LOAD( "03b_g-01.bin", 0x0000, 0x0100, CRC(02f55589) SHA1(8a3f98304aedf3aba1c08b615bf457752a480edc) )    /* red component */
+	ROM_LOAD( "04b_g-02.bin", 0x0100, 0x0100, CRC(e1e36dd9) SHA1(5bd88a35898a2d973045bdde8311aac3a12826de) )    /* green component */
+	ROM_LOAD( "05b_g-03.bin", 0x0200, 0x0100, CRC(989399c0) SHA1(e408e391f49ed0c7b9e16479fea44b809440fefc) )    /* blue component */
+	ROM_LOAD( "09d_g-04.bin", 0x0300, 0x0100, CRC(906612b5) SHA1(7b727a6200c088538180758320ede84aa7e5b96d) )    /* char lookup table */
+	ROM_LOAD( "14a_g-06.bin", 0x0400, 0x0100, CRC(4a9da18b) SHA1(fed3b81b56aab2ed0a21ed1fcebe3f1ae095a13b) )    /* tile lookup table */
+	ROM_LOAD( "15a_g-07.bin", 0x0500, 0x0100, CRC(cb9394fc) SHA1(8ad0fde6a8ef8326d2da4b6dbf3b51f5f6c668c8) )    /* tile palette bank */
+	ROM_LOAD( "09f_g-09.bin", 0x0600, 0x0100, CRC(3cee181e) SHA1(3f95bdb12391cb9b3673191bda8d09c84b36b4d3) )    /* sprite lookup table */
+	ROM_LOAD( "08f_g-08.bin", 0x0700, 0x0100, CRC(ef91cdd2) SHA1(90b9191c9f10a153d64055a4238eb6e15b8c12bc) )    /* sprite palette bank */
+	ROM_LOAD( "02j_g-10.bin", 0x0800, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+	ROM_LOAD( "01f_g-05.bin", 0x0900, 0x0100, CRC(25c90c2a) SHA1(42893572bab757ec01e181fc418cb911638d37e0) )    /* priority? (not used) */
 ROM_END
 
 /* Game Drivers */

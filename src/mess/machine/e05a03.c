@@ -250,5 +250,3 @@ void e05a03_device::device_reset()
 {
 	DEVICE_RESET_NAME( e05a03 )(this);
 }
-
-

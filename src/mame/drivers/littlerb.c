@@ -92,9 +92,9 @@ class littlerb_state : public driver_device
 public:
 	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_dacl(*this, "dacl"),
-	      m_dacr(*this, "dacr"),
+			m_maincpu(*this, "maincpu"),
+			m_dacl(*this, "dacl"),
+			m_dacr(*this, "dacr"),
 		m_region4(*this, "region4")
 	{
 		m_1ff80804 = -1;
@@ -264,7 +264,7 @@ class littlerb_vdp_device;
 
 
 class littlerb_vdp_device : public device_t,
-						  public device_memory_interface
+							public device_memory_interface
 {
 public:
 	littlerb_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -275,15 +275,15 @@ protected:
 		return (spacenum == 0) ? &m_space_config : NULL;
 	}
 
-	address_space_config		m_space_config;
+	address_space_config        m_space_config;
 };
 
 const device_type LITTLERBVDP = &device_creator<littlerb_vdp_device>;
 
 littlerb_vdp_device::littlerb_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LITTLERBVDP, "LITTLERBVDP", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("littlerb_vdp", ENDIANNESS_LITTLE, 16,32, 0, NULL, *ADDRESS_MAP_NAME(littlerb_vdp_map8))
+		device_memory_interface(mconfig, *this),
+		m_space_config("littlerb_vdp", ENDIANNESS_LITTLE, 16,32, 0, NULL, *ADDRESS_MAP_NAME(littlerb_vdp_map8))
 {
 }
 
@@ -476,7 +476,7 @@ CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
 }
 
 static INPUT_PORTS_START( littlerb )
-	PORT_START("DSW")	/* 16bit */
+	PORT_START("DSW")   /* 16bit */
 	PORT_DIPNAME( 0x0003, 0x0001, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0003, "2" )
 	PORT_DIPSETTING(      0x0001, "3" )
@@ -523,7 +523,7 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P1")	/* 16bit */
+	PORT_START("P1")    /* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, littlerb_state,littlerb_frame_step_r, NULL)
 
-	PORT_START("P2")	/* 16bit */
+	PORT_START("P2")    /* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)

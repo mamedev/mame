@@ -12,4 +12,3 @@ WRITE16_MEMBER(cchasm_state::cchasm_led_w)
 {
 	/*logerror("LED write %x to %x\n", data, offset);*/
 }
-

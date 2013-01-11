@@ -32,9 +32,9 @@ void starshp1_state::palette_init()
 		0, 5,       /* 0x04 - 0x05 - sprites (Z=1) */
 		0, 2, 4, 6, /* 0x06 - 0x09 - spaceship (EXPLODE=0) */
 		0, 6, 6, 7, /* 0x0a - 0x0d - spaceship (EXPLODE=1) */
-		5, 2,		/* 0x0e - 0x0f - star field */
-		7,			/* 0x10        - phasor */
-		5, 7		/* 0x11        - circle */
+		5, 2,       /* 0x0e - 0x0f - star field */
+		7,          /* 0x10        - phasor */
+		5, 7        /* 0x11        - circle */
 	};
 
 	/* allocate the colortable */
@@ -70,9 +70,9 @@ void starshp1_state::video_start()
 	for (i = 0; i < 0x10000; i++)
 	{
 		int bit = (val >> 0xf) ^
-				  (val >> 0xc) ^
-				  (val >> 0x7) ^
-				  (val >> 0x1) ^ 1;
+					(val >> 0xc) ^
+					(val >> 0x7) ^
+					(val >> 0x1) ^ 1;
 
 		m_LSFR[i] = val;
 
@@ -91,7 +91,7 @@ READ8_MEMBER(starshp1_state::starshp1_rng_r)
 	int y = machine().primary_screen->vpos();
 
 	/* the LFSR is only running in the non-blank region
-       of the screen, so this is not quite right */
+	   of the screen, so this is not quite right */
 	if (x > width - 1)
 		x = width - 1;
 	if (y > height - 1)
@@ -104,13 +104,13 @@ READ8_MEMBER(starshp1_state::starshp1_rng_r)
 WRITE8_MEMBER(starshp1_state::starshp1_ssadd_w)
 {
 	/*
-     * The range of sprite position values doesn't suffice to
-     * move the zoomed &spaceship sprite over the top and left
-     * edges of the screen. These additional values are used
-     * to compensate for this. Technically, they cut off the
-     * first columns and rows of the &spaceship sprite, but in
-     * practice they work like offsets in zoomed pixels.
-     */
+	 * The range of sprite position values doesn't suffice to
+	 * move the zoomed &spaceship sprite over the top and left
+	 * edges of the screen. These additional values are used
+	 * to compensate for this. Technically, they cut off the
+	 * first columns and rows of the &spaceship sprite, but in
+	 * practice they work like offsets in zoomed pixels.
+	 */
 
 	m_ship_voffset = ((offset & 0xf0) >> 4);
 	m_ship_hoffset = ((offset & 0x0f) << 2) | (data & 3);
@@ -120,10 +120,10 @@ WRITE8_MEMBER(starshp1_state::starshp1_ssadd_w)
 WRITE8_MEMBER(starshp1_state::starshp1_sspic_w)
 {
 	/*
-     * Some mysterious game code at address $2CCE is causing
-     * erratic images in the target explosion sequence. The
-     * following condition is a hack to filter these images.
-     */
+	 * Some mysterious game code at address $2CCE is causing
+	 * erratic images in the target explosion sequence. The
+	 * following condition is a hack to filter these images.
+	 */
 
 	if (data != 0x87)
 		m_ship_picture = data;
@@ -144,10 +144,10 @@ WRITE8_MEMBER(starshp1_state::starshp1_playfield_w)
 static void draw_starfield(starshp1_state *state, bitmap_ind16 &bitmap)
 {
 	/*
-     * The LSFR is reset once per frame at the position of
-     * sprite 15. This behavior is quite pointless and not
-     * really needed by the game. Not emulated.
-     */
+	 * The LSFR is reset once per frame at the position of
+	 * sprite 15. This behavior is quite pointless and not
+	 * really needed by the game. Not emulated.
+	 */
 
 	int x;
 	int y;
@@ -344,9 +344,9 @@ static int circle_collision(starshp1_state *state, const rectangle &rect)
 	int r = get_radius(state);
 
 	return point_in_circle(rect.min_x, rect.min_y, center_x, center_y, r) ||
-		   point_in_circle(rect.min_x, rect.max_y, center_x, center_y, r) ||
-		   point_in_circle(rect.max_x, rect.min_y, center_x, center_y, r) ||
-		   point_in_circle(rect.max_x, rect.max_y, center_x, center_y, r);
+			point_in_circle(rect.min_x, rect.max_y, center_x, center_y, r) ||
+			point_in_circle(rect.max_x, rect.min_y, center_x, center_y, r) ||
+			point_in_circle(rect.max_x, rect.max_y, center_x, center_y, r);
 }
 
 

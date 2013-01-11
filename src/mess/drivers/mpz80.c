@@ -54,20 +54,20 @@ enum
 	FULL_ACCESS
 };
 
-#define TASK0	((m_task & 0x0f) == 0)
+#define TASK0   ((m_task & 0x0f) == 0)
 
-#define R10	0x04
+#define R10 0x04
 
 
 // mask register
-#define MASK_STOP_ENBL		0x01
-#define MASK_AUX_ENBL		0x02
-#define MASK_TINT_ENBL		0x04
-#define MASK_RUN_ENBL		0x08
-#define MASK_HALT_ENBL		0x10
-#define MASK_SINT_ENBL		0x20
-#define MASK_IOENBL			0x40
-#define MASK_ZIO_MODE		0x80
+#define MASK_STOP_ENBL      0x01
+#define MASK_AUX_ENBL       0x02
+#define MASK_TINT_ENBL      0x04
+#define MASK_RUN_ENBL       0x08
+#define MASK_HALT_ENBL      0x10
+#define MASK_SINT_ENBL      0x20
+#define MASK_IOENBL         0x40
+#define MASK_ZIO_MODE       0x80
 
 
 
@@ -313,18 +313,18 @@ READ8_MEMBER( mpz80_state::trap_addr_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DADDR 12
-        1       DADDR 13
-        2       DADDR 14
-        3       DADDR 15
-        4       I-ADDR 12
-        5       I-ADDR 13
-        6       I-ADDR 14
-        7       I-ADDR 15
+	    0       DADDR 12
+	    1       DADDR 13
+	    2       DADDR 14
+	    3       DADDR 15
+	    4       I-ADDR 12
+	    5       I-ADDR 13
+	    6       I-ADDR 14
+	    7       I-ADDR 15
 
-    */
+	*/
 
 	return m_trap_addr;
 }
@@ -338,18 +338,18 @@ READ8_MEMBER( mpz80_state::status_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _TRAP VOID
-        1       _IORQ
-        2       _TRAP HALT
-        3       _TRAP INT
-        4       _TRAP STOP
-        5       _TRAP AUX
-        6       R10
-        7       _RD STB
+	    0       _TRAP VOID
+	    1       _IORQ
+	    2       _TRAP HALT
+	    3       _TRAP INT
+	    4       _TRAP STOP
+	    5       _TRAP AUX
+	    6       R10
+	    7       _RD STB
 
-    */
+	*/
 
 	return m_status;
 }
@@ -363,18 +363,18 @@ WRITE8_MEMBER( mpz80_state::task_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       T0, A16
-        1       T1, A17
-        2       T2, A18
-        3       T3, A19
-        4       T4, S-100 A20
-        5       T5, S-100 A21
-        6       T6, S-100 A22
-        7       T7, S-100 A23
+	    0       T0, A16
+	    1       T1, A17
+	    2       T2, A18
+	    3       T3, A19
+	    4       T4, S-100 A20
+	    5       T5, S-100 A21
+	    6       T6, S-100 A22
+	    7       T7, S-100 A23
 
-    */
+	*/
 
 	m_task = data;
 
@@ -391,18 +391,18 @@ WRITE8_MEMBER( mpz80_state::mask_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _STOP ENBL
-        1       AUX ENBL
-        2       _TINT ENBL
-        3       RUN ENBL
-        4       _HALT ENBL
-        5       SINT ENBL
-        6       _IOENBL
-        7       _ZIO MODE
+	    0       _STOP ENBL
+	    1       AUX ENBL
+	    2       _TINT ENBL
+	    3       RUN ENBL
+	    4       _HALT ENBL
+	    5       SINT ENBL
+	    6       _IOENBL
+	    7       _ZIO MODE
 
-    */
+	*/
 
 	m_mask = data;
 }
@@ -421,18 +421,18 @@ READ8_MEMBER( mpz80_state::keyboard_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	return 0;
 }
@@ -446,18 +446,18 @@ READ8_MEMBER( mpz80_state::switch_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _TRAP RESET
-        1       INT PEND
-        2       16C S6
-        3       16C S5
-        4       16C S4
-        5       16C S3
-        6       16C S2
-        7       16C S1
+	    0       _TRAP RESET
+	    1       INT PEND
+	    2       16C S6
+	    3       16C S5
+	    4       16C S4
+	    5       16C S3
+	    6       16C S2
+	    7       16C S1
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -482,18 +482,18 @@ WRITE8_MEMBER( mpz80_state::disp_seg_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 }
 
 
@@ -505,18 +505,18 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 }
 
 
@@ -833,4 +833,4 @@ DRIVER_INIT_MEMBER(mpz80_state,mpz80)
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80, mpz80_state,  mpz80,      "Morrow Designs",	"MPZ80",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80, mpz80_state,  mpz80,      "Morrow Designs",  "MPZ80",    GAME_NOT_WORKING | GAME_NO_SOUND_HW )

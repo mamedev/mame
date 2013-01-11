@@ -194,14 +194,14 @@ static const gfx_layout parentj_layout =
 	4,
 	{ 0,1,2,3 },
 	{ RGN_FRAC(7,8)+4, RGN_FRAC(7,8)+0,
-	  RGN_FRAC(6,8)+4, RGN_FRAC(6,8)+0,
-	  RGN_FRAC(5,8)+4, RGN_FRAC(5,8)+0,
-	  RGN_FRAC(4,8)+4, RGN_FRAC(4,8)+0,
-	  RGN_FRAC(3,8)+4, RGN_FRAC(3,8)+0,
-	  RGN_FRAC(2,8)+4, RGN_FRAC(2,8)+0,
-	  RGN_FRAC(1,8)+4, RGN_FRAC(1,8)+0,
-	  RGN_FRAC(0,8)+4, RGN_FRAC(0,8)+0
-	  },
+		RGN_FRAC(6,8)+4, RGN_FRAC(6,8)+0,
+		RGN_FRAC(5,8)+4, RGN_FRAC(5,8)+0,
+		RGN_FRAC(4,8)+4, RGN_FRAC(4,8)+0,
+		RGN_FRAC(3,8)+4, RGN_FRAC(3,8)+0,
+		RGN_FRAC(2,8)+4, RGN_FRAC(2,8)+0,
+		RGN_FRAC(1,8)+4, RGN_FRAC(1,8)+0,
+		RGN_FRAC(0,8)+4, RGN_FRAC(0,8)+0
+		},
 	{ 0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120},
 
 	1*128
@@ -236,7 +236,7 @@ static const ym2203_interface ym2203_config =
 
 static const tc0080vco_interface parentj_intf =
 {
-	0, 1,	/* gfxnum, txnum */
+	0, 1,   /* gfxnum, txnum */
 	1, 1, -2,
 	0
 };
@@ -250,7 +250,7 @@ void taitoo_state::machine_start()
 
 static MACHINE_CONFIG_START( parentj, taitoo_state )
 
-	MCFG_CPU_ADD("maincpu", M68000,12000000 )		/*?? MHz */
+	MCFG_CPU_ADD("maincpu", M68000,12000000 )       /*?? MHz */
 	MCFG_CPU_PROGRAM_MAP(parentj_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitoo_state, parentj_interrupt, "screen", 0, 1)
 

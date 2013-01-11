@@ -30,7 +30,7 @@ enum
 	TIMER_FINISHING
 };
 
-#define TIMER_FLAG		0x80
+#define TIMER_FLAG      0x80
 
 
 
@@ -40,29 +40,29 @@ enum
 
 struct mos6530_port
 {
-	devcb_resolved_read8		in_port_func;
-	devcb_resolved_write8		out_port_func;
+	devcb_resolved_read8        in_port_func;
+	devcb_resolved_write8       out_port_func;
 
-	UINT8				in;
-	UINT8				out;
-	UINT8				ddr;
+	UINT8               in;
+	UINT8               out;
+	UINT8               ddr;
 };
 
 
 struct mos6530_state
 {
-	devcb_resolved_write_line	out_irq_func;
+	devcb_resolved_write_line   out_irq_func;
 
-	mos6530_port	port[2];
+	mos6530_port    port[2];
 
-	UINT8			irqstate;
-	UINT8			irqenable;
+	UINT8           irqstate;
+	UINT8           irqenable;
 
-	UINT8			timershift;
-	UINT8			timerstate;
-	emu_timer *		timer;
+	UINT8           timershift;
+	UINT8           timerstate;
+	emu_timer *     timer;
 
-	UINT32			clock;
+	UINT32          clock;
 };
 
 
@@ -276,7 +276,7 @@ READ8_DEVICE_HANDLER( mos6530_r )
 		/* if A0 == 0, we are reading the port as an input */
 		else
 		{
-			UINT8	out = port->out;
+			UINT8   out = port->out;
 
 			if ( ( offset & 2 ) && miot->irqenable )
 				out = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
@@ -467,5 +467,3 @@ void mos6530_device::device_reset()
 {
 	DEVICE_RESET_NAME( mos6530 )(this);
 }
-
-

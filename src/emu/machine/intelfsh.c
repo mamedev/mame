@@ -21,19 +21,19 @@
 
 enum
 {
-	FM_NORMAL,	// normal read/write
-	FM_READID,	// read ID
-	FM_READSTATUS,	// read status
-	FM_WRITEPART1,	// first half of programming, awaiting second
-	FM_CLEARPART1,	// first half of clear, awaiting second
-	FM_SETMASTER,	// first half of set master lock, awaiting on/off
-	FM_READAMDID1,	// part 1 of alt ID sequence
-	FM_READAMDID2,	// part 2 of alt ID sequence
-	FM_READAMDID3,	// part 3 of alt ID sequence
-	FM_ERASEAMD1,	// part 1 of AMD erase sequence
-	FM_ERASEAMD2,	// part 2 of AMD erase sequence
-	FM_ERASEAMD3,	// part 3 of AMD erase sequence
-	FM_ERASEAMD4,	// part 4 of AMD erase sequence
+	FM_NORMAL,  // normal read/write
+	FM_READID,  // read ID
+	FM_READSTATUS,  // read status
+	FM_WRITEPART1,  // first half of programming, awaiting second
+	FM_CLEARPART1,  // first half of clear, awaiting second
+	FM_SETMASTER,   // first half of set master lock, awaiting on/off
+	FM_READAMDID1,  // part 1 of alt ID sequence
+	FM_READAMDID2,  // part 2 of alt ID sequence
+	FM_READAMDID3,  // part 3 of alt ID sequence
+	FM_ERASEAMD1,   // part 1 of AMD erase sequence
+	FM_ERASEAMD2,   // part 2 of AMD erase sequence
+	FM_ERASEAMD3,   // part 3 of AMD erase sequence
+	FM_ERASEAMD4,   // part 4 of AMD erase sequence
 	FM_BYTEPROGRAM,
 	FM_BANKSELECT,
 	FM_WRITEPAGEATMEL
@@ -145,20 +145,20 @@ ADDRESS_MAP_END
 
 intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_type(variant),
-	  m_size(0),
-	  m_bits(8),
-	  m_device_id(0),
-	  m_maker_id(0),
-	  m_sector_is_4k(false),
-	  m_status(0x80),
-	  m_erase_sector(0),
-	  m_flash_mode(FM_NORMAL),
-	  m_flash_master_lock(false),
-	  m_timer(NULL),
-	  m_bank(0)
+		device_memory_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_type(variant),
+		m_size(0),
+		m_bits(8),
+		m_device_id(0),
+		m_maker_id(0),
+		m_sector_is_4k(false),
+		m_status(0x80),
+		m_erase_sector(0),
+		m_flash_mode(FM_NORMAL),
+		m_flash_master_lock(false),
+		m_timer(NULL),
+		m_bank(0)
 {
 	address_map_constructor map = NULL;
 
@@ -496,7 +496,7 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 			//used in Fujitsu 29DL16X 8bits mode
 			switch (address)
 			{
-				case 0:	data = m_maker_id; break;
+				case 0: data = m_maker_id; break;
 				case 2: data = m_device_id; break;
 				case 4: data = 0; break;
 			}
@@ -505,7 +505,7 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		{
 			switch (address)
 			{
-				case 0:	data = m_maker_id; break;
+				case 0: data = m_maker_id; break;
 				case 1: data = m_device_id; break;
 				case 2: data = 0; break;
 			}
@@ -516,7 +516,7 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		{
 			switch (address)
 			{
-				case 0:	data = m_maker_id; break;
+				case 0: data = m_maker_id; break;
 				case 2: data = m_device_id; break;
 				case 4: data = 0; break;
 			}
@@ -525,13 +525,13 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		{
 			switch (address)
 			{
-			case 0:	// maker ID
+			case 0: // maker ID
 				data = m_maker_id;
 				break;
-			case 1:	// chip ID
+			case 1: // chip ID
 				data = m_device_id;
 				break;
-			case 2:	// block lock config
+			case 2: // block lock config
 				data = 0; // we don't support this yet
 				break;
 			case 3: // master lock config
@@ -599,30 +599,30 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		switch( data & 0xff )
 		{
 		case 0xf0:
-		case 0xff:	// reset chip mode
+		case 0xff:  // reset chip mode
 			m_flash_mode = FM_NORMAL;
 			break;
-		case 0x90:	// read ID
+		case 0x90:  // read ID
 			m_flash_mode = FM_READID;
 			break;
 		case 0x40:
-		case 0x10:	// program
+		case 0x10:  // program
 			m_flash_mode = FM_WRITEPART1;
 			break;
-		case 0x50:	// clear status reg
+		case 0x50:  // clear status reg
 			m_status = 0x80;
 			m_flash_mode = FM_READSTATUS;
 			break;
-		case 0x20:	// block erase
+		case 0x20:  // block erase
 			m_flash_mode = FM_CLEARPART1;
 			break;
-		case 0x60:	// set master lock
+		case 0x60:  // set master lock
 			m_flash_mode = FM_SETMASTER;
 			break;
-		case 0x70:	// read status
+		case 0x70:  // read status
 			m_flash_mode = FM_READSTATUS;
 			break;
-		case 0xaa:	// AMD ID select part 1
+		case 0xaa:  // AMD ID select part 1
 			if( ( address & 0xfff ) == 0x555 )
 			{
 				m_flash_mode = FM_READAMDID1;
@@ -779,7 +779,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		break;
 	case FM_ERASEAMD3:
 		if( (( address & 0xfff ) == 0x555 && ( data & 0xff ) == 0x10 ) ||
-		    (( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x10 ) )
+			(( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x10 ) )
 		{
 			// chip erase
 			for (offs_t offs = 0; offs < m_size; offs++)

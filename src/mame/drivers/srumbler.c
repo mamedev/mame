@@ -20,13 +20,13 @@
 WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
 {
 	/*
-      banking is controlled by two PROMs. 0000-4fff is mapped to the same
-      address (RAM and I/O) for all banks, so we don't handle it here.
-      e000-ffff is all mapped to the same ROMs, however we do handle it
-      here anyway.
-      Note that 5000-8fff can be either ROM or RAM, so we should handle
-      that as well to be 100% accurate.
-     */
+	  banking is controlled by two PROMs. 0000-4fff is mapped to the same
+	  address (RAM and I/O) for all banks, so we don't handle it here.
+	  e000-ffff is all mapped to the same ROMs, however we do handle it
+	  here anyway.
+	  Note that 5000-8fff can be either ROM or RAM, so we should handle
+	  that as well to be 100% accurate.
+	 */
 	int i;
 	UINT8 *ROM = memregion("user1")->base();
 	UINT8 *prom1 = memregion("proms")->base() + (data & 0xf0);
@@ -82,19 +82,19 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x400c, 0x400c) AM_READ_PORT("DSW2")
 	AM_RANGE(0x400a, 0x400d) AM_WRITE(srumbler_scroll_w)
 	AM_RANGE(0x400e, 0x400e) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000")	AM_WRITE(srumbler_foreground_w) AM_SHARE("foregroundram") /* Banked ROM */
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000")	/* Banked ROM */
-	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP	/* Video RAM 2 ??? (not used) */
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000")	/* Banked ROM */
+	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000") AM_WRITE(srumbler_foreground_w) AM_SHARE("foregroundram") /* Banked ROM */
+	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000") /* Banked ROM */
+	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP    /* Video RAM 2 ??? (not used) */
+	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000") /* Banked ROM */
 	AM_RANGE(0x7000, 0x73ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
-	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000")	/* Banked ROM */
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000")	/* Banked ROM */
-	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000")	/* Banked ROM */
-	AM_RANGE(0xb000, 0xbfff) AM_ROMBANK("b000")	/* Banked ROM */
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("c000")	/* Banked ROM */
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("d000")	/* Banked ROM */
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("e000")	/* Banked ROM */
-	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("f000")	/* Banked ROM */
+	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000") /* Banked ROM */
+	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000") /* Banked ROM */
+	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000") /* Banked ROM */
+	AM_RANGE(0xb000, 0xbfff) AM_ROMBANK("b000") /* Banked ROM */
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("c000") /* Banked ROM */
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("d000") /* Banked ROM */
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("e000") /* Banked ROM */
+	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("f000") /* Banked ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srumbler_sound_map, AS_PROGRAM, 8, srumbler_state )

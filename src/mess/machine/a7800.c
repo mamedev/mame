@@ -79,9 +79,9 @@ static void a7800_driver_init(running_machine &machine, int ispal, int lines)
 	state->m_p2_one_button = 1;
 
 	/* standard banks */
-	state->membank("bank5")->set_base(&state->m_ROM[0x2040]);		/* RAM0 */
-	state->membank("bank6")->set_base(&state->m_ROM[0x2140]);		/* RAM1 */
-	state->membank("bank7")->set_base(&state->m_ROM[0x2000]);		/* MAINRAM */
+	state->membank("bank5")->set_base(&state->m_ROM[0x2040]);       /* RAM0 */
+	state->membank("bank6")->set_base(&state->m_ROM[0x2140]);       /* RAM1 */
+	state->membank("bank7")->set_base(&state->m_ROM[0x2000]);       /* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
 	space.install_readwrite_bank(0x0480, 0x04FF,"bank10");
@@ -238,7 +238,7 @@ static const a7800_pcb pcb_list[] =
 
 static UINT16 a7800_get_pcb_id(const char *pcb)
 {
-	int	i;
+	int i;
 
 	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
 	{
@@ -255,7 +255,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 	UINT32 len = 0, start = 0;
 	unsigned char header[128];
 	UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
-	const char	*pcb_name;
+	const char  *pcb_name;
 
 	// detect cart type either from xml or from header
 	if (image.software_entry() == NULL)
@@ -327,9 +327,9 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 		memcpy(memory + 0xC000, memory + 0x10000 + len - 0x4000, 0x4000);
 
 		/* fixed 2002/05/13 kubecj
-            there was 0x08, I added also two other cases.
-            Now, it loads bank n-2 to $4000 if it's empty.
-        */
+		    there was 0x08, I added also two other cases.
+		    Now, it loads bank n-2 to $4000 if it's empty.
+		*/
 
 		/* bank n-2 */
 		if (!(state->m_cart_type & 0x0d))
@@ -476,16 +476,16 @@ READ8_MEMBER(a7800_state::a7800_TIA_r)
 		case 0x06:
 		case 0x07:
 		/* Even though the 7800 doesn't use the TIA graphics the collision registers should
-           still return a reasonable value */
+		   still return a reasonable value */
 			return 0x00;
 		case 0x08:
-			  return((ioport("buttons")->read() & 0x02) << 6);
+				return((ioport("buttons")->read() & 0x02) << 6);
 		case 0x09:
-			  return((ioport("buttons")->read() & 0x08) << 4);
+				return((ioport("buttons")->read() & 0x08) << 4);
 		case 0x0A:
-			  return((ioport("buttons")->read() & 0x01) << 7);
+				return((ioport("buttons")->read() & 0x01) << 7);
 		case 0x0B:
-			  return((ioport("buttons")->read() & 0x04) << 5);
+				return((ioport("buttons")->read() & 0x04) << 5);
 		case 0x0c:
 			if(((ioport("buttons")->read() & 0x08) ||(ioport("buttons")->read() & 0x02)) && m_p1_one_button)
 				return 0x00;

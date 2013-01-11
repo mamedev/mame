@@ -46,11 +46,11 @@ class h19_state : public driver_device
 public:
 	h19_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_crtc(*this, "crtc"),
-		  m_ace(*this, "ins8250"),
-		  m_beep(*this, BEEPER_TAG),
-		  m_p_videoram(*this, "p_videoram")
+			m_maincpu(*this, "maincpu"),
+			m_crtc(*this, "crtc"),
+			m_ace(*this, "ins8250"),
+			m_beep(*this, BEEPER_TAG),
+			m_p_videoram(*this, "p_videoram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -367,15 +367,15 @@ static const mc6845_interface h19_crtc6845_interface =
 /* F4 Character Displayer */
 static const gfx_layout h19_charlayout =
 {
-	8, 10,					/* 8 x 10 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 10,                  /* 8 x 10 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( h19 )
@@ -448,4 +448,4 @@ ROM_END
 /* Driver (year is either 1978 or 1979) */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1978, h19,     0,       0,	h19,	h19, driver_device,	 0, 	"Heath Inc", "Heathkit H-19", GAME_NOT_WORKING )
+COMP( 1978, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", GAME_NOT_WORKING )

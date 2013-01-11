@@ -40,7 +40,7 @@ class firefox_state : public driver_device
 public:
 	firefox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") ,
+			m_laserdisc(*this, "laserdisc") ,
 		m_tileram(*this, "tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_sprite_palette(*this, "sprite_palette"),
@@ -104,7 +104,7 @@ public:
 
 
 
-#define MASTER_XTAL		XTAL_14_31818MHz
+#define MASTER_XTAL     XTAL_14_31818MHz
 
 
 /*
@@ -443,12 +443,12 @@ WRITE8_MEMBER(firefox_state::rom_bank_w)
 
 WRITE8_MEMBER(firefox_state::main_irq_clear_w)
 {
-    machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
 }
 
 WRITE8_MEMBER(firefox_state::main_firq_clear_w)
 {
-    machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 WRITE8_MEMBER(firefox_state::self_reset_w)
@@ -466,7 +466,7 @@ WRITE8_MEMBER(firefox_state::self_reset_w)
 
 WRITE8_MEMBER(firefox_state::led_w)
 {
-    set_led_status( machine(), offset, ( data & 0x80 ) == 0 );
+	set_led_status( machine(), offset, ( data & 0x80 ) == 0 );
 }
 
 WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
@@ -479,7 +479,7 @@ WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
 static void firq_gen(running_machine &machine, phillips_22vp931_device &laserdisc, int state)
 {
 	if (state)
-	    machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
+		machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 
@@ -510,33 +510,33 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE(firefox_objram_bank_w)
 	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE(tile_palette_w) AM_SHARE("tile_palette")
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(nvram_r, nvram_w)						/* NOVRAM */
-	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0x00f8) AM_READ_PORT("rdin0")			/* RDIN0 */
-	AM_RANGE(0x4101, 0x4101) AM_MIRROR(0x00f8) AM_READ_PORT("rdin1")			/* RDIN1 */
-	AM_RANGE(0x4102, 0x4102) AM_MIRROR(0x00f8) AM_READ(firefox_disc_status_r)	/* RDIN2 */
-	AM_RANGE(0x4103, 0x4103) AM_MIRROR(0x00f8) AM_READ_PORT("opt0")				/* OPT0 */
-	AM_RANGE(0x4104, 0x4104) AM_MIRROR(0x00f8) AM_READ_PORT("opt1")				/* OPT1 */
-	AM_RANGE(0x4105, 0x4105) AM_MIRROR(0x00f8) AM_READ(firefox_disc_data_r)		/* DREAD */
-	AM_RANGE(0x4106, 0x4106) AM_MIRROR(0x00f8) AM_READ(sound_to_main_r)			/* RDSOUND */
-	AM_RANGE(0x4107, 0x4107) AM_MIRROR(0x00f8) AM_READ(adc_r)					/* ADC */
-	AM_RANGE(0x4200, 0x4200) AM_MIRROR(0x0047) AM_WRITE(main_irq_clear_w)		/* RSTIRQ */
-	AM_RANGE(0x4208, 0x4208) AM_MIRROR(0x0047) AM_WRITE(main_firq_clear_w)		/* RSTFIRQ */
-	AM_RANGE(0x4210, 0x4210) AM_MIRROR(0x0047) AM_WRITE(watchdog_reset_w)		/* WDCLK */
-	AM_RANGE(0x4218, 0x4218) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_read_w)	/* DSKREAD */
-	AM_RANGE(0x4220, 0x4223) AM_MIRROR(0x0044) AM_WRITE(adc_select_w)			/* ADCSTART */
-	AM_RANGE(0x4230, 0x4230) AM_MIRROR(0x0047) AM_WRITE(self_reset_w)			/* AMUCK */
-	AM_RANGE(0x4280, 0x4280) AM_MIRROR(0x0040) AM_WRITE(novram_recall_w)		/* LATCH0 -> NVRECALL */
-	AM_RANGE(0x4281, 0x4281) AM_MIRROR(0x0040) AM_WRITE(sound_reset_w)			/* LATCH0 -> RSTSOUND */
-	AM_RANGE(0x4282, 0x4282) AM_MIRROR(0x0040) AM_WRITE(novram_store_w)			/* LATCH0 -> NVRSTORE */
-	AM_RANGE(0x4283, 0x4283) AM_MIRROR(0x0040) AM_WRITE(firefox_disc_lock_w)	/* LATCH0 -> LOCK */
-	AM_RANGE(0x4284, 0x4285) AM_MIRROR(0x0040) AM_WRITE(audio_enable_w)			/* LATCH0 -> SWDSKR, SWDSKL */
-	AM_RANGE(0x4286, 0x4286) AM_MIRROR(0x0040) AM_WRITE(firefox_disc_reset_w)	/* LATCH0 -> RSTDSK */
-	AM_RANGE(0x4287, 0x4287) AM_MIRROR(0x0040) AM_WRITE(firefox_disc_write_w)	/* LATCH0 -> WRDSK */
-	AM_RANGE(0x4288, 0x4289) AM_MIRROR(0x0040) AM_WRITE(firefox_coin_counter_w)	/* LATCH1 -> COIN COUNTERR, COUNTERL */
-	AM_RANGE(0x428c, 0x428f) AM_MIRROR(0x0040) AM_WRITE(led_w)					/* LATCH1 -> LEDs */
-	AM_RANGE(0x4290, 0x4290) AM_MIRROR(0x0047) AM_WRITE(rom_bank_w)				/* WRTREG */
-	AM_RANGE(0x4298, 0x4298) AM_MIRROR(0x0047) AM_WRITE(main_to_sound_w)		/* WRSOUND */
-	AM_RANGE(0x42a0, 0x42a0) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_data_w)	/* DSKLATCH */
+	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(nvram_r, nvram_w)                     /* NOVRAM */
+	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0x00f8) AM_READ_PORT("rdin0")            /* RDIN0 */
+	AM_RANGE(0x4101, 0x4101) AM_MIRROR(0x00f8) AM_READ_PORT("rdin1")            /* RDIN1 */
+	AM_RANGE(0x4102, 0x4102) AM_MIRROR(0x00f8) AM_READ(firefox_disc_status_r)   /* RDIN2 */
+	AM_RANGE(0x4103, 0x4103) AM_MIRROR(0x00f8) AM_READ_PORT("opt0")             /* OPT0 */
+	AM_RANGE(0x4104, 0x4104) AM_MIRROR(0x00f8) AM_READ_PORT("opt1")             /* OPT1 */
+	AM_RANGE(0x4105, 0x4105) AM_MIRROR(0x00f8) AM_READ(firefox_disc_data_r)     /* DREAD */
+	AM_RANGE(0x4106, 0x4106) AM_MIRROR(0x00f8) AM_READ(sound_to_main_r)         /* RDSOUND */
+	AM_RANGE(0x4107, 0x4107) AM_MIRROR(0x00f8) AM_READ(adc_r)                   /* ADC */
+	AM_RANGE(0x4200, 0x4200) AM_MIRROR(0x0047) AM_WRITE(main_irq_clear_w)       /* RSTIRQ */
+	AM_RANGE(0x4208, 0x4208) AM_MIRROR(0x0047) AM_WRITE(main_firq_clear_w)      /* RSTFIRQ */
+	AM_RANGE(0x4210, 0x4210) AM_MIRROR(0x0047) AM_WRITE(watchdog_reset_w)       /* WDCLK */
+	AM_RANGE(0x4218, 0x4218) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_read_w)    /* DSKREAD */
+	AM_RANGE(0x4220, 0x4223) AM_MIRROR(0x0044) AM_WRITE(adc_select_w)           /* ADCSTART */
+	AM_RANGE(0x4230, 0x4230) AM_MIRROR(0x0047) AM_WRITE(self_reset_w)           /* AMUCK */
+	AM_RANGE(0x4280, 0x4280) AM_MIRROR(0x0040) AM_WRITE(novram_recall_w)        /* LATCH0 -> NVRECALL */
+	AM_RANGE(0x4281, 0x4281) AM_MIRROR(0x0040) AM_WRITE(sound_reset_w)          /* LATCH0 -> RSTSOUND */
+	AM_RANGE(0x4282, 0x4282) AM_MIRROR(0x0040) AM_WRITE(novram_store_w)         /* LATCH0 -> NVRSTORE */
+	AM_RANGE(0x4283, 0x4283) AM_MIRROR(0x0040) AM_WRITE(firefox_disc_lock_w)    /* LATCH0 -> LOCK */
+	AM_RANGE(0x4284, 0x4285) AM_MIRROR(0x0040) AM_WRITE(audio_enable_w)         /* LATCH0 -> SWDSKR, SWDSKL */
+	AM_RANGE(0x4286, 0x4286) AM_MIRROR(0x0040) AM_WRITE(firefox_disc_reset_w)   /* LATCH0 -> RSTDSK */
+	AM_RANGE(0x4287, 0x4287) AM_MIRROR(0x0040) AM_WRITE(firefox_disc_write_w)   /* LATCH0 -> WRDSK */
+	AM_RANGE(0x4288, 0x4289) AM_MIRROR(0x0040) AM_WRITE(firefox_coin_counter_w) /* LATCH1 -> COIN COUNTERR, COUNTERL */
+	AM_RANGE(0x428c, 0x428f) AM_MIRROR(0x0040) AM_WRITE(led_w)                  /* LATCH1 -> LEDs */
+	AM_RANGE(0x4290, 0x4290) AM_MIRROR(0x0047) AM_WRITE(rom_bank_w)             /* WRTREG */
+	AM_RANGE(0x4298, 0x4298) AM_MIRROR(0x0047) AM_WRITE(main_to_sound_w)        /* WRSOUND */
+	AM_RANGE(0x42a0, 0x42a0) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_data_w)    /* DSKLATCH */
 	AM_RANGE(0x4400, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

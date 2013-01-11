@@ -33,7 +33,7 @@
 //**************************************************************************
 
 #define MCFG_HD64610_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), HD64610, _clock)	\
+	MCFG_DEVICE_ADD((_tag), HD64610, _clock)    \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -50,21 +50,21 @@
 
 struct hd64610_interface
 {
-	devcb_write_line		m_out_irq_cb;
-	devcb_write_line		m_out_1hz_cb;
+	devcb_write_line        m_out_irq_cb;
+	devcb_write_line        m_out_1hz_cb;
 };
 
 
 
 // ======================> hd64610_device
 
-class hd64610_device :	public device_t,
+class hd64610_device :  public device_t,
 						public device_rtc_interface,
 						public device_nvram_interface,
 						public hd64610_interface
 {
 public:
-    // construction/destruction
+	// construction/destruction
 	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( read );
@@ -95,12 +95,12 @@ private:
 
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_1hz_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_1hz_func;
 
-	UINT8	m_regs[0x10];		// Internal registers
-	int		m_hline_state;		// H-Start/Stop line
-	int		m_irq_out;			// alarm output
+	UINT8   m_regs[0x10];       // Internal registers
+	int     m_hline_state;      // H-Start/Stop line
+	int     m_irq_out;          // alarm output
 
 	// timers
 	emu_timer *m_counter_timer;

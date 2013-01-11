@@ -66,7 +66,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_gfxbank_w)
 
 TILEMAP_MAPPER_MEMBER(metlclsh_state::metlclsh_bgtilemap_scan)
 {
-	return	(row & 7) + ((row & ~7) << 4) + ((col & 0xf) << 3) + ((col & ~0xf) << 4);
+	return  (row & 7) + ((row & ~7) << 4) + ((col & 0xf) << 3) + ((col & ~0xf) << 4);
 }
 
 TILE_GET_INFO_MEMBER(metlclsh_state::get_bg_tile_info)
@@ -78,7 +78,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_bgram_w)
 {
 
 	/*  This ram is banked: it's either the tilemap (e401 = 1)
-        or bit n of another area (e401 = n << 1)? (that I don't understand) */
+	    or bit n of another area (e401 = n << 1)? (that I don't understand) */
 	if (m_write_mask)
 	{
 		/* unknown area - the following is almost surely wrong */
@@ -135,7 +135,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_fgram_w)
 void metlclsh_state::video_start()
 {
 
-	m_otherram = auto_alloc_array(machine(), UINT8, 0x800);	// banked ram
+	m_otherram = auto_alloc_array(machine(), UINT8, 0x800); // banked ram
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(metlclsh_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(metlclsh_state::metlclsh_bgtilemap_scan),this), 16, 16, 32, 16);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(metlclsh_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -180,12 +180,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		attr = spriteram[offs];
 		if (!(attr & 0x01))
-			continue;	// enable
+			continue;   // enable
 
 		flipy = (attr & 0x02);
 		flipx = (attr & 0x04);
 		color = (attr & 0x08) >> 3;
-		sizey = (attr & 0x10);	// double height
+		sizey = (attr & 0x10);  // double height
 		code = ((attr & 0x60) << 3) + spriteram[offs + 1];
 
 		sx = 240 - spriteram[offs + 3];
@@ -196,9 +196,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		if (state->flip_screen())
 		{
-			sx = 240 - sx;	flipx = !flipx;
-			sy = 240 - sy;	flipy = !flipy;		if (sizey)	sy += 16;
-			if (sy > 240)	sy -= 256;
+			sx = 240 - sx;  flipx = !flipx;
+			sy = 240 - sy;  flipy = !flipy;     if (sizey)  sy += 16;
+			if (sy > 240)   sy -= 256;
 		}
 
 		/* Draw twice, at sy and sy + 256 (wrap around) */
@@ -240,19 +240,18 @@ UINT32 metlclsh_state::screen_update_metlclsh(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0x10, cliprect);
 
-	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);	// low priority tiles of foreground
+	m_fg_tilemap->draw(bitmap, cliprect, 1, 0); // low priority tiles of foreground
 
-	if (m_scrollx[0] & 0x08)					// background (if enabled)
+	if (m_scrollx[0] & 0x08)                    // background (if enabled)
 	{
 		/* The background seems to be always flipped along x */
 		m_bg_tilemap->set_flip((flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
 		m_bg_tilemap->set_scrollx(0, m_scrollx[1] + ((m_scrollx[0] & 0x02) << 7) );
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
-	draw_sprites(machine(), bitmap, cliprect);			// sprites
-	m_fg_tilemap->draw(bitmap, cliprect, 2, 0);	// high priority tiles of foreground
+	draw_sprites(machine(), bitmap, cliprect);          // sprites
+	m_fg_tilemap->draw(bitmap, cliprect, 2, 0); // high priority tiles of foreground
 
 //  popmessage("%02X", m_scrollx[0]);
 	return 0;
 }
-

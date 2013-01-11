@@ -107,7 +107,7 @@ struct fileinfo
 {
 	char name[MAX_FILENAME_LEN+1];
 	int size;
-	unsigned char *buf;	/* file is read in here */
+	unsigned char *buf; /* file is read in here */
 	int listed;
 };
 
@@ -376,9 +376,9 @@ static float filecompare(const fileinfo *file1,const fileinfo *file2,int mode1,i
 			for (i = 0;i < size1;i++)
 			{
 				if (((file1->buf[base1 + mult1 * i] & ~mask1) != (0x00 & ~mask1) &&
-					 (file1->buf[base1 + mult1 * i] & ~mask1) != (0xff & ~mask1)) ||
+						(file1->buf[base1 + mult1 * i] & ~mask1) != (0xff & ~mask1)) ||
 					((file2->buf[base1 + mult1 * i] & ~mask2) != (0x00 & ~mask2) &&
-					 (file2->buf[base1 + mult1 * i] & ~mask2) != (0xff & ~mask2)))
+						(file2->buf[base1 + mult1 * i] & ~mask2) != (0xff & ~mask2)))
 				{
 					match = 0;
 					break;
@@ -554,8 +554,8 @@ static int load_files(int i, int *found, const char *path)
 
 int CLIB_DECL main(int argc,char *argv[])
 {
-	int	err;
-	int total_modes = MODE_NIB2;	/* by default, use only MODE_A, MODE_NIB1 and MODE_NIB2 */
+	int err;
+	int total_modes = MODE_NIB2;    /* by default, use only MODE_A, MODE_NIB1 and MODE_NIB2 */
 
 	if (argc >= 2 && strcmp(argv[1],"-d") == 0)
 	{
@@ -751,4 +751,3 @@ int CLIB_DECL main(int argc,char *argv[])
 	zip_file_cache_clear();
 	return 0;
 }
-

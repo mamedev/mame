@@ -18,9 +18,9 @@ const device_type SERIAL = &device_creator<serial_image_device>;
 //-------------------------------------------------
 
 serial_image_device::serial_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SERIAL, "Serial", tag, owner, clock),
-	  device_serial_interface(mconfig, *this),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, SERIAL, "Serial", tag, owner, clock),
+		device_serial_interface(mconfig, *this),
+		device_image_interface(mconfig, *this)
 {
 
 }
@@ -49,7 +49,7 @@ void serial_image_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	m_baud_rate = 2400;
+		m_baud_rate = 2400;
 		m_data_bits = 8;
 		m_stop_bits = 2;
 		m_parity = SERIAL_PARITY_NONE;
@@ -310,4 +310,3 @@ void serial_image_device::call_unload()
 	data_stream_free(&m_transmit);
 	data_stream_free(&m_receive);
 }
-

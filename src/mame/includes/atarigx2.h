@@ -11,24 +11,24 @@ class atarigx2_state : public atarigen_state
 public:
 	atarigx2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_mo_command(*this, "mo_command"),
-		  m_protection_base(*this, "protection_base") { }
+			m_mo_command(*this, "mo_command"),
+			m_protection_base(*this, "protection_base") { }
 
-	UINT16			m_playfield_base;
+	UINT16          m_playfield_base;
 
 	required_shared_ptr<UINT32> m_mo_command;
 	required_shared_ptr<UINT32> m_protection_base;
 
-	UINT16			m_current_control;
-	UINT8			m_playfield_tile_bank;
-	UINT8			m_playfield_color_bank;
-	UINT16			m_playfield_xscroll;
-	UINT16			m_playfield_yscroll;
+	UINT16          m_current_control;
+	UINT8           m_playfield_tile_bank;
+	UINT8           m_playfield_color_bank;
+	UINT16          m_playfield_xscroll;
+	UINT16          m_playfield_yscroll;
 
-	UINT16			m_last_write;
-	UINT16			m_last_write_offset;
+	UINT16          m_last_write;
+	UINT16          m_last_write_offset;
 
-	device_t *		m_rle;
+	device_t *      m_rle;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ32_MEMBER(special_port2_r);

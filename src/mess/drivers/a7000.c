@@ -70,42 +70,42 @@ public:
 
 static const char *const vidc20_regnames[] =
 {
-	"Video Palette",					// 0
-	"Video Palette Address",			// 1
-	"RESERVED", 						// 2
-	"LCD offset",						// 3
-	"Border Colour",					// 4
-	"Cursor Palette Logical Colour 1",	// 5
-	"Cursor Palette Logical Colour 2",	// 6
-	"Cursor Palette Logical Colour 3",	// 7
-	"Horizontal",						// 8
-	"Vertical",							// 9
-	"Stereo Image",						// A
-	"Sound",							// B
-	"External",							// C
-	"Frequency Synthesis",				// D
-	"Control",							// E
-	"Data Control"						// F
+	"Video Palette",                    // 0
+	"Video Palette Address",            // 1
+	"RESERVED",                         // 2
+	"LCD offset",                       // 3
+	"Border Colour",                    // 4
+	"Cursor Palette Logical Colour 1",  // 5
+	"Cursor Palette Logical Colour 2",  // 6
+	"Cursor Palette Logical Colour 3",  // 7
+	"Horizontal",                       // 8
+	"Vertical",                         // 9
+	"Stereo Image",                     // A
+	"Sound",                            // B
+	"External",                         // C
+	"Frequency Synthesis",              // D
+	"Control",                          // E
+	"Data Control"                      // F
 };
 
 static const char *const vidc20_horz_regnames[] =
 {
-	"Horizontal Cycle", 				// 0x80 HCR
-	"Horizontal Sync Width",			// 0x81 HSWR
-	"Horizontal Border Start",			// 0x82 HBSR
-	"Horizontal Display Start",			// 0x83 HDSR
-	"Horizontal Display End",			// 0x84 HDER
-	"Horizontal Border End",			// 0x85 HBER
-	"Horizontal Cursor Start",			// 0x86 HCSR
-	"Horizontal Interlace", 			// 0x87 HIR
-	"Horizontal Counter TEST",			// 0x88
-	"Horizontal <UNDEFINED>",			// 0x89
-	"Horizontal <UNDEFINED>",			// 0x8a
-	"Horizontal <UNDEFINED>",			// 0x8b
-	"Horizontal All TEST",				// 0x8c
-	"Horizontal <UNDEFINED>",			// 0x8d
-	"Horizontal <UNDEFINED>",			// 0x8e
-	"Horizontal <UNDEFINED>"			// 0x8f
+	"Horizontal Cycle",                 // 0x80 HCR
+	"Horizontal Sync Width",            // 0x81 HSWR
+	"Horizontal Border Start",          // 0x82 HBSR
+	"Horizontal Display Start",         // 0x83 HDSR
+	"Horizontal Display End",           // 0x84 HDER
+	"Horizontal Border End",            // 0x85 HBER
+	"Horizontal Cursor Start",          // 0x86 HCSR
+	"Horizontal Interlace",             // 0x87 HIR
+	"Horizontal Counter TEST",          // 0x88
+	"Horizontal <UNDEFINED>",           // 0x89
+	"Horizontal <UNDEFINED>",           // 0x8a
+	"Horizontal <UNDEFINED>",           // 0x8b
+	"Horizontal All TEST",              // 0x8c
+	"Horizontal <UNDEFINED>",           // 0x8d
+	"Horizontal <UNDEFINED>",           // 0x8e
+	"Horizontal <UNDEFINED>"            // 0x8f
 };
 
 #define HCR  0
@@ -119,22 +119,22 @@ static const char *const vidc20_horz_regnames[] =
 
 static const char *const vidc20_vert_regnames[] =
 {
-	"Vertical Cycle",					// 0x90 VCR
-	"Vertical Sync Width",				// 0x91 VSWR
-	"Vertical Border Start",			// 0x92 VBSR
-	"Vertical Display Start",			// 0x93 VDSR
-	"Vertical Display End", 			// 0x94 VDER
-	"Vertical Border End",				// 0x95 VBER
-	"Vertical Cursor Start",			// 0x96 VCSR
-	"Vertical Cursor End",				// 0x97 VCER
-	"Vertical Counter TEST",			// 0x98
-	"Horizontal <UNDEFINED>",			// 0x99
-	"Vertical Counter Increment TEST",	// 0x9a
-	"Horizontal <UNDEFINED>",			// 0x9b
-	"Vertical All TEST",				// 0x9c
-	"Horizontal <UNDEFINED>",			// 0x9d
-	"Horizontal <UNDEFINED>",			// 0x9e
-	"Horizontal <UNDEFINED>"			// 0x9f
+	"Vertical Cycle",                   // 0x90 VCR
+	"Vertical Sync Width",              // 0x91 VSWR
+	"Vertical Border Start",            // 0x92 VBSR
+	"Vertical Display Start",           // 0x93 VDSR
+	"Vertical Display End",             // 0x94 VDER
+	"Vertical Border End",              // 0x95 VBER
+	"Vertical Cursor Start",            // 0x96 VCSR
+	"Vertical Cursor End",              // 0x97 VCER
+	"Vertical Counter TEST",            // 0x98
+	"Horizontal <UNDEFINED>",           // 0x99
+	"Vertical Counter Increment TEST",  // 0x9a
+	"Horizontal <UNDEFINED>",           // 0x9b
+	"Vertical All TEST",                // 0x9c
+	"Horizontal <UNDEFINED>",           // 0x9d
+	"Horizontal <UNDEFINED>",           // 0x9e
+	"Horizontal <UNDEFINED>"            // 0x9f
 };
 
 #define VCR  0
@@ -150,19 +150,19 @@ void a7000_state::vidc20_dynamic_screen_change()
 {
 	/* sanity checks - first pass */
 	/*
-    total cycles + border start/end
-    */
+	total cycles + border start/end
+	*/
 	if(m_vidc20_horz_reg[HCR] && m_vidc20_horz_reg[HBSR] && m_vidc20_horz_reg[HBER] &&
-	   m_vidc20_vert_reg[VCR] && m_vidc20_vert_reg[VBSR] && m_vidc20_vert_reg[VBER])
+		m_vidc20_vert_reg[VCR] && m_vidc20_vert_reg[VBSR] && m_vidc20_vert_reg[VBER])
 	{
 		/* sanity checks - second pass */
 		/*
-        total cycles > border end > border start
-        */
+		total cycles > border end > border start
+		*/
 		if((m_vidc20_horz_reg[HCR] > m_vidc20_horz_reg[HBER]) &&
-		   (m_vidc20_horz_reg[HBER] > m_vidc20_horz_reg[HBSR]) &&
-		   (m_vidc20_vert_reg[VCR] > m_vidc20_vert_reg[VBER]) &&
-		   (m_vidc20_vert_reg[VBER] > m_vidc20_vert_reg[VBSR]))
+			(m_vidc20_horz_reg[HBER] > m_vidc20_horz_reg[HBSR]) &&
+			(m_vidc20_vert_reg[VCR] > m_vidc20_vert_reg[VBER]) &&
+			(m_vidc20_vert_reg[VBER] > m_vidc20_vert_reg[VBSR]))
 		{
 			/* finally ready to change the resolution */
 			int hblank_period,vblank_period;
@@ -177,9 +177,9 @@ void a7000_state::vidc20_dynamic_screen_change()
 
 			machine().primary_screen->configure(hblank_period, vblank_period, visarea, machine().primary_screen->frame_period().attoseconds );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
-			           (m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]),(m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]),
-			           (m_vidc20_horz_reg[HBER]-m_vidc20_horz_reg[HBSR]),(m_vidc20_vert_reg[VBER]-m_vidc20_vert_reg[VBSR]),
-			           hblank_period,vblank_period);
+						(m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]),(m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]),
+						(m_vidc20_horz_reg[HBER]-m_vidc20_horz_reg[HBSR]),(m_vidc20_vert_reg[VBER]-m_vidc20_vert_reg[VBSR]),
+						hblank_period,vblank_period);
 		}
 	}
 }
@@ -400,163 +400,163 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 /* TODO: some of these registers are actually ARM7500 specific */
 static const char *const iomd_regnames[] =
 {
-	"I/O Control",						// 0x000 IOCR
-	"Keyboard Data",					// 0x004 KBDDAT
-	"Keyboard Control",					// 0x008 KBDCR
-	"General Purpose I/O Lines",		// 0x00c IOLINES
-	"IRQA Status",						// 0x010 IRQSTA
-	"IRQA Request/clear",				// 0x014 IRQRQA
-	"IRQA Mask",						// 0x018 IRQMSKA
-	"Enter SUSPEND Mode",				// 0x01c SUSMODE
-	"IRQB Status",						// 0x020 IRQSTB
-	"IRQB Request/clear",				// 0x024 IRQRQB
-	"IRQB Mask",						// 0x028 IRQMSKB
-	"Enter STOP Mode",					// 0x02c STOPMODE
-	"FIQ Status",						// 0x030 FIQST
-	"FIQ Request/clear",				// 0x034 FIQRQ
-	"FIQ Mask",							// 0x038 FIQMSK
-	"Clock divider control",			// 0x03c CLKCTL
-	"Timer 0 Low Bits",					// 0x040 T0LOW
-	"Timer 0 High Bits",				// 0x044 T0HIGH
-	"Timer 0 Go Command",				// 0x048 T0GO
-	"Timer 0 Latch Command",			// 0x04c T0LATCH
-	"Timer 1 Low Bits",					// 0x050 T1LOW
-	"Timer 1 High Bits",				// 0x054 T1HIGH
-	"Timer 1 Go Command",				// 0x058 T1GO
-	"Timer 1 Latch Command",			// 0x05c T1LATCH
-	"IRQC Status",						// 0x060 IRQSTC
-	"IRQC Request/clear",				// 0x064 IRQRQC
-	"IRQC Mask",						// 0x068 IRQMSKC
-	"LCD and IIS Control Bits",			// 0x06c VIDIMUX
-	"IRQD Status",						// 0x070 IRQSTD
-	"IRQD Request/clear",				// 0x074 IRQRQD
-	"IRQD Mask",						// 0x078 IRQMSKD
-	"<RESERVED>",						// 0x07c
-	"ROM Control Bank 0",				// 0x080 ROMCR0
-	"ROM Control Bank 1",				// 0x084 ROMCR1
-	"DRAM Control (IOMD)",				// 0x088 DRAMCR
-	"VRAM and Refresh Control",			// 0x08c VREFCR
-	"Flyback Line Size",				// 0x090 FSIZE
-	"Chip ID no. Low Byte",				// 0x094 ID0
-	"Chip ID no. High Byte",			// 0x098 ID1
-	"Chip Version Number",				// 0x09c VERSION
-	"Mouse X Position",					// 0x0a0 MOUSEX
-	"Mouse Y Position",					// 0x0a4 MOUSEY
-	"Mouse Data",						// 0x0a8 MSEDAT
-	"Mouse Control",					// 0x0ac MSECR
-	"<RESERVED>",						// 0x0b0
-	"<RESERVED>",						// 0x0b4
-	"<RESERVED>",						// 0x0b8
-	"<RESERVED>",						// 0x0bc
-	"DACK Timing Control",				// 0x0c0 DMATCR
-	"I/O Timing Control",				// 0x0c4 IOTCR
-	"Expansion Card Timing",			// 0x0c8 ECTCR
-	"DMA External Control",				// 0x0cc DMAEXT (IOMD) / ASTCR (ARM7500)
-	"DRAM Width Control",				// 0x0d0 DRAMWID
-	"Force CAS/RAS Lines Low",			// 0x0d4 SELFREF
-	"<RESERVED>",						// 0x0d8
-	"<RESERVED>",						// 0x0dc
-	"A to D IRQ Control",				// 0x0e0 ATODICR
-	"A to D IRQ Status",				// 0x0e4 ATODCC
-	"A to D IRQ Converter Control",		// 0x0e8 ATODICR
-	"A to D IRQ Counter 1",				// 0x0ec ATODCNT1
-	"A to D IRQ Counter 2",				// 0x0f0 ATODCNT2
-	"A to D IRQ Counter 3",				// 0x0f4 ATODCNT3
-	"A to D IRQ Counter 4",				// 0x0f8 ATODCNT4
-	"<RESERVED>",						// 0x0fc
-	"I/O DMA 0 CurA",					// 0x100 IO0CURA
-	"I/O DMA 0 EndA",					// 0x104 IO0ENDA
-	"I/O DMA 0 CurB",					// 0x108 IO0CURB
-	"I/O DMA 0 EndB",					// 0x10c IO0ENDB
-	"I/O DMA 0 Control",				// 0x110 IO0CR
-	"I/O DMA 0 Status",					// 0x114 IO0ST
-	"<RESERVED>",						// 0x118
-	"<RESERVED>",						// 0x11c
-	"I/O DMA 1 CurA",					// 0x120 IO1CURA
-	"I/O DMA 1 EndA",					// 0x124 IO1ENDA
-	"I/O DMA 1 CurB",					// 0x128 IO1CURB
-	"I/O DMA 1 EndB",					// 0x12c IO1ENDB
-	"I/O DMA 1 Control",				// 0x130 IO1CR
-	"I/O DMA 1 Status",					// 0x134 IO1ST
-	"<RESERVED>",						// 0x138
-	"<RESERVED>",						// 0x13c
-	"I/O DMA 2 CurA",					// 0x140 IO2CURA
-	"I/O DMA 2 EndA",					// 0x144 IO2ENDA
-	"I/O DMA 2 CurB",					// 0x148 IO2CURB
-	"I/O DMA 2 EndB",					// 0x14c IO2ENDB
-	"I/O DMA 2 Control",				// 0x150 IO2CR
-	"I/O DMA 2 Status",					// 0x154 IO2ST
-	"<RESERVED>",						// 0x158
-	"<RESERVED>",						// 0x15c
-	"I/O DMA 3 CurA",					// 0x160 IO3CURA
-	"I/O DMA 3 EndA",					// 0x164 IO3ENDA
-	"I/O DMA 3 CurB",					// 0x168 IO3CURB
-	"I/O DMA 3 EndB",					// 0x16c IO3ENDB
-	"I/O DMA 3 Control",				// 0x170 IO3CR
-	"I/O DMA 3 Status",					// 0x174 IO3ST
-	"<RESERVED>",						// 0x178
-	"<RESERVED>",						// 0x17c
-	"Sound DMA 0 CurA",					// 0x180 SD0CURA
-	"Sound DMA 0 EndA",					// 0x184 SD0ENDA
-	"Sound DMA 0 CurB",					// 0x188 SD0CURB
-	"Sound DMA 0 EndB",					// 0x18c SD0ENDB
-	"Sound DMA 0 Control",				// 0x190 SD0CR
-	"Sound DMA 0 Status",				// 0x194 SD0ST
-	"<RESERVED>",						// 0x198
-	"<RESERVED>",						// 0x19c
-	"Sound DMA 1 CurA",					// 0x1a0 SD1CURA
-	"Sound DMA 1 EndA",					// 0x1a4 SD1ENDA
-	"Sound DMA 1 CurB",					// 0x1a8 SD1CURB
-	"Sound DMA 1 EndB",					// 0x1ac SD1ENDB
-	"Sound DMA 1 Control",				// 0x1b0 SD1CR
-	"Sound DMA 1 Status",				// 0x1b4 SD1ST
-	"<RESERVED>",						// 0x1b8
-	"<RESERVED>",						// 0x1bc
-	"Cursor DMA Current",				// 0x1c0 CURSCUR
-	"Cursor DMA Init",					// 0x1c4 CURSINIT
-	"Duplex LCD Current B",				// 0x1c8 VIDCURB
-	"<RESERVED>",						// 0x1cc
-	"Video DMA Current",				// 0x1d0 VIDCUR
-	"Video DMA End",					// 0x1d4 VIDEND
-	"Video DMA Start",					// 0x1d8 VIDSTART
-	"Video DMA Init",					// 0x1dc VIDINIT
-	"Video DMA Control",				// 0x1e0 VIDCR
-	"<RESERVED>",						// 0x1e4
-	"Duplex LCD Init B",				// 0x1e8 VIDINITB
-	"<RESERVED>",						// 0x1ec
-	"DMA IRQ Status",					// 0x1f0 DMAST
-	"DMA IRQ Request",					// 0x1f4 DMARQ
-	"DMA IRQ Mask",						// 0x1f8 DMAMSK
-	"<RESERVED>"						// 0x1fc
+	"I/O Control",                      // 0x000 IOCR
+	"Keyboard Data",                    // 0x004 KBDDAT
+	"Keyboard Control",                 // 0x008 KBDCR
+	"General Purpose I/O Lines",        // 0x00c IOLINES
+	"IRQA Status",                      // 0x010 IRQSTA
+	"IRQA Request/clear",               // 0x014 IRQRQA
+	"IRQA Mask",                        // 0x018 IRQMSKA
+	"Enter SUSPEND Mode",               // 0x01c SUSMODE
+	"IRQB Status",                      // 0x020 IRQSTB
+	"IRQB Request/clear",               // 0x024 IRQRQB
+	"IRQB Mask",                        // 0x028 IRQMSKB
+	"Enter STOP Mode",                  // 0x02c STOPMODE
+	"FIQ Status",                       // 0x030 FIQST
+	"FIQ Request/clear",                // 0x034 FIQRQ
+	"FIQ Mask",                         // 0x038 FIQMSK
+	"Clock divider control",            // 0x03c CLKCTL
+	"Timer 0 Low Bits",                 // 0x040 T0LOW
+	"Timer 0 High Bits",                // 0x044 T0HIGH
+	"Timer 0 Go Command",               // 0x048 T0GO
+	"Timer 0 Latch Command",            // 0x04c T0LATCH
+	"Timer 1 Low Bits",                 // 0x050 T1LOW
+	"Timer 1 High Bits",                // 0x054 T1HIGH
+	"Timer 1 Go Command",               // 0x058 T1GO
+	"Timer 1 Latch Command",            // 0x05c T1LATCH
+	"IRQC Status",                      // 0x060 IRQSTC
+	"IRQC Request/clear",               // 0x064 IRQRQC
+	"IRQC Mask",                        // 0x068 IRQMSKC
+	"LCD and IIS Control Bits",         // 0x06c VIDIMUX
+	"IRQD Status",                      // 0x070 IRQSTD
+	"IRQD Request/clear",               // 0x074 IRQRQD
+	"IRQD Mask",                        // 0x078 IRQMSKD
+	"<RESERVED>",                       // 0x07c
+	"ROM Control Bank 0",               // 0x080 ROMCR0
+	"ROM Control Bank 1",               // 0x084 ROMCR1
+	"DRAM Control (IOMD)",              // 0x088 DRAMCR
+	"VRAM and Refresh Control",         // 0x08c VREFCR
+	"Flyback Line Size",                // 0x090 FSIZE
+	"Chip ID no. Low Byte",             // 0x094 ID0
+	"Chip ID no. High Byte",            // 0x098 ID1
+	"Chip Version Number",              // 0x09c VERSION
+	"Mouse X Position",                 // 0x0a0 MOUSEX
+	"Mouse Y Position",                 // 0x0a4 MOUSEY
+	"Mouse Data",                       // 0x0a8 MSEDAT
+	"Mouse Control",                    // 0x0ac MSECR
+	"<RESERVED>",                       // 0x0b0
+	"<RESERVED>",                       // 0x0b4
+	"<RESERVED>",                       // 0x0b8
+	"<RESERVED>",                       // 0x0bc
+	"DACK Timing Control",              // 0x0c0 DMATCR
+	"I/O Timing Control",               // 0x0c4 IOTCR
+	"Expansion Card Timing",            // 0x0c8 ECTCR
+	"DMA External Control",             // 0x0cc DMAEXT (IOMD) / ASTCR (ARM7500)
+	"DRAM Width Control",               // 0x0d0 DRAMWID
+	"Force CAS/RAS Lines Low",          // 0x0d4 SELFREF
+	"<RESERVED>",                       // 0x0d8
+	"<RESERVED>",                       // 0x0dc
+	"A to D IRQ Control",               // 0x0e0 ATODICR
+	"A to D IRQ Status",                // 0x0e4 ATODCC
+	"A to D IRQ Converter Control",     // 0x0e8 ATODICR
+	"A to D IRQ Counter 1",             // 0x0ec ATODCNT1
+	"A to D IRQ Counter 2",             // 0x0f0 ATODCNT2
+	"A to D IRQ Counter 3",             // 0x0f4 ATODCNT3
+	"A to D IRQ Counter 4",             // 0x0f8 ATODCNT4
+	"<RESERVED>",                       // 0x0fc
+	"I/O DMA 0 CurA",                   // 0x100 IO0CURA
+	"I/O DMA 0 EndA",                   // 0x104 IO0ENDA
+	"I/O DMA 0 CurB",                   // 0x108 IO0CURB
+	"I/O DMA 0 EndB",                   // 0x10c IO0ENDB
+	"I/O DMA 0 Control",                // 0x110 IO0CR
+	"I/O DMA 0 Status",                 // 0x114 IO0ST
+	"<RESERVED>",                       // 0x118
+	"<RESERVED>",                       // 0x11c
+	"I/O DMA 1 CurA",                   // 0x120 IO1CURA
+	"I/O DMA 1 EndA",                   // 0x124 IO1ENDA
+	"I/O DMA 1 CurB",                   // 0x128 IO1CURB
+	"I/O DMA 1 EndB",                   // 0x12c IO1ENDB
+	"I/O DMA 1 Control",                // 0x130 IO1CR
+	"I/O DMA 1 Status",                 // 0x134 IO1ST
+	"<RESERVED>",                       // 0x138
+	"<RESERVED>",                       // 0x13c
+	"I/O DMA 2 CurA",                   // 0x140 IO2CURA
+	"I/O DMA 2 EndA",                   // 0x144 IO2ENDA
+	"I/O DMA 2 CurB",                   // 0x148 IO2CURB
+	"I/O DMA 2 EndB",                   // 0x14c IO2ENDB
+	"I/O DMA 2 Control",                // 0x150 IO2CR
+	"I/O DMA 2 Status",                 // 0x154 IO2ST
+	"<RESERVED>",                       // 0x158
+	"<RESERVED>",                       // 0x15c
+	"I/O DMA 3 CurA",                   // 0x160 IO3CURA
+	"I/O DMA 3 EndA",                   // 0x164 IO3ENDA
+	"I/O DMA 3 CurB",                   // 0x168 IO3CURB
+	"I/O DMA 3 EndB",                   // 0x16c IO3ENDB
+	"I/O DMA 3 Control",                // 0x170 IO3CR
+	"I/O DMA 3 Status",                 // 0x174 IO3ST
+	"<RESERVED>",                       // 0x178
+	"<RESERVED>",                       // 0x17c
+	"Sound DMA 0 CurA",                 // 0x180 SD0CURA
+	"Sound DMA 0 EndA",                 // 0x184 SD0ENDA
+	"Sound DMA 0 CurB",                 // 0x188 SD0CURB
+	"Sound DMA 0 EndB",                 // 0x18c SD0ENDB
+	"Sound DMA 0 Control",              // 0x190 SD0CR
+	"Sound DMA 0 Status",               // 0x194 SD0ST
+	"<RESERVED>",                       // 0x198
+	"<RESERVED>",                       // 0x19c
+	"Sound DMA 1 CurA",                 // 0x1a0 SD1CURA
+	"Sound DMA 1 EndA",                 // 0x1a4 SD1ENDA
+	"Sound DMA 1 CurB",                 // 0x1a8 SD1CURB
+	"Sound DMA 1 EndB",                 // 0x1ac SD1ENDB
+	"Sound DMA 1 Control",              // 0x1b0 SD1CR
+	"Sound DMA 1 Status",               // 0x1b4 SD1ST
+	"<RESERVED>",                       // 0x1b8
+	"<RESERVED>",                       // 0x1bc
+	"Cursor DMA Current",               // 0x1c0 CURSCUR
+	"Cursor DMA Init",                  // 0x1c4 CURSINIT
+	"Duplex LCD Current B",             // 0x1c8 VIDCURB
+	"<RESERVED>",                       // 0x1cc
+	"Video DMA Current",                // 0x1d0 VIDCUR
+	"Video DMA End",                    // 0x1d4 VIDEND
+	"Video DMA Start",                  // 0x1d8 VIDSTART
+	"Video DMA Init",                   // 0x1dc VIDINIT
+	"Video DMA Control",                // 0x1e0 VIDCR
+	"<RESERVED>",                       // 0x1e4
+	"Duplex LCD Init B",                // 0x1e8 VIDINITB
+	"<RESERVED>",                       // 0x1ec
+	"DMA IRQ Status",                   // 0x1f0 DMAST
+	"DMA IRQ Request",                  // 0x1f4 DMARQ
+	"DMA IRQ Mask",                     // 0x1f8 DMAMSK
+	"<RESERVED>"                        // 0x1fc
 };
 
-#define IOMD_IOCR		0x000/4
-#define IOMD_KBDDAT		0x004/4
-#define IOMD_KBDCR		0x008/4
+#define IOMD_IOCR       0x000/4
+#define IOMD_KBDDAT     0x004/4
+#define IOMD_KBDCR      0x008/4
 
-#define IOMD_IRQSTA		0x010/4
-#define IOMD_IRQRQA 	0x014/4
-#define IOMD_IRQMSKA	0x018/4
+#define IOMD_IRQSTA     0x010/4
+#define IOMD_IRQRQA     0x014/4
+#define IOMD_IRQMSKA    0x018/4
 
-#define IOMD_T0LOW		0x040/4
-#define IOMD_T0HIGH 	0x044/4
-#define IOMD_T0GO		0x048/4
-#define IOMD_T0LATCH	0x04c/4
+#define IOMD_T0LOW      0x040/4
+#define IOMD_T0HIGH     0x044/4
+#define IOMD_T0GO       0x048/4
+#define IOMD_T0LATCH    0x04c/4
 
-#define IOMD_T1LOW		0x050/4
-#define IOMD_T1HIGH 	0x054/4
-#define IOMD_T1GO		0x058/4
-#define IOMD_T1LATCH	0x05c/4
+#define IOMD_T1LOW      0x050/4
+#define IOMD_T1HIGH     0x054/4
+#define IOMD_T1GO       0x058/4
+#define IOMD_T1LATCH    0x05c/4
 
-#define IOMD_ID0		0x094/4
-#define IOMD_ID1		0x098/4
-#define IOMD_VERSION	0x09c/4
+#define IOMD_ID0        0x094/4
+#define IOMD_ID1        0x098/4
+#define IOMD_VERSION    0x09c/4
 
-#define IOMD_VIDCUR		0x1d0/4
-#define IOMD_VIDEND		0x1d4/4
-#define IOMD_VIDSTART	0x1d8/4
-#define IOMD_VIDINIT	0x1dc/4
-#define IOMD_VIDCR		0x1e0/4
+#define IOMD_VIDCUR     0x1d0/4
+#define IOMD_VIDEND     0x1d4/4
+#define IOMD_VIDSTART   0x1d8/4
+#define IOMD_VIDINIT    0x1dc/4
+#define IOMD_VIDCR      0x1e0/4
 
 
 
@@ -637,37 +637,37 @@ READ32_MEMBER( a7000_state::a7000_iomd_r )
 
 			return m_IOMD_IO_ctrl | 0x34 | flyback;
 		}
-		case IOMD_KBDCR:	return m_IOMD_keyb_ctrl | 0x80; //IOMD Keyb status
+		case IOMD_KBDCR:    return m_IOMD_keyb_ctrl | 0x80; //IOMD Keyb status
 
 		/*
-        1--- ---- always high
-        -x-- ---- Timer 1
-        --x- ---- Timer 0
-        ---x ---- Power On Reset
-        ---- x--- Flyback
-        ---- -x-- nINT1
-        ---- --0- always low
-        ---- ---x INT2
-        */
-		case IOMD_IRQSTA:	return (m_IRQ_status_A & ~2) | 0x80;
-		case IOMD_IRQRQA:	return (m_IRQ_status_A & m_IRQ_mask_A) | 0x80;
-		case IOMD_IRQMSKA:	return m_IRQ_mask_A;
+		1--- ---- always high
+		-x-- ---- Timer 1
+		--x- ---- Timer 0
+		---x ---- Power On Reset
+		---- x--- Flyback
+		---- -x-- nINT1
+		---- --0- always low
+		---- ---x INT2
+		*/
+		case IOMD_IRQSTA:   return (m_IRQ_status_A & ~2) | 0x80;
+		case IOMD_IRQRQA:   return (m_IRQ_status_A & m_IRQ_mask_A) | 0x80;
+		case IOMD_IRQMSKA:  return m_IRQ_mask_A;
 
-		case IOMD_T0LOW:	return m_timer_out[0] & 0xff;
-		case IOMD_T0HIGH:	return (m_timer_out[0] >> 8) & 0xff;
+		case IOMD_T0LOW:    return m_timer_out[0] & 0xff;
+		case IOMD_T0HIGH:   return (m_timer_out[0] >> 8) & 0xff;
 
-		case IOMD_T1LOW:	return m_timer_out[1] & 0xff;
-		case IOMD_T1HIGH:	return (m_timer_out[1] >> 8) & 0xff;
+		case IOMD_T1LOW:    return m_timer_out[1] & 0xff;
+		case IOMD_T1HIGH:   return (m_timer_out[1] >> 8) & 0xff;
 
-		case IOMD_ID0:		return m_io_id & 0xff; // IOMD ID low
-		case IOMD_ID1:		return (m_io_id >> 8) & 0xff; // IOMD ID high
-		case IOMD_VERSION:	return 0;
+		case IOMD_ID0:      return m_io_id & 0xff; // IOMD ID low
+		case IOMD_ID1:      return (m_io_id >> 8) & 0xff; // IOMD ID high
+		case IOMD_VERSION:  return 0;
 
-		case IOMD_VIDEND:	return m_viddma_addr_end & 0x00fffff8; //bits 31:24 undefined
-		case IOMD_VIDSTART:	return m_viddma_addr_start & 0x1ffffff8; //bits 31, 30, 29 undefined
-		case IOMD_VIDCR:	return (m_viddma_status & 0xa0) | 0x50; //bit 6 = DRAM mode, bit 4 = QWORD transfer
+		case IOMD_VIDEND:   return m_viddma_addr_end & 0x00fffff8; //bits 31:24 undefined
+		case IOMD_VIDSTART: return m_viddma_addr_start & 0x1ffffff8; //bits 31, 30, 29 undefined
+		case IOMD_VIDCR:    return (m_viddma_status & 0xa0) | 0x50; //bit 6 = DRAM mode, bit 4 = QWORD transfer
 
-		default:	logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
+		default:    logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
 	}
 
 	return 0;
@@ -679,18 +679,18 @@ WRITE32_MEMBER( a7000_state::a7000_iomd_w )
 
 	switch(offset)
 	{
-		case IOMD_IOCR:		m_IOMD_IO_ctrl = data & ~0xf4; break;
+		case IOMD_IOCR:     m_IOMD_IO_ctrl = data & ~0xf4; break;
 
 		case IOMD_KBDCR:
 			m_IOMD_keyb_ctrl = data & ~0xf4;
 			//keyboard_ctrl_write(data & 0x08);
 			break;
 
-		case IOMD_IRQRQA:	m_IRQ_status_A &= ~data; break;
-		case IOMD_IRQMSKA:	m_IRQ_mask_A = (data & ~2) | 0x80; break;
+		case IOMD_IRQRQA:   m_IRQ_status_A &= ~data; break;
+		case IOMD_IRQMSKA:  m_IRQ_mask_A = (data & ~2) | 0x80; break;
 
-		case IOMD_T0LOW:	m_timer_in[0] = (m_timer_in[0] & 0xff00) | (data & 0xff); break;
-		case IOMD_T0HIGH:	m_timer_in[0] = (m_timer_in[0] & 0x00ff) | ((data & 0xff) << 8); break;
+		case IOMD_T0LOW:    m_timer_in[0] = (m_timer_in[0] & 0xff00) | (data & 0xff); break;
+		case IOMD_T0HIGH:   m_timer_in[0] = (m_timer_in[0] & 0x00ff) | ((data & 0xff) << 8); break;
 		case IOMD_T0GO:
 			m_timer_counter[0] = m_timer_in[0];
 			fire_iomd_timer(0);
@@ -708,8 +708,8 @@ WRITE32_MEMBER( a7000_state::a7000_iomd_w )
 			}
 			break;
 
-		case IOMD_T1LOW:	m_timer_in[1] = (m_timer_in[1] & 0xff00) | (data & 0xff); break;
-		case IOMD_T1HIGH:	m_timer_in[1] = (m_timer_in[1] & 0x00ff) | ((data & 0xff) << 8); break;
+		case IOMD_T1LOW:    m_timer_in[1] = (m_timer_in[1] & 0xff00) | (data & 0xff); break;
+		case IOMD_T1HIGH:   m_timer_in[1] = (m_timer_in[1] & 0x00ff) | ((data & 0xff) << 8); break;
 		case IOMD_T1GO:
 			m_timer_counter[1] = m_timer_in[1];
 			fire_iomd_timer(1);
@@ -727,7 +727,7 @@ WRITE32_MEMBER( a7000_state::a7000_iomd_w )
 			}
 			break;
 
-		case IOMD_VIDEND:	m_viddma_addr_end = data & 0x00fffff8; //bits 31:24 unused
+		case IOMD_VIDEND:   m_viddma_addr_end = data & 0x00fffff8; //bits 31:24 unused
 		case IOMD_VIDSTART: m_viddma_addr_start = data & 0x1ffffff8; //bits 31, 30, 29 unused
 		case IOMD_VIDCR:
 			m_viddma_status = data & 0xa0; if(data & 0x20) { viddma_transfer_start(); }
@@ -839,5 +839,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-COMP( 1995, a7000,      0,      0,      a7000,      a7000, driver_device,	0,      "Acorn",  "Archimedes A7000",   GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1997, a7000p,     a7000,  0,      a7000p,     a7000, driver_device,	0,      "Acorn",  "Archimedes A7000+",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1995, a7000,      0,      0,      a7000,      a7000, driver_device,   0,      "Acorn",  "Archimedes A7000",   GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1997, a7000p,     a7000,  0,      a7000p,     a7000, driver_device,   0,      "Acorn",  "Archimedes A7000+",  GAME_NOT_WORKING | GAME_NO_SOUND )

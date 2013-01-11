@@ -25,7 +25,7 @@
 // ======================> cbm2_24k_cartridge_device
 
 class cbm2_24k_cartridge_device : public device_t,
-								  public device_cbm2_expansion_card_interface
+									public device_cbm2_expansion_card_interface
 {
 public:
 	// construction/destruction

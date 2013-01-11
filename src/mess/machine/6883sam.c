@@ -54,7 +54,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define LOG_SAM		0
+#define LOG_SAM     0
 
 const device_type SAM6883 = &device_creator<sam6883_device>;
 
@@ -70,15 +70,15 @@ const device_type SAM6883 = &device_creator<sam6883_device>;
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock),
-	  m_space_0000(*this),
-	  m_space_8000(*this),
-	  m_space_A000(*this),
-	  m_space_C000(*this),
-	  m_space_FF00(*this),
-	  m_space_FF20(*this),
-	  m_space_FF40(*this),
-	  m_space_FF60(*this),
-	  m_space_FFE0(*this)
+		m_space_0000(*this),
+		m_space_8000(*this),
+		m_space_A000(*this),
+		m_space_C000(*this),
+		m_space_FF00(*this),
+		m_space_FF20(*this),
+		m_space_FF40(*this),
+		m_space_FF60(*this),
+		m_space_FFE0(*this)
 {
 	memset(m_banks, '\0', sizeof(m_banks));
 }
@@ -217,27 +217,27 @@ void sam6883_device::update_state(void)
 void sam6883_device::update_memory(void)
 {
 	// Memory size - allowed restricting memory accesses to something less than
-    // 32k
-    //
-    // This was a SAM switch that occupied 4 addresses:
-    //
-    //      $FFDD   (set)   R1
-    //      $FFDC   (clear) R1
-    //      $FFDB   (set)   R0
-    //      $FFDA   (clear) R0
-    //
-    // R1:R0 formed the following states:
-    //      00  - 4k
-    //      01  - 16k
-    //      10  - 64k
-    //      11  - static RAM (??)
-    //
-    // If something less than 64k was set, the low RAM would be smaller and
-    // mirror the other parts of the RAM
-    //
-    // TODO:  Find out what "static RAM" is
-    // TODO:  This should affect _all_ memory accesses, not just video ram
-    // TODO:  Verify that the CoCo 3 ignored this
+	// 32k
+	//
+	// This was a SAM switch that occupied 4 addresses:
+	//
+	//      $FFDD   (set)   R1
+	//      $FFDC   (clear) R1
+	//      $FFDB   (set)   R0
+	//      $FFDA   (clear) R0
+	//
+	// R1:R0 formed the following states:
+	//      00  - 4k
+	//      01  - 16k
+	//      10  - 64k
+	//      11  - static RAM (??)
+	//
+	// If something less than 64k was set, the low RAM would be smaller and
+	// mirror the other parts of the RAM
+	//
+	// TODO:  Find out what "static RAM" is
+	// TODO:  This should affect _all_ memory accesses, not just video ram
+	// TODO:  Verify that the CoCo 3 ignored this
 
 	// for now, lets assume that the caller is nice and made m_memory_size
 	// a power of two
@@ -307,26 +307,26 @@ void sam6883_device::update_memory(void)
 void sam6883_friend_device::update_cpu_clock(void)
 {
 	// The infamous speed up poke.
-    //
-    // This was a SAM switch that occupied 4 addresses:
-    //
-    //      $FFD9   (set)   R1
-    //      $FFD8   (clear) R1
-    //      $FFD7   (set)   R0
-    //      $FFD6   (clear) R0
-    //
-    // R1:R0 formed the following states:
-    //      00  - slow          0.89 MHz
-    //      01  - dual speed    ???
-    //      1x  - fast          1.78 MHz
-    //
-    // R1 controlled whether the video addressing was speeded up and R0
-    // did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
-    // the screen to display garbage because the M6847 could not display
-    // fast enough.
-    //
-    // TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
-    // access but RAM was not.  I don't know how to simulate this.
+	//
+	// This was a SAM switch that occupied 4 addresses:
+	//
+	//      $FFD9   (set)   R1
+	//      $FFD8   (clear) R1
+	//      $FFD7   (set)   R0
+	//      $FFD6   (clear) R0
+	//
+	// R1:R0 formed the following states:
+	//      00  - slow          0.89 MHz
+	//      01  - dual speed    ???
+	//      1x  - fast          1.78 MHz
+	//
+	// R1 controlled whether the video addressing was speeded up and R0
+	// did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
+	// the screen to display garbage because the M6847 could not display
+	// fast enough.
+	//
+	// TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
+	// access but RAM was not.  I don't know how to simulate this.
 
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
 
@@ -539,7 +539,7 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 	else
 	{
 		// this bank uses handlers
-		assert((offset == 0) && (mask == 0));	// changes to the offset are not supported
+		assert((offset == 0) && (mask == 0));   // changes to the offset are not supported
 
 		if (is_write)
 		{

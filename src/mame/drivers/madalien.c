@@ -129,14 +129,14 @@ static INPUT_PORTS_START( madalien )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives )) PORT_DIPLOCATION("SW:1,2")
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x02, "5" )
-	PORT_DIPSETTING(	0x03, "6" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage )) PORT_DIPLOCATION("SW:3,4")
-	PORT_DIPSETTING(	0x0c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life )) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, "3000" )
 	PORT_DIPSETTING(    0x10, "5000" )
@@ -173,10 +173,10 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( madalien, madalien_state )
 
 	/* main CPU */
-	MCFG_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8)	/* 1324kHz */
+	MCFG_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK / 8)		/* 512kHz */
+	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK / 8)        /* 512kHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", madalien_state,  nmi_line_pulse)
 
@@ -200,36 +200,36 @@ MACHINE_CONFIG_END
 
 
 ROM_START( madalien )
-	ROM_REGION( 0x10000, "maincpu", 0 )		/* main CPU */
-	ROM_LOAD( "m7.3f",	0xc000, 0x0800, CRC(4d12f89d) SHA1(e155f9135bc2bea56e211052f2b74d25e76308c8) )
-	ROM_LOAD( "m6.3h",	0xc800, 0x0800, CRC(1bc4a57b) SHA1(02252b868d0c07c0a18240e9d831c303cdcfa9a6) )
-	ROM_LOAD( "m5.3k",	0xd000, 0x0800, CRC(8db99572) SHA1(f8cf22f8c134b47756b7f02c5ca0217100466744) )
-	ROM_LOAD( "m4.3l",	0xd800, 0x0800, CRC(fba671af) SHA1(dd74bd357c82d525948d836a7f860bbb3182c825) )
-	ROM_LOAD( "m3.4f",	0xe000, 0x0800, CRC(1aad640d) SHA1(9ace7d2c5ef9e789c2b8cc65420b19ce72cd95fa) )
-	ROM_LOAD( "m2.4h",	0xe800, 0x0800, CRC(cbd533a0) SHA1(d3be81fb9ba40e30e5ff0171efd656b11dd20f2b) )
-	ROM_LOAD( "m1.4k",	0xf000, 0x0800, CRC(ad654b1d) SHA1(f8b365dae3801e97e04a10018a790d3bdb5d9439) )
-	ROM_LOAD( "m0.4l",	0xf800, 0x0800, CRC(cf7aa787) SHA1(f852cc806ecc582661582326747974a14f50174a) )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* main CPU */
+	ROM_LOAD( "m7.3f",  0xc000, 0x0800, CRC(4d12f89d) SHA1(e155f9135bc2bea56e211052f2b74d25e76308c8) )
+	ROM_LOAD( "m6.3h",  0xc800, 0x0800, CRC(1bc4a57b) SHA1(02252b868d0c07c0a18240e9d831c303cdcfa9a6) )
+	ROM_LOAD( "m5.3k",  0xd000, 0x0800, CRC(8db99572) SHA1(f8cf22f8c134b47756b7f02c5ca0217100466744) )
+	ROM_LOAD( "m4.3l",  0xd800, 0x0800, CRC(fba671af) SHA1(dd74bd357c82d525948d836a7f860bbb3182c825) )
+	ROM_LOAD( "m3.4f",  0xe000, 0x0800, CRC(1aad640d) SHA1(9ace7d2c5ef9e789c2b8cc65420b19ce72cd95fa) )
+	ROM_LOAD( "m2.4h",  0xe800, 0x0800, CRC(cbd533a0) SHA1(d3be81fb9ba40e30e5ff0171efd656b11dd20f2b) )
+	ROM_LOAD( "m1.4k",  0xf000, 0x0800, CRC(ad654b1d) SHA1(f8b365dae3801e97e04a10018a790d3bdb5d9439) )
+	ROM_LOAD( "m0.4l",  0xf800, 0x0800, CRC(cf7aa787) SHA1(f852cc806ecc582661582326747974a14f50174a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* audio CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* audio CPU */
 	ROM_LOAD( "m8", 0xf800, 0x0400, CRC(cfd19dab) SHA1(566dc84ffe9bcaeb112250a9e1882bf62f47b579) )
 	ROM_LOAD( "m9", 0xfc00, 0x0400, CRC(48f30f24) SHA1(9c0bf6e43b143d6af1ebb9dad2bdc2b53eb2e48e) )
 
-	ROM_REGION( 0x0c00, "gfx1", 0 )			/* background tiles */
+	ROM_REGION( 0x0c00, "gfx1", 0 )         /* background tiles */
 	ROM_LOAD( "mc.3k", 0x0000, 0x0400, CRC(2daadfb7) SHA1(8be084a39b256e538fd57111e92d47115cb142cd) )
 	ROM_LOAD( "md.3l", 0x0400, 0x0400, CRC(3ee1287a) SHA1(33bc59a8d09d22f3db80f881c2f37aa788718138) )
 	ROM_LOAD( "me.3m", 0x0800, 0x0400, CRC(45a5c201) SHA1(ac600afeabf494634c3189d8e96644bd0deb45f3) )
 
-	ROM_REGION( 0x0400, "gfx2", 0 )			/* headlight */
+	ROM_REGION( 0x0400, "gfx2", 0 )         /* headlight */
 	ROM_LOAD( "ma.2b", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
 
-	ROM_REGION( 0x0400, "user1", 0 )		/* background tile map */
+	ROM_REGION( 0x0400, "user1", 0 )        /* background tile map */
 	ROM_LOAD( "mf.4h", 0x0000, 0x0400, CRC(e9cba773) SHA1(356c7edb1b412a9e04f0747e780c945af8791c55) )
 
-	ROM_REGION( 0x0800, "user2", 0 )		/* shifting table */
+	ROM_REGION( 0x0800, "user2", 0 )        /* shifting table */
 	ROM_LOAD( "mb.5c", 0x0000, 0x0800, CRC(cb801e49) SHA1(7444c4af7cf07e5fdc54044d62ea4fcb201b2b8b) )
 
-	ROM_REGION( 0x0020, "proms", 0 )		/* color PROM */
-	ROM_LOAD( "mg.7f",	0x0000, 0x0020, CRC(3395b31f) SHA1(26235fb448a4180c58f0887e53a29c17857b3b34) )
+	ROM_REGION( 0x0020, "proms", 0 )        /* color PROM */
+	ROM_LOAD( "mg.7f",  0x0000, 0x0020, CRC(3395b31f) SHA1(26235fb448a4180c58f0887e53a29c17857b3b34) )
 ROM_END
 
 

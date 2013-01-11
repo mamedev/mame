@@ -1231,19 +1231,19 @@ static UINT32 (*const AMTable1_G7[32])(v60_state *) =
 	am1PCDisplacement8,
 	am1PCDisplacement16,
 	am1PCDisplacement32,
-  am1DirectAddress,
+	am1DirectAddress,
 	am1Immediate,
 	am1Error2,
 	am1Error2,
 	am1Error2,
-  am1PCDisplacementIndirect8,
-  am1PCDisplacementIndirect16,
-  am1PCDisplacementIndirect32,
+	am1PCDisplacementIndirect8,
+	am1PCDisplacementIndirect16,
+	am1PCDisplacementIndirect32,
 	am1DirectAddressDeferred,
 	am1PCDoubleDisplacement8,
 	am1PCDoubleDisplacement16,
 	am1PCDoubleDisplacement32,
-  am1Error2
+	am1Error2
 };
 
 static UINT32 (*const BAMTable1_G7[32])(v60_state *) =
@@ -1267,19 +1267,19 @@ static UINT32 (*const BAMTable1_G7[32])(v60_state *) =
 	bam1PCDisplacement8,
 	bam1PCDisplacement16,
 	bam1PCDisplacement32,
-  bam1DirectAddress,
+	bam1DirectAddress,
 	bam1Error6,
 	bam1Error2,
 	bam1Error2,
 	bam1Error2,
-  bam1PCDisplacementIndirect8,
-  bam1PCDisplacementIndirect16,
-  bam1PCDisplacementIndirect32,
+	bam1PCDisplacementIndirect8,
+	bam1PCDisplacementIndirect16,
+	bam1PCDisplacementIndirect32,
 	bam1DirectAddressDeferred,
 	bam1PCDoubleDisplacement8,
 	bam1PCDoubleDisplacement16,
 	bam1PCDoubleDisplacement32,
-  bam1Error2
+	bam1Error2
 };
 
 
@@ -1382,7 +1382,3 @@ static UINT32 (*const BAMTable1[2][8])(v60_state *) =
 		bam1Error1
 	}
 };
-
-
-
-

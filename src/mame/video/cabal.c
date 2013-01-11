@@ -147,5 +147,3 @@ UINT32 cabal_state::screen_update_cabal(screen_device &screen, bitmap_ind16 &bit
 	m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
-
-

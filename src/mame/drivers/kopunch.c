@@ -47,7 +47,7 @@ static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8, kopunch_state )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(kopunch_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x7100, 0x7aff) AM_RAM	// ???
+	AM_RANGE(0x7100, 0x7aff) AM_RAM // ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kopunch_io_map, AS_IO, 8, kopunch_state )
@@ -96,7 +96,7 @@ static INPUT_PORTS_START( kopunch )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* punch strength (high 3 bits) */
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* punch strength (high 3 bits) */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, kopunch_state,right_coin_inserted, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
@@ -186,7 +186,7 @@ void kopunch_state::machine_reset()
 static MACHINE_CONFIG_START( kopunch, kopunch_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
+	MCFG_CPU_ADD("maincpu", I8085A, 4000000)    /* 4 MHz ???? Uses SIM, must be 8085 */
 	MCFG_CPU_PROGRAM_MAP(kopunch_map)
 	MCFG_CPU_IO_MAP(kopunch_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kopunch_state, kopunch_interrupt)
@@ -233,9 +233,9 @@ ROM_START( kopunch )
 	ROM_LOAD( "epr1111",      0x5000, 0x1000, CRC(28530ec9) SHA1(1a8782d37128cdb43133fc891cde93d2bdd5476b) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "epr1101",      0x0000, 0x0020, CRC(15600f5d) SHA1(130179f79761cb16316c544e3c689bc10431db30) )	/* palette */
-	ROM_LOAD( "epr1099",      0x0020, 0x0020, CRC(fc58c456) SHA1(f27c3ad669dfdc33bcd7e0481fa01bf34973e816) )	/* unknown */
-	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) )	/* unknown */
+	ROM_LOAD( "epr1101",      0x0000, 0x0020, CRC(15600f5d) SHA1(130179f79761cb16316c544e3c689bc10431db30) )    /* palette */
+	ROM_LOAD( "epr1099",      0x0020, 0x0020, CRC(fc58c456) SHA1(f27c3ad669dfdc33bcd7e0481fa01bf34973e816) )    /* unknown */
+	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) )    /* unknown */
 ROM_END
 
 GAME( 1981, kopunch, 0, kopunch, kopunch, driver_device, 0, ROT270, "Sega", "KO Punch", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

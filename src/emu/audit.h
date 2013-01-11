@@ -52,8 +52,8 @@
 //**************************************************************************
 
 // hashes to use for validation
-#define AUDIT_VALIDATE_FAST				"R"		/* CRC only */
-#define AUDIT_VALIDATE_FULL				"RS"	/* CRC + SHA1 */
+#define AUDIT_VALIDATE_FAST             "R"     /* CRC only */
+#define AUDIT_VALIDATE_FULL             "RS"    /* CRC + SHA1 */
 
 
 
@@ -137,16 +137,16 @@ public:
 
 private:
 	// internal state
-	audit_record *		m_next;
-	media_type			m_type;					/* type of item that was audited */
-	audit_status		m_status;				/* status of audit on this item */
-	audit_substatus		m_substatus;			/* finer-detail status */
-	const char *		m_name;					/* name of item */
-	UINT64				m_explength;			/* expected length of item */
-	UINT64				m_length;				/* actual length of item */
-	hash_collection		m_exphashes;    		/* expected hash data */
-	hash_collection		m_hashes;				/* actual hash information */
-	device_t *			m_shared_device;		/* device that shares the rom */
+	audit_record *      m_next;
+	media_type          m_type;                 /* type of item that was audited */
+	audit_status        m_status;               /* status of audit on this item */
+	audit_substatus     m_substatus;            /* finer-detail status */
+	const char *        m_name;                 /* name of item */
+	UINT64              m_explength;            /* expected length of item */
+	UINT64              m_length;               /* actual length of item */
+	hash_collection     m_exphashes;            /* expected hash data */
+	hash_collection     m_hashes;               /* actual hash information */
+	device_t *          m_shared_device;        /* device that shares the rom */
 };
 
 
@@ -188,11 +188,11 @@ private:
 	device_t *find_shared_device(device_t &device, const char *name, const hash_collection &romhashes, UINT64 romlength);
 
 	// internal state
-	simple_list<audit_record>	m_record_list;
-	const driver_enumerator &	m_enumerator;
-	const char *				m_validation;
-	const char *				m_searchpath;
+	simple_list<audit_record>   m_record_list;
+	const driver_enumerator &   m_enumerator;
+	const char *                m_validation;
+	const char *                m_searchpath;
 };
 
 
-#endif	/* __AUDIT_H__ */
+#endif  /* __AUDIT_H__ */

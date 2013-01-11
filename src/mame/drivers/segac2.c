@@ -80,13 +80,13 @@
 
 #include "machine/megavdp.h"
 
-#define XL1_CLOCK			XTAL_640kHz
-#define XL2_CLOCK			XTAL_53_693175MHz
+#define XL1_CLOCK           XTAL_640kHz
+#define XL2_CLOCK           XTAL_53_693175MHz
 
 
-#define LOG_PROTECTION		1
-#define LOG_PALETTE			0
-#define LOG_IOCHIP			0
+#define LOG_PROTECTION      1
+#define LOG_PALETTE         0
+#define LOG_IOCHIP          0
 
 int segac2_bg_pal_lookup[4];
 int segac2_sp_pal_lookup[4];
@@ -392,15 +392,15 @@ static WRITE16_HANDLER( io_chip_w )
 		/* miscellaneous output */
 		case 0x06/2:
 			/*
-             D7 : To pin 3 of JP15. (Watchdog clock control)
-             D6 : To MUTE input pin on TDA1518BQ amplifier.
-             D5 : To CN2 pin 10. (Unknown purpose)
-             D4 : To CN2 pin 11. (Unknown purpose)
-             D3 : To CN1 pin K. (Coin lockout 2)
-             D2 : To CN1 pin 9. (Coin lockout 1)
-             D1 : To CN1 pin J. (Coin meter 2)
-             D0 : To CN1 pin 8. (Coin meter 1)
-            */
+			 D7 : To pin 3 of JP15. (Watchdog clock control)
+			 D6 : To MUTE input pin on TDA1518BQ amplifier.
+			 D5 : To CN2 pin 10. (Unknown purpose)
+			 D4 : To CN2 pin 11. (Unknown purpose)
+			 D3 : To CN1 pin K. (Coin lockout 2)
+			 D2 : To CN1 pin 9. (Coin lockout 1)
+			 D1 : To CN1 pin J. (Coin meter 2)
+			 D0 : To CN1 pin 8. (Coin meter 1)
+			*/
 /*          coin_lockout_w(space.machine(), 1, data & 0x08);
             coin_lockout_w(space.machine(), 0, data & 0x04); */
 			coin_counter_w(space.machine(), 1, data & 0x02);
@@ -410,15 +410,15 @@ static WRITE16_HANDLER( io_chip_w )
 		/* banking */
 		case 0x0e/2:
 			/*
-             D7 : To pin A19 of CN4
-             D6 : To pin B19 of CN4
-             D5 : ?
-             D4 : ?
-             D3 : To pin 31 of uPD7759 sample ROM (A18 on a 27C040)
-             D2 : To pin 30 of uPD7759 sample ROM (A17 on a 27C040)
-             D1 : To A10 of color RAM
-             D0 : To A9 of color RAM
-            */
+			 D7 : To pin A19 of CN4
+			 D6 : To pin B19 of CN4
+			 D5 : ?
+			 D4 : ?
+			 D3 : To pin 31 of uPD7759 sample ROM (A18 on a 27C040)
+			 D2 : To pin 30 of uPD7759 sample ROM (A17 on a 27C040)
+			 D1 : To A10 of color RAM
+			 D0 : To A9 of color RAM
+			*/
 			newbank = data & 3;
 			if (newbank != state->m_palbank)
 			{
@@ -554,32 +554,32 @@ static WRITE16_HANDLER( counter_timer_w )
 		/*int value = data & 1;*/
 		switch (data & 0x1e)
 		{
-			case 0x00:	/* player 1 start/stop */
-			case 0x02:	/* player 2 start/stop */
-			case 0x04:	/* ??? */
-			case 0x06:	/* ??? */
-			case 0x08:	/* player 1 game timer? */
-			case 0x0a:	/* player 2 game timer? */
-			case 0x0c:	/* ??? */
-			case 0x0e:	/* ??? */
+			case 0x00:  /* player 1 start/stop */
+			case 0x02:  /* player 2 start/stop */
+			case 0x04:  /* ??? */
+			case 0x06:  /* ??? */
+			case 0x08:  /* player 1 game timer? */
+			case 0x0a:  /* player 2 game timer? */
+			case 0x0c:  /* ??? */
+			case 0x0e:  /* ??? */
 				break;
 
-			case 0x10:	/* coin counter */
+			case 0x10:  /* coin counter */
 //              coin_counter_w(space.machine(), 0,1);
 //              coin_counter_w(space.machine(), 0,0);
 				break;
 
-			case 0x12:	/* set coinage info -- followed by two 4-bit values */
+			case 0x12:  /* set coinage info -- followed by two 4-bit values */
 				break;
 
-			case 0x14:	/* game timer? (see Tant-R) */
-			case 0x16:	/* intro timer? (see Tant-R) */
-			case 0x18:	/* ??? */
-			case 0x1a:	/* ??? */
-			case 0x1c:	/* ??? */
+			case 0x14:  /* game timer? (see Tant-R) */
+			case 0x16:  /* intro timer? (see Tant-R) */
+			case 0x18:  /* ??? */
+			case 0x1a:  /* ??? */
+			case 0x1c:  /* ??? */
 				break;
 
-			case 0x1e:	/* reset */
+			case 0x1e:  /* reset */
 				break;
 		}
 	}
@@ -668,8 +668,8 @@ static INPUT_PORTS_START( systemc_generic )
 
 	PORT_START("PORTC")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )	/* From uPD7759 pin 18. (/BUSY output) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* From MB3773P pin 1. (/RESET output) */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    /* From uPD7759 pin 18. (/BUSY output) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )    /* From MB3773P pin 1. (/RESET output) */
 
 	PORT_START("PORTD")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -706,12 +706,12 @@ static INPUT_PORTS_START( columns )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	//"SW2:1" unused
@@ -721,7 +721,7 @@ static INPUT_PORTS_START( columns )
 	//"SW2:3" unused
 	//"SW2:4" unused
 	/* The first level increase (from 0 to 1) is always after destroying
-       35 jewels. Then, the level gets 1 level more every : */
+	   35 jewels. Then, the level gets 1 level more every : */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )  // 50 jewels
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )     // 40 jewels
@@ -735,12 +735,12 @@ static INPUT_PORTS_START( columnsu )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
@@ -754,7 +754,7 @@ static INPUT_PORTS_START( columnsu )
 	PORT_DIPSETTING(    0x04, "BGM #1" )
 	PORT_DIPSETTING(    0x00, "BGM #2" )
 	/* The first level increase (from 0 to 1) is always after destroying
-       35 jewels. Then, the level gets 1 level more every : */
+	   35 jewels. Then, the level gets 1 level more every : */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )  // 50 jewels
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )     // 40 jewels
@@ -768,12 +768,12 @@ static INPUT_PORTS_START( columns2 )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
@@ -801,10 +801,10 @@ static INPUT_PORTS_START( borench )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Credits to Start" ) PORT_DIPLOCATION("SW2:1")
@@ -899,14 +899,14 @@ static INPUT_PORTS_START( ribbit )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 1 Unused */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 1 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 1 Unused */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 1 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Credits to Start" ) PORT_DIPLOCATION("SW2:1")
@@ -934,12 +934,12 @@ static INPUT_PORTS_START( puyo )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	//"SW2:1" unused
@@ -966,10 +966,10 @@ static INPUT_PORTS_START( stkclmns )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
@@ -994,12 +994,12 @@ static INPUT_PORTS_START( potopoto )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Credits to Start" ) PORT_DIPLOCATION("SW2:1")
@@ -1032,10 +1032,10 @@ static INPUT_PORTS_START( zunkyou )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Game Difficulty 1" ) PORT_DIPLOCATION("SW2:1")
@@ -1062,12 +1062,12 @@ static INPUT_PORTS_START( ichir )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
@@ -1090,12 +1090,12 @@ static INPUT_PORTS_START( bloxeedc )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "VS Mode Price" ) PORT_DIPLOCATION("SW2:1")
@@ -1119,10 +1119,10 @@ static INPUT_PORTS_START( puyopuy2 )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* Button 3 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Rannyu Off Button" ) PORT_DIPLOCATION("SW2:1")
@@ -1154,17 +1154,17 @@ static INPUT_PORTS_START( pclub )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Probably Unused */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ok")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cancel")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Probably Unused */
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Probably Unused */
 
 	PORT_MODIFY("COINAGE")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW4:1,2,3")
@@ -1200,17 +1200,17 @@ static INPUT_PORTS_START( pclubjv2 )
 	PORT_INCLUDE( systemc_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ok")
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cancel")
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Probably Unused */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ok")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Probably Unused */
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Probably Unused */
 
 	PORT_MODIFY("COINAGE")
 	PORT_DIPNAME( 0x07, 0x07, "Coins per Credit (Normal / Alternate)" ) PORT_DIPLOCATION("SW4:1,2,3")
@@ -1250,7 +1250,7 @@ static void  segac2_irq2_interrupt(device_t *device, int state)
 }
 static const ym3438_interface ym3438_intf =
 {
-	segac2_irq2_interrupt,		/* IRQ handler */
+	segac2_irq2_interrupt,      /* IRQ handler */
 };
 
 
@@ -1368,7 +1368,7 @@ static const sega315_5124_interface sms_vdp_ntsc_intf =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( segac, segac2_state )
@@ -1877,7 +1877,7 @@ static int prot_func_columns(int in)
 	int const b0 = BIT( in,2) ^ ((BIT(~in,0) && BIT( in,7)) || (BIT( in,4) && BIT( in,6)));
 	int const b1 = BIT(~in,0) ^ (BIT( in,2) || (BIT( in,5) && BIT(~in,6) && BIT( in,7)));
 	int const b2 = BIT( in,3) ^ ((BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,6)));
-	int const b3 = BIT( in,1) ^ ((BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,5)) || (BIT(~in,6) && BIT( in,7)));	// 1 repeated
+	int const b3 = BIT( in,1) ^ ((BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,5)) || (BIT(~in,6) && BIT( in,7)));   // 1 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -1887,8 +1887,8 @@ static int prot_func_columns2(int in)
 {
 	int const b0 =  BIT( in,2) ^ (BIT( in,1) || (BIT( in,4) && BIT( in,5)));
 	int const b1 = (BIT( in,0) && BIT( in,3) && BIT( in,4)) ^ (BIT( in,6) || (BIT( in,5) && BIT( in,7)));
-	int const b2 = (BIT( in,3) && BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) || (BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,6)));	// 4 repeated
-	int const b3 = (BIT( in,1) && BIT( in,0) && BIT( in,2)) ^ ((BIT( in,4) && BIT(~in,6)) || (BIT( in,6) && BIT( in,7)));	// 6 repeated
+	int const b2 = (BIT( in,3) && BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) || (BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,6))); // 4 repeated
+	int const b3 = (BIT( in,1) && BIT( in,0) && BIT( in,2)) ^ ((BIT( in,4) && BIT(~in,6)) || (BIT( in,6) && BIT( in,7)));   // 6 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -1897,9 +1897,9 @@ static int prot_func_columns2(int in)
 static int prot_func_tfrceac(int in)
 {
 	int const b0 = BIT(~in,2) ^ ((BIT( in,0) && BIT(~in,7)) || (BIT( in,3) && BIT( in,4)));
-	int const b1 = (BIT( in,4) && BIT(~in,5) && BIT( in,7)) ^ ((BIT(~in,0) || BIT(~in,3)) && (BIT(~in,6) || BIT(~in,7)));	// not in the form x1 XOR (x2 OR x3 OR x4)
+	int const b1 = (BIT( in,4) && BIT(~in,5) && BIT( in,7)) ^ ((BIT(~in,0) || BIT(~in,3)) && (BIT(~in,6) || BIT(~in,7)));   // not in the form x1 XOR (x2 OR x3 OR x4)
 	int const b2 = BIT( in,2) ^ ((BIT( in,4) && BIT(~in,5) && BIT( in,7)) || (BIT(~in,1) && BIT( in,6)));
-	int const b3 = BIT( in,0) ^ ((BIT( in,1) && BIT( in,4) && BIT( in,6)) || (BIT( in,1) && BIT( in,4) && BIT( in,7)));	// 1,4 repeated
+	int const b3 = BIT( in,0) ^ ((BIT( in,1) && BIT( in,4) && BIT( in,6)) || (BIT( in,1) && BIT( in,4) && BIT( in,7))); // 1,4 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -1910,7 +1910,7 @@ static int prot_func_borench(int in)
 	int const b0 = (BIT( in,1) && BIT( in,2) && BIT( in,3) && BIT( in,7))   ^ (BIT( in,5) || (BIT(~in,0) && BIT(~in,4)));
 	int const b1 = (BIT(~in,2) && BIT( in,3) && BIT( in,5))                 ^ (BIT( in,1) || (BIT( in,0) && BIT(~in,4)));
 	int const b2 = (BIT( in,1) && BIT(~in,4) && BIT(~in,6))                 ^ (BIT( in,2) || BIT( in,3) || (BIT( in,5) && BIT( in,7)));
-	int const b3 = (BIT(~in,0) && BIT( in,5) && (BIT( in,6) || BIT( in,7))) ^ (BIT( in,1) || (BIT( in,3) && BIT( in,4)));	// not in the form x1 XOR (x2 OR x3 OR x4)
+	int const b3 = (BIT(~in,0) && BIT( in,5) && (BIT( in,6) || BIT( in,7))) ^ (BIT( in,1) || (BIT( in,3) && BIT( in,4)));   // not in the form x1 XOR (x2 OR x3 OR x4)
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -1930,9 +1930,9 @@ static int prot_func_ribbit(int in)
 static int prot_func_twinsqua(int in)
 {
 	int const b0 = (BIT( in,2) && BIT(~in,5)) ^ (BIT( in,3) || BIT(~in,4));
-	int const b1 = (BIT( in,0) && BIT(~in,2) && BIT( in,4)) ^ (BIT(~in,0) || BIT(~in,4) || BIT(~in,6));	// 0,4 repeated
+	int const b1 = (BIT( in,0) && BIT(~in,2) && BIT( in,4)) ^ (BIT(~in,0) || BIT(~in,4) || BIT(~in,6)); // 0,4 repeated
 	int const b2 = (BIT( in,3) && BIT(~in,5)) ^ (BIT( in,4) && BIT( in,7));
-	int const b3 =  BIT( in,1) ^ ((BIT(~in,3) && BIT(~in,6)) || (BIT( in,4) && BIT(~in,6)) || (BIT(~in,1) && BIT( in,3) && BIT(~in,4)));	// 1,3,4,6 repeated
+	int const b3 =  BIT( in,1) ^ ((BIT(~in,3) && BIT(~in,6)) || (BIT( in,4) && BIT(~in,6)) || (BIT(~in,1) && BIT( in,3) && BIT(~in,4)));    // 1,3,4,6 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }
@@ -1940,7 +1940,7 @@ static int prot_func_twinsqua(int in)
 /* 317-0203 */
 static int prot_func_puyo(int in)
 {
-	int const b0 = (BIT(~in,3) && BIT( in,7)) ^ ((BIT(~in,0) && BIT(~in,1)) || (BIT(~in,1) && BIT(~in,4)));	// 1 repeated
+	int const b0 = (BIT(~in,3) && BIT( in,7)) ^ ((BIT(~in,0) && BIT(~in,1)) || (BIT(~in,1) && BIT(~in,4))); // 1 repeated
 	int const b1 = (BIT( in,3) && BIT( in,5)) ^ (BIT(~in,2) || BIT( in,4) || BIT( in,6));
 	int const b2 = (BIT(~in,2) && BIT(~in,5)) ^ (BIT( in,1) || BIT(~in,3) || BIT(~in,6));
 	int const b3 =  BIT( in,1)                ^ ((BIT( in,0) && BIT( in,3) && BIT( in,7)) || BIT( in,4));
@@ -2066,7 +2066,7 @@ static int prot_func_pclubjv2(int in)
 {
 	int const b0 = (BIT( in,3) && BIT(~in,4)) ^ ((BIT(~in,1) && BIT(~in,7)) || BIT( in,6));
 	int const b1 = (BIT( in,0) && BIT( in,5)) ^  (BIT( in,2) && BIT(~in,6));
-	int const b2 = (BIT(~in,1) && BIT( in,6)) ^  (BIT( in,3) || BIT(~in,5)  || BIT(~in,1));	// 1 repeated
+	int const b2 = (BIT(~in,1) && BIT( in,6)) ^  (BIT( in,3) || BIT(~in,5)  || BIT(~in,1)); // 1 repeated
 	int const b3 = (BIT(~in,2) && BIT(~in,7)) ^  (BIT(~in,0) || BIT(~in,4));
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
@@ -2077,7 +2077,7 @@ static int prot_func_pclubjv4(int in)
 	int const b0 = (BIT(~in,2) && BIT( in,4)) ^ (BIT( in,1) && BIT(~in,6) && BIT(~in,3));
 	int const b1 = (BIT(~in,3) && BIT(~in,4)) ^ (BIT( in,0) && BIT( in,5) && BIT(~in,6));
 	int const b2 =  BIT(~in,0)                ^ (BIT( in,3) && BIT( in,4));
-	int const b3 = (BIT(~in,1) && BIT( in,7)) ^ (BIT( in,5) && BIT(~in,7));	// 7 repeated
+	int const b3 = (BIT(~in,1) && BIT( in,7)) ^ (BIT( in,5) && BIT(~in,7)); // 7 repeated
 
 	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 }

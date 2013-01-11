@@ -1,6 +1,6 @@
 /* flags for init_pc_common */
-#define PCCOMMON_KEYBOARD_PC	0
-#define PCCOMMON_KEYBOARD_AT	1
+#define PCCOMMON_KEYBOARD_PC    0
+#define PCCOMMON_KEYBOARD_AT    1
 
 void init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int));
 

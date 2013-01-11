@@ -14,42 +14,42 @@
 
 static const UINT8 super80_rgb_palette[16*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black     */
-	0x00, 0x00, 0x00,	/*  1 Black     */
-	0x00, 0x00, 0x7f,	/*  2 Blue      */
-	0x00, 0x00, 0xff,	/*  3 Light Blue    */
-	0x00, 0x7f, 0x00,	/*  4 Green     */
-	0x00, 0xff, 0x00,	/*  5 Bright Green  */
-	0x00, 0x7f, 0x7f,	/*  6 Cyan      */
-	0x00, 0xff, 0xff,	/*  7 Turquoise     */
-	0x7f, 0x00, 0x00,	/*  8 Dark Red      */
-	0xff, 0x00, 0x00,	/*  9 Red       */
-	0x7f, 0x00, 0x7f,	/* 10 Purple        */
-	0xff, 0x00, 0xff,	/* 11 Magenta       */
-	0x7f, 0x7f, 0x00,	/* 12 Lime      */
-	0xff, 0xff, 0x00,	/* 13 Yellow        */
-	0xbf, 0xbf, 0xbf,	/* 14 Off White     */
-	0xff, 0xff, 0xff,	/* 15 White     */
+	0x00, 0x00, 0x00,   /*  0 Black     */
+	0x00, 0x00, 0x00,   /*  1 Black     */
+	0x00, 0x00, 0x7f,   /*  2 Blue      */
+	0x00, 0x00, 0xff,   /*  3 Light Blue    */
+	0x00, 0x7f, 0x00,   /*  4 Green     */
+	0x00, 0xff, 0x00,   /*  5 Bright Green  */
+	0x00, 0x7f, 0x7f,   /*  6 Cyan      */
+	0x00, 0xff, 0xff,   /*  7 Turquoise     */
+	0x7f, 0x00, 0x00,   /*  8 Dark Red      */
+	0xff, 0x00, 0x00,   /*  9 Red       */
+	0x7f, 0x00, 0x7f,   /* 10 Purple        */
+	0xff, 0x00, 0xff,   /* 11 Magenta       */
+	0x7f, 0x7f, 0x00,   /* 12 Lime      */
+	0xff, 0xff, 0x00,   /* 13 Yellow        */
+	0xbf, 0xbf, 0xbf,   /* 14 Off White     */
+	0xff, 0xff, 0xff,   /* 15 White     */
 };
 
 static const UINT8 super80_comp_palette[16*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black     */
-	0x80, 0x80, 0x80,	/*  1 Grey      */
-	0x00, 0x00, 0xff,	/*  2 Blue      */
-	0xff, 0xff, 0x80,	/*  3 Light Yellow  */
-	0x00, 0xff, 0x00,	/*  4 Green     */
-	0xff, 0x80, 0xff,	/*  5 Light Magenta */
-	0x00, 0xff, 0xff,	/*  6 Cyan      */
-	0xff, 0x40, 0x40,	/*  7 Light Red     */
-	0xff, 0x00, 0x00,	/*  8 Red       */
-	0x00, 0x80, 0x80,	/*  9 Dark Cyan     */
-	0xff, 0x00, 0xff,	/* 10 Magenta       */
-	0x80, 0xff, 0x80,	/* 11 Light Green   */
-	0xff, 0xff, 0x00,	/* 12 Yellow        */
-	0x00, 0x00, 0x80,	/* 13 Dark Blue     */
-	0xff, 0xff, 0xff,	/* 14 White     */
-	0x00, 0x00, 0x00,	/* 15 Black     */
+	0x00, 0x00, 0x00,   /*  0 Black     */
+	0x80, 0x80, 0x80,   /*  1 Grey      */
+	0x00, 0x00, 0xff,   /*  2 Blue      */
+	0xff, 0xff, 0x80,   /*  3 Light Yellow  */
+	0x00, 0xff, 0x00,   /*  4 Green     */
+	0xff, 0x80, 0xff,   /*  5 Light Magenta */
+	0x00, 0xff, 0xff,   /*  6 Cyan      */
+	0xff, 0x40, 0x40,   /*  7 Light Red     */
+	0xff, 0x00, 0x00,   /*  8 Red       */
+	0x00, 0x80, 0x80,   /*  9 Dark Cyan     */
+	0xff, 0x00, 0xff,   /* 10 Magenta       */
+	0x80, 0xff, 0x80,   /* 11 Light Green   */
+	0xff, 0xff, 0x00,   /* 12 Yellow        */
+	0x00, 0x00, 0x80,   /* 13 Dark Blue     */
+	0xff, 0xff, 0xff,   /* 14 White     */
+	0x00, 0x00, 0x00,   /* 15 Black     */
 };
 
 static void palette_set_colors_rgb(running_machine &machine, const UINT8 *colors)
@@ -76,15 +76,15 @@ void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 	if (state)
 	{
 		/* if we chose another palette or colour mode, enable it */
-		UINT8 chosen_palette = (machine().root_device().ioport("CONFIG")->read() & 0x60)>>5;				// read colour dipswitches
+		UINT8 chosen_palette = (machine().root_device().ioport("CONFIG")->read() & 0x60)>>5;                // read colour dipswitches
 
-		if (chosen_palette != m_current_palette)						// any changes?
+		if (chosen_palette != m_current_palette)                        // any changes?
 		{
-			m_current_palette = chosen_palette;					// save new palette
+			m_current_palette = chosen_palette;                 // save new palette
 			if (!m_current_palette)
-				palette_set_colors_rgb(machine(), super80_comp_palette);		// composite colour
+				palette_set_colors_rgb(machine(), super80_comp_palette);        // composite colour
 			else
-				palette_set_colors_rgb(machine(), super80_rgb_palette);		// rgb and b&w
+				palette_set_colors_rgb(machine(), super80_rgb_palette);     // rgb and b&w
 		}
 	}
 }
@@ -97,7 +97,7 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -106,7 +106,7 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 		{
 			UINT16 *p = &bitmap.pix16(sy++);
 
-			for (x = 0; x < 32; x++)	// done this way to avoid x overflowing on page FF
+			for (x = 0; x < 32; x++)    // done this way to avoid x overflowing on page FF
 			{
 				if (screen_on)
 					chr = RAM[ma | x] & 0x3f;
@@ -138,7 +138,7 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -179,7 +179,7 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -220,19 +220,19 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 	UINT8 *RAM = memregion("maincpu")->base();
 
 	/* get selected character generator */
-	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
+	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4); /* bit 0 of port F1 and cgen config switch */
 
 	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
 
-	if ((m_shared & 4) || (!(options & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((m_shared & 4) || (!(options & 4))) /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	if (screen_on)
 	{
 		if ((options & 0x60) == 0x60)
-			fg = 15;	/* b&w */
+			fg = 15;    /* b&w */
 		else
-			fg = 5;		/* green */
+			fg = 5;     /* green */
 	}
 
 	for (y = 0; y < 16; y++)
@@ -248,7 +248,7 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 
 				if (!(options & 0x40))
 				{
-					col = RAM[0xfe00 | ma | x];	/* byte of colour to display */
+					col = RAM[0xfe00 | ma | x]; /* byte of colour to display */
 					fg = col & 0x0f;
 					bg = (col & 0xf0) >> 4;
 				}
@@ -343,26 +343,26 @@ void super80_state::mc6845_cursor_configure()
 	UINT8 i,curs_type=0,r9,r10,r11;
 
 	/* curs_type holds the general cursor shape to be created
-        0 = no cursor
-        1 = partial cursor (only shows on a block of scan lines)
-        2 = full cursor
-        3 = two-part cursor (has a part at the top and bottom with the middle blank) */
+	    0 = no cursor
+	    1 = partial cursor (only shows on a block of scan lines)
+	    2 = full cursor
+	    3 = two-part cursor (has a part at the top and bottom with the middle blank) */
 
-	for ( i = 0; i < ARRAY_LENGTH(m_mc6845_cursor); i++) m_mc6845_cursor[i] = 0;		// prepare cursor by erasing old one
+	for ( i = 0; i < ARRAY_LENGTH(m_mc6845_cursor); i++) m_mc6845_cursor[i] = 0;        // prepare cursor by erasing old one
 
-	r9  = m_mc6845_reg[9];					// number of scan lines - 1
-	r10 = m_mc6845_reg[10] & 0x1f;				// cursor start line = last 5 bits
-	r11 = m_mc6845_reg[11]+1;					// cursor end line incremented to suit for-loops below
+	r9  = m_mc6845_reg[9];                  // number of scan lines - 1
+	r10 = m_mc6845_reg[10] & 0x1f;              // cursor start line = last 5 bits
+	r11 = m_mc6845_reg[11]+1;                   // cursor end line incremented to suit for-loops below
 
 	/* decide the curs_type by examining the registers */
-	if (r10 < r11) curs_type=1;				// start less than end, show start to end
+	if (r10 < r11) curs_type=1;             // start less than end, show start to end
 	else
-	if (r10 == r11) curs_type=2;				// if equal, show full cursor
-	else curs_type=3;					// if start greater than end, it's a two-part cursor
+	if (r10 == r11) curs_type=2;                // if equal, show full cursor
+	else curs_type=3;                   // if start greater than end, it's a two-part cursor
 
-	if ((r11 - 1) > r9) curs_type=2;			// if end greater than scan-lines, show full cursor
-	if (r10 > r9) curs_type=0;				// if start greater than scan-lines, then no cursor
-	if (r11 > 16) r11=16;					// truncate 5-bit register to fit our 4-bit hardware
+	if ((r11 - 1) > r9) curs_type=2;            // if end greater than scan-lines, show full cursor
+	if (r10 > r9) curs_type=0;              // if start greater than scan-lines, then no cursor
+	if (r11 > 16) r11=16;                   // truncate 5-bit register to fit our 4-bit hardware
 
 	/* create the new cursor */
 	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(m_mc6845_cursor);i++) m_mc6845_cursor[i]=0xff; // turn on full cursor
@@ -398,7 +398,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)				// for each character
+	for (x = 0; x < x_count; x++)               // for each character
 	{
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
@@ -406,21 +406,21 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		chr = state->m_p_videoram[mem];
 
 		/* get colour or b&w */
-		fg = 5;						/* green */
-		if ((state->m_s_options & 0x60) == 0x60) fg = 15;		/* b&w */
+		fg = 5;                     /* green */
+		if ((state->m_s_options & 0x60) == 0x60) fg = 15;       /* b&w */
 
 		if (~state->m_s_options & 0x40)
 		{
-			col = state->m_p_colorram[mem];					/* byte of colour to display */
+			col = state->m_p_colorram[mem];                 /* byte of colour to display */
 			fg = col & 0x0f;
 			bg = (col & 0xf0) >> 4;
 		}
 
 		/* if inverse mode, replace any pcgram chrs with inverse chrs */
-		if ((~state->m_shared & 0x10) && (chr & 0x80))			// is it a high chr in inverse mode
+		if ((~state->m_shared & 0x10) && (chr & 0x80))          // is it a high chr in inverse mode
 		{
-			inv ^= 0xff;						// invert the chr
-			chr &= 0x7f;						// and drop bit 7
+			inv ^= 0xff;                        // invert the chr
+			chr &= 0x7f;                        // and drop bit 7
 		}
 
 		/* process cursor - remove when mame fixed */
@@ -455,7 +455,7 @@ WRITE8_MEMBER( super80_state::super80v_10_w )
 
 WRITE8_MEMBER( super80_state::super80v_11_w )
 {
-	m_mc6845_reg[m_mc6845_ind] = data & mc6845_mask[m_mc6845_ind];	/* save data in register */
+	m_mc6845_reg[m_mc6845_ind] = data & mc6845_mask[m_mc6845_ind];  /* save data in register */
 	m_6845->register_w( space, 0, data );
-	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
+	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12)) mc6845_cursor_configure();       /* adjust cursor shape - remove when mame fixed */
 }

@@ -11,7 +11,7 @@ class karnov_state : public driver_device
 public:
 	karnov_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") ,
+			m_spriteram(*this, "spriteram") ,
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
 		m_pf_data(*this, "pf_data"){ }
@@ -33,7 +33,7 @@ public:
 	UINT16      m_i8751_needs_ack;
 	UINT16      m_i8751_coin_pending;
 	UINT16      m_i8751_command_queue;
-	int         m_i8751_level;	// needed by chelnov
+	int         m_i8751_level;  // needed by chelnov
 	int         m_microcontroller_id;
 	int         m_coin_mask;
 	int         m_latch;

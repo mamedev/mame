@@ -105,22 +105,22 @@ GFXDECODE_END
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL,							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL,                         /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL,							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL,                         /* Port C write */
 };
 
 
@@ -182,8 +182,8 @@ ROM_END
 #define ROL(x,n) (BITSWAP8((x),(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7))
 
 #define WRITEDEST( n ) \
-		dest[idx]=n;	\
-		dest[idx+0x10000]=(n)^0xff;	\
+		dest[idx]=n;    \
+		dest[idx+0x10000]=(n)^0xff; \
 		idx++;
 
 DRIVER_INIT_MEMBER(tcl_state,tcl)

@@ -295,7 +295,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x800;
-	const UINT8 *source = &spriteram[0x800-0x20];	/* the last is NOT a sprite */
+	const UINT8 *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
 	const UINT8 *finish = &spriteram[0];
 	gfx_element *gfx = machine.gfx[1];
 
@@ -335,7 +335,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			flipy ^= 1;
 		}
 
-		sy++;	/* sprites are buffered and delayed by one scanline */
+		sy++;   /* sprites are buffered and delayed by one scanline */
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
 		if (color != 0x7f)
@@ -378,13 +378,13 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
-	i = ((m_cus116[0] << 8) | m_cus116[1]) - 1;			// min x
+	i = ((m_cus116[0] << 8) | m_cus116[1]) - 1;         // min x
 	if (new_clip.min_x < i) new_clip.min_x = i;
-	i = ((m_cus116[2] << 8) | m_cus116[3]) - 1 - 1;		// max x
+	i = ((m_cus116[2] << 8) | m_cus116[3]) - 1 - 1;     // max x
 	if (new_clip.max_x > i) new_clip.max_x = i;
-	i = ((m_cus116[4] << 8) | m_cus116[5]) - 0x11;		// min y
+	i = ((m_cus116[4] << 8) | m_cus116[5]) - 0x11;      // min y
 	if (new_clip.min_y < i) new_clip.min_y = i;
-	i = ((m_cus116[6] << 8) | m_cus116[7]) - 0x11 - 1;	// max y
+	i = ((m_cus116[6] << 8) | m_cus116[7]) - 0x11 - 1;  // max y
 	if (new_clip.max_y > i) new_clip.max_y = i;
 
 	if (new_clip.empty())

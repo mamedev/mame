@@ -47,7 +47,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define TMS_3203X_LOG_OPCODE_USAGE	(0)
+#define TMS_3203X_LOG_OPCODE_USAGE  (0)
 
 
 
@@ -56,20 +56,20 @@
 //**************************************************************************
 
 // interrupts
-const int TMS3203X_IRQ0		= 0;		// IRQ0
-const int TMS3203X_IRQ1		= 1;		// IRQ1
-const int TMS3203X_IRQ2		= 2;		// IRQ2
-const int TMS3203X_IRQ3		= 3;		// IRQ3
-const int TMS3203X_XINT0	= 4;		// serial 0 transmit interrupt
-const int TMS3203X_RINT0	= 5;		// serial 0 receive interrupt
-const int TMS3203X_XINT1	= 6;		// serial 1 transmit interrupt
-const int TMS3203X_RINT1	= 7;		// serial 1 receive interrupt
-const int TMS3203X_TINT0	= 8;		// timer 0 interrupt
-const int TMS3203X_TINT1	= 9;		// timer 1 interrupt
-const int TMS3203X_DINT		= 10;		// DMA interrupt
-const int TMS3203X_DINT0	= 10;		// DMA 0 interrupt (32032 only)
-const int TMS3203X_DINT1	= 11;		// DMA 1 interrupt (32032 only)
-const int TMS3203X_MCBL		= 12;		// Microcomputer/boot loader mode
+const int TMS3203X_IRQ0     = 0;        // IRQ0
+const int TMS3203X_IRQ1     = 1;        // IRQ1
+const int TMS3203X_IRQ2     = 2;        // IRQ2
+const int TMS3203X_IRQ3     = 3;        // IRQ3
+const int TMS3203X_XINT0    = 4;        // serial 0 transmit interrupt
+const int TMS3203X_RINT0    = 5;        // serial 0 receive interrupt
+const int TMS3203X_XINT1    = 6;        // serial 1 transmit interrupt
+const int TMS3203X_RINT1    = 7;        // serial 1 receive interrupt
+const int TMS3203X_TINT0    = 8;        // timer 0 interrupt
+const int TMS3203X_TINT1    = 9;        // timer 1 interrupt
+const int TMS3203X_DINT     = 10;       // DMA interrupt
+const int TMS3203X_DINT0    = 10;       // DMA 0 interrupt (32032 only)
+const int TMS3203X_DINT1    = 11;       // DMA 1 interrupt (32032 only)
+const int TMS3203X_MCBL     = 12;       // Microcomputer/boot loader mode
 
 // register enumeration
 enum
@@ -139,10 +139,10 @@ typedef void (*tms3203x_iack_func)(tms3203x_device &device, UINT8 val, offs_t ad
 
 struct tms3203x_config
 {
-	bool				m_mcbl_mode;
-	tms3203x_xf_func	m_xf0_w;
-	tms3203x_xf_func	m_xf1_w;
-	tms3203x_iack_func	m_iack_w;
+	bool                m_mcbl_mode;
+	tms3203x_xf_func    m_xf0_w;
+	tms3203x_xf_func    m_xf1_w;
+	tms3203x_iack_func  m_iack_w;
 };
 
 
@@ -173,7 +173,7 @@ class tms3203x_device : public cpu_device,
 		// importers
 		void from_double(double);
 
-		UINT32		i32[2];
+		UINT32      i32[2];
 	};
 
 protected:
@@ -782,8 +782,8 @@ protected:
 	void xor3sti(UINT32 op);
 
 	// configuration
-	const address_space_config		m_program_config;
-	UINT32							m_chip_type;
+	const address_space_config      m_program_config;
+	UINT32                          m_chip_type;
 
 	union int_double
 	{
@@ -793,22 +793,22 @@ protected:
 	};
 
 	// core registers
-	UINT32				m_pc;
-	tmsreg				m_r[36];
-	UINT32				m_bkmask;
+	UINT32              m_pc;
+	tmsreg              m_r[36];
+	UINT32              m_bkmask;
 
 	// internal stuff
-	UINT16				m_irq_state;
-	bool				m_delayed;
-	bool				m_irq_pending;
-	bool				m_is_idling;
-	int					m_icount;
+	UINT16              m_irq_state;
+	bool                m_delayed;
+	bool                m_irq_pending;
+	bool                m_is_idling;
+	int                 m_icount;
 
-	UINT32				m_iotemp;
-	device_irq_acknowledge_callback	m_irq_callback;
-	address_space *		m_program;
-	direct_read_data *	m_direct;
-	UINT32 *			m_bootrom;
+	UINT32              m_iotemp;
+	device_irq_acknowledge_callback m_irq_callback;
+	address_space *     m_program;
+	direct_read_data *  m_direct;
+	UINT32 *            m_bootrom;
 
 	// tables
 	static void (tms3203x_device::*const s_tms32031ops[])(UINT32 op);
@@ -817,7 +817,7 @@ protected:
 	static UINT32 (tms3203x_device::*const s_indirect_1_def[0x20])(UINT32, UINT8, UINT32 *&);
 
 #if (TMS_3203X_LOG_OPCODE_USAGE)
-	UINT32				m_hits[0x200*4];
+	UINT32              m_hits[0x200*4];
 #endif
 };
 

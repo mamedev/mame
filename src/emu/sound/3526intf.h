@@ -19,7 +19,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( ym3526_control_port_w );
 DECLARE_WRITE8_DEVICE_HANDLER( ym3526_write_port_w );
 
 class ym3526_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

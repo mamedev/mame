@@ -64,7 +64,7 @@ void nscsi_cdrom_device::scsi_command()
 			blocks = 256;
 
 		logerror("%s: command READ start=%08x blocks=%04x\n",
-				 tag(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -73,8 +73,8 @@ void nscsi_cdrom_device::scsi_command()
 	case SC_INQUIRY: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
 		logerror("%s: command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
-				 tag(),
-				 lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
+					tag(),
+					lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
 		if(lun) {
 			bad_lun();
 			return;
@@ -112,7 +112,7 @@ void nscsi_cdrom_device::scsi_command()
 		logerror("%s: command READ CAPACITY\n", tag());
 
 		UINT32 temp = cdrom_get_track_start(cdrom, 0xaa);
-		temp--;	// return the last used block on the disc
+		temp--; // return the last used block on the disc
 
 		scsi_cmdbuf[0] = (temp>>24) & 0xff;
 		scsi_cmdbuf[1] = (temp>>16) & 0xff;
@@ -133,7 +133,7 @@ void nscsi_cdrom_device::scsi_command()
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
 		logerror("%s: command READ EXTENDED start=%08x blocks=%04x\n",
-				 tag(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);

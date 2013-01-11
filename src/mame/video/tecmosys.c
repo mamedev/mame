@@ -209,7 +209,7 @@ static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
 		for (x=0;x<320;x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
-			    dstptr[x] =  (srcptr[x]&0x7ff) | pri;
+				dstptr[x] =  (srcptr[x]&0x7ff) | pri;
 		}
 	}
 }

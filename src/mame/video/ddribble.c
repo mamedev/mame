@@ -49,14 +49,14 @@ WRITE8_MEMBER(ddribble_state::K005885_0_w)
 {
 	switch (offset)
 	{
-		case 0x03:	/* char bank selection for set 1 */
+		case 0x03:  /* char bank selection for set 1 */
 			if ((data & 0x03) != m_charbank[0])
 			{
 				m_charbank[0] = data & 0x03;
 				m_fg_tilemap->mark_all_dirty();
 			}
 			break;
-		case 0x04:	/* IRQ control, flipscreen */
+		case 0x04:  /* IRQ control, flipscreen */
 			m_int_enable_0 = data & 0x02;
 			break;
 	}
@@ -67,14 +67,14 @@ WRITE8_MEMBER(ddribble_state::K005885_1_w)
 {
 	switch (offset)
 	{
-		case 0x03:	/* char bank selection for set 2 */
+		case 0x03:  /* char bank selection for set 2 */
 			if ((data & 0x03) != m_charbank[1])
 			{
 				m_charbank[1] = data & 0x03;
 				m_bg_tilemap->mark_all_dirty();
 			}
 			break;
-		case 0x04:	/* IRQ control, flipscreen */
+		case 0x04:  /* IRQ control, flipscreen */
 			m_int_enable_1 = data & 0x02;
 			break;
 	}
@@ -90,7 +90,7 @@ WRITE8_MEMBER(ddribble_state::K005885_1_w)
 TILEMAP_MAPPER_MEMBER(ddribble_state::tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
-	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);	/* skip 0x400 */
+	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);    /* skip 0x400 */
 }
 
 TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
@@ -177,13 +177,13 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 
 	while (source < finish)
 	{
-		int number = source[0] | ((source[1] & 0x07) << 8);	/* sprite number */
-		int attr = source[4];								/* attributes */
-		int sx = source[3] | ((attr & 0x01) << 8);			/* vertical position */
-		int sy = source[2];									/* horizontal position */
-		int flipx = attr & 0x20;							/* flip x */
-		int flipy = attr & 0x40;							/* flip y */
-		int color = (source[1] & 0xf0) >> 4;				/* color */
+		int number = source[0] | ((source[1] & 0x07) << 8); /* sprite number */
+		int attr = source[4];                               /* attributes */
+		int sx = source[3] | ((attr & 0x01) << 8);          /* vertical position */
+		int sy = source[2];                                 /* horizontal position */
+		int flipx = attr & 0x20;                            /* flip x */
+		int flipy = attr & 0x40;                            /* flip y */
+		int color = (source[1] & 0xf0) >> 4;                /* color */
 		int width, height;
 
 		if (flipscreen)
@@ -194,7 +194,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 			sy = 240 - sy;
 
 			if ((attr & 0x1c) == 0x10)
-			{	/* ???. needed for some sprites in flipped mode */
+			{   /* ???. needed for some sprites in flipped mode */
 				sx -= 0x10;
 				sy -= 0x10;
 			}
@@ -202,14 +202,14 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 
 		switch (attr & 0x1c)
 		{
-			case 0x10:	/* 32x32 */
+			case 0x10:  /* 32x32 */
 				width = height = 2; number &= (~3); break;
-			case 0x08:	/* 16x32 */
+			case 0x08:  /* 16x32 */
 				width = 1; height = 2; number &= (~2); break;
-			case 0x04:	/* 32x16 */
+			case 0x04:  /* 32x16 */
 				width = 2; height = 1; number &= (~1); break;
 			/* the hardware allow more sprite sizes, but ddribble doesn't use them */
-			default:	/* 16x16 */
+			default:    /* 16x16 */
 				width = height = 1; break;
 		}
 

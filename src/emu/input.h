@@ -384,12 +384,12 @@ public:
 	UINT8 update(INT32 xaxisval, INT32 yaxisval);
 
 	// joystick mapping codes
-	static const UINT8 JOYSTICK_MAP_NEUTRAL	= 0x00;
-	static const UINT8 JOYSTICK_MAP_LEFT	= 0x01;
-	static const UINT8 JOYSTICK_MAP_RIGHT	= 0x02;
-	static const UINT8 JOYSTICK_MAP_UP		= 0x04;
-	static const UINT8 JOYSTICK_MAP_DOWN	= 0x08;
-	static const UINT8 JOYSTICK_MAP_STICKY	= 0x0f;
+	static const UINT8 JOYSTICK_MAP_NEUTRAL = 0x00;
+	static const UINT8 JOYSTICK_MAP_LEFT    = 0x01;
+	static const UINT8 JOYSTICK_MAP_RIGHT   = 0x02;
+	static const UINT8 JOYSTICK_MAP_UP      = 0x04;
+	static const UINT8 JOYSTICK_MAP_DOWN    = 0x08;
+	static const UINT8 JOYSTICK_MAP_STICKY  = 0x0f;
 
 private:
 	// internal helpers
@@ -401,9 +401,9 @@ private:
 	}
 
 	// internal state
-	UINT8					m_map[9][9];			// 9x9 grid
-	UINT8					m_lastmap;				// last value returned (for sticky tracking)
-	astring					m_origstring;			// originally parsed string
+	UINT8                   m_map[9][9];            // 9x9 grid
+	UINT8                   m_lastmap;              // last value returned (for sticky tracking)
+	astring                 m_origstring;           // originally parsed string
 };
 
 
@@ -448,7 +448,7 @@ public:
 
 private:
 	// internal state
-	UINT32		m_internal;
+	UINT32      m_internal;
 };
 
 
@@ -493,7 +493,7 @@ public:
 
 private:
 	// internal state
-	input_code	m_code[16];
+	input_code  m_code[16];
 };
 
 
@@ -532,19 +532,19 @@ public:
 
 private:
 	// internal state
-	input_class &			m_class;				// reference to our class
-	astring					m_name;					// string name of device
-	int						m_devindex;				// device index of this device
-	input_device_item *		m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1];	// array of pointers to items
-	input_item_id			m_maxitem;				// maximum item index
-	void *					m_internal;				// internal callback pointer
+	input_class &           m_class;                // reference to our class
+	astring                 m_name;                 // string name of device
+	int                     m_devindex;             // device index of this device
+	input_device_item *     m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
+	input_item_id           m_maxitem;              // maximum item index
+	void *                  m_internal;             // internal callback pointer
 
 	// joystick information
-	joystick_map			m_joymap;				// joystick map for this device
-	INT32					m_joystick_deadzone;	// deadzone for joystick
-	INT32					m_joystick_saturation;	// saturation position for joystick
-	bool					m_steadykey_enabled;	// steadykey enabled for keyboards
-	bool					m_lightgun_reload_button; // lightgun reload hack
+	joystick_map            m_joymap;               // joystick map for this device
+	INT32                   m_joystick_deadzone;    // deadzone for joystick
+	INT32                   m_joystick_saturation;  // saturation position for joystick
+	bool                    m_steadykey_enabled;    // steadykey enabled for keyboards
+	bool                    m_lightgun_reload_button; // lightgun reload hack
 };
 
 
@@ -582,12 +582,12 @@ private:
 	void frame_callback();
 
 	// internal state
-	input_manager &			m_manager;				// reference to our manager
-	input_device *			m_device[DEVICE_INDEX_MAXIMUM];	// array of devices in this class
-	input_device_class		m_devclass;				// our device class
-	int						m_maxindex;				// maximum populated index
-	bool					m_enabled;				// is this class enabled?
-	bool					m_multi;				// are multiple instances of this class allowed?
+	input_manager &         m_manager;              // reference to our manager
+	input_device *          m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
+	input_device_class      m_devclass;             // our device class
+	int                     m_maxindex;             // maximum populated index
+	bool                    m_enabled;              // is this class enabled?
+	bool                    m_multi;                // are multiple instances of this class allowed?
 };
 
 
@@ -646,20 +646,20 @@ private:
 	bool code_check_axis(input_device_item &item, input_code code);
 
 	// internal state
-	running_machine &	m_machine;
-	input_code			m_switch_memory[64];
+	running_machine &   m_machine;
+	input_code          m_switch_memory[64];
 
 	// classes
-	input_class			m_keyboard_class;
-	input_class			m_mouse_class;
-	input_class			m_joystick_class;
-	input_class			m_lightgun_class;
-	input_class *		m_class[DEVICE_CLASS_MAXIMUM];
+	input_class         m_keyboard_class;
+	input_class         m_mouse_class;
+	input_class         m_joystick_class;
+	input_class         m_lightgun_class;
+	input_class *       m_class[DEVICE_CLASS_MAXIMUM];
 
 	// sequence polling state
-	input_seq			m_poll_seq;
-	osd_ticks_t			m_poll_seq_last_ticks;
-	input_item_class	m_poll_seq_class;
+	input_seq           m_poll_seq;
+	osd_ticks_t         m_poll_seq_last_ticks;
+	input_item_class    m_poll_seq_class;
 };
 
 
@@ -1084,4 +1084,4 @@ inline input_device_class input_device::devclass() const { return m_class.devcla
 inline running_machine &input_class::machine() const { return m_manager.machine(); }
 
 
-#endif	// __INPUT_H__
+#endif  // __INPUT_H__

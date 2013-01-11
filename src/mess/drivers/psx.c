@@ -80,16 +80,16 @@ static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 	struct PSXEXE_HEADER
 	{
 		UINT8 id[ 8 ];
-		UINT32 text;	/* SCE only */
-		UINT32 data;	/* SCE only */
+		UINT32 text;    /* SCE only */
+		UINT32 data;    /* SCE only */
 		UINT32 pc0;
-		UINT32 gp0;		/* SCE only */
+		UINT32 gp0;     /* SCE only */
 		UINT32 t_addr;
 		UINT32 t_size;
-		UINT32 d_addr;	/* SCE only */
-		UINT32 d_size;	/* SCE only */
-		UINT32 b_addr;	/* SCE only */
-		UINT32 b_size;	/* SCE only */
+		UINT32 d_addr;  /* SCE only */
+		UINT32 d_size;  /* SCE only */
+		UINT32 b_addr;  /* SCE only */
+		UINT32 b_size;  /* SCE only */
 		UINT32 s_addr;
 		UINT32 s_size;
 		UINT32 SavedSP;
@@ -493,7 +493,7 @@ WRITE8_MEMBER(psx1_state::psx_cd_w)
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8(psx_cd_r, psx_cd_w, 0xffffffff)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x801fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
@@ -512,7 +512,7 @@ static INPUT_PORTS_START( psx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START )  PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
@@ -532,7 +532,7 @@ static INPUT_PORTS_START( psx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START )  PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)

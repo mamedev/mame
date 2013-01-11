@@ -372,14 +372,14 @@ static const gfx_layout spritelayout =
 	{ 24,8,16,0 },
 	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
 	32*32
 };
 
 static GFXDECODE_START( simpl156 )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0,     32 )	/* Tiles (8x8) */
-	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0,     32 )	/* Tiles (16x16) */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32)	/* Sprites (16x16) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0,     32 )    /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0,     32 )    /* Tiles (16x16) */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32)    /* Sprites (16x16) */
 
 GFXDECODE_END
 
@@ -423,7 +423,7 @@ UINT16 simpl156_pri_callback(UINT16 x)
 static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	MCFG_CPU_PROGRAM_MAP(chainrec_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
@@ -1033,11 +1033,11 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 		UINT32 addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
-		                    19,18,17,16,
-		                    15,14,13,12,
-		                    11,10,9, 8,
-		                    7, 6, 5, 4,
-		                    3, 2, 1 );
+							19,18,17,16,
+							15,14,13,12,
+							11,10,9, 8,
+							7, 6, 5, 4,
+							3, 2, 1 );
 
 		buf1[addr] = rom[x];
 	}

@@ -225,9 +225,9 @@ ADDRESS_MAP_END
 
 static const r3000_cpu_core config =
 {
-	0,		/* 1 if we have an FPU, 0 otherwise */
-	4096,	/* code cache size */
-	4096	/* data cache size */
+	0,      /* 1 if we have an FPU, 0 otherwise */
+	4096,   /* code cache size */
+	4096    /* data cache size */
 };
 
 static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )

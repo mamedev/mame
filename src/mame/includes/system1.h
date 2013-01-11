@@ -114,4 +114,3 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
 	DECLARE_WRITE8_MEMBER(system1_videoram_bank_w);
 };
-

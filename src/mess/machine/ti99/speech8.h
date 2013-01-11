@@ -43,28 +43,28 @@ public:
 	DECLARE_WRITE8_MEMBER( spchrom_load_address );
 	DECLARE_WRITE8_MEMBER( spchrom_read_and_branch );
 
-	int				m_select_mask;
-	int				m_select_value;
+	int             m_select_mask;
+	int             m_select_value;
 
 protected:
-	void			device_start();
-	void			device_reset(void);
+	void            device_start();
+	void            device_reset(void);
 	const rom_entry *device_rom_region() const;
 	machine_config_constructor device_mconfig_additions() const;
 
 private:
-	tms5220n_device	*m_vsp;
-	UINT8			*m_speechrom;			// pointer to speech ROM data
-	int 			m_load_pointer;			// which 4-bit nibble will be affected by load address
-	int 			m_rombits_count;		// current bit position in ROM
-	UINT32			m_sprom_address;		// 18 bit pointer in ROM
-	UINT32			m_sprom_length;			// length of data pointed by speechrom_data, from 0 to 2^18
+	tms5220n_device *m_vsp;
+	UINT8           *m_speechrom;           // pointer to speech ROM data
+	int             m_load_pointer;         // which 4-bit nibble will be affected by load address
+	int             m_rombits_count;        // current bit position in ROM
+	UINT32          m_sprom_address;        // 18 bit pointer in ROM
+	UINT32          m_sprom_length;         // length of data pointed by speechrom_data, from 0 to 2^18
 
 	// Ready line to the CPU
 	devcb_resolved_write_line m_ready;
 };
 
-#define MCFG_TISPEECH8_ADD(_tag, _conf)		\
+#define MCFG_TISPEECH8_ADD(_tag, _conf)     \
 	MCFG_DEVICE_ADD(_tag, TI99_SPEECH8, 0)  \
 	MCFG_DEVICE_CONFIG(_conf)
 

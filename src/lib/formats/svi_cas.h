@@ -14,4 +14,3 @@
 CASSETTE_FORMATLIST_EXTERN(svi_cassette_formats);
 
 #endif /* SVI_CAS_H */
-

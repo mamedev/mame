@@ -61,12 +61,12 @@ typedef double (*adc0808_analog_read) (device_t *device);
 
 struct adc0808_interface
 {
-	devcb_write_line		m_out_eoc_cb;
+	devcb_write_line        m_out_eoc_cb;
 
-	adc0808_analog_read		m_in_vref_pos_func;
-	adc0808_analog_read		m_in_vref_neg_func;
+	adc0808_analog_read     m_in_vref_pos_func;
+	adc0808_analog_read     m_in_vref_neg_func;
 
-	adc0808_analog_read		m_in_in_func[8];
+	adc0808_analog_read     m_in_in_func[8];
 };
 
 
@@ -76,32 +76,32 @@ class adc0808_device :  public device_t,
 						public adc0808_interface
 {
 public:
-    // construction/destruction
-    adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( data_r );
-    DECLARE_WRITE8_MEMBER( ale_w );
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( ale_w );
 
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_write_line			m_out_eoc_func;
+	devcb_resolved_write_line           m_out_eoc_func;
 
-	int m_address;						// analog channel address
-	int m_start;						// start conversion pin
-	int m_eoc;							// end of conversion pin
-	int m_next_eoc;						// next value end of conversion pin
+	int m_address;                      // analog channel address
+	int m_start;                        // start conversion pin
+	int m_eoc;                          // end of conversion pin
+	int m_next_eoc;                     // next value end of conversion pin
 
-	UINT8 m_sar;						// successive approximation register
+	UINT8 m_sar;                        // successive approximation register
 
-	int m_cycle;						// clock cycle counter
-	int m_bit;							// bit counter
+	int m_cycle;                        // clock cycle counter
+	int m_bit;                          // bit counter
 
 	// timers
 	emu_timer *m_cycle_timer;

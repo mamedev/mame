@@ -69,13 +69,13 @@ struct saa5050_interface
 
 // ======================> saa5050_device
 
-class saa5050_device :	public device_t,
-                        public saa5050_interface
+class saa5050_device :  public device_t,
+						public saa5050_interface
 {
 public:
-    // construction/destruction
-    saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
-    saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -99,15 +99,15 @@ protected:
 		TYPE_5052
 	};
 
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 
 private:
 	void process_control_character(UINT8 data);
 	void get_character_data(UINT8 data);
 
-	devcb_resolved_read8	m_in_d_func;
+	devcb_resolved_read8    m_in_d_func;
 
 	const UINT8 *m_char_rom;
 	UINT8 m_code;
@@ -138,8 +138,8 @@ private:
 class saa5052_device :  public saa5050_device
 {
 public:
-    // construction/destruction
-    saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

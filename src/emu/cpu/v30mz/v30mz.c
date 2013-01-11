@@ -51,32 +51,32 @@ enum WREGS { AW=0, CW, DW, BW, SP, BP, IX, IY };
 #define NEC_NMI_INT_VECTOR 2
 
 enum BREGS {
-   AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
-   AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
-   CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
-   CH = NATIVE_ENDIAN_VALUE_LE_BE(0x3, 0x2),
-   DL = NATIVE_ENDIAN_VALUE_LE_BE(0x4, 0x5),
-   DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
-   BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
-   BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
-  SPL = NATIVE_ENDIAN_VALUE_LE_BE(0x8, 0x9),
-  SPH = NATIVE_ENDIAN_VALUE_LE_BE(0x9, 0x8),
-  BPL = NATIVE_ENDIAN_VALUE_LE_BE(0xa, 0xb),
-  BPH = NATIVE_ENDIAN_VALUE_LE_BE(0xb, 0xa),
-  IXL = NATIVE_ENDIAN_VALUE_LE_BE(0xc, 0xd),
-  IXH = NATIVE_ENDIAN_VALUE_LE_BE(0xd, 0xc),
-  IYL = NATIVE_ENDIAN_VALUE_LE_BE(0xe, 0xf),
-  IYH = NATIVE_ENDIAN_VALUE_LE_BE(0xf, 0xe)
+	AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
+	AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
+	CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
+	CH = NATIVE_ENDIAN_VALUE_LE_BE(0x3, 0x2),
+	DL = NATIVE_ENDIAN_VALUE_LE_BE(0x4, 0x5),
+	DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
+	BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
+	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
+	SPL = NATIVE_ENDIAN_VALUE_LE_BE(0x8, 0x9),
+	SPH = NATIVE_ENDIAN_VALUE_LE_BE(0x9, 0x8),
+	BPL = NATIVE_ENDIAN_VALUE_LE_BE(0xa, 0xb),
+	BPH = NATIVE_ENDIAN_VALUE_LE_BE(0xb, 0xa),
+	IXL = NATIVE_ENDIAN_VALUE_LE_BE(0xc, 0xd),
+	IXH = NATIVE_ENDIAN_VALUE_LE_BE(0xd, 0xc),
+	IYL = NATIVE_ENDIAN_VALUE_LE_BE(0xe, 0xf),
+	IYH = NATIVE_ENDIAN_VALUE_LE_BE(0xf, 0xe)
 };
 
 
-#define CF		(m_CarryVal!=0)
-#define SF		(m_SignVal<0)
-#define ZF		(m_ZeroVal==0)
-#define PF		m_parity_table[(UINT8)m_ParityVal]
-#define AF		(m_AuxVal!=0)
-#define OF		(m_OverVal!=0)
-#define MD		(m_MF!=0)
+#define CF      (m_CarryVal!=0)
+#define SF      (m_SignVal<0)
+#define ZF      (m_ZeroVal==0)
+#define PF      m_parity_table[(UINT8)m_ParityVal]
+#define AF      (m_AuxVal!=0)
+#define OF      (m_OverVal!=0)
+#define MD      (m_MF!=0)
 
 
 /***************************************************************************/
@@ -207,7 +207,7 @@ void v30mz_cpu_device::state_string_export(const device_state_entry &entry, astr
 					flags & 0x0002 ? 'N':'.',
 					flags & 0x0001 ? 'C':'.');
 			}
-            break;
+			break;
 	}
 }
 
@@ -522,7 +522,7 @@ inline void v30mz_cpu_device::PutbackRMWord(UINT16 data)
 	{
 		m_regs.w[ m_Mod_RM.RM.w[ m_modrm ] ] = data;
 	}
-    else
+	else
 	{
 		write_word( m_ea, data );
 	}
@@ -1199,44 +1199,44 @@ inline void v30mz_cpu_device::JMP(bool cond)
 
 inline void v30mz_cpu_device::ADJ4(INT8 param1,INT8 param2)
 {
-    if (AF || ((m_regs.b[AL] & 0xf) > 9))
-    {
-        UINT16 tmp;
-        tmp = m_regs.b[AL] + param1;
-        m_regs.b[AL] = tmp;
-        m_AuxVal = 1;
-        m_CarryVal |= tmp & 0x100;
-    }
-    if (CF || (m_regs.b[AL]>0x9f))
-    {
-        m_regs.b[AL] += param2;
-        m_CarryVal = 1;
-    }
-    set_SZPF_Byte(m_regs.b[AL]);
+	if (AF || ((m_regs.b[AL] & 0xf) > 9))
+	{
+		UINT16 tmp;
+		tmp = m_regs.b[AL] + param1;
+		m_regs.b[AL] = tmp;
+		m_AuxVal = 1;
+		m_CarryVal |= tmp & 0x100;
+	}
+	if (CF || (m_regs.b[AL]>0x9f))
+	{
+		m_regs.b[AL] += param2;
+		m_CarryVal = 1;
+	}
+	set_SZPF_Byte(m_regs.b[AL]);
 }
 
 
 inline void v30mz_cpu_device::ADJB(INT8 param1, INT8 param2)
 {
-    if (AF || ((m_regs.b[AL] & 0xf) > 9))
-    {
-        m_regs.b[AL] += param1;
-        m_regs.b[AH] += param2;
-        m_AuxVal = 1;
-        m_CarryVal = 1;
-    }
-    else
-    {
-        m_AuxVal = 0;
-        m_CarryVal = 0;
-    }
-    m_regs.b[AL] &= 0x0F;
+	if (AF || ((m_regs.b[AL] & 0xf) > 9))
+	{
+		m_regs.b[AL] += param1;
+		m_regs.b[AH] += param2;
+		m_AuxVal = 1;
+		m_CarryVal = 1;
+	}
+	else
+	{
+		m_AuxVal = 0;
+		m_CarryVal = 0;
+	}
+	m_regs.b[AL] &= 0x0F;
 }
 
 
 void v30mz_cpu_device::interrupt(int int_num)
 {
-    PUSH( CompressFlags() );
+	PUSH( CompressFlags() );
 	CLK(2);
 	m_TF = m_IF = 0;
 
@@ -1266,7 +1266,7 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 		{
 			return;
 		}
-	    m_nmi_state = state;
+		m_nmi_state = state;
 		if (state != CLEAR_LINE)
 		{
 			m_pending_irq |= NMI_IRQ;
@@ -1456,56 +1456,56 @@ void v30mz_cpu_device::execute_run()
 
 					switch ( fetch() )
 					{
-					case 0x10:	/* Test */
+					case 0x10:  /* Test */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = m_regs.b[CL] & 0x7;
 						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
 						m_CarryVal = m_OverVal = 0;
 						break;
-					case 0x11:	/* Test */
+					case 0x11:  /* Test */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = m_regs.b[CL] & 0xf;
 						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
 						m_CarryVal = m_OverVal = 0;
 						break;
-					case 0x12:	/* Clr */
+					case 0x12:  /* Clr */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = m_regs.b[CL] & 0x7;
 						tmp &= ~(1<<tmp2);
 						PutbackRMByte(tmp);
 						break;
-					case 0x13:	/* Clr */
+					case 0x13:  /* Clr */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = m_regs.b[CL] & 0xf;
 						tmp &= ~(1<<tmp2);
 						PutbackRMWord(tmp);
 						break;
-					case 0x14:	/* Set */
+					case 0x14:  /* Set */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = m_regs.b[CL] & 0x7;
 						tmp |= (1<<tmp2);
 						PutbackRMByte(tmp);
 						break;
-					case 0x15:	/* Set */
+					case 0x15:  /* Set */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = m_regs.b[CL] & 0xf;
 						tmp |= (1<<tmp2);
 						PutbackRMWord(tmp);
 						break;
-					case 0x16:	/* Not */
+					case 0x16:  /* Not */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = m_regs.b[CL] & 0x7;
 						tmp ^= (1 << tmp2);
 						PutbackRMByte(tmp);
 						break;
-					case 0x17:	/* Not */
+					case 0x17:  /* Not */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = m_regs.b[CL] & 0xf;
@@ -1513,56 +1513,56 @@ void v30mz_cpu_device::execute_run()
 						PutbackRMWord(tmp);
 						break;
 
-					case 0x18:	/* Test */
+					case 0x18:  /* Test */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = fetch() & 0x7;
 						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
 						m_CarryVal = m_OverVal = 0;
 						break;
-					case 0x19:	/* Test */
+					case 0x19:  /* Test */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = fetch() & 0xf;
 						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
 						m_CarryVal = m_OverVal = 0;
 						break;
-					case 0x1a:	/* Clr */
+					case 0x1a:  /* Clr */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = fetch() & 0x7;
 						tmp &= ~(1<<tmp2);
 						PutbackRMByte(tmp);
 						break;
-					case 0x1b:	/* Clr */
+					case 0x1b:  /* Clr */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = fetch() & 0xf;
 						tmp &= ~(1<<tmp2);
 						PutbackRMWord(tmp);
 						break;
-					case 0x1c:	/* Set */
+					case 0x1c:  /* Set */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = fetch() & 0x7;
 						tmp |= (1<<tmp2);
 						PutbackRMByte(tmp);
 						break;
-					case 0x1d:	/* Set */
+					case 0x1d:  /* Set */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = fetch() & 0xf;
 						tmp |= (1<<tmp2);
 						PutbackRMWord(tmp);
 						break;
-					case 0x1e:	/* Not */
+					case 0x1e:  /* Not */
 						m_modrm = fetch();
 						tmp = GetRMByte();
 						tmp2 = fetch() & 0x7;
 						tmp ^= (1 << tmp2);
 						PutbackRMByte(tmp);
 						break;
-					case 0x1f:	/* Not */
+					case 0x1f:  /* Not */
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						tmp2 = fetch() & 0xf;
@@ -1703,7 +1703,7 @@ void v30mz_cpu_device::execute_run()
 						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield INS\n", tag(), pc()); break;
 					case 0x33:
 						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield EXT\n", tag(), pc()); break;
-					case 0x92:	/* V25/35 FINT */
+					case 0x92:  /* V25/35 FINT */
 						CLK(2);
 						break;
 					case 0xe0:
@@ -2242,7 +2242,7 @@ void v30mz_cpu_device::execute_run()
 				m_regs.w[IY] = POP();
 				m_regs.w[IX] = POP();
 				m_regs.w[BP] = POP();
-				               POP();
+								POP();
 				m_regs.w[BW] = POP();
 				m_regs.w[DW] = POP();
 				m_regs.w[CW] = POP();
@@ -2277,20 +2277,20 @@ void v30mz_cpu_device::execute_run()
 
 					switch (next)
 					{
-				    case 0x6c:	CLK(2); if (c) do { i_insb();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0x6d:	CLK(2); if (c) do { i_insw();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0x6e:	CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0x6f:	CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa4:	CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa5:	CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa6:	CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa7:	CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xaa:	CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xab:	CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xac:	CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xad:	CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xae:	CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xaf:	CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
 						logerror("%s: %06x: REPNC invalid\n", tag(), pc() );
 						// Decrement IP so the normal instruction will be executed next
@@ -2308,20 +2308,20 @@ void v30mz_cpu_device::execute_run()
 
 					switch (next)
 					{
-				    case 0x6c:	CLK(2); if (c) do { i_insb();  c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0x6d:	CLK(2); if (c) do { i_insw();  c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0x6e:	CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0x6f:	CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa4:	CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa5:	CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa6:	CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && CF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xa7:	CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && CF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xaa:	CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xab:	CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xac:	CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xad:	CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && CF);	m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xae:	CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && CF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-				    case 0xaf:	CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
 						logerror("%s: %06x: REPC invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
@@ -2457,14 +2457,14 @@ void v30mz_cpu_device::execute_run()
 				else                             { CLK(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      ADDB(); PutbackRMByte(m_dst);	break;
-				case 0x08:                      ORB();  PutbackRMByte(m_dst);	break;
-				case 0x10: m_src += CF ? 1 : 0;	ADDB();	PutbackRMByte(m_dst);	break;
-				case 0x18: m_src += CF ? 1 : 0;	SUBB();	PutbackRMByte(m_dst);	break;
-				case 0x20:                      ANDB(); PutbackRMByte(m_dst);	break;
-				case 0x28:                      SUBB(); PutbackRMByte(m_dst);	break;
-				case 0x30:                      XORB(); PutbackRMByte(m_dst);	break;
-				case 0x38:                      SUBB();                         break;	/* CMP */
+				case 0x00:                      ADDB(); PutbackRMByte(m_dst);   break;
+				case 0x08:                      ORB();  PutbackRMByte(m_dst);   break;
+				case 0x10: m_src += CF ? 1 : 0; ADDB(); PutbackRMByte(m_dst);   break;
+				case 0x18: m_src += CF ? 1 : 0; SUBB(); PutbackRMByte(m_dst);   break;
+				case 0x20:                      ANDB(); PutbackRMByte(m_dst);   break;
+				case 0x28:                      SUBB(); PutbackRMByte(m_dst);   break;
+				case 0x30:                      XORB(); PutbackRMByte(m_dst);   break;
+				case 0x38:                      SUBB();                         break;  /* CMP */
 				}
 				break;
 
@@ -2478,14 +2478,14 @@ void v30mz_cpu_device::execute_run()
 				else                             { CLK(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      ADDW(); PutbackRMWord(m_dst);	break;
-				case 0x08:                      ORW();  PutbackRMWord(m_dst);	break;
-				case 0x10: m_src += CF ? 1 : 0;	ADDW();	PutbackRMWord(m_dst);	break;
-				case 0x18: m_src += CF ? 1 : 0;	SUBW();	PutbackRMWord(m_dst);	break;
-				case 0x20:                      ANDW();	PutbackRMWord(m_dst);	break;
-				case 0x28:                      SUBW(); PutbackRMWord(m_dst);	break;
-				case 0x30:                      XORW(); PutbackRMWord(m_dst);	break;
-				case 0x38:                      SUBW();                         break;	/* CMP */
+				case 0x00:                      ADDW(); PutbackRMWord(m_dst);   break;
+				case 0x08:                      ORW();  PutbackRMWord(m_dst);   break;
+				case 0x10: m_src += CF ? 1 : 0; ADDW(); PutbackRMWord(m_dst);   break;
+				case 0x18: m_src += CF ? 1 : 0; SUBW(); PutbackRMWord(m_dst);   break;
+				case 0x20:                      ANDW(); PutbackRMWord(m_dst);   break;
+				case 0x28:                      SUBW(); PutbackRMWord(m_dst);   break;
+				case 0x30:                      XORW(); PutbackRMWord(m_dst);   break;
+				case 0x38:                      SUBW();                         break;  /* CMP */
 				}
 				break;
 
@@ -2499,13 +2499,13 @@ void v30mz_cpu_device::execute_run()
 				else                             { CLK(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      ADDB(); PutbackRMByte(m_dst);	break;
-				case 0x08:                      ORB();  PutbackRMByte(m_dst);	break;
-				case 0x10: m_src += CF ? 1 : 0;	ADDB();	PutbackRMByte(m_dst);	break;
-				case 0x18: m_src += CF ? 1 : 0;	SUBB();	PutbackRMByte(m_dst);	break;
-				case 0x20:                      ANDB(); PutbackRMByte(m_dst);	break;
-				case 0x28:                      SUBB(); PutbackRMByte(m_dst);	break;
-				case 0x30:                      XORB(); PutbackRMByte(m_dst);	break;
+				case 0x00:                      ADDB(); PutbackRMByte(m_dst);   break;
+				case 0x08:                      ORB();  PutbackRMByte(m_dst);   break;
+				case 0x10: m_src += CF ? 1 : 0; ADDB(); PutbackRMByte(m_dst);   break;
+				case 0x18: m_src += CF ? 1 : 0; SUBB(); PutbackRMByte(m_dst);   break;
+				case 0x20:                      ANDB(); PutbackRMByte(m_dst);   break;
+				case 0x28:                      SUBB(); PutbackRMByte(m_dst);   break;
+				case 0x30:                      XORB(); PutbackRMByte(m_dst);   break;
 				case 0x38:                      SUBB();                         break; /* CMP */
 				}
 				break;
@@ -2606,16 +2606,16 @@ void v30mz_cpu_device::execute_run()
 				CLKM(2,3);
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:	/* mov es,ew */
+				case 0x00:  /* mov es,ew */
 					m_sregs[ES] = m_src;
 					break;
-				case 0x08:	/* mov cs,ew */
+				case 0x08:  /* mov cs,ew */
 					m_sregs[CS] = m_src;
 					break;
-				case 0x10:	/* mov ss,ew */
+				case 0x10:  /* mov ss,ew */
 					m_sregs[SS] = m_src;
 					break;
-				case 0x18:	/* mov ds,ew */
+				case 0x18:  /* mov ds,ew */
 					m_sregs[DS] = m_src;
 					break;
 				default:
@@ -3356,20 +3356,20 @@ void v30mz_cpu_device::execute_run()
 
 					switch (next)
 					{
-					case 0x6c:	CLK(3); if (c) do { i_insb();  c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6d:  CLK(3); if (c) do { i_insw();  c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6e:	CLK(3); if (c) do { i_outsb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6f:	CLK(3); if (c) do { i_outsw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa4:	CLK(3); if (c) do { i_movsb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa5:	CLK(3); if (c) do { i_movsw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa6:	CLK(3); if (c) do { i_cmpsb(); c--; } while (c>0 && !ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa7:	CLK(3); if (c) do { i_cmpsw(); c--; } while (c>0 && !ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaa:	CLK(3); if (c) do { i_stosb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xab:	CLK(3); if (c) do { i_stosw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xac:	CLK(3); if (c) do { i_lodsb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xad:	CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xae:	CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && !ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaf:	CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && !ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  CLK(3); if (c) do { i_insb();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  CLK(3); if (c) do { i_insw();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  CLK(3); if (c) do { i_outsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  CLK(3); if (c) do { i_outsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  CLK(3); if (c) do { i_movsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  CLK(3); if (c) do { i_movsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  CLK(3); if (c) do { i_cmpsb(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  CLK(3); if (c) do { i_cmpsw(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  CLK(3); if (c) do { i_stosb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  CLK(3); if (c) do { i_stosw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  CLK(3); if (c) do { i_lodsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
 						logerror("%s: %06x: REPNE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
@@ -3386,20 +3386,20 @@ void v30mz_cpu_device::execute_run()
 
 					switch (next)
 					{
-					case 0x6c:	CLK(3); if (c) do { i_insb();  c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6d:	CLK(3); if (c) do { i_insw();  c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6e:	CLK(3); if (c) do { i_outsb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6f:	CLK(3); if (c) do { i_outsw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa4:	CLK(3); if (c) do { i_movsb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa5:	CLK(3); if (c) do { i_movsw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa6:	CLK(3); if (c) do { i_cmpsb(); c--; } while (c>0 && ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa7:	CLK(3); if (c) do { i_cmpsw(); c--; } while (c>0 && ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaa:	CLK(3); if (c) do { i_stosb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xab:	CLK(3); if (c) do { i_stosw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xac:	CLK(3); if (c) do { i_lodsb(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xad:	CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);			m_regs.w[CW]=c;	m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xae:	CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaf:	CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && ZF);	m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  CLK(3); if (c) do { i_insb();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  CLK(3); if (c) do { i_insw();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  CLK(3); if (c) do { i_outsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  CLK(3); if (c) do { i_outsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  CLK(3); if (c) do { i_movsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  CLK(3); if (c) do { i_movsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  CLK(3); if (c) do { i_cmpsb(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  CLK(3); if (c) do { i_cmpsw(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  CLK(3); if (c) do { i_stosb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  CLK(3); if (c) do { i_stosw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  CLK(3); if (c) do { i_lodsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
 						logerror("%s: %06x: REPE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
@@ -3429,7 +3429,7 @@ void v30mz_cpu_device::execute_run()
 					tmp = GetRMByte();
 					switch ( m_modrm & 0x38 )
 					{
-					case 0x00:	/* TEST */
+					case 0x00:  /* TEST */
 						tmp &= fetch();
 						m_CarryVal = m_OverVal = 0;
 						set_SZPF_Byte(tmp);
@@ -3438,30 +3438,30 @@ void v30mz_cpu_device::execute_run()
 					case 0x08:
 						logerror("%s: %06x: Undefined opcode 0xf6 0x08\n", tag(), pc());
 						break;
-					case 0x10:	/* NOT */
+					case 0x10:  /* NOT */
 						PutbackRMByte(~tmp);
 						CLKM(1,3);
 						break;
-					case 0x18:	/* NEG */
+					case 0x18:  /* NEG */
 						m_CarryVal = (tmp!=0) ? 1 : 0;
 						tmp = (~tmp)+1;
 						set_SZPF_Byte(tmp);
 						PutbackRMByte(tmp&0xff);
 						CLKM(1,3);
 						break;
-					case 0x20:	/* MULU */
+					case 0x20:  /* MULU */
 						uresult = m_regs.b[AL] * tmp;
 						m_regs.w[AW] = (UINT16)uresult;
 						m_CarryVal = m_OverVal = (m_regs.b[AH]!=0) ? 1 : 0;
 						CLKM(3,4);
 						break;
-					case 0x28:	/* MUL */
+					case 0x28:  /* MUL */
 						result = (INT16)((INT8)m_regs.b[AL])*(INT16)((INT8)tmp);
 						m_regs.w[AW] = (UINT16)result;
 						m_CarryVal = m_OverVal = (m_regs.b[AH]!=0) ? 1 : 0;
 						CLKM(3,4);
 						break;
-					case 0x30:	/* DIVU */
+					case 0x30:  /* DIVU */
 						if (tmp)
 						{
 							uresult = m_regs.w[AW];
@@ -3482,7 +3482,7 @@ void v30mz_cpu_device::execute_run()
 						}
 						CLKM(15,16);
 						break;
-					case 0x38:	/* DIV */
+					case 0x38:  /* DIV */
 						if (tmp)
 						{
 							result = (INT16)m_regs.w[AW];
@@ -3518,7 +3518,7 @@ void v30mz_cpu_device::execute_run()
 					tmp = GetRMWord();
 					switch ( m_modrm & 0x38 )
 					{
-					case 0x00:	/* TEST */
+					case 0x00:  /* TEST */
 						tmp2 = fetch_word();
 						tmp &= tmp2;
 						m_CarryVal = m_OverVal = 0;
@@ -3528,32 +3528,32 @@ void v30mz_cpu_device::execute_run()
 					case 0x08:
 						logerror("%s: %06x: Undefined opcode 0xf7 0x08\n", tag(), pc());
 						break;
-					case 0x10:	/* NOT */
+					case 0x10:  /* NOT */
 						PutbackRMWord(~tmp);
 						CLKM(1,3);
 						break;
-					case 0x18:	/* NEG */
+					case 0x18:  /* NEG */
 						m_CarryVal = (tmp!=0) ? 1 : 0;
 						tmp = (~tmp) + 1;
 						set_SZPF_Word(tmp);
 						PutbackRMWord(tmp);
 						CLKM(1,3);
 						break;
-					case 0x20:	/* MULU */
+					case 0x20:  /* MULU */
 						uresult = m_regs.w[AW]*tmp;
 						m_regs.w[AW] = uresult & 0xffff;
 						m_regs.w[DW] = ((UINT32)uresult)>>16;
 						m_CarryVal = m_OverVal = (m_regs.w[DW] != 0) ? 1 : 0;
 						CLKM(3,4);
 						break;
-					case 0x28:	/* MUL */
+					case 0x28:  /* MUL */
 						result = (INT32)((INT16)m_regs.w[AW]) * (INT32)((INT16)tmp);
 						m_regs.w[AW] = result & 0xffff;
 						m_regs.w[DW] = result >> 16;
 						m_CarryVal = m_OverVal = (m_regs.w[DW] != 0) ? 1 : 0;
 						CLKM(3,4);
 						break;
-					case 0x30:	/* DIVU */
+					case 0x30:  /* DIVU */
 						if (tmp)
 						{
 							uresult = (((UINT32)m_regs.w[DW]) << 16) | m_regs.w[AW];
@@ -3574,7 +3574,7 @@ void v30mz_cpu_device::execute_run()
 						}
 						CLKM(23,24);
 						break;
-					case 0x38:	/* DIV */
+					case 0x38:  /* DIV */
 						if (tmp)
 						{
 							result = ((UINT32)m_regs.w[DW] << 16) + m_regs.w[AW];
@@ -3637,7 +3637,7 @@ void v30mz_cpu_device::execute_run()
 					tmp = GetRMByte();
 					switch ( m_modrm & 0x38 )
 					{
-					case 0x00:	/* INC */
+					case 0x00:  /* INC */
 						tmp1 = tmp+1;
 						m_OverVal = (tmp==0x7f);
 						set_AF(tmp1,tmp,1);
@@ -3645,7 +3645,7 @@ void v30mz_cpu_device::execute_run()
 						PutbackRMByte(tmp1);
 						CLKM(1,3);
 						break;
-					case 0x08:	/* DEC */
+					case 0x08:  /* DEC */
 						tmp1 = tmp-1;
 						m_OverVal = (tmp==0x80);
 						set_AF(tmp1,tmp,1);
@@ -3667,7 +3667,7 @@ void v30mz_cpu_device::execute_run()
 					tmp = GetRMWord();
 					switch ( m_modrm & 0x38 )
 					{
-					case 0x00:	/* INC */
+					case 0x00:  /* INC */
 						tmp1 = tmp+1;
 						m_OverVal = (tmp==0x7fff);
 						set_AF(tmp1,tmp,1);
@@ -3675,7 +3675,7 @@ void v30mz_cpu_device::execute_run()
 						PutbackRMWord(tmp1);
 						CLKM(1,3);
 						break;
-					case 0x08:	/* DEC */
+					case 0x08:  /* DEC */
 						tmp1 = tmp-1;
 						m_OverVal = (tmp==0x8000);
 						set_AF(tmp1,tmp,1);
@@ -3683,12 +3683,12 @@ void v30mz_cpu_device::execute_run()
 						PutbackRMWord(tmp1);
 						CLKM(1,3);
 						break;
-					case 0x10:	/* CALL */
+					case 0x10:  /* CALL */
 						PUSH(m_ip);
 						m_ip = tmp;
 						CLKM(5,6);
 						break;
-					case 0x18:	/* CALL FAR */
+					case 0x18:  /* CALL FAR */
 						tmp1 = m_sregs[CS];
 						m_sregs[CS] = GetnextRMWord();
 						PUSH(tmp1);
@@ -3696,11 +3696,11 @@ void v30mz_cpu_device::execute_run()
 						m_ip = tmp;
 						CLKM(5,12);
 						break;
-					case 0x20:	/* JMP */
+					case 0x20:  /* JMP */
 						m_ip = tmp;
 						CLKM(4,5);
 						break;
-					case 0x28:	/* JMP FAR */
+					case 0x28:  /* JMP FAR */
 						m_ip = tmp;
 						m_sregs[CS] = GetnextRMWord();
 						CLK(10);
@@ -3724,4 +3724,3 @@ void v30mz_cpu_device::execute_run()
 		}
 	}
 }
-

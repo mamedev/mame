@@ -15,7 +15,7 @@ class itt3030_state : public driver_device
 public:
 	itt3030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	// devices
@@ -88,14 +88,14 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8, 16,				/* 8x16 characters */
-	128,				/* 128 characters */
-	1,				  /* 1 bits per pixel */
-	{0},				/* no bitplanes; 1 bit per pixel */
+	8, 16,              /* 8x16 characters */
+	128,                /* 128 characters */
+	1,                /* 1 bits per pixel */
+	{0},                /* no bitplanes; 1 bit per pixel */
 	{7, 6, 5, 4, 3, 2, 1, 0},
 	{ 0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* size of one char */
+		8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16                    /* size of one char */
 };
 
 static GFXDECODE_START( itt3030 )

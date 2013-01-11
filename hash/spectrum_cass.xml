@@ -2,39 +2,39 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- Preliminary list.  There are something like 15,000 unique Spectrum games and countless re-releases, so creating a real list will require
-                        dedicated effort.   For the time being I'm just listing some important software and good test cases (custom protection
-                        loaders etc.) but eventually a proper list should be created.  -->
+						dedicated effort.   For the time being I'm just listing some important software and good test cases (custom protection
+						loaders etc.) but eventually a proper list should be created.  -->
 
 <!-- to load software in 16/48K mode you must use the following sequence at the prompt
 
-     "J" "shift+P" "shift+P" "enter"  (in non-MESS emulators this is often "ctrl+P")
+		"J" "shift+P" "shift+P" "enter"  (in non-MESS emulators this is often "ctrl+P")
 
-     this will enter the command LOAD "" and execute it
+		this will enter the command LOAD "" and execute it
 
-     You must then of course play the tape from the menu in MESS (you'll need to turn SCRLOCK off and hit TAB to get the MESS menu)
+		You must then of course play the tape from the menu in MESS (you'll need to turn SCRLOCK off and hit TAB to get the MESS menu)
 
 -->
 
 <!-- COMPATIBILITY
-     The MESS emulation at the time of writing isn't very good, the following emulators are used to determine how things should work
+		The MESS emulation at the time of writing isn't very good, the following emulators are used to determine how things should work
 
-      EmuZWin (v2.7 release 2.8)         - Closed Source, runs some images (Gremlin 2 type*) which fail on the emulators below  - http://kolmck.net/apps/EmuZWin_Eng.htm
-      Fuse (Free Unix Spectrum Emulator) - Free, High Compatibility can run some of the trickier images, Windows port available - http://fuse-emulator.sourceforge.net/
-      Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/
+		EmuZWin (v2.7 release 2.8)         - Closed Source, runs some images (Gremlin 2 type*) which fail on the emulators below  - http://kolmck.net/apps/EmuZWin_Eng.htm
+		Fuse (Free Unix Spectrum Emulator) - Free, High Compatibility can run some of the trickier images, Windows port available - http://fuse-emulator.sourceforge.net/
+		Spectaculator                      - Commercial, a bit more user friendly than above, similar compatibility               - http://www.spectaculator.com/
 
-     Note, even with those emulators you'll have to turn off some of the speed cheats on loading to get good compatibilty for example, in Fuse
-      Use Tape Traps
-      Fastloading
-      Detect Loaders
-      Accelerate Loaders
+		Note, even with those emulators you'll have to turn off some of the speed cheats on loading to get good compatibilty for example, in Fuse
+		Use Tape Traps
+		Fastloading
+		Detect Loaders
+		Accelerate Loaders
 
-     MESS doesn't have any accelerated loading so some games which require the tricks to be disabled in other emulators work in MESS without trickery, eg Xanthius
+		MESS doesn't have any accelerated loading so some games which require the tricks to be disabled in other emulators work in MESS without trickery, eg Xanthius
 
-     http://newton.sunderland.ac.uk/~specfreak/Schemes/schemes.html is a rather outdated guide mentioning some of the custom loaders, and showing disassemblies of them.
+		http://newton.sunderland.ac.uk/~specfreak/Schemes/schemes.html is a rather outdated guide mentioning some of the custom loaders, and showing disassemblies of them.
 
-     legacy emulators including Real Spectrum ( http://zxm.speccy.cz/realspec/ ) appear to struggle with some of the more complex tape protections
+		legacy emulators including Real Spectrum ( http://zxm.speccy.cz/realspec/ ) appear to struggle with some of the more complex tape protections
 
-     * Gremlin 2 type images include 'M.A.S.K' and 'Basil The Great Mouse Detective'
+		* Gremlin 2 type images include 'M.A.S.K' and 'Basil The Great Mouse Detective'
 
 
 
@@ -362,7 +362,7 @@
 	</software>
 
 	<!-- OK -->
-  <!-- has load timer -->
+	<!-- has load timer -->
 	<software name="batmanb" cloneof="batman" >
 		<description>Batman (set 3)</description>
 		<year>1986</year>
@@ -387,7 +387,7 @@
 	</software>
 
 	<!-- OK -->
-  <!-- colourful loader -->
+	<!-- colourful loader -->
 	<software name="batmand" cloneof="batman">
 		<description>Batman (set 5)</description>
 		<year>1986</year>
@@ -457,7 +457,7 @@
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="42011">
 				<rom name="snare - alternate - side a.tzx" size="42011" crc="48239344" sha1="eeaab4c697e35e2f7bd452906314948134933cfc" offset="0"/>
-    	<!-- side B is for the Sam Coupe, see samcoupe_cass.xml -->
+		<!-- side B is for the Sam Coupe, see samcoupe_cass.xml -->
 			</dataarea>
 		</part>
 	</software>

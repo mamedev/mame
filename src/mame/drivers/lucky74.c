@@ -756,28 +756,28 @@
 *****************************************************************************************/
 
 
-#define MASTER_CLOCK		XTAL_12MHz		/* confirmed */
+#define MASTER_CLOCK        XTAL_12MHz      /* confirmed */
 
 /* custom 06B49P clocks */
-#define C_06B49P_CLKOUT_01	(MASTER_CLOCK/2)		/* 6 MHz. */
-#define C_06B49P_CLKOUT_02	(MASTER_CLOCK/4)		/* 3 MHz. */
-#define C_06B49P_CLKOUT_03	(MASTER_CLOCK/4)		/* 3 MHz. */
-#define C_06B49P_CLKOUT_04	(MASTER_CLOCK/8)		/* 1.5 MHz. */
-#define C_06B49P_CLKOUT_05	(MASTER_CLOCK/16)		/* 750 kHz. */
-#define C_06B49P_CLKOUT_06	(MASTER_CLOCK/32)		/* 375 kHz. */
-#define C_06B49P_CLKOUT_07	(MASTER_CLOCK/64)		/* 187.5 kHz. */
-#define C_06B49P_CLKOUT_08	(MASTER_CLOCK/128)		/* 93.75 kHz. */
-#define C_06B49P_CLKOUT_09	(MASTER_CLOCK/256)		/* 46875 Hz. */
-#define C_06B49P_CLKOUT_10	(7782)					/* 7782 Hz. measured */
-#define C_06B49P_CLKOUT_11	(3920)					/* 3920 Hz. measured */
-#define C_06B49P_CLKOUT_12	(1960)					/* 1960 Hz. measured */
-#define C_06B49P_CLKOUT_13	(950)					/* 950 Hz. measured */
-#define C_06B49P_CLKOUT_14	(475)					/* 475 Hz. measured */
-#define C_06B49P_CLKOUT_15	(237)					/* 237 Hz. measured */
-#define C_06B49P_CLKOUT_16	(MASTER_CLOCK/100000)	/* 120 Hz. */
-#define C_06B49P_CLKOUT_17	(MASTER_CLOCK/200000)	/* 60 Hz. */
-#define C_06B49P_CLKOUT_18	(MASTER_CLOCK/256/3)	/* 15625 Hz. (H-Sync) */
-#define C_06B49P_CLKOUT_19	(MASTER_CLOCK/200000)	/* 60 Hz. (V-Sync) */
+#define C_06B49P_CLKOUT_01  (MASTER_CLOCK/2)        /* 6 MHz. */
+#define C_06B49P_CLKOUT_02  (MASTER_CLOCK/4)        /* 3 MHz. */
+#define C_06B49P_CLKOUT_03  (MASTER_CLOCK/4)        /* 3 MHz. */
+#define C_06B49P_CLKOUT_04  (MASTER_CLOCK/8)        /* 1.5 MHz. */
+#define C_06B49P_CLKOUT_05  (MASTER_CLOCK/16)       /* 750 kHz. */
+#define C_06B49P_CLKOUT_06  (MASTER_CLOCK/32)       /* 375 kHz. */
+#define C_06B49P_CLKOUT_07  (MASTER_CLOCK/64)       /* 187.5 kHz. */
+#define C_06B49P_CLKOUT_08  (MASTER_CLOCK/128)      /* 93.75 kHz. */
+#define C_06B49P_CLKOUT_09  (MASTER_CLOCK/256)      /* 46875 Hz. */
+#define C_06B49P_CLKOUT_10  (7782)                  /* 7782 Hz. measured */
+#define C_06B49P_CLKOUT_11  (3920)                  /* 3920 Hz. measured */
+#define C_06B49P_CLKOUT_12  (1960)                  /* 1960 Hz. measured */
+#define C_06B49P_CLKOUT_13  (950)                   /* 950 Hz. measured */
+#define C_06B49P_CLKOUT_14  (475)                   /* 475 Hz. measured */
+#define C_06B49P_CLKOUT_15  (237)                   /* 237 Hz. measured */
+#define C_06B49P_CLKOUT_16  (MASTER_CLOCK/100000)   /* 120 Hz. */
+#define C_06B49P_CLKOUT_17  (MASTER_CLOCK/200000)   /* 60 Hz. */
+#define C_06B49P_CLKOUT_18  (MASTER_CLOCK/256/3)    /* 15625 Hz. (H-Sync) */
+#define C_06B49P_CLKOUT_19  (MASTER_CLOCK/200000)   /* 60 Hz. (V-Sync) */
 
 
 #include "emu.h"
@@ -866,10 +866,10 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
     ---- xx--  BIG + SMALL (need to be individualized)
 */
 
-	output_set_lamp_value(8, (data >> 0) & 1);		/* D-UP */
-	output_set_lamp_value(9, (data >> 1) & 1);		/* TAKE SCORE */
-	output_set_lamp_value(10, (data >> 2) & 1);		/* BIG */
-	output_set_lamp_value(11, (data >> 3) & 1);		/* SMALL */
+	output_set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
+	output_set_lamp_value(9, (data >> 1) & 1);      /* TAKE SCORE */
+	output_set_lamp_value(10, (data >> 2) & 1);     /* BIG */
+	output_set_lamp_value(11, (data >> 3) & 1);     /* SMALL */
 }
 
 WRITE8_MEMBER(lucky74_state::lamps_b_w)
@@ -886,14 +886,14 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
     x--- ----  CANCEL (should lit start too?)
 */
 
-	output_set_lamp_value(0, (data >> 0) & 1);						/* HOLD1 */
-	output_set_lamp_value(1, (data >> 1) & 1);						/* HOLD2 */
-	output_set_lamp_value(2, (data >> 2) & 1);						/* HOLD3 */
-	output_set_lamp_value(3, (data >> 3) & 1);						/* HOLD4 */
-	output_set_lamp_value(4, (data >> 4) & 1);						/* HOLD5 */
-	output_set_lamp_value(5, (data >> 5) & 1);						/* BET */
-	output_set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));	/* START */
-	output_set_lamp_value(7, (data >> 7) & 1);						/* CANCEL */
+	output_set_lamp_value(0, (data >> 0) & 1);                      /* HOLD1 */
+	output_set_lamp_value(1, (data >> 1) & 1);                      /* HOLD2 */
+	output_set_lamp_value(2, (data >> 2) & 1);                      /* HOLD3 */
+	output_set_lamp_value(3, (data >> 3) & 1);                      /* HOLD4 */
+	output_set_lamp_value(4, (data >> 4) & 1);                      /* HOLD5 */
+	output_set_lamp_value(5, (data >> 5) & 1);                      /* BET */
+	output_set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));  /* START */
+	output_set_lamp_value(7, (data >> 7) & 1);                      /* CANCEL */
 }
 
 
@@ -903,7 +903,7 @@ WRITE8_MEMBER(lucky74_state::lamps_b_w)
 
 INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 {
-	if ((m_ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
+	if ((m_ym2149_portb & 0x10) == 0)   /* ym2149 portB bit 4 trigger the NMI */
 	{
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -916,27 +916,27 @@ INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 
 static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_SHARE("fg_videoram")	/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_SHARE("fg_colorram")	/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_SHARE("bg_videoram")	/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_SHARE("bg_colorram")	/* VRAM2-2 */
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)		/* Input Ports 0 & 1 */
-	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)		/* DSW 1, 2 & 3 */
-	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)		/* DSW 4 */
-	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76489_device, write)						/* SN76489 #1 */
-	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)		/* Input Ports 2 & 4 */
-	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76489_device, write)						/* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)					/* YM2149 control */
-	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76489_device, write)						/* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)		/* YM2149 (Input Port 1) */
-	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
-	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")   /* NVRAM */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_SHARE("fg_videoram")    /* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_SHARE("fg_colorram")    /* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_SHARE("bg_videoram")    /* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_SHARE("bg_colorram")    /* VRAM2-2 */
+	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)        /* Input Ports 0 & 1 */
+	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)        /* DSW 1, 2 & 3 */
+	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)        /* DSW 4 */
+	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76489_device, write)                      /* SN76489 #1 */
+	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)        /* Input Ports 2 & 4 */
+	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76489_device, write)                      /* SN76489 #2 */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)                  /* YM2149 control */
+	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76489_device, write)                      /* SN76489 #3 */
+	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)       /* YM2149 (Input Port 1) */
+	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)                       /* USART 8251 port */
+	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)                   /* SM7831 Co-Processor */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lucky74_portmap, AS_IO, 8, lucky74_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)			/* custom 09R81P (samples system) */
+	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)           /* custom 09R81P (samples system) */
 	AM_RANGE(0xff, 0xff) AM_RAM // presumably HS satellite control port (check patched in Lucky 74)
 ADDRESS_MAP_END
 
@@ -1005,40 +1005,40 @@ static INPUT_PORTS_START( lucky74 )
     Test mode shows them as dupes. Maybe are multiplexed?
 */
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	/* 'A' in test mode */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	/* 'B' in test mode */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	/* 'C' in test mode */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	/* 'D' in test mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	/* 'E' in test mode */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )	PORT_NAME("Small")	/* 'F' in test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Flip SC Off") PORT_CODE(KEYCODE_O)  /* 'G' in test mode (normal screen) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Input H") PORT_CODE(KEYCODE_K)  /* 'H' in test mode */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    /* 'A' in test mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    /* 'B' in test mode */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    /* 'C' in test mode */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    /* 'D' in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    /* 'E' in test mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")  /* 'F' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Flip SC Off") PORT_CODE(KEYCODE_O)  /* 'G' in test mode (normal screen) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("Input H") PORT_CODE(KEYCODE_K)  /* 'H' in test mode */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )		/* 'I' in test mode */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Start")  /* 'J' in test mode */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	/* 'K' in test mode */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )		/* 'L' in test mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )		/* 'M' & 'Q' in test mode */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")	/* 'N' & 'P' in test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Flip SC On")  PORT_CODE(KEYCODE_I)  /* 'O' in test mode (inverted screen) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* not in test mode */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     /* 'I' in test mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )     PORT_NAME("Start")  /* 'J' in test mode */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   /* 'K' in test mode */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )        /* 'L' in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )        /* 'M' & 'Q' in test mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")   /* 'N' & 'P' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Flip SC On")  PORT_CODE(KEYCODE_I)  /* 'O' in test mode (inverted screen) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* not in test mode */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")	/* YM2149, port A */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_IMPULSE(2)	/* Coin A */
+	PORT_START("IN3")   /* YM2149, port A */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_IMPULSE(2)   /* Coin A */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_IMPULSE(2)	/* Coin B */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )    PORT_IMPULSE(2)	/* Coin C */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_IMPULSE(2)   /* Coin B */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )    PORT_IMPULSE(2)   /* Coin C */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )  PORT_NAME("Service")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1055,39 +1055,39 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )				PORT_DIPLOCATION("DSW1:1")	/* see note 1 */
+	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )             PORT_DIPLOCATION("DSW1:1")  /* see note 1 */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Jackpot" )				PORT_DIPLOCATION("DSW1:2")	/* see note 2 */
+	PORT_DIPNAME( 0x02, 0x02, "Jackpot" )               PORT_DIPLOCATION("DSW1:2")  /* see note 2 */
 	PORT_DIPSETTING(    0x02, "Bet x 100" )
 	PORT_DIPSETTING(    0x00, "Bet x 150" )
-	PORT_DIPNAME( 0x04, 0x04, "Ceiling Bonus Point" )	PORT_DIPLOCATION("DSW1:3")	/* see note 3 */
+	PORT_DIPNAME( 0x04, 0x04, "Ceiling Bonus Point" )   PORT_DIPLOCATION("DSW1:3")  /* see note 3 */
 	PORT_DIPSETTING(    0x04, "Bet x 40"  )
 	PORT_DIPSETTING(    0x00, "Bet x 50"  )
-	PORT_DIPNAME( 0x78, 0x40, "Percentage" )			PORT_DIPLOCATION("DSW1:4,5,6,7")	/* see note 4 */
-	PORT_DIPSETTING(    0x00, "90%" )	/* 110% in the instruction sheet */
-	PORT_DIPSETTING(    0x08, "87%" )	/* 106% in the instruction sheet */
-	PORT_DIPSETTING(    0x10, "84%" )	/* 102% in the instruction sheet */
-	PORT_DIPSETTING(    0x18, "81%" )	/* 98% in the instruction sheet */
-	PORT_DIPSETTING(    0x20, "78%" )	/* 94% in the instruction sheet */
-	PORT_DIPSETTING(    0x28, "75%" )	/* 90% in the instruction sheet */
-	PORT_DIPSETTING(    0x30, "72%" )	/* 86% in the instruction sheet */
-	PORT_DIPSETTING(    0x38, "69%" )	/* 82% in the instruction sheet */
-	PORT_DIPSETTING(    0x40, "66%" )	/* 78% in the instruction sheet */
-	PORT_DIPSETTING(    0x48, "63%" )	/* 74% in the instruction sheet */
-	PORT_DIPSETTING(    0x50, "60%" )	/* 70% in the instruction sheet */
-	PORT_DIPSETTING(    0x58, "57%" )	/* 66% in the instruction sheet */
-	PORT_DIPSETTING(    0x60, "54%" )	/* 62% in the instruction sheet */
-	PORT_DIPSETTING(    0x68, "51%" )	/* 58% in the instruction sheet */
-	PORT_DIPSETTING(    0x70, "48%" )	/* 54% in the instruction sheet */
-	PORT_DIPSETTING(    0x78, "45%" )	/* 50% in the instruction sheet */
-	PORT_DIPNAME( 0x80, 0x80, "Panties" )				PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x78, 0x40, "Percentage" )            PORT_DIPLOCATION("DSW1:4,5,6,7")    /* see note 4 */
+	PORT_DIPSETTING(    0x00, "90%" )   /* 110% in the instruction sheet */
+	PORT_DIPSETTING(    0x08, "87%" )   /* 106% in the instruction sheet */
+	PORT_DIPSETTING(    0x10, "84%" )   /* 102% in the instruction sheet */
+	PORT_DIPSETTING(    0x18, "81%" )   /* 98% in the instruction sheet */
+	PORT_DIPSETTING(    0x20, "78%" )   /* 94% in the instruction sheet */
+	PORT_DIPSETTING(    0x28, "75%" )   /* 90% in the instruction sheet */
+	PORT_DIPSETTING(    0x30, "72%" )   /* 86% in the instruction sheet */
+	PORT_DIPSETTING(    0x38, "69%" )   /* 82% in the instruction sheet */
+	PORT_DIPSETTING(    0x40, "66%" )   /* 78% in the instruction sheet */
+	PORT_DIPSETTING(    0x48, "63%" )   /* 74% in the instruction sheet */
+	PORT_DIPSETTING(    0x50, "60%" )   /* 70% in the instruction sheet */
+	PORT_DIPSETTING(    0x58, "57%" )   /* 66% in the instruction sheet */
+	PORT_DIPSETTING(    0x60, "54%" )   /* 62% in the instruction sheet */
+	PORT_DIPSETTING(    0x68, "51%" )   /* 58% in the instruction sheet */
+	PORT_DIPSETTING(    0x70, "48%" )   /* 54% in the instruction sheet */
+	PORT_DIPSETTING(    0x78, "45%" )   /* 50% in the instruction sheet */
+	PORT_DIPNAME( 0x80, 0x80, "Panties" )               PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x00, "Without" )
 	PORT_DIPSETTING(    0x80, "With" )
 
 	PORT_START("DSW2")
-    /* DIPs 1-4 handle the harcoded coinage for Coin A, B and Remote credits (B = A x 5; R = A x 10) */
-	PORT_DIPNAME( 0x0f, 0x0f, "Coinage A, B & Remote" )	PORT_DIPLOCATION("DSW2:1,2,3,4")
+	/* DIPs 1-4 handle the harcoded coinage for Coin A, B and Remote credits (B = A x 5; R = A x 10) */
+	PORT_DIPNAME( 0x0f, 0x0f, "Coinage A, B & Remote" ) PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "A: 20 Coins/1 Credit; B: 4 Coins/1 Credit;   R: 2 Pulses/1 Credit   " )
 	PORT_DIPSETTING(    0x01, "A: 15 Coins/1 Credit; B: 3 Coins/1 Credit;   R: 15 Pulses/10 Credits" )
 	PORT_DIPSETTING(    0x02, "A: 10 Coins/1 Credit; B: 2 Coins/1 Credit;   R: 1 Pulse/1 Credit    " )
@@ -1104,13 +1104,13 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0x0d, "A: 1 Coin/2 Credits;  B: 1 Coin/10 Credits;  R: 1 Pulse/20 Credits  " )
 	PORT_DIPSETTING(    0x0e, "A: 1 Coin/5 Credits;  B: 1 Coin/25 Credits;  R: 1 Pulse/50 Credits  " )
 	PORT_DIPSETTING(    0x0f, "A: 1 Coin/10 Credits; B: 1 Coin/50 Credits;  R: 1 Pulse/100 Credits " )
-    /* DIPs 5-8 handle the Coin C coinage */
-	PORT_DIPNAME( 0xf0, 0xf0, "Coinage C" )				PORT_DIPLOCATION("DSW2:5,6,7,8")
+	/* DIPs 5-8 handle the Coin C coinage */
+	PORT_DIPNAME( 0xf0, 0xf0, "Coinage C" )             PORT_DIPLOCATION("DSW2:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, "5 Coins/2 Credits" )		/* 2.5 coins per credit */
+	PORT_DIPSETTING(    0x20, "5 Coins/2 Credits" )     /* 2.5 coins per credit */
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
@@ -1124,53 +1124,53 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0xf0, "1 Coin/50 Credits" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )						PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )                       PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, "20" )
 	PORT_DIPSETTING(    0x00, "40" )
-	PORT_DIPNAME( 0x06, 0x06, "Minimum Bet" )					PORT_DIPLOCATION("DSW3:2,3")	/* Bet Min */
+	PORT_DIPNAME( 0x06, 0x06, "Minimum Bet" )                   PORT_DIPLOCATION("DSW3:2,3")    /* Bet Min */
 	PORT_DIPSETTING(    0x06, "1" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x02, "8" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x18, 0x18, "Limit" )							PORT_DIPLOCATION("DSW3:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Limit" )                         PORT_DIPLOCATION("DSW3:4,5")
 	PORT_DIPSETTING(    0x18, "No Limit" )
 	PORT_DIPSETTING(    0x10, "10000" )
 	PORT_DIPSETTING(    0x08, "15000" )
 	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_DIPNAME( 0x20, 0x20, "Woman's figure in Main Game" )	PORT_DIPLOCATION("DSW3:6")	/* see note 6 */
+	PORT_DIPNAME( 0x20, 0x20, "Woman's figure in Main Game" )   PORT_DIPLOCATION("DSW3:6")  /* see note 6 */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Type of Poker" )					PORT_DIPLOCATION("DSW3:7")
-	PORT_DIPSETTING(    0x40, "A - Without Wild Card" )	/* see the game notes */
-	PORT_DIPSETTING(    0x00, "B - Joker Wild Poker" )	/* see the game notes */
-	PORT_DIPNAME( 0x80, 0x80, "Kinds of Poker" )				PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPNAME( 0x40, 0x40, "Type of Poker" )                 PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(    0x40, "A - Without Wild Card" ) /* see the game notes */
+	PORT_DIPSETTING(    0x00, "B - Joker Wild Poker" )  /* see the game notes */
+	PORT_DIPNAME( 0x80, 0x80, "Kinds of Poker" )                PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, "A - Hold" )
 	PORT_DIPSETTING(    0x00, "B - Discard" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "Hopper Coin SW" )				PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPNAME( 0x01, 0x01, "Hopper Coin SW" )                PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, "Active Low" )
 	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x02, 0x02, "Coin Payment" )					PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPNAME( 0x02, 0x02, "Coin Payment" )                  PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x00, "Auto" )
 	PORT_DIPSETTING(    0x02, "Auto by PAYOUT SW" )
-	PORT_DIPNAME( 0x04, 0x00, "Hopper Capacity" )				PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPNAME( 0x04, 0x00, "Hopper Capacity" )               PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(    0x04, "700" )
 	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x08, "Woman's figure in D-UP game" )	PORT_DIPLOCATION("DSW4:4")	/* doesn't seems to work */
+	PORT_DIPNAME( 0x08, 0x08, "Woman's figure in D-UP game" )   PORT_DIPLOCATION("DSW4:4")  /* doesn't seems to work */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, "Double-Up game" )				PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPNAME( 0x10, 0x10, "Double-Up game" )                PORT_DIPLOCATION("DSW4:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Stop by 6th Double-Up" )			PORT_DIPLOCATION("DSW4:6")	/* see note 7 */
+	PORT_DIPNAME( 0x20, 0x20, "Stop by 6th Double-Up" )         PORT_DIPLOCATION("DSW4:6")  /* see note 7 */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xC0, 0xC0, "Double-Up difficulty" )			PORT_DIPLOCATION("DSW4:7,8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	/* easy      (from instruction sheet) */
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )		/* ....      (from instruction sheet) */
-	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )	/* ....      (from instruction sheet) */
-	PORT_DIPSETTING(    0xC0, DEF_STR( Easy ) )		/* difficult (from instruction sheet) */
+	PORT_DIPNAME( 0xC0, 0xC0, "Double-Up difficulty" )          PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )  /* easy      (from instruction sheet) */
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )     /* ....      (from instruction sheet) */
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )   /* ....      (from instruction sheet) */
+	PORT_DIPSETTING(    0xC0, DEF_STR( Easy ) )     /* difficult (from instruction sheet) */
 INPUT_PORTS_END
 
 
@@ -1186,12 +1186,12 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	8, 8,
-	RGN_FRAC(1,4),	/* 4096 tiles */
+	RGN_FRAC(1,4),  /* 4096 tiles */
 	4,
-	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },	/* bitplanes are separated */
+	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 
@@ -1200,8 +1200,8 @@ static const gfx_layout tilelayout =
 ******************************/
 
 static GFXDECODE_START( lucky74 )
-	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 0, 16 )		/* text, frames & cards */
-	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 256, 16 )	/* title & whores */
+	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 0, 16 )      /* text, frames & cards */
+	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 256, 16 )    /* title & whores */
 GFXDECODE_END
 
 
@@ -1212,7 +1212,7 @@ GFXDECODE_END
 static SOUND_START( lucky74 )
 {
 	lucky74_state *state = machine.driver_data<lucky74_state>();
-    /* cleaning all 09R81P registers */
+	/* cleaning all 09R81P registers */
 
 	UINT8 i;
 
@@ -1221,13 +1221,13 @@ static SOUND_START( lucky74 )
 		state->m_adpcm_reg[i] = 0;
 	}
 
-	state->m_adpcm_busy_line = 0x01;	/* free and ready */
+	state->m_adpcm_busy_line = 0x01;    /* free and ready */
 }
 
 static void lucky74_adpcm_int(device_t *device)
 {
 	lucky74_state *state = device->machine().driver_data<lucky74_state>();
-	if (state->m_adpcm_reg[05] == 0x01)	/* register 0x05 (bit 0 activated), trigger the sample */
+	if (state->m_adpcm_reg[05] == 0x01) /* register 0x05 (bit 0 activated), trigger the sample */
 	{
 		/* conditional zone for samples reproduction */
 
@@ -1253,9 +1253,9 @@ static void lucky74_adpcm_int(device_t *device)
 
 			if (state->m_adpcm_pos == state->m_adpcm_end)
 			{
-				msm5205_reset_w(device, 0);			/* reset the M5205 */
-				state->m_adpcm_reg[05] = 0;		/* clean trigger register */
-				state->m_adpcm_busy_line = 0x01;	/* deactivate busy flag */
+				msm5205_reset_w(device, 0);         /* reset the M5205 */
+				state->m_adpcm_reg[05] = 0;     /* clean trigger register */
+				state->m_adpcm_busy_line = 0x01;    /* deactivate busy flag */
 				logerror("end of sample.\n");
 			}
 		}
@@ -1282,42 +1282,42 @@ static void lucky74_adpcm_int(device_t *device)
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count */
+	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL                          /* Port C write: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("IN2"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("IN4"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("IN2"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("IN4"),            /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_2_intf )
 {
-	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("DSW3"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("DSW2"),           /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("DSW3"),           /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_3_intf )
 {
-	DEVCB_INPUT_PORT("DSW4"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(lucky74_state,lamps_a_w),			/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(lucky74_state,lamps_b_w)			/* Port C write */
+	DEVCB_INPUT_PORT("DSW4"),           /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(lucky74_state,lamps_a_w),           /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(lucky74_state,lamps_b_w)            /* Port C write */
 };
 
 
@@ -1330,15 +1330,15 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("IN3"),
-	DEVCB_NULL,	/* a sort of status byte */
+	DEVCB_NULL, /* a sort of status byte */
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(lucky74_state,ym2149_portb_w)
 };
 
 static const msm5205_interface msm5205_config =
 {
-	lucky74_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B		/* 8KHz */
+	lucky74_adpcm_int,  /* interrupt function */
+	MSM5205_S48_4B      /* 8KHz */
 };
 
 //-------------------------------------------------
@@ -1347,7 +1347,7 @@ static const msm5205_interface msm5205_config =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 /*************************
@@ -1357,10 +1357,10 @@ static const sn76496_config psg_intf =
 static MACHINE_CONFIG_START( lucky74, lucky74_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */
 	MCFG_CPU_PROGRAM_MAP(lucky74_map)
 	MCFG_CPU_IO_MAP(lucky74_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt)	/* 60 Hz. measured */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1388,23 +1388,23 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MCFG_SOUND_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MCFG_SOUND_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MCFG_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04)	/* 1.5 MHz. */
+	MCFG_SOUND_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
 	MCFG_SOUND_CONFIG(ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)			/* not routed to audio hardware */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)         /* not routed to audio hardware */
 
-	MCFG_SOUND_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)	/* 375 kHz. */
+	MCFG_SOUND_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
@@ -1428,31 +1428,31 @@ MACHINE_CONFIG_END
 */
 ROM_START( lucky74 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "luckychi.00",	0x0000, 0x10000, CRC(3b906f0e) SHA1(1f9abd168c60b0d22fa6c7391bfdf5f3aabd66ef) )
+	ROM_LOAD( "luckychi.00",    0x0000, 0x10000, CRC(3b906f0e) SHA1(1f9abd168c60b0d22fa6c7391bfdf5f3aabd66ef) )
 
 	ROM_REGION( 0x20000, "fgtiles", 0 )
-	ROM_LOAD( "luckychi.12",	0x00000, 0x8000, CRC(ff934c20) SHA1(07cd2225dfc0e5b74be2e1b379c6b180e37660db) )
-	ROM_LOAD( "luckychi.11",	0x08000, 0x8000, CRC(2fd6fb8a) SHA1(1a910e0a2e6db22a8d9a65d7b932f9ca39601e9c) )
-	ROM_LOAD( "luckychi.13",	0x10000, 0x8000, CRC(c70a6da3) SHA1(195772ef649e21a5c54c5871e7b858967b6ebee8) )
-	ROM_LOAD( "luckychi.14",	0x18000, 0x8000, CRC(b5813b67) SHA1(cce38e33a5218d6839d956174807d88e7c070d5a) )
+	ROM_LOAD( "luckychi.12",    0x00000, 0x8000, CRC(ff934c20) SHA1(07cd2225dfc0e5b74be2e1b379c6b180e37660db) )
+	ROM_LOAD( "luckychi.11",    0x08000, 0x8000, CRC(2fd6fb8a) SHA1(1a910e0a2e6db22a8d9a65d7b932f9ca39601e9c) )
+	ROM_LOAD( "luckychi.13",    0x10000, 0x8000, CRC(c70a6da3) SHA1(195772ef649e21a5c54c5871e7b858967b6ebee8) )
+	ROM_LOAD( "luckychi.14",    0x18000, 0x8000, CRC(b5813b67) SHA1(cce38e33a5218d6839d956174807d88e7c070d5a) )
 
 	ROM_REGION( 0x20000, "bgtiles", 0 )
-	ROM_LOAD( "luckychi.17",	0x00000, 0x8000, CRC(010ffa4a) SHA1(8856d61b71e951509073bc359851f47c39c4274d) )
-	ROM_LOAD( "luckychi.16",	0x08000, 0x8000, CRC(15104810) SHA1(586df734740209e2a05932e31d2a301d330e8cbd) )
-	ROM_LOAD( "luckychi.18",	0x10000, 0x8000, CRC(f2d45e76) SHA1(46df7bf98434c836fd38539575a35bf67c9ec2c6) )
-	ROM_LOAD( "luckychi.19",	0x18000, 0x8000, CRC(6b0196f3) SHA1(277049279dcfcf07189dbdb20935c2a71b2f6061) )
+	ROM_LOAD( "luckychi.17",    0x00000, 0x8000, CRC(010ffa4a) SHA1(8856d61b71e951509073bc359851f47c39c4274d) )
+	ROM_LOAD( "luckychi.16",    0x08000, 0x8000, CRC(15104810) SHA1(586df734740209e2a05932e31d2a301d330e8cbd) )
+	ROM_LOAD( "luckychi.18",    0x10000, 0x8000, CRC(f2d45e76) SHA1(46df7bf98434c836fd38539575a35bf67c9ec2c6) )
+	ROM_LOAD( "luckychi.19",    0x18000, 0x8000, CRC(6b0196f3) SHA1(277049279dcfcf07189dbdb20935c2a71b2f6061) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* 4-bits ADPCM samples @ 8kHz */
-	ROM_LOAD( "luckyson.15",	0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )	/* location 2n */
-	ROM_FILL(					0x10000, 0x10000, 0xff )															/* empty socket @ 1n */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* 4-bits ADPCM samples @ 8kHz */
+	ROM_LOAD( "luckyson.15",    0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )    /* location 2n */
+	ROM_FILL(                   0x10000, 0x10000, 0xff )                                                            /* empty socket @ 1n */
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "luckyprom.e6",	0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
-	ROM_LOAD( "luckyprom.e7",	0x0100, 0x0100, CRC(7c772d0c) SHA1(9c99daa01ca56c7ebd48945505fcbae184998b13) )
-	ROM_LOAD( "luckyprom.d6",	0x0200, 0x0100, CRC(61716584) SHA1(7a3e17f47ce173d79c12b2394edb8f32b7509e39) )
-	ROM_LOAD( "luckyprom.d7",	0x0300, 0x0100, CRC(4003bc8f) SHA1(f830203c22a4f94b8b9f0b24e287204a742a8322) )
-	ROM_LOAD( "luckyprom.c6",	0x0400, 0x0100, CRC(a8d2b3db) SHA1(7b346797bedc627fb2d49f19b18860a81c69e122) )
-	ROM_LOAD( "luckyprom.c7",	0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
+	ROM_LOAD( "luckyprom.e6",   0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
+	ROM_LOAD( "luckyprom.e7",   0x0100, 0x0100, CRC(7c772d0c) SHA1(9c99daa01ca56c7ebd48945505fcbae184998b13) )
+	ROM_LOAD( "luckyprom.d6",   0x0200, 0x0100, CRC(61716584) SHA1(7a3e17f47ce173d79c12b2394edb8f32b7509e39) )
+	ROM_LOAD( "luckyprom.d7",   0x0300, 0x0100, CRC(4003bc8f) SHA1(f830203c22a4f94b8b9f0b24e287204a742a8322) )
+	ROM_LOAD( "luckyprom.c6",   0x0400, 0x0100, CRC(a8d2b3db) SHA1(7b346797bedc627fb2d49f19b18860a81c69e122) )
+	ROM_LOAD( "luckyprom.c7",   0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
 ROM_END
 
 /*
@@ -1467,31 +1467,31 @@ ROM_END
 */
 ROM_START( lucky74a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "luckygde.00",	0x0000, 0x10000, CRC(e3f7db99) SHA1(5c7d9d3fed9eb19d3d666c8c08b34968a9996a96) )	/* bad dump? */
+	ROM_LOAD( "luckygde.00",    0x0000, 0x10000, CRC(e3f7db99) SHA1(5c7d9d3fed9eb19d3d666c8c08b34968a9996a96) ) /* bad dump? */
 
 	ROM_REGION( 0x20000, "fgtiles", 0 )
-	ROM_LOAD( "luckygde.12",	0x00000, 0x8000, CRC(7127465b) SHA1(3f72f91652fcab52c073744b1651fdfe772c584a) )
-	ROM_LOAD( "luckygde.11",	0x08000, 0x8000, CRC(8a5ea91a) SHA1(8d22615c00ff7c8a27cd721618b5d32a8d089c95) )
-	ROM_LOAD( "luckygde.13",	0x10000, 0x8000, CRC(bbb63ac1) SHA1(ab986055e34d90e81caf20c28c5ad89715209d0e) )
-	ROM_LOAD( "luckygde.14",	0x18000, 0x8000, CRC(dcffdf07) SHA1(d63fd7d23e488650d3731830f07bce0ce64424b8) )
+	ROM_LOAD( "luckygde.12",    0x00000, 0x8000, CRC(7127465b) SHA1(3f72f91652fcab52c073744b1651fdfe772c584a) )
+	ROM_LOAD( "luckygde.11",    0x08000, 0x8000, CRC(8a5ea91a) SHA1(8d22615c00ff7c8a27cd721618b5d32a8d089c95) )
+	ROM_LOAD( "luckygde.13",    0x10000, 0x8000, CRC(bbb63ac1) SHA1(ab986055e34d90e81caf20c28c5ad89715209d0e) )
+	ROM_LOAD( "luckygde.14",    0x18000, 0x8000, CRC(dcffdf07) SHA1(d63fd7d23e488650d3731830f07bce0ce64424b8) )
 
 	ROM_REGION( 0x20000, "bgtiles", 0 )
-	ROM_LOAD( "luckygde.17",	0x00000, 0x8000, CRC(18da3468) SHA1(6dc60da939bfa7528e1fe75a85328a32047c8990) )
-	ROM_LOAD( "luckygde.16",	0x08000, 0x8000, CRC(0e831be5) SHA1(302a68203f565718f7f537dab50fb52250c48859) )
-	ROM_LOAD( "luckygde.18",	0x10000, 0x8000, CRC(717e5f4e) SHA1(0f14c9525bf77bbc4de0d9695648acb40870a176) )
-	ROM_LOAD( "luckygde.19",	0x18000, 0x8000, CRC(bb4608ae) SHA1(cc8ec596f445fe0364f254241227de368f309ebb) )
+	ROM_LOAD( "luckygde.17",    0x00000, 0x8000, CRC(18da3468) SHA1(6dc60da939bfa7528e1fe75a85328a32047c8990) )
+	ROM_LOAD( "luckygde.16",    0x08000, 0x8000, CRC(0e831be5) SHA1(302a68203f565718f7f537dab50fb52250c48859) )
+	ROM_LOAD( "luckygde.18",    0x10000, 0x8000, CRC(717e5f4e) SHA1(0f14c9525bf77bbc4de0d9695648acb40870a176) )
+	ROM_LOAD( "luckygde.19",    0x18000, 0x8000, CRC(bb4608ae) SHA1(cc8ec596f445fe0364f254241227de368f309ebb) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* 4-bits ADPCM samples @ 8kHz */
-	ROM_LOAD( "luckyson.15",	0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )	/* location 2n */
-	ROM_FILL(					0x10000, 0x10000, 0xff )															/* empty socket @ 1n */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* 4-bits ADPCM samples @ 8kHz */
+	ROM_LOAD( "luckyson.15",    0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )    /* location 2n */
+	ROM_FILL(                   0x10000, 0x10000, 0xff )                                                            /* empty socket @ 1n */
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "luckyprom.e6",	0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
-	ROM_LOAD( "luckyprom.e7",	0x0100, 0x0100, CRC(7c772d0c) SHA1(9c99daa01ca56c7ebd48945505fcbae184998b13) )
-	ROM_LOAD( "luckyprom.d6",	0x0200, 0x0100, CRC(61716584) SHA1(7a3e17f47ce173d79c12b2394edb8f32b7509e39) )
-	ROM_LOAD( "luckyprom.d7",	0x0300, 0x0100, CRC(4003bc8f) SHA1(f830203c22a4f94b8b9f0b24e287204a742a8322) )
-	ROM_LOAD( "luckyprom.c6",	0x0400, 0x0100, CRC(a8d2b3db) SHA1(7b346797bedc627fb2d49f19b18860a81c69e122) )
-	ROM_LOAD( "luckyprom.c7",	0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
+	ROM_LOAD( "luckyprom.e6",   0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
+	ROM_LOAD( "luckyprom.e7",   0x0100, 0x0100, CRC(7c772d0c) SHA1(9c99daa01ca56c7ebd48945505fcbae184998b13) )
+	ROM_LOAD( "luckyprom.d6",   0x0200, 0x0100, CRC(61716584) SHA1(7a3e17f47ce173d79c12b2394edb8f32b7509e39) )
+	ROM_LOAD( "luckyprom.d7",   0x0300, 0x0100, CRC(4003bc8f) SHA1(f830203c22a4f94b8b9f0b24e287204a742a8322) )
+	ROM_LOAD( "luckyprom.c6",   0x0400, 0x0100, CRC(a8d2b3db) SHA1(7b346797bedc627fb2d49f19b18860a81c69e122) )
+	ROM_LOAD( "luckyprom.c7",   0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
 ROM_END
 
 /*
@@ -1519,34 +1519,34 @@ ROM_END
 */
 ROM_START( excitbj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "8703_1992.1_ebj._stlite.cpu", 0x000000, 0x00c000, CRC(2ccf1abd) SHA1(a0bae5e3b0debe7c6f7f3efafdcb95237b5c63d2) )
+	ROM_LOAD( "8703_1992.1_ebj._stlite.cpu", 0x000000, 0x00c000, CRC(2ccf1abd) SHA1(a0bae5e3b0debe7c6f7f3efafdcb95237b5c63d2) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-    ROM_LOAD( "terminal.cpu", 0x000000, 0x010000, NO_DUMP )
+	ROM_LOAD( "terminal.cpu", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "fgtiles", 0 )
-	ROM_LOAD( "ebj_s2.2j",	0x00000, 0x10000, CRC(a9d432f1) SHA1(25ff00a1fecc9bc767c4c417ab7dac0a32378884) )
-	ROM_LOAD( "ebj_s1.2f",	0x10000, 0x10000, CRC(955e9631) SHA1(68ae0d6502fabc5746d16043f9699315465acffb) )
-	ROM_LOAD( "ebj_s3.2k",	0x20000, 0x10000, CRC(2f887c83) SHA1(ca9407e9967c673c35f649320d3c3ae18c61b379) )
-	ROM_LOAD( "ebj_s4.2l",	0x30000, 0x10000, CRC(7e14a279) SHA1(bddbaa6cfbe86c59a7da6999ab88da878666cc1d) )
+	ROM_LOAD( "ebj_s2.2j",  0x00000, 0x10000, CRC(a9d432f1) SHA1(25ff00a1fecc9bc767c4c417ab7dac0a32378884) )
+	ROM_LOAD( "ebj_s1.2f",  0x10000, 0x10000, CRC(955e9631) SHA1(68ae0d6502fabc5746d16043f9699315465acffb) )
+	ROM_LOAD( "ebj_s3.2k",  0x20000, 0x10000, CRC(2f887c83) SHA1(ca9407e9967c673c35f649320d3c3ae18c61b379) )
+	ROM_LOAD( "ebj_s4.2l",  0x30000, 0x10000, CRC(7e14a279) SHA1(bddbaa6cfbe86c59a7da6999ab88da878666cc1d) )
 
 	ROM_REGION( 0x40000, "bgtiles", 0 )
-	ROM_LOAD( "ebj_s7.1j",	0x00000, 0x10000, CRC(7dba6ae2) SHA1(d995482cb8d8bcdfe0f77aae99f23f1c55b7c339) )
-	ROM_LOAD( "ebj_s6.1f",	0x10000, 0x10000, CRC(aad2eb77) SHA1(9c4d82bd81d10cdd32af2f4ec376cead9a5a4e78) )
-	ROM_LOAD( "ebj_s8.1k",	0x20000, 0x10000, CRC(297443a7) SHA1(3a20498dcf69412f5bd3156391a55d3b1273c0b4) )
-	ROM_LOAD( "ebj_s9.1l",	0x30000, 0x10000, CRC(79ba7d75) SHA1(7301143a019d5e79eff7941a1a34fe96036acffa) )
+	ROM_LOAD( "ebj_s7.1j",  0x00000, 0x10000, CRC(7dba6ae2) SHA1(d995482cb8d8bcdfe0f77aae99f23f1c55b7c339) )
+	ROM_LOAD( "ebj_s6.1f",  0x10000, 0x10000, CRC(aad2eb77) SHA1(9c4d82bd81d10cdd32af2f4ec376cead9a5a4e78) )
+	ROM_LOAD( "ebj_s8.1k",  0x20000, 0x10000, CRC(297443a7) SHA1(3a20498dcf69412f5bd3156391a55d3b1273c0b4) )
+	ROM_LOAD( "ebj_s9.1l",  0x30000, 0x10000, CRC(79ba7d75) SHA1(7301143a019d5e79eff7941a1a34fe96036acffa) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* 4-bits ADPCM samples @ 8kHz */
-	ROM_LOAD( "ebj_s5.2n",	0x00000, 0x10000, CRC(9b4a10a2) SHA1(843ab5955ba96bb1b1a5367652d0f6424ba23bdf) )	/* location 2n */
-	ROM_LOAD( "ebj_s10.1n",	0x10000, 0x10000, CRC(2fa7401d) SHA1(80a5dfd2b7c183acd2fc124d220de4a4921178b2) )	/* location 1n */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* 4-bits ADPCM samples @ 8kHz */
+	ROM_LOAD( "ebj_s5.2n",  0x00000, 0x10000, CRC(9b4a10a2) SHA1(843ab5955ba96bb1b1a5367652d0f6424ba23bdf) )    /* location 2n */
+	ROM_LOAD( "ebj_s10.1n", 0x10000, 0x10000, CRC(2fa7401d) SHA1(80a5dfd2b7c183acd2fc124d220de4a4921178b2) )    /* location 1n */
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "6e-a.6e",	0x0000, 0x0100, CRC(bcaa7a0d) SHA1(75554d539bf67effb862234cdf89e4df4e2193ed) )
-	ROM_LOAD( "7e.7e",		0x0100, 0x0100, CRC(09c3f397) SHA1(d8fd8faf3d9534e44e65efcef82a6d691c0e8c3f) )
-	ROM_LOAD( "6d-a.6d",	0x0200, 0x0100, CRC(5290798a) SHA1(90f0af6d9fe362d8fac672b56e443e1edcf59e13) )
-	ROM_LOAD( "7d.7d",		0x0300, 0x0100, CRC(ddef8e23) SHA1(27c975174dc9a7a9deaf34322083183033d3aba3) )
-	ROM_LOAD( "6c-a.6c",	0x0400, 0x0100, CRC(e74c63a0) SHA1(0abd56296baeef7dae5f8cff04f23de2d26ffac1) )
-	ROM_LOAD( "7c.7c",		0x0500, 0x0100, CRC(d8f90e92) SHA1(b1fa72bb6d32db3bfd95f5f1c502758f302f3053) )
+	ROM_LOAD( "6e-a.6e",    0x0000, 0x0100, CRC(bcaa7a0d) SHA1(75554d539bf67effb862234cdf89e4df4e2193ed) )
+	ROM_LOAD( "7e.7e",      0x0100, 0x0100, CRC(09c3f397) SHA1(d8fd8faf3d9534e44e65efcef82a6d691c0e8c3f) )
+	ROM_LOAD( "6d-a.6d",    0x0200, 0x0100, CRC(5290798a) SHA1(90f0af6d9fe362d8fac672b56e443e1edcf59e13) )
+	ROM_LOAD( "7d.7d",      0x0300, 0x0100, CRC(ddef8e23) SHA1(27c975174dc9a7a9deaf34322083183033d3aba3) )
+	ROM_LOAD( "6c-a.6c",    0x0400, 0x0100, CRC(e74c63a0) SHA1(0abd56296baeef7dae5f8cff04f23de2d26ffac1) )
+	ROM_LOAD( "7c.7c",      0x0500, 0x0100, CRC(d8f90e92) SHA1(b1fa72bb6d32db3bfd95f5f1c502758f302f3053) )
 ROM_END
 
 

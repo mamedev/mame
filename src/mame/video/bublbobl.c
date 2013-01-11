@@ -52,9 +52,9 @@ UINT32 bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind1
 
 		for (yc = 0; yc < 32; yc++)
 		{
-			if (prom_line[yc / 2] & 0x08)	continue;	/* NEXT */
+			if (prom_line[yc / 2] & 0x08)   continue;   /* NEXT */
 
-			if (!(prom_line[yc / 2] & 0x04))	/* next column */
+			if (!(prom_line[yc / 2] & 0x04))    /* next column */
 			{
 				sx = m_objectram[offs + 2];
 				if (gfx_attr & 0x40) sx -= 256;

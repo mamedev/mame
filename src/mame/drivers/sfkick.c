@@ -63,7 +63,7 @@ class sfkick_state : public driver_device
 public:
 	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_v9938(*this, "v9938") { }
+			m_v9938(*this, "v9938") { }
 
 	UINT8 *m_main_mem;
 	int m_bank_cfg;
@@ -83,13 +83,13 @@ public:
 };
 
 
-#define MSX2_XBORDER_PIXELS	16
-#define MSX2_YBORDER_PIXELS	28
+#define MSX2_XBORDER_PIXELS 16
+#define MSX2_YBORDER_PIXELS 28
 #define MSX2_TOTAL_XRES_PIXELS 256 * 2 + (MSX2_XBORDER_PIXELS * 2)
 #define MSX2_TOTAL_YRES_PIXELS 212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
-#define MASTER_CLOCK	XTAL_21_4772MHz
+#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
+#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
+#define MASTER_CLOCK    XTAL_21_4772MHz
 
 
 READ8_MEMBER(sfkick_state::ppi_port_b_r)
@@ -360,75 +360,75 @@ WRITE8_MEMBER(sfkick_state::ppi_port_c_w)
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_a_w),		/* Port A write */
-	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_b_r),		/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_c_w)			/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_a_w),     /* Port A write */
+	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_b_r),     /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(sfkick_state,ppi_port_c_w)          /* Port C write */
 };
 
 
 static INPUT_PORTS_START( sfkick )
-    PORT_START("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-    PORT_START("IN1")
-    PORT_BIT( 0x71, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
+	PORT_START("IN1")
+	PORT_BIT( 0x71, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-    PORT_START("DIAL")
-    PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
+	PORT_START("DIAL")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
 
-    PORT_START("DSW1") /* bitswapped at read! 76543210 -> 45673210 */
-    PORT_DIPNAME(   0x82, 0x02, DEF_STR( Unknown ) )  /* unknown, code @ $98a8 */
+	PORT_START("DSW1") /* bitswapped at read! 76543210 -> 45673210 */
+	PORT_DIPNAME(   0x82, 0x02, DEF_STR( Unknown ) )  /* unknown, code @ $98a8 */
 	PORT_DIPSETTING(      0x00, "3" )
 	PORT_DIPSETTING(      0x02, "2" )
 	PORT_DIPSETTING(      0x80, "1" )
 	PORT_DIPSETTING(      0x82, "0" )
-    PORT_DIPNAME(   0x0c, 0x08, DEF_STR( Difficulty ) ) /* not sure, code @ $9877 */
+	PORT_DIPNAME(   0x0c, 0x08, DEF_STR( Difficulty ) ) /* not sure, code @ $9877 */
 	PORT_DIPSETTING(      0x0c, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( Hard ) )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( On ) )
-    PORT_DIPNAME( 0x41, 0x01, DEF_STR( Lives ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x41, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x00, "5" )
 	PORT_DIPSETTING(      0x01, "3" )
 	PORT_DIPSETTING(      0x40, "2" )
 	PORT_DIPSETTING(      0x41, "1" )
 
-    PORT_START("DSW2") /* bitswapped at read! 76543210 -> 45673210 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
-    PORT_DIPNAME(   0x02, 0x02,  "Test Mode" )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
+	PORT_START("DSW2") /* bitswapped at read! 76543210 -> 45673210 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
+	PORT_DIPNAME(   0x02, 0x02,  "Test Mode" )
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-    PORT_DIPNAME(   0x20, 0x20,  "Freeze" )
-    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME(   0x20, 0x20,  "Freeze" )
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-    PORT_DIPNAME(   0x8c, 0x8c, DEF_STR( Coinage ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0x84, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 3C_2C ) )
-    PORT_DIPSETTING(    0x8c, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( 2C_3C ) )
-    PORT_DIPSETTING(    0x88, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME(   0x8c, 0x8c, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x84, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x8c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x88, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
 INPUT_PORTS_END
 
 static void sfkick_vdp_interrupt(device_t *, v99x8_device &device, int i)
@@ -551,7 +551,7 @@ ROM_START( sfkicka )
 	/* 0x18000-0x1ffff = empty */
 
 	ROM_REGION(0x8000,  "extrom", 0)
-	 ROM_LOAD( "c149.bin", 0x00000, 0x8000, CRC(2edbf61f) SHA1(23dcff43faf222a4b69001312ce4b1c920e2f4c2) )
+		ROM_LOAD( "c149.bin", 0x00000, 0x8000, CRC(2edbf61f) SHA1(23dcff43faf222a4b69001312ce4b1c920e2f4c2) )
 
 	ROM_REGION(0x8000,  "cartridge", 0)
 	ROM_LOAD( "c150.bin", 0x0000, 0x8000, CRC(20412918) SHA1(b0fefa957b20373ffb84d9ff97a2e84a9a3af56c) )
@@ -590,4 +590,3 @@ ROM_END
 GAME( 1988, sfkick,   0,      sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung/HJ Corp", "Super Free Kick (set 1)", 0 )
 GAME( 198?, sfkicka,  sfkick, sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung", "Super Free Kick (set 2)", 0 )
 GAME( 1988, spinkick, sfkick, sfkick, sfkick, sfkick_state, sfkick, ROT90, "Haesung/Seojin", "Hec's Spinkick", 0 )
-

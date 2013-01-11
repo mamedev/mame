@@ -117,7 +117,7 @@ static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-	if (m_gfxctrl & 0x04)	/* display disable? */
+	if (m_gfxctrl & 0x04)   /* display disable? */
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
@@ -129,7 +129,7 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 
 	switch (m_gfxctrl & 0xfb)
 	{
-		case 0x00:	/* high score screen */
+		case 0x00:  /* high score screen */
 			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect);
 			draw_bg(machine(), bitmap, cliprect);
 			draw_fg(machine(), bitmap, cliprect);

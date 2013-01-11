@@ -12,31 +12,31 @@
 //============================================================
 class DasmWindow : public WindowQt
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+
 public:
-    DasmWindow(running_machine* machine, QWidget* parent=NULL);
-    virtual ~DasmWindow() {}
+	DasmWindow(running_machine* machine, QWidget* parent=NULL);
+	virtual ~DasmWindow() {}
 
 
 private slots:
-    void cpuChanged(int index);
-    void expressionSubmitted();
+	void cpuChanged(int index);
+	void expressionSubmitted();
 
-    void toggleBreakpointAtCursor(bool changedTo);
-    void runToCursor(bool changedTo);
-    void rightBarChanged(QAction* changedTo);
+	void toggleBreakpointAtCursor(bool changedTo);
+	void runToCursor(bool changedTo);
+	void rightBarChanged(QAction* changedTo);
 
 
 private:
-    void populateComboBox();
+	void populateComboBox();
 
-    
+
 private:
-    // Widgets
-    QLineEdit* m_inputEdit;
-    QComboBox* m_cpuComboBox;
-    DebuggerView* m_dasmView;
+	// Widgets
+	QLineEdit* m_inputEdit;
+	QComboBox* m_cpuComboBox;
+	DebuggerView* m_dasmView;
 };
 
 

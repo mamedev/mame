@@ -71,7 +71,7 @@ void dday_state::palette_init()
 		colortable_entry_set_value(machine().colortable, i, i);
 
 	/* HACK!!! This table is handgenerated, but it matches the screenshot.
-       I have no clue how it really works */
+	   I have no clue how it really works */
 	colortable_entry_set_value(machine().colortable, 0*8+0+0, 0x00);
 	colortable_entry_set_value(machine().colortable, 0*8+0+1, 0x01);
 	colortable_entry_set_value(machine().colortable, 0*8+0+2, 0x15);

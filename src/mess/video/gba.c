@@ -1,17 +1,17 @@
- /***************************************************************************
+	/***************************************************************************
 
-  gba.c
+	gba.c
 
-  File to handle emulation of the video hardware of the Game Boy Advance
+	File to handle emulation of the video hardware of the Game Boy Advance
 
-  By R. Belmont, MooglyGuy, Harmony
+	By R. Belmont, MooglyGuy, Harmony
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/gba.h"
 
-#define VERBOSE_LEVEL	(0)
+#define VERBOSE_LEVEL   (0)
 
 INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
@@ -53,32 +53,32 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff_);
 static void (*const gba_draw_scanline_modes[8][3])(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux) =
 {
 	/* All modes have three sub-modes: No effects, effects, and windowed effects. */
-	{	/* Mode 0: 4 non-rotatable tilemaps and 1 OAM layer */
+	{   /* Mode 0: 4 non-rotatable tilemaps and 1 OAM layer */
 		&draw_mode0_scanline,
 		&draw_mode0_scanline_nowindow,
 		&draw_mode0_scanline_all
 	},
-	{	/* Mode 1: 2 non-rotatable tilemaps, 1 rotozoomable tilemap, and 1 OAM layer */
+	{   /* Mode 1: 2 non-rotatable tilemaps, 1 rotozoomable tilemap, and 1 OAM layer */
 		&draw_mode1_scanline,
 		&draw_mode1_scanline_nowindow,
 		&draw_mode1_scanline_all
 	},
-	{	/* Mode 2: 2 rotozoomable tilemaps, and 1 OAM layer */
+	{   /* Mode 2: 2 rotozoomable tilemaps, and 1 OAM layer */
 		&draw_mode2_scanline,
 		&draw_mode2_scanline_nowindow,
 		&draw_mode2_scanline_all
 	},
-	{	/* Mode 3: 1 rotatable 8bpp bitmap and one OAM layer */
+	{   /* Mode 3: 1 rotatable 8bpp bitmap and one OAM layer */
 		&draw_roz_bitmap_mode_scanline,
 		&draw_roz_bitmap_mode_scanline_nowindow,
 		&draw_roz_bitmap_mode_scanline_all
 	},
-	{	/* Mode 4: 1 rotatable 16bpp bitmap and one OAM layer */
+	{   /* Mode 4: 1 rotatable 16bpp bitmap and one OAM layer */
 		&draw_roz_bitmap_mode_scanline,
 		&draw_roz_bitmap_mode_scanline_nowindow,
 		&draw_roz_bitmap_mode_scanline_all
 	},
-	{	/* Mode 5: 1 rotatable 4bpp bitmap and one OAM layer */
+	{   /* Mode 5: 1 rotatable 4bpp bitmap and one OAM layer */
 		&draw_roz_bitmap_mode_scanline,
 		&draw_roz_bitmap_mode_scanline_nowindow,
 		&draw_roz_bitmap_mode_scanline_all
@@ -224,9 +224,9 @@ static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT
 
 	if (state->m_DISPCNT & enablemask)
 	{
-		base = ((ctrl & BGCNT_CHARBASE) >> BGCNT_CHARBASE_SHIFT) * 0x4000;			// VRAM base of tiles
-		mapbase = ((ctrl & BGCNT_SCREENBASE) >> BGCNT_SCREENBASE_SHIFT) * 0x800;	// VRAM base of map
-		size = (ctrl & BGCNT_SCREENSIZE) >> BGCNT_SCREENSIZE_SHIFT;					// size of map in submaps
+		base = ((ctrl & BGCNT_CHARBASE) >> BGCNT_CHARBASE_SHIFT) * 0x4000;          // VRAM base of tiles
+		mapbase = ((ctrl & BGCNT_SCREENBASE) >> BGCNT_SCREENBASE_SHIFT) * 0x800;    // VRAM base of map
+		size = (ctrl & BGCNT_SCREENSIZE) >> BGCNT_SCREENSIZE_SHIFT;                 // size of map in submaps
 
 		// sign extend roz parameters
 		if (X & 0x08000000) X |= 0xf0000000;
@@ -730,7 +730,7 @@ static void draw_gba_oam_window(gba_state *state, running_machine &machine, UINT
 				}
 
 				tiledrawindex = tileindex = (attr2 & OBJ_TILENUM);
-				tilebytebase = 0x10000;	// the index doesn't change in the higher modes, we just ignore sprites that are out of range
+				tilebytebase = 0x10000; // the index doesn't change in the higher modes, we just ignore sprites that are out of range
 
 				if (attr0 & OBJ_ROZMODE_ROZ)
 				{
@@ -1808,4 +1808,3 @@ UINT32 gba_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-

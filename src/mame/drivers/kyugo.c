@@ -405,7 +405,7 @@ static INPUT_PORTS_START( legend )
 	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	/* probably unused */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  /* probably unused */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )
@@ -457,9 +457,9 @@ static const gfx_layout spritelayout =
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{     0,     1,     2,     3,     4,     5,     6,     7,
-	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
 	16*16
 };
 
@@ -532,12 +532,12 @@ INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kyugo_main_map)
 	MCFG_CPU_IO_MAP(kyugo_main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kyugo_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gyrodine_sub_map)
 	MCFG_CPU_IO_MAP(gyrodine_sub_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
@@ -1282,15 +1282,15 @@ ROM_START( legend )
 	ROM_LOAD( "a_r9.rom",    0x4000, 0x2000, CRC(66737f1e) SHA1(5eac6606ed3a11a00eb1172e35487b0d95b1d739) )
 	ROM_LOAD( "a_n7.rom",    0x6000, 0x2000, CRC(13915a53) SHA1(25ba3babc8eb0df413bdfe7dbcd8642e4c658120) )
 
-	ROM_REGION(  0x1000, "gfx1", 0 )	/* fg tiles */
+	ROM_REGION(  0x1000, "gfx1", 0 )    /* fg tiles */
 	ROM_LOAD( "b_a4.rom",    0x0000, 0x1000, CRC(c7dd3cf7) SHA1(87f31c639d840e781d0f56f98f00d0642c6b87b4) )
 
-	ROM_REGION(  0x6000, "gfx2", 0 )	/* bg tiles */
+	ROM_REGION(  0x6000, "gfx2", 0 )    /* bg tiles */
 	ROM_LOAD( "b_h9.rom",    0x0000, 0x2000, CRC(1fe8644a) SHA1(42f5b93ffb3277321969a0bd805ec78796583d37) )
 	ROM_LOAD( "b_h10.rom",   0x2000, 0x2000, CRC(5f7dc82e) SHA1(3e70be650b8046c2b34a2405a2fbc2a16bf73bf1) )
 	ROM_LOAD( "b_h11.rom",   0x4000, 0x2000, CRC(46741643) SHA1(3fba31bac5a7d94af80035304647f39af3a9484f) )
 
-	ROM_REGION( 0x18000, "gfx3", 0 )	/* sprites */
+	ROM_REGION( 0x18000, "gfx3", 0 )    /* sprites */
 	ROM_LOAD( "b_a6.rom",   0x00000, 0x4000, CRC(1689f21c) SHA1(fafb13dc8ca27a7506065bbf08102afc6d722843) )
 	ROM_LOAD( "b_a7.rom",   0x04000, 0x4000, CRC(f527c909) SHA1(40f44828502018c73283965eb7a2a68ed25ebfe5) )
 	ROM_LOAD( "b_a8.rom",   0x08000, 0x4000, CRC(8d618629) SHA1(3cc49fd8066464ee940de010da3f33ed8573df3d) )
@@ -1324,15 +1324,15 @@ ROM_START( legendb )
 	ROM_LOAD( "04.s09",    0x4000, 0x2000, CRC(0dd50aa7) SHA1(001ba0d5e0b50fb030a95fdbeba40005ffc5c182) )
 	ROM_LOAD( "01.n07",    0x6000, 0x2000, CRC(13915a53) SHA1(25ba3babc8eb0df413bdfe7dbcd8642e4c658120) )
 
-	ROM_REGION(  0x1000, "gfx1", 0 )	/* fg tiles */
+	ROM_REGION(  0x1000, "gfx1", 0 )    /* fg tiles */
 	ROM_LOAD( "15.b05",    0x0000, 0x1000, CRC(6c879f76) SHA1(9da84446e463264ed86e912589d826d86c27bf59) )
 
-	ROM_REGION(  0x6000, "gfx2", 0 )	/* bg tiles */
+	ROM_REGION(  0x6000, "gfx2", 0 )    /* bg tiles */
 	ROM_LOAD( "18.j09",   0x0000, 0x2000, CRC(3bdcd028) SHA1(2fb2ecc5333e50834badb4b00093ca8e9a64bce4) )
 	ROM_LOAD( "17.j10",   0x2000, 0x2000, CRC(105c5b53) SHA1(269da6bdef55024e593ea0178597e37ff2fefc10) )
 	ROM_LOAD( "16.j11",   0x4000, 0x2000, CRC(b9ca4efd) SHA1(680c3ca88c65c1643ae82945b937d34579c0efeb) )
 
-	ROM_REGION( 0x18000, "gfx3", 0 )	/* sprites */
+	ROM_REGION( 0x18000, "gfx3", 0 )    /* sprites */
 	ROM_LOAD( "14.b06",   0x00000, 0x4000, CRC(1689f21c) SHA1(fafb13dc8ca27a7506065bbf08102afc6d722843) )
 	ROM_LOAD( "13.b07",   0x04000, 0x4000, CRC(f527c909) SHA1(40f44828502018c73283965eb7a2a68ed25ebfe5) )
 	ROM_LOAD( "12.b08",   0x08000, 0x4000, CRC(8d618629) SHA1(3cc49fd8066464ee940de010da3f33ed8573df3d) )

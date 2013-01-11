@@ -20,14 +20,14 @@
 #include "machine/i8255.h"
 #include "video/mc6845.h"
 
-#define MASTER_CLOCK			(XTAL_10MHz)
-#define CPU_CLOCK				(MASTER_CLOCK / 4)
-#define PIXEL_CLOCK				(MASTER_CLOCK / 1)
-#define CRTC_CLOCK				(MASTER_CLOCK / 8)
-#define SND_CLOCK				(MASTER_CLOCK / 8)
+#define MASTER_CLOCK            (XTAL_10MHz)
+#define CPU_CLOCK               (MASTER_CLOCK / 4)
+#define PIXEL_CLOCK             (MASTER_CLOCK / 1)
+#define CRTC_CLOCK              (MASTER_CLOCK / 8)
+#define SND_CLOCK               (MASTER_CLOCK / 8)
 
-#define NUM_PENS				(16)
-#define RAM_PALETTE_SIZE		(1024)
+#define NUM_PENS                (16)
+#define RAM_PALETTE_SIZE        (1024)
 
 
 class slotcarn_state : public driver_device
@@ -127,7 +127,7 @@ static MC6845_UPDATE_ROW( update_row )
 		int region = (attr & 0x40) >> 6;
 		int addr = ((state->m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
-		UINT8	*data;
+		UINT8   *data;
 
 		addr &= (rlen-1);
 		data = gfx[region];
@@ -168,16 +168,16 @@ WRITE_LINE_MEMBER(slotcarn_state::vsync_changed)
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",					/* screen we are acting on */
-	8,							/* number of pixels per video memory address */
-	begin_update,				/* before pixel update callback */
-	update_row,					/* row update callback */
-	NULL,						/* after pixel update callback */
-	DEVCB_NULL,					/* callback for display state changes */
-	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_DRIVER_LINE_MEMBER(slotcarn_state,hsync_changed),	/* HSYNC callback */
-	DEVCB_DRIVER_LINE_MEMBER(slotcarn_state,vsync_changed),	/* VSYNC callback */
-	NULL						/* update address callback */
+	"screen",                   /* screen we are acting on */
+	8,                          /* number of pixels per video memory address */
+	begin_update,               /* before pixel update callback */
+	update_row,                 /* row update callback */
+	NULL,                       /* after pixel update callback */
+	DEVCB_NULL,                 /* callback for display state changes */
+	DEVCB_NULL,                 /* callback for cursor state changes */
+	DEVCB_DRIVER_LINE_MEMBER(slotcarn_state,hsync_changed), /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(slotcarn_state,vsync_changed), /* VSYNC callback */
+	NULL                        /* update address callback */
 };
 
 
@@ -195,9 +195,9 @@ static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
-	AM_RANGE(0xba00, 0xba03) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
-	AM_RANGE(0xbc00, 0xbc03) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)	/* Input/Output Ports */
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
+	AM_RANGE(0xba00, 0xba03) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
+	AM_RANGE(0xbc00, 0xbc03) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
 
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW3")
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW4")
@@ -223,7 +223,7 @@ ADDRESS_MAP_END
 ********************************/
 
 static INPUT_PORTS_START( slotcarn )
-	PORT_START("IN0")	/* b800 (ppi8255) */
+	PORT_START("IN0")   /* b800 (ppi8255) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( slotcarn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_M) PORT_NAME("Cancel")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("Select")
 
-	PORT_START("IN1")	/* b801 (ppi8255) */
+	PORT_START("IN1")   /* b801 (ppi8255) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1)    PORT_IMPULSE(2)       /* Coin A */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2)       /* Coin B */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Stats")
@@ -243,10 +243,10 @@ static INPUT_PORTS_START( slotcarn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN4)    PORT_IMPULSE(2)       /* Coin D */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* b802 (ppi8255) */
+	PORT_START("IN2")   /* b802 (ppi8255) */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")	/* bc00 (ppi8255) */
+	PORT_START("IN3")   /* bc00 (ppi8255) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -256,61 +256,61 @@ static INPUT_PORTS_START( slotcarn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Payout")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_H) PORT_NAME("Empty Hopper")
 
-	PORT_START("IN4")	/* bc01 (ppi8255) */
+	PORT_START("IN4")   /* bc01 (ppi8255) */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")	/* ba00 (ppi8255) */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:8")
+	PORT_START("DSW1")  /* ba00 (ppi8255) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "D-UP Pay Rate" )		PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0xc0, 0xc0, "D-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0xc0, "80%" )
 	PORT_DIPSETTING(    0x80, "85%" )
 	PORT_DIPSETTING(    0x40, "90%" )
 	PORT_DIPSETTING(    0x00, "95%" )
 
-	PORT_START("DSW2")	/* ay8910, port B */
-	PORT_DIPNAME( 0x01, 0x01, "FIVE LINE Pay Rate" )	PORT_DIPLOCATION("DSW2:8")
+	PORT_START("DSW2")  /* ay8910, port B */
+	PORT_DIPNAME( 0x01, 0x01, "FIVE LINE Pay Rate" )    PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x01, "75%" )
 	PORT_DIPSETTING(    0x00, "85%" )
-	PORT_DIPNAME( 0x02, 0x02, "SUPER CONTI Pay Rate" )	PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x02, 0x02, "SUPER CONTI Pay Rate" )  PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x02, "75%" )
 	PORT_DIPSETTING(    0x00, "85%" )
-	PORT_DIPNAME( 0x04, 0x04, "LUCKY BAR Pay Rate" )	PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x04, 0x04, "LUCKY BAR Pay Rate" )    PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x04, "75%" )
 	PORT_DIPSETTING(    0x00, "85%" )
-	PORT_DIPNAME( 0x08, 0x08, "BONUS LINE Pay Rate" )	PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPNAME( 0x08, 0x08, "BONUS LINE Pay Rate" )   PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x08, "75%" )
 	PORT_DIPSETTING(    0x00, "85%" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")	/* c000 direct */
+	PORT_START("DSW3")  /* c000 direct */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( slotcarn )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW4")	/* c400 direct */
+	PORT_START("DSW4")  /* c400 direct */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( slotcarn )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spielbud )
-	PORT_START("IN0")	/* b800 (ppi8255) */
+	PORT_START("IN0")   /* b800 (ppi8255) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1 / Deal (BJ)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3 / Bet 1 / Split (BJ)")
@@ -374,20 +374,20 @@ static INPUT_PORTS_START( spielbud )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel / Select")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* b801 (ppi8255) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)	/* Coin A */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2) PORT_IMPULSE(2)	/* Coin B */
+	PORT_START("IN1")   /* b801 (ppi8255) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)   /* Coin A */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2) PORT_IMPULSE(2)   /* Coin B */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3) PORT_IMPULSE(2)	/* Coin C */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN4) PORT_IMPULSE(2)	/* Coin D */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3) PORT_IMPULSE(2)   /* Coin C */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN4) PORT_IMPULSE(2)   /* Coin D */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* b802 (ppi8255) */
+	PORT_START("IN2")   /* b802 (ppi8255) */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")	/* bc00 (ppi8255) */
+	PORT_START("IN3")   /* bc00 (ppi8255) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Tief (Low)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hoch (High)")
@@ -397,10 +397,10 @@ static INPUT_PORTS_START( spielbud )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")	/* bc01 (ppi8255) */
+	PORT_START("IN4")   /* bc01 (ppi8255) */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")	/* ba00 (ppi8255) */
+	PORT_START("DSW1")  /* ba00 (ppi8255) */
 	PORT_DIPNAME( 0x01, 0x01, "Game STRATEGIE" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( spielbud )
 	PORT_DIPSETTING(    0x40, "Play 1 bet by hand" )
 	PORT_DIPSETTING(    0x00, "Play 1 to 50 bets" )
 
-	PORT_START("DSW2")	/* ay8910, port B */
+	PORT_START("DSW2")  /* ay8910, port B */
 	PORT_DIPNAME( 0x07, 0x07, "Main Game rate" )
 	PORT_DIPSETTING(    0x06, "75%" )
 	PORT_DIPSETTING(    0x05, "80%" )
@@ -447,7 +447,7 @@ static INPUT_PORTS_START( spielbud )
 	PORT_DIPSETTING(    0x00, "Hold" )
 	PORT_DIPSETTING(    0x80, "Discard" )
 
-	PORT_START("DSW3")	/* c000 direct */
+	PORT_START("DSW3")  /* c000 direct */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -473,7 +473,7 @@ static INPUT_PORTS_START( spielbud )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW4")	/* c400 direct */
+	PORT_START("DSW4")  /* c400 direct */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -554,32 +554,32 @@ void slotcarn_state::machine_start()
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_2_intf )
 {
-	DEVCB_INPUT_PORT("IN3"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN4"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("IN3"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN4"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)

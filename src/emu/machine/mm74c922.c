@@ -115,10 +115,10 @@ inline void mm74c922_device::detect_keypress()
 //-------------------------------------------------
 
 mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MM74C922, "MM74C922", tag, owner, clock),
-	  m_x(0),
-	  m_y(0),
-	  m_next_da(0)
+	: device_t(mconfig, MM74C922, "MM74C922", tag, owner, clock),
+		m_x(0),
+		m_y(0),
+		m_next_da(0)
 {
 }
 

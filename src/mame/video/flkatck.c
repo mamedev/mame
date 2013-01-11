@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
 	if ((attr == 0x0d) && (!ctrl_0) && (!ctrl_2))
-		bank = 0;	/*  this allows the game to print text
+		bank = 0;   /*  this allows the game to print text
                     in all banks selected by the k007121 */
 
 	SET_TILE_INFO_MEMBER(
@@ -84,9 +84,9 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_w)
 {
 
 	m_k007121_ram[offset] = data;
-	if (offset < 0x1000)	/* tiles */
+	if (offset < 0x1000)    /* tiles */
 	{
-		if (offset & 0x800)	/* score */
+		if (offset & 0x800) /* score */
 			m_k007121_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
 		else
 			m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
@@ -98,12 +98,12 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 
 	switch (offset)
 	{
-		case 0x04:	/* ROM bank select */
+		case 0x04:  /* ROM bank select */
 			if (data != k007121_ctrlram_r(m_k007121, space, 4))
 				machine().tilemap().mark_all_dirty();
 			break;
 
-		case 0x07:	/* flip screen + IRQ control */
+		case 0x07:  /* flip screen + IRQ control */
 			m_flipscreen = data & 0x08;
 			machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_irq_enabled = data & 0x02;

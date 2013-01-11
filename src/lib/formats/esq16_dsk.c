@@ -72,15 +72,15 @@ void esqimg_format::find_size(io_generic *io, int &track_count, int &head_count,
 {
 	int size = io_generic_size(io);
 	track_count = 80;
-    head_count = 2;
+	head_count = 2;
 	sector_count = 10;
 
-    if (size == 512*track_count*head_count*sector_count)
-    {
-        return;
-    }
+	if (size == 512*track_count*head_count*sector_count)
+	{
+		return;
+	}
 
-    track_count = head_count = sector_count = 0;
+	track_count = head_count = sector_count = 0;
 }
 
 int esqimg_format::identify(io_generic *io, UINT32 form_factor)

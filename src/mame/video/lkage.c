@@ -109,12 +109,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	{
 		int attributes = source[2];
 		/* 0x01: horizontal flip
-         * 0x02: vertical flip
-         * 0x04: bank select
-         * 0x08: sprite size
-         * 0x70: color
-         * 0x80: priority
-         */
+		 * 0x02: vertical flip
+		 * 0x04: bank select
+		 * 0x08: sprite size
+		 * 0x70: color
+		 * 0x80: priority
+		 */
 		int priority_mask = 0;
 		int color = (attributes >> 4) & 7;
 		int flipx = attributes & 0x01;

@@ -95,7 +95,7 @@ static INPUT_PORTS_START( mouser )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )		/* guess ! - check code at 0x29a1 */
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )       /* guess ! - check code at 0x29a1 */
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -123,10 +123,10 @@ static INPUT_PORTS_START( mouser )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x02, "5" )
-	PORT_DIPSETTING(	0x03, "6" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x04, "40000" )
@@ -167,9 +167,9 @@ static const gfx_layout spritelayout =
 	2,       /* 2 bits per pixel */
 	{ 8192*8, 0 },
 	{0,  1,  2,  3,  4,  5,  6,  7,
-	 64+0, 64+1, 64+2, 64+3, 64+4, 64+5, 64+6, 64+7},
+		64+0, 64+1, 64+2, 64+3, 64+4, 64+5, 64+6, 64+7},
 	{8*0, 8*1, 8*2, 8*3, 8*4, 8*5, 8*6, 8*7,
-	 128+8*0, 128+8*1, 128+8*2, 128+8*3, 128+8*4, 128+8*5, 128+8*6, 128+8*7},
+		128+8*0, 128+8*1, 128+8*2, 128+8*3, 128+8*4, 128+8*5, 128+8*6, 128+8*7},
 	16*16
 };
 
@@ -201,11 +201,11 @@ void mouser_state::machine_reset()
 static MACHINE_CONFIG_START( mouser, mouser_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mouser_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mouser_state,  mouser_nmi_interrupt) /* NMI is masked externally */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ??? */
 	MCFG_CPU_PROGRAM_MAP(mouser_sound_map)
 	MCFG_CPU_IO_MAP(mouser_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mouser_state, mouser_sound_nmi_assert,  4*60) /* ??? This controls the sound tempo */
@@ -261,15 +261,15 @@ ROM_END
 ROM_START( mouserc )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
 	ROM_LOAD( "83001.0",       0x0000, 0x2000, CRC(e20f9601) SHA1(f559a470784bda0bee9cab257a548238365acaa6) )
-	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )	// 83001.1
-	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )	// 83001.2
+	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )   // 83001.1
+	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )   // 83001.2
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )	// 83001.5
+	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )   // 83001.5
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )	// 83001.3
-	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )	// 83001.4
+	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )   // 83001.3
+	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )   // 83001.4
 
 	/* Opcode Decryption PROMS (originally from the UPL romset!) */
 	ROM_REGION( 0x0100, "user1", 0 )
@@ -277,8 +277,8 @@ ROM_START( mouserc )
 	ROM_LOAD_NIB_LOW(  "bprom.4c",0x0000,0x0100,CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "bprom.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) )	// clr.5v
-	ROM_LOAD( "bprom.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) )	// clr.5u
+	ROM_LOAD( "bprom.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) )    // clr.5v
+	ROM_LOAD( "bprom.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) )    // clr.5u
 ROM_END
 
 

@@ -74,37 +74,37 @@ const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[9
 
 debug_view_memory_source::debug_view_memory_source(const char *name, address_space &space)
 	: debug_view_source(name, &space.device()),
-	  m_space(&space),
-	  m_memintf(dynamic_cast<device_memory_interface *>(&space.device())),
-	  m_base(NULL),
-	  m_length(0),
-	  m_offsetxor(0),
-	  m_endianness(space.endianness()),
-	  m_prefsize(space.data_width() / 8)
+		m_space(&space),
+		m_memintf(dynamic_cast<device_memory_interface *>(&space.device())),
+		m_base(NULL),
+		m_length(0),
+		m_offsetxor(0),
+		m_endianness(space.endianness()),
+		m_prefsize(space.data_width() / 8)
 {
 }
 
 debug_view_memory_source::debug_view_memory_source(const char *name, memory_region &region)
 	: debug_view_source(name),
-	  m_space(NULL),
-	  m_memintf(NULL),
-	  m_base(region),
-	  m_length(region.bytes()),
-	  m_offsetxor(NATIVE_ENDIAN_VALUE_LE_BE(region.width() - 1, 0)),
-	  m_endianness(region.endianness()),
-	  m_prefsize(MIN(region.width(), 8))
+		m_space(NULL),
+		m_memintf(NULL),
+		m_base(region),
+		m_length(region.bytes()),
+		m_offsetxor(NATIVE_ENDIAN_VALUE_LE_BE(region.width() - 1, 0)),
+		m_endianness(region.endianness()),
+		m_prefsize(MIN(region.width(), 8))
 {
 }
 
 debug_view_memory_source::debug_view_memory_source(const char *name, void *base, int element_size, int num_elements)
 	: debug_view_source(name),
-	  m_space(NULL),
-	  m_memintf(NULL),
-	  m_base(base),
-	  m_length(element_size * num_elements),
-	  m_offsetxor(0),
-	  m_endianness(ENDIANNESS_NATIVE),
-	  m_prefsize(MIN(element_size, 8))
+		m_space(NULL),
+		m_memintf(NULL),
+		m_base(base),
+		m_length(element_size * num_elements),
+		m_offsetxor(0),
+		m_endianness(ENDIANNESS_NATIVE),
+		m_prefsize(MIN(element_size, 8))
 {
 }
 
@@ -120,15 +120,15 @@ debug_view_memory_source::debug_view_memory_source(const char *name, void *base,
 
 debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: debug_view(machine, DVT_MEMORY, osdupdate, osdprivate),
-	  m_expression(machine),
-	  m_chunks_per_row(16),
-	  m_bytes_per_chunk(1),
-	  m_reverse_view(false),
-	  m_ascii_view(true),
-	  m_no_translation(false),
-	  m_maxaddr(0),
-	  m_bytes_per_row(16),
-	  m_byte_offset(0)
+		m_expression(machine),
+		m_chunks_per_row(16),
+		m_bytes_per_chunk(1),
+		m_reverse_view(false),
+		m_ascii_view(true),
+		m_no_translation(false),
+		m_maxaddr(0),
+		m_bytes_per_row(16),
+		m_byte_offset(0)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -181,10 +181,10 @@ void debug_view_memory::enumerate_sources()
 			break;
 
 		// add pretty much anything that's not a timer (we may wish to cull other items later)
-        // also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
-        if (strncmp(itemname, "timer/", 6))
+		// also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
+		if (strncmp(itemname, "timer/", 6))
 		{
-            name.cpy(itemname);
+			name.cpy(itemname);
 			m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, base, valsize, valcount)));
 		}
 	}
@@ -627,10 +627,10 @@ bool debug_view_memory::read(UINT8 size, offs_t offs, UINT64 &data)
 		{
 			switch (size)
 			{
-				case 1:	data = debug_read_byte(*source.m_space, offs, !m_no_translation); break;
-				case 2:	data = debug_read_word(*source.m_space, offs, !m_no_translation); break;
-				case 4:	data = debug_read_dword(*source.m_space, offs, !m_no_translation); break;
-				case 8:	data = debug_read_qword(*source.m_space, offs, !m_no_translation); break;
+				case 1: data = debug_read_byte(*source.m_space, offs, !m_no_translation); break;
+				case 2: data = debug_read_word(*source.m_space, offs, !m_no_translation); break;
+				case 4: data = debug_read_dword(*source.m_space, offs, !m_no_translation); break;
+				case 8: data = debug_read_qword(*source.m_space, offs, !m_no_translation); break;
 			}
 		}
 		return ismapped;
@@ -674,10 +674,10 @@ void debug_view_memory::write(UINT8 size, offs_t offs, UINT64 data)
 	{
 		switch (size)
 		{
-			case 1:	debug_write_byte(*source.m_space, offs, data, !m_no_translation); break;
-			case 2:	debug_write_word(*source.m_space, offs, data, !m_no_translation); break;
-			case 4:	debug_write_dword(*source.m_space, offs, data, !m_no_translation); break;
-			case 8:	debug_write_qword(*source.m_space, offs, data, !m_no_translation); break;
+			case 1: debug_write_byte(*source.m_space, offs, data, !m_no_translation); break;
+			case 2: debug_write_word(*source.m_space, offs, data, !m_no_translation); break;
+			case 4: debug_write_dword(*source.m_space, offs, data, !m_no_translation); break;
+			case 8: debug_write_qword(*source.m_space, offs, data, !m_no_translation); break;
 		}
 		return;
 	}

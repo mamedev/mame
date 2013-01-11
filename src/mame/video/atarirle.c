@@ -29,70 +29,70 @@
 /* internal structure containing a word index, shift and mask */
 struct atarirle_mask
 {
-	int				word;				/* word index */
-	int				shift;				/* shift amount */
-	int				mask;				/* final mask */
+	int             word;               /* word index */
+	int             shift;              /* shift amount */
+	int             mask;               /* final mask */
 };
 
 /* internal structure for sorting the motion objects */
 struct mo_sort_entry
 {
-	mo_sort_entry *	next;
-	int 			entry;
+	mo_sort_entry * next;
+	int             entry;
 };
 
 /* internal structure describing each object in the ROMs */
 struct atarirle_info
 {
-	INT16			width;
-	INT16			height;
-	INT16			xoffs;
-	INT16			yoffs;
-	UINT8			bpp;
-	const UINT16 *	table;
-	const UINT16 *	data;
+	INT16           width;
+	INT16           height;
+	INT16           xoffs;
+	INT16           yoffs;
+	UINT8           bpp;
+	const UINT16 *  table;
+	const UINT16 *  data;
 };
 
 /* internal structure containing the state of the motion objects */
 struct atarirle_data
 {
-	int				bitmapwidth;		/* width of the full playfield bitmap */
-	int				bitmapheight;		/* height of the full playfield bitmap */
-	int				bitmapxmask;		/* x coordinate mask for the playfield bitmap */
-	int				bitmapymask;		/* y coordinate mask for the playfield bitmap */
+	int             bitmapwidth;        /* width of the full playfield bitmap */
+	int             bitmapheight;       /* height of the full playfield bitmap */
+	int             bitmapxmask;        /* x coordinate mask for the playfield bitmap */
+	int             bitmapymask;        /* y coordinate mask for the playfield bitmap */
 
-	int				spriterammask;		/* combined mask when accessing sprite RAM with raw addresses */
-	int				spriteramsize;		/* total size of sprite RAM, in entries */
+	int             spriterammask;      /* combined mask when accessing sprite RAM with raw addresses */
+	int             spriteramsize;      /* total size of sprite RAM, in entries */
 
-	int				palettebase;		/* base palette entry */
-	int				maxcolors;			/* maximum number of colors */
+	int             palettebase;        /* base palette entry */
+	int             maxcolors;          /* maximum number of colors */
 
-	rectangle		cliprect;			/* clipping rectangle */
+	rectangle       cliprect;           /* clipping rectangle */
 
-	atarirle_mask	codemask;			/* mask for the code index */
-	atarirle_mask	colormask;			/* mask for the color */
-	atarirle_mask	xposmask;			/* mask for the X position */
-	atarirle_mask	yposmask;			/* mask for the Y position */
-	atarirle_mask	scalemask;			/* mask for the scale factor */
-	atarirle_mask	hflipmask;			/* mask for the horizontal flip */
-	atarirle_mask	ordermask;			/* mask for the order */
-	atarirle_mask	prioritymask;		/* mask for the priority */
-	atarirle_mask	vrammask;			/* mask for the VRAM target */
+	atarirle_mask   codemask;           /* mask for the code index */
+	atarirle_mask   colormask;          /* mask for the color */
+	atarirle_mask   xposmask;           /* mask for the X position */
+	atarirle_mask   yposmask;           /* mask for the Y position */
+	atarirle_mask   scalemask;          /* mask for the scale factor */
+	atarirle_mask   hflipmask;          /* mask for the horizontal flip */
+	atarirle_mask   ordermask;          /* mask for the order */
+	atarirle_mask   prioritymask;       /* mask for the priority */
+	atarirle_mask   vrammask;           /* mask for the VRAM target */
 
-	const UINT16 *	rombase;			/* pointer to the base of the GFX ROM */
-	int				romlength;			/* length of the GFX ROM */
-	int				objectcount;		/* number of objects in the ROM */
-	atarirle_info *	info;				/* list of info records */
-	atarirle_entry *spriteram;			/* pointer to sprite RAM */
+	const UINT16 *  rombase;            /* pointer to the base of the GFX ROM */
+	int             romlength;          /* length of the GFX ROM */
+	int             objectcount;        /* number of objects in the ROM */
+	atarirle_info * info;               /* list of info records */
+	atarirle_entry *spriteram;          /* pointer to sprite RAM */
 
-	bitmap_ind16 *		vram[2][2];			/* pointers to VRAM bitmaps and backbuffers */
-	int				partial_scanline;	/* partial update scanline */
+	bitmap_ind16 *      vram[2][2];         /* pointers to VRAM bitmaps and backbuffers */
+	int             partial_scanline;   /* partial update scanline */
 
-	UINT8			control_bits;		/* current control bits */
-	UINT8			command;			/* current command */
-	UINT8			is32bit;			/* 32-bit or 16-bit? */
-	UINT16			checksums[256];		/* checksums for each 0x40000 bytes */
-	UINT16			ram[0x1000/2];
+	UINT8           control_bits;       /* current control bits */
+	UINT8           command;            /* current command */
+	UINT8           is32bit;            /* 32-bit or 16-bit? */
+	UINT16          checksums[256];     /* checksums for each 0x40000 bytes */
+	UINT16          ram[0x1000/2];
 };
 
 

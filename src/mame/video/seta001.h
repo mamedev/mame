@@ -78,9 +78,3 @@ DECLARE_READ16_DEVICE_HANDLER( spritecode_r16 );
 DECLARE_WRITE16_DEVICE_HANDLER( spritecode_w16 );
 
 extern const device_type SETA001_SPRITE;
-
-
-
-
-
-

@@ -61,7 +61,7 @@
 
 struct profile_string
 {
-	int 		type;
+	int         type;
 	const char *string;
 };
 
@@ -79,7 +79,7 @@ profiler_state g_profiler;
 //  CONSTANTS
 //**************************************************************************
 
-#define TEXT_UPDATE_TIME		0.5
+#define TEXT_UPDATE_TIME        0.5
 
 
 

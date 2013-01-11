@@ -10,9 +10,9 @@
 #include "includes/rpunch.h"
 
 
-#define BITMAP_WIDTH	304
-#define BITMAP_HEIGHT	224
-#define BITMAP_XOFFSET	4
+#define BITMAP_WIDTH    304
+#define BITMAP_HEIGHT   224
+#define BITMAP_XOFFSET  4
 
 
 /*************************************
@@ -26,8 +26,8 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
 	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code;
-	if (m_videoflags & 0x0400)	code = (data & 0x0fff) | 0x2000;
-	else						code = (data & 0x1fff);
+	if (m_videoflags & 0x0400)  code = (data & 0x0fff) | 0x2000;
+	else                        code = (data & 0x1fff);
 
 	SET_TILE_INFO_MEMBER(
 			0,
@@ -41,8 +41,8 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
 	UINT16 *videoram = m_videoram;
 	int data = videoram[0x2000 / 2 + tile_index];
 	int code;
-	if (m_videoflags & 0x0800)	code = (data & 0x0fff) | 0x2000;
-	else						code = (data & 0x1fff);
+	if (m_videoflags & 0x0800)  code = (data & 0x0fff) | 0x2000;
+	else                        code = (data & 0x1fff);
 
 	SET_TILE_INFO_MEMBER(
 			1,

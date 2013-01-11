@@ -59,14 +59,14 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 
 	switch (offset)
 	{
-		case 0:	m_bg_ctrl = data;	break;
-		case 1:	soundlatch_byte_w(space, 0, data);	break;
-		case 2:	break;
-		case 3:	break;
-		case 4:	break;
-		case 5:	break;
-		case 6:	break;
-		case 7:	break;
+		case 0: m_bg_ctrl = data;   break;
+		case 1: soundlatch_byte_w(space, 0, data);  break;
+		case 2: break;
+		case 3: break;
+		case 4: break;
+		case 5: break;
+		case 6: break;
+		case 7: break;
 	}
 }
 
@@ -181,15 +181,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = code & 0x2;
 		int flipy = code & 0x4;
 
-		x = x * 2 + (code & 1);	// add the least significant bit
+		x = x * 2 + (code & 1); // add the least significant bit
 
 		high_code = ((code >> 4) & 0x7f0) + ((code & 0x8000) >> shift);
 
 		switch( code & 0x88 )
 		{
-			case 0x88:	n = 4; low_code = 0;										break;
-			case 0x08:	n = 2; low_code = ((code & 0x20) ? 8 : 0) + ((code & 0x10) ? 2 : 0);	break;
-			default:	n = 1; low_code = (code >> 4) & 0xf;
+			case 0x88:  n = 4; low_code = 0;                                        break;
+			case 0x08:  n = 2; low_code = ((code & 0x20) ? 8 : 0) + ((code & 0x10) ? 2 : 0);    break;
+			default:    n = 1; low_code = (code >> 4) & 0xf;
 		}
 
 #define DRAW_SPRITE(DX,DY,CODE) \
@@ -200,7 +200,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				flipx,flipy, \
 				x + (DX),y + (DY), 0xff); \
 
-		if (state->m_bg_ctrl & 1)	// flipscreen
+		if (state->m_bg_ctrl & 1)   // flipscreen
 		{
 			x = width  - x - (n - 1) * 8;
 			y = height - y - (n - 1) * 8;
@@ -208,11 +208,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		if (flipx)	{ xstart = n - 1;  xend = -1;  xinc = -1; }
-		else		{ xstart = 0;      xend = n;   xinc = +1; }
+		if (flipx)  { xstart = n - 1;  xend = -1;  xinc = -1; }
+		else        { xstart = 0;      xend = n;   xinc = +1; }
 
-		if (flipy)	{ ystart = n - 1;  yend = -1;  yinc = -1; }
-		else		{ ystart = 0;      yend = n;   yinc = +1; }
+		if (flipy)  { ystart = n - 1;  yend = -1;  yinc = -1; }
+		else        { ystart = 0;      yend = n;   yinc = +1; }
 
 
 		code = low_code + high_code;
@@ -222,7 +222,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			for (dx = xstart; dx != xend; dx += xinc)
 				DRAW_SPRITE(dx * 8, dy * 8, code++);
 
-			if (n == 2)	code += 2;
+			if (n == 2) code += 2;
 		}
 	}
 }
@@ -244,20 +244,20 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	int x, y, i;
 
 	/* The foreground stars (sprites) move at twice this speed when
-       the bg scroll rate [e.g. (skyfox_bg_reg >> 1) & 7] is 4 */
+	   the bg scroll rate [e.g. (skyfox_bg_reg >> 1) & 7] is 4 */
 	int pos = (state->m_bg_pos >> 4) & (512 * 2 - 1);
 
 	for (i = 0 ; i < 0x1000; i++)
 	{
 		int pen, offs, j;
 
-		offs	= (i * 2 + ((state->m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
+		offs    = (i * 2 + ((state->m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
 
 		pen = RAM[offs];
 		x = RAM[offs + 1] * 2 + (i & 1) + pos + ((i & 8) ? 512 : 0);
 		y = ((i / 8) / 2) * 8 + (i % 8);
 
-		if (state->m_bg_ctrl & 1)	// flipscreen
+		if (state->m_bg_ctrl & 1)   // flipscreen
 		{
 			x = 512 * 2 - (x % (512 * 2));
 			y = 256     - (y % 256);
@@ -265,8 +265,8 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 		for (j = 0 ; j <= ((pen & 0x80) ? 0 : 3); j++)
 			bitmap.pix16(
-						   (((j / 2) & 1) + y) % 256,
-						   ((j & 1)     + x) % 512) = 256 + (pen & 0x7f);
+							(((j / 2) & 1) + y) % 256,
+							((j & 1)     + x) % 512) = 256 + (pen & 0x7f);
 	}
 }
 
@@ -282,7 +282,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 UINT32 skyfox_state::screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(255, cliprect);	// the bg is black
+	bitmap.fill(255, cliprect); // the bg is black
 	draw_background(machine(), bitmap, cliprect);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;

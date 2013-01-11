@@ -30,7 +30,7 @@
 *************************************************************************************************************/
 
 
-#define MASTER_CLOCK		XTAL_12MHz	/* confirmed */
+#define MASTER_CLOCK        XTAL_12MHz  /* confirmed */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 void skylncr_state::video_start()
 {
 
-	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20	);
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20    );
 
 	m_reel_1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
 	m_reel_2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
@@ -422,8 +422,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)	/* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)	/* Input Ports */
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
 
 	AM_RANGE(0x20, 0x20) AM_WRITE(skylncr_coin_w )
 
@@ -503,9 +503,9 @@ static const gfx_layout layout8x32x8_rot =
 **************************************/
 
 static GFXDECODE_START( skylncr )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,		0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,		0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_rot,	0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,        0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,       0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_rot,   0, 2 )
 GFXDECODE_END
 
 
@@ -514,7 +514,7 @@ GFXDECODE_END
 ***********************************/
 
 static INPUT_PORTS_START( skylncr )
-	PORT_START("IN1")	/* $00 (PPI0 port A) */
+	PORT_START("IN1")   /* $00 (PPI0 port A) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
@@ -524,7 +524,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN2")	/* $01 (PPI0 port B) */
+	PORT_START("IN2")   /* $01 (PPI0 port B) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Option 2 (D-UP)") PORT_CODE(KEYCODE_S)
@@ -534,7 +534,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN3")	/* $11 (PPI1 port B) */
+	PORT_START("IN3")   /* $11 (PPI1 port B) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
@@ -544,17 +544,17 @@ static INPUT_PORTS_START( skylncr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
 
-	PORT_START("IN4")	/* $12 (PPI1 port C) */
+	PORT_START("IN4")   /* $12 (PPI1 port C) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	/* Settings */
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* Settings */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
-	PORT_START("DSW1")	/* $02 (PPI0 port C) */
+	PORT_START("DSW1")  /* $02 (PPI0 port C) */
 	PORT_DIPNAME( 0x11, 0x01, "D-UP Percentage" )
 	PORT_DIPSETTING(    0x11, "60%" )
 	PORT_DIPSETTING(    0x01, "70%" )
@@ -579,7 +579,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_DIPSETTING(    0x80, "x100" )
 	PORT_DIPSETTING(    0x00, "x1" )
 
-	PORT_START("DSW2")	/* $10 (PPI1 port A) */
+	PORT_START("DSW2")  /* $10 (PPI1 port A) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -603,7 +603,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_DIPSETTING(    0x40, "80%" )
 	PORT_DIPSETTING(    0x00, "90%" )
 
-	PORT_START("DSW3")	/* AY8910 port A */
+	PORT_START("DSW3")  /* AY8910 port A */
 	PORT_DIPNAME( 0x07, 0x07, "Coinage A, B & C" )
 	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit" )
 	PORT_DIPSETTING(    0x01, "1 Coin / 5 Credits" )
@@ -628,7 +628,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_DIPSETTING(    0x40, "16" )
 	PORT_DIPSETTING(    0x00, "32" )
 
-	PORT_START("DSW4")	/* AY8910 port B */
+	PORT_START("DSW4")  /* AY8910 port B */
 	PORT_DIPNAME( 0x07, 0x07, "Remote Credits" )
 	PORT_DIPSETTING(    0x00, "1 Pulse / 100 Credits" )
 	PORT_DIPSETTING(    0x01, "1 Pulse / 110 Credits" )
@@ -661,22 +661,22 @@ INPUT_PORTS_END
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN1"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN2"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("DSW1"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN2"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("DSW1"),           /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("DSW2"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN3"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("IN4"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("DSW2"),           /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN3"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("IN4"),            /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 

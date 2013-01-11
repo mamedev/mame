@@ -107,4 +107,3 @@ reset740
 	PC = set_h(PC, read_direct(0xffff));
 	prefetch();
 	inst_state = -1;
-

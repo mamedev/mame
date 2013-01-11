@@ -578,4 +578,3 @@ CPU_DISASSEMBLE( i8085 )
 	}
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
 }
-

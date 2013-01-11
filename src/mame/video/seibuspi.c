@@ -462,10 +462,10 @@ VIDEO_START_MEMBER(seibuspi_state,spi)
 	int i;
 	int region_length;
 
-	m_text_layer	= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8,8,64,32 );
-	m_back_layer	= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_back_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
-	m_mid_layer	= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
-	m_fore_layer	= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_fore_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
+	m_text_layer    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8,8,64,32 );
+	m_back_layer    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_back_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
+	m_mid_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
+	m_fore_layer    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_fore_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
 
 	m_text_layer->set_transparent_pen(31);
 	m_mid_layer->set_transparent_pen(63);
@@ -493,12 +493,12 @@ VIDEO_START_MEMBER(seibuspi_state,spi)
 	for (i = 4032; i < 4096; i++) { m_alpha_table[i] = 1; }
 
 	// mid layer
-	for (i = 4960; i < 4992; i++) { m_alpha_table[i] = 1; }	// breaks ejanhs
-	for (i = 5040; i < 5056; i++) { m_alpha_table[i] = 1; }	// breaks ejanhs
+	for (i = 4960; i < 4992; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
+	for (i = 5040; i < 5056; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
 	for (i = 5104; i < 5120; i++) { m_alpha_table[i] = 1; }
 	// fore layer
-	for (i = 5552; i < 5568; i++) { m_alpha_table[i] = 1; }	// breaks ejanhs
-	for (i = 5616; i < 5632; i++) { m_alpha_table[i] = 1; }	// breaks ejanhs
+	for (i = 5552; i < 5568; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
+	for (i = 5616; i < 5632; i++) { m_alpha_table[i] = 1; } // breaks ejanhs
 	// text layer
 	for (i = 6000; i < 6016; i++) { m_alpha_table[i] = 1; }
 	for (i = 6128; i < 6144; i++) { m_alpha_table[i] = 1; }
@@ -595,13 +595,13 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 {
 	INT16 *back_rowscroll, *mid_rowscroll, *fore_rowscroll;
 	if( m_layer_bank & 0x80000000 ) {
-		back_rowscroll	= (INT16*)&m_tilemap_ram[0x200];
-		mid_rowscroll	= (INT16*)&m_tilemap_ram[0x600];
-		fore_rowscroll	= (INT16*)&m_tilemap_ram[0xa00];
+		back_rowscroll  = (INT16*)&m_tilemap_ram[0x200];
+		mid_rowscroll   = (INT16*)&m_tilemap_ram[0x600];
+		fore_rowscroll  = (INT16*)&m_tilemap_ram[0xa00];
 	} else {
-		back_rowscroll	= NULL;
-		mid_rowscroll	= NULL;
-		fore_rowscroll	= NULL;
+		back_rowscroll  = NULL;
+		mid_rowscroll   = NULL;
+		fore_rowscroll  = NULL;
 	}
 
 	if( m_layer_enable & 0x1 )

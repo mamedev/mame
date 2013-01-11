@@ -50,7 +50,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_PARSE		0
+#define LOG_PARSE       0
 
 
 
@@ -60,9 +60,9 @@
 
 struct parse_info
 {
-	UINT32	inputs;
-	UINT32	outputs;
-	UINT32	terms;
+	UINT32  inputs;
+	UINT32  outputs;
+	UINT32  terms;
 };
 
 

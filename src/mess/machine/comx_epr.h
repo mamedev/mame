@@ -25,7 +25,7 @@
 // ======================> comx_epr_device
 
 class comx_epr_device : public device_t,
-					    public device_comx_expansion_card_interface
+						public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -38,7 +38,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "comx_epr"; }
+	virtual void device_config_complete() { m_shortname = "comx_epr"; }
 
 	// device_comx_expansion_card_interface overrides
 	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
@@ -46,8 +46,8 @@ protected:
 
 private:
 	UINT8 m_select;
-	UINT8 *m_rom;				// program ROM
-	UINT8 *m_eprom;				// EPROMs
+	UINT8 *m_rom;               // program ROM
+	UINT8 *m_eprom;             // EPROMs
 };
 
 

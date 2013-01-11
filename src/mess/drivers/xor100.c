@@ -109,18 +109,18 @@ WRITE8_MEMBER( xor100_state::mmu_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       A16
-        1       A17
-        2       A18
-        3       A19
-        4
-        5
-        6
-        7
+	    0       A16
+	    1       A17
+	    2       A18
+	    3       A19
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_bank = data & 0x07;
 
@@ -173,18 +173,18 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7       FDC IRQ
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7       FDC IRQ
 
-    */
+	*/
 
 	if (!m_fdc_irq && !m_fdc_drq)
 	{
@@ -199,18 +199,18 @@ WRITE8_MEMBER( xor100_state::fdc_dcont_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DS0
-        1       DS1
-        2       DS2
-        3       DS3
-        4
-        5
-        6
-        7       _HLSTB
+	    0       DS0
+	    1       DS1
+	    2       DS2
+	    3       DS3
+	    4
+	    5
+	    6
+	    7       _HLSTB
 
-    */
+	*/
 
 	// drive select
 	floppy_image_device *floppy = NULL;
@@ -229,18 +229,18 @@ WRITE8_MEMBER( xor100_state::fdc_dsel_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       J
-        1       K
-        2
-        3
-        4
-        5
-        6
-        7
+	    0       J
+	    1       K
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	switch (data & 0x03)
 	{
@@ -375,11 +375,11 @@ WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
 
 static COM8116_INTERFACE( com5016_intf )
 {
-	DEVCB_NULL,					/* fX/4 output */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_fr_w),	/* fR output */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_ft_w),	/* fT output */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG?
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG?
+	DEVCB_NULL,                 /* fX/4 output */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_fr_w),   /* fR output */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_ft_w),   /* fT output */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 }, // WRONG?
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 }, // WRONG?
 };
 
 /* Printer 8251A Interface */
@@ -418,18 +418,18 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PC0
-        PC1
-        PC2
-        PC3
-        PC4     ON LINE
-        PC5     BUSY
-        PC6     _ACK
-        PC7
+	    PC0
+	    PC1
+	    PC2
+	    PC3
+	    PC4     ON LINE
+	    PC5     BUSY
+	    PC6     _ACK
+	    PC7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -475,10 +475,10 @@ WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z0_w),			/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z1_w),			/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z2_w)		/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z0_w),           /* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z1_w),           /* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z2_w)        /* ZC/TO2 callback */
 };
 
 /* WD1795-02 Interface */

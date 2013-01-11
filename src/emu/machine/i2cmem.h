@@ -121,4 +121,4 @@ WRITE_LINE_DEVICE_HANDLER( i2cmem_scl_write );
 WRITE_LINE_DEVICE_HANDLER( i2cmem_wc_write );
 READ_LINE_DEVICE_HANDLER( i2cmem_sda_read );
 
-#endif	/* __I2CMEM_H__ */
+#endif  /* __I2CMEM_H__ */

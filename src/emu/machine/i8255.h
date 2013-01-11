@@ -69,28 +69,28 @@
 
 struct i8255_interface
 {
-	devcb_read8			m_in_pa_cb;
-	devcb_write8		m_out_pa_cb;
-	devcb_read8			m_in_pb_cb;
-	devcb_write8		m_out_pb_cb;
-	devcb_read8			m_in_pc_cb;
-	devcb_write8		m_out_pc_cb;
+	devcb_read8         m_in_pa_cb;
+	devcb_write8        m_out_pa_cb;
+	devcb_read8         m_in_pb_cb;
+	devcb_write8        m_out_pb_cb;
+	devcb_read8         m_in_pc_cb;
+	devcb_write8        m_out_pc_cb;
 };
 
 
 // ======================> i8255_device
 
 class i8255_device :  public device_t,
-					  public i8255_interface
+						public i8255_interface
 {
 public:
-    // construction/destruction
-    i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
-    DECLARE_READ8_MEMBER( pa_r );
+	DECLARE_READ8_MEMBER( pa_r );
 	UINT8 pa_r();
 
 	DECLARE_READ8_MEMBER( pb_r );
@@ -101,10 +101,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc6_w );
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	inline void check_interrupt(int port);
@@ -130,19 +130,19 @@ private:
 	void set_mode(UINT8 data);
 	void set_pc_bit(int bit, int state);
 
-	devcb_resolved_read8		m_in_port_func[3];
-	devcb_resolved_write8		m_out_port_func[3];
+	devcb_resolved_read8        m_in_port_func[3];
+	devcb_resolved_write8       m_out_port_func[3];
 
-	UINT8 m_control;			// mode control word
-	UINT8 m_output[3];			// output latch
-	UINT8 m_input[3];			// input latch
+	UINT8 m_control;            // mode control word
+	UINT8 m_output[3];          // output latch
+	UINT8 m_input[3];           // input latch
 
-	int m_ibf[2];				// input buffer full flag
-	int m_obf[2];				// output buffer full flag, negative logic
-	int m_inte[2];				// interrupt enable
-	int m_inte1;				// interrupt enable
-	int m_inte2;				// interrupt enable
-	int m_intr[2];				// interrupt
+	int m_ibf[2];               // input buffer full flag
+	int m_obf[2];               // output buffer full flag, negative logic
+	int m_inte[2];              // interrupt enable
+	int m_inte1;                // interrupt enable
+	int m_inte2;                // interrupt enable
+	int m_intr[2];              // interrupt
 };
 
 

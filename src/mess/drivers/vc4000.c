@@ -219,14 +219,14 @@ static INPUT_PORTS_START( vc4000 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 9") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad Clear") PORT_CODE(KEYCODE_R)
 #ifndef ANALOG_HACK
-    // auto centering too slow, so only using 5 bits, and scaling at videoside
-    PORT_START("JOY1_X")
+	// auto centering too slow, so only using 5 bits, and scaling at videoside
+	PORT_START("JOY1_X")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_X) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
-    PORT_START("JOY1_Y")
+	PORT_START("JOY1_Y")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(1)
-    PORT_START("JOY2_X")
+	PORT_START("JOY2_X")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_X) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_DEL) PORT_CODE_INC(KEYCODE_PGDN) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
-    PORT_START("JOY2_Y")
+	PORT_START("JOY2_Y")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(2)
 #else
 	PORT_START("JOYS")
@@ -287,14 +287,14 @@ INPUT_PORTS_START( elektor )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("7") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("3") PORT_CODE(KEYCODE_3)
 #ifndef ANALOG_HACK
-    // auto centering too slow, so only using 5 bits, and scaling at videoside
-    PORT_START("JOY1_X")
+	// auto centering too slow, so only using 5 bits, and scaling at videoside
+	PORT_START("JOY1_X")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_X) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
-    PORT_START("JOY1_Y")
+	PORT_START("JOY1_Y")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(1)
-    PORT_START("JOY2_X")
+	PORT_START("JOY2_X")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_X) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_DEL) PORT_CODE_INC(KEYCODE_PGDN) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2)
-    PORT_START("JOY2_Y")
+	PORT_START("JOY2_Y")
 PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_MINMAX(20,225) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_END) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(2)
 #else
 	PORT_START("JOYS")
@@ -326,8 +326,8 @@ static const rgb_t vc4000_palette[] =
 	MAKE_RGB(200, 200, 0), // yellow
 	MAKE_RGB(200, 200, 200), // white
 	/* sprite colors
-    The control line simply inverts the RGB lines all at once.
-    We can do that in the code with ^7 */
+	The control line simply inverts the RGB lines all at once.
+	We can do that in the code with ^7 */
 };
 
 void vc4000_state::palette_init()
@@ -350,23 +350,23 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	if (size > 0x1600)
 		size = 0x1600;
 
-	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
+	if (size > 0x1000)  /* 6k rom + 1k ram - Chess2 only */
 	{
-		memspace.install_read_bank(0x0800, 0x15ff, "bank1");	/* extra rom */
+		memspace.install_read_bank(0x0800, 0x15ff, "bank1");    /* extra rom */
 		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 
-		memspace.install_readwrite_bank(0x1800, 0x1bff, "bank2");	/* ram */
+		memspace.install_readwrite_bank(0x1800, 0x1bff, "bank2");   /* ram */
 		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1800);
 	}
-	else if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
+	else if (size > 0x0800) /* some 4k roms have 1k of mirrored ram */
 	{
-		memspace.install_read_bank(0x0800, 0x0fff, "bank1");	/* extra rom */
+		memspace.install_read_bank(0x0800, 0x0fff, "bank1");    /* extra rom */
 		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
 
 		memspace.install_readwrite_bank(0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
 		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 	}
-	else if (size == 0x0800)	/* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
+	else if (size == 0x0800)    /* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
 	{
 		memspace.install_readwrite_bank(0x0800, 0x0fff, "bank1"); /* ram */
 		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_CPU_ADD("maincpu", S2650, 3546875/4)
 	MCFG_CPU_PROGRAM_MAP(vc4000_mem)
 	MCFG_CPU_IO_MAP(vc4000_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vc4000_state, vc4000_video_line,  312*53)	// GOLF needs this exact value
+	MCFG_CPU_PERIODIC_INT_DRIVER(vc4000_state, vc4000_video_line,  312*53)  // GOLF needs this exact value
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

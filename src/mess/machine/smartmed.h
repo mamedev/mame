@@ -13,18 +13,18 @@
 
 struct smartmedia_cartslot_config
 {
-	const char *					interface;
+	const char *                    interface;
 };
 
 
 enum sm_mode_t
 {
-	SM_M_INIT,		// initial state
-	SM_M_READ,		// read page data
-	SM_M_PROGRAM,	// program page data
-	SM_M_ERASE,		// erase block data
+	SM_M_INIT,      // initial state
+	SM_M_READ,      // read page data
+	SM_M_PROGRAM,   // program page data
+	SM_M_ERASE,     // erase block data
 	SM_M_READSTATUS,// read status
-	SM_M_READID,		// read ID
+	SM_M_READID,        // read ID
 	SM_M_30,
 	SM_M_RANDOM_DATA_INPUT,
 	SM_M_RANDOM_DATA_OUTPUT
@@ -32,9 +32,9 @@ enum sm_mode_t
 
 enum pointer_sm_mode_t
 {
-	SM_PM_A,		// accessing first 256-byte half of 512-byte data field
-	SM_PM_B,		// accessing second 256-byte half of 512-byte data field
-	SM_PM_C			// accessing spare field
+	SM_PM_A,        // accessing first 256-byte half of 512-byte data field
+	SM_PM_B,        // accessing second 256-byte half of 512-byte data field
+	SM_PM_C         // accessing spare field
 };
 
 
@@ -63,13 +63,13 @@ struct nand_chip
 
 struct nand_interface
 {
-	nand_chip		 m_chip;
+	nand_chip        m_chip;
 	devcb_write_line m_devcb_write_line_cb;
 };
 
 // ======================> nand_device
 class nand_device : public device_t,
-                    public nand_interface
+					public nand_interface
 {
 public:
 	// construction/destruction
@@ -94,29 +94,29 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-	int m_page_data_size;	// 256 for a 2MB card, 512 otherwise
+	int m_page_data_size;   // 256 for a 2MB card, 512 otherwise
 	int m_page_total_size;// 264 for a 2MB card, 528 otherwise
-	int m_num_pages;		// 8192 for a 4MB card, 16184 for 8MB, 32768 for 16MB,
+	int m_num_pages;        // 8192 for a 4MB card, 16184 for 8MB, 32768 for 16MB,
 						// 65536 for 32MB, 131072 for 64MB, 262144 for 128MB...
 						// 0 means no card loaded
-	int m_log2_pages_per_block;	// log2 of number of pages per erase block (usually 4 or 5)
+	int m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
 
-	UINT8 *m_data_ptr;	// FEEPROM data area
+	UINT8 *m_data_ptr;  // FEEPROM data area
 	UINT8 *m_data_uid_ptr;
 
-	sm_mode_t m_mode;				// current operation mode
-	pointer_sm_mode_t m_pointer_mode;		// pointer mode
+	sm_mode_t m_mode;               // current operation mode
+	pointer_sm_mode_t m_pointer_mode;       // pointer mode
 
-	unsigned int m_page_addr;		// page address pointer
-	int m_byte_addr;		// byte address pointer
-	int m_addr_load_ptr;	// address load pointer
+	unsigned int m_page_addr;       // page address pointer
+	int m_byte_addr;        // byte address pointer
+	int m_addr_load_ptr;    // address load pointer
 
-	int m_status;			// current status
-	int m_accumulated_status;	// accumulated status
+	int m_status;           // current status
+	int m_accumulated_status;   // accumulated status
 
-	UINT8 *m_pagereg;	// page register used by program command
-	UINT8 m_id[5];		// chip ID
-	UINT8 m_mp_opcode;	// multi-plane operation code
+	UINT8 *m_pagereg;   // page register used by program command
+	UINT8 m_id[5];      // chip ID
+	UINT8 m_mp_opcode;  // multi-plane operation code
 
 	int m_mode_3065;
 
@@ -140,7 +140,7 @@ protected:
 // device type definition
 extern const device_type NAND;
 
-class smartmedia_image_device :	public nand_device,
+class smartmedia_image_device : public nand_device,
 								public device_image_interface
 {
 public:
@@ -166,7 +166,7 @@ public:
 	void set_image_interface(const char *image_interface) { m_image_interface = image_interface; }
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 
 	bool smartmedia_format_1();
 	bool smartmedia_format_2();
@@ -185,7 +185,7 @@ extern const device_type SMARTMEDIA;
 
 #define MCFG_NAND_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, NAND, 0) \
-    MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_CONFIG(_config)
 
 #define NAND_INTERFACE(name) \
 	const nand_interface(name) =
@@ -193,7 +193,7 @@ extern const device_type SMARTMEDIA;
 #define MCFG_SMARTMEDIA_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SMARTMEDIA, 0)
 
-#define MCFG_SMARTMEDIA_INTERFACE(_interface)							\
+#define MCFG_SMARTMEDIA_INTERFACE(_interface)                           \
 	downcast<smartmedia_image_device *>(device)->set_image_interface(_interface);
 
 #endif /* __SMARTMEDIA_H__ */

@@ -117,13 +117,13 @@ void hp48_state::palette_init()
  */
 
 
-#define draw_pixel							\
+#define draw_pixel                          \
 	state->m_screens[ state->m_cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
-	xp++;								\
+	xp++;                               \
 	data >>= 1
 
-#define draw_quart					\
-	UINT8 data = space.read_byte( addr );	\
+#define draw_quart                  \
+	UINT8 data = space.read_byte( addr );   \
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 
@@ -156,7 +156,7 @@ UINT32 hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bitma
 	if ( last_line <= 1 ) last_line = 0x3f;
 
 	LOG(( "on=%i lmargin=%i rmargin=%i contrast=%i start=%05x lline=%i menu=%05x\n",
-	      display, left_margin, right_margin, contrast, bitmap_start, last_line, menu_start ));
+			display, left_margin, right_margin, contrast, bitmap_start, last_line, menu_start ));
 
 	/* draw main bitmap */
 	addr = bitmap_start;

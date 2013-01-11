@@ -58,16 +58,16 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( coco_analog_control )
 	PORT_START(CTRL_SEL_TAG)  /* Select Controller Type */
-	PORT_CONFNAME( 0x0f, 0x01, "Right Controller Port (P1)")			PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  joystick_mode_changed, 0 )
+	PORT_CONFNAME( 0x0f, 0x01, "Right Controller Port (P1)")            PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  joystick_mode_changed, 0 )
 	PORT_CONFSETTING(  0x00, "Unconnected" )
 	PORT_CONFSETTING(  0x01, "Joystick" )
-	PORT_CONFSETTING(  0x02, "The Rat Graphics Mouse" )					PORT_CONDITION(CTRL_SEL_TAG, 0xf0, NOTEQUALS, 0x20)
-	PORT_CONFSETTING(  0x03, "Diecom Light Gun Adaptor" )				PORT_CONDITION(CTRL_SEL_TAG, 0xf0, NOTEQUALS, 0x30)
-	PORT_CONFNAME( 0xf0, 0x10, "Left Controller Port (P2)")				PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  joystick_mode_changed, 0 )
+	PORT_CONFSETTING(  0x02, "The Rat Graphics Mouse" )                 PORT_CONDITION(CTRL_SEL_TAG, 0xf0, NOTEQUALS, 0x20)
+	PORT_CONFSETTING(  0x03, "Diecom Light Gun Adaptor" )               PORT_CONDITION(CTRL_SEL_TAG, 0xf0, NOTEQUALS, 0x30)
+	PORT_CONFNAME( 0xf0, 0x10, "Left Controller Port (P2)")             PORT_CHANGED_MEMBER(DEVICE_SELF, coco_state,  joystick_mode_changed, 0 )
 	PORT_CONFSETTING(  0x00, "Unconnected" )
 	PORT_CONFSETTING(  0x10, "Joystick" )
-	PORT_CONFSETTING(  0x20, "The Rat Graphics Mouse" )					PORT_CONDITION(CTRL_SEL_TAG, 0x0f, NOTEQUALS, 0x02)
-	PORT_CONFSETTING(  0x30, "Diecom Light Gun Adaptor" )				PORT_CONDITION(CTRL_SEL_TAG, 0x0f, NOTEQUALS, 0x03)
+	PORT_CONFSETTING(  0x20, "The Rat Graphics Mouse" )                 PORT_CONDITION(CTRL_SEL_TAG, 0x0f, NOTEQUALS, 0x02)
+	PORT_CONFSETTING(  0x30, "Diecom Light Gun Adaptor" )               PORT_CONDITION(CTRL_SEL_TAG, 0x0f, NOTEQUALS, 0x03)
 
 	PORT_START(HIRES_INTF_TAG)
 	PORT_CONFNAME( 0x07, 0x00, "Hi-Res Joystick Interfaces" )
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( coco, coco12_state )
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_state::cartridge_config, coco_cart, "pak", NULL)
 
 	// video hardware
-    MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, VDG_TAG)
+	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, VDG_TAG)
 	MCFG_MC6847_ADD(VDG_TAG, MC6847_NTSC, XTAL_3_579545MHz, coco12_state::mc6847_config)
 
 	// sound hardware
@@ -326,25 +326,25 @@ MACHINE_CONFIG_END
 
 ROM_START(coco)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas10.rom",	0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
+	ROM_LOAD("bas10.rom",   0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
 ROM_END
 
 ROM_START(cocoe)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas11.rom",	0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
-	ROM_LOAD("extbas10.rom",	0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
+	ROM_LOAD("bas11.rom",   0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
+	ROM_LOAD("extbas10.rom",    0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
 ROM_END
 
 ROM_START(coco2)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas12.rom",	0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
-	ROM_LOAD("extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_LOAD("bas12.rom",   0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
+	ROM_LOAD("extbas11.rom",    0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 ROM_END
 
 ROM_START(coco2b)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("bas13.rom",	0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
-	ROM_LOAD("extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_LOAD("bas13.rom",   0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
+	ROM_LOAD("extbas11.rom",    0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 ROM_END
 
 ROM_START(cp400)
@@ -361,6 +361,6 @@ ROM_END
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT      INIT    COMPANY                 FULLNAME */
 COMP(  1980,    coco,       0,      0,      coco,      coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer", 0)
 COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer (Extended BASIC 1.0)", 0)
-COMP(  1983,    coco2,      coco,   0,      coco2,     coco, driver_device,      0,      "Tandy Radio Shack",	  "Color Computer 2", 0)
-COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,      0,      "Tandy Radio Shack",	  "Color Computer 2B", 0)
+COMP(  1983,    coco2,      coco,   0,      coco2,     coco, driver_device,      0,      "Tandy Radio Shack",     "Color Computer 2", 0)
+COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,      0,      "Tandy Radio Shack",     "Color Computer 2B", 0)
 COMP(  1984,    cp400,      coco,   0,      cp400,     coco, driver_device,      0,      "Prologica",            "CP400", 0)

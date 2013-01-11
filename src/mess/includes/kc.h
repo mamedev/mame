@@ -57,12 +57,12 @@ class kc_state : public driver_device
 public:
 	kc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_z80pio(*this, "z80pio"),
-		  m_z80ctc(*this, "z80ctc"),
-		  m_ram(*this, RAM_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_z80pio(*this, "z80pio"),
+			m_z80ctc(*this, "z80ctc"),
+			m_ram(*this, RAM_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -127,24 +127,24 @@ public:
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, UINT8 colour_byte, UINT8 gfx_byte);
 
 	// driver state
-	UINT8 *				m_ram_base;
-	UINT8 *				m_video_ram;
-	int 				m_pio_data[2];
-	int					m_high_resolution;
-	UINT8				m_ardy;
-	UINT8				m_brdy;
-	int					m_kc85_blink_state;
-	int					m_k0_line;
-	int					m_k1_line;
-	UINT8				m_speaker_level;
+	UINT8 *             m_ram_base;
+	UINT8 *             m_video_ram;
+	int                 m_pio_data[2];
+	int                 m_high_resolution;
+	UINT8               m_ardy;
+	UINT8               m_brdy;
+	int                 m_kc85_blink_state;
+	int                 m_k0_line;
+	int                 m_k1_line;
+	UINT8               m_speaker_level;
 
 	// cassette
-	emu_timer *			m_cassette_timer;
-	emu_timer *			m_cassette_oneshot_timer;
-	int 				m_astb;
-	int 				m_cassette_in;
+	emu_timer *         m_cassette_timer;
+	emu_timer *         m_cassette_oneshot_timer;
+	int                 m_astb;
+	int                 m_cassette_in;
 
-	kcexp_slot_device *	m_expansions[3];
+	kcexp_slot_device * m_expansions[3];
 	DECLARE_PALETTE_INIT(kc85);
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
@@ -177,9 +177,9 @@ public:
 	void video_control_w(int data);
 
 	// driver state
-	UINT8				m_port_84_data;
-	UINT8				m_port_86_data;
-	UINT8 *				m_display_video_ram;
+	UINT8               m_port_84_data;
+	UINT8               m_port_86_data;
+	UINT8 *             m_display_video_ram;
 };
 
 

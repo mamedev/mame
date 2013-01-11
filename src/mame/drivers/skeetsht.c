@@ -220,7 +220,7 @@ INPUT_PORTS_END
 static const hc11_config skeetsht_hc11_config =
 {
 	0,
-	0x100,	/* 256 bytes RAM */
+	0x100,  /* 256 bytes RAM */
 	0x01,
 //  0x200,  /* 512 bytes EEPROM */
 };
@@ -238,7 +238,7 @@ static const tms34010_config tms_config =
 	"screen",                   /* the screen operated on */
 	48000000 / 8,               /* pixel clock */
 	1,                          /* pixels per clock */
-	NULL,						/* scanline updater (indexed16) */
+	NULL,                       /* scanline updater (indexed16) */
 	skeetsht_scanline_update,   /* scanline updater (rgb32) */
 	skeetsht_tms_irq,           /* generate interrupt */
 	NULL,                       /* write to shiftreg function */

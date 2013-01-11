@@ -359,11 +359,11 @@ static INPUT_PORTS_START( exterm )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) ) /* According to the test screen */
-	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	/* Note that the coin settings don't match the setting shown on the test screen,
-       but instead what the game appears to used. This is either a bug in the game,
-       or I don't know what else. */
+	   but instead what the game appears to used. This is either a bug in the game,
+	   or I don't know what else. */
 	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
@@ -403,28 +403,28 @@ INPUT_PORTS_END
 
 static const tms34010_config master_config =
 {
-	FALSE,						/* halt on reset */
-	"screen",					/* the screen operated on */
-	40000000/8,					/* pixel clock */
-	1,							/* pixels per clock */
-	exterm_scanline_update,		/* scanline updater (indexed16) */
-	NULL,						/* scanline updater (rgb32) */
-	NULL,						/* generate interrupt */
-	exterm_to_shiftreg_master,	/* write to shiftreg function */
-	exterm_from_shiftreg_master	/* read from shiftreg function */
+	FALSE,                      /* halt on reset */
+	"screen",                   /* the screen operated on */
+	40000000/8,                 /* pixel clock */
+	1,                          /* pixels per clock */
+	exterm_scanline_update,     /* scanline updater (indexed16) */
+	NULL,                       /* scanline updater (rgb32) */
+	NULL,                       /* generate interrupt */
+	exterm_to_shiftreg_master,  /* write to shiftreg function */
+	exterm_from_shiftreg_master /* read from shiftreg function */
 };
 
 static const tms34010_config slave_config =
 {
-	TRUE,						/* halt on reset */
-	"screen",					/* the screen operated on */
-	40000000/8,					/* pixel clock */
-	1,							/* pixels per clock */
-	NULL,						/* scanline updater (indexed16) */
-	NULL,						/* scanline updater (rgb32) */
-	NULL,						/* generate interrupt */
-	exterm_to_shiftreg_slave,	/* write to shiftreg function */
-	exterm_from_shiftreg_slave	/* read from shiftreg function */
+	TRUE,                       /* halt on reset */
+	"screen",                   /* the screen operated on */
+	40000000/8,                 /* pixel clock */
+	1,                          /* pixels per clock */
+	NULL,                       /* scanline updater (indexed16) */
+	NULL,                       /* scanline updater (rgb32) */
+	NULL,                       /* generate interrupt */
+	exterm_to_shiftreg_slave,   /* write to shiftreg function */
+	exterm_from_shiftreg_slave  /* read from shiftreg function */
 };
 
 
@@ -485,13 +485,13 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( exterm )
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for YM2151 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for YM2151 code */
 	ROM_LOAD( "v101y1", 0x8000, 0x8000, CRC(cbeaa837) SHA1(87d8a258f059512dbf9bc0e7cfff728ef9e616f1) )
 
-	ROM_REGION( 0x10000, "audioslave", 0 )		/* 64k for DAC code */
+	ROM_REGION( 0x10000, "audioslave", 0 )      /* 64k for DAC code */
 	ROM_LOAD( "v101d1", 0x8000, 0x8000, CRC(83268b7d) SHA1(a9139e80e2382122e9919c0555937e120d4414cf) )
 
-	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 2MB for 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 ) /* 2MB for 34010 code */
 	ROM_LOAD16_BYTE( "v101bg0",  0x000000, 0x10000, CRC(8c8e72cf) SHA1(5e0fa805334f54f7e0293ea400bacb0e3e79ed56) )
 	ROM_LOAD16_BYTE( "v101bg1",  0x000001, 0x10000, CRC(cc2da0d8) SHA1(4ac23048d3ca771e315388603ad3b1b25030d6ff) )
 	ROM_LOAD16_BYTE( "v101bg2",  0x020000, 0x10000, CRC(2dcb3653) SHA1(2d74b58b02ae0587e3789d69feece268f582f226) )

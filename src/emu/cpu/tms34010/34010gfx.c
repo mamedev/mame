@@ -35,7 +35,7 @@ static void line(tms34010_state *tms, UINT16 op)
 		COUNT(tms)--;
 		if (WINDOW_CHECKING(tms) != 3 ||
 			(DADDR_X(tms) >= WSTART_X(tms) && DADDR_X(tms) <= WEND_X(tms) &&
-			 DADDR_Y(tms) >= WSTART_Y(tms) && DADDR_Y(tms) <= WEND_Y(tms)))
+				DADDR_Y(tms) >= WSTART_Y(tms) && DADDR_Y(tms) <= WEND_Y(tms)))
 			WPIXEL(tms,DXYTOL(tms,DADDR_XY(tms)),COLOR1(tms));
 
 		if (SADDR(tms) >= TEMP(tms))
@@ -264,10 +264,10 @@ static UINT32 pixel_op21(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= 
 
 static UINT32 (*const pixel_op_table[])(UINT32, UINT32, UINT32) =
 {
-	pixel_op00,	pixel_op01,	pixel_op02,	pixel_op03,	pixel_op04,	pixel_op05,	pixel_op06,	pixel_op07,
-	pixel_op08,	pixel_op09,	pixel_op10,	pixel_op11,	pixel_op12,	pixel_op13,	pixel_op14,	pixel_op15,
-	pixel_op16,	pixel_op17,	pixel_op18,	pixel_op19,	pixel_op20,	pixel_op21,	pixel_op00,	pixel_op00,
-	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00
+	pixel_op00, pixel_op01, pixel_op02, pixel_op03, pixel_op04, pixel_op05, pixel_op06, pixel_op07,
+	pixel_op08, pixel_op09, pixel_op10, pixel_op11, pixel_op12, pixel_op13, pixel_op14, pixel_op15,
+	pixel_op16, pixel_op17, pixel_op18, pixel_op19, pixel_op20, pixel_op21, pixel_op00, pixel_op00,
+	pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00, pixel_op00
 };
 static const UINT8 pixel_op_timing_table[] =
 {
@@ -366,396 +366,396 @@ static void fill_16_opx_trans(tms34010_state *tms, int dst_is_linear);
 /* tables */
 static void (*const pixblt_op_table[])(tms34010_state *, int, int) =
 {
-	pixblt_1_op0,	pixblt_1_op0_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
-	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
+	pixblt_1_op0,   pixblt_1_op0_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
+	pixblt_1_opx,   pixblt_1_opx_trans,     pixblt_1_opx,   pixblt_1_opx_trans,
 
-	pixblt_2_op0,	pixblt_2_op0_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
-	pixblt_2_opx,	pixblt_2_opx_trans,		pixblt_2_opx,	pixblt_2_opx_trans,
+	pixblt_2_op0,   pixblt_2_op0_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
+	pixblt_2_opx,   pixblt_2_opx_trans,     pixblt_2_opx,   pixblt_2_opx_trans,
 
-	pixblt_4_op0,	pixblt_4_op0_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
-	pixblt_4_opx,	pixblt_4_opx_trans,		pixblt_4_opx,	pixblt_4_opx_trans,
+	pixblt_4_op0,   pixblt_4_op0_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
+	pixblt_4_opx,   pixblt_4_opx_trans,     pixblt_4_opx,   pixblt_4_opx_trans,
 
-	pixblt_8_op0,	pixblt_8_op0_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
-	pixblt_8_opx,	pixblt_8_opx_trans,		pixblt_8_opx,	pixblt_8_opx_trans,
+	pixblt_8_op0,   pixblt_8_op0_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
+	pixblt_8_opx,   pixblt_8_opx_trans,     pixblt_8_opx,   pixblt_8_opx_trans,
 
-	pixblt_16_op0,	pixblt_16_op0_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans,
-	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans
+	pixblt_16_op0,  pixblt_16_op0_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans,
+	pixblt_16_opx,  pixblt_16_opx_trans,    pixblt_16_opx,  pixblt_16_opx_trans
 };
 
 static void (*const pixblt_r_op_table[])(tms34010_state *, int, int) =
 {
-	pixblt_r_1_op0,	pixblt_r_1_op0_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
-	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
+	pixblt_r_1_op0, pixblt_r_1_op0_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
+	pixblt_r_1_opx, pixblt_r_1_opx_trans,   pixblt_r_1_opx, pixblt_r_1_opx_trans,
 
-	pixblt_r_2_op0,	pixblt_r_2_op0_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
-	pixblt_r_2_opx,	pixblt_r_2_opx_trans,	pixblt_r_2_opx,	pixblt_r_2_opx_trans,
+	pixblt_r_2_op0, pixblt_r_2_op0_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
+	pixblt_r_2_opx, pixblt_r_2_opx_trans,   pixblt_r_2_opx, pixblt_r_2_opx_trans,
 
-	pixblt_r_4_op0,	pixblt_r_4_op0_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
-	pixblt_r_4_opx,	pixblt_r_4_opx_trans,	pixblt_r_4_opx,	pixblt_r_4_opx_trans,
+	pixblt_r_4_op0, pixblt_r_4_op0_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
+	pixblt_r_4_opx, pixblt_r_4_opx_trans,   pixblt_r_4_opx, pixblt_r_4_opx_trans,
 
-	pixblt_r_8_op0,	pixblt_r_8_op0_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
-	pixblt_r_8_opx,	pixblt_r_8_opx_trans,	pixblt_r_8_opx,	pixblt_r_8_opx_trans,
+	pixblt_r_8_op0, pixblt_r_8_op0_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
+	pixblt_r_8_opx, pixblt_r_8_opx_trans,   pixblt_r_8_opx, pixblt_r_8_opx_trans,
 
-	pixblt_r_16_op0,pixblt_r_16_op0_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans,
-	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans
+	pixblt_r_16_op0,pixblt_r_16_op0_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans,
+	pixblt_r_16_opx,pixblt_r_16_opx_trans,  pixblt_r_16_opx,pixblt_r_16_opx_trans
 };
 
 static void (*const pixblt_b_op_table[])(tms34010_state *, int) =
 {
-	pixblt_b_1_op0,	pixblt_b_1_op0_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
-	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
+	pixblt_b_1_op0, pixblt_b_1_op0_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
+	pixblt_b_1_opx, pixblt_b_1_opx_trans,   pixblt_b_1_opx, pixblt_b_1_opx_trans,
 
-	pixblt_b_2_op0,	pixblt_b_2_op0_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
-	pixblt_b_2_opx,	pixblt_b_2_opx_trans,	pixblt_b_2_opx,	pixblt_b_2_opx_trans,
+	pixblt_b_2_op0, pixblt_b_2_op0_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
+	pixblt_b_2_opx, pixblt_b_2_opx_trans,   pixblt_b_2_opx, pixblt_b_2_opx_trans,
 
-	pixblt_b_4_op0,	pixblt_b_4_op0_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
-	pixblt_b_4_opx,	pixblt_b_4_opx_trans,	pixblt_b_4_opx,	pixblt_b_4_opx_trans,
+	pixblt_b_4_op0, pixblt_b_4_op0_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
+	pixblt_b_4_opx, pixblt_b_4_opx_trans,   pixblt_b_4_opx, pixblt_b_4_opx_trans,
 
-	pixblt_b_8_op0,	pixblt_b_8_op0_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
-	pixblt_b_8_opx,	pixblt_b_8_opx_trans,	pixblt_b_8_opx,	pixblt_b_8_opx_trans,
+	pixblt_b_8_op0, pixblt_b_8_op0_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
+	pixblt_b_8_opx, pixblt_b_8_opx_trans,   pixblt_b_8_opx, pixblt_b_8_opx_trans,
 
-	pixblt_b_16_op0,pixblt_b_16_op0_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans,
-	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans
+	pixblt_b_16_op0,pixblt_b_16_op0_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans,
+	pixblt_b_16_opx,pixblt_b_16_opx_trans,  pixblt_b_16_opx,pixblt_b_16_opx_trans
 };
 
 static void (*const fill_op_table[])(tms34010_state *tms, int) =
 {
-	fill_1_op0,		fill_1_op0_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
-	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
+	fill_1_op0,     fill_1_op0_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
+	fill_1_opx,     fill_1_opx_trans,       fill_1_opx,     fill_1_opx_trans,
 
-	fill_2_op0,		fill_2_op0_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
-	fill_2_opx,		fill_2_opx_trans,		fill_2_opx,		fill_2_opx_trans,
+	fill_2_op0,     fill_2_op0_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
+	fill_2_opx,     fill_2_opx_trans,       fill_2_opx,     fill_2_opx_trans,
 
-	fill_4_op0,		fill_4_op0_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
-	fill_4_opx,		fill_4_opx_trans,		fill_4_opx,		fill_4_opx_trans,
+	fill_4_op0,     fill_4_op0_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
+	fill_4_opx,     fill_4_opx_trans,       fill_4_opx,     fill_4_opx_trans,
 
-	fill_8_op0,		fill_8_op0_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
-	fill_8_opx,		fill_8_opx_trans,		fill_8_opx,		fill_8_opx_trans,
+	fill_8_op0,     fill_8_op0_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
+	fill_8_opx,     fill_8_opx_trans,       fill_8_opx,     fill_8_opx_trans,
 
-	fill_16_op0,	fill_16_op0_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans,
-	fill_16_opx,	fill_16_opx_trans,		fill_16_opx,	fill_16_opx_trans
+	fill_16_op0,    fill_16_op0_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans,
+	fill_16_opx,    fill_16_opx_trans,      fill_16_opx,    fill_16_opx_trans
 };
 
 
 #define RECURSIVE_INCLUDE
 
 /* non-transparent replace ops */
-#define PIXEL_OP(src, mask, pixel)		pixel = pixel
-#define PIXEL_OP_TIMING					2
-#define PIXEL_OP_REQUIRES_SOURCE		0
-#define TRANSPARENCY					0
+#define PIXEL_OP(src, mask, pixel)      pixel = pixel
+#define PIXEL_OP_TIMING                 2
+#define PIXEL_OP_REQUIRES_SOURCE        0
+#define TRANSPARENCY                    0
 
 	/* 1bpp cases */
-	#define BITS_PER_PIXEL					1
-	#define FUNCTION_NAME(base)				base##_1_op0
+	#define BITS_PER_PIXEL                  1
+	#define FUNCTION_NAME(base)             base##_1_op0
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 2bpp cases */
-	#define BITS_PER_PIXEL					2
-	#define FUNCTION_NAME(base)				base##_2_op0
+	#define BITS_PER_PIXEL                  2
+	#define FUNCTION_NAME(base)             base##_2_op0
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 4bpp cases */
-	#define BITS_PER_PIXEL					4
-	#define FUNCTION_NAME(base)				base##_4_op0
+	#define BITS_PER_PIXEL                  4
+	#define FUNCTION_NAME(base)             base##_4_op0
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 8bpp cases */
-	#define BITS_PER_PIXEL					8
-	#define FUNCTION_NAME(base)				base##_8_op0
+	#define BITS_PER_PIXEL                  8
+	#define FUNCTION_NAME(base)             base##_8_op0
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 16bpp cases */
-	#define BITS_PER_PIXEL					16
-	#define FUNCTION_NAME(base)				base##_16_op0
+	#define BITS_PER_PIXEL                  16
+	#define FUNCTION_NAME(base)             base##_16_op0
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
@@ -766,42 +766,42 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 #undef PIXEL_OP
 
 
-#define PIXEL_OP(src, mask, pixel)		pixel = (*pixel_op)(src, mask, pixel)
-#define PIXEL_OP_TIMING					pixel_op_timing
-#define PIXEL_OP_REQUIRES_SOURCE		1
-#define TRANSPARENCY					0
+#define PIXEL_OP(src, mask, pixel)      pixel = (*pixel_op)(src, mask, pixel)
+#define PIXEL_OP_TIMING                 pixel_op_timing
+#define PIXEL_OP_REQUIRES_SOURCE        1
+#define TRANSPARENCY                    0
 
 	/* 1bpp cases */
-	#define BITS_PER_PIXEL					1
-	#define FUNCTION_NAME(base)				base##_1_opx
+	#define BITS_PER_PIXEL                  1
+	#define FUNCTION_NAME(base)             base##_1_opx
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 2bpp cases */
-	#define BITS_PER_PIXEL					2
-	#define FUNCTION_NAME(base)				base##_2_opx
+	#define BITS_PER_PIXEL                  2
+	#define FUNCTION_NAME(base)             base##_2_opx
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 4bpp cases */
-	#define BITS_PER_PIXEL					4
-	#define FUNCTION_NAME(base)				base##_4_opx
+	#define BITS_PER_PIXEL                  4
+	#define FUNCTION_NAME(base)             base##_4_opx
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 8bpp cases */
-	#define BITS_PER_PIXEL					8
-	#define FUNCTION_NAME(base)				base##_8_opx
+	#define BITS_PER_PIXEL                  8
+	#define FUNCTION_NAME(base)             base##_8_opx
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 16bpp cases */
-	#define BITS_PER_PIXEL					16
-	#define FUNCTION_NAME(base)				base##_16_opx
+	#define BITS_PER_PIXEL                  16
+	#define FUNCTION_NAME(base)             base##_16_opx
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
@@ -813,42 +813,42 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 
 
 /* transparent replace ops */
-#define PIXEL_OP(src, mask, pixel)		pixel = pixel
-#define PIXEL_OP_REQUIRES_SOURCE		0
-#define PIXEL_OP_TIMING					4
-#define TRANSPARENCY					1
+#define PIXEL_OP(src, mask, pixel)      pixel = pixel
+#define PIXEL_OP_REQUIRES_SOURCE        0
+#define PIXEL_OP_TIMING                 4
+#define TRANSPARENCY                    1
 
 	/* 1bpp cases */
-	#define BITS_PER_PIXEL					1
-	#define FUNCTION_NAME(base)				base##_1_op0_trans
+	#define BITS_PER_PIXEL                  1
+	#define FUNCTION_NAME(base)             base##_1_op0_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 2bpp cases */
-	#define BITS_PER_PIXEL					2
-	#define FUNCTION_NAME(base)				base##_2_op0_trans
+	#define BITS_PER_PIXEL                  2
+	#define FUNCTION_NAME(base)             base##_2_op0_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 4bpp cases */
-	#define BITS_PER_PIXEL					4
-	#define FUNCTION_NAME(base)				base##_4_op0_trans
+	#define BITS_PER_PIXEL                  4
+	#define FUNCTION_NAME(base)             base##_4_op0_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 8bpp cases */
-	#define BITS_PER_PIXEL					8
-	#define FUNCTION_NAME(base)				base##_8_op0_trans
+	#define BITS_PER_PIXEL                  8
+	#define FUNCTION_NAME(base)             base##_8_op0_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 16bpp cases */
-	#define BITS_PER_PIXEL					16
-	#define FUNCTION_NAME(base)				base##_16_op0_trans
+	#define BITS_PER_PIXEL                  16
+	#define FUNCTION_NAME(base)             base##_16_op0_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
@@ -859,42 +859,42 @@ static void (*const fill_op_table[])(tms34010_state *tms, int) =
 #undef PIXEL_OP
 
 
-#define PIXEL_OP(src, mask, pixel)		pixel = (*pixel_op)(src, mask, pixel)
-#define PIXEL_OP_REQUIRES_SOURCE		1
-#define PIXEL_OP_TIMING					(2+pixel_op_timing)
-#define TRANSPARENCY					1
+#define PIXEL_OP(src, mask, pixel)      pixel = (*pixel_op)(src, mask, pixel)
+#define PIXEL_OP_REQUIRES_SOURCE        1
+#define PIXEL_OP_TIMING                 (2+pixel_op_timing)
+#define TRANSPARENCY                    1
 
 	/* 1bpp cases */
-	#define BITS_PER_PIXEL					1
-	#define FUNCTION_NAME(base)				base##_1_opx_trans
+	#define BITS_PER_PIXEL                  1
+	#define FUNCTION_NAME(base)             base##_1_opx_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 2bpp cases */
-	#define BITS_PER_PIXEL					2
-	#define FUNCTION_NAME(base)				base##_2_opx_trans
+	#define BITS_PER_PIXEL                  2
+	#define FUNCTION_NAME(base)             base##_2_opx_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 4bpp cases */
-	#define BITS_PER_PIXEL					4
-	#define FUNCTION_NAME(base)				base##_4_opx_trans
+	#define BITS_PER_PIXEL                  4
+	#define FUNCTION_NAME(base)             base##_4_opx_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 8bpp cases */
-	#define BITS_PER_PIXEL					8
-	#define FUNCTION_NAME(base)				base##_8_opx_trans
+	#define BITS_PER_PIXEL                  8
+	#define FUNCTION_NAME(base)             base##_8_opx_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
 
 	/* 16bpp cases */
-	#define BITS_PER_PIXEL					16
-	#define FUNCTION_NAME(base)				base##_16_opx_trans
+	#define BITS_PER_PIXEL                  16
+	#define FUNCTION_NAME(base)             base##_16_opx_trans
 	#include "34010gfx.c"
 	#undef FUNCTION_NAME
 	#undef BITS_PER_PIXEL
@@ -2040,4 +2040,3 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 }
 
 #endif
-

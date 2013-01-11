@@ -171,7 +171,7 @@ public:
 
 
 /* constants */
-#define MASTER_CLOCK	XTAL_50MHz
+#define MASTER_CLOCK    XTAL_50MHz
 
 
 
@@ -350,20 +350,20 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 
 	switch (offset)
 	{
-		case 2:		/* $90 -- sound return */
+		case 2:     /* $90 -- sound return */
 			result = ioport(portnames[offset])->read();
 			result &= ~0x0002;
 			if (dcs_control_r(machine()) & 0x800)
 				result |= 0x0002;
 			break;
 
-		case 0:		/* $80 */
-		case 1:		/* $88 */
-		case 3:		/* $98 */
+		case 0:     /* $80 */
+		case 1:     /* $88 */
+		case 3:     /* $98 */
 			result = ioport(portnames[offset])->read();
 			break;
 
-		case 4:		/* $a0 */
+		case 4:     /* $a0 */
 			result = ioport(portnames[offset])->read();
 			if (space.device().safe_pc() == 0x802d428)
 				space.device().execute().spin_until_interrupt();
@@ -385,23 +385,23 @@ WRITE32_MEMBER(kinst_state::kinst_control_w)
 
 	switch (offset)
 	{
-		case 0:		/* $80 - VRAM buffer control */
+		case 0:     /* $80 - VRAM buffer control */
 			if (data & 4)
 				m_video_base = &m_rambase[0x58000/4];
 			else
 				m_video_base = &m_rambase[0x30000/4];
 			break;
 
-		case 1:		/* $88 - sound reset */
+		case 1:     /* $88 - sound reset */
 			dcs_reset_w(machine(), ~data & 0x01);
 			break;
 
-		case 2:		/* $90 - sound control */
+		case 2:     /* $90 - sound control */
 			if (!(olddata & 0x02) && (m_control[offset] & 0x02))
 				dcs_data_w(machine(), m_control[3]);
 			break;
 
-		case 3:		/* $98 - sound data */
+		case 3:     /* $98 - sound data */
 			break;
 	}
 }
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( kinst )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* door */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -468,20 +468,20 @@ static INPUT_PORTS_START( kinst )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )	/* bill */
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* coin door */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )    /* bill */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* coin door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("VOLUME")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sound status */
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SPECIAL )  /* sound status */
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )	/* verify */
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )   /* verify */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -559,7 +559,7 @@ static INPUT_PORTS_START( kinst2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* door */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -577,20 +577,20 @@ static INPUT_PORTS_START( kinst2 )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )	/* bill */
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* coin door */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )    /* bill */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* coin door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("VOLUME")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sound status */
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SPECIAL )  /* sound status */
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )	/* verify */
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )   /* verify */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -661,8 +661,8 @@ INPUT_PORTS_END
 
 static const mips3_config r4600_config =
 {
-	16384,				/* code cache size */
-	16384				/* data cache size */
+	16384,              /* code cache size */
+	16384               /* data cache size */
 };
 
 static MACHINE_CONFIG_START( kinst, kinst_state )
@@ -703,10 +703,10 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( kinst )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki-l15d.u98", 0x00000, 0x80000, CRC(7b65ca3d) SHA1(607394d4ba1713f38c2cb5159303cace9cde991e) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
 	ROM_LOAD16_BYTE( "u11-l1", 0x200000, 0x80000, CRC(0b5e05df) SHA1(0595909cb667c38ac7c8c7bd0646b28899e27777) )
 	ROM_LOAD16_BYTE( "u12-l1", 0x400000, 0x80000, CRC(d05ce6ad) SHA1(7a8ee405c118fd176b66353fa7bfab888cc63cd2) )
@@ -722,10 +722,10 @@ ROM_END
 
 
 ROM_START( kinst14 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki-l14.u98", 0x00000, 0x80000, CRC(afedb75f) SHA1(07254f20707377f7195e64675eb6458e663c1a9a) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
 	ROM_LOAD16_BYTE( "u11-l1", 0x200000, 0x80000, CRC(0b5e05df) SHA1(0595909cb667c38ac7c8c7bd0646b28899e27777) )
 	ROM_LOAD16_BYTE( "u12-l1", 0x400000, 0x80000, CRC(d05ce6ad) SHA1(7a8ee405c118fd176b66353fa7bfab888cc63cd2) )
@@ -741,10 +741,10 @@ ROM_END
 
 
 ROM_START( kinst13 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki-l13.u98", 0x00000, 0x80000, CRC(65f7ea31) SHA1(7f21620a512549db6821a0b4fa53681a767b7974) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
 	ROM_LOAD16_BYTE( "u11-l1", 0x200000, 0x80000, CRC(0b5e05df) SHA1(0595909cb667c38ac7c8c7bd0646b28899e27777) )
 	ROM_LOAD16_BYTE( "u12-l1", 0x400000, 0x80000, CRC(d05ce6ad) SHA1(7a8ee405c118fd176b66353fa7bfab888cc63cd2) )
@@ -760,10 +760,10 @@ ROM_END
 
 
 ROM_START( kinstp )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki-p47.u98", 0x00000, 0x80000, CRC(05e67bcb) SHA1(501e69b3026394f69229a6e9866c1037502b86bb) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "u10-l1", 0x000000, 0x80000, CRC(b6cc155f) SHA1(810d455df8f385d76143e9d7d048f2b555ff8bf0) )
 	ROM_LOAD16_BYTE( "u11-l1", 0x200000, 0x80000, CRC(0b5e05df) SHA1(0595909cb667c38ac7c8c7bd0646b28899e27777) )
 	ROM_LOAD16_BYTE( "u12-l1", 0x400000, 0x80000, CRC(d05ce6ad) SHA1(7a8ee405c118fd176b66353fa7bfab888cc63cd2) )
@@ -779,10 +779,10 @@ ROM_END
 
 
 ROM_START( kinst2 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki2-l14.u98", 0x00000, 0x80000, CRC(27d0285e) SHA1(aa7a2a9d72a47dd0ea2ee7b2776b79288060b179) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
 	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
@@ -798,10 +798,10 @@ ROM_END
 
 
 ROM_START( kinst2k4 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki2-l14k.u98", 0x00000, 0x80000, CRC(9cbd00a8) SHA1(926dce4bb9016331ea40d3c337a9ace896f07493) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
 	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
@@ -817,10 +817,10 @@ ROM_END
 
 
 ROM_START( kinst213 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki2-l13.u98", 0x00000, 0x80000, CRC(25ebde3b) SHA1(771d150fb4de0a2ceb279954b9545458e93e2405) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
 	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
@@ -836,10 +836,10 @@ ROM_END
 
 
 ROM_START( kinst2k3 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki2-l13k.u98", 0x00000, 0x80000, CRC(3b4f16fc) SHA1(c28416f94453fd1f73ba01025276a04610569d12) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
 	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
@@ -855,10 +855,10 @@ ROM_END
 
 
 ROM_START( kinst211 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki2-l11.u98", 0x00000, 0x80000, CRC(0cb8de1e) SHA1(fe447f4b1d29b524f57c5ba1890652ef6afff88a) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
 	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )
@@ -874,10 +874,10 @@ ROM_END
 
 
 ROM_START( kinst210 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4600 code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4600 code */
 	ROM_LOAD( "ki2-l10.u98", 0x00000, 0x80000, CRC(b17b4b3d) SHA1(756629cd1b51ae50f2b9818765dd3d277c3019b3) )
 
-	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "ki2_l1.u10", 0x000000, 0x80000, CRC(fdf6ed51) SHA1(acfc9460cd5df01403b7f00b2f68c2a8734ad6d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u11", 0x200000, 0x80000, CRC(f9e70024) SHA1(fe7fc78f1c60b15f2bbdc4c455f55cdf30f48ed4) )
 	ROM_LOAD16_BYTE( "ki2_l1.u12", 0x400000, 0x80000, CRC(2994c199) SHA1(9997a83432cb720f65b40a8af46f31a5d0d16d8e) )

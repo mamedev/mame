@@ -114,9 +114,9 @@ static void filter_w( device_t *device, int data )
 	int C = 0;
 
 	if (data & 1)
-		C += 220000;	/* 220000pF = 0.220uF */
+		C += 220000;    /* 220000pF = 0.220uF */
 	if (data & 2)
-		C +=  47000;	/*  47000pF = 0.047uF */
+		C +=  47000;    /*  47000pF = 0.047uF */
 
 	filter_rc_set_RC(device, FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
 }
@@ -264,7 +264,7 @@ const device_type TIMEPLT_AUDIO = &device_creator<timeplt_audio_device>;
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(timeplt_audio_state);
 }
@@ -297,5 +297,3 @@ void timeplt_audio_device::sound_stream_update(sound_stream &stream, stream_samp
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

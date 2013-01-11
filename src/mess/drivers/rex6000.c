@@ -33,35 +33,35 @@
 #include "sound/beep.h"
 #include "rendlay.h"
 
-#define MAKE_BANK(lo, hi)		((lo) | ((hi)<<8))
+#define MAKE_BANK(lo, hi)       ((lo) | ((hi)<<8))
 
 //irq flag/mask bits
-#define	IRQ_FLAG_KEYCHANGE	0x01
-#define	IRQ_FLAG_ALARM		0x02
-#define	IRQ_FLAG_SERIAL		0x04
-#define	IRQ_FLAG_1HZ		0x10
-#define	IRQ_FLAG_IRQ2		0x20
-#define	IRQ_FLAG_IRQ1		0x40
-#define	IRQ_FLAG_EVENT		0x80
+#define IRQ_FLAG_KEYCHANGE  0x01
+#define IRQ_FLAG_ALARM      0x02
+#define IRQ_FLAG_SERIAL     0x04
+#define IRQ_FLAG_1HZ        0x10
+#define IRQ_FLAG_IRQ2       0x20
+#define IRQ_FLAG_IRQ1       0x40
+#define IRQ_FLAG_EVENT      0x80
 
 //memory bank types
-#define BANK_FLASH0_B0		0x00
-#define BANK_FLASH0_B1		0x01
-#define BANK_FLASH1_B0		0x02
-#define BANK_FLASH1_B1		0x03
-#define BANK_RAM			0x10
-#define BANK_UNKNOWN		0xff
+#define BANK_FLASH0_B0      0x00
+#define BANK_FLASH0_B1      0x01
+#define BANK_FLASH1_B0      0x02
+#define BANK_FLASH1_B1      0x03
+#define BANK_RAM            0x10
+#define BANK_UNKNOWN        0xff
 
-#define TC8521_TAG	"rtc"
+#define TC8521_TAG  "rtc"
 
 class rex6000_state : public driver_device
 {
 public:
 	rex6000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, RAM_TAG),
-		  m_beep(*this, BEEPER_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG),
+			m_beep(*this, BEEPER_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -164,8 +164,8 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 
 	switch (offset)
 	{
-		case 0:		//bank 1 low
-		case 1:		//bank 1 high
+		case 0:     //bank 1 low
+		case 1:     //bank 1 high
 		{
 			//bank 1 start at 0x8000
 			m_banks[0].page = (MAKE_BANK(m_bank[0], m_bank[1]&0x0f) + 4);
@@ -182,8 +182,8 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 
 			break;
 		}
-		case 2:		//bank 2 low
-		case 3:		//bank 2 high
+		case 2:     //bank 2 low
+		case 3:     //bank 2 high
 		{
 			m_banks[1].page = MAKE_BANK(m_bank[2], m_bank[3]&0x1f);
 			m_banks[1].type = identify_bank_type(m_banks[1].page);
@@ -217,20 +217,20 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 
 	switch (offset)
 	{
-		case 0:		//alarm mode control
+		case 0:     //alarm mode control
 			/*
-                ---- ---x   beep off
-                ---- --x-   continuous beep
-                ---- -x--   continuous alarm 1
-                ---- x---   continuous alarm 2
-                ---x ----   continuous alarm 3
-                --x- ----   single very short beep (keyclick)
-                -x-- ----   single alarm
-                x--- ----   single short beep
-            */
+			    ---- ---x   beep off
+			    ---- --x-   continuous beep
+			    ---- -x--   continuous alarm 1
+			    ---- x---   continuous alarm 2
+			    ---x ----   continuous alarm 3
+			    --x- ----   single very short beep (keyclick)
+			    -x-- ----   single alarm
+			    x--- ----   single short beep
+			*/
 			//TODO: the beeper frequency and length in alarm mode need to be measured
 			break;
-		case 1:		//tone mode control
+		case 1:     //tone mode control
 			if (m_beep_mode)
 			{
 				beep_set_state(m_beep, BIT(data, 0));
@@ -240,9 +240,9 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 					beep_set_frequency(m_beep, 16384 / (((m_beep_io[2] | (m_beep_io[3]<<8)) & 0x0fff) + 2));
 			}
 			break;
-		case 4:		//select alarm/tone mode
+		case 4:     //select alarm/tone mode
 			if (m_beep_mode != BIT(data, 0))
-				beep_set_state(m_beep, 0);		//turned off when mode changes
+				beep_set_state(m_beep, 0);      //turned off when mode changes
 
 			m_beep_mode = BIT(data, 0);
 			break;
@@ -283,15 +283,15 @@ READ8_MEMBER( rex6000_state::irq_r )
 	{
 		case 0: //irq flag
 			/*
-                ---- ---x   input port
-                ---- --x-   alarm
-                ---- -x--   serial
-                ---- x---   ??
-                ---x ----   1Hz timer
-                --x- ----   32Hz timer
-                -x-- ----   4096Hz timer
-                x--- ----   special events
-            */
+			    ---- ---x   input port
+			    ---- --x-   alarm
+			    ---- -x--   serial
+			    ---- x---   ??
+			    ---x ----   1Hz timer
+			    --x- ----   32Hz timer
+			    -x-- ----   4096Hz timer
+			    x--- ----   special events
+			*/
 			return m_irq_flag;
 
 		case 1:
@@ -312,7 +312,7 @@ WRITE8_MEMBER( rex6000_state::irq_w )
 		case 0: //irq flag
 			m_irq_flag = data;
 			break;
-		case 1:	//clear irq flag
+		case 1: //clear irq flag
 			m_port6 = data;
 			m_irq_flag &= (~data);
 			break;
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START(rex6000_mem, AS_PROGRAM, 8, rex6000_state)
 	AM_RANGE( 0x0000, 0x7fff ) AM_READWRITE(flash_0x0000_r, flash_0x0000_w)
 	AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(flash_0x8000_r, flash_0x8000_w)
 	AM_RANGE( 0xa000, 0xbfff ) AM_READWRITE(flash_0xa000_r, flash_0xa000_w)
-	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("ram")			//system RAM
+	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("ram")            //system RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rex6000_io, AS_IO, 8, rex6000_state)
@@ -404,7 +404,7 @@ static ADDRESS_MAP_START( rex6000_io, AS_IO, 8, rex6000_state)
 	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
 	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
 	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, rp5c01_device, read, write)
-	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)	AM_NOP	//SIO
+	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_NOP  //SIO
 	AM_RANGE( 0x50, 0x51 ) AM_READWRITE(lcd_io_r, lcd_io_w)
 	AM_RANGE( 0x60, 0x6f ) AM_READWRITE(touchscreen_r, touchscreen_w)
 	//AM_RANGE( 0x00, 0xff ) AM_RAM
@@ -429,12 +429,12 @@ INPUT_PORTS_START( rex6000 )
 	PORT_CONFSETTING( 0x0000, "Poor" )
 
 	PORT_START("INPUT")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Home")	PORT_CODE(KEYCODE_HOME)			PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Back")	PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Select")		PORT_CODE(KEYCODE_SPACE)	PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Up")		PORT_CODE(KEYCODE_PGUP)			PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Down")	PORT_CODE(KEYCODE_PGDN)			PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pen")	PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)	PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Home")   PORT_CODE(KEYCODE_HOME)         PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Back")   PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Select")     PORT_CODE(KEYCODE_SPACE)    PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Up")     PORT_CODE(KEYCODE_PGUP)         PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Down")   PORT_CODE(KEYCODE_PGDN)         PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pen")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)   PORT_CHANGED_MEMBER(DEVICE_SELF, rex6000_state, trigger_irq, 0)
 
 	PORT_START("PENX")
 	PORT_BIT(0x3ff, 0x00, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_CROSSHAIR(X, 1, 0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_INVERT
@@ -580,7 +580,7 @@ static QUICKLOAD_LOAD(rex6000)
 		return IMAGE_INIT_FAIL;
 
 	img_start = strlen((const char*)data) + 5;
-	img_start += 0xa0;	//skip the icon (40x32 pixel)
+	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
 	for (int i=0; i<image.length() - img_start ;i++)
 		flash.write_byte(i, data[img_start + i]);
@@ -594,48 +594,48 @@ static QUICKLOAD_LOAD(rex6000)
 /* F4 Character Displayer */
 static const gfx_layout rex6000_bold_charlayout =
 {
-	16, 11,					/* 16 x 11 characters */
-	256,					/* 256 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	16, 11,                 /* 16 x 11 characters */
+	256,                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },
 	/* y offsets */
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16 },
-	8*24			/* every char takes 24 bytes, first 2 bytes are used for the char size */
+	8*24            /* every char takes 24 bytes, first 2 bytes are used for the char size */
 };
 
 static const gfx_layout rex6000_tiny_charlayout =
 {
-	16, 9,					/* 16 x 9 characters */
-	256,					/* 256 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	16, 9,                  /* 16 x 9 characters */
+	256,                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },
 	/* y offsets */
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16 },
-	8*20			/* every char takes 20 bytes, first 2 bytes ared use for the char size */
+	8*20            /* every char takes 20 bytes, first 2 bytes ared use for the char size */
 };
 
 static const gfx_layout rex6000_graph_charlayout =
 {
-	16, 13,					/* 16 x 13 characters */
-	48,						/* 48 characters */
-	1,						/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	16, 13,                 /* 16 x 13 characters */
+	48,                     /* 48 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },
 	/* y offsets */
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16 , 11*16 , 12*16 },
-	8*28			/* every char takes 28 bytes, first 2 bytes are used for the char size */
+	8*28            /* every char takes 28 bytes, first 2 bytes are used for the char size */
 };
 
 static GFXDECODE_START( rex6000 )
-	GFXDECODE_ENTRY( "flash0a", 0x0f0000, rex6000_bold_charlayout,  0, 0 )	//normal
-	GFXDECODE_ENTRY( "flash0a", 0x0f2000, rex6000_bold_charlayout,  0, 0 )	//bold
-	GFXDECODE_ENTRY( "flash0a", 0x0f4000, rex6000_tiny_charlayout,  0, 0 )	//tiny
-	GFXDECODE_ENTRY( "flash0a", 0x0f6000, rex6000_graph_charlayout, 0, 0 )	//graphic
+	GFXDECODE_ENTRY( "flash0a", 0x0f0000, rex6000_bold_charlayout,  0, 0 )  //normal
+	GFXDECODE_ENTRY( "flash0a", 0x0f2000, rex6000_bold_charlayout,  0, 0 )  //bold
+	GFXDECODE_ENTRY( "flash0a", 0x0f4000, rex6000_tiny_charlayout,  0, 0 )  //tiny
+	GFXDECODE_ENTRY( "flash0a", 0x0f6000, rex6000_graph_charlayout, 0, 0 )  //graphic
 GFXDECODE_END
 
 
@@ -645,24 +645,24 @@ static RP5C01_INTERFACE( rtc_intf )
 };
 
 static MACHINE_CONFIG_START( rex6000, rex6000_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
-    MCFG_CPU_PROGRAM_MAP(rex6000_mem)
-    MCFG_CPU_IO_MAP(rex6000_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
+	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
+	MCFG_CPU_IO_MAP(rex6000_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(32))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(4096))
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", LCD)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(rex6000_state, screen_update)
-    MCFG_SCREEN_SIZE(240, 120)
-    MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
+	MCFG_SCREEN_SIZE(240, 120)
+	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-    MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_LENGTH(2)
 	MCFG_GFXDECODE(rex6000)
 
 	/* quickload */
@@ -671,16 +671,16 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_RP5C01_ADD(TC8521_TAG, XTAL_32_768kHz, rtc_intf)
 
 	/*
-    Fujitsu 29DL16X have feature which is capability of reading data from one
-    bank of memory while a program or erase operation is in progress in the
-    other bank of memory (simultaneous operation). This is not supported yet
-    by the flash emulation and I have splitted every bank into a separate
-    device for have a similar behavior.
-    */
-	MCFG_FUJITSU_29DL16X_ADD("flash0a")	//bank 0 of first flash
-	MCFG_FUJITSU_29DL16X_ADD("flash0b")	//bank 1 of first flash
-	MCFG_FUJITSU_29DL16X_ADD("flash1a")	//bank 0 of second flash
-	MCFG_FUJITSU_29DL16X_ADD("flash1b")	//bank 1 of second flash
+	Fujitsu 29DL16X have feature which is capability of reading data from one
+	bank of memory while a program or erase operation is in progress in the
+	other bank of memory (simultaneous operation). This is not supported yet
+	by the flash emulation and I have splitted every bank into a separate
+	device for have a similar behavior.
+	*/
+	MCFG_FUJITSU_29DL16X_ADD("flash0a") //bank 0 of first flash
+	MCFG_FUJITSU_29DL16X_ADD("flash0b") //bank 1 of first flash
+	MCFG_FUJITSU_29DL16X_ADD("flash1a") //bank 0 of second flash
+	MCFG_FUJITSU_29DL16X_ADD("flash1b") //bank 1 of second flash
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -694,35 +694,35 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rex6000 )
-    ROM_REGION( 0x200000, "flash0a", ROMREGION_ERASE )
+	ROM_REGION( 0x200000, "flash0a", ROMREGION_ERASE )
 	ROM_LOAD( "rex6000_0.dat", 0x0000, 0x100000, BAD_DUMP CRC(e7a7324f) SHA1(01adcd469c93984438cbd4bf6e5a46e74da500d0))
 
-    ROM_REGION( 0x200000, "flash0b", ROMREGION_ERASE )
+	ROM_REGION( 0x200000, "flash0b", ROMREGION_ERASE )
 	ROM_LOAD( "rex6000_1.dat", 0x0000, 0x100000, BAD_DUMP CRC(cc4b51db) SHA1(73b655e21ece30e8dc60f2f09719bc446492cc0f))
 
-    ROM_REGION( 0x200000, "flash1a", ROMREGION_ERASE )
+	ROM_REGION( 0x200000, "flash1a", ROMREGION_ERASE )
 	ROM_LOAD( "rex6000_2.dat", 0x0000, 0x100000, NO_DUMP)
 
-    ROM_REGION( 0x200000, "flash1b", ROMREGION_ERASE )
+	ROM_REGION( 0x200000, "flash1b", ROMREGION_ERASE )
 	ROM_LOAD( "rex6000_3.dat", 0x0000, 0x100000, NO_DUMP)
 ROM_END
 
 ROM_START( ds2 )
-    ROM_REGION( 0x200000, "flash0a", ROMREGION_ERASE )
+	ROM_REGION( 0x200000, "flash0a", ROMREGION_ERASE )
 	ROM_LOAD( "ds2_0.dat", 0x0000, 0x100000, BAD_DUMP CRC(3197bed3) SHA1(9f826fd6d23ced797daae666d88ced14d24b64c3))
 
 	ROM_REGION( 0x200000, "flash0b", ROMREGION_ERASE )
 	ROM_LOAD( "ds2_1.dat", 0x0000, 0x100000, BAD_DUMP CRC(a909b755) SHA1(4db8a44539b9f94d418c33bbd794afb9bacbbadd))
 
-    ROM_REGION( 0x200000, "flash1a", ROMREGION_ERASE )
+	ROM_REGION( 0x200000, "flash1a", ROMREGION_ERASE )
 	ROM_LOAD( "ds2_2.dat", 0x0000, 0x100000, BAD_DUMP CRC(a738ea1c) SHA1(3b71f43ff30f4b15b5cd85dd9e95ebc7e84eb5a3))
 
-    ROM_REGION( 0x200000, "flash1b", ROMREGION_ERASE )
+	ROM_REGION( 0x200000, "flash1b", ROMREGION_ERASE )
 	ROM_LOAD( "ds2_3.dat", 0x0000, 0x100000, BAD_DUMP CRC(64f7c189) SHA1(a47d3413ddb879083c3aec03a42fe357d3a3c10a))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 2000, rex6000,  0,       0,	rex6000,	rex6000, driver_device,	 0,   "Xircom / Intel",   "REX 6000",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 2000, ds2,	  rex6000, 0,	rex6000,	rex6000, driver_device,	 0,   "Citizen",		  "DataSlim 2",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, driver_device,  0,   "Xircom / Intel",   "REX 6000",       GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, driver_device,  0,   "Citizen",          "DataSlim 2",     GAME_NOT_WORKING | GAME_NO_SOUND)

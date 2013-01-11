@@ -14,7 +14,7 @@
 // ======================> z88_1024k_flash_device
 
 class z88_1024k_flash_device : public device_t,
-						       public device_z88cart_interface
+								public device_z88cart_interface
 {
 public:
 	// construction/destruction

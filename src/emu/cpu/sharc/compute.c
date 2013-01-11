@@ -2,32 +2,32 @@
 
 #include <math.h>
 
-#define CLEAR_ALU_FLAGS()		(cpustate->astat &= ~(AZ|AN|AV|AC|AS|AI))
+#define CLEAR_ALU_FLAGS()       (cpustate->astat &= ~(AZ|AN|AV|AC|AS|AI))
 
-#define SET_FLAG_AZ(r)			{ cpustate->astat |= (((r) == 0) ? AZ : 0); }
-#define SET_FLAG_AN(r)			{ cpustate->astat |= (((r) & 0x80000000) ? AN : 0); }
-#define SET_FLAG_AC_ADD(r,a,b)	{ cpustate->astat |= (((UINT32)r < (UINT32)a) ? AC : 0); }
-#define SET_FLAG_AV_ADD(r,a,b)	{ cpustate->astat |= (((~((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
-#define SET_FLAG_AC_SUB(r,a,b)	{ cpustate->astat |= ((!((UINT32)a < (UINT32)b)) ? AC : 0); }
-#define SET_FLAG_AV_SUB(r,a,b)	{ cpustate->astat |= ((( ((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
+#define SET_FLAG_AZ(r)          { cpustate->astat |= (((r) == 0) ? AZ : 0); }
+#define SET_FLAG_AN(r)          { cpustate->astat |= (((r) & 0x80000000) ? AN : 0); }
+#define SET_FLAG_AC_ADD(r,a,b)  { cpustate->astat |= (((UINT32)r < (UINT32)a) ? AC : 0); }
+#define SET_FLAG_AV_ADD(r,a,b)  { cpustate->astat |= (((~((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
+#define SET_FLAG_AC_SUB(r,a,b)  { cpustate->astat |= ((!((UINT32)a < (UINT32)b)) ? AC : 0); }
+#define SET_FLAG_AV_SUB(r,a,b)  { cpustate->astat |= ((( ((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
 
-#define IS_FLOAT_ZERO(r)		((((r) & 0x7fffffff) == 0))
-#define IS_FLOAT_DENORMAL(r)	((((r) & 0x7f800000) == 0) && (((r) & 0x7fffff) != 0))
-#define IS_FLOAT_NAN(r)			((((r) & 0x7f800000) == 0x7f800000) && (((r) & 0x7fffff) != 0))
-#define IS_FLOAT_INFINITY(r)	(((r) & 0x7fffffff) == 0x7f800000)
+#define IS_FLOAT_ZERO(r)        ((((r) & 0x7fffffff) == 0))
+#define IS_FLOAT_DENORMAL(r)    ((((r) & 0x7f800000) == 0) && (((r) & 0x7fffff) != 0))
+#define IS_FLOAT_NAN(r)         ((((r) & 0x7f800000) == 0x7f800000) && (((r) & 0x7fffff) != 0))
+#define IS_FLOAT_INFINITY(r)    (((r) & 0x7fffffff) == 0x7f800000)
 
-#define CLEAR_MULTIPLIER_FLAGS()	(cpustate->astat &= ~(MN|MV|MU|MI))
+#define CLEAR_MULTIPLIER_FLAGS()    (cpustate->astat &= ~(MN|MV|MU|MI))
 
-#define SET_FLAG_MN(r)			{ cpustate->astat |= (((r) & 0x80000000) ? MN : 0); }
-#define SET_FLAG_MV(r)			{ cpustate->astat |= ((((UINT32)((r) >> 32) != 0) && ((UINT32)((r) >> 32) != 0xffffffff)) ? MV : 0); }
+#define SET_FLAG_MN(r)          { cpustate->astat |= (((r) & 0x80000000) ? MN : 0); }
+#define SET_FLAG_MV(r)          { cpustate->astat |= ((((UINT32)((r) >> 32) != 0) && ((UINT32)((r) >> 32) != 0xffffffff)) ? MV : 0); }
 
 /* TODO: MU needs 80-bit result */
-#define SET_FLAG_MU(r)			{ cpustate->astat |= ((((UINT32)((r) >> 32) == 0) && ((UINT32)(r)) != 0) ? MU : 0); }
+#define SET_FLAG_MU(r)          { cpustate->astat |= ((((UINT32)((r) >> 32) == 0) && ((UINT32)(r)) != 0) ? MU : 0); }
 
 
-#define FLOAT_SIGN			0x80000000
-#define FLOAT_INFINITY		0x7f800000
-#define FLOAT_MANTISSA		0x007fffff
+#define FLOAT_SIGN          0x80000000
+#define FLOAT_INFINITY      0x7f800000
+#define FLOAT_MANTISSA      0x007fffff
 
 /*****************************************************************************/
 
@@ -566,7 +566,7 @@ INLINE void compute_fadd(SHARC_REGS *cpustate, int rn, int rx, int ry)
 	/* TODO: AV flag */
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(rn) = r.f;
 	cpustate->astat |= AF;
@@ -590,7 +590,7 @@ INLINE void compute_fsub(SHARC_REGS *cpustate, int rn, int rx, int ry)
 	/* TODO: AV flag */
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(rn) = r.f;
 	cpustate->astat |= AF;
@@ -611,7 +611,7 @@ INLINE void compute_fneg(SHARC_REGS *cpustate, int rn, int rx)
 	cpustate->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(rn) = r.f;
 	cpustate->astat |= AF;
@@ -633,7 +633,7 @@ INLINE void compute_fcomp(SHARC_REGS *cpustate, int rx, int ry)
 	cpustate->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	// Update ASTAT compare accumulation register
 	comp_accum = (cpustate->astat >> 24) & 0xff;
@@ -663,7 +663,7 @@ INLINE void compute_fabs_plus(SHARC_REGS *cpustate, int rn, int rx, int ry)
 	/* TODO: AV flag */
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(rn) = r.f;
 	cpustate->astat |= AF;
@@ -801,7 +801,7 @@ INLINE void compute_recips(SHARC_REGS *cpustate, int rn, int rx)
 		cpustate->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
 
 		// AIS
-		if (cpustate->astat & AI)	cpustate->stky |= AIS;
+		if (cpustate->astat & AI)   cpustate->stky |= AIS;
 	}
 
 	// AF
@@ -828,7 +828,7 @@ INLINE void compute_rsqrts(SHARC_REGS *cpustate, int rn, int rx)
 	}
 	else
 	{
-		UINT32 mantissa = REG(rx) & 0xffffff;	// mantissa + LSB of biased exponent
+		UINT32 mantissa = REG(rx) & 0xffffff;   // mantissa + LSB of biased exponent
 		UINT32 exponent = (REG(rx) >> 23) & 0xff;
 		UINT32 sign = REG(rx) & FLOAT_SIGN;
 
@@ -849,7 +849,7 @@ INLINE void compute_rsqrts(SHARC_REGS *cpustate, int rn, int rx)
 	// AI
 	cpustate->astat |= (IS_FLOAT_NAN(REG(rx)) || (REG(rx) & 0x80000000)) ? AI : 0;
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 	// AF
 	cpustate->astat |= AF;
 
@@ -969,13 +969,13 @@ INLINE void compute_multi_mr_to_reg(SHARC_REGS *cpustate, int ai, int rk)
 {
 	switch(ai)
 	{
-		case 0:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrf)); break;
-		case 1:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrf >> 32)); break;
-		case 2:		fatalerror("SHARC: tried to load MR2F\n"); break;
-		case 4:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrb)); break;
-		case 5:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrb >> 32)); break;
-		case 6:		fatalerror("SHARC: tried to load MR2B\n"); break;
-		default:	fatalerror("SHARC: unknown ai %d in mr_to_reg\n", ai);
+		case 0:     SET_UREG(cpustate, rk, (UINT32)(cpustate->mrf)); break;
+		case 1:     SET_UREG(cpustate, rk, (UINT32)(cpustate->mrf >> 32)); break;
+		case 2:     fatalerror("SHARC: tried to load MR2F\n"); break;
+		case 4:     SET_UREG(cpustate, rk, (UINT32)(cpustate->mrb)); break;
+		case 5:     SET_UREG(cpustate, rk, (UINT32)(cpustate->mrb >> 32)); break;
+		case 6:     fatalerror("SHARC: tried to load MR2B\n"); break;
+		default:    fatalerror("SHARC: unknown ai %d in mr_to_reg\n", ai);
 	}
 
 	CLEAR_MULTIPLIER_FLAGS();
@@ -985,13 +985,13 @@ INLINE void compute_multi_reg_to_mr(SHARC_REGS *cpustate, int ai, int rk)
 {
 	switch(ai)
 	{
-		case 0:		cpustate->mrf &= ~0xffffffff; cpustate->mrf |= GET_UREG(cpustate, rk); break;
-		case 1:		cpustate->mrf &= 0xffffffff; cpustate->mrf |= (UINT64)(GET_UREG(cpustate, rk)) << 32; break;
-		case 2:		fatalerror("SHARC: tried to write MR2F\n"); break;
-		case 4:		cpustate->mrb &= ~0xffffffff; cpustate->mrb |= GET_UREG(cpustate, rk); break;
-		case 5:		cpustate->mrb &= 0xffffffff; cpustate->mrb |= (UINT64)(GET_UREG(cpustate, rk)) << 32; break;
-		case 6:		fatalerror("SHARC: tried to write MR2B\n"); break;
-		default:	fatalerror("SHARC: unknown ai %d in reg_to_mr\n", ai);
+		case 0:     cpustate->mrf &= ~0xffffffff; cpustate->mrf |= GET_UREG(cpustate, rk); break;
+		case 1:     cpustate->mrf &= 0xffffffff; cpustate->mrf |= (UINT64)(GET_UREG(cpustate, rk)) << 32; break;
+		case 2:     fatalerror("SHARC: tried to write MR2F\n"); break;
+		case 4:     cpustate->mrb &= ~0xffffffff; cpustate->mrb |= GET_UREG(cpustate, rk); break;
+		case 5:     cpustate->mrb &= 0xffffffff; cpustate->mrb |= (UINT64)(GET_UREG(cpustate, rk)) << 32; break;
+		case 6:     fatalerror("SHARC: tried to write MR2B\n"); break;
+		default:    fatalerror("SHARC: unknown ai %d in reg_to_mr\n", ai);
 	}
 
 	CLEAR_MULTIPLIER_FLAGS();
@@ -1102,7 +1102,7 @@ INLINE void compute_dual_fadd_fsub(SHARC_REGS *cpustate, int ra, int rs, int rx,
 	/* TODO: AV flag */
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(ra) = r_add.f;
 	FREG(rs) = r_sub.f;
@@ -1133,7 +1133,7 @@ INLINE void compute_fmul_fadd(SHARC_REGS *cpustate, int fm, int fxm, int fym, in
 	/* TODO: AV flag */
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_add.f;
@@ -1164,7 +1164,7 @@ INLINE void compute_fmul_fsub(SHARC_REGS *cpustate, int fm, int fxm, int fym, in
 	/* TODO: AV flag */
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_sub.f;
@@ -1329,7 +1329,7 @@ INLINE void compute_fmul_dual_fadd_fsub(SHARC_REGS *cpustate, int fm, int fxm, i
 	/* TODO: AV flag */
 
 	// AIS
-	if (cpustate->astat & AI)	cpustate->stky |= AIS;
+	if (cpustate->astat & AI)   cpustate->stky |= AIS;
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_add.f;

@@ -58,7 +58,7 @@ struct kaneko_pandora_state
 	int          clear_bitmap;
 	UINT8        region;
 	int          xoffset, yoffset;
-	int			 bg_pen; // might work some other way..
+	int          bg_pen; // might work some other way..
 };
 
 /*****************************************************************************
@@ -117,23 +117,23 @@ static void pandora_draw( device_t *device, bitmap_ind16 &bitmap, const rectangl
 
 
 	/*
-     * Sprite Tile Format
-     * ------------------
-     *
-     * Byte | Bit(s)   | Use
-     * -----+-76543210-+----------------
-     *  0-2 | -------- | unused
-     *  3   | xxxx.... | Palette Bank
-     *  3   | .......x | XPos - Sign Bit
-     *  3   | ......x. | YPos - Sign Bit
-     *  3   | .....x.. | Use Relative offsets
-     *  4   | xxxxxxxx | XPos
-     *  5   | xxxxxxxx | YPos
-     *  6   | xxxxxxxx | Sprite Number (low 8 bits)
-     *  7   | ....xxxx | Sprite Number (high 4 bits)
-     *  7   | x....... | Flip Sprite Y-Axis
-     *  7   | .x...... | Flip Sprite X-Axis
-     */
+	 * Sprite Tile Format
+	 * ------------------
+	 *
+	 * Byte | Bit(s)   | Use
+	 * -----+-76543210-+----------------
+	 *  0-2 | -------- | unused
+	 *  3   | xxxx.... | Palette Bank
+	 *  3   | .......x | XPos - Sign Bit
+	 *  3   | ......x. | YPos - Sign Bit
+	 *  3   | .....x.. | Use Relative offsets
+	 *  4   | xxxxxxxx | XPos
+	 *  5   | xxxxxxxx | YPos
+	 *  6   | xxxxxxxx | Sprite Number (low 8 bits)
+	 *  7   | ....xxxx | Sprite Number (high 4 bits)
+	 *  7   | x....... | Flip Sprite Y-Axis
+	 *  7   | .x...... | Flip Sprite X-Axis
+	 */
 
 	for (offs = 0; offs < 0x1000; offs += 8)
 	{
@@ -359,5 +359,3 @@ void kaneko_pandora_device::device_reset()
 {
 	DEVICE_RESET_NAME( kaneko_pandora )(this);
 }
-
-

@@ -30,7 +30,7 @@ static const rgb_t nc_palette[NC_NUM_COLOURS] =
 	MAKE_RGB(0x060, 0x060, 0x060),
 	MAKE_RGB(0x000, 0x000, 0x000),
 	MAKE_RGB(0x080, 0x0a0, 0x060),
-    MAKE_RGB(0x000, 0x000, 0x000)
+	MAKE_RGB(0x000, 0x000, 0x000)
 };
 
 
@@ -61,10 +61,10 @@ UINT32 nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, c
 	int height, width;
 	int pens[2];
 
-    if (m_type==NC_TYPE_200)
-    {
-        height = NC200_SCREEN_HEIGHT;
-        width = NC200_SCREEN_WIDTH;
+	if (m_type==NC_TYPE_200)
+	{
+		height = NC200_SCREEN_HEIGHT;
+		width = NC200_SCREEN_WIDTH;
 
 		if (m_nc200_backlight)
 		{
@@ -76,9 +76,9 @@ UINT32 nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, c
 			pens[0] = 0;
 			pens[1] = 1;
 		}
-    }
-    else
-    {
+	}
+	else
+	{
 		height = NC_SCREEN_HEIGHT;
 		width = NC_SCREEN_WIDTH;
 		pens[0] = 2;
@@ -86,8 +86,8 @@ UINT32 nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 
 
-    for (y=0; y<height; y++)
-    {
+	for (y=0; y<height; y++)
+	{
 		int by;
 		/* 64 bytes per line */
 		char *line_ptr = ((char*)machine().device<ram_device>(RAM_TAG)->pointer()) + m_display_memory_start + (y<<6);
@@ -115,4 +115,3 @@ UINT32 nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 	return 0;
 }
-

@@ -253,7 +253,7 @@ DRIVER_INIT_MEMBER(mc10_state,mc10)
 		membank("bank2")->set_base(m_ram_base + 0x1000);
 	else if (m_ram_size == 24*1024)
 		membank("bank2")->set_base(m_ram_base + 0x2000);
-	else  if (m_ram_size != 32*1024)		//ensure that is not alice90
+	else  if (m_ram_size != 32*1024)        //ensure that is not alice90
 		prg.nop_readwrite(0x5000, 0x8fff);
 
 	/* register for state saving */
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alice90_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
-	AM_RANGE(0x3000, 0xafff) AM_RAMBANK("bank1")	/* 32k internal ram */
+	AM_RANGE(0x3000, 0xafff) AM_RAMBANK("bank1")    /* 32k internal ram */
 	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(alice90_bfff_r, alice32_bfff_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
@@ -532,7 +532,7 @@ MACHINE_CONFIG_END
 
 static const ef9345_interface alice32_ef9345_config =
 {
-	"screen"			/* screen we are acting on */
+	"screen"            /* screen we are acting on */
 };
 
 static MACHINE_CONFIG_START( alice32, mc10_state )
@@ -604,7 +604,7 @@ ROM_START( alice32 )
 	ROM_LOAD("alice32.rom", 0x0000, 0x4000, CRC(c3854ddf) SHA1(f34e61c3cf711fb59ff4f1d4c0d2863dab0ab5d1))
 
 	ROM_REGION( 0x2000, "ef9345", 0 )
-	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
+	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
 ROM_START( alice90 )
@@ -612,7 +612,7 @@ ROM_START( alice90 )
 	ROM_LOAD("alice90.rom", 0x0000, 0x4000, CRC(d0a874bb) SHA1(a65c7be2d516bed2584c51c1ef78b045b91faef6))
 
 	ROM_REGION( 0x2000, "ef9345", 0 )
-	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
+	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
 /***************************************************************************

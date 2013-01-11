@@ -205,9 +205,9 @@ public:
 
 static HD44780_INTERFACE( chess_display )
 {
-    2,                  // number of lines
-    16,					// chars for line
-	NULL				// pixel update callback
+	2,                  // number of lines
+	16,                 // chars for line
+	NULL                // pixel update callback
 };
 
 static UINT8 convert_imputmask(UINT8 input)
@@ -414,8 +414,8 @@ WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
 WRITE8_MEMBER(polgar_state::milano_write_LED)
 {
 	UINT8 LED_offset = 100;
-	if (data == 0xff)	output_set_led_value(LED_offset+offset,1);
-	else				output_set_led_value(LED_offset+offset,0);
+	if (data == 0xff)   output_set_led_value(LED_offset+offset,1);
+	else                output_set_led_value(LED_offset+offset,0);
 
 	//logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
@@ -615,21 +615,21 @@ WRITE8_MEMBER(polgar_state::monteciv_3007)
 {
 //    logerror("$3007 SELECTTOP %02x\n",data);
 //    printf("$3007 SELECTTOP %02x\n",data);
-    montecivtop = data;
-    montecivtopnew = 1;
+	montecivtop = data;
+	montecivtopnew = 1;
 }
 
 WRITE8_MEMBER(polgar_state::monteciv_3005)
 {
 //    logerror("$3005 SELECTBOT %02x\n",data);
 //    printf("$3005 SELECTBOT %02x\n",data);
-    montecivbot = data;
-    montecivbotnew = 1;
+	montecivbot = data;
+	montecivbotnew = 1;
 }
 
 WRITE8_MEMBER(polgar_state::monteciv_3006)
 {
-    logerror("$3006 CLK %02x\n",data);
+	logerror("$3006 CLK %02x\n",data);
 //    printf("$3006 CLK %02x\n",data);
 }
 
@@ -926,13 +926,13 @@ WRITE16_MEMBER(polgar_state::write_IOenables)
 READ32_MEMBER(polgar_state::read_unknown1_32)
 {
 	logerror("Read from unknown1 offset: %x\n",offset);
-    return 0xff00ff00;
+	return 0xff00ff00;
 }
 
 READ16_MEMBER(polgar_state::read_unknown1)
 {
 	logerror("Read from %06x offset: %x\n",0xe80002,offset);
-    return 0xff00;
+	return 0xff00;
 }
 
 WRITE32_MEMBER(polgar_state::write_unknown2_32)
@@ -1079,40 +1079,40 @@ PALETTE_INIT_MEMBER(polgar_state,chess_lcd)
 {
 	// palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148)); // some think this is closer, but slightly less readable
 	palette_set_color(machine(), 0, MAKE_RGB(255, 255, 255));
-    palette_set_color(machine(), 1, MAKE_RGB(0, 0, 0));
+	palette_set_color(machine(), 1, MAKE_RGB(0, 0, 0));
 }
 
 static const gfx_layout chess_charlayout =
 {
-    5, 8,                   /* 5 x 8 characters */
-    224,                    /* 224 characters */
-    1,                      /* 1 bits per pixel */
-    { 0 },                  /* no bitplanes */
-    { 3, 4, 5, 6, 7},
-    { 0, 8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-    8*8                     /* 8 bytes */
+	5, 8,                   /* 5 x 8 characters */
+	224,                    /* 224 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	{ 3, 4, 5, 6, 7},
+	{ 0, 8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+	8*8                     /* 8 bytes */
 };
 
 static GFXDECODE_START( chess_lcd )
-    GFXDECODE_ENTRY( "hd44780", 0x0000, chess_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "hd44780", 0x0000, chess_charlayout, 0, 1 )
 GFXDECODE_END
 
 static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE(mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(mboard_write_board_8)		// Chessboard
-	AM_RANGE( 0x3000, 0x3000 ) AM_READ(mboard_read_board_8 )		// Chessboard
-	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE(polgar_write_LED)	// Function LEDs
+	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(mboard_write_board_8)       // Chessboard
+	AM_RANGE( 0x3000, 0x3000 ) AM_READ(mboard_read_board_8 )        // Chessboard
+	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE(polgar_write_LED)   // Function LEDs
 	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ(read_keys)
-	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE(write_polgar_IO )	// LCD Instr. Reg + Beeper
-	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(write_LCD_polgar )	        // LCD Char Reg.
+	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE(write_polgar_IO )   // LCD Instr. Reg + Beeper
+	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(write_LCD_polgar )          // LCD Char Reg.
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fef ) AM_RAM
-	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE(write_latch_sfortea)	// IO control
-	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE(write_lcd_IO_sfortea)	// LCD Char Reg.
+	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE(write_latch_sfortea)    // IO control
+	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE(write_lcd_IO_sfortea)   // LCD Char Reg.
 //  AM_RANGE( 0x1ffc, 0x1fff ) AM_DEVREADWRITE_LEGACY("acia65c51", acia_6551_r,acia_6551_w)
 	AM_RANGE( 0x1ff1, 0x1ff1 ) AM_READ(read_1ff1_sfortea )
 	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_READ(read_1ff0_sfortea )
@@ -1140,7 +1140,7 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x80000000, 0x8003ffff )  AM_RAM      /* 256KB */
 	AM_RANGE( 0xe8000000, 0xe8007fff )  AM_RAM AM_SHARE("nvram")
 
- ADDRESS_MAP_END
+	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 
@@ -1153,7 +1153,7 @@ static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x400000 , 0x4fffff )  AM_RAM      /* 1024KB */
 	AM_RANGE( 0xd00000 , 0xd07fff )  AM_RAM AM_SHARE("nvram")
 
- ADDRESS_MAP_END
+	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 
@@ -1172,7 +1172,7 @@ static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM      /* 1024KB */
 	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_SHARE("nvram")
 
- ADDRESS_MAP_END
+	ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
@@ -1192,7 +1192,7 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM
 	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_SHARE("nvram")
 
- ADDRESS_MAP_END
+	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32, polgar_state )
 
@@ -1201,7 +1201,7 @@ static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(read_1800000 )
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
 
- ADDRESS_MAP_END
+	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 
@@ -1220,7 +1220,7 @@ static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
 	AM_RANGE( 0x800000, 0x803fff )  AM_RAM AM_SHARE("nvram")
 
- ADDRESS_MAP_END
+	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, polgar_state )
 
@@ -1244,12 +1244,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1f9f ) AM_RAM
-	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE(milano_write_board )		// Chessboard
-	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ(milano_read_board )		// Chessboard
-	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE(milano_write_LED )	// Function LEDs
+	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE(milano_write_board )        // Chessboard
+	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ(milano_read_board )      // Chessboard
+	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE(milano_write_LED )  // Function LEDs
 	AM_RANGE( 0x1fd8, 0x1fdf ) AM_READ(read_keys)
-	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE(write_polgar_IO)	// IO control
-	AM_RANGE( 0x1fc0, 0x1fc0 ) AM_WRITE(write_LCD_polgar)	// LCD Char Reg. (latched)
+	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE(write_polgar_IO)    // IO control
+	AM_RANGE( 0x1fc0, 0x1fc0 ) AM_WRITE(write_LCD_polgar)   // LCD Char Reg. (latched)
 	AM_RANGE( 0x2000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -1257,8 +1257,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_academy )
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )		// Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )       // Chessboard
+	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
 	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
 	AM_RANGE( 0x3001, 0x3001 ) AM_WRITE(academy_inhibitNMI )
 	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )
@@ -1269,10 +1269,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_monteciv )
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )		// Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )			// Status LEDs
-	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE(monteciv_select_line )			// Select Keyline
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )       // Chessboard
+	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )        // Chessboard
+	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )         // Status LEDs
+	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE(monteciv_select_line )          // Select Keyline
 	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
 	AM_RANGE( 0x3004, 0x3004 ) AM_WRITE(monteciv_write_LCD )
 	AM_RANGE( 0x3005, 0x3005 ) AM_WRITE(monteciv_3005 )
@@ -1285,11 +1285,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 /// AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_monteciv )
-	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(academy_write_board )	// 2800 // Chessboard
+	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(academy_write_board )   // 2800 // Chessboard
 /// AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE(mboard_write_LED_8 )      // Chessboard
 /// AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )           // Status LEDs
-	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE(megaiv_write_LED )	// 2400     // Select Keyline
-	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE(megaiv_IO )			// Select Keyline
+	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE(megaiv_write_LED )  // 2400     // Select Keyline
+	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE(megaiv_IO )         // Select Keyline
 /// AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
 	AM_RANGE( 0x4000, 0x4007 ) AM_READ(read_keys_megaiv ) // 3000-7 fixio
 	AM_RANGE( 0x2c04, 0x2c04 ) AM_WRITE(monteciv_write_LCD ) // 2c04
@@ -1514,13 +1514,13 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
-    /* video hardware */
+	/* video hardware */
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(100, 22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 100-1, 0, 22-3)
-    MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(polgar_state,chess_lcd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1734,20 +1734,20 @@ ROM_START(sfortea)
 ROM_END
 
 ROM_START( alm16 )
-    ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-    ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000,CRC(EE5B6EC4) SHA1(30920C1B9E16FFAE576DA5AFA0B56DA59ADA3DBB))
-    ROM_LOAD16_BYTE("alm16odd.bin" , 0x00001, 0x10000,CRC(D0BE4EE4) SHA1(D36C074802D2C9099CD44E75F9DE3FC7D1FD9908))
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000,CRC(EE5B6EC4) SHA1(30920C1B9E16FFAE576DA5AFA0B56DA59ADA3DBB))
+	ROM_LOAD16_BYTE("alm16odd.bin" , 0x00001, 0x10000,CRC(D0BE4EE4) SHA1(D36C074802D2C9099CD44E75F9DE3FC7D1FD9908))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( alm32 )
-    ROM_REGION32_BE( 0x20000, "maincpu", 0 )
-    ROM_LOAD("alm32.bin", 0x00000, 0x20000,CRC(38F4B305) SHA1(43459A057FF29248C74D656A036AC325202B9C15))
+	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD("alm32.bin", 0x00000, 0x20000,CRC(38F4B305) SHA1(43459A057FF29248C74D656A036AC325202B9C15))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
@@ -1821,20 +1821,20 @@ ROM_START(sexpertc)
 ROM_END
 
 ROM_START( lyon16 )
-    ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-    ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000,CRC(497BD41A) SHA1(3FFEFEEAC694F49997C10D248EC6A7AA932898A4))
-    ROM_LOAD16_BYTE("lyon16od.bin" , 0x00001, 0x10000,CRC(F9DE3F54) SHA1(4060E29566D2F40122CCDE3C1F84C94A9C1ED54F))
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000,CRC(497BD41A) SHA1(3FFEFEEAC694F49997C10D248EC6A7AA932898A4))
+	ROM_LOAD16_BYTE("lyon16od.bin" , 0x00001, 0x10000,CRC(F9DE3F54) SHA1(4060E29566D2F40122CCDE3C1F84C94A9C1ED54F))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( lyon32 )
-    ROM_REGION32_BE( 0x20000, "maincpu", 0 )
-    ROM_LOAD("lyon32.bin", 0x00000, 0x20000, CRC(5C128B06) SHA1(954C8F0D3FAE29900CB1E9C14A41A9A07A8E185F))
+	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD("lyon32.bin", 0x00000, 0x20000, CRC(5C128B06) SHA1(954C8F0D3FAE29900CB1E9C14A41A9A07A8E185F))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
@@ -1847,105 +1847,105 @@ ROM_START(monteciv)
 ROM_END
 
 ROM_START( diablo68 )
-    ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-    ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000,CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9))
-    ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000,CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5))
-    ROM_LOAD16_BYTE("book.bin", 0x10000, 0x8000,CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108))
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000,CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9))
+	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000,CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5))
+	ROM_LOAD16_BYTE("book.bin", 0x10000, 0x8000,CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( van16 )
-    ROM_REGION16_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD16_BYTE("va16even.bin", 0x00000, 0x20000,CRC(E87602D5) SHA1(90CB2767B4AE9E1B265951EB2569B9956B9F7F44))
-    ROM_LOAD16_BYTE("va16odd.bin" , 0x00001, 0x20000,CRC(585F3BDD) SHA1(90BB94A12D3153A91E3760020E1EA2A9EAA7EC0A))
+	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("va16even.bin", 0x00000, 0x20000,CRC(E87602D5) SHA1(90CB2767B4AE9E1B265951EB2569B9956B9F7F44))
+	ROM_LOAD16_BYTE("va16odd.bin" , 0x00001, 0x20000,CRC(585F3BDD) SHA1(90BB94A12D3153A91E3760020E1EA2A9EAA7EC0A))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 
 ROM_START( van32 )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("vanc32.bin", 0x00000, 0x40000,CRC(F872BEB5) SHA1(9919F207264F74E2B634B723B048AE9CA2CEFBC7))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("vanc32.bin", 0x00000, 0x40000,CRC(F872BEB5) SHA1(9919F207264F74E2B634B723B048AE9CA2CEFBC7))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 
 ROM_START( risc )
-    ROM_REGION( 0x20000, "maincpu", 0 )
-    ROM_LOAD("s2500.bin", 0x000000, 0x20000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc))
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD("s2500.bin", 0x000000, 0x20000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( gen32 )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("gen32_4.bin", 0x00000, 0x40000,CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("gen32_4.bin", 0x00000, 0x40000,CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( gen32_41 )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( gen32_oc )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( berlinp )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("berlinp.bin", 0x00000, 0x40000,CRC(82FBAF6E) SHA1(729B7CEF3DFAECC4594A6178FC4BA6015AFA6202))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("berlinp.bin", 0x00000, 0x40000,CRC(82FBAF6E) SHA1(729B7CEF3DFAECC4594A6178FC4BA6015AFA6202))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( bpl32 )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("bpl32.bin", 0x00000, 0x40000,CRC(D75E170F) SHA1(AC0EBDAA114ABD4FEF87361A03DF56928768B1AE))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("bpl32.bin", 0x00000, 0x40000,CRC(D75E170F) SHA1(AC0EBDAA114ABD4FEF87361A03DF56928768B1AE))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( lond020 )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("lond020.bin", 0x00000, 0x40000,CRC(3225B8DA) SHA1(FD8F6F4E9C03B6CDC86D8405E856C26041BFAD12))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("lond020.bin", 0x00000, 0x40000,CRC(3225B8DA) SHA1(FD8F6F4E9C03B6CDC86D8405E856C26041BFAD12))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 
 ROM_START( lond030 )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("lond030.bin", 0x00000, 0x40000,CRC(853BAA4E) SHA1(946951081D4E91E5BDD9E93D0769568A7FE79BAD))
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("lond030.bin", 0x00000, 0x40000,CRC(853BAA4E) SHA1(946951081D4E91E5BDD9E93D0769568A7FE79BAD))
 
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
+	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
@@ -1956,30 +1956,30 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 }
 
 /*       YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT     COMPANY                      FULLNAME                     FLAGS */
-  CONS(  1986, polgar,   0,       0,      polgar,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer", GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK)
-  CONS(  1987, sfortea,  0,       0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte A Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1988, alm16,    van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte B Chess Computer (ALT)", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Expert B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1989, academy,  0,       0,      academy,   academy, driver_device,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1989, milano,   polgar,  0,      milano,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer", GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1986, polgar,   0,       0,      polgar,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer", GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK)
+	CONS(  1987, sfortea,  0,       0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte A Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1988, alm16,    van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte B Chess Computer (ALT)", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Expert B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1989, academy,  0,       0,      academy,   academy, driver_device,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1989, milano,   polgar,  0,      milano,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer", GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
 //CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-  CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1993, gen32_oc, van16,   0,      gen32_oc,  gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01OC", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_UNOFFICIAL | GAME_CLICKABLE_ARTWORK )
-  CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1996, lond020,  van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
-  CONS(  1996, lond030,  van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1993, gen32_oc, van16,   0,      gen32_oc,  gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01OC", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_UNOFFICIAL | GAME_CLICKABLE_ARTWORK )
+	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1996, lond020,  van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )
+	CONS(  1996, lond030,  van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK | GAME_CLICKABLE_ARTWORK )

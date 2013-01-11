@@ -211,12 +211,12 @@ public:
  *
  *************************************/
 
-#define MEMCARD_SIZE	0x0800
+#define MEMCARD_SIZE    0x0800
 
 CUSTOM_INPUT_MEMBER(ng_aes_state::get_memcard_status)
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
-       write protect status (we are always write enabled) */
+	   write protect status (we are always write enabled) */
 	if(strcmp((char*)machine().system().name,"aes") != 0)
 		return 0x00;  // On the Neo Geo CD, the memory card is internal and therefore always present.
 	else
@@ -537,7 +537,7 @@ READ8_MEMBER(ng_aes_state::neocd_transfer_r)
 	sekAddress ^= 1;
 
 	switch (nActiveTransferArea) {
-		case 0:	// Sprites
+		case 0: // Sprites
 			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
 
 			// address is swizzled a bit due to out sprite decoding
@@ -547,12 +547,12 @@ READ8_MEMBER(ng_aes_state::neocd_transfer_r)
 			if ((address&3)==3) return NeoSpriteRAM[address];
 
 			return NeoSpriteRAM[nSpriteTransferBank + (sekAddress & 0x0FFFFF)];
-		case 1:							// ADPCM
+		case 1:                         // ADPCM
 			return YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)];
-		case 4:							// Z80
+		case 4:                         // Z80
 			if ((sekAddress & 0xfffff) >= 0x20000) return ~0;
 			return NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1];
-		case 5:							// Text
+		case 5:                         // Text
 			return NeoTextRAM[(sekAddress & 0x3FFFF) >> 1];
 	}
 
@@ -573,7 +573,7 @@ WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
 	sekAddress ^= 1;
 
 	switch (nActiveTransferArea) {
-		case 0:							// Sprites
+		case 0:                         // Sprites
 			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
 
 			// address is swizzled a bit due to out sprite decoding
@@ -583,10 +583,10 @@ WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
 			if ((address&3)==3) NeoSpriteRAM[address] = byteValue;
 
 			break;
-		case 1:							// ADPCM
+		case 1:                         // ADPCM
 			YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
 			break;
-		case 4:							// Z80
+		case 4:                         // Z80
 
 			// kof98 and lresort attempt to write here when the system still has the z80 bank
 			// it seems they attempt to write regular samples (not even deltat) maybe there is
@@ -603,7 +603,7 @@ WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
 				NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
 			}
 			break;
-		case 5:							// Text
+		case 5:                         // Text
 			NeoTextRAM[(sekAddress & 0x3FFFF) >> 1] = byteValue;
 			break;
 	}
@@ -1200,7 +1200,7 @@ static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ(aes_in0_r)
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP	// AES has no watchdog
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP // AES has no watchdog
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN3") AM_WRITE(audio_command_w)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
@@ -1226,7 +1226,7 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
 
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ(aes_in0_r)
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP	// AES has no watchdog
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP // AES has no watchdog
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN3") AM_WRITE(audio_command_w)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
@@ -1263,7 +1263,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ng_aes_state )
-  /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
+	/*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
@@ -1289,62 +1289,62 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-#define STANDARD_DIPS																		\
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")					\
-	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")					\
-	PORT_DIPSETTING(	  0x0000, "1?" )													\
-	PORT_DIPSETTING(	  0x0002, "2?" )													\
-	PORT_DIPNAME( 0x0004, 0x0004, "Autofire (in some games)" ) PORT_DIPLOCATION("SW:3")		\
-	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")	\
-	PORT_DIPSETTING(	  0x0018, "1" )														\
-	PORT_DIPSETTING(	  0x0008, "2" )														\
-	PORT_DIPSETTING(	  0x0010, "3" )														\
-	PORT_DIPSETTING(	  0x0000, "4" )														\
-	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")	\
-	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")			\
-	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
-	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")						\
-	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )											\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+#define STANDARD_DIPS                                                                       \
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")                  \
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")                 \
+	PORT_DIPSETTING(      0x0000, "1?" )                                                    \
+	PORT_DIPSETTING(      0x0002, "2?" )                                                    \
+	PORT_DIPNAME( 0x0004, 0x0004, "Autofire (in some games)" ) PORT_DIPLOCATION("SW:3")     \
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5") \
+	PORT_DIPSETTING(      0x0018, "1" )                                                     \
+	PORT_DIPSETTING(      0x0008, "2" )                                                     \
+	PORT_DIPSETTING(      0x0010, "3" )                                                     \
+	PORT_DIPSETTING(      0x0000, "4" )                                                     \
+	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")   \
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")           \
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                           \
+	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")                       \
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )                                          \
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-#define STANDARD_IN2																				\
-	PORT_START("IN2")																				\
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )													\
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )									\
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("1P Select") PORT_CODE(KEYCODE_5) PORT_PLAYER(1)	\
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )									\
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("2P Select") PORT_CODE(KEYCODE_6) PORT_PLAYER(2)	\
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ng_aes_state, get_memcard_status, NULL)			\
+#define STANDARD_IN2                                                                                \
+	PORT_START("IN2")                                                                               \
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )                                                   \
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )                                   \
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("1P Select") PORT_CODE(KEYCODE_5) PORT_PLAYER(1)    \
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )                                   \
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("2P Select") PORT_CODE(KEYCODE_6) PORT_PLAYER(2)    \
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ng_aes_state, get_memcard_status, NULL)         \
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )  /* Matrimelee expects this bit to be active high when on an AES */
 
-#define STANDARD_IN3																				\
-	PORT_START("IN3")																				\
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )  /* Coin 1 - AES has no coin slots, it's a console */	\
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )  /* Coin 2 - AES has no coin slots, it's a console */	\
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )  /* Service Coin - not used, AES is a console */	\
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */								\
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)			\
+#define STANDARD_IN3                                                                                \
+	PORT_START("IN3")                                                                               \
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )  /* Coin 1 - AES has no coin slots, it's a console */ \
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )  /* Coin 2 - AES has no coin slots, it's a console */ \
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )  /* Service Coin - not used, AES is a console */  \
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */    \
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */    \
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */                              \
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)         \
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL) \
 
-#define STANDARD_IN4																			\
-	PORT_START("IN4")																			\
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* what is this? - is 0 for 1 or 2 slot MVS (and AES?)*/							\
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Enter BIOS") PORT_CODE(KEYCODE_F2)	\
+#define STANDARD_IN4                                                                            \
+	PORT_START("IN4")                                                                           \
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* what is this? - is 0 for 1 or 2 slot MVS (and AES?)*/                            \
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Enter BIOS") PORT_CODE(KEYCODE_F2)  \
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 static INPUT_PORTS_START( controller )
@@ -1625,7 +1625,7 @@ static NVRAM_HANDLER( neocd )
 			file->read(state->m_memcard_data,0x2000);
 		else
 		{
-		  memset(state->m_memcard_data,0x00,0x2000);
+			memset(state->m_memcard_data,0x00,0x2000);
 		}
 	}
 }
@@ -1667,9 +1667,9 @@ MACHINE_CONFIG_END
 ROM_START( aes )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "jap-aes",   "Japan AES" )
-	ROMX_LOAD("neo-po.bin",  0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))	/* AES Console (Japan) Bios */
+	ROMX_LOAD("neo-po.bin",  0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))    /* AES Console (Japan) Bios */
 	ROM_SYSTEM_BIOS( 1, "asia-aes",   "Asia AES" )
-	ROMX_LOAD("neo-epo.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))	/* AES Console (Asia?) Bios */
+	ROMX_LOAD("neo-epo.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))    /* AES Console (Asia?) Bios */
 //  ROM_SYSTEM_BIOS( 2, "uni-bios_2_3","Universe Bios (Hack, Ver. 2.3)" )
 //  ROMX_LOAD( "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3) ) /* Universe Bios v2.3 (hack) */
 
@@ -1759,7 +1759,7 @@ DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
 
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1990, aes,    0,		0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", 0)
+CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", 0)
 
 DRIVER_INIT_MEMBER(ng_aes_state,neocdz)
 {
@@ -1772,8 +1772,8 @@ DRIVER_INIT_MEMBER(ng_aes_state,neocdzj)
 }
 
 
-CONS( 1996, neocdz,  0,	     0,   neocd,    aes, ng_aes_state,   neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
+CONS( 1996, neocdz,  0,      0,   neocd,    aes, ng_aes_state,   neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
 CONS( 1996, neocdzj, neocdz, 0,   neocd,    aes, ng_aes_state,   neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
 
 
-CONS( 1994, neocd,  neocdz,	0,   neocd,    aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,  neocdz, 0,   neocd,    aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING ) // older  model, ignores disc protections?

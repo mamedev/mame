@@ -568,91 +568,91 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 }
 
 
- void sh4_handle_sar0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_sar0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_SAR0);
 }
 
- void sh4_handle_sar1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_sar1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_SAR1);
 }
 
- void sh4_handle_sar2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_sar2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_SAR2);
 }
 
- void sh4_handle_sar3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_sar3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_SAR3);
 }
 
- void sh4_handle_dar0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dar0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DAR0);
 }
 
- void sh4_handle_dar1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dar1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DAR1);
 }
 
- void sh4_handle_dar2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dar2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DAR2);
 }
 
- void sh4_handle_dar3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dar3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DAR3);
 }
 
- void sh4_handle_dmatcr0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dmatcr0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DMATCR0);
 }
 
- void sh4_handle_dmatcr1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dmatcr1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DMATCR1);
 }
 
- void sh4_handle_dmatcr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dmatcr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DMATCR2);
 }
 
- void sh4_handle_dmatcr3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dmatcr3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_DMATCR3);
 }
 
- void sh4_handle_chcr0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_chcr0_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_CHCR0);
 	sh4_dmac_check(sh4, 0);
 }
 
- void sh4_handle_chcr1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_chcr1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_CHCR1);
 	sh4_dmac_check(sh4, 1);
 }
 
- void sh4_handle_chcr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_chcr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_CHCR2);
 	sh4_dmac_check(sh4, 2);
 }
 
- void sh4_handle_chcr3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_chcr3_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&sh4->SH4_CHCR3);
 	sh4_dmac_check(sh4, 3);
 }
 
- void sh4_handle_dmaor_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+	void sh4_handle_dmaor_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
 {
 	UINT32 old = sh4->SH4_DMAOR;
 	COMBINE_DATA(&sh4->SH4_DMAOR);
@@ -667,20 +667,20 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 	sh4_dmac_check(sh4, 3);
 }
 
- UINT32 sh4_handle_sar0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR0; }
- UINT32 sh4_handle_sar1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR1; }
- UINT32 sh4_handle_sar2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR2; }
- UINT32 sh4_handle_sar3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR3; }
- UINT32 sh4_handle_dar0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR0; }
- UINT32 sh4_handle_dar1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR1; }
- UINT32 sh4_handle_dar2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR2; }
- UINT32 sh4_handle_dar3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR3; }
- UINT32 sh4_handle_dmatcr0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR0; }
- UINT32 sh4_handle_dmatcr1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR1; }
- UINT32 sh4_handle_dmatcr2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR2; }
- UINT32 sh4_handle_dmatcr3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR3; }
- UINT32 sh4_handle_chcr0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR0; }
- UINT32 sh4_handle_chcr1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR1; }
- UINT32 sh4_handle_chcr2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR2; }
- UINT32 sh4_handle_chcr3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR3; }
- UINT32 sh4_handle_dmaor_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMAOR; }
+	UINT32 sh4_handle_sar0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR0; }
+	UINT32 sh4_handle_sar1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR1; }
+	UINT32 sh4_handle_sar2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR2; }
+	UINT32 sh4_handle_sar3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_SAR3; }
+	UINT32 sh4_handle_dar0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR0; }
+	UINT32 sh4_handle_dar1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR1; }
+	UINT32 sh4_handle_dar2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR2; }
+	UINT32 sh4_handle_dar3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DAR3; }
+	UINT32 sh4_handle_dmatcr0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR0; }
+	UINT32 sh4_handle_dmatcr1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR1; }
+	UINT32 sh4_handle_dmatcr2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR2; }
+	UINT32 sh4_handle_dmatcr3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMATCR3; }
+	UINT32 sh4_handle_chcr0_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR0; }
+	UINT32 sh4_handle_chcr1_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR1; }
+	UINT32 sh4_handle_chcr2_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR2; }
+	UINT32 sh4_handle_chcr3_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_CHCR3; }
+	UINT32 sh4_handle_dmaor_addr_r(sh4_state *sh4, UINT32 mem_mask) { return sh4->SH4_DMAOR; }

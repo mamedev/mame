@@ -4,8 +4,8 @@
 
 struct filter_volume_state
 {
-	sound_stream *	stream;
-	int				gain;
+	sound_stream *  stream;
+	int             gain;
 };
 
 INLINE filter_volume_state *get_safe_token(device_t *device)
@@ -47,7 +47,7 @@ const device_type FILTER_VOLUME = &device_creator<filter_volume_device>;
 
 filter_volume_device::filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FILTER_VOLUME, "Volume Filter", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(filter_volume_state);
 }
@@ -80,5 +80,3 @@ void filter_volume_device::sound_stream_update(sound_stream &stream, stream_samp
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

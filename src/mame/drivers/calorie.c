@@ -191,7 +191,7 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 
 		if (m_sprites[x + 1] & 0x10)
 		{
-			 /* 32x32 sprites */
+				/* 32x32 sprites */
 			drawgfx_transpen(bitmap, cliprect, machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else
@@ -440,11 +440,11 @@ void calorie_state::machine_reset()
 static MACHINE_CONFIG_START( calorie, calorie_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3000000)		 /* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_sound_map)
 	MCFG_CPU_IO_MAP(calorie_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)

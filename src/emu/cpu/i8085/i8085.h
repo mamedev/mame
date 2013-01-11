@@ -19,18 +19,18 @@ enum
 };
 
 #define I8085_INTR_LINE     0
-#define I8085_RST55_LINE	1
-#define I8085_RST65_LINE	2
-#define I8085_RST75_LINE	3
+#define I8085_RST55_LINE    1
+#define I8085_RST65_LINE    2
+#define I8085_RST75_LINE    3
 
-#define I8085_STATUS_INTA	0x01
-#define I8085_STATUS_WO		0x02
-#define I8085_STATUS_STACK	0x04
-#define I8085_STATUS_HLTA	0x08
-#define I8085_STATUS_OUT	0x10
-#define I8085_STATUS_M1		0x20
-#define I8085_STATUS_INP	0x40
-#define I8085_STATUS_MEMR	0x80
+#define I8085_STATUS_INTA   0x01
+#define I8085_STATUS_WO     0x02
+#define I8085_STATUS_STACK  0x04
+#define I8085_STATUS_HLTA   0x08
+#define I8085_STATUS_OUT    0x10
+#define I8085_STATUS_M1     0x20
+#define I8085_STATUS_INP    0x40
+#define I8085_STATUS_MEMR   0x80
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -38,10 +38,10 @@ enum
 
 struct i8085_config
 {
-	devcb_write8		out_status_func;	/* STATUS changed callback */
-	devcb_write_line	out_inte_func;		/* INTE changed callback */
-	devcb_read_line		in_sid_func;		/* SID changed callback (8085A only) */
-	devcb_write_line	out_sod_func;		/* SOD changed callback (8085A only) */
+	devcb_write8        out_status_func;    /* STATUS changed callback */
+	devcb_write_line    out_inte_func;      /* INTE changed callback */
+	devcb_read_line     in_sid_func;        /* SID changed callback (8085A only) */
+	devcb_write_line    out_sod_func;       /* SOD changed callback (8085A only) */
 };
 #define I8085_CONFIG(name) const i8085_config (name) =
 
@@ -55,6 +55,6 @@ DECLARE_LEGACY_CPU_DEVICE(I8085A, i8085);
 
 CPU_DISASSEMBLE( i8085 );
 
-#define i8085_set_sid(cpu, sid)		(cpu)->state().set_state_int(I8085_SID, sid)
+#define i8085_set_sid(cpu, sid)     (cpu)->state().set_state_int(I8085_SID, sid)
 
 #endif

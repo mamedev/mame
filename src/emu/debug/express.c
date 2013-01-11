@@ -68,7 +68,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define DEBUG_TOKENS			0
+#define DEBUG_TOKENS            0
 
 
 
@@ -77,7 +77,7 @@
 ***************************************************************************/
 
 #ifndef DEFAULT_BASE
-#define DEFAULT_BASE			16			// hex unless otherwise specified
+#define DEFAULT_BASE            16          // hex unless otherwise specified
 #endif
 
 
@@ -156,9 +156,9 @@ private:
 	static void internal_setter(symbol_table &table, void *symref, UINT64 value);
 
 	// internal state
-	symbol_table::getter_func	m_getter;
-	symbol_table::setter_func	m_setter;
-	UINT64						m_value;
+	symbol_table::getter_func   m_getter;
+	symbol_table::setter_func   m_setter;
+	UINT64                      m_value;
 };
 
 
@@ -179,9 +179,9 @@ public:
 
 private:
 	// internal state
-	UINT16						m_minparams;
-	UINT16						m_maxparams;
-	symbol_table::execute_func	m_execute;
+	UINT16                      m_minparams;
+	UINT16                      m_maxparams;
+	symbol_table::execute_func  m_execute;
 };
 
 
@@ -199,26 +199,26 @@ const char *expression_error::code_string() const
 {
 	switch (m_code)
 	{
-		case NOT_LVAL:				return "not an lvalue";
-		case NOT_RVAL:				return "not an rvalue";
-		case SYNTAX:				return "syntax error";
-		case UNKNOWN_SYMBOL:		return "unknown symbol";
-		case INVALID_NUMBER:		return "invalid number";
-		case INVALID_TOKEN:			return "invalid token";
-		case STACK_OVERFLOW:		return "stack overflow";
-		case STACK_UNDERFLOW:		return "stack underflow";
-		case UNBALANCED_PARENS:		return "unbalanced parentheses";
-		case DIVIDE_BY_ZERO:		return "divide by zero";
-		case OUT_OF_MEMORY:			return "out of memory";
-		case INVALID_PARAM_COUNT:	return "invalid number of parameters";
-		case UNBALANCED_QUOTES:		return "unbalanced quotes";
-		case TOO_MANY_STRINGS:		return "too many strings";
-		case INVALID_MEMORY_SIZE:	return "invalid memory size (b/w/d/q expected)";
-		case NO_SUCH_MEMORY_SPACE:	return "non-existent memory space";
-		case INVALID_MEMORY_SPACE:	return "invalid memory space (p/d/i/o/r/m expected)";
-		case INVALID_MEMORY_NAME:	return "invalid memory name";
-		case MISSING_MEMORY_NAME:	return "missing memory name";
-		default:					return "unknown error";
+		case NOT_LVAL:              return "not an lvalue";
+		case NOT_RVAL:              return "not an rvalue";
+		case SYNTAX:                return "syntax error";
+		case UNKNOWN_SYMBOL:        return "unknown symbol";
+		case INVALID_NUMBER:        return "invalid number";
+		case INVALID_TOKEN:         return "invalid token";
+		case STACK_OVERFLOW:        return "stack overflow";
+		case STACK_UNDERFLOW:       return "stack underflow";
+		case UNBALANCED_PARENS:     return "unbalanced parentheses";
+		case DIVIDE_BY_ZERO:        return "divide by zero";
+		case OUT_OF_MEMORY:         return "out of memory";
+		case INVALID_PARAM_COUNT:   return "invalid number of parameters";
+		case UNBALANCED_QUOTES:     return "unbalanced quotes";
+		case TOO_MANY_STRINGS:      return "too many strings";
+		case INVALID_MEMORY_SIZE:   return "invalid memory size (b/w/d/q expected)";
+		case NO_SUCH_MEMORY_SPACE:  return "non-existent memory space";
+		case INVALID_MEMORY_SPACE:  return "invalid memory space (p/d/i/o/r/m expected)";
+		case INVALID_MEMORY_NAME:   return "invalid memory name";
+		case MISSING_MEMORY_NAME:   return "missing memory name";
+		default:                    return "unknown error";
 	}
 }
 
@@ -234,10 +234,10 @@ const char *expression_error::code_string() const
 
 symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *name, void *ref)
 	: m_next(NULL),
-	  m_table(table),
-	  m_type(type),
-	  m_name(name),
-	  m_ref(ref)
+		m_table(table),
+		m_type(type),
+		m_name(name),
+		m_ref(ref)
 {
 }
 
@@ -262,27 +262,27 @@ symbol_entry::~symbol_entry()
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, UINT64 *ptr)
 	: symbol_entry(table, SMT_INTEGER, name, (ptr == NULL) ? &m_value : ptr),
-	  m_getter(internal_getter),
-	  m_setter((rw == symbol_table::READ_ONLY) ? NULL : internal_setter),
-	  m_value(0)
+		m_getter(internal_getter),
+		m_setter((rw == symbol_table::READ_ONLY) ? NULL : internal_setter),
+		m_value(0)
 {
 }
 
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, UINT64 constval)
 	: symbol_entry(table, SMT_INTEGER, name, &m_value),
-	  m_getter(internal_getter),
-	  m_setter(NULL),
-	  m_value(constval)
+		m_getter(internal_getter),
+		m_setter(NULL),
+		m_value(constval)
 {
 }
 
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter)
 	: symbol_entry(table, SMT_INTEGER, name, ref),
-	  m_getter(getter),
-	  m_setter(setter),
-	  m_value(0)
+		m_getter(getter),
+		m_setter(setter),
+		m_value(0)
 {
 }
 
@@ -353,9 +353,9 @@ void integer_symbol_entry::internal_setter(symbol_table &table, void *symref, UI
 
 function_symbol_entry::function_symbol_entry(symbol_table &table, const char *name, void *ref, int minparams, int maxparams, symbol_table::execute_func execute)
 	: symbol_entry(table, SMT_FUNCTION, name, ref),
-	  m_minparams(minparams),
-	  m_maxparams(maxparams),
-	  m_execute(execute)
+		m_minparams(minparams),
+		m_maxparams(maxparams),
+		m_execute(execute)
 {
 }
 
@@ -415,11 +415,11 @@ UINT64 function_symbol_entry::execute(int numparams, const UINT64 *paramlist)
 
 symbol_table::symbol_table(void *globalref, symbol_table *parent)
 	: m_parent(parent),
-	  m_globalref(globalref),
-	  m_memory_param(NULL),
-	  m_memory_valid(NULL),
-	  m_memory_read(NULL),
-	  m_memory_write(NULL)
+		m_globalref(globalref),
+		m_memory_param(NULL),
+		m_memory_valid(NULL),
+		m_memory_read(NULL),
+		m_memory_write(NULL)
 {
 }
 
@@ -669,51 +669,51 @@ void parsed_expression::print_tokens(FILE *out)
 			case parse_token::OPERATOR:
 				switch (token->value.i)
 				{
-					case TVL_LPAREN:		fprintf(out, "(\n");					break;
-					case TVL_RPAREN:		fprintf(out, ")\n");					break;
-					case TVL_PLUSPLUS:		fprintf(out, "++ (unspecified)\n");		break;
-					case TVL_MINUSMINUS:	fprintf(out, "-- (unspecified)\n");		break;
-					case TVL_PREINCREMENT:	fprintf(out, "++ (prefix)\n");			break;
-					case TVL_PREDECREMENT:	fprintf(out, "-- (prefix)\n");			break;
-					case TVL_POSTINCREMENT:	fprintf(out, "++ (postfix)\n");			break;
-					case TVL_POSTDECREMENT:	fprintf(out, "-- (postfix)\n");			break;
-					case TVL_COMPLEMENT:	fprintf(out, "!\n");					break;
-					case TVL_NOT:			fprintf(out, "~\n");					break;
-					case TVL_UPLUS:			fprintf(out, "+ (unary)\n");			break;
-					case TVL_UMINUS:		fprintf(out, "- (unary)\n");			break;
-					case TVL_MULTIPLY:		fprintf(out, "*\n");					break;
-					case TVL_DIVIDE:		fprintf(out, "/\n");					break;
-					case TVL_MODULO:		fprintf(out, "%%\n");					break;
-					case TVL_ADD:			fprintf(out, "+\n");					break;
-					case TVL_SUBTRACT:		fprintf(out, "-\n");					break;
-					case TVL_LSHIFT:		fprintf(out, "<<\n");					break;
-					case TVL_RSHIFT:		fprintf(out, ">>\n");					break;
-					case TVL_LESS:			fprintf(out, "<\n");					break;
-					case TVL_LESSOREQUAL:	fprintf(out, "<=\n");					break;
-					case TVL_GREATER:		fprintf(out, ">\n");					break;
-					case TVL_GREATEROREQUAL:fprintf(out, ">=\n");					break;
-					case TVL_EQUAL:			fprintf(out, "==\n");					break;
-					case TVL_NOTEQUAL:		fprintf(out, "!=\n");					break;
-					case TVL_BAND:			fprintf(out, "&\n");					break;
-					case TVL_BXOR:			fprintf(out, "^\n");					break;
-					case TVL_BOR:			fprintf(out, "|\n");					break;
-					case TVL_LAND:			fprintf(out, "&&\n");					break;
-					case TVL_LOR:			fprintf(out, "||\n");					break;
-					case TVL_ASSIGN:		fprintf(out, "=\n");					break;
-					case TVL_ASSIGNMULTIPLY:fprintf(out, "*=\n");					break;
-					case TVL_ASSIGNDIVIDE:	fprintf(out, "/=\n");					break;
-					case TVL_ASSIGNMODULO:	fprintf(out, "%%=\n");					break;
-					case TVL_ASSIGNADD:		fprintf(out, "+=\n");					break;
-					case TVL_ASSIGNSUBTRACT:fprintf(out, "-=\n");					break;
-					case TVL_ASSIGNLSHIFT:	fprintf(out, "<<=\n");					break;
-					case TVL_ASSIGNRSHIFT:	fprintf(out, ">>=\n");					break;
-					case TVL_ASSIGNBAND:	fprintf(out, "&=\n");					break;
-					case TVL_ASSIGNBXOR:	fprintf(out, "^=\n");					break;
-					case TVL_ASSIGNBOR:		fprintf(out, "|=\n");					break;
-					case TVL_COMMA:			fprintf(out, ",\n");					break;
-					case TVL_MEMORYAT:		fprintf(out, "mem@\n");					break;
-					case TVL_EXECUTEFUNC:	fprintf(out, "execute\n");				break;
-					default:				fprintf(out, "INVALID OPERATOR\n");		break;
+					case TVL_LPAREN:        fprintf(out, "(\n");                    break;
+					case TVL_RPAREN:        fprintf(out, ")\n");                    break;
+					case TVL_PLUSPLUS:      fprintf(out, "++ (unspecified)\n");     break;
+					case TVL_MINUSMINUS:    fprintf(out, "-- (unspecified)\n");     break;
+					case TVL_PREINCREMENT:  fprintf(out, "++ (prefix)\n");          break;
+					case TVL_PREDECREMENT:  fprintf(out, "-- (prefix)\n");          break;
+					case TVL_POSTINCREMENT: fprintf(out, "++ (postfix)\n");         break;
+					case TVL_POSTDECREMENT: fprintf(out, "-- (postfix)\n");         break;
+					case TVL_COMPLEMENT:    fprintf(out, "!\n");                    break;
+					case TVL_NOT:           fprintf(out, "~\n");                    break;
+					case TVL_UPLUS:         fprintf(out, "+ (unary)\n");            break;
+					case TVL_UMINUS:        fprintf(out, "- (unary)\n");            break;
+					case TVL_MULTIPLY:      fprintf(out, "*\n");                    break;
+					case TVL_DIVIDE:        fprintf(out, "/\n");                    break;
+					case TVL_MODULO:        fprintf(out, "%%\n");                   break;
+					case TVL_ADD:           fprintf(out, "+\n");                    break;
+					case TVL_SUBTRACT:      fprintf(out, "-\n");                    break;
+					case TVL_LSHIFT:        fprintf(out, "<<\n");                   break;
+					case TVL_RSHIFT:        fprintf(out, ">>\n");                   break;
+					case TVL_LESS:          fprintf(out, "<\n");                    break;
+					case TVL_LESSOREQUAL:   fprintf(out, "<=\n");                   break;
+					case TVL_GREATER:       fprintf(out, ">\n");                    break;
+					case TVL_GREATEROREQUAL:fprintf(out, ">=\n");                   break;
+					case TVL_EQUAL:         fprintf(out, "==\n");                   break;
+					case TVL_NOTEQUAL:      fprintf(out, "!=\n");                   break;
+					case TVL_BAND:          fprintf(out, "&\n");                    break;
+					case TVL_BXOR:          fprintf(out, "^\n");                    break;
+					case TVL_BOR:           fprintf(out, "|\n");                    break;
+					case TVL_LAND:          fprintf(out, "&&\n");                   break;
+					case TVL_LOR:           fprintf(out, "||\n");                   break;
+					case TVL_ASSIGN:        fprintf(out, "=\n");                    break;
+					case TVL_ASSIGNMULTIPLY:fprintf(out, "*=\n");                   break;
+					case TVL_ASSIGNDIVIDE:  fprintf(out, "/=\n");                   break;
+					case TVL_ASSIGNMODULO:  fprintf(out, "%%=\n");                  break;
+					case TVL_ASSIGNADD:     fprintf(out, "+=\n");                   break;
+					case TVL_ASSIGNSUBTRACT:fprintf(out, "-=\n");                   break;
+					case TVL_ASSIGNLSHIFT:  fprintf(out, "<<=\n");                  break;
+					case TVL_ASSIGNRSHIFT:  fprintf(out, ">>=\n");                  break;
+					case TVL_ASSIGNBAND:    fprintf(out, "&=\n");                   break;
+					case TVL_ASSIGNBXOR:    fprintf(out, "^=\n");                   break;
+					case TVL_ASSIGNBOR:     fprintf(out, "|=\n");                   break;
+					case TVL_COMMA:         fprintf(out, ",\n");                    break;
+					case TVL_MEMORYAT:      fprintf(out, "mem@\n");                 break;
+					case TVL_EXECUTEFUNC:   fprintf(out, "execute\n");              break;
+					default:                fprintf(out, "INVALID OPERATOR\n");     break;
 				}
 				break;
 		}
@@ -1136,25 +1136,25 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 	expression_space memspace = EXPSPACE_INVALID;
 	switch (space)
 	{
-		case 'p':	memspace = physical ? EXPSPACE_PROGRAM_PHYSICAL : EXPSPACE_PROGRAM_LOGICAL;	break;
-		case 'd':	memspace = physical ? EXPSPACE_DATA_PHYSICAL    : EXPSPACE_DATA_LOGICAL;	break;
-		case 'i':	memspace = physical ? EXPSPACE_IO_PHYSICAL      : EXPSPACE_IO_LOGICAL;		break;
-		case '3':	memspace = physical ? EXPSPACE_SPACE3_PHYSICAL  : EXPSPACE_SPACE3_LOGICAL;	break;
-		case 'o':	memspace = EXPSPACE_OPCODE;													break;
-		case 'r':	memspace = EXPSPACE_RAMWRITE;												break;
-		case 'm':	memspace = EXPSPACE_REGION;													break;
-		default:	throw expression_error(expression_error::INVALID_MEMORY_SPACE, token.offset() + (string - startstring));
+		case 'p':   memspace = physical ? EXPSPACE_PROGRAM_PHYSICAL : EXPSPACE_PROGRAM_LOGICAL; break;
+		case 'd':   memspace = physical ? EXPSPACE_DATA_PHYSICAL    : EXPSPACE_DATA_LOGICAL;    break;
+		case 'i':   memspace = physical ? EXPSPACE_IO_PHYSICAL      : EXPSPACE_IO_LOGICAL;      break;
+		case '3':   memspace = physical ? EXPSPACE_SPACE3_PHYSICAL  : EXPSPACE_SPACE3_LOGICAL;  break;
+		case 'o':   memspace = EXPSPACE_OPCODE;                                                 break;
+		case 'r':   memspace = EXPSPACE_RAMWRITE;                                               break;
+		case 'm':   memspace = EXPSPACE_REGION;                                                 break;
+		default:    throw expression_error(expression_error::INVALID_MEMORY_SPACE, token.offset() + (string - startstring));
 	}
 
 	// convert the size to flags
 	int memsize;
 	switch (size)
 	{
-		case 'b':	memsize = 0;	break;
-		case 'w':	memsize = 1;	break;
-		case 'd':	memsize = 2;	break;
-		case 'q':	memsize = 3;	break;
-		default:	throw expression_error(expression_error::INVALID_MEMORY_SIZE, token.offset() + (string - startstring) + length - 1);
+		case 'b':   memsize = 0;    break;
+		case 'w':   memsize = 1;    break;
+		case 'd':   memsize = 2;    break;
+		case 'q':   memsize = 3;    break;
+		default:    throw expression_error(expression_error::INVALID_MEMORY_SIZE, token.offset() + (string - startstring) + length - 1);
 	}
 
 	// validate the name
@@ -1210,7 +1210,7 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 		case TVL_ADD:
 		case TVL_SUBTRACT:
 			// Assume we're unary if we are the first token, or if the previous token is not
-            // a symbol, a number, or a right parenthesis
+			// a symbol, a number, or a right parenthesis
 			if (prevtoken == NULL || (!prevtoken->is_symbol() && !prevtoken->is_number() && !prevtoken->is_operator(TVL_RPAREN)))
 				thistoken.configure_operator(thistoken.is_operator(TVL_ADD) ? TVL_UPLUS : TVL_UMINUS, 2);
 			break;
@@ -1268,8 +1268,8 @@ void parsed_expression::infix_to_postfix()
 				stack.prepend(*token);
 
 			// if the token is a closing parenthesis, pop all operators until we
-            // reach an opening parenthesis and append them to the result string,
-            // discaring the open parenthesis
+			// reach an opening parenthesis and append them to the result string,
+			// discaring the open parenthesis
 			else if (token->is_operator(TVL_RPAREN))
 			{
 				// loop until we find our matching opener
@@ -1291,8 +1291,8 @@ void parsed_expression::infix_to_postfix()
 			}
 
 			// if the token is an operator, pop operators until we reach an opening parenthesis,
-            // an operator of lower precedence, or a right associative symbol of equal precedence.
-            // Push the operator onto the stack.
+			// an operator of lower precedence, or a right associative symbol of equal precedence.
+			// Push the operator onto the stack.
 			else
 			{
 				int our_precedence = token->precedence();
@@ -1687,12 +1687,12 @@ UINT64 parsed_expression::execute_tokens()
 
 parsed_expression::parse_token::parse_token(int offset)
 	: m_next(NULL),
-	  m_type(INVALID),
-	  m_offset(offset),
-	  m_value(0),
-	  m_flags(0),
-	  m_string(NULL),
-	  m_symbol(NULL)
+		m_type(INVALID),
+		m_offset(offset),
+		m_value(0),
+		m_flags(0),
+		m_string(NULL),
+		m_symbol(NULL)
 {
 }
 

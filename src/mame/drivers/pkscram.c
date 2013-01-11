@@ -98,7 +98,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 
 	if (!(m_out & 0x2000) && m_interrupt_line_active)
 	{
-	    machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 		m_interrupt_line_active = 0;
 	}
 
@@ -220,15 +220,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
 {
 	if (param == interrupt_scanline)
 	{
-    	if (m_out & 0x2000)
-    		machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+		if (m_out & 0x2000)
+			machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 		timer.adjust(machine().primary_screen->time_until_pos(param + 1), param+1);
 		m_interrupt_line_active = 1;
 	}
 	else
 	{
 		if (m_interrupt_line_active)
-	    	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 		timer.adjust(machine().primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 		m_interrupt_line_active = 0;
 	}

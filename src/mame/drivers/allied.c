@@ -14,7 +14,7 @@ class allied_state : public driver_device
 public:
 	allied_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -72,15 +72,15 @@ ROM_END
 #define rom_starshot    rom_allied
 
 
-GAME(1977,	allied, 	0,			allied, allied, allied_state, allied, ROT0,	"Allied Leisure",				"Allied System",				GAME_IS_BIOS_ROOT)
-GAME(1977,	suprpick,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Super Picker",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1977,	royclark,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Fascination Int.",				"Roy Clark - The Entertainer",	GAME_IS_SKELETON_MECHANICAL)
-GAME(1977,	thndbolt,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Thunderbolt",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	hoedown,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Hoe Down",						GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	takefive,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Take Five",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	heartspd,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Hearts & Spades",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	foathens,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Flame of Athens",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	disco79,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Disco '79",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	erosone,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Fascination Int.",				"Eros One",						GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	circa33,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Fascination Int.",				"Circa 1933",					GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	starshot,	allied,		allied,	allied, allied_state,	allied,	ROT0,	"Allied Leisure",				"Star Shooter",					GAME_IS_SKELETON_MECHANICAL)
+GAME(1977,  allied,     0,          allied, allied, allied_state, allied, ROT0, "Allied Leisure",               "Allied System",                GAME_IS_BIOS_ROOT)
+GAME(1977,  suprpick,   allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Super Picker",                 GAME_IS_SKELETON_MECHANICAL)
+GAME(1977,  royclark,   allied,     allied, allied, allied_state,   allied, ROT0,   "Fascination Int.",             "Roy Clark - The Entertainer",  GAME_IS_SKELETON_MECHANICAL)
+GAME(1977,  thndbolt,   allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Thunderbolt",                  GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  hoedown,    allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Hoe Down",                     GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  takefive,   allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Take Five",                    GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  heartspd,   allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Hearts & Spades",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  foathens,   allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Flame of Athens",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  disco79,    allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Disco '79",                    GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  erosone,    allied,     allied, allied, allied_state,   allied, ROT0,   "Fascination Int.",             "Eros One",                     GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  circa33,    allied,     allied, allied, allied_state,   allied, ROT0,   "Fascination Int.",             "Circa 1933",                   GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  starshot,   allied,     allied, allied, allied_state,   allied, ROT0,   "Allied Leisure",               "Star Shooter",                 GAME_IS_SKELETON_MECHANICAL)

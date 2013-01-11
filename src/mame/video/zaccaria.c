@@ -43,9 +43,9 @@ void zaccaria_state::palette_init()
 	double weights_rg[3], weights_b[2];
 
 	compute_resistor_weights(0, 0xff, -1.0,
-							 3, resistances_rg, weights_rg, 390, 0,
-							 2, resistances_b,  weights_b,  470, 0,
-							 0, 0, 0, 0, 0);
+								3, resistances_rg, weights_rg, 390, 0,
+								2, resistances_b,  weights_b,  470, 0,
+								0, 0, 0, 0, 0);
 
 	/* allocate the colortable */
 	machine().colortable = colortable_alloc(machine(), 0x200);
@@ -53,13 +53,13 @@ void zaccaria_state::palette_init()
 	for (i = 0; i < 0x200; i++)
 	{
 		/*
-          TODO: I'm not sure, but I think that pen 0 must always be black, otherwise
-          there's some junk brown background in Jack Rabbit.
-          From the schematics it seems that the background color can be changed, but
-          I'm not sure where it would be taken from; I think the high bits of
-          attributesram, but they are always 0 in these games so they would turn out
-          black anyway.
-         */
+		  TODO: I'm not sure, but I think that pen 0 must always be black, otherwise
+		  there's some junk brown background in Jack Rabbit.
+		  From the schematics it seems that the background color can be changed, but
+		  I'm not sure where it would be taken from; I think the high bits of
+		  attributesram, but they are always 0 in these games so they would turn out
+		  black anyway.
+		 */
 		if (((i % 64) / 8) == 0)
 			colortable_palette_set_color(machine().colortable, i, RGB_BLACK);
 		else

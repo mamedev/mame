@@ -54,8 +54,8 @@ INLINE UINT32 pixel_ycc_to_rgb_pal(UINT16 *pixel, const rgb_t *palette)
 
 #define OP_RGB32PAL_ARGB32(_src) \
 	(texsource->palette[0x200 + RGB_RED(_src)]   | \
-	 texsource->palette[0x100 + RGB_GREEN(_src)] | \
-	 texsource->palette[RGB_BLUE(_src)] | 0xff000000)
+		texsource->palette[0x100 + RGB_GREEN(_src)] | \
+		texsource->palette[RGB_BLUE(_src)] | 0xff000000)
 
 #define OP_PAL16_ARGB32(_src) (0xff000000 | texsource->palette[_src])
 
@@ -72,14 +72,14 @@ INLINE UINT32 pixel_ycc_to_rgb_pal(UINT16 *pixel, const rgb_t *palette)
 #define OP_PAL16A_RGB32(_src) premult32(texsource->palette[_src])
 
 #define OP_PAL16_ARGB1555(_src) ((texsource->palette[_src]&0xf80000) >> 9 | \
-		 (texsource->palette[_src]&0x00f800) >> 6 | \
-		 (texsource->palette[_src]&0x0000f8) >> 3 | 0x8000)
+			(texsource->palette[_src]&0x00f800) >> 6 | \
+			(texsource->palette[_src]&0x0000f8) >> 3 | 0x8000)
 
 #define OP_RGB15_ARGB1555(_src) ((_src) | 0x8000)
 
 #define OP_RGB15PAL_ARGB1555(_src) ((texsource->palette[(_src) >> 10] & 0xf8) << 7 | \
-		 (texsource->palette[((_src) >> 5) & 0x1f] & 0xf8) << 2 | \
-		 (texsource->palette[(_src) & 0x1f] & 0xf8) >> 3 | 0x8000)
+			(texsource->palette[((_src) >> 5) & 0x1f] & 0xf8) << 2 | \
+			(texsource->palette[(_src) & 0x1f] & 0xf8) >> 3 | 0x8000)
 
 #define OP_YUV16_UYVY(_src) (_src)
 
@@ -97,7 +97,7 @@ INLINE UINT32 pixel_ycc_to_rgb_pal(UINT16 *pixel, const rgb_t *palette)
 	(((_src)<<8)&0xff00ff00) )
 
 #define OP_YUV16_ARGB32(_src) \
-	   (UINT64) ycc_to_rgb(((_src) >>  8) & 0xff, (_src) & 0xff , ((_src)>>16) & 0xff) \
+		(UINT64) ycc_to_rgb(((_src) >>  8) & 0xff, (_src) & 0xff , ((_src)>>16) & 0xff) \
 	| ((UINT64)ycc_to_rgb(((_src) >> 24) & 0xff, (_src) & 0xff , ((_src)>>16) & 0xff) << 32)
 
 #define OP_YUV16PAL_ARGB32(_src) \

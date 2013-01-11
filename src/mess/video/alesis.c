@@ -17,14 +17,14 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, UINT8 pos, UINT8 y, 
 			case 0:
 				switch(y)
 				{
-					case 0:	output_set_value("a_next", state);	break;
-					case 1:	output_set_value("b_next", state);	break;
-					case 2:	output_set_value("fill_next", state); break;
-					case 3:	output_set_value("user_next", state); break;
-					case 4:	output_set_value("play", state);	break;
-					case 5:	output_set_value("record", state);	break;
-					case 6:	output_set_value("compose", state);	break;
-					case 7:	output_set_value("perform", state);	break;
+					case 0: output_set_value("a_next", state);  break;
+					case 1: output_set_value("b_next", state);  break;
+					case 2: output_set_value("fill_next", state); break;
+					case 3: output_set_value("user_next", state); break;
+					case 4: output_set_value("play", state);    break;
+					case 5: output_set_value("record", state);  break;
+					case 6: output_set_value("compose", state); break;
+					case 7: output_set_value("perform", state); break;
 				}
 				break;
 			case 1:
@@ -60,14 +60,14 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, UINT8 pos, UINT8 y, 
 			case 3:
 				switch(y)
 				{
-					case 0:	output_set_value("b", state);		break;
-					case 1:	output_set_value("a", state);		break;
-					case 2:	output_set_value("fill", state);	break;
-					case 3:	output_set_value("user", state);	break;
-					case 4:	output_set_value("edited", state);	break;
-					case 5:	output_set_value("set", state); 	break;
-					case 6:	output_set_value("drum", state);	break;
-					case 7:	output_set_value("press_play", state); break;
+					case 0: output_set_value("b", state);       break;
+					case 1: output_set_value("a", state);       break;
+					case 2: output_set_value("fill", state);    break;
+					case 3: output_set_value("user", state);    break;
+					case 4: output_set_value("edited", state);  break;
+					case 5: output_set_value("set", state);     break;
+					case 6: output_set_value("drum", state);    break;
+					case 7: output_set_value("press_play", state); break;
 				}
 				break;
 			case 4:
@@ -124,40 +124,40 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, UINT8 pos, UINT8 y, 
 			case 2:
 				switch(y)
 				{
-					case 0:	output_set_value("step_edit", state);	break;
-					case 1:	output_set_value("swing_off", state);	break;
-					case 2:	output_set_value("swing_62", state);	break;
-					case 3:	output_set_value("click_l1", state);	break;
-					case 4:	output_set_value("click_note", state);	break;
-					case 5:	output_set_value("click_l2", state);	break;
-					case 6:	output_set_value("click_3", state);		break;
-					case 7:	output_set_value("backup", state);		break;
+					case 0: output_set_value("step_edit", state);   break;
+					case 1: output_set_value("swing_off", state);   break;
+					case 2: output_set_value("swing_62", state);    break;
+					case 3: output_set_value("click_l1", state);    break;
+					case 4: output_set_value("click_note", state);  break;
+					case 5: output_set_value("click_l2", state);    break;
+					case 6: output_set_value("click_3", state);     break;
+					case 7: output_set_value("backup", state);      break;
 				}
 				break;
 			case 3:
 				switch(y)
 				{
-					case 0:	output_set_value("drum_set", state);	break;
-					case 1:	output_set_value("swing", state);		break;
-					case 2:	output_set_value("swing_58", state);	break;
-					case 3:	output_set_value("click_off", state);	break;
-					case 4:	output_set_value("click", state);		break;
-					case 5:	output_set_value("quantize_off", state); break;
-					case 6:	output_set_value("quantize_3", state);	break;
-					case 7:	output_set_value("midi_setup", state);	break;
+					case 0: output_set_value("drum_set", state);    break;
+					case 1: output_set_value("swing", state);       break;
+					case 2: output_set_value("swing_58", state);    break;
+					case 3: output_set_value("click_off", state);   break;
+					case 4: output_set_value("click", state);       break;
+					case 5: output_set_value("quantize_off", state); break;
+					case 6: output_set_value("quantize_3", state);  break;
+					case 7: output_set_value("midi_setup", state);  break;
 				}
 				break;
 			case 4:
 				switch(y)
 				{
-					case 0:	output_set_value("record_setup", state); break;
-					case 1:	output_set_value("quantize", state);	break;
-					case 2:	output_set_value("swing_54", state);	break;
-					case 3:	output_set_value("quantize_l1", state);	break;
-					case 4:	output_set_value("quantize_l2", state);	break;
-					case 5:	output_set_value("quantize_l3", state);	break;
-					case 6:	output_set_value("quantize_note", state); break;
-					case 7:	output_set_value("setup", state);		break;
+					case 0: output_set_value("record_setup", state); break;
+					case 1: output_set_value("quantize", state);    break;
+					case 2: output_set_value("swing_54", state);    break;
+					case 3: output_set_value("quantize_l1", state); break;
+					case 4: output_set_value("quantize_l2", state); break;
+					case 5: output_set_value("quantize_l3", state); break;
+					case 6: output_set_value("quantize_note", state); break;
+					case 7: output_set_value("setup", state);       break;
 				}
 				break;
 		}

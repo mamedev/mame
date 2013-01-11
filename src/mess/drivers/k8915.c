@@ -183,4 +183,4 @@ ROM_END
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, k8915,  0,       0, 	k8915,	k8915, k8915_state,	 k8915, "Robotron",   "K8915", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, k8915,  0,       0,     k8915,  k8915, k8915_state,  k8915, "Robotron",   "K8915", GAME_NOT_WORKING | GAME_NO_SOUND)

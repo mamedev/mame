@@ -32,7 +32,7 @@ READ8_MEMBER(orao_state::orao_io_r)
 {
 	double level;
 
-	 switch(offset) {
+		switch(offset) {
 		/* Keyboard*/
 		case 0x07FC : return ioport("LINE0")->read();
 		case 0x07FD : return ioport("LINE1")->read();
@@ -61,10 +61,10 @@ READ8_MEMBER(orao_state::orao_io_r)
 						return 0x00;
 					}
 					return 0xff;
-	 }
+		}
 
 
-	 return 0xff;
+		return 0xff;
 }
 
 

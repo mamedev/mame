@@ -47,7 +47,7 @@ const device_type IQ151_DISC2 = &device_creator<iq151_disc2_device>;
 //-------------------------------------------------
 
 iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, IQ151_DISC2, "IQ151 Disc2", tag, owner, clock),
+		: device_t(mconfig, IQ151_DISC2, "IQ151 Disc2", tag, owner, clock),
 		device_iq151cart_interface( mconfig, *this ),
 		m_fdc(*this, "fdc")
 {
@@ -128,4 +128,3 @@ void iq151_disc2_device::io_write(offs_t offset, UINT8 data)
 	else if (offset == 0xac)
 		m_rom_enabled = (data == 0x01);
 }
-

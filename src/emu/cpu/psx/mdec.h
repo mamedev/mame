@@ -14,8 +14,8 @@
 
 extern const device_type PSX_MDEC;
 
-#define	DCTSIZE ( 8 )
-#define	DCTSIZE2 ( DCTSIZE * DCTSIZE )
+#define DCTSIZE ( 8 )
+#define DCTSIZE2 ( DCTSIZE * DCTSIZE )
 
 #define MDEC_COS_PRECALC_BITS ( 21 )
 

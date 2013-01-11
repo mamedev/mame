@@ -66,9 +66,9 @@ void svision_irq(running_machine &machine)
 
 TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 {
-    m_svision.timer_shot = TRUE;
-    m_svision.timer1->enable(FALSE);
-    svision_irq( machine() );
+	m_svision.timer_shot = TRUE;
+	m_svision.timer1->enable(FALSE);
+	svision_irq( machine() );
 }
 
 READ8_MEMBER(svision_state::svision_r)
@@ -288,9 +288,9 @@ INPUT_PORTS_END
 static const unsigned char svision_palette[] =
 {
 #if 0
-    /* greens grabbed from a scan of a handheld
-     * in its best adjustment for contrast
-     */
+	/* greens grabbed from a scan of a handheld
+	 * in its best adjustment for contrast
+	 */
 	86, 121, 86,
 	81, 115, 90,
 	74, 107, 101,
@@ -591,7 +591,7 @@ ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT             COMPANY     FULLNAME */
 // marketed under a ton of firms and names
-CONS(1992,	svision,	0,	0,	svision,	svision, svision_state,	svision,	"Watara",	"Super Vision", 0)
+CONS(1992,  svision,    0,  0,  svision,    svision, svision_state, svision,    "Watara",   "Super Vision", 0)
 // svdual 2 connected via communication port
 CONS( 1992, svisions,      svision,          0,svisions,  svisions, svision_state,    svisions,   "Watara", "Super Vision (PeT Communication Simulation)", 0 )
 

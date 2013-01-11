@@ -22,8 +22,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SAM_TAG			"sam"
-#define VDG_TAG			"vdg"
+#define SAM_TAG         "sam"
+#define VDG_TAG         "vdg"
 
 
 
@@ -36,8 +36,8 @@ class coco12_state : public coco_state
 public:
 	coco12_state(const machine_config &mconfig, device_type type, const char *tag)
 	: coco_state(mconfig, type, tag),
-	  m_sam(*this, SAM_TAG),
-	  m_vdg(*this, VDG_TAG)
+		m_sam(*this, SAM_TAG),
+		m_vdg(*this, VDG_TAG)
 	{
 	}
 

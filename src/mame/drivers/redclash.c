@@ -36,13 +36,13 @@ static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
-	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
-	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
-	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
-	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
+	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")    /* IN0 */
+	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")    /* IN1 */
+	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")   /* DSW0 */
+	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")   /* DSW1 */
+	AM_RANGE(0x5000, 0x5007) AM_WRITENOP    /* to sound board */
 	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(redclash_star0_w)
-	AM_RANGE(0x5801, 0x5804) AM_WRITENOP	/* to sound board */
+	AM_RANGE(0x5801, 0x5804) AM_WRITENOP    /* to sound board */
 	AM_RANGE(0x5805, 0x5805) AM_WRITE_LEGACY(redclash_star1_w)
 	AM_RANGE(0x5806, 0x5806) AM_WRITE_LEGACY(redclash_star2_w)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE_LEGACY(redclash_flipscreen_w)
@@ -55,11 +55,11 @@ static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, ladybug_state )
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
-	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
-	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
-	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
-	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
+	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")    /* IN0 */
+	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")    /* IN1 */
+	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")   /* DSW0 */
+	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")   /* DSW1 */
+	AM_RANGE(0x5000, 0x5007) AM_WRITENOP    /* to sound board */
 	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(redclash_star0_w)
 	AM_RANGE(0x5801, 0x5801) AM_WRITE_LEGACY(redclash_gfxbank_w)
 	AM_RANGE(0x5805, 0x5805) AM_WRITE_LEGACY(redclash_star1_w)
@@ -207,13 +207,13 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )	/* Switches 6-8 are not used */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )    /* Switches 6-8 are not used */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,3")	/* Also determines the default topscore, 0 for "No Bonus" */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,3")   /* Also determines the default topscore, 0 for "No Bonus" */
 	PORT_DIPSETTING(    0x00, "No Bonus" )
 	PORT_DIPSETTING(    0x30, "5000" )
 	PORT_DIPSETTING(    0x20, "8000" )
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )	/* all other combinations give 1C_1C */
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
@@ -241,7 +241,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )	/* all other combinations give 1C_1C */
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )

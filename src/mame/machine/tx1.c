@@ -12,14 +12,14 @@
 /*
     Helper functions
 */
-#define INC_PROM_ADDR		( math.promaddr = (math.promaddr + 1) & 0x1ff )
-#define ROR16(val, shift)	( ((UINT16)val >> shift) | ((UINT16)val << (16 - shift)) )
-#define ROL16(val, shift)	( ((UINT16)val << shift) | ((UINT16)val >> (16 - shift)) )
-#define SWAP16(val)			( (((UINT16)val << 8) & 0xff00) | ((UINT16)val >> 8) )
+#define INC_PROM_ADDR       ( math.promaddr = (math.promaddr + 1) & 0x1ff )
+#define ROR16(val, shift)   ( ((UINT16)val >> shift) | ((UINT16)val << (16 - shift)) )
+#define ROL16(val, shift)   ( ((UINT16)val << shift) | ((UINT16)val >> (16 - shift)) )
+#define SWAP16(val)         ( (((UINT16)val << 8) & 0xff00) | ((UINT16)val >> 8) )
 
 INLINE UINT8 reverse_nibble(UINT8 nibble)
 {
-	return	(nibble & 1) << 3 |
+	return  (nibble & 1) << 3 |
 			(nibble & 2) << 1 |
 			(nibble & 4) >> 1 |
 			(nibble & 8) >> 3;
@@ -200,19 +200,19 @@ static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 	sn74s516_t &SN74S516 = state->m_sn74s516;
 	math_t &math = state->m_math;
 
-#define LOAD_X		(SN74S516.X = *data)
-#define LOAD_Y		(SN74S516.Y = *data)
-#define LOAD_Z		(SN74S516.ZW.Z = *data)
-#define LOAD_W		(SN74S516.ZW.W = *data)
-#define READ_ZW		*data = SN74S516.ZWfl ? SN74S516.ZW.W : SN74S516.ZW.Z; \
+#define LOAD_X      (SN74S516.X = *data)
+#define LOAD_Y      (SN74S516.Y = *data)
+#define LOAD_Z      (SN74S516.ZW.Z = *data)
+#define LOAD_W      (SN74S516.ZW.W = *data)
+#define READ_ZW     *data = SN74S516.ZWfl ? SN74S516.ZW.W : SN74S516.ZW.Z; \
 					SN74S516.ZWfl ^= 1;
 
 #define UPDATE_SEQUENCE (SN74S516.code = (SN74S516.code << 4) | ins)
-#define CLEAR_SEQUENCE	(SN74S516.code = 0)
+#define CLEAR_SEQUENCE  (SN74S516.code = 0)
 
 	/*
-        Remember to change the Z/W flag.
-    */
+	    Remember to change the Z/W flag.
+	*/
 	switch (SN74S516.state)
 	{
 		case 0:
@@ -381,14 +381,14 @@ static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 ***************************************************************************/
 
 /* Same mapping as Buggy Boy actually */
-#define TX1_INSLD		0x100
-#define TX1_CNTST		0x80
-#define TX1_RADCHG		0x20
-#define TX1_DSEL		0x03
+#define TX1_INSLD       0x100
+#define TX1_CNTST       0x80
+#define TX1_RADCHG      0x20
+#define TX1_DSEL        0x03
 
 enum
 {
-	TX1_SEL_MULEN =	0x00,
+	TX1_SEL_MULEN = 0x00,
 	TX1_SEL_PPSEN,
 	TX1_SEL_PSSEN,
 	TX1_SEL_LMSEL,
@@ -397,7 +397,7 @@ enum
 	TX1_SEL_ILDEN
 };
 
-#define TX1_SET_INS0_BIT	do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff; } while(0)
+#define TX1_SET_INS0_BIT    do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff; } while(0)
 
 INLINE UINT16 get_tx1_datarom_addr(math_t &math)
 {
@@ -415,9 +415,9 @@ INLINE UINT16 get_tx1_datarom_addr(math_t &math)
 
 static void tx1_update_state(running_machine &machine)
 {
-#define LHIEN(a)	!(a & 0x80)
-#define LLOEN(a)	!(a & 0x40)
-#define GO_EN(a)	!(a & 0x4000)
+#define LHIEN(a)    !(a & 0x80)
+#define LLOEN(a)    !(a & 0x40)
+#define GO_EN(a)    !(a & 0x4000)
 
 	tx1_state *state = machine.driver_data<tx1_state>();
 	math_t &math = state->m_math;
@@ -430,11 +430,11 @@ static void tx1_update_state(running_machine &machine)
 		if (!GO_EN(math.inslatch) && GO_EN(prom[math.promaddr]))
 			go = 1;
 		/*
-            Example:
-            120 /GO /LHIEN
-            121 /GO        /LLOEN
-            Both 120 and 121 are used.
-        */
+		    Example:
+		    120 /GO /LHIEN
+		    121 /GO        /LLOEN
+		    Both 120 and 121 are used.
+		*/
 		else if ((GO_EN(math.inslatch) && GO_EN(prom[math.promaddr])) && (LHIEN(math.inslatch) && LLOEN(prom[math.promaddr])))
 			go = 1;
 
@@ -460,11 +460,11 @@ static void tx1_update_state(running_machine &machine)
 
 			if (math.mux == TX1_SEL_DSELOE)
 			{
-				int		dsel = (math.inslatch >> 8) & TX1_DSEL;
-				int		tfad = (math.inslatch & 0x1c00) << 1;
-				int		sd   = math.ppshift;
-				int		o4;
-				UINT16	data;
+				int     dsel = (math.inslatch >> 8) & TX1_DSEL;
+				int     tfad = (math.inslatch & 0x1c00) << 1;
+				int     sd   = math.ppshift;
+				int     o4;
+				UINT16  data;
 
 				o4 =
 					(!BIT(sd, 9) && !BIT(sd,10)) ||
@@ -491,15 +491,15 @@ static void tx1_update_state(running_machine &machine)
 				kick_sn74s516(machine, &data, ins);
 			}
 			/*
-                TODO: Changed ppshift to muxlatch for TX-1
+			    TODO: Changed ppshift to muxlatch for TX-1
 
-                /TMPLD1: /LHIEN
-                /TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
-                /TMPLD3: /LLOEN
-                     O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-                         !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-                         /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-            */
+			    /TMPLD1: /LHIEN
+			    /TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
+			    /TMPLD3: /LLOEN
+			         O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+			             !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+			             /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+			*/
 			else if (LHIEN(math.inslatch) || LLOEN(math.inslatch))
 			{
 				UINT16 data;
@@ -529,17 +529,17 @@ static void tx1_update_state(running_machine &machine)
 				else
 				{
 					/*
-                        /TMPLD1: /LHIEN
-                        /TMPLD2: /LLOEN.!O4 + /LHIEN.O4
-                        /TMPLD3: /LLOEN
-                         O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-                             !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-                             /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-                    */
-					int		dsel = (math.inslatch >> 8) & TX1_DSEL;
-					int		tfad = (math.inslatch & 0x1c00) << 1;
-					int		sd   = math.ppshift;
-					int		o4;
+					    /TMPLD1: /LHIEN
+					    /TMPLD2: /LLOEN.!O4 + /LHIEN.O4
+					    /TMPLD3: /LLOEN
+					     O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+					         !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+					         /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+					*/
+					int     dsel = (math.inslatch >> 8) & TX1_DSEL;
+					int     tfad = (math.inslatch & 0x1c00) << 1;
+					int     sd   = math.ppshift;
+					int     o4;
 
 					o4 =
 						(!BIT(sd, 9) && !BIT(sd,10)) ||
@@ -629,10 +629,10 @@ READ16_MEMBER(tx1_state::tx1_math_r)
 	/* /MUXCS */
 	else if ((offset & 0xc00) == 0xc00)
 	{
-		int		dsel = (math.inslatch >> 8) & TX1_DSEL;
-		int		tfad = (math.inslatch & 0x1c00) << 1;
-		int		sd   = math.ppshift;
-		int		o4;
+		int     dsel = (math.inslatch >> 8) & TX1_DSEL;
+		int     tfad = (math.inslatch & 0x1c00) << 1;
+		int     sd   = math.ppshift;
+		int     o4;
 
 		if (math.mux == TX1_SEL_LMSEL)
 			o4 = 0;
@@ -653,9 +653,9 @@ READ16_MEMBER(tx1_state::tx1_math_r)
 		else if (dsel == 1 )
 		{
 			/*
-                TODO make this constant somewhere
-                e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
-            */
+			    TODO make this constant somewhere
+			    e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
+			*/
 			UINT16 *romdata = (UINT16*)machine().root_device().memregion("au_data")->base();
 			UINT16 addr = get_tx1_datarom_addr(math);
 			math.retval = romdata[addr];
@@ -782,10 +782,10 @@ WRITE16_MEMBER(tx1_state::tx1_math_w)
 	{
 
 		/*
-            /TMPLD1: 0
-            /TMPLD2: 0
-            /TMPLD3: 0
-        */
+		    /TMPLD1: 0
+		    /TMPLD2: 0
+		    /TMPLD3: 0
+		*/
 		math.muxlatch = math.cpulatch;
 	}
 
@@ -939,10 +939,10 @@ WRITE16_MEMBER(tx1_state::tx1_spcs_ram_w)
   Buggy Boy
 
 ***************************************************************************/
-#define BB_INSLD		0x100
-#define BB_CNTST		0x80
-#define BB_RADCHG		0x20
-#define BB_DSEL			0x03
+#define BB_INSLD        0x100
+#define BB_CNTST        0x80
+#define BB_RADCHG       0x20
+#define BB_DSEL         0x03
 
 enum
 {
@@ -956,7 +956,7 @@ enum
 	BB_MUX_ILDEN,
 };
 
-#define BB_SET_INS0_BIT	do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff;} while(0)
+#define BB_SET_INS0_BIT do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff;} while(0)
 
 INLINE UINT16 get_bb_datarom_addr(math_t &math)
 {
@@ -978,9 +978,9 @@ INLINE UINT16 get_bb_datarom_addr(math_t &math)
 
 static void buggyboy_update_state(running_machine &machine)
 {
-#define LHIEN(a)	!(a & 0x80)
-#define LLOEN(a)	!(a & 0x40)
-#define GO_EN(a)	!(a & 0x4000)
+#define LHIEN(a)    !(a & 0x80)
+#define LLOEN(a)    !(a & 0x40)
+#define GO_EN(a)    !(a & 0x4000)
 
 	tx1_state *state = machine.driver_data<tx1_state>();
 	math_t &math = state->m_math;

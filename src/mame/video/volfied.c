@@ -44,10 +44,10 @@ WRITE16_MEMBER(volfied_state::volfied_video_ctrl_w)
 READ16_MEMBER(volfied_state::volfied_video_ctrl_r)
 {
 	/* Could this be some kind of hardware collision detection? If bit 6 is
-       set the game will check for collisions with the large enemy, whereas
-       bit 5 does the same for small enemies. Bit 7 is also used although
-       its purpose is unclear. This register is usually read during a VBI
-       and stored in work RAM for later use. */
+	   set the game will check for collisions with the large enemy, whereas
+	   bit 5 does the same for small enemies. Bit 7 is also used although
+	   its purpose is unclear. This register is usually read during a VBI
+	   and stored in work RAM for later use. */
 
 	return 0x60;
 }
@@ -73,23 +73,23 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap 
 
 	/*********************************************************
 
-    VIDEO RAM has 2 screens x 256 rows x 512 columns x 16 bits
+	VIDEO RAM has 2 screens x 256 rows x 512 columns x 16 bits
 
-    x---------------  select image
-    -x--------------  ?             (used for 3-D corners)
-    --x-------------  ?             (used for 3-D walls)
-    ---xxxx---------  image B
-    -------xxx------  palette index bits #8 to #A
-    ----------x-----  ?
-    -----------x----  ?
-    ------------xxxx  image A
+	x---------------  select image
+	-x--------------  ?             (used for 3-D corners)
+	--x-------------  ?             (used for 3-D walls)
+	---xxxx---------  image B
+	-------xxx------  palette index bits #8 to #A
+	----------x-----  ?
+	-----------x----  ?
+	------------xxxx  image A
 
-    '3d' corners & walls are made using unknown bits for each
-    line the player draws.  However, on the pcb they just
-    appear as solid black. Perhaps it was prototype code that
-    was turned off at some stage.
+	'3d' corners & walls are made using unknown bits for each
+	line the player draws.  However, on the pcb they just
+	appear as solid black. Perhaps it was prototype code that
+	was turned off at some stage.
 
-    *********************************************************/
+	*********************************************************/
 
 	volfied_state *state = machine.driver_data<volfied_state>();
 	UINT16* p = state->m_video_ram;
@@ -110,7 +110,7 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap 
 				color |= 0x800 | ((p[x] >> 9) & 0xf);
 
 				if (p[x] & 0x2000)
-					color &= ~0xf;	  /* hack */
+					color &= ~0xf;    /* hack */
 			}
 			else
 				color |= p[x] & 0xf;

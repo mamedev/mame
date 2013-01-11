@@ -51,10 +51,10 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 	double weights_r[3], weights_g[3], weights_b[2];
 
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	470,	0,
-			3,	resistances_rg,	weights_g,	470,	0,
-			2,	resistances_b,	weights_b,	470,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rg, weights_r,  470,    0,
+			3,  resistances_rg, weights_g,  470,    0,
+			2,  resistances_b,  weights_b,  470,    0);
 
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
 VIDEO_START_MEMBER(bagman_state,bagman)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bagman_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_bg_tilemap->set_scrolldy(-1, -1);
 }

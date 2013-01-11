@@ -17,19 +17,19 @@
  *************************************/
 
 /* the color and remap PROMs are mapped as follows */
-#define PROM1_BANK_4			0x80		/* active low */
-#define PROM1_BANK_3			0x40		/* active low */
-#define PROM1_BANK_2			0x20		/* active low */
-#define PROM1_BANK_1			0x10		/* active low */
-#define PROM1_OFFSET_MASK		0x0f		/* postive logic */
+#define PROM1_BANK_4            0x80        /* active low */
+#define PROM1_BANK_3            0x40        /* active low */
+#define PROM1_BANK_2            0x20        /* active low */
+#define PROM1_BANK_1            0x10        /* active low */
+#define PROM1_OFFSET_MASK       0x0f        /* postive logic */
 
-#define PROM2_BANK_6_OR_7		0x80		/* active low */
-#define PROM2_BANK_5			0x40		/* active low */
-#define PROM2_PLANE_5_ENABLE	0x20		/* active high */
-#define PROM2_PLANE_4_ENABLE	0x10		/* active high */
-#define PROM2_PF_COLOR_MASK		0x0f		/* negative logic */
-#define PROM2_BANK_7			0x08		/* active low, plus PROM2_BANK_6_OR_7 low as well */
-#define PROM2_MO_COLOR_MASK		0x07		/* negative logic */
+#define PROM2_BANK_6_OR_7       0x80        /* active low */
+#define PROM2_BANK_5            0x40        /* active low */
+#define PROM2_PLANE_5_ENABLE    0x20        /* active high */
+#define PROM2_PLANE_4_ENABLE    0x10        /* active high */
+#define PROM2_PF_COLOR_MASK     0x0f        /* negative logic */
+#define PROM2_BANK_7            0x08        /* active low, plus PROM2_BANK_6_OR_7 low as well */
+#define PROM2_MO_COLOR_MASK     0x07        /* negative logic */
 
 
 
@@ -41,35 +41,35 @@
 
 static const gfx_layout objlayout_4bpp =
 {
-	8,8,	/* 8*8 sprites */
-	4096,	/* 4096 of them */
-	4,		/* 4 bits per pixel */
+	8,8,    /* 8*8 sprites */
+	4096,   /* 4096 of them */
+	4,      /* 4 bits per pixel */
 	{ 3*8*0x10000, 2*8*0x10000, 1*8*0x10000, 0*8*0x10000 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8		/* every sprite takes 8 consecutive bytes */
+	8*8     /* every sprite takes 8 consecutive bytes */
 };
 
 static const gfx_layout objlayout_5bpp =
 {
-	8,8,	/* 8*8 sprites */
-	4096,	/* 4096 of them */
-	5,		/* 5 bits per pixel */
+	8,8,    /* 8*8 sprites */
+	4096,   /* 4096 of them */
+	5,      /* 5 bits per pixel */
 	{ 4*8*0x10000, 3*8*0x10000, 2*8*0x10000, 1*8*0x10000, 0*8*0x10000 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8		/* every sprite takes 8 consecutive bytes */
+	8*8     /* every sprite takes 8 consecutive bytes */
 };
 
 static const gfx_layout objlayout_6bpp =
 {
-	8,8,	/* 8*8 sprites */
-	4096,	/* 4096 of them */
-	6,		/* 6 bits per pixel */
+	8,8,    /* 8*8 sprites */
+	4096,   /* 4096 of them */
+	6,      /* 6 bits per pixel */
 	{ 5*8*0x10000, 4*8*0x10000, 3*8*0x10000, 2*8*0x10000, 1*8*0x10000, 0*8*0x10000 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8		/* every sprite takes 8 consecutive bytes */
+	8*8     /* every sprite takes 8 consecutive bytes */
 };
 
 
@@ -124,39 +124,39 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 {
 	static const atarimo_desc modesc =
 	{
-		0,					/* index to which gfx system */
-		8,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		1,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		0,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0x38,				/* maximum number of links to visit/scanline (0=all) */
+		0,                  /* index to which gfx system */
+		8,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		1,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		0,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0x38,               /* maximum number of links to visit/scanline (0=all) */
 
-		0x100,				/* base palette entry */
-		0x100,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x100,              /* base palette entry */
+		0x100,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0,0,0,0x003f }},	/* mask for the link */
-		{{ 0,0xff00,0,0 }},	/* mask for the graphics bank */
-		{{ 0,0xffff,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0xff00,0,0 }},	/* mask for the color */
-		{{ 0,0,0x3fe0,0 }},	/* mask for the X position */
-		{{ 0x3fe0,0,0,0 }},	/* mask for the Y position */
-		{{ 0 }},			/* mask for the width, in tiles*/
-		{{ 0x000f,0,0,0 }},	/* mask for the height, in tiles */
-		{{ 0x8000,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0,0,0x8000,0 }},	/* mask for the priority */
-		{{ 0 }},			/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0,0,0,0x003f }}, /* mask for the link */
+		{{ 0,0xff00,0,0 }}, /* mask for the graphics bank */
+		{{ 0,0xffff,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0xff00,0,0 }}, /* mask for the color */
+		{{ 0,0,0x3fe0,0 }}, /* mask for the X position */
+		{{ 0x3fe0,0,0,0 }}, /* mask for the Y position */
+		{{ 0 }},            /* mask for the width, in tiles*/
+		{{ 0x000f,0,0,0 }}, /* mask for the height, in tiles */
+		{{ 0x8000,0,0,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0,0,0x8000,0 }}, /* mask for the priority */
+		{{ 0 }},            /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0,0xffff,0,0 }},	/* mask for the special value */
-		0xffff,				/* resulting value to indicate "special" */
-		0					/* callback routine for special entries */
+		{{ 0,0xffff,0,0 }}, /* mask for the special value */
+		0xffff,             /* resulting value to indicate "special" */
+		0                   /* callback routine for special entries */
 	};
 
 	UINT16 motable[256];
@@ -320,14 +320,14 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 	space.machine().primary_screen->update_partial(scanline);
 
 	/* because this latches a new value into the scroll base,
-       we need to adjust for the scanline */
+	   we need to adjust for the scanline */
 	adjusted_scroll = newscroll;
 	if (scanline <= space.machine().primary_screen->visible_area().max_y)
 		adjusted_scroll -= (scanline + 1);
 	state->m_playfield_tilemap->set_scrolly(0, adjusted_scroll);
 
 	/* but since we've adjusted it, we must reset it to the normal value
-       once we hit scanline 0 again */
+	   once we hit scanline 0 again */
 	state->m_yscroll_reset_timer->adjust(space.machine().primary_screen->time_until_pos(0), newscroll);
 
 	/* update the data */
@@ -354,7 +354,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 	{
 		/* if modifying a timer, beware */
 		if (((offset & 0xc0) == 0x00 && atarimo_0_spriteram_r(space, offset | 0x40, mem_mask) == 0xffff) ||
-		    ((offset & 0xc0) == 0x40 && (newword == 0xffff || oldword == 0xffff)))
+			((offset & 0xc0) == 0x40 && (newword == 0xffff || oldword == 0xffff)))
 		{
 			/* if the timer is in the active bank, update the display list */
 			atarimo_0_spriteram_w(space, offset, data, 0xffff);

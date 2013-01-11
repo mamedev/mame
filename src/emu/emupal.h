@@ -247,4 +247,4 @@ INLINE void palette_set_colors(running_machine &machine, pen_t color_base, const
 }
 
 
-#endif	/* __PALETTE_H__ */
+#endif  /* __PALETTE_H__ */

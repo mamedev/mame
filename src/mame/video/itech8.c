@@ -100,8 +100,8 @@
  *
  *************************************/
 
-#define FULL_LOGGING			0
-#define BLIT_LOGGING			0
+#define FULL_LOGGING            0
+#define BLIT_LOGGING            0
 
 
 
@@ -111,24 +111,24 @@
  *
  *************************************/
 
-#define BLITTER_ADDRHI			blitter_data[0]
-#define BLITTER_ADDRLO			blitter_data[1]
-#define BLITTER_FLAGS			blitter_data[2]
-#define BLITTER_STATUS			blitter_data[3]
-#define BLITTER_WIDTH			blitter_data[4]
-#define BLITTER_HEIGHT			blitter_data[5]
-#define BLITTER_MASK			blitter_data[6]
-#define BLITTER_OUTPUT			blitter_data[7]
-#define BLITTER_XSTART			blitter_data[8]
-#define BLITTER_YCOUNT			blitter_data[9]
-#define BLITTER_XSTOP			blitter_data[10]
-#define BLITTER_YSKIP			blitter_data[11]
+#define BLITTER_ADDRHI          blitter_data[0]
+#define BLITTER_ADDRLO          blitter_data[1]
+#define BLITTER_FLAGS           blitter_data[2]
+#define BLITTER_STATUS          blitter_data[3]
+#define BLITTER_WIDTH           blitter_data[4]
+#define BLITTER_HEIGHT          blitter_data[5]
+#define BLITTER_MASK            blitter_data[6]
+#define BLITTER_OUTPUT          blitter_data[7]
+#define BLITTER_XSTART          blitter_data[8]
+#define BLITTER_YCOUNT          blitter_data[9]
+#define BLITTER_XSTOP           blitter_data[10]
+#define BLITTER_YSKIP           blitter_data[11]
 
-#define BLITFLAG_SHIFT			0x01
-#define BLITFLAG_XFLIP			0x02
-#define BLITFLAG_YFLIP			0x04
-#define BLITFLAG_RLE			0x08
-#define BLITFLAG_TRANSPARENT	0x10
+#define BLITFLAG_SHIFT          0x01
+#define BLITFLAG_XFLIP          0x02
+#define BLITFLAG_YFLIP          0x04
+#define BLITFLAG_RLE            0x08
+#define BLITFLAG_TRANSPARENT    0x10
 
 
 
@@ -148,10 +148,10 @@ static void generate_interrupt(running_machine &machine, int state)
 
 static const struct tms34061_interface tms34061intf =
 {
-	"screen",				/* the screen we are acting on */
-	8,						/* VRAM address is (row << rowshift) | col */
-	0x40000,				/* size of video RAM */
-	generate_interrupt		/* interrupt gen callback */
+	"screen",               /* the screen we are acting on */
+	8,                      /* VRAM address is (row << rowshift) | col */
+	0x40000,                /* size of video RAM */
+	generate_interrupt      /* interrupt gen callback */
 };
 
 
@@ -522,7 +522,7 @@ WRITE8_MEMBER(itech8_state::itech8_tms34061_w)
 	int col = offset & 0xff;
 
 	/* Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted
-       during register access. CA8 is ignored */
+	   during register access. CA8 is ignored */
 	if (func == 0 || func == 2)
 		col ^= 2;
 
@@ -537,7 +537,7 @@ READ8_MEMBER(itech8_state::itech8_tms34061_r)
 	int col = offset & 0xff;
 
 	/* Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted
-       during register access. CA8 is ignored */
+	   during register access. CA8 is ignored */
 	if (func == 0 || func == 2)
 		col ^= 2;
 

@@ -354,19 +354,19 @@ READ8_MEMBER( cbm2_state::ext_read )
 
 	/*if (!casseg1)
 	{
-		data = m_ram->pointer()[offset & 0xffff];
+	    data = m_ram->pointer()[offset & 0xffff];
 	}
 	if (!casseg2)
 	{
-		data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
+	    data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
 	}
 	if (!casseg3 && (m_ram->size() > 0x20000))
 	{
-		data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
+	    data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
 	}
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
-		data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
+	    data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
 	}*/
 
 	return data;
@@ -386,19 +386,19 @@ WRITE8_MEMBER( cbm2_state::ext_write )
 
 	if (!casseg1)
 	{
-		m_ram->pointer()[offset & 0xffff] = data;
+	    m_ram->pointer()[offset & 0xffff] = data;
 	}
 	if (!casseg2)
 	{
-		m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
+	    m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
 	}
 	if (!casseg3 && (m_ram->size() > 0x20000))
 	{
-		m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
+	    m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
 	}
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
-		m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
+	    m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
 	}*/
 
 	if (offset < 0x40000)
@@ -1201,18 +1201,18 @@ READ8_MEMBER( cbm2_state::tpi1_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       0
-        1       0
-        2       REN
-        3       ATN
-        4       DAV
-        5       EOI
-        6       NDAC
-        7       NRFD
+	    0       0
+	    1       0
+	    2       REN
+	    3       ATN
+	    4       DAV
+	    5       EOI
+	    6       NDAC
+	    7       NRFD
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -1231,18 +1231,18 @@ WRITE8_MEMBER( cbm2_state::tpi1_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       75161A DC
-        1       75161A TE
-        2       REN
-        3       ATN
-        4       DAV
-        5       EOI
-        6       NDAC
-        7       NRFD
+	    0       75161A DC
+	    1       75161A TE
+	    2       REN
+	    3       ATN
+	    4       DAV
+	    5       EOI
+	    6       NDAC
+	    7       NRFD
 
-    */
+	*/
 
 	// IEEE-488
 	m_ieee2->dc_w(BIT(data, 0));
@@ -1262,18 +1262,18 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       IFC
-        1       SRQ
-        2       user port PB2
-        3       user port PB3
-        4
-        5
-        6
-        7       CASS SW
+	    0       IFC
+	    1       SRQ
+	    2       user port PB2
+	    3       user port PB3
+	    4
+	    5
+	    6
+	    7       CASS SW
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -1295,18 +1295,18 @@ WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       IFC
-        1       SRQ
-        2       user port PB2
-        3       user port PB3
-        4       DRAMON
-        5       CASS WRT
-        6       CASS MTR
-        7
+	    0       IFC
+	    1       SRQ
+	    2       user port PB2
+	    3       user port PB3
+	    4       DRAMON
+	    5       CASS WRT
+	    6       CASS MTR
+	    7
 
-    */
+	*/
 
 	// IEEE-488
 	m_ieee2->ifc_w(BIT(data, 0));
@@ -1409,18 +1409,18 @@ READ8_MEMBER( cbm2_state::tpi2_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       COLUMN 0
-        1       COLUMN 1
-        2       COLUMN 2
-        3       COLUMN 3
-        4       COLUMN 4
-        5       COLUMN 5
-        6       0=PAL, 1=NTSC
-        7       0
+	    0       COLUMN 0
+	    1       COLUMN 1
+	    2       COLUMN 2
+	    3       COLUMN 3
+	    4       COLUMN 4
+	    5       COLUMN 5
+	    6       0=PAL, 1=NTSC
+	    7       0
 
-    */
+	*/
 
 	return (m_ntsc << 6) | (read_keyboard() & 0x3f);
 }
@@ -1429,18 +1429,18 @@ READ8_MEMBER( cbm2hp_state::tpi2_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       COLUMN 0
-        1       COLUMN 1
-        2       COLUMN 2
-        3       COLUMN 3
-        4       COLUMN 4
-        5       COLUMN 5
-        6       1
-        7       1
+	    0       COLUMN 0
+	    1       COLUMN 1
+	    2       COLUMN 2
+	    3       COLUMN 3
+	    4       COLUMN 4
+	    5       COLUMN 5
+	    6       1
+	    7       1
 
-    */
+	*/
 
 	return read_keyboard();
 }
@@ -1449,18 +1449,18 @@ READ8_MEMBER( p500_state::tpi2_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       COLUMN 0
-        1       COLUMN 1
-        2       COLUMN 2
-        3       COLUMN 3
-        4       COLUMN 4
-        5       COLUMN 5
-        6       0
-        7       0
+	    0       COLUMN 0
+	    1       COLUMN 1
+	    2       COLUMN 2
+	    3       COLUMN 3
+	    4       COLUMN 4
+	    5       COLUMN 5
+	    6       0
+	    7       0
 
-    */
+	*/
 
 	return read_keyboard();
 }
@@ -1469,18 +1469,18 @@ WRITE8_MEMBER( p500_state::tpi2_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6       VICBNKSEL0
-        7       VICBNKSEL1
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6       VICBNKSEL0
+	    7       VICBNKSEL1
 
-    */
+	*/
 
 	m_vicbnksel = data >> 6;
 }
@@ -1533,18 +1533,18 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       IEEE-488 D0, user port 1D0
-        1       IEEE-488 D1, user port 1D1
-        2       IEEE-488 D2, user port 1D2
-        3       IEEE-488 D3, user port 1D3
-        4       IEEE-488 D4, user port 1D4
-        5       IEEE-488 D5, user port 1D5
-        6       IEEE-488 D6, user port 1D6, LTPN
-        7       IEEE-488 D7, user port 1D7, GAME TRIGGER 24
+	    0       IEEE-488 D0, user port 1D0
+	    1       IEEE-488 D1, user port 1D1
+	    2       IEEE-488 D2, user port 1D2
+	    3       IEEE-488 D3, user port 1D3
+	    4       IEEE-488 D4, user port 1D4
+	    5       IEEE-488 D5, user port 1D5
+	    6       IEEE-488 D6, user port 1D6, LTPN
+	    7       IEEE-488 D7, user port 1D7, GAME TRIGGER 24
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -1565,18 +1565,18 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       IEEE-488 D0, user port 1D0
-        1       IEEE-488 D1, user port 1D1
-        2       IEEE-488 D2, user port 1D2
-        3       IEEE-488 D3, user port 1D3
-        4       IEEE-488 D4, user port 1D4
-        5       IEEE-488 D5, user port 1D5
-        6       IEEE-488 D6, user port 1D6
-        7       IEEE-488 D7, user port 1D7
+	    0       IEEE-488 D0, user port 1D0
+	    1       IEEE-488 D1, user port 1D1
+	    2       IEEE-488 D2, user port 1D2
+	    3       IEEE-488 D3, user port 1D3
+	    4       IEEE-488 D4, user port 1D4
+	    5       IEEE-488 D5, user port 1D5
+	    6       IEEE-488 D6, user port 1D6
+	    7       IEEE-488 D7, user port 1D7
 
-    */
+	*/
 
 	// IEEE-488
 	m_ieee1->write(space, 0, data);
@@ -1592,18 +1592,18 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       user port 2D0, GAME10
-        1       user port 2D1, GAME11
-        2       user port 2D2, GAME12
-        3       user port 2D3, GAME13
-        4       user port 2D4, GAME20
-        5       user port 2D5, GAME21
-        6       user port 2D6, GAME22
-        7       user port 2D7, GAME23
+	    0       user port 2D0, GAME10
+	    1       user port 2D1, GAME11
+	    2       user port 2D2, GAME12
+	    3       user port 2D3, GAME13
+	    4       user port 2D4, GAME20
+	    5       user port 2D5, GAME21
+	    6       user port 2D6, GAME22
+	    7       user port 2D7, GAME23
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -1621,18 +1621,18 @@ WRITE8_MEMBER( cbm2_state::cia_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       user port 2D0
-        1       user port 2D1
-        2       user port 2D2
-        3       user port 2D3
-        4       user port 2D4
-        5       user port 2D5
-        6       user port 2D6
-        7       user port 2D7
+	    0       user port 2D0
+	    1       user port 2D1
+	    2       user port 2D2
+	    3       user port 2D3
+	    4       user port 2D4
+	    5       user port 2D5
+	    6       user port 2D6
+	    7       user port 2D7
 
-    */
+	*/
 
 	//m_user->data2_w(data);
 }
@@ -1747,18 +1747,18 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _BUSY1
-        1       CIA PB1
-        2       CIA PB2
-        3       CIA PB3
-        4       CIA PB4
-        5       CIA PB5
-        6       1
-        7       1
+	    0       _BUSY1
+	    1       CIA PB1
+	    2       CIA PB2
+	    3       CIA PB3
+	    4       CIA PB4
+	    5       CIA PB5
+	    6       1
+	    7       1
 
-    */
+	*/
 
 	UINT8 data = 0xc0;
 
@@ -1775,18 +1775,18 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       U22B CL
-        1
-        2
-        3
-        4
-        5
-        6       CIA FLAG
-        7
+	    0       U22B CL
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6       CIA FLAG
+	    7
 
-    */
+	*/
 
 	// _BUSY2
 	if (!BIT(data, 0))
@@ -1803,18 +1803,18 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5       U22B CLK
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5       U22B CLK
+	    6
+	    7
 
-    */
+	*/
 
 	// _BUSY2
 	if (BIT(data, 5))
@@ -1847,18 +1847,18 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       _BUSY1
-        1       TPI PB1
-        2       TPI PB2
-        3       TPI PB3
-        4       TPI PB4
-        5       TPI PB5
-        6       1
-        7       1
+	    0       _BUSY1
+	    1       TPI PB1
+	    2       TPI PB2
+	    3       TPI PB3
+	    4       TPI PB4
+	    5       TPI PB5
+	    6       1
+	    7       1
 
-    */
+	*/
 
 	UINT8 data = 0xc0;
 
@@ -1875,18 +1875,18 @@ WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       U22B CL
-        1
-        2
-        3
-        4
-        5
-        6       PIC IR0, U29B CL, U22B PR
-        7       PIC IR7
+	    0       U22B CL
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6       PIC IR0, U29B CL, U22B PR
+	    7       PIC IR7
 
-    */
+	*/
 
 	// _BUSY2
 	if (!BIT(data, 0))
@@ -2494,7 +2494,7 @@ ROM_END
 //  ROM( p500p )
 //-------------------------------------------------
 
-#define rom_p500p	rom_p500
+#define rom_p500p   rom_p500
 
 
 //-------------------------------------------------
@@ -2571,14 +2571,14 @@ ROM_END
 //  ROM( cbm610 )
 //-------------------------------------------------
 
-#define rom_cbm610	rom_b128
+#define rom_cbm610  rom_b128
 
 
 //-------------------------------------------------
 //  ROM( cbm620 )
 //-------------------------------------------------
 
-#define rom_cbm620	rom_b256
+#define rom_cbm620  rom_b256
 
 
 //-------------------------------------------------
@@ -2681,21 +2681,21 @@ ROM_END
 //  ROM( cbm710 )
 //-------------------------------------------------
 
-#define rom_cbm710	rom_b128hp
+#define rom_cbm710  rom_b128hp
 
 
 //-------------------------------------------------
 //  ROM( cbm720 )
 //-------------------------------------------------
 
-#define rom_cbm720	rom_b256hp
+#define rom_cbm720  rom_b256hp
 
 
 //-------------------------------------------------
 //  ROM( cbm730 )
 //-------------------------------------------------
 
-#define rom_cbm730	rom_bx256hp
+#define rom_cbm730  rom_bx256hp
 
 
 //-------------------------------------------------
@@ -2724,20 +2724,20 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                    FLAGS
-COMP( 1983,	p500,		0,		0,		p500_ntsc,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 (NTSC)",				GAME_SUPPORTS_SAVE )
-COMP( 1983,	p500p,		p500,	0,		p500_pal,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"P500 (PAL)",				GAME_SUPPORTS_SAVE )
+COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,   driver_device,      0,      "Commodore Business Machines",  "P500 (NTSC)",              GAME_SUPPORTS_SAVE )
+COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,   driver_device,      0,      "Commodore Business Machines",  "P500 (PAL)",               GAME_SUPPORTS_SAVE )
 
-COMP( 1983,	b500,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B500",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	b128,		p500,	0,		b128,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	b256,		p500,	0,		b256,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256",						GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm610,		p500,	0,		cbm610,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 610",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm620,		p500,	0,		cbm620,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 620",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm620_hu,	p500,	0,		cbm620,		cbm2hu,	driver_device,		0,		"Commodore Business Machines",	"CBM 620 (Hungary)",		GAME_SUPPORTS_SAVE )
+COMP( 1983, b500,       p500,   0,      b128,       cbm2,   driver_device,      0,      "Commodore Business Machines",  "B500",                     GAME_SUPPORTS_SAVE )
+COMP( 1983, b128,       p500,   0,      b128,       cbm2,   driver_device,      0,      "Commodore Business Machines",  "B128",                     GAME_SUPPORTS_SAVE )
+COMP( 1983, b256,       p500,   0,      b256,       cbm2,   driver_device,      0,      "Commodore Business Machines",  "B256",                     GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm610,     p500,   0,      cbm610,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 610",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm620,     p500,   0,      cbm620,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 620",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm620_hu,  p500,   0,      cbm620,     cbm2hu, driver_device,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        GAME_SUPPORTS_SAVE )
 
-COMP( 1983,	b128hp,		p500,	0,		b128hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B128-80HP",				GAME_SUPPORTS_SAVE )
-COMP( 1983,	b256hp,		p500,	0,		b256hp,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"B256-80HP",				GAME_SUPPORTS_SAVE )
-COMP( 1983,	bx256hp,	p500,	0,		bx256hp,	cbm2,	driver_device,		0,		"Commodore Business Machines",	"BX256-80HP",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
-COMP( 1983,	cbm710,		p500,	0,		cbm710,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 710",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm720,		p500,	0,		cbm720,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 720",					GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm720_se,	p500,	0,		cbm720,		cbm2sw,	driver_device,		0,		"Commodore Business Machines",	"CBM 720 (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
-COMP( 1983,	cbm730,		p500,	0,		cbm730,		cbm2,	driver_device,		0,		"Commodore Business Machines",	"CBM 730",					GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, b128hp,     p500,   0,      b128hp,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "B128-80HP",                GAME_SUPPORTS_SAVE )
+COMP( 1983, b256hp,     p500,   0,      b256hp,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "B256-80HP",                GAME_SUPPORTS_SAVE )
+COMP( 1983, bx256hp,    p500,   0,      bx256hp,    cbm2,   driver_device,      0,      "Commodore Business Machines",  "BX256-80HP",               GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, cbm710,     p500,   0,      cbm710,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 710",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm720,     p500,   0,      cbm720,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 720",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm720_se,  p500,   0,      cbm720,     cbm2sw, driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm730,     p500,   0,      cbm730,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 730",                  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing

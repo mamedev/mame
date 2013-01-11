@@ -9,7 +9,7 @@
 #include "includes/m58.h"
 
 #define SCROLL_PANEL_WIDTH  (14*4)
-#define RADAR_PALETTE_BASE	(256)
+#define RADAR_PALETTE_BASE  (256)
 
 
 
@@ -36,7 +36,7 @@ void m58_state::palette_init()
 	machine().colortable = colortable_alloc(machine(), 256+256+16);
 
 	/* compute palette information for characters/radar */
-	scale = compute_resistor_weights(0,	255, -1.0,
+	scale = compute_resistor_weights(0, 255, -1.0,
 			2, resistances_2, weights_r, 0, 0,
 			3, resistances_3, weights_g, 0, 0,
 			3, resistances_3, weights_b, 0, 0);
@@ -64,7 +64,7 @@ void m58_state::palette_init()
 	}
 
 	/* compute palette information for sprites */
-	scale = compute_resistor_weights(0,	255, scale,
+	scale = compute_resistor_weights(0, 255, scale,
 			2, resistances_2, weights_r, 470, 0,
 			3, resistances_3, weights_g, 470, 0,
 			3, resistances_3, weights_b, 470, 0);
@@ -276,7 +276,7 @@ static void draw_panel( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 	if (!*state->m_yard_score_panel_disabled)
 	{
-		const rectangle clippanel(26*8, 32*8-1,	1*8, 31*8-1);
+		const rectangle clippanel(26*8, 32*8-1, 1*8, 31*8-1);
 		const rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
 		rectangle clip = state->flip_screen() ? clippanelflip : clippanel;
 		const rectangle &visarea = machine.primary_screen->visible_area();
@@ -288,7 +288,7 @@ static void draw_panel( running_machine &machine, bitmap_ind16 &bitmap, const re
 		clip &= cliprect;
 
 		copybitmap(bitmap, *state->m_scroll_panel_bitmap, state->flip_screen(), state->flip_screen(),
-				   sx, visarea.min_y + yoffs, clip);
+					sx, visarea.min_y + yoffs, clip);
 	}
 }
 

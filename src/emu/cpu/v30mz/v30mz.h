@@ -4,7 +4,7 @@
 
 struct nec_config
 {
-	const UINT8*	v25v35_decryptiontable; // internal decryption table
+	const UINT8*    v25v35_decryptiontable; // internal decryption table
 };
 
 enum
@@ -173,19 +173,19 @@ protected:
 		UINT16 w[8];    /* viewed as 16 bits registers */
 		UINT8  b[16];   /* or as 8 bit registers */
 	} m_regs;
-	UINT16	m_sregs[4];
+	UINT16  m_sregs[4];
 
-	UINT16	m_ip;
+	UINT16  m_ip;
 
-	INT32	m_SignVal;
+	INT32   m_SignVal;
 	UINT32  m_AuxVal, m_OverVal, m_ZeroVal, m_CarryVal, m_ParityVal; /* 0 or non-0 valued flags */
-	UINT8	m_TF, m_IF, m_DF, m_MF; 	/* 0 or 1 valued flags */	/* OB[19.07.99] added Mode Flag V30 */
-	UINT32	m_int_vector;
-	UINT32	m_pending_irq;
-	UINT32	m_nmi_state;
-	UINT32	m_irq_state;
-	UINT8	m_no_interrupt;
-	UINT8	m_fire_trap;
+	UINT8   m_TF, m_IF, m_DF, m_MF;     /* 0 or 1 valued flags */   /* OB[19.07.99] added Mode Flag V30 */
+	UINT32  m_int_vector;
+	UINT32  m_pending_irq;
+	UINT32  m_nmi_state;
+	UINT32  m_irq_state;
+	UINT8   m_no_interrupt;
+	UINT8   m_fire_trap;
 
 	device_irq_acknowledge_callback m_irq_callback;
 	address_space *m_program;
@@ -193,19 +193,19 @@ protected:
 	address_space *m_io;
 	int m_icount;
 
-	UINT32 m_prefix_base;	/* base address of the latest prefix segment */
-	bool m_seg_prefix;		/* prefix segment indicator */
-	bool m_seg_prefix_next;	/* prefix segment for next instruction */
+	UINT32 m_prefix_base;   /* base address of the latest prefix segment */
+	bool m_seg_prefix;      /* prefix segment indicator */
+	bool m_seg_prefix_next; /* prefix segment for next instruction */
 
 	UINT32 m_ea;
 	UINT16 m_eo;
 	UINT16 m_e16;
 
 	// Used during execution of instructions
-	UINT8	m_modrm;
-	UINT32	m_dst;
-	UINT32	m_src;
-	UINT32	m_pc;
+	UINT8   m_modrm;
+	UINT32  m_dst;
+	UINT32  m_src;
+	UINT32  m_pc;
 
 	// Lookup tables
 	UINT8 m_parity_table[256];

@@ -14,9 +14,9 @@
 #include "basicdsk.h"
 
 
-#define APPLE2_IMAGE_DO		0
-#define APPLE2_IMAGE_PO		1
-#define APPLE2_IMAGE_NIB	2
+#define APPLE2_IMAGE_DO     0
+#define APPLE2_IMAGE_PO     1
+#define APPLE2_IMAGE_NIB    2
 
 
 /* used in for all Apple II images */
@@ -140,9 +140,9 @@ static FLOPPY_IDENTIFY(apple2_dsk_identify)
 	if (size == expected_size)
 		*vote = 100;
 	else if ((size > expected_size) && ((size - expected_size) < 8))
-		*vote = 90;		/* tolerate images with up to eight fewer/extra bytes (bug #638) */
+		*vote = 90;     /* tolerate images with up to eight fewer/extra bytes (bug #638) */
 	else if ((size < expected_size) && ((expected_size - size) < 8))
-		*vote = 90;		/* tolerate images with up to eight fewer/extra bytes (bug #638) */
+		*vote = 90;     /* tolerate images with up to eight fewer/extra bytes (bug #638) */
 	else
 		*vote = 0;
 	return FLOPPY_ERROR_SUCCESS;
@@ -492,19 +492,19 @@ static UINT32 apple2_get_track_size(floppy_image_legacy *floppy, int head, int t
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( apple2 )
-	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",	"Apple ][ DOS order disk image",	apple2_dsk_identify,	apple2_do_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",  "Apple ][ DOS order disk image",    apple2_dsk_identify,    apple2_do_construct, NULL,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",	"Apple ][ ProDOS order disk image",	apple2_dsk_identify,	apple2_po_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",  "Apple ][ ProDOS order disk image", apple2_dsk_identify,    apple2_po_construct, NULL,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",	"Apple ][ Nibble order disk image",	apple2_nib_identify,	apple2_nib_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",    "Apple ][ Nibble order disk image", apple2_nib_identify,    apple2_nib_construct, NULL,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
@@ -1280,13 +1280,13 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 											data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
 											c ^= data[i];
 											/*if (((i&0x3)+1)==0x04) {
-                                                printf("%c", ((((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0))&0x3F)+0x40);
-                                                printf("%c", ((((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0))&0x3F)+0x40);
-                                                printf("%c", ((((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0))&0x3F)+0x40);
-                                                *dest++ = ((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0);
-                                                *dest++ = ((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0);
-                                                *dest++ = ((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0);
-                                            }*/
+											    printf("%c", ((((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0))&0x3F)+0x40);
+											    printf("%c", ((((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0))&0x3F)+0x40);
+											    printf("%c", ((((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0))&0x3F)+0x40);
+											    *dest++ = ((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0);
+											    *dest++ = ((data[i-3]&0x0C)<<4)|((data[i-1]&0x3F)>>0);
+											    *dest++ = ((data[i-3]&0x03)<<6)|((data[i-0]&0x3F)>>0);
+											}*/
 										//  printf("%02x ", data[i]);
 										//  if (((i&0xf)+1)==0x10) printf("\n");
 										}
@@ -1299,15 +1299,15 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 										}
 
 										/*if (se == 0) // dump some debug data to help find the lfsr before sector 5
-                                        {
-                                            printf("Data Postamble was 0x%08x\n", dpost);
-                                            for(int i=0; i<0x400; i++) {
-                                                data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
-                                                c ^= data[i];
-                                          printf("%02x ", data[i]);
-                                          if (((i&0xf)+1)==0x10) printf("\n");
-                                            }
-                                        }*/
+										{
+										    printf("Data Postamble was 0x%08x\n", dpost);
+										    for(int i=0; i<0x400; i++) {
+										        data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+										        c ^= data[i];
+										  printf("%02x ", data[i]);
+										  if (((i&0xf)+1)==0x10) printf("\n");
+										    }
+										}*/
 
 										// only write it if the bitfield of the track shows datagood is NOT set.
 										// if it is set we don't want to overwrite a guaranteed good read with a bad one

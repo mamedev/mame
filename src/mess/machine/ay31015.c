@@ -86,54 +86,54 @@ enum state_t
 
 struct ay31015_t
 {
-	const ay31015_config	*config;
+	const ay31015_config    *config;
 
-	int	pins[41];
+	int pins[41];
 
 	UINT8 control_reg;
 	UINT8 status_reg;
-	UINT16 second_stop_bit;	// 0, 8, 16
-	UINT16 total_pulses;	// bits * 16
+	UINT16 second_stop_bit; // 0, 8, 16
+	UINT16 total_pulses;    // bits * 16
 	UINT8 internal_sample;
 
 	state_t rx_state;
-	UINT8 rx_data;		// byte being received
-	UINT8 rx_buffer;	// received byte waiting to be accepted by computer
+	UINT8 rx_data;      // byte being received
+	UINT8 rx_buffer;    // received byte waiting to be accepted by computer
 	UINT8 rx_bit_count;
 	UINT8 rx_parity;
-	UINT16 rx_pulses;	// total pulses left
+	UINT16 rx_pulses;   // total pulses left
 	double rx_clock;
 	emu_timer *rx_timer;
 
 	state_t tx_state;
-	UINT8 tx_data;		// byte being sent
-	UINT8 tx_buffer;	// next byte to send
+	UINT8 tx_data;      // byte being sent
+	UINT8 tx_buffer;    // next byte to send
 	UINT8 tx_parity;
-	UINT16 tx_pulses;	// total pulses left
+	UINT16 tx_pulses;   // total pulses left
 	double tx_clock;
 	emu_timer *tx_timer;
 
-	devcb_resolved_read8	read_si;				/* SI - pin 20 - This will be called whenever the SI pin is sampled. Optional */
-	devcb_resolved_write8	write_so;				/* SO - pin 25 - This will be called whenever data is put on the SO pin. Optional */
-	devcb_resolved_write8	status_changed;			/* This will be called whenever one of the status pins may have changed. Optional */
+	devcb_resolved_read8    read_si;                /* SI - pin 20 - This will be called whenever the SI pin is sampled. Optional */
+	devcb_resolved_write8   write_so;               /* SO - pin 25 - This will be called whenever data is put on the SO pin. Optional */
+	devcb_resolved_write8   status_changed;         /* This will be called whenever one of the status pins may have changed. Optional */
 };
 
 
 /* control reg */
-#define CONTROL_NB1		0x01
-#define CONTROL_NB2		0x02
-#define CONTROL_TSB		0x04
-#define CONTROL_EPS		0x08
-#define CONTROL_NP		0x10
+#define CONTROL_NB1     0x01
+#define CONTROL_NB2     0x02
+#define CONTROL_TSB     0x04
+#define CONTROL_EPS     0x08
+#define CONTROL_NP      0x10
 
 
 /* status reg */
-#define STATUS_TBMT		0x01
-#define STATUS_DAV		0x02
-#define STATUS_OR		0x04
-#define STATUS_FE		0x08
-#define STATUS_PE		0x10
-#define STATUS_EOC		0x20
+#define STATUS_TBMT     0x01
+#define STATUS_DAV      0x02
+#define STATUS_OR       0x04
+#define STATUS_FE       0x08
+#define STATUS_PE       0x10
+#define STATUS_EOC      0x20
 
 
 /*-------------------------------------------------
@@ -150,7 +150,7 @@ INLINE ay31015_t *get_safe_token(device_t *device)
 
 INLINE UINT8 ay31015_get_si( device_t *device )
 {
-	ay31015_t	*ay31015 = get_safe_token( device );
+	ay31015_t   *ay31015 = get_safe_token( device );
 
 	if ( !ay31015->read_si.isnull() )
 		ay31015->pins[AY31015_SI] = ay31015->read_si( 0 ) ? 1 : 0;
@@ -161,7 +161,7 @@ INLINE UINT8 ay31015_get_si( device_t *device )
 
 INLINE void ay31015_set_so( device_t *device, int data )
 {
-	ay31015_t	*ay31015 = get_safe_token( device );
+	ay31015_t   *ay31015 = get_safe_token( device );
 
 	ay31015->pins[AY31015_SO] = data ? 1 : 0;
 
@@ -187,7 +187,7 @@ INLINE int ay31015_update_status_pin( ay31015_t *ay31015, UINT8 reg_bit, ay31015
 -------------------------------------------------*/
 static void ay31015_update_status_pins( device_t *device )
 {
-	ay31015_t	*ay31015 = get_safe_token( device );
+	ay31015_t   *ay31015 = get_safe_token( device );
 	int status_pins_changed = 0;
 
 	/* Should status pins be updated? */
@@ -217,11 +217,11 @@ static void ay31015_update_status_pins( device_t *device )
 static TIMER_CALLBACK( ay31015_rx_process )
 {
 	device_t *device = (device_t *)ptr;
-	ay31015_t			*ay31015 = get_safe_token( device );
+	ay31015_t           *ay31015 = get_safe_token( device );
 
 	switch (ay31015->rx_state)
 	{
-		case PREP_TIME:							// assist sync by ensuring high bit occurs
+		case PREP_TIME:                         // assist sync by ensuring high bit occurs
 			ay31015->rx_pulses--;
 			if (ay31015_get_si( device ))
 				ay31015->rx_state = IDLE;
@@ -238,13 +238,13 @@ static TIMER_CALLBACK( ay31015_rx_process )
 
 		case START_BIT:
 			ay31015->rx_pulses--;
-			if (ay31015->rx_pulses == 8)			// start bit must be low at sample time
+			if (ay31015->rx_pulses == 8)            // start bit must be low at sample time
 			{
 				if ( ay31015_get_si( device ) )
 					ay31015->rx_state = IDLE;
 			}
 			else
-			if (!ay31015->rx_pulses)					// end of start bit
+			if (!ay31015->rx_pulses)                    // end of start bit
 			{
 				ay31015->rx_state = PROCESSING;
 				ay31015->rx_pulses = ay31015->total_pulses;
@@ -256,22 +256,22 @@ static TIMER_CALLBACK( ay31015_rx_process )
 
 		case PROCESSING:
 			ay31015->rx_pulses--;
-			if (!ay31015->rx_pulses)					// end of a byte
+			if (!ay31015->rx_pulses)                    // end of a byte
 			{
 				ay31015->rx_pulses = 16;
-				if (ay31015->control_reg & CONTROL_NP)		// see if we need to get a parity bit
+				if (ay31015->control_reg & CONTROL_NP)      // see if we need to get a parity bit
 					ay31015->rx_state = FIRST_STOP_BIT;
 				else
 					ay31015->rx_state = PARITY_BIT;
 			}
 			else
-			if (!(ay31015->rx_pulses & 15))				// end of a bit
+			if (!(ay31015->rx_pulses & 15))             // end of a bit
 				ay31015->rx_bit_count++;
 			else
-			if ((ay31015->rx_pulses & 15) == 8)				// sample input stream
+			if ((ay31015->rx_pulses & 15) == 8)             // sample input stream
 			{
 				ay31015->internal_sample = ay31015_get_si( device );
-				ay31015->rx_parity ^= ay31015->internal_sample;		// calculate cumulative parity
+				ay31015->rx_parity ^= ay31015->internal_sample;     // calculate cumulative parity
 				ay31015->rx_data |= ay31015->internal_sample << ay31015->rx_bit_count;
 			}
 			return;
@@ -279,60 +279,60 @@ static TIMER_CALLBACK( ay31015_rx_process )
 		case PARITY_BIT:
 			ay31015->rx_pulses--;
 
-			if (ay31015->rx_pulses == 8)					// sample input stream
+			if (ay31015->rx_pulses == 8)                    // sample input stream
 			{
-				ay31015->rx_parity ^= ay31015_get_si( device );				// calculate cumulative parity
+				ay31015->rx_parity ^= ay31015_get_si( device );             // calculate cumulative parity
 			}
 			else
-			if (!ay31015->rx_pulses)					// end of a byte
+			if (!ay31015->rx_pulses)                    // end of a byte
 			{
 				ay31015->rx_pulses = 16;
 				ay31015->rx_state = FIRST_STOP_BIT;
 
 				if ((!(ay31015->control_reg & CONTROL_EPS)) && (ay31015->rx_parity))
-					ay31015->rx_parity = 0;			// odd parity, ok
+					ay31015->rx_parity = 0;         // odd parity, ok
 				else
 				if ((ay31015->control_reg & CONTROL_EPS) && (!ay31015->rx_parity))
-					ay31015->rx_parity = 0;			// even parity, ok
+					ay31015->rx_parity = 0;         // even parity, ok
 				else
-					ay31015->rx_parity = 1;			// parity error
+					ay31015->rx_parity = 1;         // parity error
 			}
 			return;
 
 		case FIRST_STOP_BIT:
 			ay31015->rx_pulses--;
-			if (ay31015->rx_pulses == 8)				// sample input stream
+			if (ay31015->rx_pulses == 8)                // sample input stream
 				ay31015->internal_sample = ay31015_get_si( device );
 			else
-			if (ay31015->rx_pulses == 7)				// set error flags
+			if (ay31015->rx_pulses == 7)                // set error flags
 			{
 				if (!ay31015->internal_sample)
 				{
-					ay31015->status_reg |= STATUS_FE;		// framing error - the stop bit not high
-					ay31015->rx_state = PREP_TIME;		// lost sync - start over
+					ay31015->status_reg |= STATUS_FE;       // framing error - the stop bit not high
+					ay31015->rx_state = PREP_TIME;      // lost sync - start over
 			//      return;
 				}
 				else
 					ay31015->status_reg &= ~STATUS_FE;
 
 				if ((ay31015->rx_parity) && (!(ay31015->control_reg & CONTROL_NP)))
-					ay31015->status_reg |= STATUS_PE;		// parity error
+					ay31015->status_reg |= STATUS_PE;       // parity error
 				else
 					ay31015->status_reg &= ~STATUS_PE;
 
 				if (ay31015->status_reg & STATUS_DAV)
-					ay31015->status_reg |= STATUS_OR;		// overrun error - previous byte still in buffer
+					ay31015->status_reg |= STATUS_OR;       // overrun error - previous byte still in buffer
 				else
 					ay31015->status_reg &= ~STATUS_OR;
 
-				ay31015->rx_buffer = ay31015->rx_data;		// bring received byte out for computer to read
+				ay31015->rx_buffer = ay31015->rx_data;      // bring received byte out for computer to read
 
 				ay31015_update_status_pins( device );
 			}
 			else
 			if (ay31015->rx_pulses == 6)
 			{
-				ay31015->status_reg |= STATUS_DAV;		// tell computer that new byte is ready
+				ay31015->status_reg |= STATUS_DAV;      // tell computer that new byte is ready
 				ay31015_update_status_pins( device );
 			}
 			else
@@ -341,7 +341,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 				if (ay31015->second_stop_bit)
 				{
 					/* We should wait for the full first stop bit and
-                       the beginning of the second stop bit */
+					   the beginning of the second stop bit */
 					ay31015->rx_state = SECOND_STOP_BIT;
 					ay31015->rx_pulses += ay31015->second_stop_bit - 7;
 				}
@@ -372,7 +372,7 @@ static TIMER_CALLBACK( ay31015_rx_process )
 static TIMER_CALLBACK( ay31015_tx_process )
 {
 	device_t *device = (device_t *)ptr;
-	ay31015_t			*ay31015 = get_safe_token( device );
+	ay31015_t           *ay31015 = get_safe_token( device );
 
 	UINT8 t1;
 	switch (ay31015->tx_state)
@@ -380,12 +380,12 @@ static TIMER_CALLBACK( ay31015_tx_process )
 		case IDLE:
 			if (!(ay31015->status_reg & STATUS_TBMT))
 			{
-				ay31015->tx_state = PREP_TIME;		// When idle, see if a byte has been sent to us
+				ay31015->tx_state = PREP_TIME;      // When idle, see if a byte has been sent to us
 				ay31015->tx_pulses = 1;
 			}
 			return;
 
-		case PREP_TIME:						// This phase lets the transmitter regain sync after an idle period
+		case PREP_TIME:                     // This phase lets the transmitter regain sync after an idle period
 			ay31015->tx_pulses--;
 			if (!ay31015->tx_pulses)
 			{
@@ -395,18 +395,18 @@ static TIMER_CALLBACK( ay31015_tx_process )
 			return;
 
 		case START_BIT:
-			if (ay31015->tx_pulses == 16)				// beginning of start bit
+			if (ay31015->tx_pulses == 16)               // beginning of start bit
 			{
-				ay31015->tx_data = ay31015->tx_buffer;			// load the shift register
-				ay31015->status_reg |= STATUS_TBMT;			// tell computer that another byte can be sent to uart
-				ay31015_set_so( device, 0 );				/* start bit begins now (we are "spacing") */
-				ay31015->status_reg &= ~STATUS_EOC;			// we are no longer idle
+				ay31015->tx_data = ay31015->tx_buffer;          // load the shift register
+				ay31015->status_reg |= STATUS_TBMT;         // tell computer that another byte can be sent to uart
+				ay31015_set_so( device, 0 );                /* start bit begins now (we are "spacing") */
+				ay31015->status_reg &= ~STATUS_EOC;         // we are no longer idle
 				ay31015->tx_parity = 0;
 				ay31015_update_status_pins( device );
 			}
 
 			ay31015->tx_pulses--;
-			if (!ay31015->tx_pulses)					// end of start bit
+			if (!ay31015->tx_pulses)                    // end of start bit
 			{
 				ay31015->tx_state = PROCESSING;
 				ay31015->tx_pulses = ay31015->total_pulses;
@@ -414,24 +414,24 @@ static TIMER_CALLBACK( ay31015_tx_process )
 			return;
 
 		case PROCESSING:
-			if (!(ay31015->tx_pulses & 15))				// beginning of a data bit
+			if (!(ay31015->tx_pulses & 15))             // beginning of a data bit
 			{
 				if (ay31015->tx_data & 1)
 				{
 					ay31015_set_so( device, 1 );
-					ay31015->tx_parity++;				// calculate cumulative parity
+					ay31015->tx_parity++;               // calculate cumulative parity
 				}
 				else
 					ay31015_set_so( device, 0 );
 
-				ay31015->tx_data >>= 1;				// adjust the shift register
+				ay31015->tx_data >>= 1;             // adjust the shift register
 			}
 
 			ay31015->tx_pulses--;
-			if (!ay31015->tx_pulses)					// all data bits sent
+			if (!ay31015->tx_pulses)                    // all data bits sent
 			{
 				ay31015->tx_pulses = 16;
-				if (ay31015->control_reg & CONTROL_NP)		// see if we need to make a parity bit
+				if (ay31015->control_reg & CONTROL_NP)      // see if we need to make a parity bit
 					ay31015->tx_state = FIRST_STOP_BIT;
 				else
 					ay31015->tx_state = PARITY_BIT;
@@ -445,9 +445,9 @@ static TIMER_CALLBACK( ay31015_tx_process )
 				t1 = (ay31015->control_reg & CONTROL_EPS) ? 0 : 1;
 				t1 ^= (ay31015->tx_parity & 1);
 				if (t1)
-					ay31015_set_so( device, 1 );			/* extra bit to set the correct parity */
+					ay31015_set_so( device, 1 );            /* extra bit to set the correct parity */
 				else
-					ay31015_set_so( device, 0 );			/* it was already correct */
+					ay31015_set_so( device, 0 );            /* it was already correct */
 			}
 
 			ay31015->tx_pulses--;
@@ -460,11 +460,11 @@ static TIMER_CALLBACK( ay31015_tx_process )
 
 		case FIRST_STOP_BIT:
 			if (ay31015->tx_pulses == 16)
-				ay31015_set_so( device, 1 );				/* create a stop bit (marking and soon idle) */
+				ay31015_set_so( device, 1 );                /* create a stop bit (marking and soon idle) */
 			ay31015->tx_pulses--;
 			if (!ay31015->tx_pulses)
 			{
-				ay31015->status_reg |= STATUS_EOC;			// character is completely sent
+				ay31015->status_reg |= STATUS_EOC;          // character is completely sent
 				if (ay31015->second_stop_bit)
 				{
 					ay31015->tx_state = SECOND_STOP_BIT;
@@ -472,11 +472,11 @@ static TIMER_CALLBACK( ay31015_tx_process )
 				}
 				else
 				if (ay31015->status_reg & STATUS_TBMT)
-					ay31015->tx_state = IDLE;			// if nothing to send, go idle
+					ay31015->tx_state = IDLE;           // if nothing to send, go idle
 				else
 				{
 					ay31015->tx_pulses = 16;
-					ay31015->tx_state = START_BIT;		// otherwise immediately start next byte
+					ay31015->tx_state = START_BIT;      // otherwise immediately start next byte
 				}
 				ay31015_update_status_pins( device );
 			}
@@ -487,11 +487,11 @@ static TIMER_CALLBACK( ay31015_tx_process )
 			if (!ay31015->tx_pulses)
 			{
 				if (ay31015->status_reg & STATUS_TBMT)
-					ay31015->tx_state = IDLE;			// if nothing to send, go idle
+					ay31015->tx_state = IDLE;           // if nothing to send, go idle
 				else
 				{
 					ay31015->tx_pulses = 16;
-					ay31015->tx_state = START_BIT;		// otherwise immediately start next byte
+					ay31015->tx_state = START_BIT;      // otherwise immediately start next byte
 				}
 			}
 			return;
@@ -505,7 +505,7 @@ static TIMER_CALLBACK( ay31015_tx_process )
 -------------------------------------------------*/
 static void ay31015_reset( device_t *device )
 {
-	ay31015_t	*ay31015 = get_safe_token( device );
+	ay31015_t   *ay31015 = get_safe_token( device );
 
 	/* total pulses = 16 * data-bits */
 	UINT8 t1;
@@ -515,10 +515,10 @@ static void ay31015_reset( device_t *device )
 	else
 		t1 = ( ay31015->control_reg & CONTROL_NB1 ) ? 6 : 5;
 
-	ay31015->total_pulses = t1 << 4;					/* total clock pulses to load a byte */
-	ay31015->second_stop_bit = ((ay31015->control_reg & CONTROL_TSB) ? 16 : 0);		/* 2nd stop bit */
+	ay31015->total_pulses = t1 << 4;                    /* total clock pulses to load a byte */
+	ay31015->second_stop_bit = ((ay31015->control_reg & CONTROL_TSB) ? 16 : 0);     /* 2nd stop bit */
 	if ((t1 == 5) && (ay31015->second_stop_bit == 16))
-		ay31015->second_stop_bit = 8;				/* 5 data bits and 2 stop bits = 1.5 stop bits */
+		ay31015->second_stop_bit = 8;               /* 5 data bits and 2 stop bits = 1.5 stop bits */
 	ay31015->status_reg = STATUS_EOC | STATUS_TBMT;
 	ay31015->tx_data = 0;
 	ay31015->rx_state = PREP_TIME;
@@ -537,7 +537,7 @@ static void ay31015_reset( device_t *device )
 -------------------------------------------------*/
 static void ay31015_transfer_control_pins( device_t *device )
 {
-	ay31015_t	*ay31015 = get_safe_token( device );
+	ay31015_t   *ay31015 = get_safe_token( device );
 	UINT8 control = 0;
 
 	control |= ay31015->pins[AY31015_NP ] ? CONTROL_NP  : 0;
@@ -559,7 +559,7 @@ static void ay31015_transfer_control_pins( device_t *device )
 -------------------------------------------------*/
 void ay31015_set_input_pin( device_t *device, ay31015_input_pin_t pin, int data )
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	data = data ? 1 : 0;
 
@@ -604,7 +604,7 @@ void ay31015_set_input_pin( device_t *device, ay31015_input_pin_t pin, int data 
 -------------------------------------------------*/
 int ay31015_get_output_pin( device_t *device, ay31015_output_pin_t pin )
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	return ay31015->pins[pin];
 }
@@ -612,7 +612,7 @@ int ay31015_get_output_pin( device_t *device, ay31015_output_pin_t pin )
 
 INLINE void ay31015_update_rx_timer( device_t *device )
 {
-	ay31015_t	*ay31015 = get_safe_token( device );
+	ay31015_t   *ay31015 = get_safe_token( device );
 
 	if ( ay31015->rx_clock > 0.0 )
 	{
@@ -627,7 +627,7 @@ INLINE void ay31015_update_rx_timer( device_t *device )
 
 INLINE void ay31015_update_tx_timer( device_t *device )
 {
-	ay31015_t	*ay31015 = get_safe_token( device );
+	ay31015_t   *ay31015 = get_safe_token( device );
 
 	if ( ay31015->tx_clock > 0.0 )
 	{
@@ -645,7 +645,7 @@ INLINE void ay31015_update_tx_timer( device_t *device )
 -------------------------------------------------*/
 void ay31015_set_receiver_clock( device_t *device, double new_clock )
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	ay31015->rx_clock = new_clock;
 	ay31015_update_rx_timer( device );
@@ -657,7 +657,7 @@ void ay31015_set_receiver_clock( device_t *device, double new_clock )
 -------------------------------------------------*/
 void ay31015_set_transmitter_clock( device_t *device, double new_clock )
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	ay31015->tx_clock = new_clock;
 	ay31015_update_tx_timer( device );
@@ -669,7 +669,7 @@ void ay31015_set_transmitter_clock( device_t *device, double new_clock )
 -------------------------------------------------*/
 UINT8 ay31015_get_received_data( device_t *device )
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	return ay31015->rx_buffer;
 }
@@ -680,7 +680,7 @@ UINT8 ay31015_get_received_data( device_t *device )
 -------------------------------------------------*/
 void ay31015_set_transmit_data( device_t *device, UINT8 data )
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	if (ay31015->status_reg & STATUS_TBMT)
 	{
@@ -693,7 +693,7 @@ void ay31015_set_transmit_data( device_t *device, UINT8 data )
 
 static DEVICE_START(ay31015)
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	ay31015->config = (const ay31015_config*)device->static_config();
 
@@ -714,7 +714,7 @@ static DEVICE_START(ay31015)
 
 static DEVICE_RESET( ay31015 )
 {
-	ay31015_t	*ay31015 = get_safe_token(device);
+	ay31015_t   *ay31015 = get_safe_token(device);
 
 	ay31015->control_reg = 0;
 	ay31015->rx_data = 0;
@@ -758,5 +758,3 @@ void ay31015_device::device_reset()
 {
 	DEVICE_RESET_NAME( ay31015 )(this);
 }
-
-

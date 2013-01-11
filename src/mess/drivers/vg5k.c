@@ -62,11 +62,11 @@ class vg5k_state : public driver_device
 public:
 	vg5k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ef9345(*this, "ef9345"),
-		  m_dac(*this, "dac"),
-		  m_printer(*this, "printer"),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_ef9345(*this, "ef9345"),
+			m_dac(*this, "dac"),
+			m_printer(*this, "printer"),
+			m_cassette(*this, CASSETTE_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -309,15 +309,15 @@ void vg5k_state::machine_reset()
 /* F4 Character Displayer */
 static const gfx_layout vg5k_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* y offsets */
 	{ 0, 8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( vg5k )
@@ -349,14 +349,14 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 
 static const ef9345_interface vg5k_ef9345_config =
 {
-	"screen"			/* screen we are acting on */
+	"screen"            /* screen we are acting on */
 };
 
 static const struct CassetteOptions vg5k_cassette_options =
 {
-	1,		/* channels */
-	16,		/* bits per sample */
-	44100	/* sample frequency */
+	1,      /* channels */
+	16,     /* bits per sample */
+	44100   /* sample frequency */
 };
 
 static const cassette_interface vg5k_cassette_interface =
@@ -420,14 +420,14 @@ MACHINE_CONFIG_END
 ROM_START( vg5k )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v11", "BASIC v1.1")
-	ROMX_LOAD( "vg5k11.bin",  0x0000, 0x4000, CRC(a6998ff8) SHA1(881ba594be0a721a999378312aea0c3c1c7b2b58), ROM_BIOS(1) )			// dumped from a Radiola VG-5000
+	ROMX_LOAD( "vg5k11.bin",  0x0000, 0x4000, CRC(a6998ff8) SHA1(881ba594be0a721a999378312aea0c3c1c7b2b58), ROM_BIOS(1) )           // dumped from a Radiola VG-5000
 	ROM_SYSTEM_BIOS(1, "v11a", "BASIC v1.1 (alt)")
-	ROMX_LOAD( "vg5k11a.bin", 0x0000, 0x4000, BAD_DUMP CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(2) )	// from dcvg5k
+	ROMX_LOAD( "vg5k11a.bin", 0x0000, 0x4000, BAD_DUMP CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(2) )  // from dcvg5k
 	ROM_SYSTEM_BIOS(2, "v10", "BASIC v1.0")
 	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(3) )
 
 	ROM_REGION( 0x4000, "ef9345", 0 )
-	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )			// from dcvg5k
+	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
 /* Driver */

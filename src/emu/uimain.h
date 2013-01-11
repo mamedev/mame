@@ -108,14 +108,14 @@ protected:
 
 	/* internal input menu item data */
 	struct input_item_data {
-		input_item_data *	next;				/* pointer to next item in the list */
-		const void *		ref;				/* reference to type description for global inputs or field for game inputs */
-		input_seq_type		seqtype;			/* sequence type */
-		input_seq			seq;				/* copy of the live sequence */
-		const input_seq *	defseq;				/* pointer to the default sequence */
-		const char *		name;				/* pointer to the base name of the item */
-		UINT16				sortorder;			/* sorting information */
-		UINT8				type;				/* type of port */
+		input_item_data *   next;               /* pointer to next item in the list */
+		const void *        ref;                /* reference to type description for global inputs or field for game inputs */
+		input_seq_type      seqtype;            /* sequence type */
+		input_seq           seq;                /* copy of the live sequence */
+		const input_seq *   defseq;             /* pointer to the default sequence */
+		const char *        name;               /* pointer to the base name of the item */
+		UINT16              sortorder;          /* sorting information */
+		UINT8               type;               /* type of port */
 	};
 
 	void populate_and_sort(struct input_item_data *itemlist);
@@ -123,14 +123,14 @@ protected:
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 
 protected:
-	const void *		pollingref;
-	input_seq_type		pollingseq;
-	input_item_data *	pollingitem;
+	const void *        pollingref;
+	input_seq_type      pollingseq;
+	input_item_data *   pollingitem;
 
 private:
-	UINT16				last_sortorder;
-	bool				record_next;
-	input_seq			starting_seq;
+	UINT16              last_sortorder;
+	bool                record_next;
+	input_seq           starting_seq;
 
 	static int compare_items(const void *i1, const void *i2);
 };
@@ -166,13 +166,13 @@ public:
 protected:
 	/* DIP switch descriptor */
 	struct dip_descriptor {
-		dip_descriptor *	next;
-		const char *		name;
-		UINT32				mask;
-		UINT32				state;
+		dip_descriptor *    next;
+		const char *        name;
+		UINT32              mask;
+		UINT32              state;
 	};
 
-	dip_descriptor *	diplist;
+	dip_descriptor *    diplist;
 	int dipcount;
 	int type;
 };
@@ -212,10 +212,10 @@ private:
 	/* internal analog menu item data */
 	struct analog_item_data {
 		ioport_field *field;
-		int					type;
-		int					min, max;
-		int					cur;
-		int 				defvalue;
+		int                 type;
+		int                 min, max;
+		int                 cur;
+		int                 defvalue;
 	};
 };
 
@@ -325,13 +325,13 @@ private:
 
 	/* internal crosshair menu item data */
 	struct crosshair_item_data {
-		UINT8				type;
-		UINT8				player;
-		UINT8				min, max;
-		UINT8				cur;
-		UINT8				defvalue;
-		char				last_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
-		char				next_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
+		UINT8               type;
+		UINT8               player;
+		UINT8               min, max;
+		UINT8               cur;
+		UINT8               defvalue;
+		char                last_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
+		char                next_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
 	};
 };
 
@@ -353,11 +353,11 @@ public:
 
 private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	UINT8				error;
-	UINT8				rerandomize;
-	char				search[40];
-	int					matchlist[VISIBLE_GAMES_IN_LIST];
-	const game_driver	**driverlist;
+	UINT8               error;
+	UINT8               rerandomize;
+	char                search[40];
+	int                 matchlist[VISIBLE_GAMES_IN_LIST];
+	const game_driver   **driverlist;
 
 	driver_enumerator *drivlist;
 
@@ -376,4 +376,4 @@ private:
 /* force game select menu */
 void ui_menu_force_game_select(running_machine &machine, render_container *container);
 
-#endif	/* __UIMAIN_H__ */
+#endif  /* __UIMAIN_H__ */

@@ -383,12 +383,12 @@ READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
 	{
 		case 0x00:
 		{
-			return (ioport("IN5")->read() << 8) + ioport("DSWA")->read();	/* DSW A + coin */
+			return (ioport("IN5")->read() << 8) + ioport("DSWA")->read();   /* DSW A + coin */
 		}
 
 		case 0x01:
 		{
-			return (ioport("IN6")->read() << 8) + ioport("DSWB")->read();	/* DSW B + coin */
+			return (ioport("IN6")->read() << 8) + ioport("DSWB")->read();   /* DSW B + coin */
 		}
 	}
 
@@ -402,19 +402,19 @@ READ16_MEMBER(taitof2_state::mjnquest_input_r)
 	switch (m_mjnquest_input)
 	{
 		case 0x01:
-			  return ioport("IN0")->read();
+				return ioport("IN0")->read();
 
-		 case 0x02:
-			  return ioport("IN1")->read();
+			case 0x02:
+				return ioport("IN1")->read();
 
-		 case 0x04:
-			  return ioport("IN2")->read();
+			case 0x04:
+				return ioport("IN2")->read();
 
-		 case 0x08:
-			  return ioport("IN3")->read();
+			case 0x08:
+				return ioport("IN3")->read();
 
-		 case 0x10:
-			  return ioport("IN4")->read();
+			case 0x10:
+				return ioport("IN4")->read();
 
 	}
 
@@ -687,11 +687,11 @@ READ16_MEMBER(taitof2_state::cchip2_word_r)
 static ADDRESS_MAP_START( finalb_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)	/* palette */
+	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)    /* palette */
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x810000, 0x81ffff) AM_WRITENOP   /* error in game init code ? */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -705,12 +705,12 @@ static ADDRESS_MAP_START( dondokod_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE_LEGACY("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)	/* ROZ tilemap */
+	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE_LEGACY("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)    /* ROZ tilemap */
 	AM_RANGE(0xa02000, 0xa0200f) AM_DEVWRITE_LEGACY("tc0280grd", tc0280grd_ctrl_word_w)
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16, taitof2_state )
@@ -721,8 +721,8 @@ static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_SHARE("cchip2_ram")
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x400000, 0x40001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
-	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x400000, 0x40001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
+	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM   /* unused? */
 	AM_RANGE(0x620000, 0x62000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
@@ -735,9 +735,9 @@ static ADDRESS_MAP_START( thundfox_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x220002, 0x220003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_word_r, tc0100scn_word_w)  /* tilemaps */
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)  /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x800000, 0x80001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0xff00)
@@ -751,22 +751,22 @@ static ADDRESS_MAP_START( cameltry_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300018, 0x30001f) AM_READ(cameltry_paddle_r)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x813fff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x813fff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE_LEGACY("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)	/* ROZ tilemap */
+	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE_LEGACY("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)    /* ROZ tilemap */
 	AM_RANGE(0xa02000, 0xa0200f) AM_DEVWRITE_LEGACY("tc0280grd", tc0280grd_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qtorimon_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)	/* palette */
+	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)    /* palette */
 	AM_RANGE(0x500000, 0x50000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x910000, 0x9120ff) AM_WRITENOP   /* error in init code ? */
@@ -779,20 +779,20 @@ static ADDRESS_MAP_START( liquidk_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)	/* palette */
+	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)    /* palette */
 	AM_RANGE(0x500004, 0x500005) AM_WRITE(growl_coin_word_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSWB")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN0")
-	AM_RANGE(0x580000, 0x580001) AM_WRITE(watchdog_reset16_w)	/* ??? */
+	AM_RANGE(0x580000, 0x580001) AM_WRITE(watchdog_reset16_w)   /* ??? */
 	AM_RANGE(0x580006, 0x580007) AM_WRITENOP   /* ??? */
 	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x580002, 0x580003) AM_READ_PORT("IN1")
@@ -800,7 +800,7 @@ static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x680000, 0x680001) AM_WRITENOP   /* ??? */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x810000, 0x81ffff) AM_WRITENOP   /* error in init code ? */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -814,7 +814,7 @@ static ADDRESS_MAP_START( ssi_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ?? */
-	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps (not used) */
+	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps (not used) */
 	AM_RANGE(0x620000, 0x62000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
 ADDRESS_MAP_END
@@ -826,11 +826,11 @@ static ADDRESS_MAP_START( gunfront_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 //  AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP   /* ?? */
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
@@ -847,20 +847,20 @@ static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x500000, 0x50000f) AM_WRITE(taitof2_spritebank_w)
-	AM_RANGE(0x504000, 0x504001) AM_WRITENOP	/* unknown... various values */
+	AM_RANGE(0x504000, 0x504001) AM_WRITENOP    /* unknown... various values */
 	AM_RANGE(0x508000, 0x50800f) AM_READ_PORT("IN3")
 	AM_RANGE(0x50c000, 0x50c00f) AM_READ_PORT("IN4")
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjnquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM   /* "sram" */
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)	/* palette */
+	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)    /* palette */
 	AM_RANGE(0x300000, 0x30000f) AM_READ(mjnquest_dsw_r)
 	AM_RANGE(0x310000, 0x310001) AM_READ(mjnquest_input_r)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(mjnquest_inputselect_w)
@@ -868,8 +868,8 @@ static ADDRESS_MAP_START( mjnquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x350000, 0x350001) AM_WRITENOP   /* watchdog ? */
 	AM_RANGE(0x360000, 0x360001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x360002, 0x360003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE_LEGACY("tc0100scn", tc0100scn_gfxbank_w)	/* scr gfx bank select */
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE_LEGACY("tc0100scn", tc0100scn_gfxbank_w)   /* scr gfx bank select */
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -878,10 +878,10 @@ static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(taitof2_spritebank_w)	/* updated at $a6e, off irq5 */
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
+	AM_RANGE(0x300000, 0x30000f) AM_WRITE(taitof2_spritebank_w) /* updated at $a6e, off irq5 */
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)     /* tilemaps */
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* 500002 written like a watchdog?! */
+	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* 500002 written like a watchdog?! */
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
@@ -903,7 +903,7 @@ static ADDRESS_MAP_START( koshien_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa20000, 0xa20001) AM_WRITE(koshien_spritebank_w)
@@ -915,7 +915,7 @@ static ADDRESS_MAP_START( yuyugogo_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
@@ -930,35 +930,35 @@ static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30000f) AM_READ(ninjak_input_r)
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(ninjak_coin_word_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(watchdog_reset16_w)	/* ??? */
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(watchdog_reset16_w)   /* ??? */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(taitof2_spritebank_w)
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* b00002 written like a watchdog?! */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* b00002 written like a watchdog?! */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x300004, 0x300005) AM_WRITE(growl_coin_word_w)	/* NOT VERIFIED */
+	AM_RANGE(0x300004, 0x300005) AM_WRITE(growl_coin_word_w)    /* NOT VERIFIED */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN0")
 	AM_RANGE(0x320002, 0x320003) AM_READ_PORT("IN1")
 	AM_RANGE(0x320004, 0x320005) AM_READ_PORT("IN2")
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(watchdog_reset16_w)	/* NOT VERIFIED */
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(watchdog_reset16_w)   /* NOT VERIFIED */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x500000, 0x50000f) AM_WRITE(taitof2_spritebank_w)
-	AM_RANGE(0x504000, 0x504001) AM_WRITENOP	/* unknown... various values */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x504000, 0x504001) AM_WRITENOP    /* unknown... various values */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzquest_map, AS_PROGRAM, 16, taitof2_state )
@@ -969,7 +969,7 @@ static ADDRESS_MAP_START( qzquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
@@ -978,12 +978,12 @@ static ADDRESS_MAP_START( pulirula_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)	/* ROZ tilemap */
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)    /* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE_LEGACY("tc0430grw", tc0430grw_ctrl_word_w)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ??? */
 	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0xff00)
@@ -995,7 +995,7 @@ static ADDRESS_MAP_START( metalb_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("spriteram")
 //  AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
-	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
+	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)     /* tilemaps */
 	AM_RANGE(0x530000, 0x53002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0x600000, 0x60001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
@@ -1013,7 +1013,7 @@ static ADDRESS_MAP_START( qzchikyu_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
@@ -1021,7 +1021,7 @@ static ADDRESS_MAP_START( yesnoj_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 //  AM_RANGE(0x700000, 0x70000b) AM_READ_LEGACY(yesnoj_unknown_r)   /* what's this? */
@@ -1041,10 +1041,10 @@ static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(taitof2_spritebank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)     /* tilemaps */
 //    AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* uses 500002 like a watchdog !? */
+	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* uses 500002 like a watchdog !? */
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
@@ -1063,9 +1063,9 @@ static ADDRESS_MAP_START( dinorex_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM
-	AM_RANGE(0x700000, 0x70001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0x700000, 0x70001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -1080,10 +1080,10 @@ static ADDRESS_MAP_START( qjinsei_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* watchdog ? */
 	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 ADDRESS_MAP_END
 
@@ -1097,10 +1097,10 @@ static ADDRESS_MAP_START( qcrayon_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qcrayon2_map, AS_PROGRAM, 16, taitof2_state )
@@ -1108,11 +1108,11 @@ static ADDRESS_MAP_START( qcrayon2_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("extra", 0)   /* extra data rom */
 	AM_RANGE(0x700000, 0x70000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
-	AM_RANGE(0x900000, 0x90001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
+	AM_RANGE(0x900000, 0x90001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)  /* ?? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0xb00000, 0xb017ff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
@@ -1123,10 +1123,10 @@ static ADDRESS_MAP_START( driftout_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)	/* ROZ tilemap */
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)    /* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE_LEGACY("tc0430grw", tc0430grw_ctrl_word_w)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0xff00)
@@ -1140,10 +1140,10 @@ static ADDRESS_MAP_START( driveout_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READNOP AM_WRITE(driveout_sound_command_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)	/* ROZ tilemap */
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)    /* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE_LEGACY("tc0430grw", tc0430grw_ctrl_word_w)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0xff00)
@@ -1166,14 +1166,14 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitof2_state )
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)	/* ?? */
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)   /* ?? */
 ADDRESS_MAP_END
 
 
 /* Alt version of Cameltry, YM2203 + M6925 sound */
 
 static ADDRESS_MAP_START( cameltrya_sound_map, AS_PROGRAM, 8, taitof2_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM		// I can't see a bank control, but there ARE some bytes past 0x8000
+	AM_RANGE(0x0000, 0x7fff) AM_ROM     // I can't see a bank control, but there ARE some bytes past 0x8000
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
@@ -1206,7 +1206,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( finalb )
 	PORT_START("DSWA")
 	/* Not sure how to handle alternate controls */
-	PORT_DIPNAME( 0x01, 0x01, "Alternate Controls" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Alternate Controls" )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SW1)
@@ -1214,12 +1214,12 @@ static INPUT_PORTS_START( finalb )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
@@ -1228,11 +1228,11 @@ static INPUT_PORTS_START( finalb )
 	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
 	PORT_START("IN2")
-	TAITO_F2_SYSTEM_INPUT	/* controls below are DIP selectable */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	/* 1P sen.sw.? */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 1P ducking? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	/* 2P sen.sw.? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	/* 2P ducking? */
+	TAITO_F2_SYSTEM_INPUT   /* controls below are DIP selectable */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) /* 1P sen.sw.? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) /* 1P ducking? */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) /* 2P sen.sw.? */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) /* 2P ducking? */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( finalbj )
@@ -1257,18 +1257,18 @@ static INPUT_PORTS_START( dondokod )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "10k and 100k" )
 	PORT_DIPSETTING(    0x08, "10k and 150k" )
 	PORT_DIPSETTING(    0x04, "10k and 250k" )
 	PORT_DIPSETTING(    0x00, "10k and 350k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
@@ -1306,20 +1306,20 @@ static INPUT_PORTS_START( megab )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "100k only" )
 	PORT_DIPSETTING(    0x04, "150k only" )
 	PORT_DIPSETTING(    0x08, "200k only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPNAME( 0x40, 0x40, "Upright Controls" )		PORT_DIPLOCATION("SW2:7") /* ie single or two players at once */
+	PORT_DIPNAME( 0x40, 0x40, "Upright Controls" )      PORT_DIPLOCATION("SW2:7") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Dual ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_2_BUTTONS( 1 )
@@ -1357,19 +1357,19 @@ static INPUT_PORTS_START( thundfox )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x04, 0x04, "Timer" )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Timer" )         PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )		PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
@@ -1409,20 +1409,20 @@ static INPUT_PORTS_START( cameltry )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Start remain time" )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Start remain time" )     PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "35" )
 	PORT_DIPSETTING(    0x04, "40" )
 	PORT_DIPSETTING(    0x0c, "50" )
 	PORT_DIPSETTING(    0x08, "60" )
-	PORT_DIPNAME( 0x30, 0x30, "Continue play time" )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Continue play time" )    PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "+20" )
 	PORT_DIPSETTING(    0x10, "+25" )
 	PORT_DIPSETTING(    0x30, "+30" )
 	PORT_DIPSETTING(    0x20, "+40" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )		PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
@@ -1453,10 +1453,10 @@ static INPUT_PORTS_START( cameltry )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("PADDLE1")	/* Paddle A */
+	PORT_START("PADDLE1")   /* Paddle A */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("PADDLE2")	/* Paddle B */
+	PORT_START("PADDLE2")   /* Paddle B */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -1470,7 +1470,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( qtorimon )
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
@@ -1481,12 +1481,12 @@ static INPUT_PORTS_START( qtorimon )
 	TAITO_DIFFICULTY_LOC(SW2)
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x40, 0x40, "Show Correct Answer" )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Show Correct Answer" )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
@@ -1526,20 +1526,20 @@ static INPUT_PORTS_START( liquidk )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "30k and 100k" )
 	PORT_DIPSETTING(    0x08, "30k and 150k" )
 	PORT_DIPSETTING(    0x04, "50k and 250k" )
 	PORT_DIPSETTING(    0x00, "50k and 350k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )		PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
@@ -1578,20 +1578,20 @@ static INPUT_PORTS_START( ssi )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Shields" )			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Shields" )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x0c, "1")
 	PORT_DIPSETTING(    0x04, "2")
 	PORT_DIPSETTING(    0x08, "3")
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "2")
 	PORT_DIPSETTING(    0x10, "3")
-	PORT_DIPNAME( 0xa0, 0xa0, "2 Players Mode" )		PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0xa0, 0xa0, "2 Players Mode" )        PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0xa0, "Simultaneous")
 	PORT_DIPSETTING(    0x80, "Alternate, Single")
 	PORT_DIPSETTING(    0x00, "Alternate, Dual")
 	PORT_DIPSETTING(    0x20, "Not Allowed")
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
@@ -1639,12 +1639,12 @@ static INPUT_PORTS_START( growl )
 	TAITO_DIFFICULTY_LOC(SW2)
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
-	PORT_DIPNAME( 0x30, 0x30, "Cabinet Type" )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Cabinet Type" )          PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "2 Players" )
-	PORT_DIPSETTING(    0x20, "4 Players / 4 Coin Slots" )	// Push Player button A to start
+	PORT_DIPSETTING(    0x20, "4 Players / 4 Coin Slots" )  // Push Player button A to start
 	PORT_DIPSETTING(    0x10, "4 Players / 2 cabinets combined" )
 	PORT_DIPSETTING(    0x00, "4 Players / 2 Coin Slots" )
-	PORT_DIPNAME( 0x40, 0x40, "Final Boss Continue" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Final Boss Continue" )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
@@ -1700,18 +1700,18 @@ static INPUT_PORTS_START( pulirula )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Magic" )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Magic" )     PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
 //  PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )	PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )  PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
@@ -1839,7 +1839,7 @@ static INPUT_PORTS_START( footchmp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, "Game Over Type" )		PORT_DIPLOCATION("SW1:1") // 2p simultaneous play
+	PORT_DIPNAME( 0x01, 0x00, "Game Over Type" )        PORT_DIPLOCATION("SW1:1") // 2p simultaneous play
 	PORT_DIPSETTING(    0x01, "Both Teams' Games Over" )
 	PORT_DIPSETTING(    0x00, "Losing Team's Game is Over" )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SW1)
@@ -1847,20 +1847,20 @@ static INPUT_PORTS_START( footchmp )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Game_Time ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Game_Time ) )        PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "1.5 Minutes" )
 	PORT_DIPSETTING(    0x0c, " 2  Minutes" )
 	PORT_DIPSETTING(    0x04, "2.5 Minutes" )
 	PORT_DIPSETTING(    0x08, " 3  Minutes" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "2 Players" )
-	PORT_DIPSETTING(    0x20, "4 Players / 4 Coin Slots" )	// Push Player button A to start
+	PORT_DIPSETTING(    0x20, "4 Players / 4 Coin Slots" )  // Push Player button A to start
 	PORT_DIPSETTING(    0x10, "4 Players / 2 cabinets combined" )
 	PORT_DIPSETTING(    0x00, "4 Players / 2 Coin Slots" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Game Version" )			PORT_DIPLOCATION("SW2:8")	// Not used for Hat Trick Hero / Euro Champ '92
+	PORT_DIPNAME( 0x80, 0x00, "Game Version" )          PORT_DIPLOCATION("SW2:8")   // Not used for Hat Trick Hero / Euro Champ '92
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, "European" )
 
@@ -1875,44 +1875,44 @@ static INPUT_PORTS_START( hthero )
 	PORT_INCLUDE(footchmp)
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x80, 0x00, "Game Over Type" )		PORT_DIPLOCATION("SW1:1")	// 2p simultaneous play
+	PORT_DIPNAME( 0x80, 0x00, "Game Over Type" )        PORT_DIPLOCATION("SW1:1")   // 2p simultaneous play
 	PORT_DIPSETTING(    0x80, "Both Teams' Games Over" )
 	PORT_DIPSETTING(    0x00, "Losing Team's Game is Over" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x20, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x00, "1.5 Minutes" )
 	PORT_DIPSETTING(    0x30, " 2  Minutes" )
 	PORT_DIPSETTING(    0x20, "2.5 Minutes" )
 	PORT_DIPSETTING(    0x10, " 3  Minutes" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:6,5")
 	PORT_DIPSETTING(    0x0c, "2 Players" )
-	PORT_DIPSETTING(    0x04, "4 Players / 4 Coin Slots" )	// Push Player button A to start
+	PORT_DIPSETTING(    0x04, "4 Players / 4 Coin Slots" )  // Push Player button A to start
 	PORT_DIPSETTING(    0x08, "4 Players / 2 cabinets combined" )
 	PORT_DIPSETTING(    0x00, "4 Players / 2 Coin Slots" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:8" )
@@ -1950,20 +1950,20 @@ static INPUT_PORTS_START( ninjak )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Cabinet Type" )			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Cabinet Type" )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "2 players" )
 	PORT_DIPSETTING(    0x08, "TROG (4 players / 2 coin slots)" )
 	PORT_DIPSETTING(    0x04, "MTX2 (4 players / 2 cabinets combined)" )
 	PORT_DIPSETTING(    0x00, "TMNT (4 players / 4 coin slots)" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Game Type" )				PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Game Type" )             PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "1 Player only" )
 	PORT_DIPSETTING(    0x80, "Multiplayer" )
 
@@ -1996,21 +1996,21 @@ static INPUT_PORTS_START( driftout )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Control" )			PORT_DIPLOCATION("SW2:3,4") /* correct acc. to service mode */
+	PORT_DIPNAME( 0x0c, 0x0c, "Control" )           PORT_DIPLOCATION("SW2:3,4") /* correct acc. to service mode */
 	PORT_DIPSETTING(    0x0c, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x08, "Paddle" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, "Steering wheel" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* 2P not used? */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* 2P not used? */
 
 	PORT_START("IN2")
 	TAITO_F2_SYSTEM_INPUT
@@ -2019,10 +2019,10 @@ static INPUT_PORTS_START( driftout )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("PADDLE1")	/* Paddle A */
+	PORT_START("PADDLE1")   /* Paddle A */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("PADDLE2")	/* Paddle B */
+	PORT_START("PADDLE2")   /* Paddle B */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -2033,20 +2033,20 @@ static INPUT_PORTS_START( gunfront )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "10k and every 80k" )
 	PORT_DIPSETTING(    0x0c, "20k and every 80k" )
 	PORT_DIPSETTING(    0x04, "30k and every 80k" )
 	PORT_DIPSETTING(    0x00, "60k and every 80k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )		PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
@@ -2079,20 +2079,20 @@ static INPUT_PORTS_START( metalb )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x04, "80k and every 160k" )
 	PORT_DIPSETTING(    0x0c, "70k and every 150k" )
 	PORT_DIPSETTING(    0x00, "100k and every 200k" )
 	PORT_DIPSETTING(    0x08, "50k and every 120k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )		PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
@@ -2138,16 +2138,16 @@ static INPUT_PORTS_START( deadconx )
 	TAITO_COINAGE_WORLD_LOC(SW1)
 
 	PORT_START("DSWB") /* DSW B, missing a timer speed maybe? */
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )		/* Listed as "NOT USE" */
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )		/* Listed as "NOT USE" */
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "NOT USE" */
-	PORT_DIPNAME( 0x18, 0x18, "Life Meter")	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )        /* Listed as "NOT USE" */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )        /* Listed as "NOT USE" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as "NOT USE" */
+	PORT_DIPNAME( 0x18, 0x18, "Life Meter") PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x10, "8" )
 	PORT_DIPSETTING(    0x18, "10" )
 	PORT_DIPSETTING(    0x08, "12" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as "NOT USE" */
-	PORT_DIPNAME( 0xc0, 0xc0, "Number of Enemies 1/2 Player" )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "NOT USE" */
+	PORT_DIPNAME( 0xc0, 0xc0, "Number of Enemies 1/2 Player" )  PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0xc0, "30/50" )
 	PORT_DIPSETTING(    0x80, "40/60" )
 	PORT_DIPSETTING(    0x40, "25/45" )
@@ -2158,26 +2158,26 @@ static INPUT_PORTS_START( deadconxj ) /* Matches PDF of Dip Sheet but not matchi
 	PORT_INCLUDE(deadconx)
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Service_Mode ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )		/* Listed as "NOT USE" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )        /* Listed as "NOT USE" */
 INPUT_PORTS_END
 
 
@@ -2188,19 +2188,19 @@ static INPUT_PORTS_START( dinorex )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Damage" )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Damage" )        PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "Small" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, "Big" )
 	PORT_DIPSETTING(    0x00, "Biggest" )
-	PORT_DIPNAME( 0x10, 0x10, "Timer Speed" )	PORT_DIPLOCATION("SW2:5")	// Appears to make little difference
+	PORT_DIPNAME( 0x10, 0x10, "Timer Speed" )   PORT_DIPLOCATION("SW2:5")   // Appears to make little difference
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPNAME( 0x20, 0x20, "Match Type" )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Match Type" )    PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Best of 3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )	PORT_DIPLOCATION("SW2:8")	/* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )  PORT_DIPLOCATION("SW2:8")   /* ie single or two players at once */
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
@@ -2253,17 +2253,17 @@ static INPUT_PORTS_START( solfigtr )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( koshien )
-	PORT_START("DSWA")	/* DSW A, one lets you control fielders ? */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_START("DSWA")  /* DSW A, one lets you control fielders ? */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SW1)
@@ -2271,21 +2271,21 @@ static INPUT_PORTS_START( koshien )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x04, 0x04, "Timer" )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Timer" )         PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )		PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
@@ -2323,7 +2323,7 @@ static INPUT_PORTS_START( quizhq )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -2333,7 +2333,7 @@ static INPUT_PORTS_START( quizhq )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
@@ -2351,20 +2351,20 @@ static INPUT_PORTS_START( quizhq )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Time" )			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Time" )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "5 seconds" )
 	PORT_DIPSETTING(    0x08, "10 seconds" )
 	PORT_DIPSETTING(    0x04, "15 seconds" )
 	PORT_DIPSETTING(    0x00, "20 seconds" )
-	PORT_DIPNAME( 0x30, 0x30, "Stock" )			PORT_DIPLOCATION("SW2:5,6") /* AKA "Lives" */
+	PORT_DIPNAME( 0x30, 0x30, "Stock" )         PORT_DIPLOCATION("SW2:5,6") /* AKA "Lives" */
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )		PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 INPUT_PORTS_END
@@ -2376,19 +2376,19 @@ static INPUT_PORTS_START( qjinsei )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -2398,7 +2398,7 @@ static INPUT_PORTS_START( qjinsei )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
@@ -2418,22 +2418,22 @@ static INPUT_PORTS_START( qcrayon )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Default Time" )		PORT_DIPLOCATION("SW2:3,4") /* Can be affected ingame by some items and/or player location */
+	PORT_DIPNAME( 0x0c, 0x0c, "Default Time" )      PORT_DIPLOCATION("SW2:3,4") /* Can be affected ingame by some items and/or player location */
 	PORT_DIPSETTING(    0x00, "6 seconds" )
 	PORT_DIPSETTING(    0x04, "7 seconds" )
 	PORT_DIPSETTING(    0x08, "8 seconds" )
 	PORT_DIPSETTING(    0x0c, "10 seconds" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -2443,7 +2443,7 @@ static INPUT_PORTS_START( qcrayon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
@@ -2459,23 +2459,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( qcrayon2 )
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_NEW_LOC(SW1)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )	/* These 2 Dip Switches were designed to change the default timer */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )	/* but the 10 seconds setting is duplicated 4 times in the tables */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )    /* These 2 Dip Switches were designed to change the default timer */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )    /* but the 10 seconds setting is duplicated 4 times in the tables */
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Game Control" )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Game Control" )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, "4 Buttons" )
 
@@ -2546,7 +2546,7 @@ static INPUT_PORTS_START( yuyugogo )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -2556,7 +2556,7 @@ static INPUT_PORTS_START( yuyugogo )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	// ??
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) // ??
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
@@ -2607,7 +2607,7 @@ static INPUT_PORTS_START( mjnquest )
 
 	PORT_START("IN5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )		// ?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )      // ?
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN6")
@@ -2632,16 +2632,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( yesnoj )
 	/* 0xb00000 -> 0x20c0e0.b ($40e0,A5) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, "Print Results" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Print Results" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Printer" )			PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Printer" )           PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )        PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2 Credits" )
 	TAITO_COINAGE_US_COIN_START_LOC(SW1)
@@ -2688,86 +2688,86 @@ INPUT_PORTS_END
 
 static const gfx_layout finalb_tilelayout =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,2),
-	6,	/* 6 bits per pixel */
+	6,  /* 6 bits per pixel */
 	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, 0, 1, 2, 3 },
 	{ 3*4, 2*4, 1*4, 0*4, 7*4, 6*4, 5*4, 4*4,
 			11*4, 10*4, 9*4, 8*4, 15*4, 14*4, 13*4, 12*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout yuyugogo_charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	1,	/* 1 bit per pixel */
+	1,  /* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every sprite takes 8 consecutive bytes */
+	8*8 /* every sprite takes 8 consecutive bytes */
 };
 
 static const gfx_layout pivotlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( finalb )
-	GFXDECODE_ENTRY( "gfx2", 0, finalb_tilelayout,  0, 64 )	/* sprites & playfield, 6-bit deep */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, finalb_tilelayout,  0, 64 ) /* sprites & playfield, 6-bit deep */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
 static GFXDECODE_START( taitof2 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
 static GFXDECODE_START( pivot )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx3", 0, pivotlayout, 0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx3", 0, pivotlayout, 0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
 static GFXDECODE_START( yuyugogo )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, yuyugogo_charlayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, yuyugogo_charlayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
 static GFXDECODE_START( thundfox )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )	/* TC0100SCN #1 */
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )	/* TC0100SCN #2 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* TC0100SCN #1 */
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* TC0100SCN #2 */
 GFXDECODE_END
 
 static const gfx_layout deadconx_charlayout =
@@ -2782,27 +2782,27 @@ static const gfx_layout deadconx_charlayout =
 };
 
 static GFXDECODE_START( deadconx )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, deadconx_charlayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, deadconx_charlayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
 static const gfx_layout footchmpbl_tilelayout =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,4),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
 	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16	/* every sprite takes 128 consecutive bytes */
+	16*16   /* every sprite takes 128 consecutive bytes */
 };
 
 
 static GFXDECODE_START( footchmpbl )
-	GFXDECODE_ENTRY( "gfx2", 0, footchmpbl_tilelayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, footchmpbl_tilelayout,  0, 256 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )	// gets wiped out by the dynamic decode atm
-	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )	// bootleg should clearly use this instead of the uploaded tiles
+	GFXDECODE_ENTRY( "gfx2", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )    // gets wiped out by the dynamic decode atm
+	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )    // bootleg should clearly use this instead of the uploaded tiles
 GFXDECODE_END
 
 
@@ -2829,10 +2829,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,				/* portA read */
+		DEVCB_NULL,             /* portA read */
 		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(taitof2_state,cameltrya_porta_w),	/* portA write - not implemented */
-		DEVCB_NULL,				/* portB write */
+		DEVCB_DRIVER_MEMBER(taitof2_state,cameltrya_porta_w),   /* portA write - not implemented */
+		DEVCB_NULL,             /* portB write */
 	},
 	DEVCB_LINE(irq_handler)
 };
@@ -2845,151 +2845,151 @@ static const ym2203_interface ym2203_config =
 static const tc0100scn_interface taitof2_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	0, 0,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	0, 0,       /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface liquidk_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	3, 0,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	3, 0,       /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface dondokod_tc0100scn_intf =
 {
 	"screen",
-	1, 3,		/* gfxnum, txnum */
-	3, 0,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 3,       /* gfxnum, txnum */
+	3, 0,       /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface finalb_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	1, 0,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	1, 0,       /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface ninjak_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	0, 0,		/* x_offset, y_offset */
-	0, 0,		/* flip_xoff, flip_yoff */
-	1, 2,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	0, 0,       /* x_offset, y_offset */
+	0, 0,       /* flip_xoff, flip_yoff */
+	1, 2,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface qzchikyu_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	0, 0,		/* x_offset, y_offset */
-	-4, 0,		/* flip_xoff, flip_yoff */
-	-11, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	0, 0,       /* x_offset, y_offset */
+	-4, 0,      /* flip_xoff, flip_yoff */
+	-11, 0,     /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface solfigtr_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	3, 0,		/* x_offset, y_offset */
-	6, 0,		/* flip_xoff, flip_yoff */
-	6, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	3, 0,       /* x_offset, y_offset */
+	6, 0,       /* flip_xoff, flip_yoff */
+	6, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface koshien_tc0100scn_intf =
 {
 	"screen",
-	1, 2,		/* gfxnum, txnum */
-	1, 0,		/* x_offset, y_offset */
-	2, 0,		/* flip_xoff, flip_yoff */
-	0, 0,		/* flip_text_xoff, flip_text_yoff */
+	1, 2,       /* gfxnum, txnum */
+	1, 0,       /* x_offset, y_offset */
+	2, 0,       /* flip_xoff, flip_yoff */
+	0, 0,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface thundfox_tc0100scn_intf_1 =
 {
 	"screen",
-	1, 3,		/* gfxnum, txnum */
-	3, 0,		/* x_offset, y_offset */
-	5, 0,		/* flip_xoff, flip_yoff */
-	4, 1,		/* flip_text_xoff, flip_text_yoff */
+	1, 3,       /* gfxnum, txnum */
+	3, 0,       /* x_offset, y_offset */
+	5, 0,       /* flip_xoff, flip_yoff */
+	4, 1,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
 
 static const tc0100scn_interface thundfox_tc0100scn_intf_2 =
 {
 	"screen",
-	2, 4,		/* gfxnum, txnum */
-	3, 0,		/* x_offset, y_offset */
-	5, 0,		/* flip_xoff, flip_yoff */
-	4, 1,		/* flip_text_xoff, flip_text_yoff */
+	2, 4,       /* gfxnum, txnum */
+	3, 0,       /* x_offset, y_offset */
+	5, 0,       /* flip_xoff, flip_yoff */
+	4, 1,       /* flip_text_xoff, flip_text_yoff */
 	TC0100SCN_SINGLE_VDU, 1
 };
 
 static const tc0480scp_interface footchmp_tc0480scp_intf =
 {
-	1, 2,		/* gfxnum, txnum */
-	3,		/* pixels */
-	0x1d, 0x08,		/* x_offset, y_offset */
-	-1, 0,		/* text_xoff, text_yoff */
-	-1, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	1, 2,       /* gfxnum, txnum */
+	3,      /* pixels */
+	0x1d, 0x08,     /* x_offset, y_offset */
+	-1, 0,      /* text_xoff, text_yoff */
+	-1, 0,      /* flip_xoff, flip_yoff */
+	0       /* col_base */
 };
 
 static const tc0480scp_interface hthero_tc0480scp_intf =
 {
-	1, 2,		/* gfxnum, txnum */
-	3,		/* pixels */
-	0x33, -0x04,		/* x_offset, y_offset */
-	-1, 0,		/* text_xoff, text_yoff */
-	-1, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	1, 2,       /* gfxnum, txnum */
+	3,      /* pixels */
+	0x33, -0x04,        /* x_offset, y_offset */
+	-1, 0,      /* text_xoff, text_yoff */
+	-1, 0,      /* flip_xoff, flip_yoff */
+	0       /* col_base */
 };
 
 static const tc0480scp_interface deadconx_tc0480scp_intf =
 {
-	1, 2,		/* gfxnum, txnum */
-	3,		/* pixels */
-	0x1e, 0x08,		/* x_offset, y_offset */
-	-1, 0,		/* text_xoff, text_yoff */
-	-1, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	1, 2,       /* gfxnum, txnum */
+	3,      /* pixels */
+	0x1e, 0x08,     /* x_offset, y_offset */
+	-1, 0,      /* text_xoff, text_yoff */
+	-1, 0,      /* flip_xoff, flip_yoff */
+	0       /* col_base */
 };
 
 static const tc0480scp_interface deadconxj_tc0480scp_intf =
 {
-	1, 2,		/* gfxnum, txnum */
-	3,		/* pixels */
-	0x34, -0x05,		/* x_offset, y_offset */
-	-1, 0,		/* text_xoff, text_yoff */
-	-1, 0,		/* flip_xoff, flip_yoff */
-	0		/* col_base */
+	1, 2,       /* gfxnum, txnum */
+	3,      /* pixels */
+	0x34, -0x05,        /* x_offset, y_offset */
+	-1, 0,      /* text_xoff, text_yoff */
+	-1, 0,      /* flip_xoff, flip_yoff */
+	0       /* col_base */
 };
 
 static const tc0480scp_interface metalb_tc0480scp_intf =
 {
-	1, 2,		/* gfxnum, txnum */
-	3,		/* pixels */
-	0x32, -0x04,		/* x_offset, y_offset */
-	1, 0,		/* text_xoff, text_yoff */
-	-1, 0,		/* flip_xoff, flip_yoff */
-	256		/* col_base */
+	1, 2,       /* gfxnum, txnum */
+	3,      /* pixels */
+	0x32, -0x04,        /* x_offset, y_offset */
+	1, 0,       /* text_xoff, text_yoff */
+	-1, 0,      /* flip_xoff, flip_yoff */
+	256     /* col_base */
 };
 
 static const tc0110pcr_interface taitof2_tc0110pcr_intf = { 0 };
@@ -3000,13 +3000,13 @@ static const tc0280grd_interface taitof2_tc0430grw_intf = { 2 };
 static const tc0220ioc_interface taitof2_io220_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
 };
 
 static const tc0510nio_interface taitof2_io510_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
 };
 
 
@@ -3038,10 +3038,10 @@ MACHINE_START_MEMBER(taitof2_state,f2)
 static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/2)	/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 24000000/2) /* 12 MHz */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  taitof2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 24000000/6)	/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 24000000/6)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,f2)
@@ -3049,7 +3049,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2)
@@ -3595,11 +3595,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)	/* verified on pcb  */
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)  /* verified on pcb  */
 	MCFG_CPU_PROGRAM_MAP(cameltry_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  taitof2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,24000000/4)	/* verifed on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,24000000/4)    /* verifed on pcb */
 	MCFG_CPU_PROGRAM_MAP(cameltrya_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,common)
@@ -3644,11 +3644,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( driveout, taitof2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)	/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)  /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(driveout_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  taitof2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(driveout_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,common)
@@ -3693,18 +3693,18 @@ ROM_START( finalb )
 	ROM_LOAD16_BYTE( "b82-09.10",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
 	ROM_LOAD16_BYTE( "b82-17.11",  0x00001, 0x20000, CRC(e91b2ec9) SHA1(c854104b8d48d20ab9278ecd122c987c3d886a26) )
 
-	ROM_REGION( 0x040000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x040000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "b82-06.19",  0x00000, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
 	ROM_LOAD16_BYTE( "b82-07.18",  0x00001, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "b82-04.4",   0x000000, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
 	ROM_LOAD16_BYTE( "b82-03.5",   0x000001, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
-       because finalb_driver_init will move some bits around before data
-       will be 'gfxdecoded'. The whole thing is because this data is 2bits-
-       while above is 4bits-packed format, for a total of 6 bits per pixel. */
+	   because finalb_driver_init will move some bits around before data
+	   will be 'gfxdecoded'. The whole thing is because this data is 2bits-
+	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_LOAD( "b82-05.3",    0x180000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
@@ -3712,10 +3712,10 @@ ROM_START( finalb )
 	ROM_LOAD( "b82_10.16",   0x00000, 0x04000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3731,18 +3731,18 @@ ROM_START( finalbj )
 	ROM_LOAD16_BYTE( "b82-09.10",  0x00000, 0x20000, CRC(632f1ecd) SHA1(aa3d1c2059b0dd619d1f6e3e0705b65b4f4be74e) )
 	ROM_LOAD16_BYTE( "b82-08.11",  0x00001, 0x20000, CRC(07154fe5) SHA1(4772362375c8c2984a305c3bb0320ea80a2e9a40) )
 
-	ROM_REGION( 0x040000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x040000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "b82-06.19",  0x00000, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
 	ROM_LOAD16_BYTE( "b82-07.18",  0x00001, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "b82-04.4",   0x000000, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
 	ROM_LOAD16_BYTE( "b82-03.5",   0x000001, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
-       because finalb_driver_init will move some bits around before data
-       will be 'gfxdecoded'. The whole thing is because this data is 2bits-
-       while above is 4bits-packed format, for a total of 6 bits per pixel. */
+	   because finalb_driver_init will move some bits around before data
+	   will be 'gfxdecoded'. The whole thing is because this data is 2bits-
+	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_LOAD( "b82-05.3",    0x180000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
@@ -3750,10 +3750,10 @@ ROM_START( finalbj )
 	ROM_LOAD( "b82_10.16",   0x00000, 0x04000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3770,18 +3770,18 @@ ROM_START( finalbu )
 	ROM_LOAD16_BYTE( "b82-09-1",  0x00000, 0x20000, CRC(66729cb9) SHA1(f265c07966cf3930a9b5e2dd63d49554705c60f7) )
 	ROM_LOAD16_BYTE( "b82-6-14",  0x00001, 0x20000, CRC(879387fa) SHA1(9d7aa8ece6cfc66e7c131d9c7a3db792a0336e09) )
 
-	ROM_REGION( 0x040000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x040000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "b82-06.19",  0x00000, 0x20000, CRC(fc450a25) SHA1(6929bd2d47549cab037e8807b778741b3c215788) )
 	ROM_LOAD16_BYTE( "b82-07.18",  0x00001, 0x20000, CRC(ec3df577) SHA1(37a0bb87a12f0332c8e67b22f91c24584f3d46ce) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "b82-04.4",   0x000000, 0x80000, CRC(6346f98e) SHA1(3fac5ea56b5ae280cd7ca0e0c6c308376056e1ba) ) /* sprites 4-bit format*/
 	ROM_LOAD16_BYTE( "b82-03.5",   0x000001, 0x80000, CRC(daa11561) SHA1(81dd596c1b36138904971c36466ec29d08d4fd84) ) /* sprites 4-bit format*/
 
 	/* Note: this is intentional to load at 0x180000, not at 0x100000
-       because finalb_driver_init will move some bits around before data
-       will be 'gfxdecoded'. The whole thing is because this data is 2bits-
-       while above is 4bits-packed format, for a total of 6 bits per pixel. */
+	   because finalb_driver_init will move some bits around before data
+	   will be 'gfxdecoded'. The whole thing is because this data is 2bits-
+	   while above is 4bits-packed format, for a total of 6 bits per pixel. */
 
 	ROM_LOAD( "b82-05.3",    0x180000, 0x80000, CRC(aa90b93a) SHA1(06f41052659959c58d72c9f68f9f6069cb835672) ) /* sprites 2-bit format */
 
@@ -3789,10 +3789,10 @@ ROM_START( finalbu )
 	ROM_LOAD( "b82_10.16",   0x00000, 0x04000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3808,22 +3808,22 @@ ROM_START( dondokod )
 	ROM_LOAD16_BYTE( "b95-12.bin",   0x00000, 0x20000, CRC(d0fce87a) SHA1(7b346d3b7cbaf0b5447d66a71e815202d796f140) )
 	ROM_LOAD16_BYTE( "b95-11-1.bin", 0x00001, 0x20000, CRC(dad40cd3) SHA1(6c07ed3dd609a8743f5851caa4d205bce8db595e) )
 	ROM_LOAD16_BYTE( "b95-10.bin",   0x40000, 0x20000, CRC(a46e1f0b) SHA1(4adfa7a788d31860e557c4059f77440fe12ac110) )
-	ROM_LOAD16_BYTE( "b95-14.bin",   0x40001, 0x20000, CRC(6e4e1351) SHA1(207db5f08904d36c1d27cf326eb9260771a836c2) )	// needs name verfied
+	ROM_LOAD16_BYTE( "b95-14.bin",   0x40001, 0x20000, CRC(6e4e1351) SHA1(207db5f08904d36c1d27cf326eb9260771a836c2) )   // needs name verfied
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "b95-02.bin", 0x00000, 0x80000, CRC(67b4e979) SHA1(e709cc24e001bccde1178f7e645fc7aec442540c) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "b95-01.bin", 0x00000, 0x80000, CRC(51c176ce) SHA1(2866e8bd57b301a0d4690f194be95784c53f9fcb) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "b95-03.bin", 0x00000, 0x80000, CRC(543aa0d1) SHA1(38282ae36a94cc3a354d343cf7d5262e0e309d1f) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b95-08.bin",  0x00000, 0x04000, CRC(b5aa49e1) SHA1(83b0a3434e0d0b9aa581c1acdd0c70308362b923) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b95-04.bin",  0x00000, 0x80000, CRC(ac4c1716) SHA1(06a9def7fa3bd739438f4a1d7b55f70eb904bf54) )
 
 	/* no Delta-T samples */
@@ -3834,22 +3834,22 @@ ROM_START( dondokodu )
 	ROM_LOAD16_BYTE( "b95-12.bin",   0x00000, 0x20000, CRC(d0fce87a) SHA1(7b346d3b7cbaf0b5447d66a71e815202d796f140) )
 	ROM_LOAD16_BYTE( "b95-11-1.bin", 0x00001, 0x20000, CRC(dad40cd3) SHA1(6c07ed3dd609a8743f5851caa4d205bce8db595e) )
 	ROM_LOAD16_BYTE( "b95-10.bin",   0x40000, 0x20000, CRC(a46e1f0b) SHA1(4adfa7a788d31860e557c4059f77440fe12ac110) )
-	ROM_LOAD16_BYTE( "b95-13.bin",   0x40001, 0x20000, CRC(350d2c65) SHA1(60e8651256867648a24719e1bbd1367e89784e30) )	// needs name verfied
+	ROM_LOAD16_BYTE( "b95-13.bin",   0x40001, 0x20000, CRC(350d2c65) SHA1(60e8651256867648a24719e1bbd1367e89784e30) )   // needs name verfied
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "b95-02.bin", 0x00000, 0x80000, CRC(67b4e979) SHA1(e709cc24e001bccde1178f7e645fc7aec442540c) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "b95-01.bin", 0x00000, 0x80000, CRC(51c176ce) SHA1(2866e8bd57b301a0d4690f194be95784c53f9fcb) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "b95-03.bin", 0x00000, 0x80000, CRC(543aa0d1) SHA1(38282ae36a94cc3a354d343cf7d5262e0e309d1f) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b95-08.bin",  0x00000, 0x04000, CRC(b5aa49e1) SHA1(83b0a3434e0d0b9aa581c1acdd0c70308362b923) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b95-04.bin",  0x00000, 0x80000, CRC(ac4c1716) SHA1(06a9def7fa3bd739438f4a1d7b55f70eb904bf54) )
 
 	/* no Delta-T samples */
@@ -3862,20 +3862,20 @@ ROM_START( dondokodj )
 	ROM_LOAD16_BYTE( "b95-10.bin",   0x40000, 0x20000, CRC(a46e1f0b) SHA1(4adfa7a788d31860e557c4059f77440fe12ac110) )
 	ROM_LOAD16_BYTE( "b95-09.bin",   0x40001, 0x20000, CRC(d8c86d39) SHA1(43a6a9d545c953e72b6a10bc9d7b2aa2f0ab4764) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "b95-02.bin", 0x00000, 0x80000, CRC(67b4e979) SHA1(e709cc24e001bccde1178f7e645fc7aec442540c) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "b95-01.bin", 0x00000, 0x80000, CRC(51c176ce) SHA1(2866e8bd57b301a0d4690f194be95784c53f9fcb) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "b95-03.bin", 0x00000, 0x80000, CRC(543aa0d1) SHA1(38282ae36a94cc3a354d343cf7d5262e0e309d1f) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b95-08.bin",  0x00000, 0x04000, CRC(b5aa49e1) SHA1(83b0a3434e0d0b9aa581c1acdd0c70308362b923) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b95-04.bin",  0x00000, 0x80000, CRC(ac4c1716) SHA1(06a9def7fa3bd739438f4a1d7b55f70eb904bf54) )
 
 	/* no Delta-T samples */
@@ -3888,21 +3888,21 @@ ROM_START( megablst )
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )
 	ROM_LOAD16_BYTE( "c11-11.38",  0x40001, 0x20000, CRC(263ecbf9) SHA1(b49c59058d6d11ea0d9f9b041789e381e5742905) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c11-03.32", 0x00000, 0x80000, CRC(46718c7a) SHA1(c10308a282bf0c618108e4afc7ce6f0f6cb8c6c0) )
 	ROM_LOAD16_BYTE( "c11-04.31", 0x00001, 0x80000, CRC(663f33cc) SHA1(5d3d3e77b7a84f6a3d4e744eef9b63bef91180e8) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c11-12.3", 0x00000, 0x04000, CRC(b11094f1) SHA1(a01e9f7d1f616bb379eaa85ad81b94173b067782) )
-	ROM_CONTINUE(       0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(       0x10000, 0x0c000 )  /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3921,74 +3921,74 @@ ROM_START( megablstu )
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )
 	ROM_LOAD16_BYTE( "c11-10.38",  0x40001, 0x20000, CRC(bf379a43) SHA1(2a0294e55c2ce514caa2885b728e6387311ed482) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c11-03.32", 0x00000, 0x80000, CRC(46718c7a) SHA1(c10308a282bf0c618108e4afc7ce6f0f6cb8c6c0) )
 	ROM_LOAD16_BYTE( "c11-04.31", 0x00001, 0x80000, CRC(663f33cc) SHA1(5d3d3e77b7a84f6a3d4e744eef9b63bef91180e8) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c11-12.3", 0x00000, 0x04000, CRC(b11094f1) SHA1(a01e9f7d1f616bb379eaa85ad81b94173b067782) )
-	ROM_CONTINUE(       0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(       0x10000, 0x0c000 )  /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 ROM_END
 
 ROM_START( megablstj )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "c11-07.55",  0x00000, 0x20000, CRC(11d228b6) SHA1(5f658a4a0ece3ad4e02ccad6e2852e16dd338dfd) )	// c11-07.17
-	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) )	// c11-08.19
-	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )	// c11-06.16
-	ROM_LOAD16_BYTE( "c11-09.38",  0x40001, 0x20000, CRC(c830aad5) SHA1(967ad3e052572300f5f49375e5f8348f2d595680) )	// c11-09.18
+	ROM_LOAD16_BYTE( "c11-07.55",  0x00000, 0x20000, CRC(11d228b6) SHA1(5f658a4a0ece3ad4e02ccad6e2852e16dd338dfd) ) // c11-07.17
+	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) ) // c11-08.19
+	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) ) // c11-06.16
+	ROM_LOAD16_BYTE( "c11-09.38",  0x40001, 0x20000, CRC(c830aad5) SHA1(967ad3e052572300f5f49375e5f8348f2d595680) ) // c11-09.18
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c11-03.32", 0x00000, 0x80000, CRC(46718c7a) SHA1(c10308a282bf0c618108e4afc7ce6f0f6cb8c6c0) )
 	ROM_LOAD16_BYTE( "c11-04.31", 0x00001, 0x80000, CRC(663f33cc) SHA1(5d3d3e77b7a84f6a3d4e744eef9b63bef91180e8) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c11-12.3", 0x00000, 0x04000, CRC(b11094f1) SHA1(a01e9f7d1f616bb379eaa85ad81b94173b067782) )
-	ROM_CONTINUE(       0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(       0x10000, 0x0c000 )  /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 ROM_END
 
-ROM_START( thundfox )		/* Thunder Fox */
+ROM_START( thundfox )       /* Thunder Fox */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c28-13-1.51",  0x00000, 0x20000, CRC(acb07013) SHA1(5043d1859ae908c00f0c00c7b8e377362d908423) )
 	ROM_LOAD16_BYTE( "c28-16-1.40",  0x00001, 0x20000, CRC(1e43d55b) SHA1(e5a389926ee95f19fc9f5d5bde97436d6f52124a) )
 	ROM_LOAD16_BYTE( "c28-08.50",    0x40000, 0x20000, CRC(38e038f1) SHA1(4b8ed31e35927671ce313f4575e622ecab2c27cb) )
 	ROM_LOAD16_BYTE( "c28-07.39",    0x40001, 0x20000, CRC(24419abb) SHA1(7d3e70213ae04dd921fc1bce8abb385747c90a38) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
-	ROM_LOAD( "c28-02.61", 0x000000, 0x80000, CRC(6230a09d) SHA1(780aff5d4511c5e08cbf78784b163d60358f9283) )	/* TC0100SCN #1 */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "c28-02.61", 0x000000, 0x80000, CRC(6230a09d) SHA1(780aff5d4511c5e08cbf78784b163d60358f9283) )    /* TC0100SCN #1 */
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c28-03.29", 0x00000, 0x80000, CRC(51bdc7af) SHA1(e36a063932fa5bd6609930c3708fee1e6feb5389) )
 	ROM_LOAD16_BYTE( "c28-04.28", 0x00001, 0x80000, CRC(ba7ed535) SHA1(be7e010f6788d1b82cebc932c793a0a976647832) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* SCR */
-	ROM_LOAD( "c28-01.63", 0x000000, 0x80000, CRC(44552b25) SHA1(850c085e3dacd4867f6bcdfab641eb07934e620f) )	/* TC0100SCN #2 */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* SCR */
+	ROM_LOAD( "c28-01.63", 0x000000, 0x80000, CRC(44552b25) SHA1(850c085e3dacd4867f6bcdfab641eb07934e620f) )    /* TC0100SCN #2 */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c28-14.3",  0x00000, 0x04000, CRC(45ef3616) SHA1(97bf1de7fd32a378839df1845f7522dae776d997) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -4000,61 +4000,61 @@ ROM_START( thundfox )		/* Thunder Fox */
 	ROM_LOAD( "pal16l8b-c28-11.ic35",  0x0a00, 0x0104, CRC(33414fe8) SHA1(7f497189fd48c6201d1048419eb67153c6cf730c) )  // MDEC 2
 ROM_END
 
-ROM_START( thundfoxu )		/* Thunder Fox */
+ROM_START( thundfoxu )      /* Thunder Fox */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c28-13-1.51",  0x00000, 0x20000, CRC(acb07013) SHA1(5043d1859ae908c00f0c00c7b8e377362d908423) )
 	ROM_LOAD16_BYTE( "c28-15-1.40",  0x00001, 0x20000, CRC(874a84e1) SHA1(f2688030faf526bc64bbb06225d3938f423f0f8b) )
 	ROM_LOAD16_BYTE( "c28-08.50",    0x40000, 0x20000, CRC(38e038f1) SHA1(4b8ed31e35927671ce313f4575e622ecab2c27cb) )
 	ROM_LOAD16_BYTE( "c28-07.39",    0x40001, 0x20000, CRC(24419abb) SHA1(7d3e70213ae04dd921fc1bce8abb385747c90a38) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
-	ROM_LOAD( "c28-02.61", 0x000000, 0x80000, CRC(6230a09d) SHA1(780aff5d4511c5e08cbf78784b163d60358f9283) )	/* TC0100SCN #1 */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "c28-02.61", 0x000000, 0x80000, CRC(6230a09d) SHA1(780aff5d4511c5e08cbf78784b163d60358f9283) )    /* TC0100SCN #1 */
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c28-03.29", 0x00000, 0x80000, CRC(51bdc7af) SHA1(e36a063932fa5bd6609930c3708fee1e6feb5389) )
 	ROM_LOAD16_BYTE( "c28-04.28", 0x00001, 0x80000, CRC(ba7ed535) SHA1(be7e010f6788d1b82cebc932c793a0a976647832) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* SCR */
-	ROM_LOAD( "c28-01.63", 0x000000, 0x80000, CRC(44552b25) SHA1(850c085e3dacd4867f6bcdfab641eb07934e620f) )	/* TC0100SCN #2 */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* SCR */
+	ROM_LOAD( "c28-01.63", 0x000000, 0x80000, CRC(44552b25) SHA1(850c085e3dacd4867f6bcdfab641eb07934e620f) )    /* TC0100SCN #2 */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c28-14.3",  0x00000, 0x04000, CRC(45ef3616) SHA1(97bf1de7fd32a378839df1845f7522dae776d997) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 
 // Pals: c28-09.25  c28-10.26  c28-11.35  b89-01.19  b89-03.37  b89-04.33
 ROM_END
 
-ROM_START( thundfoxj )		/* Thunder Fox */
+ROM_START( thundfoxj )      /* Thunder Fox */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c28-13-1.51",  0x00000, 0x20000, CRC(acb07013) SHA1(5043d1859ae908c00f0c00c7b8e377362d908423) )
 	ROM_LOAD16_BYTE( "c28-12-1.40",  0x00001, 0x20000, CRC(f04db477) SHA1(da66895b8cc79f1776f30d9c204c6907cab935db) )
 	ROM_LOAD16_BYTE( "c28-08.50",    0x40000, 0x20000, CRC(38e038f1) SHA1(4b8ed31e35927671ce313f4575e622ecab2c27cb) )
 	ROM_LOAD16_BYTE( "c28-07.39",    0x40001, 0x20000, CRC(24419abb) SHA1(7d3e70213ae04dd921fc1bce8abb385747c90a38) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
-	ROM_LOAD( "c28-02.61", 0x000000, 0x80000, CRC(6230a09d) SHA1(780aff5d4511c5e08cbf78784b163d60358f9283) )	/* TC0100SCN #1 */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "c28-02.61", 0x000000, 0x80000, CRC(6230a09d) SHA1(780aff5d4511c5e08cbf78784b163d60358f9283) )    /* TC0100SCN #1 */
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c28-03.29", 0x00000, 0x80000, CRC(51bdc7af) SHA1(e36a063932fa5bd6609930c3708fee1e6feb5389) )
 	ROM_LOAD16_BYTE( "c28-04.28", 0x00001, 0x80000, CRC(ba7ed535) SHA1(be7e010f6788d1b82cebc932c793a0a976647832) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* SCR */
-	ROM_LOAD( "c28-01.63", 0x000000, 0x80000, CRC(44552b25) SHA1(850c085e3dacd4867f6bcdfab641eb07934e620f) )	/* TC0100SCN #2 */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* SCR */
+	ROM_LOAD( "c28-01.63", 0x000000, 0x80000, CRC(44552b25) SHA1(850c085e3dacd4867f6bcdfab641eb07934e620f) )    /* TC0100SCN #2 */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c28-14.3",  0x00000, 0x04000, CRC(45ef3616) SHA1(97bf1de7fd32a378839df1845f7522dae776d997) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 ROM_END
 
@@ -4066,10 +4066,10 @@ ROM_START( cameltry )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
 	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
@@ -4079,7 +4079,7 @@ ROM_START( cameltry )
 	ROM_LOAD( "c38-08.bin", 0x00000, 0x04000, CRC(7ff78873) SHA1(6574f1c707b8911fa957dd057e1cddc7a1cea99b) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c38-03.bin", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
 	/* no Delta-T samples */
 ROM_END
@@ -4092,10 +4092,10 @@ ROM_START( cameltryj )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
 	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
@@ -4105,7 +4105,7 @@ ROM_START( cameltryj )
 	ROM_LOAD( "c38-08.bin", 0x00000, 0x04000, CRC(7ff78873) SHA1(6574f1c707b8911fa957dd057e1cddc7a1cea99b) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c38-03.bin", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
 
 	/* no Delta-T samples */
@@ -4119,10 +4119,10 @@ ROM_START( cameltrya )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
 	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
@@ -4131,7 +4131,7 @@ ROM_START( cameltrya )
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu (revised prog!?) */
 	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* M6295 samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
 ROM_END
 
@@ -4143,10 +4143,10 @@ ROM_START( cameltryau )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
 	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
@@ -4155,11 +4155,11 @@ ROM_START( cameltryau )
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu (revised prog!?) */
 	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* M6295 samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
 ROM_END
 
-ROM_START( qtorimon )	/* Quiz Torimonochou */
+ROM_START( qtorimon )   /* Quiz Torimonochou */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c41-04.bin",  0x00000, 0x20000, CRC(0fbf5223) SHA1(2aa8b3dd20ae922a3ff880db7b46e2bbb708698d) )
 	ROM_LOAD16_BYTE( "c41-05.bin",  0x00001, 0x20000, CRC(174bd5db) SHA1(f7a4b2ac91b3bcd886e2a1e1d0415a95f14c9de7) )
@@ -4169,7 +4169,7 @@ ROM_START( qtorimon )	/* Quiz Torimonochou */
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x040000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x040000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c41-02.bin",  0x00000, 0x20000, CRC(05dcd36d) SHA1(f32c5b40e0adad7991bac29ecffcd5dff330e118) )
 	ROM_LOAD16_BYTE( "c41-01.bin",  0x00001, 0x20000, CRC(39ff043c) SHA1(a4b0c6763c43a7ad16e98a938ffbb8aef4882eac) )
 
@@ -4177,7 +4177,7 @@ ROM_START( qtorimon )	/* Quiz Torimonochou */
 	ROM_LOAD( "c41-06.bin",    0x00000, 0x04000, CRC(753a98d8) SHA1(a832a4789194a67a2201da4e4484ab08210e5ccc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c41-03.bin",  0x000000, 0x020000, CRC(b2c18e89) SHA1(32eca1721cd8f47e9a6dcb553208ddd0daa67f83) )
 
 	/* no Delta-T samples */
@@ -4190,18 +4190,18 @@ ROM_START( liquidk )
 	ROM_LOAD16_BYTE( "c49-10.ic45",  0x40000, 0x20000, CRC(50bef2e0) SHA1(54afd46dde81ac0fc272417c53aba1e9e8c90606) )
 	ROM_LOAD16_BYTE( "c49-12.ic46",  0x40001, 0x20000, CRC(cb16bad5) SHA1(900c28761200f261cb217f09f492895753ef16f7) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c49-03.ic76",  0x00000, 0x80000, CRC(c3364f9b) SHA1(3512a8c352df8b8f19590c859afb8fdec758eb91) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c49-01.ic54", 0x00000, 0x80000, CRC(67cc3163) SHA1(f898d52c136f07497ec6be214f016cbadc700055) )
 	ROM_LOAD( "c49-02.ic53", 0x80000, 0x80000, CRC(d2400710) SHA1(082aa0336dbc066d8bb0dd6eb362340f49e87b67) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c49-08.ic32", 0x00000, 0x04000, CRC(413c310c) SHA1(cecb1c0c9fe3c8b744f95ce29009650a289107ab) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c49-04.ic33",  0x00000, 0x80000, CRC(474d45a4) SHA1(20cb818d753a185973098007e645f1aa75c5528d) )
 
 	/* no Delta-T samples */
@@ -4214,18 +4214,18 @@ ROM_START( liquidku )
 	ROM_LOAD16_BYTE( "c49-10.ic45",  0x40000, 0x20000, CRC(50bef2e0) SHA1(54afd46dde81ac0fc272417c53aba1e9e8c90606) )
 	ROM_LOAD16_BYTE( "c49-14.ic46",  0x40001, 0x20000, CRC(bc118a43) SHA1(eb306a753ab43e67eacb9d6eff1c14ec78de965f) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c49-03.ic76",  0x00000, 0x80000, CRC(c3364f9b) SHA1(3512a8c352df8b8f19590c859afb8fdec758eb91) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c49-01.ic54", 0x00000, 0x80000, CRC(67cc3163) SHA1(f898d52c136f07497ec6be214f016cbadc700055) )
 	ROM_LOAD( "c49-02.ic53", 0x80000, 0x80000, CRC(d2400710) SHA1(082aa0336dbc066d8bb0dd6eb362340f49e87b67) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c49-08.ic32", 0x00000, 0x04000, CRC(413c310c) SHA1(cecb1c0c9fe3c8b744f95ce29009650a289107ab) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c49-04.ic33",  0x00000, 0x80000, CRC(474d45a4) SHA1(20cb818d753a185973098007e645f1aa75c5528d) )
 
 	/* no Delta-T samples */
@@ -4238,24 +4238,24 @@ ROM_START( mizubaku )
 	ROM_LOAD16_BYTE( "c49-10.ic45",  0x40000, 0x20000, CRC(50bef2e0) SHA1(54afd46dde81ac0fc272417c53aba1e9e8c90606) )
 	ROM_LOAD16_BYTE( "c49-13.ic46",  0x40001, 0x20000, CRC(2518dbf9) SHA1(c5975d3bfbfbb34b37b5da1d1cd2adf3491f9196) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c49-03.ic76",  0x00000, 0x80000, CRC(c3364f9b) SHA1(3512a8c352df8b8f19590c859afb8fdec758eb91) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c49-01.ic54", 0x00000, 0x80000, CRC(67cc3163) SHA1(f898d52c136f07497ec6be214f016cbadc700055) )
 	ROM_LOAD( "c49-02.ic53", 0x80000, 0x80000, CRC(d2400710) SHA1(082aa0336dbc066d8bb0dd6eb362340f49e87b67) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c49-08.ic32", 0x00000, 0x04000, CRC(413c310c) SHA1(cecb1c0c9fe3c8b744f95ce29009650a289107ab) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c49-04.ic33",  0x00000, 0x80000, CRC(474d45a4) SHA1(20cb818d753a185973098007e645f1aa75c5528d) )
 
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( quizhq )	/* Quiz HQ */
+ROM_START( quizhq ) /* Quiz HQ */
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c53-05.bin",  0x00000, 0x20000, CRC(c798fc20) SHA1(4467dde3620102f87cffb2f81f71d856c0df12f8) )
 	ROM_LOAD16_BYTE( "c53-01.bin",  0x00001, 0x20000, CRC(bf44c93e) SHA1(6fd871f50da4a668767b3096660689905663f697) )
@@ -4265,17 +4265,17 @@ ROM_START( quizhq )	/* Quiz HQ */
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty */
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c53-03.bin",  0x00000, 0x20000, CRC(47596e70) SHA1(3a4612d9dd2e18a4f7f4c4ed38877071afc9c279) )
 	ROM_LOAD16_BYTE( "c53-07.bin",  0x00001, 0x20000, CRC(4f9fa82f) SHA1(ccd1ac17d38a51492b3716bad83e67b282da8bf9) )
 	ROM_LOAD16_BYTE( "c53-02.bin",  0x40000, 0x20000, CRC(d704c6f4) SHA1(9b1c47ec3abaff53d641488dece8c97438b2e809) )
 	ROM_LOAD16_BYTE( "c53-06.bin",  0x40001, 0x20000, CRC(f77f63fc) SHA1(28a509786817e88c0a5821dd68791ebd30d994c2) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c53-08.bin",    0x00000, 0x04000, CRC(25187e81) SHA1(c549fbfff6963be93aaf349b240f15b1d578d1f1) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c53-04.bin",  0x000000, 0x020000, CRC(99890ad4) SHA1(c9be9d21dc72059c39de81e1b73849cc77d6b95d) )
 
 	/* no Delta-T samples */
@@ -4289,14 +4289,14 @@ ROM_START( ssi )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c64-01.1",     0x000000, 0x100000, CRC(a1b4f486) SHA1(bdd6bf144e50fe7b1d4cf4504471a689669415a4) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c64-09.13",    0x00000, 0x04000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	/* no Delta-T samples */
@@ -4310,14 +4310,14 @@ ROM_START( ssia )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c64-01.1",     0x000000, 0x100000, CRC(a1b4f486) SHA1(bdd6bf144e50fe7b1d4cf4504471a689669415a4) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c64-09.13",    0x00000, 0x04000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	/* no Delta-T samples */
@@ -4333,14 +4333,14 @@ ROM_START( majest12 )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c64-01.1",     0x000000, 0x100000, CRC(a1b4f486) SHA1(bdd6bf144e50fe7b1d4cf4504471a689669415a4) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c64-09.13",    0x00000, 0x04000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	/* no Delta-T samples */
@@ -4421,17 +4421,17 @@ ROM_START( gunfront )
 	ROM_LOAD16_BYTE( "c71-16.ic38",  0x80000, 0x20000, CRC(1bbcc2d4) SHA1(fe664f8d2b6d902f034cf51f42378cc68c970b53) )
 	ROM_LOAD16_BYTE( "c71-15.ic37",  0x80001, 0x20000, CRC(df3e00bb) SHA1(9fe2ece7289945692099eba92f02e5a97a4d148c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c71-02.ic59", 0x000000, 0x100000, CRC(2a600c92) SHA1(38a08ade2c6fa005a402d04fabf87ff10236d4c6) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c71-03.ic19", 0x000000, 0x100000, CRC(9133c605) SHA1(fa10c60cd4ca439a273c644bbf3810824a0ca523) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c71-12.ic49", 0x00000, 0x04000, CRC(0038c7f8) SHA1(405def36e67949219b6f9394333278ec60ad5783) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c71-01.ic29", 0x000000, 0x100000, CRC(0e73105a) SHA1(c5c9743f68a43273e16f5e5179557f2392505a1e) )
 
 	/* no Delta-T samples */
@@ -4448,17 +4448,17 @@ ROM_START( gunfrontj )
 	ROM_LOAD16_BYTE( "c71-16.ic38",  0x80000, 0x20000, CRC(1bbcc2d4) SHA1(fe664f8d2b6d902f034cf51f42378cc68c970b53) )
 	ROM_LOAD16_BYTE( "c71-15.ic37",  0x80001, 0x20000, CRC(df3e00bb) SHA1(9fe2ece7289945692099eba92f02e5a97a4d148c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c71-02.ic59", 0x000000, 0x100000, CRC(2a600c92) SHA1(38a08ade2c6fa005a402d04fabf87ff10236d4c6) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c71-03.ic19", 0x000000, 0x100000, CRC(9133c605) SHA1(fa10c60cd4ca439a273c644bbf3810824a0ca523) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c71-12.ic49", 0x00000, 0x04000, CRC(0038c7f8) SHA1(405def36e67949219b6f9394333278ec60ad5783) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c71-01.ic29", 0x000000, 0x100000, CRC(0e73105a) SHA1(c5c9743f68a43273e16f5e5179557f2392505a1e) )
 
 	/* no Delta-T samples */
@@ -4471,10 +4471,10 @@ ROM_START( growl )
 	ROM_LOAD16_BYTE( "c74-11.ic58",  0x80000, 0x40000, CRC(ee3bd6d5) SHA1(71f961b4e3b3156bc52e489eb0a408a1fe537a61) )
 	ROM_LOAD16_BYTE( "c74-14.ic60",  0x80001, 0x40000, CRC(b6c24ec7) SHA1(da8ac05d12c12a58bf5185d723358a0d1a0fe71e) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c74-01.ic34",   0x000000, 0x100000, CRC(3434ce80) SHA1(ef363107fba6f5088ef9c85dd692b5c98be67f75) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c74-03.ic12",   0x000000, 0x100000, CRC(1a0d8951) SHA1(62af40f7ca651273d93fed5d55af24cf91331ec7) )
 	ROM_LOAD( "c74-02.ic11",   0x100000, 0x100000, CRC(15a21506) SHA1(3d8f066e1226e030ce549959d5a8dd4506a0e0a2) )
 
@@ -4482,10 +4482,10 @@ ROM_START( growl )
 	ROM_LOAD( "c74-12.ic62",   0x00000, 0x04000, CRC(bb6ed668) SHA1(e8c3a15ccbc788ac57d42bd2cabcdb2db6305489) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 
 //Pals c74-06.48  c74-07.47
@@ -4498,10 +4498,10 @@ ROM_START( growlu )
 	ROM_LOAD16_BYTE( "c74-11.ic58",  0x80000, 0x40000, CRC(ee3bd6d5) SHA1(71f961b4e3b3156bc52e489eb0a408a1fe537a61) )
 	ROM_LOAD16_BYTE( "c74-13.ic60",  0x80001, 0x40000, CRC(c1c57e51) SHA1(f6ffc1acf3e5ff75e64facd7e28fd675eb065c7b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c74-01.ic34",   0x000000, 0x100000, CRC(3434ce80) SHA1(ef363107fba6f5088ef9c85dd692b5c98be67f75) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c74-03.ic12",   0x000000, 0x100000, CRC(1a0d8951) SHA1(62af40f7ca651273d93fed5d55af24cf91331ec7) )
 	ROM_LOAD( "c74-02.ic11",   0x100000, 0x100000, CRC(15a21506) SHA1(3d8f066e1226e030ce549959d5a8dd4506a0e0a2) )
 
@@ -4509,10 +4509,10 @@ ROM_START( growlu )
 	ROM_LOAD( "c74-12.ic62",   0x00000, 0x04000, CRC(bb6ed668) SHA1(e8c3a15ccbc788ac57d42bd2cabcdb2db6305489) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
@@ -4523,10 +4523,10 @@ ROM_START( runark )
 	ROM_LOAD16_BYTE( "c74-11.ic58",  0x80000, 0x40000, CRC(ee3bd6d5) SHA1(71f961b4e3b3156bc52e489eb0a408a1fe537a61) )
 	ROM_LOAD16_BYTE( "c74-09.ic14",  0x80001, 0x40000, CRC(58cc2feb) SHA1(7dc314a56345be116731dbb65dfa9e508c156513) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c74-01.ic34",   0x000000, 0x100000, CRC(3434ce80) SHA1(ef363107fba6f5088ef9c85dd692b5c98be67f75) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c74-03.ic12",   0x000000, 0x100000, CRC(1a0d8951) SHA1(62af40f7ca651273d93fed5d55af24cf91331ec7) )
 	ROM_LOAD( "c74-02.ic11",   0x100000, 0x100000, CRC(15a21506) SHA1(3d8f066e1226e030ce549959d5a8dd4506a0e0a2) )
 
@@ -4534,54 +4534,54 @@ ROM_START( runark )
 	ROM_LOAD( "c74-12.ic62",   0x00000, 0x04000, CRC(bb6ed668) SHA1(e8c3a15ccbc788ac57d42bd2cabcdb2db6305489) )
 	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
-ROM_START( mjnquest )	/* Mahjong Quest */
+ROM_START( mjnquest )   /* Mahjong Quest */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c77-09",  0x000000, 0x020000, CRC(0a005d01) SHA1(caf44fcdeca9f7f1bfdb0c29503bb82ce17f945c) )
 	ROM_LOAD16_BYTE( "c77-08",  0x000001, 0x020000, CRC(4244f775) SHA1(801045d7433684195876e172676b2345827de7cc) )
-	ROM_LOAD16_WORD_SWAP( "c77-04",  0x080000, 0x080000, CRC(c2e7e038) SHA1(6cf23bab587b34cbc1f78b8b82cbab5634b074dc) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "c77-04",  0x080000, 0x080000, CRC(c2e7e038) SHA1(6cf23bab587b34cbc1f78b8b82cbab5634b074dc) ) /* data rom */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c77-01", 0x000000, 0x100000, CRC(5ba51205) SHA1(da0b6f56e7d2437ad75ada1ba07e35843d2b4704) )
 	ROM_LOAD( "c77-02", 0x100000, 0x100000, CRC(6a6f3040) SHA1(61c3ce51fa935f52572affa899bb81b3a616df3a) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c77-05", 0x00000, 0x80000, CRC(c5a54678) SHA1(d0954acbdfdf9a5f14f554635c015eee23d52e0c) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c77-10",    0x00000, 0x04000, CRC(f16b2c1e) SHA1(f6f13429a0b4e0e4c64991f1acc4ecf85dc64364) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c77-03",  0x000000, 0x080000, CRC(312f17b1) SHA1(3b45eeb6c6721c532451cb113e6a38da4d8a8cbf) )
 
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( mjnquestb )	/* Mahjong Quest (No Nudity) */
+ROM_START( mjnquestb )  /* Mahjong Quest (No Nudity) */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c77-09a", 0x000000, 0x020000, CRC(fc17f1c2) SHA1(438b0a780560940b2d3dab42b34dc2bc94a15f80) )
 	ROM_LOAD16_BYTE( "c77-08",  0x000001, 0x020000, CRC(4244f775) SHA1(801045d7433684195876e172676b2345827de7cc) )
-	ROM_LOAD16_WORD_SWAP( "c77-04",  0x080000, 0x080000, CRC(c2e7e038) SHA1(6cf23bab587b34cbc1f78b8b82cbab5634b074dc) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "c77-04",  0x080000, 0x080000, CRC(c2e7e038) SHA1(6cf23bab587b34cbc1f78b8b82cbab5634b074dc) ) /* data rom */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c77-01", 0x000000, 0x100000, CRC(5ba51205) SHA1(da0b6f56e7d2437ad75ada1ba07e35843d2b4704) )
 	ROM_LOAD( "c77-02", 0x100000, 0x100000, CRC(6a6f3040) SHA1(61c3ce51fa935f52572affa899bb81b3a616df3a) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c77-05", 0x00000, 0x80000, CRC(c5a54678) SHA1(d0954acbdfdf9a5f14f554635c015eee23d52e0c) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c77-10",    0x00000, 0x04000, CRC(f16b2c1e) SHA1(f6f13429a0b4e0e4c64991f1acc4ecf85dc64364) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c77-03",  0x000000, 0x080000, CRC(312f17b1) SHA1(3b45eeb6c6721c532451cb113e6a38da4d8a8cbf) )
 
 	/* no Delta-T samples */
@@ -4594,17 +4594,17 @@ ROM_START( footchmp )
 	ROM_LOAD16_BYTE( "c80-12.7", 0x40000, 0x20000, CRC(80d46fef) SHA1(cc81c8ba19321e8bae9054021bfb61cb11c2aba5) )
 	ROM_LOAD16_BYTE( "c80-14.5", 0x40001, 0x20000, CRC(40ac4828) SHA1(9a2112b0ccd573a3e94d9817b78bb02909b972e1) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "c80-04.1", 0x00000, 0x80000, CRC(9a17fe8c) SHA1(d2ea72743151f0f7bf78f33dba526214afb07389) )
 	ROM_LOAD16_BYTE( "c80-05.2", 0x00001, 0x80000, CRC(acde7071) SHA1(23637238d122b13edb6025418bf482cc210ef6a9) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c80-01.9",  0x000000, 0x100000, CRC(f43782e6) SHA1(53ff6cc433673f307a91e8db74428aa6172ffad4) )
 	ROM_LOAD( "c80-02.10", 0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* 64k for Z80 code */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* 64k for Z80 code */
 	ROM_LOAD( "c80-15.70", 0x00000, 0x04000, CRC(05aa7fd7) SHA1(7eb10964ea9f43abcda8444f13733a0753a04580) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )     /* YM2610 samples */
 	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
@@ -4621,19 +4621,19 @@ ROM_START( hthero )
 	ROM_LOAD16_BYTE( "c80-12.7", 0x40000, 0x20000, CRC(80d46fef) SHA1(cc81c8ba19321e8bae9054021bfb61cb11c2aba5) )
 	ROM_LOAD16_BYTE( "c80-18.5", 0x40001, 0x20000, CRC(aea22904) SHA1(907889f141fced8cada793f02244e80cf0f89c81) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "c80-04.1", 0x00000, 0x80000, CRC(9a17fe8c) SHA1(d2ea72743151f0f7bf78f33dba526214afb07389) )
 	ROM_LOAD16_BYTE( "c80-05.2", 0x00001, 0x80000, CRC(acde7071) SHA1(23637238d122b13edb6025418bf482cc210ef6a9) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c80-01.9",  0x000000, 0x100000, CRC(f43782e6) SHA1(53ff6cc433673f307a91e8db74428aa6172ffad4) )
 	ROM_LOAD( "c80-02.10", 0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c80-15.70", 0x00000, 0x04000, CRC(05aa7fd7) SHA1(7eb10964ea9f43abcda8444f13733a0753a04580) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(          0x10000, 0x0c000 )   /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
 
 	/* no Delta-T samples */
@@ -4646,20 +4646,20 @@ ROM_START( euroch92 )
 	ROM_LOAD16_BYTE( "ec92_26.rom", 0x40000, 0x20000, CRC(b986ccb2) SHA1(862a5da1bd4e8743d55f2e5bab2ade6c3dec682c) )
 	ROM_LOAD16_BYTE( "ec92_24.rom", 0x40001, 0x20000, CRC(b31d94ac) SHA1(8a3328b7e061b584992dd27b0dda9826b4b6ed91) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "ec92_21.rom", 0x00000, 0x80000, CRC(5759ed37) SHA1(2a661ea40735afbda3d0141ce3f706c64281097b) )
 	ROM_LOAD16_BYTE( "ec92_22.rom", 0x00001, 0x80000, CRC(d9a0d38e) SHA1(192f0303f4f64df46dc20701ed4362a4e14e40e7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "ec92_19.rom", 0x000000, 0x100000, CRC(219141a5) SHA1(b549e91049dcb796d4104b4426674dd87589efde) )
-	ROM_LOAD( "c80-02.10",   0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) )	// ec92_20.rom
+	ROM_LOAD( "c80-02.10",   0x100000, 0x100000, CRC(060a8b61) SHA1(b1888d8bce4c4624dc5bb64168c604ec64537c0e) ) // ec92_20.rom
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* 64k for Z80 code */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* 64k for Z80 code */
 	ROM_LOAD( "ec92_27.rom", 0x00000, 0x04000, CRC(2db48e65) SHA1(43a47ebc91c043a996e966cf808d71256e158494) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* YM2610 samples */
-	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )	// ec92_03.rom
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* YM2610 samples */
+	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )   // ec92_03.rom
 
 	/* no Delta-T samples */
 ROM_END
@@ -4671,20 +4671,20 @@ ROM_START( footchmpbl )
 
 	// there is twice as much data here as the original sets because the 2nd half of the roms contain flipped
 	// versions of the tiles!
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "bk4.rom9", 0x000000, 0x80000, CRC(264e6ec0) SHA1(1907dab063b16f5c9de753b2d9a916f1c7d32079) )
 	ROM_LOAD( "bk3.rom8", 0x080000, 0x80000, CRC(380b2565) SHA1(9d83d402a138786bad61d62722953dfdb98a80de) )
 	ROM_LOAD( "bk2.rom7", 0x100000, 0x80000, CRC(79ce5b01) SHA1(454a9b8ca5178418c7e0976efb78cb883c553476) )
 	ROM_LOAD( "bk1.rom6", 0x180000, 0x80000, CRC(6e4757c7) SHA1(a412bdb09440f80e0e323c297a79b143a9bdb7f2) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "ob17.rom1",  0x000000, 0x80000, CRC(a4891065) SHA1(69469e4c68ff72d3e50e3e74f5ca7b55e3a0bd6f) )
 	ROM_LOAD( "ob16.rom2",  0x080000, 0x80000, CRC(3b65028b) SHA1(b2bb123b067b40ddacd90f82e42dff775e7e66c7) )
 	ROM_LOAD( "ob15.rom3",  0x100000, 0x80000, CRC(dbd07328) SHA1(9d658f0a0ad119ae76a6c4749651440642ee671c) )
 	ROM_LOAD( "ob14.rom4",  0x180000, 0x80000, CRC(28fcaefa) SHA1(f92a19dc24d5faac57a5934e7001e5b0bf9d847c) )
 
 	// ?? more gfx? - should it ignore the uploaded text data and use these?
-	ROM_REGION( 0x40000, "gfx3", 0 )	/* SCR */
+	ROM_REGION( 0x40000, "gfx3", 0 )    /* SCR */
 	ROM_LOAD( "bk33.rom16", 0x000000, 0x10000, CRC(07a371fe) SHA1(27e7ba4ed7f0868206c9d7ca653322ca73929567) )
 	ROM_LOAD( "bk32.rom15", 0x010000, 0x10000, CRC(89020973) SHA1(30174e504734a851a016acf0746d726981edb8f1) )
 	ROM_LOAD( "bk31.rom14", 0x020000, 0x10000, CRC(02a0de4f) SHA1(7446d75608126e3d5693913e5dcb5636ae1e5500) )
@@ -4700,16 +4700,16 @@ ROM_START( footchmpbl )
 ROM_END
 
 
-ROM_START( koshien )	/* Ah Eikou no Koshien */
+ROM_START( koshien )    /* Ah Eikou no Koshien */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c81-11.bin", 0x000000, 0x020000, CRC(b44ea8c9) SHA1(f1d19f531b7a653f1c4244d612a339d95ce8cc7c) )
 	ROM_LOAD16_BYTE( "c81-10.bin", 0x000001, 0x020000, CRC(8f98c40a) SHA1(f9471306c47ced10a56c09794954e55fdb6f6b85) )
-	ROM_LOAD16_WORD_SWAP( "c81-04.bin", 0x080000, 0x080000, CRC(1592b460) SHA1(d42514b4d588d0376914832f0e07ce626d1cdee0) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "c81-04.bin", 0x080000, 0x080000, CRC(1592b460) SHA1(d42514b4d588d0376914832f0e07ce626d1cdee0) )  /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c81-03.bin", 0x000000, 0x100000, CRC(29bbf492) SHA1(bd370b1de256a432821b443a6653aab8507fb3a7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c81-01.bin", 0x000000, 0x100000, CRC(64b15d2a) SHA1(18b3b405f77ad80781e3fce4ef021ba49f707ed6) )
 	ROM_LOAD( "c81-02.bin", 0x100000, 0x100000, CRC(962461e8) SHA1(cb0313b00681c36110eed50eae41ad98eb22205d) )
 
@@ -4717,10 +4717,10 @@ ROM_START( koshien )	/* Ah Eikou no Koshien */
 	ROM_LOAD( "c81-12.bin", 0x00000, 0x04000, CRC(6e8625b6) SHA1(212d384aa6ed43f5389739863afecbf0ad68af14) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c81-05.bin",  0x00000, 0x80000, CRC(9c3d71be) SHA1(79f1bb40d8356d9fc93b569c20be15e7fbf34580) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c81-06.bin",  0x00000, 0x80000, CRC(927833b4) SHA1(c09240e4885d2eace1c64fa6425faeeea0296d98) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -4729,27 +4729,27 @@ ROM_START( koshien )	/* Ah Eikou no Koshien */
 	ROM_LOAD( "pal16l8b-c81-09.bin", 0x0400, 0x0104, CRC(e4c012a1) SHA1(56746ce42fd64bf04e17132811de291a1bfa5451) )
 ROM_END
 
-ROM_START( yuyugogo )	/* Yuuyu no QUIZ de GO!GO! */
+ROM_START( yuyugogo )   /* Yuuyu no QUIZ de GO!GO! */
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c83-10.3",  0x00000,  0x20000, CRC(4d185d03) SHA1(ab494c777a0acfe088d3db7c1a0488d40884ea0a) )
 	ROM_LOAD16_BYTE( "c83-09.2",  0x00001,  0x20000, CRC(f9892792) SHA1(310d02833c821a34baa0ce537019b8cade6402b7) )
 
 	ROM_REGION16_BE( 0x100000, "extra", 0 )
 	/* extra ROM mapped at d00000 */
-	ROM_LOAD16_WORD_SWAP( "c83-03.10", 0x000000, 0x100000, CRC(eed9acc2) SHA1(baa6a9aa5ed8fbbff7b289693407192b464cb7c7) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "c83-03.10", 0x000000, 0x100000, CRC(eed9acc2) SHA1(baa6a9aa5ed8fbbff7b289693407192b464cb7c7) )   /* data rom */
 
-	ROM_REGION( 0x020000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x020000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c83-05.21", 0x00000, 0x20000, CRC(eca57fb1) SHA1(c67b5e734f5fd8801a4376c0555ce4a891dcd6bc) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "c83-01.12",  0x000000, 0x100000, CRC(8bf0d416) SHA1(ec3d51422fcc8e3e822716d57adab56f639a2d02) )
 	ROM_LOAD16_BYTE( "c83-02.11",  0x000001, 0x100000, CRC(20bb1c15) SHA1(33370b665d681f765e363e5a8e79e62f59ad25f7) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c83-11.1"  , 0x00000, 0x04000, CRC(461e702a) SHA1(f1f4294a7e8acc50473df15a167ba84595c9eb15) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c83-04.5",  0x000000, 0x100000, CRC(2600093a) SHA1(824fde078e0ded58037bd06f888eac4e7487ac82) )
 
 	/* no Delta-T samples */
@@ -4763,10 +4763,10 @@ ROM_START( ninjak )
 	ROM_LOAD16_BYTE( "c85-06.ic47",   0x40001, 0x20000, CRC(d126ded1) SHA1(fc4b6504d0234e7e006a63e33fd061411f008c38) ) /* ROM 1LL */
 	/* IC45 (ROM 1HL) and IC46 (1HH) not populated */
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c85-03.ic65",    0x00000, 0x80000, CRC(4cc7b9df) SHA1(aaf0e587b86a7bf9fbfd4e19127a7295da8a3676) ) /* SCREEN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c85-01.ic19",    0x000000, 0x100000, CRC(a711977c) SHA1(b6b79ff6086a7b6e242fe26eec448f025ab431af) ) /* OBJ-0 */
 	ROM_LOAD( "c85-02.ic17",    0x100000, 0x100000, CRC(a6ad0f3d) SHA1(6d3a661807dd64f0b56ae6252a7e980fd678feef) ) /* OBJ-1 */
 
@@ -4774,10 +4774,10 @@ ROM_START( ninjak )
 	ROM_LOAD( "c85-14.ic54",     0x00000, 0x04000, CRC(f2a52a51) SHA1(951793c65a3436a7fb36f3058bc7a3b4265a90bb) ) /* SND */
 	ROM_CONTINUE(             0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4789,10 +4789,10 @@ ROM_START( ninjakj )
 	ROM_LOAD16_BYTE( "c85-06.ic47",   0x40001, 0x20000, CRC(d126ded1) SHA1(fc4b6504d0234e7e006a63e33fd061411f008c38) ) /* ROM 1LL */
 	/* IC45 (ROM 1HL) and IC46 (1HH) not populated */
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c85-03.ic65",    0x00000, 0x80000, CRC(4cc7b9df) SHA1(aaf0e587b86a7bf9fbfd4e19127a7295da8a3676) ) /* SCREEN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c85-01.ic19",    0x000000, 0x100000, CRC(a711977c) SHA1(b6b79ff6086a7b6e242fe26eec448f025ab431af) ) /* OBJ-0 */
 	ROM_LOAD( "c85-02.ic17",    0x100000, 0x100000, CRC(a6ad0f3d) SHA1(6d3a661807dd64f0b56ae6252a7e980fd678feef) ) /* OBJ-1 */
 
@@ -4800,10 +4800,10 @@ ROM_START( ninjakj )
 	ROM_LOAD( "c85-14.ic54",     0x00000, 0x04000, CRC(f2a52a51) SHA1(951793c65a3436a7fb36f3058bc7a3b4265a90bb) ) /* SND */
 	ROM_CONTINUE(             0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4815,10 +4815,10 @@ ROM_START( ninjaku )
 	ROM_LOAD16_BYTE( "c85-06.ic47",   0x40001, 0x20000, CRC(d126ded1) SHA1(fc4b6504d0234e7e006a63e33fd061411f008c38) ) /* ROM 1LL */
 	/* IC45 (ROM 1HL) and IC46 (1HH) not populated */
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c85-03.ic65",    0x00000, 0x80000, CRC(4cc7b9df) SHA1(aaf0e587b86a7bf9fbfd4e19127a7295da8a3676) ) /* SCREEN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c85-01.ic19",    0x000000, 0x100000, CRC(a711977c) SHA1(b6b79ff6086a7b6e242fe26eec448f025ab431af) ) /* OBJ-0 */
 	ROM_LOAD( "c85-02.ic17",    0x100000, 0x100000, CRC(a6ad0f3d) SHA1(6d3a661807dd64f0b56ae6252a7e980fd678feef) ) /* OBJ-1 */
 
@@ -4826,22 +4826,22 @@ ROM_START( ninjaku )
 	ROM_LOAD( "c85-14.ic54",     0x00000, 0x04000, CRC(f2a52a51) SHA1(951793c65a3436a7fb36f3058bc7a3b4265a90bb) ) /* SND */
 	ROM_CONTINUE(             0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
-ROM_START( solfigtr )	/* Solitary Fighter */
+ROM_START( solfigtr )   /* Solitary Fighter */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c91-05.59",  0x00000, 0x40000, CRC(c1260e7c) SHA1(406663b8f92380f37955061765d77a92dc51c17a) )
 	ROM_LOAD16_BYTE( "c91-09.61",  0x00001, 0x40000, CRC(d82b5266) SHA1(670dc91067dd856b5d36b71e5ddf67e82220d83b) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c91-03.34", 0x000000, 0x100000, CRC(8965da12) SHA1(b06f3fc91c9ce1e20cb4187505f3c7921c54cc12) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c91-01.12", 0x000000, 0x100000, CRC(0f3f4e00) SHA1(5912eddc066435b276d615842d123f58c4852b2b) )
 	ROM_LOAD( "c91-02.11", 0x100000, 0x100000, CRC(e14ab98e) SHA1(b2e559ec9ccf383e693b27436081c29d30f17835) )
 
@@ -4849,8 +4849,8 @@ ROM_START( solfigtr )	/* Solitary Fighter */
 	ROM_LOAD( "c91-07.62", 0x00000, 0x04000, CRC(e471a05a) SHA1(4d9c2b734aac27819673094dc1843e1ca5fe6994) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "c91-04.28", 0x00000, 0x80000, CRC(390b1065) SHA1(ee7ba77634854e4896528ff1bbc308de92a5815b) )	/* Channel A */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c91-04.28", 0x00000, 0x80000, CRC(390b1065) SHA1(ee7ba77634854e4896528ff1bbc308de92a5815b) ) /* Channel A */
 
 	/* no Delta-T samples */
 
@@ -4858,23 +4858,23 @@ ROM_START( solfigtr )	/* Solitary Fighter */
 	ROM_LOAD( "pal16l8b-c74-06.ic48", 0x0000, 0x0104, CRC(c868dc16) SHA1(b9d12f2016c6a3017b497aafc96a7dbab4a50c8b) )
 ROM_END
 
-ROM_START( qzquest )	/* Quiz Quest */
+ROM_START( qzquest )    /* Quiz Quest */
 	ROM_REGION( 0x180000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c92-06.8", 0x000000, 0x020000, CRC(424be722) SHA1(ec064028bd68e8e2ec37705cab1c79c963188944) )
 	ROM_LOAD16_BYTE( "c92-05.7", 0x000001, 0x020000, CRC(da470f93) SHA1(dc6d2142fc5662f4b3ffbe4cc9adb5b394d958ed) )
-	ROM_LOAD16_WORD_SWAP( "c92-03.6", 0x100000, 0x080000, CRC(1d697606) SHA1(0af7ac3c3229f139fab1569adaa893b43999bc89) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "c92-03.6", 0x100000, 0x080000, CRC(1d697606) SHA1(0af7ac3c3229f139fab1569adaa893b43999bc89) )    /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c92-02.10", 0x000000, 0x100000, CRC(2daccecf) SHA1(bd22f95210f2bb0b63d210a54e07535c3f0e1031) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c92-01.21", 0x000000, 0x100000, CRC(9976a285) SHA1(8575ee18a3a6d690c9aa09f0c540665a31f87216) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c92-07.5",  0x00000, 0x04000, CRC(3e313db9) SHA1(44f781c7d3df8eacd745dc0af180cec9e1164b89) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c92-04.9",  0x000000, 0x080000, CRC(e421bb43) SHA1(a89157e65b537b31f5837435dae848adde8a86d1) )
 
 	/* no Delta-T samples */
@@ -4887,21 +4887,21 @@ ROM_START( pulirula )
 	ROM_LOAD16_BYTE( "c98-06.rom", 0x80000, 0x20000, CRC(64a71b45) SHA1(40734c378f15cd47d4128f9713bf19b0d42c0517) )
 	ROM_LOAD16_BYTE( "c98-07.rom", 0x80001, 0x20000, CRC(90195bc0) SHA1(0f7e48ee8964dec1fbc6f8dab57f3ae67b2494d2) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c98-04.rom", 0x000000, 0x100000, CRC(0e1fe3b2) SHA1(37bf8e946ee4239de104a07ff87727cb6e2a3932) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c98-02.rom", 0x000000, 0x100000, CRC(4a2ad2b3) SHA1(3296cf2855203d06170c991d187c65ccc3751952) )
 	ROM_LOAD( "c98-03.rom", 0x100000, 0x100000, CRC(589a678f) SHA1(228b959046bec10b28599d83d9e58fd149273473) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "c98-05.rom", 0x000000, 0x080000, CRC(9ddd9c39) SHA1(4005a540c5cef6754284361da79a9e5e15612146) )
 
 	ROM_REGION( 0x2c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c98-14.rom", 0x00000, 0x04000, CRC(a858e17c) SHA1(4389f43035a94e776a25350a8989dcfdb3e4675a) )
 	ROM_CONTINUE(           0x10000, 0x1c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c98-01.rom", 0x000000, 0x100000, CRC(197f66f5) SHA1(cc5d104033f9ab7d614afd47eeb61a22ef5714ea) )
 
 	/* no Delta-T samples */
@@ -4914,21 +4914,21 @@ ROM_START( pulirulaj )
 	ROM_LOAD16_BYTE( "c98-06.rom", 0x80000, 0x20000, CRC(64a71b45) SHA1(40734c378f15cd47d4128f9713bf19b0d42c0517) )
 	ROM_LOAD16_BYTE( "c98-07.rom", 0x80001, 0x20000, CRC(90195bc0) SHA1(0f7e48ee8964dec1fbc6f8dab57f3ae67b2494d2) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c98-04.rom", 0x000000, 0x100000, CRC(0e1fe3b2) SHA1(37bf8e946ee4239de104a07ff87727cb6e2a3932) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "c98-02.rom", 0x000000, 0x100000, CRC(4a2ad2b3) SHA1(3296cf2855203d06170c991d187c65ccc3751952) )
 	ROM_LOAD( "c98-03.rom", 0x100000, 0x100000, CRC(589a678f) SHA1(228b959046bec10b28599d83d9e58fd149273473) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 )	/* pivot gfx */
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
 	ROM_LOAD( "c98-05.rom", 0x000000, 0x080000, CRC(9ddd9c39) SHA1(4005a540c5cef6754284361da79a9e5e15612146) )
 
 	ROM_REGION( 0x2c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c98-14.rom", 0x00000, 0x04000, CRC(a858e17c) SHA1(4389f43035a94e776a25350a8989dcfdb3e4675a) )
 	ROM_CONTINUE(           0x10000, 0x1c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c98-01.rom", 0x000000, 0x100000, CRC(197f66f5) SHA1(cc5d104033f9ab7d614afd47eeb61a22ef5714ea) )
 
 	/* no Delta-T samples */
@@ -4941,18 +4941,18 @@ ROM_START( metalb )
 	ROM_LOAD16_BYTE( "d12-07.9",   0x80000, 0x20000, CRC(e07f5136) SHA1(27df1a1f21c27feb91801e3cc304ee534969f792) )
 	ROM_LOAD16_BYTE( "d12-06.6",   0x80001, 0x20000, CRC(131df731) SHA1(537a9f404d797db051a5aaf0afa2cd1e9c0bdcfb) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "d12-03.14",  0x00000, 0x80000, CRC(46b498c0) SHA1(c2ec7ce9ac7874d1bc54ce4b5d428d73c5a16549) )
 	ROM_LOAD16_BYTE( "d12-04.13",  0x00001, 0x80000, CRC(ab66d141) SHA1(e7f82b297dd2ae0b5d29886e5393cece61b742bb) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "d12-01.20", 0x000000, 0x100000, CRC(b81523b9) SHA1(e688e88008db87fed0051fbcb28d3e3ae7e945a8) )
 
 	ROM_REGION( 0x2c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d12-13.5", 0x00000, 0x04000, CRC(bcca2649) SHA1(d932134416c951d849ae41598f75609d453ed520) )
 	ROM_CONTINUE(         0x10000, 0x1c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d12-02.10", 0x000000, 0x100000, CRC(79263e74) SHA1(f9ef222239855d593b5855dbf9ea0376ea349c4b) )
 
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
@@ -4966,18 +4966,18 @@ ROM_START( metalbj )
 	ROM_LOAD16_BYTE( "d12-07.9",   0x80000, 0x20000, CRC(e07f5136) SHA1(27df1a1f21c27feb91801e3cc304ee534969f792) )
 	ROM_LOAD16_BYTE( "d12-06.6",   0x80001, 0x20000, CRC(131df731) SHA1(537a9f404d797db051a5aaf0afa2cd1e9c0bdcfb) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "d12-03.14",  0x00000, 0x80000, CRC(46b498c0) SHA1(c2ec7ce9ac7874d1bc54ce4b5d428d73c5a16549) )
 	ROM_LOAD16_BYTE( "d12-04.13",  0x00001, 0x80000, CRC(ab66d141) SHA1(e7f82b297dd2ae0b5d29886e5393cece61b742bb) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "d12-01.20", 0x000000, 0x100000, CRC(b81523b9) SHA1(e688e88008db87fed0051fbcb28d3e3ae7e945a8) )
 
 	ROM_REGION( 0x2c000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d12-13.5", 0x00000, 0x04000, CRC(bcca2649) SHA1(d932134416c951d849ae41598f75609d453ed520) )
 	ROM_CONTINUE(         0x10000, 0x1c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d12-02.10", 0x000000, 0x100000, CRC(79263e74) SHA1(f9ef222239855d593b5855dbf9ea0376ea349c4b) )
 
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
@@ -4986,22 +4986,22 @@ ROM_END
 
 ROM_START( qzchikyu )
 	ROM_REGION( 0x180000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "d19-06.8",	0x000000, 0x020000, CRC(de8c8e55) SHA1(ffe177231193ff32da575a4f72fc655b88f08aa8) )
-	ROM_LOAD16_BYTE( "d19-05.7",	0x000001, 0x020000, CRC(c6d099d0) SHA1(a291177e1ddbe993ffa91fbe41fc04a57a568fd0) )
-	ROM_LOAD16_WORD_SWAP( "d19-03.6",	0x100000, 0x080000, CRC(5c1b92c0) SHA1(36af32584ef4b2856d397e5e3ee6d17d5be296fd) )	/* data rom */
+	ROM_LOAD16_BYTE( "d19-06.8",    0x000000, 0x020000, CRC(de8c8e55) SHA1(ffe177231193ff32da575a4f72fc655b88f08aa8) )
+	ROM_LOAD16_BYTE( "d19-05.7",    0x000001, 0x020000, CRC(c6d099d0) SHA1(a291177e1ddbe993ffa91fbe41fc04a57a568fd0) )
+	ROM_LOAD16_WORD_SWAP( "d19-03.6",   0x100000, 0x080000, CRC(5c1b92c0) SHA1(36af32584ef4b2856d397e5e3ee6d17d5be296fd) )  /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
-	ROM_LOAD( "d19-02.10",	0x000000, 0x100000, CRC(f2dce2f2) SHA1(29fd34f1177f0b587bfef40534adaea7afc0efcb) )
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "d19-02.10",  0x000000, 0x100000, CRC(f2dce2f2) SHA1(29fd34f1177f0b587bfef40534adaea7afc0efcb) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
-	ROM_LOAD( "d19-01.21",	0x000000, 0x100000, CRC(6c4342d0) SHA1(197e51302c23f65b8808ec9a66391b972c275867) )
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD( "d19-01.21",  0x000000, 0x100000, CRC(6c4342d0) SHA1(197e51302c23f65b8808ec9a66391b972c275867) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "d19-07.5",	0x00000, 0x04000, CRC(a8935f84) SHA1(6f264cf7a52dfb8248b8aeb4ff34477d7ccb0b6d) )
-	ROM_CONTINUE(			0x10000, 0x0c000 ) /* banked stuff */
+	ROM_LOAD( "d19-07.5",   0x00000, 0x04000, CRC(a8935f84) SHA1(6f264cf7a52dfb8248b8aeb4ff34477d7ccb0b6d) )
+	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "d19-04.9",	0x000000, 0x080000, CRC(d3c44905) SHA1(d00bd4f11523b2123383dd852ee5484d907ff904) )
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "d19-04.9",   0x000000, 0x080000, CRC(d3c44905) SHA1(d00bd4f11523b2123383dd852ee5484d907ff904) )
 
 	/* no Delta-T samples */
 
@@ -5011,15 +5011,15 @@ ROM_START( qzchikyu )
 	ROM_LOAD( "pal16l8b-d19-10.bin",    0x0400, 0x0104, CRC(ea1232a5) SHA1(a13199339be00db93300049d36f35b4a32f53967) )
 ROM_END
 
-ROM_START( yesnoj )	/* Yes/No Sinri Tokimeki Chart */
+ROM_START( yesnoj ) /* Yes/No Sinri Tokimeki Chart */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "d20-05-2.2",  0x00000, 0x40000, CRC(68adb929) SHA1(5238409708d67f03d251338883de536bdf76c6c1) )
 	ROM_LOAD16_BYTE( "d20-04-2.4",  0x00001, 0x40000, CRC(a84762f8) SHA1(2950419fc6dca35a43a565575cec21de8efb9df1) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "d20-01.11", 0x00000, 0x80000, CRC(9d8a4d57) SHA1(d7afcd86bdfe2a4c94a7c2847e17ba7e41d4de79) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "d20-02.12",  0x00000, 0x80000, CRC(e71a8e40) SHA1(cda7f14ba90f178887b9cd57d5b85be7d5090ca7) )
 	ROM_LOAD16_BYTE( "d20-03.13",  0x00001, 0x80000, CRC(6a51a1b4) SHA1(a2492a7775e137a705b3281de674724d4aab4fe1) )
 
@@ -5039,19 +5039,19 @@ ROM_START( deadconx )
 	ROM_LOAD16_BYTE( "d28-09.2",  0x80000, 0x40000, CRC(143a0cc1) SHA1(a0b658b6a1567651d6fe1a955e1c853b48301f30) )
 	ROM_LOAD16_BYTE( "d28-08.4",  0x80001, 0x40000, CRC(4c872bd9) SHA1(a78eec00b40445ad49425ba5a9b392b8516a30ff) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "d28-04.16", 0x00000, 0x80000, CRC(dcabc26b) SHA1(2e5e9912710ede9fc7c87430572f4e33a2ab66e7) )
 	ROM_LOAD16_BYTE( "d28-05.17", 0x00001, 0x80000, CRC(862f9665) SHA1(c576c929f90ff454adca8f127fd7f74863d03239) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "d28-01.8", 0x000000, 0x100000, CRC(181d7b69) SHA1(fea7bd60224cf98d53d1389695f2e0d76e50b573) )
 	ROM_LOAD( "d28-02.9", 0x100000, 0x100000, CRC(d301771c) SHA1(2756bb834b50a657bbcf4e9bec02f4af595ac7e9) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d28-10.6", 0x00000, 0x04000, CRC(40805d74) SHA1(172114be692c766622d1235e5c4aa83ad438d9d9) )
-	ROM_CONTINUE(         0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d28-03.10", 0x000000, 0x100000, CRC(a1804b52) SHA1(f252c473a71a4cf80d9f984fec08e5ae7524a620) )
 
 	/* no Delta-T samples */
@@ -5064,19 +5064,19 @@ ROM_START( deadconxj )
 	ROM_LOAD16_BYTE( "d28-09.2",  0x80000, 0x40000, CRC(143a0cc1) SHA1(a0b658b6a1567651d6fe1a955e1c853b48301f30) )
 	ROM_LOAD16_BYTE( "d28-08.4",  0x80001, 0x40000, CRC(4c872bd9) SHA1(a78eec00b40445ad49425ba5a9b392b8516a30ff) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "d28-04.16", 0x00000, 0x80000, CRC(dcabc26b) SHA1(2e5e9912710ede9fc7c87430572f4e33a2ab66e7) )
 	ROM_LOAD16_BYTE( "d28-05.17", 0x00001, 0x80000, CRC(862f9665) SHA1(c576c929f90ff454adca8f127fd7f74863d03239) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD( "d28-01.8", 0x000000, 0x100000, CRC(181d7b69) SHA1(fea7bd60224cf98d53d1389695f2e0d76e50b573) )
 	ROM_LOAD( "d28-02.9", 0x100000, 0x100000, CRC(d301771c) SHA1(2756bb834b50a657bbcf4e9bec02f4af595ac7e9) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d28-10.6", 0x00000, 0x04000, CRC(40805d74) SHA1(172114be692c766622d1235e5c4aa83ad438d9d9) )
-	ROM_CONTINUE(         0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d28-03.10", 0x000000, 0x100000, CRC(a1804b52) SHA1(f252c473a71a4cf80d9f984fec08e5ae7524a620) )
 
 	/* no Delta-T samples */
@@ -5084,92 +5084,92 @@ ROM_END
 
 ROM_START( dinorex )
 	ROM_REGION( 0x300000, "maincpu", 0 )     /* 1Mb for 68000 code */
-	ROM_LOAD16_BYTE( "d39-14.9",	0x000000, 0x080000, CRC(e6aafdac) SHA1(083c6f27b9f7b983e93c7f5d30a9a286b925c10c) )
-	ROM_LOAD16_BYTE( "d39-16.8",	0x000001, 0x080000, CRC(cedc8537) SHA1(b2063c2405a3d244157ae07d60a077fdd984dbb6) )
-	ROM_LOAD16_WORD_SWAP( "d39-04.6",	0x100000, 0x100000, CRC(3800506d) SHA1(a75067e94071617cd5dafdd0ae0ec096dded520a) )	/* data rom */
-	ROM_LOAD16_WORD_SWAP( "d39-05.7",	0x200000, 0x100000, CRC(e2ec3b5d) SHA1(143b72d0f2f5c40dbaeed1eee0672c3b95c2bda6) )	/* data rom */
+	ROM_LOAD16_BYTE( "d39-14.9",    0x000000, 0x080000, CRC(e6aafdac) SHA1(083c6f27b9f7b983e93c7f5d30a9a286b925c10c) )
+	ROM_LOAD16_BYTE( "d39-16.8",    0x000001, 0x080000, CRC(cedc8537) SHA1(b2063c2405a3d244157ae07d60a077fdd984dbb6) )
+	ROM_LOAD16_WORD_SWAP( "d39-04.6",   0x100000, 0x100000, CRC(3800506d) SHA1(a75067e94071617cd5dafdd0ae0ec096dded520a) )  /* data rom */
+	ROM_LOAD16_WORD_SWAP( "d39-05.7",   0x200000, 0x100000, CRC(e2ec3b5d) SHA1(143b72d0f2f5c40dbaeed1eee0672c3b95c2bda6) )  /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
-	ROM_LOAD( "d39-06.2",	0x000000, 0x100000, CRC(52f62835) SHA1(251c4f17bc98a5e81c224864fb81352cf1234377) )
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "d39-06.2",   0x000000, 0x100000, CRC(52f62835) SHA1(251c4f17bc98a5e81c224864fb81352cf1234377) )
 
-	ROM_REGION( 0x600000, "gfx2", 0 )	/* OBJ */
-	ROM_LOAD( "d39-01.29",	0x000000, 0x200000, CRC(d10e9c7d) SHA1(42c13b271a91fac37be4ea92eb358ad6a6c540cf) )
-	ROM_LOAD( "d39-02.28",	0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
-	ROM_LOAD( "d39-03.27",	0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
+	ROM_REGION( 0x600000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD( "d39-01.29",  0x000000, 0x200000, CRC(d10e9c7d) SHA1(42c13b271a91fac37be4ea92eb358ad6a6c540cf) )
+	ROM_LOAD( "d39-02.28",  0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
+	ROM_LOAD( "d39-03.27",  0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
-	ROM_LOAD( "d39-12.5",	0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "d39-12.5",   0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "d39-07.10",	0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "d39-07.10",  0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
-	ROM_LOAD( "d39-08.4",	0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_LOAD( "d39-08.4",   0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
 ROM_START( dinorexj )
 	ROM_REGION( 0x300000, "maincpu", 0 )     /* 1Mb for 68000 code */
-	ROM_LOAD16_BYTE( "d39-14.9",	0x000000, 0x080000, CRC(e6aafdac) SHA1(083c6f27b9f7b983e93c7f5d30a9a286b925c10c) )
-	ROM_LOAD16_BYTE( "d39-13.8",	0x000001, 0x080000, CRC(ae496b2f) SHA1(0e2ed2b77287590343820841d413ce6cb05b616d) )
-	ROM_LOAD16_WORD_SWAP( "d39-04.6",	0x100000, 0x100000, CRC(3800506d) SHA1(a75067e94071617cd5dafdd0ae0ec096dded520a) )	/* data rom */
-	ROM_LOAD16_WORD_SWAP( "d39-05.7",	0x200000, 0x100000, CRC(e2ec3b5d) SHA1(143b72d0f2f5c40dbaeed1eee0672c3b95c2bda6) )	/* data rom */
+	ROM_LOAD16_BYTE( "d39-14.9",    0x000000, 0x080000, CRC(e6aafdac) SHA1(083c6f27b9f7b983e93c7f5d30a9a286b925c10c) )
+	ROM_LOAD16_BYTE( "d39-13.8",    0x000001, 0x080000, CRC(ae496b2f) SHA1(0e2ed2b77287590343820841d413ce6cb05b616d) )
+	ROM_LOAD16_WORD_SWAP( "d39-04.6",   0x100000, 0x100000, CRC(3800506d) SHA1(a75067e94071617cd5dafdd0ae0ec096dded520a) )  /* data rom */
+	ROM_LOAD16_WORD_SWAP( "d39-05.7",   0x200000, 0x100000, CRC(e2ec3b5d) SHA1(143b72d0f2f5c40dbaeed1eee0672c3b95c2bda6) )  /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
-	ROM_LOAD( "d39-06.2",	0x000000, 0x100000, CRC(52f62835) SHA1(251c4f17bc98a5e81c224864fb81352cf1234377) )
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "d39-06.2",   0x000000, 0x100000, CRC(52f62835) SHA1(251c4f17bc98a5e81c224864fb81352cf1234377) )
 
-	ROM_REGION( 0x600000, "gfx2", 0 )	/* OBJ */
-	ROM_LOAD( "d39-01.29",	0x000000, 0x200000, CRC(d10e9c7d) SHA1(42c13b271a91fac37be4ea92eb358ad6a6c540cf) )
-	ROM_LOAD( "d39-02.28",	0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
-	ROM_LOAD( "d39-03.27",	0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
+	ROM_REGION( 0x600000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD( "d39-01.29",  0x000000, 0x200000, CRC(d10e9c7d) SHA1(42c13b271a91fac37be4ea92eb358ad6a6c540cf) )
+	ROM_LOAD( "d39-02.28",  0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
+	ROM_LOAD( "d39-03.27",  0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
-	ROM_LOAD( "d39-12.5",	0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "d39-12.5",   0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "d39-07.10",	0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "d39-07.10",  0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
-	ROM_LOAD( "d39-08.4",	0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_LOAD( "d39-08.4",   0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
 ROM_START( dinorexu )
-	ROM_REGION( 0x300000, "maincpu", 0 )	/* 1Mb for 68000 code */
-	ROM_LOAD16_BYTE( "d39-14.9",	0x000000, 0x080000, CRC(e6aafdac) SHA1(083c6f27b9f7b983e93c7f5d30a9a286b925c10c) )
-	ROM_LOAD16_BYTE( "d39-15.8",	0x000001, 0x080000, CRC(fe96723b) SHA1(e68b2149cc935ff36efa501b086d5ffb1e0f5887) )
-	ROM_LOAD16_WORD_SWAP( "d39-04.6",	0x100000, 0x100000, CRC(3800506d) SHA1(a75067e94071617cd5dafdd0ae0ec096dded520a) )	/* data rom */
-	ROM_LOAD16_WORD_SWAP( "d39-05.7",	0x200000, 0x100000, CRC(e2ec3b5d) SHA1(143b72d0f2f5c40dbaeed1eee0672c3b95c2bda6) )	/* data rom */
+	ROM_REGION( 0x300000, "maincpu", 0 )    /* 1Mb for 68000 code */
+	ROM_LOAD16_BYTE( "d39-14.9",    0x000000, 0x080000, CRC(e6aafdac) SHA1(083c6f27b9f7b983e93c7f5d30a9a286b925c10c) )
+	ROM_LOAD16_BYTE( "d39-15.8",    0x000001, 0x080000, CRC(fe96723b) SHA1(e68b2149cc935ff36efa501b086d5ffb1e0f5887) )
+	ROM_LOAD16_WORD_SWAP( "d39-04.6",   0x100000, 0x100000, CRC(3800506d) SHA1(a75067e94071617cd5dafdd0ae0ec096dded520a) )  /* data rom */
+	ROM_LOAD16_WORD_SWAP( "d39-05.7",   0x200000, 0x100000, CRC(e2ec3b5d) SHA1(143b72d0f2f5c40dbaeed1eee0672c3b95c2bda6) )  /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
-	ROM_LOAD( "d39-06.2",	0x000000, 0x100000, CRC(52f62835) SHA1(251c4f17bc98a5e81c224864fb81352cf1234377) )
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "d39-06.2",   0x000000, 0x100000, CRC(52f62835) SHA1(251c4f17bc98a5e81c224864fb81352cf1234377) )
 
-	ROM_REGION( 0x600000, "gfx2", 0 )	/* OBJ */
-	ROM_LOAD( "d39-01.29",	0x000000, 0x200000, CRC(d10e9c7d) SHA1(42c13b271a91fac37be4ea92eb358ad6a6c540cf) )
-	ROM_LOAD( "d39-02.28",	0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
-	ROM_LOAD( "d39-03.27",	0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
+	ROM_REGION( 0x600000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD( "d39-01.29",  0x000000, 0x200000, CRC(d10e9c7d) SHA1(42c13b271a91fac37be4ea92eb358ad6a6c540cf) )
+	ROM_LOAD( "d39-02.28",  0x200000, 0x200000, CRC(6c304403) SHA1(97cd58bd7d00550b7ed5f77b066216c05206b513) )
+	ROM_LOAD( "d39-03.27",  0x400000, 0x200000, CRC(fc9cdab4) SHA1(ce2dfac922d6ac0f008b7dfb92d76c1671ccabbd) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
-	ROM_LOAD( "d39-12.5",	0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
-	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "d39-12.5",   0x00000, 0x04000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "d39-07.10",	0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "d39-07.10",  0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
-	ROM_LOAD( "d39-08.4",	0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_LOAD( "d39-08.4",   0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
-ROM_START( qjinsei )	/* Quiz Jinsei Gekijoh */
+ROM_START( qjinsei )    /* Quiz Jinsei Gekijoh */
 	ROM_REGION( 0x200000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "d48-09",  0x000000, 0x040000, CRC(a573b68d) SHA1(fc12c7fb577c919cdb8e16e6d0ddba5603813a13) )
 	ROM_LOAD16_BYTE( "d48-10",  0x000001, 0x040000, CRC(37143a5b) SHA1(8a06031618b60a0c8f38789027d0ed042e540c4d) )
-	ROM_LOAD16_WORD_SWAP( "d48-03",  0x100000, 0x100000, CRC(fb5ea8dc) SHA1(2444042a85af6ae5b87e95ab09f661b877f215cc) )	/* data rom */
+	ROM_LOAD16_WORD_SWAP( "d48-03",  0x100000, 0x100000, CRC(fb5ea8dc) SHA1(2444042a85af6ae5b87e95ab09f661b877f215cc) ) /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "d48-04", 0x000000, 0x100000, CRC(61e4b078) SHA1(c01722af74220d0bb0daf3b78f53f8875209e066) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "d48-02", 0x000000, 0x100000, CRC(a7b68e63) SHA1(ecdd0b7f4c52eac8c6e4218f69c01cf9b2f98e2a) )
 	ROM_LOAD16_BYTE( "d48-01", 0x000001, 0x100000, CRC(72a94b73) SHA1(f4f296886c5fdb227f43cb9231bb15742f8a77f1) )
 
@@ -5177,13 +5177,13 @@ ROM_START( qjinsei )	/* Quiz Jinsei Gekijoh */
 	ROM_LOAD( "d48-11",    0x00000, 0x04000, CRC(656c5b54) SHA1(650bcc5920838db5c6613bcf30468d6e296ea017) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d48-05",  0x000000, 0x080000, CRC(3fefd058) SHA1(338c35c3a086041d28708d4b17e208b590c926d5) )
 
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( qcrayon )	/* Quiz Crayon */
+ROM_START( qcrayon )    /* Quiz Crayon */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "d55-13",  0x00000, 0x40000, CRC(16afbfc7) SHA1(daf948603c78312aa8fb8e239097939ec89ecc64) )
 	ROM_LOAD16_BYTE( "d55-14",  0x00001, 0x40000, CRC(2fb3057f) SHA1(3b107dc69c01ca1b90c78a122336896b89509a3e) )
@@ -5192,24 +5192,24 @@ ROM_START( qcrayon )	/* Quiz Crayon */
 	/* extra ROM mapped 0x300000 */
 	ROM_LOAD16_WORD_SWAP( "d55-03", 0x000000, 0x100000, CRC(4d161e76) SHA1(96189294f91f165423ba585c650ee47fc8165725) )   /* data rom */
 
-	ROM_REGION( 0x100000, "gfx1", 0 )	/* SCR */
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "d55-02", 0x000000, 0x100000, CRC(f3db2f1c) SHA1(a96d89dd2c851dae3a237141c478fe2a65dda9c3) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "d55-05", 0x000000, 0x100000, CRC(f0e59902) SHA1(44d93e0e9622a98796a128a0273065947f586a1d) )
 	ROM_LOAD16_BYTE( "d55-04", 0x000001, 0x100000, CRC(412975ce) SHA1(32058a87947d6b6cdc8b147ddfcf359792f9c9fc) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d55-15",  0x00000, 0x04000, CRC(ba782eff) SHA1(ce24654db49b9694e444e93b9a8d529a86729e03) )
-	ROM_CONTINUE(        0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(        0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d55-01",  0x000000, 0x100000, CRC(a8309af4) SHA1(dc30b2e019003c58aecaf899668b36dea6e1274e) )
 
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( qcrayon2 )	/* Quiz Crayon 2 */
+ROM_START( qcrayon2 )   /* Quiz Crayon 2 */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "d63-12",  0x00000, 0x40000, CRC(0f445a38) SHA1(cb9212c6c61d7dec7cfa039ebbbabd368dad52c3) )
 	ROM_LOAD16_BYTE( "d63-13",  0x00001, 0x40000, CRC(74455752) SHA1(9835eb5ebad8df96abe8f7d5f8e4ff663b38015a) )
@@ -5228,7 +5228,7 @@ ROM_START( qcrayon2 )	/* Quiz Crayon 2 */
 	ROM_LOAD( "d63-11",    0x00000, 0x04000, CRC(2c7ac9e5) SHA1(2477fb4415781afddc2f4084eca52f53b7d40480) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d63-02",  0x000000, 0x100000, CRC(162ae165) SHA1(8b503d096640ec91cf55e05374b293937965c672) )
 
 	/* no Delta-T samples */
@@ -5248,11 +5248,11 @@ ROM_START( driftout )
 	ROM_REGION( 0x080000, "gfx3", 0 )      /* pivot gfx */
 	ROM_LOAD( "do_piv.rom", 0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "do_50.rom",  0x00000, 0x04000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
-	ROM_CONTINUE(           0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(           0x10000, 0x0c000 )  /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "do_snd.rom", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
 
 	/* no Delta-T samples */
@@ -5272,11 +5272,11 @@ ROM_START( driftoutj )
 	ROM_REGION( 0x080000, "gfx3", 0 )      /* pivot gfx */
 	ROM_LOAD( "do_piv.rom", 0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "do_50.rom",  0x00000, 0x04000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
-	ROM_CONTINUE(           0x10000, 0x0c000 )	/* banked stuff */
+	ROM_CONTINUE(           0x10000, 0x0c000 )  /* banked stuff */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "do_snd.rom", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
 
 	/* no Delta-T samples */
@@ -5297,15 +5297,15 @@ ROM_START( driveout )
 	ROM_REGION( 0x080000, "gfx3", 0 )      /* pivot gfx */
 	ROM_LOAD( "do_piv.rom",    0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "driveout.020",  0x0000,  0x8000, CRC(99aaeb2e) SHA1(c7eb174f2ddcd8fd2b73b5251f434a20a9627b49) )
 
-	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
-	ROM_LOAD( "driveout.028",  0x00000, 0x20000, CRC(cbde0b66) SHA1(b264aa525ff40c7813182031825cd052db887000) )	/* banked */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples */
+	ROM_LOAD( "driveout.028",  0x00000, 0x20000, CRC(cbde0b66) SHA1(b264aa525ff40c7813182031825cd052db887000) ) /* banked */
 	ROM_CONTINUE(              0x40000, 0x20000 )
 	ROM_CONTINUE(              0x80000, 0x20000 )
 	ROM_CONTINUE(              0xc0000, 0x20000 )
-	ROM_LOAD( "driveout.029",  0x20000, 0x20000, CRC(0aba2026) SHA1(f592e3b294d44f499fdca4cc31646e55d8c3dfbf) )	/* sandwiched */
+	ROM_LOAD( "driveout.029",  0x20000, 0x20000, CRC(0aba2026) SHA1(f592e3b294d44f499fdca4cc31646e55d8c3dfbf) ) /* sandwiched */
 	ROM_RELOAD(                0x60000, 0x20000 )
 	ROM_RELOAD(                0xa0000, 0x20000 )
 	ROM_RELOAD(                0xe0000, 0x20000 )
@@ -5355,7 +5355,7 @@ DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
 	UINT8 *gfx = memregion("gfx2")->base();
 
 	/* the bytes in each longword are in reversed order, put them in the
-       order used by the other games. */
+	   order used by the other games. */
 	for (i = 0; i < len; i += 2)
 	{
 		int t;

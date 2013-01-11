@@ -15,8 +15,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8049_TAG		"z5"
-#define DISCRETE_TAG	"ls1"
+#define I8049_TAG       "z5"
+#define DISCRETE_TAG    "ls1"
 
 
 
@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 static const discrete_555_desc v1050_ne555 =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_DC,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
@@ -305,10 +305,10 @@ ioport_constructor v1050_keyboard_device::device_input_ports() const
 
 v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, V1050_KEYBOARD, "Visual 1050 Keyboard", tag, owner, clock),
-	  m_maincpu(*this, I8049_TAG),
-	  m_discrete(*this, DISCRETE_TAG),
-	  m_y(0),
-	  m_so(1)
+		m_maincpu(*this, I8049_TAG),
+		m_discrete(*this, DISCRETE_TAG),
+		m_y(0),
+		m_so(1)
 {
 }
 
@@ -400,18 +400,18 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P20     Z8 A8 (8039 external ROM)
-        P21     Z8 A9
-        P22     Z8 A10
-        P23
-        P24
-        P25     led output
-        P26     speaker (NE555) output
-        P27     serial output
+	    P20     Z8 A8 (8039 external ROM)
+	    P21     Z8 A9
+	    P22     Z8 A10
+	    P23
+	    P24
+	    P25     led output
+	    P26     speaker (NE555) output
+	    P27     serial output
 
-    */
+	*/
 
 	// led output
 	output_set_led_value(0, BIT(data, 5));

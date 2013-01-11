@@ -27,15 +27,15 @@ WRITE16_MEMBER(realbrk_state::realbrk_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,	data & 0x0001);
-		coin_counter_w(machine(), 1,	data & 0x0004);
+		coin_counter_w(machine(), 0,    data & 0x0001);
+		coin_counter_w(machine(), 1,    data & 0x0004);
 
-		flip_screen_set(	data & 0x0080);
+		flip_screen_set(    data & 0x0080);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_disable_video	=	data & 0x8000;
+		m_disable_video =   data & 0x8000;
 	}
 }
 
@@ -224,42 +224,42 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		UINT16 *s;
 
-		if (spriteram16[offs] & 0x8000)	continue;
+		if (spriteram16[offs] & 0x8000) continue;
 
-		s		=		&spriteram16[(spriteram16[offs] & 0x3ff) * 16/2];
+		s       =       &spriteram16[(spriteram16[offs] & 0x3ff) * 16/2];
 
-		sy		=		s[ 0 ];
-		sx		=		s[ 1 ];
-		dim		=		s[ 2 ];
-		zoom	=		s[ 3 ];
-		flip	=		s[ 4 ];
-		color	=		s[ 5 ];
-		attr	=		s[ 6 ];
-		code	=		s[ 7 ];
+		sy      =       s[ 0 ];
+		sx      =       s[ 1 ];
+		dim     =       s[ 2 ];
+		zoom    =       s[ 3 ];
+		flip    =       s[ 4 ];
+		color   =       s[ 5 ];
+		attr    =       s[ 6 ];
+		code    =       s[ 7 ];
 
-		xnum	=		((dim >> 0) & 0x1f) + 1;
-		ynum	=		((dim >> 8) & 0x1f) + 1;
+		xnum    =       ((dim >> 0) & 0x1f) + 1;
+		ynum    =       ((dim >> 8) & 0x1f) + 1;
 
-		flipx	=		flip & 0x0100;
-		flipy	=		flip & 0x0200;
-		rot		=		flip & 0x0030;
+		flipx   =       flip & 0x0100;
+		flipy   =       flip & 0x0200;
+		rot     =       flip & 0x0030;
 
-		gfx		=		(attr & 0x0001) + 2;
+		gfx     =       (attr & 0x0001) + 2;
 
-		sx		=		((sx & 0x1ff) - (sx & 0x200)) << 16;
-		sy		=		((sy & 0x0ff) - (sy & 0x100)) << 16;
+		sx      =       ((sx & 0x1ff) - (sx & 0x200)) << 16;
+		sy      =       ((sy & 0x0ff) - (sy & 0x100)) << 16;
 
-		xdim	=		((zoom & 0x00ff) >> 0) << (16-6+4);
-		ydim	=		((zoom & 0xff00) >> 8) << (16-6+4);
+		xdim    =       ((zoom & 0x00ff) >> 0) << (16-6+4);
+		ydim    =       ((zoom & 0xff00) >> 8) << (16-6+4);
 
-		if (state->flip_screen_x())	{	flipx = !flipx;		sx = (max_x << 16) - sx - xnum * xdim;	}
-		if (state->flip_screen_y())	{	flipy = !flipy;		sy = (max_y << 16) - sy - ynum * ydim;	}
+		if (state->flip_screen_x()) {   flipx = !flipx;     sx = (max_x << 16) - sx - xnum * xdim;  }
+		if (state->flip_screen_y()) {   flipy = !flipy;     sy = (max_y << 16) - sy - ynum * ydim;  }
 
-		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
-		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
+		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
+		else        { xstart = 0;       xend = xnum;  xinc = +1; }
 
-		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
-		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
+		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
+		else        { ystart = 0;       yend = ynum;  yinc = +1; }
 
 
 		// The positioning of the rotated sprites makes it look as if
@@ -289,7 +289,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				{
 					state->m_tmpbitmap0->fill(0, spritetile_clip );
 					state->m_tmpbitmap1->fill(0, spritetile_clip );
-					drawgfxzoom_transpen(	*state->m_tmpbitmap0,spritetile_clip,machine.gfx[gfx],
+					drawgfxzoom_transpen(   *state->m_tmpbitmap0,spritetile_clip,machine.gfx[gfx],
 									code++,
 									color,
 									flipx, flipy,
@@ -351,7 +351,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 						break;
 
 					default:
-						drawgfxzoom_transpen(	bitmap,cliprect,machine.gfx[gfx],
+						drawgfxzoom_transpen(   bitmap,cliprect,machine.gfx[gfx],
 										code++,
 										color,
 										flipx, flipy,
@@ -385,43 +385,43 @@ static void dai2kaku_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 		UINT16 *s;
 
-		if (spriteram16[offs] & 0x8000)	continue;
+		if (spriteram16[offs] & 0x8000) continue;
 
-		s		=		&spriteram16[(spriteram16[offs] & 0x3ff) * 16/2];
+		s       =       &spriteram16[(spriteram16[offs] & 0x3ff) * 16/2];
 
-		sy		=		s[ 0 ];
-		sx		=		s[ 1 ];
-		dim		=		s[ 2 ];
-		zoom	=		s[ 3 ];
-		flip	=		s[ 4 ];
-		color	=		s[ 5 ];
-		attr	=		s[ 6 ];
-		code	=		s[ 7 ];
+		sy      =       s[ 0 ];
+		sx      =       s[ 1 ];
+		dim     =       s[ 2 ];
+		zoom    =       s[ 3 ];
+		flip    =       s[ 4 ];
+		color   =       s[ 5 ];
+		attr    =       s[ 6 ];
+		code    =       s[ 7 ];
 
 		if(( flip & 0x03 ) != layer ) continue;
 
-		xnum	=		((dim >> 0) & 0x1f) + 1;
-		ynum	=		((dim >> 8) & 0x1f) + 1;
+		xnum    =       ((dim >> 0) & 0x1f) + 1;
+		ynum    =       ((dim >> 8) & 0x1f) + 1;
 
-		flipx	=		flip & 0x0100;
-		flipy	=		flip & 0x0200;
+		flipx   =       flip & 0x0100;
+		flipy   =       flip & 0x0200;
 
-		gfx		=		(attr & 0x0001) + 2;
+		gfx     =       (attr & 0x0001) + 2;
 
-		sx		=		((sx & 0x1ff) - (sx & 0x200)) << 16;
-		sy		=		((sy & 0x0ff) - (sy & 0x100)) << 16;
+		sx      =       ((sx & 0x1ff) - (sx & 0x200)) << 16;
+		sy      =       ((sy & 0x0ff) - (sy & 0x100)) << 16;
 
-		xdim	=		((zoom & 0x00ff) >> 0) << (16-6+4);
-		ydim	=		((zoom & 0xff00) >> 8) << (16-6+4);
+		xdim    =       ((zoom & 0x00ff) >> 0) << (16-6+4);
+		ydim    =       ((zoom & 0xff00) >> 8) << (16-6+4);
 
-		if (state->flip_screen_x())	{	flipx = !flipx;		sx = (max_x << 16) - sx - xnum * xdim;	}
-		if (state->flip_screen_y())	{	flipy = !flipy;		sy = (max_y << 16) - sy - ynum * ydim;	}
+		if (state->flip_screen_x()) {   flipx = !flipx;     sx = (max_x << 16) - sx - xnum * xdim;  }
+		if (state->flip_screen_y()) {   flipy = !flipy;     sy = (max_y << 16) - sy - ynum * ydim;  }
 
-		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
-		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
+		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
+		else        { xstart = 0;       xend = xnum;  xinc = +1; }
 
-		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
-		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
+		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
+		else        { ystart = 0;       yend = ynum;  yinc = +1; }
 
 		for (y = ystart; y != yend; y += yinc)
 		{
@@ -433,7 +433,7 @@ static void dai2kaku_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
 				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
 
-				drawgfxzoom_transpen(	bitmap,cliprect,machine.gfx[gfx],
+				drawgfxzoom_transpen(   bitmap,cliprect,machine.gfx[gfx],
 								code++,
 								color,
 								flipx, flipy,
@@ -497,10 +497,10 @@ UINT32 realbrk_state::screen_update_realbrk(screen_device &screen, bitmap_ind16 
 if ( machine().input().code_pressed(KEYCODE_Z) )
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -513,12 +513,12 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 	else
 		bitmap.fill(m_vregs[0xc/2] & 0x7fff, cliprect);
 
-	if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0,0);
-	if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0,0);
 
-	if (layers_ctrl & 8)	draw_sprites(machine(),bitmap,cliprect);
+	if (layers_ctrl & 8)    draw_sprites(machine(),bitmap,cliprect);
 
-	if (layers_ctrl & 4)	m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 4)    m_tilemap_2->draw(bitmap, cliprect, 0,0);
 
 //  popmessage("%04x",m_vregs[0x8/2]);
 	return 0;
@@ -567,10 +567,10 @@ UINT32 realbrk_state::screen_update_dai2kaku(screen_device &screen, bitmap_ind16
 if ( machine().input().code_pressed(KEYCODE_Z) )
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -586,30 +586,30 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 
 	// spr 0
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(machine(),bitmap,cliprect,2);
+	if (layers_ctrl & 8)    dai2kaku_draw_sprites(machine(),bitmap,cliprect,2);
 
 	// bglow
 	if( m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	}
 
 	// spr 1
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(machine(),bitmap,cliprect,1);
+	if (layers_ctrl & 8)    dai2kaku_draw_sprites(machine(),bitmap,cliprect,1);
 
 	// bghigh
 	if( m_vregs[8/2] & (0x8000)){
-		if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	} else {
-		if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0,0);
+		if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0,0);
 	}
 
 	// spr 2
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(machine(),bitmap,cliprect,0);
+	if (layers_ctrl & 8)    dai2kaku_draw_sprites(machine(),bitmap,cliprect,0);
 
 	// fix
-	if (layers_ctrl & 4)	m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	if (layers_ctrl & 4)    m_tilemap_2->draw(bitmap, cliprect, 0,0);
 
 //  usrintf_showmessage("%04x",m_vregs[0x8/2]);
 	return 0;

@@ -147,18 +147,18 @@ WRITE8_MEMBER( atom_state::eprom_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       block A bit 0
-        1       block A bit 1
-        2       block A bit 2
-        3       block A bit 3
-        4
-        5
-        6
-        7       block E
+	    0       block A bit 0
+	    1       block A bit 1
+	    2       block A bit 2
+	    3       block A bit 3
+	    4
+	    5
+	    6
+	    7       block E
 
-    */
+	*/
 
 	/* block A */
 	m_eprom = data & 0x0f;
@@ -350,18 +350,18 @@ WRITE8_MEMBER( atom_state::ppi_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       keyboard column 0
-        1       keyboard column 1
-        2       keyboard column 2
-        3       keyboard column 3
-        4       MC6847 A/G
-        5       MC6847 GM0
-        6       MC6847 GM1
-        7       MC6847 GM2
+	    0       keyboard column 0
+	    1       keyboard column 1
+	    2       keyboard column 2
+	    3       keyboard column 3
+	    4       MC6847 A/G
+	    5       MC6847 GM0
+	    6       MC6847 GM1
+	    7       MC6847 GM2
 
-    */
+	*/
 
 	/* keyboard column */
 	m_keylatch = data & 0x0f;
@@ -377,18 +377,18 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       keyboard row 0
-        1       keyboard row 1
-        2       keyboard row 2
-        3       keyboard row 3
-        4       keyboard row 4
-        5       keyboard row 5
-        6       keyboard CTRL
-        7       keyboard SFT
+	    0       keyboard row 0
+	    1       keyboard row 1
+	    2       keyboard row 2
+	    3       keyboard row 3
+	    4       keyboard row 4
+	    5       keyboard row 5
+	    6       keyboard CTRL
+	    7       keyboard SFT
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 
@@ -415,18 +415,18 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       O/P 1, cassette output 0
-        1       O/P 2, cassette output 1
-        2       O/P 3, speaker output
-        3       O/P 4, MC6847 CSS
-        4       2400 Hz input
-        5       cassette input
-        6       keyboard RPT
-        7       MC6847 FS
+	    0       O/P 1, cassette output 0
+	    1       O/P 2, cassette output 1
+	    2       O/P 3, speaker output
+	    3       O/P 4, MC6847 CSS
+	    4       2400 Hz input
+	    5       cassette input
+	    6       keyboard RPT
+	    7       MC6847 FS
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -449,18 +449,18 @@ WRITE8_MEMBER( atom_state::ppi_pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       O/P 1, cassette output 0
-        1       O/P 2, cassette output 1
-        2       O/P 3, speaker output
-        3       O/P 4, MC6847 CSS
-        4       2400 Hz input
-        5       cassette input
-        6       keyboard RPT
-        7       MC6847 FS
+	    0       O/P 1, cassette output 0
+	    1       O/P 2, cassette output 1
+	    2       O/P 3, speaker output
+	    3       O/P 4, MC6847 CSS
+	    4       2400 Hz input
+	    5       cassette input
+	    6       keyboard RPT
+	    7       MC6847 FS
 
-    */
+	*/
 
 	/* cassette output */
 	m_pc0 = BIT(data, 0);
@@ -523,8 +523,8 @@ static void atom_8271_interrupt_callback(device_t *device, int state)
 	atom_state *drvstate = device->machine().driver_data<atom_state>();
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
-    the nmi will be triggered, but when the state changes because the int
-    is cleared this will not cause another nmi */
+	the nmi will be triggered, but when the state changes because the int
+	is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
 	if (state!=drvstate->m_previous_i8271_int_state)
@@ -532,7 +532,7 @@ static void atom_8271_interrupt_callback(device_t *device, int state)
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
-            it would clear - to be checked */
+			it would clear - to be checked */
 			drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
@@ -643,9 +643,9 @@ void atom_state::machine_start()
 {
 	/* this is temporary */
 	/* Kees van Oss mentions that address 8-b are used for the random number
-    generator. I don't know if this is hardware, or random data because the
-    ram chips are not cleared at start-up. So at this time, these numbers
-    are poked into the memory to simulate it. When I have more details I will fix it */
+	generator. I don't know if this is hardware, or random data because the
+	ram chips are not cleared at start-up. So at this time, these numbers
+	are poked into the memory to simulate it. When I have more details I will fix it */
 	UINT8 *m_baseram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x0000);
 
 	m_baseram[0x08] = machine().rand() & 0x0ff;
@@ -781,7 +781,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_CPU_PROGRAM_MAP(atom_mem)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, vdg_intf)
 
 	/* sound hardware */
@@ -853,7 +853,7 @@ MACHINE_CONFIG_END
 ROM_START( atom )
 	ROM_REGION( 0x4000, SY6502_TAG, 0 )
 	ROM_LOAD( "abasic.ic20", 0x0000, 0x1000, CRC(289b7791) SHA1(0072c83458a9690a3ea1f6094f0f38cf8e96a445) )
-	ROM_CONTINUE(			 0x3000, 0x1000 )
+	ROM_CONTINUE(            0x3000, 0x1000 )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
 
@@ -867,7 +867,7 @@ ROM_END
 ROM_START( atomeb )
 	ROM_REGION( 0x4000, SY6502_TAG, 0 )
 	ROM_LOAD( "abasic.ic20", 0x0000, 0x1000, CRC(289b7791) SHA1(0072c83458a9690a3ea1f6094f0f38cf8e96a445) )
-	ROM_CONTINUE(			 0x3000, 0x1000 )
+	ROM_CONTINUE(            0x3000, 0x1000 )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
 
@@ -881,6 +881,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY   FULLNAME */
-COMP( 1979, atom,     0,        0,		atom,     atom, driver_device,     0,        "Acorn",  "Atom" , 0)
-COMP( 1979, atomeb,   atom,     0,		atomeb,   atom, driver_device,     0,        "Acorn",  "Atom with Eprom Box" , 0)
+COMP( 1979, atom,     0,        0,      atom,     atom, driver_device,     0,        "Acorn",  "Atom" , 0)
+COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, driver_device,     0,        "Acorn",  "Atom with Eprom Box" , 0)
 //COMP( 1983, prophet2, atom,     0,        atom,     atom, driver_device,     0,        "Busicomputers",  "Prophet 2" , 0)

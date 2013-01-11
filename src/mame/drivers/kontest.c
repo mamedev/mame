@@ -28,9 +28,9 @@ class kontest_state : public driver_device
 {
 public:
 	kontest_state(const machine_config &mconfig, device_type type, const char *tag)
-		  : driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, "ram")
+			: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, "ram")
 	{ }
 
 	// devices
@@ -67,8 +67,8 @@ public:
 void kontest_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
 	for (i = 0; i < 0x20; ++i)
 	{
@@ -232,7 +232,7 @@ INPUT_PORTS_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -298,10 +298,10 @@ MACHINE_CONFIG_END
 
 ROM_START( kontest )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "800b01.10d",   0x000000, 0x008000, CRC(520f83dc) SHA1(abc23c586864c2ecbc5b16614e27faafc93287de) )
+	ROM_LOAD( "800b01.10d",   0x000000, 0x008000, CRC(520f83dc) SHA1(abc23c586864c2ecbc5b16614e27faafc93287de) )
 
 	ROM_REGION( 0x20, "proms", 0 )
-    ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
+	ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
 GAME( 1987?, kontest,  0,   kontest,  kontest, driver_device,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", GAME_SUPPORTS_SAVE ) // late 1987 or early 1988

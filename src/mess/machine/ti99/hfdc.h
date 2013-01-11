@@ -51,65 +51,65 @@ protected:
 
 private:
 	// Calculates a simple version of a binary logarithm
-	int 			slog2(int value);
+	int             slog2(int value);
 
 	// When true, triggers motor monoflop.
-	bool			m_trigger_motor;
+	bool            m_trigger_motor;
 
 	// When true, motor monoflop is high
-	bool			m_motor_running;
+	bool            m_motor_running;
 
 	/* Clock divider bit 0. Unused in this emulation. */
-	int 			m_CD0;
+	int             m_CD0;
 
 	/* Clock divider bit 1. Unused in this emulation. */
-	int				m_CD1;
+	int             m_CD1;
 
 	/* count 4.23s from rising edge of motor_on */
-	emu_timer*		m_motor_on_timer;
+	emu_timer*      m_motor_on_timer;
 
 	// Link to the HDC9234 controller on the board. In fact, the proper name
 	// is HDC 9234, the manufacturer is Standard Microsystems Corp.
-	smc92x4_device*	m_hdc9234;
+	smc92x4_device* m_hdc9234;
 
 	/* Link to the clock chip on the board. */
-	device_t*		m_clock;
+	device_t*       m_clock;
 
 	/* Determines whether we have access to the CRU bits. */
-	bool			m_cru_select;
+	bool            m_cru_select;
 
 	/* IRQ state */
-	bool			m_irq;
+	bool            m_irq;
 
 	/* DMA in Progress state */
-	bool			m_dip;
+	bool            m_dip;
 
 	/* Output 1 latch */
-	UINT8			m_output1_latch;
+	UINT8           m_output1_latch;
 
 	/* Output 2 latch */
-	UINT8			m_output2_latch;
+	UINT8           m_output2_latch;
 
 	/* Connected floppy drives. */
-	device_t*		m_floppy_unit[HFDC_MAX_FLOPPY];
+	device_t*       m_floppy_unit[HFDC_MAX_FLOPPY];
 
 	/* Connected harddisk drives. */
-	device_t*		m_harddisk_unit[HFDC_MAX_HARD];
+	device_t*       m_harddisk_unit[HFDC_MAX_HARD];
 
 	/* DMA address latch */
-	UINT32			m_dma_address;
+	UINT32          m_dma_address;
 
 	// Device Service Routine ROM
-	UINT8*			m_dsrrom;
+	UINT8*          m_dsrrom;
 
 	// ROM banks.
-	int 			m_rom_page;
+	int             m_rom_page;
 
 	// HFDC RAM
-	UINT8*			m_buffer_ram;
+	UINT8*          m_buffer_ram;
 
 	// RAM page registers
-	int 			m_ram_page[4];
+	int             m_ram_page[4];
 };
 
 

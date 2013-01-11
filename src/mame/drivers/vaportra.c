@@ -190,11 +190,11 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( vaportra )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,    0x000, 0x500 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,    0x000, 0x500 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0x000000, charlayout,    0x000, 0x500 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0x000000, tilelayout,    0x000, 0x500 )	/* Tiles 16x16 */ // ok
-	GFXDECODE_ENTRY( "gfx3", 0x000000, tilelayout,    0x100, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,    0x000, 0x500 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,    0x000, 0x500 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0x000000, charlayout,    0x000, 0x500 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0x000000, tilelayout,    0x000, 0x500 )    /* Tiles 16x16 */ // ok
+	GFXDECODE_ENTRY( "gfx3", 0x000000, tilelayout,    0x100, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -221,9 +221,9 @@ static const deco16ic_interface vaportra_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0x30, 0x40, /* color base */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	vaportra_bank_callback,
 	vaportra_bank_callback,
 	2,3
@@ -305,7 +305,7 @@ ROM_START( vaportra )
 	ROM_LOAD16_BYTE( "fl_03.bin",   0x40000, 0x20000, CRC(80bd2844) SHA1(3fcaa409c7134388fa9458df8e8aaecc93f085e6) )
 	ROM_LOAD16_BYTE( "fl_01.bin",   0x40001, 0x20000, CRC(9474b085) SHA1(5510309ddab5fbf1dbb0a7b1e424a5dff5ec263d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -319,10 +319,10 @@ ROM_START( vaportra )
 	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
 	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -343,7 +343,7 @@ ROM_START( vaportra3 ) // 74 bytes of 68k code have been changed compared to vap
 	ROM_LOAD16_BYTE( "fl_03.bin",   0x40000, 0x20000, CRC(80bd2844) SHA1(3fcaa409c7134388fa9458df8e8aaecc93f085e6) )
 	ROM_LOAD16_BYTE( "fl_01.bin",   0x40001, 0x20000, CRC(9474b085) SHA1(5510309ddab5fbf1dbb0a7b1e424a5dff5ec263d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) // original DE board with mask rom split into 4 roms
@@ -360,10 +360,10 @@ ROM_START( vaportra3 ) // 74 bytes of 68k code have been changed compared to vap
 	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
 	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -384,7 +384,7 @@ ROM_START( vaportrau )
 	ROM_LOAD16_BYTE( "fj03",   0x40000, 0x20000, CRC(44893379) SHA1(da1340bc1821a552c317cb9a7c1ba69eb080b055) )
 	ROM_LOAD16_BYTE( "fj01",   0x40001, 0x20000, CRC(97fbc107) SHA1(b2899eb4347c0471397b83051e46c94dff3526f5) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -398,10 +398,10 @@ ROM_START( vaportrau )
 	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
 	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
 
 	ROM_REGION( 0x200, "proms", 0 )
@@ -422,7 +422,7 @@ ROM_START( kuhga )
 	ROM_LOAD16_BYTE( "fp03.bin",   0x40000, 0x20000, CRC(ea0da0f1) SHA1(ca40e694cb0aa0c13672c14fd4a389bc6d26cbc6) )
 	ROM_LOAD16_BYTE( "fp01.bin",   0x40001, 0x20000, CRC(e3ecbe86) SHA1(382e959111ec37ad94da8fd6dcefe2d2aab346b6) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -436,10 +436,10 @@ ROM_START( kuhga )
 	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
 	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
 
 	ROM_REGION( 0x200, "proms", 0 )

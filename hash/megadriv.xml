@@ -1,88 +1,88 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-    UNDUMPED / TO BE REDUMPED LIST
+	UNDUMPED / TO BE REDUMPED LIST
 
-    2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY)	PAL
-    ADVANCED DAISENRYAKU			JAPAN		we have Rev A, Rev 0 needed (does it exist?)
-    ARNOLD PALMER TOURNAMENT GOLF		PAL
-    AWESOME POSSUM				JAPAN
-    BATTLE SQUADRON				PAL
-    BEAVIS & BUTTHEAD				PAL
-    CAPTAIN PLANET				ASIA
-    CENTURION					USA/PAL		needs proper dump
-    DAVIS CUP TENNIS				JAPAN
-    DYNAMITE HEADDY SAMPLE			JAPAN
-    ECCO JR					USA/PAL		graphic corruption on later revision
-    F-22 (JUNE 1992)				USA/PAL		needs proper dump
-    FAERY TALE ADVENTURE			PAL
-    FATAL FURY 2				PAL		Australia-only PAL release
-    FERRARI GRAND PRIX CHALLENGE		PAL		we have Rev A, Rev 0 needed (does it exist?)
-    FIFA SOCCER					JAPAN
-    FIRE SHARK					PAL		dump check
-    GAIN GROUND					PAL		revision order check
-    GALAXY FORCE II				ALL		we have Rev B, Rev 0 and Rev A needed (does it exist?)
-    GO NET					JAPAN
-    INTERNATIONAL SUPERSTAR SOCCER		BRAZIL
-    JEWEL MASTER				USA/PAL		we have Rev A, Rev 0 needed (does it match Japanese release?)
-    MARBLE MADNESS				JAPAN
-    NBA PLAYOFFS - BULLS VS BLAZERS		JAPAN		(alt) version contain a checksum check which have been wiped out of the non-alt revision
-    NFL PRO FOOTBALL '94			JAPAN
-    OSAKA BANK MY LINE				JAPAN
-    OSAKA BANK MY LINE DEMO			JAPAN
-    OUTBACK JOEY - PERSONAL TRAINER		???		http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
-    PGA TOUR GOLF				USA/PAL		we have v1.1 and v1.2, v1.0 needed (does it exist?)
-    ROAD RASH					JAPAN
-    ROAD RASH					USA/PAL		needs proper dump
-    SHINING FORCE				PAL
-    SIDE POCKET					JAPAN/USA	conflict in current info
-    SMURFS					PAL		we have Rev A, Rev 0 needed (does it exist?)
-    SUMISEI HOME TANMATSU			JAPAN
-    SUPER DAISENRYAKU				JAPAN		we have Rev 0, Rev A needed (confirmed by Ototo)
-    TOM & JERRY					JAPAN
-    VALIS III					JAPAN		we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
-    WONDER MIDI					JAPAN
-    WORLD CUP SOCCER				JAPAN/USA	we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
-    WORLD OF ILLUSION				JAPAN		we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
+	2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY) PAL
+	ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
+	ARNOLD PALMER TOURNAMENT GOLF       PAL
+	AWESOME POSSUM              JAPAN
+	BATTLE SQUADRON             PAL
+	BEAVIS & BUTTHEAD               PAL
+	CAPTAIN PLANET              ASIA
+	CENTURION                   USA/PAL     needs proper dump
+	DAVIS CUP TENNIS                JAPAN
+	DYNAMITE HEADDY SAMPLE          JAPAN
+	ECCO JR                 USA/PAL     graphic corruption on later revision
+	F-22 (JUNE 1992)                USA/PAL     needs proper dump
+	FAERY TALE ADVENTURE            PAL
+	FATAL FURY 2                PAL     Australia-only PAL release
+	FERRARI GRAND PRIX CHALLENGE        PAL     we have Rev A, Rev 0 needed (does it exist?)
+	FIFA SOCCER                 JAPAN
+	FIRE SHARK                  PAL     dump check
+	GAIN GROUND                 PAL     revision order check
+	GALAXY FORCE II             ALL     we have Rev B, Rev 0 and Rev A needed (does it exist?)
+	GO NET                  JAPAN
+	INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
+	JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
+	MARBLE MADNESS              JAPAN
+	NBA PLAYOFFS - BULLS VS BLAZERS     JAPAN       (alt) version contain a checksum check which have been wiped out of the non-alt revision
+	NFL PRO FOOTBALL '94            JAPAN
+	OSAKA BANK MY LINE              JAPAN
+	OSAKA BANK MY LINE DEMO         JAPAN
+	OUTBACK JOEY - PERSONAL TRAINER     ???     http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
+	PGA TOUR GOLF               USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
+	ROAD RASH                   JAPAN
+	ROAD RASH                   USA/PAL     needs proper dump
+	SHINING FORCE               PAL
+	SIDE POCKET                 JAPAN/USA   conflict in current info
+	SMURFS                  PAL     we have Rev A, Rev 0 needed (does it exist?)
+	SUMISEI HOME TANMATSU           JAPAN
+	SUPER DAISENRYAKU               JAPAN       we have Rev 0, Rev A needed (confirmed by Ototo)
+	TOM & JERRY                 JAPAN
+	VALIS III                   JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
+	WONDER MIDI                 JAPAN
+	WORLD CUP SOCCER                JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
+	WORLD OF ILLUSION               JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 -->
 
 <!--
 
 Known undumped protos
 
-  * Ghoul Patrol
-  * Beethoven's 2nd
-  * Iron Hammer (from http://www.youtube.com/watch?v=uQG0tZQaKUg )
-  * Bill's Tomato Game (from http://www.youtube.com/watch?v=GeCuBe2xd8A )
-  * Total Carnage
-  * Monster Hunter
-  * Brown 60
-  * Nuclear Rush
-  * Bloodliners
-  * Capture the Flag
-  * Scatters
-  * Michael Jordan's Chaos in the Windy City
-  * Speedway Pro Challenge
-  * Payne Stewart Golf
-  * Jack Nicklaus 95
-  * Jack Nicklaus Power Challenge
-  * Danny Sullivan's Indy Heat
-  * Star Trek Starfleet Academy
+	* Ghoul Patrol
+	* Beethoven's 2nd
+	* Iron Hammer (from http://www.youtube.com/watch?v=uQG0tZQaKUg )
+	* Bill's Tomato Game (from http://www.youtube.com/watch?v=GeCuBe2xd8A )
+	* Total Carnage
+	* Monster Hunter
+	* Brown 60
+	* Nuclear Rush
+	* Bloodliners
+	* Capture the Flag
+	* Scatters
+	* Michael Jordan's Chaos in the Windy City
+	* Speedway Pro Challenge
+	* Payne Stewart Golf
+	* Jack Nicklaus 95
+	* Jack Nicklaus Power Challenge
+	* Danny Sullivan's Indy Heat
+	* Star Trek Starfleet Academy
 
 Known undumped pirates
 
-  * Tec Toy Mega Drive 3 (with 86 built in games)
-  * Chinese Checkers (by RealTec)
-  * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
-  * Thunderbolt II - 雷電伝説II
-  * Magic 7 Block - 百変七巧板
-  * Chinese Battle Chess (?) - 戦 棊
-  * 16 Tile Mahjong II (by Gamtec)
+	* Tec Toy Mega Drive 3 (with 86 built in games)
+	* Chinese Checkers (by RealTec)
+	* Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
+	* Thunderbolt II - 雷電伝説II
+	* Magic 7 Block - 百変七巧板
+	* Chinese Battle Chess (?) - 戦 棊
+	* 16 Tile Mahjong II (by Gamtec)
 
 NOTE
 
-  * Phantasy Star (serial G-4534, released by Sega on 1994-04-02) is actually a SMS cart which works in the MD
-    thanks to VDP compatibility mode. Since this is currently not emulated in MESS, the dump is in sms.xml
+	* Phantasy Star (serial G-4534, released by Sega on 1994-04-02) is actually a SMS cart which works in the MD
+	thanks to VDP compatibility mode. Since this is currently not emulated in MESS, the dump is in sms.xml
 
 -->
 
@@ -130,11 +130,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Rom Labeled
+	Rom Labeled
 
-    FIFA 97 B1
-    (c)ELECTRONIC ARTS 1996
-    ALL RIGHTS RESERVED
+	FIFA 97 B1
+	(c)ELECTRONIC ARTS 1996
+	ALL RIGHTS RESERVED
 	S77481/00000046
 	9640
 -->
@@ -151,11 +151,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Rom Labeled
+	Rom Labeled
 
-    SEGA
-    MPR-15312A T02
-    9305E7056
+	SEGA
+	MPR-15312A T02
+	9305E7056
 -->
 	</software>
 
@@ -170,12 +170,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Rom Labeled
+	Rom Labeled
 
-    JAMES POND U1 JAM03
-    (c)ELECTRONIC ARTS'91
-    ALL RIGHTS RESERVED
-    JAPAN 9108 D
+	JAMES POND U1 JAM03
+	(c)ELECTRONIC ARTS'91
+	ALL RIGHTS RESERVED
+	JAPAN 9108 D
 -->
 	</software>
 
@@ -190,11 +190,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Rom Labeled
+	Rom Labeled
 
-    Pond II: Robocod RO B02
-    (c)Electronic Arts 1991
-    All Rights Reserved
+	Pond II: Robocod RO B02
+	(c)Electronic Arts 1991
+	All Rights Reserved
 -->
 	</software>
 
@@ -210,11 +210,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Rom Labeled
+	Rom Labeled
 
-    LOTUS TURBO LOT03
-    (c)Electronic Arts 1992
-    All Rights Reserved
+	LOTUS TURBO LOT03
+	(c)Electronic Arts 1992
+	All Rights Reserved
 -->
 	</software>
 
@@ -232,12 +232,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Rom Labeled
+	Rom Labeled
 
-    NHL94 HL9402
-    9347
-    (C)ELECTRONIC ARTS 1993
-    ALL RIGHTS RESERVED
+	NHL94 HL9402
+	9347
+	(C)ELECTRONIC ARTS 1993
+	ALL RIGHTS RESERVED
 -->
 	</software>
 
@@ -255,12 +255,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Rom Labeled
+	Rom Labeled
 
-    PGA TOUR GOLF PGT04
-    (C)ELECTRONIC ARTS92
-    ALL RIGHTS RESERVED
-    311 418PY60 JAPAN
+	PGA TOUR GOLF PGT04
+	(C)ELECTRONIC ARTS92
+	ALL RIGHTS RESERVED
+	311 418PY60 JAPAN
 -->
 	</software>
 
@@ -276,19 +276,19 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Roms Labeled
+	Roms Labeled
 
-    ACCLAIM    U1
-    ES133-1    U1
-    RISE OF    U1
-    THE ROBOTS U1
-    9447 D
+	ACCLAIM    U1
+	ES133-1    U1
+	RISE OF    U1
+	THE ROBOTS U1
+	9447 D
 
-    ACCLAIM    U2
-    ES133-2    U2
-    RISE OF    U2
-    THE ROBOTS U2
-    9447 D
+	ACCLAIM    U2
+	ES133-2    U2
+	RISE OF    U2
+	THE ROBOTS U2
+	9447 D
 -->
 	</software>
 
@@ -318,14 +318,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-    Roms Labeled
+	Roms Labeled
 
-    ACCOLADE, INC
-    ZETSG HI
-    7500-00033A
-    (C) ACCOLADE 1994
+	ACCOLADE, INC
+	ZETSG HI
+	7500-00033A
+	(C) ACCOLADE 1994
 
-    ACCOLADE, INC
+	ACCOLADE, INC
 	ZETSG LO
 	7500-00034A
 	(C) ACCOLADE 1994
@@ -635,7 +635,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19910628"/>
 		<info name="alt_title" value="マーベルランド"/>
 		<part name="cart" interface="megadriv_cart">
-		  <!-- PCB serial isn't present -->
+			<!-- PCB serial isn't present -->
 			<feature name="pcb" value="none" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lrog452-mml.bin" size="1048576" crc="5d162d21" sha1="2f7ef2f956d62373dcd5f3808e7501e3660c0658" offset="000000" loadflag="load16_word_swap" />
@@ -13361,7 +13361,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="mk">
 		<description>Mortal Kombat (World, v1.1)</description>
 		<year>1993</year>
-		<publisher>Arena</publisher>	<!-- This game is published by Acclaim in Jpn, in fact -->
+		<publisher>Arena</publisher>    <!-- This game is published by Acclaim in Jpn, in fact -->
 		<info name="serial" value="T-81014 (JPN)"/>
 		<info name="release" value="19940527 (JPN)"/>
 		<info name="alt_title" value="神拳降臨伝説 モータルコンバット"/>
@@ -13375,7 +13375,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="mka" cloneof="mk">
 		<description>Mortal Kombat (World)</description>
 		<year>1993</year>
-		<publisher>Arena</publisher>	<!-- This game is published by Acclaim in Jpn, in fact -->
+		<publisher>Arena</publisher>    <!-- This game is published by Acclaim in Jpn, in fact -->
 		<info name="serial" value="T-81014 (JPN)"/>
 		<info name="release" value="19940527 (JPN)"/>
 		<info name="alt_title" value="神拳降臨伝説 モータルコンバット"/>
@@ -13444,7 +13444,7 @@ NOTE: several roms exist for this game
 - CRC: 2bfcaa3e (2012-04-25) - final rom assembled by hand from the binary code (the glitches above were due to the routine used to create the rom from the binary)
 Notice that these are not working on real hardware due to bugged code with VDP init (and/or interrupts)
 - CRC: 237fb077 (2012-04-25) - 'fixed' version for hardware which patches the source code to make the game work on a console
- -->
+	-->
 	<software name="mrnutz2">
 		<description>Mr. Nutz - Hoppin' Mad (Prototype)</description>
 		<year>1994</year>
@@ -20651,7 +20651,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="steeltalp"	 cloneof="steeltal">
+	<software name="steeltalp"   cloneof="steeltal">
 		<description>Steel Talons (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
@@ -27509,7 +27509,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-    <software name="iraqwara" cloneof="iraqwar">
+	<software name="iraqwara" cloneof="iraqwar">
 	<!-- Look the Same as iraqwar -->
 		<description>Iraq War 2003 (Alt)</description>
 		<year>199?</year>
@@ -28165,8 +28165,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 
-    <!-- The next development tools have been dumped by Tiido: all of them would require PC connection with Sega Loader Board and LPT cable.
-    We still need to find the PC-side software for these dumps... -->
+	<!-- The next development tools have been dumped by Tiido: all of them would require PC connection with Sega Loader Board and LPT cable.
+	We still need to find the PC-side software for these dumps... -->
 
 	<software name="gems">
 		<description>GEMS v2.8</description>

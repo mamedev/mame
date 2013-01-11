@@ -193,7 +193,7 @@ READ32_MEMBER(konamigv_state::mb89371_r)
 }
 
 static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
@@ -407,7 +407,7 @@ READ32_MEMBER(konamigv_state::flash_r)
 		//shift = 16;
 	}
 
-	if (reg == 4)	// set odd address
+	if (reg == 4)   // set odd address
 	{
 		m_flash_address |= 1;
 	}
@@ -623,16 +623,16 @@ READ32_MEMBER(konamigv_state::tokimeki_serial_r)
 WRITE32_MEMBER(konamigv_state::tokimeki_serial_w)
 {
 	/*
-        serial EEPROM-like device here: when mem_mask == 0x000000ff only,
+	    serial EEPROM-like device here: when mem_mask == 0x000000ff only,
 
-        0x40 = chip enable
-        0x20 = clock
-        0x10 = data
+	    0x40 = chip enable
+	    0x20 = clock
+	    0x10 = data
 
-        tokimosh sends 6 bits: 110100 then reads 8 bits.
-        readback is bit 3 (0x08) of serial_r
-        This happens starting around 8005e580.
-    */
+	    tokimosh sends 6 bits: 110100 then reads 8 bits.
+	    readback is bit 3 (0x08) of serial_r
+	    This happens starting around 8005e580.
+	*/
 
 }
 
@@ -722,8 +722,8 @@ static INPUT_PORTS_START( kdeadeye )
 
 INPUT_PORTS_END
 
-#define GV_BIOS	\
-	ROM_REGION32_LE( 0x080000, "user1", 0 )	\
+#define GV_BIOS \
+	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
 	ROM_LOAD( "999a01.7e",   0x0000000, 0x080000, CRC(ad498d2d) SHA1(02a82a2fe1fba0404517c3602324bfa64e23e478) )
 
 ROM_START( konamigv )

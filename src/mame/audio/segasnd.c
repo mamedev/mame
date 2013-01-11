@@ -22,15 +22,15 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SPEECH_MASTER_CLOCK	3120000
+#define SPEECH_MASTER_CLOCK 3120000
 
-#define USB_MASTER_CLOCK	6000000
-#define USB_2MHZ_CLOCK		(USB_MASTER_CLOCK/3)
-#define USB_PCS_CLOCK		(USB_2MHZ_CLOCK/2)
-#define USB_GOS_CLOCK		(USB_2MHZ_CLOCK/16/4)
-#define MM5837_CLOCK		100000
+#define USB_MASTER_CLOCK    6000000
+#define USB_2MHZ_CLOCK      (USB_MASTER_CLOCK/3)
+#define USB_PCS_CLOCK       (USB_2MHZ_CLOCK/2)
+#define USB_GOS_CLOCK       (USB_2MHZ_CLOCK/16/4)
+#define MM5837_CLOCK        100000
 
-#define SAMPLE_RATE			(USB_2MHZ_CLOCK/8)
+#define SAMPLE_RATE         (USB_2MHZ_CLOCK/8)
 
 
 
@@ -40,60 +40,60 @@
 
 struct filter_state
 {
-	double				capval;				/* current capacitor value */
-	double				exponent;			/* constant exponent */
+	double              capval;             /* current capacitor value */
+	double              exponent;           /* constant exponent */
 };
 
 
 struct timer8253_channel
 {
-	UINT8				holding;			/* holding until counts written? */
-	UINT8				latchmode;			/* latching mode */
-	UINT8				latchtoggle;		/* latching state */
-	UINT8				clockmode;			/* clocking mode */
-	UINT8				bcdmode;			/* BCD mode? */
-	UINT8				output;				/* current output value */
-	UINT8				lastgate;			/* previous gate value */
-	UINT8				gate;				/* current gate value */
-	UINT8				subcount;			/* subcount (2MHz clocks per input clock) */
-	UINT16				count;				/* initial count */
-	UINT16				remain;				/* current down counter value */
+	UINT8               holding;            /* holding until counts written? */
+	UINT8               latchmode;          /* latching mode */
+	UINT8               latchtoggle;        /* latching state */
+	UINT8               clockmode;          /* clocking mode */
+	UINT8               bcdmode;            /* BCD mode? */
+	UINT8               output;             /* current output value */
+	UINT8               lastgate;           /* previous gate value */
+	UINT8               gate;               /* current gate value */
+	UINT8               subcount;           /* subcount (2MHz clocks per input clock) */
+	UINT16              count;              /* initial count */
+	UINT16              remain;             /* current down counter value */
 };
 
 
 struct timer8253
 {
-	timer8253_channel	chan[3];			/* three channels' worth of information */
-	double				env[3];				/* envelope value for each channel */
-	filter_state		chan_filter[2];		/* filter states for the first two channels */
-	filter_state		gate1;				/* first RC filter state */
-	filter_state		gate2;				/* second RC filter state */
-	UINT8				config;				/* configuration for this timer */
+	timer8253_channel   chan[3];            /* three channels' worth of information */
+	double              env[3];             /* envelope value for each channel */
+	filter_state        chan_filter[2];     /* filter states for the first two channels */
+	filter_state        gate1;              /* first RC filter state */
+	filter_state        gate2;              /* second RC filter state */
+	UINT8               config;             /* configuration for this timer */
 };
 
 
 struct usb_state
 {
-	sound_stream *		stream;				/* output stream */
-	device_t *cpu;				/* CPU index of the 8035 */
+	sound_stream *      stream;             /* output stream */
+	device_t *cpu;              /* CPU index of the 8035 */
 	device_t *maincpu;
-	UINT8				in_latch;			/* input latch */
-	UINT8				out_latch;			/* output latch */
-	UINT8				last_p2_value;		/* current P2 output value */
-	UINT8 *				program_ram;		/* pointer to program RAM */
-	UINT8 *				work_ram;			/* pointer to work RAM */
-	UINT8				work_ram_bank;		/* currently selected work RAM bank */
-	UINT8				t1_clock;			/* T1 clock value */
-	UINT8				t1_clock_mask;		/* T1 clock mask (configured via jumpers) */
-	timer8253			timer_group[3];		/* 3 groups of timers */
-	UINT8				timer_mode[3];		/* mode control for each group */
-	UINT32				noise_shift;
-	UINT8				noise_state;
-	UINT8				noise_subcount;
-	double				gate_rc1_exp[2];
-	double				gate_rc2_exp[2];
-	filter_state		final_filter;
-	filter_state		noise_filters[5];
+	UINT8               in_latch;           /* input latch */
+	UINT8               out_latch;          /* output latch */
+	UINT8               last_p2_value;      /* current P2 output value */
+	UINT8 *             program_ram;        /* pointer to program RAM */
+	UINT8 *             work_ram;           /* pointer to work RAM */
+	UINT8               work_ram_bank;      /* currently selected work RAM bank */
+	UINT8               t1_clock;           /* T1 clock value */
+	UINT8               t1_clock_mask;      /* T1 clock mask (configured via jumpers) */
+	timer8253           timer_group[3];     /* 3 groups of timers */
+	UINT8               timer_mode[3];      /* mode control for each group */
+	UINT32              noise_shift;
+	UINT8               noise_state;
+	UINT8               noise_subcount;
+	double              gate_rc1_exp[2];
+	double              gate_rc2_exp[2];
+	filter_state        final_filter;
+	filter_state        noise_filters[5];
 };
 
 /* SP0250-based speech board */
@@ -137,7 +137,7 @@ INLINE double step_cr_filter(filter_state *state, double input)
 ***************************************************************************/
 
 class speech_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -180,7 +180,7 @@ const device_type SEGASPEECH = &device_creator<speech_sound_device>;
 
 speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGASPEECH, "Sega Speech Sound Board", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(speech_state);
 }
@@ -370,7 +370,7 @@ static const struct sp0250_interface sp0250_interface =
 MACHINE_CONFIG_FRAGMENT( sega_speech_board )
 
 	/* CPU for the speech board */
-	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
+	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)        /* divide by 15 in CPU */
 	MCFG_CPU_PROGRAM_MAP(speech_map)
 	MCFG_CPU_IO_MAP(speech_portmap)
 
@@ -388,7 +388,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 class usb_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -642,13 +642,13 @@ static STREAM_UPDATE( usb_stream_update )
 
 
 		/*----------------
-            Noise Source
-          ----------------
+		    Noise Source
+		  ----------------
 
-                         RC
-           MM5837 ---> FILTER ---> CR FILTER ---> 3.2x AMP ---> NOISE
-                       LADDER
-       */
+		                 RC
+		   MM5837 ---> FILTER ---> CR FILTER ---> 3.2x AMP ---> NOISE
+		               LADDER
+		*/
 
 		/* update the noise source */
 		for (step = USB_2MHZ_CLOCK / SAMPLE_RATE; step >= usb->noise_subcount; step -= usb->noise_subcount)
@@ -679,12 +679,12 @@ static STREAM_UPDATE( usb_stream_update )
 
 
 			/*-------------
-                Channel 0
-              -------------
+			    Channel 0
+			  -------------
 
-                8253        CR                   AD7524
-                OUT0 ---> FILTER ---> BUFFER--->  VRef  ---> 100k ---> mix
-            */
+			    8253        CR                   AD7524
+			    OUT0 ---> FILTER ---> BUFFER--->  VRef  ---> 100k ---> mix
+			*/
 
 			/* channel 0 clocks with the PCS clock */
 			for (step = USB_2MHZ_CLOCK / SAMPLE_RATE; step >= g->chan[0].subcount; step -= g->chan[0].subcount)
@@ -700,12 +700,12 @@ static STREAM_UPDATE( usb_stream_update )
 
 
 			/*-------------
-                Channel 1
-              -------------
+			    Channel 1
+			  -------------
 
-                8253        CR                   AD7524
-                OUT1 ---> FILTER ---> BUFFER--->  VRef  ---> 100k ---> mix
-            */
+			    8253        CR                   AD7524
+			    OUT1 ---> FILTER ---> BUFFER--->  VRef  ---> 100k ---> mix
+			*/
 
 			/* channel 1 clocks with the PCS clock */
 			for (step = USB_2MHZ_CLOCK / SAMPLE_RATE; step >= g->chan[1].subcount; step -= g->chan[1].subcount)
@@ -721,21 +721,21 @@ static STREAM_UPDATE( usb_stream_update )
 
 
 			/*-------------
-                Channel 2
-              -------------
+			    Channel 2
+			  -------------
 
-              If timer_mode == 0:
+			  If timer_mode == 0:
 
-                           SWITCHED                                  AD7524
-                NOISE --->    RC   ---> 1.56x AMP ---> INVERTER --->  VRef ---> 33k ---> mix
-                            FILTERS
+			               SWITCHED                                  AD7524
+			    NOISE --->    RC   ---> 1.56x AMP ---> INVERTER --->  VRef ---> 33k ---> mix
+			                FILTERS
 
-              If timer mode == 1:
+			  If timer mode == 1:
 
-                                         AD7524                                    SWITCHED
-                NOISE ---> INVERTER --->  VRef ---> 33k ---> mix ---> INVERTER --->   RC   ---> 1.56x AMP ---> finalmix
-                                                                                    FILTERS
-            */
+			                             AD7524                                    SWITCHED
+			    NOISE ---> INVERTER --->  VRef ---> 33k ---> mix ---> INVERTER --->   RC   ---> 1.56x AMP ---> finalmix
+			                                                                        FILTERS
+			*/
 
 			/* channel 2 clocks with the 2MHZ clock and triggers with the GOS clock */
 			for (step = 0; step < USB_2MHZ_CLOCK / SAMPLE_RATE; step++)
@@ -771,15 +771,15 @@ static STREAM_UPDATE( usb_stream_update )
 
 
 		/*-------------
-            Final mix
-          -------------
+		    Final mix
+		  -------------
 
-          INPUTS
-          EQUAL ---> 1.2x INVERTER ---> CR FILTER ---> out
-          WEIGHT
+		  INPUTS
+		  EQUAL ---> 1.2x INVERTER ---> CR FILTER ---> out
+		  WEIGHT
 
-       */
-       *dest++ = 4000 * step_cr_filter(&usb->final_filter, sample);
+		*/
+		*dest++ = 4000 * step_cr_filter(&usb->final_filter, sample);
 	}
 }
 
@@ -883,7 +883,7 @@ const device_type SEGAUSB = &device_creator<usb_sound_device>;
 
 usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(usb_state);
 }
@@ -956,17 +956,17 @@ static void timer_w(usb_state *usb, int which, UINT8 offset, UINT8 data)
 			/* based on the latching mode */
 			switch (ch->latchmode)
 			{
-				case 1:	/* low word only */
+				case 1: /* low word only */
 					ch->count = data;
 					ch->holding = FALSE;
 					break;
 
-				case 2:	/* high word only */
+				case 2: /* high word only */
 					ch->count = data << 8;
 					ch->holding = FALSE;
 					break;
 
-				case 3:	/* low word followed by high word */
+				case 3: /* low word followed by high word */
 					if (ch->latchtoggle == 0)
 					{
 						ch->count = (ch->count & 0xff00) | (data & 0x00ff);
@@ -1044,27 +1044,27 @@ static WRITE8_DEVICE_HANDLER( usb_workram_w )
 	/* writes to the low 32 bytes go to various controls */
 	switch (offset & ~3)
 	{
-		case 0x00:	/* CTC0 */
+		case 0x00:  /* CTC0 */
 			timer_w(usb, 0, offset & 3, data);
 			break;
 
-		case 0x04:	/* ENV0 */
+		case 0x04:  /* ENV0 */
 			env_w(usb, 0, offset & 3, data);
 			break;
 
-		case 0x08:	/* CTC1 */
+		case 0x08:  /* CTC1 */
 			timer_w(usb, 1, offset & 3, data);
 			break;
 
-		case 0x0c:	/* ENV1 */
+		case 0x0c:  /* ENV1 */
 			env_w(usb, 1, offset & 3, data);
 			break;
 
-		case 0x10:	/* CTC2 */
+		case 0x10:  /* CTC2 */
 			timer_w(usb, 2, offset & 3, data);
 			break;
 
-		case 0x14:	/* ENV2 */
+		case 0x14:  /* ENV2 */
 			env_w(usb, 2, offset & 3, data);
 			break;
 	}
@@ -1106,7 +1106,7 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_FRAGMENT( sega_universal_sound_board )
 
 	/* CPU for the usb board */
-	MCFG_CPU_ADD("usbcpu", I8035, USB_MASTER_CLOCK)		/* divide by 15 in CPU */
+	MCFG_CPU_ADD("usbcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
 	MCFG_CPU_PROGRAM_MAP(usb_map)
 	MCFG_CPU_IO_MAP(usb_portmap)
 

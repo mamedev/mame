@@ -15,8 +15,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 void ssozumo_state::palette_init()
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int	bit0, bit1, bit2, bit3, r, g, b;
-	int	i;
+	int bit0, bit1, bit2, bit3, r, g, b;
+	int i;
 
 	for (i = 0 ; i < 64 ; i++)
 	{
@@ -71,9 +71,9 @@ WRITE8_MEMBER(ssozumo_state::ssozumo_colorram2_w)
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_paletteram_w)
 {
-	int	bit0, bit1, bit2, bit3, val;
-	int	r, g, b;
-	int	offs2;
+	int bit0, bit1, bit2, bit3, val;
+	int r, g, b;
+	int offs2;
 
 	m_paletteram[offset] = data;
 	offs2 = offset & 0x0f;
@@ -134,10 +134,10 @@ void ssozumo_state::video_start()
 {
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssozumo_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,
-		 16, 16, 16, 32);
+			16, 16, 16, 32);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssozumo_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

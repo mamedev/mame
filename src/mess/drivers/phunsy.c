@@ -24,7 +24,7 @@
 #include "sound/wave.h"
 
 
-#define LOG	1
+#define LOG 1
 
 
 class phunsy_state : public driver_device
@@ -44,12 +44,12 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
-	const UINT8	*m_p_chargen;
-	UINT8		m_data_out;
-	UINT8		m_keyboard_input;
-	UINT8		m_q_bank;
-	UINT8		m_u_bank;
-	UINT8		m_ram_1800[0x800];
+	const UINT8 *m_p_chargen;
+	UINT8       m_data_out;
+	UINT8       m_keyboard_input;
+	UINT8       m_q_bank;
+	UINT8       m_u_bank;
+	UINT8       m_ram_1800[0x800];
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
 	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
-	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1")	// Banked RAM/ROM
+	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1") // Banked RAM/ROM
 	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
 
@@ -97,15 +97,15 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 
 	switch( m_u_bank )
 	{
-	case 0x00:	/* RAM */
+	case 0x00:  /* RAM */
 		membank( "bank1" )->set_base( m_ram_1800 );
 		break;
-	case 0x01:	/* MDCR program */
-	case 0x02:	/* Disassembler */
-	case 0x03:	/* Label handler */
+	case 0x01:  /* MDCR program */
+	case 0x02:  /* Disassembler */
+	case 0x03:  /* Label handler */
 		membank( "bank1" )->set_base( memregion("maincpu")->base() + ( 0x800 * m_u_bank ) );
 		break;
-	default:	/* Not used */
+	default:    /* Not used */
 		break;
 	}
 
@@ -273,15 +273,15 @@ UINT32 phunsy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 /* F4 Character Displayer */
 static const gfx_layout phunsy_charlayout =
 {
-	5, 7,					/* 6 x 8 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	5, 7,                   /* 6 x 8 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( phunsy )
@@ -298,11 +298,11 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* Display (page 12 of pdf)
-       - 8Mhz clock
-       - 64 6 pixel characters on a line.
-       - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
-       - 313 line display of which 256 are displayed.
-    */
+	   - 8Mhz clock
+	   - 64 6 pixel characters on a line.
+	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
+	   - 313 line display of which 256 are displayed.
+	*/
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_GFXDECODE(phunsy)
@@ -343,4 +343,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
 COMP( 1980, phunsy,  0,       0,     phunsy,    phunsy, driver_device,   0, "J.F.P. Philipse", "PHUNSY", GAME_NOT_WORKING )
-

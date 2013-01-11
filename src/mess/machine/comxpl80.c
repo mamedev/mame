@@ -23,7 +23,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CX005_TAG		"cx005"
+#define CX005_TAG       "cx005"
 
 
 
@@ -40,11 +40,11 @@ const device_type COMX_PL80 = &device_creator<comx_pl80_device>;
 
 ROM_START( comxpl80 )
 	ROM_REGION( 0x1000, CX005_TAG, 0 )
-	ROM_LOAD( "pl80.pt6",		0x0080, 0x0e00, CRC(ae059e5b) SHA1(f25812606b0082d32eb603d0a702a2187089d332) )
+	ROM_LOAD( "pl80.pt6",       0x0080, 0x0e00, CRC(ae059e5b) SHA1(f25812606b0082d32eb603d0a702a2187089d332) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASEFF ) // Plotter fonts
-	ROM_LOAD( "it.em.ou.bin",	0x2000, 0x2000, CRC(1b4a3198) SHA1(138ff6666a31c2d18cd63e609dd94d9cd1529931) )
-	ROM_LOAD( "tiny.bin",		0x4000, 0x0400, CRC(940ec1ed) SHA1(ad83a3b57e2f0fbaa1e40644cd999b3f239635e8) )
+	ROM_LOAD( "it.em.ou.bin",   0x2000, 0x2000, CRC(1b4a3198) SHA1(138ff6666a31c2d18cd63e609dd94d9cd1529931) )
+	ROM_LOAD( "tiny.bin",       0x4000, 0x0400, CRC(940ec1ed) SHA1(ad83a3b57e2f0fbaa1e40644cd999b3f239635e8) )
 ROM_END
 
 
@@ -160,8 +160,8 @@ ioport_constructor comx_pl80_device::device_input_ports() const
 //-------------------------------------------------
 
 comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, COMX_PL80, "COMX PL-80", tag, owner, clock),
-      device_centronics_peripheral_interface(mconfig, *this)
+	: device_t(mconfig, COMX_PL80, "COMX PL-80", tag, owner, clock),
+		device_centronics_peripheral_interface(mconfig, *this)
 {
 }
 
@@ -200,18 +200,18 @@ WRITE8_MEMBER( comx_pl80_device::pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Y motor phase A
-        1       Y motor phase B
-        2       Y motor phase C
-        3       Y motor phase D
-        4       ROM A12
-        5       ROM CE /PT5 CK
-        6       PT4 OE
-        7       SW & PE ENABLE
+	    0       Y motor phase A
+	    1       Y motor phase B
+	    2       Y motor phase C
+	    3       Y motor phase D
+	    4       ROM A12
+	    5       ROM CE /PT5 CK
+	    6       PT4 OE
+	    7       SW & PE ENABLE
 
-    */
+	*/
 
 	m_y_motor_phase = data & 0x0f;
 	m_font_addr = (BIT(data, 4) << 12) | (m_font_addr & 0xfff);
@@ -252,18 +252,18 @@ WRITE8_MEMBER( comx_pl80_device::pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Z motor phase A
-        1       Z motor phase B
-        2       Z motor phase C
-        3       Z motor phase D
-        4       ROM A8
-        5       ROM A9
-        6       ROM A10
-        7       ROM A11
+	    0       Z motor phase A
+	    1       Z motor phase B
+	    2       Z motor phase C
+	    3       Z motor phase D
+	    4       ROM A8
+	    5       ROM A9
+	    6       ROM A10
+	    7       ROM A11
 
-    */
+	*/
 
 	m_z_motor_phase = data & 0x0f;
 
@@ -279,18 +279,18 @@ WRITE8_MEMBER( comx_pl80_device::pc_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       ROM A0 /X motor phase A
-        1       ROM A1 /X motor phase B
-        2       ROM A2 /X motor phase C
-        3       ROM A3 /X motor phase D
-        4       ROM A4 /ACK
-        5       ROM A5 /On-line LED
-        6       ROM A6
-        7       ROM A7
+	    0       ROM A0 /X motor phase A
+	    1       ROM A1 /X motor phase B
+	    2       ROM A2 /X motor phase C
+	    3       ROM A3 /X motor phase D
+	    4       ROM A4 /ACK
+	    5       ROM A5 /On-line LED
+	    6       ROM A6
+	    7       ROM A7
 
-    */
+	*/
 
 	m_font_addr = (m_font_addr & 0x1f00) | data;
 
@@ -309,18 +309,18 @@ READ8_MEMBER( comx_pl80_device::pd_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       D0 /ROM D0 /DOWN SW
-        1       D1 /ROM D1 /PEN-SEL SW
-        2       D2 /ROM D2 /UP SW
-        3       D3 /ROM D3 /CRSW
-        4       D4 /ROM D4 /ON LINE SW
-        5       D5 /ROM D5 /PE Sensor
-        6       D6 /ROM D6 /RIGHT SW
-        7       D7 /ROM D7 /LEFT SW
+	    0       D0 /ROM D0 /DOWN SW
+	    1       D1 /ROM D1 /PEN-SEL SW
+	    2       D2 /ROM D2 /UP SW
+	    3       D3 /ROM D3 /CRSW
+	    4       D4 /ROM D4 /ON LINE SW
+	    5       D5 /ROM D5 /PE Sensor
+	    6       D6 /ROM D6 /RIGHT SW
+	    7       D7 /ROM D7 /LEFT SW
 
-    */
+	*/
 
 	return m_plotter_data;
 }

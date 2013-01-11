@@ -14,14 +14,14 @@ extern "C" {
 
 typedef struct
 {
-  CLzmaDec decoder;
-  UInt32 packSize;
-  UInt32 unpackSize;
-  int state;
-  Byte control;
-  Bool needInitDic;
-  Bool needInitState;
-  Bool needInitProp;
+	CLzmaDec decoder;
+	UInt32 packSize;
+	UInt32 unpackSize;
+	int state;
+	Byte control;
+	Bool needInitDic;
+	Bool needInitState;
+	Bool needInitProp;
 } CLzma2Dec;
 
 #define Lzma2Dec_Construct(p) LzmaDec_Construct(&(p)->decoder)
@@ -49,10 +49,10 @@ Returns:
 */
 
 SRes Lzma2Dec_DecodeToDic(CLzma2Dec *p, SizeT dicLimit,
-    const Byte *src, SizeT *srcLen, ELzmaFinishMode finishMode, ELzmaStatus *status);
+	const Byte *src, SizeT *srcLen, ELzmaFinishMode finishMode, ELzmaStatus *status);
 
 SRes Lzma2Dec_DecodeToBuf(CLzma2Dec *p, Byte *dest, SizeT *destLen,
-    const Byte *src, SizeT *srcLen, ELzmaFinishMode finishMode, ELzmaStatus *status);
+	const Byte *src, SizeT *srcLen, ELzmaFinishMode finishMode, ELzmaStatus *status);
 
 
 /* ---------- One Call Interface ---------- */
@@ -75,7 +75,7 @@ Returns:
 */
 
 SRes Lzma2Decode(Byte *dest, SizeT *destLen, const Byte *src, SizeT *srcLen,
-    Byte prop, ELzmaFinishMode finishMode, ELzmaStatus *status, ISzAlloc *alloc);
+	Byte prop, ELzmaFinishMode finishMode, ELzmaStatus *status, ISzAlloc *alloc);
 
 #ifdef __cplusplus
 }

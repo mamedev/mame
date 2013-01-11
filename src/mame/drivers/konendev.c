@@ -20,7 +20,7 @@ class konendev_state : public driver_device
 public:
 	konendev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -33,7 +33,7 @@ public:
 
 
 static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM // main program
 ADDRESS_MAP_END
 
 
@@ -43,7 +43,7 @@ INPUT_PORTS_END
 
 static const powerpc_config ppc603e_config =
 {
-	XTAL_66_6667MHz,		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	XTAL_66_6667MHz,        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	NULL,
 	NULL
 };
@@ -183,15 +183,15 @@ GAME( 200?, whiterus,   0,        konendev,    konendev, konendev_state,    kone
 // partial sets
 GAME( 200?, aadvent,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "African Adventure (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, dragnfly,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Dragonfly (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, gypmagic,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Gypsy Magic (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, incanp,		0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Incan Pyramids (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, jestmagi,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Jester Magic (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, luckfoun,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Lucky Fountain (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, mohicans,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Mohican Sun (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, monshow,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "The Monster Show (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, romanl,		0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Roman Legions (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, safemon,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Safe Money (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, showqn,		0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Show Queen (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, spiceup,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Spice It Up (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sultanw,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Sultan's Wish (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, konzero,	0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND ) // doesn't seem to have a title string in it?
+GAME( 200?, gypmagic,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Gypsy Magic (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, incanp,     0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Incan Pyramids (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, jestmagi,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Jester Magic (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, luckfoun,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Lucky Fountain (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, mohicans,   0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Mohican Sun (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, monshow,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "The Monster Show (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, romanl,     0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Roman Legions (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, safemon,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Safe Money (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, showqn,     0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Show Queen (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, spiceup,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Spice It Up (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sultanw,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Sultan's Wish (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, konzero,    0,        konendev,    konendev, konendev_state,    konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", GAME_NOT_WORKING | GAME_NO_SOUND ) // doesn't seem to have a title string in it?

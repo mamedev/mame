@@ -32,10 +32,10 @@ void coco12_state::configure_sam()
 	UINT8 *rom = memregion(MAINCPU_TAG)->base();
 	UINT8 *cart_rom = cart->get_cart_base();
 
-	m_sam->configure_bank(0, ram, ram_size, false);			// $0000-$7FFF
-	m_sam->configure_bank(1, &rom[0x0000], 0x2000, true);	// $8000-$9FFF
-	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);	// $A000-$BFFF
-	m_sam->configure_bank(3, cart_rom, 0x4000, true);		// $C000-$FEFF
+	m_sam->configure_bank(0, ram, ram_size, false);         // $0000-$7FFF
+	m_sam->configure_bank(1, &rom[0x0000], 0x2000, true);   // $8000-$9FFF
+	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);   // $A000-$BFFF
+	m_sam->configure_bank(3, cart_rom, 0x4000, true);       // $C000-$FEFF
 
 	// $FF00-$FF1F
 	m_sam->configure_bank(4, read8_delegate(FUNC(coco12_state::ff00_read), this), write8_delegate(FUNC(coco12_state::ff00_write), this));
@@ -114,7 +114,7 @@ void coco12_state::pia1_pb_changed(void)
 
 void coco12_state::update_cart_base(UINT8 *cart_base)
 {
-	m_sam->configure_bank(3, cart_base, 0x4000, true);		// $C000-$FEFF
+	m_sam->configure_bank(3, cart_base, 0x4000, true);      // $C000-$FEFF
 }
 
 

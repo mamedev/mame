@@ -58,7 +58,7 @@ public:
 
 private:
 	// internal state
-	sparse_dirty_rect *	m_next;
+	sparse_dirty_rect * m_next;
 };
 
 
@@ -93,12 +93,12 @@ private:
 	void invalidate_rect_list() { m_rect_list_bounds.set(0, -1, 0, -1); }
 
 	// internal state
-	int						m_width;
-	int						m_height;
-	int						m_granularity;
-	bitmap_ind8				m_bitmap;
-	rectangle				m_rect_list_bounds;
-	fixed_allocator<sparse_dirty_rect>	m_rect_allocator;
+	int                     m_width;
+	int                     m_height;
+	int                     m_granularity;
+	bitmap_ind8             m_bitmap;
+	rectangle               m_rect_list_bounds;
+	fixed_allocator<sparse_dirty_rect>  m_rect_allocator;
 	simple_list<sparse_dirty_rect> m_rect_list;
 };
 
@@ -115,11 +115,11 @@ protected:
 	// construction/destruction - only for subclasses
 	sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, int dirty_granularity = 3)
 		: device_t(mconfig, type, name, tag, owner, 0),
-		  m_xorigin(0),
-		  m_yorigin(0),
-		  m_spriteram(NULL),
-		  m_spriteram_bytes(0),
-		  m_dirty(dirty_granularity)
+			m_xorigin(0),
+			m_yorigin(0),
+			m_spriteram(NULL),
+			m_spriteram_bytes(0),
+			m_dirty(dirty_granularity)
 	{
 		force_clear();
 	}
@@ -219,17 +219,17 @@ protected:
 
 private:
 	// configuration
-	INT32							m_xorigin;				// X origin for drawing
-	INT32							m_yorigin;				// Y origin for drawing
+	INT32                           m_xorigin;              // X origin for drawing
+	INT32                           m_yorigin;              // Y origin for drawing
 
 	// memory pointers and buffers
-	_SpriteRAMType *				m_spriteram;			// pointer to spriteram pointer
-	INT32							m_spriteram_bytes;		// size of sprite RAM in bytes
-	dynamic_array<_SpriteRAMType>	m_buffer;				// buffered spriteram for those that use it
+	_SpriteRAMType *                m_spriteram;            // pointer to spriteram pointer
+	INT32                           m_spriteram_bytes;      // size of sprite RAM in bytes
+	dynamic_array<_SpriteRAMType>   m_buffer;               // buffered spriteram for those that use it
 
 	// bitmaps
-	_BitmapType						m_bitmap;				// live bitmap
-	sparse_dirty_bitmap				m_dirty;				// dirty bitmap
+	_BitmapType                     m_bitmap;               // live bitmap
+	sparse_dirty_bitmap             m_dirty;                // dirty bitmap
 };
 
 typedef sprite_device<UINT8, bitmap_ind16> sprite8_device_ind16;
@@ -241,4 +241,4 @@ typedef sprite_device<UINT16, bitmap_ind32> sprite16_device_ind32;
 typedef sprite_device<UINT32, bitmap_ind32> sprite32_device_ind32;
 
 
-#endif	// __SPRITE_H__
+#endif  // __SPRITE_H__

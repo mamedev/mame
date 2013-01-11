@@ -84,7 +84,7 @@ public:
 /* VDP device to give us our own memory map */
 
 class janshi_vdp_device : public device_t,
-						  public device_memory_interface
+							public device_memory_interface
 {
 public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -94,7 +94,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-	address_space_config		m_space_config;
+	address_space_config        m_space_config;
 
 
 
@@ -124,8 +124,8 @@ const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JANSHIVDP, "JANSHIVDP", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
+		device_memory_interface(mconfig, *this),
+		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
 {
 }
 
@@ -289,16 +289,16 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 
 		/* vram 1 (video map 0xfc2000)
 
-          tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
+		  tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
 
-          vram 2 (video map 0xfc3800)
+		  vram 2 (video map 0xfc3800)
 
-          yyyy yyyy | ???? ???? |
+		  yyyy yyyy | ???? ???? |
 
-        there is also some data at 13000 - 137ff
-        and a table at 20000..
+		there is also some data at 13000 - 137ff
+		and a table at 20000..
 
-          */
+		  */
 
 			spr_offs = ((m_janshi_vram1[(i*4)+0] & 0xff) | (m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
 			col = (m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
@@ -766,23 +766,23 @@ static INPUT_PORTS_START( janshi )
 	PORT_DIPSETTING(    0x02, "8 Seconds" )
 	PORT_DIPSETTING(    0x03, "6 Seconds" )
 	PORT_DIPNAME( 0x04, 0x04, "Yakuman Bonus" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x10, "BGM" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "Voice" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "Nudity" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW3:1" )

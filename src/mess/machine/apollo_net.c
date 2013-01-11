@@ -51,8 +51,8 @@ struct ip_header
 #define ETHERNET_APOLLO_PREFIX 0x08001e
 #define ETHERNET_APOLLO_DOMAIN_PREFIX 0x09001e
 
-#define ICMP_ECHOREPLY		0	/* Echo Reply           */
-#define ICMP_ECHO		    8	/* Echo Request         */
+#define ICMP_ECHOREPLY      0   /* Echo Reply           */
+#define ICMP_ECHO           8   /* Echo Request         */
 
 #define PACKET_HEADER_SIZE 64
 
@@ -104,15 +104,15 @@ static UINT8 list_directory_header[] = {
 };
 
 static UINT8 receive_data_header[] = {
-    0x00,0x01,                      // 0x40:
-    0x00,0x01,                      // 0x42:
-    0x00,0x09,                      // 0x44: packet type (09 = 08+1)
-    0x00,0x00,0x00,0x00,            // 0x46:
-    0x00,0x13,0xfc,0xaf,            // 0x4A: high
-    0x00,0x13,0xd8,0x00,            // 0x4E: low
-    0x00,0x13,0xd8,0x2a,            // 0x52: start
-    0x00,0x13,0xd8,0x00,            // 0x56: current load address
-    0x00,0x00                       // 0x5a:
+	0x00,0x01,                      // 0x40:
+	0x00,0x01,                      // 0x42:
+	0x00,0x09,                      // 0x44: packet type (09 = 08+1)
+	0x00,0x00,0x00,0x00,            // 0x46:
+	0x00,0x13,0xfc,0xaf,            // 0x4A: high
+	0x00,0x13,0xd8,0x00,            // 0x4E: low
+	0x00,0x13,0xd8,0x2a,            // 0x52: start
+	0x00,0x13,0xd8,0x00,            // 0x56: current load address
+	0x00,0x00                       // 0x5a:
 };
 
 static UINT8 not_found_data_header[] = {
@@ -646,8 +646,8 @@ static int is_ip_arp_request(const UINT8 ethernet_header[], const int data_lengt
 static int is_ip_echo_request(const UINT8 ethernet_header[], const int data_length) {
 	return data_length >= 0x30 && //
 			get_word(ethernet_header + 0x0c) == ETHERNET_PACKET_TYPE_IP && //
-        	get_byte(ethernet_header + 0x22) == ICMP_ECHO && //
-        	is_my_ethernet_address(ethernet_header);
+			get_byte(ethernet_header + 0x22) == ICMP_ECHO && //
+			is_my_ethernet_address(ethernet_header);
 }
 
 static UINT16 in_checksum(UINT8 *ptr, UINT32 nbytes)
@@ -725,8 +725,8 @@ static int echo_server(const device_t *device,
 		const UINT8 rx_data[], int rx_data_length,
 		UINT8 tx_data[]) {
 
-    static const UINT32 ip_offset = sizeof(ethernet_header);
-    static const UINT32 icmp_offset = ip_offset + sizeof(ip_header);
+	static const UINT32 ip_offset = sizeof(ethernet_header);
+	static const UINT32 icmp_offset = ip_offset + sizeof(ip_header);
 
 	UINT16 tx_data_length = rx_data_length;
 	memcpy(tx_data, rx_data, tx_data_length);

@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w)  AM_SHARE("custom_regs")
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
 
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8("es5503", es5503_device, read, write, 0x00ff)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0x284000, 0x28400f) AM_WRITE_LEGACY(output_w)
 	AM_RANGE(0x286000, 0x28600f) AM_READWRITE_LEGACY(coin_chip_r, coin_chip_w)
 	AM_RANGE(0x300000, 0x3bffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xf00000, 0xfbffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
+	AM_RANGE(0xf00000, 0xfbffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 ADDRESS_MAP_END
 
 
@@ -160,8 +160,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mquake )
 	PORT_START("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* JS0SW */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* JS1SW */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)         /* JS0SW */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)         /* JS1SW */
 
 	PORT_START("JOY0DAT")
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state,amiga_joystick_convert, "P1JOY")
@@ -315,20 +315,20 @@ MACHINE_RESET_MEMBER(amiga_state,mquake)
 
 static const legacy_mos6526_interface cia_0_intf =
 {
-	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_0_irq),                                    /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_INPUT_PORT("CIA0PORTA"),
-	DEVCB_HANDLER(mquake_cia_0_porta_w),	/* port A */
+	DEVCB_HANDLER(mquake_cia_0_porta_w),    /* port A */
 	DEVCB_HANDLER(mquake_cia_0_portb_r),
-	DEVCB_HANDLER(mquake_cia_0_portb_w)	/* port B */
+	DEVCB_HANDLER(mquake_cia_0_portb_w) /* port B */
 };
 
 static const legacy_mos6526_interface cia_1_intf =
 {
-	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_LINE(amiga_cia_1_irq),                                    /* irq_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( mquake, amiga_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
-	MCFG_ES5503_ADD("es5503", 7159090, 1, NULL, NULL)		/* ES5503 is likely mono due to channel strobe used as bank select */
+	MCFG_ES5503_ADD("es5503", 7159090, 1, NULL, NULL)       /* ES5503 is likely mono due to channel strobe used as bank select */
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, mquake_es5503_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)

@@ -149,4 +149,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1977, elekscmp,  0,   0,       elekscmp,  elekscmp, driver_device,  0,  "Elektor Electronics", "Elektor SC/MP", GAME_NO_SOUND_HW)
-

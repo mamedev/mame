@@ -310,7 +310,7 @@ void hd44780_device::update_ac(void) // m_data_bus_flag was left as global so ol
 	{
 		m_cursor_pos = m_ac;
 		// display is shifted only after a write
-		if (m_shift_on && m_data_bus_flag == 1)	m_disp_shift += m_direction;
+		if (m_shift_on && m_data_bus_flag == 1) m_disp_shift += m_direction;
 	}
 	m_data_bus_flag = 0;
 }

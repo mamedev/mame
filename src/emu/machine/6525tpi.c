@@ -108,15 +108,15 @@
 
 struct tpi6525_state
 {
-	devcb_resolved_write_line	out_irq_func;
-	devcb_resolved_read8		in_pa_func;
-	devcb_resolved_write8		out_pa_func;
-	devcb_resolved_read8		in_pb_func;
-	devcb_resolved_write8		out_pb_func;
-	devcb_resolved_read8		in_pc_func;
-	devcb_resolved_write8		out_pc_func;
-	devcb_resolved_write_line	out_ca_func;
-	devcb_resolved_write_line	out_cb_func;
+	devcb_resolved_write_line   out_irq_func;
+	devcb_resolved_read8        in_pa_func;
+	devcb_resolved_write8       out_pa_func;
+	devcb_resolved_read8        in_pb_func;
+	devcb_resolved_write8       out_pb_func;
+	devcb_resolved_read8        in_pc_func;
+	devcb_resolved_write8       out_pc_func;
+	devcb_resolved_write_line   out_ca_func;
+	devcb_resolved_write_line   out_cb_func;
 
 	UINT8 port_a, ddr_a, in_a;
 	UINT8 port_b, ddr_b, in_b;
@@ -646,5 +646,3 @@ void tpi6525_device::device_reset()
 {
 	DEVICE_RESET_NAME( tpi6525 )(this);
 }
-
-

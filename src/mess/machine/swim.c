@@ -3,7 +3,7 @@
     swim.c
 
     Implementation of the Apple SWIM FDC controller; used on (less)
-	early Macs
+    early Macs
 
 *********************************************************************/
 
@@ -14,7 +14,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define LOG_SWIM	0
+#define LOG_SWIM    0
 
 enum
 {
@@ -51,9 +51,9 @@ void swim_device::device_start()
 	// call inherited version
 	applefdc_base_device::device_start();
 
-	m_swim_mode			= SWIM_MODE_IWM;
-	m_swim_magic_state	= 0x00;
-	m_parm_offset		= 0x00;
+	m_swim_mode         = SWIM_MODE_IWM;
+	m_swim_magic_state  = 0x00;
+	m_parm_offset       = 0x00;
 	memset(m_ism_regs, 0, sizeof(m_ism_regs));
 	memset(m_parms, 0, sizeof(m_parms));
 }
@@ -151,7 +151,7 @@ void swim_device::write(UINT8 offset, UINT8 data)
 				m_ism_regs[6] &= ~data;
 				m_parm_offset = 0;
 
-				if (data == 0xf8)	// magic "revert to IWM" value
+				if (data == 0xf8)   // magic "revert to IWM" value
 				{
 					if (LOG_SWIM)
 						logerror("SWIM: reverting to IWM\n");

@@ -11,7 +11,7 @@
 #include "n68681.h"
 
 #define VERBOSE 0
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 static const char *const duart68681_reg_read_names[0x10] =
 {
@@ -26,28 +26,28 @@ static const char *const duart68681_reg_write_names[0x10] =
 static const int baud_rate_ACR_0[] = { 50, 110, 134, 200, 300, 600, 1200, 1050, 2400, 4800, 7200, 9600, 38400, 0, 0, 0 };
 static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 2400, 4800, 1800, 9600, 19200, 0, 0, 0 };
 
-#define INT_INPUT_PORT_CHANGE		0x80
-#define INT_DELTA_BREAK_B			0x40
-#define INT_RXRDY_FFULLB			0x20
-#define INT_TXRDYB					0x10
-#define INT_COUNTER_READY			0x08
-#define INT_DELTA_BREAK_A			0x04
-#define INT_RXRDY_FFULLA			0x02
-#define INT_TXRDYA					0x01
+#define INT_INPUT_PORT_CHANGE       0x80
+#define INT_DELTA_BREAK_B           0x40
+#define INT_RXRDY_FFULLB            0x20
+#define INT_TXRDYB                  0x10
+#define INT_COUNTER_READY           0x08
+#define INT_DELTA_BREAK_A           0x04
+#define INT_RXRDY_FFULLA            0x02
+#define INT_TXRDYA                  0x01
 
-#define STATUS_RECEIVED_BREAK		0x80
-#define STATUS_FRAMING_ERROR		0x40
-#define STATUS_PARITY_ERROR			0x20
-#define STATUS_OVERRUN_ERROR		0x10
-#define STATUS_TRANSMITTER_EMPTY	0x08
-#define STATUS_TRANSMITTER_READY	0x04
-#define STATUS_FIFO_FULL			0x02
-#define STATUS_RECEIVER_READY		0x01
+#define STATUS_RECEIVED_BREAK       0x80
+#define STATUS_FRAMING_ERROR        0x40
+#define STATUS_PARITY_ERROR         0x20
+#define STATUS_OVERRUN_ERROR        0x10
+#define STATUS_TRANSMITTER_EMPTY    0x08
+#define STATUS_TRANSMITTER_READY    0x04
+#define STATUS_FIFO_FULL            0x02
+#define STATUS_RECEIVER_READY       0x01
 
-#define MODE_RX_INT_SELECT_BIT		0x40
+#define MODE_RX_INT_SELECT_BIT      0x40
 
-#define CHANA_TAG	"cha"
-#define CHANB_TAG	"chb"
+#define CHANA_TAG   "cha"
+#define CHANB_TAG   "chb"
 
 // device type definition
 const device_type DUARTN68681 = &device_creator<duartn68681_device>;
@@ -147,30 +147,30 @@ machine_config_constructor duartn68681_device::device_mconfig_additions() const
 void duartn68681_device::update_interrupts()
 {
 	/* update SR state and update interrupt ISR state for the following bits:
-    SRn: bits 7-4: handled elsewhere.
-    SRn: bit 3 (TxEMTn) (we can assume since we're not actually emulating the delay/timing of sending bits, that as long as TxRDYn is set, TxEMTn is also set since the transmit byte has 'already happened', therefore TxEMTn is always 1 assuming tx is enabled on channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined)
-    SRn: bit 2 (TxRDYn) (we COULD assume since we're not emulating delay and timing output, that as long as tx is enabled on channel n, TxRDY is 1 for channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined; however, tx_ready is already nicely handled for us elsewhere, so we can use that instead for now, though we may need to retool that code as well)
-    SRn: bit 1 (FFULLn) (this bit we actually emulate; if the receive fifo for channel n is full, this bit is 1, otherwise it is 0. the receive fifo should be three words long.)
-    SRn: bit 0 (RxRDYn) (this bit we also emulate; the bit is always asserted if the receive fifo is not empty)
-    ISR: bit 7: Input Port change; this should be handled elsewhere, on the input port handler
-    ISR: bit 6: Delta Break B; this should be handled elsewhere, on the data receive handler
-    ISR: bit 5: RxRDYB/FFULLB: this is handled here; depending on whether MSR1B bit 6 is 0 or 1, this bit holds the state of SRB bit 0 or bit 1 respectively
-    ISR: bit 4: TxRDYB: this is handled here; it mirrors SRB bit 2
-    ISR: bit 3: Counter ready; this should be handled by the timer generator
-    ISR: bit 2: Delta Break A; this should be handled elsewhere, on the data receive handler
-    ISR: bit 1: RxRDYA/FFULLA: this is handled here; depending on whether MSR1A bit 6 is 0 or 1, this bit holds the state of SRA bit 0 or bit 1 respectively
-    ISR: bit 0: TxRDYA: this is handled here; it mirrors SRA bit 2
-    */
+	SRn: bits 7-4: handled elsewhere.
+	SRn: bit 3 (TxEMTn) (we can assume since we're not actually emulating the delay/timing of sending bits, that as long as TxRDYn is set, TxEMTn is also set since the transmit byte has 'already happened', therefore TxEMTn is always 1 assuming tx is enabled on channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined)
+	SRn: bit 2 (TxRDYn) (we COULD assume since we're not emulating delay and timing output, that as long as tx is enabled on channel n, TxRDY is 1 for channel n and the MSR2n mode is 0 or 2; in mode 1 it is explicitly zeroed, and mode 3 is undefined; however, tx_ready is already nicely handled for us elsewhere, so we can use that instead for now, though we may need to retool that code as well)
+	SRn: bit 1 (FFULLn) (this bit we actually emulate; if the receive fifo for channel n is full, this bit is 1, otherwise it is 0. the receive fifo should be three words long.)
+	SRn: bit 0 (RxRDYn) (this bit we also emulate; the bit is always asserted if the receive fifo is not empty)
+	ISR: bit 7: Input Port change; this should be handled elsewhere, on the input port handler
+	ISR: bit 6: Delta Break B; this should be handled elsewhere, on the data receive handler
+	ISR: bit 5: RxRDYB/FFULLB: this is handled here; depending on whether MSR1B bit 6 is 0 or 1, this bit holds the state of SRB bit 0 or bit 1 respectively
+	ISR: bit 4: TxRDYB: this is handled here; it mirrors SRB bit 2
+	ISR: bit 3: Counter ready; this should be handled by the timer generator
+	ISR: bit 2: Delta Break A; this should be handled elsewhere, on the data receive handler
+	ISR: bit 1: RxRDYA/FFULLA: this is handled here; depending on whether MSR1A bit 6 is 0 or 1, this bit holds the state of SRA bit 0 or bit 1 respectively
+	ISR: bit 0: TxRDYA: this is handled here; it mirrors SRA bit 2
+	*/
 	if ( (ISR & IMR) != 0 )
 	{
 		LOG(( "68681: Interrupt line active (IMR & ISR = %02X)\n", (ISR & IMR) ));
 		m_out_irq_func(ASSERT_LINE);
 	}
-    else
-    {
+	else
+	{
 		LOG(( "68681: Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR));
 		m_out_irq_func(CLEAR_LINE);
-    }
+	}
 };
 
 double duartn68681_device::duart68681_get_ct_rate()
@@ -498,8 +498,8 @@ duart68681_channel::duart68681_channel(const machine_config &mconfig, const char
 
 void duart68681_channel::device_start()
 {
-	m_uart = downcast<duartn68681_device *>(owner()); 
-	m_ch = m_uart->get_ch(this);	// get our channel number
+	m_uart = downcast<duartn68681_device *>(owner());
+	m_ch = m_uart->get_ch(this);    // get our channel number
 
 	save_item(NAME(CR));
 	save_item(NAME(CSR));
@@ -521,8 +521,8 @@ void duart68681_channel::device_start()
 
 void duart68681_channel::device_reset()
 {
-	write_CR(0x10);	// reset MR
-	write_CR(0x20);	// reset Rx
+	write_CR(0x10); // reset MR
+	write_CR(0x20); // reset Rx
 	write_CR(0x30); // reset Tx
 	write_CR(0x40); // reset errors
 
@@ -534,7 +534,7 @@ void duart68681_channel::rcv_complete()
 {
 	receive_register_extract();
 
-//	printf("ch %d rcv complete\n", m_ch);
+//  printf("ch %d rcv complete\n", m_ch);
 
 	if ( rx_enabled )
 	{
@@ -556,7 +556,7 @@ void duart68681_channel::rcv_complete()
 
 void duart68681_channel::tra_complete()
 {
-//	printf("ch %d Tx complete\n", m_ch);
+//  printf("ch %d Tx complete\n", m_ch);
 	tx_ready = 1;
 	SR |= STATUS_TRANSMITTER_READY;
 
@@ -571,7 +571,7 @@ void duart68681_channel::tra_complete()
 void duart68681_channel::tra_callback()
 {
 	int bit = transmit_register_get_data_bit();
-//	printf("ch %d transmit %d\n", m_ch, bit);
+//  printf("ch %d transmit %d\n", m_ch, bit);
 	if (m_ch == 0)
 	{
 		m_uart->m_out_a_tx_func(bit);
@@ -579,11 +579,11 @@ void duart68681_channel::tra_callback()
 	else
 	{
 		m_uart->m_out_b_tx_func(bit);
-	}   
+	}
 }
 
-void duart68681_channel::input_callback(UINT8 state) 
-{ 
+void duart68681_channel::input_callback(UINT8 state)
+{
 }
 
 void duart68681_channel::update_interrupts()
@@ -686,7 +686,7 @@ UINT8 duart68681_channel::read_rx_fifo()
 {
 	UINT8 rv = 0;
 
-//	printf("read_rx_fifo: rx_fifo_num %d\n", rx_fifo_num);
+//  printf("read_rx_fifo: rx_fifo_num %d\n", rx_fifo_num);
 
 	if ( rx_fifo_num == 0 )
 	{
@@ -712,7 +712,7 @@ UINT8 duart68681_channel::read_chan_reg(int reg)
 
 	switch (reg)
 	{
-		case 0:	// MR1/MR2
+		case 0: // MR1/MR2
 			if ( MR_ptr == 0 )
 			{
 				rv = MR1;
@@ -731,7 +731,7 @@ UINT8 duart68681_channel::read_chan_reg(int reg)
 		case 2: // CSRA: reading this is prohibited
 			break;
 
-		case 3:	// Rx holding register A
+		case 3: // Rx holding register A
 			rv = read_rx_fifo();
 			break;
 	}
@@ -751,7 +751,7 @@ void duart68681_channel::write_chan_reg(int reg, UINT8 data)
 		CSR = data;
 		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
 		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
-//		printf("ch %d Tx baud %d Rx baud %d\n", m_ch, tx_baud_rate, rx_baud_rate);
+//      printf("ch %d Tx baud %d Rx baud %d\n", m_ch, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
 		break;
@@ -792,7 +792,7 @@ void duart68681_channel::recalc_framing()
 			stopbits = 1;
 			break;
 
-		case 2:	// "1.5 async, 2 sync"
+		case 2: // "1.5 async, 2 sync"
 			stopbits = 2;
 			break;
 
@@ -803,7 +803,7 @@ void duart68681_channel::recalc_framing()
 
 	switch ((MR1>>3) & 3)
 	{
-		case 0:	// with parity
+		case 0: // with parity
 			if (MR1 & 4)
 			{
 				parity = SERIAL_PARITY_ODD;
@@ -814,7 +814,7 @@ void duart68681_channel::recalc_framing()
 			}
 			break;
 
-		case 1:	// force parity
+		case 1: // force parity
 			if (MR1 & 4)
 			{
 				parity = SERIAL_PARITY_MARK;
@@ -825,16 +825,16 @@ void duart68681_channel::recalc_framing()
 			}
 			break;
 
-		case 2:	// no parity
+		case 2: // no parity
 			parity = SERIAL_PARITY_NONE;
 			break;
 
-		case 3:	// multidrop mode
+		case 3: // multidrop mode
 			fatalerror("68681: multidrop parity not supported\n");
 			break;
 	}
 
-//	printf("ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
+//  printf("ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
 	set_data_frame((MR1 & 3)+5, stopbits, parity);
 }
@@ -867,7 +867,7 @@ void duart68681_channel::write_CR(UINT8 data)
 			else
 				m_uart->clear_ISR_bits(INT_TXRDYB);
 			transmit_register_reset();
-            break;
+			break;
 		case 4: /* Reset Error Status */
 			SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR | STATUS_OVERRUN_ERROR);
 			break;
@@ -914,19 +914,19 @@ void duart68681_channel::write_CR(UINT8 data)
 			m_uart->clear_ISR_bits(INT_TXRDYB);
 	}
 
-    update_interrupts();
+	update_interrupts();
 };
 
 void duart68681_channel::write_TX(UINT8 data)
 {
 	tx_data = data;
 
-/*	if (!tx_ready)
-	{
-		 printf("Write %02x to TX when TX not ready!\n", data);
-	}*/
+/*  if (!tx_ready)
+    {
+         printf("Write %02x to TX when TX not ready!\n", data);
+    }*/
 
-//	printf("ch %d Tx %02x\n", m_ch, data);
+//  printf("ch %d Tx %02x\n", m_ch, data);
 
 	// send the byte unless we're in loopback mode;
 	// in loopback mode do NOT 'actually' send the byte: the TXn pin is held high when loopback mode is on.
@@ -971,4 +971,3 @@ void duart68681_channel::write_TX(UINT8 data)
 
 	update_interrupts();
 };
-

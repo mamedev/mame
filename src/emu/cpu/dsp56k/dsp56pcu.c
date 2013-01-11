@@ -136,7 +136,7 @@ void pcu_reset(dsp56k_core* cpustate)
 			/*        This, in actuality, is handled with the internal boot ROM. */
 			for (i = 0; i < 0x800; i++)
 			{
-				UINT32 mem_offset = (0xc000<<1) + (i<<1);	/* TODO: TEST */
+				UINT32 mem_offset = (0xc000<<1) + (i<<1);   /* TODO: TEST */
 
 				/* TODO - DO I HAVE TO FLIP THIS WORD? */
 				/* P:$c000 -> Internal P:$0000 low byte */
@@ -144,7 +144,7 @@ void pcu_reset(dsp56k_core* cpustate)
 				/* ... */
 				/* P:$cffe -> Internal P:$07ff low byte */
 				/* P:$cfff -> Internal P:$07ff high byte */
-				UINT8 mem_value_low  = cpustate->program->read_byte(mem_offset);		/* TODO: IS THIS READING RIGHT? */
+				UINT8 mem_value_low  = cpustate->program->read_byte(mem_offset);        /* TODO: IS THIS READING RIGHT? */
 				UINT8 mem_value_high = cpustate->program->read_byte(mem_offset);
 				cpustate->program_ram[i] = (mem_value_high << 8) || mem_value_low;
 			}
@@ -348,7 +348,7 @@ void dsp56k_irq_table_init(void)
 	dsp56k_set_irq_source(19, 0x0026, "Host DMA Transmit Data");
 	dsp56k_set_irq_source(20, 0x0028, "Host Receive Data");
 	dsp56k_set_irq_source(21, 0x002a, "Host Transmit Data");
-	dsp56k_set_irq_source(22, 0x002c, "Host Command");				/* Default vector for the host command */
+	dsp56k_set_irq_source(22, 0x002c, "Host Command");              /* Default vector for the host command */
 	dsp56k_set_irq_source(23, 0x002e, "Codec Receive/Transmit");
 	dsp56k_set_irq_source(24, 0x0030, "Host Command 1");
 	dsp56k_set_irq_source(25, 0x0032, "Host Command 2");
@@ -397,7 +397,7 @@ void dsp56k_sort_pending_interrupts(dsp56k_core* cpustate, int num)
 	/* Bubble sort should be good enough for us */
 	for (i = 0; i < num; i++)
 	{
-	    for(j = 0; j < num-1; j++)
+		for(j = 0; j < num-1; j++)
 		{
 			if (priority_list[j] > priority_list[j+1])
 			{
@@ -435,7 +435,7 @@ INT8 dsp56k_get_irq_priority(dsp56k_core* cpustate, int index)
 		/* Poll the IPR for these guys. */
 		case 5:  return irqa_ipl(cpustate);  /* IRQA */
 		case 6:  return irqb_ipl(cpustate);  /* IRQB */
-		case 7:  return -1;         		 /* Reserved */
+		case 7:  return -1;                  /* Reserved */
 		case 8:  return ssi0_ipl(cpustate);  /* SSI0 Receive Data with Exception */
 		case 9:  return ssi0_ipl(cpustate);  /* SSI0 Receive Data */
 		case 10: return ssi0_ipl(cpustate);  /* SSI0 Transmit Data with Exception */

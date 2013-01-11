@@ -249,27 +249,27 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( koikoi )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x01, "Timer C" )
-	PORT_DIPSETTING(	0x00, "50" )
-	PORT_DIPSETTING(	0x01, "70" )
-	PORT_DIPSETTING(	0x02, "90" )
-	PORT_DIPSETTING(	0x03, "110" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x01, "70" )
+	PORT_DIPSETTING(    0x02, "90" )
+	PORT_DIPSETTING(    0x03, "110" )
 	PORT_DIPNAME( 0x0c, 0x04, "Timer M" )
-	PORT_DIPSETTING(	0x00, "120" )
-	PORT_DIPSETTING(	0x04, "150" )
-	PORT_DIPSETTING(	0x08, "180" )
-	PORT_DIPSETTING(	0x0c, "210" )
+	PORT_DIPSETTING(    0x00, "120" )
+	PORT_DIPSETTING(    0x04, "150" )
+	PORT_DIPSETTING(    0x08, "180" )
+	PORT_DIPSETTING(    0x0c, "210" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Test Mode" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -327,8 +327,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,					DEVCB_DRIVER_MEMBER(koikoi_state,input_r),
-	DEVCB_DRIVER_MEMBER(koikoi_state,unknown_w),	DEVCB_NULL
+	DEVCB_NULL,                 DEVCB_DRIVER_MEMBER(koikoi_state,input_r),
+	DEVCB_DRIVER_MEMBER(koikoi_state,unknown_w),    DEVCB_NULL
 };
 
 
@@ -362,7 +362,7 @@ void koikoi_state::machine_reset()
 static MACHINE_CONFIG_START( koikoi, koikoi_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
+	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
 	MCFG_CPU_PROGRAM_MAP(koikoi_map)
 	MCFG_CPU_IO_MAP(koikoi_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", koikoi_state,  nmi_line_pulse)
@@ -396,12 +396,12 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( koikoi )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* code */
 	ROM_LOAD( "ic56", 0x0000, 0x1000, CRC(bdc68f9d) SHA1(c45fbc95abb37f750acc1d9f3b35ad0f41af097d) )
 	ROM_LOAD( "ic55", 0x1000, 0x1000, CRC(fe09248a) SHA1(c192795678068e387bd406f5cd1c5aba5f5ef66a) )
 	ROM_LOAD( "ic54", 0x2000, 0x1000, CRC(925fc57c) SHA1(4c79df92b6617fe84e61359c8e6e3b907b138777) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )	/* gfx */
+	ROM_REGION( 0x3000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "ic33", 0x0000, 0x1000, CRC(9e4d563b) SHA1(63664dcffc2eb198a161c73131b95a66b2067424) )
 	ROM_LOAD( "ic26", 0x1000, 0x1000, CRC(79cb1e93) SHA1(4d08b3d88727b437673f7a51d47396f19bbc3caa) )
 	ROM_LOAD( "ic18", 0x2000, 0x1000, CRC(c209362d) SHA1(0620c19fe72e8407db0f487b6413c5d45ac8046c) )

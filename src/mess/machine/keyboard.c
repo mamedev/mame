@@ -70,7 +70,7 @@ UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 	UINT8 ctrl  = BIT(ioport("TERM_LINEC")->read(), 0);
 	i = *scan_line;
 	{
-		code =	ioport(keynames[i])->read();
+		code =  ioport(keynames[i])->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -177,7 +177,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor generic_keyboard_device::device_mconfig_additions() const
 {
-      return MACHINE_CONFIG_NAME(generic_keyboard);
+		return MACHINE_CONFIG_NAME(generic_keyboard);
 }
 
 void generic_keyboard_device::device_start()
@@ -365,8 +365,8 @@ ioport_constructor serial_keyboard_device::device_input_ports() const
 
 serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: generic_keyboard_device(mconfig, SERIAL_KEYBOARD, "Serial Keyboard", tag, owner, clock),
-	  device_serial_interface(mconfig, *this),
-	  device_serial_port_interface(mconfig, *this)
+		device_serial_interface(mconfig, *this),
+		device_serial_port_interface(mconfig, *this)
 {
 }
 

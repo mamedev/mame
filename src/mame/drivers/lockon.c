@@ -16,8 +16,8 @@
 #include "sound/flt_vol.h"
 #include "includes/lockon.h"
 
-#define V30_GND_ADDR	((m_ctrl_reg & 0x3) << 16)
-#define V30_OBJ_ADDR	((m_ctrl_reg & 0x18) << 13)
+#define V30_GND_ADDR    ((m_ctrl_reg & 0x3) << 16)
+#define V30_OBJ_ADDR    ((m_ctrl_reg & 0x18) << 13)
 
 
 /*************************************
@@ -259,10 +259,10 @@ static INPUT_PORTS_START( lockon )
 	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_6C ) )
 
 	/*
-        Wire jumper beside the dipswitches on PCB TF011.
-        To access the menu, press the service coin during
-        test mode.
-    */
+	    Wire jumper beside the dipswitches on PCB TF011.
+	    To access the menu, press the service coin during
+	    test mode.
+	*/
 	PORT_DIPNAME( 0x4000, 0x4000, "Enable H/W Tests Menu" )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -370,17 +370,17 @@ GFXDECODE_END
 
 WRITE8_MEMBER(lockon_state::sound_vol)
 {
-#define LO_SHUNT	250.0
-#define LO_R0		5600.0
-#define LO_R1		10000.0
-#define LO_R2		22000.0
-#define LO_R3		47000.0
-#define LO_R0S		(1/(1/LO_SHUNT + 1/LO_R0))
-#define LO_R1S		(1/(1/LO_SHUNT + 1/LO_R1))
-#define LO_R2S		(1/(1/LO_SHUNT + 1/LO_R2))
-#define LO_R3S		(1/(1/LO_SHUNT + 1/LO_R3))
-#define LO_RI		100000.0
-#define LO_RP		100000.0
+#define LO_SHUNT    250.0
+#define LO_R0       5600.0
+#define LO_R1       10000.0
+#define LO_R2       22000.0
+#define LO_R3       47000.0
+#define LO_R0S      (1/(1/LO_SHUNT + 1/LO_R0))
+#define LO_R1S      (1/(1/LO_SHUNT + 1/LO_R1))
+#define LO_R2S      (1/(1/LO_SHUNT + 1/LO_R2))
+#define LO_R3S      (1/(1/LO_SHUNT + 1/LO_R3))
+#define LO_RI       100000.0
+#define LO_RP       100000.0
 
 
 	static const double gains[16] =

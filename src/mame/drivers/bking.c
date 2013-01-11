@@ -213,11 +213,11 @@ static INPUT_PORTS_START( bking )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )	/* Continue 1 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	/* Continue 2 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* Continue 1 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Continue 2 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )	/* Not Connected */
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* Not Connected */
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, "Holes Awarded" ) PORT_DIPLOCATION("SWA:1")
@@ -336,18 +336,18 @@ static const gfx_layout charlayout =
 
 static const gfx_layout crowlayout =
 {
-	16,32,	/* 16*32 characters */
-	16,		/* 16 characters */
-	2,		/* 2 bits per pixel */
+	16,32,  /* 16*32 characters */
+	16,     /* 16 characters */
+	2,      /* 2 bits per pixel */
 	{ 0, 4 },
 	{ 3*32*8+3, 3*32*8+2, 3*32*8+1, 3*32*8+0,
-	  2*32*8+3, 2*32*8+2, 2*32*8+1, 2*32*8+0,
-	    32*8+3,   32*8+2,   32*8+1,   32*8+0,
-		     3,        2,        1,        0 }, /* reverse layout */
+		2*32*8+3, 2*32*8+2, 2*32*8+1, 2*32*8+0,
+		32*8+3,   32*8+2,   32*8+1,   32*8+0,
+				3,        2,        1,        0 }, /* reverse layout */
 	{ 31*8, 30*8, 29*8, 28*8, 27*8, 26*8, 25*8, 24*8,
-	  23*8, 22*8, 21*8, 20*8, 19*8, 18*8, 17*8, 16*8,
-	  15*8, 14*8, 13*8, 12*8, 11*8, 10*8,  9*8,  8*8,
-	   7*8,  6*8,  5*8,  4*8,  3*8,  2*8,  1*8,  0*8 },
+		23*8, 22*8, 21*8, 20*8, 19*8, 18*8, 17*8, 16*8,
+		15*8, 14*8, 13*8, 12*8, 11*8, 10*8,  9*8,  8*8,
+		7*8,  6*8,  5*8,  4*8,  3*8,  2*8,  1*8,  0*8 },
 	128*8    /* every sprite takes 128 consecutive bytes */
 };
 
@@ -359,7 +359,7 @@ static const gfx_layout balllayout =
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },   /* pretty straightforward layout */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
@@ -465,12 +465,12 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 static MACHINE_CONFIG_START( bking, bking_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
+	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4) /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(bking_map)
 	MCFG_CPU_IO_MAP(bking_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)	/* 3 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)  /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(bking_audio_map)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
@@ -588,10 +588,10 @@ ROM_START( bking2 )
 	ROM_LOAD( "09.13a",       0x5000, 0x1000, CRC(595e3dd4) SHA1(9dd3388ce704dd5473af034716cd8d48df3dc495) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "17",           0x0000, 0x0800, CRC(e5663f0b) SHA1(b0fed8c4cdff7b12bb220e51d5b7188933934a34) )	/* crow graphics */
+	ROM_LOAD( "17",           0x0000, 0x0800, CRC(e5663f0b) SHA1(b0fed8c4cdff7b12bb220e51d5b7188933934a34) )    /* crow graphics */
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "18",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )	/* ball 1 graphics. Only the first 128 bytes used */
+	ROM_LOAD( "18",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )    /* ball 1 graphics. Only the first 128 bytes used */
 
 	ROM_REGION( 0x0800, "gfx4", 0 )
 	ROM_LOAD( "19",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )  /* ball 2 graphics. Only the first 128 bytes used */
@@ -600,7 +600,7 @@ ROM_START( bking2 )
 	ROM_LOAD( "mb7051.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) )  /* collision detection */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s141.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )	/* palette */
+	ROM_LOAD( "82s141.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )    /* palette */
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16l8.1",  0x0000, 0x0104, CRC(e75d19f5) SHA1(d51cbb247760312b8884bbd0478a321eee05034f) )
@@ -774,12 +774,12 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-10.4f",    0x6000, 0x1000, CRC(a86b3e62) SHA1(f97a13e31e622b5ac55c23458c65a49c2998196a) )
 	ROM_LOAD( "a24-11.2f",    0x7000, 0x1000, CRC(b39db430) SHA1(4f48a34f3aaa1e998a4a5656bc3f399d9e6633c4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound ROMs */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound ROMs */
 	ROM_LOAD( "a24-18.4f",    0x0000, 0x1000, CRC(fa3bfa98) SHA1(733924e154e301a9d692d80b485afc4ab0e200c1) )
 	ROM_LOAD( "a24-19.4d",    0x1000, 0x1000, CRC(817f9c2a) SHA1(7365ecf2700e1fd13016408f5493f8d51aab5bbd) )
 	ROM_LOAD( "a24-20.4b",    0x2000, 0x1000, CRC(0e9e16d6) SHA1(43c69602a8d9c34c527ce54472db84168acc4ef4) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a24_22.ic17",  0x000000, 0x000800, CRC(27c497d5) SHA1(c6c72bbf0537da53148fa0a56d412ab46129d29c) )  //M68705P5S uC 3MHz xtal
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* Tiles */
@@ -803,7 +803,7 @@ ROM_START( bking3 )
 	ROM_LOAD( "82s123.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) ) /* collision detection */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "a24_03.2d",    0x0000, 0x0200, CRC(599a6cbe) SHA1(eed8592aaba7b2b6d06f26a2b8720a288f9ad90f) )	/* palette */
+	ROM_LOAD( "a24_03.2d",    0x0000, 0x0200, CRC(599a6cbe) SHA1(eed8592aaba7b2b6d06f26a2b8720a288f9ad90f) )    /* palette */
 
 	ROM_REGION( 0x1000, "user2", 0 )
 	ROM_LOAD( "a24-21.25",    0x0000, 0x1000, CRC(3106fcac) SHA1(08454adfb58e5df84140d86ed52fa4ef684df9f1) ) /* extra rom on the same SUB PCB where is the mcu */

@@ -22,12 +22,12 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SCREEN_TAG		"screen"
-#define I8086_TAG		"10d"
-#define Z80CTC_TAG		"13d"
-#define Z80SIO2_TAG		"15d"
-#define WD2797_TAG		"5f"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define I8086_TAG       "10d"
+#define Z80CTC_TAG      "13d"
+#define Z80SIO2_TAG     "15d"
+#define WD2797_TAG      "5f"
+#define CENTRONICS_TAG  "centronics"
 
 
 
@@ -42,16 +42,16 @@ class f1_state : public driver_device
 public:
 	f1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8086_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_sio(*this, Z80SIO2_TAG),
-		  m_fdc(*this, WD2797_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ctc_int(CLEAR_LINE),
-		  m_sio_int(CLEAR_LINE),
-		  m_p_scrollram(*this, "p_scrollram"),
-		  m_p_paletteram(*this, "p_paletteram"){ }
+			m_maincpu(*this, I8086_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_sio(*this, Z80SIO2_TAG),
+			m_fdc(*this, WD2797_TAG),
+			m_floppy0(*this, FLOPPY_0),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ctc_int(CLEAR_LINE),
+			m_sio_int(CLEAR_LINE),
+			m_p_scrollram(*this, "p_scrollram"),
+			m_p_paletteram(*this, "p_paletteram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;

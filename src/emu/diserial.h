@@ -17,11 +17,11 @@
 */
 enum
 {
-	SERIAL_PARITY_NONE,		/* no parity. a parity bit will not be in the transmitted/received data */
-	SERIAL_PARITY_ODD,		/* odd parity */
-	SERIAL_PARITY_EVEN,		/* even parity */
-	SERIAL_PARITY_MARK,		/* one parity */
-	SERIAL_PARITY_SPACE		/* zero parity */
+	SERIAL_PARITY_NONE,     /* no parity. a parity bit will not be in the transmitted/received data */
+	SERIAL_PARITY_ODD,      /* odd parity */
+	SERIAL_PARITY_EVEN,     /* even parity */
+	SERIAL_PARITY_MARK,     /* one parity */
+	SERIAL_PARITY_SPACE     /* zero parity */
 };
 
 /*
@@ -34,7 +34,7 @@ enum
       This output is active low on serial chips (e.g. 0 is CTS is set),
       but here it is active high!
 */
-#define SERIAL_STATE_CTS	0x0001
+#define SERIAL_STATE_CTS    0x0001
 
 /*
     RTS = Request to Send. (OUTPUT)
@@ -46,7 +46,7 @@ enum
       This output is active low on serial chips (e.g. 0 is RTS is set),
       but here it is active high!
 */
-#define SERIAL_STATE_RTS	0x0002
+#define SERIAL_STATE_RTS    0x0002
 
 /*
     DSR = Data Set ready. (INPUT)
@@ -58,7 +58,7 @@ enum
       This output is active low on serial chips (e.g. 0 is DSR is set),
       but here it is active high!
 */
-#define SERIAL_STATE_DSR	0x0004
+#define SERIAL_STATE_DSR    0x0004
 
 /*
     DTR = Data terminal Ready. (OUTPUT)
@@ -69,11 +69,11 @@ enum
       This output is active low on serial chips (e.g. 0 is DTR is set),
       but here it is active high!
 */
-#define SERIAL_STATE_DTR	0x0008
+#define SERIAL_STATE_DTR    0x0008
 /* RX = Recieve data. (INPUT) */
-#define SERIAL_STATE_RX_DATA	0x00010
+#define SERIAL_STATE_RX_DATA    0x00010
 /* TX = Transmit data. (OUTPUT) */
-#define SERIAL_STATE_TX_DATA	0x00020
+#define SERIAL_STATE_TX_DATA    0x00020
 
 // ======================> device_serial_interface
 class device_serial_interface : public device_interface
@@ -173,22 +173,22 @@ private:
 
 
 class serial_source_device :  public device_t,
-							  public device_serial_interface
+								public device_serial_interface
 {
 public:
-    // construction/destruction
-    serial_source_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	serial_source_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void input_callback(UINT8 state);
 	void send_bit(UINT8 data);
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 };
 
 extern const device_type SERIAL_SOURCE;
 
-#define MCFG_SERIAL_SOURCE_ADD(_tag)	\
+#define MCFG_SERIAL_SOURCE_ADD(_tag)    \
 	MCFG_DEVICE_ADD((_tag), SERIAL_SOURCE, 0)
 
 #endif  /* __DISERIAL_H__ */

@@ -20,7 +20,7 @@ static INPUT_PORTS_START( kc_d002 )
 	// 14 ID are theoretically usable.
 	PORT_START("ID")
 	PORT_DIPNAME( 0xf0, 0x10, "Device ID" )
-	PORT_DIPSETTING( 0x00, "0x00" )		// reserved for base system
+	PORT_DIPSETTING( 0x00, "0x00" )     // reserved for base system
 	PORT_DIPSETTING( 0x10, "0x10" )
 	PORT_DIPSETTING( 0x20, "0x20" )
 	PORT_DIPSETTING( 0x30, "0x30" )
@@ -35,7 +35,7 @@ static INPUT_PORTS_START( kc_d002 )
 	PORT_DIPSETTING( 0xC0, "0xC0" )
 	PORT_DIPSETTING( 0xD0, "0xD0" )
 	PORT_DIPSETTING( 0xE0, "0xE0" )
-	PORT_DIPSETTING( 0xF0, "0xF0" )		// reserved for FDC D004
+	PORT_DIPSETTING( 0xF0, "0xF0" )     // reserved for FDC D004
 INPUT_PORTS_END
 
 // defined in drivers/kc.c
@@ -89,7 +89,7 @@ const device_type KC_D002 = &device_creator<kc_d002_device>;
 //-------------------------------------------------
 
 kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock),
+		: device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock),
 		device_kcexp_interface( mconfig, *this )
 {
 }

@@ -210,13 +210,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	if (state->m_videoctrl[0x03] & 0x08)
 	{
-		sr = &RAM[0x03800];	// Sprite 2
-		ss = &RAM[0x13800];	// Additional Sprite 2
+		sr = &RAM[0x03800]; // Sprite 2
+		ss = &RAM[0x13800]; // Additional Sprite 2
 	}
 	else
 	{
-		sr = &RAM[0x03000];	// Sprite 1
-		ss = &RAM[0x13000];	// Additional Sprite 1
+		sr = &RAM[0x03000]; // Sprite 1
+		ss = &RAM[0x13000]; // Additional Sprite 1
 	}
 
 	draw_sprites_region(machine, bitmap, cliprect, ss, 0x0f5, 3);

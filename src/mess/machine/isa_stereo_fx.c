@@ -33,8 +33,8 @@ READ8_MEMBER( stereo_fx_device::p3_r )
 {
 	UINT8 ret = 0;
 
-	ret |= m_data_out << 2;	// INT0
-	ret |= m_data_in << 3;	// INT1
+	ret |= m_data_out << 2; // INT0
+	ret |= m_data_in << 3;  // INT1
 	ret |= m_t0 << 4; // T0
 	ret |= m_t1 << 5; // T1
 	return ret;
@@ -86,7 +86,7 @@ WRITE8_MEMBER( stereo_fx_device::port00_w )
 }
 
 ROM_START( stereo_fx )
-    ROM_REGION( 0x8000, "stereo_fx_cpu", 0 )
+	ROM_REGION( 0x8000, "stereo_fx_cpu", 0 )
 	ROM_LOAD("ati_stereo_fx.bin", 0x0000, 0x8000, CRC(1BEBFFA6) SHA1(e66c2619a6c05199554b5702d67877ae3799d415))
 ROM_END
 
@@ -119,9 +119,9 @@ static MACHINE_CONFIG_FRAGMENT( stereo_fx )
 	/* no CM/S support (empty sockets) */
 
 	MCFG_SOUND_ADD("dacl", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ADD("dacr", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
@@ -191,10 +191,10 @@ READ8_MEMBER( stereo_fx_device::invalid_r )
 }
 
 stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, ISA8_STEREO_FX, "ATI Stereo F/X Audio Adapter", tag, owner, clock),
+	device_t(mconfig, ISA8_STEREO_FX, "ATI Stereo F/X Audio Adapter", tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
-    m_dacl(*this, "dacl"),
-    m_dacr(*this, "dacr"),
+	m_dacl(*this, "dacl"),
+	m_dacr(*this, "dacr"),
 	m_joy(*this, "joy"),
 	m_cpu(*this, "stereo_fx_cpu")
 {

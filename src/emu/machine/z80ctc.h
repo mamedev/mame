@@ -53,17 +53,17 @@
 
 struct z80ctc_interface
 {
-	devcb_write_line	m_intr_cb;	// callback when change interrupt status
-	devcb_write_line	m_zc0_cb;	// ZC/TO0 callback
-	devcb_write_line	m_zc1_cb;	// ZC/TO1 callback
-	devcb_write_line	m_zc2_cb;	// ZC/TO2 callback
+	devcb_write_line    m_intr_cb;  // callback when change interrupt status
+	devcb_write_line    m_zc0_cb;   // ZC/TO0 callback
+	devcb_write_line    m_zc1_cb;   // ZC/TO1 callback
+	devcb_write_line    m_zc2_cb;   // ZC/TO2 callback
 };
 
 
 
 // ======================> z80ctc_device
 
-class z80ctc_device :	public device_t,
+class z80ctc_device :   public device_t,
 						public device_z80daisy_interface,
 						public z80ctc_interface
 {
@@ -118,27 +118,27 @@ private:
 		void trigger(UINT8 data);
 		void timer_callback();
 
-		z80ctc_device *	m_device;				// pointer back to our device
-		int				m_index;				// our channel index
-		devcb_resolved_write_line m_zc;			// zero crossing callbacks
-		UINT16			m_mode;					// current mode
-		UINT16			m_tconst;				// time constant
-		UINT16			m_down;					// down counter (clock mode only)
-		UINT8			m_extclk;				// current signal from the external clock
-		emu_timer *		m_timer;				// array of active timers
-		UINT8			m_int_state;			// interrupt status (for daisy chain)
+		z80ctc_device * m_device;               // pointer back to our device
+		int             m_index;                // our channel index
+		devcb_resolved_write_line m_zc;         // zero crossing callbacks
+		UINT16          m_mode;                 // current mode
+		UINT16          m_tconst;               // time constant
+		UINT16          m_down;                 // down counter (clock mode only)
+		UINT8           m_extclk;               // current signal from the external clock
+		emu_timer *     m_timer;                // array of active timers
+		UINT8           m_int_state;            // interrupt status (for daisy chain)
 
 	private:
 		static TIMER_CALLBACK( static_timer_callback ) { reinterpret_cast<z80ctc_device::ctc_channel *>(ptr)->timer_callback(); }
 	};
 
 	// internal state
-	devcb_resolved_write_line m_intr;			// interrupt callback
+	devcb_resolved_write_line m_intr;           // interrupt callback
 
-	UINT8				m_vector;				// interrupt vector
-	attotime			m_period16;				// 16/system clock
-	attotime			m_period256;			// 256/system clock
-	ctc_channel			m_channel[4];			// data for each channel
+	UINT8               m_vector;               // interrupt vector
+	attotime            m_period16;             // 16/system clock
+	attotime            m_period256;            // 256/system clock
+	ctc_channel         m_channel[4];           // data for each channel
 };
 
 

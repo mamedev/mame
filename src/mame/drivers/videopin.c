@@ -173,10 +173,10 @@ WRITE8_MEMBER(videopin_state::videopin_out2_w)
 
 	coin_counter_w(machine(), 0, data & 0x10);
 
-	discrete_sound_w(device, space, VIDEOPIN_BELL_EN, data & 0x40);	// Bell
-	discrete_sound_w(device, space, VIDEOPIN_BONG_EN, data & 0x20);	// Bong
-	discrete_sound_w(device, space, VIDEOPIN_ATTRACT_EN, data & 0x80);	// Attract
-	discrete_sound_w(device, space, VIDEOPIN_VOL_DATA, data & 0x07);		// Vol0,1,2
+	discrete_sound_w(device, space, VIDEOPIN_BELL_EN, data & 0x40); // Bell
+	discrete_sound_w(device, space, VIDEOPIN_BONG_EN, data & 0x20); // Bong
+	discrete_sound_w(device, space, VIDEOPIN_ATTRACT_EN, data & 0x80);  // Attract
+	discrete_sound_w(device, space, VIDEOPIN_VOL_DATA, data & 0x07);        // Vol0,1,2
 }
 
 
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( videopin )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CODE(KEYCODE_LCONTROL)
@@ -227,31 +227,31 @@ static INPUT_PORTS_START( videopin )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")	/* IN1 */
+	PORT_START("DSW")   /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( German ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( French ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Spanish ) )
 	PORT_DIPNAME( 0x08, 0x08, "Balls" )
-	PORT_DIPSETTING(	0x08, "3" )
-	PORT_DIPSETTING(	0x00, "5" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x04, 0x00, "Replay" )
-	PORT_DIPSETTING(	0x04, "Off (award 80000 points instead)" )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, "Off (award 80000 points instead)" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Extra Ball" )
-	PORT_DIPSETTING(	0x02, "Off (award 50000 points instead)" )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, "Off (award 50000 points instead)" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x01, 0x01, "Replay Level" )
-	PORT_DIPSETTING(	0x00, "180000 (3 balls) / 300000 (5 balls)" )
-	PORT_DIPSETTING(	0x01, "210000 (3 balls) / 350000 (5 balls)" )
+	PORT_DIPSETTING(    0x00, "180000 (3 balls) / 300000 (5 balls)" )
+	PORT_DIPSETTING(    0x01, "210000 (3 balls) / 350000 (5 balls)" )
 
-	PORT_START("IN1")	/* IN2 */
+	PORT_START("IN1")   /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -358,7 +358,7 @@ MACHINE_CONFIG_END
 
 ROM_START( videopin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD_NIB_LOW ( "34242-01.e0", 0x2000, 0x0400, CRC(c6a83795) SHA1(73a65cca7c1e337b336b7d515eafc2981e669be8) )
+	ROM_LOAD_NIB_LOW ( "34242-01.e0", 0x2000, 0x0400, CRC(c6a83795) SHA1(73a65cca7c1e337b336b7d515eafc2981e669be8) )
 	ROM_LOAD_NIB_HIGH( "34237-01.k0", 0x2000, 0x0400, CRC(9b5ef087) SHA1(4ecf441742e7c39237cd544b0f0d9339943e1a2c) )
 	ROM_LOAD_NIB_LOW ( "34243-01.d0", 0x2400, 0x0400, CRC(dc87d023) SHA1(1ecec121067a60b91b3912bd28737caaae463167) )
 	ROM_LOAD_NIB_HIGH( "34238-01.j0", 0x2400, 0x0400, CRC(280d9e67) SHA1(229cc0448bb95f86fc7acbcb9594bc313f316580) )
@@ -377,11 +377,11 @@ ROM_START( videopin )
 	ROM_LOAD_NIB_HIGH( "34241-01.f0", 0x3c00, 0x0400, CRC(5bfb83da) SHA1(9f392b0d4a972b6ae15ec12913a7e66761f4175d) )
 	ROM_RELOAD(                       0xfc00, 0x0400 )
 
-	ROM_REGION( 0x0200, "gfx1", 0 )	/* tiles */
+	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_LOW ( "34259-01.d5", 0x0000, 0x0200, CRC(6cd98c06) SHA1(48bf077b7abbd2f529a19bdf85700b93014f39f9) )
 	ROM_LOAD_NIB_HIGH( "34258-01.c5", 0x0000, 0x0200, CRC(91a5f117) SHA1(03ac6b0b3da0ed5faf1ba6695d16918d12ceeff5) )
 
-	ROM_REGION( 0x0020, "gfx2", 0 )	/* ball */
+	ROM_REGION( 0x0020, "gfx2", 0 ) /* ball */
 	ROM_LOAD( "34257-01.m1", 0x0000, 0x0020, CRC(50245866) SHA1(b0692bc8d44f127f6e7182a1ce75a785e22ac5b9) )
 
 	ROM_REGION( 0x0100, "proms", 0 )

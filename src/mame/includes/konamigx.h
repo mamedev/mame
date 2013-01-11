@@ -115,11 +115,11 @@ extern UINT16 konamigx_wrport2;
     -x------------------------------ (bit 30   : skip shadow)
     x------------------------------- (bit 31   : full shadow)
 */
-#define K055555_COLORMASK	0x0000ffff
-#define K055555_MIXSHIFT	16
-#define K055555_BRTSHIFT	18
-#define K055555_SKIPSHADOW	0x40000000
-#define K055555_FULLSHADOW	0x80000000
+#define K055555_COLORMASK   0x0000ffff
+#define K055555_MIXSHIFT    16
+#define K055555_BRTSHIFT    18
+#define K055555_SKIPSHADOW  0x40000000
+#define K055555_FULLSHADOW  0x80000000
 
 
 
@@ -133,19 +133,19 @@ extern UINT16 konamigx_wrport2;
     ---x---------------------------- (disable shadows)
     --x----------------------------- (disable z-buffering)
 */
-#define GXMIX_BLEND_AUTO	0			// emulate all blend effects
-#define GXMIX_BLEND_NONE	1			// disable all blend effects
-#define GXMIX_BLEND_FAST	2			// simulate translucency
-#define GXMIX_BLEND_FORCE	3			// force mix code on selected layer(s)
-#define GXMIX_NOLINESCROLL	0x1000		// disable linescroll on selected layer(s)
-#define GXMIX_NOSHADOW		0x10000000	// disable all shadows (shadow pens will be skipped)
-#define GXMIX_NOZBUF		0x20000000	// disable z-buffering (shadow pens will be drawn as solid)
+#define GXMIX_BLEND_AUTO    0           // emulate all blend effects
+#define GXMIX_BLEND_NONE    1           // disable all blend effects
+#define GXMIX_BLEND_FAST    2           // simulate translucency
+#define GXMIX_BLEND_FORCE   3           // force mix code on selected layer(s)
+#define GXMIX_NOLINESCROLL  0x1000      // disable linescroll on selected layer(s)
+#define GXMIX_NOSHADOW      0x10000000  // disable all shadows (shadow pens will be skipped)
+#define GXMIX_NOZBUF        0x20000000  // disable z-buffering (shadow pens will be drawn as solid)
 
 // Sub Layer Flags
-#define GXSUB_K053250	0x10	// chip type: 0=K053936 ROZ+, 1=K053250 LVC
-#define GXSUB_4BPP		0x04	//  16 colors
-#define GXSUB_5BPP		0x05	//  32 colors
-#define GXSUB_8BPP		0x08	// 256 colors
+#define GXSUB_K053250   0x10    // chip type: 0=K053936 ROZ+, 1=K053250 LVC
+#define GXSUB_4BPP      0x04    //  16 colors
+#define GXSUB_5BPP      0x05    //  32 colors
+#define GXSUB_8BPP      0x08    // 256 colors
 
 void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,

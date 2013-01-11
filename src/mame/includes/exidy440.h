@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#define EXIDY440_MASTER_CLOCK		(XTAL_12_9792MHz)
+#define EXIDY440_MASTER_CLOCK       (XTAL_12_9792MHz)
 
 
 class exidy440_state : public driver_device

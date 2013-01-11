@@ -380,7 +380,7 @@ static void gb_sound_w_internal(device_t *device, int offset, UINT8 data )
 		break;
 	case NR52: /* Sound On/Off (R/W) */
 		/* Only bit 7 is writable, writing to bits 0-3 does NOT enable or
-           disable sound.  They are read-only */
+		   disable sound.  They are read-only */
 		gb->snd_control.on = (data & 0x80) >> 7;
 		if( !gb->snd_control.on )
 		{
@@ -565,8 +565,8 @@ static STREAM_UPDATE( gameboy_update )
 		if( gb->snd_3.on )
 		{
 			/* NOTE: This is extremely close, but not quite right.
-               The problem is for GB frequencies above 2000 the frequency gets
-               clipped. This is caused because gb->snd_3.pos is never 0 at the test.*/
+			   The problem is for GB frequencies above 2000 the frequency gets
+			   clipped. This is caused because gb->snd_3.pos is never 0 at the test.*/
 			sample = gb->snd_regs[AUD3W0 + (gb->snd_3.offset/2)];
 			if( !(gb->snd_3.offset % 2) )
 			{
@@ -622,8 +622,8 @@ static STREAM_UPDATE( gameboy_update )
 			if( gb->snd_4.pos == (gb->snd_4.period >> (FIXED_POINT + 1)) )
 			{
 				/* Using a Polynomial Counter (aka Linear Feedback Shift Register)
-                   Mode 4 has a 7 bit and 15 bit counter so we need to shift the
-                   bits around accordingly */
+				   Mode 4 has a 7 bit and 15 bit counter so we need to shift the
+				   bits around accordingly */
 				mode4_mask = (((gb->snd_4.ply_value & 0x2) >> 1) ^ (gb->snd_4.ply_value & 0x1)) << (gb->snd_4.ply_step ? 6 : 14);
 				gb->snd_4.ply_value >>= 1;
 				gb->snd_4.ply_value |= mode4_mask;
@@ -719,7 +719,7 @@ static DEVICE_START( gameboy_sound )
 		for( J = 0; J < 16; J++ )
 		{
 			/* I is the dividing ratio of frequencies
-               J is the shift clock frequency */
+			   J is the shift clock frequency */
 			gb->period_mode4_table[I][J] = ((1 << FIXED_POINT) / (524288 / ((I == 0)?0.5:I) / (1 << (J + 1)))) * gb->rate;
 		}
 	}
@@ -759,7 +759,7 @@ const device_type GAMEBOY = &device_creator<gameboy_sound_device>;
 
 gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GAMEBOY, "LR35902", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(gb_sound_t);
 }
@@ -792,5 +792,3 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

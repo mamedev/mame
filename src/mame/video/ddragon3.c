@@ -12,14 +12,14 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
 
 	switch (offset)
 	{
-		case 0: COMBINE_DATA(&m_fg_scrollx);	break;	// Scroll X, BG1
-		case 1: COMBINE_DATA(&m_fg_scrolly);	break;	// Scroll Y, BG1
-		case 2: COMBINE_DATA(&m_bg_scrollx);	break;	// Scroll X, BG0
-		case 3: COMBINE_DATA(&m_bg_scrolly);	break;	// Scroll Y, BG0
-		case 4:										break;	// Unknown write
-		case 5: flip_screen_set(data & 0x01);		break;	// Flip Screen
+		case 0: COMBINE_DATA(&m_fg_scrollx);    break;  // Scroll X, BG1
+		case 1: COMBINE_DATA(&m_fg_scrolly);    break;  // Scroll Y, BG1
+		case 2: COMBINE_DATA(&m_bg_scrollx);    break;  // Scroll X, BG0
+		case 3: COMBINE_DATA(&m_bg_scrolly);    break;  // Scroll Y, BG0
+		case 4:                                     break;  // Unknown write
+		case 5: flip_screen_set(data & 0x01);       break;  // Flip Screen
 		case 6:
-			COMBINE_DATA(&m_bg_tilebase);			// BG Tile Base
+			COMBINE_DATA(&m_bg_tilebase);           // BG Tile Base
 			m_bg_tilebase &= 0x1ff;
 			m_bg_tilemap->mark_all_dirty();
 			break;
@@ -119,7 +119,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 	{
 		UINT16 attr = source[1];
 
-		if (attr & 0x01)	/* enable */
+		if (attr & 0x01)    /* enable */
 		{
 			int i;
 			int bank = source[3] & 0xff;

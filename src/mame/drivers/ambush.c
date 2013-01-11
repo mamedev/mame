@@ -181,9 +181,9 @@ static const gfx_layout spritelayout =
 	2,      /* 2 bits per pixel */
 	{ 0, 0x2000*8 },  /* The bitplanes are separate */
 	{     0,     1,     2,     3,     4,     5,     6,     7,
-	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
 	32*8     /* every char takes 32 consecutive bytes */
 };
 
@@ -229,7 +229,7 @@ static const ay8910_interface ay8912_interface_2 =
 static MACHINE_CONFIG_START( ambush, ambush_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)		/* XTAL confirmed, divisor guessed */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)      /* XTAL confirmed, divisor guessed */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_state,  irq0_line_hold)
@@ -249,11 +249,11 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL_18_432MHz/6/2)	/* XTAL confirmed, divisor guessed */
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
 	MCFG_SOUND_CONFIG(ay8912_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL_18_432MHz/6/2)	/* XTAL confirmed, divisor guessed */
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
 	MCFG_SOUND_CONFIG(ay8912_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -280,9 +280,9 @@ ROM_START( ambush )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "a.bpr",        0x0000, 0x0100, CRC(5f27f511) SHA1(fe3ae701443ff50d3d03c0a5d0e0ab0e716b05cc) )  /* color PROMs */
 
-	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )	/* How is this selected, */
-	ROM_LOAD( "13.bpr",		  0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
-	ROM_LOAD( "14.bpr",		  0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
+	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )    /* How is this selected, */
+	ROM_LOAD( "13.bpr",       0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
+	ROM_LOAD( "14.bpr",       0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
 ROM_END
 
 ROM_START( ambushj )
@@ -299,9 +299,9 @@ ROM_START( ambushj )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "a.bpr",        0x0000, 0x0100, CRC(5f27f511) SHA1(fe3ae701443ff50d3d03c0a5d0e0ab0e716b05cc) )  /* color PROMs */
 
-	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )	/* How is this selected, */
-	ROM_LOAD( "13.bpr",		  0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
-	ROM_LOAD( "14.bpr",		  0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
+	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )    /* How is this selected, */
+	ROM_LOAD( "13.bpr",       0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
+	ROM_LOAD( "14.bpr",       0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
 ROM_END
 
 ROM_START( ambushv )
@@ -318,9 +318,9 @@ ROM_START( ambushv )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "a.bpr",        0x0000, 0x0100, CRC(5f27f511) SHA1(fe3ae701443ff50d3d03c0a5d0e0ab0e716b05cc) )  /* color PROMs */
 
-	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )	/* How is this selected, */
-	ROM_LOAD( "13.bpr",		  0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
-	ROM_LOAD( "14.bpr",		  0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
+	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )    /* How is this selected, */
+	ROM_LOAD( "13.bpr",       0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
+	ROM_LOAD( "14.bpr",       0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
 ROM_END
 
 /*************************************

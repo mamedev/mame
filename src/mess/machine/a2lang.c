@@ -19,7 +19,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_LANGCARD	0
+#define LOG_LANGCARD    0
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -33,14 +33,14 @@ const device_type A2BUS_LANG = &device_creator<a2bus_lang_device>;
 //**************************************************************************
 
 a2bus_lang_device::a2bus_lang_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2BUS_LANG, "Apple II Language Card", tag, owner, clock),
+		device_t(mconfig, A2BUS_LANG, "Apple II Language Card", tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this)
 {
 	m_shortname = "a2lang";
 }
 
 a2bus_lang_device::a2bus_lang_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this)
 {
 	m_shortname = "a2lang";

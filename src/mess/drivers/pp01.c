@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( pp01, pp01_state )
 	MCFG_CPU_IO_MAP(pp01_io)
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -250,4 +250,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 198?, pp01,	0,		0,		pp01,		pp01, driver_device,		0,  	 "ZVT",					 "PP-01",	 GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, pp01,   0,      0,      pp01,       pp01, driver_device,        0,       "ZVT",                  "PP-01",    GAME_NOT_WORKING | GAME_NO_SOUND)

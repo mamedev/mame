@@ -163,5 +163,3 @@ UINT32 coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	return result;
 }
-
-

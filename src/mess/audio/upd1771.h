@@ -15,7 +15,7 @@
 
 struct upd1771_interface
 {
-	devcb_write_line	ack_callback;
+	devcb_write_line    ack_callback;
 };
 
 
@@ -24,7 +24,7 @@ struct upd1771_interface
 ***************************************************************************/
 
 class upd1771c_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

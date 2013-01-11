@@ -179,10 +179,10 @@ enum
 // operation modes
 enum
 {
-	OPERATION_MODE_REPETITIVE_MEMORY_ADDRESSING = 0,	// not implemented
+	OPERATION_MODE_REPETITIVE_MEMORY_ADDRESSING = 0,    // not implemented
 	OPERATION_MODE_DOUBLE_ROW_BUFFER = 1,
-	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,				// not implemented
-	OPERATION_MODE_ATTRIBUTE_ASSEMBLE = 7				// not implemented
+	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,               // not implemented
+	OPERATION_MODE_ATTRIBUTE_ASSEMBLE = 7               // not implemented
 };
 
 
@@ -190,23 +190,23 @@ enum
 enum
 {
 	ADDRESS_MODE_SEQUENTIAL_ADDRESSING = 0,
-	ADDRESS_MODE_SEQUENTIAL_ROLL_ADDRESSING,			// not implemented
-	ADDRESS_MODE_CONTIGUOUS_ROW_TABLE,					// not implemented
-	ADDRESS_MODE_LINKED_LIST_ROW_TABLE					// not implemented
+	ADDRESS_MODE_SEQUENTIAL_ROLL_ADDRESSING,            // not implemented
+	ADDRESS_MODE_CONTIGUOUS_ROW_TABLE,                  // not implemented
+	ADDRESS_MODE_LINKED_LIST_ROW_TABLE                  // not implemented
 };
 
 
 // interrupt enable register bits
-const int IE_VERTICAL_RETRACE			= 0x40;
-const int IE_LIGHT_PEN					= 0x20;
-const int IE_FRAME_TIMER				= 0x01;
+const int IE_VERTICAL_RETRACE           = 0x40;
+const int IE_LIGHT_PEN                  = 0x20;
+const int IE_FRAME_TIMER                = 0x01;
 
 // status register bits
-const int STATUS_INTERRUPT_PENDING		= 0x80;
-const int STATUS_VERTICAL_RETRACE		= 0x40;
-const int STATUS_LIGHT_PEN_UPDATE		= 0x20;
-const int STATUS_ODD_EVEN				= 0x04;
-const int STATUS_FRAME_TIMER_OCCURRED	= 0x01;
+const int STATUS_INTERRUPT_PENDING      = 0x80;
+const int STATUS_VERTICAL_RETRACE       = 0x40;
+const int STATUS_LIGHT_PEN_UPDATE       = 0x20;
+const int STATUS_ODD_EVEN               = 0x04;
+const int STATUS_FRAME_TIMER_OCCURRED   = 0x01;
 
 
 
@@ -447,8 +447,8 @@ inline void crt9007_device::recompute_parameters()
 
 crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CRT9007, "SMC CRT9007", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007))
+		device_memory_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007))
 {
 	for (int i = 0; i < 0x3d; i++)
 		m_reg[i] = 0;

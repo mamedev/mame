@@ -14,9 +14,9 @@
   not "rasterline" based
  */
 
-#define STICKCENTRE	(105)
-#define STICKLOW	(20)
-#define STICKHIGH	(225)
+#define STICKCENTRE (105)
+#define STICKLOW    (20)
+#define STICKHIGH   (225)
 
 #define VC4000_END_LINE (269)
 
@@ -78,10 +78,10 @@ INLINE UINT8 vc4000_joystick_return_to_centre(UINT8 joy)
 READ8_MEMBER( vc4000_state::vc4000_video_r )
 {
 	UINT8 data=0;
-	if (offset > 0xcf) offset &= 0xcf;	// c0-cf is mirrored at d0-df, e0-ef, f0-ff
+	if (offset > 0xcf) offset &= 0xcf;  // c0-cf is mirrored at d0-df, e0-ef, f0-ff
 	switch (offset)
 	{
-	case 0xca:		// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
+	case 0xca:      // Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
 		data |= m_video.background_collision;
 		m_video.background_collision=0;
 		if (m_video.sprites[3].finished)
@@ -107,7 +107,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		}
 		break;
 
-	case 0xcb:		//    VRST-Flag (bit 6) and intersprite collision (bit5-0)
+	case 0xcb:      //    VRST-Flag (bit 6) and intersprite collision (bit5-0)
 		data = m_video.sprite_collision | (m_video.reg.d.sprite_collision & 0xc0);
 		m_video.sprite_collision = 0;
 		m_video.reg.d.sprite_collision &= 0xbf;
@@ -124,9 +124,9 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		break;
 #else
 
-	case 0xcc:		/* left joystick */
+	case 0xcc:      /* left joystick */
 		if (ioport("CONFIG")->read()&1)
-		{		/* paddle */
+		{       /* paddle */
 			if (!machine().device("maincpu")->state().state_int(S2650_FO))
 			{
 				data = ioport("JOYS")->read() & 0x03;
@@ -165,7 +165,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 			}
 		}
 		else
-		{		/* buttons */
+		{       /* buttons */
 			if (!machine().device("maincpu")->state().state_int(S2650_FO))
 			{
 				data = ioport("JOYS")->read() & 0x03;
@@ -177,7 +177,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 				case 0x02:
 					m_joy1_x=STICKHIGH;
 					break;
-				default:			/* autocentre */
+				default:            /* autocentre */
 					m_joy1_x=STICKCENTRE;
 				}
 				data = m_joy1_x;
@@ -201,7 +201,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		}
 		break;
 
-	case 0xcd:		/* right joystick */
+	case 0xcd:      /* right joystick */
 		if (ioport("CONFIG")->read()&1)
 		{
 			if (!machine().device("maincpu")->state().state_int(S2650_FO))
@@ -254,7 +254,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 				case 0x20:
 					m_joy2_x=STICKHIGH;
 					break;
-				default:			/* autocentre */
+				default:            /* autocentre */
 					m_joy2_x=STICKCENTRE;
 				}
 				data = m_joy2_x;
@@ -289,62 +289,62 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 WRITE8_MEMBER( vc4000_state::vc4000_video_w )
 {
 //  m_video.reg.data[offset]=data;
-	if (offset > 0xcf) offset &= 0xcf;	// c0-cf is mirrored at d0-df, e0-ef, f0-ff
+	if (offset > 0xcf) offset &= 0xcf;  // c0-cf is mirrored at d0-df, e0-ef, f0-ff
 
 	switch (offset)
 	{
 
-	case 0xc0:						// Sprite size
+	case 0xc0:                      // Sprite size
 		m_video.sprites[0].size=1<<(data&3);
 		m_video.sprites[1].size=1<<((data>>2)&3);
 		m_video.sprites[2].size=1<<((data>>4)&3);
 		m_video.sprites[3].size=1<<((data>>6)&3);
 		break;
 
-	case 0xc1:						// Sprite 1+2 color
+	case 0xc1:                      // Sprite 1+2 color
 		m_video.sprites[0].scolor=((~data>>3)&7);
 		m_video.sprites[1].scolor=(~data&7);
 		break;
 
-	case 0xc2:						// Sprite 2+3 color
+	case 0xc2:                      // Sprite 2+3 color
 		m_video.sprites[2].scolor=((~data>>3)&7);
 		m_video.sprites[3].scolor=(~data&7);
 		break;
 
-	case 0xc3:						// Score control
+	case 0xc3:                      // Score control
 		m_video.reg.d.score_control = data;
 		break;
 
-	case 0xc6:						// Background color
+	case 0xc6:                      // Background color
 		m_video.reg.d.background = data;
 		break;
 
-	case 0xc7:						// Soundregister
+	case 0xc7:                      // Soundregister
 		m_video.reg.data[offset] = data;
 		vc4000_soundport_w(machine().device("custom"), 0, data);
 		break;
 
-	case 0xc8:						// Digits 1 and 2
+	case 0xc8:                      // Digits 1 and 2
 		m_video.reg.d.bcd[0] = data;
 		break;
 
-	case 0xc9:						// Digits 3 and 4
+	case 0xc9:                      // Digits 3 and 4
 		m_video.reg.d.bcd[1] = data;
 		break;
 
-	case 0xca:			// Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
+	case 0xca:          // Background-sprite collision (bit 7-4) and sprite finished (bit 3-0)
 		m_video.reg.data[offset]=data;
 		m_video.background_collision=data;
 		break;
 
-	case 0xcb:					// VRST-Flag (bit 6) and intersprite collision (bit5-0)
+	case 0xcb:                  // VRST-Flag (bit 6) and intersprite collision (bit5-0)
 		m_video.reg.data[offset]=data;
 		m_video.sprite_collision=data;
 		break;
 
 	default:
 		m_video.reg.data[offset]=data;
-    }
+	}
 }
 
 
@@ -477,8 +477,8 @@ static void vc4000_sprite_update(vc4000_state *state, bitmap_ind16 &bitmap, UINT
 	case 12:
 		if (This->y!=0)
 		{
-		    This->y--;
-		    break;
+			This->y--;
+			break;
 		}
 		This->state++;
 
@@ -627,7 +627,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 			x = 60;
 			vc4000_draw_digit(this, *m_bitmap, x, y, m_video.reg.d.bcd[0]>>4, m_video.line-y);
 			vc4000_draw_digit(this, *m_bitmap, x+16, y, m_video.reg.d.bcd[0]&0xf, m_video.line-y);
-			if (m_video.reg.d.score_control&2)	x -= 16;
+			if (m_video.reg.d.score_control&2)  x -= 16;
 			vc4000_draw_digit(this, *m_bitmap, x+48, y, m_video.reg.d.bcd[1]>>4, m_video.line-y);
 			vc4000_draw_digit(this, *m_bitmap, x+64, y, m_video.reg.d.bcd[1]&0xf, m_video.line-y);
 		}

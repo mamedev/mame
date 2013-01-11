@@ -66,7 +66,7 @@ WRITE8_MEMBER( mc80_state::mc80_port_b_w )
 
 Z80PIO_INTERFACE( mc8020_z80pio_intf )
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(mc80_state, mc80_port_a_r),
 	DEVCB_DRIVER_MEMBER(mc80_state, mc80_port_a_w),
 	DEVCB_NULL,
@@ -137,7 +137,7 @@ WRITE8_MEMBER( mc80_state::zve_port_b_w )
 
 Z80PIO_INTERFACE( mc8030_zve_z80pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(mc80_state, zve_port_a_r),
 	DEVCB_DRIVER_MEMBER(mc80_state, zve_port_a_w),
 	DEVCB_NULL,
@@ -166,7 +166,7 @@ WRITE8_MEMBER( mc80_state::asp_port_b_w )
 
 Z80PIO_INTERFACE( mc8030_asp_z80pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_a_r),
 	DEVCB_DRIVER_MEMBER(mc80_state, asp_port_a_w),
 	DEVCB_NULL,
@@ -178,27 +178,26 @@ Z80PIO_INTERFACE( mc8030_asp_z80pio_intf )
 Z80CTC_INTERFACE( mc8030_zve_z80ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,	// for user
-	DEVCB_NULL,	// for user
-	DEVCB_NULL	// for user
+	DEVCB_NULL, // for user
+	DEVCB_NULL, // for user
+	DEVCB_NULL  // for user
 };
 
 Z80CTC_INTERFACE( mc8030_asp_z80ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,	// to SIO CLK CH A
-	DEVCB_NULL,	// to SIO CLK CH B
-	DEVCB_NULL	// KMBG (??)
+	DEVCB_NULL, // to SIO CLK CH A
+	DEVCB_NULL, // to SIO CLK CH B
+	DEVCB_NULL  // KMBG (??)
 };
 
 // SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
 const z80sio_interface mc8030_asp_z80sio_intf =
 {
-	DEVCB_NULL,	/* interrupt handler */
-	DEVCB_NULL,			/* DTR changed handler */
-	DEVCB_NULL,			/* RTS changed handler */
-	DEVCB_NULL,			/* BREAK changed handler */
-	DEVCB_NULL,			/* transmit handler */
-	DEVCB_NULL			/* receive handler */
+	DEVCB_NULL, /* interrupt handler */
+	DEVCB_NULL,         /* DTR changed handler */
+	DEVCB_NULL,         /* RTS changed handler */
+	DEVCB_NULL,         /* BREAK changed handler */
+	DEVCB_NULL,         /* transmit handler */
+	DEVCB_NULL          /* receive handler */
 };
-

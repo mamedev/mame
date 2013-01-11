@@ -32,7 +32,7 @@ struct serial_terminal_interface
 	MCFG_DEVICE_ADD(_tag, GENERIC_TERMINAL, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_GENERIC_TERMINAL_REMOVE(_tag)		\
+#define MCFG_GENERIC_TERMINAL_REMOVE(_tag)      \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_SERIAL_TERMINAL_ADD(_tag, _intrf, _clock) \

@@ -192,13 +192,13 @@ WRITE8_MEMBER(astrocde_state::seawolf2_lamps_w)
 	/* ------x- torpedo 3 available */
 	/* -------x torpedo 4 available */
 
-	output_set_lamp_value((offset ^ 1) * 7 + 0, ( data >> 5) & 1);	/* 0/7  = hit lamp */
-	output_set_lamp_value((offset ^ 1) * 7 + 1, (~data >> 4) & 1);	/* 1/8  = reload lamp */
-	output_set_lamp_value((offset ^ 1) * 7 + 2, ( data >> 4) & 1);	/* 2/9  = ready lamp */
-	output_set_lamp_value((offset ^ 1) * 7 + 3, ( data >> 3) & 1);	/* 3/10 = torpedo 1 lamp */
-	output_set_lamp_value((offset ^ 1) * 7 + 4, ( data >> 2) & 1);	/* 4/11 = torpedo 2 lamp */
-	output_set_lamp_value((offset ^ 1) * 7 + 5, ( data >> 1) & 1);	/* 5/12 = torpedo 3 lamp */
-	output_set_lamp_value((offset ^ 1) * 7 + 6, ( data >> 0) & 1);	/* 6/13 = torpedo 4 lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 0, ( data >> 5) & 1);  /* 0/7  = hit lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 1, (~data >> 4) & 1);  /* 1/8  = reload lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 2, ( data >> 4) & 1);  /* 2/9  = ready lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 3, ( data >> 3) & 1);  /* 3/10 = torpedo 1 lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 4, ( data >> 2) & 1);  /* 4/11 = torpedo 2 lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 5, ( data >> 1) & 1);  /* 5/12 = torpedo 3 lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 6, ( data >> 0) & 1);  /* 6/13 = torpedo 4 lamp */
 }
 
 
@@ -302,13 +302,13 @@ READ8_MEMBER(astrocde_state::wow_io_r)
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(machine(), 0, data);		break;
-		case 1: coin_counter_w(machine(), 1, data);		break;
-		case 2: m_sparkle[0] = data;	break;
-		case 3: m_sparkle[1] = data;	break;
-		case 4: m_sparkle[2] = data;	break;
-		case 5: m_sparkle[3] = data;	break;
-		case 7: coin_counter_w(machine(), 2, data);		break;
+		case 0: coin_counter_w(machine(), 0, data);     break;
+		case 1: coin_counter_w(machine(), 1, data);     break;
+		case 2: m_sparkle[0] = data;    break;
+		case 3: m_sparkle[1] = data;    break;
+		case 4: m_sparkle[2] = data;    break;
+		case 5: m_sparkle[3] = data;    break;
+		case 7: coin_counter_w(machine(), 2, data);     break;
 	}
 	return 0xff;
 }
@@ -327,12 +327,12 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(machine(), 0, data);		break;
-		case 1: coin_counter_w(machine(), 1, data);		break;
-		case 2: m_sparkle[0] = data;	break;
-		case 3: m_sparkle[1] = data;	break;
-		case 4: m_sparkle[2] = data;	break;
-		case 5: m_sparkle[3] = data;	break;
+		case 0: coin_counter_w(machine(), 0, data);     break;
+		case 1: coin_counter_w(machine(), 1, data);     break;
+		case 2: m_sparkle[0] = data;    break;
+		case 3: m_sparkle[1] = data;    break;
+		case 4: m_sparkle[2] = data;    break;
+		case 5: m_sparkle[3] = data;    break;
 		case 6:
 			machine().device<astrocade_device>("astrocade1")->set_output_gain(0, data ? 0.0 : 1.0);
 #if USE_FAKE_VOTRAX
@@ -341,7 +341,7 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 			machine().device<votrax_sc01_device>("votrax")->set_output_gain(0, data ? 1.0 : 0.0);
 #endif
 			break;
-		case 7:	mame_printf_debug("io_1:%d\n", data); break;
+		case 7: mame_printf_debug("io_1:%d\n", data); break;
 	}
 	return 0xff;
 }
@@ -353,14 +353,14 @@ READ8_MEMBER(astrocde_state::gorf_io_2_r)
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: output_set_lamp_value(0, data);	break;
-		case 1: output_set_lamp_value(1, data);	break;
-		case 2: output_set_lamp_value(2, data);	break;
-		case 3: output_set_lamp_value(3, data);	break;
-		case 4: output_set_lamp_value(4, data);	break;
-		case 5: output_set_lamp_value(5, data);	break;
-		case 6:	/* n/c */						break;
-		case 7:	mame_printf_debug("io_2:%d\n", data); break;
+		case 0: output_set_lamp_value(0, data); break;
+		case 1: output_set_lamp_value(1, data); break;
+		case 2: output_set_lamp_value(2, data); break;
+		case 3: output_set_lamp_value(3, data); break;
+		case 4: output_set_lamp_value(4, data); break;
+		case 5: output_set_lamp_value(5, data); break;
+		case 6: /* n/c */                       break;
+		case 7: mame_printf_debug("io_2:%d\n", data); break;
 	}
 	return 0xff;
 }
@@ -379,11 +379,11 @@ READ8_MEMBER(astrocde_state::robby_io_r)
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(machine(), 0, data);	break;
-		case 1: coin_counter_w(machine(), 1, data);	break;
-		case 2: coin_counter_w(machine(), 2, data);	break;
-		case 6: set_led_status(machine(), 0, data);	break;
-		case 7: set_led_status(machine(), 1, data);	break;
+		case 0: coin_counter_w(machine(), 0, data); break;
+		case 1: coin_counter_w(machine(), 1, data); break;
+		case 2: coin_counter_w(machine(), 2, data); break;
+		case 6: set_led_status(machine(), 0, data); break;
+		case 7: set_led_status(machine(), 1, data); break;
 	}
 	return 0xff;
 }
@@ -408,12 +408,12 @@ READ8_MEMBER(astrocde_state::profpac_io_1_r)
 
 READ8_MEMBER(astrocde_state::profpac_io_2_r)
 {
-	output_set_lamp_value(0, (offset >> 8) & 1);	/* left lamp A */
-	output_set_lamp_value(1, (offset >> 9) & 1);	/* left lamp B */
-	output_set_lamp_value(2, (offset >> 10) & 1);	/* left lamp C */
-	output_set_lamp_value(3, (offset >> 12) & 1);	/* right lamp A */
-	output_set_lamp_value(4, (offset >> 13) & 1);	/* right lamp B */
-	output_set_lamp_value(5, (offset >> 14) & 1);	/* right lamp C */
+	output_set_lamp_value(0, (offset >> 8) & 1);    /* left lamp A */
+	output_set_lamp_value(1, (offset >> 9) & 1);    /* left lamp B */
+	output_set_lamp_value(2, (offset >> 10) & 1);   /* left lamp C */
+	output_set_lamp_value(3, (offset >> 12) & 1);   /* right lamp A */
+	output_set_lamp_value(4, (offset >> 13) & 1);   /* right lamp B */
+	output_set_lamp_value(5, (offset >> 14) & 1);   /* right lamp C */
 	return 0xff;
 }
 
@@ -503,10 +503,10 @@ WRITE8_MEMBER(astrocde_state::demndrgn_sound_w)
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_NULL,         /* ZC/TO0 callback */
 	DEVCB_NULL,         /* ZC/TO1 callback */
-	DEVCB_NULL			/* ZC/TO2 callback */
+	DEVCB_NULL          /* ZC/TO2 callback */
 };
 
 
@@ -738,7 +738,7 @@ static const ioport_value controller_table[64] =
 static INPUT_PORTS_START( seawolf2 )
 	PORT_START("P1HANDLE")
 	PORT_BIT( 0x3f, 0x1f, IPT_POSITIONAL ) PORT_PLAYER(2) PORT_POSITIONS(64) PORT_REMAP_TABLE(controller_table) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_CROSSHAIR(X, 2.0, -0.40, 34.0 / 240.0)
-	PORT_DIPNAME( 0x40, 0x00, "Language 1" )		PORT_DIPLOCATION("S2:!1")
+	PORT_DIPNAME( 0x40, 0x00, "Language 1" )        PORT_DIPLOCATION("S2:!1")
 	PORT_DIPSETTING(    0x00, "Language 2" )
 	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -752,29 +752,29 @@ static INPUT_PORTS_START( seawolf2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x08, 0x00, "Language 2" )		PORT_DIPLOCATION("S2:!2")
+	PORT_DIPNAME( 0x08, 0x00, "Language 2" )        PORT_DIPLOCATION("S2:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( German ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P4HANDLE")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )	PORT_DIPLOCATION("S1:!2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )  PORT_DIPLOCATION("S1:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x00, "Play Time" )			PORT_DIPLOCATION("S1:!3,!4")
-	PORT_DIPSETTING(    0x06, "1P 40s/2P 45s" )		/* Extended play: 1P 20s/2P 20s */
-	PORT_DIPSETTING(    0x04, "1P 50s/2P 60s" )		/* Extended play: 1P 25s/2P 30s */
-	PORT_DIPSETTING(    0x02, "1P 60s/2P 75s" )		/* Extended play: 1P 30s/2P 35s */
-	PORT_DIPSETTING(    0x00, "1P 70s/2P 90s" )		/* Extended play: 1P 35s/2P 45s */
-	PORT_DIPNAME( 0x08, 0x08, "2 Players Game" )	PORT_DIPLOCATION("S1:!1")
+	PORT_DIPNAME( 0x06, 0x00, "Play Time" )         PORT_DIPLOCATION("S1:!3,!4")
+	PORT_DIPSETTING(    0x06, "1P 40s/2P 45s" )     /* Extended play: 1P 20s/2P 20s */
+	PORT_DIPSETTING(    0x04, "1P 50s/2P 60s" )     /* Extended play: 1P 25s/2P 30s */
+	PORT_DIPSETTING(    0x02, "1P 60s/2P 75s" )     /* Extended play: 1P 30s/2P 35s */
+	PORT_DIPSETTING(    0x00, "1P 70s/2P 90s" )     /* Extended play: 1P 35s/2P 45s */
+	PORT_DIPNAME( 0x08, 0x08, "2 Players Game" )    PORT_DIPLOCATION("S1:!1")
 	PORT_DIPSETTING(    0x00, "1 Credit" )
 	PORT_DIPSETTING(    0x08, "2 Credits" )
-	PORT_DIPNAME( 0x30, 0x00, "Extended Play" )		PORT_DIPLOCATION("S1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, "Extended Play" )     PORT_DIPLOCATION("S1:!5,!6")
 	PORT_DIPSETTING(    0x10, "5000" )
 	PORT_DIPSETTING(    0x20, "6000" )
 	PORT_DIPSETTING(    0x30, "7000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, "Monitor" )			PORT_DIPLOCATION("S1:!7")
+	PORT_DIPNAME( 0x40, 0x40, "Monitor" )           PORT_DIPLOCATION("S1:!7")
 	PORT_DIPSETTING(    0x40, "Color" )
 	PORT_DIPSETTING(    0x00, "B/W" )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "S1:!8")
@@ -795,17 +795,17 @@ static INPUT_PORTS_START( ebases )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x00, "Monitor" )			PORT_DIPLOCATION( "JU:1" )
+	PORT_DIPNAME( 0x10, 0x00, "Monitor" )           PORT_DIPLOCATION( "JU:1" )
 	PORT_DIPSETTING(    0x00, "Color" )
 	PORT_DIPSETTING(    0x10, "B/W" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )	PORT_DIPLOCATION( "JU:2" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION( "JU:2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3HANDLE")
-	PORT_DIPNAME( 0x01, 0x00, "2 Players Game" )	PORT_DIPLOCATION( "S1:1" )
+	PORT_DIPNAME( 0x01, 0x00, "2 Players Game" )    PORT_DIPLOCATION( "S1:1" )
 	PORT_DIPSETTING(    0x00, "1 Credit" )
 	PORT_DIPSETTING(    0x01, "2 Credits" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "S1:2" )
@@ -843,12 +843,12 @@ INPUT_CHANGED_MEMBER(astrocde_state::spacezap_monitor)
 
 static INPUT_PORTS_START( spacezap )
 	PORT_START("P1HANDLE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// manual says this dip is unused on cocktail cabs
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // manual says this dip is unused on cocktail cabs
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )	// starts a 1 player game if 1 credit
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // starts a 1 player game if 1 credit
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2HANDLE")
@@ -866,16 +866,16 @@ static INPUT_PORTS_START( spacezap )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Aim Left") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Aim Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("JU:2")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("JU:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P4HANDLE")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )	PORT_DIPLOCATION( "S1:1" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )   PORT_DIPLOCATION( "S1:1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )	PORT_DIPLOCATION( "S1:2,3" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )   PORT_DIPLOCATION( "S1:2,3" )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
@@ -888,7 +888,7 @@ static INPUT_PORTS_START( spacezap )
 
 	PORT_START("FAKE")
 	/* Dedicated cabinets had a B/W monitor and color overlay,
-       some (unofficial/repaired?) cabinets had a color monitor. */
+	   some (unofficial/repaired?) cabinets had a color monitor. */
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_state,spacezap_monitor, 0)
 	PORT_CONFSETTING(    0x00, "B/W" )
 	PORT_CONFSETTING(    0x01, "Color" )
@@ -904,7 +904,7 @@ static INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("JU:1") /* Undocumented, jumper? */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("JU:1") /* Undocumented, jumper? */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -929,28 +929,28 @@ static INPUT_PORTS_START( wow )
 
 	PORT_START("P4HANDLE")
 	/* "If S1:1,2,3 are all ON or all OFF, only coin meter number 1 will count." */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("S1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("S1:2,3")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("S1:2,3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )		PORT_DIPLOCATION("S1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )     PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x00, "Foreign (NEED ROM)" )	/* "Requires A082-91374-A000" */
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING(    0x00, "Foreign (NEED ROM)" )    /* "Requires A082-91374-A000" */
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING(    0x10, "2 for 1 Credit / 5 for 2 Credits" )
 	PORT_DIPSETTING(    0x00, "3 for 1 Credit / 7 for 2 Credits" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("S1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("S1:6")
 	PORT_DIPSETTING(    0x20, "After 3rd Level" )
 	PORT_DIPSETTING(    0x00, "After 4th Level" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("S1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("S1:8")
-	PORT_DIPSETTING(    0x00, "On only when controls are touched" )	/* "Touching controls will enable attract sound for 1 cycle." */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("S1:8")
+	PORT_DIPSETTING(    0x00, "On only when controls are touched" ) /* "Touching controls will enable attract sound for 1 cycle." */
 	PORT_DIPSETTING(    0x80, "Always On"  )
 INPUT_PORTS_END
 
@@ -959,7 +959,7 @@ static INPUT_PORTS_START( wowg )
 	PORT_INCLUDE(wow)
 
 	PORT_MODIFY("P4HANDLE")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("S1:4") /* Default it to Foreign because this set has the German ROM */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("S1:4") /* Default it to Foreign because this set has the German ROM */
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, "Foreign (German ROM)" )
 INPUT_PORTS_END
@@ -973,10 +973,10 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("JU:1")	/* Jumper */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("JU:1")    /* Jumper */
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Speech" )				PORT_DIPLOCATION("JU:2")	/* Jumper */
+	PORT_DIPNAME( 0x80, 0x80, "Speech" )                PORT_DIPLOCATION("JU:2")    /* Jumper */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -998,27 +998,27 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gorf_speech_status_r, NULL)
 
 	PORT_START("P4HANDLE")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("S1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("S1:2,3")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("S1:2,3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )		PORT_DIPLOCATION("S1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )     PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x00, "Foreign (NEED ROM)" )	/* "Requires A082-91374-A000" */
-	PORT_DIPNAME( 0x10, 0x00, "Lives per Credit" )		PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING(    0x00, "Foreign (NEED ROM)" )    /* "Requires A082-91374-A000" */
+	PORT_DIPNAME( 0x10, 0x00, "Lives per Credit" )      PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("S1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("S1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "Mission 5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("S1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("S1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1028,7 +1028,7 @@ static INPUT_PORTS_START( gorfpgm1g )
 	PORT_INCLUDE(gorf)
 
 	PORT_MODIFY("P4HANDLE")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("S1:4") /* Default it to Foreign because this set has the German ROM */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("S1:4") /* Default it to Foreign because this set has the German ROM */
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, "Foreign (German ROM)" )
 INPUT_PORTS_END
@@ -1064,22 +1064,22 @@ static INPUT_PORTS_START( robby )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P4HANDLE")
-	PORT_DIPNAME( 0x01, 0x01, "Use NVRAM" )				PORT_DIPLOCATION("S1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Use NVRAM" )             PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, "Use Service Mode Settings" ) PORT_DIPLOCATION("S1:2")
 	PORT_DIPSETTING(    0x00, "Reset" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("S1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("S1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("S1:4")	/* Listed as "Unused". */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("S1:4")    /* Listed as "Unused". */
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "S1:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S1:7" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("S1:8")	/* Listed as "Unused". */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("S1:8")    /* Listed as "Unused". */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1109,19 +1109,19 @@ static INPUT_PORTS_START( profpac )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P4HANDLE")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("S1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )	/* Upright or Mini */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("S1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )  /* Upright or Mini */
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, "Reset on powerup" )	PORT_DIPLOCATION("S1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Reset on powerup" )  PORT_DIPLOCATION("S1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Halt on error" )		PORT_DIPLOCATION("S1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Halt on error" )     PORT_DIPLOCATION("S1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Beep" )				PORT_DIPLOCATION("S1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Beep" )              PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "ROM's Used" )		PORT_DIPLOCATION("S1:5")
+	PORT_DIPNAME( 0x10, 0x00, "ROM's Used" )        PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING(    0x10, "8K & 16K ROM's" )
 	PORT_DIPSETTING(    0x00, "32K ROM's" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
@@ -1177,43 +1177,43 @@ static INPUT_PORTS_START( tenpindx )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* select game */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* number of players */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )		/* start game */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* select game */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* number of players */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     /* start game */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P61")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("S1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, "Lockup" )			PORT_DIPLOCATION("S1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Lockup" )            PORT_DIPLOCATION("S1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Reset" )				PORT_DIPLOCATION("S1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Reset" )             PORT_DIPLOCATION("S1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Beep" )				PORT_DIPLOCATION("S1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Beep" )              PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, "Regulation" )		PORT_DIPLOCATION("S1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Regulation" )        PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Ticket Dispenser" )	PORT_DIPLOCATION("S1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Ticket Dispenser" )  PORT_DIPLOCATION("S1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Bill Acceptor" )		PORT_DIPLOCATION("S1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Bill Acceptor" )     PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
 
 	PORT_START("P62")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )	/* F1-F8 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )    /* F1-F8 */
 
 	PORT_START("P63")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )	/* F9-F0,P1-P6 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )    /* F9-F0,P1-P6 */
 
 	PORT_START("P64")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )	/* P7-P0 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )    /* P7-P0 */
 
 	PORT_START("DIPSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "S2:1" )
@@ -1248,7 +1248,7 @@ static const char *const seawolf_sample_names[] =
 
 static const samples_interface seawolf2_samples_interface =
 {
-	10,	/* 5*2 channels */
+	10, /* 5*2 channels */
 	seawolf_sample_names
 };
 
@@ -1299,7 +1299,7 @@ static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
-	MCFG_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)	/* clip out borders */
+	MCFG_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)    /* clip out borders */
 	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_astrocde)
 
 MACHINE_CONFIG_END
@@ -1412,7 +1412,7 @@ static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match screenshots */
+	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)    /* adjusted to match screenshots */
 //  MCFG_SCREEN_DEFAULT_POSITION(1.066, -0.004, 1.048, -0.026)  /* adjusted to match flyer */
 
 	/* sound hardware */
@@ -1436,7 +1436,7 @@ static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match flyer */
+	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)    /* adjusted to match flyer */
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("upper", 0.0, 0.0, 1.0)
@@ -1495,7 +1495,7 @@ static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 	MCFG_CPU_PROGRAM_MAP(profpac_map)
 	MCFG_CPU_IO_MAP(port_map_16col_pattern_nosound)
 
-	MCFG_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MCFG_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
 	MCFG_CPU_CONFIG(tenpin_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(tenpin_sub_map)
 	MCFG_CPU_IO_MAP(tenpin_sub_io_map)
@@ -1504,7 +1504,7 @@ static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MCFG_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
 	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -1656,7 +1656,7 @@ ROM_START( profpac )
 	ROM_LOAD( "ppq14",        0x34000, 0x4000, CRC(ecb861de) SHA1(73d28a79b76795d3016dd608f9ab3d255f40e477) )
 
 	ROM_REGION( 0xa00, "plds", 0 )
-    ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
+	ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
 	ROM_LOAD( "pls153a_cpu.u16",  0x00100, 0x00eb, CRC(9a5ea540) SHA1(8619c7626e58eac09a4d91f5ad49742240f5f71e) )
 	ROM_LOAD( "pls153a_epr.u6",   0x00200, 0x00eb, CRC(d8454bf7) SHA1(5e074a2cbac99ebbf02bc4cd331679ede30eea3f) )
 	ROM_LOAD( "pls153a_epr.u7",   0x00300, 0x00eb, CRC(fa831d9f) SHA1(ca8c3d8db24e99537c682aaf9726cbcef86728dd) )
@@ -1713,7 +1713,7 @@ ROM_START( tenpindx )
 	ROM_LOAD( "tpd_x16.bin",    0x1c000, 0x2000, CRC(8839d0e1) SHA1(5f1e581066d1851ee996f152ebec83db40aa7073) )
 
 	ROM_REGION( 0xa00, "plds", 0 )
-    ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
+	ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
 	ROM_LOAD( "pls153a_cpu.u16",  0x00100, 0x00eb, CRC(9a5ea540) SHA1(8619c7626e58eac09a4d91f5ad49742240f5f71e) )
 	ROM_LOAD( "pls153a_epr.u6",   0x00200, 0x00eb, CRC(d8454bf7) SHA1(5e074a2cbac99ebbf02bc4cd331679ede30eea3f) )
 	ROM_LOAD( "pls153a_epr.u7",   0x00300, 0x00eb, CRC(fa831d9f) SHA1(ca8c3d8db24e99537c682aaf9726cbcef86728dd) )

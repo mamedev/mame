@@ -83,7 +83,7 @@ UINT8 apollo_get_ram_config_byte(void);
 //apollo_get_node_id - get the node id
 UINT32 apollo_get_node_id(void);
 
- // should be called by the CPU core before executing each instruction
+	// should be called by the CPU core before executing each instruction
 int apollo_instruction_hook(device_t *device, offs_t curpc);
 
 void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
@@ -112,11 +112,11 @@ class apollo_state : public driver_device
 public:
 	apollo_state(const machine_config &mconfig, device_type type, const char *tag)
 			: driver_device(mconfig, type, tag),
-            m_ctape(*this, APOLLO_CTAPE_TAG),
-            m_messram_ptr(*this, "messram")
-            { }
+			m_ctape(*this, APOLLO_CTAPE_TAG),
+			m_messram_ptr(*this, "messram")
+			{ }
 
-    required_device<sc499_device> m_ctape;
+	required_device<sc499_device> m_ctape;
 
 	device_t *dma8237_1;
 	device_t *dma8237_2;
@@ -226,7 +226,7 @@ INPUT_PORTS_EXTERN(apollo_config);
 #define APOLLO_CSR_SR_CLEAR_ALL          0x3ffe
 
 #define APOLLO_CSR_CR_INTERRUPT_ENABLE   0x0001
-#define APOLLO_CSR_CR_RESET_DEVICES	      0x0002
+#define APOLLO_CSR_CR_RESET_DEVICES       0x0002
 #define APOLLO_CSR_CR_FPU_TRAP_ENABLE    0x0004
 #define APOLLO_CSR_CR_FORCE_BAD_PARITY   0x0008
 #define APOLLO_CSR_CR_PARITY_BYTE_MASK   0x00f0

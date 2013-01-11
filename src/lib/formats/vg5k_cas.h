@@ -12,4 +12,3 @@
 CASSETTE_FORMATLIST_EXTERN(vg5k_cassette_formats);
 
 #endif /* VG5K_CAS_H */
-

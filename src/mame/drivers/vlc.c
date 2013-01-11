@@ -121,7 +121,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 */
 
 
-#define MASTER_CLOCK	XTAL_16MHz
+#define MASTER_CLOCK    XTAL_16MHz
 #define MASTER_CPU            ((MASTER_CLOCK)/2)    // 8mhz
 #define SOUND_CLOCK           ((MASTER_CLOCK) /8)   // 2mhz
 
@@ -152,8 +152,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_microtouch(*this,"microtouch"),
-		  m_nvram(*this, "nvram"),
-		  m_backup(*this, "backup")
+			m_nvram(*this, "nvram"),
+			m_backup(*this, "backup")
 		{ }
 
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
@@ -164,13 +164,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_device> m_microtouch;
 
-	required_shared_ptr<UINT16>	m_nvram;
+	required_shared_ptr<UINT16> m_nvram;
 	required_shared_ptr<UINT16> m_backup;
 
 	UINT16  m_datA40000;
 
-        //UINT8* m_videoram;
-        //UINT8* m_colorram;
+		//UINT8* m_videoram;
+		//UINT8* m_colorram;
 
 	UINT16* m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -217,21 +217,21 @@ static const UINT8 pal35[256] = {
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",		/* screen we are acting on */
-	8,		/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",       /* screen we are acting on */
+	8,      /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 static const gfx_layout charlayout =
 {
- /* Todo  , just for sample */
+	/* Todo  , just for sample */
 
 	8,8,
 	RGN_FRAC(1,4),
@@ -256,8 +256,8 @@ static WRITE16_HANDLER( nevada_videoram_w )
 */
 /***************************************************************************/
 static GFXDECODE_START( nevada )
-  /* Todo  , just for sample */
-  GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
+	/* Todo  , just for sample */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 GFXDECODE_END
 
 /***************************************************************************/
@@ -290,19 +290,19 @@ static VIDEO_START( nevada )
 /***************************************************************************/
 static SCREEN_UPDATE_IND16( nevada )
 {
- // Todo
+	// Todo
 /*
     nevada_state *state = screen.machine().driver_data<nevada_state>();
     state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 */
-  return 0;
+	return 0;
 }
 
 /***************************************************************************/
 static PALETTE_INIT( nevada )
 {
 
-   // Palette init
+	// Palette init
 }
 
 /***************************************************************************/
@@ -320,9 +320,9 @@ static  NVRAM_HANDLER( nevada )
 			file->read(state->m_nvram,state->m_nvram.bytes());
 		else
 		{
-		  UINT16* defaultram = (UINT16 *) state->memregion("defaults")->base();
-		  memset(state->m_nvram,0x00,state->m_nvram.bytes());
-		  if (defaultram) memcpy(state->m_nvram, state->memregion("defaults")->base(), state->memregion("defaults")->bytes());
+			UINT16* defaultram = (UINT16 *) state->memregion("defaults")->base();
+			memset(state->m_nvram,0x00,state->m_nvram.bytes());
+			if (defaultram) memcpy(state->m_nvram, state->memregion("defaults")->base(), state->memregion("defaults")->bytes());
 		}
 	}
 }
@@ -346,7 +346,7 @@ static void duart18_tx(device_t *device, int channel, UINT8 data)
 /* Todo  , just for sample */
 	if ( channel == 0 )
 	{
-            // Modem 1200 Baud
+			// Modem 1200 Baud
 	}
 };
 
@@ -378,11 +378,11 @@ static void duart39_tx(device_t *device, int channel, UINT8 data)
 /* Todo  , just for sample */
 	if ( channel == 0 )
 	{
-            // Printer
+			// Printer
 	}
 	else
 	{
-	  // Player Tracking Interface J2 (not used)
+		// Player Tracking Interface J2 (not used)
 	}
 
 };
@@ -414,15 +414,15 @@ static void duart40_irq_handler( device_t *device, int state, UINT8 vector )
 static void duart40_tx( device_t *device, int channel, UINT8 data )
 {
 /* Todo  , just for sample */
-          nevada_state *state = device->machine().driver_data<nevada_state>();
+			nevada_state *state = device->machine().driver_data<nevada_state>();
 	if ( channel == 0 )
 	{
-	  state->m_microtouch->rx(state->generic_space(), 0, data);
+		state->m_microtouch->rx(state->generic_space(), 0, data);
 	}
 	else
-          {
-           // JCM Bill Acceptor
-          }
+			{
+			// JCM Bill Acceptor
+			}
 };
 /***************************************************************************/
 WRITE8_MEMBER( nevada_state::microtouch_tx )
@@ -448,7 +448,7 @@ static UINT8 duart40_input( device_t *device )
 /***************************************************************************/
 static WRITE_LINE_DEVICE_HANDLER(nevada_rtc_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);	// rtc interrupt on INT1
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);  // rtc interrupt on INT1
 }
 
 /***************************************************************************/
@@ -466,8 +466,8 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 //  DEVCB_INPUT_PORT("DSW1"),  /* not used */
 //  DEVCB_INPUT_PORT("DSW2"),  /* not used */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -475,18 +475,18 @@ static const ay8910_interface ay8910_config =
 /***************************************************************************/
 static READ16_HANDLER(io_board_r)
 {
-  // IO board Serial communication 0xA00000
-  return 1;
+	// IO board Serial communication 0xA00000
+	return 1;
 }
 /***************************************************************************/
 static WRITE16_HANDLER(io_board_w)
 {
-  // IO board Serial communication 0xA00000 on bit0
+	// IO board Serial communication 0xA00000 on bit0
 }
 /***************************************************************************/
 static WRITE16_HANDLER (io_board_x)
 {
- // IO board Serial communication 0xA80000  on bit15
+	// IO board Serial communication 0xA80000  on bit15
 }
 
 /***************************************************************************/
@@ -494,12 +494,12 @@ static READ16_HANDLER( nevada_sec_r )
 {
 	nevada_state *state = space.machine().driver_data<nevada_state>();
 //  D3..D0 = DOOR OPEN or Track STATE of PAL35
-  UINT16 res;
-	 /* UPPER byte is use for input in PAL35 */
-           // 74LS173 $bits Register used LOWER bits D3..D0 for PAL35 state and DOOR LOGIC SWITCH
-          res = pal35[state->m_datA40000 >> 8];
-          res = res << 8;
-          res = res | (state->m_datA40000 & 0x00FF);
+	UINT16 res;
+		/* UPPER byte is use for input in PAL35 */
+			// 74LS173 $bits Register used LOWER bits D3..D0 for PAL35 state and DOOR LOGIC SWITCH
+			res = pal35[state->m_datA40000 >> 8];
+			res = res << 8;
+			res = res | (state->m_datA40000 & 0x00FF);
 
 	return res;
 }
@@ -508,7 +508,7 @@ static WRITE16_HANDLER( nevada_sec_w )
 {
 	nevada_state *state = space.machine().driver_data<nevada_state>();
 	// 74LS173 $bits Register used LOWER bits D3..D0 for DOOR LOGIC SWITCH
-	state->m_datA40000 = data | 0x00f0; 	// since D7..D4 are not used and are connected to PULLUP
+	state->m_datA40000 = data | 0x00f0;     // since D7..D4 are not used and are connected to PULLUP
 //  popmessage("WRITE %04x %04x  ",datA40000,data);
 }
 
@@ -605,8 +605,8 @@ static ADDRESS_MAP_START( nevada_map, AS_PROGRAM, 16,nevada_state )
 	AM_RANGE(0x00a28000, 0x00a28001) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_w   ,0x00ff )
 	AM_RANGE(0x00a30000, 0x00A300ff) AM_DEVREADWRITE8("rtc",msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0x00a40000, 0x00A40001) AM_READWRITE_LEGACY( nevada_sec_r, nevada_sec_w)
-        //AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM_WRITE(nevada_videoram_w) AM_BASE_MEMBER(nevada_state, m_videoram)
-          AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM // Video
+		//AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM_WRITE(nevada_videoram_w) AM_BASE_MEMBER(nevada_state, m_videoram)
+			AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM // Video
 	AM_RANGE(0x00b10000, 0x00b100ff) AM_DEVREADWRITE8_LEGACY( "duart40_68681", duart68681_r, duart68681_w, 0x00ff ) // Lower byte
 	AM_RANGE(0x00b20000, 0x00b200ff) AM_DEVREADWRITE8_LEGACY( "duart39_68681", duart68681_r, duart68681_w, 0x00ff ) // Lower byte
 	AM_RANGE(0x00e00000, 0x00e000ff) AM_DEVREADWRITE8_LEGACY( "duart18_68681", duart68681_r, duart68681_w, 0xff00 ) // Upper byte
@@ -693,11 +693,11 @@ static const duart68681_config nevada_duart40_68681_config =
 static MACHINE_RESET( nevada )
 {
 
-  nevada_state *state = machine.driver_data<nevada_state>();
+	nevada_state *state = machine.driver_data<nevada_state>();
 
-  state->m_duart18_68681 = machine.device( "duart18_68681" );
-  state->m_duart39_68681 = machine.device( "duart39_68681" );
-  state->m_duart40_68681 = machine.device( "duart40_68681" );
+	state->m_duart18_68681 = machine.device( "duart18_68681" );
+	state->m_duart39_68681 = machine.device( "duart39_68681" );
+	state->m_duart40_68681 = machine.device( "duart40_68681" );
 }
 /***************************************************************************/
 
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_CPU_IO_MAP(nevada_iomap)  //0x10000 0x20000
 
 	MCFG_MACHINE_RESET(nevada)
-          MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))	/* 150ms Ds1232 TD to Ground */
+			MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
 
 
 	MCFG_NVRAM_HANDLER(nevada)
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_SCREEN_UPDATE_STATIC(nevada)
 
 	MCFG_GFXDECODE(nevada)
-          MCFG_PALETTE_LENGTH(256)
+			MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(nevada)
 	MCFG_VIDEO_START(nevada)
 
@@ -749,24 +749,24 @@ MACHINE_CONFIG_END
 
 /***************************************************************************/
 ROM_START( nevada )
-	ROM_REGION( 0x1000000, "maincpu", 0 )	/* 2 x 27C512 */
+	ROM_REGION( 0x1000000, "maincpu", 0 )   /* 2 x 27C512 */
 	ROM_LOAD16_BYTE( "u9even.bin" ,     0xfc0000, 0x010000, CRC(ADB207BD) SHA1(3E3509B78FDF32785F92CB21272694673D25C563) )  // program fc0000..fdffff
 	ROM_LOAD16_BYTE( "u10odd.bin" ,     0xfc0001, 0x010000, CRC(A79778D7) SHA1(6FF969F09D9781479360BCA3403B927099AD6481) )
 
 	ROM_LOAD16_BYTE( "u31even.bin",     0xfe0000, 0x010000, CRC(C9779F30) SHA1(5310B3D8B5E887313CE8059BD72D0730A295074F) )  // Boot fe0000..ffffff
 	ROM_LOAD16_BYTE( "u32odd.bin" ,     0xfe0001, 0x010000, CRC(51035ED1) SHA1(66CBF582CDF34CF3DDE30CF8A99BBCED4AF1CE6F) )
 
-	ROM_REGION16_BE( 0x0010000, "defaults", 0 )	/* 2 x 62256  NVRAM */
+	ROM_REGION16_BE( 0x0010000, "defaults", 0 ) /* 2 x 62256  NVRAM */
 	ROM_LOAD16_BYTE( "u30nv_even.bin",  0x000000, 0x008000, CRC(11f5c663) SHA1(f447fd59010bc7fbbda321c5aaf13e23c2aebd40) )  // NVRAM even  (RESET + Vector table in NVRAM)
 	ROM_LOAD16_BYTE( "u33nv_odd.bin" ,  0x000001, 0x008000, CRC(20623da2) SHA1(2dd31a96f0a3454855cd975e8ee95e43316344e0) )  // NVRAM odd
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "u34char.bin",            0x00000  , 0x08000, CRC(6F1C6953) SHA1(E8DB3B1D3FC3EC1C3DCA155517553BD0000A2249) )	/* Characters */
+	ROM_LOAD( "u34char.bin",            0x00000  , 0x08000, CRC(6F1C6953) SHA1(E8DB3B1D3FC3EC1C3DCA155517553BD0000A2249) )  /* Characters */
 
-        /*
-        BACKUP RAM
-        PAL DUMP
-        */
+		/*
+		BACKUP RAM
+		PAL DUMP
+		*/
 ROM_END
 
 /***************************************************************************/
@@ -775,17 +775,17 @@ ROM_END
 *************************/
 DRIVER_INIT_MEMBER(nevada_state,nevada)
 {
-  UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 
-   memset(m_backup,0x00,m_backup.bytes()); // temp
+	memset(m_backup,0x00,m_backup.bytes()); // temp
 
-  /* Patch for WDT test with int Level7 */
-  /* PATCH FE0086   4278 0414 Clrf $0414 */
-  /* this skip the test for the WDT */
+	/* Patch for WDT test with int Level7 */
+	/* PATCH FE0086   4278 0414 Clrf $0414 */
+	/* this skip the test for the WDT */
 //  ROM[0xFE0086/2] = 0x4278;
 //  ROM[0xFE0088/2] = 0x0414;
 
- // Skip PAL SECURITY
+	// Skip PAL SECURITY
 	ROM[0xFE0248/2] = 0x4E71; // nop
 	ROM[0xFE05D0/2] = 0x4E71; // nop
 	ROM[0xFE05D8/2] = 0x6014; // bra

@@ -26,4 +26,3 @@ struct ace_tape_t
 CASSETTE_FORMATLIST_EXTERN(ace_cassette_formats);
 
 #endif /* ACE_TAP_H */
-

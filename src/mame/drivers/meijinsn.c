@@ -134,7 +134,7 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 
 			if ((ioport("COINS")->read() & 0x1) == 0 && !m_mcu_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
+				m_shared_ram[0x29] = (source & 0xff00) | 0x22;  // coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
 				m_mcu_latch = 1;
 
@@ -151,7 +151,7 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 			}
 			else if ((ioport("COINS")->read() & 0x2) == 0 && !m_mcu_latch)
 			{
-				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
+				m_shared_ram[0x29] = (source & 0xff00) | 0x22;  // coinA
 				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
 				m_mcu_latch = 1;
 
@@ -261,10 +261,10 @@ void meijinsn_state::palette_init()
 	double weights_r[3], weights_g[3], weights_b[2];
 
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	0,	1000+1000,
-			3,	resistances_rg,	weights_g,	0,	1000+1000,
-			2,	resistances_b,	weights_b,	0,	1000+1000);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rg, weights_r,  0,  1000+1000,
+			3,  resistances_rg, weights_g,  0,  1000+1000,
+			2,  resistances_b,  weights_b,  0,  1000+1000);
 
 	for (i = 0; i < machine().total_colors(); i++)
 	{

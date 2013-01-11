@@ -59,7 +59,7 @@ extern const device_type MOS6530;
 
 
 #define MCFG_MOS6530_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), MOS6530, _clock)	\
+	MCFG_DEVICE_ADD((_tag), MOS6530, _clock)    \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MOS6530_INTERFACE(name) \
@@ -71,11 +71,11 @@ extern const device_type MOS6530;
 
 struct mos6530_interface
 {
-	devcb_read8				in_pa_func;
-	devcb_write8			out_pa_func;
+	devcb_read8             in_pa_func;
+	devcb_write8            out_pa_func;
 
-	devcb_read8				in_pb_func;
-	devcb_write8			out_pb_func;
+	devcb_read8             in_pb_func;
+	devcb_write8            out_pb_func;
 };
 
 /***************************************************************************

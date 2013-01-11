@@ -128,9 +128,9 @@ TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 	int color = m_colorram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0,
-				  code + ((UINT16)m_gfxbank << 8),
-				  color & 0x0f,
-				  0);
+					code + ((UINT16)m_gfxbank << 8),
+					color & 0x0f,
+					0);
 }
 
 TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
@@ -140,9 +140,9 @@ TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 	int color = ROM[tile_index + 0x2000];
 
 	SET_TILE_INFO_MEMBER(2,
-				  code,
-				  color & 0x0f,
-				  0);
+					code,
+					color & 0x0f,
+					0);
 }
 
 TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
@@ -151,9 +151,9 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
 	int color = m_colorram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0,
-				  code + ((color & 0x30) << 4),
-				  color & 0x0f,
-				  0);
+					code + ((color & 0x30) << 4),
+					color & 0x0f,
+					0);
 }
 
 
@@ -314,7 +314,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				sx,sy,0);
 
 		source += inc;
-    }
+	}
 }
 
 
@@ -396,7 +396,7 @@ UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &b
 	else
 		bitmap.fill(get_black_pen(machine()), cliprect);
 
-	draw_sprites(machine(), bitmap, cliprect, 1);	// reverse order
+	draw_sprites(machine(), bitmap, cliprect, 1);   // reverse order
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

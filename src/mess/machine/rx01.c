@@ -54,7 +54,7 @@ const device_type RX01 = &device_creator<rx01_device>;
 //-------------------------------------------------
 
 rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, RX01, "RX01", tag, owner, clock)
+	: device_t(mconfig, RX01, "RX01", tag, owner, clock)
 {
 }
 
@@ -130,8 +130,8 @@ void rx01_device::command_write(UINT16 data)
 
 	if (BIT(data,14)) // Initialize
 	{
-	   printf("initialize\n");
-	   m_state = RX01_INIT;
+		printf("initialize\n");
+		m_state = RX01_INIT;
 	}
 	else if (BIT(data,1)) // If GO bit is selected
 	{
@@ -260,4 +260,3 @@ void rx01_device::write_sector(int ddam)
 	/* write data */
 	floppy_drive_write_sector_data(m_image[m_unit], 0, m_rxsa, (char *)m_buffer, 128, ddam);
 }
-

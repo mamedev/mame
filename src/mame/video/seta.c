@@ -144,63 +144,63 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 static const game_offset game_offsets[] =
 {
 	/* only sprites */
-	{ "tndrcade", { -1,  0 } },				// correct (wall at beginning of game)
-	{ "tndrcadej",{ -1,  0 } },				// "
-	{ "wits",     {  0,  0 } },				// unknown
-	{ "thunderl", {  0,  0 } },				// unknown
-	{ "wiggie",   {  0,  0 } },				// some problems but they seem y co-ordinate related?
-	{ "superbar", {  0,  0 } },				// "
-	{ "pairlove", {  0,  0 } },				// unknown
-	{ "blockcar", {  0,  0 } },				// unknown
-	{ "neobattl", {  0,  0 } },				// correct (test grid)
-	{ "umanclub", {  0,  0 } },				// correct (test grid)
-	{ "atehate",  {  0,  0 } },				// correct (test grid)
-	{ "kiwame",   {  0,-16 } },				// correct (test grid)
-	{ "krzybowl", {  0,  0 } },				// correct (test grid)
-	{ "orbs",     {  0,  0 } },				// unknown
-	{ "keroppi",  {  0,  0 } },				// unknown
+	{ "tndrcade", { -1,  0 } },             // correct (wall at beginning of game)
+	{ "tndrcadej",{ -1,  0 } },             // "
+	{ "wits",     {  0,  0 } },             // unknown
+	{ "thunderl", {  0,  0 } },             // unknown
+	{ "wiggie",   {  0,  0 } },             // some problems but they seem y co-ordinate related?
+	{ "superbar", {  0,  0 } },             // "
+	{ "pairlove", {  0,  0 } },             // unknown
+	{ "blockcar", {  0,  0 } },             // unknown
+	{ "neobattl", {  0,  0 } },             // correct (test grid)
+	{ "umanclub", {  0,  0 } },             // correct (test grid)
+	{ "atehate",  {  0,  0 } },             // correct (test grid)
+	{ "kiwame",   {  0,-16 } },             // correct (test grid)
+	{ "krzybowl", {  0,  0 } },             // correct (test grid)
+	{ "orbs",     {  0,  0 } },             // unknown
+	{ "keroppi",  {  0,  0 } },             // unknown
 
 	/* 1 layer */
-	{ "twineagl", {  0,  0 }, {  0, -3 } },	// unknown
-	{ "downtown", {  1,  0 }, { -1,  0 } },	// sprites correct (test grid), tilemap unknown but at least -1 non-flipped to fix glitches later in the game
-	{ "downtown2",{  1,  0 }, { -1,  0 } },	// "
-	{ "downtownj",{  1,  0 }, { -1,  0 } },	// "
-	{ "downtownp",{  1,  0 }, { -1,  0 } },	// "
-	{ "usclssic", {  1,  2 }, {  0, -1 } },	// correct (test grid and bg)
-	{ "calibr50", { -1,  2 }, { -3, -2 } },	// correct (test grid and roof in animation at beginning of game)
-	{ "arbalest", {  0,  1 }, { -2, -1 } },	// correct (test grid and landing pad at beginning of game)
-	{ "metafox",  {  0,  0 }, { 16,-19 } },	// sprites unknown, tilemap correct (test grid)
-	{ "setaroul", {  0,  0 }, {  0,  0 } },	// unknown
-	{ "drgnunit", {  2,  2 }, { -2, -2 } },	// correct (test grid and I/O test)
-	{ "jockeyc",  {  0,  0 }, { -2,  0 } },	// sprites unknown, tilemap correct (test grid)
-	{ "inttoote", {  0,  0 }, { -2,  0 } },	// "
-	{ "inttootea",{  0,  0 }, { -2,  0 } },	// "
-	{ "stg",      {  0,  0 }, { -2, -2 } },	// sprites correct? (panel), tilemap correct (test grid)
-	{ "qzkklogy", {  1,  1 }, { -1, -1 } },	// correct (timer, test grid)
-	{ "qzkklgy2", {  0,  0 }, { -1, -3 } },	// sprites unknown, tilemaps correct (test grid)
+	{ "twineagl", {  0,  0 }, {  0, -3 } }, // unknown
+	{ "downtown", {  1,  0 }, { -1,  0 } }, // sprites correct (test grid), tilemap unknown but at least -1 non-flipped to fix glitches later in the game
+	{ "downtown2",{  1,  0 }, { -1,  0 } }, // "
+	{ "downtownj",{  1,  0 }, { -1,  0 } }, // "
+	{ "downtownp",{  1,  0 }, { -1,  0 } }, // "
+	{ "usclssic", {  1,  2 }, {  0, -1 } }, // correct (test grid and bg)
+	{ "calibr50", { -1,  2 }, { -3, -2 } }, // correct (test grid and roof in animation at beginning of game)
+	{ "arbalest", {  0,  1 }, { -2, -1 } }, // correct (test grid and landing pad at beginning of game)
+	{ "metafox",  {  0,  0 }, { 16,-19 } }, // sprites unknown, tilemap correct (test grid)
+	{ "setaroul", {  0,  0 }, {  0,  0 } }, // unknown
+	{ "drgnunit", {  2,  2 }, { -2, -2 } }, // correct (test grid and I/O test)
+	{ "jockeyc",  {  0,  0 }, { -2,  0 } }, // sprites unknown, tilemap correct (test grid)
+	{ "inttoote", {  0,  0 }, { -2,  0 } }, // "
+	{ "inttootea",{  0,  0 }, { -2,  0 } }, // "
+	{ "stg",      {  0,  0 }, { -2, -2 } }, // sprites correct? (panel), tilemap correct (test grid)
+	{ "qzkklogy", {  1,  1 }, { -1, -1 } }, // correct (timer, test grid)
+	{ "qzkklgy2", {  0,  0 }, { -1, -3 } }, // sprites unknown, tilemaps correct (test grid)
 
 	/* 2 layers */
-	{ "rezon",    {  0,  0 }, { -2, -2 } },	// correct (test grid)
-	{ "rezont",   {  0,  0 }, { -2, -2 } },	// "
-	{ "blandia",  {  0,  8 }, { -2,  6 } },	// correct (test grid, startup bg)
-	{ "blandiap", {  0,  8 }, { -2,  6 } },	// "
-	{ "zingzip",  {  0,  0 }, { -1, -2 } },	// sprites unknown, tilemaps correct (test grid)
-	{ "eightfrc", {  3,  4 }, {  0,  0 } },	// unknown
-	{ "daioh",    {  1,  1 }, { -1, -1 } },	// correct? (launch window and test grid are right, but planet is wrong)
-	{ "daioha",   {  1,  1 }, { -1, -1 } },	// "
-	{ "msgundam", {  0,  0 }, { -2, -2 } },	// correct (test grid, banpresto logo)
-	{ "msgundam1",{  0,  0 }, { -2, -2 } },	// "
-	{ "oisipuzl", {  0,  0 }, { -1, -1 } },	// correct (test mode) flip screen not supported?
-	{ "triplfun", {  0,  0 }, { -1, -1 } },	// "
-	{ "wrofaero", {  0,  0 }, {  0,  0 } },	// unknown
-	{ "jjsquawk", {  1,  1 }, { -1, -1 } },	// correct (test mode)
-	{ "jjsquawkb",{  1,  1 }, { -1, -1 } },	// "
-	{ "kamenrid", {  0,  0 }, { -2, -2 } },	// correct (map, banpresto logo)
-	{ "extdwnhl", {  0,  0 }, { -2, -2 } },	// correct (test grid, background images)
-	{ "sokonuke", {  0,  0 }, { -2, -2 } },	// correct (game selection, test grid)
-	{ "gundhara", {  0,  0 }, {  0,  0 } },	// unknown, flip screen not supported?
-	{ "zombraid", {  0,  0 }, { -2, -2 } },	// correct for normal, flip screen not working yet
-	{ "madshark", {  0,  0 }, {  0,  0 } },	// unknown (wrong when flipped, but along y)
+	{ "rezon",    {  0,  0 }, { -2, -2 } }, // correct (test grid)
+	{ "rezont",   {  0,  0 }, { -2, -2 } }, // "
+	{ "blandia",  {  0,  8 }, { -2,  6 } }, // correct (test grid, startup bg)
+	{ "blandiap", {  0,  8 }, { -2,  6 } }, // "
+	{ "zingzip",  {  0,  0 }, { -1, -2 } }, // sprites unknown, tilemaps correct (test grid)
+	{ "eightfrc", {  3,  4 }, {  0,  0 } }, // unknown
+	{ "daioh",    {  1,  1 }, { -1, -1 } }, // correct? (launch window and test grid are right, but planet is wrong)
+	{ "daioha",   {  1,  1 }, { -1, -1 } }, // "
+	{ "msgundam", {  0,  0 }, { -2, -2 } }, // correct (test grid, banpresto logo)
+	{ "msgundam1",{  0,  0 }, { -2, -2 } }, // "
+	{ "oisipuzl", {  0,  0 }, { -1, -1 } }, // correct (test mode) flip screen not supported?
+	{ "triplfun", {  0,  0 }, { -1, -1 } }, // "
+	{ "wrofaero", {  0,  0 }, {  0,  0 } }, // unknown
+	{ "jjsquawk", {  1,  1 }, { -1, -1 } }, // correct (test mode)
+	{ "jjsquawkb",{  1,  1 }, { -1, -1 } }, // "
+	{ "kamenrid", {  0,  0 }, { -2, -2 } }, // correct (map, banpresto logo)
+	{ "extdwnhl", {  0,  0 }, { -2, -2 } }, // correct (test grid, background images)
+	{ "sokonuke", {  0,  0 }, { -2, -2 } }, // correct (game selection, test grid)
+	{ "gundhara", {  0,  0 }, {  0,  0 } }, // unknown, flip screen not supported?
+	{ "zombraid", {  0,  0 }, { -2, -2 } }, // correct for normal, flip screen not working yet
+	{ "madshark", {  0,  0 }, {  0,  0 } }, // unknown (wrong when flipped, but along y)
 	{ "utoukond", {  0,  0 }, { -2,  0 } }, // unknown (wrong when flipped, but along y)
 	{ "crazyfgt", {  0,  0 }, { -2,  0 } }, // wrong (empty background column in title screen, but aligned sprites in screen select)
 	{ "magspeed", {  0,  0 }, { -2,  0 } }, // floating tilemap maybe 1px off in test grid
@@ -238,14 +238,14 @@ void seta_coin_lockout_w(running_machine &machine, int data)
 		}
 	}
 
-	coin_counter_w		(machine, 0, (( data) >> 0) & 1 );
-	coin_counter_w		(machine, 1, (( data) >> 1) & 1 );
+	coin_counter_w      (machine, 0, (( data) >> 0) & 1 );
+	coin_counter_w      (machine, 1, (( data) >> 1) & 1 );
 
 	/* some games haven't the coin lockout device */
-	if (	!state->m_coin_lockout )
+	if (    !state->m_coin_lockout )
 		return;
-	coin_lockout_w		(machine, 0, ((~data) >> 2) & 1 );
-	coin_lockout_w		(machine, 1, ((~data) >> 3) & 1 );
+	coin_lockout_w      (machine, 0, ((~data) >> 2) & 1 );
+	coin_lockout_w      (machine, 1, ((~data) >> 3) & 1 );
 }
 
 
@@ -282,12 +282,12 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 
 				/* Partly handled in vh_screenrefresh:
 
-                        fedc ba98 76-- ----
-                        ---- ---- --54 3---     Samples Bank (in blandia, eightfrc, zombraid)
-                        ---- ---- ---- -2--
-                        ---- ---- ---- --1-     Sprites Above Frontmost Layer
-                        ---- ---- ---- ---0     Layer 0 Above Layer 1
-                */
+				        fedc ba98 76-- ----
+				        ---- ---- --54 3---     Samples Bank (in blandia, eightfrc, zombraid)
+				        ---- ---- ---- -2--
+				        ---- ---- ---- --1-     Sprites Above Frontmost Layer
+				        ---- ---- ---- ---0     Layer 0 Above Layer 1
+				*/
 
 				new_bank = (data >> 3) & 0x7;
 
@@ -299,17 +299,17 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 
 					m_samples_bank = new_bank;
 
-					if (samples_len == 0x240000)	/* blandia, eightfrc */
+					if (samples_len == 0x240000)    /* blandia, eightfrc */
 					{
 						addr = 0x40000 * new_bank;
-						if (new_bank >= 3)	addr += 0x40000;
+						if (new_bank >= 3)  addr += 0x40000;
 
 						if ( (samples_len > 0x100000) && ((addr+0x40000) <= samples_len) )
 							memcpy(&rom[0xc0000],&rom[addr],0x40000);
 						else
 							logerror("PC %06X - Invalid samples bank %02X !\n", space.device().safe_pc(), new_bank);
 					}
-					else if (samples_len == 0x480000)	/* zombraid */
+					else if (samples_len == 0x480000)   /* zombraid */
 					{
 						/* bank 1 is never explicitly selected, 0 is used in its place */
 						if (new_bank == 0) new_bank = 1;
@@ -324,7 +324,7 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 			break;
 
 
-		case 4/2:	// ?
+		case 4/2:   // ?
 			break;
 	}
 }
@@ -366,8 +366,8 @@ INLINE void twineagl_tile_info( running_machine &machine, tile_data &tileinfo, i
 {
 	seta_state *state = machine.driver_data<seta_state>();
 	UINT16 *vram = state->m_vram_0 + offset;
-	UINT16 code =	vram[ tile_index ];
-	UINT16 attr =	vram[ tile_index + 0x800 ];
+	UINT16 code =   vram[ tile_index ];
+	UINT16 attr =   vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
 		code = (code & 0xc07f) | ((state->m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
 	SET_TILE_INFO( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
@@ -383,8 +383,8 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 	int gfx = 1 + layer;
 	UINT16 *vram = (layer == 0) ? state->m_vram_0 + offset : state->m_vram_2 + offset;
 	UINT16 *vctrl = (layer == 0) ? state->m_vctrl_0 : state->m_vctrl_2;
-	UINT16 code =	vram[ tile_index ];
-	UINT16 attr =	vram[ tile_index + 0x800 ];
+	UINT16 code =   vram[ tile_index ];
+	UINT16 attr =   vram[ tile_index + 0x800 ];
 
 	if(machine.gfx[gfx + ((vctrl[ 4/2 ] & 0x10) >> state->m_color_mode_shift)] != NULL)
 	{
@@ -446,22 +446,22 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	VIDEO_START_CALL_MEMBER( seta_no_layers );
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
-       at any given time */
+	   at any given time */
 
 	/* layer 0 */
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 
 	/* layer 1 */
 	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 	m_tilemap_3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 	m_tilemaps_flip = 0;
 	m_color_mode_shift = 3;
@@ -480,14 +480,14 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 	VIDEO_START_CALL_MEMBER( seta_no_layers );
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
-       at any given time */
+	   at any given time */
 
 	/* layer 0 */
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 	m_color_mode_shift = 4;
 
@@ -501,14 +501,14 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 	VIDEO_START_CALL_MEMBER( seta_no_layers );
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
-       at any given time */
+	   at any given time */
 
 	/* layer 0 */
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_0),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_1),this), TILEMAP_SCAN_ROWS,
-								 16,16, 64,32 );
+									16,16, 64,32 );
 
 	m_tilemap_0->set_transparent_pen(0);
 	m_tilemap_1->set_transparent_pen(0);
@@ -518,7 +518,7 @@ int setac_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 {
 	//seta_state *state = machine.driver_data<seta_state>();
 
-	int bank	=	(color & 0x06) >> 1;
+	int bank    =   (color & 0x06) >> 1;
 	code = (code & 0x3fff) + (bank * 0x4000);
 
 	return code;
@@ -538,7 +538,7 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	m_global_offsets = game_offsets;
 	while (m_global_offsets->gamename && strcmp(machine().system().name, m_global_offsets->gamename))
 		m_global_offsets++;
-	m_samples_bank = -1;	// set the samples bank to an out of range value at start-up
+	m_samples_bank = -1;    // set the samples bank to an out of range value at start-up
 
 	// position kludges
 	machine().device<seta001_device>("spritegen")->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);
@@ -841,8 +841,8 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 	int layers_ctrl = -1;
 	int enab_0, enab_1, x_0, x_1=0, y_0, y_1=0;
 
-	int order	=	0;
-	int flip	=	screen.machine().device<seta001_device>("spritegen")->is_flipped();
+	int order   =   0;
+	int flip    =   screen.machine().device<seta001_device>("spritegen")->is_flipped();
 
 	const rectangle &visarea = screen.visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
@@ -870,9 +870,9 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 
 	screen.machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
 
-	x_0		=	state->m_vctrl_0[ 0/2 ];
-	y_0		=	state->m_vctrl_0[ 2/2 ];
-	enab_0	=	state->m_vctrl_0[ 4/2 ];
+	x_0     =   state->m_vctrl_0[ 0/2 ];
+	y_0     =   state->m_vctrl_0[ 2/2 ];
+	enab_0  =   state->m_vctrl_0[ 4/2 ];
 
 	/* Only one tilemap per layer is enabled! */
 	state->m_tilemap_0->enable((!(enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
@@ -881,10 +881,10 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 	/* the hardware wants different scroll values when flipped */
 
 	/*  bg x scroll      flip
-        metafox     0000 025d = 0, $400-$1a3 = $400 - $190 - $13
-        eightfrc    ffe8 0272
-                    fff0 0260 = -$10, $400-$190 -$10
-                    ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
+	    metafox     0000 025d = 0, $400-$1a3 = $400 - $190 - $13
+	    eightfrc    ffe8 0272
+	                fff0 0260 = -$10, $400-$190 -$10
+	                ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
 
 	x_0 += 0x10 - state->m_global_offsets->tilemap_offs[flip ? 1 : 0];
 	y_0 -= (256 - vis_dimy)/2;
@@ -901,9 +901,9 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 
 	if (state->m_tilemap_2)
 	{
-		x_1		=	state->m_vctrl_2[ 0/2 ];
-		y_1		=	state->m_vctrl_2[ 2/2 ];
-		enab_1	=	state->m_vctrl_2[ 4/2 ];
+		x_1     =   state->m_vctrl_2[ 0/2 ];
+		y_1     =   state->m_vctrl_2[ 2/2 ];
+		enab_1  =   state->m_vctrl_2[ 4/2 ];
 
 		state->m_tilemap_2->enable((!(enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
 		state->m_tilemap_3->enable(( (enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
@@ -921,46 +921,46 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 		state->m_tilemap_2->set_scrolly(0, y_1);
 		state->m_tilemap_3->set_scrolly(0, y_1);
 
-		order	=	state->m_vregs[ 2/2 ];
+		order   =   state->m_vregs[ 2/2 ];
 	}
 
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
-{	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+{   int msk = 0;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))   msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))   msk |= 2;
+	if (screen.machine().input().code_pressed(KEYCODE_A))   msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 
 	if (state->m_tilemap_2)
 		popmessage("VR:%04X-%04X-%04X L0:%04X L1:%04X",
 			state->m_vregs[0], state->m_vregs[1], state->m_vregs[2], state->m_vctrl_0[4/2], state->m_vctrl_2[4/2]);
-	else if (state->m_tilemap_0)	popmessage("L0:%04X", state->m_vctrl_0[4/2]);
+	else if (state->m_tilemap_0)    popmessage("L0:%04X", state->m_vctrl_0[4/2]);
 }
 #endif
 
 	bitmap.fill(0, cliprect);
 
-	if (order & 1)	// swap the layers?
+	if (order & 1)  // swap the layers?
 	{
 		if (state->m_tilemap_2)
 		{
-			if (layers_ctrl & 2)	state->m_tilemap_2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 2)	state->m_tilemap_3->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    state->m_tilemap_2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    state->m_tilemap_3->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		}
 
-		if (order & 2)	// layer-sprite priority?
+		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)		screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if(order & 4)
 			{
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-			if (layers_ctrl & 1)	state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 		}
 		else
 		{
@@ -969,20 +969,20 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-			if (layers_ctrl & 1)	state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 
-			if (layers_ctrl & 8)		screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 	else
 	{
-		if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		if (layers_ctrl & 1)	state->m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)    state->m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)    state->m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-		if (order & 2)	// layer-sprite priority?
+		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)		screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if((order & 4) && state->m_paletteram2 != NULL)
 			{
@@ -1004,8 +1004,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 				if (state->m_tilemap_2)
 				{
-					if (layers_ctrl & 2)	state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
-					if (layers_ctrl & 2)	state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
 				}
 			}
 		}
@@ -1031,12 +1031,12 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 				if (state->m_tilemap_2)
 				{
-					if (layers_ctrl & 2)	state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
-					if (layers_ctrl & 2)	state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
 				}
 			}
 
-			if (layers_ctrl & 8)		screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 

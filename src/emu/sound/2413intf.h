@@ -11,7 +11,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( ym2413_register_port_w );
 DECLARE_WRITE8_DEVICE_HANDLER( ym2413_data_port_w );
 
 class ym2413_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

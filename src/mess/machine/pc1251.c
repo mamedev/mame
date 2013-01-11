@@ -36,7 +36,7 @@ int pc1251_ina(device_t *device)
 
 		/* At Power Up we fake a 'CL' pressure */
 		if (state->m_power)
-			data |= 0x02;		// problem with the deg lcd
+			data |= 0x02;       // problem with the deg lcd
 	}
 
 	if (state->m_outb & 0x02)
@@ -114,4 +114,3 @@ DRIVER_INIT_MEMBER(pc1251_state,pc1251)
 	m_power = 1;
 	machine().scheduler().timer_set(attotime::from_seconds(1), timer_expired_delegate(FUNC(pc1251_state::pc1251_power_up),this));
 }
-

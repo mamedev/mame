@@ -108,9 +108,9 @@
 #include "machine/53c810.h"
 #include "machine/ram.h"
 
-#define LOG_CPUIMASK	1
-#define LOG_UART		1
-#define LOG_INTERRUPTS	1
+#define LOG_CPUIMASK    1
+#define LOG_UART        1
+#define LOG_INTERRUPTS  1
 
 INLINE UINT16 read16be_with_read8_handler(read8_space_func handler, address_space &space, offs_t offset, UINT16 mem_mask)
 {
@@ -477,7 +477,7 @@ READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 {
 	int result;
 	result = pic8259_acknowledge( m_devices.pic8259_master );
-	bebox_set_irq_bit(space.machine(), 5, 0);	/* HACK */
+	bebox_set_irq_bit(space.machine(), 5, 0);   /* HACK */
 	return ((UINT64) result) << 56;
 }
 
@@ -796,17 +796,17 @@ const struct pit8253_config bebox_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_timer0_w)
 		},
 		{
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		},
 		{
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -943,7 +943,7 @@ UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, 
 	{
 		switch(offset)
 		{
-			case 0x00:	/* vendor/device ID */
+			case 0x00:  /* vendor/device ID */
 				result = 0x00011000;
 				break;
 
@@ -973,14 +973,14 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 		{
 			case 0x04:
 				/* command
-                 *
-                 * bit 8:   SERR/ Enable
-                 * bit 6:   Enable Parity Response
-                 * bit 4:   Write and Invalidate Mode
-                 * bit 2:   Enable Bus Mastering
-                 * bit 1:   Enable Memory Space
-                 * bit 0:   Enable IO Space
-                 */
+				 *
+				 * bit 8:   SERR/ Enable
+				 * bit 6:   Enable Parity Response
+				 * bit 4:   Write and Invalidate Mode
+				 * bit 2:   Enable Bus Mastering
+				 * bit 1:   Enable Memory Space
+				 * bit 0:   Enable IO Space
+				 */
 				if (data & 0x02)
 				{
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
@@ -1050,13 +1050,13 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	kbdc8042_init(machine(), &bebox_8042_interface);
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
-     * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
-     * lets CPU #1 go.  However, it seems that CPU #1 jumps into never-never
-     * land, crashes, and then goes into NetBSD's crash handler which catches
-     * it.  The current PowerPC core cannot catch this trip into never-never
-     * land properly, and MESS crashes.  In the interim, this "mitten" catches
-     * the crash
-     */
+	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
+	 * lets CPU #1 go.  However, it seems that CPU #1 jumps into never-never
+	 * land, crashes, and then goes into NetBSD's crash handler which catches
+	 * it.  The current PowerPC core cannot catch this trip into never-never
+	 * land properly, and MESS crashes.  In the interim, this "mitten" catches
+	 * the crash
+	 */
 	{
 		static UINT64 ops[2] =
 		{

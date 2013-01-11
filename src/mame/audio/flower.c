@@ -13,10 +13,10 @@ TODO:
 #include "emu.h"
 #include "includes/flower.h"
 
-#define FLOWER_VERBOSE		0		// show register writes
+#define FLOWER_VERBOSE      0       // show register writes
 
-#define MIXER_SAMPLERATE	48000	/* ? (native freq is probably in the MHz range) */
-#define MIXER_DEFGAIN		48
+#define MIXER_SAMPLERATE    48000   /* ? (native freq is probably in the MHz range) */
+#define MIXER_DEFGAIN       48
 
 
 /* this structure defines the parameters for a channel */
@@ -358,7 +358,7 @@ const device_type FLOWER = &device_creator<flower_sound_device>;
 
 flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FLOWER, "Flower Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(flower_sound_state);
 }
@@ -400,5 +400,3 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

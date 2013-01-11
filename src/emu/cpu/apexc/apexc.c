@@ -328,34 +328,34 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "apexc.h"
 
 #ifndef SUPPORT_ODD_WORD_SIZES
-#define apexc_readmem(address)	cpustate->program->read_dword((address)<<2)
-#define apexc_writemem(address, data)	cpustate->program->write_dword((address)<<2, (data))
+#define apexc_readmem(address)  cpustate->program->read_dword((address)<<2)
+#define apexc_writemem(address, data)   cpustate->program->write_dword((address)<<2, (data))
 /* eewww ! - Fortunately, there is no memory mapped I/O, so we can simulate masked write
 without danger */
-#define apexc_writemem_masked(address, data, mask)										\
+#define apexc_writemem_masked(address, data, mask)                                      \
 	apexc_writemem((address), (apexc_readmem(address) & ~(mask)) | ((data) & (mask)))
 #else
-#define apexc_readmem(address)	cpu_readmem13_32(address)
-#define apexc_writemem(address, data)	cpu_writemem13_32((address), (data))
-#define apexc_writemem_masked(address, data, mask)	cpu_writemem13_32masked((address), (data), (mask))
+#define apexc_readmem(address)  cpu_readmem13_32(address)
+#define apexc_writemem(address, data)   cpu_writemem13_32((address), (data))
+#define apexc_writemem_masked(address, data, mask)  cpu_writemem13_32masked((address), (data), (mask))
 #endif
 
 
-#define apexc_readop(address)	apexc_readmem(address)
+#define apexc_readop(address)   apexc_readmem(address)
 
 struct apexc_state
 {
-	UINT32 a;	/* accumulator */
-	UINT32 r;	/* register */
-	UINT32 cr;	/* control register (i.e. instruction register) */
-	int ml;		/* memory location (current track in working store, and requested
+	UINT32 a;   /* accumulator */
+	UINT32 r;   /* register */
+	UINT32 cr;  /* control register (i.e. instruction register) */
+	int ml;     /* memory location (current track in working store, and requested
                 word position within track) (10 bits) */
-	int working_store;	/* current working store (group of 16 tracks) (1-15) */
-	int current_word;	/* current word position within track (0-31) */
+	int working_store;  /* current working store (group of 16 tracks) (1-15) */
+	int current_word;   /* current word position within track (0-31) */
 
-	int running;	/* 1 flag: */
+	int running;    /* 1 flag: */
 				/* running: flag implied by the existence of the stop instruction */
-	UINT32 pc;	/* address of next instruction for the disassembler */
+	UINT32 pc;  /* address of next instruction for the disassembler */
 
 	legacy_cpu_device *device;
 	address_space *program;
@@ -364,7 +364,7 @@ struct apexc_state
 };
 
 /* decrement ICount by n */
-#define DELAY(n)	{cpustate->icount -= (n); cpustate->current_word = (cpustate->current_word + (n)) & 0x1f;}
+#define DELAY(n)    {cpustate->icount -= (n); cpustate->current_word = (cpustate->current_word + (n)) & 0x1f;}
 
 
 INLINE apexc_state *get_safe_token(device_t *device)
@@ -461,7 +461,7 @@ static void word_write(apexc_state *cpustate, int address, UINT32 data, UINT32 m
 #endif
 
 	/* write takes one memory cycle (2, actually, but the 2nd cycle is taken into
-    account in execute) */
+	account in execute) */
 	DELAY(1);
 }
 
@@ -494,11 +494,11 @@ INLINE int load_ml(apexc_state *cpustate, int address, int vector)
 
 	/* additionnal delay appears if we switch tracks */
 	if (((cpustate->ml & 0x3E0) != (address & 0x3E0)) /*|| vector*/)
-		delay = 6;	/* if tracks are different, delay to allow for track switching */
+		delay = 6;  /* if tracks are different, delay to allow for track switching */
 	else
-		delay = 0;	/* else, no problem */
+		delay = 0;  /* else, no problem */
 
-	cpustate->ml = address;	/* save ml */
+	cpustate->ml = address; /* save ml */
 
 	return delay;
 }
@@ -520,17 +520,17 @@ INLINE int load_ml(apexc_state *cpustate, int address, int vector)
 */
 static void execute(apexc_state *cpustate)
 {
-	int x, y, function, c6, vector;	/* instruction fields */
-	int i = 0;			/* misc counter */
-	int has_operand;	/* true if instruction is an AU operation with an X operand */
-	static const char has_operand_table[32] =	/* table for has_operand - one entry for each function code */
+	int x, y, function, c6, vector; /* instruction fields */
+	int i = 0;          /* misc counter */
+	int has_operand;    /* true if instruction is an AU operation with an X operand */
+	static const char has_operand_table[32] =   /* table for has_operand - one entry for each function code */
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0
 	};
-	int delay1;	/* pre-operand-access delay */
-	int delay2;	/* post-operation delay */
-	int delay3;	/* pre-operand-fetch delay */
+	int delay1; /* pre-operand-access delay */
+	int delay2; /* post-operation delay */
+	int delay3; /* pre-operand-fetch delay */
 
 	/* first isolate the instruction fields */
 	x = (cpustate->cr >> 22) & 0x3FF;
@@ -540,7 +540,7 @@ static void execute(apexc_state *cpustate)
 	vector = cpustate->cr & 1;
 	cpustate->pc = y<<2;
 
-	function &= 0x1E;	/* this is a mere guess - the LSBit is reserved for future additions */
+	function &= 0x1E;   /* this is a mere guess - the LSBit is reserved for future additions */
 
 	/* determinates if we need to read an operand*/
 	has_operand = has_operand_table[function];
@@ -556,7 +556,7 @@ static void execute(apexc_state *cpustate)
 		}
 	}
 
-	delay2 = 0;	/* default */
+	delay2 = 0; /* default */
 
 	do
 	{
@@ -568,22 +568,22 @@ static void execute(apexc_state *cpustate)
 			cpustate->running = FALSE;
 
 			/* BTW, I don't know whether stop loads y into ml or not, and whether
-            subsequent fetch is done */
+			subsequent fetch is done */
 			break;
 
 		case 2:
 			/* I */
 			/* I do not know whether the CPU does an OR or whatever, but since docs say that
-            the 5 bits must be cleared initially, an OR kind of makes sense */
+			the 5 bits must be cleared initially, an OR kind of makes sense */
 			cpustate->r |= papertape_read(cpustate) << 27;
-			delay2 = 32;	/* no idea whether this should be counted as an absolute delay
+			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
                             or as a value in delay2 */
 			break;
 
 		case 4:
 			/* P */
 			papertape_punch(cpustate, (cpustate->r >> 27) & 0x1f);
-			delay2 = 32;	/* no idea whether this should be counted as an absolute delay
+			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
                             or as a value in delay2 */
 			break;
 
@@ -608,7 +608,7 @@ static void execute(apexc_state *cpustate)
 
 		case 8:
 			/* l_n */
-			delay2 = (c6 & 0x20) ? 1 : 2;	/* if more than 32 shifts, it takes more time */
+			delay2 = (c6 & 0x20) ? 1 : 2;   /* if more than 32 shifts, it takes more time */
 
 			/* Yes, this code is inefficient, but this must be the way the APEXC does it ;-) */
 			while (c6 != 0)
@@ -631,7 +631,7 @@ static void execute(apexc_state *cpustate)
 
 		case 10:
 			/* r_n */
-			delay2 = (c6 & 0x20) ? 1 : 2;	/* if more than 32 shifts, it takes more time */
+			delay2 = (c6 & 0x20) ? 1 : 2;   /* if more than 32 shifts, it takes more time */
 
 			/* Yes, this code is inefficient, but this must be the way the APEXC does it ;-) */
 			while (c6 != 0)
@@ -649,7 +649,7 @@ static void execute(apexc_state *cpustate)
 
 		case 12:
 			/* unused function code.  I assume this results into a NOP, for lack of any
-            specific info... */
+			specific info... */
 
 			break;
 
@@ -672,12 +672,12 @@ static void execute(apexc_state *cpustate)
 						cpustate->a -= word_read(cpustate, x, 1);
 					else
 						/* Even if we do not read anything, the loop still takes 1 cycle of
-                        the memory word clock. */
+						the memory word clock. */
 						/* Anyway, maybe we still read the data even if we do not use it. */
 						DELAY(1);
 
 					/* exit if c6 reached 32 ("c6 & 0x20" is simpler to implement and
-                    essentially equivalent, so this is most likely the actual implementation) */
+					essentially equivalent, so this is most likely the actual implementation) */
 					if (c6 & 0x20)
 						break;
 
@@ -695,8 +695,8 @@ static void execute(apexc_state *cpustate)
 
 			//DELAY(32);    /* mmmh... we have already counted 32 wait states */
 			/* actually, if (n < 32) (which is an untypical case), we do not have 32 wait
-            states.  Question is: do we really have 32 wait states if (n < 32), or is
-            the timing table incomplete? */
+			states.  Question is: do we really have 32 wait states if (n < 32), or is
+			the timing table incomplete? */
 			break;
 
 		case 16:
@@ -762,15 +762,15 @@ static void execute(apexc_state *cpustate)
 
 		case 30:
 			/* S(x) */
-			cpustate->working_store = (x >> 5) & 0xf;	/* or is it (x >> 6)? */
-			DELAY(32);	/* no idea what the value is...  All I know is that it takes much
+			cpustate->working_store = (x >> 5) & 0xf;   /* or is it (x >> 6)? */
+			DELAY(32);  /* no idea what the value is...  All I know is that it takes much
                         more time than track switching (which takes 6 cycles) */
 			break;
 		}
 		if (vector)
 			/* increment word position in vector operations */
 			cpustate->ml = (cpustate->ml & 0x3E0) | ((cpustate->ml + 1) & 0x1F);
-	} while (vector && has_operand && (++i < 32));	/* iterate 32 times if vector bit is set */
+	} while (vector && has_operand && (++i < 32));  /* iterate 32 times if vector bit is set */
 													/* the has_operand is a mere guess */
 
 	/* load ml with Y */
@@ -787,7 +787,7 @@ static void execute(apexc_state *cpustate)
 	}
 
 	/* entry point after a successful Branch (which alters the normal instruction sequence,
-    in order not to load ml with Y) */
+	in order not to load ml with Y) */
 special_fetch:
 
 	/* fetch current instruction into control register */
@@ -819,12 +819,12 @@ static CPU_RESET( apexc )
 
 	/* mmmh...  I don't know what happens on reset with an actual APEXC. */
 
-	cpustate->working_store = 1;	/* mere guess */
-	cpustate->current_word = 0;		/* well, we do have to start somewhere... */
+	cpustate->working_store = 1;    /* mere guess */
+	cpustate->current_word = 0;     /* well, we do have to start somewhere... */
 
 	/* next two lines are just the product of my bold fantasy */
-	cpustate->cr = 0;				/* first instruction executed will be a stop */
-	cpustate->running = TRUE;		/* this causes the CPU to load the instruction at 0/0,
+	cpustate->cr = 0;               /* first instruction executed will be a stop */
+	cpustate->running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
                                 which enables easy booting (just press run on the panel) */
 }
 
@@ -840,7 +840,7 @@ static CPU_EXECUTE( apexc )
 			execute(cpustate);
 		else
 		{
-			DELAY(cpustate->icount);	/* burn cycles once for all */
+			DELAY(cpustate->icount);    /* burn cycles once for all */
 		}
 	} while (cpustate->icount > 0);
 }
@@ -852,32 +852,32 @@ static CPU_SET_INFO( apexc )
 	switch (state)
 	{
 	/* --- the following bits of info are set as 64-bit signed integers --- */
-	/*case CPUINFO_INT_INPUT_STATE + ...:*/							/* no interrupts */
+	/*case CPUINFO_INT_INPUT_STATE + ...:*/                         /* no interrupts */
 
 	case CPUINFO_INT_PC:
 		/* keep address 9 LSBits - 10th bit depends on whether we are accessing the permanent
-        track group or a switchable one */
+		track group or a switchable one */
 		cpustate->ml = info->i & 0x1ff;
 		if (info->i & 0x1e00)
-		{	/* we are accessing a switchable track group */
-			cpustate->ml |= 0x200;	/* set 10th bit */
+		{   /* we are accessing a switchable track group */
+			cpustate->ml |= 0x200;  /* set 10th bit */
 
 			if (((info->i >> 9) & 0xf) != cpustate->working_store)
-			{	/* we need to do a store switch */
+			{   /* we need to do a store switch */
 				cpustate->working_store = ((info->i >> 9) & 0xf);
 			}
 		}
 		break;
 
-	case CPUINFO_INT_SP:						(void) info->i;	/* no SP */					break;
+	case CPUINFO_INT_SP:                        (void) info->i; /* no SP */                 break;
 
-	case CPUINFO_INT_REGISTER + APEXC_CR:		cpustate->cr = info->i;							break;
-	case CPUINFO_INT_REGISTER + APEXC_A:		cpustate->a = info->i;							break;
-	case CPUINFO_INT_REGISTER + APEXC_R:		cpustate->r = info->i;							break;
-	case CPUINFO_INT_REGISTER + APEXC_ML:		cpustate->ml = info->i & 0x3ff;					break;
-	case CPUINFO_INT_REGISTER + APEXC_PC:		cpustate->pc = info->i;					break;
-	case CPUINFO_INT_REGISTER + APEXC_WS:		cpustate->working_store = info->i & 0xf;		break;
-	case CPUINFO_INT_REGISTER + APEXC_STATE:	cpustate->running = info->i ? TRUE : FALSE;		break;
+	case CPUINFO_INT_REGISTER + APEXC_CR:       cpustate->cr = info->i;                         break;
+	case CPUINFO_INT_REGISTER + APEXC_A:        cpustate->a = info->i;                          break;
+	case CPUINFO_INT_REGISTER + APEXC_R:        cpustate->r = info->i;                          break;
+	case CPUINFO_INT_REGISTER + APEXC_ML:       cpustate->ml = info->i & 0x3ff;                 break;
+	case CPUINFO_INT_REGISTER + APEXC_PC:       cpustate->pc = info->i;                 break;
+	case CPUINFO_INT_REGISTER + APEXC_WS:       cpustate->working_store = info->i & 0xf;        break;
+	case CPUINFO_INT_REGISTER + APEXC_STATE:    cpustate->running = info->i ? TRUE : FALSE;     break;
 	}
 }
 
@@ -887,66 +887,66 @@ CPU_GET_INFO( apexc )
 
 	switch (state)
 	{
-	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(apexc_state);			break;
-	case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
-	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/	break;
-	case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-	case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
-	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-	case CPUINFO_INT_MIN_CYCLES:					info->i = 2;	/* IIRC */				break;
-	case CPUINFO_INT_MAX_CYCLES:					info->i = 75;	/* IIRC */				break;
+	case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(apexc_state);          break;
+	case CPUINFO_INT_INPUT_LINES:                   info->i = 0;                            break;
+	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+	case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;   /*don't care*/  break;
+	case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+	case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
+	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+	case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;    /* IIRC */              break;
+	case CPUINFO_INT_MAX_CYCLES:                    info->i = 75;   /* IIRC */              break;
 
-	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 15;	/*13+2 ignored bits to make double word address*/	break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = /*5*/8;	/* no I/O bus, but we use address 0 for punchtape I/O */	break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = /*0*/1;	/*0 is quite enough but the MAME core does not understand*/	break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 15;  /*13+2 ignored bits to make double word address*/   break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = /*5*/8;   /* no I/O bus, but we use address 0 for punchtape I/O */    break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = /*0*/1;   /*0 is quite enough but the MAME core does not understand*/ break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
+	case CPUINFO_INT_SP:                            info->i = 0;    /* no SP */             break;
 	case CPUINFO_INT_PC:
-	case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->pc;	/* psuedo-PC */				break;
+	case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->pc; /* psuedo-PC */             break;
 
-	/*case CPUINFO_INT_INPUT_STATE + ...:*/							/* no interrupts */
+	/*case CPUINFO_INT_INPUT_STATE + ...:*/                         /* no interrupts */
 
-	case CPUINFO_INT_REGISTER + APEXC_CR:			info->i = cpustate->cr;						break;
-	case CPUINFO_INT_REGISTER + APEXC_A:			info->i = cpustate->a;						break;
-	case CPUINFO_INT_REGISTER + APEXC_R:			info->i = cpustate->r;						break;
-	case CPUINFO_INT_REGISTER + APEXC_ML:			info->i = cpustate->ml;						break;
-	case CPUINFO_INT_REGISTER + APEXC_PC:			info->i = cpustate->pc;						break;
-	case CPUINFO_INT_REGISTER + APEXC_WS:			info->i = cpustate->working_store;			break;
-	case CPUINFO_INT_REGISTER + APEXC_STATE:		info->i = cpustate->running;				break;
-	case CPUINFO_INT_REGISTER + APEXC_ML_FULL:		info->i = effective_address(cpustate, cpustate->ml);	break;
+	case CPUINFO_INT_REGISTER + APEXC_CR:           info->i = cpustate->cr;                     break;
+	case CPUINFO_INT_REGISTER + APEXC_A:            info->i = cpustate->a;                      break;
+	case CPUINFO_INT_REGISTER + APEXC_R:            info->i = cpustate->r;                      break;
+	case CPUINFO_INT_REGISTER + APEXC_ML:           info->i = cpustate->ml;                     break;
+	case CPUINFO_INT_REGISTER + APEXC_PC:           info->i = cpustate->pc;                     break;
+	case CPUINFO_INT_REGISTER + APEXC_WS:           info->i = cpustate->working_store;          break;
+	case CPUINFO_INT_REGISTER + APEXC_STATE:        info->i = cpustate->running;                break;
+	case CPUINFO_INT_REGISTER + APEXC_ML_FULL:      info->i = effective_address(cpustate, cpustate->ml);    break;
 
-	case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(apexc);			break;
-	case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(apexc);				break;
-	case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(apexc);				break;
-	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(apexc);			break;
-	case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-	case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(apexc);			break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+	case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(apexc);           break;
+	case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(apexc);              break;
+	case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(apexc);                break;
+	case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(apexc);            break;
+	case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+	case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(apexc);            break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
 
-	case CPUINFO_STR_NAME:							strcpy(info->s, "APEXC"); break;
-	case CPUINFO_STR_FAMILY:					strcpy(info->s, "APEC"); break;
-	case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0"); break;
-	case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__); break;
-	case CPUINFO_STR_CREDITS:					strcpy(info->s, "Raphael Nabet"); break;
+	case CPUINFO_STR_NAME:                          strcpy(info->s, "APEXC"); break;
+	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "APEC"); break;
+	case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0"); break;
+	case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__); break;
+	case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Raphael Nabet"); break;
 
-	case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c", (cpustate->running) ? 'R' : 'S'); break;
+	case CPUINFO_STR_FLAGS:                         sprintf(info->s, "%c", (cpustate->running) ? 'R' : 'S'); break;
 
-	case CPUINFO_STR_REGISTER + APEXC_CR:			sprintf(info->s, "CR:%08X", cpustate->cr); break;
-	case CPUINFO_STR_REGISTER + APEXC_A:			sprintf(info->s, "A :%08X", cpustate->a); break;
-	case CPUINFO_STR_REGISTER + APEXC_R:			sprintf(info->s, "R :%08X", cpustate->r); break;
-	case CPUINFO_STR_REGISTER + APEXC_ML:			sprintf(info->s, "ML:%03X", cpustate->ml); break;
-	case CPUINFO_STR_REGISTER + APEXC_PC:			sprintf(info->s, "PC:%03X", cpustate->pc); break;
-	case CPUINFO_STR_REGISTER + APEXC_WS:			sprintf(info->s, "WS:%01X", cpustate->working_store); break;
+	case CPUINFO_STR_REGISTER + APEXC_CR:           sprintf(info->s, "CR:%08X", cpustate->cr); break;
+	case CPUINFO_STR_REGISTER + APEXC_A:            sprintf(info->s, "A :%08X", cpustate->a); break;
+	case CPUINFO_STR_REGISTER + APEXC_R:            sprintf(info->s, "R :%08X", cpustate->r); break;
+	case CPUINFO_STR_REGISTER + APEXC_ML:           sprintf(info->s, "ML:%03X", cpustate->ml); break;
+	case CPUINFO_STR_REGISTER + APEXC_PC:           sprintf(info->s, "PC:%03X", cpustate->pc); break;
+	case CPUINFO_STR_REGISTER + APEXC_WS:           sprintf(info->s, "WS:%01X", cpustate->working_store); break;
 
-	case CPUINFO_STR_REGISTER + APEXC_STATE:		sprintf(info->s, "CPU state:%01X", cpustate->running ? TRUE : FALSE); break;
+	case CPUINFO_STR_REGISTER + APEXC_STATE:        sprintf(info->s, "CPU state:%01X", cpustate->running ? TRUE : FALSE); break;
 	}
 }
 

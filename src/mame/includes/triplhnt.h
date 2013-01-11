@@ -9,11 +9,11 @@
 
 
 /* Discrete Sound Input Nodes */
-#define TRIPLHNT_BEAR_ROAR_DATA	NODE_01
-#define TRIPLHNT_BEAR_EN		NODE_02
-#define TRIPLHNT_SHOT_DATA		NODE_03
-#define TRIPLHNT_SCREECH_EN		NODE_04
-#define TRIPLHNT_LAMP_EN		NODE_05
+#define TRIPLHNT_BEAR_ROAR_DATA NODE_01
+#define TRIPLHNT_BEAR_EN        NODE_02
+#define TRIPLHNT_SHOT_DATA      NODE_03
+#define TRIPLHNT_SCREECH_EN     NODE_04
+#define TRIPLHNT_LAMP_EN        NODE_05
 
 
 class triplhnt_state : public driver_device

@@ -78,7 +78,7 @@ public:
 	// construction/destruction
 	number_and_format(UINT64 value = 0, int format = 0)
 		: m_value(value),
-		  m_format(format) { }
+			m_format(format) { }
 
 	// pass-through to look like a regular number
 	operator UINT64 &() { return m_value; }
@@ -89,8 +89,8 @@ public:
 
 private:
 	// internal state
-	UINT64			m_value;
-	int				m_format;
+	UINT64          m_value;
+	int             m_format;
 };
 
 
@@ -127,8 +127,8 @@ private:
 		// construction/destruction
 		item(const char *text, UINT64 value, int valformat)
 			: m_next(NULL),
-			  m_text(text),
-			  m_value(value, valformat) { }
+				m_text(text),
+				m_value(value, valformat) { }
 
 		// getters
 		item *next() const { return m_next; }
@@ -137,18 +137,18 @@ private:
 
 	private:
 		// internal state
-		item *				m_next;							// next item in list
-		astring				m_text;							// name of the item
-		number_and_format	m_value;						// value of the item
+		item *              m_next;                         // next item in list
+		astring             m_text;                         // name of the item
+		number_and_format   m_value;                        // value of the item
 	};
 
 	// internal state
-	number_and_format	m_minval;						// minimum value
-	number_and_format	m_maxval;						// maximum value
-	number_and_format	m_stepval;						// step value
-	UINT64				m_value;						// live value of the parameter
-	astring				m_curtext;						// holding for a value string
-	simple_list<item>	m_itemlist;						// list of items
+	number_and_format   m_minval;                       // minimum value
+	number_and_format   m_maxval;                       // maximum value
+	number_and_format   m_stepval;                      // step value
+	UINT64              m_value;                        // live value of the parameter
+	astring             m_curtext;                      // holding for a value string
+	simple_list<item>   m_itemlist;                     // list of items
 };
 
 
@@ -207,30 +207,30 @@ private:
 
 		private:
 			// internal state
-			output_argument *	m_next;							// link to next argument
-			parsed_expression	m_expression;					// expression for argument
-			UINT64				m_count;						// number of repetitions
+			output_argument *   m_next;                         // link to next argument
+			parsed_expression   m_expression;                   // expression for argument
+			UINT64              m_count;                        // number of repetitions
 		};
 
 		// internal helpers
 		void validate_format(const char *filename, int line);
 
 		// internal state
-		script_entry *		m_next;							// link to next entry
-		parsed_expression	m_condition;					// condition under which this is executed
-		parsed_expression	m_expression;					// expression to execute
-		astring				m_format;						// string format to print
-		simple_list<output_argument> m_arglist;				// list of arguments
-		INT8				m_line;							// which line to print on
-		UINT8				m_justify;						// justification when printing
+		script_entry *      m_next;                         // link to next entry
+		parsed_expression   m_condition;                    // condition under which this is executed
+		parsed_expression   m_expression;                   // expression to execute
+		astring             m_format;                       // string format to print
+		simple_list<output_argument> m_arglist;             // list of arguments
+		INT8                m_line;                         // which line to print on
+		UINT8               m_justify;                      // justification when printing
 
 		// constants
 		static const int MAX_ARGUMENTS = 32;
 	};
 
 	// internal state
-	simple_list<script_entry> m_entrylist;				// list of actions to perform
-	script_state		m_state;						// which state this script is for
+	simple_list<script_entry> m_entrylist;              // list of actions to perform
+	script_state        m_state;                        // which state this script is for
 };
 
 
@@ -292,19 +292,19 @@ private:
 	cheat_script *&script_for_state(script_state state);
 
 	// internal state
-	cheat_manager &		m_manager;						// reference to our manager
-	cheat_entry *		m_next;							// next cheat entry
-	astring				m_description;					// string description/menu title
-	astring				m_comment;						// comment data
-	cheat_parameter *	m_parameter;					// parameter
-	cheat_script *		m_on_script;					// script to run when turning on
-	cheat_script *		m_off_script;					// script to run when turning off
-	cheat_script *		m_change_script;				// script to run when value changes
-	cheat_script *		m_run_script;					// script to run each frame when on
-	symbol_table		m_symbols;						// symbol table for this cheat
-	script_state		m_state;						// current cheat state
-	UINT32				m_numtemp;						// number of temporary variables
-	UINT64				m_argindex;						// argument index variable
+	cheat_manager &     m_manager;                      // reference to our manager
+	cheat_entry *       m_next;                         // next cheat entry
+	astring             m_description;                  // string description/menu title
+	astring             m_comment;                      // comment data
+	cheat_parameter *   m_parameter;                    // parameter
+	cheat_script *      m_on_script;                    // script to run when turning on
+	cheat_script *      m_off_script;                   // script to run when turning off
+	cheat_script *      m_change_script;                // script to run when value changes
+	cheat_script *      m_run_script;                   // script to run each frame when on
+	symbol_table        m_symbols;                      // symbol table for this cheat
+	script_state        m_state;                        // current cheat state
+	UINT32              m_numtemp;                      // number of temporary variables
+	UINT64              m_argindex;                     // argument index variable
 
 	// constants
 	static const int DEFAULT_TEMP_VARIABLES = 10;
@@ -347,19 +347,19 @@ private:
 	void load_cheats(const char *filename);
 
 	// internal state
-	running_machine &	m_machine;							// reference to our machine
-	simple_list<cheat_entry> m_cheatlist;					// cheat list
-	UINT64				m_framecount;						// frame count
-	astring				m_output[UI_TARGET_FONT_ROWS*2];	// array of output strings
-	UINT8				m_justify[UI_TARGET_FONT_ROWS*2];	// justification for each string
-	UINT8				m_numlines;							// number of lines available for output
-	INT8				m_lastline;							// last line used for output
-	bool				m_disabled;							// true if the cheat engine is disabled
-	symbol_table		m_symtable;							// global symbol table
+	running_machine &   m_machine;                          // reference to our machine
+	simple_list<cheat_entry> m_cheatlist;                   // cheat list
+	UINT64              m_framecount;                       // frame count
+	astring             m_output[UI_TARGET_FONT_ROWS*2];    // array of output strings
+	UINT8               m_justify[UI_TARGET_FONT_ROWS*2];   // justification for each string
+	UINT8               m_numlines;                         // number of lines available for output
+	INT8                m_lastline;                         // last line used for output
+	bool                m_disabled;                         // true if the cheat engine is disabled
+	symbol_table        m_symtable;                         // global symbol table
 
 	// constants
 	static const int CHEAT_VERSION = 1;
 };
 
 
-#endif	/* __CHEAT_H__ */
+#endif  /* __CHEAT_H__ */

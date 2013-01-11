@@ -109,20 +109,20 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 	//UINT64* destinationReg = NULL;
 	//switch (D)
 	//{
-	//	case 0x00: destinationReg = &m_a0;
-	//	case 0x01: destinationReg = &m_a1;
-	//	default: break;
+	//  case 0x00: destinationReg = &m_a0;
+	//  case 0x01: destinationReg = &m_a1;
+	//  default: break;
 	//}
 
 	// Which source is being used?
 	//UINT64* sourceReg = NULL;
 	//switch (S)
 	//{
-	//	case 0x00: sourceReg = &m_a0;
-	//	case 0x01: sourceReg = &m_a1;
-	//	default: break;
+	//  case 0x00: sourceReg = &m_a0;
+	//  case 0x01: sourceReg = &m_a1;
+	//  default: break;
 	//}
-	
+
 	switch (F1)
 	{
 		case 0x00: printf("UNIMPLEMENTED F1 operation @ PC 0x%04x\n", m_pc); break;
@@ -173,7 +173,7 @@ void dsp16_device::executeYFieldPost(const UINT8& Y)
 		case 0x03: opReg = &m_r3; break;
 		default: break;
 	}
-	
+
 	const UINT8 lower = Y & 0x03;
 	switch (lower)
 	{
@@ -463,7 +463,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			const INT8 M = (op & 0x00ff);
 			const UINT8 R = (op & 0x0e00) >> 9;
 			void* reg = registerFromRImmediateField(R);
-			writeRegister(reg, (INT16)M);	// Sign extend 8 bit int
+			writeRegister(reg, (INT16)M);   // Sign extend 8 bit int
 			cycles = 1;
 			pcAdvance = 1;
 			break;
@@ -480,14 +480,14 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 				// Do
 				m_cacheStart = m_pc + 1;
 				m_cacheEnd = m_pc + NI + 1;
-				m_cacheIterations = K-1;	// -1 because we check the counter below
+				m_cacheIterations = K-1;    // -1 because we check the counter below
 				cycles = 1;
 				pcAdvance = 1;
 			}
 			else
 			{
 				// Redo
-				m_cacheIterations = K-1;	// -1 because we check the counter below
+				m_cacheIterations = K-1;    // -1 because we check the counter below
 				m_cacheRedoNextPC = m_pc + 1;
 				m_pc = m_cacheStart;
 				pcAdvance = 0;

@@ -23,10 +23,10 @@ void zaxxon_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[0], rweights, 470, 0,
-			3,	&resistances[0], gweights, 470, 0,
-			2,	&resistances[1], bweights, 470, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  &resistances[0], rweights, 470, 0,
+			3,  &resistances[0], gweights, 470, 0,
+			2,  &resistances[1], bweights, 470, 0);
 
 	/* initialize the palette with these colors */
 	for (i = 0; i < machine().total_colors(); i++)

@@ -19,8 +19,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define CONSOLE_HISTORY		(10000)
-#define CONSOLE_LINE_CHARS	(100)
+#define CONSOLE_HISTORY     (10000)
+#define CONSOLE_LINE_CHARS  (100)
 
 
 
@@ -30,8 +30,8 @@
 
 struct help_item
 {
-	const char *		tag;
-	const char *		help;
+	const char *        tag;
+	const char *        help;
 };
 
 
@@ -640,7 +640,7 @@ static const help_item static_help_list[] =
 		"  gt[ime] <milliseconds>\n"
 		"\n"
 		"The gtime command resumes execution of the current code. Control will not be returned to the "
-		"debugger until	a specified delay has elapsed. The delay is in milliseconds.\n"
+		"debugger until a specified delay has elapsed. The delay is in milliseconds.\n"
 		"\n"
 		"Example:\n"
 		"\n"
@@ -1319,4 +1319,3 @@ const char *debug_get_help(const char *tag)
 			msglen += sprintf(&ambig_message[msglen], "  help %s?\n", static_help_list[i].tag);
 	return ambig_message;
 }
-

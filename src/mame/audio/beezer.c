@@ -62,9 +62,9 @@
  *
  *************************************/
 
-#define CRYSTAL_OSC				(XTAL_12MHz)
-#define SH6840_CLOCK			(CRYSTAL_OSC / 12)
-#define MULTIPLEX_FREQ			(SH6840_CLOCK / 16)
+#define CRYSTAL_OSC             (XTAL_12MHz)
+#define SH6840_CLOCK            (CRYSTAL_OSC / 12)
+#define MULTIPLEX_FREQ          (SH6840_CLOCK / 16)
 
 /*************************************
  *
@@ -75,12 +75,12 @@
 /* 6840 variables */
 struct sh6840_timer_channel
 {
-	UINT8	cr;
-	UINT8	state;
-	UINT8	leftovers;
-	UINT16	timer;
-	UINT32	clocks;
-	UINT8	int_flag;
+	UINT8   cr;
+	UINT8   state;
+	UINT8   leftovers;
+	UINT16  timer;
+	UINT32  clocks;
+	UINT8   int_flag;
 	union
 	{
 #ifdef LSB_FIRST
@@ -217,7 +217,7 @@ INLINE int sh6840_update_noise(beezer_sound_state *state, int clocks)
 		{
 			state->m_sh6840_LFSR_clocks = 0;
 			/* shift the LFSR. finally or in the result and see if we've
-            * had a 0->1 transition */
+			* had a 0->1 transition */
 			newxor = (((state->m_sh6840_LFSR&0x10000)?1:0) ^ ((state->m_sh6840_LFSR&0x2000)?1:0))?1:0;
 			state->m_sh6840_LFSR <<= 1;
 			state->m_sh6840_LFSR |= newxor;
@@ -353,11 +353,11 @@ static STREAM_UPDATE( beezer_stream_update )
 
 		/* stash */
 		/* each sample feeds an xor bit on the sign bit of a sign-magnitude (NOT 2'S COMPLEMENT)
-         * DAC. This requires some rather convoluted processing:
-         * samplex*0x80 brings the sample to the sign bit
-         * state->m_sh6840_volume[x]&0x80 pulls the sign bit from the dac sample
-         * state->m_sh6840_volume[x]&0x7F pulls the magnitude from the dac sample
-         */
+		 * DAC. This requires some rather convoluted processing:
+		 * samplex*0x80 brings the sample to the sign bit
+		 * state->m_sh6840_volume[x]&0x80 pulls the sign bit from the dac sample
+		 * state->m_sh6840_volume[x]&0x7F pulls the magnitude from the dac sample
+		 */
 		sample += (((sample0*0x80)^(state->m_sh6840_volume[0]&0x80))?-1:1)*(state->m_sh6840_volume[0]&0x7F);
 		sample += (((sample1*0x80)^(state->m_sh6840_volume[1]&0x80))?-1:1)*(state->m_sh6840_volume[1]&0x7F);
 		sample += (((sample2*0x80)^(state->m_sh6840_volume[2]&0x80))?-1:1)*(state->m_sh6840_volume[2]&0x7F);
@@ -398,7 +398,7 @@ const device_type BEEZER = &device_creator<beezer_sound_device>;
 
 beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(beezer_sound_state);
 }
@@ -602,4 +602,3 @@ WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w )
 	state->m_stream->update();
 	state->m_sh6840_volume[offset] = data;
 }
-

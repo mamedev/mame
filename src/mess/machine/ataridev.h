@@ -6,9 +6,9 @@
 #ifndef _ATARIDEV_H
 #define _ATARIDEV_H
 
-#define ATARI_5200	0
-#define ATARI_400	1
-#define ATARI_800	2
+#define ATARI_5200  0
+#define ATARI_400   1
+#define ATARI_800   2
 #define ATARI_600XL 3
 #define ATARI_800XL 4
 
@@ -60,7 +60,7 @@ private:
 extern const device_type ATARI_FDC;
 
 
-#define MCFG_ATARI_FDC_ADD(_tag)	\
+#define MCFG_ATARI_FDC_ADD(_tag)    \
 	MCFG_DEVICE_ADD((_tag),  ATARI_FDC, 0)
 
 
@@ -72,4 +72,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( atari_serout_w );
 WRITE_LINE_DEVICE_HANDLER( atarifdc_pia_cb2_w );
 
 #endif /* _ATARIDEV_H */
-

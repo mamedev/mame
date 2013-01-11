@@ -22,8 +22,8 @@
 const device_type X68KHDC = &device_creator<x68k_hdc_image_device>;
 
 x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, X68KHDC, "SASI Hard Disk", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, X68KHDC, "SASI Hard Disk", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -248,14 +248,14 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 				case SASI_CMD_FORMAT_UNIT:
 				case SASI_CMD_FORMAT_UNIT_06:
 					/*
-                        Format Unit command format  (differs from SASI spec?)
-                        0 |   0x06
-                        1 |   Unit number (0-7) | LBA MSB (high 5 bits)
-                        2 |   LBA
-                        3 |   LBA LSB
-                        4 |   ??  (usually 0x01)
-                        5 |   ??
-                    */
+					    Format Unit command format  (differs from SASI spec?)
+					    0 |   0x06
+					    1 |   Unit number (0-7) | LBA MSB (high 5 bits)
+					    2 |   LBA
+					    3 |   LBA LSB
+					    4 |   ??  (usually 0x01)
+					    5 |   ??
+					*/
 						m_phase = SASI_PHASE_STATUS;
 						m_io = 1;  // Output
 						m_status_port |= 0x04;  // C/D remains the same

@@ -6,16 +6,16 @@
 #include "emu.h"
 #include "includes/chaknpop.h"
 
-#define GFX_FLIP_X	0x01
-#define GFX_FLIP_Y	0x02
-#define GFX_VRAM_BANK	0x04
-#define GFX_UNKNOWN1	0x08
-#define GFX_TX_BANK1	0x20
-#define GFX_UNKNOWN2	0x40
-#define GFX_TX_BANK2	0x80
+#define GFX_FLIP_X  0x01
+#define GFX_FLIP_Y  0x02
+#define GFX_VRAM_BANK   0x04
+#define GFX_UNKNOWN1    0x08
+#define GFX_TX_BANK1    0x20
+#define GFX_UNKNOWN2    0x40
+#define GFX_TX_BANK2    0x80
 
-#define TX_COLOR1	0x0b
-#define TX_COLOR2	0x01
+#define TX_COLOR1   0x0b
+#define TX_COLOR2   0x01
 
 
 /***************************************************************************
@@ -81,7 +81,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_gfxmode_w)
 		int all_dirty = 0;
 
 		m_gfxmode = data;
-		membank("bank1")->set_entry((m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);	/* Select 2 banks of 16k */
+		membank("bank1")->set_entry((m_gfxmode & GFX_VRAM_BANK) ? 1 : 0);   /* Select 2 banks of 16k */
 
 		if (m_flip_x != (m_gfxmode & GFX_FLIP_X))
 		{
@@ -131,14 +131,14 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_attrram_w)
 TILE_GET_INFO_MEMBER(chaknpop_state::chaknpop_get_tx_tile_info)
 {
 	int tile = m_tx_ram[tile_index];
-	int tile_h_bank = (m_gfxmode & GFX_TX_BANK2) << 2;	/* 0x00-0xff -> 0x200-0x2ff */
+	int tile_h_bank = (m_gfxmode & GFX_TX_BANK2) << 2;  /* 0x00-0xff -> 0x200-0x2ff */
 	int color = m_attr_ram[TX_COLOR2];
 
 	if (tile == 0x74)
 		color = m_attr_ram[TX_COLOR1];
 
 	if (m_gfxmode & GFX_TX_BANK1 && tile >= 0xc0)
-		tile += 0xc0;					/* 0xc0-0xff -> 0x180-0x1bf */
+		tile += 0xc0;                   /* 0xc0-0xff -> 0x180-0x1bf */
 
 	tile |= tile_h_bank;
 
@@ -235,13 +235,13 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 			pen_t color = 0;
 
 			if (state->m_vram1[offs] & i)
-				color |= 0x200;	// green lower cage
+				color |= 0x200; // green lower cage
 			if (state->m_vram2[offs] & i)
 				color |= 0x080;
 			if (state->m_vram3[offs] & i)
-				color |= 0x100;	// green upper cage
+				color |= 0x100; // green upper cage
 			if (state->m_vram4[offs] & i)
-				color |= 0x040;	// tx mask
+				color |= 0x040; // tx mask
 
 			if (color)
 			{

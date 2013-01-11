@@ -14,10 +14,10 @@
 #include "sound/speaker.h"
 #include "video/dm9368.h"
 
-#define CDP1802_TAG		"ic19"
-#define CDP1864_TAG		"ic3"
-#define DM9368_TAG		"ic10"
-#define SCREEN_TAG		"screen"
+#define CDP1802_TAG     "ic19"
+#define CDP1864_TAG     "ic3"
+#define DM9368_TAG      "ic10"
+#define SCREEN_TAG      "screen"
 
 enum
 {
@@ -42,12 +42,12 @@ class cosmicos_state : public driver_device
 public:
 	cosmicos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_cti(*this, CDP1864_TAG),
-		  m_led(*this, DM9368_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_cti(*this, CDP1864_TAG),
+			m_led(*this, DM9368_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;

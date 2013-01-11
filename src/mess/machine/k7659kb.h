@@ -21,7 +21,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define K7659_KEYBOARD_TAG	"k7659kb"
+#define K7659_KEYBOARD_TAG  "k7659kb"
 
 
 

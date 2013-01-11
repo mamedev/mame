@@ -57,4 +57,3 @@ UINT32 gatron_state::screen_update_gat(screen_device &screen, bitmap_ind16 &bitm
 void gatron_state::palette_init()
 {
 }
-

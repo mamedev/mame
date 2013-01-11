@@ -155,26 +155,26 @@ void vsystem_spr_device::device_reset()
 void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 {
 	/*
-        attr_start + 0x0000
-        ---- ---x xxxx xxxx oy
-        ---- xxx- ---- ---- ysize
-        xxxx ---- ---- ---- zoomy
+	    attr_start + 0x0000
+	    ---- ---x xxxx xxxx oy
+	    ---- xxx- ---- ---- ysize
+	    xxxx ---- ---- ---- zoomy
 
-        attr_start + 0x0001
-        ---- ---x xxxx xxxx ox
-        ---- xxx- ---- ---- xsize
-        xxxx ---- ---- ---- zoomx
+	    attr_start + 0x0001
+	    ---- ---x xxxx xxxx ox
+	    ---- xxx- ---- ---- xsize
+	    xxxx ---- ---- ---- zoomx
 
-        attr_start + 0x0002
-        -x-- ---- ---- ---- flipx
-        x--- ---- ---- ---- flipy
-        --xx xxxx ---- ---- color
-        --xx ---- ---- ---- priority? (upper color bits)
-        ---- ---- ---- ---x map start (msb)
+	    attr_start + 0x0002
+	    -x-- ---- ---- ---- flipx
+	    x--- ---- ---- ---- flipy
+	    --xx xxxx ---- ---- color
+	    --xx ---- ---- ---- priority? (upper color bits)
+	    ---- ---- ---- ---x map start (msb)
 
-        attr_start + 0x0003
-        xxxx xxxx xxxx xxxx map start (lsb)
-    */
+	    attr_start + 0x0003
+	    xxxx xxxx xxxx xxxx map start (lsb)
+	*/
 
 	curr_sprite.oy =    (ram[0] & 0x01ff);
 	curr_sprite.ysize = (ram[0] & 0x0e00) >> 9;
@@ -207,10 +207,10 @@ void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap
 		switch (curr_sprite.pri)
 		{
 			default:
-			case 0:	priority_mask = 0x00; break;
-			case 3:	priority_mask = 0xfe; break;
-			case 2:	priority_mask = 0xfc; break;
-			case 1:	priority_mask = 0xf0; break;
+			case 0: priority_mask = 0x00; break;
+			case 3: priority_mask = 0xfe; break;
+			case 2: priority_mask = 0xfc; break;
+			case 1: priority_mask = 0xf0; break;
 		}
 	}
 
@@ -219,7 +219,7 @@ void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap
 
 	int ystart, yend, yinc;
 
-	if (!curr_sprite.flipy)	{ ystart = 0; yend = curr_sprite.ysize+1; yinc = 1; }
+	if (!curr_sprite.flipy) { ystart = 0; yend = curr_sprite.ysize+1; yinc = 1; }
 	else                    { ystart = curr_sprite.ysize; yend = -1; yinc = -1; }
 
 	int ycnt = ystart;
@@ -227,7 +227,7 @@ void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap
 	{
 		int xstart, xend, xinc;
 
-		if (!curr_sprite.flipx)	{ xstart = 0; xend = curr_sprite.xsize+1; xinc = 1; }
+		if (!curr_sprite.flipx) { xstart = 0; xend = curr_sprite.xsize+1; xinc = 1; }
 		else                    { xstart = curr_sprite.xsize; xend = -1; xinc = -1; }
 
 		int xcnt = xstart;
@@ -313,7 +313,3 @@ void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, r
 		offs+=inc;
 	}
 }
-
-
-
-

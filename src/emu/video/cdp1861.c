@@ -16,9 +16,9 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CDP1861_CYCLES_DMA_START	2*8
-#define CDP1861_CYCLES_DMA_ACTIVE	8*8
-#define CDP1861_CYCLES_DMA_WAIT		6*8
+#define CDP1861_CYCLES_DMA_START    2*8
+#define CDP1861_CYCLES_DMA_ACTIVE   8*8
+#define CDP1861_CYCLES_DMA_WAIT     6*8
 
 
 
@@ -34,7 +34,7 @@ const device_type CDP1861 = &device_creator<cdp1861_device>;
 //-------------------------------------------------
 
 cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock)
+	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock)
 {
 }
 

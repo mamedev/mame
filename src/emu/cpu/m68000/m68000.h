@@ -45,7 +45,7 @@ enum
 	M68K_CPU_TYPE_68040,
 	M68K_CPU_TYPE_SCC68070,
 	M68K_CPU_TYPE_68340,
-    M68K_CPU_TYPE_COLDFIRE
+	M68K_CPU_TYPE_COLDFIRE
 };
 
 // function codes
@@ -59,9 +59,9 @@ enum
 };
 
 /* HMMU enable types for use with m68k_set_hmmu_enable() */
-#define M68K_HMMU_DISABLE	0	/* no translation */
-#define M68K_HMMU_ENABLE_II	1	/* Mac II style fixed translation */
-#define M68K_HMMU_ENABLE_LC	2	/* Mac LC style fixed translation */
+#define M68K_HMMU_DISABLE   0   /* no translation */
+#define M68K_HMMU_ENABLE_II 1   /* Mac II style fixed translation */
+#define M68K_HMMU_ENABLE_LC 2   /* Mac LC style fixed translation */
 
 /* Special interrupt acknowledge values.
  * Use these as special returns from the interrupt acknowledge callback

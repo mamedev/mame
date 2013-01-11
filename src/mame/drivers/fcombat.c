@@ -48,11 +48,11 @@ READ8_MEMBER(fcombat_state::fcombat_protection_r)
 {
 	/* Must match ONE of these values after a "and  $3E" intruction :
 
-        76F0: 1E 04 2E 26 34 32 3A 16 3E 36
+	    76F0: 1E 04 2E 26 34 32 3A 16 3E 36
 
-       Check code at 0x76c8 for more infos.
-    */
-	return 0xff;	// seems enough
+	   Check code at 0x76c8 for more infos.
+	*/
+	return 0xff;    // seems enough
 }
 
 
@@ -118,13 +118,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
 	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)   // at least bit 0 for flip screen and joystick input multiplexor
 	AM_RANGE(0xe900, 0xe900) AM_WRITE(e900_w)
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(ea00_w)
 	AM_RANGE(0xeb00, 0xeb00) AM_WRITE(eb00_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
 	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)	// related to protection ? - doesn't seem to have any effect
+	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)   // related to protection ? - doesn't seem to have any effect
 	AM_RANGE(0xef00, 0xef00) AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
@@ -195,7 +195,7 @@ static INPUT_PORTS_START( fcombat )
 
 	PORT_START("DSW1")      /* dip switches/VBLANK (0xe200) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )		// related to vblank
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )      // related to vblank
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
@@ -343,9 +343,9 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	for (oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-		          ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-		          ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-		          ((oldaddr     ) & 0x0001);        /* keep h2 */
+					((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
+					((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
+					((oldaddr     ) & 0x0001);        /* keep h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -362,10 +362,10 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	for (oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-		          ((oldaddr >> 4) & 0x0200) |       /* move n3 */
-		          ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-		          ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-		          ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+					((oldaddr >> 4) & 0x0200) |       /* move n3 */
+					((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+					((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 
 		dst[newaddr] = src[oldaddr];
 	}
@@ -383,10 +383,10 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	for (oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-		          ((oldaddr >> 4) & 0x0200) |       /* move n3 */
-		          ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-		          ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-		          ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+					((oldaddr >> 4) & 0x0200) |       /* move n3 */
+					((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+					((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 

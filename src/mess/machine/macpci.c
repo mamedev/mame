@@ -19,8 +19,8 @@
 #include "machine/ram.h"
 #include "debugger.h"
 
-#define LOG_ADB			0
-#define LOG_VIA			0
+#define LOG_ADB         0
+#define LOG_VIA         0
 
 
 
@@ -53,11 +53,11 @@ READ8_MEMBER(macpci_state::mac_via_in_a)
 READ8_MEMBER(macpci_state::mac_via_in_b)
 {
 	int val = 0;
-    val |= m_cuda->get_treq()<<3;
+	val |= m_cuda->get_treq()<<3;
 
 //    printf("VIA1 IN B = %02x (PC %x)\n", val, m_maincpu->pc());
 
-    return val;
+	return val;
 }
 
 WRITE8_MEMBER(macpci_state::mac_via_out_a)
@@ -69,16 +69,16 @@ WRITE8_MEMBER(macpci_state::mac_via_out_b)
 {
 //    printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->pc());
 
-    #if LOG_ADB
-    printf("PPC: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
-    #endif
-    m_cuda->set_byteack((data&0x10) ? 1 : 0);
-    m_cuda->set_tip((data&0x20) ? 1 : 0);
+	#if LOG_ADB
+	printf("PPC: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
+	#endif
+	m_cuda->set_byteack((data&0x10) ? 1 : 0);
+	m_cuda->set_tip((data&0x20) ? 1 : 0);
 }
 
 READ16_MEMBER ( macpci_state::mac_via_r )
 {
-    UINT16 data;
+	UINT16 data;
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -89,7 +89,7 @@ READ16_MEMBER ( macpci_state::mac_via_r )
 
 	m_maincpu->adjust_icount(m_via_cycles);
 
-    return data | (data<<8);
+	return data | (data<<8);
 }
 
 WRITE16_MEMBER ( macpci_state::mac_via_w )
@@ -111,17 +111,17 @@ WRITE16_MEMBER ( macpci_state::mac_via_w )
 READ8_MEMBER(macpci_state::mac_adb_via_in_cb2)
 {
 	UINT8 ret;
-    ret = m_cuda->get_via_data();
-    #if LOG_ADB
-    printf("PPC: Read VIA_DATA %x\n", ret);
-    #endif
+	ret = m_cuda->get_via_data();
+	#if LOG_ADB
+	printf("PPC: Read VIA_DATA %x\n", ret);
+	#endif
 
-    return ret;
+	return ret;
 }
 
 WRITE8_MEMBER(macpci_state::mac_adb_via_out_cb2)
 {
-    m_cuda->set_via_data(data & 1);
+	m_cuda->set_via_data(data & 1);
 }
 
 void macpci_state::machine_start()
@@ -132,16 +132,16 @@ void macpci_state::machine_start()
 
 void macpci_state::machine_reset()
 {
-    m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 
-    m_via_cycles = -256;    // for a 66 MHz PowerMac
+	m_via_cycles = -256;    // for a 66 MHz PowerMac
 
-    machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(macpci_state::cuda_reset_w)
 {
-    machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, state);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, state);
 }
 
 WRITE_LINE_MEMBER(macpci_state::cuda_adb_linechange_w)
@@ -154,20 +154,20 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 	mac->m_model = model;
 
-    memset(mac->m_ram->pointer(), 0, mac->m_ram->size());
+	memset(mac->m_ram->pointer(), 0, mac->m_ram->size());
 }
 
-#define MAC_DRIVER_INIT(label, model)	\
+#define MAC_DRIVER_INIT(label, model)   \
 DRIVER_INIT_MEMBER(macpci_state,label)  \
-{	\
-	mac_driver_init(machine(), model );	\
+{   \
+	mac_driver_init(machine(), model ); \
 }
 
 MAC_DRIVER_INIT(pippin, PCIMODEL_MAC_PIPPIN)
 
 READ32_MEMBER(macpci_state::mac_read_id)
 {
-    printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
+	printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 
 	switch (m_model)
 	{
@@ -208,7 +208,7 @@ READ8_MEMBER(macpci_state::mac_5396_r)
 	{
 		return m_539x_1->read(space, offset>>4);
 	}
-	else	// pseudo-DMA: read from the FIFO
+	else    // pseudo-DMA: read from the FIFO
 	{
 		return m_539x_1->read(space, 2);
 	}
@@ -222,7 +222,7 @@ WRITE8_MEMBER(macpci_state::mac_5396_w)
 	{
 		m_539x_1->write(space, offset>>4, data);
 	}
-	else	// pseudo-DMA: write to the FIFO
+	else    // pseudo-DMA: write to the FIFO
 	{
 		m_539x_1->write(space, 2, data);
 	}

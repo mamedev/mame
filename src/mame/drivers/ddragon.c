@@ -80,10 +80,10 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "includes/ddragon.h"
 
 
-#define MAIN_CLOCK		XTAL_12MHz
-#define SOUND_CLOCK		XTAL_3_579545MHz
-#define MCU_CLOCK			MAIN_CLOCK / 3
-#define PIXEL_CLOCK		MAIN_CLOCK / 2
+#define MAIN_CLOCK      XTAL_12MHz
+#define SOUND_CLOCK     XTAL_3_579545MHz
+#define MCU_CLOCK           MAIN_CLOCK / 3
+#define PIXEL_CLOCK     MAIN_CLOCK / 2
 
 
 /*************************************
@@ -223,9 +223,9 @@ READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 	// logerror("BankRead %05x %08x\n",space.device().safe_pc(),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
-   so just hack around the protection here.  (The hacks are 'right' as I have
-   the original source code & notes to this version of TStrike to examine).
-   */
+	so just hack around the protection here.  (The hacks are 'right' as I have
+	the original source code & notes to this version of TStrike to examine).
+	*/
 	if (!strcmp(machine().system().name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
@@ -370,8 +370,8 @@ WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
 	if (offset == 0x17)
 	{
 		/* This is a guess, but makes sense.. The mcu definitely interrupts the main cpu.
-        I don't know what bit is the assert and what is the clear though (in comparison
-        it's quite obvious from the Double Dragon 2 code, below). */
+		I don't know what bit is the assert and what is the clear though (in comparison
+		it's quite obvious from the Double Dragon 2 code, below). */
 		if (data & 3)
 		{
 			m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -919,17 +919,17 @@ static const gfx_layout tile_layout =
 	4,
 	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4 },
 	{ 3, 2, 1, 0, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-		  32*8+3, 32*8+2, 32*8+1, 32*8+0, 48*8+3, 48*8+2, 48*8+1, 48*8+0 },
+			32*8+3, 32*8+2, 32*8+1, 32*8+0, 48*8+3, 48*8+2, 48*8+1, 48*8+0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	64*8
 };
 
 
 static GFXDECODE_START( ddragon )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout,   0, 8 )	/* colors   0-127 */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 128, 8 )	/* colors 128-255 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256, 8 )	/* colors 256-383 */
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout,   0, 8 )   /* colors   0-127 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 128, 8 )   /* colors 128-255 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256, 8 )   /* colors 256-383 */
 GFXDECODE_END
 
 
@@ -942,8 +942,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	dd_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B	/* 8kHz */
+	dd_adpcm_int,   /* interrupt function */
+	MSM5205_S48_4B  /* 8kHz */
 };
 
 
@@ -957,17 +957,17 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( ddragon, ddragon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
+	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* 6 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
+	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5Mhz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 MACHINE_CONFIG_END
 
@@ -1011,7 +1011,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
+	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6Mhz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(ddragonba_sub_map)
 	MCFG_CPU_IO_MAP(ddragonba_sub_portmap)
 MACHINE_CONFIG_END
@@ -1020,14 +1020,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)  /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
+	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)  /* 1.5 Mhz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -1066,11 +1066,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(dd2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
+	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(dd2_sub_map)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
@@ -1133,7 +1133,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( ddragon )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "21j-1-5.26",   0x08000, 0x08000, CRC(42045dfd) SHA1(0983705ea3bb87c4c239692f400e02f15c243479) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21j-3.24",     0x18000, 0x08000, CRC(3bdea613) SHA1(d9038c80646a6ce3ea61da222873237b0383680e) ) /* banked at 0x4000-0x8000 */
@@ -1146,10 +1146,10 @@ ROM_START( ddragon )
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1159,7 +1159,7 @@ ROM_START( ddragon )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1169,12 +1169,12 @@ ROM_START( ddragon )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( ddragonw )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "21j-1.26",     0x08000, 0x08000, CRC(ae714964) SHA1(072522b97ca4edd099c6b48d7634354dc7088c53) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1187,10 +1187,10 @@ ROM_START( ddragonw )
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1200,7 +1200,7 @@ ROM_START( ddragonw )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1210,12 +1210,12 @@ ROM_START( ddragonw )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( ddragonw1 )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "e1-1.26",       0x08000, 0x08000, CRC(4b951643) SHA1(efb1f9ef2e46597d76123c9770854c1d83639eb2) )
 	ROM_LOAD( "21a-2-4.25",    0x10000, 0x08000, CRC(5cd67657) SHA1(96bc7a5354a76524bd43a4d7eb8b0053a89e39c4) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",      0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1228,10 +1228,10 @@ ROM_START( ddragonw1 )
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1241,7 +1241,7 @@ ROM_START( ddragonw1 )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1251,12 +1251,12 @@ ROM_START( ddragonw1 )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( ddragonu )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "21a-1-5.26",   0x08000, 0x08000, CRC(e24a6e11) SHA1(9dd97dd712d5c896f91fd80df58be9b8a2b198ee) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1269,10 +1269,10 @@ ROM_START( ddragonu )
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1282,7 +1282,7 @@ ROM_START( ddragonu )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1292,12 +1292,12 @@ ROM_START( ddragonu )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( ddragonua )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "21a-1",     0x08000, 0x08000, CRC(1d625008) SHA1(84cc19a55e7c91fca1943d9624d93e0347ed4150) )
 	ROM_LOAD( "21a-2_4",   0x10000, 0x08000, CRC(5cd67657) SHA1(96bc7a5354a76524bd43a4d7eb8b0053a89e39c4) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1310,10 +1310,10 @@ ROM_START( ddragonua )
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1323,7 +1323,7 @@ ROM_START( ddragonua )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1333,13 +1333,13 @@ ROM_START( ddragonua )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 
 ROM_START( ddragonub )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "21a-1_6.bin",0x08000,0x08000, CRC(f354b0e1) SHA1(f2fe5d6102564691a0054d2b8dd98673fdc8a348) )
 	ROM_LOAD( "21a-2_4",   0x10000, 0x08000, CRC(5cd67657) SHA1(96bc7a5354a76524bd43a4d7eb8b0053a89e39c4) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1352,10 +1352,10 @@ ROM_START( ddragonub )
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1365,7 +1365,7 @@ ROM_START( ddragonub )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1375,13 +1375,13 @@ ROM_START( ddragonub )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 
 ROM_START( ddragonb ) /* Same program roms as the World set */
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "21j-1.26",     0x08000, 0x08000, CRC(ae714964) SHA1(072522b97ca4edd099c6b48d7634354dc7088c53) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1394,10 +1394,10 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "21j-5",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1407,7 +1407,7 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1417,12 +1417,12 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( ddragonba )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "5.bin",     0x08000, 0x08000, CRC(ae714964) SHA1(072522b97ca4edd099c6b48d7634354dc7088c53) )
 	ROM_LOAD( "4.bin",     0x10000, 0x08000, CRC(48045762) SHA1(ca39eea71ca76627a98210ce9cc61457a58f16b9) ) /* banked at 0x4000-0x8000 */
 	ROM_CONTINUE(0x20000,0x8000) /* banked at 0x4000-0x8000 */
@@ -1435,10 +1435,10 @@ ROM_START( ddragonba )
 	ROM_LOAD( "6.bin",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "1.bin",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "1.bin",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "21j-a",        0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "21j-c",        0x20000, 0x10000, CRC(bb0bc76f) SHA1(37b2225e0593335f636c1e5fded9b21fdeab2f5a) )
 	ROM_LOAD( "21j-d",        0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1448,7 +1448,7 @@ ROM_START( ddragonba )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "21j-8",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "21j-i",        0x20000, 0x10000, CRC(5effb0a0) SHA1(1f21acb15dad824e831ed9a42b3fde096bb31141) )
 	ROM_LOAD( "21j-j",        0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1458,12 +1458,12 @@ ROM_START( ddragonba )
 	ROM_LOAD( "7.bin",        0x10000, 0x10000, CRC(f9311f72) SHA1(aa554ef020e04dc896e5495bcddc64e489d0ffff) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( ddragonb2 )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "b2_4.bin",     0x08000, 0x08000, CRC(668dfa19) SHA1(9b2ff1b66eeba0989e4ed850b7df1f5719ba5572) )
 	ROM_LOAD( "b2_5.bin",     0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "b2_6.bin",     0x18000, 0x08000, CRC(3bdea613) SHA1(d9038c80646a6ce3ea61da222873237b0383680e) ) /* banked at 0x4000-0x8000 */
@@ -1476,10 +1476,10 @@ ROM_START( ddragonb2 )
 	ROM_LOAD( "b2_3.bin",     0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b2_8.bin",     0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+	ROM_LOAD( "b2_8.bin",     0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )  /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "11.bin",       0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "11.bin",       0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )  /* sprites */
 	ROM_LOAD( "12.bin",       0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "13.bin",       0x20000, 0x10000, CRC(c8b91e17) SHA1(0ce6f6ef68ecc7309a2923f7e756d5e2bf5c7a4a) )
 	ROM_LOAD( "14.bin",       0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
@@ -1489,7 +1489,7 @@ ROM_START( ddragonb2 )
 	ROM_LOAD( "18.bin",       0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "9.bin",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "9.bin",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )  /* tiles */
 	ROM_LOAD( "10.bin",       0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
 	ROM_LOAD( "19.bin",       0x20000, 0x10000, CRC(22d65df2) SHA1(2f286a24ea7af438b39126a4ed0c515745981416) )
 	ROM_LOAD( "20.bin",       0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
@@ -1499,8 +1499,8 @@ ROM_START( ddragonb2 )
 	ROM_LOAD( "2.bin",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 /* this is a well known italian bootleg of Double Dragon it can be identified by the following gameplay trait
@@ -1511,7 +1511,7 @@ ROM_END
 
  */
 ROM_START( ddragon6809 )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "6809_16.bin",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
 	ROM_LOAD( "6809_17.bin",   0x10000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "6809_18.bin",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) /* banked at 0x4000-0x8000 */
@@ -1527,7 +1527,7 @@ ROM_START( ddragon6809 )
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x08000, "chars", 0 )
-	ROM_LOAD( "6809_13.bin",   0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) )	/* chars */
+	ROM_LOAD( "6809_13.bin",   0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) ) /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "22.bin",        0x00000, 0x08000, CRC(fe08ef61) SHA1(50404936934dc61f3553add4d4b918529b3b5ef3) )
@@ -1590,7 +1590,7 @@ Note
 */
 
 ROM_START( ddragon6809a )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "20.7f",   0x08000, 0x08000, CRC(c804819f) SHA1(cc570a90b7bef1c6263f5e1fd96ed377c508fe2b) )
 	ROM_LOAD( "19.7g",   0x10000, 0x08000, CRC(de08db4d) SHA1(e63b90c3bb3af01d2855de9a996b51068bed7b52) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "18.7h",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) /* banked at 0x4000-0x8000 */
@@ -1606,7 +1606,7 @@ ROM_START( ddragon6809a )
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x08000, "chars", 0 )
-	ROM_LOAD( "13.5f",   0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) )	/* chars */
+	ROM_LOAD( "13.5f",   0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) )   /* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "1.1t",         0x00000, 0x10000, CRC(5e810a6d) SHA1(5eba3e982b271bc284ca333429cd0b3759c9c8d1) )
@@ -1654,10 +1654,10 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "26ad-0.bin",   0x00000, 0x8000, CRC(75e36cd6) SHA1(f24805f4f6925b3ac508e66a6fc25c275b05f3b9) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "26a8-0e.19",   0x00000, 0x10000, CRC(4e80cd36) SHA1(dcae0709f27f32effb359f6b943f61b102749f2a) )	/* chars */
+	ROM_LOAD( "26a8-0e.19",   0x00000, 0x10000, CRC(4e80cd36) SHA1(dcae0709f27f32effb359f6b943f61b102749f2a) )  /* chars */
 
 	ROM_REGION( 0xc0000, "gfx2", 0 )
-	ROM_LOAD( "26j0-0.bin",   0x00000, 0x20000, CRC(db309c84) SHA1(ee095e4a3bc86737539784945decb1f63da47b9b) )	/* sprites */
+	ROM_LOAD( "26j0-0.bin",   0x00000, 0x20000, CRC(db309c84) SHA1(ee095e4a3bc86737539784945decb1f63da47b9b) )  /* sprites */
 	ROM_LOAD( "26j1-0.bin",   0x20000, 0x20000, CRC(c3081e0c) SHA1(c4a9ae151aae21073a2c79c5ac088c72d4f3d9db) )
 	ROM_LOAD( "26af-0.bin",   0x40000, 0x20000, CRC(3a615aad) SHA1(ec90a35224a177d00327de6fd1a299df38abd790) )
 	ROM_LOAD( "26j2-0.bin",   0x60000, 0x20000, CRC(589564ae) SHA1(1e6e0ef623545615e8409b6d3ba586a71e2612b6) )
@@ -1665,7 +1665,7 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "26a10-0.bin",  0xa0000, 0x20000, CRC(6d16d889) SHA1(3bc62b3e7f4ddc3200a9cf8469239662da80c854) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "26j4-0.bin",   0x00000, 0x20000, CRC(a8c93e76) SHA1(54d64f052971e7fa0d21c5ce12f87b0fa2b648d6) )	/* tiles */
+	ROM_LOAD( "26j4-0.bin",   0x00000, 0x20000, CRC(a8c93e76) SHA1(54d64f052971e7fa0d21c5ce12f87b0fa2b648d6) )  /* tiles */
 	ROM_LOAD( "26j5-0.bin",   0x20000, 0x20000, CRC(ee555237) SHA1(f9698f3e57f933a43e508f60667c860dee034d05) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* adpcm samples */
@@ -1673,7 +1673,7 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown (same as ddragon) */
 ROM_END
 
 ROM_START( ddragon2u )
@@ -1690,10 +1690,10 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "26ad-0.bin",   0x00000, 0x8000, CRC(75e36cd6) SHA1(f24805f4f6925b3ac508e66a6fc25c275b05f3b9) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "26a8-0.bin",   0x00000, 0x10000, CRC(3ad1049c) SHA1(11d9544a56f8e6a84beb307a5c8a9ff8afc55c66) )	/* chars */
+	ROM_LOAD( "26a8-0.bin",   0x00000, 0x10000, CRC(3ad1049c) SHA1(11d9544a56f8e6a84beb307a5c8a9ff8afc55c66) )  /* chars */
 
 	ROM_REGION( 0xc0000, "gfx2", 0 )
-	ROM_LOAD( "26j0-0.bin",   0x00000, 0x20000, CRC(db309c84) SHA1(ee095e4a3bc86737539784945decb1f63da47b9b) )	/* sprites */
+	ROM_LOAD( "26j0-0.bin",   0x00000, 0x20000, CRC(db309c84) SHA1(ee095e4a3bc86737539784945decb1f63da47b9b) )  /* sprites */
 	ROM_LOAD( "26j1-0.bin",   0x20000, 0x20000, CRC(c3081e0c) SHA1(c4a9ae151aae21073a2c79c5ac088c72d4f3d9db) )
 	ROM_LOAD( "26af-0.bin",   0x40000, 0x20000, CRC(3a615aad) SHA1(ec90a35224a177d00327de6fd1a299df38abd790) )
 	ROM_LOAD( "26j2-0.bin",   0x60000, 0x20000, CRC(589564ae) SHA1(1e6e0ef623545615e8409b6d3ba586a71e2612b6) )
@@ -1701,7 +1701,7 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "26a10-0.bin",  0xa0000, 0x20000, CRC(6d16d889) SHA1(3bc62b3e7f4ddc3200a9cf8469239662da80c854) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "26j4-0.bin",   0x00000, 0x20000, CRC(a8c93e76) SHA1(54d64f052971e7fa0d21c5ce12f87b0fa2b648d6) )	/* tiles */
+	ROM_LOAD( "26j4-0.bin",   0x00000, 0x20000, CRC(a8c93e76) SHA1(54d64f052971e7fa0d21c5ce12f87b0fa2b648d6) )  /* tiles */
 	ROM_LOAD( "26j5-0.bin",   0x20000, 0x20000, CRC(ee555237) SHA1(f9698f3e57f933a43e508f60667c860dee034d05) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* adpcm samples */
@@ -1709,12 +1709,12 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown (same as ddragon) */
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown (same as ddragon) */
 ROM_END
 
 
 ROM_START( tstrike )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "prog.rom",        0x08000, 0x08000, CRC(bf011a00) SHA1(09a55042a219dd37cb9e7feeab092ebfb903ddde) )
 	ROM_LOAD( "tstrike.25",      0x10000, 0x08000, CRC(b6a0c2f3) SHA1(3434689ca217f5af268058ad34c277db672d389c) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "tstrike.24",      0x18000, 0x08000, CRC(363816fa) SHA1(65c1ccbb950e09230196b49dc7312a13a34f3f79) ) /* banked at 0x4000-0x8000 */
@@ -1726,13 +1726,13 @@ ROM_START( tstrike )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "tstrike.30",      0x08000, 0x08000, CRC(3f3f04a1) SHA1(45d2b4542ec783c1c4122616606be6c160f76c06) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "68705prt.mcu",   0x00000, 0x0800, CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "alpha.rom",        0x00000, 0x08000, CRC(3a7c3185) SHA1(1ccaa6a1f46d66feda49fdea337b8eb32f14c7b5) )	/* chars */
+	ROM_LOAD( "alpha.rom",        0x00000, 0x08000, CRC(3a7c3185) SHA1(1ccaa6a1f46d66feda49fdea337b8eb32f14c7b5) )  /* chars */
 
-	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
 	ROM_LOAD( "tstrike.117",  0x00000, 0x10000, CRC(f7122c0d) SHA1(2b6b359585d9df966c1fc0041fb972aac9b1ab93) )
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) ) /* from ddragon (116) */
 	ROM_LOAD( "tstrike.115",  0x20000, 0x10000, CRC(a13c7b62) SHA1(d929d8db7eb2b949cd3bd77238611ecc54b2e885) )
@@ -1742,7 +1742,7 @@ ROM_START( tstrike )
 	ROM_LOAD( "tstrike.111",  0x60000, 0x10000, CRC(7b9c87ad) SHA1(429049f84b2084bb074e380dca63b75150e7e69f) )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) ) /* from ddragon (110) */
 
-	ROM_REGION( 0x40000, "gfx3", 0 )	/* tiles */
+	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
 	ROM_LOAD( "tstrike.78",   0x00000, 0x10000, CRC(88284aec) SHA1(f07bc5f84f2b2f976c911541c8f1ff2558f569ca) )
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) ) /* from ddragon (77) */
 	ROM_LOAD( "tstrike.109",  0x20000, 0x10000, CRC(8c2cd0bb) SHA1(364a708484c7750f38162d463104216bbd555b86) )
@@ -1753,12 +1753,12 @@ ROM_START( tstrike )
 	ROM_LOAD( "tstrike.95",        0x10000, 0x08000, CRC(1812eecb) SHA1(9b7d526f30a86682cdf088600b25ea5a56b112ef) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 ROM_START( tstrikea )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "tstrike.26",      0x08000, 0x08000, CRC(871b10bc) SHA1(c824775cf72c039612fda76c4a518cd89e4c8657) )
 	ROM_LOAD( "tstrike.25",      0x10000, 0x08000, CRC(b6a0c2f3) SHA1(3434689ca217f5af268058ad34c277db672d389c) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "tstrike.24",      0x18000, 0x08000, CRC(363816fa) SHA1(65c1ccbb950e09230196b49dc7312a13a34f3f79) ) /* banked at 0x4000-0x8000 */
@@ -1770,13 +1770,13 @@ ROM_START( tstrikea )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "tstrike.30",      0x08000, 0x08000, CRC(3f3f04a1) SHA1(45d2b4542ec783c1c4122616606be6c160f76c06) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "68705prt.mcu",   0x00000, 0x0800, CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "tstrike.20",        0x00000, 0x08000, CRC(b6b8bfa0) SHA1(ce50f8eb1a84873ef3df621d971a6b087473d6c2) )	/* chars */
+	ROM_LOAD( "tstrike.20",        0x00000, 0x08000, CRC(b6b8bfa0) SHA1(ce50f8eb1a84873ef3df621d971a6b087473d6c2) ) /* chars */
 
-	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
 	ROM_LOAD( "tstrike.117",  0x00000, 0x10000, CRC(f7122c0d) SHA1(2b6b359585d9df966c1fc0041fb972aac9b1ab93) )
 	ROM_LOAD( "21j-b",        0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) ) /* from ddragon (116) */
 	ROM_LOAD( "tstrike.115",  0x20000, 0x10000, CRC(a13c7b62) SHA1(d929d8db7eb2b949cd3bd77238611ecc54b2e885) )
@@ -1786,7 +1786,7 @@ ROM_START( tstrikea )
 	ROM_LOAD( "tstrike.111",  0x60000, 0x10000, CRC(7b9c87ad) SHA1(429049f84b2084bb074e380dca63b75150e7e69f) )
 	ROM_LOAD( "21j-h",        0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) ) /* from ddragon (110) */
 
-	ROM_REGION( 0x40000, "gfx3", 0 )	/* tiles */
+	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
 	ROM_LOAD( "tstrike.78",   0x00000, 0x10000, CRC(88284aec) SHA1(f07bc5f84f2b2f976c911541c8f1ff2558f569ca) )
 	ROM_LOAD( "21j-9",        0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) ) /* from ddragon (77) */
 	ROM_LOAD( "tstrike.109",  0x20000, 0x10000, CRC(8c2cd0bb) SHA1(364a708484c7750f38162d463104216bbd555b86) )
@@ -1797,8 +1797,8 @@ ROM_START( tstrikea )
 	ROM_LOAD( "tstrike.95",        0x10000, 0x08000, CRC(1812eecb) SHA1(9b7d526f30a86682cdf088600b25ea5a56b112ef) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */
 ROM_END
 
 
@@ -1814,7 +1814,7 @@ ROM_START( ddungeon )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "dd30.30",    0x08000, 0x08000, CRC(ef1af99a) SHA1(7ced695b81ca9efbb7b28b78013e112edac85672) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "dd_mcu.bin", 0x00000, 0x0800,  CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
@@ -1853,7 +1853,7 @@ ROM_START( ddungeone )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) ) /* from ddragon */
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "dd_mcu.bin", 0x00000, 0x0800,  CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
@@ -1878,7 +1878,7 @@ ROM_END
 
 
 ROM_START( darktowr )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
 	ROM_LOAD( "dt.26",         0x08000, 0x08000, CRC(8134a472) SHA1(7d42d2ed8d09855241d98ed94bce140a314c2f66) )
 	ROM_LOAD( "21j-2-3.25",    0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* from ddragon */
 	ROM_LOAD( "dt.24",         0x18000, 0x08000, CRC(523a5413) SHA1(71c04287e4f2e792c98abdeb97fe70abd0d5e918) ) /* banked at 0x4000-0x8000 */
@@ -1890,7 +1890,7 @@ ROM_START( darktowr )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) ) /* from ddragon */
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "68705prt.mcu",   0x00000, 0x0800, CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 ) /* chars */
@@ -1917,8 +1917,8 @@ ROM_START( darktowr )
 	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) ) /* from ddragon */
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */ /* from ddragon */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */ /* from ddragon */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* unknown */ /* from ddragon */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* unknown */ /* from ddragon */
 ROM_END
 
 

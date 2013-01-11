@@ -30,7 +30,7 @@ class pimps_state : public driver_device
 public:
 	pimps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_terminal(*this, TERMINAL_TAG) { }
+			m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_READ8_MEMBER(term_r);

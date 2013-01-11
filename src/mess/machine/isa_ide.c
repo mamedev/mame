@@ -50,8 +50,8 @@ MACHINE_CONFIG_END
 static INPUT_PORTS_START( ide )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "IDE Configuration")
-	PORT_DIPSETTING(	0x00, "Primary" )
-	PORT_DIPSETTING(	0x01, "Secondary" )
+	PORT_DIPSETTING(    0x00, "Primary" )
+	PORT_DIPSETTING(    0x01, "Secondary" )
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -88,7 +88,7 @@ ioport_constructor isa16_ide_device::device_input_ports() const
 //-------------------------------------------------
 
 isa16_ide_device::isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, ISA16_IDE, "IDE Fixed Drive Adapter", tag, owner, clock),
+		: device_t(mconfig, ISA16_IDE, "IDE Fixed Drive Adapter", tag, owner, clock),
 		device_isa16_card_interface( mconfig, *this ),
 		m_is_primary(true)
 {

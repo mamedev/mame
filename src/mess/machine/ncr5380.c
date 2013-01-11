@@ -22,7 +22,7 @@
 #include "emu.h"
 #include "ncr5380.h"
 
-#define VERBOSE	(0)
+#define VERBOSE (0)
 
 static const char *const rnames[] =
 {
@@ -95,7 +95,7 @@ const device_type NCR5380 = &device_creator<ncr5380_device>;
 //-------------------------------------------------
 
 ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock)
+	: device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock)
 {
 }
 
@@ -260,7 +260,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 			// if we're in the select phase, this is the target id
 			if (m_5380_Registers[R5380_INICOMMAND] == 0x04)
 			{
-				data &= 0x7f;	// clear the high bit
+				data &= 0x7f;   // clear the high bit
 				if (data == 0x40)
 				{
 					m_last_id = 6;
@@ -321,7 +321,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 			break;
 
 		case R5380_INICOMMAND:
-			if (data == 0)	// dropping the bus
+			if (data == 0)  // dropping the bus
 			{
 				// make sure it's not busy
 				m_5380_Registers[R5380_BUSSTATUS] &= ~0x40;
@@ -363,7 +363,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 
 			}
 
-			if (data == 5)	// want the bus?
+			if (data == 5)  // want the bus?
 			{
 				// if the device exists, make the bus busy.
 				// otherwise don't.
@@ -382,13 +382,13 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 				}
 			}
 
-			if (data == 1)	// data bus (prelude to command?)
+			if (data == 1)  // data bus (prelude to command?)
 			{
 				// raise REQ
 				m_5380_Registers[R5380_BUSSTATUS] |= 0x20;
 			}
 
-			if (data & 0x10)	// ACK drops REQ
+			if (data & 0x10)    // ACK drops REQ
 			{
 				// drop REQ
 				m_5380_Registers[R5380_BUSSTATUS] &= ~0x20;
@@ -396,16 +396,16 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 			break;
 
 		case R5380_MODE:
-			if (data == 2)	// DMA
+			if (data == 2)  // DMA
 			{
 				// put us in DMA mode
 				m_5380_Registers[R5380_BUSANDSTAT] |= 0x40;
 			}
 
-			if (data == 1)	// arbitrate?
+			if (data == 1)  // arbitrate?
 			{
-				m_5380_Registers[R5380_INICOMMAND] |= 0x40;	// set arbitration in progress
-				m_5380_Registers[R5380_INICOMMAND] &= ~0x20;	// clear "lost arbitration"
+				m_5380_Registers[R5380_INICOMMAND] |= 0x40; // set arbitration in progress
+				m_5380_Registers[R5380_INICOMMAND] &= ~0x20;    // clear "lost arbitration"
 			}
 
 			if (data == 0)

@@ -149,15 +149,15 @@ MACHINE_RESET_MEMBER(atm_state,atm)
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	96,                 /* 96 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( atm )
@@ -230,7 +230,7 @@ ROM_START( atmtb2 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1991, atm,	spec128,	0,		atm,	spec_plus, driver_device,	0,			"MicroART",		"ATM", GAME_NOT_WORKING)
+COMP( 1991, atm,    spec128,    0,      atm,    spec_plus, driver_device,   0,          "MicroART",     "ATM", GAME_NOT_WORKING)
 //COMP( 1991, atmtb1,   spec128,    0,      atm,    spec_plus, driver_device,  0,      "MicroART",     "ATM-turbo1", GAME_NOT_WORKING)
-COMP( 1993, atmtb2, spec128,	0,		atmtb2,	spec_plus, driver_device,	0,			"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
+COMP( 1993, atmtb2, spec128,    0,      atmtb2, spec_plus, driver_device,   0,          "MicroART",     "ATM-turbo2", GAME_NOT_WORKING)
 //COMP( 1994, turbo2, spec128,  0,      atm,    spec_plus, driver_device,  0,          "MicroART",     "TURBO 2+", GAME_NOT_WORKING)

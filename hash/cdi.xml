@@ -2462,9 +2462,9 @@
 </software>
 
 
-  <!-- Non-games (multimedia, educational etc.) -->
+	<!-- Non-games (multimedia, educational etc.) -->
 
- <software name="1995anv" supported="no">
+	<software name="1995anv" supported="no">
 	<description>1995 - All the News and Views (Euro)[DVC]</description>
 	<year>1995</year>
 	<publisher>Philips</publisher>
@@ -7234,25 +7234,25 @@
 	</part>
 </software>
 
- <!-- These are non-tosec sourced, and could be bad -->
+	<!-- These are non-tosec sourced, and could be bad -->
 
-  <!-- The Apprentice is a CDi-Ready disc, the format of these discs is strange, and not properly supported
-	   in a PC the first track is identified as an audio track, with the game DATA being in the audio
-	   pre-gap.  Trying to convert this in CHDMAN from the cuesheet results in a mangled CHD, with
-	   incorrect offsets when trying to output it again.
+	<!-- The Apprentice is a CDi-Ready disc, the format of these discs is strange, and not properly supported
+		in a PC the first track is identified as an audio track, with the game DATA being in the audio
+		pre-gap.  Trying to convert this in CHDMAN from the cuesheet results in a mangled CHD, with
+		incorrect offsets when trying to output it again.
 
-	   Manually adding a pregap area to the cuesheet encodes it without mangling the offsets, but
-	   still doesn't result in anything that boots.
+		Manually adding a pregap area to the cuesheet encodes it without mangling the offsets, but
+		still doesn't result in anything that boots.
 
-	   Creating an additional 'track' data track in the cuesheet allows the game to boot, it still
-	   appears to play the correct audio tracks too, however this can't be considered accurate.
+		Creating an additional 'track' data track in the cuesheet allows the game to boot, it still
+		appears to play the correct audio tracks too, however this can't be considered accurate.
 
-	   The same applies to Dimo's quest and Alien Gate
+		The same applies to Dimo's quest and Alien Gate
 
-	   Lucky Luke is similar, but I've not been able to convert it to anything that works or is even
-	   recognized as having a valid data track.  (it also requires digital video, which we don't support)
-  -->
- <software name="apprentc">
+		Lucky Luke is similar, but I've not been able to convert it to anything that works or is even
+		recognized as having a valid data track.  (it also requires digital video, which we don't support)
+	-->
+	<software name="apprentc">
 	<description>The Apprentice [CDi Ready]</description>
 	<year>????</year>
 	<publisher>The Vision Factory</publisher>
@@ -7296,8 +7296,8 @@
 	</part>
 </software>
 
- <!-- this is just bad, and has visible corruption during the startup animations as a result of bad sectors -->
- <software name="gose">
+	<!-- this is just bad, and has visible corruption during the startup animations as a result of bad sectors -->
+	<software name="gose">
 	<description>Go - Special Edition</description>
 	<year>????</year>
 	<publisher>The Vision Factory</publisher>

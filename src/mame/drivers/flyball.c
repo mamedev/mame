@@ -440,7 +440,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( flyball )
-	ROM_REGION( 0x3000, "maincpu", 0 )	/* program */
+	ROM_REGION( 0x3000, "maincpu", 0 )  /* program */
 	ROM_LOAD( "6129-02.d5", 0x2000, 0x0200, CRC(105ffe40) SHA1(20225571ccf76df5d96a42168d9223cccdff90a8) )
 	ROM_LOAD( "6130-02.f5", 0x2200, 0x0200, CRC(188210e1) SHA1(6d837dd9ea44d16f0d54ea9e14260de5f7c05b6b) )
 	ROM_LOAD( "6131-01.h5", 0x2400, 0x0200, CRC(a9c7e858) SHA1(aee4a359d6a5729dc1be5b8ce8fbe54d032d12b0) ) /* Roms found with and without the "-01" extension */
@@ -450,19 +450,19 @@ ROM_START( flyball )
 	ROM_LOAD( "6135-01.n5", 0x2C00, 0x0200, CRC(b352cb51) SHA1(39b9062fb51d0a78a47dcd470ceae47fcdbd7891) ) /* Roms found with and without the "-01" extension */
 	ROM_LOAD( "6136-02.r5", 0x2E00, 0x0200, CRC(ae06a0f5) SHA1(6034176b255eeaa2980e8fef1b17ef6f0a743941) )
 
-	ROM_REGION( 0x0C00, "gfx1", 0 )	/* tiles */
+	ROM_REGION( 0x0C00, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "6142.l2", 0x0000, 0x0200, CRC(65650cfa) SHA1(7d17455146fc9def22c7bd06f7fde32df0a0c2bc) )
 	ROM_LOAD( "6139.j2", 0x0200, 0x0200, CRC(a5d1358e) SHA1(33cecbe40ae299549a3395e3dffbe7b6021803ba) )
 	ROM_LOAD( "6141.m2", 0x0400, 0x0200, CRC(98b5f803) SHA1(c4e323ced2393fa4a9720ff0086c559fb9b3a9f8) )
 	ROM_LOAD( "6140.k2", 0x0600, 0x0200, CRC(66aeec61) SHA1(f577bad015fe9e3708fd95d5d2bc438997d14d2c) )
 
-	ROM_REGION( 0x0400, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x0400, "gfx2", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "6137.e2", 0x0000, 0x0200, CRC(68961fda) SHA1(a06c7b453cce04716f49bd65ecfe1ba67cb8681e) )
 	ROM_LOAD16_BYTE( "6138.f2", 0x0001, 0x0200, CRC(aab314f6) SHA1(6625c719fdc000d6af94bc9474de8f7e977cee97) )
 ROM_END
 
 ROM_START( flyball1 )
-	ROM_REGION( 0x3000, "maincpu", 0 )	/* program */
+	ROM_REGION( 0x3000, "maincpu", 0 )  /* program */
 	ROM_LOAD( "6129.d5", 0x2000, 0x0200, CRC(17eda069) SHA1(e4ef0bf4546cf00668d759a188e0989a4f003825) )
 	ROM_LOAD( "6130.f5", 0x2200, 0x0200, CRC(a756955b) SHA1(220b7f1789bba4481d595b36b4bae25f98d3ad8d) )
 	ROM_LOAD( "6131.h5", 0x2400, 0x0200, CRC(a9c7e858) SHA1(aee4a359d6a5729dc1be5b8ce8fbe54d032d12b0) )
@@ -472,13 +472,13 @@ ROM_START( flyball1 )
 	ROM_LOAD( "6135.n5", 0x2C00, 0x0200, CRC(b352cb51) SHA1(39b9062fb51d0a78a47dcd470ceae47fcdbd7891) )
 	ROM_LOAD( "6136.r5", 0x2E00, 0x0200, CRC(1622d890) SHA1(9ad342aefdc02e022eb79d84d1c856bed538bebe) )
 
-	ROM_REGION( 0x0C00, "gfx1", 0 )	/* tiles */
+	ROM_REGION( 0x0C00, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "6142.l2", 0x0000, 0x0200, CRC(65650cfa) SHA1(7d17455146fc9def22c7bd06f7fde32df0a0c2bc) )
 	ROM_LOAD( "6139.j2", 0x0200, 0x0200, CRC(a5d1358e) SHA1(33cecbe40ae299549a3395e3dffbe7b6021803ba) )
 	ROM_LOAD( "6141.m2", 0x0400, 0x0200, CRC(98b5f803) SHA1(c4e323ced2393fa4a9720ff0086c559fb9b3a9f8) )
 	ROM_LOAD( "6140.k2", 0x0600, 0x0200, CRC(66aeec61) SHA1(f577bad015fe9e3708fd95d5d2bc438997d14d2c) )
 
-	ROM_REGION( 0x0400, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x0400, "gfx2", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "6137.e2", 0x0000, 0x0200, CRC(68961fda) SHA1(a06c7b453cce04716f49bd65ecfe1ba67cb8681e) )
 	ROM_LOAD16_BYTE( "6138.f2", 0x0001, 0x0200, CRC(aab314f6) SHA1(6625c719fdc000d6af94bc9474de8f7e977cee97) )
 ROM_END

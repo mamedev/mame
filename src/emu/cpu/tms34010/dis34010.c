@@ -27,12 +27,12 @@ static void usage (void)
 
 int main (int argc,char *argv[])
 {
-        UINT8 i,j,n;
-        char *filename=0,buf[80];
+		UINT8 i,j,n;
+		char *filename=0,buf[80];
 	FILE *f;
-        UINT32 begin=0,end=(UINT32)-1,filelen,len,pc;
+		UINT32 begin=0,end=(UINT32)-1,filelen,len,pc;
 	printf ("DIS34010\n"
-                        "Copyright Zsolt Vasvari/Aaron Giles\n");
+						"Copyright Zsolt Vasvari/Aaron Giles\n");
 
 	for (i=1,n=0;i<argc;++i)
 	{
@@ -52,13 +52,13 @@ int main (int argc,char *argv[])
 			switch (j)
 			{
 			case 0:  ++i; if (i>argc) usage();
-                                begin=strtoul(argv[i],0,16) >> 3;
+								begin=strtoul(argv[i],0,16) >> 3;
 				break;
 			case 1:  ++i; if (i>argc) usage();
-                                end=strtoul(argv[i],0,16) >> 3;
+								end=strtoul(argv[i],0,16) >> 3;
 				break;
 			case 2:  ++i; if (i>argc) usage();
-                                offset=strtoul(argv[i],0,16) >> 3;
+								offset=strtoul(argv[i],0,16) >> 3;
 				break;
 			default: usage();
 			}

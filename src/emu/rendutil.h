@@ -124,8 +124,8 @@ INLINE void set_render_color(render_color *color, float a, float r, float g, flo
 INLINE int orientation_swap_flips(int orientation)
 {
 	return (orientation & ORIENTATION_SWAP_XY) |
-	       ((orientation & ORIENTATION_FLIP_X) ? ORIENTATION_FLIP_Y : 0) |
-	       ((orientation & ORIENTATION_FLIP_Y) ? ORIENTATION_FLIP_X : 0);
+			((orientation & ORIENTATION_FLIP_X) ? ORIENTATION_FLIP_Y : 0) |
+			((orientation & ORIENTATION_FLIP_Y) ? ORIENTATION_FLIP_X : 0);
 }
 
 
@@ -200,4 +200,4 @@ INLINE UINT8 apply_brightness_contrast_gamma(UINT8 src, float brightness, float 
 }
 
 
-#endif	/* __RENDUTIL_H__ */
+#endif  /* __RENDUTIL_H__ */

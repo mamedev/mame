@@ -98,32 +98,32 @@ WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
 
 
 	/*
-    ROM:08020520                 DCW 0x3E                                           ddd1        y
-    ROM:08020522                 DCW 0x29                                           ddd2        x
-    ROM:08020524                 DCD 0x190BB6                                   ddd3        n
-    ROM:08020528                 DCW 0xC                                            ddd4        Y
-    ROM:0802052A                 DCW 0xA6                                           ddd5        X
+	ROM:08020520                 DCW 0x3E                                           ddd1        y
+	ROM:08020522                 DCW 0x29                                           ddd2        x
+	ROM:08020524                 DCD 0x190BB6                                   ddd3        n
+	ROM:08020528                 DCW 0xC                                            ddd4        Y
+	ROM:0802052A                 DCW 0xA6                                           ddd5        X
 
-    (ddd5+?)??10bit
-    ddd2??9bit
-    (ddd4+?)??11bit
-    ddd1??8bit
-    ddd3??10bit
+	(ddd5+?)??10bit
+	ddd2??9bit
+	(ddd4+?)??11bit
+	ddd1??8bit
+	ddd3??10bit
 
-    8060a4a6 2642ed8f
-    A6A46080 8FED4226
+	8060a4a6 2642ed8f
+	A6A46080 8FED4226
 
-    XXXX-XXXX
-    XXxx-xxxx
-    xxxY-YYYY
-    YYYY-YYyy
+	XXXX-XXXX
+	XXxx-xxxx
+	xxxY-YYYY
+	YYYY-YYyy
 
-    yyyy-yynn
-    nnnn-nnnn
+	yyyy-yynn
+	nnnn-nnnn
 
 
 
-    */
+	*/
 
 
 
@@ -230,16 +230,16 @@ static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("igs_mainram")// main ram for asic?
 	AM_RANGE(0x18000000, 0x18007fff) AM_RAM
 
-	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_SHARE("igs_cg_videoram")		//0x200 * 1   CG PALETTE?
-	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_WRITE(igs_palette32_w) AM_SHARE("igs_palette32")		//0x200 * 1
+	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_SHARE("igs_cg_videoram")        //0x200 * 1   CG PALETTE?
+	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_WRITE(igs_palette32_w) AM_SHARE("igs_palette32")        //0x200 * 1
 
 	AM_RANGE(0x38004000, 0x38005FFF) AM_RAM_WRITE(igs_tx_videoram_w) AM_SHARE("igs_tx_videoram") /* Text Layer */
 	AM_RANGE(0x38006000, 0x38007FFF) AM_RAM_WRITE(igs_bg_videoram_w) AM_SHARE("igs_bg_videoram") /* CG Layer */
 
 
-	AM_RANGE(0x38002010, 0x38002017) AM_RAM		//??????????????
-	AM_RANGE(0x38009000, 0x38009003) AM_RAM		//??????????????
-	AM_RANGE(0x70000200, 0x70000203) AM_RAM		//??????????????
+	AM_RANGE(0x38002010, 0x38002017) AM_RAM     //??????????????
+	AM_RANGE(0x38009000, 0x38009003) AM_RAM     //??????????????
+	AM_RANGE(0x70000200, 0x70000203) AM_RAM     //??????????????
 	AM_RANGE(0x50000000, 0x500003ff) AM_WRITENOP // uploads xor table to external rom here
 	AM_RANGE(0xf0000000, 0xF000000f) AM_WRITENOP // magic registers
 ADDRESS_MAP_END
@@ -286,7 +286,7 @@ static void sdwx_gfx_decrypt(running_machine &machine)
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
-    	result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
+		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
 
 	for (i=0; i<rom_size; i+=0x200)
 	{
@@ -331,44 +331,44 @@ INPUT_PORTS_END
 #if 0
 static const gfx_layout charlayout =
 {
-	8,8,			/* 8 x 8 chars */
+	8,8,            /* 8 x 8 chars */
 	RGN_FRAC(1,1),
-	4,				/* 4 bits per pixel */
+	4,              /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },    /* planes are packed in a nibble */
 	{ 33*4, 32*4, 49*4, 48*4, 1*4, 0*4, 17*4, 16*4 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	32*8	/* 32 bytes per char */
+	32*8    /* 32 bytes per char */
 };
 #endif
 
 static const gfx_layout gfxlayout_8x8x4 =
 {
-    8,8,
-    RGN_FRAC(1,1),
-    4,
-    //{ STEP4(0,8) },
-    { 24,8,16,0 },
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	//{ STEP4(0,8) },
+	{ 24,8,16,0 },
 		{ STEP8(7,-1) },
-    { STEP8(0,4*8) },
-    8*8*4
+	{ STEP8(0,4*8) },
+	8*8*4
 };
 
 #if 0
 static const gfx_layout gfxlayout_16x16x16 =
 {
-    16,16,
-    RGN_FRAC(1,1),
-    16,
-    { STEP16(0,0) },	// >8planes not supported
-    { STEP16(15,-1) },
-    { STEP16(0,16*1) },
-    16*16*16
+	16,16,
+	RGN_FRAC(1,1),
+	16,
+	{ STEP16(0,0) },    // >8planes not supported
+	{ STEP16(15,-1) },
+	{ STEP16(0,16*1) },
+	16*16*16
 };
 #endif
 
 static GFXDECODE_START( igs_m027 )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x4,   0, 16  )
-   // GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_16x16x16, 0, 16  )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x4,   0, 16  )
+	// GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_16x16x16, 0, 16  )
 GFXDECODE_END
 
 
@@ -426,7 +426,7 @@ static MACHINE_CONFIG_START( fearless, igs_m027_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_ICS2115_ADD("ics", 0, sound_irq)
+	MCFG_ICS2115_ADD("ics", 0, sound_irq)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 
 MACHINE_CONFIG_END
@@ -956,14 +956,14 @@ DRIVER_INIT_MEMBER(igs_m027_state,bigd2)
 
 ***************************************************************************/
 
-GAME( 2002,  sdwx,		0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", GAME_IS_SKELETON ) // aka Christmas 5 Line?
-GAME( 200?,  sddz,		0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  GAME_IS_SKELETON )
-GAME( 2000,  bigd2,		0, igs_majhong, sdwx, igs_m027_state, bigd2,       ROT0, "IGS", "Big D2",  GAME_IS_SKELETON )
-GAME( 200?,  lhzb3,		0, igs_majhong, sdwx, igs_m027_state, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", GAME_IS_SKELETON )
-GAME( 200?,  lhzb4,		0, igs_majhong, sdwx, igs_m027_state, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", GAME_IS_SKELETON )
-GAME( 200?,  klxyj,		0, igs_majhong, sdwx, igs_m027_state, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  GAME_IS_SKELETON )
-GAME( 2000,  mgfx,		0, igs_majhong, sdwx, igs_m027_state, mgfx,        ROT0, "IGS", "Man Guan Fu Xing",   GAME_IS_SKELETON )
-GAME( 200?,  gonefsh2,	0, igs_majhong, sdwx, igs_m027_state, gonefsh2,    ROT0, "IGS", "Gone Fishing 2",   GAME_IS_SKELETON )
-GAME( 200?,  chessc2,	0, igs_majhong, sdwx, igs_m027_state, chessc2,     ROT0, "IGS", "Chess Challenge 2",   GAME_IS_SKELETON )
-GAME( 200?,  haunthig,	0, igs_majhong, sdwx, igs_m027_state, hauntedh,    ROT0, "IGS", "Haunted House (IGS)",   GAME_IS_SKELETON )
-GAME( 2006,  fearless,	0, fearless,    sdwx, igs_m027_state, fearless,    ROT0, "IGS", "Fearless Pinocchio (V101US)",   GAME_IS_SKELETON )
+GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", GAME_IS_SKELETON ) // aka Christmas 5 Line?
+GAME( 200?,  sddz,      0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  GAME_IS_SKELETON )
+GAME( 2000,  bigd2,     0, igs_majhong, sdwx, igs_m027_state, bigd2,       ROT0, "IGS", "Big D2",  GAME_IS_SKELETON )
+GAME( 200?,  lhzb3,     0, igs_majhong, sdwx, igs_m027_state, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", GAME_IS_SKELETON )
+GAME( 200?,  lhzb4,     0, igs_majhong, sdwx, igs_m027_state, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", GAME_IS_SKELETON )
+GAME( 200?,  klxyj,     0, igs_majhong, sdwx, igs_m027_state, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  GAME_IS_SKELETON )
+GAME( 2000,  mgfx,      0, igs_majhong, sdwx, igs_m027_state, mgfx,        ROT0, "IGS", "Man Guan Fu Xing",   GAME_IS_SKELETON )
+GAME( 200?,  gonefsh2,  0, igs_majhong, sdwx, igs_m027_state, gonefsh2,    ROT0, "IGS", "Gone Fishing 2",   GAME_IS_SKELETON )
+GAME( 200?,  chessc2,   0, igs_majhong, sdwx, igs_m027_state, chessc2,     ROT0, "IGS", "Chess Challenge 2",   GAME_IS_SKELETON )
+GAME( 200?,  haunthig,  0, igs_majhong, sdwx, igs_m027_state, hauntedh,    ROT0, "IGS", "Haunted House (IGS)",   GAME_IS_SKELETON )
+GAME( 2006,  fearless,  0, fearless,    sdwx, igs_m027_state, fearless,    ROT0, "IGS", "Fearless Pinocchio (V101US)",   GAME_IS_SKELETON )

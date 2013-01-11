@@ -153,7 +153,7 @@ WRITE16_MEMBER(spbactn_state::soundcommand_w)
 
 static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x43fff) AM_RAM	// main ram
+	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
 	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("bgvideoram")
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8, spbactn_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 
-	AM_RANGE(0xfc00, 0xfc00) AM_READNOP	AM_WRITENOP /* irq ack ?? */
+	AM_RANGE(0xfc00, 0xfc00) AM_READNOP AM_WRITENOP /* irq ack ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
@@ -240,7 +240,7 @@ static INPUT_PORTS_START( spbactn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( spbactn )
 	PORT_DIPSETTING(    0x05, "1 Coin/1 Credit 2/3" )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
@@ -258,33 +258,33 @@ static INPUT_PORTS_START( spbactn )
 	PORT_DIPSETTING(    0x28, "1 Coin/1 Credit 2/3" )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )			PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )         PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )        PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x04, "100k and 500k" )
 	PORT_DIPSETTING(    0x0c, "200k and 800k" )
 	PORT_DIPSETTING(    0x08, "200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x10, 0x10, "Hit Difficulty" )		PORT_DIPLOCATION("SW2:5")	// From .xls file - WHAT does that mean ?
+	PORT_DIPNAME( 0x10, 0x10, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5")   // From .xls file - WHAT does that mean ?
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x20, 0x20, "Display Instructions" )	PORT_DIPLOCATION("SW2:6") /* Listed in manual as "Change Software", but seems to have no effect? */
+	PORT_DIPNAME( 0x20, 0x20, "Display Instructions" )  PORT_DIPLOCATION("SW2:6") /* Listed in manual as "Change Software", but seems to have no effect? */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:7") /* As listed in manual, but seems to have no effect? */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7") /* As listed in manual, but seems to have no effect? */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Match" )			PORT_DIPLOCATION("SW2:8")	// Check code at 0x00bf8c
+	PORT_DIPNAME( 0x80, 0x80, "Match" )         PORT_DIPLOCATION("SW2:8")   // Check code at 0x00bf8c
 	PORT_DIPSETTING(    0x80, "1/20" )
 	PORT_DIPSETTING(    0x00, "1/40" )
 INPUT_PORTS_END

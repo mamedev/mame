@@ -14,8 +14,8 @@
     DEBUGGING
 ***************************************************************************/
 
-#define PRINTF_SPU				(0)
-#define PRINTF_DECREMENTER		(0)
+#define PRINTF_SPU              (0)
+#define PRINTF_DECREMENTER      (0)
 
 
 
@@ -23,10 +23,10 @@
     CONSTANTS
 ***************************************************************************/
 
-#define DOUBLE_SIGN		(U64(0x8000000000000000))
-#define DOUBLE_EXP		(U64(0x7ff0000000000000))
-#define DOUBLE_FRAC		(U64(0x000fffffffffffff))
-#define DOUBLE_ZERO		(0)
+#define DOUBLE_SIGN     (U64(0x8000000000000000))
+#define DOUBLE_EXP      (U64(0x7ff0000000000000))
+#define DOUBLE_FRAC     (U64(0x000fffffffffffff))
+#define DOUBLE_ZERO     (0)
 
 
 
@@ -78,7 +78,7 @@ INLINE int page_access_allowed(int transtype, UINT8 key, UINT8 protbits)
 
 INLINE UINT32 get_cr(powerpc_state *ppc)
 {
-	return	((ppc->cr[0] & 0x0f) << 28) |
+	return  ((ppc->cr[0] & 0x0f) << 28) |
 			((ppc->cr[1] & 0x0f) << 24) |
 			((ppc->cr[2] & 0x0f) << 20) |
 			((ppc->cr[3] & 0x0f) << 16) |
@@ -496,7 +496,7 @@ void ppccom_dcstore_callback(powerpc_state *ppc)
 
 static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intention, offs_t *address)
 {
-	int transpriv = ((intention & TRANSLATE_USER_MASK) == 0);	// 1 for supervisor, 0 for user
+	int transpriv = ((intention & TRANSLATE_USER_MASK) == 0);   // 1 for supervisor, 0 for user
 	int transtype = intention & TRANSLATE_TYPE_MASK;
 	offs_t hash, hashbase, hashmask;
 	int batbase, batnum, hashnum;
@@ -1237,30 +1237,30 @@ void ppccom_update_fprf(powerpc_state *ppc)
 	}
 	else if (is_infinity_double(f))
 	{
-		if (sign_double(f))		/* -Infinity */
+		if (sign_double(f))     /* -Infinity */
 			fprf = 0x09;
-		else					/* +Infinity */
+		else                    /* +Infinity */
 			fprf = 0x05;
 	}
 	else if (is_normalized_double(f))
 	{
-		if (sign_double(f))		/* -Normalized */
+		if (sign_double(f))     /* -Normalized */
 			fprf = 0x08;
-		else					/* +Normalized */
+		else                    /* +Normalized */
 			fprf = 0x04;
 	}
 	else if (is_denormalized_double(f))
 	{
-		if (sign_double(f))		/* -Denormalized */
+		if (sign_double(f))     /* -Denormalized */
 			fprf = 0x18;
-		else					/* +Denormalized */
+		else                    /* +Denormalized */
 			fprf = 0x14;
 	}
 	else
 	{
-		if (sign_double(f))		/* -Zero */
+		if (sign_double(f))     /* -Zero */
 			fprf = 0x12;
-		else					/* +Zero */
+		else                    /* +Zero */
 			fprf = 0x02;
 	}
 
@@ -1284,114 +1284,114 @@ void ppccom_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ:			ppc->irq_pending = (ppc->irq_pending & ~1) | (info->i  != CLEAR_LINE); break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ:         ppc->irq_pending = (ppc->irq_pending & ~1) | (info->i  != CLEAR_LINE); break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + PPC_PC:				ppc->pc = info->i;						break;
-		case CPUINFO_INT_REGISTER + PPC_MSR:			ppc->msr = info->i;						break;
-		case CPUINFO_INT_REGISTER + PPC_CR:				set_cr(ppc, info->i);					break;
-		case CPUINFO_INT_REGISTER + PPC_LR:				ppc->spr[SPR_LR] = info->i;				break;
-		case CPUINFO_INT_REGISTER + PPC_CTR:			ppc->spr[SPR_CTR] = info->i;			break;
-		case CPUINFO_INT_REGISTER + PPC_XER:			set_xer(ppc, info->i);					break;
-		case CPUINFO_INT_REGISTER + PPC_SRR0:			ppc->spr[SPROEA_SRR0] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_SRR1:			ppc->spr[SPROEA_SRR1] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG0:			ppc->spr[SPROEA_SPRG0] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG1:			ppc->spr[SPROEA_SPRG1] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG2:			ppc->spr[SPROEA_SPRG2] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG3:			ppc->spr[SPROEA_SPRG3] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_SDR1:			ppc->spr[SPROEA_SDR1] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_EXIER:			ppc->dcr[DCR4XX_EXIER] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_EXISR:			ppc->dcr[DCR4XX_EXISR] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_EVPR:			ppc->spr[SPR4XX_EVPR] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_IOCR:			ppc->dcr[DCR4XX_IOCR] = info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_TBL:			set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00ffffff00000000)) | info->i); break;
-		case CPUINFO_INT_REGISTER + PPC_TBH:			set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00000000ffffffff)) | ((UINT64)(ppc->param1 & 0x00ffffff) << 32)); break;
-		case CPUINFO_INT_REGISTER + PPC_DEC:			set_decrementer(ppc, info->i);			break;
+		case CPUINFO_INT_REGISTER + PPC_PC:             ppc->pc = info->i;                      break;
+		case CPUINFO_INT_REGISTER + PPC_MSR:            ppc->msr = info->i;                     break;
+		case CPUINFO_INT_REGISTER + PPC_CR:             set_cr(ppc, info->i);                   break;
+		case CPUINFO_INT_REGISTER + PPC_LR:             ppc->spr[SPR_LR] = info->i;             break;
+		case CPUINFO_INT_REGISTER + PPC_CTR:            ppc->spr[SPR_CTR] = info->i;            break;
+		case CPUINFO_INT_REGISTER + PPC_XER:            set_xer(ppc, info->i);                  break;
+		case CPUINFO_INT_REGISTER + PPC_SRR0:           ppc->spr[SPROEA_SRR0] = info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_SRR1:           ppc->spr[SPROEA_SRR1] = info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG0:          ppc->spr[SPROEA_SPRG0] = info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG1:          ppc->spr[SPROEA_SPRG1] = info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG2:          ppc->spr[SPROEA_SPRG2] = info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG3:          ppc->spr[SPROEA_SPRG3] = info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_SDR1:           ppc->spr[SPROEA_SDR1] = info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_EXIER:          ppc->dcr[DCR4XX_EXIER] = info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_EXISR:          ppc->dcr[DCR4XX_EXISR] = info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_EVPR:           ppc->spr[SPR4XX_EVPR] = info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_IOCR:           ppc->dcr[DCR4XX_IOCR] = info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_TBL:            set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00ffffff00000000)) | info->i); break;
+		case CPUINFO_INT_REGISTER + PPC_TBH:            set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00000000ffffffff)) | ((UINT64)(ppc->param1 & 0x00ffffff) << 32)); break;
+		case CPUINFO_INT_REGISTER + PPC_DEC:            set_decrementer(ppc, info->i);          break;
 
-		case CPUINFO_INT_REGISTER + PPC_SR0:			ppc->sr[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR1:			ppc->sr[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR2:			ppc->sr[2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR3:			ppc->sr[3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR4:			ppc->sr[4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR5:			ppc->sr[5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR6:			ppc->sr[6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR7:			ppc->sr[7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR8:			ppc->sr[8] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR9:			ppc->sr[9] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR10:			ppc->sr[10] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR11:			ppc->sr[11] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR12:			ppc->sr[12] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR13:			ppc->sr[13] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR14:			ppc->sr[14] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_SR15:			ppc->sr[15] = info->i;					break;
+		case CPUINFO_INT_REGISTER + PPC_SR0:            ppc->sr[0] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR1:            ppc->sr[1] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR2:            ppc->sr[2] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR3:            ppc->sr[3] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR4:            ppc->sr[4] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR5:            ppc->sr[5] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR6:            ppc->sr[6] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR7:            ppc->sr[7] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR8:            ppc->sr[8] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR9:            ppc->sr[9] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR10:           ppc->sr[10] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR11:           ppc->sr[11] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR12:           ppc->sr[12] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR13:           ppc->sr[13] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR14:           ppc->sr[14] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR15:           ppc->sr[15] = info->i;                  break;
 
-		case CPUINFO_INT_REGISTER + PPC_R0:				ppc->r[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R1:				ppc->r[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R2:				ppc->r[2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R3:				ppc->r[3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R4:				ppc->r[4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R5:				ppc->r[5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R6:				ppc->r[6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R7:				ppc->r[7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R8:				ppc->r[8] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R9:				ppc->r[9] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R10:			ppc->r[10] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R11:			ppc->r[11] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R12:			ppc->r[12] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R13:			ppc->r[13] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R14:			ppc->r[14] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R15:			ppc->r[15] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R16:			ppc->r[16] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R17:			ppc->r[17] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R18:			ppc->r[18] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R19:			ppc->r[19] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R20:			ppc->r[20] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R21:			ppc->r[21] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R22:			ppc->r[22] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R23:			ppc->r[23] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R24:			ppc->r[24] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R25:			ppc->r[25] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R26:			ppc->r[26] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R27:			ppc->r[27] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R28:			ppc->r[28] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R29:			ppc->r[29] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PPC_R30:			ppc->r[30] = info->i;					break;
+		case CPUINFO_INT_REGISTER + PPC_R0:             ppc->r[0] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R1:             ppc->r[1] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R2:             ppc->r[2] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R3:             ppc->r[3] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R4:             ppc->r[4] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R5:             ppc->r[5] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R6:             ppc->r[6] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R7:             ppc->r[7] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R8:             ppc->r[8] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R9:             ppc->r[9] = info->i;                    break;
+		case CPUINFO_INT_REGISTER + PPC_R10:            ppc->r[10] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R11:            ppc->r[11] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R12:            ppc->r[12] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R13:            ppc->r[13] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R14:            ppc->r[14] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R15:            ppc->r[15] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R16:            ppc->r[16] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R17:            ppc->r[17] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R18:            ppc->r[18] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R19:            ppc->r[19] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R20:            ppc->r[20] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R21:            ppc->r[21] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R22:            ppc->r[22] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R23:            ppc->r[23] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R24:            ppc->r[24] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R25:            ppc->r[25] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R26:            ppc->r[26] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R27:            ppc->r[27] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R28:            ppc->r[28] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R29:            ppc->r[29] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PPC_R30:            ppc->r[30] = info->i;                   break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + PPC_R31:			ppc->r[31] = info->i;					break;
+		case CPUINFO_INT_REGISTER + PPC_R31:            ppc->r[31] = info->i;                   break;
 
-		case CPUINFO_INT_REGISTER + PPC_F0:				ppc->f[0] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F1:				ppc->f[1] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F2:				ppc->f[2] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F3:				ppc->f[3] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F4:				ppc->f[4] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F5:				ppc->f[5] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F6:				ppc->f[6] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F7:				ppc->f[7] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F8:				ppc->f[8] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F9:				ppc->f[9] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F10:			ppc->f[10] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F11:			ppc->f[11] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F12:			ppc->f[12] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F13:			ppc->f[13] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F14:			ppc->f[14] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F15:			ppc->f[15] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F16:			ppc->f[16] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F17:			ppc->f[17] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F18:			ppc->f[18] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F19:			ppc->f[19] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F20:			ppc->f[20] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F21:			ppc->f[21] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F22:			ppc->f[22] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F23:			ppc->f[23] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F24:			ppc->f[24] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F25:			ppc->f[25] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F26:			ppc->f[26] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F27:			ppc->f[27] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F28:			ppc->f[28] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F29:			ppc->f[29] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F30:			ppc->f[30] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_F31:			ppc->f[31] = *(double *)&info->i;		break;
-		case CPUINFO_INT_REGISTER + PPC_FPSCR:			ppc->fpscr = info->i;					break;
+		case CPUINFO_INT_REGISTER + PPC_F0:             ppc->f[0] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F1:             ppc->f[1] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F2:             ppc->f[2] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F3:             ppc->f[3] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F4:             ppc->f[4] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F5:             ppc->f[5] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F6:             ppc->f[6] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F7:             ppc->f[7] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F8:             ppc->f[8] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F9:             ppc->f[9] = *(double *)&info->i;        break;
+		case CPUINFO_INT_REGISTER + PPC_F10:            ppc->f[10] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F11:            ppc->f[11] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F12:            ppc->f[12] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F13:            ppc->f[13] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F14:            ppc->f[14] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F15:            ppc->f[15] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F16:            ppc->f[16] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F17:            ppc->f[17] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F18:            ppc->f[18] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F19:            ppc->f[19] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F20:            ppc->f[20] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F21:            ppc->f[21] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F22:            ppc->f[22] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F23:            ppc->f[23] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F24:            ppc->f[24] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F25:            ppc->f[25] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F26:            ppc->f[26] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F27:            ppc->f[27] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F28:            ppc->f[28] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F29:            ppc->f[29] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F30:            ppc->f[30] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_F31:            ppc->f[31] = *(double *)&info->i;       break;
+		case CPUINFO_INT_REGISTER + PPC_FPSCR:          ppc->fpscr = info->i;                   break;
 	}
 }
 
@@ -1406,257 +1406,257 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					/* provided by core */					break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  /* provided by core */                  break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                   break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 40;                           break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 64;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = POWERPC_MIN_PAGE_SHIFT;break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 64;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;                   break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:    info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ:			info->i = ppc->irq_pending ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ:         info->i = ppc->irq_pending ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					/* optionally implemented */			break;
+		case CPUINFO_INT_PREVIOUSPC:                    /* optionally implemented */            break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + PPC_PC:				info->i = ppc->pc;						break;
-		case CPUINFO_INT_REGISTER + PPC_MSR:			info->i = ppc->msr;						break;
-		case CPUINFO_INT_REGISTER + PPC_CR:				info->i = get_cr(ppc);					break;
-		case CPUINFO_INT_REGISTER + PPC_LR:				info->i = ppc->spr[SPR_LR];				break;
-		case CPUINFO_INT_REGISTER + PPC_CTR:			info->i = ppc->spr[SPR_CTR];			break;
-		case CPUINFO_INT_REGISTER + PPC_XER:			info->i = get_xer(ppc);					break;
-		case CPUINFO_INT_REGISTER + PPC_SRR0:			info->i = ppc->spr[SPROEA_SRR0];		break;
-		case CPUINFO_INT_REGISTER + PPC_SRR1:			info->i = ppc->spr[SPROEA_SRR1];		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG0:			info->i = ppc->spr[SPROEA_SPRG0];		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG1:			info->i = ppc->spr[SPROEA_SPRG1];		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG2:			info->i = ppc->spr[SPROEA_SPRG2];		break;
-		case CPUINFO_INT_REGISTER + PPC_SPRG3:			info->i = ppc->spr[SPROEA_SPRG3];		break;
-		case CPUINFO_INT_REGISTER + PPC_SDR1:			info->i = ppc->spr[SPROEA_SDR1];		break;
-		case CPUINFO_INT_REGISTER + PPC_EXIER:			info->i = ppc->dcr[DCR4XX_EXIER];		break;
-		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = ppc->dcr[DCR4XX_EXISR];		break;
-		case CPUINFO_INT_REGISTER + PPC_EVPR:			info->i = ppc->spr[SPR4XX_EVPR];		break;
-		case CPUINFO_INT_REGISTER + PPC_IOCR:			info->i = ppc->dcr[DCR4XX_IOCR];		break;
-		case CPUINFO_INT_REGISTER + PPC_TBH:			info->i = get_timebase(ppc) >> 32;		break;
-		case CPUINFO_INT_REGISTER + PPC_TBL:			info->i = (UINT32)get_timebase(ppc);	break;
-		case CPUINFO_INT_REGISTER + PPC_DEC:			info->i = get_decrementer(ppc);			break;
+		case CPUINFO_INT_REGISTER + PPC_PC:             info->i = ppc->pc;                      break;
+		case CPUINFO_INT_REGISTER + PPC_MSR:            info->i = ppc->msr;                     break;
+		case CPUINFO_INT_REGISTER + PPC_CR:             info->i = get_cr(ppc);                  break;
+		case CPUINFO_INT_REGISTER + PPC_LR:             info->i = ppc->spr[SPR_LR];             break;
+		case CPUINFO_INT_REGISTER + PPC_CTR:            info->i = ppc->spr[SPR_CTR];            break;
+		case CPUINFO_INT_REGISTER + PPC_XER:            info->i = get_xer(ppc);                 break;
+		case CPUINFO_INT_REGISTER + PPC_SRR0:           info->i = ppc->spr[SPROEA_SRR0];        break;
+		case CPUINFO_INT_REGISTER + PPC_SRR1:           info->i = ppc->spr[SPROEA_SRR1];        break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG0:          info->i = ppc->spr[SPROEA_SPRG0];       break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG1:          info->i = ppc->spr[SPROEA_SPRG1];       break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG2:          info->i = ppc->spr[SPROEA_SPRG2];       break;
+		case CPUINFO_INT_REGISTER + PPC_SPRG3:          info->i = ppc->spr[SPROEA_SPRG3];       break;
+		case CPUINFO_INT_REGISTER + PPC_SDR1:           info->i = ppc->spr[SPROEA_SDR1];        break;
+		case CPUINFO_INT_REGISTER + PPC_EXIER:          info->i = ppc->dcr[DCR4XX_EXIER];       break;
+		case CPUINFO_INT_REGISTER + PPC_EXISR:          info->i = ppc->dcr[DCR4XX_EXISR];       break;
+		case CPUINFO_INT_REGISTER + PPC_EVPR:           info->i = ppc->spr[SPR4XX_EVPR];        break;
+		case CPUINFO_INT_REGISTER + PPC_IOCR:           info->i = ppc->dcr[DCR4XX_IOCR];        break;
+		case CPUINFO_INT_REGISTER + PPC_TBH:            info->i = get_timebase(ppc) >> 32;      break;
+		case CPUINFO_INT_REGISTER + PPC_TBL:            info->i = (UINT32)get_timebase(ppc);    break;
+		case CPUINFO_INT_REGISTER + PPC_DEC:            info->i = get_decrementer(ppc);         break;
 
-		case CPUINFO_INT_REGISTER + PPC_SR0:			info->i = ppc->sr[0];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR1:			info->i = ppc->sr[1];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR2:			info->i = ppc->sr[2];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR3:			info->i = ppc->sr[3];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR4:			info->i = ppc->sr[4];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR5:			info->i = ppc->sr[5];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR6:			info->i = ppc->sr[6];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR7:			info->i = ppc->sr[7];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR8:			info->i = ppc->sr[8];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR9:			info->i = ppc->sr[9];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR10:			info->i = ppc->sr[10];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR11:			info->i = ppc->sr[11];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR12:			info->i = ppc->sr[12];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR13:			info->i = ppc->sr[13];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR14:			info->i = ppc->sr[14];					break;
-		case CPUINFO_INT_REGISTER + PPC_SR15:			info->i = ppc->sr[15];					break;
+		case CPUINFO_INT_REGISTER + PPC_SR0:            info->i = ppc->sr[0];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR1:            info->i = ppc->sr[1];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR2:            info->i = ppc->sr[2];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR3:            info->i = ppc->sr[3];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR4:            info->i = ppc->sr[4];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR5:            info->i = ppc->sr[5];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR6:            info->i = ppc->sr[6];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR7:            info->i = ppc->sr[7];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR8:            info->i = ppc->sr[8];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR9:            info->i = ppc->sr[9];                   break;
+		case CPUINFO_INT_REGISTER + PPC_SR10:           info->i = ppc->sr[10];                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR11:           info->i = ppc->sr[11];                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR12:           info->i = ppc->sr[12];                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR13:           info->i = ppc->sr[13];                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR14:           info->i = ppc->sr[14];                  break;
+		case CPUINFO_INT_REGISTER + PPC_SR15:           info->i = ppc->sr[15];                  break;
 
-		case CPUINFO_INT_REGISTER + PPC_R0:				info->i = ppc->r[0];					break;
-		case CPUINFO_INT_REGISTER + PPC_R1:				info->i = ppc->r[1];					break;
-		case CPUINFO_INT_REGISTER + PPC_R2:				info->i = ppc->r[2];					break;
-		case CPUINFO_INT_REGISTER + PPC_R3:				info->i = ppc->r[3];					break;
-		case CPUINFO_INT_REGISTER + PPC_R4:				info->i = ppc->r[4];					break;
-		case CPUINFO_INT_REGISTER + PPC_R5:				info->i = ppc->r[5];					break;
-		case CPUINFO_INT_REGISTER + PPC_R6:				info->i = ppc->r[6];					break;
-		case CPUINFO_INT_REGISTER + PPC_R7:				info->i = ppc->r[7];					break;
-		case CPUINFO_INT_REGISTER + PPC_R8:				info->i = ppc->r[8];					break;
-		case CPUINFO_INT_REGISTER + PPC_R9:				info->i = ppc->r[9];					break;
-		case CPUINFO_INT_REGISTER + PPC_R10:			info->i = ppc->r[10];					break;
-		case CPUINFO_INT_REGISTER + PPC_R11:			info->i = ppc->r[11];					break;
-		case CPUINFO_INT_REGISTER + PPC_R12:			info->i = ppc->r[12];					break;
-		case CPUINFO_INT_REGISTER + PPC_R13:			info->i = ppc->r[13];					break;
-		case CPUINFO_INT_REGISTER + PPC_R14:			info->i = ppc->r[14];					break;
-		case CPUINFO_INT_REGISTER + PPC_R15:			info->i = ppc->r[15];					break;
-		case CPUINFO_INT_REGISTER + PPC_R16:			info->i = ppc->r[16];					break;
-		case CPUINFO_INT_REGISTER + PPC_R17:			info->i = ppc->r[17];					break;
-		case CPUINFO_INT_REGISTER + PPC_R18:			info->i = ppc->r[18];					break;
-		case CPUINFO_INT_REGISTER + PPC_R19:			info->i = ppc->r[19];					break;
-		case CPUINFO_INT_REGISTER + PPC_R20:			info->i = ppc->r[20];					break;
-		case CPUINFO_INT_REGISTER + PPC_R21:			info->i = ppc->r[21];					break;
-		case CPUINFO_INT_REGISTER + PPC_R22:			info->i = ppc->r[22];					break;
-		case CPUINFO_INT_REGISTER + PPC_R23:			info->i = ppc->r[23];					break;
-		case CPUINFO_INT_REGISTER + PPC_R24:			info->i = ppc->r[24];					break;
-		case CPUINFO_INT_REGISTER + PPC_R25:			info->i = ppc->r[25];					break;
-		case CPUINFO_INT_REGISTER + PPC_R26:			info->i = ppc->r[26];					break;
-		case CPUINFO_INT_REGISTER + PPC_R27:			info->i = ppc->r[27];					break;
-		case CPUINFO_INT_REGISTER + PPC_R28:			info->i = ppc->r[28];					break;
-		case CPUINFO_INT_REGISTER + PPC_R29:			info->i = ppc->r[29];					break;
-		case CPUINFO_INT_REGISTER + PPC_R30:			info->i = ppc->r[30];					break;
+		case CPUINFO_INT_REGISTER + PPC_R0:             info->i = ppc->r[0];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R1:             info->i = ppc->r[1];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R2:             info->i = ppc->r[2];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R3:             info->i = ppc->r[3];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R4:             info->i = ppc->r[4];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R5:             info->i = ppc->r[5];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R6:             info->i = ppc->r[6];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R7:             info->i = ppc->r[7];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R8:             info->i = ppc->r[8];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R9:             info->i = ppc->r[9];                    break;
+		case CPUINFO_INT_REGISTER + PPC_R10:            info->i = ppc->r[10];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R11:            info->i = ppc->r[11];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R12:            info->i = ppc->r[12];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R13:            info->i = ppc->r[13];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R14:            info->i = ppc->r[14];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R15:            info->i = ppc->r[15];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R16:            info->i = ppc->r[16];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R17:            info->i = ppc->r[17];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R18:            info->i = ppc->r[18];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R19:            info->i = ppc->r[19];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R20:            info->i = ppc->r[20];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R21:            info->i = ppc->r[21];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R22:            info->i = ppc->r[22];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R23:            info->i = ppc->r[23];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R24:            info->i = ppc->r[24];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R25:            info->i = ppc->r[25];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R26:            info->i = ppc->r[26];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R27:            info->i = ppc->r[27];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R28:            info->i = ppc->r[28];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R29:            info->i = ppc->r[29];                   break;
+		case CPUINFO_INT_REGISTER + PPC_R30:            info->i = ppc->r[30];                   break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + PPC_R31:			info->i = ppc->r[31];					break;
+		case CPUINFO_INT_REGISTER + PPC_R31:            info->i = ppc->r[31];                   break;
 
-		case CPUINFO_INT_REGISTER + PPC_F0:				info->i = *(UINT64 *)&ppc->f[0];		break;
-		case CPUINFO_INT_REGISTER + PPC_F1:				info->i = *(UINT64 *)&ppc->f[1];		break;
-		case CPUINFO_INT_REGISTER + PPC_F2:				info->i = *(UINT64 *)&ppc->f[2];		break;
-		case CPUINFO_INT_REGISTER + PPC_F3:				info->i = *(UINT64 *)&ppc->f[3];		break;
-		case CPUINFO_INT_REGISTER + PPC_F4:				info->i = *(UINT64 *)&ppc->f[4];		break;
-		case CPUINFO_INT_REGISTER + PPC_F5:				info->i = *(UINT64 *)&ppc->f[5];		break;
-		case CPUINFO_INT_REGISTER + PPC_F6:				info->i = *(UINT64 *)&ppc->f[6];		break;
-		case CPUINFO_INT_REGISTER + PPC_F7:				info->i = *(UINT64 *)&ppc->f[7];		break;
-		case CPUINFO_INT_REGISTER + PPC_F8:				info->i = *(UINT64 *)&ppc->f[8];		break;
-		case CPUINFO_INT_REGISTER + PPC_F9:				info->i = *(UINT64 *)&ppc->f[9];		break;
-		case CPUINFO_INT_REGISTER + PPC_F10:			info->i = *(UINT64 *)&ppc->f[10];		break;
-		case CPUINFO_INT_REGISTER + PPC_F11:			info->i = *(UINT64 *)&ppc->f[11];		break;
-		case CPUINFO_INT_REGISTER + PPC_F12:			info->i = *(UINT64 *)&ppc->f[12];		break;
-		case CPUINFO_INT_REGISTER + PPC_F13:			info->i = *(UINT64 *)&ppc->f[13];		break;
-		case CPUINFO_INT_REGISTER + PPC_F14:			info->i = *(UINT64 *)&ppc->f[14];		break;
-		case CPUINFO_INT_REGISTER + PPC_F15:			info->i = *(UINT64 *)&ppc->f[15];		break;
-		case CPUINFO_INT_REGISTER + PPC_F16:			info->i = *(UINT64 *)&ppc->f[16];		break;
-		case CPUINFO_INT_REGISTER + PPC_F17:			info->i = *(UINT64 *)&ppc->f[17];		break;
-		case CPUINFO_INT_REGISTER + PPC_F18:			info->i = *(UINT64 *)&ppc->f[18];		break;
-		case CPUINFO_INT_REGISTER + PPC_F19:			info->i = *(UINT64 *)&ppc->f[19];		break;
-		case CPUINFO_INT_REGISTER + PPC_F20:			info->i = *(UINT64 *)&ppc->f[20];		break;
-		case CPUINFO_INT_REGISTER + PPC_F21:			info->i = *(UINT64 *)&ppc->f[21];		break;
-		case CPUINFO_INT_REGISTER + PPC_F22:			info->i = *(UINT64 *)&ppc->f[22];		break;
-		case CPUINFO_INT_REGISTER + PPC_F23:			info->i = *(UINT64 *)&ppc->f[23];		break;
-		case CPUINFO_INT_REGISTER + PPC_F24:			info->i = *(UINT64 *)&ppc->f[24];		break;
-		case CPUINFO_INT_REGISTER + PPC_F25:			info->i = *(UINT64 *)&ppc->f[25];		break;
-		case CPUINFO_INT_REGISTER + PPC_F26:			info->i = *(UINT64 *)&ppc->f[26];		break;
-		case CPUINFO_INT_REGISTER + PPC_F27:			info->i = *(UINT64 *)&ppc->f[27];		break;
-		case CPUINFO_INT_REGISTER + PPC_F28:			info->i = *(UINT64 *)&ppc->f[28];		break;
-		case CPUINFO_INT_REGISTER + PPC_F29:			info->i = *(UINT64 *)&ppc->f[29];		break;
-		case CPUINFO_INT_REGISTER + PPC_F30:			info->i = *(UINT64 *)&ppc->f[30];		break;
-		case CPUINFO_INT_REGISTER + PPC_F31:			info->i = *(UINT64 *)&ppc->f[31];		break;
-		case CPUINFO_INT_REGISTER + PPC_FPSCR:			info->i = ppc->fpscr;					break;
+		case CPUINFO_INT_REGISTER + PPC_F0:             info->i = *(UINT64 *)&ppc->f[0];        break;
+		case CPUINFO_INT_REGISTER + PPC_F1:             info->i = *(UINT64 *)&ppc->f[1];        break;
+		case CPUINFO_INT_REGISTER + PPC_F2:             info->i = *(UINT64 *)&ppc->f[2];        break;
+		case CPUINFO_INT_REGISTER + PPC_F3:             info->i = *(UINT64 *)&ppc->f[3];        break;
+		case CPUINFO_INT_REGISTER + PPC_F4:             info->i = *(UINT64 *)&ppc->f[4];        break;
+		case CPUINFO_INT_REGISTER + PPC_F5:             info->i = *(UINT64 *)&ppc->f[5];        break;
+		case CPUINFO_INT_REGISTER + PPC_F6:             info->i = *(UINT64 *)&ppc->f[6];        break;
+		case CPUINFO_INT_REGISTER + PPC_F7:             info->i = *(UINT64 *)&ppc->f[7];        break;
+		case CPUINFO_INT_REGISTER + PPC_F8:             info->i = *(UINT64 *)&ppc->f[8];        break;
+		case CPUINFO_INT_REGISTER + PPC_F9:             info->i = *(UINT64 *)&ppc->f[9];        break;
+		case CPUINFO_INT_REGISTER + PPC_F10:            info->i = *(UINT64 *)&ppc->f[10];       break;
+		case CPUINFO_INT_REGISTER + PPC_F11:            info->i = *(UINT64 *)&ppc->f[11];       break;
+		case CPUINFO_INT_REGISTER + PPC_F12:            info->i = *(UINT64 *)&ppc->f[12];       break;
+		case CPUINFO_INT_REGISTER + PPC_F13:            info->i = *(UINT64 *)&ppc->f[13];       break;
+		case CPUINFO_INT_REGISTER + PPC_F14:            info->i = *(UINT64 *)&ppc->f[14];       break;
+		case CPUINFO_INT_REGISTER + PPC_F15:            info->i = *(UINT64 *)&ppc->f[15];       break;
+		case CPUINFO_INT_REGISTER + PPC_F16:            info->i = *(UINT64 *)&ppc->f[16];       break;
+		case CPUINFO_INT_REGISTER + PPC_F17:            info->i = *(UINT64 *)&ppc->f[17];       break;
+		case CPUINFO_INT_REGISTER + PPC_F18:            info->i = *(UINT64 *)&ppc->f[18];       break;
+		case CPUINFO_INT_REGISTER + PPC_F19:            info->i = *(UINT64 *)&ppc->f[19];       break;
+		case CPUINFO_INT_REGISTER + PPC_F20:            info->i = *(UINT64 *)&ppc->f[20];       break;
+		case CPUINFO_INT_REGISTER + PPC_F21:            info->i = *(UINT64 *)&ppc->f[21];       break;
+		case CPUINFO_INT_REGISTER + PPC_F22:            info->i = *(UINT64 *)&ppc->f[22];       break;
+		case CPUINFO_INT_REGISTER + PPC_F23:            info->i = *(UINT64 *)&ppc->f[23];       break;
+		case CPUINFO_INT_REGISTER + PPC_F24:            info->i = *(UINT64 *)&ppc->f[24];       break;
+		case CPUINFO_INT_REGISTER + PPC_F25:            info->i = *(UINT64 *)&ppc->f[25];       break;
+		case CPUINFO_INT_REGISTER + PPC_F26:            info->i = *(UINT64 *)&ppc->f[26];       break;
+		case CPUINFO_INT_REGISTER + PPC_F27:            info->i = *(UINT64 *)&ppc->f[27];       break;
+		case CPUINFO_INT_REGISTER + PPC_F28:            info->i = *(UINT64 *)&ppc->f[28];       break;
+		case CPUINFO_INT_REGISTER + PPC_F29:            info->i = *(UINT64 *)&ppc->f[29];       break;
+		case CPUINFO_INT_REGISTER + PPC_F30:            info->i = *(UINT64 *)&ppc->f[30];       break;
+		case CPUINFO_INT_REGISTER + PPC_F31:            info->i = *(UINT64 *)&ppc->f[31];       break;
+		case CPUINFO_INT_REGISTER + PPC_FPSCR:          info->i = ppc->fpscr;                   break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						/* provided by core */					break;
-		case CPUINFO_FCT_INIT:							/* provided by core */					break;
-		case CPUINFO_FCT_RESET:							/* provided by core */					break;
-		case CPUINFO_FCT_EXIT:							/* provided by core */					break;
-		case CPUINFO_FCT_EXECUTE:						/* provided by core */					break;
-		case CPUINFO_FCT_TRANSLATE:						/* provided by core */					break;
-		case CPUINFO_FCT_DISASSEMBLE:					/* provided by core */					break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc->icount;			break;
+		case CPUINFO_FCT_SET_INFO:                      /* provided by core */                  break;
+		case CPUINFO_FCT_INIT:                          /* provided by core */                  break;
+		case CPUINFO_FCT_RESET:                         /* provided by core */                  break;
+		case CPUINFO_FCT_EXIT:                          /* provided by core */                  break;
+		case CPUINFO_FCT_EXECUTE:                       /* provided by core */                  break;
+		case CPUINFO_FCT_TRANSLATE:                     /* provided by core */                  break;
+		case CPUINFO_FCT_DISASSEMBLE:                   /* provided by core */                  break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &ppc->icount;            break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "PowerPC");				break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
-		case CPUINFO_STR_SOURCE_FILE:						/* provided by core */					break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PowerPC");             break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "PowerPC");             break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       /* provided by core */                  break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Aaron Giles"); break;
 
-		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
+		case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
 
-		case CPUINFO_STR_REGISTER + PPC_PC:				sprintf(info->s, "PC: %08X", ppc->pc);				break;
-		case CPUINFO_STR_REGISTER + PPC_MSR:			sprintf(info->s, "MSR:%08X", ppc->msr);				break;
-		case CPUINFO_STR_REGISTER + PPC_CR:				sprintf(info->s, "CR: %08X", get_cr(ppc));			break;
-		case CPUINFO_STR_REGISTER + PPC_LR:				sprintf(info->s, "LR: %08X", ppc->spr[SPR_LR]);		break;
-		case CPUINFO_STR_REGISTER + PPC_CTR:			sprintf(info->s, "CTR:%08X", ppc->spr[SPR_CTR]);	break;
-		case CPUINFO_STR_REGISTER + PPC_XER:			sprintf(info->s, "XER:%08X", get_xer(ppc));			break;
-		case CPUINFO_STR_REGISTER + PPC_SRR0:			sprintf(info->s, "SRR0: %08X", ppc->spr[SPROEA_SRR0]);	break;
-		case CPUINFO_STR_REGISTER + PPC_SRR1:			sprintf(info->s, "SRR1: %08X", ppc->spr[SPROEA_SRR1]);	break;
-		case CPUINFO_STR_REGISTER + PPC_SPRG0:			sprintf(info->s, "SPRG0: %08X", ppc->spr[SPROEA_SPRG0]); break;
-		case CPUINFO_STR_REGISTER + PPC_SPRG1:			sprintf(info->s, "SPRG1: %08X", ppc->spr[SPROEA_SPRG1]); break;
-		case CPUINFO_STR_REGISTER + PPC_SPRG2:			sprintf(info->s, "SPRG2: %08X", ppc->spr[SPROEA_SPRG2]); break;
-		case CPUINFO_STR_REGISTER + PPC_SPRG3:			sprintf(info->s, "SPRG3: %08X", ppc->spr[SPROEA_SPRG3]); break;
-		case CPUINFO_STR_REGISTER + PPC_SDR1:			sprintf(info->s, "SDR1: %08X", ppc->spr[SPROEA_SDR1]); break;
-		case CPUINFO_STR_REGISTER + PPC_EXIER:			sprintf(info->s, "EXIER: %08X", ppc->dcr[DCR4XX_EXIER]); break;
-		case CPUINFO_STR_REGISTER + PPC_EXISR:			sprintf(info->s, "EXISR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
-		case CPUINFO_STR_REGISTER + PPC_EVPR:			sprintf(info->s, "EVPR: %08X", ppc->spr[SPR4XX_EVPR]); break;
-		case CPUINFO_STR_REGISTER + PPC_IOCR:			sprintf(info->s, "IOCR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
-		case CPUINFO_STR_REGISTER + PPC_TBH:			sprintf(info->s, "TBH: %08X", (UINT32)(get_timebase(ppc) >> 32)); break;
-		case CPUINFO_STR_REGISTER + PPC_TBL:			sprintf(info->s, "TBL: %08X", (UINT32)get_timebase(ppc)); break;
-		case CPUINFO_STR_REGISTER + PPC_DEC:			sprintf(info->s, "DEC: %08X", get_decrementer(ppc)); break;
+		case CPUINFO_STR_REGISTER + PPC_PC:             sprintf(info->s, "PC: %08X", ppc->pc);              break;
+		case CPUINFO_STR_REGISTER + PPC_MSR:            sprintf(info->s, "MSR:%08X", ppc->msr);             break;
+		case CPUINFO_STR_REGISTER + PPC_CR:             sprintf(info->s, "CR: %08X", get_cr(ppc));          break;
+		case CPUINFO_STR_REGISTER + PPC_LR:             sprintf(info->s, "LR: %08X", ppc->spr[SPR_LR]);     break;
+		case CPUINFO_STR_REGISTER + PPC_CTR:            sprintf(info->s, "CTR:%08X", ppc->spr[SPR_CTR]);    break;
+		case CPUINFO_STR_REGISTER + PPC_XER:            sprintf(info->s, "XER:%08X", get_xer(ppc));         break;
+		case CPUINFO_STR_REGISTER + PPC_SRR0:           sprintf(info->s, "SRR0: %08X", ppc->spr[SPROEA_SRR0]);  break;
+		case CPUINFO_STR_REGISTER + PPC_SRR1:           sprintf(info->s, "SRR1: %08X", ppc->spr[SPROEA_SRR1]);  break;
+		case CPUINFO_STR_REGISTER + PPC_SPRG0:          sprintf(info->s, "SPRG0: %08X", ppc->spr[SPROEA_SPRG0]); break;
+		case CPUINFO_STR_REGISTER + PPC_SPRG1:          sprintf(info->s, "SPRG1: %08X", ppc->spr[SPROEA_SPRG1]); break;
+		case CPUINFO_STR_REGISTER + PPC_SPRG2:          sprintf(info->s, "SPRG2: %08X", ppc->spr[SPROEA_SPRG2]); break;
+		case CPUINFO_STR_REGISTER + PPC_SPRG3:          sprintf(info->s, "SPRG3: %08X", ppc->spr[SPROEA_SPRG3]); break;
+		case CPUINFO_STR_REGISTER + PPC_SDR1:           sprintf(info->s, "SDR1: %08X", ppc->spr[SPROEA_SDR1]); break;
+		case CPUINFO_STR_REGISTER + PPC_EXIER:          sprintf(info->s, "EXIER: %08X", ppc->dcr[DCR4XX_EXIER]); break;
+		case CPUINFO_STR_REGISTER + PPC_EXISR:          sprintf(info->s, "EXISR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
+		case CPUINFO_STR_REGISTER + PPC_EVPR:           sprintf(info->s, "EVPR: %08X", ppc->spr[SPR4XX_EVPR]); break;
+		case CPUINFO_STR_REGISTER + PPC_IOCR:           sprintf(info->s, "IOCR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
+		case CPUINFO_STR_REGISTER + PPC_TBH:            sprintf(info->s, "TBH: %08X", (UINT32)(get_timebase(ppc) >> 32)); break;
+		case CPUINFO_STR_REGISTER + PPC_TBL:            sprintf(info->s, "TBL: %08X", (UINT32)get_timebase(ppc)); break;
+		case CPUINFO_STR_REGISTER + PPC_DEC:            sprintf(info->s, "DEC: %08X", get_decrementer(ppc)); break;
 
-		case CPUINFO_STR_REGISTER + PPC_SR0:			sprintf(info->s, "SR0: %08X", ppc->sr[0]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR1:			sprintf(info->s, "SR1: %08X", ppc->sr[1]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR2:			sprintf(info->s, "SR2: %08X", ppc->sr[2]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR3:			sprintf(info->s, "SR3: %08X", ppc->sr[3]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR4:			sprintf(info->s, "SR4: %08X", ppc->sr[4]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR5:			sprintf(info->s, "SR5: %08X", ppc->sr[5]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR6:			sprintf(info->s, "SR6: %08X", ppc->sr[6]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR7:			sprintf(info->s, "SR7: %08X", ppc->sr[7]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR8:			sprintf(info->s, "SR8: %08X", ppc->sr[8]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR9:			sprintf(info->s, "SR9: %08X", ppc->sr[9]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR10:			sprintf(info->s, "SR10: %08X", ppc->sr[10]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR11:			sprintf(info->s, "SR11: %08X", ppc->sr[11]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR12:			sprintf(info->s, "SR12: %08X", ppc->sr[12]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR13:			sprintf(info->s, "SR13: %08X", ppc->sr[13]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR14:			sprintf(info->s, "SR14: %08X", ppc->sr[14]); break;
-		case CPUINFO_STR_REGISTER + PPC_SR15:			sprintf(info->s, "SR15: %08X", ppc->sr[15]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR0:            sprintf(info->s, "SR0: %08X", ppc->sr[0]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR1:            sprintf(info->s, "SR1: %08X", ppc->sr[1]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR2:            sprintf(info->s, "SR2: %08X", ppc->sr[2]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR3:            sprintf(info->s, "SR3: %08X", ppc->sr[3]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR4:            sprintf(info->s, "SR4: %08X", ppc->sr[4]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR5:            sprintf(info->s, "SR5: %08X", ppc->sr[5]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR6:            sprintf(info->s, "SR6: %08X", ppc->sr[6]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR7:            sprintf(info->s, "SR7: %08X", ppc->sr[7]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR8:            sprintf(info->s, "SR8: %08X", ppc->sr[8]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR9:            sprintf(info->s, "SR9: %08X", ppc->sr[9]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR10:           sprintf(info->s, "SR10: %08X", ppc->sr[10]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR11:           sprintf(info->s, "SR11: %08X", ppc->sr[11]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR12:           sprintf(info->s, "SR12: %08X", ppc->sr[12]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR13:           sprintf(info->s, "SR13: %08X", ppc->sr[13]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR14:           sprintf(info->s, "SR14: %08X", ppc->sr[14]); break;
+		case CPUINFO_STR_REGISTER + PPC_SR15:           sprintf(info->s, "SR15: %08X", ppc->sr[15]); break;
 
-		case CPUINFO_STR_REGISTER + PPC_R0:				sprintf(info->s, "R0: %08X", ppc->r[0]); break;
-		case CPUINFO_STR_REGISTER + PPC_R1:				sprintf(info->s, "R1: %08X", ppc->r[1]); break;
-		case CPUINFO_STR_REGISTER + PPC_R2:				sprintf(info->s, "R2: %08X", ppc->r[2]); break;
-		case CPUINFO_STR_REGISTER + PPC_R3:				sprintf(info->s, "R3: %08X", ppc->r[3]); break;
-		case CPUINFO_STR_REGISTER + PPC_R4:				sprintf(info->s, "R4: %08X", ppc->r[4]); break;
-		case CPUINFO_STR_REGISTER + PPC_R5:				sprintf(info->s, "R5: %08X", ppc->r[5]); break;
-		case CPUINFO_STR_REGISTER + PPC_R6:				sprintf(info->s, "R6: %08X", ppc->r[6]); break;
-		case CPUINFO_STR_REGISTER + PPC_R7:				sprintf(info->s, "R7: %08X", ppc->r[7]); break;
-		case CPUINFO_STR_REGISTER + PPC_R8:				sprintf(info->s, "R8: %08X", ppc->r[8]); break;
-		case CPUINFO_STR_REGISTER + PPC_R9:				sprintf(info->s, "R9: %08X", ppc->r[9]); break;
-		case CPUINFO_STR_REGISTER + PPC_R10:			sprintf(info->s, "R10:%08X", ppc->r[10]); break;
-		case CPUINFO_STR_REGISTER + PPC_R11:			sprintf(info->s, "R11:%08X", ppc->r[11]); break;
-		case CPUINFO_STR_REGISTER + PPC_R12:			sprintf(info->s, "R12:%08X", ppc->r[12]); break;
-		case CPUINFO_STR_REGISTER + PPC_R13:			sprintf(info->s, "R13:%08X", ppc->r[13]); break;
-		case CPUINFO_STR_REGISTER + PPC_R14:			sprintf(info->s, "R14:%08X", ppc->r[14]); break;
-		case CPUINFO_STR_REGISTER + PPC_R15:			sprintf(info->s, "R15:%08X", ppc->r[15]); break;
-		case CPUINFO_STR_REGISTER + PPC_R16:			sprintf(info->s, "R16:%08X", ppc->r[16]); break;
-		case CPUINFO_STR_REGISTER + PPC_R17:			sprintf(info->s, "R17:%08X", ppc->r[17]); break;
-		case CPUINFO_STR_REGISTER + PPC_R18:			sprintf(info->s, "R18:%08X", ppc->r[18]); break;
-		case CPUINFO_STR_REGISTER + PPC_R19:			sprintf(info->s, "R19:%08X", ppc->r[19]); break;
-		case CPUINFO_STR_REGISTER + PPC_R20:			sprintf(info->s, "R20:%08X", ppc->r[20]); break;
-		case CPUINFO_STR_REGISTER + PPC_R21:			sprintf(info->s, "R21:%08X", ppc->r[21]); break;
-		case CPUINFO_STR_REGISTER + PPC_R22:			sprintf(info->s, "R22:%08X", ppc->r[22]); break;
-		case CPUINFO_STR_REGISTER + PPC_R23:			sprintf(info->s, "R23:%08X", ppc->r[23]); break;
-		case CPUINFO_STR_REGISTER + PPC_R24:			sprintf(info->s, "R24:%08X", ppc->r[24]); break;
-		case CPUINFO_STR_REGISTER + PPC_R25:			sprintf(info->s, "R25:%08X", ppc->r[25]); break;
-		case CPUINFO_STR_REGISTER + PPC_R26:			sprintf(info->s, "R26:%08X", ppc->r[26]); break;
-		case CPUINFO_STR_REGISTER + PPC_R27:			sprintf(info->s, "R27:%08X", ppc->r[27]); break;
-		case CPUINFO_STR_REGISTER + PPC_R28:			sprintf(info->s, "R28:%08X", ppc->r[28]); break;
-		case CPUINFO_STR_REGISTER + PPC_R29:			sprintf(info->s, "R29:%08X", ppc->r[29]); break;
-		case CPUINFO_STR_REGISTER + PPC_R30:			sprintf(info->s, "R30:%08X", ppc->r[30]); break;
-		case CPUINFO_STR_REGISTER + PPC_R31:			sprintf(info->s, "R31:%08X", ppc->r[31]); break;
+		case CPUINFO_STR_REGISTER + PPC_R0:             sprintf(info->s, "R0: %08X", ppc->r[0]); break;
+		case CPUINFO_STR_REGISTER + PPC_R1:             sprintf(info->s, "R1: %08X", ppc->r[1]); break;
+		case CPUINFO_STR_REGISTER + PPC_R2:             sprintf(info->s, "R2: %08X", ppc->r[2]); break;
+		case CPUINFO_STR_REGISTER + PPC_R3:             sprintf(info->s, "R3: %08X", ppc->r[3]); break;
+		case CPUINFO_STR_REGISTER + PPC_R4:             sprintf(info->s, "R4: %08X", ppc->r[4]); break;
+		case CPUINFO_STR_REGISTER + PPC_R5:             sprintf(info->s, "R5: %08X", ppc->r[5]); break;
+		case CPUINFO_STR_REGISTER + PPC_R6:             sprintf(info->s, "R6: %08X", ppc->r[6]); break;
+		case CPUINFO_STR_REGISTER + PPC_R7:             sprintf(info->s, "R7: %08X", ppc->r[7]); break;
+		case CPUINFO_STR_REGISTER + PPC_R8:             sprintf(info->s, "R8: %08X", ppc->r[8]); break;
+		case CPUINFO_STR_REGISTER + PPC_R9:             sprintf(info->s, "R9: %08X", ppc->r[9]); break;
+		case CPUINFO_STR_REGISTER + PPC_R10:            sprintf(info->s, "R10:%08X", ppc->r[10]); break;
+		case CPUINFO_STR_REGISTER + PPC_R11:            sprintf(info->s, "R11:%08X", ppc->r[11]); break;
+		case CPUINFO_STR_REGISTER + PPC_R12:            sprintf(info->s, "R12:%08X", ppc->r[12]); break;
+		case CPUINFO_STR_REGISTER + PPC_R13:            sprintf(info->s, "R13:%08X", ppc->r[13]); break;
+		case CPUINFO_STR_REGISTER + PPC_R14:            sprintf(info->s, "R14:%08X", ppc->r[14]); break;
+		case CPUINFO_STR_REGISTER + PPC_R15:            sprintf(info->s, "R15:%08X", ppc->r[15]); break;
+		case CPUINFO_STR_REGISTER + PPC_R16:            sprintf(info->s, "R16:%08X", ppc->r[16]); break;
+		case CPUINFO_STR_REGISTER + PPC_R17:            sprintf(info->s, "R17:%08X", ppc->r[17]); break;
+		case CPUINFO_STR_REGISTER + PPC_R18:            sprintf(info->s, "R18:%08X", ppc->r[18]); break;
+		case CPUINFO_STR_REGISTER + PPC_R19:            sprintf(info->s, "R19:%08X", ppc->r[19]); break;
+		case CPUINFO_STR_REGISTER + PPC_R20:            sprintf(info->s, "R20:%08X", ppc->r[20]); break;
+		case CPUINFO_STR_REGISTER + PPC_R21:            sprintf(info->s, "R21:%08X", ppc->r[21]); break;
+		case CPUINFO_STR_REGISTER + PPC_R22:            sprintf(info->s, "R22:%08X", ppc->r[22]); break;
+		case CPUINFO_STR_REGISTER + PPC_R23:            sprintf(info->s, "R23:%08X", ppc->r[23]); break;
+		case CPUINFO_STR_REGISTER + PPC_R24:            sprintf(info->s, "R24:%08X", ppc->r[24]); break;
+		case CPUINFO_STR_REGISTER + PPC_R25:            sprintf(info->s, "R25:%08X", ppc->r[25]); break;
+		case CPUINFO_STR_REGISTER + PPC_R26:            sprintf(info->s, "R26:%08X", ppc->r[26]); break;
+		case CPUINFO_STR_REGISTER + PPC_R27:            sprintf(info->s, "R27:%08X", ppc->r[27]); break;
+		case CPUINFO_STR_REGISTER + PPC_R28:            sprintf(info->s, "R28:%08X", ppc->r[28]); break;
+		case CPUINFO_STR_REGISTER + PPC_R29:            sprintf(info->s, "R29:%08X", ppc->r[29]); break;
+		case CPUINFO_STR_REGISTER + PPC_R30:            sprintf(info->s, "R30:%08X", ppc->r[30]); break;
+		case CPUINFO_STR_REGISTER + PPC_R31:            sprintf(info->s, "R31:%08X", ppc->r[31]); break;
 
-		case CPUINFO_STR_REGISTER + PPC_F0:				sprintf(info->s, "F0: %12f", ppc->f[0]); break;
-		case CPUINFO_STR_REGISTER + PPC_F1:				sprintf(info->s, "F1: %12f", ppc->f[1]); break;
-		case CPUINFO_STR_REGISTER + PPC_F2:				sprintf(info->s, "F2: %12f", ppc->f[2]); break;
-		case CPUINFO_STR_REGISTER + PPC_F3:				sprintf(info->s, "F3: %12f", ppc->f[3]); break;
-		case CPUINFO_STR_REGISTER + PPC_F4:				sprintf(info->s, "F4: %12f", ppc->f[4]); break;
-		case CPUINFO_STR_REGISTER + PPC_F5:				sprintf(info->s, "F5: %12f", ppc->f[5]); break;
-		case CPUINFO_STR_REGISTER + PPC_F6:				sprintf(info->s, "F6: %12f", ppc->f[6]); break;
-		case CPUINFO_STR_REGISTER + PPC_F7:				sprintf(info->s, "F7: %12f", ppc->f[7]); break;
-		case CPUINFO_STR_REGISTER + PPC_F8:				sprintf(info->s, "F8: %12f", ppc->f[8]); break;
-		case CPUINFO_STR_REGISTER + PPC_F9:				sprintf(info->s, "F9: %12f", ppc->f[9]); break;
-		case CPUINFO_STR_REGISTER + PPC_F10:			sprintf(info->s, "F10:%12f", ppc->f[10]); break;
-		case CPUINFO_STR_REGISTER + PPC_F11:			sprintf(info->s, "F11:%12f", ppc->f[11]); break;
-		case CPUINFO_STR_REGISTER + PPC_F12:			sprintf(info->s, "F12:%12f", ppc->f[12]); break;
-		case CPUINFO_STR_REGISTER + PPC_F13:			sprintf(info->s, "F13:%12f", ppc->f[13]); break;
-		case CPUINFO_STR_REGISTER + PPC_F14:			sprintf(info->s, "F14:%12f", ppc->f[14]); break;
-		case CPUINFO_STR_REGISTER + PPC_F15:			sprintf(info->s, "F15:%12f", ppc->f[15]); break;
-		case CPUINFO_STR_REGISTER + PPC_F16:			sprintf(info->s, "F16:%12f", ppc->f[16]); break;
-		case CPUINFO_STR_REGISTER + PPC_F17:			sprintf(info->s, "F17:%12f", ppc->f[17]); break;
-		case CPUINFO_STR_REGISTER + PPC_F18:			sprintf(info->s, "F18:%12f", ppc->f[18]); break;
-		case CPUINFO_STR_REGISTER + PPC_F19:			sprintf(info->s, "F19:%12f", ppc->f[19]); break;
-		case CPUINFO_STR_REGISTER + PPC_F20:			sprintf(info->s, "F20:%12f", ppc->f[20]); break;
-		case CPUINFO_STR_REGISTER + PPC_F21:			sprintf(info->s, "F21:%12f", ppc->f[21]); break;
-		case CPUINFO_STR_REGISTER + PPC_F22:			sprintf(info->s, "F22:%12f", ppc->f[22]); break;
-		case CPUINFO_STR_REGISTER + PPC_F23:			sprintf(info->s, "F23:%12f", ppc->f[23]); break;
-		case CPUINFO_STR_REGISTER + PPC_F24:			sprintf(info->s, "F24:%12f", ppc->f[24]); break;
-		case CPUINFO_STR_REGISTER + PPC_F25:			sprintf(info->s, "F25:%12f", ppc->f[25]); break;
-		case CPUINFO_STR_REGISTER + PPC_F26:			sprintf(info->s, "F26:%12f", ppc->f[26]); break;
-		case CPUINFO_STR_REGISTER + PPC_F27:			sprintf(info->s, "F27:%12f", ppc->f[27]); break;
-		case CPUINFO_STR_REGISTER + PPC_F28:			sprintf(info->s, "F28:%12f", ppc->f[28]); break;
-		case CPUINFO_STR_REGISTER + PPC_F29:			sprintf(info->s, "F29:%12f", ppc->f[29]); break;
-		case CPUINFO_STR_REGISTER + PPC_F30:			sprintf(info->s, "F30:%12f", ppc->f[30]); break;
-		case CPUINFO_STR_REGISTER + PPC_F31:			sprintf(info->s, "F31:%12f", ppc->f[31]); break;
-		case CPUINFO_STR_REGISTER + PPC_FPSCR:			sprintf(info->s, "FPSCR:%08X", ppc->fpscr); break;
+		case CPUINFO_STR_REGISTER + PPC_F0:             sprintf(info->s, "F0: %12f", ppc->f[0]); break;
+		case CPUINFO_STR_REGISTER + PPC_F1:             sprintf(info->s, "F1: %12f", ppc->f[1]); break;
+		case CPUINFO_STR_REGISTER + PPC_F2:             sprintf(info->s, "F2: %12f", ppc->f[2]); break;
+		case CPUINFO_STR_REGISTER + PPC_F3:             sprintf(info->s, "F3: %12f", ppc->f[3]); break;
+		case CPUINFO_STR_REGISTER + PPC_F4:             sprintf(info->s, "F4: %12f", ppc->f[4]); break;
+		case CPUINFO_STR_REGISTER + PPC_F5:             sprintf(info->s, "F5: %12f", ppc->f[5]); break;
+		case CPUINFO_STR_REGISTER + PPC_F6:             sprintf(info->s, "F6: %12f", ppc->f[6]); break;
+		case CPUINFO_STR_REGISTER + PPC_F7:             sprintf(info->s, "F7: %12f", ppc->f[7]); break;
+		case CPUINFO_STR_REGISTER + PPC_F8:             sprintf(info->s, "F8: %12f", ppc->f[8]); break;
+		case CPUINFO_STR_REGISTER + PPC_F9:             sprintf(info->s, "F9: %12f", ppc->f[9]); break;
+		case CPUINFO_STR_REGISTER + PPC_F10:            sprintf(info->s, "F10:%12f", ppc->f[10]); break;
+		case CPUINFO_STR_REGISTER + PPC_F11:            sprintf(info->s, "F11:%12f", ppc->f[11]); break;
+		case CPUINFO_STR_REGISTER + PPC_F12:            sprintf(info->s, "F12:%12f", ppc->f[12]); break;
+		case CPUINFO_STR_REGISTER + PPC_F13:            sprintf(info->s, "F13:%12f", ppc->f[13]); break;
+		case CPUINFO_STR_REGISTER + PPC_F14:            sprintf(info->s, "F14:%12f", ppc->f[14]); break;
+		case CPUINFO_STR_REGISTER + PPC_F15:            sprintf(info->s, "F15:%12f", ppc->f[15]); break;
+		case CPUINFO_STR_REGISTER + PPC_F16:            sprintf(info->s, "F16:%12f", ppc->f[16]); break;
+		case CPUINFO_STR_REGISTER + PPC_F17:            sprintf(info->s, "F17:%12f", ppc->f[17]); break;
+		case CPUINFO_STR_REGISTER + PPC_F18:            sprintf(info->s, "F18:%12f", ppc->f[18]); break;
+		case CPUINFO_STR_REGISTER + PPC_F19:            sprintf(info->s, "F19:%12f", ppc->f[19]); break;
+		case CPUINFO_STR_REGISTER + PPC_F20:            sprintf(info->s, "F20:%12f", ppc->f[20]); break;
+		case CPUINFO_STR_REGISTER + PPC_F21:            sprintf(info->s, "F21:%12f", ppc->f[21]); break;
+		case CPUINFO_STR_REGISTER + PPC_F22:            sprintf(info->s, "F22:%12f", ppc->f[22]); break;
+		case CPUINFO_STR_REGISTER + PPC_F23:            sprintf(info->s, "F23:%12f", ppc->f[23]); break;
+		case CPUINFO_STR_REGISTER + PPC_F24:            sprintf(info->s, "F24:%12f", ppc->f[24]); break;
+		case CPUINFO_STR_REGISTER + PPC_F25:            sprintf(info->s, "F25:%12f", ppc->f[25]); break;
+		case CPUINFO_STR_REGISTER + PPC_F26:            sprintf(info->s, "F26:%12f", ppc->f[26]); break;
+		case CPUINFO_STR_REGISTER + PPC_F27:            sprintf(info->s, "F27:%12f", ppc->f[27]); break;
+		case CPUINFO_STR_REGISTER + PPC_F28:            sprintf(info->s, "F28:%12f", ppc->f[28]); break;
+		case CPUINFO_STR_REGISTER + PPC_F29:            sprintf(info->s, "F29:%12f", ppc->f[29]); break;
+		case CPUINFO_STR_REGISTER + PPC_F30:            sprintf(info->s, "F30:%12f", ppc->f[30]); break;
+		case CPUINFO_STR_REGISTER + PPC_F31:            sprintf(info->s, "F31:%12f", ppc->f[31]); break;
+		case CPUINFO_STR_REGISTER + PPC_FPSCR:          sprintf(info->s, "FPSCR:%08X", ppc->fpscr); break;
 	}
 }
 
@@ -2045,12 +2045,12 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				}
 				else
 				{
-					time = 0;		// let very short transfers occur instantly
+					time = 0;       // let very short transfers occur instantly
 				}
 
 				ppc->buffered_dma_timer[dmachan]->adjust(attotime::from_usec(time), dmachan);
 			}
-			else		/* buffered DMA with internal peripheral (SPU) */
+			else        /* buffered DMA with internal peripheral (SPU) */
 			{
 				/* nothing to do; this happens asynchronously and is driven by the SPU */
 			}
@@ -2166,7 +2166,7 @@ static TIMER_CALLBACK( ppc4xx_pit_callback )
 	}
 
 	/* update ourself for the next interval if we are enabled and we are either being
-       forced to update, or we are in auto-reload mode */
+	   forced to update, or we are in auto-reload mode */
 	if ((ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_PIE) && ppc->pit_reload != 0 && (!param || (ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_ARE)))
 	{
 		UINT32 timebase = get_timebase(ppc);
@@ -2492,14 +2492,14 @@ void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_0:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_1:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_2:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT2, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_3:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT3, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_0:  ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT0, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_1:  ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT1, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_2:  ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT2, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_3:  ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT3, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:  ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4, info->i);     break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppccom_set_info(ppc, state, info);		break;
+		default:                                        ppccom_set_info(ppc, state, info);      break;
 	}
 }
 
@@ -2514,25 +2514,23 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_0:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT0);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_1:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT1);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_2:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT2);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_3:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT3);		break;
-		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4);		break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 5;                            break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_0:  info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT0);        break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_1:  info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT1);        break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_2:  info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT2);        break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_3:  info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT3);        break;
+		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:  info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4);        break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 31;					break;
-		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = POWERPC_MIN_PAGE_SHIFT;break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 31;                  break;
+		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;                   break;
+		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:    info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							/* provided per-CPU */					break;
+		case CPUINFO_FCT_INIT:                          /* provided per-CPU */                  break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_ppc4xx); break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppccom_get_info(ppc, state, info);		break;
+		default:                                        ppccom_get_info(ppc, state, info);      break;
 	}
 }
-
-

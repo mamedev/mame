@@ -351,51 +351,51 @@
 struct pdp1_state
 {
 	/* processor registers */
-	UINT32 pc;		/* program counter (12, 15 or 16 bits) */
-	int ir;			/* basic operation code of current instruction (5 bits) */
-	int mb;			/* memory buffer (used for holding the current instruction only) (18 bits) */
-	int ma;			/* memory address (12, 15 or 16 bits) */
-	int ac;			/* accumulator (18 bits) */
-	int io;			/* i/o register (18 bits) */
-	int pf;			/* program flag register (6 bits) */
+	UINT32 pc;      /* program counter (12, 15 or 16 bits) */
+	int ir;         /* basic operation code of current instruction (5 bits) */
+	int mb;         /* memory buffer (used for holding the current instruction only) (18 bits) */
+	int ma;         /* memory address (12, 15 or 16 bits) */
+	int ac;         /* accumulator (18 bits) */
+	int io;         /* i/o register (18 bits) */
+	int pf;         /* program flag register (6 bits) */
 
 	/* operator panel switches */
-	int ta;			/* current state of the 12 or 16 address switches */
-	int tw;			/* current state of the 18 test word switches */
-	int ss;			/* current state of the 6 sense switches on the operator panel (6 bits) */
-	unsigned int sngl_step : 1;	/* stop every memory cycle */
-	unsigned int sngl_inst : 1;	/* stop every instruction */
-	unsigned int extend_sw : 1;	/* extend switch (loaded into the extend flip-flop on start/read-in) */
+	int ta;         /* current state of the 12 or 16 address switches */
+	int tw;         /* current state of the 18 test word switches */
+	int ss;         /* current state of the 6 sense switches on the operator panel (6 bits) */
+	unsigned int sngl_step : 1; /* stop every memory cycle */
+	unsigned int sngl_inst : 1; /* stop every instruction */
+	unsigned int extend_sw : 1; /* extend switch (loaded into the extend flip-flop on start/read-in) */
 
 	/* processor state flip-flops */
-	unsigned int run : 1;		/* processor is running */
-	unsigned int cycle : 1;		/* processor is in the midst of an instruction */
-	unsigned int defer : 1;		/* processor is handling deferred (i.e. indirect) addressing */
-	unsigned int brk_ctr : 2;	/* break counter */
-	unsigned int ov;			/* overflow flip-flop */
-	unsigned int rim : 1;		/* processor is in read-in mode */
+	unsigned int run : 1;       /* processor is running */
+	unsigned int cycle : 1;     /* processor is in the midst of an instruction */
+	unsigned int defer : 1;     /* processor is handling deferred (i.e. indirect) addressing */
+	unsigned int brk_ctr : 2;   /* break counter */
+	unsigned int ov;            /* overflow flip-flop */
+	unsigned int rim : 1;       /* processor is in read-in mode */
 
-	unsigned int sbm : 1;		/* processor is in sequence break mode (i.e. interrupts are enabled) */
+	unsigned int sbm : 1;       /* processor is in sequence break mode (i.e. interrupts are enabled) */
 
-	unsigned int exd : 1;		/* extend mode: processor is in extend mode */
-	unsigned int exc : 1;		/* extend-mode cycle: current instruction cycle is done in extend mode */
-	unsigned int ioc : 1;		/* i-o commands: seems to be equivalent to (! ioh) */
-	unsigned int ioh : 1;		/* i-o halt: processor is executing an Input-Output Transfer wait */
-	unsigned int ios : 1;		/* i-o synchronizer: set on i-o operation completion */
+	unsigned int exd : 1;       /* extend mode: processor is in extend mode */
+	unsigned int exc : 1;       /* extend-mode cycle: current instruction cycle is done in extend mode */
+	unsigned int ioc : 1;       /* i-o commands: seems to be equivalent to (! ioh) */
+	unsigned int ioh : 1;       /* i-o halt: processor is executing an Input-Output Transfer wait */
+	unsigned int ios : 1;       /* i-o synchronizer: set on i-o operation completion */
 
 	/* sequence break system */
-	unsigned int irq_state : 16;	/* mirrors the state of the interrupt pins */
-	unsigned int b1 : 16;			/* interrupt enable */
-	unsigned int b2 : 16;			/* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
-	/*unsigned int b3 : 16;*/			/* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
-	unsigned int b4 : 16;			/* interrupt in progress */
+	unsigned int irq_state : 16;    /* mirrors the state of the interrupt pins */
+	unsigned int b1 : 16;           /* interrupt enable */
+	unsigned int b2 : 16;           /* interrupt pulse request pending - asynchronous with computer operation (set by pulses on irq_state, cleared when interrupt is taken) */
+	/*unsigned int b3 : 16;*/           /* interrupt request pending - synchronous with computer operation (logical or of irq_state and b2???) */
+	unsigned int b4 : 16;           /* interrupt in progress */
 
 	/* additional emulator state variables */
-	int rim_step;			/* current step in rim execution */
-	int sbs_request;		/* interrupt request (i.e. (b3 & (~ b4)) && (! sbm)) */
-	int sbs_level;			/* interrupt request level (first bit in (b3 & (~ b4)) */
-	int sbs_restore;		/* set when a jump instruction is an interrupt return */
-	int no_sequence_break;	/* disable sequence break recognition for one cycle */
+	int rim_step;           /* current step in rim execution */
+	int sbs_request;        /* interrupt request (i.e. (b3 & (~ b4)) && (! sbm)) */
+	int sbs_level;          /* interrupt request level (first bit in (b3 & (~ b4)) */
+	int sbs_restore;        /* set when a jump instruction is an interrupt return */
+	int no_sequence_break;  /* disable sequence break recognition for one cycle */
 
 	/* callbacks for iot instructions (required for any I/O) */
 	pdp1_extern_iot_func extern_iot[64];
@@ -407,8 +407,8 @@ struct pdp1_state
 	/* 0: no extend support, 1: extend with 15-bit address, 2: extend with 16-bit address */
 	int extend_support;
 
-	int extended_address_mask;	/* 07777 with no extend support, 077777 or 0177777 with extend support */
-	int address_extension_mask;	/* 00000 with no extend support, 070000 or 0170000 with extend support */
+	int extended_address_mask;  /* 07777 with no extend support, 077777 or 0177777 with extend support */
+	int address_extension_mask; /* 00000 with no extend support, 070000 or 0170000 with extend support */
 
 	/* 1 to use hardware multiply/divide (MUL, DIV) instead of MUS, DIS */
 	int hw_mul_div;
@@ -437,30 +437,30 @@ static void pulse_start_clear(pdp1_state *cpustate);
 
 
 
-#define PC		cpustate->pc
-#define IR		cpustate->ir
-#define MB		cpustate->mb
-#define MA		cpustate->ma
-#define AC		cpustate->ac
-#define IO		cpustate->io
-#define OV		cpustate->ov
-#define EXD		cpustate->exd
+#define PC      cpustate->pc
+#define IR      cpustate->ir
+#define MB      cpustate->mb
+#define MA      cpustate->ma
+#define AC      cpustate->ac
+#define IO      cpustate->io
+#define OV      cpustate->ov
+#define EXD     cpustate->exd
 /* note that we start counting flags/sense switches at 1, therefore n is in [1,6] */
-#define FLAGS	cpustate->pf
-#define READFLAG(n)	((cpustate->pf >> (6-(n))) & 1)
-#define WRITEFLAG(n, data)	(cpustate->pf = (cpustate->pf & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
-#define SENSE_SW	cpustate->ss
-#define READSENSE(n)	((cpustate->ss >> (6-(n))) & 1)
-#define WRITESENSE(n, data)	(cpustate->ss = (cpustate->ss & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
+#define FLAGS   cpustate->pf
+#define READFLAG(n) ((cpustate->pf >> (6-(n))) & 1)
+#define WRITEFLAG(n, data)  (cpustate->pf = (cpustate->pf & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
+#define SENSE_SW    cpustate->ss
+#define READSENSE(n)    ((cpustate->ss >> (6-(n))) & 1)
+#define WRITESENSE(n, data) (cpustate->ss = (cpustate->ss & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
 
-#define EXTENDED_ADDRESS_MASK	cpustate->extended_address_mask
-#define ADDRESS_EXTENSION_MASK	cpustate->address_extension_mask
-#define BASE_ADDRESS_MASK		0007777
+#define EXTENDED_ADDRESS_MASK   cpustate->extended_address_mask
+#define ADDRESS_EXTENSION_MASK  cpustate->address_extension_mask
+#define BASE_ADDRESS_MASK       0007777
 
-#define INCREMENT_PC	(PC = (PC & ADDRESS_EXTENSION_MASK) | ((PC+1) & BASE_ADDRESS_MASK))
-#define DECREMENT_PC	(PC = (PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
-#define INCREMENT_MA	(MA = (MA & ADDRESS_EXTENSION_MASK) | ((MA+1) & BASE_ADDRESS_MASK))
-#define PREVIOUS_PC		((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
+#define INCREMENT_PC    (PC = (PC & ADDRESS_EXTENSION_MASK) | ((PC+1) & BASE_ADDRESS_MASK))
+#define DECREMENT_PC    (PC = (PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
+#define INCREMENT_MA    (MA = (MA & ADDRESS_EXTENSION_MASK) | ((MA+1) & BASE_ADDRESS_MASK))
+#define PREVIOUS_PC     ((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 
 
 
@@ -486,15 +486,15 @@ static void pulse_start_clear(pdp1_state *cpustate);
 static void field_interrupt(pdp1_state *cpustate)
 {
 	/* current_irq: 1 bit for each active pending interrupt request
-    Pending interrupts are in b3 (simulated by (cpustate->irq_state & cpustate->b1) | cpustate->b2)), but they
-    are only honored if no higher priority interrupt routine is in execution (one bit set in b4
-    for each routine in execution).  The revelant mask is created with (cpustate->b4 | (- cpustate->b4)),
-    as the carry chain (remember that -b4 = (~ b4) + 1) does precisely what we want.
-    b4:    0001001001000
-    -b4:   1110110111000
-    b4|-b4:1111111111000
-    Neat, uh?
-     */
+	Pending interrupts are in b3 (simulated by (cpustate->irq_state & cpustate->b1) | cpustate->b2)), but they
+	are only honored if no higher priority interrupt routine is in execution (one bit set in b4
+	for each routine in execution).  The revelant mask is created with (cpustate->b4 | (- cpustate->b4)),
+	as the carry chain (remember that -b4 = (~ b4) + 1) does precisely what we want.
+	b4:    0001001001000
+	-b4:   1110110111000
+	b4|-b4:1111111111000
+	Neat, uh?
+	 */
 	int current_irq = ((cpustate->irq_state & cpustate->b1) | cpustate->b2) & ~ (cpustate->b4 | (- cpustate->b4));
 	int i;
 
@@ -562,15 +562,15 @@ static CPU_INIT( pdp1 )
 	{
 	default:
 		cpustate->extend_support = 0;
-	case 0:		/* no extension */
+	case 0:     /* no extension */
 		cpustate->extended_address_mask = 07777;
 		cpustate->address_extension_mask = 00000;
 		break;
-	case 1:		/* 15-bit extension */
+	case 1:     /* 15-bit extension */
 		cpustate->extended_address_mask = 077777;
 		cpustate->address_extension_mask = 070000;
 		break;
-	case 2:		/* 16-bit extension */
+	case 2:     /* 16-bit extension */
 		cpustate->extended_address_mask = 0177777;
 		cpustate->address_extension_mask = 0170000;
 		break;
@@ -605,13 +605,13 @@ static CPU_RESET( pdp1 )
 static const char instruction_kind[32] =
 {
 /*      and ior xor xct         cal/jda */
-	0,	3,	3,	3,	3,	0,	0,	2,
+	0,  3,  3,  3,  3,  0,  0,  2,
 /*  lac lio dac dap dip dio dzm     */
-	3,	3,	3,	3,	3,	3,	3,	0,
+	3,  3,  3,  3,  3,  3,  3,  0,
 /*  add sub idx isp sad sas mus dis */
-	3,	3,	3,	3,	3,	3,	3,	3,
+	3,  3,  3,  3,  3,  3,  3,  3,
 /*  jmp jsp skp sft law iot     opr */
-	1,	1,	0,	0,	0,	0,	0,	0
+	1,  1,  0,  0,  0,  0,  0,  0
 };
 
 
@@ -626,7 +626,7 @@ static CPU_EXECUTE( pdp1 )
 
 
 		/* ioh should be cleared at the end of the instruction cycle, and ios at the
-        start of next instruction cycle, but who cares? */
+		start of next instruction cycle, but who cares? */
 		if (cpustate->ioh && cpustate->ios)
 		{
 			cpustate->ioh = 0;
@@ -635,7 +635,7 @@ static CPU_EXECUTE( pdp1 )
 
 
 		if ((! cpustate->run) && (! cpustate->rim))
-			cpustate->icount = 0;	/* if processor is stopped, just burn cycles */
+			cpustate->icount = 0;   /* if processor is stopped, just burn cycles */
 		else if (cpustate->rim)
 		{
 			switch (cpustate->rim_step)
@@ -643,33 +643,33 @@ static CPU_EXECUTE( pdp1 )
 			case 0:
 				/* read first word as instruction */
 				if (cpustate->read_binary_word)
-					(*cpustate->read_binary_word)(cpustate->device);		/* data will be transferred to IO register */
+					(*cpustate->read_binary_word)(cpustate->device);        /* data will be transferred to IO register */
 				cpustate->rim_step = 1;
 				break;
 
 			case 1:
 				if (! cpustate->ios)
-				{	/* transfer incomplete: wait some more */
+				{   /* transfer incomplete: wait some more */
 					cpustate->icount = 0;
 				}
 				else
-				{	/* data transfer complete */
+				{   /* data transfer complete */
 					cpustate->ios = 0;
 
 					MB = IO;
-					IR = MB >> 13;		/* basic opcode */
-					if (IR == JMP)		/* jmp instruction ? */
+					IR = MB >> 13;      /* basic opcode */
+					if (IR == JMP)      /* jmp instruction ? */
 					{
 						PC = (MA & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
-						cpustate->rim = 0;	/* exit read-in mode */
+						cpustate->rim = 0;  /* exit read-in mode */
 						cpustate->run = 1;
 						cpustate->rim_step = 0;
 					}
-					else if ((IR == DIO) || (IR == DAC))	/* dio or dac instruction ? */
-					{	/* there is a discrepancy: the pdp1 handbook tells that only dio should be used,
+					else if ((IR == DIO) || (IR == DAC))    /* dio or dac instruction ? */
+					{   /* there is a discrepancy: the pdp1 handbook tells that only dio should be used,
                         but the lisp tape uses the dac instruction instead */
 						/* Yet maintainance manual p. 6-25 states clearly that the data is located
-                        in IO and transfered to MB, so DAC is likely to be a mistake. */
+						in IO and transfered to MB, so DAC is likely to be a mistake. */
 						cpustate->rim_step = 2;
 					}
 					else
@@ -678,7 +678,7 @@ static CPU_EXECUTE( pdp1 )
 						if (LOG)
 							logerror("It seems this tape should not be operated in read-in mode\n");
 
-						cpustate->rim = 0;		/* exit read-in mode (right???) */
+						cpustate->rim = 0;      /* exit read-in mode (right???) */
 						cpustate->rim_step = 0;
 					}
 				}
@@ -687,17 +687,17 @@ static CPU_EXECUTE( pdp1 )
 			case 2:
 				/* read second word as data */
 				if (cpustate->read_binary_word)
-					(*cpustate->read_binary_word)(cpustate->device);		/* data will be transferred to IO register */
+					(*cpustate->read_binary_word)(cpustate->device);        /* data will be transferred to IO register */
 				cpustate->rim_step = 3;
 				break;
 
 			case 3:
 				if (! cpustate->ios)
-				{	/* transfer incomplete: wait some more */
+				{   /* transfer incomplete: wait some more */
 					cpustate->icount = 0;
 				}
 				else
-				{	/* data transfer complete */
+				{   /* data transfer complete */
 					cpustate->ios = 0;
 
 					MA = (PC & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
@@ -714,43 +714,43 @@ static CPU_EXECUTE( pdp1 )
 		{
 			/* yes, interrupt can occur in the midst of an instruction (impressing, huh?) */
 			/* Note that break cannot occur during a one-cycle jump that is deferred only once,
-            or another break cycle.  Also, it cannot interrupt the long cycle 1 of automatic
-            multiply/divide.  (maintainance manual 6-19) */
+			or another break cycle.  Also, it cannot interrupt the long cycle 1 of automatic
+			multiply/divide.  (maintainance manual 6-19) */
 			if (cpustate->sbs_request && (! cpustate->no_sequence_break) && (! cpustate->brk_ctr))
-			{	/* begin sequence break */
+			{   /* begin sequence break */
 				cpustate->brk_ctr = 1;
 			}
 			if (cpustate->brk_ctr)
-			{	/* sequence break in progress */
+			{   /* sequence break in progress */
 				switch (cpustate->brk_ctr)
 				{
 				case 1:
 					if (cpustate->cycle)
-						DECREMENT_PC;	/* set PC to point to aborted instruction, so that it can be re-run */
+						DECREMENT_PC;   /* set PC to point to aborted instruction, so that it can be re-run */
 
-					cpustate->b4 |= (1 << cpustate->sbs_level);	/* set "interrupt in progress" flag */
-					cpustate->b2 &= ~(1 << cpustate->sbs_level);	/* clear interrupt request */
+					cpustate->b4 |= (1 << cpustate->sbs_level); /* set "interrupt in progress" flag */
+					cpustate->b2 &= ~(1 << cpustate->sbs_level);    /* clear interrupt request */
 					field_interrupt(cpustate);
-					MA = cpustate->sbs_level << 2;	/* always 0 with standard sequence break system */
-					MB = AC;			/* save AC to MB */
-					AC = (OV << 17) | (EXD << 16) | PC;	/* save OV/EXD/PC to AC */
-					EXD = OV = 0;		/* according to maintainance manual p. 8-17 and ?-?? */
-					cpustate->cycle = cpustate->defer = cpustate->exc = 0;	/* mere guess */
-					WRITE_PDP_18BIT(MA, MB);	/* save former AC to memory */
+					MA = cpustate->sbs_level << 2;  /* always 0 with standard sequence break system */
+					MB = AC;            /* save AC to MB */
+					AC = (OV << 17) | (EXD << 16) | PC; /* save OV/EXD/PC to AC */
+					EXD = OV = 0;       /* according to maintainance manual p. 8-17 and ?-?? */
+					cpustate->cycle = cpustate->defer = cpustate->exc = 0;  /* mere guess */
+					WRITE_PDP_18BIT(MA, MB);    /* save former AC to memory */
 					INCREMENT_MA;
 					cpustate->icount -= 5;
 					cpustate->brk_ctr++;
 					break;
 
 				case 2:
-					WRITE_PDP_18BIT(MA, MB = AC);	/* save former OV/EXD/PC to memory */
+					WRITE_PDP_18BIT(MA, MB = AC);   /* save former OV/EXD/PC to memory */
 					INCREMENT_MA;
 					cpustate->icount -= 5;
 					cpustate->brk_ctr++;
 					break;
 
 				case 3:
-					WRITE_PDP_18BIT(MA, MB = IO);	/* save IO to memory */
+					WRITE_PDP_18BIT(MA, MB = IO);   /* save IO to memory */
 					INCREMENT_MA;
 					PC = MA;
 					cpustate->icount -= 5;
@@ -764,15 +764,15 @@ static CPU_EXECUTE( pdp1 )
 					cpustate->no_sequence_break = 0;
 
 				if (! cpustate->cycle)
-				{	/* no instruction in progress: time to fetch a new instruction, I guess */
+				{   /* no instruction in progress: time to fetch a new instruction, I guess */
 					MB = READ_PDP_18BIT(MA = PC);
 					INCREMENT_PC;
-					IR = MB >> 13;		/* basic opcode */
+					IR = MB >> 13;      /* basic opcode */
 
 					if ((instruction_kind[IR] & 1) && (MB & 010000))
 					{
 						cpustate->defer = 1;
-						cpustate->cycle = 1;			/* instruction shall be executed later */
+						cpustate->cycle = 1;            /* instruction shall be executed later */
 
 						/* detect deferred one-cycle jumps */
 						if ((IR == JMP) || (IR == JSP))
@@ -788,21 +788,21 @@ static CPU_EXECUTE( pdp1 )
 									cpustate->b4 &= ~(1 << level);
 									field_interrupt(cpustate);
 									if (cpustate->extend_support)
-										EXD = 1;	/* according to maintainance manual p. 6-33 */
+										EXD = 1;    /* according to maintainance manual p. 6-33 */
 									cpustate->sbs_restore = 1;
 								}
 							}
 						}
 					}
 					else if (instruction_kind[IR] & 2)
-						cpustate->cycle = 1;			/* instruction shall be executed later */
+						cpustate->cycle = 1;            /* instruction shall be executed later */
 					else
-						execute_instruction(cpustate);	/* execute instruction at once */
+						execute_instruction(cpustate);  /* execute instruction at once */
 
 					cpustate->icount -= 5;
 				}
 				else if (cpustate->defer)
-				{	/* defer cycle : handle indirect addressing */
+				{   /* defer cycle : handle indirect addressing */
 					MA = (PC & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 
 					MB = READ_PDP_18BIT(MA);
@@ -819,12 +819,12 @@ static CPU_EXECUTE( pdp1 )
 					/* execute JMP and JSP immediately if applicable */
 					if ((! cpustate->defer) && (! (instruction_kind[IR] & 2)))
 					{
-						execute_instruction(cpustate);	/* execute instruction at once */
+						execute_instruction(cpustate);  /* execute instruction at once */
 						/*cpustate->cycle = 0;*/
 						cpustate->exc = 0;
 
 						if (cpustate->sbs_restore)
-						{	/* interrupt return: according to maintainance manual p. 6-33 */
+						{   /* interrupt return: according to maintainance manual p. 6-33 */
 							if (cpustate->extend_support)
 								EXD = (MB >> 16) & 1;
 							OV = (MB >> 17) & 1;
@@ -835,7 +835,7 @@ static CPU_EXECUTE( pdp1 )
 					cpustate->icount -= 5;
 				}
 				else
-				{	/* memory reference instruction in cycle 1 */
+				{   /* memory reference instruction in cycle 1 */
 					if (cpustate->exc)
 					{
 						MA = MB & EXTENDED_ADDRESS_MASK;
@@ -844,7 +844,7 @@ static CPU_EXECUTE( pdp1 )
 					else
 						MA = (PC & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 
-					execute_instruction(cpustate);	/* execute instruction */
+					execute_instruction(cpustate);  /* execute instruction */
 
 					cpustate->icount -= 5;
 				}
@@ -882,48 +882,48 @@ static CPU_SET_INFO( pdp1 )
 	case CPUINFO_INT_INPUT_STATE + 12:
 	case CPUINFO_INT_INPUT_STATE + 13:
 	case CPUINFO_INT_INPUT_STATE + 14:
-	case CPUINFO_INT_INPUT_STATE + 15:			pdp1_set_irq_line(cpustate, state-CPUINFO_INT_INPUT_STATE, info->i); break;
+	case CPUINFO_INT_INPUT_STATE + 15:          pdp1_set_irq_line(cpustate, state-CPUINFO_INT_INPUT_STATE, info->i); break;
 
-	case CPUINFO_INT_SP:						(void) info->i;	/* no SP */					break;
+	case CPUINFO_INT_SP:                        (void) info->i; /* no SP */                 break;
 	case CPUINFO_INT_PC:
-	case CPUINFO_INT_REGISTER + PDP1_PC:		PC = info->i & EXTENDED_ADDRESS_MASK;		break;
-	case CPUINFO_INT_REGISTER + PDP1_IR:		IR = info->i & 037; /* weird idea */		break;
-	case CPUINFO_INT_REGISTER + PDP1_MB:		MB = info->i & 0777777;						break;
-	case CPUINFO_INT_REGISTER + PDP1_MA:		MA = info->i & EXTENDED_ADDRESS_MASK;		break;
-	case CPUINFO_INT_REGISTER + PDP1_AC:		AC = info->i & 0777777;						break;
-	case CPUINFO_INT_REGISTER + PDP1_IO:		IO = info->i & 0777777;						break;
-	case CPUINFO_INT_REGISTER + PDP1_OV:		OV = info->i ? 1 : 0;						break;
-	case CPUINFO_INT_REGISTER + PDP1_PF:		FLAGS = info->i & 077;						break;
-	case CPUINFO_INT_REGISTER + PDP1_PF1:		WRITEFLAG(1, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_PF2:		WRITEFLAG(2, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_PF3:		WRITEFLAG(3, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_PF4:		WRITEFLAG(4, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_PF5:		WRITEFLAG(5, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_PF6:		WRITEFLAG(6, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_TA:		cpustate->ta = info->i & 0177777 /*07777 with simpler control panel*/; break;
-	case CPUINFO_INT_REGISTER + PDP1_TW:		cpustate->tw = info->i & 0777777;				break;
-	case CPUINFO_INT_REGISTER + PDP1_SS:		SENSE_SW = info->i & 077;					break;
-	case CPUINFO_INT_REGISTER + PDP1_SS1:		WRITESENSE(1, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_SS2:		WRITESENSE(2, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_SS3:		WRITESENSE(3, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_SS4:		WRITESENSE(4, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_SS5:		WRITESENSE(5, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_SS6:		WRITESENSE(6, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP:	cpustate->sngl_step = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:	cpustate->sngl_inst = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:	cpustate->extend_sw = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + PDP1_RUN:		cpustate->run = info->i ? 1 : 0;					break;
-	case CPUINFO_INT_REGISTER + PDP1_CYC:		if (LOG) logerror("pdp1_set_reg to cycle flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_DEFER:		if (LOG) logerror("pdp1_set_reg to defer flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:	if (LOG) logerror("pdp1_set_reg to break counter ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_RIM:		cpustate->rim = info->i ? 1 : 0;					break;
-	case CPUINFO_INT_REGISTER + PDP1_SBM:		cpustate->sbm = info->i ? 1 : 0;					break;
-	case CPUINFO_INT_REGISTER + PDP1_EXD:		EXD = (cpustate->extend_support && info->i) ? 1 : 0; break;
-	case CPUINFO_INT_REGISTER + PDP1_IOC:		if (LOG) logerror("pdp1_set_reg to ioc flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_IOH:		if (LOG) logerror("pdp1_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_IOS:		if (LOG) logerror("pdp1_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_START_CLEAR:	pulse_start_clear(cpustate);					break;
-	case CPUINFO_INT_REGISTER + PDP1_IO_COMPLETE:	cpustate->ios = 1;							break;
+	case CPUINFO_INT_REGISTER + PDP1_PC:        PC = info->i & EXTENDED_ADDRESS_MASK;       break;
+	case CPUINFO_INT_REGISTER + PDP1_IR:        IR = info->i & 037; /* weird idea */        break;
+	case CPUINFO_INT_REGISTER + PDP1_MB:        MB = info->i & 0777777;                     break;
+	case CPUINFO_INT_REGISTER + PDP1_MA:        MA = info->i & EXTENDED_ADDRESS_MASK;       break;
+	case CPUINFO_INT_REGISTER + PDP1_AC:        AC = info->i & 0777777;                     break;
+	case CPUINFO_INT_REGISTER + PDP1_IO:        IO = info->i & 0777777;                     break;
+	case CPUINFO_INT_REGISTER + PDP1_OV:        OV = info->i ? 1 : 0;                       break;
+	case CPUINFO_INT_REGISTER + PDP1_PF:        FLAGS = info->i & 077;                      break;
+	case CPUINFO_INT_REGISTER + PDP1_PF1:       WRITEFLAG(1, info->i ? 1 : 0);              break;
+	case CPUINFO_INT_REGISTER + PDP1_PF2:       WRITEFLAG(2, info->i ? 1 : 0);              break;
+	case CPUINFO_INT_REGISTER + PDP1_PF3:       WRITEFLAG(3, info->i ? 1 : 0);              break;
+	case CPUINFO_INT_REGISTER + PDP1_PF4:       WRITEFLAG(4, info->i ? 1 : 0);              break;
+	case CPUINFO_INT_REGISTER + PDP1_PF5:       WRITEFLAG(5, info->i ? 1 : 0);              break;
+	case CPUINFO_INT_REGISTER + PDP1_PF6:       WRITEFLAG(6, info->i ? 1 : 0);              break;
+	case CPUINFO_INT_REGISTER + PDP1_TA:        cpustate->ta = info->i & 0177777 /*07777 with simpler control panel*/; break;
+	case CPUINFO_INT_REGISTER + PDP1_TW:        cpustate->tw = info->i & 0777777;               break;
+	case CPUINFO_INT_REGISTER + PDP1_SS:        SENSE_SW = info->i & 077;                   break;
+	case CPUINFO_INT_REGISTER + PDP1_SS1:       WRITESENSE(1, info->i ? 1 : 0);             break;
+	case CPUINFO_INT_REGISTER + PDP1_SS2:       WRITESENSE(2, info->i ? 1 : 0);             break;
+	case CPUINFO_INT_REGISTER + PDP1_SS3:       WRITESENSE(3, info->i ? 1 : 0);             break;
+	case CPUINFO_INT_REGISTER + PDP1_SS4:       WRITESENSE(4, info->i ? 1 : 0);             break;
+	case CPUINFO_INT_REGISTER + PDP1_SS5:       WRITESENSE(5, info->i ? 1 : 0);             break;
+	case CPUINFO_INT_REGISTER + PDP1_SS6:       WRITESENSE(6, info->i ? 1 : 0);             break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP: cpustate->sngl_step = info->i ? 1 : 0;          break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST: cpustate->sngl_inst = info->i ? 1 : 0;          break;
+	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW: cpustate->extend_sw = info->i ? 1 : 0;          break;
+	case CPUINFO_INT_REGISTER + PDP1_RUN:       cpustate->run = info->i ? 1 : 0;                    break;
+	case CPUINFO_INT_REGISTER + PDP1_CYC:       if (LOG) logerror("pdp1_set_reg to cycle flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_DEFER:     if (LOG) logerror("pdp1_set_reg to defer flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:   if (LOG) logerror("pdp1_set_reg to break counter ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_RIM:       cpustate->rim = info->i ? 1 : 0;                    break;
+	case CPUINFO_INT_REGISTER + PDP1_SBM:       cpustate->sbm = info->i ? 1 : 0;                    break;
+	case CPUINFO_INT_REGISTER + PDP1_EXD:       EXD = (cpustate->extend_support && info->i) ? 1 : 0; break;
+	case CPUINFO_INT_REGISTER + PDP1_IOC:       if (LOG) logerror("pdp1_set_reg to ioc flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_IOH:       if (LOG) logerror("pdp1_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_IOS:       if (LOG) logerror("pdp1_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_START_CLEAR:   pulse_start_clear(cpustate);                    break;
+	case CPUINFO_INT_REGISTER + PDP1_IO_COMPLETE:   cpustate->ios = 1;                          break;
 	}
 }
 
@@ -935,30 +935,30 @@ CPU_GET_INFO( pdp1 )
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(pdp1_state);					break;
-	case CPUINFO_INT_INPUT_LINES:						info->i = 16;							break;
-	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/	break;
-	case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-	case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
-	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-	case CPUINFO_INT_MIN_CYCLES:					info->i = 5;	/* 5us cycle time */	break;
-	case CPUINFO_INT_MAX_CYCLES:					info->i = 31;	/* we emulate individual 5us cycle, but MUL/DIV have longer timings */	break;
+	case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(pdp1_state);                   break;
+	case CPUINFO_INT_INPUT_LINES:                       info->i = 16;                           break;
+	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+	case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;   /*don't care*/  break;
+	case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+	case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
+	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+	case CPUINFO_INT_MIN_CYCLES:                    info->i = 5;    /* 5us cycle time */    break;
+	case CPUINFO_INT_MAX_CYCLES:                    info->i = 31;   /* we emulate individual 5us cycle, but MUL/DIV have longer timings */  break;
 
-	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 18;	/*16+2 ignored bits to make double word address*/	break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 18;  /*16+2 ignored bits to make double word address*/   break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
-	case CPUINFO_INT_PC:							info->i = PC;							break;
-	case CPUINFO_INT_PREVIOUSPC:					info->i = PC;	/* TODO??? */			break;
+	case CPUINFO_INT_SP:                            info->i = 0;    /* no SP */             break;
+	case CPUINFO_INT_PC:                            info->i = PC;                           break;
+	case CPUINFO_INT_PREVIOUSPC:                    info->i = PC;   /* TODO??? */           break;
 
 	case CPUINFO_INT_INPUT_STATE + 0:
 	case CPUINFO_INT_INPUT_STATE + 1:
@@ -975,121 +975,121 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_INT_INPUT_STATE + 12:
 	case CPUINFO_INT_INPUT_STATE + 13:
 	case CPUINFO_INT_INPUT_STATE + 14:
-	case CPUINFO_INT_INPUT_STATE + 15:				info->i = (cpustate->irq_state >> (state-CPUINFO_INT_INPUT_STATE)) & 1;	break;
+	case CPUINFO_INT_INPUT_STATE + 15:              info->i = (cpustate->irq_state >> (state-CPUINFO_INT_INPUT_STATE)) & 1; break;
 
-	case CPUINFO_INT_REGISTER + PDP1_PC:			info->i = PC;							break;
-	case CPUINFO_INT_REGISTER + PDP1_IR:			info->i = IR;							break;
-	case CPUINFO_INT_REGISTER + PDP1_MB:			info->i = MB;							break;
-	case CPUINFO_INT_REGISTER + PDP1_MA:			info->i = MA;							break;
-	case CPUINFO_INT_REGISTER + PDP1_AC:			info->i = AC;							break;
-	case CPUINFO_INT_REGISTER + PDP1_IO:			info->i = IO;							break;
-	case CPUINFO_INT_REGISTER + PDP1_OV:			info->i = OV;							break;
-	case CPUINFO_INT_REGISTER + PDP1_PF:			info->i = FLAGS;						break;
-	case CPUINFO_INT_REGISTER + PDP1_PF1:			info->i = READFLAG(1);					break;
-	case CPUINFO_INT_REGISTER + PDP1_PF2:			info->i = READFLAG(2);					break;
-	case CPUINFO_INT_REGISTER + PDP1_PF3:			info->i = READFLAG(3);					break;
-	case CPUINFO_INT_REGISTER + PDP1_PF4:			info->i = READFLAG(4);					break;
-	case CPUINFO_INT_REGISTER + PDP1_PF5:			info->i = READFLAG(5);					break;
-	case CPUINFO_INT_REGISTER + PDP1_PF6:			info->i = READFLAG(6);					break;
-	case CPUINFO_INT_REGISTER + PDP1_TA:			info->i = cpustate->ta;						break;
-	case CPUINFO_INT_REGISTER + PDP1_TW:			info->i = cpustate->tw;						break;
-	case CPUINFO_INT_REGISTER + PDP1_SS:			info->i = SENSE_SW;						break;
-	case CPUINFO_INT_REGISTER + PDP1_SS1:			info->i = READSENSE(1);					break;
-	case CPUINFO_INT_REGISTER + PDP1_SS2:			info->i = READSENSE(2);					break;
-	case CPUINFO_INT_REGISTER + PDP1_SS3:			info->i = READSENSE(3);					break;
-	case CPUINFO_INT_REGISTER + PDP1_SS4:			info->i = READSENSE(4);					break;
-	case CPUINFO_INT_REGISTER + PDP1_SS5:			info->i = READSENSE(5);					break;
-	case CPUINFO_INT_REGISTER + PDP1_SS6:			info->i = READSENSE(6);					break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP:		info->i = cpustate->sngl_step;				break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:		info->i = cpustate->sngl_inst;				break;
-	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:		info->i = cpustate->extend_sw;				break;
-	case CPUINFO_INT_REGISTER + PDP1_RUN:			info->i = cpustate->run;						break;
-	case CPUINFO_INT_REGISTER + PDP1_CYC:			info->i = cpustate->cycle;					break;
-	case CPUINFO_INT_REGISTER + PDP1_DEFER:			info->i = cpustate->defer;					break;
-	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:		info->i = cpustate->brk_ctr;					break;
-	case CPUINFO_INT_REGISTER + PDP1_RIM:			info->i = cpustate->rim;						break;
-	case CPUINFO_INT_REGISTER + PDP1_SBM:			info->i = cpustate->sbm;						break;
-	case CPUINFO_INT_REGISTER + PDP1_EXD:			info->i = EXD;							break;
-	case CPUINFO_INT_REGISTER + PDP1_IOC:			info->i = cpustate->ioc;						break;
-	case CPUINFO_INT_REGISTER + PDP1_IOH:			info->i = cpustate->ioh;						break;
-	case CPUINFO_INT_REGISTER + PDP1_IOS:			info->i = cpustate->ios;						break;
+	case CPUINFO_INT_REGISTER + PDP1_PC:            info->i = PC;                           break;
+	case CPUINFO_INT_REGISTER + PDP1_IR:            info->i = IR;                           break;
+	case CPUINFO_INT_REGISTER + PDP1_MB:            info->i = MB;                           break;
+	case CPUINFO_INT_REGISTER + PDP1_MA:            info->i = MA;                           break;
+	case CPUINFO_INT_REGISTER + PDP1_AC:            info->i = AC;                           break;
+	case CPUINFO_INT_REGISTER + PDP1_IO:            info->i = IO;                           break;
+	case CPUINFO_INT_REGISTER + PDP1_OV:            info->i = OV;                           break;
+	case CPUINFO_INT_REGISTER + PDP1_PF:            info->i = FLAGS;                        break;
+	case CPUINFO_INT_REGISTER + PDP1_PF1:           info->i = READFLAG(1);                  break;
+	case CPUINFO_INT_REGISTER + PDP1_PF2:           info->i = READFLAG(2);                  break;
+	case CPUINFO_INT_REGISTER + PDP1_PF3:           info->i = READFLAG(3);                  break;
+	case CPUINFO_INT_REGISTER + PDP1_PF4:           info->i = READFLAG(4);                  break;
+	case CPUINFO_INT_REGISTER + PDP1_PF5:           info->i = READFLAG(5);                  break;
+	case CPUINFO_INT_REGISTER + PDP1_PF6:           info->i = READFLAG(6);                  break;
+	case CPUINFO_INT_REGISTER + PDP1_TA:            info->i = cpustate->ta;                     break;
+	case CPUINFO_INT_REGISTER + PDP1_TW:            info->i = cpustate->tw;                     break;
+	case CPUINFO_INT_REGISTER + PDP1_SS:            info->i = SENSE_SW;                     break;
+	case CPUINFO_INT_REGISTER + PDP1_SS1:           info->i = READSENSE(1);                 break;
+	case CPUINFO_INT_REGISTER + PDP1_SS2:           info->i = READSENSE(2);                 break;
+	case CPUINFO_INT_REGISTER + PDP1_SS3:           info->i = READSENSE(3);                 break;
+	case CPUINFO_INT_REGISTER + PDP1_SS4:           info->i = READSENSE(4);                 break;
+	case CPUINFO_INT_REGISTER + PDP1_SS5:           info->i = READSENSE(5);                 break;
+	case CPUINFO_INT_REGISTER + PDP1_SS6:           info->i = READSENSE(6);                 break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP:     info->i = cpustate->sngl_step;              break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:     info->i = cpustate->sngl_inst;              break;
+	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:     info->i = cpustate->extend_sw;              break;
+	case CPUINFO_INT_REGISTER + PDP1_RUN:           info->i = cpustate->run;                        break;
+	case CPUINFO_INT_REGISTER + PDP1_CYC:           info->i = cpustate->cycle;                  break;
+	case CPUINFO_INT_REGISTER + PDP1_DEFER:         info->i = cpustate->defer;                  break;
+	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:       info->i = cpustate->brk_ctr;                    break;
+	case CPUINFO_INT_REGISTER + PDP1_RIM:           info->i = cpustate->rim;                        break;
+	case CPUINFO_INT_REGISTER + PDP1_SBM:           info->i = cpustate->sbm;                        break;
+	case CPUINFO_INT_REGISTER + PDP1_EXD:           info->i = EXD;                          break;
+	case CPUINFO_INT_REGISTER + PDP1_IOC:           info->i = cpustate->ioc;                        break;
+	case CPUINFO_INT_REGISTER + PDP1_IOH:           info->i = cpustate->ioh;                        break;
+	case CPUINFO_INT_REGISTER + PDP1_IOS:           info->i = cpustate->ios;                        break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pdp1);			break;
-	case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(pdp1);					break;
-	case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pdp1);				break;
-	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pdp1);			break;
-	case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+	case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(pdp1);            break;
+	case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(pdp1);                   break;
+	case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(pdp1);             break;
+	case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(pdp1);         break;
+	case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
 
-	case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(pdp1);			break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+	case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(pdp1);         break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME:							strcpy(info->s, "PDP1");	break;
-	case CPUINFO_STR_FAMILY:					strcpy(info->s, "DEC PDP-1");	break;
-	case CPUINFO_STR_VERSION:					strcpy(info->s, "2.0");	break;
-	case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);	break;
-	case CPUINFO_STR_CREDITS:					strcpy(info->s,
+	case CPUINFO_STR_NAME:                          strcpy(info->s, "PDP1");    break;
+	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "DEC PDP-1");   break;
+	case CPUINFO_STR_VERSION:                   strcpy(info->s, "2.0"); break;
+	case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);  break;
+	case CPUINFO_STR_CREDITS:                   strcpy(info->s,
 															"Brian Silverman (original Java Source)\n"
 															"Vadim Gerasimov (original Java Source)\n"
 															"Chris Salomon (MESS driver)\n"
 															"Raphael Nabet (MESS driver)\n");
 													break;
 
-    case CPUINFO_STR_FLAGS:
+	case CPUINFO_STR_FLAGS:
 		sprintf(info->s, "%c%c%c%c%c%c-%c%c%c%c%c%c",
-				 (FLAGS & 040) ? '1' : '.',
-				 (FLAGS & 020) ? '2' : '.',
-				 (FLAGS & 010) ? '3' : '.',
-				 (FLAGS & 004) ? '4' : '.',
-				 (FLAGS & 002) ? '5' : '.',
-				 (FLAGS & 001) ? '6' : '.',
-				 (SENSE_SW & 040) ? '1' : '.',
-				 (SENSE_SW & 020) ? '2' : '.',
-				 (SENSE_SW & 010) ? '3' : '.',
-				 (SENSE_SW & 004) ? '4' : '.',
-				 (SENSE_SW & 002) ? '5' : '.',
-				 (SENSE_SW & 001) ? '6' : '.');
+					(FLAGS & 040) ? '1' : '.',
+					(FLAGS & 020) ? '2' : '.',
+					(FLAGS & 010) ? '3' : '.',
+					(FLAGS & 004) ? '4' : '.',
+					(FLAGS & 002) ? '5' : '.',
+					(FLAGS & 001) ? '6' : '.',
+					(SENSE_SW & 040) ? '1' : '.',
+					(SENSE_SW & 020) ? '2' : '.',
+					(SENSE_SW & 010) ? '3' : '.',
+					(SENSE_SW & 004) ? '4' : '.',
+					(SENSE_SW & 002) ? '5' : '.',
+					(SENSE_SW & 001) ? '6' : '.');
 		break;
 
 
-	case CPUINFO_STR_REGISTER + PDP1_PC:			sprintf(info->s, "PC:0%06o(%04X)", PC, PC); break;
-	case CPUINFO_STR_REGISTER + PDP1_IR:			sprintf(info->s, "IR:0%02o", IR); break;
-	case CPUINFO_STR_REGISTER + PDP1_MB:			sprintf(info->s, "MB:0%06o", MB); break;
-	case CPUINFO_STR_REGISTER + PDP1_MA:			sprintf(info->s, "MA:0%06o", MA); break;
-	case CPUINFO_STR_REGISTER + PDP1_AC:			sprintf(info->s, "AC:0%06o", AC); break;
-	case CPUINFO_STR_REGISTER + PDP1_IO:			sprintf(info->s, "IO:0%06o", IO); break;
-	case CPUINFO_STR_REGISTER + PDP1_OV:			sprintf(info->s, "OV:%X", OV); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF:			sprintf(info->s, "FLAGS:0%02o", FLAGS); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF1:			sprintf(info->s, "FLAG1:%X", READFLAG(1)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF2:			sprintf(info->s, "FLAG2:%X", READFLAG(2)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF3:			sprintf(info->s, "FLAG3:%X", READFLAG(3)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF4:			sprintf(info->s, "FLAG4:%X", READFLAG(4)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF5:			sprintf(info->s, "FLAG5:%X", READFLAG(5)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF6:			sprintf(info->s, "FLAG6:%X", READFLAG(6)); break;
-	case CPUINFO_STR_REGISTER + PDP1_TA:			sprintf(info->s, "TA:0%06o", cpustate->ta); break;
-	case CPUINFO_STR_REGISTER + PDP1_TW:			sprintf(info->s, "TW:0%06o", cpustate->tw); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS:			sprintf(info->s, "SS:0%02o", SENSE_SW); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS1:			sprintf(info->s, "SENSE1:%X", READSENSE(1)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS2:			sprintf(info->s, "SENSE2:%X", READSENSE(2)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS3:			sprintf(info->s, "SENSE3:%X", READSENSE(3)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS4:			sprintf(info->s, "SENSE4:%X", READSENSE(4)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS5:			sprintf(info->s, "SENSE5:%X", READSENSE(5)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS6:			sprintf(info->s, "SENSE6:%X", READSENSE(6)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SNGL_STEP:		sprintf(info->s, "SNGLSTEP:%X", cpustate->sngl_step); break;
-	case CPUINFO_STR_REGISTER + PDP1_SNGL_INST:		sprintf(info->s, "SNGLINST:%X", cpustate->sngl_inst); break;
-	case CPUINFO_STR_REGISTER + PDP1_EXTEND_SW:		sprintf(info->s, "EXS:%X", cpustate->extend_sw); break;
-	case CPUINFO_STR_REGISTER + PDP1_RUN:			sprintf(info->s, "RUN:%X", cpustate->run); break;
-	case CPUINFO_STR_REGISTER + PDP1_CYC:			sprintf(info->s, "CYC:%X", cpustate->cycle); break;
-	case CPUINFO_STR_REGISTER + PDP1_DEFER:			sprintf(info->s, "DF:%X", cpustate->defer); break;
-	case CPUINFO_STR_REGISTER + PDP1_BRK_CTR:		sprintf(info->s, "BRKCTR:%X", cpustate->brk_ctr); break;
-	case CPUINFO_STR_REGISTER + PDP1_RIM:			sprintf(info->s, "RIM:%X", cpustate->rim); break;
-	case CPUINFO_STR_REGISTER + PDP1_SBM:			sprintf(info->s, "SBM:%X", cpustate->sbm); break;
-	case CPUINFO_STR_REGISTER + PDP1_EXD:			sprintf(info->s, "EXD:%X", EXD); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOC:			sprintf(info->s, "IOC:%X", cpustate->ioc); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOH:			sprintf(info->s, "IOH:%X", cpustate->ioh); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOS:			sprintf(info->s, "IOS:%X", cpustate->ios); break;
-	case CPUINFO_IS_OCTAL:							info->i = true;							break;
+	case CPUINFO_STR_REGISTER + PDP1_PC:            sprintf(info->s, "PC:0%06o(%04X)", PC, PC); break;
+	case CPUINFO_STR_REGISTER + PDP1_IR:            sprintf(info->s, "IR:0%02o", IR); break;
+	case CPUINFO_STR_REGISTER + PDP1_MB:            sprintf(info->s, "MB:0%06o", MB); break;
+	case CPUINFO_STR_REGISTER + PDP1_MA:            sprintf(info->s, "MA:0%06o", MA); break;
+	case CPUINFO_STR_REGISTER + PDP1_AC:            sprintf(info->s, "AC:0%06o", AC); break;
+	case CPUINFO_STR_REGISTER + PDP1_IO:            sprintf(info->s, "IO:0%06o", IO); break;
+	case CPUINFO_STR_REGISTER + PDP1_OV:            sprintf(info->s, "OV:%X", OV); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF:            sprintf(info->s, "FLAGS:0%02o", FLAGS); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF1:           sprintf(info->s, "FLAG1:%X", READFLAG(1)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF2:           sprintf(info->s, "FLAG2:%X", READFLAG(2)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF3:           sprintf(info->s, "FLAG3:%X", READFLAG(3)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF4:           sprintf(info->s, "FLAG4:%X", READFLAG(4)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF5:           sprintf(info->s, "FLAG5:%X", READFLAG(5)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF6:           sprintf(info->s, "FLAG6:%X", READFLAG(6)); break;
+	case CPUINFO_STR_REGISTER + PDP1_TA:            sprintf(info->s, "TA:0%06o", cpustate->ta); break;
+	case CPUINFO_STR_REGISTER + PDP1_TW:            sprintf(info->s, "TW:0%06o", cpustate->tw); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS:            sprintf(info->s, "SS:0%02o", SENSE_SW); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS1:           sprintf(info->s, "SENSE1:%X", READSENSE(1)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS2:           sprintf(info->s, "SENSE2:%X", READSENSE(2)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS3:           sprintf(info->s, "SENSE3:%X", READSENSE(3)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS4:           sprintf(info->s, "SENSE4:%X", READSENSE(4)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS5:           sprintf(info->s, "SENSE5:%X", READSENSE(5)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS6:           sprintf(info->s, "SENSE6:%X", READSENSE(6)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SNGL_STEP:     sprintf(info->s, "SNGLSTEP:%X", cpustate->sngl_step); break;
+	case CPUINFO_STR_REGISTER + PDP1_SNGL_INST:     sprintf(info->s, "SNGLINST:%X", cpustate->sngl_inst); break;
+	case CPUINFO_STR_REGISTER + PDP1_EXTEND_SW:     sprintf(info->s, "EXS:%X", cpustate->extend_sw); break;
+	case CPUINFO_STR_REGISTER + PDP1_RUN:           sprintf(info->s, "RUN:%X", cpustate->run); break;
+	case CPUINFO_STR_REGISTER + PDP1_CYC:           sprintf(info->s, "CYC:%X", cpustate->cycle); break;
+	case CPUINFO_STR_REGISTER + PDP1_DEFER:         sprintf(info->s, "DF:%X", cpustate->defer); break;
+	case CPUINFO_STR_REGISTER + PDP1_BRK_CTR:       sprintf(info->s, "BRKCTR:%X", cpustate->brk_ctr); break;
+	case CPUINFO_STR_REGISTER + PDP1_RIM:           sprintf(info->s, "RIM:%X", cpustate->rim); break;
+	case CPUINFO_STR_REGISTER + PDP1_SBM:           sprintf(info->s, "SBM:%X", cpustate->sbm); break;
+	case CPUINFO_STR_REGISTER + PDP1_EXD:           sprintf(info->s, "EXD:%X", EXD); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOC:           sprintf(info->s, "IOC:%X", cpustate->ioc); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOH:           sprintf(info->s, "IOH:%X", cpustate->ioh); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOS:           sprintf(info->s, "IOS:%X", cpustate->ios); break;
+	case CPUINFO_IS_OCTAL:                          info->i = true;                         break;
 	}
 }
 
@@ -1099,42 +1099,42 @@ static void execute_instruction(pdp1_state *cpustate)
 {
 	switch (IR)
 	{
-	case AND:		/* Logical And */
+	case AND:       /* Logical And */
 		AC &= (MB = READ_PDP_18BIT(MA));
 		break;
-	case IOR:		/* Inclusive Or */
+	case IOR:       /* Inclusive Or */
 		AC |= (MB = READ_PDP_18BIT(MA));
 		break;
-	case XOR:		/* Exclusive Or */
+	case XOR:       /* Exclusive Or */
 		AC ^= (MB = READ_PDP_18BIT(MA));
 		break;
-	case XCT:		/* Execute */
+	case XCT:       /* Execute */
 		MB = READ_PDP_18BIT(MA);
-		IR = MB >> 13;		/* basic opcode */
+		IR = MB >> 13;      /* basic opcode */
 		if ((instruction_kind[IR] & 1) && (MB & 010000))
 		{
 			cpustate->defer = 1;
-			/*cpustate->cycle = 1;*/			/* instruction shall be executed later */
-			goto no_fetch;			/* fall through to next instruction */
+			/*cpustate->cycle = 1;*/            /* instruction shall be executed later */
+			goto no_fetch;          /* fall through to next instruction */
 		}
 		else if (instruction_kind[IR] & 2)
 		{
-			/*cpustate->cycle = 1;*/			/* instruction shall be executed later */
-			goto no_fetch;			/* fall through to next instruction */
+			/*cpustate->cycle = 1;*/            /* instruction shall be executed later */
+			goto no_fetch;          /* fall through to next instruction */
 		}
 		else
-			execute_instruction(cpustate);	/* execute instruction at once */
+			execute_instruction(cpustate);  /* execute instruction at once */
 		break;
-	case CALJDA:	/* Call subroutine and Jump and Deposit Accumulator instructions */
+	case CALJDA:    /* Call subroutine and Jump and Deposit Accumulator instructions */
 		if (MB & 010000)
 			/* JDA */
 			MA = (PC & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 		else
 			/* CAL: equivalent to JDA 100 */
 			/* Note that I cannot tell for sure what happens to extension bits, but I did notice
-            that setting the extension bits to 0 would make cal basically useless, since
-            there would be no simple way the call routine could return to the callee
-            if it were located in another module with extend mode off (i.e. exd == 0). */
+			that setting the extension bits to 0 would make cal basically useless, since
+			there would be no simple way the call routine could return to the callee
+			if it were located in another module with extend mode off (i.e. exd == 0). */
 			MA = (PC & ADDRESS_EXTENSION_MASK) | 0100;
 
 		WRITE_PDP_18BIT(MA, (MB = AC));
@@ -1142,57 +1142,57 @@ static void execute_instruction(pdp1_state *cpustate)
 		AC = (OV << 17) | (EXD << 16) | PC;
 		PC = MA;
 		break;
-	case LAC:		/* Load Accumulator */
+	case LAC:       /* Load Accumulator */
 		AC = (MB = READ_PDP_18BIT(MA));
 		break;
-	case LIO:		/* Load i/o register */
+	case LIO:       /* Load i/o register */
 		IO = (MB = READ_PDP_18BIT(MA));
 		break;
-	case DAC:		/* Deposit Accumulator */
+	case DAC:       /* Deposit Accumulator */
 		WRITE_PDP_18BIT(MA, (MB = AC));
 		break;
-	case DAP:		/* Deposit Address Part */
+	case DAP:       /* Deposit Address Part */
 		WRITE_PDP_18BIT(MA, (MB = ((READ_PDP_18BIT(MA) & 0770000) | (AC & 0007777))));
 		break;
-	case DIP:		/* Deposit Instruction Part */
+	case DIP:       /* Deposit Instruction Part */
 		WRITE_PDP_18BIT(MA, (MB = ((READ_PDP_18BIT(MA) & 0007777) | (AC & 0770000))));
 		break;
-	case DIO:		/* Deposit I/O Register */
+	case DIO:       /* Deposit I/O Register */
 		WRITE_PDP_18BIT(MA, (MB = IO));
 		break;
-	case DZM:		/* Deposit Zero in Memory */
+	case DZM:       /* Deposit Zero in Memory */
 		WRITE_PDP_18BIT(MA, (MB = 0));
 		break;
-	case ADD:		/* Add */
+	case ADD:       /* Add */
 		{
 			/* overflow is set if the 2 operands have the same sign and the final result has another */
-			int ov2;	/* 1 if the operands have the same sign*/
+			int ov2;    /* 1 if the operands have the same sign*/
 
 			MB = READ_PDP_18BIT(MA);
 
 			ov2 = ((AC & 0400000) == (MB & 0400000));
 
 			AC = AC + MB;
-			AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
+			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 
 			/* I think we need to check for overflow before checking for -0,
-            because the sum -0+-0 = -0 = +0 would generate an overflow
-            otherwise. */
+			because the sum -0+-0 = -0 = +0 would generate an overflow
+			otherwise. */
 			if (ov2 && ((AC & 0400000) != (MB & 0400000)))
 				OV = 1;
 
-			if (AC == 0777777)		/* check for -0 */
+			if (AC == 0777777)      /* check for -0 */
 				AC = 0;
 
 			break;
 		}
-	case SUB:		/* Subtract */
-		{	/* maintainance manual 7-14 seems to imply that substract does not test for -0.
+	case SUB:       /* Subtract */
+		{   /* maintainance manual 7-14 seems to imply that substract does not test for -0.
               The sim 2.3 source says so explicitely, though they do not give a reference.
               It sounds a bit weird, but the reason is probably that doing so would
               require additionnal logic that does not exist. */
 			/* overflow is set if the 2 operands have the same sign and the final result has another */
-			int ov2;	/* 1 if the operands have the same sign*/
+			int ov2;    /* 1 if the operands have the same sign*/
 
 			AC ^= 0777777;
 
@@ -1201,7 +1201,7 @@ static void execute_instruction(pdp1_state *cpustate)
 			ov2 = ((AC & 0400000) == (MB & 0400000));
 
 			AC = AC + MB;
-			AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
+			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 
 			if (ov2 && ((AC & 0400000) != (MB & 0400000)))
 				OV = 1;
@@ -1210,12 +1210,12 @@ static void execute_instruction(pdp1_state *cpustate)
 
 			break;
 		}
-	case IDX:		/* Index */
+	case IDX:       /* Index */
 		AC = READ_PDP_18BIT(MA) + 1;
 
 		#if 0
-			AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
-			if (AC == 0777777)		/* check for -0 */
+			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
+			if (AC == 0777777)      /* check for -0 */
 				AC = 0;
 		#else
 			if (AC >= 0777777)
@@ -1224,12 +1224,12 @@ static void execute_instruction(pdp1_state *cpustate)
 
 		WRITE_PDP_18BIT(MA, (MB = AC));
 		break;
-	case ISP:		/* Index and Skip if Positive */
+	case ISP:       /* Index and Skip if Positive */
 		AC = READ_PDP_18BIT(MA) + 1;
 
 		#if 0
-			AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
-			if (AC == 0777777)		/* check for -0 */
+			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
+			if (AC == 0777777)      /* check for -0 */
 				AC = 0;
 		#else
 			if (AC >= 0777777)
@@ -1240,20 +1240,20 @@ static void execute_instruction(pdp1_state *cpustate)
 		if ((AC & 0400000) == 0)
 			INCREMENT_PC;
 		break;
-	case SAD:		/* Skip if Accumulator and Y differ */
+	case SAD:       /* Skip if Accumulator and Y differ */
 		if (AC != (MB = READ_PDP_18BIT(MA)))
 			INCREMENT_PC;
 		break;
-	case SAS:		/* Skip if Accumulator and Y are the same */
+	case SAS:       /* Skip if Accumulator and Y are the same */
 		if (AC == (MB = READ_PDP_18BIT(MA)))
 			INCREMENT_PC;
 		break;
-	case MUS_MUL:	/* Multiply Step or Multiply */
+	case MUS_MUL:   /* Multiply Step or Multiply */
 		if (cpustate->hw_mul_div)
-		{	/* MUL */
+		{   /* MUL */
 			int scr;
 			int smb, srm;
-			double etime = 4.;		/* approximative */
+			double etime = 4.;      /* approximative */
 
 			IO = MB = AC;
 			MB = READ_PDP_18BIT(MA);
@@ -1282,7 +1282,7 @@ static void execute_instruction(pdp1_state *cpustate)
 					AC = AC + MB;
 					/* we can save carry around since both numbers are positive */
 					/*AC = (AC + (AC >> 18)) & 0777777;*/
-					etime += .65;		/* approximative */
+					etime += .65;       /* approximative */
 				}
 				IO = (IO >> 1) | ((AC & 1) << 17);
 				AC = AC >> 1;
@@ -1294,43 +1294,43 @@ static void execute_instruction(pdp1_state *cpustate)
 				IO = IO ^ 0777777;
 			}
 
-			cpustate->icount -= etime+.5;	/* round to closest */
+			cpustate->icount -= etime+.5;   /* round to closest */
 		}
 		else
-		{	/* MUS */
+		{   /* MUS */
 			/* should we check for -0??? (Maintainance manual 7-14 seems to imply we should not:
-            as a matter of fact, since the MUS instruction is supposed to have positive operands,
-            there is no need to check for -0, therefore such a simplification does not sound
-            absurd.) */
+			as a matter of fact, since the MUS instruction is supposed to have positive operands,
+			there is no need to check for -0, therefore such a simplification does not sound
+			absurd.) */
 			if ((IO & 1) == 1)
 			{
 				AC = AC + (MB = READ_PDP_18BIT(MA));
-				AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
+				AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 			}
 			IO = (IO >> 1 | AC << 17) & 0777777;
 			AC >>= 1;
 		}
 		break;
-	case DIS_DIV:	/* Divide Step or Divide */
+	case DIS_DIV:   /* Divide Step or Divide */
 		if (cpustate->hw_mul_div)
-		{	/* DIV */
+		{   /* DIV */
 			/* As a side note, the order of -0 detection and overflow checking does not matter,
-            because the sum of two positive number cannot give 0777777 (since positive
-            numbers are 0377777 at most, their sum is 0777776 at most).
-            Additionnally, we cannot have carry set and a result equal to 0777777  (since numbers
-            are 0777777 at most, their sum is 01777776 at most): this is nice, because it makes
-            the sequence:
-                AC = (AC + (AC >> 18)) & 0777777;   // propagate carry around
-                if (AC == 0777777)          // check for -0
-                    AC = 0;
-            equivalent to:
-                if (AC >= 0777777)
-                    AC = (AC + 1) & 0777777;
-            which is a bit more efficient. */
+			because the sum of two positive number cannot give 0777777 (since positive
+			numbers are 0377777 at most, their sum is 0777776 at most).
+			Additionnally, we cannot have carry set and a result equal to 0777777  (since numbers
+			are 0777777 at most, their sum is 01777776 at most): this is nice, because it makes
+			the sequence:
+			    AC = (AC + (AC >> 18)) & 0777777;   // propagate carry around
+			    if (AC == 0777777)          // check for -0
+			        AC = 0;
+			equivalent to:
+			    if (AC >= 0777777)
+			        AC = (AC + 1) & 0777777;
+			which is a bit more efficient. */
 			int acl;
 			int scr;
 			int smb, srm;
-			double etime = 0;		/* approximative */
+			double etime = 0;       /* approximative */
 
 			MB = READ_PDP_18BIT(MA);
 			scr = 0;
@@ -1355,8 +1355,8 @@ static void execute_instruction(pdp1_state *cpustate)
 			{
 				AC = (AC + MB);
 				#if 1
-					AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
-					if (AC == 0777777)		/* check for -0 */
+					AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
+					if (AC == 0777777)      /* check for -0 */
 						AC = 0;
 				#else
 					if (AC >= 0777777)
@@ -1381,14 +1381,14 @@ static void execute_instruction(pdp1_state *cpustate)
 				{
 					AC++;
 					AC = (AC + (AC >> 18)) & 0777777;
-					etime += .6;		/* approximative */
+					etime += .6;        /* approximative */
 				}
 			}
 
 			AC = (AC + MB);
 			#if 1
-				AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
-				if (AC == 0777777)		/* check for -0 */
+				AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
+				if (AC == 0777777)      /* check for -0 */
 					AC = 0;
 			#else
 				if (AC >= 0777777)
@@ -1415,14 +1415,14 @@ static void execute_instruction(pdp1_state *cpustate)
 				IO = MB;
 			}
 			if (scr)
-				etime += 20;		/* approximative */
+				etime += 20;        /* approximative */
 			else
-				etime += 2;			/* approximative */
+				etime += 2;         /* approximative */
 
-			cpustate->icount -= etime+.5;	/* round to closest */
+			cpustate->icount -= etime+.5;   /* round to closest */
 		}
 		else
-		{	/* DIS */
+		{   /* DIS */
 			int acl;
 
 			acl = AC >> 17;
@@ -1433,35 +1433,35 @@ static void execute_instruction(pdp1_state *cpustate)
 				AC += (MB ^ 0777777);
 			else
 				/* Note that if AC+MB = 0777777, we are in trouble.  I don't
-                know how a real PDP-1 behaves in this case. */
+				know how a real PDP-1 behaves in this case. */
 				AC += MB + 1;
-			AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
-			if (AC == 0777777)		/* check for -0 */
+			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
+			if (AC == 0777777)      /* check for -0 */
 				AC = 0;
 		}
 		break;
-	case JMP:		/* Jump */
+	case JMP:       /* Jump */
 		if (cpustate->exc)
 			PC = MB & EXTENDED_ADDRESS_MASK;
 		else
 			PC = (MA & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 		break;
-	case JSP:		/* Jump and Save Program Counter */
+	case JSP:       /* Jump and Save Program Counter */
 		AC = (OV << 17) | (EXD << 16) | PC;
 		if (cpustate->exc)
 			PC = MB & EXTENDED_ADDRESS_MASK;
 		else
 			PC = (MA & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 		break;
-	case SKP:		/* Skip Instruction Group */
+	case SKP:       /* Skip Instruction Group */
 		{
-			int cond = ((MB & 0100) && (AC == 0))	/* ZERO Accumulator */
-				|| ((MB & 0200) && (AC >> 17 == 0))	/* Plus Accumulator */
-				|| ((MB & 0400) && (AC >> 17 == 1))	/* Minus Accumulator */
-				|| ((MB & 01000) && (OV == 0))		/* ZERO Overflow */
-				|| ((MB & 02000) && (IO >> 17 == 0))	/* Plus I/O Register */
-				|| (((MB & 7) != 0) && (((MB & 7) == 7) ? ! FLAGS : ! READFLAG(MB & 7)))	/* ZERO Flag (deleted by mistake in PDP-1 handbook) */
-				|| (((MB & 070) != 0) && (((MB & 070) == 070) ? ! SENSE_SW : ! READSENSE((MB & 070) >> 3)));	/* ZERO Switch */
+			int cond = ((MB & 0100) && (AC == 0))   /* ZERO Accumulator */
+				|| ((MB & 0200) && (AC >> 17 == 0)) /* Plus Accumulator */
+				|| ((MB & 0400) && (AC >> 17 == 1)) /* Minus Accumulator */
+				|| ((MB & 01000) && (OV == 0))      /* ZERO Overflow */
+				|| ((MB & 02000) && (IO >> 17 == 0))    /* Plus I/O Register */
+				|| (((MB & 7) != 0) && (((MB & 7) == 7) ? ! FLAGS : ! READFLAG(MB & 7)))    /* ZERO Flag (deleted by mistake in PDP-1 handbook) */
+				|| (((MB & 070) != 0) && (((MB & 070) == 070) ? ! SENSE_SW : ! READSENSE((MB & 070) >> 3)));    /* ZERO Switch */
 
 			if (! (MB & 010000))
 			{
@@ -1477,11 +1477,11 @@ static void execute_instruction(pdp1_state *cpustate)
 				OV = 0;
 			break;
 		}
-	case SFT:		/* Shift Instruction Group */
+	case SFT:       /* Shift Instruction Group */
 		{
 			/* Bit 5 specifies direction of shift, Bit 6 specifies the character of the shift
-            (arithmetic or logical), Bits 7 and 8 enable the registers (01 = AC, 10 = IO,
-            and 11 = both) and Bits 9 through 17 specify the number of steps. */
+			(arithmetic or logical), Bits 7 and 8 enable the registers (01 = AC, 10 = IO,
+			and 11 = both) and Bits 9 through 17 specify the number of steps. */
 			int nshift = 0;
 			int mask = MB & 0777;
 
@@ -1494,15 +1494,15 @@ static void execute_instruction(pdp1_state *cpustate)
 			{
 				int i;
 
-			case 1:		/* ral rotate accumulator left */
+			case 1:     /* ral rotate accumulator left */
 				for (i = 0; i < nshift; i++)
 					AC = (AC << 1 | AC >> 17) & 0777777;
 				break;
-			case 2:		/* ril rotate i/o register left */
+			case 2:     /* ril rotate i/o register left */
 				for (i = 0; i < nshift; i++)
 					IO = (IO << 1 | IO >> 17) & 0777777;
 				break;
-			case 3:		/* rcl rotate AC and IO left */
+			case 3:     /* rcl rotate AC and IO left */
 				for (i = 0; i < nshift; i++)
 				{
 					int tmp = AC;
@@ -1511,32 +1511,32 @@ static void execute_instruction(pdp1_state *cpustate)
 					IO = (IO << 1 | tmp >> 17) & 0777777;
 				}
 				break;
-			case 5:		/* sal shift accumulator left */
+			case 5:     /* sal shift accumulator left */
 				for (i = 0; i < nshift; i++)
 					AC = ((AC << 1 | AC >> 17) & 0377777) + (AC & 0400000);
 				break;
-			case 6:		/* sil shift i/o register left */
+			case 6:     /* sil shift i/o register left */
 				for (i = 0; i < nshift; i++)
 					IO = ((IO << 1 | IO >> 17) & 0377777) + (IO & 0400000);
 				break;
-			case 7:		/* scl shift AC and IO left */
+			case 7:     /* scl shift AC and IO left */
 				for (i = 0; i < nshift; i++)
 				{
 					int tmp = AC;
 
-					AC = ((AC << 1 | IO >> 17) & 0377777) + (AC & 0400000);		/* shouldn't that be IO?, no it is the sign! */
+					AC = ((AC << 1 | IO >> 17) & 0377777) + (AC & 0400000);     /* shouldn't that be IO?, no it is the sign! */
 					IO = (IO << 1 | tmp >> 17) & 0777777;
 				}
 				break;
-			case 9:		/* rar rotate accumulator right */
+			case 9:     /* rar rotate accumulator right */
 				for (i = 0; i < nshift; i++)
 					AC = (AC >> 1 | AC << 17) & 0777777;
 				break;
-			case 10:	/* rir rotate i/o register right */
+			case 10:    /* rir rotate i/o register right */
 				for (i = 0; i < nshift; i++)
 					IO = (IO >> 1 | IO << 17) & 0777777;
 				break;
-			case 11:	/* rcr rotate AC and IO right */
+			case 11:    /* rcr rotate AC and IO right */
 				for (i = 0; i < nshift; i++)
 				{
 					int tmp = AC;
@@ -1545,20 +1545,20 @@ static void execute_instruction(pdp1_state *cpustate)
 					IO = (IO >> 1 | tmp << 17) & 0777777;
 				}
 				break;
-			case 13:	/* sar shift accumulator right */
+			case 13:    /* sar shift accumulator right */
 				for (i = 0; i < nshift; i++)
 					AC = (AC >> 1) + (AC & 0400000);
 				break;
-			case 14:	/* sir shift i/o register right */
+			case 14:    /* sir shift i/o register right */
 				for (i = 0; i < nshift; i++)
 					IO = (IO >> 1) + (IO & 0400000);
 				break;
-			case 15:	/* scr shift AC and IO right */
+			case 15:    /* scr shift AC and IO right */
 				for (i = 0; i < nshift; i++)
 				{
 					int tmp = AC;
 
-					AC = (AC >> 1) + (AC & 0400000);	/* shouldn't that be IO, no it is the sign */
+					AC = (AC >> 1) + (AC & 0400000);    /* shouldn't that be IO, no it is the sign */
 					IO = (IO >> 1 | tmp << 17) & 0777777;
 				}
 				break;
@@ -1569,71 +1569,71 @@ static void execute_instruction(pdp1_state *cpustate)
 			}
 			break;
 		}
-	case LAW:		/* Load Accumulator with N */
+	case LAW:       /* Load Accumulator with N */
 		AC = MB & 07777;
 		if (MB & 010000)
 			AC ^= 0777777;
 		break;
-	case IOT:		/* In-Out Transfer Instruction Group */
+	case IOT:       /* In-Out Transfer Instruction Group */
 		/*
-            The variations within this group of instructions perform all the in-out control
-            and information transfer functions.  If Bit 5 (normally the Indirect Address bit)
-            is a ONE, the computer will enter a special waiting state until the completion pulse
-            from the activated device has returned.  When this device delivers its completion,
-            the computer will resume operation of the instruction sequence.
+		    The variations within this group of instructions perform all the in-out control
+		    and information transfer functions.  If Bit 5 (normally the Indirect Address bit)
+		    is a ONE, the computer will enter a special waiting state until the completion pulse
+		    from the activated device has returned.  When this device delivers its completion,
+		    the computer will resume operation of the instruction sequence.
 
-            The computer may be interrupted from the special waiting state to serve a sequence
-            break request or a high speed channel request.
+		    The computer may be interrupted from the special waiting state to serve a sequence
+		    break request or a high speed channel request.
 
-            Most in-out operations require a known minimum time before completion.  This time
-            may be utilized for programming.  The appropriate In-Out Transfer can be given with
-            no in-out wait (Bit 5 a ZERO and Bit 6 a ONE).  The instruction sequence then
-            continues.  This sequence must include an iot instruction 730000 which performs
-            nothing but the in-out wait. The computer will then enter the special waiting state
-            until the device returns the in-out restart pulse.  If the device has already
-            returned the completion pulse before the instruction 730000, the computer will
-            proceed immediately.
+		    Most in-out operations require a known minimum time before completion.  This time
+		    may be utilized for programming.  The appropriate In-Out Transfer can be given with
+		    no in-out wait (Bit 5 a ZERO and Bit 6 a ONE).  The instruction sequence then
+		    continues.  This sequence must include an iot instruction 730000 which performs
+		    nothing but the in-out wait. The computer will then enter the special waiting state
+		    until the device returns the in-out restart pulse.  If the device has already
+		    returned the completion pulse before the instruction 730000, the computer will
+		    proceed immediately.
 
-            Bit 6 determines whether a completion pulse will or will not be received from
-            the in-out device.  When it is different than Bit 5, a completion pulse will be
-            received.  When it is the same as Bit 5, a completion pulse will not be received.
+		    Bit 6 determines whether a completion pulse will or will not be received from
+		    the in-out device.  When it is different than Bit 5, a completion pulse will be
+		    received.  When it is the same as Bit 5, a completion pulse will not be received.
 
-            In addition to the control function of Bits 5 and 6, Bits 7 through 11 are also
-            used as control bits serving to extend greatly the power of the iot instructions.
-            For example, Bits 12 through 17, which are used to designate a class of input or
-            output devices such as typewriters, may be further defined by Bits 7 through 11
-            as referring to Typewriter 1, 2, 3, etc.  In several of the optional in-out devices,
-            in particular the magnetic tape, Bits 7 through 11 specify particular functions
-            such as forward, backward etc.  If a large number of specialized devices are to
-            be attached, these bits may be used to further the in-out transfer instruction
-            to perform totally distinct functions.
+		    In addition to the control function of Bits 5 and 6, Bits 7 through 11 are also
+		    used as control bits serving to extend greatly the power of the iot instructions.
+		    For example, Bits 12 through 17, which are used to designate a class of input or
+		    output devices such as typewriters, may be further defined by Bits 7 through 11
+		    as referring to Typewriter 1, 2, 3, etc.  In several of the optional in-out devices,
+		    in particular the magnetic tape, Bits 7 through 11 specify particular functions
+		    such as forward, backward etc.  If a large number of specialized devices are to
+		    be attached, these bits may be used to further the in-out transfer instruction
+		    to perform totally distinct functions.
 
-            Note that ioc is supposed to be set at the beggining of the memory cycle after
-            ioh is cleared.
-            However, we cannot set ioc at the beggining of every memory cycle as we
-            did before, because it breaks in the following case:
-            a) IOT instruction enables IO wait
-            b) sequence break in the middle of IO-halt
-            c) ioh is cleared in middle of sequence break routine
-            d) re-execute IOT instruction.  Unfortunately, ioc has been cleared, therefore
-              we perform an IOT command pulse and IO wait again, which is completely WRONG.
-            Therefore ioc is cleared only after a IOT with wait is executed.
-        */
+		    Note that ioc is supposed to be set at the beggining of the memory cycle after
+		    ioh is cleared.
+		    However, we cannot set ioc at the beggining of every memory cycle as we
+		    did before, because it breaks in the following case:
+		    a) IOT instruction enables IO wait
+		    b) sequence break in the middle of IO-halt
+		    c) ioh is cleared in middle of sequence break routine
+		    d) re-execute IOT instruction.  Unfortunately, ioc has been cleared, therefore
+		      we perform an IOT command pulse and IO wait again, which is completely WRONG.
+		    Therefore ioc is cleared only after a IOT with wait is executed.
+		*/
 		if (MB & 010000)
-		{	/* IOT with IO wait */
+		{   /* IOT with IO wait */
 			if (cpustate->ioc)
-			{	/* the iot command line is pulsed only if ioc is asserted */
+			{   /* the iot command line is pulsed only if ioc is asserted */
 				(*cpustate->extern_iot[MB & 0000077])(cpustate->device, MB & 0000077, (MB & 0004000) == 0, MB, &IO, AC);
 
-				cpustate->ioh = 1;	/* enable io wait */
+				cpustate->ioh = 1;  /* enable io wait */
 
-				cpustate->ioc = 0;	/* actually happens at the start of next memory cycle */
+				cpustate->ioc = 0;  /* actually happens at the start of next memory cycle */
 
 				/* test ios now in case the IOT callback has sent a completion pulse immediately */
 				if (cpustate->ioh && cpustate->ios)
 				{
 					/* ioh should be cleared at the end of the instruction cycle, and ios at the
-                    start of next instruction cycle, but who cares? */
+					start of next instruction cycle, but who cares? */
 					cpustate->ioh = 0;
 					cpustate->ios = 0;
 				}
@@ -1642,24 +1642,24 @@ static void execute_instruction(pdp1_state *cpustate)
 			if (cpustate->ioh)
 				DECREMENT_PC;
 			else
-				cpustate->ioc = 1;	/* actually happens at the start of next memory cycle */
+				cpustate->ioc = 1;  /* actually happens at the start of next memory cycle */
 		}
 		else
-		{	/* IOT with no IO wait */
+		{   /* IOT with no IO wait */
 			(*cpustate->extern_iot[MB & 0000077])(cpustate->device, MB & 0000077, (MB & 0004000) != 0, MB, &IO, AC);
 		}
 		break;
-	case OPR:		/* Operate Instruction Group */
+	case OPR:       /* Operate Instruction Group */
 		{
 			int nflag;
 
-			if (MB & 00200)		/* clear AC */
+			if (MB & 00200)     /* clear AC */
 				AC = 0;
-			if (MB & 04000)		/* clear I/O register */
+			if (MB & 04000)     /* clear I/O register */
 				IO = 0;
-			if (MB & 02000)		/* load Accumulator from Test Word */
+			if (MB & 02000)     /* load Accumulator from Test Word */
 				AC |= cpustate->tw;
-			if (MB & 00100)		/* load Accumulator with Program Counter */
+			if (MB & 00100)     /* load Accumulator with Program Counter */
 				AC |= (OV << 17) | (EXD << 16) | PC;
 			nflag = MB & 7;
 			if (nflag)
@@ -1669,9 +1669,9 @@ static void execute_instruction(pdp1_state *cpustate)
 				else
 					WRITEFLAG(nflag, (MB & 010) ? 1 : 0);
 			}
-			if (MB & 01000)		/* Complement AC */
+			if (MB & 01000)     /* Complement AC */
 				AC ^= 0777777;
-			if (MB & 00400)		/* Halt */
+			if (MB & 00400)     /* Halt */
 			{
 				if (LOG_EXTRA)
 					logerror("PDP1 Program executed HALT: at 0%06o\n", PREVIOUS_PC);
@@ -1702,7 +1702,7 @@ static void null_iot(device_t *device, int op2, int nac, int mb, int *io, int ac
 {
 	pdp1_state *cpustate = get_safe_token(device);
 	/* Note that the dummy IOT 0 is used to wait for the completion pulse
-    generated by the a pending IOT (IOT with completion pulse but no IO wait) */
+	generated by the a pending IOT (IOT with completion pulse but no IO wait) */
 	if (LOG_IOT_EXTRA)
 	{
 		if (op2 == 000)
@@ -1724,7 +1724,7 @@ static void null_iot(device_t *device, int op2, int nac, int mb, int *io, int ac
 static void lem_eem_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *cpustate = get_safe_token(device);
-	if (! cpustate->extend_support)	/* extend mode supported? */
+	if (! cpustate->extend_support) /* extend mode supported? */
 	{
 		if (LOG)
 			logerror("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
@@ -1750,21 +1750,21 @@ static void sbs_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	pdp1_state *cpustate = get_safe_token(device);
 	switch (op2)
 	{
-	case 054:	/* LSM */
+	case 054:   /* LSM */
 		if (LOG_EXTRA)
 			logerror("LSM instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
 		cpustate->sbm = 0;
 		field_interrupt(cpustate);
 		break;
-	case 055:	/* ESM */
+	case 055:   /* ESM */
 		if (LOG_EXTRA)
 			logerror("ESM instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
 		cpustate->sbm = 1;
 		field_interrupt(cpustate);
 		break;
-	case 056:	/* CBS */
+	case 056:   /* CBS */
 		if (LOG_EXTRA)
 			logerror("CBS instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
@@ -1793,7 +1793,7 @@ static void type_20_sbs_iot(device_t *device, int op2, int nac, int mb, int *io,
 {
 	pdp1_state *cpustate = get_safe_token(device);
 	int channel, mask;
-	if (! cpustate->type_20_sbs)	/* type 20 sequence break system supported? */
+	if (! cpustate->type_20_sbs)    /* type 20 sequence break system supported? */
 	{
 		if (LOG)
 			logerror("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
@@ -1803,28 +1803,28 @@ static void type_20_sbs_iot(device_t *device, int op2, int nac, int mb, int *io,
 	mask = 1 << channel;
 	switch (op2)
 	{
-	case 050:	/* DSC */
+	case 050:   /* DSC */
 		if (LOG_EXTRA)
 			logerror("DSC instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
 		cpustate->b1 &= ~mask;
 		field_interrupt(cpustate);
 		break;
-	case 051:	/* ASC */
+	case 051:   /* ASC */
 		if (LOG_EXTRA)
 			logerror("ASC instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
 		cpustate->b1 |= mask;
 		field_interrupt(cpustate);
 		break;
-	case 052:	/* ISB */
+	case 052:   /* ISB */
 		if (LOG_EXTRA)
 			logerror("ISB instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
 		cpustate->b2 |= mask;
 		field_interrupt(cpustate);
 		break;
-	case 053:	/* CAC */
+	case 053:   /* CAC */
 		if (LOG_EXTRA)
 			logerror("CAC instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
@@ -1849,36 +1849,36 @@ static void type_20_sbs_iot(device_t *device, int op2, int nac, int mb, int *io,
 static void pulse_start_clear(pdp1_state *cpustate)
 {
 	/* processor registers */
-	PC = 0;			/* according to maintainance manual p. 6-17 */
-	IR = 0;			/* according to maintainance manual p. 6-13 */
-	/*MB = 0;*/		/* ??? */
-	/*MA = 0;*/		/* ??? */
-	/*AC = 0;*/		/* ??? */
-	/*IO = 0;*/		/* ??? */
-	/*PF = 0;*/		/* ??? */
+	PC = 0;         /* according to maintainance manual p. 6-17 */
+	IR = 0;         /* according to maintainance manual p. 6-13 */
+	/*MB = 0;*/     /* ??? */
+	/*MA = 0;*/     /* ??? */
+	/*AC = 0;*/     /* ??? */
+	/*IO = 0;*/     /* ??? */
+	/*PF = 0;*/     /* ??? */
 
 	/* processor state flip-flops */
-	cpustate->run = 0;		/* ??? */
-	cpustate->cycle = 0;		/* mere guess */
-	cpustate->defer = 0;		/* mere guess */
-	cpustate->brk_ctr = 0;	/* mere guess */
-	cpustate->ov = 0;		/* according to maintainance manual p. 7-18 */
-	cpustate->rim = 0;		/* ??? */
-	cpustate->sbm = 0;		/* ??? */
-	EXD = 0;			/* according to maintainance manual p. 8-16 */
-	cpustate->exc = 0;		/* according to maintainance manual p. 8-16 */
-	cpustate->ioc = 1;		/* according to maintainance manual p. 6-10 */
-	cpustate->ioh = 0;		/* according to maintainance manual p. 6-10 */
-	cpustate->ios = 0;		/* according to maintainance manual p. 6-10 */
+	cpustate->run = 0;      /* ??? */
+	cpustate->cycle = 0;        /* mere guess */
+	cpustate->defer = 0;        /* mere guess */
+	cpustate->brk_ctr = 0;  /* mere guess */
+	cpustate->ov = 0;       /* according to maintainance manual p. 7-18 */
+	cpustate->rim = 0;      /* ??? */
+	cpustate->sbm = 0;      /* ??? */
+	EXD = 0;            /* according to maintainance manual p. 8-16 */
+	cpustate->exc = 0;      /* according to maintainance manual p. 8-16 */
+	cpustate->ioc = 1;      /* according to maintainance manual p. 6-10 */
+	cpustate->ioh = 0;      /* according to maintainance manual p. 6-10 */
+	cpustate->ios = 0;      /* according to maintainance manual p. 6-10 */
 
-	cpustate->b1 = cpustate->type_20_sbs ? 0 : 1;	/* mere guess */
-	cpustate->b2 = 0;		/* mere guess */
-	cpustate->b4 = 0;		/* mere guess */
+	cpustate->b1 = cpustate->type_20_sbs ? 0 : 1;   /* mere guess */
+	cpustate->b2 = 0;       /* mere guess */
+	cpustate->b4 = 0;       /* mere guess */
 
 
 	cpustate->rim_step = 0;
-	cpustate->sbs_restore = 0;		/* mere guess */
-	cpustate->no_sequence_break = 0;	/* mere guess */
+	cpustate->sbs_restore = 0;      /* mere guess */
+	cpustate->no_sequence_break = 0;    /* mere guess */
 
 	field_interrupt(cpustate);
 

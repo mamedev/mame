@@ -25,10 +25,10 @@ extern const device_type PERIBOX_GEN;
 
 struct peribox_config
 {
-	devcb_write_line	inta;
-	devcb_write_line	intb;
-	devcb_write_line	ready;
-	int					prefix;
+	devcb_write_line    inta;
+	devcb_write_line    intb;
+	devcb_write_line    ready;
+	int                 prefix;
 };
 
 #define PERIBOX_CONFIG(name) \
@@ -70,12 +70,12 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// Next three methods call back the console
-	devcb_resolved_write_line m_console_inta;	// INTA line (Box to console)
-	devcb_resolved_write_line m_console_intb;	// INTB line
-	devcb_resolved_write_line m_console_ready;	// READY line
+	devcb_resolved_write_line m_console_inta;   // INTA line (Box to console)
+	devcb_resolved_write_line m_console_intb;   // INTB line
+	devcb_resolved_write_line m_console_ready;  // READY line
 
 	void set_slot_loaded(int slot, peribox_slot_device* slotdev);
-	peribox_slot_device *m_slot[9];		// for the sake of simplicity we donate the first two positions (0,1)
+	peribox_slot_device *m_slot[9];     // for the sake of simplicity we donate the first two positions (0,1)
 
 	// Propagators for the slot signals. All signals are active low, and
 	// if any one slot asserts the line, the joint line is asserted.
@@ -156,7 +156,7 @@ public:
 	// called from the box itself
 	void set_genmod(bool set);
 
-	device_t*	get_drive(const char* name);
+	device_t*   get_drive(const char* name);
 
 protected:
 	void device_start(void);
@@ -191,26 +191,26 @@ public:
 	virtual void crureadz(offs_t offset, UINT8 *value) =0;
 	virtual void cruwrite(offs_t offset, UINT8 data) =0;
 
-	void	set_senila(int state) { m_senila = state; }
-	void	set_senilb(int state) { m_senilb = state; }
+	void    set_senila(int state) { m_senila = state; }
+	void    set_senilb(int state) { m_senilb = state; }
 
 protected:
-	peribox_slot_device *m_slot;		// using a link to the slot for callbacks
-	int	m_senila;
-	int	m_senilb;
+	peribox_slot_device *m_slot;        // using a link to the slot for callbacks
+	int m_senila;
+	int m_senilb;
 
 	// When TRUE, card is accessible. Indicated by a LED.
-	bool	m_selected;
+	bool    m_selected;
 
 	// When TRUE, GenMod is selected.
-	bool	m_genmod;
+	bool    m_genmod;
 
 	// CRU base. Used to configure the address by which a card is selected.
-	int 	m_cru_base;
+	int     m_cru_base;
 
 	// Used to decide whether this card has been selected.
-	int		m_select_mask;
-	int		m_select_value;
+	int     m_select_mask;
+	int     m_select_value;
 };
 
 #define MCFG_PERIBOX_ADD(_tag, _config) \

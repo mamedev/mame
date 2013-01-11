@@ -43,9 +43,9 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 	UINT8 *atapi_regs = m_atapi_regs;
 	//running_machine &machine = machine();
 	int reg, data;
-	if (mem_mask == 0x0000ffff)	// word-wide command read
+	if (mem_mask == 0x0000ffff) // word-wide command read
 	{
-      //logerror("ATAPI: packet read = %02x%02x\n", m_atapi_data[m_atapi_data_ptr+1],m_atapi_data[m_atapi_data_ptr]);
+		//logerror("ATAPI: packet read = %02x%02x\n", m_atapi_data[m_atapi_data_ptr+1],m_atapi_data[m_atapi_data_ptr]);
 
 		// assert IRQ and drop DRQ
 		if (m_atapi_data_ptr == 0 && m_atapi_data_len == 0)
@@ -128,7 +128,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 		if (m_cur_drive==1) return 0x00;
 		data = atapi_regs[reg];
 		//logerror("ATAPI: reg %d = %x (offset %x mask %x) [%08x][read]\n", reg, data, offset, mem_mask,machine().device("maincpu")->safe_pc());
-    	data <<= shift;
+		data <<= shift;
 	}
 	return data;
 }
@@ -138,14 +138,14 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 	UINT8 *atapi_regs = m_atapi_regs;
 	UINT8 *atapi_data = m_atapi_data;
 	int reg;
-	if (mem_mask == 0x0000ffff)	// word-wide command write
+	if (mem_mask == 0x0000ffff) // word-wide command write
 	{
 		atapi_data[m_atapi_data_ptr++] = data & 0xff;
 		atapi_data[m_atapi_data_ptr++] = data >> 8;
 
 		if (m_atapi_cdata_wait)
 		{
-        	//logerror("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
+			//logerror("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
 			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
@@ -251,7 +251,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					logerror("ATAPI: SCSI device returned error!\n");
 
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-					atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;	// sense key = ILLEGAL REQUEST
+					atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;   // sense key = ILLEGAL REQUEST
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 				}
@@ -273,14 +273,14 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 		if (reg==6) m_cur_drive = (data & 0x10) >> 4;
 		if (m_cur_drive==1) return;
 		atapi_regs[reg] = data;
-    	//logerror("ATAPI: reg %d = %x (offset %x mask %x)\n", reg, data, offset, mem_mask);
+		//logerror("ATAPI: reg %d = %x (offset %x mask %x)\n", reg, data, offset, mem_mask);
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-        	logerror("ATAPI command %x issued!\n", data);
+			logerror("ATAPI command %x issued!\n", data);
 			switch (data)
 			{
-				case 0xa0:	// PACKET
+				case 0xa0:  // PACKET
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
@@ -294,7 +294,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					m_atapi_cdata_wait = 0;
 					break;
 
-				case 0xa1:	// IDENTIFY PACKET DEVICE
+				case 0xa1:  // IDENTIFY PACKET DEVICE
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
 					m_atapi_data_ptr = 0;
@@ -306,8 +306,8 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 
 					memset( atapi_data, 0, m_atapi_data_len );
 
-					atapi_data[ 0 ^ 1 ] = 0x85;	// ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
-					atapi_data[ 1 ^ 1 ] = 0x80;	// ATAPI device, removable media
+					atapi_data[ 0 ^ 1 ] = 0x85; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
+					atapi_data[ 1 ^ 1 ] = 0x80; // ATAPI device, removable media
 
 					memset( &atapi_data[ 46 ], ' ', 8 );
 					atapi_data[ 46 ^ 1 ] = '1';
@@ -346,13 +346,13 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 
 					atapi_irq(this, ASSERT_LINE);
 					break;
-				case 0xec:	//IDENTIFY DEVICE - Must abort here and set for packet data
+				case 0xec:  //IDENTIFY DEVICE - Must abort here and set for packet data
 					atapi_regs[ATAPI_REG_ERRFEAT] = ATAPI_ERRFEAT_ABRT;
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_CHECK;
 
 					atapi_irq(this, ASSERT_LINE);
 					break;
-				case 0xef:	// SET FEATURES
+				case 0xef:  // SET FEATURES
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
 					m_atapi_data_ptr = 0;
@@ -361,7 +361,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					atapi_irq(this, ASSERT_LINE);
 					break;
 
-				case 0x08:	// ATAPI RESET
+				case 0x08:  // ATAPI RESET
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0x00;
 					atapi_regs[ATAPI_REG_ERRFEAT]   = 0x01;
 					atapi_regs[ATAPI_REG_INTREASON] = 0x01; // SECTOR_COUNT
@@ -391,8 +391,8 @@ MACHINE_CONFIG_END
 static INPUT_PORTS_START( ide )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "IDE Configuration")
-	PORT_DIPSETTING(	0x00, "Primary" )
-	PORT_DIPSETTING(	0x01, "Secondary" )
+	PORT_DIPSETTING(    0x00, "Primary" )
+	PORT_DIPSETTING(    0x01, "Secondary" )
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -429,7 +429,7 @@ ioport_constructor isa16_ide_cd_device::device_input_ports() const
 //-------------------------------------------------
 
 isa16_ide_cd_device::isa16_ide_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, ISA16_IDE_CD, "IDE CD Drive Adapter", tag, owner, clock),
+		: device_t(mconfig, ISA16_IDE_CD, "IDE CD Drive Adapter", tag, owner, clock),
 		device_isa16_card_interface( mconfig, *this ),
 		m_is_primary(true),
 		m_inserted_cdrom(NULL)

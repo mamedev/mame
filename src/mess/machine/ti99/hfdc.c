@@ -18,7 +18,7 @@
 #include "hfdc.h"
 #include "imagedev/flopdrv.h"
 #include "machine/mm58274c.h"
-#include "formats/ti99_dsk.h"		// Format
+#include "formats/ti99_dsk.h"       // Format
 
 #define BUFFER "ram"
 #define FDC_TAG "hdc9234"
@@ -29,11 +29,11 @@
 #define HFDC_MAX_FLOPPY 4
 #define HFDC_MAX_HARD 4
 
-#define TAPE_ADDR	0x0fc0
-#define HDC_R_ADDR	0x0fd0
-#define HDC_W_ADDR	0x0fd2
-#define CLK_ADDR	0x0fe0
-#define RAM_ADDR	0x1000
+#define TAPE_ADDR   0x0fc0
+#define HDC_R_ADDR  0x0fd0
+#define HDC_W_ADDR  0x0fd2
+#define CLK_ADDR    0x0fe0
+#define RAM_ADDR    0x1000
 
 #define VERBOSE 1
 #define LOG logerror
@@ -180,9 +180,9 @@ void myarc_hfdc_device::crureadz(offs_t offset, UINT8 *value)
 			{
 				reply = 0;
 
-				if (m_irq)			reply |= 0x01;
-				if (m_dip)			reply |= 0x02;
-				if (m_motor_running)	reply |= 0x04;
+				if (m_irq)          reply |= 0x01;
+				if (m_dip)          reply |= 0x02;
+				if (m_motor_running)    reply |= 0x04;
 			}
 			*value = reply;
 		}
@@ -322,11 +322,11 @@ READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 		mfm_harddisk_device *hd = static_cast<mfm_harddisk_device *>(m_harddisk_unit[index]);
 		state = hd->get_status();
 
-		if (state & MFMHD_TRACK00)		reply |= DS_TRK00;
-		if (state & MFMHD_SEEKCOMP)		reply |= DS_SKCOM;
-		if (state & MFMHD_WRFAULT)		reply |= DS_WRFAULT;
-		if (state & MFMHD_INDEX)		reply |= DS_INDEX;
-		if (state & MFMHD_READY)		reply |= DS_READY;
+		if (state & MFMHD_TRACK00)      reply |= DS_TRK00;
+		if (state & MFMHD_SEEKCOMP)     reply |= DS_SKCOM;
+		if (state & MFMHD_WRFAULT)      reply |= DS_WRFAULT;
+		if (state & MFMHD_INDEX)        reply |= DS_INDEX;
+		if (state & MFMHD_READY)        reply |= DS_READY;
 		if (VERBOSE>4) LOG("hfdc: hd selected, returning status %02x\n", reply);
 	}
 
@@ -433,7 +433,7 @@ void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 const smc92x4_interface ti99_smc92x4_interface =
 {
-	FALSE,		/* do not use the full track layout */
+	FALSE,      /* do not use the full track layout */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, intrq_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, dip_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, auxbus_out),
@@ -444,7 +444,7 @@ const smc92x4_interface ti99_smc92x4_interface =
 
 static const mm58274c_interface floppy_mm58274c_interface =
 {
-	1,	/*  mode 24*/
+	1,  /*  mode 24*/
 	0   /*  first day of week */
 };
 
@@ -525,7 +525,7 @@ void myarc_hfdc_device::device_reset()
 	// Resetting values
 	m_rom_page = 0;
 
-	m_ram_page[0] = 0x08;	// static page 0x08
+	m_ram_page[0] = 0x08;   // static page 0x08
 	for (int i=1; i < 4; i++) m_ram_page[i] = 0;
 	m_dma_address = 0;
 	m_output1_latch = m_output2_latch = 0;

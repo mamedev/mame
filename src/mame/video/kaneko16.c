@@ -19,7 +19,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
 
 VIDEO_START_MEMBER(kaneko16_state,kaneko16)
 {
-	m_disp_enable = 1;	// default enabled for games not using it
+	m_disp_enable = 1;  // default enabled for games not using it
 }
 
 
@@ -38,8 +38,8 @@ static void kaneko16_fill_bitmap(running_machine &machine, bitmap_ind16 &bitmap,
 
 
 	/* Fill the bitmap with pen 0. This is wrong, but will work most of
-       the times. To do it right, each pixel should be drawn with pen 0
-       of the bottomost tile that covers it (which is pretty tricky to do) */
+	   the times. To do it right, each pixel should be drawn with pen 0
+	   of the bottomost tile that covers it (which is pretty tricky to do) */
 	bitmap.fill(0, cliprect);
 
 }
@@ -99,7 +99,7 @@ PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 {
 	int sx, x,y;
-	UINT8 *RAM	=	memregion("gfx3")->base();
+	UINT8 *RAM  =   memregion("gfx3")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
@@ -110,10 +110,10 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
     8aba/2 = 455d = 10001 01010 11101 = $11 $0a $1d
 */
 
-	for (sx = 0 ; sx < 32 ; sx++)	// horizontal screens
-	 for (x = 0 ; x < 256 ; x++)	// horizontal pixels
-	  for (y = 0 ; y < 256 ; y++)	// vertical pixels
-	  {
+	for (sx = 0 ; sx < 32 ; sx++)   // horizontal screens
+		for (x = 0 ; x < 256 ; x++) // horizontal pixels
+		for (y = 0 ; y < 256 ; y++) // vertical pixels
+		{
 			int addr  = sx * (256 * 256) + x + y * 256;
 			int data = RAM[addr * 2 + 0] * 256 + RAM[addr * 2 + 1];
 			int r,g,b;
@@ -126,18 +126,18 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 			r ^= 0x09;
 
 			if (~g & 0x08) g ^= 0x10;
-			g = (g - 1) & 0x1f;		/* decrease with wraparound */
+			g = (g - 1) & 0x1f;     /* decrease with wraparound */
 
 			b ^= 0x03;
 			if (~b & 0x08) b ^= 0x10;
-			b = (b + 2) & 0x1f;		/* increase with wraparound */
+			b = (b + 2) & 0x1f;     /* increase with wraparound */
 
 			/* kludge to fix the rollercoaster picture */
 			if ((r & 0x10) && (b & 0x10))
-				g = (g - 1) & 0x1f;		/* decrease with wraparound */
+				g = (g - 1) & 0x1f;     /* decrease with wraparound */
 
 			m_bg15_bitmap.pix16(y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
-	  }
+		}
 
 	VIDEO_START_CALL_MEMBER(kaneko16);
 }
@@ -174,15 +174,15 @@ static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_ind16 
 	kaneko16_berlwall_state *state = machine.driver_data<kaneko16_berlwall_state>();
 	if (state->m_bg15_bitmap.valid())
 	{
-		int select	=	state->m_bg15_select[ 0 ];
+		int select  =   state->m_bg15_select[ 0 ];
 //      int reg     =   state->m_bg15_reg[ 0 ];
-		int flip	=	select & 0x20;
+		int flip    =   select & 0x20;
 		int sx, sy;
 
-		if (flip)	select ^= 0x1f;
+		if (flip)   select ^= 0x1f;
 
-		sx		=	(select & 0x1f) * 256;
-		sy		=	0;
+		sx      =   (select & 0x1f) * 256;
+		sy      =   0;
 
 		copybitmap(bitmap, state->m_bg15_bitmap, flip, flip, -sx, -sy, cliprect);
 

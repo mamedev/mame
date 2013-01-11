@@ -76,8 +76,8 @@ using namespace uml;
 //  DEBUGGING
 //**************************************************************************
 
-#define VALIDATE_BACKEND		(0)
-#define LOG_SIMPLIFICATIONS		(0)
+#define VALIDATE_BACKEND        (0)
+#define LOG_SIMPLIFICATIONS     (0)
 
 
 
@@ -86,60 +86,60 @@ using namespace uml;
 //**************************************************************************
 
 // opcode validation condition/flag valid bitmasks
-#define OPFLAGS_NONE	0x00
-#define OPFLAGS_C		FLAG_C
-#define OPFLAGS_SZ		(FLAG_S | FLAG_Z)
-#define OPFLAGS_SZC		(FLAG_S | FLAG_Z | FLAG_C)
-#define OPFLAGS_SZV		(FLAG_S | FLAG_Z | FLAG_V)
-#define OPFLAGS_SZVC	(FLAG_S | FLAG_Z | FLAG_V | FLAG_C)
-#define OPFLAGS_UZC		(FLAG_U | FLAG_Z | FLAG_C)
-#define OPFLAGS_ALL		0x1f
-#define OPFLAGS_P1		0x81
-#define OPFLAGS_P2		0x82
-#define OPFLAGS_P3		0x83
-#define OPFLAGS_P4		0x84
+#define OPFLAGS_NONE    0x00
+#define OPFLAGS_C       FLAG_C
+#define OPFLAGS_SZ      (FLAG_S | FLAG_Z)
+#define OPFLAGS_SZC     (FLAG_S | FLAG_Z | FLAG_C)
+#define OPFLAGS_SZV     (FLAG_S | FLAG_Z | FLAG_V)
+#define OPFLAGS_SZVC    (FLAG_S | FLAG_Z | FLAG_V | FLAG_C)
+#define OPFLAGS_UZC     (FLAG_U | FLAG_Z | FLAG_C)
+#define OPFLAGS_ALL     0x1f
+#define OPFLAGS_P1      0x81
+#define OPFLAGS_P2      0x82
+#define OPFLAGS_P3      0x83
+#define OPFLAGS_P4      0x84
 
 // parameter input/output states
-#define PIO_IN			0x01
-#define PIO_OUT			0x02
-#define PIO_INOUT		(PIO_IN | PIO_OUT)
+#define PIO_IN          0x01
+#define PIO_OUT         0x02
+#define PIO_INOUT       (PIO_IN | PIO_OUT)
 
 // parameter sizes
-#define PSIZE_4			SIZE_DWORD
-#define PSIZE_8			SIZE_QWORD
-#define PSIZE_OP		0x80
-#define PSIZE_P1		0x81
-#define PSIZE_P2		0x82
-#define PSIZE_P3		0x83
-#define PSIZE_P4		0x84
+#define PSIZE_4         SIZE_DWORD
+#define PSIZE_8         SIZE_QWORD
+#define PSIZE_OP        0x80
+#define PSIZE_P1        0x81
+#define PSIZE_P2        0x82
+#define PSIZE_P3        0x83
+#define PSIZE_P4        0x84
 
 // basic parameter types
-#define PTYPES_NONE		0
-#define PTYPES_IMM		(1 << parameter::PTYPE_IMMEDIATE)
-#define PTYPES_IREG		(1 << parameter::PTYPE_INT_REGISTER)
-#define PTYPES_FREG		(1 << parameter::PTYPE_FLOAT_REGISTER)
-#define PTYPES_VREG		(1 << parameter::PTYPE_VECTOR_REGISTER)
-#define PTYPES_MVAR		(1 << parameter::PTYPE_MAPVAR)
-#define PTYPES_MEM		(1 << parameter::PTYPE_MEMORY)
-#define PTYPES_SIZE		(1 << parameter::PTYPE_SIZE)
-#define PTYPES_SCSIZE	(1 << parameter::PTYPE_SIZE_SCALE)
-#define PTYPES_SPSIZE	(1 << parameter::PTYPE_SIZE_SPACE)
-#define PTYPES_HANDLE	(1 << parameter::PTYPE_CODE_HANDLE)
-#define PTYPES_LABEL	(1 << parameter::PTYPE_CODE_LABEL)
-#define PTYPES_CFUNC	(1 << parameter::PTYPE_C_FUNCTION)
-#define PTYPES_ROUND	(1 << parameter::PTYPE_ROUNDING)
-#define PTYPES_STR		(1 << parameter::PTYPE_STRING)
+#define PTYPES_NONE     0
+#define PTYPES_IMM      (1 << parameter::PTYPE_IMMEDIATE)
+#define PTYPES_IREG     (1 << parameter::PTYPE_INT_REGISTER)
+#define PTYPES_FREG     (1 << parameter::PTYPE_FLOAT_REGISTER)
+#define PTYPES_VREG     (1 << parameter::PTYPE_VECTOR_REGISTER)
+#define PTYPES_MVAR     (1 << parameter::PTYPE_MAPVAR)
+#define PTYPES_MEM      (1 << parameter::PTYPE_MEMORY)
+#define PTYPES_SIZE     (1 << parameter::PTYPE_SIZE)
+#define PTYPES_SCSIZE   (1 << parameter::PTYPE_SIZE_SCALE)
+#define PTYPES_SPSIZE   (1 << parameter::PTYPE_SIZE_SPACE)
+#define PTYPES_HANDLE   (1 << parameter::PTYPE_CODE_HANDLE)
+#define PTYPES_LABEL    (1 << parameter::PTYPE_CODE_LABEL)
+#define PTYPES_CFUNC    (1 << parameter::PTYPE_C_FUNCTION)
+#define PTYPES_ROUND    (1 << parameter::PTYPE_ROUNDING)
+#define PTYPES_STR      (1 << parameter::PTYPE_STRING)
 
 // special parameter types
-#define PTYPES_PTR		(PTYPES_MEM | 0x1000)
-#define PTYPES_STATE	(PTYPES_MEM | 0x2000)
+#define PTYPES_PTR      (PTYPES_MEM | 0x1000)
+#define PTYPES_STATE    (PTYPES_MEM | 0x2000)
 
 // combinations of types
-#define PTYPES_IRM		(PTYPES_IREG | PTYPES_MEM)
-#define PTYPES_FRM		(PTYPES_FREG | PTYPES_MEM)
-#define PTYPES_IMV		(PTYPES_IMM | PTYPES_MVAR)
-#define PTYPES_IANY		(PTYPES_IRM | PTYPES_IMV)
-#define PTYPES_FANY		(PTYPES_FRM)
+#define PTYPES_IRM      (PTYPES_IREG | PTYPES_MEM)
+#define PTYPES_FRM      (PTYPES_FREG | PTYPES_MEM)
+#define PTYPES_IMV      (PTYPES_IMM | PTYPES_MVAR)
+#define PTYPES_IANY     (PTYPES_IRM | PTYPES_IMV)
+#define PTYPES_FANY     (PTYPES_FRM)
 
 
 
@@ -148,12 +148,12 @@ using namespace uml;
 //**************************************************************************
 
 // macro to simplify the table
-#define PINFO(inout, size, types)									{ PIO_##inout, PSIZE_##size, PTYPES_##types }
-#define OPINFO0(op,str,sizes,cond,iflag,oflag,mflag)				{ OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { { 0 } } },
-#define OPINFO1(op,str,sizes,cond,iflag,oflag,mflag,p0)				{ OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0 } },
-#define OPINFO2(op,str,sizes,cond,iflag,oflag,mflag,p0,p1)			{ OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1 } },
-#define OPINFO3(op,str,sizes,cond,iflag,oflag,mflag,p0,p1,p2)		{ OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1, p2 } },
-#define OPINFO4(op,str,sizes,cond,iflag,oflag,mflag,p0,p1,p2,p3)	{ OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1, p2, p3 } },
+#define PINFO(inout, size, types)                                   { PIO_##inout, PSIZE_##size, PTYPES_##types }
+#define OPINFO0(op,str,sizes,cond,iflag,oflag,mflag)                { OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { { 0 } } },
+#define OPINFO1(op,str,sizes,cond,iflag,oflag,mflag,p0)             { OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0 } },
+#define OPINFO2(op,str,sizes,cond,iflag,oflag,mflag,p0,p1)          { OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1 } },
+#define OPINFO3(op,str,sizes,cond,iflag,oflag,mflag,p0,p1,p2)       { OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1, p2 } },
+#define OPINFO4(op,str,sizes,cond,iflag,oflag,mflag,p0,p1,p2,p3)    { OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1, p2, p3 } },
 
 // opcode validation table
 const opcode_info instruction::s_opcode_info_table[OP_MAX] =
@@ -285,9 +285,9 @@ inline UINT64 rol64(UINT64 source, UINT8 count)
 
 uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 	: m_code(reinterpret_cast<drccodeptr *>(drcuml.cache().alloc_near(sizeof(drccodeptr)))),
-	  m_string(name),
-	  m_next(NULL),
-	  m_drcuml(drcuml)
+		m_string(name),
+		m_next(NULL),
+		m_drcuml(drcuml)
 {
 	if (m_code == NULL)
 		throw std::bad_alloc();
@@ -318,10 +318,10 @@ void uml::code_handle::set_codeptr(drccodeptr code)
 
 uml::instruction::instruction()
 	: m_opcode(OP_INVALID),
-	  m_condition(COND_ALWAYS),
-	  m_flags(0),
-	  m_size(4),
-	  m_numparams(0)
+		m_condition(COND_ALWAYS),
+		m_flags(0),
+		m_size(4),
+		m_numparams(0)
 {
 }
 
@@ -491,11 +491,11 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate())
 					switch (m_param[2].size())
 					{
-						case SIZE_BYTE:		convert_to_mov_immediate((INT8)m_param[1].immediate());		break;
-						case SIZE_WORD:		convert_to_mov_immediate((INT16)m_param[1].immediate());	break;
-						case SIZE_DWORD:	convert_to_mov_immediate((INT32)m_param[1].immediate());	break;
-						case SIZE_QWORD:	convert_to_mov_immediate((INT64)m_param[1].immediate());	break;
-						case SIZE_DQWORD:	fatalerror("Invalid SEXT target size\n");					break;
+						case SIZE_BYTE:     convert_to_mov_immediate((INT8)m_param[1].immediate());     break;
+						case SIZE_WORD:     convert_to_mov_immediate((INT16)m_param[1].immediate());    break;
+						case SIZE_DWORD:    convert_to_mov_immediate((INT32)m_param[1].immediate());    break;
+						case SIZE_QWORD:    convert_to_mov_immediate((INT64)m_param[1].immediate());    break;
+						case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");                   break;
 					}
 				break;
 
@@ -767,14 +767,14 @@ void uml::instruction::simplify()
 		}
 
 	/*
-        if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
-        {
-            astring disasm1, disasm2;
-            orig.disasm(disasm1, block->drcuml);
-            inst->disasm(disasm2, block->drcuml);
-            mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.cstr(), disasm2.cstr());
-        }
-    */
+	    if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
+	    {
+	        astring disasm1, disasm2;
+	        orig.disasm(disasm1, block->drcuml);
+	        inst->disasm(disasm2, block->drcuml);
+	        mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.cstr(), disasm2.cstr());
+	    }
+	*/
 
 		// loop until we stop changing opcodes
 	} while (m_opcode != origop);
@@ -825,22 +825,22 @@ UINT8 uml::instruction::input_flags() const
 {
 	static const UINT8 flags_for_condition[] =
 	{
-		FLAG_Z,						// COND_Z
-		FLAG_Z,						// COND_NZ
-		FLAG_S,						// COND_S
-		FLAG_S,						// COND_NS
-		FLAG_C,						// COND_C
-		FLAG_C,						// COND_NC
-		FLAG_V,						// COND_V
-		FLAG_V,						// COND_NV
-		FLAG_U,						// COND_U
-		FLAG_U,						// COND_NU
-		FLAG_C | FLAG_Z,			// COND_A
-		FLAG_C | FLAG_Z,			// COND_BE
-		FLAG_S | FLAG_V | FLAG_Z,	// COND_G
-		FLAG_S | FLAG_V | FLAG_Z,	// COND_LE
-		FLAG_S | FLAG_V,			// COND_L
-		FLAG_S | FLAG_V				// COND_GE
+		FLAG_Z,                     // COND_Z
+		FLAG_Z,                     // COND_NZ
+		FLAG_S,                     // COND_S
+		FLAG_S,                     // COND_NS
+		FLAG_C,                     // COND_C
+		FLAG_C,                     // COND_NC
+		FLAG_V,                     // COND_V
+		FLAG_V,                     // COND_NV
+		FLAG_U,                     // COND_U
+		FLAG_U,                     // COND_NU
+		FLAG_C | FLAG_Z,            // COND_A
+		FLAG_C | FLAG_Z,            // COND_BE
+		FLAG_S | FLAG_V | FLAG_Z,   // COND_G
+		FLAG_S | FLAG_V | FLAG_Z,   // COND_LE
+		FLAG_S | FLAG_V,            // COND_L
+		FLAG_S | FLAG_V             // COND_GE
 	};
 
 	UINT8 flags = s_opcode_info_table[m_opcode].inflags;
@@ -931,14 +931,14 @@ const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) cons
 					int size;
 					switch (opinfo.param[pnum].size)
 					{
-						case PSIZE_4:	size = 4; break;
-						case PSIZE_8:	size = 8; break;
-						case PSIZE_P1:	size = 1 << m_param[0].size(); break;
-						case PSIZE_P2:	size = 1 << m_param[1].size(); break;
-						case PSIZE_P3:	size = 1 << m_param[2].size(); break;
-						case PSIZE_P4:	size = 1 << m_param[3].size(); break;
+						case PSIZE_4:   size = 4; break;
+						case PSIZE_8:   size = 8; break;
+						case PSIZE_P1:  size = 1 << m_param[0].size(); break;
+						case PSIZE_P2:  size = 1 << m_param[1].size(); break;
+						case PSIZE_P3:  size = 1 << m_param[2].size(); break;
+						case PSIZE_P4:  size = 1 << m_param[3].size(); break;
 						default:
-						case PSIZE_OP:	size = m_size; break;
+						case PSIZE_OP:  size = m_size; break;
 					}
 
 					// truncate to size

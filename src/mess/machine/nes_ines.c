@@ -76,7 +76,7 @@ WRITE8_MEMBER(nes_carts_state::mapper6_w)
 {
 	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!m_mmc_latch1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
+	if (!m_mmc_latch1)  // when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
 	{
 		prg16_89ab(data >> 2);
 		// chr8(data & 0x03, ???);
@@ -84,7 +84,7 @@ WRITE8_MEMBER(nes_carts_state::mapper6_w)
 		if (m_mmc_chr_source == CHRROM)
 			chr8(data & 0x03, CHRROM);
 	}
-	else if (m_mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
+	else if (m_mmc_chr_source == CHRROM)            // otherwise, we can use CHRROM (when present)
 		chr8(data, CHRROM);
 }
 
@@ -196,7 +196,7 @@ static const nes_mmc mmc_list[] =
 	{ 13, STD_CPROM },
 	{ 14, REXSOFT_SL1632 },
 	{ 15, WAIXING_PS2 },
-	{ 16, BANDAI_LZ93EX },	// with 24c02
+	{ 16, BANDAI_LZ93EX },  // with 24c02
 	{ 17, FFE_MAPPER17 },
 	{ 18, JALECO_SS88006 },
 	{ 19, NAMCOT_163 },
@@ -221,7 +221,7 @@ static const nes_mmc mmc_list[] =
 	{ 39, UNL_STUDYNGAME },
 	{ 40, BTL_SMB2A },
 	{ 41, CALTRON_6IN1 },
-	{ 42, BTL_MARIOBABY },	// ai senshi nicol?
+	{ 42, BTL_MARIOBABY },  // ai senshi nicol?
 	{ 43, UNL_SMB2J },
 	{ 44, BMC_SUPERBIG_7IN1 },
 	{ 45, BMC_HIK8IN1 },
@@ -336,9 +336,9 @@ static const nes_mmc mmc_list[] =
 	{ 154, NAMCOT_3453 },
 	{ 155, STD_SXROM_A }, // diff compared to MMC1 concern WRAM
 	{ 156, OPENCORP_DAOU306 },
-	{ 157, BANDAI_DATACH },	// no Datach Reader -> we fall back to mapper 16
+	{ 157, BANDAI_DATACH }, // no Datach Reader -> we fall back to mapper 16
 	{ 158, TENGEN_800037 },
-	{ 159, BANDAI_LZ93EX },	// with 24c01
+	{ 159, BANDAI_LZ93EX }, // with 24c01
 	{ 160, SACHEN_SA009 },
 	// 161 Unused
 	// 162 Unused
@@ -402,8 +402,8 @@ static const nes_mmc mmc_list[] =
 	// 220 Unused
 	{ 221, UNL_N625092 },
 	{ 222, BTL_DRAGONNINJA },
-	{ 223, WAIXING_TYPE_I },	// (according to NEStopia source, it's MMC3 with more WRAM)
-	{ 224, WAIXING_TYPE_J },	// (according to NEStopia source, it's MMC3 with more WRAM)
+	{ 223, WAIXING_TYPE_I },    // (according to NEStopia source, it's MMC3 with more WRAM)
+	{ 224, WAIXING_TYPE_J },    // (according to NEStopia source, it's MMC3 with more WRAM)
 	{ 225, BMC_72IN1 },
 	{ 226, BMC_76IN1 },
 	{ 227, BMC_1200IN1 },

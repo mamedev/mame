@@ -20,21 +20,21 @@
 
 struct rf5c400_channel
 {
-	UINT16	startH;
-	UINT16	startL;
-	UINT16	freq;
-	UINT16	endL;
-	UINT16	endHloopH;
-	UINT16	loopL;
-	UINT16	pan;
-	UINT16	effect;
-	UINT16	volume;
+	UINT16  startH;
+	UINT16  startL;
+	UINT16  freq;
+	UINT16  endL;
+	UINT16  endHloopH;
+	UINT16  loopL;
+	UINT16  pan;
+	UINT16  effect;
+	UINT16  volume;
 
-	UINT16	attack;
-	UINT16	decay;
-	UINT16	release;
+	UINT16  attack;
+	UINT16  decay;
+	UINT16  release;
 
-	UINT16	cutoff;
+	UINT16  cutoff;
 
 	UINT64 pos;
 	UINT64 step;
@@ -64,27 +64,27 @@ static int volume_table[256];
 static double pan_table[0x64];
 
 /* envelope parameter (experimental) */
-#define ENV_AR_SPEED		0.1
-#define ENV_MIN_AR			0x02
-#define ENV_MAX_AR			0x80
-#define ENV_DR_SPEED		2.0
-#define ENV_MIN_DR			0x20
-#define ENV_MAX_DR			0x73
-#define ENV_RR_SPEED		0.7
-#define ENV_MIN_RR			0x20
-#define ENV_MAX_RR			0x54
+#define ENV_AR_SPEED        0.1
+#define ENV_MIN_AR          0x02
+#define ENV_MAX_AR          0x80
+#define ENV_DR_SPEED        2.0
+#define ENV_MIN_DR          0x20
+#define ENV_MAX_DR          0x73
+#define ENV_RR_SPEED        0.7
+#define ENV_MIN_RR          0x20
+#define ENV_MAX_RR          0x54
 
 /* PCM type */
 enum {
-	TYPE_MASK		= 0x00C0,
-	TYPE_16			= 0x0000,
-	TYPE_8LOW		= 0x0040,
-	TYPE_8HIGH		= 0x0080,
+	TYPE_MASK       = 0x00C0,
+	TYPE_16         = 0x0000,
+	TYPE_8LOW       = 0x0040,
+	TYPE_8HIGH      = 0x0080,
 };
 
 /* envelope phase */
 enum {
-	PHASE_NONE		= 0,
+	PHASE_NONE      = 0,
 	PHASE_ATTACK,
 	PHASE_DECAY,
 	PHASE_RELEASE,
@@ -389,7 +389,7 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 				break;
 			}
 
-			case 0x01:		// channel control
+			case 0x01:      // channel control
 			{
 				int ch = data & 0x1f;
 				switch ( data & 0x60 )
@@ -428,21 +428,21 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 				break;
 			}
 
-			case 0x08:		// relative to env attack (channel no)
-			case 0x09:		// relative to env attack (0x0c00/ 0x1c00)
+			case 0x08:      // relative to env attack (channel no)
+			case 0x09:      // relative to env attack (0x0c00/ 0x1c00)
 
-			case 0x21:		// reverb(character).w
-			case 0x32:		// reverb(pre-lpf).w
-			case 0x2B:		// reverb(level).w
-			case 0x20:		// ???.b : reverb(time).b
+			case 0x21:      // reverb(character).w
+			case 0x32:      // reverb(pre-lpf).w
+			case 0x2B:      // reverb(level).w
+			case 0x20:      // ???.b : reverb(time).b
 
-			case 0x2C:		// chorus(level).w
-			case 0x30:		// chorus(rate).w
-			case 0x22:		// chorus(macro).w
-			case 0x23:		// chorus(depth).w
-			case 0x24:		// chorus(macro).w
-			case 0x2F:		// chorus(depth).w
-			case 0x27:		// chorus(send level to reverb).w
+			case 0x2C:      // chorus(level).w
+			case 0x30:      // chorus(rate).w
+			case 0x22:      // chorus(macro).w
+			case 0x23:      // chorus(depth).w
+			case 0x24:      // chorus(macro).w
+			case 0x2F:      // chorus(depth).w
+			case 0x27:      // chorus(send level to reverb).w
 
 			default:
 			{
@@ -462,54 +462,54 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 
 		switch (reg)
 		{
-			case 0x00:		// sample start address, bits 23 - 16
+			case 0x00:      // sample start address, bits 23 - 16
 			{
 				channel->startH = data;
 				break;
 			}
-			case 0x01:		// sample start address, bits 15 - 0
+			case 0x01:      // sample start address, bits 15 - 0
 			{
 				channel->startL = data;
 				break;
 			}
-			case 0x02:		// sample playing frequency
+			case 0x02:      // sample playing frequency
 			{
 				channel->step = ((data & 0x1fff) << (data >> 13)) * 4;
 				channel->freq = data;
 				break;
 			}
-			case 0x03:		// sample end address, bits 15 - 0
+			case 0x03:      // sample end address, bits 15 - 0
 			{
 				channel->endL = data;
 				break;
 			}
-			case 0x04:		// sample end address, bits 23 - 16 , sample loop 23 - 16
+			case 0x04:      // sample end address, bits 23 - 16 , sample loop 23 - 16
 			{
 				channel->endHloopH = data;
 				break;
 			}
-			case 0x05:		// sample loop offset, bits 15 - 0
+			case 0x05:      // sample loop offset, bits 15 - 0
 			{
 				channel->loopL = data;
 				break;
 			}
-			case 0x06:		// channel volume
+			case 0x06:      // channel volume
 			{
 				channel->pan = data;
 				break;
 			}
-			case 0x07:		// effect depth
+			case 0x07:      // effect depth
 			{
 				// 0xCCRR: CC = chorus send depth, RR = reverb send depth
 				channel->effect = data;
 				break;
 			}
-			case 0x08:		// volume, flag
+			case 0x08:      // volume, flag
 			{
 				channel->volume = data;
 				break;
 			}
-			case 0x09:		// env attack
+			case 0x09:      // env attack
 			{
 				// 0x0100: max speed                  (in case of attack <= 0x40)
 				// 0xXX40: XX = attack-0x3f (encoded) (in case of attack > 0x40)
@@ -517,35 +517,35 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 				channel->attack = data;
 				break;
 			}
-			case 0x0A:		// relative to env attack ?
+			case 0x0A:      // relative to env attack ?
 			{
 				// always 0x0100
 				break;
 			}
-			case 0x0B:		// relative to env decay ?
+			case 0x0B:      // relative to env decay ?
 			{
 				// always 0x0100
 				break;
 			}
-			case 0x0C:		// env decay
+			case 0x0C:      // env decay
 			{
 				// 0xXX70: XX = decay (encoded) (in case of decay > 0x71)
 				// 0xXX80: XX = decay (encoded) (in case of decay <= 0x71)
 				channel->decay = data;
 				break;
 			}
-			case 0x0D:		// relative to env release ?
+			case 0x0D:      // relative to env release ?
 			{
 				// always 0x0100
 				break;
 			}
-			case 0x0E:		// env release
+			case 0x0E:      // env release
 			{
 				// 0xXX70: XX = release-0x1f (encoded) (0x01 if release <= 0x20)
 				channel->release = data;
 				break;
 			}
-			case 0x10:		// resonance, cutoff freq.
+			case 0x10:      // resonance, cutoff freq.
 			{
 				// bit 15-12: resonance
 				// bit 11-0 : cutoff frequency
@@ -560,7 +560,7 @@ const device_type RF5C400 = &device_creator<rf5c400_device>;
 
 rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(rf5c400_state);
 }
@@ -593,5 +593,3 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

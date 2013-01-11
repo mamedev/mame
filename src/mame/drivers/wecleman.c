@@ -332,7 +332,7 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",space.device().safe_pc(), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
-		if ( (m_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
+		if ( (m_irqctrl & 1) && (!(data & 1)) ) // 1->0 transition
 			machine().device("sub")->execute().set_input_line(4, HOLD_LINE);
 
 		// Bit 1 : NSUBRST
@@ -346,7 +346,7 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 		// Bit 4 : SCR-HCNT
 		// Bit 5 : SCR-VCNT
 		// Bit 6 : TV-KILL
-		m_irqctrl = data;	// latch the value
+		m_irqctrl = data;   // latch the value
 	}
 }
 
@@ -363,18 +363,18 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 */
 WRITE16_MEMBER(wecleman_state::selected_ip_w)
 {
-	if (ACCESSING_BITS_0_7) m_selected_ip = data & 0xff;	// latch the value
+	if (ACCESSING_BITS_0_7) m_selected_ip = data & 0xff;    // latch the value
 }
 
 /* $140021.b - Return the previously selected input port's value */
 READ16_MEMBER(wecleman_state::selected_ip_r)
 {
 	switch ( (m_selected_ip >> 5) & 3 )
-	{																	// From WEC Le Mans Schems:
-		case 0:  return ioport("ACCEL")->read();		// Accel - Schems: Accelevr
-		case 1:  return ~0;												// ????? - Schems: Not Used
-		case 2:  return ioport("STEER")->read();		// Wheel - Schems: Handlevr
-		case 3:  return ~0;												// Table - Schems: Turnvr
+	{                                                                   // From WEC Le Mans Schems:
+		case 0:  return ioport("ACCEL")->read();        // Accel - Schems: Accelevr
+		case 1:  return ~0;                                             // ????? - Schems: Not Used
+		case 2:  return ioport("STEER")->read();        // Wheel - Schems: Handlevr
+		case 3:  return ~0;                                             // Table - Schems: Turnvr
 
 		default: return ~0;
 	}
@@ -493,28 +493,28 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 ***************************************************************************/
 
 static ADDRESS_MAP_START( wecleman_map, AS_PROGRAM, 16, wecleman_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM	// ROM (03c000-03ffff used as RAM sometimes!)
-	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_SHARE("videostatus")	// cloud blending control (HACK)
-	AM_RANGE(0x040000, 0x043fff) AM_RAM	// RAM
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM // ROM (03c000-03ffff used as RAM sometimes!)
+	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_SHARE("videostatus")   // cloud blending control (HACK)
+	AM_RANGE(0x040000, 0x043fff) AM_RAM // RAM
 	AM_RANGE(0x060000, 0x060005) AM_WRITE(wecleman_protection_w) AM_SHARE("protection_ram")
-	AM_RANGE(0x060006, 0x060007) AM_READ(wecleman_protection_r)	// MCU read
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")	// Blitter
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_SHARE("pageram")	// Background Layers
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_SHARE("txtram")	// Text Layer
+	AM_RANGE(0x060006, 0x060007) AM_READ(wecleman_protection_r) // MCU read
+	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_SHARE("pageram")   // Background Layers
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_SHARE("txtram") // Text Layer
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")	// Shared with main CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")	// Sprites
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)	// To sound CPU
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel / ..
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_WRITENOP	// Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")	// Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ??
-	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")	// DSW 2
-	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")	// DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_WRITEONLY	// Paired with writes to $140003
-	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r)	// Accelerator or Wheel or ..
-	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// toggles between 0 & 1 on hitting bumps and crashes (vibration?)
+	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")  // Shared with main CPU
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
+	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)    // To sound CPU
+	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel / ..
+	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
+	AM_RANGE(0x140006, 0x140007) AM_WRITENOP    // Watchdog reset
+	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")    // Coins + brake + gear
+	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")    // ??
+	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")   // DSW 2
+	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")   // DSW 1
+	AM_RANGE(0x140020, 0x140021) AM_WRITEONLY   // Paired with writes to $140003
+	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) // Accelerator or Wheel or ..
+	AM_RANGE(0x140030, 0x140031) AM_WRITENOP    // toggles between 0 & 1 on hitting bumps and crashes (vibration?)
 ADDRESS_MAP_END
 
 
@@ -526,27 +526,27 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotchase_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM									// RAM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM									// RAM
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")	// Blitter
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0x00ff)	// Background
-	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0x00ff)	// Background Ctrl
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0x00ff)	// Foreground
-	AM_RANGE(0x103000, 0x10301f) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0x00ff)	// Foreground Ctrl
+	AM_RANGE(0x040000, 0x041fff) AM_RAM                                 // RAM
+	AM_RANGE(0x060000, 0x063fff) AM_RAM                                 // RAM
+	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0x00ff) // Background
+	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0x00ff)   // Background Ctrl
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0x00ff) // Foreground
+	AM_RANGE(0x103000, 0x10301f) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0x00ff)   // Foreground Ctrl
 	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")					// Shared with sub CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")	// Sprites
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(hotchase_soundlatch_w)	// To sound CPU
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel /
-	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_READNOP	// Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")	// Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ?? bit 4 from sound cpu
-	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")	// DSW 2
-	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")	// DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) AM_WRITENOP	// Paired with writes to $140003
-	AM_RANGE(0x140022, 0x140023) AM_READNOP	// ??
-	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// signal to cabinet vibration motors?
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")                  // Shared with sub CPU
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites
+	AM_RANGE(0x140000, 0x140001) AM_WRITE(hotchase_soundlatch_w)    // To sound CPU
+	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)    // Selects accelerator / wheel /
+	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)    // Main CPU controls the other CPUs
+	AM_RANGE(0x140006, 0x140007) AM_READNOP // Watchdog reset
+	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")    // Coins + brake + gear
+	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")    // ?? bit 4 from sound cpu
+	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")   // DSW 2
+	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")   // DSW 1
+	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) AM_WRITENOP // Paired with writes to $140003
+	AM_RANGE(0x140022, 0x140023) AM_READNOP // ??
+	AM_RANGE(0x140030, 0x140031) AM_WRITENOP    // signal to cabinet vibration motors?
 ADDRESS_MAP_END
 
 
@@ -555,9 +555,9 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( wecleman_sub_map, AS_PROGRAM, 16, wecleman_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("roadram")	// Road
-	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")	// RAM (Shared with main CPU)
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM // ROM
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("roadram") // Road
+	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")  // RAM (Shared with main CPU)
 ADDRESS_MAP_END
 
 
@@ -566,8 +566,8 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( hotchase_sub_map, AS_PROGRAM, 16, wecleman_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// ROM
-	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_SHARE("roadram")	// Road
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM // ROM
+	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_SHARE("roadram") // Road
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1") // Shared with main CPU
 	AM_RANGE(0x060000, 0x060fff) AM_RAM // a table, presumably road related
 	AM_RANGE(0x061000, 0x06101f) AM_RAM // road vregs?
@@ -618,20 +618,20 @@ WRITE8_MEMBER(wecleman_state::multiply_w)
 WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 {
 	device_t *device = machine().device("konami");
-	k007232_set_bank(device, 0, ~data&1 );	//* (wecleman062gre)
+	k007232_set_bank(device, 0, ~data&1 );  //* (wecleman062gre)
 }
 
 static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8500, 0x8500) AM_WRITENOP	// incresed with speed (global volume)?
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)	// Protection
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)	// Protection
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP	// ?
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)	// From main CPU
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)	// K007232 (Reading offset 5/b triggers the sample)
+	AM_RANGE(0x8500, 0x8500) AM_WRITENOP    // incresed with speed (global volume)?
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // Protection
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // Protection
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP    // ?
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r) // From main CPU
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)	// Samples banking
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)    // Samples banking
 ADDRESS_MAP_END
 
 
@@ -670,14 +670,14 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 		case 0x4:
 		case 0x5:
 			/* change volume
-                offset 00000xxx----- channel select (0:channel 0, 1:channel 1)
-                ++------ chip select ( 0:chip 1, 1:chip2, 2:chip3)
-                data&0x0f left volume  (data>>4)&0x0f right volume
-            */
-		  k007232_set_volume( sound[offset>>1], offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
-		  break;
+			    offset 00000xxx----- channel select (0:channel 0, 1:channel 1)
+			    ++------ chip select ( 0:chip 1, 1:chip2, 2:chip3)
+			    data&0x0f left volume  (data>>4)&0x0f right volume
+			*/
+			k007232_set_volume( sound[offset>>1], offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
+			break;
 
-		case 0x06:	/* Bankswitch for chips 0 & 1 */
+		case 0x06:  /* Bankswitch for chips 0 & 1 */
 		{
 			int bank0_a = (data >> 1) & 1;
 			int bank1_a = (data >> 2) & 1;
@@ -691,7 +691,7 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 		}
 		break;
 
-		case 0x07:	/* Bankswitch for chip 2 */
+		case 0x07:  /* Bankswitch for chip 2 */
 		{
 			int bank2_a = (data >> 0) & 7;
 			int bank2_b = (data >> 3) & 7;
@@ -742,13 +742,13 @@ WRITE8_MEMBER(wecleman_state::hotchase_3_k007232_w)
 
 static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_1_k007232_r, hotchase_1_k007232_w)	// 3 x K007232
+	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_1_k007232_r, hotchase_1_k007232_w)   // 3 x K007232
 	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_2_k007232_r, hotchase_2_k007232_w)
 	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_3_k007232_r, hotchase_3_k007232_w)
-	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w)	// Sound volume, banking, etc.
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// ? (written with 0 on IRQ, 1 on FIRQ)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)	// From main CPU (Read on IRQ)
-	AM_RANGE(0x7000, 0x7000) AM_WRITENOP	// Command acknowledge ?
+	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
+	AM_RANGE(0x5000, 0x5000) AM_WRITENOP    // ? (written with 0 on IRQ, 1 on FIRQ)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r) // From main CPU (Read on IRQ)
+	AM_RANGE(0x7000, 0x7000) AM_WRITENOP    // Command acknowledge ?
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -758,7 +758,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( wecleman )
-	PORT_START("IN0")	/* $140011.b */
+	PORT_START("IN0")   /* $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )
@@ -768,14 +768,14 @@ static INPUT_PORTS_START( wecleman )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN1")	/* Motor? - $140013.b */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )	// right sw
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// left sw
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )	// thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound cpu ?
+	PORT_START("IN1")   /* Motor? - $140013.b */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )   // right sw
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // left sw
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )   // thermo
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSWA")	/* $140015.b */
+	PORT_START("DSWA")  /* $140015.b */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -812,21 +812,21 @@ static INPUT_PORTS_START( wecleman )
 	PORT_DIPSETTING(    0x00, "No Coin B" )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
-	PORT_START("DSWB")	/* $140017.b */
+	PORT_START("DSWB")  /* $140017.b */
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "km/h" )
 	PORT_DIPSETTING(    0x00, "mph" )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown B-1" )	// single
+	PORT_DIPNAME( 0x02, 0x02, "Unknown B-1" )   // single
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Unknown B-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )		// 66 seconds at the start
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )	// 64
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )		// 62
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 60
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )     // 66 seconds at the start
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )   // 64
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )     // 62
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )  // 60
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -837,10 +837,10 @@ static INPUT_PORTS_START( wecleman )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("ACCEL")	/* Accelerator - $140021.b (0) */
+	PORT_START("ACCEL") /* Accelerator - $140021.b (0) */
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("STEER")	/* Steering Wheel - $140021.b (2) */
+	PORT_START("STEER") /* Steering Wheel - $140021.b (2) */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -850,7 +850,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( hotchase )
-	PORT_START("IN0")	/* $140011.b */
+	PORT_START("IN0")   /* $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -860,40 +860,40 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")	/* Motor? - $140013.b */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )	// right sw
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// left sw
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )	// thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound cpu ?
+	PORT_START("IN1")   /* Motor? - $140013.b */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )   // right sw
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // left sw
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )   // thermo
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW2")	/* $140015.b */
+	PORT_START("DSW2")  /* $140015.b */
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "KM" )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )	// single (wheel related)
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )   // single (wheel related)
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Unknown 2-3&4" )	// Most likely Difficulty
+	PORT_DIPNAME( 0x18, 0x18, "Unknown 2-3&4" ) // Most likely Difficulty
 	PORT_DIPSETTING(    0x18, "0" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x08, "8" )
 	PORT_DIPSETTING(    0x00, "c" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )	// single
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )   // single
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* wheel <-> brake ; accel -> start */
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )	// single (wheel<->brake)
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )   // single (wheel<->brake)
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* $140017.b */
+	PORT_START("DSW1")  /* $140017.b */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -928,10 +928,10 @@ static INPUT_PORTS_START( hotchase )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/99 Credits" )
 
-	PORT_START("ACCEL")	/* Accelerator - $140021.b (0) */
+	PORT_START("ACCEL") /* Accelerator - $140021.b (0) */
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("STEER")	/* Steering Wheel - $140021.b (2) */
+	PORT_START("STEER") /* Steering Wheel - $140021.b (2) */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -953,15 +953,15 @@ static const gfx_layout wecleman_bg_layout =
 
 static const UINT32 wecleman_road_layout_xoffset[64] =
 {
-	 0,7,6,5,4,3,2,1,
-	 8,15,14,13,12,11,10,9,
-	 16,23,22,21,20,19,18,17,
-	 24,31,30,29,28,27,26,25,
+		0,7,6,5,4,3,2,1,
+		8,15,14,13,12,11,10,9,
+		16,23,22,21,20,19,18,17,
+		24,31,30,29,28,27,26,25,
 
-	 0+32,7+32,6+32,5+32,4+32,3+32,2+32,1+32,
-	 8+32,15+32,14+32,13+32,12+32,11+32,10+32,9+32,
-	 16+32,23+32,22+32,21+32,20+32,19+32,18+32,17+32,
-	 24+32,31+32,30+32,29+32,28+32,27+32,26+32,25+32
+		0+32,7+32,6+32,5+32,4+32,3+32,2+32,1+32,
+		8+32,15+32,14+32,13+32,12+32,11+32,10+32,9+32,
+		16+32,23+32,22+32,21+32,20+32,19+32,18+32,17+32,
+		24+32,31+32,30+32,29+32,28+32,27+32,26+32,25+32
 };
 
 /* We draw the road, made of 512 pixel lines, using 64x1 tiles */
@@ -980,8 +980,8 @@ static const gfx_layout wecleman_road_layout =
 
 static GFXDECODE_START( wecleman )
 	// "gfx1" holds sprite, which are not decoded here
-	GFXDECODE_ENTRY( "gfx2", 0, wecleman_bg_layout,   0, 2048/8 )	// [0] bg + fg + txt
-	GFXDECODE_ENTRY( "gfx3", 0, wecleman_road_layout, 0, 2048/8 )	// [1] road
+	GFXDECODE_ENTRY( "gfx2", 0, wecleman_bg_layout,   0, 2048/8 )   // [0] bg + fg + txt
+	GFXDECODE_ENTRY( "gfx3", 0, wecleman_road_layout, 0, 2048/8 )   // [1] road
 GFXDECODE_END
 
 
@@ -991,10 +991,10 @@ GFXDECODE_END
 
 static const UINT32 hotchase_road_layout_xoffset[64] =
 {
-	  0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4,7*4,7*4,
-	  8*4,8*4,9*4,9*4,10*4,10*4,11*4,11*4,12*4,12*4,13*4,13*4,14*4,14*4,15*4,15*4,
-	 16*4,16*4,17*4,17*4,18*4,18*4,19*4,19*4,20*4,20*4,21*4,21*4,22*4,22*4,23*4,23*4,
-	 24*4,24*4,25*4,25*4,26*4,26*4,27*4,27*4,28*4,28*4,29*4,29*4,30*4,30*4,31*4,31*4
+		0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4,7*4,7*4,
+		8*4,8*4,9*4,9*4,10*4,10*4,11*4,11*4,12*4,12*4,13*4,13*4,14*4,14*4,15*4,15*4,
+		16*4,16*4,17*4,17*4,18*4,18*4,19*4,19*4,20*4,20*4,21*4,21*4,22*4,22*4,23*4,23*4,
+		24*4,24*4,25*4,25*4,26*4,26*4,27*4,27*4,28*4,28*4,29*4,29*4,30*4,30*4,31*4,31*4
 };
 
 /* We draw the road, made of 512 pixel lines, using 64x1 tiles */
@@ -1015,7 +1015,7 @@ static const gfx_layout hotchase_road_layout =
 static GFXDECODE_START( hotchase )
 	// "gfx1" holds sprite, which are not decoded here
 	// "gfx2" and 3 are for the 051316
-	GFXDECODE_ENTRY( "gfx4", 0, hotchase_road_layout, 0x70*16, 16 )	// road
+	GFXDECODE_ENTRY( "gfx4", 0, hotchase_road_layout, 0x70*16, 16 ) // road
 GFXDECODE_END
 
 
@@ -1053,11 +1053,11 @@ MACHINE_RESET_MEMBER(wecleman_state,wecleman)
 static MACHINE_CONFIG_START( wecleman, wecleman_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
 	MCFG_CPU_PROGRAM_MAP(wecleman_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, wecleman_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)	/* Schems show 10MHz */
+	MCFG_CPU_ADD("sub", M68000, 10000000)   /* Schems show 10MHz */
 	MCFG_CPU_PROGRAM_MAP(wecleman_sub_map)
 
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
@@ -1125,7 +1125,7 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 	int i;
 
 	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
-             For now let's fill everything with white colors until we have better info about it */
+	         For now let's fill everything with white colors until we have better info about it */
 	for(i=0;i<0x2000/2;i++)
 	{
 		m_generic_paletteram_16[i] = 0xffff;
@@ -1137,14 +1137,14 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
+	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, hotchase_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
+	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 3579545 / 2)	/* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MCFG_CPU_ADD("audiocpu", M6809, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
 
@@ -1190,20 +1190,20 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( wecleman )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main CPU Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
 	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(493b79d3) SHA1(9625e3b65c211d5081d8ed8977de287eff100842) )
 	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(6bb4f1fa) SHA1(2cfb7885b42b49dab9892e8dfd54914b64eeab06) )
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
 	ROM_LOAD16_BYTE( "602a10.22h", 0x20001, 0x10000, CRC(569f5001) SHA1(ec2dd331a279083cf847fbbe71c017038a1d562a) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* Sub CPU Code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* Sub CPU Code */
 	ROM_LOAD16_BYTE( "602a06.18a", 0x00000, 0x08000, CRC(e12c0d11) SHA1(991afd48bf1b2c303b975ce80c754e5972c39111) )
 	ROM_LOAD16_BYTE( "602a07.20a", 0x00001, 0x08000, CRC(47968e51) SHA1(9b01b2c6a14dd80327a8f66a7f1994471a4bc38e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU Code */
 	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
 
-	ROM_REGION( 0x200000 * 2, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x200000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD( "602a25.12e", 0x000000, 0x20000, CRC(0eacf1f9) SHA1(b4dcd457e68175ffee3da4aff23a241fe33eb500) )
 	ROM_LOAD( "602a26.14e", 0x020000, 0x20000, CRC(2182edaf) SHA1(5ae4223a76b3c0be8f66458707f2e6f63fba0b13) )
 	ROM_LOAD( "602a27.15e", 0x040000, 0x20000, CRC(b22f08e9) SHA1(1ba99bc4e00e206507e9bfafc989208d6ae6f8a3) )
@@ -1222,37 +1222,37 @@ ROM_START( wecleman )
 	ROM_LOAD( "602a16.10c", 0x1e0000, 0x20000, CRC(b08770b3) SHA1(41871e9261d08fd372b7deb72d939973fb694b54) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )	// layers
+	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )   // layers
 	ROM_LOAD( "602a30.24g", 0x008000, 0x08000, CRC(be5c4138) SHA1(7aee2ee17ef3e37399a60d9b019cfa733acbf07b) )
 	ROM_LOAD( "602a29.23g", 0x010000, 0x08000, CRC(f1a8d33e) SHA1(ed6531f2fd4ad6835a879e9a5600387d8cad6d17) )
 
-	ROM_REGION( 0x0c000, "gfx3", 0 )	/* road */
+	ROM_REGION( 0x0c000, "gfx3", 0 )    /* road */
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
-	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )	// may also exist as 32KB with one half empty
+	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
 
-	ROM_REGION( 0x40000, "konami", 0 )	/* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "konami", 0 )  /* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
-	ROM_REGION( 0x04000, "user1", 0 )	/* extra data for road effects? */
+	ROM_REGION( 0x04000, "user1", 0 )   /* extra data for road effects? */
 	ROM_LOAD( "602a12.1a",  0x000000, 0x04000, CRC(77b9383d) SHA1(7cb970889677704d6324bb64aafc05326c4503ad) )
 ROM_END
 
 ROM_START( wecleman2 )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main CPU Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
 	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // only 17h and 23h differ slightly from parent
 	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // "
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
 	ROM_LOAD16_BYTE( "602a10.22h", 0x20001, 0x10000, CRC(569f5001) SHA1(ec2dd331a279083cf847fbbe71c017038a1d562a) )
 
-	ROM_REGION( 0x10000, "sub", 0 )	/* Sub CPU Code */
+	ROM_REGION( 0x10000, "sub", 0 ) /* Sub CPU Code */
 	ROM_LOAD16_BYTE( "602a06.18a", 0x00000, 0x08000, CRC(e12c0d11) SHA1(991afd48bf1b2c303b975ce80c754e5972c39111) )
 	ROM_LOAD16_BYTE( "602a07.20a", 0x00001, 0x08000, CRC(47968e51) SHA1(9b01b2c6a14dd80327a8f66a7f1994471a4bc38e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU Code */
 	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
 
-	ROM_REGION( 0x200000 * 2, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x200000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD( "602a25.12e", 0x000000, 0x20000, CRC(0eacf1f9) SHA1(b4dcd457e68175ffee3da4aff23a241fe33eb500) )
 	ROM_LOAD( "602a26.14e", 0x020000, 0x20000, CRC(2182edaf) SHA1(5ae4223a76b3c0be8f66458707f2e6f63fba0b13) )
 	ROM_LOAD( "602a27.15e", 0x040000, 0x20000, CRC(b22f08e9) SHA1(1ba99bc4e00e206507e9bfafc989208d6ae6f8a3) )
@@ -1271,25 +1271,25 @@ ROM_START( wecleman2 )
 	ROM_LOAD( "602a16.10c", 0x1e0000, 0x20000, CRC(b08770b3) SHA1(41871e9261d08fd372b7deb72d939973fb694b54) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )	// layers
+	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )   // layers
 	ROM_LOAD( "602a30.24g", 0x008000, 0x08000, CRC(be5c4138) SHA1(7aee2ee17ef3e37399a60d9b019cfa733acbf07b) )
 	ROM_LOAD( "602a29.23g", 0x010000, 0x08000, CRC(f1a8d33e) SHA1(ed6531f2fd4ad6835a879e9a5600387d8cad6d17) )
 
-	ROM_REGION( 0x0c000, "gfx3", 0 )	/* road */
+	ROM_REGION( 0x0c000, "gfx3", 0 )    /* road */
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
-	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )	// may also exist as 32KB with one half empty
+	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
 
-	ROM_REGION( 0x40000, "konami", 0 )	/* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "konami", 0 )  /* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
-	ROM_REGION( 0x04000, "user1", 0 )	/* extra data for road effects? */
+	ROM_REGION( 0x04000, "user1", 0 )   /* extra data for road effects? */
 	ROM_LOAD( "602a12.1a",  0x000000, 0x04000, CRC(77b9383d) SHA1(7cb970889677704d6324bb64aafc05326c4503ad) )
 ROM_END
 
 static void wecleman_unpack_sprites(running_machine &machine)
 {
-	const char *region       = "gfx1";	// sprites
+	const char *region       = "gfx1";  // sprites
 
 	const UINT32 len = machine.root_device().memregion(region)->bytes();
 	UINT8 *src     = machine.root_device().memregion(region)->base() + len / 2 - 1;
@@ -1329,8 +1329,8 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
 
 	/*  Sprites - decrypting the sprites nearly KILLED ME!
-        It's been the main cause of the delay of this driver ...
-        I hope you'll appreciate this effort!  */
+	    It's been the main cause of the delay of this driver ...
+	    I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
 	RAM = memregion("gfx1")->base();
@@ -1366,20 +1366,20 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 ***************************************************************************/
 
 ROM_START( hotchase )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main Code */
 	ROM_LOAD16_BYTE( "763k05", 0x000000, 0x010000, CRC(f34fef0b) SHA1(9edaf6da988348cb32d5686fe7a67fb92b1c9777) )
 	ROM_LOAD16_BYTE( "763k04", 0x000001, 0x010000, CRC(60f73178) SHA1(49c919d09fa464b205d7eccce337349e3a633a14) )
 	ROM_LOAD16_BYTE( "763k03", 0x020000, 0x010000, CRC(28e3a444) SHA1(106b22a3cbe8301eac2e46674a267b96e72ac72f) )
 	ROM_LOAD16_BYTE( "763k02", 0x020001, 0x010000, CRC(9510f961) SHA1(45b1920cab08a0dacd044c851d4e7f0cb5772b46) )
 
-	ROM_REGION( 0x20000, "sub", 0 )	/* Sub Code */
+	ROM_REGION( 0x20000, "sub", 0 ) /* Sub Code */
 	ROM_LOAD16_BYTE( "763k07", 0x000000, 0x010000, CRC(ae12fa90) SHA1(7f76f09916fe152411b5af3c504ee7be07497ef4) )
 	ROM_LOAD16_BYTE( "763k06", 0x000001, 0x010000, CRC(b77e0c07) SHA1(98bf492ac889d31419df706029fdf3d51b85c936) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Code */
 	ROM_LOAD( "763f01", 0x8000, 0x8000, CRC(4fddd061) SHA1(ff0aa18605612f6102107a6be1f93ae4c5edc84f) )
 
-	ROM_REGION( 0x300000 * 2, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x300000 * 2, "gfx1", 0 )   /* x2, do not dispose, zooming sprites */
 	ROM_LOAD16_WORD_SWAP( "763e17", 0x000000, 0x080000, CRC(8db4e0aa) SHA1(376cb3cae110998f2f9df7e6cdd35c06732fea69) )
 	ROM_LOAD16_WORD_SWAP( "763e20", 0x080000, 0x080000, CRC(a22c6fce) SHA1(174fb9c1706c092947bcce386831acd33a237046) )
 	ROM_LOAD16_WORD_SWAP( "763e18", 0x100000, 0x080000, CRC(50920d01) SHA1(313c7ecbd154b3f4c96f25c29a7734a9b3facea4) )
@@ -1387,26 +1387,26 @@ ROM_START( hotchase )
 	ROM_LOAD16_WORD_SWAP( "763e19", 0x200000, 0x080000, CRC(a2622e56) SHA1(0a0ed9713882b987518e6f06a02dba417c1f4f32) )
 	ROM_LOAD16_WORD_SWAP( "763e22", 0x280000, 0x080000, CRC(967c49d1) SHA1(01979d216a9fd8085298445ac5f7870d1598db74) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* bg */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* bg */
 	ROM_LOAD( "763e14", 0x000000, 0x020000, CRC(60392aa1) SHA1(8499eb40a246587e24f6fd00af2eaa6d75ee6363) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )	/* fg (patched) */
+	ROM_REGION( 0x10000, "gfx3", 0 )    /* fg (patched) */
 	ROM_LOAD( "763a13", 0x000000, 0x010000, CRC(8bed8e0d) SHA1(ccff330abc23fe499e76c16cab5783c3daf155dd) )
 
-	ROM_REGION( 0x20000, "gfx4", 0 )	/* road */
+	ROM_REGION( 0x20000, "gfx4", 0 )    /* road */
 	ROM_LOAD( "763e15", 0x000000, 0x020000, CRC(7110aa43) SHA1(639dc002cc1580f0530bb5bb17f574e2258d5954) )
 
-	ROM_REGION( 0x40000, "konami1", 0 )	/* Samples, 2 banks */
+	ROM_REGION( 0x40000, "konami1", 0 ) /* Samples, 2 banks */
 	ROM_LOAD( "763e11", 0x000000, 0x040000, CRC(9d99a5a7) SHA1(96e37bbb259e0a91d124c26b6b1a9b70de2e19a4) )
 
-	ROM_REGION( 0x40000, "konami2", 0 )	/* Samples, 2 banks */
+	ROM_REGION( 0x40000, "konami2", 0 ) /* Samples, 2 banks */
 	ROM_LOAD( "763e10", 0x000000, 0x040000, CRC(ca409210) SHA1(703d7619c4bd33d2ff5fad127d98c82906fede33) )
 
-	ROM_REGION( 0x100000, "konami3", 0 )	/* Samples, 4 banks for each ROM */
+	ROM_REGION( 0x100000, "konami3", 0 )    /* Samples, 4 banks for each ROM */
 	ROM_LOAD( "763e08", 0x000000, 0x080000, CRC(054a9a63) SHA1(45d7926c9e7af47c041ba9b733e334bccd730a6d) )
 	ROM_LOAD( "763e09", 0x080000, 0x080000, CRC(c39857db) SHA1(64b135a9ccf9e1dd50789cdd5c6bc03da8decfd0) )
 
-	ROM_REGION( 0x08000, "user1", 0 )	/* extra data for road effects? */
+	ROM_REGION( 0x08000, "user1", 0 )   /* extra data for road effects? */
 	ROM_LOAD( "763a12", 0x000000, 0x008000, CRC(05f1e553) SHA1(8aaeb7374bd93038c24e6470398936f22cabb0fe) )
 ROM_END
 
@@ -1419,7 +1419,7 @@ static void hotchase_sprite_decode( running_machine &machine, int num16_banks, i
 	UINT8 *base, *temp;
 	int i;
 
-	base = machine.root_device().memregion("gfx1")->base();	// sprites
+	base = machine.root_device().memregion("gfx1")->base(); // sprites
 	temp = auto_alloc_array(machine, UINT8,  bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
@@ -1475,7 +1475,7 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 	RAM = memregion("gfx1")->base();
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
-	hotchase_sprite_decode(machine(),3,0x80000*2);	// num banks, bank len
+	hotchase_sprite_decode(machine(),3,0x80000*2);  // num banks, bank len
 
 	/* Let's copy the second half of the fg layer gfx (charset) over the first */
 	RAM = memregion("gfx3")->base();

@@ -129,7 +129,7 @@ WRITE8_MEMBER(gsword_state::gsword_videoctrl_w)
 	if (m_flipscreen != (data & 0x10))
 	{
 		m_flipscreen = data & 0x10;
-	    machine().tilemap().mark_all_dirty();
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 0 could be used but unknown */
@@ -155,7 +155,7 @@ TILE_GET_INFO_MEMBER(gsword_state::get_bg_tile_info)
 void gsword_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gsword_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 64);
+			8, 8, 32, 64);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

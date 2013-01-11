@@ -15,15 +15,15 @@
 #include "formats/imageutl.h"
 #include "flopdrv.h"
 
-#define VERBOSE		0
+#define VERBOSE     0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-#define FLOPDRVTAG	"flopdrv"
-#define LOG_FLOPPY		0
+#define FLOPDRVTAG  "flopdrv"
+#define LOG_FLOPPY      0
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -50,13 +50,13 @@ struct floppy_drive
 	int tk00; /* track 00 */
 	int wpt;  /* write protect */
 	int rdy;  /* ready */
-	int dskchg;		/* disk changed */
+	int dskchg;     /* disk changed */
 
 	/* drive select logic */
 	int drive_id;
 	int active;
 
-	const floppy_interface	*config;
+	const floppy_interface  *config;
 
 	/* flags */
 	int flags;
@@ -65,17 +65,17 @@ struct floppy_drive
 	/* num sides */
 	int num_sides;
 	/* current track - this may or may not relate to the present cylinder number
-    stored by the fdc */
+	stored by the fdc */
 	int current_track;
 
 	/* index pulse timer */
-	emu_timer	*index_timer;
+	emu_timer   *index_timer;
 	/* index pulse callback */
-	void	(*index_pulse_callback)(device_t *controller,device_t *image, int state);
+	void    (*index_pulse_callback)(device_t *controller,device_t *image, int state);
 	/* rotation per minute => gives index pulse frequency */
 	float rpm;
 
-	void	(*ready_state_change_callback)(device_t *controller,device_t *img, int state);
+	void    (*ready_state_change_callback)(device_t *controller,device_t *img, int state);
 
 	int id_index;
 
@@ -104,11 +104,11 @@ struct floppy_error_map
 
 static const floppy_error_map errmap[] =
 {
-	{ FLOPPY_ERROR_SUCCESS,			IMAGE_ERROR_SUCCESS },
-	{ FLOPPY_ERROR_INTERNAL,		IMAGE_ERROR_INTERNAL },
-	{ FLOPPY_ERROR_UNSUPPORTED,		IMAGE_ERROR_UNSUPPORTED },
-	{ FLOPPY_ERROR_OUTOFMEMORY,		IMAGE_ERROR_OUTOFMEMORY },
-	{ FLOPPY_ERROR_INVALIDIMAGE,	IMAGE_ERROR_INVALIDIMAGE }
+	{ FLOPPY_ERROR_SUCCESS,         IMAGE_ERROR_SUCCESS },
+	{ FLOPPY_ERROR_INTERNAL,        IMAGE_ERROR_INTERNAL },
+	{ FLOPPY_ERROR_UNSUPPORTED,     IMAGE_ERROR_UNSUPPORTED },
+	{ FLOPPY_ERROR_OUTOFMEMORY,     IMAGE_ERROR_OUTOFMEMORY },
+	{ FLOPPY_ERROR_INVALIDIMAGE,    IMAGE_ERROR_INVALIDIMAGE }
 };
 
 /***************************************************************************
@@ -289,7 +289,7 @@ void floppy_drive_set_ready_state(device_t *img, int state, int flag)
 	if (flag)
 	{
 		/* set ready only if drive is present, disk is in the drive,
-        and disk motor is on - for Amstrad, Spectrum and PCW*/
+		and disk motor is on - for Amstrad, Spectrum and PCW*/
 
 		/* drive present? */
 		/* disk inserted? */
@@ -312,7 +312,7 @@ void floppy_drive_set_ready_state(device_t *img, int state, int flag)
 }
 
 /* get flag state */
-int	floppy_drive_get_flag_state(device_t *img, int flag)
+int floppy_drive_get_flag_state(device_t *img, int flag)
 {
 	floppy_drive *drv = get_safe_token( img );
 	int drive_flags;
@@ -323,9 +323,9 @@ int	floppy_drive_get_flag_state(device_t *img, int flag)
 	drive_flags = drv->flags;
 
 	/* these flags are independent of a real drive/disk image */
-    flags |= drive_flags & (FLOPPY_DRIVE_READY | FLOPPY_DRIVE_INDEX);
+	flags |= drive_flags & (FLOPPY_DRIVE_READY | FLOPPY_DRIVE_INDEX);
 
-    flags &= flag;
+	flags &= flag;
 
 	return flags;
 }
@@ -370,7 +370,7 @@ void floppy_drive_seek(device_t *img, signed int signed_tracks)
 
 
 /* this is not accurate. But it will do for now */
-int	floppy_drive_get_next_id(device_t *img, int side, chrn_id *id)
+int floppy_drive_get_next_id(device_t *img, int side, chrn_id *id)
 {
 	floppy_drive *pDrive;
 	int spt;
@@ -509,7 +509,7 @@ void floppy_drive_set_ready_state_change_callback(device_t *img, void (*callback
 	pDrive->ready_state_change_callback = callback;
 }
 
-int	floppy_drive_get_current_track(device_t *img)
+int floppy_drive_get_current_track(device_t *img)
 {
 	floppy_drive *drv = get_safe_token( img );
 	return drv->current_track;
@@ -668,9 +668,9 @@ int floppy_get_count(running_machine &machine)
 {
 	int cnt = 0;
 	if (machine.device(FLOPPY_0)) cnt++;
-    if (machine.device(FLOPPY_1)) cnt++;
-    if (machine.device(FLOPPY_2)) cnt++;
-    if (machine.device(FLOPPY_3)) cnt++;
+	if (machine.device(FLOPPY_1)) cnt++;
+	if (machine.device(FLOPPY_2)) cnt++;
+	if (machine.device(FLOPPY_3)) cnt++;
 	return cnt;
 }
 
@@ -849,17 +849,17 @@ const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
 //-------------------------------------------------
 
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock),
-	  device_image_interface(mconfig, *this),
-	  m_token(NULL)
+	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock),
+		device_image_interface(mconfig, *this),
+		m_token(NULL)
 {
 	m_token = global_alloc_clear(floppy_drive);
 }
 
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  device_image_interface(mconfig, *this),
-	  m_token(NULL)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_image_interface(mconfig, *this),
+		m_token(NULL)
 {
 	m_token = global_alloc_clear(floppy_drive);
 }
@@ -919,10 +919,10 @@ void legacy_floppy_image_device::device_start()
 
 void legacy_floppy_image_device::device_config_complete()
 {
-    image_device_format **formatptr;
-    image_device_format *format;
-    formatptr = &m_formatlist;
-    int cnt = 0;
+	image_device_format **formatptr;
+	image_device_format *format;
+	formatptr = &m_formatlist;
+	int cnt = 0;
 
 	m_extension_list[0] = '\0';
 	const struct FloppyFormat *floppy_options = ((floppy_interface*)static_config())->formats;
@@ -1019,7 +1019,7 @@ bool legacy_floppy_image_device::is_creatable() const
 	if (static_config() )
 	{
 		const struct FloppyFormat *floppy_options = ((floppy_interface*)static_config())->formats;
-		int	i;
+		int i;
 		for ( i = 0; floppy_options[i].construct; i++ ) {
 			if(floppy_options[i].param_guidelines) cnt++;
 		}

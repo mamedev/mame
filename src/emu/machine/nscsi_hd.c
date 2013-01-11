@@ -85,7 +85,7 @@ void nscsi_harddisk_device::scsi_command()
 			blocks = 256;
 
 		logerror("%s: command READ start=%08x blocks=%04x\n",
-				 tag(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -94,8 +94,8 @@ void nscsi_harddisk_device::scsi_command()
 	case SC_INQUIRY: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
 		logerror("%s: command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
-				 tag(),
-				 lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
+					tag(),
+					lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
 		if(lun) {
 			bad_lun();
 			return;
@@ -126,8 +126,8 @@ void nscsi_harddisk_device::scsi_command()
 	case SC_MODE_SENSE_6: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
 		logerror("%s: command MODE SENSE 6 lun=%d page=%02x alloc=%02x link=%02x\n",
-				 tag(),
-				 lun, scsi_cmdbuf[2] & 0x3f, scsi_cmdbuf[4], scsi_cmdbuf[5]);
+					tag(),
+					lun, scsi_cmdbuf[2] & 0x3f, scsi_cmdbuf[4], scsi_cmdbuf[5]);
 		if(lun) {
 			bad_lun();
 			return;
@@ -262,7 +262,7 @@ void nscsi_harddisk_device::scsi_command()
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
 		logerror("%s: command READ EXTENDED start=%08x blocks=%04x\n",
-				 tag(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -273,7 +273,7 @@ void nscsi_harddisk_device::scsi_command()
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
 		logerror("%s: command WRITE EXTENDED start=%08x blocks=%04x\n",
-				 tag(), lba, blocks);
+					tag(), lba, blocks);
 
 		scsi_data_out(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);

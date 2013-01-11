@@ -174,8 +174,8 @@ WRITE8_MEMBER(_1942_state::c1942_scroll_w)
 WRITE8_MEMBER(_1942_state::c1942_c804_w)
 {
 	/* bit 7: flip screen
-       bit 4: cpu B reset
-       bit 0: coin counter */
+	   bit 4: cpu B reset
+	   bit 0: coin counter */
 
 	coin_counter_w(machine(), 0,data & 0x01);
 

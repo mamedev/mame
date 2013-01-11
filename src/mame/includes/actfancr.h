@@ -16,7 +16,7 @@ public:
 	UINT16 m_spriteram16[0x800/2]; // a 16-bit copy of spriteram for use with the MXC06 code
 
 	/* video-related */
-	int         		m_flipscreen;
+	int                 m_flipscreen;
 
 	/* misc */
 	int            m_trio_control_select;

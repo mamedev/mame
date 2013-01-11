@@ -72,7 +72,7 @@ Notes:
 struct blitter_t
 {
 
-	UINT16	x, y, w, h,
+	UINT16  x, y, w, h,
 			gfx_lo, gfx_hi,
 			depth,
 			pen,
@@ -266,15 +266,15 @@ UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &b
 	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 0x01;
-		if (machine().input().code_pressed(KEYCODE_W))	mask |= 0x02;
-		if (machine().input().code_pressed(KEYCODE_E))	mask |= 0x04;
-		if (machine().input().code_pressed(KEYCODE_R))	mask |= 0x08;
-		if (machine().input().code_pressed(KEYCODE_A))	mask |= 0x10;
-		if (machine().input().code_pressed(KEYCODE_S))	mask |= 0x20;
-		if (machine().input().code_pressed(KEYCODE_D))	mask |= 0x40;
-		if (machine().input().code_pressed(KEYCODE_F))	mask |= 0x80;
-		if (mask)	layer_enable &= mask;
+		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 0x01;
+		if (machine().input().code_pressed(KEYCODE_W))  mask |= 0x02;
+		if (machine().input().code_pressed(KEYCODE_E))  mask |= 0x04;
+		if (machine().input().code_pressed(KEYCODE_R))  mask |= 0x08;
+		if (machine().input().code_pressed(KEYCODE_A))  mask |= 0x10;
+		if (machine().input().code_pressed(KEYCODE_S))  mask |= 0x20;
+		if (machine().input().code_pressed(KEYCODE_D))  mask |= 0x40;
+		if (machine().input().code_pressed(KEYCODE_F))  mask |= 0x80;
+		if (mask)   layer_enable &= mask;
 	}
 #endif
 
@@ -289,7 +289,7 @@ UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &b
 
 			for (l = 0; l < 8; l++)
 			{
-				if (	(m_layer[l][scr_addr] != 0xff)
+				if (    (m_layer[l][scr_addr] != 0xff)
 #ifdef MAME_DEBUG
 						&& (layer_enable & (1 << l))
 #endif
@@ -298,7 +298,7 @@ UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &b
 			}
 
 
-			l	=	pri_ram[pri_addr] & 7;
+			l   =   pri_ram[pri_addr] & 7;
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
@@ -444,10 +444,10 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx		=	memregion("blitter")->base();
-	UINT8 *gfx2		=	memregion("blitter_hi")->base();
-	int gfx_size	=	memregion("blitter")->bytes();
-	int gfx2_size	=	memregion("blitter_hi")->bytes();
+	UINT8 *gfx      =   memregion("blitter")->base();
+	UINT8 *gfx2     =   memregion("blitter_hi")->base();
+	int gfx_size    =   memregion("blitter")->bytes();
+	int gfx2_size   =   memregion("blitter_hi")->bytes();
 
 	const rectangle &clip = machine().primary_screen->visible_area();
 
@@ -458,37 +458,37 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
-	dest	=	m_layer[   blitter.flags & 0x0007	];
-	opaque	=			 !(blitter.flags & 0x0008);
-	clear	=			   blitter.flags & 0x0010;
-	flipx	=			   blitter.flags & 0x0020;
-	flipy	=			   blitter.flags & 0x0040;
-	if					(!(blitter.flags & 0x0400))
+	dest    =   m_layer[   blitter.flags & 0x0007   ];
+	opaque  =            !(blitter.flags & 0x0008);
+	clear   =              blitter.flags & 0x0010;
+	flipx   =              blitter.flags & 0x0020;
+	flipy   =              blitter.flags & 0x0040;
+	if                  (!(blitter.flags & 0x0400))
 		return;
 
-	pen_hi	=	(m_lhb2_pen_hi & 0x07) << 5;
+	pen_hi  =   (m_lhb2_pen_hi & 0x07) << 5;
 
 	// pixel address
-	z		=	blitter.gfx_lo  + (blitter.gfx_hi << 16);
+	z       =   blitter.gfx_lo  + (blitter.gfx_hi << 16);
 
 	// what were they smoking???
-	depth4	=	!((blitter.flags & 0x7) < (4 - (blitter.depth & 0x7))) ||
-				(z & 0x800000);		// see lhb2
+	depth4  =   !((blitter.flags & 0x7) < (4 - (blitter.depth & 0x7))) ||
+				(z & 0x800000);     // see lhb2
 
 	z &= 0x7fffff;
 
 	if (depth4)
 	{
-		z	*=	2;
-		if (gfx2 && (blitter.gfx_hi & 0x80))	trans_pen = 0x1f;	// lhb2
-		else									trans_pen = 0x0f;
+		z   *=  2;
+		if (gfx2 && (blitter.gfx_hi & 0x80))    trans_pen = 0x1f;   // lhb2
+		else                                    trans_pen = 0x0f;
 
 		clear_pen = blitter.pen | 0xf0;
 	}
 	else
 	{
-		if (gfx2)	trans_pen = 0x1f;	// vbowl
-		else		trans_pen = 0xff;
+		if (gfx2)   trans_pen = 0x1f;   // vbowl
+		else        trans_pen = 0xff;
 
 		clear_pen = blitter.pen;
 	}
@@ -496,11 +496,11 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	xstart = (blitter.x & 0x1ff) - (blitter.x & 0x200);
 	ystart = (blitter.y & 0x0ff) - (blitter.y & 0x100);
 
-	if (flipx)	{ xend = xstart - (blitter.w & 0x1ff) - 1;	xinc = -1; }
-	else		{ xend = xstart + (blitter.w & 0x1ff) + 1;	xinc =  1; }
+	if (flipx)  { xend = xstart - (blitter.w & 0x1ff) - 1;  xinc = -1; }
+	else        { xend = xstart + (blitter.w & 0x1ff) + 1;  xinc =  1; }
 
-	if (flipy)	{ yend = ystart - (blitter.h & 0x0ff) - 1;	yinc = -1; }
-	else		{ yend = ystart + (blitter.h & 0x0ff) + 1;	yinc =  1; }
+	if (flipy)  { yend = ystart - (blitter.h & 0x0ff) - 1;  yinc = -1; }
+	else        { yend = ystart + (blitter.h & 0x0ff) + 1;  yinc =  1; }
 
 	for (y = ystart; y != yend; y += yinc)
 	{
@@ -509,8 +509,8 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 			// fetch the pixel
 			if (!clear)
 			{
-				if (depth4)		pen = (gfx[(z/2)%gfx_size] >> ((z&1)?4:0)) & 0x0f;
-				else			pen = gfx[z%gfx_size];
+				if (depth4)     pen = (gfx[(z/2)%gfx_size] >> ((z&1)?4:0)) & 0x0f;
+				else            pen = gfx[z%gfx_size];
 
 				if ( gfx2 )
 				{
@@ -523,9 +523,9 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 			// plot it
 			if (clip.contains(x, y))
 			{
-				if      (clear)				dest[x + y * 512] = clear_pen;
-				else if (pen != trans_pen)	dest[x + y * 512] = pen | pen_hi;
-				else if (opaque)			dest[x + y * 512] = 0xff;
+				if      (clear)             dest[x + y * 512] = clear_pen;
+				else if (pen != trans_pen)  dest[x + y * 512] = pen | pen_hi;
+				else if (opaque)            dest[x + y * 512] = 0xff;
 			}
 
 			z++;
@@ -535,7 +535,7 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	#ifdef MAME_DEBUG
 #if 1
 	if (machine().input().code_pressed(KEYCODE_Z))
-	{	char buf[20];
+	{   char buf[20];
 		sprintf(buf, "%02X%02X",blitter.depth,blitter.flags&0xff);
 //      ui_draw_text(buf, blitter.x, blitter.y);    // crashes mame!
 	}
@@ -573,7 +573,7 @@ UINT16 igs011_state::igs_dips_r(int NUM)
 			ret = ioport(dipnames[i])->read();
 
 	// 0x0100 is blitter busy
-	return	(ret & 0xff) | 0x0000;
+	return  (ret & 0xff) | 0x0000;
 }
 
 // Games have 3 to 5 dips
@@ -598,13 +598,13 @@ static void wlcc_decrypt(running_machine &machine)
 	{
 		UINT16 x = src[i];
 
-    	if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
+		if ((i & 0x2000) == 0x0000 || (i & 0x0004) == 0x0000 || (i & 0x0090) == 0x0000)
 			x ^= 0x0004;
-    	if ((i & 0x0100) == 0x0100 || (i & 0x0040) == 0x0040 || (i & 0x0012) == 0x0012)
+		if ((i & 0x0100) == 0x0100 || (i & 0x0040) == 0x0040 || (i & 0x0012) == 0x0012)
 			x ^= 0x0020;
-    	if ((i & 0x2400) == 0x0000 || (i & 0x4100) == 0x4100 || ((i & 0x2000) == 0x2000 && (i & 0x0c00) != 0x0000))
+		if ((i & 0x2400) == 0x0000 || (i & 0x4100) == 0x4100 || ((i & 0x2000) == 0x2000 && (i & 0x0c00) != 0x0000))
 			x ^= 0x0200;
-    	if ((x & 0x0024) == 0x0004 || (x & 0x0024) == 0x0020)
+		if ((x & 0x0024) == 0x0004 || (x & 0x0024) == 0x0020)
 			x ^= 0x0024;
 		src[i] = x;
 	}
@@ -676,22 +676,22 @@ static void drgnwrld_type2_decrypt(running_machine &machine)
 		UINT16 x = src[i];
 
 		if(((i & 0x000090) == 0x000000) || ((i & 0x002004) != 0x002004))
-		  x ^= 0x0004;
+			x ^= 0x0004;
 
 		if((((i & 0x000050) == 0x000000) || ((i & 0x000142) != 0x000000)) && ((i & 0x000150) != 0x000000))
-		  x ^= 0x0020;
+			x ^= 0x0020;
 
 		if(((i & 0x004280) == 0x004000) || ((i & 0x004080) == 0x000000))
-		  x ^= 0x0200;
+			x ^= 0x0200;
 
 		if((i & 0x0011a0) != 0x001000)
-		  x ^= 0x0200;
+			x ^= 0x0200;
 
 		if((i & 0x000180) == 0x000100)
-		  x ^= 0x0200;
+			x ^= 0x0200;
 
 		if((x & 0x0024) == 0x0020 || (x & 0x0024) == 0x0004)
-		  x ^= 0x0024;
+			x ^= 0x0024;
 
 		src[i] = x;
 	}
@@ -920,7 +920,7 @@ static void lhb2_decrypt_gfx(running_machine &machine)
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
-    	result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
+		result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
 
 	memcpy(src,result_data,rom_size);
 
@@ -935,7 +935,7 @@ static void drgnwrld_gfx_decrypt(running_machine &machine)
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
-    	result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
+		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
 
 	memcpy(src,result_data,rom_size);
 
@@ -991,7 +991,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 
 	switch (offset)
 	{
-		case 0:	// COPY
+		case 0: // COPY
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300)
 			{
 				m_prot1 = m_prot1_swap;
@@ -999,7 +999,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 			}
 			break;
 
-		case 2:	// INC
+		case 2: // INC
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xff00)
 			{
 				m_prot1++;
@@ -1007,7 +1007,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 			}
 			break;
 
-		case 4:	// DEC
+		case 4: // DEC
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xaa00)
 			{
 				m_prot1--;
@@ -1015,7 +1015,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 			}
 			break;
 
-		case 6:	// SWAP
+		case 6: // SWAP
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500)
 			{
 				// b1 . (b2|b3) . b2 . (b0&b3)
@@ -1278,7 +1278,7 @@ READ16_MEMBER(igs011_state::igs012_prot_fake_r)
 */
 
 // Macro that checks whether the current mode and data byte written match the arguments
-#define MODE_AND_DATA(_MODE,_DATA)	(m_igs012_prot_mode == (_MODE) && ( (ACCESSING_BITS_8_15 && (data & 0xff00) == ((_DATA)<<8)) || (ACCESSING_BITS_0_7 && ((data & 0x00ff) == (_DATA))) ) )
+#define MODE_AND_DATA(_MODE,_DATA)  (m_igs012_prot_mode == (_MODE) && ( (ACCESSING_BITS_8_15 && (data & 0xff00) == ((_DATA)<<8)) || (ACCESSING_BITS_0_7 && ((data & 0x00ff) == (_DATA))) ) )
 
 WRITE16_MEMBER(igs011_state::igs012_prot_mode_w)
 {
@@ -1403,31 +1403,31 @@ READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return ioport("IN0")->read();
-		case 0x01:	return ioport("IN1")->read();
-		case 0x02:	return ioport("IN2")->read();
+		case 0x00:  return ioport("IN0")->read();
+		case 0x01:  return ioport("IN1")->read();
+		case 0x02:  return ioport("IN2")->read();
 
-		case 0x20:	return 0x49;
-		case 0x21:	return 0x47;
-		case 0x22:	return 0x53;
+		case 0x20:  return 0x49;
+		case 0x21:  return 0x47;
+		case 0x22:  return 0x53;
 
-		case 0x24:	return 0x41;
-		case 0x25:	return 0x41;
-		case 0x26:	return 0x7f;
-		case 0x27:	return 0x41;
-		case 0x28:	return 0x41;
+		case 0x24:  return 0x41;
+		case 0x25:  return 0x41;
+		case 0x26:  return 0x7f;
+		case 0x27:  return 0x41;
+		case 0x28:  return 0x41;
 
-		case 0x2a:	return 0x3e;
-		case 0x2b:	return 0x41;
-		case 0x2c:	return 0x49;
-		case 0x2d:	return 0xf9;
-		case 0x2e:	return 0x0a;
+		case 0x2a:  return 0x3e;
+		case 0x2b:  return 0x41;
+		case 0x2c:  return 0x49;
+		case 0x2d:  return 0xf9;
+		case 0x2e:  return 0x0a;
 
-		case 0x30:	return 0x26;
-		case 0x31:	return 0x49;
-		case 0x32:	return 0x49;
-		case 0x33:	return 0x49;
-		case 0x34:	return 0x32;
+		case 0x30:  return 0x26;
+		case 0x31:  return 0x49;
+		case 0x32:  return 0x49;
+		case 0x33:  return 0x49;
+		case 0x34:  return 0x32;
 
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
@@ -1444,9 +1444,9 @@ WRITE16_MEMBER(igs011_state::lhb_inputs_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,	data & 0x20	);
+		coin_counter_w(machine(), 0,    data & 0x20 );
 		//  coin out        data & 0x40
-		m_igs_hopper		=	data & 0x80;
+		m_igs_hopper        =   data & 0x80;
 	}
 
 	if ( m_igs_input_sel & (~0xff) )
@@ -1458,14 +1458,14 @@ READ16_MEMBER(igs011_state::lhb_inputs_r)
 {
 	switch(offset)
 	{
-		case 0:		return m_igs_input_sel;
+		case 0:     return m_igs_input_sel;
 
 		case 1:
-			if (~m_igs_input_sel & 0x01)	return ioport("KEY0")->read();
-			if (~m_igs_input_sel & 0x02)	return ioport("KEY1")->read();
-			if (~m_igs_input_sel & 0x04)	return ioport("KEY2")->read();
-			if (~m_igs_input_sel & 0x08)	return ioport("KEY3")->read();
-			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
+			if (~m_igs_input_sel & 0x01)    return ioport("KEY0")->read();
+			if (~m_igs_input_sel & 0x02)    return ioport("KEY1")->read();
+			if (~m_igs_input_sel & 0x04)    return ioport("KEY2")->read();
+			if (~m_igs_input_sel & 0x08)    return ioport("KEY3")->read();
+			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
 
 			logerror("%06x: warning, reading with igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
 			break;
@@ -1489,9 +1489,9 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,	data & 0x20);
+				coin_counter_w(machine(), 0,    data & 0x20);
 				//  coin out        data & 0x40
-				m_igs_hopper		=	data & 0x80;
+				m_igs_hopper        =   data & 0x80;
 			}
 
 			if ( m_igs_input_sel & ~0x7f )
@@ -1580,11 +1580,11 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 	switch(m_igs003_reg[0])
 	{
 		case 0x01:
-			if (~m_igs_input_sel & 0x01)	return ioport("KEY0")->read();
-			if (~m_igs_input_sel & 0x02)	return ioport("KEY1")->read();
-			if (~m_igs_input_sel & 0x04)	return ioport("KEY2")->read();
-			if (~m_igs_input_sel & 0x08)	return ioport("KEY3")->read();
-			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
+			if (~m_igs_input_sel & 0x01)    return ioport("KEY0")->read();
+			if (~m_igs_input_sel & 0x02)    return ioport("KEY1")->read();
+			if (~m_igs_input_sel & 0x04)    return ioport("KEY2")->read();
+			if (~m_igs_input_sel & 0x08)    return ioport("KEY3")->read();
+			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
 			/* fall through */
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
@@ -1597,27 +1597,27 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 		// 0544FE: 20 21 22 24 25 26 27 28 2A 2B 2C 2D 2E 30 31 32 33 34
 		// 0544EC: 49 47 53 41 41 7F 41 41 3E 41 49 F9 0A 26 49 49 49 32
 
-		case 0x20:	return 0x49;
-		case 0x21:	return 0x47;
-		case 0x22:	return 0x53;
+		case 0x20:  return 0x49;
+		case 0x21:  return 0x47;
+		case 0x22:  return 0x53;
 
-		case 0x24:	return 0x41;
-		case 0x25:	return 0x41;
-		case 0x26:	return 0x7f;
-		case 0x27:	return 0x41;
-		case 0x28:	return 0x41;
+		case 0x24:  return 0x41;
+		case 0x25:  return 0x41;
+		case 0x26:  return 0x7f;
+		case 0x27:  return 0x41;
+		case 0x28:  return 0x41;
 
-		case 0x2a:	return 0x3e;
-		case 0x2b:	return 0x41;
-		case 0x2c:	return 0x49;
-		case 0x2d:	return 0xf9;
-		case 0x2e:	return 0x0a;
+		case 0x2a:  return 0x3e;
+		case 0x2b:  return 0x41;
+		case 0x2c:  return 0x49;
+		case 0x2d:  return 0xf9;
+		case 0x2e:  return 0x0a;
 
-		case 0x30:	return 0x26;
-		case 0x31:	return 0x49;
-		case 0x32:	return 0x49;
-		case 0x33:	return 0x49;
-		case 0x34:	return 0x32;
+		case 0x30:  return 0x26;
+		case 0x31:  return 0x49;
+		case 0x32:  return 0x49;
+		case 0x33:  return 0x49;
+		case 0x34:  return 0x32;
 	}
 
 	return 0;
@@ -1637,12 +1637,12 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,	data & 0x01);
+				coin_counter_w(machine(), 0,    data & 0x01);
 				//  coin out        data & 0x02
 
 				okim6295_device *oki = machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
-				m_igs_hopper		=	data & 0x20;
+				m_igs_hopper        =   data & 0x20;
 			}
 
 			if (data & ~0x33)
@@ -1659,29 +1659,29 @@ READ16_MEMBER(igs011_state::wlcc_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return ioport("IN0")->read();
+		case 0x00:  return ioport("IN0")->read();
 
-		case 0x20:	return 0x49;
-		case 0x21:	return 0x47;
-		case 0x22:	return 0x53;
+		case 0x20:  return 0x49;
+		case 0x21:  return 0x47;
+		case 0x22:  return 0x53;
 
-		case 0x24:	return 0x41;
-		case 0x25:	return 0x41;
-		case 0x26:	return 0x7f;
-		case 0x27:	return 0x41;
-		case 0x28:	return 0x41;
+		case 0x24:  return 0x41;
+		case 0x25:  return 0x41;
+		case 0x26:  return 0x7f;
+		case 0x27:  return 0x41;
+		case 0x28:  return 0x41;
 
-		case 0x2a:	return 0x3e;
-		case 0x2b:	return 0x41;
-		case 0x2c:	return 0x49;
-		case 0x2d:	return 0xf9;
-		case 0x2e:	return 0x0a;
+		case 0x2a:  return 0x3e;
+		case 0x2b:  return 0x41;
+		case 0x2c:  return 0x49;
+		case 0x2d:  return 0xf9;
+		case 0x2e:  return 0x0a;
 
-		case 0x30:	return 0x26;
-		case 0x31:	return 0x49;
-		case 0x32:	return 0x49;
-		case 0x33:	return 0x49;
-		case 0x34:	return 0x32;
+		case 0x30:  return 0x26;
+		case 0x31:  return 0x49;
+		case 0x32:  return 0x49;
+		case 0x33:  return 0x49;
+		case 0x34:  return 0x32;
 
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
@@ -1706,9 +1706,9 @@ WRITE16_MEMBER(igs011_state::xymg_igs003_w)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,	data & 0x20);
+				coin_counter_w(machine(), 0,    data & 0x20);
 				//  coin out        data & 0x40
-				m_igs_hopper		=	data & 0x80;
+				m_igs_hopper        =   data & 0x80;
 			}
 
 			if ( m_igs_input_sel & 0x40 )
@@ -1725,37 +1725,37 @@ READ16_MEMBER(igs011_state::xymg_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return ioport("COIN")->read();
+		case 0x00:  return ioport("COIN")->read();
 
 		case 0x02:
-			if (~m_igs_input_sel & 0x01)	return ioport("KEY0")->read();
-			if (~m_igs_input_sel & 0x02)	return ioport("KEY1")->read();
-			if (~m_igs_input_sel & 0x04)	return ioport("KEY2")->read();
-			if (~m_igs_input_sel & 0x08)	return ioport("KEY3")->read();
-			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
+			if (~m_igs_input_sel & 0x01)    return ioport("KEY0")->read();
+			if (~m_igs_input_sel & 0x02)    return ioport("KEY1")->read();
+			if (~m_igs_input_sel & 0x04)    return ioport("KEY2")->read();
+			if (~m_igs_input_sel & 0x08)    return ioport("KEY3")->read();
+			if (~m_igs_input_sel & 0x10)    return ioport("KEY4")->read();
 			/* fall through */
 
-		case 0x20:	return 0x49;
-		case 0x21:	return 0x47;
-		case 0x22:	return 0x53;
+		case 0x20:  return 0x49;
+		case 0x21:  return 0x47;
+		case 0x22:  return 0x53;
 
-		case 0x24:	return 0x41;
-		case 0x25:	return 0x41;
-		case 0x26:	return 0x7f;
-		case 0x27:	return 0x41;
-		case 0x28:	return 0x41;
+		case 0x24:  return 0x41;
+		case 0x25:  return 0x41;
+		case 0x26:  return 0x7f;
+		case 0x27:  return 0x41;
+		case 0x28:  return 0x41;
 
-		case 0x2a:	return 0x3e;
-		case 0x2b:	return 0x41;
-		case 0x2c:	return 0x49;
-		case 0x2d:	return 0xf9;
-		case 0x2e:	return 0x0a;
+		case 0x2a:  return 0x3e;
+		case 0x2b:  return 0x41;
+		case 0x2c:  return 0x49;
+		case 0x2d:  return 0xf9;
+		case 0x2e:  return 0x0a;
 
-		case 0x30:	return 0x26;
-		case 0x31:	return 0x49;
-		case 0x32:	return 0x49;
-		case 0x33:	return 0x49;
-		case 0x34:	return 0x32;
+		case 0x30:  return 0x26;
+		case 0x31:  return 0x49;
+		case 0x32:  return 0x49;
+		case 0x33:  return 0x49;
+		case 0x34:  return 0x32;
 
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
@@ -1853,33 +1853,33 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 {
 	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return ioport("IN0")->read();
-		case 0x01:	return ioport("IN1")->read();
+		case 0x00:  return ioport("IN0")->read();
+		case 0x01:  return ioport("IN1")->read();
 
 		case 0x03:
 			return BITSWAP16(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 
-		case 0x20:	return 0x49;
-		case 0x21:	return 0x47;
-		case 0x22:	return 0x53;
+		case 0x20:  return 0x49;
+		case 0x21:  return 0x47;
+		case 0x22:  return 0x53;
 
-		case 0x24:	return 0x41;
-		case 0x25:	return 0x41;
-		case 0x26:	return 0x7f;
-		case 0x27:	return 0x41;
-		case 0x28:	return 0x41;
+		case 0x24:  return 0x41;
+		case 0x25:  return 0x41;
+		case 0x26:  return 0x7f;
+		case 0x27:  return 0x41;
+		case 0x28:  return 0x41;
 
-		case 0x2a:	return 0x3e;
-		case 0x2b:	return 0x41;
-		case 0x2c:	return 0x49;
-		case 0x2d:	return 0xf9;
-		case 0x2e:	return 0x0a;
+		case 0x2a:  return 0x3e;
+		case 0x2b:  return 0x41;
+		case 0x2c:  return 0x49;
+		case 0x2d:  return 0xf9;
+		case 0x2e:  return 0x0a;
 
-		case 0x30:	return 0x26;
-		case 0x31:	return 0x49;
-		case 0x32:	return 0x49;
-		case 0x33:	return 0x49;
-		case 0x34:	return 0x32;
+		case 0x30:  return 0x26;
+		case 0x31:  return 0x49;
+		case 0x32:  return 0x49;
+		case 0x33:  return 0x49;
+		case 0x34:  return 0x32;
 
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
@@ -2197,18 +2197,18 @@ DRIVER_INIT_MEMBER(igs011_state,lhb2)
 	lhb2_decrypt_gfx(machine());
 /*
     // PROTECTION CHECKS
-    rom[0x034f4/2]  =	0x4e71;	    // 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
-    rom[0x03502/2]  =	0x6032;	    // 003502: 6732    beq 3536   (rom test, fills palette with white otherwise)
-    rom[0x1afea/2]  =	0x6034;	    // 01AFEA: 6734    beq 1b020  (fills palette with black otherwise)
+    rom[0x034f4/2]  =   0x4e71;     // 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
+    rom[0x03502/2]  =   0x6032;     // 003502: 6732    beq 3536   (rom test, fills palette with white otherwise)
+    rom[0x1afea/2]  =   0x6034;     // 01AFEA: 6734    beq 1b020  (fills palette with black otherwise)
     rom[0x24b8a/2]  =   0x6036;     // 024B8A: 6736    beq 24bc2  (fills palette with green otherwise)
     rom[0x29ef8/2]  =   0x6036;     // 029EF8: 6736    beq 29f30  (fills palette with red otherwise)
     rom[0x2e69c/2]  =   0x6036;     // 02E69C: 6736    beq 2e6d4  (fills palette with green otherwise)
     rom[0x2fe96/2]  =   0x6036;     // 02FE96: 6736    beq 2fece  (fills palette with red otherwise)
     rom[0x325da/2]  =   0x6036;     // 0325DA: 6736    beq 32612  (fills palette with green otherwise)
-    rom[0x3d80a/2]  =	0x6034;	    // 03D80A: 6734    beq 3d840  (fills palette with black otherwise)
+    rom[0x3d80a/2]  =   0x6034;     // 03D80A: 6734    beq 3d840  (fills palette with black otherwise)
     rom[0x3ed80/2]  =   0x6036;     // 03ED80: 6736    beq 3edb8  (fills palette with red otherwise)
-    rom[0x41d72/2]  =	0x6034;	    // 041D72: 6734    beq 41da8  (fills palette with black otherwise)
-    rom[0x44834/2]  =	0x6034;	    // 044834: 6734    beq 4486a  (fills palette with black otherwise)
+    rom[0x41d72/2]  =   0x6034;     // 041D72: 6734    beq 41da8  (fills palette with black otherwise)
+    rom[0x44834/2]  =   0x6034;     // 044834: 6734    beq 4486a  (fills palette with black otherwise)
 */
 }
 
@@ -2227,13 +2227,13 @@ DRIVER_INIT_MEMBER(igs011_state,vbowl)
 	}
 
 	// Patch the bad dump so that it doesn't reboot at the end of a game (the patched value is from vbowlj)
-	rom[0x080e0/2] = 0xe549;	// 0080E0: 0449 dc.w $0449; ILLEGAL
+	rom[0x080e0/2] = 0xe549;    // 0080E0: 0449 dc.w $0449; ILLEGAL
 /*
     // PROTECTION CHECKS
     rom[0x03764/2] = 0x4e75;    // 003764: 4E56 0000 link    A6, #$0
-    rom[0x173ee/2] = 0x600c;	// 0173EE: 670C      beq     $173fc
-    rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
-    rom[0x1f7ce/2] = 0x600c;	// 01F7CE: 670C      beq     $1f7dc
+    rom[0x173ee/2] = 0x600c;    // 0173EE: 670C      beq     $173fc
+    rom[0x1e6e6/2] = 0x600c;    // 01E6E6: 670C      beq     $1e6f4
+    rom[0x1f7ce/2] = 0x600c;    // 01F7CE: 670C      beq     $1f7dc
 */
 }
 
@@ -2254,9 +2254,9 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 /*
     // PROTECTION CHECKS
     rom[0x37b4/2] = 0x4e75;     // 0037B4: 4E56 0000 link    A6, #$0
-    rom[0x17720/2] = 0x600c;	// 017720: 670C      beq     1772e
-    rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
-    rom[0x1f7c8/2] = 0x600c;	// 01F7C8: 670C      beq     1f7d6
+    rom[0x17720/2] = 0x600c;    // 017720: 670C      beq     1772e
+    rom[0x1e6e6/2] = 0x600c;    // 01E6E6: 670C      beq     $1e6f4
+    rom[0x1f7c8/2] = 0x600c;    // 01F7C8: 670C      beq     1f7d6
 */
 }
 
@@ -2270,24 +2270,24 @@ DRIVER_INIT_MEMBER(igs011_state,nkishusp)
 
 	// PROTECTION CHECKS (similar to lhb2)
 
-	rom[0x03624/2]	=	0x6042;		// 003624: 660E      bne     $3634 (ROM test)
+	rom[0x03624/2]  =   0x6042;     // 003624: 660E      bne     $3634 (ROM test)
 
-	rom[0x1a9d2/2]	=	0x6034;		// 01A9D2: 6734      beq     $1aa08
-	rom[0x26306/2]	=	0x6036;		// 026306: 6736      beq     $2633e
-	rom[0x29190/2]	=	0x6038;		// 029190: 6E38      bgt     $291ca (system error)
-	rom[0x2b82a/2]	=	0x6036;		// 02B82A: 6736      beq     $2b862
-	rom[0x2ff20/2]	=	0x6036;		// 02FF20: 6736      beq     $2ff58
-	rom[0x3151c/2]	=	0x6036;		// 03151C: 6736      beq     $31554
-	rom[0x33dfc/2]	=	0x6036;		// 033DFC: 6736      beq     $33e34
-	rom[0x3460e/2]	=	0x6038;		// 03460E: 6E38      bgt     $34648 (system error)
-	rom[0x3f09e/2]	=	0x6034;		// 03F09E: 6734      beq     $3f0d4
-	rom[0x406a8/2]	=	0x6036;		// 0406A8: 6736      beq     $406e0
-	rom[0x4376a/2]	=	0x6034;		// 04376A: 6734      beq     $437a0
-	rom[0x462d6/2]	=	0x6034;		// 0462D6: 6734      beq     $4630c
-	rom[0x471ec/2]	=	0x6036;		// 0471EC: 6E36      bgt     $47224 (system error)
-	rom[0x49c46/2]	=	0x6000;		// 049C46: 6700 0444 beq     $4a08c
-	rom[0x4a2b6/2]	=	0x6036;		// 04A2B6: 6736      beq     $4a2ee
-	rom[0x4c67a/2]	=	0x6038;		// 04C67A: 6E38      bgt     $4c6b4 (system error)
+	rom[0x1a9d2/2]  =   0x6034;     // 01A9D2: 6734      beq     $1aa08
+	rom[0x26306/2]  =   0x6036;     // 026306: 6736      beq     $2633e
+	rom[0x29190/2]  =   0x6038;     // 029190: 6E38      bgt     $291ca (system error)
+	rom[0x2b82a/2]  =   0x6036;     // 02B82A: 6736      beq     $2b862
+	rom[0x2ff20/2]  =   0x6036;     // 02FF20: 6736      beq     $2ff58
+	rom[0x3151c/2]  =   0x6036;     // 03151C: 6736      beq     $31554
+	rom[0x33dfc/2]  =   0x6036;     // 033DFC: 6736      beq     $33e34
+	rom[0x3460e/2]  =   0x6038;     // 03460E: 6E38      bgt     $34648 (system error)
+	rom[0x3f09e/2]  =   0x6034;     // 03F09E: 6734      beq     $3f0d4
+	rom[0x406a8/2]  =   0x6036;     // 0406A8: 6736      beq     $406e0
+	rom[0x4376a/2]  =   0x6034;     // 04376A: 6734      beq     $437a0
+	rom[0x462d6/2]  =   0x6034;     // 0462D6: 6734      beq     $4630c
+	rom[0x471ec/2]  =   0x6036;     // 0471EC: 6E36      bgt     $47224 (system error)
+	rom[0x49c46/2]  =   0x6000;     // 049C46: 6700 0444 beq     $4a08c
+	rom[0x4a2b6/2]  =   0x6036;     // 04A2B6: 6736      beq     $4a2ee
+	rom[0x4c67a/2]  =   0x6038;     // 04C67A: 6E38      bgt     $4c6b4 (system error)
 }
 
 
@@ -2333,21 +2333,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnwrld_igs012, AS_PROGRAM, 16, igs011_state )
 	// IGS012
-	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE(igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
-	AM_RANGE( 0x001610, 0x00161f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
-	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE(igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
-	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE(igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
-	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE(igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
-	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE(igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
-	AM_RANGE( 0x001660, 0x00166f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
-	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE(igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
+	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE(igs012_prot_swap_w      )   AM_MIRROR(0x01c000) // swap (a5 / 55)
+	AM_RANGE( 0x001610, 0x00161f ) AM_READ(igs012_prot_r            )   AM_MIRROR(0x01c000) // read (mode 0)
+	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE(igs012_prot_dec_inc_w   )   AM_MIRROR(0x01c000) // dec  (aa), inc  (fa)
+	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE(igs012_prot_inc_w       )   AM_MIRROR(0x01c000) // inc  (ff)
+	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE(igs012_prot_copy_w      )   AM_MIRROR(0x01c000) // copy (22)
+	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE(igs012_prot_dec_copy_w  )   AM_MIRROR(0x01c000) // dec  (5a), copy (33)
+	AM_RANGE( 0x001660, 0x00166f ) AM_READ(igs012_prot_r            )   AM_MIRROR(0x01c000) // read (mode 1)
+	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE(igs012_prot_mode_w      )   AM_MIRROR(0x01c000) // mode (cc / dd)
 
-	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE(igs011_prot2_dec_w				)	// dec   (33)
-	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE(drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE(igs011_prot2_reset_w			)	// reset (33)
-	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r	)	// read
+	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE(igs011_prot2_dec_w              )   // dec   (33)
+	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE(drgnwrld_igs011_prot2_swap_w    )   // swap  (33)
+	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE(igs011_prot2_reset_w            )   // reset (33)
+	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r  )   // read
 
-	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE(igs012_prot_reset_w	)	// reset?
+	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE(igs012_prot_reset_w )   // reset?
 //  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
 
 	AM_IMPORT_FROM(drgnwrld)
@@ -2383,9 +2383,9 @@ static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16, igs011_state )
 
 	AM_RANGE( 0x010000, 0x010001 ) AM_WRITE(lhb_okibank_w )
 
-	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w			)
-	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)
-	AM_RANGE( 0x010600, 0x0107ff ) AM_READ(lhb_igs011_prot2_r			)
+	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w          )
+	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w )
+	AM_RANGE( 0x010600, 0x0107ff ) AM_READ(lhb_igs011_prot2_r           )
 	// no reset
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
@@ -2423,9 +2423,9 @@ static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
 
 	AM_RANGE( 0x010000, 0x010001 ) AM_WRITE(lhb_okibank_w )
 
-	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc  (33)
-	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w		)	// swap (33)
-	AM_RANGE( 0x010600, 0x0107ff ) AM_READ(lhb_igs011_prot2_r			)	// read
+	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w          )   // inc  (33)
+	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w     )   // swap (33)
+	AM_RANGE( 0x010600, 0x0107ff ) AM_READ(lhb_igs011_prot2_r           )   // read
 	// no reset
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
@@ -2460,10 +2460,10 @@ static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16, igs011_state )
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
 
-	AM_RANGE( 0x518000, 0x5181ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (33)
-	AM_RANGE( 0x518200, 0x5183ff ) AM_WRITE(wlcc_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x518800, 0x5189ff ) AM_READ(igs011_prot2_reset_r			)	// reset
-	AM_RANGE( 0x519000, 0x5195ff ) AM_READ(lhb_igs011_prot2_r			)	// read
+	AM_RANGE( 0x518000, 0x5181ff ) AM_WRITE(igs011_prot2_inc_w          )   // inc   (33)
+	AM_RANGE( 0x518200, 0x5183ff ) AM_WRITE(wlcc_igs011_prot2_swap_w    )   // swap  (33)
+	AM_RANGE( 0x518800, 0x5189ff ) AM_READ(igs011_prot2_reset_r         )   // reset
+	AM_RANGE( 0x519000, 0x5195ff ) AM_READ(lhb_igs011_prot2_r           )   // read
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
@@ -2499,10 +2499,10 @@ static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16, igs011_state )
 //  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
 
-	AM_RANGE( 0x020000, 0x0201ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (55)
-	AM_RANGE( 0x020200, 0x0203ff ) AM_WRITE(lhb_igs011_prot2_swap_w		)	// swap  (33)
-	AM_RANGE( 0x020400, 0x0205ff ) AM_READ(lhb2_igs011_prot2_r			)	// read
-	AM_RANGE( 0x020600, 0x0207ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (55)
+	AM_RANGE( 0x020000, 0x0201ff ) AM_WRITE(igs011_prot2_inc_w          )   // inc   (55)
+	AM_RANGE( 0x020200, 0x0203ff ) AM_WRITE(lhb_igs011_prot2_swap_w     )   // swap  (33)
+	AM_RANGE( 0x020400, 0x0205ff ) AM_READ(lhb2_igs011_prot2_r          )   // read
+	AM_RANGE( 0x020600, 0x0207ff ) AM_WRITE(igs011_prot2_reset_w        )   // reset (55)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
@@ -2540,10 +2540,10 @@ static ADDRESS_MAP_START( nkishusp, AS_PROGRAM, 16, igs011_state )
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
 
 	// to be done:
-	AM_RANGE( 0x023000, 0x0231ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (55)
-	AM_RANGE( 0x023200, 0x0233ff ) AM_WRITE(lhb_igs011_prot2_swap_w		)	// swap  (33)
-	AM_RANGE( 0x023400, 0x0235ff ) AM_READ(lhb2_igs011_prot2_r			)	// read
-	AM_RANGE( 0x023600, 0x0237ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (55)
+	AM_RANGE( 0x023000, 0x0231ff ) AM_WRITE(igs011_prot2_inc_w          )   // inc   (55)
+	AM_RANGE( 0x023200, 0x0233ff ) AM_WRITE(lhb_igs011_prot2_swap_w     )   // swap  (33)
+	AM_RANGE( 0x023400, 0x0235ff ) AM_READ(lhb2_igs011_prot2_r          )   // read
+	AM_RANGE( 0x023600, 0x0237ff ) AM_WRITE(igs011_prot2_reset_w        )   // reset (55)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
@@ -2584,9 +2584,9 @@ READ16_MEMBER(igs011_state::ics2115_word_r)
 	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
 	{
-		case 0:	return ics2115_device::read(ics2115, space, (offs_t)0);
-		case 1:	return ics2115_device::read(ics2115, space, (offs_t)1);
-		case 2:	return (ics2115_device::read(ics2115, space, (offs_t)3) << 8) | ics2115_device::read(ics2115, space, (offs_t)2);
+		case 0: return ics2115_device::read(ics2115, space, (offs_t)0);
+		case 1: return ics2115_device::read(ics2115, space, (offs_t)1);
+		case 2: return (ics2115_device::read(ics2115, space, (offs_t)3) << 8) | ics2115_device::read(ics2115, space, (offs_t)2);
 	}
 	return 0xff;
 }
@@ -2597,11 +2597,11 @@ WRITE16_MEMBER(igs011_state::ics2115_word_w)
 	switch(offset)
 	{
 		case 1:
-			if (ACCESSING_BITS_0_7)		ics2115_device::write(ics2115,space, 1,data);
+			if (ACCESSING_BITS_0_7)     ics2115_device::write(ics2115,space, 1,data);
 			break;
 		case 2:
-			if (ACCESSING_BITS_0_7)		ics2115_device::write(ics2115,space, 2,data);
-			if (ACCESSING_BITS_8_15)	ics2115_device::write(ics2115,space, 3,data>>8);
+			if (ACCESSING_BITS_0_7)     ics2115_device::write(ics2115,space, 2,data);
+			if (ACCESSING_BITS_8_15)    ics2115_device::write(ics2115,space, 3,data>>8);
 			break;
 	}
 }
@@ -2643,26 +2643,26 @@ static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
 
 	// IGS012
-	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE(igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
-	AM_RANGE( 0x001610, 0x00161f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
-	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE(igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
-	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE(igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
-	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE(igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
-	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE(igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
-	AM_RANGE( 0x001660, 0x00166f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
-	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE(igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
+	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE(igs012_prot_swap_w      )   AM_MIRROR(0x01c000) // swap (a5 / 55)
+	AM_RANGE( 0x001610, 0x00161f ) AM_READ(igs012_prot_r            )   AM_MIRROR(0x01c000) // read (mode 0)
+	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE(igs012_prot_dec_inc_w   )   AM_MIRROR(0x01c000) // dec  (aa), inc  (fa)
+	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE(igs012_prot_inc_w       )   AM_MIRROR(0x01c000) // inc  (ff)
+	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE(igs012_prot_copy_w      )   AM_MIRROR(0x01c000) // copy (22)
+	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE(igs012_prot_dec_copy_w  )   AM_MIRROR(0x01c000) // dec  (5a), copy (33)
+	AM_RANGE( 0x001660, 0x00166f ) AM_READ(igs012_prot_r            )   AM_MIRROR(0x01c000) // read (mode 1)
+	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE(igs012_prot_mode_w      )   AM_MIRROR(0x01c000) // mode (cc / dd)
 
-	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE(igs011_prot2_dec_w				)	// dec   (33)
-	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE(drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE(igs011_prot2_reset_w			)	// reset (33)
-	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r		)	// read
+	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE(igs011_prot2_dec_w              )   // dec   (33)
+	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE(drgnwrld_igs011_prot2_swap_w    )   // swap  (33)
+	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE(igs011_prot2_reset_w            )   // reset (33)
+	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r      )   // read
 
-	AM_RANGE( 0x50f000, 0x50f1ff ) AM_WRITE(igs011_prot2_dec_w			)	// dec   (33)
-	AM_RANGE( 0x50f200, 0x50f3ff ) AM_WRITE(vbowl_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x50f400, 0x50f5ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (33)
-	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ(vbowl_igs011_prot2_r			)	// read
+	AM_RANGE( 0x50f000, 0x50f1ff ) AM_WRITE(igs011_prot2_dec_w          )   // dec   (33)
+	AM_RANGE( 0x50f200, 0x50f3ff ) AM_WRITE(vbowl_igs011_prot2_swap_w   )   // swap  (33)
+	AM_RANGE( 0x50f400, 0x50f5ff ) AM_WRITE(igs011_prot2_reset_w        )   // reset (33)
+	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ(vbowl_igs011_prot2_r         )   // read
 
-	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE(igs012_prot_reset_w	)	// reset?
+	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE(igs012_prot_reset_w )   // reset?
 //  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
@@ -2724,21 +2724,21 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )	// 513
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )	// 627
-	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )	// 741
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 855
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )  // 513
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )  // 627
+	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )  // 741
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )  // 855
 	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Nudity" )		// "Open Girl" in test mode
+	PORT_DIPNAME( 0x01, 0x01, "Nudity" )        // "Open Girl" in test mode
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, "Background" )
 	PORT_DIPSETTING(    0x02, "Girl" )
-	PORT_DIPSETTING(    0x00, "Landscape" )		// broken backgrounds with Nudity on (PCB does the same)
+	PORT_DIPSETTING(    0x00, "Landscape" )     // broken backgrounds with Nudity on (PCB does the same)
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
@@ -2767,10 +2767,10 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// used?
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// used?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // used?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )   // used?
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2781,7 +2781,7 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// press in girl test to pause, button 3 advances
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // press in girl test to pause, button 3 advances
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -2818,24 +2818,24 @@ static INPUT_PORTS_START( drgnwrldc )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )	// 513
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )	// 627
-	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )	// 741
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 855
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )  // 513
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )  // 627
+	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )  // 741
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )  // 855
 	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Nudity" )		// "Open Girl" in test mode
+	PORT_DIPNAME( 0x01, 0x01, "Nudity" )        // "Open Girl" in test mode
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Sex Question" )	// "background" in test mode
+	PORT_DIPNAME( 0x02, 0x02, "Sex Question" )  // "background" in test mode
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "Background" )	// "sex question" in test mode
+	PORT_DIPNAME( 0x04, 0x04, "Background" )    // "sex question" in test mode
 	PORT_DIPSETTING(    0x04, "Girl" )
-	PORT_DIPSETTING(    0x00, "Landscape" )		// broken backgrounds with Nudity on (PCB does the same)
+	PORT_DIPSETTING(    0x00, "Landscape" )     // broken backgrounds with Nudity on (PCB does the same)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -2863,10 +2863,10 @@ static INPUT_PORTS_START( drgnwrldc )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// used?
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// used?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // used?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )   // used?
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2877,7 +2877,7 @@ static INPUT_PORTS_START( drgnwrldc )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// press in girl test to pause, button 3 advances
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // press in girl test to pause, button 3 advances
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -2914,10 +2914,10 @@ static INPUT_PORTS_START( drgnwrldj )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )	// 513
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )	// 627
-	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )	// 741
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 855
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )  // 513
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )  // 627
+	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )  // 741
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )  // 855
 	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
@@ -2955,10 +2955,10 @@ static INPUT_PORTS_START( drgnwrldj )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// used?
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// used?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // used?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )   // used?
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2969,7 +2969,7 @@ static INPUT_PORTS_START( drgnwrldj )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// press in girl test to pause, button 3 advances
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // press in girl test to pause, button 3 advances
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -3019,18 +3019,18 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )	// Only when bit 4 = 1
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  // Only when bit 4 = 1
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )	// Only when bit 4 = 0
+	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )  // Only when bit 4 = 0
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPNAME( 0x08, 0x08, "Max Note Credits" )
 	PORT_DIPSETTING(    0x08, "100" )
 	PORT_DIPSETTING(    0x00, "500" )
-	PORT_DIPNAME( 0x10, 0x10, "Money Type" )	// Decides whether to use bits 0&1 or bit 2
+	PORT_DIPNAME( 0x10, 0x10, "Money Type" )    // Decides whether to use bits 0&1 or bit 2
 	PORT_DIPSETTING(    0x10, "Coins" )
 	PORT_DIPSETTING(    0x00, "Notes" )
 	PORT_DIPNAME( 0x20, 0x20, "Pay Out Type" )
@@ -3065,11 +3065,11 @@ static INPUT_PORTS_START( lhb2 )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )	// data clear
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)	// hopper switch
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// stats
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -3080,8 +3080,8 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? set to 0 both
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? and you can't start a game
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? set to 0 both
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? and you can't start a game
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -3152,15 +3152,15 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )	// Only when bit 3 = 1
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  // Only when bit 3 = 1
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )	// Only when bit 3 = 0
+	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )  // Only when bit 3 = 0
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x08, 0x08, "Money Type" )	// Decides whether to use bits 0&1 or bit 2
+	PORT_DIPNAME( 0x08, 0x08, "Money Type" )    // Decides whether to use bits 0&1 or bit 2
 	PORT_DIPSETTING(    0x08, "Coins" )
 	PORT_DIPSETTING(    0x00, "Notes" )
 	PORT_DIPNAME( 0x10, 0x10, "Auto Play" )
@@ -3195,11 +3195,11 @@ static INPUT_PORTS_START( nkishusp )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )	// data clear
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)	// hopper switch
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// stats
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -3210,8 +3210,8 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? set to 0 both
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? and you can't start a game
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? set to 0 both
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? and you can't start a game
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -3277,7 +3277,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )		// shown in test mode
+	PORT_DIPUNKNOWN( 0x10, 0x10 )       // shown in test mode
 	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPNAME( 0x40, 0x40, "Hide Title" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -3299,8 +3299,8 @@ static INPUT_PORTS_START( wlcc )
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x00, "9999" )
 	PORT_DIPNAME( 0x20, 0x20, "Money Type" )
-	PORT_DIPSETTING(    0x20, "Coins" )	// use bits 0-1
-	PORT_DIPSETTING(    0x00, "Notes" )	// use bits 2-3
+	PORT_DIPSETTING(    0x20, "Coins" ) // use bits 0-1
+	PORT_DIPSETTING(    0x00, "Notes" ) // use bits 2-3
 	PORT_DIPNAME( 0x40, 0x00, "Pay Out Type" )
 	PORT_DIPSETTING(    0x00, "Coins" )
 	PORT_DIPSETTING(    0x40, "Notes" )
@@ -3321,12 +3321,12 @@ static INPUT_PORTS_START( wlcc )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2     )
-	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW )	// keep pressed while booting
+	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW ) // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  )	// shown in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)	// hopper switch
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)   // clear coin
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)   // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -3335,7 +3335,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// bet
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // bet
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 INPUT_PORTS_END
 
@@ -3455,13 +3455,13 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)	// hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )	// system reset
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )	// stats
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // system reset
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coins
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)	// shown in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coins
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)   // shown in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("KEY0")
@@ -3508,7 +3508,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2)	// shown in test mode
+PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2)   // shown in test mode
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3545,10 +3545,10 @@ static INPUT_PORTS_START( vbowl )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy   ) )	// 5
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )	// 7
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )	// 9
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard   ) )	// 11
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy   ) )   // 5
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )   // 7
+	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )   // 9
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard   ) )   // 11
 	PORT_DIPNAME( 0x04, 0x04, "Spares To Win (Frames 1-5)" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
@@ -3617,10 +3617,10 @@ static INPUT_PORTS_START( vbowl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("AN0")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("AN1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -3651,10 +3651,10 @@ static INPUT_PORTS_START( vbowlj )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy   ) )	// 5
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )	// 7
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )	// 9
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard   ) )	// 11
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy   ) )   // 5
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )   // 7
+	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )   // 9
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard   ) )   // 11
 	PORT_DIPNAME( 0x04, 0x04, "Spares To Win (Frames 1-5)" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
@@ -3723,10 +3723,10 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("AN0")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("AN1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -3746,8 +3746,8 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x00, "9999" )
 	PORT_DIPNAME( 0x20, 0x20, "Money Type" )
-	PORT_DIPSETTING(    0x20, "Coins" )	// use bits 0-1
-	PORT_DIPSETTING(    0x00, "Notes" )	// use bits 2-3
+	PORT_DIPSETTING(    0x20, "Coins" ) // use bits 0-1
+	PORT_DIPSETTING(    0x00, "Notes" ) // use bits 2-3
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -3764,7 +3764,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	// shown in test mode
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  // shown in test mode
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN( 0x20, 0x20 )
@@ -3782,12 +3782,12 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)	// hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )	// stats
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -3870,7 +3870,7 @@ static const gfx_layout layout_16x16x4 =
 	4,
 	{ STEP4(0,1) },
 	{ 4, 0, 12, 8, 20,16, 28,24,
-	  36,32, 44,40, 52,48, 60,56 },
+		36,32, 44,40, 52,48, 60,56 },
 	{ STEP16(0,16*4) },
 	16*16*4
 };
@@ -4487,7 +4487,7 @@ ROM_START( dbc )
 
 	ROM_REGION( 0x280000, "blitter", 0 )
 	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
-	ROM_LOAD( "maj-h_cg.u8",   0x200000, 0x080000, CRC(ee45cc46) SHA1(ed011f758a02026222994aaea0677a4e9580fbda) )	// 1xxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "maj-h_cg.u8",   0x200000, 0x080000, CRC(ee45cc46) SHA1(ed011f758a02026222994aaea0677a4e9580fbda) )   // 1xxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_m0202.u39", 0x00000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // 2 banks
@@ -4589,7 +4589,7 @@ ROM_START( lhb2 )
 	ROM_LOAD( "igsm0502.u5", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )	// 2 banks
+	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
 ROM_END
 
 /***************************************************************************
@@ -4681,8 +4681,8 @@ ROM_START( vbowl )
 	ROM_LOAD( "vrbowlng.u68", 0x000000, 0x100000, CRC(b0ce27e7) SHA1(6d3ef97edd606f384b1e05b152fbea12714887b7) )
 
 	ROM_REGION( 0x400000, "ics", 0 )
-	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )	// 8 bit signed mono & u-law
-	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )	// 8 bit signed mono
+	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )  // 8 bit signed mono & u-law
+	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )  // 8 bit signed mono
 	ROM_COPY( "ics", 0, 0x100000,0x100000)
 	ROM_COPY( "ics", 0, 0x200000,0x100000)
 	ROM_COPY( "ics", 0, 0x300000,0x100000)
@@ -4700,8 +4700,8 @@ ROM_START( vbowlj )
 	ROM_LOAD( "vrbowlng.u68", 0x000000, 0x100000, CRC(b0ce27e7) SHA1(6d3ef97edd606f384b1e05b152fbea12714887b7) )
 
 	ROM_REGION( 0x400000, "ics", 0 )
-	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )	// 8 bit signed mono & u-law
-	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )	// 8 bit signed mono
+	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )  // 8 bit signed mono & u-law
+	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )  // 8 bit signed mono
 	ROM_COPY( "ics", 0, 0x100000,0x100000)
 	ROM_COPY( "ics", 0, 0x200000,0x100000)
 	ROM_COPY( "ics", 0, 0x300000,0x100000)

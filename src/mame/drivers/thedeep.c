@@ -83,7 +83,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 		{
 			UINT8 *rom;
 			int new_rombank = m_protection_command & 3;
-			if (m_rombank == new_rombank)	break;
+			if (m_rombank == new_rombank)   break;
 			m_rombank = new_rombank;
 			rom = memregion("maincpu")->base();
 			membank("bank1")->set_base(rom + 0x10000 + m_rombank * 0x4000);
@@ -147,22 +147,22 @@ WRITE8_MEMBER(thedeep_state::thedeep_e100_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// ROM (banked)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    // ROM (banked)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM				            	// RAM (MCU data copied here)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(thedeep_protection_r, thedeep_protection_w)	// To MCU
-	AM_RANGE(0xe004, 0xe004) AM_READWRITE(thedeep_e004_r, thedeep_nmi_w)	//
-	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("e008")			// P1 (Inputs)
-	AM_RANGE(0xe009, 0xe009) AM_READ_PORT("e009")			// P2
-	AM_RANGE(0xe00a, 0xe00a) AM_READ_PORT("e00a")			// DSW1
-	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")			// DSW2
-	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w)	// To Sound CPU
-	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w)	// ?
-	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_SHARE("scroll")	// Scroll
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_SHARE("vram_1")	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_SHARE("vram_0")	// Background Layer
-	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_SHARE("scroll2")	// Column Scroll
+	AM_RANGE(0xd000, 0xdfff) AM_RAM                             // RAM (MCU data copied here)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(thedeep_protection_r, thedeep_protection_w)   // To MCU
+	AM_RANGE(0xe004, 0xe004) AM_READWRITE(thedeep_e004_r, thedeep_nmi_w)    //
+	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("e008")           // P1 (Inputs)
+	AM_RANGE(0xe009, 0xe009) AM_READ_PORT("e009")           // P2
+	AM_RANGE(0xe00a, 0xe00a) AM_READ_PORT("e00a")           // DSW1
+	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")           // DSW2
+	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w)  // To Sound CPU
+	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w)   // ?
+	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_SHARE("scroll")    // Scroll
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")   // Sprites
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_SHARE("vram_1")  // Text Layer
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_SHARE("vram_0")  // Background Layer
+	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_SHARE("scroll2") // Column Scroll
 	AM_RANGE(0xf840, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -175,8 +175,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	//
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)	// From Main CPU
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)  //
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) // From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -271,7 +271,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( thedeep )
 	PORT_START("e008")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )	// Up / down shown in service mode
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )    // Up / down shown in service mode
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("MCU")	// Read by the mcu
+	PORT_START("MCU")   // Read by the mcu
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
@@ -378,9 +378,9 @@ static const gfx_layout layout_16x16x4 =
 };
 
 static GFXDECODE_START( thedeep )
-	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4,	0x080,  8 ) // [0] Sprites
-	GFXDECODE_ENTRY( "bg_gfx", 0, layout_16x16x4,	0x100, 16 ) // [1] Background Layer
-	GFXDECODE_ENTRY( "text", 0, layout_8x8x2,	0x000, 16 ) // [2] Text Layer
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4,  0x080,  8 ) // [0] Sprites
+	GFXDECODE_ENTRY( "bg_gfx", 0, layout_16x16x4,   0x100, 16 ) // [1] Background Layer
+	GFXDECODE_ENTRY( "text", 0, layout_8x8x2,   0x000, 16 ) // [2] Text Layer
 GFXDECODE_END
 
 
@@ -415,10 +415,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::thedeep_interrupt)
 		if (m_protection_command != 0x59)
 		{
 			int coins = machine().root_device().ioport("MCU")->read();
-			if		(coins & 1)	m_protection_data = 1;
-			else if	(coins & 2)	m_protection_data = 2;
-			else if	(coins & 4)	m_protection_data = 3;
-			else				m_protection_data = 0;
+			if      (coins & 1) m_protection_data = 1;
+			else if (coins & 2) m_protection_data = 2;
+			else if (coins & 4) m_protection_data = 3;
+			else                m_protection_data = 0;
 
 			if (m_protection_data)
 				m_protection_irq = 1;
@@ -445,11 +445,11 @@ INTERRUPT_GEN_MEMBER(thedeep_state::thedeep_mcu_irq)
 static MACHINE_CONFIG_START( thedeep, thedeep_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedeep_state, thedeep_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M65C02, XTAL_12MHz/8)		/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", M65C02, XTAL_12MHz/8)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
@@ -508,66 +508,66 @@ Work, mail me.
 ***************************************************************************/
 
 ROM_START( thedeep )
-	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* Z80 Code */
 	ROM_LOAD( "dp-10.rom", 0x00000, 0x08000, CRC(7480b7a5) SHA1(ac6f121873a70c8077576322c201b7089c7b8a91) )
 	ROM_LOAD( "dp-09.rom", 0x10000, 0x10000, CRC(c630aece) SHA1(809916a1ba1c8e0af4c228b0f26ac638e2abf81e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 65C02 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )		/* i8751 Code */
-	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x1000, "mcu", 0 )      /* i8751 Code */
+	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )   // 1xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, "sprites", 0 )	/* Sprites */
+	ROM_REGION( 0x40000, "sprites", 0 ) /* Sprites */
 	ROM_LOAD( "dp-08.rom", 0x00000, 0x10000, CRC(c5624f6b) SHA1(a3c0b13cddae760f30c7344d718cd69cad990054) )
 	ROM_LOAD( "dp-07.rom", 0x10000, 0x10000, CRC(c76768c1) SHA1(e41ace1cb06ebe7f676b3b179b7dd01d00cf4d6a) )
 	ROM_LOAD( "dp-06.rom", 0x20000, 0x10000, CRC(98adea78) SHA1(6a1af70de995a0a5e42fd395dd9454b7e2d9cb82) )
 	ROM_LOAD( "dp-05.rom", 0x30000, 0x10000, CRC(76ea7dd1) SHA1(c29abb44a1182b47da749eeeb2db025ae3f28ea7) )
 
-	ROM_REGION( 0x40000, "bg_gfx", 0 )	/* 16x16x4 Background Layer */
+	ROM_REGION( 0x40000, "bg_gfx", 0 )  /* 16x16x4 Background Layer */
 	ROM_LOAD( "dp-03.rom", 0x00000, 0x10000, CRC(6bf5d819) SHA1(74079632d7c88ec22010c1a5bece0e36847fdab9) )
 	ROM_LOAD( "dp-01.rom", 0x10000, 0x10000, CRC(e56be2fe) SHA1(25acc0f6d9cb5a727c9bac3e80aeb85a4727ddb0) )
 	ROM_LOAD( "dp-04.rom", 0x20000, 0x10000, CRC(4db02c3c) SHA1(6284541372dec1113570cef31ca3c1a202fb4add) )
 	ROM_LOAD( "dp-02.rom", 0x30000, 0x10000, CRC(1add423b) SHA1(b565340d719044ba2c428aab74f43f5a7cf7e2a3) )
 
-	ROM_REGION( 0x4000, "text", 0 )	/* 8x8x2 Text Layer */
+	ROM_REGION( 0x4000, "text", 0 ) /* 8x8x2 Text Layer */
 	ROM_LOAD( "dp-11.rom", 0x0000, 0x4000, CRC(196e23d1) SHA1(ed14e63fccb3e5dce462d9b8155e78749eaf9b3b) )
 
-	ROM_REGION( 0x600, "proms", 0 )	/* Colors */
-	ROM_LOAD( "fi-1", 0x000, 0x200, CRC(f31efe09) SHA1(808c90fe02ed7b4000967c331b8773c4168b8a97) )	// FIXED BITS (xxxxxx0xxxxxx0x0)
-	ROM_LOAD( "fi-2", 0x200, 0x200, CRC(f305c8d5) SHA1(f82c709dc75a3c681d6f0ebf2702cb90110b1f0c) )	// FIXED BITS (0000xxxx)
+	ROM_REGION( 0x600, "proms", 0 ) /* Colors */
+	ROM_LOAD( "fi-1", 0x000, 0x200, CRC(f31efe09) SHA1(808c90fe02ed7b4000967c331b8773c4168b8a97) )  // FIXED BITS (xxxxxx0xxxxxx0x0)
+	ROM_LOAD( "fi-2", 0x200, 0x200, CRC(f305c8d5) SHA1(f82c709dc75a3c681d6f0ebf2702cb90110b1f0c) )  // FIXED BITS (0000xxxx)
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 
 ROM_START( rundeep )
-	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* Z80 Code */
 	ROM_LOAD( "3", 0x00000, 0x08000, CRC(c9c9e194) SHA1(e9552c3321585f0902f29b55a7de8e2316885713) )
 	ROM_LOAD( "9", 0x10000, 0x10000, CRC(931f4e67) SHA1(f4942c5f0fdbcd6cdb96ddbbf2015f938b56b466) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 65C02 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )		/* i8751 Code */
-	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x1000, "mcu", 0 )      /* i8751 Code */
+	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )   // 1xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, "sprites", 0 )	/* Sprites */
+	ROM_REGION( 0x40000, "sprites", 0 ) /* Sprites */
 	ROM_LOAD( "dp-08.rom", 0x00000, 0x10000, CRC(c5624f6b) SHA1(a3c0b13cddae760f30c7344d718cd69cad990054) )
 	ROM_LOAD( "dp-07.rom", 0x10000, 0x10000, CRC(c76768c1) SHA1(e41ace1cb06ebe7f676b3b179b7dd01d00cf4d6a) )
 	ROM_LOAD( "dp-06.rom", 0x20000, 0x10000, CRC(98adea78) SHA1(6a1af70de995a0a5e42fd395dd9454b7e2d9cb82) )
 	ROM_LOAD( "dp-05.rom", 0x30000, 0x10000, CRC(76ea7dd1) SHA1(c29abb44a1182b47da749eeeb2db025ae3f28ea7) )
 
-	ROM_REGION( 0x40000, "bg_gfx", 0 )	/* 16x16x4 Background Layer */
+	ROM_REGION( 0x40000, "bg_gfx", 0 )  /* 16x16x4 Background Layer */
 	ROM_LOAD( "dp-03.rom", 0x00000, 0x10000, CRC(6bf5d819) SHA1(74079632d7c88ec22010c1a5bece0e36847fdab9) )
 	ROM_LOAD( "dp-01.rom", 0x10000, 0x10000, CRC(e56be2fe) SHA1(25acc0f6d9cb5a727c9bac3e80aeb85a4727ddb0) )
 	ROM_LOAD( "dp-04.rom", 0x20000, 0x10000, CRC(4db02c3c) SHA1(6284541372dec1113570cef31ca3c1a202fb4add) )
 	ROM_LOAD( "dp-02.rom", 0x30000, 0x10000, CRC(1add423b) SHA1(b565340d719044ba2c428aab74f43f5a7cf7e2a3) )
 
-	ROM_REGION( 0x4000, "text", 0 )	/* 8x8x2 Text Layer */
+	ROM_REGION( 0x4000, "text", 0 ) /* 8x8x2 Text Layer */
 	ROM_LOAD( "11", 0x0000, 0x4000, CRC(5d29e4b9) SHA1(608345291062e9ce329ebe9a8c1e65d52e358785) )
 
-	ROM_REGION( 0x600, "proms", 0 )	/* Colors */
-	ROM_LOAD( "fi-1", 0x000, 0x200, CRC(f31efe09) SHA1(808c90fe02ed7b4000967c331b8773c4168b8a97) )	// FIXED BITS (xxxxxx0xxxxxx0x0)
-	ROM_LOAD( "fi-2", 0x200, 0x200, CRC(f305c8d5) SHA1(f82c709dc75a3c681d6f0ebf2702cb90110b1f0c) )	// FIXED BITS (0000xxxx)
+	ROM_REGION( 0x600, "proms", 0 ) /* Colors */
+	ROM_LOAD( "fi-1", 0x000, 0x200, CRC(f31efe09) SHA1(808c90fe02ed7b4000967c331b8773c4168b8a97) )  // FIXED BITS (xxxxxx0xxxxxx0x0)
+	ROM_LOAD( "fi-2", 0x200, 0x200, CRC(f305c8d5) SHA1(f82c709dc75a3c681d6f0ebf2702cb90110b1f0c) )  // FIXED BITS (0000xxxx)
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 

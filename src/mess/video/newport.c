@@ -60,24 +60,24 @@ struct VC2_t
 	UINT16 nRegData;
 };
 
-#define VC2_VIDENTRY		pNVID->VC2.nRegister[0x00]
-#define VC2_CURENTRY		pNVID->VC2.nRegister[0x01]
-#define VC2_CURSORX			pNVID->VC2.nRegister[0x02]
-#define VC2_CURSORY			pNVID->VC2.nRegister[0x03]
-#define VC2_CURCURSORX		pNVID->VC2.nRegister[0x04]
-#define VC2_DIDENTRY		pNVID->VC2.nRegister[0x05]
-#define VC2_SCANLINELEN		pNVID->VC2.nRegister[0x06]
-#define VC2_RAMADDR			pNVID->VC2.nRegister[0x07]
-#define VC2_VTFRAMEPTR		pNVID->VC2.nRegister[0x08]
-#define VC2_VTLINEPTR		pNVID->VC2.nRegister[0x09]
-#define VC2_VTLINERUN		pNVID->VC2.nRegister[0x0a]
-#define VC2_VLINECNT		pNVID->VC2.nRegister[0x0b]
-#define VC2_CURTABLEPTR		pNVID->VC2.nRegister[0x0c]
-#define VC2_WORKCURSORY		pNVID->VC2.nRegister[0x0d]
-#define VC2_DIDFRAMEPTR		pNVID->VC2.nRegister[0x0e]
-#define VC2_DIDLINEPTR		pNVID->VC2.nRegister[0x0f]
-#define VC2_DISPLAYCTRL		pNVID->VC2.nRegister[0x10]
-#define VC2_CONFIG			pNVID->VC2.nRegister[0x1f]
+#define VC2_VIDENTRY        pNVID->VC2.nRegister[0x00]
+#define VC2_CURENTRY        pNVID->VC2.nRegister[0x01]
+#define VC2_CURSORX         pNVID->VC2.nRegister[0x02]
+#define VC2_CURSORY         pNVID->VC2.nRegister[0x03]
+#define VC2_CURCURSORX      pNVID->VC2.nRegister[0x04]
+#define VC2_DIDENTRY        pNVID->VC2.nRegister[0x05]
+#define VC2_SCANLINELEN     pNVID->VC2.nRegister[0x06]
+#define VC2_RAMADDR         pNVID->VC2.nRegister[0x07]
+#define VC2_VTFRAMEPTR      pNVID->VC2.nRegister[0x08]
+#define VC2_VTLINEPTR       pNVID->VC2.nRegister[0x09]
+#define VC2_VTLINERUN       pNVID->VC2.nRegister[0x0a]
+#define VC2_VLINECNT        pNVID->VC2.nRegister[0x0b]
+#define VC2_CURTABLEPTR     pNVID->VC2.nRegister[0x0c]
+#define VC2_WORKCURSORY     pNVID->VC2.nRegister[0x0d]
+#define VC2_DIDFRAMEPTR     pNVID->VC2.nRegister[0x0e]
+#define VC2_DIDLINEPTR      pNVID->VC2.nRegister[0x0f]
+#define VC2_DISPLAYCTRL     pNVID->VC2.nRegister[0x10]
+#define VC2_CONFIG          pNVID->VC2.nRegister[0x1f]
 
 struct XMAP_t
 {
@@ -85,19 +85,19 @@ struct XMAP_t
 	UINT32 nModeTable[0x20];
 };
 
-#define XMAP0_CONFIG		pNVID->XMAP0.nRegister[0x00]
-#define XMAP0_REVISION		pNVID->XMAP0.nRegister[0x01]
-#define XMAP0_ENTRIES		pNVID->XMAP0.nRegister[0x02]
-#define XMAP0_CURCMAP		pNVID->XMAP0.nRegister[0x03]
-#define XMAP0_POPUPCMAP		pNVID->XMAP0.nRegister[0x04]
-#define XMAP0_MODETBLIDX	pNVID->XMAP0.nRegister[0x07]
+#define XMAP0_CONFIG        pNVID->XMAP0.nRegister[0x00]
+#define XMAP0_REVISION      pNVID->XMAP0.nRegister[0x01]
+#define XMAP0_ENTRIES       pNVID->XMAP0.nRegister[0x02]
+#define XMAP0_CURCMAP       pNVID->XMAP0.nRegister[0x03]
+#define XMAP0_POPUPCMAP     pNVID->XMAP0.nRegister[0x04]
+#define XMAP0_MODETBLIDX    pNVID->XMAP0.nRegister[0x07]
 
-#define XMAP1_CONFIG		pNVID->XMAP1.nRegister[0x00]
-#define XMAP1_REVISION		pNVID->XMAP1.nRegister[0x01]
-#define XMAP1_ENTRIES		pNVID->XMAP1.nRegister[0x02]
-#define XMAP1_CURCMAP		pNVID->XMAP1.nRegister[0x03]
-#define XMAP1_POPUPCMAP		pNVID->XMAP1.nRegister[0x04]
-#define XMAP1_MODETBLIDX	pNVID->XMAP1.nRegister[0x07]
+#define XMAP1_CONFIG        pNVID->XMAP1.nRegister[0x00]
+#define XMAP1_REVISION      pNVID->XMAP1.nRegister[0x01]
+#define XMAP1_ENTRIES       pNVID->XMAP1.nRegister[0x02]
+#define XMAP1_CURCMAP       pNVID->XMAP1.nRegister[0x03]
+#define XMAP1_POPUPCMAP     pNVID->XMAP1.nRegister[0x04]
+#define XMAP1_MODETBLIDX    pNVID->XMAP1.nRegister[0x07]
 
 
 struct REX3_t
@@ -1684,5 +1684,3 @@ WRITE32_HANDLER( newport_rex3_w )
 		break;
 	}
 }
-
-

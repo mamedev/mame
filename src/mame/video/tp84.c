@@ -49,7 +49,7 @@ void tp84_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, weights, 470, 0,
 			0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0);
@@ -185,7 +185,7 @@ UINT32 tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bitma
 		m_bg_tilemap->set_scrolly(0, *m_scroll_y);
 
 		machine().tilemap().set_flip_all(((*m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
-									   ((*m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
+										((*m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);

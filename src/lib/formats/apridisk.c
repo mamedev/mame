@@ -11,17 +11,17 @@
     CONSTANTS
 ***************************************************************************/
 
-#define APR_HEADER_SIZE		128
+#define APR_HEADER_SIZE     128
 
 /* sector types */
-#define APR_DELETED		0xe31d0000
-#define APR_MAGIC		0xe31d0001
-#define APR_COMMENT		0xe31d0002
-#define APR_CREATOR		0xe31d0003
+#define APR_DELETED     0xe31d0000
+#define APR_MAGIC       0xe31d0001
+#define APR_COMMENT     0xe31d0002
+#define APR_CREATOR     0xe31d0003
 
 /* compression type */
-#define APR_UNCOMPRESSED	0x9e90
-#define APR_COMPRESSED		0x3e5a
+#define APR_UNCOMPRESSED    0x9e90
+#define APR_COMPRESSED      0x3e5a
 
 static const char *apr_magic = "ACT Apricot disk image\x1a\x04";
 

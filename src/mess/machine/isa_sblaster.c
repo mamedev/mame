@@ -41,22 +41,22 @@
 static const int m_cmd_fifo_length[256] =
 {
 /*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
-	-1, -1, -1, -1,  1,  3, -1, -1, -1, -1, -1,	-1, -1, -1,  2,  1, /* 0x */
-	 2, -1, -1, -1,  3, -1,  3,  3, -1, -1, -1,	-1,  1, -1, -1,  1, /* 1x */
-	-1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 2x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 3x */
-	 2,  3,  3, -1, -1, -1, -1, -1,  3, -1, -1,	-1, -1, -1, -1, -1, /* 4x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 5x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 6x */
-	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1,	-1, -1,  1, -1,  1, /* 7x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 8x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 9x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Ax */
-	 4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,	-1, -1, -1,  4, -1, /* Bx */
-	 4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,	-1, -1, -1,  4, -1, /* Cx */
-	 1,  1, -1,  1, -1,  1,  1, -1,  1,  1,  1,	-1, -1, -1, -1, -1, /* Dx */
-	 2,  1,  2,  1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
-	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1,  1, -1, -1, -1  /* Fx */
+	-1, -1, -1, -1,  1,  3, -1, -1, -1, -1, -1, -1, -1, -1,  2,  1, /* 0x */
+		2, -1, -1, -1,  3, -1,  3,  3, -1, -1, -1,  -1,  1, -1, -1,  1, /* 1x */
+	-1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 2x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 3x */
+		2,  3,  3, -1, -1, -1, -1, -1,  3, -1, -1,  -1, -1, -1, -1, -1, /* 4x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 5x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
+	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1, -1, -1,  1, -1,  1, /* 7x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* Ax */
+		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
+		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Cx */
+		1,  1, -1,  1, -1,  1,  1, -1,  1,  1,  1,  -1, -1, -1, -1, -1, /* Dx */
+		2,  1,  2,  1,  2, -1, -1, -1,  1, -1, -1,  -1, -1, -1, -1, -1, /* Ex */
+	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1, -1,  1, -1, -1, -1  /* Fx */
 };
 
 static const int protection_magic[4] = { 0x96, 0xa5, 0x69, 0x5a };
@@ -85,9 +85,9 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("sbdacl", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
@@ -101,9 +101,9 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	/* no CM/S support (empty sockets) */
 
 	MCFG_SOUND_ADD("sbdacl", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
@@ -117,9 +117,9 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 	MCFG_SOUND_ADD("sbdacl", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
@@ -243,10 +243,10 @@ WRITE8_MEMBER( sb_device::dsp_reset_w )
 	m_dsp.dma_autoinit = 0;
 	irq_w(0, IRQ_ALL);
 	m_timer->adjust(attotime::never, 0);
-    m_dsp.d_rptr = 0;
-    m_dsp.d_wptr = 0;
-    m_dsp.dma_throttled = false;
-    m_dsp.dma_timer_started = false;
+	m_dsp.d_rptr = 0;
+	m_dsp.d_wptr = 0;
+	m_dsp.dma_throttled = false;
+	m_dsp.dma_timer_started = false;
 
 	//printf("%02x\n",data);
 }
@@ -272,7 +272,7 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 {
 //    printf("read Rbufstat @ %x\n", offset);
 
-    if(offset)
+	if(offset)
 	{
 		if(m_dsp.version > 0x0400)
 			irq_w(0, IRQ_DMA16);
@@ -280,7 +280,7 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 	}
 
 //    printf("Clear IRQ5\n");
-    irq_w(0, IRQ_DMA8);   // reading this port ACKs the card's IRQ, 8-bit dma only?
+	irq_w(0, IRQ_DMA8);   // reading this port ACKs the card's IRQ, 8-bit dma only?
 
 	return m_dsp.rbuf_status;
 }
@@ -316,19 +316,19 @@ void sb_device::process_fifo(UINT8 cmd)
 //        printf("SB FIFO command: %02x\n", cmd);
 		switch(cmd)
 		{
-            case 0x10:  // Direct DAC
-                break;
+			case 0x10:  // Direct DAC
+				break;
 
-            case 0x14:  // 8-bit DMA, no autoinit
-                m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+			case 0x14:  // 8-bit DMA, no autoinit
+				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 //                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
-                m_dsp.dma_transferred = 0;
-                m_dsp.dma_autoinit = 0;
-                m_dsp.dma_timer_started = false;
-                m_dsp.dma_throttled = false;
-                drq_w(1);
+				m_dsp.dma_transferred = 0;
+				m_dsp.dma_autoinit = 0;
+				m_dsp.dma_timer_started = false;
+				m_dsp.dma_throttled = false;
+				drq_w(1);
 				m_dsp.flags = 0;
-                break;
+				break;
 
 			case 0x17:  // 2-bit ADPCM w/new reference
 				m_dsp.adpcm_new_ref = true;
@@ -368,7 +368,7 @@ void sb_device::process_fifo(UINT8 cmd)
 				//printf("Set time constant: %02x -> %d\n", m_dsp.fifo[1], m_dsp.frequency);
 				break;
 
-			case 0x48:	// set DMA block size (for auto-init)
+			case 0x48:  // set DMA block size (for auto-init)
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 				break;
 
@@ -400,14 +400,14 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.flags = ADPCM3;
 				break;
 
-            case 0xd0:  // halt 8-bit DMA
-                m_timer->adjust(attotime::never, 0);
-                drq_w(0);   // drop DRQ
-                m_dsp.dma_throttled = false;
-                m_dsp.dma_timer_started = false;
-                break;
+			case 0xd0:  // halt 8-bit DMA
+				m_timer->adjust(attotime::never, 0);
+				drq_w(0);   // drop DRQ
+				m_dsp.dma_throttled = false;
+				m_dsp.dma_timer_started = false;
+				break;
 
-            case 0xd1: // speaker on
+			case 0xd1: // speaker on
 				// ...
 				m_dsp.speaker_on = 1;
 				break;
@@ -430,16 +430,16 @@ void sb_device::process_fifo(UINT8 cmd)
 				queue_r(m_dsp.version & 0xff);
 				break;
 
-            case 0xe2: // DSP protection
-                m_dsp.prot_value += protection_magic[m_dsp.prot_count++] ^ m_dsp.fifo[1];
-                m_dsp.prot_count &= 3;
+			case 0xe2: // DSP protection
+				m_dsp.prot_value += protection_magic[m_dsp.prot_count++] ^ m_dsp.fifo[1];
+				m_dsp.prot_count &= 3;
 				m_dsp.adc_transferred = 0;
 				m_dsp.adc_length = 1;
 				m_dsp.wbuf_status = 0x80;
 				m_dsp.dma_no_irq = true;
-                m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
-                drq_w(1);
-                break;
+				m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
+				drq_w(1);
+				break;
 
 			case 0xe4: // write test register
 				m_dsp.test_reg = m_dsp.fifo[1];
@@ -611,7 +611,7 @@ WRITE8_MEMBER(sb_device::dsp_cmd_w)
 {
 //  printf("%02x to DSP command @ %x\n", data, offset);
 
-    if(offset)
+	if(offset)
 		return;
 
 	queue(data);
@@ -987,16 +987,16 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 //**************************************************************************
 
 sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
-    device_t(mconfig, type, name, tag, owner, clock),
-    m_dacl(*this, "sbdacl"),
-    m_dacr(*this, "sbdacr"),
+	device_t(mconfig, type, name, tag, owner, clock),
+	m_dacl(*this, "sbdacl"),
+	m_dacr(*this, "sbdacr"),
 	m_joy(*this, "joy")
 {
 }
 
 sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
 	sb_device(mconfig, type, tag, owner, clock, name),
-    device_isa8_card_interface(mconfig, *this)
+	device_isa8_card_interface(mconfig, *this)
 {
 }
 
@@ -1011,17 +1011,17 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, const 
 //-------------------------------------------------
 
 isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0")
+	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0")
 {
 }
 
 isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5")
+	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5")
 {
 }
 
 isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16")
+	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16")
 {
 }
 
@@ -1049,27 +1049,27 @@ void sb8_device::device_start()
 		m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	}
 
-    m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, NULL);
 }
 
 void isa8_sblaster1_0_device::device_start()
 {
-    set_isa_device();
-    // 1.0 always has the SAA1099s for CMS back-compatibility
+	set_isa_device();
+	// 1.0 always has the SAA1099s for CMS back-compatibility
 	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->set_dma_channel(1, this, FALSE);
 	m_dsp.version = 0x0105;
-    sb8_device::device_start();
+	sb8_device::device_start();
 }
 
 void isa8_sblaster1_5_device::device_start()
 {
-    set_isa_device();
+	set_isa_device();
 	/* 1.5 makes CM/S support optional (empty sockets, but they work if the user populates them!) */
 	m_isa->set_dma_channel(1, this, FALSE);
 	m_dsp.version = 0x0200;
-    sb8_device::device_start();
+	sb8_device::device_start();
 }
 
 void sb16_device::device_start()
@@ -1096,7 +1096,7 @@ void isa16_sblaster16_device::device_start()
 	m_isa->set_dma_channel(1, this, FALSE);
 	m_isa->set_dma_channel(5, this, FALSE);
 	m_dsp.version = 0x0405; // diagnose.exe rejects anything lower than 0x0402
-    sb16_device::device_start();
+	sb16_device::device_start();
 }
 
 //-------------------------------------------------
@@ -1105,13 +1105,13 @@ void isa16_sblaster16_device::device_start()
 
 void sb_device::device_reset()
 {
-    m_dsp.prot_value = 0xaa;
-    m_dsp.prot_count = 0;
-    m_dack_out = 0;
-    m_dsp.fifo_ptr = 0;
-    m_dsp.fifo_r_ptr = 0;
-    m_dsp.wbuf_status = 0;
-    m_dsp.rbuf_status = 0;
+	m_dsp.prot_value = 0xaa;
+	m_dsp.prot_count = 0;
+	m_dack_out = 0;
+	m_dsp.fifo_ptr = 0;
+	m_dsp.fifo_r_ptr = 0;
+	m_dsp.wbuf_status = 0;
+	m_dsp.rbuf_status = 0;
 	m_dsp.frequency = 8000; // per stereo-fx
 	m_dsp.irq_active = 0;
 	m_dsp.dma_no_irq = false;
@@ -1128,7 +1128,7 @@ UINT8 sb_device::dack_r(int line)
 		if (m_dsp.dma_autoinit)
 		{
 			m_dsp.adc_transferred = 0;
-            drq_w(1);
+			drq_w(1);
 		}
 		else
 			m_dsp.wbuf_status = 0;
@@ -1139,22 +1139,22 @@ UINT8 sb_device::dack_r(int line)
 	}
 	else
 		drq_w(1);
-    return m_dack_out;
+	return m_dack_out;
 }
 
 UINT16 sb16_device::dack16_r(int line)
 {
 	m_dsp.adc_transferred += 2;
 	if (m_dsp.adc_transferred >= m_dsp.adc_length)
-    {
-        drq16_w(0);
+	{
+		drq16_w(0);
 
-        if (m_dsp.dma_autoinit)
-        {
-            m_dsp.adc_transferred = 0;
+		if (m_dsp.dma_autoinit)
+		{
+			m_dsp.adc_transferred = 0;
 			drq16_w(1);
-        }
-        irq_w(1, IRQ_DMA16);
+		}
+		irq_w(1, IRQ_DMA16);
 	}
 	else
 		drq16_w(1);
@@ -1163,44 +1163,44 @@ UINT16 sb16_device::dack16_r(int line)
 
 void sb16_device::dack16_w(int line, UINT16 data)
 {
-    // set the transfer timer on the 1st byte
-    if (!m_dsp.dma_timer_started)
-    {
-        m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
-        m_dsp.d_rptr = m_dsp.d_wptr = 0;
-        m_dsp.dma_timer_started = true;
-    }
+	// set the transfer timer on the 1st byte
+	if (!m_dsp.dma_timer_started)
+	{
+		m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
+		m_dsp.d_rptr = m_dsp.d_wptr = 0;
+		m_dsp.dma_timer_started = true;
+	}
 
-    m_dsp.data[m_dsp.d_wptr++] = data & 0xff;
-    m_dsp.data[m_dsp.d_wptr++] = data >> 8;
-    m_dsp.d_wptr %= 128;
+	m_dsp.data[m_dsp.d_wptr++] = data & 0xff;
+	m_dsp.data[m_dsp.d_wptr++] = data >> 8;
+	m_dsp.d_wptr %= 128;
 
-    if (m_dsp.d_wptr == m_dsp.d_rptr)
-    {
+	if (m_dsp.d_wptr == m_dsp.d_rptr)
+	{
 //        printf("throttling DRQ\n");
-        drq16_w(0);	// drop DRQ here
-        m_dsp.dma_throttled = true;
-    }
+		drq16_w(0); // drop DRQ here
+		m_dsp.dma_throttled = true;
+	}
 
-    m_dsp.dma_transferred += 2;
-    if (m_dsp.dma_transferred >= m_dsp.dma_length)
-    {
+	m_dsp.dma_transferred += 2;
+	if (m_dsp.dma_transferred >= m_dsp.dma_length)
+	{
 //        printf("DMA fill completed (%d out of %d)\n", m_dsp.dma_transferred, m_dsp.dma_length);
 
-        drq16_w(0);	// drop DRQ here
+		drq16_w(0); // drop DRQ here
 
-        if (m_dsp.dma_autoinit)
-        {
+		if (m_dsp.dma_autoinit)
+		{
 //            printf("autoinit reset\n");
-            m_dsp.dma_transferred = 0;
-            if (!m_dsp.dma_throttled)   // if we're not throttled, re-raise DRQ right now
-            {
-                drq16_w(1);   // raise DRQ again (page 3-15 of the Creative manual indicates auto-init will keep going until you stop it)
-            }
-        }
+			m_dsp.dma_transferred = 0;
+			if (!m_dsp.dma_throttled)   // if we're not throttled, re-raise DRQ right now
+			{
+				drq16_w(1);   // raise DRQ again (page 3-15 of the Creative manual indicates auto-init will keep going until you stop it)
+			}
+		}
 
-        irq_w(1, IRQ_DMA16);	// raise IRQ as per the Creative manual
-    }
+		irq_w(1, IRQ_DMA16);    // raise IRQ as per the Creative manual
+	}
 }
 
 /* TODO: this mustn't be instant! */
@@ -1210,43 +1210,43 @@ void sb_device::dack_w(int line, UINT8 data)
 //  if(data != 0x80)
 //      printf("%02x\n",data);
 
-    // set the transfer timer on the 1st byte
-    if (!m_dsp.dma_timer_started)
-    {
-        m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
-        m_dsp.d_rptr = m_dsp.d_wptr = 0;
-        m_dsp.dma_timer_started = true;
-    }
+	// set the transfer timer on the 1st byte
+	if (!m_dsp.dma_timer_started)
+	{
+		m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
+		m_dsp.d_rptr = m_dsp.d_wptr = 0;
+		m_dsp.dma_timer_started = true;
+	}
 
-    m_dsp.data[m_dsp.d_wptr++] = data;
-    m_dsp.d_wptr %= 128;
+	m_dsp.data[m_dsp.d_wptr++] = data;
+	m_dsp.d_wptr %= 128;
 
-    if (m_dsp.d_wptr == m_dsp.d_rptr)
-    {
+	if (m_dsp.d_wptr == m_dsp.d_rptr)
+	{
 //        printf("throttling DRQ\n");
-        drq_w(0);	// drop DRQ here
-        m_dsp.dma_throttled = true;
-    }
+		drq_w(0);   // drop DRQ here
+		m_dsp.dma_throttled = true;
+	}
 
-    m_dsp.dma_transferred++;
-    if (m_dsp.dma_transferred >= m_dsp.dma_length)
-    {
+	m_dsp.dma_transferred++;
+	if (m_dsp.dma_transferred >= m_dsp.dma_length)
+	{
 //        printf("DMA fill completed (%d out of %d)\n", m_dsp.dma_transferred, m_dsp.dma_length);
 
-        drq_w(0);	// drop DRQ here
+		drq_w(0);   // drop DRQ here
 
-        if (m_dsp.dma_autoinit)
-        {
+		if (m_dsp.dma_autoinit)
+		{
 //            printf("autoinit reset\n");
-            m_dsp.dma_transferred = 0;
-            if (!m_dsp.dma_throttled)   // if we're not throttled, re-raise DRQ right now
-            {
-                drq_w(1);   // raise DRQ again (page 3-15 of the Creative manual indicates auto-init will keep going until you stop it)
-            }
-        }
+			m_dsp.dma_transferred = 0;
+			if (!m_dsp.dma_throttled)   // if we're not throttled, re-raise DRQ right now
+			{
+				drq_w(1);   // raise DRQ again (page 3-15 of the Creative manual indicates auto-init will keep going until you stop it)
+			}
+		}
 
-        irq_w(1, IRQ_DMA8);	// raise IRQ as per the Creative manual
-    }
+		irq_w(1, IRQ_DMA8); // raise IRQ as per the Creative manual
+	}
 }
 
 void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
@@ -1267,15 +1267,15 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			break;
 		case STEREO: // 8-bit unsigned stereo
 			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
-		    m_dsp.data[m_dsp.d_rptr++] = 0x80;
+			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
-		    m_dsp.data[m_dsp.d_rptr++] = 0x80;
+			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			break;
 		case SIGNED | STEREO: // 8-bit signed stereo
 			m_dacl->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
-		    m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dacr->write_unsigned8(m_dsp.data[m_dsp.d_rptr] + 128);
-		    m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			break;
 		case SIXTEENBIT: // 16-bit unsigned mono
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
@@ -1293,7 +1293,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			break;
 		case SIXTEENBIT | STEREO: // 16-bit unsigned stereo
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
-    		m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.data[m_dsp.d_rptr++] = 0x80;
 			m_dsp.d_rptr %= 128;
 			rsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
@@ -1304,7 +1304,7 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			break;
 		case SIXTEENBIT | SIGNED | STEREO: // 16-bit signed stereo
 			lsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
-    		m_dsp.data[m_dsp.d_rptr++] = 0x00;
+			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.data[m_dsp.d_rptr++] = 0x00;
 			m_dsp.d_rptr %= 128;
 			rsample = m_dsp.data[m_dsp.d_rptr] | (m_dsp.data[m_dsp.d_rptr+1] << 8);
@@ -1391,18 +1391,18 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 		default:
 			logerror("SB: unimplemented sample type %x\n", m_dsp.flags);
 	}
-    m_dsp.d_rptr %= 128;
+	m_dsp.d_rptr %= 128;
 
-    if (m_dsp.dma_throttled)
-    {
-        if (m_dsp.d_rptr == m_dsp.d_wptr)
-        {
+	if (m_dsp.dma_throttled)
+	{
+		if (m_dsp.d_rptr == m_dsp.d_wptr)
+		{
 //            printf("unthrottling DRQ\n");
-            if(m_dsp.flags & SIXTEENBIT) // 16-bit audio through 8-bit dma?
+			if(m_dsp.flags & SIXTEENBIT) // 16-bit audio through 8-bit dma?
 				drq16_w(1);
 			else
 				drq_w(1);   // raise DRQ
-            m_dsp.dma_throttled = false;
-        }
-    }
+			m_dsp.dma_throttled = false;
+		}
+	}
 }

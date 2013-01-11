@@ -9,10 +9,10 @@
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 
-#define X07_WAV_FREQUENCY	4800
-#define X07_TIMER_FREQUENCY	1200
-#define X07_BIT_LENGTH		(X07_WAV_FREQUENCY/X07_TIMER_FREQUENCY)
-#define X07_HEADER_BYTES	16
+#define X07_WAV_FREQUENCY   4800
+#define X07_TIMER_FREQUENCY 1200
+#define X07_BIT_LENGTH      (X07_WAV_FREQUENCY/X07_TIMER_FREQUENCY)
+#define X07_HEADER_BYTES    16
 
 // image size
 static int x07_image_size;
@@ -45,7 +45,7 @@ static int x07_output_bit(INT16 *buffer, int sample_pos, UINT8 bit)
 		samples += x07_put_samples(buffer, sample_pos + samples, X07_BIT_LENGTH/2, WAVEENTRY_LOW);
 	}
 
-    return samples;
+	return samples;
 }
 
 static int x07_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
@@ -138,13 +138,13 @@ static int x07_cassette_calculate_size_in_samples(const UINT8 *bytes, int length
 
 static const struct CassetteLegacyWaveFiller x07_legacy_fill_wave =
 {
-	x07_cassette_fill_wave,					/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	x07_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	X07_WAV_FREQUENCY,						/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	x07_cassette_fill_wave,                 /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	x07_cassette_calculate_size_in_samples, /* chunk_sample_calc */
+	X07_WAV_FREQUENCY,                      /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 static casserr_t x07_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)

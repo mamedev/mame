@@ -35,7 +35,7 @@
 
 #include "hxcmfm_dsk.h"
 
-#define MFM_FORMAT_HEADER	"HXCMFM"
+#define MFM_FORMAT_HEADER   "HXCMFM"
 
 #pragma pack(1)
 

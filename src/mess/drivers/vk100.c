@@ -200,25 +200,25 @@ public:
 };
 
 // vram access functions:
-    /* figure out vram address based on tech manual page 5-24:
-     * real address to 16-bit chunk a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0
-     * X+Y input                    Y8  Y7  | Y6  Y5  Y4  Y3 | Y2  Y1  X9' X8'| X7' X6' X5' X4'
-     *          X3' and X2' choose a 4-bit block, X1 and X0 choose a bit within that.
-     * Figure out the ram address in address space "vram" based on this:
-     * vram is 0x8000 long (0x4000 16-bit blocks in sequence)
-     * so:
-     * vram: a14 a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0
-     * vg:   Y8  Y7  Y6  | Y5  Y4  Y3  Y2 | Y1  X9' X8' X7'| X6' X5' X4'(x3') x2' x1 x0
-     *     X3' is handled by the nybbleNum statement, as is X2'
-     *     X1 and X0 are handled by the pattern rom directly:
-     *     x0 -> a0, x1 -> a1
-     *     this handles bits like:
-     *     x1 x0
-     *      0  0 -> bit 0
-     *      0  1 -> bit 1
-     *      1  0 -> bit 2
-     *      1  1 -> bit 3
-     */
+	/* figure out vram address based on tech manual page 5-24:
+	 * real address to 16-bit chunk a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0
+	 * X+Y input                    Y8  Y7  | Y6  Y5  Y4  Y3 | Y2  Y1  X9' X8'| X7' X6' X5' X4'
+	 *          X3' and X2' choose a 4-bit block, X1 and X0 choose a bit within that.
+	 * Figure out the ram address in address space "vram" based on this:
+	 * vram is 0x8000 long (0x4000 16-bit blocks in sequence)
+	 * so:
+	 * vram: a14 a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0
+	 * vg:   Y8  Y7  Y6  | Y5  Y4  Y3  Y2 | Y1  X9' X8' X7'| X6' X5' X4'(x3') x2' x1 x0
+	 *     X3' is handled by the nybbleNum statement, as is X2'
+	 *     X1 and X0 are handled by the pattern rom directly:
+	 *     x0 -> a0, x1 -> a1
+	 *     this handles bits like:
+	 *     x1 x0
+	 *      0  0 -> bit 0
+	 *      0  1 -> bit 1
+	 *      1  0 -> bit 2
+	 *      1  1 -> bit 3
+	 */
 
 // returns one nybble from vram array based on X and Y regs
 static UINT8 vram_read(running_machine &machine)
@@ -285,30 +285,30 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 			m_vgGO = 0; // done
 			break;
 	}
-    /* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
-     * see figure 5-24 on page 5-39
-     * It tells the direction and enable for counting on the X and Y counters
-     * and also handles the non-math related parts of the bresenham line algorithm
-     * control bits:
-     *            /CE1 ----- DCOUNT 0 H [verified via tracing]
-     *            /CE2 ----- ENA ERROR L [verified via tracing]
-     * addr bits: 76543210
-     *            ||||\\\\-- DIR (vgDIR register low 4 bits)
-     *            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
-     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
-     *            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
-     *            \--------- GND; the second half of the prom is blank (0x00)
-     * data bits: 76543210
-     *            |||||||\-- ENA X (enables change on X counter)
-     *            ||||||\--- ENA Y (enables change on Y counter)
-     *            |||||\---- Y DIRECTION (high is count down, low is count up)
-     *            ||||\----- X DIRECTION (high is count down, low is count up)
-     *            |||\------ PIXEL WRT
-     *            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
-     *            |\-------- UNUSED, always 0
-     *            \--------- UNUSED, always 0
-     * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
-     */
+	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
+	 * see figure 5-24 on page 5-39
+	 * It tells the direction and enable for counting on the X and Y counters
+	 * and also handles the non-math related parts of the bresenham line algorithm
+	 * control bits:
+	 *            /CE1 ----- DCOUNT 0 H [verified via tracing]
+	 *            /CE2 ----- ENA ERROR L [verified via tracing]
+	 * addr bits: 76543210
+	 *            ||||\\\\-- DIR (vgDIR register low 4 bits)
+	 *            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
+	 *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
+	 *            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
+	 *            \--------- GND; the second half of the prom is blank (0x00)
+	 * data bits: 76543210
+	 *            |||||||\-- ENA X (enables change on X counter)
+	 *            ||||||\--- ENA Y (enables change on Y counter)
+	 *            |||||\---- Y DIRECTION (high is count down, low is count up)
+	 *            ||||\----- X DIRECTION (high is count down, low is count up)
+	 *            |||\------ PIXEL WRT
+	 *            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
+	 *            |\-------- UNUSED, always 0
+	 *            \--------- UNUSED, always 0
+	 * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
+	 */
 	//UINT8 direction_rom = m_dir[];
 	// HACK: we need the proper direction rom dump for this!
 	switch(VG_DIR&0x7)
@@ -536,7 +536,7 @@ WRITE8_MEMBER(vk100_state::BAUD)
 {
 	static const UINT16 baudDivisors[16] = {
 		6336, 4224, 2880, 2355, 2112, 1056,  528,  264,
-		 176,  158,  132,   88,   66,   44,   33,   16
+			176,  158,  132,   88,   66,   44,   33,   16
 		};
 	m_RXDivisor = baudDivisors[data&0xF];
 	m_TXDivisor = baudDivisors[(data&0xF0)>>4];
@@ -692,21 +692,21 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vk100 )
 	// the dipswitches are common ground: when open (upward) the lines are pulled to 5v, otherwise they read as 0
 	PORT_START("SWITCHES")
-		PORT_DIPNAME( 0x01, 0x00, "Power Frequency" )			PORT_DIPLOCATION("SW:!1")
+		PORT_DIPNAME( 0x01, 0x00, "Power Frequency" )           PORT_DIPLOCATION("SW:!1")
 		PORT_DIPSETTING( 0x00, "60Hz" )
 		PORT_DIPSETTING( 0x01, "50Hz" )
-		PORT_DIPNAME( 0x02, 0x00, "Default Serial Port" )			PORT_DIPLOCATION("SW:!2")
+		PORT_DIPNAME( 0x02, 0x00, "Default Serial Port" )           PORT_DIPLOCATION("SW:!2")
 		PORT_DIPSETTING( 0x00, "EIA port" )
 		PORT_DIPSETTING( 0x02, "20ma port" )
-		PORT_DIPNAME( 0x04, 0x00, "Default US/UK" )			PORT_DIPLOCATION("SW:!3")
+		PORT_DIPNAME( 0x04, 0x00, "Default US/UK" )         PORT_DIPLOCATION("SW:!3")
 		PORT_DIPSETTING( 0x00, "US" )
 		PORT_DIPSETTING( 0x04, "UK" )
-		PORT_DIPNAME( 0x18, 0x00, "Default Parity" )			PORT_DIPLOCATION("SW:!4,!5")
+		PORT_DIPNAME( 0x18, 0x00, "Default Parity" )            PORT_DIPLOCATION("SW:!4,!5")
 		PORT_DIPSETTING( 0x00, "Off" )
 		PORT_DIPSETTING( 0x10, "Even" )
 		PORT_DIPSETTING( 0x08, "Odd" )
 		PORT_DIPSETTING( 0x18, "Do Not Use This Setting" )
-		PORT_DIPNAME( 0xe0, 0x00, "Default Baud Rate" )			PORT_DIPLOCATION("SW:!6,!7,!8")
+		PORT_DIPNAME( 0xe0, 0x00, "Default Baud Rate" )         PORT_DIPLOCATION("SW:!6,!7,!8")
 		PORT_DIPSETTING( 0x00, "110" )
 		PORT_DIPSETTING( 0x80, "300" )
 		PORT_DIPSETTING( 0x40, "600" )
@@ -927,9 +927,9 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 	0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000 };
 	//printf("y=%d, ma=%04x, ra=%02x, x_count=%02x ", y, ma, ra, x_count);
 	/* figure out ram address based on tech manual page 5-23:
-     * real address to 16-bit chunk a13  a12  a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
-     * crtc input                  MA11 MA10 MA9 MA8 MA7 MA6 RA1 RA0 MA5 MA4 MA3 MA2 MA1 MA0
-     */
+	 * real address to 16-bit chunk a13  a12  a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
+	 * crtc input                  MA11 MA10 MA9 MA8 MA7 MA6 RA1 RA0 MA5 MA4 MA3 MA2 MA1 MA0
+	 */
 	vk100_state *state = device->machine().driver_data<vk100_state>();
 	UINT16 EA = ((ma&0xfc0)<<2)|((ra&0x3)<<6)|(ma&0x3F);
 	// display the 64 different 12-bit-wide chunks
@@ -1016,173 +1016,173 @@ ROM_START( vk100 )
 	ROM_REGION( 0x8000, "vram", ROMREGION_ERASE00 ) // 32k of vram
 
 	ROM_REGION( 0x400, "pattern", ROMREGION_ERASEFF )
-    /* This is the "PATTERN ROM", (1k*4, 82s137)
-     * it contains a table of 4 output bits based on input of: (from figure 5-18):
-     * 4 input bits bank-selected from RAM (a0, a1, a2, a3)
-     * 2 select bits to choose one of the 4 bits, sourced from the X reg LSBs (a4, a5)
-     * 3 pattern function bits from WOPS (F0 "N" is a6, F1 and F2 are a7 and a8
-     * and one bit from the lsb of the pattern register shifter (a9)
-     * control bits:
-     *            /CE1 ----- GND [verified via tracing]
-     *            /CE2 ----- GND [verified via tracing]
-     * addr bits 9876543210
-     *           ||||||\\\\- input from ram (A)
-     *           ||||\\----- bit select (from x reg lsb)
-     *           |||\------- negate (N) \___ low 3 bits of WOPS
-     *           |\\-------- function   /
-     *           \---------- pattern bit (P)
-     * data bits: 3210
-     *            \\\\-- output to ram (M), but gated by an io line from vector rom
-     *    functions are:
-     *    Overlay: M=A|(P^N)
-     *    Replace: M=P^N
-     *    Complement: M=A^(P^N)
-     *    Erase: M=N
-     */
+	/* This is the "PATTERN ROM", (1k*4, 82s137)
+	 * it contains a table of 4 output bits based on input of: (from figure 5-18):
+	 * 4 input bits bank-selected from RAM (a0, a1, a2, a3)
+	 * 2 select bits to choose one of the 4 bits, sourced from the X reg LSBs (a4, a5)
+	 * 3 pattern function bits from WOPS (F0 "N" is a6, F1 and F2 are a7 and a8
+	 * and one bit from the lsb of the pattern register shifter (a9)
+	 * control bits:
+	 *            /CE1 ----- GND [verified via tracing]
+	 *            /CE2 ----- GND [verified via tracing]
+	 * addr bits 9876543210
+	 *           ||||||\\\\- input from ram (A)
+	 *           ||||\\----- bit select (from x reg lsb)
+	 *           |||\------- negate (N) \___ low 3 bits of WOPS
+	 *           |\\-------- function   /
+	 *           \---------- pattern bit (P)
+	 * data bits: 3210
+	 *            \\\\-- output to ram (M), but gated by an io line from vector rom
+	 *    functions are:
+	 *    Overlay: M=A|(P^N)
+	 *    Replace: M=P^N
+	 *    Complement: M=A^(P^N)
+	 *    Erase: M=N
+	 */
 	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "trans", ROMREGION_ERASEFF )
-    /* this is the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
-     * it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
-     * control bits:
-     *            /CE1 ----- GND [verified via tracing]
-     *            /CE2 ----- GND [verified via tracing]
-     * addr bits: 76543210
-     *            \\\\\\\\- X9 thru X2
-     * data bits: 76543210
-     *            \\\\\\\\- X'9 thru X'2
-     * The VT125 prom @ E60 is literally identical to this, the same exact part: 23-060B1
-     */
+	/* this is the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
+	 * it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
+	 * control bits:
+	 *            /CE1 ----- GND [verified via tracing]
+	 *            /CE2 ----- GND [verified via tracing]
+	 * addr bits: 76543210
+	 *            \\\\\\\\- X9 thru X2
+	 * data bits: 76543210
+	 *            \\\\\\\\- X'9 thru X'2
+	 * The VT125 prom @ E60 is literally identical to this, the same exact part: 23-060B1
+	 */
 	ROM_LOAD( "wb---0_060b1.mmi6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "dir", ROMREGION_ERASEFF )
-     /* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
-     * see figure 5-24 on page 5-39
-     * It tells the direction and enable for counting on the X and Y counters
-     * and also handles the non-math related parts of the bresenham line algorithm
-     * control bits:
-     *            /CE1 ----- DCOUNT 0 H [verified via tracing]
-     *            /CE2 ----- ENA ERROR L [verified via tracing]
-     * addr bits: 76543210
-     *            ||||\\\\-- DIR (vgDIR register low 4 bits)
-     *            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
-     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
-     *            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
-     *            \--------- GND; the second half of the prom is blank (0x00)
-     * data bits: 76543210
-     *            |||||||\-- ENA X (enables change on X counter)
-     *            ||||||\--- ENA Y (enables change on Y counter)
-     *            |||||\---- Y DIRECTION (high is count down, low is count up)
-     *            ||||\----- X DIRECTION (high is count down, low is count up)
-     *            |||\------ PIXEL WRT
-     *            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
-     *            |\-------- UNUSED, always 0
-     *            \--------- UNUSED, always 0
-     * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
-     */
+		/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
+		* see figure 5-24 on page 5-39
+		* It tells the direction and enable for counting on the X and Y counters
+		* and also handles the non-math related parts of the bresenham line algorithm
+		* control bits:
+		*            /CE1 ----- DCOUNT 0 H [verified via tracing]
+		*            /CE2 ----- ENA ERROR L [verified via tracing]
+		* addr bits: 76543210
+		*            ||||\\\\-- DIR (vgDIR register low 4 bits)
+		*            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
+		*            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
+		*            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
+		*            \--------- GND; the second half of the prom is blank (0x00)
+		* data bits: 76543210
+		*            |||||||\-- ENA X (enables change on X counter)
+		*            ||||||\--- ENA Y (enables change on Y counter)
+		*            |||||\---- Y DIRECTION (high is count down, low is count up)
+		*            ||||\----- X DIRECTION (high is count down, low is count up)
+		*            |||\------ PIXEL WRT
+		*            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
+		*            |\-------- UNUSED, always 0
+		*            \--------- UNUSED, always 0
+		* The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
+		*/
 	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0000, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
 	/* this is the "RAS/ERASE ROM" involved with driving the RAS lines and erasing VRAM dram (256*4, 82s129)
-     * control bits:
-     *            /CE1 ----- /WRITE aka WRITE L (pin 6 of vector rom after being latched by its ls273) [verified via tracing and vt125 schematic]
-     *            /CE2 ----- /ENA WRITE aka ENA WRITE L [verified via tracing and vt125 schematic]
-     *                       (INHIBIT WRITE L (pin 5 of ls74 to extreme left edge of translate prom) XOR STROBE D COUNT (pin 5 of ls74 near the 20ma port) (pin 3 of the ls86 above the crtc)
-     * addr bits: 76543210
-     *            |||||||\-- X'2 [verified via tracing]
-     *            ||||||\--- X'3 [verified via tracing]
-     *            |||||\---- register file bit 3/upper file MSB (DIR prom pin 4, ls191 2nd from left edge left of the hd46505 pin 9, upper ls670n pin 6, ls283 at the left edge left of the hd46505 pin 15) [verified via tracing]
-     *            ||||\----- (Y8 NOR !(X10 NAND X9)) (pins 4,5,6 of ls32 left of 8085, and pins 1,2 of the ls04 in the lower left corner, pins 10,9,8 of the ls00 at the left edge drawn from the ls74 between the 8251 and 8202) [verified via tracing]
-     *            |||\------ (X10 NOR Y10) (pins 10,9,8 of ls32 left of 8085) [verified via tracing]
-     *            ||\------- X11 (D out of ls191 left of ls191 left of hd46505) [verified via tracing]
-     *            |\-------- Y11 (D out of ls191 left of hd46505) [verified via tracing]
-     *            \--------- ERASE L/d5 on the vector rom [verified via tracing]
-     * data bits: 3210
-     *            |||\-- ? wr_1?
-     *            ||\--- ? wr_2?
-     *            |\---- ? wr_3?
-     *            \----- ? wr_4?
-     * The VT125 prom E93 is mostly equivalent to the ras/erase prom; On the vt125 version, the inputs are:
-     *  (X'10 NOR X'11)
-     *  (Y9 NOR Y10)
-     *  Y11
-     *  X8 (aka PX8)
-     *  X9 (aka PX9)
-     *  ERASE L
-     *  X'3
-     *  X'2
-     * and the outputs are:
-     *  MWR 2
-     *  MWR 1
-     *  MWR 0
-     * since the vt125 has ram laid out differently than the vk100 and
-       only has 3 banks (but 2 planes of 3 banks), I (LN) assume there
-       are four wr banks on the v100, one per nybble, and the X'3 and
-       X'2 inputs lend credence to this.
-     *
-     */
+	 * control bits:
+	 *            /CE1 ----- /WRITE aka WRITE L (pin 6 of vector rom after being latched by its ls273) [verified via tracing and vt125 schematic]
+	 *            /CE2 ----- /ENA WRITE aka ENA WRITE L [verified via tracing and vt125 schematic]
+	 *                       (INHIBIT WRITE L (pin 5 of ls74 to extreme left edge of translate prom) XOR STROBE D COUNT (pin 5 of ls74 near the 20ma port) (pin 3 of the ls86 above the crtc)
+	 * addr bits: 76543210
+	 *            |||||||\-- X'2 [verified via tracing]
+	 *            ||||||\--- X'3 [verified via tracing]
+	 *            |||||\---- register file bit 3/upper file MSB (DIR prom pin 4, ls191 2nd from left edge left of the hd46505 pin 9, upper ls670n pin 6, ls283 at the left edge left of the hd46505 pin 15) [verified via tracing]
+	 *            ||||\----- (Y8 NOR !(X10 NAND X9)) (pins 4,5,6 of ls32 left of 8085, and pins 1,2 of the ls04 in the lower left corner, pins 10,9,8 of the ls00 at the left edge drawn from the ls74 between the 8251 and 8202) [verified via tracing]
+	 *            |||\------ (X10 NOR Y10) (pins 10,9,8 of ls32 left of 8085) [verified via tracing]
+	 *            ||\------- X11 (D out of ls191 left of ls191 left of hd46505) [verified via tracing]
+	 *            |\-------- Y11 (D out of ls191 left of hd46505) [verified via tracing]
+	 *            \--------- ERASE L/d5 on the vector rom [verified via tracing]
+	 * data bits: 3210
+	 *            |||\-- ? wr_1?
+	 *            ||\--- ? wr_2?
+	 *            |\---- ? wr_3?
+	 *            \----- ? wr_4?
+	 * The VT125 prom E93 is mostly equivalent to the ras/erase prom; On the vt125 version, the inputs are:
+	 *  (X'10 NOR X'11)
+	 *  (Y9 NOR Y10)
+	 *  Y11
+	 *  X8 (aka PX8)
+	 *  X9 (aka PX9)
+	 *  ERASE L
+	 *  X'3
+	 *  X'2
+	 * and the outputs are:
+	 *  MWR 2
+	 *  MWR 1
+	 *  MWR 0
+	 * since the vt125 has ram laid out differently than the vk100 and
+	   only has 3 banks (but 2 planes of 3 banks), I (LN) assume there
+	   are four wr banks on the v100, one per nybble, and the X'3 and
+	   X'2 inputs lend credence to this.
+	 *
+	 */
 	ROM_LOAD( "wb8151_573a2.mmi6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 	// WARNING: it is possible that the first two bytes of this prom are bad!
 	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
-     * the vector rom bits are complex and are unfortunately poorly documented
-     * in the tech manual. see figure 5-23.
-     * control bits:
-     *            /CE1 ----- /GO aka GO L [verified via tracing]
-     *            /CE2 ----- GND [verified via tracing]
-     * addr bits: 76543210
-     *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-     *            |||\------ (MODE 0 NAND GO) \_This effectively means when GO is low, these bits are both 1, when GO is high, these bits are the inverse of the MODE bits; this is DIFFERENT from the vt125, and was probably removed as unnecessary given that /GO is an enable for the vector rom anyway [verified via tracing]
-     *            ||\------- (MODE 1 NAND GO) /
-     *            |\-------- ? C OUT (when set, only one /LD ERROR pulse occurs instead of two)
-     *            \--------- ? FINISH (/LD ERROR only goes active (low) when this is unset)
-     *
-     * data bits: 76543210
-     *            |||||||\-- /WRITE aka WRITE L (fig 5-20, page 5-32, writes the post-pattern-converted value back to vram at X,Y)
-     *            ||||||\--- DONE L [verified via tracing]
-     *            |||||\---- VECTOR CLK aka V CLK [verified via tracing]
-     *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
-     *            |||\------ D LOAD [by process of elimination and limited tracing]
-     *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the ras/erase rom; the counter rom may be involved in blanking all of vram) [verified via tracing]
-     *            |\-------- C0 aka C IN (high during DVM read, low otherwise, a carry in to the adder so DVM is converted from 1s to 2s complement)
-     *            \--------- SHIFT ENA [verified via tracing]
-     * The data bits all have pull-ups to +5v if the /CE1 pin is not low
-     * According to the VT125 tech manual (vt100 tech manual rev 3, page 6-85) the 8 signals here are:
-     * ERASE L - d5
-     * SHIFT ENA - d7
-     * C IN - d6
-     * D LOAD - d4
-     * WRITE L - d0
-     * DONE L - d1
-     * VECTOR CLK - d2
-     * STROBE ERROR L - d3
-     *
-     * The VT125 prom E71 and its latch E70 is mostly equivalent to the vector prom, but the address order is different
-     */
+	 * the vector rom bits are complex and are unfortunately poorly documented
+	 * in the tech manual. see figure 5-23.
+	 * control bits:
+	 *            /CE1 ----- /GO aka GO L [verified via tracing]
+	 *            /CE2 ----- GND [verified via tracing]
+	 * addr bits: 76543210
+	 *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
+	 *            |||\------ (MODE 0 NAND GO) \_This effectively means when GO is low, these bits are both 1, when GO is high, these bits are the inverse of the MODE bits; this is DIFFERENT from the vt125, and was probably removed as unnecessary given that /GO is an enable for the vector rom anyway [verified via tracing]
+	 *            ||\------- (MODE 1 NAND GO) /
+	 *            |\-------- ? C OUT (when set, only one /LD ERROR pulse occurs instead of two)
+	 *            \--------- ? FINISH (/LD ERROR only goes active (low) when this is unset)
+	 *
+	 * data bits: 76543210
+	 *            |||||||\-- /WRITE aka WRITE L (fig 5-20, page 5-32, writes the post-pattern-converted value back to vram at X,Y)
+	 *            ||||||\--- DONE L [verified via tracing]
+	 *            |||||\---- VECTOR CLK aka V CLK [verified via tracing]
+	 *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
+	 *            |||\------ D LOAD [by process of elimination and limited tracing]
+	 *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the ras/erase rom; the counter rom may be involved in blanking all of vram) [verified via tracing]
+	 *            |\-------- C0 aka C IN (high during DVM read, low otherwise, a carry in to the adder so DVM is converted from 1s to 2s complement)
+	 *            \--------- SHIFT ENA [verified via tracing]
+	 * The data bits all have pull-ups to +5v if the /CE1 pin is not low
+	 * According to the VT125 tech manual (vt100 tech manual rev 3, page 6-85) the 8 signals here are:
+	 * ERASE L - d5
+	 * SHIFT ENA - d7
+	 * C IN - d6
+	 * D LOAD - d4
+	 * WRITE L - d0
+	 * DONE L - d1
+	 * VECTOR CLK - d2
+	 * STROBE ERROR L - d3
+	 *
+	 * The VT125 prom E71 and its latch E70 is mostly equivalent to the vector prom, but the address order is different
+	 */
 	ROM_LOAD( "wb8146_058b1.mmi6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)
-     * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
-     * The exact pins for each signal are not documented.
-     * control bits:
-     *            /CE1 -- GND(Unused)
-     * addr bits: 43210
-     *            |\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-     *            \------ comes from the gated ERASE L/d5 from the vector rom, only low during VG_MODE == ER (ERase Screen) [verified via tracing]
-     *                      when high: the sync rom matches figure 5-20 (page 5-32) and 5-23 (page 5-38)
-     *                      when low: RA/RB is fixed on WOPS in the register file
-     *                                LD SHFR does NOT output pulses (effectively blanking the screen)
-     *                                WRT/RD is held at /RD so vg to vram do nothing,
-     *                                however while the crtc is refreshing the screen it instead is writing zeroes to every location
-     * data bits: 76543210
-     *            |||||||\-- WRT/RD (write high when x,y (vg) drives vram, read low when ma (crtc) drives vram)
-     *            ||||||\--- /RAS (for vram)
-     *            |||||\---- STROBE aka STROBE L aka VG STROBE(latches the carry bit from the adder to the direction rom AND causes the data at the X,Y address of vram to be read into the holding register before pattern is applied)
-     *            ||||\----- LD SHFR (loads the 12-bit shift register of data to be shifted to screen)
-     *            |||\------ /CAS (for vram)
-     *            ||\------- RA\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
-     *            |\-------- RB/
-     *            \--------- SYNC (latches the EXECUTE signal from an EXEC * write to activate the GO signal and enable the Vector rom) [verified via tracing]
-     * The VT125 proms E64/E66 and their respective latches E65 and E83 are mostly equivalent to the sync rom
-     */
+	 * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
+	 * The exact pins for each signal are not documented.
+	 * control bits:
+	 *            /CE1 -- GND(Unused)
+	 * addr bits: 43210
+	 *            |\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
+	 *            \------ comes from the gated ERASE L/d5 from the vector rom, only low during VG_MODE == ER (ERase Screen) [verified via tracing]
+	 *                      when high: the sync rom matches figure 5-20 (page 5-32) and 5-23 (page 5-38)
+	 *                      when low: RA/RB is fixed on WOPS in the register file
+	 *                                LD SHFR does NOT output pulses (effectively blanking the screen)
+	 *                                WRT/RD is held at /RD so vg to vram do nothing,
+	 *                                however while the crtc is refreshing the screen it instead is writing zeroes to every location
+	 * data bits: 76543210
+	 *            |||||||\-- WRT/RD (write high when x,y (vg) drives vram, read low when ma (crtc) drives vram)
+	 *            ||||||\--- /RAS (for vram)
+	 *            |||||\---- STROBE aka STROBE L aka VG STROBE(latches the carry bit from the adder to the direction rom AND causes the data at the X,Y address of vram to be read into the holding register before pattern is applied)
+	 *            ||||\----- LD SHFR (loads the 12-bit shift register of data to be shifted to screen)
+	 *            |||\------ /CAS (for vram)
+	 *            ||\------- RA\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
+	 *            |\-------- RB/
+	 *            \--------- SYNC (latches the EXECUTE signal from an EXEC * write to activate the GO signal and enable the Vector rom) [verified via tracing]
+	 * The VT125 proms E64/E66 and their respective latches E65 and E83 are mostly equivalent to the sync rom
+	 */
 	ROM_LOAD( "wb8014_297a1.74s288.pr6.ic89", 0x0200, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
 

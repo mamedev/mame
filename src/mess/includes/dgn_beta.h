@@ -21,63 +21,63 @@
 #define FDC_TAG     "wd2797"
 
 
-#define DGNBETA_CPU_SPEED_HZ		2000000	/* 2MHz */
-#define DGNBETA_FRAMES_PER_SECOND	50
+#define DGNBETA_CPU_SPEED_HZ        2000000 /* 2MHz */
+#define DGNBETA_FRAMES_PER_SECOND   50
 
-#define RamSize				256	        /* 256K by default */
-#define RamPageSize			4096	    /* ram pages are 4096 bytes */
+#define RamSize             256         /* 256K by default */
+#define RamPageSize         4096        /* ram pages are 4096 bytes */
 
-#define MaxTasks			16	        /* Tasks 0..15 */
-#define MaxPage				16	        /* 16 4K pages */
-#define NoPagingTask		MaxTasks	/* Task registers to use when paging disabled 16 */
+#define MaxTasks            16          /* Tasks 0..15 */
+#define MaxPage             16          /* 16 4K pages */
+#define NoPagingTask        MaxTasks    /* Task registers to use when paging disabled 16 */
 
-#define RAMPage				0		    /* Page with RAM in at power on */
-#define VideoPage			6		    /* Page where video ram mapped */
-#define IOPage				MaxPage-1	/* Page for I/O */
-#define ROMPage				MaxPage-2	/* Page for ROM */
+#define RAMPage             0           /* Page with RAM in at power on */
+#define VideoPage           6           /* Page where video ram mapped */
+#define IOPage              MaxPage-1   /* Page for I/O */
+#define ROMPage             MaxPage-2   /* Page for ROM */
 #define LastPage            MaxPage-1
 
-#define RAMPageValue		0x00		/* page with RAM at power on */
-#define VideoPageValue		0x1F		/* Default page for video ram */
-#define NoMemPageValue		0xC0		/* Page guaranteed not to have memory in */
-#define ROMPageValue		0xFE		/* Page with boot ROM */
-#define IOPageValue			0xFF		/* Page with I/O & Boot ROM */
+#define RAMPageValue        0x00        /* page with RAM at power on */
+#define VideoPageValue      0x1F        /* Default page for video ram */
+#define NoMemPageValue      0xC0        /* Page guaranteed not to have memory in */
+#define ROMPageValue        0xFE        /* Page with boot ROM */
+#define IOPageValue         0xFF        /* Page with I/O & Boot ROM */
 
-#define TextVidBasePage		0x18		/* Base page of text video ram */
+#define TextVidBasePage     0x18        /* Base page of text video ram */
 
 /***** Keyboard stuff *****/
-#define	NoKeyrows			0x0a		/* Number of rows in keyboard */
+#define NoKeyrows           0x0a        /* Number of rows in keyboard */
 
 /* From Dragon Beta OS9 keyboard driver */
-#define KAny				0x04		/* Any key pressed mask PB2 */
-#define KOutClk				0x08		/* Ouput shift register clock */
-#define KInClk				0x10		/* Input shift register clock */
-#define KOutDat				KInClk		/* Also used for data into output shifter */
-#define KInDat				0x20		/* Keyboard data in from keyboard (serial stream) */
+#define KAny                0x04        /* Any key pressed mask PB2 */
+#define KOutClk             0x08        /* Ouput shift register clock */
+#define KInClk              0x10        /* Input shift register clock */
+#define KOutDat             KInClk      /* Also used for data into output shifter */
+#define KInDat              0x20        /* Keyboard data in from keyboard (serial stream) */
 
 /***** WD2797 pins *****/
 
-#define DSMask				0x03		/* PA0 & PA1 are binary encoded drive */
-#define ENPCtrl				0x20		/* PA5 on PIA */
-#define DDenCtrl			0x40		/* PA6 on PIA */
+#define DSMask              0x03        /* PA0 & PA1 are binary encoded drive */
+#define ENPCtrl             0x20        /* PA5 on PIA */
+#define DDenCtrl            0x40        /* PA6 on PIA */
 
 /***** Video Modes *****/
 
 enum BETA_VID_MODES
 {
-	TEXT_40x25,				/* Text mode 40x25 */
-	TEXT_80x25,				/* Text mode 80x25 */
-	GRAPH_320x256x4,		/* Graphics 320x256x4 */
-	GRAPH_320x256x16,		/* Graphics 320x256x16 */
-	GRAPH_640x512x2			/* Graphics 640X512X2 */
+	TEXT_40x25,             /* Text mode 40x25 */
+	TEXT_80x25,             /* Text mode 80x25 */
+	GRAPH_320x256x4,        /* Graphics 320x256x4 */
+	GRAPH_320x256x16,       /* Graphics 320x256x16 */
+	GRAPH_640x512x2         /* Graphics 640X512X2 */
 };
 
-#define iosize	(0xfEFF-0xfc00)
+#define iosize  (0xfEFF-0xfc00)
 
 struct PageReg
 {
-	int	    value;			/* Value of the page register */
-	UINT8	*memory;		/* The memory it actually points to */
+	int     value;          /* Value of the page register */
+	UINT8   *memory;        /* The memory it actually points to */
 };
 
 
@@ -86,7 +86,7 @@ class dgn_beta_state : public driver_device
 public:
 	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_mc6845(*this, "crtc"),
+			m_mc6845(*this, "crtc"),
 		m_videoram(*this, "videoram"){ }
 
 	required_device<mc6845_device> m_mc6845;

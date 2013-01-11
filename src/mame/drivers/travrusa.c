@@ -60,12 +60,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
 	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")		/* IN0 */
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P1")			/* IN1 */
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("P2")			/* IN2 */
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")		/* DSW1 */
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")		/* DSW2 */
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)    /* + coin counters - not written by shtrider */
+	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")     /* IN0 */
+	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P1")         /* IN1 */
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("P2")         /* IN2 */
+	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")       /* DSW1 */
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")       /* DSW2 */
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -299,7 +299,7 @@ void travrusa_state::machine_reset()
 static MACHINE_CONFIG_START( travrusa, travrusa_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", travrusa_state,  irq0_line_hold)
 
@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(56.75)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790)	/* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790)   /* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */)
 				/* the Lode Runner manual (similar but different hardware) */
 				/* talks about 55Hz and 1790ms vblank duration. */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -367,7 +367,7 @@ ROM_END
 
 ROM_START( motorace )
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )	/* encrypted */
+	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )    /* encrypted */
 	ROM_LOAD( "mr1.3l",       0x2000, 0x2000, CRC(0904ed58) SHA1(2776e031cb58f99103bc35299bffd7612d954608) )
 	ROM_LOAD( "mr2.3k",       0x4000, 0x2000, CRC(8a2374ec) SHA1(7159731f5ef2485e3c822e3e8e51e9583dd1c6bc) )
 	ROM_LOAD( "mr3.3j",       0x6000, 0x2000, CRC(2f04c341) SHA1(ae990d9d4abdd7d6ef9d21aa62125fe2e0067623) )

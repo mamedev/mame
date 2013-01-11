@@ -173,9 +173,9 @@ UINT32 esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &
 if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

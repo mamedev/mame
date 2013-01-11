@@ -84,10 +84,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		int x = spriteram[i+0] + SPR_ADJUST_X;
 		int y = spriteram[i+4] + SPR_ADJUST_Y;
-		int code = spriteram[i+8] & 0x0f;		/* bit #0 .. #3 select sprite */
+		int code = spriteram[i+8] & 0x0f;       /* bit #0 .. #3 select sprite */
 /*      int bank = (spriteram[i+8] >> 4) & 1;      bit #4 selects prom ???    */
-		int bank = i;							/* that fixes it for now :-/ */
-		int flip = spriteram[i+8] >> 5;			/* bit #5 flip vertical flag */
+		int bank = i;                           /* that fixes it for now :-/ */
+		int flip = spriteram[i+8] >> 5;         /* bit #5 flip vertical flag */
 
 		drawgfx_transpen(bitmap, clip, machine.gfx[bank + 1], code, 0, flip, 0, x, y, 0);
 	}

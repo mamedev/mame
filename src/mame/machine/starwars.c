@@ -13,23 +13,23 @@
 
 
 /* Control select values for ADC_R */
-#define kPitch		0
-#define kYaw		1
-#define kThrust		2
+#define kPitch      0
+#define kYaw        1
+#define kThrust     2
 
 /* Constants for matrix processor operations */
-#define NOP			0x00
-#define LAC			0x01
-#define READ_ACC	0x02
-#define M_HALT		0x04
-#define INC_BIC		0x08
-#define CLEAR_ACC	0x10
-#define LDC			0x20
-#define LDB			0x40
-#define LDA			0x80
+#define NOP         0x00
+#define LAC         0x01
+#define READ_ACC    0x02
+#define M_HALT      0x04
+#define INC_BIC     0x08
+#define CLEAR_ACC   0x10
+#define LDC         0x20
+#define LDB         0x40
+#define LDA         0x80
 
 /* Debugging flag */
-#define MATHDEBUG	0
+#define MATHDEBUG   0
 
 #define MASTER_CLOCK (12096000)
 
@@ -64,35 +64,35 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
 {
 	switch (offset & 7)
 	{
-		case 0:		/* Coin counter 1 */
+		case 0:     /* Coin counter 1 */
 			coin_counter_w(machine(), 0, data);
 			break;
 
-		case 1:		/* Coin counter 2 */
+		case 1:     /* Coin counter 2 */
 			coin_counter_w(machine(), 1, data);
 			break;
 
-		case 2:		/* LED 3 */
+		case 2:     /* LED 3 */
 			set_led_status(machine(), 2, ~data & 0x80);
 			break;
 
-		case 3:		/* LED 2 */
+		case 3:     /* LED 2 */
 			set_led_status(machine(), 1, ~data & 0x80);
 			break;
 
-		case 4:		/* bank switch */
+		case 4:     /* bank switch */
 			membank("bank1")->set_entry((data >> 7) & 1);
 			if (m_is_esb)
 				membank("bank2")->set_entry((data >> 7) & 1);
 			break;
-		case 5:		/* reset PRNG */
+		case 5:     /* reset PRNG */
 			break;
 
-		case 6:		/* LED 1 */
+		case 6:     /* LED 1 */
 			set_led_status(machine(), 0, ~data & 0x80);
 			break;
 
-		case 7:		/* NVRAM array recall */
+		case 7:     /* NVRAM array recall */
 			machine().device<x2212_device>("x2212")->recall(~data & 0x80);
 			break;
 	}
@@ -235,12 +235,12 @@ static void run_mproc(running_machine &machine)
 
 		/* construct the current RAM address */
 		if (IP7 == 0)
-			MA = (IP6_0 & 3) | ((state->m_BIC & 0x01ff) << 2);	/* MA10-2 set to BIC8-0 */
+			MA = (IP6_0 & 3) | ((state->m_BIC & 0x01ff) << 2);  /* MA10-2 set to BIC8-0 */
 		else
 			MA = IP6_0;
 
 		/* convert RAM offset to eight bit addressing (2kx8 rather than 1k*16)
-            and apply base address offset */
+		    and apply base address offset */
 
 		MA_byte = MA << 1;
 		RAMWORD = (state->m_mathram[MA_byte + 1] & 0x00ff) | ((state->m_mathram[MA_byte] & 0x00ff) << 8);
@@ -248,19 +248,19 @@ static void run_mproc(running_machine &machine)
 //      logerror("MATH ADDR: %x, CPU ADDR: %x, RAMWORD: %x\n", MA, MA_byte, RAMWORD);
 
 		/*
-         * RAMWORD is the sixteen bit Math RAM value for the selected address
-         * MA_byte is the base address of this location as seen by the main CPU
-         * IP is the 16 bit instruction word from the PROM. IP7_0 have already
-         * been used in the address selection stage
-         * IP15_8 provide the instruction strobes
-         */
+		 * RAMWORD is the sixteen bit Math RAM value for the selected address
+		 * MA_byte is the base address of this location as seen by the main CPU
+		 * IP is the 16 bit instruction word from the PROM. IP7_0 have already
+		 * been used in the address selection stage
+		 * IP15_8 provide the instruction strobes
+		 */
 
 
 		/* The accumulator is built from two ls299 (msb) and two ls164
-         * (lsb). You can only read/write the 16 msb. The lsb are
-         * used while adding up multiplication results giving better
-         * accuracy.
-         */
+		 * (lsb). You can only read/write the 16 msb. The lsb are
+		 * used while adding up multiplication results giving better
+		 * accuracy.
+		 */
 
 		/* 0x10 - CLEAR_ACC */
 		if (IP15_8 & CLEAR_ACC)
@@ -293,45 +293,45 @@ static void run_mproc(running_machine &machine)
 			state->m_C = RAMWORD;
 
 			/* This is a serial subtractor - multiplier (74ls384) -
-             * accumulator. For the full calculation 33 GMCLK pulses
-             * are generated. The calculation performed is:
-             *
-             * ACC = ACC + (A - B) * C
-             *
-             * 1. pulse: Bit 0 of A and B are subtracted. Bit 0 of the
-             * multiplication between multiplicand C and 0 is
-             * calculated (bit 0 of A-B is not yet at the multiplier
-             * input). Bit 0 of ACC is added to 0 (again, 'real' results
-             * from the previous operations are no yet there).
-             *
-             * 2. pulse: Bit 1 of A-B is calculated. Bit 1 of
-             * mutliplication is calculated based on bit 0 of A-B and
-             * bit 1 of C. Bit 1 of ACC is added to the multiplication
-             * result from first pulse.
-             *
-             * 3. pulse: Bit 2 of A-B is calculated. Bit 2 of
-             * mutliplication is calculated based on bit 1 of A-B and
-             * bit 2 of C. Bit 2 of ACC is added to the multiplication
-             * between bit 1 of C and bit 0 of A-B.
-             *
-             * etc.
-             *
-             * This pipeline causes the shifts between A-B, C and ACC.
-             * The 32 bit ACC and one bit adder form a ring so it
-             * takes 33 clock pulses to do a full rotation.
-             */
+			 * accumulator. For the full calculation 33 GMCLK pulses
+			 * are generated. The calculation performed is:
+			 *
+			 * ACC = ACC + (A - B) * C
+			 *
+			 * 1. pulse: Bit 0 of A and B are subtracted. Bit 0 of the
+			 * multiplication between multiplicand C and 0 is
+			 * calculated (bit 0 of A-B is not yet at the multiplier
+			 * input). Bit 0 of ACC is added to 0 (again, 'real' results
+			 * from the previous operations are no yet there).
+			 *
+			 * 2. pulse: Bit 1 of A-B is calculated. Bit 1 of
+			 * mutliplication is calculated based on bit 0 of A-B and
+			 * bit 1 of C. Bit 1 of ACC is added to the multiplication
+			 * result from first pulse.
+			 *
+			 * 3. pulse: Bit 2 of A-B is calculated. Bit 2 of
+			 * mutliplication is calculated based on bit 1 of A-B and
+			 * bit 2 of C. Bit 2 of ACC is added to the multiplication
+			 * between bit 1 of C and bit 0 of A-B.
+			 *
+			 * etc.
+			 *
+			 * This pipeline causes the shifts between A-B, C and ACC.
+			 * The 32 bit ACC and one bit adder form a ring so it
+			 * takes 33 clock pulses to do a full rotation.
+			 */
 
 			state->m_ACC += (((INT32)(state->m_A - state->m_B) << 1) * state->m_C) << 1;
 
 			/* A and B are sign extended (requred by the ls384). After
-             * multiplication they just contain the sign.
-             */
+			 * multiplication they just contain the sign.
+			 */
 			state->m_A = (state->m_A & 0x8000)? 0xffff: 0;
 			state->m_B = (state->m_B & 0x8000)? 0xffff: 0;
 
 			/* The multiply-add holds the main matrix processor counter
-             * for 33 cycles
-             */
+			 * for 33 cycles
+			 */
 			mptime += 33;
 		}
 
@@ -344,11 +344,11 @@ static void run_mproc(running_machine &machine)
 			state->m_A = RAMWORD;
 
 		/*
-         * Now update the PROM address counter
-         * Done like this because the top two bits are not part of the counter
-         * This means that each of the four pages should wrap around rather than
-         * leaking from one to another.  It may not matter, but I've put it in anyway
-         */
+		 * Now update the PROM address counter
+		 * Done like this because the top two bits are not part of the counter
+		 * This means that each of the four pages should wrap around rather than
+		 * leaking from one to another.  It may not matter, but I've put it in anyway
+		 */
 		tmp = state->m_MPA + 1;
 		state->m_MPA = (state->m_MPA & 0x0300) | (tmp & 0x00ff); /* New MPA value */
 
@@ -369,16 +369,16 @@ static void run_mproc(running_machine &machine)
 READ8_MEMBER(starwars_state::starwars_prng_r)
 {
 	/*
-     * The PRNG is a modified 23 bit LFSR. Taps are at 4 and 22 so the
-     * resulting LFSR polynomial is,
-     *
-     * x^5 + x^{23} + 1
-     *
-     * which is prime. It has a loop length of 8388607. The feedback
-     * bit is inverted so the PRNG can start with 0. Only 8 bits from
-     * bit 8 to 15 can be read by the CPU. The PRNG runs constantly at
-     * a clock speed of 3 MHz.
-     */
+	 * The PRNG is a modified 23 bit LFSR. Taps are at 4 and 22 so the
+	 * resulting LFSR polynomial is,
+	 *
+	 * x^5 + x^{23} + 1
+	 *
+	 * which is prime. It has a loop length of 8388607. The feedback
+	 * bit is inverted so the PRNG can start with 0. Only 8 bits from
+	 * bit 8 to 15 can be read by the CPU. The PRNG runs constantly at
+	 * a clock speed of 3 MHz.
+	 */
 
 	/* Use MAME's PRNG for now */
 	return machine().rand();
@@ -408,19 +408,19 @@ WRITE8_MEMBER(starwars_state::starwars_math_w)
 {
 	int i;
 
-	data &= 0xff;	/* ASG 971002 -- make sure we only get bytes here */
+	data &= 0xff;   /* ASG 971002 -- make sure we only get bytes here */
 	switch (offset)
 	{
-		case 0:	/* mw0 */
-			m_MPA = data << 2;	/* Set starting PROM address */
-			run_mproc(machine());			/* and run the Matrix Processor */
+		case 0: /* mw0 */
+			m_MPA = data << 2;  /* Set starting PROM address */
+			run_mproc(machine());           /* and run the Matrix Processor */
 			break;
 
-		case 1:	/* mw1 */
+		case 1: /* mw1 */
 			m_BIC = (m_BIC & 0x00ff) | ((data & 0x01) << 8);
 			break;
 
-		case 2:	/* mw2 */
+		case 2: /* mw2 */
 			m_BIC = (m_BIC & 0x0100) | data;
 			break;
 
@@ -440,11 +440,11 @@ WRITE8_MEMBER(starwars_state::starwars_math_w)
 			m_divisor = (m_divisor & 0xff00) | data;
 
 			/*
-             * Simple restoring division as shown in the
-             * schematics. The algorithm produces the same "wrong"
-             * results as the hardware if m_divisor < 2*m_dividend or
-             * m_divisor > 0x8000.
-             */
+			 * Simple restoring division as shown in the
+			 * schematics. The algorithm produces the same "wrong"
+			 * results as the hardware if m_divisor < 2*m_dividend or
+			 * m_divisor > 0x8000.
+			 */
 			for (i = 1; i < 16; i++)
 			{
 				m_quotient_shift <<= 1;

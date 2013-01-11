@@ -160,7 +160,7 @@ void tms9980a_device::mem_read()
 		if (VERBOSE>7) LOG("tms9980a: memory read high byte %04x -> %02x\n", m_address & m_prgaddr_mask, value);
 		m_current_value = (value << 8) & 0xff00;
 		m_lowbyte = true;
-		m_pass = 2;			// make the CPU visit this method once more
+		m_pass = 2;         // make the CPU visit this method once more
 	}
 	pulse_clock(2);
 	m_check_ready = true;
@@ -179,7 +179,7 @@ void tms9980a_device::mem_write()
 		m_prgspace->write_byte(m_address & 0x3ffe, (m_current_value >> 8)&0xff);
 		if (VERBOSE>7) LOG("tms9980a: memory write high byte %04x <- %02x\n", m_address & m_prgaddr_mask, (m_current_value >> 8)&0xff);
 		m_lowbyte = true;
-		m_pass = 2;			// make the CPU visit this method once more
+		m_pass = 2;         // make the CPU visit this method once more
 	}
 	pulse_clock(2);
 	m_check_ready = true;

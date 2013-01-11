@@ -37,4 +37,4 @@ extern const device_type NAMCO_50XX;
 
 
 
-#endif	/* NAMCO50_H */
+#endif  /* NAMCO50_H */

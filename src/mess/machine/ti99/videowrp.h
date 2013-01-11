@@ -20,10 +20,10 @@
 class ti_video_device : public bus8z_device
 {
 public:
-	virtual void	reset_vdp(int state) =0;
+	virtual void    reset_vdp(int state) =0;
 
 protected:
-	address_space	*m_space;
+	address_space   *m_space;
 	tms9928a_device *m_tms9928a;
 
 	/* Constructor */
@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void	reset_vdp(int state) { m_tms9928a->reset_line(state); }
+	void    reset_vdp(int state) { m_tms9928a->reset_line(state); }
 };
 
 /*
@@ -59,11 +59,11 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ16_MEMBER(read16);
 	DECLARE_WRITE16_MEMBER(write16);
-	void	reset_vdp(int state) { m_v9938->reset_line(state); }
+	void    reset_vdp(int state) { m_v9938->reset_line(state); }
 
 protected:
-	void			device_start(void);
-	v9938_device	*m_v9938;
+	void            device_start(void);
+	v9938_device    *m_v9938;
 };
 
 extern const device_type TI99VIDEO;
@@ -79,7 +79,7 @@ extern const device_type TISOUND_76496;
 
 struct ti_sound_config
 {
-	devcb_write_line				ready;
+	devcb_write_line                ready;
 };
 
 #define TI_SOUND_CONFIG(name) \
@@ -94,15 +94,15 @@ public:
 	// Cannot read from sound; just ignore silently
 	DECLARE_READ8Z_MEMBER(readz) { };
 	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE_LINE_MEMBER( sound_ready );	// connect to console READY
+	DECLARE_WRITE_LINE_MEMBER( sound_ready );   // connect to console READY
 
 protected:
 	void device_start(void);
 	virtual machine_config_constructor device_mconfig_additions() const =0;
 
 private:
-	sn76496_base_device*		m_sound_chip;
-	devcb_resolved_write_line	m_console_ready;
+	sn76496_base_device*        m_sound_chip;
+	devcb_resolved_write_line   m_console_ready;
 };
 
 /*
@@ -134,50 +134,49 @@ protected:
 
 /****************************************************************************/
 
-#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _tmsparam)	\
-	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )					\
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG ) 							\
+#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _tmsparam)    \
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
+	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                  \
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _tmsparam)		\
-	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )						\
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )								\
+#define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _tmsparam)     \
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
+	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                      \
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI998_ADD_NTSC(_tag, _chip, _tmsparam)	\
-	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )					\
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG ) 							\
+#define MCFG_TI998_ADD_NTSC(_tag, _chip, _tmsparam) \
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
+	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                  \
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )                             \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI998_ADD_PAL(_tag, _chip, _tmsparam)		\
-	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)										\
-	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )						\
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )								\
+#define MCFG_TI998_ADD_PAL(_tag, _chip, _tmsparam)      \
+	MCFG_DEVICE_ADD(_tag, TI99VIDEO, 0)                                     \
+	MCFG_TMS9928A_ADD( VDP_TAG, _chip, _tmsparam )                      \
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _devtag, _class, _int)		\
-	MCFG_DEVICE_ADD(_tag, V9938VIDEO, 0)										\
-	MCFG_V9938_ADD(VDP_TAG, _screen, 0x20000)							\
-	MCFG_V99X8_INTERRUPT_CALLBACK_DEVICE(_devtag, _class, _int)			\
-	MCFG_SCREEN_ADD(_screen, RASTER)										\
-	MCFG_SCREEN_REFRESH_RATE(_rate)											\
-	MCFG_SCREEN_UPDATE_DEVICE(VDP_TAG, v9938_device, screen_update)	\
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))					\
-	MCFG_SCREEN_SIZE(_x, _y)												\
-	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)							\
-	MCFG_PALETTE_LENGTH(512)												\
+#define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _devtag, _class, _int)      \
+	MCFG_DEVICE_ADD(_tag, V9938VIDEO, 0)                                        \
+	MCFG_V9938_ADD(VDP_TAG, _screen, 0x20000)                           \
+	MCFG_V99X8_INTERRUPT_CALLBACK_DEVICE(_devtag, _class, _int)         \
+	MCFG_SCREEN_ADD(_screen, RASTER)                                        \
+	MCFG_SCREEN_REFRESH_RATE(_rate)                                         \
+	MCFG_SCREEN_UPDATE_DEVICE(VDP_TAG, v9938_device, screen_update) \
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))                    \
+	MCFG_SCREEN_SIZE(_x, _y)                                                \
+	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)                          \
+	MCFG_PALETTE_LENGTH(512)                                                \
 	MCFG_PALETTE_INIT(v9938)
 
-#define MCFG_TI_SOUND_94624_ADD(_tag, _conf)			\
-	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0)	\
+#define MCFG_TI_SOUND_94624_ADD(_tag, _conf)            \
+	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0) \
 	MCFG_DEVICE_CONFIG( _conf )
 
-#define MCFG_TI_SOUND_76496_ADD(_tag, _conf)			\
-	MCFG_DEVICE_ADD(_tag, TISOUND_76496, 0)	\
+#define MCFG_TI_SOUND_76496_ADD(_tag, _conf)            \
+	MCFG_DEVICE_ADD(_tag, TISOUND_76496, 0) \
 	MCFG_DEVICE_CONFIG( _conf )
 
 #endif /* __TIVIDEO__ */
-

@@ -17,7 +17,7 @@
 //#include "machine/i2cmem.h"
 
 
-#define FLASH_PAGE_SIZE	(2048+64)
+#define FLASH_PAGE_SIZE (2048+64)
 
 class nexus3d_state : public driver_device
 {

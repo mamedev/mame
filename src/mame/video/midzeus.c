@@ -17,13 +17,13 @@
  *
  *************************************/
 
-#define DUMP_WAVE_RAM		0
+#define DUMP_WAVE_RAM       0
 
-#define WAVERAM0_WIDTH		512
-#define WAVERAM0_HEIGHT		2048
+#define WAVERAM0_WIDTH      512
+#define WAVERAM0_HEIGHT     2048
 
-#define WAVERAM1_WIDTH		512
-#define WAVERAM1_HEIGHT		512
+#define WAVERAM1_WIDTH      512
+#define WAVERAM1_HEIGHT     512
 
 
 
@@ -35,16 +35,16 @@
 
 struct poly_extra_data
 {
-	const void *	palbase;
-	const void *	texbase;
-	UINT16			solidcolor;
-	UINT16			voffset;
-	INT16			zoffset;
-	UINT16			transcolor;
-	UINT16			texwidth;
-	UINT16			color;
-	UINT32			alpha;
-	UINT8			(*get_texel)(const void *, int, int, int);
+	const void *    palbase;
+	const void *    texbase;
+	UINT16          solidcolor;
+	UINT16          voffset;
+	INT16           zoffset;
+	UINT16          transcolor;
+	UINT16          texwidth;
+	UINT16          color;
+	UINT32          alpha;
+	UINT8           (*get_texel)(const void *, int, int, int);
 };
 
 
@@ -113,31 +113,31 @@ static void log_waveram(UINT32 length_and_base);
  *
  *************************************/
 
-#define WAVERAM_BLOCK0(blocknum)				((void *)((UINT8 *)waveram[0] + 8 * (blocknum)))
-#define WAVERAM_BLOCK1(blocknum)				((void *)((UINT8 *)waveram[1] + 8 * (blocknum)))
+#define WAVERAM_BLOCK0(blocknum)                ((void *)((UINT8 *)waveram[0] + 8 * (blocknum)))
+#define WAVERAM_BLOCK1(blocknum)                ((void *)((UINT8 *)waveram[1] + 8 * (blocknum)))
 
-#define WAVERAM_PTR8(base, bytenum)				((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
-#define WAVERAM_READ8(base, bytenum)			(*WAVERAM_PTR8(base, bytenum))
-#define WAVERAM_WRITE8(base, bytenum, data)		do { *WAVERAM_PTR8(base, bytenum) = (data); } while (0)
+#define WAVERAM_PTR8(base, bytenum)             ((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
+#define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
+#define WAVERAM_WRITE8(base, bytenum, data)     do { *WAVERAM_PTR8(base, bytenum) = (data); } while (0)
 
-#define WAVERAM_PTR16(base, wordnum)			((UINT16 *)(base) + BYTE_XOR_LE(wordnum))
-#define WAVERAM_READ16(base, wordnum)			(*WAVERAM_PTR16(base, wordnum))
-#define WAVERAM_WRITE16(base, wordnum, data)	do { *WAVERAM_PTR16(base, wordnum) = (data); } while (0)
+#define WAVERAM_PTR16(base, wordnum)            ((UINT16 *)(base) + BYTE_XOR_LE(wordnum))
+#define WAVERAM_READ16(base, wordnum)           (*WAVERAM_PTR16(base, wordnum))
+#define WAVERAM_WRITE16(base, wordnum, data)    do { *WAVERAM_PTR16(base, wordnum) = (data); } while (0)
 
-#define WAVERAM_PTR32(base, dwordnum)			((UINT32 *)(base) + (dwordnum))
-#define WAVERAM_READ32(base, dwordnum)			(*WAVERAM_PTR32(base, dwordnum))
-#define WAVERAM_WRITE32(base, dwordnum, data)	do { *WAVERAM_PTR32(base, dwordnum) = (data); } while (0)
+#define WAVERAM_PTR32(base, dwordnum)           ((UINT32 *)(base) + (dwordnum))
+#define WAVERAM_READ32(base, dwordnum)          (*WAVERAM_PTR32(base, dwordnum))
+#define WAVERAM_WRITE32(base, dwordnum, data)   do { *WAVERAM_PTR32(base, dwordnum) = (data); } while (0)
 
-#define PIXYX_TO_WORDNUM(y, x)					(((y) << 10) | (((x) & 0x1fe) << 1) | ((x) & 1))
-#define DEPTHYX_TO_WORDNUM(y, x)				(PIXYX_TO_WORDNUM(y, x) | 2)
+#define PIXYX_TO_WORDNUM(y, x)                  (((y) << 10) | (((x) & 0x1fe) << 1) | ((x) & 1))
+#define DEPTHYX_TO_WORDNUM(y, x)                (PIXYX_TO_WORDNUM(y, x) | 2)
 
-#define WAVERAM_PTRPIX(base, y, x)				WAVERAM_PTR16(base, PIXYX_TO_WORDNUM(y, x))
-#define WAVERAM_READPIX(base, y, x)				(*WAVERAM_PTRPIX(base, y, x))
-#define WAVERAM_WRITEPIX(base, y, x, color)		do { *WAVERAM_PTRPIX(base, y, x) = (color);  } while (0)
+#define WAVERAM_PTRPIX(base, y, x)              WAVERAM_PTR16(base, PIXYX_TO_WORDNUM(y, x))
+#define WAVERAM_READPIX(base, y, x)             (*WAVERAM_PTRPIX(base, y, x))
+#define WAVERAM_WRITEPIX(base, y, x, color)     do { *WAVERAM_PTRPIX(base, y, x) = (color);  } while (0)
 
-#define WAVERAM_PTRDEPTH(base, y, x)			WAVERAM_PTR16(base, DEPTHYX_TO_WORDNUM(y, x))
-#define WAVERAM_READDEPTH(base, y, x)			(*WAVERAM_PTRDEPTH(base, y, x))
-#define WAVERAM_WRITEDEPTH(base, y, x, color)	do { *WAVERAM_PTRDEPTH(base, y, x) = (color);  } while (0)
+#define WAVERAM_PTRDEPTH(base, y, x)            WAVERAM_PTR16(base, DEPTHYX_TO_WORDNUM(y, x))
+#define WAVERAM_READDEPTH(base, y, x)           (*WAVERAM_PTRDEPTH(base, y, x))
+#define WAVERAM_WRITEDEPTH(base, y, x, color)   do { *WAVERAM_PTRDEPTH(base, y, x) = (color);  } while (0)
 
 
 
@@ -408,7 +408,7 @@ READ32_MEMBER(midzeus_state::zeus_r)
 			logit = 0;
 			break;
 
-		case 0xf6:		// status -- they wait for this & 9 == 0
+		case 0xf6:      // status -- they wait for this & 9 == 0
 			// value & $9600 must == $9600 to pass Zeus system test
 			result = 0x9600;
 			if (m_zeusbase[0xb6] == 0x80040000)
@@ -678,8 +678,8 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
 
 		case 0x80:
 			/* this bit enables the "FIFO empty" IRQ; since our virtual FIFO is always empty,
-                we simply assert immediately if this is enabled. invasn needs this for proper
-                operations */
+			    we simply assert immediately if this is enabled. invasn needs this for proper
+			    operations */
 			if (state->m_zeusbase[0x80] & 0x02000000)
 				machine.device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
 			else
@@ -798,7 +798,7 @@ static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int n
 			break;
 
 		/* 0x13: render model based on previously set information */
-		case 0x13:	/* invasn */
+		case 0x13:  /* invasn */
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus_draw_model(machine, (state->m_zeusbase[0x06] << 16), log_fifo);
@@ -842,18 +842,18 @@ static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int n
 				{
 					log_fifo_command(data, numwords, "");
 					logerror("\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tvector %8.2f %8.2f %8.5f\n",
-						data[2] & 0xffff,	data[2] >> 16,		data[0] & 0xffff,
-						data[3] & 0xffff,	data[3] >> 16,		data[1] >> 16,
-						data[4] & 0xffff,	data[4] >> 16,		data[1] & 0xffff,
+						data[2] & 0xffff,   data[2] >> 16,      data[0] & 0xffff,
+						data[3] & 0xffff,   data[3] >> 16,      data[1] >> 16,
+						data[4] & 0xffff,   data[4] >> 16,      data[1] & 0xffff,
 						(float)(INT32)data[5] * (1.0f / 65536.0f),
 						(float)(INT32)data[6] * (1.0f / 65536.0f),
 						(float)(INT32)data[7] * (1.0f / (65536.0f * 512.0f)));
 				}
 
 				/* extract the matrix from the raw data */
-				zeus_matrix[0][0] = data[2];	zeus_matrix[0][1] = data[2] >> 16;	zeus_matrix[0][2] = data[0];
-				zeus_matrix[1][0] = data[3];	zeus_matrix[1][1] = data[3] >> 16;	zeus_matrix[1][2] = data[1] >> 16;
-				zeus_matrix[2][0] = data[4];	zeus_matrix[2][1] = data[4] >> 16;	zeus_matrix[2][2] = data[1];
+				zeus_matrix[0][0] = data[2];    zeus_matrix[0][1] = data[2] >> 16;  zeus_matrix[0][2] = data[0];
+				zeus_matrix[1][0] = data[3];    zeus_matrix[1][1] = data[3] >> 16;  zeus_matrix[1][2] = data[1] >> 16;
+				zeus_matrix[2][0] = data[4];    zeus_matrix[2][1] = data[4] >> 16;  zeus_matrix[2][2] = data[1];
 
 				/* extract the translation point from the raw data */
 				zeus_point[0] = data[5];
@@ -874,26 +874,26 @@ static int zeus_fifo_process(running_machine &machine, const UINT32 *data, int n
 				{
 					log_fifo_command(data, numwords, "");
 					logerror("\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tmatrix ( %04X %04X %04X ) ( %04X %04X %04X ) ( %04X %04X %04X )\n\t\tvector %8.2f %8.2f %8.5f\n",
-						data[4] & 0xffff,	data[4] >> 16,		data[5] >> 16,
-						data[8] & 0xffff,	data[8] >> 16,		data[6] >> 16,
-						data[9] & 0xffff,	data[9] >> 16,		data[7] >> 16,
-						data[1] & 0xffff,	data[2] & 0xffff,	data[3] & 0xffff,
-						data[1] >> 16,		data[2] >> 16,		data[3] >> 16,
-						data[5] & 0xffff,	data[6] & 0xffff,	data[7] & 0xffff,
+						data[4] & 0xffff,   data[4] >> 16,      data[5] >> 16,
+						data[8] & 0xffff,   data[8] >> 16,      data[6] >> 16,
+						data[9] & 0xffff,   data[9] >> 16,      data[7] >> 16,
+						data[1] & 0xffff,   data[2] & 0xffff,   data[3] & 0xffff,
+						data[1] >> 16,      data[2] >> 16,      data[3] >> 16,
+						data[5] & 0xffff,   data[6] & 0xffff,   data[7] & 0xffff,
 						(float)(INT32)data[10] * (1.0f / 65536.0f),
 						(float)(INT32)data[11] * (1.0f / 65536.0f),
 						(float)(INT32)data[12] * (1.0f / (65536.0f * 512.0f)));
 				}
 
 				/* extract the first matrix from the raw data */
-				matrix1[0][0] = data[4];		matrix1[0][1] = data[4] >> 16;	matrix1[0][2] = data[5] >> 16;
-				matrix1[1][0] = data[8];		matrix1[1][1] = data[8] >> 16;	matrix1[1][2] = data[6] >> 16;
-				matrix1[2][0] = data[9];		matrix1[2][1] = data[9] >> 16;	matrix1[2][2] = data[7] >> 16;
+				matrix1[0][0] = data[4];        matrix1[0][1] = data[4] >> 16;  matrix1[0][2] = data[5] >> 16;
+				matrix1[1][0] = data[8];        matrix1[1][1] = data[8] >> 16;  matrix1[1][2] = data[6] >> 16;
+				matrix1[2][0] = data[9];        matrix1[2][1] = data[9] >> 16;  matrix1[2][2] = data[7] >> 16;
 
 				/* extract the second matrix from the raw data */
-				matrix2[0][0] = data[1];		matrix2[0][1] = data[2];		matrix2[0][2] = data[3];
-				matrix2[1][0] = data[1] >> 16;	matrix2[1][1] = data[2] >> 16;	matrix2[1][2] = data[3] >> 16;
-				matrix2[2][0] = data[5];		matrix2[2][1] = data[6];		matrix2[2][2] = data[7];
+				matrix2[0][0] = data[1];        matrix2[0][1] = data[2];        matrix2[0][2] = data[3];
+				matrix2[1][0] = data[1] >> 16;  matrix2[1][1] = data[2] >> 16;  matrix2[1][2] = data[3] >> 16;
+				matrix2[2][0] = data[5];        matrix2[2][1] = data[6];        matrix2[2][2] = data[7];
 
 				/* multiply them together to get the final matrix */
 				zeus_matrix[0][0] = ((INT64)(matrix1[0][0] * matrix2[0][0]) + (INT64)(matrix1[0][1] * matrix2[1][0]) + (INT64)(matrix1[0][2] * matrix2[2][0])) >> 16;
@@ -1055,11 +1055,11 @@ static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit)
 						model_done = TRUE;
 						break;
 
-					case 0x0c:	/* mk4/invasn */
+					case 0x0c:  /* mk4/invasn */
 						zeus_pointer_w(databuffer[0] & 0xffffff, databuffer[1], logit);
 						break;
 
-					case 0x17:	/* mk4 */
+					case 0x17:  /* mk4 */
 						if (logit)
 							logerror("reg16");
 						zeus_register16_w(machine, (databuffer[0] >> 16) & 0x7f, databuffer[0], logit);
@@ -1067,7 +1067,7 @@ static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit)
 							texdata = (texdata & 0xffff) | (state->m_zeusbase[0x06] << 16);
 						break;
 
-					case 0x19:	/* invasn */
+					case 0x19:  /* invasn */
 						if (logit)
 							logerror("reg32");
 						zeus_register32_w(machine, (databuffer[0] >> 16) & 0x7f, databuffer[1], logit);
@@ -1075,9 +1075,9 @@ static void zeus_draw_model(running_machine &machine, UINT32 texdata, int logit)
 							texdata = (texdata & 0xffff) | (state->m_zeusbase[0x06] << 16);
 						break;
 
-					case 0x25:	/* mk4 */
-					case 0x28:	/* mk4r1 */
-					case 0x30:	/* invasn */
+					case 0x25:  /* mk4 */
+					case 0x28:  /* mk4r1 */
+					case 0x30:  /* invasn */
 						zeus_draw_quad(machine, TRUE, databuffer, texdata, logit);
 						break;
 
@@ -1132,7 +1132,7 @@ static void zeus_draw_quad(running_machine &machine, int long_fmt, const UINT32 
 
 
 	/* do a simple backface cull; not sure if the hardware does it, but I see no other
-       reason for a polygon normal here */
+	   reason for a polygon normal here */
 
 	/* extract the polygon normal */
 	normal[0] = (INT8)(databuffer[0] >> 0);
@@ -1360,8 +1360,8 @@ static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *ext
 				UINT16 pix = *ptr;
 
 				*ptr = ((((pix & 0x7c00) * extra->alpha) >> 7) & 0x7c00) |
-					  ((((pix & 0x03e0) * extra->alpha) >> 7) & 0x03e0) |
-					  ((((pix & 0x001f) * extra->alpha) >> 7) & 0x001f);
+						((((pix & 0x03e0) * extra->alpha) >> 7) & 0x03e0) |
+						((((pix & 0x001f) * extra->alpha) >> 7) & 0x001f);
 			}
 			else
 			{

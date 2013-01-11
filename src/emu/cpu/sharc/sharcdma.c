@@ -1,46 +1,46 @@
 /* SHARC DMA operations */
 
-#define DMA_PMODE_NO_PACKING		0
-#define DMA_PMODE_16_32				1
-#define DMA_PMODE_16_48				2
-#define DMA_PMODE_32_48				3
-#define DMA_PMODE_8_48				4
+#define DMA_PMODE_NO_PACKING        0
+#define DMA_PMODE_16_32             1
+#define DMA_PMODE_16_48             2
+#define DMA_PMODE_32_48             3
+#define DMA_PMODE_8_48              4
 
 static void schedule_chained_dma_op(SHARC_REGS *cpustate, int channel, UINT32 dma_chain_ptr, int chained_direction)
 {
 	UINT32 op_ptr = 0x20000 + dma_chain_ptr;
 
-	UINT32 int_index		= dm_read32(cpustate, op_ptr - 0);
-	UINT32 int_modifier		= dm_read32(cpustate, op_ptr - 1);
-	UINT32 int_count		= dm_read32(cpustate, op_ptr - 2);
-	UINT32 chain_ptr		= dm_read32(cpustate, op_ptr - 3);
+	UINT32 int_index        = dm_read32(cpustate, op_ptr - 0);
+	UINT32 int_modifier     = dm_read32(cpustate, op_ptr - 1);
+	UINT32 int_count        = dm_read32(cpustate, op_ptr - 2);
+	UINT32 chain_ptr        = dm_read32(cpustate, op_ptr - 3);
 	//UINT32 gen_purpose        = dm_read32(cpustate, op_ptr - 4);
-	UINT32 ext_index		= dm_read32(cpustate, op_ptr - 5);
-	UINT32 ext_modifier 	= dm_read32(cpustate, op_ptr - 6);
-	UINT32 ext_count		= dm_read32(cpustate, op_ptr - 7);
+	UINT32 ext_index        = dm_read32(cpustate, op_ptr - 5);
+	UINT32 ext_modifier     = dm_read32(cpustate, op_ptr - 6);
+	UINT32 ext_count        = dm_read32(cpustate, op_ptr - 7);
 
 	if (cpustate->dma_op[channel].active)
 	{
 		fatalerror("schedule_chained_dma_op: DMA operation already scheduled at %08X!\n", cpustate->pc);
 	}
 
-	if (chained_direction)		// Transmit to external
+	if (chained_direction)      // Transmit to external
 	{
-		cpustate->dma_op[channel].dst			= ext_index;
-		cpustate->dma_op[channel].dst_modifier	= ext_modifier;
-		cpustate->dma_op[channel].dst_count		= ext_count;
-		cpustate->dma_op[channel].src			= int_index;
-		cpustate->dma_op[channel].src_modifier	= int_modifier;
-		cpustate->dma_op[channel].src_count		= int_count;
+		cpustate->dma_op[channel].dst           = ext_index;
+		cpustate->dma_op[channel].dst_modifier  = ext_modifier;
+		cpustate->dma_op[channel].dst_count     = ext_count;
+		cpustate->dma_op[channel].src           = int_index;
+		cpustate->dma_op[channel].src_modifier  = int_modifier;
+		cpustate->dma_op[channel].src_count     = int_count;
 	}
-	else						// Receive from external
+	else                        // Receive from external
 	{
-		cpustate->dma_op[channel].src			= ext_index;
-		cpustate->dma_op[channel].src_modifier	= ext_modifier;
-		cpustate->dma_op[channel].src_count		= ext_count;
-		cpustate->dma_op[channel].dst			= int_index;
-		cpustate->dma_op[channel].dst_modifier	= int_modifier;
-		cpustate->dma_op[channel].dst_count		= int_count;
+		cpustate->dma_op[channel].src           = ext_index;
+		cpustate->dma_op[channel].src_modifier  = ext_modifier;
+		cpustate->dma_op[channel].src_count     = ext_count;
+		cpustate->dma_op[channel].dst           = int_index;
+		cpustate->dma_op[channel].dst_modifier  = int_modifier;
+		cpustate->dma_op[channel].dst_count     = int_count;
 	}
 
 	cpustate->dma_op[channel].pmode = 0;
@@ -84,13 +84,13 @@ static void schedule_dma_op(SHARC_REGS *cpustate, int channel, UINT32 src, UINT3
 static void dma_op(SHARC_REGS *cpustate, int channel)
 {
 	int i;
-	UINT32 src			= cpustate->dma_op[channel].src;
-	UINT32 dst			= cpustate->dma_op[channel].dst;
-	int src_modifier	= cpustate->dma_op[channel].src_modifier;
-	int dst_modifier	= cpustate->dma_op[channel].dst_modifier;
-	int src_count		= cpustate->dma_op[channel].src_count;
+	UINT32 src          = cpustate->dma_op[channel].src;
+	UINT32 dst          = cpustate->dma_op[channel].dst;
+	int src_modifier    = cpustate->dma_op[channel].src_modifier;
+	int dst_modifier    = cpustate->dma_op[channel].dst_modifier;
+	int src_count       = cpustate->dma_op[channel].src_count;
 	//int dst_count     = cpustate->dma_op[channel].dst_count;
-	int pmode			= cpustate->dma_op[channel].pmode;
+	int pmode           = cpustate->dma_op[channel].pmode;
 
 	//printf("dma_op: %08X, %08X, %08X, %08X, %08X, %08X, %d\n", src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);
 
@@ -126,11 +126,11 @@ static void dma_op(SHARC_REGS *cpustate, int channel)
 			for (i=0; i < length; i++)
 			{
 				UINT64 data = ((UINT64)(dm_read32(cpustate, src+0) & 0xff) <<  0) |
-							  ((UINT64)(dm_read32(cpustate, src+1) & 0xff) <<  8) |
-							  ((UINT64)(dm_read32(cpustate, src+2) & 0xff) << 16) |
-							  ((UINT64)(dm_read32(cpustate, src+3) & 0xff) << 24) |
-							  ((UINT64)(dm_read32(cpustate, src+4) & 0xff) << 32) |
-							  ((UINT64)(dm_read32(cpustate, src+5) & 0xff) << 40);
+								((UINT64)(dm_read32(cpustate, src+1) & 0xff) <<  8) |
+								((UINT64)(dm_read32(cpustate, src+2) & 0xff) << 16) |
+								((UINT64)(dm_read32(cpustate, src+3) & 0xff) << 24) |
+								((UINT64)(dm_read32(cpustate, src+4) & 0xff) << 32) |
+								((UINT64)(dm_read32(cpustate, src+5) & 0xff) << 40);
 
 				pm_write48(cpustate, dst, data);
 				src += src_modifier * 6;
@@ -186,7 +186,7 @@ static void sharc_dma_exec(SHARC_REGS *cpustate, int channel)
 
 
 
-	if (chen)		// Chained DMA
+	if (chen)       // Chained DMA
 	{
 		UINT32 dma_chain_ptr = cpustate->dma[channel].chain_ptr & 0x1ffff;
 
@@ -194,23 +194,23 @@ static void sharc_dma_exec(SHARC_REGS *cpustate, int channel)
 	}
 	else
 	{
-		if (tran)		// Transmit to external
+		if (tran)       // Transmit to external
 		{
-			dst 			= cpustate->dma[channel].ext_index;
-			dst_modifier	= cpustate->dma[channel].ext_modifier;
-			dst_count		= cpustate->dma[channel].ext_count;
-			src				= cpustate->dma[channel].int_index;
-			src_modifier	= cpustate->dma[channel].int_modifier;
-			src_count		= cpustate->dma[channel].int_count;
+			dst             = cpustate->dma[channel].ext_index;
+			dst_modifier    = cpustate->dma[channel].ext_modifier;
+			dst_count       = cpustate->dma[channel].ext_count;
+			src             = cpustate->dma[channel].int_index;
+			src_modifier    = cpustate->dma[channel].int_modifier;
+			src_count       = cpustate->dma[channel].int_count;
 		}
-		else			// Receive from external
+		else            // Receive from external
 		{
-			src 			= cpustate->dma[channel].ext_index;
-			src_modifier	= cpustate->dma[channel].ext_modifier;
-			src_count		= cpustate->dma[channel].ext_count;
-			dst				= cpustate->dma[channel].int_index;
-			dst_modifier	= cpustate->dma[channel].int_modifier;
-			dst_count		= cpustate->dma[channel].int_count;
+			src             = cpustate->dma[channel].ext_index;
+			src_modifier    = cpustate->dma[channel].ext_modifier;
+			src_count       = cpustate->dma[channel].ext_count;
+			dst             = cpustate->dma[channel].int_index;
+			dst_modifier    = cpustate->dma[channel].int_modifier;
+			dst_count       = cpustate->dma[channel].int_count;
 
 			if (dst < 0x20000)
 			{

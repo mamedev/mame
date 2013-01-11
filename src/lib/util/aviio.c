@@ -46,60 +46,60 @@
     CONSTANTS
 ***************************************************************************/
 
-#define FILETYPE_READ			1
-#define FILETYPE_CREATE			2
+#define FILETYPE_READ           1
+#define FILETYPE_CREATE         2
 
-#define MAX_RIFF_SIZE			(2UL * 1024 * 1024 * 1024 - 1024)	/* just under 2GB */
-#define MAX_AVI_SIZE_IN_GB		(256)
-#define FOUR_GB					((UINT64)1 << 32)
+#define MAX_RIFF_SIZE           (2UL * 1024 * 1024 * 1024 - 1024)   /* just under 2GB */
+#define MAX_AVI_SIZE_IN_GB      (256)
+#define FOUR_GB                 ((UINT64)1 << 32)
 
-#define MAX_SOUND_CHANNELS		2
-#define SOUND_BUFFER_MSEC		2000		/* microseconds of sond buffering */
+#define MAX_SOUND_CHANNELS      2
+#define SOUND_BUFFER_MSEC       2000        /* microseconds of sond buffering */
 
-#define CHUNKTYPE_RIFF			AVI_FOURCC('R','I','F','F')
-#define CHUNKTYPE_LIST			AVI_FOURCC('L','I','S','T')
-#define CHUNKTYPE_JUNK			AVI_FOURCC('J','U','N','K')
-#define CHUNKTYPE_AVIH			AVI_FOURCC('a','v','i','h')
-#define CHUNKTYPE_STRH			AVI_FOURCC('s','t','r','h')
-#define CHUNKTYPE_STRF			AVI_FOURCC('s','t','r','f')
-#define CHUNKTYPE_IDX1			AVI_FOURCC('i','d','x','1')
-#define CHUNKTYPE_INDX			AVI_FOURCC('i','n','d','x')
-#define CHUNKTYPE_XXDB			AVI_FOURCC(0x00,0x00,'d','b')
-#define CHUNKTYPE_XXDC			AVI_FOURCC(0x00,0x00,'d','c')
-#define CHUNKTYPE_XXWB			AVI_FOURCC(0x00,0x00,'w','b')
-#define CHUNKTYPE_IXXX			AVI_FOURCC('i','x',0x00,0x00)
-#define CHUNKTYPE_XX_MASK		AVI_FOURCC(0x00,0x00,0xff,0xff)
+#define CHUNKTYPE_RIFF          AVI_FOURCC('R','I','F','F')
+#define CHUNKTYPE_LIST          AVI_FOURCC('L','I','S','T')
+#define CHUNKTYPE_JUNK          AVI_FOURCC('J','U','N','K')
+#define CHUNKTYPE_AVIH          AVI_FOURCC('a','v','i','h')
+#define CHUNKTYPE_STRH          AVI_FOURCC('s','t','r','h')
+#define CHUNKTYPE_STRF          AVI_FOURCC('s','t','r','f')
+#define CHUNKTYPE_IDX1          AVI_FOURCC('i','d','x','1')
+#define CHUNKTYPE_INDX          AVI_FOURCC('i','n','d','x')
+#define CHUNKTYPE_XXDB          AVI_FOURCC(0x00,0x00,'d','b')
+#define CHUNKTYPE_XXDC          AVI_FOURCC(0x00,0x00,'d','c')
+#define CHUNKTYPE_XXWB          AVI_FOURCC(0x00,0x00,'w','b')
+#define CHUNKTYPE_IXXX          AVI_FOURCC('i','x',0x00,0x00)
+#define CHUNKTYPE_XX_MASK       AVI_FOURCC(0x00,0x00,0xff,0xff)
 
-#define LISTTYPE_AVI			AVI_FOURCC('A','V','I',' ')
-#define LISTTYPE_AVIX			AVI_FOURCC('A','V','I','X')
-#define LISTTYPE_HDRL			AVI_FOURCC('h','d','r','l')
-#define LISTTYPE_STRL			AVI_FOURCC('s','t','r','l')
-#define LISTTYPE_MOVI			AVI_FOURCC('m','o','v','i')
+#define LISTTYPE_AVI            AVI_FOURCC('A','V','I',' ')
+#define LISTTYPE_AVIX           AVI_FOURCC('A','V','I','X')
+#define LISTTYPE_HDRL           AVI_FOURCC('h','d','r','l')
+#define LISTTYPE_STRL           AVI_FOURCC('s','t','r','l')
+#define LISTTYPE_MOVI           AVI_FOURCC('m','o','v','i')
 
-#define STREAMTYPE_VIDS			AVI_FOURCC('v','i','d','s')
-#define STREAMTYPE_AUDS			AVI_FOURCC('a','u','d','s')
+#define STREAMTYPE_VIDS         AVI_FOURCC('v','i','d','s')
+#define STREAMTYPE_AUDS         AVI_FOURCC('a','u','d','s')
 
-#define HANDLER_DIB				AVI_FOURCC('D','I','B',' ')
-#define HANDLER_HFYU			AVI_FOURCC('h','f','y','u')
+#define HANDLER_DIB             AVI_FOURCC('D','I','B',' ')
+#define HANDLER_HFYU            AVI_FOURCC('h','f','y','u')
 
 /* main AVI header files */
-#define AVIF_HASINDEX			0x00000010
-#define AVIF_MUSTUSEINDEX		0x00000020
-#define AVIF_ISINTERLEAVED		0x00000100
-#define AVIF_COPYRIGHTED		0x00010000
-#define AVIF_WASCAPTUREFILE		0x00020000
+#define AVIF_HASINDEX           0x00000010
+#define AVIF_MUSTUSEINDEX       0x00000020
+#define AVIF_ISINTERLEAVED      0x00000100
+#define AVIF_COPYRIGHTED        0x00010000
+#define AVIF_WASCAPTUREFILE     0x00020000
 
 /* index definitions */
-#define AVI_INDEX_OF_INDEXES	0x00
-#define AVI_INDEX_OF_CHUNKS		0x01
-#define AVI_INDEX_IS_DATA		0x80
-#define AVI_INDEX_2FIELD		0x01
+#define AVI_INDEX_OF_INDEXES    0x00
+#define AVI_INDEX_OF_CHUNKS     0x01
+#define AVI_INDEX_IS_DATA       0x80
+#define AVI_INDEX_2FIELD        0x01
 
 /* HuffYUV definitions */
-#define HUFFYUV_PREDICT_LEFT	 0
+#define HUFFYUV_PREDICT_LEFT     0
 #define HUFFYUV_PREDICT_GRADIENT 1
-#define HUFFYUV_PREDICT_MEDIAN	 2
-#define HUFFYUV_PREDICT_DECORR	 0x40
+#define HUFFYUV_PREDICT_MEDIAN   2
+#define HUFFYUV_PREDICT_DECORR   0x40
 
 
 
@@ -109,95 +109,95 @@
 
 struct avi_chunk
 {
-	UINT64				offset;					/* file offset of chunk header */
-	UINT64				size;					/* size of this chunk */
-	UINT32				type;					/* type of this chunk */
-	UINT32				listtype;				/* type of this list (if we are a list) */
+	UINT64              offset;                 /* file offset of chunk header */
+	UINT64              size;                   /* size of this chunk */
+	UINT32              type;                   /* type of this chunk */
+	UINT32              listtype;               /* type of this list (if we are a list) */
 };
 
 
 struct avi_chunk_list
 {
-	UINT64				offset;					/* offset in the file of header */
-	UINT32				length;					/* length of the chunk including header */
+	UINT64              offset;                 /* offset in the file of header */
+	UINT32              length;                 /* length of the chunk including header */
 };
 
 
 struct huffyuv_table
 {
-	UINT8				shift[256];				/* bit shift amounts */
-	UINT32				bits[256];				/* bit match values */
-	UINT32				mask[256];				/* bit mask values */
-	UINT16				baselookup[65536];		/* base lookup table */
-	UINT16 *			extralookup;			/* extra lookup tables */
+	UINT8               shift[256];             /* bit shift amounts */
+	UINT32              bits[256];              /* bit match values */
+	UINT32              mask[256];              /* bit mask values */
+	UINT16              baselookup[65536];      /* base lookup table */
+	UINT16 *            extralookup;            /* extra lookup tables */
 };
 
 
 struct huffyuv_data
 {
-	UINT8				predictor;				/* predictor */
-	huffyuv_table		table[3];				/* array of tables */
+	UINT8               predictor;              /* predictor */
+	huffyuv_table       table[3];               /* array of tables */
 };
 
 
 struct avi_stream
 {
-	UINT32				type;					/* subtype of stream */
-	UINT32				format;					/* format of stream data */
+	UINT32              type;                   /* subtype of stream */
+	UINT32              format;                 /* format of stream data */
 
-	UINT32				rate;					/* timescale for stream */
-	UINT32				scale;					/* duration of one sample in the stream */
-	UINT32				samples;				/* number of samples */
+	UINT32              rate;                   /* timescale for stream */
+	UINT32              scale;                  /* duration of one sample in the stream */
+	UINT32              samples;                /* number of samples */
 
-	avi_chunk_list *	chunk;					/* list of chunks */
-	UINT32				chunks;					/* chunks currently known */
-	UINT32				chunksalloc;			/* number of chunks allocated */
+	avi_chunk_list *    chunk;                  /* list of chunks */
+	UINT32              chunks;                 /* chunks currently known */
+	UINT32              chunksalloc;            /* number of chunks allocated */
 
-	UINT32				width;					/* width of video */
-	UINT32				height;					/* height of video */
-	UINT32				depth;					/* depth of video */
-	UINT8				interlace;				/* interlace parameters */
-	huffyuv_data *		huffyuv;				/* huffyuv decompression data */
+	UINT32              width;                  /* width of video */
+	UINT32              height;                 /* height of video */
+	UINT32              depth;                  /* depth of video */
+	UINT8               interlace;              /* interlace parameters */
+	huffyuv_data *      huffyuv;                /* huffyuv decompression data */
 
-	UINT16				channels;				/* audio channels */
-	UINT16				samplebits;				/* audio bits per sample */
-	UINT32				samplerate;				/* audio sample rate */
+	UINT16              channels;               /* audio channels */
+	UINT16              samplebits;             /* audio bits per sample */
+	UINT32              samplerate;             /* audio sample rate */
 
 	/* only used when creating */
-	UINT64				saved_strh_offset;		/* writeoffset of strh chunk */
-	UINT64				saved_indx_offset;		/* writeoffset of indx chunk */
+	UINT64              saved_strh_offset;      /* writeoffset of strh chunk */
+	UINT64              saved_indx_offset;      /* writeoffset of indx chunk */
 };
 
 
 struct avi_file
 {
 	/* shared data */
-	osd_file *			file;					/* pointer to open file */
-	int					type;					/* type of access (read/create) */
-	avi_movie_info		info;					/* movie info structure */
-	UINT8 *				tempbuffer;				/* temporary buffer */
-	UINT32				tempbuffersize;			/* size of the temporary buffer */
+	osd_file *          file;                   /* pointer to open file */
+	int                 type;                   /* type of access (read/create) */
+	avi_movie_info      info;                   /* movie info structure */
+	UINT8 *             tempbuffer;             /* temporary buffer */
+	UINT32              tempbuffersize;         /* size of the temporary buffer */
 
 	/* only used when reading */
-	int					streams;				/* number of streams */
-	avi_stream *		stream;					/* allocated array of stream information */
-	avi_chunk			rootchunk;				/* dummy root chunk that wraps the whole file */
+	int                 streams;                /* number of streams */
+	avi_stream *        stream;                 /* allocated array of stream information */
+	avi_chunk           rootchunk;              /* dummy root chunk that wraps the whole file */
 
 	/* only used when creating */
-	UINT64				writeoffs;				/* current file write offset */
-	UINT64				riffbase;				/* base of the current RIFF */
+	UINT64              writeoffs;              /* current file write offset */
+	UINT64              riffbase;               /* base of the current RIFF */
 
-	avi_chunk			chunkstack[8];			/* stack of chunks we are writing */
-	int					chunksp;				/* stack pointer for the current chunk */
+	avi_chunk           chunkstack[8];          /* stack of chunks we are writing */
+	int                 chunksp;                /* stack pointer for the current chunk */
 
-	UINT64				saved_movi_offset;		/* writeoffset of movi list */
-	UINT64				saved_avih_offset;		/* writeoffset of avih chunk */
+	UINT64              saved_movi_offset;      /* writeoffset of movi list */
+	UINT64              saved_avih_offset;      /* writeoffset of avih chunk */
 
-	INT16 *				soundbuf;				/* buffer for sound data */
-	UINT32				soundbuf_samples;		/* length of sound buffer in samples */
-	UINT32				soundbuf_chansamples[MAX_SOUND_CHANNELS]; /* samples in buffer for each channel */
-	UINT32				soundbuf_chunks;		/* number of chunks completed so far */
-	UINT32				soundbuf_frames;		/* number of frames ahead of the video */
+	INT16 *             soundbuf;               /* buffer for sound data */
+	UINT32              soundbuf_samples;       /* length of sound buffer in samples */
+	UINT32              soundbuf_chansamples[MAX_SOUND_CHANNELS]; /* samples in buffer for each channel */
+	UINT32              soundbuf_chunks;        /* number of chunks completed so far */
+	UINT32              soundbuf_frames;        /* number of frames ahead of the video */
 };
 
 
@@ -294,9 +294,9 @@ INLINE UINT32 fetch_32bits(const UINT8 *data)
 INLINE UINT64 fetch_64bits(const UINT8 *data)
 {
 	return (UINT64)data[0] | ((UINT64)data[1] << 8) |
-		   ((UINT64)data[2] << 16) | ((UINT64)data[3] << 24) |
-		   ((UINT64)data[4] << 32) | ((UINT64)data[5] << 40) |
-		   ((UINT64)data[6] << 48) | ((UINT64)data[7] << 56);
+			((UINT64)data[2] << 16) | ((UINT64)data[3] << 24) |
+			((UINT64)data[4] << 32) | ((UINT64)data[5] << 40) |
+			((UINT64)data[6] << 48) | ((UINT64)data[7] << 56);
 }
 
 
@@ -740,24 +740,24 @@ const char *avi_error_string(avi_error err)
 {
 	switch (err)
 	{
-		case AVIERR_NONE:						return "success";
-		case AVIERR_END:						return "hit end of file";
-		case AVIERR_INVALID_DATA:				return "invalid data";
-		case AVIERR_NO_MEMORY:					return "out of memory";
-		case AVIERR_READ_ERROR:					return "read error";
-		case AVIERR_WRITE_ERROR:				return "write error";
-		case AVIERR_STACK_TOO_DEEP:				return "stack overflow";
-		case AVIERR_UNSUPPORTED_FEATURE:		return "unsupported feature";
-		case AVIERR_CANT_OPEN_FILE:				return "unable to open file";
-		case AVIERR_INCOMPATIBLE_AUDIO_STREAMS:	return "found incompatible audio streams";
-		case AVIERR_INVALID_SAMPLERATE:			return "found invalid sample rate";
-		case AVIERR_INVALID_STREAM:				return "invalid stream";
-		case AVIERR_INVALID_FRAME:				return "invalid frame index";
-		case AVIERR_INVALID_BITMAP:				return "invalid bitmap";
-		case AVIERR_UNSUPPORTED_VIDEO_FORMAT:	return "unsupported video format";
-		case AVIERR_UNSUPPORTED_AUDIO_FORMAT:	return "unsupported audio format";
-		case AVIERR_EXCEEDED_SOUND_BUFFER:		return "sound buffer overflow";
-		default:								return "undocumented error";
+		case AVIERR_NONE:                       return "success";
+		case AVIERR_END:                        return "hit end of file";
+		case AVIERR_INVALID_DATA:               return "invalid data";
+		case AVIERR_NO_MEMORY:                  return "out of memory";
+		case AVIERR_READ_ERROR:                 return "read error";
+		case AVIERR_WRITE_ERROR:                return "write error";
+		case AVIERR_STACK_TOO_DEEP:             return "stack overflow";
+		case AVIERR_UNSUPPORTED_FEATURE:        return "unsupported feature";
+		case AVIERR_CANT_OPEN_FILE:             return "unable to open file";
+		case AVIERR_INCOMPATIBLE_AUDIO_STREAMS: return "found incompatible audio streams";
+		case AVIERR_INVALID_SAMPLERATE:         return "found invalid sample rate";
+		case AVIERR_INVALID_STREAM:             return "invalid stream";
+		case AVIERR_INVALID_FRAME:              return "invalid frame index";
+		case AVIERR_INVALID_BITMAP:             return "invalid bitmap";
+		case AVIERR_UNSUPPORTED_VIDEO_FORMAT:   return "unsupported video format";
+		case AVIERR_UNSUPPORTED_AUDIO_FORMAT:   return "unsupported audio format";
+		case AVIERR_EXCEEDED_SOUND_BUFFER:      return "sound buffer overflow";
+		default:                                return "undocumented error";
 	}
 }
 
@@ -1571,7 +1571,7 @@ static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 		{
 			const UINT8 *base = &chunkdata[24 + entry * 4 * longs_per_entry];
 			UINT32 offset = fetch_32bits(&base[0]);
-			UINT32 size = fetch_32bits(&base[4]) & 0x7fffffff;	// bit 31 == NOT a keyframe
+			UINT32 size = fetch_32bits(&base[4]) & 0x7fffffff;  // bit 31 == NOT a keyframe
 
 			/* set the info for this chunk and advance */
 			avierr = set_stream_chunk_info(stream, stream->chunks++, baseoffset + offset - 8, size + 8);
@@ -1746,7 +1746,7 @@ static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT
 
 	/* if we are getting too big, split the RIFF */
 	/* note that we ignore writes before the current RIFF base, as those are assumed to be
-       overwrites of a chunk from the previous RIFF */
+	   overwrites of a chunk from the previous RIFF */
 	if (file->writeoffs >= file->riffbase && file->writeoffs + length + idxreserve - file->riffbase >= MAX_RIFF_SIZE)
 	{
 		/* close the movi list */
@@ -1917,10 +1917,10 @@ static avi_error write_avih_chunk(avi_file *file, int initial_write)
 
 	put_32bits(&buffer[0], 1000000 * (INT64)video->scale / video->rate); /* dwMicroSecPerFrame */
 	put_32bits(&buffer[12], AVIF_HASINDEX | AVIF_ISINTERLEAVED); /* dwFlags */
-	put_32bits(&buffer[16], video->samples);			/* dwTotalFrames */
-	put_32bits(&buffer[24], file->streams);				/* dwStreams */
-	put_32bits(&buffer[32], video->width);				/* dwWidth */
-	put_32bits(&buffer[36], video->height);				/* dwHeight */
+	put_32bits(&buffer[16], video->samples);            /* dwTotalFrames */
+	put_32bits(&buffer[24], file->streams);             /* dwStreams */
+	put_32bits(&buffer[32], video->width);              /* dwWidth */
+	put_32bits(&buffer[36], video->height);             /* dwHeight */
 
 	/* (over)write the chunk */
 	return chunk_overwrite(file, CHUNKTYPE_AVIH, buffer, sizeof(buffer), &file->saved_avih_offset, initial_write);
@@ -1939,29 +1939,29 @@ static avi_error write_strh_chunk(avi_file *file, avi_stream *stream, int initia
 	/* reset the buffer */
 	memset(buffer, 0, sizeof(buffer));
 
-	put_32bits(&buffer[0], stream->type);				/* fccType */
-	put_32bits(&buffer[20], stream->scale);				/* dwScale */
-	put_32bits(&buffer[24], stream->rate);				/* dwRate */
-	put_32bits(&buffer[32], stream->samples);			/* dwLength */
-	put_32bits(&buffer[40], 10000);						/* dwQuality */
+	put_32bits(&buffer[0], stream->type);               /* fccType */
+	put_32bits(&buffer[20], stream->scale);             /* dwScale */
+	put_32bits(&buffer[24], stream->rate);              /* dwRate */
+	put_32bits(&buffer[32], stream->samples);           /* dwLength */
+	put_32bits(&buffer[40], 10000);                     /* dwQuality */
 
 	/* video-stream specific data */
 	if (stream->type == STREAMTYPE_VIDS)
 	{
-		put_32bits(&buffer[4],							/* fccHandler */
+		put_32bits(&buffer[4],                          /* fccHandler */
 					(stream->format == FORMAT_HFYU) ? HANDLER_HFYU : HANDLER_DIB);
-		put_32bits(&buffer[36],							/* dwSuggestedBufferSize */
+		put_32bits(&buffer[36],                         /* dwSuggestedBufferSize */
 					stream->width * stream->height * 4);
-		put_16bits(&buffer[52], stream->width);			/* rcFrame.right */
-		put_16bits(&buffer[54], stream->height);		/* rcFrame.bottom */
+		put_16bits(&buffer[52], stream->width);         /* rcFrame.right */
+		put_16bits(&buffer[54], stream->height);        /* rcFrame.bottom */
 	}
 
 	/* audio-stream specific data */
 	if (stream->type == STREAMTYPE_AUDS)
 	{
-		put_32bits(&buffer[36],							/* dwSuggestedBufferSize */
+		put_32bits(&buffer[36],                         /* dwSuggestedBufferSize */
 					stream->samplerate * stream->channels * (stream->samplebits / 8));
-		put_32bits(&buffer[44], 						/* dwSampleSize */
+		put_32bits(&buffer[44],                         /* dwSampleSize */
 					stream->channels * (stream->samplebits / 8));
 	}
 
@@ -1985,13 +1985,13 @@ static avi_error write_strf_chunk(avi_file *file, avi_stream *stream)
 		/* reset the buffer */
 		memset(buffer, 0, sizeof(buffer));
 
-		put_32bits(&buffer[0], sizeof(buffer));			/* biSize */
-		put_32bits(&buffer[4], stream->width);			/* biWidth */
-		put_32bits(&buffer[8], stream->height);			/* biHeight */
-		put_16bits(&buffer[12], 1);						/* biPlanes */
-		put_16bits(&buffer[14], stream->depth);			/* biBitCount */
-		put_32bits(&buffer[16], stream->format);		/* biCompression */
-		put_32bits(&buffer[20], 						/* biSizeImage */
+		put_32bits(&buffer[0], sizeof(buffer));         /* biSize */
+		put_32bits(&buffer[4], stream->width);          /* biWidth */
+		put_32bits(&buffer[8], stream->height);         /* biHeight */
+		put_16bits(&buffer[12], 1);                     /* biPlanes */
+		put_16bits(&buffer[14], stream->depth);         /* biBitCount */
+		put_32bits(&buffer[16], stream->format);        /* biCompression */
+		put_32bits(&buffer[20],                         /* biSizeImage */
 					stream->width * stream->height * (stream->depth + 7) / 8);
 
 		/* write the chunk */
@@ -2006,14 +2006,14 @@ static avi_error write_strf_chunk(avi_file *file, avi_stream *stream)
 		/* reset the buffer */
 		memset(buffer, 0, sizeof(buffer));
 
-		put_16bits(&buffer[0], 1);						/* wFormatTag */
-		put_16bits(&buffer[2], stream->channels);		/* nChannels */
-		put_32bits(&buffer[4], stream->samplerate);		/* nSamplesPerSec */
-		put_32bits(&buffer[8],							/* nAvgBytesPerSec */
+		put_16bits(&buffer[0], 1);                      /* wFormatTag */
+		put_16bits(&buffer[2], stream->channels);       /* nChannels */
+		put_32bits(&buffer[4], stream->samplerate);     /* nSamplesPerSec */
+		put_32bits(&buffer[8],                          /* nAvgBytesPerSec */
 					stream->samplerate * stream->channels * (stream->samplebits / 8));
-		put_16bits(&buffer[12],							/* nBlockAlign */
+		put_16bits(&buffer[12],                         /* nBlockAlign */
 					stream->channels * (stream->samplebits / 8));
-		put_16bits(&buffer[14], stream->samplebits);	/* wBitsPerSample */
+		put_16bits(&buffer[14], stream->samplebits);    /* wBitsPerSample */
 
 		/* write the chunk */
 		return chunk_write(file, CHUNKTYPE_STRF, buffer, sizeof(buffer));
@@ -2070,12 +2070,12 @@ static avi_error write_indx_chunk(avi_file *file, avi_stream *stream, int initia
 			memset(tempbuf, 0, 24 + 8 * chunks_this_index);
 
 			/* make a regular index */
-			put_16bits(&tempbuf[0], 2);						/* wLongsPerEntry */
-			tempbuf[2] = 0;									/* bIndexSubType */
-			tempbuf[3] = AVI_INDEX_OF_CHUNKS;				/* bIndexType */
-			put_32bits(&tempbuf[4], chunks_this_index);		/* nEntriesInUse */
-			put_32bits(&tempbuf[8], chunkid);				/* dwChunkId */
-			put_64bits(&tempbuf[12], currentbase);			/* qwBaseOffset */
+			put_16bits(&tempbuf[0], 2);                     /* wLongsPerEntry */
+			tempbuf[2] = 0;                                 /* bIndexSubType */
+			tempbuf[3] = AVI_INDEX_OF_CHUNKS;               /* bIndexType */
+			put_32bits(&tempbuf[4], chunks_this_index);     /* nEntriesInUse */
+			put_32bits(&tempbuf[8], chunkid);               /* dwChunkId */
+			put_64bits(&tempbuf[12], currentbase);          /* qwBaseOffset */
 
 			/* now fill in the indexes */
 			chunks_this_index = 0;
@@ -2108,11 +2108,11 @@ static avi_error write_indx_chunk(avi_file *file, avi_stream *stream, int initia
 	/* build up the master index */
 	if (master_entries != 0)
 	{
-		put_16bits(&buffer[0], 4);						/* wLongsPerEntry */
-		buffer[2] = 0;									/* bIndexSubType */
-		buffer[3] = AVI_INDEX_OF_INDEXES;				/* bIndexType */
-		put_32bits(&buffer[4], master_entries);			/* nEntriesInUse */
-		put_32bits(&buffer[8], chunkid);				/* dwChunkId */
+		put_16bits(&buffer[0], 4);                      /* wLongsPerEntry */
+		buffer[2] = 0;                                  /* bIndexSubType */
+		buffer[3] = AVI_INDEX_OF_INDEXES;               /* bIndexType */
+		put_32bits(&buffer[4], master_entries);         /* nEntriesInUse */
+		put_32bits(&buffer[8], chunkid);                /* dwChunkId */
 	}
 
 	/* (over)write the chunk */

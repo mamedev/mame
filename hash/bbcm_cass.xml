@@ -7,9 +7,9 @@
 
 <!-- Loading Instructions:
 
-      If the system has a disk drive (which the BBC Master does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
+		If the system has a disk drive (which the BBC Master does by default in MESS) you must type *TAPE, then use the relevant command to load the software, usually CHAIN"" or *RUN, though some earlier titles from Micro Power require *LOAD.
 
-      To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
+		To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 -->
 
 <softwarelist name="bbcm_cass" description="BBC Master Cassette Images">
@@ -18,7 +18,7 @@
 
 	<software name="crazyrid">
 		<description>Crazy Rider</description>
-        <year>1987</year>
+		<year>1987</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="45446">
@@ -27,9 +27,9 @@
 		</part>
 	</software>
 
-    <software name="exile">
+	<software name="exile">
 		<description>Exile</description>
-        <year>1988</year>
+		<year>1988</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="53768">
@@ -38,9 +38,9 @@
 		</part>
 	</software>
 
-    <software name="reptonin">
+	<software name="reptonin">
 		<description>Repton Infinity</description>
-        <year>1988</year>
+		<year>1988</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="118611">
@@ -49,9 +49,9 @@
 		</part>
 	</software>
 
-    <software name="strykrun">
+	<software name="strykrun">
 		<description>Strykers Run</description>
-        <year>1986</year>
+		<year>1986</year>
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="46446">
@@ -60,16 +60,16 @@
 		</part>
 	</software>
 
-    <software name="welcome">
+	<software name="welcome">
 		<description>Welcome</description>
-        <year>198?</year>
+		<year>198?</year>
 		<publisher>BBC Soft</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<dataarea name="cass" size="28803">
 				<rom name="welcome-bbcmaster-side1_bm.uef" size="28803" crc="29076f21" sha1="d56ddebc09166687e89fd1210d87a98ddaf37272" offset="0" />
 			</dataarea>
 		</part>
-        <part name="cass2" interface="bbc_cass">
+		<part name="cass2" interface="bbc_cass">
 			<dataarea name="cass" size="38565">
 				<rom name="welcome-bbcmaster-side2_bm.uef" size="38565" crc="ac51d83c" sha1="c6cfd8ddbff42f983fbf0aa341cd49844025995b" offset="0" />
 			</dataarea>

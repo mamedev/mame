@@ -80,7 +80,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_MC146818		0
+#define LOG_MC146818        0
 
 
 
@@ -88,15 +88,15 @@
 //  MACROS
 //**************************************************************************
 
-#define USE_UTC		1
+#define USE_UTC     1
 
-#define HOURS_24	(m_data[0xb]&2)
-#define BCD_MODE	!(m_data[0xb]&4) // book has other description!
-#define CENTURY		m_data[100]
-#define YEAR		m_data[9]
-#define MONTH		m_data[8]
-#define DAY			m_data[7]
-#define WEEK_DAY	m_data[6]
+#define HOURS_24    (m_data[0xb]&2)
+#define BCD_MODE    !(m_data[0xb]&4) // book has other description!
+#define CENTURY     m_data[100]
+#define YEAR        m_data[9]
+#define MONTH       m_data[8]
+#define DAY         m_data[7]
+#define WEEK_DAY    m_data[6]
 
 
 
@@ -113,13 +113,13 @@ const device_type MC146818 = &device_creator<mc146818_device>;
 
 mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC146818, "NVRAM", tag, owner, clock),
-	  device_rtc_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_type(MC146818_STANDARD),
-	  m_index(0),
-	  m_eindex(0),
-	  m_updated(false),
-	  m_last_refresh(attotime::zero)
+		device_rtc_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_type(MC146818_STANDARD),
+		m_index(0),
+		m_eindex(0),
+		m_updated(false),
+		m_last_refresh(attotime::zero)
 {
 }
 
@@ -386,11 +386,11 @@ void mc146818_device::set_base_datetime()
 	if (m_type != MC146818_IGNORE_CENTURY)
 		CENTURY = dec_2_local(current_time.year /100);
 
-	m_data[0]	= dec_2_local(current_time.second);
-	m_data[2]	= dec_2_local(current_time.minute);
-	DAY					= dec_2_local(current_time.mday);
-	MONTH				= dec_2_local(current_time.month + 1);
-	YEAR				= dec_2_local(current_time.year % 100);
+	m_data[0]   = dec_2_local(current_time.second);
+	m_data[2]   = dec_2_local(current_time.minute);
+	DAY                 = dec_2_local(current_time.mday);
+	MONTH               = dec_2_local(current_time.month + 1);
+	YEAR                = dec_2_local(current_time.year % 100);
 
 	WEEK_DAY = current_time.weekday;
 	if (current_time.is_dst)
@@ -482,7 +482,7 @@ WRITE8_MEMBER( mc146818_device::write )
 			else m_period = attotime::never;
 
 			if(m_data[0x0b] & 0x40)
-				 rate = attotime::zero;
+					rate = attotime::zero;
 			else rate = attotime::never;
 
 			m_periodic_timer->adjust(rate, 0, m_period);

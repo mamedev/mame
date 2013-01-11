@@ -32,7 +32,7 @@ const device_type KANEKO_KC002_SPRITE = &device_creator<kaneko_kc002_sprite_devi
 kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
 	: device_t(mconfig, type, "kaneko16_sprite_device", tag, owner, clock)
 {
-	m_keep_sprites = 0;	// default disabled for games not using it
+	m_keep_sprites = 0; // default disabled for games not using it
 
 
 	m_sprite_xoffs = 0;
@@ -50,10 +50,10 @@ kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, co
     0   1   2   S2  3
     0   1   2   3   S3
 */
-	m_priority.sprite[0] = 1;	// above tile[0],   below the others
-	m_priority.sprite[1] = 2;	// above tile[0-1], below the others
-	m_priority.sprite[2] = 3;	// above tile[0-2], below the others
-	m_priority.sprite[3] = 8;	// above all
+	m_priority.sprite[0] = 1;   // above tile[0],   below the others
+	m_priority.sprite[1] = 2;   // above tile[0-1], below the others
+	m_priority.sprite[2] = 3;   // above tile[0-2], below the others
+	m_priority.sprite[3] = 8;   // above all
 }
 
 
@@ -158,25 +158,25 @@ Offset:         Format:                     Value:
 
 ***************************************************************************/
 
-#define USE_LATCHED_XY		1
-#define USE_LATCHED_CODE	2
-#define USE_LATCHED_COLOR	4
+#define USE_LATCHED_XY      1
+#define USE_LATCHED_CODE    2
+#define USE_LATCHED_COLOR   4
 
 void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite *s, UINT16 attr)
 {
-	s->color		=		(attr & 0x003f);
-	s->priority		=		(attr & 0x00c0) >> 6;
-	s->flipy		=		(attr & 0x0100);
-	s->flipx		=		(attr & 0x0200);
-	s->code			+=		(s->y & 1) << 16;	// bloodwar
+	s->color        =       (attr & 0x003f);
+	s->priority     =       (attr & 0x00c0) >> 6;
+	s->flipy        =       (attr & 0x0100);
+	s->flipx        =       (attr & 0x0200);
+	s->code         +=      (s->y & 1) << 16;   // bloodwar
 }
 
 void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite *s, UINT16 attr)
 {
-	s->flipy		=		(attr & 0x0001);
-	s->flipx		=		(attr & 0x0002);
-	s->color		=		(attr & 0x00fc) >> 2;
-	s->priority		=		(attr & 0x0300) >> 8;
+	s->flipy        =       (attr & 0x0001);
+	s->flipx        =       (attr & 0x0002);
+	s->color        =       (attr & 0x00fc) >> 2;
+	s->priority     =       (attr & 0x0300) >> 8;
 }
 
 
@@ -184,35 +184,35 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(running_machine &machi
 {
 	int attr, xoffs, offs;
 
-	if (m_altspacing)	offs = i * 16/2 + 0x8/2;
-	else				offs = i * 8/2;
+	if (m_altspacing)   offs = i * 16/2 + 0x8/2;
+	else                offs = i * 8/2;
 
-	if (offs >= (spriteram16_bytes/2))	return -1;
+	if (offs >= (spriteram16_bytes/2))  return -1;
 
-	attr			=		spriteram16[offs + 0];
-	s->code			=		spriteram16[offs + 1];
-	s->x			=		spriteram16[offs + 2];
-	s->y			=		spriteram16[offs + 3];
+	attr            =       spriteram16[offs + 0];
+	s->code         =       spriteram16[offs + 1];
+	s->x            =       spriteram16[offs + 2];
+	s->y            =       spriteram16[offs + 3];
 
 	// this differs between each chip type
 	get_sprite_attributes(s, attr);
 
-	xoffs			=		(attr & 0x1800) >> 11;
-	s->yoffs		=		m_sprites_regs[0x10/2 + xoffs*2 + 1];
-	s->xoffs		=		m_sprites_regs[0x10/2 + xoffs*2 + 0];
+	xoffs           =       (attr & 0x1800) >> 11;
+	s->yoffs        =       m_sprites_regs[0x10/2 + xoffs*2 + 1];
+	s->xoffs        =       m_sprites_regs[0x10/2 + xoffs*2 + 0];
 
 	if (m_sprite_flipy)
 	{
-		s->yoffs		-=		m_sprites_regs[0x2/2];
-		s->yoffs		-=		machine.primary_screen->visible_area().min_y<<6;
+		s->yoffs        -=      m_sprites_regs[0x2/2];
+		s->yoffs        -=      machine.primary_screen->visible_area().min_y<<6;
 	}
 	else
 	{
-		s->yoffs		-=		m_sprites_regs[0x2/2];
-		s->yoffs		+=		machine.primary_screen->visible_area().min_y<<6;
+		s->yoffs        -=      m_sprites_regs[0x2/2];
+		s->yoffs        +=      machine.primary_screen->visible_area().min_y<<6;
 	}
 
-	return					( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
+	return                  ( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
 							( (attr & 0x4000) ? USE_LATCHED_COLOR : 0 ) |
 							( (attr & 0x8000) ? USE_LATCHED_CODE  : 0 ) ;
 }
@@ -318,29 +318,29 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(bitmap_ind16 &dest_bmp
 void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
-       because of the multisprite feature. But they *must* be drawn
-       from the last in RAM (frontmost) to the first in order to
-       cope with priorities using pdrawgfx.
+	   because of the multisprite feature. But they *must* be drawn
+	   from the last in RAM (frontmost) to the first in order to
+	   cope with priorities using pdrawgfx.
 
-       Hence we parse them from first to last and put the result
-       in a temp buffer, then draw the buffer's contents from last
-       to first. */
+	   Hence we parse them from first to last and put the result
+	   in a temp buffer, then draw the buffer's contents from last
+	   to first. */
 
-	int max	=	(machine.primary_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max =   (machine.primary_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct tempsprite *s = m_first_sprite;
 
 	/* These values are latched from the last sprite. */
-	int x			=	0;
-	int y			=	0;
-	int code		=	0;
-	int color		=	0;
-	int priority	=	0;
-	int xoffs		=	0;
-	int yoffs		=	0;
-	int flipx		=	0;
-	int flipy		=	0;
+	int x           =   0;
+	int y           =   0;
+	int code        =   0;
+	int color       =   0;
+	int priority    =   0;
+	int xoffs       =   0;
+	int yoffs       =   0;
+	int flipx       =   0;
+	int flipy       =   0;
 
 	while (1)
 	{
@@ -348,34 +348,34 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 
 		flags = kaneko16_parse_sprite_type012(machine, i,s, spriteram16, spriteram16_bytes);
 
-		if (flags == -1)	// End of Sprites
+		if (flags == -1)    // End of Sprites
 			break;
 
 		if (flags & USE_LATCHED_CODE)
-			s->code = ++code;	// Use the latched code + 1 ..
+			s->code = ++code;   // Use the latched code + 1 ..
 		else
-			code = s->code;		// .. or latch this value
+			code = s->code;     // .. or latch this value
 
 
 		if (flags & USE_LATCHED_COLOR)
 		{
-			s->color		=	color;
-			s->priority		=	priority;
-			s->xoffs		=	xoffs;
-			s->yoffs		=	yoffs;
+			s->color        =   color;
+			s->priority     =   priority;
+			s->xoffs        =   xoffs;
+			s->yoffs        =   yoffs;
 
 			if (m_sprite_fliptype==0)
 			{
-				s->flipx		=	flipx;
-				s->flipy		=	flipy;
+				s->flipx        =   flipx;
+				s->flipy        =   flipy;
 			}
 		}
 		else
 		{
-			color		=	s->color;
-			priority	=	s->priority;
-			xoffs		=	s->xoffs;
-			yoffs		=	s->yoffs;
+			color       =   s->color;
+			priority    =   s->priority;
+			xoffs       =   s->xoffs;
+			yoffs       =   s->yoffs;
 
 			if (m_sprite_fliptype==0)
 			{
@@ -387,8 +387,8 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 		// brap boys explicitly doesn't want the flip to be latched, maybe there is a different bit to enable that behavior?
 		if (m_sprite_fliptype==1)
 		{
-			flipx		=	s->flipx;
-			flipy		=	s->flipy;
+			flipx       =   s->flipx;
+			flipy       =   s->flipy;
 		}
 
 		if (flags & USE_LATCHED_XY)
@@ -397,22 +397,22 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 			s->y += y;
 		}
 		// Always latch the latest result
-		x	=	s->x;
-		y	=	s->y;
+		x   =   s->x;
+		y   =   s->y;
 
 		/* We can now buffer this sprite */
 
-		s->x	=	s->xoffs + s->x;
-		s->y	=	s->yoffs + s->y;
+		s->x    =   s->xoffs + s->x;
+		s->y    =   s->yoffs + s->y;
 
-		s->x	+=	m_sprite_xoffs;
-		s->y	+=	m_sprite_yoffs;
+		s->x    +=  m_sprite_xoffs;
+		s->y    +=  m_sprite_yoffs;
 
-		if (m_sprite_flipx)	{ s->x = max - s->x - (16<<6);	s->flipx = !s->flipx;	}
-		if (m_sprite_flipy)	{ s->y = max - s->y - (16<<6);	s->flipy = !s->flipy;	}
+		if (m_sprite_flipx) { s->x = max - s->x - (16<<6);  s->flipx = !s->flipx;   }
+		if (m_sprite_flipy) { s->y = max - s->y - (16<<6);  s->flipy = !s->flipy;   }
 
-		s->x		=		( (s->x & 0x7fc0) - (s->x & 0x8000) ) / 0x40;
-		s->y		=		( (s->y & 0x7fc0) - (s->y & 0x8000) ) / 0x40;
+		s->x        =       ( (s->x & 0x7fc0) - (s->x & 0x8000) ) / 0x40;
+		s->y        =       ( (s->y & 0x7fc0) - (s->y & 0x8000) ) / 0x40;
 
 		i++;
 		s++;
@@ -420,7 +420,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 
 
 	/* Let's finally draw the sprites we buffered, in reverse order
-       (for pdrawgfx) */
+	   (for pdrawgfx) */
 
 	for (s--; s >= m_first_sprite; s--)
 	{
@@ -543,7 +543,7 @@ WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
 void kaneko16_sprite_device::kaneko16_render_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes)
 {
 	/* Sprites last (rendered with pdrawgfx, so they can slip
-       in between the layers) */
+	   in between the layers) */
 
 	if(m_keep_sprites)
 	{

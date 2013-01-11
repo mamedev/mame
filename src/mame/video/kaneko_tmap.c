@@ -127,7 +127,7 @@ void kaneko_view2_tilemap_device::get_tile_info(tile_data &tileinfo, tilemap_mem
 	UINT16 code_hi = m_vram[_N_][ 2 * tile_index + 0];
 	UINT16 code_lo = m_vram[_N_][ 2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(m_tilebase, code_lo + m_vram_tile_addition[_N_], (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
-	tileinfo.category	=	(code_hi >> 8) & 7;
+	tileinfo.category   =   (code_hi >> 8) & 7;
 }
 
 TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info_0) { get_tile_info(tileinfo, tile_index, 0); }
@@ -143,22 +143,22 @@ void kaneko_view2_tilemap_device::device_start()
 	m_regs = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x20/2);
 
 	m_tmap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
-										 16,16, 0x20,0x20	);
+											16,16, 0x20,0x20    );
 	m_tmap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
-										 16,16, 0x20,0x20	);
+											16,16, 0x20,0x20    );
 
 	m_tmap[0]->set_transparent_pen(0);
 	m_tmap[1]->set_transparent_pen(0);
 
-	m_tmap[0]->set_scroll_rows(0x200);	// Line Scroll
+	m_tmap[0]->set_scroll_rows(0x200);  // Line Scroll
 	m_tmap[1]->set_scroll_rows(0x200);
 
 
-	m_tmap[0]->set_scrolldx(-m_dx,		m_xdim + m_dx -1        );
-	m_tmap[1]->set_scrolldx(-(m_dx+2),	m_xdim + (m_dx + 2) - 1 );
+	m_tmap[0]->set_scrolldx(-m_dx,      m_xdim + m_dx -1        );
+	m_tmap[1]->set_scrolldx(-(m_dx+2),  m_xdim + (m_dx + 2) - 1 );
 
-	m_tmap[0]->set_scrolldy(-m_dy,		m_ydim + m_dy -1 );
-	m_tmap[1]->set_scrolldy(-m_dy,		m_ydim + m_dy -1 );
+	m_tmap[0]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
+	m_tmap[1]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
 
 	save_pointer(NAME(m_vram[0]), 0x1000/2);
 	save_pointer(NAME(m_vram[1]), 0x1000/2);
@@ -199,24 +199,24 @@ void kaneko_view2_tilemap_device::kaneko16_prepare(bitmap_ind16 &bitmap, const r
 	/* Flip layers */
 	if (!m_invert_flip)
 	{
-		m_tmap[0]->set_flip(	((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
+		m_tmap[0]->set_flip(    ((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
 								((layers_flip_0 & 0x0200) ? TILEMAP_FLIPX : 0) );
-		m_tmap[1]->set_flip(	((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
+		m_tmap[1]->set_flip(    ((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
 								((layers_flip_0 & 0x0200) ? TILEMAP_FLIPX : 0) );
 	}
 	else
 	{
-		m_tmap[0]->set_flip(	((layers_flip_0 & 0x0100) ? 0 : TILEMAP_FLIPY) |
+		m_tmap[0]->set_flip(    ((layers_flip_0 & 0x0100) ? 0 : TILEMAP_FLIPY) |
 								((layers_flip_0 & 0x0200) ? 0 : TILEMAP_FLIPX) );
-		m_tmap[1]->set_flip(	((layers_flip_0 & 0x0100) ? 0 : TILEMAP_FLIPY) |
+		m_tmap[1]->set_flip(    ((layers_flip_0 & 0x0100) ? 0 : TILEMAP_FLIPY) |
 								((layers_flip_0 & 0x0200) ? 0 : TILEMAP_FLIPX) );
 	}
 
 	/* Scroll layers */
-	layer0_scrollx		=	m_regs[ 2 ];
-	layer0_scrolly		=	m_regs[ 3 ] >> 6;
-	layer1_scrollx		=	m_regs[ 0 ];
-	layer1_scrolly		=	m_regs[ 1 ] >> 6;
+	layer0_scrollx      =   m_regs[ 2 ];
+	layer0_scrolly      =   m_regs[ 3 ] >> 6;
+	layer1_scrollx      =   m_regs[ 0 ];
+	layer1_scrolly      =   m_regs[ 1 ] >> 6;
 
 	m_tmap[0]->set_scrolly(0,layer0_scrolly);
 	m_tmap[1]->set_scrolly(0,layer1_scrolly);
@@ -314,4 +314,3 @@ WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w)
 		}
 	}
 }
-

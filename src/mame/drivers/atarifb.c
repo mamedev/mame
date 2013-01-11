@@ -244,33 +244,33 @@ static INPUT_PORTS_START( atarifb )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW,  IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x03, 0x00, "Time Per Coin" )		PORT_DIPLOCATION("K10:1,2")
-	PORT_DIPSETTING(	0x00, "1:30" )
-	PORT_DIPSETTING(	0x01, "2:00" )
-	PORT_DIPSETTING(	0x02, "2:30" )
-	PORT_DIPSETTING(	0x03, "3:00" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "K10:3" )	/* Listed as "Unused" */
-	PORT_DIPNAME( 0x08, 0x00, "Atari Logo" )		PORT_DIPLOCATION("K10:4") /* Listed as "Unused" */
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x00, "Time Per Coin" )     PORT_DIPLOCATION("K10:1,2")
+	PORT_DIPSETTING(    0x00, "1:30" )
+	PORT_DIPSETTING(    0x01, "2:00" )
+	PORT_DIPSETTING(    0x02, "2:30" )
+	PORT_DIPSETTING(    0x03, "3:00" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "K10:3" )    /* Listed as "Unused" */
+	PORT_DIPNAME( 0x08, 0x00, "Atari Logo" )        PORT_DIPLOCATION("K10:4") /* Listed as "Unused" */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("IN2")	/* IN2 - Player 1 trackball, y */
+	PORT_START("IN2")   /* IN2 - Player 1 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN3")	/* IN3 - Player 1 trackball, x */
+	PORT_START("IN3")   /* IN3 - Player 1 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN4")	/* IN4 - Player 2 trackball, y */
+	PORT_START("IN4")   /* IN4 - Player 2 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN5")	/* IN5 - Player 2 trackball, x */
+	PORT_START("IN5")   /* IN5 - Player 2 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	/* The lower 4 bits are the input */
 INPUT_PORTS_END
@@ -288,19 +288,19 @@ static INPUT_PORTS_START( atarifb4 )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("IN6")	/* IN6 - Player 3 trackball, y */
+	PORT_START("IN6")   /* IN6 - Player 3 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN7")	/* IN7 - Player 3 trackball, x */
+	PORT_START("IN7")   /* IN7 - Player 3 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN8")	/* IN8 - Player 4 trackball, y */
+	PORT_START("IN8")   /* IN8 - Player 4 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN9")	/* IN9 - Player 4 trackball, x */
+	PORT_START("IN9")   /* IN9 - Player 4 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
 	/* The lower 4 bits are the input */
 
@@ -318,13 +318,13 @@ static INPUT_PORTS_START( abaseb )
 	PORT_INCLUDE( atarifb )
 
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("K10:1,2")
-	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( Easiest ) )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "K10:3" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "K10:4" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("K10:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easiest ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "K10:3" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "K10:4" )        /* Listed as "Unused" */
 INPUT_PORTS_END
 
 
@@ -334,48 +334,48 @@ static INPUT_PORTS_START( soccer )
 
 	PORT_START("IN1")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("2/4 Player Toggle") PORT_DIPLOCATION("SW2:4") /* Listed as "Unused" */
-	PORT_DIPNAME( 0x02, 0x00, "Rule Switch" )		PORT_DIPLOCATION("SW2:3") /* Listed as "Unused" */
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Language ) )	PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(	0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( German ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( French ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( Spanish ) )
+	PORT_DIPNAME( 0x02, 0x00, "Rule Switch" )       PORT_DIPLOCATION("SW2:3") /* Listed as "Unused" */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Spanish ) )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("IN2")	/* IN2 - Player 1 trackball, y */
+	PORT_START("IN2")   /* IN2 - Player 1 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN3")	/* IN3 - Player 1 trackball, x */
+	PORT_START("IN3")   /* IN3 - Player 1 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN4")	/* IN4 - Player 2 trackball, y */
+	PORT_START("IN4")   /* IN4 - Player 2 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN5")	/* IN5 - Player 2 trackball, x */
+	PORT_START("IN5")   /* IN5 - Player 2 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN6")	/* IN6 - Player 3 trackball, y */
+	PORT_START("IN6")   /* IN6 - Player 3 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN7")	/* IN7 - Player 3 trackball, x */
+	PORT_START("IN7")   /* IN7 - Player 3 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN8")	/* IN8 - Player 4 trackball, y */
+	PORT_START("IN8")   /* IN8 - Player 4 trackball, y */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 	/* The lower 4 bits are the input */
 
-	PORT_START("IN9")	/* IN9 - Player 4 trackball, x */
+	PORT_START("IN9")   /* IN9 - Player 4 trackball, x */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
 	/* The lower 4 bits are the input */
 
@@ -390,27 +390,27 @@ static INPUT_PORTS_START( soccer )
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, "Time per coin" )		PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(	0x00, "1:00" )
-	PORT_DIPSETTING(	0x01, "1:20" )
-	PORT_DIPSETTING(	0x02, "1:40" )
-	PORT_DIPSETTING(	0x03, "2:00" )
-	PORT_DIPSETTING(	0x04, "2:30" )
-	PORT_DIPSETTING(	0x05, "3:00" )
-	PORT_DIPSETTING(	0x06, "3:30" )
-	PORT_DIPSETTING(	0x07, "4:00" )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(	0x18, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x00, "1 Coin Minimum" )
-	PORT_DIPSETTING(	0x40, "2 Coin Minimum" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )	/* Listed as "Unused" */
+	PORT_DIPNAME( 0x07, 0x00, "Time per coin" )     PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, "1:00" )
+	PORT_DIPSETTING(    0x01, "1:20" )
+	PORT_DIPSETTING(    0x02, "1:40" )
+	PORT_DIPSETTING(    0x03, "2:00" )
+	PORT_DIPSETTING(    0x04, "2:30" )
+	PORT_DIPSETTING(    0x05, "3:00" )
+	PORT_DIPSETTING(    0x06, "3:30" )
+	PORT_DIPSETTING(    0x07, "4:00" )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "1 Coin Minimum" )
+	PORT_DIPSETTING(    0x40, "2 Coin Minimum" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )    /* Listed as "Unused" */
 INPUT_PORTS_END
 
 
@@ -465,7 +465,7 @@ static const gfx_layout spritelayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	16*8
 };
 
@@ -478,7 +478,7 @@ static const gfx_layout spritemasklayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	16*8
 };
 
@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2037)	/* 16.3ms * 1/8 = 2037.5. Is it 1/8th or 3/32nds? (1528?) */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2037)   /* 16.3ms * 1/8 = 2037.5. Is it 1/8th or 3/32nds? (1528?) */)
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)

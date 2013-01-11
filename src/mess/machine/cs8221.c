@@ -22,8 +22,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-#define LOG_REGISTER	1
-#define LOG_MEMORY		1
+#define LOG_REGISTER    1
+#define LOG_MEMORY      1
 
 const device_type CS8221 = &device_creator<cs8221_device>;
 
@@ -58,8 +58,8 @@ static const char *const register_names[] =
 
 cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CS8221, "CS8221", tag, owner, clock),
-	  m_address(0),
-	  m_address_valid(false)
+		m_address(0),
+		m_address_valid(false)
 {
 }
 

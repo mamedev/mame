@@ -64,7 +64,7 @@ device_econet_interface::~device_econet_interface()
 //-------------------------------------------------
 
 econet_slot_device::econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ECONET_SLOT, "Econet station", tag, owner, clock),
+		device_t(mconfig, ECONET_SLOT, "Econet station", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -166,8 +166,8 @@ inline void econet_device::set_signal(device_t *device, int signal, int state)
 	{
 		switch (signal)
 		{
-		case CLK:	m_out_clk_func(state);	break;
-		case DATA:	m_out_data_func(state);	break;
+		case CLK:   m_out_clk_func(state);  break;
+		case DATA:  m_out_data_func(state); break;
 		}
 
 		daisy_entry *entry = m_device_list.first();
@@ -231,7 +231,7 @@ inline int econet_device::get_signal(int signal)
 //-------------------------------------------------
 
 econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ECONET, "Econet", tag, owner, clock)
+	: device_t(mconfig, ECONET, "Econet", tag, owner, clock)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{
@@ -247,8 +247,8 @@ econet_device::econet_device(const machine_config &mconfig, const char *tag, dev
 void econet_device::device_start()
 {
 	// resolve callbacks
-    m_out_clk_func.resolve(m_out_clk_cb, *this);
-    m_out_data_func.resolve(m_out_data_cb, *this);
+	m_out_clk_func.resolve(m_out_clk_cb, *this);
+	m_out_data_func.resolve(m_out_data_cb, *this);
 }
 
 
@@ -283,8 +283,8 @@ void econet_device::add_device(device_t *target, int address)
 
 econet_device::daisy_entry::daisy_entry(device_t *device)
 	: m_next(NULL),
-	  m_device(device),
-	  m_interface(NULL)
+		m_device(device),
+		m_interface(NULL)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{

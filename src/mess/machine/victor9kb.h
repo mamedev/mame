@@ -22,7 +22,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define VICTOR9K_KEYBOARD_TAG	"victor9kb"
+#define VICTOR9K_KEYBOARD_TAG   "victor9kb"
 
 
 
@@ -31,7 +31,7 @@
 //**************************************************************************
 
 #define MCFG_VICTOR9K_KEYBOARD_ADD(_config) \
-    MCFG_DEVICE_ADD(VICTOR9K_KEYBOARD_TAG, VICTOR9K_KEYBOARD, 0) \
+	MCFG_DEVICE_ADD(VICTOR9K_KEYBOARD_TAG, VICTOR9K_KEYBOARD, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -48,18 +48,18 @@
 
 struct victor9k_keyboard_interface
 {
-	devcb_write_line	m_out_kbrdy_cb;
+	devcb_write_line    m_out_kbrdy_cb;
 };
 
 
 // ======================> victor9k_keyboard_device
 
 class victor9k_keyboard_device :  public device_t,
-								  public victor9k_keyboard_interface
+									public victor9k_keyboard_interface
 {
 public:
-    // construction/destruction
-    victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -77,13 +77,13 @@ public:
 	DECLARE_READ8_MEMBER( kb_t1_r );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "victor9kb"; }
 
 private:
-	devcb_resolved_write_line	m_out_kbrdy_func;
+	devcb_resolved_write_line   m_out_kbrdy_func;
 
 	required_device<cpu_device> m_maincpu;
 

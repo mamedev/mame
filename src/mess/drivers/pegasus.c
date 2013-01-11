@@ -224,7 +224,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t') PORT_CHAR(20)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	// outputs a space
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // outputs a space
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ShiftR") PORT_NAME("ShiftR") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h') PORT_CHAR(8)
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w') PORT_CHAR(23)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )	// outputs a space
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // outputs a space
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c') PORT_CHAR(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f') PORT_CHAR(6)
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_START("X5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e') PORT_CHAR(5)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q') PORT_CHAR(17)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )	// REPEAT key which is disconnected - outputs a space
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // REPEAT key which is disconnected - outputs a space
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LineFeed") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(10)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m') PORT_CHAR(13)
@@ -274,33 +274,33 @@ INPUT_PORTS_END
 /* System - for keyboard, video, general housekeeping */
 static const pia6821_interface pegasus_pia_s_intf=
 {
-	DEVCB_NULL,						/* port A input */
-	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_r),	/* port B input */
+	DEVCB_NULL,                     /* port A input */
+	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_r), /* port B input */
 	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_cassette_r), /* CA1 input */
 	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_keyboard_irq), /* CB1 input */
-	DEVCB_NULL,						/* CA2 input */
-	DEVCB_NULL,						/* CB2 input */
-	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_w),	/* port A output */
-	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_controls_w),	/* port B output */
+	DEVCB_NULL,                     /* CA2 input */
+	DEVCB_NULL,                     /* CB2 input */
+	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_w), /* port A output */
+	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_controls_w), /* port B output */
 	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_cassette_w), /* CA2 output */
 	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_firq_clr), /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),	/* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)		/* IRQB output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
 };
 
 /* User interface - for connection of external equipment */
 static const pia6821_interface pegasus_pia_u_intf=
 {
-	DEVCB_NULL,		/* port A input */
-	DEVCB_NULL,		/* port B input */
-	DEVCB_NULL,		/* CA1 input */
-	DEVCB_NULL,		/* CB1 input */
-	DEVCB_NULL,		/* CA2 input */
-	DEVCB_NULL,		/* CB2 input */
-	DEVCB_NULL,		/* port A output */
-	DEVCB_NULL,		/* port B output */
-	DEVCB_NULL,		/* CA2 output */
-	DEVCB_NULL,		/* CB2 output */
+	DEVCB_NULL,     /* port A input */
+	DEVCB_NULL,     /* port B input */
+	DEVCB_NULL,     /* CA1 input */
+	DEVCB_NULL,     /* CB1 input */
+	DEVCB_NULL,     /* CA2 input */
+	DEVCB_NULL,     /* CB2 input */
+	DEVCB_NULL,     /* port A output */
+	DEVCB_NULL,     /* port B output */
+	DEVCB_NULL,     /* CA2 output */
+	DEVCB_NULL,     /* CB2 output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
@@ -395,15 +395,15 @@ UINT32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 /* F4 Character Displayer */
 static const gfx_layout pegasus_charlayout =
 {
-	8, 16,					/* text = 7 x 9, pcg = 8 x 16 */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* text = 7 x 9, pcg = 8 x 16 */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( pegasus )
@@ -492,7 +492,7 @@ DRIVER_INIT_MEMBER(pegasus_state,pegasus)
 
 static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C - 4MHZ clock coming in, 1MHZ internally
+	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pegasus_firq", pegasus_state, pegasus_firq, attotime::from_hz(400))

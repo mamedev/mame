@@ -7,25 +7,25 @@
 #include "gtp_cas.h"
 
 
-#define GTP_WAV_FREQUENCY	44100
-#define WAVE_LOW		-0x5a9e
-#define WAVE_HIGH		0x5a9e
-#define WAVE_NULL		0
+#define GTP_WAV_FREQUENCY   44100
+#define WAVE_LOW        -0x5a9e
+#define WAVE_HIGH       0x5a9e
+#define WAVE_NULL       0
 
-#define	GTP_BLOCK_STANDARD	0x00
-#define	GTP_BLOCK_TURBO		0x01
-#define	GTP_BLOCK_NAME		0x10
+#define GTP_BLOCK_STANDARD  0x00
+#define GTP_BLOCK_TURBO     0x01
+#define GTP_BLOCK_NAME      0x10
 
-static INT16	wave_data;
-static INT16	len;
+static INT16    wave_data;
+static INT16    len;
 
-#define PULSE_WIDTH		30
-#define PERIOD_BASE		150
-#define PERIOD_1		75
-#define PERIOD_0		150
+#define PULSE_WIDTH     30
+#define PERIOD_BASE     150
+#define PERIOD_1        75
+#define PERIOD_0        150
 
-#define INTERBYTE_PAUSE		225
-#define INTERBLOCK_PAUSE	100000
+#define INTERBYTE_PAUSE     225
+#define INTERBLOCK_PAUSE    100000
 
 
 static void gtp_output_wave( INT16 **buffer, int length ) {
@@ -162,13 +162,13 @@ static int gtp_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 
 
 static const struct CassetteLegacyWaveFiller gtp_legacy_fill_wave = {
-	gtp_cas_fill_wave,			/* fill_wave */
-	-1,					/* chunk_size */
-	0,					/* chunk_samples */
-	gtp_cas_to_wav_size,			/* chunk_sample_calc */
-	GTP_WAV_FREQUENCY,			/* sample_frequency */
-	0,					/* header_samples */
-	0					/* trailer_samples */
+	gtp_cas_fill_wave,          /* fill_wave */
+	-1,                 /* chunk_size */
+	0,                  /* chunk_samples */
+	gtp_cas_to_wav_size,            /* chunk_sample_calc */
+	GTP_WAV_FREQUENCY,          /* sample_frequency */
+	0,                  /* header_samples */
+	0                   /* trailer_samples */
 };
 
 
@@ -196,5 +196,3 @@ static const struct CassetteFormat gtp_cassette_format = {
 CASSETTE_FORMATLIST_START(gtp_cassette_formats)
 	CASSETTE_FORMAT(gtp_cassette_format)
 CASSETTE_FORMATLIST_END
-
-

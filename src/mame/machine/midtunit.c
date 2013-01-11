@@ -11,33 +11,33 @@
 
 
 /* compile-time constants */
-#define ENABLE_ALL_JDREDD_LEVELS	0
+#define ENABLE_ALL_JDREDD_LEVELS    0
 
 
 /* constant definitions */
-#define SOUND_ADPCM					1
-#define SOUND_ADPCM_LARGE			2
-#define SOUND_DCS					3
+#define SOUND_ADPCM                 1
+#define SOUND_ADPCM_LARGE           2
+#define SOUND_DCS                   3
 
 
 /* CMOS-related variables */
-static UINT8	cmos_write_enable;
+static UINT8    cmos_write_enable;
 
 /* sound-related variables */
-static UINT8	chip_type;
-static UINT8	fake_sound_state;
+static UINT8    chip_type;
+static UINT8    fake_sound_state;
 
 /* protection */
-static UINT8	mk_prot_index;
-static UINT16	mk2_prot_data;
+static UINT8    mk_prot_index;
+static UINT16   mk2_prot_data;
 
 static const UINT32 *nbajam_prot_table;
-static UINT16	nbajam_prot_queue[5];
-static UINT8	nbajam_prot_index;
+static UINT16   nbajam_prot_queue[5];
+static UINT8    nbajam_prot_index;
 
 static const UINT8 *jdredd_prot_table;
-static UINT8	jdredd_prot_index;
-static UINT8	jdredd_prot_max;
+static UINT8    jdredd_prot_index;
+static UINT8    jdredd_prot_max;
 
 
 
@@ -179,7 +179,7 @@ WRITE16_MEMBER(midtunit_state::mk_prot_w)
 READ16_MEMBER(midtunit_state::mkturbo_prot_r)
 {
 	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM &space.
-     * A startup protection check expects to read back two different values in succession */
+	 * A startup protection check expects to read back two different values in succession */
 	return machine().rand();
 }
 
@@ -228,7 +228,7 @@ static const UINT32 nbajam_prot_values[128] =
 	0x01202b3b, 0x0431283b, 0x11202b3b, 0x1021283b, 0x11202b3b, 0x1021283b, 0x03273b3b, 0x06302b39,
 	0x09302b39, 0x0c232f2f, 0x19322e06, 0x18312a12, 0x19322e06, 0x18312a12, 0x0b31283b, 0x0e26383b,
 	0x03273b3b, 0x06302b39, 0x11202b3b, 0x1021283b, 0x13273938, 0x12243938, 0x03273b3b, 0x06302b39,
-	0x0b31283b, 0x0e26383b, 0x19322e06, 0x18312a12, 0x1b332f05, 0x1a302b11, 0x0b31283b,	0x0e26383b,
+	0x0b31283b, 0x0e26383b, 0x19322e06, 0x18312a12, 0x1b332f05, 0x1a302b11, 0x0b31283b, 0x0e26383b,
 	0x21283b3b, 0x2439383b, 0x31283b3b, 0x302b3938, 0x31283b3b, 0x302b3938, 0x232f2f2f, 0x26383b3b,
 	0x21283b3b, 0x2439383b, 0x312a1224, 0x302b1120, 0x312a1224, 0x302b1120, 0x232d283b, 0x26383b3b,
 	0x2b3b3b3b, 0x2e2e2e2e, 0x39383b1b, 0x383b3b1b, 0x3b3b3b1b, 0x3a3a3a1a, 0x2b3b3b3b, 0x2e2e2e2e,
@@ -236,7 +236,7 @@ static const UINT32 nbajam_prot_values[128] =
 	0x01202b3b, 0x0431283b, 0x11202b3b, 0x1021283b, 0x11202b3b, 0x1021283b, 0x03273b3b, 0x06302b39,
 	0x09302b39, 0x0c232f2f, 0x19322e06, 0x18312a12, 0x19322e06, 0x18312a12, 0x0b31283b, 0x0e26383b,
 	0x03273b3b, 0x06302b39, 0x11202b3b, 0x1021283b, 0x13273938, 0x12243938, 0x03273b3b, 0x06302b39,
-	0x0b31283b, 0x0e26383b, 0x19322e06, 0x18312a12, 0x1b332f05, 0x1a302b11, 0x0b31283b,	0x0e26383b
+	0x0b31283b, 0x0e26383b, 0x19322e06, 0x18312a12, 0x1b332f05, 0x1a302b11, 0x0b31283b, 0x0e26383b
 };
 
 static const UINT32 nbajamte_prot_values[128] =

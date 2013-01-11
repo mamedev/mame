@@ -36,58 +36,58 @@ void slapshot_state::video_start()
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
 {
 	/*
-        Sprite format:
-        0000: ---xxxxxxxxxxxxx tile code (0x0000 - 0x1fff)
-        0002: xxxxxxxx-------- sprite y-zoom level
-              --------xxxxxxxx sprite x-zoom level
+	    Sprite format:
+	    0000: ---xxxxxxxxxxxxx tile code (0x0000 - 0x1fff)
+	    0002: xxxxxxxx-------- sprite y-zoom level
+	          --------xxxxxxxx sprite x-zoom level
 
-              0x00 - non scaled = 100%
-              0x80 - scaled to 50%
-              0xc0 - scaled to 25%
-              0xe0 - scaled to 12.5%
-              0xff - scaled to zero pixels size (off)
+	          0x00 - non scaled = 100%
+	          0x80 - scaled to 50%
+	          0xc0 - scaled to 25%
+	          0xe0 - scaled to 12.5%
+	          0xff - scaled to zero pixels size (off)
 
-        [this zoom scale may not be 100% correct, see Gunfront flame screen]
+	    [this zoom scale may not be 100% correct, see Gunfront flame screen]
 
-        0004: ----xxxxxxxxxxxx x-coordinate (-0x800 to 0x07ff)
-              ---x------------ latch extra scroll
-              --x------------- latch master scroll
-              -x-------------- don't use extra scroll compensation
-              x--------------- absolute screen coordinates (ignore all sprite scrolls)
-              xxxx------------ the typical use of the above is therefore
-                               1010 = set master scroll
-                               0101 = set extra scroll
-        0006: ----xxxxxxxxxxxx y-coordinate (-0x800 to 0x07ff)
-              x--------------- marks special control commands (used in conjunction with 00a)
-                               If the special command flag is set:
-              ---------------x related to sprite ram bank
-              ---x------------ unknown (deadconx, maybe others)
-              --x------------- unknown, some games (growl, gunfront) set it to 1 when
-                               screen is flipped
-        0008: --------xxxxxxxx color (0x00 - 0xff)
-              -------x-------- flipx
-              ------x--------- flipy
-              -----x---------- if set, use latched color, else use & latch specified one
-              ----x----------- if set, next sprite entry is part of sequence
-              ---x------------ if clear, use latched y coordinate, else use current y
-              --x------------- if set, y += 16
-              -x-------------- if clear, use latched x coordinate, else use current x
-              x--------------- if set, x += 16
-        000a: only valid when the special command bit in 006 is set
-              ---------------x related to sprite ram bank. I think this is the one causing
-                               the bank switch, implementing it this way all games seem
-                               to properly bank switch except for footchmp which uses the
-                               bit in byte 006 instead.
-              ------------x--- unknown; some games toggle it before updating sprite ram.
-              ------xx-------- unknown (finalb)
-              -----x---------- unknown (mjnquest)
-              ---x------------ disable the following sprites until another marker with
-                               this bit clear is found
-              --x------------- flip screen
+	    0004: ----xxxxxxxxxxxx x-coordinate (-0x800 to 0x07ff)
+	          ---x------------ latch extra scroll
+	          --x------------- latch master scroll
+	          -x-------------- don't use extra scroll compensation
+	          x--------------- absolute screen coordinates (ignore all sprite scrolls)
+	          xxxx------------ the typical use of the above is therefore
+	                           1010 = set master scroll
+	                           0101 = set extra scroll
+	    0006: ----xxxxxxxxxxxx y-coordinate (-0x800 to 0x07ff)
+	          x--------------- marks special control commands (used in conjunction with 00a)
+	                           If the special command flag is set:
+	          ---------------x related to sprite ram bank
+	          ---x------------ unknown (deadconx, maybe others)
+	          --x------------- unknown, some games (growl, gunfront) set it to 1 when
+	                           screen is flipped
+	    0008: --------xxxxxxxx color (0x00 - 0xff)
+	          -------x-------- flipx
+	          ------x--------- flipy
+	          -----x---------- if set, use latched color, else use & latch specified one
+	          ----x----------- if set, next sprite entry is part of sequence
+	          ---x------------ if clear, use latched y coordinate, else use current y
+	          --x------------- if set, y += 16
+	          -x-------------- if clear, use latched x coordinate, else use current x
+	          x--------------- if set, x += 16
+	    000a: only valid when the special command bit in 006 is set
+	          ---------------x related to sprite ram bank. I think this is the one causing
+	                           the bank switch, implementing it this way all games seem
+	                           to properly bank switch except for footchmp which uses the
+	                           bit in byte 006 instead.
+	          ------------x--- unknown; some games toggle it before updating sprite ram.
+	          ------xx-------- unknown (finalb)
+	          -----x---------- unknown (mjnquest)
+	          ---x------------ disable the following sprites until another marker with
+	                           this bit clear is found
+	          --x------------- flip screen
 
-        000b - 000f : unused
+	    000b - 000f : unused
 
-    */
+	*/
 	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int x, y, off, extoffs;
 	int code, color, spritedata, spritecont, flipx, flipy;
@@ -100,15 +100,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int x_offset;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
-       while processing sprite ram and then draw them all at the end */
+	   while processing sprite ram and then draw them all at the end */
 	struct slapshot_tempsprite *sprite_ptr = state->m_spritelist;
 
 	/* must remember enable status from last frame because driftout fails to
-       reactivate them from a certain point onwards. */
+	   reactivate them from a certain point onwards. */
 	int disabled = state->m_sprites_disabled;
 
 	/* must remember master scroll from previous frame because driftout
-       sometimes doesn't set it. */
+	   sometimes doesn't set it. */
 	int master_scrollx = state->m_sprites_master_scrollx;
 	int master_scrolly = state->m_sprites_master_scrolly;
 
@@ -261,14 +261,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			zoomx = zoomxlatch;
 			zoomy = zoomylatch;
-			zx = 0x10;	/* default, no zoom: 16 pixels across */
-			zy = 0x10;	/* default, no zoom: 16 pixels vertical */
+			zx = 0x10;  /* default, no zoom: 16 pixels across */
+			zy = 0x10;  /* default, no zoom: 16 pixels vertical */
 
 			if (zoomx || zoomy)
 			{
 				/* "Zoom" zx&y is pixel size horizontally and vertically
-                   of our sprite chunk. So it is difference in x and y
-                   coords of our chunk and diagonally adjoining one. */
+				   of our sprite chunk. So it is difference in x and y
+				   coords of our chunk and diagonally adjoining one. */
 
 				x = xlatch + x_no * (0x100 - zoomx) / 16;
 				y = ylatch + y_no * (0x100 - zoomy) / 16;
@@ -310,16 +310,16 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipy = spritecont & 0x02;
 
 		curx = (x + scrollx) & 0xfff;
-		if (curx >= 0x800)	curx -= 0x1000;   /* treat it as signed */
+		if (curx >= 0x800)  curx -= 0x1000;   /* treat it as signed */
 
 		cury = (y + scrolly) & 0xfff;
-		if (cury >= 0x800)	cury -= 0x1000;   /* treat it as signed */
+		if (cury >= 0x800)  cury -= 0x1000;   /* treat it as signed */
 
 		if (state->m_sprites_flipscreen)
 		{
 			/* -zx/y is there to fix zoomed sprite coords in screenflip.
-               drawgfxzoom does not know to draw from flip-side of sprites when
-               screen is flipped; so we must correct the coords ourselves. */
+			   drawgfxzoom does not know to draw from flip-side of sprites when
+			   screen is flipped; so we must correct the coords ourselves. */
 
 			curx = 319 - curx - zx;
 			cury = 256 - cury - zy;
@@ -332,7 +332,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
-			if (machine.gfx[0]->granularity() == 64)	/* Final Blow, Slapshot are 6bpp */
+			if (machine.gfx[0]->granularity() == 64)    /* Final Blow, Slapshot are 6bpp */
 				sprite_ptr->color /= 4;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;
@@ -380,7 +380,7 @@ static void taito_handle_sprite_buffering( running_machine &machine )
 {
 	slapshot_state *state = machine.driver_data<slapshot_state>();
 
-	if (state->m_prepare_sprites)	/* no buffering */
+	if (state->m_prepare_sprites)   /* no buffering */
 	{
 		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram.bytes());
 		state->m_prepare_sprites = 0;
@@ -502,10 +502,10 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 
 	priority = tc0480scp_get_bg_priority(m_tc0480scp);
 
-	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
 	layer[2] = (priority & 0x00f0) >>  4;
-	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
+	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
 	tilepri[0] = tc0360pri_r(m_tc0360pri, space, 4) & 0x0f;     /* bg0 */
@@ -560,10 +560,10 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 	}
 
 	/*
-    TODO: This isn't the correct way to handle the priority. At the moment of
-    writing, pdrawgfx() doesn't support 5 layers, so I have to cheat, assuming
-    that the FG layer is always on top of sprites.
-    */
+	TODO: This isn't the correct way to handle the priority. At the moment of
+	writing, pdrawgfx() doesn't support 5 layers, so I have to cheat, assuming
+	that the FG layer is always on top of sprites.
+	*/
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[4]] == 0)
@@ -571,4 +571,3 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }
-

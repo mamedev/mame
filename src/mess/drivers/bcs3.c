@@ -207,7 +207,7 @@ static INPUT_PORTS_START( bcs3 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)	// cassette read bit
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // cassette read bit
 INPUT_PORTS_END
 
 
@@ -266,7 +266,7 @@ UINT32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitm
 {
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (m_p_videoram[0x7a] | (m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (m_p_videoram[0x7a] | (m_p_videoram[0x7b] << 8)) - 0x3c80;  // get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 128;
 
@@ -309,7 +309,7 @@ UINT32 bcs3_state::screen_update_bcs3b(screen_device &screen, bitmap_ind16 &bitm
 {
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
-	UINT16 cursor = (m_p_videoram[0x7a] | (m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (m_p_videoram[0x7a] | (m_p_videoram[0x7b] << 8)) - 0x3c80;  // get cursor relative position
 	rat = cursor / 41;
 	if (rat > 23) ma = (rat-23) * 41 + 128;
 
@@ -352,7 +352,7 @@ UINT32 bcs3_state::screen_update_bcs3c(screen_device &screen, bitmap_ind16 &bitm
 {
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0xb4,x;
-	UINT16 cursor = (m_p_videoram[0x08] | (m_p_videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position
+	UINT16 cursor = (m_p_videoram[0x08] | (m_p_videoram[0x09] << 8)) - 0x3c80;  // get cursor relative position
 	rat = cursor / 30;
 	if (rat > 11) ma = (rat-11) * 30 + 0xb4;
 
@@ -394,15 +394,15 @@ UINT32 bcs3_state::screen_update_bcs3c(screen_device &screen, bitmap_ind16 &bitm
 /* F4 Character Displayer */
 static const gfx_layout bcs3_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( bcs3 )
@@ -500,7 +500,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1984, bcs3,   0,       0,      bcs3,	bcs3, driver_device,	 0, 	 "Eckhard Schiller",   "BCS 3 rev 2.4", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1986, bcs3a,  bcs3,    0,      bcs3a, 	bcs3, driver_device,	 0, 	 "Eckhard Schiller",   "BCS 3 rev 3.1 29-column", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1986, bcs3b,  bcs3,    0,      bcs3b, 	bcs3, driver_device,	 0, 	 "Eckhard Schiller",   "BCS 3 rev 3.1 40-column", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, bcs3c,  bcs3,    0,      bcs3c, 	bcs3, driver_device,	 0, 	 "Eckhard Schiller",   "BCS 3 rev 3.3", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, bcs3,   0,       0,      bcs3,  bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 2.4", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, bcs3a,  bcs3,    0,      bcs3a,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.1 29-column", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, bcs3b,  bcs3,    0,      bcs3b,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.1 40-column", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, bcs3c,  bcs3,    0,      bcs3c,     bcs3, driver_device,     0,      "Eckhard Schiller",   "BCS 3 rev 3.3", GAME_NOT_WORKING | GAME_NO_SOUND)

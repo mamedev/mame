@@ -83,21 +83,21 @@ public:
 
 private:
 	// internal state
-	drc_cache &		m_cache;				// cache where allocations come from
-	UINT32			m_modes;				// number of modes supported
+	drc_cache &     m_cache;                // cache where allocations come from
+	UINT32          m_modes;                // number of modes supported
 
-	drccodeptr		m_nocodeptr;			// pointer to code which will handle missing entries
+	drccodeptr      m_nocodeptr;            // pointer to code which will handle missing entries
 
-	UINT8			m_l1bits;				// bits worth of entries in l1 hash tables
-	UINT8			m_l2bits;				// bits worth of entries in l2 hash tables
-	UINT8			m_l1shift;				// shift to apply to the PC to get the l1 hash entry
-	UINT8			m_l2shift;				// shift to apply to the PC to get the l2 hash entry
-	offs_t			m_l1mask;				// mask to apply after shifting
-	offs_t			m_l2mask;				// mask to apply after shifting
+	UINT8           m_l1bits;               // bits worth of entries in l1 hash tables
+	UINT8           m_l2bits;               // bits worth of entries in l2 hash tables
+	UINT8           m_l1shift;              // shift to apply to the PC to get the l1 hash entry
+	UINT8           m_l2shift;              // shift to apply to the PC to get the l2 hash entry
+	offs_t          m_l1mask;               // mask to apply after shifting
+	offs_t          m_l2mask;               // mask to apply after shifting
 
-	drccodeptr ***	m_base;					// pointer to the l1 table for each mode
-	drccodeptr **	m_emptyl1;				// pointer to empty l1 hash table
-	drccodeptr *	m_emptyl2;				// pointer to empty l2 hash table
+	drccodeptr ***  m_base;                 // pointer to the l1 table for each mode
+	drccodeptr **   m_emptyl1;              // pointer to empty l1 hash table
+	drccodeptr *    m_emptyl2;              // pointer to empty l2 hash table
 };
 
 
@@ -125,20 +125,20 @@ public:
 
 private:
 	// internal state
-	drc_cache &			m_cache;			// pointer to the cache
-	UINT64				m_uniquevalue;		// unique value used to find the table
-	UINT32				m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
+	drc_cache &         m_cache;            // pointer to the cache
+	UINT64              m_uniquevalue;      // unique value used to find the table
+	UINT32              m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
 
 	// list of entries
 	struct map_entry
 	{
 		map_entry *next() const { return m_next; }
-		map_entry *		m_next;				// pointer to next map entry
-		drccodeptr		m_codeptr;			// pointer to the relevant code
-		UINT32			m_mapvar;			// map variable id
-		UINT32			m_newval;			// value of the variable starting at codeptr
+		map_entry *     m_next;             // pointer to next map entry
+		drccodeptr      m_codeptr;          // pointer to the relevant code
+		UINT32          m_mapvar;           // map variable id
+		UINT32          m_newval;           // value of the variable starting at codeptr
 	};
-	simple_list<map_entry> m_entry_list;	// list of entries
+	simple_list<map_entry> m_entry_list;    // list of entries
 };
 
 
@@ -166,16 +166,16 @@ private:
 	struct label_entry
 	{
 		label_entry *next() const { return m_next; }
-		label_entry *		m_next;			// pointer to next label
-		uml::code_label		m_label;		// the label specified
-		drccodeptr			m_codeptr;		// pointer to the relevant code
+		label_entry *       m_next;         // pointer to next label
+		uml::code_label     m_label;        // the label specified
+		drccodeptr          m_codeptr;      // pointer to the relevant code
 	};
 
 	struct label_fixup
 	{
 		label_fixup *next() const { return m_next; }
-		label_fixup *		m_next;			// pointer to the next oob
-		label_entry *		m_label;		// the label in question
+		label_fixup *       m_next;         // pointer to the next oob
+		label_entry *       m_label;        // the label in question
 		drc_label_fixup_delegate m_callback; // callback
 	};
 
@@ -185,10 +185,10 @@ private:
 	void oob_callback(drccodeptr *codeptr, void *param1, void *param2);
 
 	// internal state
-	drc_cache &			m_cache;			// pointer to the cache
-	simple_list<label_entry> m_list;		// head of the live list
-	simple_list<label_fixup> m_fixup_list;	// list of pending oob fixups
-	drc_oob_delegate	m_oob_callback_delegate; // pre-computed delegate
+	drc_cache &         m_cache;            // pointer to the cache
+	simple_list<label_entry> m_list;        // head of the live list
+	simple_list<label_fixup> m_fixup_list;  // list of pending oob fixups
+	drc_oob_delegate    m_oob_callback_delegate; // pre-computed delegate
 };
 
 

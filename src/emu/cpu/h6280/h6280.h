@@ -45,11 +45,11 @@ enum
 	H6280_M8
 };
 
-#define H6280_RESET_VEC	0xfffe
-#define H6280_NMI_VEC	0xfffc
-#define H6280_TIMER_VEC	0xfffa
-#define H6280_IRQ1_VEC	0xfff8
-#define H6280_IRQ2_VEC	0xfff6			/* Aka BRK vector */
+#define H6280_RESET_VEC 0xfffe
+#define H6280_NMI_VEC   0xfffc
+#define H6280_TIMER_VEC 0xfffa
+#define H6280_IRQ1_VEC  0xfff8
+#define H6280_IRQ2_VEC  0xfff6          /* Aka BRK vector */
 
 
 //**************************************************************************
@@ -126,36 +126,36 @@ protected:
 	const address_space_config m_io_config;
 
 	// CPU registers
-	PAIR  m_ppc;			/* previous program counter */
-    PAIR  m_pc;           	/* program counter */
-    PAIR  m_sp;           	/* stack pointer (always 100 - 1FF) */
-    PAIR  m_zp;           	/* zero page address */
-    PAIR  m_ea;           	/* effective address */
-    UINT8 m_a;            	/* Accumulator */
-    UINT8 m_x;            	/* X index register */
-    UINT8 m_y;            	/* Y index register */
-    UINT8 m_p;            	/* Processor status */
-    UINT8 m_mmr[8];       	/* Hu6280 memory mapper registers */
-    UINT8 m_irq_mask;     	/* interrupt enable/disable */
-    UINT8 m_timer_status; 	/* timer status */
-	UINT8 m_timer_ack;		/* timer acknowledge */
-    UINT8 m_clocks_per_cycle; /* 4 = low speed mode, 1 = high speed mode */
-    INT32 m_timer_value;    /* timer interrupt */
-    INT32 m_timer_load;		/* reload value */
-    UINT8 m_nmi_state;
-    UINT8 m_irq_state[3];
+	PAIR  m_ppc;            /* previous program counter */
+	PAIR  m_pc;             /* program counter */
+	PAIR  m_sp;             /* stack pointer (always 100 - 1FF) */
+	PAIR  m_zp;             /* zero page address */
+	PAIR  m_ea;             /* effective address */
+	UINT8 m_a;              /* Accumulator */
+	UINT8 m_x;              /* X index register */
+	UINT8 m_y;              /* Y index register */
+	UINT8 m_p;              /* Processor status */
+	UINT8 m_mmr[8];         /* Hu6280 memory mapper registers */
+	UINT8 m_irq_mask;       /* interrupt enable/disable */
+	UINT8 m_timer_status;   /* timer status */
+	UINT8 m_timer_ack;      /* timer acknowledge */
+	UINT8 m_clocks_per_cycle; /* 4 = low speed mode, 1 = high speed mode */
+	INT32 m_timer_value;    /* timer interrupt */
+	INT32 m_timer_load;     /* reload value */
+	UINT8 m_nmi_state;
+	UINT8 m_irq_state[3];
 	UINT8 m_irq_pending;
 #if LAZY_FLAGS
-    INT32 m_nz;			/* last value (lazy N and Z flag) */
+	INT32 m_nz;         /* last value (lazy N and Z flag) */
 #endif
-	UINT8 m_io_buffer;	/* last value written to the PSG, timer, and interrupt pages */
+	UINT8 m_io_buffer;  /* last value written to the PSG, timer, and interrupt pages */
 
 	// other internal states
-    int m_icount;
+	int m_icount;
 
 	// address spaces
-    address_space *m_program;
-    address_space *m_io;
+	address_space *m_program;
+	address_space *m_io;
 	direct_read_data *m_direct;
 
 	typedef void (h6280_device::*ophandler)();

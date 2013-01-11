@@ -60,26 +60,26 @@
 
 /* Some optimizations/warnings cleanups for GCC */
 #if defined(__GNUC__) && (__GNUC__ >= 3)
-#define ATTR_UNUSED				__attribute__((__unused__))
-#define ATTR_NORETURN			__attribute__((noreturn))
-#define ATTR_PRINTF(x,y)		__attribute__((format(printf, x, y)))
-#define ATTR_MALLOC				__attribute__((malloc))
-#define ATTR_PURE				__attribute__((pure))
-#define ATTR_CONST				__attribute__((const))
-#define ATTR_FORCE_INLINE		__attribute__((always_inline))
-#define ATTR_NONNULL(...)		__attribute__((nonnull(__VA_ARGS__)))
+#define ATTR_UNUSED             __attribute__((__unused__))
+#define ATTR_NORETURN           __attribute__((noreturn))
+#define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
+#define ATTR_MALLOC             __attribute__((malloc))
+#define ATTR_PURE               __attribute__((pure))
+#define ATTR_CONST              __attribute__((const))
+#define ATTR_FORCE_INLINE       __attribute__((always_inline))
+#define ATTR_NONNULL(...)       __attribute__((nonnull(__VA_ARGS__)))
 /* not supported in GCC prior to 4.4.x */
 #if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 4)
-#define ATTR_HOT				__attribute__((hot))
-#define ATTR_COLD				__attribute__((cold))
+#define ATTR_HOT                __attribute__((hot))
+#define ATTR_COLD               __attribute__((cold))
 #else
 #define ATTR_HOT
 #define ATTR_COLD
 #endif
-#define UNEXPECTED(exp)			__builtin_expect(!!(exp), 0)
-#define EXPECTED(exp)			__builtin_expect(!!(exp), 1)
-#define RESTRICT				__restrict__
-#define SETJMP_GNUC_PROTECT()	(void)__builtin_return_address(1)
+#define UNEXPECTED(exp)         __builtin_expect(!!(exp), 0)
+#define EXPECTED(exp)           __builtin_expect(!!(exp), 1)
+#define RESTRICT                __restrict__
+#define SETJMP_GNUC_PROTECT()   (void)__builtin_return_address(1)
 #else
 #define ATTR_UNUSED
 #define ATTR_NORETURN
@@ -91,16 +91,16 @@
 #define ATTR_NONNULL(...)
 #define ATTR_HOT
 #define ATTR_COLD
-#define UNEXPECTED(exp)			(exp)
-#define EXPECTED(exp)			(exp)
+#define UNEXPECTED(exp)         (exp)
+#define EXPECTED(exp)           (exp)
 #define RESTRICT
-#define SETJMP_GNUC_PROTECT()	do {} while (0)
+#define SETJMP_GNUC_PROTECT()   do {} while (0)
 #endif
 
 
 /* And some MSVC optimizations/warnings */
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
-#define DECL_NORETURN			__declspec(noreturn)
+#define DECL_NORETURN           __declspec(noreturn)
 #else
 #define DECL_NORETURN
 #endif
@@ -117,27 +117,27 @@
 #ifndef OSD_TYPES_DEFINED
 
 /* 8-bit values */
-typedef unsigned char						UINT8;
-typedef signed char 						INT8;
+typedef unsigned char                       UINT8;
+typedef signed char                         INT8;
 
 /* 16-bit values */
-typedef unsigned short						UINT16;
-typedef signed short						INT16;
+typedef unsigned short                      UINT16;
+typedef signed short                        INT16;
 
 /* 32-bit values */
 #ifndef _WINDOWS_H
-typedef unsigned int						UINT32;
-typedef signed int							INT32;
+typedef unsigned int                        UINT32;
+typedef signed int                          INT32;
 #endif
 
 /* 64-bit values */
 #ifndef _WINDOWS_H
 #ifdef _MSC_VER
-typedef signed __int64						INT64;
-typedef unsigned __int64					UINT64;
+typedef signed __int64                      INT64;
+typedef unsigned __int64                    UINT64;
 #else
-__extension__ typedef unsigned long long	UINT64;
-__extension__ typedef signed long long		INT64;
+__extension__ typedef unsigned long long    UINT64;
+__extension__ typedef signed long long      INT64;
 #endif
 #endif
 
@@ -151,11 +151,11 @@ __extension__ typedef signed long long		INT64;
 
 /* Ensure that TRUE/FALSE are defined */
 #ifndef TRUE
-#define TRUE    			1
+#define TRUE                1
 #endif
 
 #ifndef FALSE
-#define FALSE				0
+#define FALSE               0
 #endif
 
 
@@ -166,10 +166,10 @@ __extension__ typedef signed long long		INT64;
 
 /* Standard MIN/MAX macros */
 #ifndef MIN
-#define MIN(x,y)			((x) < (y) ? (x) : (y))
+#define MIN(x,y)            ((x) < (y) ? (x) : (y))
 #endif
 #ifndef MAX
-#define MAX(x,y)			((x) > (y) ? (x) : (y))
+#define MAX(x,y)            ((x) > (y) ? (x) : (y))
 #endif
 
 
@@ -184,9 +184,9 @@ __extension__ typedef signed long long		INT64;
 
 
 /* Concatenate/extract 32-bit halves of 64-bit values */
-#define CONCAT_64(hi,lo)	(((UINT64)(hi) << 32) | (UINT32)(lo))
-#define EXTRACT_64HI(val)	((UINT32)((val) >> 32))
-#define EXTRACT_64LO(val)	((UINT32)(val))
+#define CONCAT_64(hi,lo)    (((UINT64)(hi) << 32) | (UINT32)(lo))
+#define EXTRACT_64HI(val)   ((UINT32)((val) >> 32))
+#define EXTRACT_64LO(val)   ((UINT32)(val))
 
 
 /* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
@@ -198,40 +198,40 @@ __extension__ typedef signed long long		INT64;
 
 
 /* Highly useful macro for compile-time knowledge of an array size */
-#define ARRAY_LENGTH(x)		(sizeof(x) / sizeof(x[0]))
+#define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))
 
 
 /* Macros for normalizing data into big or little endian formats */
-#define FLIPENDIAN_INT16(x)	(((((UINT16) (x)) >> 8) | ((x) << 8)) & 0xffff)
-#define FLIPENDIAN_INT32(x)	((((UINT32) (x)) << 24) | (((UINT32) (x)) >> 24) | \
+#define FLIPENDIAN_INT16(x) (((((UINT16) (x)) >> 8) | ((x) << 8)) & 0xffff)
+#define FLIPENDIAN_INT32(x) ((((UINT32) (x)) << 24) | (((UINT32) (x)) >> 24) | \
 	(( ((UINT32) (x)) & 0x0000ff00) << 8) | (( ((UINT32) (x)) & 0x00ff0000) >> 8))
-#define FLIPENDIAN_INT64(x)	\
-	(												\
-		(((((UINT64) (x)) >> 56) & ((UINT64) 0xFF)) <<  0)	|	\
-		(((((UINT64) (x)) >> 48) & ((UINT64) 0xFF)) <<  8)	|	\
-		(((((UINT64) (x)) >> 40) & ((UINT64) 0xFF)) << 16)	|	\
-		(((((UINT64) (x)) >> 32) & ((UINT64) 0xFF)) << 24)	|	\
-		(((((UINT64) (x)) >> 24) & ((UINT64) 0xFF)) << 32)	|	\
-		(((((UINT64) (x)) >> 16) & ((UINT64) 0xFF)) << 40)	|	\
-		(((((UINT64) (x)) >>  8) & ((UINT64) 0xFF)) << 48)	|	\
-		(((((UINT64) (x)) >>  0) & ((UINT64) 0xFF)) << 56)		\
+#define FLIPENDIAN_INT64(x) \
+	(                                               \
+		(((((UINT64) (x)) >> 56) & ((UINT64) 0xFF)) <<  0)  |   \
+		(((((UINT64) (x)) >> 48) & ((UINT64) 0xFF)) <<  8)  |   \
+		(((((UINT64) (x)) >> 40) & ((UINT64) 0xFF)) << 16)  |   \
+		(((((UINT64) (x)) >> 32) & ((UINT64) 0xFF)) << 24)  |   \
+		(((((UINT64) (x)) >> 24) & ((UINT64) 0xFF)) << 32)  |   \
+		(((((UINT64) (x)) >> 16) & ((UINT64) 0xFF)) << 40)  |   \
+		(((((UINT64) (x)) >>  8) & ((UINT64) 0xFF)) << 48)  |   \
+		(((((UINT64) (x)) >>  0) & ((UINT64) 0xFF)) << 56)      \
 	)
 
 #ifdef LSB_FIRST
-#define BIG_ENDIANIZE_INT16(x)		(FLIPENDIAN_INT16(x))
-#define BIG_ENDIANIZE_INT32(x)		(FLIPENDIAN_INT32(x))
-#define BIG_ENDIANIZE_INT64(x)		(FLIPENDIAN_INT64(x))
-#define LITTLE_ENDIANIZE_INT16(x)	(x)
-#define LITTLE_ENDIANIZE_INT32(x)	(x)
-#define LITTLE_ENDIANIZE_INT64(x)	(x)
+#define BIG_ENDIANIZE_INT16(x)      (FLIPENDIAN_INT16(x))
+#define BIG_ENDIANIZE_INT32(x)      (FLIPENDIAN_INT32(x))
+#define BIG_ENDIANIZE_INT64(x)      (FLIPENDIAN_INT64(x))
+#define LITTLE_ENDIANIZE_INT16(x)   (x)
+#define LITTLE_ENDIANIZE_INT32(x)   (x)
+#define LITTLE_ENDIANIZE_INT64(x)   (x)
 #else
-#define BIG_ENDIANIZE_INT16(x)		(x)
-#define BIG_ENDIANIZE_INT32(x)		(x)
-#define BIG_ENDIANIZE_INT64(x)		(x)
-#define LITTLE_ENDIANIZE_INT16(x)	(FLIPENDIAN_INT16(x))
-#define LITTLE_ENDIANIZE_INT32(x)	(FLIPENDIAN_INT32(x))
-#define LITTLE_ENDIANIZE_INT64(x)	(FLIPENDIAN_INT64(x))
+#define BIG_ENDIANIZE_INT16(x)      (x)
+#define BIG_ENDIANIZE_INT32(x)      (x)
+#define BIG_ENDIANIZE_INT64(x)      (x)
+#define LITTLE_ENDIANIZE_INT16(x)   (FLIPENDIAN_INT16(x))
+#define LITTLE_ENDIANIZE_INT32(x)   (FLIPENDIAN_INT32(x))
+#define LITTLE_ENDIANIZE_INT64(x)   (FLIPENDIAN_INT64(x))
 #endif /* LSB_FIRST */
 
 
-#endif	/* __OSDCOMM_H__ */
+#endif  /* __OSDCOMM_H__ */

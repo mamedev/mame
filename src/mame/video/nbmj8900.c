@@ -110,23 +110,23 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_blitter_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 0x02:	m_blitter_destx = data; break;
-		case 0x03:	m_blitter_desty = data; break;
-		case 0x04:	m_blitter_sizex = data; break;
-		case 0x05:	m_blitter_sizey = data;
+		case 0x00:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x02:  m_blitter_destx = data; break;
+		case 0x03:  m_blitter_desty = data; break;
+		case 0x04:  m_blitter_sizex = data; break;
+		case 0x05:  m_blitter_sizey = data;
 					/* writing here also starts the blit */
 					nbmj8900_gfxdraw(machine());
 					break;
-		case 0x06:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+		case 0x06:  m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 					m_flipscreen = (data & 0x04) ? 1 : 0;
 					m_dispflag = (data & 0x08) ? 0 : 1;
 					if (m_gfxdraw_mode) nbmj8900_vramflip(machine(), 1);
 					nbmj8900_vramflip(machine(), 0);
 					break;
-		case 0x07:	break;
+		case 0x07:  break;
 	}
 }
 

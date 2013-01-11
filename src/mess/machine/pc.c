@@ -43,7 +43,7 @@
 
 #include "coreutil.h"
 
-#define VERBOSE_PIO 0	/* PIO (keyboard controller) */
+#define VERBOSE_PIO 0   /* PIO (keyboard controller) */
 
 #define PIO_LOG(N,M,A) \
 	do { \
@@ -310,11 +310,11 @@ const struct pic8259_interface ibm5150_pic8259_config =
  *
  *************************************************************/
 
-static emu_timer	*pc_int_delay_timer;
+static emu_timer    *pc_int_delay_timer;
 
 TIMER_CALLBACK_MEMBER(pc_state::pcjr_delayed_pic8259_irq)
 {
-    machine().firstcpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
+	machine().firstcpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(pc_state::pcjr_pic8259_set_int_line)
@@ -395,15 +395,15 @@ const struct pit8253_config ibm5150_pit8253_config =
 {
 	{
 		{
-			XTAL_14_31818MHz/12,				/* heartbeat IRQ */
+			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
 		}, {
-			XTAL_14_31818MHz/12,				/* dram refresh */
+			XTAL_14_31818MHz/12,                /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out1_changed)
 		}, {
-			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
+			XTAL_14_31818MHz/12,                /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out2_changed)
 		}
@@ -548,7 +548,7 @@ const rs232_port_interface ibm5150_serport_config[4] =
  *
  **********************************************************/
 
-static UINT8	nmi_enabled;
+static UINT8    nmi_enabled;
 
 WRITE8_MEMBER(pc_state::pc_nmi_enable_w)
 {
@@ -596,11 +596,11 @@ WRITE8_MEMBER(pc_state::pc_nmi_enable_w)
  *************************************************************/
 
 static struct {
-	UINT8		transferring;
-	UINT8		latch;
-	UINT32		raw_keyb_data;
-	int			signal_count;
-	emu_timer	*keyb_signal_timer;
+	UINT8       transferring;
+	UINT8       latch;
+	UINT32      raw_keyb_data;
+	int         signal_count;
+	emu_timer   *keyb_signal_timer;
 } pcjr_keyb;
 
 
@@ -629,9 +629,9 @@ static void pcjr_set_keyb_int(running_machine &machine, int state)
 {
 	if ( state )
 	{
-		UINT8	data = pc_keyb_read();
-		UINT8	parity = 0;
-		int		i;
+		UINT8   data = pc_keyb_read();
+		UINT8   parity = 0;
+		int     i;
 
 		/* Calculate the raw data */
 		for( i = 0; i < 8; i++ )
@@ -773,22 +773,22 @@ READ8_MEMBER(pc_state::ibm5160_ppi_porta_r)
 	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
-         *   1  Not used
-         * 2-3  The number of memory banks on the system board
-         * 4-5  Display mode
-         *      11 = monochrome
-         *      10 - color 80x25
-         *      01 - color 40x25
-         * 6-7  The number of floppy disk drives
-         */
+		 *   1  Not used
+		 * 2-3  The number of memory banks on the system board
+		 * 4-5  Display mode
+		 *      11 = monochrome
+		 *      10 - color 80x25
+		 *      01 - color 40x25
+		 * 6-7  The number of floppy disk drives
+		 */
 		data = machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
 		data = m_ppi_shift_register;
 	}
-    PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
-    return data;
+	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
+	return data;
 }
 
 
@@ -866,14 +866,14 @@ READ8_MEMBER(pc_state::pc_ppi_porta_r)
 	if (m_ppi_keyboard_clear)
 	{
 		/*   0  0 - no floppy drives
-         *   1  Not used
-         * 2-3  The number of memory banks on the system board
-         * 4-5  Display mode
-         *      11 = monochrome
-         *      10 - color 80x25
-         *      01 - color 40x25
-         * 6-7  The number of floppy disk drives
-         */
+		 *   1  Not used
+		 * 2-3  The number of memory banks on the system board
+		 * 4-5  Display mode
+		 *      11 = monochrome
+		 *      10 - color 80x25
+		 *      01 - color 40x25
+		 * 6-7  The number of floppy disk drives
+		 */
 		data = machine().root_device().ioport("DSW0")->read();
 	}
 	else
@@ -913,10 +913,10 @@ I8255_INTERFACE( pc_ppi8255_interface )
 
 
 static struct {
-	UINT8		pulsing;
-	UINT8		latch;		/* keyboard scan code */
-	UINT16		mask;		/* input lines */
-	emu_timer	*keyb_signal_timer;
+	UINT8       pulsing;
+	UINT8       latch;      /* keyboard scan code */
+	UINT16      mask;       /* input lines */
+	emu_timer   *keyb_signal_timer;
 } mc1502_keyb;
 
 
@@ -942,10 +942,10 @@ TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
 //      (key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
 
 	/*
-       If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
-       keep pulsing while any key is pressed, and pulse one time after all keys
-       are released.
-     */
+	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
+	   keep pulsing while any key is pressed, and pulse one time after all keys
+	   are released.
+	 */
 	if (key) {
 		if (mc1502_keyb.pulsing < 2) {
 			mc1502_keyb.pulsing += 2;
@@ -1082,8 +1082,8 @@ READ8_MEMBER(pc_state::pcjr_ppi_portc_r)
 	int data=0xff;
 
 	data&=~0x80;
-	data &= ~0x04;		/* floppy drive installed */
-	if ( machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )	/* more than 64KB ram installed */
+	data &= ~0x04;      /* floppy drive installed */
+	if ( machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )    /* more than 64KB ram installed */
 		data &= ~0x08;
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( m_ppi_portb & 0x08 ) )
@@ -1380,14 +1380,14 @@ DRIVER_INIT_MEMBER(pc_state,europc)
 	UINT8 *rom = &machine().root_device().memregion("maincpu")->base()[0];
 	int i;
 
-    /* just a plain bit pattern for graphics data generation */
-    for (i = 0; i < 256; i++)
+	/* just a plain bit pattern for graphics data generation */
+	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
 	/*
-      fix century rom bios bug !
-      if year <79 month (and not CENTURY) is loaded with 0x20
-    */
+	  fix century rom bios bug !
+	  if year <79 month (and not CENTURY) is loaded with 0x20
+	*/
 	if (rom[0xff93e]==0xb6){ // mov dh,
 		UINT8 a;
 		rom[0xff93e]=0xb5; // mov ch,
@@ -1412,8 +1412,8 @@ DRIVER_INIT_MEMBER(pc_state,pc200)
 	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
-    /* just a plain bit pattern for graphics data generation */
-    for (i = 0; i < 256; i++)
+	/* just a plain bit pattern for graphics data generation */
+	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
@@ -1424,8 +1424,8 @@ DRIVER_INIT_MEMBER(pc_state,ppc512)
 	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
-    /* just a plain bit pattern for graphics data generation */
-    for (i = 0; i < 256; i++)
+	/* just a plain bit pattern for graphics data generation */
+	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
@@ -1435,8 +1435,8 @@ DRIVER_INIT_MEMBER(pc_state,pc1512)
 	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
-    /* just a plain bit pattern for graphics data generation */
-    for (i = 0; i < 256; i++)
+	/* just a plain bit pattern for graphics data generation */
+	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
@@ -1517,11 +1517,11 @@ MACHINE_START_MEMBER(pc_state,mc1502)
 	m_pit8253 = machine().device("pit8253");
 
 	/*
-           Keyboard polling circuit holds IRQ1 high until a key is
-           pressed, then it starts a timer that pulses IRQ1 low each
-           40ms (check) for 20ms (check) until all keys are released.
-           Last pulse causes BIOS to write a 'break' scancode into port 60h.
-     */
+	       Keyboard polling circuit holds IRQ1 high until a key is
+	       pressed, then it starts a timer that pulses IRQ1 low each
+	       40ms (check) for 20ms (check) until all keys are released.
+	       Last pulse causes BIOS to write a 'break' scancode into port 60h.
+	 */
 	pic8259_ir1_w(m_pic8259, 1);
 	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
 	mc1502_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::mc1502_keyb_signal_callback),this));
@@ -1556,7 +1556,7 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_pc_spkrdata = 0;
 	m_pc_input = 1;
 	m_dma_channel = -1;
-	memset(m_memboard,0xc,sizeof(m_memboard));	// check
+	memset(m_memboard,0xc,sizeof(m_memboard));  // check
 	memset(m_dma_offset,0,sizeof(m_dma_offset));
 	m_ppi_portc_switch_high = 0;
 	m_ppi_speaker = 0;
@@ -1581,8 +1581,8 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge )
 {
-	UINT32	address;
-	UINT32	size;
+	UINT32  address;
+	UINT32  size;
 
 	address = ( ! strcmp( ":cart2", image.device().tag() ) ) ? 0xd0000 : 0xe0000;
 
@@ -1596,7 +1596,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 	}
 	else
 	{
-		UINT8	header[0x200];
+		UINT8   header[0x200];
 
 		unsigned image_size = image.length();
 
@@ -1789,11 +1789,11 @@ WRITE8_MEMBER(pc_state::pc_rtc_w)
 // I even don't know what it is!
 static struct {
 	/*
-      reg 0 ram behaviour if in
-      reg 3 write 1 to enable it
-      reg 4 ram behaviour ???
-      reg 5,6 (5 hi, 6 lowbyte) ???
-    */
+	  reg 0 ram behaviour if in
+	  reg 3 write 1 to enable it
+	  reg 4 ram behaviour ???
+	  reg 5,6 (5 hi, 6 lowbyte) ???
+	*/
 	/* selftest in ibmpc, ibmxt */
 	UINT8 reg[8];
 } pc_expansion={ { 0,0,0,0,0,0,1 } };
@@ -1812,7 +1812,7 @@ WRITE8_MEMBER(pc_state::pc_EXP_w)
 
 READ8_MEMBER(pc_state::pc_EXP_r)
 {
-    int data;
+	int data;
 	UINT16 a;
 	switch (offset) {
 	case 6:
@@ -1825,9 +1825,6 @@ READ8_MEMBER(pc_state::pc_EXP_r)
 	default:
 		data = pc_expansion.reg[offset];
 	}
-    //DBG_LOG(1,"EXP_unit_r",("%.2x $%02x\n", offset, data));
+	//DBG_LOG(1,"EXP_unit_r",("%.2x $%02x\n", offset, data));
 	return data;
 }
-
-
-

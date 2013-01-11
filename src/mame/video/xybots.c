@@ -47,39 +47,39 @@ VIDEO_START_MEMBER(xybots_state,xybots)
 {
 	static const atarimo_desc modesc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		0,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		0,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		0,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		0,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x100,				/* base palette entry */
-		0x300,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x100,              /* base palette entry */
+		0x300,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0x3f }},			/* mask for the link (dummy) */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0x3fff,0,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0,0,0x000f }},	/* mask for the color */
-		{{ 0,0,0,0xff80 }},	/* mask for the X position */
-		{{ 0,0,0xff80,0 }},	/* mask for the Y position */
-		{{ 0 }},			/* mask for the width, in tiles*/
-		{{ 0,0,0x0007,0 }},	/* mask for the height, in tiles */
-		{{ 0x8000,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0,0x000f,0,0 }},	/* mask for the priority */
-		{{ 0 }},			/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0x3f }},         /* mask for the link (dummy) */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0x3fff,0,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0,0,0x000f }}, /* mask for the color */
+		{{ 0,0,0,0xff80 }}, /* mask for the X position */
+		{{ 0,0,0xff80,0 }}, /* mask for the Y position */
+		{{ 0 }},            /* mask for the width, in tiles*/
+		{{ 0,0,0x0007,0 }}, /* mask for the height, in tiles */
+		{{ 0x8000,0,0,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0,0x000f,0,0 }}, /* mask for the priority */
+		{{ 0 }},            /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		NULL				/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		NULL                /* callback routine for special entries */
 	};
 
 	/* initialize the playfield */
@@ -122,18 +122,18 @@ UINT32 xybots_state::screen_update_xybots(screen_device &screen, bitmap_ind16 &b
 				{
 					/* verified via schematics:
 
-                        PRIEN = ~(~MOPIX3 & ~MOPIX2 & ~MOPIX1) = (MOPIX3-0 > 1)
+					    PRIEN = ~(~MOPIX3 & ~MOPIX2 & ~MOPIX1) = (MOPIX3-0 > 1)
 
-                        if (PRIEN)
-                            PF/MO = (~MOPRI3-0 > PFCOL3-0)
-                        else
-                            PF/MO = (~MOPRI3-0 >= PFCOL3-0)
+					    if (PRIEN)
+					        PF/MO = (~MOPRI3-0 > PFCOL3-0)
+					    else
+					        PF/MO = (~MOPRI3-0 >= PFCOL3-0)
 
-                        if (PF/MO | ~(PRIEN & MOCOL3))
-                            GPC(P3-0) = PFPIX3-0
-                        else
-                            GPC(P3-0) = ~MOCOL3-0
-                    */
+					    if (PF/MO | ~(PRIEN & MOCOL3))
+					        GPC(P3-0) = PFPIX3-0
+					    else
+					        GPC(P3-0) = ~MOCOL3-0
+					*/
 					int mopriority = (mo[x] >> ATARIMO_PRIORITY_SHIFT) ^ 15;
 					int pfcolor = (pf[x] >> 4) & 0x0f;
 					int prien = ((mo[x] & 0x0f) > 1);

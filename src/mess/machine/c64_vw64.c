@@ -47,7 +47,7 @@
 
 
 // 74LS122 tW=0.45*R*C = 1.1844s
-#define TIMER_PERIOD	1184
+#define TIMER_PERIOD    1184
 
 
 

@@ -37,39 +37,39 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
 {
 	static const atarimo_desc modesc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		0,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		0,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x000,				/* base palette entry */
-		0x100,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x000,              /* base palette entry */
+		0x100,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0,0,0x0ff8,0 }},	/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0,0x3fff,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0,0,0x000f }},	/* mask for the color */
-		{{ 0,0,0,0xffc0 }},	/* mask for the X position */
-		{{ 0xff80,0,0,0 }},	/* mask for the Y position */
-		{{ 0 }},			/* mask for the width, in tiles*/
-		{{ 0x000f,0,0,0 }},	/* mask for the height, in tiles */
-		{{ 0,0x8000,0,0 }},	/* mask for the horizontal flip */
-		{{ 0,0x4000,0,0 }},	/* mask for the vertical flip */
-		{{ 0 }},			/* mask for the priority */
-		{{ 0 }},			/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0,0,0x0ff8,0 }}, /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0,0x3fff,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0,0,0x000f }}, /* mask for the color */
+		{{ 0,0,0,0xffc0 }}, /* mask for the X position */
+		{{ 0xff80,0,0,0 }}, /* mask for the Y position */
+		{{ 0 }},            /* mask for the width, in tiles*/
+		{{ 0x000f,0,0,0 }}, /* mask for the height, in tiles */
+		{{ 0,0x8000,0,0 }}, /* mask for the horizontal flip */
+		{{ 0,0x4000,0,0 }}, /* mask for the vertical flip */
+		{{ 0 }},            /* mask for the priority */
+		{{ 0 }},            /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		0					/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		0                   /* callback routine for special entries */
 	};
 
 	/* initialize the playfield */
@@ -161,8 +161,8 @@ UINT32 blstroid_state::screen_update_blstroid(screen_device &screen, bitmap_ind1
 				{
 					/* verified via schematics
 
-                        priority address = HPPPMMMM
-                    */
+					    priority address = HPPPMMMM
+					*/
 					int priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
 					if (m_priorityram[priaddr] & 1)
 						pf[x] = mo[x];

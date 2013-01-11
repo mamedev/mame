@@ -61,4 +61,3 @@ device_slot_card_interface::device_slot_card_interface(const machine_config &mco
 device_slot_card_interface::~device_slot_card_interface()
 {
 }
-

@@ -13,7 +13,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 #ifdef USE_SH2DRC
 #define GET_SH2(dev) *(sh2_state **)downcast<legacy_cpu_device *>(dev)->token()
@@ -35,7 +35,7 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return sh2->program->read_dword(A & AM);
+	return sh2->program->read_dword(A & AM);
 }
 
 INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
@@ -225,7 +225,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
+					//schedule next DMA callback
 				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
@@ -273,12 +273,12 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
+					//schedule next DMA callback
 				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
 				// check: should this really be using read_word_32 / write_word_32?
-				dmadata	= sh2->program->read_word(tempsrc);
+				dmadata = sh2->program->read_word(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
 				sh2->program->write_word(tempdst, dmadata);
 
@@ -320,11 +320,11 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
+					//schedule next DMA callback
 				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
-				dmadata	= sh2->program->read_dword(tempsrc);
+				dmadata = sh2->program->read_dword(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
 				sh2->program->write_dword(tempdst, dmadata);
 
@@ -365,7 +365,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
+					//schedule next DMA callback
 				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
@@ -914,9 +914,9 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 //  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, sh2->evec, sh2->irqsr, sh2->sr);
 	#else
 	sh2->r[15] -= 4;
-	WL( sh2, sh2->r[15], sh2->sr );		/* push SR onto stack */
+	WL( sh2, sh2->r[15], sh2->sr );     /* push SR onto stack */
 	sh2->r[15] -= 4;
-	WL( sh2, sh2->r[15], sh2->pc );		/* push PC onto stack */
+	WL( sh2, sh2->r[15], sh2->pc );     /* push PC onto stack */
 
 	/* set I flags in SR */
 	if (irqline > SH2_INT_15)
@@ -1008,4 +1008,3 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_ackno
 	device->save_item(NAME(sh2->internal_irq_vector));
 	device->save_item(NAME(sh2->dma_timer_active));
 }
-

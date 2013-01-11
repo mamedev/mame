@@ -34,7 +34,7 @@ struct serial_data_stream
 
 struct serial_image_interface
 {
-    int m_baud_rate;
+	int m_baud_rate;
 	int m_data_bits;
 	int m_stop_bits;
 	int m_parity;
@@ -44,7 +44,7 @@ struct serial_image_interface
 
 // ======================> serial_image_device
 
-class serial_image_device :	public device_t,
+class serial_image_device : public device_t,
 							public serial_image_interface,
 							public device_serial_interface,
 							public device_image_interface
@@ -80,10 +80,10 @@ public:
 	int data_stream_get_data_bit_from_data_byte(serial_data_stream *stream);
 	void data_stream_reset(serial_data_stream *stream);
 	void data_stream_free(serial_data_stream *stream);
-	void data_stream_init(serial_data_stream *stream, unsigned char *pData, unsigned long DataLength)	;
+	void data_stream_init(serial_data_stream *stream, unsigned char *pData, unsigned long DataLength)   ;
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
@@ -95,7 +95,7 @@ private:
 	int m_transmit_state;
 
 	/* baud rate timer */
-	emu_timer	*m_timer;
+	emu_timer   *m_timer;
 };
 
 
@@ -105,6 +105,6 @@ extern const device_type SERIAL;
 
 #define MCFG_SERIAL_ADD(_tag,_config) \
 	MCFG_DEVICE_ADD(_tag, SERIAL, 0) \
-	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_CONFIG(_config) \
 
 #endif /* __SERIAL_H__ */

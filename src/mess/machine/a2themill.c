@@ -69,19 +69,19 @@ machine_config_constructor a2bus_themill_device::device_mconfig_additions() cons
 //**************************************************************************
 
 a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, type, name, tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this),
-    m_6809(*this, M6809_TAG),
-    m_6502space(NULL)
+	device_t(mconfig, type, name, tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_6809(*this, M6809_TAG),
+	m_6502space(NULL)
 {
 	m_shortname = "a2themill";
 }
 
 a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, A2BUS_THEMILL, "Stellation Two The Mill", tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this),
-    m_6809(*this, M6809_TAG),
-    m_6502space(NULL)
+	device_t(mconfig, A2BUS_THEMILL, "Stellation Two The Mill", tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_6809(*this, M6809_TAG),
+	m_6502space(NULL)
 {
 	m_shortname = "a2themill";
 }
@@ -103,189 +103,189 @@ void a2bus_themill_device::device_start()
 
 void a2bus_themill_device::device_reset()
 {
-    m_bEnabled = false;
-    m_6502space = NULL;
-    m_flipAddrSpace = false;
-    m_6809Mode = false;
-    m_status = 0xc0;    // OS9 loader relies on this
-    m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-    m_6809->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_bEnabled = false;
+	m_6502space = NULL;
+	m_flipAddrSpace = false;
+	m_6809Mode = false;
+	m_status = 0xc0;    // OS9 loader relies on this
+	m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_6809->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 UINT8 a2bus_themill_device::read_c0nx(address_space &space, UINT8 offset)
 {
-    return m_status;
+	return m_status;
 }
 
 void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-    switch (offset)
-    {
-        case 0: // 6502 IRQ
-            if (data & 0x80)
-            {
-                m_status |= 0x01;
-                lower_slot_irq();
-            }
-            else
-            {
-                m_status &= ~0x01;
-                raise_slot_irq();
-            }
-            break;
+	switch (offset)
+	{
+		case 0: // 6502 IRQ
+			if (data & 0x80)
+			{
+				m_status |= 0x01;
+				lower_slot_irq();
+			}
+			else
+			{
+				m_status &= ~0x01;
+				raise_slot_irq();
+			}
+			break;
 
-        case 2: // 6809 reset
-            if (data & 0x80)
-            {
-                // steal the 6502's address space
-                m_6502space = &space;
-                m_6809->reset();
+		case 2: // 6809 reset
+			if (data & 0x80)
+			{
+				// steal the 6502's address space
+				m_6502space = &space;
+				m_6809->reset();
 
-                m_6809->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-                m_6809->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				m_6809->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+				m_6809->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
-                m_bEnabled = true;
-                m_status &= ~0x04;
-            }
-            else
-            {
-                m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-                m_bEnabled = false;
-                m_status |= 0x04;
-            }
-            break;
+				m_bEnabled = true;
+				m_status &= ~0x04;
+			}
+			else
+			{
+				m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+				m_bEnabled = false;
+				m_status |= 0x04;
+			}
+			break;
 
-        case 1: // 6809 halt
-            if (data & 0x80)    // release reset
-            {
-                m_status |= 0x02;
-            }
-            else
-            {
-                m_6809->reset();
-                m_status &= ~0x02;
-            }
-            break;
+		case 1: // 6809 halt
+			if (data & 0x80)    // release reset
+			{
+				m_status |= 0x02;
+			}
+			else
+			{
+				m_6809->reset();
+				m_status &= ~0x02;
+			}
+			break;
 
-        case 3: // 6809 NMI
-            if (data & 0x80)
-            {
-                m_6809->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-                m_status |= 0x08;
-            }
-            else
-            {
-                m_6809->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-                m_status &= ~0x08;
-            }
-            break;
+		case 3: // 6809 NMI
+			if (data & 0x80)
+			{
+				m_6809->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+				m_status |= 0x08;
+			}
+			else
+			{
+				m_6809->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+				m_status &= ~0x08;
+			}
+			break;
 
-        case 4: // 6809 FIRQ
-            if (data & 0x80)
-            {
-                m_6809->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-                m_status |= 0x10;
-            }
-            else
-            {
-                m_6809->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-                m_status &= ~0x10;
-            }
-            break;
+		case 4: // 6809 FIRQ
+			if (data & 0x80)
+			{
+				m_6809->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+				m_status |= 0x10;
+			}
+			else
+			{
+				m_6809->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+				m_status &= ~0x10;
+			}
+			break;
 
-        case 5: // 6809 IRQ
-            if (data & 0x80)
-            {
-                m_6809->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-                m_status |= 0x20;
-            }
-            else
-            {
-                m_6809->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-                m_status &= ~0x20;
-            }
-            break;
+		case 5: // 6809 IRQ
+			if (data & 0x80)
+			{
+				m_6809->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+				m_status |= 0x20;
+			}
+			else
+			{
+				m_6809->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+				m_status &= ~0x20;
+			}
+			break;
 
-        case 6:
-            if (data & 0x80)    // enable ROM socket
-            {
-                m_status |= 0x40;
-                printf("The Mill: on-board ROM socket enabled; because none of these ROMs are dumped, the 6809 will not run!\n");
-            }
-            else
-            {
-                m_status &= ~0x40;
-            }
-            break;
+		case 6:
+			if (data & 0x80)    // enable ROM socket
+			{
+				m_status |= 0x40;
+				printf("The Mill: on-board ROM socket enabled; because none of these ROMs are dumped, the 6809 will not run!\n");
+			}
+			else
+			{
+				m_status &= ~0x40;
+			}
+			break;
 
-        case 7: // 6809 mapping
-            if (data & 0x80)
-            {
-                m_status |= 0x80;
-                m_flipAddrSpace = false;
-            }
-            else
-            {
-                m_status &= ~0x80;
-                m_flipAddrSpace = true;
-            }
-            break;
+		case 7: // 6809 mapping
+			if (data & 0x80)
+			{
+				m_status |= 0x80;
+				m_flipAddrSpace = false;
+			}
+			else
+			{
+				m_status &= ~0x80;
+				m_flipAddrSpace = true;
+			}
+			break;
 
-        case 0xa:   // addresses >= 0x8 are direct status writes?  "Excel Flex 9" disc seems to indicate so.
-            m_status = data;
-            break;
+		case 0xa:   // addresses >= 0x8 are direct status writes?  "Excel Flex 9" disc seems to indicate so.
+			m_status = data;
+			break;
 
-        default:
-            printf("The Mill: %02x to unhandled c0n%x\n", data, offset);
-            break;
-    }
+		default:
+			printf("The Mill: %02x to unhandled c0n%x\n", data, offset);
+			break;
+	}
 }
 
 READ8_MEMBER( a2bus_themill_device::dma_r )
 {
-    if (m_6502space)
-    {
-        if (m_6809Mode)
-        {
-            if (offset <= 0xafff)
-            {
-                return m_6502space->read_byte(offset+0x1000);
-            }
-            else if (offset <= 0xbfff)
-            {
-                return m_6502space->read_byte((offset&0xfff) + 0xd000);
-            }
-            else if (offset <= 0xcfff)
-            {
-                return m_6502space->read_byte((offset&0xfff) + 0xe000);
-            }
-            else if (offset <= 0xdfff)
-            {
-                return m_6502space->read_byte((offset&0xfff) + 0xf000);
-            }
-            else if (offset <= 0xefff)
-            {
-                return m_6502space->read_byte((offset&0xfff) + 0xc000);
-            }
-            else    // 6809 Fxxx -> 6502 ZP
-            {
-                return m_6502space->read_byte(offset&0xfff);
-            }
-        }
-        else
-        {
-            if (m_flipAddrSpace)
-            {
-                return m_6502space->read_byte(offset^0x8000);
-            }
-            else
-            {
-                return m_6502space->read_byte(offset);
-            }
-        }
-    }
+	if (m_6502space)
+	{
+		if (m_6809Mode)
+		{
+			if (offset <= 0xafff)
+			{
+				return m_6502space->read_byte(offset+0x1000);
+			}
+			else if (offset <= 0xbfff)
+			{
+				return m_6502space->read_byte((offset&0xfff) + 0xd000);
+			}
+			else if (offset <= 0xcfff)
+			{
+				return m_6502space->read_byte((offset&0xfff) + 0xe000);
+			}
+			else if (offset <= 0xdfff)
+			{
+				return m_6502space->read_byte((offset&0xfff) + 0xf000);
+			}
+			else if (offset <= 0xefff)
+			{
+				return m_6502space->read_byte((offset&0xfff) + 0xc000);
+			}
+			else    // 6809 Fxxx -> 6502 ZP
+			{
+				return m_6502space->read_byte(offset&0xfff);
+			}
+		}
+		else
+		{
+			if (m_flipAddrSpace)
+			{
+				return m_6502space->read_byte(offset^0x8000);
+			}
+			else
+			{
+				return m_6502space->read_byte(offset);
+			}
+		}
+	}
 
-    return 0xff;
+	return 0xff;
 }
 
 
@@ -295,51 +295,50 @@ READ8_MEMBER( a2bus_themill_device::dma_r )
 
 WRITE8_MEMBER( a2bus_themill_device::dma_w )
 {
-    if (m_6502space)
-    {
-        if (m_6809Mode)
-        {
-            if (offset <= 0xafff)
-            {
-                m_6502space->write_byte(offset+0x1000, data);
-            }
-            else if (offset <= 0xbfff)
-            {
-                m_6502space->write_byte((offset&0xfff) + 0xd000, data);
-            }
-            else if (offset <= 0xcfff)
-            {
-                m_6502space->write_byte((offset&0xfff) + 0xe000, data);
-            }
-            else if (offset <= 0xdfff)
-            {
-                m_6502space->write_byte((offset&0xfff) + 0xf000, data);
-            }
-            else if (offset <= 0xefff)
-            {
-                m_6502space->write_byte((offset&0xfff) + 0xc000, data);
-            }
-            else    // 6809 Fxxx -> 6502 ZP
-            {
-                m_6502space->write_byte(offset&0xfff, data);
-            }
-        }
-        else
-        {
-            if (m_flipAddrSpace)
-            {
-                m_6502space->write_byte(offset^0x8000, data);
-            }
-            else
-            {
-                m_6502space->write_byte(offset, data);
-            }
-        }
-    }
+	if (m_6502space)
+	{
+		if (m_6809Mode)
+		{
+			if (offset <= 0xafff)
+			{
+				m_6502space->write_byte(offset+0x1000, data);
+			}
+			else if (offset <= 0xbfff)
+			{
+				m_6502space->write_byte((offset&0xfff) + 0xd000, data);
+			}
+			else if (offset <= 0xcfff)
+			{
+				m_6502space->write_byte((offset&0xfff) + 0xe000, data);
+			}
+			else if (offset <= 0xdfff)
+			{
+				m_6502space->write_byte((offset&0xfff) + 0xf000, data);
+			}
+			else if (offset <= 0xefff)
+			{
+				m_6502space->write_byte((offset&0xfff) + 0xc000, data);
+			}
+			else    // 6809 Fxxx -> 6502 ZP
+			{
+				m_6502space->write_byte(offset&0xfff, data);
+			}
+		}
+		else
+		{
+			if (m_flipAddrSpace)
+			{
+				m_6502space->write_byte(offset^0x8000, data);
+			}
+			else
+			{
+				m_6502space->write_byte(offset, data);
+			}
+		}
+	}
 }
 
 bool a2bus_themill_device::take_c800()
 {
-    return false;
+	return false;
 }
-

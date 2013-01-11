@@ -191,7 +191,7 @@ static INPUT_PORTS_START( z80ne )
 /*
  * In natural mode the CTRL key is mapped on shift
  */
-PORT_START("ROW0")			/* IN0 keys row 0 */
+PORT_START("ROW0")          /* IN0 keys row 0 */
 PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 0") PORT_CODE(KEYCODE_0)          //PORT_CHAR('0') PORT_CHAR('=')
 PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 1") PORT_CODE(KEYCODE_1)          //PORT_CHAR('1') PORT_CHAR('!')
 PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 2") PORT_CODE(KEYCODE_2)          //PORT_CHAR('2') PORT_CHAR('"')
@@ -201,7 +201,7 @@ PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 5") PORT_CODE(KE
 PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 6") PORT_CODE(KEYCODE_6)          //PORT_CHAR('6') PORT_CHAR('&')
 PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 7") PORT_CODE(KEYCODE_7)          //PORT_CHAR('7') PORT_CHAR('/')
 
-PORT_START("ROW1")			/* IN1 keys row 1 */
+PORT_START("ROW1")          /* IN1 keys row 1 */
 PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 8") PORT_CODE(KEYCODE_8)          //PORT_CHAR('8') PORT_CHAR('(')
 PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 9") PORT_CODE(KEYCODE_9)          //PORT_CHAR('9') PORT_CHAR(')')
 PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 A") PORT_CODE(KEYCODE_A)          //PORT_CHAR('a') PORT_CHAR('A')
@@ -211,7 +211,7 @@ PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 D") PORT_CODE(KE
 PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 E") PORT_CODE(KEYCODE_E)          //PORT_CHAR('e') PORT_CHAR('E')
 PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 F") PORT_CODE(KEYCODE_F)          //PORT_CHAR('f') PORT_CHAR('F')
 
-PORT_START("CTRL")			/* CONTROL key */
+PORT_START("CTRL")          /* CONTROL key */
 PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -221,12 +221,12 @@ PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-PORT_START("RST")			/* RESET key */
+PORT_START("RST")           /* RESET key */
 PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_reset, NULL)
 
 /* Settings */
 PORT_START("LX.385")
-PORT_CONFNAME(0x07, 0x01	, "LX.385 Cassette: P1,P3 Data Rate")
+PORT_CONFNAME(0x07, 0x01    , "LX.385 Cassette: P1,P3 Data Rate")
 PORT_CONFSETTING( 0x01, "A-B: 300 bps")
 PORT_CONFSETTING( 0x02, "A-C: 600 bps")
 PORT_CONFSETTING( 0x04, "A-D: 1200 bps")
@@ -385,24 +385,24 @@ INPUT_PORTS_END
 
 static const UINT32 lx388palette[] =
 {
-	MAKE_RGB(0x00, 0xff, 0x00),	/* GREEN */
-	MAKE_RGB(0x00, 0xff, 0x00),	/* YELLOW in original, here GREEN */
-	MAKE_RGB(0x00, 0x00, 0xff),	/* BLUE */
-	MAKE_RGB(0xff, 0x00, 0x00),	/* RED */
-	MAKE_RGB(0xff, 0xff, 0xff),	/* BUFF */
-	MAKE_RGB(0x00, 0xff, 0xff),	/* CYAN */
-	MAKE_RGB(0xff, 0x00, 0xff),	/* MAGENTA */
-	MAKE_RGB(0xff, 0x80, 0x00),	/* ORANGE */
+	MAKE_RGB(0x00, 0xff, 0x00), /* GREEN */
+	MAKE_RGB(0x00, 0xff, 0x00), /* YELLOW in original, here GREEN */
+	MAKE_RGB(0x00, 0x00, 0xff), /* BLUE */
+	MAKE_RGB(0xff, 0x00, 0x00), /* RED */
+	MAKE_RGB(0xff, 0xff, 0xff), /* BUFF */
+	MAKE_RGB(0x00, 0xff, 0xff), /* CYAN */
+	MAKE_RGB(0xff, 0x00, 0xff), /* MAGENTA */
+	MAKE_RGB(0xff, 0x80, 0x00), /* ORANGE */
 
-	MAKE_RGB(0x00, 0x20, 0x00),	/* BLACK in original, here DARK green */
-	MAKE_RGB(0x00, 0xff, 0x00),	/* GREEN */
-	MAKE_RGB(0x00, 0x00, 0x00),	/* BLACK */
-	MAKE_RGB(0xff, 0xff, 0xff),	/* BUFF */
+	MAKE_RGB(0x00, 0x20, 0x00), /* BLACK in original, here DARK green */
+	MAKE_RGB(0x00, 0xff, 0x00), /* GREEN */
+	MAKE_RGB(0x00, 0x00, 0x00), /* BLACK */
+	MAKE_RGB(0xff, 0xff, 0xff), /* BUFF */
 
-	MAKE_RGB(0x00, 0x20, 0x00),	/* ALPHANUMERIC DARK GREEN */
-	MAKE_RGB(0x00, 0xff, 0x00),	/* ALPHANUMERIC BRIGHT GREEN */
-	MAKE_RGB(0x40, 0x10, 0x00),	/* ALPHANUMERIC DARK ORANGE */
-	MAKE_RGB(0xff, 0xc4, 0x18)		/* ALPHANUMERIC BRIGHT ORANGE */
+	MAKE_RGB(0x00, 0x20, 0x00), /* ALPHANUMERIC DARK GREEN */
+	MAKE_RGB(0x00, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
+	MAKE_RGB(0x40, 0x10, 0x00), /* ALPHANUMERIC DARK ORANGE */
+	MAKE_RGB(0xff, 0xc4, 0x18)      /* ALPHANUMERIC BRIGHT ORANGE */
 };
 
 static const ay31015_config z80ne_ay31015_config =
@@ -459,14 +459,14 @@ static const mc6847_interface z80net_mc6847_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE_GND,				/* AG */
-	DEVCB_LINE_GND,				/* GM2 */
-	DEVCB_LINE_GND,				/* GM1 */
-	DEVCB_LINE_GND,				/* GM0 */
-	DEVCB_LINE_GND,				/* CSS */
-	DEVCB_NULL,					/* AS */
-	DEVCB_NULL,					/* INTEXT */
-	DEVCB_NULL,					/* INV */
+	DEVCB_LINE_GND,             /* AG */
+	DEVCB_LINE_GND,             /* GM2 */
+	DEVCB_LINE_GND,             /* GM1 */
+	DEVCB_LINE_GND,             /* GM0 */
+	DEVCB_LINE_GND,             /* CSS */
+	DEVCB_NULL,                 /* AS */
+	DEVCB_NULL,                 /* INTEXT */
+	DEVCB_NULL,                 /* INV */
 };
 
 static MACHINE_CONFIG_START( z80ne, z80ne_state )
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80net)
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80netb)
@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
 
 	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
@@ -625,7 +625,7 @@ ROM_START( z80netf )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY               FULLNAME                      FLAGS */
-COMP( 1980,	z80ne,    0,        0,      z80ne,    z80ne, z80ne_state,    z80ne,   "Nuova Elettronica",	"Z80NE",                      GAME_NO_SOUND)
-COMP( 1980,	z80net,   z80ne,    0,      z80net,   z80net, z80ne_state,   z80net,  "Nuova Elettronica",	"Z80NE + LX.388",             GAME_NO_SOUND)
-COMP( 1980,	z80netb,  z80ne,    0,      z80netb,  z80net, z80ne_state,   z80netb, "Nuova Elettronica",	"Z80NE + LX.388 + Basic 16k", GAME_NO_SOUND)
-COMP( 1980,	z80netf,  z80ne,    0,      z80netf,  z80netf, z80ne_state,  z80netf, "Nuova Elettronica",	"Z80NE + LX.388 + LX.390",    GAME_NO_SOUND)
+COMP( 1980, z80ne,    0,        0,      z80ne,    z80ne, z80ne_state,    z80ne,   "Nuova Elettronica",  "Z80NE",                      GAME_NO_SOUND)
+COMP( 1980, z80net,   z80ne,    0,      z80net,   z80net, z80ne_state,   z80net,  "Nuova Elettronica",  "Z80NE + LX.388",             GAME_NO_SOUND)
+COMP( 1980, z80netb,  z80ne,    0,      z80netb,  z80net, z80ne_state,   z80netb, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", GAME_NO_SOUND)
+COMP( 1980, z80netf,  z80ne,    0,      z80netf,  z80netf, z80ne_state,  z80netf, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    GAME_NO_SOUND)

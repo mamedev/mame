@@ -9,8 +9,8 @@
 
 struct mb14241_state
 {
-	UINT16 shift_data;	/* 15 bits only */
-	UINT8 shift_count;	/* 3 bits */
+	UINT16 shift_data;  /* 15 bits only */
+	UINT8 shift_count;  /* 3 bits */
 };
 
 /*****************************************************************************
@@ -102,5 +102,3 @@ void mb14241_device::device_reset()
 {
 	DEVICE_RESET_NAME( mb14241 )(this);
 }
-
-

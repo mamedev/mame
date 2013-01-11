@@ -11,8 +11,8 @@
 #include "includes/harddriv.h"
 
 
-#define BIO_FREQUENCY		(1000000 / 50)
-#define CYCLES_PER_BIO		(5000000 / BIO_FREQUENCY)
+#define BIO_FREQUENCY       (1000000 / 50)
+#define CYCLES_PER_BIO      (5000000 / BIO_FREQUENCY)
 
 
 /*************************************
@@ -165,33 +165,33 @@ WRITE16_MEMBER(harddriv_state::hdsnd68k_latches_w)
 	offset &= 7;
 	switch (offset)
 	{
-		case 0:	/* SPWR - 5220 write strobe */
+		case 0: /* SPWR - 5220 write strobe */
 			/* data == 0 means high, 1 means low */
 			logerror("%06X:SPWR=%d\n", space.device().safe_pcbase(), data);
 			break;
 
-		case 1:	/* SPRES - 5220 hard reset */
+		case 1: /* SPRES - 5220 hard reset */
 			/* data == 0 means low, 1 means high */
 			logerror("%06X:SPRES=%d\n", space.device().safe_pcbase(), data);
 			break;
 
-		case 2:	/* SPRATE */
+		case 2: /* SPRATE */
 			/* data == 0 means 8kHz, 1 means 10kHz */
 			logerror("%06X:SPRATE=%d\n", space.device().safe_pcbase(), data);
 			break;
 
-		case 3:	/* CRAMEN */
+		case 3: /* CRAMEN */
 			/* data == 0 means disable 68k access to COM320, 1 means enable */
 			m_cramen = data;
 			break;
 
-		case 4:	/* RES320 */
+		case 4: /* RES320 */
 			logerror("%06X:RES320=%d\n", space.device().safe_pcbase(), data);
 			if (m_sounddsp != NULL)
 				m_sounddsp->set_input_line(INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
-		case 7:	/* LED */
+		case 7: /* LED */
 			break;
 	}
 }

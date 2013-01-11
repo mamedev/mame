@@ -56,7 +56,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_THROTTLE				(0)
+#define LOG_THROTTLE                (0)
 
 
 
@@ -101,39 +101,39 @@ static void video_notifier_callback(const char *outname, INT32 value, void *para
 
 video_manager::video_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_screenless_frame_timer(NULL),
-	  m_output_changed(false),
-	  m_throttle_last_ticks(0),
-	  m_throttle_realtime(attotime::zero),
-	  m_throttle_emutime(attotime::zero),
-	  m_throttle_history(0),
-	  m_speed_last_realtime(0),
-	  m_speed_last_emutime(attotime::zero),
-	  m_speed_percent(1.0),
-	  m_overall_real_seconds(0),
-	  m_overall_real_ticks(0),
-	  m_overall_emutime(attotime::zero),
-	  m_overall_valid_counter(0),
-	  m_throttle(machine.options().throttle()),
-	  m_fastforward(false),
-	  m_seconds_to_run(machine.options().seconds_to_run()),
-	  m_auto_frameskip(machine.options().auto_frameskip()),
-	  m_speed(original_speed_setting()),
-	  m_empty_skip_count(0),
-	  m_frameskip_level(machine.options().frameskip()),
-	  m_frameskip_counter(0),
-	  m_frameskip_adjust(0),
-	  m_skipping_this_frame(false),
-	  m_average_oversleep(0),
-	  m_snap_target(NULL),
-	  m_snap_native(true),
-	  m_snap_width(0),
-	  m_snap_height(0),
-	  m_mngfile(NULL),
-	  m_avifile(NULL),
-	  m_movie_frame_period(attotime::zero),
-	  m_movie_next_frame_time(attotime::zero),
-	  m_movie_frame(0)
+		m_screenless_frame_timer(NULL),
+		m_output_changed(false),
+		m_throttle_last_ticks(0),
+		m_throttle_realtime(attotime::zero),
+		m_throttle_emutime(attotime::zero),
+		m_throttle_history(0),
+		m_speed_last_realtime(0),
+		m_speed_last_emutime(attotime::zero),
+		m_speed_percent(1.0),
+		m_overall_real_seconds(0),
+		m_overall_real_ticks(0),
+		m_overall_emutime(attotime::zero),
+		m_overall_valid_counter(0),
+		m_throttle(machine.options().throttle()),
+		m_fastforward(false),
+		m_seconds_to_run(machine.options().seconds_to_run()),
+		m_auto_frameskip(machine.options().auto_frameskip()),
+		m_speed(original_speed_setting()),
+		m_empty_skip_count(0),
+		m_frameskip_level(machine.options().frameskip()),
+		m_frameskip_counter(0),
+		m_frameskip_adjust(0),
+		m_skipping_this_frame(false),
+		m_average_oversleep(0),
+		m_snap_target(NULL),
+		m_snap_native(true),
+		m_snap_width(0),
+		m_snap_height(0),
+		m_mngfile(NULL),
+		m_avifile(NULL),
+		m_movie_frame_period(attotime::zero),
+		m_movie_next_frame_time(attotime::zero),
+		m_movie_frame(0)
 {
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_manager::exit), this));
@@ -229,8 +229,8 @@ void video_manager::frame_update(bool debug)
 		bool anything_changed = finish_screen_updates();
 
 		// if none of the screens changed and we haven't skipped too many frames in a row,
-        // mark this frame as skipped to prevent throttling; this helps for games that
-        // don't update their screen at the monitor refresh rate
+		// mark this frame as skipped to prevent throttling; this helps for games that
+		// don't update their screen at the monitor refresh rate
 		if (!anything_changed && !m_auto_frameskip && m_frameskip_level == 0 && m_empty_skip_count++ < 3)
 			skipped_it = true;
 		else
@@ -750,10 +750,10 @@ void video_manager::update_throttle(attotime emutime)
 		attoseconds_t attoseconds_per_tick = ATTOSECONDS_PER_SECOND / ticks_per_second;
 
 		// if we're paused, emutime will not advance; instead, we subtract a fixed
-	    // amount of time (1/60th of a second) from the emulated time that was passed in,
-	    // and explicitly reset our tracked real and emulated timers to that value ...
-	    // this means we pretend that the last update was exactly 1/60th of a second
-	    // ago, and was in sync in both real and emulated time
+		// amount of time (1/60th of a second) from the emulated time that was passed in,
+		// and explicitly reset our tracked real and emulated timers to that value ...
+		// this means we pretend that the last update was exactly 1/60th of a second
+		// ago, and was in sync in both real and emulated time
 		if (machine().paused())
 		{
 			m_throttle_emutime = emutime - attotime(0, ATTOSECONDS_PER_SECOND / PAUSED_REFRESH_RATE);
@@ -761,9 +761,9 @@ void video_manager::update_throttle(attotime emutime)
 		}
 
 		// attempt to detect anomalies in the emulated time by subtracting the previously
-	    // reported value from our current value; this should be a small value somewhere
-	    // between 0 and 1/10th of a second ... anything outside of this range is obviously
-	    // wrong and requires a resync
+		// reported value from our current value; this should be a small value somewhere
+		// between 0 and 1/10th of a second ... anything outside of this range is obviously
+		// wrong and requires a resync
 		attoseconds_t emu_delta_attoseconds = (emutime - m_throttle_emutime).as_attoseconds();
 		if (emu_delta_attoseconds < 0 || emu_delta_attoseconds > ATTOSECONDS_PER_SECOND / 10)
 		{
@@ -773,13 +773,13 @@ void video_manager::update_throttle(attotime emutime)
 		}
 
 		// now determine the current real time in OSD-specified ticks; we have to be careful
-	    // here because counters can wrap, so we only use the difference between the last
-	    // read value and the current value in our computations
+		// here because counters can wrap, so we only use the difference between the last
+		// read value and the current value in our computations
 		osd_ticks_t diff_ticks = osd_ticks() - m_throttle_last_ticks;
 		m_throttle_last_ticks += diff_ticks;
 
 		// if it has been more than a full second of real time since the last call to this
-	    // function, we just need to resynchronize
+		// function, we just need to resynchronize
 		if (diff_ticks >= ticks_per_second)
 		{
 			if (LOG_THROTTLE)
@@ -795,16 +795,16 @@ void video_manager::update_throttle(attotime emutime)
 		m_throttle_realtime += attotime(0, real_delta_attoseconds);
 
 		// keep a history of whether or not emulated time beat real time over the last few
-	    // updates; this can be used for future heuristics
+		// updates; this can be used for future heuristics
 		m_throttle_history = (m_throttle_history << 1) | (emu_delta_attoseconds > real_delta_attoseconds);
 
 		// determine how far ahead real time is versus emulated time; note that we use the
-	    // accumulated times for this instead of the deltas for the current update because
-	    // we want to track time over a longer duration than a single update
+		// accumulated times for this instead of the deltas for the current update because
+		// we want to track time over a longer duration than a single update
 		attoseconds_t real_is_ahead_attoseconds = (m_throttle_emutime - m_throttle_realtime).as_attoseconds();
 
 		// if we're more than 1/10th of a second out, or if we are behind at all and emulation
-	    // is taking longer than the real frame, we just need to resync
+		// is taking longer than the real frame, we just need to resync
 		if (real_is_ahead_attoseconds < -ATTOSECONDS_PER_SECOND / 10 ||
 			(real_is_ahead_attoseconds < 0 && popcount[m_throttle_history & 0xff] < 6))
 		{
@@ -841,12 +841,12 @@ void video_manager::update_throttle(attotime emutime)
 osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 {
 	// we're allowed to sleep via the OSD code only if we're configured to do so
-    // and we're not frameskipping due to autoframeskip, or if we're paused
+	// and we're not frameskipping due to autoframeskip, or if we're paused
 	bool allowed_to_sleep = false;
-    if (machine().options().sleep() && (!effective_autoframeskip() || effective_frameskip() == 0))
-    	allowed_to_sleep = true;
-    if (machine().paused())
-    	allowed_to_sleep = true;
+	if (machine().options().sleep() && (!effective_autoframeskip() || effective_frameskip() == 0))
+		allowed_to_sleep = true;
+	if (machine().paused())
+		allowed_to_sleep = true;
 
 	// loop until we reach our target
 	g_profiler.start(PROFILER_IDLE);
@@ -967,7 +967,7 @@ void video_manager::update_refresh_speed()
 
 			// compute a target speed as an integral percentage
 			// note that we lop 0.25Hz off of the minrefresh when doing the computation to allow for
-            // the fact that most refresh rates are not accurate to 10 digits...
+			// the fact that most refresh rates are not accurate to 10 digits...
 			UINT32 target_speed = floor((minrefresh - 0.25f) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
 			UINT32 original_speed = original_speed_setting();
 			target_speed = MIN(target_speed, original_speed);
@@ -1209,7 +1209,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 
 	// create the final file
 	file.set_openflags(origflags);
-    return file.open(fname);
+	return file.open(fname);
 }
 
 

@@ -15,26 +15,26 @@ public:
 	int         m_pc3259_output[4];
 	int         m_pc3259_mask;
 	UINT8       m_xld1;
-	UINT8		m_xld2;
-	UINT8		m_xld3;
+	UINT8       m_xld2;
+	UINT8       m_xld3;
 	UINT8       m_yld1;
-	UINT8		m_yld2;
-	UINT8		m_yld3;
+	UINT8       m_yld2;
+	UINT8       m_yld3;
 	int         m_ball1_pic;
-	int			m_ball2_pic;
+	int         m_ball2_pic;
 	int         m_crow_pic;
-	int			m_crow_flip;
+	int         m_crow_flip;
 	int         m_palette_bank;
-	int			m_controller;
-	int			m_hit;
+	int         m_controller;
+	int         m_hit;
 
 	/* sound-related */
 	int         m_sound_nmi_enable;
-	int			m_pending_nmi;
+	int         m_pending_nmi;
 
 	/* misc */
 	int         m_addr_h;
-	int			m_addr_l;
+	int         m_addr_l;
 
 	/* devices */
 	cpu_device *m_audiocpu;

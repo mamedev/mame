@@ -128,9 +128,9 @@ int mfi_format::identify(io_generic *io, UINT32 form_factor)
 
 	io_generic_read(io, &h, 0, sizeof(header));
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
-	   h.cyl_count <= 160 &&
-	   h.head_count <= 2 &&
-	   (!form_factor || h.form_factor == form_factor))
+		h.cyl_count <= 160 &&
+		h.head_count <= 2 &&
+		(!form_factor || h.form_factor == form_factor))
 		return 100;
 	return 0;
 }
@@ -201,7 +201,7 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 		for(int head=0; head<heads; head++) {
 			int tsize = image->get_track_size(track, head);
 			if(tsize > max_track_size)
-				 max_track_size = tsize;
+					max_track_size = tsize;
 		}
 
 	header h;
@@ -233,7 +233,7 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 			for(int j=0; j<tsize-1; j++)
 				precomp[j] = (precomp[j] & floppy_image::MG_MASK) |
 					((precomp[j+1] & floppy_image::TIME_MASK) -
-					 (precomp[j] & floppy_image::TIME_MASK));
+						(precomp[j] & floppy_image::TIME_MASK));
 			precomp[tsize-1] = (precomp[tsize-1] & floppy_image::MG_MASK) |
 				(200000000 - (precomp[tsize-1] & floppy_image::TIME_MASK));
 

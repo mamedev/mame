@@ -14,30 +14,30 @@
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 
-#define Z80_TAG			"z1"
-#define UPD765_TAG		"z38"
-#define UPD1990A_TAG	"z43"
+#define Z80_TAG         "z1"
+#define UPD765_TAG      "z38"
+#define UPD1990A_TAG    "z43"
 
 // ------------------------------------------------------------------------
 
-#define UNIO_Z80STI_TAG			"z5"
-#define UNIO_Z80SIO_TAG			"z15"
-#define UNIO_Z80PIO_TAG			"z13"
-#define UNIO_CENTRONICS1_TAG	"n3"
-#define UNIO_CENTRONICS2_TAG	"n4"
+#define UNIO_Z80STI_TAG         "z5"
+#define UNIO_Z80SIO_TAG         "z15"
+#define UNIO_Z80PIO_TAG         "z13"
+#define UNIO_CENTRONICS1_TAG    "n3"
+#define UNIO_CENTRONICS2_TAG    "n4"
 
 class prof80_state : public driver_device
 {
 public:
 	prof80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_rtc(*this, UPD1990A_TAG),
-		  m_fdc(*this, UPD765_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:525hd"),
-		  m_floppy1(*this, UPD765_TAG ":0:525hd"),
-		  m_ecb(*this, ECBBUS_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_rtc(*this, UPD1990A_TAG),
+			m_fdc(*this, UPD765_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, UPD765_TAG ":0:525hd"),
+			m_floppy1(*this, UPD765_TAG ":0:525hd"),
+			m_ecb(*this, ECBBUS_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -69,8 +69,8 @@ public:
 	void floppy_motor_off();
 
 	// memory state
-	UINT8 m_mmu[16];		// MMU block register
-	int m_init;				// MMU enable
+	UINT8 m_mmu[16];        // MMU block register
+	int m_init;             // MMU enable
 
 	// RTC state
 	int m_c0;
@@ -78,11 +78,11 @@ public:
 	int m_c2;
 
 	// floppy state
-	int	m_fdc_index;		// floppy index hole sensor
-	int m_motor;			// floppy motor
+	int m_fdc_index;        // floppy index hole sensor
+	int m_motor;            // floppy motor
 
 	// timers
-	emu_timer	*m_floppy_motor_off_timer;
+	emu_timer   *m_floppy_motor_off_timer;
 
 };
 

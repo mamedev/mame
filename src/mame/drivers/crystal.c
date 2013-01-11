@@ -249,7 +249,7 @@ READ32_MEMBER(crystal_state::Input_r)
 	else if( offset == 2)
 	{
 		UINT8 Port4 = ioport("SYSTEM")->read();
-		if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))	//coin buttons trigger IRQs
+		if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))   //coin buttons trigger IRQs
 			IntReq(machine(), 12);
 		if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
 			IntReq(machine(), 19);
@@ -288,7 +288,7 @@ static IRQ_CALLBACK( icallback )
 			return (state->m_IntHigh << 5) | i;
 		}
 	}
-	return 0;		//This should never happen
+	return 0;       //This should never happen
 }
 
 WRITE32_MEMBER(crystal_state::Banksw_w)
@@ -316,7 +316,7 @@ INLINE void Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_ma
 {
 	crystal_state *state = space.machine().driver_data<crystal_state>();
 
-	if (((data ^ state->m_Timerctrl[which]) & 1) && (data & 1))	//Timer activate
+	if (((data ^ state->m_Timerctrl[which]) & 1) && (data & 1)) //Timer activate
 	{
 		int PD = (data >> 8) & 0xff;
 		int TCV = space.read_dword(0x01801404 + which * 8);
@@ -386,7 +386,7 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	if ((m_FlashCmd & 0xff) == 0x90)
 	{
 		if (m_Bank <= 2)
-            return 0x00180089;	//Intel 128MBit
+			return 0x00180089;  //Intel 128MBit
 		else
 			return 0xffffffff;
 	}
@@ -425,7 +425,7 @@ INLINE void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask
 {
 	crystal_state *state = space.machine().driver_data<crystal_state>();
 
-	if (((data ^ state->m_DMActrl[which]) & (1 << 10)) && (data & (1 << 10)))	//DMAOn
+	if (((data ^ state->m_DMActrl[which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
 		UINT32 CTR = data;
 		UINT32 SRC = space.read_dword(0x01800804 + which * 0x10);
@@ -433,7 +433,7 @@ INLINE void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask
 		UINT32 CNT = space.read_dword(0x0180080C + which * 0x10);
 		int i;
 
-		if (CTR & 0x2)	//32 bits
+		if (CTR & 0x2)  //32 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
@@ -441,7 +441,7 @@ INLINE void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask
 				space.write_dword(DST + i * 4, v);
 			}
 		}
-		else if (CTR & 0x1)	//16 bits
+		else if (CTR & 0x1) //16 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
@@ -449,7 +449,7 @@ INLINE void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask
 				space.write_word(DST + i * 2, v);
 			}
 		}
-		else	//8 bits
+		else    //8 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
@@ -745,7 +745,7 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 
 INTERRUPT_GEN_MEMBER(crystal_state::crystal_interrupt)
 {
-	IntReq(machine(), 24);		//VRender0 VBlank
+	IntReq(machine(), 24);      //VRender0 VBlank
 }
 
 static INPUT_PORTS_START(crystal)
@@ -887,7 +887,7 @@ ROM_START( crysbios )
 
 	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
 
-	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
 ROM_END
 
 ROM_START( crysking )
@@ -899,7 +899,7 @@ ROM_START( crysking )
 	ROM_LOAD("bcsv0004f02.u2",  0x1000000, 0x1000000, CRC(0E799845) SHA1(419674ce043cb1efb18303f4cb7fdbbae642ee39) )
 	ROM_LOAD("bcsv0004f03.u3",  0x2000000, 0x1000000, CRC(659E2D17) SHA1(342c98f3f695ef4dea8b533612451c4d2fb58809) )
 
-	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
 ROM_END
 
 ROM_START( evosocc )
@@ -911,7 +911,7 @@ ROM_START( evosocc )
 	ROM_LOAD("bcsv0001u02",  0x1000000, 0x1000000, CRC(47EF1794) SHA1(f573706c17d1342b9b7aed9b40b8b648f0bf58db) )
 	ROM_LOAD("bcsv0001u03",  0x2000000, 0x1000000, CRC(F396A2EC) SHA1(f305eb10856fb5d4c229a6b09d6a2fb21b24ce66) )
 
-	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
 ROM_END
 
 ROM_START( topbladv )
@@ -925,7 +925,7 @@ ROM_START( topbladv )
 	ROM_REGION32_LE( 0x1000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 
-	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
 ROM_END
 
 
@@ -941,7 +941,7 @@ ROM_START( officeye )
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
 	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
 
-	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
 ROM_END
 
 
@@ -956,7 +956,7 @@ ROM_START( donghaer )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) )
 
-	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
 ROM_END
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
@@ -974,8 +974,8 @@ DRIVER_INIT_MEMBER(crystal_state,crysking)
 	Rom[WORD_XOR_LE(0x8096/2)] = 0x90FC;
 	Rom[WORD_XOR_LE(0x8098/2)] = 0x9001;
 
-	Rom[WORD_XOR_LE(0x8a52/2)] = 0x4000;	//NOP
-	Rom[WORD_XOR_LE(0x8a54/2)] = 0x403c;	//NOP
+	Rom[WORD_XOR_LE(0x8a52/2)] = 0x4000;    //NOP
+	Rom[WORD_XOR_LE(0x8a54/2)] = 0x403c;    //NOP
 }
 
 DRIVER_INIT_MEMBER(crystal_state,evosocc)
@@ -983,34 +983,34 @@ DRIVER_INIT_MEMBER(crystal_state,evosocc)
 	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
-	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;	//PUSH R2..R7
-	Rom[WORD_XOR_LE(0x973890/2)] = 0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;  //PUSH R2..R7
+	Rom[WORD_XOR_LE(0x973890/2)] = 0x9001;  //PUSH R0
 
-	Rom[WORD_XOR_LE(0x971058/2)] = 0x907C;	//PUSH R2..R6
+	Rom[WORD_XOR_LE(0x971058/2)] = 0x907C;  //PUSH R2..R6
 	Rom[WORD_XOR_LE(0x971060/2)] = 0x9001; //PUSH R0
 
-	Rom[WORD_XOR_LE(0x978036/2)] = 0x900C;	//PUSH R2-R3
-	Rom[WORD_XOR_LE(0x978038/2)] = 0x8303;	//LD    (%SP,0xC),R3
+	Rom[WORD_XOR_LE(0x978036/2)] = 0x900C;  //PUSH R2-R3
+	Rom[WORD_XOR_LE(0x978038/2)] = 0x8303;  //LD    (%SP,0xC),R3
 
-	Rom[WORD_XOR_LE(0x974ED0/2)] = 0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
-	Rom[WORD_XOR_LE(0x974ED2/2)] = 0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x974ED0/2)] = 0x90FC;  //PUSH R7-R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x974ED2/2)] = 0x9001;  //PUSH R0
 }
 
 DRIVER_INIT_MEMBER(crystal_state,topbladv)
 {
 	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
 
-	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
-	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;   //PUSH R7-R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;   //PUSH R0
 
-	Rom[WORD_XOR_LE(0x2fe18/2)] = 0x9001;	//PUSH R0
-	Rom[WORD_XOR_LE(0x2fe1a/2)] = 0x9200;	//PUSH SR
+	Rom[WORD_XOR_LE(0x2fe18/2)] = 0x9001;   //PUSH R0
+	Rom[WORD_XOR_LE(0x2fe1a/2)] = 0x9200;   //PUSH SR
 
-	Rom[WORD_XOR_LE(0x18880/2)] = 0x9001;	//PUSH R0
-	Rom[WORD_XOR_LE(0x18882/2)] = 0x9200;	//PUSH SR
+	Rom[WORD_XOR_LE(0x18880/2)] = 0x9001;   //PUSH R0
+	Rom[WORD_XOR_LE(0x18882/2)] = 0x9200;   //PUSH SR
 
-	Rom[WORD_XOR_LE(0xDACE/2)] = 0x901C;	//PUSH R4-R3-R2
-	Rom[WORD_XOR_LE(0xDAD0/2)] = 0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0xDACE/2)] = 0x901C;    //PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0xDAD0/2)] = 0x9001;    //PUSH R0
 
 }
 
@@ -1018,14 +1018,14 @@ DRIVER_INIT_MEMBER(crystal_state,officeye)
 {
 	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
 
-	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;	//PUSH R4-R3-R2
-	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;    //PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;    //PUSH R0
 
-	Rom[WORD_XOR_LE(0x9EE4/2)] = 0x907C;	//PUSH R6-R5-R4-R3-R2
-	Rom[WORD_XOR_LE(0x9EE6/2)] = 0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x9EE4/2)] = 0x907C;    //PUSH R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x9EE6/2)] = 0x9001;    //PUSH R0
 
-	Rom[WORD_XOR_LE(0x4B2E0/2)] = 0x9004;	//PUSH R2
-	Rom[WORD_XOR_LE(0x4B2E2/2)] = 0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x4B2E0/2)] = 0x9004;   //PUSH R2
+	Rom[WORD_XOR_LE(0x4B2E2/2)] = 0x9001;   //PUSH R0
 
 /*
     Rom[WORD_XOR_LE(0x18880/2)] = 0x9001; //PUSH R0

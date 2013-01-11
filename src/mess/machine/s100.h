@@ -73,7 +73,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define S100_TAG		"s100"
+#define S100_TAG        "s100"
 
 
 
@@ -82,9 +82,9 @@
 //**************************************************************************
 
 #define MCFG_S100_BUS_ADD(_cpu_tag, _config) \
-    MCFG_DEVICE_ADD(S100_TAG, S100, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
-    s100_device::static_set_cputag(*device, _cpu_tag); \
+	MCFG_DEVICE_ADD(S100_TAG, S100, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
+	s100_device::static_set_cputag(*device, _cpu_tag); \
 
 
 #define S100_INTERFACE(_name) \
@@ -92,7 +92,7 @@
 
 
 #define MCFG_S100_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, S100_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, S100_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	s100_slot_device::static_set_s100_slot(*device, S100_TAG); \
 
@@ -107,7 +107,7 @@
 class s100_device;
 
 class s100_slot_device : public device_t,
-						 public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -116,8 +116,8 @@ public:
 	// device-level overrides
 	virtual void device_start();
 
-    // inline configuration
-    static void static_set_s100_slot(device_t &device, const char *tag);
+	// inline configuration
+	static void static_set_s100_slot(device_t &device, const char *tag);
 
 private:
 	// configuration
@@ -134,24 +134,24 @@ extern const device_type S100_SLOT;
 
 struct s100_bus_interface
 {
-    devcb_write_line	m_out_int_cb;
-    devcb_write_line	m_out_nmi_cb;
-    devcb_write_line	m_out_vi0_cb;
-    devcb_write_line	m_out_vi1_cb;
-    devcb_write_line	m_out_vi2_cb;
-    devcb_write_line	m_out_vi3_cb;
-    devcb_write_line	m_out_vi4_cb;
-    devcb_write_line	m_out_vi5_cb;
-    devcb_write_line	m_out_vi6_cb;
-    devcb_write_line	m_out_vi7_cb;
-	devcb_write_line	m_out_dma0_cb;
-	devcb_write_line	m_out_dma1_cb;
-	devcb_write_line	m_out_dma2_cb;
-	devcb_write_line	m_out_dma3_cb;
-	devcb_write_line	m_out_rdy_cb;
-	devcb_write_line	m_out_hold_cb;
-	devcb_write_line	m_out_error_cb;
-	devcb_write8		m_out_terminal_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_vi0_cb;
+	devcb_write_line    m_out_vi1_cb;
+	devcb_write_line    m_out_vi2_cb;
+	devcb_write_line    m_out_vi3_cb;
+	devcb_write_line    m_out_vi4_cb;
+	devcb_write_line    m_out_vi5_cb;
+	devcb_write_line    m_out_vi6_cb;
+	devcb_write_line    m_out_vi7_cb;
+	devcb_write_line    m_out_dma0_cb;
+	devcb_write_line    m_out_dma1_cb;
+	devcb_write_line    m_out_dma2_cb;
+	devcb_write_line    m_out_dma3_cb;
+	devcb_write_line    m_out_rdy_cb;
+	devcb_write_line    m_out_hold_cb;
+	devcb_write_line    m_out_error_cb;
+	devcb_write8        m_out_terminal_cb;
 };
 
 class device_s100_card_interface;
@@ -160,7 +160,7 @@ class device_s100_card_interface;
 // ======================> s100_device
 
 class s100_device : public device_t,
-                    public s100_bus_interface
+					public s100_bus_interface
 {
 public:
 	// construction/destruction
@@ -208,24 +208,24 @@ private:
 	// internal state
 	cpu_device   *m_maincpu;
 
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_vi0_func;
-	devcb_resolved_write_line	m_out_vi1_func;
-	devcb_resolved_write_line	m_out_vi2_func;
-	devcb_resolved_write_line	m_out_vi3_func;
-	devcb_resolved_write_line	m_out_vi4_func;
-	devcb_resolved_write_line	m_out_vi5_func;
-	devcb_resolved_write_line	m_out_vi6_func;
-	devcb_resolved_write_line	m_out_vi7_func;
-	devcb_resolved_write_line	m_out_dma0_func;
-	devcb_resolved_write_line	m_out_dma1_func;
-	devcb_resolved_write_line	m_out_dma2_func;
-	devcb_resolved_write_line	m_out_dma3_func;
-	devcb_resolved_write_line	m_out_rdy_func;
-	devcb_resolved_write_line	m_out_hold_func;
-	devcb_resolved_write_line	m_out_error_func;
-	devcb_resolved_write8		m_out_terminal_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_vi0_func;
+	devcb_resolved_write_line   m_out_vi1_func;
+	devcb_resolved_write_line   m_out_vi2_func;
+	devcb_resolved_write_line   m_out_vi3_func;
+	devcb_resolved_write_line   m_out_vi4_func;
+	devcb_resolved_write_line   m_out_vi5_func;
+	devcb_resolved_write_line   m_out_vi6_func;
+	devcb_resolved_write_line   m_out_vi7_func;
+	devcb_resolved_write_line   m_out_dma0_func;
+	devcb_resolved_write_line   m_out_dma1_func;
+	devcb_resolved_write_line   m_out_dma2_func;
+	devcb_resolved_write_line   m_out_dma3_func;
+	devcb_resolved_write_line   m_out_rdy_func;
+	devcb_resolved_write_line   m_out_hold_func;
+	devcb_resolved_write_line   m_out_error_func;
+	devcb_resolved_write8       m_out_terminal_func;
 
 	simple_list<device_s100_card_interface> m_device_list;
 	const char *m_cputag;

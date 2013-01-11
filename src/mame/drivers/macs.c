@@ -66,7 +66,7 @@ class macs_state : public st0016_state
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: st0016_state(mconfig, type, tag),
-		  m_ram2(*this, "ram2") { }
+			m_ram2(*this, "ram2") { }
 
 	UINT8 m_mux_data;
 	UINT8 m_rev;
@@ -132,7 +132,7 @@ READ8_MEMBER(macs_state::macs_input_r)
 		case 5: return ioport("DSW3")->read();
 		case 6: return ioport("DSW4")->read();
 		case 7: return ioport("SYS1")->read();
-		default:	popmessage("Unmapped I/O read at PC = %06x offset = %02x",space.device().safe_pc(),offset+0xc0);
+		default:    popmessage("Unmapped I/O read at PC = %06x offset = %02x",space.device().safe_pc(),offset+0xc0);
 	}
 
 	return 0xff;
@@ -154,15 +154,15 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 	{
 		case 0:
 		/*
-        --x- ---- sets RAM bank?
-        ---- -x-- Cassette B slot
-        ---- --x- Cassette A slot
-        */
+		--x- ---- sets RAM bank?
+		---- -x-- Cassette B slot
+		---- --x- Cassette A slot
+		*/
 
 		if(m_rev == 1)
 		{
 			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST screens indicates that there's just one RAM bank,
-                      but then MACS2 games locks up. */
+			          but then MACS2 games locks up. */
 			membank("bank3")->set_base(&m_ram1[((data&0x20)>>5)*0x1000+0x000] );
 
 			macs_cart_slot = (data & 0xc) >> 2;
@@ -332,8 +332,8 @@ static INPUT_PORTS_START( macs_base )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/*
-    Note: These could likely to be switches that are on the game board and not Dip Switches
-    */
+	Note: These could likely to be switches that are on the game board and not Dip Switches
+	*/
 	PORT_START("SYS0")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Note In") PORT_CODE(KEYCODE_4_PAD)
@@ -678,7 +678,7 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 		memcpy(macs_ram1 + 0x0800, memregion("user1")->base()+0x73fa, 0x507);
 		memcpy(macs_ram1 + 0x1800, memregion("user1")->base()+0x73fa, 0x507);
 
-#define MAKEJMP(n,m)	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
+#define MAKEJMP(n,m)    macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
 						macs_ram2[(n) - 0xe800 + 2]=((m)>>8)&0xff;
 

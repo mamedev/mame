@@ -203,10 +203,10 @@ static void mea8000_update_req( device_t *device )
 {
 	mea8000_t* mea8000 = get_safe_token( device );
 	/* actually, req pulses less than 3us for each new byte,
-       it goes back up if there space left in the buffer, or stays low if the
-       buffer contains a complete frame and the CPU nees to wait for the next
-       frame end to compose a new frame.
-    */
+	   it goes back up if there space left in the buffer, or stays low if the
+	   buffer contains a complete frame and the CPU nees to wait for the next
+	   frame end to compose a new frame.
+	*/
 	if (!mea8000->req_out.isnull())
 		mea8000->req_out( 0, mea8000_accept_byte( mea8000 ) );
 }
@@ -438,22 +438,22 @@ static void mea8000_decode_frame( mea8000_t* mea8000 )
 	mea8000->f[1].fm = fm2_table[ mea8000->buf[1] & 0x1f ];
 	mea8000->f[0].fm = fm1_table[ mea8000->buf[2] >> 3 ];
 	mea8000->ampl = ampl_table[ ((mea8000->buf[2] & 7) << 1) |
-				   (mea8000->buf[3] >> 7) ];
+					(mea8000->buf[3] >> 7) ];
 	mea8000->framelog = fd + 6 /* 64 samples / ms */ + 3;
 	mea8000->framelength = 1 <<  mea8000->framelog;
 	mea8000->bufpos = 0;
 #ifdef FLOAT_MODE
 	LOG(( "mea800_decode_frame: pitch=%i noise=%i  fm1=%gHz bw1=%gHz  fm2=%gHz bw2=%gHz  fm3=%gHz bw3=%gHz  fm4=%gHz bw4=%gHz  ampl=%g fd=%ims\n",
-	      mea8000->pitch, mea8000->noise,
-	      mea8000->f[0].fm, mea8000->f[0].bw, mea8000->f[1].fm, mea8000->f[1].bw,
-	      mea8000->f[2].fm, mea8000->f[2].bw, mea8000->f[3].fm, mea8000->f[3].bw,
-	      mea8000->ampl/1000., 8 << fd ));
+			mea8000->pitch, mea8000->noise,
+			mea8000->f[0].fm, mea8000->f[0].bw, mea8000->f[1].fm, mea8000->f[1].bw,
+			mea8000->f[2].fm, mea8000->f[2].bw, mea8000->f[3].fm, mea8000->f[3].bw,
+			mea8000->ampl/1000., 8 << fd ));
 #else
 	LOG(( "mea800_decode_frame: pitch=%i noise=%i  fm1=%iHz bw1=%iHz  fm2=%iHz bw2=%iHz  fm3=%iHz bw3=%iHz  fm4=%iHz bw4=%iHz  ampl=%g fd=%ims\n",
-	      mea8000->pitch, mea8000->noise,
-	      mea8000->f[0].fm, mea8000->f[0].bw, mea8000->f[1].fm, mea8000->f[1].bw,
-	      mea8000->f[2].fm, mea8000->f[2].bw, mea8000->f[3].fm, mea8000->f[3].bw,
-	      mea8000->ampl/1000., 8 << fd ));
+			mea8000->pitch, mea8000->noise,
+			mea8000->f[0].fm, mea8000->f[0].bw, mea8000->f[1].fm, mea8000->f[1].bw,
+			mea8000->f[2].fm, mea8000->f[2].bw, mea8000->f[3].fm, mea8000->f[3].bw,
+			mea8000->ampl/1000., 8 << fd ));
 #endif
 }
 
@@ -591,7 +591,7 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 		{
 			/* enqueue frame byte */
 			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", space.machine().firstcpu->pcbase( ), space.machine().time().as_double(),
-			      data, mea8000->bufpos ));
+					data, mea8000->bufpos ));
 			mea8000->buf[mea8000->bufpos] = data;
 			mea8000->bufpos++;
 			if (mea8000->bufpos == 4 && mea8000->state == MEA8000_WAIT_FIRST)
@@ -624,8 +624,8 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 			mea8000_stop_frame(space.machine(), mea8000);
 
 		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
-		      space.machine().firstcpu->pcbase(), space.machine().time().as_double(), data,
-		      stop, mea8000->cont, mea8000->roe ));
+				space.machine().firstcpu->pcbase(), space.machine().time().as_double(), data,
+				stop, mea8000->cont, mea8000->roe ));
 
 		mea8000_update_req(device);
 		break;
@@ -738,5 +738,3 @@ void mea8000_device::device_reset()
 {
 	DEVICE_RESET_NAME( mea8000 )(this);
 }
-
-

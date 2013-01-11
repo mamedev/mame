@@ -43,38 +43,38 @@
 // error.log will be 10 MB for 100000 lines
 #define APOLLO_MAX_NO_OF_LOG_LINES 500000
 
-#define ATBUS_IO_BASE		0x040000
-#define ATBUS_IO_END		0x05ffff
-#define ATBUS_MEMORY_BASE	0x080000
-#define ATBUS_MEMORY_END	0xffffff
+#define ATBUS_IO_BASE       0x040000
+#define ATBUS_IO_END        0x05ffff
+#define ATBUS_MEMORY_BASE   0x080000
+#define ATBUS_MEMORY_END    0xffffff
 
-#define DN3500_RAM_SIZE	    16 // 8 or 16 MB
+#define DN3500_RAM_SIZE     16 // 8 or 16 MB
 
-#if DN3500_RAM_SIZE	== 8
+#if DN3500_RAM_SIZE == 8
 #define DN3500_RAM_BASE     0x1000000
-#define DN3500_RAM_END	    0x17fffff
-#define DN3500_RAM_CONFIG_BYTE	0x64 // or 0xe8
+#define DN3500_RAM_END      0x17fffff
+#define DN3500_RAM_CONFIG_BYTE  0x64 // or 0xe8
 #else /* DN3500_RAM_SIZE == 16 */
 #define DN3500_RAM_BASE     0x1000000
-#define DN3500_RAM_END	    0x1ffffff
+#define DN3500_RAM_END      0x1ffffff
 #define DN3500_RAM_CONFIG_BYTE 0x60 // 4-4-4-4
 //#define DN3500_RAM_CONFIG_BYTE 0x14 // 8-8-0-0
 #endif
 
 #define DN3000_RAM_BASE     0x100000
-#define DN3000_RAM_END	    0x8fffff
+#define DN3000_RAM_END      0x8fffff
 #define DN3000_RAM_CONFIG_8MB  0xA8
 
-#define DN5500_RAM_SIZE	    32 // 16 or 32 MB
+#define DN5500_RAM_SIZE     32 // 16 or 32 MB
 
-#if DN5500_RAM_SIZE	== 16
+#if DN5500_RAM_SIZE == 16
 #define DN5500_RAM_BASE     0x1000000
-#define DN5500_RAM_END	    0x1ffffff
+#define DN5500_RAM_END      0x1ffffff
 #define DN5500_RAM_CONFIG_BYTE  0x14 // 8-8-0-0
 #define DN5500_MEM_PRESENT_BYTE 0xAA // 8-8-0-0
 #else /* DN5500_RAM_SIZE == 32 */
 #define DN5500_RAM_BASE     0x1000000
-#define DN5500_RAM_END	    0x2ffffff
+#define DN5500_RAM_END      0x2ffffff
 #define DN5500_RAM_CONFIG_BYTE  0x20 // 8-8-8-8
 #define DN5500_MEM_PRESENT_BYTE 0x00 // 8-8-8-8
 #endif
@@ -143,16 +143,16 @@ const char *apollo_cpu_context(device_t *cpu) {
 
 void apollo_set_cpu_has_fpu(device_t *device, int onoff)
 {
-    if (device == NULL || (device->type() != M68020PMMU && device->type() != M68030))
-    {
-        DLOG1(("set_cpu_has_fpu: unexpected CPU device"));
-    }
-    else
-    {
-        m68ki_cpu_core *cpu = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
-        cpu->has_fpu = onoff;
-        DLOG1(("apollo_set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
-    }
+	if (device == NULL || (device->type() != M68020PMMU && device->type() != M68030))
+	{
+		DLOG1(("set_cpu_has_fpu: unexpected CPU device"));
+	}
+	else
+	{
+		m68ki_cpu_core *cpu = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
+		cpu->has_fpu = onoff;
+		DLOG1(("apollo_set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
+	}
 }
 
 /***************************************************************************
@@ -232,7 +232,7 @@ int apollo_instruction_hook(device_t *device, offs_t curpc)
 	// 027C F8FF AND.W #F8FF,SR
 	// 60FA      BRA *-4
 
-	if ((next_ir == 0x60fa && last_ir == 0x027c) || (next_ir == 0x027c	&& last_ir == 0x60fa))
+	if ((next_ir == 0x60fa && last_ir == 0x027c) || (next_ir == 0x027c  && last_ir == 0x60fa))
 	{
 		// we are within the idle loop, slow down CPU to reduce power usage
 		m68k->remaining_cycles -= 500;
@@ -272,10 +272,10 @@ int apollo_instruction_hook(device_t *device, offs_t curpc)
 
 static void apollo_bus_error(running_machine &machine)
 {
-    machine.device(MAINCPU)->execute().set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-    machine.device(MAINCPU)->execute().set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	machine.device(MAINCPU)->execute().set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	machine.device(MAINCPU)->execute().set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 
-    apollo_csr_set_status_register(APOLLO_CSR_SR_CPU_TIMEOUT, APOLLO_CSR_SR_CPU_TIMEOUT);
+	apollo_csr_set_status_register(APOLLO_CSR_SR_CPU_TIMEOUT, APOLLO_CSR_SR_CPU_TIMEOUT);
 }
 
 static IRQ_CALLBACK(apollo_irq_acknowledge) {
@@ -451,7 +451,7 @@ READ32_MEMBER(apollo_state::ram_with_parity_r){
 	if (parity_error_byte_mask != 0) {
 		latch_page_on_parity_error_register = (ram_base_address + parity_error_offset * 4) >> 10;
 
-		apollo_csr_set_status_register(APOLLO_CSR_CR_PARITY_BYTE_MASK,	apollo_csr_get_status_register() |parity_error_byte_mask);
+		apollo_csr_set_status_register(APOLLO_CSR_CR_PARITY_BYTE_MASK,  apollo_csr_get_status_register() |parity_error_byte_mask);
 
 		if (apollo_csr_get_control_register() & APOLLO_CSR_CR_INTERRUPT_ENABLE) {
 			// force parity error (if NMI is enabled)
@@ -729,7 +729,7 @@ WRITE32_MEMBER(apollo_state::apollo_f8_w){
 
 static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
-        AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
+		AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
@@ -777,7 +777,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
-        AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
+		AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
@@ -898,7 +898,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
-        AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
+		AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
@@ -950,7 +950,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
-        AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
+		AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
@@ -1017,9 +1017,9 @@ void apollo_state::machine_reset()
 
 		// check label of physical volume and get sector data of logical volume 1
 		// Note: sector data starts with 32 byte block header
-		if (omti8621_get_sector(machine().device(APOLLO_WDC_TAG), 0, db,	sizeof(db), 0) == sizeof(db) &&
+		if (omti8621_get_sector(machine().device(APOLLO_WDC_TAG), 0, db,    sizeof(db), 0) == sizeof(db) &&
 			memcmp (db+0x22, "APOLLO", 6) == 0 &&
-			omti8621_get_sector(machine().device(APOLLO_WDC_TAG), sector1, db,	sizeof(db), 0) == sizeof(db))
+			omti8621_get_sector(machine().device(APOLLO_WDC_TAG), sector1, db,  sizeof(db), 0) == sizeof(db))
 		{
 //          MLOG2(("machine_reset_dn3500: node ID is %06X (from ROM)", node_id));
 
@@ -1030,7 +1030,7 @@ void apollo_state::machine_reset()
 		}
 	}
 
-    m68k_set_instruction_hook(cpu, apollo_instruction_hook);
+	m68k_set_instruction_hook(cpu, apollo_instruction_hook);
 }
 
 static void apollo_reset_instr_callback(device_t *device)
@@ -1047,8 +1047,8 @@ static void apollo_reset_instr_callback(device_t *device)
 	apollo->pic8259_master->reset();
 	apollo->pic8259_slave->reset();
 
-    // reset the ISA bus devices
-    apollo->m_ctape->device_reset();
+	// reset the ISA bus devices
+	apollo->m_ctape->device_reset();
 	machine.device(APOLLO_ETH_TAG)->reset();
 	machine.device(APOLLO_WDC_TAG)->reset();
 

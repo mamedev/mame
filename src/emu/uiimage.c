@@ -34,17 +34,17 @@
 
 /* conditional compilation to enable chosing of image formats - this is not
  * yet fully implemented */
-#define ENABLE_FORMATS			0
+#define ENABLE_FORMATS          0
 
 /* time (in seconds) to display errors */
-#define ERROR_MESSAGE_TIME		5
+#define ERROR_MESSAGE_TIME      5
 
 /* itemrefs for key menu items */
-#define ITEMREF_NEW_IMAGE_NAME	((void *) 0x0001)
-#define ITEMREF_CREATE			((void *) 0x0002)
-#define ITEMREF_FORMAT			((void *) 0x0003)
-#define ITEMREF_NO				((void *) 0x0004)
-#define ITEMREF_YES				((void *) 0x0005)
+#define ITEMREF_NEW_IMAGE_NAME  ((void *) 0x0001)
+#define ITEMREF_CREATE          ((void *) 0x0002)
+#define ITEMREF_FORMAT          ((void *) 0x0003)
+#define ITEMREF_NO              ((void *) 0x0004)
+#define ITEMREF_YES             ((void *) 0x0005)
 
 /***************************************************************************
     MENU HELPERS
@@ -113,7 +113,7 @@ static void extra_text_draw_box(render_container *container, float origx1, float
 
 	/* draw the text within it */
 	ui_draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
-					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+						DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 }
 
 
@@ -201,14 +201,14 @@ static int is_valid_filename_char(unicode_char unichar)
 	/* this should really be in the OSD layer */
 	static const char valid_filename_char[] =
 	{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 	/* 00-0f */
-		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 	/* 10-1f */
-		1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 	/*  !"#$%&'()*+,-./ */
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 	/* 0123456789:;<=>? */
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 	/* @ABCDEFGHIJKLMNO */
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 	/* PQRSTUVWXYZ[\]^_ */
-		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 	/* `abcdefghijklmno */
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 	/* pqrstuvwxyz{|}~  */
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     /* 00-0f */
+		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     /* 10-1f */
+		1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0,     /*  !"#$%&'()*+,-./ */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,     /* 0123456789:;<=>? */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* @ABCDEFGHIJKLMNO */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1,     /* PQRSTUVWXYZ[\]^_ */
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* `abcdefghijklmno */
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0,     /* pqrstuvwxyz{|}~  */
 	};
 	return (unichar < ARRAY_LENGTH(valid_filename_char)) && valid_filename_char[unichar];
 }
@@ -750,7 +750,7 @@ void ui_menu_file_manager::custom_render(void *selectedref, float top, float bot
 	/* access the path */
 	path = selected_device ? selected_device->filename() : NULL;
 	extra_text_render(container, top, bottom,
-					  origx1, origy1, origx2, origy2, NULL, path);
+						origx1, origy1, origx2, origy2, NULL, path);
 }
 
 
@@ -878,7 +878,7 @@ void ui_menu_image_info::handle()
 -------------------------------------------------*/
 
 ui_menu_select_format::ui_menu_select_format(running_machine &machine, render_container *container,
-											 floppy_image_format_t **_formats, int _ext_match, int _total_usable, int *_result)
+												floppy_image_format_t **_formats, int _ext_match, int _total_usable, int *_result)
 	: ui_menu(machine, container)
 {
 	formats = _formats;
@@ -920,7 +920,7 @@ void ui_menu_select_format::handle()
 -------------------------------------------------*/
 
 ui_menu_select_rw::ui_menu_select_rw(running_machine &machine, render_container *container,
-									 bool _can_in_place, int *_result)
+										bool _can_in_place, int *_result)
 	: ui_menu(machine, container)
 {
 	can_in_place = _can_in_place;
@@ -955,19 +955,19 @@ void ui_menu_select_rw::handle()
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-#define TAPECMD_NULL			((void *) 0x0000)
-#define TAPECMD_STOP			((void *) 0x0001)
-#define TAPECMD_PLAY			((void *) 0x0002)
-#define TAPECMD_RECORD			((void *) 0x0003)
-#define TAPECMD_REWIND			((void *) 0x0004)
-#define TAPECMD_FAST_FORWARD		((void *) 0x0005)
-#define TAPECMD_SLIDER			((void *) 0x0006)
-#define TAPECMD_SELECT			((void *) 0x0007)
+#define TAPECMD_NULL            ((void *) 0x0000)
+#define TAPECMD_STOP            ((void *) 0x0001)
+#define TAPECMD_PLAY            ((void *) 0x0002)
+#define TAPECMD_RECORD          ((void *) 0x0003)
+#define TAPECMD_REWIND          ((void *) 0x0004)
+#define TAPECMD_FAST_FORWARD        ((void *) 0x0005)
+#define TAPECMD_SLIDER          ((void *) 0x0006)
+#define TAPECMD_SELECT          ((void *) 0x0007)
 
-#define BITBANGERCMD_SELECT			((void *) 0x0000)
-#define BITBANGERCMD_MODE			((void *) 0x0001)
-#define BITBANGERCMD_BAUD			((void *) 0x0002)
-#define BITBANGERCMD_TUNE			((void *) 0x0003)
+#define BITBANGERCMD_SELECT         ((void *) 0x0000)
+#define BITBANGERCMD_MODE           ((void *) 0x0001)
+#define BITBANGERCMD_BAUD           ((void *) 0x0002)
+#define BITBANGERCMD_TUNE           ((void *) 0x0003)
 
 
 /***************************************************************************
@@ -1084,8 +1084,8 @@ void ui_menu_mess_tape_control::populate()
 		state = cassette->get_state();
 		item_append(
 			(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
-				?	"stopped"
-				:	((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
+				?   "stopped"
+				:   ((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
 					? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "playing" : "(playing)")
 					: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "recording" : "(recording)")
 					),
@@ -1139,22 +1139,22 @@ void ui_menu_mess_bitbanger_control::populate()
 		bitbanger_device *bitbanger = downcast<bitbanger_device *>(&device->device());
 
 		if (bitbanger->inc_mode(TRUE))
-		  mode_flags |= MENU_FLAG_RIGHT_ARROW;
+			mode_flags |= MENU_FLAG_RIGHT_ARROW;
 
 		if (bitbanger->dec_mode(TRUE))
-		  mode_flags |= MENU_FLAG_LEFT_ARROW;
+			mode_flags |= MENU_FLAG_LEFT_ARROW;
 
 		if (bitbanger->inc_baud(TRUE))
-		  baud_flags |= MENU_FLAG_RIGHT_ARROW;
+			baud_flags |= MENU_FLAG_RIGHT_ARROW;
 
 		if (bitbanger->dec_baud(TRUE))
-		  baud_flags |= MENU_FLAG_LEFT_ARROW;
+			baud_flags |= MENU_FLAG_LEFT_ARROW;
 
 		if (bitbanger->inc_tune(TRUE))
-		  tune_flags |= MENU_FLAG_RIGHT_ARROW;
+			tune_flags |= MENU_FLAG_RIGHT_ARROW;
 
 		if (bitbanger->dec_tune(TRUE))
-		  tune_flags |= MENU_FLAG_LEFT_ARROW;
+			tune_flags |= MENU_FLAG_LEFT_ARROW;
 
 		/* name of bitbanger file */
 		item_append(device->device().name(), device->filename(), flags, BITBANGERCMD_SELECT);
@@ -1293,15 +1293,15 @@ void ui_menu_mess_bitbanger_control::handle()
 				}
 				else if (event->itemref==BITBANGERCMD_MODE)
 				{
-				   bitbanger->dec_mode(FALSE);
+					bitbanger->dec_mode(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_BAUD)
 				{
-				   bitbanger->dec_baud(FALSE);
+					bitbanger->dec_baud(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_TUNE)
 				{
-				   bitbanger->dec_tune(FALSE);
+					bitbanger->dec_tune(FALSE);
 				}
 				break;
 
@@ -1317,18 +1317,17 @@ void ui_menu_mess_bitbanger_control::handle()
 				}
 				else if (event->itemref==BITBANGERCMD_MODE)
 				{
-				   bitbanger->inc_mode(FALSE);
+					bitbanger->inc_mode(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_BAUD)
 				{
-				   bitbanger->inc_baud(FALSE);
+					bitbanger->inc_baud(FALSE);
 				}
 				else if (event->itemref==BITBANGERCMD_TUNE)
 				{
-				   bitbanger->inc_tune(FALSE);
+					bitbanger->inc_tune(FALSE);
 				}
 				break;
 		}
 	}
 }
-

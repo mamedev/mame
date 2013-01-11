@@ -12,8 +12,8 @@ enum
 	HD6309_E, HD6309_F, HD6309_V, HD6309_MD
 };
 
-#define HD6309_IRQ_LINE 0	/* IRQ line number */
-#define HD6309_FIRQ_LINE 1	 /* FIRQ line number */
+#define HD6309_IRQ_LINE 0   /* IRQ line number */
+#define HD6309_FIRQ_LINE 1   /* FIRQ line number */
 
 
 /* PUBLIC FUNCTIONS */

@@ -32,11 +32,11 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CDP1864_DEFAULT_LATCH		0x35
+#define CDP1864_DEFAULT_LATCH       0x35
 
-#define CDP1864_CYCLES_DMA_START	2*8
-#define CDP1864_CYCLES_DMA_ACTIVE	8*8
-#define CDP1864_CYCLES_DMA_WAIT		6*8
+#define CDP1864_CYCLES_DMA_START    2*8
+#define CDP1864_CYCLES_DMA_ACTIVE   8*8
+#define CDP1864_CYCLES_DMA_WAIT     6*8
 
 static const int CDP1864_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
 
@@ -99,13 +99,13 @@ inline void cdp1864_device::initialize_palette()
 
 cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDP1864, "CDP1864", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_disp(0),
-	  m_dmaout(0),
-	  m_bgcolor(0),
-	  m_con(0),
-	  m_aoe(0),
-	  m_latch(CDP1864_DEFAULT_LATCH)
+		device_sound_interface(mconfig, *this),
+		m_disp(0),
+		m_dmaout(0),
+		m_bgcolor(0),
+		m_con(0),
+		m_aoe(0),
+		m_latch(CDP1864_DEFAULT_LATCH)
 {
 }
 

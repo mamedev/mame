@@ -31,7 +31,7 @@ void ti990_set_int_line(running_machine &machine, int line, int state)
 	{
 		for (level = 0; ! (intlines & (1 << level)); level++)
 			;
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, level);	/* interrupt it, baby */
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, level);  /* interrupt it, baby */
 	}
 	else
 		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
@@ -155,7 +155,7 @@ void ti990_ckon_ckof_callback(device_t *device, int state)
     F: flag (according to 990 handbook)
 */
 
- READ8_HANDLER ( ti990_panel_read )
+	READ8_HANDLER ( ti990_panel_read )
 {
 	if (offset == 1)
 		return 0x48;

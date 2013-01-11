@@ -66,15 +66,15 @@ TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
 	int tile_attrib = m_colorram[(tile_index / 64) * 2];
-	int tile_h_bank = (tile_attrib & 0x40) << 3;	/* 0x40->0x200 */
-	int tile_l_bank = (tile_attrib & 0x18) << 3;	/* 0x10->0x80, 0x08->0x40 */
+	int tile_h_bank = (tile_attrib & 0x40) << 3;    /* 0x40->0x200 */
+	int tile_l_bank = (tile_attrib & 0x18) << 3;    /* 0x10->0x80, 0x08->0x40 */
 
 	int code = tile_number;
 	if ((tile_attrib & 0x20) && (code >= 0xc0))
 		code = (code & 0x3f) | tile_l_bank | 0x100;
 	code |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(	0,
+	SET_TILE_INFO_MEMBER(   0,
 			code,
 			tile_attrib & 0x07,
 			0);
@@ -110,7 +110,7 @@ void fortyl_state::video_start()
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_xoffset = 128;	// this never changes
+	m_xoffset = 128;    // this never changes
 
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -136,7 +136,7 @@ static void fortyl_set_scroll_x( running_machine &machine, int offset )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	int i = offset & ~1;
-	int x = ((state->m_colorram[i] & 0x80) << 1) | state->m_colorram[i + 1];	/* 9 bits signed */
+	int x = ((state->m_colorram[i] & 0x80) << 1) | state->m_colorram[i + 1];    /* 9 bits signed */
 
 	if (state->m_flipscreen)
 		x += 0x51;
@@ -144,7 +144,7 @@ static void fortyl_set_scroll_x( running_machine &machine, int offset )
 		x -= 0x50;
 
 	x &= 0x1ff;
-	if (x & 0x100) x -= 0x200;				/* sign extend */
+	if (x & 0x100) x -= 0x200;              /* sign extend */
 
 	state->m_bg_tilemap->set_scrollx(offset / 2, x);
 }

@@ -264,23 +264,23 @@ WRITE16_MEMBER(mil4000_state::output_w)
 	for(i=0;i<3;i++)
 		coin_counter_w(machine(), i, data & 0x2000);
 
-	output_set_lamp_value(0, (data) & 1);		/* HOLD1 */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* HOLD2 */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* HOLD3 */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* HOLD4 */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* HOLD5 */
-	output_set_lamp_value(5, (data >> 5) & 1);	/* START */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* PREMIO */
+	output_set_lamp_value(0, (data) & 1);       /* HOLD1 */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* HOLD2 */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* HOLD3 */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* HOLD4 */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* HOLD5 */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* START */
+	output_set_lamp_value(6, (data >> 6) & 1);  /* PREMIO */
 
 //  popmessage("%04x\n",data);
 }
 
 static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")	// CY62256L-70, U77
-	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")	// CY62256L-70, U77
-	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")	// CY62256L-70, U78
-	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")	// CY62256L-70, U78
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")  // CY62256L-70, U77
+	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")  // CY62256L-70, U77
+	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")  // CY62256L-70, U78
+	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")  // CY62256L-70, U78
 
 	AM_RANGE(0x708000, 0x708001) AM_READ_PORT("IN0")
 	AM_RANGE(0x708002, 0x708003) AM_READ_PORT("IN1")
@@ -322,7 +322,7 @@ static INPUT_PORTS_START( mil4000 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Premio") PORT_CODE(KEYCODE_T)	//premio / prize (ticket?)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Premio") PORT_CODE(KEYCODE_T)   //premio / prize (ticket?)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -369,7 +369,7 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( mil4000, mil4000_state )
-	MCFG_CPU_ADD("maincpu", M68000, 12000000 )	// ?
+	MCFG_CPU_ADD("maincpu", M68000, 12000000 )  // ?
 	MCFG_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)

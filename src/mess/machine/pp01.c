@@ -148,7 +148,7 @@ WRITE8_MEMBER(pp01_state::pp01_mem_block_w)
 
 READ8_MEMBER(pp01_state::pp01_mem_block_r)
 {
-	return	m_memory_block[offset];
+	return  m_memory_block[offset];
 }
 
 void pp01_state::machine_start()
@@ -230,4 +230,3 @@ I8255A_INTERFACE( pp01_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portc_r),
 	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portc_w)
 };
-

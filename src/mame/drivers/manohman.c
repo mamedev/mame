@@ -129,8 +129,8 @@
 
 ***************************************************************************/
 
-#define MASTER_CLOCK		XTAL_8MHz
-#define SECONDARY_CLOCK		XTAL_3_6864MHz
+#define MASTER_CLOCK        XTAL_8MHz
+#define SECONDARY_CLOCK     XTAL_3_6864MHz
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -152,11 +152,11 @@ public:
 
 static ADDRESS_MAP_START( manohman_map, AS_PROGRAM, 16, _manohman_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP		// smell to MAX696 watchdog...
+	AM_RANGE(0x100000, 0x100001) AM_NOP     // smell to MAX696 watchdog...
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
-	AM_RANGE(0x600006, 0x600007) AM_RAM		// write bitpatterns to compare with the 500000-503ff8 RAM testing.
+	AM_RANGE(0x600006, 0x600007) AM_RAM     // write bitpatterns to compare with the 500000-503ff8 RAM testing.
 //  AM_RANGE(0xYYYYYY, 0xYYYYYY) AM_RAM
 ADDRESS_MAP_END
 
@@ -206,7 +206,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( manohman, _manohman_state )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)	// 8 MHz
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)   // 8 MHz
 	MCFG_CPU_PROGRAM_MAP(manohman_map)
 
 	// sound hardware
@@ -221,7 +221,7 @@ MACHINE_CONFIG_END
 *********************************************/
 
 ROM_START( manohman )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "mom_austria_vorserie_ii.bin", 0x000000, 0x010000, CRC(4b57409c) SHA1(0438f5d52f4de2ece8fb684cf2d82bdea0eacf0b) )
 	ROM_LOAD16_BYTE( "mom_austria_vorserie_i.bin",  0x000001, 0x010000, CRC(3c9507f9) SHA1(489a6aadfb7d61be0873bf48d428e9d915268f95) )
 ROM_END

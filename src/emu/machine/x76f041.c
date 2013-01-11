@@ -74,11 +74,11 @@ void x76f041_device::nvram_default()
 	{
 		// Ensure the size is correct though
 		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+
-		   SIZE_READ_PASSWORD+SIZE_CONFIGURATION_PASSWORD+SIZE_CONFIGURATION_REGISTERS+SIZE_DATA)
+			SIZE_READ_PASSWORD+SIZE_CONFIGURATION_PASSWORD+SIZE_CONFIGURATION_REGISTERS+SIZE_DATA)
 			logerror("X76F041: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
-					 SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+
-					 SIZE_READ_PASSWORD+SIZE_CONFIGURATION_PASSWORD+SIZE_CONFIGURATION_REGISTERS+SIZE_DATA,
-					 m_region->bytes());
+						SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+
+						SIZE_READ_PASSWORD+SIZE_CONFIGURATION_PASSWORD+SIZE_CONFIGURATION_REGISTERS+SIZE_DATA,
+						m_region->bytes());
 		else {
 			UINT8 *rb = m_region->base();
 			int offset = 0;
@@ -206,14 +206,14 @@ void x76f041_device::load_address()
 		bcr >>= 4;
 
 	if(((command & 0xe0) == COMMAND_READ && (bcr & BCR_Z) && (bcr & BCR_T)) ||
-	   ((command & 0xe0) == COMMAND_WRITE && (bcr & BCR_Z))) {
+		((command & 0xe0) == COMMAND_WRITE && (bcr & BCR_Z))) {
 		/* todo: find out when this is really checked. */
 		verboselog(1, "command not allowed\n");
 		state = STATE_STOP;
 		sdar = false;
 
 	} else if(((command & 0xe0) == COMMAND_WRITE && !(bcr & BCR_X)) ||
-			  ((command & 0xe0) == COMMAND_READ && !(bcr & BCR_Y))) {
+				((command & 0xe0) == COMMAND_READ && !(bcr & BCR_Y))) {
 		verboselog(1, "password not required\n");
 		password_ok();
 

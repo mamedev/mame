@@ -58,7 +58,7 @@ starfira has one less rom in total than starfire but everything passes as
 
 WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 {
-    /* A12 and A3 select video control registers */
+	/* A12 and A3 select video control registers */
 	if ((offset & 0x1008) == 0x1000)
 	{
 		switch (offset & 7)
@@ -72,19 +72,19 @@ WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
-    m_starfire_videoram[offset] = data;
+	m_starfire_videoram[offset] = data;
 }
 
 
 READ8_MEMBER(starfire_state::starfire_scratch_r)
 {
-    /* A11 selects input ports */
+	/* A11 selects input ports */
 	if (offset & 0x800)
 		return m_input_read(space, offset, 0xff);
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
-    return m_starfire_videoram[offset];
+	return m_starfire_videoram[offset];
 }
 
 
@@ -203,28 +203,28 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( starfire )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, "Time" )				PORT_DIPLOCATION("3A:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Time" )              PORT_DIPLOCATION("3A:1,2")
 	PORT_DIPSETTING(    0x00, "90 Sec" )
 	PORT_DIPSETTING(    0x01, "80 Sec" )
 	PORT_DIPSETTING(    0x02, "70 Sec" )
 	PORT_DIPSETTING(    0x03, "60 Sec" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("3A:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("3A:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x08, 0x00, "Fuel per Coin" )		PORT_DIPLOCATION("3A:4")
+	PORT_DIPNAME( 0x08, 0x00, "Fuel per Coin" )     PORT_DIPLOCATION("3A:4")
 	PORT_DIPSETTING(    0x00, "300" )
 	PORT_DIPSETTING(    0x08, "600" )
-	PORT_DIPNAME( 0x30, 0x00, "Bonus" )				PORT_DIPLOCATION("3A:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Bonus" )             PORT_DIPLOCATION("3A:5,6")
 	PORT_DIPSETTING(    0x00, "300 points" )
 	PORT_DIPSETTING(    0x10, "500 points" )
 	PORT_DIPSETTING(    0x20, "700 points" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x00, "Score Table Hold" )	PORT_DIPLOCATION("3A:7")
+	PORT_DIPNAME( 0x40, 0x00, "Score Table Hold" )  PORT_DIPLOCATION("3A:7")
 	PORT_DIPSETTING(    0x00, "fixed length" )
 	PORT_DIPSETTING(    0x40, "fixed length+fire" )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "3A:8" )
 
-	PORT_START("SYSTEM")	/* IN1 */
+	PORT_START("SYSTEM")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -234,13 +234,13 @@ static INPUT_PORTS_START( starfire )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("STICKX")	/* IN2 */
+	PORT_START("STICKX")    /* IN2 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("STICKY")	/* IN3 */
+	PORT_START("STICKY")    /* IN3 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("STICKZ")	/* IN4 */ /* throttle */
+	PORT_START("STICKZ")    /* IN4 */ /* throttle */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	PORT_START("NMI")
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( fireone )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START("SYSTEM")	/* IN1 */
+	PORT_START("SYSTEM")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
@@ -282,12 +282,12 @@ static INPUT_PORTS_START( fireone )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("P1")	/* IN2 */
+	PORT_START("P1")    /* IN2 */
 	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("P2")	/* IN3 */
+	PORT_START("P2")    /* IN3 */
 	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -317,7 +317,7 @@ static const char *const starfire_sample_names[] =
 
 static const samples_interface starfire_samples_interface =
 {
-	5,	/* 5 channels */
+	5,  /* 5 channels */
 	starfire_sample_names
 };
 

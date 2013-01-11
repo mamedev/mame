@@ -31,7 +31,7 @@ const device_type MOS6529 = &device_creator<mos6529_device>;
 //-------------------------------------------------
 
 mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MOS6529, "MOS6529", tag, owner, clock)
+	: device_t(mconfig, MOS6529, "MOS6529", tag, owner, clock)
 {
 }
 

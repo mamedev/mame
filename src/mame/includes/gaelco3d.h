@@ -9,7 +9,7 @@
 #include "sound/dmadac.h"
 #include "video/polynew.h"
 
-#define SOUND_CHANNELS	4
+#define SOUND_CHANNELS  4
 
 struct gaelco3d_object_data
 {
@@ -52,11 +52,11 @@ class gaelco3d_state : public driver_device
 public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_adsp_ram_base(*this,"adsp_ram_base"),
-		  m_m68k_ram_base(*this,"m68k_ram_base",0),
-		  m_tms_comm_base(*this,"tms_comm_base",0),
-		  m_adsp_control_regs(*this,"adsp_regs"),
-		  m_adsp_fastram_base(*this,"adsp_fastram") { }
+			m_adsp_ram_base(*this,"adsp_ram_base"),
+			m_m68k_ram_base(*this,"m68k_ram_base",0),
+			m_tms_comm_base(*this,"tms_comm_base",0),
+			m_adsp_control_regs(*this,"adsp_regs"),
+			m_adsp_fastram_base(*this,"adsp_fastram") { }
 
 	required_shared_ptr<UINT32> m_adsp_ram_base;
 	required_shared_ptr<UINT16> m_m68k_ram_base;

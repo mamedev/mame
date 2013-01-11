@@ -5,7 +5,7 @@ class toki_state : public driver_device
 public:
 	toki_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") ,
+			m_spriteram(*this, "spriteram") ,
 		m_background1_videoram16(*this, "bg1_vram16"),
 		m_background2_videoram16(*this, "bg2_vram16"),
 		m_videoram(*this, "videoram"),

@@ -25,11 +25,11 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6502_DOS_TAG	"5c"
-#define M6502_FDC_TAG	"9e"
-#define M6532_0_TAG		"9f"
-#define M6532_1_TAG		"9g"
-#define WD1797_TAG		"5e"
+#define M6502_DOS_TAG   "5c"
+#define M6502_FDC_TAG   "9e"
+#define M6532_0_TAG     "9f"
+#define M6532_1_TAG     "9g"
+#define WD1797_TAG      "5e"
 
 
 enum
@@ -55,11 +55,11 @@ const device_type C8280 = &device_creator<c8280_device>;
 
 ROM_START( c8280 )
 	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
-    ROM_DEFAULT_BIOS("r2")
-    ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
 	ROMX_LOAD( "300542-001.10c", 0x0000, 0x2000, CRC(3c6eee1e) SHA1(0726f6ab4de4fc9c18707fe87780ffd9f5ed72ab), ROM_BIOS(1) )
 	ROMX_LOAD( "300543-001.10d", 0x2000, 0x2000, CRC(f58e665e) SHA1(9e58b47c686c91efc6ef1a27f72dbb5e26c485ec), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
 	ROMX_LOAD( "300542-reva.10c", 0x0000, 0x2000, CRC(6f32ccfb) SHA1(6926c049f1635e6769ec69891de8c92941ff880e), ROM_BIOS(2) )
 	ROMX_LOAD( "300543-reva.10d", 0x2000, 0x2000, CRC(1af93f2c) SHA1(ad197b1d5dfa273487b33f473403ebd20dd15b2b), ROM_BIOS(2) )
 
@@ -121,18 +121,18 @@ READ8_MEMBER( c8280_device::dio_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     DI0
-        PA1     DI1
-        PA2     DI2
-        PA3     DI3
-        PA4     DI4
-        PA5     DI5
-        PA6     DI6
-        PA7     DI7
+	    PA0     DI0
+	    PA1     DI1
+	    PA2     DI2
+	    PA3     DI3
+	    PA4     DI4
+	    PA5     DI5
+	    PA6     DI6
+	    PA7     DI7
 
-    */
+	*/
 
 	return m_bus->dio_r();
 }
@@ -141,18 +141,18 @@ WRITE8_MEMBER( c8280_device::dio_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DO0
-        PB1     DO1
-        PB2     DO2
-        PB3     DO3
-        PB4     DO4
-        PB5     DO5
-        PB6     DO6
-        PB7     DO7
+	    PB0     DO0
+	    PB1     DO1
+	    PB2     DO2
+	    PB3     DO3
+	    PB4     DO4
+	    PB5     DO5
+	    PB6     DO6
+	    PB7     DO7
 
-    */
+	*/
 
 	m_bus->dio_w(this, data);
 }
@@ -175,18 +175,18 @@ READ8_MEMBER( c8280_device::riot1_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0
-        PA1
-        PA2
-        PA3
-        PA4
-        PA5     EOII
-        PA6     DAVI
-        PA7     _ATN
+	    PA0
+	    PA1
+	    PA2
+	    PA3
+	    PA4
+	    PA5     EOII
+	    PA6     DAVI
+	    PA7     _ATN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -206,18 +206,18 @@ WRITE8_MEMBER( c8280_device::riot1_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ATNA
-        PA1     DACO
-        PA2     RFDO
-        PA3     EOIO
-        PA4     DAVO
-        PA5
-        PA6
-        PA7
+	    PA0     ATNA
+	    PA1     DACO
+	    PA2     RFDO
+	    PA3     EOIO
+	    PA4     DAVO
+	    PA5
+	    PA6
+	    PA7
 
-    */
+	*/
 
 	// attention acknowledge
 	m_atna = BIT(data, 0);
@@ -241,18 +241,18 @@ READ8_MEMBER( c8280_device::riot1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DEVICE NUMBER SELECTION
-        PB1     DEVICE NUMBER SELECTION
-        PB2     DEVICE NUMBER SELECTION
-        PB3
-        PB4
-        PB5
-        PB6     DACI
-        PB7     RFDI
+	    PB0     DEVICE NUMBER SELECTION
+	    PB1     DEVICE NUMBER SELECTION
+	    PB2     DEVICE NUMBER SELECTION
+	    PB3
+	    PB4
+	    PB5
+	    PB6     DACI
+	    PB7     RFDI
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -272,18 +272,18 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0
-        PB1
-        PB2
-        PB3     ACT LED 1
-        PB4     ACT LED 0
-        PB5     ERR LED
-        PB6
-        PB7
+	    PB0
+	    PB1
+	    PB2
+	    PB3     ACT LED 1
+	    PB4     ACT LED 0
+	    PB5     ERR LED
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	// activity led 1
 	output_set_led_value(LED_ACT1, BIT(data, 3));
@@ -386,18 +386,18 @@ inline void c8280_device::update_ieee_signals()
 //-------------------------------------------------
 
 c8280_device::c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, C8280, "C8280", tag, owner, clock),
-	  device_ieee488_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_DOS_TAG),
-	  m_fdccpu(*this, M6502_FDC_TAG),
-	  m_riot0(*this, M6532_0_TAG),
-	  m_riot1(*this, M6532_1_TAG),
-	  m_fdc(*this, WD1797_TAG),
-	  m_floppy0(*this, WD1797_TAG":0"),
-	  m_floppy1(*this, WD1797_TAG":1"),
-	  m_rfdo(1),
-	  m_daco(1),
-	  m_atna(1)
+	: device_t(mconfig, C8280, "C8280", tag, owner, clock),
+		device_ieee488_interface(mconfig, *this),
+		m_maincpu(*this, M6502_DOS_TAG),
+		m_fdccpu(*this, M6502_FDC_TAG),
+		m_riot0(*this, M6532_0_TAG),
+		m_riot1(*this, M6532_1_TAG),
+		m_fdc(*this, WD1797_TAG),
+		m_floppy0(*this, WD1797_TAG":0"),
+		m_floppy1(*this, WD1797_TAG":1"),
+		m_rfdo(1),
+		m_daco(1),
+		m_atna(1)
 {
 }
 
@@ -475,18 +475,18 @@ READ8_MEMBER( c8280_device::fk5_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DS1
-        1       DS2
-        2       _DDEN
-        3       DCHG
-        4       TSID
-        5       MOTOR ENABLE
-        6       0
-        7       0
+	    0       DS1
+	    1       DS2
+	    2       _DDEN
+	    3       DCHG
+	    4       TSID
+	    5       MOTOR ENABLE
+	    6       0
+	    7       0
 
-    */
+	*/
 
 	UINT8 data = m_fk5;
 
@@ -500,18 +500,18 @@ WRITE8_MEMBER( c8280_device::fk5_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DS1
-        1       DS2
-        2       _DDEN
-        3
-        4
-        5       MOTOR ENABLE
-        6
-        7
+	    0       DS1
+	    1       DS2
+	    2       _DDEN
+	    3
+	    4
+	    5       MOTOR ENABLE
+	    6
+	    7
 
-    */
+	*/
 
 	m_fk5 = data & 0x27;
 

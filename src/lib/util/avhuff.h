@@ -53,7 +53,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define AVHUFF_USE_FLAC		(1)
+#define AVHUFF_USE_FLAC     (1)
 
 
 // errors
@@ -86,21 +86,21 @@ class avhuff_decompress_config
 public:
 	avhuff_decompress_config()
 		: maxsamples(0),
-		  actsamples(NULL),
-		  maxmetalength(0),
-		  actmetalength(NULL),
-		  metadata(NULL)
+			actsamples(NULL),
+			maxmetalength(0),
+			actmetalength(NULL),
+			metadata(NULL)
 	{
 		memset(audio, 0, sizeof(audio));
 	}
 
-	bitmap_yuy16 video;						// pointer to video bitmap
-	UINT32		maxsamples;					// maximum number of samples per channel
-	UINT32 *	actsamples;					// actual number of samples per channel
-	INT16 *		audio[16];					// pointer to individual audio channels
-	UINT32		maxmetalength;				// maximum length of metadata
-	UINT32 *	actmetalength;				// actual length of metadata
-	UINT8 *		metadata;					// pointer to metadata buffer
+	bitmap_yuy16 video;                     // pointer to video bitmap
+	UINT32      maxsamples;                 // maximum number of samples per channel
+	UINT32 *    actsamples;                 // actual number of samples per channel
+	INT16 *     audio[16];                  // pointer to individual audio channels
+	UINT32      maxmetalength;              // maximum length of metadata
+	UINT32 *    actmetalength;              // actual length of metadata
+	UINT8 *     metadata;                   // pointer to metadata buffer
 };
 
 
@@ -140,9 +140,9 @@ private:
 
 	private:
 		// internal state
-		int							m_rlecount;
-		huffman_encoder<256 + 16>	m_encoder;
-		dynamic_array<UINT16>		m_rlebuffer;
+		int                         m_rlecount;
+		huffman_encoder<256 + 16>   m_encoder;
+		dynamic_array<UINT16>       m_rlebuffer;
 	};
 
 	// internal helpers
@@ -151,17 +151,17 @@ private:
 	avhuff_error encode_video_lossless(const UINT8 *source, int width, int height, UINT8 *dest, UINT32 &complength);
 
 	// video encoding contexts
-	deltarle_encoder			m_ycontext;
-	deltarle_encoder			m_cbcontext;
-	deltarle_encoder			m_crcontext;
+	deltarle_encoder            m_ycontext;
+	deltarle_encoder            m_cbcontext;
+	deltarle_encoder            m_crcontext;
 
 	// audio encoding contexts
-	dynamic_buffer				m_audiobuffer;
+	dynamic_buffer              m_audiobuffer;
 #if AVHUFF_USE_FLAC
-	flac_encoder				m_flac_encoder;
+	flac_encoder                m_flac_encoder;
 #else
-	huffman_8bit_encoder		m_audiohi_encoder;
-	huffman_8bit_encoder		m_audiolo_encoder;
+	huffman_8bit_encoder        m_audiohi_encoder;
+	huffman_8bit_encoder        m_audiolo_encoder;
 #endif
 };
 
@@ -200,9 +200,9 @@ private:
 
 	private:
 		// internal state
-		int							m_rlecount;
-		UINT8						m_prevdata;
-		huffman_decoder<256 + 16>	m_decoder;
+		int                         m_rlecount;
+		UINT8                       m_prevdata;
+		huffman_decoder<256 + 16>   m_decoder;
 	};
 
 
@@ -212,18 +212,18 @@ private:
 	avhuff_error decode_video_lossless(int width, int height, const UINT8 *source, UINT32 complength, UINT8 *dest, UINT32 dstride, UINT32 dxor);
 
 	// internal state
-	avhuff_decompress_config	m_config;
+	avhuff_decompress_config    m_config;
 
 	// video decoding contexts
-	deltarle_decoder			m_ycontext;
-	deltarle_decoder			m_cbcontext;
-	deltarle_decoder			m_crcontext;
+	deltarle_decoder            m_ycontext;
+	deltarle_decoder            m_cbcontext;
+	deltarle_decoder            m_crcontext;
 
 	// audio decoding contexts
-	huffman_8bit_decoder		m_audiohi_decoder;
-	huffman_8bit_decoder		m_audiolo_decoder;
+	huffman_8bit_decoder        m_audiohi_decoder;
+	huffman_8bit_decoder        m_audiolo_decoder;
 #if AVHUFF_USE_FLAC
-	flac_decoder				m_flac_decoder;
+	flac_decoder                m_flac_decoder;
 #endif
 };
 

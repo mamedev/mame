@@ -53,7 +53,7 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 		{
 			/* Unnamed */
 			if (i >= maxunnamed)
-				goto error;	/* Too many unnamed */
+				goto error; /* Too many unnamed */
 			lastunnamed = i + 1;
 		}
 		else
@@ -337,8 +337,8 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	}
 
 	/* ugh I hate the way this function is set up, this is because the
-     * arguments depend on the partition; something that requires some
-     * rudimentary parsing */
+	 * arguments depend on the partition; something that requires some
+	 * rudimentary parsing */
 	if (argc >= 2)
 	{
 		/* open up the image */
@@ -887,20 +887,20 @@ error:
 
 static const struct command cmds[] =
 {
-	{ "create",				cmd_create,				"<format> <imagename> [--(createoption)=value]", 2, 8, 0},
-	{ "dir",				cmd_dir,				"<format> <imagename> [path]", 2, 3, 0 },
-	{ "get",				cmd_get,				"<format> <imagename> <filename> [newname] [--filter=filter] [--fork=fork]", 3, 4, 0 },
-	{ "put",				cmd_put,				"<format> <imagename> <filename>... <destname> [--(fileoption)==value] [--filter=filter] [--fork=fork]", 3, 0xffff, 0 },
-	{ "getall",				cmd_getall,				"<format> <imagename> [path] [--filter=filter]", 2, 3, 0 },
-	{ "del",				cmd_del,				"<format> <imagename> <filename>...", 3, 3, 1 },
-	{ "mkdir",				cmd_mkdir,				"<format> <imagename> <dirname>", 3, 3, 0 },
-	{ "rmdir",				cmd_rmdir,				"<format> <imagename> <dirname>...", 3, 3, 1 },
-	{ "readsector",			cmd_readsector,			"<format> <imagename> <track> <head> <sector> <filename>", 6, 6, 0 },
-	{ "writesector",		cmd_writesector,		"<format> <imagename> <track> <head> <sector> <filename>", 6, 6, 0 },
-	{ "identify",			cmd_identify,			"<imagename>", 1, 1 },
-	{ "listformats",		cmd_listformats,		NULL, 0, 0, 0 },
-	{ "listfilters",		cmd_listfilters,		NULL, 0, 0, 0 },
-	{ "listdriveroptions",	cmd_listdriveroptions, "<format>", 1, 1, 0 }
+	{ "create",             cmd_create,             "<format> <imagename> [--(createoption)=value]", 2, 8, 0},
+	{ "dir",                cmd_dir,                "<format> <imagename> [path]", 2, 3, 0 },
+	{ "get",                cmd_get,                "<format> <imagename> <filename> [newname] [--filter=filter] [--fork=fork]", 3, 4, 0 },
+	{ "put",                cmd_put,                "<format> <imagename> <filename>... <destname> [--(fileoption)==value] [--filter=filter] [--fork=fork]", 3, 0xffff, 0 },
+	{ "getall",             cmd_getall,             "<format> <imagename> [path] [--filter=filter]", 2, 3, 0 },
+	{ "del",                cmd_del,                "<format> <imagename> <filename>...", 3, 3, 1 },
+	{ "mkdir",              cmd_mkdir,              "<format> <imagename> <dirname>", 3, 3, 0 },
+	{ "rmdir",              cmd_rmdir,              "<format> <imagename> <dirname>...", 3, 3, 1 },
+	{ "readsector",         cmd_readsector,         "<format> <imagename> <track> <head> <sector> <filename>", 6, 6, 0 },
+	{ "writesector",        cmd_writesector,        "<format> <imagename> <track> <head> <sector> <filename>", 6, 6, 0 },
+	{ "identify",           cmd_identify,           "<imagename>", 1, 1 },
+	{ "listformats",        cmd_listformats,        NULL, 0, 0, 0 },
+	{ "listfilters",        cmd_listfilters,        NULL, 0, 0, 0 },
+	{ "listdriveroptions",  cmd_listdriveroptions, "<format>", 1, 1, 0 }
 };
 
 int CLIB_DECL main(int argc, char *argv[])

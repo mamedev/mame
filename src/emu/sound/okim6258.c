@@ -12,12 +12,12 @@
 #include "emu.h"
 #include "okim6258.h"
 
-#define COMMAND_STOP		(1 << 0)
-#define COMMAND_PLAY		(1 << 1)
-#define	COMMAND_RECORD		(1 << 2)
+#define COMMAND_STOP        (1 << 0)
+#define COMMAND_PLAY        (1 << 1)
+#define COMMAND_RECORD      (1 << 2)
 
-#define STATUS_PLAYING		(1 << 1)
-#define STATUS_RECORDING	(1 << 2)
+#define STATUS_PLAYING      (1 << 1)
+#define STATUS_RECORDING    (1 << 2)
 
 static const int dividers[4] = { 1024, 768, 512, 512 };
 
@@ -25,12 +25,12 @@ struct okim6258_state
 {
 	UINT8  status;
 
-	UINT32 master_clock;	/* master clock frequency */
-	UINT32 divider;			/* master clock divider */
-	UINT8 adpcm_type;		/* 3/4 bit ADPCM select */
-	UINT8 data_in;			/* ADPCM data-in register */
-	UINT8 nibble_shift;		/* nibble select */
-	sound_stream *stream;	/* which stream are we playing on? */
+	UINT32 master_clock;    /* master clock frequency */
+	UINT32 divider;         /* master clock divider */
+	UINT8 adpcm_type;       /* 3/4 bit ADPCM select */
+	UINT8 data_in;          /* ADPCM data-in register */
+	UINT8 nibble_shift;     /* nibble select */
+	sound_stream *stream;   /* which stream are we playing on? */
 
 	UINT8 output_bits;
 
@@ -84,9 +84,9 @@ static void compute_tables(void)
 		{
 			diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
 				(stepval   * nbl2bit[nib][1] +
-				 stepval/2 * nbl2bit[nib][2] +
-				 stepval/4 * nbl2bit[nib][3] +
-				 stepval/8);
+					stepval/2 * nbl2bit[nib][2] +
+					stepval/4 * nbl2bit[nib][3] +
+					stepval/8);
 		}
 	}
 
@@ -356,7 +356,7 @@ const device_type OKIM6258 = &device_creator<okim6258_device>;
 
 okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(okim6258_state);
 }
@@ -398,5 +398,3 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

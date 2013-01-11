@@ -53,7 +53,7 @@ device_vcs_control_port_interface::~device_vcs_control_port_interface()
 //-------------------------------------------------
 
 vcs_control_port_device::vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, VCS_CONTROL_PORT, "Atari VCS control port", tag, owner, clock),
+		device_t(mconfig, VCS_CONTROL_PORT, "Atari VCS control port", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }

@@ -84,13 +84,13 @@ TODO:
 #include "video/mc6845.h"
 #include "video/isa_cga.h"
 
-#define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
+#define VERBOSE_CGA 0       /* CGA (Color Graphics Adapter) */
 
-#define CGA_PALETTE_SETS 83	/* one for colour, one for mono,
+#define CGA_PALETTE_SETS 83 /* one for colour, one for mono,
                  * 81 for colour composite */
 
-#define CGA_SCREEN_NAME	"screen"
-#define CGA_MC6845_NAME	"mc6845_cga"
+#define CGA_SCREEN_NAME "screen"
+#define CGA_MC6845_NAME "mc6845_cga"
 
 #define CGA_LOG(N,M,A) \
 	do { \
@@ -606,15 +606,15 @@ static MC6845_UPDATE_ROW( cga_update_row )
 
 static const mc6845_interface mc6845_cga_intf =
 {
-	CGA_SCREEN_NAME,	/* screen number */
-	8,					/* numbers of pixels per video memory address */
-	NULL,				/* begin_update */
-	cga_update_row,		/* update_row */
-	NULL,				/* end_update */
-	DEVCB_NULL,				/* on_de_changed */
-	DEVCB_NULL,				/* on_cur_changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, hsync_changed),	/* on_hsync_changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, vsync_changed),	/* on_vsync_changed */
+	CGA_SCREEN_NAME,    /* screen number */
+	8,                  /* numbers of pixels per video memory address */
+	NULL,               /* begin_update */
+	cga_update_row,     /* update_row */
+	NULL,               /* end_update */
+	DEVCB_NULL,             /* on_de_changed */
+	DEVCB_NULL,             /* on_cur_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, hsync_changed),    /* on_hsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, vsync_changed),    /* on_vsync_changed */
 	NULL
 };
 
@@ -676,7 +676,7 @@ const rom_entry *isa8_cga_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock),
+		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this),
 		m_vram_size( 0x4000 )
 {
@@ -687,7 +687,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 }
 
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this),
 		m_vram_size( 0x4000 )
 {
@@ -875,7 +875,7 @@ const device_type ISA8_CGA_SUPERIMPOSE = &device_creator<isa8_cga_superimpose_de
 //-------------------------------------------------
 
 isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        isa8_cga_device( mconfig, ISA8_CGA_SUPERIMPOSE, "ISA8_CGA_SUPERIMPOSE", tag, owner, clock )
+		isa8_cga_device( mconfig, ISA8_CGA_SUPERIMPOSE, "ISA8_CGA_SUPERIMPOSE", tag, owner, clock )
 {
 	m_superimpose = true;
 }
@@ -888,7 +888,7 @@ isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &m
 
 static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 {
-	isa8_cga_device	*cga  = downcast<isa8_cga_device *>(device->owner());
+	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
@@ -1194,10 +1194,10 @@ static const UINT8 yc_lut2[4] = { 0, 182, 71, 255 };
 
 static const UINT8 yc_lut[16][8] =
 {
-	{ 0, 0, 0, 0, 0, 0, 0, 0 },	/* black */
-	{ 0, 0, 0, 0, 1, 1, 1, 1 },	/* blue */
-	{ 0, 1, 1, 1, 1, 0, 0, 0 },	/* green */
-	{ 0, 0, 1, 1, 1, 1, 0, 0 },	/* cyan */
+	{ 0, 0, 0, 0, 0, 0, 0, 0 }, /* black */
+	{ 0, 0, 0, 0, 1, 1, 1, 1 }, /* blue */
+	{ 0, 1, 1, 1, 1, 0, 0, 0 }, /* green */
+	{ 0, 0, 1, 1, 1, 1, 0, 0 }, /* cyan */
 	{ 1, 1, 0, 0, 0, 0, 1, 1 }, /* red */
 	{ 1, 0, 0, 0, 0, 1, 1, 1 }, /* magenta */
 	{ 1, 1, 1, 1, 0, 0, 0, 0 }, /* yellow */
@@ -1301,7 +1301,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8	fg = cga->m_color_select & 0x0F;
+	UINT8   fg = cga->m_color_select & 0x0F;
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1516,7 +1516,7 @@ void isa8_cga_device::plantronics_w(UINT8 data)
 {
 	if ( ( CGA_CHIPSET ) != CGA_CHIPSET_ATI) return;
 
-	data &= 0x70;	/* Only bits 6-4 are used */
+	data &= 0x70;   /* Only bits 6-4 are used */
 	m_plantronics = data;
 }
 
@@ -1564,7 +1564,7 @@ READ8_MEMBER( isa8_cga_device::io_read )
 		case 0x0f:
 			data = m_p3df;
 			break;
-    }
+	}
 	return data;
 }
 
@@ -1803,7 +1803,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT16	offset_base = ra << 13;
+	UINT16  offset_base = ra << 13;
 	int j;
 	running_machine &machine = device->machine();
 
@@ -2015,9 +2015,9 @@ void isa8_cga_pc1512_device::device_start()
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
 	m_isa->install_bank(0xb8000, 0xbbfff, 0, 0, "bank1", m_vram);
 
-    address_space &space = machine().firstcpu->space( AS_PROGRAM );
+	address_space &space = machine().firstcpu->space( AS_PROGRAM );
 
-    space.install_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
+	space.install_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
 }
 
 void isa8_cga_pc1512_device::device_reset()

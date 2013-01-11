@@ -16,10 +16,10 @@
 
 #define LOG 0
 
-#define CR1_0	0x03
-#define CR4_2	0x1C
-#define CR6_5	0x60
-#define CR7		0x80
+#define CR1_0   0x03
+#define CR4_2   0x1C
+#define CR6_5   0x60
+#define CR7     0x80
 
 #define TXD(_data) \
 	m_out_tx_func(_data)
@@ -59,7 +59,7 @@ const device_type ACIA6850 = &device_creator<acia6850_device>;
 //-------------------------------------------------
 
 acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ACIA6850, "6850 ACIA", tag, owner, clock)
+	: device_t(mconfig, ACIA6850, "6850 ACIA", tag, owner, clock)
 {
 	memset(static_cast<acia6850_interface *>(this), 0, sizeof(acia6850_interface));
 }

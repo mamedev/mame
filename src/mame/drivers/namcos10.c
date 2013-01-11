@@ -360,8 +360,8 @@ READ32_MEMBER(namcos10_state::range_r)
 		d16 = data32;
 
 	/* This is not entirely correct, but not entirely incorrect either...
-       It's also specific to mrdriller2, it seems.
-    */
+	   It's also specific to mrdriller2, it seems.
+	*/
 
 	UINT16 dd16 = d16 ^ key;
 

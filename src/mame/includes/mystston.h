@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 
-#define	MYSTSTON_MASTER_CLOCK	(XTAL_12MHz)
+#define MYSTSTON_MASTER_CLOCK   (XTAL_12MHz)
 
 
 class mystston_state : public driver_device

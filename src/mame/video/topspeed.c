@@ -35,7 +35,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT16 data, tilenum, code, color;
 	UINT8 flipx, flipy, priority, bad_chunks;
 	UINT8 j, k, px, py, zx, zy, zoomx, zoomy;
-	static const int primasks[2] = { 0xff00, 0xfffc };	/* Sprites are over bottom layer or under top layer */
+	static const int primasks[2] = { 0xff00, 0xfffc };  /* Sprites are over bottom layer or under top layer */
 
 	/* Most of spriteram is not used by the 68000: rest is scratch space for the h/w perhaps ? */
 	for (offs = 0; offs < (0x2c0 / 2); offs += 4)
@@ -54,7 +54,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 //      unknown = (data & 0x2000) >> 13;
 
 		if (y == 0x180)
-			continue;	/* dead sprite */
+			continue;   /* dead sprite */
 
 		map_offset = tilenum << 7;
 

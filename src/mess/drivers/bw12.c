@@ -89,13 +89,13 @@ void bw12_state::set_floppy_motor_off_timer()
 		/* trigger floppy motor off NE556 timer */
 		/*
 
-            R18 = RES_K(100)
-            C11 = CAP_U(4.7)
+		    R18 = RES_K(100)
+		    C11 = CAP_U(4.7)
 
-        */
+		*/
 
 		//m_floppy_timer->adjust(attotime::zero);
-        floppy_motor_off();
+		floppy_motor_off();
 	}
 }
 
@@ -185,31 +185,31 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bw12 )
 	/*
 
-      KB3600 PRO2 Keyboard matrix
+	  KB3600 PRO2 Keyboard matrix
 
-          | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
-          |     |     |     |     |     |     |     |     |     |     |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X0  |  7  |  8  |  9  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X1  |  U  |  I  |  O  |  P  |  Q  |  W  |  E  |  R  |  T  |  Y  |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X2  | F15 | F16 | RET | N.  | SP  | LOCK| F11 | F12 | F13 | F14 |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X3  | F7  | F8  | F9  | F10 | F1  | F2  | F3  | F4  | F5  | F6  |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X4  | LEFT|RIGHT| N3  | BS  |  @  |     |  -  |  ]  | UP  | DOWN|
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X5  | N9  | CL  | N2  | LF  | DEL | HT  |ARROW|  [  | N7  | N8  |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X6  |  M  |  ,  |  .  |  /  |  Z  |  X  |  C  |  V  |  B  |  N  |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X7  |  J  |  K  |  L  |  ;  |  A  |  S  |  D  |  F  |  G  |  H  |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-      X8  | N6  |  -  | N1  | N0  | ESC |     |  :  | NRET| N4  | N5  |
-      ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
+	      |     |     |     |     |     |     |     |     |     |     |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X0  |  7  |  8  |  9  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X1  |  U  |  I  |  O  |  P  |  Q  |  W  |  E  |  R  |  T  |  Y  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X2  | F15 | F16 | RET | N.  | SP  | LOCK| F11 | F12 | F13 | F14 |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X3  | F7  | F8  | F9  | F10 | F1  | F2  | F3  | F4  | F5  | F6  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X4  | LEFT|RIGHT| N3  | BS  |  @  |     |  -  |  ]  | UP  | DOWN|
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X5  | N9  | CL  | N2  | LF  | DEL | HT  |ARROW|  [  | N7  | N8  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X6  |  M  |  ,  |  .  |  /  |  Z  |  X  |  C  |  V  |  B  |  N  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X7  |  J  |  K  |  L  |  ;  |  A  |  S  |  D  |  F  |  G  |  H  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+	  X8  | N6  |  -  | N1  | N0  | ESC |     |  :  | NRET| N4  | N5  |
+	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
 
-    */
+	*/
 
 	PORT_START("X0")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
@@ -381,18 +381,18 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     Input from Centronics BUSY status
-        PA1     Input from Centronics ERROR status
-        PA2     Input from Centronics PAPER OUT status
-        PA3     Input from FDC MOTOR
-        PA4     Input from PIT OUT2
-        PA5     Input from keyboard strobe
-        PA6     Input from keyboard serial data
-        PA7     Input from FDC interrupt
+	    PA0     Input from Centronics BUSY status
+	    PA1     Input from Centronics ERROR status
+	    PA2     Input from Centronics PAPER OUT status
+	    PA3     Input from FDC MOTOR
+	    PA4     Input from PIT OUT2
+	    PA5     Input from keyboard strobe
+	    PA6     Input from keyboard serial data
+	    PA7     Input from FDC interrupt
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -429,27 +429,27 @@ WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 
 static const pia6821_interface pia_intf =
 {
-	DEVCB_DRIVER_MEMBER(bw12_state, pia_pa_r),					/* port A input */
-	DEVCB_NULL,													/* port B input */
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, ack_r),		/* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb1_r),			/* CB1 input */
-	DEVCB_NULL,													/* CA2 input */
-	DEVCB_NULL,													/* CB2 input */
-	DEVCB_NULL, 												/* port A output */
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),	/* port B output */
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),		/* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb2_w),			/* CB2 output */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),				/* IRQA output */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)				/* IRQB output */
+	DEVCB_DRIVER_MEMBER(bw12_state, pia_pa_r),                  /* port A input */
+	DEVCB_NULL,                                                 /* port B input */
+	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, ack_r),     /* CA1 input */
+	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb1_r),            /* CB1 input */
+	DEVCB_NULL,                                                 /* CA2 input */
+	DEVCB_NULL,                                                 /* CB2 input */
+	DEVCB_NULL,                                                 /* port A output */
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  /* port B output */
+	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),      /* CA2 output */
+	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb2_w),            /* CB2 output */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),             /* IRQA output */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)              /* IRQB output */
 };
 
 /* Centronics Interface */
 
 static const centronics_interface bw12_centronics_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, ca1_w),		/* ACK output */
-	DEVCB_NULL,											/* BUSY output */
-	DEVCB_NULL											/* NOT BUSY output */
+	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, ca1_w),       /* ACK output */
+	DEVCB_NULL,                                         /* BUSY output */
+	DEVCB_NULL                                          /* NOT BUSY output */
 };
 
 /* Z80-SIO/0 Interface */
@@ -611,15 +611,15 @@ FLOPPY_FORMATS_END
 /* F4 Character Displayer */
 static const gfx_layout bw12_charlayout =
 {
-	8, 9,					/* 8 x 9 characters */
-	256,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 9,                   /* 8 x 9 characters */
+	256,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( bw12 )
@@ -630,11 +630,11 @@ GFXDECODE_END
 /* Machine Driver */
 static MACHINE_CONFIG_START( common, bw12_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MCFG_CPU_PROGRAM_MAP(bw12_mem)
-    MCFG_CPU_IO_MAP(bw12_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(bw12_mem)
+	MCFG_CPU_IO_MAP(bw12_io)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -702,5 +702,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984,	bw12,   0,      0,      bw12,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
-COMP( 1984,	bw14,   bw12,   0,      bw14,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14",	GAME_SUPPORTS_SAVE )
+COMP( 1984, bw12,   0,      0,      bw12,   bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12", GAME_SUPPORTS_SAVE )
+COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14", GAME_SUPPORTS_SAVE )

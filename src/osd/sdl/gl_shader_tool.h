@@ -74,9 +74,9 @@ typedef void * (APIENTRYP PFNGLGETPROCADDRESSOS)(const char *procName);
 int gl_shader_loadExtention(PFNGLGETPROCADDRESSOS GetProcAddress);
 
 enum GLSLCheckMode {
-        CHECK_QUIET,         /* just return 0, if no error, otherwise the GL error code, no stderr output */
-        CHECK_VERBOSE,       /* same as CHECK_QUIET, but in the case of an error, use stderr to be verbose */
-        CHECK_ALWAYS_VERBOSE /* always print out all information available */
+		CHECK_QUIET,         /* just return 0, if no error, otherwise the GL error code, no stderr output */
+		CHECK_VERBOSE,       /* same as CHECK_QUIET, but in the case of an error, use stderr to be verbose */
+		CHECK_ALWAYS_VERBOSE /* always print out all information available */
 };
 
 #define GL_CHECK_ERROR_VERBOSE() gl_check_error(CHECK_ALWAYS_VERBOSE,__FILE__,__LINE__)
@@ -100,9 +100,9 @@ enum GLSLCheckMode {
 int gl_check_error(GLSLCheckMode m, const char *file, const int line);
 
 int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height,
-                          GLint border, GLenum format, GLenum type,
-			  GLsizei *avail_width, GLsizei *avail_height,
-			  int verbose);
+							GLint border, GLenum format, GLenum type,
+				GLsizei *avail_width, GLsizei *avail_height,
+				int verbose);
 
 int gl_round_to_pow2(int v);
 
@@ -122,26 +122,26 @@ int gl_compile_shader_source( GLhandleARB *shader, GLenum type, const char * sha
  * this is true for both, vertex and fragment shaders.
  */
 int gl_compile_shader_files( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader,
-                             const char * vertex_shader_file,
-                             const char * fragment_shader_file,
-			     int verbose
-                           );
+								const char * vertex_shader_file,
+								const char * fragment_shader_file,
+					int verbose
+							);
 
 /**
  * you can pass either a valid shader_file, or a precompiled vertex_shader,
  * this is true for both, vertex and fragment shaders.
  */
 int gl_compile_shader_sources( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader,
-                               const GLcharARB * vertex_shader_source,
-                               const GLcharARB * fragment_shader_source
-                             );
+								const GLcharARB * vertex_shader_source,
+								const GLcharARB * fragment_shader_source
+								);
 
 int gl_delete_shader( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader );
 
 #if defined(SDLMAME_MACOSX)
 #ifndef GL_ARB_shader_objects
-    typedef char GLcharARB;
-    typedef unsigned int GLhandleARB;
+	typedef char GLcharARB;
+	typedef unsigned int GLhandleARB;
 #endif
 typedef void (APIENTRYP PFNGLGETOBJECTPARAMETERIVARBPROC) (GLhandleARB obj, GLenum pname, GLint *params);
 typedef void (APIENTRYP PFNGLGETINFOLOGARBPROC) (GLhandleARB obj, GLsizei maxLength, GLsizei *length, GLcharARB *infoLog);

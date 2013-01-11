@@ -116,22 +116,22 @@ void applix_state::machine_reset()
 void applix_state::palette_init()
 { // shades need to be verified - the names on the right are from the manual
 	const UINT8 colors[16*3] = {
-	0x00, 0x00, 0x00,	//  0 Black
-	0x40, 0x40, 0x40,	//  1 Dark Grey
-	0x00, 0x00, 0x80,	//  2 Dark Blue
-	0x00, 0x00, 0xff,	//  3 Mid Blue
-	0x00, 0x80, 0x00,	//  4 Dark Green
-	0x00, 0xff, 0x00,	//  5 Green
-	0x00, 0xff, 0xff,	//  6 Blue Grey
-	0x00, 0x7f, 0x7f,	//  7 Light Blue
-	0x7f, 0x00, 0x00,	//  8 Dark Red
-	0xff, 0x00, 0x00,	//  9 Red
-	0x7f, 0x00, 0x7f,	// 10 Dark Violet
-	0xff, 0x00, 0xff,	// 11 Violet
-	0x7f, 0x7f, 0x00,	// 12 Brown
-	0xff, 0xff, 0x00,	// 13 Yellow
-	0xbf, 0xbf, 0xbf,	// 14 Light Grey
-	0xff, 0xff, 0xff };	// 15 White
+	0x00, 0x00, 0x00,   //  0 Black
+	0x40, 0x40, 0x40,   //  1 Dark Grey
+	0x00, 0x00, 0x80,   //  2 Dark Blue
+	0x00, 0x00, 0xff,   //  3 Mid Blue
+	0x00, 0x80, 0x00,   //  4 Dark Green
+	0x00, 0xff, 0x00,   //  5 Green
+	0x00, 0xff, 0xff,   //  6 Blue Grey
+	0x00, 0x7f, 0x7f,   //  7 Light Blue
+	0x7f, 0x00, 0x00,   //  8 Dark Red
+	0xff, 0x00, 0x00,   //  9 Red
+	0x7f, 0x00, 0x7f,   // 10 Dark Violet
+	0xff, 0x00, 0xff,   // 11 Violet
+	0x7f, 0x7f, 0x00,   // 12 Brown
+	0xff, 0xff, 0x00,   // 13 Yellow
+	0xbf, 0xbf, 0xbf,   // 14 Light Grey
+	0xff, 0xff, 0xff }; // 15 White
 
 	UINT8 r, b, g, i, color_count = 0;
 
@@ -164,17 +164,17 @@ MC6845_UPDATE_ROW( applix_update_row )
 	UINT16 colourm = (state->m_08 & 0x0e) << 7;
 	UINT32  *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)			// for each character
+	for (x = 0; x < x_count; x++)           // for each character
 	{
 		UINT8 inv=0;
 		mem = (ma + x) & 0x7ff;
 		chr = state->m_videoram[mem];
-		col = state->m_colorram[mem] | colourm;					// read a byte of colour
+		col = state->m_colorram[mem] | colourm;                 // read a byte of colour
 
 		/* get pattern of pixels for that character scanline */
 		gfx = state->m_gfxram[(chr<<4) | ra] ^ inv;
-		fg = (col & 0x001f) | 64;					// map to foreground palette
-		bg = (col & 0x07e0) >> 5;					// and background palette
+		fg = (col & 0x001f) | 64;                   // map to foreground palette
+		bg = (col & 0x07e0) >> 5;                   // and background palette
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[( gfx & 0x80 ) ? fg : bg];
@@ -190,10 +190,10 @@ MC6845_UPDATE_ROW( applix_update_row )
 }
 
 static const mc6845_interface applix_crtc = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	applix_update_row,		/* handler to display a scanline */
+	applix_update_row,      /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -235,4 +235,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, applix,	0,       0, 	applix,	applix, driver_device,	 0, 	  "Applix Pty Ltd",   "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, applix, 0,       0,     applix, applix, driver_device,   0,       "Applix Pty Ltd",   "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)

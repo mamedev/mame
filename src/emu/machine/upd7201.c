@@ -71,7 +71,7 @@ inline void upd7201_device::transmit(int channel)
 //-------------------------------------------------
 
 upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, UPD7201, "UPD7201", tag, owner, clock)
+	: device_t(mconfig, UPD7201, "UPD7201", tag, owner, clock)
 {
 }
 

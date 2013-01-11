@@ -99,31 +99,31 @@ static const z80_daisy_config z9001_daisy_chain[] =
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DRIVER_LINE_MEMBER(z9001_state, cass_w),			/* ZC/TO0 callback */
-	DEVCB_NULL,			/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)	/* ZC/TO2 callback */
+	DEVCB_DRIVER_LINE_MEMBER(z9001_state, cass_w),          /* ZC/TO0 callback */
+	DEVCB_NULL,         /* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3) /* ZC/TO2 callback */
 };
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,			/* read port A */
-	DEVCB_DRIVER_MEMBER(z9001_state, port88_w),			/* write port A */
-	DEVCB_NULL,			/* portA ready active callback */
-	DEVCB_NULL,			/* read port B - user expansion */
-	DEVCB_NULL,			/* write port B - user expansion */
-	DEVCB_NULL			/* portB ready active callback */
+	DEVCB_NULL,         /* read port A */
+	DEVCB_DRIVER_MEMBER(z9001_state, port88_w),         /* write port A */
+	DEVCB_NULL,         /* portA ready active callback */
+	DEVCB_NULL,         /* read port B - user expansion */
+	DEVCB_NULL,         /* write port B - user expansion */
+	DEVCB_NULL          /* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( pio2_intf ) // keyboard PIO
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,			/* read port A */
-	DEVCB_NULL,			/* write port A */
-	DEVCB_NULL,			/* portA ready active callback */
-	DEVCB_NULL,			/* read port B */
-	DEVCB_NULL,			/* write port B */
-	DEVCB_NULL			/* portB ready active callback */
+	DEVCB_NULL,         /* read port A */
+	DEVCB_NULL,         /* write port A */
+	DEVCB_NULL,         /* portA ready active callback */
+	DEVCB_NULL,         /* read port B */
+	DEVCB_NULL,         /* write port B */
+	DEVCB_NULL          /* portB ready active callback */
 };
 
 //Bits0,1 not connected; 2,3,4,5 go to a connector; 6 goes to 'graphics' LED; 7 goes to speaker.
@@ -205,15 +205,15 @@ UINT32 z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bit
 /* F4 Character Displayer */
 static const gfx_layout z9001_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	1024,					/* 4 x 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	1024,                   /* 4 x 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 WRITE8_MEMBER( z9001_state::kbd_put )

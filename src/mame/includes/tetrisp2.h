@@ -3,8 +3,8 @@ class tetrisp2_state : public driver_device
 public:
 	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram"),
-		  m_spriteram2(*this, "spriteram2") ,
+			m_spriteram(*this, "spriteram"),
+			m_spriteram2(*this, "spriteram2") ,
 		m_vram_fg(*this, "vram_fg"),
 		m_vram_bg(*this, "vram_bg"),
 		m_vram_rot(*this, "vram_rot"),
@@ -121,7 +121,7 @@ class stepstag_state : public tetrisp2_state
 public:
 	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tetrisp2_state(mconfig, type, tag),
-		  m_spriteram3(*this, "spriteram3") { }
+			m_spriteram3(*this, "spriteram3") { }
 
 	required_shared_ptr<UINT16> m_spriteram3;
 	DECLARE_READ16_MEMBER(stepstag_coins_r);

@@ -28,13 +28,13 @@
 WRITE16_MEMBER(darkseal_state::darkseal_control_w)
 {
 	switch (offset<<1) {
-    case 6: /* DMA flag */
+	case 6: /* DMA flag */
 		m_spriteram->copy();
 		return;
-    case 8: /* Sound CPU write */
+	case 8: /* Sound CPU write */
 		soundlatch_byte_w(space, 0, data & 0xff);
 		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
-    	return;
+		return;
 	case 0xa: /* IRQ Ack (VBL) */
 		return;
 	}
@@ -104,7 +104,7 @@ static INPUT_PORTS_START( darkseal )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )	/* button 3 - unused */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )   /* button 3 - unused */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -113,7 +113,7 @@ static INPUT_PORTS_START( darkseal )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )	/* button 3 - unused */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )   /* button 3 - unused */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
@@ -148,7 +148,7 @@ static INPUT_PORTS_START( darkseal )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )	/* Manual says 'Always OFF' */
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )    /* Manual says 'Always OFF' */
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0000, "1" )
@@ -177,13 +177,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 chars */
+	8,8,    /* 8*8 chars */
 	4096,
-	4,		/* 4 bits per pixel  */
+	4,      /* 4 bits per pixel  */
 	{ 0x00000*8, 0x10000*8, 0x8000*8, 0x18000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout seallayout =
@@ -213,11 +213,11 @@ static const gfx_layout seallayout2 =
 };
 
 static GFXDECODE_START( darkseal )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, seallayout,  768, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx3", 0, seallayout, 1024, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, seallayout2, 256, 32 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )  /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, seallayout,  768, 16 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )  /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx3", 0, seallayout, 1024, 16 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, seallayout2, 256, 32 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -226,9 +226,9 @@ static const deco16ic_interface darkseal_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 3, // both these tilemaps need to be twice the y size of usual!
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x00, /* color base */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	NULL,
 	NULL,
 	0,1
@@ -239,9 +239,9 @@ static const deco16ic_interface darkseal_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x00, /* color base */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	NULL,
 	NULL,
 	2,3
@@ -308,11 +308,11 @@ ROM_START( darkseal )
 	ROM_LOAD16_BYTE( "ga_00.h12",   0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
 	ROM_LOAD16_BYTE( "ga_05.j14",   0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
 	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
@@ -325,10 +325,10 @@ ROM_START( darkseal )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -339,11 +339,11 @@ ROM_START( darkseal1 )
 	ROM_LOAD16_BYTE( "ga_00.h12", 0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
 	ROM_LOAD16_BYTE( "ga_05.j14", 0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
 	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
@@ -356,10 +356,10 @@ ROM_START( darkseal1 )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -370,11 +370,11 @@ ROM_START( darksealj )
 	ROM_LOAD16_BYTE( "fz_00-2.h12", 0x40000, 0x20000, CRC(1ab99aa7) SHA1(1da51f3ee0d15094911d4090264b945090d51242) )
 	ROM_LOAD16_BYTE( "fz_05-2.j14", 0x40001, 0x20000, CRC(3374ef8c) SHA1(4144e71e452e281078bcd9b9a996db9f5dccc346) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
 	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
@@ -387,10 +387,10 @@ ROM_START( darksealj )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -401,11 +401,11 @@ ROM_START( gatedoom )
 	ROM_LOAD16_BYTE( "gb_00.h12",   0x40000, 0x20000, CRC(a88c16a1) SHA1(e02d5470692f23afa658b9bda933bb20be64602f) )
 	ROM_LOAD16_BYTE( "gb_05.j14",   0x40001, 0x20000, CRC(252d7e14) SHA1(b2f27cd9686dfc697f3faca74d20b298a59efab2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
 	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
@@ -418,10 +418,10 @@ ROM_START( gatedoom )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -432,11 +432,11 @@ ROM_START( gatedoom1 )
 	ROM_LOAD16_BYTE( "gb_00.h12", 0x40000, 0x20000, CRC(a88c16a1) SHA1(e02d5470692f23afa658b9bda933bb20be64602f) )
 	ROM_LOAD16_BYTE( "gb_05.j14", 0x40001, 0x20000, CRC(252d7e14) SHA1(b2f27cd9686dfc697f3faca74d20b298a59efab2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz_02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) ) /* chars */
 	ROM_LOAD( "fz_03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
@@ -449,10 +449,10 @@ ROM_START( gatedoom1 )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 

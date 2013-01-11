@@ -55,8 +55,8 @@
     - Beast (keeps reading command sense)
     - Beast 2
     - Bells Avenue (disk swap?)
-	- Bible Master 2 (at new game loading)
-	- Birdy World
+    - Bible Master 2 (at new game loading)
+    - Birdy World
 
     - Bokosuka Wars
     - Jangou 2: floppy fails to load after the title screen;
@@ -80,10 +80,10 @@
     - Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
     - Band-Kun: (how to run this without installing?)
     - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
-	- Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the poewr."
-	- Bishoujo Hunter ZX: Doesn't color cycle at intro (seems stuck?), doesn't clear text selection at new game screen;
-	- Bishoujo Shanshinkan: has white rectangles all over the place;
-	- Bishoujo Tsuushin: hangs with a beep while writing some intro text;
+    - Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the poewr."
+    - Bishoujo Hunter ZX: Doesn't color cycle at intro (seems stuck?), doesn't clear text selection at new game screen;
+    - Bishoujo Shanshinkan: has white rectangles all over the place;
+    - Bishoujo Tsuushin: hangs with a beep while writing some intro text;
 
     - Dragon Buster: slight issue with window masking;
     - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
@@ -93,7 +93,7 @@
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
     - Quarth: uploads a PCG charset
     - Runner's High: wrong double height on the title screen;
-	- Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
+    - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
     - Uno: uses EGC
 
@@ -347,7 +347,7 @@
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
-#define SASIBUS_TAG	 "sasi"
+#define SASIBUS_TAG  "sasi"
 
 class pc9801_state : public driver_device
 {
@@ -531,8 +531,8 @@ public:
 	DECLARE_READ8_MEMBER(pc9801rs_midi_r);
 	DECLARE_READ8_MEMBER(pc9821_memory_r);
 	DECLARE_WRITE8_MEMBER(pc9821_memory_w);
-//	DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
-//	DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
+//  DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
+//  DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
 
 	DECLARE_READ8_MEMBER(pc9801rs_ide_io_0_r);
 	DECLARE_READ8_MEMBER(pc9801rs_ide_io_1_r);
@@ -604,8 +604,8 @@ public:
 
 	DECLARE_PALETTE_INIT(pc9801);
 	INTERRUPT_GEN_MEMBER(pc9801_vrtc_irq);
-//	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-//	DECLARE_INPUT_CHANGED_MEMBER(shift_stroke);
+//  DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+//  DECLARE_INPUT_CHANGED_MEMBER(shift_stroke);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_master_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_dma_hrq_changed);
@@ -692,7 +692,7 @@ UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-    const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
@@ -702,8 +702,8 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//	popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().primary_screen->visible_area().max_y + 1);
-//	interlace_on = ((device->machine().primary_screen->visible_area().max_y + 1) >= 400) ? 1 : 0;
+//  popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().primary_screen->visible_area().max_y + 1);
+//  interlace_on = ((device->machine().primary_screen->visible_area().max_y + 1) >= 400) ? 1 : 0;
 	interlace_on = state->m_video_ff[INTERLACE_REG];
 	colors16_mode = (state->m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
@@ -753,7 +753,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-    const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int xi,yi;
 	int x;
 	UINT8 char_size;
@@ -790,8 +790,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		if(knj_tile)
 		{
 			/* Note: bit 7 doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
-               Trusted with Alice no Yakata, Animahjong V3, Aki no Tsukasa no Fushigi no Kabe, Apros ...
-            */
+			   Trusted with Alice no Yakata, Animahjong V3, Aki no Tsukasa no Fushigi no Kabe, Apros ...
+			*/
 			//kanji_lr = (knj_tile & 0x80) >> 7;
 			//kanji_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
 			tile &= 0x7f;
@@ -842,15 +842,15 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 							tile_data = 0;
 
 							/*
-                                gfx strip mode:
+							    gfx strip mode:
 
-                                number refers to the bit number in the tile data.
-                                This mode is identical to the one seen in PC-8801
-                                00004444
-                                11115555
-                                22226666
-                                33337777
-                            */
+							    number refers to the bit number in the tile data.
+							    This mode is identical to the one seen in PC-8801
+							    00004444
+							    11115555
+							    22226666
+							    33337777
+							*/
 
 							gfx_bit = (xi & 4);
 							gfx_bit+= (yi & (2 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
@@ -866,7 +866,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 					if(reverse) { tile_data^=0xff; }
 					if(u_line && yi == 7) { tile_data = 0xff; }
-					if(v_line)	{ tile_data|=8; }
+					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
 					if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
@@ -1184,26 +1184,26 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 	{
 		/*
 		TODO: this is my best bet so far. Register 4 is annoying, the pattern seems to be:
-        Write to video FF register Graphic -> 00
-        Write to video FF register 200 lines -> 0x
-        Write to video FF register 200 lines -> 00
+		Write to video FF register Graphic -> 00
+		Write to video FF register 200 lines -> 0x
+		Write to video FF register 200 lines -> 00
 
-        where x is the current mode.
-        */
+		where x is the current mode.
+		*/
 		switch((data & 0x0e) >> 1)
 		{
 			case 1:
-		        m_gfx_ff = 1;
-		        if(data & 1)
-		        	printf("Graphic f/f actually enabled!\n");
+				m_gfx_ff = 1;
+				if(data & 1)
+					printf("Graphic f/f actually enabled!\n");
 					break;
 			case 4:
 				if(m_gfx_ff)
-		        {
+				{
 					m_video_ff[(data & 0x0e) >> 1] = data &1;
 					m_gfx_ff = 0;
 				}
-		        break;
+				break;
 			default: m_video_ff[(data & 0x0e) >> 1] = data & 1; break;
 		}
 
@@ -1211,14 +1211,14 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 		{
 			static const char *const video_ff_regnames[] =
 			{
-				"Attribute Select",	// 0
-				"Graphic",			// 1
-				"Column",			// 2
-				"Font Select",		// 3
-				"200 lines",		// 4
-				"KAC?",				// 5
-				"Memory Switch",	// 6
-				"Display ON"		// 7
+				"Attribute Select", // 0
+				"Graphic",          // 1
+				"Column",           // 2
+				"Font Select",      // 3
+				"200 lines",        // 4
+				"KAC?",             // 5
+				"Memory Switch",    // 6
+				"Display ON"        // 7
 			};
 
 			printf("Write to video FF register %s -> %02x\n",video_ff_regnames[(data & 0x0e) >> 1],data & 1);
@@ -1424,7 +1424,7 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
+			case 0: return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
 			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x5f; //unknown port meaning
 		}
@@ -1497,7 +1497,7 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return machine().device<upd765a_device>("upd765_2dd")->msr_r(space, 0, 0xff);
+			case 0: return machine().device<upd765a_device>("upd765_2dd")->msr_r(space, 0, 0xff);
 			case 2: return machine().device<upd765a_device>("upd765_2dd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x40; //unknown port meaning, might be 0x70
 		}
@@ -1685,15 +1685,15 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 	if(m_sasi.ctrl & 0x40) // read status
 	{
 	/*
-		x--- -.-- REQ
-		-x-- ---- ACK
-		--x- ---- BSY
-		---x ---- MSG
-		---- x--- CD
-		---- -x-- IO
-		---- ---x INT?
-    */
-//		res |= m_sasibus->scsi_cd_r() << 0;
+	    x--- -.-- REQ
+	    -x-- ---- ACK
+	    --x- ---- BSY
+	    ---x ---- MSG
+	    ---- x--- CD
+	    ---- -x-- IO
+	    ---- ---x INT?
+	*/
+//      res |= m_sasibus->scsi_cd_r() << 0;
 		res |= m_sasibus->scsi_io_r() << 2;
 		res |= m_sasibus->scsi_cd_r() << 3;
 		res |= m_sasibus->scsi_msg_r() << 4;
@@ -1704,12 +1704,12 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 	else // read drive info
 	{
 /*
-		xx-- ---- unknown but tested
-		--xx x--- SASI-1 media type
-		---- -xxx SASI-2 media type
+        xx-- ---- unknown but tested
+        --xx x--- SASI-1 media type
+        ---- -xxx SASI-2 media type
 */
 		res |= 7 << 3; // read mediatype SASI-1
-		res |= 7;	// read mediatype SASI-2
+		res |= 7;   // read mediatype SASI-2
 	}
 
 	return res;
@@ -1718,21 +1718,21 @@ READ8_MEMBER( pc9801_state::sasi_status_r )
 WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
 {
 	/*
-		---- ----
-		---- x--- reset line
-    */
+	    ---- ----
+	    ---- x--- reset line
+	*/
 
 	if(m_sasi.ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
 	{
 		m_sasibus->scsi_rst_w(1);
-//		m_timer_rst->adjust(attotime::from_nsec(100));
+//      m_timer_rst->adjust(attotime::from_nsec(100));
 	}
 	else
 		m_sasibus->scsi_rst_w(0); // TODO
 
 	m_sasi.ctrl = data;
 
-//	m_sasibus->scsi_sel_w(BIT(data, 0));
+//  m_sasibus->scsi_sel_w(BIT(data, 0));
 }
 
 static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
@@ -1741,7 +1741,7 @@ static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(pc9801_gvram_r,pc9801_gvram_w,0xffff) //bitmap VRAM
 	AM_RANGE(0xcc000, 0xcdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
 	AM_RANGE(0xd6000, 0xd6fff) AM_ROM AM_REGION("fdc_bios_2dd",0) //floppy BIOS 2dd
-    AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
+	AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
 	AM_RANGE(0xe8000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
@@ -1758,13 +1758,13 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0xffff) //mode FF / <undefined>
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,pc9801_70_w,0xffff) //display registers / i8253 pit
-//	AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
+//  AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
 	AM_RANGE(0x0080, 0x0081) AM_DEVREAD8(SASIBUS_TAG ":host", scsicb_device, scsi_data_r, 0x00ff) AM_WRITE8(sasi_data_w, 0x00ff)
 	AM_RANGE(0x0082, 0x0083) AM_READWRITE8(sasi_status_r, sasi_ctrl_w,0x00ff)
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2hd_r,pc9801_fdc_2hd_w,0xffff) //upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
-//	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
+//  AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,pc9801_mouse_w,0xffff) // <undefined> / mouse ppi8255 ports
 ADDRESS_MAP_END
 
@@ -1899,7 +1899,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_70_r)
 		return 0xff;
 	}
 
-	return	pc9801_70_r(space,offset);;
+	return  pc9801_70_r(space,offset);;
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_70_w)
@@ -1933,17 +1933,17 @@ READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 	if(m_gate_a20 == 0)
 		offset &= 0xfffff;
 
-	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
+	if     (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000affff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,1);        }
 	else if(offset >= 0x000b0000 && offset <= 0x000b7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,2);        }
 	else if(offset >= 0x000b8000 && offset <= 0x000bffff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,3);        }
-	else if(offset >= 0x000cc000 && offset <= 0x000cffff)					{ return pc9801rs_soundrom_r(space,offset & 0x3fff);}
-	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)					{ return pc9801rs_ide_r(space,offset & 0x1fff);         }
+	else if(offset >= 0x000cc000 && offset <= 0x000cffff)                   { return pc9801rs_soundrom_r(space,offset & 0x3fff);}
+	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)                   { return pc9801rs_ide_r(space,offset & 0x1fff);         }
 	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,0);        }
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
-	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)		{ return pc9801rs_ex_wram_r(space,offset-0x00100000); }
+	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { return pc9801rs_ex_wram_r(space,offset-0x00100000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
 //  printf("%08x\n",offset);
@@ -1956,7 +1956,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_memory_w)
 	if(m_gate_a20 == 0)
 		offset &= 0xfffff;
 
-	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
+	if     (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000affff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,1,data);        }
@@ -1976,10 +1976,10 @@ READ8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_r)
 WRITE8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_w)
 {
 	/*
-    ---- x--- ready line?
-    ---- --x- select type (1) 2hd (0) 2dd
-    ---- ---x select irq
-    */
+	---- x--- ready line?
+	---- --x- select type (1) 2hd (0) 2dd
+	---- ---x select irq
+	*/
 
 	machine().device<floppy_connector>("upd765_2hd:0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 	machine().device<floppy_connector>("upd765_2hd:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
@@ -1997,7 +1997,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_2hd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
+			case 0: return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
 			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x44; //2hd flag
 		}
@@ -2044,7 +2044,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 	{
 		switch(offset & 6)
 		{
-			case 0:	return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
+			case 0: return machine().device<upd765a_device>("upd765_2hd")->msr_r(space, 0, 0xff);
 			case 2: return machine().device<upd765a_device>("upd765_2hd")->fifo_r(space, 0, 0xff);
 			case 4: return 0x44; //2dd flag
 		}
@@ -2085,10 +2085,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 		{
 			static const char *const ex_video_ff_regnames[] =
 			{
-				"16 colors mode",	// 0
-				"<unknown>",		// 1
-				"EGC related",		// 2
-				"<unknown>"			// 3
+				"16 colors mode",   // 0
+				"<unknown>",        // 1
+				"EGC related",      // 2
+				"<unknown>"         // 3
 			};
 
 			printf("Write to extended video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
@@ -2115,9 +2115,9 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
 		}
 
 		palette_set_color_rgb(machine(), (m_analog16.pal_entry)+0x10,
-											  pal4bit(m_analog16.r[m_analog16.pal_entry]),
-											  pal4bit(m_analog16.g[m_analog16.pal_entry]),
-											  pal4bit(m_analog16.b[m_analog16.pal_entry]));
+												pal4bit(m_analog16.r[m_analog16.pal_entry]),
+												pal4bit(m_analog16.g[m_analog16.pal_entry]),
+												pal4bit(m_analog16.b[m_analog16.pal_entry]));
 		return;
 	}
 
@@ -2253,7 +2253,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 //  AM_RANGE(0x00ec, 0x00ef) PC-9801-86 sound board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-//	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
+//  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(pc9801rs_ide_io_0_r,  pc9801rs_ide_io_0_w,0x00ff00ff)
 
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
@@ -2264,7 +2264,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 
 	AM_RANGE(0x3fd8, 0x3fdf) AM_READWRITE8(pc9801rs_pit_mirror_r,        pc9801rs_pit_mirror_w,        0xffffffff) // <undefined> / pit mirror ports
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
-//	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
+//  AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffffffff)
 	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffffffff)
 ADDRESS_MAP_END
@@ -2276,7 +2276,7 @@ READ8_MEMBER(pc9801_state::pc980ux_memory_r)
 	//if(m_gate_a20 == 0)
 	//  offset &= 0xfffff;
 
-	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
+	if     (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
@@ -2293,7 +2293,7 @@ WRITE8_MEMBER(pc9801_state::pc9801ux_memory_w)
 	//if(m_gate_a20 == 0)
 	//  offset &= 0xfffff;
 
-	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
+	if     (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
@@ -2323,12 +2323,12 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffff)
-//	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffff) //ym2203 opn / <undefined>
+//  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
 	AM_RANGE(0x3fd8, 0x3fdf) AM_READWRITE8(pc9801rs_pit_mirror_r,        pc9801rs_pit_mirror_w,        0xffff) // <undefined> / pit mirror ports
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffff) // <undefined> / mouse ppi8255 ports
-//	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffff)
+//  AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffff)
 
 ADDRESS_MAP_END
 
@@ -2357,20 +2357,20 @@ READ8_MEMBER(pc9801_state::pc9821_memory_r)
 
 	/* TODO: window bank at 0xa0000 - 0xbffff */
 
-	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
+	if     (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
 //  else if(offset >= 0x00080000 && offset <= 0x0009ffff)                   { return pc9821_winram_r(space,offset & 0x1ffff);     }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000affff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,1);        }
 	else if(offset >= 0x000b0000 && offset <= 0x000b7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,2);        }
 	else if(offset >= 0x000b8000 && offset <= 0x000bffff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,3);        }
-	else if(offset >= 0x000cc000 && offset <= 0x000cffff)					{ return pc9801rs_soundrom_r(space,offset & 0x3fff);}
-	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)					{ return pc9801rs_ide_r(space,offset & 0x1fff);         }
-	else if(offset >= 0x000da000 && offset <= 0x000dbfff)					{ return pc9821_ideram_r(space,offset & 0x1fff);      }
+	else if(offset >= 0x000cc000 && offset <= 0x000cffff)                   { return pc9801rs_soundrom_r(space,offset & 0x3fff);}
+	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)                   { return pc9801rs_ide_r(space,offset & 0x1fff);         }
+	else if(offset >= 0x000da000 && offset <= 0x000dbfff)                   { return pc9821_ideram_r(space,offset & 0x1fff);      }
 	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,0);        }
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { return pc9801rs_ex_wram_r(space,offset-0x00100000); }
-	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ return pc9821_ext_gvram_r(space,offset-0x00f00000); }
+	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)                   { return pc9821_ext_gvram_r(space,offset-0x00f00000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
 	//printf("%08x\n",offset);
@@ -2388,20 +2388,20 @@ WRITE8_MEMBER(pc9801_state::pc9821_memory_w)
 
 	/* TODO: window bank at 0xa0000 - 0xbffff */
 
-	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
+	if     (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 //  else if(offset >= 0x00080000 && offset <= 0x0009ffff)                   { pc9821_winram_w(space,offset & 0x1ffff,data);        }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000affff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,1,data);        }
 	else if(offset >= 0x000b0000 && offset <= 0x000b7fff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,2,data);        }
 	else if(offset >= 0x000b8000 && offset <= 0x000bffff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,3,data);        }
-	else if(offset >= 0x000cc000 && offset <= 0x000cffff)					{ /* TODO: shadow ROM */                               }
-	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)					{ /* TODO: shadow ROM */                               }
-	else if(offset >= 0x000da000 && offset <= 0x000dbfff)					{ pc9821_ideram_w(space,offset & 0x1fff,data);         }
+	else if(offset >= 0x000cc000 && offset <= 0x000cffff)                   { /* TODO: shadow ROM */                               }
+	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)                   { /* TODO: shadow ROM */                               }
+	else if(offset >= 0x000da000 && offset <= 0x000dbfff)                   { pc9821_ideram_w(space,offset & 0x1fff,data);         }
 	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,0,data);        }
-	else if(offset >= 0x000e8000 && offset <= 0x000fffff)					{ /* TODO: shadow ROM */                               }
+	else if(offset >= 0x000e8000 && offset <= 0x000fffff)                   { /* TODO: shadow ROM */                               }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
-	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ pc9821_ext_gvram_w(space,offset-0x00f00000,data);    }
+	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)                   { pc9821_ext_gvram_w(space,offset-0x00f00000,data);    }
 	//else
 	//  printf("%08x %08x\n",offset,data);
 
@@ -2463,9 +2463,9 @@ WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
 		}
 
 		palette_set_color_rgb(machine(), (m_analog256.pal_entry)+0x20,
-											  m_analog256.r[m_analog256.pal_entry],
-											  m_analog256.g[m_analog256.pal_entry],
-											  m_analog256.b[m_analog256.pal_entry]);
+												m_analog256.r[m_analog256.pal_entry],
+												m_analog256.g[m_analog256.pal_entry],
+												m_analog256.b[m_analog256.pal_entry]);
 		return;
 	}
 
@@ -2580,7 +2580,7 @@ static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
-//	ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
+//  ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -2601,7 +2601,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 //  AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-//	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
+//  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
 	AM_RANGE(0x0430, 0x0433) AM_READWRITE8(pc9801rs_ide_io_0_r,  pc9801rs_ide_io_0_w,0x00ff00ff) // IDE bank register
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
@@ -2614,7 +2614,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x074c, 0x074f) AM_READWRITE8(pc9801rs_ide_io_2_r,  pc9801rs_ide_io_2_w,0x00ff00ff) // IDE status (r) - IDE control registers (w) / <undefined>
 //  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
 	AM_RANGE(0x09a0, 0x09a3) AM_READWRITE8(pc9821_ext2_video_ff_r, pc9821_ext2_video_ff_w, 0xffffffff) // GDC extended register r/w
-//	AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
+//  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
 //  AM_RANGE(0x0c07, 0x0c07) EPSON register w
 //  AM_RANGE(0x0c03, 0x0c03) EPSON register 0 r
 //  AM_RANGE(0x0c13, 0x0c14) EPSON register 1 r
@@ -2637,7 +2637,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x8d1c, 0x8d1f) AM_READWRITE8(sdip_9_r,sdip_9_w,0xffffffff)
 	AM_RANGE(0x8e1c, 0x8e1f) AM_READWRITE8(sdip_a_r,sdip_a_w,0xffffffff)
 	AM_RANGE(0x8f1c, 0x8f1f) AM_READWRITE8(sdip_b_r,sdip_b_w,0xffffffff)
-//	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
+//  AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 //  AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 //  AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
 //  AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -2991,15 +2991,15 @@ static const struct pit8253_config pc9821_pit8253_config =
 {
 	{
 		{
-			MAIN_CLOCK_X2,				/* heartbeat IRQ */
+			MAIN_CLOCK_X2,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			MAIN_CLOCK_X2,				/* Memory Refresh */
+			MAIN_CLOCK_X2,              /* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			MAIN_CLOCK_X2,				/* RS-232c */
+			MAIN_CLOCK_X2,              /* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -3129,23 +3129,23 @@ WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
 
 static I8255A_INTERFACE( ppi_system_intf )
 {
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_porta_r),					/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portb_r),					/* Port B read */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_NULL,					/* Port C read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portc_w)					/* Port C write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_porta_r),                  /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portb_r),                  /* Port B read */
+	DEVCB_NULL,                 /* Port B write */
+	DEVCB_NULL,                 /* Port C read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portc_w)                   /* Port C write */
 };
 
 /* TODO: check this one */
 static I8255A_INTERFACE( ppi_printer_intf )
 {
-	DEVCB_NULL,					/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_prn_portb_r),					/* Port B read */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_NULL,					/* Port C read */
-	DEVCB_NULL					/* Port C write */
+	DEVCB_NULL,                 /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_prn_portb_r),                  /* Port B read */
+	DEVCB_NULL,                 /* Port B write */
+	DEVCB_NULL,                 /* Port C read */
+	DEVCB_NULL                  /* Port C write */
 };
 
 READ8_MEMBER(pc9801_state::ppi_fdd_porta_r)
@@ -3170,12 +3170,12 @@ WRITE8_MEMBER(pc9801_state::ppi_fdd_portc_w)
 
 static I8255A_INTERFACE( ppi_fdd_intf )
 {
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_porta_r),					/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portb_r),					/* Port B read */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_w)					/* Port C write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_porta_r),                  /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portb_r),                  /* Port B read */
+	DEVCB_NULL,                 /* Port B write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_r),                  /* Port C read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_w)                   /* Port C write */
 };
 
 READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
@@ -3227,12 +3227,12 @@ WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
 
 static I8255A_INTERFACE( ppi_mouse_intf )
 {
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_r),					/* Port A read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_w),					/* Port A write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portb_r),					/* Port B read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portb_w),					/* Port B write */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portc_r),					/* Port C read */
-	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portc_w)					/* Port C write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_r),                    /* Port A read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_w),                    /* Port A write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portb_r),                    /* Port B read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portb_w),                    /* Port B write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portc_r),                    /* Port C read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portc_w)                 /* Port C write */
 };
 
 /****************************************
@@ -3246,19 +3246,19 @@ static SLOT_INTERFACE_START( pc9801_floppies )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( pc9801_cbus )
-//	PC-9801-14
+//  PC-9801-14
 	SLOT_INTERFACE( "pc9801_26", PC9801_26 )
 	SLOT_INTERFACE( "pc9801_86", PC9801_86 )
-//	PC-9801-86
-//	PC-9801-26 + PC-9801-86 (?)
-//	PC-9801-86 + Chibi-Oto
+//  PC-9801-86
+//  PC-9801-26 + PC-9801-86 (?)
+//  PC-9801-86 + Chibi-Oto
 	SLOT_INTERFACE( "pc9801_118", PC9801_118 )
-//	Speak Board
-//	Spark Board
-//	AMD-98 (AmuseMent boarD)
+//  Speak Board
+//  Spark Board
+//  AMD-98 (AmuseMent boarD)
 SLOT_INTERFACE_END
 
-//	Jast Sound, could be put independently
+//  Jast Sound, could be put independently
 
 void pc9801_state::fdc_2hd_irq(bool state)
 {
@@ -3560,7 +3560,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
 	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26", NULL)
 	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, NULL, NULL)
-//	TODO: six max slots
+//  TODO: six max slots
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
@@ -3834,13 +3834,13 @@ UX - 80286 10 + V30 8
 ROM_START( pc9801ux )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_ux.rom",  0x18000, 0x08000, CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
-    ROM_LOAD( "bios_ux.rom", 0x28000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
+	ROM_LOAD( "bios_ux.rom", 0x28000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
-    ROM_LOAD( "sound_ux.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
+	ROM_LOAD( "sound_ux.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-    ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
+	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -3853,13 +3853,13 @@ RX - 80286 12 (no V30?)
 ROM_START( pc9801rx )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, BAD_DUMP CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-    ROM_LOAD( "bios_rx.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_LOAD( "bios_rx.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
-    ROM_LOAD( "sound_rx.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
+	ROM_LOAD( "sound_rx.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-    ROM_LOAD( "font_rx.rom",     0x000000, 0x046800, CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+	ROM_LOAD( "font_rx.rom",     0x000000, 0x046800, CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -3879,10 +3879,10 @@ ROM_START( pc9801rs )
 	/* following is an emulator memory dump, should be checked and nuked */
 	ROM_REGION( 0x100000, "memory", 0 )
 	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
-	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
+	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
 	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
-	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )	// 0xff everywhere
-	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )	// contains n-88 basic (86) v2.0
+	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
+	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )  // contains n-88 basic (86) v2.0
 	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
 	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
 
@@ -3905,13 +3905,13 @@ TODO: this ISN'T a real VM model!
 ROM_START( pc9801vm )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-    ROM_LOAD( "bios_vm.rom", 0x28000, 0x018000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
+	ROM_LOAD( "bios_vm.rom", 0x28000, 0x018000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
-    ROM_LOAD( "sound_vm.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
+	ROM_LOAD( "sound_vm.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-    ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+	ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -3945,13 +3945,13 @@ As - 80486DX 33
 ROM_START( pc9821as )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf.rom",     0x18000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-    ROM_LOAD( "bios_as.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_LOAD( "bios_as.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
-    ROM_LOAD( "sound_as.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
+	ROM_LOAD( "sound_as.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-    ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+	ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -3984,7 +3984,7 @@ Epson PC-486MU - 486 based, unknown clock
 ROM_START( pc486mu )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "bios_486mu.rom", 0x08000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
-	ROM_RELOAD( 				0x28000, 0x18000 ) // missing rom?
+	ROM_RELOAD(                 0x28000, 0x18000 ) // missing rom?
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_486mu.rom", 0x0000, 0x4000, CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c))
@@ -4003,13 +4003,13 @@ ROM_END
 ROM_START( pc9821ce2 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_ce2.rom",  0x18000, 0x08000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
-    ROM_LOAD( "bios_ce2.rom", 0x28000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+	ROM_LOAD( "bios_ce2.rom", 0x28000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
-    ROM_LOAD( "sound_ce2.rom",    0x000000, 0x004000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
+	ROM_LOAD( "sound_ce2.rom",    0x000000, 0x004000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-    ROM_LOAD( "font_ce2.rom",     0x000000, 0x046800, CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
+	ROM_LOAD( "font_ce2.rom",     0x000000, 0x046800, CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -4022,13 +4022,13 @@ ROM_END
 ROM_START( pc9821xs )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf.rom",  0x18000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-    ROM_LOAD( "bios_xs.rom",     0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_LOAD( "bios_xs.rom",     0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-    ROM_LOAD( "sound_xs.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
+	ROM_LOAD( "sound_xs.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-    ROM_LOAD( "font_xs.rom",     0x000000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
+	ROM_LOAD( "font_xs.rom",     0x000000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -4064,10 +4064,10 @@ ROM_START( pc9821v20 )
 	ROM_LOAD( "bios_v20.rom", 0x28000, 0x018000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
-    ROM_LOAD( "sound_v20.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
+	ROM_LOAD( "sound_v20.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-    ROM_LOAD( "font_v20.rom",     0x000000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
+	ROM_LOAD( "font_v20.rom",     0x000000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM

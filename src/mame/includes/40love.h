@@ -23,7 +23,7 @@ public:
 	bitmap_ind16    *m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	UINT8       m_flipscreen;
-	UINT8		m_pix_redraw;
+	UINT8       m_pix_redraw;
 	UINT8       m_xoffset;
 	UINT8       *m_pixram1;
 	UINT8       *m_pixram2;
@@ -33,27 +33,27 @@ public:
 
 	/* sound-related */
 	int         m_sound_nmi_enable;
-	int			m_pending_nmi;
+	int         m_pending_nmi;
 
 	/* fake mcu */
 	UINT8       m_from_mcu;
 	int         m_mcu_sent;
-	int			m_main_sent;
+	int         m_main_sent;
 	UINT8       m_mcu_in[2][16];
-	UINT8		m_mcu_out[2][16];
+	UINT8       m_mcu_out[2][16];
 	int         m_mcu_cmd;
 
 	/* misc */
 	int         m_pix_color[4];
 	UINT8       m_pix1;
-	UINT8		m_pix2[2];
+	UINT8       m_pix2[2];
 	UINT8       m_snd_data;
-	UINT8		m_snd_flag;
+	UINT8       m_snd_flag;
 	int         m_vol_ctrl[16];
 	UINT8       m_snd_ctrl0;
-	UINT8		m_snd_ctrl1;
-	UINT8		m_snd_ctrl2;
-	UINT8		m_snd_ctrl3;
+	UINT8       m_snd_ctrl1;
+	UINT8       m_snd_ctrl2;
+	UINT8       m_snd_ctrl3;
 
 	/* devices */
 	cpu_device *m_audiocpu;

@@ -22,7 +22,7 @@
 //**************************************************************************
 
 #define MCFG_WD11C00_17_ADD(_tag, _clock, _config) \
-    MCFG_DEVICE_ADD(_tag, WD11C00_17, _clock) \
+	MCFG_DEVICE_ADD(_tag, WD11C00_17, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -39,23 +39,23 @@
 
 struct wd11c00_17_interface
 {
-	devcb_write_line	m_out_irq5_cb;
-	devcb_write_line	m_out_drq3_cb;
-	devcb_write_line	m_out_mr_cb;
-	devcb_write_line	m_out_busy_cb;
-	devcb_write_line	m_out_req_cb;
-	devcb_write_line	m_out_ra3_cb;
-	devcb_read8			m_in_rd322_cb;
-	devcb_read8			m_in_ramcs_cb;
-	devcb_write8		m_out_ramwr_cb;
-	devcb_read8			m_in_cs1010_cb;
-	devcb_write8		m_out_cs1010_cb;
+	devcb_write_line    m_out_irq5_cb;
+	devcb_write_line    m_out_drq3_cb;
+	devcb_write_line    m_out_mr_cb;
+	devcb_write_line    m_out_busy_cb;
+	devcb_write_line    m_out_req_cb;
+	devcb_write_line    m_out_ra3_cb;
+	devcb_read8         m_in_rd322_cb;
+	devcb_read8         m_in_ramcs_cb;
+	devcb_write8        m_out_ramwr_cb;
+	devcb_read8         m_in_cs1010_cb;
+	devcb_write8        m_out_cs1010_cb;
 };
 
 
 // ======================> wd11c00_17_device
 
-class wd11c00_17_device :	public device_t,
+class wd11c00_17_device :   public device_t,
 							public wd11c00_17_interface
 {
 public:
@@ -84,7 +84,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 
 private:
 	inline void check_interrupt();
@@ -94,17 +94,17 @@ private:
 	inline void software_reset();
 	inline void select();
 
-	devcb_resolved_write_line	m_out_irq5_func;
-	devcb_resolved_write_line	m_out_drq3_func;
-	devcb_resolved_write_line	m_out_mr_func;
-	devcb_resolved_write_line	m_out_busy_func;
-	devcb_resolved_write_line	m_out_req_func;
-	devcb_resolved_write_line	m_out_ra3_func;
-	devcb_resolved_read8		m_in_rd322_func;
-	devcb_resolved_read8		m_in_ramcs_func;
-	devcb_resolved_write8		m_out_ramwr_func;
-	devcb_resolved_read8		m_in_cs1010_func;
-	devcb_resolved_write8		m_out_cs1010_func;
+	devcb_resolved_write_line   m_out_irq5_func;
+	devcb_resolved_write_line   m_out_drq3_func;
+	devcb_resolved_write_line   m_out_mr_func;
+	devcb_resolved_write_line   m_out_busy_func;
+	devcb_resolved_write_line   m_out_req_func;
+	devcb_resolved_write_line   m_out_ra3_func;
+	devcb_resolved_read8        m_in_rd322_func;
+	devcb_resolved_read8        m_in_ramcs_func;
+	devcb_resolved_write8       m_out_ramwr_func;
+	devcb_resolved_read8        m_in_cs1010_func;
+	devcb_resolved_write8       m_out_cs1010_func;
 
 	UINT8 m_status;
 	UINT8 m_mask;

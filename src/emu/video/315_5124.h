@@ -35,15 +35,15 @@
 //#define SEGA315_5124_PAL_240_BBORDER_HEIGHT   (0x18)  /* 24 lines */
 
 
-#define SEGA315_5124_PALETTE_SIZE	(64+16)
-#define SEGA315_5378_PALETTE_SIZE	4096
+#define SEGA315_5124_PALETTE_SIZE   (64+16)
+#define SEGA315_5378_PALETTE_SIZE   4096
 
 PALETTE_INIT( sega315_5124 );
 PALETTE_INIT( sega315_5378 );
 
 
-#define SEGA315_5378_CRAM_SIZE    0x40	/* 32 colors x 2 bytes per color = 64 bytes */
-#define SEGA315_5124_CRAM_SIZE    0x20	/* 32 colors x 1 bytes per color = 32 bytes */
+#define SEGA315_5378_CRAM_SIZE    0x40  /* 32 colors x 2 bytes per color = 64 bytes */
+#define SEGA315_5124_CRAM_SIZE    0x20  /* 32 colors x 1 bytes per color = 32 bytes */
 
 #define VRAM_SIZE             0x4000
 
@@ -61,14 +61,14 @@ struct sega315_5124_interface
 };
 
 
-extern const device_type SEGA315_5124;		/* aka SMS1 vdp */
-extern const device_type SEGA315_5246;		/* aka SMS2 vdp */
-extern const device_type SEGA315_5378;		/* aka Gamegear vdp */
+extern const device_type SEGA315_5124;      /* aka SMS1 vdp */
+extern const device_type SEGA315_5246;      /* aka SMS2 vdp */
+extern const device_type SEGA315_5378;      /* aka Gamegear vdp */
 
 
 class sega315_5124_device : public device_t,
-                            public sega315_5124_interface,
-                            public device_memory_interface
+							public sega315_5124_interface,
+							public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -143,11 +143,11 @@ protected:
 	int              m_sprite_zoom;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
-       Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
-       sms compatibility mode. */
+	   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
+	   sms compatibility mode. */
 	int              *m_line_buffer;
 	int              m_current_palette[32];
-	devcb_resolved_write_line	m_cb_int;
+	devcb_resolved_write_line   m_cb_int;
 	devcb_resolved_write_line   m_cb_pause;
 	emu_timer        *m_display_timer;
 	emu_timer        *m_set_status_vint_timer;

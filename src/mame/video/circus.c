@@ -122,14 +122,14 @@ static void robotbwl_draw_box( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	int ex = x + 24;
 	int ey = y + 26;
 
-	draw_line(bitmap, cliprect, x, y, ex, y, 0);		/* Top */
-	draw_line(bitmap, cliprect, x, ey, ex, ey, 0);		/* Bottom */
-	draw_line(bitmap, cliprect, x, y, x, ey, 0);		/* Left */
-	draw_line(bitmap, cliprect, ex, y, ex, ey, 0);		/* Right */
+	draw_line(bitmap, cliprect, x, y, ex, y, 0);        /* Top */
+	draw_line(bitmap, cliprect, x, ey, ex, ey, 0);      /* Bottom */
+	draw_line(bitmap, cliprect, x, y, x, ey, 0);        /* Left */
+	draw_line(bitmap, cliprect, ex, y, ex, ey, 0);      /* Right */
 
 	/* Score Grid */
 	ey = y + 10;
-	draw_line(bitmap, cliprect, x + 8, ey, ex, ey, 0);	/* Horizontal Divide Line */
+	draw_line(bitmap, cliprect, x + 8, ey, ex, ey, 0);  /* Horizontal Divide Line */
 	draw_line(bitmap, cliprect, x + 8, y, x + 8, ey, 0);
 	draw_line(bitmap, cliprect, x + 16, y, x + 16, ey, 0);
 }
@@ -152,8 +152,8 @@ static void robotbwl_draw_scoreboard( bitmap_ind16 &bitmap, const rectangle &cli
 		robotbwl_draw_box(bitmap, cliprect, offs + 152, 95);
 	}
 
-	robotbwl_draw_box(bitmap, cliprect, 39, 127);		/* 10th Frame */
-	draw_line(bitmap, cliprect, 39, 137, 47, 137, 0);	/* Extra digit box */
+	robotbwl_draw_box(bitmap, cliprect, 39, 127);       /* 10th Frame */
+	draw_line(bitmap, cliprect, 39, 137, 47, 137, 0);   /* Extra digit box */
 
 	robotbwl_draw_box(bitmap, cliprect, 39 + 152, 127);
 	draw_line(bitmap, cliprect, 39 + 152, 137, 47 + 152, 137, 0);

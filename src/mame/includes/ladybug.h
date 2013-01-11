@@ -24,11 +24,11 @@ public:
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_grid_tilemap;	// ladybug
-	tilemap_t    *m_fg_tilemap;	// redclash
+	tilemap_t    *m_grid_tilemap;   // ladybug
+	tilemap_t    *m_fg_tilemap; // redclash
 	UINT8      m_grid_color;
 	int        m_star_speed;
-	int        m_gfxbank;	// redclash only
+	int        m_gfxbank;   // redclash only
 	UINT8      m_stars_enable;
 	UINT8      m_stars_speed;
 	UINT32     m_stars_state;

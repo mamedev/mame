@@ -77,4 +77,3 @@ filter_getinfoproc filter_lookup(const char *name)
 
 	return NULL;
 }
-

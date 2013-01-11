@@ -121,8 +121,8 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 	}
 	AllocatePolyFrameBuffer(machine());
 	c355_obj_init(
-		0,		/* gfx bank */
-		0xf,	/* reverse palette mapping */
+		0,      /* gfx bank */
+		0xf,    /* reverse palette mapping */
 		namcos2_shared_state::c355_obj_code2tile_delegate() );
 } /* VIDEO_START( namcos21 ) */
 
@@ -135,22 +135,22 @@ update_palette( running_machine &machine )
 	int r,g,b;
 
 	/*
-    Palette:
-        0x0000..0x1fff  sprite palettes (0x10 sets of 0x100 colors)
+	Palette:
+	    0x0000..0x1fff  sprite palettes (0x10 sets of 0x100 colors)
 
-        0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors)
-            (in starblade, some palette animation effects are performed here)
+	    0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors)
+	        (in starblade, some palette animation effects are performed here)
 
-        0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors)
+	    0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors)
 
-        0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors)
+	    0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors)
 
-        The polygon-dedicated color sets within a bank typically increase in
-        intensity from very dark to full intensity.
+	    The polygon-dedicated color sets within a bank typically increase in
+	    intensity from very dark to full intensity.
 
-        Probably the selected palette is determined by most significant bits of z-code.
-        This is not yet hooked up.
-    */
+	    Probably the selected palette is determined by most significant bits of z-code.
+	    This is not yet hooked up.
+	*/
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
 	{
 		data1 = state->m_generic_paletteram_16[0x00000/2+i];
@@ -176,7 +176,7 @@ UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind1
 	if( m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
 		c355_obj_draw(bitmap, cliprect, 2 );
-		c355_obj_draw(bitmap, cliprect, 14 );	//driver's eyes
+		c355_obj_draw(bitmap, cliprect, 14 );   //driver's eyes
 	}
 
 	CopyVisiblePolyFrameBuffer( machine(), bitmap, cliprect, 0x7fc0, 0x7ffe );
@@ -196,7 +196,7 @@ UINT32 namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind1
 		{
 			c355_obj_draw(bitmap, cliprect, pri );
 		}
-			c355_obj_draw(bitmap, cliprect, 15 );	//driver's eyes
+			c355_obj_draw(bitmap, cliprect, 15 );   //driver's eyes
 	}
 	else
 	{ /* winrun bitmap layer */
@@ -437,11 +437,11 @@ namcos21_DrawQuad( running_machine &machine, int sx[4], int sy[4], int zcode[4],
 	vertex a,b,c,d;
 	int depthcueenable = 1;
 	/*
-        0x0000..0x1fff  sprite palettes (0x20 sets of 0x100 colors)
-        0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-        0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-        0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-    */
+	    0x0000..0x1fff  sprite palettes (0x20 sets of 0x100 colors)
+	    0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+	    0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+	    0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+	*/
 	if( state->m_gametype == NAMCOS21_WINRUN91 )
 	{
 		color = 0x4000|(color&0xff);

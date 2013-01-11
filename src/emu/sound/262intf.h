@@ -23,7 +23,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( ymf262_data_b_w );
 
 
 class ymf262_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

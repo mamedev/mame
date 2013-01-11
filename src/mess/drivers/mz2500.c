@@ -57,14 +57,14 @@
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
-#define RP5C15_TAG		"rp5c15"
+#define RP5C15_TAG      "rp5c15"
 
 class mz2500_state : public driver_device
 {
 public:
 	mz2500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_rtc(*this, RP5C15_TAG)
+			m_rtc(*this, RP5C15_TAG)
 	{ }
 
 	required_device<rp5c15_device> m_rtc;
@@ -214,7 +214,7 @@ void mz2500_state::video_start()
 */
 
 /* helper function, to draw stuff without getting crazy with height / width conditions :) */
-static void mz2500_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int x,int y,UINT16	 pen,UINT8 width,UINT8 height)
+static void mz2500_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int x,int y,UINT16  pen,UINT8 width,UINT8 height)
 {
 	if(width && height)
 	{
@@ -664,7 +664,7 @@ UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &b
 	//  popmessage("%02x",m_text_reg[0x0f]);
 
 
-    return 0;
+	return 0;
 }
 
 static void mz2500_reconfigure_screen(running_machine &machine)
@@ -1118,9 +1118,9 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 			if(m_text_reg_index >= 0x80 && m_text_reg_index <= 0x8f) //Bitmap 16 clut registers
 			{
 				/*
-                ---x ---- priority
-                ---- xxxx clut number
-                */
+				---x ---- priority
+				---- xxxx clut number
+				*/
 				m_clut16[m_text_reg_index & 0xf] = data & 0x1f;
 				//printf("%02x -> [%02x]\n",m_text_reg[m_text_reg_index],m_text_reg_index);
 
@@ -1546,10 +1546,10 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xde, 0xde) AM_WRITENOP
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-    AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
-    AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
+	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_tv_crtc_w)
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE_LEGACY(extrom_r,extrom_w)
 ADDRESS_MAP_END
@@ -1779,36 +1779,36 @@ void mz2500_state::machine_reset()
 
 static const gfx_layout mz2500_cg_layout =
 {
-	8, 8,		/* 8 x 8 graphics */
-	RGN_FRAC(1,1),		/* 512 codes */
-	1,		/* 1 bit per pixel */
-	{ 0 },		/* no bitplanes */
+	8, 8,       /* 8 x 8 graphics */
+	RGN_FRAC(1,1),      /* 512 codes */
+	1,      /* 1 bit per pixel */
+	{ 0 },      /* no bitplanes */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8 * 8		/* code takes 8 times 8 bits */
+	8 * 8       /* code takes 8 times 8 bits */
 };
 
 /* gfx1 is mostly 16x16, but there are some 8x8 characters */
 static const gfx_layout mz2500_8_layout =
 {
-	8, 8,		/* 8 x 8 graphics */
-	1920,		/* 1920 codes */
-	1,		/* 1 bit per pixel */
-	{ 0 },		/* no bitplanes */
+	8, 8,       /* 8 x 8 graphics */
+	1920,       /* 1920 codes */
+	1,      /* 1 bit per pixel */
+	{ 0 },      /* no bitplanes */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8 * 8		/* code takes 8 times 8 bits */
+	8 * 8       /* code takes 8 times 8 bits */
 };
 
 static const gfx_layout mz2500_16_layout =
 {
-	16, 16,		/* 16 x 16 graphics */
-	RGN_FRAC(1,1),		/* 8192 codes */
-	1,		/* 1 bit per pixel */
-	{ 0 },		/* no bitplanes */
+	16, 16,     /* 16 x 16 graphics */
+	RGN_FRAC(1,1),      /* 8192 codes */
+	1,      /* 1 bit per pixel */
+	{ 0 },      /* no bitplanes */
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 128, 129, 130, 131, 132, 133, 134, 135 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	16 * 16		/* code takes 16 times 16 bits */
+	16 * 16     /* code takes 16 times 16 bits */
 };
 
 static const gfx_layout mz2500_pcg_layout_1bpp =
@@ -1886,11 +1886,11 @@ WRITE8_MEMBER(mz2500_state::mz2500_portb_w)
 WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 {
 	/*
-    ---- x--- 0->1 transition = IPL reset
-    ---- -x-- beeper state
-    ---- --x- 0->1 transition = Work RAM reset
-    ---- ---x screen mask
-    */
+	---- x--- 0->1 transition = IPL reset
+	---- -x-- beeper state
+	---- --x- 0->1 transition = Work RAM reset
+	---- ---x screen mask
+	*/
 
 	/* work RAM reset */
 	if((m_old_portc & 0x02) == 0x00 && (data & 0x02))
@@ -1918,12 +1918,12 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 
 static I8255_INTERFACE( ppi8255_intf )
 {
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_porta_r),						/* Port A read */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_porta_w),						/* Port A write */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portb_r),						/* Port B read */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portb_w),						/* Port B write */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portc_r),						/* Port C read */
-	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portc_w)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_porta_r),                       /* Port A read */
+	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_porta_w),                       /* Port A write */
+	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portb_r),                       /* Port B read */
+	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portb_w),                       /* Port B write */
+	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portc_r),                       /* Port C read */
+	DEVCB_DRIVER_MEMBER(mz2500_state,mz2500_portc_w)                        /* Port C write */
 };
 
 WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
@@ -1943,9 +1943,9 @@ WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
 READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-	                                        "KEY4", "KEY5", "KEY6", "KEY7",
-	                                        "KEY8", "KEY9", "KEYA", "KEYB",
-	                                        "KEYC", "KEYD", "UNUSED", "UNUSED" };
+											"KEY4", "KEY5", "KEY6", "KEY7",
+											"KEY8", "KEY9", "KEYA", "KEYB",
+											"KEYC", "KEYD", "UNUSED", "UNUSED" };
 
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
@@ -1992,10 +1992,10 @@ READ8_MEMBER(mz2500_state::opn_porta_r)
 WRITE8_MEMBER(mz2500_state::opn_porta_w)
 {
 	/*
-    ---- x--- mouse select
-    ---- -x-- palette bit (16/4096 colors)
-    ---- --x- floppy reverse bit (controls wd17xx bits in command registers)
-    */
+	---- x--- mouse select
+	---- -x-- palette bit (16/4096 colors)
+	---- --x- floppy reverse bit (controls wd17xx bits in command registers)
+	*/
 
 	m_fdc_reverse = (data & 2) ? 0x00 : 0xff;
 	m_pal_select = (data & 4) ? 1 : 0;
@@ -2008,10 +2008,10 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_r),	// read A
-		DEVCB_INPUT_PORT("DSW1"),	// read B
-		DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_w),	// write A
-		DEVCB_NULL					// write B
+		DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_r),  // read A
+		DEVCB_INPUT_PORT("DSW1"),   // read B
+		DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_w),  // write A
+		DEVCB_NULL                  // write B
 	},
 	DEVCB_NULL
 };
@@ -2108,10 +2108,10 @@ static const z80sio_interface mz2500_sio_intf =
 };
 
 static MACHINE_CONFIG_START( mz2500, mz2500_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, 6000000)
-    MCFG_CPU_PROGRAM_MAP(mz2500_map)
-    MCFG_CPU_IO_MAP(mz2500_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, 6000000)
+	MCFG_CPU_PROGRAM_MAP(mz2500_map)
+	MCFG_CPU_IO_MAP(mz2500_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
 
 
@@ -2213,6 +2213,5 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,        	 0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2500", GAME_IMPERFECT_GRAPHICS )
+COMP( 1985, mz2500,   0,             0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2500", GAME_IMPERFECT_GRAPHICS )
 COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2520", GAME_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
-

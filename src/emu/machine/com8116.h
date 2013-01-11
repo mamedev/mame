@@ -34,7 +34,7 @@
 ///*************************************************************************
 
 #define MCFG_COM8116_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, COM8116, _clock)	\
+	MCFG_DEVICE_ADD(_tag, COM8116, _clock)  \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -51,9 +51,9 @@
 
 struct com8116_interface
 {
-	devcb_write_line		m_out_fx4_cb;
-	devcb_write_line		m_out_fr_cb;
-	devcb_write_line		m_out_ft_cb;
+	devcb_write_line        m_out_fx4_cb;
+	devcb_write_line        m_out_fr_cb;
+	devcb_write_line        m_out_ft_cb;
 
 	// receiver divisor ROM (19-bit)
 	UINT32 m_fr_divisors[16];
@@ -65,20 +65,20 @@ struct com8116_interface
 
 // ======================> com8116_device
 
-class com8116_device :	public device_t,
-                        public com8116_interface
+class com8116_device :  public device_t,
+						public com8116_interface
 {
 public:
-    // construction/destruction
-    com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_WRITE8_MEMBER( str_w );
-    DECLARE_WRITE8_MEMBER( stt_w );
+	DECLARE_WRITE8_MEMBER( str_w );
+	DECLARE_WRITE8_MEMBER( stt_w );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr);
 
 private:
@@ -86,12 +86,12 @@ private:
 	static const device_timer_id TIMER_FR = 1;
 	static const device_timer_id TIMER_FT = 2;
 
-	devcb_resolved_write_line	m_out_fx4_func;
-	devcb_resolved_write_line	m_out_fr_func;
-	devcb_resolved_write_line	m_out_ft_func;
+	devcb_resolved_write_line   m_out_fx4_func;
+	devcb_resolved_write_line   m_out_fr_func;
+	devcb_resolved_write_line   m_out_ft_func;
 
-	int m_fr;						// receiver frequency
-	int m_ft;						// transmitter frequency
+	int m_fr;                       // receiver frequency
+	int m_ft;                       // transmitter frequency
 
 	// timers
 	emu_timer *m_fx4_timer;

@@ -44,10 +44,10 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_MEMORY_MAP	(0)
-#define LOG_MULTIPLY	(0)
-#define LOG_DIVIDE		(0)
-#define LOG_COMPARE		(0)
+#define LOG_MEMORY_MAP  (0)
+#define LOG_MULTIPLY    (0)
+#define LOG_DIVIDE      (0)
+#define LOG_COMPARE     (0)
 
 
 
@@ -73,9 +73,9 @@ const device_type SEGA_315_5250_COMPARE_TIMER = &device_creator<sega_315_5250_co
 
 sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_paletteram(*this, "paletteram"),
-	  m_open_bus_recurse(false),
-	  m_palette_entries(0)
+		m_paletteram(*this, "paletteram"),
+		m_open_bus_recurse(false),
+		m_palette_entries(0)
 {
 	palette_init();
 }
@@ -203,10 +203,10 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 
 sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock),
-	  m_cputag(NULL),
-	  m_cpu(NULL),
-	  m_space(NULL),
-	  m_curregion(0)
+		m_cputag(NULL),
+		m_cpu(NULL),
+		m_space(NULL),
+		m_curregion(0)
 {
 }
 
@@ -308,22 +308,22 @@ if (LOG_MEMORY_MAP) mame_printf_debug("(Write %02X = %02X)\n", offset, data);
 			}
 			break;
 
-		case 0x07:	case 0x08:	case 0x09:
+		case 0x07:  case 0x08:  case 0x09:
 			// writes here latch a 68000 address for writing
 			break;
 
-		case 0x0a:	case 0x0b:	case 0x0c:
+		case 0x0a:  case 0x0b:  case 0x0c:
 			// writes here latch a 68000 address for reading
 			break;
 
-		case 0x10:	case 0x11:
-		case 0x12:	case 0x13:
-		case 0x14:	case 0x15:
-		case 0x16:	case 0x17:
-		case 0x18:	case 0x19:
-		case 0x1a:	case 0x1b:
-		case 0x1c:	case 0x1d:
-		case 0x1e:	case 0x1f:
+		case 0x10:  case 0x11:
+		case 0x12:  case 0x13:
+		case 0x14:  case 0x15:
+		case 0x16:  case 0x17:
+		case 0x18:  case 0x19:
+		case 0x1a:  case 0x1b:
+		case 0x1c:  case 0x1d:
+		case 0x1e:  case 0x1f:
 			if (oldval != data)
 				update_mapping();
 			break;
@@ -624,12 +624,12 @@ void sega_315_5195_mapper_device::update_mapping()
 
 sega_315_5195_mapper_device::decrypt_bank::decrypt_bank()
 	: m_bank(NULL),
-	  m_start(0),
-	  m_end(0),
-	  m_rgnoffs(~0),
-	  m_srcptr(NULL),
-	  m_fd1089(NULL),
-	  m_fd1094_cache(NULL)
+		m_start(0),
+		m_end(0),
+		m_rgnoffs(~0),
+		m_srcptr(NULL),
+		m_fd1089(NULL),
+		m_fd1094_cache(NULL)
 {
 	// invalidate all states
 	reset();
@@ -756,12 +756,12 @@ READ16_MEMBER( sega_315_5248_multiplier_device::read )
 	switch (offset & 3)
 	{
 		// if bit 1 is 0, just return register values
-		case 0:	return m_regs[0];
-		case 1:	return m_regs[1];
+		case 0: return m_regs[0];
+		case 1: return m_regs[1];
 
 		// if bit 1 is 1, return ther results
-		case 2:	return (INT16(m_regs[0]) * INT16(m_regs[1])) >> 16;
-		case 3:	return (INT16(m_regs[0]) * INT16(m_regs[1])) & 0xffff;
+		case 2: return (INT16(m_regs[0]) * INT16(m_regs[1])) >> 16;
+		case 3: return (INT16(m_regs[0]) * INT16(m_regs[1])) & 0xffff;
 	}
 
 	// should never get here
@@ -824,12 +824,12 @@ READ16_MEMBER( sega_315_5249_divider_device::read )
 	// 8 effective read registers
 	switch (offset & 7)
 	{
-		case 0:	return m_regs[0];	// dividend high
-		case 1:	return m_regs[1];	// dividend low
-		case 2:	return m_regs[2];	// divisor
-		case 4: return m_regs[4];	// quotient (mode 0) or quotient high (mode 1)
-		case 5:	return m_regs[5];	// remainder (mode 0) or quotient low (mode 1)
-		case 6: return m_regs[6];	// flags
+		case 0: return m_regs[0];   // dividend high
+		case 1: return m_regs[1];   // dividend low
+		case 2: return m_regs[2];   // divisor
+		case 4: return m_regs[4];   // quotient (mode 0) or quotient high (mode 1)
+		case 5: return m_regs[5];   // remainder (mode 0) or quotient low (mode 1)
+		case 6: return m_regs[6];   // flags
 	}
 	return 0xffff;
 }
@@ -846,10 +846,10 @@ WRITE16_MEMBER( sega_315_5249_divider_device::write )
 	// only 4 effective write registers
 	switch (offset & 3)
 	{
-		case 0:	COMBINE_DATA(&m_regs[0]); break;	// dividend high
-		case 1:	COMBINE_DATA(&m_regs[1]); break;	// dividend low
-		case 2:	COMBINE_DATA(&m_regs[2]); break;	// divisor/trigger
-		case 3:	break;
+		case 0: COMBINE_DATA(&m_regs[0]); break;    // dividend high
+		case 1: COMBINE_DATA(&m_regs[1]); break;    // dividend low
+		case 2: COMBINE_DATA(&m_regs[2]); break;    // divisor/trigger
+		case 3: break;
 	}
 
 	// if A4 line is high, divide, using A3 as the mode
@@ -1015,16 +1015,16 @@ READ16_MEMBER( sega_315_5250_compare_timer_device::read )
 	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, m_regs[offset]);
 	switch (offset & 15)
 	{
-		case 0x0:	return m_regs[0];
-		case 0x1:	return m_regs[1];
-		case 0x2:	return m_regs[2];
-		case 0x3:	return m_regs[3];
-		case 0x4:	return m_regs[4];
-		case 0x5:	return m_regs[1];
-		case 0x6:	return m_regs[2];
-		case 0x7:	return m_regs[7];
+		case 0x0:   return m_regs[0];
+		case 0x1:   return m_regs[1];
+		case 0x2:   return m_regs[2];
+		case 0x3:   return m_regs[3];
+		case 0x4:   return m_regs[4];
+		case 0x5:   return m_regs[1];
+		case 0x6:   return m_regs[2];
+		case 0x7:   return m_regs[7];
 		case 0x9:
-		case 0xd:	interrupt_ack(); break;
+		case 0xd:   interrupt_ack(); break;
 	}
 	return 0xffff;
 }
@@ -1039,17 +1039,17 @@ WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
 	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
 	switch (offset & 15)
 	{
-		case 0x0:	COMBINE_DATA(&m_regs[0]); execute(); break;
-		case 0x1:	COMBINE_DATA(&m_regs[1]); execute(); break;
-		case 0x2:	COMBINE_DATA(&m_regs[2]); execute(true); break;
-		case 0x4:	m_regs[4] = 0; m_bit = 0; break;
-		case 0x6:	COMBINE_DATA(&m_regs[2]); execute(); break;
+		case 0x0:   COMBINE_DATA(&m_regs[0]); execute(); break;
+		case 0x1:   COMBINE_DATA(&m_regs[1]); execute(); break;
+		case 0x2:   COMBINE_DATA(&m_regs[2]); execute(true); break;
+		case 0x4:   m_regs[4] = 0; m_bit = 0; break;
+		case 0x6:   COMBINE_DATA(&m_regs[2]); execute(); break;
 		case 0x8:
-		case 0xc:	COMBINE_DATA(&m_regs[8]); break;
+		case 0xc:   COMBINE_DATA(&m_regs[8]); break;
 		case 0x9:
-		case 0xd:	interrupt_ack(); break;
+		case 0xd:   interrupt_ack(); break;
 		case 0xa:
-		case 0xe:	COMBINE_DATA(&m_regs[10]); break;
+		case 0xe:   COMBINE_DATA(&m_regs[10]); break;
 		case 0xb:
 		case 0xf:
 			COMBINE_DATA(&m_regs[11]);

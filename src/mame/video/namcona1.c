@@ -159,11 +159,11 @@ UpdatePalette(running_machine &machine, int offset )
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 data = state->m_generic_paletteram_16[offset]; /* -RRRRRGG GGGBBBBB */
 	/**
-     * sprites can be configured to use an alternate interpretation of palette ram
-     * (used in-game in Emeraldia)
-     *
-     * RRRGGGBB RRRGGGBB
-     */
+	 * sprites can be configured to use an alternate interpretation of palette ram
+	 * (used in-game in Emeraldia)
+	 *
+	 * RRRGGGBB RRRGGGBB
+	 */
 	int r = (((data&0x00e0)>>5)+((data&0xe000)>>13)*2)*0xff/(0x7*3);
 	int g = (((data&0x001c)>>2)+((data&0x1c00)>>10)*2)*0xff/(0x7*3);
 	int b = (((data&0x0003)>>0)+((data&0x0300)>>8)*2)*0xff/(0x3*3);
@@ -294,8 +294,8 @@ void namcona1_state::video_start()
 		m_tilemap_palette_bank[i] = -1;
 	}
 
-	m_shaperam		     = auto_alloc_array(machine(), UINT16, 0x2000*4/2 );
-	m_cgram			     = auto_alloc_array(machine(), UINT16, 0x1000*0x40/2 );
+	m_shaperam           = auto_alloc_array(machine(), UINT16, 0x2000*4/2 );
+	m_cgram              = auto_alloc_array(machine(), UINT16, 0x1000*0x40/2 );
 
 	machine().gfx[0] = auto_alloc( machine(), gfx_element( machine(), cg_layout_8bpp, (UINT8 *)m_cgram, machine().total_colors()/256, 0 ));
 	machine().gfx[1] = auto_alloc( machine(), gfx_element( machine(), cg_layout_4bpp, (UINT8 *)m_cgram, machine().total_colors()/16, 0 ));
@@ -420,7 +420,7 @@ static void pdraw_tile(running_machine &machine,
 								if( bShadow )
 								{
 									if( (gfx_region == 0 && color == 0x0f) ||
-									    (gfx_region == 1 && color == 0xff) )
+										(gfx_region == 1 && color == 0xff) )
 									{
 										pen_t *palette_shadow_table = machine.shadow_table;
 										dest[x] = palette_shadow_table[dest[x]];
@@ -467,10 +467,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	for( which=0; which<0x100; which++ )
 	{ /* max 256 sprites */
 		int bpp4,palbase;
-		ypos	= source[0];	/* FHHH---Y YYYYYYYY    flipy, height, ypos */
-		tile	= source[1];	/* O???TTTT TTTTTTTT    opaque tile */
-		color	= source[2];	/* FSWWOOOO CCCCBPPP    flipx, shadow, width, color offset for 4bpp, color, 4bbp - 8bpp mode, pri*/
-		xpos	= source[3];	/* -------X XXXXXXXX    xpos */
+		ypos    = source[0];    /* FHHH---Y YYYYYYYY    flipy, height, ypos */
+		tile    = source[1];    /* O???TTTT TTTTTTTT    opaque tile */
+		color   = source[2];    /* FSWWOOOO CCCCBPPP    flipx, shadow, width, color offset for 4bpp, color, 4bbp - 8bpp mode, pri*/
+		xpos    = source[3];    /* -------X XXXXXXXX    xpos */
 
 		priority = color&0x7;
 		width = ((color>>12)&0x3)+1;
@@ -550,11 +550,11 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 *videoram = state->m_videoram;
 	/*          scrollx lineselect
-     *  tmap0   ffe000  ffe200
-     *  tmap1   ffe400  ffe600
-     *  tmap2   ffe800  ffea00
-     *  tmap3   ffec00  ffee00
-     */
+	 *  tmap0   ffe000  ffe200
+	 *  tmap1   ffe400  ffe600
+	 *  tmap2   ffe800  ffea00
+	 *  tmap3   ffec00  ffee00
+	 */
 	int xadjust = 0x3a - which*2;
 	const UINT16 *scroll = state->m_scroll+0x200*which;
 	int line;
@@ -594,8 +594,8 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 			if( xdata == 0xc001 )
 			{
 				/* This is a simplification, but produces the correct behavior for the only game that uses this
-                 * feature, Numan Athletics.
-                 */
+				 * feature, Numan Athletics.
+				 */
 				draw_pixel_line(
 					&bitmap.pix16(line),
 					&machine.priority_bitmap.pix8(line),

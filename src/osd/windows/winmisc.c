@@ -58,10 +58,10 @@
 //============================================================
 
 // presumed size of a page of memory
-#define PAGE_SIZE			4096
+#define PAGE_SIZE           4096
 
 // align allocations to start or end of the page?
-#define GUARD_ALIGN_START	0
+#define GUARD_ALIGN_START   0
 
 
 

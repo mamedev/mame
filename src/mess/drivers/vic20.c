@@ -382,24 +382,24 @@ static INPUT_PORTS_START( vic20s )
 	PORT_INCLUDE( vic20 )
 
 	PORT_MODIFY( "ROW0" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)		PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)			PORT_CHAR('-')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)     PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)          PORT_CHAR('-')
 
 	PORT_MODIFY( "ROW1" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)		PORT_CHAR('@')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)     PORT_CHAR('@')
 
 	PORT_MODIFY( "ROW2" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)			PORT_CHAR(0x00C4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)          PORT_CHAR(0x00C4)
 
 	PORT_MODIFY( "ROW5" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)		PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)			PORT_CHAR(0x00D6)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)      PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)          PORT_CHAR(0x00D6)
 
 	PORT_MODIFY( "ROW6" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)		PORT_CHAR(0x00C5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)      PORT_CHAR(0x00C5)
 
 	PORT_MODIFY( "ROW7" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)			PORT_CHAR('=')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)         PORT_CHAR('=')
 INPUT_PORTS_END
 
 
@@ -416,18 +416,18 @@ READ8_MEMBER( vic20_state::via0_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     SERIAL CLK IN
-        PA1     SERIAL DATA IN
-        PA2     JOY 0 (UP)
-        PA3     JOY 1 (DOWN)
-        PA4     JOY 2 (LEFT)
-        PA5     LITE PEN (FIRE)
-        PA6     CASS SWITCH
-        PA7
+	    PA0     SERIAL CLK IN
+	    PA1     SERIAL DATA IN
+	    PA2     JOY 0 (UP)
+	    PA3     JOY 1 (DOWN)
+	    PA4     JOY 2 (LEFT)
+	    PA5     LITE PEN (FIRE)
+	    PA6     CASS SWITCH
+	    PA7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -455,21 +455,21 @@ WRITE8_MEMBER( vic20_state::via0_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0
-        PA1
-        PA2
-        PA3
-        PA4
-        PA5     LITE PEN (FIRE)
-        PA6
-        PA7     SERIAL ATN OUT
+	    PA0
+	    PA1
+	    PA2
+	    PA3
+	    PA4
+	    PA5     LITE PEN (FIRE)
+	    PA6
+	    PA7     SERIAL ATN OUT
 
-    */
+	*/
 
-    // light pen strobe
-    m_vic->lp_w(BIT(data, 5));
+	// light pen strobe
+	m_vic->lp_w(BIT(data, 5));
 
 	// serial attention out
 	m_iec->atn_w(!BIT(data, 7));
@@ -501,18 +501,18 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ROW 0
-        PA1     ROW 1
-        PA2     ROW 2
-        PA3     ROW 3
-        PA4     ROW 4
-        PA5     ROW 5
-        PA6     ROW 6
-        PA7     ROW 7
+	    PA0     ROW 0
+	    PA1     ROW 1
+	    PA2     ROW 2
+	    PA3     ROW 3
+	    PA4     ROW 4
+	    PA5     ROW 5
+	    PA6     ROW 6
+	    PA7     ROW 7
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 
@@ -532,18 +532,18 @@ READ8_MEMBER( vic20_state::via1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     COL 0
-        PB1     COL 1
-        PB2     COL 2
-        PB3     COL 3
-        PB4     COL 4
-        PB5     COL 5
-        PB6     COL 6
-        PB7     COL 7, JOY 3 (RIGHT)
+	    PB0     COL 0
+	    PB1     COL 1
+	    PB2     COL 2
+	    PB3     COL 3
+	    PB4     COL 4
+	    PB5     COL 5
+	    PB6     COL 6
+	    PB7     COL 7, JOY 3 (RIGHT)
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 
@@ -559,18 +559,18 @@ WRITE8_MEMBER( vic20_state::via1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     COL 0
-        PB1     COL 1
-        PB2     COL 2
-        PB3     COL 3, CASS WRITE
-        PB4     COL 4
-        PB5     COL 5
-        PB6     COL 6
-        PB7     COL 7
+	    PB0     COL 0
+	    PB1     COL 1
+	    PB2     COL 2
+	    PB3     COL 3, CASS WRITE
+	    PB4     COL 4
+	    PB5     COL 5
+	    PB6     COL 6
+	    PB7     COL 7
 
-    */
+	*/
 
 	// cassette write
 	m_cassette->write(BIT(data, 3));
@@ -873,7 +873,7 @@ ROM_END
 
 ROM_START( vic20_se )
 	ROM_REGION( 0x2000, "basic", 0 )
-	ROM_LOAD( "901486-01.ue11",	0x0000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_LOAD( "901486-01.ue11", 0x0000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_LOAD( "nec22081.206", 0x0000, 0x2000, CRC(b2a60662) SHA1(cb3e2f6e661ea7f567977751846ce9ad524651a3) )
@@ -889,7 +889,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT      INIT                        COMPANY                             FULLNAME                    FLAGS
-COMP( 1980, vic1001,    0,          0,      ntsc,		vic1001,	driver_device,	0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20,      vic1001,    0,      ntsc,		vic20,		driver_device,	0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20p,     vic1001,    0,      pal,		vic20,		driver_device,	0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20_se,   vic1001,    0,      pal,		vic20s, 	driver_device,	0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1980, vic1001,    0,          0,      ntsc,       vic1001,    driver_device,  0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20,      vic1001,    0,      ntsc,       vic20,      driver_device,  0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20p,     vic1001,    0,      pal,        vic20,      driver_device,  0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20_se,   vic1001,    0,      pal,        vic20s,     driver_device,  0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

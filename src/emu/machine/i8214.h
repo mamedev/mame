@@ -36,7 +36,7 @@
 ///*************************************************************************
 
 #define MCFG_I8214_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, I8214, _clock)	\
+	MCFG_DEVICE_ADD(_tag, I8214, _clock)    \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -53,46 +53,46 @@
 
 struct i8214_interface
 {
-	devcb_write_line	m_out_int_cb;
-	devcb_write_line	m_out_enlg_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_enlg_cb;
 };
 
 
 // ======================> i8214_device
 
-class i8214_device :	public device_t, public i8214_interface
+class i8214_device :    public device_t, public i8214_interface
 {
 public:
-    // construction/destruction
-    i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
 	DECLARE_WRITE_LINE_MEMBER( etlg_w );
 	DECLARE_WRITE_LINE_MEMBER( inte_w );
 
-    UINT8 a_r();
+	UINT8 a_r();
 	void b_w(UINT8 data);
 	void r_w(UINT8 data);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 
 private:
 	inline void trigger_interrupt(int level);
 	inline void check_interrupt();
 
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_enlg_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_enlg_func;
 
-	int m_inte;					// interrupt enable
-	int m_int_dis;				// interrupt disable flip-flop
-	int m_a;					// request level
-	int m_b;					// current status register
-	UINT8 m_r;					// interrupt request latch
-	int m_sgs;					// status group select
-	int m_etlg;					// enable this level group
+	int m_inte;                 // interrupt enable
+	int m_int_dis;              // interrupt disable flip-flop
+	int m_a;                    // request level
+	int m_b;                    // current status register
+	UINT8 m_r;                  // interrupt request latch
+	int m_sgs;                  // status group select
+	int m_etlg;                 // enable this level group
 };
 
 

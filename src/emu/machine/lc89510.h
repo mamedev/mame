@@ -19,6 +19,3 @@ private:
 
 
 extern const device_type LC89510;
-
-
-

@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(
 			1,
 			code,
-			(attr & 0x78) >> 3,		/* seems correct */
+			(attr & 0x78) >> 3,     /* seems correct */
 			0);
 }
 
@@ -139,9 +139,9 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(
 			0,
 			code,
-			(attr & 0xe0) >> 5,		/* not sure */
+			(attr & 0xe0) >> 5,     /* not sure */
 			0);
-	tileinfo.category = attr & 8 ? 0 : 1;	/* seems correct */
+	tileinfo.category = attr & 8 ? 0 : 1;   /* seems correct */
 }
 
 TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(
 			1,
 			code,
-			((attr & 0x60) >> 3) | ((attr & 0x0c) >> 2),	/* seems correct */
+			((attr & 0x60) >> 3) | ((attr & 0x0c) >> 2),    /* seems correct */
 			0);
 }
 
@@ -167,7 +167,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(
 			0,
 			code,
-			(attr & 0x1c) >> 2,		/* seems correct ? */
+			(attr & 0x1c) >> 2,     /* seems correct ? */
 			0);
 }
 
@@ -326,7 +326,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 //      code = spriteram[offs + 1] + ((attr & 0x02) << 7);
-		code = spriteram[offs + 1] + ((attr & 0x06) << 7);	// for ninjemak, not sure ?
+		code = spriteram[offs + 1] + ((attr & 0x06) << 7);  // for ninjemak, not sure ?
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 				code,

@@ -10,9 +10,9 @@
 
 static UINT8 read_irqcontrol(v25_state_t *nec_state, INTSOURCES source, UINT8 priority)
 {
-	return	(((nec_state->pending_irq & source)		? 0x80 : 0x00)
-			| ((nec_state->unmasked_irq & source)	? 0x00 : 0x40)
-			| ((nec_state->bankswitch_irq & source)	? 0x10 : 0x00)
+	return  (((nec_state->pending_irq & source)     ? 0x80 : 0x00)
+			| ((nec_state->unmasked_irq & source)   ? 0x00 : 0x40)
+			| ((nec_state->bankswitch_irq & source) ? 0x10 : 0x00)
 			| priority);
 }
 
@@ -28,10 +28,10 @@ static UINT8 read_sfr(v25_state_t *nec_state, unsigned o)
 		case 0x08: /* P1 */
 			/* P1 is combined with the interrupt lines */
 			ret = ((nec_state->io->read_byte(V25_PORT_P1) & 0xF0)
-					| (nec_state->nmi_state		? 0x00 : 0x01)
-					| (nec_state->intp_state[0]	? 0x00 : 0x02)
-					| (nec_state->intp_state[1]	? 0x00 : 0x04)
-					| (nec_state->intp_state[2]	? 0x00 : 0x08));
+					| (nec_state->nmi_state     ? 0x00 : 0x01)
+					| (nec_state->intp_state[0] ? 0x00 : 0x02)
+					| (nec_state->intp_state[1] ? 0x00 : 0x04)
+					| (nec_state->intp_state[2] ? 0x00 : 0x08));
 			break;
 		case 0x10: /* P2 */
 			ret = nec_state->io->read_byte(V25_PORT_P2);
@@ -113,7 +113,7 @@ static UINT16 read_sfr_word(v25_state_t *nec_state, unsigned o)
 
 	switch(o)
 	{
-		case 0x80:	/* TM0 */
+		case 0x80:  /* TM0 */
 			logerror("%06x: Warning: read back TM0\n",PC(nec_state));
 			ret = nec_state->TM0;
 			break;
@@ -121,7 +121,7 @@ static UINT16 read_sfr_word(v25_state_t *nec_state, unsigned o)
 			logerror("%06x: Warning: read back MD0\n",PC(nec_state));
 			ret = nec_state->MD0;
 			break;
-		case 0x88:	/* TM1 */
+		case 0x88:  /* TM1 */
 			logerror("%06x: Warning: read back TM1\n",PC(nec_state));
 			ret = nec_state->TM1;
 			break;
@@ -188,7 +188,7 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 			break;
 		case 0x90: /* TMC0 */
 			nec_state->TMC0 = d;
-			if(d & 1)	/* oneshot mode */
+			if(d & 1)   /* oneshot mode */
 			{
 				if(d & 0x80)
 				{
@@ -208,7 +208,7 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 				else
 					nec_state->timers[1]->adjust(attotime::never);
 			}
-			else	/* interval mode */
+			else    /* interval mode */
 			{
 				if(d & 0x80)
 				{
@@ -285,13 +285,13 @@ static void write_sfr_word(v25_state_t *nec_state, unsigned o, UINT16 d)
 {
 	switch(o)
 	{
-		case 0x80:	/* TM0 */
+		case 0x80:  /* TM0 */
 			nec_state->TM0 = d;
 			break;
 		case 0x82: /* MD0 */
 			nec_state->MD0 = d;
 			break;
-		case 0x88:	/* TM1 */
+		case 0x88:  /* TM1 */
 			nec_state->TM1 = d;
 			break;
 		case 0x8A: /* MD1 */
@@ -335,7 +335,7 @@ UINT16 v25_read_word(v25_state_t *nec_state, unsigned a)
 			return read_sfr_word(nec_state, o-0x100);
 	}
 
-	if(a == 0xFFFFE)	/* not sure about this - manual says FFFFC-FFFFE are "reserved" */
+	if(a == 0xFFFFE)    /* not sure about this - manual says FFFFC-FFFFE are "reserved" */
 		return (nec_state->program->read_byte(a) | (read_sfr(nec_state, 0xFF) << 8));
 
 	return nec_state->program->read_word(a);
@@ -389,7 +389,7 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d)
 		}
 	}
 
-	if(a == 0xFFFFE)	/* not sure about this - manual says FFFFC-FFFFE are "reserved" */
+	if(a == 0xFFFFE)    /* not sure about this - manual says FFFFC-FFFFE are "reserved" */
 	{
 		nec_state->program->write_byte(a, d);
 		write_sfr(nec_state, 0xFF, d >> 8);

@@ -49,7 +49,7 @@ static char *DasmCoProc_RT( char *pBuf, UINT32 opcode, const char *pConditionCod
 {
 	/* co processor register transfer */
 	/* xxxx 1110 oooL nnnn dddd cccc ppp1 mmmm */
-	if( opcode&0x00100000 )		//Bit 20 = Load or Store
+	if( opcode&0x00100000 )     //Bit 20 = Load or Store
 	{
 		pBuf += sprintf( pBuf, "MRC" );
 	}
@@ -71,19 +71,19 @@ static char *DasmCoProc_DT( char *pBuf, UINT32 opcode, const char *pConditionCod
 	/* xxxx 111P UNWL nnnn dddd pppp oooooooo */
 	//todo: test this on valid instructions
 
-	pBuf += sprintf(pBuf, "%s%s",(opcode&0x00100000)?"LDC":"STC",pConditionCode);	//Bit 20 = 1 for Load, 0 for Store
+	pBuf += sprintf(pBuf, "%s%s",(opcode&0x00100000)?"LDC":"STC",pConditionCode);   //Bit 20 = 1 for Load, 0 for Store
 	//Long Operation
-	if(opcode & 0x400000)	pBuf += sprintf(pBuf, "L");
+	if(opcode & 0x400000)   pBuf += sprintf(pBuf, "L");
 	pBuf = WritePadding( pBuf, pBuf0 );
 
 	//P# & CD #
 	pBuf += sprintf(pBuf, "p%d, c%d, ",(opcode>>8)&0x0f,(opcode>>12)&0x0f);
 
 	//Base Register (Rn)
-	pBuf += sprintf(pBuf, "[R%d%s",(opcode>>16)&0x0f,(opcode&0x1000000)?"":"]");	//If Bit 24 = 1, Pre-increment, otherwise, Post increment so close brace
+	pBuf += sprintf(pBuf, "[R%d%s",(opcode>>16)&0x0f,(opcode&0x1000000)?"":"]");    //If Bit 24 = 1, Pre-increment, otherwise, Post increment so close brace
 
 	//immediate value ( 8 bit value is << 2 according to manual )
-	if(opcode & 0xff)	pBuf += sprintf(pBuf, ",%s#$%x",(opcode&0x800000)?"":"-",(opcode & 0xff)<<2);
+	if(opcode & 0xff)   pBuf += sprintf(pBuf, ",%s#$%x",(opcode&0x800000)?"":"-",(opcode & 0xff)<<2);
 
 	//Pre-Inc brace & Write back
 	pBuf += sprintf(pBuf, "%s%s",(opcode&0x1000000)?"]":"",(opcode&0x200000)?"{!}":"");
@@ -232,88 +232,88 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 		if ((opcode & 0x0f) == 14)
 			dasmflags = DASMFLAG_STEP_OUT;
 	}
-    	else if ((opcode & 0x0ff000f0) == 0x01600010)	// CLZ - v5
+		else if ((opcode & 0x0ff000f0) == 0x01600010)   // CLZ - v5
 	{
 		pBuf += sprintf(pBuf, "CLZ");
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d", (opcode>>12)&0xf, opcode&0xf);
 	}
-    	else if ((opcode & 0x0ff000f0) == 0x01000050)	// QADD - v5
+		else if ((opcode & 0x0ff000f0) == 0x01000050)   // QADD - v5
 	{
 		pBuf += sprintf(pBuf, "QADD");
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
 	}
-    	else if ((opcode & 0x0ff000f0) == 0x01400050)	// QDADD - v5
+		else if ((opcode & 0x0ff000f0) == 0x01400050)   // QDADD - v5
 	{
 		pBuf += sprintf(pBuf, "QDADD");
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
 	}
-    	else if ((opcode & 0x0ff000f0) == 0x01200050)	// QSUB - v5
+		else if ((opcode & 0x0ff000f0) == 0x01200050)   // QSUB - v5
 	{
 		pBuf += sprintf(pBuf, "QSUB");
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
 	}
-    	else if ((opcode & 0x0ff000f0) == 0x01600050)	// QDSUB - v5
+		else if ((opcode & 0x0ff000f0) == 0x01600050)   // QDSUB - v5
 	{
 		pBuf += sprintf(pBuf, "QDSUB");
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf);
 	}
-    	else if ((opcode & 0x0ff00090) == 0x01000080)	// SMLAxy - v5
+		else if ((opcode & 0x0ff00090) == 0x01000080)   // SMLAxy - v5
 	{
 		pBuf += sprintf(pBuf, "SMLA%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, (opcode>>12)&0xf, opcode&0xf, (opcode>>8)&0xf);
 	}
-    	else if ((opcode & 0x0ff00090) == 0x01400080)	// SMLALxy - v5
+		else if ((opcode & 0x0ff00090) == 0x01400080)   // SMLALxy - v5
 	{
 		pBuf += sprintf(pBuf, "SMLAL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, (opcode>>12)&0xf, opcode&0xf, (opcode>>8)&0xf);
 	}
-    	else if ((opcode & 0x0ff00090) == 0x01600080)	// SMULxy - v5
+		else if ((opcode & 0x0ff00090) == 0x01600080)   // SMULxy - v5
 	{
 		pBuf += sprintf(pBuf, "SMUL%c%c", (opcode&0x20) ? 'T' : 'B', (opcode&0x40) ? 'T' : 'B');
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>12)&0xf);
 	}
-    	else if ((opcode & 0x0ff000b0) == 0x012000a0)	// SMULWy - v5
+		else if ((opcode & 0x0ff000b0) == 0x012000a0)   // SMULWy - v5
 	{
 		pBuf += sprintf(pBuf, "SMULW%c", (opcode&0x40) ? 'T' : 'B');
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf);
 	}
-    	else if ((opcode & 0x0ff000b0) == 0x01200080)	// SMLAWy - v5
+		else if ((opcode & 0x0ff000b0) == 0x01200080)   // SMLAWy - v5
 	{
 		pBuf += sprintf(pBuf, "SMLAW%c", (opcode&0x40) ? 'T' : 'B');
 		pBuf = WritePadding( pBuf, pBuf0 );
 		pBuf += sprintf(pBuf, "R%d, R%d, R%d, R%d", (opcode>>16)&0xf, opcode&0xf, (opcode>>8)&0xf, (opcode>>12)&0xf);
 	}
-	else if( (opcode&0x0e000000)==0 && (opcode&0x80) && (opcode&0x10) )	//bits 27-25 == 000, bit 7=1, bit 4=1
+	else if( (opcode&0x0e000000)==0 && (opcode&0x80) && (opcode&0x10) ) //bits 27-25 == 000, bit 7=1, bit 4=1
 	{
 		/* multiply or swap or half word data transfer */
 		if(opcode&0x60)
-		{	//bits = 6-5 != 00
+		{   //bits = 6-5 != 00
 			/* half word data transfer */
-			if (((opcode & 0x60) == 0x40) && !(opcode & 0x100000))	// bit 20 = 0, bits 5&6 = 10 is ARMv5 LDRD
+			if (((opcode & 0x60) == 0x40) && !(opcode & 0x100000))  // bit 20 = 0, bits 5&6 = 10 is ARMv5 LDRD
 			{
 				pBuf += sprintf(pBuf, "LDRD%s", pConditionCode);
 			}
-			else if (((opcode & 0x60) == 0x60) && !(opcode & 0x100000))	// bit 20 = 0, bits 5&6 = 11 is ARMv5 STRD
+			else if (((opcode & 0x60) == 0x60) && !(opcode & 0x100000)) // bit 20 = 0, bits 5&6 = 11 is ARMv5 STRD
 			{
 				pBuf += sprintf(pBuf, "STRD%s", pConditionCode);
 			}
 			else
 			{
-				pBuf += sprintf(pBuf, "%s%s",(opcode&0x00100000)?"LDR":"STR",pConditionCode);	//Bit 20 = 1 for Load, 0 for Store
+				pBuf += sprintf(pBuf, "%s%s",(opcode&0x00100000)?"LDR":"STR",pConditionCode);   //Bit 20 = 1 for Load, 0 for Store
 
 				//Signed? (if not, always unsigned half word)
 				if(opcode&0x40)
 				{
-					pBuf += sprintf(pBuf, "%s",(opcode&0x20)?"SH":"SB");	//Bit 5 = 1 for Half Word, 0 for Byte
+					pBuf += sprintf(pBuf, "%s",(opcode&0x20)?"SH":"SB");    //Bit 5 = 1 for Half Word, 0 for Byte
 				}
 				else
 				{
@@ -326,10 +326,10 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			//Dest Register
 			pBuf += sprintf(pBuf, "R%d, ",(opcode>>12)&0x0f);
 			//Base Register
-			pBuf += sprintf(pBuf, "[R%d%s",(opcode>>16)&0x0f,(opcode&0x1000000)?"":"]");	//If Bit 24 = 1, Pre-increment, otherwise, Post increment so close brace
+			pBuf += sprintf(pBuf, "[R%d%s",(opcode>>16)&0x0f,(opcode&0x1000000)?"":"]");    //If Bit 24 = 1, Pre-increment, otherwise, Post increment so close brace
 
 			//Immediate or Register Offset?
-			if(opcode&0x400000) {			//Bit 22 - 1 = immediate, 0 = register
+			if(opcode&0x400000) {           //Bit 22 - 1 = immediate, 0 = register
 				//immediate         ( imm. value in high nibble (bits 8-11) and lo nibble (bit 0-3) )
 				pBuf += sprintf(pBuf, ",%s#$%x",(opcode&0x800000)?"":"-",( (((opcode>>8)&0x0f)<<4) | (opcode&0x0f)));
 			}
@@ -342,12 +342,12 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			pBuf += sprintf(pBuf, "%s%s",(opcode&0x1000000)?"]":"",(opcode&0x200000)?"{!}":"");
 		}
 		else {
-			if(opcode&0x01000000) {		//bit 24 = 1
+			if(opcode&0x01000000) {     //bit 24 = 1
 			/* swap */
 			//todo: Test on valid instructions
 				/* xxxx 0001 0B00 nnnn dddd 0000 1001 mmmm */
 				pBuf += sprintf( pBuf, "SWP" );
-				pBuf += sprintf( pBuf, "%s%s", pConditionCode, (opcode & 0x400000)?"B":"" );	//Bit 22 = Byte/Word selection
+				pBuf += sprintf( pBuf, "%s%s", pConditionCode, (opcode & 0x400000)?"B":"" );    //Bit 22 = Byte/Word selection
 				//Rd, Rm, [Rn]
 				pBuf += sprintf( pBuf, "R%d, R%d, [R%d]",
 								(opcode>>12)&0xf, opcode&0xf, (opcode>>16)&0xf );
@@ -355,7 +355,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			else {
 				/* multiply or multiply long */
 
-				if( opcode&0x800000 )	//Bit 23 = 1 for Multiply Long
+				if( opcode&0x800000 )   //Bit 23 = 1 for Multiply Long
 				{
 					/* Multiply Long */
 					/* xxxx0001 UAShhhhllllnnnn1001mmmm */
@@ -428,7 +428,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			}
 		}
 	}
-	else if( (opcode&0x0c000000)==0 )		//bits 27-26 == 00 - This check can only exist properly after Multiplication check above
+	else if( (opcode&0x0c000000)==0 )       //bits 27-26 == 00 - This check can only exist properly after Multiplication check above
 	{
 
 		/* Data Processing OR PSR Transfer */
@@ -442,7 +442,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			if( (opcode&0x00200000) ) {
 				pBuf += sprintf(pBuf, "MSR%s",pConditionCode );
 				//Flag Bits Only? (Bit 16 Clear)
-				if( (opcode&0x10000)==0)	pBuf += sprintf(pBuf, "F");
+				if( (opcode&0x10000)==0)    pBuf += sprintf(pBuf, "F");
 				pBuf = WritePadding( pBuf, pBuf0 );
 				pBuf += sprintf(pBuf, "%s,",strpsr);
 				WriteDataProcessingOperand(pBuf, opcode, (opcode&0x02000000)?1:0, 0, 1);
@@ -503,7 +503,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			}
 		}
 	}
-	else if( (opcode&0x0c000000)==0x04000000 )		//bits 27-26 == 01
+	else if( (opcode&0x0c000000)==0x04000000 )      //bits 27-26 == 01
 	{
 		UINT32 rn = 0;
 		UINT32 rnv = 0;
@@ -579,7 +579,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			if(rnv) pBuf += sprintf( pBuf, " (%x)",rnv);
 		}
 	}
-	else if( (opcode&0x0e000000) == 0x08000000 )		//bits 27-25 == 100
+	else if( (opcode&0x0e000000) == 0x08000000 )        //bits 27-25 == 100
 	{
 		/* xxxx100P USWLnnnn llllllll llllllll */
 		/* Block Data Transfer */
@@ -638,7 +638,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 		pBuf--;
 		pBuf += sprintf( pBuf, " }");
 	}
-	else if( (opcode&0x0e000000)==0x0a000000 )		//bits 27-25 == 101
+	else if( (opcode&0x0e000000)==0x0a000000 )      //bits 27-25 == 101
 	{
 		/* branch instruction */
 		/* xxxx101L oooooooo oooooooo oooooooo */
@@ -658,12 +658,12 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 
 		pBuf = WriteBranchAddress( pBuf, pc, opcode );
 	}
-	else if( (opcode&0x0e000000)==0x0c000000 )		//bits 27-25 == 110
+	else if( (opcode&0x0e000000)==0x0c000000 )      //bits 27-25 == 110
 	{
 		/* co processor data transfer */
 		DasmCoProc_DT(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
 	}
-	else if( (opcode&0x0f000000)==0x0e000000 )		//bits 27-24 == 1110
+	else if( (opcode&0x0f000000)==0x0e000000 )      //bits 27-24 == 1110
 	{
 		/* co processor data operation or register transfer */
 
@@ -678,7 +678,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			DasmCoProc_DO(pBuf,opcode,pConditionCode,pBuf0);
 		}
 	}
-	else if( (opcode&0x0f000000) == 0x0f000000 )	//bits 27-24 == 1111
+	else if( (opcode&0x0f000000) == 0x0f000000 )    //bits 27-24 == 1111
 	{
 		/* Software Interrupt */
 		pBuf += sprintf( pBuf, "SWI%s $%x",
@@ -1276,21 +1276,21 @@ static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 				}
 				break;
 			case 0xe: /* B #offs */
-                if( opcode  & THUMB_BLOP_LO )
-                {
-                    addr = ( ( opcode & THUMB_BLOP_OFFS ) << 1 ) & 0xfffc;
-                    pBuf += sprintf( pBuf, "BLX (LO) %08x", addr );
-                    dasmflags = DASMFLAG_STEP_OVER;
-                }
-                else
-                {
-                    offs = ( opcode & THUMB_BRANCH_OFFS ) << 1;
-                    if( offs & 0x00000800 )
-                    {
-                        offs |= 0xfffff800;
-                    }
-                    pBuf += sprintf( pBuf, "B #%08x (%08x)", offs, pc + 4 + offs);
-                }
+				if( opcode  & THUMB_BLOP_LO )
+				{
+					addr = ( ( opcode & THUMB_BLOP_OFFS ) << 1 ) & 0xfffc;
+					pBuf += sprintf( pBuf, "BLX (LO) %08x", addr );
+					dasmflags = DASMFLAG_STEP_OVER;
+				}
+				else
+				{
+					offs = ( opcode & THUMB_BRANCH_OFFS ) << 1;
+					if( offs & 0x00000800 )
+					{
+						offs |= 0xfffff800;
+					}
+					pBuf += sprintf( pBuf, "B #%08x (%08x)", offs, pc + 4 + offs);
+				}
 				break;
 			case 0xf: /* BL */
 				if( opcode & THUMB_BLOP_LO )
@@ -1336,4 +1336,3 @@ CPU_DISASSEMBLE( arm7thumb_be )
 {
 	return thumb_disasm(buffer, pc, oprom[1] | (oprom[0] << 8)) | 2;
 }
-

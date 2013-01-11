@@ -39,7 +39,7 @@ class mz2000_state : public driver_device
 public:
 	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_cass(*this, CASSETTE_TAG)
+			m_cass(*this, CASSETTE_TAG)
 		{ }
 
 	required_device<cassette_image_device> m_cass;
@@ -189,7 +189,7 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 		}
 	}
 
-    return 0;
+	return 0;
 }
 
 READ8_MEMBER(mz2000_state::mz2000_ipl_r)
@@ -367,9 +367,9 @@ static ADDRESS_MAP_START(mz2000_io, AS_IO, 8, mz2000_state )
 	AM_RANGE(0xd8, 0xdb) AM_READWRITE(mz2000_wd17xx_r, mz2000_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2000_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-    AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
-    AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
+	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 //  AM_RANGE(0xf4, 0xf7) CRTC
 	AM_RANGE(0xf5, 0xf5) AM_WRITE(mz2000_tvram_attr_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(mz2000_gvram_mask_w)
@@ -585,13 +585,13 @@ READ8_MEMBER(mz2000_state::mz2000_porta_r)
 READ8_MEMBER(mz2000_state::mz2000_portb_r)
 {
 	/*
-    x--- ---- break key
-    -x-- ---- read tape data
-    --x- ---- no tape signal
-    ---x ---- no tape write signal
-    ---- x--- end of tape reached
-    ---- ---x "blank" control
-    */
+	x--- ---- break key
+	-x-- ---- read tape data
+	--x- ---- no tape signal
+	---x ---- no tape write signal
+	---- x--- end of tape reached
+	---- ---x "blank" control
+	*/
 	UINT8 res = 0x80;
 
 	if(m_cass->get_image() != NULL)
@@ -617,16 +617,16 @@ READ8_MEMBER(mz2000_state::mz2000_portc_r)
 WRITE8_MEMBER(mz2000_state::mz2000_porta_w)
 {
 	/*
-    These are enabled thru a 0->1 transition
-    x--- ---- tape "APSS"
-    -x-- ---- tape "APLAY"
-    --x- ---- tape "AREW"
-    ---x ---- reverse video
-    ---- x--- tape stop
-    ---- -x-- tape play
-    ---- --x- tape ff
-    ---- ---x tape rewind
-    */
+	These are enabled thru a 0->1 transition
+	x--- ---- tape "APSS"
+	-x-- ---- tape "APLAY"
+	--x- ---- tape "AREW"
+	---x ---- reverse video
+	---- x--- tape stop
+	---- -x-- tape play
+	---- --x- tape ff
+	---- ---x tape rewind
+	*/
 
 	if((m_tape_ctrl & 0x80) == 0 && data & 0x80)
 	{
@@ -683,14 +683,14 @@ WRITE8_MEMBER(mz2000_state::mz2000_portb_w)
 WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 {
 	/*
-        x--- ---- tape data write
-        -x-- ---- tape rec
-        --x- ---- tape ?
-        ---x ---- tape open
-        ---- x--- 0->1 transition = IPL reset
-        ---- -x-- beeper state
-        ---- --x- 0->1 transition = Work RAM reset
-    */
+	    x--- ---- tape data write
+	    -x-- ---- tape rec
+	    --x- ---- tape ?
+	    ---x ---- tape open
+	    ---- x--- 0->1 transition = IPL reset
+	    ---- -x-- beeper state
+	    ---- --x- 0->1 transition = Work RAM reset
+	*/
 	//printf("C W %02x\n",data);
 
 	if(((m_old_portc & 8) == 0) && data & 8)
@@ -710,12 +710,12 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 
 static I8255_INTERFACE( ppi8255_intf )
 {
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_porta_r),						/* Port A read */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_porta_w),						/* Port A write */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portb_r),						/* Port B read */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portb_w),						/* Port B write */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portc_r),						/* Port C read */
-	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portc_w)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_porta_r),                       /* Port A read */
+	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_porta_w),                       /* Port A write */
+	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portb_r),                       /* Port B read */
+	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portb_w),                       /* Port B write */
+	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portc_r),                       /* Port C read */
+	DEVCB_DRIVER_MEMBER(mz2000_state,mz2000_portc_w)                        /* Port C write */
 };
 
 WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
@@ -731,9 +731,9 @@ WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
 READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-	                                        "KEY4", "KEY5", "KEY6", "KEY7",
-	                                        "KEY8", "KEY9", "KEYA", "KEYB",
-	                                        "KEYC", "KEYD", "UNUSED", "UNUSED" };
+											"KEY4", "KEY5", "KEY6", "KEY7",
+											"KEY8", "KEY9", "KEYA", "KEYB",
+											"KEYC", "KEYD", "UNUSED", "UNUSED" };
 
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{

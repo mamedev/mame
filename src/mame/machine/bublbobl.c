@@ -351,7 +351,7 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
 	if (offset == 0)
 		return m_ic43_b << 4;
 	else
-		return 0xff;	// not used?
+		return 0xff;    // not used?
 }
 
 
@@ -442,7 +442,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 	}
 	if ((m_ddr_b & 0x10) && (~data & 0x10) && (m_port_b_out & 0x10))
 	{
-		if (data & 0x08)	/* read */
+		if (data & 0x08)    /* read */
 		{
 			if ((m_address & 0x0800) == 0x0000)
 			{
@@ -457,7 +457,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 			else
 				logerror("%04x: 68705 unknown read address %04x\n", space.device().safe_pc(), m_address);
 		}
-		else	/* write */
+		else    /* write */
 		{
 			if ((m_address & 0x0c00) == 0x0c00)
 			{
@@ -492,4 +492,3 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_b_w)
 {
 	m_ddr_b = data;
 }
-

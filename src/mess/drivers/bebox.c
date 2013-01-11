@@ -84,7 +84,7 @@ READ64_MEMBER(bebox_state::bb_slave_64be_r)
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
 	if ((space.device().safe_pc() == 0xfff02e94) || (space.device().safe_pc() == 0xfff02e84))
 	{
-		return 0x108000ff;	// indicate slave CPU
+		return 0x108000ff;  // indicate slave CPU
 	}
 
 	return device->read_64be(space, offset, mem_mask);
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )
 	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END
 
-#define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
+#define BYTE_REVERSE32(x)       (((x >> 24) & 0xff) | \
 								((x >> 8) & 0xff00) | \
 								((x << 8) & 0xff0000) | \
 								((x << 24) & 0xff000000))
@@ -149,10 +149,10 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( bebox, bebox_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
+	MCFG_CPU_ADD("ppc1", PPC603, 66000000)  /* 66 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 
-	MCFG_CPU_ADD("ppc2", PPC603, 66000000)	/* 66 MHz */
+	MCFG_CPU_ADD("ppc2", PPC603, 66000000)  /* 66 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_slave_mem)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -167,10 +167,10 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", bebox_pic8259_slave_config )
 
-	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0, 0 )	/* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1, 0 )	/* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2, 0 )	/* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3, 0 )	/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0, 0 )   /* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1, 0 )   /* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2, 0 )   /* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3, 0 )   /* TODO: Verify model */
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )
@@ -187,13 +187,13 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
 	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_image_devices, "hdd", NULL, false )	/* FIXME */
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_image_devices, "hdd", NULL, false ) /* FIXME */
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, bebox_state, bebox_ide_interrupt))
 
 	/* pci */
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "mpc105", NULL, &mpc105_config, 0, true)
-	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "cirrus", NULL, NULL,	   0, true)
+	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "cirrus", NULL, NULL,     0, true)
 
 	/*MCFG_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
@@ -209,10 +209,10 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bebox2, bebox )
-	MCFG_CPU_REPLACE("ppc1", PPC603E, 133000000)	/* 133 MHz */
+	MCFG_CPU_REPLACE("ppc1", PPC603E, 133000000)    /* 133 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 
-	MCFG_CPU_REPLACE("ppc2", PPC603E, 133000000)	/* 133 MHz */
+	MCFG_CPU_REPLACE("ppc2", PPC603E, 133000000)    /* 133 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_slave_mem)
 MACHINE_CONFIG_END
 
@@ -221,16 +221,16 @@ static INPUT_PORTS_START( bebox )
 INPUT_PORTS_END
 
 ROM_START(bebox)
-    ROM_REGION(0x00200000, "user1", ROMREGION_64BIT | ROMREGION_BE)
+	ROM_REGION(0x00200000, "user1", ROMREGION_64BIT | ROMREGION_BE)
 	ROM_LOAD( "bootmain.rom", 0x000000, 0x20000, CRC(df2d19e0) SHA1(da86a7d23998dc953dd96a2ac5684faaa315c701) )
-    ROM_REGION(0x4000, "user2", ROMREGION_64BIT | ROMREGION_BE)
+	ROM_REGION(0x4000, "user2", ROMREGION_64BIT | ROMREGION_BE)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
 ROM_START(bebox2)
-    ROM_REGION(0x00200000, "user1", ROMREGION_64BIT | ROMREGION_BE)
+	ROM_REGION(0x00200000, "user1", ROMREGION_64BIT | ROMREGION_BE)
 	ROM_LOAD( "bootmain.rom", 0x000000, 0x20000, CRC(df2d19e0) SHA1(da86a7d23998dc953dd96a2ac5684faaa315c701) )
-    ROM_REGION(0x4000, "user2", ROMREGION_64BIT | ROMREGION_BE)
+	ROM_REGION(0x4000, "user2", ROMREGION_64BIT | ROMREGION_BE)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 

@@ -23,7 +23,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define V1050_KEYBOARD_TAG	"v1050kb"
+#define V1050_KEYBOARD_TAG  "v1050kb"
 
 
 
@@ -32,7 +32,7 @@
 //**************************************************************************
 
 #define MCFG_V1050_KEYBOARD_ADD() \
-    MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
+	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
 
 
 #define V1050_KEYBOARD_INTERFACE(_name) \
@@ -49,8 +49,8 @@
 class v1050_keyboard_device :  public device_t
 {
 public:
-    // construction/destruction
-    v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -66,8 +66,8 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "v1050kb"; }
 

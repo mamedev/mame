@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#define TLC34076_6_BIT		0
-#define TLC34076_8_BIT		1
+#define TLC34076_6_BIT      0
+#define TLC34076_8_BIT      1
 
 const pen_t *tlc34076_get_pens(device_t *device);
 

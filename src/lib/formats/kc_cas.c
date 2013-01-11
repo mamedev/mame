@@ -13,16 +13,16 @@
 
 #include "kc_cas.h"
 
-#define SMPLO		-32768
-#define SMPHI		32767
-#define SILENCE		0
+#define SMPLO       -32768
+#define SMPHI       32767
+#define SILENCE     0
 
-#define KC_WAV_FREQUENCY		44100
+#define KC_WAV_FREQUENCY        44100
 
 // from documentation
-#define FREQ_BIT_0			2400
-#define FREQ_BIT_1			1200
-#define FREQ_SEPARATOR		600
+#define FREQ_BIT_0          2400
+#define FREQ_BIT_1          1200
+#define FREQ_SEPARATOR      600
 
 // file formats
 enum
@@ -114,7 +114,7 @@ static int kc_handle_cass(INT16 *buffer, const UINT8 *casdata, int type)
 		sample_count += kc_cas_cycle( buffer, sample_count, FREQ_BIT_1);
 
 	// on the entire file
-    while( data_pos < kc_image_size )
+	while( data_pos < kc_image_size )
 	{
 		UINT8 checksum = 0;
 
@@ -170,7 +170,7 @@ static int kc_handle_cass(INT16 *buffer, const UINT8 *casdata, int type)
 		}
 
 		block_id++;
-    }
+	}
 
 	sample_count += kc_cas_cycle( buffer, sample_count, FREQ_SEPARATOR);
 
@@ -250,13 +250,13 @@ static int kc_kcc_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller kc_kcc_legacy_fill_wave =
 {
-	kc_kcc_fill_wave,						/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	kc_kcc_to_wav_size,					    /* chunk_sample_calc */
-	KC_WAV_FREQUENCY,						/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	kc_kcc_fill_wave,                       /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	kc_kcc_to_wav_size,                     /* chunk_sample_calc */
+	KC_WAV_FREQUENCY,                       /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 static casserr_t kc_kcc_identify(cassette_image *cassette, struct CassetteOptions *opts)
@@ -302,13 +302,13 @@ static int kc_tap_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller kc_tap_legacy_fill_wave =
 {
-	kc_tap_fill_wave,						/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	kc_tap_to_wav_size,					    /* chunk_sample_calc */
-	KC_WAV_FREQUENCY,						/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	kc_tap_fill_wave,                       /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	kc_tap_to_wav_size,                     /* chunk_sample_calc */
+	KC_WAV_FREQUENCY,                       /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 static casserr_t kc_tap_identify(cassette_image *cassette, struct CassetteOptions *opts)
@@ -354,13 +354,13 @@ static int kc_sss_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller kc_sss_legacy_fill_wave =
 {
-	kc_sss_fill_wave,						/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	kc_sss_to_wav_size,					    /* chunk_sample_calc */
-	KC_WAV_FREQUENCY,						/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	kc_sss_fill_wave,                       /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	kc_sss_to_wav_size,                     /* chunk_sample_calc */
+	KC_WAV_FREQUENCY,                       /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 static casserr_t kc_sss_identify(cassette_image *cassette, struct CassetteOptions *opts)

@@ -55,9 +55,9 @@
 /* PCB */
 enum
 {
-    SEGA_STD = 0,
+	SEGA_STD = 0,
 
-    SEGA_SRAM, SEGA_FRAM,
+	SEGA_SRAM, SEGA_FRAM,
 
 	CM_JCART, CM_JCART_SEPROM,   /* Codemasters PCB (J-Carts and SEPROM) */
 
@@ -103,7 +103,7 @@ enum
 	SQUIRRELK,                   /* Squirrel King */
 	SBUBBOB,                     /* Super Bubble Bobble */
 	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
-	PSOLAR						 /* Pier Solar */
+	PSOLAR                       /* Pier Solar */
 };
 
 struct md_pcb
@@ -166,7 +166,7 @@ static const md_pcb pcb_list[] =
 
 static int md_get_pcb_id(const char *pcb)
 {
-	int	i;
+	int i;
 
 	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
 	{
@@ -427,12 +427,12 @@ static READ16_HANDLER( chifi3_prot_r )
 	UINT32 retdat;
 
 	/* not 100% correct, there may be some relationship between the reads here
-    and the writes made at the start of the game.. */
+	and the writes made at the start of the game.. */
 
 	/*
-    04dc10 chifi3, prot_r? 2800
-    04cefa chifi3, prot_r? 65262
-    */
+	04dc10 chifi3, prot_r? 2800
+	04cefa chifi3, prot_r? 65262
+	*/
 
 	if (space.device().safe_pc() == 0x01782) // makes 'VS' screen appear
 	{
@@ -736,10 +736,10 @@ static READ16_HANDLER( topfig_6BD294_r ) /* colours on title screen */
 	static int x = -1;
 
 	/*
-     cpu #0 (PC=00177192): unmapped program memory word write to 006BD240 = 00A8 & 00FF
-     cpu #0 (PC=0017719A): unmapped program memory word write to 006BD2D2 = 0098 & 00FF
-     cpu #0 (PC=001771A2): unmapped program memory word read from 006BD294 & 00FF
-     */
+	 cpu #0 (PC=00177192): unmapped program memory word write to 006BD240 = 00A8 & 00FF
+	 cpu #0 (PC=0017719A): unmapped program memory word write to 006BD2D2 = 0098 & 00FF
+	 cpu #0 (PC=001771A2): unmapped program memory word read from 006BD294 & 00FF
+	 */
 
 	if (space.device().safe_pc()==0x1771a2) return 0x50;
 	else
@@ -926,7 +926,7 @@ static WRITE16_HANDLER( genesis_sram_toggle )
 	md_cons_state *state = space.machine().driver_data<md_cons_state>();
 
 	/* unsure if this is actually supposed to toggle or just switch on?
-    Yet to encounter game that utilizes */
+	Yet to encounter game that utilizes */
 	state->m_md_cart.sram_active = (data & 1) ? 1 : 0;
 	state->m_md_cart.sram_readonly = (data & 2) ? 1 : 0;
 
@@ -1059,22 +1059,22 @@ class stm95_device
 {
 public:
 	stm95_device() : stm_state(IDLE), stream_pos(0) {};
-	UINT8	*eeprom_data;
-	void	set_cs_line(int);
-	void	set_halt_line(int state) {}; // not implemented
-	void	set_si_line(int);
-	void	set_sck_line(int state);
-	int		get_so_line(void);
+	UINT8   *eeprom_data;
+	void    set_cs_line(int);
+	void    set_halt_line(int state) {}; // not implemented
+	void    set_si_line(int);
+	void    set_sck_line(int state);
+	int     get_so_line(void);
 protected:
-	int		latch;
-	int		reset_line;
-	int		sck_line;
-	int		WEL;
+	int     latch;
+	int     reset_line;
+	int     sck_line;
+	int     WEL;
 
-	STMSTATE	stm_state;
-	int		stream_pos;
-	int		stream_data;
-	int		eeprom_addr;
+	STMSTATE    stm_state;
+	int     stream_pos;
+	int     stream_data;
+	int     eeprom_addr;
 };
 
 void stm95_device::set_cs_line(int state)
@@ -1117,29 +1117,29 @@ void stm95_device::set_sck_line(int state)
 						//printf("STM95 EEPROM: got cmd %02X\n", stream_data&0xff);
 						switch(stream_data & 0xff)
 						{
-							case 0x01:	// write status register
+							case 0x01:  // write status register
 								if (WEL != 0)
 									stm_state = CMD_WRSR;
 								WEL = 0;
 								break;
-							case 0x02:	// write
+							case 0x02:  // write
 								if (WEL != 0)
 									stm_state = CMD_WRITE;
 								stream_data = 0;
 								WEL = 0;
 								break;
-							case 0x03:	// read
+							case 0x03:  // read
 								stm_state = M95320_CMD_READ;
 								stream_data = 0;
 								break;
-							case 0x04:	// write disable
+							case 0x04:  // write disable
 								WEL = 0;
 								break;
-							case 0x05:	// read status register
+							case 0x05:  // read status register
 								stm_state = CMD_RDSR;
 								stream_data = WEL<<1;
 								break;
-							case 0x06:	// write enable
+							case 0x06:  // write enable
 								WEL = 1;
 								break;
 							default:
@@ -1148,7 +1148,7 @@ void stm95_device::set_sck_line(int state)
 					}
 					break;
 				case CMD_WRSR:
-					stream_pos++;		// just skip, don't care block protection
+					stream_pos++;       // just skip, don't care block protection
 					if (stream_pos == 8)
 					{
 						stm_state = IDLE;
@@ -1449,19 +1449,19 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
 	if (state->m_md_cart.type == POKEMON)
 	{
 		/*todo: emulate protection instead
-         0DD19E:47F8
-         0DD1A0:FFF0
-         0DD1A2:4E63
-         0DD46E:4EF8
-         0DD470:0300
-         0DD49C:6002
-         */
+		 0DD19E:47F8
+		 0DD1A0:FFF0
+		 0DD1A2:4E63
+		 0DD46E:4EF8
+		 0DD470:0300
+		 0DD49C:6002
+		 */
 
 		/*
 
-         you need to return 1 @ 0xa13002 and 0???1f @ 0xa1303E (it does word reads).
+		 you need to return 1 @ 0xa13002 and 0???1f @ 0xa1303E (it does word reads).
 
-         */
+		 */
 		UINT16 *ROM16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 		ROM16[0x0dd19e/2] = 0x47F8;
@@ -1475,12 +1475,12 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
 	if (state->m_md_cart.type == POKEMON2)
 	{
 		/*todo: emulate protection instead
-         006036:E000
-         002540:6026
-         001ED0:6026
-         002476:6022
+		 006036:E000
+		 002540:6026
+		 001ED0:6026
+		 002476:6022
 
-         */
+		 */
 		UINT16 *ROM16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 		ROM16[0x06036/2] = 0xE000;
@@ -1494,10 +1494,10 @@ static void setup_megadriv_custom_mappers(running_machine &machine)
 	if (state->m_md_cart.type == MULAN)
 	{
 		/*todo: emulate protection instead
-         006036:E000
-         +more?
+		 006036:E000
+		 +more?
 
-         */
+		 */
 		//  ROM[0x01ED0/2] = 0xE000;
 		//  ROM[0x02540/2] = 0xE000;
 
@@ -1615,11 +1615,11 @@ static void setup_megadriv_sram(device_image_interface &image)
 			state->m_md_cart.sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
 			state->m_md_cart.sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
 
-			if ((state->m_md_cart.sram_start > state->m_md_cart.sram_end) || ((state->m_md_cart.sram_end - state->m_md_cart.sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
+			if ((state->m_md_cart.sram_start > state->m_md_cart.sram_end) || ((state->m_md_cart.sram_end - state->m_md_cart.sram_start) >= 0x10000))    // we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
 				state->m_md_cart.sram_end = state->m_md_cart.sram_start + 0x0FFFF;
 
 			/* for some games using serial EEPROM, difference between SRAM
-             end to start is 0 or 1. Currently EEPROM is not emulated. */
+			 end to start is 0 or 1. Currently EEPROM is not emulated. */
 			if ((state->m_md_cart.sram_end - state->m_md_cart.sram_start) < 2)
 				state->m_md_cart.has_serial_eeprom = 1;
 			else
@@ -1648,7 +1648,7 @@ static void setup_megadriv_sram(device_image_interface &image)
 		if (!state->m_md_cart.has_serial_eeprom)
 		{
 			/* Info from DGen: If SRAM does not overlap main ROM, set it active by
-             default since a few games can't manage to properly switch it on/off. */
+			 default since a few games can't manage to properly switch it on/off. */
 			if (state->m_md_cart.last_loaded_image_length <= state->m_md_cart.sram_start)
 				state->m_md_cart.sram_active = 1;
 
@@ -1656,8 +1656,8 @@ static void setup_megadriv_sram(device_image_interface &image)
 			//printf("res: start %x, end %x, det %d, active %d\n", state->m_md_cart.sram_start, state->m_md_cart.sram_end, state->m_md_cart.sram_detected, state->m_md_cart.sram_active);
 
 			/* Sonic 1 included in Sonic Classics doesn't have SRAM and
-             does lots of ROM access at this range, then only install read/
-             write handlers if SRAM is active to not slow down emulation. */
+			 does lots of ROM access at this range, then only install read/
+			 write handlers if SRAM is active to not slow down emulation. */
 			if (state->m_md_cart.sram_active)
 				install_sram_rw_handlers(machine, TRUE);
 		}
@@ -1708,53 +1708,53 @@ static int genesis_is_funky_SMD(unsigned char *buf,unsigned int len)
 	if (!strncmp("UZ(-01  ", (const char *) &buf[0xf0], 8))
 		return 1;
 
-    /* Phelios USA redump */
+	/* Phelios USA redump */
 	/* target earth */
 	/* klax (namcot) */
 	if (buf[0x2080] == ' ' && buf[0x0080] == 'S' && buf[0x2081] == 'E' && buf[0x0081] == 'G')
 		return 1;
 
-    /* jap baseball 94 */
+	/* jap baseball 94 */
 	if (!strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
 		return 1;
 
-    /* devilish Mahjong Tower */
-    if (!strncmp("optrEtranet", (const char *) &buf[0xf3], 11))
+	/* devilish Mahjong Tower */
+	if (!strncmp("optrEtranet", (const char *) &buf[0xf3], 11))
 		return 1;
 
 	/* golden axe 2 beta */
 	if (buf[0x0100] == 0x3c && buf[0x0101] == 0 && buf[0x0102] == 0 && buf[0x0103] == 0x3c)
 		return 1;
 
-    /* omega race */
+	/* omega race */
 	if (!strncmp("OEARC   ", (const char *) &buf[0x90], 8))
 		return 1;
 
-    /* budokan beta */
+	/* budokan beta */
 	if ((len >= 0x6708+8) && !strncmp(" NTEBDKN", (const char *) &buf[0x6708], 8))
 		return 1;
 
-    /* cdx pro 1.8 bios */
+	/* cdx pro 1.8 bios */
 	if (!strncmp("so fCXP", (const char *) &buf[0x2c0], 7))
 		return 1;
 
-    /* ishido (hacked) */
+	/* ishido (hacked) */
 	if (!strncmp("sio-Wyo ", (const char *) &buf[0x0090], 8))
 		return 1;
 
-    /* onslaught */
+	/* onslaught */
 	if (!strncmp("SS  CAL ", (const char *) &buf[0x0088], 8))
 		return 1;
 
-    /* tram terror pirate */
+	/* tram terror pirate */
 	if ((len >= 0x3648 + 8) && !strncmp("SG NEPIE", (const char *) &buf[0x3648], 8))
 		return 1;
 
-    /* breath of fire 3 chinese */
+	/* breath of fire 3 chinese */
 	if (buf[0x0007] == 0x1c && buf[0x0008] == 0x0a && buf[0x0009] == 0xb8 && buf[0x000a] == 0x0a)
 		return 1;
 
-    /*tetris pirate */
+	/*tetris pirate */
 	if ((len >= 0x1cbe + 5) && !strncmp("@TTI>", (const char *) &buf[0x1cbe], 5))
 		return 1;
 
@@ -1826,7 +1826,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 	}
 	/* is this a MD file? */
 	else if ((rawROM[0x2080] == 'E') && (rawROM[0x2081] == 'A') &&
-			 (rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))
+				(rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))
 	{
 //      printf("MD!\n");
 		tmpROMnew = global_alloc_array(unsigned char, length);
@@ -1866,7 +1866,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 		relocate = 0x2000;
 		state->m_md_cart.last_loaded_image_length = length;
 
-		for (ptr = 0; ptr < MAX_MD_CART_SIZE + relocate; ptr += 2)		/* mangle bytes for little endian machines */
+		for (ptr = 0; ptr < MAX_MD_CART_SIZE + relocate; ptr += 2)      /* mangle bytes for little endian machines */
 		{
 #ifdef LSB_FIRST
 			int temp = ROM[relocate + ptr];
@@ -1890,184 +1890,184 @@ static int megadrive_load_nonlist(device_image_interface &image)
 	/* Detect carts which need additional handlers */
 	{
 		static const unsigned char smouse_sig[] = { 0x4d, 0xf9, 0x00, 0x40, 0x00, 0x02 },
-		mjlover_sig[]	= { 0x13, 0xf9, 0x00, 0x40, 0x00, 0x00 }, // move.b  ($400000).l,($FFFF0C).l (partial)
-		squir_sig[]		= { 0x26, 0x79, 0x00, 0xff, 0x00, 0xfa },
-		bugsl_sig[]		= { 0x20, 0x12, 0x13, 0xc0, 0x00, 0xff },
-		sbub_sig[]		= { 0x0c, 0x39, 0x00, 0x55, 0x00, 0x40 }, // cmpi.b  #$55,($400000).l
-		lk3_sig[]		= { 0x0c, 0x01, 0x00, 0x30, 0x66, 0xe4 },
-		sdk_sig[]		= { 0x48, 0xe7, 0xff, 0xfe, 0x52, 0x79 },
-		redcliff_sig[]	= { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04 }, // move.b  ($400004).l,d0
-		redcl_en_sig[]	= { 0x50, 0x79, 0x40, 0x00, 0x40, 0x44 }, // move.b  ($400004).l,d0
-		smb_sig[]		= { 0x20, 0x4d, 0x41, 0x52, 0x49, 0x4f },
-		smb2_sig[]		= { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84 },
-		kaiju_sig[]		= { 0x19, 0x7c, 0x00, 0x01, 0x00, 0x00 },
-		chifi3_sig[]	= { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a },
-		lionk2_sig[]	= { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4 },
-		rx3_sig[]		= { 0x66, 0x00, 0x00, 0x0e, 0x30, 0x3c },
-		kof98_sig[]		= { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00 },
-		s15in1_sig[]	= { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00 },
-		kof99_sig[]		= { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1 }, // move.l  #$300000A1,d0
-		radica_sig[]	= { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
-		soulb_sig[]		= { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
-		s19in1_sig[]	= { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 },
-		rockman_sig[]	= { 0xea, 0x80 };
+		mjlover_sig[]   = { 0x13, 0xf9, 0x00, 0x40, 0x00, 0x00 }, // move.b  ($400000).l,($FFFF0C).l (partial)
+		squir_sig[]     = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xfa },
+		bugsl_sig[]     = { 0x20, 0x12, 0x13, 0xc0, 0x00, 0xff },
+		sbub_sig[]      = { 0x0c, 0x39, 0x00, 0x55, 0x00, 0x40 }, // cmpi.b  #$55,($400000).l
+		lk3_sig[]       = { 0x0c, 0x01, 0x00, 0x30, 0x66, 0xe4 },
+		sdk_sig[]       = { 0x48, 0xe7, 0xff, 0xfe, 0x52, 0x79 },
+		redcliff_sig[]  = { 0x10, 0x39, 0x00, 0x40, 0x00, 0x04 }, // move.b  ($400004).l,d0
+		redcl_en_sig[]  = { 0x50, 0x79, 0x40, 0x00, 0x40, 0x44 }, // move.b  ($400004).l,d0
+		smb_sig[]       = { 0x20, 0x4d, 0x41, 0x52, 0x49, 0x4f },
+		smb2_sig[]      = { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84 },
+		kaiju_sig[]     = { 0x19, 0x7c, 0x00, 0x01, 0x00, 0x00 },
+		chifi3_sig[]    = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a },
+		lionk2_sig[]    = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4 },
+		rx3_sig[]       = { 0x66, 0x00, 0x00, 0x0e, 0x30, 0x3c },
+		kof98_sig[]     = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00 },
+		s15in1_sig[]    = { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00 },
+		kof99_sig[]     = { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1 }, // move.l  #$300000A1,d0
+		radica_sig[]    = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
+		soulb_sig[]     = { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
+		s19in1_sig[]    = { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 },
+		rockman_sig[]   = { 0xea, 0x80 };
 
 		switch (state->m_md_cart.last_loaded_image_length)
 		{
 			case 0x80000:
-			    if (!allendianmemcmp(&ROM[0x08c8], &smouse_sig[0], sizeof(smouse_sig)))
+				if (!allendianmemcmp(&ROM[0x08c8], &smouse_sig[0], sizeof(smouse_sig)))
 					state->m_md_cart.type = SMOUSE;
 
-			    if (!allendianmemcmp((char *)&ROM[0x7e30e], "SEGA", 4) ||
+				if (!allendianmemcmp((char *)&ROM[0x7e30e], "SEGA", 4) ||
 					!allendianmemcmp((char *)&ROM[0x7e100], "SEGA", 4) ||
 					!allendianmemcmp((char *)&ROM[0x7e1e6], "SEGA", 4))
 					state->m_md_cart.type = REALTEC;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50396", 10)) // NHLPA Hockey 93
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50396", 10)) // NHLPA Hockey 93
 					state->m_md_cart.type = EA_NHLPA;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1215", 10)) // Evander Holyfield
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1215", 10)) // Evander Holyfield
 					state->m_md_cart.type = SEGA_EEPROM;
 
-			    break;
+				break;
 
 			case 0xc0000:
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM G-4060 ", 8)) // Wonder Boy V
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM G-4060 ", 8)) // Wonder Boy V
 					state->m_md_cart.type = SEGA_EEPROM;
 
-			    break;
+				break;
 
 			case 0x100000:
-			    if (!allendianmemcmp(&ROM[0x01b24], &mjlover_sig[0], sizeof(mjlover_sig)))
+				if (!allendianmemcmp(&ROM[0x01b24], &mjlover_sig[0], sizeof(mjlover_sig)))
 					state->m_md_cart.type = MJLOVER;
 
-			    if (!allendianmemcmp(&ROM[0x03b4], &squir_sig[0], sizeof(squir_sig)))
+				if (!allendianmemcmp(&ROM[0x03b4], &squir_sig[0], sizeof(squir_sig)))
 					state->m_md_cart.type = SQUIRRELK;
 
-			    if (!allendianmemcmp(&ROM[0xee0d0], &bugsl_sig[0], sizeof(bugsl_sig)))
+				if (!allendianmemcmp(&ROM[0xee0d0], &bugsl_sig[0], sizeof(bugsl_sig)))
 					state->m_md_cart.type = BUGSLIFE;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0172], "GAME : ELF WOR", 14))
+				if (!allendianmemcmp((char *)&ROM[0x0172], "GAME : ELF WOR", 14))
 					state->m_md_cart.type = ELFWOR;
 
-			    if (!allendianmemcmp(&ROM[0x123e4], &sbub_sig[0], sizeof(sbub_sig)))
+				if (!allendianmemcmp(&ROM[0x123e4], &sbub_sig[0], sizeof(sbub_sig)))
 					state->m_md_cart.type = SBUBBOB;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50176", 10)) // Rings of Power
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50176", 10)) // Rings of Power
 					state->m_md_cart.type = EA_NHLPA;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "MK 00001211-00", 14)) // Sports Talk Baseball
+				if (!allendianmemcmp((char *)&ROM[0x0180], "MK 00001211-00", 14)) // Sports Talk Baseball
 					state->m_md_cart.type = SEGA_EEPROM;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120096-", 12)) // Micro Machines 2
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120096-", 12)) // Micro Machines 2
 					state->m_md_cart.type = CODE_MASTERS;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120146-", 12)) // Brian Lara Cricket 96 / Shane Wayne Cricket 96
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120146-", 12)) // Brian Lara Cricket 96 / Shane Wayne Cricket 96
 					state->m_md_cart.type = CODE_MASTERS;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0190], "OJKRPTBVFCA     ", 0x10)) // Micro Machines '96 / Military TODO: better way to recognize these?
+				if (!allendianmemcmp((char *)&ROM[0x0190], "OJKRPTBVFCA     ", 0x10)) // Micro Machines '96 / Military TODO: better way to recognize these?
 					state->m_md_cart.type = CODE_MASTERS;
-			    break;
+				break;
 
 			case 0x200000:
-			    if (!allendianmemcmp(&ROM[0x18c6], &lk3_sig[0], sizeof(lk3_sig)))
+				if (!allendianmemcmp(&ROM[0x18c6], &lk3_sig[0], sizeof(lk3_sig)))
 					state->m_md_cart.type = LIONK3;
 
-			    if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
+				if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
 					state->m_md_cart.type = SKINGKONG;
 
-			    if (!allendianmemcmp(&ROM[0xce560], &redcliff_sig[0], sizeof(redcliff_sig)))
+				if (!allendianmemcmp(&ROM[0xce560], &redcliff_sig[0], sizeof(redcliff_sig)))
 					state->m_md_cart.type = REDCLIFF;
 
-			    if (!allendianmemcmp(&ROM[0xc8cb0], &smb_sig[0], sizeof(smb_sig)))
+				if (!allendianmemcmp(&ROM[0xc8cb0], &smb_sig[0], sizeof(smb_sig)))
 					state->m_md_cart.type = SMB;
 
-			    if (!allendianmemcmp(&ROM[0xf24d6], &smb2_sig[0], sizeof(smb2_sig)))
+				if (!allendianmemcmp(&ROM[0xf24d6], &smb2_sig[0], sizeof(smb2_sig)))
 					state->m_md_cart.type = SMB2;
 
-			    if (!allendianmemcmp(&ROM[0x674e], &kaiju_sig[0], sizeof(kaiju_sig)))
+				if (!allendianmemcmp(&ROM[0x674e], &kaiju_sig[0], sizeof(kaiju_sig)))
 					state->m_md_cart.type = KAIJU;
 
-			    if (!allendianmemcmp(&ROM[0x1780], &chifi3_sig[0], sizeof(chifi3_sig)))
+				if (!allendianmemcmp(&ROM[0x1780], &chifi3_sig[0], sizeof(chifi3_sig)))
 					state->m_md_cart.type = CHINFIGHT3;
 
-			    if (!allendianmemcmp(&ROM[0x03c2], &lionk2_sig[0], sizeof(lionk2_sig)))
+				if (!allendianmemcmp(&ROM[0x03c2], &lionk2_sig[0], sizeof(lionk2_sig)))
 					state->m_md_cart.type = LIONK2;
 
-			    if (!allendianmemcmp(&ROM[0xc8b90], &rx3_sig[0], sizeof(rx3_sig)))
+				if (!allendianmemcmp(&ROM[0xc8b90], &rx3_sig[0], sizeof(rx3_sig)))
 					state->m_md_cart.type = ROCKMANX3;
 
-			    if (!allendianmemcmp(&ROM[0x56ae2], &kof98_sig[0], sizeof(kof98_sig)))
+				if (!allendianmemcmp(&ROM[0x56ae2], &kof98_sig[0], sizeof(kof98_sig)))
 					state->m_md_cart.type = KOF98;
 
-			    if (!allendianmemcmp(&ROM[0x17bb2], &s15in1_sig[0], sizeof(s15in1_sig)))
+				if (!allendianmemcmp(&ROM[0x17bb2], &s15in1_sig[0], sizeof(s15in1_sig)))
 					state->m_md_cart.type = MC_SUP15IN1;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081326 ", 12)) // NBA Jam
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081326 ", 12)) // NBA Jam
 					state->m_md_cart.type = NBA_JAM;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
 					state->m_md_cart.type = SEGA_EEPROM;
 
-			    if ((!allendianmemcmp((char *)&ROM[0x0180], "GM T-12046", 10)) || // Mega Man
+				if ((!allendianmemcmp((char *)&ROM[0x0180], "GM T-12046", 10)) || // Mega Man
 					(!allendianmemcmp((char *)&ROM[0x0180], "GM T-12053", 10) && !allendianmemcmp(&ROM[0x18e], &rockman_sig[0], sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
 					state->m_md_cart.type = SEGA_EEPROM;
 
-			    break;
+				break;
 
 			case 0x200005:
-			    if (!allendianmemcmp(&ROM[0xce564], &redcl_en_sig[0], sizeof(redcliff_sig)))
+				if (!allendianmemcmp(&ROM[0xce564], &redcl_en_sig[0], sizeof(redcliff_sig)))
 					state->m_md_cart.type = REDCL_EN;
-			    break;
+				break;
 
 			case 0x300000:
-			    if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
+				if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
 					state->m_md_cart.type = SDK99;
 
-			    if (!allendianmemcmp(&ROM[0x1fd0d2], &kof99_sig[0], sizeof(kof99_sig)))
+				if (!allendianmemcmp(&ROM[0x1fd0d2], &kof99_sig[0], sizeof(kof99_sig)))
 					state->m_md_cart.type = KOF99;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81406", 10)) // NBA Jam TE
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81406", 10)) // NBA Jam TE
 					state->m_md_cart.type = NBA_JAM_TE;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081276 ", 12)) // NFL Quarterback Club
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081276 ", 12)) // NFL Quarterback Club
 					state->m_md_cart.type = NBA_JAM_TE;
 
-			    break;
+				break;
 
 			case 0x400000:
-			    if (!allendianmemcmp(&ROM[0x3c031c], &radica_sig[0], sizeof(radica_sig)) ||
+				if (!allendianmemcmp(&ROM[0x3c031c], &radica_sig[0], sizeof(radica_sig)) ||
 					!allendianmemcmp(&ROM[0x3f031c], &radica_sig[0], sizeof(radica_sig))) // ssf+gng + radica vol1
 					state->m_md_cart.type = RADICA;
 
-			    if (!allendianmemcmp(&ROM[0x028460], &soulb_sig[0], sizeof(soulb_sig)))
+				if (!allendianmemcmp(&ROM[0x028460], &soulb_sig[0], sizeof(soulb_sig)))
 					state->m_md_cart.type = SOULBLAD;
 
-			    if (!allendianmemcmp(&ROM[0x1e700], &s19in1_sig[0], sizeof(s19in1_sig)))
+				if (!allendianmemcmp(&ROM[0x1e700], &s19in1_sig[0], sizeof(s19in1_sig)))
 					state->m_md_cart.type = MC_SUP19IN1;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081586-", 12)) // NFL Quarterback Club 96
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081586-", 12)) // NFL Quarterback Club 96
 					state->m_md_cart.type = NFL_QB_96;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081576 ", 12)) // College Slam
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081576 ", 12)) // College Slam
 					state->m_md_cart.type = C_SLAM;
 
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81476", 10)) // Big Hurt Baseball
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81476", 10)) // Big Hurt Baseball
 					state->m_md_cart.type = C_SLAM;
 
-			    break;
+				break;
 
 			case 0x500000:
-			    if (!allendianmemcmp((char *)&ROM[0x0120], "SUPER STREET FIGHTER2 ", 22))
+				if (!allendianmemcmp((char *)&ROM[0x0120], "SUPER STREET FIGHTER2 ", 22))
 					state->m_md_cart.type = SSF2;
-			    break;
+				break;
 			case 0x800000:
-			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-574023-", 12)) // Pier Solar
+				if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-574023-", 12)) // Pier Solar
 					state->m_md_cart.type = PSOLAR;
-			    break;
+				break;
 			default:
-			    break;
+				break;
 		}
 	}
 
@@ -2124,7 +2124,7 @@ static int megadrive_load_list(device_image_interface &image)
 	md_cons_state *state = image.device().machine().driver_data<md_cons_state>();
 	UINT8 *ROM = state->memregion("maincpu")->base();
 	UINT32 length = image.get_software_region_length("rom");
-	const char	*pcb_name;
+	const char  *pcb_name;
 	memcpy(ROM, image.get_software_region("rom"), length);
 
 	state->m_md_cart.last_loaded_image_length = length;

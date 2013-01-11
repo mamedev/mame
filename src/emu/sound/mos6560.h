@@ -93,32 +93,32 @@
 #define MOS6561_VRETRACERATE 50
 #define MOS656X_HRETRACERATE 15625
 
-#define MOS6560_MAME_XPOS  4		   /* xleft not displayed */
-#define MOS6560_MAME_YPOS  10		   /* y up not displayed */
+#define MOS6560_MAME_XPOS  4           /* xleft not displayed */
+#define MOS6560_MAME_YPOS  10          /* y up not displayed */
 #define MOS6561_MAME_XPOS  20
 #define MOS6561_MAME_YPOS  10
-#define MOS6560_MAME_XSIZE	200
-#define MOS6560_MAME_YSIZE	248
-#define MOS6561_MAME_XSIZE	224
-#define MOS6561_MAME_YSIZE	296
+#define MOS6560_MAME_XSIZE  200
+#define MOS6560_MAME_YSIZE  248
+#define MOS6561_MAME_XSIZE  224
+#define MOS6561_MAME_YSIZE  296
 /* real values */
 
 #define MOS6560_LINES 261
 #define MOS6561_LINES 312
 
-#define MOS6560_XSIZE	(4+201)		   /* 4 left not visible */
-#define MOS6560_YSIZE	(10+251)	   /* 10 not visible */
+#define MOS6560_XSIZE   (4+201)        /* 4 left not visible */
+#define MOS6560_YSIZE   (10+251)       /* 10 not visible */
 /* cycles 65 */
 
-#define MOS6561_XSIZE	(20+229)	   /* 20 left not visible */
-#define MOS6561_YSIZE	(10+302)	   /* 10 not visible */
+#define MOS6561_XSIZE   (20+229)       /* 20 left not visible */
+#define MOS6561_YSIZE   (10+302)       /* 10 not visible */
 /* cycles 71 */
 
 
 /* the following values depend on the VIC clock,
  * but to achieve TV-frequency the clock must have a fix frequency */
-#define MOS6560_CLOCK	(14318181/14)
-#define MOS6561_CLOCK	(4433618/4)
+#define MOS6560_CLOCK   (14318181/14)
+#define MOS6561_CLOCK   (4433618/4)
 
 
 
@@ -130,19 +130,19 @@
 
 struct mos6560_interface
 {
-	const char		*m_screen_tag;
+	const char      *m_screen_tag;
 
-	devcb_read8		m_potx_cb;
-	devcb_read8 	m_poty_cb;
+	devcb_read8     m_potx_cb;
+	devcb_read8     m_poty_cb;
 };
 
 
 // ======================> mos6560_device
 
 class mos6560_device : public device_t,
-				       public device_memory_interface,
-                       public device_sound_interface,
-                       public mos6560_interface
+						public device_memory_interface,
+						public device_sound_interface,
+						public mos6560_interface
 {
 public:
 	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
@@ -163,9 +163,9 @@ public:
 protected:
 	enum
 	{
-		TYPE_6560,			// NTSC-M
-		TYPE_6561,			// PAL-B
-		TYPE_ATTACK_UFO		// NTSC-M, less features
+		TYPE_6560,          // NTSC-M
+		TYPE_6561,          // PAL-B
+		TYPE_ATTACK_UFO     // NTSC-M, less features
 	};
 
 	// device-level overrides
@@ -187,8 +187,8 @@ protected:
 
 	int  m_variant;
 
-	const address_space_config		m_videoram_space_config;
-	const address_space_config		m_colorram_space_config;
+	const address_space_config      m_videoram_space_config;
+	const address_space_config      m_colorram_space_config;
 
 	screen_device *m_screen;
 
@@ -217,14 +217,14 @@ protected:
 	UINT8 m_last_data;
 
 	/* paddles */
-	devcb_resolved_read8	m_paddle_cb[2];
+	devcb_resolved_read8    m_paddle_cb[2];
 
 	/* sound part */
 	int m_tone1pos, m_tone2pos, m_tone3pos,
 	m_tonesize, m_tone1samples, m_tone2samples, m_tone3samples,
-	m_noisesize,		  /* number of samples */
+	m_noisesize,          /* number of samples */
 	m_noisepos,         /* pos of tone */
-	m_noisesamples;	  /* count of samples to give out per tone */
+	m_noisesamples;   /* count of samples to give out per tone */
 
 	sound_stream *m_channel;
 	INT16 *m_tone;
@@ -237,8 +237,8 @@ protected:
 class mos6561_device :  public mos6560_device
 {
 public:
-    // construction/destruction
-    mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -247,8 +247,8 @@ public:
 class mos656x_attack_ufo_device :  public mos6560_device
 {
 public:
-    // construction/destruction
-    mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

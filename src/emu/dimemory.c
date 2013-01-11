@@ -45,7 +45,7 @@
 //  PARAMETERS
 //**************************************************************************
 
-#define DETECT_OVERLAPPING_MEMORY	(0)
+#define DETECT_OVERLAPPING_MEMORY   (0)
 
 
 
@@ -67,40 +67,40 @@ const int TRIGGER_SUSPENDTIME = -4000;
 
 address_space_config::address_space_config()
 	: m_name("unknown"),
-	  m_endianness(ENDIANNESS_NATIVE),
-	  m_databus_width(0),
-	  m_addrbus_width(0),
-	  m_addrbus_shift(0),
-	  m_logaddr_width(0),
-	  m_page_shift(0),
-	  m_internal_map(NULL),
-	  m_default_map(NULL)
+		m_endianness(ENDIANNESS_NATIVE),
+		m_databus_width(0),
+		m_addrbus_width(0),
+		m_addrbus_shift(0),
+		m_logaddr_width(0),
+		m_page_shift(0),
+		m_internal_map(NULL),
+		m_default_map(NULL)
 {
 }
 
 address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
-	  m_endianness(endian),
-	  m_databus_width(datawidth),
-	  m_addrbus_width(addrwidth),
-	  m_addrbus_shift(addrshift),
-	  m_logaddr_width(addrwidth),
-	  m_page_shift(0),
-	  m_internal_map(internal),
-	  m_default_map(defmap)
+		m_endianness(endian),
+		m_databus_width(datawidth),
+		m_addrbus_width(addrwidth),
+		m_addrbus_shift(addrshift),
+		m_logaddr_width(addrwidth),
+		m_page_shift(0),
+		m_internal_map(internal),
+		m_default_map(defmap)
 {
 }
 
 address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
-	  m_endianness(endian),
-	  m_databus_width(datawidth),
-	  m_addrbus_width(addrwidth),
-	  m_addrbus_shift(addrshift),
-	  m_logaddr_width(logwidth),
-	  m_page_shift(pageshift),
-	  m_internal_map(internal),
-	  m_default_map(defmap)
+		m_endianness(endian),
+		m_databus_width(datawidth),
+		m_addrbus_width(addrwidth),
+		m_addrbus_shift(addrshift),
+		m_logaddr_width(logwidth),
+		m_page_shift(pageshift),
+		m_internal_map(internal),
+		m_default_map(defmap)
 {
 }
 
@@ -269,7 +269,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 					for (scan = map->m_entrylist.first(); scan != entry; scan = scan->next())
 						if (entry->m_addrstart <= scan->m_addrend && entry->m_addrend >= scan->m_addrstart &&
 							((entry->m_read.m_type != AMH_NONE && scan->m_read.m_type != AMH_NONE) ||
-							 (entry->m_write.m_type != AMH_NONE && scan->m_write.m_type != AMH_NONE)))
+								(entry->m_write.m_type != AMH_NONE && scan->m_write.m_type != AMH_NONE)))
 						{
 							mame_printf_warning("%s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_read.m_type, entry->m_write.m_type, scan->m_addrstart, scan->m_addrend, scan->m_read.m_type, scan->m_write.m_type);
 							detected_overlap = true;

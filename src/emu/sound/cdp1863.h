@@ -43,12 +43,12 @@
 
 // ======================> cdp1863_device
 
-class cdp1863_device :	public device_t,
+class cdp1863_device :  public device_t,
 						public device_sound_interface
 {
 public:
-    // construction/destruction
-    cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_config(device_t &device, int clock2);
@@ -62,8 +62,8 @@ public:
 	void set_clk2(int clock);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 
 	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -71,14 +71,14 @@ protected:
 private:
 	sound_stream *m_stream;
 
-	int m_clock1;					// clock 1
-	int m_clock2;					// clock 2
+	int m_clock1;                   // clock 1
+	int m_clock2;                   // clock 2
 
 	// sound state
-	int m_oe;						// output enable
-	int m_latch;					// sound latch
-	INT16 m_signal;					// current signal
-	int m_incr;						// initial wave state
+	int m_oe;                       // output enable
+	int m_latch;                    // sound latch
+	INT16 m_signal;                 // current signal
+	int m_incr;                     // initial wave state
 };
 
 

@@ -4,8 +4,8 @@
 
 #include "p6001_cas.h"
 
-#define WAVE_HIGH		 0x5a9e
-#define WAVE_LOW		-0x5a9e
+#define WAVE_HIGH        0x5a9e
+#define WAVE_LOW        -0x5a9e
 
 static int cas_size;
 
@@ -59,13 +59,13 @@ static int pc6001_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller pc6001_legacy_fill_wave =
 {
-	pc6001_cas_fill_wave,					/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	pc6001_cas_to_wav_size,					/* chunk_sample_calc */
-	8000,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	pc6001_cas_fill_wave,                   /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	pc6001_cas_to_wav_size,                 /* chunk_sample_calc */
+	8000,                                   /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 static casserr_t pc6001_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)

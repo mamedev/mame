@@ -29,12 +29,12 @@ READ16_MEMBER(tatsumi_state::apache3_bank_r)
 WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 {
 	/*
-        0x8000  - Set when accessing palette ram (not implemented, perhaps blank screen?)
-        0x0080  - Set when accessing IO cpu RAM/ROM (implemented as halt cpu)
-        0x0060  - IOP bank to access from main cpu (0x0 = RAM, 0x20 = lower ROM, 0x60 = upper ROM)
-        0x0010  - Set when accessing OBJ cpu RAM/ROM (implemented as halt cpu)
-        0x000f  - OBJ bank to access from main cpu (0x8 = RAM, 0x0 to 0x7 = ROM)
-    */
+	    0x8000  - Set when accessing palette ram (not implemented, perhaps blank screen?)
+	    0x0080  - Set when accessing IO cpu RAM/ROM (implemented as halt cpu)
+	    0x0060  - IOP bank to access from main cpu (0x0 = RAM, 0x20 = lower ROM, 0x60 = upper ROM)
+	    0x0010  - Set when accessing OBJ cpu RAM/ROM (implemented as halt cpu)
+	    0x000f  - OBJ bank to access from main cpu (0x8 = RAM, 0x0 to 0x7 = ROM)
+	*/
 
 	COMBINE_DATA(&m_control_word);
 
@@ -187,21 +187,21 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 
 	/* Bank:
 
-        0x0017  :   OBJ banks
-        0x0018  :   68000 RAM       mask 0x0380 used to save bits when writing
-        0x0c10  :   68000 ROM
+	    0x0017  :   OBJ banks
+	    0x0018  :   68000 RAM       mask 0x0380 used to save bits when writing
+	    0x0c10  :   68000 ROM
 
-        0x0040  :   Z80 rom (lower half) mapped to 0x10000
-        0x0060  :   Z80 rom (upper half) mapped to 0x10000
+	    0x0040  :   Z80 rom (lower half) mapped to 0x10000
+	    0x0060  :   Z80 rom (upper half) mapped to 0x10000
 
-        0x0100  :   watchdog.
+	    0x0100  :   watchdog.
 
-        0x0c00  :   vram bank (bits 0x7000 also set when writing vram)
+	    0x0c00  :   vram bank (bits 0x7000 also set when writing vram)
 
-        0x8000  :   set whenever writing to palette ram?
+	    0x8000  :   set whenever writing to palette ram?
 
-        Changed bank to 0060 (0)
-    */
+	    Changed bank to 0060 (0)
+	*/
 
 	if ((m_control_word & 0x8) == 0 && !(m_last_control & 0x8))
 		machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
@@ -233,8 +233,8 @@ WRITE16_MEMBER(tatsumi_state::roundup5_d0000_w)
 WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
 {
 	/*  Bit 0x10 is road bank select,
-        Bit 0x100 is used, but unknown
-    */
+	    Bit 0x100 is used, but unknown
+	*/
 
 	COMBINE_DATA(&m_roundup5_e0000_ram[offset]);
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong

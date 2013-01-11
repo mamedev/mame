@@ -10,33 +10,33 @@ INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_
 		scroll[offset] = data;
 		if (map != NULL) switch (offset)
 		{
-		case 0:	/* Low byte of x scroll - scroll tilemap */
+		case 0: /* Low byte of x scroll - scroll tilemap */
 			map->set_scrollx(0, data);
 			break;
-		case 1:	/* High byte of x scroll - mark tilemap dirty so new tile gfx will be loaded */
+		case 1: /* High byte of x scroll - mark tilemap dirty so new tile gfx will be loaded */
 			map->mark_all_dirty();
 			break;
-		case 3:	/* Low byte of y scroll */
-		case 4:	/* High byte of y scroll */
+		case 3: /* Low byte of y scroll */
+		case 4: /* High byte of y scroll */
 			map->set_scrolly(0, (int)scroll[3] | ((int)scroll[4] << 8));
 			break;
-		case 6:	/* Tilemap enable and mode control */
+		case 6: /* Tilemap enable and mode control */
 			map->enable(!(data & 0x10));
-			if ((data & 0x20) != (old & 0x20))	// This sets the tilemap data format
+			if ((data & 0x20) != (old & 0x20))  // This sets the tilemap data format
 				map->mark_all_dirty();
 			break;
-		default:	/* Other addresses are used but function is unknown */
+		default:    /* Other addresses are used but function is unknown */
 			/* 0x05 and 0x07 are initialised on startup */
 			/* 0x02 is initialised on startup by some games and written to continuously by others */
 			/*{
-                const char *name;
-                if (scroll == state->m_bgscroll8)        name = "bg";
-                else if (scroll == state->m_bg2scroll8)  name = "bg2";
-                else if (scroll == state->m_fgscroll8)   name = "fg";
-                else if (scroll == state->m_fg2scroll8)  name = "fg2";
-                else                            name = "unknown";
-                printf("Unknown %s tilemap control: 0x%02x = 0x%02x\n", name, (unsigned)offset, (unsigned)data);
-            }*/
+			    const char *name;
+			    if (scroll == state->m_bgscroll8)        name = "bg";
+			    else if (scroll == state->m_bg2scroll8)  name = "bg2";
+			    else if (scroll == state->m_fgscroll8)   name = "fg";
+			    else if (scroll == state->m_fg2scroll8)  name = "fg2";
+			    else                            name = "unknown";
+			    printf("Unknown %s tilemap control: 0x%02x = 0x%02x\n", name, (unsigned)offset, (unsigned)data);
+			}*/
 			break;
 		}
 	}
@@ -210,29 +210,29 @@ INLINE void lastday_get_tile_info(running_machine &machine, tile_data &tileinfo,
 	int attr = tilerom[offs];
 	int code, color, flags;
 	if (scroll[6] & 0x20)
-	{	/* lastday/gulfstrm/pollux/flytiger */
+	{   /* lastday/gulfstrm/pollux/flytiger */
 		/* Tiles take two bytes in ROM:
-                         MSB   LSB
-           [offs + 0x00] cCCC CYXc    (bit 9 of gfx code, bits 3-0 of color, Y flip, X flip, bit 8 of gfx code)
-           [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
-           c = gfx code
-           C = color code
-           X = x flip
-           Y = y flip */
+		                 MSB   LSB
+		   [offs + 0x00] cCCC CYXc    (bit 9 of gfx code, bits 3-0 of color, Y flip, X flip, bit 8 of gfx code)
+		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
+		   c = gfx code
+		   C = color code
+		   X = x flip
+		   Y = y flip */
 		code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
 		color = (attr & 0x78) >> 3;
 		flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
 	}
 	else
-	{	/* primella/popbingo */
+	{   /* primella/popbingo */
 		/* Tiles take two bytes in ROM:
-                         MSB   LSB
-           [offs + 0x00] YXCC CCcc    (Y flip, X flip, bits 3-0 of color code, bits 9-8 of gfx code)
-           [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
-           c = gfx code
-           C = color code
-           X = x flip
-           Y = y flip */
+		                 MSB   LSB
+		   [offs + 0x00] YXCC CCcc    (Y flip, X flip, bits 3-0 of color code, bits 9-8 of gfx code)
+		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
+		   c = gfx code
+		   C = color code
+		   X = x flip
+		   Y = y flip */
 		code = tilerom[offs + 1] | ((attr & 0x03) << 8);
 		color = (attr & 0x3c) >> 2;
 		flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
@@ -245,13 +245,13 @@ INLINE void rshark_get_tile_info(running_machine &machine, tile_data &tileinfo, 
 		const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics)
 {
 		/* Tiles take two bytes in tile ROM 1:
-                         MSB   LSB
-           [offs + 0x00] YX?c cccc    (Y flip, X flip, bits 12-8 of gfx code)
-           [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
-           ? = unused/unknown
-           c = gfx code
-           X = x flip
-           Y = y flip */
+		                 MSB   LSB
+		   [offs + 0x00] YX?c cccc    (Y flip, X flip, bits 12-8 of gfx code)
+		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
+		   ? = unused/unknown
+		   c = gfx code
+		   X = x flip
+		   Y = y flip */
 	int offs = tile_index + ((int)scroll[1] << 9);
 	int attr = tilerom1[offs * 2];
 	int code = tilerom1[(offs * 2) + 1] | ((attr & 0x1f) << 8);
@@ -311,19 +311,19 @@ TILE_GET_INFO_MEMBER(dooyong_state::flytiger_get_fg_tile_info)
 TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 {
 	/* Each tile takes two bytes of memory:
-                     MSB   LSB
-       [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
-       [offs + 0x01] CCCC cccc    (bits 3-0 of color code, bits 11-8 of gfx code)
-       c = gfx code
-       C = color code */
+	                 MSB   LSB
+	   [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
+	   [offs + 0x01] CCCC cccc    (bits 3-0 of color code, bits 11-8 of gfx code)
+	   c = gfx code
+	   C = color code */
 	int offs, attr, code, color;
 	if (m_tx_tilemap_mode == 0)
-	{	/* lastday/gulfstrm/pollux/flytiger */
+	{   /* lastday/gulfstrm/pollux/flytiger */
 		offs = tile_index;
 		attr = m_txvideoram[offs | 0x0800];
 	}
 	else
-	{	/* bluehawk/primella */
+	{   /* bluehawk/primella */
 		offs = tile_index * 2;
 		attr = m_txvideoram[offs + 1];
 	}
@@ -337,27 +337,27 @@ TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions)
 {
 	/* Sprites take 32 bytes each in memory:
-                     MSB   LSB
-       [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
-       [offs + 0x01] cccx CCCC    (bits 10-8 of gfx code, bit 8 of x position, bits 3-0 of color code)
-       [offs + 0x02] yyyy yyyy
-       [offs + 0x03] xxxx xxxx    (bits 7-0 of x offset)
-       ...
-       [offs + 0x1c] ?hhh XY*c    (bits 2-0 of height, x flip, y flip, * see note, bit 11 of gfx code)
-       ...
-       ? = unused/unknown
-       E = enable
-       c = gfx code
-       x = x position
-       y = y position
-       C = color code
-       w = width
-       X = x flip
-       Y = y flip
-       * = alters y position in pollux and flytiger - see code below
-       bit 11 of gfx code only used by gulfstrm, pollux, bluehawk and flytiger
-       height only used by pollux, bluehawk and flytiger
-       x flip and y flip only used by pollux and flytiger */
+	                 MSB   LSB
+	   [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
+	   [offs + 0x01] cccx CCCC    (bits 10-8 of gfx code, bit 8 of x position, bits 3-0 of color code)
+	   [offs + 0x02] yyyy yyyy
+	   [offs + 0x03] xxxx xxxx    (bits 7-0 of x offset)
+	   ...
+	   [offs + 0x1c] ?hhh XY*c    (bits 2-0 of height, x flip, y flip, * see note, bit 11 of gfx code)
+	   ...
+	   ? = unused/unknown
+	   E = enable
+	   c = gfx code
+	   x = x position
+	   y = y position
+	   C = color code
+	   w = width
+	   X = x flip
+	   Y = y flip
+	   * = alters y position in pollux and flytiger - see code below
+	   bit 11 of gfx code only used by gulfstrm, pollux, bluehawk and flytiger
+	   height only used by pollux, bluehawk and flytiger
+	   x flip and y flip only used by pollux and flytiger */
 
 	dooyong_state *state = machine.driver_data<dooyong_state>();
 	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
@@ -431,36 +431,36 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 	UINT16 *buffered_spriteram16 = state->m_spriteram16->buffer();
 
 	/* Sprites take 8 16-bit words each in memory:
-                  MSB             LSB
-       [offs + 0] ???? ???? ???? ???E
-       [offs + 1] ???? ???? hhhh wwww
-       [offs + 2] ???? ???? ???? ????
-       [offs + 3] cccc cccc cccc cccc
-       [offs + 4] ???? ???x xxxx xxxx
-       [offs + 5] ???? ???? ???? ????
-       [offs + 6] ???? ???y yyyy yyyy
-       [offs + 7] ???? ???? ???? CCCC
-       ? = unused/unknown
-       E = enable
-       c = gfx code
-       x = x offset
-       y = y offset (signed)
-       C = color code
-       w = width
-       h = height */
+	              MSB             LSB
+	   [offs + 0] ???? ???? ???? ???E
+	   [offs + 1] ???? ???? hhhh wwww
+	   [offs + 2] ???? ???? ???? ????
+	   [offs + 3] cccc cccc cccc cccc
+	   [offs + 4] ???? ???x xxxx xxxx
+	   [offs + 5] ???? ???? ???? ????
+	   [offs + 6] ???? ???y yyyy yyyy
+	   [offs + 7] ???? ???? ???? CCCC
+	   ? = unused/unknown
+	   E = enable
+	   c = gfx code
+	   x = x offset
+	   y = y offset (signed)
+	   C = color code
+	   w = width
+	   h = height */
 
 	int offs;
 
 	for (offs = (state->m_spriteram16->bytes() / 2) - 8; offs >= 0; offs -= 8)
 	{
-		if (buffered_spriteram16[offs] & 0x0001)	/* enable */
+		if (buffered_spriteram16[offs] & 0x0001)    /* enable */
 		{
 			int sx, sy, code, color, pri;
 			int flipx = 0, flipy = 0, width, height, x, y;
 
 			sx = buffered_spriteram16[offs+4] & 0x01ff;
 			sy = (INT16)buffered_spriteram16[offs+6] & 0x01ff;
-			if (sy & 0x0100) sy |= ~(int)0x01ff;	// Correctly sign-extend 9-bit number
+			if (sy & 0x0100) sy |= ~(int)0x01ff;    // Correctly sign-extend 9-bit number
 			code = buffered_spriteram16[offs+3];
 			color = buffered_spriteram16[offs+7] & 0x000f;
 			//TODO: This priority mechanism works for known games, but seems a bit strange.
@@ -624,11 +624,11 @@ VIDEO_START_MEMBER(dooyong_state,lastday)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	m_fg_tilemap->set_transparent_pen(15);
@@ -663,11 +663,11 @@ VIDEO_START_MEMBER(dooyong_state,gulfstrm)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	m_fg_tilemap->set_transparent_pen(15);
@@ -701,11 +701,11 @@ VIDEO_START_MEMBER(dooyong_state,pollux)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	m_fg_tilemap->set_transparent_pen(15);
@@ -739,13 +739,13 @@ VIDEO_START_MEMBER(dooyong_state,bluehawk)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_fg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	m_fg_tilemap->set_transparent_pen(15);
@@ -776,11 +776,11 @@ VIDEO_START_MEMBER(dooyong_state,flytiger)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::flytiger_get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	m_bg_tilemap->set_transparent_pen(15);
@@ -811,11 +811,11 @@ VIDEO_START_MEMBER(dooyong_state,primella)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
+			32, 32, 32, 8);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-		 8, 8, 64, 32);
+			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	m_fg_tilemap->set_transparent_pen(15);
@@ -850,13 +850,13 @@ VIDEO_START_MEMBER(dooyong_state,rshark)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 16, 16, 64, 32);
+			16, 16, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
-		 16, 16, 64, 32);
+			16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-		 16, 16, 64, 32);
+			16, 16, 64, 32);
 	m_fg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
-		 16, 16, 64, 32);
+			16, 16, 64, 32);
 
 	/* Configure tilemap transparency */
 	m_bg2_tilemap->set_transparent_pen(15);
@@ -884,8 +884,8 @@ VIDEO_START_MEMBER(dooyong_state,popbingo)
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-		 32, 32, 32, 8);
-	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = NULL;	/* Stop scroll handler from crashing on these */
+			32, 32, 32, 8);
+	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = NULL;    /* Stop scroll handler from crashing on these */
 
 	memset(m_bgscroll8, 0, 0x10);
 	memset(m_bg2scroll8, 0, 0x10);
@@ -894,8 +894,8 @@ VIDEO_START_MEMBER(dooyong_state,popbingo)
 
 	/* Register for save/restore */
 	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_bg2scroll8);	// Not used atm
-	state_save_register_global_array(machine(), m_fgscroll8);	// Not used atm
-	state_save_register_global_array(machine(), m_fg2scroll8);	// Not used atm
+	state_save_register_global_array(machine(), m_bg2scroll8);  // Not used atm
+	state_save_register_global_array(machine(), m_fgscroll8);   // Not used atm
+	state_save_register_global_array(machine(), m_fg2scroll8);  // Not used atm
 	state_save_register_global(machine(), m_rshark_pri);
 }

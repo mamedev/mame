@@ -50,9 +50,9 @@ static void mrokumei_handleblit( address_space &space, int rom_base )
 		state->m_blitter_param[(state->m_blitter_param_count - 1) & 3];
 
 	/*  xxx-.----.----.---- not used?
-     *  ---x.----.----.---- layer
-     *  ----.xxxx.xxxx.xxxx addr
-     */
+	 *  ---x.----.----.---- layer
+	 *  ----.xxxx.xxxx.xxxx addr
+	 */
 	base_addr= (dest_param & 0x1000);
 	dest_addr= (dest_param & 0x0fff);
 
@@ -67,9 +67,9 @@ static void mrokumei_handleblit( address_space &space, int rom_base )
 	{
 		opcode = pBlitData[source_addr++];
 		/* 00xxxxxx RLE incrementing
-         * 01xxxxxx Raw Run
-         * 1xxxxxxx RLE constant data
-         */
+		 * 01xxxxxx Raw Run
+		 * 1xxxxxxx RLE constant data
+		 */
 		if( opcode == 0x00 )
 		{
 			/* end-of-graphic */
@@ -98,10 +98,10 @@ static void mrokumei_handleblit( address_space &space, int rom_base )
 				}
 			} /* i!=0 */
 
-			if (data)	/* 00 is a nop */
+			if (data)   /* 00 is a nop */
 				state->mrokumei_videoram_w(space, base_addr + dest_addr, data);
 
-			if (state->m_vreg[1] & 0x80)	/* flip screen */
+			if (state->m_vreg[1] & 0x80)    /* flip screen */
 			{
 				dest_addr -= 2;
 				if (dest_addr < 0)
@@ -138,12 +138,12 @@ static void reikaids_handleblit( address_space &space, int rom_base )
 		state->m_blitter_param[(state->m_blitter_param_count - 1) & 3];
 
 	/*  x---.----.----.---- flipx
-     *  -x--.----.----.---- select: attr/tile
-     *  --*x.xxxx.*xxx.xxxx addr
-     */
+	 *  -x--.----.----.---- select: attr/tile
+	 *  --*x.xxxx.*xxx.xxxx addr
+	 */
 	base_addr = (dest_param & 0x4000);
 	dest_addr = (dest_param & 0x3fff);
-	flipx	= (dest_param & 0x8000);
+	flipx   = (dest_param & 0x8000);
 
 //  logerror( "[blit %02x %04x %04x]\n",blitter_bank,source_addr,dest_param);
 
@@ -154,9 +154,9 @@ static void reikaids_handleblit( address_space &space, int rom_base )
 	{
 		opcode = pBlitData[source_addr++];
 		/* 00xxxxxx Raw Run
-         * 01xxxxxx RLE incrementing
-         * 1xxxxxxx RLE constant data
-         */
+		 * 01xxxxxx RLE incrementing
+		 * 1xxxxxxx RLE constant data
+		 */
 		if (opcode == 0x00)
 		{
 			/* end-of-graphic */
@@ -186,7 +186,7 @@ static void reikaids_handleblit( address_space &space, int rom_base )
 				}
 			} /* i!=0 */
 
-			if (data)	/* 00 is a nop */
+			if (data)   /* 00 is a nop */
 			{
 				int addr = base_addr + (dest_addr & 0x3fff);
 				int dat = data;
@@ -206,7 +206,7 @@ static void reikaids_handleblit( address_space &space, int rom_base )
 				}
 			}
 
-			if (state->m_vreg[1] & 0x80)	/* flip screen */
+			if (state->m_vreg[1] & 0x80)    /* flip screen */
 				dest_addr-=4;
 			else
 				dest_addr+=4;
@@ -234,9 +234,9 @@ static void pteacher_handleblit( address_space &space, int rom_base )
 		state->m_blitter_param[(state->m_blitter_param_count - 1) & 3];
 
 	/*  x---.----.----.---- not used?
-     *  -x--.----.----.---- layer   (0..1)
-     *  --*x.xxxx.*xxx.xxxx addr
-     */
+	 *  -x--.----.----.---- layer   (0..1)
+	 *  --*x.xxxx.*xxx.xxxx addr
+	 */
 	base_addr = (dest_param & 0x4000);
 	dest_addr = (dest_param & 0x3fff);
 
@@ -251,9 +251,9 @@ static void pteacher_handleblit( address_space &space, int rom_base )
 	{
 		opcode = pBlitData[source_addr++];
 		/* 00xxxxxx Raw Run
-         * 01xxxxxx RLE incrementing
-         * 1xxxxxxx RLE constant data
-         */
+		 * 01xxxxxx RLE incrementing
+		 * 1xxxxxxx RLE constant data
+		 */
 		if (opcode == 0x00)
 		{
 			/* end-of-graphic */
@@ -282,7 +282,7 @@ static void pteacher_handleblit( address_space &space, int rom_base )
 				}
 			} /* i!=0 */
 
-			if (data)	/* 00 is a nop */
+			if (data)   /* 00 is a nop */
 			{
 				int addr = base_addr + (dest_addr & 0x3fff);
 
@@ -293,7 +293,7 @@ static void pteacher_handleblit( address_space &space, int rom_base )
 				}
 			}
 
-			if (state->m_vreg[1] & 0x80)	/* flip screen */
+			if (state->m_vreg[1] & 0x80)    /* flip screen */
 				dest_addr -= 2;
 			else
 				dest_addr += 2;
@@ -324,10 +324,10 @@ PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 		int r,g,b;
 		int color = color_prom[i*2] * 256 + color_prom[i*2+1];
 		/* xxxx--------x--- red
-         * ----xxxx-----x-- green
-         * --------xxxx--x- blue
-         * ---------------x unused
-         */
+		 * ----xxxx-----x-- green
+		 * --------xxxx--x- blue
+		 * ---------------x unused
+		 */
 		r = ((color >> 11) & 0x1e) | ((color >> 3) & 1);
 		g = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
 		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
@@ -347,10 +347,10 @@ PALETTE_INIT_MEMBER(homedata_state,reikaids)
 		int r,g,b;
 		int color = color_prom[i*2] * 256 + color_prom[i*2+1];
 		/* xxxx--------x--- green
-         * ----xxxx-----x-- red
-         * --------xxxx--x- blue
-         * ---------------x unused
-         */
+		 * ----xxxx-----x-- red
+		 * --------xxxx--x- blue
+		 * ---------------x unused
+		 */
 		g = ((color >> 11) & 0x1e) | ((color >> 3) & 1);
 		r = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
 		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
@@ -370,10 +370,10 @@ PALETTE_INIT_MEMBER(homedata_state,pteacher)
 		int r,g,b;
 		int color = color_prom[i*2] * 256 + color_prom[i*2+1];
 		/* xxxxx----------- green
-         * -----xxxxx------ red
-         * ----------xxxxx- blue
-         * ---------------x unused
-         */
+		 * -----xxxxx------ red
+		 * ----------xxxxx- blue
+		 * ---------------x unused
+		 */
 		g = ((color >> 11) & 0x1f);
 		r = ((color >>  6) & 0x1f);
 		b = ((color >>  1) & 0x1f);
@@ -461,13 +461,13 @@ INLINE void reikaids_info( running_machine &machine, tile_data &tileinfo, int ti
 }
 
 	/* reikaids_gfx_bank[0]:
-     *      -xxx.x---   layer#1
-     *      ----.-xxx   layer#3
-     *
-     * reikaids_gfx_bank[1]:
-     *      xxxx.x---   layer#0
-     *      ----.-xxx   layer#2
-     */
+	 *      -xxx.x---   layer#1
+	 *      ----.-xxx   layer#3
+	 *
+	 * reikaids_gfx_bank[1]:
+	 *      xxxx.x---   layer#0
+	 *      ----.-xxx   layer#2
+	 */
 TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_0)
 {
 	reikaids_info(machine(), tileinfo, tile_index, 0, 0,  (m_gfx_bank[1] >> 3));
@@ -741,9 +741,9 @@ WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
 WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
 {
 	/* --xxx--- layer 1 gfx bank
-       -----x-- blitter ROM bank
-       ------xx layer 0 gfx bank
-     */
+	   -----x-- blitter ROM bank
+	   ------xx layer 0 gfx bank
+	 */
 
 	if ((m_blitter_bank ^ data) & 0x3b)
 		machine().tilemap().mark_all_dirty();
@@ -754,19 +754,19 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
 WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
 {
 	/* xxx----- priority control
-       ----x--- target page? what's this for?
-       ------xx blitter ROM bank
-     */
+	   ----x--- target page? what's this for?
+	   ------xx blitter ROM bank
+	 */
 	m_blitter_bank = data;
 }
 
 WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
 {
 	/* xxx----- blitter ROM bank
-       -----x-- pixel clock (normal/slow)
-       ------x- layer #1 gfx charset (lemnangl only)
-       -------x layer #0 gfx charset (lemnangl only)
-     */
+	   -----x-- pixel clock (normal/slow)
+	   ------x- layer #1 gfx charset (lemnangl only)
+	   -------x layer #0 gfx charset (lemnangl only)
+	 */
 
 	if ((m_blitter_bank ^ data) & 0x03)
 		machine().tilemap().mark_all_dirty();
@@ -780,7 +780,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
 		mrokumei_handleblit(space, ((m_blitter_bank & 0x04) >> 2) * 0x10000);
 
 	/* bit 0 = bank switch; used by hourouki to access the
-       optional service mode ROM (not available in current dump) */
+	   optional service mode ROM (not available in current dump) */
 }
 
 WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
@@ -821,10 +821,10 @@ UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind1
 
 	switch (m_vreg[0x3])
 	{
-		case 0xb7: width = 54; break;	// mjclinic
-		case 0xae: width = 52; break;	// mrokumei
-		case 0x9f: width = 49; break;	// hourouki, mhgaiden, mjhokite
-		case 0x96: width = 49; break;	// mjclinic
+		case 0xb7: width = 54; break;   // mjclinic
+		case 0xae: width = 52; break;   // mrokumei
+		case 0x9f: width = 49; break;   // hourouki, mhgaiden, mjhokite
+		case 0x96: width = 49; break;   // mjclinic
 		default:
 			if (m_vreg[0x3])
 				popmessage("unknown video control %02x %02x %02x %02x",
@@ -882,7 +882,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flags;
-	static const int pritable[2][8][4] =	/* table of priorities derived from the PROM */
+	static const int pritable[2][8][4] =    /* table of priorities derived from the PROM */
 	{
 	{
 		{ 3,1,0,2 },
@@ -891,8 +891,8 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 		{ 0,1,3,2 },
 		{ 3,0,1,2 },
 		{ 1,0,3,2 },
-		{ 2,3,1,0 },	// (bg color should be taken from 1)
-		{ 3,1,2,0 }	// (bg color should be taken from 1)
+		{ 2,3,1,0 },    // (bg color should be taken from 1)
+		{ 3,1,2,0 } // (bg color should be taken from 1)
 	},
 	{
 		{2,3,0,1},
@@ -945,28 +945,28 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	}
 
 	/* bit 2 of blitter_bank stretches characters horizontally by 3/2,
-       so they look as if they were 12x8 instead of 8x8.
+	   so they look as if they were 12x8 instead of 8x8.
 
-       However, the visible area can be further reduced by fudging with the video
-       registers, but I haven't figured out how they work exactly.
-       In most games it's like this (note that register 4 controls fine
-       scrolling):
+	   However, the visible area can be further reduced by fudging with the video
+	   registers, but I haven't figured out how they work exactly.
+	   In most games it's like this (note that register 4 controls fine
+	   scrolling):
 
-       width      3  4  5  6
-       33*8    = a6 00 ef db (mjikaga)
-       35*8    = bc 0b ef f0
-       51*8    = a6 07 ef db (mjikaga)
-       54*8    = bc 07 ef e8
+	   width      3  4  5  6
+	   33*8    = a6 00 ef db (mjikaga)
+	   35*8    = bc 0b ef f0
+	   51*8    = a6 07 ef db (mjikaga)
+	   54*8    = bc 07 ef e8
 
-       but in mjkinjas it's
-       42*8    = f0 ae df cc
+	   but in mjkinjas it's
+	   42*8    = f0 ae df cc
 
-       note that mjkinjas has a 11MHz xtal instead of the 9MHz of all the others:
-       the two things are probably related, in fact 35 * 11 / 9 = 42.7777777.
+	   note that mjkinjas has a 11MHz xtal instead of the 9MHz of all the others:
+	   the two things are probably related, in fact 35 * 11 / 9 = 42.7777777.
 
-       and it also seems that
-       blanked = c1 c0 ff --
-      */
+	   and it also seems that
+	   blanked = c1 c0 ff --
+	  */
 
 	if (m_blitter_bank & 0x04)
 	{

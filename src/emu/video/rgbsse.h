@@ -245,10 +245,10 @@ INLINE void rgbaint_shr(rgbaint *color, UINT8 shift)
 
 extern const struct _rgbsse_statics
 {
-	__m128	dummy_for_alignment;
-	INT16	zero[8];
-	INT16	maxbyte[8];
-	INT16	scale_table[256][8];
+	__m128  dummy_for_alignment;
+	INT16   zero[8];
+	INT16   maxbyte[8];
+	INT16   scale_table[256][8];
 } rgbsse_statics;
 
 

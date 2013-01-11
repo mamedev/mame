@@ -153,7 +153,7 @@ class dectalk_state : public driver_device
 public:
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_terminal(*this, TERMINAL_TAG) { }
+			m_terminal(*this, TERMINAL_TAG) { }
 
 	UINT8 m_data[8]; // hack to prevent gcc bitching about struct pointers. not used.
 	UINT8 m_x2214_sram[256]; // NVRAM chip's temp sram space
@@ -644,17 +644,17 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 */
 
 static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
-    AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
-    //AM_RANGE(0x094000, 0x0943ff) AM_READWRITE_LEGACY(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
-    AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
-    AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
-    AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
-    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
-    AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
-    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
-    AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
+	AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
+	//AM_RANGE(0x094000, 0x0943ff) AM_READWRITE_LEGACY(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
+	AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
+	AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
+	AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
+	AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
+	AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
+	AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
+	AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
 ADDRESS_MAP_END
 
 // do we even need this below?
@@ -663,13 +663,13 @@ static ADDRESS_MAP_START(m68k_io, AS_IO, 16, dectalk_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms32010_mem, AS_PROGRAM, 16, dectalk_state )
-    AM_RANGE(0x000, 0x7ff) AM_ROM /* ROM */
+	AM_RANGE(0x000, 0x7ff) AM_ROM /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms32010_io, AS_IO, 16, dectalk_state )
-    AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
-    AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
-    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read output fifo writable status
+	AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
+	AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read output fifo writable status
 ADDRESS_MAP_END
 
 /******************************************************************************
@@ -730,33 +730,33 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 };
 
 static MACHINE_CONFIG_START( dectalk, dectalk_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
-    MCFG_CPU_PROGRAM_MAP(m68k_mem)
-    MCFG_CPU_IO_MAP(m68k_io)
-    MCFG_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
+	MCFG_CPU_PROGRAM_MAP(m68k_mem)
+	MCFG_CPU_IO_MAP(m68k_io)
+	MCFG_DUART68681_ADD( "duart68681", XTAL_3_6864MHz, dectalk_duart68681_config ) /* Y3 3.6864MHz Xtal */
 
 
-    MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
-    MCFG_CPU_PROGRAM_MAP(tms32010_mem)
-    MCFG_CPU_IO_MAP(tms32010_io)
+	MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
+	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
+	MCFG_CPU_IO_MAP(tms32010_io)
 #ifdef USE_LOOSE_TIMING
-    MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else
-    MCFG_QUANTUM_PERFECT_CPU("dsp")
+	MCFG_QUANTUM_PERFECT_CPU("dsp")
 #endif
 
-    //MCFG_NVRAM_ADD_0FILL("nvram")
+	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-    /* video hardware */
-    //MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
+	/* video hardware */
+	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
-    /* sound hardware */
-    MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.9)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0) /* E88 10KHz OSC, handled by timer */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.9)
 
-    /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
+	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 MACHINE_CONFIG_END
@@ -819,4 +819,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY     FULLNAME            FLAGS */
-COMP( 1984, dectalk,	0,		0,		dectalk,	dectalk, dectalk_state,	dectalk,  "Digital Equipment Corporation",		"DECTalk DTC-01",	GAME_NOT_WORKING )
+COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation",      "DECTalk DTC-01",   GAME_NOT_WORKING )

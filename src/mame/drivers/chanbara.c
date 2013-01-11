@@ -298,29 +298,29 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	8,8,	/* tile size */
-	RGN_FRAC(1,2),	/* number of tiles */
-	2,	/* bits per pixel */
+	8,8,    /* tile size */
+	RGN_FRAC(1,2),  /* number of tiles */
+	2,  /* bits per pixel */
 	{ 0, 4 }, /* plane offsets */
 	{ RGN_FRAC(1,2)+0,  RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3, 0,1,2,3 }, /* x offsets */
 	{ 0*8,1*8,2*8,3*8, 4*8, 5*8, 6*8, 7*8 }, /* y offsets */
-	8*8	/* offset to next tile */
+	8*8 /* offset to next tile */
 };
 
 static const gfx_layout tile16layout =
 {
-	16,16,	/* tile size */
-	RGN_FRAC(1,4),	/* number of tiles */
-	3,	/* bits per pixel */
+	16,16,  /* tile size */
+	RGN_FRAC(1,4),  /* number of tiles */
+	3,  /* bits per pixel */
 	{ RGN_FRAC(1,2),0,4 }, /* plane offsets */
 	{ 16*8+RGN_FRAC(1,4)+0,16*8+ RGN_FRAC(1,4)+1,16*8+ RGN_FRAC(1,4)+2,16*8+ RGN_FRAC(1,4)+3,
-       0,1,2,3,
+		0,1,2,3,
 		RGN_FRAC(1,4)+0,  RGN_FRAC(1,4)+1, RGN_FRAC(1,4)+2, RGN_FRAC(1,4)+3,
-      16*8+0, 16*8+1, 16*8+2, 16*8+3,
+		16*8+0, 16*8+1, 16*8+2, 16*8+3,
 
 	}, /* x offsets */
 	{ 0*8,1*8,2*8,3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 }, /* y offsets */
-	32*8	/* offset to next tile */
+	32*8    /* offset to next tile */
 };
 
 
@@ -338,10 +338,10 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( chanbara )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,	0x40, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,	0x80, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x80, 16 )
 
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout,	0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
 GFXDECODE_END
 /***************************************************************************/
 
@@ -438,14 +438,14 @@ ROM_START( chanbara )
 	ROM_LOAD( "cp02.14c",     0x00000, 0x8000, CRC(c2b66cea) SHA1(f72f57add5f38313a72f5c521dce157edf49f70e) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) // text layer
-	ROM_LOAD( "cp12.17h",   	0x00000, 0x2000, CRC(b87b96de) SHA1(f8bb9f094917df305c4fed071edaa775071e40fd) )
+	ROM_LOAD( "cp12.17h",       0x00000, 0x2000, CRC(b87b96de) SHA1(f8bb9f094917df305c4fed071edaa775071e40fd) )
 
 	ROM_REGION( 0x08000, "gfx3", 0 ) // bg layer
-	ROM_LOAD( "cp13.15h",   	0x00000, 0x4000, CRC(2dc38c3d) SHA1(4bb1335b8285e91b51c28e74d8de11a8d6df0486) )
+	ROM_LOAD( "cp13.15h",       0x00000, 0x4000, CRC(2dc38c3d) SHA1(4bb1335b8285e91b51c28e74d8de11a8d6df0486) )
 	/* rom cp14.13h is expanded at 0x4000 - 0x8000 */
 
 	ROM_REGION( 0x08000, "gfx4", 0 )
-	ROM_LOAD( "cp14.13h",   	0x00000, 0x2000, CRC(d31db368) SHA1(b62834137bfe4ac2013d2d16b0ead10bf2a2df83) )
+	ROM_LOAD( "cp14.13h",       0x00000, 0x2000, CRC(d31db368) SHA1(b62834137bfe4ac2013d2d16b0ead10bf2a2df83) )
 
 	ROM_REGION( 0x24000, "gfx2", 0 )
 	ROM_LOAD( "cp03.12c",     0x08000, 0x4000, CRC(dea247fb) SHA1(d54fa30813613ef6c3b5f86b563e9ab618a9f627))
@@ -469,9 +469,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 {
-	UINT8	*src = machine().root_device().memregion("gfx4")->base();
-	UINT8	*dst = machine().root_device().memregion("gfx3")->base() + 0x4000;
-	UINT8	*bg = machine().root_device().memregion("user1")->base();
+	UINT8   *src = machine().root_device().memregion("gfx4")->base();
+	UINT8   *dst = machine().root_device().memregion("gfx3")->base() + 0x4000;
+	UINT8   *bg = machine().root_device().memregion("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)

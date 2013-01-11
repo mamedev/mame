@@ -38,13 +38,13 @@
 #include "machine/wd17xx.h"
 
 static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
-	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)	/* boot ROM mirror */
-	AM_RANGE(0x000008, 0x000fff) AM_RAM										/* static RAM */
-	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("maincpu", 0x010000)	/* boot ROM */
-	AM_RANGE(0x020000, 0x021fff) AM_ROM										/* macsbugs ROM (optional) */
-	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)	/* I/O space */
+	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */
+	AM_RANGE(0x000008, 0x000fff) AM_RAM                                     /* static RAM */
+	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM */
+	AM_RANGE(0x020000, 0x021fff) AM_ROM                                     /* macsbugs ROM (optional) */
+	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)    /* I/O space */
 
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_SHARE("videoram")/* AM_RAMBANK(2) */	/* DRAM */
+	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_SHARE("videoram")/* AM_RAMBANK(2) */ /* DRAM */
 ADDRESS_MAP_END
 
 /* init with simple, fixed, B/W palette */
@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 
 static const mm58274c_interface concept_mm58274c_interface =
 {
-	0,	/*  mode 24*/
+	0,  /*  mode 24*/
 	1   /*  first day of week */
 };
 
@@ -126,7 +126,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)			/* 50 or 60, jumper-selectable */
+	MCFG_SCREEN_REFRESH_RATE(60)            /* 50 or 60, jumper-selectable */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(720, 560)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 560-1)
@@ -157,7 +157,7 @@ MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( concept )
 
-	PORT_START("KEY0")	/* port 0: keys 0x00 through 0x0f */
+	PORT_START("KEY0")  /* port 0: keys 0x00 through 0x0f */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(right)") PORT_CODE(KEYCODE_RIGHT)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
@@ -175,7 +175,7 @@ static INPUT_PORTS_START( concept )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
 
-	PORT_START("KEY1")	/* port 1: keys 0x10 through 0x1f */
+	PORT_START("KEY1")  /* port 1: keys 0x10 through 0x1f */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS)
 
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE)
@@ -193,7 +193,7 @@ static INPUT_PORTS_START( concept )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT (r)") PORT_CODE(KEYCODE_RSHIFT)
 
-	PORT_START("KEY2")	/* port 2: keys 0x20 through 0x2f */
+	PORT_START("KEY2")  /* port 2: keys 0x20 through 0x2f */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( concept )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 
-	PORT_START("KEY3")	/* port 3: keys 0x30 through 0x3f */
+	PORT_START("KEY3")  /* port 3: keys 0x30 through 0x3f */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( concept )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT (l)") PORT_CODE(KEYCODE_LSHIFT)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
 
-	PORT_START("KEY4")	/* port 4: keys 0x40 through 0x4f */
+	PORT_START("KEY4")  /* port 4: keys 0x40 through 0x4f */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
@@ -245,7 +245,7 @@ static INPUT_PORTS_START( concept )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("00") PORT_CODE(KEYCODE_ASTERISK)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_DEL_PAD)
 
-	PORT_START("KEY5")	/* port 5: keys 0x50 through 0x5f */
+	PORT_START("KEY5")  /* port 5: keys 0x50 through 0x5f */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( concept )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("???") PORT_CODE(KEYCODE_SLASH_PAD)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_PAUSE)
 
-	PORT_START("DSW0")	/* port 6: on-board DIP switches */
+	PORT_START("DSW0")  /* port 6: on-board DIP switches */
 		PORT_DIPNAME(0x01, 0x00, "Omninet Address bit 0")
 		PORT_DIPSETTING(0x00, DEF_STR( Off ))
 		PORT_DIPSETTING(0x01, DEF_STR( On ))
@@ -283,13 +283,13 @@ static INPUT_PORTS_START( concept )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ))
 		PORT_DIPSETTING(0x20, DEF_STR( On ))
 		PORT_DIPNAME(0xc0, 0x00, "Type of Boot")
-		PORT_DIPSETTING(0x00, "Prompt for type of Boot")		// Documentation has 0x00 and 0xc0 reversed per boot PROM
+		PORT_DIPSETTING(0x00, "Prompt for type of Boot")        // Documentation has 0x00 and 0xc0 reversed per boot PROM
 		PORT_DIPSETTING(0x40, "Boot from Omninet")
 		PORT_DIPSETTING(0x80, "Boot from Local Disk")
 		PORT_DIPSETTING(0xc0, "Boot from Diskette")
 
 #if 0
-	PORT_START("DISPLAY")	/* port 7: Display orientation */
+	PORT_START("DISPLAY")   /* port 7: Display orientation */
 		PORT_DIPNAME(0x01, 0x00, "Screen Orientation")
 		PORT_DIPSETTING(0x00, "Horizontal")
 		PORT_DIPSETTING(0x01, "Vertical")
@@ -299,7 +299,7 @@ INPUT_PORTS_END
 
 
 ROM_START( concept )
-	ROM_REGION16_BE(0x100000,"maincpu",0)	/* 68k rom and ram */
+	ROM_REGION16_BE(0x100000,"maincpu",0)   /* 68k rom and ram */
 
 	// concept boot ROM
 #if 0
@@ -331,4 +331,4 @@ ROM_START( concept )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  COMPANY           FULLNAME */
-COMP( 1982, concept,  0,	0,	concept,  concept, driver_device, 0,    "Corvus Systems", "Concept" , GAME_NO_SOUND)
+COMP( 1982, concept,  0,    0,  concept,  concept, driver_device, 0,    "Corvus Systems", "Concept" , GAME_NO_SOUND)

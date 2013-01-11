@@ -29,8 +29,8 @@ enum
 	TIMER_FINISHING
 };
 
-#define TIMER_FLAG		0x80
-#define PA7_FLAG		0x40
+#define TIMER_FLAG      0x80
+#define PA7_FLAG        0x40
 
 
 
@@ -446,7 +446,7 @@ UINT8 riot6532_device::portb_out_get()
 
 riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RIOT6532, "6532 (RIOT)", tag, owner, clock),
-	  m_irq(CLEAR_LINE)
+		m_irq(CLEAR_LINE)
 {
 }
 

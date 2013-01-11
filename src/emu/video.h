@@ -55,7 +55,7 @@
 const int FRAMESKIP_LEVELS = 12;
 const int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 
-#define LCD_FRAMES_PER_SECOND	30
+#define LCD_FRAMES_PER_SECOND   30
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -143,59 +143,59 @@ private:
 	void record_frame();
 
 	// internal state
-	running_machine &	m_machine;					// reference to our machine
+	running_machine &   m_machine;                  // reference to our machine
 
 	// screenless systems
-	emu_timer *			m_screenless_frame_timer;	// timer to signal VBLANK start
-	bool				m_output_changed;			// did an output element change?
+	emu_timer *         m_screenless_frame_timer;   // timer to signal VBLANK start
+	bool                m_output_changed;           // did an output element change?
 
 	// throttling calculations
-	osd_ticks_t			m_throttle_last_ticks;		// osd_ticks the last call to throttle
-	attotime			m_throttle_realtime;		// real time the last call to throttle
-	attotime			m_throttle_emutime;			// emulated time the last call to throttle
-	UINT32				m_throttle_history;			// history of frames where we were fast enough
+	osd_ticks_t         m_throttle_last_ticks;      // osd_ticks the last call to throttle
+	attotime            m_throttle_realtime;        // real time the last call to throttle
+	attotime            m_throttle_emutime;         // emulated time the last call to throttle
+	UINT32              m_throttle_history;         // history of frames where we were fast enough
 
 	// dynamic speed computation
-	osd_ticks_t 		m_speed_last_realtime;		// real time at the last speed calculation
-	attotime			m_speed_last_emutime;		// emulated time at the last speed calculation
-	double				m_speed_percent;			// most recent speed percentage
+	osd_ticks_t         m_speed_last_realtime;      // real time at the last speed calculation
+	attotime            m_speed_last_emutime;       // emulated time at the last speed calculation
+	double              m_speed_percent;            // most recent speed percentage
 
 	// overall speed computation
-	UINT32				m_overall_real_seconds;		// accumulated real seconds at normal speed
-	osd_ticks_t			m_overall_real_ticks;		// accumulated real ticks at normal speed
-	attotime			m_overall_emutime;			// accumulated emulated time at normal speed
-	UINT32				m_overall_valid_counter;	// number of consecutive valid time periods
+	UINT32              m_overall_real_seconds;     // accumulated real seconds at normal speed
+	osd_ticks_t         m_overall_real_ticks;       // accumulated real ticks at normal speed
+	attotime            m_overall_emutime;          // accumulated emulated time at normal speed
+	UINT32              m_overall_valid_counter;    // number of consecutive valid time periods
 
 	// configuration
-	bool				m_throttle;					// flag: TRUE if we're currently throttled
-	bool				m_fastforward;				// flag: TRUE if we're currently fast-forwarding
-	UINT32				m_seconds_to_run;			// number of seconds to run before quitting
-	bool				m_auto_frameskip;			// flag: TRUE if we're automatically frameskipping
-	UINT32				m_speed;					// overall speed (*1000)
+	bool                m_throttle;                 // flag: TRUE if we're currently throttled
+	bool                m_fastforward;              // flag: TRUE if we're currently fast-forwarding
+	UINT32              m_seconds_to_run;           // number of seconds to run before quitting
+	bool                m_auto_frameskip;           // flag: TRUE if we're automatically frameskipping
+	UINT32              m_speed;                    // overall speed (*1000)
 
 	// frameskipping
-	UINT8				m_empty_skip_count;			// number of empty frames we have skipped
-	UINT8				m_frameskip_level;			// current frameskip level
-	UINT8				m_frameskip_counter;		// counter that counts through the frameskip steps
-	INT8				m_frameskip_adjust;
-	bool				m_skipping_this_frame;		// flag: TRUE if we are skipping the current frame
-	osd_ticks_t			m_average_oversleep;		// average number of ticks the OSD oversleeps
+	UINT8               m_empty_skip_count;         // number of empty frames we have skipped
+	UINT8               m_frameskip_level;          // current frameskip level
+	UINT8               m_frameskip_counter;        // counter that counts through the frameskip steps
+	INT8                m_frameskip_adjust;
+	bool                m_skipping_this_frame;      // flag: TRUE if we are skipping the current frame
+	osd_ticks_t         m_average_oversleep;        // average number of ticks the OSD oversleeps
 
 	// snapshot stuff
-	render_target *		m_snap_target;				// screen shapshot target
-	bitmap_rgb32		m_snap_bitmap;				// screen snapshot bitmap
-	bool				m_snap_native;				// are we using native per-screen layouts?
-	INT32				m_snap_width;				// width of snapshots (0 == auto)
-	INT32				m_snap_height;				// height of snapshots (0 == auto)
+	render_target *     m_snap_target;              // screen shapshot target
+	bitmap_rgb32        m_snap_bitmap;              // screen snapshot bitmap
+	bool                m_snap_native;              // are we using native per-screen layouts?
+	INT32               m_snap_width;               // width of snapshots (0 == auto)
+	INT32               m_snap_height;              // height of snapshots (0 == auto)
 
 	// movie recording
-	emu_file *			m_mngfile;					// handle to the open movie file
-	avi_file *			m_avifile;					// handle to the open movie file
-	attotime			m_movie_frame_period;		// period of a single movie frame
-	attotime			m_movie_next_frame_time;	// time of next frame
-	UINT32				m_movie_frame;				// current movie frame number
+	emu_file *          m_mngfile;                  // handle to the open movie file
+	avi_file *          m_avifile;                  // handle to the open movie file
+	attotime            m_movie_frame_period;       // period of a single movie frame
+	attotime            m_movie_next_frame_time;    // time of next frame
+	UINT32              m_movie_frame;              // current movie frame number
 
-	static const UINT8		s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
+	static const UINT8      s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;
@@ -209,4 +209,4 @@ private:
 bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap);
 
 
-#endif	/* __VIDEO_H__ */
+#endif  /* __VIDEO_H__ */

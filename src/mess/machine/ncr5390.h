@@ -5,12 +5,12 @@
 
 struct ncr5390_interface
 {
-    devcb_write_line	m_irq_cb;
-    devcb_write_line	m_drq_cb;
+	devcb_write_line    m_irq_cb;
+	devcb_write_line    m_drq_cb;
 };
 
 class ncr5390_device : public nscsi_device,
-					   public ncr5390_interface
+						public ncr5390_interface
 {
 public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -46,7 +46,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
-    virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	enum { MODE_D, MODE_T, MODE_I };
@@ -192,8 +192,8 @@ private:
 
 	bool irq, drq;
 
-	devcb_resolved_write_line	m_irq_func;
-	devcb_resolved_write_line	m_drq_func;
+	devcb_resolved_write_line   m_irq_func;
+	devcb_resolved_write_line   m_drq_func;
 
 	void dma_set(int dir);
 	void drq_set();

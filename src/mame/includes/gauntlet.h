@@ -12,10 +12,10 @@ public:
 	gauntlet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag) { }
 
-	UINT16			m_sound_reset_val;
-	UINT8			m_vindctr2_screen_refresh;
-	UINT8			m_playfield_tile_bank;
-	UINT8			m_playfield_color_bank;
+	UINT16          m_sound_reset_val;
+	UINT8           m_vindctr2_screen_refresh;
+	UINT8           m_playfield_tile_bank;
+	UINT8           m_playfield_color_bank;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ16_MEMBER(port4_r);

@@ -30,7 +30,7 @@ const device_type PC_KBDC_SLOT = &device_creator<pc_kbdc_slot_device>;
 //  pc_kbdc_slot_device - constructor
 //-------------------------------------------------
 pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PC_KBDC_SLOT, "PC_KBDC_SLOT", tag, owner, clock),
+		device_t(mconfig, PC_KBDC_SLOT, "PC_KBDC_SLOT", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -119,8 +119,8 @@ void pc_kbdc_device::device_start()
 //-------------------------------------------------
 void pc_kbdc_device::device_reset()
 {
-	m_clock_state = -1;		/* initial state of calculated clock line */
-	m_data_state = -1;		/* initial state of calculated data line */
+	m_clock_state = -1;     /* initial state of calculated clock line */
+	m_data_state = -1;      /* initial state of calculated data line */
 
 	// Initially assume both keyboard and mainboard have released their data and clock lines
 	m_mb_clock_state = 1;
@@ -209,9 +209,9 @@ WRITE_LINE_MEMBER( pc_kbdc_device::data_write_from_kb )
 //-------------------------------------------------
 
 device_pc_kbd_interface::device_pc_kbd_interface(const machine_config &mconfig, device_t &device)
-    : device_slot_card_interface(mconfig, device),
-      m_pc_kbdc(NULL),
-      m_pc_kbdc_tag(NULL)
+	: device_slot_card_interface(mconfig, device),
+		m_pc_kbdc(NULL),
+		m_pc_kbdc_tag(NULL)
 {
 }
 
@@ -249,4 +249,3 @@ void device_pc_kbd_interface::set_pc_kbdc_device()
 		m_pc_kbdc->set_keyboard( this );
 	}
 }
-

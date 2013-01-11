@@ -63,8 +63,8 @@
 
 struct tvcexp_interface
 {
-    devcb_write_line				m_out_irq_cb;
-    devcb_write_line				m_out_nmi_cb;
+	devcb_write_line                m_out_irq_cb;
+	devcb_write_line                m_out_nmi_cb;
 };
 
 
@@ -78,7 +78,7 @@ public:
 	virtual ~device_tvcexp_interface();
 
 	// reading and writing
-	virtual UINT8 id_r() { return 0x00; }	// ID_A and ID_B lines
+	virtual UINT8 id_r() { return 0x00; }   // ID_A and ID_B lines
 	virtual void int_ack() { }
 	virtual UINT8 int_r() { return 1; }
 	virtual DECLARE_READ8_MEMBER(read) { return 0x00; }
@@ -90,8 +90,8 @@ public:
 // ======================> tvcexp_slot_device
 
 class tvcexp_slot_device : public device_t,
-						   public tvcexp_interface,
-						   public device_slot_interface
+							public tvcexp_interface,
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -111,10 +111,10 @@ public:
 	virtual DECLARE_READ8_MEMBER(io_read);
 	virtual DECLARE_WRITE8_MEMBER(io_write);
 
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_nmi_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_nmi_func;
 
-	device_tvcexp_interface*	m_cart;
+	device_tvcexp_interface*    m_cart;
 };
 
 // device type definition

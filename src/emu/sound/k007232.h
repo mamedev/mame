@@ -30,7 +30,7 @@ void k007232_set_bank( device_t *device, int chABank, int chBBank );
 void k007232_set_volume(device_t *device,int channel,int volumeA,int volumeB);
 
 class k007232_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

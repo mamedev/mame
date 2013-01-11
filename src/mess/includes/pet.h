@@ -25,7 +25,7 @@ class pet_state : public driver_device
 public:
 	pet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ieee(*this, IEEE488_TAG),
+			m_ieee(*this, IEEE488_TAG),
 		m_videoram(*this, "videoram"),
 		m_memory(*this, "memory"){ }
 

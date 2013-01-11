@@ -21,15 +21,15 @@ public:
 
 	void reset() { osd_event_set(m_event); }
 
-	osd_event *		event(void) { return m_event; }
-	INT32			do_exit(void) { return m_do_exit; }
-	osd_ticks_t		getTimeout(void) { return m_timeout; }
-	void			setTimeout(int timeout);
+	osd_event *     event(void) { return m_event; }
+	INT32           do_exit(void) { return m_do_exit; }
+	osd_ticks_t     getTimeout(void) { return m_timeout; }
+	void            setTimeout(int timeout);
 private:
-	osd_event *		m_event;
-	osd_thread *	m_thread;
-	volatile INT32	m_do_exit;
+	osd_event *     m_event;
+	osd_thread *    m_thread;
+	volatile INT32  m_do_exit;
 
-	osd_ticks_t		m_timeout;
+	osd_ticks_t     m_timeout;
 };
 #endif

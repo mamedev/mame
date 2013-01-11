@@ -46,8 +46,8 @@
 #include "corestr.h"
 #include "sha1.h"
 
-#define DEFAULT_SPLIT_SIZE		100
-#define MAX_PARTS				1000
+#define DEFAULT_SPLIT_SIZE      100
+#define MAX_PARTS               1000
 
 
 

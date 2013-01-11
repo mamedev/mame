@@ -35,7 +35,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CPD1862_CLOCK	XTAL_7_15909MHz
+#define CPD1862_CLOCK   XTAL_7_15909MHz
 
 
 
@@ -63,57 +63,57 @@ struct cdp1862_interface
 {
 	const char *m_screen_tag;
 
-	devcb_read_line				m_in_rd_cb;
-	devcb_read_line				m_in_bd_cb;
-	devcb_read_line				m_in_gd_cb;
+	devcb_read_line             m_in_rd_cb;
+	devcb_read_line             m_in_bd_cb;
+	devcb_read_line             m_in_gd_cb;
 
-	double m_lum_r;				// red luminance resistor value
-	double m_lum_b;				// blue luminance resistor value
-	double m_lum_g;				// green luminance resistor value
-	double m_lum_bkg;			// background luminance resistor value
+	double m_lum_r;             // red luminance resistor value
+	double m_lum_b;             // blue luminance resistor value
+	double m_lum_g;             // green luminance resistor value
+	double m_lum_bkg;           // background luminance resistor value
 
-	double m_chr_r;				// red chrominance resistor value
-	double m_chr_b;				// blue chrominance resistor value
-	double m_chr_g;				// green chrominance resistor value
-	double m_chr_bkg;			// background chrominance resistor value
+	double m_chr_r;             // red chrominance resistor value
+	double m_chr_b;             // blue chrominance resistor value
+	double m_chr_g;             // green chrominance resistor value
+	double m_chr_bkg;           // background chrominance resistor value
 };
 
 
 
 // ======================> cdp1862_device
 
-class cdp1862_device :	public device_t,
-                        public cdp1862_interface
+class cdp1862_device :  public device_t,
+						public cdp1862_interface
 {
 public:
-    // construction/destruction
-    cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_WRITE8_MEMBER( dma_w );
+	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( bkg_w );
 	DECLARE_WRITE_LINE_MEMBER( con_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	inline void initialize_palette();
 
-	devcb_resolved_read_line	m_in_rd_func;
-	devcb_resolved_read_line	m_in_bd_func;
-	devcb_resolved_read_line	m_in_gd_func;
+	devcb_resolved_read_line    m_in_rd_func;
+	devcb_resolved_read_line    m_in_bd_func;
+	devcb_resolved_read_line    m_in_gd_func;
 
-	screen_device *m_screen;		// screen
-	bitmap_rgb32 m_bitmap;			// bitmap
+	screen_device *m_screen;        // screen
+	bitmap_rgb32 m_bitmap;          // bitmap
 
 	rgb_t m_palette[16];
-	int m_bgcolor;					// background color
-	int m_con;						// color on
+	int m_bgcolor;                  // background color
+	int m_con;                      // color on
 };
 
 

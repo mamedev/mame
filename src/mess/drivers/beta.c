@@ -97,18 +97,18 @@ READ8_MEMBER( beta_state::riot_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     2716 D0, segment D, key bit 0
-        PA1     2716 D1, segment E, key bit 1
-        PA2     2716 D2, segment C, key bit 2
-        PA3     2716 D3, segment G, key bit 3
-        PA4     2716 D4, segment F, key bit 4
-        PA5     2716 D5, segment B
-        PA6     2716 D6, segment A
-        PA7     2716 D7
+	    PA0     2716 D0, segment D, key bit 0
+	    PA1     2716 D1, segment E, key bit 1
+	    PA2     2716 D2, segment C, key bit 2
+	    PA3     2716 D3, segment G, key bit 3
+	    PA4     2716 D4, segment F, key bit 4
+	    PA5     2716 D5, segment B
+	    PA6     2716 D6, segment A
+	    PA7     2716 D7
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 
@@ -133,18 +133,18 @@ WRITE8_MEMBER( beta_state::riot_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     2716 D0, segment D, key bit 0
-        PA1     2716 D1, segment E, key bit 1
-        PA2     2716 D2, segment C, key bit 2
-        PA3     2716 D3, segment G, key bit 3
-        PA4     2716 D4, segment F, key bit 4
-        PA5     2716 D5, segment B
-        PA6     2716 D6, segment A
-        PA7     2716 D7
+	    PA0     2716 D0, segment D, key bit 0
+	    PA1     2716 D1, segment E, key bit 1
+	    PA2     2716 D2, segment C, key bit 2
+	    PA3     2716 D3, segment G, key bit 3
+	    PA4     2716 D4, segment F, key bit 4
+	    PA5     2716 D5, segment B
+	    PA6     2716 D6, segment A
+	    PA7     2716 D7
 
-    */
+	*/
 
 //  logerror("PA %02x\n", data);
 
@@ -165,18 +165,18 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     74LS145 P0
-        PB1     74LS145 P1
-        PB2     74LS145 P2
-        PB3     74LS145 P3, 74LS164 D
-        PB4     loudspeaker, data led
-        PB5     address led, 74LS164 CP
-        PB6     2716 _OE
-        PB7     2716 _CE
+	    PB0     74LS145 P0
+	    PB1     74LS145 P1
+	    PB2     74LS145 P2
+	    PB3     74LS145 P3, 74LS164 D
+	    PB4     loudspeaker, data led
+	    PB5     address led, 74LS164 CP
+	    PB6     2716 _OE
+	    PB7     2716 _CE
 
-    */
+	*/
 
 	//logerror("PB %02x %02x\n", data, olddata);
 

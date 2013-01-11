@@ -28,53 +28,53 @@ extern void SwitchMode(arm_state *cpustate, int cpsr_mode_val);
 
 /* Set NZCV flags for ADDS / SUBS */
 #define HandleALUAddFlags(rd, rn, op2)                                                \
-  if (insn & INSN_S)                                                                  \
-    SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
-              | (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
-              | (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
-              | HandleALUNZFlags(rd)));                                               \
-  R15 += 4;
+	if (insn & INSN_S)                                                                  \
+	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
+				| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
+				| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
+				| HandleALUNZFlags(rd)));                                               \
+	R15 += 4;
 
 #define HandleThumbALUAddFlags(rd, rn, op2)                                                       \
-    SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
-              | (((!THUMB_SIGN_BITS_DIFFER(rn, op2)) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
-              | (((~(rn)) < (op2)) << C_BIT)                                                      \
-              | HandleALUNZFlags(rd)));                                                           \
-  R15 += 2;
+	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
+				| (((!THUMB_SIGN_BITS_DIFFER(rn, op2)) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
+				| (((~(rn)) < (op2)) << C_BIT)                                                      \
+				| HandleALUNZFlags(rd)));                                                           \
+	R15 += 2;
 
 #define HandleALUSubFlags(rd, rn, op2)                                                                         \
-  if (insn & INSN_S)                                                                                           \
-    SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
-              | ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                             \
-              | (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
-              | HandleALUNZFlags(rd)));                                                                        \
-  R15 += 4;
+	if (insn & INSN_S)                                                                                           \
+	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
+				| ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                             \
+				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
+				| HandleALUNZFlags(rd)));                                                                        \
+	R15 += 4;
 
 #define HandleThumbALUSubFlags(rd, rn, op2)                                                                    \
-    SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
-              | ((THUMB_SIGN_BITS_DIFFER(rn, op2) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                 \
-              | (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
-              | HandleALUNZFlags(rd)));                                                                        \
-  R15 += 2;
+	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
+				| ((THUMB_SIGN_BITS_DIFFER(rn, op2) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                 \
+				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
+				| HandleALUNZFlags(rd)));                                                                        \
+	R15 += 2;
 
 /* Set NZC flags for logical operations. */
 
 // This macro (which I didn't write) - doesn't make it obvious that the SIGN BIT = 31, just as the N Bit does,
 // therefore, N is set by default
 #define HandleALUNZFlags(rd)               \
-  (((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
+	(((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
 
 
 // Long ALU Functions use bit 63
 #define HandleLongALUNZFlags(rd)                            \
-  ((((rd) & ((UINT64)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
+	((((rd) & ((UINT64)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
 
 #define HandleALULogicalFlags(rd, sc)                  \
-  if (insn & INSN_S)                                   \
-    SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK)) \
-              | HandleALUNZFlags(rd)                   \
-              | (((sc) != 0) << C_BIT)));              \
-  R15 += 4;
+	if (insn & INSN_S)                                   \
+	SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK)) \
+				| HandleALUNZFlags(rd)                   \
+				| (((sc) != 0) << C_BIT)));              \
+	R15 += 4;
 
 void set_cpsr( arm_state *cpustate, UINT32 val);
 
@@ -105,33 +105,33 @@ extern void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT3
  ***************************************************************************/
 INLINE void arm7_cpu_write32(arm_state *cpustate, UINT32 addr, UINT32 data)
 {
-    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-    {
-        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
-        {
-        	return;
-        }
-    }
+	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	{
+		if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+		{
+			return;
+		}
+	}
 
-    addr &= ~3;
+	addr &= ~3;
 	if ( cpustate->endian == ENDIANNESS_BIG )
 		cpustate->program->write_dword(addr, data);
 	else
-	    cpustate->program->write_dword(addr, data);
+		cpustate->program->write_dword(addr, data);
 }
 
 
 INLINE void arm7_cpu_write16(arm_state *cpustate, UINT32 addr, UINT16 data)
 {
-    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-    {
-        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
-        {
+	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	{
+		if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+		{
 			return;
-        }
-    }
+		}
+	}
 
-    addr &= ~1;
+	addr &= ~1;
 	if ( cpustate->endian == ENDIANNESS_BIG )
 		cpustate->program->write_word(addr, data);
 	else
@@ -140,13 +140,13 @@ INLINE void arm7_cpu_write16(arm_state *cpustate, UINT32 addr, UINT16 data)
 
 INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
 {
-    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-    {
-        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	{
+		if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
 		{
 			return;
 		}
-    }
+	}
 
 	if ( cpustate->endian == ENDIANNESS_BIG )
 		cpustate->program->write_byte(addr, data);
@@ -156,71 +156,71 @@ INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
 
 INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, UINT32 addr)
 {
-    UINT32 result;
+	UINT32 result;
 
-    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-    {
-        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
-        {
-        	return 0;
-        }
-    }
+	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	{
+		if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+		{
+			return 0;
+		}
+	}
 
-    if (addr & 3)
-    {
+	if (addr & 3)
+	{
 		if ( cpustate->endian == ENDIANNESS_BIG )
 			result = cpustate->program->read_dword(addr & ~3);
 		else
 			result = cpustate->program->read_dword(addr & ~3);
-        result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
-    }
-    else
-    {
+		result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+	}
+	else
+	{
 		if ( cpustate->endian == ENDIANNESS_BIG )
 			result = cpustate->program->read_dword(addr);
 		else
 			result = cpustate->program->read_dword(addr);
-    }
+	}
 
-    return result;
+	return result;
 }
 
 INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, UINT32 addr)
 {
-    UINT16 result;
+	UINT16 result;
 
-    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-    {
-        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
-        {
-        	return 0;
-        }
-    }
+	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	{
+		if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+		{
+			return 0;
+		}
+	}
 
 	if ( cpustate->endian == ENDIANNESS_BIG )
 		result = cpustate->program->read_word(addr & ~1);
 	else
 		result = cpustate->program->read_word(addr & ~1);
 
-    if (addr & 1)
-    {
-        result = ((result >> 8) & 0xff) | ((result & 0xff) << 8);
-    }
+	if (addr & 1)
+	{
+		result = ((result >> 8) & 0xff) | ((result & 0xff) << 8);
+	}
 
-    return result;
+	return result;
 }
 
 INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, UINT32 addr)
 {
-    if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-    {
-        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
-        {
-        	return 0;
-        }
-    }
+	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	{
+		if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+		{
+			return 0;
+		}
+	}
 
-    // Handle through normal 8 bit handler (for 32 bit cpu)
+	// Handle through normal 8 bit handler (for 32 bit cpu)
 	if ( cpustate->endian == ENDIANNESS_BIG )
 		return cpustate->program->read_byte(addr);
 	else
@@ -239,4 +239,3 @@ INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, UINT32 addr)
 #define WRITE32(addr,data)  arm7_cpu_write32(cpustate, addr,data)
 #define PTR_READ32          &arm7_cpu_read32
 #define PTR_WRITE32         &arm7_cpu_write32
-

@@ -77,4 +77,3 @@ DECLARE_WRITE8_HANDLER( maniach_68705_ddr_c_w );
 DECLARE_WRITE8_HANDLER( maniach_mcu_w );
 DECLARE_READ8_HANDLER( maniach_mcu_r );
 DECLARE_READ8_HANDLER( maniach_mcu_status_r );
-

@@ -322,12 +322,12 @@ static const cassette_interface mpf1_cassette_interface =
 
 static const tms5220_interface mpf1_tms5220_intf =
 {
-	DEVCB_NULL,					/* no IRQ callback */
-	DEVCB_NULL,					/* no Ready callback */
+	DEVCB_NULL,                 /* no IRQ callback */
+	DEVCB_NULL,                 /* no Ready callback */
 #if 1
-	spchroms_read,				/* speech ROM read handler */
-	spchroms_load_address,		/* speech ROM load address handler */
-	spchroms_read_and_branch	/* speech ROM read and branch handler */
+	spchroms_read,              /* speech ROM read handler */
+	spchroms_load_address,      /* speech ROM load address handler */
+	spchroms_read_and_branch    /* speech ROM read and branch handler */
 #endif
 };
 
@@ -438,22 +438,22 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( mpf1 )
-    ROM_REGION( 0x10000, Z80_TAG, 0 )
-    ROM_LOAD( "mpf.u6", 0x0000, 0x1000, CRC(b60249ce) SHA1(78e0e8874d1497fabfdd6378266d041175e3797f) )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "mpf.u6", 0x0000, 0x1000, CRC(b60249ce) SHA1(78e0e8874d1497fabfdd6378266d041175e3797f) )
 ROM_END
 
 ROM_START( mpf1b )
-    ROM_REGION( 0x10000, Z80_TAG, 0 )
-    ROM_LOAD( "c55167.u6", 0x0000, 0x1000, CRC(28b06dac) SHA1(99cfbab739d71a914c39302d384d77bddc4b705b) )
-    ROM_LOAD( "basic.u7", 0x2000, 0x1000, CRC(d276ed6b) SHA1(a45fb98961be5e5396988498c6ed589a35398dcf) )
-    ROM_LOAD( "ssb-mpf.u", 0x5000, 0x1000, CRC(f926334f) SHA1(35847f8164eed4c0794a8b74e5d7fa972b10eb90) )
-    ROM_LOAD( "prt-mpf.u5", 0x6000, 0x1000, CRC(730f2fb0) SHA1(f31536ee9dbb9babb9ce16a7490db654ca0b5749) )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "c55167.u6", 0x0000, 0x1000, CRC(28b06dac) SHA1(99cfbab739d71a914c39302d384d77bddc4b705b) )
+	ROM_LOAD( "basic.u7", 0x2000, 0x1000, CRC(d276ed6b) SHA1(a45fb98961be5e5396988498c6ed589a35398dcf) )
+	ROM_LOAD( "ssb-mpf.u", 0x5000, 0x1000, CRC(f926334f) SHA1(35847f8164eed4c0794a8b74e5d7fa972b10eb90) )
+	ROM_LOAD( "prt-mpf.u5", 0x6000, 0x1000, CRC(730f2fb0) SHA1(f31536ee9dbb9babb9ce16a7490db654ca0b5749) )
 ROM_END
 
 ROM_START( mpf1p )
-    ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "mpf1pmon.bin", 0x0000, 0x2000, CRC(91ace7d3) SHA1(22e3c16a81ac09f37741ad1b526a4456b2ba9493) )
-    ROM_LOAD( "prt-mpf-ip.u5", 0x6000, 0x1000, CRC(4dd2a4eb) SHA1(6a3e7daa7834d67fd572261ed4a9a62c4594fe3f) )
+	ROM_LOAD( "prt-mpf-ip.u5", 0x6000, 0x1000, CRC(4dd2a4eb) SHA1(6a3e7daa7834d67fd572261ed4a9a62c4594fe3f) )
 ROM_END
 
 /* System Drivers */

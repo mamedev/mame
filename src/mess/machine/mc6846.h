@@ -34,32 +34,32 @@ extern const device_type MC6846;
 
 struct mc6846_interface
 {
-  /* CPU write to the outside through chip */
-  devcb_write8 out_port_func;  /* 8-bit output */
-  devcb_write8 out_cp1_func;   /* 1-bit output */
-  devcb_write8 out_cp2_func;   /* 1-bit output */
+	/* CPU write to the outside through chip */
+	devcb_write8 out_port_func;  /* 8-bit output */
+	devcb_write8 out_cp1_func;   /* 1-bit output */
+	devcb_write8 out_cp2_func;   /* 1-bit output */
 
-  /* CPU read from the outside through chip */
-  devcb_read8 in_port_func; /* 8-bit input */
+	/* CPU read from the outside through chip */
+	devcb_read8 in_port_func; /* 8-bit input */
 
-  /* asynchronous timer output to outside world */
-  devcb_write8 out_cto_func; /* 1-bit output */
+	/* asynchronous timer output to outside world */
+	devcb_write8 out_cto_func; /* 1-bit output */
 
-  /* timer interrupt */
-  devcb_write_line irq_func;
+	/* timer interrupt */
+	devcb_write_line irq_func;
 };
 
 
 #define MCFG_MC6846_ADD(_tag, _intrf) \
-  MCFG_DEVICE_ADD(_tag, MC6846, 0)	      \
-  MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_ADD(_tag, MC6846, 0)          \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MCFG_MC6846_MODIFY(_tag, _intrf) \
-  MCFG_DEVICE_MODIFY(_tag)	      \
-  MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_MODIFY(_tag)          \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_MC6846_REMOVE(_tag)		\
-  MCFG_DEVICE_REMOVE(_tag)
+#define MCFG_MC6846_REMOVE(_tag)        \
+	MCFG_DEVICE_REMOVE(_tag)
 
 
 /* ---------- functions ------------ */
@@ -80,4 +80,3 @@ extern UINT8  mc6846_get_output_cp2  ( device_t *device );
 extern UINT16 mc6846_get_preset ( device_t *device ); /* timer interval - 1 in us */
 
 #endif
-

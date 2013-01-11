@@ -12,16 +12,16 @@
 #include "cpu/esrip/esrip.h"
 
 /* TODO */
-#define ESRIPSYS_PIXEL_CLOCK	(XTAL_25MHz / 2)
-#define ESRIPSYS_HTOTAL			(512 + 141 + 2)
-#define ESRIPSYS_HBLANK_START	(512)
-#define ESRIPSYS_HBLANK_END		(0)
-#define ESRIPSYS_VTOTAL			(384 + 20)
-#define ESRIPSYS_VBLANK_START	(384)
-#define ESRIPSYS_VBLANK_END		(0)
+#define ESRIPSYS_PIXEL_CLOCK    (XTAL_25MHz / 2)
+#define ESRIPSYS_HTOTAL         (512 + 141 + 2)
+#define ESRIPSYS_HBLANK_START   (512)
+#define ESRIPSYS_HBLANK_END     (0)
+#define ESRIPSYS_VTOTAL         (384 + 20)
+#define ESRIPSYS_VBLANK_START   (384)
+#define ESRIPSYS_VBLANK_END     (0)
 
-#define CMOS_RAM_SIZE			(2048)
-#define FDT_RAM_SIZE			(2048 * sizeof(UINT16))
+#define CMOS_RAM_SIZE           (2048)
+#define FDT_RAM_SIZE            (2048 * sizeof(UINT16))
 
 struct line_buffer_t
 {
@@ -35,10 +35,10 @@ class esripsys_state : public driver_device
 public:
 	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-          m_videocpu(*this, "video_cpu"),
-		  m_pal_ram(*this, "pal_ram") { }
+			m_videocpu(*this, "video_cpu"),
+			m_pal_ram(*this, "pal_ram") { }
 
-    required_device<esrip_device> m_videocpu;
+	required_device<esrip_device> m_videocpu;
 
 	UINT8 m_g_iodata;
 	UINT8 m_g_ioaddr;

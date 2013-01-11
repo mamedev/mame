@@ -43,15 +43,15 @@
 //**************************************************************************
 
 // these defined latencies are a pain to implement, but are necessary
-#define EMULATE_MEMORY_LATENCY		(1)
-#define EMULATE_MULTIPLIER_LATENCY	(1)
-#define EMULATE_AFLAGS_LATENCY		(1)
+#define EMULATE_MEMORY_LATENCY      (1)
+#define EMULATE_MULTIPLIER_LATENCY  (1)
+#define EMULATE_AFLAGS_LATENCY      (1)
 
 // these optimizations should have some effect, but they don't really, so
 // leave them off
-#define IGNORE_DAU_UV_FLAGS			(0)
-#define ASSUME_WRITEABLE			(0)
-#define ASSUME_UNCONDITIONAL_CAU	(0)
+#define IGNORE_DAU_UV_FLAGS         (0)
+#define ASSUME_WRITEABLE            (0)
+#define ASSUME_UNCONDITIONAL_CAU    (0)
 
 
 
@@ -59,65 +59,65 @@
 //  MACROS
 //**************************************************************************
 
-#define SET_V_16(a,b,r)			m_vflags = (((a) ^ (b) ^ (r) ^ ((r) >> 1)) << 8)
-#define SET_NZC_16(r)			m_nzcflags = ((r) << 8)
-#define SET_NZCV_16(a,b,r)		SET_NZC_16(r); SET_V_16(a,b,r)
-#define SET_NZ00_16(r)			m_nzcflags = (((r) << 8) & 0xffffff); m_vflags = 0
+#define SET_V_16(a,b,r)         m_vflags = (((a) ^ (b) ^ (r) ^ ((r) >> 1)) << 8)
+#define SET_NZC_16(r)           m_nzcflags = ((r) << 8)
+#define SET_NZCV_16(a,b,r)      SET_NZC_16(r); SET_V_16(a,b,r)
+#define SET_NZ00_16(r)          m_nzcflags = (((r) << 8) & 0xffffff); m_vflags = 0
 
-#define SET_V_24(a,b,r)			m_vflags = ((a) ^ (b) ^ (r) ^ ((r) >> 1))
-#define SET_NZC_24(r)			m_nzcflags = (r)
-#define SET_NZCV_24(a,b,r)		SET_NZC_24(r); SET_V_24(a,b,r)
-#define SET_NZ00_24(r)			m_nzcflags = ((r) & 0xffffff); m_vflags = 0
+#define SET_V_24(a,b,r)         m_vflags = ((a) ^ (b) ^ (r) ^ ((r) >> 1))
+#define SET_NZC_24(r)           m_nzcflags = (r)
+#define SET_NZCV_24(a,b,r)      SET_NZC_24(r); SET_V_24(a,b,r)
+#define SET_NZ00_24(r)          m_nzcflags = ((r) & 0xffffff); m_vflags = 0
 
-#define TRUNCATE24(a)			((a) & 0xffffff)
-#define EXTEND16_TO_24(a)		TRUNCATE24((INT32)(INT16)(a))
-#define REG16(a)				((UINT16)m_r[a])
-#define REG24(a)				(m_r[a])
+#define TRUNCATE24(a)           ((a) & 0xffffff)
+#define EXTEND16_TO_24(a)       TRUNCATE24((INT32)(INT16)(a))
+#define REG16(a)                ((UINT16)m_r[a])
+#define REG24(a)                (m_r[a])
 
-#define WRITEABLE_REGS			(0x6f3efffe)
+#define WRITEABLE_REGS          (0x6f3efffe)
 #if ASSUME_WRITEABLE
-#define IS_WRITEABLE(r) 		(1)
+#define IS_WRITEABLE(r)         (1)
 #else
-#define IS_WRITEABLE(r)			(WRITEABLE_REGS & (1 << (r)))
+#define IS_WRITEABLE(r)         (WRITEABLE_REGS & (1 << (r)))
 #endif
 
 #if ASSUME_UNCONDITIONAL_CAU
-#define CONDITION_IS_TRUE()		(1)
+#define CONDITION_IS_TRUE()     (1)
 #else
-#define CONDITION_IS_TRUE()		(!(op & 0x400) || (condition((op >> 12) & 15)))
+#define CONDITION_IS_TRUE()     (!(op & 0x400) || (condition((op >> 12) & 15)))
 #endif
 
 #if EMULATE_MEMORY_LATENCY
-#define WWORD_DEFERRED(a,v)		do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = -(a); m_mbufdata[bufidx] = (v); } while (0)
-#define WLONG_DEFERRED(a,v)		do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = (a); m_mbufdata[bufidx] = (v); } while (0)
-#define PROCESS_DEFERRED_MEMORY()									\
-	if (m_mbufaddr[++m_mbuf_index & 3] != 1)					\
-	{																	\
-		int bufidx = m_mbuf_index & 3;								\
-		if (m_mbufaddr[bufidx] >= 0)								\
-			WLONG(m_mbufaddr[bufidx], m_mbufdata[bufidx]);	\
-		else															\
-			WWORD(-m_mbufaddr[bufidx], m_mbufdata[bufidx]);	\
-		m_mbufaddr[bufidx] = 1;										\
+#define WWORD_DEFERRED(a,v)     do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = -(a); m_mbufdata[bufidx] = (v); } while (0)
+#define WLONG_DEFERRED(a,v)     do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = (a); m_mbufdata[bufidx] = (v); } while (0)
+#define PROCESS_DEFERRED_MEMORY()                                   \
+	if (m_mbufaddr[++m_mbuf_index & 3] != 1)                    \
+	{                                                                   \
+		int bufidx = m_mbuf_index & 3;                              \
+		if (m_mbufaddr[bufidx] >= 0)                                \
+			WLONG(m_mbufaddr[bufidx], m_mbufdata[bufidx]);  \
+		else                                                            \
+			WWORD(-m_mbufaddr[bufidx], m_mbufdata[bufidx]); \
+		m_mbufaddr[bufidx] = 1;                                     \
 	}
 #else
-#define WWORD_DEFERRED(a,v)	WWORD(a,v)
-#define WLONG_DEFERRED(a,v)	WLONG(a,v)
+#define WWORD_DEFERRED(a,v) WWORD(a,v)
+#define WLONG_DEFERRED(a,v) WLONG(a,v)
 #define PROCESS_DEFERRED_MEMORY()
 #endif
 
 #if EMULATE_MULTIPLIER_LATENCY
-#define DEFERRED_MULTIPLIER(x)	dau_get_amult(x)
+#define DEFERRED_MULTIPLIER(x)  dau_get_amult(x)
 #else
-#define DEFERRED_MULTIPLIER(x)	m_a[x]
+#define DEFERRED_MULTIPLIER(x)  m_a[x]
 #endif
 
 #if EMULATE_AFLAGS_LATENCY
-#define DEFERRED_NZFLAGS()	dau_get_anzflags()
-#define DEFERRED_VUFLAGS()	dau_get_avuflags()
+#define DEFERRED_NZFLAGS()  dau_get_anzflags()
+#define DEFERRED_VUFLAGS()  dau_get_avuflags()
 #else
-#define DEFERRED_NZFLAGS()	m_NZflags
-#define DEFERRED_VUFLAGS()	m_VUflags
+#define DEFERRED_NZFLAGS()  m_NZflags
+#define DEFERRED_VUFLAGS()  m_VUflags
 #endif
 
 
@@ -145,7 +145,7 @@ void dsp32c_device::illegal(UINT32 op)
 
 void dsp32c_device::unimplemented(UINT32 op)
 {
-    fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)\n", PC - 4, op, op >> 25, op >> 21);
+	fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)\n", PC - 4, op, op >> 25, op >> 21);
 }
 
 
@@ -156,7 +156,7 @@ inline void dsp32c_device::execute_one()
 	PROCESS_DEFERRED_MEMORY();
 	debugger_instruction_hook(this, PC);
 	op = ROPCODE(PC);
-	m_icount -= 4;	// 4 clocks per cycle
+	m_icount -= 4;  // 4 clocks per cycle
 	PC += 4;
 	if (op)
 		(this->*s_dsp32ops[op >> 21])(op);
@@ -172,14 +172,14 @@ UINT32 dsp32c_device::cau_read_pi_special(UINT8 i)
 {
 	switch (i)
 	{
-		case 4:		return m_ibuf;
-		case 5:		return m_obuf;
-		case 6:		update_pcr(m_pcr & ~PCR_PDFs); update_pins(); return m_pdr;
-		case 14:	return m_piop;
-		case 20:	return m_pdr2;
-		case 22:	update_pcr(m_pcr & ~PCR_PIFs); update_pins(); return m_pir;
-		case 30:	return m_pcw;
-		default:	fprintf(stderr, "Unimplemented CAU PI read = %X\n", i);
+		case 4:     return m_ibuf;
+		case 5:     return m_obuf;
+		case 6:     update_pcr(m_pcr & ~PCR_PDFs); update_pins(); return m_pdr;
+		case 14:    return m_piop;
+		case 20:    return m_pdr2;
+		case 22:    update_pcr(m_pcr & ~PCR_PIFs); update_pins(); return m_pir;
+		case 30:    return m_pcw;
+		default:    fprintf(stderr, "Unimplemented CAU PI read = %X\n", i);
 	}
 	return 0;
 }
@@ -189,14 +189,14 @@ void dsp32c_device::cau_write_pi_special(UINT8 i, UINT32 val)
 {
 	switch (i)
 	{
-		case 4:		m_ibuf = val;	break;
-		case 5:		m_obuf = val;	break;
-		case 6:		m_pdr = val; update_pcr(m_pcr | PCR_PDFs); update_pins(); break;
-		case 14:	m_piop = val;	break;
-		case 20:	m_pdr2 = val;	break;
-		case 22:	m_pir = val; update_pcr(m_pcr | PCR_PIFs); update_pins(); break;
-		case 30:	m_pcw = val;	break;
-		default:	fprintf(stderr, "Unimplemented CAU PI write = %X\n", i);
+		case 4:     m_ibuf = val;   break;
+		case 5:     m_obuf = val;   break;
+		case 6:     m_pdr = val; update_pcr(m_pcr | PCR_PDFs); update_pins(); break;
+		case 14:    m_piop = val;   break;
+		case 20:    m_pdr2 = val;   break;
+		case 22:    m_pir = val; update_pcr(m_pcr | PCR_PIFs); update_pins(); break;
+		case 30:    m_pcw = val;    break;
+		default:    fprintf(stderr, "Unimplemented CAU PI write = %X\n", i);
 	}
 }
 
@@ -449,14 +449,14 @@ inline UINT32 dsp32c_device::double_to_dsp(double val)
 
 double dsp32c_device::dau_read_pi_special(int i)
 {
-    fatalerror("Unimplemented dau_read_pi_special(%d)\n", i);
+	fatalerror("Unimplemented dau_read_pi_special(%d)\n", i);
 	return 0;
 }
 
 
 void dsp32c_device::dau_write_pi_special(int i, double val)
 {
-    fatalerror("Unimplemented dau_write_pi_special(%d)\n", i);
+	fatalerror("Unimplemented dau_write_pi_special(%d)\n", i);
 }
 
 
@@ -487,7 +487,7 @@ inline double dsp32c_device::dau_read_pi_double_2nd(int pi, int multiplier, doub
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
+	if (p == 15) p = m_lastp;       // P=15 means Z inherits from Y, Y inherits from X
 	m_lastp = p;
 	if (p)
 	{
@@ -555,7 +555,7 @@ inline void dsp32c_device::dau_write_pi_double(int pi, double val)
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
+	if (p == 15) p = m_lastp;       // P=15 means Z inherits from Y, Y inherits from X
 	if (p)
 	{
 		WLONG_DEFERRED(m_r[p], double_to_dsp(val));
@@ -576,7 +576,7 @@ inline void dsp32c_device::dau_write_pi_4bytes(int pi, UINT32 val)
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
+	if (p == 15) p = m_lastp;       // P=15 means Z inherits from Y, Y inherits from X
 	if (p)
 	{
 		m_lastp = p;
@@ -598,7 +598,7 @@ inline void dsp32c_device::dau_write_pi_2bytes(int pi, UINT16 val)
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
+	if (p == 15) p = m_lastp;       // P=15 means Z inherits from Y, Y inherits from X
 	if (p)
 	{
 		m_lastp = p;
@@ -679,24 +679,24 @@ int dsp32c_device::condition(int cond)
 		case 25:
 			return (DEFERRED_NZFLAGS() <= 0);
 
-		case 32:	// !ibf
-		case 33:	// ibf
-		case 34:	// !obe
-		case 35:	// obe
-		case 36:	// !pdf
-		case 37:	// pdf
-		case 38:	// !pif
-		case 39:	// pif
-		case 40:	// !sy
-		case 41:	// sy
-		case 42:	// !fb
-		case 43:	// fb
-		case 44:	// !ireq1
-		case 45:	// ireq1
-		case 46:	// !ireq2
-		case 47:	// ireq2
+		case 32:    // !ibf
+		case 33:    // ibf
+		case 34:    // !obe
+		case 35:    // obe
+		case 36:    // !pdf
+		case 37:    // pdf
+		case 38:    // !pif
+		case 39:    // pif
+		case 40:    // !sy
+		case 41:    // sy
+		case 42:    // !fb
+		case 43:    // fb
+		case 44:    // !ireq1
+		case 45:    // ireq1
+		case 46:    // !ireq2
+		case 47:    // ireq2
 		default:
-		    fatalerror("Unimplemented condition: %X\n", cond);
+			fatalerror("Unimplemented condition: %X\n", cond);
 	}
 }
 #endif
@@ -2513,293 +2513,293 @@ void dsp32c_device::d5_seed(UINT32 op)
 
 void (dsp32c_device::*const dsp32c_device::s_dsp32ops[])(UINT32 op) =
 {
-	&dsp32c_device::nop,		&dsp32c_device::goto_t,		&dsp32c_device::goto_pl,	&dsp32c_device::goto_mi,	&dsp32c_device::goto_ne,	&dsp32c_device::goto_eq,	&dsp32c_device::goto_vc,	&dsp32c_device::goto_vs,	// 00
-	&dsp32c_device::goto_cc,	&dsp32c_device::goto_cs,	&dsp32c_device::goto_ge,	&dsp32c_device::goto_lt,	&dsp32c_device::goto_gt,	&dsp32c_device::goto_le,	&dsp32c_device::goto_hi,	&dsp32c_device::goto_ls,
-	&dsp32c_device::goto_auc,	&dsp32c_device::goto_aus,	&dsp32c_device::goto_age,	&dsp32c_device::goto_alt,	&dsp32c_device::goto_ane,	&dsp32c_device::goto_aeq,	&dsp32c_device::goto_avc,	&dsp32c_device::goto_avs,	// 01
-	&dsp32c_device::goto_agt,	&dsp32c_device::goto_ale,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::goto_ibe,	&dsp32c_device::goto_ibf,	&dsp32c_device::goto_obf,	&dsp32c_device::goto_obe,	&dsp32c_device::goto_pde,	&dsp32c_device::goto_pdf,	&dsp32c_device::goto_pie,	&dsp32c_device::goto_pif,	// 02
-	&dsp32c_device::goto_syc,	&dsp32c_device::goto_sys,	&dsp32c_device::goto_fbc,	&dsp32c_device::goto_fbs,	&dsp32c_device::goto_irq1lo,&dsp32c_device::goto_irq1hi,&dsp32c_device::goto_irq2lo,&dsp32c_device::goto_irq2hi,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 03
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::nop,        &dsp32c_device::goto_t,     &dsp32c_device::goto_pl,    &dsp32c_device::goto_mi,    &dsp32c_device::goto_ne,    &dsp32c_device::goto_eq,    &dsp32c_device::goto_vc,    &dsp32c_device::goto_vs,    // 00
+	&dsp32c_device::goto_cc,    &dsp32c_device::goto_cs,    &dsp32c_device::goto_ge,    &dsp32c_device::goto_lt,    &dsp32c_device::goto_gt,    &dsp32c_device::goto_le,    &dsp32c_device::goto_hi,    &dsp32c_device::goto_ls,
+	&dsp32c_device::goto_auc,   &dsp32c_device::goto_aus,   &dsp32c_device::goto_age,   &dsp32c_device::goto_alt,   &dsp32c_device::goto_ane,   &dsp32c_device::goto_aeq,   &dsp32c_device::goto_avc,   &dsp32c_device::goto_avs,   // 01
+	&dsp32c_device::goto_agt,   &dsp32c_device::goto_ale,   &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::goto_ibe,   &dsp32c_device::goto_ibf,   &dsp32c_device::goto_obf,   &dsp32c_device::goto_obe,   &dsp32c_device::goto_pde,   &dsp32c_device::goto_pdf,   &dsp32c_device::goto_pie,   &dsp32c_device::goto_pif,   // 02
+	&dsp32c_device::goto_syc,   &dsp32c_device::goto_sys,   &dsp32c_device::goto_fbc,   &dsp32c_device::goto_fbs,   &dsp32c_device::goto_irq1lo,&dsp32c_device::goto_irq1hi,&dsp32c_device::goto_irq2lo,&dsp32c_device::goto_irq2hi,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 03
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
 
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 04
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 05
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	// 06
-	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,
-	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	// 07
-	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 04
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 05
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   // 06
+	&dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,
+	&dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   // 07
+	&dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,   &dsp32c_device::dec_goto,
 
-	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		// 08
-	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,
-	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		// 09
-	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,
-	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		// 0a
-	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,
-	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		// 0b
-	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,
+	&dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       // 08
+	&dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,
+	&dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       // 09
+	&dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,       &dsp32c_device::call,
+	&dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     // 0a
+	&dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,
+	&dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     // 0b
+	&dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,     &dsp32c_device::add_si,
 
-	&dsp32c_device::add_ss,		&dsp32c_device::mul2_s,		&dsp32c_device::subr_ss,	&dsp32c_device::addr_ss,	&dsp32c_device::sub_ss,		&dsp32c_device::neg_s,		&dsp32c_device::andc_ss,	&dsp32c_device::cmp_ss,		// 0c
-	&dsp32c_device::xor_ss,		&dsp32c_device::rcr_s,		&dsp32c_device::or_ss,		&dsp32c_device::rcl_s,		&dsp32c_device::shr_s,		&dsp32c_device::div2_s,		&dsp32c_device::and_ss,		&dsp32c_device::test_ss,
-	&dsp32c_device::add_di,		&dsp32c_device::illegal,	&dsp32c_device::subr_di,	&dsp32c_device::addr_di,	&dsp32c_device::sub_di,		&dsp32c_device::illegal,	&dsp32c_device::andc_di,	&dsp32c_device::cmp_di,		// 0d
-	&dsp32c_device::xor_di,		&dsp32c_device::illegal,	&dsp32c_device::or_di,		&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::and_di,		&dsp32c_device::test_di,
-	&dsp32c_device::load_hi,	&dsp32c_device::load_hi,	&dsp32c_device::load_li,	&dsp32c_device::load_li,	&dsp32c_device::load_i,		&dsp32c_device::load_i,		&dsp32c_device::load_ei,	&dsp32c_device::load_ei,	// 0e
-	&dsp32c_device::store_hi,	&dsp32c_device::store_hi,	&dsp32c_device::store_li,	&dsp32c_device::store_li,	&dsp32c_device::store_i,	&dsp32c_device::store_i,	&dsp32c_device::store_ei,	&dsp32c_device::store_ei,
-	&dsp32c_device::load_hr,	&dsp32c_device::load_hr,	&dsp32c_device::load_lr,	&dsp32c_device::load_lr,	&dsp32c_device::load_r,		&dsp32c_device::load_r,		&dsp32c_device::load_er,	&dsp32c_device::load_er,	// 0f
-	&dsp32c_device::store_hr,	&dsp32c_device::store_hr,	&dsp32c_device::store_lr,	&dsp32c_device::store_lr,	&dsp32c_device::store_r,	&dsp32c_device::store_r,	&dsp32c_device::store_er,	&dsp32c_device::store_er,
+	&dsp32c_device::add_ss,     &dsp32c_device::mul2_s,     &dsp32c_device::subr_ss,    &dsp32c_device::addr_ss,    &dsp32c_device::sub_ss,     &dsp32c_device::neg_s,      &dsp32c_device::andc_ss,    &dsp32c_device::cmp_ss,     // 0c
+	&dsp32c_device::xor_ss,     &dsp32c_device::rcr_s,      &dsp32c_device::or_ss,      &dsp32c_device::rcl_s,      &dsp32c_device::shr_s,      &dsp32c_device::div2_s,     &dsp32c_device::and_ss,     &dsp32c_device::test_ss,
+	&dsp32c_device::add_di,     &dsp32c_device::illegal,    &dsp32c_device::subr_di,    &dsp32c_device::addr_di,    &dsp32c_device::sub_di,     &dsp32c_device::illegal,    &dsp32c_device::andc_di,    &dsp32c_device::cmp_di,     // 0d
+	&dsp32c_device::xor_di,     &dsp32c_device::illegal,    &dsp32c_device::or_di,      &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::and_di,     &dsp32c_device::test_di,
+	&dsp32c_device::load_hi,    &dsp32c_device::load_hi,    &dsp32c_device::load_li,    &dsp32c_device::load_li,    &dsp32c_device::load_i,     &dsp32c_device::load_i,     &dsp32c_device::load_ei,    &dsp32c_device::load_ei,    // 0e
+	&dsp32c_device::store_hi,   &dsp32c_device::store_hi,   &dsp32c_device::store_li,   &dsp32c_device::store_li,   &dsp32c_device::store_i,    &dsp32c_device::store_i,    &dsp32c_device::store_ei,   &dsp32c_device::store_ei,
+	&dsp32c_device::load_hr,    &dsp32c_device::load_hr,    &dsp32c_device::load_lr,    &dsp32c_device::load_lr,    &dsp32c_device::load_r,     &dsp32c_device::load_r,     &dsp32c_device::load_er,    &dsp32c_device::load_er,    // 0f
+	&dsp32c_device::store_hr,   &dsp32c_device::store_hr,   &dsp32c_device::store_lr,   &dsp32c_device::store_lr,   &dsp32c_device::store_r,    &dsp32c_device::store_r,    &dsp32c_device::store_er,   &dsp32c_device::store_er,
 
-	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 10
-	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
-	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 11
-	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
-	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 12
-	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
-	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 13
-	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    // 10
+	&dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   // 11
+	&dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    // 12
+	&dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   // 13
+	&dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,
 
-	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 14
-	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
-	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 15
-	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
-	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 16
-	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
-	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 17
-	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    // 14
+	&dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   // 15
+	&dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpp,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    &dsp32c_device::d1_aMpm,    // 16
+	&dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmp,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,    &dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   // 17
+	&dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,
 
-	&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		// 18
-	&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,
-	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 19
-	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
-	&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pm,		&dsp32c_device::d1_1pm,		&dsp32c_device::d1_1pm,		&dsp32c_device::d1_1pm,		// 1a
-	&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mm,		&dsp32c_device::d1_1mm,		&dsp32c_device::d1_1mm,		&dsp32c_device::d1_1mm,
-	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 1b
-	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_0px,     &dsp32c_device::d1_0px,     &dsp32c_device::d1_0px,     &dsp32c_device::d1_0px,     &dsp32c_device::d1_0px,     &dsp32c_device::d1_0px,     &dsp32c_device::d1_0px,     &dsp32c_device::d1_0px,     // 18
+	&dsp32c_device::d1_0mx,     &dsp32c_device::d1_0mx,     &dsp32c_device::d1_0mx,     &dsp32c_device::d1_0mx,     &dsp32c_device::d1_0mx,     &dsp32c_device::d1_0mx,     &dsp32c_device::d1_0mx,     &dsp32c_device::d1_0mx,
+	&dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   // 19
+	&dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_1pp,     &dsp32c_device::d1_1pp,     &dsp32c_device::d1_1pp,     &dsp32c_device::d1_1pp,     &dsp32c_device::d1_1pm,     &dsp32c_device::d1_1pm,     &dsp32c_device::d1_1pm,     &dsp32c_device::d1_1pm,     // 1a
+	&dsp32c_device::d1_1mp,     &dsp32c_device::d1_1mp,     &dsp32c_device::d1_1mp,     &dsp32c_device::d1_1mp,     &dsp32c_device::d1_1mm,     &dsp32c_device::d1_1mm,     &dsp32c_device::d1_1mm,     &dsp32c_device::d1_1mm,
+	&dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMppr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   &dsp32c_device::d1_aMpmr,   // 1b
+	&dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmpr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,   &dsp32c_device::d1_aMmmr,
 
-	&dsp32c_device::d4_pp,		&dsp32c_device::d4_pp,		&dsp32c_device::d4_pp,		&dsp32c_device::d4_pp,		&dsp32c_device::d4_pm,		&dsp32c_device::d4_pm,		&dsp32c_device::d4_pm,		&dsp32c_device::d4_pm,		// 1c
-	&dsp32c_device::d4_mp,		&dsp32c_device::d4_mp,		&dsp32c_device::d4_mp,		&dsp32c_device::d4_mp,		&dsp32c_device::d4_mm,		&dsp32c_device::d4_mm,		&dsp32c_device::d4_mm,		&dsp32c_device::d4_mm,
-	&dsp32c_device::d4_ppr,		&dsp32c_device::d4_ppr,		&dsp32c_device::d4_ppr,		&dsp32c_device::d4_ppr,		&dsp32c_device::d4_pmr,		&dsp32c_device::d4_pmr,		&dsp32c_device::d4_pmr,		&dsp32c_device::d4_pmr,		// 1d
-	&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mmr,		&dsp32c_device::d4_mmr,		&dsp32c_device::d4_mmr,		&dsp32c_device::d4_mmr,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 1e
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 1f
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::d4_pp,      &dsp32c_device::d4_pp,      &dsp32c_device::d4_pp,      &dsp32c_device::d4_pp,      &dsp32c_device::d4_pm,      &dsp32c_device::d4_pm,      &dsp32c_device::d4_pm,      &dsp32c_device::d4_pm,      // 1c
+	&dsp32c_device::d4_mp,      &dsp32c_device::d4_mp,      &dsp32c_device::d4_mp,      &dsp32c_device::d4_mp,      &dsp32c_device::d4_mm,      &dsp32c_device::d4_mm,      &dsp32c_device::d4_mm,      &dsp32c_device::d4_mm,
+	&dsp32c_device::d4_ppr,     &dsp32c_device::d4_ppr,     &dsp32c_device::d4_ppr,     &dsp32c_device::d4_ppr,     &dsp32c_device::d4_pmr,     &dsp32c_device::d4_pmr,     &dsp32c_device::d4_pmr,     &dsp32c_device::d4_pmr,     // 1d
+	&dsp32c_device::d4_mpr,     &dsp32c_device::d4_mpr,     &dsp32c_device::d4_mpr,     &dsp32c_device::d4_mpr,     &dsp32c_device::d4_mmr,     &dsp32c_device::d4_mmr,     &dsp32c_device::d4_mmr,     &dsp32c_device::d4_mmr,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 1e
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 1f
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
 
-	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 20
-	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
-	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 21
-	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
-	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 22
-	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
-	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 23
-	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    // 20
+	&dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   // 21
+	&dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    // 22
+	&dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   // 23
+	&dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,
 
-	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 24
-	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
-	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 25
-	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
-	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 26
-	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
-	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 27
-	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    // 24
+	&dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   // 25
+	&dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    // 26
+	&dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   // 27
+	&dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,
 
-	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 28
-	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
-	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 29
-	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
-	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 2a
-	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
-	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 2b
-	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    // 28
+	&dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   // 29
+	&dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpp,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    &dsp32c_device::d2_aMpm,    // 2a
+	&dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmp,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,    &dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMppr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   &dsp32c_device::d2_aMpmr,   // 2b
+	&dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmpr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,   &dsp32c_device::d2_aMmmr,
 
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2c
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2d
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2e
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2f
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 2c
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 2d
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 2e
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 2f
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
 
-	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 30
-	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
-	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 31
-	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
-	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 32
-	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
-	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 33
-	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    // 30
+	&dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   // 31
+	&dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    // 32
+	&dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   // 33
+	&dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,
 
-	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 34
-	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
-	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 35
-	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
-	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 36
-	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
-	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 37
-	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    // 34
+	&dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   // 35
+	&dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    // 36
+	&dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   // 37
+	&dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,
 
-	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 38
-	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
-	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 39
-	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
-	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 3a
-	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
-	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 3b
-	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    // 38
+	&dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   // 39
+	&dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpp,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    &dsp32c_device::d3_aMpm,    // 3a
+	&dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmp,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,    &dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMppr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   &dsp32c_device::d3_aMpmr,   // 3b
+	&dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmpr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,   &dsp32c_device::d3_aMmmr,
 
-	&dsp32c_device::d5_ic,		&dsp32c_device::d5_ic,		&dsp32c_device::d5_ic,		&dsp32c_device::d5_ic,		&dsp32c_device::d5_oc,		&dsp32c_device::d5_oc,		&dsp32c_device::d5_oc,		&dsp32c_device::d5_oc,		// 3c
-	&dsp32c_device::d5_float,	&dsp32c_device::d5_float,	&dsp32c_device::d5_float,	&dsp32c_device::d5_float,	&dsp32c_device::d5_int,		&dsp32c_device::d5_int,		&dsp32c_device::d5_int,		&dsp32c_device::d5_int,
-	&dsp32c_device::d5_round,	&dsp32c_device::d5_round,	&dsp32c_device::d5_round,	&dsp32c_device::d5_round,	&dsp32c_device::d5_ifalt,	&dsp32c_device::d5_ifalt,	&dsp32c_device::d5_ifalt,	&dsp32c_device::d5_ifalt,	// 3d
-	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifagt,	&dsp32c_device::d5_ifagt,	&dsp32c_device::d5_ifagt,	&dsp32c_device::d5_ifagt,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 3e
-	&dsp32c_device::d5_float24,	&dsp32c_device::d5_float24,	&dsp32c_device::d5_float24,	&dsp32c_device::d5_float24,	&dsp32c_device::d5_int24,	&dsp32c_device::d5_int24,	&dsp32c_device::d5_int24,	&dsp32c_device::d5_int24,
-	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_dsp,		&dsp32c_device::d5_dsp,		&dsp32c_device::d5_dsp,		&dsp32c_device::d5_dsp,		// 3f
-	&dsp32c_device::d5_seed,	&dsp32c_device::d5_seed,	&dsp32c_device::d5_seed,	&dsp32c_device::d5_seed,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::d5_ic,      &dsp32c_device::d5_ic,      &dsp32c_device::d5_ic,      &dsp32c_device::d5_ic,      &dsp32c_device::d5_oc,      &dsp32c_device::d5_oc,      &dsp32c_device::d5_oc,      &dsp32c_device::d5_oc,      // 3c
+	&dsp32c_device::d5_float,   &dsp32c_device::d5_float,   &dsp32c_device::d5_float,   &dsp32c_device::d5_float,   &dsp32c_device::d5_int,     &dsp32c_device::d5_int,     &dsp32c_device::d5_int,     &dsp32c_device::d5_int,
+	&dsp32c_device::d5_round,   &dsp32c_device::d5_round,   &dsp32c_device::d5_round,   &dsp32c_device::d5_round,   &dsp32c_device::d5_ifalt,   &dsp32c_device::d5_ifalt,   &dsp32c_device::d5_ifalt,   &dsp32c_device::d5_ifalt,   // 3d
+	&dsp32c_device::d5_ifaeq,   &dsp32c_device::d5_ifaeq,   &dsp32c_device::d5_ifaeq,   &dsp32c_device::d5_ifaeq,   &dsp32c_device::d5_ifagt,   &dsp32c_device::d5_ifagt,   &dsp32c_device::d5_ifagt,   &dsp32c_device::d5_ifagt,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 3e
+	&dsp32c_device::d5_float24, &dsp32c_device::d5_float24, &dsp32c_device::d5_float24, &dsp32c_device::d5_float24, &dsp32c_device::d5_int24,   &dsp32c_device::d5_int24,   &dsp32c_device::d5_int24,   &dsp32c_device::d5_int24,
+	&dsp32c_device::d5_ieee,    &dsp32c_device::d5_ieee,    &dsp32c_device::d5_ieee,    &dsp32c_device::d5_ieee,    &dsp32c_device::d5_dsp,     &dsp32c_device::d5_dsp,     &dsp32c_device::d5_dsp,     &dsp32c_device::d5_dsp,     // 3f
+	&dsp32c_device::d5_seed,    &dsp32c_device::d5_seed,    &dsp32c_device::d5_seed,    &dsp32c_device::d5_seed,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
 
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 40
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 41
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 42
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 43
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 40
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 41
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 42
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 43
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
 
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 44
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 45
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::do_i,		&dsp32c_device::do_r,		&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 46
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 47
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 44
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 45
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::do_i,       &dsp32c_device::do_r,       &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 46
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 47
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
 
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 48
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 49
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	// 4a
-	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,
-	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	// 4b
-	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 48
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 49
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    // 4a
+	&dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,
+	&dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    // 4b
+	&dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,    &dsp32c_device::adde_si,
 
-	&dsp32c_device::adde_ss,	&dsp32c_device::mul2e_s,	&dsp32c_device::subre_ss,	&dsp32c_device::addre_ss,	&dsp32c_device::sube_ss,	&dsp32c_device::nege_s,		&dsp32c_device::andce_ss,	&dsp32c_device::cmpe_ss,	// 4c
-	&dsp32c_device::xore_ss,	&dsp32c_device::rcre_s,		&dsp32c_device::ore_ss,		&dsp32c_device::rcle_s,		&dsp32c_device::shre_s,		&dsp32c_device::div2e_s,	&dsp32c_device::ande_ss,	&dsp32c_device::teste_ss,
-	&dsp32c_device::adde_di,	&dsp32c_device::illegal,	&dsp32c_device::subre_di,	&dsp32c_device::addre_di,	&dsp32c_device::sube_di,	&dsp32c_device::illegal,	&dsp32c_device::andce_di,	&dsp32c_device::cmpe_di,	// 4d
-	&dsp32c_device::xore_di,	&dsp32c_device::illegal,	&dsp32c_device::ore_di,		&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::ande_di,	&dsp32c_device::teste_di,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 4e
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 4f
-	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::adde_ss,    &dsp32c_device::mul2e_s,    &dsp32c_device::subre_ss,   &dsp32c_device::addre_ss,   &dsp32c_device::sube_ss,    &dsp32c_device::nege_s,     &dsp32c_device::andce_ss,   &dsp32c_device::cmpe_ss,    // 4c
+	&dsp32c_device::xore_ss,    &dsp32c_device::rcre_s,     &dsp32c_device::ore_ss,     &dsp32c_device::rcle_s,     &dsp32c_device::shre_s,     &dsp32c_device::div2e_s,    &dsp32c_device::ande_ss,    &dsp32c_device::teste_ss,
+	&dsp32c_device::adde_di,    &dsp32c_device::illegal,    &dsp32c_device::subre_di,   &dsp32c_device::addre_di,   &dsp32c_device::sube_di,    &dsp32c_device::illegal,    &dsp32c_device::andce_di,   &dsp32c_device::cmpe_di,    // 4d
+	&dsp32c_device::xore_di,    &dsp32c_device::illegal,    &dsp32c_device::ore_di,     &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::ande_di,    &dsp32c_device::teste_di,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 4e
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    // 4f
+	&dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,    &dsp32c_device::illegal,
 
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 50
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 51
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 52
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 53
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 50
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 51
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 52
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 53
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
 
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 54
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 55
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 56
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 57
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 54
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 55
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 56
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 57
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
 
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 58
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 59
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5a
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5b
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 58
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 59
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 5a
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 5b
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
 
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5c
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5d
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5e
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5f
-	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 5c
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 5d
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 5e
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     // 5f
+	&dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,     &dsp32c_device::goto24,
 
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 60
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 61
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 62
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 63
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 60
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 61
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 62
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 63
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
 
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 64
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 65
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 66
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 67
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 64
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 65
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 66
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 67
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
 
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 68
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 69
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6a
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6b
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 68
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 69
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 6a
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 6b
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
 
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6c
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6d
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6e
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6f
-	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 6c
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 6d
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 6e
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     // 6f
+	&dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,     &dsp32c_device::load24,
 
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 70
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 71
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 72
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 73
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 70
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 71
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 72
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 73
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
 
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 74
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 75
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 76
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 77
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 74
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 75
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 76
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 77
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
 
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 78
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 79
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7a
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7b
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 78
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 79
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 7a
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 7b
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
 
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7c
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7d
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7e
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7f
-	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 7c
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 7d
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 7e
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     // 7f
+	&dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24,     &dsp32c_device::call24
 };
 
 

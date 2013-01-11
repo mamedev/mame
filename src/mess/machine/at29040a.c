@@ -34,7 +34,7 @@
 */
 at29040a_device::at29040a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, AT29040A, "ATMEL 29040A 512K*8 FEEPROM", tag, owner, clock),
-  device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this)
 {
 }
 
@@ -160,11 +160,11 @@ READ8_MEMBER( at29040a_device::read )
 		switch (offset)
 		{
 		case 0x00000:
-			reply = 0x1f;		// Manufacturer code
+			reply = 0x1f;       // Manufacturer code
 			break;
 
 		case 0x00001:
-			reply = 0xa4;		// Device code
+			reply = 0xa4;       // Device code
 			break;
 
 		case 0x00002:
@@ -183,7 +183,7 @@ READ8_MEMBER( at29040a_device::read )
 	else if ((m_pgm == PGM_2) || (m_pgm == PGM_3))
 	{
 		if (m_pgm == PGM_2)
-		{	// DATA* polling starts the programming cycle (right???)
+		{   // DATA* polling starts the programming cycle (right???)
 			m_pgm = PGM_3;
 			/* max delay 10ms, typical delay 5 to 7 ms */
 			m_programming_timer->adjust(attotime::from_msec(5));
@@ -371,7 +371,7 @@ WRITE8_MEMBER( at29040a_device::write )
 	}
 
 	if (((m_pgm == PGM_0) && !m_sdp)  // write directly
-		|| (m_pgm == PGM_1))		  // write after unlocking
+		|| (m_pgm == PGM_1))          // write after unlocking
 	{
 		if (((offset < BOOT_BLOCK_SIZE) && m_lower_bbl)
 			|| ((offset >= FEEPROM_SIZE-BOOT_BLOCK_SIZE) && m_higher_bbl))
@@ -385,7 +385,7 @@ WRITE8_MEMBER( at29040a_device::write )
 			m_disabling_sdb = false;
 		}
 		else
-		{	/* enter programming mode */
+		{   /* enter programming mode */
 			if (VERBOSE>7) LOG("at29040a: enter programming mode (m_pgm=%d)\n", m_pgm);
 			memset(m_programming_buffer, 0xff, SECTOR_SIZE);
 			m_pgm = PGM_2;
@@ -397,7 +397,7 @@ WRITE8_MEMBER( at29040a_device::write )
 		if (VERBOSE>7) LOG("at29040a: Write data to programming buffer\n");
 		m_programming_buffer[offset & 0xff] = data;
 		m_programming_last_offset = offset;
-		m_programming_timer->adjust(attotime::from_usec(150));	// next byte must be written before the timer expires
+		m_programming_timer->adjust(attotime::from_usec(150));  // next byte must be written before the timer expires
 	}
 }
 
@@ -424,9 +424,9 @@ void at29040a_device::device_reset(void)
 		m_eememory[1] = 0;
 	}
 
-	m_lower_bbl =	((m_eememory[1] & 0x04)!=0);
-	m_higher_bbl =	((m_eememory[1] & 0x02)!=0);
-	m_sdp = 		((m_eememory[1] & 0x01)!=0);
+	m_lower_bbl =   ((m_eememory[1] & 0x04)!=0);
+	m_higher_bbl =  ((m_eememory[1] & 0x02)!=0);
+	m_sdp =         ((m_eememory[1] & 0x01)!=0);
 
 	if (VERBOSE>7) LOG("at29040a (%s): LowerBBL = %d, HigherBBL = %d, SoftDataProt = %d\n", tag(), m_lower_bbl, m_higher_bbl, m_sdp);
 

@@ -12,7 +12,7 @@
 UINT32 nascom1_state::screen_update_nascom1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *videoram = m_videoram;
-	int	sy, sx;
+	int sy, sx;
 
 	for (sx = 0; sx < 48; sx++)
 	{
@@ -36,7 +36,7 @@ UINT32 nascom1_state::screen_update_nascom1(screen_device &screen, bitmap_ind16 
 UINT32 nascom1_state::screen_update_nascom2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *videoram = m_videoram;
-	int	sy, sx;
+	int sy, sx;
 
 	for (sx = 0; sx < 48; sx++)
 	{
@@ -56,4 +56,3 @@ UINT32 nascom1_state::screen_update_nascom2(screen_device &screen, bitmap_ind16 
 	}
 	return 0;
 }
-

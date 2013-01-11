@@ -117,7 +117,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	munchmo_state *state = machine.driver_data<munchmo_state>();
 	int scroll = state->m_vreg[6];
-	int flags = state->m_vreg[7];							/*   XB?????? */
+	int flags = state->m_vreg[7];                           /*   XB?????? */
 	int xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);
 	int bank = (flags & 0x40) ? 1 : 0;
 	gfx_element *gfx = machine.gfx[2 + bank];
@@ -129,10 +129,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		for (j = 0; j < 8; j++)
 		{
 			int offs = (j << 6) | (i & 0x3f);
-			int tile_number = state->m_sprite_tile[offs];		/*   ETTTTTTT */
-			int attributes = state->m_sprite_attr[offs];		/*   XYYYYYCC */
-			int sx = state->m_sprite_xpos[offs];				/*   XXXXXXX? */
-			int sy = (offs >> 6) << 5;					/* Y YY------ */
+			int tile_number = state->m_sprite_tile[offs];       /*   ETTTTTTT */
+			int attributes = state->m_sprite_attr[offs];        /*   XYYYYYCC */
+			int sx = state->m_sprite_xpos[offs];                /*   XXXXXXX? */
+			int sy = (offs >> 6) << 5;                  /* Y YY------ */
 			sy += (attributes >> 2) & 0x1f;
 			if( attributes & 0x80 )
 			{
@@ -141,7 +141,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				drawgfx_transpen( bitmap, cliprect, gfx,
 					0x7f - (tile_number & 0x7f),
 					color_base - (attributes & 0x03),
-					0,0,							/* no flip */
+					0,0,                            /* no flip */
 					sx,sy, 7 );
 			}
 		}

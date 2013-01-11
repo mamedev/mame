@@ -291,11 +291,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-									 const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map)
+										const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, name, tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
-	  m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
-      m_icount(0)
+		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
+		m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
+		m_icount(0)
 {
 	// build the opcode table
 	for (int op = 0; op < 256; op++)
@@ -504,78 +504,78 @@ void hyperstone_device::hyperstone_set_trap_entry(int which)
 	}
 }
 
-#define OP  			m_op
-#define PPC				m_ppc //previous pc
-#define PC				m_global_regs[0] //Program Counter
-#define SR				m_global_regs[1] //Status Register
-#define FER				m_global_regs[2] //Floating-Point Exception Register
+#define OP              m_op
+#define PPC             m_ppc //previous pc
+#define PC              m_global_regs[0] //Program Counter
+#define SR              m_global_regs[1] //Status Register
+#define FER             m_global_regs[2] //Floating-Point Exception Register
 // 03 - 15  General Purpose Registers
 // 16 - 17  Reserved
-#define SP				m_global_regs[18] //Stack Pointer
-#define UB				m_global_regs[19] //Upper Stack Bound
-#define BCR				m_global_regs[20] //Bus Control Register
-#define TPR				m_global_regs[21] //Timer Prescaler Register
-#define TCR				m_global_regs[22] //Timer Compare Register
-#define TR				compute_tr() //Timer Register
-#define WCR				m_global_regs[24] //Watchdog Compare Register
-#define ISR				m_global_regs[25] //Input Status Register
-#define FCR				m_global_regs[26] //Function Control Register
-#define MCR				m_global_regs[27] //Memory Control Register
+#define SP              m_global_regs[18] //Stack Pointer
+#define UB              m_global_regs[19] //Upper Stack Bound
+#define BCR             m_global_regs[20] //Bus Control Register
+#define TPR             m_global_regs[21] //Timer Prescaler Register
+#define TCR             m_global_regs[22] //Timer Compare Register
+#define TR              compute_tr() //Timer Register
+#define WCR             m_global_regs[24] //Watchdog Compare Register
+#define ISR             m_global_regs[25] //Input Status Register
+#define FCR             m_global_regs[26] //Function Control Register
+#define MCR             m_global_regs[27] //Memory Control Register
 // 28 - 31  Reserved
 
 /* SR flags */
-#define GET_C					( SR & 0x00000001)      // bit 0 //CARRY
-#define GET_Z					((SR & 0x00000002)>>1)  // bit 1 //ZERO
-#define GET_N					((SR & 0x00000004)>>2)  // bit 2 //NEGATIVE
-#define GET_V					((SR & 0x00000008)>>3)  // bit 3 //OVERFLOW
-#define GET_M					((SR & 0x00000010)>>4)  // bit 4 //CACHE-MODE
-#define GET_H					((SR & 0x00000020)>>5)  // bit 5 //HIGHGLOBAL
+#define GET_C                   ( SR & 0x00000001)      // bit 0 //CARRY
+#define GET_Z                   ((SR & 0x00000002)>>1)  // bit 1 //ZERO
+#define GET_N                   ((SR & 0x00000004)>>2)  // bit 2 //NEGATIVE
+#define GET_V                   ((SR & 0x00000008)>>3)  // bit 3 //OVERFLOW
+#define GET_M                   ((SR & 0x00000010)>>4)  // bit 4 //CACHE-MODE
+#define GET_H                   ((SR & 0x00000020)>>5)  // bit 5 //HIGHGLOBAL
 // bit 6 RESERVED (always 0)
-#define GET_I					((SR & 0x00000080)>>7)  // bit 7 //INTERRUPT-MODE
-#define GET_FTE					((SR & 0x00001f00)>>8)  // bits 12 - 8  //Floating-Point Trap Enable
-#define GET_FRM					((SR & 0x00006000)>>13) // bits 14 - 13 //Floating-Point Rounding Mode
-#define GET_L					((SR & 0x00008000)>>15) // bit 15 //INTERRUPT-LOCK
-#define GET_T					((SR & 0x00010000)>>16) // bit 16 //TRACE-MODE
-#define GET_P					((SR & 0x00020000)>>17) // bit 17 //TRACE PENDING
-#define GET_S					((SR & 0x00040000)>>18) // bit 18 //SUPERVISOR STATE
-#define GET_ILC					((SR & 0x00180000)>>19) // bits 20 - 19 //INSTRUCTION-LENGTH
+#define GET_I                   ((SR & 0x00000080)>>7)  // bit 7 //INTERRUPT-MODE
+#define GET_FTE                 ((SR & 0x00001f00)>>8)  // bits 12 - 8  //Floating-Point Trap Enable
+#define GET_FRM                 ((SR & 0x00006000)>>13) // bits 14 - 13 //Floating-Point Rounding Mode
+#define GET_L                   ((SR & 0x00008000)>>15) // bit 15 //INTERRUPT-LOCK
+#define GET_T                   ((SR & 0x00010000)>>16) // bit 16 //TRACE-MODE
+#define GET_P                   ((SR & 0x00020000)>>17) // bit 17 //TRACE PENDING
+#define GET_S                   ((SR & 0x00040000)>>18) // bit 18 //SUPERVISOR STATE
+#define GET_ILC                 ((SR & 0x00180000)>>19) // bits 20 - 19 //INSTRUCTION-LENGTH
 /* if FL is zero it is always interpreted as 16 */
-#define GET_FL					((SR & 0x01e00000) ? ((SR & 0x01e00000)>>21) : 16) // bits 24 - 21 //FRAME LENGTH
-#define GET_FP					((SR & 0xfe000000)>>25) // bits 31 - 25 //FRAME POINTER
+#define GET_FL                  ((SR & 0x01e00000) ? ((SR & 0x01e00000)>>21) : 16) // bits 24 - 21 //FRAME LENGTH
+#define GET_FP                  ((SR & 0xfe000000)>>25) // bits 31 - 25 //FRAME POINTER
 
-#define SET_C(val)				(SR = (SR & ~0x00000001) | (val))
-#define SET_Z(val)				(SR = (SR & ~0x00000002) | ((val) << 1))
-#define SET_N(val)				(SR = (SR & ~0x00000004) | ((val) << 2))
-#define SET_V(val)				(SR = (SR & ~0x00000008) | ((val) << 3))
-#define SET_M(val)				(SR = (SR & ~0x00000010) | ((val) << 4))
-#define SET_H(val)				(SR = (SR & ~0x00000020) | ((val) << 5))
-#define SET_I(val)				(SR = (SR & ~0x00000080) | ((val) << 7))
-#define SET_FTE(val)			(SR = (SR & ~0x00001f00) | ((val) << 8))
-#define	SET_FRM(val)			(SR = (SR & ~0x00006000) | ((val) << 13))
-#define SET_L(val)				(SR = (SR & ~0x00008000) | ((val) << 15))
-#define SET_T(val)				(SR = (SR & ~0x00010000) | ((val) << 16))
-#define SET_P(val)				(SR = (SR & ~0x00020000) | ((val) << 17))
-#define SET_S(val)				(SR = (SR & ~0x00040000) | ((val) << 18))
-#define SET_ILC(val)			(SR = (SR & ~0x00180000) | ((val) << 19))
-#define SET_FL(val)				(SR = (SR & ~0x01e00000) | ((val) << 21))
-#define SET_FP(val)				(SR = (SR & ~0xfe000000) | ((val) << 25))
+#define SET_C(val)              (SR = (SR & ~0x00000001) | (val))
+#define SET_Z(val)              (SR = (SR & ~0x00000002) | ((val) << 1))
+#define SET_N(val)              (SR = (SR & ~0x00000004) | ((val) << 2))
+#define SET_V(val)              (SR = (SR & ~0x00000008) | ((val) << 3))
+#define SET_M(val)              (SR = (SR & ~0x00000010) | ((val) << 4))
+#define SET_H(val)              (SR = (SR & ~0x00000020) | ((val) << 5))
+#define SET_I(val)              (SR = (SR & ~0x00000080) | ((val) << 7))
+#define SET_FTE(val)            (SR = (SR & ~0x00001f00) | ((val) << 8))
+#define SET_FRM(val)            (SR = (SR & ~0x00006000) | ((val) << 13))
+#define SET_L(val)              (SR = (SR & ~0x00008000) | ((val) << 15))
+#define SET_T(val)              (SR = (SR & ~0x00010000) | ((val) << 16))
+#define SET_P(val)              (SR = (SR & ~0x00020000) | ((val) << 17))
+#define SET_S(val)              (SR = (SR & ~0x00040000) | ((val) << 18))
+#define SET_ILC(val)            (SR = (SR & ~0x00180000) | ((val) << 19))
+#define SET_FL(val)             (SR = (SR & ~0x01e00000) | ((val) << 21))
+#define SET_FP(val)             (SR = (SR & ~0xfe000000) | ((val) << 25))
 
-#define SET_PC(val)				PC = ((val) & 0xfffffffe) //PC(0) = 0
-#define SET_SP(val)				SP = ((val) & 0xfffffffc) //SP(0) = SP(1) = 0
-#define SET_UB(val)				UB = ((val) & 0xfffffffc) //UB(0) = UB(1) = 0
+#define SET_PC(val)             PC = ((val) & 0xfffffffe) //PC(0) = 0
+#define SET_SP(val)             SP = ((val) & 0xfffffffc) //SP(0) = SP(1) = 0
+#define SET_UB(val)             UB = ((val) & 0xfffffffc) //UB(0) = UB(1) = 0
 
-#define SET_LOW_SR(val)			(SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
+#define SET_LOW_SR(val)         (SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
 
 
-#define CHECK_C(x)				(SR = (SR & ~0x00000001) | (((x) & (((UINT64)1) << 32)) ? 1 : 0 ))
-#define CHECK_VADD(x,y,z)		(SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 8: 0))
-#define CHECK_VADD3(x,y,w,z)	(SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) ? 8: 0))
-#define CHECK_VSUB(x,y,z)		(SR = (SR & ~0x00000008) | ((((z) ^ (y)) & ((y) ^ (x)) & 0x80000000) ? 8: 0))
+#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (((x) & (((UINT64)1) << 32)) ? 1 : 0 ))
+#define CHECK_VADD(x,y,z)       (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 8: 0))
+#define CHECK_VADD3(x,y,w,z)    (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) ? 8: 0))
+#define CHECK_VSUB(x,y,z)       (SR = (SR & ~0x00000008) | ((((z) ^ (y)) & ((y) ^ (x)) & 0x80000000) ? 8: 0))
 
 
 /* FER flags */
-#define GET_ACCRUED				(FER & 0x0000001f) //bits  4 - 0 //Floating-Point Accrued Exceptions
-#define GET_ACTUAL				(FER & 0x00001f00) //bits 12 - 8 //Floating-Point Actual  Exceptions
+#define GET_ACCRUED             (FER & 0x0000001f) //bits  4 - 0 //Floating-Point Accrued Exceptions
+#define GET_ACTUAL              (FER & 0x00001f00) //bits 12 - 8 //Floating-Point Actual  Exceptions
 //other bits are reversed, in particular 7 - 5 for the operating system.
 //the user program can only changes the above 2 flags
 
@@ -788,21 +788,21 @@ void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
 				adjust_timer_interrupt();
 				break;
 
-            case TCR_REGISTER:
-            	if (oldval != val)
-            	{
+			case TCR_REGISTER:
+				if (oldval != val)
+				{
 					adjust_timer_interrupt();
 					if (m_intblock < 1)
 						m_intblock = 1;
 				}
-                break;
+				break;
 
-            case FCR_REGISTER:
-            	if ((oldval ^ val) & 0x00800000)
+			case FCR_REGISTER:
+				if ((oldval ^ val) & 0x00800000)
 					adjust_timer_interrupt();
 				if (m_intblock < 1)
 					m_intblock = 1;
-                break;
+				break;
 
 			case MCR_REGISTER:
 				// bits 14..12 EntryTableMap
@@ -813,19 +813,19 @@ void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
 	}
 }
 
-#define GET_ABS_L_REG(code)			m_local_regs[code]
-#define SET_L_REG(code, val)	    set_local_register(code, val)
-#define SET_ABS_L_REG(code, val)	m_local_regs[code] = val
-#define GET_G_REG(code)				get_global_register(code)
-#define SET_G_REG(code, val)	    set_global_register(code, val)
+#define GET_ABS_L_REG(code)         m_local_regs[code]
+#define SET_L_REG(code, val)        set_local_register(code, val)
+#define SET_ABS_L_REG(code, val)    m_local_regs[code] = val
+#define GET_G_REG(code)             get_global_register(code)
+#define SET_G_REG(code, val)        set_global_register(code, val)
 
-#define S_BIT					((OP & 0x100) >> 8)
-#define N_BIT					S_BIT
-#define D_BIT					((OP & 0x200) >> 9)
-#define N_VALUE					((N_BIT << 4) | (OP & 0x0f))
-#define DST_CODE				((OP & 0xf0) >> 4)
-#define SRC_CODE				(OP & 0x0f)
-#define SIGN_BIT(val)			((val & 0x80000000) >> 31)
+#define S_BIT                   ((OP & 0x100) >> 8)
+#define N_BIT                   S_BIT
+#define D_BIT                   ((OP & 0x200) >> 9)
+#define N_VALUE                 ((N_BIT << 4) | (OP & 0x0f))
+#define DST_CODE                ((OP & 0xf0) >> 4)
+#define SRC_CODE                (OP & 0x0f)
+#define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
 
 #define LOCAL  1
 
@@ -837,430 +837,430 @@ static const INT32 immediate_values[32] =
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
 
-#define WRITE_ONLY_REGMASK	((1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER))
+#define WRITE_ONLY_REGMASK  ((1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER))
 
-#define decode_source(decode, local, hflag)											\
-do																					\
-{																					\
-	if(local)																		\
-	{																				\
-		UINT8 code = (decode)->src;													\
-		(decode)->src_is_local = 1;													\
+#define decode_source(decode, local, hflag)                                         \
+do                                                                                  \
+{                                                                                   \
+	if(local)                                                                       \
+	{                                                                               \
+		UINT8 code = (decode)->src;                                                 \
+		(decode)->src_is_local = 1;                                                 \
 		code = ((decode)->src + GET_FP) % 64; /* registers offset by frame pointer  */\
-		SREG = m_local_regs[code];													\
-		code = ((decode)->src + 1 + GET_FP) % 64;									\
-		SREGF = m_local_regs[code];													\
-	}																				\
-	else																			\
-	{																				\
-		(decode)->src_is_local = 0;													\
+		SREG = m_local_regs[code];                                                  \
+		code = ((decode)->src + 1 + GET_FP) % 64;                                   \
+		SREGF = m_local_regs[code];                                                 \
+	}                                                                               \
+	else                                                                            \
+	{                                                                               \
+		(decode)->src_is_local = 0;                                                 \
 																					\
-		if (!hflag)																	\
-		{																			\
-			SREG = get_global_register((decode)->src);								\
+		if (!hflag)                                                                 \
+		{                                                                           \
+			SREG = get_global_register((decode)->src);                              \
 																					\
-			/* bound safe */														\
-			if ((decode)->src != 15)												\
-				SREGF = get_global_register((decode)->src + 1);						\
-		}																			\
-		else																		\
-		{																			\
-			(decode)->src += 16;													\
+			/* bound safe */                                                        \
+			if ((decode)->src != 15)                                                \
+				SREGF = get_global_register((decode)->src + 1);                     \
+		}                                                                           \
+		else                                                                        \
+		{                                                                           \
+			(decode)->src += 16;                                                    \
 																					\
-			SREG = get_global_register((decode)->src);								\
-			if ((WRITE_ONLY_REGMASK >> (decode)->src) & 1)							\
-				SREG = 0; /* write-only registers */								\
-			else if ((decode)->src == ISR_REGISTER)									\
-				DEBUG_PRINTF(("read src ISR. PC = %08X\n",PPC));					\
+			SREG = get_global_register((decode)->src);                              \
+			if ((WRITE_ONLY_REGMASK >> (decode)->src) & 1)                          \
+				SREG = 0; /* write-only registers */                                \
+			else if ((decode)->src == ISR_REGISTER)                                 \
+				DEBUG_PRINTF(("read src ISR. PC = %08X\n",PPC));                    \
 																					\
-			/* bound safe */														\
-			if ((decode)->src != 31)												\
-				SREGF = get_global_register((decode)->src + 1);						\
-		}																			\
-	}																				\
+			/* bound safe */                                                        \
+			if ((decode)->src != 31)                                                \
+				SREGF = get_global_register((decode)->src + 1);                     \
+		}                                                                           \
+	}                                                                               \
 } while (0)
 
-#define decode_dest(decode, local, hflag)											\
-do																					\
-{																					\
-	if(local)																		\
-	{																				\
-		UINT8 code = (decode)->dst;													\
-		(decode)->dst_is_local = 1;													\
+#define decode_dest(decode, local, hflag)                                           \
+do                                                                                  \
+{                                                                                   \
+	if(local)                                                                       \
+	{                                                                               \
+		UINT8 code = (decode)->dst;                                                 \
+		(decode)->dst_is_local = 1;                                                 \
 		code = ((decode)->dst + GET_FP) % 64; /* registers offset by frame pointer */\
-		DREG = m_local_regs[code];													\
-		code = ((decode)->dst + 1 + GET_FP) % 64;									\
-		DREGF = m_local_regs[code];													\
-	}																				\
-	else																			\
-	{																				\
-		(decode)->dst_is_local = 0;													\
+		DREG = m_local_regs[code];                                                  \
+		code = ((decode)->dst + 1 + GET_FP) % 64;                                   \
+		DREGF = m_local_regs[code];                                                 \
+	}                                                                               \
+	else                                                                            \
+	{                                                                               \
+		(decode)->dst_is_local = 0;                                                 \
 																					\
-		if (!hflag)																	\
-		{																			\
-			DREG = get_global_register((decode)->dst);								\
+		if (!hflag)                                                                 \
+		{                                                                           \
+			DREG = get_global_register((decode)->dst);                              \
 																					\
-			/* bound safe */														\
-			if ((decode)->dst != 15)												\
-				DREGF = get_global_register((decode)->dst + 1);						\
-		}																			\
-		else																		\
-		{																			\
-			(decode)->dst += 16;													\
+			/* bound safe */                                                        \
+			if ((decode)->dst != 15)                                                \
+				DREGF = get_global_register((decode)->dst + 1);                     \
+		}                                                                           \
+		else                                                                        \
+		{                                                                           \
+			(decode)->dst += 16;                                                    \
 																					\
-			DREG = get_global_register((decode)->dst);								\
-			if( (decode)->dst == ISR_REGISTER )										\
-				DEBUG_PRINTF(("read dst ISR. PC = %08X\n",PPC));					\
+			DREG = get_global_register((decode)->dst);                              \
+			if( (decode)->dst == ISR_REGISTER )                                     \
+				DEBUG_PRINTF(("read dst ISR. PC = %08X\n",PPC));                    \
 																					\
-			/* bound safe */														\
-			if ((decode)->dst != 31)												\
-				DREGF = get_global_register((decode)->dst + 1);						\
-		}																			\
-	}																				\
+			/* bound safe */                                                        \
+			if ((decode)->dst != 31)                                                \
+				DREGF = get_global_register((decode)->dst + 1);                     \
+		}                                                                           \
+	}                                                                               \
 } while (0)
 
-#define decode_RR(decode, dlocal, slocal)											\
-do																					\
-{																					\
-	(decode)->src = SRC_CODE;														\
-	(decode)->dst = DST_CODE;														\
-	decode_source(decode, slocal, 0);												\
-	decode_dest(decode, dlocal, 0);													\
+#define decode_RR(decode, dlocal, slocal)                                           \
+do                                                                                  \
+{                                                                                   \
+	(decode)->src = SRC_CODE;                                                       \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_source(decode, slocal, 0);                                               \
+	decode_dest(decode, dlocal, 0);                                                 \
 																					\
-	if( (slocal) == (dlocal) && SRC_CODE == DST_CODE )								\
-		SAME_SRC_DST = 1;															\
+	if( (slocal) == (dlocal) && SRC_CODE == DST_CODE )                              \
+		SAME_SRC_DST = 1;                                                           \
 																					\
-	if( (slocal) == LOCAL && (dlocal) == LOCAL )									\
-	{																				\
-		if( SRC_CODE == ((DST_CODE + 1) % 64) )										\
-			SAME_SRC_DSTF = 1;														\
+	if( (slocal) == LOCAL && (dlocal) == LOCAL )                                    \
+	{                                                                               \
+		if( SRC_CODE == ((DST_CODE + 1) % 64) )                                     \
+			SAME_SRC_DSTF = 1;                                                      \
 																					\
-		if( ((SRC_CODE + 1) % 64) == DST_CODE )										\
-			SAME_SRCF_DST = 1;														\
-	}																				\
-	else if( (slocal) == 0 && (dlocal) == 0 )										\
-	{																				\
-		if( SRC_CODE == (DST_CODE + 1) )											\
-			SAME_SRC_DSTF = 1;														\
+		if( ((SRC_CODE + 1) % 64) == DST_CODE )                                     \
+			SAME_SRCF_DST = 1;                                                      \
+	}                                                                               \
+	else if( (slocal) == 0 && (dlocal) == 0 )                                       \
+	{                                                                               \
+		if( SRC_CODE == (DST_CODE + 1) )                                            \
+			SAME_SRC_DSTF = 1;                                                      \
 																					\
-		if( (SRC_CODE + 1) == DST_CODE )											\
-			SAME_SRCF_DST = 1;														\
-	}																				\
+		if( (SRC_CODE + 1) == DST_CODE )                                            \
+			SAME_SRCF_DST = 1;                                                      \
+	}                                                                               \
 } while (0)
 
-#define decode_LL(decode)															\
-do																					\
-{																					\
-	(decode)->src = SRC_CODE;														\
-	(decode)->dst = DST_CODE;														\
-	decode_source(decode, LOCAL, 0);												\
-	decode_dest(decode, LOCAL, 0);													\
+#define decode_LL(decode)                                                           \
+do                                                                                  \
+{                                                                                   \
+	(decode)->src = SRC_CODE;                                                       \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_source(decode, LOCAL, 0);                                                \
+	decode_dest(decode, LOCAL, 0);                                                  \
 																					\
-	if( SRC_CODE == DST_CODE )														\
-		SAME_SRC_DST = 1;															\
+	if( SRC_CODE == DST_CODE )                                                      \
+		SAME_SRC_DST = 1;                                                           \
 																					\
-	if( SRC_CODE == ((DST_CODE + 1) % 64) )											\
-		SAME_SRC_DSTF = 1;															\
+	if( SRC_CODE == ((DST_CODE + 1) % 64) )                                         \
+		SAME_SRC_DSTF = 1;                                                          \
 } while (0)
 
-#define decode_LR(decode, slocal)													\
-do																					\
-{																					\
-	(decode)->src = SRC_CODE;														\
-	(decode)->dst = DST_CODE;														\
-	decode_source(decode, slocal, 0);												\
-	decode_dest(decode, LOCAL, 0);													\
+#define decode_LR(decode, slocal)                                                   \
+do                                                                                  \
+{                                                                                   \
+	(decode)->src = SRC_CODE;                                                       \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_source(decode, slocal, 0);                                               \
+	decode_dest(decode, LOCAL, 0);                                                  \
 																					\
-	if( ((SRC_CODE + 1) % 64) == DST_CODE && slocal == LOCAL )						\
-		SAME_SRCF_DST = 1;															\
+	if( ((SRC_CODE + 1) % 64) == DST_CODE && slocal == LOCAL )                      \
+		SAME_SRCF_DST = 1;                                                          \
 } while (0)
 
-#define check_delay_PC()															\
-do																					\
-{																					\
-	/* if PC is used in a delay instruction, the delayed PC should be used */		\
-	if( m_delay.delay_cmd == DELAY_EXECUTE )										\
-	{																				\
-		PC = m_delay.delay_pc;														\
-		m_delay.delay_cmd = NO_DELAY;												\
-	}																				\
+#define check_delay_PC()                                                            \
+do                                                                                  \
+{                                                                                   \
+	/* if PC is used in a delay instruction, the delayed PC should be used */       \
+	if( m_delay.delay_cmd == DELAY_EXECUTE )                                        \
+	{                                                                               \
+		PC = m_delay.delay_pc;                                                      \
+		m_delay.delay_cmd = NO_DELAY;                                               \
+	}                                                                               \
 } while (0)
 
-#define decode_immediate(decode, nbit)												\
-do																					\
-{																					\
-	if (!nbit)																		\
-		EXTRA_U = immediate_values[OP & 0x0f];										\
-	else																			\
-		switch( OP & 0x0f )															\
-		{																			\
-			default:																\
-				EXTRA_U = immediate_values[0x10 + (OP & 0x0f)];						\
-				break;																\
+#define decode_immediate(decode, nbit)                                              \
+do                                                                                  \
+{                                                                                   \
+	if (!nbit)                                                                      \
+		EXTRA_U = immediate_values[OP & 0x0f];                                      \
+	else                                                                            \
+		switch( OP & 0x0f )                                                         \
+		{                                                                           \
+			default:                                                                \
+				EXTRA_U = immediate_values[0x10 + (OP & 0x0f)];                     \
+				break;                                                              \
 																					\
-			case 1:																	\
-				m_instruction_length = 3;											\
-				EXTRA_U = (READ_OP(PC) << 16) | READ_OP(PC + 2);					\
-				PC += 4;															\
-				break;																\
+			case 1:                                                                 \
+				m_instruction_length = 3;                                           \
+				EXTRA_U = (READ_OP(PC) << 16) | READ_OP(PC + 2);                    \
+				PC += 4;                                                            \
+				break;                                                              \
 																					\
-			case 2:																	\
-				m_instruction_length = 2;											\
-				EXTRA_U = READ_OP(PC);												\
-				PC += 2;															\
-				break;																\
+			case 2:                                                                 \
+				m_instruction_length = 2;                                           \
+				EXTRA_U = READ_OP(PC);                                              \
+				PC += 2;                                                            \
+				break;                                                              \
 																					\
-			case 3:																	\
-				m_instruction_length = 2;											\
-				EXTRA_U = 0xffff0000 | READ_OP(PC);									\
-				PC += 2;															\
-				break;																\
-		}																			\
+			case 3:                                                                 \
+				m_instruction_length = 2;                                           \
+				EXTRA_U = 0xffff0000 | READ_OP(PC);                                 \
+				PC += 2;                                                            \
+				break;                                                              \
+		}                                                                           \
 } while (0)
 
-#define decode_const(decode)														\
-do																					\
-{																					\
-	UINT16 imm_1 = READ_OP(PC);														\
+#define decode_const(decode)                                                        \
+do                                                                                  \
+{                                                                                   \
+	UINT16 imm_1 = READ_OP(PC);                                                     \
 																					\
-	PC += 2;																		\
-	m_instruction_length = 2;														\
+	PC += 2;                                                                        \
+	m_instruction_length = 2;                                                       \
 																					\
-	if( E_BIT(imm_1) )																\
-	{																				\
-		UINT16 imm_2 = READ_OP(PC);													\
+	if( E_BIT(imm_1) )                                                              \
+	{                                                                               \
+		UINT16 imm_2 = READ_OP(PC);                                                 \
 																					\
-		PC += 2;																	\
-		m_instruction_length = 3;													\
+		PC += 2;                                                                    \
+		m_instruction_length = 3;                                                   \
 																					\
-		EXTRA_S = imm_2;															\
-		EXTRA_S |= ((imm_1 & 0x3fff) << 16);										\
+		EXTRA_S = imm_2;                                                            \
+		EXTRA_S |= ((imm_1 & 0x3fff) << 16);                                        \
 																					\
-		if( S_BIT_CONST(imm_1) )													\
-		{																			\
-			EXTRA_S |= 0xc0000000;													\
-		}																			\
-	}																				\
-	else																			\
-	{																				\
-		EXTRA_S = imm_1 & 0x3fff;													\
+		if( S_BIT_CONST(imm_1) )                                                    \
+		{                                                                           \
+			EXTRA_S |= 0xc0000000;                                                  \
+		}                                                                           \
+	}                                                                               \
+	else                                                                            \
+	{                                                                               \
+		EXTRA_S = imm_1 & 0x3fff;                                                   \
 																					\
-		if( S_BIT_CONST(imm_1) )													\
-		{																			\
-			EXTRA_S |= 0xffffc000;													\
-		}																			\
-	}																				\
+		if( S_BIT_CONST(imm_1) )                                                    \
+		{                                                                           \
+			EXTRA_S |= 0xffffc000;                                                  \
+		}                                                                           \
+	}                                                                               \
 } while (0)
 
-#define decode_pcrel(decode)														\
-do																					\
-{																					\
-	if( OP & 0x80 )																	\
-	{																				\
-		UINT16 next = READ_OP(PC);													\
+#define decode_pcrel(decode)                                                        \
+do                                                                                  \
+{                                                                                   \
+	if( OP & 0x80 )                                                                 \
+	{                                                                               \
+		UINT16 next = READ_OP(PC);                                                  \
 																					\
-		PC += 2;																	\
-		m_instruction_length = 2;													\
+		PC += 2;                                                                    \
+		m_instruction_length = 2;                                                   \
 																					\
-		EXTRA_S = (OP & 0x7f) << 16;												\
-		EXTRA_S |= (next & 0xfffe);													\
+		EXTRA_S = (OP & 0x7f) << 16;                                                \
+		EXTRA_S |= (next & 0xfffe);                                                 \
 																					\
-		if( next & 1 )																\
-			EXTRA_S |= 0xff800000;													\
-	}																				\
-	else																			\
-	{																				\
-		EXTRA_S = OP & 0x7e;														\
+		if( next & 1 )                                                              \
+			EXTRA_S |= 0xff800000;                                                  \
+	}                                                                               \
+	else                                                                            \
+	{                                                                               \
+		EXTRA_S = OP & 0x7e;                                                        \
 																					\
-		if( OP & 1 )																\
-			EXTRA_S |= 0xffffff80;													\
-	}																				\
+		if( OP & 1 )                                                                \
+			EXTRA_S |= 0xffffff80;                                                  \
+	}                                                                               \
 } while (0)
 
-#define decode_dis(decode)															\
-do																					\
-{																					\
-	UINT16 next_1 = READ_OP(PC);													\
+#define decode_dis(decode)                                                          \
+do                                                                                  \
+{                                                                                   \
+	UINT16 next_1 = READ_OP(PC);                                                    \
 																					\
-	PC += 2;																		\
-	m_instruction_length = 2;														\
+	PC += 2;                                                                        \
+	m_instruction_length = 2;                                                       \
 																					\
-	(decode)->sub_type = DD(next_1);												\
+	(decode)->sub_type = DD(next_1);                                                \
 																					\
-	if( E_BIT(next_1) )																\
-	{																				\
-		UINT16 next_2 = READ_OP(PC);												\
+	if( E_BIT(next_1) )                                                             \
+	{                                                                               \
+		UINT16 next_2 = READ_OP(PC);                                                \
 																					\
-		PC += 2;																	\
-		m_instruction_length = 3;													\
+		PC += 2;                                                                    \
+		m_instruction_length = 3;                                                   \
 																					\
-		EXTRA_S = next_2;															\
-		EXTRA_S |= ((next_1 & 0xfff) << 16);										\
+		EXTRA_S = next_2;                                                           \
+		EXTRA_S |= ((next_1 & 0xfff) << 16);                                        \
 																					\
-		if( S_BIT_CONST(next_1) )													\
-		{																			\
-			EXTRA_S |= 0xf0000000;													\
-		}																			\
-	}																				\
-	else																			\
-	{																				\
-		EXTRA_S = next_1 & 0xfff;													\
+		if( S_BIT_CONST(next_1) )                                                   \
+		{                                                                           \
+			EXTRA_S |= 0xf0000000;                                                  \
+		}                                                                           \
+	}                                                                               \
+	else                                                                            \
+	{                                                                               \
+		EXTRA_S = next_1 & 0xfff;                                                   \
 																					\
-		if( S_BIT_CONST(next_1) )													\
-		{																			\
-			EXTRA_S |= 0xfffff000;													\
-		}																			\
-	}																				\
+		if( S_BIT_CONST(next_1) )                                                   \
+		{                                                                           \
+			EXTRA_S |= 0xfffff000;                                                  \
+		}                                                                           \
+	}                                                                               \
 } while (0)
 
-#define decode_lim(decode)															\
-do																					\
-{																					\
-	UINT32 next = READ_OP(PC);														\
-	PC += 2;																		\
-	m_instruction_length = 2;														\
+#define decode_lim(decode)                                                          \
+do                                                                                  \
+{                                                                                   \
+	UINT32 next = READ_OP(PC);                                                      \
+	PC += 2;                                                                        \
+	m_instruction_length = 2;                                                       \
 																					\
-	(decode)->sub_type = X_CODE(next);												\
+	(decode)->sub_type = X_CODE(next);                                              \
 																					\
-	if( E_BIT(next) )																\
-	{																				\
-		EXTRA_U = ((next & 0xfff) << 16) | READ_OP(PC);								\
-		PC += 2;																	\
-		m_instruction_length = 3;													\
-	}																				\
-	else																			\
-	{																				\
-		EXTRA_U = next & 0xfff;														\
-	}																				\
+	if( E_BIT(next) )                                                               \
+	{                                                                               \
+		EXTRA_U = ((next & 0xfff) << 16) | READ_OP(PC);                             \
+		PC += 2;                                                                    \
+		m_instruction_length = 3;                                                   \
+	}                                                                               \
+	else                                                                            \
+	{                                                                               \
+		EXTRA_U = next & 0xfff;                                                     \
+	}                                                                               \
 } while (0)
 
-#define RRdecode(decode, dlocal, slocal)											\
-do																					\
-{																					\
-	check_delay_PC();																\
-	decode_RR(decode, dlocal, slocal);												\
+#define RRdecode(decode, dlocal, slocal)                                            \
+do                                                                                  \
+{                                                                                   \
+	check_delay_PC();                                                               \
+	decode_RR(decode, dlocal, slocal);                                              \
 } while (0)
 
-#define RRlimdecode(decode, dlocal, slocal)											\
-do																					\
-{																					\
-	decode_lim(decode);																\
-	check_delay_PC();																\
-	decode_RR(decode, dlocal, slocal);												\
+#define RRlimdecode(decode, dlocal, slocal)                                         \
+do                                                                                  \
+{                                                                                   \
+	decode_lim(decode);                                                             \
+	check_delay_PC();                                                               \
+	decode_RR(decode, dlocal, slocal);                                              \
 } while (0)
 
-#define RRconstdecode(decode, dlocal, slocal)										\
-do																					\
-{																					\
-	decode_const(decode);															\
-	check_delay_PC();																\
-	decode_RR(decode, dlocal, slocal);												\
+#define RRconstdecode(decode, dlocal, slocal)                                       \
+do                                                                                  \
+{                                                                                   \
+	decode_const(decode);                                                           \
+	check_delay_PC();                                                               \
+	decode_RR(decode, dlocal, slocal);                                              \
 } while (0)
 
-#define RRdisdecode(decode, dlocal, slocal)											\
-do																					\
-{																					\
-	decode_dis(decode);																\
-	check_delay_PC();																\
-	decode_RR(decode, dlocal, slocal);												\
+#define RRdisdecode(decode, dlocal, slocal)                                         \
+do                                                                                  \
+{                                                                                   \
+	decode_dis(decode);                                                             \
+	check_delay_PC();                                                               \
+	decode_RR(decode, dlocal, slocal);                                              \
 } while (0)
 
-#define RRdecodewithHflag(decode, dlocal, slocal)									\
-do																					\
-{																					\
-	check_delay_PC();																\
-	(decode)->src = SRC_CODE;														\
-	(decode)->dst = DST_CODE;														\
-	decode_source(decode, slocal, GET_H);											\
-	decode_dest(decode, dlocal, GET_H);												\
+#define RRdecodewithHflag(decode, dlocal, slocal)                                   \
+do                                                                                  \
+{                                                                                   \
+	check_delay_PC();                                                               \
+	(decode)->src = SRC_CODE;                                                       \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_source(decode, slocal, GET_H);                                           \
+	decode_dest(decode, dlocal, GET_H);                                             \
 																					\
-	if(GET_H)																		\
-		if(slocal == 0 && dlocal == 0)												\
-			DEBUG_PRINTF(("MOV with hflag and 2 GRegs! PC = %08X\n",PPC));			\
+	if(GET_H)                                                                       \
+		if(slocal == 0 && dlocal == 0)                                              \
+			DEBUG_PRINTF(("MOV with hflag and 2 GRegs! PC = %08X\n",PPC));          \
 } while (0)
 
-#define Rimmdecode(decode, dlocal, nbit)											\
-do																					\
-{																					\
-	decode_immediate(decode, nbit);													\
-	check_delay_PC();																\
-	(decode)->dst = DST_CODE;														\
-	decode_dest(decode, dlocal, 0);													\
+#define Rimmdecode(decode, dlocal, nbit)                                            \
+do                                                                                  \
+{                                                                                   \
+	decode_immediate(decode, nbit);                                                 \
+	check_delay_PC();                                                               \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_dest(decode, dlocal, 0);                                                 \
 } while (0)
 
-#define Rndecode(decode, dlocal)													\
-do																					\
-{																					\
-	check_delay_PC();																\
-	(decode)->dst = DST_CODE;														\
-	decode_dest(decode, dlocal, 0);													\
+#define Rndecode(decode, dlocal)                                                    \
+do                                                                                  \
+{                                                                                   \
+	check_delay_PC();                                                               \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_dest(decode, dlocal, 0);                                                 \
 } while (0)
 
-#define RimmdecodewithHflag(decode, dlocal, nbit)									\
-do																					\
-{																					\
-	decode_immediate(decode, nbit);													\
-	check_delay_PC();																\
-	(decode)->dst = DST_CODE;														\
-	decode_dest(decode, dlocal, GET_H);												\
+#define RimmdecodewithHflag(decode, dlocal, nbit)                                   \
+do                                                                                  \
+{                                                                                   \
+	decode_immediate(decode, nbit);                                                 \
+	check_delay_PC();                                                               \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_dest(decode, dlocal, GET_H);                                             \
 } while (0)
 
-#define Lndecode(decode)															\
-do																					\
-{																					\
-	check_delay_PC();																\
-	(decode)->dst = DST_CODE;														\
-	decode_dest(decode, LOCAL, 0);													\
+#define Lndecode(decode)                                                            \
+do                                                                                  \
+{                                                                                   \
+	check_delay_PC();                                                               \
+	(decode)->dst = DST_CODE;                                                       \
+	decode_dest(decode, LOCAL, 0);                                                  \
 } while (0)
 
-#define LLdecode(decode)															\
-do																					\
-{																					\
-	check_delay_PC();																\
-	decode_LL(decode);																\
+#define LLdecode(decode)                                                            \
+do                                                                                  \
+{                                                                                   \
+	check_delay_PC();                                                               \
+	decode_LL(decode);                                                              \
 } while (0)
 
-#define LLextdecode(decode)															\
-do																					\
-{																					\
-	m_instruction_length = 2;														\
-	EXTRA_U = READ_OP(PC);															\
-	PC += 2;																		\
-	check_delay_PC();																\
-	decode_LL(decode);																\
+#define LLextdecode(decode)                                                         \
+do                                                                                  \
+{                                                                                   \
+	m_instruction_length = 2;                                                       \
+	EXTRA_U = READ_OP(PC);                                                          \
+	PC += 2;                                                                        \
+	check_delay_PC();                                                               \
+	decode_LL(decode);                                                              \
 } while (0)
 
-#define LRdecode(decode, slocal)													\
-do																					\
-{																					\
-	check_delay_PC();																\
-	decode_LR(decode, slocal);														\
+#define LRdecode(decode, slocal)                                                    \
+do                                                                                  \
+{                                                                                   \
+	check_delay_PC();                                                               \
+	decode_LR(decode, slocal);                                                      \
 } while (0)
 
-#define LRconstdecode(decode, slocal)												\
-do																					\
-{																					\
-	decode_const(decode);															\
-	check_delay_PC();																\
-	decode_LR(decode, slocal);														\
+#define LRconstdecode(decode, slocal)                                               \
+do                                                                                  \
+{                                                                                   \
+	decode_const(decode);                                                           \
+	check_delay_PC();                                                               \
+	decode_LR(decode, slocal);                                                      \
 } while (0)
 
-#define PCreldecode(decode)															\
-do																					\
-{																					\
-	decode_pcrel(decode);															\
-	check_delay_PC();																\
+#define PCreldecode(decode)                                                         \
+do                                                                                  \
+{                                                                                   \
+	decode_pcrel(decode);                                                           \
+	check_delay_PC();                                                               \
 } while (0)
 
-#define PCadrdecode(decode)															\
-do																					\
-{																					\
-	check_delay_PC();																\
+#define PCadrdecode(decode)                                                         \
+do                                                                                  \
+{                                                                                   \
+	check_delay_PC();                                                               \
 } while (0)
 
-#define no_decode(decode)															\
-do																					\
-{																					\
+#define no_decode(decode)                                                           \
+do                                                                                  \
+{                                                                                   \
 } while (0)
 
 
@@ -1416,13 +1416,13 @@ void hyperstone_device::execute_software(struct hyperstone_device::regs_decode *
         7 - TIMER   (trap 55)
 */
 
-#define INT1_LINE_STATE		((ISR >> 0) & 1)
-#define INT2_LINE_STATE		((ISR >> 1) & 1)
-#define INT3_LINE_STATE		((ISR >> 2) & 1)
-#define INT4_LINE_STATE		((ISR >> 3) & 1)
-#define IO1_LINE_STATE		((ISR >> 4) & 1)
-#define IO2_LINE_STATE		((ISR >> 5) & 1)
-#define IO3_LINE_STATE		((ISR >> 6) & 1)
+#define INT1_LINE_STATE     ((ISR >> 0) & 1)
+#define INT2_LINE_STATE     ((ISR >> 1) & 1)
+#define INT3_LINE_STATE     ((ISR >> 2) & 1)
+#define INT4_LINE_STATE     ((ISR >> 3) & 1)
+#define IO1_LINE_STATE      ((ISR >> 4) & 1)
+#define IO2_LINE_STATE      ((ISR >> 5) & 1)
+#define IO3_LINE_STATE      ((ISR >> 6) & 1)
 
 void hyperstone_device::check_interrupts()
 {
@@ -1563,118 +1563,118 @@ void hyperstone_device::init(int scale_mask)
 	astring tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_global_regs[0]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_global_regs[1]).callimport().callexport().formatstr("%40s").noshow();
-	state_add(E132XS_PC, 	   "PC  :%08X", m_global_regs[0]).mask(0xffffffff);
-	state_add(E132XS_SR, 	   "SR  :%08X", m_global_regs[1]).mask(0xffffffff);
-	state_add(E132XS_FER,	   "FER :%08X", m_global_regs[2]).mask(0xffffffff);
-	state_add(E132XS_G3, 	   "G3  :%08X", m_global_regs[3]).mask(0xffffffff);
-	state_add(E132XS_G4, 	   "G4  :%08X", m_global_regs[4]).mask(0xffffffff);
-	state_add(E132XS_G5, 	   "G5  :%08X", m_global_regs[5]).mask(0xffffffff);
-	state_add(E132XS_G6, 	   "G6  :%08X", m_global_regs[6]).mask(0xffffffff);
-	state_add(E132XS_G7, 	   "G7  :%08X", m_global_regs[7]).mask(0xffffffff);
-	state_add(E132XS_G8, 	   "G8  :%08X", m_global_regs[8]).mask(0xffffffff);
-	state_add(E132XS_G9, 	   "G9  :%08X", m_global_regs[9]).mask(0xffffffff);
-	state_add(E132XS_G10,	   "G10 :%08X", m_global_regs[10]).mask(0xffffffff);
-	state_add(E132XS_G11,	   "G11 :%08X", m_global_regs[11]).mask(0xffffffff);
-	state_add(E132XS_G12,	   "G12 :%08X", m_global_regs[12]).mask(0xffffffff);
-	state_add(E132XS_G13,	   "G13 :%08X", m_global_regs[13]).mask(0xffffffff);
-	state_add(E132XS_G14,	   "G14 :%08X", m_global_regs[14]).mask(0xffffffff);
-	state_add(E132XS_G15,	   "G15 :%08X", m_global_regs[15]).mask(0xffffffff);
-	state_add(E132XS_G16,	   "G16 :%08X", m_global_regs[16]).mask(0xffffffff);
-	state_add(E132XS_G17,	   "G17 :%08X", m_global_regs[17]).mask(0xffffffff);
-	state_add(E132XS_SP, 	   "SP  :%08X", m_global_regs[18]).mask(0xffffffff);
-	state_add(E132XS_UB, 	   "UB  :%08X", m_global_regs[19]).mask(0xffffffff);
-	state_add(E132XS_BCR,	   "BCR :%08X", m_global_regs[20]).mask(0xffffffff);
-	state_add(E132XS_TPR,	   "TPR :%08X", m_global_regs[21]).mask(0xffffffff);
-	state_add(E132XS_TCR,	   "TCR :%08X", m_global_regs[22]).mask(0xffffffff);
-	state_add(E132XS_TR, 	   "TR  :%08X", m_global_regs[23]).mask(0xffffffff);
-	state_add(E132XS_WCR,	   "WCR :%08X", m_global_regs[24]).mask(0xffffffff);
-	state_add(E132XS_ISR,	   "ISR :%08X", m_global_regs[25]).mask(0xffffffff);
-	state_add(E132XS_FCR,	   "FCR :%08X", m_global_regs[26]).mask(0xffffffff);
-	state_add(E132XS_MCR,	   "MCR :%08X", m_global_regs[27]).mask(0xffffffff);
-	state_add(E132XS_G28,	   "G28 :%08X", m_global_regs[28]).mask(0xffffffff);
-	state_add(E132XS_G29,	   "G29 :%08X", m_global_regs[29]).mask(0xffffffff);
-	state_add(E132XS_G30,	   "G30 :%08X", m_global_regs[30]).mask(0xffffffff);
-	state_add(E132XS_G31,	   "G31 :%08X", m_global_regs[31]).mask(0xffffffff);
-	state_add(E132XS_CL0,	   "CL0 :%08X", m_local_regs[(0 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL1,	   "CL1 :%08X", m_local_regs[(1 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL2,	   "CL2 :%08X", m_local_regs[(2 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL3,	   "CL3 :%08X", m_local_regs[(3 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL4,	   "CL4 :%08X", m_local_regs[(4 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL5,	   "CL5 :%08X", m_local_regs[(5 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL6,	   "CL6 :%08X", m_local_regs[(6 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL7,	   "CL7 :%08X", m_local_regs[(7 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL8,	   "CL8 :%08X", m_local_regs[(8 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL9,	   "CL9 :%08X", m_local_regs[(9 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL10,	   "CL10:%08X", m_local_regs[(10 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL11,	   "CL11:%08X", m_local_regs[(11 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL12,	   "CL12:%08X", m_local_regs[(12 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL13,	   "CL13:%08X", m_local_regs[(13 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL14,	   "CL14:%08X", m_local_regs[(14 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_CL15,	   "CL15:%08X", m_local_regs[(15 + GET_FP) % 64]).mask(0xffffffff);
-	state_add(E132XS_L0, 	   "L0  :%08X", m_local_regs[0]).mask(0xffffffff);
-	state_add(E132XS_L1, 	   "L1  :%08X", m_local_regs[1]).mask(0xffffffff);
-	state_add(E132XS_L2, 	   "L2  :%08X", m_local_regs[2]).mask(0xffffffff);
-	state_add(E132XS_L3, 	   "L3  :%08X", m_local_regs[3]).mask(0xffffffff);
-	state_add(E132XS_L4, 	   "L4  :%08X", m_local_regs[4]).mask(0xffffffff);
-	state_add(E132XS_L5, 	   "L5  :%08X", m_local_regs[5]).mask(0xffffffff);
-	state_add(E132XS_L6, 	   "L6  :%08X", m_local_regs[6]).mask(0xffffffff);
-	state_add(E132XS_L7, 	   "L7  :%08X", m_local_regs[7]).mask(0xffffffff);
-	state_add(E132XS_L8, 	   "L8  :%08X", m_local_regs[8]).mask(0xffffffff);
-	state_add(E132XS_L9, 	   "L9  :%08X", m_local_regs[9]).mask(0xffffffff);
-	state_add(E132XS_L10,	   "L10 :%08X", m_local_regs[10]).mask(0xffffffff);
-	state_add(E132XS_L11,	   "L11 :%08X", m_local_regs[11]).mask(0xffffffff);
-	state_add(E132XS_L12,	   "L12 :%08X", m_local_regs[12]).mask(0xffffffff);
-	state_add(E132XS_L13,	   "L13 :%08X", m_local_regs[13]).mask(0xffffffff);
-	state_add(E132XS_L14,	   "L14 :%08X", m_local_regs[14]).mask(0xffffffff);
-	state_add(E132XS_L15,	   "L15 :%08X", m_local_regs[15]).mask(0xffffffff);
-	state_add(E132XS_L16,	   "L16 :%08X", m_local_regs[16]).mask(0xffffffff);
-	state_add(E132XS_L17,	   "L17 :%08X", m_local_regs[17]).mask(0xffffffff);
-	state_add(E132XS_L18,	   "L18 :%08X", m_local_regs[18]).mask(0xffffffff);
-	state_add(E132XS_L19,	   "L19 :%08X", m_local_regs[19]).mask(0xffffffff);
-	state_add(E132XS_L20,	   "L20 :%08X", m_local_regs[20]).mask(0xffffffff);
-	state_add(E132XS_L21,	   "L21 :%08X", m_local_regs[21]).mask(0xffffffff);
-	state_add(E132XS_L22,	   "L22 :%08X", m_local_regs[22]).mask(0xffffffff);
-	state_add(E132XS_L23,	   "L23 :%08X", m_local_regs[23]).mask(0xffffffff);
-	state_add(E132XS_L24,	   "L24 :%08X", m_local_regs[24]).mask(0xffffffff);
-	state_add(E132XS_L25,	   "L25 :%08X", m_local_regs[25]).mask(0xffffffff);
-	state_add(E132XS_L26,	   "L26 :%08X", m_local_regs[26]).mask(0xffffffff);
-	state_add(E132XS_L27,	   "L27 :%08X", m_local_regs[27]).mask(0xffffffff);
-	state_add(E132XS_L28,	   "L28 :%08X", m_local_regs[28]).mask(0xffffffff);
-	state_add(E132XS_L29,	   "L29 :%08X", m_local_regs[29]).mask(0xffffffff);
-	state_add(E132XS_L30,	   "L30 :%08X", m_local_regs[30]).mask(0xffffffff);
-	state_add(E132XS_L31,	   "L31 :%08X", m_local_regs[31]).mask(0xffffffff);
-	state_add(E132XS_L32,	   "L32 :%08X", m_local_regs[32]).mask(0xffffffff);
-	state_add(E132XS_L33,	   "L33 :%08X", m_local_regs[33]).mask(0xffffffff);
-	state_add(E132XS_L34,	   "L34 :%08X", m_local_regs[34]).mask(0xffffffff);
-	state_add(E132XS_L35,	   "L35 :%08X", m_local_regs[35]).mask(0xffffffff);
-	state_add(E132XS_L36,	   "L36 :%08X", m_local_regs[36]).mask(0xffffffff);
-	state_add(E132XS_L37,	   "L37 :%08X", m_local_regs[37]).mask(0xffffffff);
-	state_add(E132XS_L38,	   "L38 :%08X", m_local_regs[38]).mask(0xffffffff);
-	state_add(E132XS_L39,	   "L39 :%08X", m_local_regs[39]).mask(0xffffffff);
-	state_add(E132XS_L40,	   "L40 :%08X", m_local_regs[40]).mask(0xffffffff);
-	state_add(E132XS_L41,	   "L41 :%08X", m_local_regs[41]).mask(0xffffffff);
-	state_add(E132XS_L42,	   "L42 :%08X", m_local_regs[42]).mask(0xffffffff);
-	state_add(E132XS_L43,	   "L43 :%08X", m_local_regs[43]).mask(0xffffffff);
-	state_add(E132XS_L44,	   "L44 :%08X", m_local_regs[44]).mask(0xffffffff);
-	state_add(E132XS_L45,	   "L45 :%08X", m_local_regs[45]).mask(0xffffffff);
-	state_add(E132XS_L46,	   "L46 :%08X", m_local_regs[46]).mask(0xffffffff);
-	state_add(E132XS_L47,	   "L47 :%08X", m_local_regs[47]).mask(0xffffffff);
-	state_add(E132XS_L48,	   "L48 :%08X", m_local_regs[48]).mask(0xffffffff);
-	state_add(E132XS_L49,	   "L49 :%08X", m_local_regs[49]).mask(0xffffffff);
-	state_add(E132XS_L50,	   "L50 :%08X", m_local_regs[50]).mask(0xffffffff);
-	state_add(E132XS_L51,	   "L51 :%08X", m_local_regs[51]).mask(0xffffffff);
-	state_add(E132XS_L52,	   "L52 :%08X", m_local_regs[52]).mask(0xffffffff);
-	state_add(E132XS_L53,	   "L53 :%08X", m_local_regs[53]).mask(0xffffffff);
-	state_add(E132XS_L54,	   "L54 :%08X", m_local_regs[54]).mask(0xffffffff);
-	state_add(E132XS_L55,	   "L55 :%08X", m_local_regs[55]).mask(0xffffffff);
-	state_add(E132XS_L56,	   "L56 :%08X", m_local_regs[56]).mask(0xffffffff);
-	state_add(E132XS_L57,	   "L57 :%08X", m_local_regs[57]).mask(0xffffffff);
-	state_add(E132XS_L58,	   "L58 :%08X", m_local_regs[58]).mask(0xffffffff);
-	state_add(E132XS_L59,	   "L59 :%08X", m_local_regs[59]).mask(0xffffffff);
-	state_add(E132XS_L60,	   "L60 :%08X", m_local_regs[60]).mask(0xffffffff);
-	state_add(E132XS_L61,	   "L61 :%08X", m_local_regs[61]).mask(0xffffffff);
-	state_add(E132XS_L62,	   "L62 :%08X", m_local_regs[62]).mask(0xffffffff);
-	state_add(E132XS_L63,	   "L63 :%08X", m_local_regs[63]).mask(0xffffffff);
+	state_add(E132XS_PC,       "PC  :%08X", m_global_regs[0]).mask(0xffffffff);
+	state_add(E132XS_SR,       "SR  :%08X", m_global_regs[1]).mask(0xffffffff);
+	state_add(E132XS_FER,      "FER :%08X", m_global_regs[2]).mask(0xffffffff);
+	state_add(E132XS_G3,       "G3  :%08X", m_global_regs[3]).mask(0xffffffff);
+	state_add(E132XS_G4,       "G4  :%08X", m_global_regs[4]).mask(0xffffffff);
+	state_add(E132XS_G5,       "G5  :%08X", m_global_regs[5]).mask(0xffffffff);
+	state_add(E132XS_G6,       "G6  :%08X", m_global_regs[6]).mask(0xffffffff);
+	state_add(E132XS_G7,       "G7  :%08X", m_global_regs[7]).mask(0xffffffff);
+	state_add(E132XS_G8,       "G8  :%08X", m_global_regs[8]).mask(0xffffffff);
+	state_add(E132XS_G9,       "G9  :%08X", m_global_regs[9]).mask(0xffffffff);
+	state_add(E132XS_G10,      "G10 :%08X", m_global_regs[10]).mask(0xffffffff);
+	state_add(E132XS_G11,      "G11 :%08X", m_global_regs[11]).mask(0xffffffff);
+	state_add(E132XS_G12,      "G12 :%08X", m_global_regs[12]).mask(0xffffffff);
+	state_add(E132XS_G13,      "G13 :%08X", m_global_regs[13]).mask(0xffffffff);
+	state_add(E132XS_G14,      "G14 :%08X", m_global_regs[14]).mask(0xffffffff);
+	state_add(E132XS_G15,      "G15 :%08X", m_global_regs[15]).mask(0xffffffff);
+	state_add(E132XS_G16,      "G16 :%08X", m_global_regs[16]).mask(0xffffffff);
+	state_add(E132XS_G17,      "G17 :%08X", m_global_regs[17]).mask(0xffffffff);
+	state_add(E132XS_SP,       "SP  :%08X", m_global_regs[18]).mask(0xffffffff);
+	state_add(E132XS_UB,       "UB  :%08X", m_global_regs[19]).mask(0xffffffff);
+	state_add(E132XS_BCR,      "BCR :%08X", m_global_regs[20]).mask(0xffffffff);
+	state_add(E132XS_TPR,      "TPR :%08X", m_global_regs[21]).mask(0xffffffff);
+	state_add(E132XS_TCR,      "TCR :%08X", m_global_regs[22]).mask(0xffffffff);
+	state_add(E132XS_TR,       "TR  :%08X", m_global_regs[23]).mask(0xffffffff);
+	state_add(E132XS_WCR,      "WCR :%08X", m_global_regs[24]).mask(0xffffffff);
+	state_add(E132XS_ISR,      "ISR :%08X", m_global_regs[25]).mask(0xffffffff);
+	state_add(E132XS_FCR,      "FCR :%08X", m_global_regs[26]).mask(0xffffffff);
+	state_add(E132XS_MCR,      "MCR :%08X", m_global_regs[27]).mask(0xffffffff);
+	state_add(E132XS_G28,      "G28 :%08X", m_global_regs[28]).mask(0xffffffff);
+	state_add(E132XS_G29,      "G29 :%08X", m_global_regs[29]).mask(0xffffffff);
+	state_add(E132XS_G30,      "G30 :%08X", m_global_regs[30]).mask(0xffffffff);
+	state_add(E132XS_G31,      "G31 :%08X", m_global_regs[31]).mask(0xffffffff);
+	state_add(E132XS_CL0,      "CL0 :%08X", m_local_regs[(0 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL1,      "CL1 :%08X", m_local_regs[(1 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL2,      "CL2 :%08X", m_local_regs[(2 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL3,      "CL3 :%08X", m_local_regs[(3 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL4,      "CL4 :%08X", m_local_regs[(4 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL5,      "CL5 :%08X", m_local_regs[(5 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL6,      "CL6 :%08X", m_local_regs[(6 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL7,      "CL7 :%08X", m_local_regs[(7 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL8,      "CL8 :%08X", m_local_regs[(8 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL9,      "CL9 :%08X", m_local_regs[(9 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL10,     "CL10:%08X", m_local_regs[(10 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL11,     "CL11:%08X", m_local_regs[(11 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL12,     "CL12:%08X", m_local_regs[(12 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL13,     "CL13:%08X", m_local_regs[(13 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL14,     "CL14:%08X", m_local_regs[(14 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_CL15,     "CL15:%08X", m_local_regs[(15 + GET_FP) % 64]).mask(0xffffffff);
+	state_add(E132XS_L0,       "L0  :%08X", m_local_regs[0]).mask(0xffffffff);
+	state_add(E132XS_L1,       "L1  :%08X", m_local_regs[1]).mask(0xffffffff);
+	state_add(E132XS_L2,       "L2  :%08X", m_local_regs[2]).mask(0xffffffff);
+	state_add(E132XS_L3,       "L3  :%08X", m_local_regs[3]).mask(0xffffffff);
+	state_add(E132XS_L4,       "L4  :%08X", m_local_regs[4]).mask(0xffffffff);
+	state_add(E132XS_L5,       "L5  :%08X", m_local_regs[5]).mask(0xffffffff);
+	state_add(E132XS_L6,       "L6  :%08X", m_local_regs[6]).mask(0xffffffff);
+	state_add(E132XS_L7,       "L7  :%08X", m_local_regs[7]).mask(0xffffffff);
+	state_add(E132XS_L8,       "L8  :%08X", m_local_regs[8]).mask(0xffffffff);
+	state_add(E132XS_L9,       "L9  :%08X", m_local_regs[9]).mask(0xffffffff);
+	state_add(E132XS_L10,      "L10 :%08X", m_local_regs[10]).mask(0xffffffff);
+	state_add(E132XS_L11,      "L11 :%08X", m_local_regs[11]).mask(0xffffffff);
+	state_add(E132XS_L12,      "L12 :%08X", m_local_regs[12]).mask(0xffffffff);
+	state_add(E132XS_L13,      "L13 :%08X", m_local_regs[13]).mask(0xffffffff);
+	state_add(E132XS_L14,      "L14 :%08X", m_local_regs[14]).mask(0xffffffff);
+	state_add(E132XS_L15,      "L15 :%08X", m_local_regs[15]).mask(0xffffffff);
+	state_add(E132XS_L16,      "L16 :%08X", m_local_regs[16]).mask(0xffffffff);
+	state_add(E132XS_L17,      "L17 :%08X", m_local_regs[17]).mask(0xffffffff);
+	state_add(E132XS_L18,      "L18 :%08X", m_local_regs[18]).mask(0xffffffff);
+	state_add(E132XS_L19,      "L19 :%08X", m_local_regs[19]).mask(0xffffffff);
+	state_add(E132XS_L20,      "L20 :%08X", m_local_regs[20]).mask(0xffffffff);
+	state_add(E132XS_L21,      "L21 :%08X", m_local_regs[21]).mask(0xffffffff);
+	state_add(E132XS_L22,      "L22 :%08X", m_local_regs[22]).mask(0xffffffff);
+	state_add(E132XS_L23,      "L23 :%08X", m_local_regs[23]).mask(0xffffffff);
+	state_add(E132XS_L24,      "L24 :%08X", m_local_regs[24]).mask(0xffffffff);
+	state_add(E132XS_L25,      "L25 :%08X", m_local_regs[25]).mask(0xffffffff);
+	state_add(E132XS_L26,      "L26 :%08X", m_local_regs[26]).mask(0xffffffff);
+	state_add(E132XS_L27,      "L27 :%08X", m_local_regs[27]).mask(0xffffffff);
+	state_add(E132XS_L28,      "L28 :%08X", m_local_regs[28]).mask(0xffffffff);
+	state_add(E132XS_L29,      "L29 :%08X", m_local_regs[29]).mask(0xffffffff);
+	state_add(E132XS_L30,      "L30 :%08X", m_local_regs[30]).mask(0xffffffff);
+	state_add(E132XS_L31,      "L31 :%08X", m_local_regs[31]).mask(0xffffffff);
+	state_add(E132XS_L32,      "L32 :%08X", m_local_regs[32]).mask(0xffffffff);
+	state_add(E132XS_L33,      "L33 :%08X", m_local_regs[33]).mask(0xffffffff);
+	state_add(E132XS_L34,      "L34 :%08X", m_local_regs[34]).mask(0xffffffff);
+	state_add(E132XS_L35,      "L35 :%08X", m_local_regs[35]).mask(0xffffffff);
+	state_add(E132XS_L36,      "L36 :%08X", m_local_regs[36]).mask(0xffffffff);
+	state_add(E132XS_L37,      "L37 :%08X", m_local_regs[37]).mask(0xffffffff);
+	state_add(E132XS_L38,      "L38 :%08X", m_local_regs[38]).mask(0xffffffff);
+	state_add(E132XS_L39,      "L39 :%08X", m_local_regs[39]).mask(0xffffffff);
+	state_add(E132XS_L40,      "L40 :%08X", m_local_regs[40]).mask(0xffffffff);
+	state_add(E132XS_L41,      "L41 :%08X", m_local_regs[41]).mask(0xffffffff);
+	state_add(E132XS_L42,      "L42 :%08X", m_local_regs[42]).mask(0xffffffff);
+	state_add(E132XS_L43,      "L43 :%08X", m_local_regs[43]).mask(0xffffffff);
+	state_add(E132XS_L44,      "L44 :%08X", m_local_regs[44]).mask(0xffffffff);
+	state_add(E132XS_L45,      "L45 :%08X", m_local_regs[45]).mask(0xffffffff);
+	state_add(E132XS_L46,      "L46 :%08X", m_local_regs[46]).mask(0xffffffff);
+	state_add(E132XS_L47,      "L47 :%08X", m_local_regs[47]).mask(0xffffffff);
+	state_add(E132XS_L48,      "L48 :%08X", m_local_regs[48]).mask(0xffffffff);
+	state_add(E132XS_L49,      "L49 :%08X", m_local_regs[49]).mask(0xffffffff);
+	state_add(E132XS_L50,      "L50 :%08X", m_local_regs[50]).mask(0xffffffff);
+	state_add(E132XS_L51,      "L51 :%08X", m_local_regs[51]).mask(0xffffffff);
+	state_add(E132XS_L52,      "L52 :%08X", m_local_regs[52]).mask(0xffffffff);
+	state_add(E132XS_L53,      "L53 :%08X", m_local_regs[53]).mask(0xffffffff);
+	state_add(E132XS_L54,      "L54 :%08X", m_local_regs[54]).mask(0xffffffff);
+	state_add(E132XS_L55,      "L55 :%08X", m_local_regs[55]).mask(0xffffffff);
+	state_add(E132XS_L56,      "L56 :%08X", m_local_regs[56]).mask(0xffffffff);
+	state_add(E132XS_L57,      "L57 :%08X", m_local_regs[57]).mask(0xffffffff);
+	state_add(E132XS_L58,      "L58 :%08X", m_local_regs[58]).mask(0xffffffff);
+	state_add(E132XS_L59,      "L59 :%08X", m_local_regs[59]).mask(0xffffffff);
+	state_add(E132XS_L60,      "L60 :%08X", m_local_regs[60]).mask(0xffffffff);
+	state_add(E132XS_L61,      "L61 :%08X", m_local_regs[61]).mask(0xffffffff);
+	state_add(E132XS_L62,      "L62 :%08X", m_local_regs[62]).mask(0xffffffff);
+	state_add(E132XS_L63,      "L63 :%08X", m_local_regs[63]).mask(0xffffffff);
 
 	save_item(NAME(m_global_regs));
 	save_item(NAME(m_local_regs));
@@ -3138,11 +3138,11 @@ void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *
 					load |= (load & 0x8000) ? 0xffff0000 : 0;
 				}
 				/*
-                else          // LDHU.A
-                {
-                    // nothing more
-                }
-                */
+				else          // LDHU.A
+				{
+				    // nothing more
+				}
+				*/
 
 				SET_SREG(load);
 
@@ -3212,11 +3212,11 @@ void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *
 					load |= (load & 0x8000) ? 0xffff0000 : 0;
 				}
 				/*
-                else          // LDHU.D
-                {
-                    // nothing more
-                }
-                */
+				else          // LDHU.D
+				{
+				    // nothing more
+				}
+				*/
 
 				SET_SREG(load);
 
@@ -3313,11 +3313,11 @@ void hyperstone_device::hyperstone_ldxx2(struct hyperstone_device::regs_decode *
 						DEBUG_PRINTF(("LDHS.N denoted same regs @ %08X",PPC));
 				}
 				/*
-                else          // LDHU.N
-                {
-                    // nothing more
-                }
-                */
+				else          // LDHU.N
+				{
+				    // nothing more
+				}
+				*/
 
 				SET_SREG(load);
 
@@ -3410,15 +3410,15 @@ void hyperstone_device::hyperstone_stxx1(struct hyperstone_device::regs_decode *
 				WRITE_HW(EXTRA_S & ~1, SREG & 0xffff);
 
 				/*
-                if( EXTRA_S & 1 ) // STHS.A
-                {
-                    // TODO: missing trap on range error
-                }
-                else          // STHU.A
-                {
-                    // nothing more
-                }
-                */
+				if( EXTRA_S & 1 ) // STHS.A
+				{
+				    // TODO: missing trap on range error
+				}
+				else          // STHU.A
+				{
+				    // nothing more
+				}
+				*/
 
 				break;
 
@@ -3472,15 +3472,15 @@ void hyperstone_device::hyperstone_stxx1(struct hyperstone_device::regs_decode *
 				WRITE_HW(DREG + (EXTRA_S & ~1), SREG & 0xffff);
 
 				/*
-                if( EXTRA_S & 1 ) // STHS.D
-                {
-                    // TODO: missing trap on range error
-                }
-                else          // STHU.D
-                {
-                    // nothing more
-                }
-                */
+				if( EXTRA_S & 1 ) // STHS.D
+				{
+				    // TODO: missing trap on range error
+				}
+				else          // STHU.D
+				{
+				    // nothing more
+				}
+				*/
 
 				break;
 
@@ -3550,15 +3550,15 @@ void hyperstone_device::hyperstone_stxx2(struct hyperstone_device::regs_decode *
 				SET_DREG(DREG + (EXTRA_S & ~1));
 
 				/*
-                if( EXTRA_S & 1 ) // STHS.N
-                {
-                    // TODO: missing trap on range error
-                }
-                else          // STHU.N
-                {
-                    // nothing more
-                }
-                */
+				if( EXTRA_S & 1 ) // STHS.N
+				{
+				    // TODO: missing trap on range error
+				}
+				else          // STHU.N
+				{
+				    // nothing more
+				}
+				*/
 
 				break;
 
@@ -4438,7 +4438,7 @@ void hyperstone_device::hyperstone_lddp(struct hyperstone_device::regs_decode *d
 
 	// post increment the destination register if it's different from the source one
 	// and from the "next source" one
-	if(!(decode->src == decode->dst && S_BIT == LOCAL) &&	!SAME_SRCF_DST )
+	if(!(decode->src == decode->dst && S_BIT == LOCAL) &&   !SAME_SRCF_DST )
 	{
 		SET_DREG(DREG + 8);
 	}
@@ -4925,7 +4925,7 @@ void hyperstone_device::execute_run()
 	{
 		UINT32 oldh = SR & 0x00000020;
 
-		PPC = PC;	/* copy PC to previous PC */
+		PPC = PC;   /* copy PC to previous PC */
 		debugger_instruction_hook(this, PC);
 
 		OP = READ_OP(PC);

@@ -91,10 +91,10 @@ Some bugs left :
 #include "includes/amstrad.h"
 
 /* Components */
-#include "machine/i8255.h"	/* for 8255 ppi */
-#include "cpu/z80/z80.h"		/* for cycle tables */
-#include "video/mc6845.h"		/* CRTC */
-#include "machine/upd765.h"	/* for floppy disc controller */
+#include "machine/i8255.h"  /* for 8255 ppi */
+#include "cpu/z80/z80.h"        /* for cycle tables */
+#include "video/mc6845.h"       /* CRTC */
+#include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "machine/mc146818.h"  /* Aleste RTC */
@@ -124,12 +124,12 @@ Some bugs left :
    -----------------------------*/
 static I8255_INTERFACE( amstrad_ppi8255_interface )
 {
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_r),	/* port A read */
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_w),	/* port A write */
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portb_r),	/* port B read */
-	DEVCB_NULL,							/* port B write */
-	DEVCB_NULL,							/* port C read */
-	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portc_w)	/* port C write */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_r), /* port A read */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_porta_w), /* port A write */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portb_r), /* port B read */
+	DEVCB_NULL,                         /* port B write */
+	DEVCB_NULL,                         /* port C read */
+	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portc_w)  /* port C write */
 };
 
 DRIVER_INIT_MEMBER(amstrad_state,aleste)
@@ -502,14 +502,14 @@ static INPUT_PORTS_START( cpc6128s )
 	PORT_MODIFY("keyboard_row_2")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x9C")              PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00DC)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x89")              PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(0x00E9)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)									   PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_MODIFY("keyboard_row_3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)									   PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('+') PORT_CHAR('*')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('+') PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x85")			   PORT_CODE(KEYCODE_OPENBRACE)	 PORT_CHAR(0x00C5)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x84")			   PORT_CODE(KEYCODE_QUOTE)		 PORT_CHAR(0x00C4)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x96")			   PORT_CODE(KEYCODE_COLON)		 PORT_CHAR(0x00D6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x85")              PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00C5)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x84")              PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00C4)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x96")              PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00D6)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
 
@@ -559,17 +559,17 @@ static INPUT_PORTS_START( plus )
 	PORT_INCLUDE(crtc_links)
 
 	/* The CPC+ and GX4000 adds support for analogue controllers.
-       Up to two joysticks or four paddles can be used, although the ASIC supports twice that.
-       Read at &6808-&680f in ASIC RAM
-       I am unsure if these are even close to correct.
+	   Up to two joysticks or four paddles can be used, although the ASIC supports twice that.
+	   Read at &6808-&680f in ASIC RAM
+	   I am unsure if these are even close to correct.
 
-    UPDATE: the analog port supports (probably with an Y-cable) up to two analog joysticks
-    with two buttons each or four paddles with one button each. The CPC+/GX4000 have also an
-    AUX port which supports a lightgun/lightpen with two buttons.
-    Since all these devices have their dedicated connector, two digital joystick, two analog joysticks
-    and one lightgun can be connected at the same moment.
+	UPDATE: the analog port supports (probably with an Y-cable) up to two analog joysticks
+	with two buttons each or four paddles with one button each. The CPC+/GX4000 have also an
+	AUX port which supports a lightgun/lightpen with two buttons.
+	Since all these devices have their dedicated connector, two digital joystick, two analog joysticks
+	and one lightgun can be connected at the same moment.
 
-    The connectors' description for both CPCs and CPC+'s can be found at http://www.hardwarebook.info/Category:Computer */
+	The connectors' description for both CPCs and CPC+'s can be found at http://www.hardwarebook.info/Category:Computer */
 
 	PORT_START("analog1")
 	PORT_BIT(0x3f , 0, IPT_TRACKBALL_X)
@@ -734,7 +734,7 @@ static INPUT_PORTS_START( aleste )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F4  F9")    PORT_CODE(KEYCODE_F4)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F5  F10")   PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("HELP")      PORT_CODE(KEYCODE_PGDN)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)	 PORT_NAME("INS")       PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("INS")       PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("Funny looking Russian symbol")     PORT_CODE(KEYCODE_END)
 
 	PORT_INCLUDE(crtc_links)
@@ -748,10 +748,10 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read),	/* portA read */
-	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read),	/* portB read */
-	DEVCB_NULL,					/* portA write */
-	DEVCB_NULL					/* portB write */
+	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read), /* portA read */
+	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read), /* portB read */
+	DEVCB_NULL,                 /* portA write */
+	DEVCB_NULL                  /* portB write */
 };
 
 
@@ -845,7 +845,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 
 	MCFG_I8255_ADD( "ppi8255", amstrad_ppi8255_interface )
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_16MHz, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
@@ -1144,7 +1144,7 @@ COMP( 1984, cpc464,   0,        0,      amstrad, cpc464, driver_device,   0,    
 COMP( 1985, cpc664,   cpc464,   0,      amstrad, cpc664, driver_device,   0,       "Amstrad plc",         "Amstrad CPC664",                            0 )
 COMP( 1985, cpc6128,  cpc464,   0,      amstrad, cpc6128, driver_device,  0,       "Amstrad plc",         "Amstrad CPC6128",                           0 )
 COMP( 1985, cpc6128f, cpc464,   0,      amstrad, cpc6128f, driver_device, 0,       "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s, cpc464,   0,      amstrad, cpc6128s, driver_device, 0,       "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",			 0 )
+COMP( 1985, cpc6128s, cpc464,   0,      amstrad, cpc6128s, driver_device, 0,       "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",            0 )
 COMP( 1990, cpc464p,  0,        0,      cpcplus, plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC464+",                           0 )
 COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC6128+",                          0 )
 CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000, driver_device,   0,       "Amstrad plc",         "Amstrad GX4000",                            0 )

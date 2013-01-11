@@ -77,9 +77,9 @@ public:
 
 private:
 	// internal state
-	device_t &			m_device;				// underlying device
-	device_disasm_interface *m_disasmintf;		// disassembly interface
-	address_space &		m_space;				// address space to display
+	device_t &          m_device;               // underlying device
+	device_disasm_interface *m_disasmintf;      // disassembly interface
+	address_space &     m_space;                // address space to display
 };
 
 
@@ -122,19 +122,19 @@ private:
 	bool recompute(offs_t pc, int startline, int lines);
 
 	// internal state
-	disasm_right_column	m_right_column;			// right column contents
-	UINT32				m_backwards_steps;		// number of backwards steps
-	UINT32				m_dasm_width;			// width of the disassembly area
-	UINT8 *				m_last_direct_raw;		// last direct raw value
-	UINT8 *				m_last_direct_decrypted;// last direct decrypted value
-	UINT32				m_last_change_count;	// last comment change count
-	offs_t				m_last_pcbyte;			// last PC byte value
-	int					m_divider1, m_divider2;	// left and right divider columns
-	int					m_divider3;				// comment divider column
-	debug_view_expression m_expression;			// expression-related information
-	debug_view_xy		m_allocated;			// allocated rows/columns
-	offs_t *			m_byteaddress;			// addresses of the instructions
-	char *				m_dasm;					// disassembled instructions
+	disasm_right_column m_right_column;         // right column contents
+	UINT32              m_backwards_steps;      // number of backwards steps
+	UINT32              m_dasm_width;           // width of the disassembly area
+	UINT8 *             m_last_direct_raw;      // last direct raw value
+	UINT8 *             m_last_direct_decrypted;// last direct decrypted value
+	UINT32              m_last_change_count;    // last comment change count
+	offs_t              m_last_pcbyte;          // last PC byte value
+	int                 m_divider1, m_divider2; // left and right divider columns
+	int                 m_divider3;             // comment divider column
+	debug_view_expression m_expression;         // expression-related information
+	debug_view_xy       m_allocated;            // allocated rows/columns
+	offs_t *            m_byteaddress;          // addresses of the instructions
+	char *              m_dasm;                 // disassembled instructions
 
 	// constants
 	static const int DEFAULT_DASM_LINES = 1000;

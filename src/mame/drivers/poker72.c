@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(poker72_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", poker72_state,  irq0_line_hold)
 

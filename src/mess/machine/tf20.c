@@ -13,8 +13,8 @@
 
 #include "tf20.h"
 
-#define XTAL_CR1	XTAL_8MHz
-#define XTAL_CR2	XTAL_4_9152MHz
+#define XTAL_CR1    XTAL_8MHz
+#define XTAL_CR2    XTAL_4_9152MHz
 
 
 //**************************************************************************
@@ -84,34 +84,34 @@ ioport_constructor epson_tf20_device::device_input_ports() const
 
 static UPD7201_INTERFACE( tf20_upd7201_intf )
 {
-	DEVCB_NULL,				/* interrupt: nc */
+	DEVCB_NULL,             /* interrupt: nc */
 	{
 		{
-			XTAL_CR2 / 128,		/* receive clock: 38400 baud (default) */
-			XTAL_CR2 / 128,		/* transmit clock: 38400 baud (default) */
-			DEVCB_NULL,			/* receive DRQ */
-			DEVCB_NULL,			/* transmit DRQ */
-			DEVCB_NULL,			/* receive data */
-			DEVCB_NULL,			/* transmit data */
-			DEVCB_NULL,			/* clear to send */
-			DEVCB_LINE_GND,		/* data carrier detect */
-			DEVCB_NULL,			/* ready to send */
-			DEVCB_NULL,			/* data terminal ready */
-			DEVCB_NULL,			/* wait */
-			DEVCB_NULL			/* sync output: nc */
+			XTAL_CR2 / 128,     /* receive clock: 38400 baud (default) */
+			XTAL_CR2 / 128,     /* transmit clock: 38400 baud (default) */
+			DEVCB_NULL,         /* receive DRQ */
+			DEVCB_NULL,         /* transmit DRQ */
+			DEVCB_NULL,         /* receive data */
+			DEVCB_NULL,         /* transmit data */
+			DEVCB_NULL,         /* clear to send */
+			DEVCB_LINE_GND,     /* data carrier detect */
+			DEVCB_NULL,         /* ready to send */
+			DEVCB_NULL,         /* data terminal ready */
+			DEVCB_NULL,         /* wait */
+			DEVCB_NULL          /* sync output: nc */
 		}, {
-			XTAL_CR2 / 128,		/* receive clock: 38400 baud (default) */
-			XTAL_CR2 / 128,		/* transmit clock: 38400 baud (default) */
-			DEVCB_NULL,			/* receive DRQ: nc */
-			DEVCB_NULL,			/* transmit DRQ */
-			DEVCB_NULL,			/* receive data */
-			DEVCB_NULL,			/* transmit data */
-			DEVCB_LINE_GND,		/* clear to send */
-			DEVCB_LINE_GND,		/* data carrier detect */
-			DEVCB_NULL,			/* ready to send */
-			DEVCB_NULL,			/* data terminal ready: nc */
-			DEVCB_NULL,			/* wait */
-			DEVCB_NULL			/* sync output: nc */
+			XTAL_CR2 / 128,     /* receive clock: 38400 baud (default) */
+			XTAL_CR2 / 128,     /* transmit clock: 38400 baud (default) */
+			DEVCB_NULL,         /* receive DRQ: nc */
+			DEVCB_NULL,         /* transmit DRQ */
+			DEVCB_NULL,         /* receive data */
+			DEVCB_NULL,         /* transmit data */
+			DEVCB_LINE_GND,     /* clear to send */
+			DEVCB_LINE_GND,     /* data carrier detect */
+			DEVCB_NULL,         /* ready to send */
+			DEVCB_NULL,         /* data terminal ready: nc */
+			DEVCB_NULL,         /* wait */
+			DEVCB_NULL          /* sync output: nc */
 		}
 	}
 };
@@ -180,9 +180,9 @@ void epson_tf20_device::device_start()
 		throw device_missing_dependencies();
 
 	m_timer_serial = timer_alloc(0, NULL);
-    m_timer_tc = timer_alloc(1, NULL);
+	m_timer_tc = timer_alloc(1, NULL);
 
-    m_cpu->set_irq_acknowledge_callback(irq_callback);
+	m_cpu->set_irq_acknowledge_callback(irq_callback);
 
 	m_fd0 = subdevice<floppy_connector>("5a:0")->get_device();
 	m_fd1 = subdevice<floppy_connector>("5a:1")->get_device();

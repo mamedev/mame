@@ -61,7 +61,7 @@ static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
 	/* characters */
 	for (i = 0;i < 16;i++)
 	{
-		int prom_offs = i | ((i & 8) << 1);	/* address bits 3 and 4 are tied together */
+		int prom_offs = i | ((i & 8) << 1); /* address bits 3 and 4 are tied together */
 		int bit0,bit1,bit2,r,g,b;
 
 		/* red component */
@@ -242,18 +242,18 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 void popeye_state::video_start()
 {
 	m_bitmapram = auto_alloc_array(machine(), UINT8, popeye_bitmapram_size);
-	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(),1024,1024);	/* actually 1024x512 but not rolling over vertically? */
+	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(),1024,1024);    /* actually 1024x512 but not rolling over vertically? */
 
 	m_bitmap_type = TYPE_SKYSKIPR;
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-    m_lastflip = 0;
+	m_lastflip = 0;
 
-    state_save_register_global(machine(), m_lastflip);
-    state_save_register_global_bitmap(machine(), m_tmpbitmap2);
-    state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
+	state_save_register_global(machine(), m_lastflip);
+	state_save_register_global_bitmap(machine(), m_tmpbitmap2);
+	state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
 }
 
 VIDEO_START_MEMBER(popeye_state,popeye)
@@ -266,11 +266,11 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-    m_lastflip = 0;
+	m_lastflip = 0;
 
-    state_save_register_global(machine(), m_lastflip);
-    state_save_register_global_bitmap(machine(), m_tmpbitmap2);
-    state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
+	state_save_register_global(machine(), m_lastflip);
+	state_save_register_global_bitmap(machine(), m_tmpbitmap2);
+	state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
 }
 
 static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -289,7 +289,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 	set_background_palette(machine, (*state->m_palettebank & 0x08) >> 3);
 
-	if (state->m_background_pos[1] == 0)	/* no background */
+	if (state->m_background_pos[1] == 0)    /* no background */
 		bitmap.fill(0, cliprect);
 	else
 	{
@@ -322,16 +322,16 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int code,color,flipx,flipy,sx,sy;
 
 		/*
-         * offs+3:
-         * bit 7 ?
-         * bit 6 ?
-         * bit 5 ?
-         * bit 4 MSB of sprite code
-         * bit 3 vertical flip
-         * bit 2 sprite bank
-         * bit 1 \ color (with bit 2 as well)
-         * bit 0 /
-         */
+		 * offs+3:
+		 * bit 7 ?
+		 * bit 6 ?
+		 * bit 5 ?
+		 * bit 4 MSB of sprite code
+		 * bit 3 vertical flip
+		 * bit 2 sprite bank
+		 * bit 1 \ color (with bit 2 as well)
+		 * bit 0 /
+		 */
 
 		code = (spriteram[offs + 2] & 0x7f) + ((spriteram[offs + 3] & 0x10) << 3)
 							+ ((spriteram[offs + 3] & 0x04) << 6);

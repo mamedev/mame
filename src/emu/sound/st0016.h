@@ -14,7 +14,7 @@ DECLARE_READ8_DEVICE_HANDLER( st0016_snd_r );
 DECLARE_WRITE8_DEVICE_HANDLER( st0016_snd_w );
 
 class st0016_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -32,8 +32,8 @@ void blueprnt_state::palette_init()
 		if (i < 0x200)
 			/* characters */
 			pen = ((i & 0x100) >> 5) |
-				  ((i & 0x002) ? ((i & 0x0e0) >> 5) : 0) |
-				  ((i & 0x001) ? ((i & 0x01c) >> 2) : 0);
+					((i & 0x002) ? ((i & 0x0e0) >> 5) : 0) |
+					((i & 0x001) ? ((i & 0x01c) >> 2) : 0);
 		else
 			/* sprites */
 			pen = i - 0x200;
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 	// tied to the use of upper / lower tiles or priority instead?
 	if (flip_screen())
 	{
-		bank = m_colorram[(tile_index+32)&0x3ff] & 0x40; 
+		bank = m_colorram[(tile_index+32)&0x3ff] & 0x40;
 	}
 	else
 	{
@@ -135,7 +135,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = state->m_spriteram[offs + 3];
 		int sy = 240 - state->m_spriteram[offs];
 		int flipx = state->m_spriteram[offs + 2] & 0x40;
-		int flipy = state->m_spriteram[offs + 2 - 4] & 0x80;	// -4? Awkward, isn't it?
+		int flipy = state->m_spriteram[offs + 2 - 4] & 0x80;    // -4? Awkward, isn't it?
 
 		if (state->flip_screen())
 		{

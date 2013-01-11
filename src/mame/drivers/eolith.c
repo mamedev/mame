@@ -118,13 +118,13 @@
 READ32_MEMBER(eolith_state::eolith_custom_r)
 {
 	/*
-        bit 3 = eeprom bit
-        bit 6 = vblank flag
+	    bit 3 = eeprom bit
+	    bit 6 = vblank flag
 
-        Are these used only in landbrka ?
-        bit 8 = ???
-        bit 9 = ???
-    */
+	    Are these used only in landbrka ?
+	    bit 8 = ???
+	    bit 9 = ???
+	*/
 	eolith_speedup_read(space);
 
 	return (ioport("IN0")->read() & ~0x300) | (machine().rand() & 0x300);
@@ -290,18 +290,18 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( common )
 	PORT_DIPUNUSED_DIPLOC( 0x00000020, IP_ACTIVE_LOW, "SW3:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x00000040, IP_ACTIVE_LOW, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x00000080, IP_ACTIVE_LOW, "SW3:4" )
-	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED	)
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
@@ -529,13 +529,13 @@ INPUT_PORTS_END
 // It's configured for 512 bytes
 static const eeprom_interface eeprom_interface_93C66 =
 {
-	9,				// address bits 9
-	8,				// data bits    8
-	"*110",			// read         110 aaaaaaaaa
-	"*101",			// write        101 aaaaaaaaa dddddddd
-	"*111",			// erase        111 aaaaaaaaa
-	"*10000xxxxxx",	// lock         100 00xxxxxxx
-	"*10011xxxxxx"	// unlock       100 11xxxxxxx
+	9,              // address bits 9
+	8,              // data bits    8
+	"*110",         // read         110 aaaaaaaaa
+	"*101",         // write        101 aaaaaaaaa dddddddd
+	"*111",         // erase        111 aaaaaaaaa
+	"*10000xxxxxx", // lock         100 00xxxxxxx
+	"*10011xxxxxx"  // unlock       100 11xxxxxxx
 };
 
 
@@ -569,7 +569,7 @@ static QS1000_INTERFACE( qs1000_intf )
  *************************************/
 
 static MACHINE_CONFIG_START( eolith45, eolith_state )
-	MCFG_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
+	MCFG_CPU_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
 	MCFG_CPU_PROGRAM_MAP(eolith_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
 
@@ -609,7 +609,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eolith50, eolith45 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(50000000)		 /* 50 MHz */
+	MCFG_CPU_CLOCK(50000000)         /* 50 MHz */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ironfort, eolith45 )

@@ -43,7 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-    void set_dma_base(address_space &space, int offset0, int offset1);
+	void set_dma_base(address_space &space, int offset0, int offset1);
 
 	sound_stream *m_stream;
 
@@ -58,13 +58,13 @@ protected:
 	// inline data
 	UINT8 m_regs[0x100];
 
-    int m_play_ptr, m_buffer_size, m_buffer_num;
-    bool m_playback_enable;
+	int m_play_ptr, m_buffer_size, m_buffer_num;
+	bool m_playback_enable;
 
-    address_space *m_dma_space;
-    int m_dma_offset_0, m_dma_offset_1;
+	address_space *m_dma_space;
+	int m_dma_offset_0, m_dma_offset_1;
 
-    emu_timer *m_timer;
+	emu_timer *m_timer;
 };
 
 
@@ -73,4 +73,3 @@ extern const device_type AWACS;
 
 
 #endif /* __AWACS_H__ */
-

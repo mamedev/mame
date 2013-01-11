@@ -103,7 +103,7 @@ WRes File_Read(CSzFile *p, void *data, size_t *size)
 		return 0;
 
 //  err =
-    osd_read( p->_7z_osdfile, data, p->_7z_currfpos, originalSize, &read_length );
+	osd_read( p->_7z_osdfile, data, p->_7z_currfpos, originalSize, &read_length );
 	*size = read_length;
 	p->_7z_currfpos += read_length;
 
@@ -139,13 +139,13 @@ WRes File_GetLength(CSzFile *p, UInt64 *length)
 
 static SRes FileSeqInStream_Read(void *pp, void *buf, size_t *size)
 {
-  CFileSeqInStream *p = (CFileSeqInStream *)pp;
-  return File_Read(&p->file, buf, size) == 0 ? SZ_OK : SZ_ERROR_READ;
+	CFileSeqInStream *p = (CFileSeqInStream *)pp;
+	return File_Read(&p->file, buf, size) == 0 ? SZ_OK : SZ_ERROR_READ;
 }
 
 void FileSeqInStream_CreateVTable(CFileSeqInStream *p)
 {
-  p->s.Read = FileSeqInStream_Read;
+	p->s.Read = FileSeqInStream_Read;
 }
 
 
@@ -173,14 +173,14 @@ void FileInStream_CreateVTable(CFileInStream *p)
 
 static size_t FileOutStream_Write(void *pp, const void *data, size_t size)
 {
-  CFileOutStream *p = (CFileOutStream *)pp;
-  File_Write(&p->file, data, &size);
-  return size;
+	CFileOutStream *p = (CFileOutStream *)pp;
+	File_Write(&p->file, data, &size);
+	return size;
 }
 
 void FileOutStream_CreateVTable(CFileOutStream *p)
 {
-  p->s.Write = FileOutStream_Write;
+	p->s.Write = FileOutStream_Write;
 }
 
 /***************************************************************************
@@ -188,7 +188,7 @@ void FileOutStream_CreateVTable(CFileOutStream *p)
 ***************************************************************************/
 
 /* number of open files to cache */
-#define _7Z_CACHE_SIZE	8
+#define _7Z_CACHE_SIZE  8
 
 
 /***************************************************************************
@@ -513,5 +513,3 @@ static void free__7z_file(_7z_file *_7z)
 		free(_7z);
 	}
 }
-
-

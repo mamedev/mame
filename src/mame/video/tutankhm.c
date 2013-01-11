@@ -10,7 +10,7 @@
 #include "includes/tutankhm.h"
 
 
-#define NUM_PENS	(0x10)
+#define NUM_PENS    (0x10)
 
 
 /*************************************
@@ -83,6 +83,3 @@ UINT32 tutankhm_state::screen_update_tutankhm(screen_device &screen, bitmap_rgb3
 
 	return 0;
 }
-
-
-

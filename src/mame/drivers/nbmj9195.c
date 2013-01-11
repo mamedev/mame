@@ -23,7 +23,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
-#include "includes/nb1413m3.h"		// needed for mahjong input controller
+#include "includes/nb1413m3.h"      // needed for mahjong input controller
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "cpu/z80/z80daisy.h"
@@ -105,18 +105,18 @@ READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
 {
 	// DIPSW A
 	return (((ioport("DSWA")->read() & 0x01) << 7) | ((ioport("DSWA")->read() & 0x02) << 5) |
-	        ((ioport("DSWA")->read() & 0x04) << 3) | ((ioport("DSWA")->read() & 0x08) << 1) |
-	        ((ioport("DSWA")->read() & 0x10) >> 1) | ((ioport("DSWA")->read() & 0x20) >> 3) |
-	        ((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
+			((ioport("DSWA")->read() & 0x04) << 3) | ((ioport("DSWA")->read() & 0x08) << 1) |
+			((ioport("DSWA")->read() & 0x10) >> 1) | ((ioport("DSWA")->read() & 0x20) >> 3) |
+			((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
 }
 
 READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_1_r)
 {
 	// DIPSW B
 	return (((ioport("DSWB")->read() & 0x01) << 7) | ((ioport("DSWB")->read() & 0x02) << 5) |
-	        ((ioport("DSWB")->read() & 0x04) << 3) | ((ioport("DSWB")->read() & 0x08) << 1) |
-	        ((ioport("DSWB")->read() & 0x10) >> 1) | ((ioport("DSWB")->read() & 0x20) >> 3) |
-	        ((ioport("DSWB")->read() & 0x40) >> 5) | ((ioport("DSWB")->read() & 0x80) >> 7));
+			((ioport("DSWB")->read() & 0x04) << 3) | ((ioport("DSWB")->read() & 0x08) << 1) |
+			((ioport("DSWB")->read() & 0x10) >> 1) | ((ioport("DSWB")->read() & 0x20) >> 3) |
+			((ioport("DSWB")->read() & 0x40) >> 5) | ((ioport("DSWB")->read() & 0x80) >> 7));
 }
 
 
@@ -134,11 +134,11 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 
 		switch (offset)
 		{
-			case 0:			/* PA_0 */
+			case 0:         /* PA_0 */
 				// COIN IN, ETC...
 				portdata = ioport("SYSTEM")->read();
 				break;
-			case 1:			/* PB_0 */
+			case 1:         /* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (m_mscoutm_inputport)
 				{
@@ -163,7 +163,7 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 						break;
 				}
 				break;
-			case 2:			/* PC_0 */
+			case 2:         /* PC_0 */
 				// PLAYER2 KEY
 				switch (m_mscoutm_inputport)
 				{
@@ -188,26 +188,26 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 						break;
 				}
 				break;
-			case 3:			/* PD_0 */
+			case 3:         /* PD_0 */
 				portdata = 0xff;
 				break;
-			case 4:			/* PE_0 */
+			case 4:         /* PE_0 */
 				portdata = 0xff;
 				break;
 
-			case 5:			/* PA_1 */
+			case 5:         /* PA_1 */
 				portdata = 0xff;
 				break;
-			case 6:			/* PB_1 */
+			case 6:         /* PB_1 */
 				portdata = 0xff;
 				break;
-			case 7:			/* PC_1 */
+			case 7:         /* PC_1 */
 				portdata = 0xff;
 				break;
-			case 8:			/* PD_1 */
+			case 8:         /* PD_1 */
 				portdata = nbmj9195_sound_r(space, 0);
 				break;
-			case 9:			/* PE_1 */
+			case 9:         /* PE_1 */
 				portdata = 0xff;
 				break;
 
@@ -221,11 +221,11 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 	{
 		switch (offset)
 		{
-			case 0:			/* PA_0 */
+			case 0:         /* PA_0 */
 				// COIN IN, ETC...
 				portdata = ((ioport("SYSTEM")->read() & 0xfe) | m_outcoin_flag);
 				break;
-			case 1:			/* PB_0 */
+			case 1:         /* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (m_inputport)
 				{
@@ -249,7 +249,7 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 						break;
 				}
 				break;
-			case 2:			/* PC_0 */
+			case 2:         /* PC_0 */
 				// PLAYER2 KEY
 				switch (m_inputport)
 				{
@@ -273,26 +273,26 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 						break;
 				}
 				break;
-			case 3:			/* PD_0 */
+			case 3:         /* PD_0 */
 				portdata = 0xff;
 				break;
-			case 4:			/* PE_0 */
+			case 4:         /* PE_0 */
 				portdata = 0xff;
 				break;
 
-			case 5:			/* PA_1 */
+			case 5:         /* PA_1 */
 				portdata = 0xff;
 				break;
-			case 6:			/* PB_1 */
+			case 6:         /* PB_1 */
 				portdata = 0xff;
 				break;
-			case 7:			/* PC_1 */
+			case 7:         /* PC_1 */
 				portdata = 0xff;
 				break;
-			case 8:			/* PD_1 */
+			case 8:         /* PD_1 */
 				portdata = nbmj9195_sound_r(space, 0);
 				break;
-			case 9:			/* PE_1 */
+			case 9:         /* PE_1 */
 				portdata = 0xff;
 				break;
 
@@ -315,32 +315,32 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 
 		switch (offset)
 		{
-			case 0:			/* PA_0 */
-				mscoutm_inputportsel_w(space, data);	// NB22090
+			case 0:         /* PA_0 */
+				mscoutm_inputportsel_w(space, data);    // NB22090
 				break;
-			case 1:			/* PB_0 */
+			case 1:         /* PB_0 */
 				break;
-			case 2:			/* PC_0 */
+			case 2:         /* PC_0 */
 				break;
-			case 3:			/* PD_0 */
+			case 3:         /* PD_0 */
 				nbmj9195_clutsel_w(space, data);
 				break;
-			case 4:			/* PE_0 */
-				nbmj9195_gfxflag2_w(space, data);		// NB22090
+			case 4:         /* PE_0 */
+				nbmj9195_gfxflag2_w(space, data);       // NB22090
 				break;
 
-			case 5:			/* PA_1 */
+			case 5:         /* PA_1 */
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
-			case 6:			/* PB_1 */
+			case 6:         /* PB_1 */
 				machine().device<dac_device>("dac2")->write_unsigned8(data);
 				break;
-			case 7:			/* PC_1 */
+			case 7:         /* PC_1 */
 				machine().device<dac_device>("dac1")->write_unsigned8(data);
 				break;
-			case 8:			/* PD_1 */
+			case 8:         /* PD_1 */
 				break;
-			case 9:			/* PE_1 */
+			case 9:         /* PE_1 */
 				if (!(data & 0x01)) nbmj9195_soundclr_w(space, 0, 0);
 				break;
 
@@ -353,32 +353,32 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 	{
 		switch (offset)
 		{
-			case 0:			/* PA_0 */
+			case 0:         /* PA_0 */
 				break;
-			case 1:			/* PB_0 */
+			case 1:         /* PB_0 */
 				break;
-			case 2:			/* PC_0 */
+			case 2:         /* PC_0 */
 				nbmj9195_dipswbitsel_w(space, data);
 				break;
-			case 3:			/* PD_0 */
+			case 3:         /* PD_0 */
 				nbmj9195_clutsel_w(space, data);
 				break;
-			case 4:			/* PE_0 */
+			case 4:         /* PE_0 */
 				nbmj9195_outcoin_flag_w(space, data);
 				break;
 
-			case 5:			/* PA_1 */
+			case 5:         /* PA_1 */
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
-			case 6:			/* PB_1 */
+			case 6:         /* PB_1 */
 				machine().device<dac_device>("dac1")->write_unsigned8(data);
 				break;
-			case 7:			/* PC_1 */
+			case 7:         /* PC_1 */
 				machine().device<dac_device>("dac2")->write_unsigned8(data);
 				break;
-			case 8:			/* PD_1 */
+			case 8:         /* PD_1 */
 				break;
-			case 9:			/* PE_1 */
+			case 9:         /* PE_1 */
 				if (!(data & 0x01)) nbmj9195_soundclr_w(space, 0, 0);
 				break;
 
@@ -621,17 +621,17 @@ INTERRUPT_GEN_MEMBER(nbmj9195_state::ctc0_trg1)
 static Z80CTC_INTERFACE( ctc_intf_main )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),/* interrupt handler */
-	DEVCB_NULL,					/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	DEVCB_NULL,					/* ZC/TO1 callback */
-	DEVCB_NULL					/* ZC/TO2 callback */
+	DEVCB_NULL,                 /* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	DEVCB_NULL,                 /* ZC/TO1 callback */
+	DEVCB_NULL                  /* ZC/TO2 callback */
 };
 
 static Z80CTC_INTERFACE( ctc_intf_audio )
 {
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER("audio_ctc", z80ctc_device, trg3),	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	DEVCB_NULL,					/* ZC/TO1 callback */
-	DEVCB_NULL					/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER("audio_ctc", z80ctc_device, trg3), /* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	DEVCB_NULL,                 /* ZC/TO1 callback */
+	DEVCB_NULL                  /* ZC/TO2 callback */
 };
 
 void nbmj9195_state::machine_reset()
@@ -653,7 +653,7 @@ DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 	UINT8 *ROM = memregion("audiocpu")->base();
 
 	// sound program patch
-	ROM[0x0213] = 0x00;			// DI -> NOP
+	ROM[0x0213] = 0x00;         // DI -> NOP
 
 	// initialize sound rom bank
 	nbmj9195_soundbank_w(space, 0, 0);
@@ -1091,7 +1091,7 @@ static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
 	AM_RANGE(0x84, 0x84) AM_WRITE(nbmj9195_sound_w)
 
-	AM_RANGE(0xa0, 0xa6) AM_WRITENOP			// nb22090 param ?
+	AM_RANGE(0xa0, 0xa6) AM_WRITENOP            // nb22090 param ?
 
 	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
@@ -1111,7 +1111,7 @@ static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
 	AM_RANGE(0x84, 0x84) AM_WRITE(nbmj9195_sound_w)
 
-	AM_RANGE(0xb0, 0xb6) AM_WRITENOP			// nb22090 param ?
+	AM_RANGE(0xb0, 0xb6) AM_WRITENOP            // nb22090 param ?
 
 	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
@@ -1127,7 +1127,7 @@ static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
-	AM_RANGE(0x80, 0x86) AM_WRITENOP			// nb22090 param ?
+	AM_RANGE(0x80, 0x86) AM_WRITENOP            // nb22090 param ?
 
 	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_0_r)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_0_w)
@@ -1266,14 +1266,14 @@ static INPUT_PORTS_START( mjuraden )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1335,14 +1335,14 @@ static INPUT_PORTS_START( koinomp )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1404,14 +1404,14 @@ static INPUT_PORTS_START( patimono )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1473,14 +1473,14 @@ static INPUT_PORTS_START( janbari )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1542,14 +1542,14 @@ static INPUT_PORTS_START( mjanbari )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1611,14 +1611,14 @@ static INPUT_PORTS_START( mmehyou )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1680,14 +1680,14 @@ static INPUT_PORTS_START( ultramhm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1749,14 +1749,14 @@ static INPUT_PORTS_START( gal10ren )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1818,14 +1818,14 @@ static INPUT_PORTS_START( renaiclb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1883,14 +1883,14 @@ static INPUT_PORTS_START( mjlaman )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )         // CREDIT CLEAR
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -1948,14 +1948,14 @@ static INPUT_PORTS_START( mkeibaou )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2012,14 +2012,14 @@ static INPUT_PORTS_START( pachiten )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2077,14 +2077,14 @@ static INPUT_PORTS_START( sailorws )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2141,14 +2141,14 @@ static INPUT_PORTS_START( sailorwr )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2205,14 +2205,14 @@ static INPUT_PORTS_START( psailor1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2269,14 +2269,14 @@ static INPUT_PORTS_START( psailor2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2336,14 +2336,14 @@ static INPUT_PORTS_START( otatidai )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2404,14 +2404,14 @@ static INPUT_PORTS_START( wcatcher )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2471,14 +2471,14 @@ static INPUT_PORTS_START( yosimoto )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2540,14 +2540,14 @@ static INPUT_PORTS_START( yosimotm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2609,14 +2609,14 @@ static INPUT_PORTS_START( jituroku )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2675,14 +2675,14 @@ static INPUT_PORTS_START( ngpgal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2740,14 +2740,14 @@ static INPUT_PORTS_START( mjgottsu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2805,14 +2805,14 @@ static INPUT_PORTS_START( bakuhatu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2871,14 +2871,14 @@ static INPUT_PORTS_START( cmehyou )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2937,14 +2937,14 @@ static INPUT_PORTS_START( mjkoiura )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )			// COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )			// COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -3008,8 +3008,8 @@ static INPUT_PORTS_START( mscoutm )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 
 	PORT_INCLUDE( nbmjtype2 )
 INPUT_PORTS_END
@@ -3073,8 +3073,8 @@ static INPUT_PORTS_START( imekura )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 
 	PORT_INCLUDE( nbmjtype2 )
 INPUT_PORTS_END
@@ -3138,8 +3138,8 @@ static INPUT_PORTS_START( mjegolf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 
 	PORT_INCLUDE( nbmjtype2 )
 INPUT_PORTS_END
@@ -3161,13 +3161,13 @@ static const z80_daisy_config daisy_chain_sound[] =
 static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)		/* TMPZ84C011, 6.00 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)        /* TMPZ84C011, 6.00 MHz */
 	MCFG_CPU_CONFIG(daisy_chain_main)
 	MCFG_CPU_PROGRAM_MAP(sailorws_map)
 	MCFG_CPU_IO_MAP(sailorws_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj9195_state,  ctc0_trg1)				/* vblank is connect to ctc triggfer */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj9195_state,  ctc0_trg1)                /* vblank is connect to ctc triggfer */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)					/* TMPZ84C011, 8.00 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000)                  /* TMPZ84C011, 8.00 MHz */
 	MCFG_CPU_CONFIG(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(sailorws_sound_map)
 	MCFG_CPU_IO_MAP(sailorws_sound_io_map)
@@ -3181,7 +3181,7 @@ static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(1024, 512)		/* no way this is correct */
+	MCFG_SCREEN_SIZE(1024, 512)     /* no way this is correct */
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update_nbmj9195)
 
@@ -4059,7 +4059,7 @@ ROM_START( shabdama )
 	ROM_LOAD( "1.bin",        0x000000, 0x010000, CRC(e49e3d73) SHA1(6d17d60e1b6f8aee96f7a09f45113030064d3bdb) )
 
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "3.bin",        0x000000, 0x010000, CRC(e8233c6e) SHA1(fbfdb03dc9f4e3e80e161b8522b676485ffb1c95) )
+	ROM_LOAD( "3.bin",        0x000000, 0x010000, CRC(e8233c6e) SHA1(fbfdb03dc9f4e3e80e161b8522b676485ffb1c95) )
 	ROM_LOAD( "2.bin",        0x010000, 0x010000, CRC(3e0b5344) SHA1(eeae36fc4fca091065c1d51f05c2d11f44fe6d13) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
@@ -4068,7 +4068,7 @@ ROM_START( shabdama )
 	ROM_LOAD( "8.bin",        0x040000, 0x010000, CRC(3e75423e) SHA1(62e24849ddeb004ed8570d2884afa4ab257cdf07) )
 	ROM_LOAD( "7.bin",        0x030000, 0x010000, CRC(7f08e3a6) SHA1(127018442183332175c9e1f558274cd2cb5f0147) )
 	ROM_LOAD( "6.bin",        0x020000, 0x010000, CRC(0fece809) SHA1(1fe8436af8ead02a3b517b6306f9824cd64b2d26) )
-	ROM_LOAD( "5.bin",  	  0x010000, 0x010000, CRC(0706386a) SHA1(29eee363775869dcc9c46285632e8bf745c9110b) )
+	ROM_LOAD( "5.bin",        0x010000, 0x010000, CRC(0706386a) SHA1(29eee363775869dcc9c46285632e8bf745c9110b) )
 	ROM_LOAD( "4.bin",        0x000000, 0x010000, CRC(199e2127) SHA1(2514d51cb06438b312d1f328c72baa739280416a) )
 ROM_END
 

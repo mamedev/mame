@@ -85,10 +85,10 @@ static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8_LEGACY(pc1640_port60_r, pc1640_port60_w, 0xffff)
 	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
-	AM_RANGE(0x0078, 0x0079) AM_READWRITE8_LEGACY(pc1640_mouse_x_r,	pc1640_mouse_x_w, 0xffff)
-	AM_RANGE(0x007a, 0x007b) AM_READWRITE8_LEGACY(pc1640_mouse_y_r,	pc1640_mouse_y_w, 0xffff)
+	AM_RANGE(0x0078, 0x0079) AM_READWRITE8_LEGACY(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
+	AM_RANGE(0x007a, 0x007b) AM_READWRITE8_LEGACY(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r, pc_page_w, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r,	pc_JOY_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r, pc_JOY_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_READ8_LEGACY(pc200_port278_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_2", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
@@ -130,73 +130,73 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pc200 )
 	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,	 IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
+	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
+	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
 
 	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
-	PORT_DIPSETTING(	0x00, "English/less checks" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Italian ) ) //prego attendere
-	PORT_DIPSETTING(	0x02, "V.g. v\xC3\xA4nta" )
-	PORT_DIPSETTING(	0x03, "Vent et cjeblik" ) // seldom c
-	PORT_DIPSETTING(	0x04, DEF_STR( Spanish ) ) //Por favor
-	PORT_DIPSETTING(	0x05, DEF_STR( French ) ) //patientez
-	PORT_DIPSETTING(	0x06, DEF_STR( German ) ) // bitte warten
-	PORT_DIPSETTING(	0x07, DEF_STR( English ) ) // please wait
+	PORT_DIPSETTING(    0x00, "English/less checks" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) ) //prego attendere
+	PORT_DIPSETTING(    0x02, "V.g. v\xC3\xA4nta" )
+	PORT_DIPSETTING(    0x03, "Vent et cjeblik" ) // seldom c
+	PORT_DIPSETTING(    0x04, DEF_STR( Spanish ) ) //Por favor
+	PORT_DIPSETTING(    0x05, DEF_STR( French ) ) //patientez
+	PORT_DIPSETTING(    0x06, DEF_STR( German ) ) // bitte warten
+	PORT_DIPSETTING(    0x07, DEF_STR( English ) ) // please wait
 	PORT_DIPNAME( 0x08, 0x00, "37a 0x40")
-	PORT_DIPSETTING(	0x00, "0x00" )
-	PORT_DIPSETTING(	0x08, "0x08" )
+	PORT_DIPSETTING(    0x00, "0x00" )
+	PORT_DIPSETTING(    0x08, "0x08" )
 /* 2008-05 FP: This Dip Switch overlaps the next one.
 Since pc200 is anyway NOT_WORKING, I comment out this one */
 /*  PORT_DIPNAME( 0x10, 0x00, "37a 0x80")
     PORT_DIPSETTING(    0x00, "0x00" )
     PORT_DIPSETTING(    0x10, "0x10" ) */
 	PORT_DIPNAME( 0x30, 0x00, "Integrated Graphics Adapter")
-	PORT_DIPSETTING(	0x00, "CGA 1" )
-	PORT_DIPSETTING(	0x10, "CGA 2" )
-	PORT_DIPSETTING(	0x20, "external" )
-	PORT_DIPSETTING(	0x30, "MDA" )
+	PORT_DIPSETTING(    0x00, "CGA 1" )
+	PORT_DIPSETTING(    0x10, "CGA 2" )
+	PORT_DIPSETTING(    0x20, "external" )
+	PORT_DIPSETTING(    0x30, "MDA" )
 	PORT_DIPNAME( 0xc0, 0x80, "Startup Mode")
-	PORT_DIPSETTING(	0x00, "external Color 80 Columns" )
-	PORT_DIPSETTING(	0x40, "Color 40 Columns" )
-	PORT_DIPSETTING(	0x80, "Color 80 Columns" )
-	PORT_DIPSETTING(	0xc0, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, "external Color 80 Columns" )
+	PORT_DIPSETTING(    0x40, "Color 40 Columns" )
+	PORT_DIPSETTING(    0x80, "Color 80 Columns" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Mono ) )
 
 	PORT_START("DSW1") /* IN2 */
-	PORT_BIT ( 0x80, 0x80,	 IPT_UNUSED ) // com 1 on motherboard
+	PORT_BIT ( 0x80, 0x80,   IPT_UNUSED ) // com 1 on motherboard
 	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x00, "COM3: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x00, "COM4: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-	PORT_BIT ( 0x04, 0x04,	 IPT_UNUSED ) // lpt 1 on motherboard
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_BIT ( 0x04, 0x04,   IPT_UNUSED ) // lpt 1 on motherboard
 	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW2") /* IN3 */
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
-	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
-	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
+	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
-	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
-	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
+	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
+	PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 
 	PORT_START("VIDEO") /* IN20 */
 	PORT_CONFNAME( 0x03, 0x03, "IDA character set")
@@ -208,7 +208,7 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_CONFSETTING(0x00, "Colour RGB")
 	PORT_CONFSETTING(0x04, "Mono RGB")
 	PORT_CONFSETTING(0x0C, "Television")
-	PORT_BIT ( 0xE0, 0x40, IPT_UNUSED )	/* Chipset is always PPC512 */
+	PORT_BIT ( 0xE0, 0x40, IPT_UNUSED ) /* Chipset is always PPC512 */
 
 INPUT_PORTS_END
 
@@ -234,25 +234,25 @@ SLOT_INTERFACE_START(amstr_com)
 	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
-#define MCFG_CPU_PC(mem, port, type, clock, vblankfunc)	\
-	MCFG_CPU_ADD("maincpu", type, clock)				\
-	MCFG_CPU_PROGRAM_MAP(mem##_map)	\
-	MCFG_CPU_IO_MAP(port##_io)	\
+#define MCFG_CPU_PC(mem, port, type, clock, vblankfunc) \
+	MCFG_CPU_ADD("maincpu", type, clock)                \
+	MCFG_CPU_PROGRAM_MAP(mem##_map) \
+	MCFG_CPU_IO_MAP(port##_io)  \
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, vblankfunc, "screen", 0, 1) \
 	MCFG_CPU_CONFIG(i86_address_mask)
 
 
 static const gfx_layout pc200_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	2048,					/* 2048 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	2048,                   /* 2048 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( pc200 )
@@ -274,10 +274,10 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[3], amstr_com, NULL, NULL )
@@ -312,15 +312,15 @@ MACHINE_CONFIG_END
 
 static const gfx_layout pc1512_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	1024,					/* 1024 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	1024,                   /* 1024 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( pc1512 )
@@ -345,10 +345,10 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[3], amstr_com, NULL, NULL )
@@ -502,9 +502,9 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,		pc200, pc_state,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,		pc200, pc_state,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
-COMP(  1988,	pc20,       ibm5150,	0,	pc200,		pc200, pc_state,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1988,	pc200,      ibm5150,	0,	pc200,		pc200, pc_state,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc2086,     ibm5150,	0,	pc200,      pc200, pc_state,	pc200,	"Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
-COMP(  1990,	pc3086,     ibm5150,	0,	pc200,      pc200, pc_state,	pc200,	"Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )
+COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, pc_state,    ppc512, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, pc_state,    ppc512, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,    pc2086,     ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
+COMP(  1990,    pc3086,     ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )

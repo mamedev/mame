@@ -22,9 +22,9 @@ extern const device_type TI99_EVPC;
 
 struct evpc_palette
 {
-	UINT8		read_index, write_index, mask;
-	int 		read;
-	int 		state;
+	UINT8       read_index, write_index, mask;
+	int         read;
+	int         state;
 	struct { UINT8 red, green, blue; } color[0x100];
 	//int dirty;
 };
@@ -36,8 +36,8 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void	crureadz(offs_t offset, UINT8 *value);
-	void	cruwrite(offs_t offset, UINT8 data);
+	void    crureadz(offs_t offset, UINT8 *value);
+	void    cruwrite(offs_t offset, UINT8 data);
 
 protected:
 	void device_start(void);
@@ -52,11 +52,11 @@ protected:
 	void nvram_write(emu_file &file);
 
 private:
-	UINT8*			m_dsrrom;
-	bool			m_RAMEN;
-	int 			m_dsr_page;
-	UINT8*			m_novram;	/* NOVRAM area */
-	evpc_palette	m_palette;
+	UINT8*          m_dsrrom;
+	bool            m_RAMEN;
+	int             m_dsr_page;
+	UINT8*          m_novram;   /* NOVRAM area */
+	evpc_palette    m_palette;
 };
 
 #endif

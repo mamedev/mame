@@ -44,7 +44,7 @@ struct z80sio_interface
 
 // ======================> z80sio_device
 
-class z80sio_device :	public device_t,
+class z80sio_device :   public device_t,
 						public device_z80daisy_interface,
 						public z80sio_interface
 {
@@ -121,24 +121,24 @@ private:
 		void serial_callback();
 
 	public:
-		UINT8		m_regs[8];				// 8 writeable registers
+		UINT8       m_regs[8];              // 8 writeable registers
 
 	private:
-		z80sio_device *m_device;			// pointer back to our device
-		int			m_index;				// our channel index
-		UINT8		m_status[4];			// 3 readable registers
-		int			m_inbuf;				// input buffer
-		int			m_outbuf;				// output buffer
-		bool		m_int_on_next_rx;		// interrupt on next rx?
-		emu_timer *	m_receive_timer;		// timer to clock data in
-		UINT8		m_receive_buffer[16];	// buffer for incoming data
-		UINT8		m_receive_inptr;		// index of data coming in
-		UINT8		m_receive_outptr;		// index of data going out
+		z80sio_device *m_device;            // pointer back to our device
+		int         m_index;                // our channel index
+		UINT8       m_status[4];            // 3 readable registers
+		int         m_inbuf;                // input buffer
+		int         m_outbuf;               // output buffer
+		bool        m_int_on_next_rx;       // interrupt on next rx?
+		emu_timer * m_receive_timer;        // timer to clock data in
+		UINT8       m_receive_buffer[16];   // buffer for incoming data
+		UINT8       m_receive_inptr;        // index of data coming in
+		UINT8       m_receive_outptr;       // index of data going out
 	};
 
 	// internal state
-	sio_channel					m_channel[2];			// 2 channels
-	UINT8						m_int_state[8];			// interrupt states
+	sio_channel                 m_channel[2];           // 2 channels
+	UINT8                       m_int_state[8];         // interrupt states
 
 	// callbacks
 	devcb_resolved_write_line m_irq;

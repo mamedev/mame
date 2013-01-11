@@ -64,7 +64,7 @@ typedef device_delegate<void (void)> interrupt_delegate;
 
 
 #define TOCCMD_CURPOS    (0x0)
-#define TOCCMD_TRKPOS	 (0x1)
+#define TOCCMD_TRKPOS    (0x1)
 #define TOCCMD_CURTRK    (0x2)
 #define TOCCMD_LENGTH    (0x3)
 #define TOCCMD_FIRSTLAST (0x4)
@@ -126,9 +126,9 @@ typedef device_delegate<void (void)> interrupt_delegate;
 	(segacd.toc->tracks[SCD_CURTRK - 1].trktype != CD_TRACK_AUDIO) \
 
 
-#define CDD_PLAYINGCDDA	0x0100
-#define CDD_READY		0x0400
-#define CDD_STOPPED		0x0900
+#define CDD_PLAYINGCDDA 0x0100
+#define CDD_READY       0x0400
+#define CDD_STOPPED     0x0900
 
 
 #define MCFG_SEGACD_HACK_SET_CDC_DO_DMA( _class, _method) \
@@ -187,7 +187,7 @@ public:
 
 	struct segacd_t
 	{
-		cdrom_file	*cd;
+		cdrom_file  *cd;
 		const cdrom_toc   *toc;
 		UINT32 current_frame;
 	};
@@ -329,4 +329,3 @@ private:
 };
 
 extern const device_type LC89510_TEMP;
-

@@ -20,7 +20,7 @@ public:
 	tilemap_t     *m_bg_tilemap;
 	bitmap_ind8 m_screen_bitmap;
 	int         m_video_ctrl;
-	int         m_cpu_control;	/* CPU interrupt control register */
+	int         m_cpu_control;  /* CPU interrupt control register */
 
 	/* devices */
 	cpu_device *m_maincpu;

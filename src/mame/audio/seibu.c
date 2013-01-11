@@ -287,9 +287,9 @@ static void update_irq_lines(running_machine &machine, int param)
 			break;
 	}
 
-	if ((irq1 & irq2) == 0xff)	/* no IRQs pending */
+	if ((irq1 & irq2) == 0xff)  /* no IRQs pending */
 		sound_cpu->execute().set_input_line(0,CLEAR_LINE);
-	else	/* IRQ pending */
+	else    /* IRQ pending */
 		sound_cpu->execute().set_input_line_and_vector(0,ASSERT_LINE,irq1 & irq2);
 }
 
@@ -600,7 +600,7 @@ const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;
 
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(seibu_adpcm_state);
 }
@@ -633,5 +633,3 @@ void seibu_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

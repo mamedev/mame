@@ -65,10 +65,10 @@ static void tms_interrupt(running_machine &machine, int state)
 
 static const struct tms34061_interface tms34061intf =
 {
-	"screen",		/* The screen we are acting on */
-	8,				/* VRAM address is (row << rowshift) | col */
-	0x40000,		/* Size of video RAM - FIXME: Should be 128kB + 32kB */
-	tms_interrupt	/* Interrupt gen callback */
+	"screen",       /* The screen we are acting on */
+	8,              /* VRAM address is (row << rowshift) | col */
+	0x40000,        /* Size of video RAM - FIXME: Should be 128kB + 32kB */
+	tms_interrupt   /* Interrupt gen callback */
 };
 
 WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
@@ -345,11 +345,11 @@ ADDRESS_MAP_END
 
 
 
- /*************************************
- *
- *  Touchscreen controller simulation
- *
- *************************************/
+	/*************************************
+	*
+	*  Touchscreen controller simulation
+	*
+	*************************************/
 
 /* Serial bit transmission callback */
 TIMER_CALLBACK_MEMBER(jpmsys5_state::touch_cb)
@@ -429,48 +429,48 @@ INPUT_CHANGED_MEMBER(jpmsys5_state::touchscreen_press)
 static INPUT_PORTS_START( monopoly )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Change state to enter test" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Alarm" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(	0x04, "Discontinue alarm when jam is cleared" )
-	PORT_DIPSETTING(	0x00, "Continue alarm until back door open" )
+	PORT_DIPSETTING(    0x04, "Discontinue alarm when jam is cleared" )
+	PORT_DIPSETTING(    0x00, "Continue alarm until back door open" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0x00, "Payout Percentage" ) PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(	0x00, "50%" )
-	PORT_DIPSETTING(	0x80, "45%" )
-	PORT_DIPSETTING(	0x40, "40%" )
-	PORT_DIPSETTING(	0xc0, "30%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x80, "45%" )
+	PORT_DIPSETTING(    0x40, "40%" )
+	PORT_DIPSETTING(    0xc0, "30%" )
 
 	PORT_START("DIRECT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill key") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Reset" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("10p")
@@ -729,70 +729,70 @@ READ16_MEMBER(jpmsys5_state::coins_awp_r)
 INPUT_PORTS_START( popeye )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Change state to enter test" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Alarm" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(	0x04, "Discontinue alarm when jam is cleared" )
-	PORT_DIPSETTING(	0x00, "Continue alarm until back door open" )
+	PORT_DIPSETTING(    0x04, "Discontinue alarm when jam is cleared" )
+	PORT_DIPSETTING(    0x00, "Continue alarm until back door open" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0x00, "Payout Percentage" ) PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(	0x00, "50%" )
-	PORT_DIPSETTING(	0x80, "45%" )
-	PORT_DIPSETTING(	0x40, "40%" )
-	PORT_DIPSETTING(	0xc0, "30%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x80, "45%" )
+	PORT_DIPSETTING(    0x40, "40%" )
+	PORT_DIPSETTING(    0xc0, "30%" )
 
 	PORT_START("DSW2")
 	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_START("ROTARY")//not everything has this hooked up, cna be used as a test switch internally
 	PORT_CONFNAME(0x0F, 0x0F, "Rotary Switch")
-	PORT_CONFSETTING(	0x0F, "0")
-	PORT_CONFSETTING(	0x0E, "1")
-	PORT_CONFSETTING(	0x0D, "2")
-	PORT_CONFSETTING(	0x0C, "3")
-	PORT_CONFSETTING(	0x0B, "4")
-	PORT_CONFSETTING(	0x0A, "5")
-	PORT_CONFSETTING(	0x09, "6")
-	PORT_CONFSETTING(	0x08, "7")
-	PORT_CONFSETTING(	0x06, "8")
-	PORT_CONFSETTING(	0x07, "9")
-	PORT_CONFSETTING(	0x05, "10")
-	PORT_CONFSETTING(	0x04, "11")
-	PORT_CONFSETTING(	0x03, "12")
-	PORT_CONFSETTING(	0x02, "13")
-	PORT_CONFSETTING(	0x01, "14")
-	PORT_CONFSETTING(	0x00, "15")
+	PORT_CONFSETTING(   0x0F, "0")
+	PORT_CONFSETTING(   0x0E, "1")
+	PORT_CONFSETTING(   0x0D, "2")
+	PORT_CONFSETTING(   0x0C, "3")
+	PORT_CONFSETTING(   0x0B, "4")
+	PORT_CONFSETTING(   0x0A, "5")
+	PORT_CONFSETTING(   0x09, "6")
+	PORT_CONFSETTING(   0x08, "7")
+	PORT_CONFSETTING(   0x06, "8")
+	PORT_CONFSETTING(   0x07, "9")
+	PORT_CONFSETTING(   0x05, "10")
+	PORT_CONFSETTING(   0x04, "11")
+	PORT_CONFSETTING(   0x03, "12")
+	PORT_CONFSETTING(   0x02, "13")
+	PORT_CONFSETTING(   0x01, "14")
+	PORT_CONFSETTING(   0x00, "15")
 
 	PORT_START("DIRECT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill key") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Reset" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("10p")
@@ -998,8 +998,8 @@ ROM_END
 
 
 /* Video based titles */
-GAME( 1994, monopoly	, 0			, jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 1)",         0 )
-GAME( 1994, monopolya	, monopoly	, jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 2)",         0 )
-GAME( 1995, monoplcl	, monopoly	, jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly Classic (JPM) (SYSTEM5 VIDEO)", 0 )
-GAME( 1995, monopldx	, 0			, jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly Deluxe (JPM) (SYSTEM5 VIDEO)",  0 )
-GAME( 199?, cashcade	, 0			, jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)", GAME_NOT_WORKING|GAME_NO_SOUND ) // shows a loading error.. is the set incomplete?
+GAME( 1994, monopoly    , 0         , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 1)",         0 )
+GAME( 1994, monopolya   , monopoly  , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 2)",         0 )
+GAME( 1995, monoplcl    , monopoly  , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly Classic (JPM) (SYSTEM5 VIDEO)", 0 )
+GAME( 1995, monopldx    , 0         , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly Deluxe (JPM) (SYSTEM5 VIDEO)",  0 )
+GAME( 199?, cashcade    , 0         , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)", GAME_NOT_WORKING|GAME_NO_SOUND ) // shows a loading error.. is the set incomplete?

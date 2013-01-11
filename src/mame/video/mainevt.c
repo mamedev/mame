@@ -98,8 +98,8 @@ UINT32 mainevt_state::screen_update_mainevt(screen_device &screen, bitmap_ind16 
 
 	machine().priority_bitmap.fill(0, cliprect);
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 1, 2);	/* low priority part of layer */
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 4);	/* high priority part of layer */
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 1, 2); /* low priority part of layer */
+	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 4); /* high priority part of layer */
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 8);
 
 	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);

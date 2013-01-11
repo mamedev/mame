@@ -12,7 +12,7 @@ public:
 	xybots_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag) { }
 
-	UINT16			m_h256;
+	UINT16          m_h256;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_DRIVER_INIT(xybots);
@@ -23,4 +23,3 @@ public:
 	DECLARE_VIDEO_START(xybots);
 	UINT32 screen_update_xybots(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-

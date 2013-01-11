@@ -32,15 +32,15 @@
 
 ***************************************************************************/
 
-#define TMAP_GFX			(0)
-#define TILES_PER_PAGE_X	(0x10)
-#define TILES_PER_PAGE_Y	(0x10)
-#define PAGES_PER_TMAP_X	(0x4)
-#define PAGES_PER_TMAP_Y	(0x4)
+#define TMAP_GFX            (0)
+#define TILES_PER_PAGE_X    (0x10)
+#define TILES_PER_PAGE_Y    (0x10)
+#define PAGES_PER_TMAP_X    (0x4)
+#define PAGES_PER_TMAP_Y    (0x4)
 
 TILEMAP_MAPPER_MEMBER(yunsun16_state::yunsun16_tilemap_scan_pages)
 {
-	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
+	return  (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
 
 			(col / TILES_PER_PAGE_X) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y +
@@ -169,10 +169,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		x += state->m_sprites_scrolldx;
 		y += state->m_sprites_scrolldy;
 
-		if (state->flip_screen())	// not used?
+		if (state->flip_screen())   // not used?
 		{
-			flipx = !flipx;		x = max_x - x - 16;
-			flipy = !flipy;		y = max_y - y - 16;
+			flipx = !flipx;     x = max_x - x - 16;
+			flipy = !flipy;     y = max_y - y - 16;
 		}
 
 		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],

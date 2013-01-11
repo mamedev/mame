@@ -229,8 +229,8 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_8MHz	/* from CPU Board */
-#define SECONDARY_CLOCK	XTAL_6MHz	/* from GFX Board */
+#define MASTER_CLOCK    XTAL_8MHz   /* from CPU Board */
+#define SECONDARY_CLOCK XTAL_6MHz   /* from GFX Board */
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -274,7 +274,7 @@ UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind1
 	{
 		for(x = 0; x < 384; ++x)
 		{
-		  bitmap.pix16(y, x) = tmp[index ^ 1]; /* swapped bytes in 16 bit word */
+			bitmap.pix16(y, x) = tmp[index ^ 1]; /* swapped bytes in 16 bit word */
 			++index;
 		}
 	}
@@ -296,7 +296,7 @@ void goldngam_state::palette_init()
 
 READ16_MEMBER(goldngam_state::unk_r)
 {
-    int test1 = (machine().rand() & 0xae00);
+	int test1 = (machine().rand() & 0xae00);
 //  popmessage("VAL = %02x", test1);
 
 	return test1;
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( swisspkr_map, AS_PROGRAM, 16, goldngam_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400002, 0x400003) AM_NOP // hopper status read ?
 	AM_RANGE(0x40000c, 0x40000d) AM_READ(unk_r)
-	AM_RANGE(0x40000e, 0x40000f) AM_READ_PORT("DSW2")	// not sure...
+	AM_RANGE(0x40000e, 0x40000f) AM_READ_PORT("DSW2")   // not sure...
 	AM_RANGE(0x402000, 0x402001) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x402000, 0x402003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff) //wrong
 
@@ -527,7 +527,7 @@ static const gfx_layout charlayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 
@@ -567,7 +567,7 @@ static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)	// 312x288
+	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)  // 312x288
 	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
 
 	MCFG_GFXDECODE(goldngam)
@@ -601,7 +601,7 @@ ROM_START( swisspkr )
 	ROM_LOAD16_BYTE( "v2.5_hi.pr", 0x00000, 0x10000, CRC(a7f85661) SHA1(aa307bcfe0dfb07120b9711d65916b8689626b00) )
 	ROM_LOAD16_BYTE( "v2.5_lo.pr", 0x00001, 0x10000, CRC(142db5d0) SHA1(cc6481a206ed1b0f19cccaab7d6158e81e483c9b) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )	/* The following ROMs have code for 'Super Cherry' */
+	ROM_REGION( 0x40000, "gfx1", 0 )    /* The following ROMs have code for 'Super Cherry' */
 	ROM_LOAD16_BYTE( "v1.0_hi.gr", 0x20000, 0x10000, CRC(ea750ab1) SHA1(d1284e7f2628c3aa3de9246e475d45e6be48890e) )
 	ROM_LOAD16_BYTE( "v1.0_lo.gr", 0x20001, 0x10000, CRC(d885b965) SHA1(5f2ae3e21cf4e0d20c99cec2dfd3a6f72358535a) )
 ROM_END

@@ -16,57 +16,57 @@
 static const discrete_lfsr_desc asteroid_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,			/* Bit Length */
-	0,			/* Reset Value */
-	6,			/* Use Bit 6 as XOR input 0 */
-	14,			/* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,		/* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,		/* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,	/* Feedback stage3 replaces the shifted register contents */
-	0x000001,		/* Everything is shifted into the first bit only */
-	0,			/* Output is already inverted by XNOR */
-	16			/* Output bit is feedback bit */
+	16,         /* Bit Length */
+	0,          /* Reset Value */
+	6,          /* Use Bit 6 as XOR input 0 */
+	14,         /* Use Bit 14 as XOR input 1 */
+	DISC_LFSR_XNOR,     /* Feedback stage1 is XNOR */
+	DISC_LFSR_OR,       /* Feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
+	0x000001,       /* Everything is shifted into the first bit only */
+	0,          /* Output is already inverted by XNOR */
+	16          /* Output bit is feedback bit */
 };
 
 static const discrete_dac_r1_ladder asteroid_thump_dac1 =
 {
-	4,			// size of ladder
+	4,          // size of ladder
 	{RES_K(220), RES_K(100), RES_K(47), RES_K(22)}, //R44-R47
 	4.3,        // 5v - diode junction
 	RES_K(6.8), // R49
-	RES_K(47),	// R44
-	CAP_U(0.01)	// C27
+	RES_K(47),  // R44
+	CAP_U(0.01) // C27
 };
 
 static const discrete_555_cc_desc asteroid_thump_555cc =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_AC | DISCRETE_555_CC_TO_CAP,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES,
-	0.8		// VBE 2N3906 (Si)
+	0.8     // VBE 2N3906 (Si)
 };
 
-#define ASTEROID_SAUCER_SND_EN		NODE_01
-#define ASTEROID_SAUCER_FIRE_EN		NODE_02
-#define ASTEROID_SAUCER_SEL			NODE_03
-#define ASTEROID_THRUST_EN			NODE_04
-#define ASTEROID_SHIP_FIRE_EN		NODE_05
-#define ASTEROID_LIFE_EN			NODE_06
-#define ASTEROID_NOISE_RESET		NODE_07
+#define ASTEROID_SAUCER_SND_EN      NODE_01
+#define ASTEROID_SAUCER_FIRE_EN     NODE_02
+#define ASTEROID_SAUCER_SEL         NODE_03
+#define ASTEROID_THRUST_EN          NODE_04
+#define ASTEROID_SHIP_FIRE_EN       NODE_05
+#define ASTEROID_LIFE_EN            NODE_06
+#define ASTEROID_NOISE_RESET        NODE_07
 
-#define ASTEROID_THUMP_EN			NODE_08
-#define ASTEROID_THUMP_DATA			NODE_09
-#define ASTEROID_EXPLODE_DATA		NODE_10
-#define ASTEROID_EXPLODE_PITCH		NODE_11
+#define ASTEROID_THUMP_EN           NODE_08
+#define ASTEROID_THUMP_DATA         NODE_09
+#define ASTEROID_EXPLODE_DATA       NODE_10
+#define ASTEROID_EXPLODE_PITCH      NODE_11
 
-#define ASTEROID_NOISE				NODE_20
-#define ASTEROID_THUMP_SND			NODE_21
-#define ASTEROID_SAUCER_SND			NODE_22
-#define ASTEROID_LIFE_SND			NODE_23
-#define ASTEROID_SAUCER_FIRE_SND	NODE_24
-#define ASTEROID_SHIP_FIRE_SND		NODE_25
-#define ASTEROID_EXPLODE_SND		NODE_26
-#define ASTEROID_THRUST_SND			NODE_27
+#define ASTEROID_NOISE              NODE_20
+#define ASTEROID_THUMP_SND          NODE_21
+#define ASTEROID_SAUCER_SND         NODE_22
+#define ASTEROID_LIFE_SND           NODE_23
+#define ASTEROID_SAUCER_FIRE_SND    NODE_24
+#define ASTEROID_SHIP_FIRE_SND      NODE_25
+#define ASTEROID_EXPLODE_SND        NODE_26
+#define ASTEROID_THRUST_SND         NODE_27
 
 DISCRETE_SOUND_START(asteroid)
 	/************************************************/
@@ -128,10 +128,10 @@ DISCRETE_SOUND_START(asteroid)
 	/* adder constants in the 2 lines below         */
 	/************************************************/
 	// SAUCER_SEL = 1 - larger saucer
-	DISCRETE_MULTADD(NODE_40, ASTEROID_SAUCER_SEL, -2.5, 8.25)	// Saucer Warble rate (5.75 or 8.25Hz)
-	DISCRETE_TRIANGLEWAVE(NODE_41, 1, NODE_40, 920.0, 920.0/2, 0)	// (amount of warble)
+	DISCRETE_MULTADD(NODE_40, ASTEROID_SAUCER_SEL, -2.5, 8.25)  // Saucer Warble rate (5.75 or 8.25Hz)
+	DISCRETE_TRIANGLEWAVE(NODE_41, 1, NODE_40, 920.0, 920.0/2, 0)   // (amount of warble)
 
-	DISCRETE_TRANSFORM4(NODE_42, ASTEROID_SAUCER_SEL, -250, NODE_41, 750, "01*2+3+")	// Large saucer is 250hz lower
+	DISCRETE_TRANSFORM4(NODE_42, ASTEROID_SAUCER_SEL, -250, NODE_41, 750, "01*2+3+")    // Large saucer is 250hz lower
 
 	DISCRETE_TRIANGLEWAVE(NODE_43, ASTEROID_SAUCER_SND_EN, NODE_42, 76.1, 0, 0)
 	DISCRETE_RCFILTER(ASTEROID_SAUCER_SND, NODE_43, 1, 1.0e-5)
@@ -141,10 +141,10 @@ DISCRETE_SOUND_START(asteroid)
 	/* based VCO where the frequency rapidly decays */
 	/* with time.                                   */
 	/************************************************/
-	DISCRETE_RAMP(NODE_50, ASTEROID_SHIP_FIRE_EN, ASTEROID_SHIP_FIRE_EN, (820.0-110.0)/0.28, 820.0, 110.0, 0)	/* Decay - Freq */
-	DISCRETE_RCDISC(NODE_51, ASTEROID_SHIP_FIRE_EN, 53.0-7.0, 2700.0*3, 1e-5)	/* Decay - Amplitude */
-	DISCRETE_ADDER2(NODE_52, 1, NODE_51, 7.0)	/* Amplitude */
-	DISCRETE_TRANSFORM3(NODE_53, 4500, NODE_50, 67, "01/2+")	/* Duty */
+	DISCRETE_RAMP(NODE_50, ASTEROID_SHIP_FIRE_EN, ASTEROID_SHIP_FIRE_EN, (820.0-110.0)/0.28, 820.0, 110.0, 0)   /* Decay - Freq */
+	DISCRETE_RCDISC(NODE_51, ASTEROID_SHIP_FIRE_EN, 53.0-7.0, 2700.0*3, 1e-5)   /* Decay - Amplitude */
+	DISCRETE_ADDER2(NODE_52, 1, NODE_51, 7.0)   /* Amplitude */
+	DISCRETE_TRANSFORM3(NODE_53, 4500, NODE_50, 67, "01/2+")    /* Duty */
 	DISCRETE_SQUAREWAVE(NODE_54, ASTEROID_SHIP_FIRE_EN, NODE_50, NODE_52, NODE_53, 0, 0)
 	DISCRETE_RCFILTER(ASTEROID_SHIP_FIRE_SND, NODE_54, 1, 1.0e-5)
 
@@ -153,10 +153,10 @@ DISCRETE_SOUND_START(asteroid)
 	/* based VCO where the frequency rapidly decays */
 	/* with time.                                   */
 	/************************************************/
-	DISCRETE_RAMP(NODE_60, ASTEROID_SAUCER_FIRE_EN, ASTEROID_SAUCER_FIRE_EN, (830.0-630.0)/0.28, 830.0, 630.0, 0)	/* Decay - Freq */
-	DISCRETE_RCDISC(NODE_61, ASTEROID_SAUCER_FIRE_EN, 49.5-7.0, 10000.0*3, 1e-5)	/* Decay - Amplitude */
-	DISCRETE_ADDER2(NODE_62, 1, NODE_61, 7.0)	/* Amplitude */
-	DISCRETE_TRANSFORM3(NODE_63, 4500, NODE_60, 67, "01/2+")	/* Duty */
+	DISCRETE_RAMP(NODE_60, ASTEROID_SAUCER_FIRE_EN, ASTEROID_SAUCER_FIRE_EN, (830.0-630.0)/0.28, 830.0, 630.0, 0)   /* Decay - Freq */
+	DISCRETE_RCDISC(NODE_61, ASTEROID_SAUCER_FIRE_EN, 49.5-7.0, 10000.0*3, 1e-5)    /* Decay - Amplitude */
+	DISCRETE_ADDER2(NODE_62, 1, NODE_61, 7.0)   /* Amplitude */
+	DISCRETE_TRANSFORM3(NODE_63, 4500, NODE_60, 67, "01/2+")    /* Duty */
 	DISCRETE_SQUAREWAVE(NODE_64, ASTEROID_SAUCER_FIRE_EN, NODE_60, NODE_62, NODE_63, 0, 0)
 	DISCRETE_RCFILTER(ASTEROID_SAUCER_FIRE_SND, NODE_64, 2, 1.0e-5)
 
@@ -190,9 +190,9 @@ DISCRETE_SOUND_START(asteroid)
 	/* the rising edge.  So we won't add the extra  */
 	/* nodes.                                       */
 	/************************************************/
-	DISCRETE_DIVIDE(NODE_80, 1, 12000, ASTEROID_EXPLODE_PITCH)		/* Frequency */
-	DISCRETE_DIVIDE(NODE_81, 1, 100, ASTEROID_EXPLODE_PITCH)		/* Duty */
-	DISCRETE_SQUAREWFIX(NODE_82, 1, NODE_80, 1.0, NODE_81, 1.0/2, 0)	/* Pitch clock */
+	DISCRETE_DIVIDE(NODE_80, 1, 12000, ASTEROID_EXPLODE_PITCH)      /* Frequency */
+	DISCRETE_DIVIDE(NODE_81, 1, 100, ASTEROID_EXPLODE_PITCH)        /* Duty */
+	DISCRETE_SQUAREWFIX(NODE_82, 1, NODE_80, 1.0, NODE_81, 1.0/2, 0)    /* Pitch clock */
 	DISCRETE_SAMPLHOLD(NODE_83, ASTEROID_NOISE, NODE_82, DISC_SAMPHOLD_REDGE)
 	DISCRETE_MULTIPLY(NODE_84, NODE_83, ASTEROID_EXPLODE_DATA)
 	DISCRETE_RCFILTER(ASTEROID_EXPLODE_SND, NODE_84, 3042, 1e-6)
@@ -210,7 +210,7 @@ DISCRETE_SOUND_START(asteroid)
 	DISCRETE_ADDER4(NODE_90, 1, ASTEROID_THUMP_SND, ASTEROID_SAUCER_SND, ASTEROID_SHIP_FIRE_SND, ASTEROID_SAUCER_FIRE_SND)
 	DISCRETE_ADDER4(NODE_91, 1, ASTEROID_THRUST_SND, ASTEROID_EXPLODE_SND, ASTEROID_LIFE_SND, NODE_90)
 
-	DISCRETE_OUTPUT(NODE_91, 65534.0 / (131.6+76.1+49.5+53.0+1000.0+600.0))		// Take the output from the mixer
+	DISCRETE_OUTPUT(NODE_91, 65534.0 / (131.6+76.1+49.5+53.0+1000.0+600.0))     // Take the output from the mixer
 DISCRETE_SOUND_END
 
 
@@ -261,9 +261,9 @@ DISCRETE_SOUND_START(astdelux)
 	/* the rising edge.  So we won't add the extra  */
 	/* nodes.                                       */
 	/************************************************/
-	DISCRETE_DIVIDE(NODE_80, 1, 12000, ASTEROID_EXPLODE_PITCH)		/* Frequency */
-	DISCRETE_DIVIDE(NODE_81, 1, 100, ASTEROID_EXPLODE_PITCH)		/* Duty */
-	DISCRETE_SQUAREWFIX(NODE_82, 1, NODE_80, 1.0, NODE_81, 1.0/2, 0)	/* Pitch clock */
+	DISCRETE_DIVIDE(NODE_80, 1, 12000, ASTEROID_EXPLODE_PITCH)      /* Frequency */
+	DISCRETE_DIVIDE(NODE_81, 1, 100, ASTEROID_EXPLODE_PITCH)        /* Duty */
+	DISCRETE_SQUAREWFIX(NODE_82, 1, NODE_80, 1.0, NODE_81, 1.0/2, 0)    /* Pitch clock */
 	DISCRETE_SAMPLHOLD(NODE_83, ASTEROID_NOISE, NODE_82, DISC_SAMPHOLD_REDGE)
 	DISCRETE_MULTIPLY(NODE_84, NODE_83, ASTEROID_EXPLODE_DATA)
 	DISCRETE_RCFILTER(ASTEROID_EXPLODE_SND, NODE_84, 3042, 1e-6)
@@ -274,13 +274,13 @@ DISCRETE_SOUND_START(astdelux)
 	/************************************************/
 	DISCRETE_ADDER2(NODE_90, 1, ASTEROID_THRUST_SND, ASTEROID_EXPLODE_SND)
 
-	DISCRETE_OUTPUT(NODE_90, 65534.0/(1000+600))	// Take the output from the mixer
+	DISCRETE_OUTPUT(NODE_90, 65534.0/(1000+600))    // Take the output from the mixer
 DISCRETE_SOUND_END
 
 
 WRITE8_MEMBER(asteroid_state::asteroid_explode_w)
 {
-	discrete_sound_w(m_discrete,space,ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);				// Volume
+	discrete_sound_w(m_discrete,space,ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);                // Volume
 	/* We will modify the pitch data to send the divider value. */
 	switch ((data&0xc0))
 	{

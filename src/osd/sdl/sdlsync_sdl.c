@@ -21,7 +21,7 @@
 
 #include "eminline.h"
 
-#define	VERBOSE		(0)
+#define VERBOSE     (0)
 
 #if VERBOSE
 #define LOG( x ) do { printf x; printf("\n"); } while (0)
@@ -29,16 +29,16 @@
 #define LOG( x )
 #endif
 struct hidden_mutex_t {
-	SDL_mutex *			id;
-	volatile INT32		locked;
-	volatile INT32		threadid;
+	SDL_mutex *         id;
+	volatile INT32      locked;
+	volatile INT32      threadid;
 };
 
 struct osd_event {
-	SDL_mutex *			mutex;
-	SDL_cond *			cond;
-	volatile INT32		autoreset;
-	volatile INT32		signalled;
+	SDL_mutex *         mutex;
+	SDL_cond *          cond;
+	volatile INT32      autoreset;
+	volatile INT32      signalled;
 };
 
 //============================================================
@@ -46,14 +46,14 @@ struct osd_event {
 //============================================================
 
 struct osd_thread {
-	SDL_Thread *		thread;
+	SDL_Thread *        thread;
 	osd_thread_callback callback;
 	void *param;
 };
 
 struct osd_scalable_lock
 {
-	SDL_mutex *			mutex;
+	SDL_mutex *         mutex;
 };
 
 //============================================================
@@ -350,4 +350,3 @@ void osd_thread_wait_free(osd_thread *thread)
 	SDL_WaitThread(thread->thread, &status);
 	free(thread);
 }
-

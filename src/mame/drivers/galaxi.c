@@ -187,25 +187,25 @@ UINT32 galaxi_state::screen_update_galaxi(screen_device &screen, bitmap_ind16 &b
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_R))	// remapped due to inputs changes.
+	if (machine().input().code_pressed(KEYCODE_R))  // remapped due to inputs changes.
 	{
 		int msk = 0;
-		if (machine().input().code_pressed(KEYCODE_T))	msk |= 1;
-		if (machine().input().code_pressed(KEYCODE_Y))	msk |= 2;
-		if (machine().input().code_pressed(KEYCODE_U))	msk |= 4;
-		if (machine().input().code_pressed(KEYCODE_I))	msk |= 8;
-		if (machine().input().code_pressed(KEYCODE_O))	msk |= 16;
+		if (machine().input().code_pressed(KEYCODE_T))  msk |= 1;
+		if (machine().input().code_pressed(KEYCODE_Y))  msk |= 2;
+		if (machine().input().code_pressed(KEYCODE_U))  msk |= 4;
+		if (machine().input().code_pressed(KEYCODE_I))  msk |= 8;
+		if (machine().input().code_pressed(KEYCODE_O))  msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
-	if (layers_ctrl & 1)	m_bg1_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	else				bitmap.fill(get_black_pen(machine()), cliprect);
-	if (layers_ctrl & 2)	m_bg2_tmap->draw(bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 4)	m_bg3_tmap->draw(bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 8)	m_bg4_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 1)    m_bg1_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	else                bitmap.fill(get_black_pen(machine()), cliprect);
+	if (layers_ctrl & 2)    m_bg2_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 4)    m_bg3_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 8)    m_bg4_tmap->draw(bitmap, cliprect, 0, 0);
 
-	if (layers_ctrl & 16)	m_fg_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 16)   m_fg_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -238,30 +238,30 @@ WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 	if (ACCESSING_BITS_0_7)
 	{
 	/*
-        - Lbits -
-        7654 3210
-        =========
-        ---- ---x  Hold1 lamp.
-        ---- --x-  Hold2 lamp.
-        ---- -x--  Hold3 lamp.
-        ---- x---  Hold4 lamp.
-        ---x ----  Hold5 lamp.
-        --x- ----  Start lamp.
-        -x-- ----  Payout.
+	    - Lbits -
+	    7654 3210
+	    =========
+	    ---- ---x  Hold1 lamp.
+	    ---- --x-  Hold2 lamp.
+	    ---- -x--  Hold3 lamp.
+	    ---- x---  Hold4 lamp.
+	    ---x ----  Hold5 lamp.
+	    --x- ----  Start lamp.
+	    -x-- ----  Payout.
 
-    */
-		output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
-		output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
-		output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */
-		output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
-		output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
-		output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
+	*/
+		output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+		output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+		output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+		output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+		output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+		output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		m_ticket = data & 0x0100;
 		m_hopper = data & 0x1000;
-		coin_counter_w(machine(), 0, data & 0x2000);	// coins
+		coin_counter_w(machine(), 0, data & 0x2000);    // coins
 	}
 
 	COMBINE_DATA(&m_out[2]);
@@ -288,7 +288,7 @@ static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg4_w) AM_SHARE("bg4_ram")
 
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
-	AM_RANGE(0x102000, 0x1047ff) AM_READNOP	// unknown
+	AM_RANGE(0x102000, 0x1047ff) AM_READNOP // unknown
 
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")	// 2x DS1230Y (non volatile SRAM)
+	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")   // 2x DS1230Y (non volatile SRAM)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -315,15 +315,15 @@ static INPUT_PORTS_START( galaxi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)0 )	// hopper sensor
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)	// coin a
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)	// coin b (token)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )	// pin 25LC
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)0 )	// ticket sensor
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// hopper out (pin 14LS)
-	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )	// test
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// (pin 26LC)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// (pin 15LS)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)0 )   // hopper sensor
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )   // pin 25LC
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)0 )  // ticket sensor
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
+	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 26LC)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 15LS)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( magjoker )
@@ -335,15 +335,15 @@ static INPUT_PORTS_START( magjoker )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)0 )	// hopper sensor
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)	// coin a
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)	// coin b (token)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,hopper_r, (void *)0 )   // hopper sensor
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)0 )	// ticket sensor
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// hopper out (pin 14LS)
-	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )	// test
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )	// (pin 26LC)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// (pin 15LS)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state,ticket_r, (void *)0 )  // ticket sensor
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
+	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )   // (pin 26LC)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 15LS)
 INPUT_PORTS_END
 
 
@@ -354,7 +354,7 @@ INPUT_PORTS_END
 static const gfx_layout layout_8x8x4 =
 {
 	8, 8,
-	0x1000,	// 0x1000 tiles are accessible
+	0x1000, // 0x1000 tiles are accessible
 	4,
 	{ STEP4(0,1) },
 	{ STEP4(4*4,4), STEP4(0,4) },
@@ -365,7 +365,7 @@ static const gfx_layout layout_8x8x4 =
 static const gfx_layout layout_16x16x4 =
 {
 	16, 16,
-	0x1000,	// 0x1000 tiles are accessible
+	0x1000, // 0x1000 tiles are accessible
 	4,
 	{ STEP4(0,1) },
 	{ STEP4(4*4,4), STEP4(0,4), STEP4(4*4+8*16*4,4), STEP4(0+8*16*4,4) },
@@ -404,7 +404,7 @@ void galaxi_state::machine_reset()
 static MACHINE_CONFIG_START( galaxi, galaxi_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)	// ?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) // ?
 	MCFG_CPU_PROGRAM_MAP(galaxi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
 
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW)	// ?
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -469,7 +469,7 @@ ROM_START( magjoker )
 	ROM_LOAD16_BYTE( "23.u34", 0x00000, 0x80000, CRC(952b7c84) SHA1(a28e1b79444331837ffc07c8d3c16c1d9a3c974c) )
 	ROM_LOAD16_BYTE( "22.u33", 0x00001, 0x80000, CRC(41866733) SHA1(257d77f89fcf1e8f36fb6a8fcb8ad48b1127e457) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* 4-bit ADPCM mono @ 6 kHz.*/
+	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit ADPCM mono @ 6 kHz.*/
 	ROM_LOAD( "21.u38", 0x00000, 0x40000, CRC(199baf33) SHA1(006708d955481fe1ae44555d27896d18e1ff8440) )
 ROM_END
 

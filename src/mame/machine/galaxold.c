@@ -16,12 +16,12 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
 {
 	//galaxold_state *state = device->machine().driver_data<galaxold_state>();
 	/* for some reason a call to cputag_set_input_line
-     * is significantly delayed ....
-     *
-     * device->machine().device("maincpu")->set_input_line(0, CLEAR_LINE);
-     *
-     * Therefore we reset the line without any detour ....
-     */
+	 * is significantly delayed ....
+	 *
+	 * device->machine().device("maincpu")->set_input_line(0, CLEAR_LINE);
+	 *
+	 * Therefore we reset the line without any detour ....
+	 */
 	device->machine().firstcpu->set_input_line(0, CLEAR_LINE);
 	//cpu_set_info(device->machine().firstcpu, CPUINFO_INT_INPUT_STATE + state->m_irq_line, CLEAR_LINE);
 	return 0x03;
@@ -31,7 +31,7 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
 WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_2_q_callback)
 {
 	/* Q bar clocks the other flip-flop,
-       Q is VBLANK (not visible to the CPU) */
+	   Q is VBLANK (not visible to the CPU) */
 	downcast<ttl7474_device *>(machine().device("7474_9m_1"))->clock_w(state);
 }
 
@@ -43,14 +43,14 @@ WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_1_callback)
 
 WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)
 {
-    ttl7474_device *target = machine().device<ttl7474_device>("7474_9m_1");
+	ttl7474_device *target = machine().device<ttl7474_device>("7474_9m_1");
 	target->preset_w(data ? 1 : 0);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(galaxold_state::galaxold_interrupt_timer)
 {
-    ttl7474_device *target = machine().device<ttl7474_device>("7474_9m_2");
+	ttl7474_device *target = machine().device<ttl7474_device>("7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
 	target->d_w(((param & 0xe0) != 0xe0) ? 1 : 0);
@@ -67,8 +67,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxold_state::galaxold_interrupt_timer)
 static void machine_reset_common(running_machine &machine, int line)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-    ttl7474_device *ttl7474_9m_1 = machine.device<ttl7474_device>("7474_9m_1");
-    ttl7474_device *ttl7474_9m_2 = machine.device<ttl7474_device>("7474_9m_2");
+	ttl7474_device *ttl7474_9m_1 = machine.device<ttl7474_device>("7474_9m_1");
+	ttl7474_device *ttl7474_9m_2 = machine.device<ttl7474_device>("7474_9m_2");
 	state->m_irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */
@@ -212,11 +212,11 @@ DRIVER_INIT_MEMBER(galaxold_state,dingoe)
 
 
 		/* Swap bit0 with bit4 */
-		if ((i & 0x0f) == 0x02 || (i & 0x0f) == 0x0a || (i & 0x0f) == 0x03 || (i & 0x0f) == 0x0b || (i & 0x0f) == 0x06 || (i & 0x0f) == 0x0e || (i & 0x0f) == 0x07 || (i & 0x0f) == 0x0f)	/* Swap Bit 0 and 4 */
+		if ((i & 0x0f) == 0x02 || (i & 0x0f) == 0x0a || (i & 0x0f) == 0x03 || (i & 0x0f) == 0x0b || (i & 0x0f) == 0x06 || (i & 0x0f) == 0x0e || (i & 0x0f) == 0x07 || (i & 0x0f) == 0x0f)   /* Swap Bit 0 and 4 */
 			rom[i] = BITSWAP8(rom[i],7,6,5,0,3,2,1,4);
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x3001, 0x3001, FUNC(dingoe_3001_r));	/* Protection check */
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x3001, 0x3001, FUNC(dingoe_3001_r));   /* Protection check */
 
 }
 #endif
@@ -387,7 +387,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 		int line = i & 0x07;
 
 		data_xor = (BIT(rom[i],xortable[line][0]) << xortable[line][1]) |
-				   (BIT(rom[i],xortable[line][2]) << xortable[line][3]);
+					(BIT(rom[i],xortable[line][2]) << xortable[line][3]);
 
 		rom[i] ^= data_xor;
 	}

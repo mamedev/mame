@@ -89,18 +89,18 @@ READ8_MEMBER( pc1640_state::iga_r )
 	case 0x0a: // Mono Status Register
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Display Enable
-            1       Light Pen Strobe
-            2       Light Pen Switch (-LPSW)
-            3       Mono Video
-            4       Color Diagnostic (MUX)
-            5       Color Diagnostic (MUX)
-            6       EGA Mode
-            7       -VSYNC
+		    0       Display Enable
+		    1       Light Pen Strobe
+		    2       Light Pen Switch (-LPSW)
+		    3       Mono Video
+		    4       Color Diagnostic (MUX)
+		    5       Color Diagnostic (MUX)
+		    6       EGA Mode
+		    7       -VSYNC
 
-        */
+		*/
 
 		if (!BIT(m_egc_ctrl, 0))
 		{
@@ -114,18 +114,18 @@ READ8_MEMBER( pc1640_state::iga_r )
 	case 0x12: // EGC Status Register
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1
-            2
-            3
-            4       Switch Sense
-            5
-            6
-            7       VSYNC Interrupt Active
+		    0
+		    1
+		    2
+		    3
+		    4       Switch Sense
+		    5
+		    6
+		    7       VSYNC Interrupt Active
 
-        */
+		*/
 
 		// switch sense
 		data |= BIT(ioport("SW")->read(), ((m_egc_ctrl >> 2) & 0x03) ^ 0x03);
@@ -151,18 +151,18 @@ READ8_MEMBER( pc1640_state::iga_r )
 	case 0x2a: // Color Status Register
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Display Enable
-            1       Light Pen Strobe
-            2       Light Pen Switch (-LPSW)
-            3       -VSYNC
-            4       Color Diagnostic (MUX)
-            5       Color Diagnostic (MUX)
-            6       EGA Mode
-            7       1
+		    0       Display Enable
+		    1       Light Pen Strobe
+		    2       Light Pen Switch (-LPSW)
+		    3       -VSYNC
+		    4       Color Diagnostic (MUX)
+		    5       Color Diagnostic (MUX)
+		    6       EGA Mode
+		    7       1
 
-        */
+		*/
 
 		if (BIT(m_egc_ctrl, 0))
 		{
@@ -216,18 +216,18 @@ WRITE8_MEMBER( pc1640_state::iga_w )
 	case 0x0b: // Mono Extended Mode Control Register
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Enable Color Simulation Modes
-            1       Enable 132 Character Mode
-            2       Disable Blanking
-            3       Enable Alternate Character Sets on plane 3
-            4       Lock CRTC Timing Registers
-            5       Disable Palette and Overscan Registers
-            6       Enable Special Modes
-            7       Vsync Polarity, Border Blanking
+		    0       Enable Color Simulation Modes
+		    1       Enable 132 Character Mode
+		    2       Disable Blanking
+		    3       Enable Alternate Character Sets on plane 3
+		    4       Lock CRTC Timing Registers
+		    5       Disable Palette and Overscan Registers
+		    6       Enable Special Modes
+		    7       Vsync Polarity, Border Blanking
 
-        */
+		*/
 
 		if (!BIT(m_egc_ctrl, 0) && (m_emcrp > 1))
 		{
@@ -245,18 +245,18 @@ WRITE8_MEMBER( pc1640_state::iga_w )
 	case 0x12: // EGC Control Register
 		/*
 
-            bit     description
+		    bit     description
 
-            0       CRTC 3BX/3DX I/O Address Select
-            1       Display RAM Enable
-            2       Clock Rate Select / Switch Sense Select bit 0
-            3       Clock Rate Select / Switch Sense Select bit 1
-            4       External Video Enable
-            5       Alternate (64K) Text page Select
-            6       HSYNC Polarity
-            7       VSYNC Polarity
+		    0       CRTC 3BX/3DX I/O Address Select
+		    1       Display RAM Enable
+		    2       Clock Rate Select / Switch Sense Select bit 0
+		    3       Clock Rate Select / Switch Sense Select bit 1
+		    4       External Video Enable
+		    5       Alternate (64K) Text page Select
+		    6       HSYNC Polarity
+		    7       VSYNC Polarity
 
-        */
+		*/
 
 		m_egc_ctrl = data;
 		break;
@@ -297,18 +297,18 @@ WRITE8_MEMBER( pc1640_state::iga_w )
 	case 0x2b: // Color Extended Mode Control Register
 		/*
 
-            bit     description
+		    bit     description
 
-            0       Enable Color Simulation Modes
-            1       Enable 132 Character Mode
-            2       Disable Blanking
-            3       Enable Alternate Character Sets on plane 3
-            4       Lock CRTC Timing Registers
-            5       Disable Palette and Overscan Registers
-            6       Enable Special Modes
-            7       Vsync Polarity, Border Blanking
+		    0       Enable Color Simulation Modes
+		    1       Enable 132 Character Mode
+		    2       Disable Blanking
+		    3       Enable Alternate Character Sets on plane 3
+		    4       Lock CRTC Timing Registers
+		    5       Disable Palette and Overscan Registers
+		    6       Enable Special Modes
+		    7       Vsync Polarity, Border Blanking
 
-        */
+		*/
 
 		if (BIT(m_egc_ctrl, 0) && (m_emcrp > 1))
 		{
@@ -320,18 +320,18 @@ WRITE8_MEMBER( pc1640_state::iga_w )
 	case 0x2d: // Plantronics Mode Register
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1
-            2
-            3
-            4       Enable Extended color palette 2
-            5       Enable Extended color palette 1
-            6       Color Plane 0/1 Position
-            7
+		    0
+		    1
+		    2
+		    3
+		    4       Enable Extended color palette 2
+		    5       Enable Extended color palette 1
+		    6       Color Plane 0/1 Position
+		    7
 
-        */
+		*/
 
 		m_plr = data;
 		break;

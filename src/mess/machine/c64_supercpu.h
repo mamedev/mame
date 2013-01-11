@@ -26,7 +26,7 @@
 // ======================> c64_supercpu_device
 
 class c64_supercpu_device : public device_t,
-					    	public device_c64_expansion_card_interface
+							public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -48,7 +48,7 @@ public:
 
 protected:
 	// device-level overrides
-    virtual void device_config_complete() { m_shortname = "c64_supercpu"; }
+	virtual void device_config_complete() { m_shortname = "c64_supercpu"; }
 	virtual void device_start();
 	virtual void device_reset();
 

@@ -25,11 +25,11 @@ static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype);
  */
 enum
 {
-	GFXTYPE_8BIT,			// direct mode:  8-bit; lookup table:  8-bit
-	GFXTYPE_HYBRID_12BIT,	// direct mode: 12-bit; lookup table:  8-bit
-	GFXTYPE_HYBRID_16BIT,	// direct mode: 16-bit; lookup table: 12-bit
-	GFXTYPE_PURE_16BIT,		// direct mode: 16-bit; lookup table: 16-bit
-	GFXTYPE_PURE_12BIT		// direct mode:    n/a; lookup table: 12-bit
+	GFXTYPE_8BIT,           // direct mode:  8-bit; lookup table:  8-bit
+	GFXTYPE_HYBRID_12BIT,   // direct mode: 12-bit; lookup table:  8-bit
+	GFXTYPE_HYBRID_16BIT,   // direct mode: 16-bit; lookup table: 12-bit
+	GFXTYPE_PURE_16BIT,     // direct mode: 16-bit; lookup table: 16-bit
+	GFXTYPE_PURE_12BIT      // direct mode:    n/a; lookup table: 12-bit
 };
 
 
@@ -92,9 +92,9 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
 	/* initialize 655 RGB lookup */
 	for (i = 0; i < 0x10000; i++)
 	{
-		r = (((i & 0x0700) >>  5) | ((i & 0x0007) >>  0));	// R 6bit
-		g = (((i & 0x3800) >>  9) | ((i & 0x0018) >>  3));	// G 5bit
-		b = (((i & 0xc000) >> 11) | ((i & 0x00e0) >>  5));	// B 5bit
+		r = (((i & 0x0700) >>  5) | ((i & 0x0007) >>  0));  // R 6bit
+		g = (((i & 0x3800) >>  9) | ((i & 0x0018) >>  3));  // G 5bit
+		b = (((i & 0xc000) >> 11) | ((i & 0x00e0) >>  5));  // B 5bit
 
 		palette_set_color_rgb(machine(), i, pal6bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -116,22 +116,22 @@ WRITE8_MEMBER(nbmj8688_state::nbmj8688_blitter_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 0x02:	m_blitter_destx = data; break;
-		case 0x03:	m_blitter_desty = data; break;
-		case 0x04:	m_blitter_sizex = data; break;
-		case 0x05:	m_blitter_sizey = data;
+		case 0x00:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x02:  m_blitter_destx = data; break;
+		case 0x03:  m_blitter_desty = data; break;
+		case 0x04:  m_blitter_sizex = data; break;
+		case 0x05:  m_blitter_sizey = data;
 					/* writing here also starts the blit */
 					mbmj8688_gfxdraw(machine(), m_mjsikaku_gfxmode);
 					break;
-		case 0x06:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+		case 0x06:  m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 					m_mjsikaku_flipscreen = (data & 0x04) ? 0 : 1;
 					m_mjsikaku_dispflag = (data & 0x08) ? 0 : 1;
 					mjsikaku_vramflip();
 					break;
-		case 0x07:	break;
+		case 0x07:  break;
 	}
 }
 
@@ -454,9 +454,9 @@ static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 				if (gfxtype == GFXTYPE_HYBRID_12BIT && (state->m_mjsikaku_gfxflag2 & 0x20))
 				{
 					/* 4096 colors mode, wedged in on top of normal mode
-                       Here we affect only the 4 least significant bits, the others are
-                       changed as usual.
-                     */
+					   Here we affect only the 4 least significant bits, the others are
+					   changed as usual.
+					 */
 
 					if (state->m_mjsikaku_gfxflag2 & 0x10)
 					{
@@ -545,7 +545,7 @@ static void common_video_start(running_machine &machine)
 	state->m_mjsikaku_videoram = auto_alloc_array_clear(machine, UINT16, 512 * 256);
 	state->m_clut = auto_alloc_array(machine, UINT8, 0x20);
 
-	state->m_mjsikaku_scrolly = 0;	// reset because crystalg/crystal2 don't write to this register
+	state->m_mjsikaku_scrolly = 0;  // reset because crystalg/crystal2 don't write to this register
 }
 
 VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_8bit)
@@ -607,13 +607,13 @@ static void nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,in
 	nbmj8688_state *state = space.machine().driver_data<nbmj8688_state>();
 	switch (state->m_HD61830B_instr[chip])
 	{
-		case 0x0a:	// set cursor address (low order)
+		case 0x0a:  // set cursor address (low order)
 			state->m_HD61830B_addr[chip] = (state->m_HD61830B_addr[chip] & 0xff00) | data;
 			break;
-		case 0x0b:	// set cursor address (high order)
+		case 0x0b:  // set cursor address (high order)
 			state->m_HD61830B_addr[chip] = (state->m_HD61830B_addr[chip] & 0x00ff) | (data << 8);
 			break;
-		case 0x0c:	// write display data
+		case 0x0c:  // write display data
 			state->m_HD61830B_ram[chip][state->m_HD61830B_addr[chip]++] = data;
 			break;
 		default:

@@ -44,14 +44,14 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	}
 
 	// Offset + 0 : disk format type (1 byte):
-    //  0 = 2HD / 2HDA (8 sector/track, 1024 bytes/sector, GAP#3 = 0x74)
-    //  1 = 2HS        (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
-    //  2 = 2HC        (15 sector/track, 512 bytes/sector, GAP#3 = 0x54)
-    //  3 = 2HDE(68)   (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
-    //  9 = 2HQ        (18 sector/track, 512 bytes/sector, GAP#3 = 0x54)
-    //  17 = N88-BASIC (26 sector/track, 256 bytes/sector, GAP#3 = 0x33)
-    //              or (26 sector/track, 128 bytes/sector, GAP#3 = 0x1a)
-    //
+	//  0 = 2HD / 2HDA (8 sector/track, 1024 bytes/sector, GAP#3 = 0x74)
+	//  1 = 2HS        (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
+	//  2 = 2HC        (15 sector/track, 512 bytes/sector, GAP#3 = 0x54)
+	//  3 = 2HDE(68)   (9 sector/track, 1024 bytes/sector, GAP#3 = 0x39)
+	//  9 = 2HQ        (18 sector/track, 512 bytes/sector, GAP#3 = 0x54)
+	//  17 = N88-BASIC (26 sector/track, 256 bytes/sector, GAP#3 = 0x33)
+	//              or (26 sector/track, 128 bytes/sector, GAP#3 = 0x1a)
+	//
 	floppy_image_read(floppy, &format_tmp,0,1);
 
 	switch(format_tmp)
@@ -98,4 +98,3 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	geometry.offset = 0x100;
 	return basicdsk_construct(floppy, &geometry);
 }
-

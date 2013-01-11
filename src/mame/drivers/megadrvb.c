@@ -266,13 +266,13 @@ connector, but of course, I can be wrong.
 
 static WRITE16_HANDLER( aladmdb_w )
 {
-    /*
-    Values returned from the log file :
-      - aladmdb_w : 1b2a6c - data = 6600 (each time a coin is inserted)
-      - aladmdb_w : 1b2a82 - data = 0000 (each time a coin is inserted)
-      - aladmdb_w : 1b2d18 - data = aa00 (only once on reset)
-      - aladmdb_w : 1b2d42 - data = 0000 (only once on reset)
-    */
+	/*
+	Values returned from the log file :
+	  - aladmdb_w : 1b2a6c - data = 6600 (each time a coin is inserted)
+	  - aladmdb_w : 1b2a82 - data = 0000 (each time a coin is inserted)
+	  - aladmdb_w : 1b2d18 - data = aa00 (only once on reset)
+	  - aladmdb_w : 1b2d42 - data = 0000 (only once on reset)
+	*/
 	logerror("aladmdb_w : %06x - data = %04x\n",space.device().safe_pc(),data);
 }
 
@@ -342,19 +342,19 @@ INPUT_PORTS_START( ssf2mdb )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN0")		/* 3rd I/O port */
+	PORT_START("IN0")       /* 3rd I/O port */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -416,13 +416,13 @@ INPUT_PORTS_START( mk3mdb )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -470,16 +470,16 @@ INPUT_PORTS_END
 INPUT_PORTS_START( aladmdb )
 	PORT_INCLUDE( md_common )
 
-	PORT_MODIFY("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_MODIFY("PAD1")     /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Throw") // a
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Sword") // b
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
 
-	PORT_MODIFY("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
+	PORT_MODIFY("PAD2")     /* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    /* As I don't know how it is on real hardware, this is more a guess than anything */
+	/* As I don't know how it is on real hardware, this is more a guess than anything */
 	PORT_START("MCU")
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )          /* code at 0x1b2a50 - unsure if there are so many settings */
 //  PORT_DIPSETTING(    0x00, "INVALID" )                   /* adds 0 credit */
@@ -489,7 +489,7 @@ INPUT_PORTS_START( aladmdb )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
-    PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
 //  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
@@ -517,7 +517,7 @@ INPUT_PORTS_START( srmdb )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // c (duplicate shoot button)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN0")		/* 3rd I/O port */
+	PORT_START("IN0")       /* 3rd I/O port */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -594,7 +594,7 @@ ROM_START( aladmdb )
 ROM_END
 
 ROM_START( mk3mdb ) // roms are scrambled, we take care of the address descramble in the ROM load, and the data descramble in the init
-                    // this is bootlegged from  "Mortal Kombat 3 (4) [!].bin"
+					// this is bootlegged from  "Mortal Kombat 3 (4) [!].bin"
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1.u1", 0x080001, 0x020000,  CRC(0dc01b23) SHA1(f1aa7ac88c8e3deb5a0a065862722e9d27b87b4c) )
 	ROM_CONTINUE(            0x000001, 0x020000)
@@ -656,8 +656,8 @@ ROM_END
 DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 {
 	/*
-     * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
-     */
+	 * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
+	 */
 	#if ENERGY_CONSOLE_MODE
 	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	rom[0x1afc08/2] = 0x6600;

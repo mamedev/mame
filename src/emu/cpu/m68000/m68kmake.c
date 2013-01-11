@@ -75,16 +75,16 @@ static const char g_version[] = "4.90";
 #define M68K_MAX_PATH 1024
 #define M68K_MAX_DIR  1024
 
-#define MAX_LINE_LENGTH                 200	/* length of 1 line */
-#define MAX_BODY_LENGTH                 300	/* Number of lines in 1 function */
-#define MAX_REPLACE_LENGTH               30	/* Max number of replace strings */
-#define MAX_INSERT_LENGTH              5000	/* Max size of insert piece */
-#define MAX_NAME_LENGTH                  96	/* Max length of ophandler name */
-#define MAX_SPEC_PROC_LENGTH              4	/* Max length of special processing str */
-#define MAX_SPEC_EA_LENGTH                5	/* Max length of specified EA str */
-#define EA_ALLOWED_LENGTH                11	/* Max length of ea allowed str */
-#define MAX_OPCODE_INPUT_TABLE_LENGTH  1000	/* Max length of opcode handler tbl */
-#define MAX_OPCODE_OUTPUT_TABLE_LENGTH 3000	/* Max length of opcode handler tbl */
+#define MAX_LINE_LENGTH                 200 /* length of 1 line */
+#define MAX_BODY_LENGTH                 300 /* Number of lines in 1 function */
+#define MAX_REPLACE_LENGTH               30 /* Max number of replace strings */
+#define MAX_INSERT_LENGTH              5000 /* Max size of insert piece */
+#define MAX_NAME_LENGTH                  96 /* Max length of ophandler name */
+#define MAX_SPEC_PROC_LENGTH              4 /* Max length of special processing str */
+#define MAX_SPEC_EA_LENGTH                5 /* Max length of specified EA str */
+#define EA_ALLOWED_LENGTH                11 /* Max length of ea allowed str */
+#define MAX_OPCODE_INPUT_TABLE_LENGTH  1000 /* Max length of opcode handler tbl */
+#define MAX_OPCODE_OUTPUT_TABLE_LENGTH 3000 /* Max length of opcode handler tbl */
 
 /* Default filenames */
 #define FILENAME_INPUT      "m68k_in.c"
@@ -137,7 +137,7 @@ enum
 	CPU_TYPE_030,       // 3
 	CPU_TYPE_040,       // 4
 	CPU_TYPE_68340,     // 5
-	CPU_TYPE_COLDFIRE,	// 6
+	CPU_TYPE_COLDFIRE,  // 6
 	NUM_CPUS
 };
 
@@ -158,19 +158,19 @@ enum
 
 enum
 {
-	EA_MODE_NONE,	/* No special addressing mode */
-	EA_MODE_AI,		/* Address register indirect */
-	EA_MODE_PI,		/* Address register indirect with postincrement */
-	EA_MODE_PI7,	/* Address register 7 indirect with postincrement */
-	EA_MODE_PD,		/* Address register indirect with predecrement */
-	EA_MODE_PD7,	/* Address register 7 indirect with predecrement */
-	EA_MODE_DI,		/* Address register indirect with displacement */
-	EA_MODE_IX,		/* Address register indirect with index */
-	EA_MODE_AW,		/* Absolute word */
-	EA_MODE_AL,		/* Absolute long */
-	EA_MODE_PCDI,	/* Program counter indirect with displacement */
-	EA_MODE_PCIX,	/* Program counter indirect with index */
-	EA_MODE_I		/* Immediate */
+	EA_MODE_NONE,   /* No special addressing mode */
+	EA_MODE_AI,     /* Address register indirect */
+	EA_MODE_PI,     /* Address register indirect with postincrement */
+	EA_MODE_PI7,    /* Address register 7 indirect with postincrement */
+	EA_MODE_PD,     /* Address register indirect with predecrement */
+	EA_MODE_PD7,    /* Address register 7 indirect with predecrement */
+	EA_MODE_DI,     /* Address register indirect with displacement */
+	EA_MODE_IX,     /* Address register indirect with index */
+	EA_MODE_AW,     /* Absolute word */
+	EA_MODE_AL,     /* Absolute long */
+	EA_MODE_PCDI,   /* Program counter indirect with displacement */
+	EA_MODE_PCIX,   /* Program counter indirect with index */
+	EA_MODE_I       /* Immediate */
 };
 
 
@@ -311,10 +311,10 @@ static const char *const g_cc_table[16][2] =
 /* size to index translator (0 -> 0, 8 and 16 -> 1, 32 -> 2) */
 static const int g_size_select_table[33] =
 {
-	0,												/* unsized */
-	0, 0, 0, 0, 0, 0, 0, 1,							/*    8    */
-	0, 0, 0, 0, 0, 0, 0, 1,							/*   16    */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2	/*   32    */
+	0,                                              /* unsized */
+	0, 0, 0, 0, 0, 0, 0, 1,                         /*    8    */
+	0, 0, 0, 0, 0, 0, 0, 1,                         /*   16    */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2  /*   32    */
 };
 
 /* Extra cycles required for certain EA modes */
@@ -339,91 +339,91 @@ static const int g_ea_cycle_table[13][NUM_CPUS][3] =
 /* Extra cycles for JMP instruction (000, 010) */
 static const int g_jmp_cycle_table[13] =
 {
-	 0, /* EA_MODE_NONE */
-	 4, /* EA_MODE_AI   */
-	 0, /* EA_MODE_PI   */
-	 0, /* EA_MODE_PI7  */
-	 0, /* EA_MODE_PD   */
-	 0, /* EA_MODE_PD7  */
-	 6, /* EA_MODE_DI   */
+		0, /* EA_MODE_NONE */
+		4, /* EA_MODE_AI   */
+		0, /* EA_MODE_PI   */
+		0, /* EA_MODE_PI7  */
+		0, /* EA_MODE_PD   */
+		0, /* EA_MODE_PD7  */
+		6, /* EA_MODE_DI   */
 	10, /* EA_MODE_IX   */
-	 6, /* EA_MODE_AW   */
-	 8, /* EA_MODE_AL   */
-	 6, /* EA_MODE_PCDI */
+		6, /* EA_MODE_AW   */
+		8, /* EA_MODE_AL   */
+		6, /* EA_MODE_PCDI */
 	10, /* EA_MODE_PCIX */
-	 0, /* EA_MODE_I    */
+		0, /* EA_MODE_I    */
 };
 
 /* Extra cycles for JSR instruction (000, 010) */
 static const int g_jsr_cycle_table[13] =
 {
-	 0, /* EA_MODE_NONE */
-	 4, /* EA_MODE_AI   */
-	 0, /* EA_MODE_PI   */
-	 0, /* EA_MODE_PI7  */
-	 0, /* EA_MODE_PD   */
-	 0, /* EA_MODE_PD7  */
-	 6, /* EA_MODE_DI   */
+		0, /* EA_MODE_NONE */
+		4, /* EA_MODE_AI   */
+		0, /* EA_MODE_PI   */
+		0, /* EA_MODE_PI7  */
+		0, /* EA_MODE_PD   */
+		0, /* EA_MODE_PD7  */
+		6, /* EA_MODE_DI   */
 	10, /* EA_MODE_IX   */
-	 6, /* EA_MODE_AW   */
-	 8, /* EA_MODE_AL   */
-	 6, /* EA_MODE_PCDI */
+		6, /* EA_MODE_AW   */
+		8, /* EA_MODE_AL   */
+		6, /* EA_MODE_PCDI */
 	10, /* EA_MODE_PCIX */
-	 0, /* EA_MODE_I    */
+		0, /* EA_MODE_I    */
 };
 
 /* Extra cycles for LEA instruction (000, 010) */
 static const int g_lea_cycle_table[13] =
 {
-	 0, /* EA_MODE_NONE */
-	 4, /* EA_MODE_AI   */
-	 0, /* EA_MODE_PI   */
-	 0, /* EA_MODE_PI7  */
-	 0, /* EA_MODE_PD   */
-	 0, /* EA_MODE_PD7  */
-	 8, /* EA_MODE_DI   */
+		0, /* EA_MODE_NONE */
+		4, /* EA_MODE_AI   */
+		0, /* EA_MODE_PI   */
+		0, /* EA_MODE_PI7  */
+		0, /* EA_MODE_PD   */
+		0, /* EA_MODE_PD7  */
+		8, /* EA_MODE_DI   */
 	12, /* EA_MODE_IX   */
-	 8, /* EA_MODE_AW   */
+		8, /* EA_MODE_AW   */
 	12, /* EA_MODE_AL   */
-	 8, /* EA_MODE_PCDI */
+		8, /* EA_MODE_PCDI */
 	12, /* EA_MODE_PCIX */
-	 0, /* EA_MODE_I    */
+		0, /* EA_MODE_I    */
 };
 
 /* Extra cycles for PEA instruction (000, 010) */
 static const int g_pea_cycle_table[13] =
 {
-	 0, /* EA_MODE_NONE */
-	 6, /* EA_MODE_AI   */
-	 0, /* EA_MODE_PI   */
-	 0, /* EA_MODE_PI7  */
-	 0, /* EA_MODE_PD   */
-	 0, /* EA_MODE_PD7  */
+		0, /* EA_MODE_NONE */
+		6, /* EA_MODE_AI   */
+		0, /* EA_MODE_PI   */
+		0, /* EA_MODE_PI7  */
+		0, /* EA_MODE_PD   */
+		0, /* EA_MODE_PD7  */
 	10, /* EA_MODE_DI   */
 	14, /* EA_MODE_IX   */
 	10, /* EA_MODE_AW   */
 	14, /* EA_MODE_AL   */
 	10, /* EA_MODE_PCDI */
 	14, /* EA_MODE_PCIX */
-	 0, /* EA_MODE_I    */
+		0, /* EA_MODE_I    */
 };
 
 /* Extra cycles for MOVEM instruction (000, 010) */
 static const int g_movem_cycle_table[13] =
 {
-	 0, /* EA_MODE_NONE */
-	 0, /* EA_MODE_AI   */
-	 0, /* EA_MODE_PI   */
-	 0, /* EA_MODE_PI7  */
-	 0, /* EA_MODE_PD   */
-	 0, /* EA_MODE_PD7  */
-	 4, /* EA_MODE_DI   */
-	 6, /* EA_MODE_IX   */
-	 4, /* EA_MODE_AW   */
-	 8, /* EA_MODE_AL   */
-	 0, /* EA_MODE_PCDI */
-	 0, /* EA_MODE_PCIX */
-	 0, /* EA_MODE_I    */
+		0, /* EA_MODE_NONE */
+		0, /* EA_MODE_AI   */
+		0, /* EA_MODE_PI   */
+		0, /* EA_MODE_PI7  */
+		0, /* EA_MODE_PD   */
+		0, /* EA_MODE_PD7  */
+		4, /* EA_MODE_DI   */
+		6, /* EA_MODE_IX   */
+		4, /* EA_MODE_AW   */
+		8, /* EA_MODE_AL   */
+		0, /* EA_MODE_PCDI */
+		0, /* EA_MODE_PCIX */
+		0, /* EA_MODE_I    */
 };
 
 /* Extra cycles for MOVES instruction (010) */
@@ -560,10 +560,10 @@ static int skip_spaces(char* str)
 /* Count the number of set bits in a value */
 static int num_bits(int value)
 {
-    value = ((value & 0xaaaa) >> 1) + (value & 0x5555);
-    value = ((value & 0xcccc) >> 2) + (value & 0x3333);
-    value = ((value & 0xf0f0) >> 4) + (value & 0x0f0f);
-    value = ((value & 0xff00) >> 8) + (value & 0x00ff);
+	value = ((value & 0xaaaa) >> 1) + (value & 0x5555);
+	value = ((value & 0xcccc) >> 2) + (value & 0x3333);
+	value = ((value & 0xf0f0) >> 4) + (value & 0x0f0f);
+	value = ((value & 0xff00) >> 8) + (value & 0x00ff);
 	return value;
 }
 
@@ -637,7 +637,7 @@ static int get_oper_cycles(opcode_struct* op, int ea_mode, int cpu_type)
 		/* ASG: added these cases -- immediate modes take 2 extra cycles here */
 		/* SV: but only when operating on long, and also on register direct mode */
 		if(cpu_type == CPU_TYPE_000 && (ea_mode == EA_MODE_I || ea_mode == EA_MODE_NONE) && op->size == 32 &&
-		   ((strcmp(op->name, "add") == 0 && strcmp(op->spec_proc, "er") == 0) ||
+			((strcmp(op->name, "add") == 0 && strcmp(op->spec_proc, "er") == 0) ||
 			strcmp(op->name, "adda")   == 0                                    ||
 			(strcmp(op->name, "and") == 0 && strcmp(op->spec_proc, "er") == 0) ||
 			(strcmp(op->name, "or") == 0 && strcmp(op->spec_proc, "er") == 0)  ||
@@ -667,7 +667,7 @@ static opcode_struct* find_opcode(char* name, int size, char* spec_proc, char* s
 
 	for(op = g_opcode_input_table;op->name != NULL;op++)
 	{
-		if(	strcmp(name, op->name) == 0 &&
+		if( strcmp(name, op->name) == 0 &&
 			(size == op->size) &&
 			strcmp(spec_proc, op->spec_proc) == 0 &&
 			strcmp(spec_ea, op->spec_ea) == 0)
@@ -709,7 +709,7 @@ static int extract_opcode_info(char* src, char* name, int* size, char* spec_proc
 	*size = atoi(ptr);
 	ptr = strstr(ptr, ",");
 	if(ptr == NULL) return 0;
-    ptr++;
+	ptr++;
 	ptr += skip_spaces(ptr);
 
 	ptr += check_strcncpy(spec_proc, ptr, ',', MAX_SPEC_PROC_LENGTH);

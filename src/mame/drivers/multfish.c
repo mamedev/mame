@@ -337,9 +337,9 @@ WRITE8_MEMBER(multfish_state::multfish_vid_w)
 				coldat = BITSWAP16(coldat,10,15,5,13,8,12,11,2,0,4,7,14,9,3,1,6);
 				break;
 			case 2:
-	                        coldat ^= m_xor_palette;
-        	                coldat ^= ((coldat&0x0001) <<1) ^ ((coldat&0x0010) <<1) ^ ((coldat&0x0010) <<2) ^ ((coldat&0x0020) <<1) ^ ((coldat&0x0080) >>1);
-                	        coldat = BITSWAP16(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
+							coldat ^= m_xor_palette;
+							coldat ^= ((coldat&0x0001) <<1) ^ ((coldat&0x0010) <<1) ^ ((coldat&0x0010) <<2) ^ ((coldat&0x0020) <<1) ^ ((coldat&0x0080) >>1);
+							coldat = BITSWAP16(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
 				break;
 		}
 		r = ( (coldat &0x001f)>> 0);
@@ -439,14 +439,14 @@ WRITE8_MEMBER(multfish_state::multfish_hopper_w)
 
 
 	m_hopper_motor = data & 0x10;
-        coin_lockout_w(machine(), 0, data & 0x01);
-        coin_lockout_w(machine(), 1, data & 0x01);
-        coin_lockout_w(machine(), 2, data & 0x01);
-        coin_lockout_w(machine(), 3, data & 0x01);
-        coin_lockout_w(machine(), 4, data & 0x04);
-        coin_lockout_w(machine(), 5, data & 0x04);
-        coin_lockout_w(machine(), 6, data & 0x04);
-        coin_lockout_w(machine(), 7, data & 0x04);
+		coin_lockout_w(machine(), 0, data & 0x01);
+		coin_lockout_w(machine(), 1, data & 0x01);
+		coin_lockout_w(machine(), 2, data & 0x01);
+		coin_lockout_w(machine(), 3, data & 0x01);
+		coin_lockout_w(machine(), 4, data & 0x04);
+		coin_lockout_w(machine(), 5, data & 0x04);
+		coin_lockout_w(machine(), 6, data & 0x04);
+		coin_lockout_w(machine(), 7, data & 0x04);
 }
 
 WRITE8_MEMBER(multfish_state::rollfr_hopper_w)
@@ -457,14 +457,14 @@ WRITE8_MEMBER(multfish_state::rollfr_hopper_w)
 
 
 	m_hopper_motor = data & 0x10;
-        coin_lockout_w(machine(), 0,~data & 0x01);
-        coin_lockout_w(machine(), 1,~data & 0x01);
-        coin_lockout_w(machine(), 2,~data & 0x01);
-        coin_lockout_w(machine(), 3,~data & 0x01);
-        coin_lockout_w(machine(), 4, data & 0x04);
-        coin_lockout_w(machine(), 5, data & 0x04);
-        coin_lockout_w(machine(), 6, data & 0x04);
-        coin_lockout_w(machine(), 7, data & 0x04);
+		coin_lockout_w(machine(), 0,~data & 0x01);
+		coin_lockout_w(machine(), 1,~data & 0x01);
+		coin_lockout_w(machine(), 2,~data & 0x01);
+		coin_lockout_w(machine(), 3,~data & 0x01);
+		coin_lockout_w(machine(), 4, data & 0x04);
+		coin_lockout_w(machine(), 5, data & 0x04);
+		coin_lockout_w(machine(), 6, data & 0x04);
+		coin_lockout_w(machine(), 7, data & 0x04);
 }
 
 DRIVER_INIT_MEMBER(multfish_state,customl)
@@ -508,7 +508,7 @@ A12 <-> A13
 		jscr = ((i & 0x8000)>>15) | ((i & 0x4000)>>13) | ((i & 0x0080)>>5) | ((i & 0x0040)>>3);
 		multfish_gfx[romoffset+i] = (((0x0f & multfish_gfx[romoffset+i])<<4) | ((0xf0 & multfish_gfx[romoffset+i])>>4)) ^ jscr;
 	}
-        /* ROM 2 decode */
+		/* ROM 2 decode */
 	romoffset = 0x100000;
 	for (i = 0; i < multfish_ROM_SIZE; i++)
 	{
@@ -535,13 +535,13 @@ A12 <-> A13
 
 		for (j = 0; j < (multfish_ROM_SIZE/0x40); j++)
 		{
-		   jscr =  BITSWAP16(j,15,14,13,4,3,2,0,1,6,7,5,12,11,10,8,9);
-		   memcpy(&temprom[j*0x40],&multfish_gfx[romoffset+(jscr*0x40)],0x40);
+			jscr =  BITSWAP16(j,15,14,13,4,3,2,0,1,6,7,5,12,11,10,8,9);
+			memcpy(&temprom[j*0x40],&multfish_gfx[romoffset+(jscr*0x40)],0x40);
 
 		}
 		memcpy(&multfish_gfx[romoffset],temprom,multfish_ROM_SIZE);
-          }
-        auto_free(machine(), temprom);
+			}
+		auto_free(machine(), temprom);
 }
 
 INLINE void rom_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
@@ -550,8 +550,8 @@ INLINE void rom_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor
 
 	for (i = 0; i < multfish_ROM_SIZE; i++)
 	{
-	   jscr =  BITSWAP24(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,3,2,1,0) ^ xor_add ^ 8;
-           tmprom[i] = romptr[jscr] ^ xor_data;
+		jscr =  BITSWAP24(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,3,2,1,0) ^ xor_add ^ 8;
+			tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,multfish_ROM_SIZE);
 }
@@ -561,8 +561,8 @@ INLINE void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor
 
 	for (i = 0; i < multfish_ROM_SIZE; i++)
 	{
-	   jscr =  BITSWAP24(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,2,3,1,0) ^ xor_add;
-           tmprom[i] = romptr[jscr] ^ xor_data;
+		jscr =  BITSWAP24(i,23,22,21,20,19,17,14,18,16,15,12,13,11,9,6,10,8,7,4,5,2,3,1,0) ^ xor_add;
+			tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,multfish_ROM_SIZE);
 }
@@ -582,7 +582,7 @@ static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, U
 	rom_decodeh(&multfish_gfx[0x280000], temprom, xor78, xor_addr);
 	rom_decodeh(&multfish_gfx[0x380000], temprom, xor78, xor_addr);
 
-        auto_free(machine, temprom);
+		auto_free(machine, temprom);
 }
 
 INLINE void roment_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
@@ -591,8 +591,8 @@ INLINE void roment_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 
 
 	for (i = 0; i < multfish_ROM_SIZE; i++)
 	{
-	   jscr =  BITSWAP24(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,3,2,1,0) ^ xor_add ^ 8;
-           tmprom[i] = romptr[jscr] ^ xor_data;
+		jscr =  BITSWAP24(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,3,2,1,0) ^ xor_add ^ 8;
+			tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,multfish_ROM_SIZE);
 }
@@ -602,8 +602,8 @@ INLINE void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 
 
 	for (i = 0; i < multfish_ROM_SIZE; i++)
 	{
-	   jscr =  BITSWAP24(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,2,3,1,0) ^ xor_add;
-           tmprom[i] = romptr[jscr] ^ xor_data;
+		jscr =  BITSWAP24(i,23,22,21,20,19,16,18,17,14,15,12,13,11,8,10,9,6,7,4,5,2,3,1,0) ^ xor_add;
+			tmprom[i] = romptr[jscr] ^ xor_data;
 	}
 	memcpy(romptr,tmprom,multfish_ROM_SIZE);
 }
@@ -623,117 +623,117 @@ static void ent_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8
 	roment_decodeh(&multfish_gfx[0x280000], temprom, xor78, xor_addr);
 	roment_decodeh(&multfish_gfx[0x380000], temprom, xor78, xor_addr);
 
-        auto_free(machine, temprom);
+		auto_free(machine, temprom);
 }
 
 DRIVER_INIT_MEMBER(multfish_state,island2l)
 {
-        m_xor_palette = 0x8bf7;
-        m_xor_paltype = 1;
+		m_xor_palette = 0x8bf7;
+		m_xor_paltype = 1;
 	lottery_decode(machine(), 0xff, 0x11, 0x77, 0xee, 0x44c40);
 }
 DRIVER_INIT_MEMBER(multfish_state,keksl)
 {
 
-        m_xor_palette = 0x41f3;
-        m_xor_paltype = 1;
+		m_xor_palette = 0x41f3;
+		m_xor_paltype = 1;
 	lottery_decode(machine(), 0xdd, 0xaa, 0x22, 0x55, 0x2cac0);
 }
 DRIVER_INIT_MEMBER(multfish_state,pirate2l)
 {
-        m_xor_palette = 0x8bfb;
-        m_xor_paltype = 1;
+		m_xor_palette = 0x8bfb;
+		m_xor_paltype = 1;
 	lottery_decode(machine(), 0xaa, 0x11, 0x22, 0xee, 0x48480);
 }
 DRIVER_INIT_MEMBER(multfish_state,fcockt2l)
 {
-        m_xor_palette = 0xedfb;
-        m_xor_paltype = 1;
+		m_xor_palette = 0xedfb;
+		m_xor_paltype = 1;
 	lottery_decode(machine(), 0x55, 0x11, 0xff, 0xee, 0x78780);
 }
 DRIVER_INIT_MEMBER(multfish_state,sweetl2l)
 {
-        m_xor_palette = 0x4bf7;
-        m_xor_paltype = 1;
+		m_xor_palette = 0x4bf7;
+		m_xor_paltype = 1;
 	lottery_decode(machine(), 0xdd, 0x33, 0x33, 0x77, 0x00800);
 }
 DRIVER_INIT_MEMBER(multfish_state,gnomel)
 {
 
-        m_xor_palette = 0x49ff;
-        m_xor_paltype = 1;
+		m_xor_palette = 0x49ff;
+		m_xor_paltype = 1;
 	lottery_decode(machine(), 0xcc, 0x22, 0x33, 0x66, 0x14940);
 }
 DRIVER_INIT_MEMBER(multfish_state,crzmonent)
 {
-        m_xor_palette = 0x1cdb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x1cdb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0xaa, 0x44, 0x55, 0x55, 0x1c9c0);
 }
 DRIVER_INIT_MEMBER(multfish_state,fcocktent)
 {
-        m_xor_palette = 0x2cdb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x2cdb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x77, 0x55, 0x22, 0x44, 0x18180);
 }
 DRIVER_INIT_MEMBER(multfish_state,garageent)
 {
-        m_xor_palette = 0x7adb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x7adb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x88, 0x66, 0x66, 0x99, 0x28280);
 }
 DRIVER_INIT_MEMBER(multfish_state,rclimbent)
 {
-        m_xor_palette = 0x5edb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x5edb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x55, 0xaa, 0x44, 0xff, 0x74740);
 }
 DRIVER_INIT_MEMBER(multfish_state,sweetl2ent)
 {
-        m_xor_palette = 0xdcdb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0xdcdb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0xee, 0x77, 0x88, 0x11, 0x5c5c0);
 }
 DRIVER_INIT_MEMBER(multfish_state,resdntent)
 {
-        m_xor_palette = 0x6edb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x6edb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0xaa, 0xcc, 0xaa, 0xaa, 0x78780);
 }
 DRIVER_INIT_MEMBER(multfish_state,island2ent)
 {
-        m_xor_palette = 0xecdb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0xecdb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x88, 0x55, 0xff, 0x99, 0x58d80);
 }
 DRIVER_INIT_MEMBER(multfish_state,pirate2ent)
 {
-        m_xor_palette = 0xbadb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0xbadb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x33, 0xbb, 0x77, 0x55, 0x68e80);
 }
 DRIVER_INIT_MEMBER(multfish_state,keksent)
 {
-        m_xor_palette = 0xaedb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0xaedb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x55, 0xff, 0xaa, 0x22, 0x38b80);
 }
 DRIVER_INIT_MEMBER(multfish_state,gnomeent)
 {
-        m_xor_palette = 0x9edb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x9edb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x22, 0x77, 0x11, 0xbb, 0x34b40);
 }
 DRIVER_INIT_MEMBER(multfish_state,lhauntent)
 {
-        m_xor_palette = 0x1adb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x1adb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x22, 0x44, 0x44, 0xbb, 0x24240);
 }
 DRIVER_INIT_MEMBER(multfish_state,fcockt2ent)
 {
-        m_xor_palette = 0x7cdb;
-        m_xor_paltype = 2;
+		m_xor_palette = 0x7cdb;
+		m_xor_paltype = 2;
 	ent_decode(machine(), 0x33, 0xcc, 0xaa, 0x88, 0x14140);
 }
 static ADDRESS_MAP_START( multfish_map, AS_PROGRAM, 8, multfish_state )
@@ -950,12 +950,12 @@ WRITE8_MEMBER(multfish_state::multfish_counters_w)
     -X-- ---- Key Out Counter 27A
     X--- ---- Total Bet Counter 28B
 */
-        coin_counter_w(machine(), 0, data & 0x01);
-        coin_counter_w(machine(), 1, data & 0x02);
-        coin_counter_w(machine(), 2, data & 0x04);
-        coin_counter_w(machine(), 3, data & 0x10);
-        coin_counter_w(machine(), 4, data & 0x40);
-        coin_counter_w(machine(), 5, data & 0x80);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 2, data & 0x04);
+		coin_counter_w(machine(), 3, data & 0x10);
+		coin_counter_w(machine(), 4, data & 0x40);
+		coin_counter_w(machine(), 5, data & 0x80);
 }
 
 WRITE8_MEMBER(multfish_state::multfish_f3_w)
@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8, multfish_state )
 
 	/* Write ports not hooked up yet */
 	AM_RANGE(0x30, 0x30) AM_WRITE(multfish_lamps1_w)
-        AM_RANGE(0x31, 0x31) AM_WRITE(multfish_counters_w)
+		AM_RANGE(0x31, 0x31) AM_WRITE(multfish_counters_w)
 //  AM_RANGE(0x32, 0x32) AM_WRITE_LEGACY(multfish_port32_w)
 	AM_RANGE(0x33, 0x33) AM_WRITE(multfish_hopper_w)
 	AM_RANGE(0x34, 0x34) AM_WRITE(multfish_lamps2_w)
@@ -1046,13 +1046,13 @@ static const gfx_layout tiles16x16_layout =
 	8,
 	{ RGN_FRAC(2,4)+0, RGN_FRAC(2,4)+1,RGN_FRAC(2,4)+2, RGN_FRAC(2,4)+3,0,1,2,3 },
 	{ 0,4,
-	  RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+4,
-	  8, 12,
-	  RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+12,
-	  16, 20,
-	  RGN_FRAC(1,4)+16, RGN_FRAC(1,4)+20,
-	  24, 28,
-	  RGN_FRAC(1,4)+24,RGN_FRAC(1,4)+28 },
+		RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+4,
+		8, 12,
+		RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+12,
+		16, 20,
+		RGN_FRAC(1,4)+16, RGN_FRAC(1,4)+20,
+		24, 28,
+		RGN_FRAC(1,4)+24,RGN_FRAC(1,4)+28 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
 	8*64
 };
@@ -3104,31 +3104,31 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 
 
 #define mfish_parent mfish_13
-  GAME( 2002, goldfish,    mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gold Fish (020903, prototype)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2002, goldfish,    mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gold Fish (020903, prototype)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish,       mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021120)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish_2,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021121)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_3,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021124)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2002, mfish_3,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021124)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish_4,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021219)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish_5,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (021227)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_6,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (030124)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2002, mfish_6,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (030124)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish_7,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (030511)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_8,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (030522)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2002, mfish_8,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (030522)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish_9,     mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031026)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2002, mfish_10,    mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031117)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_11,    mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031124)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_12,    mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (040308)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2002, mfish_13,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (040316)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2002, mfish_11,    mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (031124)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2002, mfish_12,    mfish_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (040308)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2002, mfish_13,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Multi Fish (040316)", GAME_SUPPORTS_SAVE ) /* World */
 
 #define crzmon_parent crzmon_8
 //GAME( 2003, crzmon,      crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030217 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2003, crzmon_2,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030225 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2003, crzmon_3,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030227 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2003, crzmon_4,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030404 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_5,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030421 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, crzmon_5,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (030421 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2003, crzmon_6,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (031016 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_7,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (031110 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_8,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (050120 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, crzmon_9,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (070315 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2003, crzmon_7,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (031110 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, crzmon_8,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (050120 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, crzmon_9,    crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (070315 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 //GAME( 2003, crzmon_10,   crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (081027 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 //GAME( 2003, crzmon_11,   crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (081113 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 //GAME( 2003, crzmon_12,   crzmon_parent,   multfish, multfish, multfish_state, crzmonent,ROT0, "Igrosoft", "Crazy Monkey (090711 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
@@ -3136,123 +3136,123 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 #define fcockt_parent fcockt_8
 //GAME( 2003, fcockt,      fcockt_parent    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030505 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2003, fcockt_2,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030512 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_3,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030623 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, fcockt_3,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (030623 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2003, fcockt_4,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031028 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_5,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_6,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_7,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (050118 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_8,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (060111 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, fcockt_9,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070305 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, fcockt_10,   fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070517 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, fcockt_11,   fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070822 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, fcockt_12,   fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070911 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2003, fcockt_5,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, fcockt_6,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, fcockt_7,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (050118 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, fcockt_8,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (060111 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, fcockt_9,    fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070305 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2003, fcockt_10,   fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070517 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2003, fcockt_11,   fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070822 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2003, fcockt_12,   fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (070911 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 //GAME( 2003, fcockt_13,   fcockt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail (081124 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2003, fcockt_14,   fcockt_parent,   multfish, multfish, multfish_state, fcocktent,ROT0, "Igrosoft", "Fruit Cocktail (090708 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2003, fcockt_14,   fcockt_parent,   multfish, multfish, multfish_state, fcocktent,ROT0, "Igrosoft", "Fruit Cocktail (090708 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define lhaunt_parent lhaunt_6
 //GAME( 2003, lhaunt,      lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (030707 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_2,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (030804 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, lhaunt_2,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (030804 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2003, lhaunt_3,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (031027 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_4,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_5,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_6,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (040825 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, lhaunt_7,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (070402 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2003, lhaunt_8,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (070604 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2003, lhaunt_4,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (031111 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, lhaunt_5,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, lhaunt_6,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (040825 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, lhaunt_7,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (070402 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2003, lhaunt_8,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (070604 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 //GAME( 2003, lhaunt_9,    lhaunt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Lucky Haunter (081208 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2003, lhaunt_10,   lhaunt_parent,   multfish, multfish, multfish_state, lhauntent,ROT0, "Igrosoft", "Lucky Haunter (090712 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2003, lhaunt_10,   lhaunt_parent,   multfish, multfish, multfish_state, lhauntent,ROT0, "Igrosoft", "Lucky Haunter (090712 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define rollfr_parent rollfr_4
 //GAME( 2003, rollfr,      rollfr_parent,   rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (030821)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, rollfr_2,    rollfr_parent,   rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (040318)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, rollfr_3,    rollfr_parent,   rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (080327)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2003, rollfr_4,    0,               rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (080331)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, rollfr_2,    rollfr_parent,   rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (040318)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, rollfr_3,    rollfr_parent,   rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (080327)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2003, rollfr_4,    0,               rollfr,   rollfr, driver_device,    0,        ROT0, "Igrosoft", "Roll Fruit (080331)", GAME_SUPPORTS_SAVE ) /* World */
 
 #define garage_parent garage_5
 //GAME( 2004, garage,      garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (040122 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2004, garage_2,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (040123 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2004, garage_3,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (040216 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, garage_4,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (040219 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, garage_5,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (050311 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, garage_6,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (070213 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2004, garage_7,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (070329 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2004, garage_4,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (040219 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2004, garage_5,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (050311 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2004, garage_6,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (070213 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2004, garage_7,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (070329 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 //GAME( 2004, garage_8,    garage_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Garage (081229 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2004, garage_9,    garage_parent,   multfish, multfish, multfish_state, garageent,ROT0, "Igrosoft", "Garage (090715 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2004, garage_9,    garage_parent,   multfish, multfish, multfish_state, garageent,ROT0, "Igrosoft", "Garage (090715 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define rclimb_parent rclimb_3
-  GAME( 2004, rclimb,      rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (040815 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2004, rclimb,      rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (040815 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2004, rclimb_2,    rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (040823 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, rclimb_3,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (040827 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, rclimb_4,    rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (070322 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2004, rclimb_5,    rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (070621 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2004, rclimb_3,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (040827 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2004, rclimb_4,    rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (070322 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2004, rclimb_5,    rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (070621 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 //GAME( 2004, rclimb_6,    rclimb_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Rock Climber (090217 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2004, rclimb_7,    rclimb_parent,   multfish, multfish, multfish_state, rclimbent,ROT0, "Igrosoft", "Rock Climber (090716 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2004, rclimb_7,    rclimb_parent,   multfish, multfish, multfish_state, rclimbent,ROT0, "Igrosoft", "Rock Climber (090716 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define sweetl_parent sweetl
-  GAME( 2004, sweetl,      0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life (041220 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, sweetl_2,    sweetl_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2004, sweetl,      0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life (041220 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2004, sweetl_2,    sweetl_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 #define resdnt_parent resdnt_2
-  GAME( 2004, resdnt,      resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (040415 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, resdnt_2,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (040513 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2004, resdnt_3,    resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (070222 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2004, resdnt,      resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (040415 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2004, resdnt_2,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (040513 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2004, resdnt_3,    resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (070222 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 //GAME( 2004, resdnt_4,    resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (090129 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 //GAME( 2004, resdnt_5,    resdnt_parent,   multfish, multfish, multfish_state, resdntent,ROT0, "Igrosoft", "Resident (090722 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define island_parent island
-  GAME( 2005, island,      0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island (050713 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, island_2,    island_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island (070409 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2005, island,      0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island (050713 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2005, island_2,    island_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island (070409 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 #define pirate_parent pirate_3
 //GAME( 2005, pirate,      pirate_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate (051229 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, pirate_2,    pirate_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate (060210 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, pirate_3,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate (060803 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2005, pirate_4,    pirate_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2005, pirate_2,    pirate_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate (060210 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2005, pirate_3,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate (060803 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2005, pirate_4,    pirate_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate (070412 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 #define island2_parent island2
-  GAME( 2006, island2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (060529 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2006, island2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (060529 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2006, island2_2,   island2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (061214 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, island2_3,   island2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (061218 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, island2_4,   island2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (070205 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2006, island2_5,   island2_parent,  multfish, multfish, multfish_state, island2l, ROT0, "Igrosoft", "Island 2 (090528 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2006, island2_6,   island2_parent,  multfish, multfish, multfish_state,island2ent,ROT0, "Igrosoft", "Island 2 (090724 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2006, island2_3,   island2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (061218 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2006, island2_4,   island2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Island 2 (070205 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2006, island2_5,   island2_parent,  multfish, multfish, multfish_state, island2l, ROT0, "Igrosoft", "Island 2 (090528 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+	GAME( 2006, island2_6,   island2_parent,  multfish, multfish, multfish_state,island2ent,ROT0, "Igrosoft", "Island 2 (090724 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define pirate2_parent pirate2
-  GAME( 2006, pirate2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate 2 (061005 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, pirate2_2,   pirate2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate 2 (070126 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2006, pirate2_3,   pirate2_parent,  multfish, multfish, multfish_state, pirate2l, ROT0, "Igrosoft", "Pirate 2 (090528 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2006, pirate2_4,   pirate2_parent,  multfish, multfish, multfish_state,pirate2ent,ROT0, "Igrosoft", "Pirate 2 (090730 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2006, pirate2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate 2 (061005 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2006, pirate2_2,   pirate2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Pirate 2 (070126 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2006, pirate2_3,   pirate2_parent,  multfish, multfish, multfish_state, pirate2l, ROT0, "Igrosoft", "Pirate 2 (090528 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+	GAME( 2006, pirate2_4,   pirate2_parent,  multfish, multfish, multfish_state,pirate2ent,ROT0, "Igrosoft", "Pirate 2 (090730 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define keks_parent keks_2
-  GAME( 2006, keks,        keks_parent,     multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Keks (060328 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, keks_2,      0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Keks (060403 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2006, keks_3,      keks_parent,     multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Keks (070119 Russia)", GAME_SUPPORTS_SAVE )  /* Russia */
-  GAME( 2006, keks_4,      keks_parent,     multfish, multfish, multfish_state, keksl,    ROT0, "Igrosoft", "Keks (090604 Lottery)", GAME_SUPPORTS_SAVE )  /* Lottery */
-  GAME( 2006, keks_5,      keks_parent,     multfish, multfish, multfish_state, keksent,  ROT0, "Igrosoft", "Keks (090727 Entertainment)", GAME_SUPPORTS_SAVE )  /* Entertainment */
+	GAME( 2006, keks,        keks_parent,     multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Keks (060328 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2006, keks_2,      0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Keks (060403 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2006, keks_3,      keks_parent,     multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Keks (070119 Russia)", GAME_SUPPORTS_SAVE )  /* Russia */
+	GAME( 2006, keks_4,      keks_parent,     multfish, multfish, multfish_state, keksl,    ROT0, "Igrosoft", "Keks (090604 Lottery)", GAME_SUPPORTS_SAVE )  /* Lottery */
+	GAME( 2006, keks_5,      keks_parent,     multfish, multfish, multfish_state, keksent,  ROT0, "Igrosoft", "Keks (090727 Entertainment)", GAME_SUPPORTS_SAVE )  /* Entertainment */
 
 #define gnome_parent gnome_5
-  GAME( 2007, gnome,       gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (070906 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2007, gnome_2,     gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (071115 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2007, gnome_3,     gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (080303 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2007, gnome_4,     gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (090402 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2007, gnome_5,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (090406 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2007, gnome,       gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (070906 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2007, gnome_2,     gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (071115 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2007, gnome_3,     gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (080303 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2007, gnome_4,     gnome_parent,    multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (090402 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2007, gnome_5,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Gnome (090406 World)", GAME_SUPPORTS_SAVE ) /* World */
 //GAME( 2007, gnome_6,     gnome_parent,    multfish, multfish, multfish_state, gnomel,   ROT0, "Igrosoft", "Gnome (090604 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2007, gnome_7,     gnome_parent,    multfish, multfish, multfish_state, gnomel,   ROT0, "Igrosoft", "Gnome (090708 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+	GAME( 2007, gnome_7,     gnome_parent,    multfish, multfish, multfish_state, gnomel,   ROT0, "Igrosoft", "Gnome (090708 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 //GAME( 2007, gnome_8,     gnome_parent,    multfish, multfish, multfish_state, gnomeent, ROT0, "Igrosoft", "Gnome (090810 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define sweetl2_parent sweetl2
-  GAME( 2007, sweetl2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2007, sweetl2_2,   sweetl2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life 2 (080320 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2007, sweetl2_3,   sweetl2_parent,  multfish, multfish, multfish_state, sweetl2l, ROT0, "Igrosoft", "Sweet Life 2 (090525 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2007, sweetl2_4,   sweetl2_parent,  multfish, multfish, multfish_state,sweetl2ent,ROT0, "Igrosoft", "Sweet Life 2 (090812 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2007, sweetl2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2007, sweetl2_2,   sweetl2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Sweet Life 2 (080320 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2007, sweetl2_3,   sweetl2_parent,  multfish, multfish, multfish_state, sweetl2l, ROT0, "Igrosoft", "Sweet Life 2 (090525 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+	GAME( 2007, sweetl2_4,   sweetl2_parent,  multfish, multfish, multfish_state,sweetl2ent,ROT0, "Igrosoft", "Sweet Life 2 (090812 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 #define fcockt2_parent fcockt2
-  GAME( 2008, fcockt2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080707 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2008, fcockt2,     0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080707 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 //GAME( 2008, fcockt2_2,   fcockt2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2008, fcockt2_3,   fcockt2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080909 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2008, fcockt2_4,   fcockt2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081105 World)", GAME_SUPPORTS_SAVE ) /* World */
-  GAME( 2008, fcockt2_5,   fcockt2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081106 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
-  GAME( 2008, fcockt2_6,   fcockt2_parent,  multfish, multfish, multfish_state, fcockt2l, ROT0, "Igrosoft", "Fruit Cocktail 2 (090528 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
-  GAME( 2008, fcockt2_7,   fcockt2_parent,  multfish, multfish, multfish_state,fcockt2ent,ROT0, "Igrosoft", "Fruit Cocktail 2 (090813 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
+	GAME( 2008, fcockt2_3,   fcockt2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080909 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2008, fcockt2_4,   fcockt2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081105 World)", GAME_SUPPORTS_SAVE ) /* World */
+	GAME( 2008, fcockt2_5,   fcockt2_parent,  multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (081106 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
+	GAME( 2008, fcockt2_6,   fcockt2_parent,  multfish, multfish, multfish_state, fcockt2l, ROT0, "Igrosoft", "Fruit Cocktail 2 (090528 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+	GAME( 2008, fcockt2_7,   fcockt2_parent,  multfish, multfish, multfish_state,fcockt2ent,ROT0, "Igrosoft", "Fruit Cocktail 2 (090813 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 
 
 
@@ -5095,6 +5095,5 @@ ROM_START( igromula )
 	ROM_LOAD( "15games.gfx", 0x000000, 0x4000000, NO_DUMP )
 ROM_END
 
-GAME( 2003, igromult,   0,		  multfish, multfish, driver_device,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (10 Games)", GAME_NOT_WORKING ) // no GFX roms
+GAME( 2003, igromult,   0,        multfish, multfish, driver_device,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (10 Games)", GAME_NOT_WORKING ) // no GFX roms
 GAME( 2003, igromula,   igromult, multfish, multfish, driver_device,  0,             ROT0,  "bootleg", "Igrosoft Multigame Bootleg (15 Games)", GAME_NOT_WORKING ) // no GFX roms
-

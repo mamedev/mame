@@ -21,13 +21,13 @@ CPU_DISASSEMBLE( i4004 )
 	UINT16 page = PC & 0x0f00;
 	switch (op = OP(pc++))
 	{
-		case 0x00:	sprintf (buffer,"nop");                         		break;
-		case 0x11:	sprintf (buffer,"jnt $%03x",page | ARG(pc));	pc++;   break;
-		case 0x12:	sprintf (buffer,"jc $%03x",page | ARG(pc));		pc++;   break;
-		case 0x14:	sprintf (buffer,"jz $%03x",page | ARG(pc));		pc++;   break;
-		case 0x19:	sprintf (buffer,"jt $%03x",page | ARG(pc));		pc++;   break;
-		case 0x1a:	sprintf (buffer,"jnc $%03x",page | ARG(pc));	pc++;   break;
-		case 0x1c:	sprintf (buffer,"jnz $%03x",page | ARG(pc));	pc++;   break;
+		case 0x00:  sprintf (buffer,"nop");                                 break;
+		case 0x11:  sprintf (buffer,"jnt $%03x",page | ARG(pc));    pc++;   break;
+		case 0x12:  sprintf (buffer,"jc $%03x",page | ARG(pc));     pc++;   break;
+		case 0x14:  sprintf (buffer,"jz $%03x",page | ARG(pc));     pc++;   break;
+		case 0x19:  sprintf (buffer,"jt $%03x",page | ARG(pc));     pc++;   break;
+		case 0x1a:  sprintf (buffer,"jnc $%03x",page | ARG(pc));    pc++;   break;
+		case 0x1c:  sprintf (buffer,"jnz $%03x",page | ARG(pc));    pc++;   break;
 		case 0x10: case 0x13: case 0x15: case 0x16:
 		case 0x17: case 0x18: case 0x1b: case 0x1d:
 		case 0x1e: case 0x1f:
@@ -95,37 +95,37 @@ CPU_DISASSEMBLE( i4004 )
 		case 0xdc: case 0xdd: case 0xde: case 0xdf:
 					sprintf (buffer,"ldm $%01x",op & 0x0f); break;
 
-		case 0xe0:	sprintf (buffer,"wrm"); break;
-		case 0xe1:	sprintf (buffer,"wmp"); break;
-		case 0xe2:	sprintf (buffer,"wrr"); break;
-		case 0xe3:	sprintf (buffer,"wpm"); break;
-		case 0xe4:	sprintf (buffer,"wr0"); break;
-		case 0xe5:	sprintf (buffer,"wr1"); break;
-		case 0xe6:	sprintf (buffer,"wr2"); break;
-		case 0xe7:	sprintf (buffer,"wr3"); break;
-		case 0xe8:	sprintf (buffer,"sbm"); break;
-		case 0xe9:	sprintf (buffer,"rdm"); break;
-		case 0xea:	sprintf (buffer,"rdr"); break;
-		case 0xeb:	sprintf (buffer,"adm"); break;
-		case 0xec:	sprintf (buffer,"rd0"); break;
-		case 0xed:	sprintf (buffer,"rd1"); break;
-		case 0xee:	sprintf (buffer,"rd2"); break;
-		case 0xef:	sprintf (buffer,"rd3"); break;
+		case 0xe0:  sprintf (buffer,"wrm"); break;
+		case 0xe1:  sprintf (buffer,"wmp"); break;
+		case 0xe2:  sprintf (buffer,"wrr"); break;
+		case 0xe3:  sprintf (buffer,"wpm"); break;
+		case 0xe4:  sprintf (buffer,"wr0"); break;
+		case 0xe5:  sprintf (buffer,"wr1"); break;
+		case 0xe6:  sprintf (buffer,"wr2"); break;
+		case 0xe7:  sprintf (buffer,"wr3"); break;
+		case 0xe8:  sprintf (buffer,"sbm"); break;
+		case 0xe9:  sprintf (buffer,"rdm"); break;
+		case 0xea:  sprintf (buffer,"rdr"); break;
+		case 0xeb:  sprintf (buffer,"adm"); break;
+		case 0xec:  sprintf (buffer,"rd0"); break;
+		case 0xed:  sprintf (buffer,"rd1"); break;
+		case 0xee:  sprintf (buffer,"rd2"); break;
+		case 0xef:  sprintf (buffer,"rd3"); break;
 
-		case 0xf0:	sprintf (buffer,"clb"); break;
-		case 0xf1:	sprintf (buffer,"clc"); break;
-		case 0xf2:	sprintf (buffer,"iac"); break;
-		case 0xf3:	sprintf (buffer,"cmc"); break;
-		case 0xf4:	sprintf (buffer,"cma"); break;
-		case 0xf5:	sprintf (buffer,"ral"); break;
-		case 0xf6:	sprintf (buffer,"rar"); break;
-		case 0xf7:	sprintf (buffer,"tcc"); break;
-		case 0xf8:	sprintf (buffer,"dac"); break;
-		case 0xf9:	sprintf (buffer,"tcs"); break;
-		case 0xfa:	sprintf (buffer,"stc"); break;
-		case 0xfb:	sprintf (buffer,"daa"); break;
-		case 0xfc:	sprintf (buffer,"kbp"); break;
-		case 0xfd:	sprintf (buffer,"dcl"); break;
+		case 0xf0:  sprintf (buffer,"clb"); break;
+		case 0xf1:  sprintf (buffer,"clc"); break;
+		case 0xf2:  sprintf (buffer,"iac"); break;
+		case 0xf3:  sprintf (buffer,"cmc"); break;
+		case 0xf4:  sprintf (buffer,"cma"); break;
+		case 0xf5:  sprintf (buffer,"ral"); break;
+		case 0xf6:  sprintf (buffer,"rar"); break;
+		case 0xf7:  sprintf (buffer,"tcc"); break;
+		case 0xf8:  sprintf (buffer,"dac"); break;
+		case 0xf9:  sprintf (buffer,"tcs"); break;
+		case 0xfa:  sprintf (buffer,"stc"); break;
+		case 0xfb:  sprintf (buffer,"daa"); break;
+		case 0xfc:  sprintf (buffer,"kbp"); break;
+		case 0xfd:  sprintf (buffer,"dcl"); break;
 
 		default : sprintf (buffer,"illegal"); break;
 	}

@@ -27,41 +27,41 @@
     PARAMETERS/MACROS
 ***************************************************************************/
 
-#define DEBUG_TMS5501	0
+#define DEBUG_TMS5501   0
 
 #define LOG_TMS5501(message, data) do { if (DEBUG_TMS5501) logerror ("\nTMS5501 %s: %s %02x", tag(), message, data); } while (0)
 
 /* status register */
-#define TMS5501_FRAME_ERROR		0x01
-#define TMS5501_OVERRUN_ERROR		0x02
-#define TMS5501_SERIAL_RCVD		0x04
-#define TMS5501_RCV_BUFFER_LOADED	0x08
-#define TMS5501_XMIT_BUFFER_EMPTY	0x10
-#define TMS5501_INTERRUPT_PENDING	0x20
-#define TMS5501_FULL_BIT_DETECT		0x40
-#define TMS5501_START_BIT_DETECT	0x80
+#define TMS5501_FRAME_ERROR     0x01
+#define TMS5501_OVERRUN_ERROR       0x02
+#define TMS5501_SERIAL_RCVD     0x04
+#define TMS5501_RCV_BUFFER_LOADED   0x08
+#define TMS5501_XMIT_BUFFER_EMPTY   0x10
+#define TMS5501_INTERRUPT_PENDING   0x20
+#define TMS5501_FULL_BIT_DETECT     0x40
+#define TMS5501_START_BIT_DETECT    0x80
 
 /* command */
-#define TMS5501_RESET			0x01
-#define TMS5501_BREAK			0x02
-#define TMS5501_INT_7_SELECT		0x04
-#define TMS5501_INT_ACK_ENABLE		0x08
-#define TMS5501_TEST_BIT_1		0x10
-#define TMS5501_TEST_BIT_2		0x20
-#define TMS5501_COMMAND_LATCHED_BITS	0x3e
+#define TMS5501_RESET           0x01
+#define TMS5501_BREAK           0x02
+#define TMS5501_INT_7_SELECT        0x04
+#define TMS5501_INT_ACK_ENABLE      0x08
+#define TMS5501_TEST_BIT_1      0x10
+#define TMS5501_TEST_BIT_2      0x20
+#define TMS5501_COMMAND_LATCHED_BITS    0x3e
 
 /* interrupt mask register */
-#define TMS5501_TIMER_0_INT		0x01
-#define TMS5501_TIMER_1_INT		0x02
-#define TMS5501_SENSOR_INT		0x04
-#define TMS5501_TIMER_2_INT		0x08
-#define TMS5501_SERIAL_RCV_LOADED_INT	0x10
-#define TMS5501_SERIAL_XMIT_EMPTY_INT	0x20
-#define TMS5501_TIMER_3_INT		0x40
-#define TMS5501_TIMER_4_INT		0x80
-#define TMS5501_INT_7_INT		0x80
+#define TMS5501_TIMER_0_INT     0x01
+#define TMS5501_TIMER_1_INT     0x02
+#define TMS5501_SENSOR_INT      0x04
+#define TMS5501_TIMER_2_INT     0x08
+#define TMS5501_SERIAL_RCV_LOADED_INT   0x10
+#define TMS5501_SERIAL_XMIT_EMPTY_INT   0x20
+#define TMS5501_TIMER_3_INT     0x40
+#define TMS5501_TIMER_4_INT     0x80
+#define TMS5501_INT_7_INT       0x80
 
-#define TMS5501_PIO_INT_7		0x80
+#define TMS5501_PIO_INT_7       0x80
 
 // device type definition
 const device_type TMS5501 = &device_creator<tms5501_device>;
@@ -119,7 +119,7 @@ int tms5501_device::find_first_bit(int value)
 
 	while (! (value & 1))
 	{
-		value >>= 1;	/* try next bit */
+		value >>= 1;    /* try next bit */
 		bit++;
 	}
 	return bit;
@@ -196,11 +196,11 @@ void tms5501_device::timer_decrementer(UINT8 mask)
 void tms5501_device::timer_reload(int timer)
 {
 	if (m_timer_counter[timer])
-	{	/* reset clock interval */
+	{   /* reset clock interval */
 		m_timer[timer]->adjust(attotime::from_double((double) m_timer_counter[timer] / (clock() / 128.)), timer_name[timer], attotime::from_double((double) m_timer_counter[timer] / (clock() / 128.)));
 	}
 	else
-	{	/* clock interval == 0 -> no timer */
+	{   /* clock interval == 0 -> no timer */
 		switch (timer)
 		{
 			case 0: timer_decrementer(TMS5501_TIMER_0_INT); break;
@@ -334,43 +334,43 @@ READ8_MEMBER( tms5501_device::read )
 
 	switch (offset)
 	{
-		case 0x00:	/* Serial input buffer */
+		case 0x00:  /* Serial input buffer */
 			data = m_sio_input_buffer;
 			m_status &= ~TMS5501_RCV_BUFFER_LOADED;
 			LOG_TMS5501("Reading from serial input buffer", data);
 			break;
-		case 0x01:	/* PIO input port */
+		case 0x01:  /* PIO input port */
 			if (!m_pio_read_func.isnull())
 				data = m_pio_read_func(0);
 			LOG_TMS5501("Reading from PIO", data);
 			break;
-		case 0x02:	/* Interrupt address register */
+		case 0x02:  /* Interrupt address register */
 			data = m_interrupt_address;
 			m_status &= ~TMS5501_INTERRUPT_PENDING;
 			break;
-		case 0x03:	/* Status register */
+		case 0x03:  /* Status register */
 			data = m_status;
 			break;
-		case 0x04:	/* Command register */
+		case 0x04:  /* Command register */
 			data = m_command;
 			LOG_TMS5501("Command register read", data);
 			break;
-		case 0x05:	/* Serial rate register */
+		case 0x05:  /* Serial rate register */
 			data = m_sio_rate;
 			LOG_TMS5501("Serial rate read", data);
 			break;
-		case 0x06:	/* Serial output buffer */
-		case 0x07:	/* PIO output */
+		case 0x06:  /* Serial output buffer */
+		case 0x07:  /* PIO output */
 			break;
-		case 0x08:	/* Interrupt mask register */
+		case 0x08:  /* Interrupt mask register */
 			data = m_interrupt_mask;
 			LOG_TMS5501("Interrupt mask read", data);
 			break;
-		case 0x09:	/* Timer 0 address */
-		case 0x0a:	/* Timer 1 address */
-		case 0x0b:	/* Timer 2 address */
-		case 0x0c:	/* Timer 3 address */
-		case 0x0d:	/* Timer 4 address */
+		case 0x09:  /* Timer 0 address */
+		case 0x0a:  /* Timer 1 address */
+		case 0x0b:  /* Timer 2 address */
+		case 0x0c:  /* Timer 3 address */
+		case 0x0d:  /* Timer 4 address */
 			break;
 	}
 	return data;
@@ -387,22 +387,22 @@ WRITE8_MEMBER( tms5501_device::write )
 
 	switch (offset)
 	{
-		case 0x00:	/* Serial input buffer */
-		case 0x01:	/* Keyboard input port, Page blanking signal */
-		case 0x02:	/* Interrupt address register */
-		case 0x03:	/* Status register */
+		case 0x00:  /* Serial input buffer */
+		case 0x01:  /* Keyboard input port, Page blanking signal */
+		case 0x02:  /* Interrupt address register */
+		case 0x03:  /* Status register */
 			LOG_TMS5501("Writing to read only port", offset&0x000f);
 			LOG_TMS5501("Data", data);
 			break;
 		case 0x04:
 			/* Command register
-                bit 0: reset
-                bit 1: send break, '1' - serial output is high impedance
-                bit 2: int 7 select: '0' - timer 5, '1' - IN7 of the DCE-bus
-                bit 3: int ack enable, '0' - disabled, '1' - enabled
-                bits 4-5: test bits, normally '0'
-                bits 6-7: not used, normally '0'
-               bits 1-5 are latched */
+			    bit 0: reset
+			    bit 1: send break, '1' - serial output is high impedance
+			    bit 2: int 7 select: '0' - timer 5, '1' - IN7 of the DCE-bus
+			    bit 3: int ack enable, '0' - disabled, '1' - enabled
+			    bits 4-5: test bits, normally '0'
+			    bits 6-7: not used, normally '0'
+			   bits 1-5 are latched */
 
 			m_command = data & TMS5501_COMMAND_LATCHED_BITS;
 			LOG_TMS5501("Command register write", data);
@@ -412,23 +412,23 @@ WRITE8_MEMBER( tms5501_device::write )
 			break;
 		case 0x05:
 			/* Serial rate register
-                bit 0: 110 baud
-                bit 1: 150 baud
-                bit 2: 300 baud
-                bit 3: 1200 baud
-                bit 4: 2400 baud
-                bit 5: 4800 baud
-                bit 6: 9600 baud
-                bit 7: '0' - two stop bits, '1' - one stop bit */
+			    bit 0: 110 baud
+			    bit 1: 150 baud
+			    bit 2: 300 baud
+			    bit 3: 1200 baud
+			    bit 4: 2400 baud
+			    bit 5: 4800 baud
+			    bit 6: 9600 baud
+			    bit 7: '0' - two stop bits, '1' - one stop bit */
 
 			m_sio_rate = data;
 			LOG_TMS5501("Serial rate write", data);
 			break;
-		case 0x06:	/* Serial output buffer */
+		case 0x06:  /* Serial output buffer */
 			m_sio_output_buffer = data;
 			LOG_TMS5501("Serial output data", data);
 			break;
-		case 0x07:	/* PIO output */
+		case 0x07:  /* PIO output */
 			m_pio_output_buffer = data;
 			if (!m_pio_write_func.isnull())
 				m_pio_write_func(0, m_pio_output_buffer);
@@ -436,23 +436,23 @@ WRITE8_MEMBER( tms5501_device::write )
 			break;
 		case 0x08:
 			/* Interrupt mask register
-                bit 0: Timer 1 has expired (UTIM)
-                bit 1: Timer 2 has expired
-                bit 2: External interrupt (STKIM)
-                bit 3: Timer 3 has expired (SNDIM)
-                bit 4: Serial receiver loaded
-                bit 5: Serial transmitter empty
-                bit 6: Timer 4 has expired (KBIM)
-                bit 7: Timer 5 has expired or IN7 (CLKIM) */
+			    bit 0: Timer 1 has expired (UTIM)
+			    bit 1: Timer 2 has expired
+			    bit 2: External interrupt (STKIM)
+			    bit 3: Timer 3 has expired (SNDIM)
+			    bit 4: Serial receiver loaded
+			    bit 5: Serial transmitter empty
+			    bit 6: Timer 4 has expired (KBIM)
+			    bit 7: Timer 5 has expired or IN7 (CLKIM) */
 
 			m_interrupt_mask = data;
 			LOG_TMS5501("Interrupt mask write", data);
 			break;
-		case 0x09:	/* Timer 0 counter */
-		case 0x0a:	/* Timer 1 counter */
-		case 0x0b:	/* Timer 2 counter */
-		case 0x0c:	/* Timer 3 counter */
-		case 0x0d:	/* Timer 4 counter */
+		case 0x09:  /* Timer 0 counter */
+		case 0x0a:  /* Timer 1 counter */
+		case 0x0b:  /* Timer 2 counter */
+		case 0x0c:  /* Timer 3 counter */
+		case 0x0d:  /* Timer 4 counter */
 			offset -= 9;
 			m_timer_counter[offset] = data;
 			timer_reload(offset);

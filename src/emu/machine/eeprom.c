@@ -29,45 +29,45 @@ const device_type EEPROM = &device_creator<eeprom_device>;
 
 const eeprom_interface eeprom_interface_93C46 =
 {
-	6,				// address bits 6
-	16,				// data bits    16
-	"*110",			// read         1 10 aaaaaa
-	"*101",			// write        1 01 aaaaaa dddddddddddddddd
-	"*111",			// erase        1 11 aaaaaa
-	"*10000xxxx",	// lock         1 00 00xxxx
-	"*10011xxxx",	// unlock       1 00 11xxxx
-	1,				// enable_multi_read
-	0				// reset_delay
+	6,              // address bits 6
+	16,             // data bits    16
+	"*110",         // read         1 10 aaaaaa
+	"*101",         // write        1 01 aaaaaa dddddddddddddddd
+	"*111",         // erase        1 11 aaaaaa
+	"*10000xxxx",   // lock         1 00 00xxxx
+	"*10011xxxx",   // unlock       1 00 11xxxx
+	1,              // enable_multi_read
+	0               // reset_delay
 //  "*10001xxxx"    // write all    1 00 01xxxx dddddddddddddddd
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
 const eeprom_interface eeprom_interface_93C46_8bit =
 {
-	7,				// address bits 7
-	8,				// data bits    8
-	"*110",			// read         1 10 aaaaaa
-	"*101",			// write        1 01 aaaaaa dddddddd
-	"*111",			// erase        1 11 aaaaaa
-	"*10000xxxx",	// lock         1 00 00xxxx
-	"*10011xxxx",	// unlock       1 00 11xxxx
-	1,				// enable_multi_read
-	0				// reset_delay
+	7,              // address bits 7
+	8,              // data bits    8
+	"*110",         // read         1 10 aaaaaa
+	"*101",         // write        1 01 aaaaaa dddddddd
+	"*111",         // erase        1 11 aaaaaa
+	"*10000xxxx",   // lock         1 00 00xxxx
+	"*10011xxxx",   // unlock       1 00 11xxxx
+	1,              // enable_multi_read
+	0               // reset_delay
 //  "*10001xxxx"    // write all    1 00 01xxxx dddddddd
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
 const eeprom_interface eeprom_interface_93C66B =
 {
-	8,				// address bits
-	16,				// data bits
-	"*110",			// read command
-	"*101",			// write command
-	"*111",			// erase command
-	"*10000xxxxxx",	// lock command
+	8,              // address bits
+	16,             // data bits
+	"*110",         // read command
+	"*101",         // write command
+	"*111",         // erase command
+	"*10000xxxxxx", // lock command
 	"*10011xxxxxx", // unlock command
-	1,				// enable_multi_read
-	0				// reset_delay
+	1,              // enable_multi_read
+	0               // reset_delay
 //  "*10001xxxxxx", // write all
 //  "*10010xxxxxx", // erase all
 };
@@ -94,20 +94,20 @@ ADDRESS_MAP_END
 
 eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EEPROM, "EEPROM", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_default_data_size(0),
-	  m_default_value(0),
-	  m_serial_count(0),
-	  m_data_buffer(0),
-	  m_read_address(0),
-	  m_clock_count(0),
-	  m_latch(0),
-	  m_reset_line(CLEAR_LINE),
-	  m_clock_line(CLEAR_LINE),
-	  m_sending(0),
-	  m_locked(false),
-	  m_reset_counter(0)
+		device_memory_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_default_data_size(0),
+		m_default_value(0),
+		m_serial_count(0),
+		m_data_buffer(0),
+		m_read_address(0),
+		m_clock_count(0),
+		m_latch(0),
+		m_reset_line(CLEAR_LINE),
+		m_clock_line(CLEAR_LINE),
+		m_sending(0),
+		m_locked(false),
+		m_reset_counter(0)
 {
 	m_default_data.u8 = NULL;
 	memset(downcast<eeprom_interface *>(this), 0, sizeof(eeprom_interface));
@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER( eeprom_device::set_cs_line )
 
 		m_serial_count = 0;
 		m_sending = 0;
-		m_reset_counter = m_reset_delay;	/* delay a little before returning setting data to 1 (needed by wbeachvl) */
+		m_reset_counter = m_reset_delay;    /* delay a little before returning setting data to 1 (needed by wbeachvl) */
 	}
 }
 
@@ -409,10 +409,10 @@ void eeprom_device::write(int bit)
 	}
 
 	m_serial_buffer[m_serial_count++] = (bit ? '1' : '0');
-	m_serial_buffer[m_serial_count] = 0;	/* nul terminate so we can treat it as a string */
+	m_serial_buffer[m_serial_count] = 0;    /* nul terminate so we can treat it as a string */
 
 	if ( (m_serial_count > m_address_bits) &&
-	      command_match((char*)(m_serial_buffer),m_cmd_read,strlen((char*)(m_serial_buffer))-m_address_bits) )
+			command_match((char*)(m_serial_buffer),m_cmd_read,strlen((char*)(m_serial_buffer))-m_address_bits) )
 	{
 		int i,address;
 
@@ -433,7 +433,7 @@ void eeprom_device::write(int bit)
 		logerror("EEPROM %s read %04x from address %02x\n", tag(), m_data_buffer,address);
 	}
 	else if ( (m_serial_count > m_address_bits) &&
-	           command_match((char*)(m_serial_buffer),m_cmd_erase,strlen((char*)(m_serial_buffer))-m_address_bits) )
+				command_match((char*)(m_serial_buffer),m_cmd_erase,strlen((char*)(m_serial_buffer))-m_address_bits) )
 	{
 		int i,address;
 
@@ -456,7 +456,7 @@ void eeprom_device::write(int bit)
 		m_serial_count = 0;
 	}
 	else if ( (m_serial_count > (m_address_bits + m_data_bits)) &&
-	           command_match((char*)(m_serial_buffer),m_cmd_write,strlen((char*)(m_serial_buffer))-(m_address_bits + m_data_bits)) )
+				command_match((char*)(m_serial_buffer),m_cmd_write,strlen((char*)(m_serial_buffer))-(m_address_bits + m_data_bits)) )
 	{
 		int i,address,data;
 
@@ -517,8 +517,8 @@ void eeprom_device::write(int bit)
 */
 bool eeprom_device::command_match(const char *buf, const char *cmd, int len)
 {
-	if ( cmd == 0 )	return false;
-	if ( len == 0 )	return false;
+	if ( cmd == 0 ) return false;
+	if ( len == 0 ) return false;
 
 	for (;len>0;)
 	{
@@ -532,7 +532,7 @@ bool eeprom_device::command_match(const char *buf, const char *cmd, int len)
 		{
 			case '0':
 			case '1':
-				if (b != c)	return false;
+				if (b != c) return false;
 			case 'X':
 			case 'x':
 				buf++;
@@ -546,10 +546,10 @@ bool eeprom_device::command_match(const char *buf, const char *cmd, int len)
 				{
 					case '0':
 					case '1':
-						if (b == c)	{	cmd++;			}
-						else		{	buf++;	len--;	}
+						if (b == c) {   cmd++;          }
+						else        {   buf++;  len--;  }
 						break;
-					default:	return false;
+					default:    return false;
 				}
 		}
 	}

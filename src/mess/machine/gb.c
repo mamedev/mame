@@ -89,38 +89,38 @@ TODO:
 
 /* Memory bank controller types */
 enum {
-	MBC_NONE=0,		/*  32KB ROM - No memory bank controller         */
-	MBC_MBC1,		/*  ~2MB ROM,   8KB RAM -or- 512KB ROM, 32KB RAM */
-	MBC_MBC2,		/* 256KB ROM,  32KB RAM                          */
-	MBC_MMM01,		/*    ?? ROM,    ?? RAM                          */
-	MBC_MBC3,		/*   2MB ROM,  32KB RAM, RTC                     */
-	MBC_MBC4,		/*    ?? ROM,    ?? RAM                          */
-	MBC_MBC5,		/*   8MB ROM, 128KB RAM (32KB w/ Rumble)         */
-	MBC_TAMA5,		/*    ?? ROM     ?? RAM - What is this?          */
-	MBC_HUC1,		/*    ?? ROM,    ?? RAM - Hudson Soft Controller */
-	MBC_HUC3,		/*    ?? ROM,    ?? RAM - Hudson Soft Controller */
-	MBC_MBC6,		/*    ?? ROM,  32KB SRAM                         */
-	MBC_MBC7,		/*    ?? ROM,    ?? RAM                          */
-	MBC_WISDOM,		/*    ?? ROM,    ?? RAM - Wisdom tree controller */
-	MBC_MBC1_KOR,	/*   1MB ROM,    ?? RAM - Korean MBC1 variant    */
-	MBC_YONGYONG,	/*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
+	MBC_NONE=0,     /*  32KB ROM - No memory bank controller         */
+	MBC_MBC1,       /*  ~2MB ROM,   8KB RAM -or- 512KB ROM, 32KB RAM */
+	MBC_MBC2,       /* 256KB ROM,  32KB RAM                          */
+	MBC_MMM01,      /*    ?? ROM,    ?? RAM                          */
+	MBC_MBC3,       /*   2MB ROM,  32KB RAM, RTC                     */
+	MBC_MBC4,       /*    ?? ROM,    ?? RAM                          */
+	MBC_MBC5,       /*   8MB ROM, 128KB RAM (32KB w/ Rumble)         */
+	MBC_TAMA5,      /*    ?? ROM     ?? RAM - What is this?          */
+	MBC_HUC1,       /*    ?? ROM,    ?? RAM - Hudson Soft Controller */
+	MBC_HUC3,       /*    ?? ROM,    ?? RAM - Hudson Soft Controller */
+	MBC_MBC6,       /*    ?? ROM,  32KB SRAM                         */
+	MBC_MBC7,       /*    ?? ROM,    ?? RAM                          */
+	MBC_WISDOM,     /*    ?? ROM,    ?? RAM - Wisdom tree controller */
+	MBC_MBC1_KOR,   /*   1MB ROM,    ?? RAM - Korean MBC1 variant    */
+	MBC_YONGYONG,   /*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
 	MBC_LASAMA,     /*    ?? ROM,    ?? RAM - Appears in La Sa Ma */
 	MBC_ATVRACIN,
-	MBC_MEGADUCK,	/* MEGADUCK style banking                        */
-	MBC_UNKNOWN,	/* Unknown mapper                                */
+	MBC_MEGADUCK,   /* MEGADUCK style banking                        */
+	MBC_UNKNOWN,    /* Unknown mapper                                */
 };
 
 /* machine.device<ram_device>(RAM_TAG)->pointer() layout defines */
-#define CGB_START_VRAM_BANKS	0x0000
-#define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
+#define CGB_START_VRAM_BANKS    0x0000
+#define CGB_START_RAM_BANKS ( 2 * 8 * 1024 )
 
-#define JOYPAD		m_gb_io[0x00]	/* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
-#define SIODATA		m_gb_io[0x01]	/* Serial IO data buffer                       */
-#define SIOCONT		m_gb_io[0x02]	/* Serial IO control register                  */
-#define DIVREG		m_gb_io[0x04]	/* Divider register (???)                      */
-#define TIMECNT		m_gb_io[0x05]	/* Timer counter. Gen. int. when it overflows  */
-#define TIMEMOD		m_gb_io[0x06]	/* New value of TimeCount after it overflows   */
-#define TIMEFRQ		m_gb_io[0x07]	/* Timer frequency and start/stop switch       */
+#define JOYPAD      m_gb_io[0x00]   /* Joystick: 1.1.P15.P14.P13.P12.P11.P10       */
+#define SIODATA     m_gb_io[0x01]   /* Serial IO data buffer                       */
+#define SIOCONT     m_gb_io[0x02]   /* Serial IO control register                  */
+#define DIVREG      m_gb_io[0x04]   /* Divider register (???)                      */
+#define TIMECNT     m_gb_io[0x05]   /* Timer counter. Gen. int. when it overflows  */
+#define TIMEMOD     m_gb_io[0x06]   /* New value of TimeCount after it overflows   */
+#define TIMEFRQ     m_gb_io[0x07]   /* Timer frequency and start/stop switch       */
 
 
 
@@ -133,8 +133,8 @@ static void gb_machine_stop(running_machine &machine);
 static void gb_timer_increment( running_machine &machine );
 
 #ifdef MAME_DEBUG
-/* #define V_GENERAL*/		/* Display general debug information */
-/* #define V_BANK*/			/* Display bank switching debug information */
+/* #define V_GENERAL*/      /* Display general debug information */
+/* #define V_BANK*/         /* Display bank switching debug information */
 #endif
 
 static void gb_init_regs(running_machine &machine)
@@ -144,8 +144,8 @@ static void gb_init_regs(running_machine &machine)
 	state->SIODATA = 0x00;
 	state->SIOCONT = 0x7E;
 
-	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );		/* TIMECNT */
-	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );		/* TIMEMOD */
+	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );       /* TIMECNT */
+	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );       /* TIMEMOD */
 }
 
 static void gb_rom16_0000( running_machine &machine, UINT8 *addr )
@@ -213,7 +213,7 @@ static void gb_init(running_machine &machine)
 			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_6000_w),state));
 			break;
 		case MBC_MBC1:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );    /* We don't emulate RAM enable yet */
 			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1),state) );
 			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1),state) );
 			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1),state) );
@@ -222,9 +222,9 @@ static void gb_init(running_machine &machine)
 			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc2),state) );
 			break;
 		case MBC_MBC3:
-		case MBC_HUC1:	/* Possibly wrong */
-		case MBC_HUC3:	/* Possibly wrong */
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );	/* We don't emulate RAM enable yet */
+		case MBC_HUC1:  /* Possibly wrong */
+		case MBC_HUC3:  /* Possibly wrong */
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );    /* We don't emulate RAM enable yet */
 			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc3),state) );
 			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc3),state) );
 			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc3),state) );
@@ -279,7 +279,7 @@ static void gb_init(running_machine &machine)
 
 	state->m_divcount = 0;
 	state->m_triggering_irq = 0;
-	state->m_gb_io[0x07] = 0xF8;		/* Upper bits of TIMEFRQ register are set to 1 */
+	state->m_gb_io[0x07] = 0xF8;        /* Upper bits of TIMEFRQ register are set to 1 */
 }
 
 MACHINE_START_MEMBER(gb_state,gb)
@@ -354,11 +354,11 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 	memset( m_sgb_atf_data, 0, sizeof(m_sgb_atf_data) );
 
 	/* HACKS for Donkey Kong Land 2 + 3.
-       For some reason that I haven't figured out, they store the tile
-       data differently.  Hacks will go once I figure it out */
+	   For some reason that I haven't figured out, they store the tile
+	   data differently.  Hacks will go once I figure it out */
 	m_sgb_hack = 0;
 
-	if (m_gb_cart)	// make sure cart is in
+	if (m_gb_cart)  // make sure cart is in
 	{
 		if( strncmp( (const char*)(m_gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
 			strncmp( (const char*)(m_gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
@@ -419,8 +419,8 @@ static void gb_machine_stop(running_machine &machine)
 		return;
 
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
-       built in macros is because they force the filename to be the name of
-       the machine.  We need to have a separate name for each game. */
+	   built in macros is because they force the filename to be the name of
+	   the machine.  We need to have a separate name for each game. */
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 	image->battery_save(state->m_gb_cart_ram, state->m_RAMBanks * 0x2000);
 }
@@ -474,9 +474,9 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc3)
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc5)
 {
 	/* MBC5 has a 9 bit bank select
-      Writing into 2000-2FFF sets the lower 8 bits
-      Writing into 3000-3FFF sets the 9th bit
-    */
+	  Writing into 2000-2FFF sets the lower 8 bits
+	  Writing into 3000-3FFF sets the 9th bit
+	*/
 	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
 	if( offset & 0x1000 )
 	{
@@ -540,17 +540,17 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc7)
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_unknown_mbc7)
 {
-        logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x3000 + offset, data );
+		logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x3000 + offset, data );
 	/* Bit 12 must be set for writing to the mbc register */
 	if ( offset & 0x0100 )
 	{
 		switch( offset & 0x7000 )
 		{
-		case 0x0000:	/* 0x3000-0x3fff */
-		case 0x1000:	/* 0x4000-0x4fff */
-		case 0x2000:	/* 0x5000-0x5fff */
-		case 0x3000:	/* 0x6000-0x6fff */
-		case 0x4000:	/* 0x7000-0x7fff */
+		case 0x0000:    /* 0x3000-0x3fff */
+		case 0x1000:    /* 0x4000-0x4fff */
+		case 0x2000:    /* 0x5000-0x5fff */
+		case 0x3000:    /* 0x6000-0x6fff */
+		case 0x4000:    /* 0x7000-0x7fff */
 			break;
 		}
 	}
@@ -581,7 +581,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
 {
 	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
 	if( data & 0x8 )
-	{	/* RTC banks */
+	{   /* RTC banks */
 		if ( m_CartType & TIMER )
 		{
 			m_MBC3RTCBank = data & 0x07;
@@ -593,7 +593,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
 		}
 	}
 	else
-	{	/* RAM banks */
+	{   /* RAM banks */
 		m_RAMBank = data & 0x3;
 		m_MBC3RTCBank = 0xFF;
 		/* Switch banks */
@@ -617,7 +617,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc5)
 WRITE8_MEMBER(gb_state::gb_ram_enable)
 {
 	/* FIXME: Currently we don't handle this, but a value of 0xA will enable
-     * writing to the cart's RAM banks */
+	 * writing to the cart's RAM banks */
 	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
 }
 
@@ -629,7 +629,7 @@ WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1)
 
 WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc3)
 {
-        logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
+		logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
 	if( m_CartType & TIMER )
 	{
 		/* FIXME: RTC Latch goes here */
@@ -668,7 +668,7 @@ WRITE8_MEMBER(gb_state::gb_ram_tama5)
 			break;
 		case 0x07:      /* Address selection lo */
 				/* This address always seems to written last, so we'll just
-                   execute the command here */
+				   execute the command here */
 			m_gbTama5Address = ( m_gbTama5Address & 0xF0 ) | ( data & 0x0F );
 			switch ( m_gbTama5Address & 0xE0 )
 			{
@@ -762,9 +762,9 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_6000_w)
 	/* Momotarou Collection 2 writes 01 and 21 here */
 	switch( data )
 	{
-	case 0x30:	m_mmm01_bank_mask = 0x07;	break;
-	case 0x38:	m_mmm01_bank_mask = 0x03;	break;
-	default:	m_mmm01_bank_mask = 0xFF; break;
+	case 0x30:  m_mmm01_bank_mask = 0x07;   break;
+	case 0x38:  m_mmm01_bank_mask = 0x03;   break;
+	default:    m_mmm01_bank_mask = 0xFF; break;
 	}
 }
 
@@ -858,24 +858,24 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 
 	switch (offset)
 	{
-	case 0x00:						/* JOYP - Joypad */
+	case 0x00:                      /* JOYP - Joypad */
 		JOYPAD = 0xCF | data;
 		if (!(data & 0x20))
 			JOYPAD &= (ioport("INPUTS")->read() >> 4) | 0xF0;
 		if (!(data & 0x10))
 			JOYPAD &= ioport("INPUTS")->read() | 0xF0;
 		return;
-	case 0x01:						/* SB - Serial transfer data */
+	case 0x01:                      /* SB - Serial transfer data */
 		break;
-	case 0x02:						/* SC - SIO control */
+	case 0x02:                      /* SC - SIO control */
 		switch( data & 0x81 )
 		{
 		case 0x00:
 		case 0x01:
-		case 0x80:				/* enabled & external clock */
+		case 0x80:              /* enabled & external clock */
 			m_SIOCount = 0;
 			break;
-		case 0x81:				/* enabled & internal clock */
+		case 0x81:              /* enabled & internal clock */
 			SIODATA = 0xFF;
 			m_SIOCount = 8;
 			m_gb_serial_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(512));
@@ -883,27 +883,27 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 			break;
 		}
 		break;
-	case 0x04:						/* DIV - Divider register */
+	case 0x04:                      /* DIV - Divider register */
 		/* Force increment of TIMECNT register */
 		if ( m_divcount >= 16 )
 			gb_timer_increment(machine());
 		m_divcount = 0;
 		return;
-	case 0x05:						/* TIMA - Timer counter */
+	case 0x05:                      /* TIMA - Timer counter */
 		/* Check if the counter is being reloaded in this cycle */
 		if ( m_reloading && ( m_divcount & ( m_shift_cycles - 1 ) ) == 4 )
 		{
 			data = TIMECNT;
 		}
 		break;
-	case 0x06:						/* TMA - Timer module */
+	case 0x06:                      /* TMA - Timer module */
 		/* Check if the counter is being reloaded in this cycle */
 		if ( m_reloading && ( m_divcount & ( m_shift_cycles - 1 ) ) == 4 )
 		{
 			TIMECNT = data;
 		}
 		break;
-	case 0x07:						/* TAC - Timer control */
+	case 0x07:                      /* TAC - Timer control */
 		data |= 0xF8;
 		/* Check if timer is just disabled or the timer frequency is changing */
 		if ( ( ! ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) ) || ( ( data & 0x04 ) && ( TIMEFRQ & 0x04 ) && ( data & 0x03 ) != ( TIMEFRQ & 0x03 ) ) )
@@ -917,7 +917,7 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 		m_shift = timer_shifts[data & 0x03];
 		m_shift_cycles = 1 << m_shift;
 		break;
-	case 0x0F:						/* IF - Interrupt flag */
+	case 0x0F:                      /* IF - Interrupt flag */
 		data &= 0x1F;
 		machine().device<lr35902_cpu_device>(":maincpu")->set_if( data );
 		break;
@@ -980,7 +980,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 		case 0x00:
 			switch (data & 0x30)
 			{
-			case 0x00:				   /* start condition */
+			case 0x00:                 /* start condition */
 				if (m_sgb_start)
 					logerror("SGB: Start condition before end of transfer ??\n");
 				m_sgb_bitcount = 0;
@@ -988,11 +988,11 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 				m_sgb_rest = 0;
 				JOYPAD = 0x0F & ((ioport("INPUTS")->read() >> 4) | ioport("INPUTS")->read() | 0xF0);
 				break;
-			case 0x10:				   /* data true */
+			case 0x10:                 /* data true */
 				if (m_sgb_rest)
 				{
 					/* We should test for this case , but the code below won't
-                       work with the current setup */
+					   work with the current setup */
 #if 0
 					if (m_sgb_bytecount == 16)
 					{
@@ -1012,7 +1012,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 				}
 				JOYPAD = 0x1F & ((ioport("INPUTS")->read() >> 4) | 0xF0);
 				break;
-			case 0x20:				/* data false */
+			case 0x20:              /* data false */
 				if (m_sgb_rest)
 				{
 					if( m_sgb_bytecount == 16 && m_sgb_packets == -1 )
@@ -1031,7 +1031,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 					{
 						switch( sgb_data[0] >> 3 )
 						{
-							case 0x00:	/* PAL01 */
+							case 0x00:  /* PAL01 */
 								m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
 								m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
 								m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
@@ -1041,7 +1041,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								m_sgb_pal[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
 								m_sgb_pal[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
-							case 0x01:	/* PAL23 */
+							case 0x01:  /* PAL23 */
 								m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
 								m_sgb_pal[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
 								m_sgb_pal[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
@@ -1051,7 +1051,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
 								m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
-							case 0x02:	/* PAL03 */
+							case 0x02:  /* PAL03 */
 								m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
 								m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
 								m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
@@ -1061,7 +1061,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
 								m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
-							case 0x03:	/* PAL12 */
+							case 0x03:  /* PAL12 */
 								m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
 								m_sgb_pal[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
 								m_sgb_pal[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
@@ -1071,7 +1071,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								m_sgb_pal[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
 								m_sgb_pal[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
-							case 0x04:	/* ATTR_BLK */
+							case 0x04:  /* ATTR_BLK */
 								{
 									UINT8 I, J, K, o;
 									for( K = 0; K < sgb_data[1]; K++ )
@@ -1090,7 +1090,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x05:	/* ATTR_LIN */
+							case 0x05:  /* ATTR_LIN */
 								{
 									UINT8 J, K;
 									if( sgb_data[1] > 15 )
@@ -1114,7 +1114,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x06:	/* ATTR_DIV */
+							case 0x06:  /* ATTR_DIV */
 								{
 									UINT8 I, J;
 									if( sgb_data[1] & 0x40 ) /* Vertical */
@@ -1161,7 +1161,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x07:	/* ATTR_CHR */
+							case 0x07:  /* ATTR_CHR */
 								{
 									UINT16 I, sets;
 									UINT8 x, y;
@@ -1256,16 +1256,16 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x08:	/* SOUND */
+							case 0x08:  /* SOUND */
 								/* This command enables internal sound effects */
 								/* Not Implemented */
 								break;
-							case 0x09:	/* SOU_TRN */
+							case 0x09:  /* SOU_TRN */
 								/* This command sends data to the SNES sound processor.
-                                   We'll need to emulate that for this to be used */
+								   We'll need to emulate that for this to be used */
 								/* Not Implemented */
 								break;
-							case 0x0A:	/* PAL_SET */
+							case 0x0A:  /* PAL_SET */
 								{
 									UINT16 index_, J, I;
 
@@ -1312,7 +1312,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x0B:	/* PAL_TRN */
+							case 0x0B:  /* PAL_TRN */
 								{
 									UINT8 *gb_vram = gb_get_vram_ptr(machine());
 									UINT16 I, col;
@@ -1324,37 +1324,37 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x0C:	/* ATRC_EN */
+							case 0x0C:  /* ATRC_EN */
 								/* Not Implemented */
 								break;
-							case 0x0D:	/* TEST_EN */
+							case 0x0D:  /* TEST_EN */
 								/* Not Implemented */
 								break;
-							case 0x0E:	/* ICON_EN */
+							case 0x0E:  /* ICON_EN */
 								/* Not Implemented */
 								break;
-							case 0x0F:	/* DATA_SND */
+							case 0x0F:  /* DATA_SND */
 								/* Not Implemented */
 								break;
-							case 0x10:	/* DATA_TRN */
+							case 0x10:  /* DATA_TRN */
 								/* Not Implemented */
 								break;
-							case 0x11:	/* MLT_REQ - Multi controller request */
+							case 0x11:  /* MLT_REQ - Multi controller request */
 								if (sgb_data[1] == 0x00)
 									m_sgb_controller_mode = 0;
 								else if (sgb_data[1] == 0x01)
 									m_sgb_controller_mode = 2;
 								break;
-							case 0x12:	/* JUMP */
+							case 0x12:  /* JUMP */
 								/* Not Implemented */
 								break;
-							case 0x13:	/* CHR_TRN */
+							case 0x13:  /* CHR_TRN */
 								if( sgb_data[1] & 0x1 )
 									memcpy( m_sgb_tile_data + 4096, gb_get_vram_ptr(machine()) + 0x0800, 4096 );
 								else
 									memcpy( m_sgb_tile_data, gb_get_vram_ptr(machine()) + 0x0800, 4096 );
 								break;
-							case 0x14:	/* PCT_TRN */
+							case 0x14:  /* PCT_TRN */
 								{
 									int I;
 									UINT16 col;
@@ -1379,10 +1379,10 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x15:	/* ATTR_TRN */
+							case 0x15:  /* ATTR_TRN */
 								memcpy( m_sgb_atf_data, gb_get_vram_ptr(machine()) + 0x0800, 4050 );
 								break;
-							case 0x16:	/* ATTR_SET */
+							case 0x16:  /* ATTR_SET */
 								{
 									UINT8 J, I;
 
@@ -1402,20 +1402,20 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									}
 								}
 								break;
-							case 0x17:	/* MASK_EN */
+							case 0x17:  /* MASK_EN */
 								m_sgb_window_mask = sgb_data[1];
 								break;
-							case 0x18:	/* OBJ_TRN */
+							case 0x18:  /* OBJ_TRN */
 								/* Not Implemnted */
 								break;
-							case 0x19:	/* ? */
+							case 0x19:  /* ? */
 								/* Called by: dkl,dkl2,dkl3,zeldadx
-                                   But I don't know what it is for. */
+								   But I don't know what it is for. */
 								/* Not Implemented */
 								break;
-							case 0x1E:	/* Used by bootrom to transfer the gb cart header */
+							case 0x1E:  /* Used by bootrom to transfer the gb cart header */
 								break;
-							case 0x1F:	/* Used by bootrom to transfer the gb cart header */
+							case 0x1F:  /* Used by bootrom to transfer the gb cart header */
 								break;
 							default:
 								logerror( "SGB: Unknown Command 0x%02x!\n", sgb_data[0] >> 3 );
@@ -1439,7 +1439,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 				}
 				JOYPAD = 0x2F & (ioport("INPUTS")->read() | 0xF0);
 				break;
-			case 0x30:				   /* rest condition */
+			case 0x30:                 /* rest condition */
 				if (m_sgb_start)
 					m_sgb_rest = 1;
 				if (m_sgb_controller_mode)
@@ -1539,27 +1539,27 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		"ROM+MBC1",
 		"ROM+MBC1+RAM",
 		"ROM+MBC1+RAM+BATTERY",
-        "UNKNOWN",
+		"UNKNOWN",
 		"ROM+MBC2",
 		"ROM+MBC2+BATTERY",
-        "UNKNOWN",
+		"UNKNOWN",
 		"ROM+RAM",
 		"ROM+RAM+BATTERY",
-        "UNKNOWN",
+		"UNKNOWN",
 		"ROM+MMM01",
 		"ROM+MMM01+SRAM",
 		"ROM+MMM01+SRAM+BATTERY",
-        "UNKNOWN",
+		"UNKNOWN",
 		"ROM+MBC3+TIMER+BATTERY",
 		"ROM+MBC3+TIMER+RAM+BATTERY",
 		"ROM+MBC3",
 		"ROM+MBC3+RAM",
 		"ROM+MBC3+RAM+BATTERY",
-        "UNKNOWN",
-        "UNKNOWN",
-        "UNKNOWN",
-        "UNKNOWN",
-        "UNKNOWN",
+		"UNKNOWN",
+		"UNKNOWN",
+		"UNKNOWN",
+		"UNKNOWN",
+		"UNKNOWN",
 		"ROM+MBC5",
 		"ROM+MBC5+RAM",
 		"ROM+MBC5+RAM+BATTERY",
@@ -1769,7 +1769,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 			0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
 			0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E
 		};
-		int	bytes_matched = 0;
+		int bytes_matched = 0;
 		gb_header = state->m_gb_cart + filesize - 0x8000;
 		for (I = 0; I < 0x18; I++)
 		{
@@ -1793,38 +1793,38 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	/* Fill in our cart details */
 	switch(gb_header[0x0147])
 	{
-	case 0x00:	state->m_MBCType = MBC_NONE;	state->m_CartType = 0;				break;
-	case 0x01:	state->m_MBCType = MBC_MBC1;	state->m_CartType = 0;				break;
-	case 0x02:	state->m_MBCType = MBC_MBC1;	state->m_CartType = CART_RAM;				break;
-	case 0x03:	state->m_MBCType = MBC_MBC1;	state->m_CartType = CART_RAM | BATTERY;		break;
-	case 0x05:	state->m_MBCType = MBC_MBC2;	state->m_CartType = 0;				break;
-	case 0x06:	state->m_MBCType = MBC_MBC2;	state->m_CartType = BATTERY;			break;
-	case 0x08:	state->m_MBCType = MBC_NONE;	state->m_CartType = CART_RAM;				break;
-	case 0x09:	state->m_MBCType = MBC_NONE;	state->m_CartType = CART_RAM | BATTERY;		break;
-	case 0x0B:	state->m_MBCType = MBC_MMM01;	state->m_CartType = 0;				break;
-	case 0x0C:	state->m_MBCType = MBC_MMM01;	state->m_CartType = CART_RAM;				break;
-	case 0x0D:	state->m_MBCType = MBC_MMM01;	state->m_CartType = CART_RAM | BATTERY;		break;
-	case 0x0F:	state->m_MBCType = MBC_MBC3;	state->m_CartType = TIMER | BATTERY;		break;
-	case 0x10:	state->m_MBCType = MBC_MBC3;	state->m_CartType = TIMER | CART_RAM | BATTERY;	break;
-	case 0x11:	state->m_MBCType = MBC_MBC3;	state->m_CartType = 0;				break;
-	case 0x12:	state->m_MBCType = MBC_MBC3;	state->m_CartType = CART_RAM;				break;
-	case 0x13:	state->m_MBCType = MBC_MBC3;	state->m_CartType = CART_RAM | BATTERY;		break;
-	case 0x15:	state->m_MBCType = MBC_MBC4;	state->m_CartType = 0;				break;
-	case 0x16:	state->m_MBCType = MBC_MBC4;	state->m_CartType = CART_RAM;				break;
-	case 0x17:	state->m_MBCType = MBC_MBC4;	state->m_CartType = CART_RAM | BATTERY;		break;
-	case 0x19:	state->m_MBCType = MBC_MBC5;	state->m_CartType = 0;				break;
-	case 0x1A:	state->m_MBCType = MBC_MBC5;	state->m_CartType = CART_RAM;				break;
-	case 0x1B:	state->m_MBCType = MBC_MBC5;	state->m_CartType = CART_RAM | BATTERY;		break;
-	case 0x1C:	state->m_MBCType = MBC_MBC5;	state->m_CartType = RUMBLE;			break;
-	case 0x1D:	state->m_MBCType = MBC_MBC5;	state->m_CartType = RUMBLE | SRAM;		break;
-	case 0x1E:	state->m_MBCType = MBC_MBC5;	state->m_CartType = RUMBLE | SRAM | BATTERY;	break;
-	case 0x20:	state->m_MBCType = MBC_MBC6;	state->m_CartType = SRAM; break;
-	case 0x22:	state->m_MBCType = MBC_MBC7;	state->m_CartType = SRAM | BATTERY;		break;
-	case 0xBE:	state->m_MBCType = MBC_NONE;	state->m_CartType = 0;				break;	/* used in Flash2Advance GB Bridge boot program */
-	case 0xEA:	state->m_MBCType = MBC_YONGYONG;	state->m_CartType = 0;	break;	/* Found in Sonic 3D Blast 5 pirate */
-	case 0xFD:	state->m_MBCType = MBC_TAMA5;	state->m_CartType = 0 /*RTC | BATTERY?*/;	break;
-	case 0xFE:	state->m_MBCType = MBC_HUC3;	state->m_CartType = 0;				break;
-	case 0xFF:	state->m_MBCType = MBC_HUC1;	state->m_CartType = 0;				break;
+	case 0x00:  state->m_MBCType = MBC_NONE;    state->m_CartType = 0;              break;
+	case 0x01:  state->m_MBCType = MBC_MBC1;    state->m_CartType = 0;              break;
+	case 0x02:  state->m_MBCType = MBC_MBC1;    state->m_CartType = CART_RAM;               break;
+	case 0x03:  state->m_MBCType = MBC_MBC1;    state->m_CartType = CART_RAM | BATTERY;     break;
+	case 0x05:  state->m_MBCType = MBC_MBC2;    state->m_CartType = 0;              break;
+	case 0x06:  state->m_MBCType = MBC_MBC2;    state->m_CartType = BATTERY;            break;
+	case 0x08:  state->m_MBCType = MBC_NONE;    state->m_CartType = CART_RAM;               break;
+	case 0x09:  state->m_MBCType = MBC_NONE;    state->m_CartType = CART_RAM | BATTERY;     break;
+	case 0x0B:  state->m_MBCType = MBC_MMM01;   state->m_CartType = 0;              break;
+	case 0x0C:  state->m_MBCType = MBC_MMM01;   state->m_CartType = CART_RAM;               break;
+	case 0x0D:  state->m_MBCType = MBC_MMM01;   state->m_CartType = CART_RAM | BATTERY;     break;
+	case 0x0F:  state->m_MBCType = MBC_MBC3;    state->m_CartType = TIMER | BATTERY;        break;
+	case 0x10:  state->m_MBCType = MBC_MBC3;    state->m_CartType = TIMER | CART_RAM | BATTERY; break;
+	case 0x11:  state->m_MBCType = MBC_MBC3;    state->m_CartType = 0;              break;
+	case 0x12:  state->m_MBCType = MBC_MBC3;    state->m_CartType = CART_RAM;               break;
+	case 0x13:  state->m_MBCType = MBC_MBC3;    state->m_CartType = CART_RAM | BATTERY;     break;
+	case 0x15:  state->m_MBCType = MBC_MBC4;    state->m_CartType = 0;              break;
+	case 0x16:  state->m_MBCType = MBC_MBC4;    state->m_CartType = CART_RAM;               break;
+	case 0x17:  state->m_MBCType = MBC_MBC4;    state->m_CartType = CART_RAM | BATTERY;     break;
+	case 0x19:  state->m_MBCType = MBC_MBC5;    state->m_CartType = 0;              break;
+	case 0x1A:  state->m_MBCType = MBC_MBC5;    state->m_CartType = CART_RAM;               break;
+	case 0x1B:  state->m_MBCType = MBC_MBC5;    state->m_CartType = CART_RAM | BATTERY;     break;
+	case 0x1C:  state->m_MBCType = MBC_MBC5;    state->m_CartType = RUMBLE;         break;
+	case 0x1D:  state->m_MBCType = MBC_MBC5;    state->m_CartType = RUMBLE | SRAM;      break;
+	case 0x1E:  state->m_MBCType = MBC_MBC5;    state->m_CartType = RUMBLE | SRAM | BATTERY;    break;
+	case 0x20:  state->m_MBCType = MBC_MBC6;    state->m_CartType = SRAM; break;
+	case 0x22:  state->m_MBCType = MBC_MBC7;    state->m_CartType = SRAM | BATTERY;     break;
+	case 0xBE:  state->m_MBCType = MBC_NONE;    state->m_CartType = 0;              break;  /* used in Flash2Advance GB Bridge boot program */
+	case 0xEA:  state->m_MBCType = MBC_YONGYONG;    state->m_CartType = 0;  break;  /* Found in Sonic 3D Blast 5 pirate */
+	case 0xFD:  state->m_MBCType = MBC_TAMA5;   state->m_CartType = 0 /*RTC | BATTERY?*/;   break;
+	case 0xFE:  state->m_MBCType = MBC_HUC3;    state->m_CartType = 0;              break;
+	case 0xFF:  state->m_MBCType = MBC_HUC1;    state->m_CartType = 0;              break;
 	}
 
 	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
@@ -1920,12 +1920,12 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/*
-      Handle odd-sized cartridges (72,80,96 banks)
-      ROMBanks      ROMMask
-      72 (1001000)  1000111 (71)
-      80 (1010000)  1001111 (79)
-      96 (1100000)  1011111 (95)
-    */
+	  Handle odd-sized cartridges (72,80,96 banks)
+	  ROMBanks      ROMMask
+	  72 (1001000)  1000111 (71)
+	  80 (1010000)  1001111 (79)
+	  96 (1100000)  1011111 (95)
+	*/
 	state->m_ROMMask = I - 1;
 	if ((state->m_ROMBanks & state->m_ROMMask) != 0)
 	{
@@ -2105,15 +2105,15 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 {
 	switch( offset )
 	{
-		case 0x0D:	/* KEY1 - Prepare speed switch */
+		case 0x0D:  /* KEY1 - Prepare speed switch */
 			machine().device<lr35902_cpu_device>(":maincpu")->set_speed( data );
 			return;
-		case 0x10:	/* BFF - Bios disable */
+		case 0x10:  /* BFF - Bios disable */
 			gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
 			return;
-		case 0x16:	/* RP - Infrared port */
+		case 0x16:  /* RP - Infrared port */
 			break;
-		case 0x30:	/* SVBK - RAM bank select */
+		case 0x30:  /* SVBK - RAM bank select */
 			m_GBC_RAMBank = data & 0x7;
 			if ( ! m_GBC_RAMBank )
 				m_GBC_RAMBank = 1;
@@ -2129,11 +2129,11 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 {
 	switch( offset )
 	{
-	case 0x0D:	/* KEY1 */
+	case 0x0D:  /* KEY1 */
 		return machine().device<lr35902_cpu_device>(":maincpu")->get_speed();
-	case 0x16:	/* RP - Infrared port */
+	case 0x16:  /* RP - Infrared port */
 		break;
-	case 0x30:	/* SVBK - RAM bank select */
+	case 0x30:  /* SVBK - RAM bank select */
 		return m_GBC_RAMBank;
 	default:
 		break;
@@ -2245,13 +2245,13 @@ WRITE8_MEMBER(gb_state::megaduck_sound_w2)
 {
 	switch(offset)
 	{
-		case 0x00:	gb_sound_w(machine().device("custom"), space, 0x10, data );	break;
-		case 0x01:	gb_sound_w(machine().device("custom"), space, 0x12, data );	break;
-		case 0x02:	gb_sound_w(machine().device("custom"), space, 0x11, data );	break;
-		case 0x03:	gb_sound_w(machine().device("custom"), space, 0x13, data );	break;
-		case 0x04:	gb_sound_w(machine().device("custom"), space, 0x14, data );	break;
-		case 0x05:	gb_sound_w(machine().device("custom"), space, 0x16, data );	break;
-		case 0x06:	gb_sound_w(machine().device("custom"), space, 0x15, data );	break;
+		case 0x00:  gb_sound_w(machine().device("custom"), space, 0x10, data ); break;
+		case 0x01:  gb_sound_w(machine().device("custom"), space, 0x12, data ); break;
+		case 0x02:  gb_sound_w(machine().device("custom"), space, 0x11, data ); break;
+		case 0x03:  gb_sound_w(machine().device("custom"), space, 0x13, data ); break;
+		case 0x04:  gb_sound_w(machine().device("custom"), space, 0x14, data ); break;
+		case 0x05:  gb_sound_w(machine().device("custom"), space, 0x16, data ); break;
+		case 0x06:  gb_sound_w(machine().device("custom"), space, 0x15, data ); break;
 		case 0x07:
 		case 0x08:
 		case 0x09:

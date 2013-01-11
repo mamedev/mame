@@ -34,4 +34,3 @@ class m68307_serial
 
 	device_t* m_duart68681;
 };
-

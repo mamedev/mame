@@ -13,14 +13,14 @@
 /***************************************************************************
     MACROS
 ***************************************************************************/
-#define ROM_CART_LOAD(tag,offset,length,flags)	\
+#define ROM_CART_LOAD(tag,offset,length,flags)  \
 	{ NULL, tag, offset, length, ROMENTRYTYPE_CARTRIDGE | (flags) },
 
-#define ROM_MIRROR		0x01000000
-#define ROM_NOMIRROR	0x00000000
-#define ROM_FULLSIZE	0x02000000
-#define ROM_FILL_FF		0x04000000
-#define ROM_NOCLEAR		0x08000000
+#define ROM_MIRROR      0x01000000
+#define ROM_NOMIRROR    0x00000000
+#define ROM_FULLSIZE    0x02000000
+#define ROM_FILL_FF     0x04000000
+#define ROM_NOCLEAR     0x08000000
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -28,7 +28,7 @@
 
 // ======================> cartslot_image_device
 
-class cartslot_image_device :	public device_t,
+class cartslot_image_device :   public device_t,
 								public device_image_interface
 {
 public:
@@ -40,7 +40,7 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) {	load_software_part_region( this, swlist, swname, start_entry ); return TRUE; }
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) {   load_software_part_region( this, swlist, swname, start_entry ); return TRUE; }
 	virtual device_image_partialhash_func get_partial_hash() const { return m_device_partialhash; }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
@@ -65,21 +65,21 @@ public:
 
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 
 	int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, bool load);
 	int process_cartridge(bool load);
 
 
-	const char *					m_extensions;
-	const char *					m_interface;
-	bool							m_must_be_loaded;
-	device_start_func				m_device_start;
-	device_image_load_func			m_device_load;
-	device_image_unload_func		m_device_unload;
-	device_image_partialhash_func	m_device_partialhash;
-	device_image_display_info_func	m_device_displayinfo;
+	const char *                    m_extensions;
+	const char *                    m_interface;
+	bool                            m_must_be_loaded;
+	device_start_func               m_device_start;
+	device_image_load_func          m_device_load;
+	device_image_unload_func        m_device_unload;
+	device_image_partialhash_func   m_device_partialhash;
+	device_image_display_info_func  m_device_displayinfo;
 };
 
 // device type definition
@@ -89,37 +89,37 @@ extern const device_type CARTSLOT;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_CARTSLOT_ADD(_tag) 										\
-	MCFG_DEVICE_ADD(_tag, CARTSLOT, 0)									\
+#define MCFG_CARTSLOT_ADD(_tag)                                         \
+	MCFG_DEVICE_ADD(_tag, CARTSLOT, 0)                                  \
 
-#define MCFG_CARTSLOT_MODIFY(_tag)										\
-	MCFG_DEVICE_MODIFY(_tag)									\
+#define MCFG_CARTSLOT_MODIFY(_tag)                                      \
+	MCFG_DEVICE_MODIFY(_tag)                                    \
 
-#define MCFG_CARTSLOT_EXTENSION_LIST(_extensions)						\
+#define MCFG_CARTSLOT_EXTENSION_LIST(_extensions)                       \
 	static_cast<cartslot_image_device *>(device)->set_extensions(_extensions);
 
-#define MCFG_CARTSLOT_INTERFACE(_interface)							\
+#define MCFG_CARTSLOT_INTERFACE(_interface)                         \
 	static_cast<cartslot_image_device *>(device)->set_interface(_interface);
 
-#define MCFG_CARTSLOT_NOT_MANDATORY										\
+#define MCFG_CARTSLOT_NOT_MANDATORY                                     \
 	static_cast<cartslot_image_device *>(device)->set_must_be_loaded(FALSE);
 
-#define MCFG_CARTSLOT_MANDATORY											\
+#define MCFG_CARTSLOT_MANDATORY                                         \
 	static_cast<cartslot_image_device *>(device)->set_must_be_loaded(TRUE);
 
-#define MCFG_CARTSLOT_START(_start)										\
+#define MCFG_CARTSLOT_START(_start)                                     \
 	static_cast<cartslot_image_device *>(device)->set_device_start(DEVICE_START_NAME(_start));
 
-#define MCFG_CARTSLOT_LOAD(_load)										\
+#define MCFG_CARTSLOT_LOAD(_load)                                       \
 	static_cast<cartslot_image_device *>(device)->set_device_load(DEVICE_IMAGE_LOAD_NAME(_load));
 
-#define MCFG_CARTSLOT_UNLOAD(_unload)									\
+#define MCFG_CARTSLOT_UNLOAD(_unload)                                   \
 	static_cast<cartslot_image_device *>(device)->set_device_unload(DEVICE_IMAGE_UNLOAD_NAME(_unload));
 
-#define MCFG_CARTSLOT_PARTIALHASH(_partialhash)							\
+#define MCFG_CARTSLOT_PARTIALHASH(_partialhash)                         \
 	static_cast<cartslot_image_device *>(device)->set_partialhash(_partialhash);
 
-#define MCFG_CARTSLOT_DISPLAY_INFO(_displayinfo)										\
+#define MCFG_CARTSLOT_DISPLAY_INFO(_displayinfo)                                        \
 	static_cast<cartslot_image_device *>(device)->set_displayinfo(DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo));
 
 #endif /* __CARTSLOT_H__ */

@@ -57,9 +57,9 @@
     CONSTANTS & DEFINES
 ***************************************************************************/
 
-#define PREPROC_CLASS		"preproc"
-#define KEYWORD_CLASS		"keyword"
-#define CUSTOM_CLASS		"custom"
+#define PREPROC_CLASS       "preproc"
+#define KEYWORD_CLASS       "keyword"
+#define CUSTOM_CLASS        "custom"
 
 
 
@@ -79,29 +79,29 @@ enum file_type
 
 struct ext_to_type
 {
-	const char *	extension;
-	file_type		type;
+	const char *    extension;
+	file_type       type;
 };
 
 
 struct token_entry
 {
-	const char *	token;
-	const char *	color;
+	const char *    token;
+	const char *    color;
 };
 
 
 struct include_path
 {
-	include_path *	next;
-	astring 		path;
+	include_path *  next;
+	astring         path;
 };
 
 
 struct list_entry
 {
-	list_entry *	next;
-	astring 		name;
+	list_entry *    next;
+	astring         name;
 };
 
 

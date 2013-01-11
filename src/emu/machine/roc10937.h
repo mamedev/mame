@@ -24,7 +24,7 @@
 	roc10937_t::static_set_zero(*device, _reversed); \
 
 #define MCFG_ROC10937_REMOVE(_tag) \
-    MCFG_DEVICE_REMOVE(_tag)
+	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ROC10957_ADD(_tag,_val,_reversed) \
 		MCFG_DEVICE_ADD(_tag, ROC10957,60)\
@@ -38,7 +38,7 @@
 	roc10957_t::static_set_zero(*device, _reversed); \
 
 #define MCFG_ROC10957_REMOVE(_tag) \
-    MCFG_DEVICE_REMOVE(_tag)
+	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_MSC1937_ADD(_tag,_val,_reversed) \
 		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
@@ -52,7 +52,7 @@
 	roc10937_t::static_set_zero(*device, _reversed); \
 
 #define MCFG_MSC1937_REMOVE(_tag) \
-    MCFG_DEVICE_REMOVE(_tag)
+	MCFG_DEVICE_REMOVE(_tag)
 
 
 class rocvfd_t : public device_t {
@@ -64,29 +64,29 @@ public:
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);
 	static void static_set_zero(device_t &device, bool reversed);
-    virtual void update_display();
-	UINT8	m_port_val;
+	virtual void update_display();
+	UINT8   m_port_val;
 	bool m_reversed;
 	void blank(int data);
 	void shift_data(int data);
-    void write_char(int data);
+	void write_char(int data);
 	void setdata(int segdata, int data);
-    UINT32 set_display(UINT32 segin);
+	UINT32 set_display(UINT32 segin);
 
 
 protected:
 	int m_cursor_pos;
-	int	m_window_size;		// window  size
-	int	m_shift_count;
-	int	m_shift_data;
+	int m_window_size;      // window  size
+	int m_shift_count;
+	int m_shift_data;
 	int m_pcursor_pos;
 	int m_brightness;
 	int m_count;
 	int m_duty;
 	int m_disp;
-    UINT8 m_cursor;
-    UINT32 m_chars[16];
-    UINT32 m_outputs[16];
+	UINT8 m_cursor;
+	UINT32 m_chars[16];
+	UINT32 m_outputs[16];
 
 	virtual void device_start();
 	virtual void device_reset();
@@ -114,7 +114,7 @@ class roc10957_t : public rocvfd_t {
 public:
 	roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    void write_char(int data);
+	void write_char(int data);
 
 protected:
 

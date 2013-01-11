@@ -2,7 +2,7 @@
 #include "includes/cclimber.h"
 
 /* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */
-#define CANNONB_HACK	0
+#define CANNONB_HACK    0
 
 static void cclimber_decode(running_machine &machine, const UINT8 convtable[8][16])
 {
@@ -119,4 +119,3 @@ DRIVER_INIT_MEMBER(cclimber_state,cannonb2)
 	cannonb_patch(machine());
 #endif
 }
-

@@ -16,43 +16,43 @@
     CONSTANTS
 ***************************************************************************/
 
-#define IPT_RAM_SIZE	(8192 * sizeof(UINT16))
+#define IPT_RAM_SIZE    (8192 * sizeof(UINT16))
 
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-#define RIP_PC		(m_pc | ((m_status_out & 1) << 8))
-#define _BIT(x, n)	((x) & (1 << (n)))
-#define RISING_EDGE(old_val, new_val, bit)	(!(old_val & (1 << bit)) && (new_val & (1 << bit)))
+#define RIP_PC      (m_pc | ((m_status_out & 1) << 8))
+#define _BIT(x, n)  ((x) & (1 << (n)))
+#define RISING_EDGE(old_val, new_val, bit)  (!(old_val & (1 << bit)) && (new_val & (1 << bit)))
 
-#define UNHANDLED	do {printf("%s:UNHANDLED (%x)\n", __FUNCTION__, inst); assert(0);} while (0)
-#define INVALID		do {printf("%s:INVALID (%x)\n", __FUNCTION__, inst); assert(0);} while (0)
+#define UNHANDLED   do {printf("%s:UNHANDLED (%x)\n", __FUNCTION__, inst); assert(0);} while (0)
+#define INVALID     do {printf("%s:INVALID (%x)\n", __FUNCTION__, inst); assert(0);} while (0)
 
-#define RAM_ADDR	(inst & 0x1f)
-#define MODE		(inst & 0x8000)
-#define WORD_MODE	(inst & 0x8000)
-#define BYTE_MODE	(!WORD_MODE)
-#define N			((inst >> 9) & 0xf)
-#define OPCODE		((inst >> 5) & 0xf)
-#define SRC			((inst >> 9) & 0xf)
-#define	DST			(inst & 0x1f)	// TEST
+#define RAM_ADDR    (inst & 0x1f)
+#define MODE        (inst & 0x8000)
+#define WORD_MODE   (inst & 0x8000)
+#define BYTE_MODE   (!WORD_MODE)
+#define N           ((inst >> 9) & 0xf)
+#define OPCODE      ((inst >> 5) & 0xf)
+#define SRC         ((inst >> 9) & 0xf)
+#define DST         (inst & 0x1f)   // TEST
 
-#define BW_WORD		(1 << 15)
-#define	BW_BYTE		(0 << 15)
+#define BW_WORD     (1 << 15)
+#define BW_BYTE     (0 << 15)
 
-#define FLAG_3		(1 << 7)
-#define FLAG_2		(1 << 6)
-#define FLAG_1		(1 << 5)
-#define L_FLAG		(1 << 4)
-#define	V_FLAG		(1 << 3)
-#define	N_FLAG		(1 << 2)
-#define	C_FLAG		(1 << 1)
-#define	Z_FLAG		(1 << 0)
+#define FLAG_3      (1 << 7)
+#define FLAG_2      (1 << 6)
+#define FLAG_1      (1 << 5)
+#define L_FLAG      (1 << 4)
+#define V_FLAG      (1 << 3)
+#define N_FLAG      (1 << 2)
+#define C_FLAG      (1 << 1)
+#define Z_FLAG      (1 << 0)
 
-#define CLEAR_FLAGS(a)	(m_new_status &= ~(a))
-#define SET_FLAGS(a)	(m_new_status |=  (a))
+#define CLEAR_FLAGS(a)  (m_new_status &= ~(a))
+#define SET_FLAGS(a)    (m_new_status |=  (a))
 
 
 /***************************************************************************
@@ -196,10 +196,10 @@ void esrip_device::device_start()
 	astring tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_status).callimport().callexport().formatstr("%8s").noshow();
-	state_add(ESRIP_PC,        "PC:",    	m_rip_pc).mask(0xffff);
-	state_add(ESRIP_ACC,       "ACC:",		m_acc).mask(0xffff);
-	state_add(ESRIP_DLATCH,    "DLATCH:",	m_d_latch).mask(0xff);
-	state_add(ESRIP_ILATCH,    "ILATCH:",	m_i_latch).mask(0xffff);
+	state_add(ESRIP_PC,        "PC:",       m_rip_pc).mask(0xffff);
+	state_add(ESRIP_ACC,       "ACC:",      m_acc).mask(0xffff);
+	state_add(ESRIP_DLATCH,    "DLATCH:",   m_d_latch).mask(0xff);
+	state_add(ESRIP_ILATCH,    "ILATCH:",   m_i_latch).mask(0xffff);
 	state_add(ESRIP_RAM00,     "RAM[00]:",  m_ram[0x00]).mask(0xffff);
 	state_add(ESRIP_RAM01,     "RAM[01]:",  m_ram[0x01]).mask(0xffff);
 	state_add(ESRIP_RAM02,     "RAM[02]:",  m_ram[0x02]).mask(0xffff);
@@ -594,9 +594,9 @@ UINT16 esrip_device::sor_op(UINT16 r, UINT16 opcode)
 
 void esrip_device::sor(UINT16 inst)
 {
-	UINT16	r = 0;
-	UINT16	dst = 0;
-	UINT16	res = 0;
+	UINT16  r = 0;
+	UINT16  dst = 0;
+	UINT16  res = 0;
 
 	if (BYTE_MODE)
 	{
@@ -606,14 +606,14 @@ void esrip_device::sor(UINT16 inst)
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case SORA: r = m_ram[RAM_ADDR];		dst = ACC;		break;
-		case SORY: r = m_ram[RAM_ADDR];		dst = Y_BUS;	break;
-		case SORS: r = m_ram[RAM_ADDR];		dst = STATUS;	break;
-		case SOAR: r = m_acc;				dst = RAM;		break;
-		case SODR: r = m_d_latch;			dst = RAM;		break;
+		case SORA: r = m_ram[RAM_ADDR];     dst = ACC;      break;
+		case SORY: r = m_ram[RAM_ADDR];     dst = Y_BUS;    break;
+		case SORS: r = m_ram[RAM_ADDR];     dst = STATUS;   break;
+		case SOAR: r = m_acc;               dst = RAM;      break;
+		case SODR: r = m_d_latch;           dst = RAM;      break;
 		case SOIR:
 		{
-			if (m_immflag == 0)		// Macrofiy this?
+			if (m_immflag == 0)     // Macrofiy this?
 			{
 				m_i_latch = inst;
 				m_immflag = 1;
@@ -627,8 +627,8 @@ void esrip_device::sor(UINT16 inst)
 			}
 			break;
 		}
-		case SOZR: r = 0;						dst = RAM;		break;
-		case SORR: r = m_ram[RAM_ADDR];	dst = RAM;		break;
+		case SOZR: r = 0;                       dst = RAM;      break;
+		case SORR: r = m_ram[RAM_ADDR]; dst = RAM;      break;
 		default: UNHANDLED;
 	}
 
@@ -666,13 +666,13 @@ enum
 
 void esrip_device::sonr(UINT16 inst)
 {
-	UINT16	r = 0;
-	UINT16	res = 0;
+	UINT16  r = 0;
+	UINT16  res = 0;
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case SOA:	r = m_acc;		break;
-		case SOD:	r = m_d_latch;	break;
+		case SOA:   r = m_acc;      break;
+		case SOD:   r = m_d_latch;  break;
 		case SOI:
 		{
 			if (m_immflag == 0)
@@ -688,7 +688,7 @@ void esrip_device::sonr(UINT16 inst)
 			}
 			break;
 		}
-		case SOZ:	r = 0; break;
+		case SOZ:   r = 0; break;
 		default: INVALID;
 	}
 
@@ -831,7 +831,7 @@ void esrip_device::tor1(UINT16 inst)
 	UINT16 r = 0;
 	UINT16 s = 0;
 	UINT16 dst = 0;
-	UINT16	res = 0;
+	UINT16  res = 0;
 
 	enum
 	{
@@ -848,7 +848,7 @@ void esrip_device::tor1(UINT16 inst)
 
 	switch (SRC)
 	{
-		case TORAA: r = m_ram[RAM_ADDR];	s = m_acc;	dst = ACC;	break;
+		case TORAA: r = m_ram[RAM_ADDR];    s = m_acc;  dst = ACC;  break;
 		case TORIA:
 		{
 			if (m_immflag == 0)
@@ -866,8 +866,8 @@ void esrip_device::tor1(UINT16 inst)
 			}
 			break;
 		}
-		case TODRA: r = m_d_latch;		s = m_ram[RAM_ADDR];	dst = ACC;	break;
-		case TORAY: r = m_ram[RAM_ADDR];	s = m_acc;			dst = Y_BUS;break;
+		case TODRA: r = m_d_latch;      s = m_ram[RAM_ADDR];    dst = ACC;  break;
+		case TORAY: r = m_ram[RAM_ADDR];    s = m_acc;          dst = Y_BUS;break;
 		case TORIY:
 		{
 			if (m_immflag == 0)
@@ -885,8 +885,8 @@ void esrip_device::tor1(UINT16 inst)
 			}
 			break;
 		}
-		case TODRY: r = m_d_latch;		s = m_ram[RAM_ADDR];	dst = Y_BUS;break;
-		case TORAR: r = m_ram[RAM_ADDR];	s = m_acc;			dst = RAM;	break;
+		case TODRY: r = m_d_latch;      s = m_ram[RAM_ADDR];    dst = Y_BUS;break;
+		case TORAR: r = m_ram[RAM_ADDR];    s = m_acc;          dst = RAM;  break;
 		case TORIR:
 		{
 			if (m_immflag == 0)
@@ -904,7 +904,7 @@ void esrip_device::tor1(UINT16 inst)
 			}
 			break;
 		}
-		case TODRR: r = m_d_latch;		s = m_ram[RAM_ADDR];	dst = RAM;	break;
+		case TODRR: r = m_d_latch;      s = m_ram[RAM_ADDR];    dst = RAM;  break;
 		default: INVALID;
 	}
 
@@ -914,10 +914,10 @@ void esrip_device::tor1(UINT16 inst)
 	/* Destination */
 	switch (dst)
 	{
-		case ACC:	m_acc = res; break;
-		case Y_BUS:	break;
-		case RAM:	m_ram[RAM_ADDR] = res; break;
-		default:	INVALID;
+		case ACC:   m_acc = res; break;
+		case Y_BUS: break;
+		case RAM:   m_ram[RAM_ADDR] = res; break;
+		default:    INVALID;
 	}
 
 	m_result = res;
@@ -938,7 +938,7 @@ void esrip_device::tor2(UINT16 inst)
 
 	switch (SRC)
 	{
-		case TODAR: r = m_d_latch;	s = m_acc;	break;
+		case TODAR: r = m_d_latch;  s = m_acc;  break;
 		case TOAIR:
 		{
 			if (m_immflag == 0)
@@ -994,7 +994,7 @@ void esrip_device::tonr(UINT16 inst)
 
 	UINT16 r = 0;
 	UINT16 s = 0;
-	UINT16	res = 0;
+	UINT16  res = 0;
 
 	switch (SRC)
 	{
@@ -1076,7 +1076,7 @@ void esrip_device::bonr(UINT16 inst)
 		LDC2NY = 0x17,
 	};
 
-	UINT16	res = 0;
+	UINT16  res = 0;
 
 	switch (inst & 0x1f)
 	{
@@ -1193,7 +1193,7 @@ void esrip_device::bor1(UINT16 inst)
 		TSTNR  = 0xf,
 	};
 
-	UINT16	res = 0;
+	UINT16  res = 0;
 
 	switch ((inst >> 5) & 0xf)
 	{
@@ -1304,16 +1304,16 @@ void esrip_device::rotr1(UINT16 inst)
 		RTRR = 0xf,
 	};
 
-	UINT16	u = 0;
-	UINT16	dst = 0;
-	UINT16	res = 0;
-	int		n = N;
+	UINT16  u = 0;
+	UINT16  dst = 0;
+	UINT16  res = 0;
+	int     n = N;
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case RTRA: u = m_ram[RAM_ADDR];	dst = ACC;		break;
-		case RTRY: u = m_ram[RAM_ADDR];	dst = Y_BUS;	break;
-		case RTRR: u = m_ram[RAM_ADDR];	dst = RAM;		break;
+		case RTRA: u = m_ram[RAM_ADDR]; dst = ACC;      break;
+		case RTRY: u = m_ram[RAM_ADDR]; dst = Y_BUS;    break;
+		case RTRR: u = m_ram[RAM_ADDR]; dst = RAM;      break;
 		default: INVALID;
 	}
 
@@ -1339,13 +1339,13 @@ void esrip_device::rotr2(UINT16 inst)
 		RTDR = 1,
 	};
 
-	UINT16	u = 0;
-	UINT16	res = 0;
+	UINT16  u = 0;
+	UINT16  res = 0;
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case RTAR: u = m_acc;		break;
-		case RTDR: u = m_d_latch;	break;
+		case RTAR: u = m_acc;       break;
+		case RTDR: u = m_d_latch;   break;
 		default: INVALID;
 	}
 
@@ -1368,16 +1368,16 @@ void esrip_device::rotnr(UINT16 inst)
 		RTAA = 0x1d,
 	};
 
-	UINT16	u = 0;
-	UINT16	res = 0;
-	UINT16	dst = 0;
+	UINT16  u = 0;
+	UINT16  res = 0;
+	UINT16  dst = 0;
 
 	switch (inst & 0x1f)
 	{
-		case RTDY: u = m_d_latch;	dst = Y_BUS;	break;
-		case RTDA: u = m_d_latch;	dst = ACC;		break;
-		case RTAY: u = m_acc;		dst = Y_BUS;	break;
-		case RTAA: u = m_acc;		dst = ACC;		break;
+		case RTDY: u = m_d_latch;   dst = Y_BUS;    break;
+		case RTDA: u = m_d_latch;   dst = ACC;      break;
+		case RTAY: u = m_acc;       dst = Y_BUS;    break;
+		case RTAA: u = m_acc;       dst = ACC;      break;
 		default: INVALID;
 	}
 
@@ -1470,7 +1470,7 @@ enum
 	SHDNOV = 8,
 };
 
-#define	SET_LINK_flag(x)	(m_new_status &= ~L_FLAG); \
+#define SET_LINK_flag(x)    (m_new_status &= ~L_FLAG); \
 							(m_new_status |= x ? L_FLAG : 0)
 
 UINT16 esrip_device::shift_op(UINT16 u, int opcode)
@@ -1526,13 +1526,13 @@ void esrip_device::shftr(UINT16 inst)
 		SHDR = 7,
 	};
 
-	UINT16	u = 0;
-	UINT16	res = 0;
+	UINT16  u = 0;
+	UINT16  res = 0;
 
 	switch ((inst >> 9) & 0xf)
 	{
-		case SHRR: u = m_ram[RAM_ADDR];	break;
-		case SHDR: u = m_d_latch;			break;
+		case SHRR: u = m_ram[RAM_ADDR]; break;
+		case SHDR: u = m_d_latch;           break;
 		default: INVALID;
 	}
 
@@ -1551,13 +1551,13 @@ void esrip_device::shftnr(UINT16 inst)
 		SHD = 7,
 	};
 
-	UINT16	u = 0;
-	UINT16	res = 0;
+	UINT16  u = 0;
+	UINT16  res = 0;
 
 	switch ((inst >> 9) & 0xf)
 	{
-		case SHA: u = m_acc;			break;
-		case SHD: u = m_d_latch;		break;
+		case SHA: u = m_acc;            break;
+		case SHD: u = m_d_latch;        break;
 		default: INVALID;
 	}
 
@@ -1565,9 +1565,9 @@ void esrip_device::shftnr(UINT16 inst)
 
 	switch (DST)
 	{
-		case NRY:	break;
-		case NRA:	m_acc = res; break;
-		default:	INVALID;
+		case NRY:   break;
+		case NRA:   m_acc = res; break;
+		default:    INVALID;
 	}
 	m_result = res;
 }
@@ -1598,10 +1598,10 @@ void esrip_device::rstst(UINT16 inst)
 	switch (inst & 0x1f)
 	{
 		case RONCZ: CLEAR_FLAGS(V_FLAG | N_FLAG | C_FLAG | Z_FLAG); break;
-		case RL:	CLEAR_FLAGS(L_FLAG); break;
-		case RF1:	CLEAR_FLAGS(FLAG_1); break;
-		case RF2:	CLEAR_FLAGS(FLAG_2); break;
-		case RF3:	CLEAR_FLAGS(FLAG_3); break;
+		case RL:    CLEAR_FLAGS(L_FLAG); break;
+		case RF1:   CLEAR_FLAGS(FLAG_1); break;
+		case RF2:   CLEAR_FLAGS(FLAG_2); break;
+		case RF3:   CLEAR_FLAGS(FLAG_3); break;
 	}
 
 	m_result = 0;
@@ -1621,10 +1621,10 @@ void esrip_device::setst(UINT16 inst)
 	switch (inst & 0x1f)
 	{
 		case SONCZ: SET_FLAGS(V_FLAG | N_FLAG | C_FLAG | Z_FLAG); break;
-		case SL:	SET_FLAGS(L_FLAG); break;
-		case SF1:	SET_FLAGS(FLAG_1); break;
-		case SF2:	SET_FLAGS(FLAG_2); break;
-		case SF3:	SET_FLAGS(FLAG_3); break;
+		case SL:    SET_FLAGS(L_FLAG); break;
+		case SF1:   SET_FLAGS(FLAG_1); break;
+		case SF2:   SET_FLAGS(FLAG_2); break;
+		case SF3:   SET_FLAGS(FLAG_3); break;
 	}
 
 	m_result = 0xffff;
@@ -1679,7 +1679,7 @@ void esrip_device::test(UINT16 inst)
 
 void esrip_device::nop(UINT16 inst)
 {
-	m_result = 0xff;	// Undefined
+	m_result = 0xff;    // Undefined
 }
 
 //**************************************************************************
@@ -1694,7 +1694,7 @@ const device_type ESRIP = &device_creator<esrip_device>;
 
 esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ESRIP, "ESRIP", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
+		m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
 {
 	// build the opcode table
 	for (int op = 0; op < 24; op++)
@@ -1721,12 +1721,12 @@ void esrip_device::static_set_config(device_t &device, const esrip_config &confi
 
 const esrip_device::ophandler esrip_device::s_opcodetable[24] =
 {
-	&esrip_device::rotr1,	&esrip_device::tor1,	&esrip_device::rotr2,	&esrip_device::rotc,
-	&esrip_device::rotm,	&esrip_device::bor2,	&esrip_device::crcf,	&esrip_device::crcr,
-	&esrip_device::svstr,	&esrip_device::prt,		&esrip_device::sor,		&esrip_device::tor2,
-	&esrip_device::shftr,	&esrip_device::test,	&esrip_device::nop,		&esrip_device::setst,
-	&esrip_device::rstst,	&esrip_device::rotnr,	&esrip_device::bonr,	&esrip_device::bor1,
-	&esrip_device::sonr,	&esrip_device::shftnr,	&esrip_device::prtnr,	&esrip_device::tonr
+	&esrip_device::rotr1,   &esrip_device::tor1,    &esrip_device::rotr2,   &esrip_device::rotc,
+	&esrip_device::rotm,    &esrip_device::bor2,    &esrip_device::crcf,    &esrip_device::crcr,
+	&esrip_device::svstr,   &esrip_device::prt,     &esrip_device::sor,     &esrip_device::tor2,
+	&esrip_device::shftr,   &esrip_device::test,    &esrip_device::nop,     &esrip_device::setst,
+	&esrip_device::rstst,   &esrip_device::rotnr,   &esrip_device::bonr,    &esrip_device::bor1,
+	&esrip_device::sonr,    &esrip_device::shftnr,  &esrip_device::prtnr,   &esrip_device::tonr
 };
 
 
@@ -1805,11 +1805,11 @@ void esrip_device::execute_run()
 	/* Core execution loop */
 	do
 	{
-		UINT64	inst;
-		UINT8	next_pc;
-		UINT16	x_bus = 0;
-		UINT16	ipt_bus = 0;
-		UINT16	y_bus = 0;
+		UINT64  inst;
+		UINT8   next_pc;
+		UINT16  x_bus = 0;
+		UINT16  ipt_bus = 0;
+		UINT16  y_bus = 0;
 
 		int yoe = _BIT(m_l5, 1);
 		int bl46 = BIT(m_l4, 6);

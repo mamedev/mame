@@ -20,7 +20,7 @@ MACHINE_RESET_MEMBER(slapfght_state,slapfight)
 	m_slapfight_status = 0xc7;
 
 	m_getstar_sequence_index = 0;
-	m_getstar_sh_intenabled = 0;	/* disable sound cpu interrupts */
+	m_getstar_sh_intenabled = 0;    /* disable sound cpu interrupts */
 
 	/* SOUND CPU */
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -275,15 +275,15 @@ READ8_MEMBER(slapfght_state::getstar_e803_r)
 			break;
 		case GTSTARB2:
 			/*
-            056B: 21 03 E8      ld   hl,$E803
-            056E: 7E            ld   a,(hl)
-            056F: BE            cp   (hl)
-            0570: 28 FD         jr   z,$056F
-            0572: C6 05         add  a,$05
-            0574: EE 56         xor  $56
-            0576: BE            cp   (hl)
-            0577: C2 6E 05      jp   nz,$056E
-            */
+			056B: 21 03 E8      ld   hl,$E803
+			056E: 7E            ld   a,(hl)
+			056F: BE            cp   (hl)
+			0570: 28 FD         jr   z,$056F
+			0572: C6 05         add  a,$05
+			0574: EE 56         xor  $56
+			0576: BE            cp   (hl)
+			0577: C2 6E 05      jp   nz,$056E
+			*/
 			if (space.device().safe_pc() == 0x056e) return (getstar_val);
 			if (space.device().safe_pc() == 0x0570) return (getstar_val+1);
 			if (space.device().safe_pc() == 0x0577) return ((getstar_val+0x05) ^ 0x56);
@@ -671,30 +671,30 @@ WRITE8_MEMBER(slapfght_state::getstar_e803_w)
 			break;
 		case GTSTARB1:
 			/* "Test mode" doesn't compute the lives value :
-                6ADA: 3E 23         ld   a,$23
-                6ADC: CD 52 11      call $1152
-                6ADF: 32 03 E8      ld   ($E803),a
-                6AE2: DB 00         in   a,($00)
-                6AE4: CB 4F         bit  1,a
-                6AE6: 28 FA         jr   z,$6AE2
-                6AE8: 3A 0A C8      ld   a,($C80A)
-                6AEB: E6 03         and  $03
-                6AED: CD 52 11      call $1152
-                6AF0: 32 03 E8      ld   ($E803),a
-                6AF3: DB 00         in   a,($00)
-                6AF5: CB 57         bit  2,a
-                6AF7: 20 FA         jr   nz,$6AF3
-                6AF9: 00            nop
-                6AFA: 00            nop
-                6AFB: 00            nop
-                6AFC: 00            nop
-                6AFD: 00            nop
-                6AFE: 00            nop
-                6AFF: 00            nop
-                6B00: 00            nop
-                6B01: 3A 03 E8      ld   a,($E803)
-               We save the regs though to hack it in 'getstar_e803_r' read handler.
-            */
+			    6ADA: 3E 23         ld   a,$23
+			    6ADC: CD 52 11      call $1152
+			    6ADF: 32 03 E8      ld   ($E803),a
+			    6AE2: DB 00         in   a,($00)
+			    6AE4: CB 4F         bit  1,a
+			    6AE6: 28 FA         jr   z,$6AE2
+			    6AE8: 3A 0A C8      ld   a,($C80A)
+			    6AEB: E6 03         and  $03
+			    6AED: CD 52 11      call $1152
+			    6AF0: 32 03 E8      ld   ($E803),a
+			    6AF3: DB 00         in   a,($00)
+			    6AF5: CB 57         bit  2,a
+			    6AF7: 20 FA         jr   nz,$6AF3
+			    6AF9: 00            nop
+			    6AFA: 00            nop
+			    6AFB: 00            nop
+			    6AFC: 00            nop
+			    6AFD: 00            nop
+			    6AFE: 00            nop
+			    6AFF: 00            nop
+			    6B00: 00            nop
+			    6B01: 3A 03 E8      ld   a,($E803)
+			   We save the regs though to hack it in 'getstar_e803_r' read handler.
+			*/
 			if (space.device().safe_pc() == 0x6ae2)
 			{
 				m_getstar_cmd = 0x00;
@@ -708,32 +708,32 @@ WRITE8_MEMBER(slapfght_state::getstar_e803_w)
 			break;
 		case GTSTARB2:
 			/* "Test mode" doesn't compute the lives value :
-                6ADA: 3E 23         ld   a,$23
-                6ADC: CD 52 11      call $1152
-                6ADF: 32 03 E8      ld   ($E803),a
-                6AE2: DB 00         in   a,($00)
-                6AE4: CB 4F         bit  1,a
-                6AE6: 00            nop
-                6AE7: 00            nop
-                6AE8: 3A 0A C8      ld   a,($C80A)
-                6AEB: E6 03         and  $03
-                6AED: CD 52 11      call $1152
-                6AF0: 32 03 E8      ld   ($E803),a
-                6AF3: DB 00         in   a,($00)
-                6AF5: CB 57         bit  2,a
-                6AF7: 00            nop
-                6AF8: 00            nop
-                6AF9: 00            nop
-                6AFA: 00            nop
-                6AFB: 00            nop
-                6AFC: 00            nop
-                6AFD: 00            nop
-                6AFE: 00            nop
-                6AFF: 00            nop
-                6B00: 00            nop
-                6B01: 3A 03 E8      ld   a,($E803)
-               We save the regs though to hack it in 'getstar_e803_r' read handler.
-            */
+			    6ADA: 3E 23         ld   a,$23
+			    6ADC: CD 52 11      call $1152
+			    6ADF: 32 03 E8      ld   ($E803),a
+			    6AE2: DB 00         in   a,($00)
+			    6AE4: CB 4F         bit  1,a
+			    6AE6: 00            nop
+			    6AE7: 00            nop
+			    6AE8: 3A 0A C8      ld   a,($C80A)
+			    6AEB: E6 03         and  $03
+			    6AED: CD 52 11      call $1152
+			    6AF0: 32 03 E8      ld   ($E803),a
+			    6AF3: DB 00         in   a,($00)
+			    6AF5: CB 57         bit  2,a
+			    6AF7: 00            nop
+			    6AF8: 00            nop
+			    6AF9: 00            nop
+			    6AFA: 00            nop
+			    6AFB: 00            nop
+			    6AFC: 00            nop
+			    6AFD: 00            nop
+			    6AFE: 00            nop
+			    6AFF: 00            nop
+			    6B00: 00            nop
+			    6B01: 3A 03 E8      ld   a,($E803)
+			   We save the regs though to hack it in 'getstar_e803_r' read handler.
+			*/
 			if (space.device().safe_pc() == 0x6ae2)
 			{
 				m_getstar_cmd = 0x00;

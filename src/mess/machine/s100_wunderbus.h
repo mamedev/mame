@@ -27,7 +27,7 @@
 // ======================> s100_wunderbus_device
 
 class s100_wunderbus_device : public device_t,
-							  public device_s100_card_interface
+								public device_s100_card_interface
 {
 public:
 	// construction/destruction

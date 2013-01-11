@@ -139,15 +139,15 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	96,                 /* 96 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( pentagon )
@@ -204,8 +204,8 @@ ROM_START(pentagon)
 	ROMX_LOAD("128p-0.rom", 0x010000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(8))
 	ROMX_LOAD( "m48a.rom",  0x014000, 0x4000, CRC(a3b4def6) SHA1(7ad59ca373876d452b0cf0ed5edb0e93c3176f1a), ROM_BIOS(8))
 	ROM_SYSTEM_BIOS(8, "v9", "ZXVGS v0.22 by Yarek")
-    ROMX_LOAD( "zxvgs-22-0.rom", 0x010000, 0x4000, CRC(63041c61) SHA1(f6718097d939afa8881b4436741a5a23d7e93d78), ROM_BIOS(9))
-    ROMX_LOAD( "zxvgs-22-1.rom", 0x014000, 0x4000, CRC(f3736047) SHA1(f3739bf460a57e3f10e8dfb1e7120842938d27ea), ROM_BIOS(9))
+	ROMX_LOAD( "zxvgs-22-0.rom", 0x010000, 0x4000, CRC(63041c61) SHA1(f6718097d939afa8881b4436741a5a23d7e93d78), ROM_BIOS(9))
+	ROMX_LOAD( "zxvgs-22-1.rom", 0x014000, 0x4000, CRC(f3736047) SHA1(f3739bf460a57e3f10e8dfb1e7120842938d27ea), ROM_BIOS(9))
 	ROM_SYSTEM_BIOS(9, "v10", "ZXVGS v0.29 by Yarek")
 	ROMX_LOAD( "zxvg-29-0.rom", 0x010000, 0x4000, CRC(3b66f433) SHA1(d21df9e7f1ee99d8b38c2e6a32727aac0f1d5dc6), ROM_BIOS(10))
 	ROMX_LOAD( "zxvg-1.rom", 0x014000, 0x4000, CRC(a8baca3e) SHA1(f2f131eaa4de832eda76290e48f86e465d28ded7), ROM_BIOS(10))
@@ -250,5 +250,5 @@ ROM_START(pent1024)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1989, pentagon, spec128,	0,		pentagon,	spec_plus, driver_device,	0,		"<unknown>",		"Pentagon", GAME_NOT_WORKING)
-COMP( 19??, pent1024, spec128,	0,		pent1024,	spec_plus, driver_device,	0,		"<unknown>",		"Pentagon 1024", GAME_NOT_WORKING)
+COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon", GAME_NOT_WORKING)
+COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon 1024", GAME_NOT_WORKING)

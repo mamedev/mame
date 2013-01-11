@@ -346,13 +346,13 @@ WRITE16_MEMBER(rbisland_state::jumping_sound_w)
 
 static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x10c000, 0x10ffff) AM_RAM				/* main RAM */
+	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x201000, 0x203fff) AM_RAM				/* r/w in initial checks */
+	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
 	AM_RANGE(0x390000, 0x390003) AM_READ_PORT("DSWA")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(rbisland_spritectrl_w)
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x3c0000, 0x3c0003) AM_WRITENOP		/* written very often, watchdog? */
+	AM_RANGE(0x3c0000, 0x3c0003) AM_WRITENOP        /* written very often, watchdog? */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r,tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(rbisland_cchip_ram_r,rbisland_cchip_ram_w)
@@ -362,29 +362,29 @@ static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
 	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram + other stuff */
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram + other stuff */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jumping_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x10c000, 0x10ffff) AM_RAM				/* main RAM */
+	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x201000, 0x203fff) AM_RAM				/* r/w in initial checks */
+	AM_RANGE(0x201000, 0x203fff) AM_RAM             /* r/w in initial checks */
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x401000, 0x401001) AM_READ_PORT("401001")
 	AM_RANGE(0x401002, 0x401003) AM_READ_PORT("401003")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(jumping_spritectrl_w)
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP		/* watchdog? */
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP        /* watchdog? */
 	AM_RANGE(0x400006, 0x400007) AM_WRITE(jumping_sound_w)
-	AM_RANGE(0x420000, 0x420001) AM_READNOP			/* read, but result not used */
+	AM_RANGE(0x420000, 0x420001) AM_READNOP         /* read, but result not used */
 	AM_RANGE(0x430000, 0x430003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITENOP		/* original c-chip location (not used) */
+	AM_RANGE(0x800000, 0x80ffff) AM_WRITENOP        /* original c-chip location (not used) */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("pc080sn", pc080sn_word_r, pc080sn_word_w)
-	AM_RANGE(0xc20000, 0xc20003) AM_WRITENOP		/* seems it is a leftover from rbisland: scroll y written here too */
+	AM_RANGE(0xc20000, 0xc20003) AM_WRITENOP        /* seems it is a leftover from rbisland: scroll y written here too */
 	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM				/* original spriteram location, needed for Attract Mode */
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM             /* original spriteram location, needed for Attract Mode */
 ADDRESS_MAP_END
 
 
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( jumping_sound_map, AS_PROGRAM, 8, rbisland_state )
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xb400, 0xb401) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ(jumping_latch_r)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	/* looks like a bankswitch, but sound works with or without it */
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    /* looks like a bankswitch, but sound works with or without it */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -584,8 +584,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( rbisland )
-	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout, 0, 0x80 )	/* OBJ 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,   0, 0x80 )	/* SCR 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout, 0, 0x80 )  /* OBJ 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,   0, 0x80 )  /* SCR 8x8 */
 GFXDECODE_END
 
 
@@ -612,8 +612,8 @@ static const gfx_layout jumping_spritelayout =
 };
 
 static GFXDECODE_START( jumping )
-	GFXDECODE_ENTRY( "gfx2", 0, jumping_spritelayout, 0, 0x80 )	/* OBJ 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, jumping_tilelayout,   0, 0x80 )	/* SCR 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, jumping_spritelayout, 0, 0x80 ) /* OBJ 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, jumping_tilelayout,   0, 0x80 ) /* SCR 8x8 */
 GFXDECODE_END
 
 
@@ -623,14 +623,14 @@ GFXDECODE_END
 
 static const pc080sn_interface rbisland_pc080sn_intf =
 {
-	1,	 /* gfxnum */
-	0, 0, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
+	1,   /* gfxnum */
+	0, 0, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const pc080sn_interface jumping_pc080sn_intf =
 {
-	1,	 /* gfxnum */
-	0, 0, 1, 0	/* x_offset, y_offset, y_invert, dblwidth */
+	1,   /* gfxnum */
+	0, 0, 1, 0  /* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const pc090oj_interface rbisland_pc090oj_intf =
@@ -662,7 +662,7 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 
 	/* video hardware */
@@ -696,14 +696,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( jumping, rbisland_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)	/* not verified but matches original */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)   /* not verified but matches original */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)	/* not verified but music tempo matches original */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6) /* not verified but music tempo matches original */
 	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough ? */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough ? */
 
 
 	/* video hardware */
@@ -724,10 +724,10 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_18_432MHz/6)	/* not verified */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_18_432MHz/6) /* not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_18_432MHz/6)	/* not verified */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_18_432MHz/6) /* not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -753,10 +753,10 @@ ROM_START( rbisland )
 	ROM_CONTINUE(                     0x10000, 0xc000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )	/* tiles */
+	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )  /* tiles */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
+	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )  /* sprites */
 	ROM_LOAD16_BYTE( "b22-12.7",      0x80000, 0x10000, CRC(67a76dc6) SHA1(626ee684eb3ea859c695ffe03344ccaa442da4af) )
 	ROM_LOAD16_BYTE( "b22-13.6",      0x80001, 0x10000, CRC(2fda099f) SHA1(a1e27a4497f6733608be924d69d965b19f725b99) )
 ROM_END
@@ -778,10 +778,10 @@ ROM_START( rbislando )
 	ROM_CONTINUE(                     0x10000, 0xc000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )	/* tiles */
+	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )  /* tiles */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
+	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )  /* sprites */
 	ROM_LOAD16_BYTE( "b22-12.7",      0x80000, 0x10000, CRC(67a76dc6) SHA1(626ee684eb3ea859c695ffe03344ccaa442da4af) )
 	ROM_LOAD16_BYTE( "b22-13.6",      0x80001, 0x10000, CRC(2fda099f) SHA1(a1e27a4497f6733608be924d69d965b19f725b99) )
 ROM_END
@@ -803,10 +803,10 @@ ROM_START( rbislande )
 	ROM_CONTINUE(                     0x10000, 0xc000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )	/* tiles */
+	ROM_LOAD( "b22-01.2",             0x00000, 0x80000, CRC(b76c9168) SHA1(e924be0c8294b930488bb04583784254a840a52e) )  /* tiles */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )	/* sprites */
+	ROM_LOAD( "b22-02.5",             0x00000, 0x80000, CRC(1b87ecf0) SHA1(37a463184f4064fe0565367236e289d57639614c) )  /* sprites */
 	ROM_LOAD16_BYTE( "b22-12.7",      0x80000, 0x10000, CRC(67a76dc6) SHA1(626ee684eb3ea859c695ffe03344ccaa442da4af) )
 	ROM_LOAD16_BYTE( "b22-13.6",      0x80001, 0x10000, CRC(2fda099f) SHA1(a1e27a4497f6733608be924d69d965b19f725b99) )
 ROM_END
@@ -819,7 +819,7 @@ ROM_START( jumping )
 	ROM_LOAD16_BYTE( "jb1_i8",        0x20001, 0x10000, CRC(ed33bae1) SHA1(24ade29f3fdd45aa772ccf9c046294baa6eae7a2) )
 	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
-	ROM_LOAD16_BYTE( "jb1_f89",       0x80001, 0x10000, CRC(0810d327) SHA1(fe91ac02e617bde413dc8a20b7cbcaf3e20aeb28) )	/* c-chip substitute */
+	ROM_LOAD16_BYTE( "jb1_f89",       0x80001, 0x10000, CRC(0810d327) SHA1(fe91ac02e617bde413dc8a20b7cbcaf3e20aeb28) )  /* c-chip substitute */
 
 	ROM_REGION( 0x14000, "audiocpu", 0 )
 	ROM_LOAD( "jb1_cd67",             0x00000, 0x8000, CRC(8527c00e) SHA1(86e3824caca39aca4ca4df63bb4474adacfc4c53) )
@@ -827,7 +827,7 @@ ROM_START( jumping )
 	ROM_CONTINUE(                     0x0c000, 0x4000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "jb2_ic8",              0x00000, 0x10000, CRC(65b76309) SHA1(1e345726e137f4c56d4bf239651c986fd53a16c3) )	/* tiles */
+	ROM_LOAD( "jb2_ic8",              0x00000, 0x10000, CRC(65b76309) SHA1(1e345726e137f4c56d4bf239651c986fd53a16c3) )  /* tiles */
 	ROM_LOAD( "jb2_ic7",              0x10000, 0x10000, CRC(43a94283) SHA1(d6a05cbc7b996a8e7f1520563f6fada9a59021a4) )
 	ROM_LOAD( "jb2_ic10",             0x20000, 0x10000, CRC(e61933fb) SHA1(02bc0e1a7a3ce9e15fb83b28ce8fafb0b8d80ebd) )
 	ROM_LOAD( "jb2_ic9",              0x30000, 0x10000, CRC(ed031eb2) SHA1(905be4d890ff7bb8a4d8ad85b2a11483fb4d67eb) )
@@ -837,7 +837,7 @@ ROM_START( jumping )
 	ROM_LOAD( "jb2_ic13",             0x70000, 0x10000, CRC(06226492) SHA1(834280ec49e61a0c9c6b6fe2033e1b20bd1bffbf) )
 
 	ROM_REGION( 0xa0000, "gfx2", ROMREGION_INVERT )
-	ROM_LOAD( "jb2_ic62",             0x00000, 0x10000, CRC(8548db6c) SHA1(675cd301259d5ed16098a38ac58b27b5ccd91264) )	/* sprites */
+	ROM_LOAD( "jb2_ic62",             0x00000, 0x10000, CRC(8548db6c) SHA1(675cd301259d5ed16098a38ac58b27b5ccd91264) )  /* sprites */
 	ROM_LOAD( "jb2_ic61",             0x10000, 0x10000, CRC(37c5923b) SHA1(c83ef45564c56ef62d7019aecbd79dccc671deee) )
 	ROM_LOAD( "jb2_ic60",             0x20000, 0x08000, CRC(662a2f1e) SHA1(1c5e8b1f0623e64faf9cd60f9653fc5957191a9b) )
 	ROM_LOAD( "jb2_ic78",             0x28000, 0x10000, CRC(925865e1) SHA1(457de50bc03e8b949ac7d46ae4188201e87574a8) )

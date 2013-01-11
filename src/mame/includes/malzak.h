@@ -11,8 +11,8 @@ class malzak_state : public driver_device
 public:
 	malzak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_trom(*this, "saa5050"),
-		  m_videoram(*this, "videoram")
+			m_trom(*this, "saa5050"),
+			m_videoram(*this, "videoram")
 	{ }
 
 	required_device<saa5050_device> m_trom;

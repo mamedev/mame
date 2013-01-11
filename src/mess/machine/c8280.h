@@ -28,11 +28,11 @@
 // ======================> c8280_device
 
 class c8280_device :  public device_t,
-					  public device_ieee488_interface
+						public device_ieee488_interface
 {
 public:
-    // construction/destruction
-    c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -51,9 +51,9 @@ public:
 	void fdc_drq_w(bool state);
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete() { m_shortname = "c8280"; }
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "c8280"; }
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_ieee488_interface overrides
@@ -73,9 +73,9 @@ private:
 	floppy_image_device *m_floppy;
 
 	// IEEE-488 bus
-	int m_rfdo;							// not ready for data output
-	int m_daco;							// not data accepted output
-	int m_atna;							// attention acknowledge
+	int m_rfdo;                         // not ready for data output
+	int m_daco;                         // not data accepted output
+	int m_atna;                         // attention acknowledge
 
 	UINT8 m_fk5;
 };

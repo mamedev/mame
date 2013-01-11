@@ -13,19 +13,19 @@
 #include "sound/discrete.h"
 #include "video/cdp1861.h"
 
-#define CDP1802_TAG		"ic1"
-#define CDP1861_TAG		"ic2"
-#define CDP1864_TAG		"cdp1864"
-#define SCREEN_TAG		"screen"
+#define CDP1802_TAG     "ic1"
+#define CDP1861_TAG     "ic2"
+#define CDP1864_TAG     "cdp1864"
+#define SCREEN_TAG      "screen"
 
 class studio2_state : public driver_device
 {
 public:
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_speaker(*this, BEEPER_TAG),
-		  m_vdc(*this, CDP1861_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_speaker(*this, BEEPER_TAG),
+			m_vdc(*this, CDP1861_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -57,8 +57,8 @@ class visicom_state : public studio2_state
 public:
 	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag),
-		  m_color_ram(*this, "color_ram"),
-		  m_color_ram1(*this, "color_ram1")
+			m_color_ram(*this, "color_ram"),
+			m_color_ram1(*this, "color_ram1")
 	{ }
 
 	required_shared_ptr<UINT8> m_color_ram;
@@ -70,8 +70,8 @@ class mpt02_state : public studio2_state
 public:
 	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag),
-		  m_cti(*this, CDP1864_TAG),
-		  m_color_ram(*this, "color_ram")
+			m_cti(*this, CDP1864_TAG),
+			m_color_ram(*this, "color_ram")
 	{ }
 
 	required_device<cdp1864_device> m_cti;

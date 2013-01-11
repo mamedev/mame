@@ -164,8 +164,8 @@ ADDRESS_MAP_END
 
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0091LVC, "TC0091LVC", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, NULL, *ADDRESS_MAP_NAME(tc0091lvc_map8))
+		device_memory_interface(mconfig, *this),
+		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, NULL, *ADDRESS_MAP_NAME(tc0091lvc_map8))
 {
 }
 
@@ -392,4 +392,3 @@ void tc0091lvc_device::screen_eof(void)
 	m_bg1_scroll[1] = m_sprram_buffer[0x3fd];
 	m_bg1_scroll[2] = m_sprram_buffer[0x3fe];
 }
-

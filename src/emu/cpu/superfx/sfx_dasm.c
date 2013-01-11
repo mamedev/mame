@@ -5,17 +5,17 @@ static char *output;
 
 static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 {
-    va_list vl;
+	va_list vl;
 
-    va_start(vl, fmt);
-    output += vsprintf(output, fmt, vl);
-    va_end(vl);
+	va_start(vl, fmt);
+	output += vsprintf(output, fmt, vl);
+	va_end(vl);
 }
 
 offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1, UINT16 alt)
 {
 	UINT8 bytes_consumed = 1;
-    output = buffer;
+	output = buffer;
 
 	switch(op)
 	{
@@ -80,7 +80,7 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:	// TO
+		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: // TO
 			print("TO      R%d", op & 0xf);
 			break;
 
@@ -90,7 +90,7 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35:
-		case 0x36: case 0x37: case 0x38: case 0x39: case 0x3a: case 0x3b:	// STW_IR / STB_IR
+		case 0x36: case 0x37: case 0x38: case 0x39: case 0x3a: case 0x3b:   // STW_IR / STB_IR
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
@@ -118,7 +118,7 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 
 		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45:
-		case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b:	// LDW_IR / LDB_IR
+		case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b:   // LDW_IR / LDB_IR
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
@@ -210,7 +210,7 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			print("MERGE");
 			break;
 
-				   case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
+					case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // AND / BIC / ANDI / BICI
 			switch(alt)
 			{
@@ -337,7 +337,7 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			print("HIB");
 			break;
 
-				   case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+					case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: // OR / XOR / ORI / XORI
 			switch(alt)
 			{
@@ -419,5 +419,5 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 p
 			break;
 	}
 
-    return bytes_consumed | DASMFLAG_SUPPORTED;
+	return bytes_consumed | DASMFLAG_SUPPORTED;
 }

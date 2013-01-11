@@ -137,10 +137,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sx      = source[1];
 		int attr    = source[2];
 			/* xx-x---- ?
-             * --x----- flipy
-             * ----x--- msb source[0]
-             * -----x-- msb source[1]
-             */
+			 * --x----- flipy
+			 * ----x--- msb source[0]
+			 * -----x-- msb source[1]
+			 */
 		int tilenum = source[3];
 
 		int color = ((tilenum&0xff)>>1)+0x00;

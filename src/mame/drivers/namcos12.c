@@ -1044,10 +1044,10 @@ class namcos12_state : public driver_device
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-          m_rtc(*this, "rtc"),
-		  m_sharedram(*this, "sharedram") { }
+			m_rtc(*this, "rtc"),
+			m_sharedram(*this, "sharedram") { }
 
-    required_device<rtc4543_device> m_rtc;
+	required_device<rtc4543_device> m_rtc;
 	required_shared_ptr<UINT32> m_sharedram;
 	UINT32 m_n_bankoffset;
 
@@ -1256,7 +1256,7 @@ WRITE32_MEMBER(namcos12_state::s12_dma_bias_w)
 
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)			/* banking */
+	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)          /* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram") /* shared ram?? */
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
@@ -1447,8 +1447,8 @@ static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")
-	AM_RANGE(0x300010, 0x300011) AM_NOP	// golgo13 writes here a lot, possibly also a wait state generator?
-	AM_RANGE(0x300030, 0x300031) AM_NOP	// most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
+	AM_RANGE(0x300010, 0x300011) AM_NOP // golgo13 writes here a lot, possibly also a wait state generator?
+	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 ADDRESS_MAP_END
 
 READ8_MEMBER(namcos12_state::s12_mcu_p8_r)
@@ -1468,21 +1468,21 @@ READ8_MEMBER(namcos12_state::s12_mcu_pa_r)
 
 WRITE8_MEMBER(namcos12_state::s12_mcu_pa_w)
 {
-    m_rtc->ce_w(data & 1);
+	m_rtc->ce_w(data & 1);
 	m_s12_porta = data;
 }
 
 READ8_MEMBER(namcos12_state::s12_mcu_rtc_r)
 {
-    UINT8 ret = 0;
+	UINT8 ret = 0;
 
-    for (int i = 0; i < 8; i++)
-    {
-        m_rtc->clk_w(0);
-        m_rtc->clk_w(1);
-        ret <<= 1;
-        ret |= m_rtc->data_r();
-    }
+	for (int i = 0; i < 8; i++)
+	{
+		m_rtc->clk_w(0);
+		m_rtc->clk_w(1);
+		ret <<= 1;
+		ret |= m_rtc->data_r();
+	}
 
 	return ret;
 }
@@ -1526,7 +1526,7 @@ WRITE8_MEMBER(namcos12_state::s12_mcu_settings_w)
 		}
 	}
 	else
-	{	// setting number
+	{   // setting number
 		m_s12_setnum = (data >> 4)-1;
 	}
 
@@ -1585,8 +1585,8 @@ static ADDRESS_MAP_START( s12h8iomap, AS_IO, 8, namcos12_state )
 	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w )
 	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ(s12_mcu_rtc_r ) AM_WRITE(s12_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
-	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_READ(s12_mcu_gun_h_r )	// golgo 13 gun X-axis
-	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_READ(s12_mcu_gun_v_r )	// golgo 13 gun Y-axis
+	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_READ(s12_mcu_gun_h_r )  // golgo 13 gun X-axis
+	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_READ(s12_mcu_gun_v_r )  // golgo 13 gun Y-axis
 	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L) AM_NOP
 ADDRESS_MAP_END
 
@@ -1642,7 +1642,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos12_state, namcos12 )
 
-    MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
@@ -2763,7 +2763,7 @@ ROM_START( truckk )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "tkk1wave0.ic1", 0x000000, 0x800000, CRC(037d3095) SHA1(cc343bdd45d023c133964321e2df5cb1c91525ef) )
 
-	ROM_REGION( 0x20000, "ioboard", 0)	/* Truck K. I/O board */
+	ROM_REGION( 0x20000, "ioboard", 0)  /* Truck K. I/O board */
 	ROM_LOAD( "tkk1prg0.ic7", 0x000000, 0x020000, CRC(11fd9c31) SHA1(068b8364ec0eb1e88f9f85f40b8b322876f6f3e2) )
 
 	DISK_REGION( "cdrom" )

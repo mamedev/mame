@@ -50,43 +50,43 @@
 /* object to track dirty states */
 struct dirty_state
 {
-	UINT32 *		dirty;						/* bitmap of dirty entries */
-	UINT32			mindirty;					/* minimum dirty entry */
-	UINT32			maxdirty;					/* minimum dirty entry */
+	UINT32 *        dirty;                      /* bitmap of dirty entries */
+	UINT32          mindirty;                   /* minimum dirty entry */
+	UINT32          maxdirty;                   /* minimum dirty entry */
 };
 
 
 /* a single palette client */
 struct palette_client
 {
-	palette_client *next;						/* pointer to next client */
-	palette_t *		palette;					/* reference to the palette */
-	dirty_state		live;						/* live dirty state */
-	dirty_state		previous;					/* previous dirty state */
+	palette_client *next;                       /* pointer to next client */
+	palette_t *     palette;                    /* reference to the palette */
+	dirty_state     live;                       /* live dirty state */
+	dirty_state     previous;                   /* previous dirty state */
 };
 
 
 /* a palette object */
 struct palette_t
 {
-	UINT32			refcount;					/* reference count on the palette */
-	UINT32			numcolors;					/* number of colors in the palette */
-	UINT32			numgroups;					/* number of groups in the palette */
+	UINT32          refcount;                   /* reference count on the palette */
+	UINT32          numcolors;                  /* number of colors in the palette */
+	UINT32          numgroups;                  /* number of groups in the palette */
 
-	float			brightness;					/* overall brightness value */
-	float			contrast;					/* overall contrast value */
-	float			gamma;						/* overall gamma value */
-	UINT8			gamma_map[256];				/* gamma map */
+	float           brightness;                 /* overall brightness value */
+	float           contrast;                   /* overall contrast value */
+	float           gamma;                      /* overall gamma value */
+	UINT8           gamma_map[256];             /* gamma map */
 
-	rgb_t *			entry_color;				/* array of raw colors */
-	float *			entry_contrast;				/* contrast value for each entry */
-	rgb_t *			adjusted_color;				/* array of adjusted colors */
-	rgb_t *			adjusted_rgb15;				/* array of adjusted colors as RGB15 */
+	rgb_t *         entry_color;                /* array of raw colors */
+	float *         entry_contrast;             /* contrast value for each entry */
+	rgb_t *         adjusted_color;             /* array of adjusted colors */
+	rgb_t *         adjusted_rgb15;             /* array of adjusted colors as RGB15 */
 
-	float *			group_bright;				/* brightness value for each group */
-	float *			group_contrast;				/* contrast value for each group */
+	float *         group_bright;               /* brightness value for each group */
+	float *         group_contrast;             /* contrast value for each group */
 
-	palette_client *client_list;				/* list of clients for this palette */
+	palette_client *client_list;                /* list of clients for this palette */
 };
 
 

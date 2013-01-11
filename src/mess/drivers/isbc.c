@@ -194,4 +194,3 @@ COMP( 19??, rpc86,    0,       0,    rpc86,      isbc, driver_device,    0,   "I
 COMP( 19??, isbc86,   0,       0,    isbc86,     isbc, driver_device,    0,   "Intel",   "iSBC 86/12A",GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 19??, isbc286,  0,       0,    isbc286,    isbc, driver_device,    0,   "Intel",   "iSBC 286",GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 19??, isbc2861, 0,       0,    isbc2861,   isbc, driver_device,    0,   "Intel",   "iSBC 286-10",GAME_NOT_WORKING | GAME_NO_SOUND)
-

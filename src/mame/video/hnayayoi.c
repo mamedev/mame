@@ -32,7 +32,7 @@ static void common_vh_start( running_machine &machine, int num_pixmaps )
 
 void hnayayoi_state::video_start()
 {
-	common_vh_start(machine(), 4);	/* 4 bitmaps -> 2 layers */
+	common_vh_start(machine(), 4);  /* 4 bitmaps -> 2 layers */
 
 	save_pointer(NAME(m_pixmap[0]), 256 * 256);
 	save_pointer(NAME(m_pixmap[1]), 256 * 256);
@@ -42,7 +42,7 @@ void hnayayoi_state::video_start()
 
 VIDEO_START_MEMBER(hnayayoi_state,untoucha)
 {
-	common_vh_start(machine(), 8);	/* 8 bitmaps -> 4 layers */
+	common_vh_start(machine(), 8);  /* 8 bitmaps -> 4 layers */
 
 	save_pointer(NAME(m_pixmap[0]), 256 * 256);
 	save_pointer(NAME(m_pixmap[1]), 256 * 256);
@@ -269,7 +269,7 @@ UINT32 hnayayoi_state::screen_update_hnayayoi(screen_device &screen, bitmap_ind1
 		draw_layer_interleaved(machine(), bitmap, cliprect, 3, 2, col1, 0);
 		draw_layer_interleaved(machine(), bitmap, cliprect, 1, 0, col0, 1);
 	}
-	else	/* total_pixmaps == 8 */
+	else    /* total_pixmaps == 8 */
 	{
 		draw_layer_interleaved(machine(), bitmap, cliprect, 7, 6, col3, 0);
 		draw_layer_interleaved(machine(), bitmap, cliprect, 5, 4, col2, 1);

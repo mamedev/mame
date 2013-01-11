@@ -332,12 +332,12 @@ void btoads_state::scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	{
 		/* mode 0: used in ship level, snake boss, title screen (free play) */
 		/* priority is:
-            1. Sprite pixels with high bit clear
-            2. BG1 pixels with the high bit set
-            3. Sprites
-            4. BG1
-            5. BG0
-        */
+		    1. Sprite pixels with high bit clear
+		    2. BG1 pixels with the high bit set
+		    3. Sprites
+		    4. BG1
+		    5. BG0
+		*/
 		case 0:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
@@ -377,12 +377,12 @@ void btoads_state::scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		/* mode 1: used in snow level, title screen (free play), top part of rolling ball level */
 		/* priority is:
-            1. Sprite pixels with high bit clear
-            2. BG0
-            3. BG1 pixels with high bit set
-            4. Sprites
-            5. BG1
-        */
+		    1. Sprite pixels with high bit clear
+		    2. BG0
+		    3. BG1 pixels with high bit set
+		    4. Sprites
+		    5. BG1
+		*/
 		case 1:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
@@ -421,10 +421,10 @@ void btoads_state::scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		/* mode 2: used in EOA screen, jetpack level, first level, high score screen */
 		/* priority is:
-            1. Sprites
-            2. BG1
-            3. BG0
-        */
+		    1. Sprites
+		    2. BG1
+		    3. BG0
+		*/
 		case 2:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
@@ -455,12 +455,12 @@ void btoads_state::scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		/* mode 3: used in toilet level, toad intros, bottom of rolling ball level */
 		/* priority is:
-            1. BG1 pixels with the high bit set
-            2. Sprite pixels with the high bit set
-            3. BG1
-            4. Sprites
-            5. BG0
-        */
+		    1. BG1 pixels with the high bit set
+		    2. Sprite pixels with the high bit set
+		    3. BG1
+		    4. Sprites
+		    5. BG0
+		*/
 		case 3:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{

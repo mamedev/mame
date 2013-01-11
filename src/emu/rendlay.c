@@ -404,11 +404,11 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 	int rotate = xml_get_attribute_int_with_subst(machine, *orientnode, "rotate", 0);
 	switch (rotate)
 	{
-		case 0:		orientation = ROT0;		break;
-		case 90:	orientation = ROT90;	break;
-		case 180:	orientation = ROT180;	break;
-		case 270:	orientation = ROT270;	break;
-		default:	throw emu_fatalerror("Invalid rotation in XML orientation node: %d", rotate);
+		case 0:     orientation = ROT0;     break;
+		case 90:    orientation = ROT90;    break;
+		case 180:   orientation = ROT180;   break;
+		case 270:   orientation = ROT270;   break;
+		default:    throw emu_fatalerror("Invalid rotation in XML orientation node: %d", rotate);
 	}
 	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "swapxy", "no")) == 0)
 		orientation ^= ORIENTATION_SWAP_XY;
@@ -430,11 +430,11 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 
 layout_element::layout_element(running_machine &machine, xml_data_node &elemnode, const char *dirname)
 	: m_next(NULL),
-	  m_machine(machine),
-	  m_complist(machine.respool()),
-	  m_defstate(0),
-	  m_maxstate(0),
-	  m_elemtex(NULL)
+		m_machine(machine),
+		m_complist(machine.respool()),
+		m_defstate(0),
+		m_maxstate(0),
+		m_elemtex(NULL)
 {
 	// extract the name
 	const char *name = xml_get_attribute_string_with_subst(machine, elemnode, "name", NULL);
@@ -571,8 +571,8 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 
 layout_element::texture::texture()
 	: m_element(NULL),
-	  m_texture(NULL),
-	  m_state(0)
+		m_texture(NULL),
+		m_state(0)
 {
 }
 
@@ -599,8 +599,8 @@ layout_element::texture::~texture()
 
 layout_element::component::component(running_machine &machine, xml_data_node &compnode, const char *dirname)
 	: m_next(NULL),
-	  m_type(CTYPE_INVALID),
-	  m_state(0)
+		m_type(CTYPE_INVALID),
+		m_state(0)
 {
 	for (int i=0;i<MAX_BITMAPS;i++)
 	{
@@ -1949,15 +1949,15 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 
 layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simple_list<layout_element> &elemlist)
 	: m_next(NULL),
-	  m_aspect(1.0f),
-	  m_scraspect(1.0f),
-	  m_screens(machine.respool()),
-	  m_backdrop_list(machine.respool()),
-	  m_screen_list(machine.respool()),
-	  m_overlay_list(machine.respool()),
-	  m_bezel_list(machine.respool()),
-	  m_cpanel_list(machine.respool()),
-	  m_marquee_list(machine.respool())
+		m_aspect(1.0f),
+		m_scraspect(1.0f),
+		m_screens(machine.respool()),
+		m_backdrop_list(machine.respool()),
+		m_screen_list(machine.respool()),
+		m_overlay_list(machine.respool()),
+		m_bezel_list(machine.respool()),
+		m_cpanel_list(machine.respool()),
+		m_marquee_list(machine.respool())
 {
 	// allocate a copy of the name
 	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
@@ -2015,13 +2015,13 @@ layout_view::item *layout_view::first_item(item_layer layer) const
 {
 	switch (layer)
 	{
-		case ITEM_LAYER_BACKDROP:	return m_backdrop_list.first();
-		case ITEM_LAYER_SCREEN:		return m_screen_list.first();
-		case ITEM_LAYER_OVERLAY:	return m_overlay_list.first();
-		case ITEM_LAYER_BEZEL:		return m_bezel_list.first();
-		case ITEM_LAYER_CPANEL:		return m_cpanel_list.first();
-		case ITEM_LAYER_MARQUEE:	return m_marquee_list.first();
-		default:					return NULL;
+		case ITEM_LAYER_BACKDROP:   return m_backdrop_list.first();
+		case ITEM_LAYER_SCREEN:     return m_screen_list.first();
+		case ITEM_LAYER_OVERLAY:    return m_overlay_list.first();
+		case ITEM_LAYER_BEZEL:      return m_bezel_list.first();
+		case ITEM_LAYER_CPANEL:     return m_cpanel_list.first();
+		case ITEM_LAYER_MARQUEE:    return m_marquee_list.first();
+		default:                    return NULL;
 	}
 }
 
@@ -2046,12 +2046,12 @@ void layout_view::recompute(render_layer_config layerconfig)
 		// determine if this layer should be visible
 		switch (layer)
 		{
-			case ITEM_LAYER_BACKDROP:	m_layenabled[layer] = layerconfig.backdrops_enabled();	break;
-			case ITEM_LAYER_OVERLAY:	m_layenabled[layer] = layerconfig.overlays_enabled();	break;
-			case ITEM_LAYER_BEZEL:		m_layenabled[layer] = layerconfig.bezels_enabled();		break;
-			case ITEM_LAYER_CPANEL:		m_layenabled[layer] = layerconfig.cpanels_enabled();	break;
-			case ITEM_LAYER_MARQUEE:	m_layenabled[layer] = layerconfig.marquees_enabled();	break;
-			default:					m_layenabled[layer] = true;								break;
+			case ITEM_LAYER_BACKDROP:   m_layenabled[layer] = layerconfig.backdrops_enabled();  break;
+			case ITEM_LAYER_OVERLAY:    m_layenabled[layer] = layerconfig.overlays_enabled();   break;
+			case ITEM_LAYER_BEZEL:      m_layenabled[layer] = layerconfig.bezels_enabled();     break;
+			case ITEM_LAYER_CPANEL:     m_layenabled[layer] = layerconfig.cpanels_enabled();    break;
+			case ITEM_LAYER_MARQUEE:    m_layenabled[layer] = layerconfig.marquees_enabled();   break;
+			default:                    m_layenabled[layer] = true;                             break;
 		}
 
 		// only do it if requested
@@ -2136,10 +2136,10 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist)
 	: m_next(NULL),
-	  m_element(NULL),
-	  m_input_mask(0),
-	  m_screen(NULL),
-	  m_orientation(ROT0)
+		m_element(NULL),
+		m_input_mask(0),
+		m_screen(NULL),
+		m_orientation(ROT0)
 {
 	// allocate a copy of the output name
 	m_output_name = xml_get_attribute_string_with_subst(machine, itemnode, "name", "");
@@ -2238,8 +2238,8 @@ int layout_view::item::state() const
 
 layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, const char *dirname)
 	: m_next(NULL),
-	  m_elemlist(machine.respool()),
-	  m_viewlist(machine.respool())
+		m_elemlist(machine.respool()),
+		m_viewlist(machine.respool())
 {
 	// find the layout node
 	xml_data_node *mamelayoutnode = xml_get_sibling(rootnode.child, "mamelayout");

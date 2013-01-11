@@ -6,8 +6,8 @@
 void othunder_state::video_start()
 {
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
-       Multiply this by 32 to give room for the number of small sprites,
-       which are what actually get put in the structure. */
+	   Multiply this by 32 to give room for the number of small sprites,
+	   which are what actually get put in the structure. */
 	m_spritelist = auto_alloc_array(machine(), struct othunder_tempsprite, 0x2000);
 }
 
@@ -76,7 +76,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int bad_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
-       while processing sprite ram and then draw them all at the end */
+	   while processing sprite ram and then draw them all at the end */
 	struct othunder_tempsprite *sprite_ptr = state->m_spritelist;
 
 	for (offs = (state->m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
@@ -95,7 +95,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		zoomx = (data & 0x7f);
 
 		data = spriteram16[offs + 3];
-		tilenum = data & 0x1fff;	// $80000 spritemap rom maps up to $2000 64x64 sprites
+		tilenum = data & 0x1fff;    // $80000 spritemap rom maps up to $2000 64x64 sprites
 		flipy = (data & 0x8000) >> 15;
 
 		if (!tilenum)
@@ -121,7 +121,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			px = k;
 			py = j;
-			if (flipx)  px = 3 - k;	/* pick tiles back to front for x and y flips */
+			if (flipx)  px = 3 - k; /* pick tiles back to front for x and y flips */
 			if (flipy)  py = 7 - j;
 
 			code = spritemap[map_offset + px + (py << 2)] & tile_mask;
@@ -141,8 +141,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (sprites_flipscreen)
 			{
 				/* -zx/y is there to fix zoomed sprite coords in screenflip.
-                   drawgfxzoom does not know to draw from flip-side of sprites when
-                   screen is flipped; so we must correct the coords ourselves. */
+				   drawgfxzoom does not know to draw from flip-side of sprites when
+				   screen is flipped; so we must correct the coords ourselves. */
 
 				curx = 320 - curx - zx;
 				cury = 256 - cury - zy;
@@ -226,4 +226,3 @@ UINT32 othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind1
 
 	return 0;
 }
-

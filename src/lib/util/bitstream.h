@@ -68,11 +68,11 @@ public:
 
 private:
 	// internal state
-	UINT32			m_buffer;		// current bit accumulator
-	int				m_bits;			// number of bits in the accumulator
-	const UINT8 *	m_read;			// read pointer
-	UINT32			m_doffset;		// byte offset within the data
-	UINT32			m_dlength;		// length of the data
+	UINT32          m_buffer;       // current bit accumulator
+	int             m_bits;         // number of bits in the accumulator
+	const UINT8 *   m_read;         // read pointer
+	UINT32          m_doffset;      // byte offset within the data
+	UINT32          m_dlength;      // length of the data
 };
 
 
@@ -92,11 +92,11 @@ public:
 
 private:
 	// internal state
-	UINT32			m_buffer;			// current bit accumulator
-	int				m_bits;				// number of bits in the accumulator
-	UINT8 *			m_write;			// write pointer
-	UINT32			m_doffset;			// byte offset within the data
-	UINT32			m_dlength;			// length of the data
+	UINT32          m_buffer;           // current bit accumulator
+	int             m_bits;             // number of bits in the accumulator
+	UINT8 *         m_write;            // write pointer
+	UINT32          m_doffset;          // byte offset within the data
+	UINT32          m_dlength;          // length of the data
 };
 
 
@@ -111,10 +111,10 @@ private:
 
 inline bitstream_in::bitstream_in(const void *src, UINT32 srclength)
 	: m_buffer(0),
-	  m_bits(0),
-	  m_read(reinterpret_cast<const UINT8 *>(src)),
-	  m_doffset(0),
-	  m_dlength(srclength)
+		m_bits(0),
+		m_read(reinterpret_cast<const UINT8 *>(src)),
+		m_doffset(0),
+		m_dlength(srclength)
 {
 }
 
@@ -209,10 +209,10 @@ inline UINT32 bitstream_in::flush()
 
 inline bitstream_out::bitstream_out(void *dest, UINT32 destlength)
 	: m_buffer(0),
-	  m_bits(0),
-	  m_write(reinterpret_cast<UINT8 *>(dest)),
-	  m_doffset(0),
-	  m_dlength(destlength)
+		m_bits(0),
+		m_write(reinterpret_cast<UINT8 *>(dest)),
+		m_doffset(0),
+		m_dlength(destlength)
 {
 }
 

@@ -120,19 +120,19 @@ HT-01B
 #include "includes/thepit.h"
 
 
-#define MASTER_CLOCK		(18432000)
-#define SOUND_CLOCK			(10000000)
+#define MASTER_CLOCK        (18432000)
+#define SOUND_CLOCK         (10000000)
 
-#define PIXEL_CLOCK			(MASTER_CLOCK/3)
+#define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
 /* H counts from 128->511, HBLANK starts at 128 and ends at 256 */
-#define HTOTAL				(384)
-#define HBEND				(0)		/*(256)*/
-#define HBSTART				(256)	/*(128)*/
+#define HTOTAL              (384)
+#define HBEND               (0)     /*(256)*/
+#define HBSTART             (256)   /*(128)*/
 
-#define VTOTAL				(264)
-#define VBEND				(16)
-#define VBSTART				(224+16)
+#define VTOTAL              (264)
+#define VBEND               (16)
+#define VBSTART             (224+16)
 
 
 READ8_MEMBER(thepit_state::thepit_colorram_r)
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( thepit )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	/* Since the real inputs are multiplexed, we used this fake port
-       to read the 2nd player controls when the screen is flipped */
+	   to read the 2nd player controls when the screen is flipped */
 	IN2_FAKE
 INPUT_PORTS_END
 
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( roundup )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	/* Since the real inputs are multiplexed, we used this fake port
-       to read the 2nd player controls when the screen is flipped */
+	   to read the 2nd player controls when the screen is flipped */
 	IN2_FAKE
 INPUT_PORTS_END
 
@@ -358,7 +358,7 @@ static INPUT_PORTS_START( fitter )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	/* Since the real inputs are multiplexed, we used this fake port
-       to read the 2nd player controls when the screen is flipped */
+	   to read the 2nd player controls when the screen is flipped */
 	IN2_FAKE
 INPUT_PORTS_END
 
@@ -403,7 +403,7 @@ static INPUT_PORTS_START( intrepid )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 	/* Since the real inputs are multiplexed, we used this fake port
-       to read the 2nd player controls when the screen is flipped */
+	   to read the 2nd player controls when the screen is flipped */
 	IN2_FAKE
 INPUT_PORTS_END
 
@@ -438,15 +438,15 @@ static INPUT_PORTS_START( dockman )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )	/* not used? */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  /* not used? */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )	/* not used? */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  /* not used? */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	/* Since the real inputs are multiplexed, we used this fake port
-       to read the 2nd player controls when the screen is flipped */
+	   to read the 2nd player controls when the screen is flipped */
 	IN2_FAKE
 INPUT_PORTS_END
 
@@ -477,8 +477,8 @@ static INPUT_PORTS_START( suprmous )
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Lives ) )  /* The game reads these together */
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
-  //PORT_DIPSETTING(    0x10, "5" )
-  //PORT_DIPSETTING(    0x18, "5" )
+	//PORT_DIPSETTING(    0x10, "5" )
+	//PORT_DIPSETTING(    0x18, "5" )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x10, "5000" )
 	PORT_DIPSETTING(    0x00, "10000" )
@@ -490,7 +490,7 @@ static INPUT_PORTS_START( suprmous )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	/* Since the real inputs are multiplexed, we used this fake port
-       to read the 2nd player controls when the screen is flipped */
+	   to read the 2nd player controls when the screen is flipped */
 	IN2_FAKE
 INPUT_PORTS_END
 
@@ -546,7 +546,7 @@ static INPUT_PORTS_START( rtriv )
 	PORT_DIPSETTING(    0xc0, "7" ) PORT_CONDITION("DSW", 0x20, NOTEQUALS, 0x20)
 
 	/* Since the real inputs are multiplexed, we used this fake port
-       to read the 2nd player controls when the screen is flipped */
+	   to read the 2nd player controls when the screen is flipped */
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -881,23 +881,23 @@ ROM_START( intrepid2 )
 ROM_END
 
 ROM_START( intrepidb )
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "ic38.bin",       0x0000, 0x1000, CRC(b23e632a) SHA1(c0ccc958a99f35f25a1853f618f3e008ce0247a7) )
-    ROM_LOAD( "ic39.bin",       0x1000, 0x1000, CRC(fd75b90e) SHA1(33d2a3c10be2266760a8341a4238a8734fc9c4c8) )
-    ROM_LOAD( "ic40.bin",       0x2000, 0x1000, CRC(86a9b6de) SHA1(458f8019ac0ca192e74bbc908c8d326d561a0b30) )
-    ROM_LOAD( "ic41.bin",       0x3000, 0x1000, CRC(fb6373c2) SHA1(235b7735cc68ec89b6f32b37d01d7ead21d13f64) )
-    ROM_LOAD( "ic33.bin",       0x4000, 0x1000, CRC(7c868725) SHA1(dca370c835fdd0564d42ecca69b9ad2600b1ce31) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic38.bin",       0x0000, 0x1000, CRC(b23e632a) SHA1(c0ccc958a99f35f25a1853f618f3e008ce0247a7) )
+	ROM_LOAD( "ic39.bin",       0x1000, 0x1000, CRC(fd75b90e) SHA1(33d2a3c10be2266760a8341a4238a8734fc9c4c8) )
+	ROM_LOAD( "ic40.bin",       0x2000, 0x1000, CRC(86a9b6de) SHA1(458f8019ac0ca192e74bbc908c8d326d561a0b30) )
+	ROM_LOAD( "ic41.bin",       0x3000, 0x1000, CRC(fb6373c2) SHA1(235b7735cc68ec89b6f32b37d01d7ead21d13f64) )
+	ROM_LOAD( "ic33.bin",       0x4000, 0x1000, CRC(7c868725) SHA1(dca370c835fdd0564d42ecca69b9ad2600b1ce31) )
 
-    ROM_REGION( 0x10000, "audiocpu", 0 )
-    ROM_LOAD( "ic22.bin",       0x0000, 0x0800, CRC(f85ead07) SHA1(72479a9b49dd9c629480a2ce72bdd09fbb12b25d) )
-    ROM_LOAD( "ic23.bin",       0x0800, 0x0800, CRC(9eb6c61b) SHA1(a168fa634b6909c2ea484c2bbaa5afee2a5fe616) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ic22.bin",       0x0000, 0x0800, CRC(f85ead07) SHA1(72479a9b49dd9c629480a2ce72bdd09fbb12b25d) )
+	ROM_LOAD( "ic23.bin",       0x0800, 0x0800, CRC(9eb6c61b) SHA1(a168fa634b6909c2ea484c2bbaa5afee2a5fe616) )
 
-    ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
-    ROM_LOAD( "ic9.9",        0x0000, 0x1000, CRC(8c70d18d) SHA1(785099c947ee1fe19196dfb02752cc849640fe21) )
-    ROM_LOAD( "ic8.8",        0x1000, 0x1000, CRC(04d067d3) SHA1(aeb763e658cd3d0bd849cdae6af55cb1008b2143) )
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
+	ROM_LOAD( "ic9.9",        0x0000, 0x1000, CRC(8c70d18d) SHA1(785099c947ee1fe19196dfb02752cc849640fe21) )
+	ROM_LOAD( "ic8.8",        0x1000, 0x1000, CRC(04d067d3) SHA1(aeb763e658cd3d0bd849cdae6af55cb1008b2143) )
 
-    ROM_REGION( 0x0020, "proms", 0 )
-    ROM_LOAD( "82s123.ic4",      0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.ic4",      0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
 
 ROM_START( zaryavos )
@@ -1040,7 +1040,7 @@ ROM_START( rtriv )
 	ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
 	ROM_LOAD( "ngames8.8",    0x1000, 0x1000, BAD_DUMP CRC(f7644e1d) SHA1(d58d0d5739906b602f4c08a2fb9a16c32fcc245b) )
 	ROM_LOAD( "ngames9.9",    0x0000, 0x1000, CRC(db553afc) SHA1(e7561ca0b2a4543c41bf41c96d17784b299ab367) )
-	ROM_RELOAD(				  0x1000, 0x1000 ) // reload it until the other rom is re-dumped
+	ROM_RELOAD(               0x1000, 0x1000 ) // reload it until the other rom is re-dumped
 
 	ROM_REGION( 0x40000, "user1", 0 ) /* Question roms */
 	ROM_LOAD( "rtriv-1f.d0",  0x00000, 0x8000, CRC(84787af0) SHA1(5c1c74128af2b2d62ae9ba730da500e818b3dbd8) )

@@ -115,13 +115,13 @@ void z88_state::lcd_update(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT
 
 					if ((ch & 0x01c0) == 0x01c0)
 					{
-					   ch &= 0x3f;
+						ch &= 0x3f;
 
-					   char_gfx = convert_address(lores0<<9);
+						char_gfx = convert_address(lores0<<9);
 					}
 					else
 					{
-					   char_gfx = convert_address(lores1<<12);
+						char_gfx = convert_address(lores1<<12);
 					}
 
 					char_gfx += (ch<<3);

@@ -114,8 +114,8 @@ WRITE_LINE_MEMBER( sitcom_state::sod_led )
 
 static I8085_CONFIG( sitcom_cpu_config )
 {
-	DEVCB_NULL,		/* Status changed callback */
-	DEVCB_NULL,			/* INTE changed callback */
+	DEVCB_NULL,     /* Status changed callback */
+	DEVCB_NULL,         /* INTE changed callback */
 	DEVCB_DRIVER_LINE_MEMBER(sitcom_state, sid_line), /* SID changed callback (I8085A only) */
 	DEVCB_DRIVER_LINE_MEMBER(sitcom_state, sod_led) /* SOD changed callback (I8085A only) */
 };

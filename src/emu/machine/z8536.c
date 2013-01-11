@@ -205,72 +205,72 @@ static const char *CTMS_DCS[] = { "Pulse", "One-shot", "Square Wave", "Do not us
 
 
 // master interrupt control register
-#define MICR_RESET		0x01	// reset
-#define MICR_RJA		0x02	// right justified address
-#define MICR_CT_VIS		0x04	// counter/timer vector includes status
-#define MICR_PB_VIS		0x08	// port B vector includes status
-#define MICR_PA_VIS		0x10	// port A vector includes status
-#define MICR_NV 		0x20	// no vector
-#define MICR_DLC		0x40	// disable lower chain
-#define MICR_MIE		0x80	// master interrupt enable
+#define MICR_RESET      0x01    // reset
+#define MICR_RJA        0x02    // right justified address
+#define MICR_CT_VIS     0x04    // counter/timer vector includes status
+#define MICR_PB_VIS     0x08    // port B vector includes status
+#define MICR_PA_VIS     0x10    // port A vector includes status
+#define MICR_NV         0x20    // no vector
+#define MICR_DLC        0x40    // disable lower chain
+#define MICR_MIE        0x80    // master interrupt enable
 
 
 // master configuration control register
-#define MCCR_LC_MASK	0x03	// counter/timer link controls
-#define MCCR_PAE		0x04	// port A enable
-#define MCCR_PLC		0x08	// port link control
-#define MCCR_PCE_CT3E	0x10	// port C and counter/timer 3 enable
-#define MCCR_CT2E		0x20	// counter/timer 2 enable
-#define MCCR_CT1E		0x40	// counter/timer 1 enable
-#define MCCR_PBE		0x80	// port B enable
+#define MCCR_LC_MASK    0x03    // counter/timer link controls
+#define MCCR_PAE        0x04    // port A enable
+#define MCCR_PLC        0x08    // port link control
+#define MCCR_PCE_CT3E   0x10    // port C and counter/timer 3 enable
+#define MCCR_CT2E       0x20    // counter/timer 2 enable
+#define MCCR_CT1E       0x40    // counter/timer 1 enable
+#define MCCR_PBE        0x80    // port B enable
 
 
 // port mode specification registers
-#define PMS_LPM			0x01	// latch on pattern match
-#define PMS_DTE			0x01	// deskew timer enable
-#define PMS_PMS_MASK	0x06	// pattern mode specification
-#define PMS_IMO			0x08	// interrupt on match only
-#define PMS_SB			0x10	// single buffer
-#define PMS_ITB			0x20	// interrupt on two bytes
-#define PMS_PTS_MASK	0xc0	// port type select
+#define PMS_LPM         0x01    // latch on pattern match
+#define PMS_DTE         0x01    // deskew timer enable
+#define PMS_PMS_MASK    0x06    // pattern mode specification
+#define PMS_IMO         0x08    // interrupt on match only
+#define PMS_SB          0x10    // single buffer
+#define PMS_ITB         0x20    // interrupt on two bytes
+#define PMS_PTS_MASK    0xc0    // port type select
 
 
 // port handshake specification registers
-#define PHS_DTS_MASK	0x07	// deskew time specification
-#define PHS_RWS_MASK	0x38	// request/wait specification
-#define PHS_HTS_MASK	0xc0	// handshake type specification
+#define PHS_DTS_MASK    0x07    // deskew time specification
+#define PHS_RWS_MASK    0x38    // request/wait specification
+#define PHS_HTS_MASK    0xc0    // handshake type specification
 
 
 // port command and status registers
-#define PCS_IOE			0x01	// interrupt on error
-#define PCS_PMF			0x02	// pattern match flag (read only)
-#define PCS_IRF			0x04	// input register full (read only)
-#define PCS_ORE			0x08	// output register empty (read only)
-#define PCS_ERR			0x10	// interrupt error (read only)
-#define PCS_IP			0x20	// interrupt pending
-#define PCS_IE			0x40	// interrupt enable
-#define PCS_IUS			0x80	// interrupt under service
+#define PCS_IOE         0x01    // interrupt on error
+#define PCS_PMF         0x02    // pattern match flag (read only)
+#define PCS_IRF         0x04    // input register full (read only)
+#define PCS_ORE         0x08    // output register empty (read only)
+#define PCS_ERR         0x10    // interrupt error (read only)
+#define PCS_IP          0x20    // interrupt pending
+#define PCS_IE          0x40    // interrupt enable
+#define PCS_IUS         0x80    // interrupt under service
 
 
 // counter/timer mode specification registers
-#define CTMS_DCS_MASK	0x03	// output duty cycle
-#define CTMS_REB		0x04	// retrigger enable bit
-#define CTMS_EDE		0x08	// external gate enable
-#define CTMS_ETE		0x10	// external trigger enable
-#define CTMS_ECE		0x20	// external count enable
-#define CTMS_EOE		0x40	// external output enable
-#define CTMS_CSC		0x80	// continuous/single cycle
+#define CTMS_DCS_MASK   0x03    // output duty cycle
+#define CTMS_REB        0x04    // retrigger enable bit
+#define CTMS_EDE        0x08    // external gate enable
+#define CTMS_ETE        0x10    // external trigger enable
+#define CTMS_ECE        0x20    // external count enable
+#define CTMS_EOE        0x40    // external output enable
+#define CTMS_CSC        0x80    // continuous/single cycle
 
 
 // counter/timer command and status registers
-#define CTCS_CIP		0x01	// count in progress (read only)
-#define CTCS_TCB		0x02	// trigger command bit (write only - read returns 0)
-#define CTCS_GCB		0x04	// gate command bit
-#define CTCS_RCC		0x08	// read counter control (read/set only - cleared by reading CCR LSB)
-#define CTCS_ERR		0x10	// interrupt error (read only)
-#define CTCS_IP			0x20	// interrupt pending
-#define CTCS_IE			0x40	// interrupt enable
-#define CTCS_IUS		0x80	// interrupt under service
+#define CTCS_CIP        0x01    // count in progress (read only)
+#define CTCS_TCB        0x02    // trigger command bit (write only - read returns 0)
+#define CTCS_GCB        0x04    // gate command bit
+#define CTCS_RCC        0x08    // read counter control (read/set only - cleared by reading CCR LSB)
+#define CTCS_ERR        0x10    // interrupt error (read only)
+#define CTCS_IP         0x20    // interrupt pending
+#define CTCS_IE         0x40    // interrupt enable
+#define CTCS_IUS        0x80    // interrupt under service
 
 
 
@@ -307,7 +307,7 @@ inline void z8536_device::get_interrupt_vector()
 
 				if (((m_register[PORT_A_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					if		(m_match[PORT_A] & 0x80) vector |= 7 << 1;
+					if      (m_match[PORT_A] & 0x80) vector |= 7 << 1;
 					else if (m_match[PORT_A] & 0x40) vector |= 6 << 1;
 					else if (m_match[PORT_A] & 0x20) vector |= 5 << 1;
 					else if (m_match[PORT_A] & 0x10) vector |= 4 << 1;
@@ -341,7 +341,7 @@ inline void z8536_device::get_interrupt_vector()
 
 				if (((m_register[PORT_B_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					if		(m_match[PORT_B] & 0x80) vector |= 7 << 1;
+					if      (m_match[PORT_B] & 0x80) vector |= 7 << 1;
 					else if (m_match[PORT_B] & 0x40) vector |= 6 << 1;
 					else if (m_match[PORT_B] & 0x20) vector |= 5 << 1;
 					else if (m_match[PORT_B] & 0x10) vector |= 4 << 1;
@@ -591,13 +591,13 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 
 		switch (data >> 5)
 		{
-		case IC_CLEAR_IP_IUS:	m_register[offset] &= ~(PCS_IP | PCS_IUS);	if (LOG) logerror("%s Z8536 '%s' Port %c Clear IP/IUS\n", machine().describe_context(), tag(), port);	break;
-		case IC_SET_IUS:		m_register[offset] |= PCS_IUS;				if (LOG) logerror("%s Z8536 '%s' Port %c Set IUS\n", machine().describe_context(), tag(), port);		break;
-		case IC_CLEAR_IUS:		m_register[offset] &= ~PCS_IUS;				if (LOG) logerror("%s Z8536 '%s' Port %c Clear IUS\n", machine().describe_context(), tag(), port);		break;
-		case IC_SET_IP:			m_register[offset] |= PCS_IP;				if (LOG) logerror("%s Z8536 '%s' Port %c Set IP\n", machine().describe_context(), tag(), port);			break;
-		case IC_CLEAR_IP:		m_register[offset] &= ~PCS_IP;				if (LOG) logerror("%s Z8536 '%s' Port %c Clear IP\n", machine().describe_context(), tag(), port);		break;
-		case IC_SET_IE:			m_register[offset] |= PCS_IE;				if (LOG) logerror("%s Z8536 '%s' Port %c Set IE\n", machine().describe_context(), tag(), port);			break;
-		case IC_CLEAR_IE:		m_register[offset] &= ~PCS_IE;				if (LOG) logerror("%s Z8536 '%s' Port %c Clear IE\n", machine().describe_context(), tag(), port);		break;
+		case IC_CLEAR_IP_IUS:   m_register[offset] &= ~(PCS_IP | PCS_IUS);  if (LOG) logerror("%s Z8536 '%s' Port %c Clear IP/IUS\n", machine().describe_context(), tag(), port);   break;
+		case IC_SET_IUS:        m_register[offset] |= PCS_IUS;              if (LOG) logerror("%s Z8536 '%s' Port %c Set IUS\n", machine().describe_context(), tag(), port);        break;
+		case IC_CLEAR_IUS:      m_register[offset] &= ~PCS_IUS;             if (LOG) logerror("%s Z8536 '%s' Port %c Clear IUS\n", machine().describe_context(), tag(), port);      break;
+		case IC_SET_IP:         m_register[offset] |= PCS_IP;               if (LOG) logerror("%s Z8536 '%s' Port %c Set IP\n", machine().describe_context(), tag(), port);         break;
+		case IC_CLEAR_IP:       m_register[offset] &= ~PCS_IP;              if (LOG) logerror("%s Z8536 '%s' Port %c Clear IP\n", machine().describe_context(), tag(), port);       break;
+		case IC_SET_IE:         m_register[offset] |= PCS_IE;               if (LOG) logerror("%s Z8536 '%s' Port %c Set IE\n", machine().describe_context(), tag(), port);         break;
+		case IC_CLEAR_IE:       m_register[offset] &= ~PCS_IE;              if (LOG) logerror("%s Z8536 '%s' Port %c Clear IE\n", machine().describe_context(), tag(), port);       break;
 		}
 
 		m_register[offset] = (m_register[offset] & ~PCS_IOE) | (data & PCS_IOE);
@@ -622,13 +622,13 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 
 		switch (data >> 5)
 		{
-		case IC_CLEAR_IP_IUS:	m_register[offset] &= ~(CTCS_IP | CTCS_IUS);if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IP/IUS\n", machine().describe_context(), tag(), counter + 1);	break;
-		case IC_SET_IUS:		m_register[offset] |= CTCS_IUS;				if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Set IUS\n", machine().describe_context(), tag(), counter + 1);		break;
-		case IC_CLEAR_IUS:		m_register[offset] &= ~CTCS_IUS;			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IUS\n", machine().describe_context(), tag(), counter + 1);		break;
-		case IC_SET_IP:			m_register[offset] |= CTCS_IP;				if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Set IP\n", machine().describe_context(), tag(), counter + 1);			break;
-		case IC_CLEAR_IP:		m_register[offset] &= ~CTCS_IP;				if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IP\n", machine().describe_context(), tag(), counter + 1);		break;
-		case IC_SET_IE:			m_register[offset] |= CTCS_IE;				if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Set IE\n", machine().describe_context(), tag(), counter + 1);			break;
-		case IC_CLEAR_IE:		m_register[offset] &= ~CTCS_IE;				if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IE\n", machine().describe_context(), tag(), counter + 1);		break;
+		case IC_CLEAR_IP_IUS:   m_register[offset] &= ~(CTCS_IP | CTCS_IUS);if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IP/IUS\n", machine().describe_context(), tag(), counter + 1);   break;
+		case IC_SET_IUS:        m_register[offset] |= CTCS_IUS;             if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Set IUS\n", machine().describe_context(), tag(), counter + 1);        break;
+		case IC_CLEAR_IUS:      m_register[offset] &= ~CTCS_IUS;            if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IUS\n", machine().describe_context(), tag(), counter + 1);      break;
+		case IC_SET_IP:         m_register[offset] |= CTCS_IP;              if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Set IP\n", machine().describe_context(), tag(), counter + 1);         break;
+		case IC_CLEAR_IP:       m_register[offset] &= ~CTCS_IP;             if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IP\n", machine().describe_context(), tag(), counter + 1);       break;
+		case IC_SET_IE:         m_register[offset] |= CTCS_IE;              if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Set IE\n", machine().describe_context(), tag(), counter + 1);         break;
+		case IC_CLEAR_IE:       m_register[offset] &= ~CTCS_IE;             if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IE\n", machine().describe_context(), tag(), counter + 1);       break;
 		}
 
 		// gate command bit
@@ -1016,9 +1016,9 @@ inline void z8536_device::external_port_w(int port, int bit, int state)
 //-------------------------------------------------
 
 z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, Z8536, "Zilog Z8536", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this),
-	  m_int(CLEAR_LINE)
+	: device_t(mconfig, Z8536, "Zilog Z8536", tag, owner, clock),
+		device_z80daisy_interface(mconfig, *this),
+		m_int(CLEAR_LINE)
 {
 }
 
@@ -1109,17 +1109,17 @@ void z8536_device::device_reset()
 
 void z8536_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (counter_enabled(TIMER_1) &&	!counter_external_count(TIMER_1))
+	if (counter_enabled(TIMER_1) && !counter_external_count(TIMER_1))
 	{
 		count(TIMER_1);
 	}
 
-	if (counter_enabled(TIMER_2) &&	!counter_external_count(TIMER_2))
+	if (counter_enabled(TIMER_2) && !counter_external_count(TIMER_2))
 	{
 		count(TIMER_2);
 	}
 
-	if (counter_enabled(TIMER_3) &&	!counter_external_count(TIMER_3))
+	if (counter_enabled(TIMER_3) && !counter_external_count(TIMER_3))
 	{
 		count(TIMER_3);
 	}

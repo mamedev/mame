@@ -39,7 +39,7 @@ UINT32 mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rgb3
 			}
 
 			/* next row, video_data is now 0, so the next line will start
-               with 4 blank pixels */
+			   with 4 blank pixels */
 			y = y + 1;
 
 			/* end of screen? */
@@ -173,7 +173,7 @@ UINT32 mw8080bw_state::screen_update_spcenctr(screen_device &screen, bitmap_rgb3
 				floor_width = floor_width + ((m_spcenctr_trench_slope[y & 0x0f] & 0x0c) >> 2);
 
 			/* next row, video_data is now 0, so the next line will start
-               with 4 blank pixels */
+			   with 4 blank pixels */
 			y = y + 1;
 
 			/* end of screen? */
@@ -246,7 +246,7 @@ UINT32 mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rgb3
 		bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		/* move to next pixel -- if ripple carry is currently set,
-           prepare for loading the shift register */
+		   prepare for loading the shift register */
 		load_shift_reg = ((x & 0x0f) == 0x0f);
 
 		if (load_shift_reg)
@@ -289,7 +289,7 @@ UINT32 mw8080bw_state::screen_update_phantom2(screen_device &screen, bitmap_rgb3
 				cloud_counter = PHANTOM2_CLOUD_COUNTER_START;
 
 			/* next row of pixels, video_data is now 0, so the next
-               line will start with 4 blank pixels */
+			   line will start with 4 blank pixels */
 			y = y + 1;
 
 			/* end of screen? */
@@ -371,7 +371,7 @@ UINT32 mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rgb3
 			}
 
 			/* next row, video_data is now 0, so the next line will start
-               with 4 blank pixels */
+			   with 4 blank pixels */
 			y = y + 1;
 
 			/* end of screen? */

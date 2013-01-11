@@ -234,8 +234,8 @@ bool disasmSIField(const UINT8& SI)
 {
 	switch (SI)
 	{
-		case 0x00: return 0;	// Not a software interrupt
-		case 0x01: return 1;	// Software Interrupt
+		case 0x00: return 0;    // Not a software interrupt
+		case 0x01: return 1;    // Software Interrupt
 	}
 	return false;
 }

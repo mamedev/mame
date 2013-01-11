@@ -101,8 +101,8 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 	AM_RANGE(0xe800, 0xefff) AM_READ_PORT("IN1")
 	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
 	AM_RANGE(0xe803, 0xe803) AM_WRITE(dambustr_noise_enable_w)
-	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)	// probably louder than normal shot
-	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)	// normal shot (like Galaxian)
+	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w) // probably louder than normal shot
+	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w) // normal shot (like Galaxian)
 	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
 
 	AM_RANGE(0xf000, 0xf7ff) AM_READ_PORT("DSW")
@@ -226,13 +226,13 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 	// Bit swap in $1000-$1fff and $4000-$5fff
 	for(i=0; i<0x1000; i++) {
-		rom[0x1000+i] =	BITSWAP8(rom[0x1000+i],7,6,5,1,3,2,4,0);
-		rom[0x4000+i] =	BITSWAP8(rom[0x4000+i],7,6,5,1,3,2,4,0);
-		rom[0x5000+i] =	BITSWAP8(rom[0x5000+i],7,6,5,1,3,2,4,0);
+		rom[0x1000+i] = BITSWAP8(rom[0x1000+i],7,6,5,1,3,2,4,0);
+		rom[0x4000+i] = BITSWAP8(rom[0x4000+i],7,6,5,1,3,2,4,0);
+		rom[0x5000+i] = BITSWAP8(rom[0x5000+i],7,6,5,1,3,2,4,0);
 	};
 
 	// Swap graphics ROMs
-	for(i=0;i<0x4000;i+=16)	{
+	for(i=0;i<0x4000;i+=16) {
 		for(j=0; j<16; j++)
 			tmpram[j] = gfx[i+j];
 		for(j=0; j<8; j++) {
@@ -246,7 +246,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(dambustr_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dambustr_state, screen_update_dambustr)
 
 	MCFG_GFXDECODE(dambustr)
-	MCFG_PALETTE_LENGTH(32+2+64+8)		/* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
+	MCFG_PALETTE_LENGTH(32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
 	MCFG_PALETTE_INIT_OVERRIDE(dambustr_state,dambustr)
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)

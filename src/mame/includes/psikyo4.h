@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#define MASTER_CLOCK 57272700	// main oscillator frequency
+#define MASTER_CLOCK 57272700   // main oscillator frequency
 
 
 class psikyo4_state : public driver_device

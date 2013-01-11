@@ -353,7 +353,7 @@ NETLIB_UPDATE(nic7448)
 
 const UINT8 nic7448::tab7448[16][7] =
 {
-		{	1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
+		{   1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
 		{   0, 1, 1, 0, 0, 0, 0 },  /* 01 */
 		{   1, 1, 0, 1, 1, 0, 1 },  /* 02 */
 		{   1, 1, 1, 1, 0, 0, 1 },  /* 03 */
@@ -908,35 +908,35 @@ NETLIB_FUNC_VOID(nic9316sub, update_outputs)
 
 static net_device_t_base_factory *netregistry[] =
 {
-	ENTRY(netdev_ttl_const,		NETDEV_TTL_CONST)
-	ENTRY(netdev_analog_const,	NETDEV_ANALOG_CONST)
-	ENTRY(netdev_logic_input,	NETDEV_LOGIC_INPUT)
+	ENTRY(netdev_ttl_const,     NETDEV_TTL_CONST)
+	ENTRY(netdev_analog_const,  NETDEV_ANALOG_CONST)
+	ENTRY(netdev_logic_input,   NETDEV_LOGIC_INPUT)
 	ENTRY(netdev_analog_input,  NETDEV_ANALOG_INPUT)
-	ENTRY(netdev_clock, 		NETDEV_CLOCK)
-	ENTRY(netdev_callback,		NETDEV_CALLBACK)
-	ENTRY(nicMultiSwitch,		NETDEV_SWITCH2)
-	ENTRY(nicRSFF,				NETDEV_RSFF)
-	ENTRY(nicMixer8,			NETDEV_MIXER)
-	ENTRY(nic7400,				TTL_7400_NAND)
-	ENTRY(nic7402,				TTL_7402_NOR)
-	ENTRY(nic7404,				TTL_7404_INVERT)
-	ENTRY(nic7410,				TTL_7410_NAND)
-	ENTRY(nic7420,				TTL_7420_NAND)
-	ENTRY(nic7425,				TTL_7425_NOR)
-	ENTRY(nic7427,				TTL_7427_NOR)
-	ENTRY(nic7430,				TTL_7430_NAND)
-	ENTRY(nic7450,				TTL_7450_ANDORINVERT)
-	ENTRY(nic7486,				TTL_7486_XOR)
-	ENTRY(nic7448,				TTL_7448)
-	ENTRY(nic7474,				TTL_7474)
-	ENTRY(nic7483,				TTL_7483)
-	ENTRY(nic7490,				TTL_7490)
-	ENTRY(nic7493,				TTL_7493)
-	ENTRY(nic74107,				TTL_74107)
-	ENTRY(nic74107A,			TTL_74107A)
-	ENTRY(nic74153,				TTL_74153)
-	ENTRY(nic9316,				TTL_9316)
-	ENTRY(nicNE555N_MSTABLE,	NE555N_MSTABLE)
+	ENTRY(netdev_clock,         NETDEV_CLOCK)
+	ENTRY(netdev_callback,      NETDEV_CALLBACK)
+	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
+	ENTRY(nicRSFF,              NETDEV_RSFF)
+	ENTRY(nicMixer8,            NETDEV_MIXER)
+	ENTRY(nic7400,              TTL_7400_NAND)
+	ENTRY(nic7402,              TTL_7402_NOR)
+	ENTRY(nic7404,              TTL_7404_INVERT)
+	ENTRY(nic7410,              TTL_7410_NAND)
+	ENTRY(nic7420,              TTL_7420_NAND)
+	ENTRY(nic7425,              TTL_7425_NOR)
+	ENTRY(nic7427,              TTL_7427_NOR)
+	ENTRY(nic7430,              TTL_7430_NAND)
+	ENTRY(nic7450,              TTL_7450_ANDORINVERT)
+	ENTRY(nic7486,              TTL_7486_XOR)
+	ENTRY(nic7448,              TTL_7448)
+	ENTRY(nic7474,              TTL_7474)
+	ENTRY(nic7483,              TTL_7483)
+	ENTRY(nic7490,              TTL_7490)
+	ENTRY(nic7493,              TTL_7493)
+	ENTRY(nic74107,             TTL_74107)
+	ENTRY(nic74107A,            TTL_74107A)
+	ENTRY(nic74153,             TTL_74153)
+	ENTRY(nic9316,              TTL_9316)
+	ENTRY(nicNE555N_MSTABLE,    NE555N_MSTABLE)
 	NULL
 };
 

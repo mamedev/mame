@@ -33,12 +33,12 @@
 
 #include "coco_cas.h"
 
-#define COCO_WAVESAMPLES_HEADER		(1.0)
-#define COCO_WAVESAMPLES_TRAILER	(1.0)
-#define COCO_LONGSILENCE			(5.0)
+#define COCO_WAVESAMPLES_HEADER     (1.0)
+#define COCO_WAVESAMPLES_TRAILER    (1.0)
+#define COCO_LONGSILENCE            (5.0)
 
 //some games load with only 5s, but most games need 15s
-#define ALICE32_WAVESAMPLES_HEADER	(15.0)
+#define ALICE32_WAVESAMPLES_HEADER  (15.0)
 
 // PAIR is an endian-safe union useful for representing 32-bit CPU registers
 union PAIR
@@ -63,8 +63,8 @@ static int synccount;
 const struct CassetteModulation coco_cas_modulation =
 {
 	CASSETTE_MODULATION_SINEWAVE,
-	600.0,	1200.0,	1500.0,
-	1500.0,	2400.0,	3000.0
+	600.0,  1200.0, 1500.0,
+	1500.0, 2400.0, 3000.0
 };
 
 
@@ -170,7 +170,7 @@ static casserr_t cas_load(cassette_image *cassette, UINT8 silence)
 	casserr_t err;
 	UINT64 offset;
 	UINT64 image_size;
-	UINT8 block[258];	/* 255 bytes per block + 3 (type, length, checksum) */
+	UINT8 block[258];   /* 255 bytes per block + 3 (type, length, checksum) */
 	int block_length = 0;
 	UINT8 last_blocktype;
 	double time_index = 0.0;
@@ -238,8 +238,8 @@ static casserr_t cas_load(cassette_image *cassette, UINT8 silence)
 				return err;
 			time_index += time_displacement;
 		}
-		else if (synccount != 0)		/* If we have multiple sync bytes in cas file, make sure they */
-		{				/* are passed through */
+		else if (synccount != 0)        /* If we have multiple sync bytes in cas file, make sure they */
+		{               /* are passed through */
 			/* sync data */
 			err = cassette_put_modulated_filler(cassette, 0, time_index, 0x55, synccount, &coco_cas_modulation, &time_displacement);
 			if (err)

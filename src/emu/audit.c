@@ -54,8 +54,8 @@
 
 media_auditor::media_auditor(const driver_enumerator &enumerator)
 	: m_enumerator(enumerator),
-	  m_validation(AUDIT_VALIDATE_FULL),
-	  m_searchpath(NULL)
+		m_validation(AUDIT_VALIDATE_FULL),
+		m_searchpath(NULL)
 {
 }
 
@@ -599,25 +599,25 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 
 audit_record::audit_record(const rom_entry &media, media_type type)
 	: m_next(NULL),
-	  m_type(type),
-	  m_status(STATUS_ERROR),
-	  m_substatus(SUBSTATUS_ERROR),
-	  m_name(ROM_GETNAME(&media)),
-	  m_explength(rom_file_size(&media)),
-	  m_length(0),
-	  m_shared_device(NULL)
+		m_type(type),
+		m_status(STATUS_ERROR),
+		m_substatus(SUBSTATUS_ERROR),
+		m_name(ROM_GETNAME(&media)),
+		m_explength(rom_file_size(&media)),
+		m_length(0),
+		m_shared_device(NULL)
 {
 	m_exphashes.from_internal_string(ROM_GETHASHDATA(&media));
 }
 
 audit_record::audit_record(const char *name, media_type type)
 	: m_next(NULL),
-	  m_type(type),
-	  m_status(STATUS_ERROR),
-	  m_substatus(SUBSTATUS_ERROR),
-	  m_name(name),
-	  m_explength(0),
-	  m_length(0),
-	  m_shared_device(NULL)
+		m_type(type),
+		m_status(STATUS_ERROR),
+		m_substatus(SUBSTATUS_ERROR),
+		m_name(name),
+		m_explength(0),
+		m_length(0),
+		m_shared_device(NULL)
 {
 }

@@ -41,7 +41,7 @@
 
 #define ATN (m_atni ^ m_atna)
 
-#define CYCLES_UNTIL_ANALOG_DESYNC		288 // 18 us
+#define CYCLES_UNTIL_ANALOG_DESYNC      288 // 18 us
 
 
 
@@ -397,40 +397,40 @@ inline void c64h156_device::decode_bit()
 //-------------------------------------------------
 
 c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, C64H156, "64H156", tag, owner, clock),
-      device_execute_interface(mconfig, *this),
-      m_icount(0),
-	  m_floppy(NULL),
-	  m_track_buffer(*this, "track_buffer"),
-	  m_speed_buffer(*this, "speed_buffer"),
-	  m_side(0),
-	  m_track_len(0),
-	  m_buffer_pos(0),
-	  m_bit_pos(0),
-	  m_bit_count(0),
-	  m_mtr(0),
-	  m_accl(0),
-	  m_ds(0),
-	  m_soe(0),
-	  m_oe(0),
-	  m_atni(1),
-	  m_atna(1),
-	  m_last_bit_sync(0),
-	  m_bit_sync(0),
-	  m_byte_sync(1),
-	  m_accl_byte_sync(1),
-	  m_block_sync(1),
-	  m_ue7(0),
-	  m_ue7_tc(0),
-	  m_uf4(0),
-	  m_uf4_qb(0),
-	  m_ud2(0),
-	  m_accl_yb(0),
-	  m_u4a(0),
-	  m_u4b(0),
-	  m_ue3(0),
-	  m_uc1b(0),
-	  m_wp(0)
+	: device_t(mconfig, C64H156, "64H156", tag, owner, clock),
+		device_execute_interface(mconfig, *this),
+		m_icount(0),
+		m_floppy(NULL),
+		m_track_buffer(*this, "track_buffer"),
+		m_speed_buffer(*this, "speed_buffer"),
+		m_side(0),
+		m_track_len(0),
+		m_buffer_pos(0),
+		m_bit_pos(0),
+		m_bit_count(0),
+		m_mtr(0),
+		m_accl(0),
+		m_ds(0),
+		m_soe(0),
+		m_oe(0),
+		m_atni(1),
+		m_atna(1),
+		m_last_bit_sync(0),
+		m_bit_sync(0),
+		m_byte_sync(1),
+		m_accl_byte_sync(1),
+		m_block_sync(1),
+		m_ue7(0),
+		m_ue7_tc(0),
+		m_uf4(0),
+		m_uf4_qb(0),
+		m_ud2(0),
+		m_accl_yb(0),
+		m_u4a(0),
+		m_u4b(0),
+		m_ue3(0),
+		m_uc1b(0),
+		m_wp(0)
 {
 }
 

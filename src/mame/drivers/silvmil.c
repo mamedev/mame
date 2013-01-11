@@ -28,9 +28,9 @@ class silvmil_state : public driver_device
 public:
 	silvmil_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_bg_videoram(*this, "bg_videoram"),
-		  m_fg_videoram(*this, "fg_videoram"),
-		  m_spriteram(*this, "spriteram")  {
+			m_bg_videoram(*this, "bg_videoram"),
+			m_fg_videoram(*this, "fg_videoram"),
+			m_spriteram(*this, "spriteram")  {
 
 
 	}
@@ -44,7 +44,7 @@ public:
 	tilemap_t   *m_bg_layer;
 	tilemap_t   *m_fg_layer;
 	int       m_silvmil_tilebank[4];
-	int		m_whichbank;
+	int     m_whichbank;
 
 	DECLARE_WRITE16_MEMBER(silvmil_tilebank_w)
 	{
@@ -209,39 +209,39 @@ static INPUT_PORTS_START( silvmil )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW") /* According to Service Mode - Need verification!! */
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "DSW1:3 - Unknown" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0004, 0x0004, "DSW1:3 - Unknown" )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "DSW1:4 - Unknown" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0008, 0x0008, "DSW1:4 - Unknown" )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "DSW1:5 - Unknown" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x0010, 0x0010, "DSW1:5 - Unknown" )      PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "DSW1:6 - Unknown" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, "DSW1:6 - Unknown" )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "DSW1:7 - Unknown" )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, "DSW1:7 - Unknown" )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "DSW1:8 - Unknown" )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "DSW1:8 - Unknown" )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "DSW2:1 - Unknown" )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW2:1 - Unknown" )      PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, "DSW2:2 - Unknown" )		PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0200, 0x0200, "DSW2:2 - Unknown" )      PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:3") /* Verified */
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:3") /* Verified */
 	PORT_DIPSETTING(      0x0400, DEF_STR( Korean ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:4,5,6") /* Verified */
+	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:4,5,6") /* Verified */
 	PORT_DIPSETTING(      0x0800, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_2C ) ) /* Works the same as 2C/1C */
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( silvmil )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_2C ) ) /* Works like 2C/1C then 1C/1C repeat */
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_2C ) ) /* Works the same as 1C/1C */
 	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )			PORT_DIPLOCATION("SW2:7") /* Funtionally reversed?? */
+	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )          PORT_DIPLOCATION("SW2:7") /* Funtionally reversed?? */
 	PORT_DIPSETTING(      0x4000, "1" ) /* Credits from Coin1 or Coin2 */
 	PORT_DIPSETTING(      0x0000, "2" ) /* Doesn't credit up from Coin2 */
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" ) /* Verified */
@@ -270,8 +270,8 @@ static const gfx_layout tlayout =
 
 
 static GFXDECODE_START( silvmil )
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 

@@ -187,18 +187,18 @@ WRITE8_MEMBER( trs80m2_state::rom_enable_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       BOOT ROM
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0       BOOT ROM
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_boot_rom = BIT(data, 0);
 }
@@ -207,18 +207,18 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       DS1
-        1       DS2
-        2       DS3
-        3       DS4
-        4
-        5
-        6       SDSEL
-        7       FM/MFM
+	    0       DS1
+	    1       DS2
+	    2       DS3
+	    3       DS4
+	    4
+	    5
+	    6       SDSEL
+	    7       FM/MFM
 
-    */
+	*/
 
 	// drive select
 	m_floppy = NULL;
@@ -264,18 +264,18 @@ READ8_MEMBER( trs80m2_state::nmi_r )
 {
 	/*
 
-        bit     signal              description
+	    bit     signal              description
 
-        0
-        1
-        2
-        3
-        4       80/40 CHAR EN       80/40 character mode
-        5       ENABLE RTC INT      RTC interrupt enable
-        6       DE                  display enabled
-        7       KBIRQ               keyboard interrupt
+	    0
+	    1
+	    2
+	    3
+	    4       80/40 CHAR EN       80/40 character mode
+	    5       ENABLE RTC INT      RTC interrupt enable
+	    6       DE                  display enabled
+	    7       KBIRQ               keyboard interrupt
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -298,18 +298,18 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 {
 	/*
 
-        bit     signal              description
+	    bit     signal              description
 
-        0                           memory bank select bit 0
-        1                           memory bank select bit 1
-        2                           memory bank select bit 2
-        3                           memory bank select bit 3
-        4       80/40 CHAR EN       80/40 character mode
-        5       ENABLE RTC INT      RTC interrupt enable
-        6       BLNKVID             video display enable
-        7                           video RAM enable
+	    0                           memory bank select bit 0
+	    1                           memory bank select bit 1
+	    2                           memory bank select bit 2
+	    3                           memory bank select bit 3
+	    4       80/40 CHAR EN       80/40 character mode
+	    5       ENABLE RTC INT      RTC interrupt enable
+	    6       BLNKVID             video display enable
+	    7                           video RAM enable
 
-    */
+	*/
 
 	// memory bank select
 	m_bank = data & 0x0f;
@@ -348,18 +348,18 @@ WRITE8_MEMBER( trs80m16_state::tcl_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       CONT0
-        1       CONT1
-        2       HALT
-        3       RESET
-        4       CONT4
-        5       CONT5
-        6       CONT6
-        7       A14
+	    0       CONT0
+	    1       CONT1
+	    2       HALT
+	    3       RESET
+	    4       CONT4
+	    5       CONT5
+	    6       CONT6
+	    7       A14
 
-    */
+	*/
 
 	m_subcpu->set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
@@ -375,18 +375,18 @@ WRITE8_MEMBER( trs80m16_state::ual_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       A15
-        1       A16
-        2       A17
-        3       A18
-        4       A19
-        5       A20
-        6       A21
-        7       A22
+	    0       A15
+	    1       A16
+	    2       A17
+	    3       A18
+	    4       A19
+	    5       A20
+	    6       A21
+	    7       A22
 
-    */
+	*/
 
 	m_ual = (data << 1) | BIT(m_ual, 0);
 }
@@ -718,18 +718,18 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       INTRQ       FDC INT request
-        1       _TWOSID     2-sided diskette
-        2       _DSKCHG     disk change
-        3       PRIME       prime
-        4       FAULT       printer fault
-        5       PSEL        printer select
-        6       PE          paper empty
-        7       BUSY        printer busy
+	    0       INTRQ       FDC INT request
+	    1       _TWOSID     2-sided diskette
+	    2       _DSKCHG     disk change
+	    3       PRIME       prime
+	    4       FAULT       printer fault
+	    5       PSEL        printer select
+	    6       PE          paper empty
+	    7       BUSY        printer busy
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -758,18 +758,18 @@ WRITE8_MEMBER( trs80m2_state::pio_pa_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       INTRQ       FDC INT request
-        1       _TWOSID     2-sided diskette
-        2       _DSKCHG     disk change
-        3       PRIME       prime
-        4       FAULT       printer fault
-        5       PSEL        printer select
-        6       PE          paper empty
-        7       BUSY        printer busy
+	    0       INTRQ       FDC INT request
+	    1       _TWOSID     2-sided diskette
+	    2       _DSKCHG     disk change
+	    3       PRIME       prime
+	    4       FAULT       printer fault
+	    5       PSEL        printer select
+	    6       PE          paper empty
+	    7       BUSY        printer busy
 
-    */
+	*/
 
 	// prime
 	m_centronics->init_prime_w(BIT(data, 3));
@@ -782,13 +782,13 @@ WRITE_LINE_MEMBER( trs80m2_state::strobe_w )
 
 static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),				// interrupt callback
-	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_r),				// port A read callback
-	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_w),				// port A write callback
-	DEVCB_NULL,													// port A ready callback
-	DEVCB_NULL,													// port B read callback
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),	// port B write callback
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, strobe_w)			// port B ready callback
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),             // interrupt callback
+	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_r),               // port A read callback
+	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_w),               // port A write callback
+	DEVCB_NULL,                                                 // port A ready callback
+	DEVCB_NULL,                                                 // port B read callback
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  // port B write callback
+	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, strobe_w)           // port B ready callback
 };
 
 
@@ -798,9 +798,9 @@ static Z80PIO_INTERFACE( pio_intf )
 
 static const centronics_interface centronics_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_TAG, z80pio_device, strobe_b),	// ACK output
-	DEVCB_NULL,										// BUSY output
-	DEVCB_NULL										// NOT BUSY output
+	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_TAG, z80pio_device, strobe_b),  // ACK output
+	DEVCB_NULL,                                     // BUSY output
+	DEVCB_NULL                                      // NOT BUSY output
 };
 
 
@@ -848,10 +848,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	// interrupt handler
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxca_w),	// ZC/TO0 callback
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_txca_w),	// ZC/TO1 callback
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w)	// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), // interrupt handler
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxca_w),  // ZC/TO0 callback
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_txca_w),  // ZC/TO1 callback
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w) // ZC/TO2 callback
 };
 
 
@@ -984,10 +984,10 @@ void trs80m2_state::machine_reset()
 
 static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	// basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
-    MCFG_CPU_PROGRAM_MAP(z80_mem)
-    MCFG_CPU_IO_MAP(z80_io)
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -1034,10 +1034,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	// basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
-    MCFG_CPU_PROGRAM_MAP(z80_mem)
-    MCFG_CPU_IO_MAP(m16_z80_io)
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(m16_z80_io)
 
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m68000_mem)
@@ -1156,8 +1156,8 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1979, trs80m2,	0,			0,		trs80m2,	trs80m2, driver_device,		0,		"Tandy Radio Shack",	"TRS-80 Model II",	GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
-COMP( 1982, trs80m16,	trs80m2,	0,		trs80m16,	trs80m2, driver_device,		0,		"Tandy Radio Shack",	"TRS-80 Model 16",	GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  GAME_NO_SOUND_HW | GAME_IMPERFECT_KEYBOARD )
+COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
 //COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
 //COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
 //COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    GAME_NO_SOUND_HW | GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )

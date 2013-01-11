@@ -24,9 +24,9 @@
 
 struct ym3526_state
 {
-	sound_stream *	stream;
-	emu_timer *		timer[2];
-	void *			chip;
+	sound_stream *  stream;
+	emu_timer *     timer[2];
+	void *          chip;
 	const ym3526_interface *intf;
 	device_t *device;
 
@@ -64,11 +64,11 @@ static void TimerHandler(void *param,int c,attotime period)
 {
 	ym3526_state *info = (ym3526_state *)param;
 	if( period == attotime::zero )
-	{	/* Reset FM Timer */
+	{   /* Reset FM Timer */
 		info->timer[c]->enable(false);
 	}
 	else
-	{	/* Start FM Timer */
+	{   /* Start FM Timer */
 		info->timer[c]->adjust(period);
 	}
 }
@@ -148,7 +148,7 @@ const device_type YM3526 = &device_creator<ym3526_device>;
 
 ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym3526_state);
 }
@@ -199,5 +199,3 @@ void ym3526_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

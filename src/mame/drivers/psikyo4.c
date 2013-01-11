@@ -152,11 +152,11 @@ GFXDECODE_END
 
 static const eeprom_interface eeprom_interface_93C56 =
 {
-	8,		// address bits 8
-	8,		// data bits    8
-	"*110x",	// read         110x aaaaaaaa
-	"*101x",	// write        101x aaaaaaaa dddddddd
-	"*111x",	// erase        111x aaaaaaaa
+	8,      // address bits 8
+	8,      // data bits    8
+	"*110x",    // read         110x aaaaaaaa
+	"*101x",    // write        101x aaaaaaaa dddddddd
+	"*111x",    // erase        111x aaaaaaaa
 	"*10000xxxxxxx",// lock         100x 00xxxx
 	"*10011xxxxxxx",// unlock       100x 11xxxx
 //  "*10001xxxx",   // write all    1 00 01xxxx dddddddddddddddd
@@ -319,12 +319,12 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 
 	if (offset == 2) /* Configure bank for gfx test */
 	{
-		if (ACCESSING_BITS_0_15)	// Bank
+		if (ACCESSING_BITS_0_15)    // Bank
 			membank("bank2")->set_base(machine().root_device().memregion("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
 	}
 }
 
-#define PCM_BANK_NO_LEGACY(n)	((state->m_io_select[0] >> (n * 4 + 24)) & 0x07)
+#define PCM_BANK_NO_LEGACY(n)   ((state->m_io_select[0] >> (n * 4 + 24)) & 0x07)
 
 static void set_hotgmck_pcm_bank( running_machine &machine, int n )
 {
@@ -334,7 +334,7 @@ static void set_hotgmck_pcm_bank( running_machine &machine, int n )
 
 	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO_LEGACY(n) * 0x100000, 0x100000);
 }
-#define PCM_BANK_NO(n)	((m_io_select[0] >> (n * 4 + 24)) & 0x07)
+#define PCM_BANK_NO(n)  ((m_io_select[0] >> (n * 4 + 24)) & 0x07)
 WRITE32_MEMBER(psikyo4_state::hotgmck_pcm_bank_w)
 {
 	int old_bank0 = PCM_BANK_NO(0);
@@ -354,7 +354,7 @@ WRITE32_MEMBER(psikyo4_state::hotgmck_pcm_bank_w)
 }
 
 static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM     // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
@@ -392,19 +392,19 @@ static INPUT_PORTS_START( hotgmck )
 	/* EEPROM is read here */
 	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
-	PORT_START("SYSTEM")	/* system inputs */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// Screen 1
+	PORT_START("SYSTEM")    /* system inputs */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // Screen 1
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )	// Screen 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )  // Screen 2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Screen 1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Screen 1
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW)
 	PORT_DIPNAME( 0x40, 0x40, "Debug" ) /* Unknown effects */
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )	// Screen 2
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Screen 2
 
-	PORT_START("KEY0")	/* fake player 1 controls 1st bank */
+	PORT_START("KEY0")  /* fake player 1 controls 1st bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -414,7 +414,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY1")	/* fake player 1 controls 2nd bank */
+	PORT_START("KEY1")  /* fake player 1 controls 2nd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")	/* fake player 1 controls 3rd bank */
+	PORT_START("KEY2")  /* fake player 1 controls 3rd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -434,7 +434,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")	/* fake player 1 controls 4th bank */
+	PORT_START("KEY3")  /* fake player 1 controls 4th bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -444,7 +444,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY4")	/* fake player 2 controls 1st bank */
+	PORT_START("KEY4")  /* fake player 2 controls 1st bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY5")	/* fake player 2 controls 2nd bank */
+	PORT_START("KEY5")  /* fake player 2 controls 2nd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
@@ -464,7 +464,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY6")	/* fake player 2 controls 3rd bank */
+	PORT_START("KEY6")  /* fake player 2 controls 3rd bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
@@ -474,7 +474,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY7")	/* fake player 2 controls 4th bank */
+	PORT_START("KEY7")  /* fake player 2 controls 4th bank */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
@@ -487,16 +487,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( loderndf )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )	// Screen 1
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )	// Screen 1 - 2nd slot
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN3 )	// Screen 2
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN4 )	// Screen 2 - 2nd slot
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Screen 1
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )    // Screen 1
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )    // Screen 1 - 2nd slot
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN3 )    // Screen 2
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN4 )    // Screen 2 - 2nd slot
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Screen 1
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW)
 	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" ) /* Must be high for rom test, unknown other side-effects */
-	PORT_DIPSETTING(	      0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(	      0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 )	// Screen 2
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Screen 2
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -523,7 +523,7 @@ static INPUT_PORTS_START( loderndf )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // Can be used as Retry button
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("P3_P4")	/* player 1/2 controls on second screen */
+	PORT_START("P3_P4") /* player 1/2 controls on second screen */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -562,8 +562,8 @@ static INPUT_PORTS_START( loderndf )
 //  1-ON,2-ON,3-ON,4-ON  --> Japanese
 //  1-ON,2-ON,3-ON,4-OFF --> English
 	PORT_DIPNAME( 0x00030000, 0x00010000, DEF_STR( Region ) )
-	PORT_DIPSETTING(	      0x00000000, "Japan (Shows Version Number)" )
-	PORT_DIPSETTING(	      0x00010000, "World (Does Not Show Version Number)" )
+	PORT_DIPSETTING(          0x00000000, "Japan (Shows Version Number)" )
+	PORT_DIPSETTING(          0x00010000, "World (Does Not Show Version Number)" )
 	/* EEPROM is read here */
 	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 INPUT_PORTS_END
@@ -571,16 +571,16 @@ INPUT_PORTS_END
 /* unused inputs also act as duplicate buttons */
 static INPUT_PORTS_START( hotdebut )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )	// Screen 1
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )	// Screen 1 - 2nd slot
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN3 )	// Screen 2
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN4 )	// Screen 2 - 2nd slot
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Screen 1
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )    // Screen 1
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )    // Screen 1 - 2nd slot
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN3 )    // Screen 2
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN4 )    // Screen 2 - 2nd slot
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Screen 1
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW)
 	PORT_DIPNAME( 0x00000040, 0x00000040, "Debug" ) /* Must be high for rom test, unknown other side-effects */
-	PORT_DIPSETTING(	      0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(	      0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 )	// Screen 2
+	PORT_DIPSETTING(          0x00000040, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Screen 2
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -607,7 +607,7 @@ static INPUT_PORTS_START( hotdebut )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("P3_P4")	/* player 1/2 controls on second screen */
+	PORT_START("P3_P4") /* player 1/2 controls on second screen */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -759,7 +759,7 @@ ROM_START( hgkairak )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000000, 0x080000, CRC(24b04aa2) SHA1(b63d02fc15f03b93a74f5549fad236939905e382) )
 	ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x100000, CRC(83cff542) SHA1(0ea5717e0b9e6c27aaf61f7e4909ed9a353b4d3b) )
 
-	ROM_REGION( 0x3000000, "gfx1", 0 )	/* Sprites */
+	ROM_REGION( 0x3000000, "gfx1", 0 )  /* Sprites */
 	ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, CRC(f7472212) SHA1(6f6c1a75615f6a1df4d9bc97225b8e1422eb114a) )
 	ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x400000, CRC(30019d0f) SHA1(1b6690ead9941171086afc89d95292c40348a15b) )
 	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(f46d5002) SHA1(0ce47b1c6da1a8ec3fd341d903d6a3e0447529e2) )
@@ -787,7 +787,7 @@ ROM_START( hotgmck3 )
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(7aad6b24) SHA1(160dfac94002766709369aad66d3b1b11d35ee63) )
 	ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x100000, CRC(316c3356) SHA1(4664465c3f88d655379235881f1142a7954c80fc) )
 
-	ROM_REGION( 0x4000000, "gfx1", 0 )	/* Sprites */
+	ROM_REGION( 0x4000000, "gfx1", 0 )  /* Sprites */
 	ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, CRC(d4bbd035) SHA1(525739eafa4574541b217707514b256af588a996) )
 	ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x400000, CRC(e8832b0b) SHA1(aa13c264964b1c48094a303b18407a7873c60267) )
 	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(08426cb2) SHA1(a66463a93580fa7b730df7d0b72176daf6d0a6f2) )
@@ -819,7 +819,7 @@ ROM_START( hotgm4ev )
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(b1a1c643) SHA1(1912a2d231e97ffbe9b668ca7f25cf406664f3ba) )
 	ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x400000, CRC(ad556d8e) SHA1(d3dc3c5cbe939b6fc28f861e4132c5485ba89f50) ) // no test
 
-	ROM_REGION( 0x8000000, "gfx1", 0 )	/* Sprites */
+	ROM_REGION( 0x8000000, "gfx1", 0 )  /* Sprites */
 	ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, CRC(f65986f7) SHA1(3824a7ea7f14ef3f319b07bd1224847131f6cac0) ) // ok
 	ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x400000, CRC(51fd07a9) SHA1(527097a376fc0ecb23aa8707eb5e029ec1126873) ) // ok
 	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(f59d21d7) SHA1(05a1b93f2926b419ff5e031a25fd227706d66050) ) // ok
@@ -852,7 +852,7 @@ ROM_START( hotgmcki )
 	ROM_RELOAD(0x300000,0x200000)
 
 	/* Roms have to be mirrored with ROM_RELOAD for rom tests to pass */
-	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASEFF | 0 )	/* Sprites */
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASEFF | 0 )  /* Sprites */
 	ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x200000, CRC(58ae45eb) SHA1(76a23e79f2c772c5e85b8c15cf79f56b6f71fbc6) ) // ok
 	ROM_RELOAD(                0x0400000, 0x200000 )
 	ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x200000, CRC(d7bbb929) SHA1(c505ad04cdafb84800099bbbb67c5f6b52212124) ) // ok
@@ -929,7 +929,7 @@ ROM_START( hotdebut )
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(0b0d0027) SHA1(f62c487a725439af035d2904d453d3c2f7a5649b) )
 	ROM_LOAD32_WORD_SWAP( "2.u22",   0x000000, 0x080000, CRC(c3b5180b) SHA1(615cc1fd99a1e4634b04bb92a3c41f914644e903) )
 
-	ROM_REGION( 0x1800000, "gfx1", 0 )	/* Sprites */
+	ROM_REGION( 0x1800000, "gfx1", 0 )  /* Sprites */
 	ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, CRC(15da9983) SHA1(a96dd048080b5bb5ce903b5f72b3c24e89e1bee3) )
 	ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x400000, CRC(76d7b73f) SHA1(0682d4155ad61cab958d55b85914c69120d7d6fc) )
 	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(76ea3498) SHA1(ab2fb4008cf1e2b48a81306386cdc463b3bb4783) )
@@ -968,7 +968,7 @@ DRIVER_INIT_MEMBER(psikyo4_state,hotgmck)
 {
 	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
-	install_hotgmck_pcm_bank(machine());	// Banked PCM ROM
+	install_hotgmck_pcm_bank(machine());    // Banked PCM ROM
 }
 
 

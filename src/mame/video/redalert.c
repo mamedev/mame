@@ -12,8 +12,8 @@
 #include "includes/redalert.h"
 
 
-#define NUM_CHARMAP_PENS	0x200
-#define NUM_BITMAP_PENS		8
+#define NUM_CHARMAP_PENS    0x200
+#define NUM_BITMAP_PENS     8
 
 
 /*************************************
@@ -54,14 +54,14 @@ static void get_pens(running_machine &machine, pen_t *pens)
 	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
-									  1, resistances_bitmap,     bitmap_weight,      470, 0,
-									  3, resistances_charmap_rg, charmap_rg_weights, 470, 0,
-									  2, resistances_charmap_b,  charmap_b_weights,  470, 0);
+										1, resistances_bitmap,     bitmap_weight,      470, 0,
+										3, resistances_charmap_rg, charmap_rg_weights, 470, 0,
+										2, resistances_charmap_b,  charmap_b_weights,  470, 0);
 
-			 compute_resistor_weights(0, 0xff, scaler,
-									  1, resistances_back_r,     back_r_weight,      470, 0,
-									  1, resistances_back_gb,    back_gb_weight,     470, 0,
-									  0, 0, 0, 0, 0);
+				compute_resistor_weights(0, 0xff, scaler,
+										1, resistances_back_r,     back_r_weight,      470, 0,
+										1, resistances_back_gb,    back_gb_weight,     470, 0,
+										0, 0, 0, 0, 0);
 
 	/* the character layer colors come from the PROM */
 	for (offs = 0; offs < NUM_CHARMAP_PENS; offs++)
@@ -119,14 +119,14 @@ static void get_panther_pens(running_machine &machine, pen_t *pens)
 	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
-									  1, resistances_bitmap,     bitmap_weight,      470, 0,
-									  3, resistances_charmap_rg, charmap_rg_weights, 470, 0,
-									  2, resistances_charmap_b,  charmap_b_weights,  470, 0);
+										1, resistances_bitmap,     bitmap_weight,      470, 0,
+										3, resistances_charmap_rg, charmap_rg_weights, 470, 0,
+										2, resistances_charmap_b,  charmap_b_weights,  470, 0);
 
-			 compute_resistor_weights(0, 0xff, scaler,
-									  1, resistances_back_r,     back_r_weight,      470, 0,
-									  1, resistances_back_gb,    back_gb_weight,     470, 0,
-									  0, 0, 0, 0, 0);
+				compute_resistor_weights(0, 0xff, scaler,
+										1, resistances_back_r,     back_r_weight,      470, 0,
+										1, resistances_back_gb,    back_gb_weight,     470, 0,
+										0, 0, 0, 0, 0);
 
 	/* the character layer colors come from the PROM */
 	for (offs = 0; offs < NUM_CHARMAP_PENS; offs++)
@@ -453,4 +453,3 @@ MACHINE_CONFIG_FRAGMENT( panther_video )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_panther)
 MACHINE_CONFIG_END
-

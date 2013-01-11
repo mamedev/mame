@@ -16,7 +16,7 @@
 
 // ======================> pce220_serial_device
 
-class pce220_serial_device :	public device_t,
+class pce220_serial_device :    public device_t,
 								public device_image_interface
 {
 public:
@@ -44,10 +44,10 @@ public:
 	UINT8 in_xin(void) { return m_xin & 0x01; }
 	UINT8 in_din(void) { return m_din & 0x01; }
 	UINT8 in_ack(void) { return m_ack & 0x01; }
-	void out_busy(UINT8 state)	{ m_busy = state & 0x01; }
-	void out_dout(UINT8 state)	{ m_dout = state & 0x01; }
-	void out_xout(UINT8 state)	{ m_xout = state & 0x01; }
-	void enable_interface(UINT8 state)	{ m_enabled = state & 0x01; }
+	void out_busy(UINT8 state)  { m_busy = state & 0x01; }
+	void out_dout(UINT8 state)  { m_dout = state & 0x01; }
+	void out_xout(UINT8 state)  { m_xout = state & 0x01; }
+	void enable_interface(UINT8 state)  { m_enabled = state & 0x01; }
 
 protected:
 	// internal helpers
@@ -61,23 +61,23 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-    // internal device state
+	// internal device state
 	static const device_timer_id TIMER_SEND    = 0;
 	static const device_timer_id TIMER_RECEIVE = 1;
 
-	emu_timer*	m_send_timer;		// timer for send data
-	emu_timer*	m_receive_timer;	// timer for receive data
-	UINT8		m_state;			// transfer status
-	UINT32		m_bytes_count;		// number of bytes transferred
-	UINT8		m_current_byte;		// byte in transfer
-	UINT8		m_enabled;			// enable/disable
+	emu_timer*  m_send_timer;       // timer for send data
+	emu_timer*  m_receive_timer;    // timer for receive data
+	UINT8       m_state;            // transfer status
+	UINT32      m_bytes_count;      // number of bytes transferred
+	UINT8       m_current_byte;     // byte in transfer
+	UINT8       m_enabled;          // enable/disable
 
-	UINT8		m_busy;				// CTS
-	UINT8		m_dout;				// DTR
-	UINT8		m_xout;				// TXD
-	UINT8		m_xin;				// RXD
-	UINT8		m_din;				// DSR
-	UINT8		m_ack;				// RTS
+	UINT8       m_busy;             // CTS
+	UINT8       m_dout;             // DTR
+	UINT8       m_xout;             // TXD
+	UINT8       m_xin;              // RXD
+	UINT8       m_din;              // DSR
+	UINT8       m_ack;              // RTS
 };
 
 // device type definition
@@ -86,7 +86,7 @@ extern const device_type PCE220SERIAL;
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define PCE220SERIAL_TAG		"serial"
+#define PCE220SERIAL_TAG        "serial"
 
 #define MCFG_PCE220_SERIAL_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PCE220SERIAL, 0) \

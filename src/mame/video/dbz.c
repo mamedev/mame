@@ -157,4 +157,3 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 	k053247_sprites_draw(m_k053246, bitmap, cliprect);
 	return 0;
 }
-

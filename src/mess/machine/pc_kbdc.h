@@ -34,7 +34,7 @@ set the data line and then set the clock line.
 //**************************************************************************
 
 
-class pc_kbdc_slot_device :	public device_t,
+class pc_kbdc_slot_device : public device_t,
 							public device_slot_interface
 {
 public:
@@ -58,14 +58,14 @@ extern const device_type PC_KBDC_SLOT;
 
 struct pc_kbdc_interface
 {
-	devcb_write_line	m_out_clock_cb;
-	devcb_write_line	m_out_data_cb;
+	devcb_write_line    m_out_clock_cb;
+	devcb_write_line    m_out_data_cb;
 };
 
 
 class device_pc_kbd_interface;
 
-class pc_kbdc_device :	public device_t,
+class pc_kbdc_device :  public device_t,
 						public pc_kbdc_interface
 {
 public:
@@ -91,18 +91,18 @@ protected:
 	void update_clock_state();
 	void update_data_state();
 
-	devcb_resolved_write_line	m_out_clock_func;
-	devcb_resolved_write_line	m_out_data_func;
+	devcb_resolved_write_line   m_out_clock_func;
+	devcb_resolved_write_line   m_out_data_func;
 
-	int							m_clock_state;
-	int							m_data_state;
+	int                         m_clock_state;
+	int                         m_data_state;
 
-	int							m_mb_clock_state;
-	int							m_mb_data_state;
-	int							m_kb_clock_state;
-	int							m_kb_data_state;
+	int                         m_mb_clock_state;
+	int                         m_mb_data_state;
+	int                         m_kb_clock_state;
+	int                         m_kb_data_state;
 
-	device_pc_kbd_interface		*m_keyboard;
+	device_pc_kbd_interface     *m_keyboard;
 };
 
 
@@ -136,12 +136,11 @@ public:
 	// inline configuration
 	static void static_set_pc_kbdc(device_t &device, device_t *kbdc_device);
 
-	pc_kbdc_device			*m_pc_kbdc;
-	const char				*m_pc_kbdc_tag;
-	device_pc_kbd_interface	*m_next;
+	pc_kbdc_device          *m_pc_kbdc;
+	const char              *m_pc_kbdc_tag;
+	device_pc_kbd_interface *m_next;
 };
 
 
 
 #endif  /* __PC_KBDC_H__ */
-

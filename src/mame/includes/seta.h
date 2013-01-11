@@ -4,14 +4,14 @@
 
 ***************************************************************************/
 
-#define	__uPD71054_TIMER	1
+#define __uPD71054_TIMER    1
 
 struct uPD71054_state
 {
-	emu_timer *timer[3];			// Timer
-	UINT16	max[3];				// Max counter
-	UINT16	write_select;		// Max counter write select
-	UINT8	reg[4];				//
+	emu_timer *timer[3];            // Timer
+	UINT16  max[3];             // Max counter
+	UINT16  write_select;       // Max counter write select
+	UINT8   reg[4];             //
 };
 
 struct game_offset
@@ -60,9 +60,9 @@ public:
 
 	int m_tiles_offset;
 	tilemap_t *m_tilemap_0;
-	tilemap_t *m_tilemap_1;	// Layer 0
+	tilemap_t *m_tilemap_1; // Layer 0
 	tilemap_t *m_tilemap_2;
-	tilemap_t *m_tilemap_3;	// Layer 1
+	tilemap_t *m_tilemap_3; // Layer 1
 	int m_tilemaps_flip;
 	int m_samples_bank;
 	int m_color_mode_shift;

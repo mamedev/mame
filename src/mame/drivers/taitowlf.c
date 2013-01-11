@@ -53,11 +53,11 @@ public:
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 
-	device_t	*m_pit8254;
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
-	device_t	*m_dma8237_1;
-	device_t	*m_dma8237_2;
+	device_t    *m_pit8254;
+	device_t    *m_pic8259_1;
+	device_t    *m_pic8259_2;
+	device_t    *m_dma8237_1;
+	device_t    *m_dma8237_2;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
@@ -144,13 +144,13 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 
 	switch(reg)
 	{
-		case 0x59:		// PAM0
+		case 0x59:      // PAM0
 		{
-			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
+			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
 				state->membank("bank1")->set_base(state->m_bios_ram);
 			}
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 			{
 				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("user1")->base() + 0x30000);
 			}
@@ -320,7 +320,7 @@ WRITE32_MEMBER(taitowlf_state::fdc_w)
 
 WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 {
-	if (m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ram + offset);
 	}
@@ -467,7 +467,7 @@ static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)   /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
@@ -476,7 +476,7 @@ static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,              at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
@@ -502,7 +502,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START(taitowlf)
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
@@ -520,13 +520,13 @@ static INPUT_PORTS_START(taitowlf)
 	PORT_START("pc_keyboard_5")
 
 	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
@@ -599,15 +599,15 @@ static const struct pit8253_config taitowlf_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -713,11 +713,11 @@ ROM_START(pf2012)
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 	#endif
 
-	ROM_REGION32_LE(0x400000, "user3", 0)		// Program ROM disk
+	ROM_REGION32_LE(0x400000, "user3", 0)       // Program ROM disk
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
 	ROM_LOAD("u2.bin", 0x200000, 0x200000, CRC(59881781) SHA1(85ff074ab2a922eac37cf96f0bf153a2dac55aa4))
 
-	ROM_REGION32_LE(0x4000000, "user4", 0)		// Data ROM disk
+	ROM_REGION32_LE(0x4000000, "user4", 0)      // Data ROM disk
 	ROM_LOAD("e59-01.u20", 0x0000000, 0x800000, CRC(701d3a9a) SHA1(34c9f34f4da34bb8eed85a4efd1d9eea47a21d77) )
 	ROM_LOAD("e59-02.u23", 0x0800000, 0x800000, CRC(626df682) SHA1(35bb4f91201734ce7ccdc640a75030aaca3d1151) )
 	ROM_LOAD("e59-03.u26", 0x1000000, 0x800000, CRC(74e4efde) SHA1(630235c2e4a11f615b5f3b8c93e1e645da09eefe) )
@@ -727,21 +727,21 @@ ROM_START(pf2012)
 	ROM_LOAD("e59-07.u22", 0x3000000, 0x800000, CRC(1f0ddcdc) SHA1(72ffe08f5effab093bdfe9863f8a11f80e914272) )
 	ROM_LOAD("e59-08.u25", 0x3800000, 0x800000, CRC(8db38ffd) SHA1(4b71ea86fb774ba6a8ac45abf4191af64af007e7) )
 
-	ROM_REGION(0x1400000, "samples", 0)			// ZOOM sample data
+	ROM_REGION(0x1400000, "samples", 0)         // ZOOM sample data
 	ROM_LOAD("e59-09.u29", 0x0000000, 0x800000, CRC(d0da5c50) SHA1(56fb3c38f35244720d32a44fed28e6b58c7851f7) )
 	ROM_LOAD("e59-10.u32", 0x0800000, 0x800000, CRC(4c0e0a5c) SHA1(6454befa3a1dd532eb2a760129dcd7e611508730) )
 	ROM_LOAD("e59-11.u33", 0x1000000, 0x400000, CRC(c90a896d) SHA1(2b62992f20e4ca9634e7953fe2c553906de44f04) )
 
-	ROM_REGION(0x180000, "cpu1", 0)			// MN10200 program
+	ROM_REGION(0x180000, "cpu1", 0)         // MN10200 program
 	ROM_LOAD("e59-12.u13", 0x000000, 0x80000, CRC(9a473a7e) SHA1(b0ec7b0ae2b33a32da98899aa79d44e8e318ceb7) )
 	ROM_LOAD("e59-13.u15", 0x080000, 0x80000, CRC(77719880) SHA1(8382dd2dfb0dae60a3831ed6d3ff08539e2d94eb) )
 	ROM_LOAD("e59-14.u14", 0x100000, 0x40000, CRC(d440887c) SHA1(d965871860d757bc9111e9adb2303a633c662d6b) )
 	ROM_LOAD("e59-15.u16", 0x140000, 0x40000, CRC(eae8e523) SHA1(8a054d3ded7248a7906c4f0bec755ddce53e2023) )
 
-	ROM_REGION(0x20000, "user5", 0)			// bootscreen
+	ROM_REGION(0x20000, "user5", 0)         // bootscreen
 	ROM_LOAD("e58-04.u71", 0x000000, 0x20000, CRC(500e6113) SHA1(93226706517c02e336f96bdf9443785158e7becf) )
 ROM_END
 
 /*****************************************************************************/
 
-GAME(1997, pf2012, 0,	taitowlf, pc_keyboard, taitowlf_state, taitowlf,	ROT0,   "Taito",  "Psychic Force 2012", GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME(1997, pf2012, 0,   taitowlf, pc_keyboard, taitowlf_state, taitowlf,    ROT0,   "Taito",  "Psychic Force 2012", GAME_NOT_WORKING | GAME_NO_SOUND)

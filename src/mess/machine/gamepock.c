@@ -8,7 +8,7 @@ void gamepock_state::hd44102ch_w( int which, int c_d, UINT8 data )
 {
 	if ( c_d )
 	{
-		UINT8	y;
+		UINT8   y;
 		/* Data */
 		m_hd44102ch[which].ram[ m_hd44102ch[which].address ] = data;
 
@@ -29,22 +29,22 @@ void gamepock_state::hd44102ch_w( int which, int c_d, UINT8 data )
 		/* Command */
 		switch ( data )
 		{
-		case 0x38:		/* Display off */
+		case 0x38:      /* Display off */
 			m_hd44102ch[which].enabled = 0;
 			break;
-		case 0x39:		/* Display on */
+		case 0x39:      /* Display on */
 			m_hd44102ch[which].enabled = 1;
 			break;
-		case 0x3A:		/* Y decrement mode */
+		case 0x3A:      /* Y decrement mode */
 			m_hd44102ch[which].y_inc = 0xFF;
 			break;
-		case 0x3B:		/* Y increment mode */
+		case 0x3B:      /* Y increment mode */
 			m_hd44102ch[which].y_inc = 0x01;
 			break;
-		case 0x3E:		/* Display start page #0 */
-		case 0x7E:		/* Display start page #1 */
-		case 0xBE:		/* Display start page #2 */
-		case 0xFE:		/* Display start page #3 */
+		case 0x3E:      /* Display start page #0 */
+		case 0x7E:      /* Display start page #1 */
+		case 0xBE:      /* Display start page #2 */
+		case 0xFE:      /* Display start page #3 */
 			m_hd44102ch[which].start_page = data & 0xC0;
 			break;
 		default:
@@ -89,7 +89,7 @@ void gamepock_state::lcd_update()
 
 WRITE8_MEMBER( gamepock_state::port_a_w )
 {
-	UINT8	old_port_a = m_port_a;
+	UINT8   old_port_a = m_port_a;
 
 	m_port_a = data;
 
@@ -115,7 +115,7 @@ READ8_MEMBER( gamepock_state::port_b_r )
 
 READ8_MEMBER( gamepock_state::port_c_r )
 {
-	UINT8	data = 0xFF;
+	UINT8   data = 0xFF;
 
 	if ( m_port_a & 0x80 )
 	{
@@ -140,8 +140,8 @@ void gamepock_state::machine_reset()
 
 UINT32 gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8	ad;
-	int		i,j;
+	UINT8   ad;
+	int     i,j;
 
 	/* Handle HD44102CH #0 */
 	ad = m_hd44102ch[0].start_page;
@@ -221,5 +221,3 @@ int gamepock_io_callback( device_t *device, int ioline, int state )
 	}
 	return 0;
 }
-
-

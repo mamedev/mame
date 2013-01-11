@@ -79,9 +79,9 @@
 #include "includes/mac.h"
 #include "mac.lh"
 
-#define C7M	(7833600)
-#define C15M	(C7M*2)
-#define C32M	(C15M*2)
+#define C7M (7833600)
+#define C15M    (C7M*2)
+#define C32M    (C15M*2)
 
 // do this here - SCREEN_UPDATE_IND16 is called each scanline when stepping in the
 // debugger, which means you can't escape the VIA2 IRQ handler
@@ -95,7 +95,7 @@
 INTERRUPT_GEN_MEMBER(mac_state::mac_rbv_vbl)
 {
 
-	m_rbv_regs[2] &= ~0x40;	// set vblank signal
+	m_rbv_regs[2] &= ~0x40; // set vblank signal
 	m_rbv_vbltime = 10;
 
 //  printf("RBV: raising VBL!\n");
@@ -147,7 +147,7 @@ WRITE32_MEMBER( mac_state::rbv_ramdac_w )
 	}
 }
 
-WRITE32_MEMBER( mac_state::ariel_ramdac_w )	// this is for the "Ariel" style RAMDAC
+WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAMDAC
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -186,7 +186,7 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w )	// this is for the "Ariel" style RAM
 		// config reg
 //      printf("Ariel: %02x to config\n", (data>>8)&0xff);
 	}
-	else	// color key reg
+	else    // color key reg
 	{
 	}
 }
@@ -216,9 +216,9 @@ void mac_state::rbv_recalc_irqs()
 
 	if (slot_irqs)
 	{
-		m_rbv_regs[3] |= 2;	// any slot
+		m_rbv_regs[3] |= 2; // any slot
 	}
-	else	// no slot irqs, clear the pending bit
+	else    // no slot irqs, clear the pending bit
 	{
 		m_rbv_regs[3] &= ~2; // any slot
 	}
@@ -268,12 +268,12 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 
 		switch (offset)
 		{
-			case 13:	// IFR
+			case 13:    // IFR
 //              printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, m_maincpu->pc(), m_rbv_regs[2]);
 				data = m_rbv_ifr;
 				break;
 
-			case 14:	// IER
+			case 14:    // IER
 //              printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, m_maincpu->pc(), m_rbv_regs[2]);
 				data = m_rbv_ier;
 				break;
@@ -318,13 +318,13 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				rbv_recalc_irqs();
 				break;
 
-			case 0x03:	// write here to ack
-				if (data & 0x80)	// 1 bits write 1s
+			case 0x03:  // write here to ack
+				if (data & 0x80)    // 1 bits write 1s
 				{
 					m_rbv_regs[offset] |= data & 0x7f;
 					m_rbv_ifr |= data & 0x7f;
 				}
-				else			// 1 bits write 0s
+				else            // 1 bits write 0s
 				{
 					m_rbv_regs[offset] &= ~(data & 0x7f);
 					m_rbv_ifr &= ~(data & 0x7f);
@@ -341,11 +341,11 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				break;
 
 			case 0x12:
-				if (data & 0x80)	// 1 bits write 1s
+				if (data & 0x80)    // 1 bits write 1s
 				{
 					m_rbv_regs[offset] |= data & 0x7f;
 				}
-				else			// 1 bits write 0s
+				else            // 1 bits write 0s
 				{
 					m_rbv_regs[offset] &= ~(data & 0x7f);
 				}
@@ -353,13 +353,13 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				break;
 
 			case 0x13:
-				if (data & 0x80)	// 1 bits write 1s
+				if (data & 0x80)    // 1 bits write 1s
 				{
 					m_rbv_regs[offset] |= data & 0x7f;
 
-					if (data == 0xff) m_rbv_regs[offset] = 0x1f;	// I don't know why this is special, but the IIci ROM's POST demands it
+					if (data == 0xff) m_rbv_regs[offset] = 0x1f;    // I don't know why this is special, but the IIci ROM's POST demands it
 				}
-				else			// 1 bits write 0s
+				else            // 1 bits write 0s
 				{
 					m_rbv_regs[offset] &= ~(data & 0x7f);
 				}
@@ -376,7 +376,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 
 		switch (offset)
 		{
-			case 13:	// IFR
+			case 13:    // IFR
 //              printf("%02x to IFR (PC=%x)\n", data, m_maincpu->pc());
 				if (data & 0x80)
 				{
@@ -385,13 +385,13 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				rbv_recalc_irqs();
 				break;
 
-			case 14:	// IER
+			case 14:    // IER
 //              printf("%02x to IER (PC=%x)\n", data, m_maincpu->pc());
-				if (data & 0x80)	// 1 bits write 1s
+				if (data & 0x80)    // 1 bits write 1s
 				{
 					m_rbv_ier |= data & 0x7f;
 				}
-				else	    // 1 bits write 0s
+				else        // 1 bits write 0s
 				{
 					m_rbv_ier &= ~(data & 0x7f);
 				}
@@ -412,7 +412,7 @@ VIDEO_START_MEMBER(mac_state,macprtb)
 
 READ16_MEMBER(mac_state::mac_config_r)
 {
-	return 0xffff;	// returns nonzero if no PDS RAM expansion, 0 if present
+	return 0xffff;  // returns nonzero if no PDS RAM expansion, 0 if present
 }
 
 // IIfx
@@ -477,7 +477,7 @@ READ8_MEMBER(mac_state::pmac_diag_r)
 {
 	switch (offset)
 	{
-		case 0:	// return 0 here to get the 'car crash' sound after the boot bong, 1 otherwise
+		case 0: // return 0 here to get the 'car crash' sound after the boot bong, 1 otherwise
 			return 1;
 	}
 
@@ -537,7 +537,7 @@ READ8_MEMBER(mac_state::mac_5396_r)
 	{
 		return m_539x_1->read(space, offset>>4);
 	}
-	else	// pseudo-DMA: read from the FIFO
+	else    // pseudo-DMA: read from the FIFO
 	{
 		return m_539x_1->read(space, 2);
 	}
@@ -551,7 +551,7 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 	{
 		m_539x_1->write(space, offset>>4, data);
 	}
-	else	// pseudo-DMA: write to the FIFO
+	else    // pseudo-DMA: write to the FIFO
 	{
 		m_539x_1->write(space, 2, data);
 	}
@@ -583,7 +583,7 @@ static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
 	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
 	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	AM_SHARE("vram16")	// VRAM
+	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM AM_SHARE("vram16")  // VRAM
 	AM_RANGE(0xfb0000, 0xfbffff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffff)
 	AM_RANGE(0xfc0000, 0xfcffff) AM_READ(mac_config_r)
 	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
@@ -591,9 +591,9 @@ static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maclc_map, AS_PROGRAM, 32, mac_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x80ffffff)	// V8 uses bit 31 and 23-0 for address decoding only
+	ADDRESS_MAP_GLOBAL_MASK(0x80ffffff) // V8 uses bit 31 and 23-0 for address decoding only
 
-	AM_RANGE(0xa00000, 0xafffff) AM_ROM AM_REGION("bootrom", 0)	// ROM (in 32-bit mode)
+	AM_RANGE(0xa00000, 0xafffff) AM_ROM AM_REGION("bootrom", 0) // ROM (in 32-bit mode)
 
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0xf04000, 0xf05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
@@ -603,7 +603,7 @@ static ADDRESS_MAP_START(maclc_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xf14000, 0xf15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
 	AM_RANGE(0xf16000, 0xf17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
 	AM_RANGE(0xf24000, 0xf24003) AM_READWRITE(rbv_ramdac_r, ariel_ramdac_w)
-	AM_RANGE(0xf26000, 0xf27fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff)	// VIA2 (V8)
+	AM_RANGE(0xf26000, 0xf27fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff)    // VIA2 (V8)
 	AM_RANGE(0xf40000, 0xfbffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
@@ -668,10 +668,10 @@ static ADDRESS_MAP_START(macse30_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50012060, 0x50012063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)	// mirror
+	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000) // mirror
 
-	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM	AM_SHARE("vram")
-    AM_RANGE(0xfee00000, 0xfee0ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x000f0000)
+	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xfee00000, 0xfee0ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x000f0000)
 	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
 ADDRESS_MAP_END
 
@@ -706,7 +706,7 @@ static ADDRESS_MAP_START(macpb140_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x01f00000)
 	AM_RANGE(0x50024000, 0x50027fff) AM_READ(buserror_r) AM_MIRROR(0x01f00000)   // bus error here to make sure we aren't mistaken for another decoder
 
-	AM_RANGE(0xfee08000, 0xfeffffff) AM_RAM	AM_SHARE("vram")
+	AM_RANGE(0xfee08000, 0xfeffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
@@ -723,29 +723,29 @@ static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50f20000, 0x50f21fff) AM_READWRITE8(mac_gsc_r, mac_gsc_w, 0xffffffff)
 	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
 
-	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
+	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
-    AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
-    AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
-    AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
-    AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
-    AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
-    AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
-    AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
-    AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
-    AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
-    AM_RANGE(0x50f20000, 0x50f21fff) AM_READ(buserror_r)    // bus error here to detect we're not the grayscale 160/165/180
-    AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
+	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
+	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
+	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
+	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
+	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
+	AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
+	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
+	AM_RANGE(0x50f20000, 0x50f21fff) AM_READ(buserror_r)    // bus error here to detect we're not the grayscale 160/165/180
+	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
 
-    // on-board color video on 165c/180c
-    AM_RANGE(0xfc000000, 0xfc07ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x00380000) // 512k of VRAM
-    AM_RANGE(0xfc400000, 0xfcefffff) AM_READWRITE(macwd_r, macwd_w)
+	// on-board color video on 165c/180c
+	AM_RANGE(0xfc000000, 0xfc07ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x00380000) // 512k of VRAM
+	AM_RANGE(0xfc400000, 0xfcefffff) AM_READWRITE(macwd_r, macwd_w)
 // fc4003c8 = DAC control, fc4003c9 = DAC data
 // fc4003da bit 3 is VBL
-    AM_RANGE(0xfcff8000, 0xfcffffff) AM_ROM AM_REGION("vrom", 0x0000)
+	AM_RANGE(0xfcff8000, 0xfcffffff) AM_ROM AM_REGION("vrom", 0x0000)
 ADDRESS_MAP_END
 #if 0
 static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
@@ -764,7 +764,7 @@ static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_read_id)
 
-	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
+	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
 #endif
 static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
@@ -782,13 +782,13 @@ static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 	// f9800000 = VDAC / DAFB
-	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM	AM_SHARE("vram")
+	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)
 	AM_RANGE(0xf9800200, 0xf980023f) AM_READWRITE(dafb_dac_r, dafb_dac_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	// 8 MB standard
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8 MB standard
 
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)
 
@@ -829,7 +829,7 @@ static const applefdc_interface mac_iwm_interface =
 
 static const struct NCR5380interface macplus_5380intf =
 {
-	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
+	mac_scsi_irq    // IRQ (unconnected on the Mac Plus)
 };
 
 static const struct NCR539Xinterface mac_539x_intf =
@@ -850,28 +850,28 @@ static const struct nbbus_interface nubus_intf =
 };
 
 static SLOT_INTERFACE_START(mac_nubus_cards)
-    SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
-	SLOT_INTERFACE("48gc", NUBUS_48GC)		/* Apple 4*8 Graphics Card */
-	SLOT_INTERFACE("824gc", NUBUS_824GC)	/* Apple 8*24 Graphics Card */
-	SLOT_INTERFACE("cb264", NUBUS_CB264)	/* RasterOps ColorBoard 264 */
-	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)	/* Moniterm Viking board */
-	SLOT_INTERFACE("image", NUBUS_IMAGE)	/* Disk Image Pseudo-Card */
-	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum PDQ */
-	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)	/* Apple Macintosh II Hi-Resolution Card */
-	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)	/* SuperMac Spectrum/8 Series III */
+	SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
+	SLOT_INTERFACE("48gc", NUBUS_48GC)      /* Apple 4*8 Graphics Card */
+	SLOT_INTERFACE("824gc", NUBUS_824GC)    /* Apple 8*24 Graphics Card */
+	SLOT_INTERFACE("cb264", NUBUS_CB264)    /* RasterOps ColorBoard 264 */
+	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)    /* Moniterm Viking board */
+	SLOT_INTERFACE("image", NUBUS_IMAGE)    /* Disk Image Pseudo-Card */
+	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)    /* SuperMac Spectrum PDQ */
+	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)    /* Apple Macintosh II Hi-Resolution Card */
+	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)    /* SuperMac Spectrum/8 Series III */
 //  SLOT_INTERFACE("thundergx", NUBUS_THUNDERGX)        /* Radius Thunder GX (not yet) */
-	SLOT_INTERFACE("radiustpd", NUBUS_RADIUSTPD)		/* Radius Two Page Display */
-	SLOT_INTERFACE("asmc3nb", NUBUS_ASNTMC3NB)	/* Asante MC3NB Ethernet card */
-	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)	/* Apple Macintosh II Portrait video card */
-	SLOT_INTERFACE("enetnb", NUBUS_APPLEENET)	/* Apple NuBus Ethernet */
+	SLOT_INTERFACE("radiustpd", NUBUS_RADIUSTPD)        /* Radius Two Page Display */
+	SLOT_INTERFACE("asmc3nb", NUBUS_ASNTMC3NB)  /* Asante MC3NB Ethernet card */
+	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)    /* Apple Macintosh II Portrait video card */
+	SLOT_INTERFACE("enetnb", NUBUS_APPLEENET)   /* Apple NuBus Ethernet */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_pds030_cards)
-    SLOT_INTERFACE("cb264", PDS030_CB264SE30)   // RasterOps Colorboard 264/SE30
-    SLOT_INTERFACE("pc816", PDS030_PROCOLOR816) // Lapis ProColor Server 8*16 PDS
-    SLOT_INTERFACE("lview", PDS030_LVIEW)       // Sigma Designs L-View
-    SLOT_INTERFACE("30hr",  PDS030_XCEED30HR)   // Micron/XCEED Technology Color 30HR
-    SLOT_INTERFACE("mc30",  PDS030_XCEEDMC30)   // Micron/XCEED Technology MacroColor 30
+	SLOT_INTERFACE("cb264", PDS030_CB264SE30)   // RasterOps Colorboard 264/SE30
+	SLOT_INTERFACE("pc816", PDS030_PROCOLOR816) // Lapis ProColor Server 8*16 PDS
+	SLOT_INTERFACE("lview", PDS030_LVIEW)       // Sigma Designs L-View
+	SLOT_INTERFACE("30hr",  PDS030_XCEED30HR)   // Micron/XCEED Technology Color 30HR
+	SLOT_INTERFACE("mc30",  PDS030_XCEEDMC30)   // Micron/XCEED Technology MacroColor 30
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_lcpds_cards)
@@ -896,14 +896,14 @@ static const floppy_interface mac_floppy_interface =
 
 static const cuda_interface mac_cuda_interface =
 {
-    DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
-    DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
 };
 
 static const cuda_interface mac_egret_interface =
 {
-    DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
-    DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
 };
 
 static MACHINE_CONFIG_START( mac512ke, mac_state )
@@ -916,7 +916,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
@@ -933,7 +933,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
@@ -997,7 +997,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_SIZE(700, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
@@ -1015,7 +1015,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
@@ -1051,7 +1051,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
@@ -1101,7 +1101,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
@@ -1127,7 +1127,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,96M,128M")
 
-    // software list
+	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
@@ -1186,8 +1186,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maccclas, maclc2 )
 
-    MCFG_EGRET_REMOVE()
-    MCFG_CUDA_ADD(CUDA_341S0788, mac_cuda_interface)    // should be 0417, but that version won't sync up properly with the '030 right now
+	MCFG_EGRET_REMOVE()
+	MCFG_CUDA_ADD(CUDA_341S0788, mac_cuda_interface)    // should be 0417, but that version won't sync up properly with the '030 right now
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc3, maclc )
@@ -1215,8 +1215,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc520, maclc3 )
 
-    MCFG_EGRET_REMOVE()
-    MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
+	MCFG_EGRET_REMOVE()
+	MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciivx, maclc )
@@ -1277,7 +1277,7 @@ static MACHINE_CONFIG_DERIVED( maciix, macii )
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciicx, maciix )	// IIcx is a IIx with only slots 9/a/b
+static MACHINE_CONFIG_DERIVED( maciicx, maciix )    // IIcx is a IIx with only slots 9/a/b
 	MCFG_NUBUS_SLOT_REMOVE("nbc")
 	MCFG_NUBUS_SLOT_REMOVE("nbd")
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
@@ -1288,7 +1288,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macse30_map)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
@@ -1309,7 +1309,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
@@ -1340,7 +1340,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
@@ -1408,7 +1408,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_CPU_ADD("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
@@ -1461,17 +1461,17 @@ static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
-    MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
-    MCFG_CPU_PROGRAM_MAP(macpb165c_map)
+	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
+	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
 
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_SIZE(800, 525)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macpbwd)
 
-    MCFG_RAM_MODIFY(RAM_TAG)
-    MCFG_RAM_DEFAULT_SIZE("4M")
-    MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 #if 0
 static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
@@ -1567,7 +1567,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
 
-    MCFG_EGRET_ADD(EGRET_344S0100, mac_egret_interface)
+	MCFG_EGRET_ADD(EGRET_344S0100, mac_egret_interface)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
@@ -1577,7 +1577,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_CPU_ADD("maincpu", PPC601, 60000000)
 	MCFG_CPU_PROGRAM_MAP(pwrmac_map)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
@@ -1616,7 +1616,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("16M,32M,64M,128M")
 
-    MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
+	MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macqd700, mac_state )
@@ -1643,7 +1643,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-    MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
@@ -1688,116 +1688,116 @@ static INPUT_PORTS_START( macplus )
 	/* main keyboard pad */
 
 	PORT_START("KEY0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) 			PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) 			PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) 			PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) 			PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) 			PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) 			PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) 			PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) 			PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) 			PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) 			PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)	/* extra key on ISO : */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) 			PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) 			PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) 			PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) 			PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) 			PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)             PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)             PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)             PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)             PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)             PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)             PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)             PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)             PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)             PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)             PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    /* extra key on ISO : */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)             PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)             PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)             PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)             PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)             PORT_CHAR('r') PORT_CHAR('R')
 
 	PORT_START("KEY1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) 			PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) 			PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) 			PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) 			PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) 			PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) 			PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) 			PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) 			PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)		PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) 			PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) 			PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)			PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) 			PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) 			PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) 			PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)             PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)             PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)             PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)             PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)             PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)             PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)             PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)             PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)        PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)             PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)             PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)         PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)             PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)             PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)    PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)             PORT_CHAR('o') PORT_CHAR('O')
 
 	PORT_START("KEY2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)				PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)		PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) 			PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) 			PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)             PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)     PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)             PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)             PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) 			PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) 			PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)			PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) 			PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)			PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)		PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) 		PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)			PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) 			PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) 			PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)			PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)             PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)             PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)         PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)             PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)         PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)     PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)         PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)         PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)             PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)             PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)          PORT_CHAR('.') PORT_CHAR('>')
 
 	PORT_START("KEY3")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)			PORT_CHAR('\t')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)			PORT_CHAR(' ')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)			PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)		PORT_CHAR(8)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)	/* keyboard Enter : */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNUSED)	/* escape: */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)	/* ??? */
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)           PORT_CHAR('\t')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)         PORT_CHAR(' ')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)         PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)     PORT_CHAR(8)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNUSED)    /* escape: */
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_UNUSED)	/* Control: */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_UNUSED)	/* keypad pseudo-keycode */
-	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)	/* ??? */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_UNUSED)    /* Control: */
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keypad pseudo-keycode */
+	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
 
 	/* keypad */
 	PORT_START("KEY4")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)			PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)			PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)           PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT(0x0038, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)			PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
 	PORT_BIT(0x0E00, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)			PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)			PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)			PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)         PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("KEY5")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)             PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)             PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)             PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)             PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)             PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	/* Arrow keys */
 	PORT_START("KEY6")
 	PORT_BIT(0x0003, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)	PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x0038, IP_ACTIVE_HIGH, IPT_UNUSED	)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)		PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x0038, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)		PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x1E00, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up Arrow") PORT_CODE(KEYCODE_UP)			PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up Arrow") PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0xC000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -1811,112 +1811,112 @@ static INPUT_PORTS_START( macadb )
 	PORT_START("MOUSE2") /* Mouse - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-        /* This handles the standard (not Extended) Apple ADB keyboard, which is similar to the IIgs's */
+		/* This handles the standard (not Extended) Apple ADB keyboard, which is similar to the IIgs's */
 	/* main keyboard */
 
 	PORT_START("KEY0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) 			PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) 			PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) 			PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) 			PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) 			PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) 			PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) 			PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) 			PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) 			PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) 			PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)	/* extra key on ISO : */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) 			PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) 			PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) 			PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) 			PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) 			PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)             PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)             PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)             PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)             PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)             PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)             PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)             PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)             PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)             PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)             PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    /* extra key on ISO : */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)             PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)             PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)             PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)             PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)             PORT_CHAR('r') PORT_CHAR('R')
 
 	PORT_START("KEY1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) 			PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) 			PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) 			PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) 			PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) 			PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) 			PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) 			PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) 			PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)		PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) 			PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) 			PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)			PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) 			PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) 			PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) 			PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)             PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)             PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)             PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)             PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)             PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)             PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)             PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)             PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)        PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)             PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)             PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)         PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)             PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)             PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)    PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)             PORT_CHAR('o') PORT_CHAR('O')
 
 	PORT_START("KEY2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)				PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)		PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) 			PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) 			PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)             PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)     PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)             PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)             PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) 			PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) 			PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)			PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) 			PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)			PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)		PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) 		PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)			PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) 			PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) 			PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)			PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)             PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)             PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)         PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)             PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)         PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)     PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)         PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)         PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)             PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)             PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)          PORT_CHAR('.') PORT_CHAR('>')
 
 	PORT_START("KEY3")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)			PORT_CHAR('\t')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)			PORT_CHAR(' ')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)			PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)		PORT_CHAR(8)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)	/* keyboard Enter : */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")		PORT_CODE(KEYCODE_ESC)		PORT_CHAR(27)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)           PORT_CHAR('\t')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)         PORT_CHAR(' ')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)         PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)     PORT_CHAR(8)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")     PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command / Open Apple") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option / Solid Apple") PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)		PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)	PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)		PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up Arrow") PORT_CODE(KEYCODE_UP)			PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)	/* ??? */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up Arrow") PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
 
 	/* keypad */
 	PORT_START("KEY4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x40
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)			PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))	// 0x41
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x42
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)			PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))	// 0x43
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x44
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)			PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x46
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))	// 0x47
-	PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x48, 49, 4a
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)			PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))	// 0x4b
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)			PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))	// 0x4c
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x4d
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)			PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // 0x4e
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x4f
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x40
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)           PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))   // 0x41
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x42
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))  // 0x43
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x44
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x46
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))    // 0x47
+	PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x48, 49, 4a
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 0x4b
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // 0x4c
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x4d
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)         PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // 0x4e
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x4f
 
 	PORT_START("KEY5")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x50
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))	// 0x51
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(0_PAD))	// 0x52
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 0x53
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 0x54
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) // 0x55
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) // 0x56
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) // 0x57
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) // 0x58
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(7_PAD))	// 0x59
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)	// 0x5a
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(8_PAD))	// 0x5b
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) 			PORT_CHAR(UCHAR_MAMEKEY(9_PAD))	// 0x5c
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x50
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK)) // 0x51
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) // 0x52
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 0x53
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 0x54
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)             PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) // 0x55
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)             PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) // 0x56
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)             PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) // 0x57
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)             PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) // 0x58
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)             PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) // 0x59
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x5a
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) // 0x5b
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) // 0x5c
 	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -1950,7 +1950,7 @@ ROM_END
 
 ROM_START( unitron )
 	ROM_REGION16_BE(0x20000, "bootrom", 0)
-    ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) )
+	ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) )
 ROM_END
 
 ROM_START( mac512ke )
@@ -2004,7 +2004,7 @@ ROM_START( maciihmu )
 	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
 ROM_END
 
-ROM_START( mac2fdhd )	// same ROM for II FDHD, IIx, IIcx, and SE/30
+ROM_START( mac2fdhd )   // same ROM for II FDHD, IIx, IIcx, and SE/30
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_LOAD( "97221136.rom", 0x000000, 0x040000, CRC(ce3b966f) SHA1(753b94351d94c369616c2c87b19d568dc5e2764e) )
 ROM_END
@@ -2034,7 +2034,7 @@ ROM_END
 
 ROM_START( maciici )
 	ROM_REGION32_BE(0x80000, "bootrom", 0)
-        ROM_LOAD( "368cadfe.rom", 0x000000, 0x080000, CRC(46adbf74) SHA1(b54f9d2ed16b63c49ed55adbe4685ebe73eb6e80) )
+		ROM_LOAD( "368cadfe.rom", 0x000000, 0x080000, CRC(46adbf74) SHA1(b54f9d2ed16b63c49ed55adbe4685ebe73eb6e80) )
 ROM_END
 
 ROM_START( maciisi )
@@ -2067,7 +2067,7 @@ ROM_END
 
 ROM_START( maclc3 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-        ROM_LOAD( "ecbbc41c.rom", 0x000000, 0x100000, CRC(e578f5f3) SHA1(c77df3220c861f37a2c553b6ee9241b202dfdffc) )
+		ROM_LOAD( "ecbbc41c.rom", 0x000000, 0x100000, CRC(e578f5f3) SHA1(c77df3220c861f37a2c553b6ee9241b202dfdffc) )
 ROM_END
 
 ROM_START( pmac6100 )
@@ -2077,12 +2077,12 @@ ROM_END
 
 ROM_START( macprtb )
 	ROM_REGION16_BE(0x40000, "bootrom", 0)
-        ROM_LOAD16_WORD( "93ca3846.rom", 0x000000, 0x040000, CRC(497348f8) SHA1(79b468b33fc53f11e87e2e4b195aac981bf0c0a6) )
+		ROM_LOAD16_WORD( "93ca3846.rom", 0x000000, 0x040000, CRC(497348f8) SHA1(79b468b33fc53f11e87e2e4b195aac981bf0c0a6) )
 ROM_END
 
 ROM_START( macpb100 )
 	ROM_REGION16_BE(0x40000, "bootrom", 0)
-    ROM_LOAD16_WORD( "96645f9c.rom", 0x000000, 0x040000, CRC(29ac7ee9) SHA1(7f3acf40b1f63612de2314a2e9fcfeafca0711fc) )
+	ROM_LOAD16_WORD( "96645f9c.rom", 0x000000, 0x040000, CRC(29ac7ee9) SHA1(7f3acf40b1f63612de2314a2e9fcfeafca0711fc) )
 ROM_END
 
 ROM_START( macpb140 )
@@ -2124,8 +2124,8 @@ ROM_START( macpb180c )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) )
 
-    ROM_REGION32_BE(0x8000, "vrom", 0)
-    ROM_LOAD( "pb180cvrom.bin", 0x0000, 0x8000, CRC(810c75ad) SHA1(3a936e97dee5ceeb25e50197ef504e514ae689a4))
+	ROM_REGION32_BE(0x8000, "vrom", 0)
+	ROM_LOAD( "pb180cvrom.bin", 0x0000, 0x8000, CRC(810c75ad) SHA1(3a936e97dee5ceeb25e50197ef504e514ae689a4))
 ROM_END
 
 ROM_START( maccclas )
@@ -2140,44 +2140,44 @@ ROM_END*/
 
 ROM_START( maclc520 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-    ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
+	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
-COMP( 1984, mac128k,  0,		0,	mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
-COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus, mac_state,  mac512ke,	  "Apple Computer", "Macintosh 512ke", 0 )
-COMP( 1985, unitron,  macplus,  0,	mac512ke, macplus, mac_state,  mac512ke,     "bootleg (Unitron)", "Mac 512",  GAME_NOT_WORKING )
-COMP( 1986, macplus,  0,		0,	macplus,  macplus, mac_state,  macplus,	  "Apple Computer", "Macintosh Plus",  0 )
-COMP( 1987, macse,    0,		0,	macse,    macadb, mac_state,   macse,	      "Apple Computer", "Macintosh SE",  0 )
-COMP( 1987, macsefd,  0,		0,	macse,    macadb, mac_state,   macse,	      "Apple Computer", "Macintosh SE (FDHD)",  0 )
-COMP( 1987, macii,    0,		0,	macii,    macadb, mac_state,   macii,	      "Apple Computer", "Macintosh II",  0 )
-COMP( 1987, maciihmu, macii,	0,	maciihmu, macadb, mac_state,   macii,	      "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
-COMP( 1988, mac2fdhd, 0,		0,	macii,    macadb, mac_state,   maciifdhd,	  "Apple Computer", "Macintosh II (FDHD)",  0 )
-COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macadb, mac_state,   maciix,	      "Apple Computer", "Macintosh IIx",  0 )
-COMP( 1989, macprtb,  0,        0,  macprtb,  macadb, mac_state,   macprtb,	  "Apple Computer", "Macintosh Portable", GAME_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macadb, mac_state,   macse30,	  "Apple Computer", "Macintosh SE/30",  0 )
-COMP( 1989, maciicx,  mac2fdhd, 0,	maciicx,  macadb, mac_state,   maciicx,	  "Apple Computer", "Macintosh IIcx",  0 )
-COMP( 1989, maciici,  0,		0,	maciici,  maciici, mac_state,  maciici,	  "Apple Computer", "Macintosh IIci", 0 )
-COMP( 1990, maciifx,  0,		0,	maciifx,  macadb, mac_state,   maciifx,      "Apple Computer", "Macintosh IIfx",  GAME_NOT_WORKING )
-COMP( 1990, macclasc, 0,		0,	macse,    macadb, mac_state,   macclassic,	  "Apple Computer", "Macintosh Classic",  0 )
-COMP( 1990, maclc,    0,		0,	maclc,    maciici, mac_state,  maclc,	      "Apple Computer", "Macintosh LC", GAME_IMPERFECT_SOUND )
-COMP( 1990, maciisi,  0,		0,	maciisi,  maciici, mac_state,  maciisi,	  "Apple Computer", "Macintosh IIsi", 0 )
-COMP( 1991, macpb100, 0,        0,  macprtb,  macadb, mac_state,   macprtb,	  "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
-COMP( 1991, macpb140, 0,        0,  macpb140, macadb, mac_state,   macpb140,	  "Apple Computer", "Macintosh PowerBook 140", GAME_NOT_WORKING )
-COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb, mac_state,   macpb140,	  "Apple Computer", "Macintosh PowerBook 170", GAME_NOT_WORKING )
+COMP( 1984, mac128k,  0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
+COMP( 1984, mac512k,  mac128k,  0,  mac512ke, macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
+COMP( 1986, mac512ke, macplus,  0,  mac512ke, macplus, mac_state,  mac512ke,      "Apple Computer", "Macintosh 512ke", 0 )
+COMP( 1985, unitron,  macplus,  0,  mac512ke, macplus, mac_state,  mac512ke,     "bootleg (Unitron)", "Mac 512",  GAME_NOT_WORKING )
+COMP( 1986, macplus,  0,        0,  macplus,  macplus, mac_state,  macplus,   "Apple Computer", "Macintosh Plus",  0 )
+COMP( 1987, macse,    0,        0,  macse,    macadb, mac_state,   macse,         "Apple Computer", "Macintosh SE",  0 )
+COMP( 1987, macsefd,  0,        0,  macse,    macadb, mac_state,   macse,         "Apple Computer", "Macintosh SE (FDHD)",  0 )
+COMP( 1987, macii,    0,        0,  macii,    macadb, mac_state,   macii,         "Apple Computer", "Macintosh II",  0 )
+COMP( 1987, maciihmu, macii,    0,  maciihmu, macadb, mac_state,   macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
+COMP( 1988, mac2fdhd, 0,        0,  macii,    macadb, mac_state,   maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  0 )
+COMP( 1988, maciix,   mac2fdhd, 0,  maciix,   macadb, mac_state,   maciix,        "Apple Computer", "Macintosh IIx",  0 )
+COMP( 1989, macprtb,  0,        0,  macprtb,  macadb, mac_state,   macprtb,   "Apple Computer", "Macintosh Portable", GAME_NOT_WORKING )
+COMP( 1989, macse30,  mac2fdhd, 0,  macse30,  macadb, mac_state,   macse30,   "Apple Computer", "Macintosh SE/30",  0 )
+COMP( 1989, maciicx,  mac2fdhd, 0,  maciicx,  macadb, mac_state,   maciicx,   "Apple Computer", "Macintosh IIcx",  0 )
+COMP( 1989, maciici,  0,        0,  maciici,  maciici, mac_state,  maciici,   "Apple Computer", "Macintosh IIci", 0 )
+COMP( 1990, maciifx,  0,        0,  maciifx,  macadb, mac_state,   maciifx,      "Apple Computer", "Macintosh IIfx",  GAME_NOT_WORKING )
+COMP( 1990, macclasc, 0,        0,  macse,    macadb, mac_state,   macclassic,    "Apple Computer", "Macintosh Classic",  0 )
+COMP( 1990, maclc,    0,        0,  maclc,    maciici, mac_state,  maclc,         "Apple Computer", "Macintosh LC", GAME_IMPERFECT_SOUND )
+COMP( 1990, maciisi,  0,        0,  maciisi,  maciici, mac_state,  maciisi,   "Apple Computer", "Macintosh IIsi", 0 )
+COMP( 1991, macpb100, 0,        0,  macprtb,  macadb, mac_state,   macprtb,   "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
+COMP( 1991, macpb140, 0,        0,  macpb140, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 140", GAME_NOT_WORKING )
+COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 170", GAME_NOT_WORKING )
 COMP( 1991, macqd700, macpb140, 0,  macqd700, macadb, mac_state,   macquadra700, "Apple Computer", "Macintosh Quadra 700", GAME_NOT_WORKING )
-COMP( 1991, macclas2, 0,		0,	macclas2, macadb, mac_state,   macclassic2,  "Apple Computer", "Macintosh Classic II", GAME_IMPERFECT_SOUND )
-COMP( 1991, maclc2,   0,		0,	maclc2,   maciici, mac_state,  maclc2,	      "Apple Computer", "Macintosh LC II",  GAME_IMPERFECT_SOUND )
-COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb, mac_state,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145", GAME_NOT_WORKING )
-COMP( 1992, macpb160, 0,        0,  macpb160, macadb, mac_state,   macpb160,	  "Apple Computer", "Macintosh PowerBook 160", GAME_NOT_WORKING )
-COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb, mac_state,   macpb160,	  "Apple Computer", "Macintosh PowerBook 180", GAME_NOT_WORKING )
+COMP( 1991, macclas2, 0,        0,  macclas2, macadb, mac_state,   macclassic2,  "Apple Computer", "Macintosh Classic II", GAME_IMPERFECT_SOUND )
+COMP( 1991, maclc2,   0,        0,  maclc2,   maciici, mac_state,  maclc2,        "Apple Computer", "Macintosh LC II",  GAME_IMPERFECT_SOUND )
+COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 145", GAME_NOT_WORKING )
+COMP( 1992, macpb160, 0,        0,  macpb160, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 160", GAME_NOT_WORKING )
+COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 180", GAME_NOT_WORKING )
 COMP( 1992, macpb180c,macpb160, 0,  macpb180c,macadb, mac_state,   macpb160,     "Apple Computer", "Macintosh PowerBook 180c", GAME_NOT_WORKING )
 //COMP( 1992, macpd210, 0,        0,  macpd210, macadb, mac_state,   macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", GAME_NOT_WORKING )
 COMP( 1993, maccclas, 0,        0,  maccclas, macadb, mac_state,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
-COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb, mac_state,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
-COMP( 1993, maclc3,   0,		0,	maclc3,   maciici, mac_state,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_IMPERFECT_SOUND )
-COMP( 1993, maciivx,  0,		0,	maciivx,  maciici, mac_state,  maciivx,	  "Apple Computer", "Macintosh IIvx", GAME_IMPERFECT_SOUND )
-COMP( 1993, maciivi,  maciivx,	0,	maciivi,  maciici, mac_state,  maciivx,	  "Apple Computer", "Macintosh IIvi", GAME_IMPERFECT_SOUND )
-COMP( 1993, maclc520, 0,		0,	maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  GAME_NOT_WORKING )
-COMP( 1994, pmac6100, 0,		0,	pwrmac,   macadb, mac_state,   macpm6100,	  "Apple Computer", "Power Macintosh 6100/60",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
+COMP( 1993, maclc3,   0,        0,  maclc3,   maciici, mac_state,  maclc3,        "Apple Computer", "Macintosh LC III",  GAME_IMPERFECT_SOUND )
+COMP( 1993, maciivx,  0,        0,  maciivx,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvx", GAME_IMPERFECT_SOUND )
+COMP( 1993, maciivi,  maciivx,  0,  maciivi,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvi", GAME_IMPERFECT_SOUND )
+COMP( 1993, maclc520, 0,        0,  maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  GAME_NOT_WORKING )
+COMP( 1994, pmac6100, 0,        0,  pwrmac,   macadb, mac_state,   macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -59,7 +59,7 @@ public:
 	UINT16      m_phantom2_cloud_counter;
 	UINT8       m_flip_screen;
 	UINT8       m_rev_shift_res;
-	UINT8       m_maze_tone_timing_state;	/* output of IC C1, pin 5 */
+	UINT8       m_maze_tone_timing_state;   /* output of IC C1, pin 5 */
 	UINT8       m_desertgun_controller_select;
 	UINT8       m_clowns_controller_select;
 
@@ -176,23 +176,23 @@ public:
 };
 
 
-#define SEAWOLF_GUN_PORT_TAG			("GUN")
+#define SEAWOLF_GUN_PORT_TAG            ("GUN")
 
-#define TORNBASE_CAB_TYPE_UPRIGHT_OLD	(0)
-#define TORNBASE_CAB_TYPE_UPRIGHT_NEW	(1)
-#define TORNBASE_CAB_TYPE_COCKTAIL		(2)
+#define TORNBASE_CAB_TYPE_UPRIGHT_OLD   (0)
+#define TORNBASE_CAB_TYPE_UPRIGHT_NEW   (1)
+#define TORNBASE_CAB_TYPE_COCKTAIL      (2)
 
-#define DESERTGU_GUN_X_PORT_TAG			("GUNX")
-#define DESERTGU_GUN_Y_PORT_TAG			("GUNY")
+#define DESERTGU_GUN_X_PORT_TAG         ("GUNX")
+#define DESERTGU_GUN_Y_PORT_TAG         ("GUNY")
 
-#define INVADERS_CAB_TYPE_PORT_TAG		("CAB")
-#define INVADERS_P1_CONTROL_PORT_TAG	("CONTP1")
-#define INVADERS_P2_CONTROL_PORT_TAG	("CONTP2")
-#define INVADERS_COIN_INPUT_PORT_TAG	("COIN")
-#define INVADERS_SW6_SW7_PORT_TAG		("SW6SW7")
-#define INVADERS_SW5_PORT_TAG			("SW5")
+#define INVADERS_CAB_TYPE_PORT_TAG      ("CAB")
+#define INVADERS_P1_CONTROL_PORT_TAG    ("CONTP1")
+#define INVADERS_P2_CONTROL_PORT_TAG    ("CONTP2")
+#define INVADERS_COIN_INPUT_PORT_TAG    ("COIN")
+#define INVADERS_SW6_SW7_PORT_TAG       ("SW6SW7")
+#define INVADERS_SW5_PORT_TAG           ("SW5")
 
-#define BLUESHRK_SPEAR_PORT_TAG			("IN0")
+#define BLUESHRK_SPEAR_PORT_TAG         ("IN0")
 
 #define INVADERS_CONTROL_PORT_P1 \
 	PORT_START(INVADERS_P1_CONTROL_PORT_TAG) \

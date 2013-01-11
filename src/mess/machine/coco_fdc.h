@@ -15,10 +15,10 @@
 
 enum coco_rtc_type_t
 {
-	RTC_DISTO	= 0x00,
-	RTC_CLOUD9	= 0x01,
+	RTC_DISTO   = 0x00,
+	RTC_CLOUD9  = 0x01,
 
-	RTC_NONE	= 0xFF
+	RTC_NONE    = 0xFF
 };
 
 // ======================> coco_fdc_device
@@ -29,7 +29,7 @@ class coco_fdc_device :
 {
 public:
 		// construction/destruction
-        coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
@@ -44,26 +44,26 @@ public:
 		void set_intrq(UINT8 val) { m_intrq = val; }
 		void set_drq(UINT8 val) { m_drq = val; }
 protected:
-        // device-level overrides
-        virtual void device_start();
+		// device-level overrides
+		virtual void device_start();
 		virtual void device_config_complete();
 		virtual DECLARE_READ8_MEMBER(read);
 		virtual DECLARE_WRITE8_MEMBER(write);
 
 		coco_rtc_type_t real_time_clock();
 
-        // internal state
+		// internal state
 		cococart_slot_device *m_owner;
 
 		UINT8 m_dskreg;
 		UINT8 m_drq : 1;
 		UINT8 m_intrq : 1;
 
-		device_t *m_wd17xx;			/* WD17xx */
-		device_t *m_ds1315;			/* DS1315 */
+		device_t *m_wd17xx;         /* WD17xx */
+		device_t *m_ds1315;         /* DS1315 */
 
 		/* Disto RTC */
-		msm6242_device *m_disto_msm6242;		/* 6242 RTC on Disto interface */
+		msm6242_device *m_disto_msm6242;        /* 6242 RTC on Disto interface */
 		offs_t m_msm6242_rtc_address;
 };
 
@@ -78,12 +78,12 @@ class coco_fdc_v11_device :
 {
 public:
 		// construction/destruction
-        coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const;
 protected:
-        // device-level overrides
+		// device-level overrides
 		virtual void device_config_complete();
 };
 
@@ -98,12 +98,12 @@ class cp400_fdc_device :
 {
 public:
 		// construction/destruction
-        cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const;
 protected:
-        // device-level overrides
+		// device-level overrides
 		virtual void device_config_complete();
 };
 
@@ -118,7 +118,7 @@ class dragon_fdc_device :
 {
 public:
 		// construction/destruction
-        dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
@@ -127,7 +127,7 @@ public:
 		virtual void update_lines();
 		virtual void dskreg_w(UINT8 data);
 protected:
-        // device-level overrides
+		// device-level overrides
 		virtual void device_start();
 		virtual void device_config_complete();
 		virtual DECLARE_READ8_MEMBER(read);
@@ -146,12 +146,12 @@ class sdtandy_fdc_device :
 {
 public:
 		// construction/destruction
-        sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const;
 protected:
-        // device-level overrides
+		// device-level overrides
 		virtual void device_config_complete();
 };
 

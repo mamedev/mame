@@ -214,7 +214,7 @@ ioport_constructor k7659_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, K7659_KEYBOARD, "K7659 Keyboard", tag, owner, clock)
+	: device_t(mconfig, K7659_KEYBOARD, "K7659 Keyboard", tag, owner, clock)
 {}
 
 

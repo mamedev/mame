@@ -204,7 +204,7 @@
 *****************************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_8MHz
+#define MASTER_CLOCK    XTAL_8MHz
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -303,20 +303,20 @@ void mpu12wbk_state::palette_init()
 *************************/
 
 static ADDRESS_MAP_START( mpu12wbk_map, AS_PROGRAM, 8, mpu12wbk_state )
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("crtc", mc6845_device, address_w)						// OK
-	AM_RANGE(0x1401, 0x1401) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)		// OK
-	AM_RANGE(0x1e00, 0x1e01) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_address_data_w)	// hmmmmm....
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(mpu12wbk_videoram_w) AM_SHARE("videoram")				// FIXME
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(mpu12wbk_colorram_w) AM_SHARE("colorram")				// FIXME
-	AM_RANGE(0x2800, 0x3fff) AM_RAM																// RAM (from 2000-3fff)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("SW1")	// dummy, placeholder
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("SW2")	// dummy, placeholder
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN0")	// dummy, placeholder
-	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("IN1")	// dummy, placeholder
-	AM_RANGE(0x6004, 0x6004) AM_READ_PORT("IN2")	// dummy, placeholder
-	AM_RANGE(0x6005, 0x6005) AM_READ_PORT("IN3")	// dummy, placeholder
+	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("crtc", mc6845_device, address_w)                      // OK
+	AM_RANGE(0x1401, 0x1401) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)     // OK
+	AM_RANGE(0x1e00, 0x1e01) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_address_data_w)  // hmmmmm....
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(mpu12wbk_videoram_w) AM_SHARE("videoram")             // FIXME
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(mpu12wbk_colorram_w) AM_SHARE("colorram")             // FIXME
+	AM_RANGE(0x2800, 0x3fff) AM_RAM                                                             // RAM (from 2000-3fff)
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("SW1")    // dummy, placeholder
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("SW2")    // dummy, placeholder
+	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN0")    // dummy, placeholder
+	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("IN1")    // dummy, placeholder
+	AM_RANGE(0x6004, 0x6004) AM_READ_PORT("IN2")    // dummy, placeholder
+	AM_RANGE(0x6005, 0x6005) AM_READ_PORT("IN3")    // dummy, placeholder
 
-	AM_RANGE(0x8000, 0xffff) AM_ROM		// OK
+	AM_RANGE(0x8000, 0xffff) AM_ROM     // OK
 ADDRESS_MAP_END
 
 /*
@@ -494,16 +494,16 @@ static const ay8910_interface ay8910_config =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	4,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	4,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -514,7 +514,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)	/* guess */
+	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
 	MCFG_CPU_PROGRAM_MAP(mpu12wbk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpu12wbk_state,  nmi_line_pulse)
 
@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)		/* guess */
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -556,12 +556,12 @@ MACHINE_CONFIG_END
 */
 ROM_START( fruitstb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "p28f512_box.ic2",	0x8000, 0x8000, CRC(95d4ddaa) SHA1(498f841b3cd12ac128954841dd463b62c335e038) )
+	ROM_LOAD( "p28f512_box.ic2",    0x8000, 0x8000, CRC(95d4ddaa) SHA1(498f841b3cd12ac128954841dd463b62c335e038) )
 	ROM_IGNORE(                     0x8000 ) // second half is filled with 0xff, vectors are at the end of the 1st half
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "fruit1.ic37",	0x00000, 0x10000, CRC(c1834a6d) SHA1(ece1e47641087be342d3c5c092d8a7233ae871f3) )
-	ROM_LOAD( "fruit2.ic38",	0x10000, 0x10000, CRC(32d282a8) SHA1(792174d75dc7ec5f1e6f145539a5ec8e3953e1dd) )
+	ROM_LOAD( "fruit1.ic37",    0x00000, 0x10000, CRC(c1834a6d) SHA1(ece1e47641087be342d3c5c092d8a7233ae871f3) )
+	ROM_LOAD( "fruit2.ic38",    0x10000, 0x10000, CRC(32d282a8) SHA1(792174d75dc7ec5f1e6f145539a5ec8e3953e1dd) )
 //  ROM_LOAD( "fruit3.ic39",    0x20000, 0x10000, CRC(311a6d4e) SHA1(62cf670b605906f7f4225905118524ee30d0e85b) )  // and this one?
 
 	ROM_REGION( 0x0400, "proms", 0 )

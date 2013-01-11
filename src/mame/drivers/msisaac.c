@@ -95,8 +95,8 @@ MCU simulation TODO:
 		/*Start-up check*/
 		case 0x5f:  return (m_mcu_val + 0x6b);
 		/*These interferes with RAM operations(setting them to non-zero you  *
-         * will have unexpected results,such as infinite lives or score not  *
-         * incremented properly).*/
+		 * will have unexpected results,such as infinite lives or score not  *
+		 * incremented properly).*/
 		case 0x40:
 		case 0x41:
 		case 0x42:
@@ -117,17 +117,17 @@ MCU simulation TODO:
 
 			UINT8 val= (ioport("IN1")->read() >> 2) & 0x0f;
 			/* bit0 = left
-               bit1 = right
-               bit2 = down
-               bit3 = up
-            */
+			   bit1 = right
+			   bit2 = down
+			   bit3 = up
+			*/
 			/* direction is encoded as:
-                               4
-                             3   5
-                            2     6
-                             1   7
-                               0
-            */
+			                   4
+			                 3   5
+			                2     6
+			                 1   7
+			                   0
+			*/
 			/*       0000   0001   0010   0011      0100   0101   0110   0111     1000   1001   1010   1011   1100   1101   1110   1111 */
 			/*      nochange left  right nochange   down downlft dwnrght down     up     upleft uprgt  up    nochnge left   right  nochange */
 
@@ -155,7 +155,7 @@ READ8_MEMBER(msisaac_state::msisaac_mcu_status_r)
 #ifdef USE_MCU
 	return buggychl_mcu_status_r(offset);
 #else
-	return 3;	//mcu ready / cpu data ready
+	return 3;   //mcu ready / cpu data ready
 #endif
 }
 
@@ -175,13 +175,13 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITENOP					//???
-	AM_RANGE(0xf002, 0xf002) AM_WRITENOP					//???
+	AM_RANGE(0xf001, 0xf001) AM_WRITENOP                    //???
+	AM_RANGE(0xf002, 0xf002) AM_WRITENOP                    //???
 
-	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)		//sound command
-	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/	//????
+	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)      //sound command
+	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/    //????
 
-	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)			//???? written in interrupt routine
+	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)         //???? written in interrupt routine
 
 	AM_RANGE(0xf0c0, 0xf0c0) AM_WRITE(msisaac_fg_scrollx_w)
 	AM_RANGE(0xf0c1, 0xf0c1) AM_WRITE(msisaac_fg_scrolly_w)
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
 //  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("spriteram")	//sprites
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("spriteram")   //sprites
 	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_SHARE("videoram2")
@@ -213,9 +213,9 @@ MACHINE_RESET_MEMBER(msisaac_state,ta7630)
 {
 	int i;
 
-	double db			= 0.0;
-	double db_step		= 0.50;	/* 0.50 dB step (at least, maybe more) */
-	double db_step_inc	= 0.275;
+	double db           = 0.0;
+	double db_step      = 0.50; /* 0.50 dB step (at least, maybe more) */
+	double db_step_inc  = 0.275;
 	for (i=0; i<16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
@@ -226,7 +226,7 @@ MACHINE_RESET_MEMBER(msisaac_state,ta7630)
 	}
 
 	/*for (i=0; i<8; i++)
-        logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );*/
+	    logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );*/
 /*
   channels 0-2 AY#0
   channels 3-5 AY#1
@@ -242,14 +242,14 @@ WRITE8_MEMBER(msisaac_state::sound_control_0_w)
 
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(0, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(1, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(2, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(3, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(0, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+	sound->set_output_gain(1, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+	sound->set_output_gain(2, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+	sound->set_output_gain(3, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+	sound->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	sound->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	sound->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	sound->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 WRITE8_MEMBER(msisaac_state::sound_control_1_w)
 {
@@ -362,12 +362,12 @@ static INPUT_PORTS_START( msisaac )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	//??
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   //??
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	//??
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	//??
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   //??
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   //??
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -423,7 +423,7 @@ GFXDECODE_END
 
 static const msm5232_interface msm5232_config =
 {
-	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 },	/* 0.65 (???) uF capacitors (match the sample, not verified) */
+	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }, /* 0.65 (???) uF capacitors (match the sample, not verified) */
 	DEVCB_NULL
 };
 
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(msisaac_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)	/* source of IRQs is unknown */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
 
 #ifdef USE_MCU
 	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
@@ -513,14 +513,14 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -539,7 +539,7 @@ ROM_START( msisaac )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 sound CPU */
 	ROM_LOAD( "a34_01.bin", 0x0000, 0x4000, CRC(545e45e7) SHA1(18ddb1ec8809bb62ae1c1068cd16cd3c933bf6ba) )
 
-	ROM_REGION( 0x0800,  "cpu2", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800,  "cpu2", 0 )    /* 2k for the microcontroller */
 	ROM_LOAD( "a34.mcu"       , 0x0000, 0x0800, NO_DUMP )
 
 // I tried following MCUs; none of them work with this game:

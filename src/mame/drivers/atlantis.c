@@ -74,8 +74,8 @@ void atlantis_state::machine_start()
 
 void atlantis_state::machine_reset()
 {
-    dcs_reset_w(machine(), 1);
-    dcs_reset_w(machine(), 0);
+	dcs_reset_w(machine(), 1);
+	dcs_reset_w(machine(), 0);
 }
 
 
@@ -101,10 +101,10 @@ UINT32 atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atlantis_state )
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8 MB main RAM
-    // 04000000 - PCI slot (ActionTec modem, ROM dump TBD)
-    // 08000000 - PLX9050 chip (Zeus interface?)
-    // 0F000000 - VR4373 ("Nile 3") registers
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8 MB main RAM
+	// 04000000 - PCI slot (ActionTec modem, ROM dump TBD)
+	// 08000000 - PLX9050 chip (Zeus interface?)
+	// 0F000000 - VR4373 ("Nile 3") registers
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
@@ -128,8 +128,8 @@ INPUT_PORTS_END
 
 static const mips3_config r4310_config =
 {
-	16384,				/* code cache size */
-	16384				/* data cache size */
+	16384,              /* code cache size */
+	16384               /* data cache size */
 };
 
 static MACHINE_CONFIG_START( mwskins, atlantis_state )
@@ -168,24 +168,24 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( mwskins )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4310 code */
-    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
+	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "mwskins", 0, SHA1(5cb293a6fdb2478293f48ddfc93cdd018acb2bb5) )
 ROM_END
 
 ROM_START( mwskinsa )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4310 code */
-    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
+	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "mwskinsa", 0, SHA1(72497917b31156eb11a46bbcc6f22a254dcec044) )
 ROM_END
 
 ROM_START( mwskinso )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* 512k for R4310 code */
-    ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
+	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "mwskins104", 0, SHA1(6917f66718999c144c854795c5856bf5659b85fa) )
@@ -211,4 +211,3 @@ DRIVER_INIT_MEMBER(atlantis_state,mwskins)
 GAME( 2000, mwskins,    0,      mwskins, mwskins, atlantis_state,  mwskins,   ROT0, "Midway", "Skins Game (1.06)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, mwskinsa, mwskins,  mwskins, mwskins, atlantis_state,  mwskins,   ROT0, "Midway", "Skins Game (1.06, alt)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, mwskinso, mwskins,  mwskins, mwskins, atlantis_state,  mwskins,   ROT0, "Midway", "Skins Game (1.04)", GAME_NOT_WORKING | GAME_NO_SOUND )
-

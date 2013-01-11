@@ -39,11 +39,11 @@ const device_type AT28C16 = &device_creator<at28c16_device>;
 
 at28c16_device::at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, AT28C16, "AT28C16", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_a9_12v( 0 ),
-	  m_oe_12v( 0 ),
-	  m_last_write( -1 )
+		device_memory_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_a9_12v( 0 ),
+		m_oe_12v( 0 ),
+		m_last_write( -1 )
 {
 }
 

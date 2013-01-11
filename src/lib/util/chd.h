@@ -221,9 +221,9 @@
 //**************************************************************************
 
 // pseudo-codecs returned by hunk_info
-const chd_codec_type CHD_CODEC_SELF 		= 1;	// copy of another hunk
-const chd_codec_type CHD_CODEC_PARENT		= 2;	// copy of a parent's hunk
-const chd_codec_type CHD_CODEC_MINI 		= 3;	// legacy "mini" 8-byte repeat
+const chd_codec_type CHD_CODEC_SELF         = 1;    // copy of another hunk
+const chd_codec_type CHD_CODEC_PARENT       = 2;    // copy of a parent's hunk
+const chd_codec_type CHD_CODEC_MINI         = 3;    // legacy "mini" 8-byte repeat
 
 // core types
 typedef UINT32 chd_metadata_tag;
@@ -233,7 +233,7 @@ const chd_metadata_tag CHDMETATAG_WILDCARD = 0;
 const UINT32 CHDMETAINDEX_APPEND = ~0;
 
 // metadata flags
-const UINT8 CHD_MDFLAGS_CHECKSUM = 0x01;		// indicates data is checksummed
+const UINT8 CHD_MDFLAGS_CHECKSUM = 0x01;        // indicates data is checksummed
 
 // standard hard disk metadata
 const chd_metadata_tag HARD_DISK_METADATA_TAG = CHD_MAKE_TAG('G','D','D','D');
@@ -428,42 +428,42 @@ private:
 	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
 	// file characteristics
-	core_file *				m_file;				// handle to the open core file
-	bool					m_owns_file;		// flag indicating if this file should be closed on chd_close()
-	bool					m_allow_reads;		// permit reads from this CHD?
-	bool					m_allow_writes;		// permit writes to this CHD?
+	core_file *             m_file;             // handle to the open core file
+	bool                    m_owns_file;        // flag indicating if this file should be closed on chd_close()
+	bool                    m_allow_reads;      // permit reads from this CHD?
+	bool                    m_allow_writes;     // permit writes to this CHD?
 
 	// core parameters from the header
-	UINT32					m_version;			// version of the header
-	UINT64					m_logicalbytes;		// logical size of the raw CHD data in bytes
-	UINT64					m_mapoffset;		// offset of map
-	UINT64					m_metaoffset;		// offset to first metadata bit
-	UINT32					m_hunkbytes;		// size of each raw hunk in bytes
-	UINT32					m_hunkcount;		// number of hunks represented
-	UINT32					m_unitbytes;		// size of each unit in bytes
-	UINT64					m_unitcount;		// number of units represented
-	chd_codec_type			m_compression[4];	// array of compression types used
-	chd_file *				m_parent;			// pointer to parent file, or NULL if none
-	bool					m_parent_missing;	// are we missing our parent?
+	UINT32                  m_version;          // version of the header
+	UINT64                  m_logicalbytes;     // logical size of the raw CHD data in bytes
+	UINT64                  m_mapoffset;        // offset of map
+	UINT64                  m_metaoffset;       // offset to first metadata bit
+	UINT32                  m_hunkbytes;        // size of each raw hunk in bytes
+	UINT32                  m_hunkcount;        // number of hunks represented
+	UINT32                  m_unitbytes;        // size of each unit in bytes
+	UINT64                  m_unitcount;        // number of units represented
+	chd_codec_type          m_compression[4];   // array of compression types used
+	chd_file *              m_parent;           // pointer to parent file, or NULL if none
+	bool                    m_parent_missing;   // are we missing our parent?
 
 	// key offsets within the header
-	UINT64					m_mapoffset_offset;	// offset of map offset field
-	UINT64					m_metaoffset_offset;// offset of metaoffset field
-	UINT64					m_sha1_offset;		// offset of SHA1 field
-	UINT64					m_rawsha1_offset;	// offset of raw SHA1 field
-	UINT64					m_parentsha1_offset;// offset of paren SHA1 field
+	UINT64                  m_mapoffset_offset; // offset of map offset field
+	UINT64                  m_metaoffset_offset;// offset of metaoffset field
+	UINT64                  m_sha1_offset;      // offset of SHA1 field
+	UINT64                  m_rawsha1_offset;   // offset of raw SHA1 field
+	UINT64                  m_parentsha1_offset;// offset of paren SHA1 field
 
 	// map information
-	UINT32					m_mapentrybytes;	// length of each entry in a map
-	dynamic_buffer			m_rawmap;			// raw map data
+	UINT32                  m_mapentrybytes;    // length of each entry in a map
+	dynamic_buffer          m_rawmap;           // raw map data
 
 	// compression management
-	chd_decompressor *		m_decompressor[4];	// array of decompression codecs
-	dynamic_buffer			m_compressed;		// temporary buffer for compressed data
+	chd_decompressor *      m_decompressor[4];  // array of decompression codecs
+	dynamic_buffer          m_compressed;       // temporary buffer for compressed data
 
 	// caching
-	dynamic_buffer			m_cache;			// single-hunk cache for partial reads/writes
-	UINT32					m_cachehunk;		// which hunk is in the cache?
+	dynamic_buffer          m_cache;            // single-hunk cache for partial reads/writes
+	UINT32                  m_cachehunk;        // which hunk is in the cache?
 };
 
 
@@ -505,9 +505,9 @@ private:
 		// internal entry
 		struct entry_t
 		{
-			entry_t *			m_next;				// next entry in list
-			UINT64				m_itemnum;			// item number
-			sha1_t				m_sha1;				// SHA-1 of the block
+			entry_t *           m_next;             // next entry in list
+			UINT64              m_itemnum;          // item number
+			sha1_t              m_sha1;             // SHA-1 of the block
 		};
 
 		// block of entries
@@ -516,14 +516,14 @@ private:
 			entry_block(entry_block *prev)
 				: m_next(prev), m_nextalloc(0) { }
 
-			entry_block *		m_next;				// next block in list
-			UINT32				m_nextalloc;		// next to be allocated
-			entry_t				m_array[16384];		// array of entries
+			entry_block *       m_next;             // next block in list
+			UINT32              m_nextalloc;        // next to be allocated
+			entry_t             m_array[16384];     // array of entries
 		};
 
 		// internal state
-		entry_t *			m_map[65536];			// map, hashed by CRC-16
-		entry_block *		m_block_list;			// list of allocated blocks
+		entry_t *           m_map[65536];           // map, hashed by CRC-16
+		entry_block *       m_block_list;           // list of allocated blocks
 	};
 
 	// status of a given work item
@@ -538,23 +538,23 @@ private:
 	// a CRC-16/SHA-1 pair
 	struct hash_pair
 	{
-		crc16_t				m_crc16;			// calculated CRC-16
-		sha1_t				m_sha1;				// calculated SHA-1
+		crc16_t             m_crc16;            // calculated CRC-16
+		sha1_t              m_sha1;             // calculated SHA-1
 	};
 
 	// a single work item
 	struct work_item
 	{
-		osd_work_item *		m_osd;				// OSD work item running on this block
-		chd_file_compressor *m_compressor;		// pointer back to the compressor
-		volatile work_status m_status;			// current status of this item
-		UINT32				m_hunknum;			// number of the hunk we're working on
-		UINT8 *				m_data;				// pointer to the data we are working on
-		UINT8 *				m_compressed;		// pointer to the compressed data
-		UINT32				m_complen;			// compressed data length
-		INT8				m_compression;		// type of compression used
-		chd_compressor_group *m_codecs;			// codec instance
-		dynamic_array<hash_pair> m_hash;		// array of hashes
+		osd_work_item *     m_osd;              // OSD work item running on this block
+		chd_file_compressor *m_compressor;      // pointer back to the compressor
+		volatile work_status m_status;          // current status of this item
+		UINT32              m_hunknum;          // number of the hunk we're working on
+		UINT8 *             m_data;             // pointer to the data we are working on
+		UINT8 *             m_compressed;       // pointer to the compressed data
+		UINT32              m_complen;          // compressed data length
+		INT8                m_compression;      // type of compression used
+		chd_compressor_group *m_codecs;         // codec instance
+		dynamic_array<hash_pair> m_hash;        // array of hashes
 	};
 
 	// internal helpers
@@ -566,31 +566,31 @@ private:
 	void async_read();
 
 	// current compression status
-	bool					m_walking_parent;	// are we building the parent map?
-	UINT64					m_total_in;			// total bytes in
-	UINT64					m_total_out;		// total bytes out
-	sha1_creator			m_compsha1;			// running SHA-1 on raw data
+	bool                    m_walking_parent;   // are we building the parent map?
+	UINT64                  m_total_in;         // total bytes in
+	UINT64                  m_total_out;        // total bytes out
+	sha1_creator            m_compsha1;         // running SHA-1 on raw data
 
 	// hash lookup maps
-	hashmap					m_parent_map;		// hash map for parent
-	hashmap					m_current_map;		// hash map for current
+	hashmap                 m_parent_map;       // hash map for parent
+	hashmap                 m_current_map;      // hash map for current
 
 	// read I/O thread
-	osd_work_queue *		m_read_queue;		// work queue for reading
-	UINT64					m_read_queue_offset;// next offset to enqueue
-	UINT64					m_read_done_offset;	// next offset that will complete
-	bool					m_read_error;		// error during reading?
+	osd_work_queue *        m_read_queue;       // work queue for reading
+	UINT64                  m_read_queue_offset;// next offset to enqueue
+	UINT64                  m_read_done_offset; // next offset that will complete
+	bool                    m_read_error;       // error during reading?
 
 	// work item thread
 	static const int WORK_BUFFER_HUNKS = 256;
-	osd_work_queue *		m_work_queue;		// queue for doing work on other threads
-	dynamic_buffer			m_work_buffer;		// buffer containing hunk data to work on
-	dynamic_buffer			m_compressed_buffer;// buffer containing compressed data
-	work_item				m_work_item[WORK_BUFFER_HUNKS]; // status of each hunk
-	chd_compressor_group *	m_codecs[WORK_MAX_THREADS]; // codecs to use
+	osd_work_queue *        m_work_queue;       // queue for doing work on other threads
+	dynamic_buffer          m_work_buffer;      // buffer containing hunk data to work on
+	dynamic_buffer          m_compressed_buffer;// buffer containing compressed data
+	work_item               m_work_item[WORK_BUFFER_HUNKS]; // status of each hunk
+	chd_compressor_group *  m_codecs[WORK_MAX_THREADS]; // codecs to use
 
 	// output state
-	UINT32					m_write_hunk;		// next hunk to write
+	UINT32                  m_write_hunk;       // next hunk to write
 };
 
 

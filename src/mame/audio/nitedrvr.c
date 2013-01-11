@@ -13,24 +13,24 @@
 static const discrete_lfsr_desc nitedrvr_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,			/* Bit Length */
-	0,			/* Reset Value */
-	0,			/* Use Bit 0 as XOR input 0 */
-	14,			/* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,		/* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,		/* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,	/* Feedback stage3 replaces the shifted register contents */
-	0x000001,		/* Everything is shifted into the first bit only */
-	0,			/* Output is already inverted by XNOR */
-	15			/* Output bit */
+	16,         /* Bit Length */
+	0,          /* Reset Value */
+	0,          /* Use Bit 0 as XOR input 0 */
+	14,         /* Use Bit 14 as XOR input 1 */
+	DISC_LFSR_XNOR,     /* Feedback stage1 is XNOR */
+	DISC_LFSR_OR,       /* Feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
+	0x000001,       /* Everything is shifted into the first bit only */
+	0,          /* Output is already inverted by XNOR */
+	15          /* Output bit */
 };
 
 /* Nodes - Sounds */
-#define NITEDRVR_NOISE			NODE_10
-#define NITEDRVR_BANG_SND		NODE_11
-#define NITEDRVR_MOTOR_SND		NODE_12
-#define NITEDRVR_SCREECH1_SND	NODE_13
-#define NITEDRVR_SCREECH2_SND	NODE_14
+#define NITEDRVR_NOISE          NODE_10
+#define NITEDRVR_BANG_SND       NODE_11
+#define NITEDRVR_MOTOR_SND      NODE_12
+#define NITEDRVR_SCREECH1_SND   NODE_13
+#define NITEDRVR_SCREECH2_SND   NODE_14
 
 DISCRETE_SOUND_START(nitedrvr)
 	/************************************************/
@@ -83,15 +83,15 @@ DISCRETE_SOUND_START(nitedrvr)
 	DISCRETE_ADJUSTMENT(NODE_21, (214.0-27.0)/12/31, (4416.0-27.0)/12/31, DISC_LOGADJ, "MOTOR")
 	DISCRETE_MULTIPLY(NODE_22, NODE_20, NODE_21)
 
-	DISCRETE_MULTADD(NODE_23, NODE_22, 2, 27.0/6)	/* F1 = /12*2 = /6 */
+	DISCRETE_MULTADD(NODE_23, NODE_22, 2, 27.0/6)   /* F1 = /12*2 = /6 */
 	DISCRETE_SQUAREWAVE(NODE_24, 1, NODE_23, (786.7/3), 50.0, 0, 0)
 	DISCRETE_RCFILTER(NODE_25, NODE_24, 10000, 1e-7)
 
-	DISCRETE_MULTADD(NODE_26, NODE_22, 3, 27.0/4)	/* F2 = /12*3 = /4 */
+	DISCRETE_MULTADD(NODE_26, NODE_22, 3, 27.0/4)   /* F2 = /12*3 = /4 */
 	DISCRETE_SQUAREWAVE(NODE_27, 1, NODE_26, (786.7/3), 50.0, 0, 0)
 	DISCRETE_RCFILTER(NODE_28, NODE_27, 10000, 1e-7)
 
-	DISCRETE_MULTADD(NODE_29, NODE_22, 4, 27.0/3)	/* F3 = /12*4 = /3 */
+	DISCRETE_MULTADD(NODE_29, NODE_22, 4, 27.0/3)   /* F3 = /12*4 = /3 */
 	DISCRETE_SQUAREWAVE(NODE_30, 1, NODE_29, (786.7/3), 100.0/3, 0, 360.0/3)
 	DISCRETE_RCFILTER(NODE_31, NODE_30, 10000, 1e-7)
 
@@ -131,8 +131,8 @@ DISCRETE_SOUND_START(nitedrvr)
 	DISCRETE_MULTADD(NODE_72, NODE_71, 940.0-630.0, ((940.0-630.0)/2)+630.0)
 	DISCRETE_SQUAREWAVE(NITEDRVR_SCREECH1_SND, NITEDRVR_SKID1_EN, NODE_72, 226.9, 31.5, 0, 0.0)
 
-	DISCRETE_MULTADD(NODE_75, NODE_71, 1380.0-626.0, 626.0+((1380.0-626.0)/2))	/* Frequency */
-	DISCRETE_MULTADD(NODE_76, NODE_71, 32.0-13.0, 13.0+((32.0-13.0)/2))		/* Duty */
+	DISCRETE_MULTADD(NODE_75, NODE_71, 1380.0-626.0, 626.0+((1380.0-626.0)/2))  /* Frequency */
+	DISCRETE_MULTADD(NODE_76, NODE_71, 32.0-13.0, 13.0+((32.0-13.0)/2))     /* Duty */
 	DISCRETE_SQUAREWAVE(NITEDRVR_SCREECH2_SND, NITEDRVR_SKID2_EN, NODE_75, 226.9, NODE_76, 0, 0.0)
 
 	/************************************************/

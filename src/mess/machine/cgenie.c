@@ -27,8 +27,8 @@
 
 
 
-#define IRQ_TIMER		0x80
-#define IRQ_FDC 		0x40
+#define IRQ_TIMER       0x80
+#define IRQ_FDC         0x40
 
 
 
@@ -108,7 +108,7 @@ void cgenie_state::machine_reset()
 		space.install_rom(0xe000, 0xefff, 0); // mess 0135u3 need to check
 		logerror("cgenie EXT enabled\n");
 		memcpy(&machine().root_device().memregion("maincpu")->base()[0x0e000],
-			   &machine().root_device().memregion("maincpu")->base()[0x12000], 0x1000);
+				&machine().root_device().memregion("maincpu")->base()[0x12000], 0x1000);
 	}
 	else
 	{
@@ -135,10 +135,10 @@ void cgenie_state::machine_start()
 	m_port_ff = 0xff;
 
 	/*
-     * Every fifth cycle is a wait cycle, so I reduced
-     * the overlocking by one fitfth
-     * Underclocking causes the tape loading to not work.
-     */
+	 * Every fifth cycle is a wait cycle, so I reduced
+	 * the overlocking by one fitfth
+	 * Underclocking causes the tape loading to not work.
+	 */
 //  cpunum_set_clockscale(machine(), 0, 0.80);
 
 	/* Initialize some patterns to be displayed in graphics mode */
@@ -160,15 +160,15 @@ void cgenie_state::machine_start()
  *************************************/
 
 /* used bits on port FF */
-#define FF_CAS	0x01		   /* tape output signal */
-#define FF_BGD0 0x04		   /* background color enable */
-#define FF_CHR1 0x08		   /* charset 0xc0 - 0xff 1:fixed 0:defined */
-#define FF_CHR0 0x10		   /* charset 0x80 - 0xbf 1:fixed 0:defined */
-#define FF_CHR	(FF_CHR0 | FF_CHR1)
-#define FF_FGR	0x20		   /* 1: "hi" resolution graphics, 0: text mode */
-#define FF_BGD1 0x40		   /* background color select 1 */
-#define FF_BGD2 0x80		   /* background color select 2 */
-#define FF_BGD	(FF_BGD0 | FF_BGD1 | FF_BGD2)
+#define FF_CAS  0x01           /* tape output signal */
+#define FF_BGD0 0x04           /* background color enable */
+#define FF_CHR1 0x08           /* charset 0xc0 - 0xff 1:fixed 0:defined */
+#define FF_CHR0 0x10           /* charset 0x80 - 0xbf 1:fixed 0:defined */
+#define FF_CHR  (FF_CHR0 | FF_CHR1)
+#define FF_FGR  0x20           /* 1: "hi" resolution graphics, 0: text mode */
+#define FF_BGD1 0x40           /* background color select 1 */
+#define FF_BGD2 0x80           /* background color select 2 */
+#define FF_BGD  (FF_BGD0 | FF_BGD1 | FF_BGD2)
 
 WRITE8_HANDLER( cgenie_port_ff_w )
 {
@@ -246,7 +246,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 READ8_HANDLER( cgenie_port_ff_r )
 {
 	cgenie_state *state = space.machine().driver_data<cgenie_state>();
-	UINT8	data = state->m_port_ff & ~0x01;
+	UINT8   data = state->m_port_ff & ~0x01;
 
 	data |= state->m_cass_bit;
 
@@ -329,7 +329,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	state->m_psg_b_out = data;
 }
 
- READ8_HANDLER( cgenie_status_r )
+	READ8_HANDLER( cgenie_status_r )
 {
 	device_t *fdc = space.machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0 */
@@ -338,7 +338,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	return wd17xx_status_r(fdc, space, offset);
 }
 
- READ8_HANDLER( cgenie_track_r )
+	READ8_HANDLER( cgenie_track_r )
 {
 	device_t *fdc = space.machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
@@ -347,7 +347,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	return wd17xx_track_r(fdc, space, offset);
 }
 
- READ8_HANDLER( cgenie_sector_r )
+	READ8_HANDLER( cgenie_sector_r )
 {
 	device_t *fdc = space.machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
@@ -356,7 +356,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	return wd17xx_sector_r(fdc, space, offset);
 }
 
- READ8_HANDLER(cgenie_data_r )
+	READ8_HANDLER(cgenie_data_r )
 {
 	device_t *fdc = space.machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
@@ -401,7 +401,7 @@ WRITE8_HANDLER( cgenie_data_w )
 	wd17xx_data_w(fdc, space, offset, data);
 }
 
- READ8_HANDLER( cgenie_irq_status_r )
+	READ8_HANDLER( cgenie_irq_status_r )
 {
 	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 int result = state->m_irq_status;
@@ -480,7 +480,7 @@ WRITE8_HANDLER( cgenie_motor_w )
 /*************************************
  *      Keyboard                     *
  *************************************/
- READ8_HANDLER( cgenie_keyboard_r )
+	READ8_HANDLER( cgenie_keyboard_r )
 {
 	int result = 0;
 
@@ -528,11 +528,11 @@ WRITE8_HANDLER( cgenie_videoram_w )
 	UINT8 *videoram = state->m_videoram;
 	/* write to video RAM */
 	if( data == videoram[offset] )
-		return; 			   /* no change */
+		return;                /* no change */
 	videoram[offset] = data;
 }
 
- READ8_HANDLER( cgenie_colorram_r )
+	READ8_HANDLER( cgenie_colorram_r )
 {
 	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	return state->m_colorram[offset] | 0xf0;
@@ -553,7 +553,7 @@ WRITE8_HANDLER( cgenie_colorram_w )
 	offset = (offset + (cgenie_get_register(space.machine(), 12) << 8) + cgenie_get_register(space.machine(), 13)) & 0x3ff;
 }
 
- READ8_HANDLER( cgenie_fontram_r )
+	READ8_HANDLER( cgenie_fontram_r )
 {
 	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	return state->m_fontram[offset];
@@ -565,7 +565,7 @@ WRITE8_HANDLER( cgenie_fontram_w )
 	UINT8 *dp;
 
 	if( data == state->m_fontram[offset] )
-		return; 			   /* no change */
+		return;                /* no change */
 
 	/* store data */
 	state->m_fontram[offset] = data;

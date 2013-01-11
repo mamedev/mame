@@ -155,7 +155,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap,const r
 	UINT8 *src;
 	int i;
 
-	if (state->m_technos_video_hw == 1)		/* China Gate Sprite RAM */
+	if (state->m_technos_video_hw == 1)     /* China Gate Sprite RAM */
 		src = (UINT8 *) (state->m_spriteram);
 	else
 		src = (UINT8 *) (&(state->m_spriteram[0x800]));
@@ -175,14 +175,14 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap,const r
 			int which;
 			int color;
 
-			if (state->m_technos_video_hw == 2)		/* Double Dragon 2 */
+			if (state->m_technos_video_hw == 2)     /* Double Dragon 2 */
 			{
 				color = (src[i + 2] >> 5);
 				which = src[i + 3] + ((src[i + 2] & 0x1f) << 8);
 			}
 			else
 			{
-				if (state->m_technos_video_hw == 1)		/* China Gate */
+				if (state->m_technos_video_hw == 1)     /* China Gate */
 				{
 					if ((sx < -7) && (sx > -16)) sx += 256; /* fix sprite clip */
 					if ((sy < -7) && (sy > -16)) sy += 256; /* fix sprite clip */

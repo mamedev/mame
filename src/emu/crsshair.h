@@ -19,22 +19,22 @@
     CONSTANTS
 ***************************************************************************/
 
-#define CROSSHAIR_SCREEN_NONE	((device_t *) 0)
-#define CROSSHAIR_SCREEN_ALL	((device_t *) ~0)
+#define CROSSHAIR_SCREEN_NONE   ((device_t *) 0)
+#define CROSSHAIR_SCREEN_ALL    ((device_t *) ~0)
 
 /* user settings for visibility mode */
-#define CROSSHAIR_VISIBILITY_OFF				0
-#define CROSSHAIR_VISIBILITY_ON					1
-#define CROSSHAIR_VISIBILITY_AUTO				2
-#define CROSSHAIR_VISIBILITY_DEFAULT			CROSSHAIR_VISIBILITY_AUTO
+#define CROSSHAIR_VISIBILITY_OFF                0
+#define CROSSHAIR_VISIBILITY_ON                 1
+#define CROSSHAIR_VISIBILITY_AUTO               2
+#define CROSSHAIR_VISIBILITY_DEFAULT            CROSSHAIR_VISIBILITY_AUTO
 
 /* range allowed for auto visibility */
-#define CROSSHAIR_VISIBILITY_AUTOTIME_MIN			0
-#define CROSSHAIR_VISIBILITY_AUTOTIME_MAX			50
-#define CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT		15
+#define CROSSHAIR_VISIBILITY_AUTOTIME_MIN           0
+#define CROSSHAIR_VISIBILITY_AUTOTIME_MAX           50
+#define CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT       15
 
 /* maximum crosshair pic filename size */
-#define CROSSHAIR_PIC_NAME_LENGTH				12
+#define CROSSHAIR_PIC_NAME_LENGTH               12
 
 
 
@@ -45,10 +45,10 @@
 /* user-controllable settings for a player */
 struct crosshair_user_settings
 {
-	UINT8			used;		/* is used */
-	UINT8			mode;		/* visibility mode */
-	UINT8			auto_time;	/* time in seconds to blank crosshair if no movement */
-	char			name[CROSSHAIR_PIC_NAME_LENGTH + 1];		/* bitmap name */
+	UINT8           used;       /* is used */
+	UINT8           mode;       /* visibility mode */
+	UINT8           auto_time;  /* time in seconds to blank crosshair if no movement */
+	char            name[CROSSHAIR_PIC_NAME_LENGTH + 1];        /* bitmap name */
 };
 
 
@@ -76,4 +76,4 @@ void crosshair_get_user_settings(running_machine &machine, UINT8 player, crossha
 void crosshair_set_user_settings(running_machine &machine, UINT8 player, crosshair_user_settings *settings);
 
 
-#endif	/* __CRSSHAIR_H__ */
+#endif  /* __CRSSHAIR_H__ */

@@ -434,9 +434,9 @@ OP_HANDLER( mul )
 OP_HANDLER( wai )
 {
 	/*
-     * WAI stacks the entire machine state on the
-     * hardware stack, then waits for an interrupt.
-     */
+	 * WAI stacks the entire machine state on the
+	 * hardware stack, then waits for an interrupt.
+	 */
 	cpustate->wai_state |= M6800_WAI;
 	PUSHWORD(pPC);
 	PUSHWORD(pX);
@@ -454,8 +454,8 @@ OP_HANDLER( swi )
 	PUSHWORD(pX);
 	PUSHBYTE(A);
 	PUSHBYTE(B);
-    PUSHBYTE(CC);
-    SEI;
+	PUSHBYTE(CC);
+	SEI;
 	PCD = RM16(cpustate, 0xfffa);
 }
 
@@ -949,7 +949,7 @@ OP_HANDLER( clr_ex )
 /* $80 SUBA immediate ?**** */
 OP_HANDLER( suba_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t); r = A-t;
 	CLR_NZVC; SET_FLAGS8(A,t,r);
 	A = r;
@@ -958,7 +958,7 @@ OP_HANDLER( suba_im )
 /* $81 CMPA immediate ?**** */
 OP_HANDLER( cmpa_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t); r = A-t;
 	CLR_NZVC; SET_FLAGS8(A,t,r);
 }
@@ -966,7 +966,7 @@ OP_HANDLER( cmpa_im )
 /* $82 SBCA immediate ?**** */
 OP_HANDLER( sbca_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t); r = A-t-(CC&0x01);
 	CLR_NZVC; SET_FLAGS8(A,t,r);
 	A = r;
@@ -1103,7 +1103,7 @@ OP_HANDLER( sts_im )
 /* $90 SUBA direct ?**** */
 OP_HANDLER( suba_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t); r = A-t;
 	CLR_NZVC; SET_FLAGS8(A,t,r);
 	A = r;
@@ -1112,7 +1112,7 @@ OP_HANDLER( suba_di )
 /* $91 CMPA direct ?**** */
 OP_HANDLER( cmpa_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t); r = A-t;
 	CLR_NZVC; SET_FLAGS8(A,t,r);
 }
@@ -1120,7 +1120,7 @@ OP_HANDLER( cmpa_di )
 /* $92 SBCA direct ?**** */
 OP_HANDLER( sbca_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t); r = A-t-(CC&0x01);
 	CLR_NZVC; SET_FLAGS8(A,t,r);
 	A = r;
@@ -1269,7 +1269,7 @@ OP_HANDLER( sts_di )
 /* $a0 SUBA indexed ?**** */
 OP_HANDLER( suba_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1280,7 +1280,7 @@ OP_HANDLER( suba_ix )
 /* $a1 CMPA indexed ?**** */
 OP_HANDLER( cmpa_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1290,7 +1290,7 @@ OP_HANDLER( cmpa_ix )
 /* $a2 SBCA indexed ?**** */
 OP_HANDLER( sbca_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = A - t - (CC&0x01);
 	CLR_NZVC;
@@ -1443,7 +1443,7 @@ OP_HANDLER( sts_ix )
 /* $b0 SUBA extended ?**** */
 OP_HANDLER( suba_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1454,7 +1454,7 @@ OP_HANDLER( suba_ex )
 /* $b1 CMPA extended ?**** */
 OP_HANDLER( cmpa_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A-t;
 	CLR_NZVC;
@@ -1464,7 +1464,7 @@ OP_HANDLER( cmpa_ex )
 /* $b2 SBCA extended ?**** */
 OP_HANDLER( sbca_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A-t-(CC&0x01);
 	CLR_NZVC;
@@ -1619,7 +1619,7 @@ OP_HANDLER( sts_ex )
 /* $c0 SUBB immediate ?**** */
 OP_HANDLER( subb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -1630,7 +1630,7 @@ OP_HANDLER( subb_im )
 /* $c1 CMPB immediate ?**** */
 OP_HANDLER( cmpb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -1640,7 +1640,7 @@ OP_HANDLER( cmpb_im )
 /* $c2 SBCB immediate ?**** */
 OP_HANDLER( sbcb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B-t-(CC&0x01);
 	CLR_NZVC;
@@ -1781,7 +1781,7 @@ OP_HANDLER( stx_im )
 /* $d0 SUBB direct ?**** */
 OP_HANDLER( subb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -1792,7 +1792,7 @@ OP_HANDLER( subb_di )
 /* $d1 CMPB direct ?**** */
 OP_HANDLER( cmpb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -1802,7 +1802,7 @@ OP_HANDLER( cmpb_di )
 /* $d2 SBCB direct ?**** */
 OP_HANDLER( sbcb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B-t-(CC&0x01);
 	CLR_NZVC;
@@ -1941,7 +1941,7 @@ OP_HANDLER( stx_di )
 /* $e0 SUBB indexed ?**** */
 OP_HANDLER( subb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -1952,7 +1952,7 @@ OP_HANDLER( subb_ix )
 /* $e1 CMPB indexed ?**** */
 OP_HANDLER( cmpb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -1962,7 +1962,7 @@ OP_HANDLER( cmpb_ix )
 /* $e2 SBCB indexed ?**** */
 OP_HANDLER( sbcb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IDXBYTE(t);
 	r = B-t-(CC&0x01);
 	CLR_NZVC;
@@ -2113,7 +2113,7 @@ OP_HANDLER( stx_ix )
 /* $f0 SUBB extended ?**** */
 OP_HANDLER( subb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -2124,7 +2124,7 @@ OP_HANDLER( subb_ex )
 /* $f1 CMPB extended ?**** */
 OP_HANDLER( cmpb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B-t;
 	CLR_NZVC;
@@ -2134,7 +2134,7 @@ OP_HANDLER( cmpb_ex )
 /* $f2 SBCB extended ?**** */
 OP_HANDLER( sbcb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B-t-(CC&0x01);
 	CLR_NZVC;

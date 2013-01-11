@@ -36,7 +36,7 @@ enum transfer_states
 };
 
 psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, PSXCARD, "Sony PSX Memory Card", tag, owner, clock)
+	: device_t(mconfig, PSXCARD, "Sony PSX Memory Card", tag, owner, clock)
 {
 }
 
@@ -117,7 +117,7 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 
 			switch (cmd)
 			{
-				case 'R':	// 0x52
+				case 'R':   // 0x52
 				{
 					pkt[0]=0x5c;
 					pkt[1]=0x5d;
@@ -131,7 +131,7 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 					state=state_read;
 					break;
 				}
-				case 'W':	// 0x57
+				case 'W':   // 0x57
 				{
 					pkt[0]=addr>>8;
 					pkt[1]=addr&0xff;

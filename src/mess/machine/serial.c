@@ -16,15 +16,15 @@ device_serial_port_interface::~device_serial_port_interface()
 
 serial_port_device::serial_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SERIAL_PORT, "Serial Port", tag, owner, clock),
-	  device_slot_interface(mconfig, *this),
-	  m_dev(NULL)
+		device_slot_interface(mconfig, *this),
+		m_dev(NULL)
 {
 }
 
 serial_port_device::serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_slot_interface(mconfig, *this),
-	  m_dev(NULL)
+		device_slot_interface(mconfig, *this),
+		m_dev(NULL)
 {
 }
 
@@ -133,4 +133,3 @@ WRITE_LINE_MEMBER( rs232_port_device::rts_w )
 		out_cts(state);
 	}
 }
-

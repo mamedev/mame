@@ -35,7 +35,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( gomoku_sound1_w );
 DECLARE_WRITE8_DEVICE_HANDLER( gomoku_sound2_w );
 
 class gomoku_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

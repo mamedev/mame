@@ -11,19 +11,19 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	/* ---- ----  xxxx xxxx  ---- ----  aaaa aaaa  ---- ----  NNNN NNNN  ---- ----  nnnn nnnn  ---- ----  yyyy yyyy (rest unused?) */
 
 	/* x = xpos LSB
-       y = ypos LSB
-       N = tile number MSB
-       n = tile number LSB
-       a = attribute / extra
-            f?XY cccc
+	   y = ypos LSB
+	   N = tile number MSB
+	   n = tile number LSB
+	   a = attribute / extra
+	        f?XY cccc
 
-        f = x-flip
-        ? = unknown, probably y-flip
-        X = xpos MSB
-        y = ypos MSB
-        c = colour
+	    f = x-flip
+	    ? = unknown, probably y-flip
+	    X = xpos MSB
+	    y = ypos MSB
+	    c = colour
 
-    */
+	*/
 
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 	const UINT16 *source = state->m_spriteram;
@@ -65,10 +65,10 @@ TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info1)
 	/* fF-- cccc  nnnn nnnn */
 
 	/* c = colour?
-       n = number?
-       F = flip-X
-       f = flip-Y
-    */
+	   n = number?
+	   F = flip-X
+	   f = flip-Y
+	*/
 
 	int tileno, colour, fx;
 
@@ -92,10 +92,10 @@ TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info2)
 	/* fF-- cccc  nnnn nnnn */
 
 	/* c = colour?
-       n = number?
-       F = flip-X
-       f = flip-Y
-    */
+	   n = number?
+	   F = flip-X
+	   f = flip-Y
+	*/
 
 	int tileno, colour, fx;
 

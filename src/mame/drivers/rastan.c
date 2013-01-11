@@ -207,8 +207,8 @@ static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x350008, 0x350009) AM_WRITENOP	/* 0 only (often) ? */
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)	/* sprite palette bank, coin counters & lockout */
+	AM_RANGE(0x350008, 0x350009) AM_WRITENOP    /* 0 only (often) ? */
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)  /* sprite palette bank, coin counters & lockout */
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("P1")
 	AM_RANGE(0x390002, 0x390003) AM_READ_PORT("P2")
 	AM_RANGE(0x390004, 0x390005) AM_READ_PORT("SPECIAL")
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
 	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram */
 ADDRESS_MAP_END
 
 
@@ -269,30 +269,30 @@ static INPUT_PORTS_START( rastan )
 
 	/* 0x390008 -> 0x10c018 ($18,A5) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )	/* Normally Demo Sound, but not used */
+	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )    /* Normally Demo Sound, but not used */
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )
 	TAITO_COINAGE_WORLD_LOC(SW1)
 
 	/* 0x39000a -> 0x10c01c ($1c,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")           /* table at 0x059f2e */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")           /* table at 0x059f2e */
 	PORT_DIPSETTING(    0x0c, "100k 200k 400k 600k 800k" )
 	PORT_DIPSETTING(    0x08, "150k 300k 600k 900k 1200k" )
 	PORT_DIPSETTING(    0x04, "200k 400k 800k 1200k 1600k" )
 	PORT_DIPSETTING(    0x00, "250k 500k 1000k 1500k 2000k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
@@ -340,8 +340,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	rastan_msm5205_vck,	/* VCK function */
-	MSM5205_S48_4B		/* 8 kHz */
+	rastan_msm5205_vck, /* VCK function */
+	MSM5205_S48_4B      /* 8 kHz */
 };
 
 void rastan_state::machine_start()
@@ -375,8 +375,8 @@ void rastan_state::machine_reset()
 
 static const pc080sn_interface rastan_pc080sn_intf =
 {
-	0,	 /* gfxnum */
-	0, 0, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
+	0,   /* gfxnum */
+	0, 0, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const pc090oj_interface rastan_pc090oj_intf =
@@ -392,14 +392,14 @@ static const tc0140syt_interface rastan_tc0140syt_intf =
 static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rastan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rastan_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rastan_s_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 
 	/* video hardware */
@@ -419,13 +419,13 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)	/* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rastan_state,rastan_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)	/* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
@@ -448,7 +448,7 @@ B04-43-1    0x00    0x00
 B04-43      0x01    0x03
 */
 ROM_START( rastan )
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-38.19",  0x00000, 0x10000, CRC(1c91dbb1) SHA1(17fc55e8546cc0b847aebd67fb4570a1e9f128f3) )
 	ROM_LOAD16_BYTE( "b04-37.7",   0x00001, 0x10000, CRC(ecf20bdd) SHA1(92e46b1edef40a19be17091c09daba598d77bca8) )
 	ROM_LOAD16_BYTE( "b04-40.20",  0x20000, 0x10000, CRC(0930d4b3) SHA1(c269b3856040ed9409de99cca48f22a2f355fc4c) )
@@ -472,12 +472,12 @@ ROM_START( rastan )
 	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
 	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* MSM5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* MSM5205 samples */
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
 ROM_END
 
 ROM_START( rastana )
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-38.19", 0x00000, 0x10000, CRC(1c91dbb1) SHA1(17fc55e8546cc0b847aebd67fb4570a1e9f128f3) )
 	ROM_LOAD16_BYTE( "b04-37.7",  0x00001, 0x10000, CRC(ecf20bdd) SHA1(92e46b1edef40a19be17091c09daba598d77bca8) )
 	ROM_LOAD16_BYTE( "b04-40.20", 0x20000, 0x10000, CRC(0930d4b3) SHA1(c269b3856040ed9409de99cca48f22a2f355fc4c) )
@@ -501,7 +501,7 @@ ROM_START( rastana )
 	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
 	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* 64k for the samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* 64k for the samples */
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) ) /* samples are 4bit ADPCM */
 ROM_END
 
@@ -513,7 +513,7 @@ B04-41-1    0x00    0x00 <-- Same changes as seen with the World set's B04-43-1.
 B04-41      0x01    0x03
 */
 ROM_START( rastanu ) /* This US set is based on newer code */
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-38.19",  0x00000, 0x10000, CRC(1c91dbb1) SHA1(17fc55e8546cc0b847aebd67fb4570a1e9f128f3) )
 	ROM_LOAD16_BYTE( "b04-37.7",   0x00001, 0x10000, CRC(ecf20bdd) SHA1(92e46b1edef40a19be17091c09daba598d77bca8) )
 	ROM_LOAD16_BYTE( "b04-45.20",  0x20000, 0x10000, CRC(362812dd) SHA1(f7df037ef423d931ca780b34813d4e9e4db67054) )
@@ -537,12 +537,12 @@ ROM_START( rastanu ) /* This US set is based on newer code */
 	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
 	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* MSM5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* MSM5205 samples */
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
 ROM_END
 
 ROM_START( rastanua ) /* This US set is based on newer code */
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-38.19", 0x00000, 0x10000, CRC(1c91dbb1) SHA1(17fc55e8546cc0b847aebd67fb4570a1e9f128f3) )
 	ROM_LOAD16_BYTE( "b04-37.7",  0x00001, 0x10000, CRC(ecf20bdd) SHA1(92e46b1edef40a19be17091c09daba598d77bca8) )
 	ROM_LOAD16_BYTE( "b04-45.20", 0x20000, 0x10000, CRC(362812dd) SHA1(f7df037ef423d931ca780b34813d4e9e4db67054) )
@@ -566,7 +566,7 @@ ROM_START( rastanua ) /* This US set is based on newer code */
 	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
 	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* MSM5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* MSM5205 samples */
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
 ROM_END
 
@@ -581,7 +581,7 @@ These US & Japan sets didn't use a region code byte (see above) so the changes a
 pointers to the copyright string.
 */
 ROM_START( rastanub ) /* This US set is based on the earlier code */
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-14.19", 0x00000, 0x10000, CRC(a38ac909) SHA1(66d792fee03c6bd87d15060b9d5cae74137c5ebd) ) /* This is the correct verfied ROM number */
 	ROM_LOAD16_BYTE( "b04-21.7",  0x00001, 0x10000, CRC(7c8dde9a) SHA1(0cfc3b4f3bc7b940a6c07267ac95e4aae25801ea) ) /* 2 bytes differ from the Japan set */
 	ROM_LOAD16_BYTE( "b04-23.20", 0x20000, 0x10000, CRC(254b3dce) SHA1(5126cd5268abaa78dfdcd2ca70621c093c79be67) )
@@ -605,12 +605,12 @@ ROM_START( rastanub ) /* This US set is based on the earlier code */
 	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
 	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* MSM5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* MSM5205 samples */
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
 ROM_END
 
 ROM_START( rastsaga )
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-14.19",   0x00000, 0x10000, CRC(a38ac909) SHA1(66d792fee03c6bd87d15060b9d5cae74137c5ebd) )
 	ROM_LOAD16_BYTE( "b04-13.7",    0x00001, 0x10000, CRC(bad60872) SHA1(e020f79b3ac3d2abccfcd5d135d2dc49e1335c7d) )
 	ROM_LOAD16_BYTE( "b04-16-1.20", 0x20000, 0x10000, CRC(00b59e60) SHA1(545ab3eb9ef25c532dda5a9eec087665ba0cecc1) )
@@ -634,7 +634,7 @@ ROM_START( rastsaga )
 	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
 	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* MSM5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* MSM5205 samples */
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
 ROM_END
 
@@ -663,7 +663,7 @@ ROM_START( rastsagaa )
 	ROM_LOAD( "b04-06.28", 0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
 	ROM_LOAD( "b04-08.27", 0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )	/* MSM5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )   /* MSM5205 samples */
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
 ROM_END
 

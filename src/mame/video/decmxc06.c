@@ -49,7 +49,7 @@ const device_type DECO_MXC06 = &device_creator<deco_mxc06_device>;
 
 deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_MXC06, "decmxc06_device", tag, owner, clock),
-	  m_gfxregion(0)
+		m_gfxregion(0)
 {
 }
 
@@ -72,8 +72,8 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 
 		flipx = sy & 0x2000;
 		flipy = sy & 0x4000;
-		h = (1 << ((sy & 0x1800) >> 11));	/* 1x, 2x, 4x, 8x height */
-		w = (1 << ((sy & 0x0600) >>  9));	/* 1x, 2x, 4x, 8x width */
+		h = (1 << ((sy & 0x1800) >> 11));   /* 1x, 2x, 4x, 8x height */
+		w = (1 << ((sy & 0x0600) >>  9));   /* 1x, 2x, 4x, 8x width */
 		/* multi width used only on the title screen? */
 
 
@@ -152,7 +152,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 
 			offs += 4;
 			if (offs >= 0x800 / 2)
-				 return;
+					return;
 		}
 	}
 }
@@ -200,4 +200,3 @@ void deco_mxc06_device::device_reset()
 {
 
 }
-

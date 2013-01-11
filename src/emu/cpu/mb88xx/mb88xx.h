@@ -10,7 +10,7 @@
 #pragma once
 
 #ifndef __MB88XX_H__
-#define	__MB88XX_H__
+#define __MB88XX_H__
 
 
 /***************************************************************************
@@ -19,14 +19,14 @@
 
 enum
 {
-	MB88_PORTK = 0,	/* input only, 4 bits */
-	MB88_PORTO,		/* output only, PLA function output */
-	MB88_PORTP,		/* 4 bits */
-	MB88_PORTR0,	/* R0-R3, 4 bits */
-	MB88_PORTR1,	/* R4-R7, 4 bits */
-	MB88_PORTR2,	/* R8-R11, 4 bits */
-	MB88_PORTR3,	/* R12-R15, 4 bits */
-	MB88_PORTSI		/* SI, 1 bit */
+	MB88_PORTK = 0, /* input only, 4 bits */
+	MB88_PORTO,     /* output only, PLA function output */
+	MB88_PORTP,     /* 4 bits */
+	MB88_PORTR0,    /* R0-R3, 4 bits */
+	MB88_PORTR1,    /* R4-R7, 4 bits */
+	MB88_PORTR2,    /* R8-R11, 4 bits */
+	MB88_PORTR3,    /* R12-R15, 4 bits */
+	MB88_PORTSI     /* SI, 1 bit */
 };
 
 /***************************************************************************
@@ -48,7 +48,7 @@ enum
 	MB88_SB
 };
 
-#define MB88_IRQ_LINE		0
+#define MB88_IRQ_LINE       0
 
 /***************************************************************************
     CONFIG STRUCTURE
@@ -56,7 +56,7 @@ enum
 
 struct mb88_cpu_core
 {
-	UINT8		*PLA_config;		/* PLA configuration (32 byte values), if NULL assume direct output */
+	UINT8       *PLA_config;        /* PLA configuration (32 byte values), if NULL assume direct output */
 };
 
 /***************************************************************************

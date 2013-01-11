@@ -4,14 +4,14 @@
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 
-#define LVIV_LVT_BIT_SAMPLES				60
-#define LVIV_LVT_HEADER_PILOT_SAMPLES		5190*60
-#define LVIV_LVT_HEADER_DATA_SAMPLES		16*11*60
-#define LVIV_LVT_PAUSE_SAMPLES				69370
-#define LVIV_LVT_BLOCK_PILOT_SAMPLES		1298*60
+#define LVIV_LVT_BIT_SAMPLES                60
+#define LVIV_LVT_HEADER_PILOT_SAMPLES       5190*60
+#define LVIV_LVT_HEADER_DATA_SAMPLES        16*11*60
+#define LVIV_LVT_PAUSE_SAMPLES              69370
+#define LVIV_LVT_BLOCK_PILOT_SAMPLES        1298*60
 
-#define LVIV_LVT_HEADER_PILOT_LENGTH		5190
-#define LVIV_LVT_BLOCK_PILOT_LENGTH			1298
+#define LVIV_LVT_HEADER_PILOT_LENGTH        5190
+#define LVIV_LVT_BLOCK_PILOT_LENGTH         1298
 
 static INT16 *lviv_emit_level(INT16 *p, int count, int level)
 {
@@ -38,7 +38,7 @@ static INT16* lviv_output_bit(INT16 *p, UINT8 b)
 		p = lviv_emit_level (p, 30, WAVEENTRY_HIGH);
 		p = lviv_emit_level (p, 30, WAVEENTRY_LOW);
 	}
-    	return p;
+		return p;
 }
 
 static INT16* lviv_output_byte(INT16 *p, UINT8 byte)
@@ -94,9 +94,9 @@ static int lviv_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 		p = lviv_output_bit (p, 1);
 
 	data_size = length - ( LVIV_LVT_HEADER_PILOT_SAMPLES +
-			       LVIV_LVT_HEADER_DATA_SAMPLES +
-		               LVIV_LVT_PAUSE_SAMPLES +
-			       LVIV_LVT_BLOCK_PILOT_SAMPLES );
+					LVIV_LVT_HEADER_DATA_SAMPLES +
+						LVIV_LVT_PAUSE_SAMPLES +
+					LVIV_LVT_BLOCK_PILOT_SAMPLES );
 	data_size/=660;
 
 	for (i=0; i<data_size; i++)
@@ -109,13 +109,13 @@ static int lviv_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller lviv_legacy_fill_wave =
 {
-	lviv_cassette_fill_wave,					/* fill_wave */
-	-1,											/* chunk_size */
-	0,											/* chunk_samples */
-	lviv_cassette_calculate_size_in_samples,	/* chunk_sample_calc */
-	44100,										/* sample_frequency */
-	0,											/* header_samples */
-	0											/* trailer_samples */
+	lviv_cassette_fill_wave,                    /* fill_wave */
+	-1,                                         /* chunk_size */
+	0,                                          /* chunk_samples */
+	lviv_cassette_calculate_size_in_samples,    /* chunk_sample_calc */
+	44100,                                      /* sample_frequency */
+	0,                                          /* header_samples */
+	0                                           /* trailer_samples */
 };
 
 

@@ -33,37 +33,37 @@ typedef void (*h63484_display_pixels_func)(device_t *device, bitmap_ind16 &bitma
 
 struct h63484_interface
 {
-	const char *m_screen_tag;		/* screen we are acting on */
-	h63484_display_pixels_func	m_display_cb;
+	const char *m_screen_tag;       /* screen we are acting on */
+	h63484_display_pixels_func  m_display_cb;
 };
 
 // ======================> upd7220_device
 
-class h63484_device :	public device_t,
+class h63484_device :   public device_t,
 						public device_memory_interface,
-                        public h63484_interface
+						public h63484_interface
 {
 public:
-    // construction/destruction
-    h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_WRITE16_MEMBER( address_w );
-    DECLARE_WRITE16_MEMBER( data_w );
+	DECLARE_WRITE16_MEMBER( address_w );
+	DECLARE_WRITE16_MEMBER( data_w );
 
-    DECLARE_READ16_MEMBER( status_r );
-    DECLARE_READ16_MEMBER( data_r );
+	DECLARE_READ16_MEMBER( status_r );
+	DECLARE_READ16_MEMBER( data_r );
 
-    DECLARE_READ8_MEMBER( vram_r );
-    DECLARE_WRITE8_MEMBER( vram_w );
+	DECLARE_READ8_MEMBER( vram_r );
+	DECLARE_WRITE8_MEMBER( vram_w );
 
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
@@ -99,16 +99,16 @@ private:
 	UINT8 m_vreg[0x100];
 	UINT8 m_sr;
 
-	UINT8 m_fifo[16];					/* FIFO W data queue */
-	int m_fifo_ptr;					/* FIFO W pointer */
+	UINT8 m_fifo[16];                   /* FIFO W data queue */
+	int m_fifo_ptr;                 /* FIFO W pointer */
 
-	UINT8 m_fifo_r[16];				/* FIFO R data queue */
-	int m_fifo_r_ptr;					/* FIFO R pointer */
+	UINT8 m_fifo_r[16];             /* FIFO R data queue */
+	int m_fifo_r_ptr;                   /* FIFO R pointer */
 
 
 	UINT16 m_cr;
-	UINT16 m_pr[0x10];					/* parameter byte register */
-	int m_param_ptr;					/* parameter pointer */
+	UINT16 m_pr[0x10];                  /* parameter byte register */
+	int m_param_ptr;                    /* parameter pointer */
 
 	UINT32 m_rwp[4];
 	UINT8 m_rwp_dn;
@@ -140,12 +140,10 @@ private:
 	UINT16 m_vc, m_vws, m_vww, m_vds;
 	UINT8 m_vsw;
 
-	const address_space_config		m_space_config;
+	const address_space_config      m_space_config;
 };
 
 // device type definition
 extern const device_type H63484;
 
 #endif /* __H63484_H__ */
-
-

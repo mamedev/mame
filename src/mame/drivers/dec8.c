@@ -377,8 +377,8 @@ WRITE8_MEMBER(dec8_state::srdarwin_i8751_w)
 
 	if (m_i8751_value == 0x0000) m_i8751_return = 0;    /* ??? */
 
-	if (m_i8751_value == 0x3063)	{ m_i8751_return = 0x9c; m_coinage_id = 0; }  /* Japanese version ID */
-	if (m_i8751_value == 0x306b)	{ m_i8751_return = 0x94; m_coinage_id = 1; }  /* World version ID */
+	if (m_i8751_value == 0x3063)    { m_i8751_return = 0x9c; m_coinage_id = 0; }  /* Japanese version ID */
+	if (m_i8751_value == 0x306b)    { m_i8751_return = 0x94; m_coinage_id = 1; }  /* World version ID */
 
 	if ((m_i8751_value >> 8) == 0x40) /* Coinage settings */
 	{
@@ -452,11 +452,11 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 {
 
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
-       Bit 1: NMI enable/disable
-       Bit 2: Not connected according to schematics
-       Bit 3: Screen flip
-       Bits 4-7: Bank switch
-    */
+	   Bit 1: NMI enable/disable
+	   Bit 2: Not connected according to schematics
+	   Bit 3: Screen flip
+	   Bits 4-7: Bank switch
+	*/
 
 	membank("bank1")->set_entry(data >> 4);
 
@@ -468,12 +468,12 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 WRITE8_MEMBER(dec8_state::csilver_control_w)
 {
 	/*
-        Bit 0x0f - ROM bank switch.
-        Bit 0x10 - Always set(?)
-        Bit 0x20 - Unused.
-        Bit 0x40 - Unused.
-        Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
-    */
+	    Bit 0x0f - ROM bank switch.
+	    Bit 0x10 - Always set(?)
+	    Bit 0x20 - Unused.
+	    Bit 0x40 - Unused.
+	    Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
+	*/
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
@@ -569,8 +569,8 @@ static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")	/* Dip 1 */
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
+	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")   /* Dip 1 */
+	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")   /* Dip 2 */
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
@@ -595,8 +595,8 @@ static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")	/* Dip 1 */
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
+	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")   /* Dip 1 */
+	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")   /* Dip 2 */
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -663,13 +663,13 @@ static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
 	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")	/* Sprites */
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")		/* Dip 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")		/* Dip 2 */
-	AM_RANGE(0x380a, 0x380b) AM_READ(gondo_player_1_r)	/* Player 1 rotary */
-	AM_RANGE(0x380c, 0x380d) AM_READ(gondo_player_2_r)	/* Player 2 rotary */
-	AM_RANGE(0x380e, 0x380e) AM_READ_PORT("IN3")		/* VBL */
-	AM_RANGE(0x380f, 0x380f) AM_READ_PORT("IN2")		/* Fire buttons */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")   /* Sprites */
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")       /* Dip 1 */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")       /* Dip 2 */
+	AM_RANGE(0x380a, 0x380b) AM_READ(gondo_player_1_r)  /* Player 1 rotary */
+	AM_RANGE(0x380c, 0x380d) AM_READ(gondo_player_2_r)  /* Player 2 rotary */
+	AM_RANGE(0x380e, 0x380e) AM_READ_PORT("IN3")        /* VBL */
+	AM_RANGE(0x380f, 0x380f) AM_READ_PORT("IN2")        /* Fire buttons */
 	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3818, 0x382f) AM_WRITE(gondo_scroll_w)
 	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
@@ -687,11 +687,11 @@ static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x3808, 0x3808) AM_READNOP		/* ? */
-	AM_RANGE(0x380a, 0x380a) AM_READ_PORT("IN1")	/* Player 2 + VBL */
-	AM_RANGE(0x380b, 0x380b) AM_READ_PORT("IN0")	/* Player 1 */
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")   /* Dip 1 */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")   /* Dip 2 */
+	AM_RANGE(0x3808, 0x3808) AM_READNOP     /* ? */
+	AM_RANGE(0x380a, 0x380a) AM_READ_PORT("IN1")    /* Player 2 + VBL */
+	AM_RANGE(0x380b, 0x380b) AM_READ_PORT("IN0")    /* Player 1 */
 	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3818, 0x382f) AM_WRITE(gondo_scroll_w)
 	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
@@ -710,12 +710,12 @@ static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2800, 0x2bff) AM_RAM // colscroll? mirror?
 	AM_RANGE(0x2c00, 0x2fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_8bit_r, deco_bac06_pf_rowscroll_8bit_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")    /* Player 1 */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")	/* Player 3 */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")	/* Start buttons + VBL */
-	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")	/* Dip */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")    /* Player 2 */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")    /* Player 3 */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")   /* Start buttons + VBL */
+	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")   /* Dip */
 	AM_RANGE(0x3820, 0x3827) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3830, 0x383f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_r, deco_bac06_pf_control1_8bit_w)
 	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
@@ -733,7 +733,7 @@ static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN0")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
-	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
+	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")   /* Dip 2 */
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* Dip 1, DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -777,15 +777,15 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3c00, 0x3c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x3c01, 0x3c01) AM_READ_PORT("IN1")
-	AM_RANGE(0x3c02, 0x3c02) AM_READ_PORT("IN2")	/* VBL & coins */
-	AM_RANGE(0x3c03, 0x3c03) AM_READ_PORT("DSW0")	/* Dip 1 */
+	AM_RANGE(0x3c02, 0x3c02) AM_READ_PORT("IN2")    /* VBL & coins */
+	AM_RANGE(0x3c03, 0x3c03) AM_READ_PORT("DSW0")   /* Dip 1 */
 	AM_RANGE(0x3c04, 0x3c04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3c10, 0x3c1f) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_w)
-	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w)	/* DMA */
-	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)  		/* BNKS */
-	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w) 		/* SOUN */
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP			/* COINCL */
+	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w)   /* DMA */
+	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)          /* BNKS */
+	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w)         /* SOUN */
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP            /* COINCL */
 	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -806,18 +806,18 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_SHARE("bg_data")
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(srdarwin_i8751_w)
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)		/* Maybe.. */
-	AM_RANGE(0x1803, 0x1803) AM_WRITENOP			/* NMI ack */
+	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)        /* Maybe.. */
+	AM_RANGE(0x1803, 0x1803) AM_WRITENOP            /* NMI ack */
 	AM_RANGE(0x1804, 0x1804) AM_DEVWRITE("spriteram", buffered_spriteram8_device, write) /* DMA */
 	AM_RANGE(0x1805, 0x1806) AM_WRITE(srdarwin_control_w) /* Scroll & Bank */
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)	/* Sound */
-	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)		/* Flipscreen */
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)  /* Sound */
+	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)     /* Flipscreen */
 	AM_RANGE(0x2800, 0x288f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3000, 0x308f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")	/* Player 1 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")	/* Player 2 (cocktail) + VBL */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* Dip 2 */
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")   /* Dip 1 */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")    /* Player 1 */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")    /* Player 2 (cocktail) + VBL */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")   /* Dip 2 */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -831,13 +831,13 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3200, 0x37ff) AM_WRITEONLY /* Unused */
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW0")	/* Dip 1 */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* Dip 2 */
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")    /* Player 1 */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")    /* Player 2 */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW0")   /* Dip 1 */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")   /* Dip 2 */
 	AM_RANGE(0x3800, 0x3807) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3810, 0x381f) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2")	/* VBL & coins */
+	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2")    /* VBL & coins */
 	AM_RANGE(0x3a00, 0x3a07) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3a10, 0x3a1f) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control1_8bit_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(dec8_bank_w)
@@ -881,10 +881,10 @@ static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w) /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x3400, 0x3400) AM_READ(csilver_adpcm_reset_r)	/* ? not sure */
+	AM_RANGE(0x3400, 0x3400) AM_READ(csilver_adpcm_reset_r) /* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1085,7 +1085,7 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )	                /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
+	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                 /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
@@ -1172,17 +1172,17 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("I8751")	/* hooked up on the i8751 */
+	PORT_START("I8751") /* hooked up on the i8751 */
 	/* Low 4 bits not connected on schematics */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produces sound but gives 0 credits - coinage not initialised in the MCU */
 
-	PORT_START("AN0")	/* player 1 12-way rotary control */
+	PORT_START("AN0")   /* player 1 12-way rotary control */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
-	PORT_START("AN1")	/* player 2 12-way rotary control */
+	PORT_START("AN1")   /* player 2 12-way rotary control */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("DSW0")
@@ -1243,7 +1243,7 @@ static INPUT_PORTS_START( garyoret )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("I8751")	/* hooked up on the (fake) i8751 */
+	PORT_START("I8751") /* hooked up on the (fake) i8751 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1281,7 +1281,7 @@ static INPUT_PORTS_START( garyoret )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )	                /* game doesn't boot when this is On - code at 0x807f and test at 0x819e */
+	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )                 /* game doesn't boot when this is On - code at 0x807f and test at 0x819e */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
@@ -1781,7 +1781,7 @@ static const gfx_layout charlayout_32k =
 	{ 0x4000*8,0x0000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every sprite takes 8 consecutive bytes */
+	8*8 /* every sprite takes 8 consecutive bytes */
 };
 
 static const gfx_layout chars_3bpp =
@@ -1792,19 +1792,19 @@ static const gfx_layout chars_3bpp =
 	{ 0x6000*8,0x4000*8,0x2000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every sprite takes 8 consecutive bytes */
+	8*8 /* every sprite takes 8 consecutive bytes */
 };
 
 /* SRDarwin characters - very unusual layout for Data East */
 static const gfx_layout charlayout_16k =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	1024,
-	2,	/* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
+	2,  /* 2 bits per pixel */
+	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
 	{ 0x2000*8+0, 0x2000*8+1, 0x2000*8+2, 0x2000*8+3, 0, 1, 2, 3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout oscar_charlayout =
@@ -1815,7 +1815,7 @@ static const gfx_layout oscar_charlayout =
 	{ 0x3000*8,0x2000*8,0x1000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every sprite takes 8 consecutive bytes */
+	8*8 /* every sprite takes 8 consecutive bytes */
 };
 
 /* Darwin sprites - only 3bpp */
@@ -1841,7 +1841,7 @@ static const gfx_layout srdarwin_tiles =
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+1024*8*8+0, 16*8+1024*8*8+1, 16*8+1024*8*8+2, 16*8+1024*8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every tile takes 32 consecutive bytes */
+	32*8    /* every tile takes 32 consecutive bytes */
 };
 
 static const gfx_layout tiles =
@@ -1871,20 +1871,20 @@ static const gfx_layout tiles_r =
 
 static GFXDECODE_START( cobracom )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_32k, 0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles,		 64, 4 )
-	GFXDECODE_ENTRY( "gfx4", 0, tiles,		128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles,		192, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles,       64, 4 )
+	GFXDECODE_ENTRY( "gfx4", 0, tiles,      128, 4 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles,      192, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( ghostb )
-	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp,	0,  4 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles,	 256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp, 0,  4 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles_r,   512, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( srdarwin )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout_16k,128, 4 ) /* Only 1 used so far :/ */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sr_sprites,	 64, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sr_sprites,    64, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, srdarwin_tiles,  0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x10000, srdarwin_tiles,  0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x20000, srdarwin_tiles,  0, 8 )
@@ -1893,20 +1893,20 @@ GFXDECODE_END
 
 static GFXDECODE_START( gondo )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp,  0, 16 ) /* Chars */
-	GFXDECODE_ENTRY( "gfx2", 0, tiles,	 256, 32 ) /* Sprites */
-	GFXDECODE_ENTRY( "gfx3", 0, tiles,	 768, 16 ) /* Tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, tiles,   256, 32 ) /* Sprites */
+	GFXDECODE_ENTRY( "gfx3", 0, tiles,   768, 16 ) /* Tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( oscar )
 	GFXDECODE_ENTRY( "gfx1", 0, oscar_charlayout, 256,  8 ) /* Chars */
-	GFXDECODE_ENTRY( "gfx2", 0, tiles,			  0, 16 ) /* Sprites */
-	GFXDECODE_ENTRY( "gfx3", 0, tiles,			384,  8 ) /* Tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, tiles,            0, 16 ) /* Sprites */
+	GFXDECODE_ENTRY( "gfx3", 0, tiles,          384,  8 ) /* Tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( shackled )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp,   0,  4 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles,	  256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles,	  768, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles,    256, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles,    768, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -1930,8 +1930,8 @@ static const ym3812_interface ym3812_config =
 
 static const msm5205_interface msm5205_config =
 {
-	csilver_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B		/* 8KHz            */
+	csilver_adpcm_int,  /* interrupt function */
+	MSM5205_S48_4B      /* 8KHz            */
 };
 
 /******************************************************************************/
@@ -2694,7 +2694,7 @@ ROM_START( gondo )
 	ROM_LOAD( "dt-11.256", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) )	/* BPROM type MB7122E for Priority (Not yet used) */
+	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 ROM_END
 
 ROM_START( makyosen )
@@ -2738,7 +2738,7 @@ ROM_START( makyosen )
 	ROM_LOAD( "dt-11.256",0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) ) // ds11.h15
 
 	ROM_REGION( 1024, "proms", 0 )
-	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) )	/* BPROM type MB7122E for Priority (Not yet used) */
+	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16r4nc.u10", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -3195,12 +3195,12 @@ ROM_START( csilver )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
 	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
-    /* 0x10000-0x1ffff empy */
+	/* 0x10000-0x1ffff empy */
 	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
-    /* 0x30000-0x3ffff empy */
+	/* 0x30000-0x3ffff empy */
 	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
-    /* 0x50000-0x5ffff empy */
-    /* 0x60000-0x7ffff empy (no 4th plane) */
+	/* 0x50000-0x5ffff empy */
+	/* 0x60000-0x7ffff empy (no 4th plane) */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
 	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
@@ -3233,12 +3233,12 @@ ROM_START( csilverj )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
 	ROM_LOAD( "dx14.b5",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
-    /* 0x10000-0x1ffff empy */
+	/* 0x10000-0x1ffff empy */
 	ROM_LOAD( "dx13.b4",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
-    /* 0x30000-0x3ffff empy */
+	/* 0x30000-0x3ffff empy */
 	ROM_LOAD( "dx12.b3",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
-    /* 0x50000-0x5ffff empy */
-    /* 0x60000-0x7ffff empy (no 4th plane) */
+	/* 0x50000-0x5ffff empy */
+	/* 0x60000-0x7ffff empy (no 4th plane) */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
 	ROM_LOAD( "dx06.a7",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
@@ -3461,16 +3461,16 @@ ROM_START( cobracom )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "el10-4.bin",  0x8000,  0x8000,  CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )	/* characters */
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
 	ROM_LOAD( "el00-4.bin",  0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
 	ROM_LOAD( "el01-4.bin",  0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
 	ROM_LOAD( "el02-4.bin",  0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
 	ROM_LOAD( "el03-4.bin",  0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles 1 */
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
 	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
 	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
 	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )

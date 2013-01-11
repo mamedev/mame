@@ -224,7 +224,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_16MHz
+#define MASTER_CLOCK    XTAL_16MHz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -288,13 +288,13 @@ WRITE8_MEMBER(gatron_state::output_port_0_w)
     .x.. .... --> Stand/FreeBonusDraw.
 
 */
-	output_set_lamp_value(0, (data) & 1);		/* hold3 lamp */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* hold4 lamp */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* hold5 lamp */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* ante/bet lamp */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* start lamp */
-	output_set_lamp_value(5, (data >> 5) & 1);	/* deal/hit lamp */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* stand/fbdraw lamp */
+	output_set_lamp_value(0, (data) & 1);       /* hold3 lamp */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* hold4 lamp */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* hold5 lamp */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* ante/bet lamp */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* start lamp */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* deal/hit lamp */
+	output_set_lamp_value(6, (data >> 6) & 1);  /* stand/fbdraw lamp */
 }
 
 
@@ -313,8 +313,8 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
     x... .... --> Inverted pulse. Related to counters.
 
 */
-	output_set_lamp_value(7, (data) & 1);		/* hold2 lamp */
-	output_set_lamp_value(8, (data >> 1) & 1);	/* hold1 lamp */
+	output_set_lamp_value(7, (data) & 1);       /* hold2 lamp */
+	output_set_lamp_value(8, (data >> 1) & 1);  /* hold1 lamp */
 }
 
 
@@ -324,12 +324,12 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(gatron_state,output_port_1_w)	/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),        /* Port A read */
+	DEVCB_NULL,                     /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),        /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_DRIVER_MEMBER(gatron_state,output_port_1_w)   /* Port C write */
 };
 
 
@@ -340,9 +340,9 @@ static I8255A_INTERFACE( ppi8255_intf )
 static ADDRESS_MAP_START( gat_map, AS_PROGRAM, 8, gatron_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76496_device, write)							/* PSG */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)										/* lamps */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76496_device, write)                            /* PSG */
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)                                      /* lamps */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gat_portmap, AS_IO, 8, gatron_state )
@@ -360,7 +360,7 @@ static INPUT_PORTS_START( poker41 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Ante")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Hit")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Free Bonus Draw / Stand")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5 / High / Double Down")
@@ -370,7 +370,7 @@ static INPUT_PORTS_START( poker41 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Service 2 (Test Mode Out / Coin Stuck)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Payout? */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Payout? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service 1 (Test/Settings)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( pulltabs )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ante") PORT_CODE(KEYCODE_1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(2)	/* Coin A */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_IMPULSE(2) /* Coin A */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Big Bar Ticket") PORT_CODE(KEYCODE_C)
@@ -408,13 +408,13 @@ static const gfx_layout charlayout =
 {
 
 	8, 16,
-	RGN_FRAC(1,3),	/* 256 tiles */
+	RGN_FRAC(1,3),  /* 256 tiles */
 	3,
 	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	16*8	/* every char takes 16 consecutive bytes */
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	16*8    /* every char takes 16 consecutive bytes */
 
 };
 
@@ -434,7 +434,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -445,7 +445,7 @@ static const sn76496_config psg_intf =
 static MACHINE_CONFIG_START( gat, gatron_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)	/* 666.66 kHz, guess */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
 	MCFG_CPU_PROGRAM_MAP(gat_map)
 	MCFG_CPU_IO_MAP(gat_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gatron_state,  nmi_line_pulse)
@@ -467,7 +467,7 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8 )	/* 2 MHz, guess */
+	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8 )   /* 2 MHz, guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
@@ -479,23 +479,23 @@ MACHINE_CONFIG_END
 
 ROM_START( poker41 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "poker.u00",		0x0000, 0x2000, CRC(8361fccd) SHA1(4faae6bb3104c1f4a0939d613966085d7e34c1df))
-	ROM_LOAD( "poker-4-1.u08",	0x2000, 0x1000, CRC(61e71f31) SHA1(b8d162a47752cff7412b3920ec9dd7a469e81e62) )
+	ROM_LOAD( "poker.u00",      0x0000, 0x2000, CRC(8361fccd) SHA1(4faae6bb3104c1f4a0939d613966085d7e34c1df))
+	ROM_LOAD( "poker-4-1.u08",  0x2000, 0x1000, CRC(61e71f31) SHA1(b8d162a47752cff7412b3920ec9dd7a469e81e62) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "black.u33",		0x0000, 0x1000, CRC(3f8a2d59) SHA1(d61dce33aa8637105905830e2f37c1052c441194) )
-	ROM_LOAD( "poker-g.u32",	0x1000, 0x1000, CRC(3e7772b2) SHA1(c7499ff148e5a9cbf0958820c41ea09a843ab355) )
-	ROM_LOAD( "poker-r.u31",	0x2000, 0x1000, CRC(18d090ec) SHA1(3504f18b3984d16545dbe61a03fbf6b8e2027150) )
+	ROM_LOAD( "black.u33",      0x0000, 0x1000, CRC(3f8a2d59) SHA1(d61dce33aa8637105905830e2f37c1052c441194) )
+	ROM_LOAD( "poker-g.u32",    0x1000, 0x1000, CRC(3e7772b2) SHA1(c7499ff148e5a9cbf0958820c41ea09a843ab355) )
+	ROM_LOAD( "poker-r.u31",    0x2000, 0x1000, CRC(18d090ec) SHA1(3504f18b3984d16545dbe61a03fbf6b8e2027150) )
 ROM_END
 
 ROM_START( pulltabs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pull-tabs-1-90.u00",	0x0000, 0x2000, CRC(7cfd490d) SHA1(8eb360f8f4806a4281dae12236d30aa86d00993d) )
+	ROM_LOAD( "pull-tabs-1-90.u00", 0x0000, 0x2000, CRC(7cfd490d) SHA1(8eb360f8f4806a4281dae12236d30aa86d00993d) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "pt-3b-v.u33",	0x0000, 0x1000, CRC(3505cec1) SHA1(98ab0383c4be382aea81ab93433f2f29a075f65d) )
-	ROM_LOAD( "pt-2g-v.u32",	0x1000, 0x1000, CRC(4a3f4f36) SHA1(3dc29f78b7df1a433d0b39bfeaa227615e70ceed) )
-	ROM_LOAD( "pt-1r-v.u31",	0x2000, 0x1000, CRC(6d1b80f4) SHA1(f2da4b4ae1eb05f9ea02e7495ee8110698cc5d1b) )
+	ROM_LOAD( "pt-3b-v.u33",    0x0000, 0x1000, CRC(3505cec1) SHA1(98ab0383c4be382aea81ab93433f2f29a075f65d) )
+	ROM_LOAD( "pt-2g-v.u32",    0x1000, 0x1000, CRC(4a3f4f36) SHA1(3dc29f78b7df1a433d0b39bfeaa227615e70ceed) )
+	ROM_LOAD( "pt-1r-v.u31",    0x2000, 0x1000, CRC(6d1b80f4) SHA1(f2da4b4ae1eb05f9ea02e7495ee8110698cc5d1b) )
 ROM_END
 
 

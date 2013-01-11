@@ -213,14 +213,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	if (!state->m_sprite_pri_mask)
 		if (pri == 1)
-			return;	/* only low priority sprites in lastduel */
+			return; /* only low priority sprites in lastduel */
 
 	for (offs = 0x400 - 4; offs >= 0; offs -= 4)
 	{
 		int attr, sy, sx, flipx, flipy, code, color;
 
 		attr = buffered_spriteram16[offs + 1];
-		if (state->m_sprite_pri_mask)	/* only madgear seems to have this */
+		if (state->m_sprite_pri_mask)   /* only madgear seems to have this */
 		{
 			if (pri == 1 && (attr & state->m_sprite_pri_mask))
 				continue;
@@ -235,7 +235,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			sy -= 0x200;
 
 		flipx = attr & 0x20;
-		flipy = attr & state->m_sprite_flipy_mask;	/* 0x40 for lastduel, 0x80 for madgear */
+		flipy = attr & state->m_sprite_flipy_mask;  /* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
 		if (state->flip_screen())

@@ -24,11 +24,11 @@
  *
  *************************************/
 
-#define SEGA005_555_TIMER_FREQ		(1.44 / ((15000 + 2 * 4700) * 1.5e-6))
-#define SEGA005_COUNTER_FREQ		(100000)	/* unknown, just a guess */
+#define SEGA005_555_TIMER_FREQ      (1.44 / ((15000 + 2 * 4700) * 1.5e-6))
+#define SEGA005_COUNTER_FREQ        (100000)    /* unknown, just a guess */
 
 class sega005_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -49,7 +49,7 @@ const device_type SEGA005 = &device_creator<sega005_sound_device>;
 
 sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA005, "005 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -211,22 +211,22 @@ static SOUND_START( astrob );
 static const char *const astrob_sample_names[] =
 {
 	"*astrob",
-	"invadr1",		/* 0 */
-	"winvadr1",		/* 1 */
-	"invadr2",		/* 2 */
-	"winvadr2",		/* 3 */
-	"invadr3",		/* 4 */
-	"winvadr3",		/* 5 */
-	"invadr4",		/* 6 */
-	"winvadr4",		/* 7 */
-	"asteroid",		/* 8 */
-	"refuel",		/* 9 */
-	"pbullet",		/* 10 */
-	"ebullet",		/* 11 */
-	"eexplode",		/* 12 */
-	"pexplode",		/* 13 */
-	"deedle",		/* 14 */
-	"sonar",		/* 15 */
+	"invadr1",      /* 0 */
+	"winvadr1",     /* 1 */
+	"invadr2",      /* 2 */
+	"winvadr2",     /* 3 */
+	"invadr3",      /* 4 */
+	"winvadr3",     /* 5 */
+	"invadr4",      /* 6 */
+	"winvadr4",     /* 7 */
+	"asteroid",     /* 8 */
+	"refuel",       /* 9 */
+	"pbullet",      /* 10 */
+	"ebullet",      /* 11 */
+	"eexplode",     /* 12 */
+	"pexplode",     /* 13 */
+	"deedle",       /* 14 */
+	"sonar",        /* 15 */
 	0
 };
 
@@ -435,13 +435,13 @@ static TIMER_CALLBACK( sega005_auto_timer );
 static const char *const sega005_sample_names[] =
 {
 	"*005",
-	"lexplode",		/* 0 */
-	"sexplode",		/* 1 */
-	"dropbomb",		/* 2 */
-	"shoot",		/* 3 */
-	"missile",		/* 4 */
-	"helicopt",		/* 5 */
-	"whistle",		/* 6 */
+	"lexplode",     /* 0 */
+	"sexplode",     /* 1 */
+	"dropbomb",     /* 2 */
+	"shoot",        /* 3 */
+	"missile",      /* 4 */
+	"helicopt",     /* 5 */
+	"whistle",      /* 6 */
 	0
 };
 
@@ -455,12 +455,12 @@ static const samples_interface sega005_samples_interface =
 
 static I8255A_INTERFACE( ppi8255_005_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sega005_sound_a_w),	/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,sega005_sound_b_w),	/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(segag80r_state,sega005_sound_a_w),  /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(segag80r_state,sega005_sound_b_w),  /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 
@@ -565,11 +565,11 @@ INLINE void sega005_update_sound_data(running_machine &machine)
 WRITE8_MEMBER(segag80r_state::sega005_sound_b_w)
 {
 	/*
-           D6: manual timer clock (0->1)
-           D5: 0 = manual timer, 1 = auto timer
-           D4: 1 = hold/reset address counter to 0
-        D3-D0: upper 4 bits of ROM address
-    */
+	       D6: manual timer clock (0->1)
+	       D5: 0 = manual timer, 1 = auto timer
+	       D4: 1 = hold/reset address counter to 0
+	    D3-D0: upper 4 bits of ROM address
+	*/
 	UINT8 diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
@@ -669,17 +669,17 @@ static SOUND_START( spaceod );
 static const char *const spaceod_sample_names[] =
 {
 	"*spaceod",
-	"fire",			/* 0 */
-	"bomb",			/* 1 */
-	"eexplode", 	/* 2 */
-	"pexplode",		/* 3 */
-	"warp", 		/* 4 */
-	"birth",		/* 5 */
-	"scoreup",		/* 6 */
-	"ssound",		/* 7 */
-	"accel",		/* 8 */
-	"damaged",		/* 9 */
-	"erocket",		/* 10 */
+	"fire",         /* 0 */
+	"bomb",         /* 1 */
+	"eexplode",     /* 2 */
+	"pexplode",     /* 3 */
+	"warp",         /* 4 */
+	"birth",        /* 5 */
+	"scoreup",      /* 6 */
+	"ssound",       /* 7 */
+	"accel",        /* 8 */
+	"damaged",      /* 9 */
+	"erocket",      /* 10 */
 	0
 };
 
@@ -840,12 +840,12 @@ ADDRESS_MAP_END
 
 static I8255A_INTERFACE( monsterb_ppi_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,monsterb_sound_a_w),	/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,monsterb_sound_b_w),	/* Port B write */
-	DEVCB_DRIVER_MEMBER(segag80r_state,n7751_status_r),		/* Port C read */
-	DEVCB_DRIVER_MEMBER(segag80r_state,n7751_command_w)		/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(segag80r_state,monsterb_sound_a_w), /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(segag80r_state,monsterb_sound_b_w), /* Port B write */
+	DEVCB_DRIVER_MEMBER(segag80r_state,n7751_status_r),     /* Port C read */
+	DEVCB_DRIVER_MEMBER(segag80r_state,n7751_command_w)     /* Port C write */
 };
 
 
@@ -931,7 +931,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_sound_b_w)
 	/* DIVE: channel 1 */
 	if ((diff & 0x02) && !(data & 0x02)) samples->start(1, 1);
 
-    /* TODO: D7 on Port B might affect TMS3617 output (mute?) */
+	/* TODO: D7 on Port B might affect TMS3617 output (mute?) */
 }
 
 
@@ -951,11 +951,11 @@ READ8_MEMBER(segag80r_state::n7751_status_r)
 WRITE8_MEMBER(segag80r_state::n7751_command_w)
 {
 	/*
-        Z80 7751 control port
+	    Z80 7751 control port
 
-        D0-D2 = connected to 7751 port C
-        D3    = /INT line
-    */
+	    D0-D2 = connected to 7751 port C
+	    D3    = /INT line
+	*/
 	m_n7751_command = data & 0x07;
 	machine().device("audiocpu")->execute().set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));

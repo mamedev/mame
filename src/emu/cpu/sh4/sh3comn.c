@@ -620,7 +620,7 @@ WRITE32_HANDLER( sh3_internal_w )
 				{
 					if (mem_mask & 0xff000000)
 					{
-					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSMR2 - Serial Mode Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSMR2 - Serial Mode Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
 
 					if (mem_mask & 0x0000ff00)
@@ -634,7 +634,7 @@ WRITE32_HANDLER( sh3_internal_w )
 				{
 					if (mem_mask & 0xff000000)
 					{
-					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSCR2 - Serial Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSCR2 - Serial Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
 
 					if (mem_mask & 0x0000ff00)
@@ -648,7 +648,7 @@ WRITE32_HANDLER( sh3_internal_w )
 				{
 					if (mem_mask & 0xffff0000)
 					{
-					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSSR2 - Serial Status Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCSSR2 - Serial Status Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
 
 					if (mem_mask & 0x0000ff00)
@@ -662,7 +662,7 @@ WRITE32_HANDLER( sh3_internal_w )
 				{
 					if (mem_mask & 0xff000000)
 					{
-					  logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCFCR2 - Fifo Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
+						logerror("'%s' (%08x): SCIF internal write to %08x = %08x & %08x (SCFCR2 - Fifo Control Register 2)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);
 					}
 
 					if (mem_mask & 0x0000ffff)
@@ -694,4 +694,3 @@ WRITE32_HANDLER( sh3_internal_w )
 	}
 
 }
-

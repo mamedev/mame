@@ -16,7 +16,7 @@
 
 // ======================> pc_kbd_keytronic_pc3270_device
 
-class pc_kbd_keytronic_pc3270_device :	public device_t,
+class pc_kbd_keytronic_pc3270_device :  public device_t,
 										public device_pc_kbd_interface
 {
 public:
@@ -47,11 +47,11 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	UINT8	m_p1;
-	UINT8	m_p1_data;
-	UINT8	m_p2;
-	UINT8	m_p3;
-	UINT16	m_last_write_addr;
+	UINT8   m_p1;
+	UINT8   m_p1_data;
+	UINT8   m_p2;
+	UINT8   m_p3;
+	UINT16  m_last_write_addr;
 };
 
 

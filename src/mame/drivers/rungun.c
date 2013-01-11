@@ -56,10 +56,10 @@
 
 static const eeprom_interface eeprom_intf =
 {
-	7,			/* address bits */
-	8,			/* data bits */
-	"011000",		/*  read command */
-	"011100",		/* write command */
+	7,          /* address bits */
+	8,          /* data bits */
+	"011000",       /*  read command */
+	"011100",       /* write command */
 	"0100100000000",/* erase command */
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
@@ -91,10 +91,10 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 
 		case 0x04/2:
 			/*
-                bit0-7: coin mechs and services
-                bit8 : freeze
-                bit9 : joysticks layout(auto detect???)
-            */
+			    bit0-7: coin mechs and services
+			    bit8 : freeze
+			    bit9 : joysticks layout(auto detect???)
+			*/
 			return ioport("SYSTEM")->read();
 
 		case 0x06/2:
@@ -117,13 +117,13 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 	{
 		case 0x08/2:
 			/*
-                bit0  : eeprom_write_bit
-                bit1  : eeprom_set_cs_line
-                bit2  : eeprom_set_clock_line
-                bit3  : coin counter?
-                bit7  : set before massive memory writes
-                bit10 : IRQ5 ACK
-            */
+			    bit0  : eeprom_write_bit
+			    bit1  : eeprom_set_cs_line
+			    bit2  : eeprom_set_clock_line
+			    bit3  : coin counter?
+			    bit7  : set before massive memory writes
+			    bit10 : IRQ5 ACK
+			*/
 			if (ACCESSING_BITS_0_7)
 				ioport("EEPROMOUT")->write(data, 0xff);
 
@@ -133,11 +133,11 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 
 		case 0x0c/2:
 			/*
-                bit 0 : also enables IRQ???
-                bit 1 : disable PSAC2 input?
-                bit 2 : OBJCHA
-                bit 3 : enable IRQ 5
-            */
+			    bit 0 : also enables IRQ???
+			    bit 1 : disable PSAC2 input?
+			    bit 2 : OBJCHA
+			    bit 3 : enable IRQ 5
+			*/
 			k053246_set_objcha_line(m_k055673, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
@@ -179,27 +179,27 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 }
 
 static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM											// main program + data
+	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ_LEGACY(K053936_0_rom_r )       // '936 ROM readback window
+	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
+	AM_RANGE(0x400000, 0x43ffff) AM_READNOP // AM_READ_LEGACY(K053936_0_rom_r )       // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
-	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r, k053252_w,0x00ff)						// CCU (for scanline and vblank polling)
+	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r, k053252_w,0x00ff)                        // CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
-	AM_RANGE(0x580000, 0x58001f) AM_RAM											// sound regs read/write fall-through
-	AM_RANGE(0x5c0000, 0x5c000d) AM_DEVREAD_LEGACY("k055673", k053246_word_r)						// 246A ROM readback window
+	AM_RANGE(0x580000, 0x58001f) AM_RAM                                         // sound regs read/write fall-through
+	AM_RANGE(0x5c0000, 0x5c000d) AM_DEVREAD_LEGACY("k055673", k053246_word_r)                       // 246A ROM readback window
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE_LEGACY("k055673", k053247_reg_word_w)
-	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE_LEGACY("k055673", k053247_word_r, k053247_word_w)	// OBJ RAM
-	AM_RANGE(0x601000, 0x601fff) AM_RAM											// communication? second monitor buffer?
-	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE_LEGACY("k055673", k053246_word_w)						// '246A registers
-	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)			// '936 registers
-	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_SHARE("936_videoram")	// PSAC2 ('936) RAM (34v + 35v)
-	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)			// PSAC "Line RAM"
-	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)		// text plane RAM
-	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP									// watchdog
+	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE_LEGACY("k055673", k053247_word_r, k053247_word_w)  // OBJ RAM
+	AM_RANGE(0x601000, 0x601fff) AM_RAM                                         // communication? second monitor buffer?
+	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE_LEGACY("k055673", k053246_word_w)                      // '246A registers
+	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)          // '936 registers
+	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_SHARE("936_videoram")  // PSAC2 ('936) RAM (34v + 35v)
+	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)          // PSAC "Line RAM"
+	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)     // text plane RAM
+	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP                                    // watchdog
 #if RNG_DEBUG
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD_LEGACY("k055673", k053247_reg_word_r)
 	AM_RANGE(0x640000, 0x640007) AM_DEVREAD_LEGACY("k055673", k053246_reg_word_r)
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( rng )
 
 	PORT_START("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x00, "Monitors" )
 	PORT_DIPSETTING(    0x00, "1" )
@@ -318,7 +318,7 @@ static const gfx_layout bglayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+		9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	128*8
@@ -347,7 +347,7 @@ static const k053247_interface rng_k055673_intf =
 	"gfx2", 1,
 	K055673_LAYOUT_RNG,
 	-8, 15,
-	KONAMI_ROM_DEINTERLEAVE_NONE,	// there is some interleave in VIDEO_START...
+	KONAMI_ROM_DEINTERLEAVE_NONE,   // there is some interleave in VIDEO_START...
 	rng_sprite_callback
 };
 
@@ -463,10 +463,10 @@ ROM_START( rungun )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
-	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )	// 5y
-	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )	// 2u
-	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )	// 2y
-	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )	// 5u
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
 
 	/* TTL text plane ("fix layer") */
 	ROM_REGION( 0x20000, "gfx3", 0)
@@ -504,10 +504,10 @@ ROM_START( runguna )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
-	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )	// 5y
-	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )	// 2u
-	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )	// 2y
-	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )	// 5u
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
 
 	/* TTL text plane ("fix layer") */
 	ROM_REGION( 0x20000, "gfx3", 0)
@@ -543,10 +543,10 @@ ROM_START( rungunu )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
-	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )	// 5y
-	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )	// 2u
-	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )	// 2y
-	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )	// 5u
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
 
 	/* TTL text plane ("fix layer") */
 	ROM_REGION( 0x20000, "gfx3", 0)
@@ -584,10 +584,10 @@ ROM_START( rungunua )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
-	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )	// 5y
-	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )	// 2u
-	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )	// 2y
-	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )	// 5u
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
 
 	/* TTL text plane ("fix layer") */
 	ROM_REGION( 0x20000, "gfx3", 0)
@@ -625,10 +625,10 @@ ROM_START( slmdunkj )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
-	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )	// 5y
-	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )	// 2u
-	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )	// 2y
-	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )	// 5u
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
 
 	/* TTL text plane ("fix layer") */
 	ROM_REGION( 0x20000, "gfx3", 0)

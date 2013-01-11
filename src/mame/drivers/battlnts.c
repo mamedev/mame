@@ -56,31 +56,31 @@ WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
  *************************************/
 
 static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("k007342", k007342_r, k007342_w)	/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE_LEGACY("k007420", k007420_r, k007420_w)	/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE_LEGACY("k007342", k007342_scroll_r, k007342_scroll_w)		/* Scroll RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("k007342", k007342_r, k007342_w)    /* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE_LEGACY("k007420", k007420_r, k007420_w)    /* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE_LEGACY("k007342", k007342_scroll_r, k007342_scroll_w)      /* Scroll RAM */
 	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_SHARE("paletteram")/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE_LEGACY("k007342", k007342_vreg_w)			/* Video Registers */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE_LEGACY("k007342", k007342_vreg_w)          /* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P1")
-	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW3")				/* coinsw, testsw, startsw */
+	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW3")               /* coinsw, testsw, startsw */
 	AM_RANGE(0x2e04, 0x2e04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)	/* bankswitch control */
-	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)	/* sprite bank select */
-	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
-	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_byte_w)				/* sound code # */
-	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM 777e02.bin */
+	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)    /* bankswitch control */
+	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)    /* sprite bank select */
+	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)         /* watchdog reset */
+	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_byte_w)                /* sound code # */
+	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w) /* cause interrupt on audio CPU */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM 777e02.bin */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battlnts_sound_map, AS_PROGRAM, 8, battlnts_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM							/* ROM 777c01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM							/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym1", ym3812_r, ym3812_w)		/* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)		/* YM3812 (chip 2) */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM                         /* ROM 777c01.rom */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM                         /* RAM */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym1", ym3812_r, ym3812_w)      /* YM3812 (chip 1) */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)      /* YM3812 (chip 2) */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)         /* soundlatch_byte_r */
 ADDRESS_MAP_END
 
 /*************************************
@@ -95,43 +95,43 @@ static INPUT_PORTS_START( battlnts )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(	0x03, "2" )
-	PORT_DIPSETTING(	0x02, "3" )
-	PORT_DIPSETTING(	0x01, "5" )
-	PORT_DIPSETTING(	0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(	0x18, "30k And Every 70k" )
-	PORT_DIPSETTING(	0x10, "40k And Every 80k" )
-	PORT_DIPSETTING(	0x08, "40k" )
-	PORT_DIPSETTING(	0x00, "50k" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(	0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "30k And Every 70k" )
+	PORT_DIPSETTING(    0x10, "40k And Every 80k" )
+	PORT_DIPSETTING(    0x08, "40k" )
+	PORT_DIPSETTING(    0x00, "50k" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
 	KONAMI8_SYSTEM_10
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(	0x40, DEF_STR( Single ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW3:3" )
 
 	PORT_START("P1")
 	KONAMI8_B1(1)
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(	0x80, "3 Times" )
-	PORT_DIPSETTING(	0x00, "5 Times" )
+	PORT_DIPSETTING(    0x80, "3 Times" )
+	PORT_DIPSETTING(    0x00, "5 Times" )
 
 	PORT_START("P2")
 	KONAMI8_B1_UNK(2)
@@ -141,16 +141,16 @@ static INPUT_PORTS_START( rackemup )
 	PORT_INCLUDE( battlnts )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, "Balls" )					PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(	0x03, "2" )
-	PORT_DIPSETTING(	0x02, "3" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x00, "7" )
-	PORT_DIPNAME( 0x18, 0x10, "Time To Aim" )			PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(	0x18, "25s (Stage 1: 30s)" )
-	PORT_DIPSETTING(	0x10, "20s (Stage 1: 25s)" )
-	PORT_DIPSETTING(	0x08, "17s (Stage 1: 22s)" )
-	PORT_DIPSETTING(	0x00, "15s (Stage 1: 20s)" )
+	PORT_DIPNAME( 0x03, 0x02, "Balls" )                 PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x18, 0x10, "Time To Aim" )           PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "25s (Stage 1: 30s)" )
+	PORT_DIPSETTING(    0x10, "20s (Stage 1: 25s)" )
+	PORT_DIPSETTING(    0x08, "17s (Stage 1: 22s)" )
+	PORT_DIPSETTING(    0x00, "15s (Stage 1: 20s)" )
 
 	PORT_MODIFY("P1")
 	KONAMI8_B12(1)
@@ -176,29 +176,29 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,			/* 8 x 8 characters */
-	0x40000/32, 	/* 8192 characters */
-	4,				/* 4bpp */
+	8,8,            /* 8 x 8 characters */
+	0x40000/32,     /* 8192 characters */
+	4,              /* 4bpp */
 	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8			/* every character takes 32 consecutive bytes */
+	32*8            /* every character takes 32 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	8,8,			/* 8*8 sprites */
+	8,8,            /* 8*8 sprites */
 	0x40000/32, /* 8192 sprites */
-	4,				/* 4 bpp */
+	4,              /* 4 bpp */
 	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4},
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8			/* every sprite takes 32 consecutive bytes */
+	32*8            /* every sprite takes 32 consecutive bytes */
 };
 
 
 static GFXDECODE_START( battlnts )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,		0, 1 ) /* colors  0-15 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 ) /* colors  0-15 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 4*16, 1 ) /* colors 64-79 */
 GFXDECODE_END
 
@@ -211,12 +211,12 @@ GFXDECODE_END
 
 static const k007342_interface bladestl_k007342_intf =
 {
-	0,	battlnts_tile_callback	/* gfx_num (for tile creation), callback */
+	0,  battlnts_tile_callback  /* gfx_num (for tile creation), callback */
 };
 
 static const k007420_interface bladestl_k007420_intf =
 {
-	0x3ff,	battlnts_sprite_callback	/* banklimit, callback */
+	0x3ff,  battlnts_sprite_callback    /* banklimit, callback */
 };
 
 
@@ -395,7 +395,7 @@ static void shuffle( UINT8 *buf, int len )
 		return;
 
 	if (len % 4)
-		fatalerror("shuffle() - not modulo 4\n");	/* must not happen */
+		fatalerror("shuffle() - not modulo 4\n");   /* must not happen */
 
 	len /= 2;
 

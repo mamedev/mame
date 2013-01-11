@@ -57,18 +57,18 @@ protected:
 
 	stream_buffer *xa_buffer, *cdda_buffer;
 	unsigned int xa_cnt,cdda_cnt,
-				 xa_freq,cdda_freq,
-				 xa_channels,
-				 xa_spf,
-				 xa_out_ptr,
-				 cur_frame_sample,
-				 cur_generate_sample,
-				 dirty_flags;
+					xa_freq,cdda_freq,
+					xa_channels,
+					xa_spf,
+					xa_out_ptr,
+					cur_frame_sample,
+					cur_generate_sample,
+					dirty_flags;
 
 	signed short xa_last[4];
 	bool status_enabled,
-			 xa_playing,
-			 cdda_playing;
+				xa_playing,
+				cdda_playing;
 	int xa_voll,xa_volr,
 			changed_xa_vol;
 	voiceinfo *voice;
@@ -80,9 +80,9 @@ protected:
 
 	unsigned char *output_buf[4];
 	unsigned int output_head,
-							 output_tail,
-							 output_size,
-							 cur_qsz;
+								output_tail,
+								output_size,
+								cur_qsz;
 
 	unsigned int noise_t;
 	signed short noise_cur;
@@ -92,14 +92,14 @@ protected:
 
 	struct voicereg
 	{
-		unsigned short vol_l,	// 0
-									 vol_r, // 2
-									 pitch, // 4
-									 addr,  // 6
-									 adsl,  // 8
-									 srrr,  // a
-									 curvol,	// c
-									 repaddr; // e
+		unsigned short vol_l,   // 0
+										vol_r, // 2
+										pitch, // 4
+										addr,  // 6
+										adsl,  // 8
+										srrr,  // a
+										curvol, // c
+										repaddr; // e
 	};
 
 	union
@@ -109,22 +109,22 @@ protected:
 		{
 			voicereg voice[24];
 			unsigned short mvol_l,mvol_r,
-										 rvol_l,rvol_r;
+											rvol_l,rvol_r;
 			unsigned int keyon,
-									 keyoff,
-									 fm,
-									 noise,
-									 reverb,
-									 chon;
+										keyoff,
+										fm,
+										noise,
+										reverb,
+										chon;
 			unsigned short _unknown,
-										 reverb_addr,
-										 irq_addr,
-										 trans_addr,
-										 data,
-										 ctrl;
+											reverb_addr,
+											irq_addr,
+											trans_addr,
+											data,
+											ctrl;
 			unsigned int status;
 			signed short cdvol_l,cdvol_r,
-									 exvol_l,exvol_r;
+										exvol_l,exvol_r;
 		} spureg;
 	};
 
@@ -153,11 +153,11 @@ protected:
 											const unsigned int sz);
 	void generate_noise(void *ptr, const unsigned int num);
 	bool process_voice(const unsigned int v,
-										 const unsigned int sz,
-										 void *ptr,
-										 void *fmnoise_ptr,
-										 void *outxptr,
-										 unsigned int *tleft);
+											const unsigned int sz,
+											void *ptr,
+											void *fmnoise_ptr,
+											void *outxptr,
+											unsigned int *tleft);
 	void process();
 	void process_until(const unsigned int tsample);
 	void update_voice_loop(const unsigned int v);
@@ -177,8 +177,8 @@ protected:
 	bool translate_sample_addr(const unsigned int addr, cache_pointer *cp);
 	sample_cache *get_sample_cache(const unsigned int addr);
 	void flush_cache(sample_cache *sc,
-									 const unsigned int istart,
-									 const unsigned int iend);
+										const unsigned int istart,
+										const unsigned int iend);
 	void invalidate_cache(const unsigned int st, const unsigned int en);
 
 	void set_xa_format(const float freq, const int channels);
@@ -191,13 +191,13 @@ protected:
 	void flush_output_buffer();
 
 	sample_loop_cache *get_loop_cache(sample_cache *cache,
-																	  const unsigned int lpen,
+																		const unsigned int lpen,
 																		sample_cache *lpcache,
-																	  const unsigned int lpst);
+																		const unsigned int lpst);
 #if 0
 	void write_cache_pointer(outfile *fout,
-													 cache_pointer *cp,
-													 sample_loop_cache *lc=NULL);
+														cache_pointer *cp,
+														sample_loop_cache *lc=NULL);
 	void read_cache_pointer(infile *fin,
 													cache_pointer *cp,
 													sample_loop_cache **lc=NULL);

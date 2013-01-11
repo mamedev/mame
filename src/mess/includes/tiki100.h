@@ -15,33 +15,33 @@
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"z80"
-#define Z80DART_TAG		"z80dart"
-#define Z80PIO_TAG		"z80pio"
-#define Z80CTC_TAG		"z80ctc"
-#define FD1797_TAG		"fd1797"
-#define AY8912_TAG		"ay8912"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "z80"
+#define Z80DART_TAG     "z80dart"
+#define Z80PIO_TAG      "z80pio"
+#define Z80CTC_TAG      "z80ctc"
+#define FD1797_TAG      "fd1797"
+#define AY8912_TAG      "ay8912"
 
-#define TIKI100_VIDEORAM_SIZE	0x8000
-#define TIKI100_VIDEORAM_MASK	0x7fff
+#define TIKI100_VIDEORAM_SIZE   0x8000
+#define TIKI100_VIDEORAM_MASK   0x7fff
 
-#define BANK_ROM		0
-#define BANK_RAM		1
-#define BANK_VIDEO_RAM	2
+#define BANK_ROM        0
+#define BANK_RAM        1
+#define BANK_VIDEO_RAM  2
 
 class tiki100_state : public driver_device
 {
 public:
 	tiki100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_fdc(*this, FD1797_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FD1797_TAG":0"),
-		  m_floppy1(*this, FD1797_TAG":1"),
-		  m_video_ram(*this, "video_ram")
+			m_maincpu(*this, Z80_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_fdc(*this, FD1797_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, FD1797_TAG":0"),
+			m_floppy1(*this, FD1797_TAG":1"),
+			m_video_ram(*this, "video_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

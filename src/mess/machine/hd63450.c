@@ -488,5 +488,3 @@ void hd63450_device::device_start()
 {
 	DEVICE_START_NAME( hd63450 )(this);
 }
-
-

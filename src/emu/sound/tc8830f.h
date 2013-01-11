@@ -26,7 +26,7 @@
 //**************************************************************************
 
 class tc8830f_device : public device_t,
-                       public device_sound_interface
+						public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -46,17 +46,17 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-    bool m_playing;
-    UINT32 m_address;
-    UINT32 m_stop_address;
-    UINT8 m_bitcount;
-    UINT8 m_bitrate;
-    UINT8 m_command;
-    int m_cmd_rw;
-    UINT8 m_phrase;
+	bool m_playing;
+	UINT32 m_address;
+	UINT32 m_stop_address;
+	UINT8 m_bitcount;
+	UINT8 m_bitrate;
+	UINT8 m_command;
+	int m_cmd_rw;
+	UINT8 m_phrase;
 
-    UINT8 *m_mem_base;
-    UINT32 m_mem_mask;
+	UINT8 *m_mem_base;
+	UINT32 m_mem_mask;
 };
 
 

@@ -171,15 +171,15 @@ WRITE8_MEMBER(turbo_state::turbo_sound_c_w)
 static const char *const turbo_sample_names[] =
 {
 	"*turbo",
-	"01",		/* 0: Trig1 */
-	"02",		/* 1: Trig2 */
-	"03",		/* 2: Trig3 */
-	"04",		/* 3: Trig4 */
-	"05",		/* 4: Screech */
-	"06",		/* 5: Crash */
-	"skidding",	/* 6: Spin */
-	"idle",		/* 7: Idle */
-	"ambulanc",	/* 8: Ambulance */
+	"01",       /* 0: Trig1 */
+	"02",       /* 1: Trig2 */
+	"03",       /* 2: Trig3 */
+	"04",       /* 3: Trig4 */
+	"05",       /* 4: Screech */
+	"06",       /* 5: Crash */
+	"skidding", /* 6: Spin */
+	"idle",     /* 7: Idle */
+	"ambulanc", /* 8: Ambulance */
 	0
 };
 
@@ -194,10 +194,10 @@ static const samples_interface turbo_samples_interface =
 MACHINE_CONFIG_FRAGMENT( turbo_samples )
 
 	/* this is the cockpit speaker configuration */
-	MCFG_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)		/* front */
-	MCFG_SPEAKER_ADD("bspeaker",  0.0, 0.0, -0.5)	/* back */
-	MCFG_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)	/* left */
-	MCFG_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)		/* right */
+	MCFG_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)     /* front */
+	MCFG_SPEAKER_ADD("bspeaker",  0.0, 0.0, -0.5)   /* back */
+	MCFG_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)    /* left */
+	MCFG_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)     /* right */
 
 	MCFG_SAMPLES_ADD("samples", turbo_samples_interface)
 
@@ -575,17 +575,17 @@ WRITE8_MEMBER(turbo_state::buckrog_sound_b_w)
 static const char *const buckrog_sample_names[]=
 {
 	"*buckrog",
-	"alarm0",	/* 0 */
-	"alarm1",	/* 1 */
-	"alarm2",	/* 2 */
-	"alarm3",	/* 3 */
-	"exp",		/* 4 */
-	"fire",		/* 5 */
-	"rebound",	/* 6 */
-	"hit",		/* 7 */
-	"shipsnd1",	/* 8 */
-	"shipsnd2",	/* 9 */
-	"shipsnd3",	/* 10 */
+	"alarm0",   /* 0 */
+	"alarm1",   /* 1 */
+	"alarm2",   /* 2 */
+	"alarm3",   /* 3 */
+	"exp",      /* 4 */
+	"fire",     /* 5 */
+	"rebound",  /* 6 */
+	"hit",      /* 7 */
+	"shipsnd1", /* 8 */
+	"shipsnd2", /* 9 */
+	"shipsnd3", /* 10 */
 	0
 };
 
@@ -614,26 +614,26 @@ MACHINE_CONFIG_END
 #if (DISCRETE_TEST)
 
 /* Nodes - Inputs */
-#define TURBO_CRASH_EN			NODE_01
-#define TURBO_TRIG1_INV			NODE_02
-#define TURBO_TRIG2_INV			NODE_03
-#define TURBO_TRIG3_INV			NODE_04
-#define TURBO_TRIG4_INV			NODE_05
-#define TURBO_SLIP_EN			NODE_06
-#define TURBO_CRASHL_EN			NODE_07
-#define TURBO_ACC_VAL			NODE_08
-#define TURBO_AMBU_EN			NODE_09
-#define TURBO_SPIN_EN			NODE_10
-#define TURBO_OSEL_VAL			NODE_11
-#define TURBO_BSEL_VAL			NODE_12
+#define TURBO_CRASH_EN          NODE_01
+#define TURBO_TRIG1_INV         NODE_02
+#define TURBO_TRIG2_INV         NODE_03
+#define TURBO_TRIG3_INV         NODE_04
+#define TURBO_TRIG4_INV         NODE_05
+#define TURBO_SLIP_EN           NODE_06
+#define TURBO_CRASHL_EN         NODE_07
+#define TURBO_ACC_VAL           NODE_08
+#define TURBO_AMBU_EN           NODE_09
+#define TURBO_SPIN_EN           NODE_10
+#define TURBO_OSEL_VAL          NODE_11
+#define TURBO_BSEL_VAL          NODE_12
 
 /* Nodes - Sounds */
-#define FIRETRUCK_NOISE			NODE_20
+#define FIRETRUCK_NOISE         NODE_20
 
 static const discrete_555_desc turbo_alarm_555 =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_DC,
-	5,				// B+ voltage of 555
+	5,              // B+ voltage of 555
 	DEFAULT_555_VALUES,
 };
 
@@ -642,18 +642,18 @@ DISCRETE_SOUND_START(turbo)
 	/* Input register mapping for turbo             */
 	/************************************************/
 	/*                  NODE             ADDR  MASK    GAIN    OFFSET  INIT */
-	DISCRETE_INPUT(TURBO_CRASH_EN		,0x00,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_TRIG1_INV  	,0x01,0x001f,                  1.0)
-	DISCRETE_INPUT(TURBO_TRIG2_INV		,0x02,0x001f,                  1.0)
-	DISCRETE_INPUT(TURBO_TRIG3_INV		,0x03,0x001f,                  1.0)
-	DISCRETE_INPUT(TURBO_TRIG4_INV  	,0x04,0x001f,                  1.0)
-	DISCRETE_INPUT(TURBO_SLIP_EN    	,0x05,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_CRASHL_EN		,0x06,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_ACC_VAL		,0x07,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_AMBU_EN		,0x08,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_SPIN_EN		,0x09,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_OSEL_VAL		,0x0a,0x001f,                  0.0)
-	DISCRETE_INPUT(TURBO_BSEL_VAL		,0x0b,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_CRASH_EN       ,0x00,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_TRIG1_INV      ,0x01,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_TRIG2_INV      ,0x02,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_TRIG3_INV      ,0x03,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_TRIG4_INV      ,0x04,0x001f,                  1.0)
+	DISCRETE_INPUT(TURBO_SLIP_EN        ,0x05,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_CRASHL_EN      ,0x06,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_ACC_VAL        ,0x07,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_AMBU_EN        ,0x08,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_SPIN_EN        ,0x09,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_OSEL_VAL       ,0x0a,0x001f,                  0.0)
+	DISCRETE_INPUT(TURBO_BSEL_VAL       ,0x0b,0x001f,                  0.0)
 
 	/************************************************/
 	/* Alarm sounds                                 */

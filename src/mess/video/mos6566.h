@@ -190,60 +190,60 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define VIC6566_CLOCK			(XTAL_8MHz / 8) // 1000000
-#define VIC6567R56A_CLOCK		(XTAL_8MHz / 8) // 1000000
-#define VIC6567_CLOCK			(XTAL_14_31818MHz / 14) // 1022727
-#define VIC6569_CLOCK			(XTAL_17_734472MHz / 18) // 985248
+#define VIC6566_CLOCK           (XTAL_8MHz / 8) // 1000000
+#define VIC6567R56A_CLOCK       (XTAL_8MHz / 8) // 1000000
+#define VIC6567_CLOCK           (XTAL_14_31818MHz / 14) // 1022727
+#define VIC6569_CLOCK           (XTAL_17_734472MHz / 18) // 985248
 
-#define VIC6566_DOTCLOCK		(VIC6566_CLOCK * 8) // 8000000
-#define VIC6567R56A_DOTCLOCK	(VIC6567R56A_CLOCK * 8) // 8000000
-#define VIC6567_DOTCLOCK		(VIC6567_CLOCK * 8) // 8181818
-#define VIC6569_DOTCLOCK		(VIC6569_CLOCK * 8) // 7881988
+#define VIC6566_DOTCLOCK        (VIC6566_CLOCK * 8) // 8000000
+#define VIC6567R56A_DOTCLOCK    (VIC6567R56A_CLOCK * 8) // 8000000
+#define VIC6567_DOTCLOCK        (VIC6567_CLOCK * 8) // 8181818
+#define VIC6569_DOTCLOCK        (VIC6569_CLOCK * 8) // 7881988
 
-#define VIC6567_CYCLESPERLINE	65
-#define VIC6569_CYCLESPERLINE	63
+#define VIC6567_CYCLESPERLINE   65
+#define VIC6569_CYCLESPERLINE   63
 
-#define VIC6567_LINES		263
-#define VIC6569_LINES		312
+#define VIC6567_LINES       263
+#define VIC6569_LINES       312
 
-#define VIC6566_VRETRACERATE		((float)VIC6566_CLOCK / 262 / 64)
-#define VIC6567R56A_VRETRACERATE	((float)VIC6567R56A_CLOCK / 262 / 64)
-#define VIC6567_VRETRACERATE		((float)VIC6567_CLOCK / 263 / 65)
-#define VIC6569_VRETRACERATE		((float)VIC6569_CLOCK / 312 / 63)
+#define VIC6566_VRETRACERATE        ((float)VIC6566_CLOCK / 262 / 64)
+#define VIC6567R56A_VRETRACERATE    ((float)VIC6567R56A_CLOCK / 262 / 64)
+#define VIC6567_VRETRACERATE        ((float)VIC6567_CLOCK / 263 / 65)
+#define VIC6569_VRETRACERATE        ((float)VIC6569_CLOCK / 312 / 63)
 
-#define VIC6566_HRETRACERATE	(VIC6566_CLOCK / VIC6566_CYCLESPERLINE)
-#define VIC6567_HRETRACERATE	(VIC6567_CLOCK / VIC6567_CYCLESPERLINE)
-#define VIC6569_HRETRACERATE	(VIC6569_CLOCK / VIC6569_CYCLESPERLINE)
+#define VIC6566_HRETRACERATE    (VIC6566_CLOCK / VIC6566_CYCLESPERLINE)
+#define VIC6567_HRETRACERATE    (VIC6567_CLOCK / VIC6567_CYCLESPERLINE)
+#define VIC6569_HRETRACERATE    (VIC6569_CLOCK / VIC6569_CYCLESPERLINE)
 
-#define VIC2_HSIZE		320
-#define VIC2_VSIZE		200
+#define VIC2_HSIZE      320
+#define VIC2_VSIZE      200
 
-#define VIC6567_VISIBLELINES	235
-#define VIC6569_VISIBLELINES	284
+#define VIC6567_VISIBLELINES    235
+#define VIC6569_VISIBLELINES    284
 
-#define VIC6567_FIRST_DMA_LINE	0x30
-#define VIC6569_FIRST_DMA_LINE	0x30
+#define VIC6567_FIRST_DMA_LINE  0x30
+#define VIC6569_FIRST_DMA_LINE  0x30
 
-#define VIC6567_LAST_DMA_LINE	0xf7
-#define VIC6569_LAST_DMA_LINE	0xf7
+#define VIC6567_LAST_DMA_LINE   0xf7
+#define VIC6569_LAST_DMA_LINE   0xf7
 
-#define VIC6567_FIRST_DISP_LINE	0x29
-#define VIC6569_FIRST_DISP_LINE	0x10
+#define VIC6567_FIRST_DISP_LINE 0x29
+#define VIC6569_FIRST_DISP_LINE 0x10
 
-#define VIC6567_LAST_DISP_LINE	(VIC6567_FIRST_DISP_LINE + VIC6567_VISIBLELINES - 1)
-#define VIC6569_LAST_DISP_LINE	(VIC6569_FIRST_DISP_LINE + VIC6569_VISIBLELINES - 1)
+#define VIC6567_LAST_DISP_LINE  (VIC6567_FIRST_DISP_LINE + VIC6567_VISIBLELINES - 1)
+#define VIC6569_LAST_DISP_LINE  (VIC6569_FIRST_DISP_LINE + VIC6569_VISIBLELINES - 1)
 
 #define VIC6567_RASTER_2_EMU(a) ((a >= VIC6567_FIRST_DISP_LINE) ? (a - VIC6567_FIRST_DISP_LINE) : (a + 222))
 #define VIC6569_RASTER_2_EMU(a) (a - VIC6569_FIRST_DISP_LINE)
 
-#define VIC6567_FIRSTCOLUMN	50
-#define VIC6569_FIRSTCOLUMN	50
+#define VIC6567_FIRSTCOLUMN 50
+#define VIC6569_FIRSTCOLUMN 50
 
-#define VIC6567_VISIBLECOLUMNS	418
-#define VIC6569_VISIBLECOLUMNS	403
+#define VIC6567_VISIBLECOLUMNS  418
+#define VIC6569_VISIBLECOLUMNS  403
 
-#define VIC6567_X_2_EMU(a)	(a)
-#define VIC6569_X_2_EMU(a)	(a)
+#define VIC6567_X_2_EMU(a)  (a)
+#define VIC6569_X_2_EMU(a)  (a)
 
 #define VIC6567_STARTVISIBLELINES ((VIC6567_LINES - VIC6567_VISIBLELINES)/2)
 #define VIC6569_STARTVISIBLELINES 16 /* ((VIC6569_LINES - VIC6569_VISIBLELINES)/2) */
@@ -285,23 +285,23 @@
 
 struct mos6566_interface
 {
-	const char			*m_screen_tag;
-	const char			*m_cpu_tag;
+	const char          *m_screen_tag;
+	const char          *m_cpu_tag;
 
-	devcb_write_line	m_out_irq_cb;
-	devcb_write_line	m_out_ba_cb;
-	devcb_write_line	m_out_aec_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_ba_cb;
+	devcb_write_line    m_out_aec_cb;
 
-	devcb_write8		m_out_k_cb;
+	devcb_write8        m_out_k_cb;
 };
 
 
 // ======================> mos6566_device
 
 class mos6566_device :  public device_t,
-					    public device_memory_interface,
-					    public device_execute_interface,
-					    public mos6566_interface
+						public device_memory_interface,
+						public device_execute_interface,
+						public mos6566_interface
 {
 public:
 	// construction/destruction
@@ -326,17 +326,17 @@ public:
 protected:
 	enum
 	{
-		TYPE_6566,	// NTSC-M (SRAM)
-		TYPE_6567,	// NTSC-M (NMOS)
-		TYPE_8562,	// NTSC-M (HMOS)
-		TYPE_8564,	// NTSC-M VIC-IIe (C128)
+		TYPE_6566,  // NTSC-M (SRAM)
+		TYPE_6567,  // NTSC-M (NMOS)
+		TYPE_8562,  // NTSC-M (HMOS)
+		TYPE_8564,  // NTSC-M VIC-IIe (C128)
 
-		TYPE_6569,	// PAL-B
-		TYPE_6572,	// PAL-N
-		TYPE_6573,	// PAL-M
-		TYPE_8565,	// PAL-B (HMOS)
-		TYPE_8566,	// PAL-B VIC-IIe (C128)
-		TYPE_8569	// PAL-N VIC-IIe (C128)
+		TYPE_6569,  // PAL-B
+		TYPE_6572,  // PAL-N
+		TYPE_6573,  // PAL-M
+		TYPE_8565,  // PAL-B (HMOS)
+		TYPE_8566,  // PAL-B VIC-IIe (C128)
+		TYPE_8569   // PAL-N VIC-IIe (C128)
 	};
 
 	// device-level overrides
@@ -345,11 +345,11 @@ protected:
 	virtual void device_reset();
 	virtual void execute_run();
 
-    int m_icount;
+	int m_icount;
 	int m_variant;
 
-	const address_space_config		m_videoram_space_config;
-	const address_space_config		m_colorram_space_config;
+	const address_space_config      m_videoram_space_config;
+	const address_space_config      m_colorram_space_config;
 
 	inline void set_interrupt( int mask );
 	inline void clear_interrupt( int mask );
@@ -376,7 +376,7 @@ protected:
 	void draw_graphics();
 	void draw_sprites();
 
-	screen_device *m_screen;			// screen which sets bitmap properties
+	screen_device *m_screen;            // screen which sets bitmap properties
 	cpu_device *m_cpu;
 
 	int m_phi0;
@@ -387,7 +387,7 @@ protected:
 
 	UINT8 m_reg[0x80];
 
-	int m_on;								/* rastering of the screen */
+	int m_on;                               /* rastering of the screen */
 
 	UINT16 m_chargenaddr, m_videoaddr, m_bitmapaddr;
 
@@ -419,8 +419,8 @@ protected:
 	UINT8 m_gfx_data;
 	UINT8 m_color_data;
 	UINT8 m_last_char_data;
-	UINT8 m_matrix_line[40];						// Buffer for video line, read in Bad Lines
-	UINT8 m_color_line[40];						// Buffer for color line, read in Bad Lines
+	UINT8 m_matrix_line[40];                        // Buffer for video line, read in Bad Lines
+	UINT8 m_color_line[40];                     // Buffer for color line, read in Bad Lines
 	UINT8 m_vblanking;
 	UINT16 m_ml_index;
 	UINT8 m_rc;
@@ -429,32 +429,32 @@ protected:
 	UINT8 m_ref_cnt;
 
 	/* Sprites */
-	UINT8 m_spr_coll_buf[0x400];					// Buffer for sprite-sprite collisions and priorities
-	UINT8 m_fore_coll_buf[0x400];					// Buffer for foreground-sprite collisions and priorities
-	UINT8 m_spr_draw_data[8][4];					// Sprite data for drawing
+	UINT8 m_spr_coll_buf[0x400];                    // Buffer for sprite-sprite collisions and priorities
+	UINT8 m_fore_coll_buf[0x400];                   // Buffer for foreground-sprite collisions and priorities
+	UINT8 m_spr_draw_data[8][4];                    // Sprite data for drawing
 	UINT8 m_spr_exp_y;
 	UINT8 m_spr_dma_on;
 	UINT8 m_spr_draw;
 	UINT8 m_spr_disp_on;
 	UINT16 m_spr_ptr[8];
 	UINT8 m_spr_data[8][4];
-	UINT16 m_mc_base[8];						// Sprite data counter bases
-	UINT16 m_mc[8];							// Sprite data counters
+	UINT16 m_mc_base[8];                        // Sprite data counter bases
+	UINT16 m_mc[8];                         // Sprite data counters
 
 	/* Border */
 	UINT8 m_border_on;
 	UINT8 m_ud_border_on;
 	UINT8 m_border_on_sample[5];
-	UINT8 m_border_color_sample[0x400 / 8];			// Samples of border color at each "displayed" cycle
+	UINT8 m_border_color_sample[0x400 / 8];         // Samples of border color at each "displayed" cycle
 
 	/* Cycles */
 	UINT64 m_first_ba_cycle;
 	UINT8 m_device_suspended;
 
-	devcb_resolved_write_line		m_out_irq_func;
-	devcb_resolved_write_line		m_out_ba_func;
-	devcb_resolved_write_line		m_out_aec_func;
-	devcb_resolved_write8			m_out_k_func;
+	devcb_resolved_write_line       m_out_irq_func;
+	devcb_resolved_write_line       m_out_ba_func;
+	devcb_resolved_write_line       m_out_aec_func;
+	devcb_resolved_write8           m_out_k_func;
 };
 
 
@@ -463,9 +463,9 @@ protected:
 class mos6567_device :  public mos6566_device
 {
 public:
-    // construction/destruction
-    mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -474,8 +474,8 @@ public:
 class mos8562_device :  public mos6567_device
 {
 public:
-    // construction/destruction
-    mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -484,8 +484,8 @@ public:
 class mos8564_device :  public mos6567_device
 {
 public:
-    // construction/destruction
-    mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -494,12 +494,12 @@ public:
 class mos6569_device :  public mos6566_device
 {
 public:
-    // construction/destruction
-    mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-    virtual void execute_run();
+	virtual void execute_run();
 };
 
 
@@ -508,8 +508,8 @@ public:
 class mos8565_device :  public mos6569_device
 {
 public:
-    // construction/destruction
-    mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -518,8 +518,8 @@ public:
 class mos8566_device :  public mos6569_device
 {
 public:
-    // construction/destruction
-    mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -18,9 +18,9 @@
  *
  *************************************/
 
-#define RNG_PERIOD		((1 << 17) - 1)
-#define VERT_OFFSET		(22)				/* pixels from top of screen to top of game area */
-#define HORZ_OFFSET		(16)				/* pixels from left of screen to left of game area */
+#define RNG_PERIOD      ((1 << 17) - 1)
+#define VERT_OFFSET     (22)                /* pixels from top of screen to top of game area */
+#define HORZ_OFFSET     (16)                /* pixels from left of screen to left of game area */
 
 
 
@@ -62,15 +62,15 @@ INLINE int mame_vpos_to_astrocade_vpos(int scanline)
 void astrocde_state::palette_init()
 {
 	/*
-        The Astrocade has a 256 color palette: 32 colors with 8 luminance
-        values for each color. The 32 colors circle around the YUV color
-        space, with the exception of the first 8 which are grayscale.
+	    The Astrocade has a 256 color palette: 32 colors with 8 luminance
+	    values for each color. The 32 colors circle around the YUV color
+	    space, with the exception of the first 8 which are grayscale.
 
-        We actually build a 512 entry palette with an extra bit of
-        luminance informaton. This is because the sparkle/star circuitry
-        on Wizard of War and Gorf replaces the luminance with a value
-        that has a 4-bit resolution.
-    */
+	    We actually build a 512 entry palette with an extra bit of
+	    luminance informaton. This is because the sparkle/star circuitry
+	    on Wizard of War and Gorf replaces the luminance with a value
+	    that has a 4-bit resolution.
+	*/
 
 	int color, luma;
 
@@ -116,7 +116,7 @@ PALETTE_INIT_MEMBER(astrocde_state,profpac)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0);
@@ -467,64 +467,64 @@ READ8_MEMBER(astrocde_state::astrocade_data_chip_register_r)
 	/* these are the core registers */
 	switch (offset & 0xff)
 	{
-		case 0x08:	/* intercept feedback */
+		case 0x08:  /* intercept feedback */
 			result = m_funcgen_intercept;
 			m_funcgen_intercept = 0;
 			break;
 
-		case 0x0e:	/* vertical feedback (from lightpen interrupt) */
+		case 0x0e:  /* vertical feedback (from lightpen interrupt) */
 			result = m_vertical_feedback;
 			break;
 
-		case 0x0f:	/* horizontal feedback (from lightpen interrupt) */
+		case 0x0f:  /* horizontal feedback (from lightpen interrupt) */
 			result = m_horizontal_feedback;
 			break;
 
-		case 0x10:	/* player 1 handle */
+		case 0x10:  /* player 1 handle */
 			result = ioport("P1HANDLE")->read_safe(0xff);
 			break;
 
-		case 0x11:	/* player 2 handle */
+		case 0x11:  /* player 2 handle */
 			result = ioport("P2HANDLE")->read_safe(0xff);
 			break;
 
-		case 0x12:	/* player 3 handle */
+		case 0x12:  /* player 3 handle */
 			result = ioport("P3HANDLE")->read_safe(0xff);
 			break;
 
-		case 0x13:	/* player 4 handle */
+		case 0x13:  /* player 4 handle */
 			result = ioport("P4HANDLE")->read_safe(0xff);
 			break;
 
-		case 0x14:	/* keypad column 0 */
+		case 0x14:  /* keypad column 0 */
 			result = ioport("KEYPAD0")->read_safe(0xff);
 			break;
 
-		case 0x15:	/* keypad column 1 */
+		case 0x15:  /* keypad column 1 */
 			result = ioport("KEYPAD1")->read_safe(0xff);
 			break;
 
-		case 0x16:	/* keypad column 2 */
+		case 0x16:  /* keypad column 2 */
 			result = ioport("KEYPAD2")->read_safe(0xff);
 			break;
 
-		case 0x17:	/* keypad column 3 */
+		case 0x17:  /* keypad column 3 */
 			result = ioport("KEYPAD3")->read_safe(0xff);
 			break;
 
-		case 0x1c:	/* player 1 knob */
+		case 0x1c:  /* player 1 knob */
 			result = ioport("P1_KNOB")->read_safe(0xff);
 			break;
 
-		case 0x1d:	/* player 2 knob */
+		case 0x1d:  /* player 2 knob */
 			result = ioport("P2_KNOB")->read_safe(0xff);
 			break;
 
-		case 0x1e:	/* player 3 knob */
+		case 0x1e:  /* player 3 knob */
 			result = ioport("P3_KNOB")->read_safe(0xff);
 			break;
 
-		case 0x1f:	/* player 4 knob */
+		case 0x1f:  /* player 4 knob */
 			result = ioport("P4_KNOB")->read_safe(0xff);
 			break;
 	}
@@ -538,7 +538,7 @@ WRITE8_MEMBER(astrocde_state::astrocade_data_chip_register_w)
 	/* these are the core registers */
 	switch (offset & 0xff)
 	{
-		case 0x00:	/* color table is in registers 0-7 */
+		case 0x00:  /* color table is in registers 0-7 */
 		case 0x01:
 		case 0x02:
 		case 0x03:
@@ -549,56 +549,56 @@ WRITE8_MEMBER(astrocde_state::astrocade_data_chip_register_w)
 			m_colors[offset & 7] = data;
 			break;
 
-		case 0x08:	/* mode register */
+		case 0x08:  /* mode register */
 			m_video_mode = data & 1;
 			break;
 
-		case 0x09:	/* color split pixel */
+		case 0x09:  /* color split pixel */
 			m_colorsplit = 2 * (data & 0x3f);
 			m_bgdata = ((data & 0xc0) >> 6) * 0x55;
 			break;
 
-		case 0x0a:	/* vertical blank register */
+		case 0x0a:  /* vertical blank register */
 			m_vblank = data;
 			break;
 
-		case 0x0b:	/* color block transfer */
+		case 0x0b:  /* color block transfer */
 			m_colors[(offset >> 8) & 7] = data;
 			break;
 
-		case 0x0c:	/* function generator */
+		case 0x0c:  /* function generator */
 			m_funcgen_control = data;
-			m_funcgen_expand_count = 0;		/* reset flip-flop for expand mode on write to this register */
-			m_funcgen_rotate_count = 0;		/* reset counter for rotate mode on write to this register */
-			m_funcgen_shift_prev_data = 0;	/* reset shift buffer on write to this register */
+			m_funcgen_expand_count = 0;     /* reset flip-flop for expand mode on write to this register */
+			m_funcgen_rotate_count = 0;     /* reset counter for rotate mode on write to this register */
+			m_funcgen_shift_prev_data = 0;  /* reset shift buffer on write to this register */
 			break;
 
-		case 0x0d:	/* interrupt feedback */
+		case 0x0d:  /* interrupt feedback */
 			m_interrupt_vector = data;
 			break;
 
-		case 0x0e:	/* interrupt enable and mode */
+		case 0x0e:  /* interrupt enable and mode */
 			m_interrupt_enabl = data;
 			break;
 
-		case 0x0f:	/* interrupt line */
+		case 0x0f:  /* interrupt line */
 			m_interrupt_scanline = data;
 			break;
 
-		case 0x10:	/* master oscillator register */
-		case 0x11:	/* tone A frequency register */
-		case 0x12:	/* tone B frequency register */
-		case 0x13:	/* tone C frequency register */
-		case 0x14:	/* vibrato register */
-		case 0x15:	/* tone C volume, noise modulation and MUX register */
-		case 0x16:	/* tone A volume and tone B volume register */
-		case 0x17:	/* noise volume register */
-		case 0x18:	/* sound block transfer */
+		case 0x10:  /* master oscillator register */
+		case 0x11:  /* tone A frequency register */
+		case 0x12:  /* tone B frequency register */
+		case 0x13:  /* tone C frequency register */
+		case 0x14:  /* vibrato register */
+		case 0x15:  /* tone C volume, noise modulation and MUX register */
+		case 0x16:  /* tone A volume and tone B volume register */
+		case 0x17:  /* noise volume register */
+		case 0x18:  /* sound block transfer */
 			if (m_video_config & AC_SOUND_PRESENT)
 				astrocade_sound_w(machine().device("astrocade1"), space, offset, data);
 			break;
 
-		case 0x19:	/* expand register */
+		case 0x19:  /* expand register */
 			m_funcgen_expand_color[0] = data & 0x03;
 			m_funcgen_expand_color[1] = (data >> 2) & 0x03;
 			break;
@@ -618,21 +618,21 @@ WRITE8_MEMBER(astrocde_state::astrocade_funcgen_w)
 	UINT8 prev_data;
 
 	/* control register:
-        bit 0 = shift amount LSB
-        bit 1 = shift amount MSB
-        bit 2 = rotate
-        bit 3 = expand
-        bit 4 = OR
-        bit 5 = XOR
-        bit 6 = flop
-    */
+	    bit 0 = shift amount LSB
+	    bit 1 = shift amount MSB
+	    bit 2 = rotate
+	    bit 3 = expand
+	    bit 4 = OR
+	    bit 5 = XOR
+	    bit 6 = flop
+	*/
 
 	/* expansion */
 	if (m_funcgen_control & 0x08)
 	{
 		m_funcgen_expand_count ^= 1;
 		data >>= 4 * m_funcgen_expand_count;
-		data =	(m_funcgen_expand_color[(data >> 3) & 1] << 6) |
+		data =  (m_funcgen_expand_color[(data >> 3) & 1] << 6) |
 				(m_funcgen_expand_color[(data >> 2) & 1] << 4) |
 				(m_funcgen_expand_color[(data >> 1) & 1] << 2) |
 				(m_funcgen_expand_color[(data >> 0) & 1] << 0);
@@ -656,7 +656,7 @@ WRITE8_MEMBER(astrocde_state::astrocade_funcgen_w)
 		else
 		{
 			UINT8 shift = 2 * (~m_funcgen_rotate_count++ & 3);
-			data =	(((m_funcgen_rotate_data[3] >> shift) & 3) << 6) |
+			data =  (((m_funcgen_rotate_data[3] >> shift) & 3) << 6) |
 					(((m_funcgen_rotate_data[2] >> shift) & 3) << 4) |
 					(((m_funcgen_rotate_data[1] >> shift) & 3) << 2) |
 					(((m_funcgen_rotate_data[0] >> shift) & 3) << 0);
@@ -741,24 +741,24 @@ static void execute_blit(address_space &space)
 {
 	astrocde_state *state = space.machine().driver_data<astrocde_state>();
 	/*
-        state->m_pattern_source = counter set U7/U16/U25/U34
-        state->m_pattern_dest = counter set U9/U18/U30/U39
-        state->m_pattern_mode = latch U21
-        state->m_pattern_skip = latch set U30/U39
-        state->m_pattern_width = latch set U32/U41
-        state->m_pattern_height = counter set U31/U40
+	    state->m_pattern_source = counter set U7/U16/U25/U34
+	    state->m_pattern_dest = counter set U9/U18/U30/U39
+	    state->m_pattern_mode = latch U21
+	    state->m_pattern_skip = latch set U30/U39
+	    state->m_pattern_width = latch set U32/U41
+	    state->m_pattern_height = counter set U31/U40
 
-        state->m_pattern_mode bits:
-            d0 = direction (0 = read from src, write to dest, 1 = read from dest, write to src)
-            d1 = expand (0 = increment src each pixel, 1 = increment src every other pixel)
-            d2 = constant (0 = never increment src, 1 = normal src increment)
-            d3 = flush (0 = copy all data, 1 = copy a 0 in place of last byte of each row)
-            d4 = dest increment direction (0 = decrement dest on carry, 1 = increment dest on carry)
-            d5 = dest direction (0 = increment dest, 1 = decrement dest)
-    */
+	    state->m_pattern_mode bits:
+	        d0 = direction (0 = read from src, write to dest, 1 = read from dest, write to src)
+	        d1 = expand (0 = increment src each pixel, 1 = increment src every other pixel)
+	        d2 = constant (0 = never increment src, 1 = normal src increment)
+	        d3 = flush (0 = copy all data, 1 = copy a 0 in place of last byte of each row)
+	        d4 = dest increment direction (0 = decrement dest on carry, 1 = increment dest on carry)
+	        d5 = dest direction (0 = increment dest, 1 = decrement dest)
+	*/
 
-	UINT8 curwidth;	/* = counter set U33/U42 */
-	UINT8 u13ff;	/* = flip-flop at U13 */
+	UINT8 curwidth; /* = counter set U33/U42 */
+	UINT8 u13ff;    /* = flip-flop at U13 */
 	int cycles = 0;
 
 /*  logerror("Blit: src=%04X mode=%02X dest=%04X skip=%02X width=%02X height=%02X\n",
@@ -838,32 +838,32 @@ WRITE8_MEMBER(astrocde_state::astrocade_pattern_board_w)
 {
 	switch (offset)
 	{
-		case 0:		/* source offset low 8 bits */
+		case 0:     /* source offset low 8 bits */
 			m_pattern_source = (m_pattern_source & 0xff00) | (data << 0);
 			break;
 
-		case 1:		/* source offset upper 8 bits */
+		case 1:     /* source offset upper 8 bits */
 			m_pattern_source = (m_pattern_source & 0x00ff) | (data << 8);
 			break;
 
-		case 2:		/* mode control; also clears low byte of dest */
+		case 2:     /* mode control; also clears low byte of dest */
 			m_pattern_mode = data & 0x3f;
 			m_pattern_dest &= 0xff00;
 			break;
 
-		case 3:		/* skip value */
+		case 3:     /* skip value */
 			m_pattern_skip = data;
 			break;
 
-		case 4:		/* dest offset upper 8 bits; also adds skip to low 8 bits */
+		case 4:     /* dest offset upper 8 bits; also adds skip to low 8 bits */
 			m_pattern_dest = ((m_pattern_dest + m_pattern_skip) & 0xff) | (data << 8);
 			break;
 
-		case 5:		/* width of blit */
+		case 5:     /* width of blit */
 			m_pattern_width = data;
 			break;
 
-		case 6:		/* height of blit and initiator */
+		case 6:     /* height of blit and initiator */
 			m_pattern_height = data;
 			execute_blit(space.device().memory().space(AS_PROGRAM));
 			break;
@@ -931,9 +931,9 @@ static void init_sparklestar(running_machine &machine)
 		/* extract the sparkle/star intensity here */
 		/* this is controlled by the shift register at U17/U19/U18 */
 		state->m_sparklestar[i] = (((shiftreg >> 4) & 1) << 3) |
-						 (((shiftreg >> 12) & 1) << 2) |
-						 (((shiftreg >> 16) & 1) << 1) |
-						 (((shiftreg >> 8) & 1) << 0);
+							(((shiftreg >> 12) & 1) << 2) |
+							(((shiftreg >> 16) & 1) << 1) |
+							(((shiftreg >> 8) & 1) << 0);
 
 		/* determine the star enable here */
 		/* this is controlled by the shift register at U17/U12/U11 */
@@ -968,29 +968,29 @@ WRITE8_MEMBER(astrocde_state::profpac_screenram_ctrl_w)
 {
 	switch (offset)
 	{
-		case 0:		/* port 0xC0 - red component */
+		case 0:     /* port 0xC0 - red component */
 			m_profpac_palette[data >> 4] = (m_profpac_palette[data >> 4] & ~0xf00) | ((data & 0x0f) << 8);
 			break;
 
-		case 1:		/* port 0xC1 - green component */
+		case 1:     /* port 0xC1 - green component */
 			m_profpac_palette[data >> 4] = (m_profpac_palette[data >> 4] & ~0x0f0) | ((data & 0x0f) << 4);
 			break;
 
-		case 2:		/* port 0xC2 - blue component */
+		case 2:     /* port 0xC2 - blue component */
 			m_profpac_palette[data >> 4] = (m_profpac_palette[data >> 4] & ~0x00f) | ((data & 0x0f) << 0);
 			break;
 
-		case 3:		/* port 0xC3 - set 2bpp to 4bpp mapping and clear intercepts */
+		case 3:     /* port 0xC3 - set 2bpp to 4bpp mapping and clear intercepts */
 			m_profpac_colormap[(data >> 4) & 3] = data & 0x0f;
 			m_profpac_intercept = 0x00;
 			break;
 
-		case 4:		/* port 0xC4 - which half to read on a memory access */
-			m_profpac_vw = data & 0x0f;	/* refresh write enable lines TBD */
+		case 4:     /* port 0xC4 - which half to read on a memory access */
+			m_profpac_vw = data & 0x0f; /* refresh write enable lines TBD */
 			m_profpac_readshift = 2 * ((data >> 4) & 1);
 			break;
 
-		case 5:		/* port 0xC5 - write enable and write mode */
+		case 5:     /* port 0xC5 - write enable and write mode */
 			m_profpac_writemask = ((data & 0x0f) << 12) | ((data & 0x0f) << 8) | ((data & 0x0f) << 4) | ((data & 0x0f) << 0);
 			m_profpac_writemode = (data >> 4) & 0x03;
 			break;
@@ -1020,22 +1020,22 @@ WRITE8_MEMBER(astrocde_state::profpac_videoram_w)
 
 	/* apply the 2->4 bit expansion first */
 	newbits = (m_profpac_colormap[(data >> 6) & 3] << 12) |
-			  (m_profpac_colormap[(data >> 4) & 3] << 8) |
-			  (m_profpac_colormap[(data >> 2) & 3] << 4) |
-			  (m_profpac_colormap[(data >> 0) & 3] << 0);
+				(m_profpac_colormap[(data >> 4) & 3] << 8) |
+				(m_profpac_colormap[(data >> 2) & 3] << 4) |
+				(m_profpac_colormap[(data >> 0) & 3] << 0);
 
 	/* there are 4 write modes: overwrite, xor, overlay, or underlay */
 	switch (m_profpac_writemode)
 	{
-		case 0:		/* normal write */
+		case 0:     /* normal write */
 			result = newbits;
 			break;
 
-		case 1:		/* xor write */
+		case 1:     /* xor write */
 			result = newbits ^ oldbits;
 			break;
 
-		case 2:		/* overlay write */
+		case 2:     /* overlay write */
 			result  = ((newbits & 0xf000) == 0) ? (oldbits & 0xf000) : (newbits & 0xf000);
 			result |= ((newbits & 0x0f00) == 0) ? (oldbits & 0x0f00) : (newbits & 0x0f00);
 			result |= ((newbits & 0x00f0) == 0) ? (oldbits & 0x00f0) : (newbits & 0x00f0);
@@ -1058,24 +1058,24 @@ WRITE8_MEMBER(astrocde_state::profpac_videoram_w)
 
 	/* There are 3 bits on the register, which are set by various combinations of writes */
 	if (((oldbits & 0xf000) == 0x2000 && (newbits & 0x8000) == 0x8000) ||
-	    ((oldbits & 0xf000) == 0x3000 && (newbits & 0xc000) == 0x4000) ||
-	    ((oldbits & 0x0f00) == 0x0200 && (newbits & 0x0800) == 0x0800) ||
-	    ((oldbits & 0x0f00) == 0x0300 && (newbits & 0x0c00) == 0x0400) ||
-	    ((oldbits & 0x00f0) == 0x0020 && (newbits & 0x0080) == 0x0080) ||
-	    ((oldbits & 0x00f0) == 0x0030 && (newbits & 0x00c0) == 0x0040) ||
-	    ((oldbits & 0x000f) == 0x0002 && (newbits & 0x0008) == 0x0008) ||
-	    ((oldbits & 0x000f) == 0x0003 && (newbits & 0x000c) == 0x0004))
-	    m_profpac_intercept |= 0x01;
+		((oldbits & 0xf000) == 0x3000 && (newbits & 0xc000) == 0x4000) ||
+		((oldbits & 0x0f00) == 0x0200 && (newbits & 0x0800) == 0x0800) ||
+		((oldbits & 0x0f00) == 0x0300 && (newbits & 0x0c00) == 0x0400) ||
+		((oldbits & 0x00f0) == 0x0020 && (newbits & 0x0080) == 0x0080) ||
+		((oldbits & 0x00f0) == 0x0030 && (newbits & 0x00c0) == 0x0040) ||
+		((oldbits & 0x000f) == 0x0002 && (newbits & 0x0008) == 0x0008) ||
+		((oldbits & 0x000f) == 0x0003 && (newbits & 0x000c) == 0x0004))
+		m_profpac_intercept |= 0x01;
 
 	if (((newbits & 0xf000) != 0x0000 && (oldbits & 0xc000) == 0x4000) ||
-	    ((newbits & 0x0f00) != 0x0000 && (oldbits & 0x0c00) == 0x0400) ||
-	    ((newbits & 0x00f0) != 0x0000 && (oldbits & 0x00c0) == 0x0040) ||
-	    ((newbits & 0x000f) != 0x0000 && (oldbits & 0x000c) == 0x0004))
-	    m_profpac_intercept |= 0x02;
+		((newbits & 0x0f00) != 0x0000 && (oldbits & 0x0c00) == 0x0400) ||
+		((newbits & 0x00f0) != 0x0000 && (oldbits & 0x00c0) == 0x0040) ||
+		((newbits & 0x000f) != 0x0000 && (oldbits & 0x000c) == 0x0004))
+		m_profpac_intercept |= 0x02;
 
 	if (((newbits & 0xf000) != 0x0000 && (oldbits & 0x8000) == 0x8000) ||
-	    ((newbits & 0x0f00) != 0x0000 && (oldbits & 0x0800) == 0x0800) ||
-	    ((newbits & 0x00f0) != 0x0000 && (oldbits & 0x0080) == 0x0080) ||
-	    ((newbits & 0x000f) != 0x0000 && (oldbits & 0x0008) == 0x0008))
-	    m_profpac_intercept |= 0x04;
+		((newbits & 0x0f00) != 0x0000 && (oldbits & 0x0800) == 0x0800) ||
+		((newbits & 0x00f0) != 0x0000 && (oldbits & 0x0080) == 0x0080) ||
+		((newbits & 0x000f) != 0x0000 && (oldbits & 0x0008) == 0x0008))
+		m_profpac_intercept |= 0x04;
 }

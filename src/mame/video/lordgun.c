@@ -238,8 +238,8 @@ void lordgun_update_gun(running_machine &machine, int i)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
-	UINT16 *s		=	state->m_spriteram;
-	UINT16 *end		=	state->m_spriteram + state->m_spriteram.bytes()/2;
+	UINT16 *s       =   state->m_spriteram;
+	UINT16 *end     =   state->m_spriteram + state->m_spriteram.bytes()/2;
 
 	for ( ; s < end; s += 8/2 )
 	{
@@ -247,42 +247,42 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sx, nx, x, x0, x1, dx, flipx;
 		int sy, ny, y, y0, y1, dy, flipy;
 
-		sy		=		s[ 0 ];
-		attr	=		s[ 1 ];
-		code	=		s[ 2 ];
-		sx		=		s[ 3 ];
+		sy      =       s[ 0 ];
+		attr    =       s[ 1 ];
+		code    =       s[ 2 ];
+		sx      =       s[ 3 ];
 
 		// End of sprite list
 		if (attr & 0x0100)
 			break;
 
-		flipx	=	 attr & 0x8000;
-		flipy	=	 attr & 0x4000;
-		pri		=	(attr & 0x0e00) >> 9;
-		color	=	(attr & 0x00f0) >> 4;
-		nx		=	(attr & 0x000f) + 1;
+		flipx   =    attr & 0x8000;
+		flipy   =    attr & 0x4000;
+		pri     =   (attr & 0x0e00) >> 9;
+		color   =   (attr & 0x00f0) >> 4;
+		nx      =   (attr & 0x000f) + 1;
 
-		ny		=	((sy & 0xf000) >> 12) + 1;
+		ny      =   ((sy & 0xf000) >> 12) + 1;
 
-		if ( flipx )	{	x0 = nx - 1;	x1 = -1;	dx = -1;	}
-		else			{	x0 = 0;			x1 = nx;	dx = +1;	}
+		if ( flipx )    {   x0 = nx - 1;    x1 = -1;    dx = -1;    }
+		else            {   x0 = 0;         x1 = nx;    dx = +1;    }
 
-		if ( flipy )	{	y0 = ny - 1;	y1 = -1;	dy = -1;	}
-		else			{	y0 = 0;			y1 = ny;	dy = +1;	}
+		if ( flipy )    {   y0 = ny - 1;    y1 = -1;    dy = -1;    }
+		else            {   y0 = 0;         y1 = ny;    dy = +1;    }
 
 		// Sign extend the position
-		sx	-=	0x18;
-		sy	=	(sy & 0x7ff) - (sy & 0x800);
+		sx  -=  0x18;
+		sy  =   (sy & 0x7ff) - (sy & 0x800);
 
 		for (y = y0; y != y1; y += dy)
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				drawgfx_transpen(	bitmap,	cliprect, machine.gfx[4],
+				drawgfx_transpen(   bitmap, cliprect, machine.gfx[4],
 									code, color + pri * 0x800/0x40,
 									flipx, flipy,
 									sx + x * 0x10, sy + y * 0x10,
-									0x3f	);
+									0x3f    );
 				code += 0x10;
 			}
 
@@ -326,11 +326,11 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 	{
 		int msk = 0;
 
-		if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-		if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-		if (machine().input().code_pressed(KEYCODE_R))	msk |= 8;
-		if (machine().input().code_pressed(KEYCODE_A))	msk |= 16;
+		if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+		if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
+		if (machine().input().code_pressed(KEYCODE_R))  msk |= 8;
+		if (machine().input().code_pressed(KEYCODE_A))  msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
@@ -363,17 +363,17 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 	// render each layer (0-3 tilemaps, 4 sprites) into a buffer bitmap.
 	// The priority code of each pixel will be stored into the high 3 bits of the pen
 
-	pen_t trans_pen = 0 * 0x800 + 0x3f;	// pri = 0, pen = 3f (transparent)
+	pen_t trans_pen = 0 * 0x800 + 0x3f; // pri = 0, pen = 3f (transparent)
 
 	int l;
 	for (l = 0; l < 5; l++)
 		m_bitmaps[l]->fill(trans_pen, cliprect);
 
-	if (layers_ctrl & 1)	m_tilemap[0]->draw(*m_bitmaps[0], cliprect, 0, 0);
-	if (layers_ctrl & 2)	m_tilemap[1]->draw(*m_bitmaps[1], cliprect, 0, 0);
-	if (layers_ctrl & 4)	m_tilemap[2]->draw(*m_bitmaps[2], cliprect, 0, 0);
-	if (layers_ctrl & 8)	m_tilemap[3]->draw(*m_bitmaps[3], cliprect, 0, 0);
-	if (layers_ctrl & 16)	draw_sprites(machine(), *m_bitmaps[4], cliprect);
+	if (layers_ctrl & 1)    m_tilemap[0]->draw(*m_bitmaps[0], cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_tilemap[1]->draw(*m_bitmaps[1], cliprect, 0, 0);
+	if (layers_ctrl & 4)    m_tilemap[2]->draw(*m_bitmaps[2], cliprect, 0, 0);
+	if (layers_ctrl & 8)    m_tilemap[3]->draw(*m_bitmaps[3], cliprect, 0, 0);
+	if (layers_ctrl & 16)   draw_sprites(machine(), *m_bitmaps[4], cliprect);
 
 	// copy to screen bitmap
 
@@ -409,7 +409,7 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 
 			pri_addr &= 0x7fff;
 
-			l	=	pri2layer[m_priority_ram[pri_addr] & 7];
+			l   =   pri2layer[m_priority_ram[pri_addr] & 7];
 
 			bitmap.pix16(y, x) = pens[l];
 		}

@@ -30,7 +30,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap, const rect
 		y = 136 + 16 * (i ^ 1);
 
 		for (x = 0; x < bitmap.width(); x += 16)
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], *p++, 0, 0, 0,	x, y, 0);
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], *p++, 0, 0, 0,   x, y, 0);
 	}
 }
 

@@ -138,10 +138,10 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 		phase = 0;
 		switch((old_state ^ new_state) & 0x0F)
 		{
-			case 1:	phase = 0; break;
-			case 2:	phase = 1; break;
-			case 4:	phase = 2; break;
-			case 8:	phase = 3; break;
+			case 1: phase = 0; break;
+			case 2: phase = 1; break;
+			case 4: phase = 2; break;
+			case 8: phase = 3; break;
 		}
 
 		phase -= floppy_drive_get_current_track(image) * 2;
@@ -165,12 +165,12 @@ int apple525_get_count(device_t *device)
 {
 	int cnt = 0;
 	if (device->subdevice("^"FLOPPY_0)!=NULL && device->type() == FLOPPY_APPLE && get_device(device->subdevice(PARENT_FLOPPY_0))!=NULL) cnt++;
-    if (device->subdevice("^"FLOPPY_1)!=NULL && device->type() == FLOPPY_APPLE && get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL) cnt++;
-    if (device->subdevice("^"FLOPPY_2)!=NULL && device->type() == FLOPPY_APPLE && get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL) cnt++;
-    if (device->subdevice("^"FLOPPY_3)!=NULL && device->type() == FLOPPY_APPLE && get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL) cnt++;
+	if (device->subdevice("^"FLOPPY_1)!=NULL && device->type() == FLOPPY_APPLE && get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL) cnt++;
+	if (device->subdevice("^"FLOPPY_2)!=NULL && device->type() == FLOPPY_APPLE && get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL) cnt++;
+	if (device->subdevice("^"FLOPPY_3)!=NULL && device->type() == FLOPPY_APPLE && get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL) cnt++;
 
 //    printf("%d apple525 drives\n", cnt);
-    return cnt;
+	return cnt;
 }
 
 void apple525_set_lines(device_t *device, UINT8 lines)
@@ -297,7 +297,7 @@ const device_type FLOPPY_APPLE = &device_creator<apple525_floppy_image_device>;
 //-------------------------------------------------
 
 apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Apple Disk II", tag, owner, clock)
+	: legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Apple Disk II", tag, owner, clock)
 {
 }
 

@@ -16,7 +16,7 @@ const device_type TVC_SOUND = &device_creator<tvc_sound_device>;
 
 tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TVC_SOUND, "TVC 64 Custom Sound", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -63,7 +63,7 @@ void tvc_sound_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_sndint_cb, 0, sizeof(m_sndint_cb));
+		memset(&m_sndint_cb, 0, sizeof(m_sndint_cb));
 	}
 }
 

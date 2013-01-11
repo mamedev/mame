@@ -100,7 +100,7 @@ void t6a04_device::device_reset()
 	m_zpos = 0;
 	m_direction = 1;
 	m_active_counter = 1;
-	m_word_len = 1;	//8bit mode
+	m_word_len = 1; //8bit mode
 	m_opa1 = 0;
 	m_opa2 = 0;
 	m_output_reg = 0;
@@ -186,15 +186,15 @@ WRITE8_MEMBER(t6a04_device::control_write)
 READ8_MEMBER(t6a04_device::control_read)
 {
 	/*
-        status read
-        x--- ----   busy
-        -x-- ----   8/6 mode
-        --x- ----   display on/off
-        ---x ----   reset state
-        ---- xx--   unused (always 0)
-        ---- --x-   x/y counter
-        ---- ---x   up/down mode
-    */
+	    status read
+	    x--- ----   busy
+	    -x-- ----   8/6 mode
+	    --x- ----   display on/off
+	    ---x ----   reset state
+	    ---- xx--   unused (always 0)
+	    ---- --x-   x/y counter
+	    ---- ---x   up/down mode
+	*/
 
 	return (m_busy_flag<<7) | (m_word_len<<6) | (m_display_on<<5) | (m_active_counter<<1) | (m_direction == 1 ? 1 : 0);
 }

@@ -93,11 +93,11 @@ TODO:
 #include "includes/pcw16.h"
 
 /* Components */
-#include "machine/pc_lpt.h"		/* PC-Parallel Port */
-#include "machine/pckeybrd.h"	/* PC-AT keyboard */
-#include "machine/upd765.h"		/* FDC superio */
-#include "machine/ins8250.h"	/* pc com port */
-#include "sound/beep.h"			/* pcw/pcw16 beeper */
+#include "machine/pc_lpt.h"     /* PC-Parallel Port */
+#include "machine/pckeybrd.h"   /* PC-AT keyboard */
+#include "machine/upd765.h"     /* FDC superio */
+#include "machine/ins8250.h"    /* pc com port */
+#include "sound/beep.h"         /* pcw/pcw16 beeper */
 #include "machine/intelfsh.h"
 
 /* Devices */
@@ -298,16 +298,16 @@ WRITE8_MEMBER(pcw16_state::pcw16_video_control_w)
 
 
 
-#define PCW16_KEYBOARD_PARITY_MASK	(1<<7)
+#define PCW16_KEYBOARD_PARITY_MASK  (1<<7)
 #define PCW16_KEYBOARD_STOP_BIT_MASK (1<<6)
 #define PCW16_KEYBOARD_START_BIT_MASK (1<<5)
-#define PCW16_KEYBOARD_BUSY_STATUS	(1<<4)
+#define PCW16_KEYBOARD_BUSY_STATUS  (1<<4)
 #define PCW16_KEYBOARD_FORCE_KEYBOARD_CLOCK (1<<1)
 #define PCW16_KEYBOARD_TRANSMIT_MODE (1<<0)
 
 #define PCW16_KEYBOARD_RESET_INTERFACE (1<<2)
 
-#define PCW16_KEYBOARD_DATA	(1<<1)
+#define PCW16_KEYBOARD_DATA (1<<1)
 #define PCW16_KEYBOARD_CLOCK (1<<0)
 
 /* parity table. Used to set parity bit in keyboard status register */
@@ -318,7 +318,7 @@ void pcw16_state::pcw16_keyboard_init()
 	int b;
 
 	/* if sum of all bits in the byte is even, then the data
-    has even parity, otherwise it has odd parity */
+	has even parity, otherwise it has odd parity */
 	for (i=0; i<256; i++)
 	{
 		int data;
@@ -433,8 +433,8 @@ void pcw16_state::pcw16_keyboard_signal_byte_received(int data)
 	m_keyboard_state |=PCW16_KEYBOARD_STOP_BIT_MASK;
 
 	/* "Keyboard data has odd parity, so the parity bit in the
-    status register should only be set when the shift register
-    data itself has even parity. */
+	status register should only be set when the shift register
+	data itself has even parity. */
 
 	m_keyboard_state &= ~PCW16_KEYBOARD_PARITY_MASK;
 
@@ -467,11 +467,11 @@ READ8_MEMBER(pcw16_state::pcw16_keyboard_status_r)
 	/* bit 2,3 are bits 8 and 9 of vdu pointer */
 	return (m_keyboard_state &
 		(PCW16_KEYBOARD_PARITY_MASK |
-		 PCW16_KEYBOARD_STOP_BIT_MASK |
-		 PCW16_KEYBOARD_START_BIT_MASK |
-		 PCW16_KEYBOARD_BUSY_STATUS |
-		 PCW16_KEYBOARD_FORCE_KEYBOARD_CLOCK |
-		 PCW16_KEYBOARD_TRANSMIT_MODE));
+			PCW16_KEYBOARD_STOP_BIT_MASK |
+			PCW16_KEYBOARD_START_BIT_MASK |
+			PCW16_KEYBOARD_BUSY_STATUS |
+			PCW16_KEYBOARD_FORCE_KEYBOARD_CLOCK |
+			PCW16_KEYBOARD_TRANSMIT_MODE));
 }
 
 WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
@@ -574,7 +574,7 @@ static const int rtc_days_in_each_month[]=
 	30, /* september */
 	31, /* october */
 	30, /* november */
-	31	/* december */
+	31  /* december */
 };
 
 static const int rtc_days_in_february[] =
@@ -659,7 +659,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::rtc_timer_callback)
 READ8_MEMBER(pcw16_state::rtc_year_invalid_r)
 {
 	/* year in lower 7 bits. RTC Invalid status is m_rtc_control bit 0
-    inverted */
+	inverted */
 	return (m_rtc_years & 0x07f) | (((m_rtc_control & 0x01)<<7)^0x080);
 }
 
@@ -754,8 +754,8 @@ void pcw16_state::trigger_fdc_int()
 		{
 			/* I'm assuming that the nmi is edge triggered */
 			/* a interrupt from the fdc will cause a change in line state, and
-            the nmi will be triggered, but when the state changes because the int
-            is cleared this will not cause another nmi */
+			the nmi will be triggered, but when the state changes because the int
+			is cleared this will not cause another nmi */
 			/* I'll emulate it like this to be sure */
 
 			if (state!=m_previous_fdc_int_state)
@@ -763,7 +763,7 @@ void pcw16_state::trigger_fdc_int()
 				if (state)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
-                    it would clear - to be checked */
+					it would clear - to be checked */
 					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
@@ -866,14 +866,14 @@ WRITE8_MEMBER(pcw16_state::pcw16_system_control_w)
 		/* bleeper on */
 		case 0x0b:
 		{
-                        beep_set_state(speaker,1);
+						beep_set_state(speaker,1);
 		}
 		break;
 
 		/* bleeper off */
 		case 0x0c:
 		{
-                        beep_set_state(speaker,0);
+						beep_set_state(speaker,0);
 		}
 		break;
 
@@ -1053,7 +1053,7 @@ static INPUT_PORTS_START(pcw16)
 	PORT_DIPSETTING(0x0, DEF_STR( Off) )
 	PORT_DIPSETTING(0x40, DEF_STR( On) )
 
-	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
+	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
 
@@ -1070,11 +1070,11 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
-	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )		/* TODO: Verify uart model */
+	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )     /* TODO: Verify uart model */
 
-	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1], XTAL_1_8432MHz )		/* TODO: Verify uart model */
+	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1], XTAL_1_8432MHz )     /* TODO: Verify uart model */
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1094,7 +1094,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_PC_LPT_ADD("lpt", pcw16_lpt_config)
 	MCFG_PC_FDC_SUPERIO_ADD("fdc")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", 0, pcw16_state::floppy_formats)
-    MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", 0, pcw16_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", 0, pcw16_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
 
@@ -1127,4 +1127,4 @@ ROM_END
 
 
 /*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT    COMPANY          FULLNAME */
-COMP( 1995, pcw16,	  0,		0,		pcw16,	   pcw16, driver_device,    0,		"Amstrad plc",   "PCW16", GAME_NOT_WORKING )
+COMP( 1995, pcw16,    0,        0,      pcw16,     pcw16, driver_device,    0,      "Amstrad plc",   "PCW16", GAME_NOT_WORKING )

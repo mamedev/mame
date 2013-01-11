@@ -37,7 +37,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-const int CRT9212_RAM_SIZE	= 135;
+const int CRT9212_RAM_SIZE  = 135;
 
 
 
@@ -64,42 +64,42 @@ const int CRT9212_RAM_SIZE	= 135;
 
 struct crt9212_interface
 {
-	devcb_write_line		m_out_rof_cb;
-	devcb_write_line		m_out_wof_cb;
-	devcb_read_line			m_in_ren_cb;
-	devcb_read_line			m_in_wen_cb;
-	devcb_read_line			m_in_wen2_cb;
+	devcb_write_line        m_out_rof_cb;
+	devcb_write_line        m_out_wof_cb;
+	devcb_read_line         m_in_ren_cb;
+	devcb_read_line         m_in_wen_cb;
+	devcb_read_line         m_in_wen2_cb;
 };
 
 
 
 // ======================> crt9212_device
 
-class crt9212_device :	public device_t,
+class crt9212_device :  public device_t,
 						public crt9212_interface
 {
 public:
-    // construction/destruction
-    crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( clrcnt_w );
 	DECLARE_WRITE_LINE_MEMBER( tog_w );
 	DECLARE_WRITE_LINE_MEMBER( rclk_w );
 	DECLARE_WRITE_LINE_MEMBER( wclk_w );
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 
 private:
-	devcb_resolved_write_line	m_out_rof_func;
-	devcb_resolved_write_line	m_out_wof_func;
-	devcb_resolved_read_line	m_in_ren_func;
-	devcb_resolved_read_line	m_in_wen_func;
-	devcb_resolved_read_line	m_in_wen2_func;
+	devcb_resolved_write_line   m_out_rof_func;
+	devcb_resolved_write_line   m_out_wof_func;
+	devcb_resolved_read_line    m_in_ren_func;
+	devcb_resolved_read_line    m_in_wen_func;
+	devcb_resolved_read_line    m_in_wen2_func;
 
 	UINT8 m_ram[CRT9212_RAM_SIZE][2];
 

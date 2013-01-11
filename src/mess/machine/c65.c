@@ -45,7 +45,7 @@ static void c65_nmi( running_machine &machine )
 	device_t *cia_1 = machine.device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)   /* KEY_RESTORE */
 	{
 		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
 
@@ -132,7 +132,7 @@ void c65_vic_interrupt( running_machine &machine, int level )
 const legacy_mos6526_interface c65_cia0 =
 {
 	DEVCB_LINE(c65_cia0_interrupt),
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(c65_state,c65_cia0_port_a_r),
@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(c65_state::c65_cia1_interrupt)
 const legacy_mos6526_interface c65_cia1 =
 {
 	DEVCB_DRIVER_LINE_MEMBER(c65_state,c65_cia1_interrupt),
-	DEVCB_NULL,	/* pc_func */
+	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(c65_state,c65_cia1_port_a_r),
@@ -300,10 +300,10 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 			if (state->m_dump_dma)
 				DBG_LOG(space.machine(), 1,"dma copy job",
 						("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
-						 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
-						 c65_read_mem(space, pair.d + 1) ) );
+							len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
+							c65_read_mem(space, pair.d + 1) ) );
 			if ((state->m_dma.version == 1)
-				 && ( (src.d&0x400000) || (dst.d & 0x400000)))
+					&& ( (src.d&0x400000) || (dst.d & 0x400000)))
 			{
 				if (!(src.d & 0x400000))
 				{
@@ -334,24 +334,24 @@ static void c65_dma_port_w( running_machine &machine, int offset, int value )
 		case 3:
 			DBG_LOG(space.machine(), 3,"dma fill job",
 					("len:%.4x value:%.2x dst:%.6x sub:%.2x modrm:%.2x\n",
-					 len.w.l, fill, dst.d, c65_read_mem(space, pair.d),
-					 c65_read_mem(space, pair.d + 1)));
+						len.w.l, fill, dst.d, c65_read_mem(space, pair.d),
+						c65_read_mem(space, pair.d + 1)));
 				for (i = 0; i < len.w.l; i++)
 					c65_write_mem(space, dst.d++, fill);
 				break;
 		case 0x30:
 			DBG_LOG(space.machine(), 1,"dma copy down",
 					("len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
-					 len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
-					 c65_read_mem(space, pair.d + 1) ) );
+						len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
+						c65_read_mem(space, pair.d + 1) ) );
 			for (i = 0; i < len.w.l; i++)
 				c65_write_mem(space, dst.d--,c65_read_mem(space, src.d--));
 			break;
 		default:
 			DBG_LOG(space.machine(), 1,"dma job",
 					("cmd:%.2x len:%.4x src:%.6x dst:%.6x sub:%.2x modrm:%.2x\n",
-					 cmd,len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
-					 c65_read_mem(space, pair.d + 1)));
+						cmd,len.w.l, src.d, dst.d, c65_read_mem(space, pair.d),
+						c65_read_mem(space, pair.d + 1)));
 		}
 		break;
 	default:
@@ -364,7 +364,7 @@ static int c65_dma_port_r( running_machine &machine, int offset )
 {
 	/* offset 3 bit 7 in progress ? */
 	DBG_LOG(machine, 2, "dma chip read", ("%.3x\n", offset));
-    return 0x7f;
+	return 0x7f;
 }
 
 static void c65_6511_port_w( running_machine &machine, int offset, int value )

@@ -42,7 +42,7 @@
 #include "machine/upd765.h"
 #include "machine/ram.h"
 
-#define MAIN_CLK	15974400
+#define MAIN_CLK    15974400
 
 /*
     Driver data
@@ -117,18 +117,18 @@ public:
 
 	UINT8 *m_char_rom;
 
-	int		m_mc146818_offset;
+	int     m_mc146818_offset;
 
 	/* FDD */
-	int		m_fdcint;
-	int		m_fdcmotor;
-	int		m_fdcready;
+	int     m_fdcint;
+	int     m_fdcmotor;
+	int     m_fdcready;
 
 	/* memory */
-	int		m_membank;
-	int		m_memprom;
-	int		m_memcmos;
-	UINT8	m_cmosram[0x800];
+	int     m_membank;
+	int     m_memprom;
+	int     m_memcmos;
+	UINT8   m_cmosram[0x800];
 
 	UINT8 m_color_mode;
 
@@ -350,9 +350,9 @@ READ8_MEMBER( qx10_state::qx10_30_r )
 	floppy2 = machine().device<floppy_connector>("upd765:1")->get_device();
 
 	return m_fdcint |
-		   /*m_fdcmotor*/ 0 << 1 |
-		   ((floppy1 != NULL) || (floppy2 != NULL) ? 1 : 0) << 3 |
-		   m_membank << 4;
+			/*m_fdcmotor*/ 0 << 1 |
+			((floppy1 != NULL) || (floppy2 != NULL) ? 1 : 0) << 3 |
+			m_membank << 4;
 }
 
 /*
@@ -459,34 +459,34 @@ WRITE8_MEMBER( qx10_state::mc146818_offset_w )
 
 static UPD7201_INTERFACE(qx10_upd7201_interface)
 {
-	DEVCB_NULL,					/* interrupt */
+	DEVCB_NULL,                 /* interrupt */
 	{
 		{
-			0,					/* receive clock */
-			0,					/* transmit clock */
-			DEVCB_NULL,			/* receive DRQ */
-			DEVCB_NULL,			/* transmit DRQ */
-			DEVCB_NULL,			/* receive data */
-			DEVCB_NULL,			/* transmit data */
-			DEVCB_NULL,			/* clear to send */
-			DEVCB_NULL,			/* data carrier detect */
-			DEVCB_NULL,			/* ready to send */
-			DEVCB_NULL,			/* data terminal ready */
-			DEVCB_NULL,			/* wait */
-			DEVCB_NULL			/* sync output */
+			0,                  /* receive clock */
+			0,                  /* transmit clock */
+			DEVCB_NULL,         /* receive DRQ */
+			DEVCB_NULL,         /* transmit DRQ */
+			DEVCB_NULL,         /* receive data */
+			DEVCB_NULL,         /* transmit data */
+			DEVCB_NULL,         /* clear to send */
+			DEVCB_NULL,         /* data carrier detect */
+			DEVCB_NULL,         /* ready to send */
+			DEVCB_NULL,         /* data terminal ready */
+			DEVCB_NULL,         /* wait */
+			DEVCB_NULL          /* sync output */
 		}, {
-			0,					/* receive clock */
-			0,					/* transmit clock */
-			DEVCB_NULL,			/* receive DRQ */
-			DEVCB_NULL,			/* transmit DRQ */
-			DEVCB_NULL,			/* receive data */
-			DEVCB_NULL,			/* transmit data */
-			DEVCB_NULL,			/* clear to send */
-			DEVCB_NULL,			/* data carrier detect */
-			DEVCB_NULL,			/* ready to send */
-			DEVCB_NULL,			/* data terminal ready */
-			DEVCB_NULL,			/* wait */
-			DEVCB_NULL			/* sync output */
+			0,                  /* receive clock */
+			0,                  /* transmit clock */
+			DEVCB_NULL,         /* receive DRQ */
+			DEVCB_NULL,         /* transmit DRQ */
+			DEVCB_NULL,         /* receive data */
+			DEVCB_NULL,         /* transmit data */
+			DEVCB_NULL,         /* clear to send */
+			DEVCB_NULL,         /* data carrier detect */
+			DEVCB_NULL,         /* ready to send */
+			DEVCB_NULL,         /* data terminal ready */
+			DEVCB_NULL,         /* wait */
+			DEVCB_NULL          /* sync output */
 		}
 	}
 };
@@ -949,15 +949,15 @@ void qx10_state::machine_reset()
 /* F4 Character Displayer */
 static const gfx_layout qx10_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	RGN_FRAC(1,1),			/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	RGN_FRAC(1,1),          /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* y offsets */
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( qx10 )
@@ -992,7 +992,7 @@ READ8_MEMBER( qx10_state::vram_r )
 {
 	int bank = 0;
 
-	if (m_vram_bank & 1)	 { bank = 0; } // B
+	if (m_vram_bank & 1)     { bank = 0; } // B
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
@@ -1003,7 +1003,7 @@ WRITE8_MEMBER( qx10_state::vram_w )
 {
 	int bank = 0;
 
-	if (m_vram_bank & 1)	 { bank = 0; } // B
+	if (m_vram_bank & 1)     { bank = 0; } // B
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
@@ -1061,7 +1061,7 @@ ROM_START( qx10 )
 
 	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
 	/* The first part of this rom looks like code for an embedded controller?
-        From 0300 on, is a keyboard lookup table */
+	    From 0300 on, is a keyboard lookup table */
 	ROM_REGION( 0x0800, "i8039", 0 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 
@@ -1073,4 +1073,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, qx10,  0,       0,	qx10,	qx10, driver_device,	 0,		  "Epson",   "QX-10",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, qx10,  0,       0,  qx10,   qx10, driver_device,     0,       "Epson",   "QX-10",       GAME_NOT_WORKING | GAME_NO_SOUND )

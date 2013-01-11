@@ -55,27 +55,27 @@ extern const device_type MC6854;
 
 struct mc6854_interface
 {
-  devcb_write_line  out_irq_func; /* interrupt request */
+	devcb_write_line  out_irq_func; /* interrupt request */
 
-  /* low-level, bit-based interface */
-  devcb_read_line   in_rxd_func; /* receive bit */
-  devcb_write_line  out_txd_func; /* transmit bit */
+	/* low-level, bit-based interface */
+	devcb_read_line   in_rxd_func; /* receive bit */
+	devcb_write_line  out_txd_func; /* transmit bit */
 
-  /* high-level, frame-based interface */
-  void ( * out_frame ) ( device_t *device, UINT8* data, int length );
+	/* high-level, frame-based interface */
+	void ( * out_frame ) ( device_t *device, UINT8* data, int length );
 
-  /* control lines */
-  devcb_write_line  out_rts_func; /* 1 = transmitting, 0 = idle */
-  devcb_write_line  out_dtr_func; /* 1 = data transmit ready, 0 = busy */
+	/* control lines */
+	devcb_write_line  out_rts_func; /* 1 = transmitting, 0 = idle */
+	devcb_write_line  out_dtr_func; /* 1 = data transmit ready, 0 = busy */
 };
 
 
 #define MCFG_MC6854_ADD(_tag, _intrf) \
-  MCFG_DEVICE_ADD(_tag, MC6854, 0)	      \
-  MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_ADD(_tag, MC6854, 0)          \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_MC6854_REMOVE(_tag)		\
-  MCFG_DEVICE_REMOVE(_tag)
+#define MCFG_MC6854_REMOVE(_tag)        \
+	MCFG_DEVICE_REMOVE(_tag)
 
 
 /* ---------- functions ------------ */

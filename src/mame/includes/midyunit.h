@@ -11,20 +11,20 @@
 /* protection data types */
 struct protection_data
 {
-	UINT16	reset_sequence[3];
-	UINT16	data_sequence[100];
+	UINT16  reset_sequence[3];
+	UINT16  data_sequence[100];
 };
 
 struct dma_state_t
 {
-	UINT32		offset;			/* source offset, in bits */
-	INT32		rowbytes;		/* source bytes to skip each row */
-	INT32		xpos;			/* x position, clipped */
-	INT32		ypos;			/* y position, clipped */
-	INT32		width;			/* horizontal pixel count */
-	INT32		height;			/* vertical pixel count */
-	UINT16		palette;		/* palette base */
-	UINT16		color;			/* current foreground color with palette */
+	UINT32      offset;         /* source offset, in bits */
+	INT32       rowbytes;       /* source bytes to skip each row */
+	INT32       xpos;           /* x position, clipped */
+	INT32       ypos;           /* y position, clipped */
+	INT32       width;          /* horizontal pixel count */
+	INT32       height;         /* vertical pixel count */
+	UINT16      palette;        /* palette base */
+	UINT16      color;          /* current foreground color with palette */
 };
 
 
@@ -33,10 +33,10 @@ class midyunit_state : public driver_device
 public:
 	midyunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_narc_sound(*this, "narcsnd"),
-		  m_cvsd_sound(*this, "cvsd"),
-		  m_adpcm_sound(*this, "adpcm"),
-		  m_gfx_rom(*this, "gfx_rom", 16) { }
+			m_narc_sound(*this, "narcsnd"),
+			m_cvsd_sound(*this, "cvsd"),
+			m_adpcm_sound(*this, "adpcm"),
+			m_gfx_rom(*this, "gfx_rom", 16) { }
 
 	optional_device<williams_narc_sound_device> m_narc_sound;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
@@ -56,8 +56,8 @@ public:
 	UINT8 *m_cvsd_protection_base;
 	UINT8 m_autoerase_enable;
 	UINT32 m_palette_mask;
-	pen_t *	m_pen_map;
-	UINT16 *	m_local_videoram;
+	pen_t * m_pen_map;
+	UINT16 *    m_local_videoram;
 	UINT8 m_videobank_select;
 	UINT8 m_yawdim_dma;
 	UINT16 m_dma_register[16];

@@ -169,8 +169,8 @@ READ8_MEMBER(pk8020_state::devices_r)
 		case 0x10: switch(offset & 1) {
 						case 0 : return rs232->data_r(space,0);
 						case 1 : return rs232->status_r(space,0);
-				   }
-				   break;
+					}
+					break;
 		case 0x18: switch(offset & 3) {
 						case 0 : return wd17xx_status_r(fdc,space, 0);
 						case 1 : return wd17xx_track_r(fdc,space, 0);
@@ -181,8 +181,8 @@ READ8_MEMBER(pk8020_state::devices_r)
 		case 0x20: switch(offset & 1) {
 						case 0 : return lan->data_r(space,0);
 						case 1 : return lan->status_r(space,0);
-				   }
-				   break;
+					}
+					break;
 		case 0x28: return pic8259_r(pic,space, offset & 1);
 		case 0x30: return ppi2->read(space,offset & 3);
 		case 0x38: return ppi1->read(space,offset & 3);
@@ -208,8 +208,8 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 		case 0x10: switch(offset & 1) {
 						case 0 : rs232->data_w(space,0,data); break;
 						case 1 : rs232->control_w(space,0,data); break;
-				   }
-				   break;
+					}
+					break;
 		case 0x18: switch(offset & 3) {
 						case 0 : wd17xx_command_w(fdc,space, 0,data);break;
 						case 1 : wd17xx_track_w(fdc,space, 0,data);break;
@@ -220,8 +220,8 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 		case 0x20: switch(offset & 1) {
 						case 0 : lan->data_w(space,0,data); break;
 						case 1 : lan->control_w(space,0,data); break;
-				   }
-				   break;
+					}
+					break;
 		case 0x28: pic8259_w(pic,space, offset & 1,data);break;
 		case 0x30: ppi2->write(space,offset & 3,data); break;
 		case 0x38: ppi1->write(space,offset & 3,data); break;

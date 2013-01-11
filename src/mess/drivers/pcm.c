@@ -221,60 +221,60 @@ UINT32 pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 static const z80_daisy_config pcm_daisy_chain[] =
 {
-	{ "z80ctc_s" },		/* System ctc */
-	{ "z80pio_s" },		/* System pio */
-	{ "z80sio" },		/* sio */
-	{ "z80pio_u" },		/* User pio */
-	{ "z80ctc_u" },		/* User ctc */
+	{ "z80ctc_s" },     /* System ctc */
+	{ "z80pio_s" },     /* System pio */
+	{ "z80sio" },       /* sio */
+	{ "z80pio_u" },     /* User pio */
+	{ "z80ctc_u" },     /* User ctc */
 	{ NULL }
 };
 
 static Z80CTC_INTERFACE( ctc_u_intf ) // all pins go to expansion socket
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,			/* ZC/TO0 callback */
-	DEVCB_NULL,			/* ZC/TO1 callback */
-	DEVCB_NULL			/* ZC/TO2 callback */
+	DEVCB_NULL,         /* ZC/TO0 callback */
+	DEVCB_NULL,         /* ZC/TO1 callback */
+	DEVCB_NULL          /* ZC/TO2 callback */
 };
 
 static Z80CTC_INTERFACE( ctc_s_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,			/* ZC/TO0 callback - SIO channel A clock */
-	DEVCB_NULL,			/* ZC/TO1 callback - SIO channel B clock */
+	DEVCB_NULL,         /* ZC/TO0 callback - SIO channel A clock */
+	DEVCB_NULL,         /* ZC/TO1 callback - SIO channel B clock */
 	DEVCB_DRIVER_LINE_MEMBER(pcm_state, pcm_82_w) /* ZC/TO2 callback - speaker */
 };
 
 static Z80PIO_INTERFACE( pio_u_intf ) // all pins go to expansion socket
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,			/* read port A */
-	DEVCB_NULL,			/* write port A */
-	DEVCB_NULL,			/* portA ready active callback */
-	DEVCB_NULL,			/* read port B */
-	DEVCB_NULL,			/* write port B */
-	DEVCB_NULL			/* portB ready active callback */
+	DEVCB_NULL,         /* read port A */
+	DEVCB_NULL,         /* write port A */
+	DEVCB_NULL,         /* portA ready active callback */
+	DEVCB_NULL,         /* read port B */
+	DEVCB_NULL,         /* write port B */
+	DEVCB_NULL          /* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( pio_s_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DEVICE_MEMBER(K7659_KEYBOARD_TAG, k7659_keyboard_device, read),			/* read port A */
-	DEVCB_NULL,			/* write port A */
-	DEVCB_NULL,			/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_r),			/* read port B */
-	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_w),			/* write port B */
-	DEVCB_NULL			/* portB ready active callback */
+	DEVCB_DEVICE_MEMBER(K7659_KEYBOARD_TAG, k7659_keyboard_device, read),           /* read port A */
+	DEVCB_NULL,         /* write port A */
+	DEVCB_NULL,         /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_r),           /* read port B */
+	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_w),           /* write port B */
+	DEVCB_NULL          /* portB ready active callback */
 };
 
 static const z80sio_interface sio_intf =
 {
 	DEVCB_NULL, //DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,			/* DTR changed handler */
-	DEVCB_NULL,			/* RTS changed handler */
-	DEVCB_NULL,			/* BREAK changed handler */
-	DEVCB_NULL,			/* transmit handler */
-	DEVCB_NULL			/* receive handler */
+	DEVCB_NULL,         /* DTR changed handler */
+	DEVCB_NULL,         /* RTS changed handler */
+	DEVCB_NULL,         /* BREAK changed handler */
+	DEVCB_NULL,         /* transmit handler */
+	DEVCB_NULL          /* receive handler */
 };
 
 
@@ -282,15 +282,15 @@ static const z80sio_interface sio_intf =
 /* F4 Character Displayer */
 static const gfx_layout pcm_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( pcm )

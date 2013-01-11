@@ -12,10 +12,10 @@
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
 
-#define SCREEN_TAG		"screen"
-#define CDP1802_TAG		"ic3"
-#define CDP1864_TAG		"ic4"
-#define MC6821_TAG		"ic5"
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "ic3"
+#define CDP1864_TAG     "ic4"
+#define MC6821_TAG      "ic5"
 
 enum
 {
@@ -28,10 +28,10 @@ class eti660_state : public driver_device
 public:
 	eti660_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_cti(*this, CDP1864_TAG),
-		  m_pia(*this, MC6821_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_cti(*this, CDP1864_TAG),
+			m_pia(*this, MC6821_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;

@@ -140,7 +140,7 @@ class pc6001_state : public driver_device
 public:
 	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ppi(*this, "ppi8255")
+			m_ppi(*this, "ppi8255")
 	,
 		m_ram(*this, "ram"){ }
 
@@ -628,12 +628,12 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 			for(x=0;x<40;x++)
 			{
 				/*
-                exgfx attr format:
-                x--- ---- rom bank select
-                -xxx ---- bg color
-                ---- xxxx fg color
-                Note that the exgfx banks a different gfx ROM
-                */
+				exgfx attr format:
+				x--- ---- rom bank select
+				-xxx ---- bg color
+				---- xxxx fg color
+				Note that the exgfx banks a different gfx ROM
+				*/
 				tile = m_video_ram[(x+(y*40))+0x400] + 0x200;
 				attr = m_video_ram[(x+(y*40)) & 0x3ff];
 				tile+= ((attr & 0x80) << 1);
@@ -841,11 +841,11 @@ WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
 			m_port_c_8255 &= ~(1<<((data>>1)&0x07));
 
 		switch(data) {
-        	case 0x08: m_port_c_8255 |= 0x88; break;
-        	case 0x09: m_port_c_8255 &= 0xf7; break;
-        	case 0x0c: m_port_c_8255 |= 0x28; break;
-        	case 0x0d: m_port_c_8255 &= 0xf7; break;
-        	default: break;
+			case 0x08: m_port_c_8255 |= 0x88; break;
+			case 0x09: m_port_c_8255 &= 0xf7; break;
+			case 0x0c: m_port_c_8255 |= 0x28; break;
+			case 0x0d: m_port_c_8255 &= 0xf7; break;
+			default: break;
 		}
 
 		m_port_c_8255 |= 0xa8;
@@ -923,144 +923,144 @@ ADDRESS_MAP_END
 /* FIXME: some comments aren't right */
 static const UINT32 banksw_table_r0[0x10*4][4] = {
 	/* 0 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ TVROM(0),		TVROM(1),		VOICEROM(0),	VOICEROM(1) },	//0x02: tv rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ TVROM(1),		BASICROM(1),	VOICEROM(0),	BASICROM(3) },	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	TVROM(2),		BASICROM(2),	VOICEROM(1) },	//0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		TVROM(2),		EXROM(0),		VOICEROM(1) },	//0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
-	{ TVROM(1),		EXROM(0),		VOICEROM(0),	EXROM(0)	},	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(0),		WRAM(1),		WRAM(2),		WRAM(3)		},	//0x0d: ram 0 & 1 / ram 2 & 3
-	{ EXWRAM(0),	EXWRAM(1),		EXWRAM(2),		EXWRAM(3)	},	//0x0e: exram 0 & 1 / exram 2 & 3
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  },	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ TVROM(0),     TVROM(1),       VOICEROM(0),    VOICEROM(1) },  //0x02: tv rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ TVROM(1),     BASICROM(1),    VOICEROM(0),    BASICROM(3) },  //0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  TVROM(2),       BASICROM(2),    VOICEROM(1) },  //0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     TVROM(2),       EXROM(0),       VOICEROM(1) },  //0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
+	{ TVROM(1),     EXROM(0),       VOICEROM(0),    EXROM(0)    },  //0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(0),      WRAM(1),        WRAM(2),        WRAM(3)     },  //0x0d: ram 0 & 1 / ram 2 & 3
+	{ EXWRAM(0),    EXWRAM(1),      EXWRAM(2),      EXWRAM(3)   },  //0x0e: exram 0 & 1 / exram 2 & 3
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x0f: <invalid setting>
 	/* 1 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ KANJIROM(0),	KANJIROM(1),	KANJIROM(0),	KANJIROM(1) },	//0x02: tv rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ KANJIROM(0),	BASICROM(1),	KANJIROM(0),	BASICROM(3) },	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	KANJIROM(1),	BASICROM(2),	KANJIROM(1) },	//0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		KANJIROM(1),	EXROM(0),		KANJIROM(1) },	//0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
-	{ KANJIROM(0),	EXROM(0),		KANJIROM(0),	EXROM(0)	},	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(0),		WRAM(1),		WRAM(2),		WRAM(3)		},	//0x0d: ram 0 & 1 / ram 2 & 3
-	{ EXWRAM(0),	EXWRAM(1),		EXWRAM(2),		EXWRAM(3)	},	//0x0e: exram 0 & 1 / exram 2 & 3
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  },	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ KANJIROM(0),  KANJIROM(1),    KANJIROM(0),    KANJIROM(1) },  //0x02: tv rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ KANJIROM(0),  BASICROM(1),    KANJIROM(0),    BASICROM(3) },  //0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  KANJIROM(1),    BASICROM(2),    KANJIROM(1) },  //0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     KANJIROM(1),    EXROM(0),       KANJIROM(1) },  //0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
+	{ KANJIROM(0),  EXROM(0),       KANJIROM(0),    EXROM(0)    },  //0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(0),      WRAM(1),        WRAM(2),        WRAM(3)     },  //0x0d: ram 0 & 1 / ram 2 & 3
+	{ EXWRAM(0),    EXWRAM(1),      EXWRAM(2),      EXWRAM(3)   },  //0x0e: exram 0 & 1 / exram 2 & 3
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x0f: <invalid setting>
 	/* 2 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ TVROM(0),		TVROM(1),		VOICEROM(0),	VOICEROM(1) },	//0x02: tv rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ TVROM(1),		BASICROM(1),	VOICEROM(0),	BASICROM(3) },	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	TVROM(2),		BASICROM(2),	VOICEROM(1) },	//0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		TVROM(2),		EXROM(0),		VOICEROM(1) },	//0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
-	{ TVROM(1),		EXROM(0),		VOICEROM(0),	EXROM(0)	},	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(0),		WRAM(1),		WRAM(2),		WRAM(3)		},	//0x0d: ram 0 & 1 / ram 2 & 3
-	{ EXWRAM(0),	EXWRAM(1),		EXWRAM(2),		EXWRAM(3)	},	//0x0e: exram 0 & 1 / exram 2 & 3
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  },	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ TVROM(0),     TVROM(1),       VOICEROM(0),    VOICEROM(1) },  //0x02: tv rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ TVROM(1),     BASICROM(1),    VOICEROM(0),    BASICROM(3) },  //0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  TVROM(2),       BASICROM(2),    VOICEROM(1) },  //0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     TVROM(2),       EXROM(0),       VOICEROM(1) },  //0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
+	{ TVROM(1),     EXROM(0),       VOICEROM(0),    EXROM(0)    },  //0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(0),      WRAM(1),        WRAM(2),        WRAM(3)     },  //0x0d: ram 0 & 1 / ram 2 & 3
+	{ EXWRAM(0),    EXWRAM(1),      EXWRAM(2),      EXWRAM(3)   },  //0x0e: exram 0 & 1 / exram 2 & 3
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x0f: <invalid setting>
 	/* 3 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ KANJIROM(2),	KANJIROM(3),	KANJIROM(2),	KANJIROM(3) },	//0x02: tv rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ KANJIROM(2),	BASICROM(1),	KANJIROM(2),	BASICROM(3) },	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	KANJIROM(3),	BASICROM(2),	KANJIROM(3) },	//0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		KANJIROM(3),	EXROM(0),		KANJIROM(3) },	//0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
-	{ KANJIROM(2),	EXROM(0),		KANJIROM(2),	EXROM(0)	},	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(0),		WRAM(1),		WRAM(2),		WRAM(3)		},	//0x0d: ram 0 & 1 / ram 2 & 3
-	{ EXWRAM(0),	EXWRAM(1),		EXWRAM(2),		EXWRAM(3)	},	//0x0e: exram 0 & 1 / exram 2 & 3
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  }	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ KANJIROM(2),  KANJIROM(3),    KANJIROM(2),    KANJIROM(3) },  //0x02: tv rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ KANJIROM(2),  BASICROM(1),    KANJIROM(2),    BASICROM(3) },  //0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  KANJIROM(3),    BASICROM(2),    KANJIROM(3) },  //0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     KANJIROM(3),    EXROM(0),       KANJIROM(3) },  //0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
+	{ KANJIROM(2),  EXROM(0),       KANJIROM(2),    EXROM(0)    },  //0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(0),      WRAM(1),        WRAM(2),        WRAM(3)     },  //0x0d: ram 0 & 1 / ram 2 & 3
+	{ EXWRAM(0),    EXWRAM(1),      EXWRAM(2),      EXWRAM(3)   },  //0x0e: exram 0 & 1 / exram 2 & 3
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  }   //0x0f: <invalid setting>
 };
 
 static const UINT32 banksw_table_r1[0x10*4][4] = {
 	/* 0 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ VOICEROM(0),	VOICEROM(1),	VOICEROM(0),	VOICEROM(1) },	//0x02: voice rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ VOICEROM(0),	BASICROM(1),	VOICEROM(0),	BASICROM(3) },	//0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	VOICEROM(1),	BASICROM(2),	VOICEROM(1) },	//0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		VOICEROM(1),	EXROM(0),		VOICEROM(1) },	//0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
-	{ VOICEROM(0),	EXROM(0),		VOICEROM(0),	EXROM(0)	},	//0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(4),		WRAM(5),		WRAM(6),		WRAM(7)		},	//0x0d: ram 4 & 5 / ram 6 & 7
-	{ EXWRAM(4),	EXWRAM(5),		EXWRAM(6),		EXWRAM(7)	},	//0x0e: exram 4 & 5 / exram 6 & 7
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  },	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ VOICEROM(0),  VOICEROM(1),    VOICEROM(0),    VOICEROM(1) },  //0x02: voice rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ VOICEROM(0),  BASICROM(1),    VOICEROM(0),    BASICROM(3) },  //0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  VOICEROM(1),    BASICROM(2),    VOICEROM(1) },  //0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     VOICEROM(1),    EXROM(0),       VOICEROM(1) },  //0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
+	{ VOICEROM(0),  EXROM(0),       VOICEROM(0),    EXROM(0)    },  //0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(4),      WRAM(5),        WRAM(6),        WRAM(7)     },  //0x0d: ram 4 & 5 / ram 6 & 7
+	{ EXWRAM(4),    EXWRAM(5),      EXWRAM(6),      EXWRAM(7)   },  //0x0e: exram 4 & 5 / exram 6 & 7
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x0f: <invalid setting>
 	/* 1 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ KANJIROM(0),	KANJIROM(1),	KANJIROM(0),	KANJIROM(1) },	//0x02: kanji rom 0 & 1 / kanji rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ KANJIROM(0),	BASICROM(1),	KANJIROM(0),	BASICROM(3) },	//0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	KANJIROM(1),	BASICROM(2),	KANJIROM(1) },	//0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		KANJIROM(1),	EXROM(0),		KANJIROM(1) },	//0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
-	{ KANJIROM(0),	EXROM(0),		KANJIROM(0),	EXROM(0)	},	//0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(4),		WRAM(5),		WRAM(6),		WRAM(7)		},	//0x0d: ram 4 & 5 / ram 6 & 7
-	{ EXWRAM(4),	EXWRAM(5),		EXWRAM(6),		EXWRAM(7)	},	//0x0e: exram 4 & 5 / exram 6 & 7
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  },	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ KANJIROM(0),  KANJIROM(1),    KANJIROM(0),    KANJIROM(1) },  //0x02: kanji rom 0 & 1 / kanji rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ KANJIROM(0),  BASICROM(1),    KANJIROM(0),    BASICROM(3) },  //0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  KANJIROM(1),    BASICROM(2),    KANJIROM(1) },  //0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     KANJIROM(1),    EXROM(0),       KANJIROM(1) },  //0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
+	{ KANJIROM(0),  EXROM(0),       KANJIROM(0),    EXROM(0)    },  //0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(4),      WRAM(5),        WRAM(6),        WRAM(7)     },  //0x0d: ram 4 & 5 / ram 6 & 7
+	{ EXWRAM(4),    EXWRAM(5),      EXWRAM(6),      EXWRAM(7)   },  //0x0e: exram 4 & 5 / exram 6 & 7
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x0f: <invalid setting>
 	/* 2 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ VOICEROM(0),	VOICEROM(1),	VOICEROM(0),	VOICEROM(1) },	//0x02: voice rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ VOICEROM(0),	BASICROM(1),	VOICEROM(0),	BASICROM(3) },	//0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	VOICEROM(1),	BASICROM(2),	VOICEROM(1) },	//0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		VOICEROM(1),	EXROM(0),		VOICEROM(1) },	//0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
-	{ VOICEROM(0),	EXROM(0),		VOICEROM(0),	EXROM(0)	},	//0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(4),		WRAM(5),		WRAM(6),		WRAM(7)		},	//0x0d: ram 4 & 5 / ram 6 & 7
-	{ EXWRAM(4),	EXWRAM(5),		EXWRAM(6),		EXWRAM(7)	},	//0x0e: exram 4 & 5 / exram 6 & 7
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  },	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ VOICEROM(0),  VOICEROM(1),    VOICEROM(0),    VOICEROM(1) },  //0x02: voice rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ VOICEROM(0),  BASICROM(1),    VOICEROM(0),    BASICROM(3) },  //0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  VOICEROM(1),    BASICROM(2),    VOICEROM(1) },  //0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     VOICEROM(1),    EXROM(0),       VOICEROM(1) },  //0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
+	{ VOICEROM(0),  EXROM(0),       VOICEROM(0),    EXROM(0)    },  //0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(4),      WRAM(5),        WRAM(6),        WRAM(7)     },  //0x0d: ram 4 & 5 / ram 6 & 7
+	{ EXWRAM(4),    EXWRAM(5),      EXWRAM(6),      EXWRAM(7)   },  //0x0e: exram 4 & 5 / exram 6 & 7
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x0f: <invalid setting>
 	/* 3 */
-	{ INVALID(0),	INVALID(0),		INVALID(0),     INVALID(0)  },	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ KANJIROM(2),	KANJIROM(3),	KANJIROM(2),	KANJIROM(3) },	//0x02: kanji rom 0 & 1 / kanji rom 0 & 1
-	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ KANJIROM(2),	BASICROM(1),	KANJIROM(2),	BASICROM(3) },	//0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
-	{ BASICROM(0),	KANJIROM(3),	BASICROM(2),	KANJIROM(3) },	//0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
-	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
-	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
-	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
-	{ EXROM(0),		KANJIROM(3),	EXROM(0),		KANJIROM(3) },	//0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
-	{ KANJIROM(2),	EXROM(0),		KANJIROM(2),	EXROM(0)	},	//0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
-	{ WRAM(4),		WRAM(5),		WRAM(6),		WRAM(7)		},	//0x0d: ram 4 & 5 / ram 6 & 7
-	{ EXWRAM(4),	EXWRAM(5),		EXWRAM(6),		EXWRAM(7)	},	//0x0e: exram 4 & 5 / exram 6 & 7
-	{ INVALID(0),	INVALID(0),		INVALID(0),		INVALID(0)  }	//0x0f: <invalid setting>
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
+	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ KANJIROM(2),  KANJIROM(3),    KANJIROM(2),    KANJIROM(3) },  //0x02: kanji rom 0 & 1 / kanji rom 0 & 1
+	{ EXROM(1),     EXROM(1),       EXROM(1),       EXROM(1)    },  //0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),     EXROM(0),       EXROM(0),       EXROM(0)    },  //0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ KANJIROM(2),  BASICROM(1),    KANJIROM(2),    BASICROM(3) },  //0x05: voice rom 0 & basic rom 1 / voice rom 0 & basic 3
+	{ BASICROM(0),  KANJIROM(3),    BASICROM(2),    KANJIROM(3) },  //0x06: basic rom 0 & voice rom 1 / basic rom 2 & voice 1
+	{ EXROM(0),     EXROM(1),       EXROM(0),       EXROM(1)    },  //0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
+	{ EXROM(1),     EXROM(0),       EXROM(1),       EXROM(0)    },  //0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),     BASICROM(1),    EXROM(1),       BASICROM(3) },  //0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
+	{ BASICROM(0),  EXROM(1),       BASICROM(2),    EXROM(1)    },  //0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
+	{ EXROM(0),     KANJIROM(3),    EXROM(0),       KANJIROM(3) },  //0x0b: ex rom 0 & voice rom 1 / ex rom 0 & voice 1
+	{ KANJIROM(2),  EXROM(0),       KANJIROM(2),    EXROM(0)    },  //0x0c: voice rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ WRAM(4),      WRAM(5),        WRAM(6),        WRAM(7)     },  //0x0d: ram 4 & 5 / ram 6 & 7
+	{ EXWRAM(4),    EXWRAM(5),      EXWRAM(6),      EXWRAM(7)   },  //0x0e: exram 4 & 5 / exram 6 & 7
+	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  }   //0x0f: <invalid setting>
 };
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r0_w)
@@ -1110,11 +1110,11 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_opt_bank_w)
 	UINT8 *gfx_data = memregion("gfx1")->base();
 
 	/*
-    0 - TVROM / VOICE ROM
-    1 - KANJI ROM bank 0
-    2 - KANJI ROM bank 1
-    3 - TVROM / VOICE ROM
-    */
+	0 - TVROM / VOICE ROM
+	1 - KANJI ROM bank 0
+	2 - KANJI ROM bank 1
+	3 - TVROM / VOICE ROM
+	*/
 	m_bank_opt = data & 3;
 
 	membank("bank1")->set_base(&ROM[banksw_table_r0[(m_bank_r0 & 0xf)+(m_bank_opt*0x10)][0]]);
@@ -1191,11 +1191,11 @@ WRITE8_MEMBER(pc6001_state::necmk2_ppi8255_w)
 			m_port_c_8255 &= ~(1<<((data>>1)&0x07));
 
 		switch(data) {
-        	case 0x08: m_port_c_8255 |= 0x88; break;
-        	case 0x09: m_port_c_8255 &= 0xf7; break;
-        	case 0x0c: m_port_c_8255 |= 0x28; break;
-        	case 0x0d: m_port_c_8255 &= 0xf7; break;
-        	default: break;
+			case 0x08: m_port_c_8255 |= 0x88; break;
+			case 0x09: m_port_c_8255 &= 0xf7; break;
+			case 0x0c: m_port_c_8255 |= 0x28; break;
+			case 0x0d: m_port_c_8255 &= 0xf7; break;
+			default: break;
 		}
 
 		m_port_c_8255 |= 0xa8;
@@ -1354,15 +1354,15 @@ WRITE8_MEMBER(pc6001_state::upd7752_reg_w)
 WRITE8_MEMBER(pc6001_state::pc6001m2_0xf3_w)
 {
 	/*
-    x--- ---- M1 (?) wait setting
-    -x-- ---- ROM wait setting
-    --x- ---- RAM wait setting
-    ---x ---- custom irq 2 address output
-    ---- x--- custom irq 1 address output
-    ---- -x-- timer irq mask 2 (mirror?)
-    ---- --x- custom irq 2 mask
-    ---- ---x custom irq 1 mask
-    */
+	x--- ---- M1 (?) wait setting
+	-x-- ---- ROM wait setting
+	--x- ---- RAM wait setting
+	---x ---- custom irq 2 address output
+	---- x--- custom irq 1 address output
+	---- -x-- timer irq mask 2 (mirror?)
+	---- --x- custom irq 2 mask
+	---- ---x custom irq 1 mask
+	*/
 	m_timer_irq_mask2 = data & 4;
 }
 
@@ -1629,11 +1629,11 @@ WRITE8_MEMBER(pc6001_state::necsr_ppi8255_w)
 			m_port_c_8255 &= ~(1<<((data>>1)&0x07));
 
 		switch(data) {
-        	case 0x08: m_port_c_8255 |= 0x88; break;
-        	case 0x09: m_port_c_8255 &= 0xf7; break;
-        	case 0x0c: m_port_c_8255 |= 0x28; break;
-        	case 0x0d: m_port_c_8255 &= 0xf7; break;
-        	default: break;
+			case 0x08: m_port_c_8255 |= 0x88; break;
+			case 0x09: m_port_c_8255 &= 0xf7; break;
+			case 0x0c: m_port_c_8255 |= 0x28; break;
+			case 0x0d: m_port_c_8255 &= 0xf7; break;
+			default: break;
 		}
 
 		m_port_c_8255 |= 0xa8;
@@ -1999,15 +1999,15 @@ static UINT8 check_joy_press(running_machine &machine)
 	UINT8 joy_press;
 
 		/*
-            PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-            PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-            PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-            PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-            PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-            PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-            PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-            PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-        */
+		    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+		    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+		    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+		    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+		    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+		    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+		    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+		    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+		*/
 
 	joy_press = 0;
 
@@ -2215,39 +2215,39 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
 static const rgb_t defcolors[] =
 {
 	MAKE_RGB(0x07, 0xff, 0x00), /* GREEN */
-	MAKE_RGB(0xff, 0xff, 0x00),	/* YELLOW */
+	MAKE_RGB(0xff, 0xff, 0x00), /* YELLOW */
 	MAKE_RGB(0x3b, 0x08, 0xff), /* BLUE */
 	MAKE_RGB(0xcc, 0x00, 0x3b), /* RED */
-	MAKE_RGB(0xff, 0xff, 0xff),	/* BUFF */
-	MAKE_RGB(0x07, 0xe3, 0x99),	/* CYAN */
-	MAKE_RGB(0xff, 0x1c, 0xff),	/* MAGENTA */
-	MAKE_RGB(0xff, 0x81, 0x00),	/* ORANGE */
+	MAKE_RGB(0xff, 0xff, 0xff), /* BUFF */
+	MAKE_RGB(0x07, 0xe3, 0x99), /* CYAN */
+	MAKE_RGB(0xff, 0x1c, 0xff), /* MAGENTA */
+	MAKE_RGB(0xff, 0x81, 0x00), /* ORANGE */
 
 	/* MC6847 specific */
-	MAKE_RGB(0x00, 0x7c, 0x00),	/* ALPHANUMERIC DARK GREEN */
-	MAKE_RGB(0x07, 0xff, 0x00),	/* ALPHANUMERIC BRIGHT GREEN */
-	MAKE_RGB(0x91, 0x00, 0x00),	/* ALPHANUMERIC DARK ORANGE */
-	MAKE_RGB(0xff, 0x81, 0x00)	/* ALPHANUMERIC BRIGHT ORANGE */
+	MAKE_RGB(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
+	MAKE_RGB(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
+	MAKE_RGB(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
+	MAKE_RGB(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
 };
 
 static const rgb_t mk2_defcolors[] =
 {
-	MAKE_RGB(0x00, 0x00, 0x00),	/* BLACK */
-	MAKE_RGB(0xff, 0xaf, 0x00),	/* ORANGE */
-	MAKE_RGB(0x00, 0xff, 0xaf),	/* tone of GREEN */
-	MAKE_RGB(0xaf, 0xff, 0x00),	/* tone of GREEN */
-	MAKE_RGB(0xaf, 0x00, 0xff),	/* VIOLET */
-	MAKE_RGB(0xff, 0x00, 0xaf),	/* SCARLET */
-	MAKE_RGB(0x00, 0xaf, 0xff),	/* LIGHT BLUE */
-	MAKE_RGB(0xaf, 0xaf, 0xaf),	/* GRAY */
-	MAKE_RGB(0x00, 0x00, 0x00),	/* BLACK */
-	MAKE_RGB(0xff, 0x00, 0x00),	/* RED */
-	MAKE_RGB(0x00, 0xff, 0x00),	/* GREEN */
-	MAKE_RGB(0xff, 0xff, 0x00),	/* YELLOW */
-	MAKE_RGB(0x00, 0x00, 0xff),	/* BLUE */
-	MAKE_RGB(0xff, 0x00, 0xff),	/* PINK */
-	MAKE_RGB(0x00, 0xff, 0xff),	/* CYAN */
-	MAKE_RGB(0xff, 0xff, 0xff)	/* WHITE */
+	MAKE_RGB(0x00, 0x00, 0x00), /* BLACK */
+	MAKE_RGB(0xff, 0xaf, 0x00), /* ORANGE */
+	MAKE_RGB(0x00, 0xff, 0xaf), /* tone of GREEN */
+	MAKE_RGB(0xaf, 0xff, 0x00), /* tone of GREEN */
+	MAKE_RGB(0xaf, 0x00, 0xff), /* VIOLET */
+	MAKE_RGB(0xff, 0x00, 0xaf), /* SCARLET */
+	MAKE_RGB(0x00, 0xaf, 0xff), /* LIGHT BLUE */
+	MAKE_RGB(0xaf, 0xaf, 0xaf), /* GRAY */
+	MAKE_RGB(0x00, 0x00, 0x00), /* BLACK */
+	MAKE_RGB(0xff, 0x00, 0x00), /* RED */
+	MAKE_RGB(0x00, 0xff, 0x00), /* GREEN */
+	MAKE_RGB(0xff, 0xff, 0x00), /* YELLOW */
+	MAKE_RGB(0x00, 0x00, 0xff), /* BLUE */
+	MAKE_RGB(0xff, 0x00, 0xff), /* PINK */
+	MAKE_RGB(0x00, 0xff, 0xff), /* CYAN */
+	MAKE_RGB(0xff, 0xff, 0xff)  /* WHITE */
 };
 
 void pc6001_state::palette_init()
@@ -2486,7 +2486,7 @@ ROM_START( pc6001mk2 )
 	ROM_COPY( "maincpu", 0x48000, 0x0000, 0x4000 )
 ROM_END
 
-ROM_START( pc6601 )	/* Variant of pc6001m2 */
+ROM_START( pc6601 ) /* Variant of pc6001m2 */
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom.66", 0x10000, 0x8000, CRC(c0b01772) SHA1(9240bb6b97fe06f5f07b5d65541c4d2f8758cc2a) )
 	ROM_LOAD( "voicerom.66", 0x18000, 0x4000, CRC(91d078c1) SHA1(6a93bd7723ef67f461394530a9feee57c8caf7b7) )

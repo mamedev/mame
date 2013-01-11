@@ -104,23 +104,23 @@ union SCUDSPREG16 {
 };
 
 static struct {
-	   UINT8 pc;							           /*Program Counter*/
-	   UINT8 delay;									   /* Delay */
-	   UINT8 top;									   /*Jump Command memory*/
-	   UINT16 lop;								       /*Counter Register*/	  /*12-bits*/
-	   UINT8  ct0,ct1,ct2,ct3;					       /*Index for RAM*/	  /*6-bits */
-	   UINT32 md0[0x40],md1[0x40],md2[0x40],md3[0x40]; /*RAM memory*/
-	   UINT8  ra;									   /*RAM selector*/
-	   SCUDSPREG32 rx;								   /*X-Bus register*/
-	   INT64 mul;                                      /*Multiplier register*//*48-bits*/
-	   SCUDSPREG32 ry;								   /*Y-Bus register*/
-	   INT64  alu;                                     /*ALU register*/       /*48-bits*/
-	   SCUDSPREG16 ph;								   /*ALU high register*/
-	   SCUDSPREG32 pl;								   /*ALU low register*/
-	   SCUDSPREG16 ach;								   /*ALU external high register*/
-	   SCUDSPREG32 acl;								   /*ALU external low register*/
-	   UINT32 ra0,wa0;								   /*DSP DMA registers*/
-	   UINT32 internal_prg[0x100];
+		UINT8 pc;                                      /*Program Counter*/
+		UINT8 delay;                                       /* Delay */
+		UINT8 top;                                     /*Jump Command memory*/
+		UINT16 lop;                                    /*Counter Register*/   /*12-bits*/
+		UINT8  ct0,ct1,ct2,ct3;                        /*Index for RAM*/      /*6-bits */
+		UINT32 md0[0x40],md1[0x40],md2[0x40],md3[0x40]; /*RAM memory*/
+		UINT8  ra;                                     /*RAM selector*/
+		SCUDSPREG32 rx;                                /*X-Bus register*/
+		INT64 mul;                                      /*Multiplier register*//*48-bits*/
+		SCUDSPREG32 ry;                                /*Y-Bus register*/
+		INT64  alu;                                     /*ALU register*/       /*48-bits*/
+		SCUDSPREG16 ph;                                /*ALU high register*/
+		SCUDSPREG32 pl;                                /*ALU low register*/
+		SCUDSPREG16 ach;                                   /*ALU external high register*/
+		SCUDSPREG32 acl;                                   /*ALU external low register*/
+		UINT32 ra0,wa0;                                /*DSP DMA registers*/
+		UINT32 internal_prg[0x100];
 } dsp_reg;
 
 static UINT32 opcode;
@@ -146,31 +146,31 @@ static UINT32 dsp_get_source_mem_value( UINT32 mode )
 
 	switch( mode )
 	{
-		case 0x0:	/* M0 */
+		case 0x0:   /* M0 */
 			value = dsp_reg.md0[ dsp_reg.ct0 ];
 			break;
-		case 0x1:	/* M1 */
+		case 0x1:   /* M1 */
 			value = dsp_reg.md1[ dsp_reg.ct1 ];
 			break;
-		case 0x2:	/* M2 */
+		case 0x2:   /* M2 */
 			value = dsp_reg.md2[ dsp_reg.ct2 ];
 			break;
-		case 0x3:	/* M3 */
+		case 0x3:   /* M3 */
 			value = dsp_reg.md3[ dsp_reg.ct3 ];
 			break;
-		case 0x4:	/* MC0 */
+		case 0x4:   /* MC0 */
 			value = dsp_reg.md0[ dsp_reg.ct0++ ];
 			dsp_reg.ct0 &= 0x3f;
 			break;
-		case 0x5:	/* MC1 */
+		case 0x5:   /* MC1 */
 			value = dsp_reg.md1[ dsp_reg.ct1++ ];
 			dsp_reg.ct1 &= 0x3f;
 			break;
-		case 0x6:	/* MC2 */
+		case 0x6:   /* MC2 */
 			value = dsp_reg.md2[ dsp_reg.ct2++ ];
 			dsp_reg.ct2 &= 0x3f;
 			break;
-		case 0x7:	/* MC3 */
+		case 0x7:   /* MC3 */
 			value = dsp_reg.md3[ dsp_reg.ct3++ ];
 			dsp_reg.ct3 &= 0x3f;
 			break;
@@ -201,56 +201,56 @@ static void dsp_set_dest_mem_reg( UINT32 mode, UINT32 value )
 {
 	switch( mode )
 	{
-		case 0x0:	/* MC0 */
+		case 0x0:   /* MC0 */
 			dsp_reg.md0[ dsp_reg.ct0++ ] = value;
 			dsp_reg.ct0 &= 0x3f;
 			break;
-		case 0x1:	/* MC1 */
+		case 0x1:   /* MC1 */
 			dsp_reg.md1[ dsp_reg.ct1++ ] = value;
 			dsp_reg.ct1 &= 0x3f;
 			break;
-		case 0x2:	/* MC2 */
+		case 0x2:   /* MC2 */
 			dsp_reg.md2[ dsp_reg.ct2++ ] = value;
 			dsp_reg.ct2 &= 0x3f;
 			break;
-		case 0x3:	/* MC3 */
+		case 0x3:   /* MC3 */
 			dsp_reg.md3[ dsp_reg.ct3++ ] = value;
 			dsp_reg.ct3 &= 0x3f;
 			break;
-		case 0x4:	/* RX */
+		case 0x4:   /* RX */
 			dsp_reg.rx.ui = value;
 			update_mul = 1;
 			break;
-		case 0x5:	/* PL */
+		case 0x5:   /* PL */
 			dsp_reg.pl.ui = value;
 			dsp_reg.ph.si = (dsp_reg.pl.si < 0) ? -1 : 0;
 			break;
-		case 0x6:	/* RA0 */
+		case 0x6:   /* RA0 */
 			dsp_reg.ra0 = value;
 			break;
-		case 0x7:	/* WA0 */
+		case 0x7:   /* WA0 */
 			dsp_reg.wa0 = value;
 			break;
 		case 0x8:
 		case 0x9:
 			/* ??? */
 			break;
-		case 0xa:	/* LOP */
+		case 0xa:   /* LOP */
 			dsp_reg.lop = value;
 			break;
-		case 0xb:	/* TOP */
+		case 0xb:   /* TOP */
 			dsp_reg.top = value;
 			break;
-		case 0xc:	/* CT0 */
+		case 0xc:   /* CT0 */
 			dsp_reg.ct0 = value & 0x3f;
 			break;
-		case 0xd:	/* CT1 */
+		case 0xd:   /* CT1 */
 			dsp_reg.ct1 = value & 0x3f;
 			break;
-		case 0xe:	/* CT2 */
+		case 0xe:   /* CT2 */
 			dsp_reg.ct2 = value & 0x3f;
 			break;
-		case 0xf:	/* CT3 */
+		case 0xf:   /* CT3 */
 			dsp_reg.ct3 = value & 0x3f;
 			break;
 	}
@@ -266,8 +266,8 @@ static void dsp_set_dest_mem_reg_2( UINT32 mode, UINT32 value )
 	{
 		switch( mode )
 		{
-			case 0xc:	/* PC */
-			    dsp_reg.delay = dsp_reg.pc;  /* address next after this command will be executed twice */
+			case 0xc:   /* PC */
+				dsp_reg.delay = dsp_reg.pc;  /* address next after this command will be executed twice */
 				dsp_reg.top = dsp_reg.pc;
 				dsp_reg.pc = value;
 				break;
@@ -282,19 +282,19 @@ static UINT32 dsp_compute_condition( address_space &space, UINT32 condition )
 
 	switch( condition & 0xf )
 	{
-		case 0x1:	/* Z */
+		case 0x1:   /* Z */
 			result = ZF;
 			break;
-		case 0x2:	/* S */
+		case 0x2:   /* S */
 			result = SF;
 			break;
-		case 0x3:	/* ZS */
+		case 0x3:   /* ZS */
 			result = ZF | SF;
 			break;
-		case  0x4:	/* C */
+		case  0x4:  /* C */
 			result = CF;
 			break;
-		case 0x8:	/* T0 */
+		case 0x8:   /* T0 */
 			result = T0F;
 			break;
 	}
@@ -370,26 +370,26 @@ void dsp_ram_addr_ctrl(UINT32 data)
 void dsp_ram_addr_w(UINT32 data)
 {
 #if DEBUG_DSP
-    if ( log_file == NULL )
-    {
-        log_file = fopen( "dsp.log", "a" );
-    }
-    fprintf( log_file, "DSP: Writing mem %02X %04X\n", dsp_reg.ra & 0xff, data );
+	if ( log_file == NULL )
+	{
+		log_file = fopen( "dsp.log", "a" );
+	}
+	fprintf( log_file, "DSP: Writing mem %02X %04X\n", dsp_reg.ra & 0xff, data );
 #endif
 	dsp_set_dest_mem_reg( (dsp_reg.ra & 0xc0) >> 6, data );
 }
 
 UINT32 dsp_ram_addr_r()
 {
-    UINT32 data;
+	UINT32 data;
 
-    data = dsp_get_source_mem_value( ((dsp_reg.ra & 0xc0) >> 6) + 4 );
+	data = dsp_get_source_mem_value( ((dsp_reg.ra & 0xc0) >> 6) + 4 );
 #if DEBUG_DSP
-    if ( log_file == NULL )
-    {
-        log_file = fopen( "dsp.log", "a" );
-    }
-    fprintf( log_file, "DSP: Reading mem at %02X %04X\n", dsp_reg.ra & 0xff, data );
+	if ( log_file == NULL )
+	{
+		log_file = fopen( "dsp.log", "a" );
+	}
+	fprintf( log_file, "DSP: Reading mem at %02X %04X\n", dsp_reg.ra & 0xff, data );
 #endif
 	return data;
 }
@@ -406,30 +406,30 @@ static void dsp_operation(address_space &space)
 	/* ALU */
 	switch( (opcode & 0x3c000000) >> 26 )
 	{
-		case 0x0:	/* NOP */
+		case 0x0:   /* NOP */
 			break;
-		case 0x1:	/* AND */
+		case 0x1:   /* AND */
 			i3 = dsp_reg.acl.si & dsp_reg.pl.si;
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
-		case 0x2:	/* OR */
+		case 0x2:   /* OR */
 			i3 = dsp_reg.acl.si | dsp_reg.pl.si;
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
-		case 0x3:	/* XOR */
+		case 0x3:   /* XOR */
 			i3 = dsp_reg.acl.si ^ dsp_reg.pl.si;
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
-		case 0x4:	/* ADD */
+		case 0x4:   /* ADD */
 			i3 = dsp_reg.acl.si + dsp_reg.pl.si;
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			//SET_Z(i3 == 0);
@@ -439,7 +439,7 @@ static void dsp_operation(address_space &space)
 			SET_C(i3 & S64(0x100000000));
 			SET_V(((i3) ^ (dsp_reg.acl.si)) & ((i3) ^ (dsp_reg.pl.si)) & 0x80000000);
 			break;
-		case 0x5:	/* SUB */
+		case 0x5:   /* SUB */
 			i3 = dsp_reg.acl.si - dsp_reg.pl.si;
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z(i3 == 0);
@@ -447,7 +447,7 @@ static void dsp_operation(address_space &space)
 			SET_S(i3 < 0);
 			SET_V(((dsp_reg.pl.si) ^ (dsp_reg.acl.si)) & ((dsp_reg.pl.si) ^ (i3)) & 0x80000000);
 			break;
-		case 0x6:	/* AD2 */
+		case 0x6:   /* AD2 */
 			i1 = CONCAT_64((INT32)dsp_reg.ph.si,dsp_reg.pl.si);
 			i2 = CONCAT_64((INT32)dsp_reg.ach.si,dsp_reg.acl.si);
 			dsp_reg.alu = i1 + i2;
@@ -456,31 +456,31 @@ static void dsp_operation(address_space &space)
 			SET_C((dsp_reg.alu) & S64(0x1000000000000));
 			SET_V(((dsp_reg.alu) ^ (i1)) & ((dsp_reg.alu) ^ (i2)) & S64(0x800000000000));
 			break;
-		case 0x7:	/* ??? */
+		case 0x7:   /* ??? */
 			/* Unrecognized opcode */
 			break;
-		case 0x8:	/* SR */
+		case 0x8:   /* SR */
 			i3 = (dsp_reg.acl.si >> 1) | (dsp_reg.acl.si & 0x80000000);/*MSB does not change*/
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z(i3 == 0);
 			SET_S(i3 < 0);
 			SET_C(dsp_reg.acl.ui & 0x80000000);
 			break;
-		case 0x9:	/* RR */
+		case 0x9:   /* RR */
 			i3 = ((dsp_reg.acl.ui >> 1) & 0x7fffffff) | ((dsp_reg.acl.ui << 31) & 0x80000000);
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
 			SET_C( dsp_reg.acl.ui & 0x1 );
 			break;
-		case 0xa:	/* SL */
+		case 0xa:   /* SL */
 			i3 = dsp_reg.acl.si << 1;
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
 			SET_C( dsp_reg.acl.ui & 0x80000000 );
 			break;
-		case 0xB:	/* RL */
+		case 0xB:   /* RL */
 			i3 = ((dsp_reg.acl.si << 1) & 0xfffffffe) | ((dsp_reg.acl.si >> 31) & 0x1);
 			dsp_reg.alu = (UINT64)(UINT32)i3;
 			SET_Z( i3 == 0 );
@@ -492,7 +492,7 @@ static void dsp_operation(address_space &space)
 		case 0xe:
 			/* Unrecognized opcode */
 			break;
-		case 0xF:	/* RL8 */
+		case 0xF:   /* RL8 */
 			i3 = ((dsp_reg.acl.si << 8) & 0xffffff00) | ((dsp_reg.acl.si >> 24) & 0xff);
 			dsp_reg.alu = i3;
 			SET_Z( i3 == 0 );
@@ -516,14 +516,14 @@ static void dsp_operation(address_space &space)
 	}
 	switch( (opcode & 0x1800000) >> 23 )
 	{
-		case 0x0:	/* NOP */
-		case 0x1:	/* NOP ? */
+		case 0x0:   /* NOP */
+		case 0x1:   /* NOP ? */
 			break;
-		case 0x2:	/* MOV MUL,P */
+		case 0x2:   /* MOV MUL,P */
 			dsp_reg.ph.ui = (UINT16)((dsp_reg.mul & U64(0x0000ffff00000000)) >> 32);
 			dsp_reg.pl.ui = (UINT32)((dsp_reg.mul & U64(0x00000000ffffffff)) >> 0);
 			break;
-		case 0x3:	/* MOV [s],P */
+		case 0x3:   /* MOV [s],P */
 			dsp_mem = (opcode & 0x700000) >> 20;
 			if ( dsp_mem & 4 )
 			{
@@ -550,17 +550,17 @@ static void dsp_operation(address_space &space)
 	}
 	switch( (opcode & 0x60000) >> 17 )
 	{
-		case 0x0:	/* NOP */
+		case 0x0:   /* NOP */
 			break;
-		case 0x1:	/* CLR A */
+		case 0x1:   /* CLR A */
 			dsp_reg.acl.ui = 0;
 			dsp_reg.ach.ui = 0;
 			break;
-		case 0x2:	/* MOV ALU,A */
+		case 0x2:   /* MOV ALU,A */
 			dsp_reg.ach.ui = (UINT16)((dsp_reg.alu & U64(0x0000ffff00000000)) >> 32);
 			dsp_reg.acl.ui = (UINT32)((dsp_reg.alu & U64(0x00000000ffffffff)) >> 0);
 			break;
-		case 0x3:	/* MOV [s], A */
+		case 0x3:   /* MOV [s], A */
 			dsp_mem = (opcode & 0x1C000 ) >> 14;
 			if (dsp_mem & 4)
 			{
@@ -582,15 +582,15 @@ static void dsp_operation(address_space &space)
 	/* D1-Bus */
 	switch( (opcode & 0x3000) >> 12 )
 	{
-		case 0x0:	/* NOP */
+		case 0x0:   /* NOP */
 			break;
-		case 0x1:	/* MOV SImm,[d] */
+		case 0x1:   /* MOV SImm,[d] */
 			dsp_set_dest_mem_reg( (opcode & 0xf00) >> 8, (INT32)(INT8)(opcode & 0xff) );
 			break;
 		case 0x2:
 			/* ??? */
 			break;
-		case 0x3:	/* MOV [s],[d] */
+		case 0x3:   /* MOV [s],[d] */
 			dsp_set_dest_mem_reg( (opcode & 0xf00) >> 8, dsp_get_source_mem_reg_value( opcode & 0xf ) );
 			break;
 	}
@@ -650,15 +650,15 @@ static void dsp_dma( address_space &space )
 		transfer_cnt = opcode & 0xff;
 		switch( add )
 		{
-		  case 0: add = 0; break;  /* 0 */
-		  case 1: add = 4; break;  /* 1 */
-		  case 2: add = 4; break;  /* 2 */
-		  case 3: add = 16; break; /* 4 */
-		  case 4: add = 16; break;  /* 8 */
-		  case 5: add = 64; break; /* 16 */
-		  case 6: add = 128; break; /* 32 */
-		  case 7: add = 256; break; /* 64 */
-        }
+			case 0: add = 0; break;  /* 0 */
+			case 1: add = 4; break;  /* 1 */
+			case 2: add = 4; break;  /* 2 */
+			case 3: add = 16; break; /* 4 */
+			case 4: add = 16; break;  /* 8 */
+			case 5: add = 64; break; /* 16 */
+			case 6: add = 128; break; /* 32 */
+			case 7: add = 256; break; /* 64 */
+		}
 	}
 
 	if ( dir_from_D0 == 0 )
@@ -670,13 +670,13 @@ static void dsp_dma( address_space &space )
 		transfer_cnt &= 0xff;
 
 #if DEBUG_DSP
-        fprintf( log_file, "/*DSP DMA D0,[RAM%d],%d add=%d*/\n", dsp_mem, transfer_cnt, add );
+		fprintf( log_file, "/*DSP DMA D0,[RAM%d],%d add=%d*/\n", dsp_mem, transfer_cnt, add );
 #endif
 
 		for ( counter = 0; counter < transfer_cnt ; counter++ )
 		{
 #if DEBUG_DSP
-            fprintf( log_file, "%08X, ", source ); fflush( log_file );
+			fprintf( log_file, "%08X, ", source ); fflush( log_file );
 #endif
 
 			if ( source >= 0x06000000 && source <= 0x060fffff )
@@ -693,7 +693,7 @@ static void dsp_dma( address_space &space )
 			}
 
 #if DEBUG_DSP
-            fprintf( log_file, "%08X,\n", data );
+			fprintf( log_file, "%08X,\n", data );
 #endif
 			dsp_set_dest_dma_mem( dsp_mem, data, counter );
 			source += add;
@@ -801,27 +801,27 @@ static void dsp_loop( void )
 #if DEBUG_DSP
 static void dsp_dump_mem( FILE *f )
 {
-    UINT16 i;
+	UINT16 i;
 
 	fprintf( f, "\n/*MEM 0*/\n{" );
 	for ( i = 0; i < 0x40; i++ )
 	{
-        fprintf( f, "%08X, ", dsp_reg.md0[ i ] );
+		fprintf( f, "%08X, ", dsp_reg.md0[ i ] );
 	}
 	fprintf( f, "}\n/*MEM 1*/\n{" );
 	for ( i = 0; i < 0x40; i++ )
 	{
-        fprintf( f, "%08X,", dsp_reg.md1[ i ] );
+		fprintf( f, "%08X,", dsp_reg.md1[ i ] );
 	}
 	fprintf( f, "}\n/*MEM 2*/\n{" );
 	for ( i = 0; i < 0x40; i++ )
 	{
-        fprintf( f, "%08X,", dsp_reg.md2[ i ] );
+		fprintf( f, "%08X,", dsp_reg.md2[ i ] );
 	}
 	fprintf( f, "}\n/*MEM 3*/\n{" );
 	for ( i = 0; i < 0x40; i++ )
 	{
-        fprintf( f, "%08X,", dsp_reg.md3[ i ] );
+		fprintf( f, "%08X,", dsp_reg.md3[ i ] );
 	}
 	fprintf( f, "}\n" );
 }
@@ -834,14 +834,14 @@ void dsp_execute_program(address_space &dmaspace)
 #if DEBUG_DSP
 	UINT16 i;
 
-    if ( log_file == NULL )
-    {
-    	log_file = fopen("dsp.log", "a");
+	if ( log_file == NULL )
+	{
+		log_file = fopen("dsp.log", "a");
 	}
 	for ( i = 0; i < 0x100; i++ )
 	{
-        dsp_dasm_opcode( dsp_reg.internal_prg[ i ], dasm_buffer );
-        fprintf( log_file, "%02X\t%08X\t%s\n", i, dsp_reg.internal_prg[ i ], dasm_buffer );
+		dsp_dasm_opcode( dsp_reg.internal_prg[ i ], dasm_buffer );
+		fprintf( log_file, "%02X\t%08X\t%s\n", i, dsp_reg.internal_prg[ i ], dasm_buffer );
 	}
 	dsp_dump_mem( log_file );
 #endif
@@ -918,118 +918,118 @@ void dsp_execute_program(address_space &dmaspace)
 ************************************************************************/
 static const char *const ALU_Commands[] =
 {
-	"",		/* 0000 */
-	"AND",	/* 0001 */
-	"OR",	/* 0010 */
-	"XOR",	/* 0011 */
-	"ADD",	/* 0100 */
-	"SUB",	/* 0101 */
-	"AD2",	/* 0110 */
-	"???",	/* 0111 */
-	"SR",	/* 1000 */
-	"RR",	/* 1001 */
-	"SL",	/* 1010 */
-	"RL",	/* 1011 */
-	"???",	/* 1100 */
-	"???",	/* 1101 */
-	"???",	/* 1110 */
-	"RL8",	/* 1111 */
+	"",     /* 0000 */
+	"AND",  /* 0001 */
+	"OR",   /* 0010 */
+	"XOR",  /* 0011 */
+	"ADD",  /* 0100 */
+	"SUB",  /* 0101 */
+	"AD2",  /* 0110 */
+	"???",  /* 0111 */
+	"SR",   /* 1000 */
+	"RR",   /* 1001 */
+	"SL",   /* 1010 */
+	"RL",   /* 1011 */
+	"???",  /* 1100 */
+	"???",  /* 1101 */
+	"???",  /* 1110 */
+	"RL8",  /* 1111 */
 };
 
 static const char *const X_Commands[] =
 {
-	"",				/* 000 */
-	"",				/* 001 */	/* NOP? check instruction @ 0x0B */
-	"MOV MUL,P",	/* 010 */
-	"MOV %s,P",		/* 011 */
-	"MOV %s,X",		/* 100 */
+	"",             /* 000 */
+	"",             /* 001 */   /* NOP? check instruction @ 0x0B */
+	"MOV MUL,P",    /* 010 */
+	"MOV %s,P",     /* 011 */
+	"MOV %s,X",     /* 100 */
 };
 
 static const char *const Y_Commands[] =
 {
-	"",				/* 000 */
-	"CLR A",		/* 001 */
-	"MOV ALU,A",	/* 010 */
-	"MOV %s,A",		/* 011 */
-	"MOV %s,Y",		/* 100 */
+	"",             /* 000 */
+	"CLR A",        /* 001 */
+	"MOV ALU,A",    /* 010 */
+	"MOV %s,A",     /* 011 */
+	"MOV %s,Y",     /* 100 */
 };
 
 static const char *const D1_Commands[] =
 {
-	"",					/* 00 */
-	"MOV %I8,%d",		/* 01 */
-	"???",				/* 10 */
-	"MOV %S,%d",		/* 11 */
+	"",                 /* 00 */
+	"MOV %I8,%d",       /* 01 */
+	"???",              /* 10 */
+	"MOV %S,%d",        /* 11 */
 };
 
 static const char *const SourceMemory[] =
 {
-	"M0",			/* 000 */
-	"M1",			/* 001 */
-	"M2",			/* 010 */
-	"M3",			/* 011 */
-	"MC0",			/* 100 */
-	"MC1",			/* 101 */
-	"MC2",			/* 110 */
-	"MC3",			/* 111 */
+	"M0",           /* 000 */
+	"M1",           /* 001 */
+	"M2",           /* 010 */
+	"M3",           /* 011 */
+	"MC0",          /* 100 */
+	"MC1",          /* 101 */
+	"MC2",          /* 110 */
+	"MC3",          /* 111 */
 };
 
 static const char *const SourceMemory2[] =
 {
-	"M0",			/* 0000 */
-	"M1",			/* 0001 */
-	"M2",			/* 0010 */
-	"M3",			/* 0011 */
-	"MC0",			/* 0100 */
-	"MC1",			/* 0101 */
-	"MC2",			/* 0110 */
-	"MC3",			/* 0111 */
-	"???",			/* 1000 */
-	"ALL",			/* 1001 */
-	"ALH",			/* 1010 */
-	"???",			/* 1011 */
-	"???",			/* 1100 */
-	"???",			/* 1101 */
-	"???",			/* 1110 */
-	"???",			/* 1111 */
+	"M0",           /* 0000 */
+	"M1",           /* 0001 */
+	"M2",           /* 0010 */
+	"M3",           /* 0011 */
+	"MC0",          /* 0100 */
+	"MC1",          /* 0101 */
+	"MC2",          /* 0110 */
+	"MC3",          /* 0111 */
+	"???",          /* 1000 */
+	"ALL",          /* 1001 */
+	"ALH",          /* 1010 */
+	"???",          /* 1011 */
+	"???",          /* 1100 */
+	"???",          /* 1101 */
+	"???",          /* 1110 */
+	"???",          /* 1111 */
 };
 
 static const char *const DestMemory[] =
 {
-	"MC0",			/* 0000 */
-	"MC1",			/* 0001 */
-	"MC2",			/* 0010 */
-	"MC3",			/* 0011 */
-	"RX",			/* 0100 */
-	"PL",			/* 0101 */
-	"RA0",			/* 0110 */
-	"WA0",			/* 0111 */
-	"???",			/* 1000 */
-	"???",			/* 1001 */
-	"LOP",			/* 1010 */
-	"TOP",			/* 1011 */
-	"CT0",			/* 1100 */
-	"CT1",			/* 1101 */
-	"CT2",			/* 1110 */
-	"CT3",			/* 1111 */
+	"MC0",          /* 0000 */
+	"MC1",          /* 0001 */
+	"MC2",          /* 0010 */
+	"MC3",          /* 0011 */
+	"RX",           /* 0100 */
+	"PL",           /* 0101 */
+	"RA0",          /* 0110 */
+	"WA0",          /* 0111 */
+	"???",          /* 1000 */
+	"???",          /* 1001 */
+	"LOP",          /* 1010 */
+	"TOP",          /* 1011 */
+	"CT0",          /* 1100 */
+	"CT1",          /* 1101 */
+	"CT2",          /* 1110 */
+	"CT3",          /* 1111 */
 };
 
 static const char *const DestDMAMemory[] =
 {
-	"M0",			/* 000 */
-	"M1",			/* 001 */
-	"M2",			/* 010 */
-	"M3",			/* 011 */
-	"PRG",			/* 100 */
-	"???",			/* 101 */
-	"???",			/* 110 */
-	"???",			/* 111 */
+	"M0",           /* 000 */
+	"M1",           /* 001 */
+	"M2",           /* 010 */
+	"M3",           /* 011 */
+	"PRG",          /* 100 */
+	"???",          /* 101 */
+	"???",          /* 110 */
+	"???",          /* 111 */
 };
 
 static const char *const MVI_Command[] =
 {
-	"MVI %I,%d",	/* 0 */
-	"MVI %I,%d,%f",	/* 1 */
+	"MVI %I,%d",    /* 0 */
+	"MVI %I,%d,%f", /* 1 */
 };
 
 static const char *const JMP_Command[] =
@@ -1047,7 +1047,7 @@ static const char *const DMA_Command[] =
 };
 
 
-static void	dsp_dasm_prefix( const char* format, char* buffer, UINT32 *data )
+static void dsp_dasm_prefix( const char* format, char* buffer, UINT32 *data )
 {
 
 	for ( ; *format; format++ )
@@ -1148,7 +1148,7 @@ static void	dsp_dasm_prefix( const char* format, char* buffer, UINT32 *data )
 	}
 	*buffer = 0;
 }
-static void	dsp_dasm_operation( UINT32 op, char *buffer )
+static void dsp_dasm_operation( UINT32 op, char *buffer )
 {
 	char *my_buffer = buffer;
 	char temp_buffer[64];
@@ -1314,4 +1314,3 @@ static void dsp_dasm_opcode( UINT32 op, char *buffer )
 		break;
 	}
 }
-

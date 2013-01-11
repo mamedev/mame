@@ -44,7 +44,7 @@
 #include "sound/sn76477.h"   /* for sn sound*/
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h"	/* for floppy disc controller */
+#include "machine/upd765.h" /* for floppy disc controller */
 
 #include "formats/hect_tap.h"
 #include "includes/hec2hrp.h"
@@ -71,9 +71,9 @@ hec2mx40
 /* Helper function*/
 static int isHectorWithDisc2(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2hrx"	, 7)==0) ||
-		(strncmp(machine.system().name , "hec2mx40"	, 8)==0) ||
-		(strncmp(machine.system().name , "hec2mx80"	, 8)==0));
+return ((strncmp(machine.system().name , "hec2hrx"  , 7)==0) ||
+		(strncmp(machine.system().name , "hec2mx40" , 8)==0) ||
+		(strncmp(machine.system().name , "hec2mx80" , 8)==0));
 }
 
 static int isHectorWithMiniDisc(running_machine &machine)
@@ -83,19 +83,19 @@ return ((strncmp(machine.system().name , "hec2mdhrx", 9)==0));
 
 static int isHectorHR(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2hr"	, 6)==0) ||  //Aviable for hr & hrp
+return ((strncmp(machine.system().name , "hec2hr"   , 6)==0) ||  //Aviable for hr & hrp
 		(strncmp(machine.system().name , "hec2mdhrx", 9)==0) ||
-		(strncmp(machine.system().name , "victor"	, 6)==0) ||
-		(strncmp(machine.system().name , "hec2mx40"	, 8)==0) ||
-		(strncmp(machine.system().name , "hec2mx80"	, 8)==0));
+		(strncmp(machine.system().name , "victor"   , 6)==0) ||
+		(strncmp(machine.system().name , "hec2mx40" , 8)==0) ||
+		(strncmp(machine.system().name , "hec2mx80" , 8)==0));
 }
 
 static int isHectoreXtend(running_machine &machine)
 {
 return ((strncmp(machine.system().name , "hec2mdhrx", 9)==0) ||
-		(strncmp(machine.system().name , "hec2hrx"	, 7)==0) ||
-		(strncmp(machine.system().name , "hec2mx40"	, 8)==0) ||
-		(strncmp(machine.system().name , "hec2mx80"	, 8)==0));
+		(strncmp(machine.system().name , "hec2hrx"  , 7)==0) ||
+		(strncmp(machine.system().name , "hec2mx40" , 8)==0) ||
+		(strncmp(machine.system().name , "hec2mx80" , 8)==0));
 }
 
 /* Cassette timer*/
@@ -112,7 +112,7 @@ void hector_minidisc_init(running_machine &machine)
 	wd17xx_dden_w(fdc, 1);// density select => always 1 (0 ?a plante !)
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
-	floppy_mon_w(floppy_get_device(machine, 0), 0);	// Moteur floppy A:
+	floppy_mon_w(floppy_get_device(machine, 0), 0); // Moteur floppy A:
 	//floppy_mon_w(floppy_get_device(space.machine(), 1), BIT(data, 7));   // Moteur floppy B:, not implanted on the real machine
 
 	//Set the drive ready !
@@ -186,7 +186,7 @@ switch (offset)
 }
 WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 {
-	if (offset==0x00)	{	/* 0x800 et 0x000=> video page, HR*/
+	if (offset==0x00)   {   /* 0x800 et 0x000=> video page, HR*/
 							if (isHectoreXtend(machine()))
 								membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
 							if (m_flag_clk ==1)
@@ -195,7 +195,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 								machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
 							}
 						}
-	if (offset==0x04)	{	/* 0x804 => video page, BR*/
+	if (offset==0x04)   {   /* 0x804 => video page, BR*/
 							m_hector_flag_hr=0;
 							if (isHectoreXtend(machine()))
 								membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
@@ -205,7 +205,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 								machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
 							}
 						}
-	if (offset==0x08)	{	/* 0x808 => base page, HR*/
+	if (offset==0x08)   {   /* 0x808 => base page, HR*/
 							if (isHectoreXtend(machine()))
 								membank("bank1")->set_entry(HECTOR_BANK_PROG);
 							if (m_flag_clk ==1)
@@ -215,7 +215,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							}
 
 						}
-	if (offset==0x0c)	{	/* 0x80c => base page, BR*/
+	if (offset==0x0c)   {   /* 0x80c => base page, BR*/
 							m_hector_flag_hr=0;
 							if (isHectoreXtend(machine()))
 								membank("bank1")->set_entry(HECTOR_BANK_PROG);
@@ -244,8 +244,8 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
-		  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-		  if (isHectorHR(machine())) /* aviable for HR and up */
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			if (isHectorHR(machine())) /* aviable for HR and up */
 			{
 				m_hector_flag_hr=1;
 				if (isHectoreXtend(machine()))
@@ -263,7 +263,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 
 			}
 
-		  else /* aviable for BR machines */
+			else /* aviable for BR machines */
 			m_hector_flag_hr=0;
 
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 		}
 	}
 	else
-	{	/* stop motor*/
+	{   /* stop motor*/
 		cassette_device_image(machine())->set_state(CASSETTE_STOPPED);
 		m_write_cassette=0;
 		m_counter_write =0;
@@ -398,7 +398,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 			/* Wait several cycle before lauch the record to prevent somes bugs*/
 			m_counter_write = 6;
 			if (m_write_cassette==0)
-			{	/* C'est la 1er fois => record*/
+			{   /* C'est la 1er fois => record*/
 							cassette_device_image(machine())->change_state(
 						CASSETTE_MOTOR_ENABLED ,
 						CASSETTE_MASK_MOTOR);
@@ -471,20 +471,20 @@ READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
 		data_l = (m_hector_port_c_l & 0x0f);
 		data_h = (m_hector_port_c_h & 0xf0);
 
-		if (BIT(m_hector_port_cmd, 0))					/* Quartet inf en entree ?*/
+		if (BIT(m_hector_port_cmd, 0))                  /* Quartet inf en entree ?*/
 			data_l = (m_hector_port_c_l & 0x0f);  /*no change*/
 
-		if (BIT(m_hector_port_cmd, 3))					/* Quartet sup en entree ?*/
+		if (BIT(m_hector_port_cmd, 3))                  /* Quartet sup en entree ?*/
 		{
-			m_hector_port_c_h = (m_hector_port_c_h & 0x0c0);	/* Clear bits 4 & 5*/
+			m_hector_port_c_h = (m_hector_port_c_h & 0x0c0);    /* Clear bits 4 & 5*/
 
 			if (m_hector_disc2_data_w_ready != 0x00)
-				m_hector_port_c_h = m_hector_port_c_h + 0x010;	// PC4 (data write ready from Disc II to Hector)
+				m_hector_port_c_h = m_hector_port_c_h + 0x010;  // PC4 (data write ready from Disc II to Hector)
 
 			if (m_hector_disc2_data_r_ready != 0x00)
-				m_hector_port_c_h = m_hector_port_c_h + 0x020;	// PC5 (data read ready from Hector to Disc2)
+				m_hector_port_c_h = m_hector_port_c_h + 0x020;  // PC5 (data read ready from Hector to Disc2)
 
-			m_hector_port_c_h = m_hector_port_c_h & 0x07F;		// PC7 (printer busy=0)
+			m_hector_port_c_h = m_hector_port_c_h & 0x07F;      // PC7 (printer busy=0)
 			data_h =  m_hector_port_c_h;
 		}
 		data= data_l + data_h;
@@ -502,9 +502,9 @@ WRITE8_MEMBER(hec2hrp_state::hector_io_8255_w)
 		m_hector_port_a = data;
 		/* Port A => to printer*/
 		/*  Caution : The strobe connection to the printer seems not be used
-        So, all what is send to the Disc2 unit will be printed too! */
+		So, all what is send to the Disc2 unit will be printed too! */
 
-		if (BIT(m_hector_port_c_l, 0)) {		// PC0 (bit X0)= strobe printer !
+		if (BIT(m_hector_port_c_l, 0)) {        // PC0 (bit X0)= strobe printer !
 			printer_image_device *printer = machine().device<printer_image_device>("printer");
 			printer->output(m_hector_port_a);
 		}
@@ -520,17 +520,17 @@ WRITE8_MEMBER(hec2hrp_state::hector_io_8255_w)
 
 	if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
 	{
-		if (!BIT(m_hector_port_cmd, 0))	 /* cmd -> Quartet inf en sortie ?*/
+		if (!BIT(m_hector_port_cmd, 0))  /* cmd -> Quartet inf en sortie ?*/
 		{
 			m_hector_port_c_l = data & 0x0f;
 			// Utilizing bits port C : PC0 for the printer : strobe!
-			if (BIT(m_hector_port_c_l  , 0))		// PC0 (bit X0)= true
+			if (BIT(m_hector_port_c_l  , 0))        // PC0 (bit X0)= true
 			{
 				/* Port A => to printer*/
 				//printer_output(machine().device("printer"), m_hector_port_a);
 			}
 			// Utilizing bits port C : PC1 // PC2  for the communication with disc2
-			if (!BIT(m_hector_port_c_l  , 1))		// PC1 (bit X1)= true
+			if (!BIT(m_hector_port_c_l  , 1))       // PC1 (bit X1)= true
 			{
 				// Lecture effectuee => RAZ memoire donnee m_hector_disc2_data_write dispo
 				m_hector_port_b = m_hector_disc2_data_write; // Mep sur port B si 2eme 74374 existant !
@@ -539,16 +539,16 @@ WRITE8_MEMBER(hec2hrp_state::hector_io_8255_w)
 					printf("\nEcriture port B vers m_hector_disc2_data_write suite a PC1");
 				#endif
 			}
-			if (!BIT(m_hector_port_c_l, 2))		// PC2 (bit X2)= true
+			if (!BIT(m_hector_port_c_l, 2))     // PC2 (bit X2)= true
 			{
 				m_hector_disc2_data_read = m_hector_port_a; /* mise en place de l'info presente sur le port A */
-				m_hector_disc2_data_r_ready = 0x08;		 /* memorisation de l'info */
+				m_hector_disc2_data_r_ready = 0x08;      /* memorisation de l'info */
 				#ifdef DEBUG_TRACE_COM_HECTOR
 					printf("\nEcriture port A pour m_hector_disc2_data_read suite a PC2");
 				#endif
 			}
 		}
-		if (!BIT(m_hector_port_cmd, 3))	 /* cmd -> Quartet sup en sortie ?*/
+		if (!BIT(m_hector_port_cmd, 3))  /* cmd -> Quartet sup en sortie ?*/
 			m_hector_port_c_h = (data & 0xf0);
 	}
 
@@ -605,7 +605,7 @@ switch(Adresse )
 {
 	case 0x2000:
 		/* Modification AU0 / AU8*/
-		{	/* AU0*/
+		{   /* AU0*/
 			state->m_AU[ 0] =  ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU8 : 0*/
 			state->m_AU[ 8] =  ((Value & 0x040 )==0) ? 0 : 1 ;
@@ -613,7 +613,7 @@ switch(Adresse )
 		}
 	case 0x2001:
 		/* Modification AU1 / AU9*/
-		{	/* AU1*/
+		{   /* AU1*/
 			state->m_AU[ 1] =  ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU9*/
 			state->m_AU[ 9] =  ((Value & 0x040 )==0) ? 0 : 1 ;
@@ -621,7 +621,7 @@ switch(Adresse )
 		}
 	case 0x2002:
 		/* Modification AU2 / AU10*/
-		{	/* AU2*/
+		{   /* AU2*/
 			state->m_AU[ 2] =  ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU10*/
 			state->m_AU[10] =  ((Value & 0x040 )==0) ? 0 : 1 ;
@@ -629,7 +629,7 @@ switch(Adresse )
 		}
 	case 0x2003:
 		/* Modification AU3 / AU11*/
-		{	/* AU3*/
+		{   /* AU3*/
 			state->m_AU[ 3] =  ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU11*/
 			state->m_AU[11] =  ((Value & 0x040 )==0) ? 0 : 1 ;
@@ -637,7 +637,7 @@ switch(Adresse )
 		}
 	case 0x2800:
 		/* Modification AU4 / AU12*/
-		{	/* AU4*/
+		{   /* AU4*/
 			state->m_AU[ 4] =  ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU8*/
 			state->m_AU[12] =  ((Value & 0x040 )==0) ? 0 : 1 ;
@@ -645,14 +645,14 @@ switch(Adresse )
 		}
 	case 0x2801:
 		/* Modification AU5 / AU13*/
-		{	/* AU5*/
+		{   /* AU5*/
 			state->m_AU[ 5] =  ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU13*/
 			state->m_AU[13] =  ((Value & 0x040 )==0) ? 0 : 1 ;
 			break;
 		}
 	case 0x2802:
-		{	/* Modification AU6 / AU14*/
+		{   /* Modification AU6 / AU14*/
 			/* AU6*/
 			state->m_AU[ 6] = ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU14*/
@@ -661,7 +661,7 @@ switch(Adresse )
 		}
 	case 0x2803:
 		/* Modification AU7 / AU15*/
-		{	/* AU7*/
+		{   /* AU7*/
 			state->m_AU[ 7] =  ((Value & 0x080 )==0) ? 0 : 1 ;
 			/* AU15*/
 			state->m_AU[15] =  ((Value & 0x040 )==0) ? 0 : 1 ;
@@ -685,7 +685,7 @@ static void Init_Value_SN76477_Hector(running_machine &machine)
 
 	/* Decay R*/
 	state->m_Pin_Value[7][1] = RES_K(680.0); /*680K  */
-	 state->m_Pin_Value[7][0] = RES_K(252.325); /* 142.325 (680 // 180KOhm)*/
+		state->m_Pin_Value[7][0] = RES_K(252.325); /* 142.325 (680 // 180KOhm)*/
 
 	/* Capa A/D*/
 	state->m_Pin_Value[8][0] = CAP_U(0.47); /* 0.47uf*/
@@ -696,10 +696,10 @@ static void Init_Value_SN76477_Hector(running_machine &machine)
 	state->m_Pin_Value[10][0]= RES_K(32.054); /* 32.054 (180 // 39 KOhm)*/
 
 	/* Version 3 : Ajuste pour les frequences mesurees :
-                // 4  0 SOUND 255 Hz => ajuste a l'oreille
-                // 4  4 SOUND  65 Hz => ajuste a l'oreille
-                // 4  8 SOUND  17 Hz =>  ajuste a l'oreille
-                // 4 12 SOUND 4,3 Hz =>  ajuste a l'oreille*/
+	            // 4  0 SOUND 255 Hz => ajuste a l'oreille
+	            // 4  4 SOUND  65 Hz => ajuste a l'oreille
+	            // 4  8 SOUND  17 Hz =>  ajuste a l'oreille
+	            // 4 12 SOUND 4,3 Hz =>  ajuste a l'oreille*/
 	/*   SLF C       Version 3*/
 	state->m_Pin_Value[21][0]= CAP_U(0.1);  /*CAPU(0.1) */
 	state->m_Pin_Value[21][1]= CAP_U(1.1);  /*1.1*/
@@ -710,10 +710,10 @@ static void Init_Value_SN76477_Hector(running_machine &machine)
 
 	/* Capa VCO*/
 	/* Version 3 : Ajust?? pour les frequences mesur??es :
-            // 0 0  SOUND 5,5KHz => 5,1KHz
-            // 0 16 SOUND 1,3KHz => 1,2KHz
-            // 0 32 SOUND 580Hz  => 570Hz
-            // 0 48 SOUND 132Hz  => 120Hz*/
+	        // 0 0  SOUND 5,5KHz => 5,1KHz
+	        // 0 16 SOUND 1,3KHz => 1,2KHz
+	        // 0 32 SOUND 580Hz  => 570Hz
+	        // 0 48 SOUND 132Hz  => 120Hz*/
 	state->m_Pin_Value[17][0] = CAP_N(47.0) ;  /*47,0 mesure ok */
 	state->m_Pin_Value[17][1] = CAP_N(580.0) ; /*580  mesure ok */
 	/* R VCO   Version 3*/
@@ -733,7 +733,7 @@ static void Init_Value_SN76477_Hector(running_machine &machine)
 
 	/* R OneShot*/
 	state->m_Pin_Value[24][1] = RES_K(100);
-	 state->m_Pin_Value[24][0] = RES_K(1000);  /*RES_M(1) infini sur Hector car non connectee*/
+		state->m_Pin_Value[24][0] = RES_K(1000);  /*RES_M(1) infini sur Hector car non connectee*/
 
 	/* Capa OneShot*/
 	state->m_Pin_Value[23][0] = 1.0;
@@ -752,14 +752,14 @@ static void Init_Value_SN76477_Hector(running_machine &machine)
 	state->m_Pin_Value[6][1] = CAP_U(08.60);    /* 0.48*/
 
 	/* Valeur corrige par rapport au schema :*/
-	state->m_Pin_Value[5][1] = RES_K(3.30 ) ;	/* 330Kohm*/
-	state->m_Pin_Value[5][0] = RES_K(1.76 ) ;	/* 76 Kohm*/
+	state->m_Pin_Value[5][1] = RES_K(3.30 ) ;   /* 330Kohm*/
+	state->m_Pin_Value[5][0] = RES_K(1.76 ) ;   /* 76 Kohm*/
 
 	/* Noise pas commande par le bus audio !*/
-	 /* Seule la valeur [0] est documentee !*/
-	state->m_Pin_Value[4][0] = RES_K(47) ;		/* 47 K ohm*/
-	state->m_Pin_Value[12][0] = RES_K(100);		/* 100K ohm*/
-	state->m_Pin_Value[3][0] = 0 ;				/* NC*/
+		/* Seule la valeur [0] est documentee !*/
+	state->m_Pin_Value[4][0] = RES_K(47) ;      /* 47 K ohm*/
+	state->m_Pin_Value[12][0] = RES_K(100);     /* 100K ohm*/
+	state->m_Pin_Value[3][0] = 0 ;              /* NC*/
 
 	/* Gestion du type d'enveloppe*/
 	state->m_Pin_Value[ 1][0] = 0;
@@ -801,14 +801,14 @@ static void Update_Sound(address_space &space, UINT8 data)
 
 	/* VCO oscillateur*/
 	if (state->m_AU[12]==1)
-		sn76477_vco_res_w(		sn76477, state->m_Pin_Value[18][state->m_AU[10]]/12.0); /* en non AU11*/
+		sn76477_vco_res_w(      sn76477, state->m_Pin_Value[18][state->m_AU[10]]/12.0); /* en non AU11*/
 	else
-		sn76477_vco_res_w(		sn76477, state->m_Pin_Value[18][state->m_AU[10]]); /* en non AU11*/
+		sn76477_vco_res_w(      sn76477, state->m_Pin_Value[18][state->m_AU[10]]); /* en non AU11*/
 
-	sn76477_vco_cap_w(		sn76477, state->m_Pin_Value[17][state->m_AU[2 ]]);
+	sn76477_vco_cap_w(      sn76477, state->m_Pin_Value[17][state->m_AU[2 ]]);
 	sn76477_pitch_voltage_w(sn76477, state->m_Pin_Value[19][state->m_AU[15]]);
-	sn76477_vco_voltage_w(	sn76477, state->m_Pin_Value[16][state->m_AU[15]]);
-	sn76477_vco_w(			sn76477, state->m_Pin_Value[22][state->m_AU[12]]); /* VCO Select Ext/SLF*/
+	sn76477_vco_voltage_w(  sn76477, state->m_Pin_Value[16][state->m_AU[15]]);
+	sn76477_vco_w(          sn76477, state->m_Pin_Value[22][state->m_AU[12]]); /* VCO Select Ext/SLF*/
 
 	/* SLF*/
 	sn76477_slf_res_w( sn76477, state->m_Pin_Value[20][state->m_AU[ 9]]);/*AU10*/
@@ -831,8 +831,8 @@ static void Update_Sound(address_space &space, UINT8 data)
 	sn76477_noise_filter_cap_w(sn76477, state->m_Pin_Value[6][state->m_AU[3]]);
 
 	/* Clock Extern Noise*/
-	sn76477_noise_clock_res_w(sn76477, state->m_Pin_Value[4][0]);	/* fix*/
-	sn76477_feedback_res_w(sn76477, state->m_Pin_Value[12][0]);		/*fix*/
+	sn76477_noise_clock_res_w(sn76477, state->m_Pin_Value[4][0]);   /* fix*/
+	sn76477_feedback_res_w(sn76477, state->m_Pin_Value[12][0]);     /*fix*/
 
 	/*  Envelope*/
 	sn76477_envelope_1_w(sn76477, state->m_Pin_Value[1 ][state->m_AU[6]]);
@@ -844,22 +844,22 @@ static void Update_Sound(address_space &space, UINT8 data)
 
 const sn76477_interface hector_sn76477_interface =
 {
-	RES_K(47),		/*  4  noise_res*/
-	RES_K(330),		/*  5  filter_res*/
-	CAP_P(390),		/*  6  filter_cap*/
-	RES_K(680),		/*  7  decay_res*/
-	CAP_U(47),		/*  8  attack_decay_cap*/
-	RES_K(180),		/* 10  attack_res*/
-	RES_K(33),		/* 11  amplitude_res*/
-	RES_K(100),		/* 12  feedback_res*/
-	2,				/* 16  vco_voltage*/
-	CAP_N(47) ,		/* 17  vco_cap*/
-	RES_K(1000),	/* 18  vco_res*/
-	2,				/* 19  pitch_voltage*/
-	RES_K(180),		/* 20  slf_res*/
-	CAP_U(0.1),		/* 21  slf_cap*/
-	CAP_U(1.00001),	/* 23  oneshot_cap*/
-	RES_K(10000)	/* 24  oneshot_res*/
+	RES_K(47),      /*  4  noise_res*/
+	RES_K(330),     /*  5  filter_res*/
+	CAP_P(390),     /*  6  filter_cap*/
+	RES_K(680),     /*  7  decay_res*/
+	CAP_U(47),      /*  8  attack_decay_cap*/
+	RES_K(180),     /* 10  attack_res*/
+	RES_K(33),      /* 11  amplitude_res*/
+	RES_K(100),     /* 12  feedback_res*/
+	2,              /* 16  vco_voltage*/
+	CAP_N(47) ,     /* 17  vco_cap*/
+	RES_K(1000),    /* 18  vco_res*/
+	2,              /* 19  pitch_voltage*/
+	RES_K(180),     /* 20  slf_res*/
+	CAP_U(0.1),     /* 21  slf_cap*/
+	CAP_U(1.00001), /* 23  oneshot_cap*/
+	RES_K(10000)    /* 24  oneshot_res*/
 };
 
 void hector_reset(running_machine &machine, int hr, int with_D2 )

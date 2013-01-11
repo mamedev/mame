@@ -67,7 +67,7 @@ machine_config_constructor isa8_adlib_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, ISA8_ADLIB, "Ad Lib Sound Card", tag, owner, clock),
+		: device_t(mconfig, ISA8_ADLIB, "Ad Lib Sound Card", tag, owner, clock),
 		device_isa8_card_interface( mconfig, *this )
 {
 }

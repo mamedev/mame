@@ -25,7 +25,7 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "video/resnet.h"
 
-#define MASTER_CLOCK	XTAL_19_968MHz
+#define MASTER_CLOCK    XTAL_19_968MHz
 
 class nightgal_state : public driver_device
 {
@@ -153,7 +153,7 @@ WRITE8_MEMBER(nightgal_state::nsc_true_blitter_w)
 	/*trigger blitter write to ram,might not be correct...*/
 	if (offset == 5)
 	{
-      //printf("%02x %02x %02x %02x %02x %02x %02x\n", m_true_blit[0], m_true_blit[1], m_true_blit[2], m_true_blit[3], m_true_blit[4], m_true_blit[5], m_true_blit[6]);
+		//printf("%02x %02x %02x %02x %02x %02x %02x\n", m_true_blit[0], m_true_blit[1], m_true_blit[2], m_true_blit[3], m_true_blit[4], m_true_blit[5], m_true_blit[6]);
 		w = (m_true_blit[4] & 0xff) + 1;
 		h = (m_true_blit[5] & 0xff) + 1;
 		src = ((m_true_blit[1] << 8) | (m_true_blit[0] << 0));
@@ -207,7 +207,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
 	/*trigger blitter write to ram,might not be correct...*/
 	if (offset == 6)
 	{
-      //printf("%02x %02x %02x %02x %02x %02x %02x\n", m_true_blit[0], m_true_blit[1], m_true_blit[2], m_true_blit[3], m_true_blit[4], m_true_blit[5], m_true_blit[6]);
+		//printf("%02x %02x %02x %02x %02x %02x %02x\n", m_true_blit[0], m_true_blit[1], m_true_blit[2], m_true_blit[3], m_true_blit[4], m_true_blit[5], m_true_blit[6]);
 		w = (m_true_blit[5] & 0xff) + 1;
 		h = (m_true_blit[6] & 0xff) + 1;
 		src = ((m_true_blit[1] << 8) | (m_true_blit[0] << 0));
@@ -264,7 +264,7 @@ void nightgal_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
@@ -440,7 +440,7 @@ READ8_MEMBER(nightgal_state::input_1p_r)
 	//printf("%04x\n", m_mux_data);
 
 	return (ioport("PL1_1")->read() & ioport("PL1_2")->read() & ioport("PL1_3")->read() &
-	       ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
+			ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
 }
 
 READ8_MEMBER(nightgal_state::input_2p_r)
@@ -459,7 +459,7 @@ READ8_MEMBER(nightgal_state::input_2p_r)
 	//printf("%04x\n", m_mux_data);
 
 	return (ioport("PL2_1")->read() & ioport("PL2_2")->read() & ioport("PL2_3")->read() &
-	       ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
+			ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
 }
 
 /********************************************
@@ -865,7 +865,7 @@ void nightgal_state::machine_reset()
 static MACHINE_CONFIG_START( royalqn, nightgal_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(royalqn_map)
 	MCFG_CPU_IO_MAP(royalqn_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)

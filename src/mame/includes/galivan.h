@@ -22,14 +22,14 @@ public:
 	tilemap_t     *m_tx_tilemap;
 	UINT16       m_scrollx;
 	UINT16       m_scrolly;
-	UINT8		m_galivan_scrollx[2],m_galivan_scrolly[2];
+	UINT8       m_galivan_scrollx[2],m_galivan_scrolly[2];
 	UINT8       m_flipscreen;
 	UINT8       m_write_layers;
 	UINT8       m_layers;
 	UINT8       m_ninjemak_dispdisable;
 
 	UINT8       m_shift_scroll; //youmab
-	UINT32		m_shift_val;
+	UINT32      m_shift_val;
 	DECLARE_WRITE8_MEMBER(galivan_sound_command_w);
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
 	DECLARE_READ8_MEMBER(IO_port_c0_r);

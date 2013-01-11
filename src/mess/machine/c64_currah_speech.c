@@ -76,7 +76,7 @@ Notes:
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define SP0256_TAG		"sp0256"
+#define SP0256_TAG      "sp0256"
 
 
 
@@ -210,18 +210,18 @@ UINT8 c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t 
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1
-            2
-            3
-            4
-            5
-            6
-            7       SBY
+		    0
+		    1
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7       SBY
 
-        */
+		*/
 
 		data = sp0256_sby_r(m_nsp) << 7;
 	}
@@ -246,18 +246,18 @@ void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t o
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       A1
-            1       A2
-            2       A3
-            3       A4
-            4       A5
-            5       A6
-            6
-            7       intonation
+		    0       A1
+		    1       A2
+		    2       A3
+		    3       A4
+		    4       A5
+		    5       A6
+		    6
+		    7       intonation
 
-        */
+		*/
 
 		int voice = BIT(offset, 0);
 		int intonation = BIT(data, 7);

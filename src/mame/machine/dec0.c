@@ -77,7 +77,7 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 			return ioport("SYSTEM")->read();
 
 		case 12:
-			return 0;	/* ?? watchdog ?? */
+			return 0;   /* ?? watchdog ?? */
 	}
 
 	logerror("PC %06x unknown control read at %02x\n", space.device().safe_pc(), 0x180000+offset);
@@ -100,8 +100,8 @@ READ8_MEMBER(dec0_state::hippodrm_prot_r)
 WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 {
 	switch (offset) {
-		case 4:	m_hippodrm_msb=data; break;
-		case 5:	m_hippodrm_lsb=data; break;
+		case 4: m_hippodrm_msb=data; break;
+		case 5: m_hippodrm_lsb=data; break;
 	}
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
@@ -232,17 +232,17 @@ static void baddudes_i8751_write(running_machine &machine, int data)
 static void birdtry_i8751_write(running_machine &machine, int data)
 {
 	dec0_state *state = machine.driver_data<dec0_state>();
-	static int	pwr,
+	static int  pwr,
 				hgt;
 
 	state->m_i8751_return=0;
 
 	switch(data&0xffff) {
 		/*"Sprite control"*/
-		case 0x22a:	state->m_i8751_return = 0x200;	  break;
+		case 0x22a: state->m_i8751_return = 0x200;    break;
 
 		/* Gives an O.B. otherwise (it must be > 0xb0 )*/
-		case 0x3c7:	state->m_i8751_return = 0x7ff;	  break;
+		case 0x3c7: state->m_i8751_return = 0x7ff;    break;
 
 		/*Enables shot checks*/
 		case 0x33c: state->m_i8751_return = 0x200;     break;
@@ -253,42 +253,42 @@ static void birdtry_i8751_write(running_machine &machine, int data)
 /*  0x100-0x10d values are for club power meters(1W=0x100<<-->>PT=0x10d).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x481.     *
  *  Lower the value,stronger is the power.                                   */
-		case 0x100: pwr = 0x30; 			break; /*1W*/
-		case 0x101: pwr = 0x34; 			break; /*3W*/
-		case 0x102: pwr = 0x38; 			break; /*4W*/
-		case 0x103: pwr = 0x3c; 			break; /*1I*/
-		case 0x104: pwr = 0x40; 			break; /*3I*/
-		case 0x105: pwr = 0x44; 			break; /*4I*/
-		case 0x106: pwr = 0x48; 			break; /*5I*/
-		case 0x107: pwr = 0x4c; 			break; /*6I*/
-		case 0x108: pwr = 0x50; 			break; /*7I*/
-		case 0x109: pwr = 0x54; 			break; /*8I*/
-		case 0x10a: pwr = 0x58; 			break; /*9I*/
-		case 0x10b: pwr = 0x5c; 			break; /*PW*/
-		case 0x10c: pwr = 0x60; 			break; /*SW*/
-		case 0x10d: pwr = 0x80; 			break; /*PT*/
+		case 0x100: pwr = 0x30;             break; /*1W*/
+		case 0x101: pwr = 0x34;             break; /*3W*/
+		case 0x102: pwr = 0x38;             break; /*4W*/
+		case 0x103: pwr = 0x3c;             break; /*1I*/
+		case 0x104: pwr = 0x40;             break; /*3I*/
+		case 0x105: pwr = 0x44;             break; /*4I*/
+		case 0x106: pwr = 0x48;             break; /*5I*/
+		case 0x107: pwr = 0x4c;             break; /*6I*/
+		case 0x108: pwr = 0x50;             break; /*7I*/
+		case 0x109: pwr = 0x54;             break; /*8I*/
+		case 0x10a: pwr = 0x58;             break; /*9I*/
+		case 0x10b: pwr = 0x5c;             break; /*PW*/
+		case 0x10c: pwr = 0x60;             break; /*SW*/
+		case 0x10d: pwr = 0x80;             break; /*PT*/
 		case 0x481: state->m_i8751_return = pwr;     break; /*Power meter*/
 
 /*  0x200-0x20f values are for shot height(STRONG=0x200<<-->>WEAK=0x20f).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x534.     *
  *  Higher the value,stronger is the height.                                 */
-		case 0x200: hgt = 0x5c0;			break; /*H*/
-		case 0x201: hgt = 0x580;			break; /*|*/
-		case 0x202: hgt = 0x540;			break; /*|*/
-		case 0x203: hgt = 0x500;			break; /*|*/
-		case 0x204: hgt = 0x4c0;			break; /*|*/
-		case 0x205: hgt = 0x480;			break; /*|*/
-		case 0x206: hgt = 0x440;			break; /*|*/
-		case 0x207: hgt = 0x400;			break; /*M*/
-		case 0x208: hgt = 0x3c0;			break; /*|*/
-		case 0x209: hgt = 0x380;			break; /*|*/
-		case 0x20a: hgt = 0x340;			break; /*|*/
-		case 0x20b: hgt = 0x300;			break; /*|*/
-		case 0x20c: hgt = 0x2c0;			break; /*|*/
-		case 0x20d: hgt = 0x280;			break; /*|*/
-		case 0x20e: hgt = 0x240;			break; /*|*/
-		case 0x20f: hgt = 0x200;			break; /*L*/
-		case 0x534: state->m_i8751_return = hgt;	break; /*Shot height*/
+		case 0x200: hgt = 0x5c0;            break; /*H*/
+		case 0x201: hgt = 0x580;            break; /*|*/
+		case 0x202: hgt = 0x540;            break; /*|*/
+		case 0x203: hgt = 0x500;            break; /*|*/
+		case 0x204: hgt = 0x4c0;            break; /*|*/
+		case 0x205: hgt = 0x480;            break; /*|*/
+		case 0x206: hgt = 0x440;            break; /*|*/
+		case 0x207: hgt = 0x400;            break; /*M*/
+		case 0x208: hgt = 0x3c0;            break; /*|*/
+		case 0x209: hgt = 0x380;            break; /*|*/
+		case 0x20a: hgt = 0x340;            break; /*|*/
+		case 0x20b: hgt = 0x300;            break; /*|*/
+		case 0x20c: hgt = 0x2c0;            break; /*|*/
+		case 0x20d: hgt = 0x280;            break; /*|*/
+		case 0x20e: hgt = 0x240;            break; /*|*/
+		case 0x20f: hgt = 0x200;            break; /*L*/
+		case 0x534: state->m_i8751_return = hgt;    break; /*Shot height*/
 
 		/*At the ending screen(???)*/
 		//case 0x3b4: state->m_i8751_return = 0;       break;

@@ -11,11 +11,11 @@
 #include "machine/z80ctc.h"
 #include "sound/speaker.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"d201"
-#define Z80CTC_TAG		"d208"
-#define Z80PIO1_TAG		"d206"
-#define Z80PIO2_TAG		"d207"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "d201"
+#define Z80CTC_TAG      "d208"
+#define Z80PIO1_TAG     "d206"
+#define Z80PIO2_TAG     "d207"
 //#define SPEAKER_TAG       "b237"
 
 class lc80_state : public driver_device
@@ -23,11 +23,11 @@ class lc80_state : public driver_device
 public:
 	lc80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_pio2(*this, Z80PIO2_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_pio2(*this, Z80PIO2_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

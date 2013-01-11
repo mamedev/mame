@@ -11,15 +11,15 @@
 #include "png.h"
 
 // paper is A4 (210x297mm)
-#define PAPER_WIDTH			(210*10)
-#define PAPER_HEIGHT		(297*10)
+#define PAPER_WIDTH         (210*10)
+#define PAPER_HEIGHT        (297*10)
 
 // usable area is 175x250mm step is 0.1mm
-#define PAPER_MAX_X			(175*10)
-#define PAPER_MAX_Y			(250*10)
+#define PAPER_MAX_X         (175*10)
+#define PAPER_MAX_Y         (250*10)
 
 // dump the m_paper bitmap into a png
-#define DUMP_PAPER_INTO_PNG		0
+#define DUMP_PAPER_INTO_PNG     0
 
 /***************************************************************************
     IMPLEMENTATION
@@ -45,7 +45,7 @@ const device_type IQ151_MS151A = &device_creator<iq151_ms151a_device>;
 //-------------------------------------------------
 
 iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, IQ151_MS151A, "IQ151 MS151A", tag, owner, clock),
+		: device_t(mconfig, IQ151_MS151A, "IQ151 MS151A", tag, owner, clock),
 		device_iq151cart_interface( mconfig, *this )
 {
 }
@@ -135,8 +135,8 @@ void iq151_ms151a_device::io_write(offs_t offset, UINT8 data)
 UINT8 iq151_ms151a_device::plotter_status()
 {
 	/*
-        bit 7 - plotter READY line
-    */
+	    bit 7 - plotter READY line
+	*/
 
 	return 0x80;
 }
@@ -146,11 +146,11 @@ void iq151_ms151a_device::plotter_update(UINT8 offset, UINT8 data)
 	// update pen and paper positions
 	switch (offset)
 	{
-		case 0:		m_posy++;				break;
-		case 1:		m_posy--;				break;
-		case 2:		m_posx++;				break;
-		case 3:		m_posx--;				break;
-		case 4:		m_pen = data & 0x01;	break;
+		case 0:     m_posy++;               break;
+		case 1:     m_posy--;               break;
+		case 2:     m_posx++;               break;
+		case 3:     m_posx--;               break;
+		case 4:     m_pen = data & 0x01;    break;
 	}
 
 	// clamp within range

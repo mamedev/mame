@@ -31,30 +31,30 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#define QS1000_CHANNELS			32
-#define QS1000_ADDRESS_MASK		0xffffff
+#define QS1000_CHANNELS         32
+#define QS1000_ADDRESS_MASK     0xffffff
 
 class qs1000_device;
 
 
 struct qs1000_interface
 {
-	bool					m_external_rom;
+	bool                    m_external_rom;
 
-	devcb_read8				m_in_p1_cb;
-	devcb_read8				m_in_p2_cb;
-	devcb_read8				m_in_p3_cb;
+	devcb_read8             m_in_p1_cb;
+	devcb_read8             m_in_p2_cb;
+	devcb_read8             m_in_p3_cb;
 
-	devcb_write8			m_out_p1_cb;
-	devcb_write8			m_out_p2_cb;
-	devcb_write8			m_out_p3_cb;
+	devcb_write8            m_out_p1_cb;
+	devcb_write8            m_out_p2_cb;
+	devcb_write8            m_out_p3_cb;
 
-	devcb_write8			m_serial_w;
+	devcb_write8            m_serial_w;
 };
 
 // ======================> qs1000_device
 
-class qs1000_device :	public device_t,
+class qs1000_device :   public device_t,
 						public device_sound_interface,
 						public device_memory_interface,
 						public qs1000_interface
@@ -109,41 +109,41 @@ public:
 	void set_voice_regs(int ch);
 
 	// Callbacks
-	devcb_resolved_read8			m_p1_r_func;
-	devcb_resolved_read8			m_p2_r_func;
-	devcb_resolved_read8			m_p3_r_func;
-	devcb_resolved_write8			m_p1_w_func;
-	devcb_resolved_write8			m_p2_w_func;
-	devcb_resolved_write8			m_p3_w_func;
+	devcb_resolved_read8            m_p1_r_func;
+	devcb_resolved_read8            m_p2_r_func;
+	devcb_resolved_read8            m_p3_r_func;
+	devcb_resolved_write8           m_p1_w_func;
+	devcb_resolved_write8           m_p2_w_func;
+	devcb_resolved_write8           m_p3_w_func;
 
 	// Internal state
-	const address_space_config		m_space_config;
-	sound_stream *					m_stream;
-	direct_read_data *				m_direct;
-	required_device<i8052_device>	m_cpu;
+	const address_space_config      m_space_config;
+	sound_stream *                  m_stream;
+	direct_read_data *              m_direct;
+	required_device<i8052_device>   m_cpu;
 
 	// Wavetable engine
-	UINT8							m_serial_data_in;
-	UINT8							m_wave_regs[18];
+	UINT8                           m_serial_data_in;
+	UINT8                           m_wave_regs[18];
 
 	struct qs1000_channel
 	{
-		UINT32			m_acc;
-		INT32			m_adpcm_signal;
-		UINT32			m_start;
-		UINT32			m_addr;
-		UINT32			m_adpcm_addr;
-		UINT32			m_loop_start;
-		UINT32			m_loop_end;
-		UINT16			m_freq;
-		UINT16			m_flags;
+		UINT32          m_acc;
+		INT32           m_adpcm_signal;
+		UINT32          m_start;
+		UINT32          m_addr;
+		UINT32          m_adpcm_addr;
+		UINT32          m_loop_start;
+		UINT32          m_loop_end;
+		UINT16          m_freq;
+		UINT16          m_flags;
 
-		UINT8			m_regs[16];	// FIXME
+		UINT8           m_regs[16]; // FIXME
 
-		oki_adpcm_state	m_adpcm;
+		oki_adpcm_state m_adpcm;
 	};
 
-	qs1000_channel					m_channels[QS1000_CHANNELS];
+	qs1000_channel                  m_channels[QS1000_CHANNELS];
 };
 
 

@@ -24,7 +24,7 @@
 //**************************************************************************
 
 #define MCFG_VCS_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, VCS_CONTROL_PORT, 0) \
+	MCFG_DEVICE_ADD(_tag, VCS_CONTROL_PORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -38,7 +38,7 @@
 class device_vcs_control_port_interface;
 
 class vcs_control_port_device : public device_t,
-						    	public device_slot_interface
+								public device_slot_interface
 {
 public:
 	// construction/destruction

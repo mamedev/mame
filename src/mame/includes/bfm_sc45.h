@@ -15,12 +15,12 @@ class sc4_state : public driver_device
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_cpuregion(*this, "maincpu"),
-		  m_duart(*this, "duart68681"),
-		  m_ymz(*this, "ymz"),
-		  m_maincpu(*this, "maincpu"),
-		  m_vfd0(*this, "vfd0"),
-		  m_nvram(*this, "nvram")
+			m_cpuregion(*this, "maincpu"),
+			m_duart(*this, "duart68681"),
+			m_ymz(*this, "ymz"),
+			m_maincpu(*this, "maincpu"),
+			m_vfd0(*this, "vfd0"),
+			m_nvram(*this, "nvram")
 
 	{
 		m_chk41addr = -1;
@@ -50,7 +50,7 @@ public:
 	int m_reel4_latch;
 	int m_reel56_latch;
 	int m_optic_pattern;
-	SEC	sec;
+	SEC sec;
 
 	int m_meterstatus;
 
@@ -491,7 +491,7 @@ class sc4_adder4_state : public sc4_state
 public:
 	sc4_adder4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sc4_state(mconfig, type, tag),
-		  m_adder4cpu(*this, "adder4")
+			m_adder4cpu(*this, "adder4")
 	{ }
 
 	UINT32* m_adder4cpuregion;
@@ -1266,7 +1266,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_REGION( 0x400000, "others1", ROMREGION_ERASE00 ) /* PR3071 */ \
 	ROM_LOAD( "95008715.bin", 0x000000, 0x100000, CRC(1796b604) SHA1(9045f9424e6447d696a6fdd7f5bdcbfda4b57c90) ) /* wiyb */ \
 	ROM_REGION( 0x400000, "others2", ROMREGION_ERASE00 ) /* PR3071 (alt checksum, extra sound??) */ \
-    ROM_LOAD( "95008766.bin", 0x000000, 0x100000, CRC(62accb81) SHA1(ed0456cefed2fbf9a1cfd911f871262e892a4ce8) ) /* wiyb */ \
+	ROM_LOAD( "95008766.bin", 0x000000, 0x100000, CRC(62accb81) SHA1(ed0456cefed2fbf9a1cfd911f871262e892a4ce8) ) /* wiyb */ \
 	ROM_REGION( 0x400000, "others3", ROMREGION_ERASE00 ) /* PR3084 (wrong game?) */ \
 	ROM_LOAD( "95008767.bin", 0x000000, 0x100000, CRC(0aa49d8a) SHA1(a2baffc495656f0b5426b720cac298a78774b7fa) ) /* super slam?? */  \
 
@@ -1593,8 +1593,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_hotsh_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR3211 HOT SHOT SOUNDS11 */ \
-    ROM_LOAD( "95008794.bin", 0x000000, 0x100000, CRC(2bbe0adc) SHA1(1d5fb724ced3dbe8d744c2befae33fff69fbecba) ) \
-    ROM_LOAD( "95008795.bin", 0x100000, 0x100000, CRC(0affc9f9) SHA1(0eea59a9e8293fb68172a9389d23488be508dda5) ) \
+	ROM_LOAD( "95008794.bin", 0x000000, 0x100000, CRC(2bbe0adc) SHA1(1d5fb724ced3dbe8d744c2befae33fff69fbecba) ) \
+	ROM_LOAD( "95008795.bin", 0x100000, 0x100000, CRC(0affc9f9) SHA1(0eea59a9e8293fb68172a9389d23488be508dda5) ) \
 
 
 #define sc_hotwd_others \
@@ -1770,8 +1770,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_mdm_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-    ROM_LOAD( "95008844.bin", 0x000000, 0x100000, CRC(807916aa) SHA1(d266cdb2c4961337b1b1f5b6325a0b0bec934bad) ) \
-    ROM_LOAD( "95008845.bin", 0x100000, 0x100000, CRC(e1e74669) SHA1(32cb963c3698a0659c23c0662da04a97539a3c28) ) \
+	ROM_LOAD( "95008844.bin", 0x000000, 0x100000, CRC(807916aa) SHA1(d266cdb2c4961337b1b1f5b6325a0b0bec934bad) ) \
+	ROM_LOAD( "95008845.bin", 0x100000, 0x100000, CRC(e1e74669) SHA1(32cb963c3698a0659c23c0662da04a97539a3c28) ) \
 
 #define sc_mhn_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2287,7 +2287,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_mww_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008593.bin", 0x0000, 0x06a118, CRC(e4aee21b) SHA1(bda104a05bd2c0d4506f389c54e8842dc20d84b0) ) \
-	 \
+		\
 	ROM_REGION( 0x5000, "pics", 0 ) \
 	ROM_LOAD( "95890162.bin", 0x0000, 0x5000, CRC(acf9118a) SHA1(b2c9073f0496de62d66edbc1da5546b9239ac1ba) ) \
 	ROM_LOAD( "95890163.bin", 0x0000, 0x5000, CRC(b02fe136) SHA1(ac52b411f8117564a8dae25b19c9395e9030bfa0) ) \
@@ -2296,7 +2296,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95890388.bin", 0x0000, 0x5000, CRC(6251f37a) SHA1(3c8beafa021b6f4d32bd46f3fd755a7f877414ea) ) \
 	ROM_LOAD( "95890389.bin", 0x0000, 0x5000, CRC(a10bd1ea) SHA1(e575a7cd0d40a7282aee2b7cd9f4801408ff846d) ) \
 
-#define	sc_manic_others \
+#define sc_manic_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008684.bin", 0x000000, 0x100000, CRC(52b7d26e) SHA1(ba6629dbad8d00c132c0ddf6a8a41ddc99231c75) ) \
 	ROM_LOAD( "95008685.bin", 0x100000, 0x100000, CRC(dc9717c0) SHA1(27234bb7c7e7bd1f395972ce2958d55e84005313) ) \
@@ -2309,7 +2309,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define PACMAN_SOUNDS \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	/* PACMAN SOUNDS */	\
+	/* PACMAN SOUNDS */ \
 	ROM_LOAD( "95004183", 0x000000, 0x080000, CRC(4b28f610) SHA1(fff01c890a8c109bb4b522ee2391c15abdc2758c) ) \
 	ROM_LOAD( "95004184", 0x080000, 0x080000, CRC(bee11fdd) SHA1(b5ce97108812e296c92a000444c1fb7a11286de4) ) \
 
@@ -2349,9 +2349,9 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95008751.bin", 0x100000, 0x100000, CRC(53c97577) SHA1(5ec3868967073b4ed429fed943fbcd568a85b4f3) ) \
 
 #define PR000050_POTOFGLD_1 \
-    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASEFF) \
-    ROM_LOAD( "95008836.bin", 0x000000, 0x100000, CRC(45105fca) SHA1(3c603726bb9f4a01113a225868e864106da9fa35) ) \
-    ROM_LOAD( "95008837.bin", 0x100000, 0x100000, CRC(3db8829c) SHA1(e8de259afd2797279154252cfeb6682b482b54a9) ) \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASEFF) \
+	ROM_LOAD( "95008836.bin", 0x000000, 0x100000, CRC(45105fca) SHA1(3c603726bb9f4a01113a225868e864106da9fa35) ) \
+	ROM_LOAD( "95008837.bin", 0x100000, 0x100000, CRC(3db8829c) SHA1(e8de259afd2797279154252cfeb6682b482b54a9) ) \
 
 
 #define sc_rt_others \
@@ -3253,8 +3253,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_clbmn_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR1955 C M MONEYBAGS SOUNDS11 */ \
-    ROM_LOAD( "95008666.bin", 0x000000, 0x100000, CRC(6dcb4a96) SHA1(844dc67bacb7136a3c0f897a69ac5bcacaa4968a) ) \
-    ROM_LOAD( "95008667.bin", 0x100000, 0x100000, CRC(5243784c) SHA1(771248de9fa3446ad6fe1bd35b240ad6ae23f008) ) \
+	ROM_LOAD( "95008666.bin", 0x000000, 0x100000, CRC(6dcb4a96) SHA1(844dc67bacb7136a3c0f897a69ac5bcacaa4968a) ) \
+	ROM_LOAD( "95008667.bin", 0x100000, 0x100000, CRC(5243784c) SHA1(771248de9fa3446ad6fe1bd35b240ad6ae23f008) ) \
 
 #define sc_mopl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR3408 MPOLY PROP LAD SOUNDS11 */ \
@@ -3279,7 +3279,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_bob_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	 \
+		\
 	ROM_REGION( 0x5000, "pics", 0 ) \
 	ROM_LOAD( "95890312.bin", 0x0000, 0x5000, CRC(9dfc2404) SHA1(c35f4197c0e0cd45b35f70cce166497de385b212) ) \
 	ROM_LOAD( "95890313.bin", 0x0000, 0x5000, CRC(e86a6030) SHA1(c7fd1ae68aa60c448a31eb9d4103aa0a8c1892d0) ) \

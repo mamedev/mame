@@ -53,4 +53,4 @@ UINT32 text_buffer_line_index_to_seqnum(text_buffer *text, UINT32 index);
 const char *text_buffer_get_seqnum_line(text_buffer *text, UINT32 seqnum);
 
 
-#endif	/* __TEXTBUF_H__ */
+#endif  /* __TEXTBUF_H__ */

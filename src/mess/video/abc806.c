@@ -20,8 +20,8 @@
 
 // these are needed because the MC6845 emulation does
 // not position the active display area correctly
-#define HORIZONTAL_PORCH_HACK	109
-#define VERTICAL_PORCH_HACK		27
+#define HORIZONTAL_PORCH_HACK   109
+#define VERTICAL_PORCH_HACK     27
 
 
 static const rgb_t PALETTE[] =
@@ -45,18 +45,18 @@ WRITE8_MEMBER( abc806_state::hrs_w )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        0       VM14    visible screen memory area bit 0
-        1       VM15    visible screen memory area bit 1
-        2       VM16    visible screen memory area bit 2
-        3       VM17    visible screen memory area bit 3
-        4       F14     cpu accessible screen memory area bit 0
-        5       F15     cpu accessible screen memory area bit 1
-        6       F16     cpu accessible screen memory area bit 2
-        7       F17     cpu accessible screen memory area bit 3
+	    0       VM14    visible screen memory area bit 0
+	    1       VM15    visible screen memory area bit 1
+	    2       VM16    visible screen memory area bit 2
+	    3       VM17    visible screen memory area bit 3
+	    4       F14     cpu accessible screen memory area bit 0
+	    5       F15     cpu accessible screen memory area bit 1
+	    6       F16     cpu accessible screen memory area bit 2
+	    7       F17     cpu accessible screen memory area bit 3
 
-    */
+	*/
 
 	m_hrs = data;
 }
@@ -126,18 +126,18 @@ READ8_MEMBER( abc806_state::cli_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       HRU II data bit 0
-        1       HRU II data bit 1
-        2       HRU II data bit 2
-        3       HRU II data bit 3
-        4
-        5
-        6
-        7       RTC data output
+	    0       HRU II data bit 0
+	    1       HRU II data bit 1
+	    2       HRU II data bit 2
+	    3       HRU II data bit 3
+	    4
+	    5
+	    6
+	    7       RTC data output
 
-    */
+	*/
 
 	UINT16 hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
 	UINT8 data = m_hru2_prom[hru2_addr] & 0x0f;
@@ -158,18 +158,18 @@ READ8_MEMBER( abc806_state::sti_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7       PROT DOUT
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7       PROT DOUT
 
-    */
+	*/
 
 	return 0x7f;
 }

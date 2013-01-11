@@ -74,7 +74,7 @@ public:
 };
 
 
-#define CPU_CLOCK			XTAL_8MHz
+#define CPU_CLOCK           XTAL_8MHz
 #define DATA_NVRAM_SIZE     0x100
 
 
@@ -210,32 +210,32 @@ WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 
 READ8_MEMBER(drw80pkr_state::t0_r)
 {
-    return m_t0;
+	return m_t0;
 }
 
 READ8_MEMBER(drw80pkr_state::t1_r)
 {
-    return m_t1;
+	return m_t1;
 }
 
 READ8_MEMBER(drw80pkr_state::p0_r)
 {
-    return m_p0;
+	return m_p0;
 }
 
 READ8_MEMBER(drw80pkr_state::p1_r)
 {
-    return m_p1;
+	return m_p1;
 }
 
 READ8_MEMBER(drw80pkr_state::p2_r)
 {
-    return m_p2;
+	return m_p2;
 }
 
 READ8_MEMBER(drw80pkr_state::bus_r)
 {
-    return m_bus;
+	return m_bus;
 }
 
 READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
@@ -301,25 +301,25 @@ READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
 				// Press '1' to draw/deal
 				//
 				case 0x0000: ret = 0x00; break;
-				case 0x0001: ret = 0x01; break;	/* Door */
+				case 0x0001: ret = 0x01; break; /* Door */
 				case 0x4000: ret = 0x00; break;
-				case 0x8000: ret = 0x00; break;	/* Hand Pay */
-				case 0x0002: ret = 0x00; break;	/* Books */
-				case 0x0004: ret = 0x0e; break;	/* Coin In */
-				case 0x0008: ret = 0x0d; break;	/* Start */
-				case 0x0010: ret = 0x00; break;	/* Discard */
-				case 0x0020: ret = 0x00; break;	/* Cancel */
-				case 0x0040: ret = 0x01; break;	/* Hold 1 */
-				case 0x0080: ret = 0x02; break;	/* Hold 2 */
-				case 0x0100: ret = 0x03; break;	/* Hold 3 */
-				case 0x0200: ret = 0x04; break;	/* Hold 4 */
-				case 0x0400: ret = 0x05; break;	/* Hold 5 */
-				case 0x0800: ret = 0x00; break;	/* Bet */
+				case 0x8000: ret = 0x00; break; /* Hand Pay */
+				case 0x0002: ret = 0x00; break; /* Books */
+				case 0x0004: ret = 0x0e; break; /* Coin In */
+				case 0x0008: ret = 0x0d; break; /* Start */
+				case 0x0010: ret = 0x00; break; /* Discard */
+				case 0x0020: ret = 0x00; break; /* Cancel */
+				case 0x0040: ret = 0x01; break; /* Hold 1 */
+				case 0x0080: ret = 0x02; break; /* Hold 2 */
+				case 0x0100: ret = 0x03; break; /* Hold 3 */
+				case 0x0200: ret = 0x04; break; /* Hold 4 */
+				case 0x0400: ret = 0x05; break; /* Hold 5 */
+				case 0x0800: ret = 0x00; break; /* Bet */
 			}
 		}
 	}
 
-    return ret;
+	return ret;
 }
 
 
@@ -427,7 +427,7 @@ static ADDRESS_MAP_START( drw80pkr_io_map, AS_IO, 8, drw80pkr_state )
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_RAM_WRITE(prog_w)
-    AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
+	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
 ADDRESS_MAP_END
 
 /*************************
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(drw80pkr_map)
-    MCFG_CPU_IO_MAP(drw80pkr_io_map)
+	MCFG_CPU_IO_MAP(drw80pkr_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
 
 
@@ -502,8 +502,8 @@ ROM_START( drw80pkr )
 	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(f8158f2b) SHA1(da3b30cfd49cd0e8a48d78fd3f82b2b4ab33670c) )
 
 	ROM_REGION( 0x002000, "gfx1", 0 )
-	ROM_LOAD( "cg0-a.u74",	 0x0000, 0x1000, CRC(0eefe598) SHA1(ed10aac345b10e35fb15babdd3ac30ebe2b8fc0f) )
-	ROM_LOAD( "cg1-a.u76",	 0x1000, 0x1000, CRC(522a96d0) SHA1(48f855a132413493353fbf6a44a1feb34ae6726d) )
+	ROM_LOAD( "cg0-a.u74",   0x0000, 0x1000, CRC(0eefe598) SHA1(ed10aac345b10e35fb15babdd3ac30ebe2b8fc0f) )
+	ROM_LOAD( "cg1-a.u76",   0x1000, 0x1000, CRC(522a96d0) SHA1(48f855a132413493353fbf6a44a1feb34ae6726d) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap13.u92", 0x0000, 0x0100, CRC(be67a8d9) SHA1(24b8cd19a5ec09779a737f6fc8c07b44f1226c8f) )
@@ -515,8 +515,8 @@ ROM_START( drw80pk2 )
 	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )
 
 	ROM_REGION( 0x002000, "gfx1", 0 )
-	ROM_LOAD( "cg0-a.u74",	 0x0000, 0x1000, CRC(97f5eb92) SHA1(f6c7bb42ccef8a78e8d56104ad942ae5b8e5b0df) )
-	ROM_LOAD( "cg1-a.u76",	 0x1000, 0x1000, CRC(2a3a750d) SHA1(db6183d11b2865b011c3748dc472cf5858dde78f) )
+	ROM_LOAD( "cg0-a.u74",   0x0000, 0x1000, CRC(97f5eb92) SHA1(f6c7bb42ccef8a78e8d56104ad942ae5b8e5b0df) )
+	ROM_LOAD( "cg1-a.u76",   0x1000, 0x1000, CRC(2a3a750d) SHA1(db6183d11b2865b011c3748dc472cf5858dde78f) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap13.u92", 0x0000, 0x0100, CRC(be67a8d9) SHA1(24b8cd19a5ec09779a737f6fc8c07b44f1226c8f) )

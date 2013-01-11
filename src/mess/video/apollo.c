@@ -271,10 +271,10 @@ static void set_cr1(device_t *device, screen_data_t *screen_data,
 
 			if ((screen_data->cr1 & CR1_DISP_EN) == 0) {
 				screen_data->status_register &= ~SR_V_DATA;
-			}else			{
+			}else           {
 				UINT16 pixel = screen_data->image_memory[screen_data->data_clock / 16]
 								& (0x8000 >> (screen_data->data_clock % 16));
-				pixel = (pixel ? 1 : 0)	^ ((screen_data->cr1 & CR1_INV) ? 0 : 1);
+				pixel = (pixel ? 1 : 0) ^ ((screen_data->cr1 & CR1_INV) ? 0 : 1);
 
 				if (pixel) {
 					screen_data->status_register |= SR_V_DATA;
@@ -909,5 +909,3 @@ void apollo_mono15i_device::device_reset()
 {
 	DEVICE_RESET_NAME( apollo_mono15i )(this);
 }
-
-

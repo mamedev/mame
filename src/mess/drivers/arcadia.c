@@ -385,26 +385,26 @@ static INPUT_PORTS_START( plldium )
 	PORT_RESET
 #else
 	PORT_START("joysticks")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )		PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )		PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )		PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )		PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )		PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )		PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )     PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )    PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )     PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )       PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )     PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )     PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )       PORT_PLAYER(2) PORT_8WAY
 #endif
 INPUT_PORTS_END
 
 static const gfx_layout arcadia_charlayout =
 {
-	8,						/*width*/
-	1,						/*height*/
-	256,					/* 256 characters */
-	1,						/* 1 bits per pixel */
+	8,                      /*width*/
+	1,                      /*height*/
+	256,                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },	/* x offsets */
-	{ 0 },					/* y offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 }, /* x offsets */
+	{ 0 },                  /* y offsets */
 	1*8
 };
 
@@ -414,14 +414,14 @@ GFXDECODE_END
 
 static const rgb_t arcadia_colors[] =
 {
-	RGB_WHITE,					/* white */
-	MAKE_RGB(0xff, 0xff, 0x00),	/* yellow */
-	MAKE_RGB(0x00, 0xff, 0xff),	/* cyan */
-	MAKE_RGB(0x00, 0xff, 0x00),	/* green */
-	MAKE_RGB(0xff, 0x00, 0xff),	/* magenta */
-	MAKE_RGB(0xff, 0x00, 0x00),	/* red */
-	MAKE_RGB(0x00, 0x00, 0xff),	/* blue */
-	RGB_BLACK					/* black */
+	RGB_WHITE,                  /* white */
+	MAKE_RGB(0xff, 0xff, 0x00), /* yellow */
+	MAKE_RGB(0x00, 0xff, 0xff), /* cyan */
+	MAKE_RGB(0x00, 0xff, 0x00), /* green */
+	MAKE_RGB(0xff, 0x00, 0xff), /* magenta */
+	MAKE_RGB(0xff, 0x00, 0x00), /* red */
+	MAKE_RGB(0x00, 0x00, 0xff), /* blue */
+	RGB_BLACK                   /* black */
 };
 
 static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
@@ -487,8 +487,8 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 		memcpy(rom + 0x4000, rom + 0x2000, 0x1000);
 #else
 	/* this is a testpatch for the golf cartridge
-       so it could be burned in a arcadia 2001 cartridge
-       activate it and use debugger to save patched version */
+	   so it could be burned in a arcadia 2001 cartridge
+	   activate it and use debugger to save patched version */
 	// not enough yet (some pointers stored as data?)
 	int i;
 	static const struct { UINT16 address; UINT8 old; UINT8 new; }
@@ -739,7 +739,7 @@ DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 	{
 		UINT8 *rom=machine().root_device().memregion("maincpu")->base();
 		/* this is a simple routine to display all rom characters
-           on the display for a snapshot */
+		   on the display for a snapshot */
 		static const UINT8 prog[]={ // address 0 of course
 		0x20, // eorz, 0
 		0x1b, 0x01, // bctr,a $0004

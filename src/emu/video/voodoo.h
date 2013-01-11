@@ -57,10 +57,10 @@ enum
 	TYPE_VOODOO_3
 };
 
-#define STD_VOODOO_1_CLOCK			50000000
-#define STD_VOODOO_2_CLOCK			90000000
-#define STD_VOODOO_BANSHEE_CLOCK	90000000
-#define STD_VOODOO_3_CLOCK			132000000
+#define STD_VOODOO_1_CLOCK          50000000
+#define STD_VOODOO_2_CLOCK          90000000
+#define STD_VOODOO_BANSHEE_CLOCK    90000000
+#define STD_VOODOO_3_CLOCK          132000000
 
 
 /***************************************************************************
@@ -73,13 +73,13 @@ typedef void (*voodoo_stall_func)(device_t *device, int state);
 
 struct voodoo_config
 {
-	UINT8				fbmem;
-	UINT8				tmumem0;
-	UINT8				tmumem1;
-	const char *		screen;
-	const char *		cputag;
-	voodoo_vblank_func	vblank;
-	voodoo_stall_func	stall;
+	UINT8               fbmem;
+	UINT8               tmumem0;
+	UINT8               tmumem1;
+	const char *        screen;
+	const char *        cputag;
+	voodoo_vblank_func  vblank;
+	voodoo_stall_func   stall;
 };
 
 

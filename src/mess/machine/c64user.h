@@ -35,7 +35,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define C64_USER_PORT_TAG		"user"
+#define C64_USER_PORT_TAG       "user"
 
 
 
@@ -48,8 +48,8 @@
 
 
 #define MCFG_C64_USER_PORT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, C64_USER_PORT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, C64_USER_PORT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -62,12 +62,12 @@
 
 struct c64_user_port_interface
 {
-	devcb_write_line	m_out_cnt1_cb;
-	devcb_write_line	m_out_sp1_cb;
-	devcb_write_line	m_out_cnt2_cb;
-	devcb_write_line	m_out_sp2_cb;
-	devcb_write_line	m_out_flag2_cb;
-    devcb_write_line	m_out_reset_cb;
+	devcb_write_line    m_out_cnt1_cb;
+	devcb_write_line    m_out_sp1_cb;
+	devcb_write_line    m_out_cnt2_cb;
+	devcb_write_line    m_out_sp2_cb;
+	devcb_write_line    m_out_flag2_cb;
+	devcb_write_line    m_out_reset_cb;
 };
 
 
@@ -76,8 +76,8 @@ struct c64_user_port_interface
 class device_c64_user_port_interface;
 
 class c64_user_port_device : public device_t,
-						     public c64_user_port_interface,
-						     public device_slot_interface
+								public c64_user_port_interface,
+								public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -107,12 +107,12 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	devcb_resolved_write_line	m_out_cnt1_func;
-	devcb_resolved_write_line	m_out_sp1_func;
-	devcb_resolved_write_line	m_out_cnt2_func;
-	devcb_resolved_write_line	m_out_sp2_func;
-	devcb_resolved_write_line	m_out_flag2_func;
-    devcb_resolved_write_line	m_out_reset_func;
+	devcb_resolved_write_line   m_out_cnt1_func;
+	devcb_resolved_write_line   m_out_sp1_func;
+	devcb_resolved_write_line   m_out_cnt2_func;
+	devcb_resolved_write_line   m_out_sp2_func;
+	devcb_resolved_write_line   m_out_flag2_func;
+	devcb_resolved_write_line   m_out_reset_func;
 
 	device_c64_user_port_interface *m_cart;
 };

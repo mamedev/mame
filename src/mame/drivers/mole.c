@@ -140,26 +140,26 @@ UINT32 mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bitma
 
 READ8_MEMBER(mole_state::mole_protection_r)
 {
-    /*  Following are all known examples of Mole Attack
-    **  code reading from the protection circuitry:
-    **
-    **  5b0b:
-    **  ram[0x0361] = (ram[0x885+ram[0x8a5])&ram[0x886]
-    **  ram[0x0363] = ram[0x886]
-    **
-    **  53c9:
-    **  ram[0xe0] = ram[0x800]+ram[0x802]+ram[0x804]
-    **  ram[0xea] = ram[0x828]
-    **
-    **  ram[0xe2] = (ram[0x806]&ram[0x826])|ram[0x820]
-    **  ram[0xe3] = ram[0x826]
-    **
-    **  ram[0x361] = (ram[0x8cd]&ram[0x8ad])|ram[0x8ce]
-    **  ram[0x362] = ram[0x8ae] = 0x32
-    **
-    **  ram[0x363] = ram[0x809]+ram[0x829]+ram[0x828]
-    **  ram[0x364] = ram[0x808]
-    */
+	/*  Following are all known examples of Mole Attack
+	**  code reading from the protection circuitry:
+	**
+	**  5b0b:
+	**  ram[0x0361] = (ram[0x885+ram[0x8a5])&ram[0x886]
+	**  ram[0x0363] = ram[0x886]
+	**
+	**  53c9:
+	**  ram[0xe0] = ram[0x800]+ram[0x802]+ram[0x804]
+	**  ram[0xea] = ram[0x828]
+	**
+	**  ram[0xe2] = (ram[0x806]&ram[0x826])|ram[0x820]
+	**  ram[0xe3] = ram[0x826]
+	**
+	**  ram[0x361] = (ram[0x8cd]&ram[0x8ad])|ram[0x8ce]
+	**  ram[0x362] = ram[0x8ae] = 0x32
+	**
+	**  ram[0x363] = ram[0x809]+ram[0x829]+ram[0x828]
+	**  ram[0x364] = ram[0x808]
+	*/
 
 	switch (offset)
 	{
@@ -177,11 +177,11 @@ READ8_MEMBER(mole_state::mole_protection_r)
 	case 0xae: return 0x32; /* coinage */
 	}
 
-    /*  The above are critical protection reads.
-    **  It isn't clear what effect (if any) the
-    **  remaining reads have; for now we simply
-    **  return 0x00
-    */
+	/*  The above are critical protection reads.
+	**  It isn't clear what effect (if any) the
+	**  remaining reads have; for now we simply
+	**  return 0x00
+	*/
 
 	return 0x00;
 }
@@ -219,26 +219,26 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( mole )
-	PORT_START("DSW")	/* 0x8d00 */
+	PORT_START("DSW")   /* 0x8d00 */
 	PORT_DIPNAME( 0x01, 0x00, "Round Points" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, "A" )
-	PORT_DIPSETTING(	0x04, "B" )
-	PORT_DIPSETTING(	0x08, "C" )
-	PORT_DIPSETTING(	0x0c, "D" )
+	PORT_DIPSETTING(    0x00, "A" )
+	PORT_DIPSETTING(    0x04, "B" )
+	PORT_DIPSETTING(    0x08, "C" )
+	PORT_DIPSETTING(    0x0c, "D" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, "A" )
-	PORT_DIPSETTING(	0x10, "B" )
-	PORT_DIPSETTING(	0x20, "C" )
-	PORT_DIPSETTING(	0x30, "D" )
+	PORT_DIPSETTING(    0x00, "A" )
+	PORT_DIPSETTING(    0x10, "B" )
+	PORT_DIPSETTING(    0x20, "C" )
+	PORT_DIPSETTING(    0x30, "D" )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN0")	/* 0x8d40 */
+	PORT_START("IN0")   /* 0x8d40 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 2") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 3") PORT_CODE(KEYCODE_3_PAD)
@@ -248,7 +248,7 @@ static INPUT_PORTS_START( mole )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 8") PORT_CODE(KEYCODE_8_PAD)
 
-	PORT_START("IN1")	/* 0x8d80 */
+	PORT_START("IN1")   /* 0x8d80 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Pad 1") PORT_CODE(KEYCODE_Q) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Pad 2") PORT_CODE(KEYCODE_W) PORT_COCKTAIL
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( mole )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("IN2")	/* 0x8dc0 */
+	PORT_START("IN2")   /* 0x8dc0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Pad 8") PORT_CODE(KEYCODE_X) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Pad 7") PORT_CODE(KEYCODE_Z) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Pad 4") PORT_CODE(KEYCODE_A) PORT_COCKTAIL
@@ -279,9 +279,9 @@ INPUT_PORTS_END
 
 static const gfx_layout tile_layout =
 {
-	8,8,	/* character size */
-	512,	/* number of characters */
-	3,		/* number of bitplanes */
+	8,8,    /* character size */
+	512,    /* number of characters */
+	3,      /* number of bitplanes */
 	{ 0x0000*8, 0x1000*8, 0x2000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -346,18 +346,18 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( mole ) // ALL ROMS ARE 2732
-	ROM_REGION( 0x10000, "maincpu", 0 )	// 64k for 6502 code
-	ROM_LOAD( "m3a.5h",	0x5000, 0x1000, CRC(5fbbdfef) SHA1(8129e90a05b3ca50f47f7610eec51c16c8609590) )
-	ROM_LOAD( "m2a.7h",	0x6000, 0x1000, CRC(f2a90642) SHA1(da6887725d70924fc4b9cca83172276976f5020c) )
-	ROM_LOAD( "m1a.8h",	0x7000, 0x1000, CRC(cff0119a) SHA1(48fc81b8c68e977680e7b8baf1193f0e7e0cd013) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 64k for 6502 code
+	ROM_LOAD( "m3a.5h", 0x5000, 0x1000, CRC(5fbbdfef) SHA1(8129e90a05b3ca50f47f7610eec51c16c8609590) )
+	ROM_LOAD( "m2a.7h", 0x6000, 0x1000, CRC(f2a90642) SHA1(da6887725d70924fc4b9cca83172276976f5020c) )
+	ROM_LOAD( "m1a.8h", 0x7000, 0x1000, CRC(cff0119a) SHA1(48fc81b8c68e977680e7b8baf1193f0e7e0cd013) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "mea.4a",	0x0000, 0x1000, CRC(49d89116) SHA1(aa4cde07e10624072e50ba5bd209acf93092cf78) )
-	ROM_LOAD( "mca.6a",	0x1000, 0x1000, CRC(04e90300) SHA1(c908a3a651e50428eedc2974160cdbf2ed946abc) )
-	ROM_LOAD( "maa.9a",	0x2000, 0x1000, CRC(6ce9442b) SHA1(c08bf0911f1dfd4a3f9452efcbb3fd3688c4bf8c) )
-	ROM_LOAD( "mfa.3a",	0x3000, 0x1000, CRC(0d0c7d13) SHA1(8a6d371571391f2b54ffa65b77e4e83fd607d2c9) )
-	ROM_LOAD( "mda.5a",	0x4000, 0x1000, CRC(41ae1842) SHA1(afc169c3245b0946ef81e65d0b755d498ee71667) )
-	ROM_LOAD( "mba.8a",	0x5000, 0x1000, CRC(50c43fc9) SHA1(af478f3d89cd6c87f32dcdda7fabce25738c340b) )
+	ROM_LOAD( "mea.4a", 0x0000, 0x1000, CRC(49d89116) SHA1(aa4cde07e10624072e50ba5bd209acf93092cf78) )
+	ROM_LOAD( "mca.6a", 0x1000, 0x1000, CRC(04e90300) SHA1(c908a3a651e50428eedc2974160cdbf2ed946abc) )
+	ROM_LOAD( "maa.9a", 0x2000, 0x1000, CRC(6ce9442b) SHA1(c08bf0911f1dfd4a3f9452efcbb3fd3688c4bf8c) )
+	ROM_LOAD( "mfa.3a", 0x3000, 0x1000, CRC(0d0c7d13) SHA1(8a6d371571391f2b54ffa65b77e4e83fd607d2c9) )
+	ROM_LOAD( "mda.5a", 0x4000, 0x1000, CRC(41ae1842) SHA1(afc169c3245b0946ef81e65d0b755d498ee71667) )
+	ROM_LOAD( "mba.8a", 0x5000, 0x1000, CRC(50c43fc9) SHA1(af478f3d89cd6c87f32dcdda7fabce25738c340b) )
 ROM_END
 
 

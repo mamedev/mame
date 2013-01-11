@@ -27,8 +27,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-#define LOG_REGISTER	1
-#define LOG_MEMORY		1
+#define LOG_REGISTER    1
+#define LOG_MEMORY      1
 
 const device_type CS4031 = &device_creator<cs4031_device>;
 
@@ -90,8 +90,8 @@ static const char *const register_names[] =
 
 cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CS4031, "CS4031", tag, owner, clock),
-	  m_address(0),
-	  m_address_valid(false)
+		m_address(0),
+		m_address_valid(false)
 {
 }
 

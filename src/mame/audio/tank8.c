@@ -16,27 +16,27 @@
 static const discrete_lfsr_desc tank8_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,			/* Bit Length */
-	0,			/* Reset Value */
-	10,			/* Use Bit 10 as F0 input 0 */
-	15,			/* Use Bit 15 as F0 input 1 */
-	DISC_LFSR_XOR,		/* F0 is XOR */
-	DISC_LFSR_XOR,		/* F1 is F0 XOR with external feed. External feed is (address line) A2 */
-	DISC_LFSR_REPLACE,	/* F2 replaces the shifted register contents */
-	0x000001,		/* Everything is shifted into the first bit only */
-	1,			/* Output is inverted by Q20 */
-	12			/* Output bit */
+	16,         /* Bit Length */
+	0,          /* Reset Value */
+	10,         /* Use Bit 10 as F0 input 0 */
+	15,         /* Use Bit 15 as F0 input 1 */
+	DISC_LFSR_XOR,      /* F0 is XOR */
+	DISC_LFSR_XOR,      /* F1 is F0 XOR with external feed. External feed is (address line) A2 */
+	DISC_LFSR_REPLACE,  /* F2 replaces the shifted register contents */
+	0x000001,       /* Everything is shifted into the first bit only */
+	1,          /* Output is inverted by Q20 */
+	12          /* Output bit */
 };
 
 static const discrete_integrate_info tank8_op1_integrate_info =
 {
 	DISC_INTEGRATE_OP_AMP_1,
-	RES_K(27),		/* R98 */
-	RES_K(2.2),		/* R97 */
-	RES_K(47),		/* R96 */
-	CAP_U(0.22),	/* C60 */
+	RES_K(27),      /* R98 */
+	RES_K(2.2),     /* R97 */
+	RES_K(47),      /* R96 */
+	CAP_U(0.22),    /* C60 */
 	5,
-	12,				// B+ is 12V, not 15V shown in the schematic.
+	12,             // B+ is 12V, not 15V shown in the schematic.
 	0,
 	0,
 	0,
@@ -45,12 +45,12 @@ static const discrete_integrate_info tank8_op1_integrate_info =
 static const discrete_integrate_info tank8_op2_integrate_info =
 {
 	DISC_INTEGRATE_OP_AMP_1,
-	RES_K(27),		/* R99 */
-	RES_K(2.2),		/* R97 */
-	RES_K(47),		/* R96 */
-	CAP_U(0.1),		/* C59 */
+	RES_K(27),      /* R99 */
+	RES_K(2.2),     /* R97 */
+	RES_K(47),      /* R96 */
+	CAP_U(0.1),     /* C59 */
 	5,
-	12,				// B+ is 12V, not 15V shown in the schematic.
+	12,             // B+ is 12V, not 15V shown in the schematic.
 	0,
 	0,
 	0,
@@ -59,27 +59,27 @@ static const discrete_integrate_info tank8_op2_integrate_info =
 static const discrete_555_desc tank8_555_a =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_DC,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
 static const discrete_555_desc tank8_555_m =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_VOLTAGE,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
 
 static const discrete_op_amp_filt_info tank8_filt =
 {
-	RES_K(18),		// R56
+	RES_K(18),      // R56
 	0,
-	RES_K(0.820),	//R57
+	RES_K(0.820),   //R57
 	0,
-	RES_K(330),		//R58
-	CAP_U(.047),	//C42
-	CAP_U(.047),	//C43
+	RES_K(330),     //R58
+	CAP_U(.047),    //C42
+	CAP_U(.047),    //C43
 	0,
 	2.5,
 	5, /* VCC */
@@ -89,25 +89,25 @@ static const discrete_op_amp_filt_info tank8_filt =
 static const discrete_dac_r1_ladder tank8_dac =
 {
 	1,
-	{RES_K(4.7)},	// R89
-	5,				// 555 Vcc
-	RES_K(5),		// 555 internal
-	RES_K(10),		// 555 internal
-	CAP_U(100)		// C26
+	{RES_K(4.7)},   // R89
+	5,              // 555 Vcc
+	RES_K(5),       // 555 internal
+	RES_K(10),      // 555 internal
+	CAP_U(100)      // C26
 };
 
 /* Nodes - Sounds */
-#define TANK8_MOTOR1		NODE_15
-#define TANK8_MOTOR2		NODE_16
-#define TANK8_MOTOR3		NODE_17
-#define TANK8_MOTOR4		NODE_18
-#define TANK8_MOTOR5		NODE_19
-#define TANK8_MOTOR6		NODE_20
-#define TANK8_MOTOR7		NODE_21
-#define TANK8_MOTOR8		NODE_22
-#define TANK8_CRASHEXPL		NODE_23
+#define TANK8_MOTOR1        NODE_15
+#define TANK8_MOTOR2        NODE_16
+#define TANK8_MOTOR3        NODE_17
+#define TANK8_MOTOR4        NODE_18
+#define TANK8_MOTOR5        NODE_19
+#define TANK8_MOTOR6        NODE_20
+#define TANK8_MOTOR7        NODE_21
+#define TANK8_MOTOR8        NODE_22
+#define TANK8_CRASHEXPL     NODE_23
 #define TANK8_BUGLE         NODE_24
-#define TANK8_FINAL_MIX		NODE_25
+#define TANK8_FINAL_MIX     NODE_25
 #define TANK8_A2_LINE       NODE_26
 
 
@@ -222,7 +222,7 @@ DISCRETE_SOUND_START(tank8)
 	/*    = 15750/4                                 */
 	/************************************************/
 	/* The A2 address line is also mixed in to the noise generator,
-     * but that is currently not implemented. */
+	 * but that is currently not implemented. */
 	DISCRETE_CONSTANT(TANK8_A2_LINE,1)
 	DISCRETE_LFSR_NOISE(NODE_120, TANK8_ATTRACT_EN, TANK8_ATTRACT_EN, 15750.0/4, 1, TANK8_A2_LINE, 0, &tank8_lfsr)
 
@@ -248,8 +248,8 @@ DISCRETE_SOUND_START(tank8)
 	DISCRETE_MULTIPLY(NODE_126, NODE_120, NODE_125 )
 	DISCRETE_RCFILTER(NODE_127, NODE_126, RES_K(47), CAP_U(0.1))
 	DISCRETE_ADJUSTMENT(NODE_128,
-				1.0,				// min gain of E5
-				1.0 + 100.0/22,		// max gain of E5 = 1 + r132/r101
+				1.0,                // min gain of E5
+				1.0 + 100.0/22,     // max gain of E5 = 1 + r132/r101
 				DISC_LINADJ, "CRASH")
 	DISCRETE_MULTIPLY(NODE_129, NODE_127, NODE_128 )
 	DISCRETE_CLAMP(TANK8_CRASHEXPL, NODE_129, -(12.0 - OP_AMP_VP_RAIL_OFFSET)/2, (12.0 - OP_AMP_VP_RAIL_OFFSET)/2)

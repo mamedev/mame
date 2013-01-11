@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r, seta_sound_w)
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)   /* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
@@ -232,11 +232,11 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 {
-	coin_counter_w(machine(), 0, data & 1);	// coin in counter
-	coin_counter_w(machine(), 1, data & 2);	// gift out counter
+	coin_counter_w(machine(), 0, data & 1); // coin in counter
+	coin_counter_w(machine(), 1, data & 2); // gift out counter
 
-	coin_lockout_w(machine(), 0, ~data & 8);	// coin lockout
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
+	coin_lockout_w(machine(), 0, ~data & 8);    // coin lockout
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x04) ? 0x00 : 0x80);  // gift out motor
 
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 
@@ -249,15 +249,15 @@ static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xc000, 0xc07f) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r,seta_sound_w)	// Sound
+	AM_RANGE(0xc000, 0xc07f) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r,seta_sound_w) // Sound
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)   /* enable / disable background transparency */
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0") AM_WRITE(doraemon_outputs_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN1") AM_WRITENOP	// Ack?
-	AM_RANGE(0xf004, 0xf004) AM_WRITENOP						// Ack?
-	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("DSW") AM_WRITENOP	// Ack?
-	AM_RANGE(0xf800, 0xf800) AM_WRITENOP						// 0
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN1") AM_WRITENOP    // Ack?
+	AM_RANGE(0xf004, 0xf004) AM_WRITENOP                        // Ack?
+	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("DSW") AM_WRITENOP    // Ack?
+	AM_RANGE(0xf800, 0xf800) AM_WRITENOP                        // 0
 ADDRESS_MAP_END
 
 
@@ -348,17 +348,17 @@ static INPUT_PORTS_START( champbwl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FAKEX")		/* FAKE */
+	PORT_START("FAKEX")     /* FAKE */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0)
 
-	PORT_START("FAKEY")		/* FAKE */
+	PORT_START("FAKEY")     /* FAKE */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 
 
 
 static INPUT_PORTS_START( doraemon )
-	PORT_START("DSW")	// f006
+	PORT_START("DSW")   // f006
 	PORT_DIPNAME( 0x0f, 0x09, "Gift Out" )
 	PORT_DIPSETTING(    0x0f,   "2 %" )
 	PORT_DIPSETTING(    0x0e,   "5 %" )
@@ -389,23 +389,23 @@ static INPUT_PORTS_START( doraemon )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN0")	// f000
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 )	PORT_NAME( "Data Clear" )
+	PORT_START("IN0")   // f000
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 )  PORT_NAME( "Data Clear" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE3 )	PORT_NAME( "Freeze" )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE3 )  PORT_NAME( "Freeze" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
-	PORT_START("IN1")	// f002
+	PORT_START("IN1")   // f002
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// sensor
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)   // sensor
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
@@ -431,7 +431,7 @@ GFXDECODE_END
 
 static const x1_010_interface champbwl_sound_intf =
 {
-	0x0000		/* address */
+	0x0000      /* address */
 };
 
 MACHINE_START_MEMBER(champbwl_state,champbwl)
@@ -576,7 +576,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( champbwl )
-	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* Z80 Code */
 	ROM_LOAD( "ab001001.u1",  0x10000, 0x10000, CRC(6c6f7675) SHA1(19834f25f2644ae5d156c1e1bbb3fc50cae10fd2) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -589,7 +589,7 @@ ROM_START( champbwl )
 	ROM_LOAD( "ab001008.u26", 0x0000, 0x0200, CRC(30ac8d48) SHA1(af034de3f3b8548534effdf4e3717fe3838b7754) )
 	ROM_LOAD( "ab001009.u27", 0x0200, 0x0200, CRC(3bbd4bcd) SHA1(8c87ccc42ece2432b8ad25f8679cdf886e12a43c) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ab002002.2-2", 0x00000, 0x40000, CRC(42ebe997) SHA1(1808b9e5e996a395c1d48ac001067f736f96feec) ) // jingles (for strike, spare etc.)
 	ROM_LOAD( "ab003002.3-2", 0x40000, 0x40000, CRC(7ede8f28) SHA1(b5519c09b4f0019dc76cadca725da1d581912540) ) // basic coin + ball sounds
 	ROM_LOAD( "ab002003.2-3", 0x80000, 0x40000, CRC(3051b8c3) SHA1(5f53596d7af1c79db1dde4bdca3878e07c67b5d1) ) // 'welcome to.. , strike' speech etc.
@@ -678,7 +678,7 @@ Notes:
 ROM_START( doraemon )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "u1.bin", 0x00000, 0x20000, CRC(d338b9ca) SHA1(5f59c994db81577dc6074362c8b6b93f8fe592f6) )
-	ROM_RELOAD(         0x10000, 0x20000 )		/* banked at 4000-7fff */
+	ROM_RELOAD(         0x10000, 0x20000 )      /* banked at 4000-7fff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "u22.bin", 0x00000, 0x20000, CRC(b264ac2d) SHA1(0529fd1b88ba61dcf72019c7b01e9b939b6e3f2e) )

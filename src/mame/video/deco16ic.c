@@ -654,16 +654,16 @@ static int deco16_pf_update(
 		/* Several different rowscroll styles */
 		switch ((control0 >> 3) & 0xf)
 		{
-			case 0: 	rows = 512; 	break;/* Every line of 512 height bitmap */
-			case 1: 	rows = 256; 	break;
-			case 2: 	rows = 128; 	break;
-			case 3: 	rows = 64;		break;
-			case 4: 	rows = 32;		break;
-			case 5: 	rows = 16;		break;
-			case 6: 	rows = 8;		break;
-			case 7: 	rows = 4;		break;
-			case 8: 	rows = 2;		break;
-			default:	rows = 1;		break;
+			case 0:     rows = 512;     break;/* Every line of 512 height bitmap */
+			case 1:     rows = 256;     break;
+			case 2:     rows = 128;     break;
+			case 3:     rows = 64;      break;
+			case 4:     rows = 32;      break;
+			case 5:     rows = 16;      break;
+			case 6:     rows = 8;       break;
+			case 7:     rows = 4;       break;
+			case 8:     rows = 2;       break;
+			default:    rows = 1;       break;
 		}
 
 		if (tilemap_16x16)
@@ -1005,5 +1005,3 @@ void deco16ic_device::device_reset()
 	deco16ic->pf1_rowscroll_ptr = 0;
 	deco16ic->pf2_rowscroll_ptr = 0;
 }
-
-

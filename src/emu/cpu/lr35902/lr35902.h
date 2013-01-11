@@ -14,8 +14,8 @@ typedef void (*lr35902_timer_fired_func)(lr35902_cpu_device *device, int cycles)
 
 struct lr35902_config
 {
-	const UINT16	*c_regs;
-	UINT8			c_features;
+	const UINT16    *c_regs;
+	UINT8           c_features;
 	lr35902_timer_fired_func c_timer_expired_func;
 };
 
@@ -30,10 +30,10 @@ enum
 };
 
 // This and the features configuration could be removed if we introduce proper subclasses
-#define LR35902_FEATURE_HALT_BUG	0x01
+#define LR35902_FEATURE_HALT_BUG    0x01
 
 
-class lr35902_cpu_device :	public cpu_device,
+class lr35902_cpu_device :  public cpu_device,
 							public lr35902_config
 {
 public:
@@ -96,24 +96,24 @@ protected:
 	UINT16 m_SP;
 	UINT16 m_PC;
 	/* Interrupt related */
-	UINT8	m_IE;
-	UINT8	m_IF;
-	int	m_irq_state;
-	int	m_ei_delay;
+	UINT8   m_IE;
+	UINT8   m_IF;
+	int m_irq_state;
+	int m_ei_delay;
 	lr35902_cpu_device *m_device;
 	address_space *m_program;
 	int m_icount;
 	/* Timer stuff */
 	lr35902_timer_fired_func m_timer_expired_func;
 	/* Fetch & execute related */
-	int		m_execution_state;
-	UINT8	m_op;
+	int     m_execution_state;
+	UINT8   m_op;
 	/* Others */
 	int m_gb_speed;
 	int m_gb_speed_change_pending;
 	int m_enable;
 	int m_doHALTbug;
-	UINT8	m_features;
+	UINT8   m_features;
 	const struct lr35902_config *m_config;
 
 	/* Flag bit definitions */

@@ -25,13 +25,13 @@ const device_type NUBUS_SLOT = &device_creator<nubus_slot_device>;
 //  nubus_slot_device - constructor
 //-------------------------------------------------
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock),
+		device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
 
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -84,12 +84,12 @@ void nubus_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq9_cb, 0, sizeof(m_out_irq9_cb));
-    	memset(&m_out_irqa_cb, 0, sizeof(m_out_irqa_cb));
-    	memset(&m_out_irqb_cb, 0, sizeof(m_out_irqb_cb));
-    	memset(&m_out_irqc_cb, 0, sizeof(m_out_irqc_cb));
-    	memset(&m_out_irqd_cb, 0, sizeof(m_out_irqd_cb));
-    	memset(&m_out_irqe_cb, 0, sizeof(m_out_irqe_cb));
+		memset(&m_out_irq9_cb, 0, sizeof(m_out_irq9_cb));
+		memset(&m_out_irqa_cb, 0, sizeof(m_out_irqa_cb));
+		memset(&m_out_irqb_cb, 0, sizeof(m_out_irqb_cb));
+		memset(&m_out_irqc_cb, 0, sizeof(m_out_irqc_cb));
+		memset(&m_out_irqd_cb, 0, sizeof(m_out_irqd_cb));
+		memset(&m_out_irqe_cb, 0, sizeof(m_out_irqe_cb));
 	}
 }
 
@@ -102,12 +102,12 @@ void nubus_device::device_config_complete()
 //-------------------------------------------------
 
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock)
+		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock)
 {
 }
 
 nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock)
+		device_t(mconfig, type, name, tag, owner, clock)
 {
 }
 //-------------------------------------------------
@@ -242,12 +242,12 @@ void nubus_device::set_irq_line(int slot, int state)
 {
 	switch (slot)
 	{
-		case 0x9:	irq9_w(state);	break;
-		case 0xa:	irqa_w(state);	break;
-		case 0xb:	irqb_w(state);	break;
-		case 0xc:	irqc_w(state);	break;
-		case 0xd:	irqd_w(state);	break;
-		case 0xe:	irqe_w(state);	break;
+		case 0x9:   irq9_w(state);  break;
+		case 0xa:   irqa_w(state);  break;
+		case 0xb:   irqb_w(state);  break;
+		case 0xc:   irqc_w(state);  break;
+		case 0xd:   irqd_w(state);  break;
+		case 0xe:   irqe_w(state);  break;
 	}
 }
 
@@ -274,8 +274,8 @@ WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_func(state); }
 
 device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_nubus(NULL),
-	  m_nubus_tag(NULL)
+		m_nubus(NULL),
+		m_nubus_tag(NULL)
 {
 }
 
@@ -297,28 +297,28 @@ void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const c
 
 void device_nubus_card_interface::set_nubus_device()
 {
-    if (!strncmp(m_nubus_slottag, "pds030", 6))
-    {
-        m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
-    }
-    else if (!strncmp(m_nubus_slottag, "lcpds", 6))
-    {
-        m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
-    }
-    else
-    {
-        // extract the slot number from the last digit of the slot tag
-        int tlen = strlen(m_nubus_slottag);
+	if (!strncmp(m_nubus_slottag, "pds030", 6))
+	{
+		m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
+	}
+	else if (!strncmp(m_nubus_slottag, "lcpds", 6))
+	{
+		m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
+	}
+	else
+	{
+		// extract the slot number from the last digit of the slot tag
+		int tlen = strlen(m_nubus_slottag);
 
-        if (m_nubus_slottag[tlen-1] == '9')
-        {
-            m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
-        }
-        else
-        {
-            m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
-        }
-    }
+		if (m_nubus_slottag[tlen-1] == '9')
+		{
+			m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+		}
+		else
+		{
+			m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
+		}
+	}
 
 	if (m_slot < 9 || m_slot > 0xe)
 	{
@@ -383,7 +383,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 	switch (byteLanes)
 	{
-		case 0x0f:	// easy case: all 4 lanes (still must scramble for 32-bit BE bus though)
+		case 0x0f:  // easy case: all 4 lanes (still must scramble for 32-bit BE bus though)
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen);
 			for (int i = 0; i < romlen; i++)
 			{
@@ -391,7 +391,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			}
 			break;
 
-		case 0xe1:	// lane 0 only
+		case 0xe1:  // lane 0 only
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
@@ -400,7 +400,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			romlen *= 4;
 			break;
 
-		case 0xd2:	// lane 1 only
+		case 0xd2:  // lane 1 only
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
@@ -409,7 +409,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			romlen *= 4;
 			break;
 
-		case 0xb4:	// lane 2 only
+		case 0xb4:  // lane 2 only
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
@@ -418,7 +418,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			romlen *= 4;
 			break;
 
-		case 0x78:	// lane 3 only
+		case 0x78:  // lane 3 only
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
@@ -427,7 +427,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			romlen *= 4;
 			break;
 
-		case 0xc3:	// lanes 0, 1
+		case 0xc3:  // lanes 0, 1
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
@@ -437,7 +437,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			romlen *= 2;
 			break;
 
-		case 0xa5:	// lanes 0, 2
+		case 0xa5:  // lanes 0, 2
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
@@ -447,7 +447,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			romlen *= 2;
 			break;
 
-		case 0x3c:	// lanes 2,3
+		case 0x3c:  // lanes 2,3
 			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
@@ -478,7 +478,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	strcat(bankname, m_nubus_slottag);
 	addr -= romlen;
 //  printf("Installing ROM at %x, length %x\n", addr, romlen);
-	if (mirror_all_mb)	// mirror the declaration ROM across all 16 megs of the slot space
+	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space
 	{
 		m_nubus->install_bank(addr, addr+romlen-1, 0, 0x00f00000, bankname, newrom);
 	}
@@ -487,4 +487,3 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 		m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, newrom);
 	}
 }
-

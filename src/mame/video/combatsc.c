@@ -27,7 +27,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 			default:
 			case 0: /* other sprites */
 			case 2: /* other sprites(alt) */
-			clut = 1;	/* 0 is wrong for Firing Range III targets */
+			clut = 1;   /* 0 is wrong for Firing Range III targets */
 			break;
 
 			case 4: /* player sprites */
@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 				ctabentry = (pal << 4) | (~color_prom[i] & 0x0f);
 			else
 				/* chars - no lookup? */
-				ctabentry = (pal << 4) | (i & 0x0f);	/* no lookup? */
+				ctabentry = (pal << 4) | (i & 0x0f);    /* no lookup? */
 
 			colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
 		}
@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 		bank = 0;
 
 	if ((attributes & 0xb0) == 0)
-		bank = 0;	/* text bank */
+		bank = 0;   /* text bank */
 
 	if (attributes & 0x80)
 		bank += 1;
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 		bank = 0;
 
 	if ((attributes & 0xb0) == 0)
-		bank = 0;	/* text bank */
+		bank = 0;   /* text bank */
 
 	if (attributes & 0x80)
 		bank += 1;
@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 		bank = 0;
 
 	if ((attributes & 0xb0) == 0)
-		bank = 0;	/* text bank */
+		bank = 0;   /* text bank */
 
 	if (attributes & 0x80)
 		bank += 1;
@@ -237,7 +237,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 		bank = 0;
 
 	if ((attributes & 0xb0) == 0)
-		bank = 0;	/* text bank */
+		bank = 0;   /* text bank */
 
 	if (attributes & 0x80)
 		bank += 1;
@@ -542,7 +542,7 @@ static void bootleg_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 //          if(state->m_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
 //          if(state->m_vreg == 0x66 ) color += 2*16;
 
-			drawgfx_transpen(	bitmap, cliprect, gfx,
+			drawgfx_transpen(   bitmap, cliprect, gfx,
 							number, color,
 							attributes & 0x10,0, /* flip */
 							x, y, 15 );

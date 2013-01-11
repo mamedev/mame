@@ -7,11 +7,11 @@
 
 extern void tms3615_enable_w(device_t *device, int enable);
 
-#define TMS3615_FOOTAGE_8	0
-#define TMS3615_FOOTAGE_16	1
+#define TMS3615_FOOTAGE_8   0
+#define TMS3615_FOOTAGE_16  1
 
 class tms3615_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

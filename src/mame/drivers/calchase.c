@@ -131,8 +131,8 @@ class calchase_state : public driver_device
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
-		  { }
+			m_maincpu(*this, "maincpu")
+			{ }
 
 	UINT32 *m_bios_ram;
 	UINT32 *m_bios_ext_ram;
@@ -142,11 +142,11 @@ public:
 	UINT8 m_mxtc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
-	device_t	*m_pit8254;
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
-	device_t	*m_dma8237_1;
-	device_t	*m_dma8237_2;
+	device_t    *m_pit8254;
+	device_t    *m_pic8259_1;
+	device_t    *m_pic8259_2;
+	device_t    *m_dma8237_1;
+	device_t    *m_dma8237_2;
 
 	UINT32 m_idle_skip_ram;
 	required_device<cpu_device> m_maincpu;
@@ -343,22 +343,22 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 //  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 
 	/*
-    memory banking with North Bridge:
-    0x63 (PAM)  xx-- ---- BIOS extension 0xe0000 - 0xeffff
-                --xx ---- BIOS area 0xf0000-0xfffff
-                ---- xx-- ISA add-on BIOS 0xc0000 - 0xcffff
-                ---- --xx ISA add-on BIOS 0xd0000 - 0xdffff
+	memory banking with North Bridge:
+	0x63 (PAM)  xx-- ---- BIOS extension 0xe0000 - 0xeffff
+	            --xx ---- BIOS area 0xf0000-0xfffff
+	            ---- xx-- ISA add-on BIOS 0xc0000 - 0xcffff
+	            ---- --xx ISA add-on BIOS 0xd0000 - 0xdffff
 
-    10 -> 1 = Write Enable, 0 = Read Enable
-    */
+	10 -> 1 = Write Enable, 0 = Read Enable
+	*/
 
 	if (reg == 0x63)
 	{
-		if (data & 0x20)		// enable RAM access to region 0xf0000 - 0xfffff
+		if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
 			state->membank("bios_bank")->set_base(state->m_bios_ram);
-		else					// disable RAM access (reads go to BIOS ROM)
+		else                    // disable RAM access (reads go to BIOS ROM)
 			state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x10000);
-		if (data & 0x80)		// enable RAM access to region 0xe0000 - 0xeffff
+		if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
 			state->membank("bios_ext")->set_base(state->m_bios_ext_ram);
 		else
 			state->membank("bios_ext")->set_base(state->memregion("bios")->base() + 0);
@@ -574,7 +574,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	//AM_RANGE(0x18000000, 0x180001ff) AM_RAM
 	//AM_RANGE(0x20000000, 0x200001ff) AM_RAM
 	//AM_RANGE(0x28000000, 0x280001ff) AM_RAM
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
@@ -629,7 +629,7 @@ ADDRESS_MAP_END
 #if 1
 static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
@@ -652,13 +652,13 @@ static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_5")
 
 	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",		KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    	KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",        KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",                      KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 
@@ -869,15 +869,15 @@ static const struct pit8253_config calchase_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}

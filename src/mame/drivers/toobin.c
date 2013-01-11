@@ -24,7 +24,7 @@
 #include "video/atarimo.h"
 #include "includes/toobin.h"
 
-#define MASTER_CLOCK		XTAL_32MHz
+#define MASTER_CLOCK        XTAL_32MHz
 
 
 
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE_LEGACY(toobin_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xff6000, 0xff6001) AM_READNOP		/* who knows? read at controls time */
+	AM_RANGE(0xff6000, 0xff6001) AM_READNOP     /* who knows? read at controls time */
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_WRITE8(sound_w, 0x00ff)
 	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE_LEGACY(toobin_intensity_w)
@@ -151,7 +151,7 @@ static INPUT_PORTS_START( toobin )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_i )		/* audio port */
+	PORT_INCLUDE( atarijsa_i )      /* audio port */
 INPUT_PORTS_END
 
 
@@ -247,7 +247,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( toobin )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "3133-1j.061",  0x000000, 0x010000, CRC(79a92d02) SHA1(72eebb96a3963f94558bb204e0afe08f2b4c1864) )
 	ROM_LOAD16_BYTE( "3137-1f.061",  0x000001, 0x010000, CRC(e389ef60) SHA1(24861fe5eb49de852987993a905fefe4dd43b204) )
 	ROM_LOAD16_BYTE( "3134-2j.061",  0x020000, 0x010000, CRC(3dbe9a48) SHA1(37fe2534fed5708a63995e53ea0cb1d2d23fc1b9) )
@@ -257,7 +257,7 @@ ROM_START( toobin )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -303,7 +303,7 @@ ROM_END
 
 
 ROM_START( toobine )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "3733-1j.061",  0x000000, 0x010000, CRC(286c7fad) SHA1(1f06168327bdc356f1bc4cf9a951f914932c491a) )
 	ROM_LOAD16_BYTE( "3737-1f.061",  0x000001, 0x010000, CRC(965c161d) SHA1(30d959a945cb7dc7f00ad4ca9db027a377024030) )
 	ROM_LOAD16_BYTE( "3134-2j.061",  0x020000, 0x010000, CRC(3dbe9a48) SHA1(37fe2534fed5708a63995e53ea0cb1d2d23fc1b9) )
@@ -313,7 +313,7 @@ ROM_START( toobine )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -359,7 +359,7 @@ ROM_END
 
 
 ROM_START( toobing )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "3233-1j.061",  0x000000, 0x010000, CRC(b04eb760) SHA1(760525b4f72fad47cfc457e14db70ade30a9ddac) )
 	ROM_LOAD16_BYTE( "3237-1f.061",  0x000001, 0x010000, CRC(4e41a470) SHA1(3a4c9b0d93cf4cff80978c0568bb9ef9eeb878dd) )
 	ROM_LOAD16_BYTE( "3234-2j.061",  0x020000, 0x010000, CRC(8c60f1b4) SHA1(0ff3f4fede83410d73027b6e7445e83044e4b21e) )
@@ -369,7 +369,7 @@ ROM_START( toobing )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -415,7 +415,7 @@ ROM_END
 
 
 ROM_START( toobin2e )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "2733-1j.061",  0x000000, 0x010000, CRC(a6334cf7) SHA1(39e540619c24af65bda44160a5bdaebf3600b64b) )
 	ROM_LOAD16_BYTE( "2737-1f.061",  0x000001, 0x010000, CRC(9a52dd20) SHA1(a370ae3e4c7af55ea61b57a203a900f2be3ce6b9) )
 	ROM_LOAD16_BYTE( "2134-2j.061",  0x020000, 0x010000, CRC(2b8164c8) SHA1(aeeaff9df9fda23b295b59efadf52160f084d256) )
@@ -425,7 +425,7 @@ ROM_START( toobin2e )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -471,7 +471,7 @@ ROM_END
 
 
 ROM_START( toobin2 )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "2133-1j.061",  0x000000, 0x010000, CRC(2c3382e4) SHA1(39919e9b5b586b630e0581adabfe25d83b2bfaef) )
 	ROM_LOAD16_BYTE( "2137-1f.061",  0x000001, 0x010000, CRC(891c74b1) SHA1(2f39d0e4934ccf48bb5fc0737f34fc5a65cfd903) )
 	ROM_LOAD16_BYTE( "2134-2j.061",  0x020000, 0x010000, CRC(2b8164c8) SHA1(aeeaff9df9fda23b295b59efadf52160f084d256) )
@@ -481,7 +481,7 @@ ROM_START( toobin2 )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -527,7 +527,7 @@ ROM_END
 
 
 ROM_START( toobin1 )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "1133-1j.061",  0x000000, 0x010000, CRC(caeb5d1b) SHA1(8036871a04b5206fd383ac0fd9a9d3218128088b) )
 	ROM_LOAD16_BYTE( "1137-1f.061",  0x000001, 0x010000, CRC(9713d9d3) SHA1(55791150312de201bdd330bfd4cbb132cb3959e4) )
 	ROM_LOAD16_BYTE( "1134-2j.061",  0x020000, 0x010000, CRC(119f5d7b) SHA1(edd0b1ab29bb9c15c3b80037635c3b6d5fb434dc) )
@@ -537,7 +537,7 @@ ROM_START( toobin1 )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "1141-2k.061",  0x010000, 0x004000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 

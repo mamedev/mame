@@ -3,7 +3,7 @@
 
 <softwarelist name="mz2500" description="MZ-2500 disk images">
 
-    <!-- Game disks -->
+	<!-- Game disks -->
 
 	<software name="simulwar">
 		<description>Aoki Ookami to Shiroki Mejika - Simulation War Game</description>
@@ -411,7 +411,7 @@
 	</software>
 
 
-    <!-- Demo disks &amp; Diskmag disks -->
+	<!-- Demo disks &amp; Diskmag disks -->
 
 	<software name="kaleidos">
 		<description>Kaleidoscope Demo</description>
@@ -654,7 +654,7 @@
 	</software>
 
 
-    <!-- Program disks -->
+	<!-- Program disks -->
 
 	<software name="basicv1">
 		<description>BASIC-M25 (6Z002) V1.0A</description>

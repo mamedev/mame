@@ -141,15 +141,15 @@ UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bit
 					if(attr & 0x80) //bitmap mode
 					{
 						/*
-                            this mode draws 4 x 4 dot blocks, by combining lower 6 bits of tile and attribute vram
+						    this mode draws 4 x 4 dot blocks, by combining lower 6 bits of tile and attribute vram
 
-                            tile def
-                            00xx x--- up-right
-                            00-- -xxx up-left
-                            attr def
-                            10xx x--- down-right
-                            10-- -xxx down-left
-                        */
+						    tile def
+						    00xx x--- up-right
+						    00-- -xxx up-left
+						    attr def
+						    10xx x--- down-right
+						    10-- -xxx down-left
+						*/
 						int step;
 
 						step = ((xi & 4) ? 3 : 0);
@@ -569,5 +569,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1982, jr200,  0,       0, 	jr200,	jr200, driver_device,	 0, 		 "National",   "JR-200",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1982, jr200u, jr200,   0, 	jr200,	jr200, driver_device,	 0, 		 "Panasonic",   "JR-200U",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, jr200,  0,       0,     jr200,  jr200, driver_device,    0,          "National",   "JR-200",        GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, jr200u, jr200,   0,     jr200,  jr200, driver_device,    0,          "Panasonic",   "JR-200U",      GAME_NOT_WORKING | GAME_NO_SOUND)

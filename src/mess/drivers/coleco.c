@@ -167,7 +167,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 {
-    // NMI on rising edge
+	// NMI on rising edge
 	if (state && !m_last_nmi_state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
@@ -248,7 +248,7 @@ static TMS9928A_INTERFACE(coleco_tms9928a_interface)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -273,7 +273,7 @@ void coleco_state::machine_reset()
 
 	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
 
-	memset(&machine().root_device().memregion(Z80_TAG)->base()[0x6000], 0xff, 0x400);	// initialize RAM
+	memset(&machine().root_device().memregion(Z80_TAG)->base()[0x6000], 0xff, 0x400);   // initialize RAM
 }
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
@@ -312,7 +312,7 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 
 static MACHINE_CONFIG_START( coleco, coleco_state )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)   // 3.579545 MHz
 	MCFG_CPU_PROGRAM_MAP(coleco_map)
 	MCFG_CPU_IO_MAP(coleco_io_map)
 
@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_CONFIG(psg_intf)
 
@@ -341,7 +341,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( czz50, coleco_state )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)	// ???
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)   // ???
 	MCFG_CPU_PROGRAM_MAP(czz50_map)
 	MCFG_CPU_IO_MAP(czz50_io_map)
 
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_CONFIG(psg_intf)
 
@@ -415,6 +415,6 @@ ROM_END
 CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device,   0,       "Coleco",           "ColecoVision",                     0 )
 CONS( 1982, colecoa,  coleco,   0,      coleco,   coleco, driver_device,   0,       "Coleco",           "ColecoVision (Thick Characters)",  0 )
 CONS( 1983, colecob,  coleco,   0,      coleco,   coleco, driver_device,   0,       "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
-CONS( 1986, czz50,    0,   coleco,      czz50,	  czz50, driver_device,    0,       "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,	  czz50, driver_device,    0,       "Telegames",        "Dina",                             0 )
+CONS( 1986, czz50,    0,   coleco,      czz50,    czz50, driver_device,    0,       "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,    0,      dina,     czz50, driver_device,    0,       "Telegames",        "Dina",                             0 )
 CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50, driver_device,    0,       "Telegames",        "Personal Arcade",                  0 )

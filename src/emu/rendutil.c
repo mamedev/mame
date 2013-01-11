@@ -454,49 +454,49 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
 	float unitx, unity;
 
 	/*
-        High-level logic -- due to math optimizations, this info is lost below.
+	    High-level logic -- due to math optimizations, this info is lost below.
 
-        Imagine a thick line of width (w), drawn from (p0) to (p1), with a unit
-        vector (u) indicating the direction from (p0) to (p1).
+	    Imagine a thick line of width (w), drawn from (p0) to (p1), with a unit
+	    vector (u) indicating the direction from (p0) to (p1).
 
-          B                                              C
-            +----------------  ...   ------------------+
-            |                                        ^ |
-            |                                        | |
-            |                                        | |
-            * (p0)        ------------>           (w)| * (p1)
-            |                  (u)                   | |
-            |                                        | |
-            |                                        v |
-            +----------------  ...   ------------------+
-          A                                              D
+	      B                                              C
+	        +----------------  ...   ------------------+
+	        |                                        ^ |
+	        |                                        | |
+	        |                                        | |
+	        * (p0)        ------------>           (w)| * (p1)
+	        |                  (u)                   | |
+	        |                                        | |
+	        |                                        v |
+	        +----------------  ...   ------------------+
+	      A                                              D
 
-        To convert this into a quad, we need to compute the four points A, B, C
-        and D.
+	    To convert this into a quad, we need to compute the four points A, B, C
+	    and D.
 
-        Starting with point A. We first multiply the unit vector by 0.5w and then
-        rotate the result 90 degrees. Thus, we have:
+	    Starting with point A. We first multiply the unit vector by 0.5w and then
+	    rotate the result 90 degrees. Thus, we have:
 
-            A.x = p0.x + 0.5 * w * u.x * cos(90) - 0.5 * w * u.y * sin(90)
-            A.y = p0.y + 0.5 * w * u.x * sin(90) + 0.5 * w * u.y * cos(90)
+	        A.x = p0.x + 0.5 * w * u.x * cos(90) - 0.5 * w * u.y * sin(90)
+	        A.y = p0.y + 0.5 * w * u.x * sin(90) + 0.5 * w * u.y * cos(90)
 
-        Conveniently, sin(90) = 1, and cos(90) = 0, so this simplifies to:
+	    Conveniently, sin(90) = 1, and cos(90) = 0, so this simplifies to:
 
-            A.x = p0.x - 0.5 * w * u.y
-            A.y = p0.y + 0.5 * w * u.x
+	        A.x = p0.x - 0.5 * w * u.y
+	        A.y = p0.y + 0.5 * w * u.x
 
-        Working clockwise around the polygon, the same fallout happens all around as
-        we rotate the unit vector by -90 (B), -90 (C), and 90 (D) degrees:
+	    Working clockwise around the polygon, the same fallout happens all around as
+	    we rotate the unit vector by -90 (B), -90 (C), and 90 (D) degrees:
 
-            B.x = p0.x + 0.5 * w * u.y
-            B.y = p0.y - 0.5 * w * u.x
+	        B.x = p0.x + 0.5 * w * u.y
+	        B.y = p0.y - 0.5 * w * u.x
 
-            C.x = p1.x - 0.5 * w * u.y
-            C.y = p1.y + 0.5 * w * u.x
+	        C.x = p1.x - 0.5 * w * u.y
+	        C.y = p1.y + 0.5 * w * u.x
 
-            D.x = p1.x + 0.5 * w * u.y
-            D.y = p1.y - 0.5 * w * u.x
-    */
+	        D.x = p1.x + 0.5 * w * u.y
+	        D.y = p1.y - 0.5 * w * u.x
+	*/
 
 	/* we only care about the half-width */
 	width *= 0.5f;

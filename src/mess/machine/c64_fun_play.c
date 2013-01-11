@@ -81,18 +81,18 @@ void c64_fun_play_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       A16
-            1
-            2
-            3       A13
-            4       A14
-            5       A15
-            6
-            7
+		    0       A16
+		    1
+		    2
+		    3       A13
+		    4       A14
+		    5       A15
+		    6
+		    7
 
-        */
+		*/
 
 		m_bank = ((data & 0x01) << 3) | ((data >> 3) & 0x07);
 	}

@@ -298,13 +298,13 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	state->m_smpc.OREG[9]=0x00;  // TODO: system region on Saturn
 
 	state->m_smpc.OREG[10]= 0 << 7 |
-	                         state->m_vdp2.dotsel << 6 |
-	                         1 << 5 |
-	                         1 << 4 |
-	                         0 << 3 | //MSHNMI
-	                         1 << 2 |
-	                         0 << 1 | //SYSRES
-	                         0 << 0;  //SOUNDRES
+								state->m_vdp2.dotsel << 6 |
+								1 << 5 |
+								1 << 4 |
+								0 << 3 | //MSHNMI
+								1 << 2 |
+								0 << 1 | //SYSRES
+								0 << 0;  //SOUNDRES
 	state->m_smpc.OREG[11]= 0 << 6; //CDRES
 
 	for(i=0;i<4;i++)
@@ -357,7 +357,7 @@ static void smpc_analog_pad(running_machine &machine, UINT8 pad_num, UINT8 offse
 	saturn_state *state = machine.driver_data<saturn_state>();
 	static const char *const padnames[] = { "AN_JOY1", "AN_JOY2" };
 	static const char *const annames[2][3] = { { "AN_X1", "AN_Y1", "AN_Z1" },
-											   { "AN_X2", "AN_Y2", "AN_Z2" }};
+												{ "AN_X2", "AN_Y2", "AN_Z2" }};
 	UINT16 pad_data;
 
 	pad_data = machine.root_device().ioport(padnames[pad_num])->read();
@@ -399,15 +399,15 @@ static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
 	state->m_smpc.OREG[2+pad_num*offset] = game_key>>8; // game buttons, TODO
 	state->m_smpc.OREG[3+pad_num*offset] = game_key & 0xff;
 	/*
-        x--- ---- 0
-        -x-- ---- caps lock
-        --x- ---- num lock
-        ---x ---- scroll lock
-        ---- x--- data ok
-        ---- -x-- 1
-        ---- --x- 1
-        ---- ---x Break key
-    */
+	    x--- ---- 0
+	    -x-- ---- caps lock
+	    --x- ---- num lock
+	    ---x ---- scroll lock
+	    ---- x--- data ok
+	    ---- -x-- 1
+	    ---- --x- 1
+	    ---- ---x Break key
+	*/
 	state->m_smpc.OREG[4+pad_num*offset] = state->m_keyb.status | 6;
 	state->m_smpc.OREG[5+pad_num*offset] = state->m_keyb.data;
 }
@@ -416,7 +416,7 @@ static void smpc_mouse(running_machine &machine, UINT8 pad_num, UINT8 offset, UI
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	static const char *const mousenames[2][3] = { { "MOUSEB1", "MOUSEX1", "MOUSEY1" },
-												  { "MOUSEB2", "MOUSEX2", "MOUSEY2" }};
+													{ "MOUSEB2", "MOUSEX2", "MOUSEY2" }};
 	UINT8 mouse_ctrl;
 	INT16 mouse_x, mouse_y;
 
@@ -505,12 +505,12 @@ static TIMER_CALLBACK( intback_peripheral )
 
 	if (state->m_smpc.intback_stage == 2)
 	{
-		state->m_smpc.SR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
+		state->m_smpc.SR = (0x80 | state->m_smpc.pmode);    // pad 2, no more data, echo back pad mode set by intback
 		state->m_smpc.intback_stage = 0;
 	}
 	else
 	{
-		state->m_smpc.SR = (0xc0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
+		state->m_smpc.SR = (0xc0 | state->m_smpc.pmode);    // pad 1, more data, echo back pad mode set by intback
 		state->m_smpc.intback_stage ++;
 	}
 
@@ -520,7 +520,7 @@ static TIMER_CALLBACK( intback_peripheral )
 		state->m_scu.ist |= (IRQ_SMPC);
 
 	state->m_smpc.OREG[31] = 0x10; /* callback for last command issued */
-	state->m_smpc.SF = 0x00;	/* clear hand-shake flag */
+	state->m_smpc.SF = 0x00;    /* clear hand-shake flag */
 }
 
 static TIMER_CALLBACK( saturn_smpc_intback )
@@ -542,13 +542,13 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 			state->m_smpc.OREG[9] = state->m_saturn_region;
 
 			state->m_smpc.OREG[10]= 0 << 7 |
-			                         state->m_vdp2.dotsel << 6 |
-			                         1 << 5 |
-			                         1 << 4 |
-			                         0 << 3 | //MSHNMI
-			                         1 << 2 |
-			                         0 << 1 | //SYSRES
-			                         0 << 0;  //SOUNDRES
+										state->m_vdp2.dotsel << 6 |
+										1 << 5 |
+										1 << 4 |
+										0 << 3 | //MSHNMI
+										1 << 2 |
+										0 << 1 | //SYSRES
+										0 << 0;  //SOUNDRES
 			state->m_smpc.OREG[11]= 0 << 6; //CDRES
 
 			for(i=0;i<4;i++)
@@ -662,9 +662,9 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
 
 			/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
-               sokyugurentai threshold is 74 lines
-               shanhigw threshold is 90 lines
-               I assume that it needs ~100 lines, so 6666,(6) usecs. Obviously needs HW tests ... */
+			   sokyugurentai threshold is 74 lines
+			   shanhigw threshold is 90 lines
+			   I assume that it needs ~100 lines, so 6666,(6) usecs. Obviously needs HW tests ... */
 
 			space.machine().scheduler().timer_set(attotime::from_usec(6666), FUNC(smpc_change_clock),data & 1);
 			break;
@@ -783,12 +783,12 @@ WRITE8_HANDLER( stv_SMPC_w )
 	if(offset == 0x75)
 	{
 		/*
-        -xx- ---- PDR1
-        ---x ---- EEPROM write bit
-        ---- x--- EEPROM CLOCK line
-        ---- -x-- EEPROM CS line
-        ---- --xx A-Bus bank bits
-        */
+		-xx- ---- PDR1
+		---x ---- EEPROM write bit
+		---- x--- EEPROM CLOCK line
+		---- -x-- EEPROM CS line
+		---- --xx A-Bus bank bits
+		*/
 		eeprom_device *eeprom = space.machine().device<eeprom_device>("eeprom");
 		eeprom->set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom->write_bit(data & 0x10);
@@ -803,9 +803,9 @@ WRITE8_HANDLER( stv_SMPC_w )
 	if(offset == 0x77)
 	{
 		/*
-            -xx- ---- PDR2
-            ---x ---- Enable Sound System (ACTIVE LOW)
-        */
+		    -xx- ---- PDR2
+		    ---x ---- Enable Sound System (ACTIVE LOW)
+		*/
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
 
 		if(LOG_SMPC) printf("SMPC: M68k %s\n",(data & 0x10) ? "off" : "on");
@@ -820,9 +820,9 @@ WRITE8_HANDLER( stv_SMPC_w )
 	if(offset == 0x7d)
 	{
 		/*
-        ---- --x- IOSEL2 direct (1) / control mode (0) port select
-        ---- ---x IOSEL1 direct (1) / control mode (0) port select
-        */
+		---- --x- IOSEL2 direct (1) / control mode (0) port select
+		---- ---x IOSEL1 direct (1) / control mode (0) port select
+		*/
 		state->m_smpc.IOSEL1 = (data & 1) >> 0;
 		state->m_smpc.IOSEL2 = (data & 2) >> 1;
 	}
@@ -937,10 +937,10 @@ WRITE8_HANDLER( saturn_SMPC_w )
 	if (offset == 0x63)
 		state->m_smpc.SF = data & 1; // hand-shake flag
 
-	if(offset == 0x75)	// PDR1
+	if(offset == 0x75)  // PDR1
 		state->m_smpc.PDR1 = (data & state->m_smpc.DDR1);
 
-	if(offset == 0x77)	// PDR2
+	if(offset == 0x77)  // PDR2
 		state->m_smpc.PDR2 = (data & state->m_smpc.DDR2);
 
 	if(offset == 0x79)

@@ -5,21 +5,21 @@
 #define __I86INTF_H__
 
 
-#define INPUT_LINE_INT0			INPUT_LINE_IRQ0
-#define INPUT_LINE_INT1			INPUT_LINE_IRQ1
-#define INPUT_LINE_INT2			INPUT_LINE_IRQ2
-#define INPUT_LINE_INT3			INPUT_LINE_IRQ3
-#define INPUT_LINE_TEST			20    /* PJB 03/05 */
-#define INPUT_LINE_DRQ0			21
-#define INPUT_LINE_DRQ1			22
-#define INPUT_LINE_TMRIN0		23
-#define INPUT_LINE_TMRIN1		24
+#define INPUT_LINE_INT0         INPUT_LINE_IRQ0
+#define INPUT_LINE_INT1         INPUT_LINE_IRQ1
+#define INPUT_LINE_INT2         INPUT_LINE_IRQ2
+#define INPUT_LINE_INT3         INPUT_LINE_IRQ3
+#define INPUT_LINE_TEST         20    /* PJB 03/05 */
+#define INPUT_LINE_DRQ0         21
+#define INPUT_LINE_DRQ1         22
+#define INPUT_LINE_TMRIN0       23
+#define INPUT_LINE_TMRIN1       24
 
 
 struct i80186_interface
 {
-	devcb_write_line		out_tmrout0_func;
-	devcb_write_line		out_tmrout1_func;
+	devcb_write_line        out_tmrout0_func;
+	devcb_write_line        out_tmrout1_func;
 };
 #define I80186_INTERFACE(name) const i80186_interface (name) =
 

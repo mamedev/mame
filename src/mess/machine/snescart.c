@@ -37,53 +37,53 @@ static const char *const types[] =
 	"ROM, Seta ST-018",
 	"ROM, SPC7110",
 	"ROM, SPC7110, RTC",
-	UNK,							// to add: Satellaview BS-X detection
+	UNK,                            // to add: Satellaview BS-X detection
 };
 
 /* Some known countries */
 static const char *const countries[] =
 {
-/* 0*/	"Japan (NTSC)", "USA & Canada (NTSC)", "Europe, Oceania & Asia (PAL)", "Sweden (PAL)",
-/* 4*/	"Finland (PAL)", "Denmark (PAL)", "France (PAL)", "Holland (PAL)",
-/* 8*/	"Spain (PAL)", "Germany, Austria & Switzerland (PAL)", "Italy (PAL)", "Hong Kong & China (PAL)",
-/* c*/	"Indonesia (PAL)", "South Korea (NTSC)", UNK, UNK,
+/* 0*/  "Japan (NTSC)", "USA & Canada (NTSC)", "Europe, Oceania & Asia (PAL)", "Sweden (PAL)",
+/* 4*/  "Finland (PAL)", "Denmark (PAL)", "France (PAL)", "Holland (PAL)",
+/* 8*/  "Spain (PAL)", "Germany, Austria & Switzerland (PAL)", "Italy (PAL)", "Hong Kong & China (PAL)",
+/* c*/  "Indonesia (PAL)", "South Korea (NTSC)", UNK, UNK,
 };
 
 /* Some known companies (integrations to the list from Snes9x) */
 static const char *const companies[] =
 {
-/* 0*/	"Invalid", "Nintendo", "Ajinomoto", "Imagineer-Zoom", "Chris Gray Enterprises Inc.", "Zamuse", "Falcom", UNK,
-/* 8*/	"Capcom", "HOT-B", "Jaleco", "Coconuts", "Rage Software", "Micronet", "Technos", "Mebio Software",
-/*10*/	"SHOUEi System", "Starfish", "Gremlin Graphics", "Electronic Arts", "NCS / Masaya", "COBRA Team", "Human/Field", "KOEI",
-/*18*/	"Hudson Soft", "Game Village", "Yanoman", UNK, "Tecmo", UNK, "Open System", "Virgin Games",
-/*20*/	"KSS", "Sunsoft", "POW", "Micro World", UNK, UNK, "Enix", "Loriciel/Electro Brain",
-/*28*/	"Kemco", "Seta Co.,Ltd.", "Culture Brain", "Irem Japan", "Pal Soft", "Visit Co.,Ltd.", "INTEC Inc.", "System Sacom Corp.",
-/*30*/	"Viacom New Media", "Carrozzeria", "Dynamic", "Nintendo", "Magifact", "Hect", UNK, UNK,
-/*38*/	"Capcom Europe", "Accolade Europe", UNK, "Arcade Zone", "Empire Software", "Loriciel", "Gremlin Graphics", UNK,
-/*40*/	"Seika Corp.", "UBI Soft", UNK, UNK, "LifeFitness Exertainment", UNK, "System 3", "Spectrum Holobyte",
-/*48*/	UNK, "Irem", UNK, "Raya Systems/Sculptured Software", "Renovation Products", "Malibu Games/Black Pearl", UNK, "U.S. Gold",
-/*50*/	"Absolute Entertainment", "Acclaim", "Activision", "American Sammy", "GameTek", "Hi Tech Expressions", "LJN Toys", UNK,
-/*58*/	UNK, UNK, "Mindscape", "Romstar, Inc.", UNK, "Tradewest", UNK, "American Softworks Corp.",
-/*60*/	"Titus", "Virgin Interactive Entertainment", "Maxis", "Origin/FCI/Pony Canyon", UNK, UNK, UNK, "Ocean",
-/*68*/	UNK, "Electronic Arts", UNK, "Laser Beam", UNK, UNK, "Elite", "Electro Brain",
-/*70*/	"Infogrames", "Interplay", "LucasArts", "Parker Brothers", "Konami", "STORM", UNK, UNK,
-/*78*/	"THQ Software", "Accolade Inc.", "Triffix Entertainment", UNK, "Microprose", UNK, UNK, "Kemco",
-/*80*/	"Misawa", "Teichio", "Namco Ltd.", "Lozc", "Koei", UNK, "Tokuma Shoten Intermedia", "Tsukuda Original",
-/*88*/	"DATAM-Polystar", UNK, UNK, "Bullet-Proof Software", "Vic Tokai", UNK, "Character Soft", "I\'\'Max",
-/*90*/	"Takara", "CHUN Soft", "Video System Co., Ltd.", "BEC", UNK, "Varie", "Yonezawa / S'Pal Corp.", "Kaneco",
-/*98*/	UNK, "Pack in Video", "Nichibutsu", "TECMO", "Imagineer Co.", UNK, UNK, UNK,
-/*a0*/	"Telenet", "Hori", UNK, UNK, "Konami", "K.Amusement Leasing Co.", UNK, "Takara",
-/*a8*/	UNK, "Technos Jap.", "JVC", UNK, "Toei Animation", "Toho", UNK, "Namco Ltd.",
-/*b0*/	"Media Rings Corp.", "ASCII Co. Activison", "Bandai", UNK, "Enix America", UNK, "Halken", UNK,
-/*b8*/	UNK, UNK, "Culture Brain", "Sunsoft", "Toshiba EMI", "Sony Imagesoft", UNK, "Sammy",
-/*c0*/	"Taito", UNK, "Kemco", "Square", "Tokuma Soft", "Data East", "Tonkin House", UNK,
-/*c8*/	"KOEI", UNK, "Konami USA", "NTVIC", UNK, "Meldac", "Pony Canyon", "Sotsu Agency/Sunrise",
-/*d0*/	"Disco/Taito", "Sofel", "Quest Corp.", "Sigma", "Ask Kodansha Co., Ltd.", UNK, "Naxat", UNK,
-/*d8*/	"Capcom Co., Ltd.", "Banpresto", "Tomy", "Acclaim", UNK, "NCS", "Human Entertainment", "Altron",
-/*e0*/	"Jaleco", UNK, "Yutaka", UNK, "T&ESoft", "EPOCH Co.,Ltd.", UNK, "Athena",
-/*e8*/	"Asmik", "Natsume", "King Records", "Atlus", "Sony Music Entertainment", UNK, "IGS", UNK,
-/*f0*/	UNK, "Motown Software", "Left Field Entertainment", "Beam Software", "Tec Magik", UNK, UNK, UNK,
-/*f8*/	UNK, "Cybersoft", UNK, "Psygnosis", UNK, UNK, "Davidson", UNK,
+/* 0*/  "Invalid", "Nintendo", "Ajinomoto", "Imagineer-Zoom", "Chris Gray Enterprises Inc.", "Zamuse", "Falcom", UNK,
+/* 8*/  "Capcom", "HOT-B", "Jaleco", "Coconuts", "Rage Software", "Micronet", "Technos", "Mebio Software",
+/*10*/  "SHOUEi System", "Starfish", "Gremlin Graphics", "Electronic Arts", "NCS / Masaya", "COBRA Team", "Human/Field", "KOEI",
+/*18*/  "Hudson Soft", "Game Village", "Yanoman", UNK, "Tecmo", UNK, "Open System", "Virgin Games",
+/*20*/  "KSS", "Sunsoft", "POW", "Micro World", UNK, UNK, "Enix", "Loriciel/Electro Brain",
+/*28*/  "Kemco", "Seta Co.,Ltd.", "Culture Brain", "Irem Japan", "Pal Soft", "Visit Co.,Ltd.", "INTEC Inc.", "System Sacom Corp.",
+/*30*/  "Viacom New Media", "Carrozzeria", "Dynamic", "Nintendo", "Magifact", "Hect", UNK, UNK,
+/*38*/  "Capcom Europe", "Accolade Europe", UNK, "Arcade Zone", "Empire Software", "Loriciel", "Gremlin Graphics", UNK,
+/*40*/  "Seika Corp.", "UBI Soft", UNK, UNK, "LifeFitness Exertainment", UNK, "System 3", "Spectrum Holobyte",
+/*48*/  UNK, "Irem", UNK, "Raya Systems/Sculptured Software", "Renovation Products", "Malibu Games/Black Pearl", UNK, "U.S. Gold",
+/*50*/  "Absolute Entertainment", "Acclaim", "Activision", "American Sammy", "GameTek", "Hi Tech Expressions", "LJN Toys", UNK,
+/*58*/  UNK, UNK, "Mindscape", "Romstar, Inc.", UNK, "Tradewest", UNK, "American Softworks Corp.",
+/*60*/  "Titus", "Virgin Interactive Entertainment", "Maxis", "Origin/FCI/Pony Canyon", UNK, UNK, UNK, "Ocean",
+/*68*/  UNK, "Electronic Arts", UNK, "Laser Beam", UNK, UNK, "Elite", "Electro Brain",
+/*70*/  "Infogrames", "Interplay", "LucasArts", "Parker Brothers", "Konami", "STORM", UNK, UNK,
+/*78*/  "THQ Software", "Accolade Inc.", "Triffix Entertainment", UNK, "Microprose", UNK, UNK, "Kemco",
+/*80*/  "Misawa", "Teichio", "Namco Ltd.", "Lozc", "Koei", UNK, "Tokuma Shoten Intermedia", "Tsukuda Original",
+/*88*/  "DATAM-Polystar", UNK, UNK, "Bullet-Proof Software", "Vic Tokai", UNK, "Character Soft", "I\'\'Max",
+/*90*/  "Takara", "CHUN Soft", "Video System Co., Ltd.", "BEC", UNK, "Varie", "Yonezawa / S'Pal Corp.", "Kaneco",
+/*98*/  UNK, "Pack in Video", "Nichibutsu", "TECMO", "Imagineer Co.", UNK, UNK, UNK,
+/*a0*/  "Telenet", "Hori", UNK, UNK, "Konami", "K.Amusement Leasing Co.", UNK, "Takara",
+/*a8*/  UNK, "Technos Jap.", "JVC", UNK, "Toei Animation", "Toho", UNK, "Namco Ltd.",
+/*b0*/  "Media Rings Corp.", "ASCII Co. Activison", "Bandai", UNK, "Enix America", UNK, "Halken", UNK,
+/*b8*/  UNK, UNK, "Culture Brain", "Sunsoft", "Toshiba EMI", "Sony Imagesoft", UNK, "Sammy",
+/*c0*/  "Taito", UNK, "Kemco", "Square", "Tokuma Soft", "Data East", "Tonkin House", UNK,
+/*c8*/  "KOEI", UNK, "Konami USA", "NTVIC", UNK, "Meldac", "Pony Canyon", "Sotsu Agency/Sunrise",
+/*d0*/  "Disco/Taito", "Sofel", "Quest Corp.", "Sigma", "Ask Kodansha Co., Ltd.", UNK, "Naxat", UNK,
+/*d8*/  "Capcom Co., Ltd.", "Banpresto", "Tomy", "Acclaim", UNK, "NCS", "Human Entertainment", "Altron",
+/*e0*/  "Jaleco", UNK, "Yutaka", UNK, "T&ESoft", "EPOCH Co.,Ltd.", UNK, "Athena",
+/*e8*/  "Asmik", "Natsume", "King Records", "Atlus", "Sony Music Entertainment", UNK, "IGS", UNK,
+/*f0*/  UNK, "Motown Software", "Left Field Entertainment", "Beam Software", "Tec Magik", UNK, UNK, UNK,
+/*f8*/  UNK, "Cybersoft", UNK, "Psygnosis", UNK, UNK, "Davidson", UNK,
 };
 
 
@@ -136,7 +136,7 @@ static void snes_load_sram(running_machine &machine)
 		UINT32 size = state->m_cart[0].small_sram ? 0x8000 : 0x10000;
 
 		/* There could be some larger image needing banks 0x70 to 0x7f at address 0x8000 for ROM
-         * mirroring. These should be treated separately or data would be overwritten by SRAM */
+		 * mirroring. These should be treated separately or data would be overwritten by SRAM */
 		for (ii = 0; ii < 16; ii++)
 		{
 			/* loading */
@@ -310,97 +310,97 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 	UINT16 reset_vector = infoblock[offset + 0x3c] | (infoblock[offset + 0x3d] << 8);
 	UINT16 checksum     = infoblock[offset + 0x1e] | (infoblock[offset + 0x1f] << 8);
 	UINT16 ichecksum    = infoblock[offset + 0x1c] | (infoblock[offset + 0x1d] << 8);
-	UINT8 reset_opcode  = infoblock[(offset & ~0x7fff) | (reset_vector & 0x7fff)];	//first opcode executed upon reset
-	UINT8 mapper        = infoblock[offset + 0x15] & ~0x10;							//mask off irrelevant FastROM-capable bit
+	UINT8 reset_opcode  = infoblock[(offset & ~0x7fff) | (reset_vector & 0x7fff)];  //first opcode executed upon reset
+	UINT8 mapper        = infoblock[offset + 0x15] & ~0x10;                         //mask off irrelevant FastROM-capable bit
 
 	/* $00:[000-7fff] contains uninitialized RAM and MMIO.
-    reset vector must point to ROM at $00:[8000-ffff] to be considered valid. */
+	reset vector must point to ROM at $00:[8000-ffff] to be considered valid. */
 	if (reset_vector < 0x8000)
 		return 0;
 
 	/* some images duplicate the header in multiple locations, and others have completely
-    invalid header information that cannot be relied upon. The code below will analyze
-    the first opcode executed at the specified reset vector to determine the probability
-    that this is the correct header. Score is assigned accordingly. */
+	invalid header information that cannot be relied upon. The code below will analyze
+	the first opcode executed at the specified reset vector to determine the probability
+	that this is the correct header. Score is assigned accordingly. */
 
 	/* most likely opcodes */
-	if (reset_opcode == 0x78		//sei
-		|| reset_opcode == 0x18		//clc (clc; xce)
-		|| reset_opcode == 0x38		//sec (sec; xce)
-		|| reset_opcode == 0x9c		//stz $nnnn (stz $4200)
-		|| reset_opcode == 0x4c		//jmp $nnnn
-		|| reset_opcode == 0x5c		//jml $nnnnnn
+	if (reset_opcode == 0x78        //sei
+		|| reset_opcode == 0x18     //clc (clc; xce)
+		|| reset_opcode == 0x38     //sec (sec; xce)
+		|| reset_opcode == 0x9c     //stz $nnnn (stz $4200)
+		|| reset_opcode == 0x4c     //jmp $nnnn
+		|| reset_opcode == 0x5c     //jml $nnnnnn
 	)
 		score += 8;
 
 	/* plausible opcodes */
-	if (reset_opcode == 0xc2		//rep #$nn
-		|| reset_opcode == 0xe2		//sep #$nn
-		|| reset_opcode == 0xad		//lda $nnnn
-		|| reset_opcode == 0xae		//ldx $nnnn
-		|| reset_opcode == 0xac		//ldy $nnnn
-		|| reset_opcode == 0xaf		//lda $nnnnnn
-		|| reset_opcode == 0xa9		//lda #$nn
-		|| reset_opcode == 0xa2		//ldx #$nn
-		|| reset_opcode == 0xa0		//ldy #$nn
-		|| reset_opcode == 0x20		//jsr $nnnn
-		|| reset_opcode == 0x22		//jsl $nnnnnn
+	if (reset_opcode == 0xc2        //rep #$nn
+		|| reset_opcode == 0xe2     //sep #$nn
+		|| reset_opcode == 0xad     //lda $nnnn
+		|| reset_opcode == 0xae     //ldx $nnnn
+		|| reset_opcode == 0xac     //ldy $nnnn
+		|| reset_opcode == 0xaf     //lda $nnnnnn
+		|| reset_opcode == 0xa9     //lda #$nn
+		|| reset_opcode == 0xa2     //ldx #$nn
+		|| reset_opcode == 0xa0     //ldy #$nn
+		|| reset_opcode == 0x20     //jsr $nnnn
+		|| reset_opcode == 0x22     //jsl $nnnnnn
 	)
 		score += 4;
 
 	/* implausible opcodes */
-	if (reset_opcode == 0x40		//rti
-		|| reset_opcode == 0x60		//rts
-		|| reset_opcode == 0x6b		//rtl
-		|| reset_opcode == 0xcd		//cmp $nnnn
-		|| reset_opcode == 0xec		//cpx $nnnn
-		|| reset_opcode == 0xcc		//cpy $nnnn
+	if (reset_opcode == 0x40        //rti
+		|| reset_opcode == 0x60     //rts
+		|| reset_opcode == 0x6b     //rtl
+		|| reset_opcode == 0xcd     //cmp $nnnn
+		|| reset_opcode == 0xec     //cpx $nnnn
+		|| reset_opcode == 0xcc     //cpy $nnnn
 	)
 		score -= 4;
 
 	/* least likely opcodes */
-	if (reset_opcode == 0x00		//brk #$nn
-		|| reset_opcode == 0x02		//cop #$nn
-		|| reset_opcode == 0xdb		//stp
-		|| reset_opcode == 0x42		//wdm
-		|| reset_opcode == 0xff		//sbc $nnnnnn,x
+	if (reset_opcode == 0x00        //brk #$nn
+		|| reset_opcode == 0x02     //cop #$nn
+		|| reset_opcode == 0xdb     //stp
+		|| reset_opcode == 0x42     //wdm
+		|| reset_opcode == 0xff     //sbc $nnnnnn,x
 	)
 		score -= 8;
 
 	/* Sometimes, both the header and reset vector's first opcode will match ...
-    fallback and rely on info validity in these cases to determine more likely header. */
+	fallback and rely on info validity in these cases to determine more likely header. */
 
 	/* a valid checksum is the biggest indicator of a valid header. */
 	if ((checksum + ichecksum) == 0xffff && (checksum != 0) && (ichecksum != 0))
 		score += 4;
 
 	/* then there are the expected mapper values */
-	if (offset == 0x007fc0 && mapper == 0x20)	// 0x20 is usually LoROM
+	if (offset == 0x007fc0 && mapper == 0x20)   // 0x20 is usually LoROM
 		score += 2;
 
-	if (offset == 0x00ffc0 && mapper == 0x21)	// 0x21 is usually HiROM
+	if (offset == 0x00ffc0 && mapper == 0x21)   // 0x21 is usually HiROM
 		score += 2;
 
-	if (offset == 0x007fc0 && mapper == 0x22)	// 0x22 is usually ExLoROM
+	if (offset == 0x007fc0 && mapper == 0x22)   // 0x22 is usually ExLoROM
 		score += 2;
 
-	if (offset == 0x40ffc0 && mapper == 0x25)	// 0x25 is usually ExHiROM
+	if (offset == 0x40ffc0 && mapper == 0x25)   // 0x25 is usually ExHiROM
 		score += 2;
 
 	/* finally, there are valid values in the Company, Region etc. fields */
-	if (infoblock[offset + 0x1a] == 0x33)			// Company field: 0x33 indicates extended header
+	if (infoblock[offset + 0x1a] == 0x33)           // Company field: 0x33 indicates extended header
 		score += 2;
 
-	if (infoblock[offset + 0x16] < 0x08)			// ROM Type field
+	if (infoblock[offset + 0x16] < 0x08)            // ROM Type field
 		score++;
 
-	if (infoblock[offset + 0x17] < 0x10)			// ROM Size field
+	if (infoblock[offset + 0x17] < 0x10)            // ROM Size field
 		score++;
 
-	if (infoblock[offset + 0x18] < 0x08)			// SRAM Size field
+	if (infoblock[offset + 0x18] < 0x08)            // SRAM Size field
 		score++;
 
-	if (infoblock[offset + 0x19] < 14)				// Region field
+	if (infoblock[offset + 0x19] < 14)              // Region field
 		score++;
 
 	/* do we still have a positive score? */
@@ -469,9 +469,9 @@ static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer,
 	if ((valid_mode20 >= valid_mode21) && (valid_mode20 >= valid_mode25))
 	{
 		if ((buffer[0x007fd5] == 0x32) || ((state->m_cart_size - offset) > 0x401000))
-			state->m_cart[cartid].mode = SNES_MODE_22;	// ExLoRom
+			state->m_cart[cartid].mode = SNES_MODE_22;  // ExLoRom
 		else
-			state->m_cart[cartid].mode = SNES_MODE_20;	// LoRom
+			state->m_cart[cartid].mode = SNES_MODE_20;  // LoRom
 
 		retvalue = 0x007fc0;
 
@@ -480,23 +480,23 @@ static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer,
 	}
 	else if (valid_mode21 >= valid_mode25)
 	{
-		state->m_cart[cartid].mode = SNES_MODE_21;	// HiRom
+		state->m_cart[cartid].mode = SNES_MODE_21;  // HiRom
 		retvalue = 0x00ffc0;
 		state->m_cart[cartid].sram_max = 0x20000;
 	}
 	else
 	{
-		state->m_cart[cartid].mode = SNES_MODE_25;	// ExHiRom
+		state->m_cart[cartid].mode = SNES_MODE_25;  // ExHiRom
 		retvalue = 0x40ffc0;
 		state->m_cart[cartid].sram_max = 0x20000;
 	}
 
 	logerror( "\t HiROM/LoROM id: %s (LoROM: %d , HiROM: %d, ExHiROM: %d)\n",
-			 (state->m_cart[cartid].mode == SNES_MODE_20) ? "LoROM" :
-			 (state->m_cart[cartid].mode == SNES_MODE_21) ? "HiROM" :
-			 (state->m_cart[cartid].mode == SNES_MODE_22) ? "ExLoROM" :
-			 (state->m_cart[cartid].mode == SNES_MODE_25) ? "ExHiROM" : "Other (BSX or ST)",
-			 valid_mode20, valid_mode21, valid_mode25);
+				(state->m_cart[cartid].mode == SNES_MODE_20) ? "LoROM" :
+				(state->m_cart[cartid].mode == SNES_MODE_21) ? "HiROM" :
+				(state->m_cart[cartid].mode == SNES_MODE_22) ? "ExLoROM" :
+				(state->m_cart[cartid].mode == SNES_MODE_25) ? "ExHiROM" : "Other (BSX or ST)",
+				valid_mode20, valid_mode21, valid_mode25);
 
 	return retvalue;
 }
@@ -554,10 +554,10 @@ static int snes_find_addon_chip( running_machine &machine )
 			}
 			break;
 
-		case 0x13:	// Mario Chip 1
-		case 0x14:	// GSU-x
-		case 0x15:	// GSU-x
-		case 0x1a:	// GSU-1 (21 MHz at start)
+		case 0x13:  // Mario Chip 1
+		case 0x14:  // GSU-x
+		case 0x15:  // GSU-x
+		case 0x1a:  // GSU-1 (21 MHz at start)
 			if (snes_r_bank1(space, 0x00ffd5) == 0x20)
 				state->m_has_addon_chip = HAS_SUPERFX;
 			break;
@@ -566,7 +566,7 @@ static int snes_find_addon_chip( running_machine &machine )
 			state->m_has_addon_chip = HAS_OBC1;
 			break;
 
-		case 0x32:	// needed by a Sample game (according to ZSNES)
+		case 0x32:  // needed by a Sample game (according to ZSNES)
 		case 0x34:
 		case 0x35:
 			if (snes_r_bank1(space, 0x00ffd5) == 0x23)
@@ -615,7 +615,7 @@ static int snes_find_addon_chip( running_machine &machine )
 
 		case 0xf6:
 			/* These Seta ST-01X chips have both 0x30 at 0x00ffd5,
-             they only differ for the 'size' at 0x00ffd7 */
+			 they only differ for the 'size' at 0x00ffd7 */
 			if (snes_r_bank1(space, 0x00ffd7) < 0x0a)
 				state->m_has_addon_chip = HAS_ST011;
 			else
@@ -722,10 +722,10 @@ static void snes_cart_log_info( running_machine &machine, int total_blocks, int 
 	logerror( "===========\n\n" );
 	logerror( "\tTotal blocks:  %d (%dmb)\n", total_blocks, total_blocks / (state->m_cart[0].mode & 5 ? 32 : 16) );
 	logerror( "\tROM bank size: %s \n",
-			 (state->m_cart[0].mode == SNES_MODE_20) ? "LoROM" :
-			 (state->m_cart[0].mode == SNES_MODE_21) ? "HiROM" :
-			 (state->m_cart[0].mode == SNES_MODE_22) ? "ExLoROM" :
-			 (state->m_cart[0].mode == SNES_MODE_25) ? "ExHiROM" : "Other (BSX or ST)" );
+				(state->m_cart[0].mode == SNES_MODE_20) ? "LoROM" :
+				(state->m_cart[0].mode == SNES_MODE_21) ? "HiROM" :
+				(state->m_cart[0].mode == SNES_MODE_22) ? "ExLoROM" :
+				(state->m_cart[0].mode == SNES_MODE_25) ? "ExHiROM" : "Other (BSX or ST)" );
 	logerror( "\tCompany:       %s [%.2s]\n", companies[company], company_id );
 	logerror( "\tROM ID:        %.4s\n\n", rom_id );
 
@@ -854,23 +854,23 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	if (SNES_CART_DEBUG) mame_printf_error("blocks %d\n", total_blocks);
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
-     * have to mirror the blocks until we reach the end. E.g. for a 11Mbits image (44 blocks), we proceed
-     * as follows:
-     * 11 Mbits = 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44).
-     * Hence, we fill memory up to 16 Mbits (banks 0x00 to 0x3f) mirroring as follows
-     * 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44)
-     *   + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44)
-     * and we repeat the same blocks in the second half of the banks (banks 0x40 to 0x7f).
-     * This is likely what happens in the real SNES as well, because the unit cannot be aware of the exact
-     * size of data in the cart (procedure confirmed by byuu)
-     */
+	 * have to mirror the blocks until we reach the end. E.g. for a 11Mbits image (44 blocks), we proceed
+	 * as follows:
+	 * 11 Mbits = 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44).
+	 * Hence, we fill memory up to 16 Mbits (banks 0x00 to 0x3f) mirroring as follows
+	 * 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44)
+	 *   + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44)
+	 * and we repeat the same blocks in the second half of the banks (banks 0x40 to 0x7f).
+	 * This is likely what happens in the real SNES as well, because the unit cannot be aware of the exact
+	 * size of data in the cart (procedure confirmed by byuu)
+	 */
 	switch (state->m_cart[0].mode)
 	{
 		case SNES_MODE_21:
 		/* HiROM carts load data in banks 0xc0 to 0xff. Each bank is fully mirrored in banks 0x40 to 0x7f
-         * (actually up to 0x7d, because 0x7e and 0x7f are overwritten by WRAM). The top half (address
-         * range 0x8000 - 0xffff) of each bank is also mirrored in banks 0x00 to 0x3f and 0x80 to 0xbf.
-         */
+		 * (actually up to 0x7d, because 0x7e and 0x7f are overwritten by WRAM). The top half (address
+		 * range 0x8000 - 0xffff) of each bank is also mirrored in banks 0x00 to 0x3f and 0x80 to 0xbf.
+		 */
 			/* SPC7110 games needs this different loading routine */
 			if ((ROM[0x00ffd6] == 0xf9 || ROM[0x00ffd6] == 0xf5) && (ROM[0x00ffd5] == 0x3a))
 			{
@@ -915,12 +915,12 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 		case SNES_MODE_25:
 		/* Extendend HiROM carts start to load data in banks 0xc0 to 0xff. However, they exceed the
-         * available space in these banks, and continue loading at banks 0x40 to 0x7f. The top half
-         * (address range 0x8000 - 0xffff) of each bank is also mirrored either to banks 0x00 to 0x3f
-         * (for data in banks 0x40 to 0x7f) or to banks 0x80 to 0xbf (for data in banks 0xc0 to 0xff).
-         * Notice that banks 0x7e and 0x7f are overwritten by WRAM, but they could contain data at
-         * address > 0x8000 because the mirrors at 0x3e and 0x3f are not overwritten.
-         */
+		 * available space in these banks, and continue loading at banks 0x40 to 0x7f. The top half
+		 * (address range 0x8000 - 0xffff) of each bank is also mirrored either to banks 0x00 to 0x3f
+		 * (for data in banks 0x40 to 0x7f) or to banks 0x80 to 0xbf (for data in banks 0xc0 to 0xff).
+		 * Notice that banks 0x7e and 0x7f are overwritten by WRAM, but they could contain data at
+		 * address > 0x8000 because the mirrors at 0x3e and 0x3f are not overwritten.
+		 */
 			/* Reading the first 64 blocks */
 			while (read_blocks < 64 && read_blocks < total_blocks)
 			{
@@ -964,11 +964,11 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 		case SNES_MODE_22:
 		/* "Extendend LoROM" carts have their data loaded in banks 0x00 to 0x3f at address 0x8000.
-         * These are then mirrored in banks 0x40 to 0x7f, both at address 0x0000 and at address
-         * 0x8000, in banks 0x80 to 0xbf at address 0x8000 and in banks 0xc0 to 0xff, both at address
-         * 0x0000 and at address 0x8000. Notice that SDD-1 games (Star Ocean and Street Fighter Zero 2)
-         * use SNES_MODE_22
-         */
+		 * These are then mirrored in banks 0x40 to 0x7f, both at address 0x0000 and at address
+		 * 0x8000, in banks 0x80 to 0xbf at address 0x8000 and in banks 0xc0 to 0xff, both at address
+		 * 0x0000 and at address 0x8000. Notice that SDD-1 games (Star Ocean and Street Fighter Zero 2)
+		 * use SNES_MODE_22
+		 */
 			while (read_blocks < 64 && read_blocks < total_blocks)
 			{
 				/* Loading and mirroring data */
@@ -1043,8 +1043,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		default:
 		case SNES_MODE_20:
 		/* LoROM carts load data in banks 0x00 to 0x7f at address 0x8000 (actually up to 0x7d, because 0x7e and
-         * 0x7f are overwritten by WRAM). Each block is also mirrored in banks 0x80 to 0xff (up to 0xff for real)
-         */
+		 * 0x7f are overwritten by WRAM). Each block is also mirrored in banks 0x80 to 0xff (up to 0xff for real)
+		 */
 			/* SuperFX games needs this different loading routine */
 			if (((ROM[0x007fd6] >= 0x13 && ROM[0x007fd6] <= 0x15) || ROM[0x007fd6] == 0x1a) && (ROM[0x007fd5] == 0x20))
 			{
@@ -1242,7 +1242,7 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 
 	sufami_load_sram(machine, image.device().tag());
 
-	state->m_cart[slot_id].slot_in_use = 1;	// aknowledge the cart in this slot, for saving sram at exit
+	state->m_cart[slot_id].slot_in_use = 1; // aknowledge the cart in this slot, for saving sram at exit
 
 	auto_free(image.device().machine(), ROM);
 

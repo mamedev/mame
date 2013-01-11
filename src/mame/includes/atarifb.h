@@ -8,11 +8,11 @@
 
 
 /* Discrete Sound Input Nodes */
-#define ATARIFB_WHISTLE_EN		NODE_01
-#define ATARIFB_CROWD_DATA		NODE_02
-#define ATARIFB_ATTRACT_EN		NODE_03
-#define ATARIFB_NOISE_EN		NODE_04
-#define ATARIFB_HIT_EN			NODE_05
+#define ATARIFB_WHISTLE_EN      NODE_01
+#define ATARIFB_CROWD_DATA      NODE_02
+#define ATARIFB_ATTRACT_EN      NODE_03
+#define ATARIFB_NOISE_EN        NODE_04
+#define ATARIFB_HIT_EN          NODE_05
 
 
 class atarifb_state : public driver_device
@@ -87,4 +87,3 @@ public:
 /*----------- defined in audio/atarifb.c -----------*/
 DISCRETE_SOUND_EXTERN( atarifb );
 DISCRETE_SOUND_EXTERN( abaseb );
-

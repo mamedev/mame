@@ -121,13 +121,13 @@ WRITE8_HANDLER ( cgenie_register_w )
 				break;
 			state->m_crt.cursor_top = data;
 			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
-            break;
+			break;
 		case 11:
 			if( state->m_crt.cursor_bottom == data )
 				break;
 			state->m_crt.cursor_bottom = data;
 			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
-            break;
+			break;
 		case 12:
 			data &= 63;
 			if( state->m_crt.screen_address_hi == data )
@@ -145,13 +145,13 @@ WRITE8_HANDLER ( cgenie_register_w )
 				break;
 			state->m_crt.cursor_address_hi = data;
 			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
-            break;
+			break;
 		case 15:
 			if( state->m_crt.cursor_address_lo == data )
 				break;
 			state->m_crt.cursor_address_lo = data;
 			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
-            break;
+			break;
 	}
 }
 
@@ -167,7 +167,7 @@ WRITE8_HANDLER ( cgenie_index_w )
 /***************************************************************************
   Read from an indexed register of the 6845 CRTC
 ***************************************************************************/
- READ8_HANDLER ( cgenie_register_r )
+	READ8_HANDLER ( cgenie_register_r )
 {
 	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	return cgenie_get_register(space.machine(), state->m_crt.idx);
@@ -220,7 +220,7 @@ int cgenie_get_register(running_machine &machine, int indx)
 /***************************************************************************
   Read the index register of the 6845 CRTC
 ***************************************************************************/
- READ8_HANDLER ( cgenie_index_r )
+	READ8_HANDLER ( cgenie_index_r )
 {
 	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	return state->m_crt.idx;
@@ -241,7 +241,7 @@ static void cgenie_refresh_monitor(running_machine &machine, bitmap_ind16 &bitma
 	cgenie_state *state = machine.driver_data<cgenie_state>();
 	UINT8 *videoram = state->m_videoram;
 	int i, address, offset, cursor, size, code, x, y;
-    rectangle r;
+	rectangle r;
 
 	bitmap.fill(get_black_pen(machine), cliprect);
 
@@ -252,9 +252,9 @@ static void cgenie_refresh_monitor(running_machine &machine, bitmap_ind16 &bitma
 		cursor = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
 
 		/*
-         * for every character in the Video RAM, check if it has been modified since
-         * last time and update it accordingly.
-         */
+		 * for every character in the Video RAM, check if it has been modified since
+		 * last time and update it accordingly.
+		 */
 		for( address = 0; address < size; address++ )
 		{
 			i = (offset + address) & 0x3fff;
@@ -333,9 +333,9 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_ind16 &bitmap
 		cursor = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
 
 		/*
-         * for every character in the Video RAM, check if it has been modified since
-         * last time and update it accordingly.
-         */
+		 * for every character in the Video RAM, check if it has been modified since
+		 * last time and update it accordingly.
+		 */
 		for( address = 0; address < size; address++ )
 		{
 			i = (offset + address) & 0x3fff;
@@ -412,7 +412,7 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_ind16 &bitmap
 ***************************************************************************/
 UINT32 cgenie_state::screen_update_cgenie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    if( m_tv_mode )
+	if( m_tv_mode )
 		cgenie_refresh_tv_set(machine(), bitmap, cliprect);
 	else
 		cgenie_refresh_monitor(machine(), bitmap, cliprect);

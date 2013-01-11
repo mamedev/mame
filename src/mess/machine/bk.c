@@ -23,7 +23,7 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 
 	for(i = 1; i < 12; i++)
 	{
-		code =	machine().root_device().ioport(keynames[i-1])->read();
+		code =  machine().root_device().ioport(keynames[i-1])->read();
 		if (code != 0)
 		{
 			for(j = 0; j < 8; j++)
@@ -167,4 +167,3 @@ READ16_MEMBER(bk_state::bk_floppy_data_r)
 WRITE16_MEMBER(bk_state::bk_floppy_data_w)
 {
 }
-

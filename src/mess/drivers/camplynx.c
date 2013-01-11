@@ -205,7 +205,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lynx48k_io , AS_IO, 8, camplynx_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x007f,0x007f) AM_MIRROR(0xff00) AM_WRITE(lynx48k_bank_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITENOP		/* to be emulated */
+	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITENOP       /* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
 	AM_RANGE(0x0280,0x0280) AM_READ_PORT("LINE2")
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( lynx48k_io , AS_IO, 8, camplynx_state )
 	AM_RANGE(0x0780,0x0780) AM_READ_PORT("LINE7")
 	AM_RANGE(0x0880,0x0880) AM_READ_PORT("LINE8")
 	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
-	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_device, write_unsigned8)	/* 6-bit dac */
+	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_device, write_unsigned8)   /* 6-bit dac */
 	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( lynx128k_io , AS_IO, 8, camplynx_state )
 //  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
 //  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
 //  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
-	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITENOP		/* to be emulated */
+	AM_RANGE(0x0080,0x0080) AM_MIRROR(0xff00) AM_WRITENOP       /* to be emulated */
 	AM_RANGE(0x0080,0x0080) AM_READ_PORT("LINE0")
 	AM_RANGE(0x0180,0x0180) AM_READ_PORT("LINE1")
 	AM_RANGE(0x0280,0x0280) AM_READ_PORT("LINE2")
@@ -241,8 +241,8 @@ static ADDRESS_MAP_START( lynx128k_io , AS_IO, 8, camplynx_state )
 	AM_RANGE(0x0780,0x0780) AM_READ_PORT("LINE7")
 	AM_RANGE(0x0880,0x0880) AM_READ_PORT("LINE8")
 	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
-	AM_RANGE(0x0082,0x0082) AM_MIRROR(0xff00) AM_WRITE(lynx128k_bank_w)	// read=serial buffer
-	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_device, write_unsigned8)	/* 6-bit dac. Read="single-step", causes a NMI */
+	AM_RANGE(0x0082,0x0082) AM_MIRROR(0xff00) AM_WRITE(lynx128k_bank_w) // read=serial buffer
+	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_device, write_unsigned8)   /* 6-bit dac. Read="single-step", causes a NMI */
 	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
@@ -359,14 +359,14 @@ WRITE8_MEMBER( camplynx_state::lynx128k_irq )
 
 static const UINT8 lynx48k_palette[8*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black     */
-	0x00, 0x00, 0xff,	/*  1 Blue      */
-	0xff, 0x00, 0x00,	/*  2 Red       */
-	0xff, 0x00, 0xff,	/*  3 Magenta       */
-	0x00, 0xff, 0x00,	/*  4 Green     */
-	0x00, 0xff, 0xff,	/*  5 Cyan      */
-	0xff, 0xff, 0x00,	/*  6 Yellow        */
-	0xff, 0xff, 0xff,	/*  7 White     */
+	0x00, 0x00, 0x00,   /*  0 Black     */
+	0x00, 0x00, 0xff,   /*  1 Blue      */
+	0xff, 0x00, 0x00,   /*  2 Red       */
+	0xff, 0x00, 0xff,   /*  3 Magenta       */
+	0x00, 0xff, 0x00,   /*  4 Green     */
+	0x00, 0xff, 0xff,   /*  5 Cyan      */
+	0xff, 0xff, 0x00,   /*  6 Yellow        */
+	0xff, 0xff, 0xff,   /*  7 White     */
 };
 
 void camplynx_state::palette_init()
@@ -446,14 +446,14 @@ static const mc6845_interface lynx48k_crtc6845_interface = {
 };
 
 static const mc6845_interface lynx128k_crtc6845_interface = {
-	"screen",			/* screen name */
-	8,				/* dots per character */
+	"screen",           /* screen name */
+	8,              /* dots per character */
 	NULL,
-	lynx128k_update_row,		/* callback to display one scanline */
+	lynx128k_update_row,        /* callback to display one scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(camplynx_state, lynx128k_irq),	/* callback when cursor pin changes state */
+	DEVCB_DRIVER_MEMBER(camplynx_state, lynx128k_irq),  /* callback when cursor pin changes state */
 	DEVCB_NULL,
 	NULL
 };

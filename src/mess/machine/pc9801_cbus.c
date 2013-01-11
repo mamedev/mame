@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	CCBUS Slot interface for PC-98xx family
+    CCBUS Slot interface for PC-98xx family
 
 **********************************************************************/
 
@@ -50,7 +50,7 @@ device_pc9801cbus_card_interface::~device_pc9801cbus_card_interface()
 //-------------------------------------------------
 
 pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PC9801CBUS_SLOT, "PC-9801 sound cbus slot", tag, owner, clock),
+		device_t(mconfig, PC9801CBUS_SLOT, "PC-9801 sound cbus slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -74,8 +74,5 @@ void pc9801_slot_device::device_config_complete()
 
 void pc9801_slot_device::device_start()
 {
-//	m_card = dynamic_cast<device_pc9801_slot_card_interface *>(get_card_device());
+//  m_card = dynamic_cast<device_pc9801_slot_card_interface *>(get_card_device());
 }
-
-
-

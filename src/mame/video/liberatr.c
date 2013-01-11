@@ -17,7 +17,7 @@
 #include "includes/liberatr.h"
 
 
-#define NUM_PENS	(0x18)
+#define NUM_PENS    (0x18)
 
 
 
@@ -99,9 +99,9 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 				UINT16 length, planet_data, address;
 
 				/*
-                   read the planet picture ROM and get the
-                   latitude and longitude scaled from the scaling PROMS
-                */
+				   read the planet picture ROM and get the
+				   latitude and longitude scaled from the scaling PROMS
+				*/
 				address = (latitude << 5) + segment;
 				planet_data = (planet_rom[address] << 8) | planet_rom[address + 0x1000];
 
@@ -110,7 +110,7 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 
 
 				/* scale the longitude limit (adding the starting longitude) */
-				address = longitude + ( length >> 1 ) + ( length & 1 );		/* shift with rounding */
+				address = longitude + ( length >> 1 ) + ( length & 1 );     /* shift with rounding */
 				visible_array[segment] = (( address & 0x100 ) ? 1 : 0);
 				if (address & 0x80)
 				{
@@ -122,26 +122,26 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 					longitude_scale_factor = longitude_scale[address];
 				}
 
-				x_array[segment] = (((UINT16)latitude_scale_factor * (UINT16)longitude_scale_factor) + 0x80) >> 8;	/* round it */
+				x_array[segment] = (((UINT16)latitude_scale_factor * (UINT16)longitude_scale_factor) + 0x80) >> 8;  /* round it */
 				color_array[segment] = color;
 			}
 
 			/*
-               determine which segment is the western horizon and
-                 leave 'segment' indexing it.
-            */
-			for (segment = 0; segment < 0x1f; segment++)	/* if not found, 'segment' = 0x1f */
+			   determine which segment is the western horizon and
+			     leave 'segment' indexing it.
+			*/
+			for (segment = 0; segment < 0x1f; segment++)    /* if not found, 'segment' = 0x1f */
 				if (visible_array[segment]) break;
 
 			/* transfer from the temporary arrays to the structure */
 			line->max_x = (latitude_scale_factor * 0xc0) >> 8;
 			if (line->max_x & 1)
-				line->max_x += 1;				/* make it even */
+				line->max_x += 1;               /* make it even */
 
 			/*
-               as part of the quest to reduce memory usage (and to a lesser degree
-                 execution time), stitch together segments that have the same color
-            */
+			   as part of the quest to reduce memory usage (and to a lesser degree
+			     execution time), stitch together segments that have the same color
+			*/
 			segment_count = 0;
 			i = 0;
 			start_segment = segment;
@@ -168,9 +168,9 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 		}
 
 		/* now that the all the lines have been processed, and we know how
-           many segments it will take to store the description, allocate the
-           space for it and copy the data to it.
-        */
+		   many segments it will take to store the description, allocate the
+		   space for it and copy the data to it.
+		*/
 		buffer = auto_alloc_array(machine(), UINT8, 2*(128 + total_segment_count));
 
 		liberatr_planet.frames[longitude] = buffer;
@@ -186,7 +186,7 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 			last_x = 0;
 
 			/* calculate the bitmap's x coordinate for the western horizon
-               center of bitmap - (the number of planet pixels) / 4 */
+			   center of bitmap - (the number of planet pixels) / 4 */
 			*buffer++ = (machine().primary_screen->width() / 2) - ((line->max_x + 2) / 4);
 
 			for (i = 0; i < segment_count; i++)
@@ -226,10 +226,10 @@ void liberatr_state::get_pens(pen_t *pens)
 		UINT8 r,g,b;
 
 		/* handle the hardware flip of the bit order from 765 to 576 that
-           hardware does between vram and color ram */
+		   hardware does between vram and color ram */
 		static const offs_t penmap[] = { 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08,
-								   0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00,
-								   0x10, 0x12, 0x14, 0x16, 0x11, 0x13, 0x15, 0x17 };
+									0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00,
+									0x10, 0x12, 0x14, 0x16, 0x11, 0x13, 0x15, 0x17 };
 
 		UINT8 data = m_colorram[i];
 

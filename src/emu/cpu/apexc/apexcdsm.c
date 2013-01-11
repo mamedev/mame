@@ -66,28 +66,28 @@ enum format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, tw
 struct instr_desc
 {
 	const char *mnemonic;
-	format_type format;	/* -> X and Y are format */
+	format_type format; /* -> X and Y are format */
 };
 
 static const instr_desc instructions[16] =
 {
-	{ "Stop",	one_address },	{ "I",		one_address },
-	{ "P",		one_address },	{ "B",		branch },
-	{ "l",		shiftl },		{ "r",		shiftr },
-	{ "Illegal",one_address },	{ "X",		multiply },
-	{ "+c",		two_address },	{ "-c",		two_address },
-	{ "+",		two_address },	{ "-",		two_address },
-	{ "T",		two_address },	{ "R",		store },
-	{ "A",		store },		{ "S",		swap }
+	{ "Stop",   one_address },  { "I",      one_address },
+	{ "P",      one_address },  { "B",      branch },
+	{ "l",      shiftl },       { "r",      shiftr },
+	{ "Illegal",one_address },  { "X",      multiply },
+	{ "+c",     two_address },  { "-c",     two_address },
+	{ "+",      two_address },  { "-",      two_address },
+	{ "T",      two_address },  { "R",      store },
+	{ "A",      store },        { "S",      swap }
 };
 
 CPU_DISASSEMBLE( apexc )
 {
-	UINT32 instruction;			/* 32-bit machine instruction */
-	int x, y, function, c6, vector;	/* instruction fields */
-	int n;						/* 'friendly', instruction-dependant interpretation of C6 */
-	const instr_desc *the_desc;	/* pointer to the revelant entry in the instructions array */
-	char mnemonic[9];			/* storage for generated mnemonic */
+	UINT32 instruction;         /* 32-bit machine instruction */
+	int x, y, function, c6, vector; /* instruction fields */
+	int n;                      /* 'friendly', instruction-dependant interpretation of C6 */
+	const instr_desc *the_desc; /* pointer to the revelant entry in the instructions array */
+	char mnemonic[9];           /* storage for generated mnemonic */
 
 	/* read the instruction to disassemble */
 	instruction = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
@@ -112,7 +112,7 @@ CPU_DISASSEMBLE( apexc )
 	case two_address:
 	case branch:
 	case swap:
-		buffer += sprintf(buffer, "   %-10s", mnemonic);	/* 10 chars*/
+		buffer += sprintf(buffer, "   %-10s", mnemonic);    /* 10 chars*/
 		break;
 
 	case shiftl:
@@ -121,32 +121,32 @@ CPU_DISASSEMBLE( apexc )
 			n = c6;
 		else
 			n = 64-c6;
-		buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n);	/* 10 chars */
+		buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n); /* 10 chars */
 		break;
 
 	case multiply:
 		n = 33-c6;
 		if (n == 32)
 			/* case "32" : do not show bit specifier */
-			buffer += sprintf(buffer, "   %-10s", mnemonic);	/* 10 chars */
+			buffer += sprintf(buffer, "   %-10s", mnemonic);    /* 10 chars */
 		else
-			buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n);	/* 10 chars */
+			buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n); /* 10 chars */
 		break;
 
 	case store:
 		if (c6 == 0)
-		{	/* case "1-32" : do not show bit specifier */
-			buffer += sprintf(buffer, "   %-10s", mnemonic);	/* 10 chars*/
+		{   /* case "1-32" : do not show bit specifier */
+			buffer += sprintf(buffer, "   %-10s", mnemonic);    /* 10 chars*/
 		}
 		else if (c6 & 0x20)
-		{	/* case "1-n" */
+		{   /* case "1-n" */
 			n = c6-32;
-			buffer += sprintf(buffer, "   %-2s (1-%02d) ", mnemonic, n);	/* 10 chars */
+			buffer += sprintf(buffer, "   %-2s (1-%02d) ", mnemonic, n);    /* 10 chars */
 		}
 		else
-		{	/* case "n-32" */
+		{   /* case "n-32" */
 			n = c6+1;
-			buffer += sprintf(buffer, "   %-2s(%02d-32) ", mnemonic, n);	/* 8 chars */
+			buffer += sprintf(buffer, "   %-2s(%02d-32) ", mnemonic, n);    /* 8 chars */
 		}
 	}
 
@@ -154,29 +154,29 @@ CPU_DISASSEMBLE( apexc )
 	switch (the_desc->format)
 	{
 	case branch:
-		buffer--;	/* eat last char */
-		buffer += sprintf(buffer, "<%03X(%02d/%02d) >=", x<<2, (x >> 5) & 0x1f, x & 0x1f);	/* 10+1 chars */
+		buffer--;   /* eat last char */
+		buffer += sprintf(buffer, "<%03X(%02d/%02d) >=", x<<2, (x >> 5) & 0x1f, x & 0x1f);  /* 10+1 chars */
 		break;
 
 	case multiply:
 	case swap:
-		buffer += sprintf(buffer, "   (%02d)      ", (x >> 5) & 0x1f);	/* 10 chars */
+		buffer += sprintf(buffer, "   (%02d)      ", (x >> 5) & 0x1f);  /* 10 chars */
 		break;
 
 	case one_address:
 	case shiftl:
 	case shiftr:
-		buffer += sprintf(buffer, "             ");	/* 10 chars */
+		buffer += sprintf(buffer, "             "); /* 10 chars */
 		break;
 
 	case two_address:
 	case store:
-		buffer += sprintf(buffer, "%03X(%02d/%02d)   ", x<<2, (x >> 5) & 0x1f, x & 0x1f);	/* 10 chars */
+		buffer += sprintf(buffer, "%03X(%02d/%02d)   ", x<<2, (x >> 5) & 0x1f, x & 0x1f);   /* 10 chars */
 		break;
 	}
 
 	/* print Y address */
-	buffer += sprintf(buffer, "%03X(%02d/%02d)", y<<2, (y >> 5) & 0x1f, y & 0x1f);	/* 7 chars */
+	buffer += sprintf(buffer, "%03X(%02d/%02d)", y<<2, (y >> 5) & 0x1f, y & 0x1f);  /* 7 chars */
 
 	return 4;
 }

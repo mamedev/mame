@@ -37,10 +37,10 @@
 
 static const eeprom_interface eeprom_intf =
 {
-	7,			/* address bits */
-	8,			/* data bits */
-	"011000",		/*  read command */
-	"011100",		/* write command */
+	7,          /* address bits */
+	8,          /* data bits */
+	"011000",       /*  read command */
+	"011100",       /* write command */
 	"0100100000000",/* erase command */
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
@@ -50,10 +50,10 @@ static const eeprom_interface eeprom_intf =
    but the command formats are slightly different.  Why? */
 static const eeprom_interface gaia_eeprom_intf =
 {
-	7,			/* address bits */
-	8,			/* data bits */
-	"011000",		/*  read command */
-	"010100",		/* write command */
+	7,          /* address bits */
+	8,          /* data bits */
+	"011000",       /*  read command */
+	"010100",       /* write command */
 	"0100100000000",/* erase command */
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
@@ -246,7 +246,7 @@ WRITE16_MEMBER(mystwarr_state::K053247_scattered_word_w)
 /* 68000 memory handlers */
 /* Mystic Warriors */
 static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// main program
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x4800ff) AM_WRITE_LEGACY(K055555_word_w)
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x48a000, 0x48a01f) AM_WRITE_LEGACY(K054338_word_w)
 	AM_RANGE(0x48c000, 0x48c03f) AM_WRITE_LEGACY(K056832_word_w)
 	AM_RANGE(0x490000, 0x490001) AM_WRITE(mweeprom_w)
-	AM_RANGE(0x492000, 0x492001) AM_WRITENOP	// watchdog
+	AM_RANGE(0x492000, 0x492001) AM_WRITENOP    // watchdog
 	AM_RANGE(0x494000, 0x494001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x494002, 0x494003) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x496000, 0x496001) AM_READ_PORT("IN0")
@@ -267,9 +267,9 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x498000, 0x49801f) AM_RAM
 	AM_RANGE(0x49a000, 0x49a001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x49c000, 0x49c01f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)
-	AM_RANGE(0x49e000, 0x49e007) AM_WRITE(irq_ack_w)	// VSCCS (custom)
+	AM_RANGE(0x49e000, 0x49e007) AM_WRITE(irq_ack_w)    // VSCCS (custom)
 	AM_RANGE(0x600000, 0x601fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)
-	AM_RANGE(0x602000, 0x603fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read(essential)
+	AM_RANGE(0x602000, 0x603fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM mirror read(essential)
 	AM_RANGE(0x680000, 0x683fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 #if MW_DEBUG
@@ -283,7 +283,7 @@ ADDRESS_MAP_END
 
 /* Metamorphic Force */
 static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// main program
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x210000, 0x210fff) AM_READWRITE_LEGACY(K053247_word_r,K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
@@ -306,10 +306,10 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x274002, 0x274003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x278000, 0x278001) AM_READ_PORT("IN0")
 	AM_RANGE(0x278002, 0x278003) AM_READ(eeprom_r)
-	AM_RANGE(0x27c000, 0x27c001) AM_READNOP	// watchdog lives here
+	AM_RANGE(0x27c000, 0x27c001) AM_READNOP // watchdog lives here
 	AM_RANGE(0x27c000, 0x27c001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x300000, 0x301fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)
-	AM_RANGE(0x302000, 0x303fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
+	AM_RANGE(0x302000, 0x303fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x310000, 0x311fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREAD("k053250_1", k053250_t, rom_r)
 	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
@@ -325,15 +325,15 @@ ADDRESS_MAP_END
 
 /* Violent Storm */
 static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM		// main program
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM     // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x210000, 0x210fff) AM_READWRITE_LEGACY(K053247_word_r,K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE_LEGACY(K053246_word_w)
 	AM_RANGE(0x244000, 0x24400f) AM_READ_LEGACY(K055673_rom_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_WRITE_LEGACY(K053247_reg_word_w)
-	AM_RANGE(0x24c000, 0x24ffff) AM_RAM		// K053250 ram
-	AM_RANGE(0x250000, 0x25000f) AM_RAM		// K053250 reg
+	AM_RANGE(0x24c000, 0x24ffff) AM_RAM     // K053250 ram
+	AM_RANGE(0x250000, 0x25000f) AM_RAM     // K053250 reg
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE_LEGACY(K055555_word_w)
 	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE(K055550_word_r,K055550_word_w)
@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x274002, 0x274003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x278000, 0x278001) AM_READ_PORT("IN0")
 	AM_RANGE(0x278002, 0x278003) AM_READ(eeprom_r)
-	AM_RANGE(0x27c000, 0x27c001) AM_READNOP		// watchdog lives here
+	AM_RANGE(0x27c000, 0x27c001) AM_READNOP     // watchdog lives here
 	AM_RANGE(0x27c000, 0x27c001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x300000, 0x301fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)
 	AM_RANGE(0x302000, 0x303fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM mirror read(essential)
@@ -418,34 +418,34 @@ WRITE16_MEMBER(mystwarr_state::mccontrol_w)
 
 /* Martial Champion */
 static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM									// main program
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("gx_workram")			// work RAM
-	AM_RANGE(0x300000, 0x3fffff) AM_ROM									// data ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_WRITE_LEGACY(K055555_word_w)				// PCU2
-	AM_RANGE(0x402000, 0x40200f) AM_READ_LEGACY(K055673_rom_word_r)			// sprite ROM readback
-	AM_RANGE(0x402010, 0x40201f) AM_WRITE_LEGACY(K053247_reg_word_w)			// OBJSET2
-	AM_RANGE(0x404000, 0x404007) AM_WRITE_LEGACY(K053246_word_w)				// OBJSET1
-	AM_RANGE(0x40a000, 0x40a01f) AM_WRITE_LEGACY(K054338_word_w)				// CLTC
-	AM_RANGE(0x40c000, 0x40c03f) AM_WRITE_LEGACY(K056832_word_w)				// VACSET
-	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)		// protection
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                 // main program
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("gx_workram")          // work RAM
+	AM_RANGE(0x300000, 0x3fffff) AM_ROM                                 // data ROM
+	AM_RANGE(0x400000, 0x4000ff) AM_WRITE_LEGACY(K055555_word_w)                // PCU2
+	AM_RANGE(0x402000, 0x40200f) AM_READ_LEGACY(K055673_rom_word_r)         // sprite ROM readback
+	AM_RANGE(0x402010, 0x40201f) AM_WRITE_LEGACY(K053247_reg_word_w)            // OBJSET2
+	AM_RANGE(0x404000, 0x404007) AM_WRITE_LEGACY(K053246_word_w)                // OBJSET1
+	AM_RANGE(0x40a000, 0x40a01f) AM_WRITE_LEGACY(K054338_word_w)                // CLTC
+	AM_RANGE(0x40c000, 0x40c03f) AM_WRITE_LEGACY(K056832_word_w)                // VACSET
+	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)      // protection
 	AM_RANGE(0x410000, 0x410001) AM_WRITE(mweeprom_w)
 	AM_RANGE(0x412000, 0x412001) AM_READWRITE(mccontrol_r,mccontrol_w)
 	AM_RANGE(0x414000, 0x414001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x414002, 0x414003) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x416000, 0x416001) AM_READ_PORT("IN0")
-	AM_RANGE(0x416002, 0x416003) AM_READ(eeprom_r)					// eeprom read
-	AM_RANGE(0x418014, 0x418015) AM_READ(sound_status_r)				// z80 status
+	AM_RANGE(0x416002, 0x416003) AM_READ(eeprom_r)                  // eeprom read
+	AM_RANGE(0x418014, 0x418015) AM_READ(sound_status_r)                // z80 status
 	AM_RANGE(0x41800c, 0x41800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x41800e, 0x41800f) AM_WRITE(sound_cmd2_w)
-	AM_RANGE(0x418000, 0x41801f) AM_RAM									// sound regs fall through
+	AM_RANGE(0x418000, 0x41801f) AM_RAM                                 // sound regs fall through
 	AM_RANGE(0x41a000, 0x41a001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x41c000, 0x41c01f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)				// CCU
-	AM_RANGE(0x41e000, 0x41e007) AM_WRITE_LEGACY(K056832_b_word_w)				// VSCCS
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_SHARE("spriteram")	// sprite RAM
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")						// palette RAM
-	AM_RANGE(0x680000, 0x681fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
-	AM_RANGE(0x682000, 0x683fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
-	AM_RANGE(0x700000, 0x703fff) AM_READ_LEGACY(K056832_mw_rom_word_r)			// tile ROM readback
+	AM_RANGE(0x41c000, 0x41c01f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)              // CCU
+	AM_RANGE(0x41e000, 0x41e007) AM_WRITE_LEGACY(K056832_b_word_w)              // VSCCS
+	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_SHARE("spriteram")    // sprite RAM
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")                     // palette RAM
+	AM_RANGE(0x680000, 0x681fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM
+	AM_RANGE(0x682000, 0x683fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM mirror read/write (essential)
+	AM_RANGE(0x700000, 0x703fff) AM_READ_LEGACY(K056832_mw_rom_word_r)          // tile ROM readback
 #if MW_DEBUG
 	AM_RANGE(0x400000, 0x4000ff) AM_READ_LEGACY(K055555_word_r)
 	AM_RANGE(0x402010, 0x40201f) AM_READ_LEGACY(K053247_reg_word_r)
@@ -459,10 +459,10 @@ ADDRESS_MAP_END
 
 /* Ultimate Battler Dadandarn */
 static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM							// main program and data ROM
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM                         // main program and data ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
-	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
+	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM
+	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w) // tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x430000, 0x430007) AM_WRITE_LEGACY(K053246_word_w)
 	AM_RANGE(0x440000, 0x443fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
@@ -470,27 +470,27 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x450010, 0x45001f) AM_WRITE_LEGACY(K053247_reg_word_w)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
-	AM_RANGE(0x480000, 0x48003f) AM_WRITE_LEGACY(K056832_word_w)		// VACSET
-	AM_RANGE(0x482000, 0x482007) AM_WRITE_LEGACY(K056832_b_word_w)	// VSCCS
+	AM_RANGE(0x480000, 0x48003f) AM_WRITE_LEGACY(K056832_word_w)        // VACSET
+	AM_RANGE(0x482000, 0x482007) AM_WRITE_LEGACY(K056832_b_word_w)  // VSCCS
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
 	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x488000, 0x4880ff) AM_WRITE_LEGACY(K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
-	AM_RANGE(0x48a000, 0x48a01f) AM_RAM					// sound regs fall-through
+	AM_RANGE(0x48a000, 0x48a01f) AM_RAM                 // sound regs fall-through
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE_LEGACY(K054338_word_w)
-	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")	// bit 3 (0x8) is test switch
+	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1") // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x680000, 0x68003f) AM_READWRITE(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x800000, 0x87ffff) AM_READ(ddd_053936_tilerom_0_r)	// 256k tilemap readback
+	AM_RANGE(0x800000, 0x87ffff) AM_READ(ddd_053936_tilerom_0_r)    // 256k tilemap readback
 	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r) // 128k tilemap readback
-	AM_RANGE(0xc00000, 0xdfffff) AM_READ(ddd_053936_tilerom_2_r)	// tile character readback
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP	// watchdog
+	AM_RANGE(0xc00000, 0xdfffff) AM_READ(ddd_053936_tilerom_2_r)    // tile character readback
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    // watchdog
 #if MW_DEBUG
 	AM_RANGE(0x430000, 0x430007) AM_READ_LEGACY(K053246_reg_word_r)
 	AM_RANGE(0x450010, 0x45001f) AM_READ_LEGACY(K053247_reg_word_r)
@@ -506,10 +506,10 @@ ADDRESS_MAP_END
 // 800000 = the 256k tilemap
 // c00000 = 936 tiles (7fffff window)
 static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM								// main program
+	AM_RANGE(0x000000, 0x2fffff) AM_ROM                             // main program
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM
-	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM mirror read / write (essential)
+	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)     // tilemap RAM
+	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)     // tilemap RAM mirror read / write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x430000, 0x430007) AM_WRITE_LEGACY(K053246_word_w)
 	AM_RANGE(0x440000, 0x441fff) AM_READ_LEGACY(K056832_mw_rom_word_r)
@@ -517,27 +517,27 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x450010, 0x45001f) AM_WRITE_LEGACY(K053247_reg_word_w)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
-	AM_RANGE(0x480000, 0x48003f) AM_WRITE_LEGACY(K056832_word_w)			// VACSET
-	AM_RANGE(0x482000, 0x482007) AM_WRITE_LEGACY(K056832_b_word_w)			// VSCCS
+	AM_RANGE(0x480000, 0x48003f) AM_WRITE_LEGACY(K056832_word_w)            // VACSET
+	AM_RANGE(0x482000, 0x482007) AM_WRITE_LEGACY(K056832_b_word_w)          // VSCCS
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
 	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x488000, 0x4880ff) AM_WRITE_LEGACY(K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
-	AM_RANGE(0x48a000, 0x48a01f) AM_RAM								// sound regs fall-through
+	AM_RANGE(0x48a000, 0x48a01f) AM_RAM                             // sound regs fall-through
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE_LEGACY(K054338_word_w)
-	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")				// bit 3 (0x8) is test switch
+	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")             // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x660000, 0x6600ff) AM_READWRITE_LEGACY(K054000_lsb_r,K054000_lsb_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x800000, 0x87ffff) AM_READ(gai_053936_tilerom_0_r)	// 256k tilemap readback
-	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r)	// 128k tilemap readback
-	AM_RANGE(0xc00000, 0xdfffff) AM_READ(gai_053936_tilerom_2_r)	// tile character readback
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP	// watchdog
+	AM_RANGE(0x800000, 0x87ffff) AM_READ(gai_053936_tilerom_0_r)    // 256k tilemap readback
+	AM_RANGE(0xa00000, 0xa7ffff) AM_READ(ddd_053936_tilerom_1_r)    // 128k tilemap readback
+	AM_RANGE(0xc00000, 0xdfffff) AM_READ(gai_053936_tilerom_2_r)    // tile character readback
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    // watchdog
 #if MW_DEBUG
 	AM_RANGE(0x430000, 0x430007) AM_READ_LEGACY(K053246_reg_word_r)
 	AM_RANGE(0x450010, 0x45001f) AM_READ_LEGACY(K053247_reg_word_r)
@@ -584,7 +584,7 @@ static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP	// unknown write
+	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP    // unknown write
 ADDRESS_MAP_END
 
 
@@ -608,16 +608,16 @@ static INPUT_PORTS_START( mystwarr )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "Common" )
 	PORT_DIPSETTING(    0x00, "Independent" )
-	PORT_DIPNAME( 0x40, 0x40, "Number of Players" ) 	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )     PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:4" )
@@ -649,19 +649,19 @@ static INPUT_PORTS_START( metamrph )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )            PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "Common" )
 	PORT_DIPSETTING(    0x00, "Independent" )
-	PORT_DIPNAME( 0x40, 0x40, "Number of Players" ) 		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )         PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPNAME( 0x80, 0x80, "Continuous Energy Increment" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x80, 0x80, "Continuous Energy Increment" )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
@@ -692,19 +692,19 @@ static INPUT_PORTS_START( viostorm )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )			PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )            PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x40, "Common" )
 	PORT_DIPSETTING(    0x00, "Independent" )
-	PORT_DIPNAME( 0x80, 0x80, "Number of Players" ) 		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x80, 0x80, "Number of Players" )         PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "2" )
 
@@ -728,7 +728,7 @@ static INPUT_PORTS_START( dadandrn )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )	/* duplicate required for use */
+	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW ) /* duplicate required for use */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -736,13 +736,13 @@ static INPUT_PORTS_START( dadandrn )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:3" )
@@ -776,13 +776,13 @@ static INPUT_PORTS_START( martchmp )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:3" )
@@ -981,7 +981,7 @@ static const k053252_interface gaiapols_k053252_intf =
 static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz (confirmed) */
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz (confirmed) */
 	MCFG_CPU_PROGRAM_MAP(mystwarr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mystwarr_state, mystwarr_interrupt, "screen", 0, 1)
 
@@ -1016,11 +1016,11 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_K054539_ADD("konami1", 48000, k054539_config)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)	/* stereo channels are inverted */
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 
 	MCFG_K054539_ADD("konami2", 48000, k054539_config)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)	/* stereo channels are inverted */
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 

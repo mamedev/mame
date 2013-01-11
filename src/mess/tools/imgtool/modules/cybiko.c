@@ -37,7 +37,7 @@ enum
 	BLOCK_TYPE_FILE
 };
 
-#define	MAX_PAGE_SIZE (264 * 2)
+#define MAX_PAGE_SIZE (264 * 2)
 
 #define INVALID_FILE_ID  0xFFFF
 

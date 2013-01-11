@@ -23,7 +23,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define WANGPC_KEYBOARD_TAG	"wangpckb"
+#define WANGPC_KEYBOARD_TAG "wangpckb"
 
 
 
@@ -32,7 +32,7 @@
 //**************************************************************************
 
 #define MCFG_WANGPC_KEYBOARD_ADD() \
-    MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
 
 
 
@@ -46,8 +46,8 @@ class wangpc_keyboard_device :  public device_t,
 								public device_serial_interface
 {
 public:
-    // construction/destruction
-    wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -64,9 +64,9 @@ public:
 	static void mcs51_tx_callback(device_t *device, int data);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "wangpckb"; }
-    virtual void device_start();
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_serial_interface overrides

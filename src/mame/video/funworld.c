@@ -120,10 +120,10 @@ PALETTE_INIT_MEMBER(funworld_state,funworld)
 	static const int resistances_g [2] = { 470, 220 };
 	double weights_r[3], weights_b[3], weights_g[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rb,	weights_r,	100,	0,
-			3,	resistances_rb,	weights_b,	100,	0,
-			2,	resistances_g,	weights_g,	100,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rb, weights_r,  100,    0,
+			3,  resistances_rb, weights_b,  100,    0,
+			2,  resistances_g,  weights_g,  100,    0);
 
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 	int offs = tile_index;
 	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
 	int code = attr & 0xfff;
-	int color = m_colorram[offs] >> 4;	// 4 bits for color.
+	int color = m_colorram[offs] >> 4;  // 4 bits for color.
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }

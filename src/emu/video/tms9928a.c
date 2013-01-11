@@ -92,8 +92,8 @@ static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99 )
 	: device_t( mconfig, type, name, tag, owner, clock ),
-	  device_memory_interface(mconfig, *this),
-      m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
+		device_memory_interface(mconfig, *this),
+		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = is_50hz;
 	m_reva = is_reva;
@@ -104,8 +104,8 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t( mconfig, TMS9928A, "TMS9928A", tag, owner, clock ),
-	  device_memory_interface(mconfig, *this),
-    m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
+		device_memory_interface(mconfig, *this),
+	m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = false;
 	m_reva = true;
@@ -172,7 +172,7 @@ void tms9928a_device::update_backdrop()
 void tms9928a_device::update_table_masks()
 {
 	m_colourmask = ( (m_Regs[3] & 0x7f) << 3 ) | 7;
-	
+
 	// on 91xx family, the colour table mask doesn't affect the pattern table mask
 	m_patternmask = ( (m_Regs[4] & 3) << 8 ) | ( m_99 ? (m_colourmask & 0xff) : 0xff );
 }
@@ -318,7 +318,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 		switch( m_mode )
 		{
-		case 0:				/* MODE 0 */
+		case 0:             /* MODE 0 */
 			// if (vpos==100 ) popmessage("TMS9928A MODE 0");
 			{
 				UINT16 addr = m_nametbl + ( ( y & 0xF8 ) << 2 );
@@ -337,7 +337,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 			break;
 
-		case 1:				/* MODE 1 */
+		case 1:             /* MODE 1 */
 			//if (vpos==100 ) popmessage("TMS9928A MODE 1");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
@@ -363,7 +363,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 			break;
 
-		case 2:				/* MODE 2 */
+		case 2:             /* MODE 2 */
 			//if (vpos==100 ) popmessage("TMS9928A MODE 2");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 32 );
@@ -382,7 +382,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 			break;
 
-		case 3:				/* MODE 1+2 */
+		case 3:             /* MODE 1+2 */
 			//if (vpos==100) popmessage("TMS9928A MODE1+2");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 40 );
@@ -408,7 +408,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 			break;
 
-		case 4:				/* MODE 3 */
+		case 4:             /* MODE 3 */
 			//if (vpos==100 ) popmessage("TMS9928A MODE 3");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 32 );
@@ -426,7 +426,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 			break;
 
-		case 5:	case 7:		/* MODE bogus */
+		case 5: case 7:     /* MODE bogus */
 			//if (vpos==100 ) popmessage("TMS9928A MODE bogus");
 			{
 				rgb_t fg = m_palette[(m_Regs[7] >> 4) ? (m_Regs[7] >> 4) : BackColour];
@@ -448,7 +448,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 			break;
 
-		case 6:				/* MODE 2+3 */
+		case 6:             /* MODE 2+3 */
 			//if (vpos==100 ) popmessage("TMS9928A MODE 2+3");
 			{
 				UINT16 addr = m_nametbl + ( ( y >> 3 ) * 32 );
@@ -609,8 +609,8 @@ void tms9928a_device::device_config_complete()
 
 void tms9928a_device::device_start()
 {
-    astring tempstring;
-    m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
+	astring tempstring;
+	m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
 	assert( m_screen != NULL );
 
 	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
@@ -627,10 +627,10 @@ void tms9928a_device::device_start()
 	m_line_timer = timer_alloc(TIMER_LINE);
 
 	/* copy default palette into working palette */
-    for (int i = 0; i < TMS9928A_PALETTE_SIZE; i++)
-    {
+	for (int i = 0; i < TMS9928A_PALETTE_SIZE; i++)
+	{
 		m_palette[i] = tms9928a_palette[i];
-    }
+	}
 
 	save_item(NAME(m_Regs[0]));
 	save_item(NAME(m_Regs[1]));
@@ -681,4 +681,3 @@ void tms9928a_device::device_reset()
 
 	m_line_timer->adjust( m_screen->time_until_pos( 0, TMS9928A_HORZ_DISPLAY_START ) );
 }
-

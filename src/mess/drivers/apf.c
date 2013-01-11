@@ -474,31 +474,31 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( apf_m1000 )
 
 	/*
-       There must be a bug lurking somewhere, because the lines 0-3 are not detected correctly:
-       Using another known APF emulator, this simple Basic program can be used to read
-       the joysticks and the keyboard:
+	   There must be a bug lurking somewhere, because the lines 0-3 are not detected correctly:
+	   Using another known APF emulator, this simple Basic program can be used to read
+	   the joysticks and the keyboard:
 
-       10 PRINT KEY$(n);
-       20 GOTO 10
+	   10 PRINT KEY$(n);
+	   20 GOTO 10
 
-       where n = 0, 1 or 2 - 0 = keyboard, 1,2 = joysticks #1 and #2
+	   where n = 0, 1 or 2 - 0 = keyboard, 1,2 = joysticks #1 and #2
 
-       When reading the keyboard KEY$(0) returns the character associated to the key, with the
-       following exceptions:
+	   When reading the keyboard KEY$(0) returns the character associated to the key, with the
+	   following exceptions:
 
-       Ctrl =    CHR$(1)
-       Rept =    CHR$(2)
-       Here Is = CHR$(4)
-       Rubout =  CHR$(8)
+	   Ctrl =    CHR$(1)
+	   Rept =    CHR$(2)
+	   Here Is = CHR$(4)
+	   Rubout =  CHR$(8)
 
-       When reading the joysticks, KEY$() = "N", "S", "E", "W" for the directions
-                                            "0" - "9" for the keypad digits
-                                            "?" for "Cl"
-                                            "!" for "En"
+	   When reading the joysticks, KEY$() = "N", "S", "E", "W" for the directions
+	                                        "0" - "9" for the keypad digits
+	                                        "?" for "Cl"
+	                                        "!" for "En"
 
-       Current code doesn't behaves this way...
+	   Current code doesn't behaves this way...
 
-    */
+	*/
 
 /*
   ? player right is player 1

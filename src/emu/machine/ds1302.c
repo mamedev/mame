@@ -27,7 +27,7 @@
 #define LOG 0
 
 
-#define RAM_SIZE	0x1f	// 31 bytes
+#define RAM_SIZE    0x1f    // 31 bytes
 
 
 enum
@@ -51,13 +51,13 @@ enum
 };
 
 
-#define COMMAND_READ	(m_cmd & 0x01)
-#define COMMAND_RAM		(m_cmd & 0x40)
-#define COMMAND_VALID	(m_cmd & 0x80)
-#define COMMAND_BURST	(((m_cmd >> 1) & 0x1f) == 0x1f)
-#define CLOCK_HALT		(m_reg[REGISTER_SECONDS] & 0x80)
-#define WRITE_PROTECT	(m_reg[REGISTER_CONTROL] & 0x80)
-#define BURST_END		(COMMAND_RAM ? 0x1f : 0x09)
+#define COMMAND_READ    (m_cmd & 0x01)
+#define COMMAND_RAM     (m_cmd & 0x40)
+#define COMMAND_VALID   (m_cmd & 0x80)
+#define COMMAND_BURST   (((m_cmd >> 1) & 0x1f) == 0x1f)
+#define CLOCK_HALT      (m_reg[REGISTER_SECONDS] & 0x80)
+#define WRITE_PROTECT   (m_reg[REGISTER_CONTROL] & 0x80)
+#define BURST_END       (COMMAND_RAM ? 0x1f : 0x09)
 
 
 
@@ -74,9 +74,9 @@ const device_type DS1302 = &device_creator<ds1302_device>;
 //-------------------------------------------------
 
 ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, DS1302, "Dallas DS1302", tag, owner, clock),
-	  device_rtc_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, DS1302, "Dallas DS1302", tag, owner, clock),
+		device_rtc_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this)
 {
 }
 

@@ -114,25 +114,25 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 	const address_space_config m_io_config;
-    UINT8 *m_eeprom;
+	UINT8 *m_eeprom;
 
 	// CPU registers
-    UINT32 m_pc;
-    UINT32 m_shifted_pc;
+	UINT32 m_pc;
+	UINT32 m_shifted_pc;
 	UINT8 m_r[256];
 
 	// internal timers
-    UINT8 m_timer0_top;
+	UINT8 m_timer0_top;
 	INT32 m_timer0_increment;
 	UINT16 m_timer0_prescale;
 	UINT16 m_timer0_prescale_count;
 
-    UINT16 m_timer1_top;
+	UINT16 m_timer1_top;
 	INT32 m_timer1_increment;
 	UINT16 m_timer1_prescale;
 	UINT16 m_timer1_prescale_count;
 
-    UINT8 m_timer2_top;
+	UINT8 m_timer2_top;
 	INT32 m_timer2_increment;
 	UINT16 m_timer2_prescale;
 	UINT16 m_timer2_prescale_count;
@@ -142,7 +142,7 @@ protected:
 	UINT8 m_spi_prescale;
 	UINT8 m_spi_prescale_count;
 	INT8 m_spi_prescale_countdown;
-    static const UINT8 spi_clock_divisor[8];
+	static const UINT8 spi_clock_divisor[8];
 	void enable_spi();
 	void disable_spi();
 	void spi_update_masterslave_select();
@@ -152,12 +152,12 @@ protected:
 	void change_spcr(UINT8 data);
 	void change_spsr(UINT8 data);
 
-    // internal CPU state
+	// internal CPU state
 	UINT32 m_addr_mask;
 	bool m_interrupt_pending;
 
 	// other internal states
-    int m_icount;
+	int m_icount;
 	UINT64 m_elapsed_cycles;
 
 	// memory access
@@ -211,9 +211,9 @@ protected:
 	void timer2_force_output_compare(int reg);
 
 	// address spaces
-    address_space *m_program;
-    address_space *m_data;
-    address_space *m_io;
+	address_space *m_program;
+	address_space *m_data;
+	address_space *m_io;
 };
 
 // device type definition
@@ -246,104 +246,104 @@ public:
 
 enum
 {
-    AVR8_SREG = 1,
-    AVR8_PC,
-    AVR8_R0,
-    AVR8_R1,
-    AVR8_R2,
-    AVR8_R3,
-    AVR8_R4,
-    AVR8_R5,
-    AVR8_R6,
-    AVR8_R7,
-    AVR8_R8,
-    AVR8_R9,
-    AVR8_R10,
-    AVR8_R11,
-    AVR8_R12,
-    AVR8_R13,
-    AVR8_R14,
-    AVR8_R15,
-    AVR8_R16,
-    AVR8_R17,
-    AVR8_R18,
-    AVR8_R19,
-    AVR8_R20,
-    AVR8_R21,
-    AVR8_R22,
-    AVR8_R23,
-    AVR8_R24,
-    AVR8_R25,
-    AVR8_R26,
-    AVR8_R27,
-    AVR8_R28,
-    AVR8_R29,
-    AVR8_R30,
-    AVR8_R31,
-    AVR8_X,
-    AVR8_Y,
-    AVR8_Z,
-    AVR8_SP,
+	AVR8_SREG = 1,
+	AVR8_PC,
+	AVR8_R0,
+	AVR8_R1,
+	AVR8_R2,
+	AVR8_R3,
+	AVR8_R4,
+	AVR8_R5,
+	AVR8_R6,
+	AVR8_R7,
+	AVR8_R8,
+	AVR8_R9,
+	AVR8_R10,
+	AVR8_R11,
+	AVR8_R12,
+	AVR8_R13,
+	AVR8_R14,
+	AVR8_R15,
+	AVR8_R16,
+	AVR8_R17,
+	AVR8_R18,
+	AVR8_R19,
+	AVR8_R20,
+	AVR8_R21,
+	AVR8_R22,
+	AVR8_R23,
+	AVR8_R24,
+	AVR8_R25,
+	AVR8_R26,
+	AVR8_R27,
+	AVR8_R28,
+	AVR8_R29,
+	AVR8_R30,
+	AVR8_R31,
+	AVR8_X,
+	AVR8_Y,
+	AVR8_Z,
+	AVR8_SP,
 };
 
 enum
 {
-    AVR8_INT_RESET = 0,
-    AVR8_INT_INT0,
-    AVR8_INT_INT1,
-    AVR8_INT_PCINT0,
-    AVR8_INT_PCINT1,
-    AVR8_INT_PCINT2,
-    AVR8_INT_WDT,
-    AVR8_INT_T2COMPA,
-    AVR8_INT_T2COMPB,
-    AVR8_INT_T2OVF,
-    AVR8_INT_T1CAPT,
-    AVR8_INT_T1COMPA,
-    AVR8_INT_T1COMPB,
-    AVR8_INT_T1OVF,
-    AVR8_INT_T0COMPA,
-    AVR8_INT_T0COMPB,
-    AVR8_INT_T0OVF,
-    AVR8_INT_SPI_STC,
-    AVR8_INT_USART_RX,
-    AVR8_INT_USART_UDRE,
-    AVR8_INT_USART_TX,
-    AVR8_INT_ADC,
-    AVR8_INT_EE_RDY,
-    AVR8_INT_ANALOG_COMP,
-    AVR8_INT_TWI,
-    AVR8_INT_SPM_RDY,
+	AVR8_INT_RESET = 0,
+	AVR8_INT_INT0,
+	AVR8_INT_INT1,
+	AVR8_INT_PCINT0,
+	AVR8_INT_PCINT1,
+	AVR8_INT_PCINT2,
+	AVR8_INT_WDT,
+	AVR8_INT_T2COMPA,
+	AVR8_INT_T2COMPB,
+	AVR8_INT_T2OVF,
+	AVR8_INT_T1CAPT,
+	AVR8_INT_T1COMPA,
+	AVR8_INT_T1COMPB,
+	AVR8_INT_T1OVF,
+	AVR8_INT_T0COMPA,
+	AVR8_INT_T0COMPB,
+	AVR8_INT_T0OVF,
+	AVR8_INT_SPI_STC,
+	AVR8_INT_USART_RX,
+	AVR8_INT_USART_UDRE,
+	AVR8_INT_USART_TX,
+	AVR8_INT_ADC,
+	AVR8_INT_EE_RDY,
+	AVR8_INT_ANALOG_COMP,
+	AVR8_INT_TWI,
+	AVR8_INT_SPM_RDY,
 
 	// ATMEGA644
-    ATMEGA644_INT_RESET	= 0,
-    ATMEGA644_INT_INT0,
-    ATMEGA644_INT_INT1,
-    ATMEGA644_INT_INT2,
-    ATMEGA644_INT_PCINT0,
-    ATMEGA644_INT_PCINT1,
-    ATMEGA644_INT_PCINT2,
-    ATMEGA644_INT_PCINT3,
-    ATMEGA644_INT_WDT,
-    ATMEGA644_INT_T2COMPA,
-    ATMEGA644_INT_T2COMPB,
-    ATMEGA644_INT_T2OVF,
-    ATMEGA644_INT_T1CAPT,
-    ATMEGA644_INT_T1COMPA,
-    ATMEGA644_INT_T1COMPB,
-    ATMEGA644_INT_T1OVF,
-    ATMEGA644_INT_T0COMPA,
-    ATMEGA644_INT_T0COMPB,
-    ATMEGA644_INT_T0OVF,
-    ATMEGA644_INT_SPI_STC,
-    ATMEGA644_INT_USART_RX,
-    ATMEGA644_INT_USART_UDRE,
-    ATMEGA644_INT_USART_TX,
-    ATMEGA644_INT_ADC,
-    ATMEGA644_INT_EE_RDY,
-    ATMEGA644_INT_ANALOG_COMP,
-    ATMEGA644_INT_TWI,
-    ATMEGA644_INT_SPM_RDY,
+	ATMEGA644_INT_RESET = 0,
+	ATMEGA644_INT_INT0,
+	ATMEGA644_INT_INT1,
+	ATMEGA644_INT_INT2,
+	ATMEGA644_INT_PCINT0,
+	ATMEGA644_INT_PCINT1,
+	ATMEGA644_INT_PCINT2,
+	ATMEGA644_INT_PCINT3,
+	ATMEGA644_INT_WDT,
+	ATMEGA644_INT_T2COMPA,
+	ATMEGA644_INT_T2COMPB,
+	ATMEGA644_INT_T2OVF,
+	ATMEGA644_INT_T1CAPT,
+	ATMEGA644_INT_T1COMPA,
+	ATMEGA644_INT_T1COMPB,
+	ATMEGA644_INT_T1OVF,
+	ATMEGA644_INT_T0COMPA,
+	ATMEGA644_INT_T0COMPB,
+	ATMEGA644_INT_T0OVF,
+	ATMEGA644_INT_SPI_STC,
+	ATMEGA644_INT_USART_RX,
+	ATMEGA644_INT_USART_UDRE,
+	ATMEGA644_INT_USART_TX,
+	ATMEGA644_INT_ADC,
+	ATMEGA644_INT_EE_RDY,
+	ATMEGA644_INT_ANALOG_COMP,
+	ATMEGA644_INT_TWI,
+	ATMEGA644_INT_SPM_RDY,
 };
 
 // Used by I/O register handling
@@ -518,21 +518,21 @@ enum
 	AVR8_INTIDX_COUNT,
 };
 
-#define AVR8_EECR_EERE			0x01
+#define AVR8_EECR_EERE          0x01
 
-#define AVR8_EEARH_MASK			0x01
+#define AVR8_EEARH_MASK         0x01
 
-#define AVR8_SPSR_SPIF_MASK		0x80
-#define AVR8_SPSR_SPIF_SHIFT	7
-#define AVR8_SPSR_SPR2X_MASK	0x01
+#define AVR8_SPSR_SPIF_MASK     0x80
+#define AVR8_SPSR_SPIF_SHIFT    7
+#define AVR8_SPSR_SPR2X_MASK    0x01
 
-#define AVR8_SPCR_SPIE_MASK		0x80
-#define AVR8_SPCR_SPE_MASK		0x40
-#define AVR8_SPCR_DORD_MASK		0x20
-#define AVR8_SPCR_MSTR_MASK		0x10
-#define AVR8_SPCR_CPOL_MASK		0x08
-#define AVR8_SPCR_CPHA_MASK		0x04
-#define AVR8_SPCR_SPR_MASK		0x03
+#define AVR8_SPCR_SPIE_MASK     0x80
+#define AVR8_SPCR_SPE_MASK      0x40
+#define AVR8_SPCR_DORD_MASK     0x20
+#define AVR8_SPCR_MSTR_MASK     0x10
+#define AVR8_SPCR_CPOL_MASK     0x08
+#define AVR8_SPCR_CPHA_MASK     0x04
+#define AVR8_SPCR_SPR_MASK      0x03
 
 CPU_DISASSEMBLE( avr8 );
 

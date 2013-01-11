@@ -14,8 +14,8 @@
 
 #define PRINT(x) mame_printf_info x
 
-#define LOG(x)	do { if (VERBOSE > 0) logerror x; } while (0)
-#define VLOG(x)	do { if (VERBOSE > 1) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE > 0) logerror x; } while (0)
+#define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)
 
 
 
@@ -317,13 +317,13 @@ static WRITE8_HANDLER( to7_5p14_w )
 			wd17xx_set_drive( fdc, drive );
 			wd17xx_set_side( fdc, side );
 			LOG(( "%f $%04x to7_5p14_w: $%02X set drive=%i side=%i density=%s\n",
-			      space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(),
-			      data, drive, side, (BIT(data, 7) ? "FM" : "MFM")));
+					space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(),
+					data, drive, side, (BIT(data, 7) ? "FM" : "MFM")));
 		}
 	}
 	else
 		logerror ( "%f $%04x to7_5p14_w: invalid write offset %i (data=$%02X)\n",
-			   space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
 }
 
 
@@ -410,12 +410,12 @@ static WRITE8_HANDLER( to7_5p14sd_w )
 			mc6843_set_drive( space.machine().device("mc6843"), drive );
 			mc6843_set_side( space.machine().device("mc6843"), side );
 			LOG(( "%f $%04x to7_5p14sd_w: $%02X set drive=%i side=%i\n",
-			      space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data, drive, side ));
+					space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data, drive, side ));
 		}
 	}
 	else
 		logerror ( "%f $%04x to7_5p14sd_w: invalid write offset %i (data=$%02X)\n",
-			   space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
 }
 
 static void to7_5p14_index_pulse_callback( device_t *controller,device_t *image, int state )
@@ -565,13 +565,13 @@ static void to7_qdd_stat_update( running_machine &machine )
 	/* irq update */
 
 	if ( ( (to7qdd->ctrl1 & QDD_C1_RIE) && !(to7qdd->status & QDD_S_RDA ) ) ||
-	     ( (to7qdd->ctrl1 & QDD_C1_TIE) && !(to7qdd->status & QDD_S_TDRA) ) ||
-	     ( (to7qdd->ctrl2 & QDD_C2_EIE) && !(to7qdd->status & QDD_S_ERR ) ) )
+			( (to7qdd->ctrl1 & QDD_C1_TIE) && !(to7qdd->status & QDD_S_TDRA) ) ||
+			( (to7qdd->ctrl2 & QDD_C2_EIE) && !(to7qdd->status & QDD_S_ERR ) ) )
 		to7qdd->status &= ~QDD_S_IRQ;
 
 	if ( ( (to7qdd->ctrl1 & QDD_C1_RIE) && (to7qdd->status & QDD_S_RDA ) ) ||
-	     ( (to7qdd->ctrl1 & QDD_C1_TIE) && (to7qdd->status & QDD_S_TDRA) ) ||
-	     ( (to7qdd->ctrl2 & QDD_C2_EIE) && (to7qdd->status & QDD_S_ERR ) ) )
+			( (to7qdd->ctrl1 & QDD_C1_TIE) && (to7qdd->status & QDD_S_TDRA) ) ||
+			( (to7qdd->ctrl2 & QDD_C2_EIE) && (to7qdd->status & QDD_S_ERR ) ) )
 		to7qdd->status |= QDD_S_IRQ;
 }
 
@@ -594,8 +594,8 @@ static UINT8 to7_qdd_read_byte( running_machine &machine )
 		data = to7qdd->data[ to7qdd->data_idx ];
 
 	VLOG(( "%f $%04x to7_qdd_read_byte: RDATA off=%i/%i data=$%02X\n",
-	       machine.time().as_double(), machine.device("maincpu")->safe_pcbase(),
-	       to7qdd->data_idx, to7qdd->data_size, data ));
+			machine.time().as_double(), machine.device("maincpu")->safe_pcbase(),
+			to7qdd->data_idx, to7qdd->data_size, data ));
 
 	to7qdd->data_idx++;
 	to7qdd->start_idx = to7qdd->data_idx;
@@ -622,8 +622,8 @@ static void to7_qdd_write_byte( running_machine &machine, UINT8 data )
 	}
 
 	if ( ( to7qdd->start_idx != to7qdd->data_idx || /* field in construction */
-	       data==0xA5 || data==0x5A ) &&    /* first byte of tentative field */
-	     to7qdd->data_idx <to7qdd->data_size )
+			data==0xA5 || data==0x5A ) &&    /* first byte of tentative field */
+			to7qdd->data_idx <to7qdd->data_size )
 	{
 
 		/* this is the first byte of the field */
@@ -640,8 +640,8 @@ static void to7_qdd_write_byte( running_machine &machine, UINT8 data )
 
 		/* end of tentative id field */
 		if ( to7qdd->data_idx == to7qdd->start_idx + 4 &&
-		     to7qdd->data[ to7qdd->start_idx ] == 0xA5 &&
-		     to7qdd->data[ to7qdd->start_idx + 3 ] == to7qdd->data_crc )
+				to7qdd->data[ to7qdd->start_idx ] == 0xA5 &&
+				to7qdd->data[ to7qdd->start_idx + 3 ] == to7qdd->data_crc )
 		{
 
 			/* got an id field => format */
@@ -649,27 +649,27 @@ static void to7_qdd_write_byte( running_machine &machine, UINT8 data )
 			UINT8 filler = 0xff;
 
 			LOG(( "%f $%04x to7_qdd_write_byte: got id field for sector=%i\n",
-			      machine.time().as_double(), machine.device("maincpu")->safe_pcbase(), sector ));
+					machine.time().as_double(), machine.device("maincpu")->safe_pcbase(), sector ));
 
 			floppy_drive_format_sector( to7_qdd_image(machine),
-						    0, sector, 0, 0, sector, 128, filler );
-                        thom_floppy_active( machine, 1 );
+							0, sector, 0, 0, sector, 128, filler );
+						thom_floppy_active( machine, 1 );
 			to7qdd->start_idx = to7qdd->data_idx;
 		}
 
 		/* end of tentative data field */
 		else if ( to7qdd->data_idx == to7qdd->start_idx + 130 &&
-			  to7qdd->data[ to7qdd->start_idx  ] == 0x5A &&
-			  to7qdd->data[ to7qdd->start_idx + 129 ] == to7qdd->data_crc )
+				to7qdd->data[ to7qdd->start_idx  ] == 0x5A &&
+				to7qdd->data[ to7qdd->start_idx + 129 ] == to7qdd->data_crc )
 		{
 
 			/* look backwards for previous id field */
 			for ( i = to7qdd->start_idx - 3; i >= 0; i-- )
 			{
 				if ( to7qdd->data[ i ] == 0xA5 &&
-				     ( ( to7qdd->data[ i ] + to7qdd->data[ i + 1 ] +
-					 to7qdd->data[ i + 2 ] ) & 0xff
-					     ) == to7qdd->data[ i + 3 ] )
+						( ( to7qdd->data[ i ] + to7qdd->data[ i + 1 ] +
+						to7qdd->data[ i + 2 ] ) & 0xff
+							) == to7qdd->data[ i + 3 ] )
 					break;
 			}
 
@@ -679,10 +679,10 @@ static void to7_qdd_write_byte( running_machine &machine, UINT8 data )
 				int sector = (int) to7qdd->data[ i + 1 ] * 256 + (int) to7qdd->data[ i + 2 ];
 
 				LOG(( "%f $%04x to7_qdd_write_byte: goto data field for sector=%i\n",
-				      machine.time().as_double(), machine.device("maincpu")->safe_pcbase(), sector ));
+						machine.time().as_double(), machine.device("maincpu")->safe_pcbase(), sector ));
 
 				floppy_drive_write_sector_data( to7_qdd_image(machine), 0, sector, to7qdd->data + to7qdd->start_idx + 1, 128, 0 );
-                                thom_floppy_active( machine, 1 );
+								thom_floppy_active( machine, 1 );
 			}
 
 			to7qdd->start_idx = to7qdd->data_idx;
@@ -702,14 +702,14 @@ static READ8_HANDLER ( to7_qdd_r )
 	case 0: /* MC6852 status */
 		to7_qdd_stat_update(space.machine());
 		VLOG(( "%f $%04x to7_qdd_r: STAT=$%02X irq=%i pe=%i ovr=%i und=%i tr=%i rd=%i ncts=%i\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), to7qdd->status,
-		       to7qdd->status & QDD_S_IRQ  ? 1 : 0,
-		       to7qdd->status & QDD_S_PE   ? 1 : 0,
-		       to7qdd->status & QDD_S_OVR  ? 1 : 0,
-		       to7qdd->status & QDD_S_TUF  ? 1 : 0,
-		       to7qdd->status & QDD_S_TDRA ? 1 : 0,
-		       to7qdd->status & QDD_S_RDA  ? 1 : 0,
-		       to7qdd->status & QDD_S_NCTS ? 1 : 0 ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), to7qdd->status,
+				to7qdd->status & QDD_S_IRQ  ? 1 : 0,
+				to7qdd->status & QDD_S_PE   ? 1 : 0,
+				to7qdd->status & QDD_S_OVR  ? 1 : 0,
+				to7qdd->status & QDD_S_TUF  ? 1 : 0,
+				to7qdd->status & QDD_S_TDRA ? 1 : 0,
+				to7qdd->status & QDD_S_RDA  ? 1 : 0,
+				to7qdd->status & QDD_S_NCTS ? 1 : 0 ));
 		return to7qdd->status;
 
 	case 1: /* MC6852 data input => read byte from disk */
@@ -752,12 +752,12 @@ static WRITE8_HANDLER( to7_qdd_w )
 		to7qdd->ctrl1 = ( data & ~(QDD_C1_RRESET | QDD_C1_TRESET) ) |( data &  (QDD_C1_RRESET | QDD_C1_TRESET) & to7qdd->ctrl1 );
 		to7_qdd_stat_update(space.machine());
 		VLOG(( "%f $%04x to7_qdd_w: CTRL1=$%02X reset=%c%c %s%sirq=%c%c\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-		       data & QDD_C1_RRESET ? 'r' : '-', data & QDD_C1_TRESET ? 't' : '-',
-		       data & QDD_C1_STRIPSYNC ? "strip-sync " : "",
-		       data & QDD_C1_CLRSYNC ? "clear-sync " : "",
-		       data & QDD_C1_RIE ? 'r' : '-',
-		       data & QDD_C1_TIE ? 't' : '-' ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+				data & QDD_C1_RRESET ? 'r' : '-', data & QDD_C1_TRESET ? 't' : '-',
+				data & QDD_C1_STRIPSYNC ? "strip-sync " : "",
+				data & QDD_C1_CLRSYNC ? "clear-sync " : "",
+				data & QDD_C1_RIE ? 'r' : '-',
+				data & QDD_C1_TIE ? 't' : '-' ));
 		break;
 
 	case 1:
@@ -776,10 +776,10 @@ static WRITE8_HANDLER( to7_qdd_w )
 			parity = par[ (data >> 3) & 7 ];
 			to7_qdd_stat_update(space.machine());
 			VLOG(( "%f $%04x to7_qdd_w: CTRL2=$%02X bits=%i par=%s blen=%i under=%s%s\n",
-			       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-			       bits, parname[ parity ], data & QDD_C2_BLEN ? 1 : 2,
-			       data & QDD_C2_TSYNC ? "sync" : "ff",
-			       data & QDD_C2_EIE ? "irq-err" : "" ));
+					space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+					bits, parname[ parity ], data & QDD_C2_BLEN ? 1 : 2,
+					data & QDD_C2_TSYNC ? "sync" : "ff",
+					data & QDD_C2_EIE ? "irq-err" : "" ));
 #endif
 			to7qdd->ctrl2 = data;
 			break;
@@ -794,11 +794,11 @@ static WRITE8_HANDLER( to7_qdd_w )
 				to7qdd->status &= ~QDD_S_NCTS;
 			to7_qdd_stat_update(space.machine());
 			VLOG(( "%f $%04x to7_qdd_w: CTRL3=$%02X %s%ssync-len=%i sync-mode=%s\n",
-			       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-			       data & QDD_C3_CLRTUF ? "clr-tuf " : "",
-			       data & QDD_C3_CLRCTS ? "clr-cts " : "",
-			       data & QDD_C3_SYNCLEN ? 1 : 2,
-			       data & QDD_C3_SYNCMODE ? "ext" : "int" ));
+					space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+					data & QDD_C3_CLRTUF ? "clr-tuf " : "",
+					data & QDD_C3_CLRCTS ? "clr-cts " : "",
+					data & QDD_C3_SYNCLEN ? 1 : 2,
+					data & QDD_C3_SYNCMODE ? "ext" : "int" ));
 			break;
 
 		case 2: /* MC6852 sync code => write byte to disk */
@@ -911,7 +911,7 @@ struct thmfc1_t
 
 	UINT8   op;
 	UINT8   sector;            /* target sector, in [1,16] */
-        UINT32  sector_id;
+		UINT32  sector_id;
 	UINT8   track;             /* current track, in [0,79] */
 	UINT8   side;              /* current side, 0 or 1 */
 	UINT8   drive;             /* 0 to 3 */
@@ -998,9 +998,9 @@ static int thmfc_floppy_find_sector ( running_machine &machine, chrn_id* dst )
 		if ( floppy_drive_get_next_id( img, thmfc1->side, &id ) )
 		{
 			if ( id.C == thmfc1->track &&
-			     id.R == thmfc1->sector &&
-			     (128 << id.N) == thmfc1->sector_size
-			     /* check side ?  id.H == thmfc1->side */ )
+					id.R == thmfc1->sector &&
+					(128 << id.N) == thmfc1->sector_size
+					/* check side ?  id.H == thmfc1->side */ )
 			{
 				if ( dst )
 					memcpy( dst, &id, sizeof( chrn_id ) );
@@ -1025,14 +1025,14 @@ static int thmfc_floppy_find_sector ( running_machine &machine, chrn_id* dst )
 static void thmfc_floppy_cmd_complete( running_machine &machine )
 {
 	LOG (( "%f thmfc_floppy_cmd_complete_cb: cmd=%i off=%i/%i/%i\n",
-	       machine.time().as_double(), thmfc1->op, thmfc1->data_idx,
-	       thmfc1->data_finish - 1, thmfc1->data_size - 1 ));
+			machine.time().as_double(), thmfc1->op, thmfc1->data_idx,
+			thmfc1->data_finish - 1, thmfc1->data_size - 1 ));
 
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT )
 	{
 		device_t * img = thmfc_floppy_image(machine);
 		floppy_drive_write_sector_data( img, thmfc1->side, thmfc1->sector_id, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
-                thom_floppy_active( machine, 1 );
+				thom_floppy_active( machine, 1 );
 	}
 	thmfc1->op = THMFC1_OP_RESET;
 	thmfc1->stat0 |= THMFC1_STAT0_FINISHED;
@@ -1056,9 +1056,9 @@ static UINT8 thmfc_floppy_read_byte ( running_machine &machine )
 	UINT8 data = thmfc1->data[ thmfc1->data_idx ];
 
 	VLOG(( "%f $%04x thmfc_floppy_read_byte: off=%i/%i/%i data=$%02X\n",
-	       machine.time().as_double(), machine.device("maincpu")->safe_pcbase(),
-	       thmfc1->data_idx, thmfc1->data_finish - 1, thmfc1->data_size - 1,
-	       data ));
+			machine.time().as_double(), machine.device("maincpu")->safe_pcbase(),
+			thmfc1->data_idx, thmfc1->data_finish - 1, thmfc1->data_size - 1,
+			data ));
 
 	if ( thmfc1->data_idx >= thmfc1->data_size - 1 )
 		thmfc_floppy_cmd_complete( machine );
@@ -1099,8 +1099,8 @@ static UINT8 thmfc_floppy_raw_read_byte ( running_machine &machine )
 		data = thmfc1->data[ thmfc1->data_raw_idx ];
 
 	VLOG(( "%f $%04x thmfc_floppy_raw_read_byte: off=%i/%i data=$%02X\n",
-	       machine.time().as_double(), machine.device("maincpu")->safe_pcbase(),
-	       thmfc1->data_raw_idx, thmfc1->data_raw_size, data ));
+			machine.time().as_double(), machine.device("maincpu")->safe_pcbase(),
+			thmfc1->data_raw_idx, thmfc1->data_raw_size, data ));
 
 	thmfc1->data_raw_idx++;
 
@@ -1115,8 +1115,8 @@ static void thmfc_floppy_qdd_write_byte ( running_machine &machine, UINT8 data )
 	int i;
 
 	if ( thmfc1->formatting &&
-	     ( thmfc1->data_idx || data==0xA5 || data==0x5A ) &&
-	     thmfc1->data_raw_idx < THOM_MAXBUF )
+			( thmfc1->data_idx || data==0xA5 || data==0x5A ) &&
+			thmfc1->data_raw_idx < THOM_MAXBUF )
 	{
 
 		if ( ! thmfc1->data_raw_size )
@@ -1141,8 +1141,8 @@ static void thmfc_floppy_qdd_write_byte ( running_machine &machine, UINT8 data )
 			thmfc1->data_idx,thmfc1->data_raw_idx ));
 
 		if ( thmfc1->data_raw_idx == thmfc1->data_idx + 3 &&
-		     thmfc1->data[ thmfc1->data_idx - 1 ] == 0xA5 &&
-		     thmfc1->data[ thmfc1->data_idx + 2 ] == thmfc1->data_crc )
+				thmfc1->data[ thmfc1->data_idx - 1 ] == 0xA5 &&
+				thmfc1->data[ thmfc1->data_idx + 2 ] == thmfc1->data_crc )
 		{
 
 			/* got an id field => format */
@@ -1152,22 +1152,22 @@ static void thmfc_floppy_qdd_write_byte ( running_machine &machine, UINT8 data )
 			LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: id field, sector=%i\n", machine.time().as_double(), machine.device("maincpu")->safe_pcbase(), sector ));
 
 			floppy_drive_format_sector( thmfc_floppy_image(machine), 0, sector, 0, 0, sector, 128, filler );
-                        thom_floppy_active( machine, 1 );
+						thom_floppy_active( machine, 1 );
 			thmfc1->data_idx = 0;
 		}
 
 		else if ( thmfc1->data_raw_idx == thmfc1->data_idx + 129 &&
-			  thmfc1->data[ thmfc1->data_idx -   1 ] == 0x5A &&
-			  thmfc1->data[ thmfc1->data_idx + 128 ] == thmfc1->data_crc )
+				thmfc1->data[ thmfc1->data_idx -   1 ] == 0x5A &&
+				thmfc1->data[ thmfc1->data_idx + 128 ] == thmfc1->data_crc )
 		{
 
 			/* look backwards for previous id field */
 			for ( i = thmfc1->data_idx - 4; i >= 0; i-- )
 			{
 				if ( thmfc1->data[ i ] == 0xA5 &&
-				     ( ( thmfc1->data[ i ] + thmfc1->data[ i + 1 ] +
-					 thmfc1->data[ i + 2 ] ) & 0xff
-					     ) == thmfc1->data[ i + 3 ] )
+						( ( thmfc1->data[ i ] + thmfc1->data[ i + 1 ] +
+						thmfc1->data[ i + 2 ] ) & 0xff
+							) == thmfc1->data[ i + 3 ] )
 					break;
 			}
 
@@ -1179,10 +1179,10 @@ static void thmfc_floppy_qdd_write_byte ( running_machine &machine, UINT8 data )
 					(int) thmfc1->data[ i + 2 ];
 
 				LOG(( "%f $%04x thmfc_floppy_qdd_write_byte: data field, sector=%i\n",
-				      machine.time().as_double(), machine.device("maincpu")->safe_pcbase(), sector ));
+						machine.time().as_double(), machine.device("maincpu")->safe_pcbase(), sector ));
 
 				floppy_drive_write_sector_data( img, 0, sector, thmfc1->data + thmfc1->data_idx, 128, 0 );
-                                thom_floppy_active( machine, 1 );
+								thom_floppy_active( machine, 1 );
 			}
 
 			thmfc1->data_idx = 0;
@@ -1241,12 +1241,12 @@ static void thmfc_floppy_format_byte ( running_machine &machine, UINT8 data )
 				UINT8 sector = thmfc1->data[6];
 				UINT8 length = thmfc1->data[7]; /* actually, log length */
 				UINT8 filler = 0xe5;            /* standard Thomson filler */
-                                chrn_id id;
-                                if ( thmfc_floppy_find_sector( machine, &id ) )
-                                {
-                                        floppy_drive_format_sector( img, side, thmfc1->sector_id, track, thmfc1->side, sector, length, filler );
-                                        thom_floppy_active( machine, 1 );
-                                }
+								chrn_id id;
+								if ( thmfc_floppy_find_sector( machine, &id ) )
+								{
+										floppy_drive_format_sector( img, side, thmfc1->sector_id, track, thmfc1->side, sector, length, filler );
+										thom_floppy_active( machine, 1 );
+								}
 			}
 
 			thmfc1->data_idx = 0;
@@ -1337,10 +1337,10 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		chrn_id id;
 		thmfc1->formatting = (data >> 2) & 1;
 		LOG (( "%f $%04x thmfc_floppy_w: CMD0=$%02X dens=%s wsync=%i dsync=%i fmt=%i op=%i\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-		       (BIT(data, 5) ? "FM" : "MFM"),
-		       wsync, (data >> 3) & 1,
-		       thmfc1->formatting, data & 3 ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+				(BIT(data, 5) ? "FM" : "MFM"),
+				wsync, (data >> 3) & 1,
+				thmfc1->formatting, data & 3 ));
 
 		/* abort previous command, if any */
 		thmfc1->op = THMFC1_OP_RESET;
@@ -1358,7 +1358,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				logerror( "thmfc_floppy_w: smart operation 1 not supported for QDD\n" );
 			else if ( thmfc_floppy_find_sector( space.machine(), &id ) )
 			{
-                                thmfc1->sector_id = id.data_id;
+								thmfc1->sector_id = id.data_id;
 				thmfc1->data_idx = 0;
 				thmfc1->data_size = thmfc1->sector_size + 3; /* A1 A1 FB <data> */
 				thmfc1->data_finish = thmfc1->sector_size + 3;
@@ -1423,13 +1423,13 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		if ( thmfc1->sector_size > 256 )
 		{
 			logerror( "$%04x thmfc_floppy_w: sector size %i > 256 not handled\n",
-				  space.machine().device("maincpu")->safe_pcbase(), thmfc1->sector_size );
+					space.machine().device("maincpu")->safe_pcbase(), thmfc1->sector_size );
 			thmfc1->sector_size = 256;
 		}
 
 		LOG (( "%f $%04x thmfc_floppy_w: CMD1=$%02X sect-size=%i comp=%i head=%i\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-		       thmfc1->sector_size, (data >> 1) & 7, thmfc1->side ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+				thmfc1->sector_size, (data >> 1) & 7, thmfc1->side ));
 		break;
 
 
@@ -1451,14 +1451,14 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 				seek = (data & 0x20) ? 1 : -1;
 			motor =  (data >> 2) & 1;
 			thmfc1->drive |= 1 ^ ((data >> 6) & 1);
-                        img = thmfc_floppy_image(space.machine());
+						img = thmfc_floppy_image(space.machine());
 		}
 
 		thom_floppy_active( space.machine(), 0 );
 
 		LOG (( "%f $%04x thmfc_floppy_w: CMD2=$%02X drv=%i step=%i motor=%i\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-		       thmfc1->drive, seek, motor ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+				thmfc1->drive, seek, motor ));
 
 		if ( seek )
 		{
@@ -1467,9 +1467,9 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		}
 
 		/* in real life, to keep the motor running, it is sufficient to
-           set motor to 1 every few seconds.
-           instead of counting, we assume the motor is always running...
-        */
+		   set motor to 1 every few seconds.
+		   instead of counting, we assume the motor is always running...
+		*/
 		motor_on = CLEAR_LINE /* motor */;
 		floppy_mon_w(img, motor_on);
 	}
@@ -1488,7 +1488,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		{
 			/* TODO: implement other forms of raw track writing */
 			LOG (( "%f $%04x thmfc_floppy_w: ignored raw WDATA $%02X\n",
-			       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data ));
+					space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data ));
 		}
 		break;
 
@@ -1496,32 +1496,32 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 	case 4: /* WCLK (unemulated) */
 		/* clock configuration: FF for data, 0A for synchro */
 		LOG (( "%f $%04x thmfc_floppy_w: WCLK=$%02X (%s)\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-		       (data == 0xff) ? "data" : (data == 0x0A) ? "synchro" : "?" ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+				(data == 0xff) ? "data" : (data == 0x0A) ? "synchro" : "?" ));
 		break;
 
 	case 5: /* WSECT */
 		thmfc1->sector = data;
 		LOG (( "%f $%04x thmfc_floppy_w: WSECT=%i\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data ));
 		break;
 
 	case 6: /* WTRCK */
 		thmfc1->track = data;
 		LOG (( "%f $%04x thmfc_floppy_w: WTRCK=%i (real=%i)\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
-		       floppy_drive_get_current_track( thmfc_floppy_image(space.machine()) ) ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data,
+				floppy_drive_get_current_track( thmfc_floppy_image(space.machine()) ) ));
 		break;
 
 	case 7: /* WCELL */
 		/* precompensation (unemulated) */
 		LOG (( "%f $%04x thmfc_floppy_w: WCELL=$%02X\n",
-		       space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data ));
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), data ));
 		break;
 
 	default:
 		logerror ( "%f $%04x thmfc_floppy_w: invalid write offset %i (data=$%02X)\n",
-			   space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
 	}
 }
 
@@ -1683,8 +1683,8 @@ static void to7_network_got_frame( device_t *device, UINT8* data, int length )
 				name[i]=' ';
 		}
 		LOG(( "to7_network_got_frame: DKBOOT system=%s appli=\"%s\"\n",
-		      (data[10] == 0) ? "TO7" : (data[10] == 1) ? "MO5" :
-		      (data[10] == 2) ? "TO7/70" : "?", name ));
+				(data[10] == 0) ? "TO7" : (data[10] == 1) ? "MO5" :
+				(data[10] == 2) ? "TO7/70" : "?", name ));
 	}
 
 }
@@ -1738,7 +1738,7 @@ static WRITE8_HANDLER ( to7_network_w )
 	else
 	{
 		logerror( "%f $%04x to7_network_w: invalid write offset %i (data=$%02X)\n",
-			  space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
+				space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), offset, data );
 	}
 }
 

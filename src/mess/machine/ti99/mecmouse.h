@@ -31,16 +31,16 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	int 	m_last_select;
-	bool	m_read_y_axis;
-	int 	m_x;
-	int 	m_y;
-	int		m_x_buf;
-	int 	m_y_buf;
-	int 	m_last_mx;
-	int 	m_last_my;
-	void	device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	int     m_last_select;
+	bool    m_read_y_axis;
+	int     m_x;
+	int     m_y;
+	int     m_x_buf;
+	int     m_y_buf;
+	int     m_last_mx;
+	int     m_last_my;
+	void    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	emu_timer	*m_poll_timer;
+	emu_timer   *m_poll_timer;
 };
 #endif

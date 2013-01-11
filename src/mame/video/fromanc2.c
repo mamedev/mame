@@ -178,12 +178,12 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[0][0] = -(data - 0x000); break;
-		case 0x01:	m_scrolly[0][0] = -(data - 0x000); break;
-		case 0x02:	m_scrollx[0][1] = -(data - 0x004); break;
-		case 0x03:	m_scrolly[0][1] = -(data - 0x000); break;
+		case 0x00:  m_scrollx[0][0] = -(data - 0x000); break;
+		case 0x01:  m_scrolly[0][0] = -(data - 0x000); break;
+		case 0x02:  m_scrollx[0][1] = -(data - 0x004); break;
+		case 0x03:  m_scrolly[0][1] = -(data - 0x000); break;
 		// offset 0x04 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -191,12 +191,12 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_1_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[1][0] = -(data - 0x1be); break;
-		case 0x01:	m_scrolly[1][0] = -(data - 0x1ef); break;
-		case 0x02:	m_scrollx[1][1] = -(data - 0x1c2); break;
-		case 0x03:	m_scrolly[1][1] = -(data - 0x1ef); break;
+		case 0x00:  m_scrollx[1][0] = -(data - 0x1be); break;
+		case 0x01:  m_scrolly[1][0] = -(data - 0x1ef); break;
+		case 0x02:  m_scrollx[1][1] = -(data - 0x1c2); break;
+		case 0x03:  m_scrolly[1][1] = -(data - 0x1ef); break;
 		// offset 0x04 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -204,12 +204,12 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_2_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[0][2] = -(data - 0x1c0); break;
-		case 0x01:	m_scrolly[0][2] = -(data - 0x1ef); break;
-		case 0x02:	m_scrollx[0][3] = -(data - 0x1c3); break;
-		case 0x03:	m_scrolly[0][3] = -(data - 0x1ef); break;
+		case 0x00:  m_scrollx[0][2] = -(data - 0x1c0); break;
+		case 0x01:  m_scrolly[0][2] = -(data - 0x1ef); break;
+		case 0x02:  m_scrollx[0][3] = -(data - 0x1c3); break;
+		case 0x03:  m_scrolly[0][3] = -(data - 0x1ef); break;
 		// offset 0x04 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -217,12 +217,12 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_3_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[1][2] = -(data - 0x1bf); break;
-		case 0x01:	m_scrolly[1][2] = -(data - 0x1ef); break;
-		case 0x02:	m_scrollx[1][3] = -(data - 0x1c3); break;
-		case 0x03:	m_scrolly[1][3] = -(data - 0x1ef); break;
+		case 0x00:  m_scrollx[1][2] = -(data - 0x1bf); break;
+		case 0x01:  m_scrolly[1][2] = -(data - 0x1ef); break;
+		case 0x02:  m_scrollx[1][3] = -(data - 0x1c3); break;
+		case 0x03:  m_scrolly[1][3] = -(data - 0x1ef); break;
 		// offset 0x04 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -268,12 +268,12 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[0][0] = -(data - 0x1bf); break;
-		case 0x01:	m_scrolly[0][0] = -(data - 0x1ef); break;
-		case 0x02:	m_scrollx[1][0] = -(data - 0x1c3); break;
-		case 0x03:	m_scrolly[1][0] = -(data - 0x1ef); break;
+		case 0x00:  m_scrollx[0][0] = -(data - 0x1bf); break;
+		case 0x01:  m_scrolly[0][0] = -(data - 0x1ef); break;
+		case 0x02:  m_scrollx[1][0] = -(data - 0x1c3); break;
+		case 0x03:  m_scrolly[1][0] = -(data - 0x1ef); break;
 		// offset 0x04 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -281,12 +281,12 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_1_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[0][1] = -(data - 0x000); break;
-		case 0x01:	m_scrolly[0][1] = -(data - 0x000); break;
-		case 0x02:	m_scrollx[1][1] = -(data - 0x004); break;
-		case 0x03:	m_scrolly[1][1] = -(data - 0x000); break;
+		case 0x00:  m_scrollx[0][1] = -(data - 0x000); break;
+		case 0x01:  m_scrolly[0][1] = -(data - 0x000); break;
+		case 0x02:  m_scrollx[1][1] = -(data - 0x004); break;
+		case 0x03:  m_scrolly[1][1] = -(data - 0x000); break;
 		// offset 0x04 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -294,10 +294,10 @@ void fromancr_gfxbank_w( running_machine &machine, int data )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	state->m_gfxbank[0][0] = (data & 0x0010) >>  4;	// BG (1P)
-	state->m_gfxbank[0][1] = (data & 0xf000) >> 12;	// FG (1P)
-	state->m_gfxbank[1][0] = (data & 0x0008) >>  3;	// BG (2P)
-	state->m_gfxbank[1][1] = (data & 0x0f00) >>  8;	// FG (2P)
+	state->m_gfxbank[0][0] = (data & 0x0010) >>  4; // BG (1P)
+	state->m_gfxbank[0][1] = (data & 0xf000) >> 12; // FG (1P)
+	state->m_gfxbank[1][0] = (data & 0x0008) >>  3; // BG (2P)
+	state->m_gfxbank[1][1] = (data & 0x0f00) >>  8; // FG (2P)
 	state->m_tilemap[0][0]->mark_all_dirty();
 	state->m_tilemap[0][1]->mark_all_dirty();
 	state->m_tilemap[1][0]->mark_all_dirty();
@@ -322,17 +322,17 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[0][2] = -(data - 0xfbb); break;
-		case 0x01:	m_scrolly[0][2] = -(data - 0x1e4); break;
-		case 0x02:	m_scrollx[1][2] = -(data - 0xfbb); break;
-		case 0x03:	m_scrolly[1][2] = -(data - 0x1e4); break;
-		case 0x05:	m_gfxbank[0][2] = (data & 0x000f) >> 0;
+		case 0x00:  m_scrollx[0][2] = -(data - 0xfbb); break;
+		case 0x01:  m_scrolly[0][2] = -(data - 0x1e4); break;
+		case 0x02:  m_scrollx[1][2] = -(data - 0xfbb); break;
+		case 0x03:  m_scrolly[1][2] = -(data - 0x1e4); break;
+		case 0x05:  m_gfxbank[0][2] = (data & 0x000f) >> 0;
 				m_gfxbank[1][2] = (data & 0x0f00) >> 8;
 				m_tilemap[0][2]->mark_all_dirty();
 				m_tilemap[1][2]->mark_all_dirty();
 				break;
 		// offset 0x04, 0x06 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -340,17 +340,17 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_1_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[0][1] = -(data - 0xfba); break;
-		case 0x01:	m_scrolly[0][1] = -(data - 0x1e4); break;
-		case 0x02:	m_scrollx[1][1] = -(data - 0xfba); break;
-		case 0x03:	m_scrolly[1][1] = -(data - 0x1e4); break;
-		case 0x05:	m_gfxbank[0][1] = (data & 0x000f) >> 0;
+		case 0x00:  m_scrollx[0][1] = -(data - 0xfba); break;
+		case 0x01:  m_scrolly[0][1] = -(data - 0x1e4); break;
+		case 0x02:  m_scrollx[1][1] = -(data - 0xfba); break;
+		case 0x03:  m_scrolly[1][1] = -(data - 0x1e4); break;
+		case 0x05:  m_gfxbank[0][1] = (data & 0x000f) >> 0;
 				m_gfxbank[1][1] = (data & 0x0f00) >> 8;
 				m_tilemap[0][1]->mark_all_dirty();
 				m_tilemap[1][1]->mark_all_dirty();
 				break;
 		// offset 0x04, 0x06 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -358,17 +358,17 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_2_w)
 {
 	switch (offset)
 	{
-		case 0x00:	m_scrollx[0][0] = -(data - 0xfbb); break;
-		case 0x01:	m_scrolly[0][0] = -(data - 0x1e4); break;
-		case 0x02:	m_scrollx[1][0] = -(data - 0xfbb); break;
-		case 0x03:	m_scrolly[1][0] = -(data - 0x1e4); break;
-		case 0x05:	m_gfxbank[0][0] = (data & 0x000f) >> 0;
+		case 0x00:  m_scrollx[0][0] = -(data - 0xfbb); break;
+		case 0x01:  m_scrolly[0][0] = -(data - 0x1e4); break;
+		case 0x02:  m_scrollx[1][0] = -(data - 0xfbb); break;
+		case 0x03:  m_scrolly[1][0] = -(data - 0x1e4); break;
+		case 0x05:  m_gfxbank[0][0] = (data & 0x000f) >> 0;
 				m_gfxbank[1][0] = (data & 0x0f00) >> 8;
 				m_tilemap[0][0]->mark_all_dirty();
 				m_tilemap[1][0]->mark_all_dirty();
 				break;
 		// offset 0x04, 0x06 - 0x11 unknown
-		default:	break;
+		default:    break;
 	}
 }
 

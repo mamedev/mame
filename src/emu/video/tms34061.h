@@ -40,21 +40,21 @@ enum
 /* interface structure */
 struct tms34061_interface
 {
-	const char	*screen_tag;	/* the screen we are acting on */
-	UINT8		rowshift;		/* VRAM address is (row << rowshift) | col */
-	UINT32		vramsize;		/* size of video RAM */
-	void		(*interrupt)(running_machine &machine, int state);	/* interrupt gen callback */
+	const char  *screen_tag;    /* the screen we are acting on */
+	UINT8       rowshift;       /* VRAM address is (row << rowshift) | col */
+	UINT32      vramsize;       /* size of video RAM */
+	void        (*interrupt)(running_machine &machine, int state);  /* interrupt gen callback */
 };
 
 
 /* display state structure */
 struct tms34061_display
 {
-	UINT8	blanked;		/* true if blanked */
-	UINT8	*vram;			/* base of VRAM */
-	UINT8	*latchram;		/* base of latch RAM */
-	UINT16	*regs;			/* pointer to array of registers */
-	offs_t	dispstart;		/* display start */
+	UINT8   blanked;        /* true if blanked */
+	UINT8   *vram;          /* base of VRAM */
+	UINT8   *latchram;      /* base of latch RAM */
+	UINT16  *regs;          /* pointer to array of registers */
+	offs_t  dispstart;      /* display start */
 };
 
 

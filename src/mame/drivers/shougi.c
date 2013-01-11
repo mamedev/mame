@@ -143,10 +143,10 @@ void shougi_state::palette_init()
 	double weights_r[3], weights_g[3], weights_b[2];
 
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	1000, 0,
-			3,	resistances_rg,	weights_g,	1000, 0,
-			2,	resistances_b,	weights_b,	1000, 0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rg, weights_r,  1000, 0,
+			3,  resistances_rg, weights_g,  1000, 0,
+			2,  resistances_b,  weights_b,  1000, 0);
 
 	for (i = 0;i < machine().total_colors();i++)
 	{
@@ -184,13 +184,13 @@ UINT32 shougi_state::screen_update_shougi(screen_device &screen, bitmap_ind16 &b
 	{
 		int sx, sy, x, data1, data2, color, data;
 
-		sx = offs >> 8;		/*00..0x3f (64*4=256)*/
-		sy = offs & 0xff;	/*00..0xff*/
+		sx = offs >> 8;     /*00..0x3f (64*4=256)*/
+		sy = offs & 0xff;   /*00..0xff*/
 		//if (flipscreen[0]) sx = 31 - sx;
 		//if (flipscreen[1]) sy = 31 - sy;
 
-		data1 = m_videoram[offs];				/* color */
-		data2 = m_videoram[0x4000 + offs];	/* pixel data */
+		data1 = m_videoram[offs];               /* color */
+		data2 = m_videoram[0x4000 + offs];  /* pixel data */
 
 		for (x=0; x<4; x++) /*4 pixels per byte (2 bitplanes in 2 nibbles: 1st=bits 7-4, 2nd=bits 3-0)*/
 		{
@@ -288,7 +288,7 @@ INTERRUPT_GEN_MEMBER(shougi_state::shougi_vblank_nmi)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM		/* 2114 x 2 (0x400 x 4bit each) */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM     /* 2114 x 2 (0x400 x 4bit each) */
 
 	/* 4800-480f connected to the 74LS259, A3 is data line so 4800-4807 write 0, and 4808-480f write 1 */
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(cpu_shared_ctrl_sub_w)
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x4802, 0x4802) AM_NOP
 	AM_RANGE(0x4803, 0x4803) AM_NOP
 	AM_RANGE(0x4804, 0x4804) AM_WRITE(shougi_mcu_halt_off_w)
-	AM_RANGE(0x4807, 0x4807) AM_WRITENOP	//?????? connected to +5v via resistor
+	AM_RANGE(0x4807, 0x4807) AM_WRITENOP    //?????? connected to +5v via resistor
 	AM_RANGE(0x4808, 0x4808) AM_WRITE(cpu_shared_ctrl_main_w)
 	AM_RANGE(0x4809, 0x4809) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x480a, 0x480a) AM_NOP
@@ -305,13 +305,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x480f, 0x480f) AM_NOP
 
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
+	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(shougi_watchdog_reset_w)   /* game won't boot if watchdog doesn't work */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")	/* 4116 x 16 (32K) */
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")    /* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
 /* sub */
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-	MCFG_WATCHDOG_VBLANK_INIT(16)	// assuming it's the same as champbas
+	MCFG_WATCHDOG_VBLANK_INIT(16)   // assuming it's the same as champbas
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

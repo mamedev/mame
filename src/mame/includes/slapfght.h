@@ -17,14 +17,14 @@ class slapfght_state : public driver_device
 public:
 	slapfght_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_slapfight_videoram(*this, "videoram"),
-		  m_slapfight_colorram(*this, "colorram"),
-		  m_slapfight_fixvideoram(*this, "fixvideoram"),
-		  m_slapfight_fixcolorram(*this, "fixcolorram"),
-		  m_slapfight_scrollx_lo(*this, "scrollx_lo"),
-		  m_slapfight_scrollx_hi(*this, "scrollx_hi"),
-		  m_slapfight_scrolly(*this, "scrolly"),
-		  m_spriteram(*this, "spriteram") { }
+			m_slapfight_videoram(*this, "videoram"),
+			m_slapfight_colorram(*this, "colorram"),
+			m_slapfight_fixvideoram(*this, "fixvideoram"),
+			m_slapfight_fixcolorram(*this, "fixcolorram"),
+			m_slapfight_scrollx_lo(*this, "scrollx_lo"),
+			m_slapfight_scrollx_hi(*this, "scrollx_hi"),
+			m_slapfight_scrolly(*this, "scrolly"),
+			m_spriteram(*this, "spriteram") { }
 
 	int m_getstar_id;
 	required_shared_ptr<UINT8> m_slapfight_videoram;
@@ -136,10 +136,9 @@ public:
    register C is a unaltered copy of register A */
 
 #define GS_SAVE_REGS  m_gs_a = space.device().state().state_int(Z80_BC) >> 0; \
-                      m_gs_d = space.device().state().state_int(Z80_DE) >> 8; \
-                      m_gs_e = space.device().state().state_int(Z80_DE) >> 0;
+						m_gs_d = space.device().state().state_int(Z80_DE) >> 8; \
+						m_gs_e = space.device().state().state_int(Z80_DE) >> 0;
 
 #define GS_RESET_REGS m_gs_a = 0; \
-                      m_gs_d = 0; \
-                      m_gs_e = 0;
-
+						m_gs_d = 0; \
+						m_gs_e = 0;

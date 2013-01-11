@@ -8,7 +8,7 @@
 #include "iq151cart.h"
 #include "emuopts.h"
 
-#define  LOG	0
+#define  LOG    0
 
 
 /***************************************************************************
@@ -52,7 +52,7 @@ device_iq151cart_interface::~device_iq151cart_interface()
 //  iq151cart_slot_device - constructor
 //-------------------------------------------------
 iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, IQ151CART_SLOT, "IQ151 cartridge slot", tag, owner, clock),
+		device_t(mconfig, IQ151CART_SLOT, "IQ151 cartridge slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -103,7 +103,7 @@ void iq151cart_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq0_cb, 0, sizeof(m_out_irq0_cb));
+		memset(&m_out_irq0_cb, 0, sizeof(m_out_irq0_cb));
 		memset(&m_out_irq1_cb, 0, sizeof(m_out_irq1_cb));
 		memset(&m_out_irq2_cb, 0, sizeof(m_out_irq2_cb));
 		memset(&m_out_irq3_cb, 0, sizeof(m_out_irq3_cb));

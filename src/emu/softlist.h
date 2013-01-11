@@ -15,9 +15,9 @@
 
 
 
-#define SOFTWARE_SUPPORTED_YES		0
-#define SOFTWARE_SUPPORTED_PARTIAL	1
-#define SOFTWARE_SUPPORTED_NO		2
+#define SOFTWARE_SUPPORTED_YES      0
+#define SOFTWARE_SUPPORTED_PARTIAL  1
+#define SOFTWARE_SUPPORTED_NO       2
 
 enum softlist_type
 {
@@ -75,12 +75,12 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
 
 	// configuration state
-	const char *				m_list_name;
-	softlist_type				m_list_type;
-	const char *				m_filter;
+	const char *                m_list_name;
+	softlist_type               m_list_type;
+	const char *                m_filter;
 
 	// static state
-	static tagmap_t<UINT8>		s_checked_lists;
+	static tagmap_t<UINT8>      s_checked_lists;
 };
 
 
@@ -101,9 +101,9 @@ typedef device_type_iterator<&device_creator<software_list_device>, software_lis
 /* Replace this with list<string>? */
 struct feature_list
 {
-	feature_list	*next;
-	char			*name;
-	char			*value;
+	feature_list    *next;
+	char            *name;
+	char            *value;
 };
 
 struct software_part
@@ -121,16 +121,16 @@ struct software_info
 	const char *shortname;
 	const char *longname;
 	const char *parentname;
-	const char *year;			// Copyright year on title screen, actual release dates can be tracked in external resources
+	const char *year;           // Copyright year on title screen, actual release dates can be tracked in external resources
 	const char *publisher;
-	feature_list *other_info;	// Here we store info like developer, serial #, etc. which belong to the software entry as a whole
-	feature_list *shared_info;	// Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
+	feature_list *other_info;   // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
+	feature_list *shared_info;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
 								// by each part of this software entry (after loading these are stored in partdata->featurelist)
 	UINT32 supported;
 	int part_entries;
 	int current_part_entry;
 	software_part *partdata;
-	struct software_info *next;	// Used internally
+	struct software_info *next; // Used internally
 };
 
 
@@ -146,8 +146,8 @@ enum softlist_parse_position
 
 struct parse_state
 {
-	XML_Parser	parser;
-	int			done;
+	XML_Parser  parser;
+	int         done;
 
 	void (*error_proc)(const char *message);
 	void *param;
@@ -159,13 +159,13 @@ struct parse_state
 
 struct software_list
 {
-	emu_file	*file;
-	object_pool	*pool;
-	parse_state	state;
+	emu_file    *file;
+	object_pool *pool;
+	parse_state state;
 	const char *description;
-	struct software_info	*software_info_list;
-	struct software_info	*current_software_info;
-	software_info	*softinfo;
+	struct software_info    *software_info_list;
+	struct software_info    *current_software_info;
+	software_info   *softinfo;
 	const char *look_for;
 	int rom_entries;
 	int current_rom_entry;

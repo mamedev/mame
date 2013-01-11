@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( polyplay )
-	PORT_START("INPUT")	/* IN0 */
+	PORT_START("INPUT") /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -238,24 +238,24 @@ READ8_MEMBER(polyplay_state::polyplay_random_read)
 /* graphic structures */
 static const gfx_layout charlayout_1_bit =
 {
-	8,8,	/* 8*8 characters */
-	128,	/* 128 characters */
-	1,  	/* 1 bit per pixel */
+	8,8,    /* 8*8 characters */
+	128,    /* 128 characters */
+	1,      /* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout charlayout_3_bit =
 {
-	8,8,	/* 8*8 characters */
-	128,	/* 128 characters */
-	3,  	/* 3 bit per pixel */
+	8,8,    /* 8*8 characters */
+	128,    /* 128 characters */
+	3,      /* 3 bit per pixel */
 	{ 0, 128*8*8, 128*8*8 + 128*8*8 },    /* offset for each bitplane */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static GFXDECODE_START( polyplay )

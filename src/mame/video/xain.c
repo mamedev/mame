@@ -188,7 +188,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipy = !flipy;
 		}
 
-		if (attr & 0x80)	/* double height */
+		if (attr & 0x80)    /* double height */
 		{
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					numtile,

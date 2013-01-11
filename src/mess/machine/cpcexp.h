@@ -42,7 +42,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define CPC_EXP_SLOT_TAG		"cpcexp"
+#define CPC_EXP_SLOT_TAG        "cpcexp"
 
 
 
@@ -55,8 +55,8 @@
 
 
 #define MCFG_CPC_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, CPC_EXPANSION_SLOT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, CPC_EXPANSION_SLOT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -69,11 +69,11 @@
 
 struct cpc_expansion_slot_interface
 {
-    devcb_write_line	m_out_irq_cb;
-    devcb_write_line	m_out_nmi_cb;
-    devcb_write_line	m_out_reset_cb;
-    devcb_write_line	m_out_romdis_cb;
-    devcb_write_line	m_out_romen_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_reset_cb;
+	devcb_write_line    m_out_romdis_cb;
+	devcb_write_line    m_out_romen_cb;
 };
 
 
@@ -95,8 +95,8 @@ public:
 // ======================> cpc_expansion_slot_device
 
 class cpc_expansion_slot_device : public device_t,
-								  public cpc_expansion_slot_interface,
-								  public device_slot_interface
+									public cpc_expansion_slot_interface,
+									public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -115,11 +115,11 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_reset_func;
-    devcb_resolved_write_line	m_out_romdis_func;
-    devcb_resolved_write_line	m_out_romen_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_reset_func;
+	devcb_resolved_write_line   m_out_romdis_func;
+	devcb_resolved_write_line   m_out_romen_func;
 
 	device_cpc_expansion_card_interface *m_card;
 };

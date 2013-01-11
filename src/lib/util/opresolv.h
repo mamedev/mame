@@ -65,28 +65,28 @@ struct option_guide
 	const char *display_name;
 };
 
-#define OPTION_GUIDE_START(option_guide_)									\
-	const option_guide option_guide_[] =								\
-	{																		\
+#define OPTION_GUIDE_START(option_guide_)                                   \
+	const option_guide option_guide_[] =                                \
+	{                                                                       \
 
-#define OPTION_GUIDE_END													\
-		{ OPTIONTYPE_END }													\
-	};																		\
+#define OPTION_GUIDE_END                                                    \
+		{ OPTIONTYPE_END }                                                  \
+	};                                                                      \
 
-#define OPTION_GUIDE_EXTERN(option_guide_)									\
-	extern const option_guide option_guide_[]							\
+#define OPTION_GUIDE_EXTERN(option_guide_)                                  \
+	extern const option_guide option_guide_[]                           \
 
-#define OPTION_INT(option_char, identifier, display_name)					\
-		{ OPTIONTYPE_INT, (option_char), (identifier), (display_name) },	\
+#define OPTION_INT(option_char, identifier, display_name)                   \
+		{ OPTIONTYPE_INT, (option_char), (identifier), (display_name) },    \
 
-#define OPTION_STRING(option_char, identifier, display_name)				\
-	{ OPTIONTYPE_STRING, (option_char), (identifier), (display_name) },		\
+#define OPTION_STRING(option_char, identifier, display_name)                \
+	{ OPTIONTYPE_STRING, (option_char), (identifier), (display_name) },     \
 
-#define OPTION_ENUM_START(option_char, identifier, display_name)			\
-	{ OPTIONTYPE_ENUM_BEGIN, (option_char), (identifier), (display_name) },	\
+#define OPTION_ENUM_START(option_char, identifier, display_name)            \
+	{ OPTIONTYPE_ENUM_BEGIN, (option_char), (identifier), (display_name) }, \
 
-#define OPTION_ENUM(value, identifier, display_name)						\
-	{ OPTIONTYPE_ENUM_VALUE, (value), (identifier), (display_name) },		\
+#define OPTION_ENUM(value, identifier, display_name)                        \
+	{ OPTIONTYPE_ENUM_VALUE, (value), (identifier), (display_name) },       \
 
 #define OPTION_ENUM_END
 
@@ -156,4 +156,3 @@ int option_resolution_contains(const char *specification, int option_char);
 const char *option_resolution_error_string(optreserr_t err);
 
 #endif /* __OPRESOLV_H__ */
-

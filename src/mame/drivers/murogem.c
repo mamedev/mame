@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8, murogem_state )
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("IN1")
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(outport_w)	/* output port */
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(outport_w)    /* output port */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -161,7 +161,7 @@ static INPUT_PORTS_START( murogem )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Select Card 1")
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "Reset" )	// reduces credits to 0 and resets game??
+	PORT_DIPNAME( 0x01, 0x01, "Reset" ) // reduces credits to 0 and resets game??
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -230,22 +230,22 @@ UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
 static MACHINE_CONFIG_START( murogem, murogem_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 8000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", M6802, 8000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(murogem_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", murogem_state,  irq0_line_hold)
 
@@ -279,7 +279,7 @@ ROM_START( murogem )
 	ROM_LOAD( "a2.6e", 0x0000, 0x0400, CRC(86e053da) SHA1(b7cdddca273204513c818384860883bf54cf9434)  )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )	/* 74s288 at 1B */
+	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B */
 
 ROM_END
 
@@ -292,7 +292,7 @@ ROM_START( murogema )
 	ROM_LOAD( "poker.01", 0x0000, 0x0400, CRC(164d7443) SHA1(1421a3d32d1296a2544da16b51ade94a58e8ba03)  )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )	/* 74s288 at 1B. Originally named 6336.pkr */
+	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B. Originally named 6336.pkr */
 
 ROM_END
 
@@ -302,7 +302,7 @@ ROM_END
 ROM_START( murogemb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a1.8e", 0xf000, 0x0400, CRC(5b59417a) SHA1(2a2a92b3f8e703ee723ff47d133214e61af8e87d)  )
-	ROM_FILL(		   0xf400, 0x0400, 0xff ) /* filling the hole */
+	ROM_FILL(          0xf400, 0x0400, 0xff ) /* filling the hole */
 	ROM_LOAD( "a0.9e", 0xf800, 0x0800, CRC(14ef74fb) SHA1(09ae8156fc76c132cb456aefc1c07a4136d935b8)  )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
@@ -318,12 +318,12 @@ ROM_START( lasvegas )
 	ROM_LOAD( "pk8.8e", 0xf000, 0x0800, CRC(995bd527) SHA1(af96bd0118511b13a755925e3bf5138be61c09d8)  )
 	ROM_LOAD( "pk9.9e", 0xf800, 0x0800, CRC(2ab1556e) SHA1(cd7bd377b6a3f6c0f8df61b0da83e55468d599d6)  )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )	// the second half is filled of 0xff.
+	ROM_REGION( 0x0400, "gfx1", 0 ) // the second half is filled of 0xff.
 	ROM_LOAD( "pk6.6e", 0x0000, 0x0400, CRC(78a3593a) SHA1(96ba470f5b0dd6d490eadd09b4b6894e044c66b4)  )
 	ROM_IGNORE(                 0x0400)
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )	/* 74s288 at 1B */
+	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B */
 ROM_END
 
 GAME( 198?, murogem,  0,       murogem, murogem, driver_device, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", GAME_WRONG_COLORS )

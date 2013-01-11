@@ -17,23 +17,23 @@
 // 53CF96 register set
 enum
 {
-	REG_XFERCNTLOW = 0,	// read = current xfer count lo byte, write = set xfer count lo byte
-	REG_XFERCNTMID,		// read = current xfer count mid byte, write = set xfer count mid byte
-	REG_FIFO,		// read/write = FIFO
-	REG_COMMAND,		// read/write = command
+	REG_XFERCNTLOW = 0, // read = current xfer count lo byte, write = set xfer count lo byte
+	REG_XFERCNTMID,     // read = current xfer count mid byte, write = set xfer count mid byte
+	REG_FIFO,       // read/write = FIFO
+	REG_COMMAND,        // read/write = command
 
-	REG_STATUS,		// read = status, write = destination SCSI ID (4)
-	REG_IRQSTATE,		// read = IRQ status, write = timeout         (5)
-	REG_INTSTATE,		// read = internal state, write = sync xfer period (6)
-	REG_FIFOSTATE,		// read = FIFO status, write = sync offset
-	REG_CTRL1,		// read/write = control 1
-	REG_CLOCKFCTR,		// clock factor (write only)
-	REG_TESTMODE,		// test mode (write only)
-	REG_CTRL2,		// read/write = control 2
-	REG_CTRL3,		// read/write = control 3
-	REG_CTRL4,		// read/write = control 4
-	REG_XFERCNTHI,		// read = current xfer count hi byte, write = set xfer count hi byte
-	REG_DATAALIGN		// data alignment (write only)
+	REG_STATUS,     // read = status, write = destination SCSI ID (4)
+	REG_IRQSTATE,       // read = IRQ status, write = timeout         (5)
+	REG_INTSTATE,       // read = internal state, write = sync xfer period (6)
+	REG_FIFOSTATE,      // read = FIFO status, write = sync offset
+	REG_CTRL1,      // read/write = control 1
+	REG_CLOCKFCTR,      // clock factor (write only)
+	REG_TESTMODE,       // test mode (write only)
+	REG_CTRL2,      // read/write = control 2
+	REG_CTRL3,      // read/write = control 3
+	REG_CTRL4,      // read/write = control 4
+	REG_XFERCNTHI,      // read = current xfer count hi byte, write = set xfer count hi byte
+	REG_DATAALIGN       // data alignment (write only)
 };
 
 class am53cf96_device : public device_t

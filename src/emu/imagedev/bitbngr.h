@@ -14,11 +14,11 @@
 
 enum
 {
-	BITBANGER_PRINTER			= 0,
+	BITBANGER_PRINTER           = 0,
 	BITBANGER_MODEM,
 	BITBANGER_MODE_MAX,
 
-	BITBANGER_150				= 0,
+	BITBANGER_150               = 0,
 	BITBANGER_300,
 	BITBANGER_600,
 	BITBANGER_1200,
@@ -68,21 +68,21 @@ enum
 struct bitbanger_config
 {
 	/* callback to driver */
-	devcb_write_line		m_input_callback;
+	devcb_write_line        m_input_callback;
 
 	/* emulating a printer or modem */
-	int						m_default_mode;
+	int                     m_default_mode;
 
 	/* output bits per second */
-	int						m_default_baud;
+	int                     m_default_baud;
 
 	/* fine tune adjustment to the baud */
-	int						m_default_tune;
+	int                     m_default_tune;
 };
 
 
 
-class bitbanger_device :	public device_t,
+class bitbanger_device :    public device_t,
 							public device_image_interface,
 							public bitbanger_config
 {
@@ -143,21 +143,21 @@ private:
 	void set_input_line(UINT8 line);
 
 	// variables
-	emu_timer *					m_output_timer;
-	emu_timer *					m_input_timer;
-	devcb_resolved_write_line	m_input_func;
-	int							m_output_value;
-	int							m_build_count;
-	int							m_build_byte;
-	attotime					m_idle_delay;
-	attotime					m_current_baud;
-	UINT32						m_input_buffer_size;
-	UINT32						m_input_buffer_cursor;
-	int							m_mode;
-	int							m_baud;
-	int							m_tune;
-	UINT8						m_current_input;
-	UINT8						m_input_buffer[1000];
+	emu_timer *                 m_output_timer;
+	emu_timer *                 m_input_timer;
+	devcb_resolved_write_line   m_input_func;
+	int                         m_output_value;
+	int                         m_build_count;
+	int                         m_build_byte;
+	attotime                    m_idle_delay;
+	attotime                    m_current_baud;
+	UINT32                      m_input_buffer_size;
+	UINT32                      m_input_buffer_cursor;
+	int                         m_mode;
+	int                         m_baud;
+	int                         m_tune;
+	UINT8                       m_current_input;
+	UINT8                       m_input_buffer[1000];
 };
 
 // device type definition

@@ -62,7 +62,7 @@ enum screen_type_enum
 
 
 // screen_update callback flags
-const UINT32 UPDATE_HAS_NOT_CHANGED = 0x0001;	// the video has not changed
+const UINT32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
 
 
 
@@ -88,18 +88,18 @@ public:
 	// construction/destruction
 	screen_bitmap()
 		: m_format(BITMAP_FORMAT_RGB32),
-		  m_texformat(TEXFORMAT_RGB32),
-		  m_live(&m_rgb32) { }
+			m_texformat(TEXFORMAT_RGB32),
+			m_live(&m_rgb32) { }
 	screen_bitmap(bitmap_ind16 &orig)
 		: m_format(BITMAP_FORMAT_IND16),
-		  m_texformat(TEXFORMAT_PALETTE16),
-		  m_live(&m_ind16),
-		  m_ind16(orig, orig.cliprect()) { }
+			m_texformat(TEXFORMAT_PALETTE16),
+			m_live(&m_ind16),
+			m_ind16(orig, orig.cliprect()) { }
 	screen_bitmap(bitmap_rgb32 &orig)
 		: m_format(BITMAP_FORMAT_RGB32),
-		  m_texformat(TEXFORMAT_RGB32),
-		  m_live(&m_rgb32),
-		  m_rgb32(orig, orig.cliprect()) { }
+			m_texformat(TEXFORMAT_RGB32),
+			m_live(&m_rgb32),
+			m_rgb32(orig, orig.cliprect()) { }
 
 	// resizing
 	void resize(int width, int height) { live().resize(width, height); }
@@ -129,9 +129,9 @@ public:
 		m_texformat = texformat;
 		switch (format)
 		{
-			case BITMAP_FORMAT_IND16:	m_live = &m_ind16;	break;
-			case BITMAP_FORMAT_RGB32:	m_live = &m_rgb32;	break;
-			default:					m_live = NULL;		break;
+			case BITMAP_FORMAT_IND16:   m_live = &m_ind16;  break;
+			case BITMAP_FORMAT_RGB32:   m_live = &m_rgb32;  break;
+			default:                    m_live = NULL;      break;
 		}
 		m_ind16.reset();
 		m_rgb32.reset();
@@ -139,11 +139,11 @@ public:
 
 private:
 	// internal state
-	bitmap_format		m_format;
-	texture_format		m_texformat;
-	bitmap_t *			m_live;
-	bitmap_ind16		m_ind16;
-	bitmap_rgb32		m_rgb32;
+	bitmap_format       m_format;
+	texture_format      m_texformat;
+	bitmap_t *          m_live;
+	bitmap_ind16        m_ind16;
+	bitmap_rgb32        m_rgb32;
 };
 
 
@@ -263,49 +263,49 @@ private:
 	void load_effect_overlay(const char *filename);
 
 	// inline configuration data
-	screen_type_enum	m_type;						// type of screen
-	bool				m_oldstyle_vblank_supplied;	// MCFG_SCREEN_VBLANK_TIME macro used
-	attoseconds_t		m_refresh;					// default refresh period
-	attoseconds_t		m_vblank;					// duration of a VBLANK
-	float				m_xoffset, m_yoffset;		// default X/Y offsets
-	float				m_xscale, m_yscale;			// default X/Y scale factor
+	screen_type_enum    m_type;                     // type of screen
+	bool                m_oldstyle_vblank_supplied; // MCFG_SCREEN_VBLANK_TIME macro used
+	attoseconds_t       m_refresh;                  // default refresh period
+	attoseconds_t       m_vblank;                   // duration of a VBLANK
+	float               m_xoffset, m_yoffset;       // default X/Y offsets
+	float               m_xscale, m_yscale;         // default X/Y scale factor
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
-	screen_vblank_delegate m_screen_vblank;			// screen vblank callback
+	screen_vblank_delegate m_screen_vblank;         // screen vblank callback
 
 	// internal state
-	render_container *	m_container;				// pointer to our container
+	render_container *  m_container;                // pointer to our container
 
 	// dimensions
-	int					m_width;					// current width (HTOTAL)
-	int					m_height;					// current height (VTOTAL)
-	rectangle			m_visarea;					// current visible area (HBLANK end/start, VBLANK end/start)
+	int                 m_width;                    // current width (HTOTAL)
+	int                 m_height;                   // current height (VTOTAL)
+	rectangle           m_visarea;                  // current visible area (HBLANK end/start, VBLANK end/start)
 
 	// textures and bitmaps
-	texture_format		m_texformat;				// texture format
-	render_texture *	m_texture[2];				// 2x textures for the screen bitmap
-	screen_bitmap		m_bitmap[2];				// 2x bitmaps for rendering
-	bitmap_ind64		m_burnin;					// burn-in bitmap
-	UINT8				m_curbitmap;				// current bitmap index
-	UINT8				m_curtexture;				// current texture index
-	bool				m_changed;					// has this bitmap changed?
-	INT32				m_last_partial_scan;		// scanline of last partial update
-	bitmap_argb32		m_screen_overlay_bitmap;	// screen overlay bitmap
-	UINT32				m_unique_id;				// unique id for this screen_device
+	texture_format      m_texformat;                // texture format
+	render_texture *    m_texture[2];               // 2x textures for the screen bitmap
+	screen_bitmap       m_bitmap[2];                // 2x bitmaps for rendering
+	bitmap_ind64        m_burnin;                   // burn-in bitmap
+	UINT8               m_curbitmap;                // current bitmap index
+	UINT8               m_curtexture;               // current texture index
+	bool                m_changed;                  // has this bitmap changed?
+	INT32               m_last_partial_scan;        // scanline of last partial update
+	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
+	UINT32              m_unique_id;                // unique id for this screen_device
 
 	// screen timing
-	attoseconds_t		m_frame_period;				// attoseconds per frame
-	attoseconds_t		m_scantime;					// attoseconds per scanline
-	attoseconds_t		m_pixeltime;				// attoseconds per pixel
-	attoseconds_t		m_vblank_period;			// attoseconds per VBLANK period
-	attotime			m_vblank_start_time;		// time of last VBLANK start
-	attotime			m_vblank_end_time;			// time of last VBLANK end
-	emu_timer *			m_vblank_begin_timer;		// timer to signal VBLANK start
-	emu_timer *			m_vblank_end_timer;			// timer to signal VBLANK end
-	emu_timer *			m_scanline0_timer;			// scanline 0 timer
-	emu_timer *			m_scanline_timer;			// scanline timer
-	UINT64				m_frame_number;				// the current frame number
-	UINT32				m_partial_updates_this_frame;// partial update counter this frame
+	attoseconds_t       m_frame_period;             // attoseconds per frame
+	attoseconds_t       m_scantime;                 // attoseconds per scanline
+	attoseconds_t       m_pixeltime;                // attoseconds per pixel
+	attoseconds_t       m_vblank_period;            // attoseconds per VBLANK period
+	attotime            m_vblank_start_time;        // time of last VBLANK start
+	attotime            m_vblank_end_time;          // time of last VBLANK end
+	emu_timer *         m_vblank_begin_timer;       // timer to signal VBLANK start
+	emu_timer *         m_vblank_end_timer;         // timer to signal VBLANK end
+	emu_timer *         m_scanline0_timer;          // scanline 0 timer
+	emu_timer *         m_scanline_timer;           // scanline timer
+	UINT64              m_frame_number;             // the current frame number
+	UINT32              m_partial_updates_this_frame;// partial update counter this frame
 
 	// VBLANK callbacks
 	class callback_item
@@ -313,13 +313,13 @@ private:
 	public:
 		callback_item(vblank_state_delegate callback)
 			: m_next(NULL),
-			  m_callback(callback) { }
+				m_callback(callback) { }
 		callback_item *next() const { return m_next; }
 
-		callback_item *				m_next;
-		vblank_state_delegate		m_callback;
+		callback_item *             m_next;
+		vblank_state_delegate       m_callback;
 	};
-	simple_list<callback_item> m_callback_list;		// list of VBLANK callbacks
+	simple_list<callback_item> m_callback_list;     // list of VBLANK callbacks
 
 	// auto-sizing bitmaps
 	class auto_bitmap_item
@@ -327,17 +327,17 @@ private:
 	public:
 		auto_bitmap_item(bitmap_t &bitmap)
 			: m_next(NULL),
-			  m_bitmap(bitmap) { }
+				m_bitmap(bitmap) { }
 		auto_bitmap_item *next() const { return m_next; }
 
-		auto_bitmap_item *			m_next;
-		bitmap_t &					m_bitmap;
+		auto_bitmap_item *          m_next;
+		bitmap_t &                  m_bitmap;
 	};
 	simple_list<auto_bitmap_item> m_auto_bitmap_list; // list of registered bitmaps
 
 	// static data
-	static UINT32		m_id_counter; // incremented for each constructed screen_device,
-									  // used as a unique identifier during runtime
+	static UINT32       m_id_counter; // incremented for each constructed screen_device,
+										// used as a unique identifier during runtime
 };
 
 // device type definition
@@ -352,15 +352,15 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 //  SCREEN DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define SCREEN_UPDATE_NAME(name)		screen_update_##name
-#define SCREEN_UPDATE_IND16(name)		UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-#define SCREEN_UPDATE_RGB32(name)		UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-#define SCREEN_UPDATE16_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
-#define SCREEN_UPDATE32_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
+#define SCREEN_UPDATE_NAME(name)        screen_update_##name
+#define SCREEN_UPDATE_IND16(name)       UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE_RGB32(name)       UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
+#define SCREEN_UPDATE32_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 
-#define SCREEN_VBLANK_NAME(name)		screen_vblank_##name
-#define SCREEN_VBLANK(name)				void SCREEN_VBLANK_NAME(name)(device_t *, screen_device &screen, bool vblank_on)
-#define SCREEN_VBLANK_CALL(name)		SCREEN_VBLANK_NAME(name)(NULL, screen, vblank_on)
+#define SCREEN_VBLANK_NAME(name)        screen_vblank_##name
+#define SCREEN_VBLANK(name)             void SCREEN_VBLANK_NAME(name)(device_t *, screen_device &screen, bool vblank_on)
+#define SCREEN_VBLANK_CALL(name)        SCREEN_VBLANK_NAME(name)(NULL, screen, vblank_on)
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
@@ -387,7 +387,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
 	screen_device::static_set_visarea(*device, _minx, _maxx, _miny, _maxy); \
 
-#define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
+#define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
 	screen_device::static_set_default_position(*device, _xscale, _xoffs, _yscale, _yoffs); \
 
 #define MCFG_SCREEN_UPDATE_STATIC(_func) \
@@ -447,4 +447,4 @@ inline screen_update_rgb32_delegate screen_update_delegate_smart(UINT32 (_Functi
 }
 
 
-#endif	/* __SCREEN_H__ */
+#endif  /* __SCREEN_H__ */

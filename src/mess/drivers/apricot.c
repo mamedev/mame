@@ -329,7 +329,7 @@ void apricot_state::palette_init()
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 

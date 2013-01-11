@@ -19,7 +19,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SASIBUS_TAG		"sasi"
+#define SASIBUS_TAG     "sasi"
 
 
 
@@ -162,9 +162,9 @@ inline void luxor_4105_device::update_trrq_int()
 //-------------------------------------------------
 
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock),
-	  device_abc1600bus_card_interface(mconfig, *this),
-	  m_sasibus(*this, SASIBUS_TAG ":host")
+	: device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock),
+		device_abc1600bus_card_interface(mconfig, *this),
+		m_sasibus(*this, SASIBUS_TAG ":host")
 {
 }
 
@@ -248,18 +248,18 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       ?
-            1       ?
-            2       ?
-            3       ?
-            4
-            5
-            6       ? (tested at 014D9A, after command 08 sent and 1 byte read from SASI, should be 1)
-            7
+		    0       ?
+		    1       ?
+		    2       ?
+		    3       ?
+		    4
+		    5
+		    6       ? (tested at 014D9A, after command 08 sent and 1 byte read from SASI, should be 1)
+		    7
 
-        */
+		*/
 
 		data = m_sasibus->scsi_bsy_r();
 		data |= m_sasibus->scsi_req_r() << 2;
@@ -366,18 +366,18 @@ void luxor_4105_device::abc1600bus_c4(UINT8 data)
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0
-            1
-            2
-            3
-            4
-            5       byte interrupt enable?
-            6       DMA/CPU mode (1=DMA, 0=CPU)?
-            7       error interrupt enable?
+		    0
+		    1
+		    2
+		    3
+		    4
+		    5       byte interrupt enable?
+		    6       DMA/CPU mode (1=DMA, 0=CPU)?
+		    7       error interrupt enable?
 
-        */
+		*/
 
 		m_dma = data;
 

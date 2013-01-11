@@ -11,7 +11,7 @@
 #include "sstrangr.lh"
 
 
-#define NUM_PENS	(8)
+#define NUM_PENS    (8)
 
 class sstrangr_state : public driver_device
 {
@@ -194,14 +194,14 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080,1996800)	/* clock is a guess, taken from mw8080bw */
+	MCFG_CPU_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
 	MCFG_CPU_PROGRAM_MAP(sstrangr_map)
 	MCFG_CPU_IO_MAP(sstrangr_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
+	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size is a guess, taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrangr)
@@ -290,7 +290,7 @@ ROM_START( sstrangr2 )
 	ROM_LOAD( "4764.09",      0x0000, 0x2000, CRC(d88f86cc) SHA1(9f284ee50caf3c64bd04a79a798de620348881bc) )
 	ROM_LOAD( "2708.10",      0x6000, 0x0400, CRC(eba304c1) SHA1(3fa6fbb29fa46c146283f69a712bfc51cbb2a43c) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0400, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "2708.15",      0x0000, 0x0400, CRC(c176a89d) SHA1(955dd540dc3787091c3f34ae122a13e6b7523414) )
 ROM_END
 

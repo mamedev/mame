@@ -18,7 +18,7 @@
 #define VERBOSE 1
 #endif
 
-#define LOG(N,M,A)	\
+#define LOG(N,M,A)  \
 	do { \
 		if(VERBOSE>=N) \
 		{ \
@@ -41,7 +41,7 @@ void mz_state::palette_init()
 	for (i = 0; i < 256; i++)
 	{
 		colortable_entry_set_value(machine().colortable, i*2, i & 7);
-        	colortable_entry_set_value(machine().colortable, i*2+1, (i >> 4) & 7);
+			colortable_entry_set_value(machine().colortable, i*2+1, (i >> 4) & 7);
 	}
 }
 

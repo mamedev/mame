@@ -162,10 +162,10 @@ static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
+	AM_RANGE(0xc000, 0xefff) AM_ROM                     /* rom pac and bios */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
+	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */
+	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sorcererd_mem, AS_PROGRAM, 8, sorcerer_state)
@@ -174,10 +174,10 @@ static ADDRESS_MAP_START( sorcererd_mem, AS_PROGRAM, 8, sorcerer_state)
 	AM_RANGE(0x0800, 0xbbff) AM_RAM
 	AM_RANGE(0xbc00, 0xbcff) AM_ROM
 	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE_LEGACY("fdc", micropolis_r, micropolis_w)
-	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
-	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
-	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
+	AM_RANGE(0xc000, 0xefff) AM_ROM                     /* rom pac and bios */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)        /* screen ram */
+	AM_RANGE(0xf800, 0xfbff) AM_ROM                     /* char rom */
+	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_REGION("maincpu", 0xfc00)        /* programmable chars */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sorcerer_io, AS_IO, 8, sorcerer_state)
@@ -326,15 +326,15 @@ INPUT_PORTS_END
 
 static const gfx_layout sorcerer_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
@@ -440,11 +440,11 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass1 speaker
 	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, CASSETTE2_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass2 speaker
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)	// speaker or music card on parallel port
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75) // speaker or music card on parallel port
 
 	MCFG_AY31015_ADD( "uart", sorcerer_ay31015_config )
 

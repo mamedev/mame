@@ -51,8 +51,8 @@
 
 device_sound_interface::device_sound_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
-	  m_outputs(0),
-	  m_auto_allocated_inputs(0)
+		m_outputs(0),
+		m_auto_allocated_inputs(0)
 {
 }
 
@@ -389,11 +389,11 @@ void device_sound_interface::interface_pre_reset()
 
 device_sound_interface::sound_route::sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput)
 	: m_next(NULL),
-	  m_output(output),
-	  m_input(input),
-	  m_mixoutput(mixoutput),
-	  m_gain(gain),
-	  m_target(target)
+		m_output(output),
+		m_input(input),
+		m_mixoutput(mixoutput),
+		m_gain(gain),
+		m_target(target)
 {
 }
 
@@ -409,8 +409,8 @@ device_sound_interface::sound_route::sound_route(int output, int input, float ga
 
 device_mixer_interface::device_mixer_interface(const machine_config &mconfig, device_t &device, int outputs)
 	: device_sound_interface(mconfig, device),
-	  m_outputs(outputs),
-	  m_mixer_stream(NULL)
+		m_outputs(outputs),
+		m_mixer_stream(NULL)
 {
 }
 

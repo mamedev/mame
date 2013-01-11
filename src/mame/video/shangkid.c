@@ -14,10 +14,10 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
 	if( m_gfx_type==1 )
 	{
 		/* Shanghai Kid:
-            ------xx    bank
-            -----x--    flipx
-            xxxxx---    color
-        */
+		    ------xx    bank
+		    -----x--    flipx
+		    xxxxx---    color
+		*/
 		color = attributes>>3;
 		color = (color&0x03)|((color&0x1c)<<1);
 		SET_TILE_INFO_MEMBER(
@@ -29,10 +29,10 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
 	else
 	{
 		/* Chinese Hero:
-            ------xx    bank
-            -xxxxx--    color
-            x-------    flipx?
-        */
+		    ------xx    bank
+		    -xxxxx--    color
+		    x-------    flipx?
+		*/
 		color = (attributes>>2)&0x1f;
 		SET_TILE_INFO_MEMBER(
 				0,
@@ -67,17 +67,17 @@ static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_in
 	int width,height;
 	int sx,sy;
 
-	int ypos		= 209 - source[0];
-	int tile		= source[1]&0x3f;
-	int xflip		= (source[1]&0x40)?1:0;
-	int yflip		= (source[1]&0x80)?1:0;
-	int bank		= source[2]&0x3f;
-	int xsize		= (source[2]&0x40)?1:0;
-	int ysize		= (source[2]&0x80)?1:0;
-	int yscale		= source[3]&0x07;	/* 0x0 = smallest; 0x7 = biggest */
-	int xpos		= ((source[4]+source[5]*255)&0x1ff)-23;
-	int color		= source[6]&0x3f;
-	int xscale		= source[7]&0x07;	/* 0x0 = smallest; 0x7 = biggest */
+	int ypos        = 209 - source[0];
+	int tile        = source[1]&0x3f;
+	int xflip       = (source[1]&0x40)?1:0;
+	int yflip       = (source[1]&0x80)?1:0;
+	int bank        = source[2]&0x3f;
+	int xsize       = (source[2]&0x40)?1:0;
+	int ysize       = (source[2]&0x80)?1:0;
+	int yscale      = source[3]&0x07;   /* 0x0 = smallest; 0x7 = biggest */
+	int xpos        = ((source[4]+source[5]*255)&0x1ff)-23;
+	int color       = source[6]&0x3f;
+	int xscale      = source[7]&0x07;   /* 0x0 = smallest; 0x7 = biggest */
 
 	/* adjust placement for small sprites */
 	if( xsize==0 && xflip ) xpos -= 16;
@@ -267,9 +267,9 @@ static void dynamski_draw_background(running_machine &machine, bitmap_ind16 &bit
 		tile = videoram[i];
 		attr = videoram[i+0x400];
 		/*
-            x---.----   priority?
-            -xx-.----   bank
-        */
+		    x---.----   priority?
+		    -xx-.----   bank
+		*/
 		if( pri==0 || (attr>>7)==pri )
 		{
 			tile += ((attr>>5)&0x3)*256;

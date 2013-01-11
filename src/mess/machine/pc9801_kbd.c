@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	PC-9801 Keyboard simulation
+    PC-9801 Keyboard simulation
 
-	TODO:
-	- key repeat
+    TODO:
+    - key repeat
 
         - Some keys to be found:
           NFER, XFER, GRPH, kana-only key next to right-shift
@@ -236,9 +236,9 @@ void pc9801_kbd_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_kbd_device::device_start()
 {
-    m_irq_func.resolve(m_irq_cb, *this);
-   	m_rxtimer = timer_alloc(RX_TIMER);
-   	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_irq_func.resolve(m_irq_cb, *this);
+	m_rxtimer = timer_alloc(RX_TIMER);
+	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 
 

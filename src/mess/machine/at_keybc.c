@@ -49,7 +49,7 @@ ROM_END
 
 at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, "AT Keyboard Controller", tag, owner, clock),
-	  m_cpu(NULL)
+		m_cpu(NULL)
 {
 	m_shortname = "at_keybc";
 }

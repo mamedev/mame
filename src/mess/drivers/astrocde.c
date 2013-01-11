@@ -105,19 +105,19 @@ INPUT_CHANGED_MEMBER(astrocde_mess_state::set_write_protect)  // run when RAM ex
 
 	get_ram_expansion_settings(ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
-    if (ram_expansion_installed == 1)
-    {
-        if (write_protect_on == 0)  // write protect off, so install memory normally
-        {
-            space.install_ram(expansion_ram_start, expansion_ram_end, expram);
-            if (shadow_ram_end > expansion_ram_end)
-                space.install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
-        }
-        else  // write protect on, so make memory read only
-        {
-            space.nop_write(expansion_ram_start, expansion_ram_end);
-        }
-     }
+	if (ram_expansion_installed == 1)
+	{
+		if (write_protect_on == 0)  // write protect off, so install memory normally
+		{
+			space.install_ram(expansion_ram_start, expansion_ram_end, expram);
+			if (shadow_ram_end > expansion_ram_end)
+				space.install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
+		}
+		else  // write protect on, so make memory read only
+		{
+			space.nop_write(expansion_ram_start, expansion_ram_end);
+		}
+		}
 }
 
 /*************************************
@@ -224,15 +224,15 @@ static INPUT_PORTS_START( astrocde )
 	PORT_START("P4_KNOB")
 	PORT_BIT(0xff, 0x00, IPT_PADDLE) PORT_INVERT PORT_SENSITIVITY(85) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CODE_DEC(KEYCODE_Y) PORT_CODE_INC(KEYCODE_U) PORT_PLAYER(4)
 
-    PORT_START("CFG")	/* machine config */
+	PORT_START("CFG")   /* machine config */
 	PORT_DIPNAME( 0x3f, 0x00, "RAM Expansion")
-	PORT_DIPSETTING(	0x00, "No RAM Expansion")
-	PORT_DIPSETTING(	0x01, "16KB Viper System 1 RAM Expansion")
-	PORT_DIPSETTING(	0x02, "32KB Lil' WHITE RAM Expansion")
-	PORT_DIPSETTING(	0x04, "R&L 64K RAM Board (44K installed)")
-	PORT_DIPSETTING(	0x08, "4KB Blue RAM Expansion")
-	PORT_DIPSETTING(	0x10, "16KB Blue RAM Expansion")
-	PORT_DIPSETTING(	0x20, "32KB Blue RAM Expansion")
+	PORT_DIPSETTING(    0x00, "No RAM Expansion")
+	PORT_DIPSETTING(    0x01, "16KB Viper System 1 RAM Expansion")
+	PORT_DIPSETTING(    0x02, "32KB Lil' WHITE RAM Expansion")
+	PORT_DIPSETTING(    0x04, "R&L 64K RAM Board (44K installed)")
+	PORT_DIPSETTING(    0x08, "4KB Blue RAM Expansion")
+	PORT_DIPSETTING(    0x10, "16KB Blue RAM Expansion")
+	PORT_DIPSETTING(    0x20, "32KB Blue RAM Expansion")
 
 	PORT_START("PROTECT")  /* Write protect RAM */
 	PORT_DIPNAME( 0x01, 0x00, "Write Protect RAM") PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_mess_state, set_write_protect, 0)
@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	MCFG_SOUND_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-    /* optional expansion ram (installed in MACHINE_RESET)*/
+	/* optional expansion ram (installed in MACHINE_RESET)*/
 	MCFG_RAM_ADD("ram_tag")
 	MCFG_RAM_DEFAULT_SIZE("32k")
 
@@ -319,75 +319,75 @@ DRIVER_INIT_MEMBER(astrocde_state,astrocde)
 
 MACHINE_RESET_MEMBER(astrocde_mess_state, astrocde)
 {
-    int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-    address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-    UINT8 *expram = machine().device<ram_device>("ram_tag")->pointer();
-    space.unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
+	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *expram = machine().device<ram_device>("ram_tag")->pointer();
+	space.unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
 
-    get_ram_expansion_settings(ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
+	get_ram_expansion_settings(ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
-    if (ram_expansion_installed == 1)
-    {
-        if (write_protect_on == 0)  // write protect off, so install memory normally
-        {
-            space.install_ram(expansion_ram_start, expansion_ram_end, expram);
-            if (shadow_ram_end > expansion_ram_end)
-                space.install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
-        }
-        else  // write protect on, so make memory read only
-        {
-            space.nop_write(expansion_ram_start, expansion_ram_end);
-        }
-     }
+	if (ram_expansion_installed == 1)
+	{
+		if (write_protect_on == 0)  // write protect off, so install memory normally
+		{
+			space.install_ram(expansion_ram_start, expansion_ram_end, expram);
+			if (shadow_ram_end > expansion_ram_end)
+				space.install_ram(expansion_ram_end + 1, shadow_ram_end, expram);
+		}
+		else  // write protect on, so make memory read only
+		{
+			space.nop_write(expansion_ram_start, expansion_ram_end);
+		}
+		}
 }
 
 void astrocde_mess_state::get_ram_expansion_settings(int &ram_expansion_installed, int &write_protect_on, int &expansion_ram_start, int &expansion_ram_end, int &shadow_ram_end)
 {
-    if (machine().root_device().ioport("PROTECT")->read() == 0x01)
-        write_protect_on = 1;
-    else
-        write_protect_on = 0;
+	if (machine().root_device().ioport("PROTECT")->read() == 0x01)
+		write_protect_on = 1;
+	else
+		write_protect_on = 0;
 
-    ram_expansion_installed = 1;
+	ram_expansion_installed = 1;
 
-    switch(machine().root_device().ioport("CFG")->read())  // check RAM expansion configuration and set address ranges
-    {
-        case 0x00:  // No RAM Expansion
-             ram_expansion_installed = 0;
-             break;
-        case 0x01:  // 16KB Viper System 1 RAM Expansion
-             expansion_ram_start = 0x6000;
-             expansion_ram_end = 0x9fff;
-             shadow_ram_end = 0;
-             break;
-        case 0x02:  // "32KB Lil' WHITE RAM Expansion
-             expansion_ram_start = 0x5000;
-             expansion_ram_end = 0xcfff;
-             shadow_ram_end = 0xffff;
-             break;
-        case 0x04:  // R&L 64K RAM Board (44KB installed)
-             expansion_ram_start = 0x5000;
-             expansion_ram_end = 0xffff;
-             shadow_ram_end = 0;
-             break;
-        case 0x08:  // 4KB Blue RAM Expansion
-             expansion_ram_start = 0x6000;
-             expansion_ram_end = 0x6fff;
-             shadow_ram_end = 0;
-             break;
-        case 0x10:  // 16KB Blue RAM Expansion
-             expansion_ram_start = 0x6000;
-             expansion_ram_end = 0x9fff;
-             shadow_ram_end = 0;
-             break;
-        case 0x20:  // 32KB Blue RAM Expansion
-             expansion_ram_start = 0x6000;
-             expansion_ram_end = 0xdfff;
-             shadow_ram_end = 0;
-             break;
-        default:
-            break;
-    }
+	switch(machine().root_device().ioport("CFG")->read())  // check RAM expansion configuration and set address ranges
+	{
+		case 0x00:  // No RAM Expansion
+				ram_expansion_installed = 0;
+				break;
+		case 0x01:  // 16KB Viper System 1 RAM Expansion
+				expansion_ram_start = 0x6000;
+				expansion_ram_end = 0x9fff;
+				shadow_ram_end = 0;
+				break;
+		case 0x02:  // "32KB Lil' WHITE RAM Expansion
+				expansion_ram_start = 0x5000;
+				expansion_ram_end = 0xcfff;
+				shadow_ram_end = 0xffff;
+				break;
+		case 0x04:  // R&L 64K RAM Board (44KB installed)
+				expansion_ram_start = 0x5000;
+				expansion_ram_end = 0xffff;
+				shadow_ram_end = 0;
+				break;
+		case 0x08:  // 4KB Blue RAM Expansion
+				expansion_ram_start = 0x6000;
+				expansion_ram_end = 0x6fff;
+				shadow_ram_end = 0;
+				break;
+		case 0x10:  // 16KB Blue RAM Expansion
+				expansion_ram_start = 0x6000;
+				expansion_ram_end = 0x9fff;
+				shadow_ram_end = 0;
+				break;
+		case 0x20:  // 32KB Blue RAM Expansion
+				expansion_ram_start = 0x6000;
+				expansion_ram_end = 0xdfff;
+				shadow_ram_end = 0;
+				break;
+		default:
+			break;
+	}
 }
 
 

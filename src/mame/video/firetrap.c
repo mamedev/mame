@@ -216,7 +216,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		if (state->m_spriteram[offs + 1] & 0x10)	/* double width */
+		if (state->m_spriteram[offs + 1] & 0x10)    /* double width */
 		{
 			if (state->flip_screen()) sy -= 16;
 

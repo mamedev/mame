@@ -173,7 +173,7 @@ static void c64_bankswitch( running_machine &machine, int reset )
 
 	if (ultimax_mode)
 	{
-			state->m_io_enabled = 1;		// charen has no effect in ultimax_mode
+			state->m_io_enabled = 1;        // charen has no effect in ultimax_mode
 
 			state->membank("bank1")->set_base(state->m_roml);
 			state->membank("bank3")->set_base(state->m_memory + 0xa000);
@@ -211,7 +211,7 @@ static void c64_bankswitch( running_machine &machine, int reset )
 			state->m_io_ram_w_ptr = state->m_memory + 0xd000;
 		}
 		// IO/RAM
-		else if (loram && !hiram && !state->m_game)	// remember we cannot be in ultimax_mode, no need of !state->m_exrom
+		else if (loram && !hiram && !state->m_game) // remember we cannot be in ultimax_mode, no need of !state->m_exrom
 		{
 			state->m_io_enabled = 1;
 			state->m_io_ram_r_ptr = (!charen) ? state->m_chargen : state->m_memory + 0xd000;
@@ -268,7 +268,7 @@ int c64_paddle_read( device_t *device, address_space &space, int which )
 			break;
 
 		case 0x03:
-			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))	/* Joy1 Button 2 */
+			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))  /* Joy1 Button 2 */
 				pot1 = 0x00;
 			break;
 
@@ -280,7 +280,7 @@ int c64_paddle_read( device_t *device, address_space &space, int which )
 			break;
 
 		case 0x06:
-			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	/* Lightpen Signal */
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))    /* Lightpen Signal */
 				pot2 = 0x00;
 			break;
 
@@ -310,7 +310,7 @@ int c64_paddle_read( device_t *device, address_space &space, int which )
 			break;
 
 		case 0x30:
-			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))	/* Joy2 Button 2 */
+			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))  /* Joy2 Button 2 */
 				pot4 = 0x00;
 			break;
 
@@ -322,7 +322,7 @@ int c64_paddle_read( device_t *device, address_space &space, int which )
 			break;
 
 		case 0x60:
-			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	/* Lightpen Signal */
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))    /* Lightpen Signal */
 				pot4 = 0x00;
 			break;
 
@@ -335,7 +335,7 @@ int c64_paddle_read( device_t *device, address_space &space, int which )
 			break;
 	}
 
-	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)		/* Swap */
+	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)     /* Swap */
 	{
 		temp = pot1; pot1 = pot3; pot3 = temp;
 		temp = pot2; pot2 = pot4; pot4 = temp;
@@ -455,54 +455,54 @@ CHIP content description
 
 /* Hardware Types for C64 carts */
 enum {
-	GENERIC_CRT = 0,		/* 00 - Normal cartridge                    */
-	ACTION_REPLAY,		/* 01 - Action Replay                       */
-	KCS_PC,			/* 02 - KCS Power Cartridge                 */
-	FINAL_CART_III,		/* 03 - Final Cartridge III                 */
-	SIMONS_BASIC,		/* 04 - Simons Basic                        */
-	OCEAN_1,			/* 05 - Ocean type 1 (1)                    */
-	EXPERT,			/* 06 - Expert Cartridge                    */
-	FUN_PLAY,			/* 07 - Fun Play, Power Play                */
-	SUPER_GAMES,		/* 08 - Super Games                         */
-	ATOMIC_POWER,		/* 09 - Atomic Power                        */
-	EPYX_FASTLOAD,		/* 10 - Epyx Fastload                       */
-	WESTERMANN,			/* 11 - Westermann Learning                 */
-	REX,				/* 12 - Rex Utility                         */
-	FINAL_CART_I,		/* 13 - Final Cartridge I                   */
-	MAGIC_FORMEL,		/* 14 - Magic Formel                        */
-	C64GS,			/* 15 - C64 Game System, System 3           */
-	WARPSPEED,			/* 16 - WarpSpeed                           */
-	DINAMIC,			/* 17 - Dinamic (2)                         */
-	ZAXXON,			/* 18 - Zaxxon, Super Zaxxon (SEGA)         */
-	DOMARK,			/* 19 - Magic Desk, Domark, HES Australia   */
-	SUPER_SNAP_5,		/* 20 - Super Snapshot 5                    */
-	COMAL_80,			/* 21 - Comal-80                            */
-	STRUCT_BASIC,		/* 22 - Structured Basic                    */
-	ROSS,				/* 23 - Ross                                */
-	DELA_EP64,			/* 24 - Dela EP64                           */
-	DELA_EP7X8,			/* 25 - Dela EP7x8                          */
-	DELA_EP256,			/* 26 - Dela EP256                          */
-	REX_EP256,			/* 27 - Rex EP256                           */
-	MIKRO_ASSMBLR,		/* 28 - Mikro Assembler                     */
-	REAL_FC_I,			/* 29 - (3)                                 */
-	ACTION_REPLAY_4,		/* 30 - Action Replay 4                     */
-	STARDOS,			/* 31 - StarDOS                             */
+	GENERIC_CRT = 0,        /* 00 - Normal cartridge                    */
+	ACTION_REPLAY,      /* 01 - Action Replay                       */
+	KCS_PC,         /* 02 - KCS Power Cartridge                 */
+	FINAL_CART_III,     /* 03 - Final Cartridge III                 */
+	SIMONS_BASIC,       /* 04 - Simons Basic                        */
+	OCEAN_1,            /* 05 - Ocean type 1 (1)                    */
+	EXPERT,         /* 06 - Expert Cartridge                    */
+	FUN_PLAY,           /* 07 - Fun Play, Power Play                */
+	SUPER_GAMES,        /* 08 - Super Games                         */
+	ATOMIC_POWER,       /* 09 - Atomic Power                        */
+	EPYX_FASTLOAD,      /* 10 - Epyx Fastload                       */
+	WESTERMANN,         /* 11 - Westermann Learning                 */
+	REX,                /* 12 - Rex Utility                         */
+	FINAL_CART_I,       /* 13 - Final Cartridge I                   */
+	MAGIC_FORMEL,       /* 14 - Magic Formel                        */
+	C64GS,          /* 15 - C64 Game System, System 3           */
+	WARPSPEED,          /* 16 - WarpSpeed                           */
+	DINAMIC,            /* 17 - Dinamic (2)                         */
+	ZAXXON,         /* 18 - Zaxxon, Super Zaxxon (SEGA)         */
+	DOMARK,         /* 19 - Magic Desk, Domark, HES Australia   */
+	SUPER_SNAP_5,       /* 20 - Super Snapshot 5                    */
+	COMAL_80,           /* 21 - Comal-80                            */
+	STRUCT_BASIC,       /* 22 - Structured Basic                    */
+	ROSS,               /* 23 - Ross                                */
+	DELA_EP64,          /* 24 - Dela EP64                           */
+	DELA_EP7X8,         /* 25 - Dela EP7x8                          */
+	DELA_EP256,         /* 26 - Dela EP256                          */
+	REX_EP256,          /* 27 - Rex EP256                           */
+	MIKRO_ASSMBLR,      /* 28 - Mikro Assembler                     */
+	REAL_FC_I,          /* 29 - (3)                                 */
+	ACTION_REPLAY_4,        /* 30 - Action Replay 4                     */
+	STARDOS,            /* 31 - StarDOS                             */
 	/*
-    (1) Ocean type 1 includes Navy Seals, Robocop 2 & 3,  Shadow  of
-    the Beast, Toki, Terminator 2 and more. Both 256 and 128 Kb images.
-    (2) Dinamic includes Narco Police and more.
-    (3) Type 29 is reserved for the real Final Cartridge I, the one
-    above (Type 13) will become Final Cartridge II.                 */
+	(1) Ocean type 1 includes Navy Seals, Robocop 2 & 3,  Shadow  of
+	the Beast, Toki, Terminator 2 and more. Both 256 and 128 Kb images.
+	(2) Dinamic includes Narco Police and more.
+	(3) Type 29 is reserved for the real Final Cartridge I, the one
+	above (Type 13) will become Final Cartridge II.                 */
 	/****************************************
-    Vice also defines the following types:
-    #define CARTRIDGE_ACTION_REPLAY3    -29
-    #define CARTRIDGE_IEEE488           -11
-    #define CARTRIDGE_IDE64             -7
-    #define CARTRIDGE_RETRO_REPLAY      -5
-    #define CARTRIDGE_SUPER_SNAPSHOT    -4
+	Vice also defines the following types:
+	#define CARTRIDGE_ACTION_REPLAY3    -29
+	#define CARTRIDGE_IEEE488           -11
+	#define CARTRIDGE_IDE64             -7
+	#define CARTRIDGE_RETRO_REPLAY      -5
+	#define CARTRIDGE_SUPER_SNAPSHOT    -4
 
-    Can we support these as well?
-    *****************************************/
+	Can we support these as well?
+	*****************************************/
 };
 
 static DEVICE_IMAGE_UNLOAD( c64_cart )
@@ -524,7 +524,7 @@ static DEVICE_START( c64_cart )
 {
 	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 	/* In the first slot we can load a .crt file. In this case we want
-        to use game & exrom values from the header, not the default ones. */
+	    to use game & exrom values from the header, not the default ones. */
 	state->m_cart.game = -1;
 	state->m_cart.exrom = -1;
 	state->m_cart.mapper = GENERIC_CRT;
@@ -559,31 +559,31 @@ static int c64_crt_load( device_image_interface &image )
 		/* If it is unsupported cart type, warn the user */
 		switch (state->m_cart.mapper)
 		{
-			case SIMONS_BASIC:	/* Type #  4 */
-			case OCEAN_1:		/* Type #  5 */
-			case FUN_PLAY:		/* Type #  7 */
-			case SUPER_GAMES:		/* Type #  8 */
-			case EPYX_FASTLOAD:	/* Type # 10 */
-			case REX:			/* Type # 12 */
-			case C64GS:			/* Type # 15 */
-			case DINAMIC:		/* Type # 17 */
-			case ZAXXON:		/* Type # 18 */
-			case DOMARK:		/* Type # 19 */
-			case COMAL_80:		/* Type # 21 */
-			case GENERIC_CRT:		/* Type #  0 */
+			case SIMONS_BASIC:  /* Type #  4 */
+			case OCEAN_1:       /* Type #  5 */
+			case FUN_PLAY:      /* Type #  7 */
+			case SUPER_GAMES:       /* Type #  8 */
+			case EPYX_FASTLOAD: /* Type # 10 */
+			case REX:           /* Type # 12 */
+			case C64GS:         /* Type # 15 */
+			case DINAMIC:       /* Type # 17 */
+			case ZAXXON:        /* Type # 18 */
+			case DOMARK:        /* Type # 19 */
+			case COMAL_80:      /* Type # 21 */
+			case GENERIC_CRT:       /* Type #  0 */
 				printf("Currently supported cart type (Type %d)\n", state->m_cart.mapper);
 				break;
 
 			default:
-			case ACTION_REPLAY:	/* Type #  1 */
-			case KCS_PC:		/* Type #  2 */
-			case FINAL_CART_III:	/* Type #  3 */
-			case EXPERT:		/* Type #  6 */
-			case ATOMIC_POWER:	/* Type #  9 */
-			case WESTERMANN:		/* Type # 11 */
-			case FINAL_CART_I:	/* Type # 13 */
-			case MAGIC_FORMEL:	/* Type # 14 */
-			case SUPER_SNAP_5:	/* Type # 20 */
+			case ACTION_REPLAY: /* Type #  1 */
+			case KCS_PC:        /* Type #  2 */
+			case FINAL_CART_III:    /* Type #  3 */
+			case EXPERT:        /* Type #  6 */
+			case ATOMIC_POWER:  /* Type #  9 */
+			case WESTERMANN:        /* Type # 11 */
+			case FINAL_CART_I:  /* Type # 13 */
+			case MAGIC_FORMEL:  /* Type # 14 */
+			case SUPER_SNAP_5:  /* Type # 20 */
 				printf("Currently unsupported cart type (Type %d)\n", state->m_cart.mapper);
 				break;
 		}
@@ -604,9 +604,9 @@ static int c64_crt_load( device_image_interface &image )
 
 
 		/* Data in a .crt image are organized in blocks called 'CHIP':
-           each 'CHIP' consists of a 0x10 header, which contains the
-           actual size of the block, the loading address and info on
-           the bankswitch, followed by the actual data                  */
+		   each 'CHIP' consists of a 0x10 header, which contains the
+		   actual size of the block, the loading address and info on
+		   the bankswitch, followed by the actual data                  */
 		while (j < size)
 		{
 			unsigned short chip_size, chip_bank_index, chip_data_size;
@@ -884,18 +884,18 @@ static WRITE8_HANDLER( hugo_bank_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4       A14
-        5       A15
-        6       A16
-        7       A13
+	    0
+	    1
+	    2
+	    3
+	    4       A14
+	    5       A15
+	    6       A16
+	    7       A13
 
-    */
+	*/
 
 	int bank = ((data >> 3) & 0x0e) | BIT(data, 7);
 
@@ -947,34 +947,34 @@ static WRITE8_HANDLER( pagefox_bank_w )
 {
 	/*
 
-        Die 96KB des Moduls belegen in 6 16K-Banken den Modulbereich von $8000- $c000.
-        Die Umschaltung erfolgt mit einem Register in $DE80 (-$DEFF, nicht voll decodiert),
-        welches nur beschrieben und nicht gelesen werden kann. Durch Schreiben der Werte
-        $08 oder $0A selektiert man eine der beiden RAM-Banke, $FF deselektiert das Modul.
+	    Die 96KB des Moduls belegen in 6 16K-Banken den Modulbereich von $8000- $c000.
+	    Die Umschaltung erfolgt mit einem Register in $DE80 (-$DEFF, nicht voll decodiert),
+	    welches nur beschrieben und nicht gelesen werden kann. Durch Schreiben der Werte
+	    $08 oder $0A selektiert man eine der beiden RAM-Banke, $FF deselektiert das Modul.
 
-        Zusatzlich muss Adresse 1 entsprechend belegt werden :$37 fur Lesezugriffe auf das
-        Modul, $35 oder $34 fur Lesezugriffe auf das Ram des C64. Schreibzugriffe lenkt
-        der C64 grundsatzlich ins eigene RAM, weshalb zum Beschreiben des Modulrams ein
-        Trick notwendig ist: Man schaltet das Ram-Modul parallel zum C64-Ram, rettet vor
-        dem Schreiben den C64-Ram-Inhalt und stellt ihn nachher wieder her...
+	    Zusatzlich muss Adresse 1 entsprechend belegt werden :$37 fur Lesezugriffe auf das
+	    Modul, $35 oder $34 fur Lesezugriffe auf das Ram des C64. Schreibzugriffe lenkt
+	    der C64 grundsatzlich ins eigene RAM, weshalb zum Beschreiben des Modulrams ein
+	    Trick notwendig ist: Man schaltet das Ram-Modul parallel zum C64-Ram, rettet vor
+	    dem Schreiben den C64-Ram-Inhalt und stellt ihn nachher wieder her...
 
-        Ldy#0
-        Lda#$35
-        Sta 1
-        Loop Lda (Ptr),y
-        Pha
-        Lda#$08
-        Sta $DE80
-        Lda (Quell),y
-        Sta (Ptr),y
-        Lda#$FF
-        Sta $DE80
-        Pla
-        Sta (Ptr),y
-        Iny
-        Bne Loop
+	    Ldy#0
+	    Lda#$35
+	    Sta 1
+	    Loop Lda (Ptr),y
+	    Pha
+	    Lda#$08
+	    Sta $DE80
+	    Lda (Quell),y
+	    Sta (Ptr),y
+	    Lda#$FF
+	    Sta $DE80
+	    Pla
+	    Sta (Ptr),y
+	    Iny
+	    Bne Loop
 
-    */
+	*/
 
 	legacy_c64_state *state = space.machine().driver_data<legacy_c64_state>();
 	UINT8 *cart = state->memregion("user1")->base();
@@ -1145,14 +1145,14 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 		else if (!strcmp(cart_type, "multiscreen"))
 			/*
 
-                TODO: crashes on protection check after cartridge RAM test
+			    TODO: crashes on protection check after cartridge RAM test
 
-                805A: lda  $01
-                805C: and  #$FE
-                805E: sta  $01
-                8060: m6502_brk#$00 <-- BOOM!
+			    805A: lda  $01
+			    805C: and  #$FE
+			    805E: sta  $01
+			    8060: m6502_brk#$00 <-- BOOM!
 
-            */
+			*/
 			load_multiscreen_cartridge(image);
 
 		else if (!strcmp(cart_type, "simons_basic"))
@@ -1197,4 +1197,3 @@ MACHINE_CONFIG_FRAGMENT( c64_cartslot )
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 MACHINE_CONFIG_END
-

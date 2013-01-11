@@ -30,11 +30,11 @@ class avigo_state : public driver_device
 public:
 	avigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, RAM_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_uart(*this, "ns16550"),
-		  m_serport(*this, "serport")
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_uart(*this, "ns16550"),
+			m_serport(*this, "serport")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -88,22 +88,22 @@ public:
 	DECLARE_WRITE8_MEMBER(vid_memory_w);
 
 	// driver state
-	UINT8				m_key_line;
-	UINT8				m_irq;
-	UINT8				m_port2;
-	UINT8				m_bank2_l;
-	UINT8				m_bank2_h;
-	UINT8				m_bank1_l;
-	UINT8				m_bank1_h;
-	UINT8				m_ad_control_status;
-	intelfsh8_device *	m_flashes[3];
-	int 				m_flash_at_0x4000;
-	int 				m_flash_at_0x8000;
-	UINT16				m_ad_value;
-	UINT8 *				m_video_memory;
-	UINT8				m_screen_column;
-	UINT8				m_warm_start;
-	UINT8 * 			m_ram_base;
+	UINT8               m_key_line;
+	UINT8               m_irq;
+	UINT8               m_port2;
+	UINT8               m_bank2_l;
+	UINT8               m_bank2_h;
+	UINT8               m_bank1_l;
+	UINT8               m_bank1_h;
+	UINT8               m_ad_control_status;
+	intelfsh8_device *  m_flashes[3];
+	int                 m_flash_at_0x4000;
+	int                 m_flash_at_0x8000;
+	UINT16              m_ad_value;
+	UINT8 *             m_video_memory;
+	UINT8               m_screen_column;
+	UINT8               m_warm_start;
+	UINT8 *             m_ram_base;
 	virtual void palette_init();
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);

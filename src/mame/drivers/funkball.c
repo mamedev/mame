@@ -86,14 +86,14 @@ class funkball_state : public driver_device
 public:
 	funkball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_pit8254(*this, "pit8254"),
-		  m_dma8237_1(*this, "dma8237_1"),
-		  m_dma8237_2(*this, "dma8237_2"),
-		  m_pic8259_1(*this, "pic8259_1"),
-		  m_pic8259_2(*this, "pic8259_2"),
-		  m_voodoo(*this, "voodoo_0"),
-		  m_unk_ram(*this, "unk_ram"){ }
+			m_maincpu(*this, "maincpu"),
+			m_pit8254(*this, "pit8254"),
+			m_dma8237_1(*this, "dma8237_1"),
+			m_dma8237_2(*this, "dma8237_2"),
+			m_pic8259_1(*this, "pic8259_1"),
+			m_pic8259_2(*this, "pic8259_2"),
+			m_voodoo(*this, "voodoo_0"),
+			m_unk_ram(*this, "unk_ram"){ }
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
@@ -230,7 +230,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 	//mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	switch (reg)
 	{
-		case 0:		return 0x00001078;
+		case 0:     return 0x00001078;
 	}
 
 	return state->m_cx5510_regs[reg/4];
@@ -471,9 +471,9 @@ WRITE8_MEMBER( funkball_state::flash_w )
 	else if(offset == 2)
 	{
 		/* 0x83: read from u29/u30
-           0x03: read from u3
-           0x81: init device
-        */
+		   0x03: read from u3
+		   0x81: init device
+		*/
 		m_flash_cmd = data;
 		printf("%02x CMD\n",data);
 	}
@@ -535,16 +535,16 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
-	if (offset == 0x0c/4)		// BC_XMAP_3 register
+	if (offset == 0x0c/4)       // BC_XMAP_3 register
 	{
 		const char *const banknames[8] = { "bios_ext1", "bios_ext2", "bios_ext3","bios_ext4", "bios_bank1", "bios_bank2", "bios_bank3", "bios_bank4" };
 		int i;
 
 		for(i=0;i<8;i++)
 		{
-			if (data & 0x1 << i*4)		// enable RAM access to region 0xe0000 - 0xfffff
+			if (data & 0x1 << i*4)      // enable RAM access to region 0xe0000 - 0xfffff
 				membank(banknames[i])->set_base(m_bios_ram + (0x4000 * i));
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 				membank(banknames[i])->set_base(machine().root_device().memregion("bios")->base() + (0x4000 * i));
 		}
 	}
@@ -562,7 +562,7 @@ WRITE8_MEMBER(funkball_state::bios_ram_w)
 READ8_MEMBER( funkball_state::test_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7",
-	                                         "IN8", "IN9", "INA", "INB", "INC", "IND", "INE", "INF",};
+												"IN8", "IN9", "INA", "INB", "INC", "IND", "INE", "INF",};
 
 	return ioport(portnames[offset])->read();
 }
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_SHARE("unk_ram")
 	AM_RANGE(0xff000000, 0xffffdfff) AM_DEVREADWRITE_LEGACY("voodoo_0", voodoo_r, voodoo_w)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
@@ -1021,15 +1021,15 @@ static const struct pit8253_config funkball_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}

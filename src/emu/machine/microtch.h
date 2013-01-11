@@ -8,8 +8,8 @@ typedef int (*microtouch_touch_func)(int *touch_x, int *touch_y);
 
 struct microtouch_interface
 {
-	devcb_write8			m_out_tx_cb;
-	microtouch_touch_func	m_out_touch_cb;
+	devcb_write8            m_out_tx_cb;
+	microtouch_touch_func   m_out_touch_cb;
 };
 
 class microtouch_device :
@@ -28,7 +28,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 	virtual void tx(UINT8 data) { m_out_tx_func(0, data); }
-	emu_timer*	m_timer;
+	emu_timer*  m_timer;
 private:
 	int check_command( const char* commandtocheck, int command_len, UINT8* command_data );
 	void send_format_table_packet(UINT8 flag, int x, int y);
@@ -47,17 +47,17 @@ private:
 		MODE_STREAM,
 		MODE_POINT
 	};
-	UINT8		m_rx_buffer[16];
-	int			m_rx_buffer_ptr;
-	UINT8		m_tx_buffer[16];
-	UINT8		m_tx_buffer_num;
-	UINT8		m_tx_buffer_ptr;
-	int			m_reset_done;
-	int			m_format;
-	int			m_mode;
-	int			m_last_touch_state;
-	int			m_last_x;
-	int			m_last_y;
+	UINT8       m_rx_buffer[16];
+	int         m_rx_buffer_ptr;
+	UINT8       m_tx_buffer[16];
+	UINT8       m_tx_buffer_num;
+	UINT8       m_tx_buffer_ptr;
+	int         m_reset_done;
+	int         m_format;
+	int         m_mode;
+	int         m_last_touch_state;
+	int         m_last_x;
+	int         m_last_y;
 	devcb_resolved_write8 m_out_tx_func;
 };
 
@@ -74,8 +74,8 @@ struct microtouch_serial_interface
 
 class microtouch_serial_device
 	: public microtouch_device,
-	  public device_serial_interface,
-	  public microtouch_serial_interface
+		public device_serial_interface,
+		public microtouch_serial_interface
 {
 public:
 	microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

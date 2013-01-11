@@ -320,31 +320,31 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	const pen_t *paldata = screen.machine().pens;
 
 	int miny = cliprect.min_y;
-	int	maxy = cliprect.max_y;
+	int maxy = cliprect.max_y;
 	int minx = cliprect.min_x;
-	int	maxx = cliprect.max_x;
+	int maxx = cliprect.max_x;
 	UINT16* dest;
 
 	/*
 
-    o = offset
-    y = ypos  Y = ysize ^ = always 0xF?  ? = set for no obvious reason..
-    x = xpos  X = xsize f = flipx
+	o = offset
+	y = ypos  Y = ysize ^ = always 0xF?  ? = set for no obvious reason..
+	x = xpos  X = xsize f = flipx
 
-    Z = zoom   * = alt zoom? (ok for roadside, but 00 for player tank etc?)
-    C = colour
-    E = sprite enabled
-                            +word offset
-     CCCC CCCC #### Eooo   0x0  # bits are often set too?
-     oooo oooo oooo oooo   0x1
-     ---- ---- ---y yyyy   0x2
-     ---- ---- ---- ----   0x3 (always has a value here, gets set to FFFF on some cleared sprites?)
-     ???? ^^^^ YYYY YYYY   0x4
-     f--- --xx xxxx xxxx   0x5
-     ZZZZ ZZZZ ---- XXXX   0x6
-     ---- ---- **** ****   0x7
+	Z = zoom   * = alt zoom? (ok for roadside, but 00 for player tank etc?)
+	C = colour
+	E = sprite enabled
+	                        +word offset
+	 CCCC CCCC #### Eooo   0x0  # bits are often set too?
+	 oooo oooo oooo oooo   0x1
+	 ---- ---- ---y yyyy   0x2
+	 ---- ---- ---- ----   0x3 (always has a value here, gets set to FFFF on some cleared sprites?)
+	 ???? ^^^^ YYYY YYYY   0x4
+	 f--- --xx xxxx xxxx   0x5
+	 ZZZZ ZZZZ ---- XXXX   0x6
+	 ---- ---- **** ****   0x7
 
-    */
+	*/
 
 
 	for(int offs=0;offs<0x1000/2;offs+=8)
@@ -672,13 +672,13 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("P1 Handle")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c, 0x0004, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:6,5")
+	PORT_DIPNAME( 0x000c, 0x0004, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:6,5")
 	PORT_DIPSETTING(      0x000c, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
@@ -704,18 +704,18 @@ static INPUT_PORTS_START( cybertnk )
 |                |  every 1,000K thereafter.  |  every 1,000K thereafter.  |
 +----------------+----------------------------+----------------------------+
 */
-	PORT_DIPNAME( 0x0010, 0x0000, "Coin B Value" )			PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0010, 0x0000, "Coin B Value" )          PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0010, "Set by Dipswitches" )
 	PORT_DIPSETTING(      0x0000, "Same Value as Coin A" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:3") /* Manual states "Off Not Use" */
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3") /* Manual states "Off Not Use" */
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SW2:2" )		/* Manual states "Off Not Use" */
-	PORT_DIPNAME( 0x0080, 0x0080, "2 Credits to Start" )		PORT_DIPLOCATION("SW2:1")
+	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SW2:2" )      /* Manual states "Off Not Use" */
+	PORT_DIPNAME( 0x0080, 0x0080, "2 Credits to Start" )        PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )			/* 2 credits to start single player, 3 credits to start Pair Play, 1 credit to continue (or add 2nd player) */
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )           /* 2 credits to start single player, 3 credits to start Pair Play, 1 credit to continue (or add 2nd player) */
 
-	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6,5")
 	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
@@ -732,7 +732,7 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:4,3,2,1")
 	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 2C_1C ) )
@@ -750,7 +750,7 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x9000, DEF_STR( 1C_7C ) )
 
-	PORT_START("DSW2")	/* Manual states "Not Use" */
+	PORT_START("DSW2")  /* Manual states "Not Use" */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -776,18 +776,18 @@ static INPUT_PORTS_START( cybertnk )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_BIT(	  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(     0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tile_8x8x4 =
 {
 	8,8,
 	RGN_FRAC(1,4),
-    4,
-    { RGN_FRAC(3,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(0,4) },
-    { STEP8(0,1) },
-    { STEP8(0,8) },
-    8*8
+	4,
+	{ RGN_FRAC(3,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(0,4) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 static const UINT32 xoffsets[] = { STEP1024(0,4) };

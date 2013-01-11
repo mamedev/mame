@@ -11,8 +11,8 @@
 #define EXERION_PIXEL_CLOCK       (EXERION_MASTER_CLOCK / 3)
 #define EXERION_HCOUNT_START      (0x58)
 #define EXERION_HTOTAL            (512-EXERION_HCOUNT_START)
-#define EXERION_HBEND             (12*8)	/* ?? */
-#define EXERION_HBSTART           (52*8)	/* ?? */
+#define EXERION_HBEND             (12*8)    /* ?? */
+#define EXERION_HBSTART           (52*8)    /* ?? */
 #define EXERION_VTOTAL            (256)
 #define EXERION_VBEND             (16)
 #define EXERION_VBSTART           (240)

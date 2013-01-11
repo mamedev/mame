@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CASSETTE_TAG	"cassette"
+#define CASSETTE_TAG    "cassette"
 
 
 
@@ -57,9 +57,9 @@ machine_config_constructor c2n_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 c2n_device::c2n_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  device_pet_datassette_port_interface(mconfig, *this),
-	  m_cassette(*this, CASSETTE_TAG)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_pet_datassette_port_interface(mconfig, *this),
+		m_cassette(*this, CASSETTE_TAG)
 {
 }
 

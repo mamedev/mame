@@ -560,9 +560,9 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 	for (oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-		          ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-		          ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-		          ((oldaddr     ) & 0x0001);        /* keep h2 */
+					((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
+					((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
+					((oldaddr     ) & 0x0001);        /* keep h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -578,10 +578,10 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 	for (oldaddr = 0; oldaddr < length; oldaddr++)
 	{
 		newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-		          ((oldaddr >> 4) & 0x0200) |       /* move n3 */
-		          ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-		          ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-		          ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+					((oldaddr >> 4) & 0x0200) |       /* move n3 */
+					((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+					((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 

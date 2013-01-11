@@ -140,7 +140,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 		drawgfx_opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(), machine().gfx[1],
 				m_videoram[offs] + ((m_colorram[offs] & 0x08) << 5),
 				(m_colorram[offs] & 0x30) >> 4,
-				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
+				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
 				16 * sx, 16 * sy);
 	}
 
@@ -153,7 +153,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 		drawgfx_opaque(*m_tmpbitmap2, m_tmpbitmap2->cliprect(), machine().gfx[1],
 				m_videoram3[offs] + ((m_colorram3[offs] & 0x08) << 5),
 				(m_colorram3[offs] & 0x30) >> 4,
-				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
+				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
 
@@ -211,7 +211,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		drawgfx_opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(), machine().gfx[1],
 				m_videoram[offs] + ((m_colorram[offs] & 0x03) << 8),
 				(m_colorram[offs] & 0x30) >> 4,
-				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
+				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
 
@@ -224,7 +224,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		drawgfx_opaque(*m_tmpbitmap2, m_tmpbitmap2->cliprect(), machine().gfx[1],
 				m_videoram3[offs] + ((m_colorram3[offs] & 0x03) << 8),
 				(m_colorram3[offs] & 0x30) >> 4,
-				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
+				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
 

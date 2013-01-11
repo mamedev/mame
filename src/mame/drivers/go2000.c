@@ -108,9 +108,9 @@ static INPUT_PORTS_START( go2000 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED) // unused?
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED) // unused?
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED) // unused?
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 M1")	// m1
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 M2")	// m2
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 M3")	// m3
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 M1")   // m1
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 M2")   // m2
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 M3")   // m3
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED) // unused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 ) // coin2
 
@@ -219,19 +219,19 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 		int x = m_videoram[offs + 1 + 0x00000 / 2];
 		int dim = m_videoram2[offs + 0 + 0x00000 / 2];
 
-		int bank	=	(x >> 12) & 0xf;
+		int bank    =   (x >> 12) & 0xf;
 
 		srcpg = ((y & 0xf000) >> 12) + ((x & 0x0200) >> 5); // src page
-		srcx = ((y >> 8) & 0xf) * 2;					// src col
-		srcy = ((dim >> 0) & 0xf) * 2;					// src row
+		srcx = ((y >> 8) & 0xf) * 2;                    // src col
+		srcy = ((dim >> 0) & 0xf) * 2;                  // src row
 
 		switch ((dim >> 4) & 0xc)
 		{
-			case 0x0:	dimx = 2;	dimy = 2;	y0 = 0x100; break;
-			case 0x4:	dimx = 4;	dimy = 4;	y0 = 0x100; break;
-			case 0x8:	dimx = 2;	dimy = 32;	y0 = 0x130; break;
+			case 0x0:   dimx = 2;   dimy = 2;   y0 = 0x100; break;
+			case 0x4:   dimx = 4;   dimy = 4;   y0 = 0x100; break;
+			case 0x8:   dimx = 2;   dimy = 32;  y0 = 0x130; break;
 			default:
-			case 0xc:	dimx = 4;	dimy = 32;	y0 = 0x120; break;
+			case 0xc:   dimx = 4;   dimy = 32;  y0 = 0x120; break;
 		}
 
 		if (dimx == 4)
@@ -286,11 +286,11 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(	bitmap, cliprect,machine().gfx[0],
+				drawgfx_transpen(   bitmap, cliprect,machine().gfx[0],
 							(tile & 0x1fff) + bank*0x4000,
 							attr,
 							tile_flipx, tile_flipy,
-							sx, sy,15	);
+							sx, sy,15   );
 
 				tile_x += tile_xinc;
 			}

@@ -25,22 +25,22 @@
 
 #define LOG 0
 
-#define OPTION_ID		0x1f
+#define OPTION_ID       0x1f
 
-#define Z80SIO2_TAG		"z80sio2"
-#define Z80DART_TAG		"z80dart"
+#define Z80SIO2_TAG     "z80sio2"
+#define Z80DART_TAG     "z80dart"
 
-#define FUNCTION_PORT1_EXT_CLK		BIT(m_option, 0)
-#define FUNCTION_PORT1_NRZI			BIT(m_option, 1)
-#define FUNCTION_PORT1_RI_IE		BIT(m_option, 2)
-#define FUNCTION_PORT2_EXT_CLK		BIT(m_option, 3)
-#define FUNCTION_PORT2_NRZI			BIT(m_option, 4)
-#define FUNCTION_PORT2_RI_IE		BIT(m_option, 5)
-#define FUNCTION_IRQ_MASK			(m_option & 0xc0)
-#define FUNCTION_IRQ2				0x00
-#define FUNCTION_IRQ3				0x40
-#define FUNCTION_IRQ4				0x80
-#define FUNCTION_IRQ_INVALID		0xc0
+#define FUNCTION_PORT1_EXT_CLK      BIT(m_option, 0)
+#define FUNCTION_PORT1_NRZI         BIT(m_option, 1)
+#define FUNCTION_PORT1_RI_IE        BIT(m_option, 2)
+#define FUNCTION_PORT2_EXT_CLK      BIT(m_option, 3)
+#define FUNCTION_PORT2_NRZI         BIT(m_option, 4)
+#define FUNCTION_PORT2_RI_IE        BIT(m_option, 5)
+#define FUNCTION_IRQ_MASK           (m_option & 0xc0)
+#define FUNCTION_IRQ2               0x00
+#define FUNCTION_IRQ3               0x40
+#define FUNCTION_IRQ4               0x80
+#define FUNCTION_IRQ_INVALID        0xc0
 
 
 
@@ -235,26 +235,26 @@ UINT16 wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 			// board status
 			/*
 
-                bit     description
+			    bit     description
 
-                0       SIO channel A WAIT/RDY
-                1       SIO channel B WAIT/RDY
-                2       SIO channel A DSR
-                3       SIO channel B DSR
-                4       SIO channel A RI
-                5       SIO channel B RI
-                6       DART channel A WAIT/RDY
-                7       DART channel A DSR
-                8       DART channel B WAIT/RDY
-                9       0 (1 for PC-PM042)
-                10      0 (1 for PC-PM042)
-                11      0 (1 for PC-PM042)
-                12      1
-                13      1
-                14      1
-                15      1
+			    0       SIO channel A WAIT/RDY
+			    1       SIO channel B WAIT/RDY
+			    2       SIO channel A DSR
+			    3       SIO channel B DSR
+			    4       SIO channel A RI
+			    5       SIO channel B RI
+			    6       DART channel A WAIT/RDY
+			    7       DART channel A DSR
+			    8       DART channel B WAIT/RDY
+			    9       0 (1 for PC-PM042)
+			    10      0 (1 for PC-PM042)
+			    11      0 (1 for PC-PM042)
+			    12      1
+			    13      1
+			    14      1
+			    15      1
 
-            */
+			*/
 			data = 0xf000;
 			break;
 

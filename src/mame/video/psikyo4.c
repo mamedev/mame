@@ -35,22 +35,22 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 
-    0 hhhh --yy yyyy yyyy | wwww --xx xxxx xxxx  1  Ffpp pppp ---- -nnn | nnnn nnnn nnnn nnnn
+	0 hhhh --yy yyyy yyyy | wwww --xx xxxx xxxx  1  Ffpp pppp ---- -nnn | nnnn nnnn nnnn nnnn
 
-    y = ypos
-    x = xpos
+	y = ypos
+	x = xpos
 
-    h = height
-    w = width
+	h = height
+	w = width
 
-    f = flip (x)
-    F = flip (y) Unused?
+	f = flip (x)
+	F = flip (y) Unused?
 
-    n = tile number
+	n = tile number
 
-    p = palette
+	p = palette
 
-    **- End Sprite Format -*/
+	**- End Sprite Format -*/
 
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
 	gfx_element *gfx = machine.gfx[0];
@@ -105,11 +105,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				flipy = !flipy;
 			}
 
-			if (flipx)	{ xstart = wide - 1;  xend = -1;    xinc = -1; }
-			else		{ xstart = 0;         xend = wide;  xinc = +1; }
+			if (flipx)  { xstart = wide - 1;  xend = -1;    xinc = -1; }
+			else        { xstart = 0;         xend = wide;  xinc = +1; }
 
-			if (flipy)	{ ystart = high - 1;  yend = -1;     yinc = -1; }
-			else		{ ystart = 0;         yend = high;   yinc = +1; }
+			if (flipy)  { ystart = high - 1;  yend = -1;     yinc = -1; }
+			else        { ystart = 0;         yend = high;   yinc = +1; }
 
 			for (j = ystart; j != yend; j += yinc)
 			{

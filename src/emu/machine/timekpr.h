@@ -56,7 +56,7 @@ struct timekeeper_config
 
 // ======================> timekeeper_device
 
-class timekeeper_device :	public device_t,
+class timekeeper_device :   public device_t,
 							public device_nvram_interface
 {
 protected:

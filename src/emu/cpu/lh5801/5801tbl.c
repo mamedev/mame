@@ -71,7 +71,7 @@ INLINE UINT8 lh5801_decimaladd_generic(lh5801_state *cpustate, int left, int rig
 		da = 0xa0;
 	else if ((cpustate->t&C) && !(cpustate->t&H))
 		da = 0xfa;
-	else	//if ((cpustate->t&C) && (cpustate->t&H))
+	else    //if ((cpustate->t&C) && (cpustate->t&H))
 		da = 0x00;
 
 	return res + da;
@@ -79,7 +79,7 @@ INLINE UINT8 lh5801_decimaladd_generic(lh5801_state *cpustate, int left, int rig
 
 INLINE void lh5801_dca(lh5801_state *cpustate, UINT8 data)
 {
-	cpustate->a += 0x66;	//taken from official documentation
+	cpustate->a += 0x66;    //taken from official documentation
 	cpustate->a=lh5801_decimaladd_generic(cpustate, cpustate->a, data, cpustate->t&C);
 }
 
@@ -689,4 +689,3 @@ static void lh5801_instruction(lh5801_state *cpustate)
 	}
 
 }
-

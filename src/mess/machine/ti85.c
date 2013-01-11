@@ -11,8 +11,8 @@
 #include "cpu/z80/z80.h"
 #include "includes/ti85.h"
 
-#define TI85_SNAPSHOT_SIZE	 32976
-#define TI86_SNAPSHOT_SIZE	131284
+#define TI85_SNAPSHOT_SIZE   32976
+#define TI86_SNAPSHOT_SIZE  131284
 
 
 TIMER_CALLBACK_MEMBER(ti85_state::ti85_timer_callback)
@@ -248,12 +248,12 @@ READ8_MEMBER(ti85_state::ti8x_keypad_r)
 	return data;
 }
 
- READ8_MEMBER(ti85_state::ti85_port_0002_r )
+	READ8_MEMBER(ti85_state::ti85_port_0002_r )
 {
 	return 0xff;
 }
 
- READ8_MEMBER(ti85_state::ti85_port_0003_r )
+	READ8_MEMBER(ti85_state::ti85_port_0003_r )
 {
 	int data = 0;
 
@@ -270,12 +270,12 @@ READ8_MEMBER(ti85_state::ti8x_keypad_r)
 	return data;
 }
 
- READ8_MEMBER(ti85_state::ti85_port_0004_r )
+	READ8_MEMBER(ti85_state::ti85_port_0004_r )
 {
 	return 0xff;
 }
 
- READ8_MEMBER(ti85_state::ti85_port_0005_r )
+	READ8_MEMBER(ti85_state::ti85_port_0005_r )
 {
 	return m_ti8x_memory_page_1;
 }
@@ -293,7 +293,7 @@ READ8_MEMBER(ti85_state::ti8x_serial_r)
 		| (m_red_out<<2)
 		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
 		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
-		| 0x03	// no link cable
+		| 0x03  // no link cable
 		| m_PCR;
 }
 
@@ -345,7 +345,7 @@ READ8_MEMBER(ti85_state::ti8x_plus_serial_r)
 		| (m_red_out<<2)
 		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
 		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
-		| 0x03	// no link cable
+		| 0x03  // no link cable
 		| m_PCR;
 }
 
@@ -376,7 +376,7 @@ WRITE8_MEMBER(ti85_state::ti85_port_0002_w)
 
 WRITE8_MEMBER(ti85_state::ti85_port_0003_w)
 {
-	if (m_LCD_status && !(data&0x08))	m_timer_interrupt_mask = 0;
+	if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
 	m_ON_interrupt_mask = data&0x01;
 //  m_timer_interrupt_mask = data&0x04;
 	m_LCD_mask = data&0x02;
@@ -447,7 +447,7 @@ WRITE8_MEMBER(ti85_state::ti83_port_0002_w)
 
 WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
 {
-		if (m_LCD_status && !(data&0x08))	m_timer_interrupt_mask = 0;
+		if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
 		m_ON_interrupt_mask = data&0x01;
 		//m_timer_interrupt_mask = data&0x04;
 		m_LCD_mask = data&0x02;
@@ -616,7 +616,7 @@ static void ti85_setup_snapshot (running_machine &machine, UINT8 * data)
 
 	/* Memory dump */
 	for (i = 0; i < 0x8000; i++)
-	   space.write_byte(i + 0x8000, data[i+0x94]);
+		space.write_byte(i + 0x8000, data[i+0x94]);
 
 	state->m_keypad_mask = hdw[0x00]&0x7f;
 
@@ -717,4 +717,3 @@ SNAPSHOT_LOAD( ti8x )
 	free(ti8x_snapshot_data);
 	return IMAGE_INIT_PASS;
 }
-

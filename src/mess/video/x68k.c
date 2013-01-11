@@ -500,19 +500,19 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 	UINT16* gvram;
 //  int xloc,yloc,pageoffset;
 	/*
-       G-VRAM usage is determined by colour depth and "real" screen size.
+	   G-VRAM usage is determined by colour depth and "real" screen size.
 
-       For screen size of 1024x1024, all G-VRAM space is used, in one big page.
-       At 1024x1024 real screen size, colour depth is always 4bpp, and ranges from
-       0xc00000-0xdfffff.
+	   For screen size of 1024x1024, all G-VRAM space is used, in one big page.
+	   At 1024x1024 real screen size, colour depth is always 4bpp, and ranges from
+	   0xc00000-0xdfffff.
 
-       For screen size of 512x512, the colour depth determines the page usage.
-       16 colours = 4 pages
-       256 colours = 2 pages
-       65,536 colours = 1 page
-       Page 1 - 0xc00000-0xc7ffff    Page 2 - 0xc80000-0xcfffff
-       Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
-    */
+	   For screen size of 512x512, the colour depth determines the page usage.
+	   16 colours = 4 pages
+	   256 colours = 2 pages
+	   65,536 colours = 1 page
+	   Page 1 - 0xc00000-0xc7ffff    Page 2 - 0xc80000-0xcfffff
+	   Page 3 - 0xd00000-0xd7ffff    Page 4 - 0xd80000-0xdfffff
+	*/
 
 	if(m_is_32bit)
 		gvram = (UINT16*)m_gvram32.target();
@@ -772,21 +772,21 @@ WRITE16_MEMBER(x68k_state::x68k_spriteram_w )
 	m_video.tile16_dirty[offset / 64] = 1;
 	if(offset < 0x2000)
 	{
-        m_bg1_8->mark_all_dirty();
-        m_bg1_16->mark_all_dirty();
-        m_bg0_8->mark_all_dirty();
-        m_bg0_16->mark_all_dirty();
-    }
-    if(offset >= 0x2000 && offset < 0x3000)
-    {
-        m_bg1_8->mark_tile_dirty(offset & 0x0fff);
-        m_bg1_16->mark_tile_dirty(offset & 0x0fff);
-    }
-    if(offset >= 0x3000)
-    {
-        m_bg0_8->mark_tile_dirty(offset & 0x0fff);
-        m_bg0_16->mark_tile_dirty(offset & 0x0fff);
-    }
+		m_bg1_8->mark_all_dirty();
+		m_bg1_16->mark_all_dirty();
+		m_bg0_8->mark_all_dirty();
+		m_bg0_16->mark_all_dirty();
+	}
+	if(offset >= 0x2000 && offset < 0x3000)
+	{
+		m_bg1_8->mark_tile_dirty(offset & 0x0fff);
+		m_bg1_16->mark_tile_dirty(offset & 0x0fff);
+	}
+	if(offset >= 0x3000)
+	{
+		m_bg0_8->mark_tile_dirty(offset & 0x0fff);
+		m_bg0_16->mark_tile_dirty(offset & 0x0fff);
+	}
 }
 
 READ16_MEMBER(x68k_state::x68k_spriteram_r )
@@ -973,34 +973,34 @@ void x68k_state::x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect)
 void x68k_state::x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect)
 {
 	/*
-       0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
-           + 00 : b9-0,  Sprite X position
-           + 02 : b9-0,  Sprite Y position
-           + 04 : b15,   Vertical Reversing (flipping?)
-                  b14,   Horizontal Reversing
-                  b11-8, Sprite colour
-                  b7-0,  Sprite tile code (in PCG)
-           + 06 : b1-0,  Priority
-                         00 = Sprite not displayed
+	   0xeb0000 - 0xeb07ff - Sprite registers (up to 128)
+	       + 00 : b9-0,  Sprite X position
+	       + 02 : b9-0,  Sprite Y position
+	       + 04 : b15,   Vertical Reversing (flipping?)
+	              b14,   Horizontal Reversing
+	              b11-8, Sprite colour
+	              b7-0,  Sprite tile code (in PCG)
+	       + 06 : b1-0,  Priority
+	                     00 = Sprite not displayed
 
-       0xeb0800 - BG0 X Scroll  (10-bit)
-       0xeb0802 - BG0 Y Scroll
-       0xeb0804 - BG1 X Scroll
-       0xeb0806 - BG1 Y Scroll
-       0xeb0808 - BG control
-                  b9,    BG/Sprite display (RAM and register access is faster if 1)
-                  b4,    PCG area 1 available
-                  b3,    BG1 display enable
-                  b1,    PCG area 0 available
-                  b0,    BG0 display enable
-       0xeb080a - Horizontal total (like CRTC reg 0 - is 0xff if in 256x256?)
-       0xeb080c - Horizontal display position (like CRTC reg 2 - +4)
-       0xeb080e - Vertical display position (like CRTC reg 6)
-       0xeb0810 - Resolution setting
-                  b4,    "L/H" (apparently 15kHz/31kHz switch for sprites/BG?)
-                  b3-2,  V-Res
-                  b1-0,  H-Res (0 = 8x8 tilemaps, 1 = 16x16 tilemaps, 2 or 3 = unknown)
-    */
+	   0xeb0800 - BG0 X Scroll  (10-bit)
+	   0xeb0802 - BG0 Y Scroll
+	   0xeb0804 - BG1 X Scroll
+	   0xeb0806 - BG1 Y Scroll
+	   0xeb0808 - BG control
+	              b9,    BG/Sprite display (RAM and register access is faster if 1)
+	              b4,    PCG area 1 available
+	              b3,    BG1 display enable
+	              b1,    PCG area 0 available
+	              b0,    BG0 display enable
+	   0xeb080a - Horizontal total (like CRTC reg 0 - is 0xff if in 256x256?)
+	   0xeb080c - Horizontal display position (like CRTC reg 2 - +4)
+	   0xeb080e - Vertical display position (like CRTC reg 6)
+	   0xeb0810 - Resolution setting
+	              b4,    "L/H" (apparently 15kHz/31kHz switch for sprites/BG?)
+	              b3-2,  V-Res
+	              b1-0,  H-Res (0 = 8x8 tilemaps, 1 = 16x16 tilemaps, 2 or 3 = unknown)
+	*/
 	int ptr,pri;
 
 	for(ptr=508;ptr>=0;ptr-=4)  // stepping through sprites

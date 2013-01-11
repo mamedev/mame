@@ -262,13 +262,13 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
     for each layer and hardwired to 1x or 4x for both tile sizes
 */
 
-	m_8x8_scroll_factor[0] = 1;	m_16x16_scroll_factor[0] = 4;
-	m_8x8_scroll_factor[1] = 1;	m_16x16_scroll_factor[1] = 4;
-	m_8x8_scroll_factor[2] = 1;	m_16x16_scroll_factor[2] = 4;
+	m_8x8_scroll_factor[0] = 1; m_16x16_scroll_factor[0] = 4;
+	m_8x8_scroll_factor[1] = 1; m_16x16_scroll_factor[1] = 4;
+	m_8x8_scroll_factor[2] = 1; m_16x16_scroll_factor[2] = 4;
 
 	if (strcmp(machine().system().name, "soldamj") == 0)
 	{
-		m_8x8_scroll_factor[1] = 4;	m_16x16_scroll_factor[1] = 4;
+		m_8x8_scroll_factor[1] = 4; m_16x16_scroll_factor[1] = 4;
 	}
 
 	m_hardware_type_z = 0;
@@ -296,7 +296,7 @@ INLINE void scrollram_w(address_space &space, offs_t offset, UINT16 data, UINT16
 	COMBINE_DATA(&state->m_scrollram[which][offset]);
 	if (offset < 0x40000/2 && state->m_tmap[which])
 	{
-		if (state->m_scroll_flag[which] & 0x10)	/* tiles are 8x8 */
+		if (state->m_scroll_flag[which] & 0x10) /* tiles are 8x8 */
 		{
 			state->m_tmap[which]->mark_tile_dirty(offset );
 		}
@@ -337,15 +337,15 @@ WRITE16_MEMBER(megasys1_state::megasys1_scrollram_2_w){ scrollram_w(space, offse
 TILEMAP_MAPPER_MEMBER(megasys1_state::megasys1_scan_8x8)
 {
 	return (col * TILES_PER_PAGE_Y) +
-		   (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE * (num_cols / TILES_PER_PAGE_X) +
-		   (row % TILES_PER_PAGE_Y);
+			(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE * (num_cols / TILES_PER_PAGE_X) +
+			(row % TILES_PER_PAGE_Y);
 }
 
 TILEMAP_MAPPER_MEMBER(megasys1_state::megasys1_scan_16x16)
 {
 	return ( ((col / 2) * (TILES_PER_PAGE_Y / 2)) +
-			 ((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
-			 ((row / 2) % (TILES_PER_PAGE_Y / 2)) )*4 + (row&1) + (col&1)*2;
+				((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
+				((row / 2) % (TILES_PER_PAGE_Y / 2)) )*4 + (row&1) + (col&1)*2;
 }
 
 TILE_GET_INFO_MEMBER(megasys1_state::megasys1_get_scroll_tile_info_8x8)
@@ -371,23 +371,23 @@ static void create_tilemaps(running_machine &machine)
 	{
 		/* 16x16 tilemaps */
 		state->m_tilemap[layer][0][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
+									8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
 		state->m_tilemap[layer][0][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
+									8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
 		state->m_tilemap[layer][0][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
+									8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
 		state->m_tilemap[layer][0][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_16x16),state),
-								 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
+									8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
 
 		/* 8x8 tilemaps */
 		state->m_tilemap[layer][1][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
+									8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
 		state->m_tilemap[layer][1][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+									8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		state->m_tilemap[layer][1][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+									8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		state->m_tilemap[layer][1][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(megasys1_state::megasys1_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(megasys1_state::megasys1_scan_8x8),state),
-								 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
+									8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
 
 		/* set user data and transparency */
 		for (i = 0; i < 8; i++)
@@ -417,23 +417,23 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 
 	switch (offset)
 	{
-		case 0x000/2   :	m_active_layers = new_data;	break;
+		case 0x000/2   :    m_active_layers = new_data; break;
 
-		case 0x008/2+0 :	m_scrollx[2] = new_data;	break;
-		case 0x008/2+1 :	m_scrolly[2] = new_data;	break;
-		case 0x008/2+2 :	megasys1_set_vreg_flag(2, new_data);		break;
+		case 0x008/2+0 :    m_scrollx[2] = new_data;    break;
+		case 0x008/2+1 :    m_scrolly[2] = new_data;    break;
+		case 0x008/2+2 :    megasys1_set_vreg_flag(2, new_data);        break;
 
-		case 0x200/2+0 :	m_scrollx[0] = new_data;	break;
-		case 0x200/2+1 :	m_scrolly[0] = new_data;	break;
-		case 0x200/2+2 :	megasys1_set_vreg_flag(0, new_data);		break;
+		case 0x200/2+0 :    m_scrollx[0] = new_data;    break;
+		case 0x200/2+1 :    m_scrolly[0] = new_data;    break;
+		case 0x200/2+2 :    megasys1_set_vreg_flag(0, new_data);        break;
 
-		case 0x208/2+0 :	m_scrollx[1] = new_data;	break;
-		case 0x208/2+1 :	m_scrolly[1] = new_data;	break;
-		case 0x208/2+2 :	megasys1_set_vreg_flag(1, new_data);		break;
+		case 0x208/2+0 :    m_scrollx[1] = new_data;    break;
+		case 0x208/2+1 :    m_scrolly[1] = new_data;    break;
+		case 0x208/2+2 :    megasys1_set_vreg_flag(1, new_data);        break;
 
-		case 0x100/2   :	m_sprite_flag = new_data;		break;
+		case 0x100/2   :    m_sprite_flag = new_data;       break;
 
-		case 0x300/2   :	m_screen_flag = new_data;
+		case 0x300/2   :    m_screen_flag = new_data;
 							if (machine().device("soundcpu"))
 							{
 								if (new_data & 0x10)
@@ -443,11 +443,11 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 							}
 							break;
 
-		case 0x308/2   :	soundlatch_word_w(space,0,new_data,0xffff);
+		case 0x308/2   :    soundlatch_word_w(space,0,new_data,0xffff);
 							machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);
 							break;
 
-		default		 :	SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
+		default      :  SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}
 
 }
@@ -460,8 +460,8 @@ READ16_MEMBER(megasys1_state::megasys1_vregs_C_r)
 {
 	switch (offset)
 	{
-		case 0x8000/2:	return soundlatch2_word_r(space,0,0xffff);
-		default:		return m_vregs[offset];
+		case 0x8000/2:  return soundlatch2_word_r(space,0,0xffff);
+		default:        return m_vregs[offset];
 	}
 }
 
@@ -471,35 +471,35 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_C_w)
 
 	switch (offset)
 	{
-		case 0x2000/2+0 :	m_scrollx[0] = new_data;	break;
-		case 0x2000/2+1 :	m_scrolly[0] = new_data;	break;
-		case 0x2000/2+2 :	megasys1_set_vreg_flag(0, new_data);		break;
+		case 0x2000/2+0 :   m_scrollx[0] = new_data;    break;
+		case 0x2000/2+1 :   m_scrolly[0] = new_data;    break;
+		case 0x2000/2+2 :   megasys1_set_vreg_flag(0, new_data);        break;
 
-		case 0x2008/2+0 :	m_scrollx[1] = new_data;	break;
-		case 0x2008/2+1 :	m_scrolly[1] = new_data;	break;
-		case 0x2008/2+2 :	megasys1_set_vreg_flag(1, new_data);		break;
+		case 0x2008/2+0 :   m_scrollx[1] = new_data;    break;
+		case 0x2008/2+1 :   m_scrolly[1] = new_data;    break;
+		case 0x2008/2+2 :   megasys1_set_vreg_flag(1, new_data);        break;
 
-		case 0x2100/2+0 :	m_scrollx[2] = new_data;	break;
-		case 0x2100/2+1 :	m_scrolly[2] = new_data;	break;
-		case 0x2100/2+2 :	megasys1_set_vreg_flag(2, new_data);		break;
+		case 0x2100/2+0 :   m_scrollx[2] = new_data;    break;
+		case 0x2100/2+1 :   m_scrolly[2] = new_data;    break;
+		case 0x2100/2+2 :   megasys1_set_vreg_flag(2, new_data);        break;
 
-		case 0x2108/2   :	m_sprite_bank   = new_data;	break;
-		case 0x2200/2   :	m_sprite_flag   = new_data;	break;
-		case 0x2208/2   :	m_active_layers = new_data;	break;
+		case 0x2108/2   :   m_sprite_bank   = new_data; break;
+		case 0x2200/2   :   m_sprite_flag   = new_data; break;
+		case 0x2208/2   :   m_active_layers = new_data; break;
 
-		case 0x2308/2   :	m_screen_flag = new_data;
+		case 0x2308/2   :   m_screen_flag = new_data;
 							if (new_data & 0x10)
 								machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 							else
 								machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
-		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
+		case 0x8000/2   :   /* Cybattler reads sound latch on irq 2 */
 							soundlatch_word_w(space, 0, new_data, 0xffff);
 							machine().device("soundcpu")->execute().set_input_line(2, HOLD_LINE);
 							break;
 
-		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X", offset * 2, data);
+		default:        SHOW_WRITE_ERROR("vreg %04X <- %04X", offset * 2, data);
 	}
 }
 
@@ -512,24 +512,24 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_D_w)
 
 	switch (offset)
 	{
-		case 0x2000/2+0 :	m_scrollx[0] = new_data;	break;
-		case 0x2000/2+1 :	m_scrolly[0] = new_data;	break;
-		case 0x2000/2+2 :	megasys1_set_vreg_flag(0, new_data);		break;
+		case 0x2000/2+0 :   m_scrollx[0] = new_data;    break;
+		case 0x2000/2+1 :   m_scrolly[0] = new_data;    break;
+		case 0x2000/2+2 :   megasys1_set_vreg_flag(0, new_data);        break;
 
-		case 0x2008/2+0 :	m_scrollx[1] = new_data;	break;
-		case 0x2008/2+1 :	m_scrolly[1] = new_data;	break;
-		case 0x2008/2+2 :	megasys1_set_vreg_flag(1, new_data);		break;
+		case 0x2008/2+0 :   m_scrollx[1] = new_data;    break;
+		case 0x2008/2+1 :   m_scrolly[1] = new_data;    break;
+		case 0x2008/2+2 :   megasys1_set_vreg_flag(1, new_data);        break;
 
 //      case 0x2100/2+0 :   m_scrollx[2] = new_data; break;
 //      case 0x2100/2+1 :   m_scrolly[2] = new_data; break;
 //      case 0x2100/2+2 :   megasys1_set_vreg_flag(2, new_data);        break;
 
-		case 0x2108/2   :	m_sprite_bank	=	new_data;		break;
-		case 0x2200/2   :	m_sprite_flag	=	new_data;		break;
-		case 0x2208/2   :	m_active_layers	=	new_data;		break;
-		case 0x2308/2   :	m_screen_flag	=	new_data;		break;
+		case 0x2108/2   :   m_sprite_bank   =   new_data;       break;
+		case 0x2200/2   :   m_sprite_flag   =   new_data;       break;
+		case 0x2208/2   :   m_active_layers =   new_data;       break;
+		case 0x2308/2   :   m_screen_flag   =   new_data;       break;
 
-		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
+		default:        SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}
 }
 
@@ -569,7 +569,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 	/* sprite order is from first in Sprite Data RAM (frontmost) to last */
 
-	if (state->m_hardware_type_z == 0)	/* standard sprite hardware */
+	if (state->m_hardware_type_z == 0)  /* standard sprite hardware */
 	{
 		color_mask = (state->m_sprite_flag & 0x100) ? 0x07 : 0x0f;
 
@@ -581,7 +581,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				UINT16 *spritedata = &state->m_buffer2_spriteram16[ (objectdata[ 0 ] & 0x7f) * 0x10/2];
 
 				attr = spritedata[ 8/2 ];
-				if (((attr & 0xc0)>>6) != sprite)	continue;	// flipping
+				if (((attr & 0xc0)>>6) != sprite)   continue;   // flipping
 
 				/* apply the position displacements */
 				sx = ( spritedata[0x0A/2] + objectdata[0x02/2] ) % 512;
@@ -595,8 +595,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 				if (state->m_screen_flag & 1)
 				{
-					flipx = !flipx;		flipy = !flipy;
-					sx = 240-sx;		sy = 240-sy;
+					flipx = !flipx;     flipy = !flipy;
+					sx = 240-sx;        sy = 240-sy;
 				}
 
 				/* sprite code is displaced as well */
@@ -611,9 +611,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 						sx, sy,
 						machine.priority_bitmap,
 						(attr & 0x08) ? 0x0c : 0x0a,15);
-			}	/* sprite */
-		}	/* offs */
-	}	/* non Z hw */
+			}   /* sprite */
+		}   /* offs */
+	}   /* non Z hw */
 	else
 	{
 		UINT16 *spriteram16 = state->m_spriteram;
@@ -640,8 +640,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 			if (state->m_screen_flag & 1)
 			{
-				flipx = !flipx;		flipy = !flipy;
-				sx = 240-sx;		sy = 240-sy;
+				flipx = !flipx;     flipy = !flipy;
+				sx = 240-sx;        sy = 240-sy;
 			}
 
 			pdrawgfx_transpen(bitmap,cliprect,
@@ -652,8 +652,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 					sx, sy,
 					machine.priority_bitmap,
 					(attr & 0x08) ? 0x0c : 0x0a,15);
-		}	/* sprite */
-	}	/* Z hw */
+		}   /* sprite */
+	}   /* Z hw */
 
 }
 
@@ -692,15 +692,15 @@ struct priority
 
 static const struct priority priorities[] =
 {
-	{	"64street",
+	{   "64street",
 		{ 0x04132,0x03142,0x14032,0x04132,0xfffff,0x04132,0xfffff,0xfffff,
-		  0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
+			0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
 	},
-	{	"chimerab",
+	{   "chimerab",
 		{ 0x14032,0x04132,0x14032,0x04132,0xfffff,0xfffff,0xfffff,0xfffff,
-		  0xfffff,0xfffff,0x01324,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
+			0xfffff,0xfffff,0x01324,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
 	},
-	{	0	}	// end of list: use the prom's data
+	{   0   }   // end of list: use the prom's data
 };
 
 
@@ -754,11 +754,11 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 	int pri_code, offset, i, order;
 
 	/* First check if we have an hand-crafted priority scheme
-       available (this should happen only if no good dump
-       of the prom is known) */
+	   available (this should happen only if no good dump
+	   of the prom is known) */
 
 	i = 0;
-	while (	priorities[i].driver &&
+	while ( priorities[i].driver &&
 			strcmp(priorities[i].driver, machine().system().name) != 0 &&
 			strcmp(priorities[i].driver, machine().system().parent) != 0)
 		i++;
@@ -774,44 +774,44 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 
 	/* Otherwise, perform the conversion from the prom itself */
 
-	for (pri_code = 0; pri_code < 0x10 ; pri_code++)	// 16 priority codes
+	for (pri_code = 0; pri_code < 0x10 ; pri_code++)    // 16 priority codes
 	{
-		int layers_order[2];	// 2 layers orders (split sprites on/off)
+		int layers_order[2];    // 2 layers orders (split sprites on/off)
 
 		for (offset = 0; offset < 2; offset ++)
 		{
-			int enable_mask = 0xf;	// start with every layer enabled
+			int enable_mask = 0xf;  // start with every layer enabled
 
 			layers_order[offset] = 0xfffff;
 
 			do
 			{
-				int top = color_prom[pri_code * 0x20 + offset + enable_mask * 2] & 3;	// this must be the top layer
+				int top = color_prom[pri_code * 0x20 + offset + enable_mask * 2] & 3;   // this must be the top layer
 				int top_mask = 1 << top;
 
-				int	result = 0;		// result of the feasibility check for this layer
+				int result = 0;     // result of the feasibility check for this layer
 
-				for (i = 0; i < 0x10 ; i++)	// every combination of opaque and transparent pens
+				for (i = 0; i < 0x10 ; i++) // every combination of opaque and transparent pens
 				{
-					int opacity	=	i & enable_mask;	// only consider active layers
-					int layer	=	color_prom[pri_code * 0x20 + offset + opacity * 2];
+					int opacity =   i & enable_mask;    // only consider active layers
+					int layer   =   color_prom[pri_code * 0x20 + offset + opacity * 2];
 
 					if (opacity)
 					{
 						if (opacity & top_mask)
 						{
-							if (layer != top )	result |= 1;	// error: opaque pens aren't always opaque!
+							if (layer != top )  result |= 1;    // error: opaque pens aren't always opaque!
 						}
 						else
 						{
-							if (layer == top)	result |= 2;	// transparent pen is opaque
-							else				result |= 4;	// transparent pen is transparent
+							if (layer == top)   result |= 2;    // transparent pen is opaque
+							else                result |= 4;    // transparent pen is transparent
 						}
 					}
 				}
 
 				/*  note: 3210 means that layer 0 is the bottom layer
-                    (the order is reversed in the hand-crafted data) */
+				    (the order is reversed in the hand-crafted data) */
 
 				layers_order[offset] = ( (layers_order[offset] << 4) | top ) & 0xfffff;
 				enable_mask &= ~top_mask;
@@ -832,28 +832,28 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 					break;
 				}
 
-				if (result == 2)	enable_mask = 0; // totally opaque top layer
+				if (result == 2)    enable_mask = 0; // totally opaque top layer
 
-			}	while (enable_mask);
+			}   while (enable_mask);
 
-        }	// offset
+		}   // offset
 
 		/* merge the two layers orders */
 
 		order = 0xfffff;
 
-		for (i = 5; i > 0 ; )	// 5 layers to write
+		for (i = 5; i > 0 ; )   // 5 layers to write
 		{
 			int layer;
 			int layer0 = layers_order[0] & 0x0f;
 			int layer1 = layers_order[1] & 0x0f;
 
-			if (layer0 != 3)	// 0,1,2 or f
+			if (layer0 != 3)    // 0,1,2 or f
 			{
 				if (layer1 == 3)
 				{
 					layer = 4;
-					layers_order[0] <<= 4;	// layer1 won't change next loop
+					layers_order[0] <<= 4;  // layer1 won't change next loop
 				}
 				else
 				{
@@ -868,34 +868,34 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 
 				}
 			}
-			else	// layer0 = 3;
+			else    // layer0 = 3;
 			{
 				if (layer1 == 3)
 				{
-					layer = 0x43;			// 4 must always be present
+					layer = 0x43;           // 4 must always be present
 					order <<= 4;
-					i --;					// 2 layers written at once
+					i --;                   // 2 layers written at once
 				}
 				else
 				{
 					layer = 3;
-					layers_order[1] <<= 4;	// layer1 won't change next loop
+					layers_order[1] <<= 4;  // layer1 won't change next loop
 				}
 			}
 
 			/* reverse the order now */
 			order = (order << 4 ) | layer;
 
-			i --;		// layer written
+			i --;       // layer written
 
 			layers_order[0] >>= 4;
 			layers_order[1] >>= 4;
 
-		}	// merging
+		}   // merging
 
-		m_layers_order[pri_code] = order & 0xfffff;	// at last!
+		m_layers_order[pri_code] = order & 0xfffff; // at last!
 
-	}	// pri_code
+	}   // pri_code
 
 
 
@@ -949,7 +949,7 @@ UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind1
 			reallyactive |= 1 << ((pri >> (4*i)) & 0x0f);
 
 		active_layers = m_active_layers & reallyactive;
-		active_layers |= 1 << ((pri & 0xf0000) >> 16);	// bottom layer can't be disabled
+		active_layers |= 1 << ((pri & 0xf0000) >> 16);  // bottom layer can't be disabled
 	}
 
 	machine().tilemap().set_flip_all((m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
@@ -994,14 +994,14 @@ UINT32 megasys1_state::screen_update_megasys1(screen_device &screen, bitmap_ind1
 					bitmap.fill(0, cliprect);
 				}
 
-				if (m_sprite_flag & 0x100)	/* sprites are split */
+				if (m_sprite_flag & 0x100)  /* sprites are split */
 				{
 					/* following tilemaps will obscure this sprites layer */
 					primask |= 1 << (layer-3);
 				}
 				else
 					/* following tilemaps will obscure all sprites */
-					if (layer == 3)	primask |= 3;
+					if (layer == 3) primask |= 3;
 
 				break;
 		}
@@ -1027,4 +1027,3 @@ void megasys1_state::screen_eof_megasys1(screen_device &screen, bool state)
 	}
 
 }
-

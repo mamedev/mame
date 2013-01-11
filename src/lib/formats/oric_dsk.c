@@ -14,8 +14,8 @@
 #include "basicdsk.h"
 
 
-#define mfm_disk_header_size	0x0100
-#define MFM_ID	"MFM_DISK"
+#define mfm_disk_header_size    0x0100
+#define MFM_ID  "MFM_DISK"
 
 #define TRACK_SIZE_MFM 0x1900
 
@@ -34,7 +34,7 @@ struct oricdsk_tag
 	int geometry;
 	int tracksize;
 	int num_sectors;
-	struct mfm_disk_sector_info	sector_data[32];
+	struct mfm_disk_sector_info sector_data[32];
 };
 
 
@@ -306,7 +306,7 @@ static FLOPPY_CONSTRUCT(oric_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( oric )
-	LEGACY_FLOPPY_OPTION( oricmfm, "dsk", "Oric MFM floppy disk image",	oric_dsk_identify, oric_dsk_construct, NULL, NULL)
+	LEGACY_FLOPPY_OPTION( oricmfm, "dsk", "Oric MFM floppy disk image", oric_dsk_identify, oric_dsk_construct, NULL, NULL)
 	LEGACY_FLOPPY_OPTION( oric, "dsk", "Oric disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])

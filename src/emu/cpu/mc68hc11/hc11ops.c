@@ -1,28 +1,28 @@
-#define SET_Z8(r)			(cpustate->ccr |= ((UINT8)r == 0) ? CC_Z : 0)
-#define SET_Z16(r)			(cpustate->ccr |= ((UINT16)r == 0) ? CC_Z : 0)
-#define SET_N8(r)			(cpustate->ccr |= (r & 0x80) ? CC_N : 0)
-#define SET_N16(r)			(cpustate->ccr |= (r & 0x8000) ? CC_N : 0)
-#define SET_V_ADD8(r,s,d)	(cpustate->ccr |= (((r) ^ (s)) & ((r) ^ (d)) & 0x80) ? CC_V : 0)
-#define SET_V_SUB8(r,s,d)	(cpustate->ccr |= (((d) ^ (s)) & ((d) ^ (r)) & 0x80) ? CC_V : 0)
-#define SET_V_ADD16(r,s,d)	(cpustate->ccr |= (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? CC_V : 0)
-#define SET_V_SUB16(r,s,d)	(cpustate->ccr |= (((d) ^ (s)) & ((d) ^ (r)) & 0x8000) ? CC_V : 0)
-#define SET_H(r,s,d)		(cpustate->ccr |= (((r) ^ (s) ^ (d)) & 0x10) ? CC_H : 0)
-#define SET_C8(x)			(cpustate->ccr |= ((x) & 0x100) ? CC_C : 0)
-#define SET_C16(x)			(cpustate->ccr |= ((x) & 0x10000) ? CC_C : 0)
-#define CLEAR_Z(cpustate)			(cpustate->ccr &= ~(CC_Z))
-#define CLEAR_C(cpustate)			(cpustate->ccr &= ~(CC_C))
-#define CLEAR_NZV(cpustate)			(cpustate->ccr &= ~(CC_N | CC_Z | CC_V))
-#define CLEAR_ZVC(cpustate)			(cpustate->ccr &= ~(CC_Z | CC_V | CC_C))
-#define CLEAR_NZVC(cpustate)		(cpustate->ccr &= ~(CC_N | CC_Z | CC_V | CC_C))
-#define CLEAR_HNZVC(cpustate)		(cpustate->ccr &= ~(CC_H | CC_N | CC_Z | CC_V | CC_C))
+#define SET_Z8(r)           (cpustate->ccr |= ((UINT8)r == 0) ? CC_Z : 0)
+#define SET_Z16(r)          (cpustate->ccr |= ((UINT16)r == 0) ? CC_Z : 0)
+#define SET_N8(r)           (cpustate->ccr |= (r & 0x80) ? CC_N : 0)
+#define SET_N16(r)          (cpustate->ccr |= (r & 0x8000) ? CC_N : 0)
+#define SET_V_ADD8(r,s,d)   (cpustate->ccr |= (((r) ^ (s)) & ((r) ^ (d)) & 0x80) ? CC_V : 0)
+#define SET_V_SUB8(r,s,d)   (cpustate->ccr |= (((d) ^ (s)) & ((d) ^ (r)) & 0x80) ? CC_V : 0)
+#define SET_V_ADD16(r,s,d)  (cpustate->ccr |= (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? CC_V : 0)
+#define SET_V_SUB16(r,s,d)  (cpustate->ccr |= (((d) ^ (s)) & ((d) ^ (r)) & 0x8000) ? CC_V : 0)
+#define SET_H(r,s,d)        (cpustate->ccr |= (((r) ^ (s) ^ (d)) & 0x10) ? CC_H : 0)
+#define SET_C8(x)           (cpustate->ccr |= ((x) & 0x100) ? CC_C : 0)
+#define SET_C16(x)          (cpustate->ccr |= ((x) & 0x10000) ? CC_C : 0)
+#define CLEAR_Z(cpustate)           (cpustate->ccr &= ~(CC_Z))
+#define CLEAR_C(cpustate)           (cpustate->ccr &= ~(CC_C))
+#define CLEAR_NZV(cpustate)         (cpustate->ccr &= ~(CC_N | CC_Z | CC_V))
+#define CLEAR_ZVC(cpustate)         (cpustate->ccr &= ~(CC_Z | CC_V | CC_C))
+#define CLEAR_NZVC(cpustate)        (cpustate->ccr &= ~(CC_N | CC_Z | CC_V | CC_C))
+#define CLEAR_HNZVC(cpustate)       (cpustate->ccr &= ~(CC_H | CC_N | CC_Z | CC_V | CC_C))
 
-#define SET_ZFLAG(cpustate)			(cpustate->ccr |= CC_Z)
-#define SET_NFLAG(cpustate)			(cpustate->ccr |= CC_N)
-#define SET_VFLAG(cpustate)			(cpustate->ccr |= CC_V)
+#define SET_ZFLAG(cpustate)         (cpustate->ccr |= CC_Z)
+#define SET_NFLAG(cpustate)         (cpustate->ccr |= CC_N)
+#define SET_VFLAG(cpustate)         (cpustate->ccr |= CC_V)
 
-#define REG_A				cpustate->d.d8.a
-#define REG_B				cpustate->d.d8.b
-#define REG_D				cpustate->d.d16
+#define REG_A               cpustate->d.d8.a
+#define REG_B               cpustate->d.d8.b
+#define REG_D               cpustate->d.d16
 
 INLINE void CYCLES(hc11_state *cpustate, int cycles)
 {
@@ -789,7 +789,7 @@ static void HC11OP(bitb_indy)(hc11_state *cpustate)
 static void HC11OP(bcc)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if ((cpustate->ccr & CC_C) == 0)	/* Branch if C flag clear */
+	if ((cpustate->ccr & CC_C) == 0)    /* Branch if C flag clear */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -827,7 +827,7 @@ static void HC11OP(bclr_indx)(hc11_state *cpustate)
 static void HC11OP(bcs)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if (cpustate->ccr & CC_C)			/* Branch if C flag set */
+	if (cpustate->ccr & CC_C)           /* Branch if C flag set */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -839,7 +839,7 @@ static void HC11OP(bcs)(hc11_state *cpustate)
 static void HC11OP(beq)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if (cpustate->ccr & CC_Z)			/* Branch if Z flag set */
+	if (cpustate->ccr & CC_Z)           /* Branch if Z flag set */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -851,7 +851,7 @@ static void HC11OP(beq)(hc11_state *cpustate)
 static void HC11OP(bhi)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if (((cpustate->ccr & CC_C) == 0) && ((cpustate->ccr & CC_Z) == 0))	/* Branch if C and Z flag clear */
+	if (((cpustate->ccr & CC_C) == 0) && ((cpustate->ccr & CC_Z) == 0)) /* Branch if C and Z flag clear */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -863,7 +863,7 @@ static void HC11OP(bhi)(hc11_state *cpustate)
 static void HC11OP(bne)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if ((cpustate->ccr & CC_Z) == 0)		/* Branch if Z flag clear */
+	if ((cpustate->ccr & CC_Z) == 0)        /* Branch if Z flag clear */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -877,7 +877,7 @@ static void HC11OP(ble)(hc11_state *cpustate)
 	UINT8 n = (cpustate->ccr & CC_N) ? 1 : 0;
 	UINT8 v = (cpustate->ccr & CC_V) ? 1 : 0;
 	INT8 rel = FETCH(cpustate);
-	if ((cpustate->ccr & CC_Z) || (n ^ v))	/* Branch if Z flag set or (N ^ V) */
+	if ((cpustate->ccr & CC_Z) || (n ^ v))  /* Branch if Z flag set or (N ^ V) */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -888,7 +888,7 @@ static void HC11OP(ble)(hc11_state *cpustate)
 static void HC11OP(bls)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if (cpustate->ccr & CC_C || cpustate->ccr & CC_Z)	/* Branch if C or Z flag set */
+	if (cpustate->ccr & CC_C || cpustate->ccr & CC_Z)   /* Branch if C or Z flag set */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -899,7 +899,7 @@ static void HC11OP(bls)(hc11_state *cpustate)
 static void HC11OP(bmi)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if (cpustate->ccr & CC_N)		/* Branch if N flag set */
+	if (cpustate->ccr & CC_N)       /* Branch if N flag set */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -910,7 +910,7 @@ static void HC11OP(bmi)(hc11_state *cpustate)
 static void HC11OP(bpl)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if ((cpustate->ccr & CC_N) == 0)		/* Branch if N flag clear */
+	if ((cpustate->ccr & CC_N) == 0)        /* Branch if N flag clear */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -1042,7 +1042,7 @@ static void HC11OP(bsr)(hc11_state *cpustate)
 static void HC11OP(bvc)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if ((cpustate->ccr & CC_V) == 0)	/* Branch if V flag clear */
+	if ((cpustate->ccr & CC_V) == 0)    /* Branch if V flag clear */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
@@ -1053,7 +1053,7 @@ static void HC11OP(bvc)(hc11_state *cpustate)
 static void HC11OP(bvs)(hc11_state *cpustate)
 {
 	INT8 rel = FETCH(cpustate);
-	if (cpustate->ccr & CC_V)	/* Branch if V flag set */
+	if (cpustate->ccr & CC_V)   /* Branch if V flag set */
 	{
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}

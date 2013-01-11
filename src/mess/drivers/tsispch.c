@@ -192,11 +192,11 @@ READ8_MEMBER( tsispch_state::dsw_r )
 {
 	UINT8 data;
 	/* the only dipswitch I'm really sure about is s4-7 which enables the test mode
-     * The switches are, for normal operation on my unit:
-     * ON ON OFF OFF OFF OFF OFF OFF
-     * which makes this register read 0xFC
-     * When s4-7 is turned on, it reads 0xBC
-     */
+	 * The switches are, for normal operation on my unit:
+	 * ON ON OFF OFF OFF OFF OFF OFF
+	 * which makes this register read 0xFC
+	 * When s4-7 is turned on, it reads 0xBC
+	 */
 	data = ioport("s4")->read();
 	return data;
 }
@@ -204,10 +204,10 @@ READ8_MEMBER( tsispch_state::dsw_r )
 WRITE8_MEMBER( tsispch_state::peripheral_w )
 {
 	/* This controls the four LEDS, the RESET line for the upd77p20,
-    and (probably) the p0-to-ir0 masking of the upd77p20; there are two
-    unknown and seemingly unused bits as well.
-    see the top of the file for more info.
-    */
+	and (probably) the p0-to-ir0 masking of the upd77p20; there are two
+	unknown and seemingly unused bits as well.
+	see the top of the file for more info.
+	*/
 	tsispch_state *state = machine().driver_data<tsispch_state>();
 	state->m_paramReg = data;
 	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
@@ -281,7 +281,7 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	UINT8 *dspsrc = (UINT8 *)(*machine().root_device().memregion("dspprgload"));
 	UINT32 *dspprg = (UINT32 *)(*machine().root_device().memregion("dspprg"));
 	fprintf(stderr,"driver init\n");
-    // unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
+	// unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
 	// source upd7720                  dest upd7725
 	// bit 7  6  5  4  3  2  1  0      bit 7  6  5  4  3  2  1  0
@@ -299,8 +299,8 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
 	UINT8 byte1t;
 	UINT16 byte23t;
-        for (int i = 0; i < 0x600; i+= 3)
-        {
+		for (int i = 0; i < 0x600; i+= 3)
+		{
 			byte1t = BITSWAP8(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
 			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
 			if ((byte1t&0x80) == 0x00) // op or rt instruction
@@ -316,11 +316,11 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 				byte23t = BITSWAP16( (((UINT16)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
 			}
 
-            *dspprg = byte1t<<24 | byte23t<<8;
-            dspprg++;
-        }
-    m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
-    machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
+			*dspprg = byte1t<<24 | byte23t<<8;
+			dspprg++;
+		}
+	m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
 /******************************************************************************
@@ -362,11 +362,11 @@ static ADDRESS_MAP_START(i8086_io, AS_IO, 16, tsispch_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp_prg_map, AS_PROGRAM, 32, tsispch_state)
-    AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspprg", 0)
+	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp_data_map, AS_DATA, 16, tsispch_state)
-    AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspdata", 0)
+	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
 
@@ -376,60 +376,60 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( prose2k )
 PORT_START("s4") // dipswitch array s4
 	PORT_DIPNAME( 0x01, 0x00, "S4-1") PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "S4-2") PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "S4-3") PORT_DIPLOCATION("SW4:3")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "S4-4") PORT_DIPLOCATION("SW4:4")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "S4-5") PORT_DIPLOCATION("SW4:5")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "S4-6") PORT_DIPLOCATION("SW4:6")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "S4-7: Self Test") PORT_DIPLOCATION("SW4:7")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "S4-8") PORT_DIPLOCATION("SW4:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
 static MACHINE_CONFIG_START( prose2k, tsispch_state )
-    /* basic machine hardware */
+	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
-    MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
-    MCFG_CPU_PROGRAM_MAP(i8086_mem)
-    MCFG_CPU_IO_MAP(i8086_io)
+	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
+	MCFG_CPU_PROGRAM_MAP(i8086_mem)
+	MCFG_CPU_IO_MAP(i8086_io)
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
-    MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
-    MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-    MCFG_CPU_DATA_MAP(dsp_data_map)
-    MCFG_CPU_CONFIG(upd7720_config)
+	MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_CPU_CONFIG(upd7720_config)
 
-    /* PIC 8259 */
-    MCFG_PIC8259_ADD("pic8259", pic8259_config)
+	/* PIC 8259 */
+	MCFG_PIC8259_ADD("pic8259", pic8259_config)
 
-    /* uarts */
-    MCFG_I8251_ADD("i8251a_u15", i8251_config)
+	/* uarts */
+	MCFG_I8251_ADD("i8251a_u15", i8251_config)
 
-    /* sound hardware */
-    //MCFG_SPEAKER_STANDARD_MONO("mono")
-    //MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up */
-    //MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	/* sound hardware */
+	//MCFG_SPEAKER_STANDARD_MONO("mono")
+	//MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up */
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,tsispch_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,tsispch_terminal_intf)
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -521,4 +521,4 @@ ROM_START( prose2k )
 ******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1985, prose2k,	0,		0,		prose2k,		prose2k, tsispch_state,	prose2k,	"Telesensory Systems Inc/Speech Plus",	"Prose 2000/2020",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, prose2k,    0,      0,      prose2k,        prose2k, tsispch_state, prose2k,    "Telesensory Systems Inc/Speech Plus",  "Prose 2000/2020",  GAME_NOT_WORKING | GAME_NO_SOUND )

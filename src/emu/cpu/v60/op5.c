@@ -84,10 +84,3 @@ static UINT32 opTRAPFL(v60_state *cpustate)
 
 	return 1;
 }
-
-
-
-
-
-
-

@@ -147,7 +147,7 @@ const device_type SOCRATES = &device_creator<socrates_snd_device>;
 
 socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SOCRATES, "Socrates Sound", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(SocratesASIC);
 }
@@ -180,5 +180,3 @@ void socrates_snd_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

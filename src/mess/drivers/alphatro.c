@@ -361,7 +361,7 @@ void alphatro_state::machine_reset()
 	m_serial_timer->adjust(attotime::from_hz(500),0,attotime::from_hz(500));  // USART clock - this is a guesstimate
 	m_timer_bit = 0;
 	beep_set_state(m_beep, 0);
-	beep_set_frequency(m_beep, 950);	/* piezo-device needs to be measured */
+	beep_set_frequency(m_beep, 950);    /* piezo-device needs to be measured */
 }
 
 void alphatro_state::palette_init()

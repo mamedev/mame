@@ -7,8 +7,8 @@
 #include "video/konicdev.h"
 #include "includes/djmain.h"
 
-#define NUM_SPRITES	(0x800 / 16)
-#define NUM_LAYERS	2
+#define NUM_SPRITES (0x800 / 16)
+#define NUM_LAYERS  2
 
 
 
@@ -97,17 +97,17 @@ static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap, const r
 					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
 					drawgfxzoom_transpen(bitmap,
-					            cliprect,
-					            machine.gfx[0],
-					            c,
-					            color,
-					            flipx,
-					            flipy,
-					            sx,
-					            sy,
-					            (zw << 16) / 16,
-					            (zh << 16) / 16,
-					            0);
+								cliprect,
+								machine.gfx[0],
+								c,
+								color,
+								flipx,
+								flipy,
+								sx,
+								sy,
+								(zw << 16) / 16,
+								(zh << 16) / 16,
+								0);
 				}
 				else
 				{
@@ -115,15 +115,15 @@ static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap, const r
 					int sy = oy + (y << 4);
 
 					drawgfx_transpen(bitmap,
-					        cliprect,
-					        machine.gfx[0],
-					        c,
-					        color,
-					        flipx,
-					        flipy,
-					        sx,
-					        sy,
-					        0);
+							cliprect,
+							machine.gfx[0],
+							c,
+							color,
+							flipx,
+							flipy,
+							sx,
+							sy,
+							0);
 				}
 			}
 	}

@@ -5,7 +5,7 @@
 ***************************************************************************/
 #include "sound/discrete.h"
 
-#define NUM_PENS	(8)
+#define NUM_PENS    (8)
 
 class spiders_state : public driver_device
 {

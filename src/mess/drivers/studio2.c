@@ -312,10 +312,10 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 
 static const rgb_t VISICOM_PALETTE[] =
 {
-    MAKE_RGB(0x00, 0x80, 0x00),
-    MAKE_RGB(0x00, 0x00, 0xff),
-    MAKE_RGB(0x00, 0xff, 0x00),
-    MAKE_RGB(0xff, 0x00, 0x00)
+	MAKE_RGB(0x00, 0x80, 0x00),
+	MAKE_RGB(0x00, 0x00, 0xff),
+	MAKE_RGB(0x00, 0xff, 0x00),
+	MAKE_RGB(0xff, 0x00, 0x00)
 };
 
 READ_LINE_MEMBER( mpt02_state::rdata_r )
@@ -345,10 +345,10 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	DEVCB_NULL,
-	RES_K(2.2),	// unverified
-	RES_K(1),	// unverified
-	RES_K(5.1),	// unverified
-	RES_K(4.7)	// unverified
+	RES_K(2.2), // unverified
+	RES_K(1),   // unverified
+	RES_K(5.1), // unverified
+	RES_K(4.7)  // unverified
 };
 
 /* CDP1802 Configuration */
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 	MCFG_CPU_IO_MAP(studio2_io_map)
 	MCFG_CPU_CONFIG(studio2_cosmac_intf)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 1760000)
 	MCFG_CDP1861_ADD(CDP1861_TAG, 1760000, studio2_cdp1861_intf)
 
@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 	MCFG_CPU_IO_MAP(visicom_io_map)
 	MCFG_CPU_CONFIG(studio2_cosmac_intf)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
 
@@ -506,7 +506,7 @@ static MACHINE_CONFIG_START( mpt02, mpt02_state )
 	MCFG_CPU_IO_MAP(mpt02_io_map)
 	MCFG_CPU_CONFIG(mpt02_cosmac_intf)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
@@ -566,11 +566,11 @@ DRIVER_INIT_MEMBER(studio2_state,studio2)
 /* Game Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY   FULLNAME */
-CONS( 1977,	studio2,	0,		0,		studio2,	studio2, studio2_state,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978, visicom,	studio2,0,		visicom,	studio2, studio2_state,	studio2,	"Toshiba",	"Visicom COM-100 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978,	mpt02,		studio2,0,		mpt02,		studio2, studio2_state,	studio2,	"Soundic",	"Victory MPT-02 Home TV Programmer (Austria)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978,	mpt02h,		studio2,0,		mpt02,		studio2, studio2_state,	studio2,	"Hanimex",	"MPT-02 Jeu TV Programmable (France)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE)
-CONS( 1978,	mtc9016,	studio2,0,		mpt02,		studio2, studio2_state,	studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978, shmc1200,	studio2,0,		mpt02,		studio2, studio2_state,	studio2,	"Sheen",	"1200 Micro Computer (Australia)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978, cm1200,		studio2,0,		mpt02,		studio2, studio2_state,	studio2,	"Conic",	"M-1200 (?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-CONS( 1978, apollo80,	studio2,0,		mpt02,		studio2, studio2_state,	studio2,	"Academy",	"Apollo 80 (Germany)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1977, studio2,    0,      0,      studio2,    studio2, studio2_state, studio2,    "RCA",      "Studio II", GAME_SUPPORTS_SAVE )
+CONS( 1978, visicom,    studio2,0,      visicom,    studio2, studio2_state, studio2,    "Toshiba",  "Visicom COM-100 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Hanimex",  "MPT-02 Jeu TV Programmable (France)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE)
+CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Mustang",  "9016 Telespiel Computer (Germany)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Sheen",    "1200 Micro Computer (Australia)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Conic",    "M-1200 (?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, studio2_state, studio2,    "Academy",  "Apollo 80 (Germany)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

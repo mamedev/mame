@@ -180,7 +180,7 @@
 			<orientation flipy="yes" />
 		</backdrop>
 		<screen index="0">
-        		<bounds x="0" y="0" width="1024" height="768" />
+				<bounds x="0" y="0" width="1024" height="768" />
 		</screen>
 	</view>
 </mamelayout>

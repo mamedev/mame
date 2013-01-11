@@ -84,10 +84,10 @@ TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
 	int tile;
 
 	/*
-        robiza notes:
-        - flip y (handled with a +0x10 tile banking) depends only by position of the tile in the screen
-        - bits 0-3 are not used by gfx hardware; the value is the color of the pixel in the map (golf)
-    */
+	    robiza notes:
+	    - flip y (handled with a +0x10 tile banking) depends only by position of the tile in the screen
+	    - bits 0-3 are not used by gfx hardware; the value is the color of the pixel in the map (golf)
+	*/
 
 	tile = (m_bg_vram[tile_index] & 0xf0)>>4;
 
@@ -290,17 +290,17 @@ static void liberate_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		int multi, fx, fy, sx, sy, sy2, code, color;
 
 		/*
-            Byte 0: 0x01 - ?
-                    0x02 - Y flip
-                    0x04 - X flip
-                    0x08 - Colour?
-                    0x10 - Multi sprite set
-                    0x60 - Tile (high bits)
-                    0x80 - ?
-            Byte 1: 0xff - Tile (low bits)
-            Byte 2: 0xff - Y position
-            Byte 3: 0xff - X position
-        */
+		    Byte 0: 0x01 - ?
+		            0x02 - Y flip
+		            0x04 - X flip
+		            0x08 - Colour?
+		            0x10 - Multi sprite set
+		            0x60 - Tile (high bits)
+		            0x80 - ?
+		    Byte 1: 0xff - Tile (low bits)
+		    Byte 2: 0xff - Y position
+		    Byte 3: 0xff - X position
+		*/
 
 		code = spriteram[offs + 1] + ((spriteram[offs + 0] & 0x60) << 3);
 		sx = 240 - spriteram[offs + 3];

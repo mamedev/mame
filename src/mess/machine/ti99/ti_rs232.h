@@ -54,48 +54,48 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	void		incoming_dtr(int uartind, line_state value);
-	void		transmit_data(int uartind, UINT8 value);
-	UINT8		map_lines_out(int uartind, UINT8 value);
-	UINT8		map_lines_in(int uartind, UINT8 value);
-	void		receive_data_or_line_state(int uartind);
-	void		set_bit(int uartind, int line, int value);
+	void        incoming_dtr(int uartind, line_state value);
+	void        transmit_data(int uartind, UINT8 value);
+	UINT8       map_lines_out(int uartind, UINT8 value);
+	UINT8       map_lines_in(int uartind, UINT8 value);
+	void        receive_data_or_line_state(int uartind);
+	void        set_bit(int uartind, int line, int value);
 
-	void		configure_interface(int uartind, int type, int value);
-	void		output_line_state(int uartind, int mask, UINT8 value);
-	void		output_exception(int uartind, int param, UINT8 value);
-	void		ctrl_callback(int uartind, int type, UINT8 data);
+	void        configure_interface(int uartind, int type, int value);
+	void        output_line_state(int uartind, int mask, UINT8 value);
+	void        output_exception(int uartind, int param, UINT8 value);
+	void        ctrl_callback(int uartind, int type, UINT8 data);
 
-	tms9902_device*				m_uart[2];
-	ti_rs232_attached_device*	m_serdev[2];
-	ti_pio_attached_device*		m_piodev;
-	address_space*				m_space;
-	UINT8*						m_dsrrom;
+	tms9902_device*             m_uart[2];
+	ti_rs232_attached_device*   m_serdev[2];
+	ti_pio_attached_device*     m_piodev;
+	address_space*              m_space;
+	UINT8*                      m_dsrrom;
 
-	UINT8	m_signals[2];	// Latches the state of the output lines for UART0/UART1
-	int		m_recv_mode[2]; 	// May be NORMAL or ESC
+	UINT8   m_signals[2];   // Latches the state of the output lines for UART0/UART1
+	int     m_recv_mode[2];     // May be NORMAL or ESC
 
 	// Baud rate management
 	// not part of the real device, but required for the connection to the
 	// real UART
-	double	m_time_hold[2];
+	double  m_time_hold[2];
 
 	// PIO flags
-	bool	m_pio_direction_in;		// a.k.a. PIOOC pio in output mode if 0
-	bool	m_pio_handshakeout;
-	bool	m_pio_handshakein;
-	bool	m_pio_spareout;
-	bool	m_pio_sparein;
-	bool	m_flag0;				// spare
-	bool	m_led;				// a.k.a. flag3
-	int		m_pio_out_buffer;
-	int		m_pio_in_buffer;
-	bool	m_pio_readable;
-	bool	m_pio_writable;
-	bool	m_pio_write;			// true if image is to be written to
+	bool    m_pio_direction_in;     // a.k.a. PIOOC pio in output mode if 0
+	bool    m_pio_handshakeout;
+	bool    m_pio_handshakein;
+	bool    m_pio_spareout;
+	bool    m_pio_sparein;
+	bool    m_flag0;                // spare
+	bool    m_led;              // a.k.a. flag3
+	int     m_pio_out_buffer;
+	int     m_pio_in_buffer;
+	bool    m_pio_readable;
+	bool    m_pio_writable;
+	bool    m_pio_write;            // true if image is to be written to
 
 	/* Keeps the value put on the bus when SENILA becomes active. */
-	UINT8	m_ila;
+	UINT8   m_ila;
 };
 
 /****************************************************************************/
@@ -109,20 +109,20 @@ public:
 	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	iodevice_t image_type() const { return IO_SERIAL; }
-	bool is_readable()  const			{ return true; }
-	bool is_writeable() const			{ return true; }
-	bool is_creatable() const			{ return true; }
-	bool must_be_loaded() const 		{ return false; }
-	bool is_reset_on_load() const		{ return false; }
+	bool is_readable()  const           { return true; }
+	bool is_writeable() const           { return true; }
+	bool is_creatable() const           { return true; }
+	bool must_be_loaded() const         { return false; }
+	bool is_reset_on_load() const       { return false; }
 	const char *image_interface() const { return ""; }
 	const char *file_extensions() const { return ""; }
 	const option_guide *create_option_guide() const { return NULL; }
 
 protected:
-	void	device_start(void);
-	bool	call_load();
-	void	call_unload();
-	void	device_config_complete();
+	void    device_start(void);
+	bool    call_load();
+	void    call_unload();
+	void    device_config_complete();
 
 private:
 	int get_index_from_tagname();
@@ -137,20 +137,20 @@ public:
 	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	iodevice_t image_type() const { return IO_PARALLEL; }
-	bool is_readable()  const			{ return true; }
-	bool is_writeable() const			{ return true; }
-	bool is_creatable() const			{ return true; }
-	bool must_be_loaded() const 		{ return false; }
-	bool is_reset_on_load() const		{ return false; }
+	bool is_readable()  const           { return true; }
+	bool is_writeable() const           { return true; }
+	bool is_creatable() const           { return true; }
+	bool must_be_loaded() const         { return false; }
+	bool is_reset_on_load() const       { return false; }
 	const char *image_interface() const { return ""; }
 	const char *file_extensions() const { return ""; }
 	const option_guide *create_option_guide() const { return NULL; }
 
 protected:
-	void	device_start(void);
-	bool	call_load();
-	void	call_unload();
-	void	device_config_complete();
+	void    device_start(void);
+	bool    call_load();
+	void    call_unload();
+	void    device_config_complete();
 };
 
 #endif

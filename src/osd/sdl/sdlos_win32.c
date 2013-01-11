@@ -32,9 +32,9 @@ static osd_ticks_t performance_cycle_counter(void);
 //============================================================
 
 // global cycle_counter function and divider
-static osd_ticks_t		(*cycle_counter)(void) = init_cycle_counter;
-static osd_ticks_t		(*ticks_counter)(void) = init_cycle_counter;
-static osd_ticks_t		ticks_per_second;
+static osd_ticks_t      (*cycle_counter)(void) = init_cycle_counter;
+static osd_ticks_t      (*ticks_counter)(void) = init_cycle_counter;
+static osd_ticks_t      ticks_per_second;
 
 //============================================================
 //  init_cycle_counter
@@ -127,7 +127,7 @@ osd_ticks_t osd_ticks_per_second(void)
 {
 	if (ticks_per_second == 0)
 	{
-		return 1;	// this isn't correct, but it prevents the crash
+		return 1;   // this isn't correct, but it prevents the crash
 	}
 	return ticks_per_second;
 }
@@ -280,8 +280,8 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	result = putenv(buf);
 
 	/* will be referenced by environment
-     * Therefore it is not freed here
-     */
+	 * Therefore it is not freed here
+	 */
 
 	return result;
 }

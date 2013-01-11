@@ -164,17 +164,17 @@ UINT32 quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_ind1
 	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int msk = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+		if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
-	if (layers_ctrl & 1)	m_bg_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	else					bitmap.fill(get_black_pen(machine()), cliprect);
+	if (layers_ctrl & 1)    m_bg_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	else                    bitmap.fill(get_black_pen(machine()), cliprect);
 
 bitmap.fill(get_black_pen(machine()), cliprect);
-	if (layers_ctrl & 2)	m_fg_tmap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_fg_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -220,34 +220,34 @@ READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 
 	switch ( prot.state )
 	{
-		case STATE_ROM_R:		// Checksum of MCU addresses 0-ff (0x8e9c^0xffff expected)
-			if      (prot.addr == 0xfe)	ret = 0x8e ^ 0xff;
-			else if (prot.addr == 0xff)	ret = 0x9c ^ 0xff;
-			else						ret = 0x00;
+		case STATE_ROM_R:       // Checksum of MCU addresses 0-ff (0x8e9c^0xffff expected)
+			if      (prot.addr == 0xfe) ret = 0x8e ^ 0xff;
+			else if (prot.addr == 0xff) ret = 0x9c ^ 0xff;
+			else                        ret = 0x00;
 			break;
 
-		case STATE_ADDR_R:		// Address to jump to (big endian!)
+		case STATE_ADDR_R:      // Address to jump to (big endian!)
 			switch ( prot.param )
 			{
-				case 0x19:	// Print
+				case 0x19:  // Print
 					ret = 0x0b95 >> ((prot.addr & 1) ? 0 : 8);
 					break;
 
-				case 0x44:	// Clear screen?
-					ret = 0x1bd9 >> ((prot.addr & 1) ? 0 : 8);	// needed, but should also clear the screen
+				case 0x44:  // Clear screen?
+					ret = 0x1bd9 >> ((prot.addr & 1) ? 0 : 8);  // needed, but should also clear the screen
 					break;
 
-				case 0x45:	// Backup RAM check
+				case 0x45:  // Backup RAM check
 					ret = 0x2242 >> ((prot.addr & 1) ? 0 : 8);
 					break;
 
 				default:
 					log_protection(space, "unknown address");
-					ret = 0x2e59 >> ((prot.addr & 1) ? 0 : 8);	// return the address of: XOR A, RET
+					ret = 0x2e59 >> ((prot.addr & 1) ? 0 : 8);  // return the address of: XOR A, RET
 			}
 			break;
 
-		case STATE_EEPROM_R:		// EEPROM read
+		case STATE_EEPROM_R:        // EEPROM read
 		{
 			UINT8 *eeprom = memregion("eeprom")->base();
 			ret = eeprom[prot.addr];
@@ -362,9 +362,9 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
 
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w ) AM_SHARE("fg_ram")	// 4 * 800
-	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE(bg_ram_w ) AM_SHARE("bg_ram")	// 4 * 400
-	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										//
+	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w ) AM_SHARE("fg_ram")   // 4 * 800
+	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE(bg_ram_w ) AM_SHARE("bg_ram")   // 4 * 400
+	AM_RANGE( 0xc800, 0xcfff ) AM_RAM                                       //
 
 	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w )  AM_SHARE("paletteram")
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
@@ -393,8 +393,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP	// IRQ end
-	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP	// NMI end
+	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP  // IRQ end
+	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP  // NMI end
 	AM_RANGE( 0x40, 0x40 ) AM_READ(soundlatch_byte_r )
 	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w )
 ADDRESS_MAP_END
@@ -485,12 +485,12 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)	// 4 MHz?
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) // 4 MHz?
 	MCFG_CPU_PROGRAM_MAP(quizpun2_map)
 	MCFG_CPU_IO_MAP(quizpun2_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpun2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)	// 4 MHz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)    // 4 MHz?
 	MCFG_CPU_PROGRAM_MAP(quizpun2_sound_map)
 	MCFG_CPU_IO_MAP(quizpun2_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpun2_state,  irq0_line_hold)
@@ -512,7 +512,7 @@ static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_8MHz / 4 )	// 2 MHz?
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_8MHz / 4 ) // 2 MHz?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -525,7 +525,7 @@ ROM_START( quizpun2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "u111", 0x00000, 0x08000, CRC(14bdaffc) SHA1(7fb5988ea565d7cbe3c8e2cdb9402d3cf81507d7) )
 	ROM_LOAD( "u117", 0x10000, 0x10000, CRC(e9d1d05e) SHA1(c24104e023d12db8c9199d3e18750414aa511e40) )
-	ROM_LOAD( "u118", 0x20000, 0x10000, CRC(1f232707) SHA1(3f5f44611f25c556521333f15daf3e2128cc1538) BAD_DUMP )	// fails rom check
+	ROM_LOAD( "u118", 0x20000, 0x10000, CRC(1f232707) SHA1(3f5f44611f25c556521333f15daf3e2128cc1538) BAD_DUMP ) // fails rom check
 	ROM_LOAD( "u119", 0x30000, 0x10000, CRC(c73b82f7) SHA1(d5c683440e9db46dd5859b519b3f32da80352626) )
 	ROM_LOAD( "u120", 0x40000, 0x10000, CRC(700648b8) SHA1(dfa824166dfe7361d7c2ab0d8aa1ada882916cb9) )
 
@@ -535,13 +535,13 @@ ROM_START( quizpun2 )
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP ) // could be a state machine instead
 
-	ROM_REGION( 0x40000, "gfx1", 0 )	// 8x16x8
-    ROM_LOAD( "u21", 0x00000, 0x10000, CRC(8ac86759) SHA1(2eac9ceee4462ce905aa08ff4f5a6215e0b6672f) )
-    ROM_LOAD( "u20", 0x10000, 0x10000, CRC(67640a46) SHA1(5b33850afbb89db9ce9044a578423bfe3a55420d) )
+	ROM_REGION( 0x40000, "gfx1", 0 )    // 8x16x8
+	ROM_LOAD( "u21", 0x00000, 0x10000, CRC(8ac86759) SHA1(2eac9ceee4462ce905aa08ff4f5a6215e0b6672f) )
+	ROM_LOAD( "u20", 0x10000, 0x10000, CRC(67640a46) SHA1(5b33850afbb89db9ce9044a578423bfe3a55420d) )
 	ROM_LOAD( "u29", 0x20000, 0x10000, CRC(cd8ff05b) SHA1(25e5be914fe49ff96a3c04de0c0e266a79068930) )
-    ROM_LOAD( "u30", 0x30000, 0x10000, CRC(8612b443) SHA1(1033a378b21023eca471f43309d49461494b5ea1) )
+	ROM_LOAD( "u30", 0x30000, 0x10000, CRC(8612b443) SHA1(1033a378b21023eca471f43309d49461494b5ea1) )
 
-	ROM_REGION( 0x6000, "gfx2", 0 )	// 8x16x2
+	ROM_REGION( 0x6000, "gfx2", 0 ) // 8x16x2
 	ROM_LOAD( "u26", 0x1000, 0x1000, CRC(151de8af) SHA1(2159ab030043e69d63cc9fbbc772f5bae8ab3f9d) )
 	ROM_CONTINUE(    0x0000, 0x1000 )
 	ROM_LOAD( "u27", 0x3000, 0x1000, CRC(2afdafea) SHA1(4c116a1e8a91f2e309646063139763b837e24bc7) )
@@ -549,11 +549,11 @@ ROM_START( quizpun2 )
 	ROM_LOAD( "u28", 0x5000, 0x1000, CRC(c8bd85ad) SHA1(e7f0882f669edea1bb4634c263872f63da6a3290) )
 	ROM_CONTINUE(    0x4000, 0x1000 )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )	// 8x16x2
+	ROM_REGION( 0x20000, "gfx3", 0 )    // 8x16x2
 	ROM_LOAD( "u1", 0x00000, 0x10000, CRC(58506040) SHA1(9d8bed2585e8f188a20270fccd9cfbdb91e48599) )
 	ROM_LOAD( "u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
 
-	ROM_REGION( 0x80, "eeprom", 0 )	// EEPROM (tied to the unknown DIP40)
+	ROM_REGION( 0x80, "eeprom", 0 ) // EEPROM (tied to the unknown DIP40)
 	ROM_LOAD( "93c46", 0x00, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) )
 
 	ROM_REGION( 0x2000, "unknown", 0 )
@@ -574,13 +574,13 @@ ROM_START( quizpun )
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP ) // could be a state machine instead
 
-	ROM_REGION( 0x40000, "gfx1", 0 )	// 8x16x8
-    ROM_LOAD( "04.u21", 0x00000, 0x10000, CRC(fa8d64f4) SHA1(71badabf8f34f246dec83323a1cddbe74deb91bd) )
-    ROM_LOAD( "03.u20", 0x10000, 0x10000, CRC(8dda8167) SHA1(42838cf6866fb1d59c5bb3b477053aac448e7760) )
+	ROM_REGION( 0x40000, "gfx1", 0 )    // 8x16x8
+	ROM_LOAD( "04.u21", 0x00000, 0x10000, CRC(fa8d64f4) SHA1(71badabf8f34f246dec83323a1cddbe74deb91bd) )
+	ROM_LOAD( "03.u20", 0x10000, 0x10000, CRC(8dda8167) SHA1(42838cf6866fb1d59c5bb3b477053aac448e7760) )
 	ROM_LOAD( "09.u29", 0x20000, 0x10000, CRC(b9f28569) SHA1(1395cd226d314ee57385eed25f28b68607bfda53) )
-    ROM_LOAD( "10.u30", 0x30000, 0x10000, CRC(db5762c0) SHA1(606dc4a3e6b8034f063f11dcf0a2b1db59838f4c) )
+	ROM_LOAD( "10.u30", 0x30000, 0x10000, CRC(db5762c0) SHA1(606dc4a3e6b8034f063f11dcf0a2b1db59838f4c) )
 
-	ROM_REGION( 0xc000, "gfx2", 0 )	// 8x16x2
+	ROM_REGION( 0xc000, "gfx2", 0 ) // 8x16x2
 	ROM_LOAD( "06.u26", 0x1000, 0x1000, CRC(6d071b6d) SHA1(19565c8d768eeecd4119677915cc06f3ea18a47a) )
 	ROM_CONTINUE(    0x0000, 0x1000 )
 	ROM_LOAD( "07.u27", 0x3000, 0x1000, CRC(0f8b516e) SHA1(8bfabfd0bd28a1c7ddd01586fe9757b241feb59b) )
@@ -589,7 +589,7 @@ ROM_START( quizpun )
 	ROM_LOAD( "08.u28", 0x5000, 0x1000, CRC(51c0c5cb) SHA1(0c7bfc9b6b3ce0cdd5c0e36df2b4d90f9cff7fae) )
 	ROM_CONTINUE(    0x4000, 0x1000 )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )	// 8x16x2
+	ROM_REGION( 0x20000, "gfx3", 0 )    // 8x16x2
 	ROM_LOAD( "01.u1", 0x00000, 0x10000, CRC(58506040) SHA1(9d8bed2585e8f188a20270fccd9cfbdb91e48599) )
 	ROM_LOAD( "02.u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
 

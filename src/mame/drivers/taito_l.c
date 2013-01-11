@@ -69,20 +69,20 @@ static const struct
 	UINT32 offset;
 } rambank_modify_notifiers[12] =
 {
-	{ taitol_chardef14_m, 0x0000 },	// 14
-	{ taitol_chardef15_m, 0x1000 },	// 15
-	{ taitol_chardef16_m, 0x2000 },	// 16
-	{ taitol_chardef17_m, 0x3000 },	// 17
+	{ taitol_chardef14_m, 0x0000 }, // 14
+	{ taitol_chardef15_m, 0x1000 }, // 15
+	{ taitol_chardef16_m, 0x2000 }, // 16
+	{ taitol_chardef17_m, 0x3000 }, // 17
 
-	{ taitol_bg18_m, 0x8000 },		// 18
-	{ taitol_bg19_m, 0x9000 },		// 19
-	{ taitol_char1a_m, 0xa000 },	// 1a
-	{ taitol_obj1b_m, 0xb000 },		// 1b
+	{ taitol_bg18_m, 0x8000 },      // 18
+	{ taitol_bg19_m, 0x9000 },      // 19
+	{ taitol_char1a_m, 0xa000 },    // 1a
+	{ taitol_obj1b_m, 0xb000 },     // 1b
 
-	{ taitol_chardef1c_m, 0x4000 },	// 1c
-	{ taitol_chardef1d_m, 0x5000 },	// 1d
-	{ taitol_chardef1e_m, 0x6000 },	// 1e
-	{ taitol_chardef1f_m, 0x7000 },	// 1f
+	{ taitol_chardef1c_m, 0x4000 }, // 1c
+	{ taitol_chardef1d_m, 0x5000 }, // 1d
+	{ taitol_chardef1e_m, 0x6000 }, // 1e
+	{ taitol_chardef1f_m, 0x7000 }, // 1f
 };
 
 
@@ -658,21 +658,21 @@ READ8_MEMBER(taitol_state::horshoes_trackx_hi_r)
 
 
 #define COMMON_BANKS_MAP \
-	AM_RANGE(0x0000, 0x5fff) AM_ROM			\
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")			\
+	AM_RANGE(0x0000, 0x5fff) AM_ROM         \
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")            \
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w) \
 	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
 	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w) \
-	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)		\
-	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)	\
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)			\
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)		\
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)	\
+	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)       \
+	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)   \
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)         \
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)       \
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w) \
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 
 #define COMMON_SINGLE_MAP \
-	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	\
+	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w) \
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
 
@@ -689,12 +689,12 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP	// Direct copy of input port 0
+	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP   // Direct copy of input port 0
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
 	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
-	AM_RANGE(0xd005, 0xd006) AM_WRITENOP	// Always 0
+	AM_RANGE(0xd005, 0xd006) AM_WRITENOP    // Always 0
 	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -713,7 +713,7 @@ static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -759,7 +759,7 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP	// Watchdog
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP   // Watchdog
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
@@ -791,7 +791,7 @@ static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_state )
@@ -814,31 +814,31 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
+	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM     // Wrong, used to overcome protection
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
 	AM_RANGE(0xb801, 0xb801) AM_READWRITE(mcu_control_r, mcu_control_w)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // Control register, function unknown
 ADDRESS_MAP_END
 
 /* bootleg, doesn't have the MCU */
 static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
+	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM     // Wrong, used to overcome protection
 //  AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // Control register, function unknown
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( plotting_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_WRITENOP	// Watchdog or interrupt ack
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP	// Control register, function unknown
+	AM_RANGE(0xa800, 0xa800) AM_WRITENOP    // Watchdog or interrupt ack
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP    // Control register, function unknown
 ADDRESS_MAP_END
 
 
@@ -848,9 +848,9 @@ static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown (copy of 8822)
-	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack
+	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown (copy of 8822)
+	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack
 ADDRESS_MAP_END
 
 
@@ -860,9 +860,9 @@ static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown
-	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 ADDRESS_MAP_END
 
@@ -876,7 +876,7 @@ static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xa804, 0xa804) AM_READ(horshoes_tracky_hi_r)
 	AM_RANGE(0xa808, 0xa808) AM_READ(horshoes_trackx_lo_r)
 	AM_RANGE(0xa80c, 0xa80c) AM_READ(horshoes_trackx_hi_r)
-	AM_RANGE(0xb801, 0xb801) AM_READNOP	// Watchdog or interrupt ack
+	AM_RANGE(0xb801, 0xb801) AM_READNOP // Watchdog or interrupt ack
 	AM_RANGE(0xb802, 0xb802) AM_WRITE(horshoes_bankg_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
 ADDRESS_MAP_END
@@ -885,11 +885,11 @@ static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP	//watchdog ?
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP   //watchdog ?
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
 	AM_RANGE(0xa803, 0xa803) AM_READ_PORT("IN1")
-	AM_RANGE(0xa804, 0xa804) AM_WRITENOP	//coin couters/locks ?
+	AM_RANGE(0xa804, 0xa804) AM_WRITENOP    //coin couters/locks ?
 	AM_RANGE(0xa807, 0xa807) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
@@ -925,15 +925,15 @@ static INPUT_PORTS_START( fhawk )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as Unused */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as Unused */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as Unused */
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_2_BUTTONS( 1 )
@@ -958,18 +958,18 @@ static INPUT_PORTS_START( raimais )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "80k and 160k" )
 	PORT_DIPSETTING(    0x0c, "80k only" )
 	PORT_DIPSETTING(    0x04, "160k only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -992,25 +992,25 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( champwr )
 	PORT_START("DSWA")
-	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)	// all 2 in manual
+	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)  // all 2 in manual
 	TAITO_COINAGE_WORLD_LOC(SW1)
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Time" )			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Time" )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "2 minutes" )
 	PORT_DIPSETTING(    0x0c, "3 minutes" )
 	PORT_DIPSETTING(    0x04, "4 minutes" )
 	PORT_DIPSETTING(    0x00, "5 minutes" )
-	PORT_DIPNAME( 0x30, 0x30, "'1 minute' Lasts:" )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "'1 minute' Lasts:" )     PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "30 sec" )
 	PORT_DIPSETTING(    0x10, "40 sec" )
 	PORT_DIPSETTING(    0x30, "50 sec" )
 	PORT_DIPSETTING(    0x20, "60 sec" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as Unused */
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -1064,14 +1064,14 @@ static INPUT_PORTS_START( kurikint )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )		/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )		/* Listed as Unused */
-	PORT_DIPNAME( 0x40, 0x40, "Bosses' messages" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )        /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )        /* Listed as Unused */
+	PORT_DIPNAME( 0x40, 0x40, "Bosses' messages" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "5 Times" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1095,42 +1095,42 @@ static INPUT_PORTS_START( kurikinta )
 	PORT_INCLUDE( kurikint )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2") /* Oposite of most Taito settings. IE: Off "means" off */
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2") /* Oposite of most Taito settings. IE: Off "means" off */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_COINAGE_WORLD_LOC(SW1)
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "Level Select (Cheat)")	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Level Select (Cheat)")   PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, "Invulnerability (Cheat)")    PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Bosses' messages" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Bosses' messages" )      PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Slow Motion (Cheat)")	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Slow Motion (Cheat)")    PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1138,28 +1138,28 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( puzznic )
 	PORT_START("DSWA")
 	TAITO_MACHINE_COCKTAIL_LOC(SW1)
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )	/* There is no Coin B in the Manual */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )	/* There is no Coin B in the Manual */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )    /* There is no Coin B in the Manual */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )    /* There is no Coin B in the Manual */
 
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY_LOC(SW2)			/* Difficulty controls the Timer Speed (how many seconds are there in a minute) */
-	PORT_DIPNAME( 0x0c, 0x0c, "Retries" )		PORT_DIPLOCATION("SW2:3,4")
+	TAITO_DIFFICULTY_LOC(SW2)           /* Difficulty controls the Timer Speed (how many seconds are there in a minute) */
+	PORT_DIPNAME( 0x0c, 0x0c, "Retries" )       PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x0c, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPNAME( 0x10, 0x10, "Bombs" )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Bombs" )     PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "0" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x20, "Girls" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Girls" )     PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Terms of Replay" )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Terms of Replay" )   PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x40, "Stage one step back/Timer continuous" )
 	PORT_DIPSETTING(    0xc0, "Stage reset to start/Timer continuous" )
 	PORT_DIPSETTING(    0x80, "Stage reset to start/Timer reset to start" )
@@ -1198,7 +1198,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( plotting )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "Play Mode" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Play Mode" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "1 Player" )
 	PORT_DIPSETTING(    0x01, "2 Player" )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SW1)
@@ -1206,17 +1206,17 @@ static INPUT_PORTS_START( plotting )
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )		/* Listed as Unused and "Must Remain Off" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )		/* Listed as Unused and "Must Remain Off" */
-	PORT_DIPNAME( 0x30, 0x30, "Wild Blocks" )		PORT_DIPLOCATION("SW2:5,6") /* Number of allowed misses */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )        /* Listed as Unused and "Must Remain Off" */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )        /* Listed as Unused and "Must Remain Off" */
+	PORT_DIPNAME( 0x30, 0x30, "Wild Blocks" )       PORT_DIPLOCATION("SW2:5,6") /* Number of allowed misses */
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as Unused and "Must Remain Off" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as Unused and "Must Remain Off" */
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1245,19 +1245,19 @@ static INPUT_PORTS_START( palamed )
 	TAITO_COINAGE_JAPAN_NEW_LOC(SW1)
 
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY_LOC(SW2)				/* Difficulty controls how fast the dice lines fall*/
-	PORT_DIPNAME( 0x0c, 0x0c, "Games for VS Victory" )	PORT_DIPLOCATION("SW2:3,4")
+	TAITO_DIFFICULTY_LOC(SW2)               /* Difficulty controls how fast the dice lines fall*/
+	PORT_DIPNAME( 0x0c, 0x0c, "Games for VS Victory" )  PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1 Game" )
 	PORT_DIPSETTING(    0x0c, "2 Games" )
 	PORT_DIPSETTING(    0x04, "3 Games" )
 	PORT_DIPSETTING(    0x00, "4 Games" )
-	PORT_DIPNAME( 0x30, 0x30, "Dice Appear at" )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Dice Appear at" )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "500 Lines" )
 	PORT_DIPSETTING(    0x30, "1000 Lines" )
 	PORT_DIPSETTING(    0x10, "2000 Lines" )
 	PORT_DIPSETTING(    0x00, "3000 Lines" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x80, 0x80, "Versus Mode" )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x80, 0x80, "Versus Mode" )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
@@ -1295,7 +1295,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cachat )
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2") /* Oposite of most Taito settings. IE: Off "means" off */
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2") /* Oposite of most Taito settings. IE: Off "means" off */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
@@ -1344,7 +1344,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tubeit )
 	PORT_START("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2") /* Oposite of most Taito settings. IE: Off "means" off */
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2") /* Oposite of most Taito settings. IE: Off "means" off */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
@@ -1392,30 +1392,30 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( horshoes )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "Beer Frame Message" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Beer Frame Message" )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "Break Time" )
 	PORT_DIPSETTING(    0x00, "Beer Frame" )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SW1)
-	TAITO_COINAGE_US_LOC(SW1)				/* According to the "United States Version" manual listing */
+	TAITO_COINAGE_US_LOC(SW1)               /* According to the "United States Version" manual listing */
 
 	PORT_START("DSWB")
 	/* Not for sure, the CPU seems to play better when set to Hardest */
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, "Time" )			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Time" )          PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "20 sec" )
 	PORT_DIPSETTING(    0x0c, "30 sec" )
 	PORT_DIPSETTING(    0x04, "40 sec" )
 	PORT_DIPSETTING(    0x00, "60 sec" )
-	PORT_DIPNAME( 0x10, 0x10, "Innings" )			PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Innings" )           PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "3 per Credit" )
 	PORT_DIPSETTING(    0x00, "9 per Credit" )
-	PORT_DIPNAME( 0x20, 0x20, "Bonus Advantage" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Bonus Advantage" )       PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Scoring Speed" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Scoring Speed" )     PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPNAME( 0x80, 0x80, "Grip/Angle Select" )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Grip/Angle Select" )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "2 Buttons" )
 	PORT_DIPSETTING(    0x00, "1 Button" )
 
@@ -1448,14 +1448,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( plgirls )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:4,5,6") /* Manual shows same coinage as Play Girls 2 */
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:4,5,6") /* Manual shows same coinage as Play Girls 2 */
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
@@ -1468,15 +1468,15 @@ static INPUT_PORTS_START( plgirls )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY_LOC(SW2)				/* Difficulty controls the Ball Speed */
+	TAITO_DIFFICULTY_LOC(SW2)               /* Difficulty controls the Ball Speed */
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPNAME( 0x80, 0x80, "P1+P2 Start to Clear Round (Cheat)" )	PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "P1+P2 Start to Clear Round (Cheat)" )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1511,15 +1511,15 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( plgirls2 )
 	PORT_START("DSWA")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )		/* Listed as Not Used */
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )        /* Listed as Not Used */
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )         PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "Mode A" )
 	PORT_DIPSETTING(    0x00, "Mode B" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
@@ -1528,7 +1528,7 @@ static INPUT_PORTS_START( plgirls2 )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x08)
@@ -1539,20 +1539,20 @@ static INPUT_PORTS_START( plgirls2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSWA", 0x08, EQUALS, 0x00)
 
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY_LOC(SW2)				/* Difficulty controls the number of hits requiered to destroy enemies */
-	PORT_DIPNAME( 0x04, 0x04, "Time" )			PORT_DIPLOCATION("SW2:3") /* Simply listed as "Time", what exactly does it refer to? */
+	TAITO_DIFFICULTY_LOC(SW2)               /* Difficulty controls the number of hits requiered to destroy enemies */
+	PORT_DIPNAME( 0x04, 0x04, "Time" )          PORT_DIPLOCATION("SW2:3") /* Simply listed as "Time", what exactly does it refer to? */
 	PORT_DIPSETTING(    0x04, "2 Seconds" )
 	PORT_DIPSETTING(    0x00, "3 Seconds" )
-	PORT_DIPNAME( 0x18, 0x18, "Lives for Joe/Lady/Jack" )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Lives for Joe/Lady/Jack" )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x10, "3/2/3" )
 	PORT_DIPSETTING(    0x18, "4/3/4" )
 	PORT_DIPSETTING(    0x08, "5/4/5" )
 	PORT_DIPSETTING(    0x00, "6/5/6" )
-	PORT_DIPNAME( 0x20, 0x20, "Character Speed" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Character Speed" )       PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )		/* Listed as Not Used */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as Not Used */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as Not Used */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as Not Used */
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1590,7 +1590,7 @@ static INPUT_PORTS_START( cubybop )
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_NEW_LOC(SW1)
@@ -1644,12 +1644,12 @@ static INPUT_PORTS_START( evilston )
 	TAITO_DIFFICULTY_LOC(SW2)
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( English ) )
@@ -1810,7 +1810,7 @@ static const ym2203_interface ym2203_interface_champwr =
 static const msm5205_interface msm5205_config =
 {
 	champwr_msm5205_vck,/* VCK function */
-	MSM5205_S48_4B		/* 8 kHz */
+	MSM5205_S48_4B      /* 8 kHz */
 };
 
 static const ym2610_interface ym2610_config =
@@ -1841,14 +1841,14 @@ static const tc0140syt_interface taitol_tc0140syt_intf =
 static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(fhawk_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_3_map)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL_12MHz/3)		/* verified on pcb */
+	MCFG_CPU_ADD("slave", Z80, XTAL_12MHz/3)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, irq0_line_hold, 3*60) /* fixes slow down problems */
 
@@ -1874,7 +1874,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* verified on pcb */
 	MCFG_SOUND_CONFIG(ym2203_interface_triple)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -1925,7 +1925,7 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state,raimais)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)		/* verified on pcb (8Mhz OSC is also for the 2nd z80) */
+	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_SOUND_CONFIG(ym2610_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -1936,11 +1936,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kurikint, taitol_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(kurikint_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)		/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kurikint_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state,  irq0_line_hold)
 
@@ -1966,7 +1966,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -1988,7 +1988,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( plotting, taitol_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
 	MCFG_CPU_PROGRAM_MAP(plotting_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
@@ -2012,7 +2012,7 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4)	/* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4) /* verified on pcb */
 	MCFG_SOUND_CONFIG(ym2203_interface_single)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -2074,11 +2074,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( evilston, taitol_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* not verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state,  irq0_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, nmi_line_pulse, 60)
@@ -2105,7 +2105,7 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* not verified */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* not verified */
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
@@ -2235,7 +2235,7 @@ ROM_START( champwr )
 	ROM_LOAD( "c01-02.rom", 0x080000, 0x80000, CRC(1e0476c4) SHA1(b7922e5196990ad4382f367ec80b5c72e75f9d35) )
 	ROM_LOAD( "c01-03.rom", 0x100000, 0x80000, CRC(2a142dbc) SHA1(5d0e40ec266d3abcff4237c5c609355c65b4fa33) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c01-05.rom", 0x00000, 0x20000, CRC(22efad4a) SHA1(54fb33dfba5059dee16fa8b5a33b0b2d62a78373) )
 ROM_END
 
@@ -2255,7 +2255,7 @@ ROM_START( champwru )
 	ROM_LOAD( "c01-02.rom", 0x080000, 0x80000, CRC(1e0476c4) SHA1(b7922e5196990ad4382f367ec80b5c72e75f9d35) )
 	ROM_LOAD( "c01-03.rom", 0x100000, 0x80000, CRC(2a142dbc) SHA1(5d0e40ec266d3abcff4237c5c609355c65b4fa33) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c01-05.rom", 0x00000, 0x20000, CRC(22efad4a) SHA1(54fb33dfba5059dee16fa8b5a33b0b2d62a78373) )
 ROM_END
 
@@ -2275,7 +2275,7 @@ ROM_START( champwrj )
 	ROM_LOAD( "c01-02.rom", 0x080000, 0x80000, CRC(1e0476c4) SHA1(b7922e5196990ad4382f367ec80b5c72e75f9d35) )
 	ROM_LOAD( "c01-03.rom", 0x100000, 0x80000, CRC(2a142dbc) SHA1(5d0e40ec266d3abcff4237c5c609355c65b4fa33) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c01-05.rom", 0x00000, 0x20000, CRC(22efad4a) SHA1(54fb33dfba5059dee16fa8b5a33b0b2d62a78373) )
 ROM_END
 
@@ -2395,7 +2395,7 @@ ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system
 	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 
@@ -2408,7 +2408,7 @@ ROM_START( plottinga ) /* B96-09 or higher by Taito's rom numbering system, demo
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( plottingb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
@@ -2420,7 +2420,7 @@ ROM_START( plottingb ) /* The first (earliest) "World" version by Taito's rom nu
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( plottingu ) /* The demo mode is 2 players */
@@ -2432,7 +2432,7 @@ ROM_START( plottingu ) /* The demo mode is 2 players */
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( flipull ) /* The demo mode is 1 player */
@@ -2444,14 +2444,14 @@ ROM_START( flipull ) /* The demo mode is 1 player */
 	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
+	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
 ROM_START( puzznic )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "c20-09.ic11", 0x00000, 0x20000, CRC(156d6de1) SHA1(c247936b62ef354851c9bace76a7a0aa14194d5f) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085F68B4) SHA1(2DBC7E2C015220DC59EE1F1208540744E5B9B7CC) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
@@ -2466,7 +2466,7 @@ ROM_START( puzznicj )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "u11.ic11",  0x00000, 0x20000, CRC(a4150b6c) SHA1(27719b8993735532cd59f4ed5693ff3143ee2336) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085F68B4) SHA1(2DBC7E2C015220DC59EE1F1208540744E5B9B7CC) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )

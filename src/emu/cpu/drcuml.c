@@ -77,8 +77,8 @@ using namespace uml;
 //  DEBUGGING
 //**************************************************************************
 
-#define VALIDATE_BACKEND		(0)
-#define LOG_SIMPLIFICATIONS		(0)
+#define VALIDATE_BACKEND        (0)
+#define LOG_SIMPLIFICATIONS     (0)
 
 
 
@@ -89,11 +89,11 @@ using namespace uml;
 // structure describing back-end validation test
 struct bevalidate_test
 {
-	opcode_t				opcode;
-	UINT8					size;
-	UINT8					iflags;
-	UINT8					flags;
-	UINT64					param[4];
+	opcode_t                opcode;
+	UINT8                   size;
+	UINT8                   iflags;
+	UINT8                   flags;
+	UINT64                  param[4];
 };
 
 
@@ -108,10 +108,10 @@ struct bevalidate_test
 
 drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_t &device)
 	: m_drcuml(drcuml),
-	  m_cache(cache),
-	  m_device(device),
-	  m_state(*(drcuml_machine_state *)cache.alloc_near(sizeof(m_state))),
-	  m_accessors((data_accessors *)cache.alloc_near(sizeof(*m_accessors) * ADDRESS_SPACES))
+		m_cache(cache),
+		m_device(device),
+		m_state(*(drcuml_machine_state *)cache.alloc_near(sizeof(m_state))),
+		m_accessors((data_accessors *)cache.alloc_near(sizeof(*m_accessors) * ADDRESS_SPACES))
 {
 	// reset the machine state
 	memset(m_accessors, 0, sizeof(*m_accessors) * ADDRESS_SPACES);
@@ -149,13 +149,13 @@ drcbe_interface::~drcbe_interface()
 
 drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 	: m_device(device),
-	  m_cache(cache),
-	  m_beintf((flags & DRCUML_OPTION_USE_C) ?
+		m_cache(cache),
+		m_beintf((flags & DRCUML_OPTION_USE_C) ?
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
-	  m_umllog(NULL),
-	  m_blocklist(device.machine().respool()),
-	  m_symlist(device.machine().respool())
+		m_umllog(NULL),
+		m_blocklist(device.machine().respool()),
+		m_symlist(device.machine().respool())
 {
 	// if we're to log, create the logfile
 	if (flags & DRCUML_OPTION_LOG_UML)
@@ -320,11 +320,11 @@ void drcuml_state::log_printf(const char *format, ...)
 
 drcuml_block::drcuml_block(drcuml_state &drcuml, UINT32 maxinst)
 	: m_drcuml(drcuml),
-	  m_next(NULL),
-	  m_nextinst(0),
-	  m_maxinst(maxinst * 3/2),
-	  m_inst(auto_alloc_array(drcuml.device().machine(), instruction, m_maxinst)),
-	  m_inuse(false)
+		m_next(NULL),
+		m_nextinst(0),
+		m_maxinst(maxinst * 3/2),
+		m_inst(auto_alloc_array(drcuml.device().machine(), instruction, m_maxinst)),
+		m_inuse(false)
 {
 }
 
@@ -581,13 +581,13 @@ inline UINT8 effective_test_psize(const opcode_info &opinfo, int pnum, int insts
 {
 	switch (opinfo.param[pnum].size)
 	{
-		case PSIZE_4:	return 4;
-		case PSIZE_8:	return 8;
-		case PSIZE_OP:	return instsize;
-		case PSIZE_P1:	return 1 << (params[0] & 3);
-		case PSIZE_P2:	return 1 << (params[1] & 3);
-		case PSIZE_P3:	return 1 << (params[2] & 3);
-		case PSIZE_P4:	return 1 << (params[3] & 3);
+		case PSIZE_4:   return 4;
+		case PSIZE_8:   return 8;
+		case PSIZE_OP:  return instsize;
+		case PSIZE_P1:  return 1 << (params[0] & 3);
+		case PSIZE_P2:  return 1 << (params[1] & 3);
+		case PSIZE_P3:  return 1 << (params[2] & 3);
+		case PSIZE_P4:  return 1 << (params[3] & 3);
 	}
 	return instsize;
 }
@@ -807,9 +807,9 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, code_handle **h
 			// for some parameter types, we wish to iterate over all possibilities
 			switch (ptype)
 			{
-				case parameter::PTYPE_INT_REGISTER:		pcount = REG_I_END - REG_I0;		break;
-				case parameter::PTYPE_FLOAT_REGISTER:	pcount = REG_F_END - REG_F0;		break;
-				default:							pcount = 1;										break;
+				case parameter::PTYPE_INT_REGISTER:     pcount = REG_I_END - REG_I0;        break;
+				case parameter::PTYPE_FLOAT_REGISTER:   pcount = REG_F_END - REG_F0;        break;
+				default:                            pcount = 1;                                     break;
 			}
 
 			// iterate over possibilities

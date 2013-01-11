@@ -42,8 +42,8 @@
 
 static const char *const joynames[2][4] =
 {
-	{ "JOY0", "JOY2", "JOY4", "JOY6" },		// X axis
-	{ "JOY1", "JOY3", "JOY5", "JOY7" }		// Y axis
+	{ "JOY0", "JOY2", "JOY4", "JOY6" },     // X axis
+	{ "JOY1", "JOY3", "JOY5", "JOY7" }      // Y axis
 };
 
 static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
@@ -180,7 +180,7 @@ bool ti99_handset_device::poll_keyboard(int num)
 			// The shift modifier state has changed: we need to update the
 			// keyboard state
 			if (key_buf & 0x0008)
-			{	/* shift has been pressed down */
+			{   /* shift has been pressed down */
 				previous_key[num] = current_key = previous_key[num] | 0x20;
 			}
 			else
@@ -193,14 +193,14 @@ bool ti99_handset_device::poll_keyboard(int num)
 		}
 	}
 
-	current_key = 0;	/* default value if no key is down */
+	current_key = 0;    /* default value if no key is down */
 	for (i=0; i<20; i++)
 	{
 		if (key_buf & (1 << i))
 		{
 			current_key = i + 1;
 			if (key_buf & 0x0008)
-				current_key |= 0x20;	/* set shift flag */
+				current_key |= 0x20;    /* set shift flag */
 
 			if (current_key != 0x24)
 				// If this is the shift key, any other key we may find will
@@ -305,13 +305,13 @@ void ti99_handset_device::do_task()
 			if (poll_keyboard(i)==true) return;
 	}
 	else if (m_buflen == 3)
-	{	/* update messages after they have been posted */
+	{   /* update messages after they have been posted */
 		if (m_buf & 1)
-		{	/* keyboard */
+		{   /* keyboard */
 			poll_keyboard((~(m_buf >> 1)) & 0x3);
 		}
 		else
-		{	/* joystick */
+		{   /* joystick */
 			poll_joystick((~(m_buf >> 1)) & 0x3);
 		}
 	}
@@ -335,39 +335,39 @@ void ti99_handset_device::device_reset(void)
 	m_ack = 0;
 }
 
-#define JOYSTICK_DELTA			10
-#define JOYSTICK_SENSITIVITY	100
+#define JOYSTICK_DELTA          10
+#define JOYSTICK_SENSITIVITY    100
 
 INPUT_PORTS_START( handset )
 	/* 13 pseudo-ports for IR remote handsets */
 
 	/* 8 pseudo-ports for the 4 IR joysticks */
-	PORT_START("JOY0")	/* joystick 1, X axis */
+	PORT_START("JOY0")  /* joystick 1, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(1)
 
-	PORT_START("JOY1")	/* joystick 1, Y axis */
+	PORT_START("JOY1")  /* joystick 1, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(1) PORT_REVERSE
 
-	PORT_START("JOY2")	/* joystick 2, X axis */
+	PORT_START("JOY2")  /* joystick 2, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(2)
 
-	PORT_START("JOY3")	/* joystick 2, Y axis */
+	PORT_START("JOY3")  /* joystick 2, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(2) PORT_REVERSE
 
-	PORT_START("JOY4")	/* joystick 3, X axis */
+	PORT_START("JOY4")  /* joystick 3, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(3)
 
-	PORT_START("JOY5")	/* joystick 3, Y axis */
+	PORT_START("JOY5")  /* joystick 3, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(3) PORT_REVERSE
 
-	PORT_START("JOY6")	/* joystick 4, X axis */
+	PORT_START("JOY6")  /* joystick 4, X axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(4)
 
-	PORT_START("JOY7")	/* joystick 4, Y axis */
+	PORT_START("JOY7")  /* joystick 4, Y axis */
 		PORT_BIT( 0xf, 0x7,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,0xe) PORT_PLAYER(4) PORT_REVERSE
 
 	/* 5 pseudo-ports for the 4 IR remote keypads */
-	PORT_START("KP0")	/* keypad 1, keys 1 to 16 */
+	PORT_START("KP0")   /* keypad 1, keys 1 to 16 */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: CLR") PORT_CODE(KEYCODE_1) PORT_PLAYER(1)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: GO") PORT_CODE(KEYCODE_Q) PORT_PLAYER(1)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: SET") PORT_CODE(KEYCODE_SPACE) PORT_PLAYER(1)
@@ -385,7 +385,7 @@ INPUT_PORTS_START( handset )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: 3") PORT_CODE(KEYCODE_D) PORT_PLAYER(1)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: E =") PORT_CODE(KEYCODE_C) PORT_PLAYER(1)
 
-	PORT_START("KP1")	/* keypad 1, keys 17 to 20 */
+	PORT_START("KP1")   /* keypad 1, keys 17 to 20 */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: (div)") PORT_CODE(KEYCODE_5) PORT_PLAYER(1)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: (mul)") PORT_CODE(KEYCODE_T) PORT_PLAYER(1)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1: NO -") PORT_CODE(KEYCODE_F) PORT_PLAYER(1)
@@ -404,7 +404,7 @@ INPUT_PORTS_START( handset )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2: 2") PORT_CODE(KEYCODE_J) PORT_PLAYER(2)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2: 0") PORT_CODE(KEYCODE_M) PORT_PLAYER(2)
 
-	PORT_START("KP2")	/* keypad 2, keys 13 to 20 */
+	PORT_START("KP2")   /* keypad 2, keys 13 to 20 */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2: 9") PORT_CODE(KEYCODE_9) PORT_PLAYER(2)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2: 6") PORT_CODE(KEYCODE_O) PORT_PLAYER(2)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2: 3") PORT_CODE(KEYCODE_K) PORT_PLAYER(2)
@@ -423,7 +423,7 @@ INPUT_PORTS_START( handset )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3: 1") PORT_CODE(KEYCODE_A) PORT_PLAYER(3)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3: STOP") PORT_CODE(KEYCODE_Z) PORT_PLAYER(3)
 
-	PORT_START("KP3")	/* keypad 3, keys 9 to 20 */
+	PORT_START("KP3")   /* keypad 3, keys 9 to 20 */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3: 8") PORT_CODE(KEYCODE_3) PORT_PLAYER(3)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3: 5") PORT_CODE(KEYCODE_E) PORT_PLAYER(3)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3: 2") PORT_CODE(KEYCODE_S) PORT_PLAYER(3)
@@ -442,7 +442,7 @@ INPUT_PORTS_START( handset )
 		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4: SET") PORT_CODE(KEYCODE_G) PORT_PLAYER(4)
 		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4: NEXT") PORT_CODE(KEYCODE_B) PORT_PLAYER(4)
 
-	PORT_START("KP4")	/* keypad 4, keys 5 to 20 */
+	PORT_START("KP4")   /* keypad 4, keys 5 to 20 */
 		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4: 7") PORT_CODE(KEYCODE_7) PORT_PLAYER(4)
 		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4: 4") PORT_CODE(KEYCODE_U) PORT_PLAYER(4)
 		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4: 1") PORT_CODE(KEYCODE_H) PORT_PLAYER(4)
@@ -533,4 +533,3 @@ ioport_constructor ti99_twin_joystick::device_input_ports() const
 }
 
 const device_type TI99_JOYSTICK = &device_creator<ti99_twin_joystick>;
-

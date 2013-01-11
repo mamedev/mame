@@ -226,19 +226,19 @@ static INPUT_PORTS_START( sicv )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )			PORT_DIPLOCATION("SW1:3")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
 	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun.
-    Be sure these are always ON */
+	Be sure these are always ON */
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
-	PORT_DIPNAME( 0x80, 0x00, "Coin Info" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Coin Info" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -299,16 +299,16 @@ static INPUT_PORTS_START( alieninv )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPNAME( 0x02, 0x02, "Pence Coinage" )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Pence Coinage" )     PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )		PORT_DIPLOCATION("SW1:3") /* Pence Coin */
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )	/* Not bonus */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )     PORT_DIPLOCATION("SW1:3") /* Pence Coin */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )   /* Not bonus */
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL) PORT_DIPLOCATION("SW1:5,6,7")
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )					PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )                  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "2C/1C 50p/3C (+ Bonus Life)" )
 	PORT_DIPSETTING(    0x80, "1C/1C 50p/5C" )
 
@@ -455,11 +455,11 @@ static INPUT_PORTS_START( spcewars )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:2" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2000" )
 INPUT_PORTS_END
@@ -512,7 +512,7 @@ static INPUT_PORTS_START( astropal )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )		/* never read */
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )        /* never read */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -582,7 +582,7 @@ static INPUT_PORTS_START( cosmo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:2" )
@@ -622,15 +622,15 @@ static INPUT_PORTS_START( searthin )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPNAME( 0x02, 0x02, "Pence Coinage" )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Pence Coinage" )     PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )		PORT_DIPLOCATION("SW1:3") /* Pence Coin */
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )	/* Not bonus */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )     PORT_DIPLOCATION("SW1:3") /* Pence Coin */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )   /* Not bonus */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "2C/1C 50p/3C (+ Bonus Life)" )
 	PORT_DIPSETTING(    0x80, "1C/1C 50p/5C" )
 INPUT_PORTS_END
@@ -647,7 +647,7 @@ static INPUT_PORTS_START( sinvzen )
 	PORT_INCLUDE( sicv )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
@@ -665,7 +665,7 @@ static INPUT_PORTS_START( spaceat2 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:7" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
@@ -729,7 +729,7 @@ static INPUT_PORTS_START( spacecom )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
 
-	PORT_START(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
+	PORT_START(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -810,7 +810,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( invrvnge )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )
@@ -819,7 +819,7 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x80, "Fuel Destroyed by Comet" )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x80, 0x80, "Fuel Destroyed by Comet" )   PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "6" )
 
@@ -834,19 +834,19 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2000" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) // 1 play 10p, 2 play 20p, 6 play 50p
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // 1 play 20p, 2 play 40p, 3 play 50p
 
@@ -913,19 +913,19 @@ static INPUT_PORTS_START( spclaser )
 	// ROM disassembly doesn't show any dipswitch reads on portmapped I/O, maybe the manual is for a different ROM set? (that we don't have the dump for)
 #if 0
 	// these are the settings according to Gameplan Intruder manual
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x80, 0x80, "Display Coinage" )			PORT_DIPLOCATION("SW:8")
+	PORT_DIPNAME( 0x80, 0x80, "Display Coinage" )           PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 #endif
@@ -938,7 +938,7 @@ static INPUT_PORTS_START( spclaser )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Coinage) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Coinage) )        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Or 2 Players" )
 	PORT_DIPSETTING(    0x80, "1 Coin/1 Player  2 Coins/2 Players" )   /* Irrelevant, causes bugs */
 
@@ -965,16 +965,16 @@ static INPUT_PORTS_START( galxwars )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "3000" )
 	PORT_DIPSETTING(    0x08, "5000" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
@@ -982,11 +982,11 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( starw1_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_WRITENOP	/* writes 9B at boot */
+	AM_RANGE(0x03, 0x03) AM_WRITENOP    /* writes 9B at boot */
 	AM_RANGE(0x04, 0x04) AM_WRITE(invadpt2_sh_port_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITENOP	/* writes 89 at boot */
+	AM_RANGE(0x07, 0x07) AM_WRITENOP    /* writes 89 at boot */
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( starw1, invadpt2, _8080bw_state )
@@ -1068,21 +1068,21 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2500" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
@@ -1148,17 +1148,17 @@ static INPUT_PORTS_START( invasion )
 
 	PORT_MODIFY("IN2")
 	/* SW1:5-8 Unused according to manual. */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:4,3") /* Default is OFF, OFF (6) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4,3") /* Default is OFF, OFF (6) */
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:8" )		/* Default OFF */
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:2") /* Default is ON (2500) */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:8" )        /* Default OFF */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:2") /* Default is ON (2500) */
 	PORT_DIPSETTING(    0x08, "1500" )
 	PORT_DIPSETTING(    0x00, "2500" )
 	/* SW1:5,6,7 Default ON */
-	PORT_DIPNAME( 0x80, 0x80, "Laser Bonus Info" )		PORT_DIPLOCATION("SW1:1") /* Default is OFF (Info on) */
+	PORT_DIPNAME( 0x80, 0x80, "Laser Bonus Info" )      PORT_DIPLOCATION("SW1:1") /* Default is OFF (Info on) */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1180,7 +1180,7 @@ static INPUT_PORTS_START( superinv )
 
 	PORT_MODIFY("IN2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "1500" )
 	PORT_DIPSETTING(    0x00, "2500" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
@@ -1281,7 +1281,7 @@ static INPUT_PORTS_START( schaser )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x60, 0x00, "Hard Starting Level" )	PORT_DIPLOCATION("SW1:5,7")
+	PORT_DIPNAME( 0x60, 0x00, "Hard Starting Level" )   PORT_DIPLOCATION("SW1:5,7")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
@@ -1298,20 +1298,20 @@ static INPUT_PORTS_START( schaser )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("IN2")	// port 2
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_START("IN2")   // port 2
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	// Name Reset - if name of high scorer was rude, owner can press this button
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Name Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1342,7 +1342,7 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser)
 static MACHINE_CONFIG_DERIVED_CLASS( schaser, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
+	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(schaser_io_map)
 	MCFG_WATCHDOG_VBLANK_INIT(255)
@@ -1419,17 +1419,17 @@ static INPUT_PORTS_START( schasercv )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )									PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )                                    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)		PORT_DIPLOCATION("SW1:3")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )								PORT_DIPLOCATION("SW1:4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)    PORT_DIPLOCATION("SW1:2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )                               PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)					PORT_DIPLOCATION("SW1:5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:7")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)                    PORT_DIPLOCATION("SW1:5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)    PORT_DIPLOCATION("SW1:6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)   PORT_DIPLOCATION("SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
 
 	/* Dummy port for cocktail mode */
@@ -1585,15 +1585,15 @@ static INPUT_PORTS_START( lupin3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bags To Collect" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bags To Collect" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:5" )
@@ -1612,7 +1612,7 @@ static INPUT_PORTS_START( lupin3a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* something has to do with sound */
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Japanese ) )
 INPUT_PORTS_END
@@ -1688,7 +1688,7 @@ INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
 {
 	m_polaris_cloud_speed++;
 
-	if (m_polaris_cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
+	if (m_polaris_cloud_speed >= 4) /* every 4 frames - this was verified against real machine */
 	{
 		m_polaris_cloud_speed = 0;
 		m_polaris_cloud_pos++;
@@ -1749,20 +1749,20 @@ static INPUT_PORTS_START( polaris )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, "Invincible Test" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Invincible Test" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	/* The Demo Sounds dip switch does function.
-       It allows the sonar sounds to play in demo mode. */
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	   It allows the sonar sounds to play in demo mode. */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:6" )
@@ -1784,7 +1784,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED_CLASS( polaris, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
+	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(polaris_io_map)
 	MCFG_WATCHDOG_VBLANK_INIT(255)
@@ -1821,16 +1821,16 @@ static INPUT_PORTS_START( ozmawars )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x03, 0x00, "Energy" )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Energy" )            PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "15000" )
 	PORT_DIPSETTING(    0x01, "20000" )
 	PORT_DIPSETTING(    0x02, "25000" )
 	PORT_DIPSETTING(    0x03, "35000" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x00, "Bonus Energy" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bonus Energy" )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "15000" )
 	PORT_DIPSETTING(    0x08, "10000" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
@@ -1859,7 +1859,7 @@ static INPUT_PORTS_START( sinvemag )
 
 	PORT_MODIFY("IN2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "2000" )
 	PORT_DIPSETTING(    0x00, "3000" )
 INPUT_PORTS_END
@@ -2068,8 +2068,8 @@ READ8_MEMBER(_8080bw_state::indianbt_r)
 {
 	switch(space.device().safe_pc())
 	{
-		case 0x5fed:	return 0x10;
-		case 0x5ffc:	return 0;
+		case 0x5fed:    return 0x10;
+		case 0x5ffc:    return 0;
 	}
 	logerror("unknown port 0 read @ %x\n",space.device().safe_pc());
 	return machine().rand();
@@ -2119,7 +2119,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(_8080bw_state::steelwkr_sh_port_3_w)
 {
-	coin_lockout_global_w(machine(), !(~data & 0x03));		/* possibly */
+	coin_lockout_global_w(machine(), !(~data & 0x03));      /* possibly */
 }
 
 static ADDRESS_MAP_START( steelwkr_io_map, AS_IO, 8, _8080bw_state )
@@ -2145,12 +2145,12 @@ static INPUT_PORTS_START( steelwkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )			PORT_DIPLOCATION("SW1:3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
@@ -2308,10 +2308,10 @@ READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 
 WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
 {
-        /* bit 0 goes high when first coin inserted
-           bit 1 also goes high when subsequent coins are inserted
-              These may be for indicator lamps under the start buttons.
-           bit 2 goes high while player 2 is playing     */
+		/* bit 0 goes high when first coin inserted
+		   bit 1 also goes high when subsequent coins are inserted
+		      These may be for indicator lamps under the start buttons.
+		   bit 2 goes high while player 2 is playing     */
 
 	m_flip_screen = BIT(data, 2) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }
@@ -2512,19 +2512,19 @@ static INPUT_PORTS_START( vortex )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
@@ -2560,16 +2560,16 @@ DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 	{
 		UINT32 addr = x;
 		/*
-        A15 A14 A13     A0  A3  A9
-        0   0   0       I   I   I
-        0   0   1       I   I   I
-        0   1   0       N   N   N
-        0   1   1       N   I   I
-        1   0   0       N   I   I
-        1   0   1       N   I   I
-        1   1   0       N   I   I
-        1   1   1       N   I   I
-        */
+		A15 A14 A13     A0  A3  A9
+		0   0   0       I   I   I
+		0   0   1       I   I   I
+		0   1   0       N   N   N
+		0   1   1       N   I   I
+		1   0   0       N   I   I
+		1   0   1       N   I   I
+		1   1   0       N   I   I
+		1   1   1       N   I   I
+		*/
 		switch (x&0xE000) // inputs are A13 A14 A15
 		{
 			case 0x0000: case 0x2000: // A0 A3 A9
@@ -2582,14 +2582,14 @@ DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 				addr ^= 0x0208;
 				break;
 		/*
-            case 0x0000: case 0x2000: // A0 A3 A9
-                addr ^= 0x0001;
-                break;
-            case 0x4000:
-                addr ^= 0x0208;
-                break;
-            case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000:
-                break;*/
+		    case 0x0000: case 0x2000: // A0 A3 A9
+		        addr ^= 0x0001;
+		        break;
+		    case 0x4000:
+		        addr ^= 0x0208;
+		        break;
+		    case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000:
+		        break;*/
 		}
 		buf1[addr] = rom[x];
 	}
@@ -2742,23 +2742,23 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 	if (newval)
 	{
 		/*
-            The game registers a valid shot after the gun trigger is pressed, and IN1 d0 is high.
-            It latches the gun position and then compares it with VRAM contents: 1 byte/8 pixels, 0 means miss.
-            IN1 d0 probably indicates if the latch is ready or not (glitches happen otherwise)
+		    The game registers a valid shot after the gun trigger is pressed, and IN1 d0 is high.
+		    It latches the gun position and then compares it with VRAM contents: 1 byte/8 pixels, 0 means miss.
+		    IN1 d0 probably indicates if the latch is ready or not (glitches happen otherwise)
 
-            in   $06
-            cpi  $04
-            rc
-            mov  h,a
-            in   $02
-            mov  l,a
-            lxi  d,$1ffe  <-- this is where the +2 comes from
-            dad  d
-            out  $00
-            mov  a,m
-            ana  a
-            rz
-        */
+		    in   $06
+		    cpi  $04
+		    rc
+		    mov  h,a
+		    in   $02
+		    mov  l,a
+		    lxi  d,$1ffe  <-- this is where the +2 comes from
+		    dad  d
+		    out  $00
+		    mov  a,m
+		    ana  a
+		    rz
+		*/
 		UINT8 gunx = ioport("GUNX")->read_safe(0x00);
 		UINT8 guny = ioport("GUNY")->read_safe(0x20);
 		m_claybust_gun_pos = ((gunx >> 3) | (guny << 5)) + 2;
@@ -2795,7 +2795,7 @@ static INPUT_PORTS_START( claybust )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 
 	// switch is 6-pos, but DNS06:5 and DNS06:6 are not connected
-	PORT_DIPNAME( 0x10, 0x10, "Shots" )				PORT_DIPLOCATION("DNS06:1")
+	PORT_DIPNAME( 0x10, 0x10, "Shots" )             PORT_DIPLOCATION("DNS06:1")
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DNS06:2" )
@@ -2814,10 +2814,10 @@ static INPUT_PORTS_START( gunchamp )
 	PORT_MODIFY("IN1")
 
 	// switch is 6-pos, but DNS06:5 and DNS06:6 are not connected
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DNS06:1")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DNS06:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0x40, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DNS06:2,3,4")
+	PORT_DIPNAME( 0xe0, 0x40, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DNS06:2,3,4")
 	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
@@ -3242,7 +3242,7 @@ ROM_START( sicv )
 	ROM_LOAD( "cv19.34",     0x1000, 0x0800, CRC(d202b41c) SHA1(868fe938ef768655c894ec95b7d9a81bf21f69ca) )
 	ROM_LOAD( "cv20.33",     0x1800, 0x0800, CRC(c74ee7b6) SHA1(4f52db274a2d4433ab67c099ee805e8eb8516c0f) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv01.1",      0x0000, 0x0400, CRC(037e16ac) SHA1(d585030aaff428330c91ae94d7cd5c96ebdd67dd) )
 	ROM_LOAD( "cv02.2",      0x0400, 0x0400, CRC(8263da38) SHA1(2e7c769d129e6f8a1a31eba1e02777bb94ac32b2) )
 ROM_END
@@ -3256,7 +3256,7 @@ ROM_START( sisv )
 	ROM_LOAD( "sv09.42",     0x1800, 0x0400, CRC(cd80b13f) SHA1(0f4b9537b99fe3cdeebe525efb1869a1be0bc704) )
 	ROM_LOAD( "sv06.41",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv01(__sisv).1",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
@@ -3270,7 +3270,7 @@ ROM_START( sisv2 )
 	ROM_LOAD( "sv13.42",     0x1800, 0x0400, CRC(a9011634) SHA1(1f1369ecb02078042cfdf17a497b8dda6dd23793) )
 	ROM_LOAD( "sv14.41",     0x1c00, 0x0400, CRC(58730370) SHA1(13dc806bcecd2d6089a85dd710ac2869413f7475) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv01(__sisv).1",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
@@ -3282,7 +3282,7 @@ ROM_START( spacerng )
 	ROM_LOAD( "sr3.u34",    0x1000, 0x0800, CRC(edc28ba9) SHA1(c96668f709d3fa0b97a6b118614e9c139f8f54cc) )
 	ROM_LOAD( "sr4.u33",    0x1800, 0x0800, CRC(a95f559f) SHA1(f597c7af96a9d039fd8e54d976d68a065f6bf0c8) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from sisv */
 	ROM_LOAD( "cv01(__sisv).1",      0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "cv02(__sisv).2",      0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
@@ -3356,7 +3356,7 @@ ROM_START( invadpt2 )
 	ROM_LOAD( "pv04",        0x1800, 0x0800, CRC(8f0e62e0) SHA1(a967b155f15f8432222fcc78b23121b00c405c5c) )
 	ROM_LOAD( "pv05",        0x4000, 0x0800, CRC(19b505e9) SHA1(6a31a37586782ce421a7d2cffd8f958c00b7b415) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "pv06.1",   0x0000, 0x0400, CRC(a732810b) SHA1(a5fabffa73ca740909e23b9530936f9274dff356) )
 	ROM_LOAD( "pv07.2",   0x0400, 0x0400, CRC(2c5b91cb) SHA1(7fa4d4aef85473b1b4f18734230c164e72be44e7) )
 ROM_END
@@ -3385,7 +3385,7 @@ ROM_START( invadpt2br )
 	ROM_LOAD( "br_pv04",     0x1800, 0x0800, CRC(b0626aff) SHA1(b7de6c21030732bd0479228f057ca4c87b913b0a) )
 	ROM_LOAD( "br_pv05",     0x4000, 0x0800, CRC(84c70bb8) SHA1(75fef3ee6da3e7e01a257629016bc10a23691d62) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 (taken from parent set) */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 (taken from parent set) */
 	ROM_LOAD( "pv06.1",   0x0000, 0x0400, CRC(a732810b) SHA1(a5fabffa73ca740909e23b9530936f9274dff356) )
 	ROM_LOAD( "pv07.2",   0x0400, 0x0400, CRC(2c5b91cb) SHA1(7fa4d4aef85473b1b4f18734230c164e72be44e7) )
 ROM_END
@@ -3424,7 +3424,7 @@ ROM_START( moonbase )
 	ROM_LOAD( "ze3-9.e5",     0x4000, 0x0400, CRC(2dd5adfa) SHA1(62cb98cad1e48de0e0cbf30392d35834b38dadbd) )
 	ROM_LOAD( "ze3-10.f5",    0x4400, 0x0400, CRC(1e7c22a4) SHA1(b34173375494ffbf5400dd4014a683a9807f4f08) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv02.h7",      0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 	ROM_LOAD( "cv01.g7",      0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
@@ -3442,7 +3442,7 @@ ROM_START( moonbasea )
 	ROM_LOAD( "ze3-9.e5",     0x4000, 0x0400, CRC(2dd5adfa) SHA1(62cb98cad1e48de0e0cbf30392d35834b38dadbd) )
 	ROM_LOAD( "ze3-10.f5",    0x4400, 0x0400, CRC(1e7c22a4) SHA1(b34173375494ffbf5400dd4014a683a9807f4f08) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv02.h7",      0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 	ROM_LOAD( "cv01.g7",      0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
@@ -3531,7 +3531,7 @@ ROM_START( spclaser )
 	ROM_LOAD( "la03",         0x1000, 0x0800, CRC(1083e9cc) SHA1(7ad45c6230c9e02fcf51e3414c15e2237eebbd7a) )
 	ROM_LOAD( "la04",         0x1800, 0x0800, CRC(5116b234) SHA1(b165b2574cbcb26a5bb43f91df5f8be5f111f486) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from sisv/intruder */
 	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "02.2",         0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
@@ -3544,7 +3544,7 @@ ROM_START( intruder )
 	ROM_LOAD( "la03-1.34",    0x1000, 0x0800, CRC(278ef9cf) SHA1(74a9c1d3500ea28e50d07363a547c381999c84fa) )
 	ROM_LOAD( "la04-1.33",    0x1800, 0x0800, CRC(5116b234) SHA1(b165b2574cbcb26a5bb43f91df5f8be5f111f486) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "01.1",         0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "02.2",         0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
@@ -3556,7 +3556,7 @@ ROM_START( laser )
 	ROM_LOAD( "3.u34",        0x1000, 0x0800, CRC(ed79000b) SHA1(bfe0407e833ce61aa909f5f1f93c3fc1d46605e9) )
 	ROM_LOAD( "4.u33",        0x1800, 0x0800, CRC(10a160a1) SHA1(e2d4208af11b65fc42d2856e57ee3c196f89d360) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from intruder */
 	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "02.2",         0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
@@ -3569,7 +3569,7 @@ ROM_START( spcewarl )
 	ROM_LOAD( "spcewarl.3",   0x1000, 0x0800, CRC(7820df3a) SHA1(53315857f4282c68624b338b068d80ee6828af4c) )
 	ROM_LOAD( "spcewarl.4",   0x1800, 0x0800, CRC(adc05b8d) SHA1(c4acf75537c0662a4785d5d6a90643239a54bf43) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from intruder */
 	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "02.2",         0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
@@ -3584,7 +3584,7 @@ ROM_START( galxwars )
 	ROM_LOAD( "univgw1.4",    0x4000, 0x0400, CRC(0871156e) SHA1(3726d0bfe153a0afc62ea56737662074986064b0) )
 	ROM_LOAD( "univgw2.5",    0x4400, 0x0400, CRC(6036d7bf) SHA1(36c2ad2ffdb47bbecc40fd67ced6ab51a5cd2f3e) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from sisv/intruder */
 	/* Or are colormaps generated by a group of TTLs, similar to dai3wksi? */
 	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
@@ -3596,7 +3596,7 @@ ROM_START( galxwars2 )
 	ROM_LOAD( "3192.h6",      0x0000, 0x1000, CRC(bde6860b) SHA1(e04b8add32d8f7ea588fae6d6a387f1d40495f1b) )
 	ROM_LOAD( "3193.h7",      0x4000, 0x1000, CRC(a17cd507) SHA1(554ab0e8bdc0e7af4a30b0ddc8aa053c8e70255c) ) /* 2nd half unused */
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from sisv/intruder */
 	/* Or are colormaps generated by a group of TTLs, similar to dai3wksi? */
 	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
@@ -3612,7 +3612,7 @@ ROM_START( galxwarst )
 	ROM_LOAD( "galxwars.4",   0x4000, 0x0400, CRC(ae4fe8fb) SHA1(494f44167dc84e4515b769c12f6e24419461dce4) )
 	ROM_LOAD( "galxwars.5",   0x4400, 0x0400, CRC(37708a35) SHA1(df6fd521ddfa146ef93e390e47741bdbfda1e7ba) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	/* !! not dumped yet, these were taken from sisv/intruder */
 	/* Or are colormaps generated by a group of TTLs, similar to dai3wksi? */
 	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
@@ -3638,7 +3638,7 @@ ROM_START( starw1 )
 	ROM_LOAD( "gc.81",        0x1800, 0x0400, CRC(246621ef) SHA1(bddc5253f735fa81266d725a24b1c14faabe0c6a) )
 	ROM_LOAD( "gc.82",        0x1c00, 0x0400, CRC(19bd32ee) SHA1(a1718a6a6300c3d7df469793cb0d590c4a966aff) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv01",         0x0000, 0x0400, CRC(8d892ef3) SHA1(c471dd6197a3c779d89c33fcb425cf3bbdf4fc15) )
 	ROM_IGNORE( 0x0400 )
 	ROM_LOAD( "cv02",         0x0400, 0x0400, CRC(b44ddde8) SHA1(8793f370526c072e645d8d0b9794b1b64a7701ef) )
@@ -3654,9 +3654,9 @@ ROM_START( lrescue )
 	ROM_LOAD( "lrescue.5",    0x4000, 0x0800, CRC(58fde8bc) SHA1(663665ac5254204c1eba18357d9867034eae55eb) )
 	ROM_LOAD( "lrescue.6",    0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color map */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color map */
 	ROM_LOAD( "7643-1.cpu",   0x0000, 0x0400, CRC(8b2e38de) SHA1(d6a757be31c3a179d31bd3709e71f9e38ec632e9) )
-	ROM_RELOAD( 			  0x0400, 0x0400 )
+	ROM_RELOAD(               0x0400, 0x0400 )
 ROM_END
 
 /*
@@ -3741,7 +3741,7 @@ ROM_START( mlander )
 	ROM_LOAD( "ml5.u32",    0x4000, 0x0800, CRC(88291fa2) SHA1(40c4eb51f75b5ca81a62121231d22b9f48d0f628) )
 	ROM_LOAD( "ml6.u31",    0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color map */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color map */
 	ROM_LOAD( "01.bin",     0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "02.bin",     0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
@@ -3755,9 +3755,9 @@ ROM_START( grescue )
 	ROM_LOAD( "grescue.5",    0x4000, 0x0800, CRC(a419a4d6) SHA1(8eeeb31cbebffc98d2c6c5b964f9b320fcf303d2) )
 	ROM_LOAD( "lrescue.6",    0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color map */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color map */
 	ROM_LOAD( "7643-1.cpu",   0x0000, 0x0400, CRC(8b2e38de) SHA1(d6a757be31c3a179d31bd3709e71f9e38ec632e9) )
-	ROM_RELOAD( 			  0x0400, 0x0400 )
+	ROM_RELOAD(               0x0400, 0x0400 )
 ROM_END
 
 ROM_START( desterth )
@@ -3770,9 +3770,9 @@ ROM_START( desterth )
 	ROM_LOAD( "31_c.bin",     0x4800, 0x0800, CRC(ab019c30) SHA1(33931510a722168bcf7c30d22eac9345576b6631) )
 	ROM_LOAD( "42_b.bin",     0x5000, 0x0800, CRC(ed9dbac6) SHA1(4553f445ac32ebb1be490b02df4924f76557e8f9) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color map */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color map */
 	ROM_LOAD( "7643-1.cpu",   0x0000, 0x0400, CRC(8b2e38de) SHA1(d6a757be31c3a179d31bd3709e71f9e38ec632e9) )
-	ROM_RELOAD( 			  0x0400, 0x0400 )
+	ROM_RELOAD(               0x0400, 0x0400 )
 ROM_END
 
 ROM_START( lrescuem )
@@ -3790,7 +3790,7 @@ ROM_START( lrescuem )
 	ROM_LOAD( "58.ic38",    0x4800, 0x0400, CRC(1b7a5644) SHA1(d26530ea11ada86f7c99b11d6faf4416a8f5a9eb) )
 	ROM_LOAD( "59.ic37",    0x4c00, 0x0400, CRC(c342b907) SHA1(327da029420c4eedabc2a0534199a008a3f341b8) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 - these don't really fit this game, but were on the PCB */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 - these don't really fit this game, but were on the PCB */
 	ROM_LOAD( "cv01-7643.2c",   0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
 	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
@@ -3822,7 +3822,7 @@ ROM_START( cosmo )
 	ROM_LOAD( "6.31",         0x4800, 0x0800, CRC(b037f6c4) SHA1(b9a42948052b8cda8d2e4575e59909589f4e7a8d) )
 	ROM_LOAD( "7.42",         0x5000, 0x0800, CRC(c3831ea2) SHA1(8c67ef0312656ef0eeff34b8463376c736bd8ea1) )
 
-	ROM_REGION( 0x1000, "proms", 0 )		/* color map */
+	ROM_REGION( 0x1000, "proms", 0 )        /* color map */
 	ROM_LOAD( "n-1.7d",       0x0800, 0x0800, CRC(bd8576f1) SHA1(aa5fe0a4d024f21a3bca7a6b3f5022779af6f3f4) )
 	ROM_LOAD( "n-2.6e",       0x0000, 0x0800, CRC(48f1ade5) SHA1(a1b45f82f3649cde8ae6a2ef494a3a6cdb5e65d0) )
 ROM_END
@@ -4021,7 +4021,7 @@ ROM_START( schaser )
 	ROM_LOAD( "rt21.bin",     0x4000, 0x0400, CRC(b368ac98) SHA1(6860efe0496955db67611183be0efecda92c9c98) )
 	ROM_LOAD( "rt22.bin",     0x4400, 0x0400, CRC(6e060dfb) SHA1(614e2ecf676c3ea2f9ea869125cfffef2f713684) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
 ROM_END
 
@@ -4033,7 +4033,7 @@ ROM_START( schasera )
 	ROM_LOAD( "rt19.bin",     0x1800, 0x0800, CRC(c0adab87) SHA1(4bb8e4ccfb5eaa052584555bfa03fecf19ab8a29) )
 	ROM_LOAD( "rt21.bin",     0x4000, 0x0800, CRC(a3b31070) SHA1(af0108e1446a2be66cfc00d0b837fa91ab882441) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
 ROM_END
 
@@ -4045,7 +4045,7 @@ ROM_START( schaserb )
 	ROM_LOAD( "rt36.bin",     0x1800, 0x0800, CRC(521ec25e) SHA1(ce53e882c11a4c36f3edc3b389d3f5ad0e0ec151) )
 	ROM_LOAD( "rt37.bin",     0x4000, 0x0800, CRC(44f65f19) SHA1(ee97d7987f54c9c26f5a20c72bdae04c46f94dc4) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
 ROM_END
 
@@ -4060,18 +4060,18 @@ ROM_END
 
 ROM_START( schasercv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1",  		  0x0000, 0x0400, CRC(bec2b16b) SHA1(c62210ecb64d7c38e5b63481d7fe04eb59bb1068) )
-	ROM_LOAD( "2",  		  0x0400, 0x0400, CRC(9d25e608) SHA1(4cc52a93a3ab96a0ec1d07593e17832fa59b30a1) )
-	ROM_LOAD( "3",  		  0x0800, 0x0400, CRC(113d0635) SHA1(ab5e98d0b5fc37d7d69bb5c541681a0f66460440) )
-	ROM_LOAD( "4",  		  0x0c00, 0x0400, CRC(f3a43c8d) SHA1(29a7a8b7d1de763a255cfec79157fd95e7bff551) )
-	ROM_LOAD( "5",  		  0x1000, 0x0400, CRC(47c84f23) SHA1(61b475fa92b8335f8edd3a128d8ac8561658e464) )
-	ROM_LOAD( "6",  		  0x1400, 0x0400, CRC(02ff2199) SHA1(e12c235b2064cb4bb426145172e523256e3c6358) )
-	ROM_LOAD( "7",  		  0x1800, 0x0400, CRC(87d06b88) SHA1(2d743161f85e47cb8ee2a600cbee790b1ad7ad99) )
-	ROM_LOAD( "8",  		  0x1c00, 0x0400, CRC(6dfaad08) SHA1(2184c4e2f4b6bffdc4fe13e178134331fcd43253) )
-	ROM_LOAD( "9",  		  0x4000, 0x0400, CRC(3d1a2ae3) SHA1(672ad6590aebdfebc2748455fa638107f3934c41) )
-	ROM_LOAD( "10", 		  0x4400, 0x0400, CRC(037edb99) SHA1(f2fc5e61f962666e7f6bb81753ac24ea0b97e581) )
+	ROM_LOAD( "1",            0x0000, 0x0400, CRC(bec2b16b) SHA1(c62210ecb64d7c38e5b63481d7fe04eb59bb1068) )
+	ROM_LOAD( "2",            0x0400, 0x0400, CRC(9d25e608) SHA1(4cc52a93a3ab96a0ec1d07593e17832fa59b30a1) )
+	ROM_LOAD( "3",            0x0800, 0x0400, CRC(113d0635) SHA1(ab5e98d0b5fc37d7d69bb5c541681a0f66460440) )
+	ROM_LOAD( "4",            0x0c00, 0x0400, CRC(f3a43c8d) SHA1(29a7a8b7d1de763a255cfec79157fd95e7bff551) )
+	ROM_LOAD( "5",            0x1000, 0x0400, CRC(47c84f23) SHA1(61b475fa92b8335f8edd3a128d8ac8561658e464) )
+	ROM_LOAD( "6",            0x1400, 0x0400, CRC(02ff2199) SHA1(e12c235b2064cb4bb426145172e523256e3c6358) )
+	ROM_LOAD( "7",            0x1800, 0x0400, CRC(87d06b88) SHA1(2d743161f85e47cb8ee2a600cbee790b1ad7ad99) )
+	ROM_LOAD( "8",            0x1c00, 0x0400, CRC(6dfaad08) SHA1(2184c4e2f4b6bffdc4fe13e178134331fcd43253) )
+	ROM_LOAD( "9",            0x4000, 0x0400, CRC(3d1a2ae3) SHA1(672ad6590aebdfebc2748455fa638107f3934c41) )
+	ROM_LOAD( "10",           0x4400, 0x0400, CRC(037edb99) SHA1(f2fc5e61f962666e7f6bb81753ac24ea0b97e581) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 (not used, but they were on the board) */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 (not used, but they were on the board) */
 	ROM_LOAD( "cv01",         0x0000, 0x0400, CRC(037e16ac) SHA1(d585030aaff428330c91ae94d7cd5c96ebdd67dd) )
 	ROM_LOAD( "cv02",         0x0400, 0x0400, CRC(8263da38) SHA1(2e7c769d129e6f8a1a31eba1e02777bb94ac32b2) )
 ROM_END
@@ -4085,7 +4085,7 @@ ROM_START( lupin3 )
 	ROM_LOAD( "lp05.32",      0x4000, 0x0800, CRC(f5c2faf4) SHA1(8d056f8c630e4659c02dd5da759dd497e4734292) )
 	ROM_LOAD( "lp06.31",      0x4800, 0x0800, CRC(66289ab2) SHA1(fc9b4a7b7a08d43f34beaf1a8e68ed0ff6148534) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color map */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color map */
 	ROM_LOAD( "lp08.1",       0x0000, 0x0400, CRC(33dbd03a) SHA1(1e0ae1cad1e9a90642886ae2ef726d3f383dd6cf) )
 	ROM_LOAD( "lp09.2",       0x0400, 0x0400, CRC(9eaee652) SHA1(a4d2d8282ba825f3a8c0cc9bca16e1d36a0d0796) )
 ROM_END
@@ -4111,10 +4111,10 @@ ROM_START( polaris )
 	ROM_LOAD( "ps10.38",     0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
 	ROM_LOAD( "ps26",        0x5000, 0x0800, CRC(9d5c3d50) SHA1(a6acf9ca6e807625156cb1759269014d5830a44f) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
 
-	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
+	ROM_REGION( 0x0100, "user1", 0 )        /* cloud graphics */
 	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
 ROM_END
 
@@ -4127,10 +4127,10 @@ ROM_START( polarisa )
 	ROM_LOAD( "ps05.32",     0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
 	ROM_LOAD( "ps10.38",     0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
 
-	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
+	ROM_REGION( 0x0100, "user1", 0 )        /* cloud graphics */
 	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
 ROM_END
 
@@ -4144,10 +4144,10 @@ ROM_START( polariso )
 	ROM_LOAD( "ps05.32",     0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
 	ROM_LOAD( "ps06.38",     0x4800, 0x0800, CRC(f577cb72) SHA1(7a931b5ebaf0d6941191f21afb9ed670d0251e07) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
 
-	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
+	ROM_REGION( 0x0100, "user1", 0 )        /* cloud graphics */
 	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
 ROM_END
 
@@ -4161,10 +4161,10 @@ ROM_START( polarisbr ) /* aka Polaris II on flyers? */
 	ROM_LOAD( "6",   0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
 	ROM_LOAD( "7",   0x5000, 0x0800, CRC(0d811b92) SHA1(09af62997e1e0da0525ab4f6ced775d3673d8f35) )
 
-	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
 
-	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
+	ROM_REGION( 0x0100, "user1", 0 )        /* cloud graphics */
 	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
 ROM_END
 
@@ -4225,29 +4225,29 @@ ROM_START( ballbomb )
 	ROM_LOAD( "tn04",         0x1800, 0x0800, CRC(d0689a22) SHA1(1f6b258431b7eb878853ff979e4d97a05fb6b797) )
 	ROM_LOAD( "tn05-1",       0x4000, 0x0800, CRC(5d5e94f1) SHA1(b9f8ba38161ef4f0940c274e9d93fed4bb7db017) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "tn06",         0x0000, 0x0400, CRC(7ec554c4) SHA1(b638605ba2043fdca4c5e18755fa5fa81ed3db07) )
 	ROM_LOAD( "tn07",         0x0400, 0x0400, CRC(deb0ac82) SHA1(839581c4e58cb7b0c2c14cf4f239220017cc26eb) )
 
-	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics (missing) */
+	ROM_REGION( 0x0100, "user1", 0 )        /* cloud graphics (missing) */
 	ROM_LOAD( "mb7052.2c",    0x0000, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( yosakdon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "yd1.bin",	  0x0000, 0x0400, CRC(607899c9) SHA1(219c0c99894715818606fba49cc75517f6f43e0c) )
-	ROM_LOAD( "yd2.bin",	  0x0400, 0x0400, CRC(78336df4) SHA1(b0b6254568d191d2d0b9c9280a3ccf2417ef3f38) )
-	ROM_LOAD( "yd3.bin",	  0x0800, 0x0400, CRC(c5af6d52) SHA1(c40af79fe060562c64fc316881b7d0348e11ee3f) )
-	ROM_LOAD( "yd4.bin",	  0x0c00, 0x0400, CRC(dca8064f) SHA1(77a58137cc7f0b5fbe0e9e8deb9c5be88b1ebbcf) )
-	ROM_LOAD( "yd5.bin",	  0x1400, 0x0400, CRC(38804ff1) SHA1(9b7527b9d2b106355f0c8df46666b1e3f286b2e3) )
-	ROM_LOAD( "yd6.bin",	  0x1800, 0x0400, CRC(988d2362) SHA1(deaf864b4e287cbc2585c2a11343b1ae82e15463) )
-	ROM_LOAD( "yd7.bin",	  0x1c00, 0x0400, CRC(2744e68b) SHA1(5ad5a7a615d36f57b6d560425e035c15e25e9005) )
+	ROM_LOAD( "yd1.bin",      0x0000, 0x0400, CRC(607899c9) SHA1(219c0c99894715818606fba49cc75517f6f43e0c) )
+	ROM_LOAD( "yd2.bin",      0x0400, 0x0400, CRC(78336df4) SHA1(b0b6254568d191d2d0b9c9280a3ccf2417ef3f38) )
+	ROM_LOAD( "yd3.bin",      0x0800, 0x0400, CRC(c5af6d52) SHA1(c40af79fe060562c64fc316881b7d0348e11ee3f) )
+	ROM_LOAD( "yd4.bin",      0x0c00, 0x0400, CRC(dca8064f) SHA1(77a58137cc7f0b5fbe0e9e8deb9c5be88b1ebbcf) )
+	ROM_LOAD( "yd5.bin",      0x1400, 0x0400, CRC(38804ff1) SHA1(9b7527b9d2b106355f0c8df46666b1e3f286b2e3) )
+	ROM_LOAD( "yd6.bin",      0x1800, 0x0400, CRC(988d2362) SHA1(deaf864b4e287cbc2585c2a11343b1ae82e15463) )
+	ROM_LOAD( "yd7.bin",      0x1c00, 0x0400, CRC(2744e68b) SHA1(5ad5a7a615d36f57b6d560425e035c15e25e9005) )
 ROM_END
 
 ROM_START( yosakdona )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "yosaku1",      0x0000, 0x0400, CRC(d132f4f0) SHA1(373c7ea1bd6debcb3dad5881793b8c31dc7a01e6) )
-	ROM_LOAD( "yd2.bin",	  0x0400, 0x0400, CRC(78336df4) SHA1(b0b6254568d191d2d0b9c9280a3ccf2417ef3f38) )
+	ROM_LOAD( "yd2.bin",      0x0400, 0x0400, CRC(78336df4) SHA1(b0b6254568d191d2d0b9c9280a3ccf2417ef3f38) )
 	ROM_LOAD( "yosaku3",      0x0800, 0x0400, CRC(b1a0b3eb) SHA1(4eb80668920b45dc6216424f8ca53d753a35f4f1) )
 	ROM_LOAD( "yosaku4",      0x0c00, 0x0400, CRC(c06c225e) SHA1(2699e3c13b09b6de16bd3ca3ca2e9d7a91b7e268) )
 	ROM_LOAD( "yosaku5",      0x1400, 0x0400, CRC(ae422a43) SHA1(5219680f9d6c5d984b29167f85106fa375856121) )
@@ -4266,7 +4266,7 @@ ROM_START( indianbt )
 	ROM_LOAD( "7.42",       0x5000, 0x0800, CRC(7060ba0b) SHA1(366ce02b7b0a3391afef23b8b41cd98a91034830) )
 	ROM_LOAD( "8.41",       0x5800, 0x0800, CRC(eaccfc0a) SHA1(c6c2d702243bdd1d2ad5fbaaceadb5a5798577bc) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "mb7054.1",   0x0000, 0x0400, CRC(4acf4db3) SHA1(842a6c9f91806b424b7cc437670b4fe0bd57dff1) )
 	ROM_LOAD( "mb7054.2",   0x0400, 0x0400, CRC(62cb3419) SHA1(3df65062945589f1df37359dbd3e30ae4b23f469) )
 ROM_END
@@ -4321,16 +4321,16 @@ ROM_END
 
 ROM_START( steelwkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.36",   		  0x0000, 0x0400, CRC(5d78873a) SHA1(293cbc067937668148181453877239cb5ed57600) )
-	ROM_LOAD( "2.35",   		  0x0400, 0x0400, CRC(99cd70c6) SHA1(a08bf4db6b39d22dfcf052cc6603aab041db0208) )
-	ROM_LOAD( "3.34",   		  0x0800, 0x0400, CRC(18103b67) SHA1(45929ea56ab15769fc68873570aab3d403e8e913) )
-	ROM_LOAD( "4.33",   		  0x0c00, 0x0400, CRC(c413ae82) SHA1(302b933b45b2aaa515434b5268fd74aec4160e3f) )
-	ROM_LOAD( "5.32",   		  0x1000, 0x0400, CRC(ca7b07b5) SHA1(cbea221c4daf84825f99bbef6d731fc2ef88feeb) )
-	ROM_LOAD( "6.31",   		  0x1400, 0x0400, CRC(f8181fa0) SHA1(a907611529a1500a2ae118e834c2d4b6d11974f1) )
-	ROM_LOAD( "7.42",   		  0x1800, 0x0400, CRC(a35f113e) SHA1(53073037db55c14055810c0bee7b85eb75bbaa72) )
-	ROM_LOAD( "8.41",   		  0x1c00, 0x0400, CRC(af208370) SHA1(ccbd002accda26cc0a02987d9801a47e5f49921a) )
+	ROM_LOAD( "1.36",             0x0000, 0x0400, CRC(5d78873a) SHA1(293cbc067937668148181453877239cb5ed57600) )
+	ROM_LOAD( "2.35",             0x0400, 0x0400, CRC(99cd70c6) SHA1(a08bf4db6b39d22dfcf052cc6603aab041db0208) )
+	ROM_LOAD( "3.34",             0x0800, 0x0400, CRC(18103b67) SHA1(45929ea56ab15769fc68873570aab3d403e8e913) )
+	ROM_LOAD( "4.33",             0x0c00, 0x0400, CRC(c413ae82) SHA1(302b933b45b2aaa515434b5268fd74aec4160e3f) )
+	ROM_LOAD( "5.32",             0x1000, 0x0400, CRC(ca7b07b5) SHA1(cbea221c4daf84825f99bbef6d731fc2ef88feeb) )
+	ROM_LOAD( "6.31",             0x1400, 0x0400, CRC(f8181fa0) SHA1(a907611529a1500a2ae118e834c2d4b6d11974f1) )
+	ROM_LOAD( "7.42",             0x1800, 0x0400, CRC(a35f113e) SHA1(53073037db55c14055810c0bee7b85eb75bbaa72) )
+	ROM_LOAD( "8.41",             0x1c00, 0x0400, CRC(af208370) SHA1(ccbd002accda26cc0a02987d9801a47e5f49921a) )
 
-	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 (not used, but they were on the board) */
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 (not used, but they were on the board) */
 	ROM_LOAD( "la05.1",         0x0000, 0x0400, CRC(98f31392) SHA1(ccdd1bd2ddd24bd6b1f8255a87e138f937eaf5b4) )
 	ROM_LOAD( "la06.2",         0x0400, 0x0400, CRC(98f31392) SHA1(ccdd1bd2ddd24bd6b1f8255a87e138f937eaf5b4) )
 ROM_END
@@ -4424,7 +4424,7 @@ GAME( 1980, polaris,    0,        polaris,   polaris,   driver_device, 0, ROT270
 GAME( 1980, polarisa,   polaris,  polaris,   polaris,   driver_device, 0, ROT270, "Taito", "Polaris (First revision)", GAME_SUPPORTS_SAVE )
 GAME( 1980, polariso,   polaris,  polaris,   polaris,   driver_device, 0, ROT270, "Taito", "Polaris (Original version)", GAME_SUPPORTS_SAVE )
 GAME( 1981, polarisbr,  polaris,  polaris,   polaris,   driver_device, 0, ROT270, "Taito do Brasil", "Polaris (Brazil)", GAME_SUPPORTS_SAVE )
-GAME( 1980, ballbomb,   0,        ballbomb,  ballbomb,  driver_device, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )	/* missing clouds */
+GAME( 1980, ballbomb,   0,        ballbomb,  ballbomb,  driver_device, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )  /* missing clouds */
 GAME( 1980, indianbt,   0,        indianbt,  indianbt,  driver_device, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, steelwkr,   0,        steelwkr,  steelwkr,  driver_device, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(1980?,galactic,   0,        galactic,  galactic,  driver_device, 0, ROT270, "Taito do Brasil", "Galactica - Batalha Espacial", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_galactic )

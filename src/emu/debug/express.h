@@ -110,7 +110,7 @@ public:
 	// construction/destruction
 	expression_error(error_code code, int offset = 0)
 		: m_code(code),
-		  m_offset(offset) { }
+			m_offset(offset) { }
 
 	// operators
 	operator error_code() const { return m_code; }
@@ -122,8 +122,8 @@ public:
 
 private:
 	// internal state
-	error_code			m_code;
-	int					m_offset;
+	error_code          m_code;
+	int                 m_offset;
 };
 
 
@@ -161,11 +161,11 @@ public:
 
 protected:
 	// internal state
-	symbol_entry *	m_next;						// link to next entry
-	symbol_table &	m_table;					// pointer back to the owning table
-	symbol_type		m_type;						// type of symbol
-	astring 		m_name;						// name of the symbol
-	void *			m_ref;						// internal reference
+	symbol_entry *  m_next;                     // link to next entry
+	symbol_table &  m_table;                    // pointer back to the owning table
+	symbol_type     m_type;                     // type of symbol
+	astring         m_name;                     // name of the symbol
+	void *          m_ref;                      // internal reference
 };
 
 
@@ -224,13 +224,13 @@ public:
 
 private:
 	// internal state
-	symbol_table *			m_parent;			// pointer to the parent symbol table
-	void *					m_globalref;		// global reference parameter
-	tagged_list<symbol_entry> m_symlist;		// list of symbols
-	void *					m_memory_param;		// callback parameter for memory
-	valid_func				m_memory_valid;		// validation callback
-	read_func				m_memory_read;		// read callback
-	write_func				m_memory_write;		// write callback
+	symbol_table *          m_parent;           // pointer to the parent symbol table
+	void *                  m_globalref;        // global reference parameter
+	tagged_list<symbol_entry> m_symlist;        // list of symbols
+	void *                  m_memory_param;     // callback parameter for memory
+	valid_func              m_memory_valid;     // validation callback
+	read_func               m_memory_read;      // read callback
+	write_func              m_memory_write;     // write callback
 };
 
 
@@ -269,18 +269,18 @@ private:
 		// operator flags
 		enum
 		{
-			TIN_OPTYPE_SHIFT		= 0,		// 8 bits (0-7)
-			TIN_OPTYPE_MASK			= 0xff << TIN_OPTYPE_SHIFT,
-			TIN_RIGHT_TO_LEFT_SHIFT	= 16,		// 1 bit  (16)
-			TIN_RIGHT_TO_LEFT_MASK	= 1 << TIN_RIGHT_TO_LEFT_SHIFT,
-			TIN_FUNCTION_SHIFT		= 17,		// 1 bit  (17)
-			TIN_FUNCTION_MASK		= 1 << TIN_FUNCTION_SHIFT,
-			TIN_MEMORY_SIZE_SHIFT	= 18,		// 2 bits (18-19)
-			TIN_MEMORY_SIZE_MASK	= 3 << TIN_MEMORY_SIZE_SHIFT,
-			TIN_MEMORY_SPACE_SHIFT	= 20,		// 4 bits (20-23)
-			TIN_MEMORY_SPACE_MASK	= 0xf << TIN_MEMORY_SPACE_SHIFT,
-			TIN_PRECEDENCE_SHIFT	= 24,		// 8 bits (24-31)
-			TIN_PRECEDENCE_MASK		= 0xff << TIN_PRECEDENCE_SHIFT
+			TIN_OPTYPE_SHIFT        = 0,        // 8 bits (0-7)
+			TIN_OPTYPE_MASK         = 0xff << TIN_OPTYPE_SHIFT,
+			TIN_RIGHT_TO_LEFT_SHIFT = 16,       // 1 bit  (16)
+			TIN_RIGHT_TO_LEFT_MASK  = 1 << TIN_RIGHT_TO_LEFT_SHIFT,
+			TIN_FUNCTION_SHIFT      = 17,       // 1 bit  (17)
+			TIN_FUNCTION_MASK       = 1 << TIN_FUNCTION_SHIFT,
+			TIN_MEMORY_SIZE_SHIFT   = 18,       // 2 bits (18-19)
+			TIN_MEMORY_SIZE_MASK    = 3 << TIN_MEMORY_SIZE_SHIFT,
+			TIN_MEMORY_SPACE_SHIFT  = 20,       // 4 bits (20-23)
+			TIN_MEMORY_SPACE_MASK   = 0xf << TIN_MEMORY_SPACE_SHIFT,
+			TIN_PRECEDENCE_SHIFT    = 24,       // 8 bits (24-31)
+			TIN_PRECEDENCE_MASK     = 0xff << TIN_PRECEDENCE_SHIFT
 		};
 
 		// types of tokens
@@ -343,13 +343,13 @@ private:
 
 	private:
 		// internal state
-		parse_token *			m_next;				// next token in list
-		token_type				m_type;				// type of token
-		int						m_offset;			// offset within the string
-		UINT64					m_value;			// integral value
-		UINT32					m_flags;			// additional flags/info
-		const char *			m_string;			// associated string
-		symbol_entry *			m_symbol;			// symbol pointer
+		parse_token *           m_next;             // next token in list
+		token_type              m_type;             // type of token
+		int                     m_offset;           // offset within the string
+		UINT64                  m_value;            // integral value
+		UINT32                  m_flags;            // additional flags/info
+		const char *            m_string;           // associated string
+		symbol_entry *          m_symbol;           // symbol pointer
 	};
 
 	// an expression_string holds an indexed string parsed from the expression
@@ -361,7 +361,7 @@ private:
 		// construction/destruction
 		expression_string(const char *string, int length = 0)
 			: m_next(NULL),
-			  m_string(string, (length == 0) ? strlen(string) : length) { }
+				m_string(string, (length == 0) ? strlen(string) : length) { }
 
 		// operators
 		operator const char *() { return m_string; }
@@ -369,8 +369,8 @@ private:
 
 	private:
 		// internal state
-		expression_string *	m_next;						// next string in list
-		astring				m_string;					// copy of the string
+		expression_string * m_next;                     // next string in list
+		astring             m_string;                   // copy of the string
 	};
 
 	// internal helpers
@@ -401,12 +401,12 @@ private:
 	static const int MAX_STACK_DEPTH = 16;
 
 	// internal state
-	symbol_table *		m_symtable;						// symbol table
-	astring 			m_original_string;				// original string (prior to parsing)
-	simple_list<parse_token> m_tokenlist;				// token list
-	simple_list<expression_string> m_stringlist;		// string list
-	int					m_token_stack_ptr;				// stack pointer (used during execution)
-	parse_token			m_token_stack[MAX_STACK_DEPTH];	// token stack (used during execution)
+	symbol_table *      m_symtable;                     // symbol table
+	astring             m_original_string;              // original string (prior to parsing)
+	simple_list<parse_token> m_tokenlist;               // token list
+	simple_list<expression_string> m_stringlist;        // string list
+	int                 m_token_stack_ptr;              // stack pointer (used during execution)
+	parse_token         m_token_stack[MAX_STACK_DEPTH]; // token stack (used during execution)
 };
 
 

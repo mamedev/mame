@@ -6,17 +6,17 @@
 #include "orao_cas.h"
 
 
-#define ORAO_WAV_FREQUENCY	44100
-#define WAVE_HIGH		-32768
-#define WAVE_LOW		0
+#define ORAO_WAV_FREQUENCY  44100
+#define WAVE_HIGH       -32768
+#define WAVE_LOW        0
 
-#define ORAO_WAVE_ONE	24
-#define ORAO_WAVE_ZERO	11
+#define ORAO_WAVE_ONE   24
+#define ORAO_WAVE_ZERO  11
 
 #define ORAO_HEADER_SIZE 360
 
-static INT16	wave_data;
-static int  	len;
+static INT16    wave_data;
+static int      len;
 
 static void orao_output_wave( INT16 **buffer, int length ) {
 	if ( buffer == NULL ) {
@@ -82,13 +82,13 @@ static int orao_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 
 
 static const struct CassetteLegacyWaveFiller orao_legacy_fill_wave = {
-	orao_cas_fill_wave,			/* fill_wave */
-	-1,					/* chunk_size */
-	0,					/* chunk_samples */
-	orao_cas_to_wav_size,			/* chunk_sample_calc */
-	ORAO_WAV_FREQUENCY,			/* sample_frequency */
-	0,					/* header_samples */
-	0					/* trailer_samples */
+	orao_cas_fill_wave,         /* fill_wave */
+	-1,                 /* chunk_size */
+	0,                  /* chunk_samples */
+	orao_cas_to_wav_size,           /* chunk_sample_calc */
+	ORAO_WAV_FREQUENCY,         /* sample_frequency */
+	0,                  /* header_samples */
+	0                   /* trailer_samples */
 };
 
 
@@ -116,5 +116,3 @@ static const struct CassetteFormat orao_cassette_format = {
 CASSETTE_FORMATLIST_START(orao_cassette_formats)
 	CASSETTE_FORMAT(orao_cassette_format)
 CASSETTE_FORMATLIST_END
-
-

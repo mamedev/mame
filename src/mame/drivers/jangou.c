@@ -32,7 +32,7 @@ $c088-$c095 player tiles
 #include "video/resnet.h"
 #include "machine/nvram.h"
 
-#define MASTER_CLOCK	XTAL_19_968MHz
+#define MASTER_CLOCK    XTAL_19_968MHz
 
 class jangou_state : public driver_device
 {
@@ -52,7 +52,7 @@ public:
 	/* misc */
 	UINT8        m_mux_data;
 	UINT8        m_nsc_latch;
-	UINT8		 m_z80_latch;
+	UINT8        m_z80_latch;
 
 	/* devices */
 	device_t *m_cpu_0;
@@ -213,7 +213,7 @@ WRITE8_MEMBER(jangou_state::blitter_process_w)
 		int xcount, ycount;
 
 		/* printf("%02x %02x %02x %02x %02x %02x\n", m_blit_data[0], m_blit_data[1], m_blit_data[2],
-                    m_blit_data[3], m_blit_data[4], m_blit_data[5]); */
+		            m_blit_data[3], m_blit_data[4], m_blit_data[5]); */
 		w = (m_blit_data[4] & 0xff) + 1;
 		h = (m_blit_data[5] & 0xff) + 1;
 		src = ((m_blit_data[1] << 8)|(m_blit_data[0] << 0));
@@ -274,10 +274,10 @@ WRITE8_MEMBER(jangou_state::mux_w)
 WRITE8_MEMBER(jangou_state::output_w)
 {
 	/*
-    --x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
-    ---- -x-- flip screen
-    ---- ---x coin counter
-    */
+	--x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
+	---- -x-- flip screen
+	---- ---x coin counter
+	*/
 //  printf("%02x\n", data);
 	coin_counter_w(machine(), 0, data & 0x01);
 //  flip_screen_set(data & 0x04);
@@ -495,20 +495,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("nvram")	/* MK48Z02B-15 ZEROPOWER RAM */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("nvram")   /* MK48Z02B-15 ZEROPOWER RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW")			/* DSW + blitter busy flag */
-	AM_RANGE(0x10,0x10) AM_WRITENOP					/* Writes continuosly 0's in attract mode, and 1's in game */
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW")         /* DSW + blitter busy flag */
+	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x13,0x13) AM_READNOP					/* Often reads bit7 with unknown purposes */
+	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
 	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
 	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w)
-	AM_RANGE(0x30,0x30) AM_WRITENOP					/* Seems to write 0x10 on each sound event */
+	AM_RANGE(0x30,0x30) AM_WRITENOP                 /* Seems to write 0x10 on each sound event */
 ADDRESS_MAP_END
 
 
@@ -798,41 +798,41 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( roylcrdn )
 	PORT_START("PL1_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("1P Bet1")				/* 1P Bet1 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("1P Bet2")				/* 1P Bet2 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("1P Bet3")				/* 1P Bet3 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("1P Bet4")				/* 1P Bet4 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("1P Bet5")				/* 1P Bet5 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("1P Flip-Flop")	/* 1P Flip-Flop */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("1P Start")				/* 1P Start */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("1P Bet1")                /* 1P Bet1 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("1P Bet2")                /* 1P Bet2 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("1P Bet3")                /* 1P Bet3 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("1P Bet4")                /* 1P Bet4 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("1P Bet5")                /* 1P Bet5 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("1P Flip-Flop")    /* 1P Flip-Flop */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("1P Start")               /* 1P Start */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL1_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("1P Take Score")			/* 1P Take Score */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("1P Hi-Lo (W-Up)")		/* 1P W-Up */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("1P Hi (Big)")			/* 1P Big */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("1P Lo (Small)")			/* 1P Small */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("1P Stand")				/* 1P Stand */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("1P Hit")					/* 1P Hit */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("1P Take Score")          /* 1P Take Score */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("1P Hi-Lo (W-Up)")        /* 1P W-Up */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("1P Hi (Big)")            /* 1P Big */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("1P Lo (Small)")          /* 1P Small */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("1P Stand")               /* 1P Stand */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("1P Hit")                 /* 1P Hit */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL2_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("2P Bet1")			/* 2P Bet1 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2P Bet2")			/* 2P Bet2 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("2P Bet3")			/* 2P Bet3 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("2P Bet4")			/* 2P Bet4 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("2P Bet5")			/* 2P Bet5 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("2P Flip-Flop")	/* 2P Flip-Flop */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("2P Start")			/* 2P Start */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("2P Bet1")            /* 2P Bet1 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2P Bet2")            /* 2P Bet2 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("2P Bet3")            /* 2P Bet3 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("2P Bet4")            /* 2P Bet4 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("2P Bet5")            /* 2P Bet5 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("2P Flip-Flop")    /* 2P Flip-Flop */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("2P Start")           /* 2P Start */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL2_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)  PORT_NAME("2P Take Score")		/* 2P Take Score */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("2P Hi-Lo (W-Up)")	/* 2P W-Up */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)    PORT_NAME("2P Hi (Big)")		/* 2P Big */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)  PORT_NAME("2P Lo (Small)")		/* 2P Small */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("2P Stand")			/* 2P Stand */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("2P Hit")				/* 2P Hit */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)  PORT_NAME("2P Take Score")      /* 2P Take Score */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("2P Hi-Lo (W-Up)")    /* 2P W-Up */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)    PORT_NAME("2P Hi (Big)")        /* 2P Big */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)  PORT_NAME("2P Lo (Small)")      /* 2P Small */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("2P Stand")           /* 2P Stand */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("2P Hit")             /* 2P Hit */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL1_3")
@@ -842,16 +842,16 @@ static INPUT_PORTS_START( roylcrdn )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )																	/* Spare 2 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )										PORT_NAME("Note In")		/* Note In */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_9)	PORT_NAME("Memory Reset")	/* Memory Reset */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_0)	PORT_NAME("Analyzer")		/* Analyzer */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_F2) PORT_NAME("Test Mode")		/* Test Mode */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )										PORT_NAME("Coin In")		/* Coin In */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )								PORT_NAME("Credit Clear")	/* Credit Clear */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )																	/* Spare 1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 2 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                      PORT_NAME("Note In")        /* Note In */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_9)  PORT_NAME("Memory Reset")   /* Memory Reset */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_0)  PORT_NAME("Analyzer")       /* Analyzer */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_F2) PORT_NAME("Test Mode")      /* Test Mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                      PORT_NAME("Coin In")        /* Coin In */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                              PORT_NAME("Credit Clear")   /* Credit Clear */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 1 */
 
-	PORT_START("DSW")	/* Not a real DSW on PCB */
+	PORT_START("DSW")   /* Not a real DSW on PCB */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -873,7 +873,7 @@ static INPUT_PORTS_START( roylcrdn )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* blitter busy flag */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* blitter busy flag */
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1247,7 +1247,7 @@ ROM_START( cntrygrl )
 	ROM_LOAD( "rom5.7k", 0x02000, 0x02000, CRC(24d210ed) SHA1(6a0eae9d459975fbaad75bf21284baac3ba4f872) )
 
 	/* wtf,these 2 roms are next to the CPU roms, one is a CPU rom from Moon Quasar, the other a GFX rom from Crazy Climber,
-        I dunno what's going on,the game doesn't appear to need these two....*/
+	    I dunno what's going on,the game doesn't appear to need these two....*/
 	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "rom6.7h", 0x00000, 0x0800, CRC(33965a89) SHA1(92912cea76a472d9b709c664d9818844a07fcc32)  ) // = mq3    Moon Quasar
 	ROM_LOAD( "rom7.7j", 0x00800, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7)  ) // = cc06   Crazy Climber (US)
@@ -1318,17 +1318,17 @@ ROM_END
 
 ROM_START( roylcrdn )
 	ROM_REGION( 0x10000, "cpu0", 0 )
-	ROM_LOAD( "prg.p1",		0x0000, 0x1000, CRC(9c3b1662) SHA1(b874f88521a21ba6cf9670ed4d81b5d275cf4d12) )
-	ROM_LOAD( "prg.p2",		0x1000, 0x1000, CRC(7e10259d) SHA1(d1279922a8c2475c3c73d9960b0a728c0ef851fb) )
-	ROM_LOAD( "prg.p3",		0x2000, 0x1000, CRC(06ef7073) SHA1(d3f990d710629b23daec76cd7ad6ccc7e066e710) )
+	ROM_LOAD( "prg.p1",     0x0000, 0x1000, CRC(9c3b1662) SHA1(b874f88521a21ba6cf9670ed4d81b5d275cf4d12) )
+	ROM_LOAD( "prg.p2",     0x1000, 0x1000, CRC(7e10259d) SHA1(d1279922a8c2475c3c73d9960b0a728c0ef851fb) )
+	ROM_LOAD( "prg.p3",     0x2000, 0x1000, CRC(06ef7073) SHA1(d3f990d710629b23daec76cd7ad6ccc7e066e710) )
 
 	ROM_REGION( 0x20000, "gfx", 0 )
-	ROM_LOAD( "chrgen.cr1",	0x0000, 0x1000, CRC(935d0e1c) SHA1(0d5b067f6931585c8138b211cf73e5f585af8101) )
-	ROM_LOAD( "chrgen.cr2",	0x1000, 0x1000, CRC(4429362e) SHA1(0bbb6dedf919e0453be2db6343827c5787d139f3) )
-	ROM_LOAD( "chrgen.cr3",	0x2000, 0x1000, CRC(dc059cc9) SHA1(3041e83b9a265adfe4e1da889ae6a18593de0894) )
+	ROM_LOAD( "chrgen.cr1", 0x0000, 0x1000, CRC(935d0e1c) SHA1(0d5b067f6931585c8138b211cf73e5f585af8101) )
+	ROM_LOAD( "chrgen.cr2", 0x1000, 0x1000, CRC(4429362e) SHA1(0bbb6dedf919e0453be2db6343827c5787d139f3) )
+	ROM_LOAD( "chrgen.cr3", 0x2000, 0x1000, CRC(dc059cc9) SHA1(3041e83b9a265adfe4e1da889ae6a18593de0894) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "mb7051.3h",	0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )
+	ROM_LOAD( "mb7051.3h",  0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )
 ROM_END
 
 
@@ -1379,7 +1379,7 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
 
 	unsigned char patn2[32] = {
 		0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20,
-		0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88,	0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88
+		0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88
 	};
 
 	for (A = 0; A < 0x3000; A++)

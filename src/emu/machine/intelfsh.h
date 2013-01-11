@@ -73,7 +73,7 @@ class intelfsh_device;
 
 // ======================> intelfsh_device
 
-class intelfsh_device :	public device_t,
+class intelfsh_device : public device_t,
 						public device_memory_interface,
 						public device_nvram_interface
 {
@@ -125,23 +125,23 @@ protected:
 	void write_full(UINT32 offset, UINT32 data);
 
 	// configuration state
-	address_space_config	m_space_config;
-	UINT32					m_type;
-	INT32					m_size;
-	UINT8					m_bits;
-	UINT8					m_device_id;
-	UINT8					m_maker_id;
-	bool					m_sector_is_4k;
-	UINT8					m_page_size;
+	address_space_config    m_space_config;
+	UINT32                  m_type;
+	INT32                   m_size;
+	UINT8                   m_bits;
+	UINT8                   m_device_id;
+	UINT8                   m_maker_id;
+	bool                    m_sector_is_4k;
+	UINT8                   m_page_size;
 
 	// internal state
-	UINT8					m_status;
-	INT32					m_erase_sector;
-	INT32					m_flash_mode;
-	bool					m_flash_master_lock;
-	emu_timer *				m_timer;
-	INT32					m_bank;
-	UINT8					m_byte_count;
+	UINT8                   m_status;
+	INT32                   m_erase_sector;
+	INT32                   m_flash_mode;
+	bool                    m_flash_master_lock;
+	emu_timer *             m_timer;
+	INT32                   m_bank;
+	UINT8                   m_byte_count;
 };
 
 

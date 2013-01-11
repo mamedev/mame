@@ -53,20 +53,20 @@ INLINE UINT32 get_UINT32BE(UINT32BE word)
 #ifdef UNUSED_FUNCTION
 INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
-    word->bytes[0] = (data >> 24) & 0xff;
-    word->bytes[1] = (data >> 16) & 0xff;
-    word->bytes[2] = (data >> 8) & 0xff;
-    word->bytes[3] = data & 0xff;
+	word->bytes[0] = (data >> 24) & 0xff;
+	word->bytes[1] = (data >> 16) & 0xff;
+	word->bytes[2] = (data >> 8) & 0xff;
+	word->bytes[3] = data & 0xff;
 }
 #endif
 
 /* disk image header */
 struct disk_image_header
 {
-	UINT32BE cylinders;			/* number of cylinders on hard disk (big-endian) */
-	UINT32BE heads;				/* number of heads on hard disk (big-endian) */
-	UINT32BE sectors_per_track;	/* number of sectors per track on hard disk (big-endian) */
-	UINT32BE bytes_per_sector;	/* number of bytes of data per sector on hard disk (big-endian) */
+	UINT32BE cylinders;         /* number of cylinders on hard disk (big-endian) */
+	UINT32BE heads;             /* number of heads on hard disk (big-endian) */
+	UINT32BE sectors_per_track; /* number of sectors per track on hard disk (big-endian) */
+	UINT32BE bytes_per_sector;  /* number of bytes of data per sector on hard disk (big-endian) */
 };
 
 enum
@@ -83,11 +83,11 @@ enum format_t
 /* disk drive unit descriptor */
 struct hd_unit_t
 {
-	device_image_interface *img;						/* image descriptor */
+	device_image_interface *img;                        /* image descriptor */
 	format_t format;
-	hard_disk_file *hd_handle;		/* mame hard disk descriptor - only if format == format_mame */
-	unsigned int wp : 1;					/* TRUE if disk is write-protected */
-	unsigned int unsafe : 1;				/* TRUE when a disk has just been connected */
+	hard_disk_file *hd_handle;      /* mame hard disk descriptor - only if format == format_mame */
+	unsigned int wp : 1;                    /* TRUE if disk is write-protected */
+	unsigned int unsafe : 1;                /* TRUE when a disk has just been connected */
 
 	/* disk geometry */
 	unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
@@ -106,54 +106,54 @@ struct hdc_t
 /* masks for individual bits controller registers */
 enum
 {
-	w0_offline			= 0x8000,
-	w0_not_ready		= 0x4000,
-	w0_write_protect	= 0x2000,
-	w0_unsafe			= 0x1000,
-	w0_end_of_cylinder	= 0x0800,
-	w0_seek_incomplete	= 0x0400,
+	w0_offline          = 0x8000,
+	w0_not_ready        = 0x4000,
+	w0_write_protect    = 0x2000,
+	w0_unsafe           = 0x1000,
+	w0_end_of_cylinder  = 0x0800,
+	w0_seek_incomplete  = 0x0400,
 	/*w0_offset_active  = 0x0200,*/
-	w0_pack_change		= 0x0100,
+	w0_pack_change      = 0x0100,
 
-	w0_attn_lines		= 0x00f0,
-	w0_attn_mask		= 0x000f,
+	w0_attn_lines       = 0x00f0,
+	w0_attn_mask        = 0x000f,
 
-	w1_extended_command	= 0xc000,
+	w1_extended_command = 0xc000,
 	/*w1_strobe_early       = 0x2000,
-    w1_strobe_late      = 0x1000,*/
-	w1_transfer_inhibit	= 0x0800,
-	w1_command			= 0x0700,
-	w1_offset			= 0x0080,
-	w1_offset_forward	= 0x0040,
-	w1_head_address		= 0x003f,
+	w1_strobe_late      = 0x1000,*/
+	w1_transfer_inhibit = 0x0800,
+	w1_command          = 0x0700,
+	w1_offset           = 0x0080,
+	w1_offset_forward   = 0x0040,
+	w1_head_address     = 0x003f,
 
-	w6_unit0_sel		= 0x0800,
-	w6_unit1_sel		= 0x0400,
-	w6_unit2_sel		= 0x0200,
-	w6_unit3_sel		= 0x0100,
+	w6_unit0_sel        = 0x0800,
+	w6_unit1_sel        = 0x0400,
+	w6_unit2_sel        = 0x0200,
+	w6_unit3_sel        = 0x0100,
 
-	w7_idle				= 0x8000,
-	w7_complete			= 0x4000,
-	w7_error			= 0x2000,
-	w7_int_enable		= 0x1000,
+	w7_idle             = 0x8000,
+	w7_complete         = 0x4000,
+	w7_error            = 0x2000,
+	w7_int_enable       = 0x1000,
 	/*w7_lock_out           = 0x0800,*/
-	w7_retry			= 0x0400,
-	w7_ecc				= 0x0200,
-	w7_abnormal_completion	= 0x0100,
-	w7_memory_error			= 0x0080,
-	w7_data_error			= 0x0040,
-	w7_tiline_timeout_err	= 0x0020,
-	w7_header_err			= 0x0010,
-	w7_rate_err				= 0x0008,
-	w7_command_time_out_err	= 0x0004,
-	w7_search_err			= 0x0002,
-	w7_unit_err				= 0x0001
+	w7_retry            = 0x0400,
+	w7_ecc              = 0x0200,
+	w7_abnormal_completion  = 0x0100,
+	w7_memory_error         = 0x0080,
+	w7_data_error           = 0x0040,
+	w7_tiline_timeout_err   = 0x0020,
+	w7_header_err           = 0x0010,
+	w7_rate_err             = 0x0008,
+	w7_command_time_out_err = 0x0004,
+	w7_search_err           = 0x0002,
+	w7_unit_err             = 0x0001
 };
 
 /* masks for computer-controlled bit in each controller register  */
 static const UINT16 w_mask[8] =
 {
-	0x000f,		/* Controllers should prevent overwriting of w0 status bits, and I know
+	0x000f,     /* Controllers should prevent overwriting of w0 status bits, and I know
                 that some controllers do so. */
 	0xffff,
 	0xffff,
@@ -161,7 +161,7 @@ static const UINT16 w_mask[8] =
 	0xffff,
 	0xffff,
 	0xffff,
-	0xf7ff		/* Don't overwrite reserved bits */
+	0xf7ff      /* Don't overwrite reserved bits */
 };
 
 static hdc_t hdc;
@@ -207,7 +207,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
-	hard_disk_file	*hd_file;
+	hard_disk_file  *hd_file;
 
 	d = &hdc.d[id];
 	d->img = &image;
@@ -241,7 +241,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 
 		/* use custom image header. */
 		/* to convert old header-less images to this format, insert a 16-byte
-        header as follow: 00 00 03 8f  00 00 00 05  00 00 00 21  00 00 01 00 */
+		header as follow: 00 00 03 8f  00 00 00 05  00 00 00 21  00 00 01 00 */
 		d->img->fseek(0, SEEK_SET);
 		bytes_read = d->img->fread(&custom_header, sizeof(custom_header));
 		if (bytes_read != sizeof(custom_header))
@@ -287,7 +287,7 @@ static DEVICE_IMAGE_UNLOAD( ti990_hd )
 
 	d = &hdc.d[id];
 
-	d->format = format_mame;	/* don't care */
+	d->format = format_mame;    /* don't care */
 	d->hd_handle = NULL;
 	d->wp = 1;
 	d->unsafe = 1;
@@ -398,7 +398,7 @@ static void update_interrupt(running_machine &machine)
 static int check_sector_address(running_machine &machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector)
 {
 	if ((cylinder > hdc.d[unit].cylinders) || (head > hdc.d[unit].heads) || (sector > hdc.d[unit].sectors_per_track))
-	{	/* invalid address */
+	{   /* invalid address */
 		if (cylinder > hdc.d[unit].cylinders)
 		{
 			hdc.w[0] |= w0_seek_incomplete;
@@ -513,14 +513,14 @@ static void store_registers(running_machine &machine)
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
-	{	/* offline */
+	{   /* offline */
 		hdc.w[0] |= w0_offline | w0_not_ready;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 
-	hdc.d[dsk_sel].unsafe = 0;		/* I think */
+	hdc.d[dsk_sel].unsafe = 0;      /* I think */
 
 	dma_address = ((((int) hdc.w[6]) << 16) | hdc.w[5]) & 0x1ffffe;
 	byte_count = hdc.w[4] & 0xfffe;
@@ -572,21 +572,21 @@ static void write_format(running_machine &machine)
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
-	{	/* offline */
+	{   /* offline */
 		hdc.w[0] |= w0_offline | w0_not_ready;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 	else if (hdc.d[dsk_sel].unsafe)
-	{	/* disk in unsafe condition */
+	{   /* disk in unsafe condition */
 		hdc.w[0] |= w0_unsafe | w0_pack_change;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 	else if (hdc.d[dsk_sel].wp)
-	{	/* disk write-protected */
+	{   /* disk write-protected */
 		hdc.w[0] |= w0_write_protect;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
@@ -647,14 +647,14 @@ static void read_data(running_machine &machine)
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
-	{	/* offline */
+	{   /* offline */
 		hdc.w[0] |= w0_offline | w0_not_ready;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 	else if (hdc.d[dsk_sel].unsafe)
-	{	/* disk in unsafe condition */
+	{   /* disk in unsafe condition */
 		hdc.w[0] |= w0_unsafe | w0_pack_change;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
@@ -672,7 +672,7 @@ static void read_data(running_machine &machine)
 		return;
 
 	while (byte_count)
-	{	/* read data sector per sector */
+	{   /* read data sector per sector */
 		if (cylinder > hdc.d[dsk_sel].cylinders)
 		{
 			hdc.w[0] |= w0_seek_incomplete;
@@ -685,7 +685,7 @@ static void read_data(running_machine &machine)
 		bytes_read = read_sector(dsk_sel, lba, buffer, bytes_to_read);
 
 		if (bytes_read != bytes_to_read)
-		{	/* behave as if the controller could not found the sector ID mark */
+		{   /* behave as if the controller could not found the sector ID mark */
 			hdc.w[7] |= w7_idle | w7_error | w7_command_time_out_err;
 			update_interrupt(machine);
 			return;
@@ -747,21 +747,21 @@ static void write_data(running_machine &machine)
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
-	{	/* offline */
+	{   /* offline */
 		hdc.w[0] |= w0_offline | w0_not_ready;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 	else if (hdc.d[dsk_sel].unsafe)
-	{	/* disk in unsafe condition */
+	{   /* disk in unsafe condition */
 		hdc.w[0] |= w0_unsafe | w0_pack_change;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 	else if (hdc.d[dsk_sel].wp)
-	{	/* disk write-protected */
+	{   /* disk write-protected */
 		hdc.w[0] |= w0_write_protect;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
@@ -779,7 +779,7 @@ static void write_data(running_machine &machine)
 		return;
 
 	while (byte_count > 0)
-	{	/* write data sector per sector */
+	{   /* write data sector per sector */
 		if (cylinder > hdc.d[dsk_sel].cylinders)
 		{
 			hdc.w[0] |= w0_seek_incomplete;
@@ -856,14 +856,14 @@ static void unformatted_read(running_machine &machine)
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
-	{	/* offline */
+	{   /* offline */
 		hdc.w[0] |= w0_offline | w0_not_ready;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 	else if (hdc.d[dsk_sel].unsafe)
-	{	/* disk in unsafe condition */
+	{   /* disk in unsafe condition */
 		hdc.w[0] |= w0_unsafe | w0_pack_change;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
@@ -922,17 +922,17 @@ static void restore(running_machine &machine)
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
-	{	/* offline */
+	{   /* offline */
 		hdc.w[0] |= w0_offline | w0_not_ready;
 		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
 		update_interrupt(machine);
 		return;
 	}
 
-	hdc.d[dsk_sel].unsafe = 0;		/* I think */
+	hdc.d[dsk_sel].unsafe = 0;      /* I think */
 
 	/*if (seek_to_sector(dsk_sel, 0, 0, 0))
-        return;*/
+	    return;*/
 
 	hdc.w[7] |= w7_idle | w7_complete;
 	update_interrupt(machine);
@@ -1028,7 +1028,7 @@ WRITE16_HANDLER(ti990_hdc_w)
 				update_interrupt(space.machine());
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
-			{	/* idle has been cleared: start command execution */
+			{   /* idle has been cleared: start command execution */
 				execute_command(space.machine());
 			}
 		}
@@ -1050,4 +1050,3 @@ MACHINE_CONFIG_FRAGMENT( ti990_hdc )
 	MCFG_HARDDISK_CONFIG_ADD( "harddisk3", ti990_harddisk_config )
 	MCFG_HARDDISK_CONFIG_ADD( "harddisk4", ti990_harddisk_config )
 MACHINE_CONFIG_END
-

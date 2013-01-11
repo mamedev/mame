@@ -11,14 +11,14 @@
 
 
 /* constants */
-#define VRAM_SIZE		(0x10000)
-#define QRAM_SIZE		(0x10000)
+#define VRAM_SIZE       (0x10000)
+#define QRAM_SIZE       (0x10000)
 
-#define VIDEO_WIDTH 	(320)
+#define VIDEO_WIDTH     (320)
 
 
 /* debugging */
-#define LOG_COMM	0
+#define LOG_COMM    0
 
 
 /*************************************
@@ -158,18 +158,18 @@ static int leland_vram_port_r(address_space &space, int offset, int num)
 
 	switch (offset & 7)
 	{
-		case 3:	/* read hi/lo (alternating) */
+		case 3: /* read hi/lo (alternating) */
 			ret = drvstate->m_video_ram[addr];
 			addr += inc & (addr << 1);
 			addr ^= 1;
 			break;
 
-		case 5:	/* read hi */
+		case 5: /* read hi */
 			ret = drvstate->m_video_ram[addr | 1];
 			addr += inc;
 			break;
 
-		case 6:	/* read lo */
+		case 6: /* read lo */
 			ret = drvstate->m_video_ram[addr & ~1];
 			addr += inc;
 			break;
@@ -206,7 +206,7 @@ static void leland_vram_port_w(address_space &space, int offset, int data, int n
 	int trans = (offset >> 4) & num;
 
 	/* don't fully understand why this is needed.  Isn't the
-       video RAM just one big RAM? */
+	   video RAM just one big RAM? */
 	int scanline = space.machine().primary_screen->vpos();
 	if (scanline > 0)
 		space.machine().primary_screen->update_partial(scanline - 1);
@@ -217,19 +217,19 @@ static void leland_vram_port_w(address_space &space, int offset, int data, int n
 	/* based on the low 3 bits of the offset, update the destination */
 	switch (offset & 7)
 	{
-		case 1:	/* write hi = data, lo = latch */
+		case 1: /* write hi = data, lo = latch */
 			video_ram[addr & ~1] = state->m_latch[0];
 			video_ram[addr |  1] = data;
 			addr += inc;
 			break;
 
-		case 2:	/* write hi = latch, lo = data */
+		case 2: /* write hi = latch, lo = data */
 			video_ram[addr & ~1] = data;
 			video_ram[addr |  1] = state->m_latch[1];
 			addr += inc;
 			break;
 
-		case 3:	/* write hi/lo = data (alternating) */
+		case 3: /* write hi/lo = data (alternating) */
 			if (trans)
 			{
 				if (!(data & 0xf0)) data |= video_ram[addr] & 0xf0;
@@ -240,7 +240,7 @@ static void leland_vram_port_w(address_space &space, int offset, int data, int n
 			addr ^= 1;
 			break;
 
-		case 5:	/* write hi = data */
+		case 5: /* write hi = data */
 			state->m_latch[1] = data;
 			if (trans)
 			{
@@ -251,7 +251,7 @@ static void leland_vram_port_w(address_space &space, int offset, int data, int n
 			addr += inc;
 			break;
 
-		case 6:	/* write lo = data */
+		case 6: /* write lo = data */
 			state->m_latch[0] = data;
 			if (trans)
 			{
@@ -411,20 +411,20 @@ UINT32 leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &b
 
 			/* get the byte address this background pixel comes from */
 			offs_t bg_prom_offs = (sx >> 3) |
-								  ((sy << 5) & 0x01f00) |
-								  prom_bank |
-								  ((sy << 6) & 0x1c000);
+									((sy << 5) & 0x01f00) |
+									prom_bank |
+									((sy << 6) & 0x1c000);
 
 			offs_t bg_gfx_offs = (sy & 0x07) |
-								 (bg_prom[bg_prom_offs] << 3) |
-								 ((sy << 2) & 0x1800) |
-								 char_bank;
+									(bg_prom[bg_prom_offs] << 3) |
+									((sy << 2) & 0x1800) |
+									char_bank;
 
 			/* build the pen, background is d0-d5 */
-			pen_t pen = (((bg_gfx[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |	/* d0 */
-						(((bg_gfx[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |	/* d1 */
-						(((bg_gfx[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |	/* d2 */
-						((bg_prom[bg_prom_offs] & 0xe0) >> 2);													/* d3-d5 */
+			pen_t pen = (((bg_gfx[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |    /* d0 */
+						(((bg_gfx[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |    /* d1 */
+						(((bg_gfx[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |    /* d2 */
+						((bg_prom[bg_prom_offs] & 0xe0) >> 2);                                                  /* d3-d5 */
 
 			/* foreground is d6-d9 */
 			if (x & 0x01)
@@ -477,20 +477,20 @@ UINT32 leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &bi
 
 			/* get the byte address this background pixel comes from */
 			offs_t qram_offs = (sx >> 3) |
-							   ((sy << 5) & 0x3f00) |
-							   ((sy << 6) & 0x8000);
+								((sy << 5) & 0x3f00) |
+								((sy << 6) & 0x8000);
 
 			offs_t bg_gfx_offs = ((sy & 0x07) |
-								  (m_ataxx_qram[qram_offs] << 3) |
-								  ((m_ataxx_qram[0x4000 | qram_offs] & 0x7f) << 11)) & bg_gfx_offs_mask;
+									(m_ataxx_qram[qram_offs] << 3) |
+									((m_ataxx_qram[0x4000 | qram_offs] & 0x7f) << 11)) & bg_gfx_offs_mask;
 
 			/* build the pen, background is d0-d5 */
-			pen_t pen = (((bg_gfx[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |	/* d0 */
-						(((bg_gfx[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |	/* d1 */
-						(((bg_gfx[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |	/* d2 */
-						(((bg_gfx[bg_gfx_offs + (3 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 4) |	/* d3 */
-						(((bg_gfx[bg_gfx_offs + (4 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 3) |	/* d4 */
-						(((bg_gfx[bg_gfx_offs + (5 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 2);		/* d5 */
+			pen_t pen = (((bg_gfx[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |    /* d0 */
+						(((bg_gfx[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |    /* d1 */
+						(((bg_gfx[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |    /* d2 */
+						(((bg_gfx[bg_gfx_offs + (3 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 4) |    /* d3 */
+						(((bg_gfx[bg_gfx_offs + (4 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 3) |    /* d4 */
+						(((bg_gfx[bg_gfx_offs + (5 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 2);     /* d5 */
 
 			/* foreground is d6-d9 */
 			if (x & 0x01)

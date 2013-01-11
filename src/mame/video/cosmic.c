@@ -288,7 +288,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		if (state->m_spriteram[offs] != 0)
-        {
+		{
 			int code, color;
 
 			code  = ~state->m_spriteram[offs] & 0x3f;
@@ -297,19 +297,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (extra_sprites)
 				code |= (state->m_spriteram[offs + 3] & 0x08) << 3;
 
-            if (state->m_spriteram[offs] & 0x80)
-                /* 16x16 sprite */
-			    drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-					    code, color,
-					    0, ~state->m_spriteram[offs] & 0x40,
-				    	256-state->m_spriteram[offs + 2],state->m_spriteram[offs + 1],0);
-            else
-                /* 32x32 sprite */
-			    drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-					    code >> 2, color,
-					    0, ~state->m_spriteram[offs] & 0x40,
-				    	256-state->m_spriteram[offs + 2],state->m_spriteram[offs + 1],0);
-        }
+			if (state->m_spriteram[offs] & 0x80)
+				/* 16x16 sprite */
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+						code, color,
+						0, ~state->m_spriteram[offs] & 0x40,
+						256-state->m_spriteram[offs + 2],state->m_spriteram[offs + 1],0);
+			else
+				/* 32x32 sprite */
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+						code >> 2, color,
+						0, ~state->m_spriteram[offs] & 0x40,
+						256-state->m_spriteram[offs + 2],state->m_spriteram[offs + 1],0);
+		}
 	}
 }
 
@@ -345,8 +345,8 @@ static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap,
 				// flip-flop at IC11 is clocked
 				map = PROM[(x1 >> 5) | (y >> 1 << 3)];
 
-			if (((!(hc & va)) & (vb ^ hb_)) &&			/* right network */
-			    (((x1 ^ map) & (hc | 0x1e)) == 0x1e))	/* left network */
+			if (((!(hc & va)) & (vb ^ hb_)) &&          /* right network */
+				(((x1 ^ map) & (hc | 0x1e)) == 0x1e))   /* left network */
 			{
 				/* RGB order is reversed -- bit 7=R, 6=G, 5=B */
 				int col = (map >> 7) | ((map >> 5) & 0x02) | ((map >> 3) & 0x04);
@@ -385,13 +385,13 @@ static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, c
 			int x1;
 
 			/* for the vertical lines, each bit indicates
-               if there should be a line at the x position */
+			   if there should be a line at the x position */
 			vert_data = vert_PROM[x >> 3];
 
 			/* the horizontal (perspective) lines are RLE encoded.
-               When the screen is flipped, the address should be
-               decrementing.  But since it's just a mirrored image,
-               this is easier. */
+			   When the screen is flipped, the address should be
+			   decrementing.  But since it's just a mirrored image,
+			   this is easier. */
 			if (count == 0)
 				count = horz_PROM[horz_addr++];
 
@@ -402,7 +402,7 @@ static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, c
 
 			for (x1 = 0; x1 < 8; x1++)
 			{
-				if (!(vert_data & horz_data & 0x80))	/* NAND gate */
+				if (!(vert_data & horz_data & 0x80))    /* NAND gate */
 				{
 					/* blue */
 					if (state->flip_screen())
@@ -432,40 +432,40 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 
 	/* all positioning is via logic gates:
 
-       tree is displayed where
-       __          __
-       HD' ^ HC' ^ HB'
+	   tree is displayed where
+	   __          __
+	   HD' ^ HC' ^ HB'
 
-       and
-        __          __              __
-       (VB' ^ VC' ^ VD')  X  (VB' ^ VC' ^ VD')
+	   and
+	    __          __              __
+	   (VB' ^ VC' ^ VD')  X  (VB' ^ VC' ^ VD')
 
-       water is displayed where
-             __         __
-       HD' ^ HC' ^ HB ^ HA'
+	   water is displayed where
+	         __         __
+	   HD' ^ HC' ^ HB ^ HA'
 
-       and vertically the same equation as the trees,
-       but the final result is inverted.
+	   and vertically the same equation as the trees,
+	   but the final result is inverted.
 
 
-       The colors are coded in logic gates:
+	   The colors are coded in logic gates:
 
-       trees:
-                                P1 P2  BGR
-         R = Plane1 ^ Plane2     0  0  000
-         G = Plane2              0  1  010
-         B = Plane1 ^ ~Plane2    1  0  100
-                                 1  1  011
-       water:
-                                P1 P2  BGR or
-         R = Plane1 ^ Plane2     0  0  100 000
-         G = Plane2 v Plane2     0  1  110 010
-         B = ~Plane1 or          1  0  010 010
-             0 based oh HD       1  1  011 011
+	   trees:
+	                            P1 P2  BGR
+	     R = Plane1 ^ Plane2     0  0  000
+	     G = Plane2              0  1  010
+	     B = Plane1 ^ ~Plane2    1  0  100
+	                             1  1  011
+	   water:
+	                            P1 P2  BGR or
+	     R = Plane1 ^ Plane2     0  0  100 000
+	     G = Plane2 v Plane2     0  1  110 010
+	     B = ~Plane1 or          1  0  010 010
+	         0 based oh HD       1  1  011 011
 
-         Not sure about B, the logic seems convulated for such
-         a simple result.
-    */
+	     Not sure about B, the logic seems convulated for such
+	     a simple result.
+	*/
 
 	while (1)
 	{
@@ -491,7 +491,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 				if ((!hd_) & hc_ & (!hb_))
 				{
 					offs_t offs = ((x >> 3) & 0x03) | ((y & 0x1f) << 2) |
-					              (state->flip_screen() ? 0x80 : 0);
+									(state->flip_screen() ? 0x80 : 0);
 
 					UINT8 plane1 = PROM[offs         ] << (x & 0x07);
 					UINT8 plane2 = PROM[offs | 0x0400] << (x & 0x07);
@@ -499,9 +499,9 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 					plane1 >>= 7;
 					plane2 >>= 7;
 
-					color = (plane1 & plane2)       |	// R
-					        (plane2 		)  << 1 |	// G
-					        (plane1 & !plane2) << 2;	// B
+					color = (plane1 & plane2)       |   // R
+							(plane2         )  << 1 |   // G
+							(plane1 & !plane2) << 2;    // B
 				}
 			}
 			else
@@ -517,9 +517,9 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 					plane1 >>= 7;
 					plane2 >>= 7;
 
-					color = ( plane1 & plane2)      |	// R
-					        ( plane1 | plane2) << 1 |	// G
-					        ((!plane1) & hd)     << 2;	// B - see above
+					color = ( plane1 & plane2)      |   // R
+							( plane1 | plane2) << 1 |   // G
+							((!plane1) & hd)     << 2;  // B - see above
 				}
 			}
 
@@ -600,7 +600,7 @@ UINT32 cosmic_state::screen_update_nomnlnd(screen_device &screen, bitmap_ind16 &
 {
 
 	/* according to the video summation logic on pg4, the trees and river
-       have the highest priority */
+	   have the highest priority */
 
 	bitmap.fill(0, cliprect);
 	draw_bitmap(machine(), bitmap, cliprect);

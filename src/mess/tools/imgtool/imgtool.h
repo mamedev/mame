@@ -21,11 +21,11 @@
 
 /* ----------------------------------------------------------------------- */
 
-#define EOLN_CR		"\x0d"
-#define EOLN_LF		"\x0a"
-#define EOLN_CRLF	"\x0d\x0a"
+#define EOLN_CR     "\x0d"
+#define EOLN_LF     "\x0a"
+#define EOLN_CRLF   "\x0d\x0a"
 
-#define FILENAME_BOOTBLOCK	((const char *) 1)
+#define FILENAME_BOOTBLOCK  ((const char *) 1)
 
 enum
 {

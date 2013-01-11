@@ -21,7 +21,7 @@ class spc1000_state : public driver_device
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vdg(*this, "mc6847") {}
+			m_vdg(*this, "mc6847") {}
 
 	required_device<mc6847_base_device> m_vdg;
 	UINT8 m_IPLK;
@@ -249,14 +249,14 @@ READ8_MEMBER(spc1000_state::spc1000_mc6847_videoram_r)
 
 	// m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
 	//  [PS2,PS1] is used to set screen 0/1 pages
-	if ( !BIT(m_GMODE, 3) ) {	// text mode (~A/G set to A)
+	if ( !BIT(m_GMODE, 3) ) {   // text mode (~A/G set to A)
 		unsigned int page = (BIT(m_GMODE, 5) << 1) | BIT(m_GMODE, 4);
 		m_vdg->inv_w(BIT(m_video_ram[offset+page*0x200+0x800], 0));
 		m_vdg->css_w(BIT(m_video_ram[offset+page*0x200+0x800], 1));
 		m_vdg->as_w(BIT(m_video_ram[offset+page*0x200+0x800], 2));
 		m_vdg->intext_w(BIT(m_video_ram[offset+page*0x200+0x800], 3));
 		return m_video_ram[offset+page*0x200];
-	} else {	// graphics mode: uses full 6KB of VRAM
+	} else {    // graphics mode: uses full 6KB of VRAM
 		return m_video_ram[offset];
 	}
 }
@@ -280,18 +280,18 @@ static const cassette_interface spc1000_cassette_interface =
 static const mc6847_interface spc1000_mc6847_intf =
 {
 	"screen",
-	DEVCB_DRIVER_MEMBER(spc1000_state,spc1000_mc6847_videoram_r),	// data fetch
+	DEVCB_DRIVER_MEMBER(spc1000_state,spc1000_mc6847_videoram_r),   // data fetch
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL,					/* AG */
-	DEVCB_LINE_VCC,				/* GM2 */
-	DEVCB_NULL,					/* GM1 */
-	DEVCB_NULL,					/* GM0 */
-	DEVCB_NULL,					/* CSS */
-	DEVCB_NULL,					/* AS */
-	DEVCB_NULL,					/* INTEXT */
-	DEVCB_NULL,					/* INV */
+	DEVCB_NULL,                 /* AG */
+	DEVCB_LINE_VCC,             /* GM2 */
+	DEVCB_NULL,                 /* GM1 */
+	DEVCB_NULL,                 /* GM0 */
+	DEVCB_NULL,                 /* CSS */
+	DEVCB_NULL,                 /* AS */
+	DEVCB_NULL,                 /* INTEXT */
+	DEVCB_NULL,                 /* INV */
 
 	&spc1000_state::get_char_rom
 };
@@ -303,8 +303,8 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_CPU_IO_MAP(spc1000_io)
 
 
-    /* video hardware */
-    MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
+	/* video hardware */
+	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, spc1000_mc6847_intf)
 
 	/* sound hardware */
@@ -331,4 +331,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,       0,	spc1000,	spc1000, driver_device,	 0,  "Samsung",   "SPC-1000",		GAME_NOT_WORKING)
+COMP( 1982, spc1000,  0,       0,   spc1000,    spc1000, driver_device,  0,  "Samsung",   "SPC-1000",       GAME_NOT_WORKING)

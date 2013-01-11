@@ -596,13 +596,13 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="flighsim">
-	    <description>Flight Simulator - Gyorai Kougeki</description>
+		<description>Flight Simulator - Gyorai Kougeki</description>
 		<year>1988</year>
 		<publisher>subLOGIC</publisher>
 		<info name="alt_title" value="Flight Simulator 魚雷攻撃" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
-			<feature name="mapper" value="NEOS MR6401" />	<!-- MR6401 -->
+			<feature name="mapper" value="NEOS MR6401" />   <!-- MR6401 -->
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="a6165bd4" sha1="453eac7568d5d04c8cf7da86f2e8dc79777343da" offset="0" />
 			</dataarea>
@@ -658,7 +658,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 		<info name="alt_title" value="迷宮への扉" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-16KB" />
-			<feature name="mapper" value="MR6401" />	<!-- NEOS MR6401 -->
+			<feature name="mapper" value="MR6401" />    <!-- NEOS MR6401 -->
 			<dataarea name="rom" size="131072">
 				<rom name="dempa labyrinth rp231024d" size="131072" crc="2c2020a0" sha1="0cb11c766bd357d203879bd6bee041a4690cc3df" offset="0" />
 			</dataarea>

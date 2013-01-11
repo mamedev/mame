@@ -26,7 +26,7 @@ WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 WRITE8_MEMBER( mbee_state::pio_port_a_w )
 {
 	/* hardware strobe driven by PIO ARDY, bit 7..0 = data */
-	m_pio->strobe_a(1);	/* needed - otherwise nothing prints */
+	m_pio->strobe_a(1); /* needed - otherwise nothing prints */
 	m_printer->write(space, 0, data);
 };
 
@@ -117,8 +117,8 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
 	wd17xx_set_drive(m_fdc, data & 3);
 	wd17xx_set_side(m_fdc, BIT(data, 2));
 	wd17xx_dden_w(m_fdc, !BIT(data, 3));
-       /* no idea what turns the motors on & off, guessing it could be drive select
-        commented out because it prevents 128k and 256TC from booting up */
+		/* no idea what turns the motors on & off, guessing it could be drive select
+		commented out because it prevents 128k and 256TC from booting up */
 	//floppy_mon_w(floppy_get_device(machine(), data & 3), CLEAR_LINE); // motor on
 }
 
@@ -131,16 +131,16 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
 
 TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
 {
-    /* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
-    pin 2 (XTL2) and is therefore unknown. If a key change is detected (up or down), the /strobe
-    line activates, sending a high to bit 1 of port 2 (one of the pio input lines). The next read of
-    port 18 will clear this line, and read the key scancode. It will also signal the 3870 that the key
-    data has been read, on pin 38 (/extint). The 3870 can cache up to 9 keys. With no rom dump
-    available, the following is a guess.
+	/* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
+	pin 2 (XTL2) and is therefore unknown. If a key change is detected (up or down), the /strobe
+	line activates, sending a high to bit 1 of port 2 (one of the pio input lines). The next read of
+	port 18 will clear this line, and read the key scancode. It will also signal the 3870 that the key
+	data has been read, on pin 38 (/extint). The 3870 can cache up to 9 keys. With no rom dump
+	available, the following is a guess.
 
-    The 3870 (MK3870) 8-bit microcontroller is a single chip implementation of Fairchild F8 (Mostek 3850).
-    It includes up to 4 KB of mask-programmable ROM, 64 bytes of scratchpad RAM and up to 64 bytes
-    of executable RAM. The MCU also integrates 32-bit I/O and a programmable timer. */
+	The 3870 (MK3870) 8-bit microcontroller is a single chip implementation of Fairchild F8 (Mostek 3850).
+	It includes up to 4 KB of mask-programmable ROM, 64 bytes of scratchpad RAM and up to 64 bytes
+	of executable RAM. The MCU also integrates 32-bit I/O and a programmable timer. */
 
 	UINT8 i, j;
 	UINT8 pressed[15];
@@ -219,19 +219,19 @@ READ8_MEMBER( mbee_state::mbee256_speed_high_r )
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::mbee_04_w )	// address
+WRITE8_MEMBER( mbee_state::mbee_04_w )  // address
 {
 	address_space &mem = m_maincpu->space(AS_IO);
 	machine().device<mc146818_device>("rtc")->write(mem, 0, data);
 }
 
-WRITE8_MEMBER( mbee_state::mbee_06_w )	// write
+WRITE8_MEMBER( mbee_state::mbee_06_w )  // write
 {
 	address_space &mem = m_maincpu->space(AS_IO);
 	machine().device<mc146818_device>("rtc")->write(mem, 1, data);
 }
 
-READ8_MEMBER( mbee_state::mbee_07_r )	// read
+READ8_MEMBER( mbee_state::mbee_07_r )   // read
 {
 	address_space &mem = m_maincpu->space(AS_IO);
 	return machine().device<mc146818_device>("rtc")->read(mem, 1);
@@ -563,8 +563,8 @@ INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
 
 	//address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
-        busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
-        The line below does what the interrupt should be doing. */
+	    busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
+	    The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
 	//m_z80pio->strobe_a(centronics_busy_r(m_printer)); /* signal int when not busy (L->H) */
@@ -572,7 +572,7 @@ INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
 
 
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
-    but need to find out what it does */
+	but need to find out what it does */
 	m_clock_pulse = 0x80;
 	irq0_line_hold(device);
 
@@ -710,8 +710,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbee256)
 	membank("bank8l")->configure_entry(0, &RAM[0x0000]); // rom
 	membank("bank8h")->configure_entry(0, &RAM[0x0800]); // rom
 
-	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));	/* timer for rtc */
-	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));	/* timer for kbd */
+	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));   /* timer for rtc */
+	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));   /* timer for kbd */
 
 	m_size = 0x8000;
 }
@@ -730,8 +730,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
 	membank("pak")->set_entry(5);
 	membank("telcom")->set_entry(0);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));	/* timer for rtc */
-	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));	/* timer for kbd */
+	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));   /* timer for rtc */
+	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));   /* timer for kbd */
 
 	m_size = 0x8000;
 }
@@ -752,7 +752,7 @@ QUICKLOAD_LOAD( mbee )
 	device_t *cpu = image.device().machine().device("maincpu");
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 i, j;
-	UINT8 data, sw = image.device().machine().root_device().ioport("CONFIG")->read() & 1;	/* reading the dipswitch: 1 = autorun */
+	UINT8 data, sw = image.device().machine().root_device().ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
 
 	if (!mame_stricmp(image.filetype(), "mwb"))
 	{
@@ -778,7 +778,7 @@ QUICKLOAD_LOAD( mbee )
 
 		if (sw)
 		{
-			space.write_word(0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
+			space.write_word(0xa2,0x801e);  /* fix warm-start vector to get around some copy-protections */
 			cpu->state().set_pc(0x801e);
 		}
 		else

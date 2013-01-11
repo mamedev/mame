@@ -113,20 +113,20 @@ READ8_MEMBER(ojankohs_state::ojankohs_keymatrix_r)
 
 	switch (m_portselect)
 	{
-		case 0x01:	ret = ioport("KEY0")->read();	break;
-		case 0x02:	ret = ioport("KEY1")->read(); break;
-		case 0x04:	ret = ioport("KEY2")->read(); break;
-		case 0x08:	ret = ioport("KEY3")->read(); break;
-		case 0x10:	ret = ioport("KEY4")->read(); break;
-		case 0x20:	ret = 0xff; break;
-		case 0x3f:	ret = 0xff;
+		case 0x01:  ret = ioport("KEY0")->read();   break;
+		case 0x02:  ret = ioport("KEY1")->read(); break;
+		case 0x04:  ret = ioport("KEY2")->read(); break;
+		case 0x08:  ret = ioport("KEY3")->read(); break;
+		case 0x10:  ret = ioport("KEY4")->read(); break;
+		case 0x20:  ret = 0xff; break;
+		case 0x3f:  ret = 0xff;
 					ret &= ioport("KEY0")->read();
 					ret &= ioport("KEY1")->read();
 					ret &= ioport("KEY2")->read();
 					ret &= ioport("KEY3")->read();
 					ret &= ioport("KEY4")->read();
 					break;
-		default:	ret = 0xff;
+		default:    ret = 0xff;
 					logerror("PC:%04X unknown %02X\n", space.device().safe_pc(), m_portselect);
 					break;
 	}
@@ -158,9 +158,9 @@ READ8_MEMBER(ojankohs_state::ojankohs_ay8910_0_r)
 	// DIPSW 1
 	device_t &root = machine().root_device();
 	return (((root.ioport("DSW1")->read() & 0x01) << 7) | ((root.ioport("DSW1")->read() & 0x02) << 5) |
-	        ((root.ioport("DSW1")->read() & 0x04) << 3) | ((root.ioport("DSW1")->read() & 0x08) << 1) |
-	        ((root.ioport("DSW1")->read() & 0x10) >> 1) | ((root.ioport("DSW1")->read() & 0x20) >> 3) |
-	        ((root.ioport("DSW1")->read() & 0x40) >> 5) | ((root.ioport("DSW1")->read() & 0x80) >> 7));
+			((root.ioport("DSW1")->read() & 0x04) << 3) | ((root.ioport("DSW1")->read() & 0x08) << 1) |
+			((root.ioport("DSW1")->read() & 0x10) >> 1) | ((root.ioport("DSW1")->read() & 0x20) >> 3) |
+			((root.ioport("DSW1")->read() & 0x40) >> 5) | ((root.ioport("DSW1")->read() & 0x80) >> 7));
 }
 
 READ8_MEMBER(ojankohs_state::ojankohs_ay8910_1_r)
@@ -168,19 +168,19 @@ READ8_MEMBER(ojankohs_state::ojankohs_ay8910_1_r)
 	// DIPSW 1
 	device_t &root = machine().root_device();
 	return (((root.ioport("DSW2")->read() & 0x01) << 7) | ((root.ioport("DSW2")->read() & 0x02) << 5) |
-	        ((root.ioport("DSW2")->read() & 0x04) << 3) | ((root.ioport("DSW2")->read() & 0x08) << 1) |
-	        ((root.ioport("DSW2")->read() & 0x10) >> 1) | ((root.ioport("DSW2")->read() & 0x20) >> 3) |
-	        ((root.ioport("DSW2")->read() & 0x40) >> 5) | ((root.ioport("DSW2")->read() & 0x80) >> 7));
+			((root.ioport("DSW2")->read() & 0x04) << 3) | ((root.ioport("DSW2")->read() & 0x08) << 1) |
+			((root.ioport("DSW2")->read() & 0x10) >> 1) | ((root.ioport("DSW2")->read() & 0x20) >> 3) |
+			((root.ioport("DSW2")->read() & 0x40) >> 5) | ((root.ioport("DSW2")->read() & 0x80) >> 7));
 }
 
 READ8_MEMBER(ojankohs_state::ccasino_dipsw3_r)
 {
-	return (ioport("DSW3")->read() ^ 0xff);		// DIPSW 3
+	return (ioport("DSW3")->read() ^ 0xff);     // DIPSW 3
 }
 
 READ8_MEMBER(ojankohs_state::ccasino_dipsw4_r)
 {
-	return (ioport("DSW4")->read() ^ 0xff);		// DIPSW 4
+	return (ioport("DSW4")->read() ^ 0xff);     // DIPSW 4
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoy_coinctr_w)
@@ -230,8 +230,8 @@ static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP				// unknown
-	AM_RANGE(0x11, 0x11) AM_WRITENOP				// unknown
+	AM_RANGE(0x10, 0x10) AM_WRITENOP                // unknown
+	AM_RANGE(0x11, 0x11) AM_WRITENOP                // unknown
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8, ojankohs_state )
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_SHARE("paletteram")		// 16bit address access
+	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_SHARE("paletteram")     // 16bit address access
 	AM_RANGE(0x10, 0x10) AM_WRITENOP
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 ADDRESS_MAP_END
@@ -327,9 +327,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ojankohs )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)		// TEST
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)        // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -342,7 +342,7 @@ static INPUT_PORTS_START( ojankohs )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -388,9 +388,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ojankoy )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)		// TEST
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)        // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -403,7 +403,7 @@ static INPUT_PORTS_START( ojankoy )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -459,9 +459,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ccasino )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)		// TEST
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)        // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -474,7 +474,7 @@ static INPUT_PORTS_START( ccasino )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -762,30 +762,30 @@ static const ay8910_interface ojankohs_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_0_r),	/* read port #0 */
-	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_1_r)	/* read port #1 */
+	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_0_r),    /* read port #0 */
+	DEVCB_DRIVER_MEMBER(ojankohs_state,ojankohs_ay8910_1_r) /* read port #1 */
 };
 
 static const ay8910_interface ojankoy_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),		/* read port #0 */
-	DEVCB_INPUT_PORT("DSW2"),		/* read port #1 */
+	DEVCB_INPUT_PORT("DSW1"),       /* read port #0 */
+	DEVCB_INPUT_PORT("DSW2"),       /* read port #1 */
 };
 
 static const ay8910_interface ojankoc_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),		/* read port #0 */
-	DEVCB_INPUT_PORT("DSW2"),		/* read port #1 */
+	DEVCB_INPUT_PORT("DSW1"),       /* read port #0 */
+	DEVCB_INPUT_PORT("DSW2"),       /* read port #1 */
 };
 
 static const msm5205_interface msm5205_config =
 {
-	ojankohs_adpcm_int,		/* IRQ handler */
-	MSM5205_S48_4B			/* 8 KHz */
+	ojankohs_adpcm_int,     /* IRQ handler */
+	MSM5205_S48_4B          /* 8 KHz */
 };
 
 
@@ -854,7 +854,7 @@ void ojankohs_state::machine_reset()
 static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ojankohs_map)
 	MCFG_CPU_IO_MAP(ojankohs_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
@@ -890,7 +890,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
 	MCFG_CPU_IO_MAP(ojankoy_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
@@ -927,7 +927,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
 	MCFG_CPU_IO_MAP(ccasino_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
@@ -963,7 +963,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)			/* 4.00 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(ojankoc_map)
 	MCFG_CPU_IO_MAP(ojankoc_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)

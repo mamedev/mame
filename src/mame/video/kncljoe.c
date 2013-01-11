@@ -126,15 +126,15 @@ WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
 {
 	int i;
 	/*
-            0x01    screen flip
-            0x02    coin counter#1
-            0x04    sprite bank
-            0x10    character bank
-            0x20    coin counter#2
+	        0x01    screen flip
+	        0x02    coin counter#1
+	        0x04    sprite bank
+	        0x10    character bank
+	        0x20    coin counter#2
 
-            reset when IN0 - Coin 1 goes low (active)
-            set after IN0 - Coin 1 goes high AND the credit has been added
-   */
+	        reset when IN0 - Coin 1 goes low (active)
+	        set after IN0 - Coin 1 goes high AND the credit has been added
+	*/
 	m_flipscreen = data & 0x01;
 	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 

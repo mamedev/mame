@@ -195,25 +195,25 @@ protected:
 	// the callback target is going to be one of these
 	union callback_target
 	{
-		void *				ptr;
-		device_t *			device;
-		ioport_port *		ioport;
+		void *              ptr;
+		device_t *          device;
+		ioport_port *       ioport;
 	};
 
 	// configuration
-	device_t &			m_device;				// reference to our owning device
-	callback_type		m_type;					// type of callback registered
-	const char *		m_target_tag;			// tag of target object
-	UINT64				m_target_int;			// integer value of target object
-	const char *		m_space_tag;			// tag of address space device
-	address_spacenum	m_space_num;			// address space number of space device
+	device_t &          m_device;               // reference to our owning device
+	callback_type       m_type;                 // type of callback registered
+	const char *        m_target_tag;           // tag of target object
+	UINT64              m_target_int;           // integer value of target object
+	const char *        m_space_tag;            // tag of address space device
+	address_spacenum    m_space_num;            // address space number of space device
 
 	// derived state
-	address_space *		m_space;				// target address space
-	callback_target		m_target;				// resolved pointer to target object
-	int 				m_rshift;				// right shift to apply to data read
-	UINT64				m_mask;					// mask to apply to data read
-	UINT64				m_xor;					// XOR to apply to data read
+	address_space *     m_space;                // target address space
+	callback_target     m_target;               // resolved pointer to target object
+	int                 m_rshift;               // right shift to apply to data read
+	UINT64              m_mask;                 // mask to apply to data read
+	UINT64              m_xor;                  // XOR to apply to data read
 };
 
 
@@ -254,15 +254,15 @@ protected:
 	UINT64 read_constant_adapter(address_space &space, offs_t offset, UINT64 mask);
 
 	// configuration
-	read_line_delegate	m_readline;				// copy of registered line reader
-	read8_delegate		m_read8;				// copy of registered 8-bit reader
-	read16_delegate		m_read16;				// copy of registered 16-bit reader
-	read32_delegate		m_read32;				// copy of registered 32-bit reader
-	read64_delegate		m_read64;				// copy of registered 64-bit reader
+	read_line_delegate  m_readline;             // copy of registered line reader
+	read8_delegate      m_read8;                // copy of registered 8-bit reader
+	read16_delegate     m_read16;               // copy of registered 16-bit reader
+	read32_delegate     m_read32;               // copy of registered 32-bit reader
+	read64_delegate     m_read64;               // copy of registered 64-bit reader
 
 	// derived state
 	typedef UINT64 (devcb2_read_base::*adapter_func)(address_space &, offs_t, UINT64);
-	adapter_func		m_adapter;				// actual callback to invoke
+	adapter_func        m_adapter;              // actual callback to invoke
 };
 
 
@@ -304,15 +304,15 @@ protected:
 	void write_inputline_adapter(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
 
 	// configuration
-	write_line_delegate	m_writeline;			// copy of registered line writer
-	write8_delegate		m_write8;				// copy of registered 8-bit writer
-	write16_delegate	m_write16;				// copy of registered 16-bit writer
-	write32_delegate	m_write32;				// copy of registered 32-bit writer
-	write64_delegate	m_write64;				// copy of registered 64-bit writer
+	write_line_delegate m_writeline;            // copy of registered line writer
+	write8_delegate     m_write8;               // copy of registered 8-bit writer
+	write16_delegate    m_write16;              // copy of registered 16-bit writer
+	write32_delegate    m_write32;              // copy of registered 32-bit writer
+	write64_delegate    m_write64;              // copy of registered 64-bit writer
 
 	// derived state
 	typedef void (devcb2_write_base::*adapter_func)(address_space &, offs_t, UINT64, UINT64);
-	adapter_func		m_adapter;				// actual callback to invoke
+	adapter_func        m_adapter;              // actual callback to invoke
 };
 
 
@@ -430,4 +430,4 @@ public:
 };
 
 
-#endif	/* __DEVCB2_H__ */
+#endif  /* __DEVCB2_H__ */

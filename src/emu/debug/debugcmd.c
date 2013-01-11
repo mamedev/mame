@@ -26,7 +26,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_GLOBALS		1000
+#define MAX_GLOBALS     1000
 
 
 
@@ -36,39 +36,39 @@
 
 struct global_entry
 {
-	void *		base;
-	UINT32		size;
+	void *      base;
+	UINT32      size;
 };
 
 
 struct cheat_map
 {
-	UINT64		offset;
-	UINT64		first_value;
-	UINT64		previous_value;
-	UINT8		state:1;
-	UINT8		undo:7;
+	UINT64      offset;
+	UINT64      first_value;
+	UINT64      previous_value;
+	UINT8       state:1;
+	UINT8       undo:7;
 };
 
 
 struct cheat_system
 {
-	char		cpu;
-	UINT64		length;
-	UINT8		width;
-	cheat_map *	cheatmap;
-	UINT8		undo;
-	UINT8		signed_cheat;
-	UINT8		swapped_cheat;
+	char        cpu;
+	UINT64      length;
+	UINT8       width;
+	cheat_map * cheatmap;
+	UINT8       undo;
+	UINT8       signed_cheat;
+	UINT8       swapped_cheat;
 };
 
 
 struct cheat_region_map
 {
-	UINT64		offset;
-	UINT64		endoffset;
+	UINT64      offset;
+	UINT64      endoffset;
 	const char *share;
-	UINT8		disabled;
+	UINT8       disabled;
 };
 
 
@@ -176,9 +176,9 @@ INLINE UINT64 cheat_sign_extend(const cheat_system *cheatsys, UINT64 value)
 	{
 		switch (cheatsys->width)
 		{
-			case 1:	value = (INT8)value;	break;
-			case 2:	value = (INT16)value;	break;
-			case 4:	value = (INT32)value;	break;
+			case 1: value = (INT8)value;    break;
+			case 2: value = (INT16)value;   break;
+			case 4: value = (INT32)value;   break;
 		}
 	}
 	return value;
@@ -193,10 +193,10 @@ INLINE UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
 	{
 		switch (cheatsys->width)
 		{
-			case 2:	value = ((value >> 8) & 0x00ff) | ((value << 8) & 0xff00);	break;
-			case 4:	value = ((value >> 24) & 0x000000ff) | ((value >> 8) & 0x0000ff00) | ((value << 8) & 0x00ff0000) | ((value << 24) & 0xff000000);	break;
-			case 8:	value = ((value >> 56) & U64(0x00000000000000ff)) | ((value >> 40) & U64(0x000000000000ff00)) | ((value >> 24) & U64(0x0000000000ff0000)) | ((value >> 8) & U64(0x00000000ff000000)) |
-							((value << 8) & U64(0x000000ff00000000)) | ((value << 24) & U64(0x0000ff0000000000)) | ((value << 40) & U64(0x00ff000000000000)) | ((value << 56) & U64(0xff00000000000000));	break;
+			case 2: value = ((value >> 8) & 0x00ff) | ((value << 8) & 0xff00);  break;
+			case 4: value = ((value >> 24) & 0x000000ff) | ((value >> 8) & 0x0000ff00) | ((value << 8) & 0x00ff0000) | ((value << 24) & 0xff000000);    break;
+			case 8: value = ((value >> 56) & U64(0x00000000000000ff)) | ((value >> 40) & U64(0x000000000000ff00)) | ((value >> 24) & U64(0x0000000000ff0000)) | ((value >> 8) & U64(0x00000000ff000000)) |
+							((value << 8) & U64(0x000000ff00000000)) | ((value << 24) & U64(0x0000ff0000000000)) | ((value << 40) & U64(0x00ff000000000000)) | ((value << 56) & U64(0xff00000000000000));   break;
 		}
 	}
 	return value;
@@ -284,10 +284,10 @@ void debug_command_init(running_machine &machine)
 	debug_console_register_command(machine, "ignore",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_ignore);
 	debug_console_register_command(machine, "observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_observe);
 
-	debug_console_register_command(machine, "comadd",	CMDFLAG_NONE, 0, 1, 2, execute_comment);
+	debug_console_register_command(machine, "comadd",   CMDFLAG_NONE, 0, 1, 2, execute_comment);
 	debug_console_register_command(machine, "//",        CMDFLAG_NONE, 0, 1, 2, execute_comment);
-	debug_console_register_command(machine, "comdelete",	CMDFLAG_NONE, 0, 1, 1, execute_comment_del);
-	debug_console_register_command(machine, "comsave",	CMDFLAG_NONE, 0, 0, 0, execute_comment_save);
+	debug_console_register_command(machine, "comdelete",    CMDFLAG_NONE, 0, 1, 1, execute_comment_del);
+	debug_console_register_command(machine, "comsave",  CMDFLAG_NONE, 0, 0, 0, execute_comment_save);
 
 	debug_console_register_command(machine, "bpset",     CMDFLAG_NONE, 0, 1, 3, execute_bpset);
 	debug_console_register_command(machine, "bp",        CMDFLAG_NONE, 0, 1, 3, execute_bpset);
@@ -357,19 +357,19 @@ void debug_command_init(running_machine &machine)
 
 	debug_console_register_command(machine, "source",    CMDFLAG_NONE, 0, 1, 1, execute_source);
 
-	debug_console_register_command(machine, "map",		CMDFLAG_NONE, AS_PROGRAM, 1, 1, execute_map);
-	debug_console_register_command(machine, "mapd",		CMDFLAG_NONE, AS_DATA, 1, 1, execute_map);
-	debug_console_register_command(machine, "mapi",		CMDFLAG_NONE, AS_IO, 1, 1, execute_map);
-	debug_console_register_command(machine, "memdump",	CMDFLAG_NONE, 0, 0, 1, execute_memdump);
+	debug_console_register_command(machine, "map",      CMDFLAG_NONE, AS_PROGRAM, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapd",     CMDFLAG_NONE, AS_DATA, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapi",     CMDFLAG_NONE, AS_IO, 1, 1, execute_map);
+	debug_console_register_command(machine, "memdump",  CMDFLAG_NONE, 0, 0, 1, execute_memdump);
 
-	debug_console_register_command(machine, "symlist",	CMDFLAG_NONE, 0, 0, 1, execute_symlist);
+	debug_console_register_command(machine, "symlist",  CMDFLAG_NONE, 0, 0, 1, execute_symlist);
 
-	debug_console_register_command(machine, "softreset",	CMDFLAG_NONE, 0, 0, 1, execute_softreset);
-	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
+	debug_console_register_command(machine, "softreset",    CMDFLAG_NONE, 0, 0, 1, execute_softreset);
+	debug_console_register_command(machine, "hardreset",    CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
-	debug_console_register_command(machine, "images",	CMDFLAG_NONE, 0, 0, 0, execute_images);
-	debug_console_register_command(machine, "mount",	CMDFLAG_NONE, 0, 2, 2, execute_mount);
-	debug_console_register_command(machine, "unmount",	CMDFLAG_NONE, 0, 1, 1, execute_unmount);
+	debug_console_register_command(machine, "images",   CMDFLAG_NONE, 0, 0, 0, execute_images);
+	debug_console_register_command(machine, "mount",    CMDFLAG_NONE, 0, 2, 2, execute_mount);
+	debug_console_register_command(machine, "unmount",  CMDFLAG_NONE, 0, 1, 1, execute_unmount);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_command_exit), &machine));
 
@@ -440,10 +440,10 @@ static UINT64 global_get(symbol_table &table, void *ref)
 	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
-		case 1:		return *(UINT8 *)global->base;
-		case 2:		return *(UINT16 *)global->base;
-		case 4:		return *(UINT32 *)global->base;
-		case 8:		return *(UINT64 *)global->base;
+		case 1:     return *(UINT8 *)global->base;
+		case 2:     return *(UINT16 *)global->base;
+		case 4:     return *(UINT32 *)global->base;
+		case 8:     return *(UINT64 *)global->base;
 	}
 	return ~0;
 }
@@ -458,10 +458,10 @@ static void global_set(symbol_table &table, void *ref, UINT64 value)
 	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
-		case 1:		*(UINT8 *)global->base = value;	break;
-		case 2:		*(UINT16 *)global->base = value;	break;
-		case 4:		*(UINT32 *)global->base = value;	break;
-		case 8:		*(UINT64 *)global->base = value;	break;
+		case 1:     *(UINT8 *)global->base = value; break;
+		case 2:     *(UINT16 *)global->base = value;    break;
+		case 4:     *(UINT32 *)global->base = value;    break;
+		case 8:     *(UINT64 *)global->base = value;    break;
 	}
 }
 
@@ -691,9 +691,9 @@ static int mini_printf(running_machine &machine, char *buffer, const char *forma
 			if (!c) break;
 			switch (c)
 			{
-				case '\\':	*p++ = c;		break;
-				case 'n':	*p++ = '\n';	break;
-				default:					break;
+				case '\\':  *p++ = c;       break;
+				case 'n':   *p++ = '\n';    break;
+				default:                    break;
 			}
 			continue;
 		}
@@ -2078,18 +2078,18 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	switch (space->spacenum())
 	{
 		default:
-		case AS_PROGRAM:	spaceletter = 'p';	break;
-		case AS_DATA:	spaceletter = 'd';	break;
-		case AS_IO:		spaceletter = 'i';	break;
+		case AS_PROGRAM:    spaceletter = 'p';  break;
+		case AS_DATA:   spaceletter = 'd';  break;
+		case AS_IO:     spaceletter = 'i';  break;
 	}
 
 	switch (cheat.width)
 	{
 		default:
-		case 1:						sizeletter = 'b';	sizemask = 0xff;					break;
-		case 2:						sizeletter = 'w';	sizemask = 0xffff;					break;
-		case 4:						sizeletter = 'd';	sizemask = 0xffffffff;				break;
-		case 8:						sizeletter = 'q';	sizemask = U64(0xffffffffffffffff);	break;
+		case 1:                     sizeletter = 'b';   sizemask = 0xff;                    break;
+		case 2:                     sizeletter = 'w';   sizemask = 0xffff;                  break;
+		case 4:                     sizeletter = 'd';   sizemask = 0xffffffff;              break;
+		case 8:                     sizeletter = 'q';   sizemask = U64(0xffffffffffffffff); break;
 	}
 
 	/* write the cheat list */
@@ -2223,11 +2223,11 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 		{
 			switch (data_size[j])
 			{
-				case 1:	match = ((UINT8)debug_read_byte(*space, i + suboffset, TRUE) == (UINT8)data_to_find[j]);	break;
-				case 2:	match = ((UINT16)debug_read_word(*space, i + suboffset, TRUE) == (UINT16)data_to_find[j]);	break;
-				case 4:	match = ((UINT32)debug_read_dword(*space, i + suboffset, TRUE) == (UINT32)data_to_find[j]);	break;
-				case 8:	match = ((UINT64)debug_read_qword(*space, i + suboffset, TRUE) == (UINT64)data_to_find[j]);	break;
-				default:	/* all other cases are wildcards */		break;
+				case 1: match = ((UINT8)debug_read_byte(*space, i + suboffset, TRUE) == (UINT8)data_to_find[j]);    break;
+				case 2: match = ((UINT16)debug_read_word(*space, i + suboffset, TRUE) == (UINT16)data_to_find[j]);  break;
+				case 4: match = ((UINT32)debug_read_dword(*space, i + suboffset, TRUE) == (UINT32)data_to_find[j]); break;
+				case 8: match = ((UINT64)debug_read_qword(*space, i + suboffset, TRUE) == (UINT64)data_to_find[j]); break;
+				default:    /* all other cases are wildcards */     break;
 			}
 			suboffset += data_size[j] & 0x0f;
 		}

@@ -61,9 +61,9 @@ public:
 	// construction/destruction
 	simple_list(resource_pool &pool = global_resource_pool())
 		: m_head(NULL),
-		  m_tail(NULL),
-		  m_pool(pool),
-		  m_count(0) { }
+			m_tail(NULL),
+			m_pool(pool),
+			m_count(0) { }
 
 	virtual ~simple_list() { reset(); }
 
@@ -258,10 +258,10 @@ public:
 
 private:
 	// internal state
-	_ElementType *	m_head;			// head of the singly-linked list
-	_ElementType *	m_tail;			// tail of the singly-linked list
-	resource_pool &	m_pool;			// resource pool where objects are freed
-	int 			m_count;		// number of objects in the list
+	_ElementType *  m_head;         // head of the singly-linked list
+	_ElementType *  m_tail;         // tail of the singly-linked list
+	resource_pool & m_pool;         // resource pool where objects are freed
+	int             m_count;        // number of objects in the list
 };
 
 
@@ -279,7 +279,7 @@ public:
 	// construction/destruction
 	simple_list_wrapper(_ObjectType *object)
 		: m_next(NULL),
-		  m_object(object) { }
+			m_object(object) { }
 
 	// operators
 	operator _ObjectType *() { return m_object; }
@@ -293,8 +293,8 @@ public:
 
 private:
 	// internal state
-	simple_list_wrapper *	m_next;
-	_ObjectType *			m_object;
+	simple_list_wrapper *   m_next;
+	_ObjectType *           m_object;
 };
 
 
@@ -330,7 +330,7 @@ public:
 
 private:
 	// internal state
-	simple_list<_ItemType>	m_freelist;		// list of free objects
+	simple_list<_ItemType>  m_freelist;     // list of free objects
 };
 
 
@@ -425,9 +425,9 @@ public:
 
 private:
 	// internal state
-	simple_list<_ElementType>	m_list;
-	tagmap_t<_ElementType *>	m_map;
+	simple_list<_ElementType>   m_list;
+	tagmap_t<_ElementType *>    m_map;
 };
 
 
-#endif	/* __EMUTEMPL_H__ */
+#endif  /* __EMUTEMPL_H__ */

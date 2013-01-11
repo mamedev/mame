@@ -18,6 +18,6 @@
 ***************************************************************************/
 
 /* help management */
-const char *		debug_get_help(const char *tag);
+const char *        debug_get_help(const char *tag);
 
 #endif

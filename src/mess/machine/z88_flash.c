@@ -14,7 +14,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define FLASH_TAG	"flash"
+#define FLASH_TAG   "flash"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -40,7 +40,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 z88_1024k_flash_device::z88_1024k_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, Z88_1024K_FLASH, "Z88 1024KB Flash", tag, owner, clock),
+		: device_t(mconfig, Z88_1024K_FLASH, "Z88 1024KB Flash", tag, owner, clock),
 		device_z88cart_interface( mconfig, *this ),
 		m_flash(*this, FLASH_TAG)
 {

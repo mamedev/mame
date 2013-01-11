@@ -426,16 +426,16 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 
 		switch(curr_state)
 		{
-			case 0x01:	case 0x09:	case 0x19:	case 0x0d:	case 0x8d:
+			case 0x01:  case 0x09:  case 0x19:  case 0x0d:  case 0x8d:
 				pre_train[0] = ( mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f) );
 				break;
-			case 0x0f:	case 0x2f:
+			case 0x0f:  case 0x2f:
 				RAM[ram_addr] = ( mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f) );
 				break;
-			case 0x4d:	case 0x69:	case 0x6d:	case 0xc5:	case 0xcd:
+			case 0x4d:  case 0x69:  case 0x6d:  case 0xc5:  case 0xcd:
 				pre_train[0] = RAM[ram_addr] & 0x0f;
 				break;
-			case 0xea:	case 0xee:
+			case 0xea:  case 0xee:
 				RAM[ram_addr] = ( mux61 ? (pre_train[1]) : ((pre_train[1] + pre_train[2] + carry) & 0x0f) );
 				break;
 			default:
@@ -448,16 +448,16 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 
 			switch(curr_state)
 			{
-				case 0x01:	case 0x09:	case 0x19:	case 0x0d:	case 0x8d:
+				case 0x01:  case 0x09:  case 0x19:  case 0x0d:  case 0x8d:
 					tree_train[0] = RAM2[ram2_addr] = pre_train[0];
 					break;
-				case 0x0f:	case 0x2f:
+				case 0x0f:  case 0x2f:
 					math_train[0] = RAM2[ram2_addr] = RAM[ram_addr] & 0x0f;
 					break;
-				case 0x4d:	case 0x69:	case 0x6d:	case 0xc5:	case 0xcd:
+				case 0x4d:  case 0x69:  case 0x6d:  case 0xc5:  case 0xcd:
 					tree_train[0] = RAM2[ram2_addr] = pre_train[0];
 					break;
-				case 0xea:	case 0xee:
+				case 0xea:  case 0xee:
 					math_train[0] = RAM2[ram2_addr] = ( mux82 ? ((tree_train[1] + tree_train[2] + tree_carry) & 0x0f) : (tree_train[1]) );
 					break;
 				default:
@@ -470,16 +470,16 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 
 			switch(curr_state)
 			{
-				case 0x01:	case 0x09:	case 0x19:	case 0x0d:	case 0x8d:
+				case 0x01:  case 0x09:  case 0x19:  case 0x0d:  case 0x8d:
 					tree_train[0] = RAM2[ram2_addr];
 					break;
-				case 0x0f:	case 0x2f:
+				case 0x0f:  case 0x2f:
 					math_train[0] = RAM2[ram2_addr];
 					break;
-				case 0x4d:	case 0x69:	case 0x6d:	case 0xc5:	case 0xcd:
+				case 0x4d:  case 0x69:  case 0x6d:  case 0xc5:  case 0xcd:
 					tree_train[0] = RAM2[ram2_addr];
 					break;
-				case 0xea:	case 0xee:
+				case 0xea:  case 0xee:
 					math_train[0] = RAM2[ram2_addr] = (mux82 ? ((tree_train[1] + tree_train[2] + tree_carry) & 0x0f) : (tree_train[1]));
 					break;
 				default:
@@ -591,7 +591,7 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 	}
 
 	/* Tree on only stays high if a pixel that is not 0xf is encountered,
-       because any non 0xf pixel sets U56 high */
+	   because any non 0xf pixel sets U56 high */
 	if (all_ff) state->m_tree_on[tree_num] = 0;
 }
 
@@ -734,19 +734,19 @@ UINT32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind1
 WRITE8_MEMBER(changela_state::changela_colors_w)
 {
 	/* Each color is combined from 3 bits from open-colelctor outputs of ram.
-    Each of the bits is connected to a 220, 470, or 1000 Ohm resistor.
-    There is also a 680 Ohm pull-up resistor connected to 5V, and a
-    2.2k resisor connected to GND. Thus these output voltages are obtained:
-        Val     |   Vout
-        000     |   0.766   (220 || 470 || 1k || 2.2k)
-        001     |   0.855   (220 || 470 || 2.2k)
-        010     |   0.984   (220 || 1k || 2.2k)
-        011     |   1.136   (220 || 2.2k)
-        100     |   1.455   (470 || 1k || 2.2k)
-        101     |   1.814   (470 || 2.2k)
-        110     |   2.514   (1k || 2.2k)
-        111     |   3.819   (2.2k)
-    Which were normalized to produce the following table: */
+	Each of the bits is connected to a 220, 470, or 1000 Ohm resistor.
+	There is also a 680 Ohm pull-up resistor connected to 5V, and a
+	2.2k resisor connected to GND. Thus these output voltages are obtained:
+	    Val     |   Vout
+	    000     |   0.766   (220 || 470 || 1k || 2.2k)
+	    001     |   0.855   (220 || 470 || 2.2k)
+	    010     |   0.984   (220 || 1k || 2.2k)
+	    011     |   1.136   (220 || 2.2k)
+	    100     |   1.455   (470 || 1k || 2.2k)
+	    101     |   1.814   (470 || 2.2k)
+	    110     |   2.514   (1k || 2.2k)
+	    111     |   3.819   (2.2k)
+	Which were normalized to produce the following table: */
 
 	static const UINT8 color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
 
@@ -758,7 +758,7 @@ WRITE8_MEMBER(changela_state::changela_colors_w)
 	c ^= 0x1ff; /* active low */
 
 	color_index = offset >> 1;
-	color_index ^= 0x30;	/* A4 and A5 lines are negated */
+	color_index ^= 0x30;    /* A4 and A5 lines are negated */
 
 	r = color_table[(c >> 0) & 0x07];
 	g = color_table[(c >> 3) & 0x07];
@@ -774,14 +774,14 @@ WRITE8_MEMBER(changela_state::changela_mem_device_select_w)
 	m_tree_en = (data & 0x30) >> 4;
 
 	/*
-    (data & 0x07) possible settings:
-    0 - not connected (no device)
-    1 - ADR1 is 2114 RAM at U59 (state machine()) (accessible range: 0x0000-0x003f)
-    2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
-    3 - ADR3 is 2128 RAM at U114 (Tree RAM)    (accessible range: 0x0000-0x07ff)
-    4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
-    5 - SLOPE is ROM at U44 (state machine())     (accessible range: 0x0000-0x07ff)
-    */
+	(data & 0x07) possible settings:
+	0 - not connected (no device)
+	1 - ADR1 is 2114 RAM at U59 (state machine()) (accessible range: 0x0000-0x003f)
+	2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
+	3 - ADR3 is 2128 RAM at U114 (Tree RAM)    (accessible range: 0x0000-0x07ff)
+	4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
+	5 - SLOPE is ROM at U44 (state machine())     (accessible range: 0x0000-0x07ff)
+	*/
 }
 
 WRITE8_MEMBER(changela_state::changela_mem_device_w)
@@ -811,5 +811,3 @@ WRITE8_MEMBER(changela_state::changela_slope_rom_addr_lo_w)
 {
 	m_horizon = data;
 }
-
-

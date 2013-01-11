@@ -10,11 +10,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	/*- SPR RAM Format -**
 
-     16 bytes per sprite
+	 16 bytes per sprite
 
-      nnnn nnnn  nnnn nnnn  aaaa aaaa  aaaa aaaa  xxxx xxxx  xxxx xxxx  yyyy yyyy  yyyy yyyy
-        ( rest unused )
-    **- End of Comments -*/
+	  nnnn nnnn  nnnn nnnn  aaaa aaaa  aaaa aaaa  xxxx xxxx  xxxx xxxx  yyyy yyyy  yyyy yyyy
+	    ( rest unused )
+	**- End of Comments -*/
 
 	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	gfx_element *gfx = machine.gfx[2];
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile_info)
 	int tileno,col;
 
 	tileno = m_videoram[tile_index] & 0x0fff;
-	col=	m_videoram[tile_index] & 0xf000;
+	col=    m_videoram[tile_index] & 0xf000;
 
 	SET_TILE_INFO_MEMBER(0,tileno,col>>12,0);
 }
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile2_info)
 	int tileno,col;
 
 	tileno = m_videoram2[tile_index] & 0x0fff;
-	col=	m_videoram2[tile_index] & 0xf000;
+	col=    m_videoram2[tile_index] & 0xf000;
 
 	SET_TILE_INFO_MEMBER(1,tileno,col>>12,0);
 }
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile3_info)
 	int tileno,col;
 
 	tileno = m_videoram3[tile_index] & 0x0fff;
-	col=	m_videoram3[tile_index] & 0xf000;
+	col=    m_videoram3[tile_index] & 0xf000;
 
 	SET_TILE_INFO_MEMBER(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }

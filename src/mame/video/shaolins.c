@@ -34,7 +34,7 @@ void shaolins_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, rweights, 470, 0,
 			4, resistances, gweights, 470, 0,
 			4, resistances, bweights, 470, 0);
@@ -76,7 +76,7 @@ void shaolins_state::palette_init()
 	color_prom += 0x300;
 
 	/* characters use colors 0x10-0x1f of each 0x20 color bank,
-       while sprites use colors 0-0x0f */
+	   while sprites use colors 0-0x0f */
 	for (i = 0; i < 0x200; i++)
 	{
 		int j;
@@ -147,7 +147,7 @@ void shaolins_state::video_start()
 {
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shaolins_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
 }

@@ -16,7 +16,7 @@
  *
  *************************************/
 
-#define VERBOSE		0
+#define VERBOSE     0
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
@@ -27,9 +27,9 @@
  *
  *************************************/
 
-#define DEFAULT_SAMPLE_RATE			(44100)
+#define DEFAULT_SAMPLE_RATE         (44100)
 
-#define BUFFER_SIZE					32768
+#define BUFFER_SIZE                 32768
 
 
 
@@ -42,15 +42,15 @@
 struct dmadac_state
 {
 	/* sound stream and buffers */
-	sound_stream *	channel;
-	INT16 *			buffer;
-	UINT32			bufin;
-	UINT32			bufout;
+	sound_stream *  channel;
+	INT16 *         buffer;
+	UINT32          bufin;
+	UINT32          bufout;
 
 	/* per-channel parameters */
-	INT16			volume;
-	UINT8			enabled;
-	double			frequency;
+	INT16           volume;
+	UINT8           enabled;
+	double          frequency;
 };
 
 
@@ -237,7 +237,7 @@ const device_type DMADAC = &device_creator<dmadac_sound_device>;
 
 dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DMADAC, "DMA-driven DAC", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(dmadac_state);
 }
@@ -270,5 +270,3 @@ void dmadac_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

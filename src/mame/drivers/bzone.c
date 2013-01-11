@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8, bzone_state )
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP		/* coin out - Manual states this is "Coin Counter" */
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP        /* coin out - Manual states this is "Coin Counter" */
 	AM_RANGE(0x1200, 0x1200) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE_LEGACY(avgdvg_reset_w)
@@ -330,8 +330,8 @@ static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8, bzone_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
 	AM_RANGE(0x1804, 0x1804) AM_DEVREAD_LEGACY("mathbox", mathbox_lo_r)
 	AM_RANGE(0x1806, 0x1806) AM_DEVREAD_LEGACY("mathbox", mathbox_hi_r)
-	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_joysound_w)	/* and select joystick pot also */
-	AM_RANGE(0x180a, 0x180a) AM_WRITENOP				/* sound reset, yet todo */
+	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_joysound_w)  /* and select joystick pot also */
+	AM_RANGE(0x180a, 0x180a) AM_WRITENOP                /* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)
@@ -365,47 +365,47 @@ ADDRESS_MAP_END
 #define BZONEDSW0\
 	PORT_START("DSW0")\
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("M10:1,2")\
-	PORT_DIPSETTING(	0x00, "2" )\
-	PORT_DIPSETTING(	0x01, "3" )\
-	PORT_DIPSETTING(	0x02, "4" )\
-	PORT_DIPSETTING(	0x03, "5" )\
+	PORT_DIPSETTING(    0x00, "2" )\
+	PORT_DIPSETTING(    0x01, "3" )\
+	PORT_DIPSETTING(    0x02, "4" )\
+	PORT_DIPSETTING(    0x03, "5" )\
 	PORT_DIPNAME( 0x0c, 0x04, "Missile appears at" ) PORT_DIPLOCATION("M10:3,4")\
-	PORT_DIPSETTING(	0x00, "5000" )\
-	PORT_DIPSETTING(	0x04, "10000" )\
-	PORT_DIPSETTING(	0x08, "20000" )\
-	PORT_DIPSETTING(	0x0c, "30000" )\
+	PORT_DIPSETTING(    0x00, "5000" )\
+	PORT_DIPSETTING(    0x04, "10000" )\
+	PORT_DIPSETTING(    0x08, "20000" )\
+	PORT_DIPSETTING(    0x0c, "30000" )\
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("M10:5,6")\
-	PORT_DIPSETTING(	0x10, "15k and 100k" )\
-	PORT_DIPSETTING(	0x20, "25k and 100k" )\
-	PORT_DIPSETTING(	0x30, "50k and 100k" )\
-	PORT_DIPSETTING(	0x00, DEF_STR( None ) )\
+	PORT_DIPSETTING(    0x10, "15k and 100k" )\
+	PORT_DIPSETTING(    0x20, "25k and 100k" )\
+	PORT_DIPSETTING(    0x30, "50k and 100k" )\
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )\
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("M10:7,8")\
-	PORT_DIPSETTING(	0x00, DEF_STR( English ))\
-	PORT_DIPSETTING(	0x40, DEF_STR( German ))\
-	PORT_DIPSETTING(	0x80, DEF_STR( French ))\
-	PORT_DIPSETTING(	0xc0, DEF_STR( Spanish ))
+	PORT_DIPSETTING(    0x00, DEF_STR( English ))\
+	PORT_DIPSETTING(    0x40, DEF_STR( German ))\
+	PORT_DIPSETTING(    0x80, DEF_STR( French ))\
+	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ))
 
 #define BZONEDSW1\
 	PORT_START("DSW1")\
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("P10:1,2")\
-	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )\
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_1C ) )\
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )\
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )\
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )\
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )\
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )\
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )\
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("P10:3,4")\
-	PORT_DIPSETTING(	0x00, "*1" )\
-	PORT_DIPSETTING(	0x04, "*4" )\
-	PORT_DIPSETTING(	0x08, "*5" )\
-	PORT_DIPSETTING(	0x0c, "*6" )\
+	PORT_DIPSETTING(    0x00, "*1" )\
+	PORT_DIPSETTING(    0x04, "*4" )\
+	PORT_DIPSETTING(    0x08, "*5" )\
+	PORT_DIPSETTING(    0x0c, "*6" )\
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("P10:5")\
-	PORT_DIPSETTING(	0x00, "*1" )\
-	PORT_DIPSETTING(	0x10, "*2" )\
+	PORT_DIPSETTING(    0x00, "*1" )\
+	PORT_DIPSETTING(    0x10, "*2" )\
 	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("P10:6,7,8")\
-	PORT_DIPSETTING(	0x00, DEF_STR( None ) )\
-	PORT_DIPSETTING(	0x20, "3 credits/2 coins" )\
-	PORT_DIPSETTING(	0x40, "5 credits/4 coins" )\
-	PORT_DIPSETTING(	0x60, "6 credits/4 coins" )\
-	PORT_DIPSETTING(	0x80, "6 credits/5 coins" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )\
+	PORT_DIPSETTING(    0x20, "3 credits/2 coins" )\
+	PORT_DIPSETTING(    0x40, "5 credits/4 coins" )\
+	PORT_DIPSETTING(    0x60, "6 credits/4 coins" )\
+	PORT_DIPSETTING(    0x80, "6 credits/5 coins" )
 
 #define BZONEADJ \
 	PORT_START("R11") \
@@ -436,30 +436,30 @@ static INPUT_PORTS_START( redbaron )
 	PORT_START("DSW0")
 	/* See the table above if you are really interested */
 	PORT_DIPNAME( 0xff, 0xfd, DEF_STR( Coinage ) ) PORT_DIPLOCATION("M10:1,2,3,4,5,6,7,8")
-	PORT_DIPSETTING(	0xfd, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0xfd, DEF_STR( Normal ) )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Language ) ) PORT_DIPLOCATION("P10:1,2")
-	PORT_DIPSETTING(	0x00, DEF_STR( German ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( French ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Spanish ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( English ) )
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("P10:3,4")
-	PORT_DIPSETTING(	0x0c, "2k 10k 30k" )
-	PORT_DIPSETTING(	0x08, "4k 15k 40k" )
-	PORT_DIPSETTING(	0x04, "6k 20k 50k" )
-	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x0c, "2k 10k 30k" )
+	PORT_DIPSETTING(    0x08, "4k 15k 40k" )
+	PORT_DIPSETTING(    0x04, "6k 20k 50k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Lives ) ) PORT_DIPLOCATION("P10:5,6")
-	PORT_DIPSETTING(	0x30, "2" )
-	PORT_DIPSETTING(	0x20, "3" )
-	PORT_DIPSETTING(	0x10, "4" )
-	PORT_DIPSETTING(	0x00, "5" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x40, 0x40, "One Play Minimum" ) PORT_DIPLOCATION("P10:7")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Self Adjust Diff" ) PORT_DIPLOCATION("P10:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/* IN3 - the real machine reads either the X or Y axis from this port */
 	/* Instead, we use the two fake 5 & 6 ports and bank-switch the proper */
@@ -470,17 +470,17 @@ static INPUT_PORTS_START( redbaron )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
 
-	PORT_START("IN4")	/* Misc controls */
+	PORT_START("IN4")   /* Misc controls */
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	/* These 2 are fake - they are bank-switched from reads to IN3 */
 	/* Red Baron doesn't seem to use the full 0-255 range. */
-	PORT_START("FAKE1")	/* IN5 */
+	PORT_START("FAKE1") /* IN5 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(64,192) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("FAKE2")	/* IN6 */
+	PORT_START("FAKE2") /* IN6 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(64,192) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -512,13 +512,13 @@ static INPUT_PORTS_START( bradley )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Magnification Toggle") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("AN0")	/* analog 0 = turret rotation */
+	PORT_START("AN0")   /* analog 0 = turret rotation */
 	PORT_BIT( 0xff, 0x88, IPT_AD_STICK_X ) PORT_MINMAX(0x48,0xc8) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("AN1")	/* analog 1 = turret elevation */
+	PORT_START("AN1")   /* analog 1 = turret elevation */
 	PORT_BIT( 0xff, 0x86, IPT_AD_STICK_Y ) PORT_MINMAX(0x46,0xc6) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("AN2")	/* analog 2 = shell firing range hack removed, now uses Z */
+	PORT_START("AN2")   /* analog 2 = shell firing range hack removed, now uses Z */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	BZONEADJ
@@ -650,7 +650,7 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "036408-01.k7",	0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
@@ -680,7 +680,7 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "036408-01.k7",	0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
@@ -706,12 +706,12 @@ ROM_START( bzonec ) /* cocktail version */
 	ROM_LOAD( "bz1b7000",   0x7000, 0x0800, CRC(ed8a860e) SHA1(316a3c4870ba44bb3e9cb9fc5200eb081318facf) )
 	ROM_LOAD( "bz1a7800",   0x7800, 0x0800, CRC(04babf45) SHA1(a59da5ff49fc398ca4a948e28f05250af776b898) )
 	/* Vector Generator ROMs */
-	ROM_LOAD( "036422-01.bc3",  0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )	// bz3a3000
+	ROM_LOAD( "036422-01.bc3",  0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )  // bz3a3000
 	ROM_LOAD( "bz3b3800",   0x3800, 0x0800, CRC(76cf57f6) SHA1(1b8f3fcd664ed04ce60d94fdf27e56b20d52bdbd) )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "036408-01.k7",	0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )
@@ -743,7 +743,7 @@ ROM_START( bradley )
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "036408-01.k7",	0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
 	ROM_REGION( 0x20, "user2", 0 )

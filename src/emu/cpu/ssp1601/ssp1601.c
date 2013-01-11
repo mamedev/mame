@@ -31,7 +31,7 @@ CPU_DISASSEMBLE( ssp1601 );
 
 struct ssp1601_state_t
 {
-	PAIR gr[8];		/* general regs, some are 16bit, some 32bit */
+	PAIR gr[8];     /* general regs, some are 16bit, some 32bit */
 	union {
 			unsigned char r[8];             /* pointer registers, 4 for earch bank */
 			struct {
@@ -70,7 +70,7 @@ INLINE ssp1601_state_t *get_safe_token(device_t *device)
 #define rX     ssp1601_state->gr[SSP_X].w.h
 #define rY     ssp1601_state->gr[SSP_Y].w.h
 #define rA     ssp1601_state->gr[SSP_A].w.h
-#define rST    ssp1601_state->gr[SSP_ST].w.h	// 4
+#define rST    ssp1601_state->gr[SSP_ST].w.h    // 4
 #define rSTACK ssp1601_state->gr[SSP_STACK].w.h
 #define rPC    ssp1601_state->gr[SSP_PC].w.h
 #define rP     ssp1601_state->gr[SSP_P]
@@ -329,15 +329,15 @@ typedef void (*write_func_t)(ssp1601_state_t *ssp1601_state, int reg, UINT32 d);
 static const read_func_t reg_read_handlers[16] =
 {
 	read_unknown, read_unknown, read_unknown, read_unknown, // -, X, Y, A
-	read_unknown,	// 4 ST
+	read_unknown,   // 4 ST
 	read_STACK,
 	read_PC,
 	read_P,
-	read_ext,	// 8
+	read_ext,   // 8
 	read_ext,
 	read_ext,
 	read_ext,
-	read_ext,	// 12
+	read_ext,   // 12
 	read_ext,
 	read_ext,
 	read_AL
@@ -349,12 +349,12 @@ static const write_func_t reg_write_handlers[16] =
 	write_ST,
 	write_STACK,
 	write_PC,
-	write_unknown,	// 7 P (not writable)
-	write_ext,	// 8
+	write_unknown,  // 7 P (not writable)
+	write_ext,  // 8
 	write_ext,
 	write_ext,
 	write_ext,
-	write_ext,	// 12
+	write_ext,  // 12
 	write_ext,
 	write_ext,
 	write_AL
@@ -395,27 +395,27 @@ static UINT32 ptr1_read_(ssp1601_state_t *ssp1601_state, int ri, int isj2, int m
 		case 0x10:
 		case 0x11:
 		case 0x12: rp = &ssp1601_state->r0[t&3]; t = ssp1601_state->RAM0[*rp];
-		           if (!(rST&7)) { (*rp)--; return t; }
-		           add = -1; goto modulo;
+					if (!(rST&7)) { (*rp)--; return t; }
+					add = -1; goto modulo;
 		case 0x13: return ssp1601_state->RAM0[2];
 		case 0x14:
 		case 0x15:
 		case 0x16: rp = &ssp1601_state->r1[t&3]; t = ssp1601_state->RAM1[*rp];
-		           if (!(rST&7)) { (*rp)--; return t; }
-		           add = -1; goto modulo;
+					if (!(rST&7)) { (*rp)--; return t; }
+					add = -1; goto modulo;
 		case 0x17: return ssp1601_state->RAM1[2];
 		// mod=3 (11), "+"
 		case 0x18:
 		case 0x19:
 		case 0x1a: rp = &ssp1601_state->r0[t&3]; t = ssp1601_state->RAM0[*rp];
-		           if (!(rST&7)) { (*rp)++; return t; }
-		           add = 1; goto modulo;
+					if (!(rST&7)) { (*rp)++; return t; }
+					add = 1; goto modulo;
 		case 0x1b: return ssp1601_state->RAM0[3];
 		case 0x1c:
 		case 0x1d:
 		case 0x1e: rp = &ssp1601_state->r1[t&3]; t = ssp1601_state->RAM1[*rp];
-		           if (!(rST&7)) { (*rp)++; return t; }
-		           add = 1; goto modulo;
+					if (!(rST&7)) { (*rp)++; return t; }
+					add = 1; goto modulo;
 		case 0x1f: return ssp1601_state->RAM1[3];
 	}
 
@@ -496,7 +496,7 @@ static UINT32 ptr2_read(ssp1601_state_t *ssp1601_state, int op)
 		case 0x1b: mv = ssp1601_state->RAM0[3]++; break;
 		case 0x1f: mv = ssp1601_state->RAM1[3]++; break;
 		default:   logerror(__FILE__ " FIXME: unimplemented mod in ((rX)) @ %04x\n", GET_PPC_OFFS());
-		           return 0;
+					return 0;
 	}
 
 	return PROGRAM_WORD(mv);
@@ -768,28 +768,28 @@ static CPU_SET_INFO( ssp1601 )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 
-		case CPUINFO_INT_REGISTER + SSP_X:				rX = info->i;							break;
-		case CPUINFO_INT_REGISTER + SSP_Y:				rY = info->i;							break;
-		case CPUINFO_INT_REGISTER + SSP_A:				rA32 = info->i;							break;
-		case CPUINFO_INT_REGISTER + SSP_ST:				rST = info->i;							break;
-		case CPUINFO_INT_REGISTER + SSP_STACK:			rSTACK = info->i;						break;
+		case CPUINFO_INT_REGISTER + SSP_X:              rX = info->i;                           break;
+		case CPUINFO_INT_REGISTER + SSP_Y:              rY = info->i;                           break;
+		case CPUINFO_INT_REGISTER + SSP_A:              rA32 = info->i;                         break;
+		case CPUINFO_INT_REGISTER + SSP_ST:             rST = info->i;                          break;
+		case CPUINFO_INT_REGISTER + SSP_STACK:          rSTACK = info->i;                       break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SSP_PC:				rPC = info->i;							break;
-		case CPUINFO_INT_REGISTER + SSP_P:				rP.d = info->i;							break;
-		case CPUINFO_INT_REGISTER + SSP_STACK0:			ssp1601_state->stack[0] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK1:			ssp1601_state->stack[1] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK2:			ssp1601_state->stack[2] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK3:			ssp1601_state->stack[3] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK4:			ssp1601_state->stack[4] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK5:			ssp1601_state->stack[5] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_PR0:			ssp1601_state->r[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR1:			ssp1601_state->r[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR2:			ssp1601_state->r[2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR3:			ssp1601_state->r[3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR4:			ssp1601_state->r[4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR5:			ssp1601_state->r[5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR6:			ssp1601_state->r[6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR7:			ssp1601_state->r[7] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PC:             rPC = info->i;                          break;
+		case CPUINFO_INT_REGISTER + SSP_P:              rP.d = info->i;                         break;
+		case CPUINFO_INT_REGISTER + SSP_STACK0:         ssp1601_state->stack[0] = info->i;              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK1:         ssp1601_state->stack[1] = info->i;              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK2:         ssp1601_state->stack[2] = info->i;              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK3:         ssp1601_state->stack[3] = info->i;              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK4:         ssp1601_state->stack[4] = info->i;              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK5:         ssp1601_state->stack[5] = info->i;              break;
+		case CPUINFO_INT_REGISTER + SSP_PR0:            ssp1601_state->r[0] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR1:            ssp1601_state->r[1] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR2:            ssp1601_state->r[2] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR3:            ssp1601_state->r[3] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR4:            ssp1601_state->r[4] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR5:            ssp1601_state->r[5] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR6:            ssp1601_state->r[6] = info->i;                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR7:            ssp1601_state->r[7] = info->i;                  break;
 
 //      case CPUINFO_INT_INPUT_STATE + 0:               set_irq_line(0, info->i);               break;
 //      case CPUINFO_INT_INPUT_STATE + 1:               set_irq_line(1, info->i);               break;
@@ -808,102 +808,102 @@ CPU_GET_INFO( ssp1601 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(ssp1601_state_t);				break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(ssp1601_state_t);              break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 3;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                   break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 4;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = -1;                  break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 16;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 4;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:					/* not implemented */				break;
+		case CPUINFO_INT_INPUT_STATE + 0:                   /* not implemented */               break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;							break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = PPC;                          break;
 
-		case CPUINFO_INT_REGISTER + SSP_R0:				info->i = ssp1601_state->gr[0].w.h;			break;
-		case CPUINFO_INT_REGISTER + SSP_X:				info->i = rX;							break;
-		case CPUINFO_INT_REGISTER + SSP_Y:				info->i = rY;							break;
-		case CPUINFO_INT_REGISTER + SSP_A:				info->i = rA32;							break;
-		case CPUINFO_INT_REGISTER + SSP_ST:				info->i = rST;							break;
-		case CPUINFO_INT_REGISTER + SSP_STACK:			info->i = rSTACK;						break;
+		case CPUINFO_INT_REGISTER + SSP_R0:             info->i = ssp1601_state->gr[0].w.h;         break;
+		case CPUINFO_INT_REGISTER + SSP_X:              info->i = rX;                           break;
+		case CPUINFO_INT_REGISTER + SSP_Y:              info->i = rY;                           break;
+		case CPUINFO_INT_REGISTER + SSP_A:              info->i = rA32;                         break;
+		case CPUINFO_INT_REGISTER + SSP_ST:             info->i = rST;                          break;
+		case CPUINFO_INT_REGISTER + SSP_STACK:          info->i = rSTACK;                       break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SSP_PC:				info->i = rPC;							break;
-		case CPUINFO_INT_REGISTER + SSP_P:				info->i = rP.d;							break;
-		case CPUINFO_INT_REGISTER + SSP_STACK0:			info->i = ssp1601_state->stack[0];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK1:			info->i = ssp1601_state->stack[1];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK2:			info->i = ssp1601_state->stack[2];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK3:			info->i = ssp1601_state->stack[3];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK4:			info->i = ssp1601_state->stack[4];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK5:			info->i = ssp1601_state->stack[5];				break;
-		case CPUINFO_INT_REGISTER + SSP_PR0:			info->i = ssp1601_state->r[0];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR1:			info->i = ssp1601_state->r[1];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR2:			info->i = ssp1601_state->r[2];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR3:			info->i = ssp1601_state->r[3];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR4:			info->i = ssp1601_state->r[4];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR5:			info->i = ssp1601_state->r[5];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR6:			info->i = ssp1601_state->r[6];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR7:			info->i = ssp1601_state->r[7];					break;
+		case CPUINFO_INT_REGISTER + SSP_PC:             info->i = rPC;                          break;
+		case CPUINFO_INT_REGISTER + SSP_P:              info->i = rP.d;                         break;
+		case CPUINFO_INT_REGISTER + SSP_STACK0:         info->i = ssp1601_state->stack[0];              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK1:         info->i = ssp1601_state->stack[1];              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK2:         info->i = ssp1601_state->stack[2];              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK3:         info->i = ssp1601_state->stack[3];              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK4:         info->i = ssp1601_state->stack[4];              break;
+		case CPUINFO_INT_REGISTER + SSP_STACK5:         info->i = ssp1601_state->stack[5];              break;
+		case CPUINFO_INT_REGISTER + SSP_PR0:            info->i = ssp1601_state->r[0];                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR1:            info->i = ssp1601_state->r[1];                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR2:            info->i = ssp1601_state->r[2];                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR3:            info->i = ssp1601_state->r[3];                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR4:            info->i = ssp1601_state->r[4];                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR5:            info->i = ssp1601_state->r[5];                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR6:            info->i = ssp1601_state->r[6];                  break;
+		case CPUINFO_INT_REGISTER + SSP_PR7:            info->i = ssp1601_state->r[7];                  break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ssp1601);	break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ssp1601);			break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ssp1601);			break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ssp1601);			break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ssp1601);		break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ssp1601);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ssp1601_state->g_cycles;			break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(ssp1601); break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ssp1601);            break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(ssp1601);          break;
+		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(ssp1601);            break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(ssp1601);      break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(ssp1601);  break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &ssp1601_state->g_cycles;            break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map16 = NULL;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map16 = NULL; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "SSP1601");									break;
-		case CPUINFO_STR_FAMILY:				strcpy(info->s, "SSP1601 DSP");								break;
-		case CPUINFO_STR_VERSION:				strcpy(info->s, "1.0");										break;
-		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case CPUINFO_STR_CREDITS:				strcpy(info->s, "Copyright Grazvydas Ignotas");				break;
+		case CPUINFO_STR_NAME:                      strcpy(info->s, "SSP1601");                                 break;
+		case CPUINFO_STR_FAMILY:                strcpy(info->s, "SSP1601 DSP");                             break;
+		case CPUINFO_STR_VERSION:               strcpy(info->s, "1.0");                                     break;
+		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                                  break;
+		case CPUINFO_STR_CREDITS:               strcpy(info->s, "Copyright Grazvydas Ignotas");             break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c", (rST&SSP_FLAG_N)?'N':'.', (rST&SSP_FLAG_V)?'V':'.',
 				(rST&SSP_FLAG_Z)?'Z':'.', (rST&SSP_FLAG_L)?'L':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + SSP_R0:			sprintf(info->s, "REG0  :%04X", ssp1601_state->gr[0].w.h);			break;
-		case CPUINFO_STR_REGISTER + SSP_X:			sprintf(info->s, "X  :%04X", rX);							break;
-		case CPUINFO_STR_REGISTER + SSP_Y:			sprintf(info->s, "Y  :%04X", rY);							break;
-		case CPUINFO_STR_REGISTER + SSP_A:			sprintf(info->s, "A  :%08X", rA32);							break;
-		case CPUINFO_STR_REGISTER + SSP_ST:			sprintf(info->s, "ST  :%04X", rST);							break;
-		case CPUINFO_STR_REGISTER + SSP_STACK:		sprintf(info->s, "STACK  :%04X", rSTACK);					break;
-		case CPUINFO_STR_REGISTER + SSP_PC: 		sprintf(info->s, "PC  :%04X", rPC);							break;
-		case CPUINFO_STR_REGISTER + SSP_P:			sprintf(info->s, "P  :%08X", rP.d);							break;
-		case CPUINFO_STR_REGISTER + SSP_STACK0:		sprintf(info->s, "STACK0  :%04X", ssp1601_state->stack[0]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK1:		sprintf(info->s, "STACK1  :%04X", ssp1601_state->stack[1]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK2:		sprintf(info->s, "STACK2  :%04X", ssp1601_state->stack[2]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK3:		sprintf(info->s, "STACK3  :%04X", ssp1601_state->stack[3]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK4:		sprintf(info->s, "STACK4  :%04X", ssp1601_state->stack[4]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK5:		sprintf(info->s, "STACK5  :%04X", ssp1601_state->stack[5]);		break;
-		case CPUINFO_STR_REGISTER + SSP_PR0:		sprintf(info->s, "R0  :%02X", ssp1601_state->r[0]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR1:		sprintf(info->s, "R1  :%02X", ssp1601_state->r[1]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR2:		sprintf(info->s, "R2  :%02X", ssp1601_state->r[2]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR3:		sprintf(info->s, "R3  :%02X", ssp1601_state->r[3]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR4:		sprintf(info->s, "R4  :%02X", ssp1601_state->r[4]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR5:		sprintf(info->s, "R5  :%02X", ssp1601_state->r[5]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR6:		sprintf(info->s, "R6  :%02X", ssp1601_state->r[6]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR7:		sprintf(info->s, "R7  :%02X", ssp1601_state->r[7]);				break;
+		case CPUINFO_STR_REGISTER + SSP_R0:         sprintf(info->s, "REG0  :%04X", ssp1601_state->gr[0].w.h);          break;
+		case CPUINFO_STR_REGISTER + SSP_X:          sprintf(info->s, "X  :%04X", rX);                           break;
+		case CPUINFO_STR_REGISTER + SSP_Y:          sprintf(info->s, "Y  :%04X", rY);                           break;
+		case CPUINFO_STR_REGISTER + SSP_A:          sprintf(info->s, "A  :%08X", rA32);                         break;
+		case CPUINFO_STR_REGISTER + SSP_ST:         sprintf(info->s, "ST  :%04X", rST);                         break;
+		case CPUINFO_STR_REGISTER + SSP_STACK:      sprintf(info->s, "STACK  :%04X", rSTACK);                   break;
+		case CPUINFO_STR_REGISTER + SSP_PC:         sprintf(info->s, "PC  :%04X", rPC);                         break;
+		case CPUINFO_STR_REGISTER + SSP_P:          sprintf(info->s, "P  :%08X", rP.d);                         break;
+		case CPUINFO_STR_REGISTER + SSP_STACK0:     sprintf(info->s, "STACK0  :%04X", ssp1601_state->stack[0]);     break;
+		case CPUINFO_STR_REGISTER + SSP_STACK1:     sprintf(info->s, "STACK1  :%04X", ssp1601_state->stack[1]);     break;
+		case CPUINFO_STR_REGISTER + SSP_STACK2:     sprintf(info->s, "STACK2  :%04X", ssp1601_state->stack[2]);     break;
+		case CPUINFO_STR_REGISTER + SSP_STACK3:     sprintf(info->s, "STACK3  :%04X", ssp1601_state->stack[3]);     break;
+		case CPUINFO_STR_REGISTER + SSP_STACK4:     sprintf(info->s, "STACK4  :%04X", ssp1601_state->stack[4]);     break;
+		case CPUINFO_STR_REGISTER + SSP_STACK5:     sprintf(info->s, "STACK5  :%04X", ssp1601_state->stack[5]);     break;
+		case CPUINFO_STR_REGISTER + SSP_PR0:        sprintf(info->s, "R0  :%02X", ssp1601_state->r[0]);             break;
+		case CPUINFO_STR_REGISTER + SSP_PR1:        sprintf(info->s, "R1  :%02X", ssp1601_state->r[1]);             break;
+		case CPUINFO_STR_REGISTER + SSP_PR2:        sprintf(info->s, "R2  :%02X", ssp1601_state->r[2]);             break;
+		case CPUINFO_STR_REGISTER + SSP_PR3:        sprintf(info->s, "R3  :%02X", ssp1601_state->r[3]);             break;
+		case CPUINFO_STR_REGISTER + SSP_PR4:        sprintf(info->s, "R4  :%02X", ssp1601_state->r[4]);             break;
+		case CPUINFO_STR_REGISTER + SSP_PR5:        sprintf(info->s, "R5  :%02X", ssp1601_state->r[5]);             break;
+		case CPUINFO_STR_REGISTER + SSP_PR6:        sprintf(info->s, "R6  :%02X", ssp1601_state->r[6]);             break;
+		case CPUINFO_STR_REGISTER + SSP_PR7:        sprintf(info->s, "R7  :%02X", ssp1601_state->r[7]);             break;
 	}
 }
 

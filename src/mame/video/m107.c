@@ -209,27 +209,27 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			if (rom[rom_offs+1] || rom[rom_offs+3] || rom[rom_offs+5] || rom[rom_offs+7])
 			{
-				while (rom_offs < 0x40000)	/* safety check */
+				while (rom_offs < 0x40000)  /* safety check */
 				{
 					/*
-                    [1]
-                    x--- ---- end of block marker
-                    ---- --x- Flip Y
-                    ---- ---x Flip X
-                    [2]
-                    xxxx xxxx Y offs lo byte
-                    [3]
-                    ---- xxx- height (1/2/4/8)
-                    ---- ---x Y offs hi byte
-                    [4]
-                    xxxx xxxx sprite number lo byte
-                    [5]
-                    xxxx xxxx sprite number hi byte
-                    [6]
-                    xxxx xxxx X offs lo byte
-                    [7]
-                    ---- ---x X offs hi byte
-                    */
+					[1]
+					x--- ---- end of block marker
+					---- --x- Flip Y
+					---- ---x Flip X
+					[2]
+					xxxx xxxx Y offs lo byte
+					[3]
+					---- xxx- height (1/2/4/8)
+					---- ---x Y offs hi byte
+					[4]
+					xxxx xxxx sprite number lo byte
+					[5]
+					xxxx xxxx sprite number hi byte
+					[6]
+					xxxx xxxx X offs lo byte
+					[7]
+					---- ---x X offs hi byte
+					*/
 
 					int xdisp = rom[rom_offs+6]+256*rom[rom_offs+7];
 					int ydisp = rom[rom_offs+2]+256*rom[rom_offs+3];
@@ -258,7 +258,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 								machine.priority_bitmap,pri_mask,0);
 					}
 
-					if (rom[rom_offs+1]&0x80) break;	/* end of block */
+					if (rom[rom_offs+1]&0x80) break;    /* end of block */
 
 					rom_offs += 8;
 				}
@@ -276,10 +276,10 @@ static void m107_update_scroll_positions(running_machine &machine)
 	int i;
 
 	/*
-        rowscroll is at 0xde000 - 0xde7ff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 0 of the layer video register
-        rowselect is at 0xde800 - 0xdefff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 1 of the layer video register
-        Perhaps 0xdf000 - 0xdffff and bit 2-3 are respectively colscroll and colselect?
-    */
+	    rowscroll is at 0xde000 - 0xde7ff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 0 of the layer video register
+	    rowselect is at 0xde800 - 0xdefff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 1 of the layer video register
+	    Perhaps 0xdf000 - 0xdffff and bit 2-3 are respectively colscroll and colselect?
+	*/
 
 	for (laynum = 0; laynum < 4; laynum++)
 	{
@@ -360,7 +360,7 @@ static void m107_screenrefresh(running_machine &machine, bitmap_ind16 &bitmap, c
 		draw_sprites(machine, bitmap, cliprect);
 
 	/* This hardware probably has more priority values - but I haven't found
-        any used yet */
+	    any used yet */
 }
 
 /*****************************************************************************/
@@ -369,10 +369,10 @@ WRITE16_MEMBER(m107_state::m107_spritebuffer_w)
 {
 	if (ACCESSING_BITS_0_7) {
 		/*
-        TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
-        */
+		TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
+		*/
 //      logerror("%04x: buffered spriteram\n",space.device().safe_pc());
-		m_sprite_display	= (!(data & 0x1000));
+		m_sprite_display    = (!(data & 0x1000));
 
 		memcpy(m_buffered_spriteram, m_spriteram, 0x1000);
 	}
@@ -386,4 +386,3 @@ UINT32 m107_state::screen_update_m107(screen_device &screen, bitmap_ind16 &bitma
 	m107_screenrefresh(machine(), bitmap, cliprect);
 	return 0;
 }
-

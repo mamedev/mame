@@ -31,10 +31,10 @@
 //**************************************************************************
 
 #define MCFG_CS4031_ADD(_tag, _cputag, _isatag, _biostag) \
-    MCFG_DEVICE_ADD(_tag, CS4031, 0) \
-    cs4031_device::static_set_cputag(*device, _cputag); \
-    cs4031_device::static_set_isatag(*device, _isatag); \
-    cs4031_device::static_set_biostag(*device, _biostag);
+	MCFG_DEVICE_ADD(_tag, CS4031, 0) \
+	cs4031_device::static_set_cputag(*device, _cputag); \
+	cs4031_device::static_set_isatag(*device, _isatag); \
+	cs4031_device::static_set_biostag(*device, _biostag);
 
 
 //**************************************************************************
@@ -92,4 +92,4 @@ private:
 extern const device_type CS4031;
 
 
-#endif	/* __CS4031_H__ */
+#endif  /* __CS4031_H__ */

@@ -158,8 +158,8 @@ WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
 }
 
 static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM	// work RAM
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM // main program
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM // work RAM
 
 	AM_RANGE(0x200000, 0x207fff) AM_RAM // backup RAM 24F
 
@@ -214,14 +214,14 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16, kongambl_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// main program (mirrored?)
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// work RAM
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM // main program (mirrored?)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM // work RAM
 	AM_RANGE(0x180000, 0x180001) AM_WRITENOP
 	AM_RANGE(0x190000, 0x190001) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITENOP
 	AM_RANGE(0x1b0000, 0x1b0001) AM_READNOP
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READNOP
-	AM_RANGE(0x200000, 0x2000ff) AM_RAM	// unknown (YMZ280b?  Shared with 68020?)
+	AM_RANGE(0x200000, 0x2000ff) AM_RAM // unknown (YMZ280b?  Shared with 68020?)
 	AM_RANGE(0x280000, 0x2800ff) AM_RAM
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM
 ADDRESS_MAP_END
@@ -550,7 +550,7 @@ static const gfx_layout charlayout8_tasman =
 	RGN_FRAC(1,1),
 	8,
 	{ 0,8,16,24,32,40,48,56 },
-	{ 0,1,2,3,4,5,6,7 },	// bit order probably not exact - note ramp in first 16 tiles
+	{ 0,1,2,3,4,5,6,7 },    // bit order probably not exact - note ramp in first 16 tiles
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
 	8*64
 };

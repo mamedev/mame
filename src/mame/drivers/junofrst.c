@@ -226,9 +226,9 @@ WRITE8_MEMBER(junofrst_state::junofrst_portB_w)
 		int C = 0;
 
 		if (data & 1)
-			C += 47000;	/* 47000pF = 0.047uF */
+			C += 47000; /* 47000pF = 0.047uF */
 		if (data & 2)
-			C += 220000;	/* 220000pF = 0.22uF */
+			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
 		filter_rc_set_RC(filter[i], FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
@@ -351,16 +351,16 @@ static INPUT_PORTS_START( junofrst )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "256 (Cheat)")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:5,6,7")
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6,7")
 	PORT_DIPSETTING(    0x70, "1 (Easiest)" )
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x50, "3" )
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( junofrst )
 	PORT_DIPSETTING(    0x20, "6" )
 	PORT_DIPSETTING(    0x10, "7" )
 	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -431,14 +431,14 @@ INTERRUPT_GEN_MEMBER(junofrst_state::junofrst_30hz_irq)
 static MACHINE_CONFIG_START( junofrst, junofrst_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M6809, 1500000)         /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", junofrst_state,  junofrst_30hz_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)	/* 1.78975 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_CPU_ADD("mcu", I8039,8000000)	/* 8MHz crystal */
+	MCFG_CPU_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 
@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
 	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
 
 	/* sound hardware */
@@ -475,7 +475,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( junofrst )
-	ROM_REGION( 0x1c000, "maincpu", 0 )	/* code + space for decrypted opcodes */
+	ROM_REGION( 0x1c000, "maincpu", 0 ) /* code + space for decrypted opcodes */
 	ROM_LOAD( "jfa_b9.bin",   0x0a000, 0x2000, CRC(f5a7ab9d) SHA1(9603e797839290f8e1f93ccff9cc820604cc49ab) ) /* program ROMs */
 	ROM_LOAD( "jfb_b10.bin",  0x0c000, 0x2000, CRC(f20626e0) SHA1(46f58bdc1a613124e2c148b61f774fcc6c232868) )
 	ROM_LOAD( "jfc_a10.bin",  0x0e000, 0x2000, CRC(1e7744a7) SHA1(bee69833af886436016560295cddf0c8b4c5e771) )
@@ -490,17 +490,17 @@ ROM_START( junofrst )
 	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "jfs1_j3.bin",  0x0000, 0x1000, CRC(235a2893) SHA1(b90251c4971f7ba12e407f86c32723d513d6b4a0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */
 	ROM_LOAD( "jfs2_p4.bin",  0x0000, 0x1000, CRC(d0fa5d5f) SHA1(9d0730d1d037bf96b0c933a32355602bf2d735dd) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )	/* BLTROM, used at runtime */
+	ROM_REGION( 0x6000, "gfx1", 0 ) /* BLTROM, used at runtime */
 	ROM_LOAD( "jfs3_c7.bin",  0x00000, 0x2000, CRC(aeacf6db) SHA1(f99ef9f9153d7a83e1881d9181faac99cb8c8a57) )
 	ROM_LOAD( "jfs4_d7.bin",  0x02000, 0x2000, CRC(206d954c) SHA1(65494766676f18d8b5ae9a54cee00790e7b1e67e) )
 	ROM_LOAD( "jfs5_e7.bin",  0x04000, 0x2000, CRC(1eb87a6e) SHA1(f5471b9f6f1fa6d6e5d76300d89f71da3129516a) )
 ROM_END
 
 ROM_START( junofrstg )
-	ROM_REGION( 0x1c000, "maincpu", 0 )	/* code + space for decrypted opcodes */
+	ROM_REGION( 0x1c000, "maincpu", 0 ) /* code + space for decrypted opcodes */
 	ROM_LOAD( "jfg_a.9b",     0x0a000, 0x2000, CRC(8f77d1c5) SHA1(d47fcdbc47673c228661a3528fff0c691c76df9e) ) /* program ROMs */
 	ROM_LOAD( "jfg_b.10b",    0x0c000, 0x2000, CRC(cd645673) SHA1(25994210a8a424bdf2eca3efa19e7eeffc097cec) )
 	ROM_LOAD( "jfg_c.10a",    0x0e000, 0x2000, CRC(47852761) SHA1(eeef814b6ad681d4c2274f0a69d1ed9c5c1b9118) )
@@ -515,10 +515,10 @@ ROM_START( junofrstg )
 	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "jfs1_j3.bin",  0x0000, 0x1000, CRC(235a2893) SHA1(b90251c4971f7ba12e407f86c32723d513d6b4a0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 8039 */
 	ROM_LOAD( "jfs2_p4.bin",  0x0000, 0x1000, CRC(d0fa5d5f) SHA1(9d0730d1d037bf96b0c933a32355602bf2d735dd) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )	/* BLTROM, used at runtime */
+	ROM_REGION( 0x6000, "gfx1", 0 ) /* BLTROM, used at runtime */
 	ROM_LOAD( "jfs3_c7.bin",  0x00000, 0x2000, CRC(aeacf6db) SHA1(f99ef9f9153d7a83e1881d9181faac99cb8c8a57) )
 	ROM_LOAD( "jfs4_d7.bin",  0x02000, 0x2000, CRC(206d954c) SHA1(65494766676f18d8b5ae9a54cee00790e7b1e67e) )
 	ROM_LOAD( "jfs5_e7.bin",  0x04000, 0x2000, CRC(1eb87a6e) SHA1(f5471b9f6f1fa6d6e5d76300d89f71da3129516a) )

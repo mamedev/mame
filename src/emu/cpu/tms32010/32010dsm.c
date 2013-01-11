@@ -1,28 +1,28 @@
- /**************************************************************************\
- *                Texas Instruments TMS32010 DSP Disassembler               *
- *                                                                          *
- *                  Copyright Tony La Porta                                 *
- *               To be used with TMS32010 DSP Emulator engine.              *
- *      You are not allowed to distribute this software commercially.       *
- *                      Written for the MAME project.                       *
- *                                                                          *
- *         Many thanks to those involved in the i8039 Disassembler          *
- *                        as this was based on it.                          *
- *                                                                          *
- *                                                                          *
- *                                                                          *
- * A Memory address                                                         *
- * B Branch Address for Branch instructions (Requires next opcode read)     *
- * D Immediate byte load                                                    *
- * K Immediate bit  load                                                    *
- * W Immediate word load (Actually 13 bit)                                  *
- * M AR[x] register modification type (for indirect addressing)             *
- * N ARP register to change ARP pointer to (for indirect addressing)        *
- * P I/O port address number                                                *
- * R AR[R] register to use                                                  *
- * S Shift ALU left                                                         *
- *                                                                          *
- \**************************************************************************/
+	/**************************************************************************\
+	*                Texas Instruments TMS32010 DSP Disassembler               *
+	*                                                                          *
+	*                  Copyright Tony La Porta                                 *
+	*               To be used with TMS32010 DSP Emulator engine.              *
+	*      You are not allowed to distribute this software commercially.       *
+	*                      Written for the MAME project.                       *
+	*                                                                          *
+	*         Many thanks to those involved in the i8039 Disassembler          *
+	*                        as this was based on it.                          *
+	*                                                                          *
+	*                                                                          *
+	*                                                                          *
+	* A Memory address                                                         *
+	* B Branch Address for Branch instructions (Requires next opcode read)     *
+	* D Immediate byte load                                                    *
+	* K Immediate bit  load                                                    *
+	* W Immediate word load (Actually 13 bit)                                  *
+	* M AR[x] register modification type (for indirect addressing)             *
+	* N ARP register to change ARP pointer to (for indirect addressing)        *
+	* P I/O port address number                                                *
+	* R AR[R] register to use                                                  *
+	* S Shift ALU left                                                         *
+	*                                                                          *
+	\**************************************************************************/
 
 #include "emu.h"
 #include "debugger.h"
@@ -57,8 +57,8 @@ static const char *const TMS32010Formats[] = {
 	FMT("01000ppp10mmn00n", "in   %M,%P%N"),
 	FMT("01001ppp0aaaaaaa", "out  %A,%P"),
 	FMT("01001ppp10mmn00n", "out  %M,%P%N"),
-	FMT("01010sss0aaaaaaa", "sacl %A"),		/* This instruction has a shift but */
-	FMT("01010sss10mmn00n", "sacl %M%N"),	/* is documented as not performed */
+	FMT("01010sss0aaaaaaa", "sacl %A"),     /* This instruction has a shift but */
+	FMT("01010sss10mmn00n", "sacl %M%N"),   /* is documented as not performed */
 	FMT("01011sss0aaaaaaa", "sach %A%S"),
 	FMT("01011sss10mmn00n", "sach %M%S%N"),
 	FMT("011000000aaaaaaa", "addh %A"),
@@ -78,7 +78,7 @@ static const char *const TMS32010Formats[] = {
 	FMT("011001110aaaaaaa", "tblr %A"),
 	FMT("0110011110mmn00n", "tblr %M%N"),
 	FMT("011010001000000k", "larp %K"),
-	FMT("011010000aaaaaaa", "mar  %A"),		/* Actually this is executed as a NOP */
+	FMT("011010000aaaaaaa", "mar  %A"),     /* Actually this is executed as a NOP */
 /*  FMT("0110100010mmn00n", "mar  %M%N"),   */
 /*  MAR indirect has been expanded out to all its variations because one of */
 /*  its opcodes is the same as LARP (actually performs the same function) */
@@ -125,10 +125,10 @@ static const char *const TMS32010Formats[] = {
 	FMT("011111010aaaaaaa", "tblw %A"),
 	FMT("0111110110mmn00n", "tblw %M%N"),
 	FMT("01111110dddddddd", "lack %D"),
-	FMT("0111111110000000", "nop"),			/* 7F80 */
+	FMT("0111111110000000", "nop"),         /* 7F80 */
 	FMT("0111111110000001", "dint"),
 	FMT("0111111110000010", "eint"),
-	FMT("0111111110001000", "abs"),			/* 7F88 */
+	FMT("0111111110001000", "abs"),         /* 7F88 */
 	FMT("0111111110001001", "zac"),
 	FMT("0111111110001010", "rovm"),
 	FMT("0111111110001011", "sovm"),
@@ -138,7 +138,7 @@ static const char *const TMS32010Formats[] = {
 	FMT("0111111110001111", "apac"),
 	FMT("0111111110010000", "spac"),
 	FMT("0111111110011100", "push"),
-	FMT("0111111110011101", "pop"),			/* 7F9D */
+	FMT("0111111110011101", "pop"),         /* 7F9D */
 	FMT("100wwwwwwwwwwwww", "mpyk %W"),
 	FMT("1111010000000000bbbbbbbbbbbbbbbb", "banz %B"),
 	FMT("1111010100000000bbbbbbbbbbbbbbbb", "bv   %B"),
@@ -157,11 +157,11 @@ static const char *const TMS32010Formats[] = {
 #define MAX_OPS (((sizeof(TMS32010Formats) / sizeof(TMS32010Formats[0])) - 1) / PTRS_PER_FORMAT)
 
 struct TMS32010Opcode  {
-	word mask;			/* instruction mask */
-	word bits;			/* constant bits */
-	word extcode;		/* value that gets extension code */
-	const char *parse;		/* how to parse bits */
-	const char *fmt;			/* instruction format */
+	word mask;          /* instruction mask */
+	word bits;          /* constant bits */
+	word extcode;       /* value that gets extension code */
+	const char *parse;      /* how to parse bits */
+	const char *fmt;            /* instruction format */
 };
 
 static TMS32010Opcode Op[MAX_OPS+1];
@@ -225,18 +225,18 @@ static void InitDasm32010(void)
 CPU_DISASSEMBLE( tms32010 )
 {
 	UINT32 flags = 0;
-	int a, b, d, k, m, n, p, r, s, w;	/* these can all be filled in by parsing an instruction */
+	int a, b, d, k, m, n, p, r, s, w;   /* these can all be filled in by parsing an instruction */
 	int i;
 	int op;
 	int cnt = 1;
 	int code;
 	int bit;
 	//char *buffertmp;
-	const char *cp;				/* character pointer in OpFormats */
+	const char *cp;             /* character pointer in OpFormats */
 
 	if (!OpInizialized) InitDasm32010();
 
-	op = -1;				/* no matching opcode */
+	op = -1;                /* no matching opcode */
 	code = (oprom[0] << 8) | oprom[1];
 	for ( i = 0; i < MAX_OPS; i++)
 	{

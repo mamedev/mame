@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/irobot.h"
 
-#define BITMAP_WIDTH	256
+#define BITMAP_WIDTH    256
 
 
 /***************************************************************************
@@ -45,11 +45,11 @@ void irobot_state::palette_init()
 	/* convert the color prom for the text palette */
 	for (i = 0; i < 32; i++)
 	{
-	    int intensity = color_prom[i] & 0x03;
+		int intensity = color_prom[i] & 0x03;
 
-	    int r = 28 * ((color_prom[i] >> 6) & 0x03) * intensity;
-	    int g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
-	    int b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
+		int r = 28 * ((color_prom[i] >> 6) & 0x03) * intensity;
+		int g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
+		int b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
 
 		int swapped_i = BITSWAP8(i,7,6,5,4,3,0,1,2);
 
@@ -153,8 +153,8 @@ void irobot_state::video_start()
 
 ***************************************************************************/
 
-#define draw_pixel(x,y,c)		polybitmap[(y) * BITMAP_WIDTH + (x)] = (c)
-#define fill_hline(x1,x2,y,c)	memset(&polybitmap[(y) * BITMAP_WIDTH + (x1)], (c), (x2) - (x1) + 1)
+#define draw_pixel(x,y,c)       polybitmap[(y) * BITMAP_WIDTH + (x)] = (c)
+#define fill_hline(x1,x2,y,c)   memset(&polybitmap[(y) * BITMAP_WIDTH + (x1)], (c), (x2) - (x1) + 1)
 
 
 /*
@@ -165,51 +165,51 @@ void irobot_state::video_start()
 static void draw_line(running_machine &machine, UINT8 *polybitmap, int x1, int y1, int x2, int y2, int col)
 {
 	irobot_state *state = machine.driver_data<irobot_state>();
-    int dx,dy,sx,sy,cx,cy;
+	int dx,dy,sx,sy,cx,cy;
 
-    dx = abs(x1-x2);
-    dy = abs(y1-y2);
-    sx = (x1 <= x2) ? 1: -1;
-    sy = (y1 <= y2) ? 1: -1;
-    cx = dx/2;
-    cy = dy/2;
+	dx = abs(x1-x2);
+	dy = abs(y1-y2);
+	sx = (x1 <= x2) ? 1: -1;
+	sy = (y1 <= y2) ? 1: -1;
+	cx = dx/2;
+	cy = dy/2;
 
-    if (dx>=dy)
-    {
-        for (;;)
-        {
-        	if (x1 >= state->m_ir_xmin && x1 < state->m_ir_xmax && y1 >= state->m_ir_ymin && y1 < state->m_ir_ymax)
-	             draw_pixel (x1, y1, col);
-             if (x1 == x2) break;
-             x1 += sx;
-             cx -= dy;
-             if (cx < 0)
-             {
-                  y1 += sy;
-                  cx += dx;
-             }
-        }
-    }
-    else
-    {
-        for (;;)
-        {
-        	if (x1 >= state->m_ir_xmin && x1 < state->m_ir_xmax && y1 >= state->m_ir_ymin && y1 < state->m_ir_ymax)
-	            draw_pixel (x1, y1, col);
-            if (y1 == y2) break;
-            y1 += sy;
-            cy -= dx;
-            if (cy < 0)
-            {
-                 x1 += sx;
-                 cy += dy;
-            }
-        }
-    }
+	if (dx>=dy)
+	{
+		for (;;)
+		{
+			if (x1 >= state->m_ir_xmin && x1 < state->m_ir_xmax && y1 >= state->m_ir_ymin && y1 < state->m_ir_ymax)
+					draw_pixel (x1, y1, col);
+				if (x1 == x2) break;
+				x1 += sx;
+				cx -= dy;
+				if (cx < 0)
+				{
+					y1 += sy;
+					cx += dx;
+				}
+		}
+	}
+	else
+	{
+		for (;;)
+		{
+			if (x1 >= state->m_ir_xmin && x1 < state->m_ir_xmax && y1 >= state->m_ir_ymin && y1 < state->m_ir_ymax)
+				draw_pixel (x1, y1, col);
+			if (y1 == y2) break;
+			y1 += sy;
+			cy -= dx;
+			if (cy < 0)
+			{
+					x1 += sx;
+					cy += dy;
+			}
+		}
+	}
 }
 
 
-#define ROUND_TO_PIXEL(x)	((x >> 7) - 128)
+#define ROUND_TO_PIXEL(x)   ((x >> 7) - 128)
 
 void irobot_run_video(running_machine &machine)
 {
@@ -249,7 +249,7 @@ void irobot_run_video(running_machine &machine)
 				color = sy & 0x3f;
 				sx = ROUND_TO_PIXEL(sx);
 				sy = ROUND_TO_PIXEL(sy);
-	        	if (sx >= state->m_ir_xmin && sx < state->m_ir_xmax && sy >= state->m_ir_ymin && sy < state->m_ir_ymax)
+				if (sx >= state->m_ir_xmin && sx < state->m_ir_xmax && sy >= state->m_ir_ymin && sy < state->m_ir_ymax)
 					draw_pixel(sx,sy,color);
 				spnt+=2;
 			}//while object

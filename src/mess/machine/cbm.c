@@ -64,25 +64,25 @@ void cbm_common_interrupt( device_t *device )
 	switch(controller1)
 	{
 		case 0x00:
-			value &= ~device->machine().root_device().ioport("JOY1_1B")->read();			/* Joy1 Directions + Button 1 */
+			value &= ~device->machine().root_device().ioport("JOY1_1B")->read();            /* Joy1 Directions + Button 1 */
 			break;
 
 		case 0x01:
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x40)			/* Paddle2 Button */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x40)         /* Paddle2 Button */
 				value &= ~0x08;
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x80)			/* Paddle1 Button */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x80)         /* Paddle1 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x02:
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x02)			/* Mouse Button Left */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x02)         /* Mouse Button Left */
 				value &= ~0x10;
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x01)			/* Mouse Button Right */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x01)         /* Mouse Button Right */
 				value &= ~0x01;
 			break;
 
 		case 0x03:
-			value &= ~(device->machine().root_device().ioport("JOY1_2B")->read() & 0x1f);	/* Joy1 Directions + Button 1 */
+			value &= ~(device->machine().root_device().ioport("JOY1_2B")->read() & 0x1f);   /* Joy1 Directions + Button 1 */
 			break;
 
 		case 0x04:
@@ -106,25 +106,25 @@ void cbm_common_interrupt( device_t *device )
 	switch(controller2)
 	{
 		case 0x00:
-			value &= ~device->machine().root_device().ioport("JOY2_1B")->read();			/* Joy2 Directions + Button 1 */
+			value &= ~device->machine().root_device().ioport("JOY2_1B")->read();            /* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x10:
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x10)			/* Paddle4 Button */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x10)         /* Paddle4 Button */
 				value &= ~0x08;
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x20)			/* Paddle3 Button */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x20)         /* Paddle3 Button */
 				value &= ~0x04;
 			break;
 
 		case 0x20:
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x02)			/* Mouse Button Left */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x02)         /* Mouse Button Left */
 				value &= ~0x10;
-			if (device->machine().root_device().ioport("OTHER")->read() & 0x01)			/* Mouse Button Right */
+			if (device->machine().root_device().ioport("OTHER")->read() & 0x01)         /* Mouse Button Right */
 				value &= ~0x01;
 			break;
 
 		case 0x30:
-			value &= ~(device->machine().root_device().ioport("JOY2_2B")->read() & 0x1f);	/* Joy2 Directions + Button 1 */
+			value &= ~(device->machine().root_device().ioport("JOY2_2B")->read() & 0x1f);   /* Joy2 Directions + Button 1 */
 			break;
 
 		case 0x40:
@@ -149,8 +149,8 @@ void cbm_common_interrupt( device_t *device )
 	/* check if lightpen has been chosen as input: if so, enable crosshair */
 	device->machine().scheduler().timer_set(attotime::zero, FUNC(lightpen_tick));
 
-	set_led_status (device->machine(), 1, device->machine().root_device().ioport("SPECIAL")->read() & 0x40 ? 1 : 0);		/* Shift Lock */
-	set_led_status (device->machine(), 0, device->machine().root_device().ioport("CTRLSEL")->read() & 0x80 ? 1 : 0);		/* Joystick Swap */
+	set_led_status (device->machine(), 1, device->machine().root_device().ioport("SPECIAL")->read() & 0x40 ? 1 : 0);        /* Shift Lock */
+	set_led_status (device->machine(), 0, device->machine().root_device().ioport("CTRLSEL")->read() & 0x80 ? 1 : 0);        /* Joystick Swap */
 }
 
 

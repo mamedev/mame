@@ -192,8 +192,8 @@ WRITE8_DEVICE_HANDLER ( ds1315_w_data )
 static void ds1315_fill_raw_data(device_t *device)
 {
 	/* This routine will (hopefully) call a standard 'C' library routine to get the current
-       date and time and then fill in the raw data struct.
-    */
+	   date and time and then fill in the raw data struct.
+	*/
 
 	system_time systime;
 	ds1315_t *ds1315 = get_token(device);
@@ -202,7 +202,7 @@ static void ds1315_fill_raw_data(device_t *device)
 	/* get the current date/time from the core */
 	device->machine().current_datetime(systime);
 
-	raw[0] = 0;	/* tenths and hundreths of seconds are always zero */
+	raw[0] = 0; /* tenths and hundreths of seconds are always zero */
 	raw[1] = dec_2_bcd(systime.local_time.second);
 	raw[2] = dec_2_bcd(systime.local_time.minute);
 	raw[3] = dec_2_bcd(systime.local_time.hour);
@@ -230,11 +230,11 @@ static void ds1315_fill_raw_data(device_t *device)
 static void ds1315_input_raw_data(device_t *device)
 {
 	/* This routine is called when new date and time has been written to the
-       clock chip. Currently we ignore setting the date and time in the clock
-       chip.
+	   clock chip. Currently we ignore setting the date and time in the clock
+	   chip.
 
-       We always return the host's time when asked.
-    */
+	   We always return the host's time when asked.
+	*/
 }
 
 
@@ -264,5 +264,3 @@ void ds1315_device::device_start()
 {
 	DEVICE_START_NAME( ds1315 )(this);
 }
-
-

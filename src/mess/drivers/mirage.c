@@ -54,23 +54,23 @@
 class mirage_state : public driver_device
 {
 public:
-    mirage_state(const machine_config &mconfig, device_type type, const char *tag)
-    : driver_device(mconfig, type, tag),
-    m_maincpu(*this, "maincpu"),
-    m_fdc(*this, "wd1772")
-    { }
+	mirage_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_fdc(*this, "wd1772")
+	{ }
 
-    required_device<m6809e_device> m_maincpu;
-    required_device<wd1772_t> m_fdc;
+	required_device<m6809e_device> m_maincpu;
+	required_device<wd1772_t> m_fdc;
 
 	virtual void machine_reset();
 
-    int last_sndram_bank;
+	int last_sndram_bank;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-    void fdc_intrq_w(bool state);
-    void fdc_drq_w(bool state);
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 	DECLARE_DRIVER_INIT(mirage);
 	virtual void video_start();
 	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -104,12 +104,12 @@ WRITE_LINE_MEMBER(mirage_state::acia_irq_w)
 
 void mirage_state::fdc_intrq_w(bool state)
 {
-    m_maincpu->set_input_line(INPUT_LINE_NMI, state);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 void mirage_state::fdc_drq_w(bool state)
 {
-    m_maincpu->set_input_line(M6809_IRQ_LINE, state);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 static void mirage_doc_irq(device_t *device, int state)
@@ -138,15 +138,15 @@ void mirage_state::machine_reset()
 }
 
 static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("sndbank")	// 32k window on 128k of wave RAM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM			// main RAM
-    AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("sndbank")  // 32k window on 128k of wave RAM
+	AM_RANGE(0x8000, 0xbfff) AM_RAM         // main RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM
 	AM_RANGE(0xe100, 0xe100) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xe101, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
 	AM_RANGE(0xe200, 0xe2ff) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE(0xe400, 0xe4ff) AM_NOP
 	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("wd1772", wd1772_t, read, write)
-    AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE("es5503", es5503_device, read, write)
+	AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("osrom", 0)
 ADDRESS_MAP_END
 
@@ -282,13 +282,13 @@ const via6522_interface mirage_via =
 
 static ACIA6850_INTERFACE( mirage_acia6850_interface )
 {
-	0,				// tx clock
-	0,				// rx clock
-	DEVCB_NULL,			// rx in
-	DEVCB_NULL,			// rx out
-	DEVCB_NULL,			// cts in
-	DEVCB_NULL,			// rts out
-	DEVCB_NULL,			// dcd in
+	0,              // tx clock
+	0,              // rx clock
+	DEVCB_NULL,         // rx in
+	DEVCB_NULL,         // rx out
+	DEVCB_NULL,         // cts in
+	DEVCB_NULL,         // rts out
+	DEVCB_NULL,         // dcd in
 	DEVCB_DRIVER_LINE_MEMBER(mirage_state, acia_irq_w)
 };
 
@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 
 	MCFG_ACIA6850_ADD("acia6850", mirage_acia6850_interface)
 
-    MCFG_WD1772x_ADD("wd1772", 8000000)
+	MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, mirage_state::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -324,16 +324,16 @@ ROM_END
 DRIVER_INIT_MEMBER(mirage_state,mirage)
 {
 
-    floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
+	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
-    if (floppy)
-    {
-        m_fdc->set_floppy(floppy);
-        m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_intrq_w), this));
-        m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_drq_w), this));
+	if (floppy)
+	{
+		m_fdc->set_floppy(floppy);
+		m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_intrq_w), this));
+		m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_drq_w), this));
 
-        floppy->ss_w(0);
-    }
+		floppy->ss_w(0);
+	}
 
 	m_l_hi = m_r_hi = 9;
 	m_l_segs = m_r_segs = 0;

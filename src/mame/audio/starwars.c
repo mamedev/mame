@@ -120,7 +120,7 @@ READ8_MEMBER(starwars_state::starwars_main_read_r)
 
 READ8_MEMBER(starwars_state::starwars_main_ready_flag_r)
 {
-	return riot6532_porta_in_get(m_riot) & 0xc0;	/* only upper two flag bits mapped */
+	return riot6532_porta_in_get(m_riot) & 0xc0;    /* only upper two flag bits mapped */
 }
 
 static TIMER_CALLBACK( main_callback )

@@ -118,12 +118,12 @@ WRITE16_MEMBER(tatsumi_state::roundup5_text_w)
 
 READ16_MEMBER(tatsumi_state::cyclwarr_videoram0_r)
 {
-	 return m_cyclwarr_videoram0[offset];
+		return m_cyclwarr_videoram0[offset];
 }
 
 READ16_MEMBER(tatsumi_state::cyclwarr_videoram1_r)
 {
-	 return m_cyclwarr_videoram1[offset];
+		return m_cyclwarr_videoram1[offset];
 }
 
 WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram0_w)
@@ -241,11 +241,11 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 	if (!scalex || !scaley) return;
 
 	/*
-    scalex and scaley are 16.16 fixed point numbers
-    1<<15 : shrink to 50%
-    1<<16 : uniform scale
-    1<<17 : double to 200%
-    */
+	scalex and scaley are 16.16 fixed point numbers
+	1<<15 : shrink to 50%
+	1<<16 : uniform scale
+	1<<17 : double to 200%
+	*/
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
@@ -514,44 +514,44 @@ static void draw_sprites(running_machine &machine, _BitmapClass &bitmap, const r
 	for (offs = rambank;offs < rambank + 0x800;offs += 6)
 	{
 		/*
-            Sprite RAM itself uses an index into two ROM tables to actually draw the object.
+		    Sprite RAM itself uses an index into two ROM tables to actually draw the object.
 
-            Sprite RAM format:
+		    Sprite RAM format:
 
-            Word 0: 0xf000 - ?
-                    0x0fff - Index into ROM sprite table
-            Word 1: 0x8000 - X Flip
-                    0x4000 - Y Flip
-                    0x3000 - ?
-                    0x0ff8 - Color
-                    0x0007 - ?
-            Word 2: 0xffff - X position
-            Word 3: 0xffff - Y position
-            Word 4: 0x01ff - Scale
-            Word 5: 0x01ff - Rotation
+		    Word 0: 0xf000 - ?
+		            0x0fff - Index into ROM sprite table
+		    Word 1: 0x8000 - X Flip
+		            0x4000 - Y Flip
+		            0x3000 - ?
+		            0x0ff8 - Color
+		            0x0007 - ?
+		    Word 2: 0xffff - X position
+		    Word 3: 0xffff - Y position
+		    Word 4: 0x01ff - Scale
+		    Word 5: 0x01ff - Rotation
 
-            Sprite ROM table format, alternate lines come from each bank, with the
-            very first line indicating control information:
+		    Sprite ROM table format, alternate lines come from each bank, with the
+		    very first line indicating control information:
 
-            First bank:
-            Byte 0: Y destination offset (in scanlines, unaffected by scale).
-            Byte 1: Always 0?
-            Byte 2: Number of source scanlines to render from (so unaffected by destination scale).
-            Byte 3: Usually 0, sometimes 0x80??
+		    First bank:
+		    Byte 0: Y destination offset (in scanlines, unaffected by scale).
+		    Byte 1: Always 0?
+		    Byte 2: Number of source scanlines to render from (so unaffected by destination scale).
+		    Byte 3: Usually 0, sometimes 0x80??
 
-            Other banks:
-            Byte 0: Width of line in tiles (-1)
-            Byte 1: X offset to start drawing line at (multipled by scale * 8)
-            Bytes 2/3: Tile index to start fetching tiles from (increments per tile).
+		    Other banks:
+		    Byte 0: Width of line in tiles (-1)
+		    Byte 1: X offset to start drawing line at (multipled by scale * 8)
+		    Bytes 2/3: Tile index to start fetching tiles from (increments per tile).
 
-        */
-		y =			spriteram16[offs+3];
-		x =			spriteram16[offs+2];
-		scale =		spriteram16[offs+4] & 0x1ff;
-		color =		spriteram16[offs+1] >> 3 & 0x1ff;
-		flip_x =	spriteram16[offs+1] & 0x8000;
-		flip_y =	spriteram16[offs+1] & 0x4000;
-		rotate =	0;//spriteram16[offs+5]&0x1ff; // Todo:  Turned off for now
+		*/
+		y =         spriteram16[offs+3];
+		x =         spriteram16[offs+2];
+		scale =     spriteram16[offs+4] & 0x1ff;
+		color =     spriteram16[offs+1] >> 3 & 0x1ff;
+		flip_x =    spriteram16[offs+1] & 0x8000;
+		flip_y =    spriteram16[offs+1] & 0x4000;
+		rotate =    0;//spriteram16[offs+5]&0x1ff; // Todo:  Turned off for now
 
 		index = spriteram16[offs];
 
@@ -795,27 +795,27 @@ pos is 11.5 fixed point
 		int palette_byte;//=state->m_roundup_l_ram[visible_line/8];
 
 		/*
-            Each road line consists of up to two sets of 128 pixel data that can be positioned
-            on the x-axis and stretched/compressed on the x-axis.  Any screen pixels to the left
-            of the first set are drawn with pen 0 of the road pixel data.  Any screen pixels to the
-            right of the second set line are drawn with pen 127 of the road pixel data.
+		    Each road line consists of up to two sets of 128 pixel data that can be positioned
+		    on the x-axis and stretched/compressed on the x-axis.  Any screen pixels to the left
+		    of the first set are drawn with pen 0 of the road pixel data.  Any screen pixels to the
+		    right of the second set line are drawn with pen 127 of the road pixel data.
 
-            The road control data is laid out as follows (4 words per screen line, with 2 banks):
+		    The road control data is laid out as follows (4 words per screen line, with 2 banks):
 
-            Word 0: Line shift for 1st set - 13.3 signed fixed point value.
-            Word 1: Line scale - 5.11 fixed point value.  So 0x800 is 1:1, 0x400 is 1:2, etc
-            Word 2: Line shift for 2nd set - 13.3 signed fixed point value.
-            Word 3: ?
+		    Word 0: Line shift for 1st set - 13.3 signed fixed point value.
+		    Word 1: Line scale - 5.11 fixed point value.  So 0x800 is 1:1, 0x400 is 1:2, etc
+		    Word 2: Line shift for 2nd set - 13.3 signed fixed point value.
+		    Word 3: ?
 
-            The scale is shared between both pixel sets.  The 2nd set is only used when the road
-            forks into two between stages.  The 2nd line shift is an offset from the last pixel
-            of the 1st set.  The 2nd line shift uses a different palette bank.
+		    The scale is shared between both pixel sets.  The 2nd set is only used when the road
+		    forks into two between stages.  The 2nd line shift is an offset from the last pixel
+		    of the 1st set.  The 2nd line shift uses a different palette bank.
 
 2nd road uses upper palette - confirmed by water stage.
 offset is from last pixel of first road segment?
 //last pixel of first road is really colour from 2nd road line?
 
-        */
+		*/
 
 		palette_byte=state->m_roundup_l_ram[visible_line/8];
 		pal=4 + ((palette_byte>>(visible_line%8))&1);
@@ -928,9 +928,9 @@ static void update_cluts(running_machine &machine, int fake_palette_offset, int 
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 	/* Object palettes are build from a series of cluts stored in the object roms.
 
-        We update 'Mame palettes' from the clut here in order to simplify the
-        draw routines.  We also note down any uses of the 'shadow' pen (index 255).
-    */
+	    We update 'Mame palettes' from the clut here in order to simplify the
+	    draw routines.  We also note down any uses of the 'shadow' pen (index 255).
+	*/
 	int i;
 	const UINT8* bank1=state->m_rom_clut0;
 	const UINT8* bank2=state->m_rom_clut1;
@@ -963,9 +963,9 @@ static void update_cluts(running_machine &machine, int fake_palette_offset, int 
 static void draw_bg(running_machine &machine, bitmap_rgb32 &dst, tilemap_t *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
 {
 	/*
-        Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
-        from sets of 8 bit palettes!
-    */
+	    Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
+	    from sets of 8 bit palettes!
+	*/
 	const UINT8* tile_cluts = machine.root_device().memregion("gfx4")->base();
 	const bitmap_ind16 &src_bitmap = src->pixmap();
 	int src_y_mask=ysize-1;

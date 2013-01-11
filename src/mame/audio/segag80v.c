@@ -204,22 +204,22 @@ WRITE8_MEMBER(segag80v_state::zektor1_sh_w)
 
 	/* Play fireball sample */
 	if (data & 0x02)
-                samples->start(0, 0);
+				samples->start(0, 0);
 
 	/* Play explosion samples */
 	if (data & 0x04)
-                samples->start(1, 10);
+				samples->start(1, 10);
 	if (data & 0x08)
-                  samples->start(1, 9);
+					samples->start(1, 9);
 	if (data & 0x10)
-                  samples->start(1, 8);
+					samples->start(1, 8);
 
 	/* Play bounce sample */
 	if (data & 0x20)
 	{
-                if (samples->playing(2))
-                        samples->stop(2);
-                samples->start(2, 1);
+				if (samples->playing(2))
+						samples->stop(2);
+				samples->start(2, 1);
 	}
 
 	/* Play lazer sample */
@@ -227,7 +227,7 @@ WRITE8_MEMBER(segag80v_state::zektor1_sh_w)
 	{
 		if (samples->playing(3))
 			samples->stop(3);
-                samples->start(3, 5);
+				samples->start(3, 5);
 	}
 }
 
@@ -238,23 +238,23 @@ WRITE8_MEMBER(segag80v_state::zektor2_sh_w)
 
 	/* Play thrust sample */
 	if (data & 0x0f)
-            samples->start(4, 6);
+			samples->start(4, 6);
 	else
 		samples->stop(4);
 
 	/* Play skitter sample */
 	if (data & 0x10)
-                samples->start(5, 2);
+				samples->start(5, 2);
 
 	/* Play eliminator sample */
 	if (data & 0x20)
-                samples->start(6, 3);
+				samples->start(6, 3);
 
 	/* Play electron samples */
 	if (data & 0x40)
-                samples->start(7, 40);
+				samples->start(7, 40);
 	if (data & 0x80)
-                samples->start(7, 41);
+				samples->start(7, 41);
 }
 
 
@@ -330,4 +330,3 @@ WRITE8_MEMBER(segag80v_state::spacfury2_sh_w)
 		samples->start(0, 7);
 
 }
-

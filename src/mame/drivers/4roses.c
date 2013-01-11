@@ -170,7 +170,7 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_16MHz
+#define MASTER_CLOCK    XTAL_16MHz
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
@@ -201,7 +201,7 @@ public:
 *************************/
 
 static ADDRESS_MAP_START( 4roses_map, AS_PROGRAM, 8, _4roses_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM	// AM_SHARE("nvram")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM // AM_SHARE("nvram")
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -286,7 +286,7 @@ static INPUT_PORTS_START( 4roses )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW2")	/* this bank is x4 DIP switches */
+	PORT_START("SW2")   /* this bank is x4 DIP switches */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -351,10 +351,10 @@ static const ay8910_interface ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,				/* portA in  */
-	DEVCB_NULL,				/* portB in  */
-	DEVCB_NULL,				/* portA out */
-	DEVCB_NULL				/* portB out */
+	DEVCB_NULL,             /* portA in  */
+	DEVCB_NULL,             /* portB in  */
+	DEVCB_NULL,             /* portA out */
+	DEVCB_NULL              /* portB out */
 };
 
 
@@ -364,16 +364,16 @@ static const ay8910_interface ay8910_intf =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -383,7 +383,7 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
+	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(4roses_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4roses_state,  nmi_line_pulse)
 
@@ -394,8 +394,8 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* guess. taken from funworld games */
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* guess. taken from funworld games */
+	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* guess. taken from funworld games */
+	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* guess. taken from funworld games */
 	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
 
 	MCFG_GFXDECODE(4roses)
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz, guess */
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
@@ -420,36 +420,36 @@ MACHINE_CONFIG_END
 *************************/
 
 ROM_START( 4roses )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "4.10.u32", 0x00000, 0x10000, CRC(e94440e9) SHA1(b2f81ba79f1f40ed35e45fd80c17eb8529ccdb4c) )
 
-	ROM_REGION( 0x0400,  "mcu", 0 )	/* protected... no dump available */
+	ROM_REGION( 0x0400,  "mcu", 0 ) /* protected... no dump available */
 	ROM_LOAD( "ep87c750ebpn_no_dump.u41", 0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "30.u17", 0x00000, 0x80000, CRC(daefacc2) SHA1(5896e9da06fde39770fcdc585881b8c689b34369) )
 
 	ROM_REGION( 0x18000, "proms", 0 )
-	ROM_LOAD( "20.u43",	0x00000, 0x08000, CRC(f206b4d3) SHA1(dfee226a9e01ddacf09995ec4e027b0ed4dffe7e) )
-	ROM_LOAD( "10.u39",	0x08000, 0x10000, CRC(87dcf9c5) SHA1(b289527b8d9db1e91adf85b53233415c6969f4d4) )
+	ROM_LOAD( "20.u43", 0x00000, 0x08000, CRC(f206b4d3) SHA1(dfee226a9e01ddacf09995ec4e027b0ed4dffe7e) )
+	ROM_LOAD( "10.u39", 0x08000, 0x10000, CRC(87dcf9c5) SHA1(b289527b8d9db1e91adf85b53233415c6969f4d4) )
 
 	ROM_REGION( 0x02dd, "plds", 0 )
 	ROM_LOAD( "palce22v10h.u29", 0x0000, 0x02dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
 ROM_END
 
 ROM_START( 4rosesa )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* encrypted program ROM...*/
 	ROM_LOAD( "4.u15", 0x00000, 0x10000, CRC(66bb5b67) SHA1(438371c3918f0a285cb19caa650739df9fb24800) )
 
-	ROM_REGION( 0x0400,  "mcu", 0 )	/* protected... no dump available */
+	ROM_REGION( 0x0400,  "mcu", 0 ) /* protected... no dump available */
 	ROM_LOAD( "ep87c750ebpn_no_dump.u41", 0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "30.u17", 0x00000, 0x80000, CRC(daefacc2) SHA1(5896e9da06fde39770fcdc585881b8c689b34369) )
 
 	ROM_REGION( 0x20000, "proms", 0 )
-	ROM_LOAD( "20.ub5",	0x00000, 0x10000, CRC(01cc8b15) SHA1(f8e1fa7c0a4ae35debf8eecde31471049308cd60) )
-	ROM_LOAD( "10.ua5",	0x10000, 0x10000, CRC(87dcf9c5) SHA1(b289527b8d9db1e91adf85b53233415c6969f4d4) )
+	ROM_LOAD( "20.ub5", 0x00000, 0x10000, CRC(01cc8b15) SHA1(f8e1fa7c0a4ae35debf8eecde31471049308cd60) )
+	ROM_LOAD( "10.ua5", 0x10000, 0x10000, CRC(87dcf9c5) SHA1(b289527b8d9db1e91adf85b53233415c6969f4d4) )
 
 	ROM_REGION( 0x02dd, "plds", 0 )
 	ROM_LOAD( "palce22v10h.u29", 0x0000, 0x02dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )

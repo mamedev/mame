@@ -72,9 +72,9 @@ public:
 WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 {
 	/*
-     paletteram_xxxxBBBBGGGGRRRR_byte_be_w
-     but... each palette has 8 colors only, not 16 as expected...
-    */
+	 paletteram_xxxxBBBBGGGGRRRR_byte_be_w
+	 but... each palette has 8 colors only, not 16 as expected...
+	*/
 
 	int i,j,a,b;
 	m_generic_paletteram_8[offset]=data;
@@ -239,7 +239,7 @@ static const gfx_layout charlayout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( vroulet )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,	0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0, 32 )
 GFXDECODE_END
 
 /* Sound Interface */
@@ -262,22 +262,22 @@ WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_a_w),			/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_b_w),			/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_c_w)			/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_a_w),         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_b_w),         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(vroulet_state,ppi8255_c_w)          /* Port C write */
 };
 
 
@@ -285,7 +285,7 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 
 static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	//???
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   //???
 	MCFG_CPU_PROGRAM_MAP(vroulet_map)
 	MCFG_CPU_IO_MAP(vroulet_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)

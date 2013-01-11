@@ -141,10 +141,10 @@ Find lamps/reels after UPD changes.
  *
  *************************************/
 
-#define DUART_CLOCK 	XTAL_3_6864MHz
-#define PIXEL_CLOCK		0
-#define MASTER_CLOCK	XTAL_16MHz
-#define SOUND_CLOCK		XTAL_11_0592MHz
+#define DUART_CLOCK     XTAL_3_6864MHz
+#define PIXEL_CLOCK     0
+#define MASTER_CLOCK    XTAL_16MHz
+#define SOUND_CLOCK     XTAL_11_0592MHz
 
 /*************************************
  *
@@ -153,7 +153,7 @@ Find lamps/reels after UPD changes.
  *************************************/
 
 
-#define VREG(a)		i82716.r[a]
+#define VREG(a)     i82716.r[a]
 
 enum
 {
@@ -175,42 +175,42 @@ enum
 	HVCONST3
 };
 
-#define	VCR0_UCF			0x0001
-#define VCR0_DEI			0x0002
-#define VCR0_SAB			0x0004
-#define VCR0_DEN			0x0008
-#define VCR0_HRS			0x0010
-#define VCR0_DOF			0x0020
+#define VCR0_UCF            0x0001
+#define VCR0_DEI            0x0002
+#define VCR0_SAB            0x0004
+#define VCR0_DEN            0x0008
+#define VCR0_HRS            0x0010
+#define VCR0_DOF            0x0020
 
-#define VCR0_DS_MASK		0x00c0
+#define VCR0_DS_MASK        0x00c0
 #define VCR0_DS_SHIFT       6
-#define VCR0_BLINK_MASK		0x1f00
+#define VCR0_BLINK_MASK     0x1f00
 #define VCR0_BLINK_SHIFT    8
-#define VCR0_DUTY_MASK		0xe000
+#define VCR0_DUTY_MASK      0xe000
 #define VCR0_DUTY_SHIFT     13
 
 static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
-#define DRAM_BANK_SEL		(banks[(VREG(DSBA) >> 7) & 3])
+#define DRAM_BANK_SEL       (banks[(VREG(DSBA) >> 7) & 3])
 
 struct i82716_t
 {
-	UINT16	r[16];
-	UINT16	*dram;
+	UINT16  r[16];
+	UINT16  *dram;
 
-	UINT8	*line_buf;	// there's actually two
+	UINT8   *line_buf;  // there's actually two
 };
 
 
 struct i8279_t
 {
-	UINT8	command;
-	UINT8	mode;
-	UINT8	prescale;
-	UINT8	inhibit;
-	UINT8	clear;
-	UINT8	fifo[8];
-	UINT8	ram[16];
+	UINT8   command;
+	UINT8   mode;
+	UINT8   prescale;
+	UINT8   inhibit;
+	UINT8   clear;
+	UINT8   fifo[8];
+	UINT8   ram[16];
 };
 
 class maygayv1_state : public driver_device
@@ -339,10 +339,10 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 			// Draw on this line?
 			if ( !BIT(slmask, obj) )
 			{
-				UINT32	objbase, trans, width;
-				INT32	x, xpos;
-				UINT16	w0, w1, w2;
-				UINT16	*objptr;
+				UINT32  objbase, trans, width;
+				INT32   x, xpos;
+				UINT16  w0, w1, w2;
+				UINT16  *objptr;
 				UINT8 *bmpptr; // ?
 
 				/* Get object table entry words */
@@ -609,24 +609,24 @@ WRITE16_MEMBER(maygayv1_state::maygay_8279_w)
 		{
 			/* command 0: set mode */
 			/*
-                Display modes:
+			    Display modes:
 
-                00 = 8 x 8-bit character display -- left entry
-                01 = 16 x 8-bit character display -- left entry
-                10 = 8 x 8-bit character display -- right entry
-                11 = 16 x 8-bit character display -- right entry
+			    00 = 8 x 8-bit character display -- left entry
+			    01 = 16 x 8-bit character display -- left entry
+			    10 = 8 x 8-bit character display -- right entry
+			    11 = 16 x 8-bit character display -- right entry
 
-                Keyboard modes:
+			    Keyboard modes:
 
-                000 = Encoded scan keyboard -- 2 key lockout
-                001 = Decoded scan keyboard -- 2 key lockout
-                010 = Encoded scan keyboard -- N-key rollover
-                011 = Decoded scan keyboard -- N-key rollover
-                100 = Encoded scan sensor matrix
-                101 = Decoded scan sensor matrix
-                110 = Strobed input, encoded display scan
-                111 = Strobed input, decoded display scan
-            */
+			    000 = Encoded scan keyboard -- 2 key lockout
+			    001 = Decoded scan keyboard -- 2 key lockout
+			    010 = Encoded scan keyboard -- N-key rollover
+			    011 = Decoded scan keyboard -- N-key rollover
+			    100 = Encoded scan sensor matrix
+			    101 = Decoded scan sensor matrix
+			    110 = Strobed input, encoded display scan
+			    111 = Strobed input, decoded display scan
+			*/
 			case 0x00:
 				logerror("8279: display mode = %d, keyboard mode = %d\n", (data >> 3) & 3, data & 7);
 				i8279.mode = data & 0x1f;
@@ -737,7 +737,7 @@ READ8_MEMBER(maygayv1_state::mcu_r)
 		case 1:
 		{
 			if ( !BIT(m_p3, 4) )
-				return (ioport("REEL")->read());	// Reels???
+				return (ioport("REEL")->read());    // Reels???
 			else
 				return 0;
 		}
@@ -793,34 +793,34 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( screenpl )
 	PORT_START("STROBE1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW01")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "DSW02")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "DSW03")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "DSW04")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Stake selection?")
-	PORT_DIPSETTING(	0x10, "5p" )
-	PORT_DIPSETTING(	0x00, "10p" )
+	PORT_DIPSETTING(    0x10, "5p" )
+	PORT_DIPSETTING(    0x00, "10p" )
 	PORT_DIPNAME( 0x20, 0x20, "DSW06")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "DSW07")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "DSW08")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("STROBE2")
 	PORT_DIPNAME( 0x01, 0x01, "Test")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STROBE3")
@@ -838,46 +838,46 @@ static INPUT_PORTS_START( screenpl )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green")
 	PORT_DIPNAME( 0x08, 0x08, "DSW34")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "DSW35")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Jackpot Selection")
-	PORT_DIPSETTING(	0x20, "600p" )
-	PORT_DIPSETTING(	0x00, "300p" )
+	PORT_DIPSETTING(    0x20, "600p" )
+	PORT_DIPSETTING(    0x00, "300p" )
 	PORT_DIPNAME( 0x40, 0x40, "Reset?")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Cash door")
-	PORT_DIPSETTING(	0x80, "Open"   )
-	PORT_DIPSETTING(	0x00, "Closed" )
+	PORT_DIPSETTING(    0x80, "Open"   )
+	PORT_DIPSETTING(    0x00, "Closed" )
 
 	PORT_START("STROBE5")
 	PORT_DIPNAME( 0x01, 0x01, "DSW41")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Re-fill key")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "DSW43")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "DSW44")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "DSW45")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "DSW46")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "DSW47")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "DSW48")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("STROBE6")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -895,29 +895,29 @@ static INPUT_PORTS_START( screenpl )
 
 	PORT_START("REEL")
 	PORT_DIPNAME( 0x01, 0x00, "REEL 1")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "REEL 2")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "REEL 3")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "REEL 4")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "MCU DIP1")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "MCU DIP2")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "MCU DIP3")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "MCU DIP4")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -987,18 +987,18 @@ WRITE8_MEMBER(maygayv1_state::b_writ)
 /* U25 ST 2 9148 EF68B21P */
 static const pia6821_interface pia_intf =
 {
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),		/* port A in */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),		/* port A out */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),     /* port A in */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),     /* port A out */
+	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -1423,15 +1423,15 @@ GAME( 1991, screenp3a,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, RO
 GAME( 1991, screenp4 ,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. ?.?)",  GAME_FLAGS )
 
 // incomplete sets
-GAME( 199?, mv1bon	, 0			,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Believe It Or Not (Maygay, MV1 Video)",  GAME_FLAGS )
-GAME( 199?, mv1cpc	, 0			,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1cpca	, mv1cpc	,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1cpcb	, mv1cpc	,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 3)",  GAME_FLAGS )
-GAME( 199?, mv1cwq	, 0			,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1cwqa	, mv1cwq	,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1guac	, 0			,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1guaca, mv1guac	,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1sfx	, 0			,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1sfxa	, mv1sfx	,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1sfx2	, 0			,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects V2 (Maygay, MV1 Video)",  GAME_FLAGS )
-GAME( 199?, mv1wc	, 0			,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "World Cup (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1bon  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Believe It Or Not (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1cpc  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1cpca , mv1cpc    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1cpcb , mv1cpc    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 3)",  GAME_FLAGS )
+GAME( 199?, mv1cwq  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1cwqa , mv1cwq    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1guac , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1guaca, mv1guac   ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1sfx  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1sfxa , mv1sfx    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1sfx2 , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects V2 (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1wc   , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "World Cup (Maygay, MV1 Video)",  GAME_FLAGS )

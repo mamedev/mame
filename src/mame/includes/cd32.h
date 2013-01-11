@@ -15,7 +15,7 @@ class cd32_state : public amiga_state
 public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag),
-		  m_microtouch(*this, "microtouch")
+			m_microtouch(*this, "microtouch")
 	{
 	}
 

@@ -28,8 +28,8 @@
 
 struct machine_entry
 {
-	machine_entry *		next;
-	running_machine *	machine;
+	machine_entry *     next;
+	running_machine *   machine;
 };
 
 

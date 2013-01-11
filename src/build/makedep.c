@@ -50,7 +50,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define HASH_SIZE		193
+#define HASH_SIZE       193
 
 
 /***************************************************************************
@@ -59,24 +59,24 @@
 
 struct include_path
 {
-	include_path *	next;
-	astring 		path;
+	include_path *  next;
+	astring         path;
 };
 
 
 struct exclude_path
 {
-	exclude_path *	next;
-	astring 		path;
-	int				pathlen;
-	UINT8			recursive;
+	exclude_path *  next;
+	astring         path;
+	int             pathlen;
+	UINT8           recursive;
 };
 
 
 struct list_entry
 {
-	list_entry *	next;
-	astring 		name;
+	list_entry *    next;
+	astring         name;
 };
 
 
@@ -84,15 +84,15 @@ struct file_entry;
 
 struct dependency
 {
-	dependency *	next;
-	file_entry *	file;
+	dependency *    next;
+	file_entry *    file;
 };
 
 
 struct file_entry
 {
-	astring			name;
-	dependency *	deplist;
+	astring         name;
+	dependency *    deplist;
 };
 
 typedef tagmap_t<UINT8> dependency_map;

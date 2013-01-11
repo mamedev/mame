@@ -270,9 +270,9 @@ static INPUT_PORTS_START( xtheball )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ))
 
 	/* service mode is funky:
-        hit F2 to enter bookkeeping mode; hit service1 (9) to exit
-        hold service 1 (9) and hit F2 to enter test mode; hit service2 (0) to exit
-    */
+	    hit F2 to enter bookkeeping mode; hit service1 (9) to exit
+	    hold service 1 (9) and hit F2 to enter test mode; hit service2 (0) to exit
+	*/
 	PORT_START("COIN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -314,15 +314,15 @@ INPUT_PORTS_END
 
 static const tms34010_config tms_config =
 {
-	FALSE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	10000000,						/* pixel clock */
-	1,								/* pixels per clock */
-	NULL,							/* scanline callback (indexed16) */
-	xtheball_scanline_update,		/* scanline callback (rgb32) */
-	NULL,							/* generate interrupt */
-	xtheball_to_shiftreg,			/* write to shiftreg function */
-	xtheball_from_shiftreg			/* read from shiftreg function */
+	FALSE,                          /* halt on reset */
+	"screen",                       /* the screen operated on */
+	10000000,                       /* pixel clock */
+	1,                              /* pixels per clock */
+	NULL,                           /* scanline callback (indexed16) */
+	xtheball_scanline_update,       /* scanline callback (rgb32) */
+	NULL,                           /* generate interrupt */
+	xtheball_to_shiftreg,           /* write to shiftreg function */
+	xtheball_from_shiftreg          /* read from shiftreg function */
 };
 
 
@@ -367,11 +367,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( xtheball )
-	ROM_REGION16_LE( 0x10000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x10000, "user1", 0 )  /* 34010 code */
 	ROM_LOAD16_BYTE( "aces18-lo.ic13",  0x000000, 0x8000, CRC(c0e80004) SHA1(d79c2e7301857148674fffad349c7a2a98fa1ee2) )
 	ROM_LOAD16_BYTE( "aces18-hi.ic19",  0x000001, 0x8000, CRC(5a682f92) SHA1(ed77c02cbdcff9eac32760cee67e3a784efacac7) )
 
-	ROM_REGION16_LE( 0x300000, "user2", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x300000, "user2", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "xtb-ic6.bin", 0x000000, 0x40000, CRC(a3cc01b8) SHA1(49d42bb17c314609f371df7d7ace57e54fdf6335) )
 	ROM_LOAD16_BYTE( "xtb-ic7.bin", 0x000001, 0x40000, CRC(8dfa6c1b) SHA1(a32940b3f9501a44e1d1ef1628f8a64b32aa2183) )
 	ROM_LOAD16_BYTE( "xtb-1l.ic8",  0x100000, 0x80000, CRC(df52c00f) SHA1(9a89d780ad394b55ce9540a5743bbe571543288f) )

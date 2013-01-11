@@ -99,9 +99,9 @@ static void CX4_op00_00(running_machine &machine)
 					}
 				}
 			}
-    	}
-    	else if(sprcount > 0)
-    	{
+		}
+		else if(sprcount > 0)
+		{
 			cx4.ram[oamptr    ] = (UINT8)sprx;
 			cx4.ram[oamptr + 1] = (UINT8)spry;
 			cx4.ram[oamptr + 2] = sprname;

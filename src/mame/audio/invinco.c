@@ -7,12 +7,12 @@
 #include "includes/vicdual.h"
 
 /* output port 0x02 definitions - sound effect drive outputs */
-#define OUT_PORT_2_SAUCER		0x04
-#define OUT_PORT_2_MOVE1		0x08
-#define OUT_PORT_2_MOVE2		0x10
-#define OUT_PORT_2_FIRE			0x20
-#define OUT_PORT_2_INVHIT		0x40
-#define OUT_PORT_2_SHIPHIT		0x80
+#define OUT_PORT_2_SAUCER       0x04
+#define OUT_PORT_2_MOVE1        0x08
+#define OUT_PORT_2_MOVE2        0x10
+#define OUT_PORT_2_FIRE         0x20
+#define OUT_PORT_2_INVHIT       0x40
+#define OUT_PORT_2_SHIPHIT      0x80
 
 
 #define PLAY(samp,id,loop)      samp->start( id, id, loop )
@@ -29,8 +29,8 @@ static const char *const invinco_sample_names[] =
 	"fire",
 	"invhit",
 	"shiphit",
-	"move3",	/* currently not used */
-	"move4",	/* currently not used */
+	"move3",    /* currently not used */
+	"move4",    /* currently not used */
 	0
 };
 

@@ -54,7 +54,7 @@ void mrdo_state::palette_init()
 	const int pull = 220;
 	float pot[16];
 	int weight[16];
-	const float potadjust = 0.7f;	/* diode voltage drop */
+	const float potadjust = 0.7f;   /* diode voltage drop */
 
 	for (i = 0x0f; i >= 0; i--)
 	{
@@ -118,9 +118,9 @@ void mrdo_state::palette_init()
 		UINT8 ctabentry = color_prom[(i - 0x100) & 0x1f];
 
 		if ((i - 0x100) & 0x20)
-			ctabentry >>= 4;		/* high 4 bits are for sprite color n + 8 */
+			ctabentry >>= 4;        /* high 4 bits are for sprite color n + 8 */
 		else
-			ctabentry &= 0x0f;	/* low 4 bits are for sprite color n */
+			ctabentry &= 0x0f;  /* low 4 bits are for sprite color n */
 
 		colortable_entry_set_value(machine().colortable, i, ctabentry + ((ctabentry & 0x0c) << 3));
 	}

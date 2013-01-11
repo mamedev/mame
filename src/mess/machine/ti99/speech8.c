@@ -14,7 +14,7 @@
 #include "speech8.h"
 #include "sound/wave.h"
 
-#define TMS5220_ADDRESS_MASK 0x3FFFFUL	/* 18-bit mask for tms5220 address */
+#define TMS5220_ADDRESS_MASK 0x3FFFFUL  /* 18-bit mask for tms5220 address */
 
 #define VERBOSE 1
 #define LOG logerror
@@ -72,7 +72,7 @@ READ8Z_MEMBER( ti998_spsyn_device::readz )
 {
 	if ((offset & m_select_mask)==m_select_value)
 	{
-		machine().device("maincpu")->execute().adjust_icount(-(18+3));		/* this is just a minimum, it can be more */
+		machine().device("maincpu")->execute().adjust_icount(-(18+3));      /* this is just a minimum, it can be more */
 		*value = m_vsp->read(space, offset, 0xff) & 0xff;
 		if (VERBOSE>4) LOG("speech8: read value = %02x\n", *value);
 	}
@@ -85,7 +85,7 @@ WRITE8_MEMBER( ti998_spsyn_device::write )
 {
 	if ((offset & m_select_mask)==(m_select_value | 0x0400))
 	{
-		machine().device("maincpu")->execute().adjust_icount(-(54+3));		/* this is just an approx. minimum, it can be much more */
+		machine().device("maincpu")->execute().adjust_icount(-(54+3));      /* this is just an approx. minimum, it can be much more */
 
 		/* RN: the stupid design of the tms5220 core means that ready is cleared */
 		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
@@ -118,7 +118,7 @@ READ8_MEMBER( ti998_spsyn_device::spchrom_read )
 	int count = offset;
 
 	if (m_load_pointer != 0)
-	{	// first read after load address is ignored
+	{   // first read after load address is ignored
 		m_load_pointer = 0;
 		count--;
 	}
@@ -189,12 +189,12 @@ WRITE8_MEMBER( ti998_spsyn_device::spchrom_read_and_branch )
 */
 static const tms52xx_config ti99_8_tms5200interface =
 {
-	DEVCB_NULL,						// no IRQ callback
+	DEVCB_NULL,                     // no IRQ callback
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti998_spsyn_device, speech8_ready),
 
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti998_spsyn_device, spchrom_read),				// speech ROM read handler
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti998_spsyn_device, spchrom_load_address),		// speech ROM load address handler
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti998_spsyn_device, spchrom_read_and_branch)	// speech ROM read and branch handler
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti998_spsyn_device, spchrom_read),               // speech ROM read handler
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti998_spsyn_device, spchrom_load_address),       // speech ROM load address handler
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti998_spsyn_device, spchrom_read_and_branch) // speech ROM read and branch handler
 };
 
 /**************************************************************************/
@@ -258,4 +258,3 @@ const rom_entry *ti998_spsyn_device::device_rom_region() const
 	return ROM_NAME( ti998_speech );
 }
 const device_type TI99_SPEECH8 = &device_creator<ti998_spsyn_device>;
-

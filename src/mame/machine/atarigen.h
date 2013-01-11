@@ -49,10 +49,10 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ATARI_CLOCK_14MHz	XTAL_14_31818MHz
-#define ATARI_CLOCK_20MHz	XTAL_20MHz
-#define ATARI_CLOCK_32MHz	XTAL_32MHz
-#define ATARI_CLOCK_50MHz	XTAL_50MHz
+#define ATARI_CLOCK_14MHz   XTAL_14_31818MHz
+#define ATARI_CLOCK_20MHz   XTAL_20MHz
+#define ATARI_CLOCK_32MHz   XTAL_32MHz
+#define ATARI_CLOCK_50MHz   XTAL_50MHz
 
 
 
@@ -62,27 +62,27 @@
 
 struct atarivc_state_desc
 {
-	UINT32 latch1;							/* latch #1 value (-1 means disabled) */
-	UINT32 latch2;							/* latch #2 value (-1 means disabled) */
-	UINT32 rowscroll_enable;				/* true if row-scrolling is enabled */
-	UINT32 palette_bank;					/* which palette bank is enabled */
-	UINT32 pf0_xscroll;						/* playfield 1 xscroll */
-	UINT32 pf0_xscroll_raw;					/* playfield 1 xscroll raw value */
-	UINT32 pf0_yscroll;						/* playfield 1 yscroll */
-	UINT32 pf1_xscroll;						/* playfield 2 xscroll */
-	UINT32 pf1_xscroll_raw;					/* playfield 2 xscroll raw value */
-	UINT32 pf1_yscroll;						/* playfield 2 yscroll */
-	UINT32 mo_xscroll;						/* sprite xscroll */
-	UINT32 mo_yscroll;						/* sprite xscroll */
+	UINT32 latch1;                          /* latch #1 value (-1 means disabled) */
+	UINT32 latch2;                          /* latch #2 value (-1 means disabled) */
+	UINT32 rowscroll_enable;                /* true if row-scrolling is enabled */
+	UINT32 palette_bank;                    /* which palette bank is enabled */
+	UINT32 pf0_xscroll;                     /* playfield 1 xscroll */
+	UINT32 pf0_xscroll_raw;                 /* playfield 1 xscroll raw value */
+	UINT32 pf0_yscroll;                     /* playfield 1 yscroll */
+	UINT32 pf1_xscroll;                     /* playfield 2 xscroll */
+	UINT32 pf1_xscroll_raw;                 /* playfield 2 xscroll raw value */
+	UINT32 pf1_yscroll;                     /* playfield 2 yscroll */
+	UINT32 mo_xscroll;                      /* sprite xscroll */
+	UINT32 mo_yscroll;                      /* sprite xscroll */
 };
 
 
 struct atarigen_screen_timer
 {
 	screen_device *screen;
-	emu_timer *			scanline_interrupt_timer;
-	emu_timer *			scanline_timer;
-	emu_timer *			atarivc_eof_update_timer;
+	emu_timer *         scanline_interrupt_timer;
+	emu_timer *         scanline_timer;
+	emu_timer *         atarivc_eof_update_timer;
 };
 
 
@@ -211,20 +211,20 @@ public:
 
 	// vector and early raster EAROM interface
 	optional_device<er2055_device> m_earom;
-	UINT8				m_earom_data;
-	UINT8				m_earom_control;
+	UINT8               m_earom_data;
+	UINT8               m_earom_control;
 
 	optional_shared_ptr<UINT16> m_eeprom;
 	optional_shared_ptr<UINT32> m_eeprom32;
 
-	UINT8				m_scanline_int_state;
-	UINT8				m_sound_int_state;
-	UINT8				m_video_int_state;
+	UINT8               m_scanline_int_state;
+	UINT8               m_sound_int_state;
+	UINT8               m_video_int_state;
 
-	const UINT16 *		m_eeprom_default;
+	const UINT16 *      m_eeprom_default;
 
-	UINT8				m_cpu_to_sound_ready;
-	UINT8				m_sound_to_cpu_ready;
+	UINT8               m_cpu_to_sound_ready;
+	UINT8               m_sound_to_cpu_ready;
 
 	optional_shared_ptr<UINT16> m_playfield;
 	optional_shared_ptr<UINT16> m_playfield2;
@@ -237,43 +237,43 @@ public:
 	optional_shared_ptr<UINT32> m_playfield32;
 	optional_shared_ptr<UINT32> m_alpha32;
 
-	tilemap_t *				m_playfield_tilemap;
-	tilemap_t *				m_playfield2_tilemap;
-	tilemap_t *				m_alpha_tilemap;
-	tilemap_t *				m_alpha2_tilemap;
+	tilemap_t *             m_playfield_tilemap;
+	tilemap_t *             m_playfield2_tilemap;
+	tilemap_t *             m_alpha_tilemap;
+	tilemap_t *             m_alpha2_tilemap;
 
 	optional_shared_ptr<UINT16> m_atarivc_data;
 	optional_shared_ptr<UINT16> m_atarivc_eof_data;
-	atarivc_state_desc		m_atarivc_state;
+	atarivc_state_desc      m_atarivc_state;
 
 	/* internal state */
-	bool					m_eeprom_unlocked;
+	bool                    m_eeprom_unlocked;
 
-	UINT8					m_slapstic_num;
-	UINT16 *				m_slapstic;
-	UINT8					m_slapstic_bank;
-	dynamic_buffer			m_slapstic_bank0;
-	offs_t					m_slapstic_last_pc;
-	offs_t					m_slapstic_last_address;
-	offs_t					m_slapstic_base;
-	offs_t					m_slapstic_mirror;
+	UINT8                   m_slapstic_num;
+	UINT16 *                m_slapstic;
+	UINT8                   m_slapstic_bank;
+	dynamic_buffer          m_slapstic_bank0;
+	offs_t                  m_slapstic_last_pc;
+	offs_t                  m_slapstic_last_address;
+	offs_t                  m_slapstic_base;
+	offs_t                  m_slapstic_mirror;
 
 	optional_device<m6502_device> m_sound_cpu;
-	UINT8					m_cpu_to_sound;
-	UINT8					m_sound_to_cpu;
-	UINT8					m_timed_int;
-	UINT8					m_ym2151_int;
+	UINT8                   m_cpu_to_sound;
+	UINT8                   m_sound_to_cpu;
+	UINT8                   m_timed_int;
+	UINT8                   m_ym2151_int;
 
-	UINT32					m_scanlines_per_callback;
+	UINT32                  m_scanlines_per_callback;
 
-	UINT32					m_actual_vc_latch0;
-	UINT32					m_actual_vc_latch1;
-	UINT8					m_atarivc_playfields;
+	UINT32                  m_actual_vc_latch0;
+	UINT32                  m_actual_vc_latch1;
+	UINT8                   m_atarivc_playfields;
 
-	UINT32					m_playfield_latch;
-	UINT32					m_playfield2_latch;
+	UINT32                  m_playfield_latch;
+	UINT32                  m_playfield2_latch;
 
-	atarigen_screen_timer	m_screen_timer[2];
+	atarigen_screen_timer   m_screen_timer[2];
 };
 
 

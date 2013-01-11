@@ -47,7 +47,7 @@ class mpu5_state : public driver_device
 public:
 	mpu5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 	UINT32* m_cpuregion;
 	UINT32* m_mainram;
@@ -123,7 +123,7 @@ void mpu5_state::machine_start()
 
 
 MACHINE_CONFIG_START( mpu5, mpu5_state )
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)	 // ?
+	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 
 

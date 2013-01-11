@@ -189,7 +189,7 @@ INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4) /* 3.5795 MHz */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)
 
 	/* video hardware */

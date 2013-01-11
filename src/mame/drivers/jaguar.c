@@ -343,9 +343,9 @@ Notes:
 #include "sound/dac.h"
 #include "machine/eeprom.h"
 
-#define COJAG_CLOCK			XTAL_52MHz
-#define R3000_CLOCK			XTAL_40MHz
-#define M68K_CLOCK			XTAL_50MHz
+#define COJAG_CLOCK         XTAL_52MHz
+#define R3000_CLOCK         XTAL_40MHz
+#define M68K_CLOCK          XTAL_50MHz
 
 static QUICKLOAD_LOAD( jaguar );
 static DEVICE_START( jaguar_cart );
@@ -382,7 +382,7 @@ void jaguar_state::machine_reset()
 	/* 68020 only: copy the interrupt vectors into RAM */
 	if (!m_is_r3000)
 	{
-		memcpy(m_shared_ram, m_rom_base, 0x400);	// do not increase, or Doom breaks
+		memcpy(m_shared_ram, m_rom_base, 0x400);    // do not increase, or Doom breaks
 		m_main_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
@@ -510,7 +510,7 @@ WRITE32_MEMBER(jaguar_state::eeprom_w)
 {
 	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	m_eeprom_bit_count++;
-	if (m_eeprom_bit_count != 9)		/* kill extra bit at end of address */
+	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
 	{
 		eeprom->write_bit(data >> 31);
 		eeprom->set_clock_line(PULSE_LINE);
@@ -520,16 +520,16 @@ WRITE32_MEMBER(jaguar_state::eeprom_w)
 READ32_MEMBER(jaguar_state::eeprom_clk)
 {
 	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	eeprom->set_clock_line(PULSE_LINE);	/* get next bit when reading */
+	eeprom->set_clock_line(PULSE_LINE); /* get next bit when reading */
 	return 0;
 }
 
 READ32_MEMBER(jaguar_state::eeprom_cs)
 {
 	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	eeprom->set_cs_line(ASSERT_LINE);	/* must do at end of an operation */
-	eeprom->set_cs_line(CLEAR_LINE);		/* enable chip for next operation */
-	eeprom->write_bit(1);			/* write a start bit */
+	eeprom->set_cs_line(ASSERT_LINE);   /* must do at end of an operation */
+	eeprom->set_cs_line(CLEAR_LINE);        /* enable chip for next operation */
+	eeprom->write_bit(1);           /* write a start bit */
 	eeprom->set_clock_line(PULSE_LINE);
 	m_eeprom_bit_count = 0;
 	return 0;
@@ -546,11 +546,11 @@ READ32_MEMBER(jaguar_state::eeprom_cs)
 READ32_MEMBER(jaguar_state::misc_control_r)
 {
 	/*  D7    = board reset (low)
-        D6    = audio must & reset (high)
-        D5    = volume control data (invert on write)
-        D4    = volume control clock
-        D3-D1 = audio bank 2-0
-        D0    = shared memory select (0=XBUS) */
+	    D6    = audio must & reset (high)
+	    D5    = volume control data (invert on write)
+	    D4    = volume control clock
+	    D3-D1 = audio bank 2-0
+	    D0    = shared memory select (0=XBUS) */
 
 	return m_misc_control_data ^ 0x20;
 }
@@ -561,11 +561,11 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 	logerror("%08X:misc_control_w(%02X)\n", space.device().safe_pcbase(), data);
 
 	/*  D7    = board reset (low)
-        D6    = audio must & reset (high)
-        D5    = volume control data (invert on write)
-        D4    = volume control clock
-        D3-D1 = audio bank 2-0
-        D0    = shared memory select (0=XBUS) */
+	    D6    = audio must & reset (high)
+	    D5    = volume control data (invert on write)
+	    D4    = volume control clock
+	    D3-D1 = audio bank 2-0
+	    D0    = shared memory select (0=XBUS) */
 
 	/* handle resetting the DSPs */
 	if (!(data & 0x80))
@@ -663,18 +663,18 @@ READ32_MEMBER(jaguar_state::joystick_r)
 	};
 
 	/*
-     *   16        12        8         4         0
-     *   +---------+---------+---------^---------+
-     *   |  pad 1  |  pad 0  |      unused       |
-     *   +---------+---------+-------------------+
-     *     15...12   11...8          7...0
-     *
-     *   Reading this register gives you the output of the selected columns
-     *   of the pads.
-     *   The buttons pressed will appear as cleared bits.
-     *   See the description of the column addressing to map the bits
-     *   to the buttons.
-     */
+	 *   16        12        8         4         0
+	 *   +---------+---------+---------^---------+
+	 *   |  pad 1  |  pad 0  |      unused       |
+	 *   +---------+---------+-------------------+
+	 *     15...12   11...8          7...0
+	 *
+	 *   Reading this register gives you the output of the selected columns
+	 *   of the pads.
+	 *   The buttons pressed will appear as cleared bits.
+	 *   See the description of the column addressing to map the bits
+	 *   to the buttons.
+	 */
 
 	for (i = 0; i < 8; i++)
 	{
@@ -694,51 +694,51 @@ READ32_MEMBER(jaguar_state::joystick_r)
 WRITE32_MEMBER(jaguar_state::joystick_w)
 {
 	/*
-     *   16        12         8         4         0
-     *   +-+-------^------+--+---------+---------+
-     *   |r|    unused    |mu|  col 1  |  col 0  |
-     *   +-+--------------+--+---------+---------+
-     *    15                8   7...4     3...0
-     *
-     *   col 0:   column control of joypad 0
-     *
-     *      Here you select which column of the joypad to poll.
-     *      The columns are:
-     *
-     *                Joystick       Joybut
-     *      col_bit|11 10  9  8     1    0
-     *      -------+--+--+--+--    ---+------
-     *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
-     *         1   | 1  4  7  *     B
-     *         2   | 2  5  8  0     C
-     *         3   | 3  6  9  #   OPTION
-     *
-     *      You select a column my clearing the appropriate bit and setting
-     *      all the other "column" bits.
-     *
-     *
-     *   col1:    column control of joypad 1
-     *
-     *      This is pretty much the same as for joypad EXCEPT that the
-     *      column addressing is reversed (strange!!)
-     *
-     *                Joystick      Joybut
-     *      col_bit|15 14 13 12     3    2
-     *      -------+--+--+--+--    ---+------
-     *         4   | 3  6  9  #   OPTION
-     *         5   | 2  5  8  0     C
-     *         6   | 1  4  7  *     B
-     *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
-     *
-     *   mute (mu):   sound control
-     *
-     *      You can turn off the sound by clearing this bit.
-     *
-     *   read enable (r):
-     *
-     *      Set this bit to read from the joysticks, clear it to write
-     *      to them.
-     */
+	 *   16        12         8         4         0
+	 *   +-+-------^------+--+---------+---------+
+	 *   |r|    unused    |mu|  col 1  |  col 0  |
+	 *   +-+--------------+--+---------+---------+
+	 *    15                8   7...4     3...0
+	 *
+	 *   col 0:   column control of joypad 0
+	 *
+	 *      Here you select which column of the joypad to poll.
+	 *      The columns are:
+	 *
+	 *                Joystick       Joybut
+	 *      col_bit|11 10  9  8     1    0
+	 *      -------+--+--+--+--    ---+------
+	 *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
+	 *         1   | 1  4  7  *     B
+	 *         2   | 2  5  8  0     C
+	 *         3   | 3  6  9  #   OPTION
+	 *
+	 *      You select a column my clearing the appropriate bit and setting
+	 *      all the other "column" bits.
+	 *
+	 *
+	 *   col1:    column control of joypad 1
+	 *
+	 *      This is pretty much the same as for joypad EXCEPT that the
+	 *      column addressing is reversed (strange!!)
+	 *
+	 *                Joystick      Joybut
+	 *      col_bit|15 14 13 12     3    2
+	 *      -------+--+--+--+--    ---+------
+	 *         4   | 3  6  9  #   OPTION
+	 *         5   | 2  5  8  0     C
+	 *         6   | 1  4  7  *     B
+	 *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
+	 *
+	 *   mute (mu):   sound control
+	 *
+	 *      You can turn off the sound by clearing this bit.
+	 *
+	 *   read enable (r):
+	 *
+	 *      Set this bit to read from the joysticks, clear it to write
+	 *      to them.
+	 */
 	COMBINE_DATA(&m_joystick_data);
 }
 
@@ -1050,14 +1050,14 @@ READ16_MEMBER(jaguar_state::joystick_r16){ if (!(offset&1)) { return joystick_r(
 WRITE16_MEMBER(jaguar_state::joystick_w16){ if (!(offset&1)) { joystick_w(space, offset>>1, data << 16, mem_mask << 16); } else { joystick_w(space, offset>>1, data, mem_mask); } }
 
 READ32_MEMBER(jaguar_state::shared_ram_r){ return m_shared_ram[offset]; }
-WRITE32_MEMBER(jaguar_state::shared_ram_w){	COMBINE_DATA(&m_shared_ram[offset]); }
+WRITE32_MEMBER(jaguar_state::shared_ram_w){ COMBINE_DATA(&m_shared_ram[offset]); }
 READ32_MEMBER(jaguar_state::rom_base_r){ return m_rom_base[offset]; }
 WRITE32_MEMBER(jaguar_state::rom_base_w){ /*ROM!*/ }
 READ32_MEMBER(jaguar_state::cart_base_r){ return m_cart_base[offset]; }
 WRITE32_MEMBER(jaguar_state::cart_base_w){ /*ROM!*/ }
 READ32_MEMBER(jaguar_state::wave_rom_r){ return m_wave_rom[offset]; }
 WRITE32_MEMBER(jaguar_state::wave_rom_w){ /*ROM!*/ }
-READ32_MEMBER(jaguar_state::dsp_ram_r){	return m_dsp_ram[offset]; }
+READ32_MEMBER(jaguar_state::dsp_ram_r){ return m_dsp_ram[offset]; }
 WRITE32_MEMBER(jaguar_state::dsp_ram_w){ COMBINE_DATA(&m_dsp_ram[offset]); }
 READ32_MEMBER(jaguar_state::gpu_clut_r){ return m_gpu_clut[offset]; }
 WRITE32_MEMBER(jaguar_state::gpu_clut_w){ COMBINE_DATA(&m_gpu_clut[offset]); }
@@ -1092,8 +1092,8 @@ static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, jaguar_state )
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE(gpu_ram_r16, gpu_ram_w16 )
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jerry_regs_r, jerry_regs_w) // might be reversed endian of the others..
 	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r16, joystick_w16)
-	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(eeprom_clk16,eeprom_w16)	// GPI00
-	AM_RANGE(0xf15000, 0xf15003) AM_READ(eeprom_cs16)				// GPI01
+	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(eeprom_clk16,eeprom_w16)  // GPI00
+	AM_RANGE(0xf15000, 0xf15003) AM_READ(eeprom_cs16)               // GPI01
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r16, dspctrl_w16)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(serial_r16, serial_w16)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE(dsp_ram_r16, dsp_ram_w16)
@@ -1119,17 +1119,17 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0x04f02200, 0x04f022ff) AM_READWRITE(blitter_r, blitter_w)
 	AM_RANGE(0x04f03000, 0x04f03fff) AM_MIRROR(0x00008000) AM_RAM AM_SHARE("gpuram")
 	AM_RANGE(0x04f10000, 0x04f103ff) AM_READWRITE16(jerry_regs_r, jerry_regs_w, 0xffffffff)
-	AM_RANGE(0x04f16000, 0x04f1600b) AM_READ(cojag_gun_input_r)	// GPI02
-	AM_RANGE(0x04f17000, 0x04f17003) AM_READ_PORT("SYSTEM")		// GPI03
-	AM_RANGE(0x04f17800, 0x04f17803) AM_WRITE(latch_w)			// GPI04
-	AM_RANGE(0x04f17c00, 0x04f17c03) AM_READ_PORT("P1_P2")		// GPI05
+	AM_RANGE(0x04f16000, 0x04f1600b) AM_READ(cojag_gun_input_r) // GPI02
+	AM_RANGE(0x04f17000, 0x04f17003) AM_READ_PORT("SYSTEM")     // GPI03
+	AM_RANGE(0x04f17800, 0x04f17803) AM_WRITE(latch_w)          // GPI04
+	AM_RANGE(0x04f17c00, 0x04f17c03) AM_READ_PORT("P1_P2")      // GPI05
 	AM_RANGE(0x04f1a100, 0x04f1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0x04f1a140, 0x04f1a17f) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE(0x04f1b000, 0x04f1cfff) AM_RAM AM_SHARE("dspram")
 
 	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM
-	AM_RANGE(0x12000000, 0x120fffff) AM_RAM		// tested in self-test only?
+	AM_RANGE(0x12000000, 0x120fffff) AM_RAM     // tested in self-test only?
 	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
@@ -1153,10 +1153,10 @@ static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE(blitter_r, blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_SHARE("gpuram")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE16(jerry_regs_r, jerry_regs_w, 0xffffffff)
-	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
-	AM_RANGE(0xf17000, 0xf17003) AM_READ_PORT("SYSTEM")		// GPI03
+	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r) // GPI02
+	AM_RANGE(0xf17000, 0xf17003) AM_READ_PORT("SYSTEM")     // GPI03
 //  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
-	AM_RANGE(0xf17c00, 0xf17c03) AM_READ_PORT("P1_P2")		// GPI05
+	AM_RANGE(0xf17c00, 0xf17c03) AM_READ_PORT("P1_P2")      // GPI05
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("dspram")
@@ -1276,25 +1276,25 @@ static INPUT_PORTS_START( area51 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )			// s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	// vsyncneq
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("FAKE1_X")				/* fake analog X */
+	PORT_START("FAKE1_X")               /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 320.0/(320.0 - 7 -7), 0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("FAKE1_Y")				/* fake analog Y */
+	PORT_START("FAKE1_Y")               /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (240.0 - 1)/240, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START("FAKE2_X")				/* fake analog X */
+	PORT_START("FAKE2_X")               /* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 320.0/(320.0 - 7 -7), 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("FAKE2_Y")				/* fake analog Y */
+	PORT_START("FAKE2_Y")               /* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (240.0 - 1)/240, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("IN3")			/* gun triggers */
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_SPECIAL )	// gun data valid
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SPECIAL )	// gun data valid
+	PORT_START("IN3")           /* gun triggers */
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_SPECIAL )  // gun data valid
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SPECIAL )  // gun data valid
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xfff00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1332,14 +1332,14 @@ static INPUT_PORTS_START( freezeat )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )	// volume down
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )	// volume up
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )			// s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	// vsyncneq
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume down
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume up
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// coin returns
+	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // coin returns
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1376,14 +1376,14 @@ static INPUT_PORTS_START( fishfren )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )	// volume down
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )	// volume up
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )			// s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	// vsyncneq
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume down
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume up
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// coin returns
+	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // coin returns
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1428,12 +1428,12 @@ static INPUT_PORTS_START( vcircle )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )			// s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	// vsyncneq
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL )	// coin returns
+	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // coin returns
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1547,9 +1547,9 @@ INPUT_PORTS_END
 
 static const r3000_cpu_core r3000_config =
 {
-	0,		/* 1 if we have an FPU, 0 otherwise */
-	4096,	/* code cache size */
-	4096	/* data cache size */
+	0,      /* 1 if we have an FPU, 0 otherwise */
+	4096,   /* code cache size */
+	4096    /* data cache size */
 };
 
 
@@ -1728,7 +1728,7 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 		start = m_shared_ram[0x100e];
 		skip = m_shared_ram[0x1011];
 	}
-	else	/* PRG */
+	else    /* PRG */
 	if (((m_shared_ram[0x1000] & 0xffff0000) == 0x601A0000) && (m_shared_ram[0x1007] == 0x4A414752))
 	{
 		UINT32 type = m_shared_ram[0x1008] >> 16;
@@ -1737,22 +1737,22 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 		if (type == 2) skip = 42;
 		else if (type == 3) skip = 46;
 	}
-	else	/* ABS with header */
+	else    /* ABS with header */
 	if ((m_shared_ram[0x1000] & 0xffff0000) == 0x601B0000)
 	{
 		start = ((m_shared_ram[0x1005] & 0xffff) << 16) | (m_shared_ram[0x1006] >> 16);
 		skip = 36;
 	}
 
-	else	/* A header used by Badcoder */
+	else    /* A header used by Badcoder */
 	if ((m_shared_ram[0x1000] & 0xffff0000) == 0x72000000)
 		skip = 96;
 
-	else	/* ABS binary */
+	else    /* ABS binary */
 	if (!mame_stricmp(image.filetype(), "abs"))
 		start = 0xc000;
 
-	else	/* JAG binary */
+	else    /* JAG binary */
 	if (!mame_stricmp(image.filetype(), "jag"))
 		start = 0x5000;
 
@@ -1806,8 +1806,8 @@ int jaguar_state::cart_load(device_image_interface &image)
 		/* .rom files load & run at 802000 */
 		if (!mame_stricmp(image.filetype(), "rom"))
 		{
-			load_offset = 0x2000;		// fix load address
-			m_cart_base[0x101]=0x802000;	// fix exec address
+			load_offset = 0x2000;       // fix load address
+			m_cart_base[0x101]=0x802000;    // fix exec address
 		}
 
 		/* Load cart into memory */
@@ -1876,7 +1876,7 @@ ROM_END
 /* There is known to exist an Area 51 set with "136105-000x Q" labels - currently not dumped */
 
 ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003c.3h", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "136105-0002c.3p", 0x00001, 0x80000, CRC(e9c9f4bd) SHA1(7c6c50372d45dca8929767241b092339f3bab4d2) )
 	ROM_LOAD32_BYTE( "136105-0001c.3m", 0x00002, 0x80000, CRC(6f135a81) SHA1(2d9660f240b14481e8c46bc98713e9dc12035063) )
@@ -1890,7 +1890,7 @@ ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1
 ROM_END
 
 ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1995 */
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003a.3h", 0x00000, 0x80000, CRC(116d37e6) SHA1(5d36cae792dd349faa77cd2d8018722a28ee55c1) ) /* Usually found with "orange" labels */
 	ROM_LOAD32_BYTE( "136105-0002a.3p", 0x00001, 0x80000, CRC(eb10f539) SHA1(dadc4be5a442dd4bd17385033056555e528ed994) )
 	ROM_LOAD32_BYTE( "136105-0001a.3m", 0x00002, 0x80000, CRC(c6d8322b) SHA1(90cf848a4195c51b505653cc2c74a3b9e3c851b8) )
@@ -1904,7 +1904,7 @@ ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1
 ROM_END
 
 ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 */
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "a51_2-c.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "a51_2-c.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) )
 	ROM_LOAD32_BYTE( "a51_2-c.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) )
@@ -1918,7 +1918,7 @@ ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 *
 ROM_END
 
 ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" */
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "maxf_105.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Usually found with "light grey" labels */
 	ROM_LOAD32_BYTE( "maxf_105.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) )
 	ROM_LOAD32_BYTE( "maxf_105.lh", 0x00002, 0x80000, CRC(84d49423) SHA1(88d9a6724f1118f2bbef5dfa27accc2b65c5ba1d) )
@@ -1933,7 +1933,7 @@ ROM_END
 
 
 ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" */
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "maxf_102.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Usually found with "yellow" labels */
 	ROM_LOAD32_BYTE( "maxf_102.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) )
 	ROM_LOAD32_BYTE( "maxf_102.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) )
@@ -1948,7 +1948,7 @@ ROM_END
 
 
 ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "mf_ng_hh.21v", 0x00000, 0x80000, CRC(08791c02) SHA1(9befbff3201c7d345109b26c296fd8548dbfc95b) )
 	ROM_LOAD32_BYTE( "mf_ng_hl.17v", 0x00001, 0x80000, CRC(52cf482c) SHA1(ff98b3f04987acef82a97a2ad35a9085fa84e6d5) )
 	ROM_LOAD32_BYTE( "mf_ng_lh.21y", 0x00002, 0x80000, CRC(ab4ee992) SHA1(69f0fe111d3f5f31151d2922579e5073e484b1e1) )
@@ -1965,7 +1965,7 @@ ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
 ROM_END
 
 
-ROM_START( area51mx )	/* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date: Apr 22, 1998 */
+ROM_START( area51mx )   /* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date: Apr 22, 1998 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "area51mx.3h", 0x00000, 0x80000, CRC(47cbf30b) SHA1(23377bcc65c0fc330d5bc7e76e233bae043ac364) )
 	ROM_LOAD32_BYTE( "area51mx.3p", 0x00001, 0x80000, CRC(a3c93684) SHA1(f6b3357bb69900a176fd6bc6b819b2f57b7d0f59) )
@@ -1981,7 +1981,7 @@ ROM_END
 
 
 ROM_START( a51mxr3k ) /* R3000 based, Labeled as "R3K Max/A51 Kit Ver 1.0" */
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "a51mxr3k.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) )
 	ROM_LOAD32_BYTE( "a51mxr3k.hl", 0x00001, 0x80000, CRC(0af49d74) SHA1(c19f26056a823fd32293e9a7b3ea868640eabf49) )
 	ROM_LOAD32_BYTE( "a51mxr3k.lh", 0x00002, 0x80000, CRC(d7d94dac) SHA1(2060a74715f36a0d7f5dd0855eda48ad1f20f095) )
@@ -1996,7 +1996,7 @@ ROM_END
 
 
 ROM_START( vcircle )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "hh", 0x00000, 0x80000, CRC(7276f5f5) SHA1(716287e370a4f300b1743103f8031afc82de38ca) )
 	ROM_LOAD32_BYTE( "hl", 0x00001, 0x80000, CRC(146060a1) SHA1(f291989f1f0ef228757f1990fb14da5ff8f3cf8d) )
 	ROM_LOAD32_BYTE( "lh", 0x00002, 0x80000, CRC(be4b2ef6) SHA1(4332b3036e9cb12685e914d085d9a63aa856f0be) )
@@ -2019,7 +2019,7 @@ ROM_END
 
 
 ROM_START( fishfren )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "hh", 0x00000, 0x80000, CRC(2ef79767) SHA1(abcea584f2cbd71b05f9d7e61f40ca9da6799215) )
 	ROM_LOAD32_BYTE( "hl", 0x00001, 0x80000, CRC(7eefd4a2) SHA1(181be04836704098082fd78cacc68ffa70e77892) )
 	ROM_LOAD32_BYTE( "lh", 0x00002, 0x80000, CRC(bbe9ed15) SHA1(889af29afe6d984b39105aa238400392a5dfb2c5) )
@@ -2028,7 +2028,7 @@ ROM_START( fishfren )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "l63-56", 0x000000, 0x100000, CRC(42764ea5) SHA1(805245f01006bd974fbac56f688cfcf137ddc914), ROM_SKIP(7) )
 	ROMX_LOAD( "l55-48", 0x000001, 0x100000, CRC(0c7592bb) SHA1(d5bd6b872abad58947842205f9eac46fd065e88f), ROM_SKIP(7) )
 	ROMX_LOAD( "l47-40", 0x000002, 0x100000, CRC(6d7dcdb1) SHA1(914dae3b9df5c861f794b683571c5fb0c2c3c3fd), ROM_SKIP(7) )
@@ -2049,7 +2049,7 @@ ROM_START( fishfren )
 ROM_END
 
 ROM_START( freezeat )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog_eng.hh",          0x000000, 0x040000, CRC(f7cffafd) SHA1(62369de4cf0a5abab86f6bcf9621028b9e171ec3) )
 	ROM_LOAD32_BYTE( "prog_eng.hl",          0x000001, 0x040000, CRC(17150705) SHA1(c5a32d334bffb58a816920cc1251a21acc5a6f92) )
 	ROM_LOAD32_BYTE( "prog_eng.lh",          0x000002, 0x040000, CRC(12a903bf) SHA1(41f5949d7ed2081917af8411f92666b754564b37) )
@@ -2058,7 +2058,7 @@ ROM_START( freezeat )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "fish_gr0.63-56", 0x000000, 0x100000, CRC(b61061c5) SHA1(aeb409aa5073232d80ed81b27946e753290234f4), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0.55-48", 0x000001, 0x100000, CRC(c85acf42) SHA1(c3365caeb126a83a7e7afcda25f05849ceb5c98b), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0.47-40", 0x000002, 0x100000, CRC(67f78f59) SHA1(40b256a8939fad365c7e896cff4a959fcc70a477), ROM_SKIP(7) )
@@ -2078,7 +2078,7 @@ ROM_START( freezeat )
 ROM_END
 
 ROM_START( freezeatjp )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog_jpn.hh",          0x000000, 0x040000, CRC(989302bf) SHA1(232927ec0a52b8bb587a3c206af8e1c6cde67860) )
 	ROM_LOAD32_BYTE( "prog_jpn.hl",          0x000001, 0x040000, CRC(6262b760) SHA1(12ca749f5cdc6db7d19f88a21f5f955b80206784) )
 	ROM_LOAD32_BYTE( "prog_jpn.lh",          0x000002, 0x040000, CRC(c6a12b0c) SHA1(971242b5b09e15164e7c335e684b5043510c6462) )
@@ -2087,7 +2087,7 @@ ROM_START( freezeatjp )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "fish_gr0.63-56", 0x000000, 0x100000, CRC(b61061c5) SHA1(aeb409aa5073232d80ed81b27946e753290234f4), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0.55-48", 0x000001, 0x100000, CRC(c85acf42) SHA1(c3365caeb126a83a7e7afcda25f05849ceb5c98b), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0.47-40", 0x000002, 0x100000, CRC(67f78f59) SHA1(40b256a8939fad365c7e896cff4a959fcc70a477), ROM_SKIP(7) )
@@ -2107,7 +2107,7 @@ ROM_START( freezeatjp )
 ROM_END
 
 ROM_START( freezeat2 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__961018).hh",  0x000000, 0x040000, CRC(a8aefa52) SHA1(ba95da93035520de4b15245f68217c59dfb69dbd) )
 	ROM_LOAD32_BYTE( "prog(__961018).hl",  0x000001, 0x040000, CRC(152dd641) SHA1(52fa260baf1979ed8f15f8abcbbeebd8e595d0e4) )
 	ROM_LOAD32_BYTE( "prog(__961018).lh",  0x000002, 0x040000, CRC(416d26ed) SHA1(11cf3b88415a8a5d0bb8e1df08603a85202186ef) )
@@ -2116,7 +2116,7 @@ ROM_START( freezeat2 )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "fish_gr0(__961018).63-56", 0x000000, 0x100000, CRC(99d0dc75) SHA1(b32126eea70c7584d1c34a6ca33282fbaf4b03aa), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__961018).55-48", 0x000001, 0x100000, CRC(2dfdfe62) SHA1(e0554d36ef5cf4b6ce171857ea4f2737f11286a5), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__961018).47-40", 0x000002, 0x100000, CRC(722aee2a) SHA1(bc79433131bed5b08453d1b80324a28a552783de), ROM_SKIP(7) )
@@ -2136,7 +2136,7 @@ ROM_START( freezeat2 )
 ROM_END
 
 ROM_START( freezeat3 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__961007).hh",  0x000000, 0x040000, CRC(863942e6) SHA1(c7429c8a5c86ff93c64950e201cffca83dd7b7b0) )
 	ROM_LOAD32_BYTE( "prog(__961007).hl",  0x000001, 0x040000, CRC(2acc18ef) SHA1(ead02566f7641b1d1066bd2e257b695e5c7e8437) )
 	ROM_LOAD32_BYTE( "prog(__961007).lh",  0x000002, 0x040000, CRC(948cf20c) SHA1(86c757aa3c849ef5ba94ed4d5dbf10e833dab6bd) )
@@ -2145,7 +2145,7 @@ ROM_START( freezeat3 )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "fish_gr0(__961007).63-56", 0x000000, 0x100000, CRC(36799449) SHA1(bb706fe7fdc68f840702a127eed7d4519dd45869), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__961007).55-48", 0x000001, 0x100000, CRC(23959947) SHA1(a35a6e62c7b2be57d41b1b64be93713cbf897f0a), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__961007).47-40", 0x000002, 0x100000, CRC(4657e4e0) SHA1(b6c07182babcb0a106bf4a8f2e3f524371dd882d), ROM_SKIP(7) )
@@ -2165,7 +2165,7 @@ ROM_START( freezeat3 )
 ROM_END
 
 ROM_START( freezeat4 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__961003).hh",  0x000000, 0x040000, CRC(80336f5e) SHA1(9946e8eebec2cd68db059f40f535ea212f41913d) )
 	ROM_LOAD32_BYTE( "prog(__961003).hl",  0x000001, 0x040000, CRC(55125520) SHA1(13be4fbf32bcd94a2ea97fd690bd1dfdff146d33) )
 	ROM_LOAD32_BYTE( "prog(__961003).lh",  0x000002, 0x040000, CRC(9d99c794) SHA1(f443f05a5979db66d61ef4174f0369a1cf4b7793) )
@@ -2174,7 +2174,7 @@ ROM_START( freezeat4 )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "fish_gr0(__961003).63-56", 0x000000, 0x100000, CRC(36799449) SHA1(bb706fe7fdc68f840702a127eed7d4519dd45869), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__961003).55-48", 0x000001, 0x100000, CRC(23959947) SHA1(a35a6e62c7b2be57d41b1b64be93713cbf897f0a), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__961003).47-40", 0x000002, 0x100000, CRC(4657e4e0) SHA1(b6c07182babcb0a106bf4a8f2e3f524371dd882d), ROM_SKIP(7) )
@@ -2194,7 +2194,7 @@ ROM_START( freezeat4 )
 ROM_END
 
 ROM_START( freezeat5 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__960920).hh",  0x000000, 0x040000, CRC(95c4fc64) SHA1(cd00efe7f760ef1e4cdc4bc8a3b368427cb15d8a) )
 	ROM_LOAD32_BYTE( "prog(__960920).hl",  0x000001, 0x040000, CRC(ffb9cb71) SHA1(35d6a5440d63bc5b94c4447645365039169da368) )
 	ROM_LOAD32_BYTE( "prog(__960920).lh",  0x000002, 0x040000, CRC(3ddacd80) SHA1(79f9650531847eefd83908b6ea1e8362688b377c) )
@@ -2203,7 +2203,7 @@ ROM_START( freezeat5 )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "fish_gr0(__960920).63-56", 0x000000, 0x100000, CRC(404a10c3) SHA1(8e353ac7608bd54f0fea610c85166ad14f2faadb), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__960920).55-48", 0x000001, 0x100000, CRC(0b262f2f) SHA1(2a963cb5c3344091406d090edfdda498709c6aa6), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__960920).47-40", 0x000002, 0x100000, CRC(43f86d26) SHA1(b31d36b11052514b5bcd5bf8e400457ca572c306), ROM_SKIP(7) )
@@ -2223,7 +2223,7 @@ ROM_START( freezeat5 )
 ROM_END
 
 ROM_START( freezeat6 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__960907).hh",  0x000000, 0x040000, CRC(120711fe) SHA1(387e3cc8a1a9ea7d65c528387891d09ed9889fe3) )
 	ROM_LOAD32_BYTE( "prog(__960907).hl",  0x000001, 0x040000, CRC(18dd292a) SHA1(00e79851140716985f43594142c97e510a06b24a) )
 	ROM_LOAD32_BYTE( "prog(__960907).lh",  0x000002, 0x040000, CRC(ce387e72) SHA1(021a274da0b828550a47c3778e1059d4e759693a) )
@@ -2232,7 +2232,7 @@ ROM_START( freezeat6 )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
+	ROM_REGION32_BE( 0x1000000, "romboard", 0 ) /* 16MB for 64-bit ROM data */
 	ROMX_LOAD( "fish_gr0(__960907).63-56", 0x000000, 0x100000, CRC(293a3308) SHA1(e4c88759c3b8f8a359db83817dbd0428350b4f7e), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__960907).55-48", 0x000001, 0x100000, CRC(18bb4bdf) SHA1(1f6c49b3b5946390fa7582b531f8d9af3baa2567), ROM_SKIP(7) )
 	ROMX_LOAD( "fish_gr0(__960907).47-40", 0x000002, 0x100000, CRC(1faedcc6) SHA1(1e4ecbe4553fb3ebfbd03bd7e16066ccb531d00b), ROM_SKIP(7) )

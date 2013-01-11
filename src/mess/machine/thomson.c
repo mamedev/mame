@@ -24,8 +24,8 @@
 
 #define PRINT(x) mame_printf_info x
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
-#define VLOG(x)	do { if (VERBOSE > 1) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)
 #define LOG_IRQ(x) do { if (VERBOSE_IRQ) logerror x; } while (0)
 #define LOG_KBD(x) do { if (VERBOSE_KBD) logerror x; } while (0)
 #define LOG_BANK(x) do { if (VERBOSE_BANK) logerror x; } while (0)
@@ -152,8 +152,8 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 	double pos = img->get_position();
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-	       space.machine().device("maincpu")->safe_pcbase(), img->machine().time().as_double(), data ? "off" : "on",
-	       (int) (pos / TO7_BIT_LENGTH) ));
+			space.machine().device("maincpu")->safe_pcbase(), img->machine().time().as_double(), data ? "off" : "on",
+			(int) (pos / TO7_BIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
 	{
@@ -228,8 +228,8 @@ static WRITE8_DEVICE_HANDLER ( mo5_set_cassette_motor )
 	double pos = img->get_position();
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-	       space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ? "off" : "on",
-	       (int) (pos / MO5_HBIT_LENGTH) ));
+			space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ? "off" : "on",
+			(int) (pos / MO5_HBIT_LENGTH) ));
 
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
 	{
@@ -453,12 +453,12 @@ static void to7_update_cart_bank(running_machine &machine)
 	{
 		bank = thom_cart_bank % thom_cart_nb_banks;
 		if ( bank != old_cart_bank && old_cart_bank < 0 )
-                {
-                        space.install_legacy_read_handler(0x0000, 0x0003, FUNC(to7_cartridge_r) );
-                }
+				{
+						space.install_legacy_read_handler(0x0000, 0x0003, FUNC(to7_cartridge_r) );
+				}
 	}
 	if ( bank != old_cart_bank )
-        {
+		{
 		machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 		old_cart_bank = bank;
 		LOG_BANK(( "to7_update_cart_bank: CART is cartridge bank %i\n", bank ));
@@ -492,7 +492,7 @@ READ8_HANDLER ( to7_cartridge_r )
 	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	if ( !space.debugger_access() )
-        {
+		{
 		thom_cart_bank = offset & 3;
 		to7_update_cart_bank(space.machine());
 	}
@@ -510,9 +510,9 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_port_out )
 	thom_set_mode_point( space.machine(), data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( space.machine(), (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
 	thom_set_border_color( space.machine(),
-			       ((data & 0x10) ? 1 : 0) |           /* bits 4-6: border color */
-			       ((data & 0x20) ? 2 : 0) |
-			       ((data & 0x40) ? 4 : 0) );
+					((data & 0x10) ? 1 : 0) |           /* bits 4-6: border color */
+					((data & 0x20) ? 2 : 0) |
+					((data & 0x40) ? 4 : 0) );
 }
 
 
@@ -720,8 +720,8 @@ const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
 //-------------------------------------------------
 
 to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, TO7_IO_LINE, "Serial source", tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+	: device_t(mconfig, TO7_IO_LINE, "Serial source", tag, owner, clock),
+		device_serial_interface(mconfig, *this)
 {
 }
 
@@ -940,9 +940,9 @@ const mea8000_interface to7_speech = { "speech", DEVCB_NULL };
 READ8_HANDLER ( to7_modem_mea8000_r )
 {
 	if ( space.debugger_access() )
-        {
+		{
 		return 0;
-        }
+		}
 
 	if ( space.machine().root_device().ioport("mconfig")->read() & 1 )
 	{
@@ -1048,10 +1048,10 @@ static READ8_DEVICE_HANDLER ( to7_game_porta_in )
 		/* joystick */
 		data = space.machine().root_device().ioport("game_port_directions")->read();
 		/* bit 0=0 => P1 up      bit 4=0 => P2 up
-           bit 1=0 => P1 down    bit 5=0 => P2 down
-           bit 2=0 => P1 left    bit 6=0 => P2 left
-           bit 3=0 => P1 right   bit 7=0 => P2 right
-        */
+		   bit 1=0 => P1 down    bit 5=0 => P2 down
+		   bit 2=0 => P1 left    bit 6=0 => P2 left
+		   bit 3=0 => P1 right   bit 7=0 => P2 right
+		*/
 		/* remove impossible combinations: up+down, left+right */
 		if ( ! ( data & 0x03 ) )
 			data |= 0x03;
@@ -1158,14 +1158,14 @@ static TIMER_CALLBACK(to7_game_update_cb)
 		game_pia->cb1_w( (in & 0x08) ? 1 : 0 ); /* P2 action B */
 		game_pia->ca1_w( (in & 0x04) ? 1 : 0 ); /* P1 action B */
 		/* TODO:
-           it seems that CM 90-112 behaves differently
-           - ca1 is P1 action A, i.e., in & 0x40
-           - ca2 is P2 action A, i.e., in & 0x80
-           - cb1, cb2 are not connected (should not be a problem)
-        */
+		   it seems that CM 90-112 behaves differently
+		   - ca1 is P1 action A, i.e., in & 0x40
+		   - ca2 is P2 action A, i.e., in & 0x80
+		   - cb1, cb2 are not connected (should not be a problem)
+		*/
 		/* Note: the MO6 & MO5NR have slightly different connections
-           (see mo6_game_update_cb)
-        */
+		   (see mo6_game_update_cb)
+		*/
 	}
 }
 
@@ -1283,36 +1283,36 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
 		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
-			  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to7_midi_status,
-			  (to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
-			  (to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
-			  (to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
-			  (to7_midi_status & ACIA_6850_irq) ? 1 : 0 ));
+				space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to7_midi_status,
+				(to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
+				(to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
+				(to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
+				(to7_midi_status & ACIA_6850_irq) ? 1 : 0 ));
 		return to7_midi_status;
 
 
 	case 1: /* get input data */
 	{
-                UINT8 data = chardev_in( to7_midi_chardev );
-                if ( !space.debugger_access() )
-                {
-                        to7_midi_status &= ~(ACIA_6850_irq | ACIA_6850_RDRF);
-                        if ( to7_midi_overrun )
-                                to7_midi_status |= ACIA_6850_OVRN;
-                        else
-                                to7_midi_status &= ~ACIA_6850_OVRN;
-                        to7_midi_overrun = 0;
-                        LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
-                                   space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
-                        to7_midi_update_irq( space.machine() );
-                }
-                return data;
+				UINT8 data = chardev_in( to7_midi_chardev );
+				if ( !space.debugger_access() )
+				{
+						to7_midi_status &= ~(ACIA_6850_irq | ACIA_6850_RDRF);
+						if ( to7_midi_overrun )
+								to7_midi_status |= ACIA_6850_OVRN;
+						else
+								to7_midi_status &= ~ACIA_6850_OVRN;
+						to7_midi_overrun = 0;
+						LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
+									space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
+						to7_midi_update_irq( space.machine() );
+				}
+				return data;
 	}
 
 
 	default:
 		logerror( "$%04x to7_midi_r: invalid offset %i\n",
-			  space.machine().device("maincpu")->safe_pcbase(),  offset );
+				space.machine().device("maincpu")->safe_pcbase(),  offset );
 		return 0;
 	}
 }
@@ -1348,13 +1348,13 @@ WRITE8_HANDLER ( to7_midi_w )
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
 				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
-					  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-					  data,
-					  bits[ (data >> 2) & 7 ],
-					  stop[ (data >> 2) & 7 ],
-					  parity[ (data >> 2) & 7 ],
-					  to7_midi_intr >> 2,
-					  (to7_midi_intr & 3) ? 1 : 0));
+						space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+						data,
+						bits[ (data >> 2) & 7 ],
+						stop[ (data >> 2) & 7 ],
+						parity[ (data >> 2) & 7 ],
+						to7_midi_intr >> 2,
+						(to7_midi_intr & 3) ? 1 : 0));
 			}
 		}
 		to7_midi_update_irq( space.machine() );
@@ -1593,15 +1593,15 @@ static void to770_update_ram_bank(running_machine &machine)
 	}
 
 	if ( bank != old_ram_bank )
-        {
+		{
 		if ( machine.device<ram_device>(RAM_TAG)->size() == 128*1024 || bank < 2 )
-                {
+				{
 			machine.root_device().membank( THOM_RAM_BANK )->set_entry( bank );
 		}
-                else
-                {
+				else
+				{
 			/* RAM size is 48 KB only and unavailable bank
-             * requested */
+			 * requested */
 			space.nop_readwrite(0xa000, 0xdfff);
 		}
 		old_ram_bank = bank;
@@ -1652,10 +1652,10 @@ static WRITE8_DEVICE_HANDLER ( to770_timer_port_out )
 	thom_set_mode_point( space.machine(), data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( space.machine(), (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
 	thom_set_border_color( space.machine(),
-			       ((data & 0x10) ? 1 : 0) |          /* 4-bit border color */
-			       ((data & 0x20) ? 2 : 0) |
-			       ((data & 0x40) ? 4 : 0) |
-			       ((data & 0x04) ? 0 : 8) );
+					((data & 0x10) ? 1 : 0) |          /* 4-bit border color */
+					((data & 0x20) ? 2 : 0) |
+					((data & 0x40) ? 4 : 0) |
+					((data & 0x04) ? 0 : 8) );
 }
 
 
@@ -1840,9 +1840,9 @@ static void mo5_init_timer(running_machine &machine)
 
 static WRITE8_DEVICE_HANDLER ( mo5_sys_porta_out )
 {
-	thom_set_mode_point( space.machine(), data & 1 );		/* bit 0: video bank switch */
-	thom_set_border_color( space.machine(), (data >> 1) & 15 );	/* bit 1-4: border color */
-	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );	/* bit 6: cassette output */
+	thom_set_mode_point( space.machine(), data & 1 );       /* bit 0: video bank switch */
+	thom_set_border_color( space.machine(), (data >> 1) & 15 ); /* bit 1-4: border color */
+	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 ); /* bit 6: cassette output */
 }
 
 
@@ -2003,9 +2003,9 @@ static void mo5_update_cart_bank(running_machine &machine)
 		/* 64 KB ROM from "JANE" cartridge */
 		bank = mo5_reg_cart & 3;
 		if ( bank != old_cart_bank )
-                {
+				{
 			if ( old_cart_bank < 0 || old_cart_bank > 3 )
-                        {
+						{
 				space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
 				space.nop_write( 0xb000, 0xefff);
 			}
@@ -2019,21 +2019,21 @@ static void mo5_update_cart_bank(running_machine &machine)
 		bank_is_read_only = (( mo5_reg_cart & 8 ) == 0);
 
 		if ( bank != old_cart_bank || bank_is_read_only != old_cart_bank_was_read_only)
-                {
-                        if ( bank_is_read_only )
-                        {
-                                space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
-                                space.nop_write( 0xb000, 0xefff );
-                        }
-                        else
-                        {
-                                space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
-                        }
-                        LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (%s)\n",
-                                   mo5_reg_cart & 3,
-                                   bank_is_read_only ? "read-only":"read-write"));
-                        old_cart_bank_was_read_only = bank_is_read_only;
-                }
+				{
+						if ( bank_is_read_only )
+						{
+								space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+								space.nop_write( 0xb000, 0xefff );
+						}
+						else
+						{
+								space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
+						}
+						LOG_BANK(( "mo5_update_cart_bank: CART is nanonetwork RAM bank %i (%s)\n",
+									mo5_reg_cart & 3,
+									bank_is_read_only ? "read-only":"read-write"));
+						old_cart_bank_was_read_only = bank_is_read_only;
+				}
 	}
 	else
 	{
@@ -2042,9 +2042,9 @@ static void mo5_update_cart_bank(running_machine &machine)
 		{
 			bank = thom_cart_bank % thom_cart_nb_banks;
 			if ( bank != old_cart_bank )
-                        {
+						{
 				if ( old_cart_bank < 0 )
-                                {
+								{
 					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
 					space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo5_cartridge_w) );
 					space.install_legacy_read_handler( 0xbffc, 0xbfff, FUNC(mo5_cartridge_r) );
@@ -2054,14 +2054,14 @@ static void mo5_update_cart_bank(running_machine &machine)
 		} else
 			/* internal ROM */
 			if ( old_cart_bank != 0 )
-                        {
+						{
 				space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
 				space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo5_cartridge_w) );
 				LOG_BANK(( "mo5_update_cart_bank: CART is internal\n"));
 			}
 	}
 	if ( bank != old_cart_bank )
-        {
+		{
 		machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 		old_cart_bank = bank;
 	}
@@ -2094,7 +2094,7 @@ READ8_HANDLER ( mo5_cartridge_r )
 	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	if ( !space.debugger_access() )
-        {
+		{
 		thom_cart_bank = offset & 3;
 		mo5_update_cart_bank(space.machine());
 	}
@@ -2316,9 +2316,9 @@ READ8_HANDLER  ( to9_vreg_r )
 	{
 		UINT8 c =  to9_palette_data[ to9_palette_idx ];
 		if ( !space.debugger_access() )
-                {
+				{
 			to9_palette_idx = ( to9_palette_idx + 1 ) & 31;
-                }
+				}
 		return c;
 	}
 
@@ -2404,11 +2404,11 @@ static void to9_update_cart_bank(running_machine &machine)
 		/* BASIC (64 KB) */
 		bank = 4 + to9_soft_bank;
 		if ( bank != old_cart_bank )
-                {
+				{
 			if ( old_cart_bank < 4)
-                        {
+						{
 				space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-                        }
+						}
 			LOG_BANK(( "to9_update_cart_bank: CART is BASIC bank %i\n", to9_soft_bank ));
 		}
 		break;
@@ -2416,11 +2416,11 @@ static void to9_update_cart_bank(running_machine &machine)
 		/* software 1 (32 KB) */
 		bank = 8 + (to9_soft_bank & 1);
 		if ( bank != old_cart_bank )
-                {
+				{
 			if ( old_cart_bank < 4)
-                        {
+						{
 				space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-                        }
+						}
 			LOG_BANK(( "to9_update_cart_bank: CART is software 1 bank %i\n", to9_soft_bank ));
 		}
 		break;
@@ -2428,11 +2428,11 @@ static void to9_update_cart_bank(running_machine &machine)
 		/* software 2 (32 KB) */
 		bank = 10 + (to9_soft_bank & 1);
 		if ( bank != old_cart_bank )
-                {
+				{
 			if ( old_cart_bank < 4)
-                        {
+						{
 				space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-                        }
+						}
 			LOG_BANK(( "to9_update_cart_bank: CART is software 2 bank %i\n", to9_soft_bank ));
 		}
 		break;
@@ -2442,9 +2442,9 @@ static void to9_update_cart_bank(running_machine &machine)
 		{
 			bank = thom_cart_bank % thom_cart_nb_banks;
 			if ( bank != old_cart_bank )
-                        {
+						{
 				if ( old_cart_bank < 0 || old_cart_bank > 3 )
-                                {
+								{
 					space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
 					space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to9_cartridge_w) );
 					space.install_legacy_read_handler( 0x0000, 0x0003, FUNC(to9_cartridge_r) );
@@ -2453,14 +2453,14 @@ static void to9_update_cart_bank(running_machine &machine)
 			}
 		} else
 			if ( old_cart_bank != 0 )
-                        {
+						{
 				space.nop_read( 0x0000, 0x3fff);
 				LOG_BANK(( "to9_update_cart_bank: CART is unmapped\n"));
 			}
 		break;
 	}
 	if ( bank != old_cart_bank )
-        {
+		{
 		machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 		old_cart_bank = bank;
 	}
@@ -2498,7 +2498,7 @@ READ8_HANDLER ( to9_cartridge_r )
 	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	if ( !space.debugger_access() )
-        {
+		{
 		thom_cart_bank = offset & 3;
 		to9_update_cart_bank(space.machine());
 	}
@@ -2538,15 +2538,15 @@ static void to9_update_ram_bank (running_machine &machine)
 	}
 
 	if ( old_ram_bank != bank )
-        {
+		{
 		if ( machine.device<ram_device>(RAM_TAG)->size() == 192*1024 || bank < 6 )
-                {
+				{
 			machine.root_device().membank( THOM_RAM_BANK )->set_entry( bank );
-                }
+				}
 		else
-                {
+				{
 			space.nop_readwrite( 0xa000, 0xdfff);
-                }
+				}
 		old_ram_bank = bank;
 		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
 	}
@@ -2668,12 +2668,12 @@ READ8_HANDLER ( to9_kbd_r )
 		/* bit 7:     interrupt */
 
 		LOG_KBD(( "$%04x %f to9_kbd_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, pe=%i, irq=%i)\n",
-			  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to9_kbd_status,
-			  (to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
-			  (to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
-			  (to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
-			  (to9_kbd_status & ACIA_6850_PE) ? 1 : 0,
-			  (to9_kbd_status & ACIA_6850_irq) ? 1 : 0 ));
+				space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to9_kbd_status,
+				(to9_kbd_status & ACIA_6850_RDRF) ? 1 : 0,
+				(to9_kbd_status & ACIA_6850_TDRE) ? 1 : 0,
+				(to9_kbd_status & ACIA_6850_OVRN) ? 1 : 0,
+				(to9_kbd_status & ACIA_6850_PE) ? 1 : 0,
+				(to9_kbd_status & ACIA_6850_irq) ? 1 : 0 ));
 		return to9_kbd_status;
 
 	case 1: /* get input data */
@@ -2727,9 +2727,9 @@ WRITE8_HANDLER ( to9_kbd_w )
 			to9_kbd_intr = data >> 5;
 
 			LOG_KBD(( "$%04x %f to9_kbd_w: set control to $%02X (parity=%i, intr in=%i out=%i)\n",
-				  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-				  data, to9_kbd_parity, to9_kbd_intr >> 2,
-				  (to9_kbd_intr & 3) ? 1 : 0 ));
+					space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+					data, to9_kbd_parity, to9_kbd_intr >> 2,
+					(to9_kbd_intr & 3) ? 1 : 0 ));
 		}
 		to9_kbd_update_irq(space.machine());
 		break;
@@ -2764,8 +2764,8 @@ WRITE8_HANDLER ( to9_kbd_w )
 		thom_set_caps_led( space.machine(), !to9_kbd_caps );
 
 		LOG(( "$%04x %f to9_kbd_w: kbd command %02X (caps=%i, pad=%i, periph=%i)\n",
-		      space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data,
-		      to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
+				space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data,
+				to9_kbd_caps, to9_kbd_pad, to9_kbd_periph ));
 
 		break;
 
@@ -2863,8 +2863,8 @@ static int to9_kbd_get_key( running_machine &machine )
 			port |= 1; /* shift & control */
 
 		/* TODO: correct handling of simultaneous keystokes:
-           return the new key preferably & disable repeat
-        */
+		   return the new key preferably & disable repeat
+		*/
 		for ( bit = 0; bit < 8; bit++ )
 		{
 			if ( ! (port & (1 << bit)) )
@@ -3302,8 +3302,8 @@ static int to8_kbd_get_key( running_machine &machine )
 			port |= 1; /* shift & control */
 
 		/* TODO: correct handling of simultaneous keystokes:
-           return the new key preferably & disable repeat
-        */
+		   return the new key preferably & disable repeat
+		*/
 		for ( bit = 0; bit < 8; bit++ )
 		{
 			if ( ! (port & (1 << bit)) )
@@ -3366,8 +3366,8 @@ static void to8_kbd_timer_func(running_machine &machine)
 		/* key polling */
 		int k = to8_kbd_get_key(machine);
 		/* if not in transfer, send pulse from time to time
-           (helps avoiding CPU lock)
-        */
+		   (helps avoiding CPU lock)
+		*/
 		if ( ! to8_kbd_ack )
 			mc6846_set_input_cp1( machine.device("mc6846"), 0 );
 		mc6846_set_input_cp1( machine.device("mc6846"), 1 );
@@ -3552,10 +3552,10 @@ static void to8_update_floppy_bank( running_machine &machine )
 	int bank = (to8_reg_sys1 & 0x80) ? to7_floppy_bank : (to8_bios_bank + TO7_NB_FLOP_BANK);
 
 	if ( bank != old_floppy_bank )
-        {
+		{
 		LOG_BANK(( "to8_update_floppy_bank: floppy ROM is %s bank %i\n",
-                           (to8_reg_sys1 & 0x80) ? "external" : "internal",
-                           bank % TO7_NB_FLOP_BANK ));
+							(to8_reg_sys1 & 0x80) ? "external" : "internal",
+							bank % TO7_NB_FLOP_BANK ));
 		machine.root_device().membank( THOM_FLOP_BANK )->set_entry( bank );
 		old_floppy_bank = bank;
 	}
@@ -3601,22 +3601,22 @@ static void to8_update_ram_bank (running_machine &machine)
 	}
 
 	/*  due to addressing distortion, the 16 KB banked memory space is
-        split into two 8 KB spaces:
-        - 0xa000-0xbfff maps to 0x2000-0x3fff in 16 KB bank
-        - 0xc000-0xdfff maps to 0x0000-0x1fff in 16 KB bank
-        this is important if we map a bank that is also reachable by another,
-        undistorted space, such as cartridge, page 0 (video), or page 1
-    */
+	    split into two 8 KB spaces:
+	    - 0xa000-0xbfff maps to 0x2000-0x3fff in 16 KB bank
+	    - 0xc000-0xdfff maps to 0x0000-0x1fff in 16 KB bank
+	    this is important if we map a bank that is also reachable by another,
+	    undistorted space, such as cartridge, page 0 (video), or page 1
+	*/
 	if ( bank != old_ram_bank)
-        {
+		{
 		if (machine.device<ram_device>(RAM_TAG)->size() == 512*1024 || to8_data_vpage < 16)
-                {
+				{
 			machine.root_device().membank( TO8_DATA_LO )->set_entry( bank );
 			machine.root_device().membank( TO8_DATA_HI )->set_entry( bank );
 		} else
-                {
+				{
 			/* RAM size is 256 KB only and unavailable
-             * bank requested */
+			 * bank requested */
 			space.nop_readwrite( 0xa000, 0xbfff);
 			space.nop_readwrite( 0xc000, 0xdfff);
 		}
@@ -3648,75 +3648,75 @@ static void to8_update_cart_bank (running_machine &machine)
 		bank = 8 + to8_cart_vpage;
 		bank_is_read_only = (( to8_reg_cart & 0x40 ) == 0);
 		if ( bank != old_cart_bank )
-                {
+				{
 			/* mapping to VRAM */
 			if (machine.device<ram_device>(RAM_TAG)->size() == 512*1024 || to8_cart_vpage < 16)
-                        {
+						{
 				if (to8_cart_vpage < 4)
-                                {
+								{
 					if (old_cart_bank < 8 || old_cart_bank > 11)
-                                        {
+										{
 						space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
 						if ( bank_is_read_only )
-                                                {
+												{
 							space.nop_write( 0x0000, 0x3fff);
-                                                }
+												}
 						else
-                                                {
+												{
 							space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
-                                                }
+												}
 					}
 				}
-                                else
-                                {
+								else
+								{
 					if (old_cart_bank < 12)
-                                        {
+										{
 						if ( bank_is_read_only )
-                                                {
+												{
 							space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
 							space.nop_write( 0x0000, 0x3fff);
 						}
-                                                else
-                                                {
+												else
+												{
 							space.install_readwrite_bank( 0x0000, 0x3fff,THOM_CART_BANK);
-                                                }
-                                        }
-                                }
+												}
+										}
+								}
 			}
-                        else
-                        {
+						else
+						{
 				/* RAM size is 256 KB only and unavailable
-                 * bank requested */
+				 * bank requested */
 				space.nop_readwrite( 0x0000, 0x3fff);
-                        }
+						}
 			LOG_BANK(( "to8_update_cart_bank: CART is RAM bank %i (%s)\n",
-                                   to8_cart_vpage,
-                                   bank_is_read_only ? "read-only":"read-write"));
+									to8_cart_vpage,
+									bank_is_read_only ? "read-only":"read-write"));
 		}
 		else
-                {
-                        if ( bank_is_read_only != old_cart_bank_was_read_only )
-                        {
-                                if ( bank_is_read_only )
-                                {
-                                        space.nop_write( 0x0000, 0x3fff);
-                                }
-                                else
-                                {
-                                        if (to8_cart_vpage < 4)
-                                        {
-                                                space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
-                                        }
-                                        else
-                                        {
-                                                space.install_readwrite_bank( 0x0000, 0x3fff, THOM_CART_BANK );
-                                        }
-                                }
-                                LOG_BANK(( "to8_update_cart_bank: update CART bank %i write status to %s\n",
-                                           to8_cart_vpage,
-                                           bank_is_read_only ? "read-only":"read-write"));
-                        }
-                }
+				{
+						if ( bank_is_read_only != old_cart_bank_was_read_only )
+						{
+								if ( bank_is_read_only )
+								{
+										space.nop_write( 0x0000, 0x3fff);
+								}
+								else
+								{
+										if (to8_cart_vpage < 4)
+										{
+												space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
+										}
+										else
+										{
+												space.install_readwrite_bank( 0x0000, 0x3fff, THOM_CART_BANK );
+										}
+								}
+								LOG_BANK(( "to8_update_cart_bank: update CART bank %i write status to %s\n",
+											to8_cart_vpage,
+											bank_is_read_only ? "read-only":"read-write"));
+						}
+				}
 		old_cart_bank_was_read_only = bank_is_read_only;
 	}
 	else
@@ -3726,9 +3726,9 @@ static void to8_update_cart_bank (running_machine &machine)
 			/* internal software ROM space */
 			bank = 4 + to8_soft_bank;
 			if ( bank != old_cart_bank )
-                        {
+						{
 				if ( old_cart_bank < 4 || old_cart_bank > 7 )
-                                {
+								{
 					space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
 					space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_cartridge_w) );
 				}
@@ -3742,9 +3742,9 @@ static void to8_update_cart_bank (running_machine &machine)
 			{
 				bank = thom_cart_bank % thom_cart_nb_banks;
 				if ( bank != old_cart_bank )
-                                {
+								{
 					if ( old_cart_bank < 0 || old_cart_bank > 3 )
-                                        {
+										{
 						space.install_read_bank( 0x0000, 0x3fff, THOM_CART_BANK );
 						space.install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_cartridge_w) );
 						space.install_legacy_read_handler( 0x0000, 0x0003, FUNC(to8_cartridge_r) );
@@ -3752,18 +3752,18 @@ static void to8_update_cart_bank (running_machine &machine)
 					LOG_BANK(( "to8_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 				}
 			}
-                        else
-                        {
+						else
+						{
 				if ( old_cart_bank != 0 )
-                                {
+								{
 					space.nop_read( 0x0000, 0x3fff);
 					LOG_BANK(( "to8_update_cart_bank: CART is unmapped\n"));
 				}
-                        }
-                }
-        }
+						}
+				}
+		}
 	if ( bank != old_cart_bank )
-        {
+		{
 		machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 		old_cart_bank = bank;
 	}
@@ -3800,7 +3800,7 @@ READ8_HANDLER ( to8_cartridge_r )
 	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	if ( !space.debugger_access() )
-        {
+		{
 		thom_cart_bank = offset & 3;
 		to8_update_cart_bank(space.machine());
 	}
@@ -3921,8 +3921,8 @@ READ8_HANDLER ( to8_gatearray_r )
 	}
 
 	LOG_VIDEO(( "$%04x %f to8_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-		  offset, 0xe7e4 + offset, res, to7_lightpen ));
+			space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+			offset, 0xe7e4 + offset, res, to7_lightpen ));
 
 	return res;
 }
@@ -3932,8 +3932,8 @@ READ8_HANDLER ( to8_gatearray_r )
 WRITE8_HANDLER ( to8_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-		  offset, 0xe7e4 + offset, data ));
+			space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+			offset, 0xe7e4 + offset, data ));
 
 	switch ( offset )
 	{
@@ -3964,7 +3964,7 @@ WRITE8_HANDLER ( to8_gatearray_w )
 
 	default:
 		logerror( "$%04x to8_gatearray_w: invalid offset %i (data=$%02X)\n",
-			  space.machine().device("maincpu")->safe_pcbase(), offset, data );
+				space.machine().device("maincpu")->safe_pcbase(), offset, data );
 	}
 }
 
@@ -3995,9 +3995,9 @@ READ8_HANDLER  ( to8_vreg_r )
 	{
 		UINT8 c =  to9_palette_data[ to9_palette_idx ];
 		if ( !space.debugger_access() )
-                {
+				{
 			to9_palette_idx = ( to9_palette_idx + 1 ) & 31;
-                }
+				}
 		return c;
 	}
 
@@ -4019,8 +4019,8 @@ READ8_HANDLER  ( to8_vreg_r )
 WRITE8_HANDLER ( to8_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-		  offset, 0xe7da + offset, data ));
+			space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+			offset, 0xe7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -4515,62 +4515,62 @@ static void mo6_update_cart_bank (running_machine &machine)
 			bank = 8 + to8_cart_vpage;
 			bank_is_read_only = (( to8_reg_cart & 0x40 ) == 0);
 			if ( bank != old_cart_bank )
-                        {
+						{
 				if (to8_cart_vpage < 4)
-                                {
+								{
 					if (old_cart_bank < 8 || old_cart_bank > 11)
-                                        {
+										{
 						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
 						if ( bank_is_read_only )
-                                                {
+												{
 							space.nop_write( 0xb000, 0xefff);
-                                                }
+												}
 						else
-                                                {
+												{
 							space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(to8_vcart_w));
-                                                }
+												}
 					}
 				}
-                                else
-                                {
+								else
+								{
 
 					if (old_cart_bank < 12)
-                                        {
+										{
 						if ( bank_is_read_only )
-                                                {
+												{
 							space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
 							space.nop_write( 0xb000, 0xefff);
 						}
-                                                else
-                                                {
+												else
+												{
 							space.install_readwrite_bank( 0xb000, 0xefff,THOM_CART_BANK);
-                                                }
-                                        }
-                                }
+												}
+										}
+								}
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (%s)\n",
 					to8_cart_vpage,
 					bank_is_read_only ? "read-only":"read-write"));
 			}
 			else if ( bank_is_read_only != old_cart_bank_was_read_only )
-                        {
+						{
 				if ( bank_is_read_only )
-                                {
+								{
 					space.nop_write( 0xb000, 0xefff);
-                                }
+								}
 				else
-                                {
+								{
 					if (to8_cart_vpage < 4)
-                                        {
+										{
 						space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(to8_vcart_w));
-                                        }
+										}
 					else
-                                        {
+										{
 						space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK );
-                                        }
-                                }
+										}
+								}
 				LOG_BANK(( "mo6_update_cart_bank: update CART bank %i write status to %s\n",
-                                           to8_cart_vpage,
-                                           bank_is_read_only ? "read-only":"read-write"));
+											to8_cart_vpage,
+											bank_is_read_only ? "read-only":"read-write"));
 			}
 			old_cart_bank_was_read_only = bank_is_read_only;
 		}
@@ -4579,9 +4579,9 @@ static void mo6_update_cart_bank (running_machine &machine)
 			/* "JANE"-style cartridge bank switching */
 			bank = mo5_reg_cart & 3;
 			if ( bank != old_cart_bank )
-                        {
+						{
 				if ( old_cart_bank < 0 || old_cart_bank > 3 )
-                                {
+								{
 					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
 					space.nop_write( 0xb000, 0xefff);
 				}
@@ -4595,36 +4595,36 @@ static void mo6_update_cart_bank (running_machine &machine)
 			to8_cart_vpage = (mo5_reg_cart & 3) | 4;
 			bank = 8 + to8_cart_vpage;
 			if ( bank != old_cart_bank )
-                        {
+						{
 				if ( old_cart_bank < 12 )
-                                {
+								{
 					if ( bank_is_read_only )
-                                        {
+										{
 						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
 						space.nop_write( 0xb000, 0xefff);
 					} else
-                                        {
+										{
 						space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
-                                        }
+										}
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (MO5 compat.) (%s)\n",
-                                           to8_cart_vpage,
-                                           bank_is_read_only ? "read-only":"read-write"));
+											to8_cart_vpage,
+											bank_is_read_only ? "read-only":"read-write"));
 			}
 			else if ( bank_is_read_only != old_cart_bank_was_read_only )
-                        {
+						{
 				if ( bank_is_read_only )
-                                {
+								{
 					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
 					space.nop_write( 0xb000, 0xefff);
 				}
-                                else
-                                {
+								else
+								{
 					space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
-                                }
+								}
 				LOG_BANK(( "mo5_update_cart_bank: update CART bank %i write status to %s\n",
-                                           to8_cart_vpage,
-                                           bank_is_read_only ? "read-only":"read-write"));
+											to8_cart_vpage,
+											bank_is_read_only ? "read-only":"read-write"));
 			}
 			old_cart_bank_was_read_only = bank_is_read_only;
 		}
@@ -4636,17 +4636,17 @@ static void mo6_update_cart_bank (running_machine &machine)
 		{
 			/* internal ROM */
 			if ( to8_reg_sys2 & 0x10)
-                        {
+						{
 				bank = b + 6; /* BASIC 128 */
-                        }
+						}
 			else
-                        {
+						{
 				bank = b + 4;                      /* BASIC 1 */
-                        }
+						}
 			if ( bank != old_cart_bank )
-                        {
+						{
 				if ( old_cart_bank < 4 || old_cart_bank > 7 )
-                                {
+								{
 					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
 					space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo6_cartridge_w) );
 				}
@@ -4660,9 +4660,9 @@ static void mo6_update_cart_bank (running_machine &machine)
 			{
 				bank = thom_cart_bank % thom_cart_nb_banks;
 				if ( bank != old_cart_bank )
-                                {
+								{
 					if ( old_cart_bank < 0 || old_cart_bank > 3 )
-                                        {
+										{
 						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
 						space.install_legacy_write_handler( 0xb000, 0xefff, FUNC(mo6_cartridge_w) );
 						space.install_legacy_read_handler( 0xbffc, 0xbfff, FUNC(mo6_cartridge_r) );
@@ -4670,18 +4670,18 @@ static void mo6_update_cart_bank (running_machine &machine)
 					LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 				}
 			}
-                        else
-                        {
+						else
+						{
 				if ( old_cart_bank != 0 )
-                                {
+								{
 					space.nop_read( 0xb000, 0xefff );
 					LOG_BANK(( "mo6_update_cart_bank: CART is unmapped\n"));
 				}
-                        }
+						}
 		}
 	}
 	if ( bank != old_cart_bank )
-        {
+		{
 		machine.root_device().membank( THOM_CART_BANK )->set_entry( bank );
 		machine.root_device().membank( TO8_BIOS_BANK )->set_entry( b );
 		old_cart_bank = bank;
@@ -4715,7 +4715,7 @@ READ8_HANDLER ( mo6_cartridge_r )
 	UINT8* pos = space.machine().root_device().memregion( "maincpu" )->base() + 0x10000;
 	UINT8 data = pos[offset + 0xbffc + (thom_cart_bank % thom_cart_nb_banks) * 0x4000];
 	if ( !space.debugger_access() )
-        {
+		{
 		thom_cart_bank = offset & 3;
 		mo6_update_cart_bank(space.machine());
 	}
@@ -4879,11 +4879,11 @@ static READ8_DEVICE_HANDLER ( mo6_sys_portb_in )
 
 static WRITE8_DEVICE_HANDLER ( mo6_sys_porta_out )
 {
-	thom_set_mode_point( space.machine(),data & 1 );				/* bit 0: video bank switch */
-	to7_game_mute = data & 4;						/* bit 2: sound mute */
-	thom_set_caps_led( space.machine(),(data & 16) ? 0 : 1 ) ;		/* bit 4: keyboard led */
-	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
-	mo6_update_cart_bank(space.machine());					/* bit 5: rom bank */
+	thom_set_mode_point( space.machine(),data & 1 );                /* bit 0: video bank switch */
+	to7_game_mute = data & 4;                       /* bit 2: sound mute */
+	thom_set_caps_led( space.machine(),(data & 16) ? 0 : 1 ) ;      /* bit 4: keyboard led */
+	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );     /* bit 6: cassette output */
+	mo6_update_cart_bank(space.machine());                  /* bit 5: rom bank */
 	to7_game_sound_update(space.machine());
 }
 
@@ -4980,8 +4980,8 @@ READ8_HANDLER ( mo6_gatearray_r )
 	}
 
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_r: off=%i ($%04X) res=$%02X lightpen=%i\n",
-		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-		  offset, 0xa7e4 + offset, res, to7_lightpen ));
+			space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+			offset, 0xa7e4 + offset, res, to7_lightpen ));
 
 	return res;
 }
@@ -4991,8 +4991,8 @@ READ8_HANDLER ( mo6_gatearray_r )
 WRITE8_HANDLER ( mo6_gatearray_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
-		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-		  offset, 0xa7e4 + offset, data ));
+			space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+			offset, 0xa7e4 + offset, data ));
 
 	switch ( offset )
 	{
@@ -5034,10 +5034,10 @@ READ8_HANDLER ( mo6_vreg_r )
 {
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( to8_reg_ram & 0x80 ) )
-        {
+		{
 		if ( !space.debugger_access() )
 			return to7_floppy_r( space, 0xc );
-        }
+		}
 
 	switch ( offset )
 	{
@@ -5061,8 +5061,8 @@ READ8_HANDLER ( mo6_vreg_r )
 WRITE8_HANDLER ( mo6_vreg_w )
 {
 	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
-		  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
-		  offset, 0xa7da + offset, data ));
+			space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+			offset, 0xa7da + offset, data ));
 
 	switch ( offset )
 	{
@@ -5232,7 +5232,7 @@ WRITE8_HANDLER ( mo5nr_net_w )
 		to7_floppy_w ( space, offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
-			  space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data, offset );
+				space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data, offset );
 }
 
 
@@ -5288,10 +5288,10 @@ static READ8_DEVICE_HANDLER ( mo5nr_sys_portb_in )
 static WRITE8_DEVICE_HANDLER ( mo5nr_sys_porta_out )
 {
 	/* no keyboard LED */
-	thom_set_mode_point( space.machine(), data & 1 );			/* bit 0: video bank switch */
-	to7_game_mute = data & 4;						/* bit 2: sound mute */
-	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
-	mo6_update_cart_bank(space.machine());					/* bit 5: rom bank */
+	thom_set_mode_point( space.machine(), data & 1 );           /* bit 0: video bank switch */
+	to7_game_mute = data & 4;                       /* bit 2: sound mute */
+	mo5_set_cassette( space.machine(), (data & 0x40) ? 1 : 0 );     /* bit 6: cassette output */
+	mo6_update_cart_bank(space.machine());                  /* bit 5: rom bank */
 	to7_game_sound_update(space.machine());
 }
 

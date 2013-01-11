@@ -123,151 +123,151 @@ unknown cycle: CME, SSE, SSS
 #include "debugger.h"
 #include "tms0980.h"
 
-#define LOG					0
+#define LOG                 0
 
-#define MICRO_MASK			0x80000000
-#define FIXED_INSTRUCTION	0x00000000
+#define MICRO_MASK          0x80000000
+#define FIXED_INSTRUCTION   0x00000000
 
 
 /* Standard/fixed intructions */
-#define F_ILL				0x00000000
-#define F_BR				0x00000001
-#define F_CALL				0x00000002
-#define F_CLO				0x00000004
-#define F_COMC				0x00000008
-#define F_COMX				0x00000010
-#define F_COMX8				0x00000020
-#define F_LDP				0x00000040
-#define F_LDX				0x00000080
-#define F_OFF				0x00000100
-#define F_RBIT				0x00000200
-#define F_REAC				0x00000400
-#define F_RETN				0x00000800
-#define F_RSTR				0x00001000
-#define F_SAL				0x00002000
-#define F_SBIT				0x00004000
-#define F_SBL				0x00008000
-#define F_SEAC				0x00010000
-#define F_SETR				0x00020000
-#define F_TDO				0x00040000
+#define F_ILL               0x00000000
+#define F_BR                0x00000001
+#define F_CALL              0x00000002
+#define F_CLO               0x00000004
+#define F_COMC              0x00000008
+#define F_COMX              0x00000010
+#define F_COMX8             0x00000020
+#define F_LDP               0x00000040
+#define F_LDX               0x00000080
+#define F_OFF               0x00000100
+#define F_RBIT              0x00000200
+#define F_REAC              0x00000400
+#define F_RETN              0x00000800
+#define F_RSTR              0x00001000
+#define F_SAL               0x00002000
+#define F_SBIT              0x00004000
+#define F_SBL               0x00008000
+#define F_SEAC              0x00010000
+#define F_SETR              0x00020000
+#define F_TDO               0x00040000
 
 
 /* Microinstructions */
-#define M_15TN				0x00000001
-#define M_ATN				0x00000002
-#define M_AUTA				0x00000004
-#define M_AUTY				0x00000008
-#define M_C8				0x00000010
-#define M_CIN				0x00000020
-#define M_CKM				0x00000040
-#define M_CKN				0x00000080
-#define M_CKP				0x00000100
-#define M_CME				0x00000200
-#define M_DMTP				0x00000400
-#define M_MTN				0x00000800
-#define M_MTP				0x00001000
-#define M_NATN				0x00002000
-#define M_NDMTP				0x00004000
-#define M_NE				0x00008000
-#define M_SSE				0x00010000
-#define M_SSS				0x00020000
-#define M_STO				0x00040000
-#define M_STSL				0x00080000
-#define M_YTP				0x00100000
+#define M_15TN              0x00000001
+#define M_ATN               0x00000002
+#define M_AUTA              0x00000004
+#define M_AUTY              0x00000008
+#define M_C8                0x00000010
+#define M_CIN               0x00000020
+#define M_CKM               0x00000040
+#define M_CKN               0x00000080
+#define M_CKP               0x00000100
+#define M_CME               0x00000200
+#define M_DMTP              0x00000400
+#define M_MTN               0x00000800
+#define M_MTP               0x00001000
+#define M_NATN              0x00002000
+#define M_NDMTP             0x00004000
+#define M_NE                0x00008000
+#define M_SSE               0x00010000
+#define M_SSS               0x00020000
+#define M_STO               0x00040000
+#define M_STSL              0x00080000
+#define M_YTP               0x00100000
 
 
 /* instructions built from microinstructions */
-#define I_AC1AC		( MICRO_MASK | M_CKP | M_ATN | M_CIN | M_C8 | M_AUTA )
-#define I_A6AAC		I_ACACC
-#define I_A8AAC		I_ACACC
-#define I_A10AAC	I_ACACC
-#define I_ACACC		( MICRO_MASK | M_CKP | M_ATN | M_C8 | M_AUTA )
-#define I_ACNAA		( MICRO_MASK | M_CKP | M_NATN | M_AUTA )
-#define I_ALEC		( MICRO_MASK | M_CKP | M_NATN | M_CIN | M_C8 )
-#define I_ALEM		( MICRO_MASK | M_MTP | M_NATN | M_CIN | M_C8 )
-#define I_AMAAC		( MICRO_MASK | M_MTP | M_ATN | M_C8 | M_AUTA )
-#define I_CCLA		( MICRO_MASK | M_AUTA | M_SSS )
-#define I_CLA		( MICRO_MASK | M_AUTA )
-#define I_CPAIZ		( MICRO_MASK | M_NATN | M_CIN | M_C8 | M_AUTA )
-#define I_CTMDYN	( MICRO_MASK | M_YTP | M_15TN | M_C8 | M_AUTY | M_CME )
-#define I_DAN		( MICRO_MASK | M_CKP | M_ATN | M_CIN | M_C8 | M_AUTA )
-#define I_DMAN		( MICRO_MASK | M_MTP | M_15TN | M_C8 | M_AUTA )
-#define I_DMEA		( MICRO_MASK | M_MTP | M_DMTP | M_SSS | M_AUTA )
-#define I_DNAA		( MICRO_MASK | M_DMTP | M_NATN | M_SSS | M_AUTA )
-#define I_DYN		( MICRO_MASK | M_YTP | M_15TN | M_C8 | M_AUTY )
-#define I_IA		( MICRO_MASK | M_ATN | M_CIN | M_AUTA )
-#define I_IMAC		( MICRO_MASK | M_MTP | M_CIN | M_C8 | M_AUTA )
-#define I_IYC		( MICRO_MASK | M_YTP | M_CIN | M_C8 | M_AUTY )
-#define I_KNEZ		( MICRO_MASK | M_CKP | M_NE )
-#define I_MNEA		( MICRO_MASK | M_MTP | M_ATN | M_NE )
-#define I_MNEZ		( MICRO_MASK | M_MTP | M_NE )
-#define I_M_NDMEA	( MICRO_MASK | M_MTN | M_NDTMP | M_SSS | M_AUTA )
-#define I_SAMAN		( MICRO_MASK | M_MTP | M_NATN | M_CIN | M_C8 | M_AUTA )
-#define I_SETR		( MICRO_MASK | M_YTP | M_15TN | M_AUTY | M_C8 )
-#define I_TAM		( MICRO_MASK | M_STO )
-#define I_TAMACS	( MICRO_MASK | M_STO | M_ATN | M_CKP | M_AUTA | M_SSE )
-#define I_TAMDYN	( MICRO_MASK | M_STO | M_YTP | M_15TN | M_AUTY | M_C8 )
-#define I_TAMIY		( MICRO_MASK | M_STO | M_YTP | M_CIN | M_AUTY )
-#define I_TAMIYC	( MICRO_MASK | M_STO | M_YTP | M_CIN | M_C8 | M_AUTY )
-#define I_TAMZA		( MICRO_MASK | M_STO | M_AUTA )
-#define I_TAY		( MICRO_MASK | M_ATN | M_AUTY )
-#define I_TBIT		( MICRO_MASK | M_CKP | M_CKN | M_MTP | M_NE )
-#define I_TCY		( MICRO_MASK | M_CKP | M_AUTY )
-#define I_TCMIY		( MICRO_MASK | M_CKM | M_YTP | M_CIN | M_AUTY )
-#define I_TKA		( MICRO_MASK | M_CKP | M_AUTA )
-#define I_TKM		( MICRO_MASK | M_CKM )
-#define I_TMA		( MICRO_MASK | M_MTP | M_AUTA )
-#define I_TMY		( MICRO_MASK | M_MTP | M_AUTY )
-#define I_TYA		( MICRO_MASK | M_YTP | M_AUTA )
-#define I_XDA		( MICRO_MASK | M_DMTP | M_AUTA | M_STO )
-#define I_XMA		( MICRO_MASK | M_MTP | M_STO | M_AUTA )
-#define I_YMCY		( MICRO_MASK | M_CIN | M_YTP | M_CKN | M_AUTY )
-#define I_YNEA		( MICRO_MASK | M_YTP | M_ATN | M_NE )
-#define I_YNEC		( MICRO_MASK | M_YTP | M_CKN | M_NE )
+#define I_AC1AC     ( MICRO_MASK | M_CKP | M_ATN | M_CIN | M_C8 | M_AUTA )
+#define I_A6AAC     I_ACACC
+#define I_A8AAC     I_ACACC
+#define I_A10AAC    I_ACACC
+#define I_ACACC     ( MICRO_MASK | M_CKP | M_ATN | M_C8 | M_AUTA )
+#define I_ACNAA     ( MICRO_MASK | M_CKP | M_NATN | M_AUTA )
+#define I_ALEC      ( MICRO_MASK | M_CKP | M_NATN | M_CIN | M_C8 )
+#define I_ALEM      ( MICRO_MASK | M_MTP | M_NATN | M_CIN | M_C8 )
+#define I_AMAAC     ( MICRO_MASK | M_MTP | M_ATN | M_C8 | M_AUTA )
+#define I_CCLA      ( MICRO_MASK | M_AUTA | M_SSS )
+#define I_CLA       ( MICRO_MASK | M_AUTA )
+#define I_CPAIZ     ( MICRO_MASK | M_NATN | M_CIN | M_C8 | M_AUTA )
+#define I_CTMDYN    ( MICRO_MASK | M_YTP | M_15TN | M_C8 | M_AUTY | M_CME )
+#define I_DAN       ( MICRO_MASK | M_CKP | M_ATN | M_CIN | M_C8 | M_AUTA )
+#define I_DMAN      ( MICRO_MASK | M_MTP | M_15TN | M_C8 | M_AUTA )
+#define I_DMEA      ( MICRO_MASK | M_MTP | M_DMTP | M_SSS | M_AUTA )
+#define I_DNAA      ( MICRO_MASK | M_DMTP | M_NATN | M_SSS | M_AUTA )
+#define I_DYN       ( MICRO_MASK | M_YTP | M_15TN | M_C8 | M_AUTY )
+#define I_IA        ( MICRO_MASK | M_ATN | M_CIN | M_AUTA )
+#define I_IMAC      ( MICRO_MASK | M_MTP | M_CIN | M_C8 | M_AUTA )
+#define I_IYC       ( MICRO_MASK | M_YTP | M_CIN | M_C8 | M_AUTY )
+#define I_KNEZ      ( MICRO_MASK | M_CKP | M_NE )
+#define I_MNEA      ( MICRO_MASK | M_MTP | M_ATN | M_NE )
+#define I_MNEZ      ( MICRO_MASK | M_MTP | M_NE )
+#define I_M_NDMEA   ( MICRO_MASK | M_MTN | M_NDTMP | M_SSS | M_AUTA )
+#define I_SAMAN     ( MICRO_MASK | M_MTP | M_NATN | M_CIN | M_C8 | M_AUTA )
+#define I_SETR      ( MICRO_MASK | M_YTP | M_15TN | M_AUTY | M_C8 )
+#define I_TAM       ( MICRO_MASK | M_STO )
+#define I_TAMACS    ( MICRO_MASK | M_STO | M_ATN | M_CKP | M_AUTA | M_SSE )
+#define I_TAMDYN    ( MICRO_MASK | M_STO | M_YTP | M_15TN | M_AUTY | M_C8 )
+#define I_TAMIY     ( MICRO_MASK | M_STO | M_YTP | M_CIN | M_AUTY )
+#define I_TAMIYC    ( MICRO_MASK | M_STO | M_YTP | M_CIN | M_C8 | M_AUTY )
+#define I_TAMZA     ( MICRO_MASK | M_STO | M_AUTA )
+#define I_TAY       ( MICRO_MASK | M_ATN | M_AUTY )
+#define I_TBIT      ( MICRO_MASK | M_CKP | M_CKN | M_MTP | M_NE )
+#define I_TCY       ( MICRO_MASK | M_CKP | M_AUTY )
+#define I_TCMIY     ( MICRO_MASK | M_CKM | M_YTP | M_CIN | M_AUTY )
+#define I_TKA       ( MICRO_MASK | M_CKP | M_AUTA )
+#define I_TKM       ( MICRO_MASK | M_CKM )
+#define I_TMA       ( MICRO_MASK | M_MTP | M_AUTA )
+#define I_TMY       ( MICRO_MASK | M_MTP | M_AUTY )
+#define I_TYA       ( MICRO_MASK | M_YTP | M_AUTA )
+#define I_XDA       ( MICRO_MASK | M_DMTP | M_AUTA | M_STO )
+#define I_XMA       ( MICRO_MASK | M_MTP | M_STO | M_AUTA )
+#define I_YMCY      ( MICRO_MASK | M_CIN | M_YTP | M_CKN | M_AUTY )
+#define I_YNEA      ( MICRO_MASK | M_YTP | M_ATN | M_NE )
+#define I_YNEC      ( MICRO_MASK | M_YTP | M_CKN | M_NE )
 
 
 struct tms0980_state
 {
-	UINT8	m_prev_pc;		/* previous program counter */
-	UINT8	m_prev_pa;		/* previous page address register */
-	UINT8	m_pc;			/* program counter is a 7 bit register on tms0980, 6 bit register on tms1000/1070/1200/1270/1100/1300 */
-	UINT8	m_pa;			/* page address register is a 4 bit register */
-	UINT8	m_sr;			/* subroutine return register is a 7 bit register */
-	UINT8	m_pb;			/* page buffer register is a 4 bit register */
-	UINT8	m_a;			/* Accumulator is a 4 bit register (?) */
-	UINT8	m_x;			/* X-register is a 2, 3, or 4 bit register */
-	UINT8	m_y;			/* Y-register is a 4 bit register */
-	UINT8	m_dam;			/* DAM register is a 4 bit register */
-	UINT8	m_ca;			/* Chapter address bit */
-	UINT8	m_cb;			/* Chapter buffer bit */
-	UINT8	m_cs;			/* Chapter subroutine bit */
-	UINT16	m_r;
-	UINT8	m_o;
-	UINT8	m_cki_bus;		/* CKI bus */
-	UINT8	m_p;			/* adder p-input */
-	UINT8	m_n;			/* adder n-input */
-	UINT8	m_adder_result;	/* adder result */
-	UINT8	m_carry_in;		/* carry in */
-	UINT8	m_status;
-	UINT8	m_status_latch;
-	UINT8	m_special_status;
-	UINT8	m_call_latch;
-	UINT8	m_add_latch;
-	UINT8	m_branch_latch;
-	int		m_subcycle;
-	UINT8	m_ram_address;
-	UINT16	m_ram_data;
-	UINT16	m_rom_address;
-	UINT16	m_opcode;
-	UINT32	m_decode;
-	int		m_icount;
-	UINT16	m_o_mask;		/* mask to determine the number of O outputs */
-	UINT16	m_r_mask;		/* mask to determine the number of R outputs */
-	UINT8	m_pc_size;		/* how bits in the PC register */
-	UINT8	m_byte_size;	/* 8 or 9 bit bytes */
-	UINT8	m_x_bits;		/* determine the number of bits in the X register */
+	UINT8   m_prev_pc;      /* previous program counter */
+	UINT8   m_prev_pa;      /* previous page address register */
+	UINT8   m_pc;           /* program counter is a 7 bit register on tms0980, 6 bit register on tms1000/1070/1200/1270/1100/1300 */
+	UINT8   m_pa;           /* page address register is a 4 bit register */
+	UINT8   m_sr;           /* subroutine return register is a 7 bit register */
+	UINT8   m_pb;           /* page buffer register is a 4 bit register */
+	UINT8   m_a;            /* Accumulator is a 4 bit register (?) */
+	UINT8   m_x;            /* X-register is a 2, 3, or 4 bit register */
+	UINT8   m_y;            /* Y-register is a 4 bit register */
+	UINT8   m_dam;          /* DAM register is a 4 bit register */
+	UINT8   m_ca;           /* Chapter address bit */
+	UINT8   m_cb;           /* Chapter buffer bit */
+	UINT8   m_cs;           /* Chapter subroutine bit */
+	UINT16  m_r;
+	UINT8   m_o;
+	UINT8   m_cki_bus;      /* CKI bus */
+	UINT8   m_p;            /* adder p-input */
+	UINT8   m_n;            /* adder n-input */
+	UINT8   m_adder_result; /* adder result */
+	UINT8   m_carry_in;     /* carry in */
+	UINT8   m_status;
+	UINT8   m_status_latch;
+	UINT8   m_special_status;
+	UINT8   m_call_latch;
+	UINT8   m_add_latch;
+	UINT8   m_branch_latch;
+	int     m_subcycle;
+	UINT8   m_ram_address;
+	UINT16  m_ram_data;
+	UINT16  m_rom_address;
+	UINT16  m_opcode;
+	UINT32  m_decode;
+	int     m_icount;
+	UINT16  m_o_mask;       /* mask to determine the number of O outputs */
+	UINT16  m_r_mask;       /* mask to determine the number of R outputs */
+	UINT8   m_pc_size;      /* how bits in the PC register */
+	UINT8   m_byte_size;    /* 8 or 9 bit bytes */
+	UINT8   m_x_bits;       /* determine the number of bits in the X register */
 	const UINT32 *m_decode_table;
-	const tms0980_config	*config;
+	const tms0980_config    *config;
 	address_space *m_program;
 	address_space *m_data;
 
@@ -747,8 +747,8 @@ INLINE void tms0980_next_pc( tms0980_state *cpustate )
 {
 	if ( cpustate->m_byte_size > 8 )
 	{
-		UINT8	xorval = ( cpustate->m_pc & 0x3F ) == 0x3F ? 1 : 0;
-		UINT8	new_bit = ( ( cpustate->m_pc ^ ( cpustate->m_pc << 1 ) ) & 0x40 ) ? xorval : 1 - xorval;
+		UINT8   xorval = ( cpustate->m_pc & 0x3F ) == 0x3F ? 1 : 0;
+		UINT8   new_bit = ( ( cpustate->m_pc ^ ( cpustate->m_pc << 1 ) ) & 0x40 ) ? xorval : 1 - xorval;
 
 		cpustate->m_pc = ( cpustate->m_pc << 1 ) | new_bit;
 	}
@@ -1134,15 +1134,15 @@ static CPU_SET_INFO( tms0980 )
 
 	switch( state )
 	{
-		case CPUINFO_INT_PC:										cpustate->m_pc = ( info->i >> 1 ) & 0x7f; cpustate->m_pa = ( info->i >> 8 ) & 0x0F; cpustate->m_cb = ( info->i >> 12 ) & 0x01; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PC:						cpustate->m_pc = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_SR:						cpustate->m_sr = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PA:						cpustate->m_pa = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PB:						cpustate->m_pb = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_A:						cpustate->m_a = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_X:						cpustate->m_x = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_Y:						cpustate->m_y = info->i; break;
-		case CPUINFO_INT_REGISTER + TMS0980_STATUS:					cpustate->m_status = info->i; break;
+		case CPUINFO_INT_PC:                                        cpustate->m_pc = ( info->i >> 1 ) & 0x7f; cpustate->m_pa = ( info->i >> 8 ) & 0x0F; cpustate->m_cb = ( info->i >> 12 ) & 0x01; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PC:                     cpustate->m_pc = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_SR:                     cpustate->m_sr = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PA:                     cpustate->m_pa = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PB:                     cpustate->m_pb = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_A:                      cpustate->m_a = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_X:                      cpustate->m_x = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_Y:                      cpustate->m_y = info->i; break;
+		case CPUINFO_INT_REGISTER + TMS0980_STATUS:                 cpustate->m_status = info->i; break;
 	}
 }
 
@@ -1153,51 +1153,51 @@ static CPU_GET_INFO( tms_generic )
 
 	switch(state)
 	{
-		case CPUINFO_INT_CONTEXT_SIZE:									info->i = sizeof(tms0980_state); break;
-		case CPUINFO_INT_INPUT_LINES:									info->i = 1; break;
-		case CPUINFO_INT_ENDIANNESS:									info->i = ENDIANNESS_BIG; break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:								info->i = 1; break;
-		case CPUINFO_INT_CLOCK_DIVIDER:									info->i = 1; break;
-		case CPUINFO_INT_MIN_CYCLES:									info->i = 1; break;
-		case CPUINFO_INT_MAX_CYCLES:									info->i = 6; break;
+		case CPUINFO_INT_CONTEXT_SIZE:                                  info->i = sizeof(tms0980_state); break;
+		case CPUINFO_INT_INPUT_LINES:                                   info->i = 1; break;
+		case CPUINFO_INT_ENDIANNESS:                                    info->i = ENDIANNESS_BIG; break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:                              info->i = 1; break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                                 info->i = 1; break;
+		case CPUINFO_INT_MIN_CYCLES:                                    info->i = 1; break;
+		case CPUINFO_INT_MAX_CYCLES:                                    info->i = 6; break;
 
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0; break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8 /* 4 */; break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0; break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = 0; break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8 /* 4 */; break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0; break;
 
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->m_prev_pa << 7 ) | cpustate->m_prev_pc ) << 1; break;
-		case CPUINFO_INT_PC:											info->i = ( ( cpustate->m_pa << 7 ) | cpustate->m_pc ) << 1; break;
-		case CPUINFO_INT_SP:											info->i = 0xFFFF; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PC:							info->i = cpustate->m_pc; break;
-		case CPUINFO_INT_REGISTER + TMS0980_SR:							info->i = cpustate->m_sr; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PA:							info->i = cpustate->m_pa; break;
-		case CPUINFO_INT_REGISTER + TMS0980_PB:							info->i = cpustate->m_pb; break;
-		case CPUINFO_INT_REGISTER + TMS0980_A:							info->i = cpustate->m_a; break;
-		case CPUINFO_INT_REGISTER + TMS0980_X:							info->i = cpustate->m_x; break;
-		case CPUINFO_INT_REGISTER + TMS0980_Y:							info->i = cpustate->m_y; break;
-		case CPUINFO_INT_REGISTER + TMS0980_STATUS:						info->i = cpustate->m_status; break;
+		case CPUINFO_INT_PREVIOUSPC:                                    info->i = ( ( cpustate->m_prev_pa << 7 ) | cpustate->m_prev_pc ) << 1; break;
+		case CPUINFO_INT_PC:                                            info->i = ( ( cpustate->m_pa << 7 ) | cpustate->m_pc ) << 1; break;
+		case CPUINFO_INT_SP:                                            info->i = 0xFFFF; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PC:                         info->i = cpustate->m_pc; break;
+		case CPUINFO_INT_REGISTER + TMS0980_SR:                         info->i = cpustate->m_sr; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PA:                         info->i = cpustate->m_pa; break;
+		case CPUINFO_INT_REGISTER + TMS0980_PB:                         info->i = cpustate->m_pb; break;
+		case CPUINFO_INT_REGISTER + TMS0980_A:                          info->i = cpustate->m_a; break;
+		case CPUINFO_INT_REGISTER + TMS0980_X:                          info->i = cpustate->m_x; break;
+		case CPUINFO_INT_REGISTER + TMS0980_Y:                          info->i = cpustate->m_y; break;
+		case CPUINFO_INT_REGISTER + TMS0980_STATUS:                     info->i = cpustate->m_status; break;
 
-		case CPUINFO_FCT_SET_INFO:										info->setinfo = CPU_SET_INFO_NAME( tms0980 ); break;
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms0980 ); break;
-		case CPUINFO_FCT_RESET:											info->reset = CPU_RESET_NAME( tms0980 ); break;
-		case CPUINFO_FCT_EXECUTE:										info->execute = CPU_EXECUTE_NAME( tms0980 ); break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:							info->icount = &cpustate->m_icount; break;
+		case CPUINFO_FCT_SET_INFO:                                      info->setinfo = CPU_SET_INFO_NAME( tms0980 ); break;
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms0980 ); break;
+		case CPUINFO_FCT_RESET:                                         info->reset = CPU_RESET_NAME( tms0980 ); break;
+		case CPUINFO_FCT_EXECUTE:                                       info->execute = CPU_EXECUTE_NAME( tms0980 ); break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:                           info->icount = &cpustate->m_icount; break;
 
-		case CPUINFO_STR_FAMILY:										strcpy( info->s, "Texas Instruments TMS0980/TMS1000" ); break;
-		case CPUINFO_STR_VERSION:										strcpy( info->s, "0.2" ); break;
-		case CPUINFO_STR_SOURCE_FILE:									strcpy( info->s, __FILE__ ); break;
-		case CPUINFO_STR_CREDITS:										strcpy( info->s, "Copyright the MESS and MAME teams" ); break;
+		case CPUINFO_STR_FAMILY:                                        strcpy( info->s, "Texas Instruments TMS0980/TMS1000" ); break;
+		case CPUINFO_STR_VERSION:                                       strcpy( info->s, "0.2" ); break;
+		case CPUINFO_STR_SOURCE_FILE:                                   strcpy( info->s, __FILE__ ); break;
+		case CPUINFO_STR_CREDITS:                                       strcpy( info->s, "Copyright the MESS and MAME teams" ); break;
 
-		case CPUINFO_STR_FLAGS:											strcpy( info->s, "N/A" ); break;
+		case CPUINFO_STR_FLAGS:                                         strcpy( info->s, "N/A" ); break;
 
-		case CPUINFO_STR_REGISTER + TMS0980_PC:							sprintf( info->s, "PC:%02X", cpustate->m_pc ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_SR:							sprintf( info->s, "SR:%01X", cpustate->m_sr ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_PA:							sprintf( info->s, "PA:%01X", cpustate->m_pa ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_PB:							sprintf( info->s, "PB:%01X", cpustate->m_pb ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_A:							sprintf( info->s, "A:%01X", cpustate->m_a ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_X:							sprintf( info->s, "X:%01X", cpustate->m_x ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_Y:							sprintf( info->s, "Y:%01X", cpustate->m_y ); break;
-		case CPUINFO_STR_REGISTER + TMS0980_STATUS:						sprintf( info->s, "STATUS:%01X", cpustate->m_status ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_PC:                         sprintf( info->s, "PC:%02X", cpustate->m_pc ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_SR:                         sprintf( info->s, "SR:%01X", cpustate->m_sr ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_PA:                         sprintf( info->s, "PA:%01X", cpustate->m_pa ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_PB:                         sprintf( info->s, "PB:%01X", cpustate->m_pb ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_A:                          sprintf( info->s, "A:%01X", cpustate->m_a ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_X:                          sprintf( info->s, "X:%01X", cpustate->m_x ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_Y:                          sprintf( info->s, "Y:%01X", cpustate->m_y ); break;
+		case CPUINFO_STR_REGISTER + TMS0980_STATUS:                     sprintf( info->s, "STATUS:%01X", cpustate->m_status ); break;
 
 	}
 }
@@ -1209,19 +1209,19 @@ CPU_GET_INFO( tms0980 )
 
 	switch(state)
 	{
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:							info->i = 2; break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:							info->i = 2; break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16 /* 9 */; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 12; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->m_prev_pa << 7 ) | cpustate->m_prev_pc ) << 1; break;
-		case CPUINFO_INT_PC:											info->i = ( ( cpustate->m_pa << 7 ) | cpustate->m_pc ) << 1; break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map16 = ADDRESS_MAP_NAME( tms0980_internal_rom ); break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( tms0980_internal_ram ); break;
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms0980 ); break;
-		case CPUINFO_FCT_DISASSEMBLE:									info->disassemble = CPU_DISASSEMBLE_NAME( tms0980 ); break;
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS0980" ); break;
-		default:														CPU_GET_INFO_CALL( tms_generic );
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:                         info->i = 2; break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:                         info->i = 2; break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 16 /* 9 */; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 12; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 7; break;
+		case CPUINFO_INT_PREVIOUSPC:                                    info->i = ( ( cpustate->m_prev_pa << 7 ) | cpustate->m_prev_pc ) << 1; break;
+		case CPUINFO_INT_PC:                                            info->i = ( ( cpustate->m_pa << 7 ) | cpustate->m_pc ) << 1; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:                  info->internal_map16 = ADDRESS_MAP_NAME( tms0980_internal_rom ); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:                     info->internal_map8 = ADDRESS_MAP_NAME( tms0980_internal_ram ); break;
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms0980 ); break;
+		case CPUINFO_FCT_DISASSEMBLE:                                   info->disassemble = CPU_DISASSEMBLE_NAME( tms0980 ); break;
+		case CPUINFO_STR_NAME:                                          strcpy( info->s, "TMS0980" ); break;
+		default:                                                        CPU_GET_INFO_CALL( tms_generic );
 	}
 }
 
@@ -1232,19 +1232,19 @@ CPU_GET_INFO( tms1000 )
 
 	switch(state)
 	{
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:							info->i = 1; break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:							info->i = 1; break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 10; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 6; break;
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->m_prev_pa << 6 ) | tms1000_pc_decode[ cpustate->m_prev_pc ]; break;
-		case CPUINFO_INT_PC:											info->i = ( cpustate->m_pa << 6 ) | tms1000_pc_decode[ cpustate->m_pc ]; break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_10bit_8 ); break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_6bit ); break;
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1000 ); break;
-		case CPUINFO_FCT_DISASSEMBLE:									info->disassemble = CPU_DISASSEMBLE_NAME( tms1000 ); break;
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS1000" ); break;
-		default:														CPU_GET_INFO_CALL( tms_generic );
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:                         info->i = 1; break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:                         info->i = 1; break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 10; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 6; break;
+		case CPUINFO_INT_PREVIOUSPC:                                    info->i = ( cpustate->m_prev_pa << 6 ) | tms1000_pc_decode[ cpustate->m_prev_pc ]; break;
+		case CPUINFO_INT_PC:                                            info->i = ( cpustate->m_pa << 6 ) | tms1000_pc_decode[ cpustate->m_pc ]; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:                  info->internal_map8 = ADDRESS_MAP_NAME( program_10bit_8 ); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:                     info->internal_map8 = ADDRESS_MAP_NAME( data_6bit ); break;
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms1000 ); break;
+		case CPUINFO_FCT_DISASSEMBLE:                                   info->disassemble = CPU_DISASSEMBLE_NAME( tms1000 ); break;
+		case CPUINFO_STR_NAME:                                          strcpy( info->s, "TMS1000" ); break;
+		default:                                                        CPU_GET_INFO_CALL( tms_generic );
 	}
 }
 
@@ -1253,9 +1253,9 @@ CPU_GET_INFO( tms1070 )
 {
 	switch(state)
 	{
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1070 ); break;
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS1070" ); break;
-		default:														CPU_GET_INFO_CALL( tms1000 );
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms1070 ); break;
+		case CPUINFO_STR_NAME:                                          strcpy( info->s, "TMS1070" ); break;
+		default:                                                        CPU_GET_INFO_CALL( tms1000 );
 	}
 }
 
@@ -1264,9 +1264,9 @@ CPU_GET_INFO( tms1200 )
 {
 	switch(state)
 	{
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1200 ); break;
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS1200" ); break;
-		default:														CPU_GET_INFO_CALL( tms1000 );
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms1200 ); break;
+		case CPUINFO_STR_NAME:                                          strcpy( info->s, "TMS1200" ); break;
+		default:                                                        CPU_GET_INFO_CALL( tms1000 );
 	}
 }
 
@@ -1275,9 +1275,9 @@ CPU_GET_INFO( tms1270 )
 {
 	switch(state)
 	{
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1270 ); break;
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS1270" ); break;
-		default:														CPU_GET_INFO_CALL( tms1000 );
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms1270 ); break;
+		case CPUINFO_STR_NAME:                                          strcpy( info->s, "TMS1270" ); break;
+		default:                                                        CPU_GET_INFO_CALL( tms1000 );
 	}
 }
 
@@ -1289,19 +1289,19 @@ CPU_GET_INFO( tms1100 )
 
 	switch(state)
 	{
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:							info->i = 1; break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:							info->i = 1; break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 11; break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
-		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->m_prev_pa << 6 ) | cpustate->m_prev_pc; break;
-		case CPUINFO_INT_PC:											info->i = ( cpustate->m_ca << 10 ) | ( cpustate->m_pa << 6 ) | cpustate->m_pc; break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_11bit_8 ); break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_7bit ); break;
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1100 ); break;
-		case CPUINFO_FCT_DISASSEMBLE:									info->disassemble = CPU_DISASSEMBLE_NAME( tms1100 ); break;
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS1100" ); break;
-		default:														CPU_GET_INFO_CALL( tms_generic );
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:                         info->i = 1; break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:                         info->i = 1; break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 11; break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 7; break;
+		case CPUINFO_INT_PREVIOUSPC:                                    info->i = ( cpustate->m_prev_pa << 6 ) | cpustate->m_prev_pc; break;
+		case CPUINFO_INT_PC:                                            info->i = ( cpustate->m_ca << 10 ) | ( cpustate->m_pa << 6 ) | cpustate->m_pc; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:                  info->internal_map8 = ADDRESS_MAP_NAME( program_11bit_8 ); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:                     info->internal_map8 = ADDRESS_MAP_NAME( data_7bit ); break;
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms1100 ); break;
+		case CPUINFO_FCT_DISASSEMBLE:                                   info->disassemble = CPU_DISASSEMBLE_NAME( tms1100 ); break;
+		case CPUINFO_STR_NAME:                                          strcpy( info->s, "TMS1100" ); break;
+		default:                                                        CPU_GET_INFO_CALL( tms_generic );
 	}
 }
 
@@ -1310,9 +1310,9 @@ CPU_GET_INFO( tms1300 )
 {
 	switch(state)
 	{
-		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1300 ); break;
-		case CPUINFO_STR_NAME:											strcpy( info->s, "TMS1300" ); break;
-		default:														CPU_GET_INFO_CALL( tms1100 );
+		case CPUINFO_FCT_INIT:                                          info->init = CPU_INIT_NAME( tms1300 ); break;
+		case CPUINFO_STR_NAME:                                          strcpy( info->s, "TMS1300" ); break;
+		default:                                                        CPU_GET_INFO_CALL( tms1100 );
 	}
 }
 

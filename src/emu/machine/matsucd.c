@@ -18,38 +18,38 @@ can be expanded with support for the other drives as needed.
 #include "machine/matsucd.h"
 
 
-#define MATSU_STATUS_READY		( 1 << 0 )	/* driver ready */
-#define MATSU_STATUS_DOORLOCKED	( 1 << 1 )	/* door locked */
-#define MATSU_STATUS_PLAYING	( 1 << 2 )	/* drive playing */
-#define MATSU_STATUS_SUCCESS	( 1 << 3 )	/* last command was successful */
-#define MATSU_STATUS_ERROR		( 1 << 4 )	/* last command failed */
-#define MATSU_STATUS_MOTOR		( 1 << 5 )	/* spinning */
-#define MATSU_STATUS_MEDIA		( 1 << 6 )	/* media present (in caddy or tray) */
-#define MATSU_STATUS_DOORCLOSED	( 1 << 7 )	/* tray status */
+#define MATSU_STATUS_READY      ( 1 << 0 )  /* driver ready */
+#define MATSU_STATUS_DOORLOCKED ( 1 << 1 )  /* door locked */
+#define MATSU_STATUS_PLAYING    ( 1 << 2 )  /* drive playing */
+#define MATSU_STATUS_SUCCESS    ( 1 << 3 )  /* last command was successful */
+#define MATSU_STATUS_ERROR      ( 1 << 4 )  /* last command failed */
+#define MATSU_STATUS_MOTOR      ( 1 << 5 )  /* spinning */
+#define MATSU_STATUS_MEDIA      ( 1 << 6 )  /* media present (in caddy or tray) */
+#define MATSU_STATUS_DOORCLOSED ( 1 << 7 )  /* tray status */
 
 struct matsucd
 {
-	UINT8	enabled;		/* /ENABLE - Unit enabled */
-	UINT8	cmd_signal;		/* /CMD - Command mode   */
-	UINT8	stch_signal;	/* /STCH - Status Changed */
-	UINT8	sten_signal;	/* /STEN - Status Enabled */
-	UINT8	scor_signal;	/* /STEN - Subcode Ready */
-	UINT8	input[16];
-	UINT8	input_pos;
-	UINT8	output[16];
-	UINT8	output_pos;
-	UINT8	output_len;
-	UINT8	status;
-	UINT8	motor;
-	UINT16	sector_size;
-	UINT32	lba;
-	UINT16	num_blocks;
-	UINT16	xfer_offset;
-	UINT8	sector_buffer[CD_MAX_SECTOR_DATA];
-	UINT8	cdda_set;
-	void (*sten_cb)( running_machine &machine, int level );	/* Status enabled callback */
-	void (*stch_cb)( running_machine &machine, int level );	/* Status changed callback */
-	void (*scor_cb)( running_machine &machine, int level );	/* Subcode ready callback */
+	UINT8   enabled;        /* /ENABLE - Unit enabled */
+	UINT8   cmd_signal;     /* /CMD - Command mode   */
+	UINT8   stch_signal;    /* /STCH - Status Changed */
+	UINT8   sten_signal;    /* /STEN - Status Enabled */
+	UINT8   scor_signal;    /* /STEN - Subcode Ready */
+	UINT8   input[16];
+	UINT8   input_pos;
+	UINT8   output[16];
+	UINT8   output_pos;
+	UINT8   output_len;
+	UINT8   status;
+	UINT8   motor;
+	UINT16  sector_size;
+	UINT32  lba;
+	UINT16  num_blocks;
+	UINT16  xfer_offset;
+	UINT8   sector_buffer[CD_MAX_SECTOR_DATA];
+	UINT8   cdda_set;
+	void (*sten_cb)( running_machine &machine, int level ); /* Status enabled callback */
+	void (*stch_cb)( running_machine &machine, int level ); /* Status changed callback */
+	void (*scor_cb)( running_machine &machine, int level ); /* Subcode ready callback */
 	cdrom_file *cdrom;
 	device_t *cdda;
 	emu_timer *frame_timer;
@@ -188,20 +188,20 @@ static UINT8 matsucd_cdda_getstatus( running_machine &machine, UINT32 *lba )
 
 			if (cdda_audio_paused(cdda))
 			{
-				return 0x12;	/* audio paused */
+				return 0x12;    /* audio paused */
 			}
 			else
 			{
-				return 0x11;	/* audio in progress */
+				return 0x11;    /* audio in progress */
 			}
 		}
 		else if (cdda_audio_ended(cdda))
 		{
-			return 0x13;	/* audio ended */
+			return 0x13;    /* audio ended */
 		}
 	}
 
-	return 0x15;	/* no audio status */
+	return 0x15;    /* no audio status */
 }
 
 void matsucd_enable_w( int level )
@@ -286,8 +286,8 @@ static TIMER_CALLBACK(matsu_subcode_proc)
 
 	if (cdda != NULL)
 	{
-		UINT8	s = matsucd_cdda_getstatus(machine, NULL);
-		UINT8	newstatus = cd.status;
+		UINT8   s = matsucd_cdda_getstatus(machine, NULL);
+		UINT8   newstatus = cd.status;
 
 		if ( s == 0x11 || s == 0x12 )
 		{
@@ -312,7 +312,7 @@ static TIMER_CALLBACK(matsu_subcode_proc)
 
 static void matsucd_command_error( running_machine &machine )
 {
-	UINT8	newstatus = cd.status;
+	UINT8   newstatus = cd.status;
 
 	newstatus &= ~MATSU_STATUS_SUCCESS;
 	newstatus |= MATSU_STATUS_ERROR;
@@ -322,7 +322,7 @@ static void matsucd_command_error( running_machine &machine )
 
 static void matsucd_complete_cmd( running_machine &machine, UINT8 len )
 {
-	UINT8	newstatus = cd.status;
+	UINT8   newstatus = cd.status;
 
 	cd.input_pos = 0;
 	cd.output_pos = 0;
@@ -339,7 +339,7 @@ static void matsucd_complete_cmd( running_machine &machine, UINT8 len )
 
 UINT8 matsucd_response_r( running_machine &machine )
 {
-	UINT8	v = cd.output[cd.output_pos++];
+	UINT8   v = cd.output[cd.output_pos++];
 
 	if ( cd.output_pos < cd.output_len )
 	{
@@ -352,7 +352,7 @@ UINT8 matsucd_response_r( running_machine &machine )
 
 void matsucd_command_w( running_machine &machine, UINT8 data )
 {
-	UINT8	cmd;
+	UINT8   cmd;
 
 	/* make sure we're enabled */
 	if ( cd.enabled == 0 )
@@ -379,7 +379,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 
 	switch( cmd )
 	{
-		case 0x01:	/* seek */
+		case 0x01:  /* seek */
 		{
 			if ( cd.input_pos < 7 )
 				return;
@@ -394,7 +394,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x02:	/* read sectors */
+		case 0x02:  /* read sectors */
 		{
 			if ( cd.input_pos < 7 )
 				return;
@@ -432,7 +432,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x04:	/* motor on */
+		case 0x04:  /* motor on */
 		{
 			if ( cd.input_pos < 7 )
 				return;
@@ -444,7 +444,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x05:	/* motor off */
+		case 0x05:  /* motor off */
 		{
 			if ( cd.input_pos < 7 )
 				return;
@@ -459,9 +459,9 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x09:	/* play audio cd, LBA mode */
+		case 0x09:  /* play audio cd, LBA mode */
 		{
-			UINT32	lba, numblocks;
+			UINT32  lba, numblocks;
 
 			if ( cd.input_pos < 7 )
 				return;
@@ -487,9 +487,9 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x0a:	/* play audio cd, MSF mode */
+		case 0x0a:  /* play audio cd, MSF mode */
 		{
-			UINT32	start, end, lba_start, lba_end;
+			UINT32  start, end, lba_start, lba_end;
 
 			if ( cd.input_pos < 7 )
 				return;
@@ -530,13 +530,13 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x0b:	/* play audio track and index */
+		case 0x0b:  /* play audio track and index */
 		{
-			UINT8	track_start = cd.input[1];
-			UINT8	index_start = cd.input[2];
-			UINT8	track_end = cd.input[3];
-			UINT8	index_end = cd.input[4];
-			UINT32	lba_start, lba_end;
+			UINT8   track_start = cd.input[1];
+			UINT8   index_start = cd.input[2];
+			UINT8   track_end = cd.input[3];
+			UINT8   index_end = cd.input[4];
+			UINT32  lba_start, lba_end;
 
 			/* TODO: Add index support once the CDDA engine supports it */
 			(void)index_start;
@@ -569,9 +569,9 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x81:	/* status read */
+		case 0x81:  /* status read */
 		{
-			UINT8	newstatus = cd.status;
+			UINT8   newstatus = cd.status;
 
 			newstatus &= MATSU_STATUS_SUCCESS | MATSU_STATUS_ERROR | MATSU_STATUS_PLAYING;
 			newstatus |= MATSU_STATUS_READY;
@@ -592,7 +592,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x82:	/* error read */
+		case 0x82:  /* error read */
 		{
 			if ( cd.input_pos < 7 )
 				return;
@@ -602,7 +602,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x84:	/* set mode */
+		case 0x84:  /* set mode */
 		{
 			if ( cd.input_pos < 7 )
 				return;
@@ -616,11 +616,11 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x87:	/* read SUBQ */
+		case 0x87:  /* read SUBQ */
 		{
-			int		msfmode;
-			UINT32	lba;
-			UINT8	track;
+			int     msfmode;
+			UINT32  lba;
+			UINT8   track;
 
 			if ( cd.input_pos < 7 )
 				return;
@@ -633,8 +633,8 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 
 			if ( lba > 0 )
 			{
-				UINT32	disk_pos;
-				UINT32	track_pos;
+				UINT32  disk_pos;
+				UINT32  track_pos;
 
 				track = cdrom_get_track(cd.cdrom, lba);
 
@@ -666,9 +666,9 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x89:	/* read disk info */
+		case 0x89:  /* read disk info */
 		{
-			UINT32	end;
+			UINT32  end;
 
 			if ( cd.input_pos < 7 )
 				return;
@@ -688,11 +688,11 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x8a:	/* read toc */
+		case 0x8a:  /* read toc */
 		{
-			UINT8	track;
-			int		msfmode;
-			UINT32	track_start;
+			UINT8   track;
+			int     msfmode;
+			UINT32  track_start;
 
 			if ( cd.input_pos < 7 )
 				return;
@@ -736,7 +736,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0x8b:	/* pause audio */
+		case 0x8b:  /* pause audio */
 		{
 			if ( cd.input_pos < 7 )
 				return;
@@ -747,7 +747,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 		}
 		break;
 
-		case 0xa3:	/* front panel */
+		case 0xa3:  /* front panel */
 		{
 			if ( cd.input_pos < 7 )
 				return;

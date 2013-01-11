@@ -385,7 +385,7 @@ class chihiro_state : public driver_device
 {
 public:
 	chihiro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)	{ }
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_READ32_MEMBER( geforce_r );
 	DECLARE_WRITE32_MEMBER( geforce_w );
@@ -407,9 +407,9 @@ public:
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct chihiro_devices {
-		device_t	*pic8259_1;
-		device_t	*pic8259_2;
-		device_t	*ide;
+		device_t    *pic8259_1;
+		device_t    *pic8259_2;
+		device_t    *ide;
 	} chihiro_devs;
 
 	nv2a_renderer *nvidia_nv2a;
@@ -442,7 +442,7 @@ most methods set parameters, others actually draw
 class nv2a_renderer : public poly_manager<float, nvidia_object_data, 5, 6000>
 {
 public:
-	nv2a_renderer(running_machine &machine)	: poly_manager<float, nvidia_object_data, 5, 6000>(machine)
+	nv2a_renderer(running_machine &machine) : poly_manager<float, nvidia_object_data, 5, 6000>(machine)
 	{
 		memset(channel,0,sizeof(channel));
 		memset(pfifo,0,sizeof(pfifo));
@@ -720,7 +720,7 @@ static void jamtable_disasm(running_machine &machine, address_space &space,UINT3
 static void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
 {
 	address_space &space=machine.firstcpu->space();
-	UINT64	addr,size;
+	UINT64  addr,size;
 
 	if (params < 2)
 		return;
@@ -734,7 +734,7 @@ static void jamtable_disasm_command(running_machine &machine, int ref, int param
 static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
 {
 	address_space &space=machine.firstcpu->space();
-	UINT64	addr;
+	UINT64  addr;
 	offs_t address;
 	UINT32 length,maximumlength;
 	offs_t buffer;
@@ -1021,12 +1021,12 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 		texture.dilate=dilatechose[(basesizeu << 4)+basesizev];
 		texture.buffer=space.get_read_ptr(offset);
 		/*if (dma0 != 0) {
-            dmahand=channel[channel][subchannel].object.method[0x184/4];
-            geforce_read_dma_object(dmahand,dmaoff,smasiz);
-        } else if (dma1 != 0) {
-            dmahand=channel[channel][subchannel].object.method[0x188/4];
-            geforce_read_dma_object(dmahand,dmaoff,smasiz);
-        }*/
+		    dmahand=channel[channel][subchannel].object.method[0x184/4];
+		    geforce_read_dma_object(dmahand,dmaoff,smasiz);
+		} else if (dma1 != 0) {
+		    dmahand=channel[channel][subchannel].object.method[0x188/4];
+		    geforce_read_dma_object(dmahand,dmaoff,smasiz);
+		}*/
 	}
 	if (method*4 == 0x1810) {
 		// draw vertices
@@ -1064,9 +1064,9 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				float z[4],w[4];
 				UINT32 c[4];
 				/*float u[4],v[4];
-                int   xi,yi,xf,yf,dx,dy,xp,yp,up,vp;
-                float ui,vi,uf,vf,du,dv;
-                rectangle clip(0,0,639,479);*/
+				int   xi,yi,xf,yf,dx,dy,xp,yp,up,vp;
+				float ui,vi,uf,vf,du,dv;
+				rectangle clip(0,0,639,479);*/
 				render_delegate rend;
 
 				for (m=0;m < 4;m++) {
@@ -1088,9 +1088,9 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				render_polygon<4>(fb.cliprect(),rend,3+texture.enabled*2,xy);
 				wait();
 				/*myline(fb,xy[0].x,xy[0].y,xy[1].x,xy[1].y);
-                myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
-                myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);
-                myline(fb,xy[3].x,xy[3].y,xy[0].x,xy[0].y);*/
+				myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
+				myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);
+				myline(fb,xy[3].x,xy[3].y,xy[0].x,xy[0].y);*/
 				//printf(" (%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)\n\r",x[0],y[0],z[0],x[1],y[1],z[1],x[2],y[2],z[2],x[3],y[3],z[3]);
 			}
 		} else {
@@ -1476,16 +1476,16 @@ WRITE32_MEMBER( chihiro_state::ide_w )
 class ide_baseboard_device : public ide_hdd_device
 {
 public:
-    // construction/destruction
-    ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int	 read_sector(UINT32 lba, void *buffer);
-	virtual int	 write_sector(UINT32 lba, const void *buffer);
+	virtual int  read_sector(UINT32 lba, void *buffer);
+	virtual int  write_sector(UINT32 lba, const void *buffer);
 	virtual bool is_ready() { return true; }
 	virtual void read_key(UINT8 key[]) { }
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "ide_baseboard"; }
 };
@@ -1502,7 +1502,7 @@ const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
 //-------------------------------------------------
 
 ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : ide_hdd_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock)
+	: ide_hdd_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock)
 {
 }
 
@@ -1604,15 +1604,15 @@ static const struct pit8253_config chihiro_pit8254_config =
 {
 	{
 		{
-			1125000,				/* heartbeat IRQ */
+			1125000,                /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pit8254_out0_changed)
 		}, {
-			1125000,				/* (unused) dram refresh */
+			1125000,                /* (unused) dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			1125000,				/* (unused) pio port c pin 4, and speaker polling enough */
+			1125000,                /* (unused) pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pit8254_out2_changed)
 		}
@@ -2071,7 +2071,7 @@ ROM_START( outr2st )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0014a", 0, BAD_DUMP SHA1(4f9656634c47631f63eab554a13d19b15558217e) )
 
-	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)	// number was not readable on pic, please fix if known
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)   // number was not readable on pic, please fix if known
 	ROM_LOAD( "317-0xxx-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
 ROM_END
 

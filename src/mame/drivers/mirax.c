@@ -422,7 +422,7 @@ static const gfx_layout layout16 =
 	3,
 	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3)},
 	{ 0, 1, 2, 3, 4, 5, 6, 7 ,
-	  0+8*8,1+8*8,2+8*8,3+8*8,4+8*8,5+8*8,6+8*8,7+8*8},
+		0+8*8,1+8*8,2+8*8,3+8*8,4+8*8,5+8*8,6+8*8,7+8*8},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 	0*8+8*8*2, 1*8+8*8*2, 2*8+8*8*2, 3*8+8*8*2, 4*8+8*8*2, 5*8+8*8*2, 6*8+8*8*2, 7*8+8*8*2},
 	16*16
@@ -509,7 +509,7 @@ ROM_START( mirax )
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
-	ROM_LOAD( "mirax.prm",	0x0040, 0x0020, NO_DUMP ) // data ? encrypted roms for cpu1 ?
+	ROM_LOAD( "mirax.prm",  0x0040, 0x0020, NO_DUMP ) // data ? encrypted roms for cpu1 ?
 ROM_END
 
 ROM_START( miraxa )

@@ -685,8 +685,8 @@
 	<!--- Images below are from the TOSEC set -->
 	<!-- ones believed to be duplicates of those found in the REDUMP set are commented out
 
-     HOWEVER, this is not confirmed, they should eventually be checked on a case-by-case basis
- -->
+		HOWEVER, this is not confirmed, they should eventually be checked on a case-by-case basis
+	-->
 
 	<software name="3ninja">
 		<description>3 Ninjas Kick Back (USA)</description>

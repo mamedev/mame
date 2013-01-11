@@ -31,24 +31,24 @@
 #define __SH2_H__
 
 
-#define SH2_INT_NONE	-1
-#define SH2_INT_VBLIN	0
-#define SH2_INT_VBLOUT	1
-#define SH2_INT_HBLIN	2
-#define SH2_INT_TIMER0	3
-#define SH2_INT_TIMER1	4
-#define SH2_INT_DSP 	5
-#define SH2_INT_SOUND	6
-#define SH2_INT_SMPC	7
-#define SH2_INT_PAD 	8
-#define SH2_INT_DMA2	9
-#define SH2_INT_DMA1	10
-#define SH2_INT_DMA0	11
-#define SH2_INT_DMAILL	12
-#define SH2_INT_SPRITE	13
-#define SH2_INT_14		14
-#define SH2_INT_15		15
-#define SH2_INT_ABUS	16
+#define SH2_INT_NONE    -1
+#define SH2_INT_VBLIN   0
+#define SH2_INT_VBLOUT  1
+#define SH2_INT_HBLIN   2
+#define SH2_INT_TIMER0  3
+#define SH2_INT_TIMER1  4
+#define SH2_INT_DSP     5
+#define SH2_INT_SOUND   6
+#define SH2_INT_SMPC    7
+#define SH2_INT_PAD     8
+#define SH2_INT_DMA2    9
+#define SH2_INT_DMA1    10
+#define SH2_INT_DMA0    11
+#define SH2_INT_DMAILL  12
+#define SH2_INT_SPRITE  13
+#define SH2_INT_14      14
+#define SH2_INT_15      15
+#define SH2_INT_ABUS    16
 
 enum
 {
@@ -77,12 +77,12 @@ void sh2_set_frt_input(device_t *device, int state);
     COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
 
-#define SH2DRC_STRICT_VERIFY		0x0001			/* verify all instructions */
-#define SH2DRC_FLUSH_PC			0x0002			/* flush the PC value before each memory access */
-#define SH2DRC_STRICT_PCREL		0x0004			/* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
+#define SH2DRC_STRICT_VERIFY        0x0001          /* verify all instructions */
+#define SH2DRC_FLUSH_PC         0x0002          /* flush the PC value before each memory access */
+#define SH2DRC_STRICT_PCREL     0x0004          /* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
 
-#define SH2DRC_COMPATIBLE_OPTIONS	(SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
-#define SH2DRC_FASTEST_OPTIONS	(0)
+#define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
+#define SH2DRC_FASTEST_OPTIONS  (0)
 
 void sh2drc_set_options(device_t *device, UINT32 options);
 void sh2drc_add_pcflush(device_t *device, offs_t address);

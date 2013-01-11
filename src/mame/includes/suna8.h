@@ -38,7 +38,7 @@ public:
 		GFXBANK_TYPE_SPARKMAN,
 		GFXBANK_TYPE_BRICKZN,
 		GFXBANK_TYPE_STARFIGH
-	}	m_gfxbank_type;
+	}   m_gfxbank_type;
 	UINT8 m_gfxbank;
 
 	int m_text_dim; // vertical size of the text layer (0 = no text layer)

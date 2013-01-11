@@ -15,11 +15,11 @@
 ***************************************************************************/
 
 /* border color from border register */
-#define BORDER_COLOR(x)	((x & 0x20) >> 2 | (x & 0x07))
+#define BORDER_COLOR(x) ((x & 0x20) >> 2 | (x & 0x07))
 
 /* foreground and background color from attribute byte in mode 1 and 2 */
-#define ATTR_BG(x)		((x >> 3) & 0x07)
-#define ATTR_FG(x)		(((x >> 3) & 0x08) | (x & 0x07))
+#define ATTR_BG(x)      ((x >> 3) & 0x07)
+#define ATTR_FG(x)      (((x >> 3) & 0x08) | (x & 0x07))
 
 
 /***************************************************************************
@@ -158,10 +158,10 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::sam_video_update_callback)
 			/* main screen area */
 			switch ((m_vmpr & 0x60) >> 5)
 			{
-			case 0:	draw_mode1_line(machine(), vpos, hpos); break;
-			case 1:	draw_mode2_line(machine(), vpos, hpos); break;
-			case 2:	draw_mode3_line(machine(), vpos, hpos); break;
-			case 3:	draw_mode4_line(machine(), vpos, hpos); break;
+			case 0: draw_mode1_line(machine(), vpos, hpos); break;
+			case 1: draw_mode2_line(machine(), vpos, hpos); break;
+			case 2: draw_mode3_line(machine(), vpos, hpos); break;
+			case 3: draw_mode4_line(machine(), vpos, hpos); break;
 			}
 		}
 	}

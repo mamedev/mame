@@ -55,8 +55,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SOUND_TIMER_RATE			attotime::from_usec(5)
-#define SOUND_TIMER_BOOST			attotime::from_usec(100)
+#define SOUND_TIMER_RATE            attotime::from_usec(5)
+#define SOUND_TIMER_BOOST           attotime::from_usec(100)
 
 
 
@@ -86,51 +86,51 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 
 atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_earom(*this, "earom"),
-	  m_earom_data(0),
-	  m_earom_control(0),
-	  m_eeprom(*this, "eeprom"),
-	  m_eeprom32(*this, "eeprom"),
-	  m_scanline_int_state(0),
-	  m_sound_int_state(0),
-	  m_video_int_state(0),
-	  m_eeprom_default(NULL),
-	  m_cpu_to_sound_ready(0),
-	  m_sound_to_cpu_ready(0),
-	  m_playfield(*this, "playfield"),
-	  m_playfield2(*this, "playfield2"),
-	  m_playfield_upper(*this, "playfield_up"),
-	  m_alpha(*this, "alpha"),
-	  m_alpha2(*this, "alpha2"),
-	  m_xscroll(*this, "xscroll"),
-	  m_yscroll(*this, "yscroll"),
-	  m_playfield32(*this, "playfield32"),
-	  m_alpha32(*this, "alpha32"),
-	  m_playfield_tilemap(NULL),
-	  m_playfield2_tilemap(NULL),
-	  m_alpha_tilemap(NULL),
-	  m_alpha2_tilemap(NULL),
-	  m_atarivc_data(*this, "atarivc_data"),
-	  m_atarivc_eof_data(*this, "atarivc_eof"),
-	  m_eeprom_unlocked(false),
-	  m_slapstic_num(0),
-	  m_slapstic(NULL),
-	  m_slapstic_bank(0),
-	  m_slapstic_last_pc(0),
-	  m_slapstic_last_address(0),
-	  m_slapstic_base(0),
-	  m_slapstic_mirror(0),
-	  m_sound_cpu(*this, "audiocpu"),
-	  m_cpu_to_sound(0),
-	  m_sound_to_cpu(0),
-	  m_timed_int(0),
-	  m_ym2151_int(0),
-	  m_scanlines_per_callback(0),
-	  m_actual_vc_latch0(0),
-	  m_actual_vc_latch1(0),
-	  m_atarivc_playfields(0),
-	  m_playfield_latch(0),
-	  m_playfield2_latch(0)
+		m_earom(*this, "earom"),
+		m_earom_data(0),
+		m_earom_control(0),
+		m_eeprom(*this, "eeprom"),
+		m_eeprom32(*this, "eeprom"),
+		m_scanline_int_state(0),
+		m_sound_int_state(0),
+		m_video_int_state(0),
+		m_eeprom_default(NULL),
+		m_cpu_to_sound_ready(0),
+		m_sound_to_cpu_ready(0),
+		m_playfield(*this, "playfield"),
+		m_playfield2(*this, "playfield2"),
+		m_playfield_upper(*this, "playfield_up"),
+		m_alpha(*this, "alpha"),
+		m_alpha2(*this, "alpha2"),
+		m_xscroll(*this, "xscroll"),
+		m_yscroll(*this, "yscroll"),
+		m_playfield32(*this, "playfield32"),
+		m_alpha32(*this, "alpha32"),
+		m_playfield_tilemap(NULL),
+		m_playfield2_tilemap(NULL),
+		m_alpha_tilemap(NULL),
+		m_alpha2_tilemap(NULL),
+		m_atarivc_data(*this, "atarivc_data"),
+		m_atarivc_eof_data(*this, "atarivc_eof"),
+		m_eeprom_unlocked(false),
+		m_slapstic_num(0),
+		m_slapstic(NULL),
+		m_slapstic_bank(0),
+		m_slapstic_last_pc(0),
+		m_slapstic_last_address(0),
+		m_slapstic_base(0),
+		m_slapstic_mirror(0),
+		m_sound_cpu(*this, "audiocpu"),
+		m_cpu_to_sound(0),
+		m_sound_to_cpu(0),
+		m_timed_int(0),
+		m_ym2151_int(0),
+		m_scanlines_per_callback(0),
+		m_actual_vc_latch0(0),
+		m_actual_vc_latch1(0),
+		m_atarivc_playfields(0),
+		m_playfield_latch(0),
+		m_playfield2_latch(0)
 {
 }
 
@@ -165,18 +165,18 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_cpu_to_sound_ready));
 	save_item(NAME(m_sound_to_cpu_ready));
 
-	save_item(NAME(m_atarivc_state.latch1));				// latch #1 value (-1 means disabled)
-	save_item(NAME(m_atarivc_state.latch2));				// latch #2 value (-1 means disabled)
-	save_item(NAME(m_atarivc_state.rowscroll_enable));		// true if row-scrolling is enabled
-	save_item(NAME(m_atarivc_state.palette_bank));			// which palette bank is enabled
-	save_item(NAME(m_atarivc_state.pf0_xscroll));			// playfield 1 xscroll
-	save_item(NAME(m_atarivc_state.pf0_xscroll_raw));		// playfield 1 xscroll raw value
-	save_item(NAME(m_atarivc_state.pf0_yscroll));			// playfield 1 yscroll
-	save_item(NAME(m_atarivc_state.pf1_xscroll));			// playfield 2 xscroll
-	save_item(NAME(m_atarivc_state.pf1_xscroll_raw));		// playfield 2 xscroll raw value
-	save_item(NAME(m_atarivc_state.pf1_yscroll));			// playfield 2 yscroll
-	save_item(NAME(m_atarivc_state.mo_xscroll));			// sprite xscroll
-	save_item(NAME(m_atarivc_state.mo_yscroll));			// sprite xscroll
+	save_item(NAME(m_atarivc_state.latch1));                // latch #1 value (-1 means disabled)
+	save_item(NAME(m_atarivc_state.latch2));                // latch #2 value (-1 means disabled)
+	save_item(NAME(m_atarivc_state.rowscroll_enable));      // true if row-scrolling is enabled
+	save_item(NAME(m_atarivc_state.palette_bank));          // which palette bank is enabled
+	save_item(NAME(m_atarivc_state.pf0_xscroll));           // playfield 1 xscroll
+	save_item(NAME(m_atarivc_state.pf0_xscroll_raw));       // playfield 1 xscroll raw value
+	save_item(NAME(m_atarivc_state.pf0_yscroll));           // playfield 1 yscroll
+	save_item(NAME(m_atarivc_state.pf1_xscroll));           // playfield 2 xscroll
+	save_item(NAME(m_atarivc_state.pf1_xscroll_raw));       // playfield 2 xscroll raw value
+	save_item(NAME(m_atarivc_state.pf1_yscroll));           // playfield 2 yscroll
+	save_item(NAME(m_atarivc_state.mo_xscroll));            // sprite xscroll
+	save_item(NAME(m_atarivc_state.mo_yscroll));            // sprite xscroll
 
 	save_item(NAME(m_eeprom_unlocked));
 
@@ -455,8 +455,8 @@ void atarigen_state::device_post_load()
 DIRECT_UPDATE_MEMBER(atarigen_state::slapstic_setdirect)
 {
 	// if we jump to an address in the slapstic region, tweak the slapstic
-    // at that address and return ~0; this will cause us to be called on
-    // subsequent fetches as well
+	// at that address and return ~0; this will cause us to be called on
+	// subsequent fetches as well
 	address &= ~m_slapstic_mirror;
 	if (address >= m_slapstic_base && address < m_slapstic_base + 0x8000)
 	{
@@ -947,11 +947,11 @@ void atarigen_state::atarivc_common_w(screen_device &screen, offs_t offset, UINT
 	switch (offset)
 	{
 		//
-        //  additional registers:
-        //
-        //      01 = vertical start (for centering)
-        //      04 = horizontal start (for centering)
-        //
+		//  additional registers:
+		//
+		//      01 = vertical start (for centering)
+		//      04 = horizontal start (for centering)
+		//
 
 		// set the scanline interrupt here
 		case 0x03:

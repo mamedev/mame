@@ -8,31 +8,31 @@
 #include "emu.h"
 #include "pc16552d.h"
 
-#define REG_RECV_BUFFER			0x0		// Read
-#define REG_XMIT_HOLD			0x0		// Write
-#define REG_INT_ENABLE			0x1
-#define REG_FIFO_CTRL			0x2		// Write
-#define REG_LINE_CTRL			0x3
-#define REG_MODEL_CTRL			0x4
-#define REG_LINE_STATUS			0x5
-#define REG_MODEM_STATUS		0x6
-#define REG_SCRATCH				0x7
-#define REG_DIV_LATCH_LSB		0x0		// When DLAB == 1
-#define REG_DIV_LATCH_MSB		0x1		// When DLAB == 1
-#define REG_ALT_FUNCTION		0x2		// When DLAB == 1
+#define REG_RECV_BUFFER         0x0     // Read
+#define REG_XMIT_HOLD           0x0     // Write
+#define REG_INT_ENABLE          0x1
+#define REG_FIFO_CTRL           0x2     // Write
+#define REG_LINE_CTRL           0x3
+#define REG_MODEL_CTRL          0x4
+#define REG_LINE_STATUS         0x5
+#define REG_MODEM_STATUS        0x6
+#define REG_SCRATCH             0x7
+#define REG_DIV_LATCH_LSB       0x0     // When DLAB == 1
+#define REG_DIV_LATCH_MSB       0x1     // When DLAB == 1
+#define REG_ALT_FUNCTION        0x2     // When DLAB == 1
 
-#define LINE_CTRL_DLAB			0x80
+#define LINE_CTRL_DLAB          0x80
 
-#define IRQ_RX_LINE_STATUS			0x1
-#define IRQ_RX_DATA_AVAILABLE		0x2
-#define IRQ_CHARACTER_TIMEOUT		0x4
-#define IRQ_TX_HOLDING_REG_EMPTY	0x8
-#define IRQ_MODEM_STATUS			0x10
+#define IRQ_RX_LINE_STATUS          0x1
+#define IRQ_RX_DATA_AVAILABLE       0x2
+#define IRQ_CHARACTER_TIMEOUT       0x4
+#define IRQ_TX_HOLDING_REG_EMPTY    0x8
+#define IRQ_MODEM_STATUS            0x10
 
-#define INT_ENABLE_RX_DATA			0x01
-#define INT_ENABLE_TX_EMPTY			0x02
-#define INT_ENABLE_RX_LINE_STATUS	0x04
-#define INT_ENABLE_MODEM_STATUS		0x08
+#define INT_ENABLE_RX_DATA          0x01
+#define INT_ENABLE_TX_EMPTY         0x02
+#define INT_ENABLE_RX_LINE_STATUS   0x04
+#define INT_ENABLE_MODEM_STATUS     0x08
 
 struct PC16552D_CHANNEL
 {
@@ -58,7 +58,7 @@ struct PC16552D_REGS
 	void (* tx_callback)(running_machine &machine, int channel, int count, UINT8* data);
 };
 
-#define MAX_PC16552D_CHIPS		4
+#define MAX_PC16552D_CHIPS      4
 
 static PC16552D_REGS duart[MAX_PC16552D_CHIPS];
 
@@ -108,7 +108,7 @@ static void duart_push_rx_fifo(running_machine &machine, int chip, int channel, 
 
 	if (ch->rx_fifo_num == rx_trigger_level[(ch->reg[REG_FIFO_CTRL] >> 6) & 3])
 	{
-		ch->pending_interrupt |= IRQ_RX_DATA_AVAILABLE;		// INT ID: received data available
+		ch->pending_interrupt |= IRQ_RX_DATA_AVAILABLE;     // INT ID: received data available
 
 		check_interrupts(machine, chip, channel);
 	}
@@ -242,11 +242,11 @@ static UINT8 duart_r(running_machine &machine, int chip, int reg)
 					{
 						switch (i)
 						{
-							case 0: r = 0x06; break;	// Receiver Line Status
-							case 1: r = 0x04; break;	// Received Data Available
-							case 2: r = 0x0c; break;	// Character Timeout Indication
-							case 3: r = 0x02; break;	// Transmitter Holding Register Empty
-							case 4: r = 0x00; break;	// MODEM Status
+							case 0: r = 0x06; break;    // Receiver Line Status
+							case 1: r = 0x04; break;    // Received Data Available
+							case 2: r = 0x0c; break;    // Character Timeout Indication
+							case 3: r = 0x02; break;    // Transmitter Holding Register Empty
+							case 4: r = 0x00; break;    // MODEM Status
 						}
 						break;
 					}
@@ -262,7 +262,7 @@ static UINT8 duart_r(running_machine &machine, int chip, int reg)
 			break;
 		}
 
-		case 5:		// Line Status Register
+		case 5:     // Line Status Register
 		{
 			UINT8 r = 0;
 
@@ -370,13 +370,13 @@ static void duart_w(running_machine &machine, int chip, int reg, UINT8 data)
 				}
 
 				/*if (data & 0x1 && (ch->reg[reg] & 0x1) == 0)
-                {
-                    // cause transmitter empty IRQ
-                    ch->pending_interrupt |= IRQ_TX_HOLDING_REG_EMPTY;
+				{
+				    // cause transmitter empty IRQ
+				    ch->pending_interrupt |= IRQ_TX_HOLDING_REG_EMPTY;
 
-                    check_interrupts(machine, chip, channel);
-                }
-                */
+				    check_interrupts(machine, chip, channel);
+				}
+				*/
 			}
 			break;
 		}
@@ -409,7 +409,7 @@ void pc16552d_init(running_machine &machine, int chip, int frequency, void (* ir
 
 void pc16552d_rx_data(running_machine &machine, int chip, int channel, UINT8 data)
 {
-	if (duart[chip].ch[channel].reg[REG_FIFO_CTRL] & 0x01)	// RCVR & XMIT FIFO enable
+	if (duart[chip].ch[channel].reg[REG_FIFO_CTRL] & 0x01)  // RCVR & XMIT FIFO enable
 	{
 		duart_push_rx_fifo(machine, chip, channel, data);
 	}

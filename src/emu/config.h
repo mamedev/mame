@@ -24,15 +24,15 @@
  *
  *************************************/
 
-#define CONFIG_VERSION			10
+#define CONFIG_VERSION          10
 
 enum
 {
-	CONFIG_TYPE_INIT = 0,					/* opportunity to initialize things first */
-	CONFIG_TYPE_CONTROLLER,					/* loading from controller file */
-	CONFIG_TYPE_DEFAULT,					/* loading from default.cfg */
-	CONFIG_TYPE_GAME,					/* loading from game.cfg */
-	CONFIG_TYPE_FINAL					/* opportunity to finish initialization */
+	CONFIG_TYPE_INIT = 0,                   /* opportunity to initialize things first */
+	CONFIG_TYPE_CONTROLLER,                 /* loading from controller file */
+	CONFIG_TYPE_DEFAULT,                    /* loading from default.cfg */
+	CONFIG_TYPE_GAME,                   /* loading from game.cfg */
+	CONFIG_TYPE_FINAL                   /* opportunity to finish initialization */
 };
 
 
@@ -58,4 +58,4 @@ void config_register(running_machine &machine, const char *nodename, config_save
 int config_load_settings(running_machine &machine);
 void config_save_settings(running_machine &machine);
 
-#endif	/* __CONFIG_H__ */
+#endif  /* __CONFIG_H__ */

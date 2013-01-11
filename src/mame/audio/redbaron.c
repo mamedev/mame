@@ -18,7 +18,7 @@
 #include "includes/bzone.h"
 #include "sound/pokey.h"
 
-#define OUTPUT_RATE		(48000)
+#define OUTPUT_RATE     (48000)
 
 struct redbaron_sound_state
 {
@@ -112,9 +112,9 @@ static STREAM_UPDATE( redbaron_sound_update )
 		{
 			if( state->m_shot_amp > 0 )
 			{
-                /* discharge C32 (0.1u) through R26 (33k) + R27 (15k)
-                 * 0.68 * C32 * (R26 + R27) = 3264us
-                 */
+				/* discharge C32 (0.1u) through R26 (33k) + R27 (15k)
+				 * 0.68 * C32 * (R26 + R27) = 3264us
+				 */
 //              #define C32_DISCHARGE_TIME (int)(32767 / 0.003264);
 				/* I think this is to short. Is C32 really 1u? */
 				#define C32_DISCHARGE_TIME (int)(32767 / 0.03264);
@@ -138,8 +138,8 @@ static STREAM_UPDATE( redbaron_sound_update )
 			if( state->m_squeal_amp < 32767 )
 			{
 				/* charge C5 (22u) over R3 (68k) and CR1 (1N914)
-                 * time = 0.68 * C5 * R3 = 1017280us
-                 */
+				 * time = 0.68 * C5 * R3 = 1017280us
+				 */
 				#define C5_CHARGE_TIME (int)(32767 / 1.01728);
 				state->m_squeal_amp_counter -= C5_CHARGE_TIME;
 				while( state->m_squeal_amp_counter <= 0 )
@@ -153,10 +153,10 @@ static STREAM_UPDATE( redbaron_sound_update )
 			if( state->m_squeal_out )
 			{
 				/* NE555 setup as pulse position modulator
-                 * C = 0.01u, Ra = 33k, Rb = 47k
-                 * frequency = 1.44 / ((33k + 2*47k) * 0.01u) = 1134Hz
-                 * modulated by squeal_amp
-                 */
+				 * C = 0.01u, Ra = 33k, Rb = 47k
+				 * frequency = 1.44 / ((33k + 2*47k) * 0.01u) = 1134Hz
+				 * modulated by squeal_amp
+				 */
 				state->m_squeal_off_counter -= (1134 + 1134 * state->m_squeal_amp / 32767) / 3;
 				while( state->m_squeal_off_counter <= 0 )
 				{
@@ -229,7 +229,7 @@ const device_type REDBARON = &device_creator<redbaron_sound_device>;
 
 redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, REDBARON, "Red Baron Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(redbaron_sound_state);
 }
@@ -262,5 +262,3 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

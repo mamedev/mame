@@ -54,7 +54,7 @@ void thepit_state::palette_init()
 	}
 
 	/* allocate primary colors for the background and foreground
-       this is wrong, but I don't know where to pick the colors from */
+	   this is wrong, but I don't know where to pick the colors from */
 	for (i = 0; i < 8; i++)
 		palette_set_color_rgb(machine(), i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(thepit_state,suprmous)
 	}
 
 	/* allocate primary colors for the background and foreground
-       this is wrong, but I don't know where to pick the colors from */
+	   this is wrong, but I don't know where to pick the colors from */
 	for (i = 0; i < 8; i++)
 		palette_set_color_rgb(machine(), i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
@@ -132,7 +132,7 @@ void thepit_state::video_start()
 
 	m_dummy_tile = auto_alloc_array_clear(machine(), UINT8, 8*8);
 
-	m_graphics_bank = 0;	/* only used in intrepid */
+	m_graphics_bank = 0;    /* only used in intrepid */
 }
 
 
@@ -204,7 +204,7 @@ WRITE8_MEMBER(thepit_state::intrepid_graphics_bank_w)
 READ8_MEMBER(thepit_state::thepit_input_port_0_r)
 {
 	/* Read either the real or the fake input ports depending on the
-       horizontal flip switch. (This is how the real PCB does it) */
+	   horizontal flip switch. (This is how the real PCB does it) */
 	if (m_flip_screen_x)
 	{
 		return ioport("IN2")->read();
@@ -224,9 +224,9 @@ READ8_MEMBER(thepit_state::thepit_input_port_0_r)
  *************************************/
 
 static void draw_sprites(running_machine &machine,
-						 bitmap_ind16 &bitmap,
-						 const rectangle &cliprect,
-						 int priority_to_draw)
+							bitmap_ind16 &bitmap,
+							const rectangle &cliprect,
+							int priority_to_draw)
 {
 	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);

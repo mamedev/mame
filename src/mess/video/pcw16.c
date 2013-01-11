@@ -13,38 +13,38 @@ static const unsigned short pcw16_colour_table[PCW16_NUM_COLOURS] =
 
 static const rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 {
-	MAKE_RGB(0x080, 0x080, 0x080),	/* light grey */
-	MAKE_RGB(0x080, 0x080, 0x080),	/* light grey */
-	MAKE_RGB(0x000, 0x080, 0x080),	/* magenta */
-	MAKE_RGB(0x000, 0x080, 0x080),	/* magenta */
-	MAKE_RGB(0x080, 0x080, 0x080),	/* light grey */
-	MAKE_RGB(0x080, 0x080, 0x080),	/* light grey */
-	MAKE_RGB(0x0ff, 0x080, 0x080),	/* pastel green */
-	MAKE_RGB(0x0ff, 0x080, 0x080),	/* pastel green */
-	MAKE_RGB(0x000, 0x000, 0x080),	/* blue */
-	MAKE_RGB(0x000, 0x000, 0x000),	/* black */
-	MAKE_RGB(0x000, 0x080, 0x0ff),	/* mauve */
-	MAKE_RGB(0x000, 0x000, 0x0ff),	/* bright blue */
-	MAKE_RGB(0x000, 0x080, 0x000),	/* red */
-	MAKE_RGB(0x000, 0x0ff, 0x000),	/* bright red */
-	MAKE_RGB(0x000, 0x0ff, 0x080),	/* purple */
-	MAKE_RGB(0x000, 0x0ff, 0x0ff),	/* bright magenta */
-	MAKE_RGB(0x0ff, 0x000, 0x080),	/* sea green */
-	MAKE_RGB(0x0ff, 0x000, 0x0ff),	/* bright green */
-	MAKE_RGB(0x0ff, 0x080, 0x0ff),	/* pastel cyan */
-	MAKE_RGB(0x0ff, 0x000, 0x0ff),	/* bright cyan */
-	MAKE_RGB(0x0ff, 0x080, 0x000),	/* lime green */
-	MAKE_RGB(0x0ff, 0x0ff, 0x000),	/* bright yellow */
-	MAKE_RGB(0x0ff, 0x0ff, 0x080),	/* pastel yellow */
-	MAKE_RGB(0x0ff, 0x0ff, 0x0ff),	/* bright white */
-	MAKE_RGB(0x080, 0x000, 0x080),	/* cyan */
-	MAKE_RGB(0x080, 0x000, 0x000),	/* green */
-	MAKE_RGB(0x080, 0x080, 0x0ff),	/* pastel blue */
-	MAKE_RGB(0x080, 0x000, 0x0ff),	/* sky blue */
-	MAKE_RGB(0x080, 0x080, 0x000),	/* yellow */
-	MAKE_RGB(0x080, 0x0ff, 0x000),	/* orange */
-	MAKE_RGB(0x080, 0x0ff, 0x080),	/* pink */
-	MAKE_RGB(0x080, 0x0ff, 0x0ff),	/* pastel magenta */
+	MAKE_RGB(0x080, 0x080, 0x080),  /* light grey */
+	MAKE_RGB(0x080, 0x080, 0x080),  /* light grey */
+	MAKE_RGB(0x000, 0x080, 0x080),  /* magenta */
+	MAKE_RGB(0x000, 0x080, 0x080),  /* magenta */
+	MAKE_RGB(0x080, 0x080, 0x080),  /* light grey */
+	MAKE_RGB(0x080, 0x080, 0x080),  /* light grey */
+	MAKE_RGB(0x0ff, 0x080, 0x080),  /* pastel green */
+	MAKE_RGB(0x0ff, 0x080, 0x080),  /* pastel green */
+	MAKE_RGB(0x000, 0x000, 0x080),  /* blue */
+	MAKE_RGB(0x000, 0x000, 0x000),  /* black */
+	MAKE_RGB(0x000, 0x080, 0x0ff),  /* mauve */
+	MAKE_RGB(0x000, 0x000, 0x0ff),  /* bright blue */
+	MAKE_RGB(0x000, 0x080, 0x000),  /* red */
+	MAKE_RGB(0x000, 0x0ff, 0x000),  /* bright red */
+	MAKE_RGB(0x000, 0x0ff, 0x080),  /* purple */
+	MAKE_RGB(0x000, 0x0ff, 0x0ff),  /* bright magenta */
+	MAKE_RGB(0x0ff, 0x000, 0x080),  /* sea green */
+	MAKE_RGB(0x0ff, 0x000, 0x0ff),  /* bright green */
+	MAKE_RGB(0x0ff, 0x080, 0x0ff),  /* pastel cyan */
+	MAKE_RGB(0x0ff, 0x000, 0x0ff),  /* bright cyan */
+	MAKE_RGB(0x0ff, 0x080, 0x000),  /* lime green */
+	MAKE_RGB(0x0ff, 0x0ff, 0x000),  /* bright yellow */
+	MAKE_RGB(0x0ff, 0x0ff, 0x080),  /* pastel yellow */
+	MAKE_RGB(0x0ff, 0x0ff, 0x0ff),  /* bright white */
+	MAKE_RGB(0x080, 0x000, 0x080),  /* cyan */
+	MAKE_RGB(0x080, 0x000, 0x000),  /* green */
+	MAKE_RGB(0x080, 0x080, 0x0ff),  /* pastel blue */
+	MAKE_RGB(0x080, 0x000, 0x0ff),  /* sky blue */
+	MAKE_RGB(0x080, 0x080, 0x000),  /* yellow */
+	MAKE_RGB(0x080, 0x0ff, 0x000),  /* orange */
+	MAKE_RGB(0x080, 0x0ff, 0x080),  /* pink */
+	MAKE_RGB(0x080, 0x0ff, 0x0ff),  /* pastel magenta */
 };
 
 
@@ -157,7 +157,7 @@ static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_ind16 &bitmap, int 
 UINT32 pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
-	unsigned char *pScanLine = (unsigned char *)ram + 0x0fc00;	//0x03c00;  //0x020FC00;
+	unsigned char *pScanLine = (unsigned char *)ram + 0x0fc00;  //0x03c00;  //0x020FC00;
 
 	int y;
 	int x;
@@ -170,7 +170,7 @@ UINT32 pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bit
 	if (m_video_control & (1<<7))
 	{
 		/* colour 0 and colour 1 need to be inverted? - what happens in mode 1 and 2 - ignored? or is bit 1 toggled,
-        or is whole lot toggled? */
+		or is whole lot toggled? */
 
 		/* force border to be colour 1 */
 		border_colour = m_colour_palette[1];
@@ -196,8 +196,8 @@ UINT32 pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bit
 		bitmap.fill(border_colour, rect);
 
 		/* render border on either side of display */
-		bitmap.plot_box(0,											PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
-		bitmap.plot_box(PCW16_DISPLAY_WIDTH + PCW16_BORDER_WIDTH,	PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
+		bitmap.plot_box(0,                                          PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
+		bitmap.plot_box(PCW16_DISPLAY_WIDTH + PCW16_BORDER_WIDTH,   PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
 
 		/* render display */
 		for (y=0; y<PCW16_DISPLAY_HEIGHT; y++)

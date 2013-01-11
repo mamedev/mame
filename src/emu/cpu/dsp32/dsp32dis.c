@@ -131,18 +131,18 @@ static const char *dasm_XYZ(UINT8 bits, char *buffer)
 
 	if (p)
 	{
-		if (p == 15) p = lastp;		/* P=15 means Z inherits from Y, Y inherits from X */
+		if (p == 15) p = lastp;     /* P=15 means Z inherits from Y, Y inherits from X */
 		lastp = p;
 		switch (i)
 		{
-			case 0:		sprintf(buffer, "*r%d", p);	break;
+			case 0:     sprintf(buffer, "*r%d", p); break;
 			case 1:
 			case 2:
 			case 3:
 			case 4:
-			case 5:		sprintf(buffer, "*r%d++r%d", p, i + 14); break;
-			case 6:		sprintf(buffer, "*r%d--", p); break;
-			case 7:		sprintf(buffer, "*r%d++", p); break;
+			case 5:     sprintf(buffer, "*r%d++r%d", p, i + 14); break;
+			case 6:     sprintf(buffer, "*r%d--", p); break;
+			case 7:     sprintf(buffer, "*r%d++", p); break;
 		}
 	}
 	else
@@ -152,11 +152,11 @@ static const char *dasm_XYZ(UINT8 bits, char *buffer)
 			case 0:
 			case 1:
 			case 2:
-			case 3:		sprintf(buffer, "a%d", i); break;
-			case 4:		sprintf(buffer, "ibuf"); break;
-			case 5:		sprintf(buffer, "obuf"); break;
-			case 6:		sprintf(buffer, "pdr"); break;
-			case 7:		buffer[0] = 0; break;
+			case 3:     sprintf(buffer, "a%d", i); break;
+			case 4:     sprintf(buffer, "ibuf"); break;
+			case 5:     sprintf(buffer, "obuf"); break;
+			case 6:     sprintf(buffer, "pdr"); break;
+			case 7:     buffer[0] = 0; break;
 		}
 	}
 	return buffer;
@@ -173,24 +173,24 @@ static const char *dasm_PI(UINT16 bits, char *buffer)
 		switch (i)
 		{
 			case 0:
-			case 16:	sprintf(buffer, "*%s", regname[p]);	break;
-			case 22:	sprintf(buffer, "*%s--", regname[p]); break;
-			case 23:	sprintf(buffer, "*%s++", regname[p]); break;
-			default:	sprintf(buffer, "*%s++%s", regname[p], regname[i]); break;
+			case 16:    sprintf(buffer, "*%s", regname[p]); break;
+			case 22:    sprintf(buffer, "*%s--", regname[p]); break;
+			case 23:    sprintf(buffer, "*%s++", regname[p]); break;
+			default:    sprintf(buffer, "*%s++%s", regname[p], regname[i]); break;
 		}
 	}
 	else
 	{
 		switch (i)
 		{
-			case 4:		sprintf(buffer, "ibuf"); break;
-			case 5:		sprintf(buffer, "obuf"); break;
-			case 6:		sprintf(buffer, "pdr"); break;
-			case 14:	sprintf(buffer, "piop"); break;
-			case 20:	sprintf(buffer, "pdr2"); break;
-			case 22:	sprintf(buffer, "pir"); break;
-			case 30:	sprintf(buffer, "pcw"); break;
-			default:	sprintf(buffer, "????"); break;
+			case 4:     sprintf(buffer, "ibuf"); break;
+			case 5:     sprintf(buffer, "obuf"); break;
+			case 6:     sprintf(buffer, "pdr"); break;
+			case 14:    sprintf(buffer, "piop"); break;
+			case 20:    sprintf(buffer, "pdr2"); break;
+			case 22:    sprintf(buffer, "pir"); break;
+			case 30:    sprintf(buffer, "pcw"); break;
+			default:    sprintf(buffer, "????"); break;
 		}
 	}
 	return buffer;
@@ -204,9 +204,9 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 	switch (op >> 25)
 	{
 		/* DA format 1 */
-		case 0x10:	case 0x11:	case 0x12:	case 0x13:
-		case 0x14:	case 0x15:	case 0x16:	case 0x17:
-		case 0x18:	case 0x19:	case 0x1a:	case 0x1b:
+		case 0x10:  case 0x11:  case 0x12:  case 0x13:
+		case 0x14:  case 0x15:  case 0x16:  case 0x17:
+		case 0x18:  case 0x19:  case 0x1a:  case 0x1b:
 		{
 			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
 			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
@@ -235,9 +235,9 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* DA format 2 */
-		case 0x20:	case 0x21:	case 0x22:	case 0x23:
-		case 0x24:	case 0x25:	case 0x26:	case 0x27:
-		case 0x28:	case 0x29:	case 0x2a:	case 0x2b:
+		case 0x20:  case 0x21:  case 0x22:  case 0x23:
+		case 0x24:  case 0x25:  case 0x26:  case 0x27:
+		case 0x28:  case 0x29:  case 0x2a:  case 0x2b:
 		{
 			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
 			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
@@ -263,9 +263,9 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* DA format 3 */
-		case 0x30:	case 0x31:	case 0x32:	case 0x33:
-		case 0x34:	case 0x35:	case 0x36:	case 0x37:
-		case 0x38:	case 0x39:	case 0x3a:	case 0x3b:
+		case 0x30:  case 0x31:  case 0x32:  case 0x33:
+		case 0x34:  case 0x35:  case 0x36:  case 0x37:
+		case 0x38:  case 0x39:  case 0x3a:  case 0x3b:
 		{
 			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
 			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
@@ -291,7 +291,7 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* DA format 4 */
-		case 0x1c:	case 0x1d:
+		case 0x1c:  case 0x1d:
 		{
 			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
 			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
@@ -306,22 +306,22 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* DA format 5 */
-		case 0x3c:	case 0x3d:	case 0x3e:	case 0x3f:
+		case 0x3c:  case 0x3d:  case 0x3e:  case 0x3f:
 			if ((op & 0x7f) == 7)
 				sprintf(buffer, "a%d = %s(%s)",
-						(op >> 21) & 3, 							// aN
-						functable[(op >> 23) & 15],					// G
-						dasm_XYZ((op >> 7) & 0x7f, tempbuf[0]));	// Y
+						(op >> 21) & 3,                             // aN
+						functable[(op >> 23) & 15],                 // G
+						dasm_XYZ((op >> 7) & 0x7f, tempbuf[0]));    // Y
 			else
 				sprintf(buffer, "%s = a%d = %s(%s)",
-						dasm_XYZ((op >> 0) & 0x7f, tempbuf[2]),		// Z
-						(op >> 21) & 3, 							// aN
-						functable[(op >> 23) & 15],					// G
-						dasm_XYZ((op >> 7) & 0x7f, tempbuf[0]));	// Y
+						dasm_XYZ((op >> 0) & 0x7f, tempbuf[2]),     // Z
+						(op >> 21) & 3,                             // aN
+						functable[(op >> 23) & 15],                 // G
+						dasm_XYZ((op >> 7) & 0x7f, tempbuf[0]));    // Y
 			break;
 
 		/* CA formats 0/1 */
-		case 0x00:	case 0x01:	case 0x02:	case 0x03:
+		case 0x00:  case 0x01:  case 0x02:  case 0x03:
 		{
 			const char *rH = regname[(op >> 16) & 0x1f];
 			UINT8 C = (op >> 21) & 0x3f;
@@ -365,7 +365,7 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* CA format 3a */
-		case 0x06:	case 0x07:
+		case 0x06:  case 0x07:
 		{
 			const char *rH = regname[(op >> 16) & 0x1f];
 			const char *rM = regname[(op >> 21) & 0x1f];
@@ -403,7 +403,7 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 			break;
 
 		/* CA format 4 */
-		case 0x08:	case 0x09:
+		case 0x08:  case 0x09:
 		{
 			const char *rH = regname[(op >> 16) & 0x1f];
 			const char *rM = regname[(op >> 21) & 0x1f];
@@ -422,8 +422,8 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* CA format 5a/5b */
-		case 0x0a:	case 0x0b:
-		case 0x4a:	case 0x4b:
+		case 0x0a:  case 0x0b:
+		case 0x4a:  case 0x4b:
 		{
 			const char *rD = regname[(op >> 21) & 0x1f];
 			const char *rH = regname[(op >> 16) & 0x1f];
@@ -439,7 +439,7 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* CA format 6a/6b */
-		case 0x0c:	case 0x4c:
+		case 0x0c:  case 0x4c:
 		{
 			const char *rD = regname[(op >> 16) & 0x1f];
 			const char *rS1 = regname[(op >> 5) & 0x1f];
@@ -566,7 +566,7 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* CA format 6c/6d */
-		case 0x0d:	case 0x4d:
+		case 0x0d:  case 0x4d:
 		{
 			const char *rD = regname[(op >> 16) & 0x1f];
 			const char *s = sizesuffix[(op >> 31) & 1];
@@ -640,10 +640,10 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 			break;
 
 		/* CA format 8a */
-		case 0x50:	case 0x51:	case 0x52:	case 0x53:
-		case 0x54:	case 0x55:	case 0x56:	case 0x57:
-		case 0x58:	case 0x59:	case 0x5a:	case 0x5b:
-		case 0x5c:	case 0x5d:	case 0x5e:	case 0x5f:
+		case 0x50:  case 0x51:  case 0x52:  case 0x53:
+		case 0x54:  case 0x55:  case 0x56:  case 0x57:
+		case 0x58:  case 0x59:  case 0x5a:  case 0x5b:
+		case 0x5c:  case 0x5d:  case 0x5e:  case 0x5f:
 		{
 			INT32 N = (op & 0xffff) | ((INT32)((op & 0x1fe00000) << 3) >> 8);
 			const char *rH = regname[(op >> 16) & 0x1f];
@@ -664,10 +664,10 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* CA format 8b */
-		case 0x60:	case 0x61:	case 0x62:	case 0x63:
-		case 0x64:	case 0x65:	case 0x66:	case 0x67:
-		case 0x68:	case 0x69:	case 0x6a:	case 0x6b:
-		case 0x6c:	case 0x6d:	case 0x6e:	case 0x6f:
+		case 0x60:  case 0x61:  case 0x62:  case 0x63:
+		case 0x64:  case 0x65:  case 0x66:  case 0x67:
+		case 0x68:  case 0x69:  case 0x6a:  case 0x6b:
+		case 0x6c:  case 0x6d:  case 0x6e:  case 0x6f:
 		{
 			INT32 immed = (op & 0xffff) | ((INT32)((op & 0x1fe00000) << 3) >> 8);
 			sprintf(buffer, "%s = $%x", regnamee[(op >> 16) & 0x1f], immed & 0xffffff);
@@ -675,10 +675,10 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, UINT32 op)
 		}
 
 		/* CA format 8c */
-		case 0x70:	case 0x71:	case 0x72:	case 0x73:
-		case 0x74:	case 0x75:	case 0x76:	case 0x77:
-		case 0x78:	case 0x79:	case 0x7a:	case 0x7b:
-		case 0x7c:	case 0x7d:	case 0x7e:	case 0x7f:
+		case 0x70:  case 0x71:  case 0x72:  case 0x73:
+		case 0x74:  case 0x75:  case 0x76:  case 0x77:
+		case 0x78:  case 0x79:  case 0x7a:  case 0x7b:
+		case 0x7c:  case 0x7d:  case 0x7e:  case 0x7f:
 		{
 			INT32 N = (op & 0xffff) | ((INT32)((op & 0x1fe00000) << 3) >> 8);
 			const char *rM = regname[(op >> 16) & 0x1f];

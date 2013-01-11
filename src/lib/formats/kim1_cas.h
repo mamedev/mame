@@ -14,4 +14,3 @@
 CASSETTE_FORMATLIST_EXTERN(kim1_cassette_formats);
 
 #endif /* __KIM1_CAS_H */
-

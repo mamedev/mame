@@ -237,14 +237,14 @@ READ16_MEMBER(mcr68_state::pigskin_protection_r)
 {
 	/* based on the last 5 bytes return a value */
 	if (m_protection_data[4] == 0xe3 && m_protection_data[3] == 0x94)
-		return 0x00;	/* must be <= 1 */
+		return 0x00;    /* must be <= 1 */
 	if (m_protection_data[4] == 0xc7 && m_protection_data[3] == 0x7b && m_protection_data[2] == 0x36)
-		return 0x00;	/* must be <= 1 */
+		return 0x00;    /* must be <= 1 */
 	if (m_protection_data[4] == 0xc7 && m_protection_data[3] == 0x7b)
-		return 0x07;	/* must be > 5 */
+		return 0x07;    /* must be > 5 */
 	if (m_protection_data[4] == 0xc7 && m_protection_data[3] == 0x1f && m_protection_data[2] == 0x03 &&
 		m_protection_data[1] == 0x25 && m_protection_data[0] == 0x36)
-		return 0x00;	/* must be < 3 */
+		return 0x00;    /* must be < 3 */
 
 	logerror("Protection read after unrecognized sequence: %02X %02X %02X %02X %02X\n",
 			m_protection_data[0], m_protection_data[1], m_protection_data[2], m_protection_data[3], m_protection_data[4]);
@@ -402,26 +402,26 @@ static INPUT_PORTS_START( zwackery )
 	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* sword */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* sword */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sound communications */
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_SPECIAL )    /* sound communications */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* spell up */
-	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNUSED )	/* encoder wheel */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* shield */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* spell down */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* spell up */
+	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNUSED )    /* encoder wheel */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* shield */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* spell down */
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x05, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
@@ -430,7 +430,7 @@ static INPUT_PORTS_START( zwackery )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x00, "Buy-in" )			PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x00, "Buy-in" )            PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x00, "1 coin" )
 	PORT_DIPSETTING(    0x08, "2 coins" )
 	PORT_DIPSETTING(    0x10, "3 coins" )
@@ -439,7 +439,7 @@ static INPUT_PORTS_START( zwackery )
 	PORT_DIPSETTING(    0x28, "6 coins" )
 	PORT_DIPSETTING(    0x30, "7 coins" )
 	PORT_DIPSETTING(    0x38, DEF_STR( None ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Easier ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Harder ) )
@@ -486,22 +486,22 @@ static INPUT_PORTS_START( xenophob )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")	/* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW1:2" )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Coins per Life Unit" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0008, 0x0008, "Coins per Life Unit" )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0x0010, 0x0010, "Life Unit" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x0010, 0x0010, "Life Unit" )     PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, "1000" )
 	PORT_DIPSETTING(      0x0000, "2000" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
@@ -540,31 +540,31 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME ("P1 R Trigger")/* Right Trigger */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME ("P1 R Button")/* Right Button */
 
-	PORT_START("DSW")	/* dipswitches */
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_START("DSW")   /* dipswitches */
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, "1C/2C (duplicate)" )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0018, 0x0008, "Point Threshholds" )	PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x0018, 0x0008, "Point Threshholds" ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0060, 0x0060, "Free Timer After" )	PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x0060, 0x0060, "Free Timer After" )  PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(      0x0000, "30 sec" )
 	PORT_DIPSETTING(      0x0040, "45 sec" )
 	PORT_DIPSETTING(      0x0060, "60 sec" )
 	PORT_DIPSETTING(      0x0020, "90 sec" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Rack Advance (Cheat)" ) PORT_CODE(KEYCODE_F1)	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Rack Advance (Cheat)" ) PORT_CODE(KEYCODE_F1)    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN1")	/* analog ports for steering and pedals */
+	PORT_START("AN1")   /* analog ports for steering and pedals */
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL ) PORT_MINMAX(0x30,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("AN2")
@@ -606,24 +606,24 @@ static INPUT_PORTS_START( blasted )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, "1C/2C (duplicate)" )
-	PORT_DIPNAME( 0x000c, 0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x000c, 0x0000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x000c, "Medium (duplicate)" )
 	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )
-	PORT_DIPNAME( 0x0020, 0x0020, "Dollar Receptor" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, "Dollar Receptor" )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Rack Advance (Cheat)" ) PORT_CODE(KEYCODE_F1)	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Rack Advance (Cheat)" ) PORT_CODE(KEYCODE_F1)    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -664,7 +664,7 @@ static INPUT_PORTS_START( intlaser )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
@@ -674,7 +674,7 @@ static INPUT_PORTS_START( intlaser )
 	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Rack Advance (Cheat)" ) PORT_CODE(KEYCODE_F1)	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Rack Advance (Cheat)" ) PORT_CODE(KEYCODE_F1)    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -699,15 +699,15 @@ static INPUT_PORTS_START( archrivl )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("IN1")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )	/* player 1/2 joysticks go here */
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 1/2 joysticks go here */
 
-	PORT_START("DSW")	/* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0003, "Preset Time" )
 	PORT_DIPSETTING(      0x0002, "Preset + 10sec" )
 	PORT_DIPSETTING(      0x0001, "Preset + 20sec" )
 	PORT_DIPSETTING(      0x0000, "Preset + 30sec" )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(      0x0014, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
@@ -716,27 +716,27 @@ static INPUT_PORTS_START( archrivl )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Team Names" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, "Team Names" )        PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, "Default" )
 	PORT_DIPSETTING(      0x0000, "Hometown Heroes" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("49WAYX1")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYX1")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYY1")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYY1")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYX2")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYX2")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYY2")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYY2")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -766,43 +766,43 @@ static INPUT_PORTS_START( pigskin )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )	/* player 1 joystick goes here */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 1 joystick goes here */
 
-	PORT_START("DSW")	/* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "Shortest" )
 	PORT_DIPSETTING(      0x0002, "Short" )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0001, "Long" )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0004, "Set Your Own" )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Test Switch" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, "Test Switch" )       PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Coin Chutes" )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, "Coin Chutes" )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, "Individual" )
 	PORT_DIPSETTING(      0x0040, "Common" )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Joystick ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Joystick ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x0000, "Rotated" )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )	/* player 2 joystick goes here */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 2 joystick goes here */
 
-	PORT_START("49WAYX1")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYX1")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("49WAYY1")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYY1")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYX2")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYX2")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("49WAYY2")	/* converted to standard 49-way inputs */
+	PORT_START("49WAYY2")   /* converted to standard 49-way inputs */
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -823,10 +823,10 @@ static INPUT_PORTS_START( trisport )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )	/* analog controls go here */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* analog controls go here */
 
-	PORT_START("DSW")	/* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
@@ -835,27 +835,27 @@ static INPUT_PORTS_START( trisport )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(      0x0000, "Battery Options" )
-	PORT_DIPNAME( 0x0018, 0x0018, "Pool Turns" )		PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x0018, 0x0018, "Pool Turns" )        PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x0010, "5" )
 	PORT_DIPSETTING(      0x0008, "6" )
 	PORT_DIPSETTING(      0x0018, "7" )
 	PORT_DIPSETTING(      0x0000, "8" )
-	PORT_DIPNAME( 0x0020, 0x0020, "Bowling Difficulty" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, "Bowling Difficulty" )    PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x0000, "Advanced" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Shot Timer" )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, "Shot Timer" )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, "Slower" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Standard ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Golf Holes" )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Golf Holes" )        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN1")
-    PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START("AN2")
-    PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -885,9 +885,9 @@ static const gfx_layout mcr68_sprite_layout =
 	4,
 	{ STEP4(0,1) },
 	{ STEP2(RGN_FRAC(0,4)+0,4), STEP2(RGN_FRAC(1,4)+0,4), STEP2(RGN_FRAC(2,4)+0,4), STEP2(RGN_FRAC(3,4)+0,4),
-	  STEP2(RGN_FRAC(0,4)+8,4), STEP2(RGN_FRAC(1,4)+8,4), STEP2(RGN_FRAC(2,4)+8,4), STEP2(RGN_FRAC(3,4)+8,4),
-	  STEP2(RGN_FRAC(0,4)+16,4), STEP2(RGN_FRAC(1,4)+16,4), STEP2(RGN_FRAC(2,4)+16,4), STEP2(RGN_FRAC(3,4)+16,4),
-	  STEP2(RGN_FRAC(0,4)+24,4), STEP2(RGN_FRAC(1,4)+24,4), STEP2(RGN_FRAC(2,4)+24,4), STEP2(RGN_FRAC(3,4)+24,4) },
+		STEP2(RGN_FRAC(0,4)+8,4), STEP2(RGN_FRAC(1,4)+8,4), STEP2(RGN_FRAC(2,4)+8,4), STEP2(RGN_FRAC(3,4)+8,4),
+		STEP2(RGN_FRAC(0,4)+16,4), STEP2(RGN_FRAC(1,4)+16,4), STEP2(RGN_FRAC(2,4)+16,4), STEP2(RGN_FRAC(3,4)+16,4),
+		STEP2(RGN_FRAC(0,4)+24,4), STEP2(RGN_FRAC(1,4)+24,4), STEP2(RGN_FRAC(2,4)+24,4), STEP2(RGN_FRAC(3,4)+24,4) },
 	{ STEP32(0,32) },
 	32*32
 };
@@ -900,7 +900,7 @@ static const gfx_layout zwackery_layout =
 	{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ STEP4(3,-1), STEP4(11,-1), STEP4(19,-1), STEP4(27,-1) },
 	{ 4, RGN_FRAC(1,2)+4, 0, RGN_FRAC(1,2)+0, 36, RGN_FRAC(1,2)+36, 32, RGN_FRAC(1,2)+32,
-	  68, RGN_FRAC(1,2)+68, 64, RGN_FRAC(1,2)+64, 100, RGN_FRAC(1,2)+100, 96, RGN_FRAC(1,2)+96 },
+		68, RGN_FRAC(1,2)+68, 64, RGN_FRAC(1,2)+64, 100, RGN_FRAC(1,2)+100, 96, RGN_FRAC(1,2)+96 },
 	128
 };
 
@@ -912,7 +912,7 @@ GFXDECODE_END
 static GFXDECODE_START( zwackery )
 	GFXDECODE_ENTRY( "gfx1", 0, zwackery_layout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0x800, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, zwackery_layout,       0, 16 )	/* yes, an extra copy */
+	GFXDECODE_ENTRY( "gfx1", 0, zwackery_layout,       0, 16 )  /* yes, an extra copy */
 GFXDECODE_END
 
 
@@ -954,7 +954,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( zwackery, mcr68_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
+	MCFG_CPU_ADD("maincpu", M68000, 7652400)    /* should be XTAL_16MHz/2 */
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
@@ -1118,7 +1118,7 @@ ROM_START( zwackery )
 	ROM_LOAD( "spr10j.bin",   0x18000, 0x4000, CRC(4dd04376) SHA1(069b64397e7a961c1fc246671472f759bd9f6c03) )
 	ROM_LOAD( "spr11j.bin",   0x1c000, 0x4000, CRC(e8c6a880) SHA1(dd3d52ddbc36e244b96cfb87e6a80adb94626407) )
 
-	ROM_REGION( 0x8000, "gfx3", 0 )	/* bg color maps */
+	ROM_REGION( 0x8000, "gfx3", 0 ) /* bg color maps */
 	ROM_LOAD16_BYTE( "tilef.bin",  0x0000, 0x4000, CRC(a0dfcd7e) SHA1(0fc6723eddef2a96de9bf1f48006dd067c148540) )
 	ROM_LOAD16_BYTE( "tilee.bin",  0x0001, 0x4000, CRC(ab504dc8) SHA1(4ebdcd42624e94c29ccdb8247bfff2d8e936ddd7) )
 

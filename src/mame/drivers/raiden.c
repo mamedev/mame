@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static INPUT_PORTS_START( raiden )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -201,9 +201,9 @@ INPUT_PORTS_END
 
 static const gfx_layout raiden_charlayout =
 {
-	8,8,		/* 8*8 characters */
-	2048,		/* 512 characters */
-	4,			/* 4 bits per pixel */
+	8,8,        /* 8*8 characters */
+	2048,       /* 512 characters */
+	4,          /* 4 bits per pixel */
 	{ 4,0,(0x08000*8)+4,0x08000*8  },
 	{ 0,1,2,3,8,9,10,11 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
@@ -212,20 +212,20 @@ static const gfx_layout raiden_charlayout =
 
 static const gfx_layout raiden_spritelayout =
 {
-  16,16,	/* 16*16 tiles */
-  4096,		/* 2048*4 tiles */
-  4,		/* 4 bits per pixel */
-  { 12, 8, 4, 0 },
-  {
-    0,1,2,3, 16,17,18,19,
+	16,16,  /* 16*16 tiles */
+	4096,       /* 2048*4 tiles */
+	4,      /* 4 bits per pixel */
+	{ 12, 8, 4, 0 },
+	{
+	0,1,2,3, 16,17,18,19,
 	512+0,512+1,512+2,512+3,
 	512+8+8,512+9+8,512+10+8,512+11+8,
-  },
-  {
+	},
+	{
 	0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-  },
-  1024
+	},
+	1024
 };
 
 static GFXDECODE_START( raiden )
@@ -239,7 +239,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	/* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* VBL */
 }
 
 static MACHINE_CONFIG_START( raiden, raiden_state )
@@ -337,7 +337,7 @@ ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s?
 	ROM_REGION( 0x090000, "gfx4", 0 ) /* sprites */
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -370,7 +370,7 @@ ROM_START( raidena )
 	ROM_REGION( 0x090000, "gfx4", 0 ) /* sprites */
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -403,7 +403,7 @@ ROM_START( raident )
 	ROM_REGION( 0x090000, "gfx4", 0 ) /* sprites */
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -436,7 +436,7 @@ ROM_START( raidenu )
 	ROM_REGION( 0x090000, "gfx4", 0 ) /* sprites */
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -469,7 +469,7 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 	ROM_REGION( 0x090000, "gfx4", 0 ) /* sprites */
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -502,7 +502,7 @@ ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_REGION( 0x090000, "gfx4", 0 ) /* Sprites */
 	ROM_LOAD( "sei440", 0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* U165 on this PCB */
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
 	ROM_REGION( 0x2000, "plds", 0 )
@@ -539,7 +539,7 @@ ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encry
 	ROM_REGION( 0x090000, "gfx4", 0 ) /* Sprites */
 	ROM_LOAD( "sei440",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* U012 on this PCB */
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x00000, 0x10000, CRC(2051263e) SHA1(dff96caa11adf619360d88704e3af8427ddfe524) )
 ROM_END
 

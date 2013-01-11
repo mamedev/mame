@@ -92,26 +92,26 @@ UINT32 ip20_state::screen_update_ip204415(screen_device &screen, bitmap_ind16 &b
 
 static const eeprom_interface eeprom_interface_93C56 =
 {
-	7,					// address bits 7
-	16,					// data bits    16
-	"*110x",			// read         110x aaaaaaaa
-	"*101x",			// write        101x aaaaaaaa dddddddd
-	"*111x",			// erase        111x aaaaaaaa
-	"*10000xxxxxxx",	// lock         100x 00xxxx
-	"*10011xxxxxxx",	// unlock       100x 11xxxx
+	7,                  // address bits 7
+	16,                 // data bits    16
+	"*110x",            // read         110x aaaaaaaa
+	"*101x",            // write        101x aaaaaaaa dddddddd
+	"*111x",            // erase        111x aaaaaaaa
+	"*10000xxxxxxx",    // lock         100x 00xxxx
+	"*10011xxxxxxx",    // unlock       100x 11xxxx
 };
 
 
 
 
-#define RTC_DAYOFWEEK	state->m_RTC.nRAM[0x0e]
-#define RTC_YEAR		state->m_RTC.nRAM[0x0b]
-#define RTC_MONTH		state->m_RTC.nRAM[0x0a]
-#define RTC_DAY			state->m_RTC.nRAM[0x09]
-#define RTC_HOUR		state->m_RTC.nRAM[0x08]
-#define RTC_MINUTE		state->m_RTC.nRAM[0x07]
-#define RTC_SECOND		state->m_RTC.nRAM[0x06]
-#define RTC_HUNDREDTH	state->m_RTC.nRAM[0x05]
+#define RTC_DAYOFWEEK   state->m_RTC.nRAM[0x0e]
+#define RTC_YEAR        state->m_RTC.nRAM[0x0b]
+#define RTC_MONTH       state->m_RTC.nRAM[0x0a]
+#define RTC_DAY         state->m_RTC.nRAM[0x09]
+#define RTC_HOUR        state->m_RTC.nRAM[0x08]
+#define RTC_MINUTE      state->m_RTC.nRAM[0x07]
+#define RTC_SECOND      state->m_RTC.nRAM[0x06]
+#define RTC_HUNDREDTH   state->m_RTC.nRAM[0x05]
 
 READ32_MEMBER(ip20_state::hpc_r)
 {
@@ -179,7 +179,7 @@ READ32_MEMBER(ip20_state::hpc_r)
 		scc = machine().device<scc8530_t>("scc");
 		return scc->reg_r(space, 2);
 	case 0x0d08:
-		verboselog(machine(), 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
+		verboselog(machine(), 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask  );
 //      return 0x40;
 		return 0x7c; //scc->reg_r(space, 1);
 	case 0x0d0c:
@@ -260,11 +260,11 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 	}
 	switch( offset )
 	{
-	case 0x0090:	// SCSI0 next descriptor pointer
+	case 0x0090:    // SCSI0 next descriptor pointer
 		m_HPC.nSCSI0Descriptor = data;
 		break;
 
-	case 0x0094:	// SCSI0 control flags
+	case 0x0094:    // SCSI0 control flags
 		m_HPC.nSCSI0DMACtrl = data;
 		#if 0
 		if (data & 0x80)
@@ -488,7 +488,7 @@ static void scsi_irq(running_machine &machine, int state)
 
 static const struct WD33C93interface wd33c93_intf =
 {
-	&scsi_irq,		/* command completion IRQ */
+	&scsi_irq,      /* command completion IRQ */
 };
 
 DRIVER_INIT_MEMBER(ip20_state,ip204415)
@@ -578,8 +578,8 @@ INPUT_PORTS_END
 
 static const mips3_config config =
 {
-	32768,	/* code cache size */
-	32768	/* data cache size */
+	32768,  /* code cache size */
+	32768   /* data cache size */
 };
 
 static MACHINE_CONFIG_START( ip204415, ip20_state )

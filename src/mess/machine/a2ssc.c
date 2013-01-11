@@ -31,7 +31,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ssc )
 	ROM_REGION(0x000800, SSC_ROM_REGION, 0)
-    ROM_LOAD( "341-0065-a.bin", 0x000000, 0x000800, CRC(b7539d4c) SHA1(6dab633470c6bc4cb3e81d09fda46597caf8ee57) )
+	ROM_LOAD( "341-0065-a.bin", 0x000000, 0x000800, CRC(b7539d4c) SHA1(6dab633470c6bc4cb3e81d09fda46597caf8ee57) )
 ROM_END
 
 static INPUT_PORTS_START( ssc )
@@ -54,7 +54,7 @@ static INPUT_PORTS_START( ssc )
 	PORT_DIPSETTING(    0xe0, "9600" )
 	PORT_DIPSETTING(    0xf0, "19200" )
 
-    PORT_DIPNAME( 0x0c, 0x00, "Mode" )
+	PORT_DIPNAME( 0x0c, 0x00, "Mode" )
 	PORT_DIPSETTING(    0x00, "Communications Mode" )
 	PORT_DIPSETTING(    0x04, "SIC P8 Emulation Mode" )
 	PORT_DIPSETTING(    0x08, "Printer Mode" )
@@ -71,16 +71,16 @@ static INPUT_PORTS_START( ssc )
 	PORT_DIPSETTING(    0x80, "8 data, 2 stop")
 	PORT_DIPSETTING(    0xc0, "7 data, 2 stop")
 
-    PORT_DIPNAME( 0x30, 0x00, "Parity" )
+	PORT_DIPNAME( 0x30, 0x00, "Parity" )
 	PORT_DIPSETTING(    0x00, "None")
 	PORT_DIPSETTING(    0x10, "Odd")
 	PORT_DIPSETTING(    0x30, "Even")
 
-    PORT_DIPNAME( 0x08, 0x08, "End of Line" )
+	PORT_DIPNAME( 0x08, 0x08, "End of Line" )
 	PORT_DIPSETTING(    0x00, "Add LF after CR")
 	PORT_DIPSETTING(    0x08, "Don't add LF after CR")
 
-    PORT_DIPNAME( 0x04, 0x04, "Interrupts" )
+	PORT_DIPNAME( 0x04, 0x04, "Interrupts" )
 	PORT_DIPSETTING(    0x00, "On")
 	PORT_DIPSETTING(    0x04, "Off")
 INPUT_PORTS_END
@@ -118,17 +118,17 @@ const rom_entry *a2bus_ssc_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2BUS_SSC, "Apple Super Serial Card", tag, owner, clock),
+		device_t(mconfig, A2BUS_SSC, "Apple Super Serial Card", tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
-        m_acia(*this, SSC_ACIA_TAG)
+		m_acia(*this, SSC_ACIA_TAG)
 {
 	m_shortname = "a2ssc";
 }
 
 a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
-        m_acia(*this, SSC_ACIA_TAG)
+		m_acia(*this, SSC_ACIA_TAG)
 {
 	m_shortname = "a2ssc";
 }
@@ -174,24 +174,24 @@ UINT8 a2bus_ssc_device::read_c800(address_space &space, UINT16 offset)
 
 UINT8 a2bus_ssc_device::read_c0nx(address_space &space, UINT8 offset)
 {
-    // dips at C0n1/C0n2, ACIA at C0n8/9/A/B
+	// dips at C0n1/C0n2, ACIA at C0n8/9/A/B
 
-    switch (offset)
-    {
-        case 1:
-            return device().ioport("DSW1")->read();
-        case 2:
-            return device().ioport("DSW2")->read();
+	switch (offset)
+	{
+		case 1:
+			return device().ioport("DSW1")->read();
+		case 2:
+			return device().ioport("DSW2")->read();
 
-        case 8:
-        case 9:
-        case 0xa:
-        case 0xb:
-            return m_acia->read(space, offset-8);
+		case 8:
+		case 9:
+		case 0xa:
+		case 0xb:
+			return m_acia->read(space, offset-8);
 
-    }
+	}
 
-    return 0;
+	return 0;
 }
 
 /*-------------------------------------------------
@@ -200,15 +200,14 @@ UINT8 a2bus_ssc_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_ssc_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-    switch (offset)
-    {
-        case 8:
-        case 9:
-        case 0xa:
-        case 0xb:
-            m_acia->write(space, offset-8, data);
-            break;
+	switch (offset)
+	{
+		case 8:
+		case 9:
+		case 0xa:
+		case 0xb:
+			m_acia->write(space, offset-8, data);
+			break;
 
-    }
+	}
 }
-

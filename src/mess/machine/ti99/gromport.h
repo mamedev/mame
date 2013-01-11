@@ -20,8 +20,8 @@ extern const device_type GROMPORT;
 
 struct gromport_config
 {
-	devcb_write_line	ready;
-	devcb_write_line	reset;
+	devcb_write_line    ready;
+	devcb_write_line    reset;
 };
 
 class ti99_cartridge_connector_device;
@@ -36,7 +36,7 @@ public:
 	void cruwrite(offs_t offset, UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 
-	void	cartridge_inserted();
+	void    cartridge_inserted();
 
 protected:
 	void device_start();
@@ -45,7 +45,7 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	ti99_cartridge_connector_device*	m_connector;
+	ti99_cartridge_connector_device*    m_connector;
 	bool m_reset_on_insert;
 	devcb_resolved_write_line m_console_reset;
 	devcb_resolved_write_line m_console_ready;
@@ -53,9 +53,9 @@ private:
 
 SLOT_INTERFACE_EXTERN(gromport);
 
-#define MCFG_TI99_GROMPORT_ADD( _tag, _conf )	\
+#define MCFG_TI99_GROMPORT_ADD( _tag, _conf )   \
 	MCFG_DEVICE_ADD(_tag, GROMPORT, 0) \
-	MCFG_DEVICE_CONFIG(_conf)	\
+	MCFG_DEVICE_CONFIG(_conf)   \
 	MCFG_DEVICE_SLOT_INTERFACE(gromport, "single", NULL, false)
 
 /****************************************************************************/
@@ -70,12 +70,12 @@ public:
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void	crureadz(offs_t offset, UINT8 *value);
-	void	cruwrite(offs_t offset, UINT8 data);
-	void	ready_line(int state);
-	bool	is_available() { return m_pcb != NULL; }
-	bool	has_grom();
-	void	set_slot(int i);
+	void    crureadz(offs_t offset, UINT8 *value);
+	void    cruwrite(offs_t offset, UINT8 data);
+	void    ready_line(int state);
+	bool    is_available() { return m_pcb != NULL; }
+	bool    has_grom();
+	void    set_slot(int i);
 
 protected:
 	void device_start() { };
@@ -92,27 +92,27 @@ protected:
 
 	// device_image_interface
 	iodevice_t image_type() const { return IO_CARTSLOT; }
-	bool is_readable()  const			{ return true; }
-	bool is_writeable() const			{ return false; }
-	bool is_creatable() const			{ return false; }
-	bool must_be_loaded() const 		{ return false; }
-	bool is_reset_on_load() const		{ return false; }
+	bool is_readable()  const           { return true; }
+	bool is_writeable() const           { return false; }
+	bool is_creatable() const           { return false; }
+	bool must_be_loaded() const         { return false; }
+	bool is_reset_on_load() const       { return false; }
 	const char *image_interface() const { return "ti99_cart"; }
 	const char *file_extensions() const { return "rpk"; }
 	const option_guide *create_option_guide() const { return NULL; }
 
 private:
-	bool	m_softlist;
-	int 	m_pcbtype;
-	int 	m_slot;
-	int 	get_index_from_tagname();
+	bool    m_softlist;
+	int     m_pcbtype;
+	int     m_slot;
+	int     get_index_from_tagname();
 
-	ti99_cartridge_pcb*					m_pcb;			// inbound
-	ti99_cartridge_connector_device*	m_connector;	// outbound
+	ti99_cartridge_pcb*                 m_pcb;          // inbound
+	ti99_cartridge_connector_device*    m_connector;    // outbound
 
 	// RPK which is associated to this cartridge
 	// When we close it, the contents are saved to NVRAM if available
-	rpk	*m_rpk;
+	rpk *m_rpk;
 };
 
 extern const device_type TI99CART;
@@ -133,7 +133,7 @@ public:
 
 protected:
 	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	gromport_device*	m_gromport;
+	gromport_device*    m_gromport;
 };
 
 /*
@@ -188,15 +188,15 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	int		m_active_slot;
-	int		m_fixed_slot;
-	int		m_next_free_slot;
-	int		m_numcart;
-	ti99_cartridge_device*	m_cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
+	int     m_active_slot;
+	int     m_fixed_slot;
+	int     m_next_free_slot;
+	int     m_numcart;
+	ti99_cartridge_device*  m_cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
 
-	void	set_slot(int slotnumber);
-	int 	get_active_slot(bool changebase, offs_t offset);
-	void	change_slot(bool inserted, int index);
+	void    set_slot(int slotnumber);
+	int     get_active_slot(bool changebase, offs_t offset);
+	void    change_slot(bool inserted, int index);
 };
 
 /*
@@ -230,16 +230,16 @@ protected:
 	void nvram_write(emu_file &file);
 
 private:
-	int 	m_gk_switch[6];			// Used to cache the switch settings.
+	int     m_gk_switch[6];         // Used to cache the switch settings.
 
-	int		m_ram_page;
-	int		m_grom_address;
-	UINT8*	m_ram_ptr;
-	UINT8*	m_grom_ptr;
+	int     m_ram_page;
+	int     m_grom_address;
+	UINT8*  m_ram_ptr;
+	UINT8*  m_grom_ptr;
 
-	bool	m_waddr_LSB;
+	bool    m_waddr_LSB;
 
-	ti99_cartridge_device *m_cartridge;		// guest cartridge
+	ti99_cartridge_device *m_cartridge;     // guest cartridge
 
 	// Just for proper initialization
 	void gk_install_menu(const char* menutext, int len, int ptr, int next, int start);
@@ -261,21 +261,21 @@ public:
 protected:
 	virtual DECLARE_READ8Z_MEMBER(readz);
 	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual void	crureadz(offs_t offset, UINT8 *value);
-	virtual void	cruwrite(offs_t offset, UINT8 data);
+	virtual void    crureadz(offs_t offset, UINT8 *value);
+	virtual void    cruwrite(offs_t offset, UINT8 data);
 
 	DECLARE_READ8Z_MEMBER(gromreadz);
 	DECLARE_WRITE8_MEMBER(gromwrite);
-	inline void 		set_grom_pointer(int number, device_t *dev);
+	inline void         set_grom_pointer(int number, device_t *dev);
 
-	ti99_grom_device*	m_grom[5];
-	int					m_grom_size;
-	int					m_rom_size;
-	int					m_ram_size;
+	ti99_grom_device*   m_grom[5];
+	int                 m_grom_size;
+	int                 m_rom_size;
+	int                 m_ram_size;
 
-	UINT8*				m_rom_ptr;
-	UINT8*				m_rom2_ptr;
-	UINT8*				m_ram_ptr;
+	UINT8*              m_rom_ptr;
+	UINT8*              m_rom2_ptr;
+	UINT8*              m_ram_ptr;
 
 private:
 };
@@ -298,7 +298,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 private:
-	int 	m_rom_page;
+	int     m_rom_page;
 };
 
 /********************** Mini Memory ***********************************/
@@ -319,11 +319,11 @@ public:
 	~ti99_super_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void	crureadz(offs_t offset, UINT8 *value);
-	void	cruwrite(offs_t offset, UINT8 data);
+	void    crureadz(offs_t offset, UINT8 *value);
+	void    cruwrite(offs_t offset, UINT8 data);
 
 private:
-	int		m_ram_page;
+	int     m_ram_page;
 };
 
 /************************* MBX  ***************************************/
@@ -335,7 +335,7 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 private:
-	int 	m_rom_page;
+	int     m_rom_page;
 };
 
 /********************** Paged 379i ************************************/
@@ -347,8 +347,8 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 private:
-	int 	get_paged379i_bank(int rompage);
-	int 	m_rom_page;
+	int     get_paged379i_bank(int rompage);
+	int     m_rom_page;
 };
 
 /********************** Paged CRU  ************************************/
@@ -359,10 +359,10 @@ public:
 	~ti99_pagedcru_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-	void	crureadz(offs_t offset, UINT8 *value);
-	void	cruwrite(offs_t offset, UINT8 data);
+	void    crureadz(offs_t offset, UINT8 *value);
+	void    cruwrite(offs_t offset, UINT8 data);
 private:
-	int 	m_rom_page;
+	int     m_rom_page;
 };
 
 
@@ -386,19 +386,19 @@ public:
 	rpk_socket(const char *id, int length, void *contents);
 	rpk_socket(const char *id, int length, void *contents, const char *pathname);
 
-	const char*		id() { return m_id; }
-	int 			get_content_length() { return m_length; }
-	void*			get_contents() { return m_contents; }
-	bool			persistent_ram() { return m_pathname != NULL; }
-	const char*		get_pathname() { return m_pathname; }
-	void			cleanup() { if (m_contents != NULL) free(m_contents); }
+	const char*     id() { return m_id; }
+	int             get_content_length() { return m_length; }
+	void*           get_contents() { return m_contents; }
+	bool            persistent_ram() { return m_pathname != NULL; }
+	const char*     get_pathname() { return m_pathname; }
+	void            cleanup() { if (m_contents != NULL) free(m_contents); }
 
 private:
-	const char		*m_id;
-	UINT32			m_length;
-	rpk_socket		*m_next;
-	void			*m_contents;
-	const char		*m_pathname;
+	const char      *m_id;
+	UINT32          m_length;
+	rpk_socket      *m_next;
+	void            *m_contents;
+	const char      *m_pathname;
 };
 
 class rpk_reader
@@ -410,10 +410,10 @@ public:
 	rpk *open(emu_options &options, const char *filename, const char *system_name);
 
 private:
-	const zip_file_header*	find_file(zip_file *zip, const char *filename, UINT32 crc);
-	rpk_socket*				load_rom_resource(zip_file* zip, xml_data_node* rom_resource_node, const char* socketname);
-	rpk_socket* 			load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
-	const pcb_type*			m_types;
+	const zip_file_header*  find_file(zip_file *zip, const char *filename, UINT32 crc);
+	rpk_socket*             load_rom_resource(zip_file* zip, xml_data_node* rom_resource_node, const char* socketname);
+	rpk_socket*             load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
+	const pcb_type*         m_types;
 };
 
 class rpk
@@ -423,16 +423,16 @@ public:
 	rpk(emu_options& options, const char* sysname);
 	~rpk();
 
-	int			get_type(void) { return m_type; }
-	void*		get_contents_of_socket(const char *socket_name);
-	int			get_resource_length(const char *socket_name);
-	void		close();
+	int         get_type(void) { return m_type; }
+	void*       get_contents_of_socket(const char *socket_name);
+	int         get_resource_length(const char *socket_name);
+	void        close();
 
 private:
-	emu_options&			m_options;		// need this to find the path to the nvram files
-	int						m_type;
-	const char*				m_system_name;	// need this to find the path to the nvram files
-	tagged_list<rpk_socket>	m_sockets;
+	emu_options&            m_options;      // need this to find the path to the nvram files
+	int                     m_type;
+	const char*             m_system_name;  // need this to find the path to the nvram files
+	tagged_list<rpk_socket> m_sockets;
 
 	void add_socket(const char* id, rpk_socket *newsock);
 };

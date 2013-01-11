@@ -14,8 +14,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define AM29F040_0_TAG	"u3"
-#define AM29F040_1_TAG	"u4"
+#define AM29F040_0_TAG  "u3"
+#define AM29F040_1_TAG  "u4"
 
 
 
@@ -176,18 +176,18 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       BA13
-                1       BA14
-                2       BA15
-                3       BA16
-                4       BA17
-                5       BA18
-                6
-                7
+			    0       BA13
+			    1       BA14
+			    2       BA15
+			    3       BA16
+			    4       BA17
+			    5       BA18
+			    6
+			    7
 
-            */
+			*/
 
 			m_bank = data & 0x3f;
 		}
@@ -195,18 +195,18 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       GAME
-                1       EXROM
-                2       MODE
-                3
-                4
-                5
-                6
-                7       LED
+			    0       GAME
+			    1       EXROM
+			    2       MODE
+			    3
+			    4
+			    5
+			    6
+			    7       LED
 
-            */
+			*/
 
 			m_mode = data;
 		}

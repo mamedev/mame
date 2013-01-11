@@ -34,7 +34,7 @@ MACHINE_CONFIG_END
 
 alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ALESIS_DM3AG, "Alesis DM3AG", tag, owner, clock),
-	  m_dac(*this, "dac")
+		m_dac(*this, "dac")
 {
 }
 
@@ -89,13 +89,13 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 			if (count == 1 && m_shift)
 			{
 				/*
-                    The HR-16 seems to use a simple scheme to generate 16-bit samples from its 8-bit sample ROMs.
-                    When the sound starts the 8-bit sample is sent to the most significant bits of the DAC and every
-                    time a -1 sample is found the data is shifted one position to right.
-                */
+				    The HR-16 seems to use a simple scheme to generate 16-bit samples from its 8-bit sample ROMs.
+				    When the sound starts the 8-bit sample is sent to the most significant bits of the DAC and every
+				    time a -1 sample is found the data is shifted one position to right.
+				*/
 				m_shift--;
 
-				if (LOG)	logerror("DM3AG '%s' shift: %02x\n", tag(), m_shift);
+				if (LOG)    logerror("DM3AG '%s' shift: %02x\n", tag(), m_shift);
 			}
 
 			// every block ends with three or more -1 samples
@@ -104,7 +104,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 				m_output_active = false;
 				sample = 0;
 
-				if (LOG)	logerror("DM3AG '%s' stop: %d, len: %d\n", tag(), m_cur_sample, m_cur_sample-((m_cmd[0]<<12) | (m_cmd[1]<<4) | ((m_cmd[2]>>4) & 0x0f)));
+				if (LOG)    logerror("DM3AG '%s' stop: %d, len: %d\n", tag(), m_cur_sample, m_cur_sample-((m_cmd[0]<<12) | (m_cmd[1]<<4) | ((m_cmd[2]>>4) & 0x0f)));
 
 				break;
 			}
@@ -118,22 +118,22 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 WRITE8_MEMBER(alesis_dm3ag_device::write)
 {
-	if (LOG)	logerror("DM3AG '%s' write: %02x\n", tag(), data);
+	if (LOG)    logerror("DM3AG '%s' write: %02x\n", tag(), data);
 
 	m_cmd[m_count++] = data;
 
 	if (m_count == 5)
 	{
 		/*
-            commands are sent in block of 5 bytes (40 bits)
+		    commands are sent in block of 5 bytes (40 bits)
 
-            bit 00-19       sample position in the roms
-            bit 20-23       ???
-            bit 24-31       volume
-            bit 32-34       panning
-            bit 35          output selector: 0 = out2, 1 = out1
-            bit 36-39       ???
-        */
+		    bit 00-19       sample position in the roms
+		    bit 20-23       ???
+		    bit 24-31       volume
+		    bit 32-34       panning
+		    bit 35          output selector: 0 = out2, 1 = out1
+		    bit 36-39       ???
+		*/
 
 		m_cur_sample = (m_cmd[0]<<12) | (m_cmd[1]<<4) | ((m_cmd[2]>>4) & 0x0f);
 

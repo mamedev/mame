@@ -61,19 +61,19 @@ private:
 	static const device_timer_id TIMER_TC_CLEAR = 1;
 
 	required_device<cpu_device> m_cpu;
-	required_device<upd765a_device>	m_fdc;
-	required_shared_ptr<UINT8>	m_koppel_ram;
+	required_device<upd765a_device> m_fdc;
+	required_shared_ptr<UINT8>  m_koppel_ram;
 
 	// internal state
-	emu_timer *			m_reset_timer;
-	emu_timer *			m_tc_clear_timer;
+	emu_timer *         m_reset_timer;
+	emu_timer *         m_tc_clear_timer;
 
-	UINT8 *				m_rom;
-	UINT8				m_hw_input_gate;
-	UINT16				m_rom_base;
-	UINT8				m_enabled;
-	UINT8				m_connected;
-	UINT8				m_active_fdd;
+	UINT8 *             m_rom;
+	UINT8               m_hw_input_gate;
+	UINT16              m_rom_base;
+	UINT8               m_enabled;
+	UINT8               m_connected;
+	UINT8               m_active_fdd;
 
 	floppy_image_device *m_floppy;
 };
@@ -104,8 +104,8 @@ public:
 private:
 	required_device<ide_controller_device> m_ide;
 
-	UINT16				m_ide_data;
-	int 				m_lh;
+	UINT16              m_ide_data;
+	int                 m_lh;
 };
 
 // device type definition

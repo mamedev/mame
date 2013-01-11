@@ -41,16 +41,16 @@ extern const device_type UPD7002;
 ***************************************************************************/
 
 typedef int (*uPD7002_get_analogue_func)(device_t *device, int channel_number);
-#define UPD7002_GET_ANALOGUE(name)	int name(device_t *device, int channel_number )
+#define UPD7002_GET_ANALOGUE(name)  int name(device_t *device, int channel_number )
 
 typedef void (*uPD7002_eoc_func)(device_t *device, int data);
-#define UPD7002_EOC(name)	void name(device_t *device, int data )
+#define UPD7002_EOC(name)   void name(device_t *device, int data )
 
 
 struct uPD7002_interface
 {
 	uPD7002_get_analogue_func get_analogue_func;
-	uPD7002_eoc_func		  EOC_func;
+	uPD7002_eoc_func          EOC_func;
 };
 
 /***************************************************************************

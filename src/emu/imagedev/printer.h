@@ -20,12 +20,12 @@
 
 struct printer_interface
 {
-    devcb_write_line m_online;
+	devcb_write_line m_online;
 };
 
 // ======================> printer_image_device
 
-class printer_image_device :	public device_t,
+class printer_image_device :    public device_t,
 								public printer_interface,
 								public device_image_interface
 {
@@ -58,7 +58,7 @@ public:
 	void output(UINT8 data);
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 
 	devcb_resolved_write_line m_online_func;

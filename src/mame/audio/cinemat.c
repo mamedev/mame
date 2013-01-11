@@ -32,17 +32,17 @@
  *
  *************************************/
 
-#define RISING_EDGE(bit, changed, val)	(((changed) & (bit)) && ((val) & (bit)))
-#define FALLING_EDGE(bit, changed, val)	(((changed) & (bit)) && !((val) & (bit)))
+#define RISING_EDGE(bit, changed, val)  (((changed) & (bit)) && ((val) & (bit)))
+#define FALLING_EDGE(bit, changed, val) (((changed) & (bit)) && !((val) & (bit)))
 
-#define SOUNDVAL_RISING_EDGE(bit)		RISING_EDGE(bit, bits_changed, sound_val)
-#define SOUNDVAL_FALLING_EDGE(bit)		FALLING_EDGE(bit, bits_changed, sound_val)
+#define SOUNDVAL_RISING_EDGE(bit)       RISING_EDGE(bit, bits_changed, sound_val)
+#define SOUNDVAL_FALLING_EDGE(bit)      FALLING_EDGE(bit, bits_changed, sound_val)
 
-#define SHIFTREG_RISING_EDGE(bit)		RISING_EDGE(bit, (state->m_last_shift ^ state->m_current_shift), state->m_current_shift)
-#define SHIFTREG_FALLING_EDGE(bit)		FALLING_EDGE(bit, (state->m_last_shift ^ state->m_current_shift), state->m_current_shift)
+#define SHIFTREG_RISING_EDGE(bit)       RISING_EDGE(bit, (state->m_last_shift ^ state->m_current_shift), state->m_current_shift)
+#define SHIFTREG_FALLING_EDGE(bit)      FALLING_EDGE(bit, (state->m_last_shift ^ state->m_current_shift), state->m_current_shift)
 
-#define SHIFTREG2_RISING_EDGE(bit)		RISING_EDGE(bit, (state->m_last_shift2 ^ state->m_current_shift), state->m_current_shift)
-#define SHIFTREG2_FALLING_EDGE(bit)		FALLING_EDGE(bit, (state->m_last_shift2 ^ state->m_current_shift), state->m_current_shift)
+#define SHIFTREG2_RISING_EDGE(bit)      RISING_EDGE(bit, (state->m_last_shift2 ^ state->m_current_shift), state->m_current_shift)
+#define SHIFTREG2_FALLING_EDGE(bit)     FALLING_EDGE(bit, (state->m_last_shift2 ^ state->m_current_shift), state->m_current_shift)
 
 
 /*************************************
@@ -74,17 +74,17 @@ WRITE8_MEMBER(cinemat_state::cinemat_sound_control_w)
 static SOUND_START( generic )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-    /* register for save states */
-    state_save_register_global(machine, state->m_sound_control);
-    state_save_register_global(machine, state->m_current_shift);
-    state_save_register_global(machine, state->m_last_shift);
-    state_save_register_global(machine, state->m_last_shift2);
-    state_save_register_global(machine, state->m_current_pitch);
-    state_save_register_global(machine, state->m_last_frame);
-    state_save_register_global_array(machine, state->m_sound_fifo);
-    state_save_register_global(machine, state->m_sound_fifo_in);
-    state_save_register_global(machine, state->m_sound_fifo_out);
-    state_save_register_global(machine, state->m_last_portb_write);
+	/* register for save states */
+	state_save_register_global(machine, state->m_sound_control);
+	state_save_register_global(machine, state->m_current_shift);
+	state_save_register_global(machine, state->m_last_shift);
+	state_save_register_global(machine, state->m_last_shift2);
+	state_save_register_global(machine, state->m_current_pitch);
+	state_save_register_global(machine, state->m_last_frame);
+	state_save_register_global_array(machine, state->m_sound_fifo);
+	state_save_register_global(machine, state->m_sound_fifo_in);
+	state_save_register_global(machine, state->m_sound_fifo_out);
+	state_save_register_global(machine, state->m_last_portb_write);
 }
 
 
@@ -99,15 +99,15 @@ static void generic_init(running_machine &machine, void (*callback)(running_mach
 	state->m_sound_control = 0x9f;
 
 	/* reset shift register values */
-    state->m_current_shift = 0xffff;
-    state->m_last_shift = 0xffff;
-    state->m_last_shift2 = 0xffff;
+	state->m_current_shift = 0xffff;
+	state->m_last_shift = 0xffff;
+	state->m_last_shift2 = 0xffff;
 
 	/* reset frame counters */
-    state->m_last_frame = 0;
+	state->m_last_frame = 0;
 
 	/* reset Star Castle pitch */
-    state->m_current_pitch = 0x10000;
+	state->m_current_pitch = 0x10000;
 }
 
 
@@ -129,7 +129,7 @@ static const char *const spacewar_sample_names[] =
 	"pop",
 	"explode2",
 	"fire2",
-    0
+	0
 };
 
 static const samples_interface spacewar_samples_interface =
@@ -164,10 +164,10 @@ static void spacewar_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bi
 
 	/* Mute - 0=off, 1=on */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
-		samples->start(2, 2, true);	/* play idle sound */
+		samples->start(2, 2, true); /* play idle sound */
 	if (SOUNDVAL_RISING_EDGE(0x10))
 	{
-        int i;
+		int i;
 
 		/* turn off all but the idle sound */
 		for (i = 0; i < 5; i++)
@@ -208,7 +208,7 @@ static const char *const barrier_sample_names[] =
 	"playrdie",
 	"playmove",
 	"enemmove",
-    0
+	0
 };
 
 static const samples_interface barrier_samples_interface =
@@ -261,7 +261,7 @@ static const char *const speedfrk_sample_names[] =
 {
 	"*speedfrk",
 	"offroad",
-    NULL
+	NULL
 };
 
 static const samples_interface speedfrk_samples_interface =
@@ -291,8 +291,8 @@ static void speedfrk_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bi
 	if (SOUNDVAL_FALLING_EDGE(0x10))
 		samples->stop(0);
 
-    /* start LED is controlled by bit 0x02 */
-    set_led_status(machine, 0, ~sound_val & 0x02);
+	/* start LED is controlled by bit 0x02 */
+	set_led_status(machine, 0, ~sound_val & 0x02);
 }
 
 static SOUND_RESET( speedfrk )
@@ -327,7 +327,7 @@ static const char *const starhawk_sample_names[] =
 	"k",
 	"master",
 	"kexit",
-    NULL
+	NULL
 };
 
 static const samples_interface starhawk_samples_interface =
@@ -403,7 +403,7 @@ static const char *const sundance_sample_names[] =
 	"ping1",
 	"ping2",
 	"hatch",
-    0
+	0
 };
 
 static const samples_interface sundance_samples_interface =
@@ -473,7 +473,7 @@ static const char *const tailg_sample_names[] =
 	"shield",
 	"bounce",
 	"hypersp",
-    NULL
+	NULL
 };
 
 static const samples_interface tailg_samples_interface =
@@ -562,7 +562,7 @@ static const char *const warrior_sample_names[] =
 	"killed",
 	"fall",
 	"appear",
-    NULL
+	NULL
 };
 
 static const samples_interface warrior_samples_interface =
@@ -626,14 +626,14 @@ MACHINE_CONFIG_END
 static const char *const armora_sample_names[] =
 {
 	"*armora",
-    "loexp",
-    "jeepfire",
+	"loexp",
+	"jeepfire",
 	"hiexp",
 	"tankfire",
 	"tankeng",
 	"beep",
 	"chopper",
-    NULL
+	NULL
 };
 
 static const samples_interface armora_samples_interface =
@@ -725,7 +725,7 @@ static const char *const ripoff_sample_names[] =
 	"bonuslvl",
 	"eattack",
 	"shipfire",
-    "efire",
+	"efire",
 	"explosn",
 	"bg1",
 	"bg2",
@@ -735,7 +735,7 @@ static const char *const ripoff_sample_names[] =
 	"bg6",
 	"bg7",
 	"bg8",
-    NULL
+	NULL
 };
 
 static const samples_interface ripoff_samples_interface =
@@ -823,7 +823,7 @@ static const char *const starcas_sample_names[] =
 	"lexplode",
 	"sexplode",
 	"pfire",
-    0
+	0
 };
 
 static const samples_interface starcas_samples_interface =
@@ -873,18 +873,18 @@ static void starcas_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 
 		/* latch the drone pitch */
 		target_pitch = (state->m_current_shift & 7) + ((state->m_current_shift & 2) << 2);
-        target_pitch = 0x5800 + (target_pitch << 12);
+		target_pitch = 0x5800 + (target_pitch << 12);
 
-        /* once per frame slide the pitch toward the target */
-        if (machine.primary_screen->frame_number() > state->m_last_frame)
-        {
-            if (state->m_current_pitch > target_pitch)
-                state->m_current_pitch -= 225;
-            if (state->m_current_pitch < target_pitch)
-                state->m_current_pitch += 150;
-            samples->set_frequency(4, state->m_current_pitch);
-            state->m_last_frame = machine.primary_screen->frame_number();
-        }
+		/* once per frame slide the pitch toward the target */
+		if (machine.primary_screen->frame_number() > state->m_last_frame)
+		{
+			if (state->m_current_pitch > target_pitch)
+				state->m_current_pitch -= 225;
+			if (state->m_current_pitch < target_pitch)
+				state->m_current_pitch += 150;
+			samples->set_frequency(4, state->m_current_pitch);
+			state->m_last_frame = machine.primary_screen->frame_number();
+		}
 
 		/* remember the previous value */
 		state->m_last_shift = state->m_current_shift;
@@ -929,15 +929,15 @@ MACHINE_CONFIG_END
 static const char *const solarq_sample_names[] =
 {
 	"*solarq",
-    "bigexpl",
+	"bigexpl",
 	"smexpl",
 	"lthrust",
 	"slaser",
 	"pickup",
 	"nuke2",
 	"nuke1",
-    "music",
-    NULL
+	"music",
+	NULL
 };
 
 static const samples_interface solarq_samples_interface =
@@ -980,18 +980,18 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 			state->m_target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (samples->playing(2) && machine.primary_screen->frame_number() > state->m_last_frame)
-        {
-            if (state->m_current_volume > state->m_target_volume)
-                state->m_current_volume -= 0.078f;
-            if (state->m_current_volume < state->m_target_volume)
-                state->m_current_volume += 0.078f;
-            if (state->m_current_volume > 0)
-                samples->set_volume(2, state->m_current_volume);
-            else
-                samples->stop(2);
-            state->m_last_frame = machine.primary_screen->frame_number();
-        }
+		if (samples->playing(2) && machine.primary_screen->frame_number() > state->m_last_frame)
+		{
+			if (state->m_current_volume > state->m_target_volume)
+				state->m_current_volume -= 0.078f;
+			if (state->m_current_volume < state->m_target_volume)
+				state->m_current_volume += 0.078f;
+			if (state->m_current_volume > 0)
+				samples->set_volume(2, state->m_current_volume);
+			else
+				samples->stop(2);
+			state->m_last_frame = machine.primary_screen->frame_number();
+		}
 
 		/* fire - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x10))
@@ -1036,7 +1036,7 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 
 		/* remember the previous value */
 		state->m_last_shift2 = state->m_current_shift;
-    }
+	}
 }
 
 static SOUND_RESET( solarq )
@@ -1065,19 +1065,19 @@ MACHINE_CONFIG_END
 static const char *const boxingb_sample_names[] =
 {
 	"*boxingb",
-    "softexpl",
+	"softexpl",
 	"loudexpl",
 	"chirp",
 	"eggcrack",
 	"bugpusha",
 	"bugpushb",
 	"bugdie",
-    "beetle",
-    "music",
-    "cannon",
-    "bounce",
-    "bell",
-    NULL
+	"beetle",
+	"music",
+	"cannon",
+	"bounce",
+	"bell",
+	NULL
 };
 
 static const samples_interface boxingb_samples_interface =
@@ -1158,13 +1158,13 @@ static void boxingb_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 		vol = (~state->m_current_shift >> 12) & 3;
 		samples->set_volume(8, vol / 3.0);
 
-        /* cannon - falling edge */
-        if (SHIFTREG2_RISING_EDGE(0x4000))
-        	samples->start(9, 9);
+		/* cannon - falling edge */
+		if (SHIFTREG2_RISING_EDGE(0x4000))
+			samples->start(9, 9);
 
 		/* remember the previous value */
 		state->m_last_shift2 = state->m_current_shift;
-    }
+	}
 
 	/* bounce - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x04))
@@ -1209,7 +1209,7 @@ static const char *const wotw_sample_names[] =
 	"lexplode",
 	"sexplode",
 	"pfire",
-    0
+	0
 };
 
 static const samples_interface wotw_samples_interface =
@@ -1259,18 +1259,18 @@ static void wotw_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_c
 
 		/* latch the drone pitch */
 		target_pitch = (state->m_current_shift & 7) + ((state->m_current_shift & 2) << 2);
-        target_pitch = 0x10000 + (target_pitch << 12);
+		target_pitch = 0x10000 + (target_pitch << 12);
 
-        /* once per frame slide the pitch toward the target */
-        if (machine.primary_screen->frame_number() > state->m_last_frame)
-        {
-            if (state->m_current_pitch > target_pitch)
-                state->m_current_pitch -= 300;
-            if (state->m_current_pitch < target_pitch)
-                state->m_current_pitch += 200;
-            samples->set_frequency(4, state->m_current_pitch);
-            state->m_last_frame = machine.primary_screen->frame_number();
-        }
+		/* once per frame slide the pitch toward the target */
+		if (machine.primary_screen->frame_number() > state->m_last_frame)
+		{
+			if (state->m_current_pitch > target_pitch)
+				state->m_current_pitch -= 300;
+			if (state->m_current_pitch < target_pitch)
+				state->m_current_pitch += 200;
+			samples->set_frequency(4, state->m_current_pitch);
+			state->m_last_frame = machine.primary_screen->frame_number();
+		}
 
 		/* remember the previous value */
 		state->m_last_shift = state->m_current_shift;
@@ -1394,8 +1394,8 @@ static Z80CTC_INTERFACE( demon_z80ctc_interface )
 {
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
 	DEVCB_NULL,     /* ZC/TO0 callback */
-	DEVCB_NULL,		/* ZC/TO1 callback */
-	DEVCB_NULL		/* ZC/TO2 callback */
+	DEVCB_NULL,     /* ZC/TO1 callback */
+	DEVCB_NULL      /* ZC/TO2 callback */
 };
 
 

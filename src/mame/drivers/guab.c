@@ -36,7 +36,7 @@
  *
  *************************************/
 
-#define LOG_FDC_COMMANDS	0
+#define LOG_FDC_COMMANDS    0
 #define FDC_LOG(x) do { if (LOG_FDC_COMMANDS) mame_printf_debug x; } while(0)
 
 
@@ -55,20 +55,20 @@ enum int_levels
 struct ef9369
 {
 	UINT32 addr;
-	UINT16 clut[16];	/* 13-bits - a marking bit and a 444 color */
+	UINT16 clut[16];    /* 13-bits - a marking bit and a 444 color */
 };
 
 
 struct wd1770
 {
-	UINT32	status;
-	UINT8	cmd;
-	UINT8	data;
+	UINT32  status;
+	UINT8   cmd;
+	UINT8   data;
 
-	UINT32	side;
-	INT32	track;
-	INT32	sector;
-	UINT32	sptr;
+	UINT32  side;
+	INT32   track;
+	INT32   sector;
+	UINT32  sptr;
 };
 
 
@@ -140,10 +140,10 @@ static void tms_interrupt(running_machine &machine, int state)
 
 static const struct tms34061_interface tms34061intf =
 {
-	"screen",		/* The screen we are acting on */
-	8,				/* VRAM address is (row << rowshift) | col */
-	0x40000,		/* Size of video RAM */
-	tms_interrupt	/* Interrupt gen callback */
+	"screen",       /* The screen we are acting on */
+	8,              /* VRAM address is (row << rowshift) | col */
+	0x40000,        /* Size of video RAM */
+	tms_interrupt   /* Interrupt gen callback */
 };
 
 
@@ -300,28 +300,28 @@ UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
-#define USEC_DELAY			40
-#define DISK_SIDES			2
-#define DISK_TRACKS			80
-#define DISK_SECTORS		18
+#define USEC_DELAY          40
+#define DISK_SIDES          2
+#define DISK_TRACKS         80
+#define DISK_SECTORS        18
 
-#define DISK_SECTOR_SIZE	256
-#define DISK_TRACK_SIZE		(DISK_SECTOR_SIZE * DISK_SECTORS)
-#define DISK_SIDE_SIZE		(DISK_TRACK_SIZE * DISK_TRACKS)
+#define DISK_SECTOR_SIZE    256
+#define DISK_TRACK_SIZE     (DISK_SECTOR_SIZE * DISK_SECTORS)
+#define DISK_SIDE_SIZE      (DISK_TRACK_SIZE * DISK_TRACKS)
 
 enum wd1770_status
 {
-	BUSY			 = 1 << 0,
-	DATA_REQUEST	 = 1 << 1,
-	INDEX			 = 1 << 1,
-	LOST_DATA		 = 1 << 2,
-	TRACK_00		 = 1 << 2,
-	CRC_ERROR		 = 1 << 3,
+	BUSY             = 1 << 0,
+	DATA_REQUEST     = 1 << 1,
+	INDEX            = 1 << 1,
+	LOST_DATA        = 1 << 2,
+	TRACK_00         = 1 << 2,
+	CRC_ERROR        = 1 << 3,
 	RECORD_NOT_FOUND = 1 << 4,
-	RECORD_TYPE		 = 1 << 5,
-	SPIN_UP			 = 1 << 5,
-	WRITE_PROTECT	 = 1 << 6,
-	MOTOR_ON		 = 1 << 7
+	RECORD_TYPE      = 1 << 5,
+	SPIN_UP          = 1 << 5,
+	WRITE_PROTECT    = 1 << 6,
+	MOTOR_ON         = 1 << 7
 };
 
 
@@ -332,18 +332,18 @@ TIMER_CALLBACK_MEMBER(guab_state::fdc_data_callback)
 	int more_data = 0;
 
 	/*
-        Disk dumps are organised as:
+	    Disk dumps are organised as:
 
-        Side 0, Track 0: Sectors 0 - 17
-        Side 1, Track 0: Sectors 0 - 17
-        Side 0, Track 1: Sectors 0 - 17
-        Side 1, Track 1: Sectors 0 - 17
-        etc.
-    */
+	    Side 0, Track 0: Sectors 0 - 17
+	    Side 1, Track 0: Sectors 0 - 17
+	    Side 0, Track 1: Sectors 0 - 17
+	    Side 1, Track 1: Sectors 0 - 17
+	    etc.
+	*/
 
 	int idx = 2 * fdc.track * (DISK_TRACK_SIZE) + (fdc.side ? DISK_TRACK_SIZE : 0)+
-			  fdc.sector * (DISK_SECTOR_SIZE) +
-			  fdc.sptr;
+				fdc.sector * (DISK_SECTOR_SIZE) +
+				fdc.sptr;
 
 	/* Write or read? */
 	if (fdc.cmd & 0x20)
@@ -455,7 +455,7 @@ WRITE16_MEMBER(guab_state::wd1770_w)
 					if (data & 0x10)
 						FDC_LOG(("Multi "));
 
-					FDC_LOG(("Sector read: H%d T%d S%d\n",	fdc.side,
+					FDC_LOG(("Sector read: H%d T%d S%d\n",  fdc.side,
 															fdc.track,
 															fdc.sector));
 
@@ -474,7 +474,7 @@ WRITE16_MEMBER(guab_state::wd1770_w)
 					if (data & 0x10)
 						FDC_LOG(("Multi "));
 
-					FDC_LOG(("Sector write: H%d T%d S%d\n",	fdc.side,
+					FDC_LOG(("Sector write: H%d T%d S%d\n", fdc.side,
 															fdc.track,
 															fdc.sector));
 
@@ -793,7 +793,7 @@ INPUT_PORTS_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 

@@ -62,14 +62,14 @@ static UINT8 difficulty_input_port_r( running_machine &machine, int bit )
 	UINT8 ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	UINT8	raw = machine.root_device().ioport("FAKE")->read();
+	UINT8   raw = machine.root_device().ioport("FAKE")->read();
 
 	if (raw & (1 << (bit + 1)))
-		ret = 0x03;		/* expert */
+		ret = 0x03;     /* expert */
 	else if (raw & (1 << (bit + 2)))
-		ret = 0x01;		/* pro */
+		ret = 0x01;     /* pro */
 	else
-		ret = 0x00;		/* amateur otherwise */
+		ret = 0x00;     /* amateur otherwise */
 
 	return ret;
 }
@@ -81,13 +81,13 @@ READ8_MEMBER(clayshoo_state::input_port_r)
 
 	switch (m_input_port_select)
 	{
-	case 0x01:	ret = ioport("IN0")->read(); break;
-	case 0x02:	ret = ioport("IN1")->read(); break;
-	case 0x04:	ret = (ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(machine(), 0) |
-					  (difficulty_input_port_r(machine(), 3) << 2); break;
-	case 0x08:	ret = ioport("IN3")->read(); break;
+	case 0x01:  ret = ioport("IN0")->read(); break;
+	case 0x02:  ret = ioport("IN1")->read(); break;
+	case 0x04:  ret = (ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(machine(), 0) |
+						(difficulty_input_port_r(machine(), 3) << 2); break;
+	case 0x08:  ret = ioport("IN3")->read(); break;
 	case 0x10:
-	case 0x20:	break;	/* these two are not really used */
+	case 0x20:  break;  /* these two are not really used */
 	default: logerror("Unexpected port read: %02X\n", m_input_port_select);
 	}
 	return ret;
@@ -110,7 +110,7 @@ TIMER_CALLBACK_MEMBER(clayshoo_state::reset_analog_bit)
 static attotime compute_duration( device_t *device, int analog_pos )
 {
 	/* the 58 comes from the length of the loop used to
-       read the analog position */
+	   read the analog position */
 	return downcast<cpu_device *>(device)->cycles_to_attotime(58 * analog_pos);
 }
 
@@ -118,8 +118,8 @@ static attotime compute_duration( device_t *device, int analog_pos )
 WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 {
 	/* reset the analog value, and start the two times that will fire
-       off in a short period proportional to the position of the
-       analog control and set the appropriate bit. */
+	   off in a short period proportional to the position of the
+	   analog control and set the appropriate bit. */
 
 	m_analog_port_val = 0xff;
 
@@ -151,22 +151,22 @@ static void create_analog_timers( running_machine &machine )
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_DRIVER_MEMBER(clayshoo_state,input_port_select_w),	/* Port A write */
-	DEVCB_DRIVER_MEMBER(clayshoo_state,input_port_r),		/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_DRIVER_MEMBER(clayshoo_state,input_port_select_w),    /* Port A write */
+	DEVCB_DRIVER_MEMBER(clayshoo_state,input_port_r),       /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 void clayshoo_state::machine_start()
@@ -222,8 +222,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, clayshoo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("videoram")	/* 6k of video ram according to readme */
-	AM_RANGE(0x9800, 0xa800) AM_WRITENOP	  /* not really mapped, but cleared */
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("videoram")    /* 6k of video ram according to readme */
+	AM_RANGE(0x9800, 0xa800) AM_WRITENOP      /* not really mapped, but cleared */
 	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
 ADDRESS_MAP_END
 
@@ -260,11 +260,11 @@ static INPUT_PORTS_START( clayshoo )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* doesn't appear to be used */
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	/* not 100% positive */
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* doesn't appear to be used */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  /* not 100% positive */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		/* used */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      /* used */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -278,11 +278,11 @@ static INPUT_PORTS_START( clayshoo )
 	PORT_DIPSETTING(    0x05, "60/8k-120/10k" )
 	PORT_DIPSETTING(    0x06, "90/11.5k-150/11.5k" )
 	PORT_DIPSETTING(    0x07, "90/11.5k-190/13k" )
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* doesn't appear to be used */
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* doesn't appear to be used */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_SPECIAL )	/* amateur/expert/pro Player 2 */
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_SPECIAL )	/* amateur/expert/pro Player 1 */
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_SPECIAL )    /* amateur/expert/pro Player 2 */
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_SPECIAL )    /* amateur/expert/pro Player 1 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -300,7 +300,7 @@ static INPUT_PORTS_START( clayshoo )
 	PORT_BIT( 0x0f, 0x08, IPT_AD_STICK_Y ) PORT_MINMAX(0,0x0f) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("FAKE")	/* IN6 - Fake.  Visible in IN2 bits 0-1 and 2-3 */
+	PORT_START("FAKE")  /* IN6 - Fake.  Visible in IN2 bits 0-1 and 2-3 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_PLAYER(2) PORT_NAME("P2 Amateur Difficulty")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_PLAYER(2) PORT_NAME("P2 Expert Difficulty")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(2) PORT_NAME("P2 Pro Difficulty")
@@ -328,7 +328,7 @@ void clayshoo_state::machine_reset()
 static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,5068000/4)		/* 5.068/4 Mhz (divider is a guess) */
+	MCFG_CPU_ADD("maincpu", Z80,5068000/4)      /* 5.068/4 Mhz (divider is a guess) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)

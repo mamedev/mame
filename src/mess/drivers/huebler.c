@@ -58,15 +58,15 @@ READ8_MEMBER( amu880_state::keyboard_r )
 {
 	/*
 
-        A0..A3  Y
-        A4      !(X0&X3)
-        A5      !(X2&X3)
-        A6      shift
-        A7      ctrl
-        A8      key pressed
-        A9      AB0
+	    A0..A3  Y
+	    A4      !(X0&X3)
+	    A5      !(X2&X3)
+	    A6      shift
+	    A7      ctrl
+	    A8      key pressed
+	    A9      AB0
 
-    */
+	*/
 
 	UINT8 special = ioport("SPECIAL")->read();
 
@@ -242,7 +242,7 @@ UINT32 amu880_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		}
 	}
 
-    return 0;
+	return 0;
 }
 
 /* Z80-CTC Interface */
@@ -258,34 +258,34 @@ WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w),	/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z2_w)	/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z0_w),    /* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w),    /* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z2_w) /* ZC/TO2 callback */
 };
 
 /* Z80-PIO Interface */
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( pio2_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 /* Z80-SIO Interface */
@@ -365,15 +365,15 @@ static const cassette_interface amu880_cassette_interface =
 /* F4 Character Displayer */
 static const gfx_layout amu880_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( amu880 )
@@ -438,4 +438,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1983, amu880,	0,		0,		amu880,	amu880, driver_device,	0,		"Militaerverlag der DDR",	"Ausbaufaehiger Mikrocomputer mit dem U 880",	GAME_NO_SOUND )
+COMP( 1983, amu880, 0,      0,      amu880, amu880, driver_device,  0,      "Militaerverlag der DDR",   "Ausbaufaehiger Mikrocomputer mit dem U 880",   GAME_NO_SOUND )

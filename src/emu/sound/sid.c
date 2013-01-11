@@ -109,11 +109,11 @@ void sidEmuFillBuffer(SID6581_t *This, stream_sample_t *buffer, UINT32 bufferLen
 /* hack for digi sounds
    does n't seam to come from a tone operator
    ghostbusters and goldrunner everything except volume zeroed */
-					      +(This->masterVolume<<2)
+							+(This->masterVolume<<2)
 //                        +(*sampleEmuRout)()
 		)];
 		syncEm(This);
-    }
+	}
 }
 
 /* --------------------------------------------------------------------- Init */
@@ -325,39 +325,38 @@ void sid6581_port_w (SID6581_t *This, int offset, int data)
 
 int sid6581_port_r (running_machine &machine, SID6581_t *This, int offset)
 {
-    int data;
+	int data;
 /* SIDPLAY reads last written at a sid address value */
-    offset &= 0x1f;
-    switch (offset)
-    {
-    case 0x1d:
-    case 0x1e:
-    case 0x1f:
+	offset &= 0x1f;
+	switch (offset)
+	{
+	case 0x1d:
+	case 0x1e:
+	case 0x1f:
 	data=0xff;
 	break;
-    case 0x19:						   /* paddle 1 */
+	case 0x19:                         /* paddle 1 */
 	if (!This->in_potx_func.isnull())
 		data = This->in_potx_func(offset);
 	else
-	    data=0;
+		data=0;
 	break;
-    case 0x1a:						   /* paddle 2 */
+	case 0x1a:                         /* paddle 2 */
 	if (!This->in_poty_func.isnull())
 		data = This->in_poty_func(offset);
 	else
-	    data=0;
+		data=0;
 	break;
-    case 0x1b:
+	case 0x1b:
 	This->mixer_channel->update();
 	data = This->optr3.output;
 	break;
-    case 0x1c:
+	case 0x1c:
 	This->mixer_channel->update();
 	data = This->optr3.enveVol;
 	break;
-    default:
+	default:
 	data=This->reg[offset];
-    }
-    return data;
+	}
+	return data;
 }
-

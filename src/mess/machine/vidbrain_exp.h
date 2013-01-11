@@ -48,7 +48,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define VIDEOBRAIN_EXPANSION_SLOT_TAG		"exp"
+#define VIDEOBRAIN_EXPANSION_SLOT_TAG       "exp"
 
 
 
@@ -61,8 +61,8 @@
 
 
 #define MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, VIDEOBRAIN_EXPANSION_SLOT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, VIDEOBRAIN_EXPANSION_SLOT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -75,7 +75,7 @@
 
 struct videobrain_expansion_slot_interface
 {
-    devcb_write_line	m_out_extres_cb;
+	devcb_write_line    m_out_extres_cb;
 };
 
 
@@ -84,9 +84,9 @@ struct videobrain_expansion_slot_interface
 class device_videobrain_expansion_card_interface;
 
 class videobrain_expansion_slot_device : public device_t,
-										 public videobrain_expansion_slot_interface,
-										 public device_slot_interface,
-										 public device_image_interface
+											public videobrain_expansion_slot_interface,
+											public device_slot_interface,
+											public device_image_interface
 {
 public:
 	// construction/destruction
@@ -130,7 +130,7 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	devcb_resolved_write_line	m_out_extres_func;
+	devcb_resolved_write_line   m_out_extres_func;
 
 	device_videobrain_expansion_card_interface *m_cart;
 };

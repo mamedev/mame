@@ -41,19 +41,19 @@ BE02 and BE03 - read data, write data
 #define STAT_TRACK0     0x08
 #define STAT_READY      0x80
 
-#define VERBOSE			0	/* General logging */
-#define VERBOSE_DATA	0	/* Logging of each byte during read and write */
+#define VERBOSE         0   /* General logging */
+#define VERBOSE_DATA    0   /* Logging of each byte during read and write */
 
 /* structure describing a single density track */
-#define TRKSIZE_SD		16*270
+#define TRKSIZE_SD      16*270
 #if 0
 static const UINT8 track_SD[][2] = {
-	{ 1, 0xff}, 	/*  1 * FF (marker)                      */
-	{ 1, 0x00}, 	/*  1 byte, track number (00-4C)         */
-	{ 1, 0x01}, 	/*  1 byte, sector number (00-0F)        */
+	{ 1, 0xff},     /*  1 * FF (marker)                      */
+	{ 1, 0x00},     /*  1 byte, track number (00-4C)         */
+	{ 1, 0x01},     /*  1 byte, sector number (00-0F)        */
 	{10, 0x00},     /*  10 bytes of zeroes                   */
-	{256, 0xe5},	/*  256 bytes of sector data             */
-	{ 1, 0xb7}, 	/*  1 byte, CRC                          */
+	{256, 0xe5},    /*  256 bytes of sector data             */
+	{ 1, 0xb7},     /*  1 byte, CRC                          */
 };
 #endif
 
@@ -72,13 +72,13 @@ struct micropolis_state
 	UINT8 command;
 	UINT8 status;
 
-	UINT8	write_cmd;				/* last write command issued */
+	UINT8   write_cmd;              /* last write command issued */
 
-	UINT8	buffer[6144];			/* I/O buffer (holds up to a whole track) */
-	UINT32	data_offset;			/* offset into I/O buffer */
-	INT32	data_count; 			/* transfer count from/into I/O buffer */
+	UINT8   buffer[6144];           /* I/O buffer (holds up to a whole track) */
+	UINT32  data_offset;            /* offset into I/O buffer */
+	INT32   data_count;             /* transfer count from/into I/O buffer */
 
-	UINT32	sector_length;			/* sector length (byte) */
+	UINT32  sector_length;          /* sector length (byte) */
 
 	/* this is the drive currently selected */
 	device_t *drive;
@@ -138,9 +138,9 @@ static void micropolis_write_sector(device_t *device)
 #if 0
 	micropolis_state *w = get_safe_token(device);
 	/* at this point, the disc is write enabled, and data
-     * has been transfered into our buffer - now write it to
-     * the disc image or to the real disc
-     */
+	 * has been transfered into our buffer - now write it to
+	 * the disc image or to the real disc
+	 */
 
 	/* find sector */
 	w->data_count = w->sector_length;
@@ -307,9 +307,9 @@ READ8_DEVICE_HANDLER( micropolis_r )
 	switch (offset & 0x03)
 	{
 	case 0: data = micropolis_status_r(device, space, 0); break;
-	case 1:	data = micropolis_status_r(device, space, 1); break;
+	case 1: data = micropolis_status_r(device, space, 1); break;
 	case 2:
-	case 3:	data = micropolis_data_r(device, space, 0); break;
+	case 3: data = micropolis_data_r(device, space, 0); break;
 	}
 
 	return data;
@@ -320,7 +320,7 @@ WRITE8_DEVICE_HANDLER( micropolis_w )
 	switch (offset & 0x03)
 	{
 	case 0:
-	case 1:	micropolis_command_w(device, space, 0, data); break;
+	case 1: micropolis_command_w(device, space, 0, data); break;
 	case 2:
 	case 3: micropolis_data_w(device, space, 0, data);    break;
 	}
@@ -411,5 +411,3 @@ void micropolis_device::device_reset()
 {
 	DEVICE_RESET_NAME( micropolis )(this);
 }
-
-

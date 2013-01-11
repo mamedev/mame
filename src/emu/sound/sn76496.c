@@ -128,14 +128,14 @@ sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_t
 	device_t *owner, UINT32 clock)
 
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_feedback_mask(feedbackmask),
-	  m_whitenoise_tap1(noisetap1),
-	  m_whitenoise_tap2(noisetap2),
-	  m_negate(negate),
-	  m_stereo(stereo),
-	  m_clock_divider(clockdivider),
-	  m_freq0_is_max(freq0)
+		device_sound_interface(mconfig, *this),
+		m_feedback_mask(feedbackmask),
+		m_whitenoise_tap1(noisetap1),
+		m_whitenoise_tap2(noisetap2),
+		m_negate(negate),
+		m_stereo(stereo),
+		m_clock_divider(clockdivider),
+		m_freq0_is_max(freq0)
 {
 }
 
@@ -157,7 +157,7 @@ void sn76496_base_device::device_start()
 	for (i = 0; i < 8; i+=2)
 	{
 		m_register[i] = 0;
-		m_register[i + 1] = 0x0f;	// volume = 0
+		m_register[i + 1] = 0x0f;   // volume = 0
 	}
 
 	for (i = 0; i < 4; i++)
@@ -170,8 +170,8 @@ void sn76496_base_device::device_start()
 	m_RNG = m_feedback_mask;
 	m_output[3] = m_RNG & 1;
 
-	m_cycles_to_ready = 1;			// assume ready is not active immediately on init. is this correct?
-	m_stereo_mask = 0xFF;			// all channels enabled
+	m_cycles_to_ready = 1;          // assume ready is not active immediately on init. is this correct?
+	m_stereo_mask = 0xFF;           // all channels enabled
 	m_current_clock = m_clock_divider-1;
 
 	// set gain
@@ -182,7 +182,7 @@ void sn76496_base_device::device_start()
 	// increase max output basing on gain (0.2 dB per step)
 	out = MAX_OUTPUT / 4; // four channels, each gets 1/4 of the total range
 	while (gain-- > 0)
-		out *= 1.023292992;	// = (10 ^ (0.2/20))
+		out *= 1.023292992; // = (10 ^ (0.2/20))
 
 	// build volume table (2dB per step)
 	for (i = 0; i < 15; i++)
@@ -191,7 +191,7 @@ void sn76496_base_device::device_start()
 		if (out > MAX_OUTPUT / 4) m_vol_table[i] = MAX_OUTPUT / 4;
 		else m_vol_table[i] = out;
 
-		out /= 1.258925412;	/* = 10 ^ (2/20) = 2dB */
+		out /= 1.258925412; /* = 10 ^ (2/20) = 2dB */
 	}
 	m_vol_table[15] = 0;
 
@@ -246,9 +246,9 @@ void sn76496_base_device::write(UINT8 data)
 	c = r >> 1;
 	switch (r)
 	{
-		case 0:	// tone 0: frequency
-		case 2:	// tone 1: frequency
-		case 4:	// tone 2: frequency
+		case 0: // tone 0: frequency
+		case 2: // tone 1: frequency
+		case 4: // tone 2: frequency
 			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x0f) | ((data & 0x3f) << 4);
 			if ((m_register[r] != 0) || (!m_freq0_is_max)) m_period[c] = m_register[r];
 			else m_period[c] = 0x400;
@@ -256,17 +256,17 @@ void sn76496_base_device::write(UINT8 data)
 			if (r == 4)
 			{
 				// update noise shift frequency
-				if ((m_register[6] & 0x03) == 0x03)	m_period[3] = m_period[2]<<1;
+				if ((m_register[6] & 0x03) == 0x03) m_period[3] = m_period[2]<<1;
 			}
 			break;
-		case 1:	// tone 0: volume
-		case 3:	// tone 1: volume
-		case 5:	// tone 2: volume
-		case 7:	// noise: volume
+		case 1: // tone 0: volume
+		case 3: // tone 1: volume
+		case 5: // tone 2: volume
+		case 7: // noise: volume
 			m_volume[c] = m_vol_table[data & 0x0f];
 			if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
 			break;
-		case 6:	// noise: frequency, mode
+		case 6: // noise: frequency, mode
 			{
 				if ((data & 0x80) == 0) logerror("sn76496_base_device: write to reg 6 with bit 7 clear; data was %03x, new write is %02x! report this to LN!\n", m_register[6], data);
 				if ((data & 0x80) == 0) m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
@@ -419,4 +419,3 @@ const device_type SN94624 = &device_creator<sn94624_device>;
 const device_type NCR7496 = &device_creator<ncr7496_device>;
 const device_type GAMEGEAR = &device_creator<gamegear_device>;
 const device_type SEGAPSG = &device_creator<segapsg_device>;
-

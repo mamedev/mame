@@ -45,12 +45,12 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define TEMP_HACKS		(1)
+#define TEMP_HACKS      (1)
 
-#define LOG_TIMING		(0)
-#define LOG_LOWPARAM	(0)
-#define LOG_GLOTTAL		(0)
-#define LOG_TRANSITION	(0)
+#define LOG_TIMING      (0)
+#define LOG_LOWPARAM    (0)
+#define LOG_GLOTTAL     (0)
+#define LOG_TRANSITION  (0)
 
 
 
@@ -60,8 +60,8 @@
 
 // note that according to the patent timing circuit, p1/p2 and phi1/phi2
 // run 4x faster than all references in the patent text
-const UINT32 P_CLOCK_BIT = 5;		// 5 according to timing diagram
-const UINT32 PHI_CLOCK_BIT = 3;		// 3 according to timing diagram
+const UINT32 P_CLOCK_BIT = 5;       // 5 according to timing diagram
+const UINT32 PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 
 
 
@@ -81,14 +81,14 @@ ROM_END
 // textual phoneme names for debugging
 const char *const votrax_sc01_device::s_phoneme_table[64] =
 {
-	"EH3",	"EH2",	"EH1",	"PA0",	"DT",	"A1",	"A2",	"ZH",
-	"AH2",	"I3",	"I2",	"I1",	"M",	"N",	"B",	"V",
-	"CH",	"SH",	"Z",	"AW1",	"NG",	"AH1",	"OO1",	"OO",
-	"L",	"K",	"J",	"H",	"G",	"F",	"D",	"S",
-	"A",	"AY",	"Y1",	"UH3",	"AH",	"P",	"O",	"I",
-	"U",	"Y",	"T",	"R",	"E",	"W",	"AE",	"AE1",
-	"AW2",	"UH2",	"UH1",	"UH",	"O2",	"O1",	"IU",	"U1",
-	"THV",	"TH",	"ER",	"EH",	"E1",	"AW",	"PA1",	"STOP"
+	"EH3",  "EH2",  "EH1",  "PA0",  "DT",   "A1",   "A2",   "ZH",
+	"AH2",  "I3",   "I2",   "I1",   "M",    "N",    "B",    "V",
+	"CH",   "SH",   "Z",    "AW1",  "NG",   "AH1",  "OO1",  "OO",
+	"L",    "K",    "J",    "H",    "G",    "F",    "D",    "S",
+	"A",    "AY",   "Y1",   "UH3",  "AH",   "P",    "O",    "I",
+	"U",    "Y",    "T",    "R",    "E",    "W",    "AE",   "AE1",
+	"AW2",  "UH2",  "UH1",  "UH",   "O2",   "O1",   "IU",   "U1",
+	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
 };
 
 // this waveform is derived from measuring fig. 10 in the patent
@@ -125,9 +125,9 @@ const double votrax_sc01_device::s_glottal_wave[16] =
 
 votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VOTRAX_SC01, "Votrax SC-01", "votrax", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_phoneme_timer(NULL)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_phoneme_timer(NULL)
 {
 }
 
@@ -671,7 +671,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 
 			// update the state of the subphoneme clock line
 			UINT8 old_clock_88 = m_clock_88;
-			m_clock_88 = !m_latch_42;	//!(m_latch_42 | m_phi1); -- figure 7 seems to be wrong here
+			m_clock_88 = !m_latch_42;   //!(m_latch_42 | m_phi1); -- figure 7 seems to be wrong here
 			UINT8 clock_88_rising = (old_clock_88 ^ m_clock_88) & m_clock_88;
 
 			// the A/R line holds the counter in reset except during phoneme processing,
@@ -867,9 +867,9 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 			// and then the latch to the right
 			if (a2_rising)
 				m_latch_46 = (BIT(m_counter_46, 1) << 0) |
-							 (BIT(m_latch_46, 0) << 1) |
-							 (m_0625_clock << 2) |
-							 (BIT(m_latch_46, 2) << 3);
+								(BIT(m_latch_46, 0) << 1) |
+								(m_0625_clock << 2) |
+								(BIT(m_latch_46, 2) << 3);
 
 #if TEMP_HACKS
 			m_latch_46 = 0xf;
@@ -881,7 +881,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 			{
 				// write if not FF and low 2 bits of latch
 				// FF is the S/R flip-flop at 142 ANDed with !(/FA & /VA)
-				case 0:	case 1:	case 2: case 3: case 4:
+				case 0: case 1: case 2: case 3: case 4:
 					if (!(m_srff_142 & !((m_fa == 0) & (m_va == 0))) && (m_latch_46 & 0x3) == 0x3)
 						ram_write = 1;
 					break;
@@ -992,7 +992,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				UINT32 old_shift = m_shift_252;
 				m_shift_252 <<= 1;
 				m_shift_252 |= ((BIT(old_shift, 17) ^ BIT(old_shift, 9)) ^ (BIT(old_shift, 3) ^ BIT(old_shift, 4))) ^
-								 ((m_counter_250 & 0xc) == 0);
+									((m_counter_250 & 0xc) == 0);
 			}
 
 			// rising edge clocks the counter

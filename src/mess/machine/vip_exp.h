@@ -45,7 +45,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define VIP_EXPANSION_SLOT_TAG		"exp"
+#define VIP_EXPANSION_SLOT_TAG      "exp"
 
 
 
@@ -58,8 +58,8 @@
 
 
 #define MCFG_VIP_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, VIP_EXPANSION_SLOT, _clock) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, VIP_EXPANSION_SLOT, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -72,9 +72,9 @@
 
 struct vip_expansion_slot_interface
 {
-    devcb_write_line	m_out_interrupt_cb;
-    devcb_write_line	m_out_dma_out_cb;
-    devcb_write_line	m_out_dma_in_cb;
+	devcb_write_line    m_out_interrupt_cb;
+	devcb_write_line    m_out_dma_out_cb;
+	devcb_write_line    m_out_dma_in_cb;
 };
 
 
@@ -83,8 +83,8 @@ struct vip_expansion_slot_interface
 class device_vip_expansion_card_interface;
 
 class vip_expansion_slot_device : public device_t,
-								  public vip_expansion_slot_interface,
-								  public device_slot_interface
+									public vip_expansion_slot_interface,
+									public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -116,9 +116,9 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 
-	devcb_resolved_write_line	m_out_interrupt_func;
-	devcb_resolved_write_line	m_out_dma_out_func;
-	devcb_resolved_write_line	m_out_dma_in_func;
+	devcb_resolved_write_line   m_out_interrupt_func;
+	devcb_resolved_write_line   m_out_dma_out_func;
+	devcb_resolved_write_line   m_out_dma_in_func;
 
 	device_vip_expansion_card_interface *m_cart;
 };

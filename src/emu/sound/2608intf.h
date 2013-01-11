@@ -13,7 +13,7 @@ void ym2608_update_request(void *param);
 struct ym2608_interface
 {
 	const ay8910_interface ay8910_intf;
-	void ( *handler )( device_t *device, int irq );	/* IRQ handler for the YM2608 */
+	void ( *handler )( device_t *device, int irq ); /* IRQ handler for the YM2608 */
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ym2608_r );
@@ -29,7 +29,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( ym2608_data_port_a_w );
 DECLARE_WRITE8_DEVICE_HANDLER( ym2608_data_port_b_w );
 
 class ym2608_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

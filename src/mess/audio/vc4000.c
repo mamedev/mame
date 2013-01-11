@@ -10,10 +10,10 @@
 
 struct vc4000_sound
 {
-    sound_stream *channel;
-    UINT8 reg[1];
-    int size, pos;
-    unsigned level;
+	sound_stream *channel;
+	UINT8 reg[1];
+	int size, pos;
+	unsigned level;
 };
 
 
@@ -78,14 +78,14 @@ static DEVICE_START(vc4000_sound)
 {
 	vc4000_sound *token = get_token(device);
 	memset(token, 0, sizeof(*token));
-    token->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, vc4000_update);
+	token->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, vc4000_update);
 }
 
 const device_type VC4000 = &device_creator<vc4000_sound_device>;
 
 vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VC4000, "VC 4000 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(vc4000_sound);
 }
@@ -118,5 +118,3 @@ void vc4000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

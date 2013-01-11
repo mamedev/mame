@@ -52,4 +52,4 @@ extern const rgb_t RGB_MONOCHROME_GREEN[];
 extern const rgb_t RGB_MONOCHROME_GREEN_HIGHLIGHT[];
 extern const rgb_t RGB_MONOCHROME_YELLOW[];
 
-#endif	/* __VIDEO_GENERIC_H__ */
+#endif  /* __VIDEO_GENERIC_H__ */

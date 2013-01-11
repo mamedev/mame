@@ -295,12 +295,12 @@ WRITE16_MEMBER(highvdeo_state::write1_w)
     ---x ----  Hold5 lamp.
     --x- ----  Start lamp.
 */
-	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
-	output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
+	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+	output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+	output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
 
 //  popmessage("%04x %04x",t1,t3);
 }
@@ -605,7 +605,7 @@ static INPUT_PORTS_START( tv_ncf )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 ) // Note 1
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )		/* connected to the clock signal, to signal heartbeat */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )        /* connected to the clock signal, to signal heartbeat */
 	PORT_DIPNAME( 0x0080, 0x0000, "Reset NVRAM" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -927,7 +927,7 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq)
 }
 
 static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
-	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 )	// ?
+	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
 	MCFG_CPU_IO_MAP(tv_vcf_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)
@@ -986,14 +986,14 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", I80186, 20000000/2 )	// ?
+	MCFG_CPU_ADD("maincpu", I80186, 20000000/2 )    // ?
 	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
 	MCFG_CPU_IO_MAP(tv_tcf_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( brasil, highvdeo_state )
-	MCFG_CPU_ADD("maincpu", I80186, 20000000 )	// fashion doesn't like 20/2 Mhz
+	MCFG_CPU_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(brasil_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)

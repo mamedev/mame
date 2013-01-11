@@ -15,15 +15,15 @@ struct okim6258_interface
 };
 
 
-#define FOSC_DIV_BY_1024	0
-#define FOSC_DIV_BY_768		1
-#define FOSC_DIV_BY_512		2
+#define FOSC_DIV_BY_1024    0
+#define FOSC_DIV_BY_768     1
+#define FOSC_DIV_BY_512     2
 
-#define TYPE_3BITS      	0
-#define TYPE_4BITS			1
+#define TYPE_3BITS          0
+#define TYPE_4BITS          1
 
-#define	OUTPUT_10BITS		0
-#define	OUTPUT_12BITS		1
+#define OUTPUT_10BITS       0
+#define OUTPUT_12BITS       1
 
 void okim6258_set_divider(device_t *device, int val);
 void okim6258_set_clock(device_t *device, int val);
@@ -34,7 +34,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( okim6258_data_w );
 DECLARE_WRITE8_DEVICE_HANDLER( okim6258_ctrl_w );
 
 class okim6258_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -183,11 +183,11 @@ class meritm_state : public driver_device
 public:
 	meritm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_z80pio_0(*this, "z80pio_0"),
-		  m_z80pio_1(*this, "z80pio_1"),
-		  m_v9938_0(*this, "v9938_0"),
-		  m_v9938_1(*this, "v9938_1"),
-		  m_microtouch(*this, "microtouch") { }
+			m_z80pio_0(*this, "z80pio_0"),
+			m_z80pio_1(*this, "z80pio_1"),
+			m_v9938_0(*this, "v9938_0"),
+			m_v9938_1(*this, "v9938_1"),
+			m_microtouch(*this, "microtouch") { }
 
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT8* m_ram;
@@ -248,8 +248,8 @@ public:
 };
 
 
-#define SYSTEM_CLK	21470000
-#define UART_CLK	XTAL_18_432MHz
+#define SYSTEM_CLK  21470000
+#define UART_CLK    XTAL_18_432MHz
 
 
 
@@ -259,11 +259,11 @@ public:
  *
  *************************************/
 
-#define DS1204_STATE_IDLE			0
-#define DS1204_STATE_COMMAND			1
-#define DS1204_STATE_READ_KEY			2
-#define DS1204_STATE_WRITE_SECURITY_MATCH	3
-#define DS1204_STATE_READ_NVRAM			4
+#define DS1204_STATE_IDLE           0
+#define DS1204_STATE_COMMAND            1
+#define DS1204_STATE_READ_KEY           2
+#define DS1204_STATE_WRITE_SECURITY_MATCH   3
+#define DS1204_STATE_READ_NVRAM         4
 
 static void ds1204_w( ds1204_t *ds1204, int rst, int clk, int dq )
 {
@@ -444,13 +444,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::meritm_interrupt)
 static void meritm_vdp0_interrupt(device_t *, v99x8_device &device, int i)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
-       interrupts seem to be fired quite randomly */
+	   interrupts seem to be fired quite randomly */
 }
 
 static void meritm_vdp1_interrupt(device_t *, v99x8_device &device, int i)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
-       interrupts seem to be fired quite randomly */
+	   interrupts seem to be fired quite randomly */
 }
 
 
@@ -517,9 +517,9 @@ static void meritm_switch_banks( running_machine &machine )
 	meritm_state *state = machine.driver_data<meritm_state>();
 	int rambank = (state->m_psd_a15 >> 2) & 0x3;
 	int rombank = (((state->m_bank >> 3) & 0x3) << 5) |
-			  (((state->m_psd_a15 >> 1) & 0x1) << 4) |
-			  (((state->m_bank & 0x07) ^ 0x07) << 1) |
-			  (state->m_psd_a15 & 0x1);
+				(((state->m_psd_a15 >> 1) & 0x1) << 4) |
+				(((state->m_bank & 0x07) ^ 0x07) << 1) |
+				(state->m_psd_a15 & 0x1);
 
 	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, state->m_bank, rambank);
 	state->membank("bank1")->set_entry(rombank );
@@ -741,7 +741,7 @@ static INPUT_PORTS_START(meritm_crt260)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "Calibration" ) PORT_CODE(KEYCODE_C)
 
-	PORT_START("DSW")	/* need for AY-8910 accesses */
+	PORT_START("DSW")   /* need for AY-8910 accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -762,7 +762,7 @@ static INPUT_PORTS_START(meritm_crt250)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("DSW")	/* need for AY-8910 accesses */
+	PORT_START("DSW")   /* need for AY-8910 accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -810,7 +810,7 @@ static INPUT_PORTS_START(pitbossm)
 	PORT_INCLUDE(meritm_crt250)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW1:1" )				/* Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW1:1" )                /* Unused */
 	PORT_DIPNAME( 0x02, 0x02, "Solitaire Timer Mode" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -819,17 +819,17 @@ static INPUT_PORTS_START(pitbossm)
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Coin Limit" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "No Coin Limit" )
-	PORT_DIPSETTING(    0x08, "4 Coin Limit" )	/* With Lockout coil */
+	PORT_DIPSETTING(    0x08, "4 Coin Limit" )  /* With Lockout coil */
 	PORT_DIPNAME( 0x10, 0x10, "Run 21 and Trivia Whiz 2000: Coins to start" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "2 Coins" )
 	PORT_DIPSETTING(    0x10, "1 Coin" )
 	PORT_DIPNAME( 0x20, 0x20, "Great Solitaire: Coins to start" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "2 Coins" )
 	PORT_DIPSETTING(    0x20, "1 Coin" )
-	PORT_DIPNAME( 0x40, 0x00, "Sync Adjustment (Set by factory)" ) PORT_DIPLOCATION("SW1:7")	/* Sync Adjustment (Set by factory) */
+	PORT_DIPNAME( 0x40, 0x00, "Sync Adjustment (Set by factory)" ) PORT_DIPLOCATION("SW1:7")    /* Sync Adjustment (Set by factory) */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Sync Adjustment (Set by factory)" ) PORT_DIPLOCATION("SW1:8")	/* Sync Adjustment (Set by factory) */
+	PORT_DIPNAME( 0x80, 0x00, "Sync Adjustment (Set by factory)" ) PORT_DIPLOCATION("SW1:8")    /* Sync Adjustment (Set by factory) */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -899,22 +899,22 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
 
 static I8255A_INTERFACE( crt260_ppi8255_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
 	DEVCB_DRIVER_MEMBER(meritm_state,meritm_8255_port_c_r),/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL                          /* Port C write */
 };
 
 static I8255A_INTERFACE( crt250_ppi8255_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
 	DEVCB_DRIVER_MEMBER(meritm_state,meritm_crt250_port_b_w),/* Port B write (used LMP x DRIVE) */
 	DEVCB_DRIVER_MEMBER(meritm_state,meritm_8255_port_c_r),/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_NULL                          /* Port C write */
 };
 
 /*************************************
@@ -953,18 +953,18 @@ READ8_MEMBER(meritm_state::meritm_audio_pio_port_a_r)
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       BANK0
-        1       BANK1
-        2       BANK2
-        3       /VINT1      V9938 #1 INT
-        4       /VINT2      V9938 #2 INT
-        5       BANK3
-        6
-        7
+	    0       BANK0
+	    1       BANK1
+	    2       BANK2
+	    3       /VINT1      V9938 #1 INT
+	    4       /VINT2      V9938 #2 INT
+	    5       BANK3
+	    6
+	    7
 
-    */
+	*/
 
 	return m_vint;
 };
@@ -973,18 +973,18 @@ READ8_MEMBER(meritm_state::meritm_audio_pio_port_b_r)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       J4 D0
-        1       J4 D1
-        2       J4 D2
-        3       J4 D3
-        4       J4 D4
-        5       J4 D5
-        6       J4 D6
-        7       J4 D7
+	    0       J4 D0
+	    1       J4 D1
+	    2       J4 D2
+	    3       J4 D3
+	    4       J4 D4
+	    5       J4 D5
+	    6       J4 D6
+	    7       J4 D7
 
-    */
+	*/
 
 	return ds1204_r(&m_ds1204);
 };
@@ -993,18 +993,18 @@ WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_a_w)
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       BANK0
-        1       BANK1
-        2       BANK2
-        3       /VINT1      V9938 #1 INT
-        4       /VINT2      V9938 #2 INT
-        5       BANK3
-        6
-        7
+	    0       BANK0
+	    1       BANK1
+	    2       BANK2
+	    3       /VINT1      V9938 #1 INT
+	    4       /VINT2      V9938 #2 INT
+	    5       BANK3
+	    6
+	    7
 
-    */
+	*/
 
 	m_bank = (data & 7) | ((data >> 2) & 0x18);
 	//logerror("Writing BANK with %x (raw = %x)\n", m_bank, data);
@@ -1014,18 +1014,18 @@ WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_b_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       J4 D0
-        1       J4 D1
-        2       J4 D2
-        3       J4 D3
-        4       J4 D4
-        5       J4 D5
-        6       J4 D6
-        7       J4 D7
+	    0       J4 D0
+	    1       J4 D1
+	    2       J4 D2
+	    3       J4 D3
+	    4       J4 D4
+	    5       J4 D5
+	    6       J4 D6
+	    7       J4 D7
 
-    */
+	*/
 
 	ds1204_w(&m_ds1204, (data & 0x4) >> 2, (data & 0x2) >> 1, data & 0x01);
 };
@@ -1034,36 +1034,36 @@ WRITE8_MEMBER(meritm_state::meritm_io_pio_port_a_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       J3 PE0
-        1       J3 PE1
-        2       J3 PE2
-        3       J3 PE3
-        4       J3 PE4
-        5       J3 PE5
-        6       J3 PE6
-        7       J3 PE7
+	    0       J3 PE0
+	    1       J3 PE1
+	    2       J3 PE2
+	    3       J3 PE3
+	    4       J3 PE4
+	    5       J3 PE5
+	    6       J3 PE6
+	    7       J3 PE7
 
-    */
+	*/
 };
 
 WRITE8_MEMBER(meritm_state::meritm_io_pio_port_b_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       J3 PF0
-        1       J3 PF1
-        2       J3 PF2
-        3       J3 PF3
-        4       J3 PF4
-        5       J3 PF5
-        6       J3 PF6
-        7       J3 PF7
+	    0       J3 PF0
+	    1       J3 PF1
+	    2       J3 PF2
+	    3       J3 PF3
+	    4       J3 PF4
+	    5       J3 PF5
+	    6       J3 PF6
+	    7       J3 PF7
 
-    */
+	*/
 };
 
 static Z80PIO_INTERFACE( meritm_audio_pio_intf )
@@ -1145,12 +1145,12 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 };
 
 // from MSX2 driver, may be not accurate for merit games
-#define MSX2_XBORDER_PIXELS		16
-#define MSX2_YBORDER_PIXELS		28
-#define MSX2_TOTAL_XRES_PIXELS		256 * 2 + (MSX2_XBORDER_PIXELS * 2)
-#define MSX2_TOTAL_YRES_PIXELS		212 * 2 + (MSX2_YBORDER_PIXELS * 2)
-#define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
-#define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
+#define MSX2_XBORDER_PIXELS     16
+#define MSX2_YBORDER_PIXELS     28
+#define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
+#define MSX2_TOTAL_YRES_PIXELS      212 * 2 + (MSX2_YBORDER_PIXELS * 2)
+#define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
+#define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
 TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
 {
@@ -1204,7 +1204,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_PALETTE_INIT( v9938 )
 
 
-  /* sound hardware */
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, SYSTEM_CLK/12)
 	MCFG_SOUND_CONFIG(ay8910_config)
@@ -1233,7 +1233,7 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_I8255A_ADD( "ppi8255", crt260_ppi8255_intf )
 
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))	// DS1232, TD connected to VCC
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
 MACHINE_CONFIG_END

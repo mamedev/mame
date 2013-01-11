@@ -1194,7 +1194,7 @@ static void konami_shuffle_8(UINT8 *buf,int len)
 
 	if (len == 2) return;
 
-	if (len % 4) fatalerror("shuffle() - not modulo 4\n");	/* must not happen */
+	if (len % 4) fatalerror("shuffle() - not modulo 4\n");  /* must not happen */
 
 	len /= 2;
 
@@ -1422,7 +1422,7 @@ WRITE8_DEVICE_HANDLER( k007121_ctrl_w )
  */
 
 void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
-						  const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask )
+							const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask )
 {
 	k007121_state *k007121 = k007121_get_safe_token(device);
 //  gfx_element *gfx = gfxs[chip];
@@ -1442,7 +1442,7 @@ void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 		offs[3] = 0x04;
 		offs[4] = 0x08;
 	}
-	else	/* all others */
+	else    /* all others */
 	{
 		/* TODO: sprite limit is supposed to be per-line! (check MT #00185) */
 		num = 0x40;
@@ -1464,13 +1464,13 @@ void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 
 	for (i = 0; i < num; i++)
 	{
-		int number = source[offs[0]];				/* sprite number */
-		int sprite_bank = source[offs[1]] & 0x0f;	/* sprite bank */
-		int sx = source[offs[3]];					/* vertical position */
-		int sy = source[offs[2]];					/* horizontal position */
-		int attr = source[offs[4]];				/* attributes */
-		int xflip = source[offs[4]] & 0x10;		/* flip x */
-		int yflip = source[offs[4]] & 0x20;		/* flip y */
+		int number = source[offs[0]];               /* sprite number */
+		int sprite_bank = source[offs[1]] & 0x0f;   /* sprite bank */
+		int sx = source[offs[3]];                   /* vertical position */
+		int sy = source[offs[2]];                   /* horizontal position */
+		int attr = source[offs[4]];             /* attributes */
+		int xflip = source[offs[4]] & 0x10;     /* flip x */
+		int yflip = source[offs[4]] & 0x20;     /* flip y */
 		int color = base_color + ((source[offs[1]] & 0xf0) >> 4);
 		int width, height;
 		int transparent_mask;
@@ -1492,7 +1492,7 @@ void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 		else
 			transparent_mask = colortable_get_transpen_mask(ctable, gfx, color, 0);
 
-		if (!is_flakatck || source[0x00])	/* Flak Attack needs this */
+		if (!is_flakatck || source[0x00])   /* Flak Attack needs this */
 		{
 			number += bank_base;
 
@@ -1670,9 +1670,9 @@ WRITE8_DEVICE_HANDLER( k007342_w )
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	k007342->ram[offset] = data;
 
-	if (offset < 0x1000)	/* layer 0 */
+	if (offset < 0x1000)    /* layer 0 */
 		k007342->tilemap[0]->mark_tile_dirty(offset & 0x7ff);
-	else				/* layer 1 */
+	else                /* layer 1 */
 		k007342->tilemap[1]->mark_tile_dirty(offset & 0x7ff);
 }
 
@@ -1733,14 +1733,14 @@ void k007342_tilemap_update( device_t *device )
 	switch (k007342->regs[2] & 0x1c)
 	{
 		case 0x00:
-		case 0x08:	/* unknown, blades of steel shootout between periods */
+		case 0x08:  /* unknown, blades of steel shootout between periods */
 			k007342->tilemap[0]->set_scroll_rows(1);
 			k007342->tilemap[0]->set_scroll_cols(1);
 			k007342->tilemap[0]->set_scrollx(0, k007342->scrollx[0]);
 			k007342->tilemap[0]->set_scrolly(0, k007342->scrolly[0]);
 			break;
 
-		case 0x0c:	/* 32 columns */
+		case 0x0c:  /* 32 columns */
 			k007342->tilemap[0]->set_scroll_rows(1);
 			k007342->tilemap[0]->set_scroll_cols(512);
 			k007342->tilemap[0]->set_scrollx(0, k007342->scrollx[0]);
@@ -1749,7 +1749,7 @@ void k007342_tilemap_update( device_t *device )
 						k007342->scroll_ram[2 * (offs / 8)] + 256 * k007342->scroll_ram[2 * (offs / 8) + 1]);
 			break;
 
-		case 0x14:	/* 256 rows */
+		case 0x14:  /* 256 rows */
 			k007342->tilemap[0]->set_scroll_rows(256);
 			k007342->tilemap[0]->set_scroll_cols(1);
 			k007342->tilemap[0]->set_scrolly(0, k007342->scrolly[0]);
@@ -1935,8 +1935,8 @@ struct k007420_state
 	UINT8        *ram;
 
 	int          banklimit;
-	int          flipscreen;	// current code uses the 7342 flipscreen!!
-	UINT8        regs[8];	// current code uses the 7342 regs!! (only [2])
+	int          flipscreen;    // current code uses the 7342 flipscreen!!
+	UINT8        regs[8];   // current code uses the 7342 regs!! (only [2])
 
 	k007420_callback callback;
 };
@@ -2167,8 +2167,8 @@ static DEVICE_START( k007420 )
 	k007420->ram = auto_alloc_array(device->machine(), UINT8, 0x200);
 
 	device->save_pointer(NAME(k007420->ram), 0x200);
-	device->save_item(NAME(k007420->flipscreen));	// current one uses 7342 one
-	device->save_item(NAME(k007420->regs));	// current one uses 7342 ones
+	device->save_item(NAME(k007420->flipscreen));   // current one uses 7342 one
+	device->save_item(NAME(k007420->regs)); // current one uses 7342 ones
 }
 
 static DEVICE_RESET( k007420 )
@@ -2285,22 +2285,22 @@ READ8_DEVICE_HANDLER( k052109_r )
 		if ((offset & 0x1fff) >= 0x1800)
 		{
 			if (offset >= 0x180c && offset < 0x1834)
-			{	/* A y scroll */	}
+			{   /* A y scroll */    }
 			else if (offset >= 0x1a00 && offset < 0x1c00)
-			{	/* A x scroll */	}
+			{   /* A x scroll */    }
 			else if (offset == 0x1d00)
-			{	/* read for bitwise operations before writing */	}
+			{   /* read for bitwise operations before writing */    }
 			else if (offset >= 0x380c && offset < 0x3834)
-			{	/* B y scroll */	}
+			{   /* B y scroll */    }
 			else if (offset >= 0x3a00 && offset < 0x3c00)
-			{	/* B x scroll */	}
+			{   /* B x scroll */    }
 //          else
 //logerror("%04x: read from unknown 052109 address %04x\n",space.device().safe_pc(),offset);
 		}
 
 		return k052109->ram[offset];
 	}
-	else	/* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
+	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
 	{
 		int code = (offset & 0x1fff) >> 5;
 		int color = k052109->romsubbank;
@@ -2312,7 +2312,7 @@ READ8_DEVICE_HANDLER( k052109_r )
 		bank |= (k052109->charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
 
 	if (k052109->has_extra_video_ram)
-		code |= color << 8;	/* kludge for X-Men */
+		code |= color << 8; /* kludge for X-Men */
 	else
 		k052109->callback(space.machine(), 0, bank, &code, &color, &flags, &priority);
 
@@ -2337,14 +2337,14 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 		k052109->ram[offset] = data;
 		k052109->tilemap[(offset & 0x1800) >> 11]->mark_tile_dirty(offset & 0x7ff);
 	}
-	else	/* control registers */
+	else    /* control registers */
 	{
 		k052109->ram[offset] = data;
 
 		if (offset >= 0x180c && offset < 0x1834)
-		{	/* A y scroll */	}
+		{   /* A y scroll */    }
 		else if (offset >= 0x1a00 && offset < 0x1c00)
-		{	/* A x scroll */	}
+		{   /* A x scroll */    }
 		else if (offset == 0x1c80)
 		{
 			if (k052109->scrollctrl != data)
@@ -2433,9 +2433,9 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 			}
 		}
 		else if (offset >= 0x380c && offset < 0x3834)
-		{	/* B y scroll */	}
+		{   /* B y scroll */    }
 		else if (offset >= 0x3a00 && offset < 0x3c00)
-		{	/* B x scroll */	}
+		{   /* B x scroll */    }
 		else if (offset == 0x3d80) // Surprise Attack uses offset 0x3d80 in rom test
 		{
 			// mirroring this write, breaks Surprise Attack in game tilemaps
@@ -2699,7 +2699,7 @@ INLINE void k052109_get_tile_info( running_machine &machine, device_t *device, t
 	int priority = 0;
 	int bank = k052109->charrombank[(color & 0x0c) >> 2];
 	if (k052109->has_extra_video_ram)
-		bank = (color & 0x0c) >> 2;	/* kludge for X-Men */
+		bank = (color & 0x0c) >> 2; /* kludge for X-Men */
 
 	color = (color & 0xf3) | ((bank & 0x03) << 2);
 	bank >>= 2;
@@ -2964,7 +2964,7 @@ READ8_DEVICE_HANDLER( k051960_r )
 	{
 		/* the 051960 remembers the last address read and uses it when reading the sprite ROMs */
 		k051960->romoffset = (offset & 0x3fc) >> 2;
-		return k051960_fetchromdata(device, offset & 3);	/* only 88 Games reads the ROMs from here */
+		return k051960_fetchromdata(device, offset & 3);    /* only 88 Games reads the ROMs from here */
 	}
 	else
 		return k051960->ram[offset];
@@ -3138,7 +3138,7 @@ void k051960_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 	{
 		if (k051960->ram[offs] & 0x80)
 		{
-			if (max_priority == -1)	/* draw front to back when using priority buffer */
+			if (max_priority == -1) /* draw front to back when using priority buffer */
 				sortedlist[(k051960->ram[offs] & 0x7f) ^ 0x7f] = offs;
 			else
 				sortedlist[k051960->ram[offs] & 0x7f] = offs;
@@ -3149,15 +3149,15 @@ void k051960_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 	{
 		int ox, oy, code, color, pri, shadow, size, w, h, x, y, flipx, flipy, zoomx, zoomy;
 		/* sprites can be grouped up to 8x8. The draw order is
-             0  1  4  5 16 17 20 21
-             2  3  6  7 18 19 22 23
-             8  9 12 13 24 25 28 29
-            10 11 14 15 26 27 30 31
-            32 33 36 37 48 49 52 53
-            34 35 38 39 50 51 54 55
-            40 41 44 45 56 57 60 61
-            42 43 46 47 58 59 62 63
-        */
+		     0  1  4  5 16 17 20 21
+		     2  3  6  7 18 19 22 23
+		     8  9 12 13 24 25 28 29
+		    10 11 14 15 26 27 30 31
+		    32 33 36 37 48 49 52 53
+		    34 35 38 39 50 51 54 55
+		    40 41 44 45 56 57 60 61
+		    42 43 46 47 58 59 62 63
+		*/
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 		static const int width[8] =  { 1, 2, 1, 2, 4, 2, 4, 8 };
@@ -3479,9 +3479,9 @@ struct k05324x_state
 
 	gfx_element *gfx;
 
-	UINT8    regs[0x10];	// 053244
+	UINT8    regs[0x10];    // 053244
 	int      dx, dy;
-	int      rombank;		// 053244
+	int      rombank;       // 053244
 	int      ramsize;
 	int      z_rejection;
 
@@ -3726,26 +3726,26 @@ void k053245_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 			continue;
 
 		/* the following changes the sprite draw order from
-             0  1  4  5 16 17 20 21
-             2  3  6  7 18 19 22 23
-             8  9 12 13 24 25 28 29
-            10 11 14 15 26 27 30 31
-            32 33 36 37 48 49 52 53
-            34 35 38 39 50 51 54 55
-            40 41 44 45 56 57 60 61
-            42 43 46 47 58 59 62 63
+		     0  1  4  5 16 17 20 21
+		     2  3  6  7 18 19 22 23
+		     8  9 12 13 24 25 28 29
+		    10 11 14 15 26 27 30 31
+		    32 33 36 37 48 49 52 53
+		    34 35 38 39 50 51 54 55
+		    40 41 44 45 56 57 60 61
+		    42 43 46 47 58 59 62 63
 
-            to
+		    to
 
-             0  1  2  3  4  5  6  7
-             8  9 10 11 12 13 14 15
-            16 17 18 19 20 21 22 23
-            24 25 26 27 28 29 30 31
-            32 33 34 35 36 37 38 39
-            40 41 42 43 44 45 46 47
-            48 49 50 51 52 53 54 55
-            56 57 58 59 60 61 62 63
-        */
+		     0  1  2  3  4  5  6  7
+		     8  9 10 11 12 13 14 15
+		    16 17 18 19 20 21 22 23
+		    24 25 26 27 28 29 30 31
+		    32 33 34 35 36 37 38 39
+		    40 41 42 43 44 45 46 47
+		    48 49 50 51 52 53 54 55
+		    56 57 58 59 60 61 62 63
+		*/
 
 		/* NOTE: from the schematics, it looks like the top 2 bits should be ignored */
 		/* (there are not output pins for them), and probably taken from the "color" */
@@ -3754,7 +3754,7 @@ void k053245_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 		/* the bits from. */
 		code = k053245->buffer[offs + 1];
 		code = ((code & 0xffe1) + ((code & 0x0010) >> 2) + ((code & 0x0008) << 1)
-				 + ((code & 0x0004) >> 1) + ((code & 0x0002) << 2));
+					+ ((code & 0x0004) >> 1) + ((code & 0x0002) << 2));
 		color = k053245->buffer[offs + 6] & 0x00ff;
 		pri = 0;
 
@@ -3766,10 +3766,10 @@ void k053245_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 		h = 1 << ((size >> 2) & 0x03);
 
 		/* zoom control:
-           0x40 = normal scale
-          <0x40 enlarge (0x20 = double size)
-          >0x40 reduce (0x80 = half size)
-        */
+		   0x40 = normal scale
+		  <0x40 enlarge (0x20 = double size)
+		  >0x40 reduce (0x80 = half size)
+		*/
 		zoomy = k053245->buffer[offs + 4];
 		if (zoomy > 0x2000)
 			continue;
@@ -3980,26 +3980,26 @@ void k053245_sprites_draw_lethal( device_t *device, bitmap_ind16 &bitmap, const 
 			continue;
 
 		/* the following changes the sprite draw order from
-             0  1  4  5 16 17 20 21
-             2  3  6  7 18 19 22 23
-             8  9 12 13 24 25 28 29
-            10 11 14 15 26 27 30 31
-            32 33 36 37 48 49 52 53
-            34 35 38 39 50 51 54 55
-            40 41 44 45 56 57 60 61
-            42 43 46 47 58 59 62 63
+		     0  1  4  5 16 17 20 21
+		     2  3  6  7 18 19 22 23
+		     8  9 12 13 24 25 28 29
+		    10 11 14 15 26 27 30 31
+		    32 33 36 37 48 49 52 53
+		    34 35 38 39 50 51 54 55
+		    40 41 44 45 56 57 60 61
+		    42 43 46 47 58 59 62 63
 
-            to
+		    to
 
-             0  1  2  3  4  5  6  7
-             8  9 10 11 12 13 14 15
-            16 17 18 19 20 21 22 23
-            24 25 26 27 28 29 30 31
-            32 33 34 35 36 37 38 39
-            40 41 42 43 44 45 46 47
-            48 49 50 51 52 53 54 55
-            56 57 58 59 60 61 62 63
-        */
+		     0  1  2  3  4  5  6  7
+		     8  9 10 11 12 13 14 15
+		    16 17 18 19 20 21 22 23
+		    24 25 26 27 28 29 30 31
+		    32 33 34 35 36 37 38 39
+		    40 41 42 43 44 45 46 47
+		    48 49 50 51 52 53 54 55
+		    56 57 58 59 60 61 62 63
+		*/
 
 		/* NOTE: from the schematics, it looks like the top 2 bits should be ignored */
 		/* (there are not output pins for them), and probably taken from the "color" */
@@ -4008,7 +4008,7 @@ void k053245_sprites_draw_lethal( device_t *device, bitmap_ind16 &bitmap, const 
 		/* the bits from. */
 		code = k053245->buffer[offs + 1];
 		code = ((code & 0xffe1) + ((code & 0x0010) >> 2) + ((code & 0x0008) << 1)
-				 + ((code & 0x0004) >> 1) + ((code & 0x0002) << 2));
+					+ ((code & 0x0004) >> 1) + ((code & 0x0002) << 2));
 		color = k053245->buffer[offs + 6] & 0x00ff;
 		pri = 0;
 
@@ -4020,10 +4020,10 @@ void k053245_sprites_draw_lethal( device_t *device, bitmap_ind16 &bitmap, const 
 		h = 1 << ((size >> 2) & 0x03);
 
 		/* zoom control:
-           0x40 = normal scale
-          <0x40 enlarge (0x20 = double size)
-          >0x40 reduce (0x80 = half size)
-        */
+		   0x40 = normal scale
+		  <0x40 enlarge (0x20 = double size)
+		  >0x40 reduce (0x80 = half size)
+		*/
 		zoomy = k053245->buffer[offs + 4];
 		if (zoomy > 0x2000)
 			continue;
@@ -4471,7 +4471,7 @@ WRITE8_DEVICE_HANDLER( k053247_w )
 // write the address to the 246 as usual, but there's a completely separate ROM
 // window that works without needing an objcha line.
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
-READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
+READ16_DEVICE_HANDLER( k055673_rom_word_r ) // 5bpp
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
 	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(k053246->memory_region)->base();
@@ -4479,26 +4479,26 @@ READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
 	int size4 = (space.machine().root_device().memregion(k053246->memory_region)->bytes() / (1024 * 1024)) / 5;
 	int romofs;
 
-	size4 *= 4 * 1024 * 1024;	// get offset to 5th bit
+	size4 *= 4 * 1024 * 1024;   // get offset to 5th bit
 	ROM8 += size4;
 
 	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
 
 	switch (offset)
 	{
-		case 0:	// 20k / 36u
+		case 0: // 20k / 36u
 			return ROM[romofs + 2];
-		case 1:	// 17k / 36y
+		case 1: // 17k / 36y
 			return ROM[romofs + 3];
 		case 2: // 10k / 32y
 		case 3:
 			romofs /= 2;
 			return ROM8[romofs + 1];
-		case 4:	// 22k / 34u
+		case 4: // 22k / 34u
 			return ROM[romofs];
-		case 5:	// 19k / 34y
+		case 5: // 19k / 34y
 			return ROM[romofs + 1];
-		case 6:	// 12k / 29y
+		case 6: // 12k / 29y
 		case 7:
 			romofs /= 2;
 			return ROM8[romofs];
@@ -4518,8 +4518,8 @@ READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 
 	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
 
-	romofs /= 4;	// romofs increments 4 at a time
-	romofs *= 12 / 2;	// each increment of romofs = 12 new bytes (6 new words)
+	romofs /= 4;    // romofs increments 4 at a time
+	romofs *= 12 / 2;   // each increment of romofs = 12 new bytes (6 new words)
 
 	switch (offset)
 	{
@@ -4648,15 +4648,15 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	running_machine &machine = device->machine();
 
 	/* sprites can be grouped up to 8x8. The draw order is
-         0  1  4  5 16 17 20 21
-         2  3  6  7 18 19 22 23
-         8  9 12 13 24 25 28 29
-        10 11 14 15 26 27 30 31
-        32 33 36 37 48 49 52 53
-        34 35 38 39 50 51 54 55
-        40 41 44 45 56 57 60 61
-        42 43 46 47 58 59 62 63
-    */
+	     0  1  4  5 16 17 20 21
+	     2  3  6  7 18 19 22 23
+	     8  9 12 13 24 25 28 29
+	    10 11 14 15 26 27 30 31
+	    32 33 36 37 48 49 52 53
+	    34 35 38 39 50 51 54 55
+	    40 41 44 45 56 57 60 61
+	    42 43 46 47 58 59 62 63
+	*/
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 
@@ -4681,10 +4681,10 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	shadowmode_table[0] = DRAWMODE_NONE;
 
 	/*
-        safeguard older drivers missing any of the following video attributes:
+	    safeguard older drivers missing any of the following video attributes:
 
-        VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
-    */
+	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
+	*/
 	if (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
 		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
@@ -4696,29 +4696,29 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		shdmask = -1; // disable everything
 
 	/*
-        The k053247 does not draw pixels on top of those with equal or smaller Z-values
-        regardless of priority. Embedded shadows inherit Z-values from their host sprites
-        but do not assume host priorities unless explicitly told. In other words shadows
-        can have priorities different from that of normal pens in the same sprite,
-        in addition to the ability of masking themselves from specific layers or pixels
-        on the other sprites.
+	    The k053247 does not draw pixels on top of those with equal or smaller Z-values
+	    regardless of priority. Embedded shadows inherit Z-values from their host sprites
+	    but do not assume host priorities unless explicitly told. In other words shadows
+	    can have priorities different from that of normal pens in the same sprite,
+	    in addition to the ability of masking themselves from specific layers or pixels
+	    on the other sprites.
 
-        In front-to-back rendering, sprites cannot sandwich between alpha blended layers
-        or the draw code will have to figure out the percentage opacities of what is on
-        top and beneath each sprite pixel and blend the target accordingly. The process
-        is overly demanding for realtime software and is thus another shortcoming of
-        pdrawgfx and pixel based mixers. Even mahjong games with straight forward video
-        subsystems are feeling the impact by which the girls cannot appear under
-        translucent dialogue boxes.
+	    In front-to-back rendering, sprites cannot sandwich between alpha blended layers
+	    or the draw code will have to figure out the percentage opacities of what is on
+	    top and beneath each sprite pixel and blend the target accordingly. The process
+	    is overly demanding for realtime software and is thus another shortcoming of
+	    pdrawgfx and pixel based mixers. Even mahjong games with straight forward video
+	    subsystems are feeling the impact by which the girls cannot appear under
+	    translucent dialogue boxes.
 
-        These are a small part of the k053247's feature set but many games expect them
-        to be the minimum compliances. The specification will undoubtedly require
-        redesigning the priority system from the ground up. Drawgfx.c and tilemap.c must
-        also undergo heavy facelifts but in the end the changes could hurt simpler games
-        more than they help complex systems; therefore the new engine should remain
-        completely stand alone and self-contained. Implementation details are being
-        hammered down but too early to make propositions.
-    */
+	    These are a small part of the k053247's feature set but many games expect them
+	    to be the minimum compliances. The specification will undoubtedly require
+	    redesigning the priority system from the ground up. Drawgfx.c and tilemap.c must
+	    also undergo heavy facelifts but in the end the changes could hurt simpler games
+	    more than they help complex systems; therefore the new engine should remain
+	    completely stand alone and self-contained. Implementation details are being
+	    hammered down but too early to make propositions.
+	*/
 
 	// Prebuild a sorted table by descending Z-order.
 	zcode = k053246->z_rejection;
@@ -4822,10 +4822,10 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		}
 
 		/* zoom control:
-           0x40 = normal scale
-          <0x40 enlarge (0x20 = double size)
-          >0x40 reduce (0x80 = half size)
-        */
+		   0x40 = normal scale
+		  <0x40 enlarge (0x20 = double size)
+		  >0x40 reduce (0x80 = half size)
+		*/
 		y = zoomy = k053246->ram[offs + 4] & 0x3ff;
 		if (zoomy)
 			zoomy = (0x400000 + (zoomy >> 1)) / zoomy;
@@ -4857,8 +4857,8 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 // ************************************************************************************
 		if ( k053246->kx46_regs[5] & 0x08 ) // Check only "Bit #3 is '1'?" (NOTE: good guess)
 		{
-			zoomx >>= 1;		// Fix sprite width to HALF size
-			ox = (ox >> 1) + 1;	// Fix sprite draw position
+			zoomx >>= 1;        // Fix sprite width to HALF size
+			ox = (ox >> 1) + 1; // Fix sprite draw position
 			if (flipscreenx)
 				ox += screen_width;
 			nozoom = 0;
@@ -5143,7 +5143,7 @@ static DEVICE_START( k055673 )
 	UINT16 *K055673_rom;
 	int size4;
 
-	static const gfx_layout spritelayout =	/* System GX sprite layout */
+	static const gfx_layout spritelayout =  /* System GX sprite layout */
 	{
 		16,16,
 		0,
@@ -5151,10 +5151,10 @@ static DEVICE_START( k055673 )
 		{ 32, 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 46, 47 },
 		{ 0, 10*8, 10*8*2, 10*8*3, 10*8*4, 10*8*5, 10*8*6, 10*8*7, 10*8*8,
-		  10*8*9, 10*8*10, 10*8*11, 10*8*12, 10*8*13, 10*8*14, 10*8*15 },
+			10*8*9, 10*8*10, 10*8*11, 10*8*12, 10*8*13, 10*8*14, 10*8*15 },
 		16*16*5
 	};
-	static const gfx_layout spritelayout2 =	/* Run and Gun sprite layout */
+	static const gfx_layout spritelayout2 = /* Run and Gun sprite layout */
 	{
 		16,16,
 		0,
@@ -5164,7 +5164,7 @@ static DEVICE_START( k055673 )
 		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
 		16*16*4
 	};
-	static const gfx_layout spritelayout3 =	/* Lethal Enforcers II sprite layout */
+	static const gfx_layout spritelayout3 = /* Lethal Enforcers II sprite layout */
 	{
 		16,16,
 		0,
@@ -5172,10 +5172,10 @@ static DEVICE_START( k055673 )
 		{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
 		{  0,1,2,3,4,5,6,7,64+0,64+1,64+2,64+3,64+4,64+5,64+6,64+7 },
 		{ 128*0, 128*1, 128*2,  128*3,  128*4,  128*5,  128*6,  128*7,
-		  128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
+			128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
 		128*16
 	};
-	static const gfx_layout spritelayout4 =	/* System GX 6bpp sprite layout */
+	static const gfx_layout spritelayout4 = /* System GX 6bpp sprite layout */
 	{
 		16,16,
 		0,
@@ -5183,7 +5183,7 @@ static DEVICE_START( k055673 )
 		{ 40, 32, 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7, 48, 49, 50, 51, 52, 53, 54, 55 },
 		{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7, 12*8*8,
-		  12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
+			12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 		16*16*6
 	};
 
@@ -5192,7 +5192,7 @@ static DEVICE_START( k055673 )
 	K055673_rom = (UINT16 *)machine.root_device().memregion(intf->gfx_memory_region)->base();
 
 	/* decode the graphics */
-	switch (intf->plane_order)	/* layout would be more correct than plane_order, but we use k053247_interface */
+	switch (intf->plane_order)  /* layout would be more correct than plane_order, but we use k053247_interface */
 	{
 	case K055673_LAYOUT_GX:
 		size4 = (machine.root_device().memregion(intf->gfx_memory_region)->bytes() / (1024 * 1024)) / 5;
@@ -5202,7 +5202,7 @@ static DEVICE_START( k055673 )
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
 		s1 = machine.root_device().memregion(intf->gfx_memory_region)->base(); // 4bpp area
-		s2 = s1 + (size4);	 // 1bpp area
+		s2 = s1 + (size4);   // 1bpp area
 		for (i = 0; i < size4; i+= 4)
 		{
 			*d++ = *s1++;
@@ -5529,9 +5529,9 @@ void k051316_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 			k051316->ctrlram[0x09],
 			k051316->ctrlram[0x0a],
 			k051316->ctrlram[0x0b],
-			k051316->ctrlram[0x0c],	/* bank for ROM testing */
+			k051316->ctrlram[0x0c], /* bank for ROM testing */
 			k051316->ctrlram[0x0d],
-			k051316->ctrlram[0x0e],	/* 0 = test ROMs */
+			k051316->ctrlram[0x0e], /* 0 = test ROMs */
 			k051316->ctrlram[0x0f]);
 #endif
 }
@@ -5648,7 +5648,7 @@ void k051316_device::device_start()
 
 	k051316->memory_region = intf->gfx_memory_region;
 	k051316->gfxnum = intf->gfx_num;
-	k051316->bpp = is_tail2nos ? 4 : intf->bpp;	// tail2nos is passed with bpp = -4 to setup the custom charlayout!
+	k051316->bpp = is_tail2nos ? 4 : intf->bpp; // tail2nos is passed with bpp = -4 to setup the custom charlayout!
 	k051316->callback = intf->callback;
 
 	k051316->tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k051316_device::k051316_get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -5771,7 +5771,7 @@ void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 		// it's difficult to know what the output SHOULD be.  (hold W in Racin' Force
 		// to see the chip output)
 
-		if (((k053936->ctrl[0x07] & 0x0002) && k053936->ctrl[0x09]) && (glfgreat_hack))	/* wrong, but fixes glfgreat */
+		if (((k053936->ctrl[0x07] & 0x0002) && k053936->ctrl[0x09]) && (glfgreat_hack)) /* wrong, but fixes glfgreat */
 		{
 			my_clip.min_x = k053936->ctrl[0x08] + k053936->offset[0] + 2;
 			my_clip.max_x = k053936->ctrl[0x09] + k053936->offset[0] + 2 - 1;
@@ -5824,7 +5824,7 @@ void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 			y++;
 		}
 	}
-	else	/* "simple" mode */
+	else    /* "simple" mode */
 	{
 		UINT32 startx, starty;
 		int incxx, incxy, incyx, incyy;
@@ -6487,15 +6487,15 @@ struct k056832_state
 	tilemap_t   *tilemap[K056832_PAGE_COUNT];
 	bitmap_ind16  *pixmap[K056832_PAGE_COUNT];
 
-	UINT16    regs[0x20];	// 157/832 regs group 1
-	UINT16    regsb[4];	// 157/832 regs group 2, board dependent
+	UINT16    regs[0x20];   // 157/832 regs group 1
+	UINT16    regsb[4]; // 157/832 regs group 2, board dependent
 
-	UINT8 *   rombase;	// pointer to tile gfx data
+	UINT8 *   rombase;  // pointer to tile gfx data
 	UINT16 *  videoram;
-	int       num_gfx_banks;	// depends on size of graphics ROMs
-	int       cur_gfx_banks;		// cached info for K056832_regs[0x1a]
-	int       gfxnum;			// graphics element index for unpacked tiles
-	const char *memory_region;	// memory region for tile gfx data
+	int       num_gfx_banks;    // depends on size of graphics ROMs
+	int       cur_gfx_banks;        // cached info for K056832_regs[0x1a]
+	int       gfxnum;           // graphics element index for unpacked tiles
+	const char *memory_region;  // memory region for tile gfx data
 
 
 	// ROM readback involves reading 2 halves of a word
@@ -6508,12 +6508,12 @@ struct k056832_state
 	int       layer_assoc_with_page[K056832_PAGE_COUNT];
 	int       layer_offs[8][2];
 	int       lsram_page[8][2];
-	INT32     x[8];	// 0..3 left
-	INT32     y[8];	// 0..3 top
-	INT32     w[8];	// 0..3 width  -> 1..4 pages
-	INT32     h[8];	// 0..3 height -> 1..4 pages
-	INT32     dx[8];	// scroll
-	INT32     dy[8];	// scroll
+	INT32     x[8]; // 0..3 left
+	INT32     y[8]; // 0..3 top
+	INT32     w[8]; // 0..3 width  -> 1..4 pages
+	INT32     h[8]; // 0..3 height -> 1..4 pages
+	INT32     dx[8];    // scroll
+	INT32     dy[8];    // scroll
 	UINT32    line_dirty[K056832_PAGE_COUNT][8];
 	UINT8     all_lines_dirty[K056832_PAGE_COUNT];
 	UINT8     page_tile_mode[K056832_PAGE_COUNT];
@@ -6532,7 +6532,7 @@ struct k056832_state
 
 	k056832_callback  callback;
 
-	device_t *k055555;	/* used to choose colorbase */
+	device_t *k055555;  /* used to choose colorbase */
 };
 
 /*****************************************************************************
@@ -6667,7 +6667,7 @@ int k056832_get_lookup( device_t *device, int bits )
 
 	res = (k056832->regs[0x1c] >> (bits << 2)) & 0x0f;
 
-	if (k056832->uses_tile_banks)	/* Asterix */
+	if (k056832->uses_tile_banks)   /* Asterix */
 		res |= k056832->cur_tile_bank << 4;
 
 	return res;
@@ -6692,7 +6692,7 @@ INLINE void k056832_get_tile_info(  running_machine &machine, device_t *device, 
 	{
 		layer = k056832->layer_assoc_with_page[pageIndex];
 		if (layer == -1)
-			layer = 0;	// use layer 0's palette info for unmapped pages
+			layer = 0;  // use layer 0's palette info for unmapped pages
 	}
 	else
 		layer = k056832->active_layer;
@@ -6739,11 +6739,11 @@ TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_infof) { k056832_get_tile_
 static void k056832_change_rambank( k056832_state *k056832 )
 {
 	/* ------xx page col
-     * ---xx--- page row
-     */
+	 * ---xx--- page row
+	 */
 	int bank = k056832->regs[0x19];
 
-	if (k056832->regs[0] & 0x02)	// external linescroll enable
+	if (k056832->regs[0] & 0x02)    // external linescroll enable
 		k056832->selected_page = K056832_PAGE_COUNT;
 	else
 		k056832->selected_page = ((bank >> 1) & 0xc) | (bank & 3);
@@ -6766,7 +6766,7 @@ static void k056832_change_rombank( k056832_state *k056832 )
 {
 	int bank;
 
-	if (k056832->uses_tile_banks)	/* Asterix */
+	if (k056832->uses_tile_banks)   /* Asterix */
 		bank = (k056832->regs[0x1a] >> 8) | (k056832->regs[0x1b] << 4) | (k056832->cur_tile_bank << 6);
 	else
 		bank = k056832->regs[0x1a] | (k056832->regs[0x1b] << 16);
@@ -7078,7 +7078,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_code_lo_w )
 	*adr &= 0xff00;
 	*adr |= data;
 
-	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
+	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
 			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
@@ -7095,7 +7095,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_code_hi_w )
 	*adr &= 0x00ff;
 	*adr |= data << 8;
 
-	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
+	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
 			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
@@ -7112,7 +7112,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_attr_lo_w )
 	*adr &= 0xff00;
 	*adr |= data;
 
-	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
+	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
 			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
@@ -7129,7 +7129,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_attr_hi_w )
 	*adr &= 0x00ff;
 	*adr |= data << 8;
 
-	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
+	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
 			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
@@ -7177,7 +7177,7 @@ WRITE16_DEVICE_HANDLER( k056832_ram_half_word_w )
 		if (k056832->page_tile_mode[k056832->selected_page])
 			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(dofs);
 		else
-    		k056832_mark_line_dirty(k056832->selected_page, dofs);
+			k056832_mark_line_dirty(k056832->selected_page, dofs);
 	}
 }
 
@@ -7242,10 +7242,10 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 		switch(offset)
 		{
 			/* -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
-             * --x- ---- screen flip y
-             * ---x ---- screen flip x
-             * ---- --x- external linescroll RAM page enable
-             */
+			 * --x- ---- screen flip y
+			 * ---x ---- screen flip x
+			 * ---- --x- external linescroll RAM page enable
+			 */
 			case 0x00/2:
 				if ((new_data & 0x30) != (old_data & 0x30))
 				{
@@ -7265,8 +7265,8 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 			break;
 
 			/* -------- -----xxx external irqlines enable (not used by GX)
-             * -------- xx------ tilemap attribute config (FBIT0 and FBIT1)
-             */
+			 * -------- xx------ tilemap attribute config (FBIT0 and FBIT1)
+			 */
 			//case 0x06/2: break;
 
 			// -------- ----DCBA tile mode: 0=512x1, 1=8x8
@@ -7285,14 +7285,14 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 			break;
 
 			/* -------- ------xx layer A linescroll config
-             * -------- ----xx-- layer B linescroll config
-             * -------- --xx---- layer C linescroll config
-             * -------- xx------ layer D linescroll config
-             *
-             * 0: linescroll
-             * 2: rowscroll
-             * 3: xy scroll
-             */
+			 * -------- ----xx-- layer B linescroll config
+			 * -------- --xx---- layer C linescroll config
+			 * -------- xx------ layer D linescroll config
+			 *
+			 * 0: linescroll
+			 * 2: rowscroll
+			 * 3: xy scroll
+			 */
 			//case 0x0a/2: break;
 
 			case 0x32/2:
@@ -7429,10 +7429,10 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
-			memset(&zerorect, 0, sizeof(rectangle));	// zero dimension
-			tmap->draw(bitmap, zerorect, 0, 0);	// dummy call to reset tile_dirty_map
-			xprmap.fill(0);						// reset pixel transparency_bitmap;
-			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
+			memset(&zerorect, 0, sizeof(rectangle));    // zero dimension
+			tmap->draw(bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
+			xprmap.fill(0);                     // reset pixel transparency_bitmap;
+			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
 		}
 		else
 		{
@@ -7440,7 +7440,7 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 				return 0;
 		}
 
-#if 0	/* this code is broken.. really broken .. gijoe uses it for some line/column scroll style effects (lift level of attract mode)
+#if 0   /* this code is broken.. really broken .. gijoe uses it for some line/column scroll style effects (lift level of attract mode)
             we REALLY shouldn't be writing directly back into the pixmap, surely this should
             be done when rendering instead
 
@@ -7704,11 +7704,11 @@ printf("\nend\n");
 				sdat_start = dy;
 			else
 				/*
-                    doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
-                    LE2U (naturally Y-flipped) seems to expect this condition as an override.
+				    doesn't work with Metamorphic Force and Martial Champion (software Y-flipped) but
+				    LE2U (naturally Y-flipped) seems to expect this condition as an override.
 
-                    sdat_start = K056832_PAGE_HEIGHT-1 -dy;
-                */
+				    sdat_start = K056832_PAGE_HEIGHT-1 -dy;
+				*/
 			sdat_start = K056832_PAGE_HEIGHT - 1;
 
 			if (scrollmode == 2) { sdat_start &= ~7; line_starty -= dy & 7; }
@@ -7736,7 +7736,7 @@ printf("\nend\n");
 				k056832->active_layer = layer;
 			}
 
-			if (k056832->k055555 != NULL)		// are we using k055555 palette?
+			if (k056832->k055555 != NULL)       // are we using k055555 palette?
 			{
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
@@ -8018,7 +8018,7 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 				k056832->active_layer = layer;
 			}
 
-			if (k056832->k055555 != NULL)		// are we using k055555 palette?
+			if (k056832->k055555 != NULL)       // are we using k055555 palette?
 			{
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
@@ -8280,7 +8280,7 @@ void k056832_device::device_start()
 		RGN_FRAC(1,1),
 		8,
 		{ 0,8,16,24,32,40,48,56 },
-		{ 0,1,2,3,4,5,6,7 },	// bit order probably not exact - note ramp in first 16 tiles
+		{ 0,1,2,3,4,5,6,7 },    // bit order probably not exact - note ramp in first 16 tiles
 		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
 		8*64
 	};
@@ -8626,7 +8626,7 @@ struct k054338_state
 	int       alphainverted;
 
 	screen_device *screen;
-	device_t *k055555;	/* used to fill BG color */
+	device_t *k055555;  /* used to fill BG color */
 };
 
 /*****************************************************************************
@@ -9007,19 +9007,19 @@ READ32_DEVICE_HANDLER( k001006_r )
 	{
 		switch (k001006->device_sel)
 		{
-			case 0x0b:		// CG Board ROM read
+			case 0x0b:      // CG Board ROM read
 			{
 				UINT16 *rom = (UINT16*)space.machine().root_device().memregion(k001006->gfx_region)->base();
 				return rom[k001006->addr / 2] << 16;
 			}
-			case 0x0d:		// Palette RAM read
+			case 0x0d:      // Palette RAM read
 			{
 				UINT32 addr = k001006->addr;
 
 				k001006->addr += 2;
 				return k001006->pal_ram[addr >> 1];
 			}
-			case 0x0f:		// Unknown RAM read
+			case 0x0f:      // Unknown RAM read
 			{
 				return k001006->unknown_ram[k001006->addr++];
 			}
@@ -9044,7 +9044,7 @@ WRITE32_DEVICE_HANDLER( k001006_w )
 	{
 		switch (k001006->device_sel)
 		{
-			case 0xd:	// Palette RAM write
+			case 0xd:   // Palette RAM write
 			{
 				int r, g, b, a;
 				UINT32 index = k001006->addr;
@@ -9063,7 +9063,7 @@ WRITE32_DEVICE_HANDLER( k001006_w )
 				k001006->addr += 2;
 				break;
 			}
-			case 0xf:	// Unknown RAM write
+			case 0xf:   // Unknown RAM write
 			{
 			//  mame_printf_debug("Unknown RAM %08X = %04X\n", k001006->addr, data & 0xffff);
 				k001006->unknown_ram[k001006->addr++] = data & 0xffff;
@@ -9315,14 +9315,14 @@ READ32_DEVICE_HANDLER( k001005_r )
 
 	switch(offset)
 	{
-		case 0x000:			// FIFO read, high 16 bits
+		case 0x000:         // FIFO read, high 16 bits
 		{
 			UINT16 value = k001005->fifo[k001005->fifo_read_ptr] >> 16;
 		//  mame_printf_debug("FIFO_r0: %08X\n", k001005->fifo_ptr);
 			return value;
 		}
 
-		case 0x001:			// FIFO read, low 16 bits
+		case 0x001:         // FIFO read, low 16 bits
 		{
 			UINT16 value = k001005->fifo[k001005->fifo_read_ptr] & 0xffff;
 		//  mame_printf_debug("FIFO_r1: %08X\n", k001005->fifo_ptr);
@@ -9351,10 +9351,10 @@ READ32_DEVICE_HANDLER( k001005_r )
 			return value;
 		}
 
-		case 0x11b:			// status ?
+		case 0x11b:         // status ?
 			return 0x8002;
 
-		case 0x11c:			// slave status ?
+		case 0x11c:         // slave status ?
 			return 0x8000;
 
 		case 0x11f:
@@ -9380,7 +9380,7 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 
 	switch (offset)
 	{
-		case 0x000:			// FIFO write
+		case 0x000:         // FIFO write
 		{
 			if (k001005->status != 1 && k001005->status != 2)
 			{
@@ -9401,7 +9401,7 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 			}
 
-	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+		//  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
 			k001005->fifo[k001005->fifo_write_ptr] = data;
 			k001005->fifo_write_ptr++;
 			k001005->fifo_write_ptr &= 0x7ff;
@@ -9602,7 +9602,7 @@ static void k001005_render_polygons( device_t *device )
 #if POLY_DEVICE
 				v[j].x = ((float)(x) / 16.0f) + 256.0f;
 				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
-				v[j].p[0] = 0;	/* ??? */
+				v[j].p[0] = 0;  /* ??? */
 #endif
 			}
 
@@ -9624,11 +9624,11 @@ static void k001005_render_polygons( device_t *device )
 			i = index - 1;
 		}
 		else if (k001005->_3d_fifo[i] == 0x800000ae || k001005->_3d_fifo[i] == 0x8000008e ||
-				 k001005->_3d_fifo[i] == 0x80000096 || k001005->_3d_fifo[i] == 0x800000b6 ||
-				 k001005->_3d_fifo[i] == 0x8000002e || k001005->_3d_fifo[i] == 0x8000000e ||
-				 k001005->_3d_fifo[i] == 0x80000016 || k001005->_3d_fifo[i] == 0x80000036 ||
-				 k001005->_3d_fifo[i] == 0x800000aa || k001005->_3d_fifo[i] == 0x800000a8 ||
-				 k001005->_3d_fifo[i] == 0x800000b2)
+					k001005->_3d_fifo[i] == 0x80000096 || k001005->_3d_fifo[i] == 0x800000b6 ||
+					k001005->_3d_fifo[i] == 0x8000002e || k001005->_3d_fifo[i] == 0x8000000e ||
+					k001005->_3d_fifo[i] == 0x80000016 || k001005->_3d_fifo[i] == 0x80000036 ||
+					k001005->_3d_fifo[i] == 0x800000aa || k001005->_3d_fifo[i] == 0x800000a8 ||
+					k001005->_3d_fifo[i] == 0x800000b2)
 		{
 			// 0x00: xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx    Command
 			//
@@ -9698,18 +9698,18 @@ static void k001005_render_polygons( device_t *device )
 			}
 
 			ty = ((header & 0x400) >> 5) |
-				 ((header & 0x100) >> 4) |
-				 ((header & 0x040) >> 3) |
-				 ((header & 0x010) >> 2) |
-				 ((header & 0x004) >> 1) |
-				 ((header & 0x001) >> 0);
+					((header & 0x100) >> 4) |
+					((header & 0x040) >> 3) |
+					((header & 0x010) >> 2) |
+					((header & 0x004) >> 1) |
+					((header & 0x001) >> 0);
 
 			tx = ((header & 0x800) >> 6) |
-				 ((header & 0x200) >> 5) |
-				 ((header & 0x080) >> 4) |
-				 ((header & 0x020) >> 3) |
-				 ((header & 0x008) >> 2) |
-				 ((header & 0x002) >> 1);
+					((header & 0x200) >> 5) |
+					((header & 0x080) >> 4) |
+					((header & 0x020) >> 3) |
+					((header & 0x008) >> 2) |
+					((header & 0x002) >> 1);
 
 			extra->texture_x = tx * 8;
 			extra->texture_y = ty * 8;
@@ -9840,7 +9840,7 @@ static void k001005_render_polygons( device_t *device )
 			i = index - 1;
 		}
 		else if (k001005->_3d_fifo[i] == 0x80000006 || k001005->_3d_fifo[i] == 0x80000026 ||
-				 k001005->_3d_fifo[i] == 0x80000020 || k001005->_3d_fifo[i] == 0x80000022)
+					k001005->_3d_fifo[i] == 0x80000020 || k001005->_3d_fifo[i] == 0x80000022)
 		{
 			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
 			poly_vertex v[4];
@@ -9966,13 +9966,13 @@ static void k001005_render_polygons( device_t *device )
 		else if ((k001005->_3d_fifo[i] & 0xffffff00) == 0x80000000)
 		{
 			/*
-            mame_printf_debug("Unknown polygon type %08X:\n", k001005->_3d_fifo[i]);
-            for (j = 0; j < 0x20; j++)
-            {
-                mame_printf_debug("  %02X: %08X\n", j, k001005->_3d_fifo[i + 1 + j]);
-            }
-            mame_printf_debug("\n");
-            */
+			mame_printf_debug("Unknown polygon type %08X:\n", k001005->_3d_fifo[i]);
+			for (j = 0; j < 0x20; j++)
+			{
+			    mame_printf_debug("  %02X: %08X\n", j, k001005->_3d_fifo[i + 1 + j]);
+			}
+			mame_printf_debug("\n");
+			*/
 		}
 	}
 }
@@ -10152,8 +10152,8 @@ struct k001604_state
 };
 
 
-#define K001604_NUM_TILES_LAYER0		16384
-#define K001604_NUM_TILES_LAYER1		4096
+#define K001604_NUM_TILES_LAYER0        16384
+#define K001604_NUM_TILES_LAYER1        4096
 
 /*****************************************************************************
     INLINE FUNCTIONS
@@ -10329,7 +10329,7 @@ void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rect
 		if ((k001604->reg[0x6c / 4] & (0x08 >> layer)) != 0)
 		{
 			k001604->layer_roz[layer]->draw_roz(bitmap, cliprect,
-							 x << 5, y << 5, xx << 5, xy << 5, yx << 5, yy << 5, 1, 0, 0);
+								x << 5, y << 5, xx << 5, xy << 5, yx << 5, yy << 5, 1, 0, 0);
 		}
 	}
 }
@@ -10380,8 +10380,8 @@ READ32_DEVICE_HANDLER( k001604_reg_r )
 
 	switch (offset)
 	{
-		case 0x54/4:	return space.machine().rand() << 16;
-		case 0x5c/4:	return space.machine().rand() << 16 | space.machine().rand();
+		case 0x54/4:    return space.machine().rand() << 16;
+		case 0x5c/4:    return space.machine().rand() << 16 | space.machine().rand();
 	}
 
 	return k001604->reg[offset];
@@ -10510,8 +10510,8 @@ void k001604_device::device_start()
 	const k001604_interface *intf = k001604_get_interface(this);
 	int roz_tile_size;
 
-	k001604->layer_size = intf->layer_size;		// 0 -> width = 128 tiles, 1 -> width = 256 tiles
-	k001604->roz_size = intf->roz_size;		// 0 -> 8x8, 1 -> 16x16
+	k001604->layer_size = intf->layer_size;     // 0 -> width = 128 tiles, 1 -> width = 256 tiles
+	k001604->roz_size = intf->roz_size;     // 0 -> 8x8, 1 -> 16x16
 
 	k001604->gfx_index[0] = intf->gfx_index_1;
 	k001604->gfx_index[1] = intf->gfx_index_2;
@@ -10539,7 +10539,7 @@ void k001604_device::device_start()
 			k001604->layer_roz[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k001604_device::k001604_tile_info_layer_roz),this), tilemap_mapper_delegate(FUNC(k001604_device::k001604_scan_layer_roz_1_size0),this), roz_tile_size, roz_tile_size, 64, 64);
 		}
 	}
-	else	/* slrasslt has shifted tilemaps (but only has k001604->layer_size =  0) */
+	else    /* slrasslt has shifted tilemaps (but only has k001604->layer_size =  0) */
 	{
 		k001604->layer_8x8[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k001604_device::k001604_tile_info_layer_8x8),this), tilemap_mapper_delegate(FUNC(k001604_device::slrasslt_scan_layer_8x8_0_size0),this), 8, 8, 64, 64);
 		k001604->layer_8x8[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k001604_device::k001604_tile_info_layer_8x8),this), tilemap_mapper_delegate(FUNC(k001604_device::slrasslt_scan_layer_8x8_1_size0),this), 8, 8, 64, 64);
@@ -10593,7 +10593,7 @@ struct k037122_state
 };
 
 
-#define K037122_NUM_TILES		16384
+#define K037122_NUM_TILES       16384
 
 /*****************************************************************************
     INLINE FUNCTIONS
@@ -10850,49 +10850,49 @@ READ16_DEVICE_HANDLER( k056832_word_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	return (k056832->regs[offset]);
-}		// VACSET
+}       // VACSET
 
 READ16_DEVICE_HANDLER( k056832_b_word_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	return (k056832->regsb[offset]);
-}	// VSCCS (board dependent)
+}   // VSCCS (board dependent)
 
 READ16_DEVICE_HANDLER( k053246_reg_word_r )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	return(k053247->kx46_regs[offset * 2] << 8 | k053247->kx46_regs[offset * 2 + 1]);
-}	// OBJSET1
+}   // OBJSET1
 
 READ16_DEVICE_HANDLER( k053247_reg_word_r )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	return(k053247->kx47_regs[offset]);
-}	// OBJSET2
+}   // OBJSET2
 
 READ16_DEVICE_HANDLER( k054338_word_r )
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	return(k054338->regs[offset]);
-}		// CLTC
+}       // CLTC
 
 READ16_DEVICE_HANDLER( k053251_lsb_r )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 	return(k053251->ram[offset]);
-}		// PCU1
+}       // PCU1
 
 READ16_DEVICE_HANDLER( k053251_msb_r )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 	return(k053251->ram[offset] << 8);
-}		// PCU1
+}       // PCU1
 
 READ16_DEVICE_HANDLER( k055555_word_r )
 {
 	k055555_state *k055555 = k055555_get_safe_token(device);
 	return(k055555->regs[offset] << 8);
-}	// PCU2
+}   // PCU2
 
 READ32_DEVICE_HANDLER( k056832_long_r )
 {
@@ -10917,4 +10917,3 @@ READ16_DEVICE_HANDLER( k053244_reg_word_r )
 	k05324x_state *k053244 = k05324x_get_safe_token(device);
 	return(k053244->regs[offset * 2] << 8 | k053244->regs[offset * 2 + 1]);
 }
-

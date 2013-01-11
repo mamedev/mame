@@ -39,7 +39,7 @@
 #include "mc6845.h"
 
 
-#define LOG		(0)
+#define LOG     (0)
 
 
 const device_type MC6845 = &device_creator<mc6845_device>;
@@ -57,31 +57,31 @@ const device_type MOS8568 = &device_creator<mos8568_device>;
 
 
 /* mode macros */
-#define MODE_TRANSPARENT			((m_mode_control & 0x08) != 0)
-#define MODE_TRANSPARENT_PHI2		((m_mode_control & 0x88) == 0x88)
+#define MODE_TRANSPARENT            ((m_mode_control & 0x08) != 0)
+#define MODE_TRANSPARENT_PHI2       ((m_mode_control & 0x88) == 0x88)
 /* FIXME: not supported yet */
-#define MODE_TRANSPARENT_BLANK		((m_mode_control & 0x88) == 0x08)
-#define MODE_UPDATE_STROBE			((m_mode_control & 0x40) != 0)
-#define MODE_CURSOR_SKEW			((m_mode_control & 0x20) != 0)
-#define MODE_DISPLAY_ENABLE_SKEW	((m_mode_control & 0x10) != 0)
-#define MODE_ROW_COLUMN_ADDRESSING	((m_mode_control & 0x04) != 0)
+#define MODE_TRANSPARENT_BLANK      ((m_mode_control & 0x88) == 0x08)
+#define MODE_UPDATE_STROBE          ((m_mode_control & 0x40) != 0)
+#define MODE_CURSOR_SKEW            ((m_mode_control & 0x20) != 0)
+#define MODE_DISPLAY_ENABLE_SKEW    ((m_mode_control & 0x10) != 0)
+#define MODE_ROW_COLUMN_ADDRESSING  ((m_mode_control & 0x04) != 0)
 
-#define VSS_CBRATE					BIT(m_vert_scroll, 5)
-#define VSS_RVS						BIT(m_vert_scroll, 6)
-#define VSS_COPY					BIT(m_vert_scroll, 7)
+#define VSS_CBRATE                  BIT(m_vert_scroll, 5)
+#define VSS_RVS                     BIT(m_vert_scroll, 6)
+#define VSS_COPY                    BIT(m_vert_scroll, 7)
 
-#define HSS_DBL						BIT(m_horiz_scroll, 4)
-#define HSS_SEMI					BIT(m_horiz_scroll, 5)
-#define HSS_ATTR					BIT(m_horiz_scroll, 6)
-#define HSS_TEXT					BIT(m_horiz_scroll, 7)
+#define HSS_DBL                     BIT(m_horiz_scroll, 4)
+#define HSS_SEMI                    BIT(m_horiz_scroll, 5)
+#define HSS_ATTR                    BIT(m_horiz_scroll, 6)
+#define HSS_TEXT                    BIT(m_horiz_scroll, 7)
 
-#define ATTR_COLOR					(attr & 0x0f)
-#define ATTR_BACKGROUND				(attr & 0x0f)
-#define ATTR_FOREGROUND				(attr >> 4)
-#define ATTR_BLINK					BIT(attr, 4)
-#define ATTR_UNDERLINE				BIT(attr, 5)
-#define ATTR_REVERSE				BIT(attr, 6)
-#define ATTR_ALTERNATE_CHARSET		BIT(attr, 7)
+#define ATTR_COLOR                  (attr & 0x0f)
+#define ATTR_BACKGROUND             (attr & 0x0f)
+#define ATTR_FOREGROUND             (attr >> 4)
+#define ATTR_BLINK                  BIT(attr, 4)
+#define ATTR_UNDERLINE              BIT(attr, 5)
+#define ATTR_REVERSE                BIT(attr, 6)
+#define ATTR_ALTERNATE_CHARSET      BIT(attr, 7)
 
 
 void mc6845_device::device_config_complete()
@@ -146,15 +146,15 @@ READ8_MEMBER( mc6845_device::status_r )
 
 	/* VBLANK bit */
 	if (m_supports_status_reg_d5 && !m_line_enable_ff)
-	   ret = ret | 0x20;
+		ret = ret | 0x20;
 
 	/* light pen latched */
 	if (m_supports_status_reg_d6 && m_light_pen_latched)
-	   ret = ret | 0x40;
+		ret = ret | 0x40;
 
 	/* UPDATE ready */
 	if (m_supports_status_reg_d7 && m_update_ready_bit)
-	   ret = ret | 0x80;
+		ret = ret | 0x80;
 
 	return ret;
 }
@@ -285,15 +285,15 @@ READ8_MEMBER( mos8563_device::status_r )
 
 	/* VBLANK bit */
 	if (!m_line_enable_ff)
-	   ret = ret | 0x20;
+		ret = ret | 0x20;
 
 	/* light pen latched */
 	if (m_light_pen_latched)
-	   ret = ret | 0x40;
+		ret = ret | 0x40;
 
 	/* UPDATE ready */
 	if (m_update_ready_bit)
-	   ret = ret | 0x80;
+		ret = ret | 0x80;
 
 	return ret;
 }
@@ -305,18 +305,18 @@ READ8_MEMBER( mos8563_device::register_r )
 
 	switch (m_register_address_latch)
 	{
-		case 0x00:	ret = m_horiz_char_total; break;
-		case 0x01:	ret = m_horiz_disp; break;
-		case 0x02:	ret = m_horiz_sync_pos; break;
-		case 0x03:	ret = m_sync_width; break;
-		case 0x04:	ret = m_vert_char_total; break;
-		case 0x05:	ret = m_vert_total_adj | 0xc0; break;
-		case 0x06:	ret = m_vert_disp; break;
-		case 0x07:	ret = m_vert_sync_pos; break;
-		case 0x08:	ret = m_mode_control | 0xfc; break;
-		case 0x09:	ret = m_max_ras_addr | 0xe0; break;
-		case 0x0a:	ret = m_cursor_start_ras | 0x80; break;
-		case 0x0b:	ret = m_cursor_end_ras | 0xe0; break;
+		case 0x00:  ret = m_horiz_char_total; break;
+		case 0x01:  ret = m_horiz_disp; break;
+		case 0x02:  ret = m_horiz_sync_pos; break;
+		case 0x03:  ret = m_sync_width; break;
+		case 0x04:  ret = m_vert_char_total; break;
+		case 0x05:  ret = m_vert_total_adj | 0xc0; break;
+		case 0x06:  ret = m_vert_disp; break;
+		case 0x07:  ret = m_vert_sync_pos; break;
+		case 0x08:  ret = m_mode_control | 0xfc; break;
+		case 0x09:  ret = m_max_ras_addr | 0xe0; break;
+		case 0x0a:  ret = m_cursor_start_ras | 0x80; break;
+		case 0x0b:  ret = m_cursor_end_ras | 0xe0; break;
 		case 0x0c:  ret = (m_disp_start_addr >> 8) & 0xff; break;
 		case 0x0d:  ret = (m_disp_start_addr >> 0) & 0xff; break;
 		case 0x0e:  ret = (m_cursor_addr     >> 8) & 0xff; break;
@@ -327,22 +327,22 @@ READ8_MEMBER( mos8563_device::register_r )
 		case 0x13:  ret = (m_update_addr     >> 0) & 0xff; break;
 		case 0x14:  ret = (m_attribute_addr  >> 8) & 0xff; break;
 		case 0x15:  ret = (m_attribute_addr  >> 0) & 0xff; break;
-		case 0x16:	ret = m_horiz_char; break;
-		case 0x17:	ret = m_vert_char_disp | 0xe0; break;
-		case 0x18:	ret = m_vert_scroll; break;
-		case 0x19:	ret = m_horiz_scroll; break;
-		case 0x1a:	ret = m_color; break;
-		case 0x1b:	ret = m_row_addr_incr; break;
-		case 0x1c:	ret = m_char_base_addr | 0x1f; break;
-		case 0x1d:	ret = m_underline_ras | 0xe0; break;
-		case 0x1e:	ret = m_word_count; break;
-		case 0x1f:	ret = read_videoram(m_update_addr++); break;
+		case 0x16:  ret = m_horiz_char; break;
+		case 0x17:  ret = m_vert_char_disp | 0xe0; break;
+		case 0x18:  ret = m_vert_scroll; break;
+		case 0x19:  ret = m_horiz_scroll; break;
+		case 0x1a:  ret = m_color; break;
+		case 0x1b:  ret = m_row_addr_incr; break;
+		case 0x1c:  ret = m_char_base_addr | 0x1f; break;
+		case 0x1d:  ret = m_underline_ras | 0xe0; break;
+		case 0x1e:  ret = m_word_count; break;
+		case 0x1f:  ret = read_videoram(m_update_addr++); break;
 		case 0x20:  ret = (m_block_addr      >> 8) & 0xff; break;
 		case 0x21:  ret = (m_block_addr      >> 0) & 0xff; break;
 		case 0x22:  ret = (m_de_begin        >> 8) & 0xff; break;
 		case 0x23:  ret = (m_de_begin        >> 0) & 0xff; break;
-		case 0x24:	ret = m_dram_refresh | 0xf0; break;
-		case 0x25:	ret = m_sync_polarity | 0x3f; break;
+		case 0x24:  ret = m_dram_refresh | 0xf0; break;
+		case 0x25:  ret = m_sync_polarity | 0x3f; break;
 	}
 
 	return ret;
@@ -373,13 +373,13 @@ WRITE8_MEMBER( mos8563_device::register_w )
 		case 0x0f:  m_cursor_addr      = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
 		case 0x10: /* read-only */ break;
 		case 0x11: /* read-only */ break;
-		case 0x12:  m_update_addr	   = ((data & 0xff) << 8) | (m_update_addr & 0x00ff); break;
-		case 0x13:	m_update_addr	   = ((data & 0xff) << 0) | (m_update_addr & 0xff00); break;
+		case 0x12:  m_update_addr      = ((data & 0xff) << 8) | (m_update_addr & 0x00ff); break;
+		case 0x13:  m_update_addr      = ((data & 0xff) << 0) | (m_update_addr & 0xff00); break;
 		case 0x14:  m_attribute_addr   = ((data & 0xff) << 8) | (m_attribute_addr & 0x00ff); break;
 		case 0x15:  m_attribute_addr   = ((data & 0xff) << 0) | (m_attribute_addr & 0xff00); break;
-		case 0x16:	m_horiz_char       =   data & 0xff; break;
-		case 0x17:	m_vert_char_disp   =   data & 0x1f; break;
-		case 0x18:	m_vert_scroll	   =   data & 0xff; break;
+		case 0x16:  m_horiz_char       =   data & 0xff; break;
+		case 0x17:  m_vert_char_disp   =   data & 0x1f; break;
+		case 0x18:  m_vert_scroll      =   data & 0xff; break;
 		case 0x19:
 			{
 			int dbl = HSS_DBL;
@@ -388,10 +388,10 @@ WRITE8_MEMBER( mos8563_device::register_w )
 			if (!dbl && HSS_DBL) set_clock(m_clock >> 1);
 			break;
 			}
-		case 0x1a:	m_color			   =   data & 0xff; break;
-		case 0x1b:	m_row_addr_incr	   =   data & 0xff; break;
-		case 0x1c:	m_char_base_addr   =   data & 0xe0; break;
-		case 0x1d:	m_underline_ras    =   data & 0x1f; break;
+		case 0x1a:  m_color            =   data & 0xff; break;
+		case 0x1b:  m_row_addr_incr    =   data & 0xff; break;
+		case 0x1c:  m_char_base_addr   =   data & 0xe0; break;
+		case 0x1d:  m_underline_ras    =   data & 0x1f; break;
 		case 0x1e:
 			m_word_count = data & 0xff;
 			m_update_ready_bit = 0;
@@ -401,12 +401,12 @@ WRITE8_MEMBER( mos8563_device::register_w )
 			m_data = data & 0xff;
 			write_videoram(m_update_addr++, m_data);
 			break;
-		case 0x20:  m_block_addr	   = ((data & 0xff) << 8) | (m_block_addr & 0x00ff); break;
-		case 0x21:  m_block_addr	   = ((data & 0xff) << 0) | (m_block_addr & 0xff00); break;
-		case 0x22:  m_de_begin  	   = ((data & 0xff) << 8) | (m_de_begin & 0x00ff); break;
-		case 0x23:  m_de_begin  	   = ((data & 0xff) << 0) | (m_de_begin & 0xff00); break;
-		case 0x24:	m_dram_refresh     =   data & 0x0f; break;
-		case 0x25:	m_sync_polarity    =   data & 0xc0; break;
+		case 0x20:  m_block_addr       = ((data & 0xff) << 8) | (m_block_addr & 0x00ff); break;
+		case 0x21:  m_block_addr       = ((data & 0xff) << 0) | (m_block_addr & 0xff00); break;
+		case 0x22:  m_de_begin         = ((data & 0xff) << 8) | (m_de_begin & 0x00ff); break;
+		case 0x23:  m_de_begin         = ((data & 0xff) << 0) | (m_de_begin & 0xff00); break;
+		case 0x24:  m_dram_refresh     =   data & 0x0f; break;
+		case 0x25:  m_sync_polarity    =   data & 0xc0; break;
 	}
 
 	recompute_parameters(false);
@@ -479,7 +479,7 @@ void mc6845_device::recompute_parameters(bool postload)
 	vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
 
 	/* the Commodore PET computers program a horizontal synch pulse that extends
-       past the scanline width.  I assume that the real device will clamp it */
+	   past the scanline width.  I assume that the real device will clamp it */
 	if (hsync_off_pos > horiz_pix_total)
 		hsync_off_pos = horiz_pix_total;
 
@@ -491,7 +491,7 @@ void mc6845_device::recompute_parameters(bool postload)
 
 	/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 	if (postload ||
-	    (horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
+		(horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
 		(max_visible_x != m_max_visible_x) || (max_visible_y != m_max_visible_y) ||
 		(hsync_on_pos != m_hsync_on_pos) || (vsync_on_pos != m_vsync_on_pos) ||
 		(hsync_off_pos != m_hsync_off_pos) || (vsync_off_pos != m_vsync_off_pos))
@@ -509,7 +509,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			visarea.set(0, max_visible_x, 0, max_visible_y);
 
 			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
-							  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 			if ( m_screen != NULL )
 				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
@@ -1401,16 +1401,16 @@ ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag,
 
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, type, name, tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map))
+		device_memory_interface(mconfig, *this),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map))
 {
 }
 
 
 mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, MOS8563, "MOS8563", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map))
+		device_memory_interface(mconfig, *this),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map))
 {
 }
 
@@ -1561,7 +1561,7 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
-    mos8563_device *mos8563 = static_cast<mos8563_device *>(device);
+	mos8563_device *mos8563 = static_cast<mos8563_device *>(device);
 
-    mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+	mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 }

@@ -44,32 +44,32 @@ void psxgpu_device::device_reset( void )
 }
 
 cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : psxgpu_device(mconfig, CXD8514Q, "CXD8514Q", tag, owner, clock)
+	: psxgpu_device(mconfig, CXD8514Q, "CXD8514Q", tag, owner, clock)
 {
 }
 
 cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : psxgpu_device(mconfig, CXD8538Q, "CXD8538Q", tag, owner, clock)
+	: psxgpu_device(mconfig, CXD8538Q, "CXD8538Q", tag, owner, clock)
 {
 }
 
 cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : psxgpu_device(mconfig, CXD8561Q, "CXD8561Q", tag, owner, clock)
+	: psxgpu_device(mconfig, CXD8561Q, "CXD8561Q", tag, owner, clock)
 {
 }
 
 cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : psxgpu_device(mconfig, CXD8561BQ, "CXD8561BQ", tag, owner, clock)
+	: psxgpu_device(mconfig, CXD8561BQ, "CXD8561BQ", tag, owner, clock)
 {
 }
 
 cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : psxgpu_device(mconfig, CXD8561CQ, "CXD8561CQ", tag, owner, clock)
+	: psxgpu_device(mconfig, CXD8561CQ, "CXD8561CQ", tag, owner, clock)
 {
 }
 
 cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : psxgpu_device(mconfig, CXD8654Q, "CXD8654Q", tag, owner, clock)
+	: psxgpu_device(mconfig, CXD8654Q, "CXD8654Q", tag, owner, clock)
 {
 }
 
@@ -834,7 +834,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 	p_n_redtrans = p_n_redaddtrans; \
 	p_n_greentrans = p_n_greenaddtrans; \
 	p_n_bluetrans = p_n_blueaddtrans; \
- \
+	\
 	switch( n_cmd & 0x02 ) \
 	{ \
 	case 0x02: \
@@ -921,7 +921,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 		n_distance = ( n_drawarea_x2 - n_x ) + 1; \
 	} \
 	p_vram = p_p_vram[ n_y ] + n_x; \
- \
+	\
 	switch( n_cmd & 0x02 ) \
 	{ \
 	case 0x00: \
@@ -1053,7 +1053,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 		n_distance = ( n_drawarea_x2 - n_x ) + 1; \
 	} \
 	p_vram = p_p_vram[ n_y ] + n_x; \
- \
+	\
 	if( n_ti != 0 ) \
 	{ \
 		/* interleaved texture */ \

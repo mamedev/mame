@@ -62,16 +62,16 @@ static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
-	AM_RANGE(0xc080, 0xc080) AM_WRITENOP							// ? 0
-	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq)			// cause irq on cpu #2
-	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)				// nmi ack
+	AM_RANGE(0xc080, 0xc080) AM_WRITENOP                            // ? 0
+	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq)           // cause irq on cpu #2
+	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)             // nmi ack
 /**/AM_RANGE(0xc800, 0xc82f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 /**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 /**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ym2", ym3526_w	)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ym2", ym3526_w )
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
+	AM_RANGE(0xfff0, 0xffff) AM_ROM                                 // Reset/IRQ vectors
 ADDRESS_MAP_END
 
 
@@ -104,20 +104,20 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_flipscreen_w)
 static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8, metlclsh_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)	// bg tiles bank
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)   // bg tiles bank
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)			// cause nmi on cpu #1
-	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)			// irq ack
+	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)          // cause nmi on cpu #1
+	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)            // irq ack
 	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE(metlclsh_bgram_w) AM_SHARE("bgram") // this is banked
-	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)		// 0/1
+	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)        // 0/1
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w)
 	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_SHARE("scrollx")
 //  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
 //  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
-	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)			// nmi ack
-	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
+	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)            // nmi ack
+	AM_RANGE(0xfff0, 0xffff) AM_ROM                                 // Reset/IRQ vectors
 ADDRESS_MAP_END
 
 
@@ -135,7 +135,7 @@ INPUT_CHANGED_MEMBER(metlclsh_state::coin_inserted)
 }
 
 static INPUT_PORTS_START( metlclsh )
-	PORT_START("IN0")		/* c000 */
+	PORT_START("IN0")       /* c000 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -160,7 +160,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")		/* c001 */
+	PORT_START("IN1")       /* c001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -170,7 +170,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2")		/* c002 */
+	PORT_START("IN2")       /* c002 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, metlclsh_state,coin_inserted, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, metlclsh_state,coin_inserted, 0)
 
-	PORT_START("DSW")		/* c003 */
+	PORT_START("DSW")       /* c003 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// cpu2 will clr c040 on startup forever
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // cpu2 will clr c040 on startup forever
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, metlclsh_state,coin_inserted, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using PORT_VBLANK
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
@@ -390,12 +390,12 @@ ROM_START( metlclsh )
 	ROM_LOAD( "cs03.bin",    0x00000, 0x8000, CRC(51c4720c) SHA1(7fd93bdcf029e7d2509b73b32f61fddf85f3453f) )
 	ROM_COPY( "sub", 0x7ff0, 0xfff0, 0x10 )
 
-	ROM_REGION( 0x18000, "gfx1", 0 )	// Sprites
+	ROM_REGION( 0x18000, "gfx1", 0 )    // Sprites
 	ROM_LOAD( "cs06.bin",    0x00000, 0x8000, CRC(9f61403f) SHA1(0ebb1cb9d4983746b6b32ec948e7b9efd90783d1) )
 	ROM_LOAD( "cs07.bin",    0x08000, 0x8000, CRC(d0610ea5) SHA1(3dfa16cbe93a4c08993111f78a8dd22c874fdd28) )
 	ROM_LOAD( "cs08.bin",    0x10000, 0x8000, CRC(a8b02125) SHA1(145a22b2910b2fbfb28925f58968ee2bdeae1dda) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )	// Background
+	ROM_REGION( 0x10000, "gfx2", 0 )    // Background
 	ROM_LOAD( "cs01.bin",    0x00000, 0x1000, CRC(9c72343d) SHA1(c5618be7874ab6c930b0e68935c93f1958a1916d) )
 	ROM_CONTINUE(            0x04000, 0x1000 )
 	ROM_CONTINUE(            0x08000, 0x1000 )
@@ -413,11 +413,11 @@ ROM_START( metlclsh )
 	ROM_CONTINUE(            0x0b000, 0x1000 )
 	ROM_CONTINUE(            0x0f000, 0x1000 )
 
-	ROM_REGION( 0x04000, "gfx3", 0 )	// Foreground
+	ROM_REGION( 0x04000, "gfx3", 0 )    // Foreground
 	ROM_LOAD( "cs05.bin",    0x00000, 0x4000, CRC(f90c9c6b) SHA1(ca8e497e9c388078343dd1303beef6ee38748d6a) )
-	ROM_CONTINUE(            0x00000, 0x4000 )	// first half is empty
+	ROM_CONTINUE(            0x00000, 0x4000 )  // first half is empty
 
-	ROM_REGION( 0x020, "proms", 0 )	// ?
+	ROM_REGION( 0x020, "proms", 0 ) // ?
 	ROM_LOAD( "82s123.prm",   0x0000, 0x20, CRC(6844cc88) SHA1(89d23367aa6ff541205416e82781fe938dfeeb52) )
 ROM_END
 

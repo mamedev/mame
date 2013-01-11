@@ -346,7 +346,7 @@ void kof2002b_gfx_decrypt(running_machine &machine, UINT8 *src, int size)
 		{
 			int n = (( j % 0x40) / 8 );
 			int ofst = BITSWAP16(j, 15, 14, 13, 12, 11, 10, 9, t[n][0], t[n][1], t[n][2],
-								 t[n][3], t[n][4], t[n][5], t[n][6], t[n][7], t[n][8]);
+									t[n][3], t[n][4], t[n][5], t[n][6], t[n][7], t[n][8]);
 			memcpy( src+i+ofst*128, dst+j*128, 128 );
 		}
 	}
@@ -405,7 +405,7 @@ static void cthd2003_neogeo_gfx_address_fix_do(running_machine &machine, int sta
 	int i,j;
 	int tilesize=128;
 
-	UINT8* rom = auto_alloc_array(machine, UINT8, 16*tilesize);	// 16 tiles buffer
+	UINT8* rom = auto_alloc_array(machine, UINT8, 16*tilesize); // 16 tiles buffer
 	UINT8* realrom = machine.root_device().memregion("sprites")->base() + start*tilesize;
 
 	for (i = 0; i < (end-start)/16; i++) {
@@ -553,8 +553,8 @@ static void ct2k3sp_sx_decrypt( running_machine &machine )
 
 	for( i = 0; i < rom_size; i++ ){
 		ofst = BITSWAP24( (i & 0x1ffff), 23, 22, 21, 20, 19, 18, 17,  3,
-									      0,  1,  4,  2, 13, 14, 16, 15,
-										  5,  6, 11, 10,  9,  8,  7, 12 );
+											0,  1,  4,  2, 13, 14, 16, 15,
+											5,  6, 11, 10,  9,  8,  7, 12 );
 
 		ofst += (i >> 17) << 17;
 
@@ -824,8 +824,8 @@ void svcplus_px_decrypt( running_machine &machine )
 	memcpy( dst, src, size );
 	for( i = 0; i < size / 2; i++ ){
 		ofst = BITSWAP24( (i & 0xfffff), 0x17, 0x16, 0x15, 0x14, 0x13, 0x00, 0x01, 0x02,
-										 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08,
-										 0x07, 0x06, 0x05, 0x04, 0x03, 0x10, 0x11, 0x12 );
+											0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08,
+											0x07, 0x06, 0x05, 0x04, 0x03, 0x10, 0x11, 0x12 );
 		ofst ^= 0x0f0007;
 		ofst += (i & 0xff00000);
 		memcpy( &src[ i * 0x02 ], &dst[ ofst * 0x02 ], 0x02 );
@@ -888,7 +888,7 @@ void svcsplus_px_decrypt( running_machine &machine )
 	memcpy( dst, src, size );
 	for( i = 0; i < size / 2; i++ ){
 		ofst = BITSWAP16( (i & 0x007fff), 0x0f, 0x00, 0x08, 0x09, 0x0b, 0x0a, 0x0c, 0x0d,
-										  0x04, 0x03, 0x01, 0x07, 0x06, 0x02, 0x05, 0x0e );
+											0x04, 0x03, 0x01, 0x07, 0x06, 0x02, 0x05, 0x0e );
 
 		ofst += (i & 0x078000);
 		ofst += sec[ (i & 0xf80000) >> 19 ] << 19;
@@ -913,14 +913,14 @@ static UINT16 mv0_bank_ram[ 0x10/2 ];
 
 static READ16_HANDLER( mv0_bankswitch_r )
 {
-    return mv0_bank_ram[ offset ];
+	return mv0_bank_ram[ offset ];
 }
 
 static WRITE16_HANDLER( mv0_bankswitch_w )
 {
-    UINT32 bankaddress = (mv0_bank_ram[ 0 ] >> 8) + (mv0_bank_ram[ 1 ] << 8) + 0x100000;
+	UINT32 bankaddress = (mv0_bank_ram[ 0 ] >> 8) + (mv0_bank_ram[ 1 ] << 8) + 0x100000;
 	COMBINE_DATA( &mv0_bank_ram[ offset ] );
-    neogeo_set_main_cpu_bank_address( space, bankaddress );
+	neogeo_set_main_cpu_bank_address( space, bankaddress );
 }
 #endif
 
@@ -977,20 +977,20 @@ void kf2k3bl_px_decrypt( running_machine &machine )
 		0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06
 	};
 
-    int rom_size = 0x800000;
-    UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
-    UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
-    memcpy( buf, rom, rom_size );
+	int rom_size = 0x800000;
+	UINT8 *rom = machine.root_device().memregion( "maincpu" )->base();
+	UINT8 *buf = auto_alloc_array(machine, UINT8,  rom_size );
+	memcpy( buf, rom, rom_size );
 
-    for( i = 0; i < rom_size / 0x100000; i++ ){
-        memcpy( &rom[ i * 0x100000 ], &buf[ sec[ i ] * 0x100000 ], 0x100000 );
-    }
-    auto_free( machine, buf );
+	for( i = 0; i < rom_size / 0x100000; i++ ){
+		memcpy( &rom[ i * 0x100000 ], &buf[ sec[ i ] * 0x100000 ], 0x100000 );
+	}
+	auto_free( machine, buf );
 }
 
 void kf2k3bl_install_protection(running_machine &machine)
 {
-    machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
 }
 
 
@@ -1018,7 +1018,7 @@ void kf2k3pl_px_decrypt( running_machine &machine )
 
 void kf2k3pl_install_protection(running_machine &machine)
 {
-    machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003p_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003p_w) );
 }
 
 
@@ -1049,7 +1049,7 @@ void kf2k3upl_px_decrypt( running_machine &machine )
 
 void kf2k3upl_install_protection(running_machine &machine)
 {
-    machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(kof2003_r), FUNC(kof2003_w) );
 }
 
 
@@ -1140,4 +1140,3 @@ void matrimbl_decrypt( running_machine &machine )
 	/* decrypt gfx */
 	cthd2003_c( machine, 0 );
 }
-

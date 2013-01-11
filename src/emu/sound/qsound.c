@@ -54,14 +54,14 @@ const device_type QSOUND = &device_creator<qsound_device>;
 
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_data(0),
-	  m_stream(NULL),
-	  m_sample_rom_length(0),
-	  m_sample_rom(NULL),
-	  m_frq_ratio(0.0f),
-	  m_fpRawDataL(NULL),
-	  m_fpRawDataR(NULL)
+		device_sound_interface(mconfig, *this),
+		m_data(0),
+		m_stream(NULL),
+		m_sample_rom_length(0),
+		m_sample_rom(NULL),
+		m_frq_ratio(0.0f),
+		m_fpRawDataL(NULL),
+		m_fpRawDataR(NULL)
 {
 }
 
@@ -264,7 +264,7 @@ void qsound_device::qsound_set_command(int data, int value)
 	switch (reg)
 	{
 		case 0: /* Bank */
-			ch=(ch+1)&0x0f;	/* strange ... */
+			ch=(ch+1)&0x0f; /* strange ... */
 			m_channel[ch].bank=(value&0x7f)<<16;
 #ifdef MAME_DEBUG
 			if (!(value & 0x8000))
@@ -320,17 +320,17 @@ void qsound_device::qsound_set_command(int data, int value)
 			break;
 		case 8:
 			{
-			   int pandata=(value-0x10)&0x3f;
-			   if (pandata > 32)
-			   {
+				int pandata=(value-0x10)&0x3f;
+				if (pandata > 32)
+				{
 					pandata=32;
-			   }
-			   m_channel[ch].rvol=m_pan_table[pandata];
-			   m_channel[ch].lvol=m_pan_table[32-pandata];
-			   m_channel[ch].pan = value;
+				}
+				m_channel[ch].rvol=m_pan_table[pandata];
+				m_channel[ch].lvol=m_pan_table[32-pandata];
+				m_channel[ch].pan = value;
 			}
 			break;
-		 case 9:
+			case 9:
 			m_channel[ch].reg9=value;
 /*
 #ifdef MAME_DEBUG

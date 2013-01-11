@@ -255,15 +255,15 @@ static void draw_background(stactics_state *state, bitmap_ind16 &bitmap, const r
 
 			/* assemble the pen index */
 			int pen = color |
-					  (pixel_b << 4) |
-					  (pixel_f << 5) |
-					  (pixel_e << 6) |
-					  (pixel_d << 7) |
-					  ((state->m_palette[0] & 0x01) << 8) |
-					  ((state->m_palette[1] & 0x01) << 9);
+						(pixel_b << 4) |
+						(pixel_f << 5) |
+						(pixel_e << 6) |
+						(pixel_d << 7) |
+						((state->m_palette[0] & 0x01) << 8) |
+						((state->m_palette[1] & 0x01) << 9);
 
 			/* compute the effective pixel coordinate after adjusting for the
-               mirror movement - this is mechanical on the real machine */
+			   mirror movement - this is mechanical on the real machine */
 			int sy = y + state->m_vert_pos;
 			int sx = x - state->m_horiz_pos;
 

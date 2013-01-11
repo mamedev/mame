@@ -5,32 +5,32 @@
 
 #include "machine/ram.h"
 
-#define MC6800_TAG			"u61"
-#define MC6820_Y_TAG		"u561"
-#define MC6820_X_TAG		"u565"
-#define MC6820_TAPE_TAG		"u361"
-#define MC6820_KB_TAG		"u461"
-#define MC6820_GPIB_TAG		"u265"
-#define MC6820_COM_TAG		"u5"
-#define MC6850_TAG			"u25"
-#define RS232_TAG			"rs232"
-#define SCREEN_TAG			"screen"
+#define MC6800_TAG          "u61"
+#define MC6820_Y_TAG        "u561"
+#define MC6820_X_TAG        "u565"
+#define MC6820_TAPE_TAG     "u361"
+#define MC6820_KB_TAG       "u461"
+#define MC6820_GPIB_TAG     "u265"
+#define MC6820_COM_TAG      "u5"
+#define MC6850_TAG          "u25"
+#define RS232_TAG           "rs232"
+#define SCREEN_TAG          "screen"
 
-#define AM2901A_TAG			"am2901a"
+#define AM2901A_TAG         "am2901a"
 
 class tek4051_state : public driver_device
 {
 public:
 	tek4051_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, MC6800_TAG),
-		  m_gpib_pia(*this, MC6820_GPIB_TAG),
-		  m_com_pia(*this, MC6820_COM_TAG),
-		  m_acia(*this, MC6850_TAG),
-		  m_gpib(*this, IEEE488_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_ram(*this, RAM_TAG)
-	 { }
+			m_maincpu(*this, MC6800_TAG),
+			m_gpib_pia(*this, MC6820_GPIB_TAG),
+			m_com_pia(*this, MC6820_COM_TAG),
+			m_acia(*this, MC6850_TAG),
+			m_gpib(*this, IEEE488_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_ram(*this, RAM_TAG)
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_gpib_pia;
@@ -132,9 +132,9 @@ class tek4052_state : public driver_device
 public:
 	tek4052_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, AM2901A_TAG),
-		  m_ram(*this, RAM_TAG)
-	 { }
+			m_maincpu(*this, AM2901A_TAG),
+			m_ram(*this, RAM_TAG)
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

@@ -18,7 +18,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define HASH_SIZE		53
+#define HASH_SIZE       53
 
 
 
@@ -28,20 +28,20 @@
 
 struct output_notify
 {
-	output_notify *		next;			/* link to next item */
-	output_notifier_func		notifier;		/* callback to call */
-	void *				param;			/* parameter to pass the callback */
+	output_notify *     next;           /* link to next item */
+	output_notifier_func        notifier;       /* callback to call */
+	void *              param;          /* parameter to pass the callback */
 };
 
 
 struct output_item
 {
-	output_item *		next;			/* next item in list */
-	const char *		name;			/* string name of the item */
-	UINT32				hash;			/* hash for this item name */
-	UINT32				id;				/* unique ID for this item */
-	INT32				value;			/* current value */
-	output_notify *		notifylist;		/* list of notifier callbacks */
+	output_item *       next;           /* next item in list */
+	const char *        name;           /* string name of the item */
+	UINT32              hash;           /* hash for this item name */
+	UINT32              id;             /* unique ID for this item */
+	INT32               value;          /* current value */
+	output_notify *     notifylist;     /* list of notifier callbacks */
 };
 
 

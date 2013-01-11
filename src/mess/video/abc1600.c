@@ -11,25 +11,25 @@
 
 
 // video RAM
-#define VIDEORAM_SIZE		0x40000
-#define VIDEORAM16_MASK		0x3ffff
-#define VIDEORAM8_MASK		0x7fffe
+#define VIDEORAM_SIZE       0x40000
+#define VIDEORAM16_MASK     0x3ffff
+#define VIDEORAM8_MASK      0x7fffe
 
 
 // flag register
-#define L_P			BIT(m_flag, 0)
-#define BLANK		BIT(m_flag, 1)
-#define PIX_POL		BIT(m_flag, 2)
-#define FRAME_POL	BIT(m_flag, 3)
-#define HOLD_FY		BIT(m_flag, 4)
-#define HOLD_FX		BIT(m_flag, 5)
-#define COMP_MOVE	BIT(m_flag, 6)
-#define REPLACE		BIT(m_flag, 7)
+#define L_P         BIT(m_flag, 0)
+#define BLANK       BIT(m_flag, 1)
+#define PIX_POL     BIT(m_flag, 2)
+#define FRAME_POL   BIT(m_flag, 3)
+#define HOLD_FY     BIT(m_flag, 4)
+#define HOLD_FX     BIT(m_flag, 5)
+#define COMP_MOVE   BIT(m_flag, 6)
+#define REPLACE     BIT(m_flag, 7)
 
 
 // image position
-#define HFP			96
-#define VFP			23
+#define HFP         96
+#define VFP         23
 
 
 // IOWR0 registers
@@ -175,18 +175,18 @@ READ8_MEMBER( abc1600_state::iord0_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       0
-        1       SCREENPOS
-        2
-        3
-        4
-        5
-        6       VSYNC
-        7       BUSY
+	    0       0
+	    1       SCREENPOS
+	    2
+	    3
+	    4
+	    5
+	    6       VSYNC
+	    7       BUSY
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -211,18 +211,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDSX_HB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       XSIZE8
-            1       XSIZE9
-            2       U/D* Y
-            3       U/D* X
-            4
-            5
-            6
-            7
+		    0       XSIZE8
+		    1       XSIZE9
+		    2       U/D* Y
+		    3       U/D* X
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDSX HB: %02x\n", machine().describe_context(), data);
 
@@ -234,18 +234,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDSX_LB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       XSIZE0
-            1       XSIZE1
-            2       XSIZE2
-            3       XSIZE3
-            4       XSIZE4
-            5       XSIZE5
-            6       XSIZE6
-            7       XSIZE7
+		    0       XSIZE0
+		    1       XSIZE1
+		    2       XSIZE2
+		    3       XSIZE3
+		    4       XSIZE4
+		    5       XSIZE5
+		    6       XSIZE6
+		    7       XSIZE7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDSX LB: %02x\n", machine().describe_context(), data);
 
@@ -255,18 +255,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDSY_HB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       YSIZE8
-            1       YSIZE9
-            2       YSIZE10
-            3       YSIZE11
-            4
-            5
-            6
-            7
+		    0       YSIZE8
+		    1       YSIZE9
+		    2       YSIZE10
+		    3       YSIZE11
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDSY HB: %02x\n", machine().describe_context(), data);
 
@@ -276,18 +276,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDSY_LB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       YSIZE0
-            1       YSIZE1
-            2       YSIZE2
-            3       YSIZE3
-            4       YSIZE4
-            5       YSIZE5
-            6       YSIZE6
-            7       YSIZE7
+		    0       YSIZE0
+		    1       YSIZE1
+		    2       YSIZE2
+		    3       YSIZE3
+		    4       YSIZE4
+		    5       YSIZE5
+		    6       YSIZE6
+		    7       YSIZE7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDSX LB: %02x\n", machine().describe_context(), data);
 
@@ -297,18 +297,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDTX_HB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       XTO8, MTA4
-            1       XTO9, MTA5
-            2
-            3
-            4
-            5
-            6
-            7
+		    0       XTO8, MTA4
+		    1       XTO9, MTA5
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDTX HB: %02x\n", machine().describe_context(), data);
 
@@ -319,18 +319,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDTX_LB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       XTO0
-            1       XTO1
-            2       XTO2
-            3       XTO3
-            4       XTO4, MTA0
-            5       XTO5, MTA1
-            6       XTO6, MTA2
-            7       XTO7, MTA3
+		    0       XTO0
+		    1       XTO1
+		    2       XTO2
+		    3       XTO3
+		    4       XTO4, MTA0
+		    5       XTO5, MTA1
+		    6       XTO6, MTA2
+		    7       XTO7, MTA3
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDTX LB: %02x\n", machine().describe_context(), data);
 
@@ -341,18 +341,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDTY_HB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       YTO8, MTA14
-            1       YTO9, MTA15
-            2       YTO10, MTA16
-            3       YTO11, MTA17
-            4
-            5
-            6
-            7
+		    0       YTO8, MTA14
+		    1       YTO9, MTA15
+		    2       YTO10, MTA16
+		    3       YTO11, MTA17
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDTY HB: %02x\n", machine().describe_context(), data);
 
@@ -364,18 +364,18 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 	case LDTY_LB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       YTO0, MTA6
-            1       YTO1, MTA7
-            2       YTO2, MTA8
-            3       YTO3, MTA9
-            4       YTO4, MTA10
-            5       YTO5, MTA11
-            6       YTO6, MTA12
-            7       YTO7, MTA13
+		    0       YTO0, MTA6
+		    1       YTO1, MTA7
+		    2       YTO2, MTA8
+		    3       YTO3, MTA9
+		    4       YTO4, MTA10
+		    5       YTO5, MTA11
+		    6       YTO6, MTA12
+		    7       YTO7, MTA13
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDTY LB: %02x\n", machine().describe_context(), data);
 
@@ -398,18 +398,18 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	case LDFX_HB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       XFROM8, MFA4
-            1       XFROM9, MFA5
-            2
-            3
-            4
-            5
-            6
-            7
+		    0       XFROM8, MFA4
+		    1       XFROM9, MFA5
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDFX HB: %02x\n", machine().describe_context(), data);
 
@@ -420,18 +420,18 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	case LDFX_LB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       XFROM0
-            1       XFROM1
-            2       XFROM2
-            3       XFROM3
-            4       XFROM4, MFA0
-            5       XFROM5, MFA1
-            6       XFROM6, MFA2
-            7       XFROM7, MFA3
+		    0       XFROM0
+		    1       XFROM1
+		    2       XFROM2
+		    3       XFROM3
+		    4       XFROM4, MFA0
+		    5       XFROM5, MFA1
+		    6       XFROM6, MFA2
+		    7       XFROM7, MFA3
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDFX LB: %02x\n", machine().describe_context(), data);
 
@@ -442,18 +442,18 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	case LDFY_HB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       MFA14
-            1       MFA15
-            2       MFA16
-            3       MFA17
-            4
-            5
-            6
-            7
+		    0       MFA14
+		    1       MFA15
+		    2       MFA16
+		    3       MFA17
+		    4
+		    5
+		    6
+		    7
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDFY HB: %02x\n", machine().describe_context(), data);
 
@@ -463,18 +463,18 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	case LDFY_LB:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       MFA6
-            1       MFA7
-            2       MFA8
-            3       MFA9
-            4       MFA10
-            5       MFA11
-            6       MFA12
-            7       MFA13
+		    0       MFA6
+		    1       MFA7
+		    2       MFA8
+		    3       MFA9
+		    4       MFA10
+		    5       MFA11
+		    6       MFA12
+		    7       MFA13
 
-        */
+		*/
 
 		if (LOG) logerror("%s LDFY LB: %02x\n", machine().describe_context(), data);
 
@@ -486,18 +486,18 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	case WRML:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       MOVE CYK CLK
-            1       DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
-            2       DATA CLK
-            3       _DISP MEM WE
-            4       _CAS HB
-            5       DTACK CLK / BLANK TEST (+2 PIXCLK)
-            6       DISPREC CLK
-            7       _RAS HB
+		    0       MOVE CYK CLK
+		    1       DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
+		    2       DATA CLK
+		    3       _DISP MEM WE
+		    4       _CAS HB
+		    5       DTACK CLK / BLANK TEST (+2 PIXCLK)
+		    6       DISPREC CLK
+		    7       _RAS HB
 
-        */
+		*/
 
 		if (LOG) logerror("MS %u : %02x\n", (offset >> 4) & 0x0f, data);
 
@@ -510,18 +510,18 @@ WRITE8_MEMBER( abc1600_state::iowr1_w )
 	case WRDL:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       MOVE CYK CLK
-            1       DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
-            2       DATA CLK
-            3       _DISP MEM WE
-            4       _CAS HB
-            5       DTACK CLK / BLANK TEST (+2 PIXCLK)
-            6       DISPREC CLK
-            7       _RAS HB
+		    0       MOVE CYK CLK
+		    1       DISP CYC SEL / DISP CYK PRE FETCH (+1 PIXCLK)
+		    2       DATA CLK
+		    3       _DISP MEM WE
+		    4       _CAS HB
+		    5       DTACK CLK / BLANK TEST (+2 PIXCLK)
+		    6       DISPREC CLK
+		    7       _RAS HB
 
-        */
+		*/
 
 		if (LOG) logerror("WS %u : %02x\n", (offset >> 4) & 0x0f, data);
 
@@ -580,18 +580,18 @@ WRITE8_MEMBER( abc1600_state::iowr2_w )
 	case FLAG_STROBE:
 		/*
 
-            bit     description
+		    bit     description
 
-            0       L/_P FLAG
-            1       BLANK FLAG
-            2       PIX POL
-            3       FRAME POL
-            4       HOLD FY
-            5       HOLD FX
-            6       COMP MOVE FLAG
-            7       REPLACE/SET & RESET
+		    0       L/_P FLAG
+		    1       BLANK FLAG
+		    2       PIX POL
+		    3       FRAME POL
+		    4       HOLD FY
+		    5       HOLD FX
+		    6       COMP MOVE FLAG
+		    7       REPLACE/SET & RESET
 
-        */
+		*/
 
 		m_flag = data;
 		if (LOG) logerror("FLAG %02x\n", m_flag);
@@ -764,19 +764,19 @@ inline void abc1600_state::get_shinf()
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        A0      XFROM0
-        A1      XFROM1
-        A2      XFROM2
-        A3      XFROM3
-        A4      XTO0
-        A5      XTO1
-        A6      XTO2
-        A7      XTO3
-        A8      U/D* X
+	    A0      XFROM0
+	    A1      XFROM1
+	    A2      XFROM2
+	    A3      XFROM3
+	    A4      XTO0
+	    A5      XTO1
+	    A6      XTO2
+	    A7      XTO3
+	    A8      U/D* X
 
-    */
+	*/
 
 	UINT16 shinf_addr = (m_udx << 8) | ((m_xto & 0x0f) << 4) | (m_xfrom & 0x0f);
 	UINT8 shinf = m_shinf_rom[shinf_addr];
@@ -794,15 +794,15 @@ inline UINT16 abc1600_state::get_drmsk()
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        A0      SH0
-        A1      SH1
-        A2      SH2
-        A3      SH3
-        A4      U/D* X
+	    A0      SH0
+	    A1      SH1
+	    A2      SH2
+	    A3      SH3
+	    A4      U/D* X
 
-    */
+	*/
 
 	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
 	UINT8 drmskl = m_drmsk_rom[drmsk_addr];
@@ -821,22 +821,22 @@ inline UINT16 abc1600_state::get_wrmsk()
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        A0      XTO0
-        A1      XTO1
-        A2      XTO2
-        A3      XTO3
-        A4      XSIZE0
-        A5      XSIZE1
-        A6      XSIZE2
-        A7      XSIZE3
-        A8      U/D* X
-        A9      ANDED MASKS
-        A10     WRMS0
-        A11     WRMS1
+	    A0      XTO0
+	    A1      XTO1
+	    A2      XTO2
+	    A3      XTO3
+	    A4      XSIZE0
+	    A5      XSIZE1
+	    A6      XSIZE2
+	    A7      XSIZE3
+	    A8      U/D* X
+	    A9      ANDED MASKS
+	    A10     WRMS0
+	    A11     WRMS1
 
-    */
+	*/
 
 	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 && !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
 	UINT8 wrmskl = m_wrmsk_rom[wrmsk_addr];
@@ -960,26 +960,26 @@ inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 {
 	/*
 
-        bit         description
+	    bit         description
 
-        CRTCA0      0
-        CRTCA1      0
-        CRTCA2      CC1/MA1
-        CRTCA3      CC2/MA2
-        CRTCA4      CC3/MA3
-        CRTCA5      CC4/MA4
-        CRTCA6      RA0
-        CRTCA7      RA1
-        CRTCA8      RA2
-        CRTCA9      RA3
-        CRTCA10     CR0/MA8
-        CRTCA11     CR1/MA9
-        CRTCA12     CR2/MA10
-        CRTCA13     CR3/MA11
-        CRTCA14     CR4/MA12
-        CRTCA15     CR5/MA13
+	    CRTCA0      0
+	    CRTCA1      0
+	    CRTCA2      CC1/MA1
+	    CRTCA3      CC2/MA2
+	    CRTCA4      CC3/MA3
+	    CRTCA5      CC4/MA4
+	    CRTCA6      RA0
+	    CRTCA7      RA1
+	    CRTCA8      RA2
+	    CRTCA9      RA3
+	    CRTCA10     CR0/MA8
+	    CRTCA11     CR1/MA9
+	    CRTCA12     CR2/MA10
+	    CRTCA13     CR3/MA11
+	    CRTCA14     CR4/MA12
+	    CRTCA15     CR5/MA13
 
-    */
+	*/
 
 	UINT8 cc = (ma & 0xff) + column;
 	UINT8 cr = ma >> 8;
@@ -1116,12 +1116,12 @@ UINT32 abc1600_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 MACHINE_CONFIG_FRAGMENT( abc1600_video )
 	MCFG_DEFAULT_LAYOUT(layout_abc1600)
 
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_state, screen_update)
-    MCFG_SCREEN_SIZE(958, 1067)
-    MCFG_SCREEN_VISIBLE_AREA(0, 958-1, 0, 1067-1)
+	MCFG_SCREEN_SIZE(958, 1067)
+	MCFG_SCREEN_VISIBLE_AREA(0, 958-1, 0, 1067-1)
 
 	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, XTAL_64MHz/32, crtc_intf)
 MACHINE_CONFIG_END

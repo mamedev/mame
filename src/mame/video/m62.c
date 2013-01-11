@@ -105,8 +105,8 @@ static const res_net_info battroad_char_net_info =
 
 static const res_net_decode_info m62_tile_decode_info =
 {
-	1,					/* single PROM per color */
-	0x000, 0x0ff,		/* start/end */
+	1,                  /* single PROM per color */
+	0x000, 0x0ff,       /* start/end */
 	/*  R      G      B */
 	{ 0x000, 0x200, 0x400 }, /* offsets */
 	{     0,     0,     0 }, /* shifts */
@@ -116,8 +116,8 @@ static const res_net_decode_info m62_tile_decode_info =
 
 static const res_net_decode_info m62_sprite_decode_info =
 {
-	1,					/* single PROM per color */
-	0x000, 0x0ff,		/* start/end */
+	1,                  /* single PROM per color */
+	0x000, 0x0ff,       /* start/end */
 	/*  R      G      B */
 	{ 0x100, 0x300, 0x500 }, /* offsets */
 	{     0,     0,     0 }, /* shifts */
@@ -127,8 +127,8 @@ static const res_net_decode_info m62_sprite_decode_info =
 
 static const res_net_decode_info lotlot_tile_decode_info =
 {
-	1,					/* single PROM per color */
-	0x000, 0x17f,		/* start/end */
+	1,                  /* single PROM per color */
+	0x000, 0x17f,       /* start/end */
 	/*  R      G      B */
 	{ 0x000, 0x300, 0x600 }, /* offsets */
 	{     0,     0,     0 }, /* shifts */
@@ -138,8 +138,8 @@ static const res_net_decode_info lotlot_tile_decode_info =
 
 static const res_net_decode_info lotlot_sprite_decode_info =
 {
-	1,					/* single PROM per color */
-	0x000, 0x17f,		/* start/end */
+	1,                  /* single PROM per color */
+	0x000, 0x17f,       /* start/end */
 	/*  R      G      B */
 	{ 0x180, 0x480, 0x780 }, /* offsets */
 	{     0,     0,     0 }, /* shifts */
@@ -149,8 +149,8 @@ static const res_net_decode_info lotlot_sprite_decode_info =
 
 static const res_net_decode_info battroad_char_decode_info =
 {
-	1,					/* single PROM per color */
-	0x000, 0x01f,		/* start/end */
+	1,                  /* single PROM per color */
+	0x000, 0x01f,       /* start/end */
 	/*  R      G      B */
 	{ 0x600, 0x600, 0x600 }, /* offsets */
 	{     0,     3,     6 }, /* shifts */
@@ -160,8 +160,8 @@ static const res_net_decode_info battroad_char_decode_info =
 
 static const res_net_decode_info spelunk2_tile_decode_info =
 {
-	1,					/* single PROM per color */
-	0x000, 0x1ff,		/* start/end */
+	1,                  /* single PROM per color */
+	0x000, 0x1ff,       /* start/end */
 	/*  R      G      B */
 	{ 0x000, 0x000, 0x200 }, /* offsets */
 	{     0,     4,     0 }, /* shifts */
@@ -171,8 +171,8 @@ static const res_net_decode_info spelunk2_tile_decode_info =
 
 static const res_net_decode_info spelunk2_sprite_decode_info =
 {
-	1,					/* single PROM per color */
-	0x000, 0x0ff,		/* start/end */
+	1,                  /* single PROM per color */
+	0x000, 0x0ff,       /* start/end */
 	/*  R      G      B */
 	{ 0x400, 0x500, 0x600 }, /* offsets */
 	{     0,     0,     0 }, /* shifts */
@@ -365,12 +365,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = state->m_spriteram[offs + 5] & 0x80;
 
 			i = state->m_sprite_height_prom[(code >> 5) & 0x1f];
-			if (i == 1)	/* double height */
+			if (i == 1) /* double height */
 			{
 				code &= ~1;
 				sy -= 16;
 			}
-			else if (i == 2)	/* quadruple height */
+			else if (i == 2)    /* quadruple height */
 			{
 				i = 3;
 				code &= ~3;
@@ -380,7 +380,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (state->m_flipscreen)
 			{
 				sx = 496 - sx;
-				sy = 242 - i*16 - sy;	/* sprites are slightly misplaced by the hardware */
+				sy = 242 - i*16 - sy;   /* sprites are slightly misplaced by the hardware */
 				flipx = !flipx;
 				flipy = !flipy;
 			}
@@ -505,8 +505,8 @@ void m62_state::video_start()
 {
 
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_ldrun_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
-	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
 }
 
 UINT32 m62_state::screen_update_ldrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -543,8 +543,8 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun2_bg_tile_info)
 VIDEO_START_MEMBER(m62_state,ldrun2)
 {
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_ldrun2_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
-	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
 }
 
 
@@ -606,8 +606,8 @@ VIDEO_START_MEMBER(m62_state,battroad)
 {
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_battroad_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
 	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_battroad_fg_tile_info),this), 1, 1, 8, 8, 32, 32);
-	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
 }
 
 UINT32 m62_state::screen_update_battroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -740,8 +740,8 @@ VIDEO_START_MEMBER(m62_state,kidniki)
 {
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
 
 	register_savestate(machine());
 
@@ -881,8 +881,8 @@ VIDEO_START_MEMBER(m62_state,youjyudn)
 {
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_bg_tile_info),this), 1, 0, 8, 16, 64, 16);
 	m62_textlayer(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
-	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
 }
 
 UINT32 m62_state::screen_update_youjyudn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -922,8 +922,8 @@ TILE_GET_INFO_MEMBER(m62_state::get_horizon_bg_tile_info)
 VIDEO_START_MEMBER(m62_state,horizon)
 {
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_horizon_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
-	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
 }
 
 UINT32 m62_state::screen_update_horizon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

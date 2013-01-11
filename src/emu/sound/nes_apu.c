@@ -57,7 +57,7 @@
 /* GLOBAL VARIABLES */
 struct nesapu_state
 {
-	apu_t   APU;			       /* Actual APUs */
+	apu_t   APU;                   /* Actual APUs */
 	float   apu_incsize;           /* Adjustment increment */
 	uint32  samps_per_sync;        /* Number of samples per vsync */
 	uint32  buffer_size;           /* Actual buffer size in bytes */
@@ -136,10 +136,10 @@ static int8 apu_square(nesapu_state *info, square_t *chan)
 	int8 output;
 
 	/* reg0: 0-3=volume, 4=envelope, 5=hold, 6-7=duty cycle
-    ** reg1: 0-2=sweep shifts, 3=sweep inc/dec, 4-6=sweep length, 7=sweep on
-    ** reg2: 8 bits of freq
-    ** reg3: 0-2=high freq, 7-4=vbl length counter
-    */
+	** reg1: 0-2=sweep shifts, 3=sweep inc/dec, 4-6=sweep length, 7=sweep on
+	** reg2: 8 bits of freq
+	** reg3: 0-2=high freq, 7-4=vbl length counter
+	*/
 
 	if (FALSE == chan->enabled)
 		return 0;
@@ -181,7 +181,7 @@ static int8 apu_square(nesapu_state *info, square_t *chan)
 	}
 
 	if ((0 == (chan->regs[1] & 8) && (chan->freq >> 16) > freq_limit[chan->regs[1] & 7])
-		 || (chan->freq >> 16) < 4)
+			|| (chan->freq >> 16) < 4)
 		return 0;
 
 	chan->phaseacc -= (float) info->apu_incsize; /* # of cycles per sample */
@@ -209,9 +209,9 @@ static int8 apu_triangle(nesapu_state *info, triangle_t *chan)
 	int freq;
 	int8 output;
 	/* reg0: 7=holdnote, 6-0=linear length counter
-    ** reg2: low 8 bits of frequency
-    ** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
-    */
+	** reg2: low 8 bits of frequency
+	** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
+	*/
 
 	if (FALSE == chan->enabled)
 		return 0;
@@ -269,9 +269,9 @@ static int8 apu_noise(nesapu_state *info, noise_t *chan)
 	uint8 output;
 
 	/* reg0: 0-3=volume, 4=envelope, 5=hold
-    ** reg2: 7=small(93 byte) sample,3-0=freq lookup
-    ** reg3: 7-4=vbl length counter
-    */
+	** reg2: 7=small(93 byte) sample,3-0=freq lookup
+	** reg3: 7-4=vbl length counter
+	*/
 
 	if (FALSE == chan->enabled)
 		return 0;
@@ -346,10 +346,10 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 	int freq, bit_pos;
 
 	/* reg0: 7=irq gen, 6=looping, 3-0=pointer to clock table
-    ** reg1: output dc level, 7 bits unsigned
-    ** reg2: 8 bits of 64-byte aligned address offset : $C000 + (value * 64)
-    ** reg3: length, (value * 16) + 1
-    */
+	** reg1: output dc level, 7 bits unsigned
+	** reg2: 8 bits of 64-byte aligned address offset : $C000 + (value * 64)
+	** reg3: length, (value * 16) + 1
+	*/
 
 	if (chan->enabled)
 	{
@@ -467,19 +467,19 @@ INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
 		info->APU.tri.regs[3] = value;
 
 		/* this is somewhat of a hack.  there is some latency on the Real
-        ** Thing between when trireg0 is written to and when the linear
-        ** length counter actually begins its countdown.  we want to prevent
-        ** the case where the program writes to the freq regs first, then
-        ** to reg 0, and the counter accidentally starts running because of
-        ** the sound queue's timestamp processing.
-        **
-        ** set to a few NES sample -- should be sufficient
-        **
-        **    3 * (1789772.727 / 44100) = ~122 cycles, just around one scanline
-        **
-        ** should be plenty of time for the 6502 code to do a couple of table
-        ** dereferences and load up the other triregs
-        */
+		** Thing between when trireg0 is written to and when the linear
+		** length counter actually begins its countdown.  we want to prevent
+		** the case where the program writes to the freq regs first, then
+		** to reg 0, and the counter accidentally starts running because of
+		** the sound queue's timestamp processing.
+		**
+		** set to a few NES sample -- should be sufficient
+		**
+		**    3 * (1789772.727 / 44100) = ~122 cycles, just around one scanline
+		**
+		** should be plenty of time for the 6502 code to do a couple of table
+		** dereferences and load up the other triregs
+		*/
 
 	/* used to be 3, but now we run the clock faster, so base it on samples/sync */
 		info->APU.tri.write_latency = (info->samps_per_sync + 239) / 240;
@@ -677,8 +677,8 @@ WRITE8_DEVICE_HANDLER( nes_psg_w ) {apu_write(get_safe_token(device),offset,data
 /* UPDATE APU SYSTEM */
 static STREAM_UPDATE( nes_psg_update_sound )
 {
-  nesapu_state *info = (nesapu_state *)param;
-  apu_update(info, outputs[0], samples);
+	nesapu_state *info = (nesapu_state *)param;
+	apu_update(info, outputs[0], samples);
 }
 
 
@@ -770,7 +770,7 @@ const device_type NES = &device_creator<nesapu_device>;
 
 nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NES, "N2A03", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(nesapu_state);
 }
@@ -803,5 +803,3 @@ void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

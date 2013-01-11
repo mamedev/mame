@@ -13,8 +13,8 @@ public:
 		m_rowscrollram(*this, "rowscrollram"),
 		m_vidregs2(*this, "vidregs2"),
 		m_spriteram(*this, "spriteram"),
-		  m_oki_1(*this, "oki1"),
-		  m_oki_2(*this, "oki2") { }
+			m_oki_1(*this, "oki1"),
+			m_oki_2(*this, "oki2") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_vidregs;

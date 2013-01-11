@@ -63,7 +63,7 @@ const char *sf7000_format::extensions() const
 
 const sf7000_format::format sf7000_format::formats[] = {
 	{
-    // mfm h=00 n=01 sc=10 gpl=2a d=ff
+	// mfm h=00 n=01 sc=10 gpl=2a d=ff
 		floppy_image::FF_3, floppy_image::SSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		16, 40, 1,

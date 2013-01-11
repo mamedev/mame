@@ -14,21 +14,21 @@
 #include "sound/cdp1864.h"
 #include "video/cdp1861.h"
 
-#define TMC2000_COLORRAM_SIZE	0x200
+#define TMC2000_COLORRAM_SIZE   0x200
 
-#define SCREEN_TAG		"screen"
-#define CDP1802_TAG		"cdp1802"
-#define CDP1861_TAG		"cdp1861"
-#define CDP1864_TAG		"m3"
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "cdp1802"
+#define CDP1861_TAG     "cdp1861"
+#define CDP1864_TAG     "m3"
 
 class tmc1800_state : public driver_device
 {
 public:
 	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_vdc(*this, CDP1861_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_vdc(*this, CDP1861_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
 	/* keyboard state */
-	int m_keylatch;			/* key latch */
+	int m_keylatch;         /* key latch */
 	DECLARE_DRIVER_INIT(tmc1800);
 	TIMER_CALLBACK_MEMBER(setup_beep);
 };
@@ -57,8 +57,8 @@ class osc1000b_state : public driver_device
 public:
 	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
 	/* keyboard state */
-	int m_keylatch;			/* key latch */
+	int m_keylatch;         /* key latch */
 };
 
 class tmc2000_state : public driver_device
@@ -84,10 +84,10 @@ class tmc2000_state : public driver_device
 public:
 	tmc2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_cti(*this, CDP1864_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_cti(*this, CDP1864_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -117,11 +117,11 @@ public:
 	int m_roc;
 
 	/* video state */
-	UINT8 *m_colorram;		/* color memory */
+	UINT8 *m_colorram;      /* color memory */
 	UINT8 m_color;
 
 	/* keyboard state */
-	int m_keylatch;			/* key latch */
+	int m_keylatch;         /* key latch */
 };
 
 class nano_state : public driver_device
@@ -129,10 +129,10 @@ class nano_state : public driver_device
 public:
 	nano_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_cti(*this, CDP1864_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_cti(*this, CDP1864_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -159,7 +159,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
 
 	/* keyboard state */
-	int m_keylatch;			/* key latch */
+	int m_keylatch;         /* key latch */
 };
 
 /* ---------- defined in video/tmc1800.c ---------- */

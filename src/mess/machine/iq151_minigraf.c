@@ -11,15 +11,15 @@
 #include "png.h"
 
 // paper is A4 (297x210mm)
-#define PAPER_WIDTH			(210*8)
-#define PAPER_HEIGHT		(297*8)
+#define PAPER_WIDTH         (210*8)
+#define PAPER_HEIGHT        (297*8)
 
 // usable area is 187.5x262.5mm step is 0.125mm
-#define PAPER_MAX_X			1500
-#define PAPER_MAX_Y			2100
+#define PAPER_MAX_X         1500
+#define PAPER_MAX_Y         2100
 
 // dump the m_paper bitmap into a png
-#define DUMP_PAPER_INTO_PNG		0
+#define DUMP_PAPER_INTO_PNG     0
 
 /***************************************************************************
     IMPLEMENTATION
@@ -46,7 +46,7 @@ const device_type IQ151_MINIGRAF = &device_creator<iq151_minigraf_device>;
 //-------------------------------------------------
 
 iq151_minigraf_device::iq151_minigraf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, IQ151_MINIGRAF, "IQ151 Minigraf", tag, owner, clock),
+		: device_t(mconfig, IQ151_MINIGRAF, "IQ151 Minigraf", tag, owner, clock),
 		device_iq151cart_interface( mconfig, *this )
 {
 }
@@ -117,13 +117,13 @@ void iq151_minigraf_device::io_write(offs_t offset, UINT8 data)
 	if (offset >= 0xf0 && offset < 0xf4)
 	{
 		/*
-            Plotter control lines
+		    Plotter control lines
 
-            ---- -xxx   horizontal step
-            --xx x---   vertical step
-            -x-- ----   ???
-            x--- ----   pen up/down
-        */
+		    ---- -xxx   horizontal step
+		    --xx x---   vertical step
+		    -x-- ----   ???
+		    x--- ----   pen up/down
+		*/
 
 		plotter_update(data);
 	}
@@ -136,8 +136,8 @@ void iq151_minigraf_device::io_write(offs_t offset, UINT8 data)
 
 inline int iq151_minigraf_device::get_direction(UINT8 old_val, UINT8 new_val)
 {
-	if (new_val == 0 && old_val == 7)	return +1;
-	if (new_val == 7 && old_val == 0)	return -1;
+	if (new_val == 0 && old_val == 7)   return +1;
+	if (new_val == 7 && old_val == 0)   return -1;
 
 	return (new_val - old_val);
 }

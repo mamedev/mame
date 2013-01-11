@@ -78,30 +78,30 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	strcpy(s2, s1);
 	module->extensions = s2;
 
-	module->imgclass					= *imgclass;
-	module->name						= imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME));
-	module->description					= imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION));
-	module->eoln						= imgtool_library_strdup_allow_null(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN));
-	module->initial_path_separator		= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR) ? 1 : 0;
-	module->open_is_strict				= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_OPEN_IS_STRICT) ? 1 : 0;
-	module->tracks_are_called_cylinders	= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? 1 : 0;
-	module->writing_untested			= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED) ? 1 : 0;
-	module->creation_untested			= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_CREATION_UNTESTED) ? 1 : 0;
-	module->open						= (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
-	module->create						= (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *, option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
-	module->close						= (void (*)(imgtool_image *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
-	module->info						= (void (*)(imgtool_image *, char *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
-	module->read_sector					= (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, void *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_SECTOR);
-	module->write_sector				= (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, const void *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_SECTOR);
-	module->get_geometry				= (imgtoolerr_t (*)(imgtool_image *, UINT32 *, UINT32 *, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_GEOMETRY);
-	module->get_sector_size				= (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_SECTOR_SIZE);
-	module->read_block					= (imgtoolerr_t (*)(imgtool_image *, void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_BLOCK);
-	module->write_block					= (imgtoolerr_t (*)(imgtool_image *, const void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_BLOCK);
-	module->list_partitions				= (imgtoolerr_t (*)(imgtool_image *, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
-	module->block_size					= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
-	module->createimage_optguide		= (const option_guide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
-	module->createimage_optspec			= imgtool_library_strdup_allow_null(library, (const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
-	module->image_extra_bytes			+= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES);
+	module->imgclass                    = *imgclass;
+	module->name                        = imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME));
+	module->description                 = imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION));
+	module->eoln                        = imgtool_library_strdup_allow_null(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN));
+	module->initial_path_separator      = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR) ? 1 : 0;
+	module->open_is_strict              = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_OPEN_IS_STRICT) ? 1 : 0;
+	module->tracks_are_called_cylinders = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? 1 : 0;
+	module->writing_untested            = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED) ? 1 : 0;
+	module->creation_untested           = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_CREATION_UNTESTED) ? 1 : 0;
+	module->open                        = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_OPEN);
+	module->create                      = (imgtoolerr_t (*)(imgtool_image *, imgtool_stream *, option_resolution *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CREATE);
+	module->close                       = (void (*)(imgtool_image *)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_CLOSE);
+	module->info                        = (void (*)(imgtool_image *, char *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_INFO);
+	module->read_sector                 = (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, void *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_SECTOR);
+	module->write_sector                = (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, const void *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_SECTOR);
+	module->get_geometry                = (imgtoolerr_t (*)(imgtool_image *, UINT32 *, UINT32 *, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_GEOMETRY);
+	module->get_sector_size             = (imgtoolerr_t (*)(imgtool_image *, UINT32, UINT32, UINT32, UINT32 *))imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_GET_SECTOR_SIZE);
+	module->read_block                  = (imgtoolerr_t (*)(imgtool_image *, void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_READ_BLOCK);
+	module->write_block                 = (imgtoolerr_t (*)(imgtool_image *, const void *, UINT64)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_WRITE_BLOCK);
+	module->list_partitions             = (imgtoolerr_t (*)(imgtool_image *, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
+	module->block_size                  = imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
+	module->createimage_optguide        = (const option_guide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
+	module->createimage_optspec         = imgtool_library_strdup_allow_null(library, (const char*)imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
+	module->image_extra_bytes           += imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES);
 }
 
 
@@ -277,4 +277,3 @@ char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s)
 {
 	return s ? imgtool_library_strdup(library, s) : NULL;
 }
-

@@ -74,38 +74,38 @@ static const kcexp_interface kc85_exp_interface =
 };
 
 extern SLOT_INTERFACE_START(kc85_cart)
-	SLOT_INTERFACE("standard", KC_STANDARD)	// standard 8KB ROM module
-	SLOT_INTERFACE("m006", KC_M006)			// BASIC
-	SLOT_INTERFACE("m011", KC_M011)			// 64KB RAM
-	SLOT_INTERFACE("m022", KC_M022)			// 16KB RAM
-	SLOT_INTERFACE("m032", KC_M032)			// 256KB segmented RAM
-	SLOT_INTERFACE("m033", KC_M033)			// TypeStar
-	SLOT_INTERFACE("m034", KC_M034)			// 512KB segmented RAM
-	SLOT_INTERFACE("m035", KC_M035)			// 1MB segmented RAM
-	SLOT_INTERFACE("m036", KC_M036)			// 128KB segmented RAM
+	SLOT_INTERFACE("standard", KC_STANDARD) // standard 8KB ROM module
+	SLOT_INTERFACE("m006", KC_M006)         // BASIC
+	SLOT_INTERFACE("m011", KC_M011)         // 64KB RAM
+	SLOT_INTERFACE("m022", KC_M022)         // 16KB RAM
+	SLOT_INTERFACE("m032", KC_M032)         // 256KB segmented RAM
+	SLOT_INTERFACE("m033", KC_M033)         // TypeStar
+	SLOT_INTERFACE("m034", KC_M034)         // 512KB segmented RAM
+	SLOT_INTERFACE("m035", KC_M035)         // 1MB segmented RAM
+	SLOT_INTERFACE("m036", KC_M036)         // 128KB segmented RAM
 SLOT_INTERFACE_END
 
 extern SLOT_INTERFACE_START(kc85_exp)
-	SLOT_INTERFACE("d002", KC_D002)			// D002 Bus Driver
-	SLOT_INTERFACE("d004", KC_D004)			// D004 Floppy Disk Interface
+	SLOT_INTERFACE("d002", KC_D002)         // D002 Bus Driver
+	SLOT_INTERFACE("d004", KC_D004)         // D004 Floppy Disk Interface
 	SLOT_INTERFACE("d004gide", KC_D004_GIDE) // D004 Floppy Disk + GIDE Interface
 SLOT_INTERFACE_END
 
 
 Z80PIO_INTERFACE( kc85_pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),						/* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_r),				/* port A read callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_w),				/* port A write callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_ardy_cb),		/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_r),				/* port B read callback */
-	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_w),				/* port B write callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_brdy_cb)			/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),                     /* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_r),             /* port A read callback */
+	DEVCB_DRIVER_MEMBER(kc_state, pio_porta_w),             /* port A write callback */
+	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_ardy_cb),        /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_r),             /* port B read callback */
+	DEVCB_DRIVER_MEMBER(kc_state, pio_portb_w),             /* port B write callback */
+	DEVCB_DRIVER_LINE_MEMBER(kc_state, pio_brdy_cb)         /* portB ready active callback */
 };
 
 Z80CTC_INTERFACE( kc85_ctc_intf )
 {
-    DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
 	DEVCB_DRIVER_LINE_MEMBER(kc_state, ctc_zc0_callback),
 	DEVCB_DRIVER_LINE_MEMBER(kc_state, ctc_zc1_callback),
 	DEVCB_DRIVER_LINE_MEMBER(kc_state, video_toggle_blink_state)
@@ -288,7 +288,7 @@ ROM_START(kc85_5)
 ROM_END
 
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT     INIT  COMPANY   FULLNAME */
-COMP( 1987, kc85_2,   0,	   0,		kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", GAME_NOT_WORKING)
-COMP( 1987, kc85_3,   kc85_2,  0,		kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/3", GAME_NOT_WORKING)
-COMP( 1989, kc85_4,   kc85_2,  0,		kc85_4,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/4", GAME_NOT_WORKING)
-COMP( 1989, kc85_5,   kc85_2,  0,		kc85_5,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/5", GAME_NOT_WORKING)
+COMP( 1987, kc85_2,   0,       0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", GAME_NOT_WORKING)
+COMP( 1987, kc85_3,   kc85_2,  0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/3", GAME_NOT_WORKING)
+COMP( 1989, kc85_4,   kc85_2,  0,       kc85_4,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/4", GAME_NOT_WORKING)
+COMP( 1989, kc85_5,   kc85_2,  0,       kc85_5,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/5", GAME_NOT_WORKING)

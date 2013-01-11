@@ -8,11 +8,11 @@
 #include "video/vector.h"
 #include "includes/segag80v.h"
 
-#define VECTOR_CLOCK		15468480			/* master clock */
-#define U34_CLOCK			(VECTOR_CLOCK/3)	/* clock for interrupt chain */
-#define VCL_CLOCK			(U34_CLOCK/2)		/* clock for vector generator */
-#define U51_CLOCK			(VCL_CLOCK/16)		/* clock for phase generator */
-#define IRQ_CLOCK			(U34_CLOCK/0x1f788)	/* 40Hz interrupt */
+#define VECTOR_CLOCK        15468480            /* master clock */
+#define U34_CLOCK           (VECTOR_CLOCK/3)    /* clock for interrupt chain */
+#define VCL_CLOCK           (U34_CLOCK/2)       /* clock for vector generator */
+#define U51_CLOCK           (VCL_CLOCK/16)      /* clock for phase generator */
+#define IRQ_CLOCK           (U34_CLOCK/0x1f788) /* 40Hz interrupt */
 
 
 

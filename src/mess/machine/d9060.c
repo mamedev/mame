@@ -18,16 +18,16 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6502_DOS_TAG	"7e"
-#define M6532_0_TAG		"7f"
-#define M6532_1_TAG		"7g"
+#define M6502_DOS_TAG   "7e"
+#define M6532_0_TAG     "7f"
+#define M6532_1_TAG     "7g"
 
-#define M6502_HDC_TAG	"4a"
-#define M6522_TAG		"4b"
+#define M6502_HDC_TAG   "4a"
+#define M6522_TAG       "4b"
 
-#define AM2910_TAG		"9d"
+#define AM2910_TAG      "9d"
 
-#define SASIBUS_TAG		"sasi"
+#define SASIBUS_TAG     "sasi"
 
 enum
 {
@@ -151,18 +151,18 @@ READ8_MEMBER( base_d9060_device::dio_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     DI0
-        PA1     DI1
-        PA2     DI2
-        PA3     DI3
-        PA4     DI4
-        PA5     DI5
-        PA6     DI6
-        PA7     DI7
+	    PA0     DI0
+	    PA1     DI1
+	    PA2     DI2
+	    PA3     DI3
+	    PA4     DI4
+	    PA5     DI5
+	    PA6     DI6
+	    PA7     DI7
 
-    */
+	*/
 
 	return m_bus->dio_r();
 }
@@ -172,18 +172,18 @@ WRITE8_MEMBER( base_d9060_device::dio_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DO0
-        PB1     DO1
-        PB2     DO2
-        PB3     DO3
-        PB4     DO4
-        PB5     DO5
-        PB6     DO6
-        PB7     DO7
+	    PB0     DO0
+	    PB1     DO1
+	    PB2     DO2
+	    PB3     DO3
+	    PB4     DO4
+	    PB5     DO5
+	    PB6     DO6
+	    PB7     DO7
 
-    */
+	*/
 
 	m_bus->dio_w(this, data);
 }
@@ -207,18 +207,18 @@ READ8_MEMBER( base_d9060_device::riot1_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0
-        PA1
-        PA2
-        PA3
-        PA4
-        PA5     EOII
-        PA6     DAVI
-        PA7     _ATN
+	    PA0
+	    PA1
+	    PA2
+	    PA3
+	    PA4
+	    PA5     EOII
+	    PA6     DAVI
+	    PA7     _ATN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -238,18 +238,18 @@ WRITE8_MEMBER( base_d9060_device::riot1_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ATNA
-        PA1     DACO
-        PA2     RFDO
-        PA3     EOIO
-        PA4     DAVO
-        PA5
-        PA6
-        PA7
+	    PA0     ATNA
+	    PA1     DACO
+	    PA2     RFDO
+	    PA3     EOIO
+	    PA4     DAVO
+	    PA5
+	    PA6
+	    PA7
 
-    */
+	*/
 
 	// attention acknowledge
 	m_atna = BIT(data, 0);
@@ -273,18 +273,18 @@ READ8_MEMBER( base_d9060_device::riot1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     device #
-        PB1     device #
-        PB2     device #
-        PB3
-        PB4
-        PB5
-        PB6     DACI
-        PB7     RFDI
+	    PB0     device #
+	    PB1     device #
+	    PB2     device #
+	    PB3
+	    PB4
+	    PB5
+	    PB6     DACI
+	    PB7     RFDI
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -304,18 +304,18 @@ WRITE8_MEMBER( base_d9060_device::riot1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0
-        PB1
-        PB2
-        PB3
-        PB4     DRIVE RDY
-        PB5     PWR ON AND NO ERRORS
-        PB6
-        PB7
+	    PB0
+	    PB1
+	    PB2
+	    PB3
+	    PB4     DRIVE RDY
+	    PB5     PWR ON AND NO ERRORS
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	// ready led
 	output_set_led_value(LED_READY, BIT(data, 4));
@@ -345,18 +345,18 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0
-        PB1
-        PB2     C/D
-        PB3     BUSY
-        PB4     J14 (1=9060, 0=9090)
-        PB5     J13
-        PB6     I/O
-        PB7     MSG
+	    PB0
+	    PB1
+	    PB2     C/D
+	    PB3     BUSY
+	    PB4     J14 (1=9060, 0=9090)
+	    PB5     J13
+	    PB6     I/O
+	    PB7     MSG
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -375,18 +375,18 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     SEL
-        PB1     RST
-        PB2
-        PB3
-        PB4
-        PB5
-        PB6
-        PB7
+	    PB0     SEL
+	    PB1     RST
+	    PB2
+	    PB3
+	    PB4
+	    PB5
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	m_sasibus->scsi_sel_w(BIT(data, 0));
 	m_sasibus->scsi_rst_w(BIT(data, 1));
@@ -512,19 +512,19 @@ inline void base_d9060_device::update_ieee_signals()
 //-------------------------------------------------
 
 base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  device_ieee488_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_DOS_TAG),
-	  m_hdccpu(*this, M6502_HDC_TAG),
-	  m_riot0(*this, M6532_0_TAG),
-	  m_riot1(*this, M6532_1_TAG),
-	  m_via(*this, M6522_TAG),
-	  m_sasibus(*this, SASIBUS_TAG ":host"),
-	  m_rfdo(1),
-	  m_daco(1),
-	  m_atna(1),
-	  m_enable(0),
-	  m_variant(variant)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_ieee488_interface(mconfig, *this),
+		m_maincpu(*this, M6502_DOS_TAG),
+		m_hdccpu(*this, M6502_HDC_TAG),
+		m_riot0(*this, M6532_0_TAG),
+		m_riot1(*this, M6532_1_TAG),
+		m_via(*this, M6522_TAG),
+		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_rfdo(1),
+		m_daco(1),
+		m_atna(1),
+		m_enable(0),
+		m_variant(variant)
 {
 }
 

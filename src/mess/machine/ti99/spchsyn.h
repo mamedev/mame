@@ -34,20 +34,20 @@ public:
 	DECLARE_WRITE8_MEMBER( spchrom_read_and_branch );
 
 protected:
-	void			device_start();
-	void			device_reset(void);
+	void            device_start();
+	void            device_reset(void);
 	const rom_entry *device_rom_region() const;
 	machine_config_constructor device_mconfig_additions() const;
-	void			device_config_complete();
+	void            device_config_complete();
 
 private:
-	tmc0285n_device	*m_vsp;
+	tmc0285n_device *m_vsp;
 
-	UINT8			*m_speechrom;			// pointer to speech ROM data
-	int 			m_load_pointer;			// which 4-bit nibble will be affected by load address
-	int 			m_rombits_count;		// current bit position in ROM
-	UINT32			m_sprom_address;		// 18 bit pointer in ROM
-	UINT32			m_sprom_length;			// length of data pointed by speechrom_data, from 0 to 2^18
+	UINT8           *m_speechrom;           // pointer to speech ROM data
+	int             m_load_pointer;         // which 4-bit nibble will be affected by load address
+	int             m_rombits_count;        // current bit position in ROM
+	UINT32          m_sprom_address;        // 18 bit pointer in ROM
+	UINT32          m_sprom_length;         // length of data pointed by speechrom_data, from 0 to 2^18
 };
 
 #endif

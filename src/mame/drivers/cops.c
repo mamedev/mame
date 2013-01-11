@@ -15,8 +15,8 @@
 
 #include "cops.lh"
 
-#define LOG_CDROM	1
-#define LOG_DACIA	0
+#define LOG_CDROM   1
+#define LOG_DACIA   0
 
 #define MAIN_CLOCK XTAL_4MHz
 
@@ -25,8 +25,8 @@ class cops_state : public driver_device
 public:
 	cops_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_irq(0)
+			m_maincpu(*this, "maincpu"),
+			m_irq(0)
 	{ }
 
 	// devices
@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
 	DECLARE_READ8_MEMBER(cdrom_data_r);
 
-	int	m_irq;
+	int m_irq;
 
 	UINT8 m_lcd_addr_l, m_lcd_addr_h;
 	UINT8 m_lcd_data_l, m_lcd_data_h;
@@ -343,11 +343,11 @@ READ8_MEMBER(cops_state::io1_r)
 {
 	switch( offset & 0x0f )
 	{
-		case 0x08:	/* SW0 */
+		case 0x08:  /* SW0 */
 			return ioport("SW0")->read();
-		case 0x09:	/* SW1 */
+		case 0x09:  /* SW1 */
 			return ioport("SW1")->read();
-		case 0x0a:	/* SW2 */
+		case 0x0a:  /* SW2 */
 			return ioport("SW2")->read();
 		default:
 			logerror("Unknown io1_r, offset = %03x\n", offset);
@@ -372,7 +372,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 			{
 				// update display
 				const UINT16 addrs_table[] = { 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0002, 0x0001, 0x0080,
-											   0x1000, 0x0800, 0x0400, 0x2000, 0x4000, 0x0200, 0x0100, 0x8000 };
+												0x1000, 0x0800, 0x0400, 0x2000, 0x4000, 0x0200, 0x0100, 0x8000 };
 				UINT16 addr = m_lcd_addr_l | (m_lcd_addr_h << 8);
 				for (i = 0; i < 16; i++ )
 				{
@@ -496,11 +496,11 @@ WRITE8_MEMBER(cops_state::via1_irq)
 
 static const via6522_interface via_1_interface =
 {
-	DEVCB_NULL, DEVCB_NULL,								/*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		/*inputs : CA/B1,CA/B2 */
-	DEVCB_NULL, DEVCB_NULL,								/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
-	DEVCB_DRIVER_MEMBER(cops_state,via1_irq)			/*irq                  */
+	DEVCB_NULL, DEVCB_NULL,                             /*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*inputs : CA/B1,CA/B2 */
+	DEVCB_NULL, DEVCB_NULL,                             /*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*outputs: CA/B1,CA/B2 */
+	DEVCB_DRIVER_MEMBER(cops_state,via1_irq)            /*irq                  */
 };
 
 /*************************************
@@ -528,11 +528,11 @@ WRITE8_MEMBER(cops_state::via2_irq)
 
 static const via6522_interface via_2_interface =
 {
-	DEVCB_NULL, DEVCB_NULL,								/*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		/*inputs : CA/B1,CA/B2 */
-	DEVCB_NULL, DEVCB_NULL,								/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
-	DEVCB_DRIVER_MEMBER(cops_state,via2_irq)			/*irq                  */
+	DEVCB_NULL, DEVCB_NULL,                             /*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*inputs : CA/B1,CA/B2 */
+	DEVCB_NULL, DEVCB_NULL,                             /*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*outputs: CA/B1,CA/B2 */
+	DEVCB_DRIVER_MEMBER(cops_state,via2_irq)            /*irq                  */
 };
 
 /*************************************
@@ -545,11 +545,11 @@ static const via6522_interface via_2_interface =
 
 static const via6522_interface via_3_interface =
 {
-	DEVCB_DRIVER_MEMBER(cops_state, cdrom_data_r), DEVCB_NULL,								/*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		/*inputs : CA/B1,CA/B2 */
-	DEVCB_DRIVER_MEMBER(cops_state, cdrom_data_w), DEVCB_DRIVER_MEMBER(cops_state, cdrom_ctrl_w),								/*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
-	DEVCB_NULL											/*irq                  */
+	DEVCB_DRIVER_MEMBER(cops_state, cdrom_data_r), DEVCB_NULL,                              /*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*inputs : CA/B1,CA/B2 */
+	DEVCB_DRIVER_MEMBER(cops_state, cdrom_data_w), DEVCB_DRIVER_MEMBER(cops_state, cdrom_ctrl_w),                               /*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*outputs: CA/B1,CA/B2 */
+	DEVCB_NULL                                          /*irq                  */
 };
 
 /*************************************
@@ -562,13 +562,13 @@ static ADDRESS_MAP_START( cops_map, AS_PROGRAM, 8, cops_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_r, io1_w)
-	AM_RANGE(0xb000, 0xb00f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/* VIA 1 */
-	AM_RANGE(0xb800, 0xb80f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)	/* VIA 2 */
+	AM_RANGE(0xb000, 0xb00f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /* VIA 1 */
+	AM_RANGE(0xb800, 0xb80f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)  /* VIA 2 */
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(io2_r, io2_w)
 //  AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("acia6551_1", acia6551_device, read, write )
 //  AM_RANGE(0xd004, 0xd007) AM_DEVREADWRITE("acia6551_2", acia6551_device, read, write )
 	AM_RANGE(0xd000, 0xd007) AM_READWRITE(dacia_r, dacia_w)
-	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("via6522_3", via6522_device, read, write)	/* VIA 3 */
+	AM_RANGE(0xd800, 0xd80f) AM_DEVREADWRITE("via6522_3", via6522_device, read, write)  /* VIA 3 */
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("system", 0)
 ADDRESS_MAP_END
 

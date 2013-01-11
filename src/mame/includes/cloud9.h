@@ -12,8 +12,8 @@ class cloud9_state : public driver_device
 public:
 	cloud9_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_nvram(*this, "nvram") ,
+			m_maincpu(*this, "maincpu"),
+			m_nvram(*this, "nvram") ,
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"){ }
 
@@ -31,8 +31,8 @@ public:
 	const UINT8 *m_priprom;
 	bitmap_ind16 m_spritebitmap;
 	double      m_rweights[3];
-	double		m_gweights[3];
-	double		m_bweights[3];
+	double      m_gweights[3];
+	double      m_bweights[3];
 	UINT8       m_video_control[8];
 	UINT8       m_bitmode_addr[2];
 

@@ -136,7 +136,7 @@ WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 
 READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
-	int ret	= soundlatch_byte_r(space, offset);
+	int ret = soundlatch_byte_r(space, offset);
 	soundlatch_clear_byte_w(space, offset, 0);
 	return ret;
 }
@@ -184,18 +184,18 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITENOP		/* coin reset */
+	AM_RANGE(0xc2, 0xc2) AM_WRITENOP        /* coin reset */
 	AM_RANGE(0xc3, 0xc3) AM_WRITE(sauro_coin1_w)
-	AM_RANGE(0xc4, 0xc4) AM_WRITENOP		/* coin reset */
+	AM_RANGE(0xc4, 0xc4) AM_WRITENOP        /* coin reset */
 	AM_RANGE(0xc5, 0xc5) AM_WRITE(sauro_coin2_w)
-	AM_RANGE(0xc6, 0xc7) AM_WRITENOP		/* same as 0x80 - verified with debugger */
-	AM_RANGE(0xc8, 0xc8) AM_WRITENOP		/* written every int: 0 written at end   of isr */
-	AM_RANGE(0xc9, 0xc9) AM_WRITENOP		/* written every int: 1 written at start of isr */
-	AM_RANGE(0xca, 0xcb) AM_WRITE(sauro_palette_bank_w)	/* 1 written upon death, cleared 2 vblanks later */
+	AM_RANGE(0xc6, 0xc7) AM_WRITENOP        /* same as 0x80 - verified with debugger */
+	AM_RANGE(0xc8, 0xc8) AM_WRITENOP        /* written every int: 0 written at end   of isr */
+	AM_RANGE(0xc9, 0xc9) AM_WRITENOP        /* written every int: 1 written at start of isr */
+	AM_RANGE(0xca, 0xcb) AM_WRITE(sauro_palette_bank_w) /* 1 written upon death, cleared 2 vblanks later */
 														/* Sequence 3,2,1 written during intro screen */
-	AM_RANGE(0xcc, 0xcc) AM_WRITENOP		/* same as 0xca */
-	AM_RANGE(0xcd, 0xcd) AM_WRITENOP		/* same as 0xcb */
-	AM_RANGE(0xce, 0xce) AM_WRITENOP		/* only written at startup */
+	AM_RANGE(0xcc, 0xcc) AM_WRITENOP        /* same as 0xca */
+	AM_RANGE(0xcd, 0xcd) AM_WRITENOP        /* same as 0xcb */
+	AM_RANGE(0xce, 0xce) AM_WRITENOP        /* only written at startup */
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
-	AM_RANGE(0xe000, 0xe006) AM_WRITENOP	/* echo from write to e0000 */
+	AM_RANGE(0xe000, 0xe006) AM_WRITENOP    /* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -223,12 +223,12 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
-	AM_RANGE(0xf838, 0xf838) AM_WRITENOP				/* only written at startup */
+	AM_RANGE(0xf838, 0xf838) AM_WRITENOP                /* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(sauro_coin1_w)
 	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(sauro_coin2_w)
 	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP				/* only written at startup */
+	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP                /* only written at startup */
 ADDRESS_MAP_END
 
 
@@ -313,41 +313,41 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 chars */
-    2048,   /* 2048 characters */
-    4,      /* 4 bits per pixel */
-    { 0,1,2,3 },  /* The 4 planes are packed together */
-    { 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4},
-    { 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8},
-    8*8*4     /* every char takes 32 consecutive bytes */
+	8,8,    /* 8*8 chars */
+	2048,   /* 2048 characters */
+	4,      /* 4 bits per pixel */
+	{ 0,1,2,3 },  /* The 4 planes are packed together */
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4},
+	{ 0*4*8, 1*4*8, 2*4*8, 3*4*8, 4*4*8, 5*4*8, 6*4*8, 7*4*8},
+	8*8*4     /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout trckydoc_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-    512,	/* 512 sprites */
-    4,      /* 4 bits per pixel */
-    { 0,1,2,3 },  /* The 4 planes are packed together */
-    { 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4},
-    { RGN_FRAC(3,4)+0*4*16, RGN_FRAC(2,4)+0*4*16, RGN_FRAC(1,4)+0*4*16, RGN_FRAC(0,4)+0*4*16,
-      RGN_FRAC(3,4)+1*4*16, RGN_FRAC(2,4)+1*4*16, RGN_FRAC(1,4)+1*4*16, RGN_FRAC(0,4)+1*4*16,
-      RGN_FRAC(3,4)+2*4*16, RGN_FRAC(2,4)+2*4*16, RGN_FRAC(1,4)+2*4*16, RGN_FRAC(0,4)+2*4*16,
-      RGN_FRAC(3,4)+3*4*16, RGN_FRAC(2,4)+3*4*16, RGN_FRAC(1,4)+3*4*16, RGN_FRAC(0,4)+3*4*16 },
-    16*16     /* every sprite takes 32 consecutive bytes */
+	16,16,  /* 16*16 sprites */
+	512,    /* 512 sprites */
+	4,      /* 4 bits per pixel */
+	{ 0,1,2,3 },  /* The 4 planes are packed together */
+	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4},
+	{ RGN_FRAC(3,4)+0*4*16, RGN_FRAC(2,4)+0*4*16, RGN_FRAC(1,4)+0*4*16, RGN_FRAC(0,4)+0*4*16,
+		RGN_FRAC(3,4)+1*4*16, RGN_FRAC(2,4)+1*4*16, RGN_FRAC(1,4)+1*4*16, RGN_FRAC(0,4)+1*4*16,
+		RGN_FRAC(3,4)+2*4*16, RGN_FRAC(2,4)+2*4*16, RGN_FRAC(1,4)+2*4*16, RGN_FRAC(0,4)+2*4*16,
+		RGN_FRAC(3,4)+3*4*16, RGN_FRAC(2,4)+3*4*16, RGN_FRAC(1,4)+3*4*16, RGN_FRAC(0,4)+3*4*16 },
+	16*16     /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout sauro_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-    1024,	/* 1024 sprites */
-    4,      /* 4 bits per pixel */
-    { 0,1,2,3 },  /* The 4 planes are packed together */
-    { 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4},
-    { RGN_FRAC(3,4)+0*4*16, RGN_FRAC(2,4)+0*4*16, RGN_FRAC(1,4)+0*4*16, RGN_FRAC(0,4)+0*4*16,
-      RGN_FRAC(3,4)+1*4*16, RGN_FRAC(2,4)+1*4*16, RGN_FRAC(1,4)+1*4*16, RGN_FRAC(0,4)+1*4*16,
-      RGN_FRAC(3,4)+2*4*16, RGN_FRAC(2,4)+2*4*16, RGN_FRAC(1,4)+2*4*16, RGN_FRAC(0,4)+2*4*16,
-      RGN_FRAC(3,4)+3*4*16, RGN_FRAC(2,4)+3*4*16, RGN_FRAC(1,4)+3*4*16, RGN_FRAC(0,4)+3*4*16 },
-    16*16     /* every sprite takes 32 consecutive bytes */
+	16,16,  /* 16*16 sprites */
+	1024,   /* 1024 sprites */
+	4,      /* 4 bits per pixel */
+	{ 0,1,2,3 },  /* The 4 planes are packed together */
+	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4},
+	{ RGN_FRAC(3,4)+0*4*16, RGN_FRAC(2,4)+0*4*16, RGN_FRAC(1,4)+0*4*16, RGN_FRAC(0,4)+0*4*16,
+		RGN_FRAC(3,4)+1*4*16, RGN_FRAC(2,4)+1*4*16, RGN_FRAC(1,4)+1*4*16, RGN_FRAC(0,4)+1*4*16,
+		RGN_FRAC(3,4)+2*4*16, RGN_FRAC(2,4)+2*4*16, RGN_FRAC(1,4)+2*4*16, RGN_FRAC(0,4)+2*4*16,
+		RGN_FRAC(3,4)+3*4*16, RGN_FRAC(2,4)+3*4*16, RGN_FRAC(1,4)+3*4*16, RGN_FRAC(0,4)+3*4*16 },
+	16*16     /* every sprite takes 32 consecutive bytes */
 };
 
 static const sp0256_interface sauro_sp256 =
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_CPU_PROGRAM_MAP(sauro_map)
 	MCFG_CPU_IO_MAP(sauro_io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	// 4 MHz?
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  // 4 MHz?
 	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, sauro_interrupt,  8*60) // ?
 
@@ -553,7 +553,7 @@ ROM_END
 DRIVER_INIT_MEMBER(sauro_state,tecfri)
 {
 	/* This game doesn't like all memory to be initialized to zero, it won't
-       initialize the high scores */
+	   initialize the high scores */
 
 	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 

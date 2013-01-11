@@ -524,7 +524,7 @@ static void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, U
 	if(ACCESSING_BITS_0_15)
 		device->write(offset, data);
 	if(ACCESSING_BITS_16_31)
-	    device->write(offset+1, data >> 16);
+		device->write(offset+1, data >> 16);
 }
 
 
@@ -701,23 +701,23 @@ WRITE32_MEMBER(taitogn_state::znsecsel_w)
 READ32_MEMBER(taitogn_state::boardconfig_r)
 {
 	/*
-    ------00 mem=4M
-    ------01 mem=4M
-    ------10 mem=8M
-    ------11 mem=16M
-    -----0-- smem=hM
-    -----1-- smem=2M
-    ----0--- vmem=1M
-    ----1--- vmem=2M
-    000----- rev=-2
-    001----- rev=-1
-    010----- rev=0
-    011----- rev=1
-    100----- rev=2
-    101----- rev=3
-    110----- rev=4
-    111----- rev=5
-    */
+	------00 mem=4M
+	------01 mem=4M
+	------10 mem=8M
+	------11 mem=16M
+	-----0-- smem=hM
+	-----1-- smem=2M
+	----0--- vmem=1M
+	----1--- vmem=2M
+	000----- rev=-2
+	001----- rev=-1
+	010----- rev=0
+	011----- rev=1
+	100----- rev=2
+	101----- rev=3
+	110----- rev=4
+	111----- rev=5
+	*/
 
 	return 64|32|8;
 }
@@ -726,11 +726,11 @@ READ32_MEMBER(taitogn_state::boardconfig_r)
 WRITE32_MEMBER(taitogn_state::coin_w)
 {
 	/* 0x01=counter
-       0x02=coin lock 1
-       0x08=??
-       0x20=coin lock 2
-       0x80=??
-    */
+	   0x02=coin lock 1
+	   0x08=??
+	   0x20=coin lock 2
+	   0x80=??
+	*/
 	COMBINE_DATA (&m_coin_info);
 }
 
@@ -987,9 +987,9 @@ INPUT_PORTS_END
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
 	ROM_REGION( 0x200000, "biosflash", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "v1",   "G-NET Bios v1" ) \
-    	ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
+		ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_SYSTEM_BIOS( 1, "v2",   "G-NET Bios v2" ) \
-    	ROM_LOAD16_WORD_BIOS(1, "flashv2.u30", 0x000000, 0x200000, CRC(CAE462D3) SHA1(f1b10846a8423d9fe021191c5876190857c3d2a4) ) \
+		ROM_LOAD16_WORD_BIOS(1, "flashv2.u30", 0x000000, 0x200000, CRC(CAE462D3) SHA1(f1b10846a8423d9fe021191c5876190857c3d2a4) ) \
 	ROM_REGION32_LE( 0x80000,  "mn10200", 0) \
 	ROM_FILL( 0, 0x80000, 0xff) \
 	ROM_REGION32_LE( 0x600000, "zsg1", 0) \

@@ -11,7 +11,7 @@ void ym2610_update_request(void *param);
 
 struct ym2610_interface
 {
-	void ( *handler )( device_t *device, int irq );	/* IRQ handler for the YM2610 */
+	void ( *handler )( device_t *device, int irq ); /* IRQ handler for the YM2610 */
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ym2610_r );
@@ -28,7 +28,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( ym2610_data_port_b_w );
 
 
 class ym2610_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

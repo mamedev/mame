@@ -17,50 +17,50 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"409"
-#define COP420_TAG		"419"
-#define MC6850_TAG		"459"
-#define ADC0809_TAG		"427"
-#define DAC0808_TAG		"461"
-#define Z80CTC_TAG		"458"
-#define FDC_Z80_TAG		"416"
-#define UPD765_TAG		"418"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "409"
+#define COP420_TAG      "419"
+#define MC6850_TAG      "459"
+#define ADC0809_TAG     "427"
+#define DAC0808_TAG     "461"
+#define Z80CTC_TAG      "458"
+#define FDC_Z80_TAG     "416"
+#define UPD765_TAG      "418"
 
-#define NEWBRAIN_EIM_RAM_SIZE			0x10000
+#define NEWBRAIN_EIM_RAM_SIZE           0x10000
 
-#define NEWBRAIN_ENRG1_CLK				0x01
-#define NEWBRAIN_ENRG1_TVP				0x04
-#define NEWBRAIN_ENRG1_CTS				0x10
-#define NEWBRAIN_ENRG1_DO				0x20
-#define NEWBRAIN_ENRG1_PO				0x80
-#define NEWBRAIN_ENRG1_UST_BIT_1_MASK	0x30
-#define NEWBRAIN_ENRG1_UST_BIT_0_MASK	0xc0
+#define NEWBRAIN_ENRG1_CLK              0x01
+#define NEWBRAIN_ENRG1_TVP              0x04
+#define NEWBRAIN_ENRG1_CTS              0x10
+#define NEWBRAIN_ENRG1_DO               0x20
+#define NEWBRAIN_ENRG1_PO               0x80
+#define NEWBRAIN_ENRG1_UST_BIT_1_MASK   0x30
+#define NEWBRAIN_ENRG1_UST_BIT_0_MASK   0xc0
 
-#define NEWBRAIN_ENRG2_USERP			0x01
-#define NEWBRAIN_ENRG2_ANP				0x02
-#define NEWBRAIN_ENRG2_MLTMD			0x04
-#define NEWBRAIN_ENRG2_MSPD				0x08
-#define NEWBRAIN_ENRG2_ENOR				0x10
-#define NEWBRAIN_ENRG2_ANSW				0x20
-#define NEWBRAIN_ENRG2_ENOT				0x40
-#define NEWBRAIN_ENRG2_CENTRONICS_OUT	0x80
+#define NEWBRAIN_ENRG2_USERP            0x01
+#define NEWBRAIN_ENRG2_ANP              0x02
+#define NEWBRAIN_ENRG2_MLTMD            0x04
+#define NEWBRAIN_ENRG2_MSPD             0x08
+#define NEWBRAIN_ENRG2_ENOR             0x10
+#define NEWBRAIN_ENRG2_ANSW             0x20
+#define NEWBRAIN_ENRG2_ENOT             0x40
+#define NEWBRAIN_ENRG2_CENTRONICS_OUT   0x80
 
-#define NEWBRAIN_VIDEO_RV				0x01
-#define NEWBRAIN_VIDEO_FS				0x02
-#define NEWBRAIN_VIDEO_32_40			0x04
-#define NEWBRAIN_VIDEO_UCR				0x08
-#define NEWBRAIN_VIDEO_80L				0x40
+#define NEWBRAIN_VIDEO_RV               0x01
+#define NEWBRAIN_VIDEO_FS               0x02
+#define NEWBRAIN_VIDEO_32_40            0x04
+#define NEWBRAIN_VIDEO_UCR              0x08
+#define NEWBRAIN_VIDEO_80L              0x40
 
 class newbrain_state : public driver_device
 {
 public:
 	newbrain_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_copcpu(*this, COP420_TAG),
-		  m_cassette1(*this, CASSETTE_TAG),
-		  m_cassette2(*this, CASSETTE2_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_copcpu(*this, COP420_TAG),
+			m_cassette1(*this, CASSETTE_TAG),
+			m_cassette2(*this, CASSETTE2_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -114,38 +114,38 @@ public:
 	void screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// processor state
-	int m_pwrup;			// power up
-	int m_userint;			// user interrupt
-	int m_userint0;			// parallel port interrupt
-	int m_clkint;			// clock interrupt
-	int m_aciaint;			// ACIA interrupt
-	int m_copint;			// COP interrupt
-	int m_anint;			// A/DC interrupt
-	int m_bee;				// identity
-	UINT8 m_enrg1;			// enable register 1
-	UINT8 m_enrg2;			// enable register 2
-	int m_acia_rxd;			// ACIA receive
-	int m_acia_txd;			// ACIA transmit
+	int m_pwrup;            // power up
+	int m_userint;          // user interrupt
+	int m_userint0;         // parallel port interrupt
+	int m_clkint;           // clock interrupt
+	int m_aciaint;          // ACIA interrupt
+	int m_copint;           // COP interrupt
+	int m_anint;            // A/DC interrupt
+	int m_bee;              // identity
+	UINT8 m_enrg1;          // enable register 1
+	UINT8 m_enrg2;          // enable register 2
+	int m_acia_rxd;         // ACIA receive
+	int m_acia_txd;         // ACIA transmit
 
 	// COP420 state
-	UINT8 m_cop_bus;		// data bus
-	int m_cop_so;			// serial out
-	int m_cop_tdo;			// tape data output
-	int m_cop_tdi;			// tape data input
-	int m_cop_rd;			// memory read
-	int m_cop_wr;			// memory write
-	int m_cop_access;		// COP access
+	UINT8 m_cop_bus;        // data bus
+	int m_cop_so;           // serial out
+	int m_cop_tdo;          // tape data output
+	int m_cop_tdi;          // tape data input
+	int m_cop_rd;           // memory read
+	int m_cop_wr;           // memory write
+	int m_cop_access;       // COP access
 
 	// keyboard state
-	int m_keylatch;			// keyboard row
-	int m_keydata;			// keyboard column
+	int m_keylatch;         // keyboard row
+	int m_keydata;          // keyboard column
 
 	// video state
-	int m_segment_data[16];	// VF segment data
-	int m_tvcnsl;			// TV console required
-	int m_tvctl;			// TV control register
-	UINT16 m_tvram;			// TV start address
-	UINT8 *m_char_rom;		// character ROM
+	int m_segment_data[16]; // VF segment data
+	int m_tvcnsl;           // TV console required
+	int m_tvctl;            // TV control register
+	UINT16 m_tvram;         // TV start address
+	UINT8 *m_char_rom;      // character ROM
 
 	// user bus state
 	UINT8 m_user;
@@ -164,11 +164,11 @@ class newbrain_eim_state : public newbrain_state
 public:
 	newbrain_eim_state(const machine_config &mconfig, device_type type, const char *tag)
 		: newbrain_state(mconfig, type, tag),
-		  m_fdccpu(*this, FDC_Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_acia(*this, MC6850_TAG),
-		  m_fdc(*this, UPD765_TAG),
-		  m_floppy(*this, UPD765_TAG ":0:525dd")
+			m_fdccpu(*this, FDC_Z80_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_acia(*this, MC6850_TAG),
+			m_fdc(*this, UPD765_TAG),
+			m_floppy(*this, UPD765_TAG ":0:525dd")
 	{ }
 
 	required_device<cpu_device> m_fdccpu;
@@ -210,15 +210,15 @@ public:
 	void bankswitch();
 
 	// paging state
-	int m_paging;			// paging enabled
-	int m_mpm;				// multi paging mode ?
-	int m_a16;				// address line 16
-	UINT8 m_pr[16];			// expansion interface paging register
-	UINT8 *m_eim_ram;		// expansion interface RAM
+	int m_paging;           // paging enabled
+	int m_mpm;              // multi paging mode ?
+	int m_a16;              // address line 16
+	UINT8 m_pr[16];         // expansion interface paging register
+	UINT8 *m_eim_ram;       // expansion interface RAM
 
 	// floppy state
-	int m_fdc_int;			// interrupt
-	int m_fdc_att;			// attention
+	int m_fdc_int;          // interrupt
+	int m_fdc_att;          // attention
 };
 
 // ---------- defined in video/newbrain.c ----------

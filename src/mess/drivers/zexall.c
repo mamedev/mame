@@ -29,8 +29,8 @@ class zexall_state : public driver_device
 public:
 	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_terminal(*this, TERMINAL_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_terminal(*this, TERMINAL_TAG)
 	,
 		m_main_ram(*this, "main_ram"){ }
 
@@ -171,4 +171,3 @@ ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
 COMP( 2009, zexall,   0,          0,      zexall,   zexall, zexall_state, zexall,      "Frank Cringle & MESSDEV",   "ZEXALL Z80 instruction set exerciser (modified for MESS)", GAME_NO_SOUND_HW )
-

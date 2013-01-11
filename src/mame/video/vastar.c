@@ -151,7 +151,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipy = !flipy;
 		}
 
-		if (spriteram_2[offs] & 0x08)	/* double width */
+		if (spriteram_2[offs] & 0x08)   /* double width */
 		{
 			if (!state->flip_screen())
 				sy = 224 - sy;

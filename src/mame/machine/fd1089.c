@@ -457,19 +457,19 @@ UINT8 fd1089b_device::decode(UINT8 val, UINT8 key, bool opcode)
 UINT16 fd1089_base_device::decrypt_one(offs_t addr, UINT16 val, const UINT8 *key, bool opcode)
 {
 	// pick the translation table from bits ff022a of the address
-	int tbl_num =	((addr & 0x000002) >> 1) |
+	int tbl_num =   ((addr & 0x000002) >> 1) |
 					((addr & 0x000008) >> 2) |
 					((addr & 0x000020) >> 3) |
 					((addr & 0x000200) >> 6) |
 					((addr & 0xff0000) >> 12);
 
-	UINT16 src =	((val & 0x0008) >> 3) |
+	UINT16 src =    ((val & 0x0008) >> 3) |
 					((val & 0x0040) >> 5) |
 					((val & 0xfc00) >> 8);
 
 	src = decode(src, key[tbl_num + (opcode ? 0 : 1) * 0x1000], opcode);
 
-	src =	((src & 0x01) << 3) |
+	src =   ((src & 0x01) << 3) |
 			((src & 0x02) << 5) |
 			((src & 0xfc) << 8);
 

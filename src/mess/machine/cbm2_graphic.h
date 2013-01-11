@@ -26,7 +26,7 @@
 // ======================> cbm2_graphic_cartridge_device
 
 class cbm2_graphic_cartridge_device : public device_t,
-					    			  public device_cbm2_expansion_card_interface
+										public device_cbm2_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -43,7 +43,7 @@ protected:
 	};
 
 	// device-level overrides
-    virtual void device_config_complete() { m_shortname = "cbm2_graphic"; }
+	virtual void device_config_complete() { m_shortname = "cbm2_graphic"; }
 	virtual void device_start();
 	virtual void device_reset();
 

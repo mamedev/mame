@@ -57,8 +57,8 @@
 //============================================================
 
 // window styles
-#define WINDOW_STYLE		WS_OVERLAPPEDWINDOW
-#define WINDOW_STYLE_EX		0
+#define WINDOW_STYLE        WS_OVERLAPPEDWINDOW
+#define WINDOW_STYLE_EX     0
 
 
 
@@ -68,9 +68,9 @@
 
 struct registered_client
 {
-	registered_client *	next;		// next client in the list
-	LPARAM				id;			// client-specified ID
-	HWND				hwnd;		// client HWND
+	registered_client * next;       // next client in the list
+	LPARAM              id;         // client-specified ID
+	HWND                hwnd;       // client HWND
 };
 
 
@@ -80,18 +80,18 @@ struct registered_client
 //============================================================
 
 // our HWND
-static HWND					output_hwnd;
+static HWND                 output_hwnd;
 
 // client list
-static registered_client *	clientlist;
+static registered_client *  clientlist;
 
 // message IDs
-static UINT					om_mame_start;
-static UINT					om_mame_stop;
-static UINT					om_mame_update_state;
-static UINT					om_mame_register_client;
-static UINT					om_mame_unregister_client;
-static UINT					om_mame_get_id_string;
+static UINT                 om_mame_start;
+static UINT                 om_mame_stop;
+static UINT                 om_mame_update_state;
+static UINT                 om_mame_register_client;
+static UINT                 om_mame_unregister_client;
+static UINT                 om_mame_get_id_string;
 
 
 
@@ -201,9 +201,9 @@ static int create_window_class(void)
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName	= OUTPUT_WINDOW_CLASS;
-		wc.hInstance		= GetModuleHandle(NULL);
-		wc.lpfnWndProc		= output_window_proc;
+		wc.lpszClassName    = OUTPUT_WINDOW_CLASS;
+		wc.hInstance        = GetModuleHandle(NULL);
+		wc.lpfnWndProc      = output_window_proc;
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))

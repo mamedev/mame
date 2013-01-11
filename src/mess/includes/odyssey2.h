@@ -21,25 +21,25 @@
 
 #define VDC_CONTROL_REG_STROBE_XY (0x02)
 
-#define I824X_START_ACTIVE_SCAN			6
-#define I824X_END_ACTIVE_SCAN			(6 + 160)
-#define I824X_START_Y					1
-#define I824X_SCREEN_HEIGHT				243
-#define I824X_LINE_CLOCKS				228
+#define I824X_START_ACTIVE_SCAN         6
+#define I824X_END_ACTIVE_SCAN           (6 + 160)
+#define I824X_START_Y                   1
+#define I824X_SCREEN_HEIGHT             243
+#define I824X_LINE_CLOCKS               228
 
 union o2_vdc_t {
-    UINT8 reg[0x100];
-    struct {
+	UINT8 reg[0x100];
 	struct {
-	    UINT8 y,x,color,res;
+	struct {
+		UINT8 y,x,color,res;
 	} sprites[4];
 	struct {
-	    UINT8 y,x,ptr,color;
+		UINT8 y,x,ptr,color;
 	} foreground[12];
 	struct {
-	    struct {
+		struct {
 		UINT8 y,x,ptr,color;
-	    } single[4];
+		} single[4];
 	} quad[4];
 	UINT8 shape[4][8];
 	UINT8 control;
@@ -54,23 +54,23 @@ union o2_vdc_t {
 	UINT8 res2[5+0x10];
 	UINT8 hgrid[2][0x10];
 	UINT8 vgrid[0x10];
-    } s;
+	} s;
 };
 
 struct ef9341_t
 {
-	UINT8	TA;
-	UINT8	TB;
-	UINT8	busy;
+	UINT8   TA;
+	UINT8   TB;
+	UINT8   busy;
 };
 
 struct ef9340_t
 {
-	UINT8	X;
-	UINT8	Y;
-	UINT8	Y0;
-	UINT8	R;
-	UINT8	M;
+	UINT8   X;
+	UINT8   Y;
+	UINT8   Y0;
+	UINT8   R;
+	UINT8   M;
 };
 
 class odyssey2_state : public driver_device
@@ -137,12 +137,12 @@ public:
 protected:
 	ef9340_t m_ef9340;
 	ef9341_t m_ef9341;
-	UINT8	m_ef934x_ram_a[1024];
-	UINT8	m_ef934x_ram_b[1024];
-	UINT8	m_ef934x_ext_char_ram[1024];
-	bool	m_g7400;
-	UINT8	m_g7400_ic674_decode[8];
-	UINT8	m_g7400_ic678_decode[8];
+	UINT8   m_ef934x_ram_a[1024];
+	UINT8   m_ef934x_ram_b[1024];
+	UINT8   m_ef934x_ext_char_ram[1024];
+	bool    m_g7400;
+	UINT8   m_g7400_ic674_decode[8];
+	UINT8   m_g7400_ic678_decode[8];
 
 	inline UINT16 ef9340_get_c_addr(UINT8 x, UINT8 y);
 	inline void ef9340_inc_c();
@@ -171,7 +171,7 @@ protected:
 STREAM_UPDATE( odyssey2_sh_update );
 
 class odyssey2_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	odyssey2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

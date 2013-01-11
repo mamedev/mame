@@ -12,9 +12,9 @@ enum
 };
 
 #define T11_IRQ0        0      /* IRQ0 */
-#define T11_IRQ1		1	   /* IRQ1 */
-#define T11_IRQ2		2	   /* IRQ2 */
-#define T11_IRQ3		3	   /* IRQ3 */
+#define T11_IRQ1        1      /* IRQ1 */
+#define T11_IRQ2        2      /* IRQ2 */
+#define T11_IRQ3        3      /* IRQ3 */
 
 #define T11_RESERVED    0x000   /* Reserved vector */
 #define T11_TIMEOUT     0x004   /* Time-out/system error vector */
@@ -28,7 +28,7 @@ enum
 
 struct t11_setup
 {
-	UINT16	mode;			/* initial processor mode */
+	UINT16  mode;           /* initial processor mode */
 };
 
 

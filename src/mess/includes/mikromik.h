@@ -16,39 +16,39 @@
 #include "video/i8275x.h"
 #include "video/upd7220.h"
 
-#define SCREEN_TAG		"screen"
-#define I8085A_TAG		"ic40"
-#define I8212_TAG		"ic12"
-#define I8237_TAG		"ic45"
-#define I8253_TAG		"ic6"
-#define UPD765_TAG		"ic15"
-#define I8275_TAG		"ic59"
-#define UPD7201_TAG		"ic11"
-#define UPD7220_TAG		"ic101"
+#define SCREEN_TAG      "screen"
+#define I8085A_TAG      "ic40"
+#define I8212_TAG       "ic12"
+#define I8237_TAG       "ic45"
+#define I8253_TAG       "ic6"
+#define UPD765_TAG      "ic15"
+#define I8275_TAG       "ic59"
+#define UPD7201_TAG     "ic11"
+#define UPD7220_TAG     "ic101"
 
 class mm1_state : public driver_device
 {
 public:
 	mm1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8085A_TAG),
-		  m_iop(*this, I8212_TAG),
-		  m_dmac(*this, I8237_TAG),
-		  m_pit(*this, I8253_TAG),
-		  m_crtc(*this, I8275_TAG),
-		  m_fdc(*this, UPD765_TAG),
-		  m_mpsc(*this, UPD7201_TAG),
-		  m_hgdc(*this, UPD7220_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:525qd"),
-		  m_floppy1(*this, UPD765_TAG ":1:525qd"),
-		  m_ram(*this, RAM_TAG),
-		  m_video_ram(*this, "video_ram"),
-		  m_a8(0),
-		  m_recall(0),
-		  m_dack3(1),
-		  m_tc(CLEAR_LINE),
-		  m_fdc_tc(0)
+			m_maincpu(*this, I8085A_TAG),
+			m_iop(*this, I8212_TAG),
+			m_dmac(*this, I8237_TAG),
+			m_pit(*this, I8253_TAG),
+			m_crtc(*this, I8275_TAG),
+			m_fdc(*this, UPD765_TAG),
+			m_mpsc(*this, UPD7201_TAG),
+			m_hgdc(*this, UPD7220_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_floppy0(*this, UPD765_TAG ":0:525qd"),
+			m_floppy1(*this, UPD765_TAG ":1:525qd"),
+			m_ram(*this, RAM_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_a8(0),
+			m_recall(0),
+			m_dack3(1),
+			m_tc(CLEAR_LINE),
+			m_fdc_tc(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

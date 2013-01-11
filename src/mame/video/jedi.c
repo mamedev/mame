@@ -18,7 +18,7 @@
 #include "includes/jedi.h"
 
 
-#define NUM_PENS	(0x1000)
+#define NUM_PENS    (0x1000)
 
 
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(jedi_state::jedi_hscroll_w)
 static void draw_background_and_text(running_machine &machine, jedi_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y;
-	int background_line_buffer[0x200];	/* RAM chip at 2A */
+	int background_line_buffer[0x200];  /* RAM chip at 2A */
 
 	UINT8 *tx_gfx = machine.root_device().memregion("gfx1")->base();
 	UINT8 *bg_gfx = machine.root_device().memregion("gfx2")->base();
@@ -169,9 +169,9 @@ static void draw_background_and_text(running_machine &machine, jedi_state *state
 			int tx_code = ((tx_bank & 0x80) << 1) | tx_ram[tx_offs];
 			int bg_bank = bg_ram[0x0400 | bg_offs];
 			int bg_code = bg_ram[0x0000 | bg_offs] |
-						  ((bg_bank & 0x01) << 8) |
-						  ((bg_bank & 0x08) << 6) |
-						  ((bg_bank & 0x02) << 9);
+							((bg_bank & 0x01) << 8) |
+							((bg_bank & 0x08) << 6) |
+							((bg_bank & 0x02) << 9);
 
 			/* background flip X */
 			if (bg_bank & 0x04)
@@ -208,8 +208,8 @@ static void draw_background_and_text(running_machine &machine, jedi_state *state
 			}
 
 			/* the first pixel is smoothed via a lookup using the current and last pixel value -
-               the next pixel just uses the current value directly. After we done with a pixel
-               save it for later in the line buffer RAM */
+			   the next pixel just uses the current value directly. After we done with a pixel
+			   save it for later in the line buffer RAM */
 			bg_tempcol = prom1[(bg_last_col << 4) | bg_col];
 			bitmap.pix32(y, x + 0) = tx_col1 | prom2[(background_line_buffer[x + 0] << 4) | bg_tempcol];
 			bitmap.pix32(y, x + 1) = tx_col2 | prom2[(background_line_buffer[x + 1] << 4) | bg_col];
@@ -249,9 +249,9 @@ static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_rgb
 
 		/* shuffle the bank bits in */
 		UINT16 code = spriteram[offs] |
-					  ((spriteram[offs + 0x40] & 0x04) << 8) |
-					  ((spriteram[offs + 0x40] & 0x40) << 3) |
-					  ((spriteram[offs + 0x40] & 0x02) << 7);
+						((spriteram[offs + 0x40] & 0x04) << 8) |
+						((spriteram[offs + 0x40] & 0x40) << 3) |
+						((spriteram[offs + 0x40] & 0x02) << 7);
 
 		/* adjust for double-height */
 		if (tall)
@@ -333,7 +333,7 @@ UINT32 jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitma
 	else
 	{
 		/* draw the background/text layers, followed by the sprites
-           - it needs to be done in this order*/
+		   - it needs to be done in this order*/
 		draw_background_and_text(machine(), this, bitmap, cliprect);
 		draw_sprites(machine(), this, bitmap, cliprect);
 		do_pen_lookup(this, bitmap, cliprect);

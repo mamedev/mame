@@ -22,20 +22,20 @@
 CPU_DISASSEMBLE( arm );
 CPU_DISASSEMBLE( arm_be );
 
-#define READ8(addr)			cpu_read8(cpustate,addr)
-#define WRITE8(addr,data)	cpu_write8(cpustate,addr,data)
-#define READ32(addr)		cpu_read32(cpustate,addr)
-#define WRITE32(addr,data)	cpu_write32(cpustate,addr,data)
+#define READ8(addr)         cpu_read8(cpustate,addr)
+#define WRITE8(addr,data)   cpu_write8(cpustate,addr,data)
+#define READ32(addr)        cpu_read32(cpustate,addr)
+#define WRITE32(addr,data)  cpu_write32(cpustate,addr,data)
 
 #define ARM_DEBUG_CORE 0
 #define ARM_DEBUG_COPRO 0
 
 enum
 {
-	eARM_MODE_USER	= 0x0,
-	eARM_MODE_FIQ	= 0x1,
-	eARM_MODE_IRQ	= 0x2,
-	eARM_MODE_SVC	= 0x3,
+	eARM_MODE_USER  = 0x0,
+	eARM_MODE_FIQ   = 0x1,
+	eARM_MODE_IRQ   = 0x2,
+	eARM_MODE_SVC   = 0x3,
 
 	kNumModes
 };
@@ -92,88 +92,88 @@ static const int sRegisterTable[kNumModes][16] =
 	}
 };
 
-#define N_BIT	31
-#define Z_BIT	30
-#define C_BIT	29
-#define V_BIT	28
-#define I_BIT	27
-#define F_BIT	26
+#define N_BIT   31
+#define Z_BIT   30
+#define C_BIT   29
+#define V_BIT   28
+#define I_BIT   27
+#define F_BIT   26
 
-#define N_MASK	((UINT32)(1<<N_BIT)) /* Negative flag */
-#define Z_MASK	((UINT32)(1<<Z_BIT)) /* Zero flag */
-#define C_MASK	((UINT32)(1<<C_BIT)) /* Carry flag */
-#define V_MASK	((UINT32)(1<<V_BIT)) /* oVerflow flag */
-#define I_MASK	((UINT32)(1<<I_BIT)) /* Interrupt request disable */
-#define F_MASK	((UINT32)(1<<F_BIT)) /* Fast interrupt request disable */
+#define N_MASK  ((UINT32)(1<<N_BIT)) /* Negative flag */
+#define Z_MASK  ((UINT32)(1<<Z_BIT)) /* Zero flag */
+#define C_MASK  ((UINT32)(1<<C_BIT)) /* Carry flag */
+#define V_MASK  ((UINT32)(1<<V_BIT)) /* oVerflow flag */
+#define I_MASK  ((UINT32)(1<<I_BIT)) /* Interrupt request disable */
+#define F_MASK  ((UINT32)(1<<F_BIT)) /* Fast interrupt request disable */
 
-#define N_IS_SET(pc)	((pc) & N_MASK)
-#define Z_IS_SET(pc)	((pc) & Z_MASK)
-#define C_IS_SET(pc)	((pc) & C_MASK)
-#define V_IS_SET(pc)	((pc) & V_MASK)
-#define I_IS_SET(pc)	((pc) & I_MASK)
-#define F_IS_SET(pc)	((pc) & F_MASK)
+#define N_IS_SET(pc)    ((pc) & N_MASK)
+#define Z_IS_SET(pc)    ((pc) & Z_MASK)
+#define C_IS_SET(pc)    ((pc) & C_MASK)
+#define V_IS_SET(pc)    ((pc) & V_MASK)
+#define I_IS_SET(pc)    ((pc) & I_MASK)
+#define F_IS_SET(pc)    ((pc) & F_MASK)
 
-#define N_IS_CLEAR(pc)	(!N_IS_SET(pc))
-#define Z_IS_CLEAR(pc)	(!Z_IS_SET(pc))
-#define C_IS_CLEAR(pc)	(!C_IS_SET(pc))
-#define V_IS_CLEAR(pc)	(!V_IS_SET(pc))
-#define I_IS_CLEAR(pc)	(!I_IS_SET(pc))
-#define F_IS_CLEAR(pc)	(!F_IS_SET(pc))
+#define N_IS_CLEAR(pc)  (!N_IS_SET(pc))
+#define Z_IS_CLEAR(pc)  (!Z_IS_SET(pc))
+#define C_IS_CLEAR(pc)  (!C_IS_SET(pc))
+#define V_IS_CLEAR(pc)  (!V_IS_SET(pc))
+#define I_IS_CLEAR(pc)  (!I_IS_SET(pc))
+#define F_IS_CLEAR(pc)  (!F_IS_SET(pc))
 
-#define PSR_MASK		((UINT32) 0xf0000000u)
-#define IRQ_MASK		((UINT32) 0x0c000000u)
-#define ADDRESS_MASK	((UINT32) 0x03fffffcu)
-#define MODE_MASK		((UINT32) 0x00000003u)
+#define PSR_MASK        ((UINT32) 0xf0000000u)
+#define IRQ_MASK        ((UINT32) 0x0c000000u)
+#define ADDRESS_MASK    ((UINT32) 0x03fffffcu)
+#define MODE_MASK       ((UINT32) 0x00000003u)
 
-#define R15						cpustate->sArmRegister[eR15]
-#define MODE					(R15&0x03)
-#define SIGN_BIT				((UINT32)(1<<31))
-#define SIGN_BITS_DIFFER(a,b)	(((a)^(b)) >> 31)
+#define R15                     cpustate->sArmRegister[eR15]
+#define MODE                    (R15&0x03)
+#define SIGN_BIT                ((UINT32)(1<<31))
+#define SIGN_BITS_DIFFER(a,b)   (((a)^(b)) >> 31)
 
 /* Deconstructing an instruction */
 
-#define INSN_COND			((UINT32) 0xf0000000u)
-#define INSN_SDT_L			((UINT32) 0x00100000u)
-#define INSN_SDT_W			((UINT32) 0x00200000u)
-#define INSN_SDT_B			((UINT32) 0x00400000u)
-#define INSN_SDT_U			((UINT32) 0x00800000u)
-#define INSN_SDT_P			((UINT32) 0x01000000u)
-#define INSN_BDT_L			((UINT32) 0x00100000u)
-#define INSN_BDT_W			((UINT32) 0x00200000u)
-#define INSN_BDT_S			((UINT32) 0x00400000u)
-#define INSN_BDT_U			((UINT32) 0x00800000u)
-#define INSN_BDT_P			((UINT32) 0x01000000u)
-#define INSN_BDT_REGS		((UINT32) 0x0000ffffu)
-#define INSN_SDT_IMM		((UINT32) 0x00000fffu)
-#define INSN_MUL_A			((UINT32) 0x00200000u)
-#define INSN_MUL_RM			((UINT32) 0x0000000fu)
-#define INSN_MUL_RS			((UINT32) 0x00000f00u)
-#define INSN_MUL_RN			((UINT32) 0x0000f000u)
-#define INSN_MUL_RD			((UINT32) 0x000f0000u)
-#define INSN_I				((UINT32) 0x02000000u)
-#define INSN_OPCODE			((UINT32) 0x01e00000u)
-#define INSN_S				((UINT32) 0x00100000u)
-#define INSN_BL				((UINT32) 0x01000000u)
-#define INSN_BRANCH			((UINT32) 0x00ffffffu)
-#define INSN_SWI			((UINT32) 0x00ffffffu)
-#define INSN_RN				((UINT32) 0x000f0000u)
-#define INSN_RD				((UINT32) 0x0000f000u)
-#define INSN_OP2			((UINT32) 0x00000fffu)
-#define INSN_OP2_SHIFT		((UINT32) 0x00000f80u)
-#define INSN_OP2_SHIFT_TYPE	((UINT32) 0x00000070u)
-#define INSN_OP2_RM			((UINT32) 0x0000000fu)
-#define INSN_OP2_ROTATE		((UINT32) 0x00000f00u)
-#define INSN_OP2_IMM		((UINT32) 0x000000ffu)
-#define INSN_OP2_SHIFT_TYPE_SHIFT	4
-#define INSN_OP2_SHIFT_SHIFT		7
-#define INSN_OP2_ROTATE_SHIFT		8
-#define INSN_MUL_RS_SHIFT			8
-#define INSN_MUL_RN_SHIFT			12
-#define INSN_MUL_RD_SHIFT			16
-#define INSN_OPCODE_SHIFT			21
-#define INSN_RN_SHIFT				16
-#define INSN_RD_SHIFT				12
-#define INSN_COND_SHIFT				28
+#define INSN_COND           ((UINT32) 0xf0000000u)
+#define INSN_SDT_L          ((UINT32) 0x00100000u)
+#define INSN_SDT_W          ((UINT32) 0x00200000u)
+#define INSN_SDT_B          ((UINT32) 0x00400000u)
+#define INSN_SDT_U          ((UINT32) 0x00800000u)
+#define INSN_SDT_P          ((UINT32) 0x01000000u)
+#define INSN_BDT_L          ((UINT32) 0x00100000u)
+#define INSN_BDT_W          ((UINT32) 0x00200000u)
+#define INSN_BDT_S          ((UINT32) 0x00400000u)
+#define INSN_BDT_U          ((UINT32) 0x00800000u)
+#define INSN_BDT_P          ((UINT32) 0x01000000u)
+#define INSN_BDT_REGS       ((UINT32) 0x0000ffffu)
+#define INSN_SDT_IMM        ((UINT32) 0x00000fffu)
+#define INSN_MUL_A          ((UINT32) 0x00200000u)
+#define INSN_MUL_RM         ((UINT32) 0x0000000fu)
+#define INSN_MUL_RS         ((UINT32) 0x00000f00u)
+#define INSN_MUL_RN         ((UINT32) 0x0000f000u)
+#define INSN_MUL_RD         ((UINT32) 0x000f0000u)
+#define INSN_I              ((UINT32) 0x02000000u)
+#define INSN_OPCODE         ((UINT32) 0x01e00000u)
+#define INSN_S              ((UINT32) 0x00100000u)
+#define INSN_BL             ((UINT32) 0x01000000u)
+#define INSN_BRANCH         ((UINT32) 0x00ffffffu)
+#define INSN_SWI            ((UINT32) 0x00ffffffu)
+#define INSN_RN             ((UINT32) 0x000f0000u)
+#define INSN_RD             ((UINT32) 0x0000f000u)
+#define INSN_OP2            ((UINT32) 0x00000fffu)
+#define INSN_OP2_SHIFT      ((UINT32) 0x00000f80u)
+#define INSN_OP2_SHIFT_TYPE ((UINT32) 0x00000070u)
+#define INSN_OP2_RM         ((UINT32) 0x0000000fu)
+#define INSN_OP2_ROTATE     ((UINT32) 0x00000f00u)
+#define INSN_OP2_IMM        ((UINT32) 0x000000ffu)
+#define INSN_OP2_SHIFT_TYPE_SHIFT   4
+#define INSN_OP2_SHIFT_SHIFT        7
+#define INSN_OP2_ROTATE_SHIFT       8
+#define INSN_MUL_RS_SHIFT           8
+#define INSN_MUL_RN_SHIFT           12
+#define INSN_MUL_RD_SHIFT           16
+#define INSN_OPCODE_SHIFT           21
+#define INSN_RN_SHIFT               16
+#define INSN_RD_SHIFT               12
+#define INSN_COND_SHIFT             28
 
 #define S_CYCLE 1
 #define N_CYCLE 1
@@ -181,42 +181,42 @@ static const int sRegisterTable[kNumModes][16] =
 
 enum
 {
-	OPCODE_AND,	/* 0000 */
-	OPCODE_EOR,	/* 0001 */
-	OPCODE_SUB,	/* 0010 */
-	OPCODE_RSB,	/* 0011 */
-	OPCODE_ADD,	/* 0100 */
-	OPCODE_ADC,	/* 0101 */
-	OPCODE_SBC,	/* 0110 */
-	OPCODE_RSC,	/* 0111 */
-	OPCODE_TST,	/* 1000 */
-	OPCODE_TEQ,	/* 1001 */
-	OPCODE_CMP,	/* 1010 */
-	OPCODE_CMN,	/* 1011 */
-	OPCODE_ORR,	/* 1100 */
-	OPCODE_MOV,	/* 1101 */
-	OPCODE_BIC,	/* 1110 */
-	OPCODE_MVN	/* 1111 */
+	OPCODE_AND, /* 0000 */
+	OPCODE_EOR, /* 0001 */
+	OPCODE_SUB, /* 0010 */
+	OPCODE_RSB, /* 0011 */
+	OPCODE_ADD, /* 0100 */
+	OPCODE_ADC, /* 0101 */
+	OPCODE_SBC, /* 0110 */
+	OPCODE_RSC, /* 0111 */
+	OPCODE_TST, /* 1000 */
+	OPCODE_TEQ, /* 1001 */
+	OPCODE_CMP, /* 1010 */
+	OPCODE_CMN, /* 1011 */
+	OPCODE_ORR, /* 1100 */
+	OPCODE_MOV, /* 1101 */
+	OPCODE_BIC, /* 1110 */
+	OPCODE_MVN  /* 1111 */
 };
 
 enum
 {
-	COND_EQ = 0,	/* Z: equal */
-	COND_NE,		/* ~Z: not equal */
-	COND_CS, COND_HS = 2,	/* C: unsigned higher or same */
-	COND_CC, COND_LO = 3,	/* ~C: unsigned lower */
-	COND_MI,		/* N: negative */
-	COND_PL,		/* ~N: positive or zero */
-	COND_VS,		/* V: overflow */
-	COND_VC,		/* ~V: no overflow */
-	COND_HI,		/* C && ~Z: unsigned higher */
-	COND_LS,		/* ~C || Z: unsigned lower or same */
-	COND_GE,		/* N == V: greater or equal */
-	COND_LT,		/* N != V: less than */
-	COND_GT,		/* ~Z && (N == V): greater than */
-	COND_LE,		/* Z || (N != V): less than or equal */
-	COND_AL,		/* always */
-	COND_NV			/* never */
+	COND_EQ = 0,    /* Z: equal */
+	COND_NE,        /* ~Z: not equal */
+	COND_CS, COND_HS = 2,   /* C: unsigned higher or same */
+	COND_CC, COND_LO = 3,   /* ~C: unsigned lower */
+	COND_MI,        /* N: negative */
+	COND_PL,        /* ~N: positive or zero */
+	COND_VS,        /* V: overflow */
+	COND_VC,        /* ~V: no overflow */
+	COND_HI,        /* C && ~Z: unsigned higher */
+	COND_LS,        /* ~C || Z: unsigned lower or same */
+	COND_GE,        /* N == V: greater or equal */
+	COND_LT,        /* N != V: less than */
+	COND_GT,        /* ~Z && (N == V): greater than */
+	COND_LE,        /* Z || (N != V): less than or equal */
+	COND_AL,        /* always */
+	COND_NV         /* never */
 };
 
 #define LSL(v,s) ((v) << (s))
@@ -419,7 +419,7 @@ static CPU_EXECUTE( arm )
 			goto L_Next;
 		}
 		/* Condition satisfied, so decode the instruction */
-		if ((insn & 0x0fc000f0u) == 0x00000090u)	/* Multiplication */
+		if ((insn & 0x0fc000f0u) == 0x00000090u)    /* Multiplication */
 		{
 			HandleMul(cpustate, insn);
 			R15 += 4;
@@ -438,20 +438,20 @@ static CPU_EXECUTE( arm )
 			HandleMemBlock(cpustate, insn);
 			R15 += 4;
 		}
-		else if ((insn & 0x0e000000u) == 0x0a000000u)	/* Branch */
+		else if ((insn & 0x0e000000u) == 0x0a000000u)   /* Branch */
 		{
 			HandleBranch(cpustate, insn);
 		}
-		else if ((insn & 0x0f000000u) == 0x0e000000u)	/* Coprocessor */
+		else if ((insn & 0x0f000000u) == 0x0e000000u)   /* Coprocessor */
 		{
 			HandleCoPro(cpustate, insn);
 			R15 += 4;
 		}
-		else if ((insn & 0x0f000000u) == 0x0f000000u)	/* Software interrupt */
+		else if ((insn & 0x0f000000u) == 0x0f000000u)   /* Software interrupt */
 		{
 			pc=R15+4;
-			R15 = eARM_MODE_SVC;	/* Set SVC mode so PC is saved to correct R14 bank */
-			SetRegister( cpustate, 14, pc );	/* save PC */
+			R15 = eARM_MODE_SVC;    /* Set SVC mode so PC is saved to correct R14 bank */
+			SetRegister( cpustate, 14, pc );    /* save PC */
 			R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x8|eARM_MODE_SVC|I_MASK|(pc&MODE_MASK);
 			cpustate->icount -= 2 * S_CYCLE + N_CYCLE;
 		}
@@ -475,25 +475,25 @@ static void arm_check_irq_state(ARM_REGS* cpustate)
 
 	/* Exception priorities (from ARM6, not specifically ARM2/3):
 
-        Reset
-        Data abort
-        FIRQ
-        IRQ
-        Prefetch abort
-        Undefined instruction
-    */
+	    Reset
+	    Data abort
+	    FIRQ
+	    IRQ
+	    Prefetch abort
+	    Undefined instruction
+	*/
 
 	if (cpustate->pendingFiq && (pc&F_MASK)==0) {
-		R15 = eARM_MODE_FIQ;	/* Set FIQ mode so PC is saved to correct R14 bank */
-		SetRegister( cpustate, 14, pc );	/* save PC */
+		R15 = eARM_MODE_FIQ;    /* Set FIQ mode so PC is saved to correct R14 bank */
+		SetRegister( cpustate, 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
 		cpustate->pendingFiq=0;
 		return;
 	}
 
 	if (cpustate->pendingIrq && (pc&I_MASK)==0) {
-		R15 = eARM_MODE_IRQ;	/* Set IRQ mode so PC is saved to correct R14 bank */
-		SetRegister( cpustate, 14, pc );	/* save PC */
+		R15 = eARM_MODE_IRQ;    /* Set IRQ mode so PC is saved to correct R14 bank */
+		SetRegister( cpustate, 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
 		cpustate->pendingIrq=0;
 		return;
@@ -658,13 +658,13 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 				R15 = (READ32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
 
 				/*
-                The docs are explicit in that the bottom bits should be masked off
-                when writing to R15 in this way, however World Cup Volleyball 95 has
-                an example of an unaligned jump (bottom bits = 2) where execution
-                should definitely continue from the rounded up address.
+				The docs are explicit in that the bottom bits should be masked off
+				when writing to R15 in this way, however World Cup Volleyball 95 has
+				an example of an unaligned jump (bottom bits = 2) where execution
+				should definitely continue from the rounded up address.
 
-                In other cases, 4 is subracted from R15 here to account for pipelining.
-                */
+				In other cases, 4 is subracted from R15 here to account for pipelining.
+				*/
 				if ((READ32(rnv)&3)==0)
 					R15 -= 4;
 
@@ -702,7 +702,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		if (insn & INSN_SDT_U)
 		{
 			/* Writeback is applied in pipeline, before value is read from mem,
-                so writeback is effectively ignored */
+			    so writeback is effectively ignored */
 			if (rd==rn) {
 				SetRegister(cpustate, rn,GetRegister(cpustate, rd));
 			}
@@ -717,7 +717,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		else
 		{
 			/* Writeback is applied in pipeline, before value is read from mem,
-                so writeback is effectively ignored */
+			    so writeback is effectively ignored */
 			if (rd==rn) {
 				SetRegister(cpustate, rn,GetRegister(cpustate, rd));
 			}
@@ -737,38 +737,38 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 /* Set NZCV flags for ADDS / SUBS */
 
 #define HandleALUAddFlags(rd, rn, op2) \
-  if (insn & INSN_S) \
-    R15 = \
-      ((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
-      | (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) \
-          << V_BIT) \
-      | (((~(rn)) < (op2)) << C_BIT) \
-      | HandleALUNZFlags(rd)) \
-      + 4; \
-  else R15 += 4;
+	if (insn & INSN_S) \
+	R15 = \
+		((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
+		| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) \
+			<< V_BIT) \
+		| (((~(rn)) < (op2)) << C_BIT) \
+		| HandleALUNZFlags(rd)) \
+		+ 4; \
+	else R15 += 4;
 
 #define HandleALUSubFlags(rd, rn, op2) \
-  if (insn & INSN_S) \
-    R15 = \
-      ((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
-      | ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) \
-          << V_BIT) \
-      | (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
-      | HandleALUNZFlags(rd)) \
-      + 4; \
-  else R15 += 4;
+	if (insn & INSN_S) \
+	R15 = \
+		((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
+		| ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) \
+			<< V_BIT) \
+		| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
+		| HandleALUNZFlags(rd)) \
+		+ 4; \
+	else R15 += 4;
 
 /* Set NZC flags for logical operations. */
 
 #define HandleALUNZFlags(rd) \
-  (((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
+	(((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
 
 #define HandleALULogicalFlags(rd, sc) \
-  if (insn & INSN_S) \
-    R15 = ((R15 &~ (N_MASK | Z_MASK | C_MASK)) \
-                     | HandleALUNZFlags(rd) \
-                     | (((sc) != 0) << C_BIT)) + 4; \
-  else R15 += 4;
+	if (insn & INSN_S) \
+	R15 = ((R15 &~ (N_MASK | Z_MASK | C_MASK)) \
+						| HandleALUNZFlags(rd) \
+						| (((sc) != 0) << C_BIT)) + 4; \
+	else R15 += 4;
 
 static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 {
@@ -801,7 +801,7 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 	{
 		op2 = decodeShift(cpustate, insn, (insn & INSN_S) ? &sc : NULL);
 
-        	if (!(insn & INSN_S))
+			if (!(insn & INSN_S))
 			sc=0;
 	}
 
@@ -814,7 +814,7 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 				logerror("%08x:  Pipelined R15 (Shift %d)\n",R15,(insn&INSN_I?8:insn&0x10u?12:12));
 
 			/* Docs strongly suggest the mode bits should be included here, but it breaks Captain
-            America, as it starts doing unaligned reads */
+			America, as it starts doing unaligned reads */
 			rn=(R15+8)&ADDRESS_MASK;
 		}
 		else
@@ -927,8 +927,8 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 		else
 		{
 			// combine the flags from rd with the address from R15
-			rd &= ~ADDRESS_MASK;	// clear address part of RD
-			rd |= (R15 & ADDRESS_MASK);	// RD = address part of R15
+			rd &= ~ADDRESS_MASK;    // clear address part of RD
+			rd |= (R15 & ADDRESS_MASK); // RD = address part of R15
 			SetRegister(cpustate, rdn,(rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
 		}
 		cpustate->icount -= S_CYCLE + N_CYCLE;
@@ -941,28 +941,28 @@ static void HandleMul( ARM_REGS* cpustate, UINT32 insn)
 
 	cpustate->icount -= S_CYCLE + I_CYCLE;
 	/* should be:
-            Range of Rs            Number of cycles
+	        Range of Rs            Number of cycles
 
-               &0 -- &1            1S + 1I
-               &2 -- &7            1S + 2I
-               &8 -- &1F           1S + 3I
-              &20 -- &7F           1S + 4I
-              &80 -- &1FF          1S + 5I
-             &200 -- &7FF          1S + 6I
-             &800 -- &1FFF         1S + 7I
-            &2000 -- &7FFF         1S + 8I
-            &8000 -- &1FFFF        1S + 9I
-           &20000 -- &7FFFF        1S + 10I
-           &80000 -- &1FFFFF       1S + 11I
-          &200000 -- &7FFFFF       1S + 12I
-          &800000 -- &1FFFFFF      1S + 13I
-         &2000000 -- &7FFFFFF      1S + 14I
-         &8000000 -- &1FFFFFFF     1S + 15I
-        &20000000 -- &FFFFFFFF     1S + 16I
-  */
+	           &0 -- &1            1S + 1I
+	           &2 -- &7            1S + 2I
+	           &8 -- &1F           1S + 3I
+	          &20 -- &7F           1S + 4I
+	          &80 -- &1FF          1S + 5I
+	         &200 -- &7FF          1S + 6I
+	         &800 -- &1FFF         1S + 7I
+	        &2000 -- &7FFF         1S + 8I
+	        &8000 -- &1FFFF        1S + 9I
+	       &20000 -- &7FFFF        1S + 10I
+	       &80000 -- &1FFFFF       1S + 11I
+	      &200000 -- &7FFFFF       1S + 12I
+	      &800000 -- &1FFFFFF      1S + 13I
+	     &2000000 -- &7FFFFFF      1S + 14I
+	     &8000000 -- &1FFFFFFF     1S + 15I
+	    &20000000 -- &FFFFFFFF     1S + 16I
+	*/
 
 	/* Do the basic multiply of Rm and Rs */
-	r =	GetRegister( cpustate, insn&INSN_MUL_RM ) *
+	r = GetRegister( cpustate, insn&INSN_MUL_RM ) *
 		GetRegister( cpustate, (insn&INSN_MUL_RS)>>INSN_MUL_RS_SHIFT );
 
 	if (ARM_DEBUG_CORE && ((insn&INSN_MUL_RM)==0xf
@@ -1101,15 +1101,15 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 			if (insn & INSN_BDT_W)
 			{
 				/* Arm docs notes: The base register can always be loaded without any problems.
-                However, don't specify writeback if the base register is being loaded -
-                you can't end up with both a written-back value and a loaded value in the base register!
+				However, don't specify writeback if the base register is being loaded -
+				you can't end up with both a written-back value and a loaded value in the base register!
 
-                However - Fighter's History does exactly that at 0x121e4 (LDMUW [R13], { R13-R15 })!
+				However - Fighter's History does exactly that at 0x121e4 (LDMUW [R13], { R13-R15 })!
 
-                This emulator implementation skips applying writeback in this case, which is confirmed
-                correct for this situation, but that is not necessarily true for all ARM hardware
-                implementations (the results are officially undefined).
-                */
+				This emulator implementation skips applying writeback in this case, which is confirmed
+				correct for this situation, but that is not necessarily true for all ARM hardware
+				implementations (the results are officially undefined).
+				*/
 
 				if (ARM_DEBUG_CORE && rb==15)
 					logerror("%08x:  Illegal LDRM writeback to r15\n",R15);
@@ -1157,11 +1157,11 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 	{
 		/* Storing
 
-            ARM docs notes: Storing a list of registers including the base register using writeback
-            will write the value of the base register before writeback to memory only if the base
-            register is the first in the list. Otherwise, the value which is used is not defined.
+		    ARM docs notes: Storing a list of registers including the base register using writeback
+		    will write the value of the base register before writeback to memory only if the base
+		    register is the first in the list. Otherwise, the value which is used is not defined.
 
-        */
+		*/
 		if (insn & (1<<eR15))
 		{
 			if (ARM_DEBUG_CORE)
@@ -1211,13 +1211,13 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
  */
 static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 {
-	UINT32 k	= (insn & INSN_OP2_SHIFT) >> INSN_OP2_SHIFT_SHIFT;
-	UINT32 rm	= GetRegister( cpustate, insn & INSN_OP2_RM );
-	UINT32 t	= (insn & INSN_OP2_SHIFT_TYPE) >> INSN_OP2_SHIFT_TYPE_SHIFT;
+	UINT32 k    = (insn & INSN_OP2_SHIFT) >> INSN_OP2_SHIFT_SHIFT;
+	UINT32 rm   = GetRegister( cpustate, insn & INSN_OP2_RM );
+	UINT32 t    = (insn & INSN_OP2_SHIFT_TYPE) >> INSN_OP2_SHIFT_TYPE_SHIFT;
 
 	if ((insn & INSN_OP2_RM)==0xf) {
 		/* If hardwired shift, then PC is 8 bytes ahead, else if register shift
-        is used, then 12 bytes - TODO?? */
+		is used, then 12 bytes - TODO?? */
 		rm+=8;
 	}
 
@@ -1241,14 +1241,14 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 	/* Decode the shift type and perform the shift */
 	switch (t >> 1)
 	{
-	case 0:						/* LSL */
+	case 0:                     /* LSL */
 		if (pCarry)
 		{
 			*pCarry = k ? (rm & (1 << (32 - k))) : (R15 & C_MASK);
 		}
 		return k ? LSL(rm, k) : rm;
 
-	case 1:			    			/* LSR */
+	case 1:                         /* LSR */
 		if (k == 0 || k == 32)
 		{
 			if (pCarry) *pCarry = rm & SIGN_BIT;
@@ -1266,7 +1266,7 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 		}
 		break;
 
-	case 2:						/* ASR */
+	case 2:                     /* ASR */
 		if (k == 0 || k > 32)
 			k = 32;
 		if (pCarry) *pCarry = (rm & (1 << (k - 1)));
@@ -1281,7 +1281,7 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 		}
 		break;
 
-	case 3:						/* ROR and RRX */
+	case 3:                     /* ROR and RRX */
 		if (k)
 		{
 			while (k > 32) k -= 32;
@@ -1303,9 +1303,9 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 
 static UINT32 BCDToDecimal(UINT32 value)
 {
-	UINT32	accumulator = 0;
-	UINT32	multiplier = 1;
-	int		i;
+	UINT32  accumulator = 0;
+	UINT32  multiplier = 1;
+	int     i;
 
 	for(i = 0; i < 8; i++)
 	{
@@ -1320,13 +1320,13 @@ static UINT32 BCDToDecimal(UINT32 value)
 
 static UINT32 DecimalToBCD(UINT32 value)
 {
-	UINT32	accumulator = 0;
-	UINT32	divisor = 10;
-	int		i;
+	UINT32  accumulator = 0;
+	UINT32  divisor = 10;
+	int     i;
 
 	for(i = 0; i < 8; i++)
 	{
-		UINT32	temp;
+		UINT32  temp;
 
 		temp = value % divisor;
 		value -= temp;
@@ -1445,40 +1445,40 @@ static CPU_SET_INFO( arm )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:	set_irq_line(cpustate, ARM_IRQ_LINE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:	set_irq_line(cpustate, ARM_FIRQ_LINE, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:    set_irq_line(cpustate, ARM_IRQ_LINE, info->i);  break;
+		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:   set_irq_line(cpustate, ARM_FIRQ_LINE, info->i); break;
 
-		case CPUINFO_INT_REGISTER + ARM32_R0:	cpustate->sArmRegister[ 0]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R1:	cpustate->sArmRegister[ 1]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R2:	cpustate->sArmRegister[ 2]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R3:	cpustate->sArmRegister[ 3]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R4:	cpustate->sArmRegister[ 4]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R5:	cpustate->sArmRegister[ 5]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R6:	cpustate->sArmRegister[ 6]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R7:	cpustate->sArmRegister[ 7]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R8:	cpustate->sArmRegister[ 8]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R9:	cpustate->sArmRegister[ 9]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R10:	cpustate->sArmRegister[10]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R11:	cpustate->sArmRegister[11]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R12:	cpustate->sArmRegister[12]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R13:	cpustate->sArmRegister[13]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R14:	cpustate->sArmRegister[14]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_R15:	cpustate->sArmRegister[15]= info->i;					break;
-		case CPUINFO_INT_REGISTER + ARM32_FR8:	cpustate->sArmRegister[eR8_FIQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_FR9:	cpustate->sArmRegister[eR9_FIQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_FR10:	cpustate->sArmRegister[eR10_FIQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_FR11:	cpustate->sArmRegister[eR11_FIQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_FR12:	cpustate->sArmRegister[eR12_FIQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_FR13:	cpustate->sArmRegister[eR13_FIQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_FR14:	cpustate->sArmRegister[eR14_FIQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_IR13:	cpustate->sArmRegister[eR13_IRQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_IR14:	cpustate->sArmRegister[eR14_IRQ] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_SR13:	cpustate->sArmRegister[eR13_SVC] = info->i;			break;
-		case CPUINFO_INT_REGISTER + ARM32_SR14:	cpustate->sArmRegister[eR14_SVC] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ARM32_R0:   cpustate->sArmRegister[ 0]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R1:   cpustate->sArmRegister[ 1]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R2:   cpustate->sArmRegister[ 2]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R3:   cpustate->sArmRegister[ 3]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R4:   cpustate->sArmRegister[ 4]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R5:   cpustate->sArmRegister[ 5]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R6:   cpustate->sArmRegister[ 6]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R7:   cpustate->sArmRegister[ 7]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R8:   cpustate->sArmRegister[ 8]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R9:   cpustate->sArmRegister[ 9]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R10:  cpustate->sArmRegister[10]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R11:  cpustate->sArmRegister[11]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R12:  cpustate->sArmRegister[12]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R13:  cpustate->sArmRegister[13]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R14:  cpustate->sArmRegister[14]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_R15:  cpustate->sArmRegister[15]= info->i;                    break;
+		case CPUINFO_INT_REGISTER + ARM32_FR8:  cpustate->sArmRegister[eR8_FIQ] = info->i;          break;
+		case CPUINFO_INT_REGISTER + ARM32_FR9:  cpustate->sArmRegister[eR9_FIQ] = info->i;          break;
+		case CPUINFO_INT_REGISTER + ARM32_FR10: cpustate->sArmRegister[eR10_FIQ] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_FR11: cpustate->sArmRegister[eR11_FIQ] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_FR12: cpustate->sArmRegister[eR12_FIQ] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_FR13: cpustate->sArmRegister[eR13_FIQ] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_FR14: cpustate->sArmRegister[eR14_FIQ] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_IR13: cpustate->sArmRegister[eR13_IRQ] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_IR14: cpustate->sArmRegister[eR14_IRQ] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_SR13: cpustate->sArmRegister[eR13_SVC] = info->i;         break;
+		case CPUINFO_INT_REGISTER + ARM32_SR14: cpustate->sArmRegister[eR14_SVC] = info->i;         break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ARM32_PC:	R15 = (R15&~ADDRESS_MASK)|info->i;				break;
-		case CPUINFO_INT_SP:					SetRegister(cpustate,13,info->i);						break;
+		case CPUINFO_INT_REGISTER + ARM32_PC:   R15 = (R15&~ADDRESS_MASK)|info->i;              break;
+		case CPUINFO_INT_SP:                    SetRegister(cpustate,13,info->i);                       break;
 	}
 }
 
@@ -1495,80 +1495,80 @@ CPU_GET_INFO( arm )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(ARM_REGS);				break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 3;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(ARM_REGS);             break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 2;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 3;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 26;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 26;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:	info->i = cpustate->pendingIrq;			break;
-		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:	info->i = cpustate->pendingFiq;			break;
+		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:    info->i = cpustate->pendingIrq;         break;
+		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:   info->i = cpustate->pendingFiq;         break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = 0;	/* not implemented */	break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = 0;    /* not implemented */   break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ARM32_PC:			info->i = cpustate->sArmRegister[15]&ADDRESS_MASK; break;
-		case CPUINFO_INT_SP:							info->i = GetRegister(cpustate, 13);	break;
+		case CPUINFO_INT_REGISTER + ARM32_PC:           info->i = cpustate->sArmRegister[15]&ADDRESS_MASK; break;
+		case CPUINFO_INT_SP:                            info->i = GetRegister(cpustate, 13);    break;
 
-		case CPUINFO_INT_REGISTER + ARM32_R0:			info->i = cpustate->sArmRegister[ 0];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R1:			info->i = cpustate->sArmRegister[ 1];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R2:			info->i = cpustate->sArmRegister[ 2];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R3:			info->i = cpustate->sArmRegister[ 3];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R4:			info->i = cpustate->sArmRegister[ 4];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R5:			info->i = cpustate->sArmRegister[ 5];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R6:			info->i = cpustate->sArmRegister[ 6];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R7:			info->i = cpustate->sArmRegister[ 7];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R8:			info->i = cpustate->sArmRegister[ 8];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R9:			info->i = cpustate->sArmRegister[ 9];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R10:			info->i = cpustate->sArmRegister[10];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R11:			info->i = cpustate->sArmRegister[11];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R12:			info->i = cpustate->sArmRegister[12];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R13:			info->i = cpustate->sArmRegister[13];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R14:			info->i = cpustate->sArmRegister[14];	break;
-		case CPUINFO_INT_REGISTER + ARM32_R15:			info->i = cpustate->sArmRegister[15];	break;
+		case CPUINFO_INT_REGISTER + ARM32_R0:           info->i = cpustate->sArmRegister[ 0];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R1:           info->i = cpustate->sArmRegister[ 1];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R2:           info->i = cpustate->sArmRegister[ 2];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R3:           info->i = cpustate->sArmRegister[ 3];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R4:           info->i = cpustate->sArmRegister[ 4];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R5:           info->i = cpustate->sArmRegister[ 5];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R6:           info->i = cpustate->sArmRegister[ 6];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R7:           info->i = cpustate->sArmRegister[ 7];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R8:           info->i = cpustate->sArmRegister[ 8];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R9:           info->i = cpustate->sArmRegister[ 9];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R10:          info->i = cpustate->sArmRegister[10];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R11:          info->i = cpustate->sArmRegister[11];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R12:          info->i = cpustate->sArmRegister[12];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R13:          info->i = cpustate->sArmRegister[13];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R14:          info->i = cpustate->sArmRegister[14];   break;
+		case CPUINFO_INT_REGISTER + ARM32_R15:          info->i = cpustate->sArmRegister[15];   break;
 
-		case CPUINFO_INT_REGISTER + ARM32_FR8:			info->i = cpustate->sArmRegister[eR8_FIQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_FR9:			info->i = cpustate->sArmRegister[eR9_FIQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_FR10:			info->i = cpustate->sArmRegister[eR10_FIQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_FR11:			info->i = cpustate->sArmRegister[eR11_FIQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_FR12:			info->i = cpustate->sArmRegister[eR12_FIQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_FR13:			info->i = cpustate->sArmRegister[eR13_FIQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_FR14:			info->i = cpustate->sArmRegister[eR14_FIQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_IR13:			info->i = cpustate->sArmRegister[eR13_IRQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_IR14:			info->i = cpustate->sArmRegister[eR14_IRQ];	break;
-		case CPUINFO_INT_REGISTER + ARM32_SR13:			info->i = cpustate->sArmRegister[eR13_SVC];	break;
-		case CPUINFO_INT_REGISTER + ARM32_SR14:			info->i = cpustate->sArmRegister[eR14_SVC];	break;
+		case CPUINFO_INT_REGISTER + ARM32_FR8:          info->i = cpustate->sArmRegister[eR8_FIQ];  break;
+		case CPUINFO_INT_REGISTER + ARM32_FR9:          info->i = cpustate->sArmRegister[eR9_FIQ];  break;
+		case CPUINFO_INT_REGISTER + ARM32_FR10:         info->i = cpustate->sArmRegister[eR10_FIQ]; break;
+		case CPUINFO_INT_REGISTER + ARM32_FR11:         info->i = cpustate->sArmRegister[eR11_FIQ]; break;
+		case CPUINFO_INT_REGISTER + ARM32_FR12:         info->i = cpustate->sArmRegister[eR12_FIQ]; break;
+		case CPUINFO_INT_REGISTER + ARM32_FR13:         info->i = cpustate->sArmRegister[eR13_FIQ]; break;
+		case CPUINFO_INT_REGISTER + ARM32_FR14:         info->i = cpustate->sArmRegister[eR14_FIQ]; break;
+		case CPUINFO_INT_REGISTER + ARM32_IR13:         info->i = cpustate->sArmRegister[eR13_IRQ]; break;
+		case CPUINFO_INT_REGISTER + ARM32_IR14:         info->i = cpustate->sArmRegister[eR14_IRQ]; break;
+		case CPUINFO_INT_REGISTER + ARM32_SR13:         info->i = cpustate->sArmRegister[eR13_SVC]; break;
+		case CPUINFO_INT_REGISTER + ARM32_SR14:         info->i = cpustate->sArmRegister[eR14_SVC]; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(arm);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(arm);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(arm);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(arm);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(arm);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(arm);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(arm);         break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(arm);                break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(arm);              break;
+		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(arm);                break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(arm);          break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                              break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(arm);  break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ARM");					break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Acorn Risc Machine");	break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.3");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, bmcphail@tendril.co.uk"); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "ARM");                 break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Acorn Risc Machine");  break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.3");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Bryan McPhail, bmcphail@tendril.co.uk"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c",
@@ -1595,34 +1595,34 @@ CPU_GET_INFO( arm )
 			}
 			break;
 
-		case CPUINFO_STR_REGISTER + ARM32_PC:	sprintf( info->s, "PC  :%08x", cpustate->sArmRegister[15]&ADDRESS_MASK ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R0:	sprintf( info->s, "R0  :%08x", cpustate->sArmRegister[ 0] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R1:	sprintf( info->s, "R1  :%08x", cpustate->sArmRegister[ 1] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R2:	sprintf( info->s, "R2  :%08x", cpustate->sArmRegister[ 2] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R3:	sprintf( info->s, "R3  :%08x", cpustate->sArmRegister[ 3] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R4:	sprintf( info->s, "R4  :%08x", cpustate->sArmRegister[ 4] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R5:	sprintf( info->s, "R5  :%08x", cpustate->sArmRegister[ 5] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R6:	sprintf( info->s, "R6  :%08x", cpustate->sArmRegister[ 6] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R7:	sprintf( info->s, "R7  :%08x", cpustate->sArmRegister[ 7] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R8:	sprintf( info->s, "R8  :%08x", cpustate->sArmRegister[ 8] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R9:	sprintf( info->s, "R9  :%08x", cpustate->sArmRegister[ 9] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R10:	sprintf( info->s, "R10 :%08x", cpustate->sArmRegister[10] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R11:	sprintf( info->s, "R11 :%08x", cpustate->sArmRegister[11] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R12:	sprintf( info->s, "R12 :%08x", cpustate->sArmRegister[12] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R13:	sprintf( info->s, "R13 :%08x", cpustate->sArmRegister[13] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R14:	sprintf( info->s, "R14 :%08x", cpustate->sArmRegister[14] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R15:	sprintf( info->s, "R15 :%08x", cpustate->sArmRegister[15] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR8:	sprintf( info->s, "FR8 :%08x", cpustate->sArmRegister[eR8_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR9:	sprintf( info->s, "FR9 :%08x", cpustate->sArmRegister[eR9_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR10:	sprintf( info->s, "FR10:%08x", cpustate->sArmRegister[eR10_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR11:	sprintf( info->s, "FR11:%08x", cpustate->sArmRegister[eR11_FIQ]); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR12:	sprintf( info->s, "FR12:%08x", cpustate->sArmRegister[eR12_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR13:	sprintf( info->s, "FR13:%08x", cpustate->sArmRegister[eR13_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR14:	sprintf( info->s, "FR14:%08x", cpustate->sArmRegister[eR14_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_IR13:	sprintf( info->s, "IR13:%08x", cpustate->sArmRegister[eR13_IRQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_IR14:	sprintf( info->s, "IR14:%08x", cpustate->sArmRegister[eR14_IRQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_SR13:	sprintf( info->s, "SR13:%08x", cpustate->sArmRegister[eR13_SVC] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_SR14:	sprintf( info->s, "SR14:%08x", cpustate->sArmRegister[eR14_SVC] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_PC:   sprintf( info->s, "PC  :%08x", cpustate->sArmRegister[15]&ADDRESS_MASK ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R0:   sprintf( info->s, "R0  :%08x", cpustate->sArmRegister[ 0] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R1:   sprintf( info->s, "R1  :%08x", cpustate->sArmRegister[ 1] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R2:   sprintf( info->s, "R2  :%08x", cpustate->sArmRegister[ 2] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R3:   sprintf( info->s, "R3  :%08x", cpustate->sArmRegister[ 3] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R4:   sprintf( info->s, "R4  :%08x", cpustate->sArmRegister[ 4] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R5:   sprintf( info->s, "R5  :%08x", cpustate->sArmRegister[ 5] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R6:   sprintf( info->s, "R6  :%08x", cpustate->sArmRegister[ 6] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R7:   sprintf( info->s, "R7  :%08x", cpustate->sArmRegister[ 7] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R8:   sprintf( info->s, "R8  :%08x", cpustate->sArmRegister[ 8] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R9:   sprintf( info->s, "R9  :%08x", cpustate->sArmRegister[ 9] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R10:  sprintf( info->s, "R10 :%08x", cpustate->sArmRegister[10] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R11:  sprintf( info->s, "R11 :%08x", cpustate->sArmRegister[11] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R12:  sprintf( info->s, "R12 :%08x", cpustate->sArmRegister[12] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R13:  sprintf( info->s, "R13 :%08x", cpustate->sArmRegister[13] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R14:  sprintf( info->s, "R14 :%08x", cpustate->sArmRegister[14] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_R15:  sprintf( info->s, "R15 :%08x", cpustate->sArmRegister[15] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_FR8:  sprintf( info->s, "FR8 :%08x", cpustate->sArmRegister[eR8_FIQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_FR9:  sprintf( info->s, "FR9 :%08x", cpustate->sArmRegister[eR9_FIQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_FR10: sprintf( info->s, "FR10:%08x", cpustate->sArmRegister[eR10_FIQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_FR11: sprintf( info->s, "FR11:%08x", cpustate->sArmRegister[eR11_FIQ]); break;
+		case CPUINFO_STR_REGISTER + ARM32_FR12: sprintf( info->s, "FR12:%08x", cpustate->sArmRegister[eR12_FIQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_FR13: sprintf( info->s, "FR13:%08x", cpustate->sArmRegister[eR13_FIQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_FR14: sprintf( info->s, "FR14:%08x", cpustate->sArmRegister[eR14_FIQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_IR13: sprintf( info->s, "IR13:%08x", cpustate->sArmRegister[eR13_IRQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_IR14: sprintf( info->s, "IR14:%08x", cpustate->sArmRegister[eR14_IRQ] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_SR13: sprintf( info->s, "SR13:%08x", cpustate->sArmRegister[eR13_SVC] ); break;
+		case CPUINFO_STR_REGISTER + ARM32_SR14: sprintf( info->s, "SR14:%08x", cpustate->sArmRegister[eR14_SVC] ); break;
 	}
 }
 
@@ -1632,20 +1632,19 @@ CPU_GET_INFO( arm_be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(arm_be);					break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(arm_be);	break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(arm_be);                 break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(arm_be);   break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-        case CPUINFO_STR_NAME:							strcpy(info->s, "ARM (big endian)");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "ARM (big endian)");                break;
 
-		default:										CPU_GET_INFO_CALL(arm);								break;
+		default:                                        CPU_GET_INFO_CALL(arm);                             break;
 	}
 }
 
 
 DEFINE_LEGACY_CPU_DEVICE(ARM, arm);
 DEFINE_LEGACY_CPU_DEVICE(ARM_BE, arm_be);
-

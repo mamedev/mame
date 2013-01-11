@@ -1,18 +1,18 @@
 # deco16 - deco variant
-brk_16_imp	ora_idx		ill_non		ill_non		ill_non		ora_zpg		asl_zpg		ill_non		php_imp		ora_imm		asl_acc		u0B_zpg		ill_non		ora_aba		asl_aba		ill_non
-bpl_rel		ora_idy		ill_non		u13_zpg		ill_non		ora_zpx		asl_zpx		ill_non		clc_imp		ora_aby		ill_non		ill_non		ill_non		ora_abx		asl_abx		ill_non
-jsr_adr		and_idx		ill_non		u23_zpg		bit_zpg		and_zpg		rol_zpg		ill_non		plp_imp		and_imm		rol_acc		ill_non		bit_aba		and_aba		rol_aba		ill_non
-bmi_rel		and_idy		ill_non		ill_non		ill_non		and_zpx		rol_zpx		ill_non		sec_imp		and_aby		ill_non		ill_non		ill_non		and_abx		rol_abx		u3F_zpg
-rti_imp		eor_idx		ill_non		ill_non		ill_non		eor_zpg		lsr_zpg		ill_non		pha_imp		eor_imm		lsr_acc		u4B_zpg		jmp_adr		eor_aba		lsr_aba		ill_non
-bvc_rel		eor_idy		ill_non		ill_non		ill_non		eor_zpx		lsr_zpx		ill_non		cli_imp		eor_aby		ill_non		ill_non		ill_non		eor_abx		lsr_abx		ill_non
-rts_imp		adc_idx		ill_non		ill_non		ill_non		adc_zpg		ror_zpg		vbl_zpg		pla_imp		adc_imm		ror_acc		ill_non		jmp_ind		adc_aba		ror_aba		ill_non
-bvs_rel		adc_idy		ill_non		ill_non		ill_non		adc_zpx		ror_zpx		ill_non		sei_imp		adc_aby		ill_non		ill_non		ill_non		adc_abx		ror_abx		ill_non
-ill_non		sta_idx		ill_non		ill_non		sty_zpg		sta_zpg		stx_zpg		u87_zpg		dey_imp		ill_non		txa_imp		ill_non		sty_aba		sta_aba		stx_aba		u8F_zpg
-bcc_rel		sta_idy		ill_non		ill_non		sty_zpx		sta_zpx		stx_zpy		ill_non		tya_imp		sta_aby		txs_imp		ill_non		ill_non		sta_abx		ill_non		ill_non
-ldy_imm		lda_idx		ldx_imm		uA3_zpg		ldy_zpg		lda_zpg		ldx_zpg		ill_non		tay_imp		lda_imm		tax_imp		ill_non		ldy_aba		lda_aba		ldx_aba		ill_non
-bcs_rel		lda_idy		ill_non		ill_non		ldy_zpx		lda_zpx		ldx_zpy		ill_non		clv_imp		lda_aby		tsx_imp		uBB_zpg		ldy_abx		lda_abx		ldx_aby		ill_non
-cpy_imm		cmp_idx		ill_non		ill_non		cpy_zpg		cmp_zpg		dec_zpg		ill_non		iny_imp		cmp_imm		dex_imp		ill_non		cpy_aba		cmp_aba		dec_aba		ill_non
-bne_rel		cmp_idy		ill_non		ill_non		ill_non		cmp_zpx		dec_zpx		ill_non		cld_imp		cmp_aby		ill_non		ill_non		ill_non		cmp_abx		dec_abx		ill_non
-cpx_imm		sbc_idx		ill_non		ill_non		cpx_zpg		sbc_zpg		inc_zpg		ill_non		inx_imp		sbc_imm		nop_imp		ill_non		cpx_aba		sbc_aba		inc_aba		ill_non
-beq_rel		sbc_idy		ill_non		ill_non		ill_non		sbc_zpx		inc_zpx		ill_non		sed_imp		sbc_aby		ill_non		ill_non		ill_non		sbc_abx		inc_abx		ill_non
+brk_16_imp  ora_idx     ill_non     ill_non     ill_non     ora_zpg     asl_zpg     ill_non     php_imp     ora_imm     asl_acc     u0B_zpg     ill_non     ora_aba     asl_aba     ill_non
+bpl_rel     ora_idy     ill_non     u13_zpg     ill_non     ora_zpx     asl_zpx     ill_non     clc_imp     ora_aby     ill_non     ill_non     ill_non     ora_abx     asl_abx     ill_non
+jsr_adr     and_idx     ill_non     u23_zpg     bit_zpg     and_zpg     rol_zpg     ill_non     plp_imp     and_imm     rol_acc     ill_non     bit_aba     and_aba     rol_aba     ill_non
+bmi_rel     and_idy     ill_non     ill_non     ill_non     and_zpx     rol_zpx     ill_non     sec_imp     and_aby     ill_non     ill_non     ill_non     and_abx     rol_abx     u3F_zpg
+rti_imp     eor_idx     ill_non     ill_non     ill_non     eor_zpg     lsr_zpg     ill_non     pha_imp     eor_imm     lsr_acc     u4B_zpg     jmp_adr     eor_aba     lsr_aba     ill_non
+bvc_rel     eor_idy     ill_non     ill_non     ill_non     eor_zpx     lsr_zpx     ill_non     cli_imp     eor_aby     ill_non     ill_non     ill_non     eor_abx     lsr_abx     ill_non
+rts_imp     adc_idx     ill_non     ill_non     ill_non     adc_zpg     ror_zpg     vbl_zpg     pla_imp     adc_imm     ror_acc     ill_non     jmp_ind     adc_aba     ror_aba     ill_non
+bvs_rel     adc_idy     ill_non     ill_non     ill_non     adc_zpx     ror_zpx     ill_non     sei_imp     adc_aby     ill_non     ill_non     ill_non     adc_abx     ror_abx     ill_non
+ill_non     sta_idx     ill_non     ill_non     sty_zpg     sta_zpg     stx_zpg     u87_zpg     dey_imp     ill_non     txa_imp     ill_non     sty_aba     sta_aba     stx_aba     u8F_zpg
+bcc_rel     sta_idy     ill_non     ill_non     sty_zpx     sta_zpx     stx_zpy     ill_non     tya_imp     sta_aby     txs_imp     ill_non     ill_non     sta_abx     ill_non     ill_non
+ldy_imm     lda_idx     ldx_imm     uA3_zpg     ldy_zpg     lda_zpg     ldx_zpg     ill_non     tay_imp     lda_imm     tax_imp     ill_non     ldy_aba     lda_aba     ldx_aba     ill_non
+bcs_rel     lda_idy     ill_non     ill_non     ldy_zpx     lda_zpx     ldx_zpy     ill_non     clv_imp     lda_aby     tsx_imp     uBB_zpg     ldy_abx     lda_abx     ldx_aby     ill_non
+cpy_imm     cmp_idx     ill_non     ill_non     cpy_zpg     cmp_zpg     dec_zpg     ill_non     iny_imp     cmp_imm     dex_imp     ill_non     cpy_aba     cmp_aba     dec_aba     ill_non
+bne_rel     cmp_idy     ill_non     ill_non     ill_non     cmp_zpx     dec_zpx     ill_non     cld_imp     cmp_aby     ill_non     ill_non     ill_non     cmp_abx     dec_abx     ill_non
+cpx_imm     sbc_idx     ill_non     ill_non     cpx_zpg     sbc_zpg     inc_zpg     ill_non     inx_imp     sbc_imm     nop_imp     ill_non     cpx_aba     sbc_aba     inc_aba     ill_non
+beq_rel     sbc_idy     ill_non     ill_non     ill_non     sbc_zpx     inc_zpx     ill_non     sed_imp     sbc_aby     ill_non     ill_non     ill_non     sbc_abx     inc_abx     ill_non
 reset_16

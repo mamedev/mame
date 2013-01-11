@@ -26,7 +26,7 @@ INLINE UINT16 ADD16( minx_state *minx, UINT16 arg1, UINT16 arg2 )
 
 INLINE UINT8 ADDC8( minx_state *minx, UINT8 arg1, UINT8 arg2 )
 {
-        UINT32 res = arg1 + arg2 + ( ( minx->F & FLAG_C ) ? 1 : 0 );
+		UINT32 res = arg1 + arg2 + ( ( minx->F & FLAG_C ) ? 1 : 0 );
 	minx->F = ( minx->F & ~ ( FLAG_S | FLAG_O | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ^ 0x80 ) & ( arg2 ^ res ) & 0x80 ) ? FLAG_O : 0 )
@@ -342,21 +342,21 @@ INLINE void CALL( minx_state *minx, UINT16 arg )
 }
 
 
-#define AD1_IHL	UINT32 addr1 = ( minx->I << 16 ) | minx->HL
-#define AD1_IN8	UINT32 addr1 = ( minx->I << 16 ) | ( minx->N << 8 ) | rdop(minx)
-#define AD1_I16	UINT32 addr1 = ( minx->I << 16 ) | rdop16(minx)
-#define AD1_XIX	UINT32 addr1 = ( minx->XI << 16 ) | minx->X
-#define AD1_YIY	UINT32 addr1 = ( minx->YI << 16 ) | minx->Y
-#define AD1_X8	UINT32 addr1 = ( minx->XI << 16 ) | ( minx->X + rdop(minx) )
-#define AD1_Y8	UINT32 addr1 = ( minx->YI << 16 ) | ( minx->Y + rdop(minx) )
-#define AD1_XL	UINT32 addr1 = ( minx->XI << 16 ) | ( minx->X + ( minx->HL & 0x00FF ) )
-#define AD1_YL	UINT32 addr1 = ( minx->YI << 16 ) | ( minx->Y + ( minx->HL & 0x00FF ) )
-#define AD2_IHL	UINT32 addr2 = ( minx->I << 16 ) | minx->HL
-#define AD2_IN8	UINT32 addr2 = ( minx->I << 16 ) | ( minx->N << 8 ) | rdop(minx)
-#define AD2_I16	UINT32 addr2 = ( minx->I << 16 ) | rdop(minx); addr2 |= ( rdop(minx) << 8 )
-#define AD2_XIX	UINT32 addr2 = ( minx->XI << 16 ) | minx->X
-#define AD2_YIY	UINT32 addr2 = ( minx->YI << 16 ) | minx->Y
-#define AD2_X8	UINT32 addr2 = ( minx->XI << 16 ) | ( minx->X + rdop(minx) )
-#define AD2_Y8	UINT32 addr2 = ( minx->YI << 16 ) | ( minx->Y + rdop(minx) )
-#define AD2_XL	UINT32 addr2 = ( minx->XI << 16 ) | ( minx->X + ( minx->HL & 0x00FF ) )
-#define AD2_YL	UINT32 addr2 = ( minx->YI << 16 ) | ( minx->Y + ( minx->HL & 0x00FF ) )
+#define AD1_IHL UINT32 addr1 = ( minx->I << 16 ) | minx->HL
+#define AD1_IN8 UINT32 addr1 = ( minx->I << 16 ) | ( minx->N << 8 ) | rdop(minx)
+#define AD1_I16 UINT32 addr1 = ( minx->I << 16 ) | rdop16(minx)
+#define AD1_XIX UINT32 addr1 = ( minx->XI << 16 ) | minx->X
+#define AD1_YIY UINT32 addr1 = ( minx->YI << 16 ) | minx->Y
+#define AD1_X8  UINT32 addr1 = ( minx->XI << 16 ) | ( minx->X + rdop(minx) )
+#define AD1_Y8  UINT32 addr1 = ( minx->YI << 16 ) | ( minx->Y + rdop(minx) )
+#define AD1_XL  UINT32 addr1 = ( minx->XI << 16 ) | ( minx->X + ( minx->HL & 0x00FF ) )
+#define AD1_YL  UINT32 addr1 = ( minx->YI << 16 ) | ( minx->Y + ( minx->HL & 0x00FF ) )
+#define AD2_IHL UINT32 addr2 = ( minx->I << 16 ) | minx->HL
+#define AD2_IN8 UINT32 addr2 = ( minx->I << 16 ) | ( minx->N << 8 ) | rdop(minx)
+#define AD2_I16 UINT32 addr2 = ( minx->I << 16 ) | rdop(minx); addr2 |= ( rdop(minx) << 8 )
+#define AD2_XIX UINT32 addr2 = ( minx->XI << 16 ) | minx->X
+#define AD2_YIY UINT32 addr2 = ( minx->YI << 16 ) | minx->Y
+#define AD2_X8  UINT32 addr2 = ( minx->XI << 16 ) | ( minx->X + rdop(minx) )
+#define AD2_Y8  UINT32 addr2 = ( minx->YI << 16 ) | ( minx->Y + rdop(minx) )
+#define AD2_XL  UINT32 addr2 = ( minx->XI << 16 ) | ( minx->X + ( minx->HL & 0x00FF ) )
+#define AD2_YL  UINT32 addr2 = ( minx->YI << 16 ) | ( minx->Y + ( minx->HL & 0x00FF ) )

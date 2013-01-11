@@ -40,13 +40,13 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_VERTEX_PARAMS					6
-#define MAX_POLYGON_VERTS					32
+#define MAX_VERTEX_PARAMS                   6
+#define MAX_POLYGON_VERTS                   32
 
-#define POLYFLAG_INCLUDE_BOTTOM_EDGE		0x01
-#define POLYFLAG_INCLUDE_RIGHT_EDGE			0x02
-#define POLYFLAG_NO_WORK_QUEUE				0x04
-#define POLYFLAG_ALLOW_QUADS				0x08
+#define POLYFLAG_INCLUDE_BOTTOM_EDGE        0x01
+#define POLYFLAG_INCLUDE_RIGHT_EDGE         0x02
+#define POLYFLAG_NO_WORK_QUEUE              0x04
+#define POLYFLAG_ALLOW_QUADS                0x08
 
 
 
@@ -61,26 +61,26 @@ struct poly_manager;
 /* input vertex data */
 struct poly_vertex
 {
-	float		x;							/* X coordinate */
-	float		y;							/* Y coordinate */
-	float		p[MAX_VERTEX_PARAMS];		/* interpolated parameter values */
+	float       x;                          /* X coordinate */
+	float       y;                          /* Y coordinate */
+	float       p[MAX_VERTEX_PARAMS];       /* interpolated parameter values */
 };
 
 
 /* poly_param_extent describes information for a single parameter in an extent */
 struct poly_param_extent
 {
-	float		start;						/* parameter value at starting X,Y */
-	float		dpdx;						/* dp/dx relative to starting X */
+	float       start;                      /* parameter value at starting X,Y */
+	float       dpdx;                       /* dp/dx relative to starting X */
 };
 
 
 /* poly_extent describes start/end points for a scanline, along with per-scanline parameters */
 struct poly_extent
 {
-	INT16		startx;						/* starting X coordinate (inclusive) */
-	INT16		stopx;						/* ending X coordinate (exclusive) */
-	poly_param_extent param[MAX_VERTEX_PARAMS];	/* starting and dx values for each parameter */
+	INT16       startx;                     /* starting X coordinate (inclusive) */
+	INT16       stopx;                      /* ending X coordinate (exclusive) */
+	poly_param_extent param[MAX_VERTEX_PARAMS]; /* starting and dx values for each parameter */
 };
 
 
@@ -150,4 +150,4 @@ UINT32 poly_render_polygon(poly_manager *poly, void *dest, const rectangle &clip
 int poly_zclip_if_less(int numverts, const poly_vertex *v, poly_vertex *outv, int paramcount, float clipval);
 
 
-#endif	/* __POLY_H__ */
+#endif  /* __POLY_H__ */

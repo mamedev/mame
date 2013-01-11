@@ -35,7 +35,7 @@ READ8_MEMBER(gaplus_state::gaplus_customio_3_r)
 	switch (offset)
 	{
 		case 0:
-			return ioport("IN2")->read();		/* cabinet & test mode */
+			return ioport("IN2")->read();       /* cabinet & test mode */
 		case 1:
 			return (mode == 2) ? m_customio_3[offset] : 0x0f;
 		case 2:

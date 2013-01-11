@@ -57,7 +57,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define ABC1600BUS_TAG			"abc1600bus"
+#define ABC1600BUS_TAG          "abc1600bus"
 
 
 
@@ -70,7 +70,7 @@
 
 
 #define MCFG_ABC1600BUS_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, ABC1600BUS_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, ABC1600BUS_SLOT, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
@@ -84,16 +84,16 @@
 
 struct abc1600bus_interface
 {
-    devcb_write_line	m_out_int_cb;
-    devcb_write_line	m_out_pren_cb;
-    devcb_write_line	m_out_trrq_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_pren_cb;
+	devcb_write_line    m_out_trrq_cb;
 
 	// the following are connected only on BUS0X
-    devcb_write_line	m_out_nmi_cb;
-    devcb_write_line	m_out_xint2_cb;
-    devcb_write_line	m_out_xint3_cb;
-    devcb_write_line	m_out_xint4_cb;
-    devcb_write_line	m_out_xint5_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_xint2_cb;
+	devcb_write_line    m_out_xint3_cb;
+	devcb_write_line    m_out_xint4_cb;
+	devcb_write_line    m_out_xint5_cb;
 };
 
 
@@ -141,8 +141,8 @@ public:
 // ======================> abc1600bus_slot_device
 
 class abc1600bus_slot_device : public device_t,
-							   public device_slot_interface,
-							   public abc1600bus_interface
+								public device_slot_interface,
+								public abc1600bus_interface
 {
 public:
 	// construction/destruction
@@ -190,14 +190,14 @@ public:
 	DECLARE_READ_LINE_MEMBER( xint5_r );
 
 private:
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_pren_func;
-	devcb_resolved_write_line	m_out_trrq_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_xint2_func;
-	devcb_resolved_write_line	m_out_xint3_func;
-	devcb_resolved_write_line	m_out_xint4_func;
-	devcb_resolved_write_line	m_out_xint5_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_pren_func;
+	devcb_resolved_write_line   m_out_trrq_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_xint2_func;
+	devcb_resolved_write_line   m_out_xint3_func;
+	devcb_resolved_write_line   m_out_xint4_func;
+	devcb_resolved_write_line   m_out_xint5_func;
 
 	device_abc1600bus_card_interface *m_card;
 

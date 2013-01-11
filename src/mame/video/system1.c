@@ -241,11 +241,11 @@ WRITE8_MEMBER(system1_state::system1_sprite_collision_reset_w)
 INLINE void videoram_wait_states(cpu_device *cpu)
 {
 	/* The main Z80's CPU clock is halted whenever an access to VRAM happens,
-       and is only restarted by the FIXST signal, which occurs once every
-       'n' pixel clocks. 'n' is determined by the horizontal control PAL. */
+	   and is only restarted by the FIXST signal, which occurs once every
+	   'n' pixel clocks. 'n' is determined by the horizontal control PAL. */
 
 	/* this assumes 4 5MHz pixel clocks per FIXST, or 8*4 20MHz CPU clocks,
-       and is based on a dump of 315-5137 */
+	   and is based on a dump of 315-5137 */
 	const UINT32 cpu_cycles_per_fixst = 4 * 4;
 	const UINT32 fixst_offset = 2 * 4;
 	UINT32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((cpu->total_cycles() - fixst_offset) % cpu_cycles_per_fixst);
@@ -294,25 +294,25 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 	int val,r,g,b;
 
 	/*
-      There are two kind of color handling: in the System 1 games, values in the
-      palette RAM are directly mapped to colors with the usual BBGGGRRR format;
-      in the System 2 ones (Choplifter, WBML, etc.), the value in the palette RAM
-      is a lookup offset for three palette PROMs in RRRRGGGGBBBB format.
+	  There are two kind of color handling: in the System 1 games, values in the
+	  palette RAM are directly mapped to colors with the usual BBGGGRRR format;
+	  in the System 2 ones (Choplifter, WBML, etc.), the value in the palette RAM
+	  is a lookup offset for three palette PROMs in RRRRGGGGBBBB format.
 
-      It's hard to tell for sure because they use resistor packs, but here's
-      what I think the values are from measurment with a volt meter:
+	  It's hard to tell for sure because they use resistor packs, but here's
+	  what I think the values are from measurment with a volt meter:
 
-      Blue: .250K ohms
-      Blue: .495K ohms
-      Green:.250K ohms
-      Green:.495K ohms
-      Green:.995K ohms
-      Red:  .495K ohms
-      Red:  .250K ohms
-      Red:  .995K ohms
+	  Blue: .250K ohms
+	  Blue: .495K ohms
+	  Green:.250K ohms
+	  Green:.495K ohms
+	  Green:.995K ohms
+	  Red:  .495K ohms
+	  Red:  .250K ohms
+	  Red:  .995K ohms
 
-      accurate to +/- .003K ohms.
-    */
+	  accurate to +/- .003K ohms.
+	*/
 
 	m_generic_paletteram_8[offset] = data;
 
@@ -383,8 +383,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int x, y, i;
 
 		/* writing an 0xff into the first byte of sprite RAM seems to disable all sprites;
-           not sure if this applies to each sprite or only to the first one; see pitfall2
-           and wmatch for examples where this is done */
+		   not sure if this applies to each sprite or only to the first one; see pitfall2
+		   and wmatch for examples where this is done */
 		if (spritedata[0] == 0xff)
 			return;
 
@@ -524,7 +524,7 @@ static void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, con
 			UINT8 lookup_value;
 
 			/* using the sprite, background, and foreground pixels, look up the color behavior */
-			lookup_index =	(((sprpix & 0xf) == 0) << 0) |
+			lookup_index =  (((sprpix & 0xf) == 0) << 0) |
 							(((fgpix & 7) == 0) << 1) |
 							(((fgpix >> 9) & 3) << 2) |
 							(((bgpix & 7) == 0) << 4) |

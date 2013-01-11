@@ -69,4 +69,3 @@ DECLARE_WRITE16_DEVICE_HANDLER( pandora_spriteram_LSB_w );
 DECLARE_READ16_DEVICE_HANDLER( pandora_spriteram_LSB_r );
 
 #endif /* __KAN_PAND_H__ */
-

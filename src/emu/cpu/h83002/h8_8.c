@@ -16,18 +16,18 @@
 
 CPU_DISASSEMBLE(h8);
 
-#define H8_SP	(7)
+#define H8_SP   (7)
 
-#define h8_mem_read8(x)		h8->program->read_byte(x)
-#define h8_mem_write8(x, y)	h8->program->write_byte(x, y)
+#define h8_mem_read8(x)     h8->program->read_byte(x)
+#define h8_mem_write8(x, y) h8->program->write_byte(x, y)
 
 // timing macros
-#define H8_IFETCH_TIMING(x)	h8->cyccnt -= (x) * 4;
-#define H8_BRANCH_TIMING(x)	h8->cyccnt -= (x) * 4;
-#define H8_STACK_TIMING(x)	h8->cyccnt -= (x) * 4;
-#define H8_BYTE_TIMING(x, adr)	if (address24 >= 0xff90) h8->cyccnt -= (x) * 3; else h8->cyccnt -= (x) * 4;
-#define H8_WORD_TIMING(x, adr)	if (address24 >= 0xff90) h8->cyccnt -= (x) * 3; else h8->cyccnt -= (x) * 4;
-#define H8_IOP_TIMING(x)	h8->cyccnt -= (x);
+#define H8_IFETCH_TIMING(x) h8->cyccnt -= (x) * 4;
+#define H8_BRANCH_TIMING(x) h8->cyccnt -= (x) * 4;
+#define H8_STACK_TIMING(x)  h8->cyccnt -= (x) * 4;
+#define H8_BYTE_TIMING(x, adr)  if (address24 >= 0xff90) h8->cyccnt -= (x) * 3; else h8->cyccnt -= (x) * 4;
+#define H8_WORD_TIMING(x, adr)  if (address24 >= 0xff90) h8->cyccnt -= (x) * 3; else h8->cyccnt -= (x) * 4;
+#define H8_IOP_TIMING(x)    h8->cyccnt -= (x);
 
 static TIMER_CALLBACK( h8_timer_0_cb );
 static TIMER_CALLBACK( h8_timer_1_cb );
@@ -106,7 +106,7 @@ static UINT8 h8_get_ccr(h83xx_state *h8)
 
 static UINT8 h8_get_exr(h83xx_state *h8)
 {
-    return h8->exr;
+	return h8->exr;
 }
 
 static char *h8_get_ccr_str(h83xx_state *h8)
@@ -295,8 +295,8 @@ static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
 	h8->pc = h8_mem_read16(h8, vectornr * 2) & 0xffff;
 
 	// these timings are still approximations but much better than before
-	H8_IFETCH_TIMING(8);	// 24 cycles
-	H8_STACK_TIMING(3);	// 12 cycles
+	H8_IFETCH_TIMING(8);    // 24 cycles
+	H8_STACK_TIMING(3); // 12 cycles
 }
 
 static int h8_get_priority(h83xx_state *h8, UINT8 bit)
@@ -443,7 +443,7 @@ static void timer_8bit_expire(h83xx_state *h8, int t, int sel)
 
 	switch ((h8->TCR[t]>>3) & 3)
 	{
-		case 0:	// no clear
+		case 0: // no clear
 			break;
 
 		case 1: // clear on match A
@@ -462,7 +462,7 @@ static void timer_8bit_expire(h83xx_state *h8, int t, int sel)
 			}
 			break;
 
-		case 3:	// clear on external reset input signal (not implemented)
+		case 3: // clear on external reset input signal (not implemented)
 			logerror("H8: external reset not implemented for 8-bit timers\n");
 			break;
 	}
@@ -476,32 +476,32 @@ static CPU_SET_INFO( h8 )
 	h83xx_state *h8 = get_safe_token(device);
 
 	switch(state) {
-	case CPUINFO_INT_PC:			    		h8->pc = info->i;								break;
-	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i;								break;
-    case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
-    case CPUINFO_INT_REGISTER + H8_EXR:         h8_set_exr(h8, info->i);                        break;
+	case CPUINFO_INT_PC:                        h8->pc = info->i;                               break;
+	case CPUINFO_INT_REGISTER + H8_PC:          h8->pc = info->i;                               break;
+	case CPUINFO_INT_REGISTER + H8_CCR:         h8_set_ccr(h8, info->i);                        break;
+	case CPUINFO_INT_REGISTER + H8_EXR:         h8_set_exr(h8, info->i);                        break;
 
-	case CPUINFO_INT_REGISTER + H8_E0:			h8->regs[0] = info->i;							break;
-	case CPUINFO_INT_REGISTER + H8_E1:			h8->regs[1] = info->i;							break;
-	case CPUINFO_INT_REGISTER + H8_E2:			h8->regs[2] = info->i;							break;
-	case CPUINFO_INT_REGISTER + H8_E3:			h8->regs[3] = info->i;							break;
-	case CPUINFO_INT_REGISTER + H8_E4:			h8->regs[4] = info->i;							break;
-	case CPUINFO_INT_REGISTER + H8_E5:			h8->regs[5] = info->i;							break;
-	case CPUINFO_INT_REGISTER + H8_E6:			h8->regs[6] = info->i;							break;
-	case CPUINFO_INT_REGISTER + H8_E7:			h8->regs[7] = info->i;							break;
+	case CPUINFO_INT_REGISTER + H8_E0:          h8->regs[0] = info->i;                          break;
+	case CPUINFO_INT_REGISTER + H8_E1:          h8->regs[1] = info->i;                          break;
+	case CPUINFO_INT_REGISTER + H8_E2:          h8->regs[2] = info->i;                          break;
+	case CPUINFO_INT_REGISTER + H8_E3:          h8->regs[3] = info->i;                          break;
+	case CPUINFO_INT_REGISTER + H8_E4:          h8->regs[4] = info->i;                          break;
+	case CPUINFO_INT_REGISTER + H8_E5:          h8->regs[5] = info->i;                          break;
+	case CPUINFO_INT_REGISTER + H8_E6:          h8->regs[6] = info->i;                          break;
+	case CPUINFO_INT_REGISTER + H8_E7:          h8->regs[7] = info->i;                          break;
 
-	case CPUINFO_INT_INPUT_STATE + H8_NMI:		h8_300_InterruptRequest(h8, 3, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ0:		h8_300_InterruptRequest(h8, 4, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ1:		h8_300_InterruptRequest(h8, 5, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ2:		h8_300_InterruptRequest(h8, 6, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ3:		h8_300_InterruptRequest(h8, 7, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ4:		h8_300_InterruptRequest(h8, 8, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ5:		h8_300_InterruptRequest(h8, 9, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ6:		h8_300_InterruptRequest(h8, 10, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_IRQ7:		h8_300_InterruptRequest(h8, 11, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_NMI:      h8_300_InterruptRequest(h8, 3, info->i);        break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ0:     h8_300_InterruptRequest(h8, 4, info->i);        break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ1:     h8_300_InterruptRequest(h8, 5, info->i);        break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ2:     h8_300_InterruptRequest(h8, 6, info->i);        break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ3:     h8_300_InterruptRequest(h8, 7, info->i);        break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ4:     h8_300_InterruptRequest(h8, 8, info->i);        break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ5:     h8_300_InterruptRequest(h8, 9, info->i);        break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ6:     h8_300_InterruptRequest(h8, 10, info->i);       break;
+	case CPUINFO_INT_INPUT_STATE + H8_IRQ7:     h8_300_InterruptRequest(h8, 11, info->i);       break;
 
-	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX:	h8_300_InterruptRequest(h8, 28, info->i);		break;
-	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	h8_300_InterruptRequest(h8, 32, info->i);		break;
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_0_RX: h8_300_InterruptRequest(h8, 28, info->i);       break;
+	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX: h8_300_InterruptRequest(h8, 32, info->i);       break;
 
 	default:
 		fatalerror("h8_set_info unknown request %x\n", state);
@@ -521,76 +521,76 @@ static READ8_HANDLER( h8330_itu_r )
 
 	switch(reg)
 	{
-	case 0x8d:		// serial Rx 1
+	case 0x8d:      // serial Rx 1
 		val = h8->io->read_byte(H8_SERIAL_1);
 		break;
-	case 0x92:  		// FRC H
+	case 0x92:          // FRC H
 		frc = h8->device->total_cycles() / divider[h8->per_regs[0x96]];
 		frc %= 65536;
 		return frc>>8;
-	case 0x93:		// FRC L
+	case 0x93:      // FRC L
 		frc = h8->device->total_cycles() / divider[h8->per_regs[0x96]];
 		frc %= 65536;
 		return frc&0xff;
-	case 0xb2:  		// port 1 data
+	case 0xb2:          // port 1 data
 		val = h8->io->read_byte(H8_PORT_1);
 		break;
-	case 0xb3:  		// port 2 data
+	case 0xb3:          // port 2 data
 		val = h8->io->read_byte(H8_PORT_2);
 		break;
-	case 0xb6:		// port 3 data
+	case 0xb6:      // port 3 data
 		val = h8->io->read_byte(H8_PORT_3);
 		break;
-	case 0xb7:		// port 4 data
+	case 0xb7:      // port 4 data
 		val = h8->io->read_byte(H8_PORT_4);
 		break;
-	case 0xba:		// port 5 data
+	case 0xba:      // port 5 data
 		val = h8->io->read_byte(H8_PORT_5);
 		break;
-	case 0xbb:		// port 6 data
+	case 0xbb:      // port 6 data
 		val = h8->io->read_byte(H8_PORT_6);
 		break;
-	case 0xbe:		// port 7 data
+	case 0xbe:      // port 7 data
 		val = h8->io->read_byte(H8_PORT_7);
 		break;
-	case 0xbf:		// port 8 data
+	case 0xbf:      // port 8 data
 		val = h8->io->read_byte(H8_PORT_8);
 		break;
-	case 0xc1:		// port 9 data
+	case 0xc1:      // port 9 data
 		val = h8->io->read_byte(H8_PORT_9);
 		break;
-	case 0xdc:	// serial status
+	case 0xdc:  // serial status
 		val = 0x87;
 		break;
-	case 0xdd:		// serial Rx 0
+	case 0xdd:      // serial Rx 0
 		val = h8->io->read_byte(H8_SERIAL_0);
 		break;
-	case 0xe0:	// ADC 0 low byte
+	case 0xe0:  // ADC 0 low byte
 		val = h8->io->read_byte(H8_ADC_0_L);
 		break;
-	case 0xe1:	// ADC 0 high byte
+	case 0xe1:  // ADC 0 high byte
 		val = h8->io->read_byte(H8_ADC_0_H);
 		break;
-	case 0xe2:	// ADC 1 low byte
+	case 0xe2:  // ADC 1 low byte
 		val = h8->io->read_byte(H8_ADC_1_L);
 		break;
-	case 0xe3:	// ADC 1 high byte
+	case 0xe3:  // ADC 1 high byte
 		val = h8->io->read_byte(H8_ADC_1_H);
 		break;
-	case 0xe4:	// ADC 2 low byte
+	case 0xe4:  // ADC 2 low byte
 		val = h8->io->read_byte(H8_ADC_2_L);
 		break;
-	case 0xe5:	// ADC 2 high byte
+	case 0xe5:  // ADC 2 high byte
 		val = h8->io->read_byte(H8_ADC_2_H);
 		break;
-	case 0xe6:	// ADC 3 low byte
+	case 0xe6:  // ADC 3 low byte
 		val = h8->io->read_byte(H8_ADC_3_L);
 		break;
-	case 0xe7:	// ADC 3 high byte
+	case 0xe7:  // ADC 3 high byte
 		val = h8->io->read_byte(H8_ADC_3_H);
 		break;
-	case 0xe8:	// ADCSR: A/D control/status
-		val = 0x80;	// return conversion completed
+	case 0xe8:  // ADCSR: A/D control/status
+		val = 0x80; // return conversion completed
 		break;
 	default:
 		val = h8->per_regs[reg];
@@ -612,37 +612,37 @@ static WRITE8_HANDLER( h8330_itu_w )
 	case 0x80:
 		printf("%02x to flash control or external\n", data);
 		break;
-	case 0x8b:		// serial Tx 1
+	case 0x8b:      // serial Tx 1
 		h8->io->write_byte(H8_SERIAL_1, data);
 		break;
-	case 0xb2:  		// port 1 data
+	case 0xb2:          // port 1 data
 		h8->io->write_byte(H8_PORT_1, data);
 		break;
-	case 0xb3:  		// port 2 data
+	case 0xb3:          // port 2 data
 		h8->io->write_byte(H8_PORT_2, data);
 		break;
-	case 0xb6:		// port 3 data
+	case 0xb6:      // port 3 data
 		h8->io->write_byte(H8_PORT_3, data);
 		break;
-	case 0xb7:		// port 4 data
+	case 0xb7:      // port 4 data
 		h8->io->write_byte(H8_PORT_4, data);
 		break;
-	case 0xba:		// port 5 data
+	case 0xba:      // port 5 data
 		h8->io->write_byte(H8_PORT_5, data);
 		break;
-	case 0xbb:		// port 6 data
+	case 0xbb:      // port 6 data
 		h8->io->write_byte(H8_PORT_6, data);
 		break;
-	case 0xbe:		// port 7 data
+	case 0xbe:      // port 7 data
 		h8->io->write_byte(H8_PORT_7, data);
 		break;
-	case 0xbf:		// port 8 data
+	case 0xbf:      // port 8 data
 		h8->io->write_byte(H8_PORT_8, data);
 		break;
-	case 0xc1:		// port 9 data
+	case 0xc1:      // port 9 data
 		h8->io->write_byte(H8_PORT_9, data);
 		break;
-	case 0xdb:		// serial Tx 0
+	case 0xdb:      // serial Tx 0
 		h8->io->write_byte(H8_SERIAL_0, data);
 		break;
 
@@ -662,7 +662,7 @@ static WRITE8_HANDLER( h8330_itu_w )
 		break;
 
 	case 0xc8:
-	    	h8->TCR[0] = data;
+			h8->TCR[0] = data;
 		recalc_8bit_timer(h8, 0);
 		break;
 	case 0xc9:
@@ -692,7 +692,7 @@ static WRITE8_HANDLER( h8330_itu_w )
 		break;
 
 	case 0xd0:
-	    	h8->TCR[1] = data;
+			h8->TCR[1] = data;
 		recalc_8bit_timer(h8, 1);
 		break;
 	case 0xd1:
@@ -755,74 +755,74 @@ CPU_GET_INFO( h8_3334 )
 
 	switch(state) {
 	// Interface functions and variables
-	case CPUINFO_FCT_SET_INFO:			info->setinfo     = CPU_SET_INFO_NAME(h8);				break;
-	case CPUINFO_FCT_INIT:				info->init        = CPU_INIT_NAME(h8bit);					break;
-	case CPUINFO_FCT_RESET:				info->reset       = CPU_RESET_NAME(h8bit);					break;
-	case CPUINFO_FCT_EXIT:				info->exit        = 0;							break;
-	case CPUINFO_FCT_EXECUTE:			info->execute     = CPU_EXECUTE_NAME(h8);					break;
-	case CPUINFO_FCT_BURN:				info->burn        = 0;							break;
-	case CPUINFO_FCT_DISASSEMBLE:			info->disassemble = CPU_DISASSEMBLE_NAME(h8);					break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount      = &h8->cyccnt;					break;
-	case CPUINFO_INT_CONTEXT_SIZE:			info->i           = sizeof(h83xx_state);		break;
-	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i           = 2;							break;
-	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i           = 10;							break;
+	case CPUINFO_FCT_SET_INFO:          info->setinfo     = CPU_SET_INFO_NAME(h8);              break;
+	case CPUINFO_FCT_INIT:              info->init        = CPU_INIT_NAME(h8bit);                   break;
+	case CPUINFO_FCT_RESET:             info->reset       = CPU_RESET_NAME(h8bit);                  break;
+	case CPUINFO_FCT_EXIT:              info->exit        = 0;                          break;
+	case CPUINFO_FCT_EXECUTE:           info->execute     = CPU_EXECUTE_NAME(h8);                   break;
+	case CPUINFO_FCT_BURN:              info->burn        = 0;                          break;
+	case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(h8);                   break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:       info->icount      = &h8->cyccnt;                    break;
+	case CPUINFO_INT_CONTEXT_SIZE:          info->i           = sizeof(h83xx_state);        break;
+	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:     info->i           = 2;                          break;
+	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:     info->i           = 10;                         break;
 
 		// Bus sizes
-	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;						break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 16;						break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;						break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;						break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;						break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;						break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;						break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 16;						break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;						break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                        break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:    info->i = 16;                       break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:    info->i = 0;                        break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                        break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                        break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                        break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_IO: info->i = 8;                        break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO: info->i = 16;                       break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO: info->i = 0;                        break;
 
 		// Internal maps
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(h8_3334_internal_map); break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;	break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL;	break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;  break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL; break;
 
 		// CPU misc parameters
-	case CPUINFO_STR_NAME:					strcpy(info->s, "H8/3334");						break;
-	case CPUINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);						break;
-	case CPUINFO_STR_FLAGS:					strcpy(info->s, h8_get_ccr_str(h8));				break;
-	case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;							break;
-	case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
-	case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
-	case CPUINFO_INT_INPUT_LINES:				info->i = 16;									break;
-	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;									break;
+	case CPUINFO_STR_NAME:                  strcpy(info->s, "H8/3334");                     break;
+	case CPUINFO_STR_SOURCE_FILE:               strcpy(info->s, __FILE__);                      break;
+	case CPUINFO_STR_FLAGS:                 strcpy(info->s, h8_get_ccr_str(h8));                break;
+	case CPUINFO_INT_ENDIANNESS:                info->i = ENDIANNESS_BIG;                           break;
+	case CPUINFO_INT_CLOCK_MULTIPLIER:          info->i = 1;                                    break;
+	case CPUINFO_INT_CLOCK_DIVIDER:             info->i = 1;                                    break;
+	case CPUINFO_INT_INPUT_LINES:               info->i = 16;                                   break;
+	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = -1;                                   break;
 
 		// CPU main state
-	case CPUINFO_INT_PC:					info->i = h8->pc;								break;
-	case CPUINFO_INT_PREVIOUSPC:				info->i = h8->ppc;								break;
+	case CPUINFO_INT_PC:                    info->i = h8->pc;                               break;
+	case CPUINFO_INT_PREVIOUSPC:                info->i = h8->ppc;                              break;
 
-	case CPUINFO_INT_REGISTER + H8_PC:			info->i = h8->pc;								break;
-	case CPUINFO_INT_REGISTER + H8_CCR:			info->i = h8_get_ccr(h8);							break;
-	case CPUINFO_INT_REGISTER + H8_EXR:			info->i = h8_get_exr(h8);							break;
+	case CPUINFO_INT_REGISTER + H8_PC:          info->i = h8->pc;                               break;
+	case CPUINFO_INT_REGISTER + H8_CCR:         info->i = h8_get_ccr(h8);                           break;
+	case CPUINFO_INT_REGISTER + H8_EXR:         info->i = h8_get_exr(h8);                           break;
 
-	case CPUINFO_INT_REGISTER + H8_E0:			info->i = h8->regs[0];							break;
-	case CPUINFO_INT_REGISTER + H8_E1:			info->i = h8->regs[1];							break;
-	case CPUINFO_INT_REGISTER + H8_E2:			info->i = h8->regs[2];							break;
-	case CPUINFO_INT_REGISTER + H8_E3:			info->i = h8->regs[3];							break;
-	case CPUINFO_INT_REGISTER + H8_E4:			info->i = h8->regs[4];							break;
-	case CPUINFO_INT_REGISTER + H8_E5:			info->i = h8->regs[5];							break;
-	case CPUINFO_INT_REGISTER + H8_E6:			info->i = h8->regs[6];							break;
-	case CPUINFO_INT_REGISTER + H8_E7:			info->i = h8->regs[7];							break;
+	case CPUINFO_INT_REGISTER + H8_E0:          info->i = h8->regs[0];                          break;
+	case CPUINFO_INT_REGISTER + H8_E1:          info->i = h8->regs[1];                          break;
+	case CPUINFO_INT_REGISTER + H8_E2:          info->i = h8->regs[2];                          break;
+	case CPUINFO_INT_REGISTER + H8_E3:          info->i = h8->regs[3];                          break;
+	case CPUINFO_INT_REGISTER + H8_E4:          info->i = h8->regs[4];                          break;
+	case CPUINFO_INT_REGISTER + H8_E5:          info->i = h8->regs[5];                          break;
+	case CPUINFO_INT_REGISTER + H8_E6:          info->i = h8->regs[6];                          break;
+	case CPUINFO_INT_REGISTER + H8_E7:          info->i = h8->regs[7];                          break;
 
 	// CPU debug stuff
-	case CPUINFO_STR_REGISTER + H8_PC:			sprintf(info->s, "PC   :%08x", h8->pc);			break;
-	case CPUINFO_STR_REGISTER + H8_CCR:			sprintf(info->s, "CCR  :%08x", h8_get_ccr(h8));	break;
-	case CPUINFO_STR_REGISTER + H8_EXR:			sprintf(info->s, "EXR  :%02x", h8_get_exr(h8));	break;
+	case CPUINFO_STR_REGISTER + H8_PC:          sprintf(info->s, "PC   :%08x", h8->pc);         break;
+	case CPUINFO_STR_REGISTER + H8_CCR:         sprintf(info->s, "CCR  :%08x", h8_get_ccr(h8)); break;
+	case CPUINFO_STR_REGISTER + H8_EXR:         sprintf(info->s, "EXR  :%02x", h8_get_exr(h8)); break;
 
-	case CPUINFO_STR_REGISTER + H8_E0:			sprintf(info->s, " R0  :%08x", h8->regs[0]);		break;
-	case CPUINFO_STR_REGISTER + H8_E1:			sprintf(info->s, " R1  :%08x", h8->regs[1]);		break;
-	case CPUINFO_STR_REGISTER + H8_E2:			sprintf(info->s, " R2  :%08x", h8->regs[2]);		break;
-	case CPUINFO_STR_REGISTER + H8_E3:			sprintf(info->s, " R3  :%08x", h8->regs[3]);		break;
-	case CPUINFO_STR_REGISTER + H8_E4:			sprintf(info->s, " R4  :%08x", h8->regs[4]);		break;
-	case CPUINFO_STR_REGISTER + H8_E5:			sprintf(info->s, " R5  :%08x", h8->regs[5]);		break;
-	case CPUINFO_STR_REGISTER + H8_E6:			sprintf(info->s, " R6  :%08x", h8->regs[6]);		break;
-	case CPUINFO_STR_REGISTER + H8_E7:			sprintf(info->s, " SP  :%08x", h8->regs[7]);		break;
+	case CPUINFO_STR_REGISTER + H8_E0:          sprintf(info->s, " R0  :%08x", h8->regs[0]);        break;
+	case CPUINFO_STR_REGISTER + H8_E1:          sprintf(info->s, " R1  :%08x", h8->regs[1]);        break;
+	case CPUINFO_STR_REGISTER + H8_E2:          sprintf(info->s, " R2  :%08x", h8->regs[2]);        break;
+	case CPUINFO_STR_REGISTER + H8_E3:          sprintf(info->s, " R3  :%08x", h8->regs[3]);        break;
+	case CPUINFO_STR_REGISTER + H8_E4:          sprintf(info->s, " R4  :%08x", h8->regs[4]);        break;
+	case CPUINFO_STR_REGISTER + H8_E5:          sprintf(info->s, " R5  :%08x", h8->regs[5]);        break;
+	case CPUINFO_STR_REGISTER + H8_E6:          sprintf(info->s, " R6  :%08x", h8->regs[6]);        break;
+	case CPUINFO_STR_REGISTER + H8_E7:          sprintf(info->s, " SP  :%08x", h8->regs[7]);        break;
 	}
 }
 

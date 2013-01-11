@@ -356,11 +356,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( c64 )
-	PORT_INCLUDE( common_cbm_keyboard )		// ROW0 -> ROW7
+	PORT_INCLUDE( common_cbm_keyboard )     // ROW0 -> ROW7
 
-	PORT_INCLUDE( c64_special )				// SPECIAL
+	PORT_INCLUDE( c64_special )             // SPECIAL
 
-	PORT_INCLUDE( c64_controls )			// CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER
+	PORT_INCLUDE( c64_controls )            // CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER
 INPUT_PORTS_END
 
 
@@ -372,16 +372,16 @@ static INPUT_PORTS_START( c64sw )
 	PORT_INCLUDE( c64 )
 
 	PORT_MODIFY( "ROW5" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)								PORT_CHAR(';') PORT_CHAR(']')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)							PORT_CHAR('=')
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)								PORT_CHAR('-')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)                             PORT_CHAR(';') PORT_CHAR(']')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)                            PORT_CHAR('=')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)                             PORT_CHAR('-')
 
 	PORT_MODIFY( "ROW6" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)						PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('@')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(':') PORT_CHAR('*')
 INPUT_PORTS_END
 
 
@@ -504,18 +504,18 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     COL0, JOY B0
-        PA1     COL1, JOY B1
-        PA2     COL2, JOY B2
-        PA3     COL3, JOY B3
-        PA4     COL4, BTNB
-        PA5     COL5
-        PA6     COL6
-        PA7     COL7
+	    PA0     COL0, JOY B0
+	    PA1     COL1, JOY B1
+	    PA2     COL2, JOY B2
+	    PA3     COL3, JOY B3
+	    PA4     COL4, BTNB
+	    PA5     COL5
+	    PA6     COL6
+	    PA7     COL7
 
-    */
+	*/
 
 	UINT8 cia0portb = m_cia1->pb_r();
 
@@ -526,18 +526,18 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     JOY A0
-        PB1     JOY A1
-        PB2     JOY A2
-        PB3     JOY A3
-        PB4     BTNA/_LP
-        PB5
-        PB6
-        PB7
+	    PB0     JOY A0
+	    PB1     JOY A1
+	    PB2     JOY A2
+	    PB3     JOY A3
+	    PB4     BTNA/_LP
+	    PB5
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	UINT8 cia0porta = m_cia1->pa_r();
 
@@ -548,18 +548,18 @@ WRITE8_MEMBER( c64_state::cia1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     ROW0
-        PB1     ROW1
-        PB2     ROW2
-        PB3     ROW3
-        PB4     ROW4
-        PB5     ROW5
-        PB6     ROW6
-        PB7     ROW7
+	    PB0     ROW0
+	    PB1     ROW1
+	    PB2     ROW2
+	    PB3     ROW3
+	    PB4     ROW4
+	    PB5     ROW5
+	    PB6     ROW6
+	    PB7     ROW7
 
-    */
+	*/
 
 	m_vic->lp_w(BIT(data, 4));
 }
@@ -592,18 +592,18 @@ READ8_MEMBER( c64_state::cia2_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0
-        PA1
-        PA2     USER PORT
-        PA3
-        PA4
-        PA5
-        PA6     CLK
-        PA7     DATA
+	    PA0
+	    PA1
+	    PA2     USER PORT
+	    PA3
+	    PA4
+	    PA5
+	    PA6     CLK
+	    PA7     DATA
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -621,18 +621,18 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     _VA14
-        PA1     _VA15
-        PA2     USER PORT
-        PA3     ATN OUT
-        PA4     CLK OUT
-        PA5     DATA OUT
-        PA6
-        PA7
+	    PA0     _VA14
+	    PA1     _VA15
+	    PA2     USER PORT
+	    PA3     ATN OUT
+	    PA4     CLK OUT
+	    PA5     DATA OUT
+	    PA6
+	    PA7
 
-    */
+	*/
 
 	// VIC banking
 	m_va14 = BIT(data, 0);
@@ -668,16 +668,16 @@ READ8_MEMBER( c64_state::cpu_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      1
-        P1      1
-        P2      1
-        P3
-        P4      CASS SENS
-        P5      0
+	    P0      1
+	    P1      1
+	    P2      1
+	    P3
+	    P4      CASS SENS
+	    P5      0
 
-    */
+	*/
 
 	UINT8 data = 0x07;
 
@@ -690,18 +690,18 @@ WRITE8_MEMBER( c64_state::cpu_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      LORAM
-        P1      HIRAM
-        P2      CHAREN
-        P3      CASS WRT
-        P4
-        P5      CASS MOTOR
+	    P0      LORAM
+	    P1      HIRAM
+	    P2      CHAREN
+	    P3      CASS WRT
+	    P4
+	    P5      CASS MOTOR
 
-    */
+	*/
 
-    // memory banking
+	// memory banking
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
@@ -721,16 +721,16 @@ READ8_MEMBER( sx64_state::cpu_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      1
-        P1      1
-        P2      1
-        P3
-        P4
-        P5
+	    P0      1
+	    P1      1
+	    P2      1
+	    P3
+	    P4
+	    P5
 
-    */
+	*/
 
 	return 0x07;
 }
@@ -739,18 +739,18 @@ WRITE8_MEMBER( sx64_state::cpu_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      LORAM
-        P1      HIRAM
-        P2      CHAREN
-        P3
-        P4
-        P5
+	    P0      LORAM
+	    P1      HIRAM
+	    P2      CHAREN
+	    P3
+	    P4
+	    P5
 
-    */
+	*/
 
-    // memory banking
+	// memory banking
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
@@ -764,16 +764,16 @@ READ8_MEMBER( c64gs_state::cpu_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      1
-        P1      1
-        P2      1
-        P3
-        P4
-        P5
+	    P0      1
+	    P1      1
+	    P2      1
+	    P3
+	    P4
+	    P5
 
-    */
+	*/
 
 	return 0x07;
 }
@@ -782,18 +782,18 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P0      LORAM
-        P1      HIRAM
-        P2      CHAREN
-        P3
-        P4
-        P5
+	    P0      LORAM
+	    P1      HIRAM
+	    P2      CHAREN
+	    P3
+	    P4
+	    P5
 
-    */
+	*/
 
-    // memory banking
+	// memory banking
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
@@ -1347,7 +1347,7 @@ ROM_START( c64_se )
 	ROM_LOAD( "901226-01.u3", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROM_LOAD( "kernel.u4",	0x0000, 0x2000, CRC(f10c2c25) SHA1(e4f52d9b36c030eb94524eb49f6f0774c1d02e5e) )
+	ROM_LOAD( "kernel.u4",  0x0000, 0x2000, CRC(f10c2c25) SHA1(e4f52d9b36c030eb94524eb49f6f0774c1d02e5e) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Swedish Characters" )
@@ -1383,7 +1383,7 @@ ROM_END
 //  ROM( edu64 )
 //-------------------------------------------------
 
-#define rom_edu64	rom_c64
+#define rom_edu64   rom_c64
 
 
 //-------------------------------------------------
@@ -1416,7 +1416,7 @@ ROM_END
 //  ROM( rom_sx64p )
 //-------------------------------------------------
 
-#define rom_sx64p	rom_sx64
+#define rom_sx64p   rom_sx64
 
 
 //-------------------------------------------------
@@ -1443,7 +1443,7 @@ ROM_END
 //-------------------------------------------------
 
 // ROM_LOAD( "dx64kern.bin", 0x0000, 0x2000, CRC(58065128) ) TODO where is this illusive ROM?
-#define rom_dx64	rom_sx64
+#define rom_dx64    rom_sx64
 
 
 //-------------------------------------------------
@@ -1466,14 +1466,14 @@ ROM_END
 //  ROM( c64cp )
 //-------------------------------------------------
 
-#define rom_c64cp		rom_c64c
+#define rom_c64cp       rom_c64c
 
 
 //-------------------------------------------------
 //  ROM( c64g )
 //-------------------------------------------------
 
-#define rom_c64g		rom_c64c
+#define rom_c64g        rom_c64c
 
 
 //-------------------------------------------------
@@ -1514,20 +1514,20 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
-COMP( 1982,	c64,	0,  	0,		ntsc,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1982,	c64_jp,	c64,	0,		ntsc,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (Japan)",						GAME_SUPPORTS_SAVE )
-COMP( 1982,	c64p,	c64,	0,		pal,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",						GAME_SUPPORTS_SAVE )
-COMP( 1982,	c64_se,	c64,	0,		pal,		c64sw,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
-COMP( 1983, pet64,	c64,	0,  	pet64,  	c64,	driver_device,		0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
-COMP( 1983, edu64,  c64,	0,  	pet64,  	c64,	driver_device,		0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
-COMP( 1984, sx64,	c64,	0,		ntsc_sx,	c64,	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",				GAME_SUPPORTS_SAVE )
-COMP( 1984, sx64p,	c64,	0,		pal_sx,		c64,	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)",				GAME_SUPPORTS_SAVE )
-COMP( 1984, vip64,	c64,	0,		pal_sx,		c64sw,	driver_device,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					GAME_SUPPORTS_SAVE )
-COMP( 1984, dx64,	c64,	0,		ntsc_dx,	c64,	driver_device,		0,		"Commodore Business Machines", "DX-64 (NTSC)",								GAME_SUPPORTS_SAVE )
+COMP( 1982, c64,    0,      0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (NTSC)",                       GAME_SUPPORTS_SAVE )
+COMP( 1982, c64_jp, c64,    0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (Japan)",                      GAME_SUPPORTS_SAVE )
+COMP( 1982, c64p,   c64,    0,      pal,        c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (PAL)",                        GAME_SUPPORTS_SAVE )
+COMP( 1982, c64_se, c64,    0,      pal,        c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",   GAME_SUPPORTS_SAVE )
+COMP( 1983, pet64,  c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                  GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+COMP( 1983, edu64,  c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "Educator 64 (NTSC)",                        GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+COMP( 1984, sx64,   c64,    0,      ntsc_sx,    c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",               GAME_SUPPORTS_SAVE )
+COMP( 1984, sx64p,  c64,    0,      pal_sx,     c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",                GAME_SUPPORTS_SAVE )
+COMP( 1984, vip64,  c64,    0,      pal_sx,     c64sw,  driver_device,      0,      "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                   GAME_SUPPORTS_SAVE )
+COMP( 1984, dx64,   c64,    0,      ntsc_dx,    c64,    driver_device,      0,      "Commodore Business Machines", "DX-64 (NTSC)",                              GAME_SUPPORTS_SAVE )
 //COMP(1983, clipper,  c64,  0, c64pal,  clipper, XXX_CLASS, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //COMP(1983, tesa6240, c64,  0, c64pal,  c64, XXX_CLASS,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
-COMP( 1986, c64c,	c64,	0,  	ntsc_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (NTSC)",						GAME_SUPPORTS_SAVE )
-COMP( 1986, c64cp,	c64,	0,  	pal_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (PAL)",						GAME_SUPPORTS_SAVE )
-COMP( 1986, c64c_se,c64,	0,  	pal_c,		c64sw,	driver_device,		0,		"Commodore Business Machines", "Commodore 64C (Sweden/Finland)",			GAME_SUPPORTS_SAVE )
-COMP( 1986, c64g,	c64,	0,		pal_c,		c64,	driver_device,		0,		"Commodore Business Machines", "Commodore 64G (PAL)",						GAME_SUPPORTS_SAVE )
-CONS( 1990, c64gs,	c64,	0,		pal_gs,		c64gs,	driver_device,		0,		"Commodore Business Machines", "Commodore 64 Games System (PAL)",			GAME_SUPPORTS_SAVE )
+COMP( 1986, c64c,   c64,    0,      ntsc_c,     c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (NTSC)",                      GAME_SUPPORTS_SAVE )
+COMP( 1986, c64cp,  c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (PAL)",                       GAME_SUPPORTS_SAVE )
+COMP( 1986, c64c_se,c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",            GAME_SUPPORTS_SAVE )
+COMP( 1986, c64g,   c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64G (PAL)",                       GAME_SUPPORTS_SAVE )
+CONS( 1990, c64gs,  c64,    0,      pal_gs,     c64gs,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 Games System (PAL)",           GAME_SUPPORTS_SAVE )

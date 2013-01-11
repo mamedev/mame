@@ -8,10 +8,10 @@
 
 #include "includes/zx.h"
 
-#define video_screen_get_refresh(screen)	(((screen_config *)(screen)->inline_config)->refresh)
+#define video_screen_get_refresh(screen)    (((screen_config *)(screen)->inline_config)->refresh)
 
-#define	DEBUG_ZX81_PORTS	1
-#define DEBUG_ZX81_VSYNC	1
+#define DEBUG_ZX81_PORTS    1
+#define DEBUG_ZX81_VSYNC    1
 
 #define LOG_ZX81_IOR(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space.machine().primary_screen->vpos(), _comment); } while (0)
 #define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space.machine().primary_screen->vpos(), _comment); } while (0)
@@ -390,4 +390,3 @@ WRITE8_MEMBER( zx_state::zx81_io_w )
 		}
 	}
 }
-

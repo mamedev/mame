@@ -15,7 +15,7 @@ class bzone_state : public driver_device
 public:
 	bzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_discrete(*this, "discrete") { }
+			m_discrete(*this, "discrete") { }
 
 	optional_device<discrete_device> m_discrete;
 
@@ -43,7 +43,7 @@ MACHINE_CONFIG_EXTERN( bzone_audio );
 DECLARE_WRITE8_DEVICE_HANDLER( redbaron_sounds_w );
 
 class redbaron_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -64,4 +64,3 @@ private:
 };
 
 extern const device_type REDBARON;
-

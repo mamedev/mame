@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( tmc2000e )
-	PORT_START("DSW0")	// System Configuration DIPs
+	PORT_START("DSW0")  // System Configuration DIPs
 	PORT_DIPNAME( 0x80, 0x00, "Keyboard Type" )
 	PORT_DIPSETTING(    0x00, "ASCII" )
 	PORT_DIPSETTING(    0x80, "Matrix" )
@@ -142,10 +142,10 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT),
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1),
 	DEVCB_NULL,
-	RES_K(2.2),	// unverified
-	RES_K(1),	// unverified
-	RES_K(5.1),	// unverified
-	RES_K(4.7)	// unverified
+	RES_K(2.2), // unverified
+	RES_K(1),   // unverified
+	RES_K(5.1), // unverified
+	RES_K(4.7)  // unverified
 };
 
 /* CDP1802 Interface */
@@ -286,4 +286,4 @@ ROM_START( tmc2000e )
 ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT    COMPANY        FULLNAME
-COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, driver_device, 0,		"Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1980, tmc2000e, 0,       0,       tmc2000e, tmc2000e, driver_device, 0,       "Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

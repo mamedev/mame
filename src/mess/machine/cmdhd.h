@@ -28,7 +28,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CMD_HD_TAG			"cmdhd"
+#define CMD_HD_TAG          "cmdhd"
 
 
 
@@ -39,11 +39,11 @@
 // ======================> cmd_hd_device
 
 class cmd_hd_device :  public device_t,
-					   public device_cbm_iec_interface
+						public device_cbm_iec_interface
 {
 public:
-    // construction/destruction
-    cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -52,9 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER( led_w );
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete() { m_shortname = "cmdhd"; }
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "cmdhd"; }
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_cbm_iec_interface overrides

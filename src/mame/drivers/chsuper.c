@@ -26,7 +26,7 @@ class chsuper_state : public driver_device
 public:
 	chsuper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") { }
+			m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
 	DECLARE_READ8_MEMBER(ff_r);
@@ -200,7 +200,7 @@ static RAMDAC_INTERFACE( ramdac_intf )
 static MACHINE_CONFIG_START( chsuper, chsuper_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(chsuper_prg_map)
 	MCFG_CPU_IO_MAP(chsuper_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)

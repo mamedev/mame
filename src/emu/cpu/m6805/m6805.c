@@ -60,27 +60,27 @@
 /****************************************************************************/
 #define M6805_RDOP_ARG(addr) ((unsigned)m_direct->read_raw_byte(addr))
 
-#define SP_MASK m_sp_mask	/* stack pointer mask */
-#define SP_LOW	m_sp_low	/* stack pointer low water mark */
-#define PC		m_pc.w.l	/* program counter lower word */
-#define S		m_s.w.l 	/* stack pointer lower word */
-#define A		m_a 		/* accumulator */
-#define X		m_x 		/* index register */
-#define CC		m_cc		/* condition codes */
+#define SP_MASK m_sp_mask   /* stack pointer mask */
+#define SP_LOW  m_sp_low    /* stack pointer low water mark */
+#define PC      m_pc.w.l    /* program counter lower word */
+#define S       m_s.w.l     /* stack pointer lower word */
+#define A       m_a         /* accumulator */
+#define X       m_x         /* index register */
+#define CC      m_cc        /* condition codes */
 
 #define EAD m_ea.d
 #define EA  m_ea.w.l
 
 
 /* DS -- THESE ARE RE-DEFINED IN m6805.h TO RAM, ROM or FUNCTIONS IN cpuintrf.c */
-#define RM(addr)			M6805_RDMEM(addr)
-#define WM(addr, value)		M6805_WRMEM(addr, value)
+#define RM(addr)            M6805_RDMEM(addr)
+#define WM(addr, value)     M6805_WRMEM(addr, value)
 #define M_RDOP(addr)        M6805_RDOP(addr)
-#define M_RDOP_ARG(addr)	M6805_RDOP_ARG(addr)
+#define M_RDOP_ARG(addr)    M6805_RDOP_ARG(addr)
 
 /* macros to tweak the PC and SP */
-#define SP_INC	if( ++S > SP_MASK) S = SP_LOW
-#define SP_DEC	if( --S < SP_LOW) S = SP_MASK
+#define SP_INC  if( ++S > SP_MASK) S = SP_LOW
+#define SP_DEC  if( --S < SP_LOW) S = SP_MASK
 #define SP_ADJUST(s) ( ( (s) & SP_MASK ) | SP_LOW )
 
 /* macros to access memory */
@@ -100,20 +100,20 @@
 #define IFLAG 0x08
 #define HFLAG 0x10
 
-#define CLR_NZ	  CC&=~(NFLAG|ZFLAG)
+#define CLR_NZ    CC&=~(NFLAG|ZFLAG)
 #define CLR_HNZC  CC&=~(HFLAG|NFLAG|ZFLAG|CFLAG)
-#define CLR_Z	  CC&=~(ZFLAG)
+#define CLR_Z     CC&=~(ZFLAG)
 #define CLR_NZC   CC&=~(NFLAG|ZFLAG|CFLAG)
-#define CLR_ZC	  CC&=~(ZFLAG|CFLAG)
+#define CLR_ZC    CC&=~(ZFLAG|CFLAG)
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)       if(!a)SEZ
-#define SET_Z8(a)	   SET_Z((UINT8)a)
-#define SET_N8(a)	   CC|=((a&0x80)>>5)
+#define SET_Z8(a)      SET_Z((UINT8)a)
+#define SET_N8(a)      CC|=((a&0x80)>>5)
 #define SET_H(a,b,r)   CC|=((a^b^r)&0x10)
-#define SET_C8(a)	   CC|=((a&0x100)>>8)
+#define SET_C8(a)      CC|=((a&0x100)>>8)
 
-const UINT8 m6805_base_device::m_flags8i[256]=	 /* increment */
+const UINT8 m6805_base_device::m_flags8i[256]=   /* increment */
 {
 	0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -152,12 +152,12 @@ const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
 	0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,
 	0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04
 };
-#define SET_FLAGS8I(a)		{CC |= m_flags8i[(a) & 0xff];}
-#define SET_FLAGS8D(a)		{CC |= m_flags8d[(a) & 0xff];}
+#define SET_FLAGS8I(a)      {CC |= m_flags8i[(a) & 0xff];}
+#define SET_FLAGS8D(a)      {CC |= m_flags8d[(a) & 0xff];}
 
 /* combos */
-#define SET_NZ8(a)			{SET_N8(a); SET_Z(a);}
-#define SET_FLAGS8(a,b,r)	{SET_N8(r); SET_Z8(r); SET_C8(r);}
+#define SET_NZ8(a)          {SET_N8(a); SET_Z(a);}
+#define SET_FLAGS8(a,b,r)   {SET_N8(r); SET_Z8(r); SET_C8(r);}
 
 /* for treating an unsigned UINT8 as a signed INT16 */
 #define SIGNED(b) ((INT16)(b & 0x80 ? b | 0xff00 : b))
@@ -197,23 +197,23 @@ const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
 /* what they say it is ... */
 const UINT8 m6805_base_device::m_cycles1[] =
 {
-      /* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-  /*0*/ 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
-  /*1*/  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-  /*2*/  4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-  /*3*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 6, 0, 6, 6, 0,
-  /*4*/  4, 0, 0, 4, 4, 0, 4, 4, 4, 4, 4, 0, 4, 4, 0, 4,
-  /*5*/  4, 0, 0, 4, 4, 0, 4, 4, 4, 4, 4, 0, 4, 4, 0, 4,
-  /*6*/  7, 0, 0, 7, 7, 0, 7, 7, 7, 7, 7, 0, 7, 7, 0, 7,
-  /*7*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 0, 6,
-  /*8*/  9, 6, 0,11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  /*9*/  0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 2,
-  /*A*/  2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 8, 2, 0,
-  /*B*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5,
-  /*C*/  5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
-  /*D*/  6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 5, 9, 6, 7,
-  /*E*/  5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
-  /*F*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5
+		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+	/*0*/ 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+	/*1*/  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	/*2*/  4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+	/*3*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 6, 0, 6, 6, 0,
+	/*4*/  4, 0, 0, 4, 4, 0, 4, 4, 4, 4, 4, 0, 4, 4, 0, 4,
+	/*5*/  4, 0, 0, 4, 4, 0, 4, 4, 4, 4, 4, 0, 4, 4, 0, 4,
+	/*6*/  7, 0, 0, 7, 7, 0, 7, 7, 7, 7, 7, 0, 7, 7, 0, 7,
+	/*7*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 0, 6,
+	/*8*/  9, 6, 0,11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	/*9*/  0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 2,
+	/*A*/  2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 8, 2, 0,
+	/*B*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5,
+	/*C*/  5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
+	/*D*/  6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 5, 9, 6, 7,
+	/*E*/  5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
+	/*F*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5
 };
 
 
@@ -244,16 +244,16 @@ void m6805_base_device::wr_s_handler_b(UINT8 *b)
 void m6805_base_device::wr_s_handler_w(PAIR *p)
 {
 	WM( S, p->b.l );
-    SP_DEC;
+	SP_DEC;
 	WM( S, p->b.h );
-    SP_DEC;
+	SP_DEC;
 }
 
 void m6805_base_device::RM16(UINT32 addr, PAIR *p)
 {
 	CLEAR_PAIR(p);
-    p->b.h = RM(addr);
-    ++addr;
+	p->b.h = RM(addr);
+	++addr;
 //  if( ++addr > AMASK ) addr = 0;
 	p->b.l = RM(addr);
 }
@@ -418,10 +418,10 @@ void m6805_base_device::device_start()
 	astring tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
-	state_add(M6805_A,         "A",        	m_a).mask(0xff);
-	state_add(M6805_PC,        "PC",    	m_pc.w.l).mask(0xffff);
-	state_add(M6805_S,         "S",        	m_s.w.l).mask(0xff);
-	state_add(M6805_X,         "X",        	m_x).mask(0xff);
+	state_add(M6805_A,         "A",         m_a).mask(0xff);
+	state_add(M6805_PC,        "PC",        m_pc.w.l).mask(0xffff);
+	state_add(M6805_S,         "S",         m_s.w.l).mask(0xff);
+	state_add(M6805_X,         "X",         m_x).mask(0xff);
 	state_add(M6805_CC,        "CC",        m_cc).mask(0xff);
 
 	save_item(NAME(A));
@@ -462,9 +462,9 @@ void m6805_base_device::device_reset()
 	m_direct = &m_program->direct();
 
 	/* IRQ disabled */
-    SEI;
+	SEI;
 
-    RM16(0xfffe, &m_pc);
+	RM16(0xfffe, &m_pc);
 }
 
 
@@ -495,14 +495,14 @@ void m6805_base_device::state_string_export(const device_state_entry &entry, ast
 	{
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c%c%c%c%c",
-			    (m_cc & 0x80) ? '?' : '.',
-			    (m_cc & 0x40) ? '?' : '.',
-			    (m_cc & 0x20) ? '?' : '.',
-			    (m_cc & 0x10) ? 'H' : '.',
-			    (m_cc & 0x08) ? 'I' : '.',
-			    (m_cc & 0x04) ? 'N' : '.',
-			    (m_cc & 0x02) ? 'Z' : '.',
-			    (m_cc & 0x01) ? 'C' : '.');
+				(m_cc & 0x80) ? '?' : '.',
+				(m_cc & 0x40) ? '?' : '.',
+				(m_cc & 0x20) ? '?' : '.',
+				(m_cc & 0x10) ? 'H' : '.',
+				(m_cc & 0x08) ? 'I' : '.',
+				(m_cc & 0x04) ? 'N' : '.',
+				(m_cc & 0x02) ? 'Z' : '.',
+				(m_cc & 0x01) ? 'C' : '.');
 			break;
 	}
 }
@@ -619,7 +619,7 @@ void m6805_base_device::execute_run()
 {
 	UINT8 ireg;
 
-	S = SP_ADJUST( S );		/* Taken from CPU_SET_CONTEXT when pointer'afying */
+	S = SP_ADJUST( S );     /* Taken from CPU_SET_CONTEXT when pointer'afying */
 
 	do
 	{

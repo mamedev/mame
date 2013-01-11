@@ -53,32 +53,32 @@
 // laserdisc field codes
 enum laserdisc_field_code
 {
-	LASERDISC_CODE_WHITE_FLAG = 11,		// boolean white flag
-	LASERDISC_CODE_LINE16 = 16,			// 24-bit line 16 code
-	LASERDISC_CODE_LINE17 = 17,			// 24-bit line 17 code
-	LASERDISC_CODE_LINE18 = 18,			// 24-bit line 18 code
-	LASERDISC_CODE_LINE1718	= 1718		// 24-bit best of line 17/18 code
+	LASERDISC_CODE_WHITE_FLAG = 11,     // boolean white flag
+	LASERDISC_CODE_LINE16 = 16,         // 24-bit line 16 code
+	LASERDISC_CODE_LINE17 = 17,         // 24-bit line 17 code
+	LASERDISC_CODE_LINE18 = 18,         // 24-bit line 18 code
+	LASERDISC_CODE_LINE1718 = 1718      // 24-bit best of line 17/18 code
 };
 
 
 // special frame and chapter numbers from VBI conversion
-#define FRAME_NOT_PRESENT			-2						// no frame number information present
-#define FRAME_LEAD_IN				-1						// lead-in code detected
-#define FRAME_LEAD_OUT				99999					// lead-out code detected
-#define CHAPTER_NOT_PRESENT			-2						// no chapter number information present
-#define CHAPTER_LEAD_IN				-1						// lead-in code detected
-#define CHAPTER_LEAD_OUT			100						// lead-out code detected
+#define FRAME_NOT_PRESENT           -2                      // no frame number information present
+#define FRAME_LEAD_IN               -1                      // lead-in code detected
+#define FRAME_LEAD_OUT              99999                   // lead-out code detected
+#define CHAPTER_NOT_PRESENT         -2                      // no chapter number information present
+#define CHAPTER_LEAD_IN             -1                      // lead-in code detected
+#define CHAPTER_LEAD_OUT            100                     // lead-out code detected
 
 // generic head movement speeds; use player-specific information where appropriate
-#define GENERIC_SLOW_SPEED			(5)						// 1/5 normal speed
-#define GENERIC_FAST_SPEED			(3)						// 3x normal speed
-#define GENERIC_SCAN_SPEED			(50)					// 50x normal speed
-#define GENERIC_SEARCH_SPEED		(5000)					// 5000x normal speed
+#define GENERIC_SLOW_SPEED          (5)                     // 1/5 normal speed
+#define GENERIC_FAST_SPEED          (3)                     // 3x normal speed
+#define GENERIC_SCAN_SPEED          (50)                    // 50x normal speed
+#define GENERIC_SEARCH_SPEED        (5000)                  // 5000x normal speed
 
 // generic timings; use player-specific information where appropriate
-#define GENERIC_EJECT_TIME			(attotime::from_seconds(5))
-#define GENERIC_SPINUP_TIME			(attotime::from_seconds(2))
-#define GENERIC_LOAD_TIME			(attotime::from_seconds(5))
+#define GENERIC_EJECT_TIME          (attotime::from_seconds(5))
+#define GENERIC_SPINUP_TIME         (attotime::from_seconds(2))
+#define GENERIC_LOAD_TIME           (attotime::from_seconds(5))
 
 
 
@@ -135,7 +135,7 @@ enum laserdisc_field_code
 //  MACROS
 //**************************************************************************
 
-#define SCANNING_PARAM(speed,duration)	(((speed) << 8) | ((duration) & 0xff))
+#define SCANNING_PARAM(speed,duration)  (((speed) << 8) | ((duration) & 0xff))
 
 
 
@@ -156,17 +156,17 @@ typedef delegate<void (laserdisc_device &device, int samplerate, int samples, co
 // overlay configuration
 struct laserdisc_overlay_config
 {
-	float					m_overposx;
-	float					m_overposy;
-	float					m_overscalex;
-	float					m_overscaley;
+	float                   m_overposx;
+	float                   m_overposy;
+	float                   m_overscalex;
+	float                   m_overscaley;
 };
 
 
 // ======================> laserdisc_device
 
 // base laserdisc class
-class laserdisc_device :	public device_t,
+class laserdisc_device :    public device_t,
 							public device_sound_interface,
 							public laserdisc_overlay_config
 {
@@ -216,53 +216,53 @@ protected:
 	// common laserdisc states
 	enum player_state
 	{
-		LDSTATE_NONE,							// unspecified state
-		LDSTATE_EJECTING,						// in the process of ejecting
-		LDSTATE_EJECTED,						// fully ejected
-		LDSTATE_PARKED,							// head parked in lead-in
-		LDSTATE_LOADING,						// loading from ejected state
-		LDSTATE_SPINUP,							// spinning up
-		LDSTATE_PAUSING,						// looking for a frame boundary to pause
-		LDSTATE_PAUSED,							// found a frame boundary; now paused
+		LDSTATE_NONE,                           // unspecified state
+		LDSTATE_EJECTING,                       // in the process of ejecting
+		LDSTATE_EJECTED,                        // fully ejected
+		LDSTATE_PARKED,                         // head parked in lead-in
+		LDSTATE_LOADING,                        // loading from ejected state
+		LDSTATE_SPINUP,                         // spinning up
+		LDSTATE_PAUSING,                        // looking for a frame boundary to pause
+		LDSTATE_PAUSED,                         // found a frame boundary; now paused
 												//   parameter specifies the fieldnum of the first frame
-		LDSTATE_PLAYING,						// playing forward normally, with audio
+		LDSTATE_PLAYING,                        // playing forward normally, with audio
 												//   parameter specifies the target frame, or 0 if none
-		LDSTATE_PLAYING_SLOW_REVERSE,			// playing slow in the reverse direction, with no audio
+		LDSTATE_PLAYING_SLOW_REVERSE,           // playing slow in the reverse direction, with no audio
 												//   parameter specifies the number of times to repeat each track
-		LDSTATE_PLAYING_SLOW_FORWARD,			// playing slow in the forward direction, with no audio
+		LDSTATE_PLAYING_SLOW_FORWARD,           // playing slow in the forward direction, with no audio
 												//   parameter specifies the number of times to repeat each track
-		LDSTATE_PLAYING_FAST_REVERSE,			// playing fast in the reverse direction, with no audio
+		LDSTATE_PLAYING_FAST_REVERSE,           // playing fast in the reverse direction, with no audio
 												//   parameter specifies the number of frames to skip backwards after each frame
-		LDSTATE_PLAYING_FAST_FORWARD,			// playing fast in the forward direction, with no audio
+		LDSTATE_PLAYING_FAST_FORWARD,           // playing fast in the forward direction, with no audio
 												//   parameter specifies the number of frames to skip forwards after each frame
-		LDSTATE_STEPPING_REVERSE,				// single frame stepping in the reverse direction
-		LDSTATE_STEPPING_FORWARD,				// single frame stepping in the forward direction
-		LDSTATE_SCANNING,						// scanning in the forward or reverse direction
+		LDSTATE_STEPPING_REVERSE,               // single frame stepping in the reverse direction
+		LDSTATE_STEPPING_FORWARD,               // single frame stepping in the forward direction
+		LDSTATE_SCANNING,                       // scanning in the forward or reverse direction
 												//   parameter(0:7) controls how many vsyncs until revert to savestate
 												//   parameter(8:31) specifies the speed
-		LDSTATE_SEEKING,						// seeking to a specific frame
+		LDSTATE_SEEKING,                        // seeking to a specific frame
 												//   parameter specifies the target frame
-		LDSTATE_OTHER							// other states start here
+		LDSTATE_OTHER                           // other states start here
 	};
 
 	// slider position
 	enum slider_position
 	{
-		SLIDER_MINIMUM,							// at the minimum value
-		SLIDER_VIRTUAL_LEADIN,					// within the virtual lead-in area
-		SLIDER_CHD,								// within the boundaries of the CHD
-		SLIDER_OUTSIDE_CHD,						// outside of the CHD area but before the virtual lead-out area
-		SLIDER_VIRTUAL_LEADOUT,					// within the virtual lead-out area
-		SLIDER_MAXIMUM							// at the maximum value
+		SLIDER_MINIMUM,                         // at the minimum value
+		SLIDER_VIRTUAL_LEADIN,                  // within the virtual lead-in area
+		SLIDER_CHD,                             // within the boundaries of the CHD
+		SLIDER_OUTSIDE_CHD,                     // outside of the CHD area but before the virtual lead-out area
+		SLIDER_VIRTUAL_LEADOUT,                 // within the virtual lead-out area
+		SLIDER_MAXIMUM                          // at the maximum value
 	};
 
 	// information about the current player state
 	struct player_state_info
 	{
-		player_state	m_state;				// current state
-		INT32			m_substate;				// internal sub-state; starts at 0 on any state change
-		INT32			m_param;				// parameter for current state
-		attotime		m_endtime;				// minimum ending time for current state
+		player_state    m_state;                // current state
+		INT32           m_substate;             // internal sub-state; starts at 0 on any state change
+		INT32           m_param;                // parameter for current state
+		attotime        m_endtime;              // minimum ending time for current state
 	};
 
 	// subclass overrides
@@ -293,17 +293,17 @@ protected:
 	int frame_from_metadata(const vbi_metadata &metadata);
 	int chapter_from_metadata(const vbi_metadata &metadata);
 
-	player_state_info	m_player_state;			// active state
-	player_state_info	m_saved_state;			// saved state during temporary operations
+	player_state_info   m_player_state;         // active state
+	player_state_info   m_saved_state;          // saved state during temporary operations
 
 private:
 	// internal type definitions
 	struct frame_data
 	{
-		bitmap_yuy16		m_bitmap;				// cached bitmap
-		bitmap_yuy16		m_visbitmap;			// wrapper around bitmap with only visible lines
-		UINT8				m_numfields;			// number of fields in this frame
-		INT32				m_lastfield;			// last absolute field number
+		bitmap_yuy16        m_bitmap;               // cached bitmap
+		bitmap_yuy16        m_visbitmap;            // wrapper around bitmap with only visible lines
+		UINT8               m_numfields;            // number of fields in this frame
+		INT32               m_lastfield;            // last absolute field number
 	};
 
 	// internal helpers
@@ -322,68 +322,68 @@ private:
 	void config_save(int config_type, xml_data_node *parentnode);
 
 	// configuration
-	laserdisc_get_disc_delegate	m_getdisc_callback;
-	laserdisc_audio_delegate m_audio_callback;	// audio streaming callback
-	const char *		m_screen_name;			// name of the screen device
-	laserdisc_overlay_config m_orig_config;		// original overlay configuration
-	UINT32				m_overwidth;			// overlay screen width
-	UINT32				m_overheight;			// overlay screen height
-	rectangle			m_overclip;				// overlay visarea
+	laserdisc_get_disc_delegate m_getdisc_callback;
+	laserdisc_audio_delegate m_audio_callback;  // audio streaming callback
+	const char *        m_screen_name;          // name of the screen device
+	laserdisc_overlay_config m_orig_config;     // original overlay configuration
+	UINT32              m_overwidth;            // overlay screen width
+	UINT32              m_overheight;           // overlay screen height
+	rectangle           m_overclip;             // overlay visarea
 	screen_update_ind16_delegate m_overupdate_ind16; // overlay update delegate
 	screen_update_rgb32_delegate m_overupdate_rgb32; // overlay update delegate
 
 	// disc parameters
-	chd_file *			m_disc;					// handle to the disc itself
-	dynamic_buffer		m_vbidata;				// pointer to precomputed VBI data
-	int					m_width;				// width of video
-	int					m_height;				// height of video
-	UINT32				m_fps_times_1million;	// frame rate of video
-	int					m_samplerate;			// audio samplerate
-	int					m_readresult;			// result of the most recent read
-	UINT32				m_chdtracks;			// number of tracks in the CHD
-	avhuff_decompress_config m_avhuff_config;	// decompression configuration
+	chd_file *          m_disc;                 // handle to the disc itself
+	dynamic_buffer      m_vbidata;              // pointer to precomputed VBI data
+	int                 m_width;                // width of video
+	int                 m_height;               // height of video
+	UINT32              m_fps_times_1million;   // frame rate of video
+	int                 m_samplerate;           // audio samplerate
+	int                 m_readresult;           // result of the most recent read
+	UINT32              m_chdtracks;            // number of tracks in the CHD
+	avhuff_decompress_config m_avhuff_config;   // decompression configuration
 
 	// async operations
-	osd_work_queue *	m_work_queue;			// work queue
-	UINT32				m_queued_hunknum;		// queued hunk
+	osd_work_queue *    m_work_queue;           // work queue
+	UINT32              m_queued_hunknum;       // queued hunk
 
 	// core states
-	UINT8				m_audiosquelch;			// audio squelch state: bit 0 = audio 1, bit 1 = audio 2
-	UINT8				m_videosquelch;			// video squelch state: bit 0 = on/off
-	UINT8				m_fieldnum;				// field number (0 or 1)
-	INT32				m_curtrack;				// current track at this end of this vsync
-	UINT32				m_maxtrack;				// maximum track number
-	attoseconds_t		m_attospertrack;		// attoseconds per track, or 0 if not moving
-	attotime			m_sliderupdate;			// time of last slider update
+	UINT8               m_audiosquelch;         // audio squelch state: bit 0 = audio 1, bit 1 = audio 2
+	UINT8               m_videosquelch;         // video squelch state: bit 0 = on/off
+	UINT8               m_fieldnum;             // field number (0 or 1)
+	INT32               m_curtrack;             // current track at this end of this vsync
+	UINT32              m_maxtrack;             // maximum track number
+	attoseconds_t       m_attospertrack;        // attoseconds per track, or 0 if not moving
+	attotime            m_sliderupdate;         // time of last slider update
 
 	// video data
-	screen_device *		m_screen;				// pointer to the screen device
-	frame_data			m_frame[3];				// circular list of frames
-	UINT8				m_videoindex;			// index of the current video buffer
-	bitmap_yuy16		m_emptyframe;			// blank frame
+	screen_device *     m_screen;               // pointer to the screen device
+	frame_data          m_frame[3];             // circular list of frames
+	UINT8               m_videoindex;           // index of the current video buffer
+	bitmap_yuy16        m_emptyframe;           // blank frame
 
 	// audio data
-	sound_stream *		m_stream;
-	INT16 *				m_audiobuffer[2];		// buffer for audio samples
-	UINT32				m_audiobufsize;			// size of buffer
-	UINT32				m_audiobufin;			// input index
-	UINT32				m_audiobufout;			// output index
-	UINT32				m_audiocursamples;		// current samples this track
-	UINT32				m_audiomaxsamples;		// maximum samples per track
+	sound_stream *      m_stream;
+	INT16 *             m_audiobuffer[2];       // buffer for audio samples
+	UINT32              m_audiobufsize;         // size of buffer
+	UINT32              m_audiobufin;           // input index
+	UINT32              m_audiobufout;          // output index
+	UINT32              m_audiocursamples;      // current samples this track
+	UINT32              m_audiomaxsamples;      // maximum samples per track
 
 	// metadata
-	vbi_metadata		m_metadata[2];			// metadata parsed from the stream, for each field
+	vbi_metadata        m_metadata[2];          // metadata parsed from the stream, for each field
 
 	// video updating
-	bool				m_videoenable;			// is video enabled?
-	render_texture *	m_videotex;				// texture for the video
-	palette_t *			m_videopalette;			// palette for the video
+	bool                m_videoenable;          // is video enabled?
+	render_texture *    m_videotex;             // texture for the video
+	palette_t *         m_videopalette;         // palette for the video
 
 	// overlays
-	bool				m_overenable;			// is the overlay enabled?
-	screen_bitmap		m_overbitmap[2];		// overlay bitmaps
-	int					m_overindex;			// index of the overlay bitmap
-	render_texture *	m_overtex;				// texture for the overlay
+	bool                m_overenable;           // is the overlay enabled?
+	screen_bitmap       m_overbitmap[2];        // overlay bitmaps
+	int                 m_overindex;            // index of the overlay bitmap
+	render_texture *    m_overtex;              // texture for the overlay
 };
 
 // iterator - interface iterator works for subclasses too
@@ -403,8 +403,8 @@ typedef device_interface_iterator<laserdisc_device> laserdisc_device_iterator;
 inline bool laserdisc_device::is_start_of_frame(const vbi_metadata &vbi)
 {
 	// is it not known if the white flag or the presence of a frame code
-    // determines the start of frame; the former seems to be the "official"
-    // way, but the latter seems to be the practical implementation
+	// determines the start of frame; the former seems to be the "official"
+	// way, but the latter seems to be the practical implementation
 	return (vbi.white || (vbi.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE);
 }
 

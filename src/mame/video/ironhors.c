@@ -24,7 +24,7 @@ void ironhors_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, rweights, 1000, 0,
 			4, resistances, gweights, 1000, 0,
 			4, resistances, bweights, 1000, 0);
@@ -66,7 +66,7 @@ void ironhors_state::palette_init()
 	color_prom += 0x300;
 
 	/* characters use colors 0x10-0x1f of each 0x20 color bank,
-       while sprites use colors 0-0x0f */
+	   while sprites use colors 0-0x0f */
 	for (i = 0; i < 0x200; i++)
 	{
 		int j;
@@ -181,7 +181,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		switch (sr[offs + 4] & 0x0c)
 		{
-			case 0x00:	/* 16x16 */
+			case 0x00:  /* 16x16 */
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 						code/4,
 						color,
@@ -189,7 +189,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						sx,sy,0);
 				break;
 
-			case 0x04:	/* 16x8 */
+			case 0x04:  /* 16x8 */
 				{
 					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
 
@@ -206,7 +206,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				}
 				break;
 
-			case 0x08:	/* 8x16 */
+			case 0x08:  /* 8x16 */
 				{
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code & ~2,
@@ -221,7 +221,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				}
 				break;
 
-			case 0x0c:	/* 8x8 */
+			case 0x0c:  /* 8x8 */
 				{
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code,
@@ -291,7 +291,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 		switch (sr[offs + 3] & 0x0c)
 		{
-			case 0x00:	/* 16x16 */
+			case 0x00:  /* 16x16 */
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 						code/4,
 						color,
@@ -299,7 +299,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 						sx,sy,0);
 				break;
 
-			case 0x04:	/* 16x8 */
+			case 0x04:  /* 16x8 */
 				{
 					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
 
@@ -316,7 +316,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 				}
 				break;
 
-			case 0x08:	/* 8x16 */
+			case 0x08:  /* 8x16 */
 				{
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code & ~2,
@@ -331,7 +331,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 				}
 				break;
 
-			case 0x0c:	/* 8x8 */
+			case 0x0c:  /* 8x8 */
 				{
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code,
@@ -355,4 +355,3 @@ UINT32 ironhors_state::screen_update_farwest(screen_device &screen, bitmap_ind16
 	farwest_draw_sprites(machine(), bitmap, cliprect);
 	return 0;
 }
-

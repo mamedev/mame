@@ -383,7 +383,7 @@ static const gfx_layout charlayout =
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8	/* every char takes 8 consecutive bytes */
+	16*8    /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
@@ -414,12 +414,12 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( backfire )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 128 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,    0x200, 32 )	/* Sprites 16x16 (screen 1) */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,    0x600, 32 )	/* Sprites 16x16 (screen 2) */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 )   /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 )   /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 128 )   /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,      0, 128 )   /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,    0x200, 32 )    /* Sprites 16x16 (screen 1) */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,    0x600, 32 )    /* Sprites 16x16 (screen 2) */
 GFXDECODE_END
 
 
@@ -453,9 +453,9 @@ static const deco16ic_interface backfire_deco16ic_tilegen1_intf =
 {
 	"lscreen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0x00, 0x40, /* color base */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	backfire_bank_callback,
 	backfire_bank_callback,
 	0,1
@@ -465,9 +465,9 @@ static const deco16ic_interface backfire_deco16ic_tilegen2_intf =
 {
 	"lscreen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0x10, 0x50, /* color base */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	backfire_bank_callback,
 	backfire_bank_callback,
 	2,3
@@ -501,7 +501,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
 	MCFG_CPU_PROGRAM_MAP(backfire_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", backfire_state,  deco32_vbl_interrupt)	/* or is it "rscreen?" */
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", backfire_state,  deco32_vbl_interrupt)    /* or is it "rscreen?" */
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -681,11 +681,11 @@ static void descramble_sound( running_machine &machine )
 		UINT32 addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
-		                    19,18,17,16,
-		                    15,14,13,12,
-		                    11,10,9, 8,
-		                    7, 6, 5, 4,
-		                    3, 2, 1 );
+							19,18,17,16,
+							15,14,13,12,
+							11,10,9, 8,
+							7, 6, 5, 4,
+							3, 2, 1 );
 
 		buf1[addr] = rom[x];
 	}

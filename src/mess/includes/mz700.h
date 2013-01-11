@@ -23,7 +23,7 @@ public:
 	mz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	int m_mz700;				/* 1 if running on an mz700 */
+	int m_mz700;                /* 1 if running on an mz700 */
 
 	device_t *m_pit;
 	i8255_device *m_ppi;
@@ -31,20 +31,20 @@ public:
 	int m_cursor_timer;
 	int m_other_timer;
 
-	int m_intmsk;	/* PPI8255 pin PC2 */
+	int m_intmsk;   /* PPI8255 pin PC2 */
 
-	int m_mz700_ram_lock;		/* 1 if ram lock is active */
-	int m_mz700_ram_vram;		/* 1 if vram is banked in */
+	int m_mz700_ram_lock;       /* 1 if ram lock is active */
+	int m_mz700_ram_vram;       /* 1 if vram is banked in */
 
 	/* mz800 specific */
 	UINT8 *m_cgram;
 
-	int m_mz700_mode;			/* 1 if in mz700 mode */
-	int m_mz800_ram_lock;		/* 1 if lock is active */
-	int m_mz800_ram_monitor;	/* 1 if monitor rom banked in */
+	int m_mz700_mode;           /* 1 if in mz700 mode */
+	int m_mz800_ram_lock;       /* 1 if lock is active */
+	int m_mz800_ram_monitor;    /* 1 if monitor rom banked in */
 
-	int m_hires_mode;			/* 1 if in 640x200 mode */
-	int m_screen;			/* screen designation */
+	int m_hires_mode;           /* 1 if in 640x200 mode */
+	int m_screen;           /* screen designation */
 	UINT8 *m_colorram;
 	UINT8 *m_videoram;
 	UINT8 m_speaker_level;

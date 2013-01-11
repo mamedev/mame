@@ -200,7 +200,7 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 				{
 					px = 8 * x + dx - 6;
 					py = 8 * y + dy + 9;
-				 }
+					}
 				else
 				{
 					px = 248 - (8 * x + dx - 8);

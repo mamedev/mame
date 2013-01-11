@@ -426,7 +426,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 				UINT32 size, mode;
 				UINT64 index0, index1, track_end;
 
-				fseek(infile, 12, SEEK_CUR);	// skip ISRC code
+				fseek(infile, 12, SEEK_CUR);    // skip ISRC code
 				size = read_uint16(infile);
 				mode = read_uint16(infile);
 				fseek(infile, 2, SEEK_CUR);
@@ -442,42 +442,42 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 
 				switch (mode)
 				{
-					case 0x0000:	// 2048 byte data
+					case 0x0000:    // 2048 byte data
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE1;
 						outinfo.track[track-1].swap = false;
 						break;
 
-					case 0x0300:	// Mode 2 Form 1
+					case 0x0300:    // Mode 2 Form 1
 						printf("ERROR: Mode 2 Form 1 tracks not supported\n");
 						fclose(infile);
 						return CHDERR_UNSUPPORTED_FORMAT;
 
-					case 0x0500:	// raw data
+					case 0x0500:    // raw data
 						printf("ERROR: Raw data tracks not supported\n");
 						fclose(infile);
 						return CHDERR_UNSUPPORTED_FORMAT;
 
-					case 0x0600:	// 2352 byte mode 2 raw
+					case 0x0600:    // 2352 byte mode 2 raw
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
 						outinfo.track[track-1].swap = false;
 						break;
 
-					case 0x0700:	// 2352 byte audio
+					case 0x0700:    // 2352 byte audio
 						outtoc.tracks[track-1].trktype = CD_TRACK_AUDIO;
 						outinfo.track[track-1].swap = true;
 						break;
 
-					case 0x0f00:	// raw data with sub-channel
+					case 0x0f00:    // raw data with sub-channel
 						printf("ERROR: Raw data tracks with sub-channel not supported\n");
 						fclose(infile);
 						return CHDERR_UNSUPPORTED_FORMAT;
 
-					case 0x1000:	// audio with sub-channel
+					case 0x1000:    // audio with sub-channel
 						printf("ERROR: Audio tracks with sub-channel not supported\n");
 						fclose(infile);
 						return CHDERR_UNSUPPORTED_FORMAT;
 
-					case 0x1100:	// raw Mode 2 Form 1 with sub-channel
+					case 0x1100:    // raw Mode 2 Form 1 with sub-channel
 						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported\n");
 						fclose(infile);
 						return CHDERR_UNSUPPORTED_FORMAT;
@@ -609,7 +609,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 	memset(&outtoc, 0, sizeof(outtoc));
 	outinfo.reset();
 
-    outtoc.flags = CD_FLAG_GDROM;
+	outtoc.flags = CD_FLAG_GDROM;
 
 	fgets(linebuffer,511,infile);
 	numtracks=atoi(linebuffer);
@@ -630,7 +630,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		outinfo.track[trknum].swap=false;
 		outinfo.track[trknum].offset=0;
 
-        outtoc.tracks[trknum].datasize = 0;
+		outtoc.tracks[trknum].datasize = 0;
 		outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 		outtoc.tracks[trknum].subsize = 0;
 
@@ -688,12 +688,12 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		}
 	}
 
-    #if 0
+	#if 0
 	for(i=0; i < numtracks; i++)
-    {
-        printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.cstr(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
-    }
-    #endif
+	{
+		printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.cstr(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
+	}
+	#endif
 
 	/* close the input TOC */
 	fclose(infile);
@@ -822,7 +822,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 				cdrom_convert_subtype_string_to_track_info(token, &outtoc.tracks[trknum]);
 			}
-			else if (!strcmp(token, "INDEX"))	/* only in bin/cue files */
+			else if (!strcmp(token, "INDEX"))   /* only in bin/cue files */
 			{
 				int idx, frames;
 
@@ -905,7 +905,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
 					outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 				}
-				else	/* data files are different */
+				else    /* data files are different */
 				{
 					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
@@ -925,7 +925,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				{
 					outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx1offs - outinfo.track[trknum].idx1offs;
 
-					if (trknum == 0)	// track 0 offset is 0
+					if (trknum == 0)    // track 0 offset is 0
 					{
 						outinfo.track[trknum].offset = 0;
 					}
@@ -940,7 +940,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 						return CHDERR_INVALID_DATA;
 					}
 				}
-				else	/* data files are different */
+				else    /* data files are different */
 				{
 					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
@@ -969,13 +969,13 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	FILE *infile;
 	int i, trknum;
 	static char token[512];
-    char tocftemp[512];
+	char tocftemp[512];
 
-    strcpy(tocftemp, tocfname);
-    for (i = 0; i < strlen(tocfname); i++)
-    {
-        tocftemp[i] = tolower(tocftemp[i]);
-    }
+	strcpy(tocftemp, tocfname);
+	for (i = 0; i < strlen(tocfname); i++)
+	{
+		tocftemp[i] = tolower(tocftemp[i]);
+	}
 
 	if (strstr(tocftemp,".gdi"))
 	{

@@ -12,9 +12,9 @@
 #include "includes/dkong.h"
 #include "machine/latch8.h"
 
-#define RADARSCP_BCK_COL_OFFSET			256
-#define RADARSCP_GRID_COL_OFFSET		(RADARSCP_BCK_COL_OFFSET + 256)
-#define RADARSCP_STAR_COL				(RADARSCP_GRID_COL_OFFSET + 8)
+#define RADARSCP_BCK_COL_OFFSET         256
+#define RADARSCP_GRID_COL_OFFSET        (RADARSCP_BCK_COL_OFFSET + 256)
+#define RADARSCP_STAR_COL               (RADARSCP_GRID_COL_OFFSET + 8)
 
 static const double cd4049_vl = 1.5/5.0;
 static const double cd4049_vh = 3.5/5.0;
@@ -61,13 +61,13 @@ static const double cd4049_al = 0.01;
 
 static const res_net_decode_info dkong_decode_info =
 {
-	2,		/*  there may be two proms needed to construct color */
-	0,		/*  start at 0 */
-	255,	/*  end at 255 */
+	2,      /*  there may be two proms needed to construct color */
+	0,      /*  start at 0 */
+	255,    /*  end at 255 */
 	/*  R,   G,   B,   R,   G,   B */
-	{ 256, 256,   0,   0,   0,   0},		/*  offsets */
-	{   1,  -2,   0,   0,   2,   0},		/*  shifts */
-	{0x07,0x04,0x03,0x00,0x03,0x00}		    /*  masks */
+	{ 256, 256,   0,   0,   0,   0},        /*  offsets */
+	{   1,  -2,   0,   0,   2,   0},        /*  shifts */
+	{0x07,0x04,0x03,0x00,0x03,0x00}         /*  masks */
 };
 
 static const res_net_info dkong_net_info =
@@ -92,13 +92,13 @@ static const res_net_info dkong_net_bck_info =
 
 static const res_net_decode_info dkong3_decode_info =
 {
-	1,		/*  one prom needed to contruct color */
-	0,		/*  start at 0 */
-	255,	/*  end at 255 */
+	1,      /*  one prom needed to contruct color */
+	0,      /*  start at 0 */
+	255,    /*  end at 255 */
 	/*   R,   G,   B */
-	{   0,   0, 512 },		/*  offsets */
-	{   4,   0,   0 },		/*  shifts */
-	{0x0F,0x0F,0x0F }		    /*  masks */
+	{   0,   0, 512 },      /*  offsets */
+	{   4,   0,   0 },      /*  shifts */
+	{0x0F,0x0F,0x0F }           /*  masks */
 };
 
 static const res_net_info dkong3_net_info =
@@ -120,7 +120,7 @@ static const res_net_info dkong3_net_info =
 */
 
 
-#define TRS_J1	(1)			// (1) = Closed (0) = Open
+#define TRS_J1  (1)         // (1) = Closed (0) = Open
 
 
 static const res_net_info radarscp_net_info =
@@ -129,7 +129,7 @@ static const res_net_info radarscp_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_EMITTER,	  680 * TRS_J1, 680*(1-TRS_J1), 2, {  470, 220,   0 } }    /*  radarscp */
+		{ RES_NET_AMP_EMITTER,    680 * TRS_J1, 680*(1-TRS_J1), 2, {  470, 220,   0 } }    /*  radarscp */
 	}
 };
 
@@ -139,7 +139,7 @@ static const res_net_info radarscp_net_bck_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 4700, 0, { 0 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 4700, 0, { 0 } },
-		{ RES_NET_AMP_EMITTER,	  470, 4700, 0, { 0 } }    /*  radarscp */
+		{ RES_NET_AMP_EMITTER,    470, 4700, 0, { 0 } }    /*  radarscp */
 	}
 };
 
@@ -168,8 +168,8 @@ static const res_net_info radarscp_stars_net_info =
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 4700, 470, 0, { 0 } },
-		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },	/*  dummy */
-		{ RES_NET_AMP_EMITTER,       1,   0, 0, { 0 } },	/*  dummy */
+		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },    /*  dummy */
+		{ RES_NET_AMP_EMITTER,       1,   0, 0, { 0 } },    /*  dummy */
 	}
 };
 
@@ -179,9 +179,9 @@ static const res_net_info radarscp_blue_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_VCC | RES_NET_MONITOR_SANYO_EZV20,
 	{
-		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	/*  bias/gnd exist in schematics, readable in TKG3 schematics */
-		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	/*  bias/gnd exist in schematics, readable in TKG3 schematics */
-		{ RES_NET_AMP_EMITTER,       0,    0, 8, { 128,64,32,16,8,4,2,1 } },	/*  dummy */
+		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },   /*  bias/gnd exist in schematics, readable in TKG3 schematics */
+		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },   /*  bias/gnd exist in schematics, readable in TKG3 schematics */
+		{ RES_NET_AMP_EMITTER,       0,    0, 8, { 128,64,32,16,8,4,2,1 } },    /*  dummy */
 	}
 };
 
@@ -191,9 +191,9 @@ static const res_net_info radarscp_grid_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT | RES_NET_MONITOR_SANYO_EZV20,
 	{
-		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
-		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
-		{ RES_NET_AMP_EMITTER,       0,   0, 1, { 1 } },	/*  dummy */
+		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },    /*  dummy */
+		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },    /*  dummy */
+		{ RES_NET_AMP_EMITTER,       0,   0, 1, { 1 } },    /*  dummy */
 	}
 };
 
@@ -206,7 +206,7 @@ static const res_net_info radarscp_grid_net_info =
 PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	rgb_t	*rgb;
+	rgb_t   *rgb;
 	int i;
 
 	rgb = compute_res_net_all(machine(), color_prom, &dkong_decode_info, &dkong_net_info);
@@ -228,7 +228,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
-	m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom; /* we'll need it later */
 	auto_free(machine(), rgb);
 }
 
@@ -268,7 +268,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
-	m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom; /* we'll need it later */
 }
 #endif
 
@@ -333,7 +333,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
-	m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom; /* we'll need it later */
 }
 
 PALETTE_INIT_MEMBER(dkong_state,radarscp1)
@@ -396,7 +396,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
-	m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom; /* we'll need it later */
 }
 
 
@@ -439,7 +439,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 PALETTE_INIT_MEMBER(dkong_state,dkong3)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	rgb_t	*rgb;
+	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &dkong3_decode_info, &dkong3_net_info);
 	palette_set_colors(machine(), 0, rgb, 256);
@@ -448,7 +448,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong3)
 
 	color_prom += 1024;
 	/* color_prom now points to the beginning of the character color codes */
-	m_color_codes = color_prom;	/* we'll need it later */
+	m_color_codes = color_prom; /* we'll need it later */
 }
 
 TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
@@ -557,49 +557,49 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int offs;
-	int scanline_vf;	/* buffering scanline including flip */
-	int scanline_vfc;	/* line buffering scanline including flip - this is the cached scanline_vf */
-	int scanline;		/* current scanline */
+	int scanline_vf;    /* buffering scanline including flip */
+	int scanline_vfc;   /* line buffering scanline including flip - this is the cached scanline_vf */
+	int scanline;       /* current scanline */
 	int add_y;
 	int add_x;
 	int num_sprt;
 
 	/* Draw the sprites. There are two pecularities which have been mentioned by
-     * a Donkey Kong II author at CAX 2008:
-     * 1) On real hardware, sprites wrap around from the right to the left instead
-     *    of clipping.
-     * 2) On real hardware, there is a limit of 16 sprites per scanline.
-     *    Sprites after the 16th (starting from the left) simply don't show.
-     *
-     * 2) is in line with the real hardware which buffers the sprite data
-     * for one scanline. The ram is 64x9 and a sprite takes 4 bytes.
-     * ==> 16 sprites per scanline.
-     *
-     * TODO: 9th bit is not understood right now.
-     *
-     * 1) is due to limitation of signals to 8 bit.
-     *
-     * This is quite different from galaxian. The dkong hardware updates sprites
-     * only once every frame by dma. The number of sprites can not be processed
-     * directly, Thus the preselection. The buffering takes place during the
-     * active phase of the video signal. The scanline is than rendered into the linebuffer
-     * during HBLANK.
-     *
-     * A sprite will be drawn:
-     * a) FlipQ = 1 : (sprite_y + 0xF9 + scanline) & 0xF0 == 0xF0
-     * b) FlipQ = 0 : (sprite_y + 0xF7 + (scanline ^ 0xFF)) & 0xF0 == 0xF0
-     *
-     * FlipQ = 1 ("Normal Play"):
-     *
-     * sprite_y = 0x20
-     *
-     * scanline
-     * 0x10, 0xEF, 0x208, 0x00
-     * 0x18, 0xE7, 0x200, 0x00
-     * 0x19, 0xE6, 0x1FF, 0xF0
-     * 0x20, 0xDF, 0x1F8, 0xF0
-     *
-     */
+	 * a Donkey Kong II author at CAX 2008:
+	 * 1) On real hardware, sprites wrap around from the right to the left instead
+	 *    of clipping.
+	 * 2) On real hardware, there is a limit of 16 sprites per scanline.
+	 *    Sprites after the 16th (starting from the left) simply don't show.
+	 *
+	 * 2) is in line with the real hardware which buffers the sprite data
+	 * for one scanline. The ram is 64x9 and a sprite takes 4 bytes.
+	 * ==> 16 sprites per scanline.
+	 *
+	 * TODO: 9th bit is not understood right now.
+	 *
+	 * 1) is due to limitation of signals to 8 bit.
+	 *
+	 * This is quite different from galaxian. The dkong hardware updates sprites
+	 * only once every frame by dma. The number of sprites can not be processed
+	 * directly, Thus the preselection. The buffering takes place during the
+	 * active phase of the video signal. The scanline is than rendered into the linebuffer
+	 * during HBLANK.
+	 *
+	 * A sprite will be drawn:
+	 * a) FlipQ = 1 : (sprite_y + 0xF9 + scanline) & 0xF0 == 0xF0
+	 * b) FlipQ = 0 : (sprite_y + 0xF7 + (scanline ^ 0xFF)) & 0xF0 == 0xF0
+	 *
+	 * FlipQ = 1 ("Normal Play"):
+	 *
+	 * sprite_y = 0x20
+	 *
+	 * scanline
+	 * 0x10, 0xEF, 0x208, 0x00
+	 * 0x18, 0xE7, 0x200, 0x00
+	 * 0x19, 0xE6, 0x1FF, 0xF0
+	 * 0x20, 0xDF, 0x1F8, 0xF0
+	 *
+	 */
 
 	scanline_vf = (cliprect.max_y - 1) & 0xFF;
 	scanline_vfc = (cliprect.max_y - 1) & 0xFF;
@@ -637,9 +637,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int flipy = state->m_sprite_ram[offs + 1] & 0x80;
 
 			/* On the real board, the x and y are read inverted after the first
-             * buffer stage. This due to the fact that the 82S09 delivers complements
-             * of stored data on read!
-             */
+			 * buffer stage. This due to the fact that the 82S09 delivers complements
+			 * of stored data on read!
+			 */
 
 			int x = (state->m_sprite_ram[offs + 3] + add_x + 1) & 0xFF;
 			if (state->m_flip)
@@ -692,12 +692,12 @@ INLINE double CD4049(running_machine &machine, double x)
  * a period of roughly 4.4 ms
  */
 
-#define RC1		(2.2e3 * 22e-6) /*  22e-6; */
-#define RC2		(10e3 * 33e-6)
-#define RC31	(18e3 * 33e-6)
-#define RC32	((18e3 + 68e3) * 33e-6)
-#define RC4		(90e3 * 0.47e-6)
-#define dt		(1./60./(double) VTOTAL)
+#define RC1     (2.2e3 * 22e-6) /*  22e-6; */
+#define RC2     (10e3 * 33e-6)
+#define RC31    (18e3 * 33e-6)
+#define RC32    ((18e3 + 68e3) * 33e-6)
+#define RC4     (90e3 * 0.47e-6)
+#define dt      (1./60./(double) VTOTAL)
 #define period2 (((INT64)(PIXEL_CLOCK) * ( 33L * 68L )) / (INT32)10000000L / 3)  /*  period/2 in pixel ... */
 
 static void radarscp_step(running_machine &machine, int line_cnt)
@@ -705,17 +705,17 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	dkong_state *state = machine.driver_data<dkong_state>();
 
 	/* Condensator is illegible in schematics for TRS2 board.
-     * TRS1 board states 3.3u.
-     */
+	 * TRS1 board states 3.3u.
+	 */
 
 	double vg3i;
 	double diff;
 	int sig;
 
 	/* vsync is divided by 2 by a LS161
-     * The resulting 30 Hz signal clocks a LFSR (LS164) operating as a
-     * random number generator.
-     */
+	 * The resulting 30 Hz signal clocks a LFSR (LS164) operating as a
+	 * random number generator.
+	 */
 
 	if ( line_cnt == 0)
 	{
@@ -725,9 +725,9 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	}
 
 	/* sound2 mixes in a 30Hz noise signal.
-     * With the current model this has no real effect
-     * Included for completeness
-     */
+	 * With the current model this has no real effect
+	 * Included for completeness
+	 */
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
 	address_space &space = machine.driver_data()->generic_space();
@@ -792,10 +792,10 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 	//printf("%d\n", state->m_blue_level);
 
 	/*
-     * Grid signal
-     *
-     * Mixed with ANS line (bit 5) from Port B of 8039
-     */
+	 * Grid signal
+	 *
+	 * Mixed with ANS line (bit 5) from Port B of 8039
+	 */
 	if (state->m_grid_on && latch8_bit5_r(state->m_dev_vp2, space, 0))
 	{
 		diff = (0.0 - state->m_cv3);
@@ -829,10 +829,10 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 
 static void radarscp_draw_background(running_machine &machine, dkong_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 	*htable = NULL;
-	int 			x,y;
-	UINT8			draw_ok;
-	UINT16			*pixel;
+	const UINT8     *htable = NULL;
+	int             x,y;
+	UINT8           draw_ok;
+	UINT16          *pixel;
 
 	if (state->m_hardware_type == HARDWARE_TRS01)
 		htable = state->m_gfx4;
@@ -859,9 +859,9 @@ static void radarscp_scanline(running_machine &machine, int scanline)
 {
 	dkong_state *state = machine.driver_data<dkong_state>();
 	const UINT8 *table = state->m_gfx3;
-	int 		table_len = state->m_gfx3_len;
-	int 			x,y,offset;
-	UINT16			*pixel;
+	int         table_len = state->m_gfx3_len;
+	int             x,y,offset;
+	UINT16          *pixel;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	y = scanline;
@@ -875,9 +875,9 @@ static void radarscp_scanline(running_machine &machine, int scanline)
 		pixel = &state->m_bg_bits.pix16(y, x);
 		if ((state->m_counter < table_len) && (x == 4 * (table[state->m_counter|offset] & 0x7f)))
 		{
-			if ( state->m_star_ff && (table[state->m_counter|offset] & 0x80) )	/* star */
+			if ( state->m_star_ff && (table[state->m_counter|offset] & 0x80) )  /* star */
 				*pixel = RADARSCP_STAR_COL;
-			else if (state->m_grid_sig && !(table[state->m_counter|offset] & 0x80))			/* radar */
+			else if (state->m_grid_sig && !(table[state->m_counter|offset] & 0x80))         /* radar */
 				*pixel = RADARSCP_GRID_COL_OFFSET+state->m_grid_col;
 			else
 				*pixel = RADARSCP_BCK_COL_OFFSET + state->m_blue_level;
@@ -966,7 +966,7 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 			machine().primary_screen->register_screen_bitmap(m_bg_bits);
 			m_gfx3 = memregion("gfx3")->base();
 			m_gfx3_len = memregion("gfx3")->bytes();
-		    /* fall through */
+			/* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
 			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::dkong_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);

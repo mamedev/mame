@@ -53,13 +53,13 @@ static int subs_steering_1(running_machine &machine)
 
 	if (state->m_steering_buf1>0)
 	{
-	      state->m_steering_buf1--;
-	      state->m_steering_val1=0xC0;
+			state->m_steering_buf1--;
+			state->m_steering_val1=0xC0;
 	}
 	else if (state->m_steering_buf1<0)
 	{
-	      state->m_steering_buf1++;
-	      state->m_steering_val1=0x80;
+			state->m_steering_buf1++;
+			state->m_steering_val1=0x80;
 	}
 
 	return state->m_steering_val1;
@@ -112,14 +112,14 @@ READ8_MEMBER(subs_state::subs_control_r)
 
 	switch (offset & 0x07)
 	{
-		case 0x00:		return ((inport & 0x01) << 7);	/* diag step */
-		case 0x01:		return ((inport & 0x02) << 6);	/* diag hold */
-		case 0x02:		return ((inport & 0x04) << 5);	/* slam */
-		case 0x03:		return ((inport & 0x08) << 4);	/* spare */
-		case 0x04:		return ((subs_steering_1(machine()) & 0x40) << 1);	/* steer dir 1 */
-		case 0x05:		return ((subs_steering_1(machine()) & 0x80) << 0);	/* steer flag 1 */
-		case 0x06:		return ((subs_steering_2(machine()) & 0x40) << 1);	/* steer dir 2 */
-		case 0x07:		return ((subs_steering_2(machine()) & 0x80) << 0);	/* steer flag 2 */
+		case 0x00:      return ((inport & 0x01) << 7);  /* diag step */
+		case 0x01:      return ((inport & 0x02) << 6);  /* diag hold */
+		case 0x02:      return ((inport & 0x04) << 5);  /* slam */
+		case 0x03:      return ((inport & 0x08) << 4);  /* spare */
+		case 0x04:      return ((subs_steering_1(machine()) & 0x40) << 1);  /* steer dir 1 */
+		case 0x05:      return ((subs_steering_1(machine()) & 0x80) << 0);  /* steer flag 1 */
+		case 0x06:      return ((subs_steering_2(machine()) & 0x40) << 1);  /* steer dir 2 */
+		case 0x07:      return ((subs_steering_2(machine()) & 0x80) << 0);  /* steer flag 2 */
 	}
 
 	return 0;
@@ -134,14 +134,14 @@ READ8_MEMBER(subs_state::subs_coin_r)
 
 	switch (offset & 0x07)
 	{
-		case 0x00:		return ((inport & 0x01) << 7);	/* coin 1 */
-		case 0x01:		return ((inport & 0x02) << 6);	/* start 1 */
-		case 0x02:		return ((inport & 0x04) << 5);	/* coin 2 */
-		case 0x03:		return ((inport & 0x08) << 4);	/* start 2 */
-		case 0x04:		return ((inport & 0x10) << 3);	/* VBLANK */
-		case 0x05:		return ((inport & 0x20) << 2);	/* fire 1 */
-		case 0x06:		return ((inport & 0x40) << 1);	/* test */
-		case 0x07:		return ((inport & 0x80) << 0);	/* fire 2 */
+		case 0x00:      return ((inport & 0x01) << 7);  /* coin 1 */
+		case 0x01:      return ((inport & 0x02) << 6);  /* start 1 */
+		case 0x02:      return ((inport & 0x04) << 5);  /* coin 2 */
+		case 0x03:      return ((inport & 0x08) << 4);  /* start 2 */
+		case 0x04:      return ((inport & 0x10) << 3);  /* VBLANK */
+		case 0x05:      return ((inport & 0x20) << 2);  /* fire 1 */
+		case 0x06:      return ((inport & 0x40) << 1);  /* test */
+		case 0x07:      return ((inport & 0x80) << 0);  /* fire 2 */
 	}
 
 	return 0;
@@ -156,10 +156,10 @@ READ8_MEMBER(subs_state::subs_options_r)
 
 	switch (offset & 0x03)
 	{
-		case 0x00:		return ((opts & 0xC0) >> 6);		/* language */
-		case 0x01:		return ((opts & 0x30) >> 4);		/* credits */
-		case 0x02:		return ((opts & 0x0C) >> 2);		/* game time */
-		case 0x03:		return ((opts & 0x03) >> 0);		/* extended time */
+		case 0x00:      return ((opts & 0xC0) >> 6);        /* language */
+		case 0x01:      return ((opts & 0x30) >> 4);        /* credits */
+		case 0x02:      return ((opts & 0x0C) >> 2);        /* game time */
+		case 0x03:      return ((opts & 0x03) >> 0);        /* extended time */
 	}
 
 	return 0;

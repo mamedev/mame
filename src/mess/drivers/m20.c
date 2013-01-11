@@ -53,40 +53,40 @@ class m20_state : public driver_device
 public:
 	m20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-        m_maincpu(*this, "maincpu"),
+		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
-        m_kbdi8251(*this, "i8251_1"),
-        m_ttyi8251(*this, "i8251_2"),
-        m_i8255(*this, "ppi8255"),
-        m_i8259(*this, "i8259"),
+		m_kbdi8251(*this, "i8251_1"),
+		m_ttyi8251(*this, "i8251_2"),
+		m_i8255(*this, "ppi8255"),
+		m_i8259(*this, "i8259"),
 		m_fd1797(*this, "fd1797"),
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_p_videoram(*this, "p_videoram"){ }
 
-    required_device<z8001_device> m_maincpu;
+	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;
-    required_device<i8251_device> m_kbdi8251;
-    required_device<i8251_device> m_ttyi8251;
-    required_device<i8255_device> m_i8255;
-    required_device<pic8259_device> m_i8259;
-    required_device<fd1797_t> m_fd1797;
+	required_device<i8251_device> m_kbdi8251;
+	required_device<i8251_device> m_ttyi8251;
+	required_device<i8255_device> m_i8255;
+	required_device<pic8259_device> m_i8259;
+	required_device<fd1797_t> m_fd1797;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 
 	required_shared_ptr<UINT16> m_p_videoram;
 
-    virtual void machine_start();
-    virtual void machine_reset();
+	virtual void machine_start();
+	virtual void machine_reset();
 
-    DECLARE_READ16_MEMBER(m20_i8259_r);
-    DECLARE_WRITE16_MEMBER(m20_i8259_w);
-    DECLARE_READ16_MEMBER(port21_r);
-    DECLARE_WRITE16_MEMBER(port21_w);
-    DECLARE_WRITE_LINE_MEMBER(pic_irq_line_w);
-    DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
-    DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-    DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
+	DECLARE_READ16_MEMBER(m20_i8259_r);
+	DECLARE_WRITE16_MEMBER(m20_i8259_w);
+	DECLARE_READ16_MEMBER(port21_r);
+	DECLARE_WRITE16_MEMBER(port21_w);
+	DECLARE_WRITE_LINE_MEMBER(pic_irq_line_w);
+	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
+	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
+	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
 	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -151,7 +151,7 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 READ_LINE_MEMBER(m20_state::kbd_rx)
 {
 	/* TODO: correct hookup for keyboard, keyboard uses 8048 */
-    return 0x00;
+	return 0x00;
 }
 
 WRITE_LINE_MEMBER(m20_state::kbd_tx)
@@ -239,50 +239,50 @@ WRITE16_MEMBER(m20_state::port21_w)
 
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
-    return pic8259_r(m_i8259, space, offset)<<1;
+	return pic8259_r(m_i8259, space, offset)<<1;
 }
 
 WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
-    pic8259_w(m_i8259, space, offset, (data>>1));
+	pic8259_w(m_i8259, space, offset, (data>>1));
 }
 
 WRITE_LINE_MEMBER( m20_state::pic_irq_line_w )
 {
-    if (state)
-    {
+	if (state)
+	{
 		//printf ("PIC raised VI\n");
 		m_maincpu->set_input_line(1, ASSERT_LINE);
-    }
-    else
-    {
+	}
+	else
+	{
 		//printf ("PIC lowered VI\n");
 		m_maincpu->set_input_line(1, CLEAR_LINE);
-    }
+	}
 }
 
 WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
 {
-    m_ttyi8251->transmit_clock();
-    m_ttyi8251->receive_clock();
+	m_ttyi8251->transmit_clock();
+	m_ttyi8251->receive_clock();
 }
 
 WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
 {
-    m_kbdi8251->transmit_clock();
-    m_kbdi8251->receive_clock();
+	m_kbdi8251->transmit_clock();
+	m_kbdi8251->receive_clock();
 }
 
 WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 {
 	/* Using HOLD_LINE is not completely correct:
-     * The output of the 8253 is connected to a 74LS74 flop chip.
-     * The output of the flop chip is connected to NVI CPU input.
-     * The flop is reset by a 1:8 decoder which compares CPU ST0-ST3
-     * outputs to detect an interrupt acknowledge transaction.
-     * 8253 is programmed in square wave mode, not rate
-     * generator mode.
-     */
+	 * The output of the 8253 is connected to a 74LS74 flop chip.
+	 * The output of the flop chip is connected to NVI CPU input.
+	 * The flop is reset by a 1:8 decoder which compares CPU ST0-ST3
+	 * outputs to detect an interrupt acknowledge transaction.
+	 * 8253 is programmed in square wave mode, not rate
+	 * generator mode.
+	 */
 	m_maincpu->set_input_line(0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 
@@ -371,14 +371,14 @@ B/W, 128K cards, 3 cards => 512K of memory:
 
 static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-  AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
-  AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-  AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
-  AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
 
@@ -766,11 +766,11 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 
 	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
 
-    AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
-    AM_RANGE(0xa2, 0xa3) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xa2, 0xa3) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
 
-    AM_RANGE(0xc0, 0xc1) AM_DEVREADWRITE8("i8251_2", i8251_device, data_r, data_w, 0x00ff)
-    AM_RANGE(0xc2, 0xc3) AM_DEVREADWRITE8("i8251_2", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xc0, 0xc1) AM_DEVREADWRITE8("i8251_2", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xc2, 0xc3) AM_DEVREADWRITE8("i8251_2", i8251_device, status_r, control_w, 0x00ff)
 
 	AM_RANGE(0x120, 0x127) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0x00ff)
 
@@ -806,7 +806,7 @@ static IRQ_CALLBACK( m20_irq_callback )
 	if (! irqline)
 		return 0xff; // NVI, value ignored
 	else
-        return pic8259_acknowledge(device->machine().device("i8259"));
+		return pic8259_acknowledge(device->machine().device("i8259"));
 }
 
 void m20_state::machine_start()
@@ -830,32 +830,32 @@ void m20_state::machine_reset()
 
 	m_fd1797->reset();
 
-    memcpy(RAM, ROM, 8);  // we need only the reset vector
-    m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
+	memcpy(RAM, ROM, 8);  // we need only the reset vector
+	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
 }
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	16,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	16,         /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 static I8255A_INTERFACE( ppi_interface )
 {
 	DEVCB_NULL,     // port A read
 	DEVCB_NULL,     // port A write
-    DEVCB_NULL,     // port B read
+	DEVCB_NULL,     // port B read
 	DEVCB_NULL,     // port B write
-    DEVCB_NULL,     // port C read
-    DEVCB_NULL      // port C write
+	DEVCB_NULL,     // port C read
+	DEVCB_NULL      // port C write
 };
 
 WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
@@ -935,17 +935,17 @@ const struct pit8253_config pit8253_intf =
 		{
 			1230782,
 			DEVCB_NULL,
-            DEVCB_DRIVER_LINE_MEMBER(m20_state, tty_clock_tick_w)
+			DEVCB_DRIVER_LINE_MEMBER(m20_state, tty_clock_tick_w)
 		},
 		{
 			1230782,
 			DEVCB_NULL,
-            DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_clock_tick_w)
+			DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_clock_tick_w)
 		},
 		{
 			1230782,
 			DEVCB_NULL,
-            DEVCB_DRIVER_LINE_MEMBER(m20_state, timer_tick_w)
+			DEVCB_DRIVER_LINE_MEMBER(m20_state, timer_tick_w)
 		}
 	}
 };
@@ -953,7 +953,7 @@ const struct pit8253_config pit8253_intf =
 const struct pic8259_interface pic_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(m20_state, pic_irq_line_w),
-    DEVCB_LINE_VCC, // we're the only 8259, so we're the master
+	DEVCB_LINE_VCC, // we're the only 8259, so we're the master
 	DEVCB_NULL
 };
 
@@ -997,7 +997,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_FD1797x_ADD("fd1797", 1000000)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", NULL, m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", NULL, m20_state::floppy_formats)
-	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf)	/* hand tuned to get ~50 fps */
+	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf) /* hand tuned to get ~50 fps */
 	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
 	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)
 	MCFG_I8251_ADD("i8251_2", tty_i8251_intf)
@@ -1032,5 +1032,5 @@ ROM_START(m40)
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
-COMP( 1981, m20,   0,      0,      m20,    m20, m20_state,    m20,	"Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, m20,   0,      0,      m20,    m20, m20_state,    m20,  "Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1981, m40,   m20,    0,      m20,    m20, m20_state,    m20, "Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING | GAME_NO_SOUND)

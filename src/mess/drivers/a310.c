@@ -71,7 +71,7 @@ class a310_state : public archimedes_state
 public:
 	a310_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag),
-		  m_physram(*this, "physicalram") { }
+			m_physram(*this, "physicalram") { }
 
 	required_shared_ptr<UINT32> m_physram;
 
@@ -241,8 +241,8 @@ static INPUT_PORTS_START( a310 )
 	PORT_START("via1a") /* VIA #1 PORT A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1					 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2					 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1                   )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2                   )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
@@ -368,7 +368,7 @@ ROM_START( a3010 )
 ROM_END
 
 ROM_START( a3020 )
-    ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "riscos_3.11_1.bin", 0x000000, 0x100000, CRC(552fc3aa) SHA1(b2f1911e53d7377f2e69e1a870139745d3df494b))
 	ROM_LOAD32_WORD( "riscos_3.11_2.bin", 0x000002, 0x100000, CRC(308d5a4a) SHA1(b309e1dd85670a06d77ec504dbbec6c42336329f))
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )

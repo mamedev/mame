@@ -85,94 +85,94 @@
 #include "sound/dac.h"
 
 
-#define OUTPUT_RATE			50000
+#define OUTPUT_RATE         50000
 
-#define DAC_BUFFER_SIZE		1024
-#define DAC_BUFFER_SIZE_MASK		(DAC_BUFFER_SIZE - 1)
+#define DAC_BUFFER_SIZE     1024
+#define DAC_BUFFER_SIZE_MASK        (DAC_BUFFER_SIZE - 1)
 
-#define LOG_INTERRUPTS		0
-#define LOG_DMA				0
-#define LOG_SHORTAGES		0
-#define LOG_TIMER			0
-#define LOG_COMM			0
-#define LOG_PORTS			0
-#define LOG_DAC				0
-#define LOG_EXTERN			0
-#define LOG_PIT				0
+#define LOG_INTERRUPTS      0
+#define LOG_DMA             0
+#define LOG_SHORTAGES       0
+#define LOG_TIMER           0
+#define LOG_COMM            0
+#define LOG_PORTS           0
+#define LOG_DAC             0
+#define LOG_EXTERN          0
+#define LOG_PIT             0
 
 
 /* according to the Intel manual, external interrupts are not latched */
 /* however, I cannot get this system to work without latching them */
-#define LATCH_INTS	1
+#define LATCH_INTS  1
 
-#define DAC_VOLUME_SCALE	4
+#define DAC_VOLUME_SCALE    4
 
 struct mem_state
 {
-	UINT16	lower;
-	UINT16	upper;
-	UINT16	middle;
-	UINT16	middle_size;
-	UINT16	peripheral;
+	UINT16  lower;
+	UINT16  upper;
+	UINT16  middle;
+	UINT16  middle_size;
+	UINT16  peripheral;
 };
 
 struct timer_state
 {
-	UINT16	control;
-	UINT16	maxA;
-	UINT16	maxB;
-	UINT16	count;
+	UINT16  control;
+	UINT16  maxA;
+	UINT16  maxB;
+	UINT16  count;
 	emu_timer *int_timer;
 	emu_timer *time_timer;
-	UINT8	time_timer_active;
+	UINT8   time_timer_active;
 	attotime last_time;
 };
 
 struct dma_state
 {
-	UINT32	source;
-	UINT32	dest;
-	UINT16	count;
-	UINT16	control;
-	UINT8	finished;
+	UINT32  source;
+	UINT32  dest;
+	UINT16  count;
+	UINT16  control;
+	UINT8   finished;
 	emu_timer *finish_timer;
 };
 
 struct intr_state
 {
-	UINT8	pending;
-	UINT16	ack_mask;
-	UINT16	priority_mask;
-	UINT16	in_service;
-	UINT16	request;
-	UINT16	status;
-	UINT16	poll_status;
-	UINT16	timer;
-	UINT16	dma[2];
-	UINT16	ext[4];
+	UINT8   pending;
+	UINT16  ack_mask;
+	UINT16  priority_mask;
+	UINT16  in_service;
+	UINT16  request;
+	UINT16  status;
+	UINT16  poll_status;
+	UINT16  timer;
+	UINT16  dma[2];
+	UINT16  ext[4];
 };
 
 struct i80186_state
 {
 	device_t *cpu;
-	struct timer_state	timer[3];
-	struct dma_state	dma[2];
-	struct intr_state	intr;
-	struct mem_state	mem;
+	struct timer_state  timer[3];
+	struct dma_state    dma[2];
+	struct intr_state   intr;
+	struct mem_state    mem;
 };
 
 struct dac_state
 {
-	INT16	value;
-	INT16	volume;
-	UINT32	frequency;
-	UINT32	step;
-	UINT32	fraction;
+	INT16   value;
+	INT16   volume;
+	UINT32  frequency;
+	UINT32  step;
+	UINT32  fraction;
 
-	INT16	buffer[DAC_BUFFER_SIZE];
-	UINT32	bufin;
-	UINT32	bufout;
-	UINT32	buftarget;
+	INT16   buffer[DAC_BUFFER_SIZE];
+	UINT32  bufin;
+	UINT32  bufout;
+	UINT32  buftarget;
 };
 
 struct counter_state
@@ -574,14 +574,14 @@ const device_type LELAND = &device_creator<leland_sound_device>;
 
 leland_sound_device::leland_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LELAND, "Leland DAC", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(leland_sound_state);
 }
 
 leland_sound_device::leland_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(leland_sound_state);
 }
@@ -727,14 +727,14 @@ static void leland_80186_reset(device_t *device)
 	state->m_i80186.dma[1].finish_timer = oldstate.dma[1].finish_timer;
 
 	/* reset the interrupt state */
-	state->m_i80186.intr.priority_mask	= 0x0007;
-	state->m_i80186.intr.timer			= 0x000f;
-	state->m_i80186.intr.dma[0]			= 0x000f;
-	state->m_i80186.intr.dma[1]			= 0x000f;
-	state->m_i80186.intr.ext[0]			= 0x000f;
-	state->m_i80186.intr.ext[1]			= 0x000f;
-	state->m_i80186.intr.ext[2]			= 0x000f;
-	state->m_i80186.intr.ext[3]			= 0x000f;
+	state->m_i80186.intr.priority_mask  = 0x0007;
+	state->m_i80186.intr.timer          = 0x000f;
+	state->m_i80186.intr.dma[0]         = 0x000f;
+	state->m_i80186.intr.dma[1]         = 0x000f;
+	state->m_i80186.intr.ext[0]         = 0x000f;
+	state->m_i80186.intr.ext[1]         = 0x000f;
+	state->m_i80186.intr.ext[2]         = 0x000f;
+	state->m_i80186.intr.ext[3]         = 0x000f;
 
 	/* reset the DAC and counter states as well */
 	memset(&state->m_dac, 0, sizeof(state->m_dac));
@@ -791,9 +791,9 @@ static IRQ_CALLBACK( int_callback )
 	{
 		switch (state->m_i80186.intr.poll_status & 0x1f)
 		{
-			case 0x08:	state->m_i80186.intr.status &= ~0x01;	break;
-			case 0x12:	state->m_i80186.intr.status &= ~0x02;	break;
-			case 0x13:	state->m_i80186.intr.status &= ~0x04;	break;
+			case 0x08:  state->m_i80186.intr.status &= ~0x01;   break;
+			case 0x12:  state->m_i80186.intr.status &= ~0x02;   break;
+			case 0x13:  state->m_i80186.intr.status &= ~0x04;   break;
 		}
 	}
 	state->m_i80186.intr.ack_mask = 0;
@@ -905,16 +905,16 @@ static void handle_eoi(device_t *device, int data)
 		/* turn off the appropriate in-service bit */
 		switch (data & 0x1f)
 		{
-			case 0x08:	state->m_i80186.intr.in_service &= ~0x01;	break;
-			case 0x12:	state->m_i80186.intr.in_service &= ~0x01;	break;
-			case 0x13:	state->m_i80186.intr.in_service &= ~0x01;	break;
-			case 0x0a:	state->m_i80186.intr.in_service &= ~0x04;	break;
-			case 0x0b:	state->m_i80186.intr.in_service &= ~0x08;	break;
-			case 0x0c:	state->m_i80186.intr.in_service &= ~0x10;	break;
-			case 0x0d:	state->m_i80186.intr.in_service &= ~0x20;	break;
-			case 0x0e:	state->m_i80186.intr.in_service &= ~0x40;	break;
-			case 0x0f:	state->m_i80186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", machine.describe_context(), data & 0x1f);
+			case 0x08:  state->m_i80186.intr.in_service &= ~0x01;   break;
+			case 0x12:  state->m_i80186.intr.in_service &= ~0x01;   break;
+			case 0x13:  state->m_i80186.intr.in_service &= ~0x01;   break;
+			case 0x0a:  state->m_i80186.intr.in_service &= ~0x04;   break;
+			case 0x0b:  state->m_i80186.intr.in_service &= ~0x08;   break;
+			case 0x0c:  state->m_i80186.intr.in_service &= ~0x10;   break;
+			case 0x0d:  state->m_i80186.intr.in_service &= ~0x20;   break;
+			case 0x0e:  state->m_i80186.intr.in_service &= ~0x40;   break;
+			case 0x0f:  state->m_i80186.intr.in_service &= ~0x80;   break;
+			default:    logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", machine.describe_context(), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine.time().as_double(), data & 0x1f);
 	}
@@ -1932,11 +1932,11 @@ static TIMER_CALLBACK( delayed_response_r )
 	int oldaf = master->state_int(Z80_AF);
 
 	/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
-       synchronizing on the write to this register from the slave side does nothing.
-       In order to make sure the master CPU get the real response, we synchronize on
-       the read. However, the value we returned the first time around may not be
-       accurate, so after the system has synced up, we go back into the master CPUs
-       state and put the proper value into the A register. */
+	   synchronizing on the write to this register from the slave side does nothing.
+	   In order to make sure the master CPU get the real response, we synchronize on
+	   the read. However, the value we returned the first time around may not be
+	   accurate, so after the system has synced up, we go back into the master CPUs
+	   state and put the proper value into the A register. */
 	if (pc == checkpc)
 	{
 		if (LOG_COMM) logerror("(Updated sound response latch to %02X)\n", state->m_sound_response);
@@ -2251,7 +2251,7 @@ static WRITE16_DEVICE_HANDLER( peripheral_w )
 				dac_10bit_w(device, space, offset, data, mem_mask);
 			break;
 
-		case 5:	/* Ataxx/WSF/Indy Heat only */
+		case 5: /* Ataxx/WSF/Indy Heat only */
 			ataxx_dac_control(device, space, offset, data, mem_mask);
 			break;
 
@@ -2272,7 +2272,7 @@ static WRITE16_DEVICE_HANDLER( peripheral_w )
 WRITE8_DEVICE_HANDLER( ataxx_80186_control_w )
 {
 	/* compute the bit-shuffled variants of the bits and then write them */
-	int modified =	((data & 0x01) << 7) |
+	int modified =  ((data & 0x01) << 7) |
 					((data & 0x02) << 5) |
 					((data & 0x04) << 3) |
 					((data & 0x08) << 1);

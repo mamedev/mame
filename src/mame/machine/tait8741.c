@@ -132,7 +132,7 @@ static void taito8741_update(address_space &space, int num)
 		num = next;
 		st = &taito8741[num];
 		if( st->connect != -1 )
-			 sst = &taito8741[st->connect];
+				sst = &taito8741[st->connect];
 		else sst = 0;
 		next = -1;
 		/* check pending command */
@@ -200,7 +200,7 @@ static void taito8741_update(address_space &space, int num)
 //if (data == 2 && num==0 && st->rxd[data-1]&0x80) logerror("Coin Get\n");
 				taito8741_hostdata_w(st,st->rxd[data-1]);
 				break;
-			case 0x08:	/* latch received serial data */
+			case 0x08:  /* latch received serial data */
 				st->txd[0] = st->portHandler ? st->portHandler(space,0,0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0;
 				if( sst )
 				{
@@ -210,10 +210,10 @@ static void taito8741_update(address_space &space, int num)
 					st->phase = CMD_08;
 				}
 				break;
-			case 0x0a:	/* 8741-0 : set serial comminucation mode 'MASTER' */
+			case 0x0a:  /* 8741-0 : set serial comminucation mode 'MASTER' */
 				//st->mode = TAITO8741_MASTER;
 				break;
-			case 0x0b:	/* 8741-1 : set serial comminucation mode 'SLAVE'  */
+			case 0x0b:  /* 8741-1 : set serial comminucation mode 'SLAVE'  */
 				//st->mode = TAITO8741_SLAVE;
 				break;
 			case 0x1f:  /* 8741-2,3 : ?? set parallelport mode ?? */
@@ -224,7 +224,7 @@ static void taito8741_update(address_space &space, int num)
 				break;
 			case 0x62:  /* 8741-3   : ? */
 				break;
-			case 0x4a:	/* ?? syncronus with other cpu and return 00H */
+			case 0x4a:  /* ?? syncronus with other cpu and return 00H */
 				if( sst )
 				{
 					if(sst->pending4a)
@@ -236,10 +236,10 @@ static void taito8741_update(address_space &space, int num)
 					else st->phase = CMD_4a;
 				}
 				break;
-			case 0x80:	/* 8741-3 : return check code */
+			case 0x80:  /* 8741-3 : return check code */
 				taito8741_hostdata_w(st,0x66);
 				break;
-			case 0x81:	/* 8741-2 : return check code */
+			case 0x81:  /* 8741-2 : return check code */
 				taito8741_hostdata_w(st,0x48);
 				break;
 			case 0xf0:  /* GSWORD 8741-1 : initialize ?? */

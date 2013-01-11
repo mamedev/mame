@@ -28,13 +28,13 @@ class diag264_serial_loopback_device :  public device_t,
 										public device_cbm_iec_interface
 {
 public:
-    // construction/destruction
-    diag264_serial_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	diag264_serial_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "diag264_serial_loopback"; }
-    virtual void device_start();
+	virtual void device_start();
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_atn(int state);

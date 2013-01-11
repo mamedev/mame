@@ -186,20 +186,20 @@ bits(7:4) and bit(24)), X, and Y:
  *
  *************************************/
 
-#define DEBUG_DEPTH			(0)
-#define DEBUG_LOD			(0)
+#define DEBUG_DEPTH         (0)
+#define DEBUG_LOD           (0)
 
-#define LOG_VBLANK_SWAP		(0)
-#define LOG_FIFO			(0)
-#define LOG_FIFO_VERBOSE	(0)
-#define LOG_REGISTERS		(0)
-#define LOG_WAITS			(0)
-#define LOG_LFB				(0)
-#define LOG_TEXTURE_RAM		(0)
-#define LOG_RASTERIZERS		(0)
-#define LOG_CMDFIFO			(0)
-#define LOG_CMDFIFO_VERBOSE	(0)
-#define LOG_BANSHEE_2D		(0)
+#define LOG_VBLANK_SWAP     (0)
+#define LOG_FIFO            (0)
+#define LOG_FIFO_VERBOSE    (0)
+#define LOG_REGISTERS       (0)
+#define LOG_WAITS           (0)
+#define LOG_LFB             (0)
+#define LOG_TEXTURE_RAM     (0)
+#define LOG_RASTERIZERS     (0)
+#define LOG_CMDFIFO         (0)
+#define LOG_CMDFIFO_VERBOSE (0)
+#define LOG_BANSHEE_2D      (0)
 
 #define MODIFY_PIXEL(VV)
 
@@ -1002,9 +1002,9 @@ static TIMER_CALLBACK( vblank_off_callback )
 	// TODO: Vblank IRQ enable is VOODOO3 only?
 	if (v->type >= TYPE_VOODOO_3)
 	{
-		if (v->reg[intrCtrl].u & 0x8)		// call IRQ handler if VSYNC interrupt (falling) is enabled
+		if (v->reg[intrCtrl].u & 0x8)       // call IRQ handler if VSYNC interrupt (falling) is enabled
 		{
-			v->reg[intrCtrl].u |= 0x200;		// VSYNC int (falling) active
+			v->reg[intrCtrl].u |= 0x200;        // VSYNC int (falling) active
 
 			if (v->fbi.vblank_client != NULL)
 				(*v->fbi.vblank_client)(v->device, FALSE);
@@ -1058,9 +1058,9 @@ static TIMER_CALLBACK( vblank_callback )
 	// TODO: Vblank IRQ enable is VOODOO3 only?
 	if (v->type >= TYPE_VOODOO_3)
 	{
-		if (v->reg[intrCtrl].u & 0x4)		// call IRQ handler if VSYNC interrupt (rising) is enabled
+		if (v->reg[intrCtrl].u & 0x4)       // call IRQ handler if VSYNC interrupt (rising) is enabled
 		{
-			v->reg[intrCtrl].u |= 0x100;		// VSYNC int (rising) active
+			v->reg[intrCtrl].u |= 0x100;        // VSYNC int (rising) active
 
 			if (v->fbi.vblank_client != NULL)
 				(*v->fbi.vblank_client)(v->device, TRUE);
@@ -1144,20 +1144,20 @@ static void recompute_video_memory(voodoo_state *v)
 	/* remaining buffers are based on the config */
 	switch (memory_config)
 	{
-		case 3:	/* reserved */
+		case 3: /* reserved */
 			logerror("VOODOO.%d.ERROR:Unexpected memory configuration in recompute_video_memory!\n", v->index);
 
-		case 0:	/* 2 color buffers, 1 aux buffer */
+		case 0: /* 2 color buffers, 1 aux buffer */
 			v->fbi.rgboffs[2] = ~0;
 			v->fbi.auxoffs = 2 * buffer_pages * 0x1000;
 			break;
 
-		case 1:	/* 3 color buffers, 0 aux buffers */
+		case 1: /* 3 color buffers, 0 aux buffers */
 			v->fbi.rgboffs[2] = 2 * buffer_pages * 0x1000;
 			v->fbi.auxoffs = ~0;
 			break;
 
-		case 2:	/* 3 color buffers, 1 aux buffers */
+		case 2: /* 3 color buffers, 1 aux buffers */
 			v->fbi.rgboffs[2] = 2 * buffer_pages * 0x1000;
 			v->fbi.auxoffs = 3 * buffer_pages * 0x1000;
 			break;
@@ -1334,9 +1334,9 @@ static void dacdata_r(dac_state *d, UINT8 regnum)
 			/* this is just to make startup happy */
 			switch (d->reg[7])
 			{
-				case 0x01:	result = 0x55; break;
-				case 0x07:	result = 0x71; break;
-				case 0x0b:	result = 0x79; break;
+				case 0x01:  result = 0x55; break;
+				case 0x07:  result = 0x71; break;
+				case 0x0b:  result = 0x79; break;
 			}
 			break;
 
@@ -1509,118 +1509,118 @@ static int cmdfifo_compute_expected_depth(voodoo_state *v, cmdfifo_info *f)
 	switch (command & 7)
 	{
 		/*
-            Packet type 0: 1 or 2 words
+		    Packet type 0: 1 or 2 words
 
-              Word  Bits
-                0  31:29 = reserved
-                0  28:6  = Address [24:2]
-                0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
-                0   2:0  = Packet type (0)
-                1  31:11 = reserved (JMP AGP only)
-                1  10:0  = Address [35:25]
-        */
+		      Word  Bits
+		        0  31:29 = reserved
+		        0  28:6  = Address [24:2]
+		        0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
+		        0   2:0  = Packet type (0)
+		        1  31:11 = reserved (JMP AGP only)
+		        1  10:0  = Address [35:25]
+		*/
 		case 0:
 			if (((command >> 3) & 7) == 4)
 				return 2;
 			return 1;
 
 		/*
-            Packet type 1: 1 + N words
+		    Packet type 1: 1 + N words
 
-              Word  Bits
-                0  31:16 = Number of words
-                0    15  = Increment?
-                0  14:3  = Register base
-                0   2:0  = Packet type (1)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:16 = Number of words
+		        0    15  = Increment?
+		        0  14:3  = Register base
+		        0   2:0  = Packet type (1)
+		        1  31:0  = Data word
+		*/
 		case 1:
 			return 1 + (command >> 16);
 
 		/*
-            Packet type 2: 1 + N words
+		    Packet type 2: 1 + N words
 
-              Word  Bits
-                0  31:3  = 2D Register mask
-                0   2:0  = Packet type (2)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:3  = 2D Register mask
+		        0   2:0  = Packet type (2)
+		        1  31:0  = Data word
+		*/
 		case 2:
 			for (i = 3; i <= 31; i++)
 				if (command & (1 << i)) count++;
 			return 1 + count;
 
 		/*
-            Packet type 3: 1 + N words
+		    Packet type 3: 1 + N words
 
-              Word  Bits
-                0  31:29 = Number of dummy entries following the data
-                0   28   = Packed color data?
-                0   25   = Disable ping pong sign correction (0=normal, 1=disable)
-                0   24   = Culling sign (0=positive, 1=negative)
-                0   23   = Enable culling (0=disable, 1=enable)
-                0   22   = Strip mode (0=strip, 1=fan)
-                0   17   = Setup S1 and T1
-                0   16   = Setup W1
-                0   15   = Setup S0 and T0
-                0   14   = Setup W0
-                0   13   = Setup Wb
-                0   12   = Setup Z
-                0   11   = Setup Alpha
-                0   10   = Setup RGB
-                0   9:6  = Number of vertices
-                0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
-                0   2:0  = Packet type (3)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:29 = Number of dummy entries following the data
+		        0   28   = Packed color data?
+		        0   25   = Disable ping pong sign correction (0=normal, 1=disable)
+		        0   24   = Culling sign (0=positive, 1=negative)
+		        0   23   = Enable culling (0=disable, 1=enable)
+		        0   22   = Strip mode (0=strip, 1=fan)
+		        0   17   = Setup S1 and T1
+		        0   16   = Setup W1
+		        0   15   = Setup S0 and T0
+		        0   14   = Setup W0
+		        0   13   = Setup Wb
+		        0   12   = Setup Z
+		        0   11   = Setup Alpha
+		        0   10   = Setup RGB
+		        0   9:6  = Number of vertices
+		        0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
+		        0   2:0  = Packet type (3)
+		        1  31:0  = Data word
+		*/
 		case 3:
-			count = 2;		/* X/Y */
+			count = 2;      /* X/Y */
 			if (command & (1 << 28))
 			{
-				if (command & (3 << 10)) count++;		/* ARGB */
+				if (command & (3 << 10)) count++;       /* ARGB */
 			}
 			else
 			{
-				if (command & (1 << 10)) count += 3;	/* RGB */
-				if (command & (1 << 11)) count++;		/* A */
+				if (command & (1 << 10)) count += 3;    /* RGB */
+				if (command & (1 << 11)) count++;       /* A */
 			}
-			if (command & (1 << 12)) count++;			/* Z */
-			if (command & (1 << 13)) count++;			/* Wb */
-			if (command & (1 << 14)) count++;			/* W0 */
-			if (command & (1 << 15)) count += 2;		/* S0/T0 */
-			if (command & (1 << 16)) count++;			/* W1 */
-			if (command & (1 << 17)) count += 2;		/* S1/T1 */
-			count *= (command >> 6) & 15;				/* numverts */
+			if (command & (1 << 12)) count++;           /* Z */
+			if (command & (1 << 13)) count++;           /* Wb */
+			if (command & (1 << 14)) count++;           /* W0 */
+			if (command & (1 << 15)) count += 2;        /* S0/T0 */
+			if (command & (1 << 16)) count++;           /* W1 */
+			if (command & (1 << 17)) count += 2;        /* S1/T1 */
+			count *= (command >> 6) & 15;               /* numverts */
 			return 1 + count + (command >> 29);
 
 		/*
-            Packet type 4: 1 + N words
+		    Packet type 4: 1 + N words
 
-              Word  Bits
-                0  31:29 = Number of dummy entries following the data
-                0  28:15 = General register mask
-                0  14:3  = Register base
-                0   2:0  = Packet type (4)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:29 = Number of dummy entries following the data
+		        0  28:15 = General register mask
+		        0  14:3  = Register base
+		        0   2:0  = Packet type (4)
+		        1  31:0  = Data word
+		*/
 		case 4:
 			for (i = 15; i <= 28; i++)
 				if (command & (1 << i)) count++;
 			return 1 + count + (command >> 29);
 
 		/*
-            Packet type 5: 2 + N words
+		    Packet type 5: 2 + N words
 
-              Word  Bits
-                0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
-                0  29:26 = Byte disable W2
-                0  25:22 = Byte disable WN
-                0  21:3  = Num words
-                0   2:0  = Packet type (5)
-                1  31:30 = Reserved
-                1  29:0  = Base address [24:0]
-                2  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
+		        0  29:26 = Byte disable W2
+		        0  25:22 = Byte disable WN
+		        0  21:3  = Num words
+		        0   2:0  = Packet type (5)
+		        1  31:30 = Reserved
+		        1  29:0  = Base address [24:0]
+		        2  31:0  = Data word
+		*/
 		case 5:
 			return 2 + ((command >> 3) & 0x7ffff);
 
@@ -1652,16 +1652,16 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 	switch (command & 7)
 	{
 		/*
-            Packet type 0: 1 or 2 words
+		    Packet type 0: 1 or 2 words
 
-              Word  Bits
-                0  31:29 = reserved
-                0  28:6  = Address [24:2]
-                0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
-                0   2:0  = Packet type (0)
-                1  31:11 = reserved (JMP AGP only)
-                1  10:0  = Address [35:25]
-        */
+		      Word  Bits
+		        0  31:29 = reserved
+		        0  28:6  = Address [24:2]
+		        0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
+		        0   2:0  = Packet type (0)
+		        1  31:11 = reserved (JMP AGP only)
+		        1  10:0  = Address [35:25]
+		*/
 		case 0:
 
 			/* extract parameters */
@@ -1670,27 +1670,27 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			/* switch off of the specific command */
 			switch ((command >> 3) & 7)
 			{
-				case 0:		/* NOP */
+				case 0:     /* NOP */
 					if (LOG_CMDFIFO) logerror("  NOP\n");
 					break;
 
-				case 1:		/* JSR */
+				case 1:     /* JSR */
 					if (LOG_CMDFIFO) logerror("  JSR $%06X\n", target);
 					mame_printf_debug("JSR in CMDFIFO!\n");
 					src = &fifobase[target / 4];
 					break;
 
-				case 2:		/* RET */
+				case 2:     /* RET */
 					if (LOG_CMDFIFO) logerror("  RET $%06X\n", target);
 					fatalerror("RET in CMDFIFO!\n");
 					break;
 
-				case 3:		/* JMP LOCAL FRAME BUFFER */
+				case 3:     /* JMP LOCAL FRAME BUFFER */
 					if (LOG_CMDFIFO) logerror("  JMP LOCAL FRAMEBUF $%06X\n", target);
 					src = &fifobase[target / 4];
 					break;
 
-				case 4:		/* JMP AGP */
+				case 4:     /* JMP AGP */
 					if (LOG_CMDFIFO) logerror("  JMP AGP $%06X\n", target);
 					fatalerror("JMP AGP in CMDFIFO!\n");
 					src = &fifobase[target / 4];
@@ -1704,15 +1704,15 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			break;
 
 		/*
-            Packet type 1: 1 + N words
+		    Packet type 1: 1 + N words
 
-              Word  Bits
-                0  31:16 = Number of words
-                0    15  = Increment?
-                0  14:3  = Register base
-                0   2:0  = Packet type (1)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:16 = Number of words
+		        0    15  = Increment?
+		        0  14:3  = Register base
+		        0   2:0  = Packet type (1)
+		        1  31:0  = Data word
+		*/
 		case 1:
 
 			/* extract parameters */
@@ -1743,13 +1743,13 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			break;
 
 		/*
-            Packet type 2: 1 + N words
+		    Packet type 2: 1 + N words
 
-              Word  Bits
-                0  31:3  = 2D Register mask
-                0   2:0  = Packet type (2)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:3  = 2D Register mask
+		        0   2:0  = Packet type (2)
+		        1  31:0  = Data word
+		*/
 		case 2:
 			if (LOG_CMDFIFO) logerror("  PACKET TYPE 2: mask=%X\n", (command >> 3) & 0x1ffffff);
 
@@ -1760,28 +1760,28 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			break;
 
 		/*
-            Packet type 3: 1 + N words
+		    Packet type 3: 1 + N words
 
-              Word  Bits
-                0  31:29 = Number of dummy entries following the data
-                0   28   = Packed color data?
-                0   25   = Disable ping pong sign correction (0=normal, 1=disable)
-                0   24   = Culling sign (0=positive, 1=negative)
-                0   23   = Enable culling (0=disable, 1=enable)
-                0   22   = Strip mode (0=strip, 1=fan)
-                0   17   = Setup S1 and T1
-                0   16   = Setup W1
-                0   15   = Setup S0 and T0
-                0   14   = Setup W0
-                0   13   = Setup Wb
-                0   12   = Setup Z
-                0   11   = Setup Alpha
-                0   10   = Setup RGB
-                0   9:6  = Number of vertices
-                0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
-                0   2:0  = Packet type (3)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:29 = Number of dummy entries following the data
+		        0   28   = Packed color data?
+		        0   25   = Disable ping pong sign correction (0=normal, 1=disable)
+		        0   24   = Culling sign (0=positive, 1=negative)
+		        0   23   = Enable culling (0=disable, 1=enable)
+		        0   22   = Strip mode (0=strip, 1=fan)
+		        0   17   = Setup S1 and T1
+		        0   16   = Setup W1
+		        0   15   = Setup S0 and T0
+		        0   14   = Setup W0
+		        0   13   = Setup Wb
+		        0   12   = Setup Z
+		        0   11   = Setup Alpha
+		        0   10   = Setup RGB
+		        0   9:6  = Number of vertices
+		        0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
+		        0   2:0  = Packet type (3)
+		        1  31:0  = Data word
+		*/
 		case 3:
 
 			/* extract parameters */
@@ -1884,15 +1884,15 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			break;
 
 		/*
-            Packet type 4: 1 + N words
+		    Packet type 4: 1 + N words
 
-              Word  Bits
-                0  31:29 = Number of dummy entries following the data
-                0  28:15 = General register mask
-                0  14:3  = Register base
-                0   2:0  = Packet type (4)
-                1  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:29 = Number of dummy entries following the data
+		        0  28:15 = General register mask
+		        0  14:3  = Register base
+		        0   2:0  = Packet type (4)
+		        1  31:0  = Data word
+		*/
 		case 4:
 
 			/* extract parameters */
@@ -1928,18 +1928,18 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			break;
 
 		/*
-            Packet type 5: 2 + N words
+		    Packet type 5: 2 + N words
 
-              Word  Bits
-                0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
-                0  29:26 = Byte disable W2
-                0  25:22 = Byte disable WN
-                0  21:3  = Num words
-                0   2:0  = Packet type (5)
-                1  31:30 = Reserved
-                1  29:0  = Base address [24:0]
-                2  31:0  = Data word
-        */
+		      Word  Bits
+		        0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
+		        0  29:26 = Byte disable W2
+		        0  25:22 = Byte disable WN
+		        0  21:3  = Num words
+		        0   2:0  = Packet type (5)
+		        1  31:30 = Reserved
+		        1  29:0  = Base address [24:0]
+		        2  31:0  = Data word
+		*/
 		case 5:
 
 			/* extract parameters */
@@ -1949,7 +1949,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			/* handle LFB writes */
 			switch (command >> 30)
 			{
-				case 0:		// Linear FB
+				case 0:     // Linear FB
 				{
 					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
@@ -1967,7 +1967,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 					}
 					break;
 				}
-				case 2:		// 3D LFB
+				case 2:     // 3D LFB
 				{
 					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
@@ -1978,7 +1978,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 					break;
 				}
 
-				case 1:		// Planar YUV
+				case 1:     // Planar YUV
 				{
 					// TODO
 
@@ -1992,7 +1992,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 					break;
 				}
 
-				case 3:		// Texture Port
+				case 3:     // Texture Port
 				{
 					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
@@ -2983,171 +2983,171 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	/* first extract A,R,G,B from the data */
 	switch (LFBMODE_WRITE_FORMAT(v->reg[lfbMode].u) + 16 * LFBMODE_RGBA_LANES(v->reg[lfbMode].u))
 	{
-		case 16*0 + 0:		/* ARGB, 16-bit RGB 5-6-5 */
-		case 16*2 + 0:		/* RGBA, 16-bit RGB 5-6-5 */
+		case 16*0 + 0:      /* ARGB, 16-bit RGB 5-6-5 */
+		case 16*2 + 0:      /* RGBA, 16-bit RGB 5-6-5 */
 			EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
 			EXTRACT_565_TO_888(data >> 16, sr[1], sg[1], sb[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
-		case 16*1 + 0:		/* ABGR, 16-bit RGB 5-6-5 */
-		case 16*3 + 0:		/* BGRA, 16-bit RGB 5-6-5 */
+		case 16*1 + 0:      /* ABGR, 16-bit RGB 5-6-5 */
+		case 16*3 + 0:      /* BGRA, 16-bit RGB 5-6-5 */
 			EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
 			EXTRACT_565_TO_888(data >> 16, sb[1], sg[1], sr[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
 
-		case 16*0 + 1:		/* ARGB, 16-bit RGB x-5-5-5 */
+		case 16*0 + 1:      /* ARGB, 16-bit RGB x-5-5-5 */
 			EXTRACT_x555_TO_888(data, sr[0], sg[0], sb[0]);
 			EXTRACT_x555_TO_888(data >> 16, sr[1], sg[1], sb[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
-		case 16*1 + 1:		/* ABGR, 16-bit RGB x-5-5-5 */
+		case 16*1 + 1:      /* ABGR, 16-bit RGB x-5-5-5 */
 			EXTRACT_x555_TO_888(data, sb[0], sg[0], sr[0]);
 			EXTRACT_x555_TO_888(data >> 16, sb[1], sg[1], sr[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
-		case 16*2 + 1:		/* RGBA, 16-bit RGB x-5-5-5 */
+		case 16*2 + 1:      /* RGBA, 16-bit RGB x-5-5-5 */
 			EXTRACT_555x_TO_888(data, sr[0], sg[0], sb[0]);
 			EXTRACT_555x_TO_888(data >> 16, sr[1], sg[1], sb[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
-		case 16*3 + 1:		/* BGRA, 16-bit RGB x-5-5-5 */
+		case 16*3 + 1:      /* BGRA, 16-bit RGB x-5-5-5 */
 			EXTRACT_555x_TO_888(data, sb[0], sg[0], sr[0]);
 			EXTRACT_555x_TO_888(data >> 16, sb[1], sg[1], sr[1]);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
 
-		case 16*0 + 2:		/* ARGB, 16-bit ARGB 1-5-5-5 */
+		case 16*0 + 2:      /* ARGB, 16-bit ARGB 1-5-5-5 */
 			EXTRACT_1555_TO_8888(data, sa[0], sr[0], sg[0], sb[0]);
 			EXTRACT_1555_TO_8888(data >> 16, sa[1], sr[1], sg[1], sb[1]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
 			offset <<= 1;
 			break;
-		case 16*1 + 2:		/* ABGR, 16-bit ARGB 1-5-5-5 */
+		case 16*1 + 2:      /* ABGR, 16-bit ARGB 1-5-5-5 */
 			EXTRACT_1555_TO_8888(data, sa[0], sb[0], sg[0], sr[0]);
 			EXTRACT_1555_TO_8888(data >> 16, sa[1], sb[1], sg[1], sr[1]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
 			offset <<= 1;
 			break;
-		case 16*2 + 2:		/* RGBA, 16-bit ARGB 1-5-5-5 */
+		case 16*2 + 2:      /* RGBA, 16-bit ARGB 1-5-5-5 */
 			EXTRACT_5551_TO_8888(data, sr[0], sg[0], sb[0], sa[0]);
 			EXTRACT_5551_TO_8888(data >> 16, sr[1], sg[1], sb[1], sa[1]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
 			offset <<= 1;
 			break;
-		case 16*3 + 2:		/* BGRA, 16-bit ARGB 1-5-5-5 */
+		case 16*3 + 2:      /* BGRA, 16-bit ARGB 1-5-5-5 */
 			EXTRACT_5551_TO_8888(data, sb[0], sg[0], sr[0], sa[0]);
 			EXTRACT_5551_TO_8888(data >> 16, sb[1], sg[1], sr[1], sa[1]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
 			offset <<= 1;
 			break;
 
-		case 16*0 + 4:		/* ARGB, 32-bit RGB x-8-8-8 */
+		case 16*0 + 4:      /* ARGB, 32-bit RGB x-8-8-8 */
 			EXTRACT_x888_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT;
 			break;
-		case 16*1 + 4:		/* ABGR, 32-bit RGB x-8-8-8 */
+		case 16*1 + 4:      /* ABGR, 32-bit RGB x-8-8-8 */
 			EXTRACT_x888_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT;
 			break;
-		case 16*2 + 4:		/* RGBA, 32-bit RGB x-8-8-8 */
+		case 16*2 + 4:      /* RGBA, 32-bit RGB x-8-8-8 */
 			EXTRACT_888x_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT;
 			break;
-		case 16*3 + 4:		/* BGRA, 32-bit RGB x-8-8-8 */
+		case 16*3 + 4:      /* BGRA, 32-bit RGB x-8-8-8 */
 			EXTRACT_888x_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT;
 			break;
 
-		case 16*0 + 5:		/* ARGB, 32-bit ARGB 8-8-8-8 */
+		case 16*0 + 5:      /* ARGB, 32-bit ARGB 8-8-8-8 */
 			EXTRACT_8888_TO_8888(data, sa[0], sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
 			break;
-		case 16*1 + 5:		/* ABGR, 32-bit ARGB 8-8-8-8 */
+		case 16*1 + 5:      /* ABGR, 32-bit ARGB 8-8-8-8 */
 			EXTRACT_8888_TO_8888(data, sa[0], sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
 			break;
-		case 16*2 + 5:		/* RGBA, 32-bit ARGB 8-8-8-8 */
+		case 16*2 + 5:      /* RGBA, 32-bit ARGB 8-8-8-8 */
 			EXTRACT_8888_TO_8888(data, sr[0], sg[0], sb[0], sa[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
 			break;
-		case 16*3 + 5:		/* BGRA, 32-bit ARGB 8-8-8-8 */
+		case 16*3 + 5:      /* BGRA, 32-bit ARGB 8-8-8-8 */
 			EXTRACT_8888_TO_8888(data, sb[0], sg[0], sr[0], sa[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
 			break;
 
-		case 16*0 + 12:		/* ARGB, 32-bit depth+RGB 5-6-5 */
-		case 16*2 + 12:		/* RGBA, 32-bit depth+RGB 5-6-5 */
+		case 16*0 + 12:     /* ARGB, 32-bit depth+RGB 5-6-5 */
+		case 16*2 + 12:     /* RGBA, 32-bit depth+RGB 5-6-5 */
 			sw[0] = data >> 16;
 			EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*1 + 12:		/* ABGR, 32-bit depth+RGB 5-6-5 */
-		case 16*3 + 12:		/* BGRA, 32-bit depth+RGB 5-6-5 */
+		case 16*1 + 12:     /* ABGR, 32-bit depth+RGB 5-6-5 */
+		case 16*3 + 12:     /* BGRA, 32-bit depth+RGB 5-6-5 */
 			sw[0] = data >> 16;
 			EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
-		case 16*0 + 13:		/* ARGB, 32-bit depth+RGB x-5-5-5 */
+		case 16*0 + 13:     /* ARGB, 32-bit depth+RGB x-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_x555_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*1 + 13:		/* ABGR, 32-bit depth+RGB x-5-5-5 */
+		case 16*1 + 13:     /* ABGR, 32-bit depth+RGB x-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_x555_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*2 + 13:		/* RGBA, 32-bit depth+RGB x-5-5-5 */
+		case 16*2 + 13:     /* RGBA, 32-bit depth+RGB x-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_555x_TO_888(data, sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*3 + 13:		/* BGRA, 32-bit depth+RGB x-5-5-5 */
+		case 16*3 + 13:     /* BGRA, 32-bit depth+RGB x-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_555x_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
-		case 16*0 + 14:		/* ARGB, 32-bit depth+ARGB 1-5-5-5 */
+		case 16*0 + 14:     /* ARGB, 32-bit depth+ARGB 1-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_1555_TO_8888(data, sa[0], sr[0], sg[0], sb[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*1 + 14:		/* ABGR, 32-bit depth+ARGB 1-5-5-5 */
+		case 16*1 + 14:     /* ABGR, 32-bit depth+ARGB 1-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_1555_TO_8888(data, sa[0], sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*2 + 14:		/* RGBA, 32-bit depth+ARGB 1-5-5-5 */
+		case 16*2 + 14:     /* RGBA, 32-bit depth+ARGB 1-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_5551_TO_8888(data, sr[0], sg[0], sb[0], sa[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*3 + 14:		/* BGRA, 32-bit depth+ARGB 1-5-5-5 */
+		case 16*3 + 14:     /* BGRA, 32-bit depth+ARGB 1-5-5-5 */
 			sw[0] = data >> 16;
 			EXTRACT_5551_TO_8888(data, sb[0], sg[0], sr[0], sa[0]);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
-		case 16*0 + 15:		/* ARGB, 16-bit depth */
-		case 16*1 + 15:		/* ARGB, 16-bit depth */
-		case 16*2 + 15:		/* ARGB, 16-bit depth */
-		case 16*3 + 15:		/* ARGB, 16-bit depth */
+		case 16*0 + 15:     /* ARGB, 16-bit depth */
+		case 16*1 + 15:     /* ARGB, 16-bit depth */
+		case 16*2 + 15:     /* ARGB, 16-bit depth */
+		case 16*3 + 15:     /* ARGB, 16-bit depth */
 			sw[0] = data & 0xffff;
 			sw[1] = data >> 16;
 			mask = LFB_DEPTH_PRESENT | (LFB_DEPTH_PRESENT << 4);
 			offset <<= 1;
 			break;
 
-		default:			/* reserved */
+		default:            /* reserved */
 			return 0;
 	}
 
@@ -3165,18 +3165,18 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_WRITE_BUFFER_SELECT(v->reg[lfbMode].u);
 	switch (destbuf)
 	{
-		case 0:			/* front buffer */
+		case 0:         /* front buffer */
 			dest = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
 			destmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.frontbuf]) / 2;
 			v->fbi.video_changed = TRUE;
 			break;
 
-		case 1:			/* back buffer */
+		case 1:         /* back buffer */
 			dest = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
 			destmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.backbuf]) / 2;
 			break;
 
-		default:		/* reserved */
+		default:        /* reserved */
 			return 0;
 	}
 	depth = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs);
@@ -3860,8 +3860,8 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 
 		/* reserved area in the TMU read by the Vegas startup sequence */
 		case hvRetrace:
-			result = 0x200 << 16;	/* should be between 0x7b and 0x267 */
-			result |= 0x80;			/* should be between 0x17 and 0x103 */
+			result = 0x200 << 16;   /* should be between 0x7b and 0x267 */
+			result |= 0x80;         /* should be between 0x17 and 0x103 */
 			break;
 
 		/* cmdFifo -- Voodoo2 only */
@@ -3950,24 +3950,24 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
 	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_READ_BUFFER_SELECT(v->reg[lfbMode].u);
 	switch (destbuf)
 	{
-		case 0:			/* front buffer */
+		case 0:         /* front buffer */
 			buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
 			bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.frontbuf]) / 2;
 			break;
 
-		case 1:			/* back buffer */
+		case 1:         /* back buffer */
 			buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
 			bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.backbuf]) / 2;
 			break;
 
-		case 2:			/* aux buffer */
+		case 2:         /* aux buffer */
 			if (v->fbi.auxoffs == ~0)
 				return 0xffffffff;
 			buffer = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs);
 			bufmax = (v->fbi.mask + 1 - v->fbi.auxoffs) / 2;
 			break;
 
-		default:		/* reserved */
+		default:        /* reserved */
 			return 0xffffffff;
 	}
 
@@ -4173,11 +4173,11 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 		/* Input status 0 */
 		case 0x3c2:
 			/*
-                bit 7 = Interrupt Status. When its value is ?1?, denotes that an interrupt is pending.
-                bit 6:5 = Feature Connector. These 2 bits are readable bits from the feature connector.
-                bit 4 = Sense. This bit reflects the state of the DAC monitor sense logic.
-                bit 3:0 = Reserved. Read back as 0.
-            */
+			    bit 7 = Interrupt Status. When its value is ?1?, denotes that an interrupt is pending.
+			    bit 6:5 = Feature Connector. These 2 bits are readable bits from the feature connector.
+			    bit 4 = Sense. This bit reflects the state of the DAC monitor sense logic.
+			    bit 3:0 = Reserved. Read back as 0.
+			*/
 			result = 0x00;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_r(%X)\n", device->machine().describe_context(), 0x300+offset);
@@ -4225,14 +4225,14 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 		/* Input status 1 */
 		case 0x3da:
 			/*
-                bit 7:6 = Reserved. These bits read back 0.
-                bit 5:4 = Display Status. These 2 bits reflect 2 of the 8 pixel data outputs from the Attribute
-                            controller, as determined by the Attribute controller index 0x12 bits 4 and 5.
-                bit 3 = Vertical sync Status. A ?1? indicates vertical retrace is in progress.
-                bit 2:1 = Reserved. These bits read back 0x2.
-                bit 0 = Display Disable. When this bit is 1, either horizontal or vertical display end has occurred,
-                            otherwise video data is being displayed.
-            */
+			    bit 7:6 = Reserved. These bits read back 0.
+			    bit 5:4 = Display Status. These 2 bits reflect 2 of the 8 pixel data outputs from the Attribute
+			                controller, as determined by the Attribute controller index 0x12 bits 4 and 5.
+			    bit 3 = Vertical sync Status. A ?1? indicates vertical retrace is in progress.
+			    bit 2:1 = Reserved. These bits read back 0x2.
+			    bit 0 = Display Disable. When this bit is 1, either horizontal or vertical display end has occurred,
+			                otherwise video data is being displayed.
+			*/
 			result = 0x04;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_r(%X)\n", device->machine().describe_context(), 0x300+offset);
@@ -4268,9 +4268,9 @@ READ32_DEVICE_HANDLER( banshee_io_r )
 				logerror("%s:banshee_dac_r(%X)\n", device->machine().describe_context(), v->banshee.io[io_dacAddr] & 0x1ff);
 			break;
 
-		case io_vgab0:	case io_vgab4:	case io_vgab8:	case io_vgabc:
-		case io_vgac0:	case io_vgac4:	case io_vgac8:	case io_vgacc:
-		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
+		case io_vgab0:  case io_vgab4:  case io_vgab8:  case io_vgabc:
+		case io_vgac0:  case io_vgac4:  case io_vgac8:  case io_vgacc:
+		case io_vgad0:  case io_vgad4:  case io_vgad8:  case io_vgadc:
 			result = 0;
 			if (ACCESSING_BITS_0_7)
 				result |= banshee_vga_r(device, space, offset*4+0, mem_mask >> 0) << 0;
@@ -4303,12 +4303,12 @@ static void blit_2d(voodoo_state *v, UINT32 data)
 {
 	switch (v->banshee.blt_cmd)
 	{
-		case 0:			// NOP - wait for idle
+		case 0:         // NOP - wait for idle
 		{
 			break;
 		}
 
-		case 1:			// Screen-to-screen blit
+		case 1:         // Screen-to-screen blit
 		{
 			// TODO
 #if LOG_BANSHEE_2D
@@ -4317,12 +4317,12 @@ static void blit_2d(voodoo_state *v, UINT32 data)
 			break;
 		}
 
-		case 2:			// Screen-to-screen stretch blit
+		case 2:         // Screen-to-screen stretch blit
 		{
 			fatalerror("   blit_2d:screen_to_screen_stretch: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
 		}
 
-		case 3:			// Host-to-screen blit
+		case 3:         // Host-to-screen blit
 		{
 			UINT32 addr = v->banshee.blt_dst_base;
 
@@ -4368,22 +4368,22 @@ static void blit_2d(voodoo_state *v, UINT32 data)
 			break;
 		}
 
-		case 5:			// Rectangle fill
+		case 5:         // Rectangle fill
 		{
 			fatalerror("blit_2d:rectangle_fill: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
 		}
 
-		case 6:			// Line
+		case 6:         // Line
 		{
 			fatalerror("blit_2d:line: end X %d, end Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
 		}
 
-		case 7:			// Polyline
+		case 7:         // Polyline
 		{
 			fatalerror("blit_2d:polyline: end X %d, end Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
 		}
 
-		case 8:			// Polygon fill
+		case 8:         // Polygon fill
 		{
 			fatalerror("blit_2d:polygon_fill\n");
 		}
@@ -4404,12 +4404,12 @@ static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data)
 			logerror("   2D:command: cmd %d, ROP0 %02X\n", data & 0xf, data >> 24);
 #endif
 
-			v->banshee.blt_src_x		= v->banshee.blt_regs[banshee2D_srcXY] & 0xfff;
-			v->banshee.blt_src_y		= (v->banshee.blt_regs[banshee2D_srcXY] >> 16) & 0xfff;
-			v->banshee.blt_src_base		= v->banshee.blt_regs[banshee2D_srcBaseAddr] & 0xffffff;
-			v->banshee.blt_src_stride	= v->banshee.blt_regs[banshee2D_srcFormat] & 0x3fff;
-			v->banshee.blt_src_width	= v->banshee.blt_regs[banshee2D_srcSize] & 0xfff;
-			v->banshee.blt_src_height	= (v->banshee.blt_regs[banshee2D_srcSize] >> 16) & 0xfff;
+			v->banshee.blt_src_x        = v->banshee.blt_regs[banshee2D_srcXY] & 0xfff;
+			v->banshee.blt_src_y        = (v->banshee.blt_regs[banshee2D_srcXY] >> 16) & 0xfff;
+			v->banshee.blt_src_base     = v->banshee.blt_regs[banshee2D_srcBaseAddr] & 0xffffff;
+			v->banshee.blt_src_stride   = v->banshee.blt_regs[banshee2D_srcFormat] & 0x3fff;
+			v->banshee.blt_src_width    = v->banshee.blt_regs[banshee2D_srcSize] & 0xfff;
+			v->banshee.blt_src_height   = (v->banshee.blt_regs[banshee2D_srcSize] >> 16) & 0xfff;
 
 			switch ((v->banshee.blt_regs[banshee2D_srcFormat] >> 16) & 0xf)
 			{
@@ -4422,12 +4422,12 @@ static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data)
 				default: v->banshee.blt_src_bpp = 1; break;
 			}
 
-			v->banshee.blt_dst_x		= v->banshee.blt_regs[banshee2D_dstXY] & 0xfff;
-			v->banshee.blt_dst_y		= (v->banshee.blt_regs[banshee2D_dstXY] >> 16) & 0xfff;
-			v->banshee.blt_dst_base		= v->banshee.blt_regs[banshee2D_dstBaseAddr] & 0xffffff;
-			v->banshee.blt_dst_stride	= v->banshee.blt_regs[banshee2D_dstFormat] & 0x3fff;
-			v->banshee.blt_dst_width	= v->banshee.blt_regs[banshee2D_dstSize] & 0xfff;
-			v->banshee.blt_dst_height	= (v->banshee.blt_regs[banshee2D_dstSize] >> 16) & 0xfff;
+			v->banshee.blt_dst_x        = v->banshee.blt_regs[banshee2D_dstXY] & 0xfff;
+			v->banshee.blt_dst_y        = (v->banshee.blt_regs[banshee2D_dstXY] >> 16) & 0xfff;
+			v->banshee.blt_dst_base     = v->banshee.blt_regs[banshee2D_dstBaseAddr] & 0xffffff;
+			v->banshee.blt_dst_stride   = v->banshee.blt_regs[banshee2D_dstFormat] & 0x3fff;
+			v->banshee.blt_dst_width    = v->banshee.blt_regs[banshee2D_dstSize] & 0xfff;
+			v->banshee.blt_dst_height   = (v->banshee.blt_regs[banshee2D_dstSize] >> 16) & 0xfff;
 
 			switch ((v->banshee.blt_regs[banshee2D_dstFormat] >> 16) & 0x7)
 			{
@@ -4851,9 +4851,9 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", device->machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
-		case io_vgab0:	case io_vgab4:	case io_vgab8:	case io_vgabc:
-		case io_vgac0:	case io_vgac4:	case io_vgac8:	case io_vgacc:
-		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
+		case io_vgab0:  case io_vgab4:  case io_vgab8:  case io_vgabc:
+		case io_vgac0:  case io_vgac4:  case io_vgac8:  case io_vgacc:
+		case io_vgad0:  case io_vgad4:  case io_vgad8:  case io_vgadc:
 			if (ACCESSING_BITS_0_7)
 				banshee_vga_w(device, space, offset*4+0, data >> 0, mem_mask >> 0);
 			if (ACCESSING_BITS_8_15)
@@ -5049,7 +5049,7 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 	v->banshee.io[io_sipMonitor] = 0x40000000;
 	v->banshee.io[io_lfbMemoryConfig] = 0x000a2200;
 	v->banshee.io[io_dramInit0] = 0x00579d29;
-	v->banshee.io[io_dramInit0] |= 0x08000000;		// Konami Viper expects 16MBit SGRAMs
+	v->banshee.io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
 	v->banshee.io[io_dramInit1] = 0x00f02200;
 	v->banshee.io[io_tmuGbeInit] = 0x00000bfb;
 
@@ -5135,15 +5135,15 @@ static INT32 fastfill(voodoo_state *v)
 		int destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
 		switch (destbuf)
 		{
-			case 0:		/* front buffer */
+			case 0:     /* front buffer */
 				drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
 				break;
 
-			case 1:		/* back buffer */
+			case 1:     /* back buffer */
 				drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
 				break;
 
-			default:	/* reserved */
+			default:    /* reserved */
 				break;
 		}
 
@@ -5273,16 +5273,16 @@ static INT32 triangle(voodoo_state *v)
 	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
 	switch (destbuf)
 	{
-		case 0:		/* front buffer */
+		case 0:     /* front buffer */
 			drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
 			v->fbi.video_changed = TRUE;
 			break;
 
-		case 1:		/* back buffer */
+		case 1:     /* back buffer */
 			drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
 			break;
 
-		default:	/* reserved */
+		default:    /* reserved */
 			return TRIANGLE_SETUP_CLOCKS;
 	}
 
@@ -5400,7 +5400,7 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 
 	/* compute the divisor */
 	divisor = 1.0f / ((v->fbi.svert[0].x - v->fbi.svert[1].x) * (v->fbi.svert[0].y - v->fbi.svert[2].y) -
-					  (v->fbi.svert[0].x - v->fbi.svert[2].x) * (v->fbi.svert[0].y - v->fbi.svert[1].y));
+						(v->fbi.svert[0].x - v->fbi.svert[2].x) * (v->fbi.svert[0].y - v->fbi.svert[1].y));
 
 	/* backface culling */
 	if (v->reg[sSetupMode].u & 0x20000)

@@ -15,11 +15,11 @@
 /* SKR - 2102 RAM chip on carts 10 and 18 I/O ports */
 struct r2102_t
 {
-	UINT8 d;			/* data bit:inverted logic, but reading/writing cancel out */
-	UINT8 r_w;			/* inverted logic: 0 means read, 1 means write */
-	UINT8 a[10];		/* addr bits: inverted logic, but reading/writing cancel out */
-	UINT16 addr;		/* calculated addr from addr bits */
-	UINT8 ram[1024];	/* RAM array */
+	UINT8 d;            /* data bit:inverted logic, but reading/writing cancel out */
+	UINT8 r_w;          /* inverted logic: 0 means read, 1 means write */
+	UINT8 a[10];        /* addr bits: inverted logic, but reading/writing cancel out */
+	UINT16 addr;        /* calculated addr from addr bits */
+	UINT8 ram[1024];    /* RAM array */
 };
 
 
@@ -64,7 +64,7 @@ public:
 /*----------- defined in audio/channelf.c -----------*/
 
 class channelf_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

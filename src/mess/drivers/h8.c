@@ -61,11 +61,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 
 READ8_MEMBER( h8_state::h8_f0_r )
 {
-    // reads the keyboard
+	// reads the keyboard
 
-    // The following not emulated, can occur any time even if keyboard not being scanned
-    // - if 0 and RTM pressed, causes int10
-    // - if 0 and RST pressed, resets cpu
+	// The following not emulated, can occur any time even if keyboard not being scanned
+	// - if 0 and RTM pressed, causes int10
+	// - if 0 and RST pressed, resets cpu
 
 	UINT8 i,keyin,data = 0xff;
 
@@ -91,12 +91,12 @@ READ8_MEMBER( h8_state::h8_f0_r )
 
 WRITE8_MEMBER( h8_state::h8_f0_w )
 {
-    // this will always turn off int10 that was set by the timer
-    // d0-d3 = digit select
-    // d4 = int20 is allowed
-    // d5 = mon led
-    // d6 = int10 is allowed
-    // d7 = beeper enable
+	// this will always turn off int10 that was set by the timer
+	// d0-d3 = digit select
+	// d4 = int20 is allowed
+	// d5 = mon led
+	// d6 = int10 is allowed
+	// d7 = beeper enable
 
 	m_digit = data & 15;
 	if (m_digit) output_set_digit_value(m_digit, m_segment);
@@ -112,14 +112,14 @@ WRITE8_MEMBER( h8_state::h8_f0_w )
 
 WRITE8_MEMBER( h8_state::h8_f1_w )
 {
-    //d7 segment dot
-    //d6 segment f
-    //d5 segment e
-    //d4 segment d
-    //d3 segment c
-    //d2 segment b
-    //d1 segment a
-    //d0 segment g
+	//d7 segment dot
+	//d6 segment f
+	//d5 segment e
+	//d4 segment d
+	//d3 segment c
+	//d2 segment b
+	//d1 segment a
+	//d0 segment g
 
 	m_segment = 0xff ^ BITSWAP8(data, 7, 0, 6, 5, 4, 3, 2, 1);
 	if (m_digit) output_set_digit_value(m_digit, m_segment);
@@ -174,7 +174,7 @@ void h8_state::machine_reset()
 
 WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
 {
-        // operate the ION LED
+		// operate the ION LED
 	output_set_value("ion_led",(state) ? 0 : 1);
 	m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
@@ -206,16 +206,16 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 	}
 
 
-        // operate the RUN LED
+		// operate the RUN LED
 	output_set_value("run_led", state);
 }
 
 static I8085_CONFIG( h8_cpu_config )
 {
-	DEVCB_DRIVER_MEMBER(h8_state, h8_status_callback),		/* Status changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(h8_state, h8_inte_callback),			/* INTE changed callback */
-	DEVCB_NULL,					/* SID changed callback (I8085A only) */
-	DEVCB_NULL					/* SOD changed callback (I8085A only) */
+	DEVCB_DRIVER_MEMBER(h8_state, h8_status_callback),      /* Status changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(h8_state, h8_inte_callback),           /* INTE changed callback */
+	DEVCB_NULL,                 /* SID changed callback (I8085A only) */
+	DEVCB_NULL                  /* SOD changed callback (I8085A only) */
 };
 
 static MACHINE_CONFIG_START( h8, h8_state )
@@ -252,4 +252,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1977, h8,  0,       0,	h8, 	h8, driver_device,	 0, "Heath, Inc.", "Heathkit H8", GAME_NOT_WORKING )
+COMP( 1977, h8,  0,       0,    h8,     h8, driver_device,   0, "Heath, Inc.", "Heathkit H8", GAME_NOT_WORKING )

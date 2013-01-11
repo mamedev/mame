@@ -16,7 +16,7 @@ public:
 
 	tilemap_t* pf8x8_tilemap[3];
 	tilemap_t* pf16x16_tilemap[3];
-	int	   tile_region;
+	int    tile_region;
 	void create_tilemaps(int region8x8,int region16x16);
 	UINT16 pf_control_0[8];
 	UINT16 pf_control_1[8];
@@ -29,7 +29,7 @@ public:
 
 	  For games with multiple chips typically the flip bit only gets set on one of the chips, but
 	  is expected to apply to both (and often the sprites as well?)
-	  
+
 	  Furthermore we have the m_rambank thing used by Stadium Hero which appears to be used to
 	  control the upper address line on some external RAM even if it gets written to the control_0
 	  area
@@ -113,5 +113,3 @@ DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r );
 DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w );
 
 extern const device_type DECO_BAC06;
-
-

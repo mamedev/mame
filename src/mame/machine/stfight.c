@@ -92,8 +92,8 @@ void stfight_state::machine_reset()
 	m_coin_mech_query_active = 0;
 	m_coin_mech_query = 0;
 
-    // initialise rom bank
-    stfight_bank_w(space, 0, 0 );
+	// initialise rom bank
+	stfight_bank_w(space, 0, 0 );
 }
 
 // It's entirely possible that this bank is never switched out
@@ -111,15 +111,15 @@ WRITE8_MEMBER(stfight_state::stfight_bank_w)
 
 TIMER_CALLBACK_MEMBER(stfight_state::stfight_interrupt_1)
 {
-    // Do a RST08
-    machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+	// Do a RST08
+	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
 }
 
 INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 {
-    // Do a RST10
-    device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);
-    machine().scheduler().timer_set(attotime::from_hz(120), timer_expired_delegate(FUNC(stfight_state::stfight_interrupt_1),this));
+	// Do a RST10
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);
+	machine().scheduler().timer_set(attotime::from_hz(120), timer_expired_delegate(FUNC(stfight_state::stfight_interrupt_1),this));
 }
 
 /*
@@ -129,47 +129,47 @@ INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 // Perhaps define dipswitches as active low?
 READ8_MEMBER(stfight_state::stfight_dsw_r)
 {
-    return( ~ioport(offset ? "DSW1" : "DSW0")->read() );
+	return( ~ioport(offset ? "DSW1" : "DSW0")->read() );
 }
 
 READ8_MEMBER(stfight_state::stfight_coin_r)
 {
-    int coin_mech_data;
-    int i;
+	int coin_mech_data;
+	int i;
 
-    // Was the coin mech queried by software?
-    if( m_coin_mech_query_active )
-    {
-        m_coin_mech_query_active = 0;
-        return( (~m_coin_mech_query) & 0x03 );
-    }
+	// Was the coin mech queried by software?
+	if( m_coin_mech_query_active )
+	{
+		m_coin_mech_query_active = 0;
+		return( (~m_coin_mech_query) & 0x03 );
+	}
 
-    /*
-     *      Is this really necessary?
-     *      - we can control impulse length so that the port is
-     *        never strobed twice within the impulse period
-     *        since it's read by the 30Hz interrupt ISR
-     */
+	/*
+	 *      Is this really necessary?
+	 *      - we can control impulse length so that the port is
+	 *        never strobed twice within the impulse period
+	 *        since it's read by the 30Hz interrupt ISR
+	 */
 
-    coin_mech_data = ioport("COIN")->read();
+	coin_mech_data = ioport("COIN")->read();
 
-    for( i=0; i<2; i++ )
-    {
-        /* Only valid on signal edge */
-        if( ( coin_mech_data & (1<<i) ) != m_coin_mech_latch[i] )
-            m_coin_mech_latch[i] = coin_mech_data & (1<<i);
-        else
-            coin_mech_data |= coin_mech_data & (1<<i);
-    }
+	for( i=0; i<2; i++ )
+	{
+		/* Only valid on signal edge */
+		if( ( coin_mech_data & (1<<i) ) != m_coin_mech_latch[i] )
+			m_coin_mech_latch[i] = coin_mech_data & (1<<i);
+		else
+			coin_mech_data |= coin_mech_data & (1<<i);
+	}
 
-    return( coin_mech_data );
+	return( coin_mech_data );
 }
 
 WRITE8_MEMBER(stfight_state::stfight_coin_w)
 {
-    // interrogate coin mech
-    m_coin_mech_query_active = 1;
-    m_coin_mech_query = data;
+	// interrogate coin mech
+	m_coin_mech_query_active = 1;
+	m_coin_mech_query = data;
 }
 
 /*
@@ -178,12 +178,12 @@ WRITE8_MEMBER(stfight_state::stfight_coin_w)
 
 static const int sampleLimits[] =
 {
-    0x0000,     // machine gun fire?
-    0x1000,     // player getting shot
-    0x2C00,     // player shooting
-    0x3C00,     // girl screaming
-    0x5400,     // girl getting shot
-    0x7200      // (end of samples)
+	0x0000,     // machine gun fire?
+	0x1000,     // player getting shot
+	0x2C00,     // player shooting
+	0x3C00,     // girl screaming
+	0x5400,     // girl getting shot
+	0x7200      // (end of samples)
 };
 
 void stfight_adpcm_int(device_t *device)
@@ -192,12 +192,12 @@ void stfight_adpcm_int(device_t *device)
 	UINT8 *SAMPLES = state->memregion("adpcm")->base();
 	int adpcm_data = SAMPLES[state->m_adpcm_data_offs & 0x7fff];
 
-    // finished playing sample?
-    if( state->m_adpcm_data_offs == state->m_adpcm_data_end )
-    {
-        msm5205_reset_w( device, 1 );
-        return;
-    }
+	// finished playing sample?
+	if( state->m_adpcm_data_offs == state->m_adpcm_data_end )
+	{
+		msm5205_reset_w( device, 1 );
+		return;
+	}
 
 	if( state->m_toggle == 0 )
 		msm5205_data_w( device, ( adpcm_data >> 4 ) & 0x0f );
@@ -212,13 +212,13 @@ void stfight_adpcm_int(device_t *device)
 
 WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)
 {
-    if( data < 0x08 )
-    {
-        m_adpcm_data_offs = sampleLimits[data];
-        m_adpcm_data_end = sampleLimits[data+1];
-    }
+	if( data < 0x08 )
+	{
+		m_adpcm_data_offs = sampleLimits[data];
+		m_adpcm_data_end = sampleLimits[data+1];
+	}
 
-    msm5205_reset_w( machine().device("msm"), data & 0x08 ? 1 : 0 );
+	msm5205_reset_w( machine().device("msm"), data & 0x08 ? 1 : 0 );
 }
 
 WRITE8_MEMBER(stfight_state::stfight_e800_w)
@@ -231,16 +231,16 @@ WRITE8_MEMBER(stfight_state::stfight_e800_w)
 
 WRITE8_MEMBER(stfight_state::stfight_fm_w)
 {
-    // the sound cpu ignores any fm data without bit 7 set
-    m_fm_data = 0x80 | data;
+	// the sound cpu ignores any fm data without bit 7 set
+	m_fm_data = 0x80 | data;
 }
 
 READ8_MEMBER(stfight_state::stfight_fm_r)
 {
-    int data = m_fm_data;
+	int data = m_fm_data;
 
-    // clear the latch?!?
-    m_fm_data &= 0x7f;
+	// clear the latch?!?
+	m_fm_data &= 0x7f;
 
-    return( data );
+	return( data );
 }

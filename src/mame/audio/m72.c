@@ -225,7 +225,7 @@ WRITE8_DEVICE_HANDLER( poundfor_sample_addr_w )
 	m72_audio_state *state = get_safe_token(device);
 
 	/* poundfor writes both sample start and sample END - a first for Irem...
-       we don't handle the end written here, 00 marks the sample end as usual. */
+	   we don't handle the end written here, 00 marks the sample end as usual. */
 	if (offset > 1) return;
 
 	state->sample_addr >>= 4;
@@ -257,7 +257,7 @@ const device_type M72 = &device_creator<m72_audio_device>;
 
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, M72, "M72 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(m72_audio_state);
 }
@@ -299,5 +299,3 @@ void m72_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

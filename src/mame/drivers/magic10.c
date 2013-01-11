@@ -205,9 +205,9 @@ UINT32 magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind16 
 	m_layer2_tilemap->set_scrolly(0, m_layer2_offset[1]);
 
 	/*
-    4 and 6 are y/x global register writes.
-    0 and 2 are y/x writes for the scrolling layer.
-    */
+	4 and 6 are y/x global register writes.
+	0 and 2 are y/x writes for the scrolling layer.
+	*/
 	m_layer1_tilemap->set_scrolly(0, (m_vregs[0/2] - m_vregs[4/2])+0);
 	m_layer1_tilemap->set_scrollx(0, (m_vregs[2/2] - m_vregs[6/2])+4);
 
@@ -279,14 +279,14 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 
 //  popmessage("lamps: %02X", data);
 
-	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
-	output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
-	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
-	output_set_lamp_value(8, (data >> 8) & 1);		/* Lamp 8 - PAYOUT/SUPERGAME */
+	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+	output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+	output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
+	output_set_lamp_value(7, (data >> 6) & 1);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
+	output_set_lamp_value(8, (data >> 8) & 1);      /* Lamp 8 - PAYOUT/SUPERGAME */
 
 	coin_counter_w(machine(), 0, data & 0x400);
 }
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITENOP
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_SHARE("vregs")	// video registers?
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_SHARE("vregs")   // video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")	// video registers?
+	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")   // video registers?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w)	// copro comm
+	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w) // copro comm
 	AM_RANGE(0x500006, 0x500011) AM_RAM
 	AM_RANGE(0x500012, 0x500013) AM_READ_PORT("IN0")
 	AM_RANGE(0x500014, 0x500015) AM_READ_PORT("IN1")
@@ -376,7 +376,7 @@ static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_SHARE("vregs")	// video registers?
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_SHARE("vregs")   // video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 /*
@@ -432,23 +432,23 @@ static INPUT_PORTS_START( magic10 )
 	PORT_DIPSETTING(      0x0800, "Note A: 20 - Note B: 40 - Note C: 100 - Note D: 200" )
 	PORT_DIPSETTING(      0x0400, "Note A: 50 - Note B: 100 - Note C: 500 - Note D: 1000" )
 	PORT_DIPSETTING(      0x0c00, "Note A: 100 - Note B: 200 - Note C: 1000 - Note D: 2000" )
-	PORT_DIPNAME( 0x3000, 0x3000, "Lots At" )			PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
+	PORT_DIPNAME( 0x3000, 0x3000, "Lots At" )           PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
 	PORT_DIPSETTING(      0x0000, "50 200 500 1000 2000" )
 	PORT_DIPSETTING(      0x1000, "100 300 1000 3000 5000" )
 	PORT_DIPSETTING(      0x2000, "200 500 2000 3000 5000" )
 	PORT_DIPSETTING(      0x3000, "500 1000 2000 4000 8000" )
-	PORT_DIPNAME( 0x3000, 0x3000, "1 Ticket Won" )		PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
+	PORT_DIPNAME( 0x3000, 0x3000, "1 Ticket Won" )      PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
 //  PORT_DIPSETTING(      0x0000, "Every 100 Score" )
 //  PORT_DIPSETTING(      0x1000, "Every 100 Score" )
 //  PORT_DIPSETTING(      0x2000, "Every 100 Score" )
 	PORT_DIPSETTING(      0x3000, "Every 100 Score" )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unused ) )	PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unused ) )   PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )	PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unused ) )   PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x3000, 0x3000, "1 Play Won" )		PORT_CONDITION("DSW", 0xc000, EQUALS, 0x0000)
+	PORT_DIPNAME( 0x3000, 0x3000, "1 Play Won" )        PORT_CONDITION("DSW", 0xc000, EQUALS, 0x0000)
 //  PORT_DIPSETTING(      0x0000, "Every 10 Score" )
 //  PORT_DIPSETTING(      0x1000, "Every 10 Score" )
 //  PORT_DIPSETTING(      0x2000, "Every 10 Score" )
@@ -562,26 +562,26 @@ static INPUT_PORTS_START( musicsrt )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("OK")
 
 	PORT_START("DSW")
-    PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1: 1, 2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1: 1, 2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1: 3, 4")
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1: 3, 4")
 	PORT_DIPSETTING(      0x0000, "Coin A: 50 - Coin B: 50" )
 	PORT_DIPSETTING(      0x0800, "Coin A: 50 - Coin B: 50" )
 	PORT_DIPSETTING(      0x0400, "Coin A: 100 - Coin B: 100" )
 	PORT_DIPSETTING(      0x0c00, "Coin A: 100 - Coin B: 100" )
-	PORT_DIPNAME( 0x3000, 0x3000, "Bonus?" )				PORT_DIPLOCATION("SW1: 5, 6")
+	PORT_DIPNAME( 0x3000, 0x3000, "Bonus?" )                PORT_DIPLOCATION("SW1: 5, 6")
 	PORT_DIPSETTING(      0x3000, "1000= 1 Play; 2000= 2 Play; 3000= 3 Play" )
 	PORT_DIPSETTING(      0x2000, "2000= 1 Play; 4000= 2 Play; 6000= 3 Play" )
 	PORT_DIPSETTING(      0x1000, "2500= 1 Play; 5000= 2 Play; 7500= 3 Play" )
 	PORT_DIPSETTING(      0x0000, "5000= 1 Play; 10000= 2 Play; 15000= 3 Play" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Hopper" )				PORT_DIPLOCATION("SW1: 7")
+	PORT_DIPNAME( 0x4000, 0x4000, "Hopper" )                PORT_DIPLOCATION("SW1: 7")
 	PORT_DIPSETTING(      0x0000, "Disabled" )
 	PORT_DIPSETTING(      0x4000, "Enabled" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Score" )					PORT_DIPLOCATION("SW1: 8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Score" )                 PORT_DIPLOCATION("SW1: 8")
 	PORT_DIPSETTING(      0x0000, "Play Score" )
 	PORT_DIPSETTING(      0x8000, "No Play Score" )
 INPUT_PORTS_END
@@ -609,32 +609,32 @@ static INPUT_PORTS_START( hotslot )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("IN2")
-    PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("DSW1")
-    PORT_DIPNAME( 0x03,	0x03, DEF_STR( Difficulty ) )
-    PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
-    PORT_DIPSETTING(	0x01, DEF_STR( Medium ) )
-    PORT_DIPSETTING(	0x02, DEF_STR( Hard ) )
-    PORT_DIPSETTING(	0x03, DEF_STR( Hardest ) )
-    PORT_DIPNAME( 0x0c,	0x0c, DEF_STR( Coinage ) )
-    PORT_DIPSETTING(	0x00, "Coin A=10; B=10" )
-    PORT_DIPSETTING(	0x08, "Coin A=10; B=20" )
-    PORT_DIPSETTING(	0x04, "Coin A=10; B=50" )
-    PORT_DIPSETTING(	0x0c, "Coin A=10; B=100" )
-    PORT_DIPNAME( 0x10,	0x10, "Bet Max" )
-    PORT_DIPSETTING(	0x10, "10" )
-    PORT_DIPSETTING(	0x00, "20" )
-    PORT_DIPNAME( 0x20,	0x20, "Cum" )
-    PORT_DIPSETTING(	0x20, "10" )
-    PORT_DIPSETTING(	0x00, "100" )
-    PORT_DIPNAME( 0xc0,	0xc0, "Payout" )
-    PORT_DIPSETTING(	0x00, "Replay Only" )
-    PORT_DIPSETTING(	0x40, "Tokens Only" )
-    PORT_DIPSETTING(	0x80, "Tickets Only" )
-    PORT_DIPSETTING(	0xc0, "Tickets & Tokens" )
-    PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "Coin A=10; B=10" )
+	PORT_DIPSETTING(    0x08, "Coin A=10; B=20" )
+	PORT_DIPSETTING(    0x04, "Coin A=10; B=50" )
+	PORT_DIPSETTING(    0x0c, "Coin A=10; B=100" )
+	PORT_DIPNAME( 0x10, 0x10, "Bet Max" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x20, 0x20, "Cum" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Payout" )
+	PORT_DIPSETTING(    0x00, "Replay Only" )
+	PORT_DIPSETTING(    0x40, "Tokens Only" )
+	PORT_DIPSETTING(    0x80, "Tickets Only" )
+	PORT_DIPSETTING(    0xc0, "Tickets & Tokens" )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgsafari )
@@ -657,29 +657,29 @@ static INPUT_PORTS_START( sgsafari )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout / Super Game")
 
-    PORT_START("DSW1")
-    PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-    PORT_DIPNAME( 0x0300,	0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2")
-    PORT_DIPSETTING(		0x0300, DEF_STR( Easy ) )
-    PORT_DIPSETTING(		0x0200, DEF_STR( Normal ) )
-    PORT_DIPSETTING(		0x0100, DEF_STR( Hard ) )
-    PORT_DIPSETTING(		0x0000, DEF_STR( Hardest ) )
-    PORT_DIPNAME( 0x0c00,	0x0c00, DEF_STR( Coinage ) )
-    PORT_DIPSETTING(		0x0c00, DEF_STR( 1C_1C ) )		PORT_DIPLOCATION("SW1:3,4")
-    PORT_DIPSETTING(		0x0800, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(		0x0400, DEF_STR( 1C_4C ) )
-    PORT_DIPSETTING(		0x0000, "1 Coin/10 Credits" )
-    PORT_DIPNAME( 0x3000,	0x0000, "Payout Options" )		PORT_DIPLOCATION("SW1:5,6")
-    PORT_DIPSETTING(		0x3000, "Pay at 100 points" )
-    PORT_DIPSETTING(		0x2000, "Pay at 200 points" )
-    PORT_DIPSETTING(		0x1000, "Pay at 400 points" )
-    PORT_DIPSETTING(		0x0000, "Pay at 500 points" )
-    PORT_DIPNAME( 0x4000,	0x4000, "Tickets" )				PORT_DIPLOCATION("SW1:7")
-    PORT_DIPSETTING(		0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000,	0x0000, "Hopper" )				PORT_DIPLOCATION("SW1:8")
-    PORT_DIPSETTING(		0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
+	PORT_START("DSW1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x0300,   0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(        0x0300, DEF_STR( Easy ) )
+	PORT_DIPSETTING(        0x0200, DEF_STR( Normal ) )
+	PORT_DIPSETTING(        0x0100, DEF_STR( Hard ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c00,   0x0c00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(        0x0c00, DEF_STR( 1C_1C ) )      PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(        0x0800, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(        0x0400, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(        0x0000, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x3000,   0x0000, "Payout Options" )      PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(        0x3000, "Pay at 100 points" )
+	PORT_DIPSETTING(        0x2000, "Pay at 200 points" )
+	PORT_DIPSETTING(        0x1000, "Pay at 400 points" )
+	PORT_DIPSETTING(        0x0000, "Pay at 500 points" )
+	PORT_DIPNAME( 0x4000,   0x4000, "Tickets" )             PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(        0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000,   0x0000, "Hopper" )              PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(        0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -747,7 +747,7 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)   /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_DERIVED( sgsafari, magic10 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sgsafari_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state,  irq2_line_hold)	/* L1 interrupts */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state,  irq2_line_hold)    /* L1 interrupts */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
@@ -904,7 +904,7 @@ pcb is marked: Copyright ABM - 9605 Rev.02
 
 */
 ROM_START( magic102 )
-	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u3",  0x00000, 0x20000, CRC(6fc55fe4) SHA1(392ad92e55aeac9bf5235cceb6b0b415942105a4) )
 	ROM_LOAD16_BYTE( "1.u2",  0x00001, 0x20000, CRC(501507af) SHA1(ceed50c9380a9838cd3d171d2387334edfeff77f) )
 
@@ -1236,8 +1236,8 @@ DRIVER_INIT_MEMBER(magic10_state,hotslot)
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
 */
-	m_layer2_offset[0] = -56;	// X offset.
-	m_layer2_offset[1] = 0;	// Y offset.
+	m_layer2_offset[0] = -56;   // X offset.
+	m_layer2_offset[1] = 0; // Y offset.
 }
 
 DRIVER_INIT_MEMBER(magic10_state,sgsafari)

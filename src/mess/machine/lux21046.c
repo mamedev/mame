@@ -82,10 +82,10 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG			"5ab"
-#define Z80DMA_TAG		"6ab"
-#define SAB1793_TAG		"7ab"
-#define FDC9229_TAG		"8b"
+#define Z80_TAG         "5ab"
+#define Z80DMA_TAG      "6ab"
+#define SAB1793_TAG     "7ab"
+#define FDC9229_TAG     "8b"
 
 
 
@@ -103,11 +103,11 @@ const device_type LUXOR_55_21046 = &device_creator<luxor_55_21046_device>;
 ROM_START( luxor_55_21046 )
 	ROM_REGION( 0x4000, Z80_TAG, 0 ) // A13 is always high, thus loading at 0x2000
 	ROM_DEFAULT_BIOS( "v107" )
-    ROM_SYSTEM_BIOS( 0, "v107", "Luxor v1.07 (1985-07-03)" )
+	ROM_SYSTEM_BIOS( 0, "v107", "Luxor v1.07 (1985-07-03)" )
 	ROMX_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS( 1, "v108", "Luxor v1.08 (1986-03-12)" )
+	ROM_SYSTEM_BIOS( 1, "v108", "Luxor v1.08 (1986-03-12)" )
 	ROMX_LOAD( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d), ROM_BIOS(2) )
-    ROM_SYSTEM_BIOS( 2, "v207", "DiAB v2.07 (1987-06-24)" )
+	ROM_SYSTEM_BIOS( 2, "v207", "DiAB v2.07 (1987-06-24)" )
 	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(3) )
 ROM_END
 
@@ -379,22 +379,22 @@ ioport_constructor luxor_55_21046_device::device_input_ports() const
 //-------------------------------------------------
 
 luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock),
-	  device_abcbus_card_interface(mconfig, *this),
-	  m_maincpu(*this, Z80_TAG),
-	  m_dma(*this, Z80DMA_TAG),
-	  m_fdc(*this, SAB1793_TAG),
-	  m_floppy0(*this, SAB1793_TAG":0"),
-	  m_floppy1(*this, SAB1793_TAG":1"),
-	  m_floppy(NULL),
-	  m_sw1(*this, "SW1"),
-	  m_sw2(*this, "SW2"),
-	  m_sw3(*this, "SW3"),
-	  m_cs(false),
-	  m_fdc_irq(0),
-	  m_dma_irq(0),
-	  m_busy(0),
-	  m_force_busy(0)
+	: device_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock),
+		device_abcbus_card_interface(mconfig, *this),
+		m_maincpu(*this, Z80_TAG),
+		m_dma(*this, Z80DMA_TAG),
+		m_fdc(*this, SAB1793_TAG),
+		m_floppy0(*this, SAB1793_TAG":0"),
+		m_floppy1(*this, SAB1793_TAG":1"),
+		m_floppy(NULL),
+		m_sw1(*this, "SW1"),
+		m_sw2(*this, "SW2"),
+		m_sw3(*this, "SW3"),
+		m_cs(false),
+		m_fdc_irq(0),
+		m_dma_irq(0),
+		m_busy(0),
+		m_force_busy(0)
 {
 }
 
@@ -585,18 +585,18 @@ WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       force busy
-        1
-        2
-        3
-        4       N/C
-        5       N/C
-        6
-        7
+	    0       force busy
+	    1
+	    2
+	    3
+	    4       N/C
+	    5       N/C
+	    6
+	    7
 
-    */
+	*/
 
 	m_status = data;
 
@@ -616,21 +616,21 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       DS0         drive select 0
-        1       DS1         drive select 1
-        2       DS2         drive select 2
-        3       MTRON       motor on
-        4       TG43        track > 43
-        5       SIDE1       side 1 select
-        6
-        7
+	    0       DS0         drive select 0
+	    1       DS1         drive select 1
+	    2       DS2         drive select 2
+	    3       MTRON       motor on
+	    4       TG43        track > 43
+	    5       SIDE1       side 1 select
+	    6
+	    7
 
-    */
+	*/
 
 	// drive select
-    m_floppy = NULL;
+	m_floppy = NULL;
 
 	if (!BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (!BIT(data, 1)) m_floppy = m_floppy1->get_device();
@@ -656,20 +656,20 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 {
 	/*
 
-        bit     signal                          description
+	    bit     signal                          description
 
-        0       FD1793 _MR                      FDC master reset
-        1       FD1793 _DDEN, FDC9229 DENS      density select
-        2       FDC9229 MINI
-        3       READY signal polarity           (0=inverted)
-        4       FDC9229 P2
-        5       FDC9229 P1
-        6
-        7
+	    0       FD1793 _MR                      FDC master reset
+	    1       FD1793 _DDEN, FDC9229 DENS      density select
+	    2       FDC9229 MINI
+	    3       READY signal polarity           (0=inverted)
+	    4       FDC9229 P2
+	    5       FDC9229 P1
+	    6
+	    7
 
-        FDC9229 P0 is grounded
+	    FDC9229 P0 is grounded
 
-    */
+	*/
 
 	// FDC master reset
 	if (!BIT(data, 0)) m_fdc->reset();
@@ -687,18 +687,18 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       busy        controller busy
-        1       _FD2S       double-sided disk
-        2       SW2
-        3       _DCG        disk changed
-        4       SW1-1
-        5       SW1-2
-        6       SW1-3
-        7       SW1-4
+	    0       busy        controller busy
+	    1       _FD2S       double-sided disk
+	    2       SW2
+	    3       _DCG        disk changed
+	    4       SW1-1
+	    5       SW1-2
+	    6       SW1-3
+	    7       SW1-4
 
-    */
+	*/
 
 	UINT8 data = 0;
 

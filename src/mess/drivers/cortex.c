@@ -62,9 +62,9 @@ UINT32 cortex_state::screen_update_cortex(screen_device &screen, bitmap_ind16 &b
 
 static const struct tms9995reset_param cortex_processor_config =
 {
-	0,	/* disable automatic wait state generation */
-	0,	/* no IDLE callback */
-	0	/* no MP9537 mask */
+	0,  /* disable automatic wait state generation */
+	0,  /* no IDLE callback */
+	0   /* no MP9537 mask */
 };
 
 

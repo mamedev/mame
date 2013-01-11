@@ -220,9 +220,9 @@ static const gfx_layout spritelayout =
 	3,      /* 3 bits per pixel */
 	{ 2*256*16*16, 256*16*16, 0 },  /* the bitplanes are separated */
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-	  0, 1, 2, 3, 4, 5, 6, 7 },
+		0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
@@ -333,9 +333,9 @@ ROM_START( dommy )
 	ROM_LOAD( "dommy.e30",  0x4000, 0x2000, CRC(4e68bb12) SHA1(de26d278e43882deffad4d5b19d785f8824cf05a) )
 
 	ROM_REGION( 0x0040, "proms", 0 ) /* palette decoding is probably wrong */
-	ROM_LOAD( "dommy.e70",  0x0018, 0x0008, CRC(50c1d86e) SHA1(990a87a7f7e6a2af67dc6890e2326c7403e46520) )	/* palette */
-	ROM_CONTINUE(			  0x0000, 0x0018 )
-	ROM_LOAD( "dommy.e60",  0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) )	/* unknown */
+	ROM_LOAD( "dommy.e70",  0x0018, 0x0008, CRC(50c1d86e) SHA1(990a87a7f7e6a2af67dc6890e2326c7403e46520) )  /* palette */
+	ROM_CONTINUE(             0x0000, 0x0018 )
+	ROM_LOAD( "dommy.e60",  0x0020, 0x0020, CRC(24da2b63) SHA1(4db7e1ff1b9fd5ae4098cd7ca66cf1fa2574501a) )  /* unknown */
 ROM_END
 
 ROM_START( scregg )
@@ -356,8 +356,8 @@ ROM_START( scregg )
 	ROM_LOAD( "da0.g10",   0x5000, 0x1000, CRC(9c20214a) SHA1(e01b72501a01ffc0370cf19c9a379a54800cccc6) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "dc0.c6 ",   0x0000, 0x0020, CRC(ff23bdd6) SHA1(d09738915da456449bb4e8d9eefb8e6378f0edea) )	/* palette */
-	ROM_LOAD( "db1.b4",    0x0020, 0x0020, CRC(7cc4824b) SHA1(2a283fc17fac32e63385948bfe180d05f1fb8727) )	/* unknown */
+	ROM_LOAD( "dc0.c6 ",   0x0000, 0x0020, CRC(ff23bdd6) SHA1(d09738915da456449bb4e8d9eefb8e6378f0edea) )   /* palette */
+	ROM_LOAD( "db1.b4",    0x0020, 0x0020, CRC(7cc4824b) SHA1(2a283fc17fac32e63385948bfe180d05f1fb8727) )   /* unknown */
 ROM_END
 
 ROM_START( eggs )
@@ -378,34 +378,34 @@ ROM_START( eggs )
 	ROM_LOAD( "g10.bin",   0x5000, 0x1000, CRC(5b58d3b5) SHA1(f138b7294dd20d050bb8a2191e87b0c3815f6148) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "eggs.c6",   0x0000, 0x0020, CRC(e8408c81) SHA1(549b9948a4a73e7a704731b942565183cef05d52) )	/* palette */
-	ROM_LOAD( "db1.b4",    0x0020, 0x0020, CRC(7cc4824b) SHA1(2a283fc17fac32e63385948bfe180d05f1fb8727) )	/* unknown */
+	ROM_LOAD( "eggs.c6",   0x0000, 0x0020, CRC(e8408c81) SHA1(549b9948a4a73e7a704731b942565183cef05d52) )   /* palette */
+	ROM_LOAD( "db1.b4",    0x0020, 0x0020, CRC(7cc4824b) SHA1(2a283fc17fac32e63385948bfe180d05f1fb8727) )   /* unknown */
 ROM_END
 
 // rockduck - check gfx roms (planes) order
 
 ROM_START( rockduck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rde.bin",	0x4000, 0x2000, CRC(56e2a030) SHA1(f03cca53ac30f1c4ec45afbe58c231673739e425) )
-	ROM_COPY( "maincpu",	0x5000, 0x3000, 0x1000 ) // rgn,srcoffset,offset,length.
-	ROM_LOAD( "rdc.bin",	0x6000, 0x2000, CRC(482d9a0c) SHA1(2838cbcd35edaf19848fcf1588ec3a35adf5b179) )
-	ROM_COPY( "maincpu",	0x7000, 0x5000, 0x1000 ) // rgn,srcoffset,offset,length.
-	ROM_LOAD( "rdb.bin",	0x8000, 0x2000, CRC(974626f2) SHA1(cfd767947df9aa99b22afbc0a83afd3f92e7d903) )
-	ROM_RELOAD(				0xe000, 0x2000 )	// for vectors/pointers
-	ROM_COPY( "maincpu",	0x9000, 0x7000, 0x1000 ) // rgn,srcoffset,offset,length.
+	ROM_LOAD( "rde.bin",    0x4000, 0x2000, CRC(56e2a030) SHA1(f03cca53ac30f1c4ec45afbe58c231673739e425) )
+	ROM_COPY( "maincpu",    0x5000, 0x3000, 0x1000 ) // rgn,srcoffset,offset,length.
+	ROM_LOAD( "rdc.bin",    0x6000, 0x2000, CRC(482d9a0c) SHA1(2838cbcd35edaf19848fcf1588ec3a35adf5b179) )
+	ROM_COPY( "maincpu",    0x7000, 0x5000, 0x1000 ) // rgn,srcoffset,offset,length.
+	ROM_LOAD( "rdb.bin",    0x8000, 0x2000, CRC(974626f2) SHA1(cfd767947df9aa99b22afbc0a83afd3f92e7d903) )
+	ROM_RELOAD(             0xe000, 0x2000 )    // for vectors/pointers
+	ROM_COPY( "maincpu",    0x9000, 0x7000, 0x1000 ) // rgn,srcoffset,offset,length.
 
 //  ROM_LOAD( "b.bin",  0x8000, 0x2000, CRC(637fbb50) SHA1(b31799f9cc6aefd9f4b39cc1afb1ca00d9200efb) ) // alternate rom, bad dump
 //  this rom is a bad dump of rdb.bin with only 1 bit different.
 //  (bit 5 is on at offset $1629).
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "rd3.rdg",	0x0000, 0x2000, CRC(8a3f1e53) SHA1(398bbbab314e4ea87cc5f5978c7e806818398d02) ) // not scrambled
-	ROM_LOAD( "rd2.rdh",	0x2000, 0x2000, CRC(e94e673e) SHA1(0adf01d35879b9dd355d0c53a51b5f416f22d7b2) )
-	ROM_LOAD( "rd1.rdj",	0x4000, 0x2000, CRC(654afff2) SHA1(f1e21447f0a2ac23cd64cf1f6f315937787b6377) )
+	ROM_LOAD( "rd3.rdg",    0x0000, 0x2000, CRC(8a3f1e53) SHA1(398bbbab314e4ea87cc5f5978c7e806818398d02) ) // not scrambled
+	ROM_LOAD( "rd2.rdh",    0x2000, 0x2000, CRC(e94e673e) SHA1(0adf01d35879b9dd355d0c53a51b5f416f22d7b2) )
+	ROM_LOAD( "rd1.rdj",    0x4000, 0x2000, CRC(654afff2) SHA1(f1e21447f0a2ac23cd64cf1f6f315937787b6377) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	/* no proms were in the rock duck set and no PCB available, use eggs palette for now, although its probably wrong */
-	ROM_LOAD( "eggs.c6",      0x0000, 0x0020, BAD_DUMP CRC(e8408c81) SHA1(549b9948a4a73e7a704731b942565183cef05d52) )	/* palette */
+	ROM_LOAD( "eggs.c6",      0x0000, 0x0020, BAD_DUMP CRC(e8408c81) SHA1(549b9948a4a73e7a704731b942565183cef05d52) )   /* palette */
 //  ROM_LOAD( "screggco.b4",  0x0020, 0x0020, BAD_DUMP CRC(7cc4824b) SHA1(2a283fc17fac32e63385948bfe180d05f1fb8727) )   /* unknown */
 ROM_END
 

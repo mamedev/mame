@@ -49,16 +49,16 @@ TODO: boot tests fail
 //
 
 static UINT8 prom16a[256] = {
-	0x00,0x00,		// checksum
-	0x00,			// 256 bytes idprom
-	 '2', '0', '1', '0', 'A', '0', '0', '0', '0', '0', '0',		// serial in ascii DDDDCSSSSSS date code, country, serial number
-	 '9', '8', '1', '6', 'A', ' ', ' ',							// product number
-	0xff,			// 8 bits processor board config
-	0x01,			// keyboard 98203B
-	0x02,			// CRT alpha see crtid for monitor
-	0x03,			// HP-IB
-	0x04,			// Graphics
-	0xff,			// end
+	0x00,0x00,      // checksum
+	0x00,           // 256 bytes idprom
+		'2', '0', '1', '0', 'A', '0', '0', '0', '0', '0', '0',      // serial in ascii DDDDCSSSSSS date code, country, serial number
+		'9', '8', '1', '6', 'A', ' ', ' ',                          // product number
+	0xff,           // 8 bits processor board config
+	0x01,           // keyboard 98203B
+	0x02,           // CRT alpha see crtid for monitor
+	0x03,           // HP-IB
+	0x04,           // Graphics
+	0xff,           // end
 	0xff,
 	0xff,
 	0xff,
@@ -70,8 +70,8 @@ static UINT8 prom16a[256] = {
 	0xff,
 	0xff,
 	0xff,
-	0xff,0xfe,0x00,0x00,			// bottom minimun address for ram size
-	0xff,0xff,						// 16 required IO cards here not used
+	0xff,0xfe,0x00,0x00,            // bottom minimun address for ram size
+	0xff,0xff,                      // 16 required IO cards here not used
 	0xff,0xff,
 	0xff,0xff,
 	0xff,0xff,
@@ -87,12 +87,12 @@ static UINT8 prom16a[256] = {
 	0xff,0xff,
 	0xff,0xff,
 	0xff,0xff,
-	0xff,0xff,0xff,0xff,			// boot msus to try before Boot list scan
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,	// Boot file name
-	0x00,0x00,0x00,0x00,			// delay in millisec before boot scan
-	0x00,							// owner byte, HP format
-	0x00,							// id prom revision byte : 0x00
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,									// rest reserved at 0xFF
+	0xff,0xff,0xff,0xff,            // boot msus to try before Boot list scan
+	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,   // Boot file name
+	0x00,0x00,0x00,0x00,            // delay in millisec before boot scan
+	0x00,                           // owner byte, HP format
+	0x00,                           // id prom revision byte : 0x00
+	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,                                 // rest reserved at 0xFF
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
@@ -122,7 +122,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	//m_terminal(*this, TERMINAL_TAG),
-  m_6845(*this, "mc6845")
+	m_6845(*this, "mc6845")
 	{
 		kbdBit=0;
 		crtc_curreg=0;
@@ -329,14 +329,14 @@ DRIVER_INIT_MEMBER(hp9k_state,hp9k)
 static const gfx_layout hp9k_charlayout =
 {
 	HP9816_CHDIMX, HP9816_CHDIMY,
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 1*8, 0*8, 3*8, 2*8, 5*8, 4*8, 7*8, 6*8, 9*8, 8*8, 11*8, 10*8, 13*8, 12*8, 15*8, 14*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( hp9k )
@@ -386,10 +386,10 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 }
 
 static const mc6845_interface hp9k_mc6845_intf = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	NULL,		/* handler to display a scanline */
+	NULL,       /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -435,4 +435,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982,	hp9816,	0,		0,		hp9k,	hp9k, hp9k_state,		hp9k,	"Hewlett Packard",	"HP 9816" ,  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, hp9816, 0,      0,      hp9k,   hp9k, hp9k_state,       hp9k,   "Hewlett Packard",  "HP 9816" ,  GAME_NOT_WORKING | GAME_NO_SOUND )

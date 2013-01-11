@@ -362,7 +362,7 @@ Quick review of the system16 hardware:
  *
  *************************************/
 
-#define PRINT_UNUSUAL_MODES		(0)
+#define PRINT_UNUSUAL_MODES     (0)
 
 
 

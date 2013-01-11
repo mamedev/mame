@@ -44,7 +44,7 @@ Limit for help/undo (matta):
 #include "video/mc6845.h"
 
 
-#define	TILE_WIDTH 6
+#define TILE_WIDTH 6
 
 
 class othello_state : public driver_device
@@ -156,11 +156,11 @@ WRITE8_MEMBER(othello_state::unk_8a_w)
 	/*
 
 
-    m_n7751_command = (data & 0x07);
-    m_n7751->execute().set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-    //m_n7751->execute().set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-    machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-    */
+	m_n7751_command = (data & 0x07);
+	m_n7751->execute().set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	//m_n7751->execute().set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	*/
 
 	logerror("8a -> %x\n", data);
 }
@@ -323,24 +323,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( othello )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x00, "Limit for Matta" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Limit for Matta" )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )		PORT_DIPLOCATION("SW1:5") /* stored at $fd1e */
-	PORT_DIPNAME( 0x60, 0x60, "Timer (seconds)" )	PORT_DIPLOCATION("SW1:6,7")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )     PORT_DIPLOCATION("SW1:5") /* stored at $fd1e */
+	PORT_DIPNAME( 0x60, 0x60, "Timer (seconds)" )   PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x20, "6" )
 	PORT_DIPSETTING(    0x40, "8" )
 	PORT_DIPSETTING(    0x60, "10" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 
@@ -369,16 +369,16 @@ INPUT_PORTS_END
 
 static const mc6845_interface h46505_intf =
 {
-	"screen",	/* screen we are acting on */
-	TILE_WIDTH,	/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
+	"screen",   /* screen we are acting on */
+	TILE_WIDTH, /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
 	update_row, /* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -438,7 +438,7 @@ static MACHINE_CONFIG_START( othello, othello_state )
 
 	MCFG_PALETTE_LENGTH(0x10)
 
-	MCFG_MC6845_ADD("crtc", H46505, 1000000 /* ? MHz */, h46505_intf)	/* H46505 @ CPU clock */
+	MCFG_MC6845_ADD("crtc", H46505, 1000000 /* ? MHz */, h46505_intf)   /* H46505 @ CPU clock */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

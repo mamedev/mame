@@ -5,10 +5,10 @@
 
 struct ym2203_state
 {
-	sound_stream *	stream;
-	emu_timer *		timer[2];
-	void *			chip;
-	void *			psg;
+	sound_stream *  stream;
+	emu_timer *     timer[2];
+	void *          chip;
+	void *          psg;
 	const ym2203_interface *intf;
 	devcb_resolved_write_line irqhandler;
 	device_t *device;
@@ -88,11 +88,11 @@ static void timer_handler(void *param,int c,int count,int clock)
 {
 	ym2203_state *info = (ym2203_state *)param;
 	if( count == 0 )
-	{	/* Reset FM Timer */
+	{   /* Reset FM Timer */
 		info->timer[c]->enable(false);
 	}
 	else
-	{	/* Start FM Timer */
+	{   /* Start FM Timer */
 		attotime period = attotime::from_hz(clock) * count;
 		if (!info->timer[c]->enable(true))
 			info->timer[c]->adjust(period);
@@ -184,7 +184,7 @@ const device_type YM2203 = &device_creator<ym2203_device>;
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2203, "YM2203", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ym2203_state);
 }
@@ -235,5 +235,3 @@ void ym2203_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

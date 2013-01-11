@@ -6,14 +6,14 @@
 #include "devlegcy.h"
 
 
-#define CEM3394_SAMPLE_RATE		(44100*4)
+#define CEM3394_SAMPLE_RATE     (44100*4)
 
 
 /* interface */
 struct cem3394_interface
 {
-	double vco_zero_freq;				/* frequency at 0V for VCO */
-	double filter_zero_freq;			/* frequency at 0V for filter */
+	double vco_zero_freq;               /* frequency at 0V for VCO */
+	double filter_zero_freq;            /* frequency at 0V for filter */
 	void (*external)(device_t *, int, short *);/* external input source */
 };
 
@@ -45,7 +45,7 @@ void cem3394_set_voltage(device_t *device, int input, double voltage);
 double cem3394_get_parameter(device_t *device, int input);
 
 class cem3394_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

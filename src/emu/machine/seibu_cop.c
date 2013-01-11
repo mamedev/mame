@@ -68,8 +68,8 @@ inline void seibu_cop_device::write_word(offs_t address, UINT16 data)
 
 seibu_cop_device::seibu_cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP, "seibu_cop", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("io", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(seibu_cop_io))
+		device_memory_interface(mconfig, *this),
+		m_space_config("io", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(seibu_cop_io))
 {
 
 }
@@ -178,14 +178,14 @@ WRITE16_MEMBER(seibu_cop_device::pal_brightness_mode_w)
 WRITE16_MEMBER(seibu_cop_device::dma_unk_param_w)
 {
 	/*
-        This sets up a DMA mode of some sort
-            0x0e00: grainbow, cupsoc
-            0x0a00: legionna, godzilla, denjinmk
-            0x0600: heatbrl
-            0x1e00: zeroteam, xsedae
-        raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
-        (both only uses 0x14 and 0x15 as DMAs afaik)
-    */
+	    This sets up a DMA mode of some sort
+	        0x0e00: grainbow, cupsoc
+	        0x0a00: legionna, godzilla, denjinmk
+	        0x0600: heatbrl
+	        0x1e00: zeroteam, xsedae
+	    raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
+	    (both only uses 0x14 and 0x15 as DMAs afaik)
+	*/
 	COMBINE_DATA(&m_dma_unk_param);
 }
 
@@ -253,10 +253,10 @@ void seibu_cop_device::normal_dma_transfer(void)
 /* RE from Seibu Cup Soccer bootleg */
 const UINT8 seibu_cop_device::fade_table(int v)
 {
-    int low  = v & 0x001f;
-    int high = v & 0x03e0;
+	int low  = v & 0x001f;
+	int high = v & 0x03e0;
 
-    return (low * (high | (high >> 5)) + 0x210) >> 10;
+	return (low * (high | (high >> 5)) + 0x210) >> 10;
 }
 
 void seibu_cop_device::palette_dma_transfer(void)
@@ -264,18 +264,18 @@ void seibu_cop_device::palette_dma_transfer(void)
 	UINT32 src,dst,size,i;
 
 	/*
-             Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
-             0x80 is used by Legionnaire
-             0x81 is used by SD Gundam and Godzilla
-             0x82 is used by Zero Team and X Se Dae
-             0x86 is used by Seibu Cup Soccer
-             0x87 is used by Denjin Makai
+	         Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
+	         0x80 is used by Legionnaire
+	         0x81 is used by SD Gundam and Godzilla
+	         0x82 is used by Zero Team and X Se Dae
+	         0x86 is used by Seibu Cup Soccer
+	         0x87 is used by Denjin Makai
 
-            TODO:
-             - Denjin Makai mode 4 is totally guessworked.
-             - SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
-               presumably bad RAM table or bad algorithm
-    */
+	        TODO:
+	         - Denjin Makai mode 4 is totally guessworked.
+	         - SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
+	           presumably bad RAM table or bad algorithm
+	*/
 
 	src = (m_dma_src[m_dma_trigger] << 6);
 	dst = (m_dma_dst[m_dma_trigger] << 6);
@@ -386,7 +386,7 @@ WRITE16_MEMBER( seibu_cop_device::dma_write_trigger_w )
 	{
 		case 0x008: normal_dma_transfer(); break;
 		case 0x010: break; // private buffer copy, TODO
-		case 0x080:	palette_dma_transfer(); break;
+		case 0x080: palette_dma_transfer(); break;
 		case 0x110: fill_word_transfer(); break; // Godzilla uses this
 		case 0x118: fill_dword_transfer(); break;
 		default:

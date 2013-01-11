@@ -14,7 +14,7 @@
 #define RADIUSTPD_SCREEN_NAME "tpd_screen"
 #define RADIUSTPD_ROM_REGION  "tpd_rom"
 
-#define VRAM_SIZE	(0x40000)	// 256k.  1152x880 1 bit per pixel fits nicely.
+#define VRAM_SIZE   (0x40000)   // 256k.  1152x880 1 bit per pixel fits nicely.
 
 MACHINE_CONFIG_FRAGMENT( radiustpd )
 	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
@@ -64,14 +64,14 @@ const rom_entry *nubus_radiustpd_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_RADIUSTPD, "Radius Two Page Display video card", tag, owner, clock),
+		device_t(mconfig, NUBUS_RADIUSTPD, "Radius Two Page Display video card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_rtpd";
 }
 
 nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_rtpd";
@@ -102,7 +102,7 @@ void nubus_radiustpd_device::device_start()
 	m_nubus->install_device(slotspace+0x980000, slotspace+0x9effff, read32_delegate(FUNC(nubus_radiustpd_device::radiustpd_r), this), write32_delegate(FUNC(nubus_radiustpd_device::radiustpd_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------

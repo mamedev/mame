@@ -35,4 +35,3 @@ class m68307_timer
 	void init(legacy_cpu_device *device);
 	void reset(void);
 };
-

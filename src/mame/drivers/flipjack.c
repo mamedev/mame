@@ -80,8 +80,8 @@ ________________________|___________________________
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
-#define MASTER_CLOCK	XTAL_16MHz
-#define VIDEO_CLOCK		XTAL_6MHz
+#define MASTER_CLOCK    XTAL_16MHz
+#define VIDEO_CLOCK     XTAL_6MHz
 
 
 class flipjack_state : public driver_device
@@ -365,25 +365,25 @@ static INPUT_PORTS_START( flipjack )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // output
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("A0:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("A0:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coinage ) )		PORT_DIPLOCATION("A0:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coinage ) )      PORT_DIPLOCATION("A0:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Drop Target" )		PORT_DIPLOCATION("A0:3")
+	PORT_DIPNAME( 0x04, 0x04, "Drop Target" )       PORT_DIPLOCATION("A0:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("A0:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("A0:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("A0:5,6,7")
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("A0:5,6,7")
 	PORT_DIPSETTING(    0x70, "150K & Every 70K" )
 	PORT_DIPSETTING(    0x60, "150K & Every 100K" )
 	PORT_DIPSETTING(    0x50, "200K & Every 70K" )
 	PORT_DIPSETTING(    0x40, "200K & Every 100K" )
 	PORT_DIPSETTING(    0x00, "None" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )		PORT_DIPLOCATION("A0:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )        PORT_DIPLOCATION("A0:8")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 
@@ -398,47 +398,47 @@ INPUT_PORTS_END
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("P1"),				/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("P2"),				/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("P3"),				/* Port C read */
-	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_portc_w)		/* Port C write */
+	DEVCB_INPUT_PORT("P1"),             /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("P2"),             /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("P3"),             /* Port C read */
+	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_portc_w)        /* Port C write */
 };
 
 
 static AY8910_INTERFACE( ay8910_config_1 )
 {
-	AY8910_LEGACY_OUTPUT,					/* Flags */
-	AY8910_DEFAULT_LOADS,					/* Load on channel in ohms */
-	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_soundlatch_r),	/* Port A read */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_NULL,								/* Port A write */
-	DEVCB_NULL								/* Port B write */
+	AY8910_LEGACY_OUTPUT,                   /* Flags */
+	AY8910_DEFAULT_LOADS,                   /* Load on channel in ohms */
+	DEVCB_DRIVER_MEMBER(flipjack_state,flipjack_soundlatch_r),  /* Port A read */
+	DEVCB_NULL,                             /* Port B read */
+	DEVCB_NULL,                             /* Port A write */
+	DEVCB_NULL                              /* Port B write */
 };
 
 static AY8910_INTERFACE( ay8910_config_2 )
 {
-	AY8910_LEGACY_OUTPUT,					/* Flags */
-	AY8910_DEFAULT_LOADS,					/* Load on channel in ohms */
-	DEVCB_NULL,								/* Port A read */
-	DEVCB_NULL,								/* Port B read */
-	DEVCB_NULL,								/* Port A write */
-	DEVCB_NULL								/* Port B write */
+	AY8910_LEGACY_OUTPUT,                   /* Flags */
+	AY8910_DEFAULT_LOADS,                   /* Load on channel in ohms */
+	DEVCB_NULL,                             /* Port A read */
+	DEVCB_NULL,                             /* Port B read */
+	DEVCB_NULL,                             /* Port A write */
+	DEVCB_NULL                              /* Port B write */
 };
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 

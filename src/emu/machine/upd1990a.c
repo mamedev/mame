@@ -56,8 +56,8 @@ enum
 
 upd1990a_rtc_device::upd1990a_rtc_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-      device_rtc_interface(mconfig, *this),
-      m_data_out(0)
+		device_rtc_interface(mconfig, *this),
+		m_data_out(0)
 {
 }
 
@@ -126,7 +126,7 @@ void upd1990a_rtc_device::device_start()
 	save_item(NAME(m_c));
 	save_item(NAME(m_clk));
 	save_item(NAME(m_tp));
-    save_item(NAME(m_c_unlatched));
+	save_item(NAME(m_c_unlatched));
 }
 
 
@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER( upd1990a_rtc_device::stb_w )
 
 	if (m_cs && m_stb && !m_clk)
 	{
-        m_c = m_c_unlatched;            // if STB = 1, latch in the command bits
+		m_c = m_c_unlatched;            // if STB = 1, latch in the command bits
 
 		switch (m_c)
 		{

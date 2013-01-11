@@ -40,11 +40,11 @@ struct mc6843_interface
 
 
 #define MCFG_MC6843_ADD(_tag, _intrf) \
-  MCFG_DEVICE_ADD(_tag, MC6843, 0)	      \
-  MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_ADD(_tag, MC6843, 0)          \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MCFG_MC6843_REMOVE(_tag)		\
-  MCFG_DEVICE_REMOVE(_tag)
+#define MCFG_MC6843_REMOVE(_tag)        \
+	MCFG_DEVICE_REMOVE(_tag)
 
 
 /* ---------- functions ------------ */

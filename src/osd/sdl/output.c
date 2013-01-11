@@ -25,7 +25,7 @@
 //  CONSTANTS
 //============================================================
 
-#define SDLMAME_OUTPUT	"/tmp/sdlmame_out"
+#define SDLMAME_OUTPUT  "/tmp/sdlmame_out"
 
 /*
  * Using long/int should be sufficient on all

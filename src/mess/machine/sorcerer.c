@@ -15,7 +15,7 @@
 TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
-    Transmit and receive clocks are connected to the same clock */
+	Transmit and receive clocks are connected to the same clock */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
 	if (m_fe & 0x80)
@@ -43,12 +43,12 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 {
 	UINT8 cass_ws = 0;
-	switch (m_fe & 0xc0)		/*/ bit 7 low indicates cassette */
+	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
 	{
-		case 0x00:				/* Cassette 300 baud */
+		case 0x00:              /* Cassette 300 baud */
 
 			/* loading a tape - this is basically the same as the super80.
-                           We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
+			               We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
 
 			m_cass_data.input.length++;
 
@@ -63,7 +63,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
-                           Synchronisation of the frequency pulses to the uart is extremely important. */
+			               Synchronisation of the frequency pulses to the uart is extremely important. */
 
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 0x1f))
@@ -80,13 +80,13 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 			{
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 4)))
 				{
-					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
 					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
 
-		case 0x40:			/* Cassette 1200 baud */
+		case 0x40:          /* Cassette 1200 baud */
 			/* loading a tape */
 			m_cass_data.input.length++;
 
@@ -120,7 +120,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 			{
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 8)))
 				{
-					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
 					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
@@ -261,9 +261,9 @@ READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
 READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 {
 	/* bits 6..7
-     - hardware handshakes from user port
-     - not emulated
-     - tied high, allowing PARIN and PAROUT bios routines to run */
+	 - hardware handshakes from user port
+	 - not emulated
+	 - tied high, allowing PARIN and PAROUT bios routines to run */
 
 	UINT8 data = 0xc0;
 	char kbdrow[6];
@@ -282,9 +282,9 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 {
 	/* The use of the parallel port as a general purpose port is not emulated.
-    Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
-    This uses bit 7. The other bits have been set high (=nothing plugged in).
-    This fixes those games that use a joystick. */
+	Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
+	This uses bit 7. The other bits have been set high (=nothing plugged in).
+	This fixes those games that use a joystick. */
 
 	UINT8 data=0x7f;
 

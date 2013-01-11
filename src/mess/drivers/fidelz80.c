@@ -650,7 +650,7 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
 {
 	if (!(data & 0x80))
 	{
-		m_led_data = (data&0x01);	// common for two leds
+		m_led_data = (data&0x01);   // common for two leds
 
 		m_led_selected = data;
 
@@ -831,13 +831,13 @@ WRITE8_MEMBER( fidelz80_state::vsc_pio_portb_w )
 
 static Z80PIO_INTERFACE( vsc_z80pio_intf )
 {
-	DEVCB_NULL,												/* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_porta_r),	/* port A read callback */
-	DEVCB_NULL,												/* port A write callback */
-	DEVCB_NULL,												/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_r),	/* port B read callback */
-	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_w),	/* port B write callback */
-	DEVCB_NULL												/* portB ready active callback */
+	DEVCB_NULL,                                             /* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_porta_r),   /* port A read callback */
+	DEVCB_NULL,                                             /* port A write callback */
+	DEVCB_NULL,                                             /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_r),   /* port B read callback */
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_w),   /* port B write callback */
+	DEVCB_NULL                                              /* portB ready active callback */
 };
 
 /******************************************************************************
@@ -1022,8 +1022,8 @@ static ADDRESS_MAP_START(cc10_z80_mem, AS_PROGRAM, 8, fidelz80_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vcc_z80_mem, AS_PROGRAM, 8, fidelz80_state)
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x0000, 0x0fff) AM_ROM // 4k rom
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_ROM // 4k rom
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // 4k rom
 	AM_RANGE(0x2000, 0x2fff) AM_ROM // 4k rom
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
@@ -1038,8 +1038,8 @@ static ADDRESS_MAP_START(vsc_mem, AS_PROGRAM, 8, fidelz80_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(abc_z80_mem, AS_PROGRAM, 8, fidelz80_state)
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x0000, 0x1fff) AM_ROM // 8k rom
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_ROM // 8k rom
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 8k rom
 	AM_RANGE(0x4000, 0x5fff) AM_ROM // 8k rom
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
@@ -1095,7 +1095,7 @@ INPUT_CHANGED_MEMBER(fidelz80_state::abc_trigger_reset)
 }
 
 static INPUT_PORTS_START( fidelz80 )
-	PORT_START("LEVEL")		// cc10 only
+	PORT_START("LEVEL")     // cc10 only
 		PORT_CONFNAME( 0x80, 0x00, "Number of levels" )
 		PORT_CONFSETTING( 0x00, "10" )
 		PORT_CONFSETTING( 0x80, "3" )
@@ -1202,23 +1202,23 @@ static INPUT_PORTS_START( vsc )
 
 	//buttons on the right
 	PORT_START("COL_I")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pawn")	PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Rook")	PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Knight")	PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Bishop")	PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Queen")	PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King")	PORT_CODE(KEYCODE_6)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL")		PORT_CODE(KEYCODE_DEL)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE")		PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pawn")    PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Rook")    PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Knight")  PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Bishop")  PORT_CODE(KEYCODE_4)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Queen")   PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King")    PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL")      PORT_CODE(KEYCODE_DEL)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE")      PORT_CODE(KEYCODE_R)
 
 	//buttons beside the display
 	PORT_START("COL_L")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TM")		PORT_CODE(KEYCODE_T)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV")		PORT_CODE(KEYCODE_V)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak")	PORT_CODE(KEYCODE_SPACE)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV")		PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM")		PORT_CODE(KEYCODE_M)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ST")		PORT_CODE(KEYCODE_S)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TM")      PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV")      PORT_CODE(KEYCODE_V)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak")   PORT_CODE(KEYCODE_SPACE)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV")      PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM")      PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ST")      PORT_CODE(KEYCODE_S)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc )
@@ -1284,13 +1284,13 @@ INPUT_PORTS_END
 ******************************************************************************/
 
 static MACHINE_CONFIG_START( cc10, fidelz80_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(cc10_z80_mem)
-    MCFG_CPU_IO_MAP(fidel_z80_io)
-    MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(cc10_z80_mem)
+	MCFG_CPU_IO_MAP(fidel_z80_io)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* other hardware */
@@ -1303,13 +1303,13 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vcc, fidelz80_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(vcc_z80_mem)
-    MCFG_CPU_IO_MAP(fidel_z80_io)
-    MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(vcc_z80_mem)
+	MCFG_CPU_IO_MAP(fidel_z80_io)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* other hardware */
@@ -1322,10 +1322,10 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vsc, fidelz80_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(vsc_mem)
-    MCFG_CPU_IO_MAP(vsc_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(vsc_mem)
+	MCFG_CPU_IO_MAP(vsc_io)
 
 	MCFG_DEFAULT_LAYOUT(layout_vsc)
 
@@ -1343,13 +1343,13 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( abc, fidelz80_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2) // 2.5MHz
-    MCFG_CPU_PROGRAM_MAP(abc_z80_mem)
-    MCFG_CPU_IO_MAP(abc_z80_io)
-    MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2) // 2.5MHz
+	MCFG_CPU_PROGRAM_MAP(abc_z80_mem)
+	MCFG_CPU_IO_MAP(abc_z80_io)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_abc)
 
 	/* other hardware */
@@ -1370,63 +1370,63 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START( cc10 )
-    ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cc10.bin",   0x0000, 0x1000, CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63))
 ROM_END
 
 ROM_START(vcc)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257BB5AB) SHA1(F7589225BB8E5F3EAC55F23E2BD526BE780B38B5)) // 32014.VCC??? at location b3?
-    ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(F33095E7) SHA1(692FCAB1B88C910B74D04FE4D0660367AEE3F4F0)) // at location a2?
-    ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624F0CD5) SHA1(7C1A4F4497FE5882904DE1D6FECF510C07EE6FC6)) // at location a1?
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257BB5AB) SHA1(F7589225BB8E5F3EAC55F23E2BD526BE780B38B5)) // 32014.VCC??? at location b3?
+	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(F33095E7) SHA1(692FCAB1B88C910B74D04FE4D0660367AEE3F4F0)) // at location a2?
+	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624F0CD5) SHA1(7C1A4F4497FE5882904DE1D6FECF510C07EE6FC6)) // at location a1?
 
-    ROM_REGION(0x2000, "speech", 0)
-    ROM_LOAD("vcc-engl.bin", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // at location c4?
+	ROM_REGION(0x2000, "speech", 0)
+	ROM_LOAD("vcc-engl.bin", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // at location c4?
 ROM_END
 
 ROM_START(uvc)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(F1133ABF) SHA1(09DD85051C4E7D364D43507C1CFEA5C2D08D37F4)) // "MOS // 101-64017 // 3880"
-    ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624F0CD5) SHA1(7C1A4F4497FE5882904DE1D6FECF510C07EE6FC6)) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(F1133ABF) SHA1(09DD85051C4E7D364D43507C1CFEA5C2D08D37F4)) // "MOS // 101-64017 // 3880"
+	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624F0CD5) SHA1(7C1A4F4497FE5882904DE1D6FECF510C07EE6FC6)) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
 
-    ROM_REGION(0x2000, "speech", 0)
-    ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
+	ROM_REGION(0x2000, "speech", 0)
+	ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
 ROM_END
 
 ROM_START(vsc)
-    ROM_REGION(0x10000, "maincpu", 0)
-    ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626))
-    ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626))
+	ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341))
 	ROM_LOAD("101-32024.bin", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb))
 
-    ROM_REGION(0x2000, "speech", 0)
-    ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d))
+	ROM_REGION(0x2000, "speech", 0)
+	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d))
 ROM_END
 
 ROM_START(vbc)
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(08472223) SHA1(859865B13C908DBB474333263DC60F6A32461141))
 	ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(320AFA0F) SHA1(90EDFE0AC19B108D232CDA376B03A3A24BEFAD4C))
 	ROM_LOAD("101-64110.bin", 0x4000, 0x2000, CRC(3040D0BD) SHA1(CAA55FC8D9196E408FB41E7171A68E5099519813))
 
-    ROM_REGION(0x1000, "mcu", 0)
-    ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
+	ROM_REGION(0x1000, "mcu", 0)
+	ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
 
-    ROM_REGION(0x2000, "speech", 0)
-    ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
+	ROM_REGION(0x2000, "speech", 0)
+	ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
 ROM_END
 
 ROM_START(abc)
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("bridge_w.bin", 0x0000, 0x2000, CRC(eb1620ef) SHA1(987a9abc8c685f1a68678ea4ee65ec4a99419179))
 	ROM_LOAD("bridge_r.bin", 0x2000, 0x2000, CRC(74af0019) SHA1(8dc05950c254ca050b95b93e5d0cf48f913a6d49))
 	ROM_LOAD("bridge_b.bin", 0x4000, 0x2000, CRC(341d9ca6) SHA1(370876573bb9408e75f4fc797304b6c64af0590a))
 
-    ROM_REGION(0x1000, "mcu", 0)
-    ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
+	ROM_REGION(0x1000, "mcu", 0)
+	ROM_LOAD("100-1009.bin", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
 
-    ROM_REGION(0x2000, "speech", 0)
-    ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
+	ROM_REGION(0x2000, "speech", 0)
+	ROM_LOAD("101-32118.bin", 0x0000, 0x1000, CRC(A0B8BB8F) SHA1(F56852108928D5C6CACCFC8166FA347D6760A740))
 ROM_END
 
 /******************************************************************************
@@ -1436,8 +1436,7 @@ ROM_END
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
 COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, driver_device, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", GAME_NOT_WORKING )
 COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
-COMP( 1979, vbc,        0,          0,      abc,   abc, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBC)",	GAME_NOT_WORKING )
+COMP( 1979, vbc,        0,          0,      abc,   abc, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBC)",  GAME_NOT_WORKING )
 COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
 COMP( 1980, abc,        vbc,        0,      abc,   abc, driver_device,      0,      "Fidelity Electronics",   "Advanced Bridge Challenger (model ABC)", GAME_NOT_WORKING )
 COMP( 1980, vsc,        0,          0,      vsc,   vsc, driver_device,      0,      "Fidelity Electronics",   "Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
-

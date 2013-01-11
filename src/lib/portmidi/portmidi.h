@@ -33,20 +33,20 @@ extern "C" {
  */
 
 /*
- * The text above constitutes the entire PortMidi license; however, 
+ * The text above constitutes the entire PortMidi license; however,
  * the PortMusic community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
  * they can be incorporated into the canonical version. It is also
- * requested that these non-binding requests be included along with the 
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
 /* CHANGELOG FOR PORTMIDI
  *     (see ../CHANGELOG.txt)
  *
- * NOTES ON HOST ERROR REPORTING: 
+ * NOTES ON HOST ERROR REPORTING:
  *
  *    PortMidi errors (of type PmError) are generic, system-independent errors.
  *    When an error does not map to one of the more specific PmErrors, the
@@ -54,27 +54,27 @@ extern "C" {
  *    retained a more specific system-dependent error code. The caller can
  *    get more information by calling Pm_HasHostError() to test if there is
  *    a pending host error, and Pm_GetHostErrorText() to get a text string
- *    describing the error. Host errors are reported on a per-device basis 
- *    because only after you open a device does PortMidi have a place to 
- *    record the host error code. I.e. only 
- *    those routines that receive a (PortMidiStream *) argument check and 
- *    report errors. One exception to this is that Pm_OpenInput() and 
+ *    describing the error. Host errors are reported on a per-device basis
+ *    because only after you open a device does PortMidi have a place to
+ *    record the host error code. I.e. only
+ *    those routines that receive a (PortMidiStream *) argument check and
+ *    report errors. One exception to this is that Pm_OpenInput() and
  *    Pm_OpenOutput() can report errors even though when an error occurs,
  *    there is no PortMidiStream* to hold the error. Fortunately, both
  *    of these functions return any error immediately, so we do not really
  *    need per-device error memory. Instead, any host error code is stored
- *    in a global, pmHostError is returned, and the user can call 
+ *    in a global, pmHostError is returned, and the user can call
  *    Pm_GetHostErrorText() to get the error message (and the invalid stream
- *    parameter will be ignored.) The functions 
+ *    parameter will be ignored.) The functions
  *    pm_init and pm_term do not fail or raise
  *    errors. The job of pm_init is to locate all available devices so that
  *    the caller can get information via PmDeviceInfo(). If an error occurs,
  *    the device is simply not listed as available.
  *
  *    Host errors come in two flavors:
- *      a) host error 
+ *      a) host error
  *      b) host error during callback
- *    These can occur w/midi input or output devices. (b) can only happen 
+ *    These can occur w/midi input or output devices. (b) can only happen
  *    asynchronously (during callback routines), whereas (a) only occurs while
  *    synchronously running PortMidi and any resulting system dependent calls.
  *    Both (a) and (b) are reported by the next read or write call. You can
@@ -84,7 +84,7 @@ extern "C" {
  * NOTES ON COMPILE-TIME SWITCHES
  *
  *    DEBUG assumes stdio and a console. Use this if you want automatic, simple
- *        error reporting, e.g. for prototyping. If you are using MFC or some 
+ *        error reporting, e.g. for prototyping. If you are using MFC or some
  *        other graphical interface with no console, DEBUG probably should be
  *        undefined.
  *    PM_CHECK_ERRORS more-or-less takes over error checking for return values,
@@ -97,7 +97,7 @@ extern "C" {
 #include <stdint.h>
 #else
 #ifndef INT32_DEFINED
-// rather than having users install a special .h file for windows, 
+// rather than having users install a special .h file for windows,
 // just put the required definitions inline here. porttime.h uses
 // these too, so the definitions are (unfortunately) duplicated there
 typedef int int32_t;
@@ -109,14 +109,14 @@ typedef unsigned int uint32_t;
 //#ifdef _WINDLL
 //#define PMEXPORT __declspec(dllexport)
 //#else
-#define PMEXPORT 
+#define PMEXPORT
 //#endif
 
 #ifndef FALSE
-    #define FALSE 0
+	#define FALSE 0
 #endif
 #ifndef TRUE
-    #define TRUE 1
+	#define TRUE 1
 #endif
 
 /* default size of buffers for sysex transmission: */
@@ -124,26 +124,26 @@ typedef unsigned int uint32_t;
 
 /** List of portmidi errors.*/
 typedef enum {
-    pmNoError = 0,
-    pmNoData = 0, /**< A "no error" return that also indicates no data avail. */
-    pmGotData = 1, /**< A "no error" return that also indicates data available */
-    pmHostError = -10000,
-    pmInvalidDeviceId, /** out of range or 
-                        * output device when input is requested or 
+	pmNoError = 0,
+	pmNoData = 0, /**< A "no error" return that also indicates no data avail. */
+	pmGotData = 1, /**< A "no error" return that also indicates data available */
+	pmHostError = -10000,
+	pmInvalidDeviceId, /** out of range or
+                        * output device when input is requested or
                         * input device when output is requested or
-                        * device is already opened 
+                        * device is already opened
                         */
-    pmInsufficientMemory,
-    pmBufferTooSmall,
-    pmBufferOverflow,
-    pmBadPtr, /* PortMidiStream parameter is NULL or
+	pmInsufficientMemory,
+	pmBufferTooSmall,
+	pmBufferOverflow,
+	pmBadPtr, /* PortMidiStream parameter is NULL or
                * stream is not opened or
                * stream is output when input is required or
                * stream is input when output is required */
-    pmBadData, /** illegal midi data, e.g. missing EOX */
-    pmInternalError,
-    pmBufferMaxSize /** buffer is already as large as it can be */
-    /* NOTE: If you add a new error type, be sure to update Pm_GetErrorText() */
+	pmBadData, /** illegal midi data, e.g. missing EOX */
+	pmInternalError,
+	pmBufferMaxSize /** buffer is already as large as it can be */
+	/* NOTE: If you add a new error type, be sure to update Pm_GetErrorText() */
 } PmError;
 
 /**
@@ -169,11 +169,11 @@ typedef void PortMidiStream;
     asynchronously where the client does not
     explicitly call a function, and therefore cannot receive an error code.
     The client can test for a pending error using Pm_HasHostError(). If true,
-    the error can be accessed and cleared by calling Pm_GetErrorText(). 
+    the error can be accessed and cleared by calling Pm_GetErrorText().
     Errors are also cleared by calling other functions that can return
     errors, e.g. Pm_OpenInput(), Pm_OpenOutput(), Pm_Read(), Pm_Write(). The
     client does not need to call Pm_HasHostError(). Any pending error will be
-    reported the next time the client performs an explicit function call on 
+    reported the next time the client performs an explicit function call on
     the stream, e.g. an input or output operation. Until the error is cleared,
     no new error codes will be obtained, even for a different stream.
 */
@@ -181,19 +181,19 @@ PMEXPORT int Pm_HasHostError( PortMidiStream * stream );
 
 
 /**  Translate portmidi error number into human readable message.
-    These strings are constants (set at compile time) so client has 
+    These strings are constants (set at compile time) so client has
     no need to allocate storage
 */
 PMEXPORT const char *Pm_GetErrorText( PmError errnum );
 
 /**  Translate portmidi host error into human readable message.
     These strings are computed at run time, so client has to allocate storage.
-    After this routine executes, the host error is cleared. 
+    After this routine executes, the host error is cleared.
 */
 PMEXPORT void Pm_GetHostErrorText(char * msg, unsigned int len);
 
 #define HDRLENGTH 50
-#define PM_HOST_ERROR_MSG_LEN 256u /* any host error msg will occupy less 
+#define PM_HOST_ERROR_MSG_LEN 256u /* any host error msg will occupy less
                                       than this number of characters */
 
 /**
@@ -205,12 +205,12 @@ PMEXPORT void Pm_GetHostErrorText(char * msg, unsigned int len);
 typedef int PmDeviceID;
 #define pmNoDevice -1
 typedef struct {
-    int structVersion; /**< this internal structure version */ 
-    const char *interf; /**< underlying MIDI API, e.g. MMSystem or DirectX */
-    const char *name;   /**< device name, e.g. USB MidiSport 1x1 */
-    int input; /**< true iff input is available */
-    int output; /**< true iff output is available */
-    int opened; /**< used by generic PortMidi code to do error checking on arguments */
+	int structVersion; /**< this internal structure version */
+	const char *interf; /**< underlying MIDI API, e.g. MMSystem or DirectX */
+	const char *name;   /**< device name, e.g. USB MidiSport 1x1 */
+	int input; /**< true iff input is available */
+	int output; /**< true iff output is available */
+	int opened; /**< used by generic PortMidi code to do error checking on arguments */
 
 } PmDeviceInfo;
 
@@ -221,24 +221,24 @@ PMEXPORT int Pm_CountDevices( void );
 
     Return the default device ID or pmNoDevice if there are no devices.
     The result (but not pmNoDevice) can be passed to Pm_OpenMidi().
-    
+
     The default device can be specified using a small application
     named pmdefaults that is part of the PortMidi distribution. This
     program in turn uses the Java Preferences object created by
     java.util.prefs.Preferences.userRoot().node("/PortMidi"); the
-    preference is set by calling 
+    preference is set by calling
         prefs.put("PM_RECOMMENDED_OUTPUT_DEVICE", prefName);
     or  prefs.put("PM_RECOMMENDED_INPUT_DEVICE", prefName);
-    
+
     In the statements above, prefName is a string describing the
     MIDI device in the form "interf, name" where interf identifies
     the underlying software system or API used by PortMdi to access
-    devices and name is the name of the device. These correspond to 
+    devices and name is the name of the device. These correspond to
     the interf and name fields of a PmDeviceInfo. (Currently supported
-    interfaces are "MMSystem" for Win32, "ALSA" for Linux, and 
+    interfaces are "MMSystem" for Win32, "ALSA" for Linux, and
     "CoreMIDI" for OS X, so in fact, there is no choice of interface.)
-    In "interf, name", the strings are actually substrings of 
-    the full interface and name strings. For example, the preference 
+    In "interf, name", the strings are actually substrings of
+    the full interface and name strings. For example, the preference
     "Core, Sport" will match a device with interface "CoreMIDI"
     and name "In USB MidiSport 1x1". It will also match "CoreMIDI"
     and "In USB MidiSport 2x2". The devices are enumerated in device
@@ -248,14 +248,14 @@ PMEXPORT int Pm_CountDevices( void );
     the entire preference string is interpreted as a name, and the
     interface part is the empty string, which matches anything.
 
-    On the MAC, preferences are stored in 
+    On the MAC, preferences are stored in
       /Users/$NAME/Library/Preferences/com.apple.java.util.prefs.plist
     which is a binary file. In addition to the pmdefaults program,
     there are utilities that can read and edit this preference file.
 
-    On the PC, 
+    On the PC,
 
-    On Linux, 
+    On Linux,
 
 */
 PMEXPORT PmDeviceID Pm_GetDefaultInputDeviceID( void );
@@ -271,7 +271,7 @@ typedef PmTimestamp (*PmTimeProcPtr)(void *time_info);
 
 /** TRUE if t1 before t2 */
 #define PmBefore(t1,t2) ((t1-t2) < 0)
-/** 
+/**
     \defgroup grp_device Input/Output Devices Handling
     @{
 */
@@ -306,18 +306,18 @@ PMEXPORT const PmDeviceInfo* Pm_GetDeviceInfo( PmDeviceID id );
     outputDriverInfo is never required for correct operation. If not used
     outputDriverInfo should be NULL.
 
-    For input, the buffersize specifies the number of input events to be 
-    buffered waiting to be read using Pm_Read(). For output, buffersize 
-    specifies the number of output events to be buffered waiting for output. 
+    For input, the buffersize specifies the number of input events to be
+    buffered waiting to be read using Pm_Read(). For output, buffersize
+    specifies the number of output events to be buffered waiting for output.
     (In some cases -- see below -- PortMidi does not buffer output at all
     and merely passes data to a lower-level API, in which case buffersize
     is ignored.)
-    
-    latency is the delay in milliseconds applied to timestamps to determine 
-    when the output should actually occur. (If latency is < 0, 0 is assumed.) 
+
+    latency is the delay in milliseconds applied to timestamps to determine
+    when the output should actually occur. (If latency is < 0, 0 is assumed.)
     If latency is zero, timestamps are ignored and all output is delivered
     immediately. If latency is greater than zero, output is delayed until the
-    message timestamp plus the latency. (NOTE: the time is measured relative 
+    message timestamp plus the latency. (NOTE: the time is measured relative
     to the time source indicated by time_proc. Timestamps are absolute,
     not relative delays or offsets.) In some cases, PortMidi can obtain
     better timing than your application by passing timestamps along to the
@@ -325,7 +325,7 @@ PMEXPORT const PmDeviceInfo* Pm_GetDeviceInfo( PmDeviceID id );
     data to audio data by matching midi latency to the audio buffer latency.
 
     time_proc is a pointer to a procedure that returns time in milliseconds. It
-    may be NULL, in which case a default millisecond timebase (PortTime) is 
+    may be NULL, in which case a default millisecond timebase (PortTime) is
     used. If the application wants to use PortTime, it should start the timer
     (call Pt_Start) before calling Pm_OpenInput or Pm_OpenOutput. If the
     application tries to start the timer *after* Pm_OpenInput or Pm_OpenOutput,
@@ -351,20 +351,20 @@ PMEXPORT const PmDeviceInfo* Pm_GetDeviceInfo( PmDeviceID id );
 
 */
 PMEXPORT PmError Pm_OpenInput( PortMidiStream** stream,
-                PmDeviceID inputDevice,
-                void *inputDriverInfo,
-                int32_t bufferSize,
-                PmTimeProcPtr time_proc,
-                void *time_info );
+				PmDeviceID inputDevice,
+				void *inputDriverInfo,
+				int32_t bufferSize,
+				PmTimeProcPtr time_proc,
+				void *time_info );
 
 PMEXPORT PmError Pm_OpenOutput( PortMidiStream** stream,
-                PmDeviceID outputDevice,
-                void *outputDriverInfo,
-                int32_t bufferSize,
-                PmTimeProcPtr time_proc,
-                void *time_info,
-                int32_t latency );
-  /** @} */
+				PmDeviceID outputDevice,
+				void *outputDriverInfo,
+				int32_t bufferSize,
+				PmTimeProcPtr time_proc,
+				void *time_info,
+				int32_t latency );
+	/** @} */
 
 /**
    \defgroup grp_events_filters Events and Filters Handling
@@ -384,7 +384,7 @@ PMEXPORT PmError Pm_OpenOutput( PortMidiStream** stream,
     Or you may be using a sequencer or drum-machine for MIDI clock information but want to
     exclude any notes it may play.
  */
-    
+
 /* Filter bit-mask definitions */
 /** filter active sensing messages (0xFE): */
 #define PM_FILT_ACTIVE (1 << 0x0E)
@@ -404,7 +404,7 @@ PMEXPORT PmError Pm_OpenOutput( PortMidiStream** stream,
 #define PM_FILT_RESET (1 << 0x0F)
 /** filter all real-time messages */
 #define PM_FILT_REALTIME (PM_FILT_ACTIVE | PM_FILT_SYSEX | PM_FILT_CLOCK | \
-    PM_FILT_PLAY | PM_FILT_UNDEFINED | PM_FILT_RESET | PM_FILT_TICK)
+	PM_FILT_PLAY | PM_FILT_UNDEFINED | PM_FILT_RESET | PM_FILT_TICK)
 /** filter note-on and note-off (0x90-0x9F and 0x80-0x8F */
 #define PM_FILT_NOTE ((1 << 0x19) | (1 << 0x18))
 /** filter channel aftertouch (most midi controllers use this) (0xD0-0xDF)*/
@@ -443,7 +443,7 @@ PMEXPORT PmError Pm_SetFilter( PortMidiStream* stream, int32_t filters );
     Multiple channels should be OR'd together, like
     Pm_SetChannelMask(Pm_Channel(10) | Pm_Channel(11))
 
-    Note that channels are numbered 0 to 15 (not 1 to 16). Most 
+    Note that channels are numbered 0 to 15 (not 1 to 16). Most
     synthesizer and interfaces number channels starting at 1, but
     PortMidi numbers channels starting at 0.
 
@@ -460,10 +460,10 @@ PMEXPORT PmError Pm_SetChannelMask(PortMidiStream *stream, int mask);
     any time.
  */
 PMEXPORT PmError Pm_Abort( PortMidiStream* stream );
-     
+
 /**
     Pm_Close() closes a midi stream, flushing any pending buffers.
-    (PortMidi attempts to close open streams when the application 
+    (PortMidi attempts to close open streams when the application
     exits -- this is particularly difficult under Windows.)
 */
 PMEXPORT PmError Pm_Close( PortMidiStream* stream );
@@ -473,22 +473,22 @@ PMEXPORT PmError Pm_Close( PortMidiStream* stream );
     time_proc passed when the stream was opened. Typically, this
     is used when the stream must be opened before the time_proc
     reference is actually advancing. In this case, message timing
-    may be erratic, but since timestamps of zero mean 
+    may be erratic, but since timestamps of zero mean
     "send immediately," initialization messages with zero timestamps
     can be written without a functioning time reference and without
     problems. Before the first MIDI message with a non-zero
     timestamp is written to the stream, the time reference must
     begin to advance (for example, if the time_proc computes time
-    based on audio samples, time might begin to advance when an 
+    based on audio samples, time might begin to advance when an
     audio stream becomes active). After time_proc return values
-    become valid, and BEFORE writing the first non-zero timestamped 
+    become valid, and BEFORE writing the first non-zero timestamped
     MIDI message, call Pm_Synchronize() so that PortMidi can observe
     the difference between the current time_proc value and its
-    MIDI stream time. 
-    
-    In the more normal case where time_proc 
-    values advance continuously, there is no need to call 
-    Pm_Synchronize. PortMidi will always synchronize at the 
+    MIDI stream time.
+
+    In the more normal case where time_proc
+    values advance continuously, there is no need to call
+    Pm_Synchronize. PortMidi will always synchronize at the
     first output message and periodically thereafter.
 */
 PmError Pm_Synchronize( PortMidiStream* stream );
@@ -498,13 +498,13 @@ PmError Pm_Synchronize( PortMidiStream* stream );
     Pm_Message() encodes a short Midi message into a 32-bit word. If data1
     and/or data2 are not present, use zero.
 
-    Pm_MessageStatus(), Pm_MessageData1(), and 
+    Pm_MessageStatus(), Pm_MessageData1(), and
     Pm_MessageData2() extract fields from a 32-bit midi message.
 */
 #define Pm_Message(status, data1, data2) \
-         ((((data2) << 16) & 0xFF0000) | \
-          (((data1) << 8) & 0xFF00) | \
-          ((status) & 0xFF))
+			((((data2) << 16) & 0xFF0000) | \
+			(((data1) << 8) & 0xFF00) | \
+			((status) & 0xFF))
 #define Pm_MessageStatus(msg) ((msg) & 0xFF)
 #define Pm_MessageData1(msg) (((msg) >> 8) & 0xFF)
 #define Pm_MessageData2(msg) (((msg) >> 16) & 0xFF)
@@ -516,71 +516,71 @@ typedef int32_t PmMessage; /**< see PmEvent */
    structure carrying 4 bytes of the message, i.e. only the first
    PmEvent carries the status byte.
 
-   Note that MIDI allows nested messages: the so-called "real-time" MIDI 
-   messages can be inserted into the MIDI byte stream at any location, 
+   Note that MIDI allows nested messages: the so-called "real-time" MIDI
+   messages can be inserted into the MIDI byte stream at any location,
    including within a sysex message. MIDI real-time messages are one-byte
-   messages used mainly for timing (see the MIDI spec). PortMidi retains 
-   the order of non-real-time MIDI messages on both input and output, but 
+   messages used mainly for timing (see the MIDI spec). PortMidi retains
+   the order of non-real-time MIDI messages on both input and output, but
    it does not specify exactly how real-time messages are processed. This
-   is particulary problematic for MIDI input, because the input parser 
-   must either prepare to buffer an unlimited number of sysex message 
-   bytes or to buffer an unlimited number of real-time messages that 
+   is particulary problematic for MIDI input, because the input parser
+   must either prepare to buffer an unlimited number of sysex message
+   bytes or to buffer an unlimited number of real-time messages that
    arrive embedded in a long sysex message. To simplify things, the input
-   parser is allowed to pass real-time MIDI messages embedded within a 
-   sysex message, and it is up to the client to detect, process, and 
+   parser is allowed to pass real-time MIDI messages embedded within a
+   sysex message, and it is up to the client to detect, process, and
    remove these messages as they arrive.
 
    When receiving sysex messages, the sysex message is terminated
    by either an EOX status byte (anywhere in the 4 byte messages) or
    by a non-real-time status byte in the low order byte of the message.
-   If you get a non-real-time status byte but there was no EOX byte, it 
+   If you get a non-real-time status byte but there was no EOX byte, it
    means the sysex message was somehow truncated. This is not
    considered an error; e.g., a missing EOX can result from the user
    disconnecting a MIDI cable during sysex transmission.
 
-   A real-time message can occur within a sysex message. A real-time 
-   message will always occupy a full PmEvent with the status byte in 
+   A real-time message can occur within a sysex message. A real-time
+   message will always occupy a full PmEvent with the status byte in
    the low-order byte of the PmEvent message field. (This implies that
    the byte-order of sysex bytes and real-time message bytes may not
    be preserved -- for example, if a real-time message arrives after
    3 bytes of a sysex message, the real-time message will be delivered
    first. The first word of the sysex message will be delivered only
    after the 4th byte arrives, filling the 4-byte PmEvent message field.
-   
+
    The timestamp field is observed when the output port is opened with
    a non-zero latency. A timestamp of zero means "use the current time",
    which in turn means to deliver the message with a delay of
    latency (the latency parameter used when opening the output port.)
-   Do not expect PortMidi to sort data according to timestamps -- 
-   messages should be sent in the correct order, and timestamps MUST 
+   Do not expect PortMidi to sort data according to timestamps --
+   messages should be sent in the correct order, and timestamps MUST
    be non-decreasing. See also "Example" for Pm_OpenOutput() above.
 
-   A sysex message will generally fill many PmEvent structures. On 
+   A sysex message will generally fill many PmEvent structures. On
    output to a PortMidiStream with non-zero latency, the first timestamp
-   on sysex message data will determine the time to begin sending the 
-   message. PortMidi implementations may ignore timestamps for the 
-   remainder of the sysex message. 
-   
-   On input, the timestamp ideally denotes the arrival time of the 
-   status byte of the message. The first timestamp on sysex message 
-   data will be valid. Subsequent timestamps may denote 
-   when message bytes were actually received, or they may be simply 
+   on sysex message data will determine the time to begin sending the
+   message. PortMidi implementations may ignore timestamps for the
+   remainder of the sysex message.
+
+   On input, the timestamp ideally denotes the arrival time of the
+   status byte of the message. The first timestamp on sysex message
+   data will be valid. Subsequent timestamps may denote
+   when message bytes were actually received, or they may be simply
    copies of the first timestamp.
 
-   Timestamps for nested messages: If a real-time message arrives in 
-   the middle of some other message, it is enqueued immediately with 
-   the timestamp corresponding to its arrival time. The interrupted 
-   non-real-time message or 4-byte packet of sysex data will be enqueued 
+   Timestamps for nested messages: If a real-time message arrives in
+   the middle of some other message, it is enqueued immediately with
+   the timestamp corresponding to its arrival time. The interrupted
+   non-real-time message or 4-byte packet of sysex data will be enqueued
    later. The timestamp of interrupted data will be equal to that of
    the interrupting real-time message to insure that timestamps are
    non-decreasing.
  */
 typedef struct {
-    PmMessage      message;
-    PmTimestamp    timestamp;
+	PmMessage      message;
+	PmTimestamp    timestamp;
 } PmEvent;
 
-/** 
+/**
     @}
 */
 /** \defgroup grp_io Reading and Writing Midi Messages
@@ -588,19 +588,19 @@ typedef struct {
 */
 /**
     Pm_Read() retrieves midi data into a buffer, and returns the number
-    of events read. Result is a non-negative number unless an error occurs, 
+    of events read. Result is a non-negative number unless an error occurs,
     in which case a PmError value will be returned.
 
     Buffer Overflow
 
-    The problem: if an input overflow occurs, data will be lost, ultimately 
-    because there is no flow control all the way back to the data source. 
-    When data is lost, the receiver should be notified and some sort of 
-    graceful recovery should take place, e.g. you shouldn't resume receiving 
+    The problem: if an input overflow occurs, data will be lost, ultimately
+    because there is no flow control all the way back to the data source.
+    When data is lost, the receiver should be notified and some sort of
+    graceful recovery should take place, e.g. you shouldn't resume receiving
     in the middle of a long sysex message.
 
-    With a lock-free fifo, which is pretty much what we're stuck with to 
-    enable portability to the Mac, it's tricky for the producer and consumer 
+    With a lock-free fifo, which is pretty much what we're stuck with to
+    enable portability to the Mac, it's tricky for the producer and consumer
     to synchronously reset the buffer and resume normal operation.
 
     Solution: the buffer managed by PortMidi will be flushed when an overflow
@@ -613,20 +613,20 @@ typedef struct {
 PMEXPORT int Pm_Read( PortMidiStream *stream, PmEvent *buffer, int32_t length );
 
 /**
-    Pm_Poll() tests whether input is available, 
+    Pm_Poll() tests whether input is available,
     returning TRUE, FALSE, or an error value.
 */
 PMEXPORT PmError Pm_Poll( PortMidiStream *stream);
 
-/** 
+/**
     Pm_Write() writes midi data from a buffer. This may contain:
-        - short messages 
-    or 
+        - short messages
+    or
         - sysex messages that are converted into a sequence of PmEvent
           structures, e.g. sending data from a file or forwarding them
           from midi input.
 
-    Use Pm_WriteSysEx() to write a sysex message stored as a contiguous 
+    Use Pm_WriteSysEx() to write a sysex message stored as a contiguous
     array of bytes.
 
     Sysex data may contain embedded real-time messages.
@@ -635,7 +635,7 @@ PMEXPORT PmError Pm_Write( PortMidiStream *stream, PmEvent *buffer, int32_t leng
 
 /**
     Pm_WriteShort() writes a timestamped non-system-exclusive midi message.
-    Messages are delivered in order as received, and timestamps must be 
+    Messages are delivered in order as received, and timestamps must be
     non-decreasing. (But timestamps are ignored if the stream was opened
     with latency = 0.)
 */

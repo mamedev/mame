@@ -15,7 +15,7 @@ const device_type I82439TX = &device_creator<i82439tx_device>;
 
 
 i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock),
+		: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock),
 		pci_device_interface( mconfig, *this )
 {
 }
@@ -56,32 +56,32 @@ UINT32 i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int offse
 
 	switch(offset)
 	{
-		case 0x00:	/* vendor/device ID */
+		case 0x00:  /* vendor/device ID */
 			result = 0x71008086;
 			break;
 
-		case 0x08:	/* revision identification register and class code register*/
+		case 0x08:  /* revision identification register and class code register*/
 			result = 0x06000001;
 			break;
 
-		case 0x04:	/* PCI command register */
+		case 0x04:  /* PCI command register */
 		case 0x0C:
-		case 0x10:	/* reserved */
-		case 0x14:	/* reserved */
-		case 0x18:	/* reserved */
-		case 0x1C:	/* reserved */
-		case 0x20:	/* reserved */
-		case 0x24:	/* reserved */
-		case 0x28:	/* reserved */
-		case 0x2C:	/* reserved */
-		case 0x30:	/* reserved */
-		case 0x34:	/* reserved */
-		case 0x38:	/* reserved */
-		case 0x3C:	/* reserved */
-		case 0x40:	/* reserved */
-		case 0x44:	/* reserved */
-		case 0x48:	/* reserved */
-		case 0x4C:	/* reserved */
+		case 0x10:  /* reserved */
+		case 0x14:  /* reserved */
+		case 0x18:  /* reserved */
+		case 0x1C:  /* reserved */
+		case 0x20:  /* reserved */
+		case 0x24:  /* reserved */
+		case 0x28:  /* reserved */
+		case 0x2C:  /* reserved */
+		case 0x30:  /* reserved */
+		case 0x34:  /* reserved */
+		case 0x38:  /* reserved */
+		case 0x3C:  /* reserved */
+		case 0x40:  /* reserved */
+		case 0x44:  /* reserved */
+		case 0x48:  /* reserved */
+		case 0x4C:  /* reserved */
 		case 0x50:
 		case 0x54:
 		case 0x58:
@@ -143,25 +143,25 @@ void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset
 
 	switch(offset)
 	{
-		case 0x00:	/* vendor/device ID */
-		case 0x10:	/* reserved */
-		case 0x14:	/* reserved */
-		case 0x18:	/* reserved */
-		case 0x1C:	/* reserved */
-		case 0x20:	/* reserved */
-		case 0x24:	/* reserved */
-		case 0x28:	/* reserved */
-		case 0x2C:	/* reserved */
-		case 0x30:	/* reserved */
-		case 0x3C:	/* reserved */
-		case 0x40:	/* reserved */
-		case 0x44:	/* reserved */
-		case 0x48:	/* reserved */
-		case 0x4C:	/* reserved */
+		case 0x00:  /* vendor/device ID */
+		case 0x10:  /* reserved */
+		case 0x14:  /* reserved */
+		case 0x18:  /* reserved */
+		case 0x1C:  /* reserved */
+		case 0x20:  /* reserved */
+		case 0x24:  /* reserved */
+		case 0x28:  /* reserved */
+		case 0x2C:  /* reserved */
+		case 0x30:  /* reserved */
+		case 0x3C:  /* reserved */
+		case 0x40:  /* reserved */
+		case 0x44:  /* reserved */
+		case 0x48:  /* reserved */
+		case 0x4C:  /* reserved */
 			/* read only */
 			break;
 
-		case 0x04:	/* PCI command register */
+		case 0x04:  /* PCI command register */
 		case 0x0C:
 		case 0x50:
 		case 0x54:
@@ -270,8 +270,8 @@ void i82439tx_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_cputag, 0, sizeof(m_cputag));
-    	memset(&m_rom_region, 0, sizeof(m_rom_region));
+		memset(&m_cputag, 0, sizeof(m_cputag));
+		memset(&m_rom_region, 0, sizeof(m_rom_region));
 	}
 	m_shortname = "i82439tx";
 }

@@ -83,14 +83,14 @@ static UINT32 pm_io(address_space &space, int reg, int write, UINT32 d)
 			{
 				int inc = get_inc(mode);
 				if (mode & 0x0400) {
-				       overwrite_write(&dram[addr], d);
+						overwrite_write(&dram[addr], d);
 				} else dram[addr] = d;
 				state->m_pmac_write[reg] += inc;
 			}
 			else if ((mode & 0xfbff) == 0x4018) // DRAM, cell inc
 			{
 				if (mode & 0x0400) {
-				       overwrite_write(&dram[addr], d);
+						overwrite_write(&dram[addr], d);
 				} else dram[addr] = d;
 				state->m_pmac_write[reg] += (addr&1) ? 31 : 1;
 			}
@@ -333,7 +333,7 @@ static UINT8 megadrive_io_read_data_port_svp(running_machine &machine, int portn
 
 static READ16_HANDLER( svp_speedup_r )
 {
-	 space.device().execute().spin_until_time(attotime::from_usec(100));
+		space.device().execute().spin_until_time(attotime::from_usec(100));
 	return 0x0425;
 }
 
@@ -368,5 +368,5 @@ void svp_init(running_machine &machine)
 	ROM = state->memregion("maincpu")->base();
 	state->membank("bank4")->set_base(ROM + 0x800);
 
-	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
+	megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_svp;
 }

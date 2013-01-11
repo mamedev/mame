@@ -74,26 +74,26 @@ Stop_Compiling_Bad_Endian
 #define GetUi16(p) (((const Byte *)(p))[0] | ((UInt16)((const Byte *)(p))[1] << 8))
 
 #define GetUi32(p) ( \
-             ((const Byte *)(p))[0]        | \
-    ((UInt32)((const Byte *)(p))[1] <<  8) | \
-    ((UInt32)((const Byte *)(p))[2] << 16) | \
-    ((UInt32)((const Byte *)(p))[3] << 24))
+				((const Byte *)(p))[0]        | \
+	((UInt32)((const Byte *)(p))[1] <<  8) | \
+	((UInt32)((const Byte *)(p))[2] << 16) | \
+	((UInt32)((const Byte *)(p))[3] << 24))
 
 #define GetUi64(p) (GetUi32(p) | ((UInt64)GetUi32(((const Byte *)(p)) + 4) << 32))
 
 #define SetUi16(p, d) { UInt32 _x_ = (d); \
-    ((Byte *)(p))[0] = (Byte)_x_; \
-    ((Byte *)(p))[1] = (Byte)(_x_ >> 8); }
+	((Byte *)(p))[0] = (Byte)_x_; \
+	((Byte *)(p))[1] = (Byte)(_x_ >> 8); }
 
 #define SetUi32(p, d) { UInt32 _x_ = (d); \
-    ((Byte *)(p))[0] = (Byte)_x_; \
-    ((Byte *)(p))[1] = (Byte)(_x_ >> 8); \
-    ((Byte *)(p))[2] = (Byte)(_x_ >> 16); \
-    ((Byte *)(p))[3] = (Byte)(_x_ >> 24); }
+	((Byte *)(p))[0] = (Byte)_x_; \
+	((Byte *)(p))[1] = (Byte)(_x_ >> 8); \
+	((Byte *)(p))[2] = (Byte)(_x_ >> 16); \
+	((Byte *)(p))[3] = (Byte)(_x_ >> 24); }
 
 #define SetUi64(p, d) { UInt64 _x64_ = (d); \
-    SetUi32(p, (UInt32)_x64_); \
-    SetUi32(((Byte *)(p)) + 4, (UInt32)(_x64_ >> 32)); }
+	SetUi32(p, (UInt32)_x64_); \
+	SetUi32(((Byte *)(p)) + 4, (UInt32)(_x64_ >> 32)); }
 
 #endif
 
@@ -108,10 +108,10 @@ Stop_Compiling_Bad_Endian
 #else
 
 #define GetBe32(p) ( \
-    ((UInt32)((const Byte *)(p))[0] << 24) | \
-    ((UInt32)((const Byte *)(p))[1] << 16) | \
-    ((UInt32)((const Byte *)(p))[2] <<  8) | \
-             ((const Byte *)(p))[3] )
+	((UInt32)((const Byte *)(p))[0] << 24) | \
+	((UInt32)((const Byte *)(p))[1] << 16) | \
+	((UInt32)((const Byte *)(p))[2] <<  8) | \
+				((const Byte *)(p))[3] )
 
 #define GetBe64(p) (((UInt64)GetBe32(p) << 32) | GetBe32(((const Byte *)(p)) + 4))
 
@@ -124,19 +124,19 @@ Stop_Compiling_Bad_Endian
 
 typedef struct
 {
-  UInt32 maxFunc;
-  UInt32 vendor[3];
-  UInt32 ver;
-  UInt32 b;
-  UInt32 c;
-  UInt32 d;
+	UInt32 maxFunc;
+	UInt32 vendor[3];
+	UInt32 ver;
+	UInt32 b;
+	UInt32 c;
+	UInt32 d;
 } Cx86cpuid;
 
 enum
 {
-  CPU_FIRM_INTEL,
-  CPU_FIRM_AMD,
-  CPU_FIRM_VIA
+	CPU_FIRM_INTEL,
+	CPU_FIRM_AMD,
+	CPU_FIRM_VIA
 };
 
 Bool x86cpuid_CheckAndRead(Cx86cpuid *p);

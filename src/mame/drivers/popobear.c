@@ -197,14 +197,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	#endif
 
 	/*
-    ???? ---- ---- ---- unused?
-    ---- xxxx ---- ---- priority?
-    ---- ---- x--- ---- Y direction
-    ---- ---- -x-- ---- X direction
-    ---- ---- --xx ---- width
-    ---- ---- ---- xx-- color bank
-    ---- ---- ---- --xx height?
-    */
+	???? ---- ---- ---- unused?
+	---- xxxx ---- ---- priority?
+	---- ---- x--- ---- Y direction
+	---- ---- -x-- ---- X direction
+	---- ---- --xx ---- width
+	---- ---- ---- xx-- color bank
+	---- ---- ---- --xx height?
+	*/
 
 	/* 0x106 = 8 x 8 */
 	/* 0x*29 = 32 x 32 */

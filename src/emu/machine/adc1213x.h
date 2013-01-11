@@ -89,4 +89,4 @@ extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_conv_w );
 extern DECLARE_READ8_DEVICE_HANDLER( adc1213x_do_r );
 extern DECLARE_READ8_DEVICE_HANDLER( adc1213x_eoc_r );
 
-#endif	/* __ADC1213X_H__ */
+#endif  /* __ADC1213X_H__ */

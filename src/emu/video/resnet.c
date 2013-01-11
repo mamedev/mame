@@ -62,12 +62,12 @@ double compute_resistor_weights(
 
 	int networks_no;
 
-	int rescount[MAX_NETS];		/* number of resistors in each of the nets */
-	double r[MAX_NETS][MAX_RES_PER_NET];		/* resistances */
-	double w[MAX_NETS][MAX_RES_PER_NET];		/* calulated weights */
-	double ws[MAX_NETS][MAX_RES_PER_NET];	/* calulated, scaled weights */
-	int r_pd[MAX_NETS];			/* pulldown resistances */
-	int r_pu[MAX_NETS];			/* pullup resistances */
+	int rescount[MAX_NETS];     /* number of resistors in each of the nets */
+	double r[MAX_NETS][MAX_RES_PER_NET];        /* resistances */
+	double w[MAX_NETS][MAX_RES_PER_NET];        /* calulated weights */
+	double ws[MAX_NETS][MAX_RES_PER_NET];   /* calulated, scaled weights */
+	int r_pd[MAX_NETS];         /* pulldown resistances */
+	int r_pu[MAX_NETS];         /* pullup resistances */
 
 	double max_out[MAX_NETS];
 	double * out[MAX_NETS];
@@ -87,26 +87,26 @@ double compute_resistor_weights(
 
 		switch(n){
 		case 0:
-				count		= count_1;
-				resistances	= resistances_1;
-				weights		= weights_1;
-				pd			= pulldown_1;
-				pu			= pullup_1;
+				count       = count_1;
+				resistances = resistances_1;
+				weights     = weights_1;
+				pd          = pulldown_1;
+				pu          = pullup_1;
 				break;
 		case 1:
-				count		= count_2;
-				resistances	= resistances_2;
-				weights		= weights_2;
-				pd			= pulldown_2;
-				pu			= pullup_2;
+				count       = count_2;
+				resistances = resistances_2;
+				weights     = weights_2;
+				pd          = pulldown_2;
+				pu          = pullup_2;
 				break;
 		case 2:
 		default:
-				count		= count_3;
-				resistances	= resistances_3;
-				weights		= weights_3;
-				pd			= pulldown_3;
-				pu			= pullup_3;
+				count       = count_3;
+				resistances = resistances_3;
+				weights     = weights_3;
+				pd          = pulldown_3;
+				pu          = pullup_3;
 				break;
 		}
 
@@ -144,7 +144,7 @@ double compute_resistor_weights(
 
 			for( j = 0; j < rescount[i]; j++ )
 			{
-				if( j==n )	/* only one resistance in the network connected to Vcc */
+				if( j==n )  /* only one resistance in the network connected to Vcc */
 				{
 					if (r[i][j] != 0.0)
 						R1 += 1.0/r[i][j];
@@ -175,7 +175,7 @@ double compute_resistor_weights(
 
 		/* of n resistors */
 		for( n = 0; n < rescount[i]; n++ )
-			sum += w[i][n];	/* maximum output, ie when each resistance is connected to Vcc */
+			sum += w[i][n]; /* maximum output, ie when each resistance is connected to Vcc */
 
 		max_out[i] = sum;
 		if (max < sum)
@@ -186,10 +186,10 @@ double compute_resistor_weights(
 	}
 
 
-	if (scaler < 0.0)	/* use autoscale ? */
+	if (scaler < 0.0)   /* use autoscale ? */
 		/* calculate the output scaler according to the network with the greatest output */
 		scale = ((double)maxval) / max_out[j];
-	else				/* use scaler provided on entry */
+	else                /* use scaler provided on entry */
 		scale = scaler;
 
 	/* calculate scaled output and fill the output table(s)*/
@@ -197,8 +197,8 @@ double compute_resistor_weights(
 	{
 		for (n = 0; n < rescount[i]; n++)
 		{
-			ws[i][n] = w[i][n]*scale;	/* scale the result */
-			(out[i])[n] = ws[i][n];		/* fill the output table */
+			ws[i][n] = w[i][n]*scale;   /* scale the result */
+			(out[i])[n] = ws[i][n];     /* fill the output table */
 		}
 	}
 
@@ -242,12 +242,12 @@ double compute_resistor_net_outputs(
 
 	int networks_no;
 
-	int rescount[MAX_NETS];		/* number of resistors in each of the nets */
-	double r[MAX_NETS][MAX_RES_PER_NET];		/* resistances */
-	double *o;					/* calulated outputs */
-	double *os;					/* calulated, scaled outputss */
-	int r_pd[MAX_NETS];			/* pulldown resistances */
-	int r_pu[MAX_NETS];			/* pullup resistances */
+	int rescount[MAX_NETS];     /* number of resistors in each of the nets */
+	double r[MAX_NETS][MAX_RES_PER_NET];        /* resistances */
+	double *o;                  /* calulated outputs */
+	double *os;                 /* calulated, scaled outputss */
+	int r_pd[MAX_NETS];         /* pulldown resistances */
+	int r_pu[MAX_NETS];         /* pullup resistances */
 
 	double max_out[MAX_NETS];
 	double min_out[MAX_NETS];
@@ -272,26 +272,26 @@ double compute_resistor_net_outputs(
 
 		switch(n){
 		case 0:
-				count		= count_1;
-				resistances	= resistances_1;
-				weights		= outputs_1;
-				pd			= pulldown_1;
-				pu			= pullup_1;
+				count       = count_1;
+				resistances = resistances_1;
+				weights     = outputs_1;
+				pd          = pulldown_1;
+				pu          = pullup_1;
 				break;
 		case 1:
-				count		= count_2;
-				resistances	= resistances_2;
-				weights		= outputs_2;
-				pd			= pulldown_2;
-				pu			= pullup_2;
+				count       = count_2;
+				resistances = resistances_2;
+				weights     = outputs_2;
+				pd          = pulldown_2;
+				pu          = pullup_2;
 				break;
 		case 2:
 		default:
-				count		= count_3;
-				resistances	= resistances_3;
-				weights		= outputs_3;
-				pd			= pulldown_3;
-				pu			= pullup_3;
+				count       = count_3;
+				resistances = resistances_3;
+				weights     = outputs_3;
+				pd          = pulldown_3;
+				pu          = pullup_3;
 				break;
 		}
 
@@ -363,15 +363,15 @@ double compute_resistor_net_outputs(
 				max_tmp = o[i*(1<<MAX_RES_PER_NET)+n];
 		}
 
-		max_out[i] = max_tmp;	/* maximum output */
-		min_out[i] = min_tmp;	/* minimum output */
+		max_out[i] = max_tmp;   /* maximum output */
+		min_out[i] = min_tmp;   /* minimum output */
 
-		val = min_out[i];	/* minimum output of this network */
+		val = min_out[i];   /* minimum output of this network */
 		if (min > val)
 		{
 			min = val;
 		}
-		val = max_out[i];	/* maximum output of this network */
+		val = max_out[i];   /* maximum output of this network */
 		if (max < val)
 		{
 			max = val;
@@ -379,10 +379,10 @@ double compute_resistor_net_outputs(
 	}
 
 
-	if (scaler < 0.0)	/* use autoscale ? */
+	if (scaler < 0.0)   /* use autoscale ? */
 		/* calculate the output scaler according to the network with the smallest output */
 		scale = ((double)maxval) / (max-min);
-	else				/* use scaler provided on entry */
+	else                /* use scaler provided on entry */
 		scale = scaler;
 
 	/* calculate scaled output and fill the output table(s) */
@@ -390,8 +390,8 @@ double compute_resistor_net_outputs(
 	{
 		for (n = 0; n < (1<<rescount[i]); n++)
 		{
-			os[i*(1<<MAX_RES_PER_NET)+n] = (o[i*(1<<MAX_RES_PER_NET)+n] - min) * scale;	/* scale the result */
-			(out[i])[n] = os[i*(1<<MAX_RES_PER_NET)+n];		/* fill the output table */
+			os[i*(1<<MAX_RES_PER_NET)+n] = (o[i*(1<<MAX_RES_PER_NET)+n] - min) * scale; /* scale the result */
+			(out[i])[n] = os[i*(1<<MAX_RES_PER_NET)+n];     /* fill the output table */
 		}
 	}
 
@@ -442,7 +442,7 @@ if (VERBOSE)
  * in such circuits VOL is likely to be around 50mV.
  */
 
-#define	TTL_VOL			(0.05)
+#define TTL_VOL         (0.05)
 
 
 /* Likely, datasheets give a typical value of 3.4V to 3.6V
@@ -450,7 +450,7 @@ if (VERBOSE)
  * of 4V for typical currents involved in resistor networks.
  */
 
-#define TTL_VOH			(4.0)
+#define TTL_VOH         (4.0)
 
 int compute_res_net(int inputs, int channel, const res_net_info *di)
 {
@@ -539,8 +539,8 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			vOL = TTL_VOL;
 			vOH = TTL_VOH;
 			/* rough estimation from 82s129 (7052) datasheet and from various sources
-             * 1.4k / 30
-             */
+			 * 1.4k / 30
+			 */
 			ttlHRes = 50;
 			OpenCol = 0;
 			break;
@@ -641,9 +641,9 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 		rTotal += 1.0 / rGnd;
 
 	/* if the resulting voltage after application of all low inputs is
-     * greater than vOH, treat high inputs as open collector/high impedance
-     * There will be now current into/from the TTL gate
-     */
+	 * greater than vOH, treat high inputs as open collector/high impedance
+	 * There will be now current into/from the TTL gate
+	 */
 
 	if ( (di->options & RES_NET_VIN_MASK)==RES_NET_VIN_TTL_OUT)
 	{

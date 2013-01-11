@@ -49,15 +49,15 @@ public:
 
 
 static INPUT_PORTS_START(ggconnie)
-    PORT_START("IN0")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Medal" )
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) /* 100 Yen */
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) /* 10 Yen */
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( DEF_STR(Test) )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hopper")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Medal" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) /* 100 Yen */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) /* 10 Yen */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( DEF_STR(Test) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hopper")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
@@ -148,17 +148,17 @@ READ8_MEMBER(ggconnie_state::rtc_r)
 	switch(offset)
 	{
 		case 0x00:  return (systime.local_time.second % 10) & 0xf;
-		case 0x01:	return (systime.local_time.second / 10) & 0xf;
-		case 0x02:	return (systime.local_time.minute % 10) & 0xf;
-		case 0x03:	return (systime.local_time.minute / 10) & 0xf;
+		case 0x01:  return (systime.local_time.second / 10) & 0xf;
+		case 0x02:  return (systime.local_time.minute % 10) & 0xf;
+		case 0x03:  return (systime.local_time.minute / 10) & 0xf;
 		case 0x04:  return (systime.local_time.hour % 10) & 0xf;
-		case 0x05:	return (systime.local_time.hour / 10) & 0xf;
-		case 0x07:	return ((systime.local_time.day+1) % 10) & 0xf;
-		case 0x08:	return ((systime.local_time.day+1) / 10) & 0xf;
-		case 0x09:	return ((systime.local_time.month+1) % 10) & 0xf;
-		case 0x0a:	return ((systime.local_time.month+1) / 10) & 0xf;
-		case 0x0b:	return ((systime.local_time.year-1996) % 10) & 0xf;
-		case 0x0c:	return (((systime.local_time.year-1996) % 100) / 10) & 0xf;
+		case 0x05:  return (systime.local_time.hour / 10) & 0xf;
+		case 0x07:  return ((systime.local_time.day+1) % 10) & 0xf;
+		case 0x08:  return ((systime.local_time.day+1) / 10) & 0xf;
+		case 0x09:  return ((systime.local_time.month+1) % 10) & 0xf;
+		case 0x0a:  return ((systime.local_time.month+1) / 10) & 0xf;
+		case 0x0b:  return ((systime.local_time.year-1996) % 10) & 0xf;
+		case 0x0c:  return (((systime.local_time.year-1996) % 100) / 10) & 0xf;
 	}
 
 	return 0;
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )

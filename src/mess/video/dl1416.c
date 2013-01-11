@@ -214,7 +214,7 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 		{
 			if (device->type() == DL1416B)
 			{
-			 /* DL1416B uses offset to decide cursor pos to change and D0 to hold new state */
+				/* DL1416B uses offset to decide cursor pos to change and D0 to hold new state */
 
 				/* The cursor will be set if D0 is high and the original */
 				/* character restored otherwise */
@@ -342,5 +342,3 @@ dl1416t_device::dl1416t_device(const machine_config &mconfig, const char *tag, d
 	: dl1416_device(mconfig, DL1416T, "DL1416T", tag, owner, clock)
 {
 }
-
-

@@ -109,11 +109,11 @@ CPU_DISASSEMBLE( sh2 );
 #ifndef USE_SH2DRC
 
 /* speed up delay loops, bail out of tight loops */
-#define BUSY_LOOP_HACKS 	1
+#define BUSY_LOOP_HACKS     1
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 INLINE sh2_state *get_safe_token(device_t *device)
 {
@@ -121,7 +121,7 @@ INLINE sh2_state *get_safe_token(device_t *device)
 	assert(device->token != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SH1 ||
-		   cpu_get_type(device) == CPU_SH2);
+			cpu_get_type(device) == CPU_SH2);
 	return (sh2_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -164,7 +164,7 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return sh2->program->read_dword(A & AM);
+	return sh2->program->read_dword(A & AM);
 }
 
 INLINE void WB(sh2_state *sh2, offs_t A, UINT8 V)
@@ -374,10 +374,10 @@ INLINE void BRA(sh2_state *sh2, UINT32 d)
 	{
 		UINT32 next_opcode = RW( sh2, sh2->ppc & AM );
 		/* BRA  $
-         * NOP
-         */
+		 * NOP
+		 */
 		if (next_opcode == 0x0009)
-			sh2->icount %= 3;	/* cycles for BRA $ and NOP taken (3) */
+			sh2->icount %= 3;   /* cycles for BRA $ and NOP taken (3) */
 	}
 #endif
 	sh2->delay = sh2->pc;
@@ -560,19 +560,19 @@ INLINE void CMPPZ(sh2_state *sh2, UINT32 n)
  * CMP_STR  Rm,Rn
  */
 INLINE void CMPSTR(sh2_state *sh2, UINT32 m, UINT32 n)
- {
-  UINT32 temp;
-  INT32 HH, HL, LH, LL;
-  temp = sh2->r[n] ^ sh2->r[m];
-  HH = (temp >> 24) & 0xff;
-  HL = (temp >> 16) & 0xff;
-  LH = (temp >> 8) & 0xff;
-  LL = temp & 0xff;
-  if (HH && HL && LH && LL)
-   sh2->sr &= ~T;
-  else
-   sh2->sr |= T;
- }
+	{
+	UINT32 temp;
+	INT32 HH, HL, LH, LL;
+	temp = sh2->r[n] ^ sh2->r[m];
+	HH = (temp >> 24) & 0xff;
+	HL = (temp >> 16) & 0xff;
+	LH = (temp >> 8) & 0xff;
+	LL = temp & 0xff;
+	if (HH && HL && LH && LL)
+	sh2->sr &= ~T;
+	else
+	sh2->sr |= T;
+	}
 
 
 /*  code                 cycles  t-bit
@@ -802,14 +802,14 @@ INLINE void DT(sh2_state *sh2, UINT32 n)
 	{
 		UINT32 next_opcode = RW( sh2, sh2->ppc & AM );
 		/* DT   Rn
-         * BF   $-2
-         */
+		 * BF   $-2
+		 */
 		if (next_opcode == 0x8bfd)
 		{
 			while (sh2->r[n] > 1 && sh2->icount > 4)
 			{
 				sh2->r[n]--;
-				sh2->icount -= 4;	/* cycles for DT (1) and BF taken (3) */
+				sh2->icount -= 4;   /* cycles for DT (1) and BF taken (3) */
 			}
 		}
 	}
@@ -1829,73 +1829,73 @@ INLINE void op0000(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 0x3F)
 	{
-	case 0x00: NOP();						break;
-	case 0x01: NOP();						break;
-	case 0x02: STCSR(sh2, Rn);					break;
-	case 0x03: BSRF(sh2, Rn);					break;
-	case 0x04: MOVBS0(sh2, Rm, Rn);				break;
-	case 0x05: MOVWS0(sh2, Rm, Rn);				break;
-	case 0x06: MOVLS0(sh2, Rm, Rn);				break;
-	case 0x07: MULL(sh2, Rm, Rn);				break;
-	case 0x08: CLRT(sh2);						break;
-	case 0x09: NOP();						break;
-	case 0x0a: STSMACH(sh2, Rn);				break;
-	case 0x0b: RTS(sh2);						break;
-	case 0x0c: MOVBL0(sh2, Rm, Rn);				break;
-	case 0x0d: MOVWL0(sh2, Rm, Rn);				break;
-	case 0x0e: MOVLL0(sh2, Rm, Rn);				break;
-	case 0x0f: MAC_L(sh2, Rm, Rn);				break;
+	case 0x00: NOP();                       break;
+	case 0x01: NOP();                       break;
+	case 0x02: STCSR(sh2, Rn);                  break;
+	case 0x03: BSRF(sh2, Rn);                   break;
+	case 0x04: MOVBS0(sh2, Rm, Rn);             break;
+	case 0x05: MOVWS0(sh2, Rm, Rn);             break;
+	case 0x06: MOVLS0(sh2, Rm, Rn);             break;
+	case 0x07: MULL(sh2, Rm, Rn);               break;
+	case 0x08: CLRT(sh2);                       break;
+	case 0x09: NOP();                       break;
+	case 0x0a: STSMACH(sh2, Rn);                break;
+	case 0x0b: RTS(sh2);                        break;
+	case 0x0c: MOVBL0(sh2, Rm, Rn);             break;
+	case 0x0d: MOVWL0(sh2, Rm, Rn);             break;
+	case 0x0e: MOVLL0(sh2, Rm, Rn);             break;
+	case 0x0f: MAC_L(sh2, Rm, Rn);              break;
 
-	case 0x10: NOP();						break;
-	case 0x11: NOP();						break;
-	case 0x12: STCGBR(sh2, Rn);					break;
-	case 0x13: NOP();						break;
-	case 0x14: MOVBS0(sh2, Rm, Rn);				break;
-	case 0x15: MOVWS0(sh2, Rm, Rn);				break;
-	case 0x16: MOVLS0(sh2, Rm, Rn);				break;
-	case 0x17: MULL(sh2, Rm, Rn);				break;
-	case 0x18: SETT(sh2);						break;
-	case 0x19: DIV0U(sh2);					break;
-	case 0x1a: STSMACL(sh2, Rn);				break;
-	case 0x1b: SLEEP(sh2);					break;
-	case 0x1c: MOVBL0(sh2, Rm, Rn);				break;
-	case 0x1d: MOVWL0(sh2, Rm, Rn);				break;
-	case 0x1e: MOVLL0(sh2, Rm, Rn);				break;
-	case 0x1f: MAC_L(sh2, Rm, Rn);				break;
+	case 0x10: NOP();                       break;
+	case 0x11: NOP();                       break;
+	case 0x12: STCGBR(sh2, Rn);                 break;
+	case 0x13: NOP();                       break;
+	case 0x14: MOVBS0(sh2, Rm, Rn);             break;
+	case 0x15: MOVWS0(sh2, Rm, Rn);             break;
+	case 0x16: MOVLS0(sh2, Rm, Rn);             break;
+	case 0x17: MULL(sh2, Rm, Rn);               break;
+	case 0x18: SETT(sh2);                       break;
+	case 0x19: DIV0U(sh2);                  break;
+	case 0x1a: STSMACL(sh2, Rn);                break;
+	case 0x1b: SLEEP(sh2);                  break;
+	case 0x1c: MOVBL0(sh2, Rm, Rn);             break;
+	case 0x1d: MOVWL0(sh2, Rm, Rn);             break;
+	case 0x1e: MOVLL0(sh2, Rm, Rn);             break;
+	case 0x1f: MAC_L(sh2, Rm, Rn);              break;
 
-	case 0x20: NOP();						break;
-	case 0x21: NOP();						break;
-	case 0x22: STCVBR(sh2, Rn);					break;
-	case 0x23: BRAF(sh2, Rn);					break;
-	case 0x24: MOVBS0(sh2, Rm, Rn);				break;
-	case 0x25: MOVWS0(sh2, Rm, Rn);				break;
-	case 0x26: MOVLS0(sh2, Rm, Rn);				break;
-	case 0x27: MULL(sh2, Rm, Rn);				break;
-	case 0x28: CLRMAC(sh2);					break;
-	case 0x29: MOVT(sh2, Rn);					break;
-	case 0x2a: STSPR(sh2, Rn);					break;
-	case 0x2b: RTE(sh2);						break;
-	case 0x2c: MOVBL0(sh2, Rm, Rn);				break;
-	case 0x2d: MOVWL0(sh2, Rm, Rn);				break;
-	case 0x2e: MOVLL0(sh2, Rm, Rn);				break;
-	case 0x2f: MAC_L(sh2, Rm, Rn);				break;
+	case 0x20: NOP();                       break;
+	case 0x21: NOP();                       break;
+	case 0x22: STCVBR(sh2, Rn);                 break;
+	case 0x23: BRAF(sh2, Rn);                   break;
+	case 0x24: MOVBS0(sh2, Rm, Rn);             break;
+	case 0x25: MOVWS0(sh2, Rm, Rn);             break;
+	case 0x26: MOVLS0(sh2, Rm, Rn);             break;
+	case 0x27: MULL(sh2, Rm, Rn);               break;
+	case 0x28: CLRMAC(sh2);                 break;
+	case 0x29: MOVT(sh2, Rn);                   break;
+	case 0x2a: STSPR(sh2, Rn);                  break;
+	case 0x2b: RTE(sh2);                        break;
+	case 0x2c: MOVBL0(sh2, Rm, Rn);             break;
+	case 0x2d: MOVWL0(sh2, Rm, Rn);             break;
+	case 0x2e: MOVLL0(sh2, Rm, Rn);             break;
+	case 0x2f: MAC_L(sh2, Rm, Rn);              break;
 
-	case 0x30: NOP();						break;
-	case 0x31: NOP();						break;
-	case 0x32: NOP();						break;
-	case 0x33: NOP();						break;
-	case 0x34: MOVBS0(sh2, Rm, Rn);				break;
-	case 0x35: MOVWS0(sh2, Rm, Rn);				break;
-	case 0x36: MOVLS0(sh2, Rm, Rn);				break;
-	case 0x37: MULL(sh2, Rm, Rn);				break;
-	case 0x38: NOP();						break;
-	case 0x39: NOP();						break;
-	case 0x3c: MOVBL0(sh2, Rm, Rn);				break;
-	case 0x3d: MOVWL0(sh2, Rm, Rn);				break;
-	case 0x3e: MOVLL0(sh2, Rm, Rn);				break;
-	case 0x3f: MAC_L(sh2, Rm, Rn);				break;
-	case 0x3a: NOP();						break;
-	case 0x3b: NOP();						break;
+	case 0x30: NOP();                       break;
+	case 0x31: NOP();                       break;
+	case 0x32: NOP();                       break;
+	case 0x33: NOP();                       break;
+	case 0x34: MOVBS0(sh2, Rm, Rn);             break;
+	case 0x35: MOVWS0(sh2, Rm, Rn);             break;
+	case 0x36: MOVLS0(sh2, Rm, Rn);             break;
+	case 0x37: MULL(sh2, Rm, Rn);               break;
+	case 0x38: NOP();                       break;
+	case 0x39: NOP();                       break;
+	case 0x3c: MOVBL0(sh2, Rm, Rn);             break;
+	case 0x3d: MOVWL0(sh2, Rm, Rn);             break;
+	case 0x3e: MOVLL0(sh2, Rm, Rn);             break;
+	case 0x3f: MAC_L(sh2, Rm, Rn);              break;
+	case 0x3a: NOP();                       break;
+	case 0x3b: NOP();                       break;
 
 
 
@@ -1911,22 +1911,22 @@ INLINE void op0010(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: MOVBS(sh2, Rm, Rn);				break;
-	case  1: MOVWS(sh2, Rm, Rn);				break;
-	case  2: MOVLS(sh2, Rm, Rn);				break;
-	case  3: NOP(); 						break;
-	case  4: MOVBM(sh2, Rm, Rn);				break;
-	case  5: MOVWM(sh2, Rm, Rn);				break;
-	case  6: MOVLM(sh2, Rm, Rn);				break;
-	case  7: DIV0S(sh2, Rm, Rn);				break;
-	case  8: TST(sh2, Rm, Rn);					break;
-	case  9: AND(sh2, Rm, Rn);					break;
-	case 10: XOR(sh2, Rm, Rn);					break;
-	case 11: OR(sh2, Rm, Rn);					break;
-	case 12: CMPSTR(sh2, Rm, Rn);				break;
-	case 13: XTRCT(sh2, Rm, Rn);				break;
-	case 14: MULU(sh2, Rm, Rn);					break;
-	case 15: MULS(sh2, Rm, Rn);					break;
+	case  0: MOVBS(sh2, Rm, Rn);                break;
+	case  1: MOVWS(sh2, Rm, Rn);                break;
+	case  2: MOVLS(sh2, Rm, Rn);                break;
+	case  3: NOP();                         break;
+	case  4: MOVBM(sh2, Rm, Rn);                break;
+	case  5: MOVWM(sh2, Rm, Rn);                break;
+	case  6: MOVLM(sh2, Rm, Rn);                break;
+	case  7: DIV0S(sh2, Rm, Rn);                break;
+	case  8: TST(sh2, Rm, Rn);                  break;
+	case  9: AND(sh2, Rm, Rn);                  break;
+	case 10: XOR(sh2, Rm, Rn);                  break;
+	case 11: OR(sh2, Rm, Rn);                   break;
+	case 12: CMPSTR(sh2, Rm, Rn);               break;
+	case 13: XTRCT(sh2, Rm, Rn);                break;
+	case 14: MULU(sh2, Rm, Rn);                 break;
+	case 15: MULS(sh2, Rm, Rn);                 break;
 	}
 }
 
@@ -1934,22 +1934,22 @@ INLINE void op0011(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: CMPEQ(sh2, Rm, Rn);				break;
-	case  1: NOP(); 						break;
-	case  2: CMPHS(sh2, Rm, Rn);				break;
-	case  3: CMPGE(sh2, Rm, Rn);				break;
-	case  4: DIV1(sh2, Rm, Rn);					break;
-	case  5: DMULU(sh2, Rm, Rn);				break;
-	case  6: CMPHI(sh2, Rm, Rn);				break;
-	case  7: CMPGT(sh2, Rm, Rn);				break;
-	case  8: SUB(sh2, Rm, Rn);					break;
-	case  9: NOP(); 						break;
-	case 10: SUBC(sh2, Rm, Rn);					break;
-	case 11: SUBV(sh2, Rm, Rn);					break;
-	case 12: ADD(sh2, Rm, Rn);					break;
-	case 13: DMULS(sh2, Rm, Rn);				break;
-	case 14: ADDC(sh2, Rm, Rn);					break;
-	case 15: ADDV(sh2, Rm, Rn);					break;
+	case  0: CMPEQ(sh2, Rm, Rn);                break;
+	case  1: NOP();                         break;
+	case  2: CMPHS(sh2, Rm, Rn);                break;
+	case  3: CMPGE(sh2, Rm, Rn);                break;
+	case  4: DIV1(sh2, Rm, Rn);                 break;
+	case  5: DMULU(sh2, Rm, Rn);                break;
+	case  6: CMPHI(sh2, Rm, Rn);                break;
+	case  7: CMPGT(sh2, Rm, Rn);                break;
+	case  8: SUB(sh2, Rm, Rn);                  break;
+	case  9: NOP();                         break;
+	case 10: SUBC(sh2, Rm, Rn);                 break;
+	case 11: SUBV(sh2, Rm, Rn);                 break;
+	case 12: ADD(sh2, Rm, Rn);                  break;
+	case 13: DMULS(sh2, Rm, Rn);                break;
+	case 14: ADDC(sh2, Rm, Rn);                 break;
+	case 15: ADDV(sh2, Rm, Rn);                 break;
 	}
 }
 
@@ -1957,73 +1957,73 @@ INLINE void op0100(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 0x3F)
 	{
-	case 0x00: SHLL(sh2, Rn);					break;
-	case 0x01: SHLR(sh2, Rn);					break;
-	case 0x02: STSMMACH(sh2, Rn);				break;
-	case 0x03: STCMSR(sh2, Rn);					break;
-	case 0x04: ROTL(sh2, Rn);					break;
-	case 0x05: ROTR(sh2, Rn);					break;
-	case 0x06: LDSMMACH(sh2, Rn);				break;
-	case 0x07: LDCMSR(sh2, Rn);					break;
-	case 0x08: SHLL2(sh2, Rn);					break;
-	case 0x09: SHLR2(sh2, Rn);					break;
-	case 0x0a: LDSMACH(sh2, Rn);				break;
-	case 0x0b: JSR(sh2, Rn);					break;
-	case 0x0c: NOP();						break;
-	case 0x0d: NOP();						break;
-	case 0x0e: LDCSR(sh2, Rn);					break;
-	case 0x0f: MAC_W(sh2, Rm, Rn);				break;
+	case 0x00: SHLL(sh2, Rn);                   break;
+	case 0x01: SHLR(sh2, Rn);                   break;
+	case 0x02: STSMMACH(sh2, Rn);               break;
+	case 0x03: STCMSR(sh2, Rn);                 break;
+	case 0x04: ROTL(sh2, Rn);                   break;
+	case 0x05: ROTR(sh2, Rn);                   break;
+	case 0x06: LDSMMACH(sh2, Rn);               break;
+	case 0x07: LDCMSR(sh2, Rn);                 break;
+	case 0x08: SHLL2(sh2, Rn);                  break;
+	case 0x09: SHLR2(sh2, Rn);                  break;
+	case 0x0a: LDSMACH(sh2, Rn);                break;
+	case 0x0b: JSR(sh2, Rn);                    break;
+	case 0x0c: NOP();                       break;
+	case 0x0d: NOP();                       break;
+	case 0x0e: LDCSR(sh2, Rn);                  break;
+	case 0x0f: MAC_W(sh2, Rm, Rn);              break;
 
-	case 0x10: DT(sh2, Rn);						break;
-	case 0x11: CMPPZ(sh2, Rn);					break;
-	case 0x12: STSMMACL(sh2, Rn);				break;
-	case 0x13: STCMGBR(sh2, Rn);				break;
-	case 0x14: NOP();						break;
-	case 0x15: CMPPL(sh2, Rn);					break;
-	case 0x16: LDSMMACL(sh2, Rn);				break;
-	case 0x17: LDCMGBR(sh2, Rn);				break;
-	case 0x18: SHLL8(sh2, Rn);					break;
-	case 0x19: SHLR8(sh2, Rn);					break;
-	case 0x1a: LDSMACL(sh2, Rn);				break;
-	case 0x1b: TAS(sh2, Rn);					break;
-	case 0x1c: NOP();						break;
-	case 0x1d: NOP();						break;
-	case 0x1e: LDCGBR(sh2, Rn);					break;
-	case 0x1f: MAC_W(sh2, Rm, Rn);				break;
+	case 0x10: DT(sh2, Rn);                     break;
+	case 0x11: CMPPZ(sh2, Rn);                  break;
+	case 0x12: STSMMACL(sh2, Rn);               break;
+	case 0x13: STCMGBR(sh2, Rn);                break;
+	case 0x14: NOP();                       break;
+	case 0x15: CMPPL(sh2, Rn);                  break;
+	case 0x16: LDSMMACL(sh2, Rn);               break;
+	case 0x17: LDCMGBR(sh2, Rn);                break;
+	case 0x18: SHLL8(sh2, Rn);                  break;
+	case 0x19: SHLR8(sh2, Rn);                  break;
+	case 0x1a: LDSMACL(sh2, Rn);                break;
+	case 0x1b: TAS(sh2, Rn);                    break;
+	case 0x1c: NOP();                       break;
+	case 0x1d: NOP();                       break;
+	case 0x1e: LDCGBR(sh2, Rn);                 break;
+	case 0x1f: MAC_W(sh2, Rm, Rn);              break;
 
-	case 0x20: SHAL(sh2, Rn);					break;
-	case 0x21: SHAR(sh2, Rn);					break;
-	case 0x22: STSMPR(sh2, Rn);					break;
-	case 0x23: STCMVBR(sh2, Rn);				break;
-	case 0x24: ROTCL(sh2, Rn);					break;
-	case 0x25: ROTCR(sh2, Rn);					break;
-	case 0x26: LDSMPR(sh2, Rn);					break;
-	case 0x27: LDCMVBR(sh2, Rn);				break;
-	case 0x28: SHLL16(sh2, Rn);					break;
-	case 0x29: SHLR16(sh2, Rn);					break;
-	case 0x2a: LDSPR(sh2, Rn);					break;
-	case 0x2b: JMP(sh2, Rn);					break;
-	case 0x2c: NOP();						break;
-	case 0x2d: NOP();						break;
-	case 0x2e: LDCVBR(sh2, Rn);					break;
-	case 0x2f: MAC_W(sh2, Rm, Rn);				break;
+	case 0x20: SHAL(sh2, Rn);                   break;
+	case 0x21: SHAR(sh2, Rn);                   break;
+	case 0x22: STSMPR(sh2, Rn);                 break;
+	case 0x23: STCMVBR(sh2, Rn);                break;
+	case 0x24: ROTCL(sh2, Rn);                  break;
+	case 0x25: ROTCR(sh2, Rn);                  break;
+	case 0x26: LDSMPR(sh2, Rn);                 break;
+	case 0x27: LDCMVBR(sh2, Rn);                break;
+	case 0x28: SHLL16(sh2, Rn);                 break;
+	case 0x29: SHLR16(sh2, Rn);                 break;
+	case 0x2a: LDSPR(sh2, Rn);                  break;
+	case 0x2b: JMP(sh2, Rn);                    break;
+	case 0x2c: NOP();                       break;
+	case 0x2d: NOP();                       break;
+	case 0x2e: LDCVBR(sh2, Rn);                 break;
+	case 0x2f: MAC_W(sh2, Rm, Rn);              break;
 
-	case 0x30: NOP();						break;
-	case 0x31: NOP();						break;
-	case 0x32: NOP();						break;
-	case 0x33: NOP();						break;
-	case 0x34: NOP();						break;
-	case 0x35: NOP();						break;
-	case 0x36: NOP();						break;
-	case 0x37: NOP();						break;
-	case 0x38: NOP();						break;
-	case 0x39: NOP();						break;
-	case 0x3a: NOP();						break;
-	case 0x3b: NOP();						break;
-	case 0x3c: NOP();						break;
-	case 0x3d: NOP();						break;
-	case 0x3e: NOP();						break;
-	case 0x3f: MAC_W(sh2, Rm, Rn);				break;
+	case 0x30: NOP();                       break;
+	case 0x31: NOP();                       break;
+	case 0x32: NOP();                       break;
+	case 0x33: NOP();                       break;
+	case 0x34: NOP();                       break;
+	case 0x35: NOP();                       break;
+	case 0x36: NOP();                       break;
+	case 0x37: NOP();                       break;
+	case 0x38: NOP();                       break;
+	case 0x39: NOP();                       break;
+	case 0x3a: NOP();                       break;
+	case 0x3b: NOP();                       break;
+	case 0x3c: NOP();                       break;
+	case 0x3d: NOP();                       break;
+	case 0x3e: NOP();                       break;
+	case 0x3f: MAC_W(sh2, Rm, Rn);              break;
 
 	}
 }
@@ -2037,22 +2037,22 @@ INLINE void op0110(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: MOVBL(sh2, Rm, Rn);				break;
-	case  1: MOVWL(sh2, Rm, Rn);				break;
-	case  2: MOVLL(sh2, Rm, Rn);				break;
-	case  3: MOV(sh2, Rm, Rn);					break;
-	case  4: MOVBP(sh2, Rm, Rn);				break;
-	case  5: MOVWP(sh2, Rm, Rn);				break;
-	case  6: MOVLP(sh2, Rm, Rn);				break;
-	case  7: NOT(sh2, Rm, Rn);					break;
-	case  8: SWAPB(sh2, Rm, Rn);				break;
-	case  9: SWAPW(sh2, Rm, Rn);				break;
-	case 10: NEGC(sh2, Rm, Rn);					break;
-	case 11: NEG(sh2, Rm, Rn);					break;
-	case 12: EXTUB(sh2, Rm, Rn);				break;
-	case 13: EXTUW(sh2, Rm, Rn);				break;
-	case 14: EXTSB(sh2, Rm, Rn);				break;
-	case 15: EXTSW(sh2, Rm, Rn);				break;
+	case  0: MOVBL(sh2, Rm, Rn);                break;
+	case  1: MOVWL(sh2, Rm, Rn);                break;
+	case  2: MOVLL(sh2, Rm, Rn);                break;
+	case  3: MOV(sh2, Rm, Rn);                  break;
+	case  4: MOVBP(sh2, Rm, Rn);                break;
+	case  5: MOVWP(sh2, Rm, Rn);                break;
+	case  6: MOVLP(sh2, Rm, Rn);                break;
+	case  7: NOT(sh2, Rm, Rn);                  break;
+	case  8: SWAPB(sh2, Rm, Rn);                break;
+	case  9: SWAPW(sh2, Rm, Rn);                break;
+	case 10: NEGC(sh2, Rm, Rn);                 break;
+	case 11: NEG(sh2, Rm, Rn);                  break;
+	case 12: EXTUB(sh2, Rm, Rn);                break;
+	case 13: EXTUW(sh2, Rm, Rn);                break;
+	case 14: EXTSB(sh2, Rm, Rn);                break;
+	case 15: EXTSW(sh2, Rm, Rn);                break;
 	}
 }
 
@@ -2065,22 +2065,22 @@ INLINE void op1000(sh2_state *sh2, UINT16 opcode)
 {
 	switch ( opcode  & (15<<8) )
 	{
-	case  0 << 8: MOVBS4(sh2, opcode & 0x0f, Rm);	break;
-	case  1 << 8: MOVWS4(sh2, opcode & 0x0f, Rm);	break;
-	case  2<< 8: NOP(); 				break;
-	case  3<< 8: NOP(); 				break;
-	case  4<< 8: MOVBL4(sh2, Rm, opcode & 0x0f);	break;
-	case  5<< 8: MOVWL4(sh2, Rm, opcode & 0x0f);	break;
-	case  6<< 8: NOP(); 				break;
-	case  7<< 8: NOP(); 				break;
-	case  8<< 8: CMPIM(sh2, opcode & 0xff);		break;
-	case  9<< 8: BT(sh2, opcode & 0xff);		break;
-	case 10<< 8: NOP(); 				break;
-	case 11<< 8: BF(sh2, opcode & 0xff);		break;
-	case 12<< 8: NOP(); 				break;
-	case 13<< 8: BTS(sh2, opcode & 0xff);		break;
-	case 14<< 8: NOP(); 				break;
-	case 15<< 8: BFS(sh2, opcode & 0xff);		break;
+	case  0 << 8: MOVBS4(sh2, opcode & 0x0f, Rm);   break;
+	case  1 << 8: MOVWS4(sh2, opcode & 0x0f, Rm);   break;
+	case  2<< 8: NOP();                 break;
+	case  3<< 8: NOP();                 break;
+	case  4<< 8: MOVBL4(sh2, Rm, opcode & 0x0f);    break;
+	case  5<< 8: MOVWL4(sh2, Rm, opcode & 0x0f);    break;
+	case  6<< 8: NOP();                 break;
+	case  7<< 8: NOP();                 break;
+	case  8<< 8: CMPIM(sh2, opcode & 0xff);     break;
+	case  9<< 8: BT(sh2, opcode & 0xff);        break;
+	case 10<< 8: NOP();                 break;
+	case 11<< 8: BF(sh2, opcode & 0xff);        break;
+	case 12<< 8: NOP();                 break;
+	case 13<< 8: BTS(sh2, opcode & 0xff);       break;
+	case 14<< 8: NOP();                 break;
+	case 15<< 8: BFS(sh2, opcode & 0xff);       break;
 	}
 }
 
@@ -2104,22 +2104,22 @@ INLINE void op1100(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & (15<<8))
 	{
-	case  0<<8: MOVBSG(sh2, opcode & 0xff);		break;
-	case  1<<8: MOVWSG(sh2, opcode & 0xff);		break;
-	case  2<<8: MOVLSG(sh2, opcode & 0xff);		break;
-	case  3<<8: TRAPA(sh2, opcode & 0xff);		break;
-	case  4<<8: MOVBLG(sh2, opcode & 0xff);		break;
-	case  5<<8: MOVWLG(sh2, opcode & 0xff);		break;
-	case  6<<8: MOVLLG(sh2, opcode & 0xff);		break;
-	case  7<<8: MOVA(sh2, opcode & 0xff);		break;
-	case  8<<8: TSTI(sh2, opcode & 0xff);		break;
-	case  9<<8: ANDI(sh2, opcode & 0xff);		break;
-	case 10<<8: XORI(sh2, opcode & 0xff);		break;
-	case 11<<8: ORI(sh2, opcode & 0xff);			break;
-	case 12<<8: TSTM(sh2, opcode & 0xff);		break;
-	case 13<<8: ANDM(sh2, opcode & 0xff);		break;
-	case 14<<8: XORM(sh2, opcode & 0xff);		break;
-	case 15<<8: ORM(sh2, opcode & 0xff);			break;
+	case  0<<8: MOVBSG(sh2, opcode & 0xff);     break;
+	case  1<<8: MOVWSG(sh2, opcode & 0xff);     break;
+	case  2<<8: MOVLSG(sh2, opcode & 0xff);     break;
+	case  3<<8: TRAPA(sh2, opcode & 0xff);      break;
+	case  4<<8: MOVBLG(sh2, opcode & 0xff);     break;
+	case  5<<8: MOVWLG(sh2, opcode & 0xff);     break;
+	case  6<<8: MOVLLG(sh2, opcode & 0xff);     break;
+	case  7<<8: MOVA(sh2, opcode & 0xff);       break;
+	case  8<<8: TSTI(sh2, opcode & 0xff);       break;
+	case  9<<8: ANDI(sh2, opcode & 0xff);       break;
+	case 10<<8: XORI(sh2, opcode & 0xff);       break;
+	case 11<<8: ORI(sh2, opcode & 0xff);            break;
+	case 12<<8: TSTM(sh2, opcode & 0xff);       break;
+	case 13<<8: ANDM(sh2, opcode & 0xff);       break;
+	case 14<<8: XORM(sh2, opcode & 0xff);       break;
+	case 15<<8: ORM(sh2, opcode & 0xff);            break;
 	}
 }
 
@@ -2296,51 +2296,51 @@ static CPU_SET_INFO( sh2 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLIN:	sh2_set_irq_line(sh2, SH2_INT_VBLIN, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLOUT:	sh2_set_irq_line(sh2, SH2_INT_VBLOUT, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_HBLIN:	sh2_set_irq_line(sh2, SH2_INT_HBLIN, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER0:	sh2_set_irq_line(sh2, SH2_INT_TIMER0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER1:	sh2_set_irq_line(sh2, SH2_INT_TIMER1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DSP:		sh2_set_irq_line(sh2, SH2_INT_DSP, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_SOUND:	sh2_set_irq_line(sh2, SH2_INT_SOUND, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_SMPC:	sh2_set_irq_line(sh2, SH2_INT_SMPC, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_PAD:		sh2_set_irq_line(sh2, SH2_INT_PAD, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA2:	sh2_set_irq_line(sh2, SH2_INT_DMA2, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA1:	sh2_set_irq_line(sh2, SH2_INT_DMA1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA0:	sh2_set_irq_line(sh2, SH2_INT_DMA0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMAILL:	sh2_set_irq_line(sh2, SH2_INT_DMAILL, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_SPRITE:	sh2_set_irq_line(sh2, SH2_INT_SPRITE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_14:		sh2_set_irq_line(sh2, SH2_INT_14, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_15:		sh2_set_irq_line(sh2, SH2_INT_15, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_ABUS:	sh2_set_irq_line(sh2, SH2_INT_ABUS, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	sh2_set_irq_line(sh2, INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLIN:   sh2_set_irq_line(sh2, SH2_INT_VBLIN, info->i);  break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLOUT:  sh2_set_irq_line(sh2, SH2_INT_VBLOUT, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_HBLIN:   sh2_set_irq_line(sh2, SH2_INT_HBLIN, info->i);  break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER0:  sh2_set_irq_line(sh2, SH2_INT_TIMER0, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER1:  sh2_set_irq_line(sh2, SH2_INT_TIMER1, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DSP:     sh2_set_irq_line(sh2, SH2_INT_DSP, info->i);        break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_SOUND:   sh2_set_irq_line(sh2, SH2_INT_SOUND, info->i);  break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_SMPC:    sh2_set_irq_line(sh2, SH2_INT_SMPC, info->i);   break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_PAD:     sh2_set_irq_line(sh2, SH2_INT_PAD, info->i);        break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA2:    sh2_set_irq_line(sh2, SH2_INT_DMA2, info->i);   break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA1:    sh2_set_irq_line(sh2, SH2_INT_DMA1, info->i);   break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA0:    sh2_set_irq_line(sh2, SH2_INT_DMA0, info->i);   break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMAILL:  sh2_set_irq_line(sh2, SH2_INT_DMAILL, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_SPRITE:  sh2_set_irq_line(sh2, SH2_INT_SPRITE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_14:      sh2_set_irq_line(sh2, SH2_INT_14, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_15:      sh2_set_irq_line(sh2, SH2_INT_15, info->i);     break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_ABUS:    sh2_set_irq_line(sh2, SH2_INT_ABUS, info->i);   break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  sh2_set_irq_line(sh2, INPUT_LINE_NMI, info->i); break;
 
 		case CPUINFO_INT_REGISTER + SH2_PC:
-		case CPUINFO_INT_PC:							sh2->pc = info->i; sh2->delay = 0;		break;
-		case CPUINFO_INT_SP:							sh2->r[15] = info->i;   				break;
-		case CPUINFO_INT_REGISTER + SH2_PR: 			sh2->pr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH2_SR:				sh2->sr = info->i; CHECK_PENDING_IRQ("sh2_set_reg"); break;
-		case CPUINFO_INT_REGISTER + SH2_GBR:			sh2->gbr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH2_VBR:			sh2->vbr = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH2_MACH:			sh2->mach = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH2_MACL:			sh2->macl = info->i;						break;
-		case CPUINFO_INT_REGISTER + SH2_R0:				sh2->r[ 0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R1:				sh2->r[ 1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R2:				sh2->r[ 2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R3:				sh2->r[ 3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R4:				sh2->r[ 4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R5:				sh2->r[ 5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R6:				sh2->r[ 6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R7:				sh2->r[ 7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R8:				sh2->r[ 8] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R9:				sh2->r[ 9] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R10:			sh2->r[10] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R11:			sh2->r[11] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R12:			sh2->r[12] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R13:			sh2->r[13] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R14:			sh2->r[14] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_R15:			sh2->r[15] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SH2_EA:				sh2->ea = info->i;						break;
+		case CPUINFO_INT_PC:                            sh2->pc = info->i; sh2->delay = 0;      break;
+		case CPUINFO_INT_SP:                            sh2->r[15] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_PR:             sh2->pr = info->i;                      break;
+		case CPUINFO_INT_REGISTER + SH2_SR:             sh2->sr = info->i; CHECK_PENDING_IRQ("sh2_set_reg"); break;
+		case CPUINFO_INT_REGISTER + SH2_GBR:            sh2->gbr = info->i;                     break;
+		case CPUINFO_INT_REGISTER + SH2_VBR:            sh2->vbr = info->i;                     break;
+		case CPUINFO_INT_REGISTER + SH2_MACH:           sh2->mach = info->i;                        break;
+		case CPUINFO_INT_REGISTER + SH2_MACL:           sh2->macl = info->i;                        break;
+		case CPUINFO_INT_REGISTER + SH2_R0:             sh2->r[ 0] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R1:             sh2->r[ 1] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R2:             sh2->r[ 2] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R3:             sh2->r[ 3] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R4:             sh2->r[ 4] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R5:             sh2->r[ 5] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R6:             sh2->r[ 6] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R7:             sh2->r[ 7] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R8:             sh2->r[ 8] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R9:             sh2->r[ 9] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R10:            sh2->r[10] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R11:            sh2->r[11] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R12:            sh2->r[12] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R13:            sh2->r[13] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R14:            sh2->r[14] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_R15:            sh2->r[15] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + SH2_EA:             sh2->ea = info->i;                      break;
 	}
 }
 
@@ -2356,90 +2356,90 @@ CPU_GET_INFO( sh2 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sh2_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 16;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(sh2_state);            break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 16;                           break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                   break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLIN:	info->i = sh2->irq_line_state[SH2_INT_VBLIN]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLOUT:	info->i = sh2->irq_line_state[SH2_INT_VBLOUT]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_HBLIN:	info->i = sh2->irq_line_state[SH2_INT_HBLIN]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER0:	info->i = sh2->irq_line_state[SH2_INT_TIMER0]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER1:	info->i = sh2->irq_line_state[SH2_INT_TIMER1]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DSP:		info->i = sh2->irq_line_state[SH2_INT_DSP]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_SOUND:	info->i = sh2->irq_line_state[SH2_INT_SOUND]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_SMPC:	info->i = sh2->irq_line_state[SH2_INT_SMPC];	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_PAD:		info->i = sh2->irq_line_state[SH2_INT_PAD]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA2:	info->i = sh2->irq_line_state[SH2_INT_DMA2];	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA1:	info->i = sh2->irq_line_state[SH2_INT_DMA1];	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA0:	info->i = sh2->irq_line_state[SH2_INT_DMA0];	break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMAILL:	info->i = sh2->irq_line_state[SH2_INT_DMAILL]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_SPRITE:	info->i = sh2->irq_line_state[SH2_INT_SPRITE]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_14:		info->i = sh2->irq_line_state[SH2_INT_14]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_15:		info->i = sh2->irq_line_state[SH2_INT_15]; break;
-		case CPUINFO_INT_INPUT_STATE + SH2_INT_ABUS:	info->i = sh2->irq_line_state[SH2_INT_ABUS];	break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = sh2->nmi_line_state;			break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLIN:   info->i = sh2->irq_line_state[SH2_INT_VBLIN]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLOUT:  info->i = sh2->irq_line_state[SH2_INT_VBLOUT]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_HBLIN:   info->i = sh2->irq_line_state[SH2_INT_HBLIN]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER0:  info->i = sh2->irq_line_state[SH2_INT_TIMER0]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_TIMER1:  info->i = sh2->irq_line_state[SH2_INT_TIMER1]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DSP:     info->i = sh2->irq_line_state[SH2_INT_DSP]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_SOUND:   info->i = sh2->irq_line_state[SH2_INT_SOUND]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_SMPC:    info->i = sh2->irq_line_state[SH2_INT_SMPC];    break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_PAD:     info->i = sh2->irq_line_state[SH2_INT_PAD]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA2:    info->i = sh2->irq_line_state[SH2_INT_DMA2];    break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA1:    info->i = sh2->irq_line_state[SH2_INT_DMA1];    break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMA0:    info->i = sh2->irq_line_state[SH2_INT_DMA0];    break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_DMAILL:  info->i = sh2->irq_line_state[SH2_INT_DMAILL]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_SPRITE:  info->i = sh2->irq_line_state[SH2_INT_SPRITE]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_14:      info->i = sh2->irq_line_state[SH2_INT_14]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_15:      info->i = sh2->irq_line_state[SH2_INT_15]; break;
+		case CPUINFO_INT_INPUT_STATE + SH2_INT_ABUS:    info->i = sh2->irq_line_state[SH2_INT_ABUS];    break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = sh2->nmi_line_state;          break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = sh2->ppc;						break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = sh2->ppc;                     break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SH2_PC:				info->i = (sh2->delay) ? (sh2->delay & AM) : (sh2->pc & AM); break;
-		case CPUINFO_INT_SP:							info->i = sh2->r[15];					break;
-		case CPUINFO_INT_REGISTER + SH2_PR:				info->i = sh2->pr;						break;
-		case CPUINFO_INT_REGISTER + SH2_SR:				info->i = sh2->sr;						break;
-		case CPUINFO_INT_REGISTER + SH2_GBR:			info->i = sh2->gbr;						break;
-		case CPUINFO_INT_REGISTER + SH2_VBR:			info->i = sh2->vbr;						break;
-		case CPUINFO_INT_REGISTER + SH2_MACH:			info->i = sh2->mach;						break;
-		case CPUINFO_INT_REGISTER + SH2_MACL:			info->i = sh2->macl;						break;
-		case CPUINFO_INT_REGISTER + SH2_R0:				info->i = sh2->r[ 0];					break;
-		case CPUINFO_INT_REGISTER + SH2_R1:				info->i = sh2->r[ 1];					break;
-		case CPUINFO_INT_REGISTER + SH2_R2:				info->i = sh2->r[ 2];					break;
-		case CPUINFO_INT_REGISTER + SH2_R3:				info->i = sh2->r[ 3];					break;
-		case CPUINFO_INT_REGISTER + SH2_R4:				info->i = sh2->r[ 4];					break;
-		case CPUINFO_INT_REGISTER + SH2_R5:				info->i = sh2->r[ 5];					break;
-		case CPUINFO_INT_REGISTER + SH2_R6:				info->i = sh2->r[ 6];					break;
-		case CPUINFO_INT_REGISTER + SH2_R7:				info->i = sh2->r[ 7];					break;
-		case CPUINFO_INT_REGISTER + SH2_R8:				info->i = sh2->r[ 8];					break;
-		case CPUINFO_INT_REGISTER + SH2_R9:				info->i = sh2->r[ 9];					break;
-		case CPUINFO_INT_REGISTER + SH2_R10:			info->i = sh2->r[10];					break;
-		case CPUINFO_INT_REGISTER + SH2_R11:			info->i = sh2->r[11];					break;
-		case CPUINFO_INT_REGISTER + SH2_R12:			info->i = sh2->r[12];					break;
-		case CPUINFO_INT_REGISTER + SH2_R13:			info->i = sh2->r[13];					break;
-		case CPUINFO_INT_REGISTER + SH2_R14:			info->i = sh2->r[14];					break;
-		case CPUINFO_INT_REGISTER + SH2_R15:			info->i = sh2->r[15];					break;
-		case CPUINFO_INT_REGISTER + SH2_EA:				info->i = sh2->ea;						break;
+		case CPUINFO_INT_REGISTER + SH2_PC:             info->i = (sh2->delay) ? (sh2->delay & AM) : (sh2->pc & AM); break;
+		case CPUINFO_INT_SP:                            info->i = sh2->r[15];                   break;
+		case CPUINFO_INT_REGISTER + SH2_PR:             info->i = sh2->pr;                      break;
+		case CPUINFO_INT_REGISTER + SH2_SR:             info->i = sh2->sr;                      break;
+		case CPUINFO_INT_REGISTER + SH2_GBR:            info->i = sh2->gbr;                     break;
+		case CPUINFO_INT_REGISTER + SH2_VBR:            info->i = sh2->vbr;                     break;
+		case CPUINFO_INT_REGISTER + SH2_MACH:           info->i = sh2->mach;                        break;
+		case CPUINFO_INT_REGISTER + SH2_MACL:           info->i = sh2->macl;                        break;
+		case CPUINFO_INT_REGISTER + SH2_R0:             info->i = sh2->r[ 0];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R1:             info->i = sh2->r[ 1];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R2:             info->i = sh2->r[ 2];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R3:             info->i = sh2->r[ 3];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R4:             info->i = sh2->r[ 4];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R5:             info->i = sh2->r[ 5];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R6:             info->i = sh2->r[ 6];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R7:             info->i = sh2->r[ 7];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R8:             info->i = sh2->r[ 8];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R9:             info->i = sh2->r[ 9];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R10:            info->i = sh2->r[10];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R11:            info->i = sh2->r[11];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R12:            info->i = sh2->r[12];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R13:            info->i = sh2->r[13];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R14:            info->i = sh2->r[14];                   break;
+		case CPUINFO_INT_REGISTER + SH2_R15:            info->i = sh2->r[15];                   break;
+		case CPUINFO_INT_REGISTER + SH2_EA:             info->i = sh2->ea;                      break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh2);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(sh2);					break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(sh2);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh2);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh2);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh2->icount;				break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(sh2);         break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(sh2);                    break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(sh2);              break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(sh2);          break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(sh2);          break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &sh2->icount;                break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "SH-2");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7600");		break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.01");				break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-2");                break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Hitachi SH7600");      break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.01");                break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%d%c%c",
@@ -2450,30 +2450,30 @@ CPU_GET_INFO( sh2 )
 					sh2->sr & T ? 'T':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + SH2_PC:				sprintf(info->s, "PC  :%08X", sh2->pc); break;
-		case CPUINFO_STR_REGISTER + SH2_SR:				sprintf(info->s, "SR  :%08X", sh2->sr); break;
-		case CPUINFO_STR_REGISTER + SH2_PR:				sprintf(info->s, "PR  :%08X", sh2->pr); break;
-		case CPUINFO_STR_REGISTER + SH2_GBR:			sprintf(info->s, "GBR :%08X", sh2->gbr); break;
-		case CPUINFO_STR_REGISTER + SH2_VBR:			sprintf(info->s, "VBR :%08X", sh2->vbr); break;
-		case CPUINFO_STR_REGISTER + SH2_MACH:			sprintf(info->s, "MACH:%08X", sh2->mach); break;
-		case CPUINFO_STR_REGISTER + SH2_MACL:			sprintf(info->s, "MACL:%08X", sh2->macl); break;
-		case CPUINFO_STR_REGISTER + SH2_R0:				sprintf(info->s, "R0  :%08X", sh2->r[ 0]); break;
-		case CPUINFO_STR_REGISTER + SH2_R1:				sprintf(info->s, "R1  :%08X", sh2->r[ 1]); break;
-		case CPUINFO_STR_REGISTER + SH2_R2:				sprintf(info->s, "R2  :%08X", sh2->r[ 2]); break;
-		case CPUINFO_STR_REGISTER + SH2_R3:				sprintf(info->s, "R3  :%08X", sh2->r[ 3]); break;
-		case CPUINFO_STR_REGISTER + SH2_R4:				sprintf(info->s, "R4  :%08X", sh2->r[ 4]); break;
-		case CPUINFO_STR_REGISTER + SH2_R5:				sprintf(info->s, "R5  :%08X", sh2->r[ 5]); break;
-		case CPUINFO_STR_REGISTER + SH2_R6:				sprintf(info->s, "R6  :%08X", sh2->r[ 6]); break;
-		case CPUINFO_STR_REGISTER + SH2_R7:				sprintf(info->s, "R7  :%08X", sh2->r[ 7]); break;
-		case CPUINFO_STR_REGISTER + SH2_R8:				sprintf(info->s, "R8  :%08X", sh2->r[ 8]); break;
-		case CPUINFO_STR_REGISTER + SH2_R9:				sprintf(info->s, "R9  :%08X", sh2->r[ 9]); break;
-		case CPUINFO_STR_REGISTER + SH2_R10:			sprintf(info->s, "R10 :%08X", sh2->r[10]); break;
-		case CPUINFO_STR_REGISTER + SH2_R11:			sprintf(info->s, "R11 :%08X", sh2->r[11]); break;
-		case CPUINFO_STR_REGISTER + SH2_R12:			sprintf(info->s, "R12 :%08X", sh2->r[12]); break;
-		case CPUINFO_STR_REGISTER + SH2_R13:			sprintf(info->s, "R13 :%08X", sh2->r[13]); break;
-		case CPUINFO_STR_REGISTER + SH2_R14:			sprintf(info->s, "R14 :%08X", sh2->r[14]); break;
-		case CPUINFO_STR_REGISTER + SH2_R15:			sprintf(info->s, "R15 :%08X", sh2->r[15]); break;
-		case CPUINFO_STR_REGISTER + SH2_EA:				sprintf(info->s, "EA  :%08X", sh2->ea);    break;
+		case CPUINFO_STR_REGISTER + SH2_PC:             sprintf(info->s, "PC  :%08X", sh2->pc); break;
+		case CPUINFO_STR_REGISTER + SH2_SR:             sprintf(info->s, "SR  :%08X", sh2->sr); break;
+		case CPUINFO_STR_REGISTER + SH2_PR:             sprintf(info->s, "PR  :%08X", sh2->pr); break;
+		case CPUINFO_STR_REGISTER + SH2_GBR:            sprintf(info->s, "GBR :%08X", sh2->gbr); break;
+		case CPUINFO_STR_REGISTER + SH2_VBR:            sprintf(info->s, "VBR :%08X", sh2->vbr); break;
+		case CPUINFO_STR_REGISTER + SH2_MACH:           sprintf(info->s, "MACH:%08X", sh2->mach); break;
+		case CPUINFO_STR_REGISTER + SH2_MACL:           sprintf(info->s, "MACL:%08X", sh2->macl); break;
+		case CPUINFO_STR_REGISTER + SH2_R0:             sprintf(info->s, "R0  :%08X", sh2->r[ 0]); break;
+		case CPUINFO_STR_REGISTER + SH2_R1:             sprintf(info->s, "R1  :%08X", sh2->r[ 1]); break;
+		case CPUINFO_STR_REGISTER + SH2_R2:             sprintf(info->s, "R2  :%08X", sh2->r[ 2]); break;
+		case CPUINFO_STR_REGISTER + SH2_R3:             sprintf(info->s, "R3  :%08X", sh2->r[ 3]); break;
+		case CPUINFO_STR_REGISTER + SH2_R4:             sprintf(info->s, "R4  :%08X", sh2->r[ 4]); break;
+		case CPUINFO_STR_REGISTER + SH2_R5:             sprintf(info->s, "R5  :%08X", sh2->r[ 5]); break;
+		case CPUINFO_STR_REGISTER + SH2_R6:             sprintf(info->s, "R6  :%08X", sh2->r[ 6]); break;
+		case CPUINFO_STR_REGISTER + SH2_R7:             sprintf(info->s, "R7  :%08X", sh2->r[ 7]); break;
+		case CPUINFO_STR_REGISTER + SH2_R8:             sprintf(info->s, "R8  :%08X", sh2->r[ 8]); break;
+		case CPUINFO_STR_REGISTER + SH2_R9:             sprintf(info->s, "R9  :%08X", sh2->r[ 9]); break;
+		case CPUINFO_STR_REGISTER + SH2_R10:            sprintf(info->s, "R10 :%08X", sh2->r[10]); break;
+		case CPUINFO_STR_REGISTER + SH2_R11:            sprintf(info->s, "R11 :%08X", sh2->r[11]); break;
+		case CPUINFO_STR_REGISTER + SH2_R12:            sprintf(info->s, "R12 :%08X", sh2->r[12]); break;
+		case CPUINFO_STR_REGISTER + SH2_R13:            sprintf(info->s, "R13 :%08X", sh2->r[13]); break;
+		case CPUINFO_STR_REGISTER + SH2_R14:            sprintf(info->s, "R14 :%08X", sh2->r[14]); break;
+		case CPUINFO_STR_REGISTER + SH2_R15:            sprintf(info->s, "R15 :%08X", sh2->r[15]); break;
+		case CPUINFO_STR_REGISTER + SH2_EA:             sprintf(info->s, "EA  :%08X", sh2->ea);    break;
 
 	}
 }
@@ -2483,12 +2483,12 @@ CPU_GET_INFO( sh1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh1);				break;
+		case CPUINFO_FCT_RESET:                     info->reset = CPU_RESET_NAME(sh1);              break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "SH-1");                break;
 
-		default:							CPU_GET_INFO_CALL(sh2);			break;
+		default:                            CPU_GET_INFO_CALL(sh2);         break;
 	}
 }
 

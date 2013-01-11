@@ -74,4 +74,4 @@ float mb87078_gain_decibel_r(device_t *device, int channel);
 int   mb87078_gain_percent_r(device_t *device, int channel);
 
 
-#endif	/* __MB87078_H__ */
+#endif  /* __MB87078_H__ */

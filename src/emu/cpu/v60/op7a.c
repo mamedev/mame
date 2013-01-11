@@ -12,19 +12,19 @@
  *   they do the opposite (set if not found, reset if found)
  */
 
-#define F7AEND(cs)	\
+#define F7AEND(cs)  \
 	return (cs)->amlength1 + (cs)->amlength2 + 4;
 
-#define F7BEND(cs)	\
+#define F7BEND(cs)  \
 	return (cs)->amlength1 + (cs)->amlength2 + 3;
 
-#define F7CEND(cs)	\
+#define F7CEND(cs)  \
 	return (cs)->amlength1 + (cs)->amlength2 + 3;
 
-#define F7BCREATEBITMASK(x)	\
+#define F7BCREATEBITMASK(x) \
 	x = ((1 << (x)) - 1)
 
-#define F7CCREATEBITMASK(x)	\
+#define F7CCREATEBITMASK(x) \
 	x = ((1 << (x)) - 1)
 
 static void F7aDecodeOperands(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1, UINT32 (*DecodeOp2)(v60_state *), UINT8 dim2)
@@ -193,11 +193,11 @@ static UINT32 opCMPSTRB(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 
 		if (c1 > c2)
 		{
-			cpustate->_S = 1;	break;
+			cpustate->_S = 1;   break;
 		}
 		else if (c2 > c1)
 		{
-			cpustate->_S = 0;	break;
+			cpustate->_S = 0;   break;
 		}
 
 		if (bStop)
@@ -259,11 +259,11 @@ static UINT32 opCMPSTRH(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 
 		if (c1 > c2)
 		{
-			cpustate->_S = 1;	break;
+			cpustate->_S = 1;   break;
 		}
 		else if (c2 > c1)
 		{
-			cpustate->_S = 0;	break;
+			cpustate->_S = 0;   break;
 		}
 
 		if (bStop)
@@ -1035,7 +1035,7 @@ static UINT32 (*const Op5BTable[32])(v60_state *) =
 	opSCH0BSU,
 	op5BUNHANDLED,
 	opSCH1BSU,
-    	op5BUNHANDLED,
+		op5BUNHANDLED,
 	op5BUNHANDLED,
 	op5BUNHANDLED,
 	op5BUNHANDLED,

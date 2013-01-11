@@ -27,8 +27,8 @@ const device_type ACIA6551 = &device_creator<acia6551_device>;
 //-------------------------------------------------
 
 acia6551_device::acia6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ACIA6551, "MOS Technology 6551 ACIA", tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+	: device_t(mconfig, ACIA6551, "MOS Technology 6551 ACIA", tag, owner, clock),
+		device_serial_interface(mconfig, *this)
 {
 }
 
@@ -135,7 +135,7 @@ void acia6551_device::refresh_ints()
 	}
 
 	//if (m_irq_callback != NULL)
-        //(*m_irq_callback)(interrupt_state);
+		//(*m_irq_callback)(interrupt_state);
 }
 
 
@@ -188,25 +188,25 @@ READ8_MEMBER(acia6551_device::read)
 		break;
 
 	/*
-    Status                    cleared by
-    b0  Parity error * (1: error)       self clearing **
-    b1  Framing error * (1: error)      self clearing **
-    b2  Overrun * (1: error)            self clearing **
-    b3  Receive Data Register Full (1: full)  Read Receive Data Register
-    b4  Transmit Data Reg Empty (1: empty) Write Transmit Data Register
-    b5  DCD (0: DCD low, 1: DCD high) Not resettable, reflects DCD state
-    b6  DSR (0: DSR low, 1: DCD high) Not resettable, reflects DSR state
-    b7  IRQ (0: no int., 1: interrupt)  Read Status Register
-    */
+	Status                    cleared by
+	b0  Parity error * (1: error)       self clearing **
+	b1  Framing error * (1: error)      self clearing **
+	b2  Overrun * (1: error)            self clearing **
+	b3  Receive Data Register Full (1: full)  Read Receive Data Register
+	b4  Transmit Data Reg Empty (1: empty) Write Transmit Data Register
+	b5  DCD (0: DCD low, 1: DCD high) Not resettable, reflects DCD state
+	b6  DSR (0: DSR low, 1: DCD high) Not resettable, reflects DSR state
+	b7  IRQ (0: no int., 1: interrupt)  Read Status Register
+	*/
 		case 1:
-        {
-            data = m_status_register;
+		{
+			data = m_status_register;
 			/* clear interrupt */
 			m_status_register &= ~(1<<7);
 		}
-        break;
+		break;
 
-        case 2:
+		case 2:
 			data = m_command_register;
 			break;
 
@@ -276,32 +276,32 @@ WRITE8_MEMBER(acia6551_device::write)
 
 
 		/*
-        Command Register:
+		Command Register:
 
-        b0  Data Terminal Ready
-            0 : disable receiver and all interrupts (DTR high)
-            1 : enable receiver and all interrupts (DTR low)
-        b1  Receiver Interrupt Enable
-            0 : IRQ interrupt enabled from bit 3 of status register
-            1 : IRQ interrupt disabled
-        b3,b2   Transmitter Control
-                Transmit Interrupt    RTS level    Transmitter
-            00     disabled     high        off
-            01     enabled      low     on
-            10     disabled     low     on
-            11     disabled     low    Transmit BRK
-        b4  Normal/Echo Mode for Receiver
-            0 : normal
-            1 : echo (bits 2 and 3 must be 0)
-        b5  Parity Enable
-            0 : parity disabled, no parity bit generated or received
-            1 : parity enabled
-        b7,b6   Parity
-            00 : odd parity receiver and transmitter
-            01 : even parity receiver and transmitter
-            10 : mark parity bit transmitted, parity check disabled
-            11 : space parity bit transmitted, parity check disabled
-        */
+		b0  Data Terminal Ready
+		    0 : disable receiver and all interrupts (DTR high)
+		    1 : enable receiver and all interrupts (DTR low)
+		b1  Receiver Interrupt Enable
+		    0 : IRQ interrupt enabled from bit 3 of status register
+		    1 : IRQ interrupt disabled
+		b3,b2   Transmitter Control
+		        Transmit Interrupt    RTS level    Transmitter
+		    00     disabled     high        off
+		    01     enabled      low     on
+		    10     disabled     low     on
+		    11     disabled     low    Transmit BRK
+		b4  Normal/Echo Mode for Receiver
+		    0 : normal
+		    1 : echo (bits 2 and 3 must be 0)
+		b5  Parity Enable
+		    0 : parity disabled, no parity bit generated or received
+		    1 : parity enabled
+		b7,b6   Parity
+		    00 : odd parity receiver and transmitter
+		    01 : even parity receiver and transmitter
+		    10 : mark parity bit transmitted, parity check disabled
+		    11 : space parity bit transmitted, parity check disabled
+		*/
 
 		case 2:
 		{
@@ -338,50 +338,50 @@ WRITE8_MEMBER(acia6551_device::write)
 		break;
 
 		/*
-        Control register:
+		Control register:
 
-        b3-b0   baud rate generator:
-            0000 : 16x external clock
-            0001 : 50 baud
-            0010 : 75 25
-            0011 : 110 35
-            0100 : 134.5
-            0101 : 150
-            0110 : 300 150
-            0111 : 600 300
-            1000 : 1200 600
-            1001 : 1800 600
-            1010 : 2400 600
-            1011 : 3600 1200
-            1100 : 4800 1200
-            1101 : 7200 2400
-            1110 : 9600 2400
-            1111 : 19,200 9600
-        b4  receiver clock source
-            0 : external receiver clock
-            1 : baud rate generator
-        b6,b5   word length
-            00 : 8 bits
-            01 : 7
-            10 : 6
-            11 : 5
-        b7  stop bits
-            0 : 1 stop bit
-            1 : 2 stop bits
-                (1 stop bit if parity and word length = 8)
-                (1 1/2 stop bits if word length = 5 and no parity)
-        */
+		b3-b0   baud rate generator:
+		    0000 : 16x external clock
+		    0001 : 50 baud
+		    0010 : 75 25
+		    0011 : 110 35
+		    0100 : 134.5
+		    0101 : 150
+		    0110 : 300 150
+		    0111 : 600 300
+		    1000 : 1200 600
+		    1001 : 1800 600
+		    1010 : 2400 600
+		    1011 : 3600 1200
+		    1100 : 4800 1200
+		    1101 : 7200 2400
+		    1110 : 9600 2400
+		    1111 : 19,200 9600
+		b4  receiver clock source
+		    0 : external receiver clock
+		    1 : baud rate generator
+		b6,b5   word length
+		    00 : 8 bits
+		    01 : 7
+		    10 : 6
+		    11 : 5
+		b7  stop bits
+		    0 : 1 stop bit
+		    1 : 2 stop bits
+		        (1 stop bit if parity and word length = 8)
+		        (1 1/2 stop bits if word length = 5 and no parity)
+		*/
 		case 3:
 		{
 			unsigned char previous_control_register;
 
-            previous_control_register = m_control_register;
+			previous_control_register = m_control_register;
 
-            if (((previous_control_register^data) & 0x07)!=0)
+			if (((previous_control_register^data) & 0x07)!=0)
 			{
 				int rate;
 
-                rate = data & 0x07;
+				rate = data & 0x07;
 
 				/* baud rate changed? */
 				m_timer->reset();

@@ -33,12 +33,12 @@
 // ======================> abc890_device
 
 class abc890_device :  public device_t,
-					   public device_abcbus_card_interface
+						public device_abcbus_card_interface
 {
 public:
-    // construction/destruction
-    abc890_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-    abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	abc890_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -50,9 +50,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( resin_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_config_complete() { m_shortname = "abc890"; }
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "abc890"; }
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
@@ -76,30 +76,30 @@ protected:
 class abc894_device :  public abc890_device
 {
 public:
-    // construction/destruction
-    abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 };
 
 
 class abc850_device :  public abc890_device
 {
 public:
-    // construction/destruction
-    abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 };
 
 

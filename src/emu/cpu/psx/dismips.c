@@ -14,16 +14,16 @@ extern unsigned dasmmips3(char *,unsigned, UINT32);
 static struct
 {
 	UINT8 id[ 8 ];
-	UINT32 text;	/* SCE only */
-	UINT32 data;	/* SCE only */
+	UINT32 text;    /* SCE only */
+	UINT32 data;    /* SCE only */
 	UINT32 pc0;
-	UINT32 gp0;		/* SCE only */
+	UINT32 gp0;     /* SCE only */
 	UINT32 t_addr;
 	UINT32 t_size;
-	UINT32 d_addr;	/* SCE only */
-	UINT32 d_size;	/* SCE only */
-	UINT32 b_addr;	/* SCE only */
-	UINT32 b_size;	/* SCE only */
+	UINT32 d_addr;  /* SCE only */
+	UINT32 d_size;  /* SCE only */
+	UINT32 b_addr;  /* SCE only */
+	UINT32 b_size;  /* SCE only */
 	UINT32 s_addr;
 	UINT32 s_size;
 	UINT32 SavedSP;

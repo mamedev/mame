@@ -12,7 +12,7 @@
 #include "includes/taitosj.h"
 
 
-#define VERBOSE	1
+#define VERBOSE 1
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
@@ -281,7 +281,7 @@ WRITE8_MEMBER(taitosj_state::alpine_protection_w)
 	case 0x07:
 	case 0x0c:
 	case 0x0f:
-		m_protection_value = 0x00;		/* not used as far as I can tell */
+		m_protection_value = 0x00;      /* not used as far as I can tell */
 		break;
 	case 0x16:
 		m_protection_value = 0x08;
@@ -290,14 +290,14 @@ WRITE8_MEMBER(taitosj_state::alpine_protection_w)
 		m_protection_value = 0x18;
 		break;
 	default:
-		m_protection_value = data;		/* not used as far as I can tell */
+		m_protection_value = data;      /* not used as far as I can tell */
 		break;
 	}
 }
 
 WRITE8_MEMBER(taitosj_state::alpinea_bankswitch_w)
 {
-    taitosj_bankswitch_w(space, offset, data);
+	taitosj_bankswitch_w(space, offset, data);
 	m_protection_value = data >> 2;
 }
 

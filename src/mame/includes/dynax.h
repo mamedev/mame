@@ -11,9 +11,9 @@ class dynax_state : public driver_device
 public:
 	dynax_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_dsw_sel16(*this, "dsw_sel16"),
-		  m_protection1(*this, "protection1"),
-		  m_protection2(*this, "protection2")
+			m_dsw_sel16(*this, "dsw_sel16"),
+			m_protection1(*this, "protection1"),
+			m_protection2(*this, "protection2")
 		{ }
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
@@ -21,7 +21,7 @@ public:
 	UINT8 *  m_ddenlovr_pixmap[8];
 
 	/* irq */
-	void (*m_update_irq_func)(running_machine &machine);	// some games trigger IRQ at blitter end, some don't
+	void (*m_update_irq_func)(running_machine &machine);    // some games trigger IRQ at blitter end, some don't
 	UINT8 m_sound_irq;
 	UINT8 m_vblank_irq;
 	UINT8 m_blitter_irq;
@@ -98,8 +98,8 @@ public:
 	int m_ddenlovr_transparency_pen[8];
 	int m_ddenlovr_transparency_mask[8];
 	int m_ddenlovr_blit_latch;
-	int m_ddenlovr_blit_pen_mask;	// not implemented
-	int m_ddenlovr_blit_rom_bits;			// usually 8, 16 in hanakanz
+	int m_ddenlovr_blit_pen_mask;   // not implemented
+	int m_ddenlovr_blit_rom_bits;           // usually 8, 16 in hanakanz
 	const int *m_ddenlovr_blit_commands;
 	int m_ddenlovr_blit_regs[2];
 
@@ -142,7 +142,7 @@ public:
 	UINT16 m_prot_16;
 	UINT16 m_quiz365_protection[2];
 
-	UINT16 m_mmpanic_leds;	/* A led for each of the 9 buttons */
+	UINT16 m_mmpanic_leds;  /* A led for each of the 9 buttons */
 	UINT8 m_funkyfig_lockout;
 	UINT8 m_romdata[2];
 	int m_palette_index;

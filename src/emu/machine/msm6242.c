@@ -21,7 +21,7 @@
 
 enum
 {
-	MSM6242_REG_S1		= 0,
+	MSM6242_REG_S1      = 0,
 	MSM6242_REG_S10,
 	MSM6242_REG_MI1,
 	MSM6242_REG_MI10,
@@ -39,11 +39,11 @@ enum
 	MSM6242_REG_CF
 };
 
-#define TIMER_RTC_CALLBACK		1
+#define TIMER_RTC_CALLBACK      1
 
-#define LOG_UNMAPPED			0
-#define LOG_IRQ					0
-#define LOG_IRQ_ENABLE			0
+#define LOG_UNMAPPED            0
+#define LOG_IRQ                 0
+#define LOG_IRQ_ENABLE          0
 
 
 
@@ -65,7 +65,7 @@ const device_type msm6242 = &device_creator<msm6242_device>;
 
 msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, msm6242, "msm6242", tag, owner, clock),
-	  device_rtc_interface(mconfig, *this)
+		device_rtc_interface(mconfig, *this)
 {
 
 }
@@ -325,7 +325,7 @@ void msm6242_device::update_timer()
 		UINT64 absolute_callback_ticks = curtime + callback_ticks;
 
 		// convert that to an attotime
-		attotime absolute_callback_time = attotime::from_ticks(absolute_callback_ticks, clock());		
+		attotime absolute_callback_time = attotime::from_ticks(absolute_callback_ticks, clock());
 
 		// and finally get the delta as an attotime
 		callback_time = absolute_callback_time - machine().time();
@@ -380,11 +380,11 @@ const char *msm6242_device::irq_type_string(UINT8 irq_type)
 {
 	switch(irq_type)
 	{
-		case IRQ_64THSECOND:	return "1/64th second";
-		case IRQ_SECOND:		return "second";
-		case IRQ_MINUTE:		return "minute";
-		case IRQ_HOUR:			return "hour";
-		default:				return "???";
+		case IRQ_64THSECOND:    return "1/64th second";
+		case IRQ_SECOND:        return "second";
+		case IRQ_MINUTE:        return "minute";
+		case IRQ_HOUR:          return "hour";
+		default:                return "???";
 	}
 }
 
@@ -502,17 +502,17 @@ WRITE8_MEMBER( msm6242_device::write )
 	switch(offset)
 	{
 		case MSM6242_REG_CD:
-            //  x--- 30s ADJ
-            //  -x-- IRQ FLAG
-            //  --x- BUSY
-            //  ---x HOLD
+			//  x--- 30s ADJ
+			//  -x-- IRQ FLAG
+			//  --x- BUSY
+			//  ---x HOLD
 			m_reg[0] = data & 0x0f;
 			break;
 
 		case MSM6242_REG_CE:
-            //  xx-- t0,t1 (timing irq)
-            //  --x- STD
-            //  ---x MASK
+			//  xx-- t0,t1 (timing irq)
+			//  --x- STD
+			//  ---x MASK
 			m_reg[1] = data & 0x0f;
 			if((data & 3) == 0) // MASK & STD = 0
 			{
@@ -534,10 +534,10 @@ WRITE8_MEMBER( msm6242_device::write )
 			break;
 
 		case MSM6242_REG_CF:
-            //  x--- TEST
-            //  -x-- 24/12
-            //  --x- STOP
-            //  ---x RESET
+			//  x--- TEST
+			//  -x-- 24/12
+			//  --x- STOP
+			//  ---x RESET
 
 			// the 12/24 mode bit can only be changed when RESET does a 1 -> 0 transition
 			if (((data & 0x01) == 0x00) && (m_reg[2] & 0x01))

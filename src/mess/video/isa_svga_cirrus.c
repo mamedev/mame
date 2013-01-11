@@ -58,7 +58,7 @@ const rom_entry *isa8_svga_cirrus_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_svga_cirrus_device::isa8_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_SVGA_CIRRUS, "Diamond Multimedia Graphics Card", tag, owner, clock),
+		device_t(mconfig, ISA8_SVGA_CIRRUS, "Diamond Multimedia Graphics Card", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "dm_clgd5430";

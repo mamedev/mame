@@ -18,7 +18,7 @@ void gotya_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 0, 0,
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
@@ -78,8 +78,8 @@ WRITE8_MEMBER(gotya_state::gotya_video_control_w)
 {
 
 	/* bit 0 - scroll bit 8
-       bit 1 - flip screen
-       bit 2 - sound disable ??? */
+	   bit 1 - flip screen
+	   bit 2 - sound disable ??? */
 
 	m_scroll_bit_8 = data & 0x01;
 
@@ -167,8 +167,8 @@ static void draw_status( running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	draw_status_row(machine, bitmap, cliprect, 0,  1);
 	draw_status_row(machine, bitmap, cliprect, 1,  0);
-	draw_status_row(machine, bitmap, cliprect, 2,  2);	/* these two are blank, but I dont' know if the data comes */
-	draw_status_row(machine, bitmap, cliprect, 33, 13);	/* from RAM or 'hardcoded' into the hardware. Likely the latter */
+	draw_status_row(machine, bitmap, cliprect, 2,  2);  /* these two are blank, but I dont' know if the data comes */
+	draw_status_row(machine, bitmap, cliprect, 33, 13); /* from RAM or 'hardcoded' into the hardware. Likely the latter */
 	draw_status_row(machine, bitmap, cliprect, 35, 14);
 	draw_status_row(machine, bitmap, cliprect, 34, 15);
 }

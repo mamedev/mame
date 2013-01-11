@@ -20,7 +20,7 @@
 #define ETH_BUFFER_SIZE 2048
 #define PGM_BUFFER_SIZE 0x2000
 
-#define	ETHERNET_ADDR_SIZE 6                 /* size of ethernet addr */
+#define ETHERNET_ADDR_SIZE 6                 /* size of ethernet addr */
 
 #define RX_FIFO_SIZE 32
 
@@ -152,8 +152,8 @@ struct pcb_struct
 // ======================> threecom3c505_device
 
 class threecom3c505_device:  public device_t,
-					  public device_network_interface,
-					  public threecom3c505_interface
+						public device_network_interface,
+						public threecom3c505_interface
 {
 public:
 	// construction/destruction
@@ -178,7 +178,7 @@ private:
 
 	class data_buffer_fifo;
 
-    /* data buffer */
+	/* data buffer */
 	class data_buffer
 	{
 		friend class data_buffer_fifo;
@@ -205,7 +205,7 @@ private:
 		UINT8 *m_data;
 	};
 
-    /* data_buffer fifo (used to buffer the received data) */
+	/* data_buffer fifo (used to buffer the received data) */
 	class data_buffer_fifo
 	{
 	public:
@@ -245,7 +245,7 @@ private:
 	void write_control_port( UINT8 data);
 	UINT8 read_status_port();
 
-	 // pointer to myself (nasty: used for cpu_context)
+		// pointer to myself (nasty: used for cpu_context)
 	threecom3c505_device *m_device;
 
 	UINT8 m_reg[16];

@@ -22,60 +22,60 @@
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 
-#define I8086_TAG		"ic120"
-#define I8087_TAG		"ic119"
-#define I8048_TAG		"i8048"
-#define I8237A5_TAG		"ic130"
-#define I8259A2_TAG		"ic109"
-#define I8253_TAG		"ic114"
-#define MC146818_TAG	"ic134"
-#define PC_FDC_XT_TAG	"ic112"
-#define INS8250_TAG		"ic106"
-#define AMS40041_TAG	"ic126"
-#define CENTRONICS_TAG	"centronics"
-#define SPEAKER_TAG		"speaker"
-#define ISA_BUS_TAG		"isa"
-#define SCREEN_TAG		"screen"
+#define I8086_TAG       "ic120"
+#define I8087_TAG       "ic119"
+#define I8048_TAG       "i8048"
+#define I8237A5_TAG     "ic130"
+#define I8259A2_TAG     "ic109"
+#define I8253_TAG       "ic114"
+#define MC146818_TAG    "ic134"
+#define PC_FDC_XT_TAG   "ic112"
+#define INS8250_TAG     "ic106"
+#define AMS40041_TAG    "ic126"
+#define CENTRONICS_TAG  "centronics"
+#define SPEAKER_TAG     "speaker"
+#define ISA_BUS_TAG     "isa"
+#define SCREEN_TAG      "screen"
 
 class pc1512_state : public driver_device
 {
 public:
 	pc1512_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8086_TAG),
-		  m_dmac(*this, I8237A5_TAG),
-		  m_pic(*this, I8259A2_TAG),
-		  m_pit(*this, I8253_TAG),
-		  m_rtc(*this, MC146818_TAG),
-		  m_fdc(*this, PC_FDC_XT_TAG),
-		  m_uart(*this, INS8250_TAG),
-		  m_vdu(*this, AMS40041_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_kb(*this, PC1512_KEYBOARD_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
-		  m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
-		  m_bus(*this, ISA_BUS_TAG),
-		  m_video_ram(*this, "video_ram"),
-		  m_pit1(0),
-		  m_pit2(0),
-		  m_status1(0),
-		  m_status2(0),
-		  m_port61(0),
-		  m_nmi_enable(0),
-		  m_kb_bits(0),
-		  m_kbclk(1),
-		  m_kbdata(1),
-		  m_dreq0(0),
-		  m_nden(1),
-		  m_dint(0),
-		  m_ddrq(0),
-		  m_fdc_dsr(0),
-		  m_neop(0),
-		  m_ack_int_enable(1),
-		  m_ack(0),
-		  m_speaker_drive(0)
+			m_maincpu(*this, I8086_TAG),
+			m_dmac(*this, I8237A5_TAG),
+			m_pic(*this, I8259A2_TAG),
+			m_pit(*this, I8253_TAG),
+			m_rtc(*this, MC146818_TAG),
+			m_fdc(*this, PC_FDC_XT_TAG),
+			m_uart(*this, INS8250_TAG),
+			m_vdu(*this, AMS40041_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_kb(*this, PC1512_KEYBOARD_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
+			m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
+			m_bus(*this, ISA_BUS_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_pit1(0),
+			m_pit2(0),
+			m_status1(0),
+			m_status2(0),
+			m_port61(0),
+			m_nmi_enable(0),
+			m_kb_bits(0),
+			m_kbclk(1),
+			m_kbdata(1),
+			m_dreq0(0),
+			m_nden(1),
+			m_dint(0),
+			m_ddrq(0),
+			m_fdc_dsr(0),
+			m_neop(0),
+			m_ack_int_enable(1),
+			m_ack(0),
+			m_speaker_drive(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -218,7 +218,7 @@ class pc1640_state : public pc1512_state
 public:
 	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc1512_state(mconfig, type, tag),
-		  m_opt(0)
+			m_opt(0)
 	{ }
 
 	virtual void machine_start();
@@ -239,15 +239,15 @@ public:
 	// video state
 	int m_opt;
 	UINT8 m_egc_ctrl;
-	UINT8 m_emcr;			// extended mode control register
-	UINT8 m_emcrp;			// extended mode control register protection read counter
-	UINT8 m_sar;			// sequencer address register
-	UINT8 m_sdr[8];			// sequencer data registers
-	UINT8 m_gcar;			// graphics controller address register
-	UINT8 m_gcdr[16];		// graphics controller data registers
-	UINT8 m_crtcar;			// CRT controller address register
-	UINT8 m_crtcdr[32];		// CRT controller data registers
-	UINT8 m_plr;			// Plantronics mode register
+	UINT8 m_emcr;           // extended mode control register
+	UINT8 m_emcrp;          // extended mode control register protection read counter
+	UINT8 m_sar;            // sequencer address register
+	UINT8 m_sdr[8];         // sequencer data registers
+	UINT8 m_gcar;           // graphics controller address register
+	UINT8 m_gcdr[16];       // graphics controller data registers
+	UINT8 m_crtcar;         // CRT controller address register
+	UINT8 m_crtcdr[32];     // CRT controller data registers
+	UINT8 m_plr;            // Plantronics mode register
 
 	bool test_unmapped;     // Temporary for io_r/unmapped_r combination
 };

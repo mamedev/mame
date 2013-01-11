@@ -14,4 +14,3 @@
 CASSETTE_FORMATLIST_EXTERN(trs80l2_cassette_formats);
 
 #endif /* __TRS_CAS_H */
-

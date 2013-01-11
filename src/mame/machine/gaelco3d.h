@@ -15,18 +15,18 @@
 	MCFG_DEVICE_CONFIG(_intrf)
 
 /* external status bits */
-#define GAELCOSER_STATUS_READY			0x01
-#define GAELCOSER_STATUS_RTS			0x02
+#define GAELCOSER_STATUS_READY          0x01
+#define GAELCOSER_STATUS_RTS            0x02
 
 /* only RTS currently understood ! */
 //#define GAELCOSER_STATUS_DTR          0x04
 
-#define GAELCOSER_EXT_STATUS_MASK		0x03
+#define GAELCOSER_EXT_STATUS_MASK       0x03
 
 /* internal bits follow ... */
-#define GAELCOSER_STATUS_IRQ_ENABLE		0x10
-#define GAELCOSER_STATUS_RESET			0x20
-#define GAELCOSER_STATUS_SEND			0x40
+#define GAELCOSER_STATUS_IRQ_ENABLE     0x10
+#define GAELCOSER_STATUS_RESET          0x20
+#define GAELCOSER_STATUS_SEND           0x40
 
 
 

@@ -7,12 +7,12 @@
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */
-#define VIDEOPIN_OCTAVE_DATA	NODE_01
-#define VIDEOPIN_NOTE_DATA		NODE_02
-#define VIDEOPIN_BELL_EN		NODE_03
-#define VIDEOPIN_BONG_EN		NODE_04
-#define VIDEOPIN_ATTRACT_EN		NODE_05
-#define VIDEOPIN_VOL_DATA		NODE_06
+#define VIDEOPIN_OCTAVE_DATA    NODE_01
+#define VIDEOPIN_NOTE_DATA      NODE_02
+#define VIDEOPIN_BELL_EN        NODE_03
+#define VIDEOPIN_BONG_EN        NODE_04
+#define VIDEOPIN_ATTRACT_EN     NODE_05
+#define VIDEOPIN_VOL_DATA       NODE_06
 
 
 class videopin_state : public driver_device

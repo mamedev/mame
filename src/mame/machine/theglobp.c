@@ -80,8 +80,8 @@ static void theglobp_decrypt_rom_8(running_machine &machine)
 		inverted_oldbyte = ~oldbyte;
 
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
-            connected to D0.  The other six data bits are converted by a
-            PAL10H8 driven by the counter. */
+		    connected to D0.  The other six data bits are converted by a
+		    PAL10H8 driven by the counter. */
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;
@@ -115,8 +115,8 @@ static void theglobp_decrypt_rom_9(running_machine &machine)
 		inverted_oldbyte = ~oldbyte;
 
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
-            connected to D0.  The other six data bits are converted by a
-            PAL10H8 driven by the counter. */
+		    connected to D0.  The other six data bits are converted by a
+		    PAL10H8 driven by the counter. */
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;
@@ -149,8 +149,8 @@ static void theglobp_decrypt_rom_A(running_machine &machine)
 		inverted_oldbyte = ~oldbyte;
 
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
-            connected to D0.  The other six data bits are converted by a
-            PAL10H8 driven by the counter. */
+		    connected to D0.  The other six data bits are converted by a
+		    PAL10H8 driven by the counter. */
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;
@@ -183,8 +183,8 @@ static void theglobp_decrypt_rom_B(running_machine &machine)
 		inverted_oldbyte = ~oldbyte;
 
 		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
-            connected to D0.  The other six data bits are converted by a
-            PAL10H8 driven by the counter. */
+		    connected to D0.  The other six data bits are converted by a
+		    PAL10H8 driven by the counter. */
 
 		/* Direct inversion */
 		newbyte  = (inverted_oldbyte & 0x04) >> 1;
@@ -218,10 +218,10 @@ READ8_HANDLER( theglobp_decrypt_rom )
 
 	switch(state->m_counter)
 	{
-		case 0x08:	state->membank ("bank1")->set_entry (0);		break;
-		case 0x09:	state->membank ("bank1")->set_entry (1);		break;
-		case 0x0A:	state->membank ("bank1")->set_entry (2);		break;
-		case 0x0B:	state->membank ("bank1")->set_entry (3);		break;
+		case 0x08:  state->membank ("bank1")->set_entry (0);        break;
+		case 0x09:  state->membank ("bank1")->set_entry (1);        break;
+		case 0x0A:  state->membank ("bank1")->set_entry (2);        break;
+		case 0x0B:  state->membank ("bank1")->set_entry (3);        break;
 		default:
 			logerror("Invalid counter = %02X\n",state->m_counter);
 			break;
@@ -236,8 +236,8 @@ MACHINE_START_MEMBER(pacman_state,theglobp)
 	UINT8 *RAM = memregion("maincpu")->base();
 
 	/* While the PAL supports up to 16 decryption methods, only four
-        are actually used in the PAL.  Therefore, we'll take a little
-        memory overhead and decrypt the ROMs using each method in advance. */
+	    are actually used in the PAL.  Therefore, we'll take a little
+	    memory overhead and decrypt the ROMs using each method in advance. */
 	theglobp_decrypt_rom_8(machine());
 	theglobp_decrypt_rom_9(machine());
 	theglobp_decrypt_rom_A(machine());

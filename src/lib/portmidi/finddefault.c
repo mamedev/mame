@@ -24,34 +24,34 @@ PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
    returns matching device id if found, otherwise id
 */
 {
-    static char *pref_file = (char *)"com.apple.java.util.prefs.plist";
-    char *pref_str = NULL;
-    // read device preferences
-    value_ptr prefs = bplist_read_user_pref(pref_file);
-    if (prefs) {
-        value_ptr pref_val = value_dict_lookup_using_path(prefs, path);
-        if (pref_val) {
-            pref_str = value_get_asciistring(pref_val);
-        }
-    }
-    if (!pref_str) {
-        bplist_free_data(); /* look elsewhere */
-        prefs = bplist_read_system_pref(pref_file);
-        if (prefs) {
-            value_ptr pref_val = value_dict_lookup_using_path(prefs, path);
-            if (pref_val) {
-                pref_str = value_get_asciistring(pref_val);
-            }
-        }
-    }
-    if (pref_str) { /* search devices for match */
-        int i = pm_find_default_device(pref_str, input);
-        if (i != pmNoDevice) {
-            id = i;
+	static char *pref_file = (char *)"com.apple.java.util.prefs.plist";
+	char *pref_str = NULL;
+	// read device preferences
+	value_ptr prefs = bplist_read_user_pref(pref_file);
+	if (prefs) {
+		value_ptr pref_val = value_dict_lookup_using_path(prefs, path);
+		if (pref_val) {
+			pref_str = value_get_asciistring(pref_val);
+		}
 	}
-    }
-    if (prefs) {
-        bplist_free_data();
-    }
-    return id;
+	if (!pref_str) {
+		bplist_free_data(); /* look elsewhere */
+		prefs = bplist_read_system_pref(pref_file);
+		if (prefs) {
+			value_ptr pref_val = value_dict_lookup_using_path(prefs, path);
+			if (pref_val) {
+				pref_str = value_get_asciistring(pref_val);
+			}
+		}
+	}
+	if (pref_str) { /* search devices for match */
+		int i = pm_find_default_device(pref_str, input);
+		if (i != pmNoDevice) {
+			id = i;
+	}
+	}
+	if (prefs) {
+		bplist_free_data();
+	}
+	return id;
 }

@@ -13,7 +13,7 @@ class jpmsys7_state : public driver_device
 public:
 	jpmsys7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -37,7 +37,7 @@ static INPUT_PORTS_START(  jpmsys7 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( jpmsys7, jpmsys7_state )
-	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000)	 // seems to be a Coldfire of some kind
+	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
 	MCFG_CPU_PROGRAM_MAP(jpmsys7_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -208,15 +208,15 @@ ROM_START( j7bullio )
 ROM_END
 
 
-GAME( 200?, j7bmagic		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Black Magic (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7cexprs		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Cash Xpress (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7crztrl		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Crazy Trails (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7fantaz		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Fantaztec (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7kerchn		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Ker - Chinq (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7razzma		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Razzamataz (JPM) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7razzmaa		,j7razzma,	jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Razzamataz (JPM) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7r2roll		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Ready To Roll (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7tubgld		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Turbo Gold (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7wldwkd		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Wild 'N' Wicked (JPM)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7bullio		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "Ace","Bullionaire (Ace)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7clbmag		,0,			jpmsys7, jpmsys7, driver_device, 0, ROT0, "Qps","Club Magic (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7bmagic        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Black Magic (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7cexprs        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Cash Xpress (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7crztrl        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Crazy Trails (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7fantaz        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Fantaztec (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7kerchn        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Ker - Chinq (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7razzma        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Razzamataz (JPM) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7razzmaa       ,j7razzma,  jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Razzamataz (JPM) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7r2roll        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Ready To Roll (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7tubgld        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Turbo Gold (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7wldwkd        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "JPM","Wild 'N' Wicked (JPM)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7bullio        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "Ace","Bullionaire (Ace)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7clbmag        ,0,         jpmsys7, jpmsys7, driver_device, 0, ROT0, "Qps","Club Magic (JPM)", GAME_IS_SKELETON_MECHANICAL )

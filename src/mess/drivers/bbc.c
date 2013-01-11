@@ -101,103 +101,103 @@ READ8_MEMBER(bbc_state::bbc_fe_r)
 }
 
 static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
-	ADDRESS_MAP_UNMAP_HIGH											    						/*  Hardware marked with a # is not present in a Model A        */
+	ADDRESS_MAP_UNMAP_HIGH                                                                      /*  Hardware marked with a # is not present in a Model A        */
 
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)						/*    0000-3fff                 Regular Ram                     */
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memorya1_w)						/*    4000-7fff                 Repeat of the Regular Ram       */
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                     /*    0000-3fff                 Regular Ram                     */
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memorya1_w)                     /*    4000-7fff                 Repeat of the Regular Ram       */
 
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4")	                		    			    /*    8000-bfff                 Paged ROM                       */
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4")                                              /*    8000-bfff                 Paged ROM                       */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                  		    			    /*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                              /*    c000-fbff                 OS ROM                          */
 
-	AM_RANGE(0xfc00, 0xfdff) AM_NOP	                                					        /*    fc00-fdff                 FRED & JIM Pages                */
+	AM_RANGE(0xfc00, 0xfdff) AM_NOP                                                             /*    fc00-fdff                 FRED & JIM Pages                */
 
 																								/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r , bbc_6845_w)								/*    fe00-fe07  6845 CRTA      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r , bbc_6845_w)                              /*    fe00-fe07  6845 CRTA      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
-	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
-	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)											/* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                            /*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe18, 0xfe1f) AM_NOP                                                             /*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
+	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                           /* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
-	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selecta_w)							/* R: fe30-fe3f  NC             Not Connected                   */
+	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selecta_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	AM_RANGE(0xfe60, 0xfe7f) AM_NOP																/*    fe60-fe7f  6522 VIA       # USER VIA                      */
-	AM_RANGE(0xfe80, 0xfe9f) AM_NOP																/*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
-	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     # ECONET controller             */
-	AM_RANGE(0xfec0, 0xfedf) AM_NOP																/*    fec0-fedf  uPD7002        # Analogue to digital converter */
-	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)													/*    fee0-feff  Tube ULA       # Tube system interface         */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)  /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe60, 0xfe7f) AM_NOP                                                             /*    fe60-fe7f  6522 VIA       # USER VIA                      */
+	AM_RANGE(0xfe80, 0xfe9f) AM_NOP                                                             /*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
+	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     # ECONET controller             */
+	AM_RANGE(0xfec0, 0xfedf) AM_NOP                                                             /*    fec0-fedf  uPD7002        # Analogue to digital converter */
+	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       # Tube system interface         */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x13f00)									/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x13f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)						/*    0000-3fff                 Regular Ram                     */
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)						/*    4000-7fff                 Repeat of the Regular Ram       */
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                     /*    0000-3fff                 Regular Ram                     */
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                     /*    4000-7fff                 Repeat of the Regular Ram       */
 
 
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)						/*    8000-bfff                 Paged ROM                       */
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                     /*    8000-bfff                 Paged ROM                       */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")												/*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                              /*    c000-fbff                 OS ROM                          */
 
-	AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read, bbc_opus_write)						/*    fc00-fdff                 OPUS Disc Controller            */
+	AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read, bbc_opus_write)                        /*    fc00-fdff                 OPUS Disc Controller            */
 
 																								/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)								/*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)                               /*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
-	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
-	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)											/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                            /*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe18, 0xfe1f) AM_NOP                                                             /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
+	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                           /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
-	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)							/* R: fe30-fe3f  NC             Not Connected                   */
+	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                         /* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
-	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_disc_r, bbc_disc_w)								/*    fe80-fe9f  8271 FDC       Floppy disc controller          */
-	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002",uPD7002_r,uPD7002_w)						/*    fec0-fedf  uPD7002        Analogue to digital converter   */
-	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)													/*    fee0-feff  Tube ULA       Tube system interface           */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)  /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /*    fe60-fe7f  6522 VIA       USER VIA                        */
+	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_disc_r, bbc_disc_w)                               /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
+	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002",uPD7002_r,uPD7002_w)                      /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)									/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)					/*    0000-2fff                 Regular Ram                     */
-	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)					/*    3000-7fff                 Video/Shadow Ram                */
+	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
+	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 
-	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)					/*    8000-afff                 Paged ROM or 12K of RAM         */
-	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6")												/*    b000-bfff                 Rest of paged ROM area          */
+	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of RAM         */
+	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6")                                              /*    b000-bfff                 Rest of paged ROM area          */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")  											/*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                              /*    c000-fbff                 OS ROM                          */
 
-	AM_RANGE(0xfc00, 0xfdff) AM_NOP																/*    fc00-fdff                 FRED & JIM Pages                */
+	AM_RANGE(0xfc00, 0xfdff) AM_NOP                                                             /*    fc00-fdff                 FRED & JIM Pages                */
 
 																								/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)								/*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)                               /*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
-	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
-	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)											/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                            /*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe18, 0xfe1f) AM_NOP                                                             /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
+	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                           /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
-	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)						/* R: fe30-fe3f  NC             Not Connected                   */
+	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
-	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)					/*    fe80-fe9f  1770 FDC       Floppy disc controller          */
-	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)					/*    fec0-fedf  uPD7002        Analogue to digital converter   */
-	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)													/*    fee0-feff  Tube ULA       Tube system interface           */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)  /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /*    fe60-fe7f  6522 VIA       USER VIA                        */
+	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)                    /*    fe80-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)                    /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)									/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -205,35 +205,35 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)					/*    0000-2fff                 Regular Ram                     */
-	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)					/*    3000-7fff                 Video/Shadow Ram                */
+	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
+	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 
-	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_128_w)				/*    8000-afff                 Paged ROM or 12K of RAM         */
-	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(bbc_memorybp6_128_w)				/*    b000-bfff                 Rest of paged ROM area          */
+	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_128_w)                /*    8000-afff                 Paged ROM or 12K of RAM         */
+	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(bbc_memorybp6_128_w)                /*    b000-bfff                 Rest of paged ROM area          */
 
-	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")												/*    c000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                              /*    c000-fbff                 OS ROM                          */
 
-	AM_RANGE(0xfc00, 0xfdff) AM_NOP																/*    fc00-fdff                 FRED & JIM Pages                */
+	AM_RANGE(0xfc00, 0xfdff) AM_NOP                                                             /*    fc00-fdff                 FRED & JIM Pages                */
 
 																								/*    fe00-feff                 Shiela Address Page             */
-	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)								/*    fe00-fe07  6845 CRTC      Video controller                */
+	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)                               /*    fe00-fe07  6845 CRTC      Video controller                */
 	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
-	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
-	AM_RANGE(0xfe10, 0xfe17) AM_NOP																/*    fe10-fe17  Serial ULA     Serial system chip              */
-	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
-	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)											/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
+	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)                            /*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe10, 0xfe17) AM_NOP                                                             /*    fe10-fe17  Serial ULA     Serial system chip              */
+	AM_RANGE(0xfe18, 0xfe1f) AM_NOP                                                             /*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
+	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)                                           /* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
-	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)						/* R: fe30-fe3f  NC             Not Connected                   */
+	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
-	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)					/*    fe80-fe9f  1770 FDC       Floppy disc controller          */
-	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)					/*    fec0-fedf  uPD7002        Analogue to digital converter   */
-	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)													/*    fee0-feff  Tube ULA       Tube system interface           */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)  /*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  /*    fe60-fe7f  6522 VIA       USER VIA                        */
+	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)                    /*    fe80-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)                    /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)									/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -264,20 +264,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
 
-	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybm1_w)					/*    0000-2fff                 Regular Ram                     */
+	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybm1_w)                    /*    0000-2fff                 Regular Ram                     */
 
-	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybm2_w)					/*    3000-7fff                 Video/Shadow Ram                */
+	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybm2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 
-	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybm4_w)					/*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
-	AM_RANGE(0x9000, 0xbfff) AM_READ_BANK("bank5") AM_WRITE(bbc_memorybm5_w)					/*    9000-bfff                 Rest of paged ROM/RAM area      */
+	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybm4_w)                    /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */
+	AM_RANGE(0x9000, 0xbfff) AM_READ_BANK("bank5") AM_WRITE(bbc_memorybm5_w)                    /*    9000-bfff                 Rest of paged ROM/RAM area      */
 
-	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank7") AM_WRITE(bbc_memorybm7_w)					/*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
-	AM_RANGE(0xe000, 0xfbff) AM_ROM AM_REGION("user1", 0x42000)									/*    e000-fbff                 OS ROM                          */
+	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank7") AM_WRITE(bbc_memorybm7_w)                    /*    c000-dfff                 OS ROM or 8K of RAM       HAZEL */
+	AM_RANGE(0xe000, 0xfbff) AM_ROM AM_REGION("user1", 0x42000)                                 /*    e000-fbff                 OS ROM                          */
 
 	//AM_RANGE(0xfc00, 0xfeff) AM_READWRITE(bbcm_r, bbcm_w)
-	AM_RANGE(0xfc00, 0xfeff) AM_READ_BANK("bank8") AM_WRITE(bbcm_w)								/*    this is now processed directly because it can be ROM or hardware */
+	AM_RANGE(0xfc00, 0xfeff) AM_READ_BANK("bank8") AM_WRITE(bbcm_w)                             /*    this is now processed directly because it can be ROM or hardware */
 
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)									/*    ff00-ffff                 OS Rom (continued)              */
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
@@ -307,121 +307,121 @@ Small note about natural keyboard support: currently,
 /*  Port                                        Key description                 Emulated key                    Natural key         Shift 1         Shift 2 (Ctrl) */
 
 static INPUT_PORTS_START(bbca)
-	PORT_START("COL0")	/* KEYBOARD COLUMN 0 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")              PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT)	PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("Q")                  PORT_CODE(KEYCODE_Q)			PORT_CHAR('Q')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0")					PORT_CODE(KEYCODE_F10)			PORT_CHAR(UCHAR_MAMEKEY(F10))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")                PORT_CODE(KEYCODE_1)			PORT_CHAR('1')		PORT_CHAR('!')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPSLOCK")           PORT_CODE(KEYCODE_CAPSLOCK)		PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFTLOCK")	        PORT_CODE(KEYCODE_LALT)			PORT_CHAR(UCHAR_MAMEKEY(F12))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TAB")                PORT_CODE(KEYCODE_TAB)			PORT_CHAR('\t')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESCAPE")		        PORT_CODE(KEYCODE_ESC)			PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_START("COL0")  /* KEYBOARD COLUMN 0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")              PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")                  PORT_CODE(KEYCODE_Q)            PORT_CHAR('Q')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0")                 PORT_CODE(KEYCODE_F10)          PORT_CHAR(UCHAR_MAMEKEY(F10))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")                PORT_CODE(KEYCODE_1)            PORT_CHAR('1')      PORT_CHAR('!')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPSLOCK")           PORT_CODE(KEYCODE_CAPSLOCK)     PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFTLOCK")          PORT_CODE(KEYCODE_LALT)         PORT_CHAR(UCHAR_MAMEKEY(F12))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TAB")                PORT_CODE(KEYCODE_TAB)          PORT_CHAR('\t')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESCAPE")             PORT_CODE(KEYCODE_ESC)          PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
-	PORT_START("COL1")	/* KEYBOARD COLUMN 1 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")		        PORT_CODE(KEYCODE_LCONTROL)	PORT_CODE(KEYCODE_RCONTROL)	PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #")                PORT_CODE(KEYCODE_3)			PORT_CHAR('3')		PORT_CHAR('#')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")                  PORT_CODE(KEYCODE_W)			PORT_CHAR('W')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \"")               PORT_CODE(KEYCODE_2)			PORT_CHAR('2')		PORT_CHAR('\"')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")                  PORT_CODE(KEYCODE_A)			PORT_CHAR('A')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")                  PORT_CODE(KEYCODE_S)			PORT_CHAR('S')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")                  PORT_CODE(KEYCODE_Z)			PORT_CHAR('Z')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")                 PORT_CODE(KEYCODE_F1)			PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_START("COL1")  /* KEYBOARD COLUMN 1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")               PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #")                PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR('#')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")                  PORT_CODE(KEYCODE_W)            PORT_CHAR('W')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \"")               PORT_CODE(KEYCODE_2)            PORT_CHAR('2')      PORT_CHAR('\"')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")                  PORT_CODE(KEYCODE_A)            PORT_CHAR('A')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")                  PORT_CODE(KEYCODE_S)            PORT_CHAR('S')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")                  PORT_CODE(KEYCODE_Z)            PORT_CHAR('Z')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")                 PORT_CODE(KEYCODE_F1)           PORT_CHAR(UCHAR_MAMEKEY(F1))
 
-	PORT_START("COL2")	/* KEYBOARD COLUMN 2 */
+	PORT_START("COL2")  /* KEYBOARD COLUMN 2 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 8 (Not Used)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")					PORT_CODE(KEYCODE_4)			PORT_CHAR('4')		PORT_CHAR('$')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")					PORT_CODE(KEYCODE_E)			PORT_CHAR('E')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")					PORT_CODE(KEYCODE_D)			PORT_CHAR('D')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")					PORT_CODE(KEYCODE_X)			PORT_CHAR('X')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")					PORT_CODE(KEYCODE_C)			PORT_CHAR('C')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE")				PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")					PORT_CODE(KEYCODE_F2)			PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")                  PORT_CODE(KEYCODE_4)            PORT_CHAR('4')      PORT_CHAR('$')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")                  PORT_CODE(KEYCODE_E)            PORT_CHAR('E')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")                  PORT_CODE(KEYCODE_X)            PORT_CHAR('X')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")                  PORT_CODE(KEYCODE_C)            PORT_CHAR('C')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE")              PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")                 PORT_CODE(KEYCODE_F2)           PORT_CHAR(UCHAR_MAMEKEY(F2))
 
-	PORT_START("COL3")	/* KEYBOARD COLUMN 3 */
+	PORT_START("COL3")  /* KEYBOARD COLUMN 3 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 7 (Not Used)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")					PORT_CODE(KEYCODE_5)			PORT_CHAR('5')		PORT_CHAR('%')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")					PORT_CODE(KEYCODE_T)			PORT_CHAR('T')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")					PORT_CODE(KEYCODE_R)			PORT_CHAR('R')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")					PORT_CODE(KEYCODE_F)			PORT_CHAR('F')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")					PORT_CODE(KEYCODE_G)			PORT_CHAR('G')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")					PORT_CODE(KEYCODE_V)			PORT_CHAR('V')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")					PORT_CODE(KEYCODE_F3)			PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")                  PORT_CODE(KEYCODE_5)            PORT_CHAR('5')      PORT_CHAR('%')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")                  PORT_CODE(KEYCODE_T)            PORT_CHAR('T')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")                  PORT_CODE(KEYCODE_R)            PORT_CHAR('R')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")                  PORT_CODE(KEYCODE_F)            PORT_CHAR('F')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")                  PORT_CODE(KEYCODE_G)            PORT_CHAR('G')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")                  PORT_CODE(KEYCODE_V)            PORT_CHAR('V')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")                 PORT_CODE(KEYCODE_F3)           PORT_CHAR(UCHAR_MAMEKEY(F3))
 
-	PORT_START("COL4")	/* KEYBOARD COLUMN 4 */
+	PORT_START("COL4")  /* KEYBOARD COLUMN 4 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 6 (Disc Speed 1)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")					PORT_CODE(KEYCODE_F4)			PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \\")				PORT_CODE(KEYCODE_7)			PORT_CHAR('7')		PORT_CHAR('\'')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 &")				PORT_CODE(KEYCODE_6)			PORT_CHAR('6')		PORT_CHAR('&')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")					PORT_CODE(KEYCODE_Y)			PORT_CHAR('Y')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")					PORT_CODE(KEYCODE_H)			PORT_CHAR('H')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")					PORT_CODE(KEYCODE_B)			PORT_CHAR('B')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")					PORT_CODE(KEYCODE_F5)			PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")                 PORT_CODE(KEYCODE_F4)           PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \\")               PORT_CODE(KEYCODE_7)            PORT_CHAR('7')      PORT_CHAR('\'')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 &")                PORT_CODE(KEYCODE_6)            PORT_CHAR('6')      PORT_CHAR('&')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")                  PORT_CODE(KEYCODE_Y)            PORT_CHAR('Y')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")                  PORT_CODE(KEYCODE_H)            PORT_CHAR('H')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")                  PORT_CODE(KEYCODE_B)            PORT_CHAR('B')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")                 PORT_CODE(KEYCODE_F5)           PORT_CHAR(UCHAR_MAMEKEY(F5))
 
-	PORT_START("COL5")	/* KEYBOARD COLUMN 5 */
+	PORT_START("COL5")  /* KEYBOARD COLUMN 5 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 5 (Disc Speed 0)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("* (")				PORT_CODE(KEYCODE_8)			PORT_CHAR('8')		PORT_CHAR('(')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")					PORT_CODE(KEYCODE_I)			PORT_CHAR('I')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")					PORT_CODE(KEYCODE_U)			PORT_CHAR('U')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")					PORT_CODE(KEYCODE_J)			PORT_CHAR('J')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")					PORT_CODE(KEYCODE_N)			PORT_CHAR('N')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")					PORT_CODE(KEYCODE_M)			PORT_CHAR('M')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")					PORT_CODE(KEYCODE_F6)			PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("* (")                PORT_CODE(KEYCODE_8)            PORT_CHAR('8')      PORT_CHAR('(')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")                  PORT_CODE(KEYCODE_I)            PORT_CHAR('I')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")                  PORT_CODE(KEYCODE_U)            PORT_CHAR('U')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")                  PORT_CODE(KEYCODE_J)            PORT_CHAR('J')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")                  PORT_CODE(KEYCODE_N)            PORT_CHAR('N')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")                  PORT_CODE(KEYCODE_M)            PORT_CHAR('M')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")                 PORT_CODE(KEYCODE_F6)           PORT_CHAR(UCHAR_MAMEKEY(F6))
 
-	PORT_START("COL6")	/* KEYBOARD COLUMN 6 */
+	PORT_START("COL6")  /* KEYBOARD COLUMN 6 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 4 (Shift Break)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7")					PORT_CODE(KEYCODE_F7)			PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )")				PORT_CODE(KEYCODE_9)			PORT_CHAR('9')		PORT_CHAR(')')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")					PORT_CODE(KEYCODE_O)			PORT_CHAR('O')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("K")					PORT_CODE(KEYCODE_K)			PORT_CHAR('K')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")					PORT_CODE(KEYCODE_L)			PORT_CHAR('L')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")				PORT_CODE(KEYCODE_COMMA)		PORT_CHAR(',')		PORT_CHAR('<')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8")					PORT_CODE(KEYCODE_F8)			PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7")                 PORT_CODE(KEYCODE_F7)           PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )")                PORT_CODE(KEYCODE_9)            PORT_CHAR('9')      PORT_CHAR(')')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")                  PORT_CODE(KEYCODE_O)            PORT_CHAR('O')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")                  PORT_CODE(KEYCODE_K)            PORT_CHAR('K')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")                  PORT_CODE(KEYCODE_L)            PORT_CHAR('L')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")                PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')      PORT_CHAR('<')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8")                 PORT_CODE(KEYCODE_F8)           PORT_CHAR(UCHAR_MAMEKEY(F8))
 
-	PORT_START("COL7")	/* KEYBOARD COLUMN 7 */
+	PORT_START("COL7")  /* KEYBOARD COLUMN 7 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 3 (Mode bit 2)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- =")				PORT_CODE(KEYCODE_MINUS)		PORT_CHAR('-')		PORT_CHAR('=')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")					PORT_CODE(KEYCODE_0)			PORT_CHAR('0')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")					PORT_CODE(KEYCODE_P)			PORT_CHAR('P')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@")					PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('@')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; +")				PORT_CODE(KEYCODE_COLON)		PORT_CHAR(';')		PORT_CHAR('+')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")				PORT_CODE(KEYCODE_STOP)			PORT_CHAR('.')		PORT_CHAR('>')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F9")					PORT_CODE(KEYCODE_F9)			PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- =")                PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')      PORT_CHAR('=')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")                  PORT_CODE(KEYCODE_0)            PORT_CHAR('0')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")                  PORT_CODE(KEYCODE_P)            PORT_CHAR('P')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@")                  PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('@')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; +")                PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';')      PORT_CHAR('+')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")                PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')      PORT_CHAR('>')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F9")                 PORT_CODE(KEYCODE_F9)           PORT_CHAR(UCHAR_MAMEKEY(F9))
 
-	PORT_START("COL8")	/* KEYBOARD COLUMN 8 */
+	PORT_START("COL8")  /* KEYBOARD COLUMN 8 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 2 (Mode bit 1)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ ~")				PORT_CODE(KEYCODE_EQUALS)		PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("_ POUND")			PORT_CODE(KEYCODE_TILDE)		PORT_CHAR('_') PORT_CHAR('\xa3')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {")				PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME(": *")				PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("] }")				PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("/ ?")				PORT_CODE(KEYCODE_SLASH)		PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("\\ |")				PORT_CODE(KEYCODE_BACKSLASH2)	PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ ~")                PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('^') PORT_CHAR('~')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_ POUND")            PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR('\xa3')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(": *")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("] }")                PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ ?")                PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |")               PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('\\') PORT_CHAR('|')
 
-	PORT_START("COL9")	/* KEYBOARD COLUMN 9 */
+	PORT_START("COL9")  /* KEYBOARD COLUMN 9 */
 	PORT_DIPNAME(0x01, 0x01, "DIP 1 (Mode bit 0)")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("LEFT")				PORT_CODE(KEYCODE_LEFT)			PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("DOWN")				PORT_CODE(KEYCODE_DOWN)			PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("UP")					PORT_CODE(KEYCODE_UP)			PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("ENTER")				PORT_CODE(KEYCODE_ENTER)		PORT_CHAR(13)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("DELETE")				PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHAR(8)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("COPY")				PORT_CODE(KEYCODE_END)          PORT_CHAR(UCHAR_MAMEKEY(F11))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)	PORT_NAME("RIGHT")				PORT_CODE(KEYCODE_RIGHT)		PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT")               PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN")               PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UP")                 PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER")              PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DELETE")             PORT_CODE(KEYCODE_BACKSPACE)    PORT_CHAR(8)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("COPY")               PORT_CODE(KEYCODE_END)          PORT_CHAR(UCHAR_MAMEKEY(F11))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT")              PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	/* Keyboard columns 10 -> 15 are reserved for BBC Master */
 	PORT_START("COL10")
@@ -480,9 +480,9 @@ ROM_START(bbca)
 	ROM_REGION(0x14000,"user1",0) /* ROM */
 	ROM_LOAD("os12.rom",    0x10000,  0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
 
-														  /* rom page 0  00000 */
-														  /* rom page 1  04000 */
-														  /* rom page 2  08000 */
+															/* rom page 0  00000 */
+															/* rom page 1  04000 */
+															/* rom page 2  08000 */
 	ROM_LOAD("basic2.rom",  0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281)) /* rom page 3  0c000 */
 ROM_END
 
@@ -510,20 +510,20 @@ ROM_START(bbcb)
 	//ROM_LOAD("speech-1.0.rom",  0x08000, 0x2000, CRC(e63f7fb7) )
 	//ROM_RELOAD(                 0x0a000, 0x2000                )
 	//ROM_LOAD("dfs144.rom",  0x04000, 0x4000, CRC(9fb8d13f) SHA1(387d2468c6e1360f5b531784ce95d5f71a50c2b5)) /* rom page 14 38000 */
-	                                                      /* rom page 0  00000 */
-	                                                      /* rom page 1  04000 */
-	                                                      /* rom page 2  08000 */
-	                                                      /* rom page 3  0c000 */
-	                                                      /* rom page 4  10000 */
-	                                                      /* rom page 5  14000 */
-														  /* rom page 6  18000 */
-	                                                      /* rom page 7  1c000 */
-														  /* rom page 8  20000 */
-														  /* rom page 9  24000 */
-														  /* rom page 10 28000 */
-														  /* rom page 11 2c000 */
-														  /* rom page 12 30000 */
-														  /* rom page 13 34000 */
+															/* rom page 0  00000 */
+															/* rom page 1  04000 */
+															/* rom page 2  08000 */
+															/* rom page 3  0c000 */
+															/* rom page 4  10000 */
+															/* rom page 5  14000 */
+															/* rom page 6  18000 */
+															/* rom page 7  1c000 */
+															/* rom page 8  20000 */
+															/* rom page 9  24000 */
+															/* rom page 10 28000 */
+															/* rom page 11 2c000 */
+															/* rom page 12 30000 */
+															/* rom page 13 34000 */
 
 	ROM_REGION(0x20000,"user2",0) /* DFS ROMS */
 
@@ -536,7 +536,7 @@ ROM_START(bbcb)
 	ROM_LOAD("ddfs223.rom",  0x10000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
 	ROM_LOAD("ddfs-1.53.rom",0x14000, 0x4000, CRC(e1be4ee4) SHA1(6719dc958f2631e6dc8f045429797b289bfe649a))
 	ROM_LOAD("ch103.rom",    0x18000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33))
-   /*NONE*/
+	/*NONE*/
 
 	ROM_REGION(0x80000, "disks", ROMREGION_ERASEFF) /* Opus Ram Disc Space */
 
@@ -563,20 +563,20 @@ ROM_START(bbcbcsw)
 	//ROM_LOAD("speech-1.0.rom",  0x08000, 0x2000, CRC(e63f7fb7) )
 	//ROM_RELOAD(                 0x0a000, 0x2000                )
 	//ROM_LOAD("dfs144.rom",  0x04000, 0x4000, CRC(9fb8d13f) SHA1(387d2468c6e1360f5b531784ce95d5f71a50c2b5)) /* rom page 14 38000 */
-	                                                      /* rom page 0  00000 */
-	                                                      /* rom page 1  04000 */
-	                                                      /* rom page 2  08000 */
-	                                                      /* rom page 3  0c000 */
-	                                                      /* rom page 4  10000 */
-	                                                      /* rom page 5  14000 */
-														  /* rom page 6  18000 */
-	                                                      /* rom page 7  1c000 */
-														  /* rom page 8  20000 */
-														  /* rom page 9  24000 */
-														  /* rom page 10 28000 */
-														  /* rom page 11 2c000 */
-														  /* rom page 12 30000 */
-														  /* rom page 13 34000 */
+															/* rom page 0  00000 */
+															/* rom page 1  04000 */
+															/* rom page 2  08000 */
+															/* rom page 3  0c000 */
+															/* rom page 4  10000 */
+															/* rom page 5  14000 */
+															/* rom page 6  18000 */
+															/* rom page 7  1c000 */
+															/* rom page 8  20000 */
+															/* rom page 9  24000 */
+															/* rom page 10 28000 */
+															/* rom page 11 2c000 */
+															/* rom page 12 30000 */
+															/* rom page 13 34000 */
 
 	ROM_REGION(0x20000,"user2",0) /* DFS ROMS */
 
@@ -589,7 +589,7 @@ ROM_START(bbcbcsw)
 	//ROM_LOAD("ddfs223.rom",  0x10000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
 	//ROM_LOAD("ddfs-1.53.rom",0x14000, 0x4000, CRC(e1be4ee4) SHA1(6719dc958f2631e6dc8f045429797b289bfe649a))
 	//ROM_LOAD("ch103.rom",    0x18000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33))
-   /*NONE*/
+	/*NONE*/
 
 	ROM_REGION(0x80000, "disks", ROMREGION_ERASEFF) /* Opus Ram Disc Space */
 
@@ -603,23 +603,23 @@ ROM_START(bbcbp)
 	ROM_LOAD("bpos2.rom",   0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))  /* basic rom */
 	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
 
-	                                                      /* rom page 0  00000 */
-	                                                      /* rom page 1  04000 */
-	                                                      /* rom page 2  08000 */
-	                                                      /* rom page 3  0c000 */
-	                                                      /* rom page 4  10000 */
-	                                                      /* rom page 5  14000 */
-														  /* rom page 6  18000 */
-	                                                      /* rom page 7  1c000 */
-														  /* rom page 8  20000 */
-														  /* rom page 9  24000 */
-														  /* rom page 10 28000 */
-														  /* rom page 11 2c000 */
-														  /* rom page 12 30000 */
-														  /* rom page 13 34000 */
+															/* rom page 0  00000 */
+															/* rom page 1  04000 */
+															/* rom page 2  08000 */
+															/* rom page 3  0c000 */
+															/* rom page 4  10000 */
+															/* rom page 5  14000 */
+															/* rom page 6  18000 */
+															/* rom page 7  1c000 */
+															/* rom page 8  20000 */
+															/* rom page 9  24000 */
+															/* rom page 10 28000 */
+															/* rom page 11 2c000 */
+															/* rom page 12 30000 */
+															/* rom page 13 34000 */
 
-    /* ddfs 2.23 this is acorns 1770 disc controller Double density disc filing system */
-    ROM_LOAD("ddfs223.rom", 0x38000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa)) /* rom page 14 38000 */
+	/* ddfs 2.23 this is acorns 1770 disc controller Double density disc filing system */
+	ROM_LOAD("ddfs223.rom", 0x38000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa)) /* rom page 14 38000 */
 
 ROM_END
 
@@ -631,23 +631,23 @@ ROM_START(bbcbp128)
 	ROM_LOAD("bpos2.rom",   0x3c000, 0x4000, CRC(9f356396) SHA1(ea7d3a7e3ee1ecfaa1483af994048057362b01f2))  /* basic rom */
 	ROM_CONTINUE(           0x40000, 0x4000)  /* OS */
 
-	                                                      /* rom page 0  00000 */
-	                                                      /* rom page 1  04000 */
-	                                                      /* rom page 2  08000 */
-	                                                      /* rom page 3  0c000 */
-	                                                      /* rom page 4  10000 */
-	                                                      /* rom page 5  14000 */
-														  /* rom page 6  18000 */
-	                                                      /* rom page 7  1c000 */
-														  /* rom page 8  20000 */
-														  /* rom page 9  24000 */
-														  /* rom page 10 28000 */
-														  /* rom page 11 2c000 */
-														  /* rom page 12 30000 */
-														  /* rom page 13 34000 */
+															/* rom page 0  00000 */
+															/* rom page 1  04000 */
+															/* rom page 2  08000 */
+															/* rom page 3  0c000 */
+															/* rom page 4  10000 */
+															/* rom page 5  14000 */
+															/* rom page 6  18000 */
+															/* rom page 7  1c000 */
+															/* rom page 8  20000 */
+															/* rom page 9  24000 */
+															/* rom page 10 28000 */
+															/* rom page 11 2c000 */
+															/* rom page 12 30000 */
+															/* rom page 13 34000 */
 
-    /* ddfs 2.23 this is acorns 1770 disc controller Double density disc filing system */
-    ROM_LOAD("ddfs223.rom", 0x38000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa)) /* rom page 14 38000 */
+	/* ddfs 2.23 this is acorns 1770 disc controller Double density disc filing system */
+	ROM_LOAD("ddfs223.rom", 0x38000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa)) /* rom page 14 38000 */
 
 ROM_END
 
@@ -795,7 +795,7 @@ static const mc6854_interface adlc_intf =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
@@ -840,10 +840,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)     	/* 2.00 MHz */
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)         /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP( bbca_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state,  bbcb_vsync)		/* screen refresh interrupts */
-	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan,  1000)		/* scan keyboard */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state,  bbcb_vsync)        /* screen refresh interrupts */
+	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan,  1000)        /* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbca )
@@ -859,13 +859,13 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state,bbc)
 	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
 
-    MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state,bbca)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
+	MCFG_SOUND_ADD("sn76489", SN76489, 4000000) /* 4 MHz */
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 //  MCFG_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
@@ -934,8 +934,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP( bbcm_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state,  bbcb_vsync)				/* screen refresh interrupts */
-	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcm_keyscan,  1000)		/* scan keyboard */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state,  bbcb_vsync)                /* screen refresh interrupts */
+	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcm_keyscan,  1000)        /* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm )
@@ -953,13 +953,13 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
 
-    MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
+	MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state,bbcm)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489", SN76489, 4000000)	/* 4 MHz */
+	MCFG_SOUND_ADD("sn76489", SN76489, 4000000) /* 4 MHz */
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -995,8 +995,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 MACHINE_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      COMPANY  FULLNAME */
-COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model A" , 0)
-COMP ( 1981, bbcb,     bbca,	 0,		bbcb,     bbca, bbc_state,   bbc,	   "Acorn","BBC Micro Model B" , 0)
-COMP ( 1985, bbcbp,    bbca,	 0,		bbcbp,    bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model B+ 64K" , 0)
-COMP ( 1985, bbcbp128, bbca,     0,		bbcbp128, bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model B+ 128k" , 0)
-COMP ( 1986, bbcm,     bbca,     0,		bbcm,     bbca, bbc_state,   bbcm,    "Acorn","BBC Master" , 0)
+COMP ( 1981, bbca,     0,        0,     bbca,     bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model A" , 0)
+COMP ( 1981, bbcb,     bbca,     0,     bbcb,     bbca, bbc_state,   bbc,      "Acorn","BBC Micro Model B" , 0)
+COMP ( 1985, bbcbp,    bbca,     0,     bbcbp,    bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model B+ 64K" , 0)
+COMP ( 1985, bbcbp128, bbca,     0,     bbcbp128, bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model B+ 128k" , 0)
+COMP ( 1986, bbcm,     bbca,     0,     bbcm,     bbca, bbc_state,   bbcm,    "Acorn","BBC Master" , 0)

@@ -21,10 +21,10 @@ colour, including the word "Konami"
 
 static const eeprom_interface eeprom_intf =
 {
-	7,				/* address bits */
-	8,				/* data bits */
-	"111000",		/*  read command */
-	"111100",		/* write command */
+	7,              /* address bits */
+	8,              /* data bits */
+	"111000",       /*  read command */
+	"111100",       /* write command */
 	"1100100000000",/* erase command */
 	"1100000000000",/* lock command */
 	"1100110000000" /* unlock command */
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE_LEGACY("k053244", k053245_word_r, k053245_word_w)
-	AM_RANGE(0x180800, 0x180fff) AM_RAM								// extra RAM, or mirror for the above?
+	AM_RANGE(0x180800, 0x180fff) AM_RAM                             // extra RAM, or mirror for the above?
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE_LEGACY("k053244", k053244_word_r, k053244_word_w)
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE_LEGACY("k053244", k053244_lsb_r, k053244_lsb_w)
@@ -182,11 +182,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
 	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x380600, 0x380601) AM_NOP								// Watchdog
+	AM_RANGE(0x380600, 0x380601) AM_NOP                             // Watchdog
 	AM_RANGE(0x380700, 0x380707) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)
 	AM_RANGE(0x380800, 0x380803) AM_WRITE(protection_w)
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_half_word_r, k056832_ram_half_word_w)
-	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD_LEGACY("k056832", k056832_old_rom_word_r)	// Passthrough to tile roms
+	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD_LEGACY("k056832", k056832_old_rom_word_r)   // Passthrough to tile roms
 	AM_RANGE(0x440000, 0x44003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
 ADDRESS_MAP_END
 
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( asterix )
 	PORT_START("IN1")
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNUSED )	// EEPROM ready (always 1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNUSED )  // EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE(0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 

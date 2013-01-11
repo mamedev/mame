@@ -44,8 +44,8 @@ This is not a bug (real machine behaves the same).
 
 #define SPRITE_GLOBAL_X 0
 #define SPRITE_GLOBAL_Y 1
-#define SUBLIST_OFFSET	2
-#define SUBLIST_LENGTH	3
+#define SUBLIST_OFFSET  2
+#define SUBLIST_LENGTH  3
 
 #define SUBLIST_OFFSET_SHIFT 3
 #define SPRITE_LIST_END_MARKER 0x8000
@@ -519,9 +519,9 @@ static const st0016_interface st0016_config =
 
 static const r3000_cpu_core r3000_config =
 {
-	1,	/* 1 if we have an FPU, 0 otherwise */
-	4096,	/* code cache size */
-	4096	/* data cache size */
+	1,  /* 1 if we have an FPU, 0 otherwise */
+	4096,   /* code cache size */
+	4096    /* data cache size */
 };
 
 static const gfx_layout tile_16x8x8_layout =
@@ -626,4 +626,4 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 #endif
 }
 
-GAME( 1994, srmp5,	0,	  srmp5,    srmp5, srmp5_state,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5", GAME_IMPERFECT_GRAPHICS)
+GAME( 1994, srmp5,  0,    srmp5,    srmp5, srmp5_state,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5", GAME_IMPERFECT_GRAPHICS)

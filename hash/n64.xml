@@ -5,19 +5,19 @@
 
 There appear to exist some undumped N64 protos
 
-  - Air Boardin' USA,
-  - Echo Delta,
-  - Looney Tunes Space Race,
-  - Ohcouchi Gengorou Ikka,
-  - Star Soldier Vanishing Earth (Europe),
-  - Wild Waters (a more complete version than the available proto was shown)
+	- Air Boardin' USA,
+	- Echo Delta,
+	- Looney Tunes Space Race,
+	- Ohcouchi Gengorou Ikka,
+	- Star Soldier Vanishing Earth (Europe),
+	- Wild Waters (a more complete version than the available proto was shown)
 
 Canceled games (possibly never got to the proto stage)
-  - Acclaim Sports Soccer / Ultra Soccer,
-  - Addams Family Pinball,
-  - Freak Boy,
-  - Ikazuchi No Go Toku,
-  - X-Men Mutant Academy
+	- Acclaim Sports Soccer / Ultra Soccer,
+	- Addams Family Pinball,
+	- Freak Boy,
+	- Ikazuchi No Go Toku,
+	- X-Men Mutant Academy
 -->
 
 <softwarelist name="n64" description="Nintendo 64 cartridges">
@@ -2176,9 +2176,9 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Interactive Studios / Blitzgames</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="9448848">
-                <!-- Original release, in .z64 format -->
+				<!-- Original release, in .z64 format -->
 				<!-- rom name="dragonsword.n64" size="9448848" crc="dcea9210" sha1="efbdbcb499a3d8a37613ca1d94528016bdbf5735" offset="000000" /-->
-                <!-- .v64 version -->
+				<!-- .v64 version -->
 				<rom name="dragonsword.bin" size="9448848" crc="c16b220f" sha1="72e2c2261c7c4031b7b27137cb092d40a0e45e02" offset="000000" />
 			</dataarea>
 		</part>
@@ -4565,9 +4565,9 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
-                <!-- Original release, in .z64 format -->
+				<!-- Original release, in .z64 format -->
 				<!-- rom name="mm_debug.rom" size="67108864" crc="687d8395" sha1="b38b71d2961dffb523020a67f4807a4b704e347a" offset="000000" /-->
-                <!-- .v64 version -->
+				<!-- .v64 version -->
 				<rom name="mm_debug.bin" size="67108864" crc="ea2e7abb" sha1="c790b3de31196645034c76e326640ccf3b8c91dd" offset="000000" />
 			</dataarea>
 		</part>
@@ -10809,7 +10809,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-    <!-- to be verified -->
+	<!-- to be verified -->
 	<software name="zeldaootmq" cloneof="zeldaoot">
 		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, Ripped from GC)</description>
 		<year>2003</year>

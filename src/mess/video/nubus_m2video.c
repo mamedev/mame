@@ -12,10 +12,10 @@
 #include "emu.h"
 #include "video/nubus_m2video.h"
 
-#define M2VIDEO_SCREEN_NAME	"m2video_screen"
+#define M2VIDEO_SCREEN_NAME "m2video_screen"
 #define M2VIDEO_ROM_REGION  "m2video_rom"
 
-#define VRAM_SIZE	(0x80000)	// 512k max
+#define VRAM_SIZE   (0x80000)   // 512k max
 
 MACHINE_CONFIG_FRAGMENT( m2video )
 	MCFG_SCREEN_ADD( M2VIDEO_SCREEN_NAME, RASTER)
@@ -27,7 +27,7 @@ MACHINE_CONFIG_END
 
 ROM_START( m2video )
 	ROM_REGION(0x1000, M2VIDEO_ROM_REGION, 0)
-    ROM_LOAD( "342-0008-a.bin", 0x000000, 0x001000, CRC(bf50850d) SHA1(abe85d8a882bb2b8187a28bd6707fc2f5d77eedd) )
+	ROM_LOAD( "342-0008-a.bin", 0x000000, 0x001000, CRC(bf50850d) SHA1(abe85d8a882bb2b8187a28bd6707fc2f5d77eedd) )
 ROM_END
 
 //**************************************************************************
@@ -65,14 +65,14 @@ const rom_entry *nubus_m2video_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_m2video_device::nubus_m2video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_M2VIDEO, "Macintosh II Video Card", tag, owner, clock),
+		device_t(mconfig, NUBUS_M2VIDEO, "Macintosh II Video Card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_m2vc";
 }
 
 nubus_m2video_device::nubus_m2video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_m2vc";
@@ -102,7 +102,7 @@ void nubus_m2video_device::device_start()
 	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_m2video_device::m2video_r), this), write32_delegate(FUNC(nubus_m2video_device::m2video_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -164,14 +164,14 @@ UINT32 nubus_m2video_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				{
 					pixels = vram[(y * 128) + (BYTE4_XOR_BE(x))];
 
-                    *scanline++ = m_palette[(pixels&0x80)];
-                    *scanline++ = m_palette[((pixels<<1)&0x80)];
-                    *scanline++ = m_palette[((pixels<<2)&0x80)];
-                    *scanline++ = m_palette[((pixels<<3)&0x80)];
-                    *scanline++ = m_palette[((pixels<<4)&0x80)];
-                    *scanline++ = m_palette[((pixels<<5)&0x80)];
-                    *scanline++ = m_palette[((pixels<<6)&0x80)];
-                    *scanline++ = m_palette[((pixels<<7)&0x80)];
+					*scanline++ = m_palette[(pixels&0x80)];
+					*scanline++ = m_palette[((pixels<<1)&0x80)];
+					*scanline++ = m_palette[((pixels<<2)&0x80)];
+					*scanline++ = m_palette[((pixels<<3)&0x80)];
+					*scanline++ = m_palette[((pixels<<4)&0x80)];
+					*scanline++ = m_palette[((pixels<<5)&0x80)];
+					*scanline++ = m_palette[((pixels<<6)&0x80)];
+					*scanline++ = m_palette[((pixels<<7)&0x80)];
 				}
 			}
 			break;
@@ -232,7 +232,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 	data ^= 0xffffffff;
 	switch (offset)
 	{
-		case 0:			// mode
+		case 0:         // mode
 			switch (data & 0xff000000)
 			{
 				case 0x20000000:
@@ -253,7 +253,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 			}
 			break;
 
-        case 0x4007:	// DAC control
+		case 0x4007:    // DAC control
 //          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
 			m_clutoffs = (data>>24)&0xff;
 			break;
@@ -274,17 +274,17 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 			}
 			break;
 
-        case 0x8000:	// enable and ack VBL
+		case 0x8000:    // enable and ack VBL
 			m_vbl_disable = 0;
 			lower_slot_irq();
 			break;
 
-		case 0x8001:	// disable VBL
+		case 0x8001:    // disable VBL
 			m_vbl_disable = 1;
 			break;
 
 		default:
-            printf("m2video_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+			printf("m2video_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 }
@@ -296,10 +296,10 @@ READ32_MEMBER( nubus_m2video_device::m2video_r )
 		m_toggle ^= 1;
 		return m_toggle;
 	}
-    else
-    {
-        printf("m2video_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
-    }
+	else
+	{
+		printf("m2video_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+	}
 
 	return 0;
 }

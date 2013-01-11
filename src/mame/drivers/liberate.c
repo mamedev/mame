@@ -723,9 +723,9 @@ static const gfx_layout pro_tiles =
 	3,
 	{ 4,0, RGN_FRAC(1,2)+4 },
 	{ 384+0, 384+1, 384+2, 384+3,
-	  256+0, 256+1, 256+2, 256+3,
-	  128+0, 128+1, 128+2, 128+3,
-	  0,1,2,3 },
+		256+0, 256+1, 256+2, 256+3,
+		128+0, 128+1, 128+2, 128+3,
+		0,1,2,3 },
 	{ 0*8, 1*8, 2*8, 3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	512
 };
@@ -1170,7 +1170,7 @@ ROM_START( kamikcab )
 	ROM_LOAD( "bp11", 0x0c000, 0x4000, CRC(a69e5580) SHA1(554e45a3f5a91864b62a2439c2277cd18dbe45a7) )
 	ROM_RELOAD(       0x00000, 0x4000 )
 
-	ROM_REGION(0x10000, "audiocpu", 0)	/* 64K for CPU 2 */
+	ROM_REGION(0x10000, "audiocpu", 0)  /* 64K for CPU 2 */
 	ROM_LOAD( "bp09", 0x0e000, 0x2000, CRC(16b13676) SHA1(f3cad959cbcde243db3ebc77a3692302a44beb09) )
 
 	ROM_REGION(0xc000, "gfx1", 0 )
@@ -1196,7 +1196,7 @@ ROM_START( yellowcbj )
 	ROM_LOAD( "bp10.bin", 0xc000, 0x2000, CRC(1024f2f1) SHA1(a3804df3c9ecfde9318ed121327ef095d7a9e1f0) )
 	ROM_RELOAD(            0x0000, 0x2000 )
 
-	ROM_REGION(0x10000, "audiocpu", 0)	/* 64K for CPU 2 */
+	ROM_REGION(0x10000, "audiocpu", 0)  /* 64K for CPU 2 */
 	ROM_LOAD( "bp09", 0x0e000, 0x2000, CRC(16b13676) SHA1(f3cad959cbcde243db3ebc77a3692302a44beb09) )
 
 	ROM_REGION(0xc000, "gfx1", 0 )
@@ -1226,7 +1226,7 @@ ROM_START( yellowcbb )
 	ROM_LOAD( "rom10.rom", 0xe000, 0x2000, CRC(33c3e9b9) SHA1(7ea6602204c43a86842a0b0f7a0786913a6707d6) )
 	ROM_RELOAD(            0x2000, 0x2000 )
 
-	ROM_REGION(0x10000, "audiocpu", 0)	/* 64K for CPU 2 */
+	ROM_REGION(0x10000, "audiocpu", 0)  /* 64K for CPU 2 */
 	ROM_LOAD( "bp09", 0x0e000, 0x2000, CRC(16b13676) SHA1(f3cad959cbcde243db3ebc77a3692302a44beb09) )
 
 	ROM_REGION(0xc000, "gfx1", 0 )
@@ -1259,7 +1259,7 @@ ROM_START( liberate )
 	ROM_LOAD( "bt11.bin",  0xe000, 0x2000,  CRC(b549ccaa) SHA1(e4c8350fea61ed85d21037cbd4c3c50f9a9de09f) )
 
 	ROM_REGION( 0x12000, "gfx1", 0 )
-	ROM_LOAD( "bt04.bin", 0x00000, 0x4000, CRC(96e48d72) SHA1(c31a58d6f1a3354b234849bf7ee013fe59bf908e) )	/* Chars/Sprites */
+	ROM_LOAD( "bt04.bin", 0x00000, 0x4000, CRC(96e48d72) SHA1(c31a58d6f1a3354b234849bf7ee013fe59bf908e) )   /* Chars/Sprites */
 	ROM_LOAD( "bt03.bin", 0x04000, 0x2000, CRC(29ad1b59) SHA1(4d5a385ccad4cdebe87300ef08e1220bc9303673) )
 	ROM_LOAD( "bt06.bin", 0x06000, 0x4000, CRC(7bed1497) SHA1(ba309f468d98269014b2a757b8e98496d7e29120) )
 	ROM_LOAD( "bt05.bin", 0x0a000, 0x2000, CRC(a8896c20) SHA1(c21412c8a6b10719d324ce7ecb01ec4e9d803932) )
@@ -1288,7 +1288,7 @@ ROM_START( dualaslt )
 	ROM_LOAD( "bt11.bin",  0xe000, 0x2000,  CRC(b549ccaa) SHA1(e4c8350fea61ed85d21037cbd4c3c50f9a9de09f) )
 
 	ROM_REGION( 0x12000, "gfx1", 0 )
-	ROM_LOAD( "bt04-5",   0x00000, 0x4000, CRC(159a3e85) SHA1(e916ee7e96c7c64d9ef05ff410d0cbba4d1b8ad0) )	/* Chars/Sprites */
+	ROM_LOAD( "bt04-5",   0x00000, 0x4000, CRC(159a3e85) SHA1(e916ee7e96c7c64d9ef05ff410d0cbba4d1b8ad0) )   /* Chars/Sprites */
 	ROM_LOAD( "bt03.bin", 0x04000, 0x2000, CRC(29ad1b59) SHA1(4d5a385ccad4cdebe87300ef08e1220bc9303673) )
 	ROM_LOAD( "bt06-5",   0x06000, 0x4000, CRC(3b5a80c8) SHA1(8b55b18ab46a64381fc135e84ab82fc451ee722d) )
 	ROM_LOAD( "bt05.bin", 0x0a000, 0x2000, CRC(a8896c20) SHA1(c21412c8a6b10719d324ce7ecb01ec4e9d803932) )
@@ -1321,7 +1321,7 @@ ROM_START( liberateb )
 	ROM_LOAD( "bt11.bin",  0xe000, 0x2000,  CRC(b549ccaa) SHA1(e4c8350fea61ed85d21037cbd4c3c50f9a9de09f) )
 
 	ROM_REGION( 0x12000, "gfx1", 0 )
-	ROM_LOAD( "bt04.bin", 0x00000, 0x4000, CRC(96e48d72) SHA1(c31a58d6f1a3354b234849bf7ee013fe59bf908e) )	/* Chars/Sprites */
+	ROM_LOAD( "bt04.bin", 0x00000, 0x4000, CRC(96e48d72) SHA1(c31a58d6f1a3354b234849bf7ee013fe59bf908e) )   /* Chars/Sprites */
 	ROM_LOAD( "bt03.bin", 0x04000, 0x2000, CRC(29ad1b59) SHA1(4d5a385ccad4cdebe87300ef08e1220bc9303673) )
 	ROM_LOAD( "bt06.bin", 0x06000, 0x4000, CRC(7bed1497) SHA1(ba309f468d98269014b2a757b8e98496d7e29120) )
 	ROM_LOAD( "bt05.bin", 0x0a000, 0x2000, CRC(a8896c20) SHA1(c21412c8a6b10719d324ce7ecb01ec4e9d803932) )

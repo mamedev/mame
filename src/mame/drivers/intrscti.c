@@ -172,12 +172,12 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( intrscti, intrscti_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(intrscti_map)
 	MCFG_CPU_IO_MAP(intrscti_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", intrscti_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, 4000000)		 /* ? MHz */
+	MCFG_CPU_ADD("subcpu", Z80, 4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(intrscti_sub_map)
 	MCFG_CPU_IO_MAP(intrscti_sub_io_map)
 
@@ -217,9 +217,9 @@ DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 		cpu[i+0x8000]=0xc9; // ret
 
 	/*
-    0x8208 -> string copy (hl = pointer to videoram, de = pointer to epoxy block ROM)
+	0x8208 -> string copy (hl = pointer to videoram, de = pointer to epoxy block ROM)
 
-    */
+	*/
 
 	/* one of the protection sub-routines does this */
 	for (i=0;i<0x400;i++)

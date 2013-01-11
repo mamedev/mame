@@ -15,27 +15,27 @@
 static int compis_get_tracks_and_sectors(floppy_image_legacy *floppy, int *tracks, int *sectors)
 {
 	switch(floppy_image_size(floppy)) {
-	case 0x50000:	/* 320 KB */
+	case 0x50000:   /* 320 KB */
 		*tracks = 40;
 		*sectors = 8;
 		break;
 
-	case 0x5a000:	/* 360 KB */
+	case 0x5a000:   /* 360 KB */
 		*tracks = 40;
 		*sectors = 9;
 		break;
 
-	case 0xa0000:	/* 640 KB */
+	case 0xa0000:   /* 640 KB */
 		*tracks = 80;
 		*sectors = 8;
 		break;
 
-	case 0xb4000:	/* 720 KB */
+	case 0xb4000:   /* 720 KB */
 		*tracks = 80;
 		*sectors = 9;
 		break;
 
-	case 0x12c000:	/* 1200 KB */
+	case 0x12c000:  /* 1200 KB */
 		*tracks = 80;
 		*sectors = 15;
 		break;
@@ -87,7 +87,7 @@ static FLOPPY_CONSTRUCT(compis_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( compis )
-	LEGACY_FLOPPY_OPTION( compis_dsk, "dsk",		"Compis floppy disk image",	compis_dsk_identify, compis_dsk_construct, NULL,
+	LEGACY_FLOPPY_OPTION( compis_dsk, "dsk",        "Compis floppy disk image", compis_dsk_identify, compis_dsk_construct, NULL,
 		TRACKS(40/[80])
 		SECTORS(8/[9]/15))
 LEGACY_FLOPPY_OPTIONS_END

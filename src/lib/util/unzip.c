@@ -51,54 +51,54 @@
 ***************************************************************************/
 
 /* number of open files to cache */
-#define ZIP_CACHE_SIZE	8
+#define ZIP_CACHE_SIZE  8
 
 /* offsets in end of central directory structure */
-#define ZIPESIG			0x00
-#define ZIPEDSK			0x04
-#define ZIPECEN			0x06
-#define ZIPENUM			0x08
-#define ZIPECENN		0x0a
-#define ZIPECSZ			0x0c
-#define ZIPEOFST		0x10
-#define ZIPECOML		0x14
-#define ZIPECOM			0x16
+#define ZIPESIG         0x00
+#define ZIPEDSK         0x04
+#define ZIPECEN         0x06
+#define ZIPENUM         0x08
+#define ZIPECENN        0x0a
+#define ZIPECSZ         0x0c
+#define ZIPEOFST        0x10
+#define ZIPECOML        0x14
+#define ZIPECOM         0x16
 
 /* offsets in central directory entry structure */
-#define ZIPCENSIG		0x00
-#define ZIPCVER			0x04
-#define ZIPCOS			0x05
-#define	ZIPCVXT			0x06
-#define	ZIPCEXOS		0x07
-#define ZIPCFLG			0x08
-#define ZIPCMTHD		0x0a
-#define ZIPCTIM			0x0c
-#define ZIPCDAT			0x0e
-#define ZIPCCRC			0x10
-#define ZIPCSIZ			0x14
-#define ZIPCUNC			0x18
-#define ZIPCFNL			0x1c
-#define ZIPCXTL			0x1e
-#define ZIPCCML			0x20
-#define ZIPDSK			0x22
-#define ZIPINT			0x24
-#define ZIPEXT			0x26
-#define ZIPOFST			0x2a
-#define ZIPCFN			0x2e
+#define ZIPCENSIG       0x00
+#define ZIPCVER         0x04
+#define ZIPCOS          0x05
+#define ZIPCVXT         0x06
+#define ZIPCEXOS        0x07
+#define ZIPCFLG         0x08
+#define ZIPCMTHD        0x0a
+#define ZIPCTIM         0x0c
+#define ZIPCDAT         0x0e
+#define ZIPCCRC         0x10
+#define ZIPCSIZ         0x14
+#define ZIPCUNC         0x18
+#define ZIPCFNL         0x1c
+#define ZIPCXTL         0x1e
+#define ZIPCCML         0x20
+#define ZIPDSK          0x22
+#define ZIPINT          0x24
+#define ZIPEXT          0x26
+#define ZIPOFST         0x2a
+#define ZIPCFN          0x2e
 
 /* offsets in local file header structure */
-#define ZIPLOCSIG		0x00
-#define ZIPVER			0x04
-#define ZIPGENFLG		0x06
-#define ZIPMTHD			0x08
-#define ZIPTIME			0x0a
-#define ZIPDATE			0x0c
-#define ZIPCRC			0x0e
-#define ZIPSIZE			0x12
-#define ZIPUNCMP		0x16
-#define ZIPFNLN			0x1a
-#define ZIPXTRALN		0x1c
-#define ZIPNAME			0x1e
+#define ZIPLOCSIG       0x00
+#define ZIPVER          0x04
+#define ZIPGENFLG       0x06
+#define ZIPMTHD         0x08
+#define ZIPTIME         0x0a
+#define ZIPDATE         0x0c
+#define ZIPCRC          0x0e
+#define ZIPSIZE         0x12
+#define ZIPUNCMP        0x16
+#define ZIPFNLN         0x1a
+#define ZIPXTRALN       0x1c
+#define ZIPNAME         0x1e
 
 
 
@@ -368,37 +368,37 @@ const zip_file_header *zip_file_next_file(zip_file *zip)
 
 zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
 {
-    zip_error ziperr;
-    UINT64 offset;
+	zip_error ziperr;
+	UINT64 offset;
 
-    /* if we don't have enough buffer, error */
-    if (length < zip->header.uncompressed_length)
-    	return ZIPERR_BUFFER_TOO_SMALL;
+	/* if we don't have enough buffer, error */
+	if (length < zip->header.uncompressed_length)
+		return ZIPERR_BUFFER_TOO_SMALL;
 
-    /* make sure the info in the header aligns with what we know */
+	/* make sure the info in the header aligns with what we know */
 	if (zip->header.start_disk_number != zip->ecd.disk_number)
 		return ZIPERR_UNSUPPORTED;
 
-    /* get the compressed data offset */
-    ziperr = get_compressed_data_offset(zip, &offset);
-    if (ziperr != ZIPERR_NONE)
-    	return ziperr;
+	/* get the compressed data offset */
+	ziperr = get_compressed_data_offset(zip, &offset);
+	if (ziperr != ZIPERR_NONE)
+		return ziperr;
 
-    /* handle compression types */
-    switch (zip->header.compression)
-    {
-    	case 0:
-    		ziperr = decompress_data_type_0(zip, offset, buffer, length);
-    		break;
+	/* handle compression types */
+	switch (zip->header.compression)
+	{
+		case 0:
+			ziperr = decompress_data_type_0(zip, offset, buffer, length);
+			break;
 
 		case 8:
-    		ziperr = decompress_data_type_8(zip, offset, buffer, length);
-    		break;
+			ziperr = decompress_data_type_8(zip, offset, buffer, length);
+			break;
 
-    	default:
-    		ziperr = ZIPERR_UNSUPPORTED;
-    		break;
-    }
+		default:
+			ziperr = ZIPERR_UNSUPPORTED;
+			break;
+	}
 	return ziperr;
 }
 
@@ -573,36 +573,36 @@ static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buff
 
 static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
 {
-    UINT32 input_remaining = zip->header.compressed_length;
-    UINT32 read_length;
-    z_stream stream;
-    int filerr;
-    int zerr;
+	UINT32 input_remaining = zip->header.compressed_length;
+	UINT32 read_length;
+	z_stream stream;
+	int filerr;
+	int zerr;
 
 	/* make sure we don't need a newer mechanism */
 	if (zip->header.version_needed > 0x14)
 		return ZIPERR_UNSUPPORTED;
 
-    /* reset the stream */
-    memset(&stream, 0, sizeof(stream));
-    stream.next_out = (Bytef *)buffer;
-    stream.avail_out = length;
+	/* reset the stream */
+	memset(&stream, 0, sizeof(stream));
+	stream.next_out = (Bytef *)buffer;
+	stream.avail_out = length;
 
-    /* initialize the decompressor */
-    zerr = inflateInit2(&stream, -MAX_WBITS);
-    if (zerr != Z_OK)
-    	return ZIPERR_DECOMPRESS_ERROR;
+	/* initialize the decompressor */
+	zerr = inflateInit2(&stream, -MAX_WBITS);
+	if (zerr != Z_OK)
+		return ZIPERR_DECOMPRESS_ERROR;
 
-    /* loop until we're done */
-    while (1)
+	/* loop until we're done */
+	while (1)
 	{
 		/* read in the next chunk of data */
 		filerr = osd_read(zip->file, zip->buffer, offset, MIN(input_remaining, sizeof(zip->buffer)), &read_length);
 		if (filerr != FILERR_NONE)
 		{
 			inflateEnd(&stream);
-	    	return ZIPERR_FILE_ERROR;
-	    }
+			return ZIPERR_FILE_ERROR;
+		}
 		offset += read_length;
 
 		/* if we read nothing, but still have data left, the file is truncated */
@@ -622,15 +622,15 @@ static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buff
 			stream.avail_in++;
 
 		/* now inflate */
-        zerr = inflate(&stream, Z_NO_FLUSH);
-        if (zerr == Z_STREAM_END)
+		zerr = inflate(&stream, Z_NO_FLUSH);
+		if (zerr == Z_STREAM_END)
 			break;
 		if (zerr != Z_OK)
 		{
 			inflateEnd(&stream);
 			return ZIPERR_DECOMPRESS_ERROR;
 		}
-    }
+	}
 
 	/* finish decompression */
 	zerr = inflateEnd(&stream);

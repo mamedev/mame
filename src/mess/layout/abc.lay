@@ -14,14 +14,14 @@
 		</rect>
 	</element>
 
-	<element name="str_n">		<text string="N"/>			</element>
-	<element name="str_e">		<text string="E"/>			</element>
-	<element name="str_s">		<text string="S"/>			</element>
-	<element name="str_w">		<text string="W"/>			</element>
-	<element name="str_v1">		<text string="^V"/>			</element>
-	<element name="str_v2">		<text string="&lt;&gt;V"/>	</element>
-	<element name="str_db">		<text string="DB"/>			</element>
-	<element name="str_rd">		<text string="RD"/>			</element>
+	<element name="str_n">      <text string="N"/>          </element>
+	<element name="str_e">      <text string="E"/>          </element>
+	<element name="str_s">      <text string="S"/>          </element>
+	<element name="str_w">      <text string="W"/>          </element>
+	<element name="str_v1">     <text string="^V"/>         </element>
+	<element name="str_v2">     <text string="&lt;&gt;V"/>  </element>
+	<element name="str_db">     <text string="DB"/>         </element>
+	<element name="str_rd">     <text string="RD"/>         </element>
 
 	<element name="background">
 		<rect>

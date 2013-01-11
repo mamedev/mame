@@ -28,8 +28,8 @@
 static void apple3_update_drives(device_t *device);
 
 
-#define LOG_MEMORY		1
-#define LOG_INDXADDR	1
+#define LOG_MEMORY      1
+#define LOG_INDXADDR    1
 
 
 
@@ -280,7 +280,7 @@ static void apple3_setbank(running_machine &machine,const char *mame_bank, UINT1
 	ptr = apple3_bankaddr(machine,bank, offset);
 	state->membank(mame_bank)->set_base(ptr);
 
-    #if 0
+	#if 0
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
@@ -289,7 +289,7 @@ static void apple3_setbank(running_machine &machine,const char *mame_bank, UINT1
 		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine.device<ram_device>(RAM_TAG)->pointer());
 		#endif
 	}
-    #endif
+	#endif
 }
 
 
@@ -342,12 +342,12 @@ static void apple3_update_memory(running_machine &machine)
 	{
 		if (state->m_via_0_b < 0x20)
 		{
-			bank = ~0;	/* system bank */
+			bank = ~0;  /* system bank */
 			page = state->m_via_0_b ^ 0x01;
 		}
 		else if (state->m_via_0_b >= 0xA0)
 		{
-			bank = ~0;	/* system bank */
+			bank = ~0;  /* system bank */
 			page = (state->m_via_0_b ^ 0x01) - 0x80;
 		}
 		else
@@ -504,36 +504,36 @@ static void apple2_via_1_irq_func(device_t *device, int state)
 
 const via6522_interface apple3_via_0_intf =
 {
-	DEVCB_NULL,					/* in_a_func */
-	DEVCB_NULL,					/* in_b_func */
-	DEVCB_NULL,					/* in_ca1_func */
-	DEVCB_NULL,					/* in_cb1_func */
-	DEVCB_NULL,					/* in_ca2_func */
-	DEVCB_NULL,					/* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_0_out_a),		/* out_a_func */
-	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_0_out_b),		/* out_b_func */
-	DEVCB_NULL,					/* out_ca1_func */
-	DEVCB_NULL,					/* out_cb1_func */
-	DEVCB_NULL,					/* out_ca2_func */
-	DEVCB_NULL,					/* out_cb2_func */
-	DEVCB_NULL					/* irq_func */
+	DEVCB_NULL,                 /* in_a_func */
+	DEVCB_NULL,                 /* in_b_func */
+	DEVCB_NULL,                 /* in_ca1_func */
+	DEVCB_NULL,                 /* in_cb1_func */
+	DEVCB_NULL,                 /* in_ca2_func */
+	DEVCB_NULL,                 /* in_cb2_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_0_out_a),       /* out_a_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_0_out_b),       /* out_b_func */
+	DEVCB_NULL,                 /* out_ca1_func */
+	DEVCB_NULL,                 /* out_cb1_func */
+	DEVCB_NULL,                 /* out_ca2_func */
+	DEVCB_NULL,                 /* out_cb2_func */
+	DEVCB_NULL                  /* irq_func */
 };
 
 const via6522_interface apple3_via_1_intf =
 {
-	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_in_a),		/* in_a_func */
-	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_in_b),		/* in_b_func */
-	DEVCB_NULL,					/* in_ca1_func */
-	DEVCB_NULL,					/* in_cb1_func */
-	DEVCB_NULL,					/* in_ca2_func */
-	DEVCB_NULL,					/* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_out_a),		/* out_a_func */
-	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_out_b),		/* out_b_func */
-	DEVCB_NULL,					/* out_ca1_func */
-	DEVCB_NULL,					/* out_cb1_func */
-	DEVCB_NULL,					/* out_ca2_func */
-	DEVCB_NULL,					/* out_cb2_func */
-	DEVCB_LINE(apple2_via_1_irq_func)	/* irq_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_in_a),        /* in_a_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_in_b),        /* in_b_func */
+	DEVCB_NULL,                 /* in_ca1_func */
+	DEVCB_NULL,                 /* in_cb1_func */
+	DEVCB_NULL,                 /* in_ca2_func */
+	DEVCB_NULL,                 /* in_cb2_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_out_a),       /* out_a_func */
+	DEVCB_DRIVER_MEMBER(apple3_state,apple3_via_1_out_b),       /* out_b_func */
+	DEVCB_NULL,                 /* out_ca1_func */
+	DEVCB_NULL,                 /* out_cb1_func */
+	DEVCB_NULL,                 /* out_ca2_func */
+	DEVCB_NULL,                 /* out_cb2_func */
+	DEVCB_LINE(apple2_via_1_irq_func)   /* irq_func */
 };
 
 
@@ -606,11 +606,11 @@ static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
 	{
 #if 0
 		/* The Apple /// Diagnostics seems to expect that indexed writes
-         * always write to RAM.  That image jumps to an address that is
-         * undefined unless this code is enabled.  However, the Sara
-         * emulator does not have corresponding code here, though Chris
-         * Smolinski does not rule out the possibility
-         */
+		 * always write to RAM.  That image jumps to an address that is
+		 * undefined unless this code is enabled.  However, the Sara
+		 * emulator does not have corresponding code here, though Chris
+		 * Smolinski does not rule out the possibility
+		 */
 		result = apple3_bankaddr(machine,~0, offset - 0x8000);
 #endif
 	}

@@ -12,7 +12,7 @@ Atari Sky Raider driver
 
 void skyraid_state::palette_init()
 {
-	palette_set_color(machine(),  0, MAKE_RGB(0x00, 0x00, 0x00));	/* terrain */
+	palette_set_color(machine(),  0, MAKE_RGB(0x00, 0x00, 0x00));   /* terrain */
 	palette_set_color(machine(),  1, MAKE_RGB(0x18, 0x18, 0x18));
 	palette_set_color(machine(),  2, MAKE_RGB(0x30, 0x30, 0x30));
 	palette_set_color(machine(),  3, MAKE_RGB(0x48, 0x48, 0x48));
@@ -20,7 +20,7 @@ void skyraid_state::palette_init()
 	palette_set_color(machine(),  5, MAKE_RGB(0x78, 0x78, 0x78));
 	palette_set_color(machine(),  6, MAKE_RGB(0x90, 0x90, 0x90));
 	palette_set_color(machine(),  7, MAKE_RGB(0xA8, 0xA8, 0xA8));
-	palette_set_color(machine(),  8, MAKE_RGB(0x10, 0x10, 0x10));	/* sprites */
+	palette_set_color(machine(),  8, MAKE_RGB(0x10, 0x10, 0x10));   /* sprites */
 	palette_set_color(machine(),  9, MAKE_RGB(0xE0, 0xE0, 0xE0));
 	palette_set_color(machine(), 10, MAKE_RGB(0xA0, 0xA0, 0xA0));
 	palette_set_color(machine(), 11, MAKE_RGB(0x48, 0x48, 0x48));
@@ -28,9 +28,9 @@ void skyraid_state::palette_init()
 	palette_set_color(machine(), 13, MAKE_RGB(0x48, 0x48, 0x48));
 	palette_set_color(machine(), 14, MAKE_RGB(0xA0, 0xA0, 0xA0));
 	palette_set_color(machine(), 15, MAKE_RGB(0xE0, 0xE0, 0xE0));
-	palette_set_color(machine(), 16, MAKE_RGB(0x00, 0x00, 0x00));	/* missiles */
+	palette_set_color(machine(), 16, MAKE_RGB(0x00, 0x00, 0x00));   /* missiles */
 	palette_set_color(machine(), 17, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 18, MAKE_RGB(0x00, 0x00, 0x00));	/* text */
+	palette_set_color(machine(), 18, MAKE_RGB(0x00, 0x00, 0x00));   /* text */
 	palette_set_color(machine(), 19, MAKE_RGB(0xE0, 0xE0, 0xE0));
 }
 
@@ -102,7 +102,7 @@ static INPUT_PORTS_START( skyraid )
 	PORT_DIPSETTING(    0x10, "80 Seconds" )
 	PORT_DIPSETTING(    0x20, "100 Seconds" )
 	PORT_DIPSETTING(    0x30, "120 Seconds" )
-	PORT_DIPNAME( 0x40, 0x40, "DIP #5" )	/* must be OFF */
+	PORT_DIPNAME( 0x40, 0x40, "DIP #5" )    /* must be OFF */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 	PORT_DIPNAME( 0x80, 0x00, "Extended Play" )
@@ -172,7 +172,7 @@ static const gfx_layout skyraid_sprite_layout =
 	32, 32, /* width, height */
 	8,      /* total         */
 	2,      /* planes        */
-	        /* plane offsets */
+			/* plane offsets */
 	{ 0, 1 },
 	{
 		0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E,

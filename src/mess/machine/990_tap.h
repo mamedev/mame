@@ -37,7 +37,6 @@ private:
 extern const device_type TI990_TAPE_CTRL;
 
 
-#define MCFG_TI990_TAPE_CTRL_ADD(_tag, _intrf)	\
+#define MCFG_TI990_TAPE_CTRL_ADD(_tag, _intrf)  \
 	MCFG_DEVICE_ADD((_tag),  TI990_TAPE_CTRL, 0)\
 	MCFG_DEVICE_CONFIG(_intrf)
-

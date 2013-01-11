@@ -25,8 +25,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int width = ((attr & 0x0f00) >> 8) + 1;
 		int wcount;
 		int color = (attr & 0x003f) ;
-		int pri		 =	((attr & 0x1000)>>12);	// Priority (1 = Low)
-		int pri_mask =	~((1 << (pri+1)) - 1);	// Above the first "pri" levels
+		int pri      =  ((attr & 0x1000)>>12);  // Priority (1 = Low)
+		int pri_mask =  ~((1 << (pri+1)) - 1);  // Above the first "pri" levels
 
 		// attr & 0x2000 -> another priority bit?
 
@@ -155,7 +155,7 @@ UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind1
 
 	if (0)
 	{
-	    popmessage ("Regs %08x %08x %08x %08x %08x",
+		popmessage ("Regs %08x %08x %08x %08x %08x",
 		m_regs[0],
 		m_regs[1],
 		m_regs[2],

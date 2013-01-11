@@ -106,7 +106,7 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind
 		sy += 32;
 
 	/* assume no collision */
-    state->m_collision_address = 0xffff;
+	state->m_collision_address = 0xffff;
 
 	for (y = 0x1f; y >= 0; y--)
 	{
@@ -129,7 +129,7 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind
 			{
 				if (bitmap.pix16(sy, sx) & 0x01)
 					/* compute the collision address -- the +1 is via observation
-                       of the game code, probably wrong for cocktail mode */
+					   of the game code, probably wrong for cocktail mode */
 					state->m_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
 
 				bitmap.pix16(sy, sx) = (color << 1) | 1;
@@ -137,9 +137,9 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind
 
 			sx = sx + 1;
 			data = data << 1;
-        }
+		}
 
-        sy = sy + 1;
+		sy = sy + 1;
 	}
 }
 

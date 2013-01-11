@@ -44,7 +44,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-#define MASTER_CLOCK	XTAL_16MHz
+#define MASTER_CLOCK    XTAL_16MHz
 
 
 class k3_state : public driver_device
@@ -52,8 +52,8 @@ class k3_state : public driver_device
 public:
 	k3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_oki1(*this, "oki1"),
-		  m_oki2(*this, "oki2") ,
+			m_oki1(*this, "oki1"),
+			m_oki2(*this, "oki2") ,
 		m_spriteram_1(*this, "spritera1"),
 		m_spriteram_2(*this, "spritera2"),
 		m_bgram(*this, "bgram"){ }
@@ -149,12 +149,12 @@ WRITE16_MEMBER(k3_state::k3_soundbanks_w)
 }
 
 static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
-	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP	// bug in code? (clean up log)
-	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP	// bug in code? (clean up log)
+	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP    // bug in code? (clean up log)
+	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP    // bug in code? (clean up log)
 
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	// palette
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Main Ram
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")    // palette
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spritera1")
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spritera2")
 	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_SHARE("bgram")
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
 	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x8c0000, 0x8cffff) AM_RAM	// not used?
+	AM_RANGE(0x8c0000, 0x8cffff) AM_RAM // not used?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( k3 )
@@ -193,10 +193,10 @@ static INPUT_PORTS_START( k3 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Are these used at all? */
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* Are these used at all? */
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x007,  0x0007, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x007,  0x0007, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
@@ -205,21 +205,21 @@ static INPUT_PORTS_START( k3 )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(      0x0040, "2" )
 	PORT_DIPSETTING(      0x0060, "3" )
 	PORT_DIPSETTING(      0x0020, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
@@ -239,7 +239,7 @@ static const gfx_layout k3_layout =
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0,8,16,24,32,40,48,56, 64, 72, 80, 88, 96, 104, 112, 120 },
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-	  8*128, 9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+		8*128, 9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
 	16*128
 };
 

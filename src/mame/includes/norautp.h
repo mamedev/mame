@@ -2,8 +2,8 @@
 
 
 /* Discrete Sound Input Nodes */
-#define NORAUTP_SND_EN					NODE_01
-#define NORAUTP_FREQ_DATA				NODE_02
+#define NORAUTP_SND_EN                  NODE_01
+#define NORAUTP_FREQ_DATA               NODE_02
 
 
 class norautp_state : public driver_device

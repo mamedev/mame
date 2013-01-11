@@ -480,4 +480,3 @@ INLINE UINT16 setst_sla_laeco(tms99xx_state *cpustate, UINT16 a, UINT16 c)
 
 
 /***********************************************************************/
-

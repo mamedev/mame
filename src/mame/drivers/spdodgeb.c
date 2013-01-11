@@ -86,7 +86,7 @@ static void spd_adpcm_int(device_t *device)
 }
 
 
-#if 0	// default - more sensitive (state change and timing measured on real board?)
+#if 0   // default - more sensitive (state change and timing measured on real board?)
 static void mcu63705_update_inputs(running_machine &machine)
 {
 	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
@@ -135,7 +135,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 
 		curr[p] = machine.root_device().ioport(p ? "P2" : "P1")->read() & 0x30;
 
-		if (state->m_jumped[p]) buttons[p] = 0;	/* jump only momentarily flips the buttons */
+		if (state->m_jumped[p]) buttons[p] = 0; /* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
 
 		if (buttons[p] == 0x30) state->m_jumped[p] = 1;
@@ -149,7 +149,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 	state->m_inputs[2] = state->m_running[0] | buttons[0];
 	state->m_inputs[3] = state->m_running[1] | buttons[1];
 }
-#else	// alternate - less sensitive
+#else   // alternate - less sensitive
 static void mcu63705_update_inputs(running_machine &machine)
 {
 	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
@@ -237,7 +237,7 @@ READ8_MEMBER(spdodgeb_state::port_0_r)
 {
 	int port = ioport("IN0")->read();
 
-	m_toggle^=0x02;	/* mcu63701_busy flag */
+	m_toggle^=0x02; /* mcu63701_busy flag */
 
 	return (port | m_toggle);
 }
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(spdodgeb_scrollx_lo_w)
 //  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
-	AM_RANGE(0x3006, 0x3006) AM_WRITE(spdodgeb_ctrl_w)	/* scroll hi, flip screen, bank switch, palette select */
+	AM_RANGE(0x3006, 0x3006) AM_WRITE(spdodgeb_ctrl_w)  /* scroll hi, flip screen, bank switch, palette select */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(mcu63701_w)
 	AM_RANGE(0x3801, 0x3805) AM_READ(mcu63701_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( spdodgeb )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* mcu63701_busy flag */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* mcu63701_busy flag */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -365,15 +365,15 @@ static const gfx_layout spritelayout =
 	4,
 	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0,4 },
 	{ 3, 2, 1, 0, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-		  32*8+3, 32*8+2, 32*8+1, 32*8+0, 48*8+3, 48*8+2, 48*8+1, 48*8+0 },
+			32*8+3, 32*8+2, 32*8+1, 32*8+0, 48*8+3, 48*8+2, 48*8+1, 48*8+0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	64*8
 };
 
 static GFXDECODE_START( spdodgeb )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000, 32 )	/* colors 0x000-0x1ff */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32 )	/* colors 0x200-0x3ff */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000, 32 )   /* colors 0x000-0x1ff */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32 )   /* colors 0x200-0x3ff */
 GFXDECODE_END
 
 
@@ -389,8 +389,8 @@ static const ym3812_interface ym3812_config =
 
 static const msm5205_interface msm5205_config =
 {
-	spd_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B	/* 8kHz? */
+	spd_adpcm_int,  /* interrupt function */
+	MSM5205_S48_4B  /* 8kHz? */
 };
 
 
@@ -411,11 +411,11 @@ void spdodgeb_state::machine_reset()
 static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */
+	MCFG_CPU_ADD("maincpu", M6502,12000000/6)   /* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, spdodgeb_interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2MHz ? */
+	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)  /* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */
@@ -451,8 +451,8 @@ MACHINE_CONFIG_END
 
 ROM_START( spdodgeb )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "22a-04.139",	  0x10000, 0x08000, CRC(66071fda) SHA1(4a239295900e6234a2a693321ca821671747a58e) )  /* Two banks */
-	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
+	ROM_LOAD( "22a-04.139",   0x10000, 0x08000, CRC(66071fda) SHA1(4a239295900e6234a2a693321ca821671747a58e) )  /* Two banks */
+	ROM_CONTINUE(             0x08000, 0x08000 )         /* Static code */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
@@ -473,7 +473,7 @@ ROM_START( spdodgeb )
 	ROM_LOAD( "22j6-0.83",    0x00000, 0x10000, CRC(744a26e3) SHA1(519f22f1e5cc417cb8f9ced97e959d23c711283b) )
 	ROM_LOAD( "22j7-0.82",    0x10000, 0x10000, CRC(2fa1de21) SHA1(e8c7af6057b64ecadd3473b82abd8e9f873082fd) )
 
-	ROM_REGION( 0x0800, "proms", 0 )	/* color PROMs */
+	ROM_REGION( 0x0800, "proms", 0 )    /* color PROMs */
 	ROM_LOAD( "mb7132e.158",  0x0000, 0x0400, CRC(7e623722) SHA1(e1fe60533237bd0aba5c8de9775df620ed5227c0) )
 	ROM_LOAD( "mb7122e.159",  0x0400, 0x0400, CRC(69706e8d) SHA1(778ee88ff566aa38c80e0e61bb3fe8458f0e9450) )
 ROM_END
@@ -511,14 +511,14 @@ TJ22J2-0.35 /
 
 ROM_START( nkdodge )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "22j4-0.139",	  0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
-	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
+	ROM_LOAD( "22j4-0.139",   0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
+	ROM_CONTINUE(             0x08000, 0x08000 )         /* Static code */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
+	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP ) /* missing */
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
 	ROM_LOAD( "tj22j4-0.121",    0x00000, 0x20000, CRC(d2922b3f) SHA1(30ad37f8355c732b545017c2fc56879256b650be) )
@@ -532,7 +532,7 @@ ROM_START( nkdodge )
 	ROM_LOAD( "22j6-0.83",    0x00000, 0x10000, CRC(744a26e3) SHA1(519f22f1e5cc417cb8f9ced97e959d23c711283b) )
 	ROM_LOAD( "22j7-0.82",    0x10000, 0x10000, CRC(2fa1de21) SHA1(e8c7af6057b64ecadd3473b82abd8e9f873082fd) )
 
-	ROM_REGION( 0x0800, "proms", 0 )	/* color PROMs */
+	ROM_REGION( 0x0800, "proms", 0 )    /* color PROMs */
 	ROM_LOAD( "22j8-0.158",  0x0000, 0x0400, CRC(c368440f) SHA1(39762d102a42211f24db16bc721b01230df1c4d6) )
 	ROM_LOAD( "22j9-0.159",  0x0400, 0x0400, CRC(6059f401) SHA1(280b1bda3a55f2d8c2fd4552c4dcec7100f0170f) )
 ROM_END
@@ -541,14 +541,14 @@ ROM_END
 
 ROM_START( nkdodgeb )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "12.bin",	      0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
-	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
+	ROM_LOAD( "12.bin",       0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
+	ROM_CONTINUE(             0x08000, 0x08000 )         /* Static code */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
+	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP ) /* missing */
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
 	ROM_LOAD( "10.bin",       0x00000, 0x10000, CRC(442326fd) SHA1(e0e9e1dfdca3edd6e2522f55c191b40b81b8eaff) )
@@ -566,7 +566,7 @@ ROM_START( nkdodgeb )
 	ROM_LOAD( "22j6-0.83",    0x00000, 0x10000, CRC(744a26e3) SHA1(519f22f1e5cc417cb8f9ced97e959d23c711283b) )
 	ROM_LOAD( "22j7-0.82",    0x10000, 0x10000, CRC(2fa1de21) SHA1(e8c7af6057b64ecadd3473b82abd8e9f873082fd) )
 
-	ROM_REGION( 0x0800, "proms", 0 )	/* color PROMs */
+	ROM_REGION( 0x0800, "proms", 0 )    /* color PROMs */
 	ROM_LOAD( "27s191.bin",  0x0000, 0x0800, CRC(317e42ea) SHA1(59caacc02fb7fb11604bd177f790fd68830ca7c1) )
 	ROM_LOAD( "82s137.bin",  0x0400, 0x0400, CRC(6059f401) SHA1(280b1bda3a55f2d8c2fd4552c4dcec7100f0170f) )
 ROM_END

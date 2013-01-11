@@ -7,12 +7,12 @@
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */
-#define NITEDRVR_BANG_DATA	NODE_01
-#define NITEDRVR_SKID1_EN	NODE_02
-#define NITEDRVR_SKID2_EN	NODE_03
-#define NITEDRVR_MOTOR_DATA	NODE_04
-#define NITEDRVR_CRASH_EN	NODE_05
-#define NITEDRVR_ATTRACT_EN	NODE_06
+#define NITEDRVR_BANG_DATA  NODE_01
+#define NITEDRVR_SKID1_EN   NODE_02
+#define NITEDRVR_SKID2_EN   NODE_03
+#define NITEDRVR_MOTOR_DATA NODE_04
+#define NITEDRVR_CRASH_EN   NODE_05
+#define NITEDRVR_ATTRACT_EN NODE_06
 
 
 class nitedrvr_state : public driver_device
@@ -38,7 +38,7 @@ public:
 	INT32 m_steering_val;
 	UINT8 m_crash_en;
 	UINT8 m_crash_data;
-	UINT8 m_crash_data_en;	// IC D8
+	UINT8 m_crash_data_en;  // IC D8
 	UINT8 m_ac_line;
 	INT32 m_last_steering_val;
 

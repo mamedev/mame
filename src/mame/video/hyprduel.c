@@ -91,13 +91,13 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
 
 /* A 2048 x 2048 virtual tilemap */
 
-#define BIG_NX		(0x100)
-#define BIG_NY		(0x100)
+#define BIG_NX      (0x100)
+#define BIG_NY      (0x100)
 
 /* A smaller 512 x 256 window defines the actual tilemap */
 
-#define WIN_NX		(0x40)
-#define WIN_NY		(0x20)
+#define WIN_NX      (0x40)
+#define WIN_NY      (0x20)
 //#define WIN_NX        (0x40+1)
 //#define WIN_NY        (0x20+1)
 
@@ -168,7 +168,7 @@ INLINE void get_tile_info_8bit( running_machine &machine, tile_data &tileinfo, i
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
 	}
-	else if ((tile & 0x00f00000) == 0x00f00000)	/* draw tile as 8bpp */
+	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
 		SET_TILE_INFO(
@@ -216,7 +216,7 @@ INLINE void get_tile_info_16x16_8bit( running_machine &machine, tile_data &tilei
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
 	}
-	else if ((tile & 0x00f00000) == 0x00f00000)	/* draw tile as 8bpp */
+	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
 		SET_TILE_INFO(
@@ -551,11 +551,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			if (state->flip_screen())
 			{
-				flipx = !flipx;		x = max_x - x - width;
-				flipy = !flipy;		y = max_y - y - height;
+				flipx = !flipx;     x = max_x - x - width;
+				flipy = !flipy;     y = max_y - y - height;
 			}
 
-			if (color == 0xf)	/* 8bpp */
+			if (color == 0xf)   /* 8bpp */
 			{
 				/* Bounds checking */
 				if ((gfxstart + width * height - 1) >= gfx_size)
@@ -588,7 +588,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 								machine.priority_bitmap,primask[pri], 15);
 			}
 #if 0
-{	/* Display priority + zoom on each sprite */
+{   /* Display priority + zoom on each sprite */
 	char buf[80];
 	sprintf(buf, "%02X %02X",((src[ 0 ] & 0xf800) >> 11)^0x1f,((src[ 1 ] & 0xfc00) >> 10) );
 	ui_draw_text(buf, x, y);
@@ -640,11 +640,11 @@ static void draw_layers( running_machine &machine, bitmap_ind16 &bitmap, const r
 	int layer;
 
 	/* Draw all the layers with priority == pri */
-	for (layer = 2; layer >= 0; layer--)	// tilemap[2] below?
+	for (layer = 2; layer >= 0; layer--)    // tilemap[2] below?
 	{
 		if ( pri == ((layers_pri >> (layer*2)) & 3) )
 		{
-			if (layers_ctrl & (1 << layer))	// for debug
+			if (layers_ctrl & (1 << layer)) // for debug
 				state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 1 << (3 - pri));
 		}
 	}
@@ -709,26 +709,26 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 
 	/*  Screen Control Register:
 
-        f--- ---- ---- ----     ?
-        -edc b--- ---- ----
-        ---- -a98 ---- ----     ? Leds
-        ---- ---- 7--- ----     16x16 Tiles (Layer 2)
-        ---- ---- -6-- ----     16x16 Tiles (Layer 1)
-        ---- ---- --5- ----     16x16 Tiles (Layer 0)
-        ---- ---- ---4 32--
-        ---- ---- ---- --1-     ? Blank Screen
-        ---- ---- ---- ---0     Flip  Screen    */
+	    f--- ---- ---- ----     ?
+	    -edc b--- ---- ----
+	    ---- -a98 ---- ----     ? Leds
+	    ---- ---- 7--- ----     16x16 Tiles (Layer 2)
+	    ---- ---- -6-- ----     16x16 Tiles (Layer 1)
+	    ---- ---- --5- ----     16x16 Tiles (Layer 0)
+	    ---- ---- ---4 32--
+	    ---- ---- ---- --1-     ? Blank Screen
+	    ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)
 		return 0;
 	flip_screen_set(screenctrl & 1);
 
 #if 0
 if (machine().input().code_pressed(KEYCODE_Z))
-{	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 0x01;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 0x02;
-	if (machine().input().code_pressed(KEYCODE_E))	msk |= 0x04;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 0x08;
+{   int msk = 0;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 0x01;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 0x02;
+	if (machine().input().code_pressed(KEYCODE_E))  msk |= 0x04;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 0x08;
 	if (msk != 0)
 	{
 		bitmap.fill(0, cliprect);

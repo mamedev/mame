@@ -22,20 +22,20 @@
 #include "psion_pack.h"
 
 // Datapack control lines
-#define DP_LINE_CLOCK			0x01
-#define DP_LINE_RESET			0x02
-#define DP_LINE_PROGRAM			0x04
-#define DP_LINE_OUTPUT_ENABLE	0x08
-#define DP_LINE_SLOT_SELECT		0x10
+#define DP_LINE_CLOCK           0x01
+#define DP_LINE_RESET           0x02
+#define DP_LINE_PROGRAM         0x04
+#define DP_LINE_OUTPUT_ENABLE   0x08
+#define DP_LINE_SLOT_SELECT     0x10
 
 // Datapack ID
-#define DP_ID_EPROM				0x02
-#define DP_ID_PAGED				0x04
-#define DP_ID_WRITE				0x08
-#define DP_ID_BOOT				0x10
-#define DP_ID_COPY				0x20
+#define DP_ID_EPROM             0x02
+#define DP_ID_PAGED             0x04
+#define DP_ID_WRITE             0x08
+#define DP_ID_BOOT              0x10
+#define DP_ID_COPY              0x20
 
-#define OPK_HEAD_SIZE			6
+#define OPK_HEAD_SIZE           6
 
 
 static OPTION_GUIDE_START( datapack_option_guide )
@@ -59,8 +59,8 @@ const device_type PSION_DATAPACK = &device_creator<datapack_device>;
 //-------------------------------------------------
 
 datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, PSION_DATAPACK, "Psion Datapack", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, PSION_DATAPACK, "Psion Datapack", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -94,12 +94,12 @@ void datapack_device::device_config_complete()
 {
 	image_device_format *format = global_alloc_clear(image_device_format);
 
-	format->m_index 	  = 0;
+	format->m_index       = 0;
 	format->m_name        = "opk";
 	format->m_description = "Psion Datapack image";
 	format->m_extensions  = "opk";
 	format->m_optspec     = datapack_option_spec;
-	format->m_next		  = NULL;
+	format->m_next        = NULL;
 
 	m_formatlist = format;
 
@@ -174,7 +174,7 @@ void datapack_device::update()
 			if (m_id & DP_ID_EPROM)
 				m_data = m_id;
 			else
-				m_data = 0x01;		// for identify RAM pack
+				m_data = 0x01;      // for identify RAM pack
 		}
 	}
 }

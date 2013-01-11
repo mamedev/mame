@@ -18,7 +18,7 @@ public:
 	/* misc */
 	int        m_inval;
 	int        m_outval;
-	int        m_cnt;	// used by oigas
+	int        m_cnt;   // used by oigas
 	int        m_romaddr;
 	int        m_spinner;
 	int        m_nmi_en;

@@ -54,37 +54,37 @@
 // tracks are padded to a multiple of this many frames
 const UINT32 CD_TRACK_PADDING = 4;
 
-#define CD_MAX_TRACKS			(99)	/* AFAIK the theoretical limit */
-#define CD_MAX_SECTOR_DATA		(2352)
-#define CD_MAX_SUBCODE_DATA		(96)
+#define CD_MAX_TRACKS           (99)    /* AFAIK the theoretical limit */
+#define CD_MAX_SECTOR_DATA      (2352)
+#define CD_MAX_SUBCODE_DATA     (96)
 
-#define CD_FRAME_SIZE			(CD_MAX_SECTOR_DATA + CD_MAX_SUBCODE_DATA)
-#define CD_FRAMES_PER_HUNK		(8)
+#define CD_FRAME_SIZE           (CD_MAX_SECTOR_DATA + CD_MAX_SUBCODE_DATA)
+#define CD_FRAMES_PER_HUNK      (8)
 
-#define CD_METADATA_WORDS		(1+(CD_MAX_TRACKS * 6))
+#define CD_METADATA_WORDS       (1+(CD_MAX_TRACKS * 6))
 
 enum
 {
-	CD_TRACK_MODE1 = 0, 		/* mode 1 2048 bytes/sector */
-	CD_TRACK_MODE1_RAW,	    	/* mode 1 2352 bytes/sector */
-	CD_TRACK_MODE2,		    	/* mode 2 2336 bytes/sector */
-	CD_TRACK_MODE2_FORM1,		/* mode 2 2048 bytes/sector */
-	CD_TRACK_MODE2_FORM2,		/* mode 2 2324 bytes/sector */
-	CD_TRACK_MODE2_FORM_MIX,	/* mode 2 2336 bytes/sector */
-	CD_TRACK_MODE2_RAW,	    	/* mode 2 2352 bytes / sector */
-	CD_TRACK_AUDIO,			/* redbook audio track 2352 bytes/sector (588 samples) */
+	CD_TRACK_MODE1 = 0,         /* mode 1 2048 bytes/sector */
+	CD_TRACK_MODE1_RAW,         /* mode 1 2352 bytes/sector */
+	CD_TRACK_MODE2,             /* mode 2 2336 bytes/sector */
+	CD_TRACK_MODE2_FORM1,       /* mode 2 2048 bytes/sector */
+	CD_TRACK_MODE2_FORM2,       /* mode 2 2324 bytes/sector */
+	CD_TRACK_MODE2_FORM_MIX,    /* mode 2 2336 bytes/sector */
+	CD_TRACK_MODE2_RAW,         /* mode 2 2352 bytes / sector */
+	CD_TRACK_AUDIO,         /* redbook audio track 2352 bytes/sector (588 samples) */
 
-	CD_TRACK_RAW_DONTCARE		/* special flag for cdrom_read_data: just return me whatever is there */
+	CD_TRACK_RAW_DONTCARE       /* special flag for cdrom_read_data: just return me whatever is there */
 };
 
 enum
 {
-	CD_SUB_NORMAL = 0,			/* "cooked" 96 bytes per sector */
-	CD_SUB_RAW,					/* raw uninterleaved 96 bytes per sector */
-	CD_SUB_NONE					/* no subcode data stored */
+	CD_SUB_NORMAL = 0,          /* "cooked" 96 bytes per sector */
+	CD_SUB_RAW,                 /* raw uninterleaved 96 bytes per sector */
+	CD_SUB_NONE                 /* no subcode data stored */
 };
 
-#define	CD_FLAG_GDROM	0x00000001	// disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
+#define CD_FLAG_GDROM   0x00000001  // disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -95,33 +95,33 @@ struct cdrom_file;
 struct cdrom_track_info
 {
 	/* fields used by CHDMAN and in MAME */
-	UINT32 trktype;		/* track type */
-	UINT32 subtype;		/* subcode data type */
-	UINT32 datasize;	/* size of data in each sector of this track */
-	UINT32 subsize;		/* size of subchannel data in each sector of this track */
-	UINT32 frames;		/* number of frames in this track */
-	UINT32 extraframes;	/* number of "spillage" frames in this track */
-	UINT32 pregap;		/* number of pregap frames */
-	UINT32 postgap;		/* number of postgap frames */
-	UINT32 pgtype;		/* type of sectors in pregap */
-	UINT32 pgsub;		/* type of subchannel data in pregap */
-	UINT32 pgdatasize;	/* size of data in each sector of the pregap */
-	UINT32 pgsubsize;	/* size of subchannel data in each sector of the pregap */
+	UINT32 trktype;     /* track type */
+	UINT32 subtype;     /* subcode data type */
+	UINT32 datasize;    /* size of data in each sector of this track */
+	UINT32 subsize;     /* size of subchannel data in each sector of this track */
+	UINT32 frames;      /* number of frames in this track */
+	UINT32 extraframes; /* number of "spillage" frames in this track */
+	UINT32 pregap;      /* number of pregap frames */
+	UINT32 postgap;     /* number of postgap frames */
+	UINT32 pgtype;      /* type of sectors in pregap */
+	UINT32 pgsub;       /* type of subchannel data in pregap */
+	UINT32 pgdatasize;  /* size of data in each sector of the pregap */
+	UINT32 pgsubsize;   /* size of subchannel data in each sector of the pregap */
 
 	/* fields used in CHDMAN only */
-	UINT32 padframes;	/* number of frames of padding to add to the end of the track; needed for GDI */
+	UINT32 padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
 
 	/* fields used in MAME only */
-	UINT32 logframeofs;	/* logical frame offset: offset including pre/postgaps */
+	UINT32 logframeofs; /* logical frame offset: offset including pre/postgaps */
 	UINT32 physframeofs; /* physical frame offset: offset ignoring pre/postgaps */
-	UINT32 chdframeofs;	/* frame number this track starts at on the CHD */
+	UINT32 chdframeofs; /* frame number this track starts at on the CHD */
 };
 
 
 struct cdrom_toc
 {
-	UINT32 numtrks;		/* number of tracks */
-	UINT32 flags;		/* see FLAG_ above */
+	UINT32 numtrks;     /* number of tracks */
+	UINT32 flags;       /* see FLAG_ above */
 	cdrom_track_info tracks[CD_MAX_TRACKS];
 };
 
@@ -188,8 +188,8 @@ INLINE UINT32 lba_to_msf(UINT32 lba)
 	f = lba % 75;
 
 	return ((m / 10) << 20) | ((m % 10) << 16) |
-	       ((s / 10) << 12) | ((s % 10) <<  8) |
-	       ((f / 10) <<  4) | ((f % 10) <<  0);
+			((s / 10) << 12) | ((s % 10) <<  8) |
+			((f / 10) <<  4) | ((f % 10) <<  0);
 }
 
 // segacd needs it like this.. investigate
@@ -209,4 +209,4 @@ INLINE UINT32 lba_to_msf_alt(int lba)
 
 
 
-#endif	// __CDROM_H__
+#endif  // __CDROM_H__

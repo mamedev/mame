@@ -69,13 +69,13 @@ typedef UINT8 (*lh5801_in_func)(device_t *device);
 
 struct lh5801_cpu_core
 {
-	lh5801_in_func	in;
+	lh5801_in_func  in;
 };
 
 // input lines
 enum
 {
-	LH5801_LINE_MI,		//maskable interrupt
+	LH5801_LINE_MI,     //maskable interrupt
 };
 
 DECLARE_LEGACY_CPU_DEVICE(LH5801, lh5801);

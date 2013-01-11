@@ -117,14 +117,14 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 
 	/* dirty char */
 	machine().gfx[0]->mark_dirty(offset >> 4);
-    machine().gfx[1]->mark_dirty(offset >> 5);
+	machine().gfx[1]->mark_dirty(offset >> 5);
 }
 
 
 WRITE8_MEMBER(cmmb_state::cmmb_paletteram_w)
 {
-    /* RGB output is inverted */
-    paletteram_RRRGGGBB_byte_w(space,offset,~data);
+	/* RGB output is inverted */
+	paletteram_RRRGGGBB_byte_w(space,offset,~data);
 }
 
 READ8_MEMBER(cmmb_state::cmmb_input_r)
@@ -348,7 +348,7 @@ MACHINE_CONFIG_END
 ROM_START( cmmb162 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "cmmb162.u2",   0x10000, 0x40000, CRC(71a5a75d) SHA1(0ad7b97580082cda98cb1e8aab8efcf491d0ed25) )
-	ROM_COPY( "maincpu",	  0x18000, 0x08000, 0x08000 )
+	ROM_COPY( "maincpu",      0x18000, 0x08000, 0x08000 )
 
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END

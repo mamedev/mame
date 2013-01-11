@@ -82,34 +82,34 @@ T0 output clock
 ***************************************************************************/
 
 /* timer/counter enable bits */
-#define TIMER_ENABLED	0x01
-#define COUNTER_ENABLED	0x02
+#define TIMER_ENABLED   0x01
+#define COUNTER_ENABLED 0x02
 
 /* flag bits */
-#define C_FLAG			0x80
-#define A_FLAG			0x40
-#define F_FLAG			0x20
-#define B_FLAG			0x10
+#define C_FLAG          0x80
+#define A_FLAG          0x40
+#define F_FLAG          0x20
+#define B_FLAG          0x10
 
 /* status bits (UPI-41) */
-#define STS_F1			0x08
-#define STS_F0			0x04
-#define STS_IBF			0x02
-#define STS_OBF			0x01
+#define STS_F1          0x08
+#define STS_F0          0x04
+#define STS_IBF         0x02
+#define STS_OBF         0x01
 
 /* port 2 bits (UPI-41) */
-#define P2_OBF			0x10
-#define P2_NIBF			0x20
-#define P2_DRQ			0x40
-#define P2_NDACK		0x80
+#define P2_OBF          0x10
+#define P2_NIBF         0x20
+#define P2_DRQ          0x40
+#define P2_NDACK        0x80
 
 /* enable bits (UPI-41) */
-#define ENABLE_FLAGS	0x01
-#define ENABLE_DMA		0x02
+#define ENABLE_FLAGS    0x01
+#define ENABLE_DMA      0x02
 
 /* feature masks */
-#define MCS48_FEATURE	0x01
-#define UPI41_FEATURE	0x02
+#define MCS48_FEATURE   0x01
+#define UPI41_FEATURE   0x02
 
 
 
@@ -120,48 +120,48 @@ T0 output clock
 /* live processor state */
 struct mcs48_state
 {
-	UINT16		prevpc;				/* 16-bit previous program counter */
-	UINT16		pc;					/* 16-bit program counter */
+	UINT16      prevpc;             /* 16-bit previous program counter */
+	UINT16      pc;                 /* 16-bit program counter */
 
-	UINT8		a;					/* 8-bit accumulator */
-	UINT8 *		regptr;				/* pointer to r0-r7 */
-	UINT8		psw;				/* 8-bit cpustate->psw */
-	UINT8		p1;					/* 8-bit latched port 1 */
-	UINT8		p2;					/* 8-bit latched port 2 */
-	UINT8		ea;					/* 1-bit latched ea input */
-	UINT8		timer;				/* 8-bit timer */
-	UINT8		prescaler;			/* 5-bit timer prescaler */
-	UINT8		t1_history;			/* 8-bit history of the T1 input */
-	UINT8		sts;				/* 8-bit status register (UPI-41 only, except for F1) */
-	UINT8		dbbi;				/* 8-bit input data buffer (UPI-41 only) */
-	UINT8		dbbo;				/* 8-bit output data buffer (UPI-41 only) */
+	UINT8       a;                  /* 8-bit accumulator */
+	UINT8 *     regptr;             /* pointer to r0-r7 */
+	UINT8       psw;                /* 8-bit cpustate->psw */
+	UINT8       p1;                 /* 8-bit latched port 1 */
+	UINT8       p2;                 /* 8-bit latched port 2 */
+	UINT8       ea;                 /* 1-bit latched ea input */
+	UINT8       timer;              /* 8-bit timer */
+	UINT8       prescaler;          /* 5-bit timer prescaler */
+	UINT8       t1_history;         /* 8-bit history of the T1 input */
+	UINT8       sts;                /* 8-bit status register (UPI-41 only, except for F1) */
+	UINT8       dbbi;               /* 8-bit input data buffer (UPI-41 only) */
+	UINT8       dbbo;               /* 8-bit output data buffer (UPI-41 only) */
 
-	UINT8		irq_state;			/* TRUE if an IRQ is pending */
-	UINT8		irq_in_progress;	/* TRUE if an IRQ is in progress */
-	UINT8		timer_overflow;		/* TRUE on a timer overflow; cleared by taking interrupt */
-	UINT8		timer_flag;			/* TRUE on a timer overflow; cleared on JTF */
-	UINT8		tirq_enabled;		/* TRUE if the timer IRQ is enabled */
-	UINT8		xirq_enabled;		/* TRUE if the external IRQ is enabled */
-	UINT8		timecount_enabled;	/* bitmask of timer/counter enabled */
-	UINT8		flags_enabled;		/* TRUE if I/O flags have been enabled (UPI-41 only) */
-	UINT8		dma_enabled;		/* TRUE if DMA has been enabled (UPI-41 only) */
+	UINT8       irq_state;          /* TRUE if an IRQ is pending */
+	UINT8       irq_in_progress;    /* TRUE if an IRQ is in progress */
+	UINT8       timer_overflow;     /* TRUE on a timer overflow; cleared by taking interrupt */
+	UINT8       timer_flag;         /* TRUE on a timer overflow; cleared on JTF */
+	UINT8       tirq_enabled;       /* TRUE if the timer IRQ is enabled */
+	UINT8       xirq_enabled;       /* TRUE if the external IRQ is enabled */
+	UINT8       timecount_enabled;  /* bitmask of timer/counter enabled */
+	UINT8       flags_enabled;      /* TRUE if I/O flags have been enabled (UPI-41 only) */
+	UINT8       dma_enabled;        /* TRUE if DMA has been enabled (UPI-41 only) */
 
-	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
+	UINT16      a11;                /* A11 value, either 0x000 or 0x800 */
 
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
-	int			icount;
+	int         icount;
 
 	/* Memory spaces */
-    address_space *program;
-    direct_read_data *direct;
-    address_space *data;
-    address_space *io;
+	address_space *program;
+	direct_read_data *direct;
+	address_space *data;
+	address_space *io;
 
-	UINT8		feature_mask;		/* processor feature flags */
-	UINT16		int_rom_size;		/* internal rom size */
+	UINT8       feature_mask;       /* processor feature flags */
+	UINT16      int_rom_size;       /* internal rom size */
 
-	UINT8		rtemp;				/* temporary for import/export */
+	UINT8       rtemp;              /* temporary for import/export */
 };
 
 
@@ -175,33 +175,33 @@ typedef int (*mcs48_ophandler)(mcs48_state *state);
 ***************************************************************************/
 
 /* ROM is mapped to AS_PROGRAM */
-#define program_r(a)	cpustate->program->read_byte(a)
+#define program_r(a)    cpustate->program->read_byte(a)
 
 /* RAM is mapped to AS_DATA */
-#define ram_r(a)		cpustate->data->read_byte(a)
-#define ram_w(a,V)		cpustate->data->write_byte(a, V)
+#define ram_r(a)        cpustate->data->read_byte(a)
+#define ram_w(a,V)      cpustate->data->write_byte(a, V)
 
 /* ports are mapped to AS_IO */
-#define ext_r(a)		cpustate->io->read_byte(a)
-#define ext_w(a,V)		cpustate->io->write_byte(a, V)
-#define port_r(a)		cpustate->io->read_byte(MCS48_PORT_P0 + a)
-#define port_w(a,V)		cpustate->io->write_byte(MCS48_PORT_P0 + a, V)
-#define test_r(a)		cpustate->io->read_byte(MCS48_PORT_T0 + a)
-#define test_w(a,V)		cpustate->io->write_byte(MCS48_PORT_T0 + a, V)
-#define bus_r()			cpustate->io->read_byte(MCS48_PORT_BUS)
-#define bus_w(V)		cpustate->io->write_byte(MCS48_PORT_BUS, V)
-#define ea_r()			cpustate->io->read_byte(MCS48_PORT_EA)
-#define prog_w(V)		cpustate->io->write_byte(MCS48_PORT_PROG, V)
+#define ext_r(a)        cpustate->io->read_byte(a)
+#define ext_w(a,V)      cpustate->io->write_byte(a, V)
+#define port_r(a)       cpustate->io->read_byte(MCS48_PORT_P0 + a)
+#define port_w(a,V)     cpustate->io->write_byte(MCS48_PORT_P0 + a, V)
+#define test_r(a)       cpustate->io->read_byte(MCS48_PORT_T0 + a)
+#define test_w(a,V)     cpustate->io->write_byte(MCS48_PORT_T0 + a, V)
+#define bus_r()         cpustate->io->read_byte(MCS48_PORT_BUS)
+#define bus_w(V)        cpustate->io->write_byte(MCS48_PORT_BUS, V)
+#define ea_r()          cpustate->io->read_byte(MCS48_PORT_EA)
+#define prog_w(V)       cpustate->io->write_byte(MCS48_PORT_PROG, V)
 
 /* r0-r7 map to memory via the regptr */
-#define R0				regptr[0]
-#define R1				regptr[1]
-#define R2				regptr[2]
-#define R3				regptr[3]
-#define R4				regptr[4]
-#define R5				regptr[5]
-#define R6				regptr[6]
-#define R7				regptr[7]
+#define R0              regptr[0]
+#define R1              regptr[1]
+#define R2              regptr[2]
+#define R3              regptr[3]
+#define R4              regptr[4]
+#define R5              regptr[5]
+#define R6              regptr[6]
+#define R7              regptr[7]
 
 
 
@@ -221,24 +221,24 @@ INLINE mcs48_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I8021 ||
-		   device->type() == I8022 ||
-		   device->type() == I8035 ||
-		   device->type() == I8048 ||
-		   device->type() == I8648 ||
-		   device->type() == I8748 ||
-		   device->type() == I8039 ||
-		   device->type() == I8049 ||
-		   device->type() == I8749 ||
-		   device->type() == I8040 ||
-		   device->type() == I8050 ||
-		   device->type() == I8041 ||
-		   device->type() == I8741 ||
-		   device->type() == I8042 ||
-		   device->type() == I8242 ||
-		   device->type() == I8742 ||
-		   device->type() == MB8884 ||
-		   device->type() == N7751 ||
-		   device->type() == M58715);
+			device->type() == I8022 ||
+			device->type() == I8035 ||
+			device->type() == I8048 ||
+			device->type() == I8648 ||
+			device->type() == I8748 ||
+			device->type() == I8039 ||
+			device->type() == I8049 ||
+			device->type() == I8749 ||
+			device->type() == I8040 ||
+			device->type() == I8050 ||
+			device->type() == I8041 ||
+			device->type() == I8741 ||
+			device->type() == I8042 ||
+			device->type() == I8242 ||
+			device->type() == I8742 ||
+			device->type() == MB8884 ||
+			device->type() == N7751 ||
+			device->type() == M58715);
 	return (mcs48_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -451,68 +451,68 @@ OPHANDLER( illegal )
 	return 1;
 }
 
-OPHANDLER( add_a_r0 )		{ execute_add(cpustate, cpustate->R0); return 1; }
-OPHANDLER( add_a_r1 )		{ execute_add(cpustate, cpustate->R1); return 1; }
-OPHANDLER( add_a_r2 )		{ execute_add(cpustate, cpustate->R2); return 1; }
-OPHANDLER( add_a_r3 )		{ execute_add(cpustate, cpustate->R3); return 1; }
-OPHANDLER( add_a_r4 )		{ execute_add(cpustate, cpustate->R4); return 1; }
-OPHANDLER( add_a_r5 )		{ execute_add(cpustate, cpustate->R5); return 1; }
-OPHANDLER( add_a_r6 )		{ execute_add(cpustate, cpustate->R6); return 1; }
-OPHANDLER( add_a_r7 )		{ execute_add(cpustate, cpustate->R7); return 1; }
-OPHANDLER( add_a_xr0 )		{ execute_add(cpustate, ram_r(cpustate->R0)); return 1; }
-OPHANDLER( add_a_xr1 )		{ execute_add(cpustate, ram_r(cpustate->R1)); return 1; }
-OPHANDLER( add_a_n )		{ execute_add(cpustate, argument_fetch(cpustate)); return 2; }
+OPHANDLER( add_a_r0 )       { execute_add(cpustate, cpustate->R0); return 1; }
+OPHANDLER( add_a_r1 )       { execute_add(cpustate, cpustate->R1); return 1; }
+OPHANDLER( add_a_r2 )       { execute_add(cpustate, cpustate->R2); return 1; }
+OPHANDLER( add_a_r3 )       { execute_add(cpustate, cpustate->R3); return 1; }
+OPHANDLER( add_a_r4 )       { execute_add(cpustate, cpustate->R4); return 1; }
+OPHANDLER( add_a_r5 )       { execute_add(cpustate, cpustate->R5); return 1; }
+OPHANDLER( add_a_r6 )       { execute_add(cpustate, cpustate->R6); return 1; }
+OPHANDLER( add_a_r7 )       { execute_add(cpustate, cpustate->R7); return 1; }
+OPHANDLER( add_a_xr0 )      { execute_add(cpustate, ram_r(cpustate->R0)); return 1; }
+OPHANDLER( add_a_xr1 )      { execute_add(cpustate, ram_r(cpustate->R1)); return 1; }
+OPHANDLER( add_a_n )        { execute_add(cpustate, argument_fetch(cpustate)); return 2; }
 
-OPHANDLER( adc_a_r0 )		{ execute_addc(cpustate, cpustate->R0); return 1; }
-OPHANDLER( adc_a_r1 )		{ execute_addc(cpustate, cpustate->R1); return 1; }
-OPHANDLER( adc_a_r2 )		{ execute_addc(cpustate, cpustate->R2); return 1; }
-OPHANDLER( adc_a_r3 )		{ execute_addc(cpustate, cpustate->R3); return 1; }
-OPHANDLER( adc_a_r4 )		{ execute_addc(cpustate, cpustate->R4); return 1; }
-OPHANDLER( adc_a_r5 )		{ execute_addc(cpustate, cpustate->R5); return 1; }
-OPHANDLER( adc_a_r6 )		{ execute_addc(cpustate, cpustate->R6); return 1; }
-OPHANDLER( adc_a_r7 )		{ execute_addc(cpustate, cpustate->R7); return 1; }
-OPHANDLER( adc_a_xr0 )		{ execute_addc(cpustate, ram_r(cpustate->R0)); return 1; }
-OPHANDLER( adc_a_xr1 )		{ execute_addc(cpustate, ram_r(cpustate->R1)); return 1; }
-OPHANDLER( adc_a_n )		{ execute_addc(cpustate, argument_fetch(cpustate)); return 2; }
+OPHANDLER( adc_a_r0 )       { execute_addc(cpustate, cpustate->R0); return 1; }
+OPHANDLER( adc_a_r1 )       { execute_addc(cpustate, cpustate->R1); return 1; }
+OPHANDLER( adc_a_r2 )       { execute_addc(cpustate, cpustate->R2); return 1; }
+OPHANDLER( adc_a_r3 )       { execute_addc(cpustate, cpustate->R3); return 1; }
+OPHANDLER( adc_a_r4 )       { execute_addc(cpustate, cpustate->R4); return 1; }
+OPHANDLER( adc_a_r5 )       { execute_addc(cpustate, cpustate->R5); return 1; }
+OPHANDLER( adc_a_r6 )       { execute_addc(cpustate, cpustate->R6); return 1; }
+OPHANDLER( adc_a_r7 )       { execute_addc(cpustate, cpustate->R7); return 1; }
+OPHANDLER( adc_a_xr0 )      { execute_addc(cpustate, ram_r(cpustate->R0)); return 1; }
+OPHANDLER( adc_a_xr1 )      { execute_addc(cpustate, ram_r(cpustate->R1)); return 1; }
+OPHANDLER( adc_a_n )        { execute_addc(cpustate, argument_fetch(cpustate)); return 2; }
 
-OPHANDLER( anl_a_r0 )		{ cpustate->a &= cpustate->R0; return 1; }
-OPHANDLER( anl_a_r1 )		{ cpustate->a &= cpustate->R1; return 1; }
-OPHANDLER( anl_a_r2 )		{ cpustate->a &= cpustate->R2; return 1; }
-OPHANDLER( anl_a_r3 )		{ cpustate->a &= cpustate->R3; return 1; }
-OPHANDLER( anl_a_r4 )		{ cpustate->a &= cpustate->R4; return 1; }
-OPHANDLER( anl_a_r5 )		{ cpustate->a &= cpustate->R5; return 1; }
-OPHANDLER( anl_a_r6 )		{ cpustate->a &= cpustate->R6; return 1; }
-OPHANDLER( anl_a_r7 )		{ cpustate->a &= cpustate->R7; return 1; }
-OPHANDLER( anl_a_xr0 )		{ cpustate->a &= ram_r(cpustate->R0); return 1; }
-OPHANDLER( anl_a_xr1 )		{ cpustate->a &= ram_r(cpustate->R1); return 1; }
-OPHANDLER( anl_a_n )		{ cpustate->a &= argument_fetch(cpustate); return 2; }
+OPHANDLER( anl_a_r0 )       { cpustate->a &= cpustate->R0; return 1; }
+OPHANDLER( anl_a_r1 )       { cpustate->a &= cpustate->R1; return 1; }
+OPHANDLER( anl_a_r2 )       { cpustate->a &= cpustate->R2; return 1; }
+OPHANDLER( anl_a_r3 )       { cpustate->a &= cpustate->R3; return 1; }
+OPHANDLER( anl_a_r4 )       { cpustate->a &= cpustate->R4; return 1; }
+OPHANDLER( anl_a_r5 )       { cpustate->a &= cpustate->R5; return 1; }
+OPHANDLER( anl_a_r6 )       { cpustate->a &= cpustate->R6; return 1; }
+OPHANDLER( anl_a_r7 )       { cpustate->a &= cpustate->R7; return 1; }
+OPHANDLER( anl_a_xr0 )      { cpustate->a &= ram_r(cpustate->R0); return 1; }
+OPHANDLER( anl_a_xr1 )      { cpustate->a &= ram_r(cpustate->R1); return 1; }
+OPHANDLER( anl_a_n )        { cpustate->a &= argument_fetch(cpustate); return 2; }
 
-OPHANDLER( anl_bus_n )		{ bus_w(bus_r() & argument_fetch(cpustate)); return 2; }
-OPHANDLER( anl_p1_n )		{ port_w(1, cpustate->p1 &= argument_fetch(cpustate)); return 2; }
-OPHANDLER( anl_p2_n )		{ port_w(2, cpustate->p2 &= argument_fetch(cpustate) | ~p2_mask(cpustate)); return 2; }
-OPHANDLER( anld_p4_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 4); return 2; }
-OPHANDLER( anld_p5_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 5); return 2; }
-OPHANDLER( anld_p6_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 6); return 2; }
-OPHANDLER( anld_p7_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 7); return 2; }
+OPHANDLER( anl_bus_n )      { bus_w(bus_r() & argument_fetch(cpustate)); return 2; }
+OPHANDLER( anl_p1_n )       { port_w(1, cpustate->p1 &= argument_fetch(cpustate)); return 2; }
+OPHANDLER( anl_p2_n )       { port_w(2, cpustate->p2 &= argument_fetch(cpustate) | ~p2_mask(cpustate)); return 2; }
+OPHANDLER( anld_p4_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 4); return 2; }
+OPHANDLER( anld_p5_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 5); return 2; }
+OPHANDLER( anld_p6_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 6); return 2; }
+OPHANDLER( anld_p7_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_AND, 7); return 2; }
 
-OPHANDLER( call_0 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x000); return 2; }
-OPHANDLER( call_1 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x100); return 2; }
-OPHANDLER( call_2 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x200); return 2; }
-OPHANDLER( call_3 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x300); return 2; }
-OPHANDLER( call_4 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x400); return 2; }
-OPHANDLER( call_5 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x500); return 2; }
-OPHANDLER( call_6 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x600); return 2; }
-OPHANDLER( call_7 )			{ execute_call(cpustate, argument_fetch(cpustate) | 0x700); return 2; }
+OPHANDLER( call_0 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x000); return 2; }
+OPHANDLER( call_1 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x100); return 2; }
+OPHANDLER( call_2 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x200); return 2; }
+OPHANDLER( call_3 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x300); return 2; }
+OPHANDLER( call_4 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x400); return 2; }
+OPHANDLER( call_5 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x500); return 2; }
+OPHANDLER( call_6 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x600); return 2; }
+OPHANDLER( call_7 )         { execute_call(cpustate, argument_fetch(cpustate) | 0x700); return 2; }
 
-OPHANDLER( clr_a )			{ cpustate->a = 0; return 1; }
-OPHANDLER( clr_c )			{ cpustate->psw &= ~C_FLAG; return 1; }
-OPHANDLER( clr_f0 )			{ cpustate->psw &= ~F_FLAG; cpustate->sts &= ~STS_F0; return 1; }
-OPHANDLER( clr_f1 )			{ cpustate->sts &= ~STS_F1; return 1; }
+OPHANDLER( clr_a )          { cpustate->a = 0; return 1; }
+OPHANDLER( clr_c )          { cpustate->psw &= ~C_FLAG; return 1; }
+OPHANDLER( clr_f0 )         { cpustate->psw &= ~F_FLAG; cpustate->sts &= ~STS_F0; return 1; }
+OPHANDLER( clr_f1 )         { cpustate->sts &= ~STS_F1; return 1; }
 
-OPHANDLER( cpl_a )			{ cpustate->a ^= 0xff; return 1; }
-OPHANDLER( cpl_c )			{ cpustate->psw ^= C_FLAG; return 1; }
-OPHANDLER( cpl_f0 )			{ cpustate->psw ^= F_FLAG; cpustate->sts ^= STS_F0; return 1; }
-OPHANDLER( cpl_f1 )			{ cpustate->sts ^= STS_F1; return 1; }
+OPHANDLER( cpl_a )          { cpustate->a ^= 0xff; return 1; }
+OPHANDLER( cpl_c )          { cpustate->psw ^= C_FLAG; return 1; }
+OPHANDLER( cpl_f0 )         { cpustate->psw ^= F_FLAG; cpustate->sts ^= STS_F0; return 1; }
+OPHANDLER( cpl_f1 )         { cpustate->sts ^= STS_F1; return 1; }
 
 OPHANDLER( da_a )
 {
@@ -532,41 +532,41 @@ OPHANDLER( da_a )
 	return 1;
 }
 
-OPHANDLER( dec_a )			{ cpustate->a--; return 1; }
-OPHANDLER( dec_r0 )			{ cpustate->R0--; return 1; }
-OPHANDLER( dec_r1 )			{ cpustate->R1--; return 1; }
-OPHANDLER( dec_r2 )			{ cpustate->R2--; return 1; }
-OPHANDLER( dec_r3 )			{ cpustate->R3--; return 1; }
-OPHANDLER( dec_r4 )			{ cpustate->R4--; return 1; }
-OPHANDLER( dec_r5 )			{ cpustate->R5--; return 1; }
-OPHANDLER( dec_r6 )			{ cpustate->R6--; return 1; }
-OPHANDLER( dec_r7 )			{ cpustate->R7--; return 1; }
+OPHANDLER( dec_a )          { cpustate->a--; return 1; }
+OPHANDLER( dec_r0 )         { cpustate->R0--; return 1; }
+OPHANDLER( dec_r1 )         { cpustate->R1--; return 1; }
+OPHANDLER( dec_r2 )         { cpustate->R2--; return 1; }
+OPHANDLER( dec_r3 )         { cpustate->R3--; return 1; }
+OPHANDLER( dec_r4 )         { cpustate->R4--; return 1; }
+OPHANDLER( dec_r5 )         { cpustate->R5--; return 1; }
+OPHANDLER( dec_r6 )         { cpustate->R6--; return 1; }
+OPHANDLER( dec_r7 )         { cpustate->R7--; return 1; }
 
-OPHANDLER( dis_i )			{ cpustate->xirq_enabled = FALSE; return 1; }
-OPHANDLER( dis_tcnti )		{ cpustate->tirq_enabled = FALSE; cpustate->timer_overflow = FALSE; return 1; }
+OPHANDLER( dis_i )          { cpustate->xirq_enabled = FALSE; return 1; }
+OPHANDLER( dis_tcnti )      { cpustate->tirq_enabled = FALSE; cpustate->timer_overflow = FALSE; return 1; }
 
-OPHANDLER( djnz_r0 )		{ execute_jcc(cpustate, --cpustate->R0 != 0); return 2; }
-OPHANDLER( djnz_r1 )		{ execute_jcc(cpustate, --cpustate->R1 != 0); return 2; }
-OPHANDLER( djnz_r2 )		{ execute_jcc(cpustate, --cpustate->R2 != 0); return 2; }
-OPHANDLER( djnz_r3 )		{ execute_jcc(cpustate, --cpustate->R3 != 0); return 2; }
-OPHANDLER( djnz_r4 )		{ execute_jcc(cpustate, --cpustate->R4 != 0); return 2; }
-OPHANDLER( djnz_r5 )		{ execute_jcc(cpustate, --cpustate->R5 != 0); return 2; }
-OPHANDLER( djnz_r6 )		{ execute_jcc(cpustate, --cpustate->R6 != 0); return 2; }
-OPHANDLER( djnz_r7 )		{ execute_jcc(cpustate, --cpustate->R7 != 0); return 2; }
+OPHANDLER( djnz_r0 )        { execute_jcc(cpustate, --cpustate->R0 != 0); return 2; }
+OPHANDLER( djnz_r1 )        { execute_jcc(cpustate, --cpustate->R1 != 0); return 2; }
+OPHANDLER( djnz_r2 )        { execute_jcc(cpustate, --cpustate->R2 != 0); return 2; }
+OPHANDLER( djnz_r3 )        { execute_jcc(cpustate, --cpustate->R3 != 0); return 2; }
+OPHANDLER( djnz_r4 )        { execute_jcc(cpustate, --cpustate->R4 != 0); return 2; }
+OPHANDLER( djnz_r5 )        { execute_jcc(cpustate, --cpustate->R5 != 0); return 2; }
+OPHANDLER( djnz_r6 )        { execute_jcc(cpustate, --cpustate->R6 != 0); return 2; }
+OPHANDLER( djnz_r7 )        { execute_jcc(cpustate, --cpustate->R7 != 0); return 2; }
 
-OPHANDLER( en_i )			{ cpustate->xirq_enabled = TRUE; return 1 + check_irqs(cpustate); }
-OPHANDLER( en_tcnti )		{ cpustate->tirq_enabled = TRUE; return 1 + check_irqs(cpustate); }
-OPHANDLER( en_dma )			{ cpustate->dma_enabled = TRUE; port_w(2, cpustate->p2); return 1; }
-OPHANDLER( en_flags )		{ cpustate->flags_enabled = TRUE; port_w(2, cpustate->p2); return 1; }
+OPHANDLER( en_i )           { cpustate->xirq_enabled = TRUE; return 1 + check_irqs(cpustate); }
+OPHANDLER( en_tcnti )       { cpustate->tirq_enabled = TRUE; return 1 + check_irqs(cpustate); }
+OPHANDLER( en_dma )         { cpustate->dma_enabled = TRUE; port_w(2, cpustate->p2); return 1; }
+OPHANDLER( en_flags )       { cpustate->flags_enabled = TRUE; port_w(2, cpustate->p2); return 1; }
 OPHANDLER( ent0_clk )
 {
 	logerror("MCS-48 PC:%04X - Unimplemented opcode = %02x\n", cpustate->pc - 1, program_r(cpustate->pc - 1));
 	return 1;
 }
 
-OPHANDLER( in_a_p1 )		{ cpustate->a = port_r(1) & cpustate->p1; return 2; }
-OPHANDLER( in_a_p2 )		{ cpustate->a = port_r(2) & cpustate->p2; return 2; }
-OPHANDLER( ins_a_bus )		{ cpustate->a = bus_r(); return 2; }
+OPHANDLER( in_a_p1 )        { cpustate->a = port_r(1) & cpustate->p1; return 2; }
+OPHANDLER( in_a_p2 )        { cpustate->a = port_r(2) & cpustate->p2; return 2; }
+OPHANDLER( ins_a_bus )      { cpustate->a = bus_r(); return 2; }
 OPHANDLER( in_a_dbb )
 {
 	/* acknowledge the IBF IRQ and clear the bit in STS */
@@ -581,131 +581,131 @@ OPHANDLER( in_a_dbb )
 	return 2;
 }
 
-OPHANDLER( inc_a )			{ cpustate->a++; return 1; }
-OPHANDLER( inc_r0 )			{ cpustate->R0++; return 1; }
-OPHANDLER( inc_r1 )			{ cpustate->R1++; return 1; }
-OPHANDLER( inc_r2 )			{ cpustate->R2++; return 1; }
-OPHANDLER( inc_r3 )			{ cpustate->R3++; return 1; }
-OPHANDLER( inc_r4 )			{ cpustate->R4++; return 1; }
-OPHANDLER( inc_r5 )			{ cpustate->R5++; return 1; }
-OPHANDLER( inc_r6 )			{ cpustate->R6++; return 1; }
-OPHANDLER( inc_r7 )			{ cpustate->R7++; return 1; }
-OPHANDLER( inc_xr0 )		{ ram_w(cpustate->R0, ram_r(cpustate->R0) + 1); return 1; }
-OPHANDLER( inc_xr1 )		{ ram_w(cpustate->R1, ram_r(cpustate->R1) + 1); return 1; }
+OPHANDLER( inc_a )          { cpustate->a++; return 1; }
+OPHANDLER( inc_r0 )         { cpustate->R0++; return 1; }
+OPHANDLER( inc_r1 )         { cpustate->R1++; return 1; }
+OPHANDLER( inc_r2 )         { cpustate->R2++; return 1; }
+OPHANDLER( inc_r3 )         { cpustate->R3++; return 1; }
+OPHANDLER( inc_r4 )         { cpustate->R4++; return 1; }
+OPHANDLER( inc_r5 )         { cpustate->R5++; return 1; }
+OPHANDLER( inc_r6 )         { cpustate->R6++; return 1; }
+OPHANDLER( inc_r7 )         { cpustate->R7++; return 1; }
+OPHANDLER( inc_xr0 )        { ram_w(cpustate->R0, ram_r(cpustate->R0) + 1); return 1; }
+OPHANDLER( inc_xr1 )        { ram_w(cpustate->R1, ram_r(cpustate->R1) + 1); return 1; }
 
-OPHANDLER( jb_0 )			{ execute_jcc(cpustate, (cpustate->a & 0x01) != 0); return 2; }
-OPHANDLER( jb_1 )			{ execute_jcc(cpustate, (cpustate->a & 0x02) != 0); return 2; }
-OPHANDLER( jb_2 )			{ execute_jcc(cpustate, (cpustate->a & 0x04) != 0); return 2; }
-OPHANDLER( jb_3 )			{ execute_jcc(cpustate, (cpustate->a & 0x08) != 0); return 2; }
-OPHANDLER( jb_4 )			{ execute_jcc(cpustate, (cpustate->a & 0x10) != 0); return 2; }
-OPHANDLER( jb_5 )			{ execute_jcc(cpustate, (cpustate->a & 0x20) != 0); return 2; }
-OPHANDLER( jb_6 )			{ execute_jcc(cpustate, (cpustate->a & 0x40) != 0); return 2; }
-OPHANDLER( jb_7 )			{ execute_jcc(cpustate, (cpustate->a & 0x80) != 0); return 2; }
-OPHANDLER( jc )				{ execute_jcc(cpustate, (cpustate->psw & C_FLAG) != 0); return 2; }
-OPHANDLER( jf0 )			{ execute_jcc(cpustate, (cpustate->psw & F_FLAG) != 0); return 2; }
-OPHANDLER( jf1 )			{ execute_jcc(cpustate, (cpustate->sts & STS_F1) != 0); return 2; }
-OPHANDLER( jnc )			{ execute_jcc(cpustate, (cpustate->psw & C_FLAG) == 0); return 2; }
-OPHANDLER( jni )			{ execute_jcc(cpustate, cpustate->irq_state != 0); return 2; }
-OPHANDLER( jnibf )			{ execute_jcc(cpustate, (cpustate->sts & STS_IBF) == 0); return 2; }
-OPHANDLER( jnt_0 )  		{ execute_jcc(cpustate, test_r(0) == 0); return 2; }
-OPHANDLER( jnt_1 )  		{ execute_jcc(cpustate, test_r(1) == 0); return 2; }
-OPHANDLER( jnz )			{ execute_jcc(cpustate, cpustate->a != 0); return 2; }
-OPHANDLER( jobf )			{ execute_jcc(cpustate, (cpustate->sts & STS_OBF) != 0); return 2; }
-OPHANDLER( jtf )			{ execute_jcc(cpustate, cpustate->timer_flag); cpustate->timer_flag = FALSE; return 2; }
-OPHANDLER( jt_0 )			{ execute_jcc(cpustate, test_r(0) != 0); return 2; }
-OPHANDLER( jt_1 )			{ execute_jcc(cpustate, test_r(1) != 0); return 2; }
-OPHANDLER( jz )				{ execute_jcc(cpustate, cpustate->a == 0); return 2; }
+OPHANDLER( jb_0 )           { execute_jcc(cpustate, (cpustate->a & 0x01) != 0); return 2; }
+OPHANDLER( jb_1 )           { execute_jcc(cpustate, (cpustate->a & 0x02) != 0); return 2; }
+OPHANDLER( jb_2 )           { execute_jcc(cpustate, (cpustate->a & 0x04) != 0); return 2; }
+OPHANDLER( jb_3 )           { execute_jcc(cpustate, (cpustate->a & 0x08) != 0); return 2; }
+OPHANDLER( jb_4 )           { execute_jcc(cpustate, (cpustate->a & 0x10) != 0); return 2; }
+OPHANDLER( jb_5 )           { execute_jcc(cpustate, (cpustate->a & 0x20) != 0); return 2; }
+OPHANDLER( jb_6 )           { execute_jcc(cpustate, (cpustate->a & 0x40) != 0); return 2; }
+OPHANDLER( jb_7 )           { execute_jcc(cpustate, (cpustate->a & 0x80) != 0); return 2; }
+OPHANDLER( jc )             { execute_jcc(cpustate, (cpustate->psw & C_FLAG) != 0); return 2; }
+OPHANDLER( jf0 )            { execute_jcc(cpustate, (cpustate->psw & F_FLAG) != 0); return 2; }
+OPHANDLER( jf1 )            { execute_jcc(cpustate, (cpustate->sts & STS_F1) != 0); return 2; }
+OPHANDLER( jnc )            { execute_jcc(cpustate, (cpustate->psw & C_FLAG) == 0); return 2; }
+OPHANDLER( jni )            { execute_jcc(cpustate, cpustate->irq_state != 0); return 2; }
+OPHANDLER( jnibf )          { execute_jcc(cpustate, (cpustate->sts & STS_IBF) == 0); return 2; }
+OPHANDLER( jnt_0 )          { execute_jcc(cpustate, test_r(0) == 0); return 2; }
+OPHANDLER( jnt_1 )          { execute_jcc(cpustate, test_r(1) == 0); return 2; }
+OPHANDLER( jnz )            { execute_jcc(cpustate, cpustate->a != 0); return 2; }
+OPHANDLER( jobf )           { execute_jcc(cpustate, (cpustate->sts & STS_OBF) != 0); return 2; }
+OPHANDLER( jtf )            { execute_jcc(cpustate, cpustate->timer_flag); cpustate->timer_flag = FALSE; return 2; }
+OPHANDLER( jt_0 )           { execute_jcc(cpustate, test_r(0) != 0); return 2; }
+OPHANDLER( jt_1 )           { execute_jcc(cpustate, test_r(1) != 0); return 2; }
+OPHANDLER( jz )             { execute_jcc(cpustate, cpustate->a == 0); return 2; }
 
-OPHANDLER( jmp_0 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x000); return 2; }
-OPHANDLER( jmp_1 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x100); return 2; }
-OPHANDLER( jmp_2 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x200); return 2; }
-OPHANDLER( jmp_3 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x300); return 2; }
-OPHANDLER( jmp_4 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x400); return 2; }
-OPHANDLER( jmp_5 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x500); return 2; }
-OPHANDLER( jmp_6 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x600); return 2; }
-OPHANDLER( jmp_7 )			{ execute_jmp(cpustate, argument_fetch(cpustate) | 0x700); return 2; }
-OPHANDLER( jmpp_xa )		{ cpustate->pc &= 0xf00; cpustate->pc |= program_r(cpustate->pc | cpustate->a); return 2; }
+OPHANDLER( jmp_0 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x000); return 2; }
+OPHANDLER( jmp_1 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x100); return 2; }
+OPHANDLER( jmp_2 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x200); return 2; }
+OPHANDLER( jmp_3 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x300); return 2; }
+OPHANDLER( jmp_4 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x400); return 2; }
+OPHANDLER( jmp_5 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x500); return 2; }
+OPHANDLER( jmp_6 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x600); return 2; }
+OPHANDLER( jmp_7 )          { execute_jmp(cpustate, argument_fetch(cpustate) | 0x700); return 2; }
+OPHANDLER( jmpp_xa )        { cpustate->pc &= 0xf00; cpustate->pc |= program_r(cpustate->pc | cpustate->a); return 2; }
 
-OPHANDLER( mov_a_n )		{ cpustate->a = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_a_psw )		{ cpustate->a = cpustate->psw; return 1; }
-OPHANDLER( mov_a_r0 )		{ cpustate->a = cpustate->R0; return 1; }
-OPHANDLER( mov_a_r1 )		{ cpustate->a = cpustate->R1; return 1; }
-OPHANDLER( mov_a_r2 )		{ cpustate->a = cpustate->R2; return 1; }
-OPHANDLER( mov_a_r3 )		{ cpustate->a = cpustate->R3; return 1; }
-OPHANDLER( mov_a_r4 )		{ cpustate->a = cpustate->R4; return 1; }
-OPHANDLER( mov_a_r5 )		{ cpustate->a = cpustate->R5; return 1; }
-OPHANDLER( mov_a_r6 )		{ cpustate->a = cpustate->R6; return 1; }
-OPHANDLER( mov_a_r7 )		{ cpustate->a = cpustate->R7; return 1; }
-OPHANDLER( mov_a_xr0 )		{ cpustate->a = ram_r(cpustate->R0); return 1; }
-OPHANDLER( mov_a_xr1 )		{ cpustate->a = ram_r(cpustate->R1); return 1; }
-OPHANDLER( mov_a_t )		{ cpustate->a = cpustate->timer; return 1; }
+OPHANDLER( mov_a_n )        { cpustate->a = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_a_psw )      { cpustate->a = cpustate->psw; return 1; }
+OPHANDLER( mov_a_r0 )       { cpustate->a = cpustate->R0; return 1; }
+OPHANDLER( mov_a_r1 )       { cpustate->a = cpustate->R1; return 1; }
+OPHANDLER( mov_a_r2 )       { cpustate->a = cpustate->R2; return 1; }
+OPHANDLER( mov_a_r3 )       { cpustate->a = cpustate->R3; return 1; }
+OPHANDLER( mov_a_r4 )       { cpustate->a = cpustate->R4; return 1; }
+OPHANDLER( mov_a_r5 )       { cpustate->a = cpustate->R5; return 1; }
+OPHANDLER( mov_a_r6 )       { cpustate->a = cpustate->R6; return 1; }
+OPHANDLER( mov_a_r7 )       { cpustate->a = cpustate->R7; return 1; }
+OPHANDLER( mov_a_xr0 )      { cpustate->a = ram_r(cpustate->R0); return 1; }
+OPHANDLER( mov_a_xr1 )      { cpustate->a = ram_r(cpustate->R1); return 1; }
+OPHANDLER( mov_a_t )        { cpustate->a = cpustate->timer; return 1; }
 
-OPHANDLER( mov_psw_a )		{ cpustate->psw = cpustate->a; update_regptr(cpustate); return 1; }
-OPHANDLER( mov_sts_a )		{ cpustate->sts = (cpustate->sts & 0x0f) | (cpustate->a & 0xf0); return 1; }
-OPHANDLER( mov_r0_a )		{ cpustate->R0 = cpustate->a; return 1; }
-OPHANDLER( mov_r1_a )		{ cpustate->R1 = cpustate->a; return 1; }
-OPHANDLER( mov_r2_a )		{ cpustate->R2 = cpustate->a; return 1; }
-OPHANDLER( mov_r3_a )		{ cpustate->R3 = cpustate->a; return 1; }
-OPHANDLER( mov_r4_a )		{ cpustate->R4 = cpustate->a; return 1; }
-OPHANDLER( mov_r5_a )		{ cpustate->R5 = cpustate->a; return 1; }
-OPHANDLER( mov_r6_a )		{ cpustate->R6 = cpustate->a; return 1; }
-OPHANDLER( mov_r7_a )		{ cpustate->R7 = cpustate->a; return 1; }
-OPHANDLER( mov_r0_n )		{ cpustate->R0 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_r1_n )		{ cpustate->R1 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_r2_n )		{ cpustate->R2 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_r3_n )		{ cpustate->R3 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_r4_n )		{ cpustate->R4 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_r5_n )		{ cpustate->R5 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_r6_n )		{ cpustate->R6 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_r7_n )		{ cpustate->R7 = argument_fetch(cpustate); return 2; }
-OPHANDLER( mov_t_a )		{ cpustate->timer = cpustate->a; return 1; }
-OPHANDLER( mov_xr0_a )		{ ram_w(cpustate->R0, cpustate->a); return 1; }
-OPHANDLER( mov_xr1_a )		{ ram_w(cpustate->R1, cpustate->a); return 1; }
-OPHANDLER( mov_xr0_n )		{ ram_w(cpustate->R0, argument_fetch(cpustate)); return 2; }
-OPHANDLER( mov_xr1_n )		{ ram_w(cpustate->R1, argument_fetch(cpustate)); return 2; }
+OPHANDLER( mov_psw_a )      { cpustate->psw = cpustate->a; update_regptr(cpustate); return 1; }
+OPHANDLER( mov_sts_a )      { cpustate->sts = (cpustate->sts & 0x0f) | (cpustate->a & 0xf0); return 1; }
+OPHANDLER( mov_r0_a )       { cpustate->R0 = cpustate->a; return 1; }
+OPHANDLER( mov_r1_a )       { cpustate->R1 = cpustate->a; return 1; }
+OPHANDLER( mov_r2_a )       { cpustate->R2 = cpustate->a; return 1; }
+OPHANDLER( mov_r3_a )       { cpustate->R3 = cpustate->a; return 1; }
+OPHANDLER( mov_r4_a )       { cpustate->R4 = cpustate->a; return 1; }
+OPHANDLER( mov_r5_a )       { cpustate->R5 = cpustate->a; return 1; }
+OPHANDLER( mov_r6_a )       { cpustate->R6 = cpustate->a; return 1; }
+OPHANDLER( mov_r7_a )       { cpustate->R7 = cpustate->a; return 1; }
+OPHANDLER( mov_r0_n )       { cpustate->R0 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_r1_n )       { cpustate->R1 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_r2_n )       { cpustate->R2 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_r3_n )       { cpustate->R3 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_r4_n )       { cpustate->R4 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_r5_n )       { cpustate->R5 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_r6_n )       { cpustate->R6 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_r7_n )       { cpustate->R7 = argument_fetch(cpustate); return 2; }
+OPHANDLER( mov_t_a )        { cpustate->timer = cpustate->a; return 1; }
+OPHANDLER( mov_xr0_a )      { ram_w(cpustate->R0, cpustate->a); return 1; }
+OPHANDLER( mov_xr1_a )      { ram_w(cpustate->R1, cpustate->a); return 1; }
+OPHANDLER( mov_xr0_n )      { ram_w(cpustate->R0, argument_fetch(cpustate)); return 2; }
+OPHANDLER( mov_xr1_n )      { ram_w(cpustate->R1, argument_fetch(cpustate)); return 2; }
 
-OPHANDLER( movd_a_p4 )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 4); return 2; }
-OPHANDLER( movd_a_p5 )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 5); return 2; }
-OPHANDLER( movd_a_p6 )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 6); return 2; }
-OPHANDLER( movd_a_p7 )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 7); return 2; }
-OPHANDLER( movd_p4_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 4); return 2; }
-OPHANDLER( movd_p5_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 5); return 2; }
-OPHANDLER( movd_p6_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 6); return 2; }
-OPHANDLER( movd_p7_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 7); return 2; }
+OPHANDLER( movd_a_p4 )      { expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 4); return 2; }
+OPHANDLER( movd_a_p5 )      { expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 5); return 2; }
+OPHANDLER( movd_a_p6 )      { expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 6); return 2; }
+OPHANDLER( movd_a_p7 )      { expander_operation(cpustate, MCS48_EXPANDER_OP_READ, 7); return 2; }
+OPHANDLER( movd_p4_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 4); return 2; }
+OPHANDLER( movd_p5_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 5); return 2; }
+OPHANDLER( movd_p6_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 6); return 2; }
+OPHANDLER( movd_p7_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_WRITE, 7); return 2; }
 
-OPHANDLER( movp_a_xa )		{ cpustate->a = program_r((cpustate->pc & 0xf00) | cpustate->a); return 2; }
-OPHANDLER( movp3_a_xa )		{ cpustate->a = program_r(0x300 | cpustate->a); return 2; }
+OPHANDLER( movp_a_xa )      { cpustate->a = program_r((cpustate->pc & 0xf00) | cpustate->a); return 2; }
+OPHANDLER( movp3_a_xa )     { cpustate->a = program_r(0x300 | cpustate->a); return 2; }
 
-OPHANDLER( movx_a_xr0 )		{ cpustate->a = ext_r(cpustate->R0); return 2; }
-OPHANDLER( movx_a_xr1 )		{ cpustate->a = ext_r(cpustate->R1); return 2; }
-OPHANDLER( movx_xr0_a )		{ ext_w(cpustate->R0, cpustate->a); return 2; }
-OPHANDLER( movx_xr1_a )		{ ext_w(cpustate->R1, cpustate->a); return 2; }
+OPHANDLER( movx_a_xr0 )     { cpustate->a = ext_r(cpustate->R0); return 2; }
+OPHANDLER( movx_a_xr1 )     { cpustate->a = ext_r(cpustate->R1); return 2; }
+OPHANDLER( movx_xr0_a )     { ext_w(cpustate->R0, cpustate->a); return 2; }
+OPHANDLER( movx_xr1_a )     { ext_w(cpustate->R1, cpustate->a); return 2; }
 
-OPHANDLER( nop )			{ return 1; }
+OPHANDLER( nop )            { return 1; }
 
-OPHANDLER( orl_a_r0 )		{ cpustate->a |= cpustate->R0; return 1; }
-OPHANDLER( orl_a_r1 )		{ cpustate->a |= cpustate->R1; return 1; }
-OPHANDLER( orl_a_r2 )		{ cpustate->a |= cpustate->R2; return 1; }
-OPHANDLER( orl_a_r3 )		{ cpustate->a |= cpustate->R3; return 1; }
-OPHANDLER( orl_a_r4 )		{ cpustate->a |= cpustate->R4; return 1; }
-OPHANDLER( orl_a_r5 )		{ cpustate->a |= cpustate->R5; return 1; }
-OPHANDLER( orl_a_r6 )		{ cpustate->a |= cpustate->R6; return 1; }
-OPHANDLER( orl_a_r7 )		{ cpustate->a |= cpustate->R7; return 1; }
-OPHANDLER( orl_a_xr0 )		{ cpustate->a |= ram_r(cpustate->R0); return 1; }
-OPHANDLER( orl_a_xr1 )		{ cpustate->a |= ram_r(cpustate->R1); return 1; }
-OPHANDLER( orl_a_n )		{ cpustate->a |= argument_fetch(cpustate); return 2; }
+OPHANDLER( orl_a_r0 )       { cpustate->a |= cpustate->R0; return 1; }
+OPHANDLER( orl_a_r1 )       { cpustate->a |= cpustate->R1; return 1; }
+OPHANDLER( orl_a_r2 )       { cpustate->a |= cpustate->R2; return 1; }
+OPHANDLER( orl_a_r3 )       { cpustate->a |= cpustate->R3; return 1; }
+OPHANDLER( orl_a_r4 )       { cpustate->a |= cpustate->R4; return 1; }
+OPHANDLER( orl_a_r5 )       { cpustate->a |= cpustate->R5; return 1; }
+OPHANDLER( orl_a_r6 )       { cpustate->a |= cpustate->R6; return 1; }
+OPHANDLER( orl_a_r7 )       { cpustate->a |= cpustate->R7; return 1; }
+OPHANDLER( orl_a_xr0 )      { cpustate->a |= ram_r(cpustate->R0); return 1; }
+OPHANDLER( orl_a_xr1 )      { cpustate->a |= ram_r(cpustate->R1); return 1; }
+OPHANDLER( orl_a_n )        { cpustate->a |= argument_fetch(cpustate); return 2; }
 
-OPHANDLER( orl_bus_n )		{ bus_w(bus_r() | argument_fetch(cpustate)); return 2; }
-OPHANDLER( orl_p1_n )		{ port_w(1, cpustate->p1 |= argument_fetch(cpustate)); return 2; }
-OPHANDLER( orl_p2_n )		{ port_w(2, cpustate->p2 |= argument_fetch(cpustate) & p2_mask(cpustate)); return 2; }
-OPHANDLER( orld_p4_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 4); return 2; }
-OPHANDLER( orld_p5_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 5); return 2; }
-OPHANDLER( orld_p6_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 6); return 2; }
-OPHANDLER( orld_p7_a )		{ expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 7); return 2; }
+OPHANDLER( orl_bus_n )      { bus_w(bus_r() | argument_fetch(cpustate)); return 2; }
+OPHANDLER( orl_p1_n )       { port_w(1, cpustate->p1 |= argument_fetch(cpustate)); return 2; }
+OPHANDLER( orl_p2_n )       { port_w(2, cpustate->p2 |= argument_fetch(cpustate) & p2_mask(cpustate)); return 2; }
+OPHANDLER( orld_p4_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 4); return 2; }
+OPHANDLER( orld_p5_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 5); return 2; }
+OPHANDLER( orld_p6_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 6); return 2; }
+OPHANDLER( orld_p7_a )      { expander_operation(cpustate, MCS48_EXPANDER_OP_OR, 7); return 2; }
 
-OPHANDLER( outl_bus_a )		{ bus_w(cpustate->a); return 2; }
-OPHANDLER( outl_p1_a )		{ port_w(1, cpustate->p1 = cpustate->a); return 2; }
-OPHANDLER( outl_p2_a )		{ UINT8 mask = p2_mask(cpustate); port_w(2, cpustate->p2 = (cpustate->p2 & ~mask) | (cpustate->a & mask)); return 2; }
+OPHANDLER( outl_bus_a )     { bus_w(cpustate->a); return 2; }
+OPHANDLER( outl_p1_a )      { port_w(1, cpustate->p1 = cpustate->a); return 2; }
+OPHANDLER( outl_p2_a )      { UINT8 mask = p2_mask(cpustate); port_w(2, cpustate->p2 = (cpustate->p2 & ~mask) | (cpustate->a & mask)); return 2; }
 OPHANDLER( out_dbb_a )
 {
 	/* copy to the DBBO and update the bit in STS */
@@ -719,7 +719,7 @@ OPHANDLER( out_dbb_a )
 }
 
 
-OPHANDLER( ret )			{ pull_pc(cpustate); return 2; }
+OPHANDLER( ret )            { pull_pc(cpustate); return 2; }
 OPHANDLER( retr )
 {
 	pull_pc_psw(cpustate);
@@ -729,50 +729,50 @@ OPHANDLER( retr )
 	return 2 + check_irqs(cpustate);
 }
 
-OPHANDLER( rl_a )			{ cpustate->a = (cpustate->a << 1) | (cpustate->a >> 7); return 1; }
-OPHANDLER( rlc_a )			{ UINT8 newc = cpustate->a & C_FLAG; cpustate->a = (cpustate->a << 1) | (cpustate->psw >> 7); cpustate->psw = (cpustate->psw & ~C_FLAG) | newc; return 1; }
+OPHANDLER( rl_a )           { cpustate->a = (cpustate->a << 1) | (cpustate->a >> 7); return 1; }
+OPHANDLER( rlc_a )          { UINT8 newc = cpustate->a & C_FLAG; cpustate->a = (cpustate->a << 1) | (cpustate->psw >> 7); cpustate->psw = (cpustate->psw & ~C_FLAG) | newc; return 1; }
 
-OPHANDLER( rr_a )			{ cpustate->a = (cpustate->a >> 1) | (cpustate->a << 7); return 1; }
-OPHANDLER( rrc_a )			{ UINT8 newc = (cpustate->a << 7) & C_FLAG; cpustate->a = (cpustate->a >> 1) | (cpustate->psw & C_FLAG); cpustate->psw = (cpustate->psw & ~C_FLAG) | newc; return 1; }
+OPHANDLER( rr_a )           { cpustate->a = (cpustate->a >> 1) | (cpustate->a << 7); return 1; }
+OPHANDLER( rrc_a )          { UINT8 newc = (cpustate->a << 7) & C_FLAG; cpustate->a = (cpustate->a >> 1) | (cpustate->psw & C_FLAG); cpustate->psw = (cpustate->psw & ~C_FLAG) | newc; return 1; }
 
-OPHANDLER( sel_mb0 )		{ cpustate->a11 = 0x000; return 1; }
-OPHANDLER( sel_mb1 )		{ cpustate->a11 = 0x800; return 1; }
+OPHANDLER( sel_mb0 )        { cpustate->a11 = 0x000; return 1; }
+OPHANDLER( sel_mb1 )        { cpustate->a11 = 0x800; return 1; }
 
-OPHANDLER( sel_rb0 )		{ cpustate->psw &= ~B_FLAG; update_regptr(cpustate); return 1; }
-OPHANDLER( sel_rb1 )		{ cpustate->psw |=  B_FLAG; update_regptr(cpustate); return 1; }
+OPHANDLER( sel_rb0 )        { cpustate->psw &= ~B_FLAG; update_regptr(cpustate); return 1; }
+OPHANDLER( sel_rb1 )        { cpustate->psw |=  B_FLAG; update_regptr(cpustate); return 1; }
 
-OPHANDLER( stop_tcnt )		{ cpustate->timecount_enabled = 0; return 1; }
+OPHANDLER( stop_tcnt )      { cpustate->timecount_enabled = 0; return 1; }
 
-OPHANDLER( strt_cnt )		{ cpustate->timecount_enabled = COUNTER_ENABLED; cpustate->t1_history = test_r(1); return 1; }
-OPHANDLER( strt_t )			{ cpustate->timecount_enabled = TIMER_ENABLED; cpustate->prescaler = 0; return 1; }
+OPHANDLER( strt_cnt )       { cpustate->timecount_enabled = COUNTER_ENABLED; cpustate->t1_history = test_r(1); return 1; }
+OPHANDLER( strt_t )         { cpustate->timecount_enabled = TIMER_ENABLED; cpustate->prescaler = 0; return 1; }
 
-OPHANDLER( swap_a )			{ cpustate->a = (cpustate->a << 4) | (cpustate->a >> 4); return 1; }
+OPHANDLER( swap_a )         { cpustate->a = (cpustate->a << 4) | (cpustate->a >> 4); return 1; }
 
-OPHANDLER( xch_a_r0 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R0; cpustate->R0 = tmp; return 1; }
-OPHANDLER( xch_a_r1 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R1; cpustate->R1 = tmp; return 1; }
-OPHANDLER( xch_a_r2 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R2; cpustate->R2 = tmp; return 1; }
-OPHANDLER( xch_a_r3 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R3; cpustate->R3 = tmp; return 1; }
-OPHANDLER( xch_a_r4 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R4; cpustate->R4 = tmp; return 1; }
-OPHANDLER( xch_a_r5 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R5; cpustate->R5 = tmp; return 1; }
-OPHANDLER( xch_a_r6 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R6; cpustate->R6 = tmp; return 1; }
-OPHANDLER( xch_a_r7 )		{ UINT8 tmp = cpustate->a; cpustate->a = cpustate->R7; cpustate->R7 = tmp; return 1; }
-OPHANDLER( xch_a_xr0 )		{ UINT8 tmp = cpustate->a; cpustate->a = ram_r(cpustate->R0); ram_w(cpustate->R0, tmp); return 1; }
-OPHANDLER( xch_a_xr1 )		{ UINT8 tmp = cpustate->a; cpustate->a = ram_r(cpustate->R1); ram_w(cpustate->R1, tmp); return 1; }
+OPHANDLER( xch_a_r0 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R0; cpustate->R0 = tmp; return 1; }
+OPHANDLER( xch_a_r1 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R1; cpustate->R1 = tmp; return 1; }
+OPHANDLER( xch_a_r2 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R2; cpustate->R2 = tmp; return 1; }
+OPHANDLER( xch_a_r3 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R3; cpustate->R3 = tmp; return 1; }
+OPHANDLER( xch_a_r4 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R4; cpustate->R4 = tmp; return 1; }
+OPHANDLER( xch_a_r5 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R5; cpustate->R5 = tmp; return 1; }
+OPHANDLER( xch_a_r6 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R6; cpustate->R6 = tmp; return 1; }
+OPHANDLER( xch_a_r7 )       { UINT8 tmp = cpustate->a; cpustate->a = cpustate->R7; cpustate->R7 = tmp; return 1; }
+OPHANDLER( xch_a_xr0 )      { UINT8 tmp = cpustate->a; cpustate->a = ram_r(cpustate->R0); ram_w(cpustate->R0, tmp); return 1; }
+OPHANDLER( xch_a_xr1 )      { UINT8 tmp = cpustate->a; cpustate->a = ram_r(cpustate->R1); ram_w(cpustate->R1, tmp); return 1; }
 
-OPHANDLER( xchd_a_xr0 )		{ UINT8 oldram = ram_r(cpustate->R0); ram_w(cpustate->R0, (oldram & 0xf0) | (cpustate->a & 0x0f)); cpustate->a = (cpustate->a & 0xf0) | (oldram & 0x0f); return 1; }
-OPHANDLER( xchd_a_xr1 )		{ UINT8 oldram = ram_r(cpustate->R1); ram_w(cpustate->R1, (oldram & 0xf0) | (cpustate->a & 0x0f)); cpustate->a = (cpustate->a & 0xf0) | (oldram & 0x0f); return 1; }
+OPHANDLER( xchd_a_xr0 )     { UINT8 oldram = ram_r(cpustate->R0); ram_w(cpustate->R0, (oldram & 0xf0) | (cpustate->a & 0x0f)); cpustate->a = (cpustate->a & 0xf0) | (oldram & 0x0f); return 1; }
+OPHANDLER( xchd_a_xr1 )     { UINT8 oldram = ram_r(cpustate->R1); ram_w(cpustate->R1, (oldram & 0xf0) | (cpustate->a & 0x0f)); cpustate->a = (cpustate->a & 0xf0) | (oldram & 0x0f); return 1; }
 
-OPHANDLER( xrl_a_r0 )		{ cpustate->a ^= cpustate->R0; return 1; }
-OPHANDLER( xrl_a_r1 )		{ cpustate->a ^= cpustate->R1; return 1; }
-OPHANDLER( xrl_a_r2 )		{ cpustate->a ^= cpustate->R2; return 1; }
-OPHANDLER( xrl_a_r3 )		{ cpustate->a ^= cpustate->R3; return 1; }
-OPHANDLER( xrl_a_r4 )		{ cpustate->a ^= cpustate->R4; return 1; }
-OPHANDLER( xrl_a_r5 )		{ cpustate->a ^= cpustate->R5; return 1; }
-OPHANDLER( xrl_a_r6 )		{ cpustate->a ^= cpustate->R6; return 1; }
-OPHANDLER( xrl_a_r7 )		{ cpustate->a ^= cpustate->R7; return 1; }
-OPHANDLER( xrl_a_xr0 )		{ cpustate->a ^= ram_r(cpustate->R0); return 1; }
-OPHANDLER( xrl_a_xr1 )		{ cpustate->a ^= ram_r(cpustate->R1); return 1; }
-OPHANDLER( xrl_a_n )		{ cpustate->a ^= argument_fetch(cpustate); return 2; }
+OPHANDLER( xrl_a_r0 )       { cpustate->a ^= cpustate->R0; return 1; }
+OPHANDLER( xrl_a_r1 )       { cpustate->a ^= cpustate->R1; return 1; }
+OPHANDLER( xrl_a_r2 )       { cpustate->a ^= cpustate->R2; return 1; }
+OPHANDLER( xrl_a_r3 )       { cpustate->a ^= cpustate->R3; return 1; }
+OPHANDLER( xrl_a_r4 )       { cpustate->a ^= cpustate->R4; return 1; }
+OPHANDLER( xrl_a_r5 )       { cpustate->a ^= cpustate->R5; return 1; }
+OPHANDLER( xrl_a_r6 )       { cpustate->a ^= cpustate->R6; return 1; }
+OPHANDLER( xrl_a_r7 )       { cpustate->a ^= cpustate->R7; return 1; }
+OPHANDLER( xrl_a_xr0 )      { cpustate->a ^= ram_r(cpustate->R0); return 1; }
+OPHANDLER( xrl_a_xr1 )      { cpustate->a ^= ram_r(cpustate->R1); return 1; }
+OPHANDLER( xrl_a_n )        { cpustate->a ^= argument_fetch(cpustate); return 2; }
 
 SPLIT_OPHANDLER( split_02, outl_bus_a, out_dbb_a )
 SPLIT_OPHANDLER( split_08, ins_a_bus,  illegal )
@@ -846,9 +846,9 @@ static void mcs48_init(legacy_cpu_device *device, device_irq_acknowledge_callbac
 	mcs48_state *cpustate = get_safe_token(device);
 
 	/* External access line
-     * EA=1 : read from external rom
-     * EA=0 : read from internal rom
-     */
+	 * EA=1 : read from external rom
+	 * EA=0 : read from internal rom
+	 */
 
 	/* FIXME: Current implementation suboptimal */
 	cpustate->ea = (romsize ? 0 : 1);
@@ -1345,8 +1345,8 @@ static CPU_SET_INFO( mcs48 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	cpustate->irq_state = (info->i != CLEAR_LINE);	break;
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	cpustate->ea = (info->i != CLEAR_LINE);	break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ: cpustate->irq_state = (info->i != CLEAR_LINE);  break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:  cpustate->ea = (info->i != CLEAR_LINE); break;
 	}
 }
 
@@ -1363,50 +1363,50 @@ static CPU_GET_INFO( mcs48 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs48_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = MCS48_INPUT_IRQ;				break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(mcs48_state);          break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 2;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = MCS48_INPUT_IRQ;              break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 3;                            break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 12;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			/*info->i = 6 or 7 or 8;*/				break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 12;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = 0;                            break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           /*info->i = 6 or 7 or 8;*/              break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                            break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 9;                            break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break;
 
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	info->i = cpustate->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	info->i = cpustate->ea;					break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ: info->i = cpustate->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:  info->i = cpustate->ea;                 break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(mcs48);				break;
-		case CPUINFO_FCT_INIT:			/* set per-core */										break;
-		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(mcs48);					break;
-		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(mcs48);				break;
-		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(mcs48);		break;
-		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(mcs48);		break;
-		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(mcs48);		break;
-		case CPUINFO_FCT_EXPORT_STRING:	info->export_string = CPU_EXPORT_STRING_NAME(mcs48);	break;
+		case CPUINFO_FCT_SET_INFO:      info->setinfo = CPU_SET_INFO_NAME(mcs48);               break;
+		case CPUINFO_FCT_INIT:          /* set per-core */                                      break;
+		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(mcs48);                    break;
+		case CPUINFO_FCT_EXECUTE:       info->execute = CPU_EXECUTE_NAME(mcs48);                break;
+		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(mcs48);        break;
+		case CPUINFO_FCT_IMPORT_STATE:  info->import_state = CPU_IMPORT_STATE_NAME(mcs48);      break;
+		case CPUINFO_FCT_EXPORT_STATE:  info->export_state = CPU_EXPORT_STATE_NAME(mcs48);      break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(mcs48);    break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	/* set per-core */						break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		/* set per-core */						break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;       break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  /* set per-core */                      break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     /* set per-core */                      break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							/* set per-core */						break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Intel 8039");			break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.2");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
+		case CPUINFO_STR_NAME:                          /* set per-core */                      break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Intel 8039");          break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.2");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
 	}
 }
 
@@ -1523,26 +1523,26 @@ CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATU
 CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128,  5, "M58715"); }
 
 /* Official Intel MCS-48 parts */
-DEFINE_LEGACY_CPU_DEVICE(I8021, i8021);			/* 1k internal ROM,      64 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8022, i8022);			/* 2k internal ROM,     128 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8035, i8035);			/* external ROM,         64 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8048, i8048);			/* 1k internal ROM,      64 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8648, i8648);			/* 1k internal OTP ROM,  64 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8748, i8748);			/* 1k internal EEPROM,   64 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8039, i8039);			/* external ROM,        128 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8049, i8049);			/* 2k internal ROM,     128 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8749, i8749);			/* 2k internal EEPROM,  128 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8040, i8040);			/* external ROM,        256 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8050, i8050);			/* 4k internal ROM,     256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8021, i8021);         /* 1k internal ROM,      64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8022, i8022);         /* 2k internal ROM,     128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8035, i8035);         /* external ROM,         64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8048, i8048);         /* 1k internal ROM,      64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8648, i8648);         /* 1k internal OTP ROM,  64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8748, i8748);         /* 1k internal EEPROM,   64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8039, i8039);         /* external ROM,        128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8049, i8049);         /* 2k internal ROM,     128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8749, i8749);         /* 2k internal EEPROM,  128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8040, i8040);         /* external ROM,        256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8050, i8050);         /* 4k internal ROM,     256 bytes internal RAM */
 
 /* Official Intel UPI-41 parts */
-DEFINE_LEGACY_CPU_DEVICE(I8041, i8041);			/* 1k internal ROM,     128 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8741, i8741);			/* 1k internal EEPROM,  128 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8042, i8042);			/* 2k internal ROM,     256 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8242, i8242);			/* 2k internal ROM,     256 bytes internal RAM */
-DEFINE_LEGACY_CPU_DEVICE(I8742, i8742);			/* 2k internal EEPROM,  256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8041, i8041);         /* 1k internal ROM,     128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8741, i8741);         /* 1k internal EEPROM,  128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8042, i8042);         /* 2k internal ROM,     256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8242, i8242);         /* 2k internal ROM,     256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8742, i8742);         /* 2k internal EEPROM,  256 bytes internal RAM */
 
 /* Clones */
-DEFINE_LEGACY_CPU_DEVICE(MB8884, mb8884);		/* 8035 clone */
-DEFINE_LEGACY_CPU_DEVICE(N7751, n7751);			/* 8048 clone */
-DEFINE_LEGACY_CPU_DEVICE(M58715, m58715);		/* 8049 clone */
+DEFINE_LEGACY_CPU_DEVICE(MB8884, mb8884);       /* 8035 clone */
+DEFINE_LEGACY_CPU_DEVICE(N7751, n7751);         /* 8048 clone */
+DEFINE_LEGACY_CPU_DEVICE(M58715, m58715);       /* 8049 clone */

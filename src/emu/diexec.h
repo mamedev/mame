@@ -52,22 +52,22 @@
 //**************************************************************************
 
 // suspension reasons for executing devices
-const UINT32 SUSPEND_REASON_HALT		= 0x0001;	// HALT line set (or equivalent)
-const UINT32 SUSPEND_REASON_RESET		= 0x0002;	// RESET line set (or equivalent)
-const UINT32 SUSPEND_REASON_SPIN		= 0x0004;	// currently spinning
-const UINT32 SUSPEND_REASON_TRIGGER 	= 0x0008;	// waiting for a trigger
-const UINT32 SUSPEND_REASON_DISABLE 	= 0x0010;	// disabled (due to disable flag)
-const UINT32 SUSPEND_REASON_TIMESLICE	= 0x0020;	// waiting for the next timeslice
-const UINT32 SUSPEND_ANY_REASON 		= ~0;		// all of the above
+const UINT32 SUSPEND_REASON_HALT        = 0x0001;   // HALT line set (or equivalent)
+const UINT32 SUSPEND_REASON_RESET       = 0x0002;   // RESET line set (or equivalent)
+const UINT32 SUSPEND_REASON_SPIN        = 0x0004;   // currently spinning
+const UINT32 SUSPEND_REASON_TRIGGER     = 0x0008;   // waiting for a trigger
+const UINT32 SUSPEND_REASON_DISABLE     = 0x0010;   // disabled (due to disable flag)
+const UINT32 SUSPEND_REASON_TIMESLICE   = 0x0020;   // waiting for the next timeslice
+const UINT32 SUSPEND_ANY_REASON         = ~0;       // all of the above
 
 
 // I/O line states
 enum line_state
 {
-	CLEAR_LINE = 0,				// clear (a fired or held) line
-	ASSERT_LINE,				// assert an interrupt immediately
-	HOLD_LINE,					// hold interrupt line until acknowledged
-	PULSE_LINE					// pulse interrupt line instantaneously (only for NMI, RESET)
+	CLEAR_LINE = 0,             // clear (a fired or held) line
+	ASSERT_LINE,                // assert an interrupt immediately
+	HOLD_LINE,                  // hold interrupt line until acknowledged
+	PULSE_LINE                  // pulse interrupt line instantaneously (only for NMI, RESET)
 };
 
 
@@ -100,11 +100,11 @@ enum
 //**************************************************************************
 
 // IRQ callback to be called by device implementations when an IRQ is actually taken
-#define IRQ_CALLBACK(func)				int func(device_t *device, int irqline)
+#define IRQ_CALLBACK(func)              int func(device_t *device, int irqline)
 
 // interrupt generator callback called as a VBLANK or periodic interrupt
-#define INTERRUPT_GEN(func)				void func(device_t *device)
-#define INTERRUPT_GEN_MEMBER(func)		void func(device_t &device)
+#define INTERRUPT_GEN(func)             void func(device_t *device)
+#define INTERRUPT_GEN_MEMBER(func)      void func(device_t &device)
 
 
 
@@ -124,7 +124,7 @@ enum
 #define MCFG_DEVICE_VBLANK_INT_DEVICE(_devtag, _tag, _class, _func) \
 	device_execute_interface::static_set_vblank_int(*device, device_interrupt_delegate(&_class::_func, #_class "::" #_func, _devtag, (_class *)0), _tag); \
 
-#define MCFG_DEVICE_PERIODIC_INT(_func, _rate)	\
+#define MCFG_DEVICE_PERIODIC_INT(_func, _rate)  \
 	device_execute_interface::static_set_periodic_int(*device, _func, attotime::from_hz(_rate)); \
 
 #define MCFG_DEVICE_PERIODIC_INT_DRIVER(_class, _func, _rate) \
@@ -271,14 +271,14 @@ protected:
 		int default_irq_callback();
 
 		device_execute_interface *m_execute;// pointer to the execute interface
-		device_t *		m_device;			// pointer to our device
-		int				m_linenum;			// which input line we are
+		device_t *      m_device;           // pointer to our device
+		int             m_linenum;          // which input line we are
 
-		INT32			m_stored_vector;	// most recently written vector
-		INT32			m_curvector;		// most recently processed vector
-		UINT8			m_curstate;			// most recently processed state
-		INT32			m_queue[32];		// queue of pending events
-		int				m_qindex;			// index within the queue
+		INT32           m_stored_vector;    // most recently written vector
+		INT32           m_curvector;        // most recently processed vector
+		UINT8           m_curstate;         // most recently processed state
+		INT32           m_queue[32];        // queue of pending events
+		int             m_qindex;           // index within the queue
 
 	private:
 		static void static_empty_event_queue(running_machine &machine, void *ptr, int param);
@@ -286,44 +286,44 @@ protected:
 	};
 
 	// configuration
-	bool					m_disabled;					// disabled from executing?
-	device_interrupt_delegate m_vblank_interrupt;		// for interrupts tied to VBLANK
-	device_interrupt_func	m_vblank_interrupt_legacy;	// for interrupts tied to VBLANK
-	const char *			m_vblank_interrupt_screen;	// the screen that causes the VBLANK interrupt
-	device_interrupt_delegate m_timed_interrupt;		// for interrupts not tied to VBLANK
-	device_interrupt_func	m_timed_interrupt_legacy;	// for interrupts not tied to VBLANK
-	attotime				m_timed_interrupt_period;	// period for periodic interrupts
-	bool					m_is_octal;					// to determine if messages/debugger will show octal or hex
+	bool                    m_disabled;                 // disabled from executing?
+	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
+	device_interrupt_func   m_vblank_interrupt_legacy;  // for interrupts tied to VBLANK
+	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
+	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
+	device_interrupt_func   m_timed_interrupt_legacy;   // for interrupts not tied to VBLANK
+	attotime                m_timed_interrupt_period;   // period for periodic interrupts
+	bool                    m_is_octal;                 // to determine if messages/debugger will show octal or hex
 
 	// execution lists
-	device_execute_interface *m_nextexec;				// pointer to the next device to execute, in order
+	device_execute_interface *m_nextexec;               // pointer to the next device to execute, in order
 
 	// input states and IRQ callbacks
-	device_irq_acknowledge_callback m_driver_irq;		// driver-specific IRQ callback
-	device_input			m_input[MAX_INPUT_LINES];	// data about inputs
-	emu_timer *				m_timedint_timer;			// reference to this device's periodic interrupt timer
+	device_irq_acknowledge_callback m_driver_irq;       // driver-specific IRQ callback
+	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
+	emu_timer *             m_timedint_timer;           // reference to this device's periodic interrupt timer
 
 	// cycle counting and executing
-	profile_type			m_profiler;					// profiler tag
-	int *					m_icountptr;				// pointer to the icount
-	int 					m_cycles_running;			// number of cycles we are executing
-	int						m_cycles_stolen;			// number of cycles we artificially stole
+	profile_type            m_profiler;                 // profiler tag
+	int *                   m_icountptr;                // pointer to the icount
+	int                     m_cycles_running;           // number of cycles we are executing
+	int                     m_cycles_stolen;            // number of cycles we artificially stole
 
 	// suspend states
-	UINT32					m_suspend;					// suspend reason mask (0 = not suspended)
-	UINT32					m_nextsuspend;				// pending suspend reason mask
-	UINT8					m_eatcycles;				// true if we eat cycles while suspended
-	UINT8					m_nexteatcycles;			// pending value
-	INT32					m_trigger;					// pending trigger to release a trigger suspension
-	INT32					m_inttrigger;				// interrupt trigger index
+	UINT32                  m_suspend;                  // suspend reason mask (0 = not suspended)
+	UINT32                  m_nextsuspend;              // pending suspend reason mask
+	UINT8                   m_eatcycles;                // true if we eat cycles while suspended
+	UINT8                   m_nexteatcycles;            // pending value
+	INT32                   m_trigger;                  // pending trigger to release a trigger suspension
+	INT32                   m_inttrigger;               // interrupt trigger index
 
 	// clock and timing information
-	UINT64					m_totalcycles;				// total device cycles executed
-	attotime				m_localtime;				// local time, relative to the timer system's global time
-	INT32					m_divisor;					// 32-bit attoseconds_per_cycle divisor
-	UINT8					m_divshift;					// right shift amount to fit the divisor into 32 bits
-	UINT32					m_cycles_per_second;		// cycles per second, adjusted for multipliers
-	attoseconds_t			m_attoseconds_per_cycle;	// attoseconds per adjusted clock cycle
+	UINT64                  m_totalcycles;              // total device cycles executed
+	attotime                m_localtime;                // local time, relative to the timer system's global time
+	INT32                   m_divisor;                  // 32-bit attoseconds_per_cycle divisor
+	UINT8                   m_divshift;                 // right shift amount to fit the divisor into 32 bits
+	UINT32                  m_cycles_per_second;        // cycles per second, adjusted for multipliers
+	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
 
 private:
 	// callbacks
@@ -341,4 +341,4 @@ private:
 typedef device_interface_iterator<device_execute_interface> execute_interface_iterator;
 
 
-#endif	/* __DIEXEC_H__ */
+#endif  /* __DIEXEC_H__ */

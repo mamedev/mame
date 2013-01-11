@@ -128,11 +128,11 @@ TIMER_CALLBACK_MEMBER(destroyr_state::destroyr_dial_callback)
 	int dial = param;
 
 	/* Analog inputs come from the player's depth control potentiometer.
-       The voltage is compared to a voltage ramp provided by a discrete
-       analog circuit that conditions the VBLANK signal. When the ramp
-       voltage exceeds the input voltage an NMI signal is generated. The
-       computer then reads the VSYNC data functions to tell where the
-       cursor should be located. */
+	   The voltage is compared to a voltage ramp provided by a discrete
+	   analog circuit that conditions the VBLANK signal. When the ramp
+	   voltage exceeds the input voltage an NMI signal is generated. The
+	   computer then reads the VSYNC data functions to tell where the
+	   cursor should be located. */
 
 	m_potsense[dial] = 1;
 
@@ -348,12 +348,12 @@ static const gfx_layout destroyr_minor_object_layout =
 	1,        /* planes        */
 	{ 0 },    /* plane offsets */
 	{
-	  0x04, 0x05, 0x06, 0x07, 0x0C, 0x0D, 0x0E, 0x0F,
-	  0x14, 0x15, 0x16, 0x17, 0x1C, 0x1D, 0x1E, 0x1F
+		0x04, 0x05, 0x06, 0x07, 0x0C, 0x0D, 0x0E, 0x0F,
+		0x14, 0x15, 0x16, 0x17, 0x1C, 0x1D, 0x1E, 0x1F
 	},
 	{
-	  0x000, 0x020, 0x040, 0x060, 0x080, 0x0a0, 0x0c0, 0x0e0,
-	  0x100, 0x120, 0x140, 0x160, 0x180, 0x1a0, 0x1c0, 0x1e0
+		0x000, 0x020, 0x040, 0x060, 0x080, 0x0a0, 0x0c0, 0x0e0,
+		0x100, 0x120, 0x140, 0x160, 0x180, 0x1a0, 0x1c0, 0x1e0
 	},
 	0x200     /* increment */
 };
@@ -470,51 +470,51 @@ MACHINE_CONFIG_END
 
 
 ROM_START( destroyr )
-	ROM_REGION( 0x8000, "maincpu", 0 )	/* program code */
+	ROM_REGION( 0x8000, "maincpu", 0 )  /* program code */
 	ROM_LOAD( "language.rom",0x7000, 0x0800, NO_DUMP ) // optional add-on translation rom
 	ROM_LOAD( "30146-01.c3", 0x7800, 0x0800, CRC(e560c712) SHA1(0505ab57eee5421b4ff4e87d14505e02b18fd54c) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )		/* alpha numerics */
+	ROM_REGION( 0x0400, "gfx1", 0 )     /* alpha numerics */
 	ROM_LOAD( "30135-01.p4", 0x0000, 0x0400, CRC(184824cf) SHA1(713cfd1d41ef7b1c345ea0038b652c4ba3f08301) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 )		/* minor objects */
+	ROM_REGION( 0x0800, "gfx2", 0 )     /* minor objects */
 	ROM_LOAD( "30132-01.f4", 0x0000, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) )
 	ROM_LOAD( "30132-01.k4", 0x0400, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) ) // identical to f4
 
-	ROM_REGION( 0x0400, "gfx3", 0 )		/* major objects */
+	ROM_REGION( 0x0400, "gfx3", 0 )     /* major objects */
 	ROM_LOAD_NIB_HIGH( "30134-01.p8", 0x0000, 0x0400, CRC(6259e007) SHA1(049f5f7160305cb4f4b499dd113cb11eea73fc95) )
 	ROM_LOAD_NIB_LOW ( "30133-01.n8", 0x0000, 0x0400, CRC(108d3e2c) SHA1(8c993369d37c6713670483af78e6d04d38f4b4fc) )
 
-	ROM_REGION( 0x0020, "gfx4", 0 )		/* waves */
+	ROM_REGION( 0x0020, "gfx4", 0 )     /* waves */
 	ROM_LOAD( "30136-01.k2", 0x0000, 0x0020, CRC(532c11b1) SHA1(18ab5369a3f2cfcc9a44f38fa8649524bea5b203) )
 
-	ROM_REGION( 0x0100, "user1", 0 )	/* sync (used for vsync/vblank signals, not hooked up yet) */
+	ROM_REGION( 0x0100, "user1", 0 )    /* sync (used for vsync/vblank signals, not hooked up yet) */
 	ROM_LOAD( "30131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 
 ROM_START( destroyr1 )
-	ROM_REGION( 0x8000, "maincpu", 0 )	/* program code */
+	ROM_REGION( 0x8000, "maincpu", 0 )  /* program code */
 	ROM_LOAD( "language.rom",0x7000, 0x0800, NO_DUMP ) // optional add-on translation rom
 	ROM_LOAD_NIB_HIGH( "30142-01.f3", 0x7800, 0x0400, CRC(9e9a08d3) SHA1(eb31bab1537caf43ab8c3d23a6c9cc2009fcb98e) )
 	ROM_LOAD_NIB_LOW ( "30141-01.e2", 0x7800, 0x0400, CRC(c924fbce) SHA1(53aa9a3c4c6e90fb94500ddfa6c2ae3076eee2ef) )
 	ROM_LOAD_NIB_HIGH( "30144-01.j3", 0x7c00, 0x0400, CRC(0c7135c6) SHA1(6a0180353a0a6f34639dadc23179f6323aae8d62) )
 	ROM_LOAD_NIB_LOW ( "30143-01.h2", 0x7c00, 0x0400, CRC(b946e6f0) SHA1(b906024bb0e03a644fff1d5516637c24916b096e) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )		/* alpha numerics */
+	ROM_REGION( 0x0400, "gfx1", 0 )     /* alpha numerics */
 	ROM_LOAD( "30135-01.p4", 0x0000, 0x0400, CRC(184824cf) SHA1(713cfd1d41ef7b1c345ea0038b652c4ba3f08301) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 )		/* minor objects */
+	ROM_REGION( 0x0800, "gfx2", 0 )     /* minor objects */
 	ROM_LOAD( "30132-01.f4", 0x0000, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) )
 	ROM_LOAD( "30132-01.k4", 0x0400, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) ) // identical to f4
 
-	ROM_REGION( 0x0400, "gfx3", 0 )		/* major objects */
+	ROM_REGION( 0x0400, "gfx3", 0 )     /* major objects */
 	ROM_LOAD_NIB_HIGH( "30134-01.p8", 0x0000, 0x0400, CRC(6259e007) SHA1(049f5f7160305cb4f4b499dd113cb11eea73fc95) )
 	ROM_LOAD_NIB_LOW ( "30133-01.n8", 0x0000, 0x0400, CRC(108d3e2c) SHA1(8c993369d37c6713670483af78e6d04d38f4b4fc) )
 
-	ROM_REGION( 0x0020, "gfx4", 0 )		/* waves */
+	ROM_REGION( 0x0020, "gfx4", 0 )     /* waves */
 	ROM_LOAD( "30136-01.k2", 0x0000, 0x0020, CRC(532c11b1) SHA1(18ab5369a3f2cfcc9a44f38fa8649524bea5b203) )
 
-	ROM_REGION( 0x0100, "user1", 0 )	/* sync (used for vsync/vblank signals, not hooked up yet) */
+	ROM_REGION( 0x0100, "user1", 0 )    /* sync (used for vsync/vblank signals, not hooked up yet) */
 	ROM_LOAD( "30131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 

@@ -17,13 +17,13 @@
 
 #define LOG 0
 
-#define OPTION_ID		0x3f
+#define OPTION_ID       0x3f
 
-#define RAM_SIZE		0x40000
+#define RAM_SIZE        0x40000
 
-#define A19_A18_A17		((offset >> 16) & 0x07)
-#define BASE(bank)		((m_option >> (bank * 4)) & 0x07)
-#define ENABLE(bank)	BIT(m_option, (bank * 4) + 3)
+#define A19_A18_A17     ((offset >> 16) & 0x07)
+#define BASE(bank)      ((m_option >> (bank * 4)) & 0x07)
+#define ENABLE(bank)    BIT(m_option, (bank * 4) + 3)
 #define RAM_BANK(bank)  m_ram[(bank * 0x10000) | (offset & 0xffff)]
 
 

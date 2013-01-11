@@ -13,7 +13,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( sp0250_w );
 UINT8 sp0250_drq_r(device_t *device);
 
 class sp0250_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -62,9 +62,9 @@ WRITE16_MEMBER(globalfr_state::vfd_w)
 }
 
 static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 16, globalfr_state )
-    AM_RANGE(0x002000, 0x002fff) AM_RAM
+	AM_RANGE(0x002000, 0x002fff) AM_RAM
 	AM_RANGE(0x008000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0x8000)
-    AM_RANGE(0x0a0000, 0x0a01ff) AM_RAM
+	AM_RANGE(0x0a0000, 0x0a01ff) AM_RAM
 	AM_RANGE(0x7e0040, 0x7e0041) AM_WRITE(vfd_w)
 ADDRESS_MAP_END
 
@@ -87,7 +87,7 @@ MACHINE_CONFIG_END
 #define GL_SNBEV_SOUND \
 	ROM_REGION( 0x200000, "snd", 0 ) \
 	ROM_LOAD( "3pbv0-8t.u1", 0x000000, 0x100000, CRC(330d891f) SHA1(3bf0f4a107289a079371cd3a9dcce6dd9b304dfe) ) \
-	ROM_LOAD( "3pbv0-8t.u2", 0x100000, 0x100000, CRC(b4a0d108) SHA1(cb63bf3cb399c91015b70ef0ebd95e2bdc405b27) )	 \
+	ROM_LOAD( "3pbv0-8t.u2", 0x100000, 0x100000, CRC(b4a0d108) SHA1(cb63bf3cb399c91015b70ef0ebd95e2bdc405b27) )  \
 
 ROM_START( gl_snbev )
 	ROM_REGION( 0x080000, "maincpu", 0 )
@@ -209,11 +209,11 @@ ROM_END
 /******************************************************************************/
 
 // standalone game or topbox?
-GAME( 199?, gl_snbev,	0,			globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Saturday Night Beaver (Global) (Stealth?) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_snbeva,	gl_snbev,	globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Saturday Night Beaver (Global) (Stealth?) (set 2)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_snbev,   0,          globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Saturday Night Beaver (Global) (Stealth?) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_snbeva,  gl_snbev,   globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Saturday Night Beaver (Global) (Stealth?) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 // standalone game or topbox?
-GAME( 199?, gl_grncl,	0,			globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Grid Runner Club (Global) (Stealth?) (set 1)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_grncla,	gl_grncl,	globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Grid Runner Club (Global) (Stealth?) (set 2)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_grncl,   0,          globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Grid Runner Club (Global) (Stealth?) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_grncla,  gl_grncl,   globalfr,  globalfr, driver_device,  0,  ROT0, "Global",        "Grid Runner Club (Global) (Stealth?) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 
 GAME( 199?, gl_dow,  0,        globalfr, globalfr, driver_device, 0, ROT0, "Global", "Deals On Wheels (Global) (v1.4) (Stealth)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 199?, gl_dowp, gl_dow,   globalfr, globalfr, driver_device, 0, ROT0, "Global", "Deals On Wheels (Global) (v1.4 Protocol) (Stealth)", GAME_IS_SKELETON_MECHANICAL)

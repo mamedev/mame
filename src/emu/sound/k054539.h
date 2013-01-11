@@ -16,7 +16,7 @@
 struct k054539_interface
 {
 	const char *rgnoverride;
-	void (*apan)(device_t *, double, double);	/* Callback for analog output mixing levels (0..1 for each channel) */
+	void (*apan)(device_t *, double, double);   /* Callback for analog output mixing levels (0..1 for each channel) */
 	void (*irq)(device_t *);
 };
 
@@ -32,8 +32,8 @@ void k054539_init_flags(device_t *device, int flags);
 void k054539_set_gain(device_t *device, int channel, double gain);
 
 class k054539_device : public device_t,
-					   public device_sound_interface,
-					   public k054539_interface
+						public device_sound_interface,
+						public k054539_interface
 {
 public:
 	enum {
@@ -55,16 +55,16 @@ public:
 	void init_flags(int flags);
 
 	/*
-      Note that the eight PCM channels of a K054539 do not have separate
-      volume controls. Considering the global attenuation equation may not
-      be entirely accurate, k054539_set_gain() provides means to control
-      channel gain. It can be called anywhere but preferrably from
-      DRIVER_INIT().
+	  Note that the eight PCM channels of a K054539 do not have separate
+	  volume controls. Considering the global attenuation equation may not
+	  be entirely accurate, k054539_set_gain() provides means to control
+	  channel gain. It can be called anywhere but preferrably from
+	  DRIVER_INIT().
 
-      Parameters:
-          channel : 0 - 7
-          gain    : 0.0=silent, 1.0=no gain, 2.0=twice as loud, etc.
-    */
+	  Parameters:
+	      channel : 0 - 7
+	      gain    : 0.0=silent, 1.0=no gain, 2.0=twice as loud, etc.
+	*/
 	void set_gain(int channel, double gain);
 
 protected:

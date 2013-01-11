@@ -42,7 +42,7 @@
 //  COMPILE-TIME OPTIONS
 //**************************************************************************
 
-#define USE_FP				0
+#define USE_FP              0
 
 
 
@@ -50,47 +50,47 @@
 //  MACROS
 //**************************************************************************
 
-#define IREG(rnum)			(m_r[rnum].i32[0])
-#define FREGEXP(rnum)		(m_r[rnum].exponent())
-#define FREGMAN(rnum)		(m_r[rnum].mantissa())
+#define IREG(rnum)          (m_r[rnum].i32[0])
+#define FREGEXP(rnum)       (m_r[rnum].exponent())
+#define FREGMAN(rnum)       (m_r[rnum].mantissa())
 
-#define FP2LONG(rnum)		((FREGEXP(rnum) << 24) | ((UINT32)FREGMAN(rnum) >> 8))
-#define LONG2FP(rnum,v)		do { m_r[rnum].set_mantissa((v) << 8); m_r[rnum].set_exponent((INT32)(v) >> 24); } while (0)
-#define SHORT2FP(rnum,v)	do { \
+#define FP2LONG(rnum)       ((FREGEXP(rnum) << 24) | ((UINT32)FREGMAN(rnum) >> 8))
+#define LONG2FP(rnum,v)     do { m_r[rnum].set_mantissa((v) << 8); m_r[rnum].set_exponent((INT32)(v) >> 24); } while (0)
+#define SHORT2FP(rnum,v)    do { \
 								if ((UINT16)(v) == 0x8000) { m_r[rnum].set_mantissa(0); m_r[rnum].set_exponent(-128); } \
 								else { m_r[rnum].set_mantissa((v) << 20); m_r[rnum].set_exponent((INT16)(v) >> 12); } \
 							} while (0)
 
-#define DIRECT(op)				(((IREG(TMR_DP) & 0xff) << 16) | ((UINT16)op))
-#define INDIRECT_D(op,o)		((this->*s_indirect_d[((o) >> 3) & 31])(op,o))
-#define INDIRECT_1(op,o)		((this->*s_indirect_1[((o) >> 3) & 31])(op,o))
-#define INDIRECT_1_DEF(op,o)	((this->*s_indirect_1_def[((o) >> 3) & 31])(op,o,defptr))
+#define DIRECT(op)              (((IREG(TMR_DP) & 0xff) << 16) | ((UINT16)op))
+#define INDIRECT_D(op,o)        ((this->*s_indirect_d[((o) >> 3) & 31])(op,o))
+#define INDIRECT_1(op,o)        ((this->*s_indirect_1[((o) >> 3) & 31])(op,o))
+#define INDIRECT_1_DEF(op,o)    ((this->*s_indirect_1_def[((o) >> 3) & 31])(op,o,defptr))
 
-#define SIGN(val)			((val) & 0x80000000)
+#define SIGN(val)           ((val) & 0x80000000)
 
-#define OVERFLOW_SUB(a,b,r)	((INT32)(((a) ^ (b)) & ((a) ^ (r))) < 0)
-#define OVERFLOW_ADD(a,b,r)	((INT32)(((a) ^ (r)) & ((b) ^ (r))) < 0)
+#define OVERFLOW_SUB(a,b,r) ((INT32)(((a) ^ (b)) & ((a) ^ (r))) < 0)
+#define OVERFLOW_ADD(a,b,r) ((INT32)(((a) ^ (r)) & ((b) ^ (r))) < 0)
 
-#define CLR_FLAGS(f)		do { IREG(TMR_ST) &= ~(f); } while (0)
-#define CLR_NVUF()			CLR_FLAGS(NFLAG | VFLAG | UFFLAG)
-#define CLR_NZVUF()			CLR_FLAGS(NFLAG | ZFLAG | VFLAG | UFFLAG)
-#define CLR_NZCVUF()		CLR_FLAGS(NFLAG | ZFLAG | VFLAG | CFLAG | UFFLAG)
+#define CLR_FLAGS(f)        do { IREG(TMR_ST) &= ~(f); } while (0)
+#define CLR_NVUF()          CLR_FLAGS(NFLAG | VFLAG | UFFLAG)
+#define CLR_NZVUF()         CLR_FLAGS(NFLAG | ZFLAG | VFLAG | UFFLAG)
+#define CLR_NZCVUF()        CLR_FLAGS(NFLAG | ZFLAG | VFLAG | CFLAG | UFFLAG)
 
-#define OR_C(flag)			do { IREG(TMR_ST) |= flag & CFLAG; } while (0)
-#define OR_NZ(val)			do { IREG(TMR_ST) |= (((val) >> 28) & NFLAG) | (((val) == 0) << 2); } while (0)
-#define OR_NZF(reg)			do { IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | ((reg.exponent() == -128) << 2); } while (0)
-#define OR_NUF(reg)			do { int temp = (reg.exponent() == -128) << 4; IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | (temp) | (temp << 2); } while (0)
-#define OR_V_SUB(a,b,r)		do { UINT32 temp = ((((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
-#define OR_V_ADD(a,b,r)		do { UINT32 temp = ((((a) ^ (r)) & ((b) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
-#define OR_C_SUB(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(b) > (UINT32)(a)); } while (0)
-#define OR_C_ADD(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(a) > (UINT32)(r)); } while (0)
-#define OR_C_SBB(a,b,c)		do { INT64 temp = (UINT32)(a) - (UINT32)(b) - (UINT32)(c); IREG(TMR_ST) |= (temp < 0); } while (0)
-#define OR_C_ADC(a,b,c)		do { UINT64 temp = (UINT32)(a) + (UINT32)(b) + (UINT32)(c); IREG(TMR_ST) |= (temp > 0xffffffffUL); } while (0)
+#define OR_C(flag)          do { IREG(TMR_ST) |= flag & CFLAG; } while (0)
+#define OR_NZ(val)          do { IREG(TMR_ST) |= (((val) >> 28) & NFLAG) | (((val) == 0) << 2); } while (0)
+#define OR_NZF(reg)         do { IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | ((reg.exponent() == -128) << 2); } while (0)
+#define OR_NUF(reg)         do { int temp = (reg.exponent() == -128) << 4; IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | (temp) | (temp << 2); } while (0)
+#define OR_V_SUB(a,b,r)     do { UINT32 temp = ((((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
+#define OR_V_ADD(a,b,r)     do { UINT32 temp = ((((a) ^ (r)) & ((b) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
+#define OR_C_SUB(a,b,r)     do { IREG(TMR_ST) |= ((UINT32)(b) > (UINT32)(a)); } while (0)
+#define OR_C_ADD(a,b,r)     do { IREG(TMR_ST) |= ((UINT32)(a) > (UINT32)(r)); } while (0)
+#define OR_C_SBB(a,b,c)     do { INT64 temp = (UINT32)(a) - (UINT32)(b) - (UINT32)(c); IREG(TMR_ST) |= (temp < 0); } while (0)
+#define OR_C_ADC(a,b,c)     do { UINT64 temp = (UINT32)(a) + (UINT32)(b) + (UINT32)(c); IREG(TMR_ST) |= (temp > 0xffffffffUL); } while (0)
 
-#define OVM()				(IREG(TMR_ST) & OVMFLAG)
+#define OVM()               (IREG(TMR_ST) & OVMFLAG)
 
-#define DECLARE_DEF			UINT32 defval; UINT32 *defptr = &defval
-#define UPDATE_DEF()		*defptr = defval
+#define DECLARE_DEF         UINT32 defval; UINT32 *defptr = &defval
+#define UPDATE_DEF()        *defptr = defval
 
 
 
@@ -117,7 +117,7 @@ void tms3203x_device::unimplemented(UINT32 op)
 inline void tms3203x_device::execute_one()
 {
 	UINT32 op = ROPCODE(m_pc);
-	m_icount -= 2;	// 2 clocks per cycle
+	m_icount -= 2;  // 2 clocks per cycle
 	m_pc++;
 #if (TMS_3203X_LOG_OPCODE_USAGE)
 	if (machine.primary_screen->frame_number() == 2003)
@@ -175,155 +175,155 @@ const UINT32 C_ZUF = 1 << 20;
 
 const UINT32 condition_table[0x80] =
 {
-/* ------- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_NLUF,
-/* ------C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_NLUF,
-/* -----V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_NLUF,
-/* -----VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_NLUF,
-/* ----Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* ----Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* ----ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* ----ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* ---N--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF,
-/* ---N--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF,
-/* ---N-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF,
-/* ---N-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF,
-/* ---NZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* ---NZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* ---NZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* ---NZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
-/* --U---- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --U---C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --U--V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --U--VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --U-Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --U-Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --U-ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --U-ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UN--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UN--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UN-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UN-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UNZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UNZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UNZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* --UNZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
-/* -v----- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_NLUF,
-/* -v----C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_NLUF,
-/* -v---V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_NLUF,
-/* -v---VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_NLUF,
-/* -v--Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -v--Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -v--ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -v--ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -v-N--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF,
-/* -v-N--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF,
-/* -v-N-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF,
-/* -v-N-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF,
-/* -v-NZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -v-NZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -v-NZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -v-NZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
-/* -vU---- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vU---C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vU--V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vU--VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vU-Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vU-Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vU-ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vU-ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUN--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUN--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUN-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUN-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUNZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUNZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUNZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* -vUNZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
-/* u------ */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_LUF,
-/* u-----C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_LUF,
-/* u----V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_LUF,
-/* u----VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_LUF,
-/* u---Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u---Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u---ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u---ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u--N--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF,
-/* u--N--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF,
-/* u--N-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF,
-/* u--N-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF,
-/* u--NZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u--NZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u--NZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u--NZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
-/* u-U---- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-U---C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-U--V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-U--VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-U-Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-U-Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-U-ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-U-ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UN--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UN--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UN-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UN-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UNZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UNZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UNZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* u-UNZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
-/* uv----- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_LUF,
-/* uv----C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_LUF,
-/* uv---V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_LUF,
-/* uv---VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_LUF,
-/* uv--Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uv--Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uv--ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uv--ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uv-N--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF,
-/* uv-N--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF,
-/* uv-N-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF,
-/* uv-N-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF,
-/* uv-NZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uv-NZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uv-NZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uv-NZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
-/* uvU---- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvU---C */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvU--V- */	1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvU--VC */	1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvU-Z-- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvU-Z-C */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvU-ZV- */	1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvU-ZVC */	1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUN--- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUN--C */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUN-V- */	1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUN-VC */	1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUNZ-- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUNZ-C */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUNZV- */	1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
-/* uvUNZVC */	1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* ------- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_NLUF,
+/* ------C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_NLUF,
+/* -----V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_NLUF,
+/* -----VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_NLUF,
+/* ----Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* ----Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* ----ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* ----ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* ---N--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF,
+/* ---N--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF,
+/* ---N-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF,
+/* ---N-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF,
+/* ---NZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* ---NZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* ---NZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* ---NZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_NLUF | C_ZUF,
+/* --U---- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --U---C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --U--V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --U--VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --U-Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --U-Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --U-ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --U-ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UN--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UN--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UN-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UN-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UNZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UNZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UNZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* --UNZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_NLUF | C_ZUF,
+/* -v----- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_NLUF,
+/* -v----C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_NLUF,
+/* -v---V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_NLUF,
+/* -v---VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_NLUF,
+/* -v--Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -v--Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -v--ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -v--ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -v-N--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF,
+/* -v-N--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF,
+/* -v-N-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF,
+/* -v-N-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF,
+/* -v-NZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -v-NZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -v-NZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -v-NZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_NLUF | C_ZUF,
+/* -vU---- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vU---C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vU--V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vU--VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vU-Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vU-Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vU-ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vU-ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUN--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUN--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUN-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUN-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUNZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUNZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUNZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* -vUNZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_NLUF | C_ZUF,
+/* u------ */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_LUF,
+/* u-----C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_NLV | C_LUF,
+/* u----V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_LUF,
+/* u----VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_NLV | C_LUF,
+/* u---Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u---Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u---ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u---ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u--N--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF,
+/* u--N--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF,
+/* u--N-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF,
+/* u--N-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF,
+/* u--NZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u--NZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u--NZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u--NZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_NLV | C_LUF  | C_ZUF,
+/* u-U---- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-U---C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-U--V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-U--VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-U-Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-U-Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-U-ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-U-ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UN--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UN--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UN-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UN-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UNZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UNZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UNZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* u-UNZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_NLV | C_LUF  | C_ZUF,
+/* uv----- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_LUF,
+/* uv----C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_NUF | C_LV  | C_LUF,
+/* uv---V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_LUF,
+/* uv---VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_NUF | C_LV  | C_LUF,
+/* uv--Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uv--Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uv--ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uv--ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uv-N--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF,
+/* uv-N--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF,
+/* uv-N-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF,
+/* uv-N-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF,
+/* uv-NZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uv-NZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uv-NZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uv-NZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_NUF | C_LV  | C_LUF  | C_ZUF,
+/* uvU---- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvU---C */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvU--V- */   1 | C_HI | C_HS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvU--VC */   1 | C_LO | C_LS | C_NE | C_GT | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvU-Z-- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvU-Z-C */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvU-ZV- */   1 | C_LS | C_HS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvU-ZVC */   1 | C_LO | C_LS | C_EQ | C_LE | C_GE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUN--- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUN--C */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUN-V- */   1 | C_HI | C_HS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUN-VC */   1 | C_LO | C_LS | C_NE | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUNZ-- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUNZ-C */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_NV | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUNZV- */   1 | C_LS | C_HS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
+/* uvUNZVC */   1 | C_LO | C_LS | C_EQ | C_LT | C_LE | C_V  | C_UF  | C_LV  | C_LUF  | C_ZUF,
 };
 
-#define	CONDITION_LO()		(IREG(TMR_ST) & CFLAG)
-#define CONDITION_LS()		(IREG(TMR_ST) & (CFLAG | ZFLAG))
-#define CONDITION_HI()		(!(IREG(TMR_ST) & (CFLAG | ZFLAG)))
-#define CONDITION_HS()		(!(IREG(TMR_ST) & CFLAG))
-#define CONDITION_EQ()		(IREG(TMR_ST) & ZFLAG)
-#define CONDITION_NE()		(!(IREG(TMR_ST) & ZFLAG))
-#define CONDITION_LT()		(IREG(TMR_ST) & NFLAG)
-#define CONDITION_LE()		(IREG(TMR_ST) & (NFLAG | ZFLAG))
-#define CONDITION_GT()		(!(IREG(TMR_ST) & (NFLAG | ZFLAG)))
-#define CONDITION_GE()		(!(IREG(TMR_ST) & NFLAG))
-#define CONDITION_NV()		(!(IREG(TMR_ST) & VFLAG))
-#define CONDITION_V()		(IREG(TMR_ST) & VFLAG)
-#define CONDITION_NUF()		(!(IREG(TMR_ST) & UFFLAG))
-#define CONDITION_UF()		(IREG(TMR_ST) & UFFLAG)
-#define CONDITION_NLV()		(!(IREG(TMR_ST) & LVFLAG))
-#define CONDITION_LV()		(IREG(TMR_ST) & LVFLAG)
-#define CONDITION_NLUF()	(!(IREG(TMR_ST) & LUFFLAG))
-#define CONDITION_LUF()		(IREG(TMR_ST) & LUFFLAG)
-#define CONDITION_ZUF()		(IREG(TMR_ST) & (UFFLAG | ZFLAG))
+#define CONDITION_LO()      (IREG(TMR_ST) & CFLAG)
+#define CONDITION_LS()      (IREG(TMR_ST) & (CFLAG | ZFLAG))
+#define CONDITION_HI()      (!(IREG(TMR_ST) & (CFLAG | ZFLAG)))
+#define CONDITION_HS()      (!(IREG(TMR_ST) & CFLAG))
+#define CONDITION_EQ()      (IREG(TMR_ST) & ZFLAG)
+#define CONDITION_NE()      (!(IREG(TMR_ST) & ZFLAG))
+#define CONDITION_LT()      (IREG(TMR_ST) & NFLAG)
+#define CONDITION_LE()      (IREG(TMR_ST) & (NFLAG | ZFLAG))
+#define CONDITION_GT()      (!(IREG(TMR_ST) & (NFLAG | ZFLAG)))
+#define CONDITION_GE()      (!(IREG(TMR_ST) & NFLAG))
+#define CONDITION_NV()      (!(IREG(TMR_ST) & VFLAG))
+#define CONDITION_V()       (IREG(TMR_ST) & VFLAG)
+#define CONDITION_NUF()     (!(IREG(TMR_ST) & UFFLAG))
+#define CONDITION_UF()      (IREG(TMR_ST) & UFFLAG)
+#define CONDITION_NLV()     (!(IREG(TMR_ST) & LVFLAG))
+#define CONDITION_LV()      (IREG(TMR_ST) & LVFLAG)
+#define CONDITION_NLUF()    (!(IREG(TMR_ST) & LUFFLAG))
+#define CONDITION_LUF()     (IREG(TMR_ST) & LUFFLAG)
+#define CONDITION_ZUF()     (IREG(TMR_ST) & (UFFLAG | ZFLAG))
 
 inline bool tms3203x_device::condition(int which)
 {
@@ -1432,18 +1432,18 @@ UINT32 tms3203x_device::modillegal_def(UINT32 op, UINT8 ar, UINT32 *&defptrptr)
 
 /*-----------------------------------------------------*/
 
-#define ABSF(dreg, sreg)												\
-{																		\
-	INT32 man = FREGMAN(sreg);											\
-	CLR_NZVUF();														\
-	m_r[dreg] = m_r[sreg];								\
-	if (man < 0)														\
-	{																	\
-		m_r[dreg].set_mantissa(~man);							\
-		if (man == (INT32)0x80000000 && FREGEXP(sreg) == 127)			\
-			IREG(TMR_ST) |= VFLAG | LVFLAG;								\
-	}																	\
-	OR_NZF(m_r[dreg]);											\
+#define ABSF(dreg, sreg)                                                \
+{                                                                       \
+	INT32 man = FREGMAN(sreg);                                          \
+	CLR_NZVUF();                                                        \
+	m_r[dreg] = m_r[sreg];                              \
+	if (man < 0)                                                        \
+	{                                                                   \
+		m_r[dreg].set_mantissa(~man);                           \
+		if (man == (INT32)0x80000000 && FREGEXP(sreg) == 127)           \
+			IREG(TMR_ST) |= VFLAG | LVFLAG;                             \
+	}                                                                   \
+	OR_NZF(m_r[dreg]);                                          \
 }
 
 void tms3203x_device::absf_reg(UINT32 op)
@@ -1478,22 +1478,22 @@ void tms3203x_device::absf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define ABSI(dreg, src)												\
-{																	\
-	UINT32 _res = ((INT32)src < 0) ? -src : src;					\
-	if (!OVM() || _res != 0x80000000)									\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = 0x7fffffff;									\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ(_res);												\
-		if (_res == 0x80000000) 									\
-			IREG(TMR_ST) |= VFLAG | LVFLAG;							\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define ABSI(dreg, src)                                             \
+{                                                                   \
+	UINT32 _res = ((INT32)src < 0) ? -src : src;                    \
+	if (!OVM() || _res != 0x80000000)                                   \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = 0x7fffffff;                                    \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ(_res);                                                \
+		if (_res == 0x80000000)                                     \
+			IREG(TMR_ST) |= VFLAG | LVFLAG;                         \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::absi_reg(UINT32 op)
@@ -1526,23 +1526,23 @@ void tms3203x_device::absi_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define ADDC(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = src1 + src2 + (IREG(TMR_ST) & CFLAG);				\
-	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))					\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
-	if (dreg < 8)													\
-	{																\
-		UINT32 tempc = IREG(TMR_ST) & CFLAG;						\
-		CLR_NZCVUF();												\
-		OR_C_ADC(src1,src2,tempc);									\
-		OR_V_ADD(src1,src2,_res);									\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define ADDC(dreg, src1, src2)                                      \
+{                                                                   \
+	UINT32 _res = src1 + src2 + (IREG(TMR_ST) & CFLAG);             \
+	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))                    \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		UINT32 tempc = IREG(TMR_ST) & CFLAG;                        \
+		CLR_NZCVUF();                                               \
+		OR_C_ADC(src1,src2,tempc);                                  \
+		OR_V_ADD(src1,src2,_res);                                   \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::addc_reg(UINT32 op)
@@ -1610,22 +1610,22 @@ void tms3203x_device::addf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define ADDI(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = src1 + src2;										\
-	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))					\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZCVUF();												\
-		OR_C_ADD(src1,src2,_res);									\
-		OR_V_ADD(src1,src2,_res);									\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define ADDI(dreg, src1, src2)                                      \
+{                                                                   \
+	UINT32 _res = src1 + src2;                                      \
+	if (!OVM() || !OVERFLOW_ADD(src1,src2,_res))                    \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZCVUF();                                               \
+		OR_C_ADD(src1,src2,_res);                                   \
+		OR_V_ADD(src1,src2,_res);                                   \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::addi_reg(UINT32 op)
@@ -1662,17 +1662,17 @@ void tms3203x_device::addi_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define AND(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = (src1) & (src2);									\
-	IREG(dreg) = _res;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define AND(dreg, src1, src2)                                       \
+{                                                                   \
+	UINT32 _res = (src1) & (src2);                                  \
+	IREG(dreg) = _res;                                              \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::and_reg(UINT32 op)
@@ -1709,17 +1709,17 @@ void tms3203x_device::and_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define ANDN(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = (src1) & ~(src2);									\
-	IREG(dreg) = _res;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define ANDN(dreg, src1, src2)                                      \
+{                                                                   \
+	UINT32 _res = (src1) & ~(src2);                                 \
+	IREG(dreg) = _res;                                              \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::andn_reg(UINT32 op)
@@ -1756,44 +1756,44 @@ void tms3203x_device::andn_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define ASH(dreg, src, count)										\
-{																	\
-	UINT32 _res;													\
-	INT32 _count = (INT16)(count << 9) >> 9;	/* 7 LSBs */		\
-	if (_count < 0)													\
-	{																\
-		if (_count >= -31)											\
-			_res = (INT32)src >> -_count;							\
-		else														\
-			_res = (INT32)src >> 31;								\
-	}																\
-	else															\
-	{																\
-		if (_count <= 31)											\
-			_res = (INT32)src << _count;							\
-		else														\
-			_res = 0;												\
-	}																\
-	IREG(dreg) = _res;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZCVUF();												\
-		OR_NZ(_res);												\
-		if (_count < 0)												\
-		{															\
-			if (_count >= -32)										\
-				OR_C(((INT32)src >> (-_count - 1)) & 1);			\
-			else													\
-				OR_C(((INT32)src >> 31) & 1);						\
-		}															\
-		else if (_count > 0)										\
-		{															\
-			if (_count <= 32)										\
-				OR_C(((UINT32)src << (_count - 1)) >> 31);			\
-		}															\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define ASH(dreg, src, count)                                       \
+{                                                                   \
+	UINT32 _res;                                                    \
+	INT32 _count = (INT16)(count << 9) >> 9;    /* 7 LSBs */        \
+	if (_count < 0)                                                 \
+	{                                                               \
+		if (_count >= -31)                                          \
+			_res = (INT32)src >> -_count;                           \
+		else                                                        \
+			_res = (INT32)src >> 31;                                \
+	}                                                               \
+	else                                                            \
+	{                                                               \
+		if (_count <= 31)                                           \
+			_res = (INT32)src << _count;                            \
+		else                                                        \
+			_res = 0;                                               \
+	}                                                               \
+	IREG(dreg) = _res;                                              \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZCVUF();                                               \
+		OR_NZ(_res);                                                \
+		if (_count < 0)                                             \
+		{                                                           \
+			if (_count >= -32)                                      \
+				OR_C(((INT32)src >> (-_count - 1)) & 1);            \
+			else                                                    \
+				OR_C(((INT32)src >> 31) & 1);                       \
+		}                                                           \
+		else if (_count > 0)                                        \
+		{                                                           \
+			if (_count <= 32)                                       \
+				OR_C(((UINT32)src << (_count - 1)) >> 31);          \
+		}                                                           \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::ash_reg(UINT32 op)
@@ -1861,13 +1861,13 @@ void tms3203x_device::cmpf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define CMPI(src1, src2)											\
-{																	\
-	UINT32 _res = src1 - src2;										\
-	CLR_NZCVUF();													\
-	OR_C_SUB(src1,src2,_res);										\
-	OR_V_SUB(src1,src2,_res);										\
-	OR_NZ(_res);													\
+#define CMPI(src1, src2)                                            \
+{                                                                   \
+	UINT32 _res = src1 - src2;                                      \
+	CLR_NZCVUF();                                                   \
+	OR_C_SUB(src1,src2,_res);                                       \
+	OR_V_SUB(src1,src2,_res);                                       \
+	OR_NZ(_res);                                                    \
 }
 
 void tms3203x_device::cmpi_reg(UINT32 op)
@@ -1936,10 +1936,10 @@ void tms3203x_device::fix_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define FLOAT(dreg, src)											\
-{																	\
-	IREG(dreg) = src;												\
-	int2float(m_r[dreg]);									\
+#define FLOAT(dreg, src)                                            \
+{                                                                   \
+	IREG(dreg) = src;                                               \
+	int2float(m_r[dreg]);                                   \
 }
 
 void tms3203x_device::float_reg(UINT32 op)
@@ -2063,16 +2063,16 @@ void tms3203x_device::ldfi_ind(UINT32 op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
-#define LDI(dreg, src)												\
-{																	\
-	IREG(dreg) = src;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ(src);													\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define LDI(dreg, src)                                              \
+{                                                                   \
+	IREG(dreg) = src;                                               \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ(src);                                                 \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::ldi_reg(UINT32 op)
@@ -2139,42 +2139,42 @@ void tms3203x_device::ldm_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define LSH(dreg, src, count)										\
-{																	\
-	UINT32 _res;													\
-	INT32 _count = (INT16)(count << 9) >> 9;	/* 7 LSBs */		\
-	if (_count < 0)													\
-	{																\
-		if (_count >= -31)											\
-			_res = (UINT32)src >> -_count;							\
-		else														\
-			_res = 0;												\
-	}																\
-	else															\
-	{																\
-		if (_count <= 31)											\
-			_res = (UINT32)src << _count;							\
-		else														\
-			_res = 0;												\
-	}																\
-	IREG(dreg) = _res;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZCVUF();												\
-		OR_NZ(_res);												\
-		if (_count < 0)												\
-		{															\
-			if (_count >= -32)										\
-				OR_C(((UINT32)src >> (-_count - 1)) & 1);			\
-		}															\
-		else if (_count > 0)										\
-		{															\
-			if (_count <= 32)										\
-				OR_C(((UINT32)src << (_count - 1)) >> 31);			\
-		}															\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define LSH(dreg, src, count)                                       \
+{                                                                   \
+	UINT32 _res;                                                    \
+	INT32 _count = (INT16)(count << 9) >> 9;    /* 7 LSBs */        \
+	if (_count < 0)                                                 \
+	{                                                               \
+		if (_count >= -31)                                          \
+			_res = (UINT32)src >> -_count;                          \
+		else                                                        \
+			_res = 0;                                               \
+	}                                                               \
+	else                                                            \
+	{                                                               \
+		if (_count <= 31)                                           \
+			_res = (UINT32)src << _count;                           \
+		else                                                        \
+			_res = 0;                                               \
+	}                                                               \
+	IREG(dreg) = _res;                                              \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZCVUF();                                               \
+		OR_NZ(_res);                                                \
+		if (_count < 0)                                             \
+		{                                                           \
+			if (_count >= -32)                                      \
+				OR_C(((UINT32)src >> (-_count - 1)) & 1);           \
+		}                                                           \
+		else if (_count > 0)                                        \
+		{                                                           \
+			if (_count <= 32)                                       \
+				OR_C(((UINT32)src << (_count - 1)) >> 31);          \
+		}                                                           \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::lsh_reg(UINT32 op)
@@ -2242,22 +2242,22 @@ void tms3203x_device::mpyf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define MPYI(dreg, src1, src2)										\
-{																	\
+#define MPYI(dreg, src1, src2)                                      \
+{                                                                   \
 	INT64 _res = (INT64)((INT32)(src1 << 8) >> 8) * (INT64)((INT32)(src2 << 8) >> 8);\
-	if (!OVM() || (_res >= -(INT64)0x80000000 && _res <= (INT64)0x7fffffff))		\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = (_res < 0) ? 0x80000000 : 0x7fffffff;			\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ((UINT32)_res);										\
-		if (_res < -(INT64)0x80000000 || _res > (INT64)0x7fffffff)	\
-			IREG(TMR_ST) |= VFLAG | LVFLAG;							\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+	if (!OVM() || (_res >= -(INT64)0x80000000 && _res <= (INT64)0x7fffffff))        \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = (_res < 0) ? 0x80000000 : 0x7fffffff;          \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ((UINT32)_res);                                        \
+		if (_res < -(INT64)0x80000000 || _res > (INT64)0x7fffffff)  \
+			IREG(TMR_ST) |= VFLAG | LVFLAG;                         \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::mpyi_reg(UINT32 op)
@@ -2294,23 +2294,23 @@ void tms3203x_device::mpyi_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define NEGB(dreg, src)												\
-{																	\
-	UINT32 _res = 0 - src - (IREG(TMR_ST) & CFLAG);					\
-	if (!OVM() || !OVERFLOW_SUB(0,src,_res))						\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;	\
-	if (dreg < 8)													\
-	{																\
-		UINT32 tempc = IREG(TMR_ST) & CFLAG;						\
-		CLR_NZCVUF();												\
-		OR_C_SBB(0,src,tempc);										\
-		OR_V_SUB(0,src,_res);										\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define NEGB(dreg, src)                                             \
+{                                                                   \
+	UINT32 _res = 0 - src - (IREG(TMR_ST) & CFLAG);                 \
+	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;    \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		UINT32 tempc = IREG(TMR_ST) & CFLAG;                        \
+		CLR_NZCVUF();                                               \
+		OR_C_SBB(0,src,tempc);                                      \
+		OR_V_SUB(0,src,_res);                                       \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::negb_reg(UINT32 op)
@@ -2374,22 +2374,22 @@ void tms3203x_device::negf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define NEGI(dreg, src)												\
-{																	\
-	UINT32 _res = 0 - src;											\
-	if (!OVM() || !OVERFLOW_SUB(0,src,_res))						\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;	\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZCVUF();												\
-		OR_C_SUB(0,src,_res);										\
-		OR_V_SUB(0,src,_res);										\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define NEGI(dreg, src)                                             \
+{                                                                   \
+	UINT32 _res = 0 - src;                                          \
+	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = ((INT32)src < 0) ? 0x80000000 : 0x7fffffff;    \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZCVUF();                                               \
+		OR_C_SUB(0,src,_res);                                       \
+		OR_V_SUB(0,src,_res);                                       \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::negi_reg(UINT32 op)
@@ -2464,17 +2464,17 @@ void tms3203x_device::norm_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define NOT(dreg, src)												\
-{																	\
-	UINT32 _res = ~(src);											\
-	IREG(dreg) = _res;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define NOT(dreg, src)                                              \
+{                                                                   \
+	UINT32 _res = ~(src);                                           \
+	IREG(dreg) = _res;                                              \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::not_reg(UINT32 op)
@@ -2543,17 +2543,17 @@ void tms3203x_device::pushf(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define OR(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = (src1) | (src2);									\
-	IREG(dreg) = _res;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define OR(dreg, src1, src2)                                        \
+{                                                                   \
+	UINT32 _res = (src1) | (src2);                                  \
+	IREG(dreg) = _res;                                              \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::or_reg(UINT32 op)
@@ -2594,26 +2594,26 @@ void tms3203x_device::maxspeed(UINT32 op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
-#define RND(dreg)													\
-{																	\
-	INT32 man = FREGMAN(dreg);										\
-	CLR_NVUF();														\
-	if (man < 0x7fffff80)											\
-	{																\
-		m_r[dreg].set_mantissa(((UINT32)man + 0x80) & 0xffffff00);	\
-		OR_NUF(m_r[dreg]);									\
-	}																\
-	else if (FREGEXP(dreg) < 127)									\
-	{																\
-		m_r[dreg].set_mantissa(((UINT32)man + 0x80) & 0x7fffff00);	\
-		m_r[dreg].set_exponent(FREGEXP(dreg) + 1);			\
-		OR_NUF(m_r[dreg]);									\
-	}																\
-	else															\
-	{																\
-		m_r[dreg].set_mantissa(0x7fffff00);				\
-		IREG(TMR_ST) |= VFLAG | LVFLAG;								\
-	}																\
+#define RND(dreg)                                                   \
+{                                                                   \
+	INT32 man = FREGMAN(dreg);                                      \
+	CLR_NVUF();                                                     \
+	if (man < 0x7fffff80)                                           \
+	{                                                               \
+		m_r[dreg].set_mantissa(((UINT32)man + 0x80) & 0xffffff00);  \
+		OR_NUF(m_r[dreg]);                                  \
+	}                                                               \
+	else if (FREGEXP(dreg) < 127)                                   \
+	{                                                               \
+		m_r[dreg].set_mantissa(((UINT32)man + 0x80) & 0x7fffff00);  \
+		m_r[dreg].set_exponent(FREGEXP(dreg) + 1);          \
+		OR_NUF(m_r[dreg]);                                  \
+	}                                                               \
+	else                                                            \
+	{                                                               \
+		m_r[dreg].set_mantissa(0x7fffff00);             \
+		IREG(TMR_ST) |= VFLAG | LVFLAG;                             \
+	}                                                               \
 }
 
 void tms3203x_device::rnd_reg(UINT32 op)
@@ -2799,23 +2799,23 @@ void tms3203x_device::sigi(UINT32 op) { unimplemented(op); }
 
 /*-----------------------------------------------------*/
 
-#define SUBB(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = src1 - src2 - (IREG(TMR_ST) & CFLAG);				\
-	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))					\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
-	if (dreg < 8)													\
-	{																\
-		UINT32 tempc = IREG(TMR_ST) & CFLAG;						\
-		CLR_NZCVUF();												\
-		OR_C_SBB(src1,src2,tempc);									\
-		OR_V_SUB(src1,src2,_res);									\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define SUBB(dreg, src1, src2)                                      \
+{                                                                   \
+	UINT32 _res = src1 - src2 - (IREG(TMR_ST) & CFLAG);             \
+	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))                    \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		UINT32 tempc = IREG(TMR_ST) & CFLAG;                        \
+		CLR_NZCVUF();                                               \
+		OR_C_SBB(src1,src2,tempc);                                  \
+		OR_V_SUB(src1,src2,_res);                                   \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::subb_reg(UINT32 op)
@@ -2852,15 +2852,15 @@ void tms3203x_device::subb_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define SUBC(dreg, src)												\
-{																	\
-	UINT32 dst = IREG(dreg);										\
-	if (dst >= src)													\
-		IREG(dreg) = ((dst - src) << 1) | 1;						\
-	else															\
-		IREG(dreg) = dst << 1;										\
-	if (dreg >= TMR_BK)												\
-		update_special(dreg);										\
+#define SUBC(dreg, src)                                             \
+{                                                                   \
+	UINT32 dst = IREG(dreg);                                        \
+	if (dst >= src)                                                 \
+		IREG(dreg) = ((dst - src) << 1) | 1;                        \
+	else                                                            \
+		IREG(dreg) = dst << 1;                                      \
+	if (dreg >= TMR_BK)                                             \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::subc_reg(UINT32 op)
@@ -2924,22 +2924,22 @@ void tms3203x_device::subf_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define SUBI(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = src1 - src2;										\
-	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))					\
-		IREG(dreg) = _res;											\
-	else															\
-		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;	\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZCVUF();												\
-		OR_C_SUB(src1,src2,_res);									\
-		OR_V_SUB(src1,src2,_res);									\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define SUBI(dreg, src1, src2)                                      \
+{                                                                   \
+	UINT32 _res = src1 - src2;                                      \
+	if (!OVM() || !OVERFLOW_SUB(src1,src2,_res))                    \
+		IREG(dreg) = _res;                                          \
+	else                                                            \
+		IREG(dreg) = ((INT32)src1 < 0) ? 0x80000000 : 0x7fffffff;   \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZCVUF();                                               \
+		OR_C_SUB(src1,src2,_res);                                   \
+		OR_V_SUB(src1,src2,_res);                                   \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::subi_reg(UINT32 op)
@@ -3075,11 +3075,11 @@ void tms3203x_device::subri_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define TSTB(src1, src2)											\
-{																	\
-	UINT32 _res = (src1) & (src2);									\
-	CLR_NZVUF();													\
-	OR_NZ(_res);													\
+#define TSTB(src1, src2)                                            \
+{                                                                   \
+	UINT32 _res = (src1) & (src2);                                  \
+	CLR_NZVUF();                                                    \
+	OR_NZ(_res);                                                    \
 }
 
 void tms3203x_device::tstb_reg(UINT32 op)
@@ -3112,17 +3112,17 @@ void tms3203x_device::tstb_imm(UINT32 op)
 
 /*-----------------------------------------------------*/
 
-#define XOR(dreg, src1, src2)										\
-{																	\
-	UINT32 _res = (src1) ^ (src2);									\
-	IREG(dreg) = _res;												\
-	if (dreg < 8)													\
-	{																\
-		CLR_NZVUF();												\
-		OR_NZ(_res);												\
-	}																\
-	else if (dreg >= TMR_BK)										\
-		update_special(dreg);										\
+#define XOR(dreg, src1, src2)                                       \
+{                                                                   \
+	UINT32 _res = (src1) ^ (src2);                                  \
+	IREG(dreg) = _res;                                              \
+	if (dreg < 8)                                                   \
+	{                                                               \
+		CLR_NZVUF();                                                \
+		OR_NZ(_res);                                                \
+	}                                                               \
+	else if (dreg >= TMR_BK)                                        \
+		update_special(dreg);                                       \
 }
 
 void tms3203x_device::xor_reg(UINT32 op)
@@ -6364,561 +6364,561 @@ void tms3203x_device::xor3sti(UINT32 op)
 
 UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_d[0x20])(UINT32, UINT8) =
 {
-	&tms3203x_device::mod00_d,		&tms3203x_device::mod01_d,		&tms3203x_device::mod02_d,		&tms3203x_device::mod03_d,
-	&tms3203x_device::mod04_d,		&tms3203x_device::mod05_d,		&tms3203x_device::mod06_d,		&tms3203x_device::mod07_d,
-	&tms3203x_device::mod08,		&tms3203x_device::mod09,		&tms3203x_device::mod0a,		&tms3203x_device::mod0b,
-	&tms3203x_device::mod0c,		&tms3203x_device::mod0d,		&tms3203x_device::mod0e,		&tms3203x_device::mod0f,
-	&tms3203x_device::mod10,		&tms3203x_device::mod11,		&tms3203x_device::mod12,		&tms3203x_device::mod13,
-	&tms3203x_device::mod14,		&tms3203x_device::mod15,		&tms3203x_device::mod16,		&tms3203x_device::mod17,
-	&tms3203x_device::mod18,		&tms3203x_device::mod19,		&tms3203x_device::modillegal,	&tms3203x_device::modillegal,
-	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal
+	&tms3203x_device::mod00_d,      &tms3203x_device::mod01_d,      &tms3203x_device::mod02_d,      &tms3203x_device::mod03_d,
+	&tms3203x_device::mod04_d,      &tms3203x_device::mod05_d,      &tms3203x_device::mod06_d,      &tms3203x_device::mod07_d,
+	&tms3203x_device::mod08,        &tms3203x_device::mod09,        &tms3203x_device::mod0a,        &tms3203x_device::mod0b,
+	&tms3203x_device::mod0c,        &tms3203x_device::mod0d,        &tms3203x_device::mod0e,        &tms3203x_device::mod0f,
+	&tms3203x_device::mod10,        &tms3203x_device::mod11,        &tms3203x_device::mod12,        &tms3203x_device::mod13,
+	&tms3203x_device::mod14,        &tms3203x_device::mod15,        &tms3203x_device::mod16,        &tms3203x_device::mod17,
+	&tms3203x_device::mod18,        &tms3203x_device::mod19,        &tms3203x_device::modillegal,   &tms3203x_device::modillegal,
+	&tms3203x_device::modillegal,   &tms3203x_device::modillegal,   &tms3203x_device::modillegal,   &tms3203x_device::modillegal
 };
 
 
 UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1[0x20])(UINT32, UINT8) =
 {
-	&tms3203x_device::mod00_1,		&tms3203x_device::mod01_1,		&tms3203x_device::mod02_1,		&tms3203x_device::mod03_1,
-	&tms3203x_device::mod04_1,		&tms3203x_device::mod05_1,		&tms3203x_device::mod06_1,		&tms3203x_device::mod07_1,
-	&tms3203x_device::mod08,		&tms3203x_device::mod09,		&tms3203x_device::mod0a,		&tms3203x_device::mod0b,
-	&tms3203x_device::mod0c,		&tms3203x_device::mod0d,		&tms3203x_device::mod0e,		&tms3203x_device::mod0f,
-	&tms3203x_device::mod10,		&tms3203x_device::mod11,		&tms3203x_device::mod12,		&tms3203x_device::mod13,
-	&tms3203x_device::mod14,		&tms3203x_device::mod15,		&tms3203x_device::mod16,		&tms3203x_device::mod17,
-	&tms3203x_device::mod18,		&tms3203x_device::mod19,		&tms3203x_device::modillegal,	&tms3203x_device::modillegal,
-	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal
+	&tms3203x_device::mod00_1,      &tms3203x_device::mod01_1,      &tms3203x_device::mod02_1,      &tms3203x_device::mod03_1,
+	&tms3203x_device::mod04_1,      &tms3203x_device::mod05_1,      &tms3203x_device::mod06_1,      &tms3203x_device::mod07_1,
+	&tms3203x_device::mod08,        &tms3203x_device::mod09,        &tms3203x_device::mod0a,        &tms3203x_device::mod0b,
+	&tms3203x_device::mod0c,        &tms3203x_device::mod0d,        &tms3203x_device::mod0e,        &tms3203x_device::mod0f,
+	&tms3203x_device::mod10,        &tms3203x_device::mod11,        &tms3203x_device::mod12,        &tms3203x_device::mod13,
+	&tms3203x_device::mod14,        &tms3203x_device::mod15,        &tms3203x_device::mod16,        &tms3203x_device::mod17,
+	&tms3203x_device::mod18,        &tms3203x_device::mod19,        &tms3203x_device::modillegal,   &tms3203x_device::modillegal,
+	&tms3203x_device::modillegal,   &tms3203x_device::modillegal,   &tms3203x_device::modillegal,   &tms3203x_device::modillegal
 };
 
 
 UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1_def[0x20])(UINT32, UINT8, UINT32 *&) =
 {
-	&tms3203x_device::mod00_1_def,	&tms3203x_device::mod01_1_def,	&tms3203x_device::mod02_1_def,	&tms3203x_device::mod03_1_def,
-	&tms3203x_device::mod04_1_def,	&tms3203x_device::mod05_1_def,	&tms3203x_device::mod06_1_def,	&tms3203x_device::mod07_1_def,
-	&tms3203x_device::mod08_def,	&tms3203x_device::mod09_def,	&tms3203x_device::mod0a_def,	&tms3203x_device::mod0b_def,
-	&tms3203x_device::mod0c_def,	&tms3203x_device::mod0d_def,	&tms3203x_device::mod0e_def,	&tms3203x_device::mod0f_def,
-	&tms3203x_device::mod10_def,	&tms3203x_device::mod11_def,	&tms3203x_device::mod12_def,	&tms3203x_device::mod13_def,
-	&tms3203x_device::mod14_def,	&tms3203x_device::mod15_def,	&tms3203x_device::mod16_def,	&tms3203x_device::mod17_def,
-	&tms3203x_device::mod18_def,	&tms3203x_device::mod19_def,	&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,
+	&tms3203x_device::mod00_1_def,  &tms3203x_device::mod01_1_def,  &tms3203x_device::mod02_1_def,  &tms3203x_device::mod03_1_def,
+	&tms3203x_device::mod04_1_def,  &tms3203x_device::mod05_1_def,  &tms3203x_device::mod06_1_def,  &tms3203x_device::mod07_1_def,
+	&tms3203x_device::mod08_def,    &tms3203x_device::mod09_def,    &tms3203x_device::mod0a_def,    &tms3203x_device::mod0b_def,
+	&tms3203x_device::mod0c_def,    &tms3203x_device::mod0d_def,    &tms3203x_device::mod0e_def,    &tms3203x_device::mod0f_def,
+	&tms3203x_device::mod10_def,    &tms3203x_device::mod11_def,    &tms3203x_device::mod12_def,    &tms3203x_device::mod13_def,
+	&tms3203x_device::mod14_def,    &tms3203x_device::mod15_def,    &tms3203x_device::mod16_def,    &tms3203x_device::mod17_def,
+	&tms3203x_device::mod18_def,    &tms3203x_device::mod19_def,    &tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,
 	&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def
 };
 
 void (tms3203x_device::*const tms3203x_device::s_tms32031ops[])(UINT32 op) =
 {
-	&tms3203x_device::absf_reg,		&tms3203x_device::absf_dir,		&tms3203x_device::absf_ind,		&tms3203x_device::absf_imm,		// 0x00
-	&tms3203x_device::absi_reg,		&tms3203x_device::absi_dir,		&tms3203x_device::absi_ind,		&tms3203x_device::absi_imm,
-	&tms3203x_device::addc_reg,		&tms3203x_device::addc_dir,		&tms3203x_device::addc_ind,		&tms3203x_device::addc_imm,
-	&tms3203x_device::addf_reg,		&tms3203x_device::addf_dir,		&tms3203x_device::addf_ind,		&tms3203x_device::addf_imm,
-	&tms3203x_device::addi_reg,		&tms3203x_device::addi_dir,		&tms3203x_device::addi_ind,		&tms3203x_device::addi_imm,
-	&tms3203x_device::and_reg,		&tms3203x_device::and_dir,		&tms3203x_device::and_ind,		&tms3203x_device::and_imm,
-	&tms3203x_device::andn_reg,		&tms3203x_device::andn_dir,		&tms3203x_device::andn_ind,		&tms3203x_device::andn_imm,
-	&tms3203x_device::ash_reg,		&tms3203x_device::ash_dir,		&tms3203x_device::ash_ind,		&tms3203x_device::ash_imm,
-	&tms3203x_device::cmpf_reg,		&tms3203x_device::cmpf_dir,		&tms3203x_device::cmpf_ind,		&tms3203x_device::cmpf_imm,		// 0x08
-	&tms3203x_device::cmpi_reg,		&tms3203x_device::cmpi_dir,		&tms3203x_device::cmpi_ind,		&tms3203x_device::cmpi_imm,
-	&tms3203x_device::fix_reg,		&tms3203x_device::fix_dir,		&tms3203x_device::fix_ind,		&tms3203x_device::fix_imm,
-	&tms3203x_device::float_reg,	&tms3203x_device::float_dir,	&tms3203x_device::float_ind,	&tms3203x_device::float_imm,
-	&tms3203x_device::idle,			&tms3203x_device::idle,			&tms3203x_device::idle,			&tms3203x_device::idle,
-	&tms3203x_device::lde_reg,		&tms3203x_device::lde_dir,		&tms3203x_device::lde_ind,		&tms3203x_device::lde_imm,
-	&tms3203x_device::ldf_reg,		&tms3203x_device::ldf_dir,		&tms3203x_device::ldf_ind,		&tms3203x_device::ldf_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::ldfi_dir,		&tms3203x_device::ldfi_ind,		&tms3203x_device::illegal,
-	&tms3203x_device::ldi_reg,		&tms3203x_device::ldi_dir,		&tms3203x_device::ldi_ind,		&tms3203x_device::ldi_imm,		// 0x10
-	&tms3203x_device::illegal,		&tms3203x_device::ldii_dir,		&tms3203x_device::ldii_ind,		&tms3203x_device::illegal,
-	&tms3203x_device::ldm_reg,		&tms3203x_device::ldm_dir,		&tms3203x_device::ldm_ind,		&tms3203x_device::ldm_imm,
-	&tms3203x_device::lsh_reg,		&tms3203x_device::lsh_dir,		&tms3203x_device::lsh_ind,		&tms3203x_device::lsh_imm,
-	&tms3203x_device::mpyf_reg,		&tms3203x_device::mpyf_dir,		&tms3203x_device::mpyf_ind,		&tms3203x_device::mpyf_imm,
-	&tms3203x_device::mpyi_reg,		&tms3203x_device::mpyi_dir,		&tms3203x_device::mpyi_ind,		&tms3203x_device::mpyi_imm,
-	&tms3203x_device::negb_reg,		&tms3203x_device::negb_dir,		&tms3203x_device::negb_ind,		&tms3203x_device::negb_imm,
-	&tms3203x_device::negf_reg,		&tms3203x_device::negf_dir,		&tms3203x_device::negf_ind,		&tms3203x_device::negf_imm,
-	&tms3203x_device::negi_reg,		&tms3203x_device::negi_dir,		&tms3203x_device::negi_ind,		&tms3203x_device::negi_imm,		// 0x18
-	&tms3203x_device::nop_reg,		&tms3203x_device::illegal,		&tms3203x_device::nop_ind,		&tms3203x_device::illegal,
-	&tms3203x_device::norm_reg,		&tms3203x_device::norm_dir,		&tms3203x_device::norm_ind,		&tms3203x_device::norm_imm,
-	&tms3203x_device::not_reg,		&tms3203x_device::not_dir,		&tms3203x_device::not_ind,		&tms3203x_device::not_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::pop,			&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::popf,			&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::push,			&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::pushf,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::or_reg,		&tms3203x_device::or_dir,		&tms3203x_device::or_ind,		&tms3203x_device::or_imm,		// 0x20
-	&tms3203x_device::maxspeed,		&tms3203x_device::maxspeed,		&tms3203x_device::maxspeed,		&tms3203x_device::maxspeed,
-	&tms3203x_device::rnd_reg,		&tms3203x_device::rnd_dir,		&tms3203x_device::rnd_ind,		&tms3203x_device::rnd_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::rol,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::rolc,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::ror,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::rorc,
-	&tms3203x_device::rtps_reg,		&tms3203x_device::rtps_dir,		&tms3203x_device::rtps_ind,		&tms3203x_device::rtps_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::stf_dir,		&tms3203x_device::stf_ind,		&tms3203x_device::illegal,		// 0x28
-	&tms3203x_device::illegal,		&tms3203x_device::stfi_dir,		&tms3203x_device::stfi_ind,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::sti_dir,		&tms3203x_device::sti_ind,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::stii_dir,		&tms3203x_device::stii_ind,		&tms3203x_device::illegal,
-	&tms3203x_device::sigi,			&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::subb_reg,		&tms3203x_device::subb_dir,		&tms3203x_device::subb_ind,		&tms3203x_device::subb_imm,
-	&tms3203x_device::subc_reg,		&tms3203x_device::subc_dir,		&tms3203x_device::subc_ind,		&tms3203x_device::subc_imm,
-	&tms3203x_device::subf_reg,		&tms3203x_device::subf_dir,		&tms3203x_device::subf_ind,		&tms3203x_device::subf_imm,
-	&tms3203x_device::subi_reg,		&tms3203x_device::subi_dir,		&tms3203x_device::subi_ind,		&tms3203x_device::subi_imm,		// 0x30
-	&tms3203x_device::subrb_reg,	&tms3203x_device::subrb_dir,	&tms3203x_device::subrb_ind,	&tms3203x_device::subrb_imm,
-	&tms3203x_device::subrf_reg,	&tms3203x_device::subrf_dir,	&tms3203x_device::subrf_ind,	&tms3203x_device::subrf_imm,
-	&tms3203x_device::subri_reg,	&tms3203x_device::subri_dir,	&tms3203x_device::subri_ind,	&tms3203x_device::subri_imm,
-	&tms3203x_device::tstb_reg,		&tms3203x_device::tstb_dir,		&tms3203x_device::tstb_ind,		&tms3203x_device::tstb_imm,
-	&tms3203x_device::xor_reg,		&tms3203x_device::xor_dir,		&tms3203x_device::xor_ind,		&tms3203x_device::xor_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::iack_dir,		&tms3203x_device::iack_ind,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x38
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
+	&tms3203x_device::absf_reg,     &tms3203x_device::absf_dir,     &tms3203x_device::absf_ind,     &tms3203x_device::absf_imm,     // 0x00
+	&tms3203x_device::absi_reg,     &tms3203x_device::absi_dir,     &tms3203x_device::absi_ind,     &tms3203x_device::absi_imm,
+	&tms3203x_device::addc_reg,     &tms3203x_device::addc_dir,     &tms3203x_device::addc_ind,     &tms3203x_device::addc_imm,
+	&tms3203x_device::addf_reg,     &tms3203x_device::addf_dir,     &tms3203x_device::addf_ind,     &tms3203x_device::addf_imm,
+	&tms3203x_device::addi_reg,     &tms3203x_device::addi_dir,     &tms3203x_device::addi_ind,     &tms3203x_device::addi_imm,
+	&tms3203x_device::and_reg,      &tms3203x_device::and_dir,      &tms3203x_device::and_ind,      &tms3203x_device::and_imm,
+	&tms3203x_device::andn_reg,     &tms3203x_device::andn_dir,     &tms3203x_device::andn_ind,     &tms3203x_device::andn_imm,
+	&tms3203x_device::ash_reg,      &tms3203x_device::ash_dir,      &tms3203x_device::ash_ind,      &tms3203x_device::ash_imm,
+	&tms3203x_device::cmpf_reg,     &tms3203x_device::cmpf_dir,     &tms3203x_device::cmpf_ind,     &tms3203x_device::cmpf_imm,     // 0x08
+	&tms3203x_device::cmpi_reg,     &tms3203x_device::cmpi_dir,     &tms3203x_device::cmpi_ind,     &tms3203x_device::cmpi_imm,
+	&tms3203x_device::fix_reg,      &tms3203x_device::fix_dir,      &tms3203x_device::fix_ind,      &tms3203x_device::fix_imm,
+	&tms3203x_device::float_reg,    &tms3203x_device::float_dir,    &tms3203x_device::float_ind,    &tms3203x_device::float_imm,
+	&tms3203x_device::idle,         &tms3203x_device::idle,         &tms3203x_device::idle,         &tms3203x_device::idle,
+	&tms3203x_device::lde_reg,      &tms3203x_device::lde_dir,      &tms3203x_device::lde_ind,      &tms3203x_device::lde_imm,
+	&tms3203x_device::ldf_reg,      &tms3203x_device::ldf_dir,      &tms3203x_device::ldf_ind,      &tms3203x_device::ldf_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::ldfi_dir,     &tms3203x_device::ldfi_ind,     &tms3203x_device::illegal,
+	&tms3203x_device::ldi_reg,      &tms3203x_device::ldi_dir,      &tms3203x_device::ldi_ind,      &tms3203x_device::ldi_imm,      // 0x10
+	&tms3203x_device::illegal,      &tms3203x_device::ldii_dir,     &tms3203x_device::ldii_ind,     &tms3203x_device::illegal,
+	&tms3203x_device::ldm_reg,      &tms3203x_device::ldm_dir,      &tms3203x_device::ldm_ind,      &tms3203x_device::ldm_imm,
+	&tms3203x_device::lsh_reg,      &tms3203x_device::lsh_dir,      &tms3203x_device::lsh_ind,      &tms3203x_device::lsh_imm,
+	&tms3203x_device::mpyf_reg,     &tms3203x_device::mpyf_dir,     &tms3203x_device::mpyf_ind,     &tms3203x_device::mpyf_imm,
+	&tms3203x_device::mpyi_reg,     &tms3203x_device::mpyi_dir,     &tms3203x_device::mpyi_ind,     &tms3203x_device::mpyi_imm,
+	&tms3203x_device::negb_reg,     &tms3203x_device::negb_dir,     &tms3203x_device::negb_ind,     &tms3203x_device::negb_imm,
+	&tms3203x_device::negf_reg,     &tms3203x_device::negf_dir,     &tms3203x_device::negf_ind,     &tms3203x_device::negf_imm,
+	&tms3203x_device::negi_reg,     &tms3203x_device::negi_dir,     &tms3203x_device::negi_ind,     &tms3203x_device::negi_imm,     // 0x18
+	&tms3203x_device::nop_reg,      &tms3203x_device::illegal,      &tms3203x_device::nop_ind,      &tms3203x_device::illegal,
+	&tms3203x_device::norm_reg,     &tms3203x_device::norm_dir,     &tms3203x_device::norm_ind,     &tms3203x_device::norm_imm,
+	&tms3203x_device::not_reg,      &tms3203x_device::not_dir,      &tms3203x_device::not_ind,      &tms3203x_device::not_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::pop,          &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::popf,         &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::push,         &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::pushf,        &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::or_reg,       &tms3203x_device::or_dir,       &tms3203x_device::or_ind,       &tms3203x_device::or_imm,       // 0x20
+	&tms3203x_device::maxspeed,     &tms3203x_device::maxspeed,     &tms3203x_device::maxspeed,     &tms3203x_device::maxspeed,
+	&tms3203x_device::rnd_reg,      &tms3203x_device::rnd_dir,      &tms3203x_device::rnd_ind,      &tms3203x_device::rnd_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::rol,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::rolc,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::ror,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::rorc,
+	&tms3203x_device::rtps_reg,     &tms3203x_device::rtps_dir,     &tms3203x_device::rtps_ind,     &tms3203x_device::rtps_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::stf_dir,      &tms3203x_device::stf_ind,      &tms3203x_device::illegal,      // 0x28
+	&tms3203x_device::illegal,      &tms3203x_device::stfi_dir,     &tms3203x_device::stfi_ind,     &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::sti_dir,      &tms3203x_device::sti_ind,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::stii_dir,     &tms3203x_device::stii_ind,     &tms3203x_device::illegal,
+	&tms3203x_device::sigi,         &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::subb_reg,     &tms3203x_device::subb_dir,     &tms3203x_device::subb_ind,     &tms3203x_device::subb_imm,
+	&tms3203x_device::subc_reg,     &tms3203x_device::subc_dir,     &tms3203x_device::subc_ind,     &tms3203x_device::subc_imm,
+	&tms3203x_device::subf_reg,     &tms3203x_device::subf_dir,     &tms3203x_device::subf_ind,     &tms3203x_device::subf_imm,
+	&tms3203x_device::subi_reg,     &tms3203x_device::subi_dir,     &tms3203x_device::subi_ind,     &tms3203x_device::subi_imm,     // 0x30
+	&tms3203x_device::subrb_reg,    &tms3203x_device::subrb_dir,    &tms3203x_device::subrb_ind,    &tms3203x_device::subrb_imm,
+	&tms3203x_device::subrf_reg,    &tms3203x_device::subrf_dir,    &tms3203x_device::subrf_ind,    &tms3203x_device::subrf_imm,
+	&tms3203x_device::subri_reg,    &tms3203x_device::subri_dir,    &tms3203x_device::subri_ind,    &tms3203x_device::subri_imm,
+	&tms3203x_device::tstb_reg,     &tms3203x_device::tstb_dir,     &tms3203x_device::tstb_ind,     &tms3203x_device::tstb_imm,
+	&tms3203x_device::xor_reg,      &tms3203x_device::xor_dir,      &tms3203x_device::xor_ind,      &tms3203x_device::xor_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::iack_dir,     &tms3203x_device::iack_ind,     &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x38
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
 
-	&tms3203x_device::addc3_regreg,	&tms3203x_device::addc3_indreg,	&tms3203x_device::addc3_regind,	&tms3203x_device::addc3_indind,	// 0x40
-	&tms3203x_device::addf3_regreg,	&tms3203x_device::addf3_indreg,	&tms3203x_device::addf3_regind,	&tms3203x_device::addf3_indind,
-	&tms3203x_device::addi3_regreg,	&tms3203x_device::addi3_indreg,	&tms3203x_device::addi3_regind,	&tms3203x_device::addi3_indind,
-	&tms3203x_device::and3_regreg,	&tms3203x_device::and3_indreg,	&tms3203x_device::and3_regind,	&tms3203x_device::and3_indind,
-	&tms3203x_device::andn3_regreg,	&tms3203x_device::andn3_indreg,	&tms3203x_device::andn3_regind,	&tms3203x_device::andn3_indind,
-	&tms3203x_device::ash3_regreg,	&tms3203x_device::ash3_indreg,	&tms3203x_device::ash3_regind,	&tms3203x_device::ash3_indind,
-	&tms3203x_device::cmpf3_regreg,	&tms3203x_device::cmpf3_indreg,	&tms3203x_device::cmpf3_regind,	&tms3203x_device::cmpf3_indind,
-	&tms3203x_device::cmpi3_regreg,	&tms3203x_device::cmpi3_indreg,	&tms3203x_device::cmpi3_regind,	&tms3203x_device::cmpi3_indind,
-	&tms3203x_device::lsh3_regreg,	&tms3203x_device::lsh3_indreg,	&tms3203x_device::lsh3_regind,	&tms3203x_device::lsh3_indind,	// 0x48
-	&tms3203x_device::mpyf3_regreg,	&tms3203x_device::mpyf3_indreg,	&tms3203x_device::mpyf3_regind,	&tms3203x_device::mpyf3_indind,
-	&tms3203x_device::mpyi3_regreg,	&tms3203x_device::mpyi3_indreg,	&tms3203x_device::mpyi3_regind,	&tms3203x_device::mpyi3_indind,
-	&tms3203x_device::or3_regreg,	&tms3203x_device::or3_indreg,	&tms3203x_device::or3_regind,	&tms3203x_device::or3_indind,
-	&tms3203x_device::subb3_regreg,	&tms3203x_device::subb3_indreg,	&tms3203x_device::subb3_regind,	&tms3203x_device::subb3_indind,
-	&tms3203x_device::subf3_regreg,	&tms3203x_device::subf3_indreg,	&tms3203x_device::subf3_regind,	&tms3203x_device::subf3_indind,
-	&tms3203x_device::subi3_regreg,	&tms3203x_device::subi3_indreg,	&tms3203x_device::subi3_regind,	&tms3203x_device::subi3_indind,
-	&tms3203x_device::tstb3_regreg,	&tms3203x_device::tstb3_indreg,	&tms3203x_device::tstb3_regind,	&tms3203x_device::tstb3_indind,
-	&tms3203x_device::xor3_regreg,	&tms3203x_device::xor3_indreg,	&tms3203x_device::xor3_regind,	&tms3203x_device::xor3_indind,	// 0x50
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x58
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x60
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x68
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x70
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x78
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
+	&tms3203x_device::addc3_regreg, &tms3203x_device::addc3_indreg, &tms3203x_device::addc3_regind, &tms3203x_device::addc3_indind, // 0x40
+	&tms3203x_device::addf3_regreg, &tms3203x_device::addf3_indreg, &tms3203x_device::addf3_regind, &tms3203x_device::addf3_indind,
+	&tms3203x_device::addi3_regreg, &tms3203x_device::addi3_indreg, &tms3203x_device::addi3_regind, &tms3203x_device::addi3_indind,
+	&tms3203x_device::and3_regreg,  &tms3203x_device::and3_indreg,  &tms3203x_device::and3_regind,  &tms3203x_device::and3_indind,
+	&tms3203x_device::andn3_regreg, &tms3203x_device::andn3_indreg, &tms3203x_device::andn3_regind, &tms3203x_device::andn3_indind,
+	&tms3203x_device::ash3_regreg,  &tms3203x_device::ash3_indreg,  &tms3203x_device::ash3_regind,  &tms3203x_device::ash3_indind,
+	&tms3203x_device::cmpf3_regreg, &tms3203x_device::cmpf3_indreg, &tms3203x_device::cmpf3_regind, &tms3203x_device::cmpf3_indind,
+	&tms3203x_device::cmpi3_regreg, &tms3203x_device::cmpi3_indreg, &tms3203x_device::cmpi3_regind, &tms3203x_device::cmpi3_indind,
+	&tms3203x_device::lsh3_regreg,  &tms3203x_device::lsh3_indreg,  &tms3203x_device::lsh3_regind,  &tms3203x_device::lsh3_indind,  // 0x48
+	&tms3203x_device::mpyf3_regreg, &tms3203x_device::mpyf3_indreg, &tms3203x_device::mpyf3_regind, &tms3203x_device::mpyf3_indind,
+	&tms3203x_device::mpyi3_regreg, &tms3203x_device::mpyi3_indreg, &tms3203x_device::mpyi3_regind, &tms3203x_device::mpyi3_indind,
+	&tms3203x_device::or3_regreg,   &tms3203x_device::or3_indreg,   &tms3203x_device::or3_regind,   &tms3203x_device::or3_indind,
+	&tms3203x_device::subb3_regreg, &tms3203x_device::subb3_indreg, &tms3203x_device::subb3_regind, &tms3203x_device::subb3_indind,
+	&tms3203x_device::subf3_regreg, &tms3203x_device::subf3_indreg, &tms3203x_device::subf3_regind, &tms3203x_device::subf3_indind,
+	&tms3203x_device::subi3_regreg, &tms3203x_device::subi3_indreg, &tms3203x_device::subi3_regind, &tms3203x_device::subi3_indind,
+	&tms3203x_device::tstb3_regreg, &tms3203x_device::tstb3_indreg, &tms3203x_device::tstb3_regind, &tms3203x_device::tstb3_indind,
+	&tms3203x_device::xor3_regreg,  &tms3203x_device::xor3_indreg,  &tms3203x_device::xor3_regind,  &tms3203x_device::xor3_indind,  // 0x50
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x58
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x60
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x68
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x70
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x78
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
 
-	&tms3203x_device::ldfu_reg,		&tms3203x_device::ldfu_dir,		&tms3203x_device::ldfu_ind,		&tms3203x_device::ldfu_imm,		// 0x80
-	&tms3203x_device::ldflo_reg,	&tms3203x_device::ldflo_dir,	&tms3203x_device::ldflo_ind,	&tms3203x_device::ldflo_imm,
-	&tms3203x_device::ldfls_reg,	&tms3203x_device::ldfls_dir,	&tms3203x_device::ldfls_ind,	&tms3203x_device::ldfls_imm,
-	&tms3203x_device::ldfhi_reg,	&tms3203x_device::ldfhi_dir,	&tms3203x_device::ldfhi_ind,	&tms3203x_device::ldfhi_imm,
-	&tms3203x_device::ldfhs_reg,	&tms3203x_device::ldfhs_dir,	&tms3203x_device::ldfhs_ind,	&tms3203x_device::ldfhs_imm,
-	&tms3203x_device::ldfeq_reg,	&tms3203x_device::ldfeq_dir,	&tms3203x_device::ldfeq_ind,	&tms3203x_device::ldfeq_imm,
-	&tms3203x_device::ldfne_reg,	&tms3203x_device::ldfne_dir,	&tms3203x_device::ldfne_ind,	&tms3203x_device::ldfne_imm,
-	&tms3203x_device::ldflt_reg,	&tms3203x_device::ldflt_dir,	&tms3203x_device::ldflt_ind,	&tms3203x_device::ldflt_imm,
-	&tms3203x_device::ldfle_reg,	&tms3203x_device::ldfle_dir,	&tms3203x_device::ldfle_ind,	&tms3203x_device::ldfle_imm,	// 0x88
-	&tms3203x_device::ldfgt_reg,	&tms3203x_device::ldfgt_dir,	&tms3203x_device::ldfgt_ind,	&tms3203x_device::ldfgt_imm,
-	&tms3203x_device::ldfge_reg,	&tms3203x_device::ldfge_dir,	&tms3203x_device::ldfge_ind,	&tms3203x_device::ldfge_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::ldfnv_reg,	&tms3203x_device::ldfnv_dir,	&tms3203x_device::ldfnv_ind,	&tms3203x_device::ldfnv_imm,
-	&tms3203x_device::ldfv_reg,		&tms3203x_device::ldfv_dir,		&tms3203x_device::ldfv_ind,		&tms3203x_device::ldfv_imm,
-	&tms3203x_device::ldfnuf_reg,	&tms3203x_device::ldfnuf_dir,	&tms3203x_device::ldfnuf_ind,	&tms3203x_device::ldfnuf_imm,
-	&tms3203x_device::ldfuf_reg,	&tms3203x_device::ldfuf_dir,	&tms3203x_device::ldfuf_ind,	&tms3203x_device::ldfuf_imm,
-	&tms3203x_device::ldfnlv_reg,	&tms3203x_device::ldfnlv_dir,	&tms3203x_device::ldfnlv_ind,	&tms3203x_device::ldfnlv_imm,	// 0x90
-	&tms3203x_device::ldflv_reg,	&tms3203x_device::ldflv_dir,	&tms3203x_device::ldflv_ind,	&tms3203x_device::ldflv_imm,
-	&tms3203x_device::ldfnluf_reg,	&tms3203x_device::ldfnluf_dir,	&tms3203x_device::ldfnluf_ind,	&tms3203x_device::ldfnluf_imm,
-	&tms3203x_device::ldfluf_reg,	&tms3203x_device::ldfluf_dir,	&tms3203x_device::ldfluf_ind,	&tms3203x_device::ldfluf_imm,
-	&tms3203x_device::ldfzuf_reg,	&tms3203x_device::ldfzuf_dir,	&tms3203x_device::ldfzuf_ind,	&tms3203x_device::ldfzuf_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x98
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::ldiu_reg,		&tms3203x_device::ldiu_dir,		&tms3203x_device::ldiu_ind,		&tms3203x_device::ldiu_imm,		// 0xa0
-	&tms3203x_device::ldilo_reg,	&tms3203x_device::ldilo_dir,	&tms3203x_device::ldilo_ind,	&tms3203x_device::ldilo_imm,
-	&tms3203x_device::ldils_reg,	&tms3203x_device::ldils_dir,	&tms3203x_device::ldils_ind,	&tms3203x_device::ldils_imm,
-	&tms3203x_device::ldihi_reg,	&tms3203x_device::ldihi_dir,	&tms3203x_device::ldihi_ind,	&tms3203x_device::ldihi_imm,
-	&tms3203x_device::ldihs_reg,	&tms3203x_device::ldihs_dir,	&tms3203x_device::ldihs_ind,	&tms3203x_device::ldihs_imm,
-	&tms3203x_device::ldieq_reg,	&tms3203x_device::ldieq_dir,	&tms3203x_device::ldieq_ind,	&tms3203x_device::ldieq_imm,
-	&tms3203x_device::ldine_reg,	&tms3203x_device::ldine_dir,	&tms3203x_device::ldine_ind,	&tms3203x_device::ldine_imm,
-	&tms3203x_device::ldilt_reg,	&tms3203x_device::ldilt_dir,	&tms3203x_device::ldilt_ind,	&tms3203x_device::ldilt_imm,
-	&tms3203x_device::ldile_reg,	&tms3203x_device::ldile_dir,	&tms3203x_device::ldile_ind,	&tms3203x_device::ldile_imm,	// 0xa8
-	&tms3203x_device::ldigt_reg,	&tms3203x_device::ldigt_dir,	&tms3203x_device::ldigt_ind,	&tms3203x_device::ldigt_imm,
-	&tms3203x_device::ldige_reg,	&tms3203x_device::ldige_dir,	&tms3203x_device::ldige_ind,	&tms3203x_device::ldige_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::ldinv_reg,	&tms3203x_device::ldinv_dir,	&tms3203x_device::ldinv_ind,	&tms3203x_device::ldinv_imm,
-	&tms3203x_device::ldiv_reg,		&tms3203x_device::ldiv_dir,		&tms3203x_device::ldiv_ind,		&tms3203x_device::ldiv_imm,
-	&tms3203x_device::ldinuf_reg,	&tms3203x_device::ldinuf_dir,	&tms3203x_device::ldinuf_ind,	&tms3203x_device::ldinuf_imm,
-	&tms3203x_device::ldiuf_reg,	&tms3203x_device::ldiuf_dir,	&tms3203x_device::ldiuf_ind,	&tms3203x_device::ldiuf_imm,
-	&tms3203x_device::ldinlv_reg,	&tms3203x_device::ldinlv_dir,	&tms3203x_device::ldinlv_ind,	&tms3203x_device::ldinlv_imm,	// 0xb0
-	&tms3203x_device::ldilv_reg,	&tms3203x_device::ldilv_dir,	&tms3203x_device::ldilv_ind,	&tms3203x_device::ldilv_imm,
-	&tms3203x_device::ldinluf_reg,	&tms3203x_device::ldinluf_dir,	&tms3203x_device::ldinluf_ind,	&tms3203x_device::ldinluf_imm,
-	&tms3203x_device::ldiluf_reg,	&tms3203x_device::ldiluf_dir,	&tms3203x_device::ldiluf_ind,	&tms3203x_device::ldiluf_imm,
-	&tms3203x_device::ldizuf_reg,	&tms3203x_device::ldizuf_dir,	&tms3203x_device::ldizuf_ind,	&tms3203x_device::ldizuf_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0xb8
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
+	&tms3203x_device::ldfu_reg,     &tms3203x_device::ldfu_dir,     &tms3203x_device::ldfu_ind,     &tms3203x_device::ldfu_imm,     // 0x80
+	&tms3203x_device::ldflo_reg,    &tms3203x_device::ldflo_dir,    &tms3203x_device::ldflo_ind,    &tms3203x_device::ldflo_imm,
+	&tms3203x_device::ldfls_reg,    &tms3203x_device::ldfls_dir,    &tms3203x_device::ldfls_ind,    &tms3203x_device::ldfls_imm,
+	&tms3203x_device::ldfhi_reg,    &tms3203x_device::ldfhi_dir,    &tms3203x_device::ldfhi_ind,    &tms3203x_device::ldfhi_imm,
+	&tms3203x_device::ldfhs_reg,    &tms3203x_device::ldfhs_dir,    &tms3203x_device::ldfhs_ind,    &tms3203x_device::ldfhs_imm,
+	&tms3203x_device::ldfeq_reg,    &tms3203x_device::ldfeq_dir,    &tms3203x_device::ldfeq_ind,    &tms3203x_device::ldfeq_imm,
+	&tms3203x_device::ldfne_reg,    &tms3203x_device::ldfne_dir,    &tms3203x_device::ldfne_ind,    &tms3203x_device::ldfne_imm,
+	&tms3203x_device::ldflt_reg,    &tms3203x_device::ldflt_dir,    &tms3203x_device::ldflt_ind,    &tms3203x_device::ldflt_imm,
+	&tms3203x_device::ldfle_reg,    &tms3203x_device::ldfle_dir,    &tms3203x_device::ldfle_ind,    &tms3203x_device::ldfle_imm,    // 0x88
+	&tms3203x_device::ldfgt_reg,    &tms3203x_device::ldfgt_dir,    &tms3203x_device::ldfgt_ind,    &tms3203x_device::ldfgt_imm,
+	&tms3203x_device::ldfge_reg,    &tms3203x_device::ldfge_dir,    &tms3203x_device::ldfge_ind,    &tms3203x_device::ldfge_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::ldfnv_reg,    &tms3203x_device::ldfnv_dir,    &tms3203x_device::ldfnv_ind,    &tms3203x_device::ldfnv_imm,
+	&tms3203x_device::ldfv_reg,     &tms3203x_device::ldfv_dir,     &tms3203x_device::ldfv_ind,     &tms3203x_device::ldfv_imm,
+	&tms3203x_device::ldfnuf_reg,   &tms3203x_device::ldfnuf_dir,   &tms3203x_device::ldfnuf_ind,   &tms3203x_device::ldfnuf_imm,
+	&tms3203x_device::ldfuf_reg,    &tms3203x_device::ldfuf_dir,    &tms3203x_device::ldfuf_ind,    &tms3203x_device::ldfuf_imm,
+	&tms3203x_device::ldfnlv_reg,   &tms3203x_device::ldfnlv_dir,   &tms3203x_device::ldfnlv_ind,   &tms3203x_device::ldfnlv_imm,   // 0x90
+	&tms3203x_device::ldflv_reg,    &tms3203x_device::ldflv_dir,    &tms3203x_device::ldflv_ind,    &tms3203x_device::ldflv_imm,
+	&tms3203x_device::ldfnluf_reg,  &tms3203x_device::ldfnluf_dir,  &tms3203x_device::ldfnluf_ind,  &tms3203x_device::ldfnluf_imm,
+	&tms3203x_device::ldfluf_reg,   &tms3203x_device::ldfluf_dir,   &tms3203x_device::ldfluf_ind,   &tms3203x_device::ldfluf_imm,
+	&tms3203x_device::ldfzuf_reg,   &tms3203x_device::ldfzuf_dir,   &tms3203x_device::ldfzuf_ind,   &tms3203x_device::ldfzuf_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x98
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::ldiu_reg,     &tms3203x_device::ldiu_dir,     &tms3203x_device::ldiu_ind,     &tms3203x_device::ldiu_imm,     // 0xa0
+	&tms3203x_device::ldilo_reg,    &tms3203x_device::ldilo_dir,    &tms3203x_device::ldilo_ind,    &tms3203x_device::ldilo_imm,
+	&tms3203x_device::ldils_reg,    &tms3203x_device::ldils_dir,    &tms3203x_device::ldils_ind,    &tms3203x_device::ldils_imm,
+	&tms3203x_device::ldihi_reg,    &tms3203x_device::ldihi_dir,    &tms3203x_device::ldihi_ind,    &tms3203x_device::ldihi_imm,
+	&tms3203x_device::ldihs_reg,    &tms3203x_device::ldihs_dir,    &tms3203x_device::ldihs_ind,    &tms3203x_device::ldihs_imm,
+	&tms3203x_device::ldieq_reg,    &tms3203x_device::ldieq_dir,    &tms3203x_device::ldieq_ind,    &tms3203x_device::ldieq_imm,
+	&tms3203x_device::ldine_reg,    &tms3203x_device::ldine_dir,    &tms3203x_device::ldine_ind,    &tms3203x_device::ldine_imm,
+	&tms3203x_device::ldilt_reg,    &tms3203x_device::ldilt_dir,    &tms3203x_device::ldilt_ind,    &tms3203x_device::ldilt_imm,
+	&tms3203x_device::ldile_reg,    &tms3203x_device::ldile_dir,    &tms3203x_device::ldile_ind,    &tms3203x_device::ldile_imm,    // 0xa8
+	&tms3203x_device::ldigt_reg,    &tms3203x_device::ldigt_dir,    &tms3203x_device::ldigt_ind,    &tms3203x_device::ldigt_imm,
+	&tms3203x_device::ldige_reg,    &tms3203x_device::ldige_dir,    &tms3203x_device::ldige_ind,    &tms3203x_device::ldige_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::ldinv_reg,    &tms3203x_device::ldinv_dir,    &tms3203x_device::ldinv_ind,    &tms3203x_device::ldinv_imm,
+	&tms3203x_device::ldiv_reg,     &tms3203x_device::ldiv_dir,     &tms3203x_device::ldiv_ind,     &tms3203x_device::ldiv_imm,
+	&tms3203x_device::ldinuf_reg,   &tms3203x_device::ldinuf_dir,   &tms3203x_device::ldinuf_ind,   &tms3203x_device::ldinuf_imm,
+	&tms3203x_device::ldiuf_reg,    &tms3203x_device::ldiuf_dir,    &tms3203x_device::ldiuf_ind,    &tms3203x_device::ldiuf_imm,
+	&tms3203x_device::ldinlv_reg,   &tms3203x_device::ldinlv_dir,   &tms3203x_device::ldinlv_ind,   &tms3203x_device::ldinlv_imm,   // 0xb0
+	&tms3203x_device::ldilv_reg,    &tms3203x_device::ldilv_dir,    &tms3203x_device::ldilv_ind,    &tms3203x_device::ldilv_imm,
+	&tms3203x_device::ldinluf_reg,  &tms3203x_device::ldinluf_dir,  &tms3203x_device::ldinluf_ind,  &tms3203x_device::ldinluf_imm,
+	&tms3203x_device::ldiluf_reg,   &tms3203x_device::ldiluf_dir,   &tms3203x_device::ldiluf_ind,   &tms3203x_device::ldiluf_imm,
+	&tms3203x_device::ldizuf_reg,   &tms3203x_device::ldizuf_dir,   &tms3203x_device::ldizuf_ind,   &tms3203x_device::ldizuf_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0xb8
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
 
-	&tms3203x_device::br_imm,		&tms3203x_device::br_imm,		&tms3203x_device::br_imm,		&tms3203x_device::br_imm,		// 0xc0
-	&tms3203x_device::br_imm,		&tms3203x_device::br_imm,		&tms3203x_device::br_imm,		&tms3203x_device::br_imm,
-	&tms3203x_device::brd_imm,		&tms3203x_device::brd_imm,		&tms3203x_device::brd_imm,		&tms3203x_device::brd_imm,
-	&tms3203x_device::brd_imm,		&tms3203x_device::brd_imm,		&tms3203x_device::brd_imm,		&tms3203x_device::brd_imm,
-	&tms3203x_device::call_imm,		&tms3203x_device::call_imm,		&tms3203x_device::call_imm,		&tms3203x_device::call_imm,
-	&tms3203x_device::call_imm,		&tms3203x_device::call_imm,		&tms3203x_device::call_imm,		&tms3203x_device::call_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::rptb_imm,		&tms3203x_device::rptb_imm,		&tms3203x_device::rptb_imm,		&tms3203x_device::rptb_imm,		// 0xc8
-	&tms3203x_device::rptb_imm,		&tms3203x_device::rptb_imm,		&tms3203x_device::rptb_imm,		&tms3203x_device::rptb_imm,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::swi,			&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::brc_reg,		&tms3203x_device::brcd_reg,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0xd0
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::brc_imm,		&tms3203x_device::brcd_imm,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,		&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,		// 0xd8
-	&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,		&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,
-	&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,		&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,
-	&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,		&tms3203x_device::dbc_reg,		&tms3203x_device::dbcd_reg,
-	&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,		&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,
-	&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,		&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,
-	&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,		&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,
-	&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,		&tms3203x_device::dbc_imm,		&tms3203x_device::dbcd_imm,
-	&tms3203x_device::callc_reg,	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0xe0
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::callc_imm,	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::trapc,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0xe8
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::retic_reg,	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0xf0
-	&tms3203x_device::retsc_reg,	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0xf8
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
+	&tms3203x_device::br_imm,       &tms3203x_device::br_imm,       &tms3203x_device::br_imm,       &tms3203x_device::br_imm,       // 0xc0
+	&tms3203x_device::br_imm,       &tms3203x_device::br_imm,       &tms3203x_device::br_imm,       &tms3203x_device::br_imm,
+	&tms3203x_device::brd_imm,      &tms3203x_device::brd_imm,      &tms3203x_device::brd_imm,      &tms3203x_device::brd_imm,
+	&tms3203x_device::brd_imm,      &tms3203x_device::brd_imm,      &tms3203x_device::brd_imm,      &tms3203x_device::brd_imm,
+	&tms3203x_device::call_imm,     &tms3203x_device::call_imm,     &tms3203x_device::call_imm,     &tms3203x_device::call_imm,
+	&tms3203x_device::call_imm,     &tms3203x_device::call_imm,     &tms3203x_device::call_imm,     &tms3203x_device::call_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::rptb_imm,     &tms3203x_device::rptb_imm,     &tms3203x_device::rptb_imm,     &tms3203x_device::rptb_imm,     // 0xc8
+	&tms3203x_device::rptb_imm,     &tms3203x_device::rptb_imm,     &tms3203x_device::rptb_imm,     &tms3203x_device::rptb_imm,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::swi,          &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::brc_reg,      &tms3203x_device::brcd_reg,     &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0xd0
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::brc_imm,      &tms3203x_device::brcd_imm,     &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,     &tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,     // 0xd8
+	&tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,     &tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,
+	&tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,     &tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,
+	&tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,     &tms3203x_device::dbc_reg,      &tms3203x_device::dbcd_reg,
+	&tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,     &tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,
+	&tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,     &tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,
+	&tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,     &tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,
+	&tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,     &tms3203x_device::dbc_imm,      &tms3203x_device::dbcd_imm,
+	&tms3203x_device::callc_reg,    &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0xe0
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::callc_imm,    &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::trapc,        &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0xe8
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::retic_reg,    &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0xf0
+	&tms3203x_device::retsc_reg,    &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0xf8
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
 
-	&tms3203x_device::mpyaddf_0,	&tms3203x_device::mpyaddf_0,	&tms3203x_device::mpyaddf_0,	&tms3203x_device::mpyaddf_0,	// 0x100
-	&tms3203x_device::mpyaddf_0,	&tms3203x_device::mpyaddf_0,	&tms3203x_device::mpyaddf_0,	&tms3203x_device::mpyaddf_0,
-	&tms3203x_device::mpyaddf_1,	&tms3203x_device::mpyaddf_1,	&tms3203x_device::mpyaddf_1,	&tms3203x_device::mpyaddf_1,
-	&tms3203x_device::mpyaddf_1,	&tms3203x_device::mpyaddf_1,	&tms3203x_device::mpyaddf_1,	&tms3203x_device::mpyaddf_1,
-	&tms3203x_device::mpyaddf_2,	&tms3203x_device::mpyaddf_2,	&tms3203x_device::mpyaddf_2,	&tms3203x_device::mpyaddf_2,
-	&tms3203x_device::mpyaddf_2,	&tms3203x_device::mpyaddf_2,	&tms3203x_device::mpyaddf_2,	&tms3203x_device::mpyaddf_2,
-	&tms3203x_device::mpyaddf_3,	&tms3203x_device::mpyaddf_3,	&tms3203x_device::mpyaddf_3,	&tms3203x_device::mpyaddf_3,
-	&tms3203x_device::mpyaddf_3,	&tms3203x_device::mpyaddf_3,	&tms3203x_device::mpyaddf_3,	&tms3203x_device::mpyaddf_3,
-	&tms3203x_device::mpysubf_0,	&tms3203x_device::mpysubf_0,	&tms3203x_device::mpysubf_0,	&tms3203x_device::mpysubf_0,	// 0x108
-	&tms3203x_device::mpysubf_0,	&tms3203x_device::mpysubf_0,	&tms3203x_device::mpysubf_0,	&tms3203x_device::mpysubf_0,
-	&tms3203x_device::mpysubf_1,	&tms3203x_device::mpysubf_1,	&tms3203x_device::mpysubf_1,	&tms3203x_device::mpysubf_1,
-	&tms3203x_device::mpysubf_1,	&tms3203x_device::mpysubf_1,	&tms3203x_device::mpysubf_1,	&tms3203x_device::mpysubf_1,
-	&tms3203x_device::mpysubf_2,	&tms3203x_device::mpysubf_2,	&tms3203x_device::mpysubf_2,	&tms3203x_device::mpysubf_2,
-	&tms3203x_device::mpysubf_2,	&tms3203x_device::mpysubf_2,	&tms3203x_device::mpysubf_2,	&tms3203x_device::mpysubf_2,
-	&tms3203x_device::mpysubf_3,	&tms3203x_device::mpysubf_3,	&tms3203x_device::mpysubf_3,	&tms3203x_device::mpysubf_3,
-	&tms3203x_device::mpysubf_3,	&tms3203x_device::mpysubf_3,	&tms3203x_device::mpysubf_3,	&tms3203x_device::mpysubf_3,
-	&tms3203x_device::mpyaddi_0,	&tms3203x_device::mpyaddi_0,	&tms3203x_device::mpyaddi_0,	&tms3203x_device::mpyaddi_0,	// 0x110
-	&tms3203x_device::mpyaddi_0,	&tms3203x_device::mpyaddi_0,	&tms3203x_device::mpyaddi_0,	&tms3203x_device::mpyaddi_0,
-	&tms3203x_device::mpyaddi_1,	&tms3203x_device::mpyaddi_1,	&tms3203x_device::mpyaddi_1,	&tms3203x_device::mpyaddi_1,
-	&tms3203x_device::mpyaddi_1,	&tms3203x_device::mpyaddi_1,	&tms3203x_device::mpyaddi_1,	&tms3203x_device::mpyaddi_1,
-	&tms3203x_device::mpyaddi_2,	&tms3203x_device::mpyaddi_2,	&tms3203x_device::mpyaddi_2,	&tms3203x_device::mpyaddi_2,
-	&tms3203x_device::mpyaddi_2,	&tms3203x_device::mpyaddi_2,	&tms3203x_device::mpyaddi_2,	&tms3203x_device::mpyaddi_2,
-	&tms3203x_device::mpyaddi_3,	&tms3203x_device::mpyaddi_3,	&tms3203x_device::mpyaddi_3,	&tms3203x_device::mpyaddi_3,
-	&tms3203x_device::mpyaddi_3,	&tms3203x_device::mpyaddi_3,	&tms3203x_device::mpyaddi_3,	&tms3203x_device::mpyaddi_3,
-	&tms3203x_device::mpysubi_0,	&tms3203x_device::mpysubi_0,	&tms3203x_device::mpysubi_0,	&tms3203x_device::mpysubi_0,	// 0x118
-	&tms3203x_device::mpysubi_0,	&tms3203x_device::mpysubi_0,	&tms3203x_device::mpysubi_0,	&tms3203x_device::mpysubi_0,
-	&tms3203x_device::mpysubi_1,	&tms3203x_device::mpysubi_1,	&tms3203x_device::mpysubi_1,	&tms3203x_device::mpysubi_1,
-	&tms3203x_device::mpysubi_1,	&tms3203x_device::mpysubi_1,	&tms3203x_device::mpysubi_1,	&tms3203x_device::mpysubi_1,
-	&tms3203x_device::mpysubi_2,	&tms3203x_device::mpysubi_2,	&tms3203x_device::mpysubi_2,	&tms3203x_device::mpysubi_2,
-	&tms3203x_device::mpysubi_2,	&tms3203x_device::mpysubi_2,	&tms3203x_device::mpysubi_2,	&tms3203x_device::mpysubi_2,
-	&tms3203x_device::mpysubi_3,	&tms3203x_device::mpysubi_3,	&tms3203x_device::mpysubi_3,	&tms3203x_device::mpysubi_3,
-	&tms3203x_device::mpysubi_3,	&tms3203x_device::mpysubi_3,	&tms3203x_device::mpysubi_3,	&tms3203x_device::mpysubi_3,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x120
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x128
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x130
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x138
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
+	&tms3203x_device::mpyaddf_0,    &tms3203x_device::mpyaddf_0,    &tms3203x_device::mpyaddf_0,    &tms3203x_device::mpyaddf_0,    // 0x100
+	&tms3203x_device::mpyaddf_0,    &tms3203x_device::mpyaddf_0,    &tms3203x_device::mpyaddf_0,    &tms3203x_device::mpyaddf_0,
+	&tms3203x_device::mpyaddf_1,    &tms3203x_device::mpyaddf_1,    &tms3203x_device::mpyaddf_1,    &tms3203x_device::mpyaddf_1,
+	&tms3203x_device::mpyaddf_1,    &tms3203x_device::mpyaddf_1,    &tms3203x_device::mpyaddf_1,    &tms3203x_device::mpyaddf_1,
+	&tms3203x_device::mpyaddf_2,    &tms3203x_device::mpyaddf_2,    &tms3203x_device::mpyaddf_2,    &tms3203x_device::mpyaddf_2,
+	&tms3203x_device::mpyaddf_2,    &tms3203x_device::mpyaddf_2,    &tms3203x_device::mpyaddf_2,    &tms3203x_device::mpyaddf_2,
+	&tms3203x_device::mpyaddf_3,    &tms3203x_device::mpyaddf_3,    &tms3203x_device::mpyaddf_3,    &tms3203x_device::mpyaddf_3,
+	&tms3203x_device::mpyaddf_3,    &tms3203x_device::mpyaddf_3,    &tms3203x_device::mpyaddf_3,    &tms3203x_device::mpyaddf_3,
+	&tms3203x_device::mpysubf_0,    &tms3203x_device::mpysubf_0,    &tms3203x_device::mpysubf_0,    &tms3203x_device::mpysubf_0,    // 0x108
+	&tms3203x_device::mpysubf_0,    &tms3203x_device::mpysubf_0,    &tms3203x_device::mpysubf_0,    &tms3203x_device::mpysubf_0,
+	&tms3203x_device::mpysubf_1,    &tms3203x_device::mpysubf_1,    &tms3203x_device::mpysubf_1,    &tms3203x_device::mpysubf_1,
+	&tms3203x_device::mpysubf_1,    &tms3203x_device::mpysubf_1,    &tms3203x_device::mpysubf_1,    &tms3203x_device::mpysubf_1,
+	&tms3203x_device::mpysubf_2,    &tms3203x_device::mpysubf_2,    &tms3203x_device::mpysubf_2,    &tms3203x_device::mpysubf_2,
+	&tms3203x_device::mpysubf_2,    &tms3203x_device::mpysubf_2,    &tms3203x_device::mpysubf_2,    &tms3203x_device::mpysubf_2,
+	&tms3203x_device::mpysubf_3,    &tms3203x_device::mpysubf_3,    &tms3203x_device::mpysubf_3,    &tms3203x_device::mpysubf_3,
+	&tms3203x_device::mpysubf_3,    &tms3203x_device::mpysubf_3,    &tms3203x_device::mpysubf_3,    &tms3203x_device::mpysubf_3,
+	&tms3203x_device::mpyaddi_0,    &tms3203x_device::mpyaddi_0,    &tms3203x_device::mpyaddi_0,    &tms3203x_device::mpyaddi_0,    // 0x110
+	&tms3203x_device::mpyaddi_0,    &tms3203x_device::mpyaddi_0,    &tms3203x_device::mpyaddi_0,    &tms3203x_device::mpyaddi_0,
+	&tms3203x_device::mpyaddi_1,    &tms3203x_device::mpyaddi_1,    &tms3203x_device::mpyaddi_1,    &tms3203x_device::mpyaddi_1,
+	&tms3203x_device::mpyaddi_1,    &tms3203x_device::mpyaddi_1,    &tms3203x_device::mpyaddi_1,    &tms3203x_device::mpyaddi_1,
+	&tms3203x_device::mpyaddi_2,    &tms3203x_device::mpyaddi_2,    &tms3203x_device::mpyaddi_2,    &tms3203x_device::mpyaddi_2,
+	&tms3203x_device::mpyaddi_2,    &tms3203x_device::mpyaddi_2,    &tms3203x_device::mpyaddi_2,    &tms3203x_device::mpyaddi_2,
+	&tms3203x_device::mpyaddi_3,    &tms3203x_device::mpyaddi_3,    &tms3203x_device::mpyaddi_3,    &tms3203x_device::mpyaddi_3,
+	&tms3203x_device::mpyaddi_3,    &tms3203x_device::mpyaddi_3,    &tms3203x_device::mpyaddi_3,    &tms3203x_device::mpyaddi_3,
+	&tms3203x_device::mpysubi_0,    &tms3203x_device::mpysubi_0,    &tms3203x_device::mpysubi_0,    &tms3203x_device::mpysubi_0,    // 0x118
+	&tms3203x_device::mpysubi_0,    &tms3203x_device::mpysubi_0,    &tms3203x_device::mpysubi_0,    &tms3203x_device::mpysubi_0,
+	&tms3203x_device::mpysubi_1,    &tms3203x_device::mpysubi_1,    &tms3203x_device::mpysubi_1,    &tms3203x_device::mpysubi_1,
+	&tms3203x_device::mpysubi_1,    &tms3203x_device::mpysubi_1,    &tms3203x_device::mpysubi_1,    &tms3203x_device::mpysubi_1,
+	&tms3203x_device::mpysubi_2,    &tms3203x_device::mpysubi_2,    &tms3203x_device::mpysubi_2,    &tms3203x_device::mpysubi_2,
+	&tms3203x_device::mpysubi_2,    &tms3203x_device::mpysubi_2,    &tms3203x_device::mpysubi_2,    &tms3203x_device::mpysubi_2,
+	&tms3203x_device::mpysubi_3,    &tms3203x_device::mpysubi_3,    &tms3203x_device::mpysubi_3,    &tms3203x_device::mpysubi_3,
+	&tms3203x_device::mpysubi_3,    &tms3203x_device::mpysubi_3,    &tms3203x_device::mpysubi_3,    &tms3203x_device::mpysubi_3,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x120
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x128
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x130
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x138
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
 
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x140
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x148
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x150
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x158
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x160
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x168
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x170
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x178
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x140
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x148
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x150
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x158
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x160
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x168
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x170
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x178
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
 
-	&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		// 0x180
-	&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,
-	&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,
-	&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,		&tms3203x_device::stfstf,
-	&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,
-	&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,
-	&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,
-	&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,		&tms3203x_device::stisti,
-	&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		// 0x188
-	&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,
-	&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,
-	&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,		&tms3203x_device::ldfldf,
-	&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,
-	&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,
-	&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,
-	&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,		&tms3203x_device::ldildi,
-	&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		// 0x190
-	&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,
-	&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,
-	&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,		&tms3203x_device::absfstf,
-	&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,
-	&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,
-	&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,
-	&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,		&tms3203x_device::absisti,
-	&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		// 0x198
-	&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,
-	&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,
-	&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,		&tms3203x_device::addf3stf,
-	&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,
-	&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,
-	&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,
-	&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,		&tms3203x_device::addi3sti,
-	&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		// 0x1a0
-	&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,
-	&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,
-	&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,		&tms3203x_device::and3sti,
-	&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,
-	&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,
-	&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,
-	&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,		&tms3203x_device::ash3sti,
-	&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		// 0x1a8
-	&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,
-	&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,
-	&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,		&tms3203x_device::fixsti,
-	&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,
-	&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,
-	&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,
-	&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,		&tms3203x_device::floatstf,
-	&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		// 0x1b0
-	&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,
-	&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,
-	&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,		&tms3203x_device::ldfstf,
-	&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,
-	&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,
-	&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,
-	&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,		&tms3203x_device::ldisti,
-	&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		// 0x1b8
-	&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,
-	&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,
-	&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,		&tms3203x_device::lsh3sti,
-	&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,
-	&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,
-	&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,
-	&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,		&tms3203x_device::mpyf3stf,
+	&tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,       // 0x180
+	&tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,
+	&tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,
+	&tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,       &tms3203x_device::stfstf,
+	&tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,
+	&tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,
+	&tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,
+	&tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,       &tms3203x_device::stisti,
+	&tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       // 0x188
+	&tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,
+	&tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,
+	&tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,       &tms3203x_device::ldfldf,
+	&tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,
+	&tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,
+	&tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,
+	&tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,       &tms3203x_device::ldildi,
+	&tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,      // 0x190
+	&tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,
+	&tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,
+	&tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,      &tms3203x_device::absfstf,
+	&tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,
+	&tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,
+	&tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,
+	&tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,      &tms3203x_device::absisti,
+	&tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     // 0x198
+	&tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,
+	&tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,
+	&tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,     &tms3203x_device::addf3stf,
+	&tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,
+	&tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,
+	&tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,
+	&tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,     &tms3203x_device::addi3sti,
+	&tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,      // 0x1a0
+	&tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,
+	&tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,
+	&tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,      &tms3203x_device::and3sti,
+	&tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,
+	&tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,
+	&tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,
+	&tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,      &tms3203x_device::ash3sti,
+	&tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,       // 0x1a8
+	&tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,
+	&tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,
+	&tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,       &tms3203x_device::fixsti,
+	&tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,
+	&tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,
+	&tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,
+	&tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,     &tms3203x_device::floatstf,
+	&tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       // 0x1b0
+	&tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,
+	&tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,
+	&tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,       &tms3203x_device::ldfstf,
+	&tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,
+	&tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,
+	&tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,
+	&tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,       &tms3203x_device::ldisti,
+	&tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      // 0x1b8
+	&tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,
+	&tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,
+	&tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,      &tms3203x_device::lsh3sti,
+	&tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,
+	&tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,
+	&tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,
+	&tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,     &tms3203x_device::mpyf3stf,
 
-	&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		// 0x1c0
-	&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,
-	&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,
-	&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,		&tms3203x_device::mpyi3sti,
-	&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,
-	&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,
-	&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,
-	&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,		&tms3203x_device::negfstf,
-	&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,		// 0x1c8
-	&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,
-	&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,
-	&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,		&tms3203x_device::negisti,
-	&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,
-	&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,
-	&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,
-	&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,		&tms3203x_device::notsti,
-	&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		// 0x1d0
-	&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,
-	&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,
-	&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,		&tms3203x_device::or3sti,
-	&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,
-	&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,
-	&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,
-	&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,		&tms3203x_device::subf3stf,
-	&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		// 0x1d8
-	&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,
-	&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,
-	&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,		&tms3203x_device::subi3sti,
-	&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,
-	&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,
-	&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,
-	&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,		&tms3203x_device::xor3sti,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x1e0
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x1e8
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x1f0
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		// 0x1f8
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,
-	&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal,		&tms3203x_device::illegal
+	&tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     // 0x1c0
+	&tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,
+	&tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,
+	&tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,     &tms3203x_device::mpyi3sti,
+	&tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,
+	&tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,
+	&tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,
+	&tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,      &tms3203x_device::negfstf,
+	&tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,      // 0x1c8
+	&tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,
+	&tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,
+	&tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,      &tms3203x_device::negisti,
+	&tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,
+	&tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,
+	&tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,
+	&tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,       &tms3203x_device::notsti,
+	&tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,       // 0x1d0
+	&tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,
+	&tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,
+	&tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,       &tms3203x_device::or3sti,
+	&tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,
+	&tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,
+	&tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,
+	&tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,     &tms3203x_device::subf3stf,
+	&tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     // 0x1d8
+	&tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,
+	&tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,
+	&tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,     &tms3203x_device::subi3sti,
+	&tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,
+	&tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,
+	&tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,
+	&tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,      &tms3203x_device::xor3sti,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x1e0
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x1e8
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x1f0
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      // 0x1f8
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,
+	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal
 };

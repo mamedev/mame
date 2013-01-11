@@ -139,8 +139,8 @@ Notes:
 #define VZ_BASIC 0xf0
 #define VZ_MCODE 0xf1
 
-#define TRKSIZE_VZ	0x9b0	/* arbitrary (actually from analyzing format) */
-#define TRKSIZE_FM	3172	/* size of a standard FM mode track */
+#define TRKSIZE_VZ  0x9b0   /* arbitrary (actually from analyzing format) */
+#define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 
 #define PHI0(n) (((n)>>0)&1)
 #define PHI1(n) (((n)>>1)&1)
@@ -157,10 +157,10 @@ class vtech1_state : public driver_device
 public:
 	vtech1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_mc6847(*this, "mc6847"),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_videoram(*this, "videoram"){ }
+			m_mc6847(*this, "mc6847"),
+			m_speaker(*this, SPEAKER_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_videoram(*this, "videoram"){ }
 
 	/* devices */
 	required_device<mc6847_base_device> m_mc6847;
@@ -240,7 +240,7 @@ static SNAPSHOT_LOAD( vtech1 )
 	/* patch variables depending on snapshot type */
 	switch (header[21])
 	{
-	case VZ_BASIC:		/* 0xF0 */
+	case VZ_BASIC:      /* 0xF0 */
 		space.write_byte(0x78a4, start % 256); /* start of basic program */
 		space.write_byte(0x78a5, start / 256);
 		space.write_byte(0x78f9, end % 256); /* end of basic program */
@@ -252,11 +252,11 @@ static SNAPSHOT_LOAD( vtech1 )
 		image.message(" %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
-	case VZ_MCODE:		/* 0xF1 */
+	case VZ_MCODE:      /* 0xF1 */
 		space.write_byte(0x788e, start % 256); /* usr subroutine address */
 		space.write_byte(0x788f, start / 256);
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		image.device().machine().device("maincpu")->state().set_pc(start);				/* start program */
+		image.device().machine().device("maincpu")->state().set_pc(start);              /* start program */
 		break;
 
 	default:
@@ -308,7 +308,7 @@ static void vtech1_put_track(running_machine &machine)
 	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
 
 
-    /* drive selected and image file ok? */
+	/* drive selected and image file ok? */
 	if (vtech1->m_drive >= 0 && floppy_get_device(machine,vtech1->m_drive) != NULL)
 	{
 		int size, offs;
@@ -697,9 +697,9 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1h)
 ***************************************************************************/
 
 static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8, vtech1_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
-	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
-	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM /* basic rom */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM /* dos rom or other catridges */
+	AM_RANGE(0x6000, 0x67ff) AM_ROM /* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* (6847) */
 	AM_RANGE(0x7800, 0x7fff) AM_RAMBANK("bank1") /* 2k user ram */
@@ -708,9 +708,9 @@ static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8, vtech1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8, vtech1_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
-	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
-	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM /* basic rom */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM /* dos rom or other catridges */
+	AM_RANGE(0x6000, 0x67ff) AM_ROM /* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* U7 (6847) */
 	AM_RANGE(0x7800, 0x8fff) AM_RAMBANK("bank1") /* 6k user ram */
@@ -719,9 +719,9 @@ static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8, vtech1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8, vtech1_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
-	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
-	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM /* basic rom */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM /* dos rom or other catridges */
+	AM_RANGE(0x6000, 0x67ff) AM_ROM /* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* (6847) */
 	AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK("bank1") /* 16k user ram */
@@ -911,57 +911,57 @@ static const mc6847_interface vtech1_mc6847_bw_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-	DEVCB_NULL,									/* horz sync */
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
+	DEVCB_NULL,                                 /* horz sync */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),         /* field sync */
 
-	DEVCB_NULL,									/* AG */
-	DEVCB_LINE_GND,								/* GM2 */
-	DEVCB_LINE_VCC,								/* GM1 */
-	DEVCB_LINE_GND,								/* GM0 */
-	DEVCB_NULL,									/* CSS */
-	DEVCB_NULL,									/* AS */
-	DEVCB_LINE_GND,								/* INTEXT */
-	DEVCB_NULL,									/* INV */
+	DEVCB_NULL,                                 /* AG */
+	DEVCB_LINE_GND,                             /* GM2 */
+	DEVCB_LINE_VCC,                             /* GM1 */
+	DEVCB_LINE_GND,                             /* GM0 */
+	DEVCB_NULL,                                 /* CSS */
+	DEVCB_NULL,                                 /* AS */
+	DEVCB_LINE_GND,                             /* INTEXT */
+	DEVCB_NULL,                                 /* INV */
 
-	NULL,										/* m_get_char_rom */
-	true	// monochrome
+	NULL,                                       /* m_get_char_rom */
+	true    // monochrome
 };
 
 static const mc6847_interface vtech1_mc6847_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-	DEVCB_NULL,									/* horz sync */
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
+	DEVCB_NULL,                                 /* horz sync */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),         /* field sync */
 
-	DEVCB_NULL,									/* AG */
-	DEVCB_LINE_GND,								/* GM2 */
-	DEVCB_LINE_VCC,								/* GM1 */
-	DEVCB_LINE_GND,								/* GM0 */
-	DEVCB_NULL,									/* CSS */
-	DEVCB_NULL,									/* AS */
-	DEVCB_LINE_GND,								/* INTEXT */
-	DEVCB_NULL,									/* INV */
+	DEVCB_NULL,                                 /* AG */
+	DEVCB_LINE_GND,                             /* GM2 */
+	DEVCB_LINE_VCC,                             /* GM1 */
+	DEVCB_LINE_GND,                             /* GM0 */
+	DEVCB_NULL,                                 /* CSS */
+	DEVCB_NULL,                                 /* AS */
+	DEVCB_LINE_GND,                             /* INTEXT */
+	DEVCB_NULL,                                 /* INV */
 
-	NULL,										/* m_get_char_rom */
-	false	// colour
+	NULL,                                       /* m_get_char_rom */
+	false   // colour
 };
 
 static const mc6847_interface vtech1_shrg_mc6847_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-	DEVCB_NULL,									/* horz sync */
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
+	DEVCB_NULL,                                 /* horz sync */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),         /* field sync */
 
-	DEVCB_NULL,									/* AG */
-	DEVCB_NULL,									/* GM2 */
-	DEVCB_LINE_VCC,								/* GM1 */
-	DEVCB_NULL,									/* GM0 */
-	DEVCB_NULL,									/* CSS */
-	DEVCB_NULL,									/* AS */
-	DEVCB_LINE_GND,								/* INTEXT */
-	DEVCB_NULL,									/* INV */
+	DEVCB_NULL,                                 /* AG */
+	DEVCB_NULL,                                 /* GM2 */
+	DEVCB_LINE_VCC,                             /* GM1 */
+	DEVCB_NULL,                                 /* GM0 */
+	DEVCB_NULL,                                 /* CSS */
+	DEVCB_NULL,                                 /* AS */
+	DEVCB_LINE_GND,                             /* INTEXT */
+	DEVCB_NULL,                                 /* INV */
 };
 
 static MACHINE_CONFIG_START( laser110, vtech1_state )
@@ -1056,13 +1056,13 @@ ROM_START( vz200de )
 	ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-#define rom_las110de	rom_laser110
-#define rom_laser200	rom_laser110
-#define rom_fellow	rom_laser110
+#define rom_las110de    rom_laser110
+#define rom_laser200    rom_laser110
+#define rom_fellow  rom_laser110
 
 /* It's possible that the Texet TX8000 came with BASIC V1.0, but this
    needs to be verified */
-#define rom_tx8000	rom_laser110
+#define rom_tx8000  rom_laser110
 
 ROM_START( laser210 )
 	ROM_REGION(0x6800, "maincpu", 0)
@@ -1071,8 +1071,8 @@ ROM_START( laser210 )
 	ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-#define rom_las210de	rom_laser210
-#define rom_vz200	rom_laser210
+#define rom_las210de    rom_laser210
+#define rom_vz200   rom_laser210
 
 ROM_START( laser310 )
 	ROM_REGION(0x6800, "maincpu", 0)
@@ -1083,7 +1083,7 @@ ROM_START( laser310 )
 	ROM_CART_LOAD("cart", 0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-#define rom_vz300	rom_laser310
+#define rom_vz300   rom_laser310
 #define rom_laser310h   rom_laser310
 
 /***************************************************************************

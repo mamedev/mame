@@ -234,12 +234,12 @@ static void blendbitmaps(running_machine &machine,
 		UINT16 *sd2 = &src2.pix16(0);
 		UINT16 *sd3 = &src3.pix16(0);
 
-		int sw = ex-sx+1;														/* source width  */
-		int sh = ey-sy+1;														/* source height */
-		int sm = src1.rowpixels();												/* source modulo */
+		int sw = ex-sx+1;                                                       /* source width  */
+		int sh = ey-sy+1;                                                       /* source height */
+		int sm = src1.rowpixels();                                              /* source modulo */
 
-		UINT32 *dd = &dest.pix32(sy, sx);								/* dest data     */
-		int dm = dest.rowpixels();												/* dest modulo   */
+		UINT32 *dd = &dest.pix32(sy, sx);                               /* dest data     */
+		int dm = dest.rowpixels();                                              /* dest modulo   */
 
 		sd1 += (sx-ox);
 		sd1 += sm * (sy-oy);
@@ -254,22 +254,22 @@ static void blendbitmaps(running_machine &machine,
 		while (sh)
 		{
 
-#define BLENDPIXEL(x)	if (sd3[x]) {														\
-							if (sd2[x]) {													\
-								dd[x] = paldata[sd2[x] | 0x0400] + paldata[sd3[x]];			\
-							} else {														\
-								dd[x] = paldata[sd1[x] | 0x0400] + paldata[sd3[x]];			\
-							}																\
-						} else {															\
-							if (sd2[x]) {													\
-								if (sd2[x] & 0x0800) {										\
-									dd[x] = paldata[sd1[x] | 0x0400] + paldata[sd2[x]];		\
-								} else {													\
-									dd[x] = paldata[sd2[x]];								\
-								}															\
-							} else {														\
-								dd[x] = paldata[sd1[x]];									\
-							}																\
+#define BLENDPIXEL(x)   if (sd3[x]) {                                                       \
+							if (sd2[x]) {                                                   \
+								dd[x] = paldata[sd2[x] | 0x0400] + paldata[sd3[x]];         \
+							} else {                                                        \
+								dd[x] = paldata[sd1[x] | 0x0400] + paldata[sd3[x]];         \
+							}                                                               \
+						} else {                                                            \
+							if (sd2[x]) {                                                   \
+								if (sd2[x] & 0x0800) {                                      \
+									dd[x] = paldata[sd1[x] | 0x0400] + paldata[sd2[x]];     \
+								} else {                                                    \
+									dd[x] = paldata[sd2[x]];                                \
+								}                                                           \
+							} else {                                                        \
+								dd[x] = paldata[sd1[x]];                                    \
+							}                                                               \
 						}
 
 			end = dd + sw;
@@ -329,7 +329,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 
 	for (offs = state->m_spriteram.bytes()/2 - 8;offs >= 0;offs -= 8)
 	{
-		if (spriteram16[offs] & 0x04)	/* enable */
+		if (spriteram16[offs] & 0x04)   /* enable */
 		{
 			int code,color,sizex,sizey,flipx,flipy,xpos,ypos;
 			int x,y,priority,priority_mask;
@@ -363,7 +363,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 				default:
 				case 0x0: priority_mask = 0; break;
 				case 0x1: priority_mask = 0xf0; break; /* obscured by text layer */
-				case 0x2: priority_mask = 0xf0|0xcc; break;	/* obscured by foreground */
+				case 0x2: priority_mask = 0xf0|0xcc; break; /* obscured by foreground */
 				case 0x3: priority_mask = 0xf0|0xcc|0xaa; break; /* obscured by bg and fg */
 			}
 
@@ -478,7 +478,7 @@ UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 
 	m_bg_tilemap->draw(m_tile_bitmap_bg, cliprect, 0, 1);
 	m_fg_tilemap->draw(m_tile_bitmap_fg, cliprect, 0, 2);
 	/* draw the blended tiles at a lower priority
-       so sprites covered by them will still be drawn */
+	   so sprites covered by them will still be drawn */
 	m_fg_tilemap->draw(m_tile_bitmap_fg, cliprect, 1, 0);
 	m_tx_tilemap->draw(m_tile_bitmap_fg, cliprect, 0, 4);
 

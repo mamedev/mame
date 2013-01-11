@@ -290,7 +290,7 @@ static void HALT(upd7810_state *cpustate)
 	int cycles = (cpustate->icount / 4) * 4;
 	cpustate->icount -= cycles;
 	cpustate->handle_timers(cpustate, cycles);
-	PC -= 1;		/* continue executing HALT */
+	PC -= 1;        /* continue executing HALT */
 }
 
 /* 48 3d: 0100 1000 0011 1101 */
@@ -304,7 +304,7 @@ static void DIV_A(upd7810_state *cpustate)
 		A = remainder;
 	}
 	else
-		EA = 0xffff;	/* guess */
+		EA = 0xffff;    /* guess */
 }
 
 /* 48 3e: 0100 1000 0011 1110 */
@@ -318,7 +318,7 @@ static void DIV_B(upd7810_state *cpustate)
 		B = remainder;
 	}
 	else
-		EA = 0xffff;	/* guess */
+		EA = 0xffff;    /* guess */
 }
 
 /* 48 3f: 0100 1000 0011 1111 */
@@ -332,7 +332,7 @@ static void DIV_C(upd7810_state *cpustate)
 		C = remainder;
 	}
 	else
-		EA = 0xffff;	/* guess */
+		EA = 0xffff;    /* guess */
 }
 
 /* 48 40: 0100 1000 0100 0000 */
@@ -8614,37 +8614,37 @@ static void SKN_bit(upd7810_state *cpustate)
 
 	switch( imm & 0x1f )
 	{
-		case 0x10:	/* PA */
+		case 0x10:  /* PA */
 			val = RP( cpustate, UPD7810_PORTA );
 			break;
-		case 0x11:	/* PB */
+		case 0x11:  /* PB */
 			val = RP( cpustate, UPD7810_PORTB );
 			break;
-		case 0x12:	/* PC */
+		case 0x12:  /* PC */
 			val = RP( cpustate, UPD7810_PORTC );
 			break;
-		case 0x13:	/* PD */
+		case 0x13:  /* PD */
 			val = RP( cpustate, UPD7810_PORTD );
 			break;
-		case 0x15:	/* PF */
+		case 0x15:  /* PF */
 			val = RP( cpustate, UPD7810_PORTF );
 			break;
-		case 0x16:	/* MKH */
+		case 0x16:  /* MKH */
 			val = MKH;
 			break;
-		case 0x17:	/* MKL */
+		case 0x17:  /* MKL */
 			val = MKL;
 			break;
-		case 0x19:	/* SMH */
+		case 0x19:  /* SMH */
 			val = SMH;
 			break;
-		case 0x1b:	/* EOM */
+		case 0x1b:  /* EOM */
 			val = EOM;
 			break;
-		case 0x1d:	/* TMM */
+		case 0x1d:  /* TMM */
 			val = TMM;
 			break;
-		case 0x1e:	/* PT */
+		case 0x1e:  /* PT */
 			val = RP( cpustate, UPD7807_PORTT );
 			break;
 		default:
@@ -8668,34 +8668,34 @@ static void SETB(upd7810_state *cpustate)
 
 	switch( imm & 0x1f )
 	{
-		case 0x10:	/* PA */
+		case 0x10:  /* PA */
 			WP( cpustate, UPD7810_PORTA, RP( cpustate, UPD7810_PORTA ) | (1 << bit));
 			break;
-		case 0x11:	/* PB */
+		case 0x11:  /* PB */
 			WP( cpustate, UPD7810_PORTB, RP( cpustate, UPD7810_PORTB ) | (1 << bit));
 			break;
-		case 0x12:	/* PC */
+		case 0x12:  /* PC */
 			WP( cpustate, UPD7810_PORTC, RP( cpustate, UPD7810_PORTC ) | (1 << bit));
 			break;
-		case 0x13:	/* PD */
+		case 0x13:  /* PD */
 			WP( cpustate, UPD7810_PORTD, RP( cpustate, UPD7810_PORTD ) | (1 << bit));
 			break;
-		case 0x15:	/* PF */
+		case 0x15:  /* PF */
 			WP( cpustate, UPD7810_PORTF, RP( cpustate, UPD7810_PORTF ) | (1 << bit));
 			break;
-		case 0x16:	/* MKH */
+		case 0x16:  /* MKH */
 			MKH |= (1 << bit);
 			break;
-		case 0x17:	/* MKL */
+		case 0x17:  /* MKL */
 			MKL |= (1 << bit);
 			break;
-		case 0x19:	/* SMH */
+		case 0x19:  /* SMH */
 			SMH |= (1 << bit);
 			break;
-		case 0x1b:	/* EOM */
+		case 0x1b:  /* EOM */
 			EOM |= (1 << bit);
 			break;
-		case 0x1d:	/* TMM */
+		case 0x1d:  /* TMM */
 			TMM |= (1 << bit);
 			break;
 //      case 0x1e:  /* PT */
@@ -8718,34 +8718,34 @@ static void CLR(upd7810_state *cpustate)
 
 	switch( imm & 0x1f )
 	{
-		case 0x10:	/* PA */
+		case 0x10:  /* PA */
 			WP( cpustate, UPD7810_PORTA, RP( cpustate, UPD7810_PORTA ) & ~(1 << bit));
 			break;
-		case 0x11:	/* PB */
+		case 0x11:  /* PB */
 			WP( cpustate, UPD7810_PORTB, RP( cpustate, UPD7810_PORTB ) & ~(1 << bit));
 			break;
-		case 0x12:	/* PC */
+		case 0x12:  /* PC */
 			WP( cpustate, UPD7810_PORTC, RP( cpustate, UPD7810_PORTC ) & ~(1 << bit));
 			break;
-		case 0x13:	/* PD */
+		case 0x13:  /* PD */
 			WP( cpustate, UPD7810_PORTD, RP( cpustate, UPD7810_PORTD ) & ~(1 << bit));
 			break;
-		case 0x15:	/* PF */
+		case 0x15:  /* PF */
 			WP( cpustate, UPD7810_PORTF, RP( cpustate, UPD7810_PORTF ) & ~(1 << bit));
 			break;
-		case 0x16:	/* MKH */
+		case 0x16:  /* MKH */
 			MKH &= ~(1 << bit);
 			break;
-		case 0x17:	/* MKL */
+		case 0x17:  /* MKL */
 			MKL &= ~(1 << bit);
 			break;
-		case 0x19:	/* SMH */
+		case 0x19:  /* SMH */
 			SMH &= ~(1 << bit);
 			break;
-		case 0x1b:	/* EOM */
+		case 0x1b:  /* EOM */
 			EOM &= ~(1 << bit);
 			break;
-		case 0x1d:	/* TMM */
+		case 0x1d:  /* TMM */
 			TMM &= ~(1 << bit);
 			break;
 //      case 0x1e:  /* PT */
@@ -8767,37 +8767,37 @@ static void SK_bit(upd7810_state *cpustate)
 
 	switch( imm & 0x1f )
 	{
-		case 0x10:	/* PA */
+		case 0x10:  /* PA */
 			val = RP( cpustate, UPD7810_PORTA );
 			break;
-		case 0x11:	/* PB */
+		case 0x11:  /* PB */
 			val = RP( cpustate, UPD7810_PORTB );
 			break;
-		case 0x12:	/* PC */
+		case 0x12:  /* PC */
 			val = RP( cpustate, UPD7810_PORTC );
 			break;
-		case 0x13:	/* PD */
+		case 0x13:  /* PD */
 			val = RP( cpustate, UPD7810_PORTD );
 			break;
-		case 0x15:	/* PF */
+		case 0x15:  /* PF */
 			val = RP( cpustate, UPD7810_PORTF );
 			break;
-		case 0x16:	/* MKH */
+		case 0x16:  /* MKH */
 			val = MKH;
 			break;
-		case 0x17:	/* MKL */
+		case 0x17:  /* MKL */
 			val = MKL;
 			break;
-		case 0x19:	/* SMH */
+		case 0x19:  /* SMH */
 			val = SMH;
 			break;
-		case 0x1b:	/* EOM */
+		case 0x1b:  /* EOM */
 			val = EOM;
 			break;
-		case 0x1d:	/* TMM */
+		case 0x1d:  /* TMM */
 			val = TMM;
 			break;
-		case 0x1e:	/* PT */
+		case 0x1e:  /* PT */
 			val = RP( cpustate, UPD7807_PORTT );
 			break;
 		default:
@@ -8828,7 +8828,7 @@ static void DAA(upd7810_state *cpustate)
 	{
 		if (l < 10)
 		{
-		    if (!(h < 10 && 0 == (PSW & CY)))
+			if (!(h < 10 && 0 == (PSW & CY)))
 			adj = 0x60;
 		}
 		else
@@ -8912,9 +8912,9 @@ static void MVI_V_xx(upd7810_state *cpustate)
 /* 69: 0110 1001 xxxx xxxx */
 static void MVI_A_xx(upd7810_state *cpustate)
 {
-	if (PSW & L1) {	/* overlay active? */
+	if (PSW & L1) { /* overlay active? */
 		PC++;
-		return; 	/* NOP */
+		return;     /* NOP */
 	}
 	RDOPARG( A );
 	PSW |= L1;
@@ -8953,9 +8953,9 @@ static void MVI_H_xx(upd7810_state *cpustate)
 /* 6f: 0110 1111 xxxx xxxx */
 static void MVI_L_xx(upd7810_state *cpustate)
 {
-	if (PSW & L0) {	/* overlay active? */
+	if (PSW & L0) { /* overlay active? */
 		PC++;
-		return; 	/* NOP */
+		return;     /* NOP */
 	}
 	RDOPARG( L );
 	PSW |= L0;
@@ -9049,8 +9049,8 @@ static void CALT(upd7810_state *cpustate)
 
 	switch (cpustate->config.type) {
 	case TYPE_7810_GAMEMASTER:
-	    logerror ("!!!!!!!%.4x calt %.2x game master table position not known\n",PPC, OP);
-	    break;
+		logerror ("!!!!!!!%.4x calt %.2x game master table position not known\n",PPC, OP);
+		break;
 	default:
 	w.w.l = 0x80 + 2 * (OP & 0x1f);
 	}
@@ -9061,8 +9061,8 @@ static void CALT(upd7810_state *cpustate)
 	SP--;
 	WM( SPD, PCL );
 
-	    PCL=RM(w.w.l);
-	    PCH=RM(w.w.l+1);
+		PCL=RM(w.w.l);
+		PCH=RM(w.w.l+1);
 	}
 }
 
@@ -9268,7 +9268,7 @@ static void RETS(upd7810_state *cpustate)
 	SP++;
 	PCH = RM( SPD );
 	SP++;
-	PSW|=SK;	/* skip one instruction */
+	PSW|=SK;    /* skip one instruction */
 }
 
 /* ba: 1011 1010 */
@@ -9487,4 +9487,3 @@ static void MOV_MC_A_7801(upd7810_state *cpustate)
 	/* PC7  Input   HOLD Input   */
 	MC = 0x84 | ( ( A & 0x02 ) ? 0x02 : 0x00 ) | ( ( A & 0x01 ) ? 0x01 : 0x00 );
 }
-

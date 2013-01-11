@@ -21,7 +21,7 @@ const device_type DAI_SOUND = &device_creator<dai_sound_device>;
 
 dai_sound_device::dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DAI_SOUND, "DAI Custom Sound", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -51,7 +51,7 @@ void dai_sound_device::device_reset()
 //-------------------------------------------------
 
 const UINT16 dai_sound_device::s_osc_volume_table[] = {
-					   0,  500, 1000, 1500,
+						0,  500, 1000, 1500,
 					2000, 2500, 3000, 3500,
 					4000, 4500, 5000, 5500,
 					6000, 6500, 7000, 7500
@@ -62,9 +62,9 @@ const UINT16 dai_sound_device::s_osc_volume_table[] = {
 //-------------------------------------------------
 
 const UINT16 dai_sound_device::s_noise_volume_table[] = {
-					   0,    0,    0,    0,
-					   0,    0,    0,    0,
-				     500, 1000, 1500, 2000,
+						0,    0,    0,    0,
+						0,    0,    0,    0,
+						500, 1000, 1500, 2000,
 					2500, 3000, 3500, 4000
 };
 

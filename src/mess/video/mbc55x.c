@@ -68,8 +68,8 @@ give the leftmost column of the rectangle, the next four give the next column, a
 
 #include "includes/mbc55x.h"
 
-#define DEBUG_LINES		1
-#define DEBUG_VSYNC		2
+#define DEBUG_LINES     1
+#define DEBUG_VSYNC     2
 
 #define DEBUG_SET(flags)    ((mstate->m_debug_video & (flags))==(flags))
 
@@ -92,26 +92,26 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	mbc55x_state *mstate = device->machine().driver_data<mbc55x_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
-	UINT8	*ram	= &mstate->m_ram->pointer()[0];
-	UINT8	*red	= &mstate->m_video_mem[RED_PLANE_OFFSET];
-	UINT8	*blue	= &mstate->m_video_mem[BLUE_PLANE_OFFSET];
-	UINT8	*green;
-	int		offset;
-	UINT8	rpx,gpx,bpx;
-	UINT8	rb,gb,bb;
+	UINT8   *ram    = &mstate->m_ram->pointer()[0];
+	UINT8   *red    = &mstate->m_video_mem[RED_PLANE_OFFSET];
+	UINT8   *blue   = &mstate->m_video_mem[BLUE_PLANE_OFFSET];
+	UINT8   *green;
+	int     offset;
+	UINT8   rpx,gpx,bpx;
+	UINT8   rb,gb,bb;
 
-	int		x_pos;
-	int		pixelno;
-	UINT8	bitno;
-	UINT8	shifts;
-	UINT8	colour;
+	int     x_pos;
+	int     pixelno;
+	UINT8   bitno;
+	UINT8   shifts;
+	UINT8   colour;
 
 	switch(mstate->m_vram_page)
 	{
-		case 4	: green=&ram[0x08000]; break;
-		case 5	: green=&ram[0x1C000]; break;
-		case 6	: green=&ram[0x2C000]; break;
-		case 7	: green=&ram[0x3C000]; break;
+		case 4  : green=&ram[0x08000]; break;
+		case 5  : green=&ram[0x1C000]; break;
+		case 6  : green=&ram[0x2C000]; break;
+		case 7  : green=&ram[0x3C000]; break;
 		default :
 			green=&ram[0x0C000];
 	}
@@ -161,15 +161,15 @@ WRITE_LINE_MEMBER( mbc55x_state::vid_vsync_changed )
 
 const mc6845_interface mb55x_mc6845_intf =
 {
-	SCREEN_TAG,						/* screen number */
-	8,								/* numbers of pixels per video memory address */
-	NULL,							/* begin_update */
-	vid_update_row,					/* update_row */
-	NULL,							/* end_update */
-	DEVCB_NULL,						/* on_de_changed */
-	DEVCB_NULL,						/* on_cur_changed */
-	DEVCB_DRIVER_LINE_MEMBER(mbc55x_state, vid_hsync_changed),	/* on_hsync_changed */
-	DEVCB_DRIVER_LINE_MEMBER(mbc55x_state, vid_vsync_changed),	/* on_vsync_changed */
+	SCREEN_TAG,                     /* screen number */
+	8,                              /* numbers of pixels per video memory address */
+	NULL,                           /* begin_update */
+	vid_update_row,                 /* update_row */
+	NULL,                           /* end_update */
+	DEVCB_NULL,                     /* on_de_changed */
+	DEVCB_NULL,                     /* on_cur_changed */
+	DEVCB_DRIVER_LINE_MEMBER(mbc55x_state, vid_hsync_changed),  /* on_hsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(mbc55x_state, vid_vsync_changed),  /* on_vsync_changed */
 	NULL
 };
 

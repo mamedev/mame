@@ -39,7 +39,7 @@
 #include "includes/opwolf.h"
 
 /* Select how coinage data is initialised in opwolf_cchip_data_w : 0 = user-defined in function - 1 = automatic */
-#define OPWOLF_READ_COINAGE_FROM_ROM	1
+#define OPWOLF_READ_COINAGE_FROM_ROM    1
 
 /* List of possible regions */
 enum {
@@ -448,14 +448,14 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 #else
 			if ((m_opwolf_region == OPWOLF_REGION_JAPAN) || (m_opwolf_region == OPWOLF_REGION_US))
 			{
-				switch (data&0x30)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
+				switch (data&0x30)  /* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
 					case 0x00: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 3; break;
 					case 0x10: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
 					case 0x20: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 2; break;
 					case 0x30: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
 				}
-				switch (data&0xc0)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
+				switch (data&0xc0)  /* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
 					case 0x00: m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 3; break;
 					case 0x40: m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 1; break;
@@ -466,14 +466,14 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 
 			if ((opwolf_region == OPWOLF_REGION_WORLD) || (opwolf_region == OPWOLF_REGION_OTHER))
 			{
-				switch (data&0x30)	/* table at 0x03ffde.w - 4 * 2 words (coins for credits first) - inverted order */
+				switch (data&0x30)  /* table at 0x03ffde.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
 					case 0x00: m_cchip_coins_for_credit[0] = 4; cchip_credits_for_coin[0] = 1; break;
 					case 0x10: m_cchip_coins_for_credit[0] = 3; cchip_credits_for_coin[0] = 1; break;
 					case 0x20: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
 					case 0x30: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
 				}
-				switch (data & 0xc0)	/* table at 0x03ffee.w - 4 * 2 words (coins for credits first) - inverted order */
+				switch (data & 0xc0)    /* table at 0x03ffee.w - 4 * 2 words (coins for credits first) - inverted order */
 				{
 					case 0x00: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 6; break;
 					case 0x40: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 4; break;
@@ -502,9 +502,9 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 READ16_MEMBER(opwolf_state::opwolf_cchip_status_r)
 {
 	/*
-        Bit 0x4 = Error signal
-        Bit 0x1 = Ready signal
-    */
+	    Bit 0x4 = Error signal
+	    Bit 0x1 = Ready signal
+	*/
 	return 0x1; /* Return 0x5 for C-Chip error */
 }
 

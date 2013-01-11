@@ -43,7 +43,7 @@
 #include "sundance.lh"
 #include "tailg.lh"
 
-#define MASTER_CLOCK			XTAL_19_923MHz
+#define MASTER_CLOCK            XTAL_19_923MHz
 
 
 /*************************************
@@ -167,14 +167,14 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 	static const UINT8 speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
 	int delta_wheel;
 
-    /* the shift register is cleared once per 'frame' */
-    delta_wheel = (INT8)ioport("WHEEL")->read() / 8;
-    if (delta_wheel > 3)
-        delta_wheel = 3;
-    else if (delta_wheel < -3)
-        delta_wheel = -3;
+	/* the shift register is cleared once per 'frame' */
+	delta_wheel = (INT8)ioport("WHEEL")->read() / 8;
+	if (delta_wheel > 3)
+		delta_wheel = 3;
+	else if (delta_wheel < -3)
+		delta_wheel = -3;
 
-    return (speedfrk_steer[delta_wheel + 3] >> offset) & 1;
+	return (speedfrk_steer[delta_wheel + 3] >> offset) & 1;
 }
 
 
@@ -184,11 +184,11 @@ READ8_MEMBER(cinemat_state::speedfrk_gear_r)
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
-        m_gear = gearval & 0x0f;
+		m_gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
 	if (!(ioport("INPUTS")->read() & 0x80))
-        m_gear &= ~0x08;
+		m_gear &= ~0x08;
 
 	return (m_gear >> offset) & 1;
 }
@@ -207,7 +207,7 @@ static const struct
 	UINT16 bitmask;
 } sundance_port_map[16] =
 {
-	{ "PAD1", 0x155 },	/* bit  0 is set if P1 1,3,5,7,9 is pressed */
+	{ "PAD1", 0x155 },  /* bit  0 is set if P1 1,3,5,7,9 is pressed */
 	{ NULL, 0 },
 	{ NULL, 0 },
 	{ NULL, 0 },
@@ -217,15 +217,15 @@ static const struct
 	{ NULL, 0 },
 	{ NULL, 0 },
 
-	{ "PAD2", 0x1a1 },	/* bit  8 is set if P2 1,6,8,9 is pressed */
-	{ "PAD1", 0x1a1 },	/* bit  9 is set if P1 1,6,8,9 is pressed */
-	{ "PAD2", 0x155 },	/* bit 10 is set if P2 1,3,5,7,9 is pressed */
+	{ "PAD2", 0x1a1 },  /* bit  8 is set if P2 1,6,8,9 is pressed */
+	{ "PAD1", 0x1a1 },  /* bit  9 is set if P1 1,6,8,9 is pressed */
+	{ "PAD2", 0x155 },  /* bit 10 is set if P2 1,3,5,7,9 is pressed */
 	{ NULL, 0 },
 
-	{ "PAD1", 0x093 },	/* bit 12 is set if P1 1,2,5,8 is pressed */
-	{ "PAD2", 0x093 },	/* bit 13 is set if P2 1,2,5,8 is pressed */
-	{ "PAD1", 0x048 },	/* bit 14 is set if P1 4,8 is pressed */
-	{ "PAD2", 0x048 },	/* bit 15 is set if P2 4,8 is pressed */
+	{ "PAD1", 0x093 },  /* bit 12 is set if P1 1,2,5,8 is pressed */
+	{ "PAD2", 0x093 },  /* bit 13 is set if P2 1,2,5,8 is pressed */
+	{ "PAD1", 0x048 },  /* bit 14 is set if P1 4,8 is pressed */
+	{ "PAD2", 0x048 },  /* bit 15 is set if P2 4,8 is pressed */
 };
 
 
@@ -357,15 +357,15 @@ static INPUT_PORTS_START( spacewar )
 	PORT_DIPNAME( 0x03, 0x00,  "Time" )
 	PORT_DIPSETTING(    0x03, "0:45/coin" )
 	PORT_DIPSETTING(    0x00, "1:00/coin" )
-	PORT_DIPSETTING(	0x01, "1:30/coin" )
-	PORT_DIPSETTING(	0x02, "2:00/coin" )
+	PORT_DIPSETTING(    0x01, "1:30/coin" )
+	PORT_DIPSETTING(    0x02, "2:00/coin" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 INPUT_PORTS_END
 
@@ -375,10 +375,10 @@ static INPUT_PORTS_START( spaceshp )
 
 	PORT_MODIFY("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x00, "Time" ) PORT_DIPLOCATION("SW1:!4,!3")
-	PORT_DIPSETTING(	0x00, "1:00/coin" )
-	PORT_DIPSETTING(	0x01, "1:30/coin" )
-	PORT_DIPSETTING(	0x02, "2:00/coin" )
-	PORT_DIPSETTING(	0x03, "2:30/coin" )
+	PORT_DIPSETTING(    0x00, "1:00/coin" )
+	PORT_DIPSETTING(    0x01, "1:30/coin" )
+	PORT_DIPSETTING(    0x02, "2:00/coin" )
+	PORT_DIPSETTING(    0x03, "2:30/coin" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:!1" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:!2" )
@@ -493,17 +493,17 @@ static INPUT_PORTS_START( starhawk )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Game_Time ) )
-	PORT_DIPSETTING(	0x03, "2:00/4:00" )
-	PORT_DIPSETTING(	0x01, "1:30/3:00" )
-	PORT_DIPSETTING(	0x02, "1:00/2:00" )
-	PORT_DIPSETTING(	0x00, "0:45/1:30" )
+	PORT_DIPSETTING(    0x03, "2:00/4:00" )
+	PORT_DIPSETTING(    0x01, "1:30/3:00" )
+	PORT_DIPSETTING(    0x02, "1:00/2:00" )
+	PORT_DIPSETTING(    0x00, "0:45/1:30" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x40,	0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 INPUT_PORTS_END
 
@@ -529,13 +529,13 @@ static INPUT_PORTS_START( sundance )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x02, "Time" )
-	PORT_DIPSETTING(	0x00, "0:45/coin" )
-	PORT_DIPSETTING(	0x02, "1:00/coin" )
-	PORT_DIPSETTING(	0x01, "1:30/coin" )
-	PORT_DIPSETTING(	0x03, "2:00/coin" )
-	PORT_DIPNAME( 0x04,	0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, "0:45/coin" )
+	PORT_DIPSETTING(    0x02, "1:00/coin" )
+	PORT_DIPSETTING(    0x01, "1:30/coin" )
+	PORT_DIPSETTING(    0x03, "2:00/coin" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) /* supposedly coinage, doesn't work */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -584,17 +584,17 @@ static INPUT_PORTS_START( tailg )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x23, 0x23, "Shield Points" )
-	PORT_DIPSETTING(	0x00, "15" )
-	PORT_DIPSETTING(	0x02, "20" )
-	PORT_DIPSETTING(	0x01, "30" )
-	PORT_DIPSETTING(	0x03, "40" )
-	PORT_DIPSETTING(	0x20, "50" )
-	PORT_DIPSETTING(	0x22, "60" )
-	PORT_DIPSETTING(	0x21, "70" )
-	PORT_DIPSETTING(	0x23, "80" )
-	PORT_DIPNAME( 0x04,	0x04, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, "15" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x01, "30" )
+	PORT_DIPSETTING(    0x03, "40" )
+	PORT_DIPSETTING(    0x20, "50" )
+	PORT_DIPSETTING(    0x22, "60" )
+	PORT_DIPSETTING(    0x21, "70" )
+	PORT_DIPSETTING(    0x23, "80" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -705,22 +705,22 @@ static INPUT_PORTS_START( ripoff )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x03, "8" )
-	PORT_DIPSETTING(	0x00, "12" )
-	PORT_DIPSETTING(	0x02, "16" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x03, "8" )
+	PORT_DIPSETTING(    0x00, "12" )
+	PORT_DIPSETTING(    0x02, "16" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x0c, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPNAME( 0x10,	0x10, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20,	0x00, "Scores" )
-	PORT_DIPSETTING(	0x00, "Individual" )
-	PORT_DIPSETTING(	0x20, "Combined" )
-	PORT_SERVICE( 0x40,	IP_ACTIVE_LOW )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Scores" )
+	PORT_DIPSETTING(    0x00, "Individual" )
+	PORT_DIPSETTING(    0x20, "Combined" )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 INPUT_PORTS_END
 
@@ -774,22 +774,22 @@ static INPUT_PORTS_START( solarq )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x05, 0x05, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 2C_3C ) )
-	PORT_DIPNAME( 0x02,	0x02, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x02, "25 captures" )
-	PORT_DIPSETTING(	0x00, "40 captures" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x02, "25 captures" )
+	PORT_DIPSETTING(    0x00, "40 captures" )
 	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x18, "2" )
-	PORT_DIPSETTING(	0x08, "3" )
-	PORT_DIPSETTING(	0x10, "4" )
-	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x20,	0x20, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x40,	IP_ACTIVE_HIGH )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 INPUT_PORTS_END
 
@@ -803,27 +803,27 @@ static INPUT_PORTS_START( boxingb )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0fc0, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* dial */
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* dial */
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_3C ) )
-	PORT_DIPNAME( 0x04,	0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x04, "3" )
-	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x08,	0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x00, "30,000" )
-	PORT_DIPSETTING(	0x08, "50,000" )
-	PORT_DIPNAME( 0x10,	0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20,	0x20, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x40,	IP_ACTIVE_LOW )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "30,000" )
+	PORT_DIPSETTING(    0x08, "50,000" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 
 	PORT_START("DIAL")
@@ -922,38 +922,38 @@ static INPUT_PORTS_START( qb3 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_JOYSTICKRIGHT_DOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON4 )					// read at $1a5; if 0 add 8 to $25
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON4 )                 // read at $1a5; if 0 add 8 to $25
 	PORT_DIPNAME( 0x0200, 0x0200, "Debug" )
-	PORT_DIPSETTING(	  0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON2 )					// read at $c7; jmp to $3AF1 if 0
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON2 )                 // read at $c7; jmp to $3AF1 if 0
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_JOYSTICKLEFT_RIGHT )
 	PORT_DIPNAME( 0x1000, 0x1000, "Infinite Lives" )
-	PORT_DIPSETTING(	  0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_JOYSTICKLEFT_LEFT )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SPECIAL )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x02, "3" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x03, "5" )
-	PORT_DIPNAME( 0x04,	0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08,	0x08, DEF_STR( Free_Play ) )	// read at $244, $2c1
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10,	0x00, DEF_STR( Unknown ) )	// read at $27d
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20,	0x20, DEF_STR( Unknown ) )	 // read at $282
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x40,	IP_ACTIVE_LOW )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )    // read at $244, $2c1
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  // read at $27d
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )   // read at $282
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 INPUT_PORTS_END
 
@@ -1353,9 +1353,9 @@ ROM_START( spaceftr )
 	ROM_LOAD16_BYTE( "fortrest7.7t", 0x0000, 0x0800, CRC(65d0a225) SHA1(e1fbee5ff42dd040ab2e90bbe2189fcb76d6167e) )
 
 	/* The original fortresp7.7p ROM image was a bad dump, a comparison showed only two bytes difference between it
-    and starcast.p7 from starcas1. A disassembly proved that the two affected bytes resulted in bogus opcodes, which
-    ultimately caused the game to fail. The current ROM taken from starcas1 can be assumed to be equal to a correct
-    dump of fortresp7.7p. The BAD_DUMP flag is kept in just to be sure. */
+	and starcast.p7 from starcas1. A disassembly proved that the two affected bytes resulted in bogus opcodes, which
+	ultimately caused the game to fail. The current ROM taken from starcas1 can be assumed to be equal to a correct
+	dump of fortresp7.7p. The BAD_DUMP flag is kept in just to be sure. */
 	ROM_LOAD16_BYTE( "fortresp7.7p", 0x0001, 0x0800, BAD_DUMP CRC(d8f58d9a) SHA1(abba459431dcacc75099b0d340b957be71b89cfd) ) // taken from starcas1, read note above
 
 	ROM_LOAD16_BYTE( "fortresu7.7u", 0x1000, 0x0800, CRC(13b0287c) SHA1(366a23fd10684975bd5ee190e5227e47a0298ad5) )

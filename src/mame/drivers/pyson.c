@@ -160,7 +160,7 @@ class pyson_state : public driver_device
 public:
 	pyson_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -185,7 +185,7 @@ UINT32 pyson_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 }
 
 static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32, pyson_state)
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM	// 32 MB RAM in consumer PS2s, do these have more?
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
@@ -194,12 +194,12 @@ INPUT_PORTS_END
 
 static const mips3_config r5000_config =
 {
-	16384,				/* code cache size - probably wrong */
-	16384				/* data cache size */
+	16384,              /* code cache size - probably wrong */
+	16384               /* data cache size */
 };
 
 static MACHINE_CONFIG_START( pyson, pyson_state )
-	MCFG_CPU_ADD("maincpu", R5000LE, 294000000)	// imported from namcops2.c driver
+	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
 	MCFG_CPU_PROGRAM_MAP(ps2_map)
 	MCFG_CPU_CONFIG(r5000_config)
 
@@ -213,8 +213,8 @@ static MACHINE_CONFIG_START( pyson, pyson_state )
 	MCFG_PALETTE_LENGTH(65536)
 MACHINE_CONFIG_END
 
-#define PYSON_BIOS	\
-        ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) )
+#define PYSON_BIOS  \
+		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) )
 
 ROM_START( pyson )
 	ROM_REGION(0x200000, "bios", 0)
@@ -229,11 +229,11 @@ ROM_START( wswe )
 	PYSON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-        ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(bd1770aa) SHA1(be217d6d7648e529953ea25caad904394919644c) )
-        ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(296c8436) SHA1(c0da440b50dba4ca8eb2b1ee7b6de681769fcf65) )
+		ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(bd1770aa) SHA1(be217d6d7648e529953ea25caad904394919644c) )
+		ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(296c8436) SHA1(c0da440b50dba4ca8eb2b1ee7b6de681769fcf65) )
 
 	ROM_REGION(0x2000, "timekeeper", ROMREGION_ERASE00)
-        ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(d4181cb5) SHA1(c5560d1ac043bfe2527fac3fb1989fa8fc53cf8a) )
+		ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(d4181cb5) SHA1(c5560d1ac043bfe2527fac3fb1989fa8fc53cf8a) )
 
 	DISK_REGION("drive_0")
 	DISK_IMAGE_READONLY( "c18jaa03", 0, SHA1(b47190aa38f1f3a499b817758e3f29fac54391bd) )
@@ -244,11 +244,11 @@ ROM_START( wswe2k3 )
 	PYSON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-        ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(6f5b7309) SHA1(5e9d75497c3a3a92af41b20e41991c9c5837d50a) )
-        ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(433f7ad9) SHA1(4fd05124d59cdbedd781580e49ff940c5df67d94) )
+		ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(6f5b7309) SHA1(5e9d75497c3a3a92af41b20e41991c9c5837d50a) )
+		ROM_LOAD( "kn00002_spr.ic002", 0x800000, 0x040000, CRC(433f7ad9) SHA1(4fd05124d59cdbedd781580e49ff940c5df67d94) )
 
 	ROM_REGION(0x2000, "timekeeper", ROMREGION_ERASE00)
-        ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(76068de0) SHA1(5f75b88ad04871fb3799fe904658c87524bad94f) )
+		ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(76068de0) SHA1(5f75b88ad04871fb3799fe904658c87524bad94f) )
 
 	DISK_REGION("drive_0")
 	DISK_IMAGE_READONLY( "c27jaa03", 0, SHA1(9b2aa900711d88cf5effb3ba6be18726ea006ac4) )

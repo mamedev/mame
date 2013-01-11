@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
 	if (color & 8)
 		code |= 0x1000;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);	/* no flip */
+	SET_TILE_INFO_MEMBER(1, code, color, 0);    /* no flip */
 }
 
 WRITE8_MEMBER(djboy_state::djboy_videoram_w)
@@ -55,11 +55,11 @@ WRITE8_MEMBER(djboy_state::djboy_paletteram_w)
 UINT32 djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/**
-     * xx------ msb x
-     * --x----- msb y
-     * ---x---- flipscreen?
-     * ----xxxx ROM bank
-     */
+	 * xx------ msb x
+	 * --x----- msb y
+	 * ---x---- flipscreen?
+	 * ----xxxx ROM bank
+	 */
 	int scroll;
 
 	scroll = m_scrollx | ((m_videoreg & 0xc0) << 2);

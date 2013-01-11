@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1") AM_WRITE(pbaction_flipscreen_w)
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* ??? */ AM_WRITE(pbaction_scroll_w)
+	AM_RANGE(0xe606, 0xe606) AM_READNOP /* ??? */ AM_WRITE(pbaction_scroll_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(pbaction_sh_command_w)
 ADDRESS_MAP_END
 
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	/* watchdog? */
+	AM_RANGE(0xffff, 0xffff) AM_WRITENOP    /* watchdog? */
 ADDRESS_MAP_END
 
 
@@ -149,30 +149,30 @@ static INPUT_PORTS_START( pbaction )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!1,!2,!3")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x01, "70k 200k 1000k" )
 	PORT_DIPSETTING(    0x04, "100k 300k 1000k" )
 	PORT_DIPSETTING(    0x00, "70k 200k" )
@@ -181,15 +181,15 @@ static INPUT_PORTS_START( pbaction )
 	PORT_DIPSETTING(    0x02, "100k" )
 	PORT_DIPSETTING(    0x05, "200k" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
-	PORT_DIPNAME( 0x08, 0x00, "Extra" )			PORT_DIPLOCATION("SW2:!4")
+	PORT_DIPNAME( 0x08, 0x00, "Extra" )         PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x30, 0x00, "Difficulty (Flippers)" )	PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, "Difficulty (Flippers)" ) PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Difficulty (Outlanes)" )	PORT_DIPLOCATION("SW2:!7,!8")
+	PORT_DIPNAME( 0xc0, 0x00, "Difficulty (Outlanes)" ) PORT_DIPLOCATION("SW2:!7,!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
@@ -242,16 +242,16 @@ static const gfx_layout spritelayout2 =
 
 
 static GFXDECODE_START( pbaction )
-	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )	/*   0-127 characters */
-	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )	/* 128-255 background */
-	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )	/*   0-127 normal sprites */
-	GFXDECODE_ENTRY( "sprites", 0x01000, spritelayout2,  0, 16 )	/*   0-127 large sprites */
+	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )    /*   0-127 characters */
+	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )    /* 128-255 background */
+	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )    /*   0-127 normal sprites */
+	GFXDECODE_ENTRY( "sprites", 0x01000, spritelayout2,  0, 16 )    /*   0-127 large sprites */
 GFXDECODE_END
 
 
 INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x02); /* the CPU is in Interrupt Mode 2 */
 }
 
 
@@ -280,14 +280,14 @@ INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
 static MACHINE_CONFIG_START( pbaction, pbaction_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
 	MCFG_CPU_PROGRAM_MAP(pbaction_sound_map)
 	MCFG_CPU_IO_MAP(pbaction_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pbaction_state, pbaction_interrupt, 2*60)	/* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(pbaction_state, pbaction_interrupt, 2*60)  /* ??? */
 									/* IRQs are caused by the main CPU */
 
 
@@ -330,7 +330,7 @@ ROM_START( pbaction )
 	ROM_LOAD( "b-n7.bin",     0x4000, 0x4000, CRC(d54d5402) SHA1(a4c3205bfe5fba8bb1ff3ad15941a77c35b44a27) )
 	ROM_LOAD( "b-l7.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "a-e3.bin",     0x0000,  0x2000, CRC(0e53a91f) SHA1(df2827197cd55c3685e5ac8b26c20800623cb932) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -357,10 +357,10 @@ ROM_START( pbaction2 )
 	ROM_LOAD( "pba15.bin",     0x4000, 0x4000, CRC(3afef03a) SHA1(dec714415d2fd00c9021171a48f6c94b40888ae8) )
 	ROM_LOAD( "pba14.bin",     0x8000, 0x2000, CRC(c0a98c8a) SHA1(442f37af31db13fd98602dd7f9eeae5529da0f44) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* 64k for a third Z80 (not emulated) */
+	ROM_REGION( 0x10000, "cpu2", 0 )    /* 64k for a third Z80 (not emulated) */
 	ROM_LOAD( "pba17.bin",    0x0000,  0x4000, CRC(2734ae60) SHA1(4edcdfac1611c49c4f890609efbe8352b8161f8e) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -386,7 +386,7 @@ ROM_START( pbaction3 )
 	ROM_LOAD( "12.bin",     0x4000, 0x4000, CRC(ec3c64c6) SHA1(6130b80606d717f95e219316c2d3fa0a1980ea1d) )
 	ROM_LOAD( "13.bin",     0x8000, 0x4000, CRC(c93c851e) SHA1(b41077708fce4ccbcecdeae32af8821ca5322e87) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -412,7 +412,7 @@ ROM_START( pbaction4 )
 	ROM_IGNORE(0x4000)
 	ROM_LOAD( "pinball_10.bin",     0x4000, 0x8000, CRC(04b56c7c) SHA1(d09c22fd0235e1c6a9b1978ba69338bb1ae5667d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "pinball_01.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -442,7 +442,7 @@ ROM_START( pbaction5 )
 	ROM_LOAD( "c15.bin",     0x4000, 0x4000, CRC(057acfe3) SHA1(49c184d7caea0c0e9f0d0e163f2ef42bb9aebf16) )
 	ROM_LOAD( "p14.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "p1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )

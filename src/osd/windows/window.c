@@ -39,8 +39,8 @@
 //
 //============================================================
 
-#define LOG_THREADS			0
-#define LOG_TEMP_PAUSE		0
+#define LOG_THREADS         0
+#define LOG_TEMP_PAUSE      0
 
 // Needed for RAW Input
 #define WM_INPUT 0x00FF
@@ -80,29 +80,29 @@ extern int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 //============================================================
 
 // window styles
-#define WINDOW_STYLE					WS_OVERLAPPEDWINDOW
-#define WINDOW_STYLE_EX					0
+#define WINDOW_STYLE                    WS_OVERLAPPEDWINDOW
+#define WINDOW_STYLE_EX                 0
 
 // debugger window styles
-#define DEBUG_WINDOW_STYLE				WS_OVERLAPPED
-#define DEBUG_WINDOW_STYLE_EX			0
+#define DEBUG_WINDOW_STYLE              WS_OVERLAPPED
+#define DEBUG_WINDOW_STYLE_EX           0
 
 // full screen window styles
-#define FULLSCREEN_STYLE				WS_POPUP
-#define FULLSCREEN_STYLE_EX				WS_EX_TOPMOST
+#define FULLSCREEN_STYLE                WS_POPUP
+#define FULLSCREEN_STYLE_EX             WS_EX_TOPMOST
 
 // minimum window dimension
-#define MIN_WINDOW_DIM					200
+#define MIN_WINDOW_DIM                  200
 
 // custom window messages
-#define WM_USER_FINISH_CREATE_WINDOW	(WM_USER + 0)
-#define WM_USER_SELF_TERMINATE			(WM_USER + 1)
-#define WM_USER_REDRAW					(WM_USER + 2)
-#define WM_USER_SET_FULLSCREEN			(WM_USER + 3)
-#define WM_USER_SET_MAXSIZE				(WM_USER + 4)
-#define WM_USER_SET_MINSIZE				(WM_USER + 5)
-#define WM_USER_UI_TEMP_PAUSE			(WM_USER + 6)
-#define WM_USER_EXEC_FUNC				(WM_USER + 7)
+#define WM_USER_FINISH_CREATE_WINDOW    (WM_USER + 0)
+#define WM_USER_SELF_TERMINATE          (WM_USER + 1)
+#define WM_USER_REDRAW                  (WM_USER + 2)
+#define WM_USER_SET_FULLSCREEN          (WM_USER + 3)
+#define WM_USER_SET_MAXSIZE             (WM_USER + 4)
+#define WM_USER_SET_MINSIZE             (WM_USER + 5)
+#define WM_USER_UI_TEMP_PAUSE           (WM_USER + 6)
+#define WM_USER_EXEC_FUNC               (WM_USER + 7)
 
 
 
@@ -175,7 +175,7 @@ static void set_fullscreen(win_window_info *window, int fullscreen);
 #if LOG_THREADS
 struct mtlog
 {
-	osd_ticks_t	timestamp;
+	osd_ticks_t timestamp;
 	const char *event;
 };
 
@@ -872,11 +872,11 @@ static void create_window_class(void)
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName	= TEXT("MAME");
-		wc.hInstance		= GetModuleHandle(NULL);
-		wc.lpfnWndProc		= winwindow_video_window_proc_ui;
-		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
-		wc.hIcon			= LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
+		wc.lpszClassName    = TEXT("MAME");
+		wc.hInstance        = GetModuleHandle(NULL);
+		wc.lpfnWndProc      = winwindow_video_window_proc_ui;
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))

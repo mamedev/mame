@@ -17,16 +17,16 @@
 #include "video/tms9928a.h"
 #include "crsshair.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"z80"
-#define SN76489AN_TAG	"sn76489an"
-#define UPD765_TAG		"upd765"
-#define UPD8251_TAG		"upd8251"
-#define UPD9255_TAG		"upd9255"
-#define UPD9255_0_TAG	"upd9255_0"
-#define UPD9255_1_TAG	"upd9255_1"
-#define CENTRONICS_TAG	"centronics"
-#define TMS9918A_TAG	"tms9918a"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "z80"
+#define SN76489AN_TAG   "sn76489an"
+#define UPD765_TAG      "upd765"
+#define UPD8251_TAG     "upd8251"
+#define UPD9255_TAG     "upd9255"
+#define UPD9255_0_TAG   "upd9255_0"
+#define UPD9255_1_TAG   "upd9255_1"
+#define CENTRONICS_TAG  "centronics"
+#define TMS9918A_TAG    "tms9918a"
 
 #define IS_CARTRIDGE_TV_DRAW(ptr) \
 	(!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
@@ -49,8 +49,8 @@ class sg1000_state : public driver_device
 public:
 	sg1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -80,7 +80,7 @@ class sc3000_state : public sg1000_state
 public:
 	sc3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sg1000_state(mconfig, type, tag),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cassette_image_device> m_cassette;
@@ -99,9 +99,9 @@ class sf7000_state : public sc3000_state
 public:
 	sf7000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sc3000_state(mconfig, type, tag),
-		  m_fdc(*this, UPD765_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:3ssdd")
+			m_fdc(*this, UPD765_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_floppy0(*this, UPD765_TAG ":0:3ssdd")
 	{ }
 
 	required_device<upd765a_device> m_fdc;

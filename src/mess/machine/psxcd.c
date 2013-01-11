@@ -278,17 +278,17 @@ void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
 					}
 				}
 				/*else
-                {
-                    if (rdp>=cur_res->sz)
-                    {
-                        sr&=~(1<<5);
-                    } else
-                    {
-                        sr|=~(1<<5);
-                        res=cur_res->data[rdp++];
-                    }
-                }
-                */
+				{
+				    if (rdp>=cur_res->sz)
+				    {
+				        sr&=~(1<<5);
+				    } else
+				    {
+				        sr|=~(1<<5);
+				        res=cur_res->data[rdp++];
+				    }
+				}
+				*/
 			}
 			break;
 
@@ -326,37 +326,37 @@ void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
 
 psxcd_device::command_info psxcd_device::cmd_table[num_commands]=
 {
-	{ &psxcd_device::cdcmd_sync,				"sync"			},	// 00
-	{ &psxcd_device::cdcmd_nop,				"nop"				},	// 01
-	{ &psxcd_device::cdcmd_setloc,			"setloc"		},	// 02
-	{ &psxcd_device::cdcmd_play,				"play"			},	// 03
-	{ &psxcd_device::cdcmd_forward,		"forward"		},	// 04
-	{ &psxcd_device::cdcmd_backward,		"backward"	},	// 05
-	{ &psxcd_device::cdcmd_readn,			"readn"			},	// 06
-	{ &psxcd_device::cdcmd_standby,		"standby"		},	// 07
-	{ &psxcd_device::cdcmd_stop,				"stop"			},	// 08
-	{ &psxcd_device::cdcmd_pause,			"pause"			},	// 09
-	{ &psxcd_device::cdcmd_init,				"init"			},	// 0a
-	{ &psxcd_device::cdcmd_mute,				"mute"			},	// 0b
-	{ &psxcd_device::cdcmd_demute,			"demute"		},	// 0c
-	{ &psxcd_device::cdcmd_setfilter,	"setfilter"	},	// 0d
-	{ &psxcd_device::cdcmd_setmode,		"setmode"		},	// 0e
-	{ &psxcd_device::cdcmd_getparam,		"getparam"	},	// 0f
-	{ &psxcd_device::cdcmd_getlocl,		"getlocl"		},	// 10
-	{ &psxcd_device::cdcmd_getlocp,		"getlocp"		},	// 11
-	{ &psxcd_device::cdcmd_illegal,		"illegal"		},	// 12
-	{ &psxcd_device::cdcmd_gettn,			"gettn"			},	// 13
-	{ &psxcd_device::cdcmd_gettd,			"gettd"			},	// 14
-	{ &psxcd_device::cdcmd_seekl,			"seekl"			},	// 15
-	{ &psxcd_device::cdcmd_seekp,			"seekp"			},	// 16
-	{ &psxcd_device::cdcmd_illegal,		"illegal"		},	// 17
-	{ &psxcd_device::cdcmd_illegal,		"illegal"		},	// 18
-	{ &psxcd_device::cdcmd_test,				"test"			},	// 19
-	{ &psxcd_device::cdcmd_id,					"id"				},	// 1a
-	{ &psxcd_device::cdcmd_reads,			"reads"			},	// 1b
-	{ &psxcd_device::cdcmd_reset,			"reset"			},	// 1c
-	{ &psxcd_device::cdcmd_illegal,		"illegal"		},	// 1d
-	{ &psxcd_device::cdcmd_readtoc,		"readtoc"		},	// 1e
+	{ &psxcd_device::cdcmd_sync,                "sync"          },  // 00
+	{ &psxcd_device::cdcmd_nop,             "nop"               },  // 01
+	{ &psxcd_device::cdcmd_setloc,          "setloc"        },  // 02
+	{ &psxcd_device::cdcmd_play,                "play"          },  // 03
+	{ &psxcd_device::cdcmd_forward,     "forward"       },  // 04
+	{ &psxcd_device::cdcmd_backward,        "backward"  },  // 05
+	{ &psxcd_device::cdcmd_readn,           "readn"         },  // 06
+	{ &psxcd_device::cdcmd_standby,     "standby"       },  // 07
+	{ &psxcd_device::cdcmd_stop,                "stop"          },  // 08
+	{ &psxcd_device::cdcmd_pause,           "pause"         },  // 09
+	{ &psxcd_device::cdcmd_init,                "init"          },  // 0a
+	{ &psxcd_device::cdcmd_mute,                "mute"          },  // 0b
+	{ &psxcd_device::cdcmd_demute,          "demute"        },  // 0c
+	{ &psxcd_device::cdcmd_setfilter,   "setfilter" },  // 0d
+	{ &psxcd_device::cdcmd_setmode,     "setmode"       },  // 0e
+	{ &psxcd_device::cdcmd_getparam,        "getparam"  },  // 0f
+	{ &psxcd_device::cdcmd_getlocl,     "getlocl"       },  // 10
+	{ &psxcd_device::cdcmd_getlocp,     "getlocp"       },  // 11
+	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 12
+	{ &psxcd_device::cdcmd_gettn,           "gettn"         },  // 13
+	{ &psxcd_device::cdcmd_gettd,           "gettd"         },  // 14
+	{ &psxcd_device::cdcmd_seekl,           "seekl"         },  // 15
+	{ &psxcd_device::cdcmd_seekp,           "seekp"         },  // 16
+	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 17
+	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 18
+	{ &psxcd_device::cdcmd_test,                "test"          },  // 19
+	{ &psxcd_device::cdcmd_id,                  "id"                },  // 1a
+	{ &psxcd_device::cdcmd_reads,           "reads"         },  // 1b
+	{ &psxcd_device::cdcmd_reset,           "reset"         },  // 1c
+	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 1d
+	{ &psxcd_device::cdcmd_readtoc,     "readtoc"       },  // 1e
 };
 
 //
@@ -431,7 +431,7 @@ void psxcd_device::cdcmd_setloc()
 	} else
 	{
 		printf("setloc out of range: %02d:%02d:%02d\n",
-					 l[0],l[1],l[2]);
+						l[0],l[1],l[2]);
 	}
 
 	send_result(intr_complete);
@@ -683,14 +683,14 @@ void psxcd_device::cdcmd_getlocp()
 
 	unsigned char data[8]=
 	{
-		0x01,							// track
-		0x01,							// index
-		decimal_to_bcd(tloc[0]),	// min
-		decimal_to_bcd(tloc[1]),	// sec
-		decimal_to_bcd(tloc[2]),	// frame
-		decimal_to_bcd(loc[0]),	// amin
-		decimal_to_bcd(loc[1]),	// asec
-		decimal_to_bcd(loc[2])	// aframe
+		0x01,                           // track
+		0x01,                           // index
+		decimal_to_bcd(tloc[0]),    // min
+		decimal_to_bcd(tloc[1]),    // sec
+		decimal_to_bcd(tloc[2]),    // frame
+		decimal_to_bcd(loc[0]), // amin
+		decimal_to_bcd(loc[1]), // asec
+		decimal_to_bcd(loc[2])  // aframe
 	};
 
 	//unsigned char data[8]={ 2,1,0,0xff,0xff,0xff,0xff,0xff };
@@ -748,10 +748,10 @@ void psxcd_device::cdcmd_gettd()
 
 	#ifdef debug_cdrom
 		printf("cdrom: gettd %02x [%02x %02x %02x]\n",
-												 cmdbuf[0],
-												 data[0],
-												 data[1],
-												 data[2]);
+													cmdbuf[0],
+													data[0],
+													data[1],
+													data[2]);
 	#endif
 
 	//stop_read();
@@ -816,7 +816,7 @@ void psxcd_device::cdcmd_id()
 	if (open)
 	{
 		static unsigned char gamedata[8] = { 0x08, 0x00, 0x00, 0x00, 'S', 'C', 'E', 'A' };
-		static unsigned char audiodata[8] = { 0x08, 0x90, 0x00, 0x00, 'S', 'C', 'E', 'A' };	// drops into the audio CD player.  08 80 goes to the menu.
+		static unsigned char audiodata[8] = { 0x08, 0x90, 0x00, 0x00, 'S', 'C', 'E', 'A' }; // drops into the audio CD player.  08 80 goes to the menu.
 
 		if (cdrom_get_track_type(m_cd, 0) == CD_TRACK_AUDIO)
 		{
@@ -1163,7 +1163,7 @@ void psxcd_device::read_sector()
 
 							if ((xasub->submode&submode_audio) &&
 									(((mode&mode_channel)==0) ||
-									 ((xasub->file==sub->file) &&
+										((xasub->file==sub->file) &&
 										(xasub->channel==sub->channel))))
 							{
 								if (! machine().device<spu_device>("spu")->play_xa(xa_prefetch_sector,xaptr))
@@ -1252,7 +1252,7 @@ void psxcd_device::read_sector()
 //
 
 bool psxcd_device::play_cdda_sector(const unsigned int sector,
-																 unsigned char *rawsec)
+																	unsigned char *rawsec)
 {
 	bool isdata=true;
 
@@ -1365,7 +1365,7 @@ void psxcd_device::play_sector()
 		if (mode&mode_report)
 		{
 			command_result *res=new command_result;
-			res->res=intr_complete;	//dataready;
+			res->res=intr_complete; //dataready;
 
 			res->data[0]=status_playing|status_standby;
 			res->data[1]=0x01;
@@ -1684,4 +1684,3 @@ void psxcd_device::add_system_event(event *ev)
 	// back-reference the timer from the event
 	ev->timer = timer;
 }
-

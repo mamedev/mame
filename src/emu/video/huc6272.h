@@ -25,7 +25,7 @@ Template for skeleton device
 
 // ======================> huc6272_device
 
-class huc6272_device :	public device_t,
+class huc6272_device :  public device_t,
 						public device_memory_interface
 {
 public:
@@ -60,7 +60,7 @@ private:
 		UINT16 data[16];
 	}m_micro_prg;
 
-	const address_space_config		m_space_config;
+	const address_space_config      m_space_config;
 };
 
 

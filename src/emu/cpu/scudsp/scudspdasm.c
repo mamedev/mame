@@ -55,52 +55,52 @@ static const SCUDSP_OPCODE alu_table[16] =
 
 static const SCUDSP_OPCODE xbus_table[] =
 {
-	{ "NOP", 0,          0,    0, },			/* 000 */
-	{ "???", 0,          0,    0, },			/* 001 */
-	{ "MOV", EA_MUL,     EA_P, 0, },	/* 010 */
-	{ "MOV", EA_SRCMEMX, EA_P, 0, },		/* 011 */ //MOV %s,P
-	{ "MOV", EA_SRCMEMX, EA_X, 0, },		/* 100 */ //MOV %s,X
-	{ "???", 0,          0,    0, },			/* 101 */
-	{ "???", 0,          0,    0, },			/* 110 */
-	{ "???", 0,          0,    0, },			/* 111 */
+	{ "NOP", 0,          0,    0, },            /* 000 */
+	{ "???", 0,          0,    0, },            /* 001 */
+	{ "MOV", EA_MUL,     EA_P, 0, },    /* 010 */
+	{ "MOV", EA_SRCMEMX, EA_P, 0, },        /* 011 */ //MOV %s,P
+	{ "MOV", EA_SRCMEMX, EA_X, 0, },        /* 100 */ //MOV %s,X
+	{ "???", 0,          0,    0, },            /* 101 */
+	{ "???", 0,          0,    0, },            /* 110 */
+	{ "???", 0,          0,    0, },            /* 111 */
 };
 
 static const SCUDSP_OPCODE ybus_table[] =
 {
-	{ "NOP", 0,          0,    0, },	/* 000 */
-	{ "CLR", 0,          EA_A, 0, },	/* 001 */
-	{ "MOV", EA_ALU,     EA_A, 0, },	/* 010 */
-	{ "MOV", EA_SRCMEMY, EA_A, 0, },	/* 011 */ //MOV %s,A
-	{ "MOV", EA_SRCMEMY, EA_Y, 0, },	/* 100 */ //MOV %s,Y
-	{ "???", 0,          0,    0, },				/* 101 */
-	{ "???", 0,          0,    0, },				/* 110 */
-	{ "???", 0,          0,    0, },				/* 111 */
+	{ "NOP", 0,          0,    0, },    /* 000 */
+	{ "CLR", 0,          EA_A, 0, },    /* 001 */
+	{ "MOV", EA_ALU,     EA_A, 0, },    /* 010 */
+	{ "MOV", EA_SRCMEMY, EA_A, 0, },    /* 011 */ //MOV %s,A
+	{ "MOV", EA_SRCMEMY, EA_Y, 0, },    /* 100 */ //MOV %s,Y
+	{ "???", 0,          0,    0, },                /* 101 */
+	{ "???", 0,          0,    0, },                /* 110 */
+	{ "???", 0,          0,    0, },                /* 111 */
 };
 
 static const SCUDSP_OPCODE d1bus_table[] =
 {
-	{ "NOP", 0,          0,         0, },					/* 00 */
-	{ "MOV", EA_IMM8,    EA_DSTMEM, 0, },		/* 01 */ //MOV %I8,%d
-	{ "???", 0,          0,         0, },					/* 10 */
-	{ "MOV", EA_SRCMEMD1,0,         0, },			/* 11 */ //MOV %S,%d
+	{ "NOP", 0,          0,         0, },                   /* 00 */
+	{ "MOV", EA_IMM8,    EA_DSTMEM, 0, },       /* 01 */ //MOV %I8,%d
+	{ "???", 0,          0,         0, },                   /* 10 */
+	{ "MOV", EA_SRCMEMD1,0,         0, },           /* 11 */ //MOV %S,%d
 };
 
 static const SCUDSP_OPCODE mvi_table[] =
 {
-	{ "MVI", EA_IMM25,   EA_MVIDSTMEM,  0, },					/* 0 */ //"MVI %I,%d"
-	{ "MVI", EA_IMM18,   EA_MVIDSTMEM,  EA_FLAGS, },			/* 1 */ //"MVI %I,%d,%f"
+	{ "MVI", EA_IMM25,   EA_MVIDSTMEM,  0, },                   /* 0 */ //"MVI %I,%d"
+	{ "MVI", EA_IMM18,   EA_MVIDSTMEM,  EA_FLAGS, },            /* 1 */ //"MVI %I,%d,%f"
 };
 
 static const SCUDSP_OPCODE dma_table[] =
 {
 	{ "DMA",  EA_D0,          EA_DMADSTMEM,  EA_IMM8, }, /* 000 */ // "DMA%H%A D0,%M,%I",
-	{ "DMA",  EA_DMASRCMEM,   EA_D0,  EA_IMM8, },	/* 001 */ // "DMA%H%A %s,D0,%I",
-	{ "DMA",  0,          0,  0, },	/* 010 */ // "DMA%H%A D0,%M,%s",
-	{ "DMA",  0,   0,  0, },						/* 011 */ // "DMA%H%A %s,D0,%s",
-	{ "DMAH", EA_D0,   EA_DMADSTMEM,  EA_IMM8, },	/* 100 */ // "DMA%H%A D0,%M,%I",
-	{ "DMAH", EA_DMASRCMEM,   EA_D0,  EA_IMM8, },	/* 101 */ // "DMA%H%A %s,D0,%I",
-	{ "DMAH", 0,   0,  0, },						/* 110 */ // "DMA%H%A D0,%M,%s",
-	{ "DMAH", 0,   0,  0, },						/* 111 */ // "DMA%H%A %s,D0,%s",
+	{ "DMA",  EA_DMASRCMEM,   EA_D0,  EA_IMM8, },   /* 001 */ // "DMA%H%A %s,D0,%I",
+	{ "DMA",  0,          0,  0, }, /* 010 */ // "DMA%H%A D0,%M,%s",
+	{ "DMA",  0,   0,  0, },                        /* 011 */ // "DMA%H%A %s,D0,%s",
+	{ "DMAH", EA_D0,   EA_DMADSTMEM,  EA_IMM8, },   /* 100 */ // "DMA%H%A D0,%M,%I",
+	{ "DMAH", EA_DMASRCMEM,   EA_D0,  EA_IMM8, },   /* 101 */ // "DMA%H%A %s,D0,%I",
+	{ "DMAH", 0,   0,  0, },                        /* 110 */ // "DMA%H%A D0,%M,%s",
+	{ "DMAH", 0,   0,  0, },                        /* 111 */ // "DMA%H%A %s,D0,%s",
 
 };
 
@@ -112,75 +112,75 @@ static const SCUDSP_OPCODE jmp_table[] =
 
 static const SCUDSP_OPCODE loop_table[] =
 {
-	{ "BTM", 0,   0,  0, },					/* 00 */
-	{ "LPS", 0,   0,  0, },					/* 01 */
+	{ "BTM", 0,   0,  0, },                 /* 00 */
+	{ "LPS", 0,   0,  0, },                 /* 01 */
 };
 
 static const SCUDSP_OPCODE end_table[] =
 {
-	{ "END", 0,   0,  0, },					/* 00 */
-	{ "ENDI",0,   0,  0, },					/* 01 */
+	{ "END", 0,   0,  0, },                 /* 00 */
+	{ "ENDI",0,   0,  0, },                 /* 01 */
 };
 
 
 static const char *const src_mem[] =
 {
-	"M0",			/* 0000 */
-	"M1",			/* 0001 */
-	"M2",			/* 0010 */
-	"M3",			/* 0011 */
-	"MC0",			/* 0100 */
-	"MC1",			/* 0101 */
-	"MC2",			/* 0110 */
-	"MC3",			/* 0111 */
-	"???",			/* 1000 */
-	"ALL",			/* 1001 */
-	"ALH",			/* 1010 */
-	"???",			/* 1011 */
-	"???",			/* 1100 */
-	"???",			/* 1101 */
-	"???",			/* 1110 */
-	"???",			/* 1111 */
+	"M0",           /* 0000 */
+	"M1",           /* 0001 */
+	"M2",           /* 0010 */
+	"M3",           /* 0011 */
+	"MC0",          /* 0100 */
+	"MC1",          /* 0101 */
+	"MC2",          /* 0110 */
+	"MC3",          /* 0111 */
+	"???",          /* 1000 */
+	"ALL",          /* 1001 */
+	"ALH",          /* 1010 */
+	"???",          /* 1011 */
+	"???",          /* 1100 */
+	"???",          /* 1101 */
+	"???",          /* 1110 */
+	"???",          /* 1111 */
 };
 
 static const char *const dst_mem[] =
 {
-	"MC0",			/* 0000 */
-	"MC1",			/* 0001 */
-	"MC2",			/* 0010 */
-	"MC3",			/* 0011 */
-	"RX",			/* 0100 */
-	"PL",			/* 0101 */
-	"RA0",			/* 0110 */
-	"WA0",			/* 0111 */
-	"???",			/* 1000 */
-	"???",			/* 1001 */
-	"LOP",			/* 1010 */
-	"TOP",			/* 1011 */
-	"CT0",			/* 1100 */
-	"CT1",			/* 1101 */
-	"CT2",			/* 1110 */
-	"CT3",			/* 1111 */
+	"MC0",          /* 0000 */
+	"MC1",          /* 0001 */
+	"MC2",          /* 0010 */
+	"MC3",          /* 0011 */
+	"RX",           /* 0100 */
+	"PL",           /* 0101 */
+	"RA0",          /* 0110 */
+	"WA0",          /* 0111 */
+	"???",          /* 1000 */
+	"???",          /* 1001 */
+	"LOP",          /* 1010 */
+	"TOP",          /* 1011 */
+	"CT0",          /* 1100 */
+	"CT1",          /* 1101 */
+	"CT2",          /* 1110 */
+	"CT3",          /* 1111 */
 };
 
 static const char *const mvi_dst_mem[] =
 {
-	"MC0",			/* 0000 */
-	"MC1",			/* 0001 */
-	"MC2",			/* 0010 */
-	"MC3",			/* 0011 */
-	"RX",			/* 0100 */
-	"PL",			/* 0101 */
-	"RA0",			/* 0110 */
-	"WA0",			/* 0111 */
-	"???",			/* 1000 */
-	"???",			/* 1001 */
-	"LOP",			/* 1010 */
-	"???",			/* 1011 */
+	"MC0",          /* 0000 */
+	"MC1",          /* 0001 */
+	"MC2",          /* 0010 */
+	"MC3",          /* 0011 */
+	"RX",           /* 0100 */
+	"PL",           /* 0101 */
+	"RA0",          /* 0110 */
+	"WA0",          /* 0111 */
+	"???",          /* 1000 */
+	"???",          /* 1001 */
+	"LOP",          /* 1010 */
+	"???",          /* 1011 */
 	"PC",           /* 1100 */ //???
-	"???",			/* 1101 */
-	"???",			/* 1110 */
-	"???",			/* 1111 */
+	"???",          /* 1101 */
+	"???",          /* 1110 */
+	"???",          /* 1111 */
 };
 
 static const char *const cond_flags[] =
@@ -267,10 +267,10 @@ static UINT32 decode_opcode(UINT32 pc, const SCUDSP_OPCODE *op_table,UINT32 cur_
 
 	switch(op_table->address_mode_2)
 	{
-		case EA_A:		   print("A"); break;
-		case EA_P:		   print("P"); break;
-		case EA_X:		   print("X"); break;
-		case EA_Y:		   print("Y"); break;
+		case EA_A:         print("A"); break;
+		case EA_P:         print("P"); break;
+		case EA_X:         print("X"); break;
+		case EA_Y:         print("Y"); break;
 		case EA_DSTMEM:    print("%s ", dst_mem[(cur_opcode & 0x00000f00) >> 8]); break;
 		case EA_DMADSTMEM: print("%s ", dst_mem[(cur_opcode & 0x00000300) >> 8]); break;
 		case EA_MVIDSTMEM: print("%s ", mvi_dst_mem[(cur_opcode & 0x3c000000) >> 26]); break;

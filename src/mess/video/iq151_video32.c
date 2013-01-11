@@ -23,15 +23,15 @@ ROM_END
 /* F4 Character Displayer */
 static const gfx_layout iq151_video32_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 //**************************************************************************
@@ -49,7 +49,7 @@ const device_type IQ151_VIDEO32 = &device_creator<iq151_video32_device>;
 //-------------------------------------------------
 
 iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, IQ151_VIDEO32, "IQ151 video32", tag, owner, clock),
+		: device_t(mconfig, IQ151_VIDEO32, "IQ151 video32", tag, owner, clock),
 		device_iq151cart_interface( mconfig, *this )
 {
 }

@@ -26,34 +26,34 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 
-#define LOG_PROT	(0)
+#define LOG_PROT    (0)
 
 /* these values provide a fairly low refresh rate of around 53Hz, but
    they were derived from the schemtics.  The horizontal synch chain
    counts from 0x0c0-0x1ff and the vertical one from 0x0d8-0x1ff.  */
 
-#define MASTER_CLOCK		(10000000)
-#define CPU_CLOCK			(MASTER_CLOCK / 4)
-#define PIXEL_CLOCK			(MASTER_CLOCK / 2)
-#define AY8910_CLOCK		(MASTER_CLOCK / 8)
-#define HCOUNTER_START		(0x0c0)
-#define HCOUNTER_END		(0x1ff)
-#define HTOTAL				(HCOUNTER_END + 1 - HCOUNTER_START)
-#define HBEND				(0x000)
-#define HBSTART				(0x100)
-#define VCOUNTER_START		(0x0d8)
-#define VCOUNTER_END		(0x1ff)
-#define VTOTAL				(VCOUNTER_END + 1 - VCOUNTER_START)
-#define VBEND				(0x048)
-#define VBSTART				(VTOTAL)
+#define MASTER_CLOCK        (10000000)
+#define CPU_CLOCK           (MASTER_CLOCK / 4)
+#define PIXEL_CLOCK         (MASTER_CLOCK / 2)
+#define AY8910_CLOCK        (MASTER_CLOCK / 8)
+#define HCOUNTER_START      (0x0c0)
+#define HCOUNTER_END        (0x1ff)
+#define HTOTAL              (HCOUNTER_END + 1 - HCOUNTER_START)
+#define HBEND               (0x000)
+#define HBSTART             (0x100)
+#define VCOUNTER_START      (0x0d8)
+#define VCOUNTER_END        (0x1ff)
+#define VTOTAL              (VCOUNTER_END + 1 - VCOUNTER_START)
+#define VBEND               (0x048)
+#define VBSTART             (VTOTAL)
 
 /* the IRQ line is cleared (active LO) at these vertical sync counter
    values and raised one scan line later */
-#define INT_TRIGGER_COUNT_1	(0x10f)
-#define INT_TRIGGER_COUNT_2	(0x18f)
+#define INT_TRIGGER_COUNT_1 (0x10f)
+#define INT_TRIGGER_COUNT_2 (0x18f)
 
 
-#define NUM_PENS	(8)
+#define NUM_PENS    (8)
 
 
 class enigma2_state : public driver_device
@@ -235,15 +235,15 @@ UINT32 enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 
 		{
 			offs_t color_map_address = (y >> 3 << 5) | (x >> 3);
 			/* the schematics shows it like this, but it doesn't work as this would
-               produce no stars, due to the contents of the PROM -- maybe there is
-               a star disabled bit somewhere that's connected here instead of flip_screen() */
+			   produce no stars, due to the contents of the PROM -- maybe there is
+			   a star disabled bit somewhere that's connected here instead of flip_screen() */
 			/* star_map_address = (y >> 4 << 6) | (engima2_flip_screen_get() << 5) | (x >> 3); */
 			offs_t star_map_address = (y >> 4 << 6) | 0x20 | (x >> 3);
 
 			offs_t videoram_address = (y << 5) | (x >> 3);
 
 			/* when the screen is flipped, all the video address bits are inverted,
-               and the adder at 16A is activated */
+			   and the adder at 16A is activated */
 			if (m_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
 			video_data = m_videoram[videoram_address];
@@ -313,7 +313,7 @@ UINT32 enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb32
 			offs_t videoram_address = (y << 5) | (x >> 3);
 
 			/* when the screen is flipped, all the video address bits are inverted,
-               and the adder at 16A is activated */
+			   and the adder at 16A is activated */
 			if (m_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
 			video_data = m_videoram[videoram_address];
@@ -364,7 +364,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 	{
 	case 0x01:
 		/* For the DIP switches to be read, protection_data must be
-           0xff on reset. The AY8910 reset ensures this. */
+		   0xff on reset. The AY8910 reset ensures this. */
 		if (m_protection_data != 0xff)
 			ret = m_protection_data ^ 0x88;
 		else
@@ -378,9 +378,9 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 			ret = 0xf4;
 		break;
 
-	case 0x35:	ret = 0x38; break;
-	case 0x51:	ret = 0xaa; break;
-	case 0x79:	ret = 0x38; break;
+	case 0x35:  ret = 0x38; break;
+	case 0x51:  ret = 0xaa; break;
+	case 0x79:  ret = 0x38; break;
 	}
 
 	return ret;
@@ -661,13 +661,13 @@ ROM_START( enigma2 )
 	ROM_LOAD( "2.7d",         0x0800, 0x0800, CRC(173c1329) SHA1(3f1ad46d0e58ab236e4ff2b385d09fbf113627da) )
 	ROM_LOAD( "3.8d",         0x1000, 0x0800, CRC(c7d3e6b1) SHA1(43f7c3a02b46747998260d5469248f21714fe12b) )
 	ROM_LOAD( "4.10d",        0x1800, 0x0800, CRC(c6a7428c) SHA1(3503f09856655c5973fb89f60d1045fe41012aa9) )
-	ROM_LOAD( "5.11d",  	  0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
-	ROM_LOAD( "6.13d",  	  0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
+	ROM_LOAD( "5.11d",        0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
+	ROM_LOAD( "6.13d",        0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "enigma2.s",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
 
-	ROM_REGION( 0x1000, "proms", 0 )	/* color map/star map */
+	ROM_REGION( 0x1000, "proms", 0 )    /* color map/star map */
 	ROM_LOAD( "7.11f",        0x0000, 0x0800, CRC(409b5aad) SHA1(1b774a70f725637458ed68df9ed42476291b0e43) )
 	ROM_LOAD( "8.13f",        0x0800, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
 ROM_END
@@ -680,7 +680,7 @@ ROM_START( enigma2a )
 	ROM_LOAD( "34_en3.bin",   0x1000, 0x0800, CRC(43d06cf4) SHA1(495af05d54c0325efb67347f691e64d194645d85) )
 	ROM_LOAD( "33_en4.bin",   0x1800, 0x0800, CRC(8879a430) SHA1(c97f44bef3741eef74e137d2459e79f1b3a90457) )
 	ROM_LOAD( "5.11d",        0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
-	ROM_LOAD( "6.13d",  	  0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
+	ROM_LOAD( "6.13d",        0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
@@ -714,6 +714,6 @@ DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 
 
 
-GAME( 1981, enigma2,  0,	   enigma2,  enigma2, enigma2_state,  enigma2, ROT270, "Game Plan (Zilec Electronics license)", "Enigma II", GAME_SUPPORTS_SAVE )
+GAME( 1981, enigma2,  0,       enigma2,  enigma2, enigma2_state,  enigma2, ROT270, "Game Plan (Zilec Electronics license)", "Enigma II", GAME_SUPPORTS_SAVE )
 GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics", "Enigma II (Space Invaders hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, enigma2b, enigma2, enigma2a, enigma2a, enigma2_state, enigma2, ROT270, "Zilec Electronics", "Phantoms II (Space Invaders hardware)", GAME_SUPPORTS_SAVE )

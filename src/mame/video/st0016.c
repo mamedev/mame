@@ -159,26 +159,26 @@ WRITE8_MEMBER(st0016_state::st0016_vregs_w)
 {
 	/*
 
-       I/O ports:
+	   I/O ports:
 
-        $a0 \
-        $a1 - source address >> 1
-        $a2 /
+	    $a0 \
+	    $a1 - source address >> 1
+	    $a2 /
 
-        $a3 \
-        $a4 - destination address >> 1  (inside character ram)
-        $a5 /
+	    $a3 \
+	    $a4 - destination address >> 1  (inside character ram)
+	    $a5 /
 
-        $a6 \
-        &a7 - (length inbytes - 1 ) >> 1
+	    $a6 \
+	    &a7 - (length inbytes - 1 ) >> 1
 
-        $a8 - 76543210
-              ??faaaaa
+	    $a8 - 76543210
+	          ??faaaaa
 
-              a - most sign. bits of length
-              f - DMA start latch
+	          a - most sign. bits of length
+	          f - DMA start latch
 
-    */
+	*/
 
 	st0016_vregs[offset]=data;
 	if(offset==0xa8 && (data&0x20))
@@ -215,47 +215,47 @@ WRITE8_MEMBER(st0016_state::st0016_vregs_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/*
-    object ram :
+	object ram :
 
-     each entry is 8 bytes:
+	 each entry is 8 bytes:
 
-       76543210 (bit)
-     0 llllllll
-     1 ---1SSSl
-     2 oooooooo
-     3 fooooooo
-     4 xxxxxxxx
-     5 ------xx
-     6 yyyyyyyy
-     7 ------yy
+	   76543210 (bit)
+	 0 llllllll
+	 1 ---1SSSl
+	 2 oooooooo
+	 3 fooooooo
+	 4 xxxxxxxx
+	 5 ------xx
+	 6 yyyyyyyy
+	 7 ------yy
 
-       1 - always(?) set
-       S - scroll index ? (ports $40-$60, X(word),Y(word) )
-       l - sublist length (8 byte entries -1)
-       o - sublist offset (*8 to get real offset)
-       f - end of list  flag
-       x,y - sprite coords
+	   1 - always(?) set
+	   S - scroll index ? (ports $40-$60, X(word),Y(word) )
+	   l - sublist length (8 byte entries -1)
+	   o - sublist offset (*8 to get real offset)
+	   f - end of list  flag
+	   x,y - sprite coords
 
-     sublist format (8 bytes/entry):
+	 sublist format (8 bytes/entry):
 
-       76543210
-     0 cccccccc
-     1 cccccccc
-     2 --kkkkkk
-     3 QW------
-     4 xxxxxxxx
-     5 -B---XXx
-     6 yyyyyyyy
-     7 -----YYy
+	   76543210
+	 0 cccccccc
+	 1 cccccccc
+	 2 --kkkkkk
+	 3 QW------
+	 4 xxxxxxxx
+	 5 -B---XXx
+	 6 yyyyyyyy
+	 7 -----YYy
 
-      c - character code
-      k - palette
-      QW - flips
-      x,y - coords
-      XX,YY - size (1<<size)
-      B - merge pixel data with prevoius one (8bpp mode - neratte: seta logo and title screen)
+	  c - character code
+	  k - palette
+	  QW - flips
+	  x,y - coords
+	  XX,YY - size (1<<size)
+	  B - merge pixel data with prevoius one (8bpp mode - neratte: seta logo and title screen)
 
-    */
+	*/
 
 	gfx_element *gfx = machine.gfx[st0016_ramgfx];
 	int i,j,lx,ly,x,y,code,offset,length,sx,sy,color,flipx,flipy,scrollx,scrolly/*,plx,ply*/;
@@ -330,12 +330,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				lx=(st0016_spriteram[offset+5]>>2)&3;
 				ly=(st0016_spriteram[offset+7]>>2)&3;
 			/*
-                if(plx |ply) //parent
-                {
-                    lx=plx;
-                    ly=ply;
-                }
-                */
+			    if(plx |ply) //parent
+			    {
+			        lx=plx;
+			        ly=ply;
+			    }
+			    */
 
 				flipx=st0016_spriteram[offset+3]&0x80;
 				flipy=st0016_spriteram[offset+3]&0x40;
@@ -610,7 +610,7 @@ UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &b
 			fprintf(p,"%.4x - %.4x - ",h,h>>3);
 			for(j=0;j<8;j++)
 				fprintf(p,"%.2x ",st0016_spriteram[h+j]);
-			 fprintf(p,"\n");
+				fprintf(p,"\n");
 		}
 		fclose(p);
 	}
@@ -620,4 +620,3 @@ UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &b
 	st0016_draw_screen(screen, bitmap, cliprect);
 	return 0;
 }
-

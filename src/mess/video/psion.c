@@ -103,5 +103,3 @@ WRITE8_MEMBER(psion_custom_lcdc::control_write)
 	else
 		hd44780_device::control_write(space, offset, data);
 }
-
-

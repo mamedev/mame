@@ -37,7 +37,7 @@ void bking_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 0, 0,
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
@@ -273,7 +273,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 
 		UINT32 latch = 0;
 
-		if (m_pc3259_mask == 6)	/* player 1 */
+		if (m_pc3259_mask == 6) /* player 1 */
 		{
 			xld = m_xld1;
 			yld = m_yld1;
@@ -287,7 +287,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 			latch = 0x0c00;
 		}
 
-		if (m_pc3259_mask == 3)	/* player 2 */
+		if (m_pc3259_mask == 3) /* player 2 */
 		{
 			xld = m_xld2;
 			yld = m_yld2;

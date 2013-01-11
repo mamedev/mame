@@ -79,8 +79,8 @@ class isa8_lpt_device :
 		public device_isa8_card_interface
 {
 public:
-        // construction/destruction
-        isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -88,12 +88,12 @@ public:
 
 		bool is_primary() { return m_is_primary; }
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 		virtual void device_config_complete() { m_shortname = "isa_lpt"; }
 private:
-        // internal state
+		// internal state
 		bool m_is_primary;
 };
 

@@ -261,7 +261,7 @@ NO_USE_XINPUT = 1
 ifdef BIGENDIAN
 ifdef SYMBOLS
 CCOMFLAGS += -mlong-branch
-endif	# SYMBOLS
+endif   # SYMBOLS
 ifeq ($(PTR64),1)
 CCOMFLAGS += -arch ppc64
 LDFLAGS += -arch ppc64
@@ -270,7 +270,7 @@ CCOMFLAGS += -arch ppc
 LDFLAGS += -arch ppc
 endif
 $(OBJ)/emu/cpu/tms57002/tms57002.o : CCOMFLAGS += -O0
-else	# BIGENDIAN
+else    # BIGENDIAN
 ifeq ($(PTR64),1)
 CCOMFLAGS += -arch x86_64
 LDFLAGS += -arch x86_64
@@ -278,7 +278,7 @@ else
 CCOMFLAGS += -m32 -arch i386
 LDFLAGS += -m32 -arch i386
 endif
-endif	# BIGENDIAN
+endif   # BIGENDIAN
 
 endif
 
@@ -369,13 +369,13 @@ OBJDIRS += $(SDLOBJ)
 #-------------------------------------------------
 
 OSDCOREOBJS = \
-	$(SDLOBJ)/strconv.o	\
-	$(SDLOBJ)/sdldir.o	\
-	$(SDLOBJ)/sdlfile.o 	\
-	$(SDLOBJ)/sdlptty_$(BASE_TARGETOS).o	\
-	$(SDLOBJ)/sdlsocket.o	\
-	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o	\
-	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o	\
+	$(SDLOBJ)/strconv.o \
+	$(SDLOBJ)/sdldir.o  \
+	$(SDLOBJ)/sdlfile.o     \
+	$(SDLOBJ)/sdlptty_$(BASE_TARGETOS).o    \
+	$(SDLOBJ)/sdlsocket.o   \
+	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o    \
+	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o \
 	$(SDLOBJ)/sdlsync_$(SYNC_IMPLEMENTATION).o     \
 	$(SDLOBJ)/sdlwork.o
 
@@ -444,7 +444,7 @@ endif
 ifeq ($(findstring 4.7.2-2ubuntu1,$(TEST_GCC)),4.7.2-2ubuntu1)
 GCC46TST = $(shell which g++-4.6 2>/dev/null)
 ifeq '$(GCC46TST)' ''
-    $(error Ubuntu 12.10 detected.  Please install the gcc-4.6 and g++-4.6 packages)
+	$(error Ubuntu 12.10 detected.  Please install the gcc-4.6 and g++-4.6 packages)
 endif
 CC = @gcc-4.6
 LD = @g++-4.6
@@ -604,7 +604,7 @@ endif
 LIBS += -lSDL.dll
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
-endif	# Win32
+endif   # Win32
 
 #-------------------------------------------------
 # OS/2

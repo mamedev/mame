@@ -1190,37 +1190,37 @@ static WRITE32_DEVICE_HANDLER( s3c44b0_gpio_w )
 	{
 		case S3C44B0_GPADAT :
 		{
-			 iface_gpio_port_w( device, S3C44B0_GPIO_PORT_A, data & S3C44B0_GPADAT_MASK);
+				iface_gpio_port_w( device, S3C44B0_GPIO_PORT_A, data & S3C44B0_GPADAT_MASK);
 		}
 		break;
 		case S3C44B0_GPBDAT :
 		{
-			 iface_gpio_port_w( device, S3C44B0_GPIO_PORT_B, data & S3C44B0_GPBDAT_MASK);
+				iface_gpio_port_w( device, S3C44B0_GPIO_PORT_B, data & S3C44B0_GPBDAT_MASK);
 		}
 		break;
 		case S3C44B0_GPCDAT :
 		{
-			 iface_gpio_port_w( device, S3C44B0_GPIO_PORT_C, data & S3C44B0_GPCDAT_MASK);
+				iface_gpio_port_w( device, S3C44B0_GPIO_PORT_C, data & S3C44B0_GPCDAT_MASK);
 		}
 		break;
 		case S3C44B0_GPDDAT :
 		{
-			 iface_gpio_port_w( device, S3C44B0_GPIO_PORT_D, data & S3C44B0_GPDDAT_MASK);
+				iface_gpio_port_w( device, S3C44B0_GPIO_PORT_D, data & S3C44B0_GPDDAT_MASK);
 		}
 		break;
 		case S3C44B0_GPEDAT :
 		{
-			 iface_gpio_port_w( device, S3C44B0_GPIO_PORT_E, data & S3C44B0_GPEDAT_MASK);
+				iface_gpio_port_w( device, S3C44B0_GPIO_PORT_E, data & S3C44B0_GPEDAT_MASK);
 		}
 		break;
 		case S3C44B0_GPFDAT :
 		{
-			 iface_gpio_port_w( device, S3C44B0_GPIO_PORT_F, data & S3C44B0_GPFDAT_MASK);
+				iface_gpio_port_w( device, S3C44B0_GPIO_PORT_F, data & S3C44B0_GPFDAT_MASK);
 		}
 		break;
 		case S3C44B0_GPGDAT :
 		{
-			 iface_gpio_port_w( device, S3C44B0_GPIO_PORT_G, data & S3C44B0_GPGDAT_MASK);
+				iface_gpio_port_w( device, S3C44B0_GPIO_PORT_G, data & S3C44B0_GPGDAT_MASK);
 		}
 		break;
 		case S3C44B0_EXTINTPND :
@@ -2070,5 +2070,3 @@ void s3c44b0_device::device_reset()
 {
 	DEVICE_RESET_NAME( s3c44b0 )(this);
 }
-
-

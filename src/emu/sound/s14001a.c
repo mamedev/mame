@@ -296,7 +296,7 @@ static const INT8 DeltaTable[4][4] =
 static INT16 audiofilter(S14001AChip *chip) /* rewrite me to better match the real filter! */
 {
 	UINT8 temp1;
-        INT16 temp2 = 0;
+		INT16 temp2 = 0;
 	/* mean averaging filter! 1/n exponential *would* be somewhat better, but I'm lazy... */
 	for (temp1 = 0; temp1 < 8; temp1++) { temp2 += chip->filtervals[temp1]; }
 	temp2 >>= 3;
@@ -408,8 +408,8 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 	UINT8 CurDelta; // Current delta
 
 	/* on even clocks, audio output is floating, /romen is low so rom data bus is driven
-         * on odd clocks, audio output is driven, /romen is high, state machine 2 is clocked
-         */
+	     * on odd clocks, audio output is driven, /romen is high, state machine 2 is clocked
+	     */
 	chip->oddeven = !(chip->oddeven); // invert the clock
 	if (chip->oddeven == 0) // even clock
 	{
@@ -537,8 +537,8 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 		chip->laststate = chip->machineState;
 		chip->machineState = chip->nextstate;
 
-	        /* the dac is 4 bits wide. if a delta step forced it outside of 4 bits, mask it back over here */
-	        chip->DACOutput &= 0xF;
+			/* the dac is 4 bits wide. if a delta step forced it outside of 4 bits, mask it back over here */
+			chip->DACOutput &= 0xF;
 	}
 }
 
@@ -633,7 +633,7 @@ const device_type S14001A = &device_creator<s14001a_device>;
 
 s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(S14001AChip);
 }
@@ -666,5 +666,3 @@ void s14001a_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

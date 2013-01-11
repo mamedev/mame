@@ -249,8 +249,8 @@ void wd17xx_reset(device_t *device);
 
 /* the following are not strictly part of the wd179x hardware/emulation
 but will be put here for now until the flopdrv code has been finalised more */
-void wd17xx_set_drive(device_t *device, UINT8);		/* set drive wd179x is accessing */
-void wd17xx_set_side(device_t *device, UINT8);		/* set side wd179x is accessing */
+void wd17xx_set_drive(device_t *device, UINT8);     /* set drive wd179x is accessing */
+void wd17xx_set_side(device_t *device, UINT8);      /* set side wd179x is accessing */
 
 void wd17xx_set_pause_time(device_t *device, int usec);       /* default is 40 usec if not set */
 void wd17xx_index_pulse_callback(device_t *controller, device_t *img, int state);

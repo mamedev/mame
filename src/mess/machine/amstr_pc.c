@@ -227,8 +227,8 @@ READ8_HANDLER( pc200_port278_r )
 
 READ8_HANDLER( pc1640_port378_r )
 {
-	 device_t *lpt = space.machine().device("lpt_1");
-	 UINT8 data = pc_lpt_r(lpt, space, offset);
+		device_t *lpt = space.machine().device("lpt_1");
+		UINT8 data = pc_lpt_r(lpt, space, offset);
 
 	if (offset == 1)
 		data=(data & ~7) | (space.machine().root_device().ioport("DSW0")->read() & 7);
@@ -294,7 +294,7 @@ WRITE8_HANDLER( pc1640_mouse_y_w )
 INPUT_PORTS_START( amstrad_keyboard )
 
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2)

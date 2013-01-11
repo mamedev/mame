@@ -430,8 +430,8 @@ static const gfx_layout sp2_layout =
 
 
 static GFXDECODE_START( lastbank )
-	GFXDECODE_ENTRY( "gfx1",		0, bg2_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1",		0, sp2_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1",        0, bg2_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1",        0, sp2_layout, 0, 16 )
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::lastbank_irq_scanline)

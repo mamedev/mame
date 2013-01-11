@@ -96,13 +96,13 @@ void ms32_state::video_start()
 	m_reverse_sprite_order = 1;
 
 	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
-	if (!strcmp(machine().system().name,"kirarast"))	m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"tp2m32"))	m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"47pie2"))	m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"47pie2o"))	m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"hayaosi3"))	m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"bnstars"))	m_reverse_sprite_order = 0;
-	if (!strcmp(machine().system().name,"wpksocv2"))	m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"kirarast"))    m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"tp2m32"))  m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"47pie2"))  m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"47pie2o")) m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"hayaosi3"))    m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"bnstars")) m_reverse_sprite_order = 0;
+	if (!strcmp(machine().system().name,"wpksocv2"))    m_reverse_sprite_order = 0;
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = 0xffff;
@@ -126,9 +126,9 @@ static void update_color(running_machine &machine, int color)
 	int r,g,b;
 
 	/* I'm not sure how the brightness should be applied, currently I'm only
-       affecting bg & sprites, not fg.
-       The second brightness control might apply to shadows, see gametngk.
-     */
+	   affecting bg & sprites, not fg.
+	   The second brightness control might apply to shadows, see gametngk.
+	 */
 	if (~color & 0x4000)
 	{
 		r = ((state->m_palram_16[color*2] & 0xff00) >>8 ) * state->m_brt_r / 0x100;
@@ -204,41 +204,41 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_
 	int xzoom, yzoom;
 	gfx_element *gfx = machine.gfx[gfxnum];
 
-	UINT16		*source	=	sprram_top;
-	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
+	UINT16      *source =   sprram_top;
+	UINT16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
 
 	if (reverseorder == 1)
 	{
-		source	= sprram_top + (sprram_size - 0x10) / 2;
-		finish	= sprram_top;
+		source  = sprram_top + (sprram_size - 0x10) / 2;
+		finish  = sprram_top;
 	}
 
 	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
 	{
-		attr	=	source[ 0 ];
+		attr    =   source[ 0 ];
 		pri = (attr & 0x00f0);
 
-		if ((attr & 0x0004) == 0)			continue;
+		if ((attr & 0x0004) == 0)           continue;
 
-		flipx	=	attr & 1;
-		flipy	=	attr & 2;
-		code	=	source[ 1 ];
-		color	=	source[ 2 ];
-		tx		=	(code >> 0) & 0xff;
-		ty		=	(code >> 8) & 0xff;
+		flipx   =   attr & 1;
+		flipy   =   attr & 2;
+		code    =   source[ 1 ];
+		color   =   source[ 2 ];
+		tx      =   (code >> 0) & 0xff;
+		ty      =   (code >> 8) & 0xff;
 
-		code	=	(color & 0x0fff);
-		color	=	(color >> 12) & 0xf;
-		size	=	source[ 3 ];
+		code    =   (color & 0x0fff);
+		color   =   (color >> 12) & 0xf;
+		size    =   source[ 3 ];
 
-		xsize	=	((size >> 0) & 0xff) + 1;
-		ysize	=	((size >> 8) & 0xff) + 1;
+		xsize   =   ((size >> 0) & 0xff) + 1;
+		ysize   =   ((size >> 8) & 0xff) + 1;
 
-		sx		=	(source[5] & 0x3ff) - (source[5] & 0x400);
-		sy		=	(source[4] & 0x1ff) - (source[4] & 0x200);
+		sx      =   (source[5] & 0x3ff) - (source[5] & 0x400);
+		sy      =   (source[4] & 0x1ff) - (source[4] & 0x200);
 
-		xzoom	=	(source[ 6 ]&0xffff);
-		yzoom	=	(source[ 7 ]&0xffff);
+		xzoom   =   (source[ 6 ]&0xffff);
+		yzoom   =   (source[ 7 ]&0xffff);
 
 		{
 			if (!yzoom || !xzoom)
@@ -261,7 +261,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_
 					sx,sy,
 					xzoom, yzoom, bitmap_pri,0, 0);
 		}
-	}	/* end sprite loop */
+	}   /* end sprite loop */
 }
 
 
@@ -270,7 +270,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 	ms32_state *state = machine.driver_data<ms32_state>();
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
-	if (state->m_roz_ctrl[0x5c/4] & 1)	/* "super" mode */
+	if (state->m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
 		rectangle my_clip;
 		int y,maxy;
@@ -296,8 +296,8 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 
 			my_clip.min_y = my_clip.max_y = y;
 
-			offsx += (state->m_roz_ctrl[0x38/4] & 1) * 0x400;	// ??? gratia, hayaosi1...
-			offsy += (state->m_roz_ctrl[0x3c/4] & 1) * 0x400;	// ??? gratia, hayaosi1...
+			offsx += (state->m_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+			offsy += (state->m_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
 
 			/* extend sign */
 			if (start2x & 0x20000) start2x |= ~0x3ffff;
@@ -316,7 +316,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 			y++;
 		}
 	}
-	else	/* "simple" mode */
+	else    /* "simple" mode */
 	{
 		int startx = (state->m_roz_ctrl[0x00/4] & 0xffff) | ((state->m_roz_ctrl[0x04/4] & 3) << 16);
 		int starty = (state->m_roz_ctrl[0x08/4] & 0xffff) | ((state->m_roz_ctrl[0x0c/4] & 3) << 16);
@@ -327,8 +327,8 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 		int offsx  = state->m_roz_ctrl[0x30/4];
 		int offsy  = state->m_roz_ctrl[0x34/4];
 
-		offsx += (state->m_roz_ctrl[0x38/4] & 1) * 0x400;	// ??? gratia, hayaosi1...
-		offsy += (state->m_roz_ctrl[0x3c/4] & 1) * 0x400;	// ??? gratia, hayaosi1...
+		offsx += (state->m_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+		offsy += (state->m_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
 
 		/* extend sign */
 		if (startx & 0x20000) startx |= ~0x3ffff;
@@ -356,16 +356,16 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 	int rot_pri;
 
 	/* TODO: registers 0x04/4 and 0x10/4 are used too; the most interesting case
-       is gametngk, where they are *usually*, but not always, copies of 0x00/4
-       and 0x0c/4 (used for scrolling).
-       0x10/4 is 0xdf in most games (apart from gametngk's special case), but
-       it's 0x00 in hayaosi1 and kirarast, and 0xe2 (!) in gratia's tx layer.
-       The two registers might be somewhat related to the width and height of the
-       tilemaps, but there's something that just doesn't fit.
-     */
+	   is gametngk, where they are *usually*, but not always, copies of 0x00/4
+	   and 0x0c/4 (used for scrolling).
+	   0x10/4 is 0xdf in most games (apart from gametngk's special case), but
+	   it's 0x00 in hayaosi1 and kirarast, and 0xe2 (!) in gratia's tx layer.
+	   The two registers might be somewhat related to the width and height of the
+	   tilemaps, but there's something that just doesn't fit.
+	 */
 	int i;
 
-	for (i = 0;i < 0x10000;i++)	// colors 0x3000-0x3fff are not used
+	for (i = 0;i < 0x10000;i++) // colors 0x3000-0x3fff are not used
 		update_color(machine(), i);
 
 	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;
@@ -386,8 +386,8 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
-       top and bottom of the screen becomes black on black) */
-	m_temp_bitmap_tilemaps.fill(0, cliprect);	/* bg color */
+	   top and bottom of the screen becomes black on black) */
+	m_temp_bitmap_tilemaps.fill(0, cliprect);   /* bg color */
 
 	/* clear our sprite bitmaps */
 	m_temp_bitmap_sprites.fill(0, cliprect);
@@ -459,8 +459,8 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 
 	/* MIX it! */
 	/* this mixing isn't 100% accurate, it should be using ALL the data in
-       the priority ram, probably for per-pixel / pen mixing, or more levels
-       than are supported here..  I don't know, it will need hw tests I think */
+	   the priority ram, probably for per-pixel / pen mixing, or more levels
+	   than are supported here..  I don't know, it will need hw tests I think */
 	{
 		int xx, yy;
 		int width = screen.width();

@@ -112,13 +112,13 @@ WRITE8_MEMBER(superqix_state::superqix_bitmapram2_w)
 WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 {
 	/*
-     -------0  ? [not used]
-     ------1-  coin counter 1
-     -----2--  coin counter 2
-     ----3---  rom 2 HI (reserved for ROM banking , not used)
-     ---4----  nmi enable/disable
-     --5-----  flip screen
-    */
+	 -------0  ? [not used]
+	 ------1-  coin counter 1
+	 -----2--  coin counter 2
+	 ----3---  rom 2 HI (reserved for ROM banking , not used)
+	 ---4----  nmi enable/disable
+	 --5-----  flip screen
+	*/
 
 	coin_counter_w(machine(), 0,data & 0x02);
 	coin_counter_w(machine(), 1,data & 0x04);

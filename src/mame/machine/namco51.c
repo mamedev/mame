@@ -63,13 +63,13 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-#define READ_PORT(st,num)			(st)->m_in[num](0)
-#define WRITE_PORT(st,num,data) 	(st)->m_out[num](0, data)
+#define READ_PORT(st,num)           (st)->m_in[num](0)
+#define WRITE_PORT(st,num,data)     (st)->m_out[num](0, data)
 
 
 struct namco_51xx_state
 {
-	device_t *	m_cpu;
+	device_t *  m_cpu;
 	devcb_resolved_read8 m_in[4];
 	devcb_resolved_write8 m_out[2];
 	INT32 m_lastcoins;
@@ -116,10 +116,10 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 	{
 		switch (data)
 		{
-			case 0:	// nop
+			case 0: // nop
 				break;
 
-			case 1:	// set coinage
+			case 1: // set coinage
 				state->m_coincred_mode = 4;
 				/* this is a good time to reset the credits counter */
 				state->m_credits = 0;
@@ -148,20 +148,20 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 				}
 				break;
 
-			case 2:	// go in "credits" mode and enable start buttons
+			case 2: // go in "credits" mode and enable start buttons
 				state->m_mode = 1;
 				state->m_in_count = 0;
 				break;
 
-			case 3:	// disable joystick remapping
+			case 3: // disable joystick remapping
 				state->m_remap_joy = 0;
 				break;
 
-			case 4:	// enable joystick remapping
+			case 4: // enable joystick remapping
 				state->m_remap_joy = 1;
 				break;
 
-			case 5:	// go in "switch" mode
+			case 5: // go in "switch" mode
 				state->m_mode = 0;
 				state->m_in_count = 0;
 				break;
@@ -191,7 +191,7 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 */
 static const int joy_map[16] =
 /*  LDRU, LDR, LDU,  LD, LRU, LR,  LU,    L, DRU,  DR,  DU,   D,  RU,   R,   U, center */
-{	 0xf, 0xe, 0xd, 0x5, 0xc, 0x9, 0x7, 0x6, 0xb, 0x3, 0xa, 0x4, 0x1, 0x2, 0x0, 0x8 };
+{    0xf, 0xe, 0xd, 0x5, 0xc, 0x9, 0x7, 0x6, 0xb, 0x3, 0xa, 0x4, 0x1, 0x2, 0x0, 0x8 };
 
 
 READ8_DEVICE_HANDLER( namco_51xx_read )
@@ -200,22 +200,22 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 
 	LOG(("%s: custom 51XX read\n",space.machine().describe_context()));
 
-	if (state->m_mode == 0)	/* switch mode */
+	if (state->m_mode == 0) /* switch mode */
 	{
 		switch ((state->m_in_count++) % 3)
 		{
 			default:
 			case 0: return READ_PORT(state,0) | (READ_PORT(state,1) << 4);
 			case 1: return READ_PORT(state,2) | (READ_PORT(state,3) << 4);
-			case 2: return 0;	// nothing?
+			case 2: return 0;   // nothing?
 		}
 	}
-	else	/* credits mode */
+	else    /* credits mode */
 	{
 		switch ((state->m_in_count++) % 3)
 		{
 			default:
-			case 0:	// number of credits in BCD format
+			case 0: // number of credits in BCD format
 				{
 					int in,toggle;
 
@@ -227,16 +227,16 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 					{
 						if (state->m_credits >= 99)
 						{
-							WRITE_PORT(state,1,1);	// coin lockout
+							WRITE_PORT(state,1,1);  // coin lockout
 						}
 						else
 						{
-							WRITE_PORT(state,1,0);	// coin lockout
+							WRITE_PORT(state,1,0);  // coin lockout
 							/* check if the user inserted a coin */
 							if (toggle & in & 0x10)
 							{
 								state->m_coins[0]++;
-								WRITE_PORT(state,0,0x04);	// coin counter
+								WRITE_PORT(state,0,0x04);   // coin counter
 								WRITE_PORT(state,0,0x0c);
 								if (state->m_coins[0] >= state->m_coins_per_cred[0])
 								{
@@ -247,7 +247,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 							if (toggle & in & 0x20)
 							{
 								state->m_coins[1]++;
-								WRITE_PORT(state,0,0x08);	// coin counter
+								WRITE_PORT(state,0,0x08);   // coin counter
 								WRITE_PORT(state,0,0x0c);
 								if (state->m_coins[1] >= state->m_coins_per_cred[1])
 								{
@@ -261,18 +261,18 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 							}
 						}
 					}
-					else state->m_credits = 100;	// free play
+					else state->m_credits = 100;    // free play
 
 					if (state->m_mode == 1)
 					{
 						int on = (space.machine().primary_screen->frame_number() & 0x10) >> 4;
 
 						if (state->m_credits >= 2)
-							WRITE_PORT(state,0,0x0c | 3*on);	// lamps
+							WRITE_PORT(state,0,0x0c | 3*on);    // lamps
 						else if (state->m_credits >= 1)
-							WRITE_PORT(state,0,0x0c | 2*on);	// lamps
+							WRITE_PORT(state,0,0x0c | 2*on);    // lamps
 						else
-							WRITE_PORT(state,0,0x0c);	// lamps off
+							WRITE_PORT(state,0,0x0c);   // lamps off
 
 						/* check for 1 player start button */
 						if (toggle & in & 0x04)
@@ -281,7 +281,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 							{
 								state->m_credits--;
 								state->m_mode = 2;
-								WRITE_PORT(state,0,0x0c);	// lamps off
+								WRITE_PORT(state,0,0x0c);   // lamps off
 							}
 						}
 						/* check for 2 players start button */
@@ -291,13 +291,13 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 							{
 								state->m_credits -= 2;
 								state->m_mode = 2;
-								WRITE_PORT(state, 0,0x0c);	// lamps off
+								WRITE_PORT(state, 0,0x0c);  // lamps off
 							}
 						}
 					}
 				}
 
-				if (~READ_PORT(state, 1) & 0x08)	/* check test mode switch */
+				if (~READ_PORT(state, 1) & 0x08)    /* check test mode switch */
 					return 0xbb;
 
 				return (state->m_credits / 10) * 16 + state->m_credits % 10;
@@ -360,7 +360,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( namco_51xx )
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
+	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
 	MCFG_CPU_IO_MAP(namco_51xx_map_io)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
@@ -495,5 +495,3 @@ const rom_entry *namco_51xx_device::device_rom_region() const
 {
 	return ROM_NAME(namco_51xx );
 }
-
-

@@ -81,7 +81,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 		pal[2] = m_ula.current_pal[8];
 		pal[3] = m_ula.current_pal[10];
 		break;
-	case 2:	/* 16 colour mode */
+	case 2: /* 16 colour mode */
 		for( i = 0; i < 16; i++ )
 			pal[i] = m_ula.current_pal[i];
 	}

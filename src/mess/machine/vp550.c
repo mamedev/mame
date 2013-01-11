@@ -26,8 +26,8 @@
 #define LOG 0
 
 
-#define CDP1863_A_TAG	"u1"
-#define CDP1863_B_TAG	"u2"
+#define CDP1863_A_TAG   "u1"
+#define CDP1863_B_TAG   "u2"
 
 
 enum
@@ -196,7 +196,7 @@ WRITE8_MEMBER( vp550_device::octave_w )
 		case 0: clock2 = m_slot->clock() / 8; break;
 		case 1: clock2 = m_slot->clock() / 4; break;
 		case 2: clock2 = m_slot->clock() / 2; break;
-		case 3: clock2 = m_slot->clock();	  break;
+		case 3: clock2 = m_slot->clock();     break;
 		}
 	}
 

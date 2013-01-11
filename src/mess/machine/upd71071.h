@@ -7,11 +7,11 @@ struct upd71071_intf
 {
 	const char* cputag;
 	int clock;
-	devcb_write_line	m_out_hreq_cb;
-	devcb_write_line	m_out_eop_cb;
+	devcb_write_line    m_out_hreq_cb;
+	devcb_write_line    m_out_eop_cb;
 	UINT16 (*dma_read[4])(running_machine &machine);
 	void (*dma_write[4])(running_machine &machine, UINT16 data);
-	devcb_write_line	m_out_dack_cb[4];
+	devcb_write_line    m_out_dack_cb[4];
 };
 
 int upd71071_dmarq(device_t* device,int state,int channel);

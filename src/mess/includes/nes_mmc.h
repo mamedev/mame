@@ -108,9 +108,9 @@ enum
 };
 
 // these are used to setup the proper PCB ID, for each supported type of files
-int nes_get_pcb_id(running_machine &machine, const char *feature);	// for softlist
-void unif_mapr_setup(running_machine &machine, const char *board);	// for UNIF files
-int nes_get_mmc_id(running_machine &machine, int mapper);	// for iNES files
+int nes_get_pcb_id(running_machine &machine, const char *feature);  // for softlist
+void unif_mapr_setup(running_machine &machine, const char *board);  // for UNIF files
+int nes_get_mmc_id(running_machine &machine, int mapper);   // for iNES files
 
 // these are used to setup handlers and callbacks necessary to the emulation (resp. at start and reset)
 void pcb_handlers_setup(running_machine &machine);
@@ -119,29 +119,29 @@ int nes_pcb_reset(running_machine &machine);
 //TEMPORARY PPU STUFF
 
 /* mirroring types */
-#define PPU_MIRROR_NONE		0
-#define PPU_MIRROR_VERT		1
-#define PPU_MIRROR_HORZ		2
-#define PPU_MIRROR_HIGH		3
-#define PPU_MIRROR_LOW		4
-#define PPU_MIRROR_4SCREEN	5	// Same effect as NONE, but signals that we should never mirror
+#define PPU_MIRROR_NONE     0
+#define PPU_MIRROR_VERT     1
+#define PPU_MIRROR_HORZ     2
+#define PPU_MIRROR_HIGH     3
+#define PPU_MIRROR_LOW      4
+#define PPU_MIRROR_4SCREEN  5   // Same effect as NONE, but signals that we should never mirror
 
 void set_nt_mirroring(running_machine &machine, int mirroring);
 
 struct chr_bank
 {
-	int source;	//defines source of base pointer
+	int source; //defines source of base pointer
 	int origin; //defines offset of 0x400 byte segment at base pointer
-	UINT8* access;	//source translated + origin -> valid pointer!
+	UINT8* access;  //source translated + origin -> valid pointer!
 };
 
 
 struct name_table
 {
-	int source;		/* defines source of base pointer */
-	int origin;		/* defines offset of 0x400 byte segment at base pointer */
-	int writable;	/* ExRAM, at least, can be write-protected AND used as nametable */
-	UINT8* access;	/* direct access when possible */
+	int source;     /* defines source of base pointer */
+	int origin;     /* defines offset of 0x400 byte segment at base pointer */
+	int writable;   /* ExRAM, at least, can be write-protected AND used as nametable */
+	UINT8* access;  /* direct access when possible */
 };
 
 typedef void (*nes_prg_callback)(running_machine &machine, int start, int bank);
@@ -157,7 +157,7 @@ public:
 	chr_bank      m_chr_map[8];  //quick banking structure, because some of this changes multiple times per scanline!
 	name_table    m_nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
-	nes_prg_callback    m_mmc3_prg_cb;	// these are used to simplify a lot emulation of some MMC3 pirate clones
+	nes_prg_callback    m_mmc3_prg_cb;  // these are used to simplify a lot emulation of some MMC3 pirate clones
 	nes_chr_callback    m_mmc3_chr_cb;
 
 	// mapper variables (to be sorted out at some point, to split more complex mappers as separate devices)
@@ -198,20 +198,20 @@ public:
 	UINT8      m_IRQ_clear;
 	int        m_mult1, m_mult2;
 
-	UINT8 m_mmc_chr_source;			// This is set at init to CHRROM or CHRRAM. a few mappers can swap between
+	UINT8 m_mmc_chr_source;         // This is set at init to CHRROM or CHRRAM. a few mappers can swap between
 	// the two (this is done in the specific handlers).
 
-	UINT8 m_mmc_cmd1, m_mmc_cmd2;		// These represent registers where the mapper writes important values
-	UINT8 m_mmc_count;				// This is used as counter in mappers like 1 and 45
+	UINT8 m_mmc_cmd1, m_mmc_cmd2;       // These represent registers where the mapper writes important values
+	UINT8 m_mmc_count;              // This is used as counter in mappers like 1 and 45
 
-	int m_mmc_prg_base, m_mmc_prg_mask;	// MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
-	int m_mmc_chr_base, m_mmc_chr_mask;	// while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
+	int m_mmc_prg_base, m_mmc_prg_mask; // MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
+	int m_mmc_chr_base, m_mmc_chr_mask; // while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
 
-	UINT8 m_mmc_prg_bank[6];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
-	UINT8 m_mmc_vrom_bank[16];			// hence these are handy to latch bank values.
+	UINT8 m_mmc_prg_bank[6];                // Many mappers writes only some bits of the selected bank (for both PRG and CHR),
+	UINT8 m_mmc_vrom_bank[16];          // hence these are handy to latch bank values.
 
-	UINT16 m_MMC5_vrom_bank[12];			// MMC5 has 10bit wide VROM regs!
-	UINT8 m_mmc_extra_bank[16];			// some MMC3 clone have 2 series of PRG/CHR banks...
+	UINT16 m_MMC5_vrom_bank[12];            // MMC5 has 10bit wide VROM regs!
+	UINT8 m_mmc_extra_bank[16];         // some MMC3 clone have 2 series of PRG/CHR banks...
 	// we collect them all here: first 4 elements PRG banks, then 6/8 CHR banks
 
 	UINT8 m_mmc_latch1, m_mmc_latch2;
@@ -242,9 +242,9 @@ public:
 	// but be careful that MMC3 clones often use state->m_mmc_cmd1/state->m_mmc_cmd2 (from base MMC3) AND additional regs below!
 	UINT8 m_mapper83_reg[10];
 	UINT8 m_mapper83_low_reg[4];
-	UINT8 m_txc_reg[4];	// used by mappers 132, 172 & 173
-	UINT8 m_subor_reg[4];	// used by mappers 166 & 167
-	UINT8 m_sachen_reg[8];	// used by mappers 137, 138, 139 & 141
+	UINT8 m_txc_reg[4]; // used by mappers 132, 172 & 173
+	UINT8 m_subor_reg[4];   // used by mappers 166 & 167
+	UINT8 m_sachen_reg[8];  // used by mappers 137, 138, 139 & 141
 	UINT8 m_map52_reg_written;
 	UINT8 m_map114_reg, m_map114_reg_enabled;
 
@@ -541,21 +541,21 @@ public:
 	UINT32      m_mapper_bram_size;
 
 	/* load-time cart variables which remain constant */
-	UINT16 m_prg_chunks;		// iNES 2.0 allows for more chunks (a recently dumped multigame cart has 256 chunks of both PRG & CHR!)
+	UINT16 m_prg_chunks;        // iNES 2.0 allows for more chunks (a recently dumped multigame cart has 256 chunks of both PRG & CHR!)
 	UINT16 m_chr_chunks;
 	UINT16 m_vram_chunks;
 	UINT8 m_trainer;
-	UINT8 m_battery;			// if there is PRG RAM with battery backup
+	UINT8 m_battery;            // if there is PRG RAM with battery backup
 	UINT32 m_battery_size;
-	UINT8 m_prg_ram;			// if there is PRG RAM with no backup
+	UINT8 m_prg_ram;            // if there is PRG RAM with no backup
 	UINT32 m_wram_size;
 
 	/* system variables which don't change at run-time */
-	UINT16 m_mapper;		// for iNES
-	UINT16 m_pcb_id;		// for UNIF & xml
+	UINT16 m_mapper;        // for iNES
+	UINT16 m_pcb_id;        // for UNIF & xml
 	UINT8 m_four_screen_vram;
 	UINT8 m_hard_mirroring;
-	UINT8 m_crc_hack;	// this is needed to detect different boards sharing the same Mappers (shame on .nes format)
+	UINT8 m_crc_hack;   // this is needed to detect different boards sharing the same Mappers (shame on .nes format)
 	UINT8 m_ines20;
 
 	// things below are included here for the moment, even if probably would better fit nes_state
@@ -565,7 +565,7 @@ public:
 	cpu_device        *m_maincpu;
 	ppu2c0x_device    *m_ppu;
 	device_t          *m_sound;
-	emu_timer	      *m_irq_timer;
+	emu_timer         *m_irq_timer;
 
 //private:
 
@@ -580,7 +580,7 @@ public:
 	void prg8_ab(int bank);
 	void prg8_cd(int bank);
 	void prg8_ef(int bank);
-	void prg8_67(int bank);	// a bunch of pcbs can bank ROM in WRAM area!
+	void prg8_67(int bank); // a bunch of pcbs can bank ROM in WRAM area!
 	void prg8_x(int start, int bank);
 	// CHR 8k bankswitch
 	void chr8(int bank, int source);

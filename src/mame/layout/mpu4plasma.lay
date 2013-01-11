@@ -20,7 +20,7 @@
 		</rect>
 	</element>
 	<element name="Steppers" defstate="0">
-    	<simplecounter maxstate="999" digits="3">
+		<simplecounter maxstate="999" digits="3">
 		<color red="1.0" green="1.0" blue="1.0" />
 		<bounds x="0" y="0" width="1" height="1" />
 		</simplecounter>
@@ -507,9 +507,9 @@
 			<bounds x="122" y="280" width="7" height="24"/>
 		</backdrop>
 
-    <screen index="0">
-      <bounds x="32" y="64" width="200" height="75" />
-    </screen>
+	<screen index="0">
+		<bounds x="32" y="64" width="200" height="75" />
+	</screen>
 
-  </view>
+	</view>
 	</mamelayout>

@@ -138,7 +138,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 		int flipx = attr & 0x0100;
 		int flipy = attr & 0x0200;
 
-		if (attr & 0x400)	/* large sprite */
+		if (attr & 0x400)   /* large sprite */
 		{
 			int c1, c2, c3, c4, t;
 

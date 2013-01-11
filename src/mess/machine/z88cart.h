@@ -60,7 +60,7 @@
 
 struct z88cart_interface
 {
-    devcb_write_line				m_out_flp_cb;
+	devcb_write_line                m_out_flp_cb;
 };
 
 
@@ -84,9 +84,9 @@ public:
 // ======================> z88cart_slot_device
 
 class z88cart_slot_device : public device_t,
-						    public z88cart_interface,
+							public z88cart_interface,
 							public device_image_interface,
-						    public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -123,9 +123,9 @@ public:
 private:
 	static const device_timer_id TIMER_FLP_CLEAR = 0;
 
-	devcb_resolved_write_line		m_out_flp_func;
-	device_z88cart_interface*		m_cart;
-	emu_timer *						m_flp_timer;
+	devcb_resolved_write_line       m_out_flp_func;
+	device_z88cart_interface*       m_cart;
+	emu_timer *                     m_flp_timer;
 };
 
 

@@ -18,7 +18,7 @@
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
-#define LVIV_SNAPSHOT_SIZE	82219
+#define LVIV_SNAPSHOT_SIZE  82219
 
 
 
@@ -101,7 +101,7 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_porta_r)
 
 READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
 {
-	return	((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : machine().root_device().ioport("KEY0")->read()) &
+	return  ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : machine().root_device().ioport("KEY0")->read()) &
 		((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : machine().root_device().ioport("KEY1")->read()) &
 		((m_ppi_port_outputs[1][0] & 0x04) ? 0xff : machine().root_device().ioport("KEY2")->read()) &
 		((m_ppi_port_outputs[1][0] & 0x08) ? 0xff : machine().root_device().ioport("KEY3")->read()) &
@@ -113,7 +113,7 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
 
 READ8_MEMBER(lviv_state::lviv_ppi_1_portc_r)/* keyboard reading */
 {
-	return	((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : machine().root_device().ioport("KEY8")->read()) &
+	return  ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : machine().root_device().ioport("KEY8")->read()) &
 		((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : machine().root_device().ioport("KEY9" )->read()) &
 		((m_ppi_port_outputs[1][2] & 0x04) ? 0xff : machine().root_device().ioport("KEY10")->read()) &
 		((m_ppi_port_outputs[1][2] & 0x08) ? 0xff : ioport("KEY11")->read());
@@ -140,7 +140,7 @@ READ8_MEMBER(lviv_state::lviv_io_r)
 {
 	if (m_startup_mem_map)
 	{
-		return 0;	/* ??? */
+		return 0;   /* ??? */
 	}
 	else
 	{
@@ -156,7 +156,7 @@ READ8_MEMBER(lviv_state::lviv_io_r)
 		case 3:
 		default:
 			/* reserved for extension? */
-			return 0;	/* ??? */
+			return 0;   /* ??? */
 		}
 	}
 }
@@ -359,4 +359,3 @@ SNAPSHOT_LOAD( lviv )
 	logerror("Snapshot file loaded\n");
 	return IMAGE_INIT_PASS;
 }
-

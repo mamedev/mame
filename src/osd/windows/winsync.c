@@ -53,7 +53,7 @@
 //  DEBUGGING
 //============================================================
 
-#define DEBUG_SLOW_LOCKS	0
+#define DEBUG_SLOW_LOCKS    0
 
 
 
@@ -65,7 +65,7 @@ typedef BOOL (WINAPI *try_enter_critical_section_ptr)(LPCRITICAL_SECTION lpCriti
 
 struct osd_lock
 {
-	CRITICAL_SECTION	critsect;
+	CRITICAL_SECTION    critsect;
 };
 
 

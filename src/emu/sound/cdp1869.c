@@ -28,15 +28,15 @@
 
 #define LOG 0
 
-#define CDP1869_WEIGHT_RED		30 // % of max luminance
-#define CDP1869_WEIGHT_GREEN	59
-#define CDP1869_WEIGHT_BLUE		11
+#define CDP1869_WEIGHT_RED      30 // % of max luminance
+#define CDP1869_WEIGHT_GREEN    59
+#define CDP1869_WEIGHT_BLUE     11
 
-#define CDP1869_COLUMNS_HALF	20
-#define CDP1869_COLUMNS_FULL	40
-#define CDP1869_ROWS_HALF		12
-#define CDP1869_ROWS_FULL_PAL	25
-#define CDP1869_ROWS_FULL_NTSC	24
+#define CDP1869_COLUMNS_HALF    20
+#define CDP1869_COLUMNS_FULL    40
+#define CDP1869_ROWS_HALF       12
+#define CDP1869_ROWS_FULL_PAL   25
+#define CDP1869_ROWS_FULL_NTSC  24
 
 enum
 {
@@ -324,10 +324,10 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 
 cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
+		device_sound_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		m_stream(NULL),
+		m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
 {
 
 }
@@ -622,17 +622,17 @@ void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 WRITE8_MEMBER( cdp1869_device::out3_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0   bkg green
-        1   bkg blue
-        2   bkg red
-        3   cfc
-        4   disp off
-        5   colb0
-        6   colb1
-        7   fres horz
-    */
+	    0   bkg green
+	    1   bkg blue
+	    2   bkg red
+	    3   cfc
+	    4   disp off
+	    5   colb0
+	    6   colb1
+	    7   fres horz
+	*/
 
 	m_bkg = data & 0x07;
 	m_cfc = BIT(data, 3);
@@ -649,25 +649,25 @@ WRITE8_MEMBER( cdp1869_device::out3_w )
 WRITE8_MEMBER( cdp1869_device::out4_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0   tone amp 2^0
-        1   tone amp 2^1
-        2   tone amp 2^2
-        3   tone amp 2^3
-        4   tone freq sel0
-        5   tone freq sel1
-        6   tone freq sel2
-        7   tone off
-        8   tone / 2^0
-        9   tone / 2^1
-       10   tone / 2^2
-       11   tone / 2^3
-       12   tone / 2^4
-       13   tone / 2^5
-       14   tone / 2^6
-       15   always 0
-    */
+	    0   tone amp 2^0
+	    1   tone amp 2^1
+	    2   tone amp 2^2
+	    3   tone amp 2^3
+	    4   tone freq sel0
+	    5   tone freq sel1
+	    6   tone freq sel2
+	    7   tone off
+	    8   tone / 2^0
+	    9   tone / 2^1
+	   10   tone / 2^2
+	   11   tone / 2^3
+	   12   tone / 2^4
+	   13   tone / 2^5
+	   14   tone / 2^6
+	   15   always 0
+	*/
 
 	m_toneamp = offset & 0x0f;
 	m_tonefreq = (offset & 0x70) >> 4;
@@ -685,25 +685,25 @@ WRITE8_MEMBER( cdp1869_device::out4_w )
 WRITE8_MEMBER( cdp1869_device::out5_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0   cmem access mode
-        1   x
-        2   x
-        3   9-line
-        4   x
-        5   16 line hi-res
-        6   double page
-        7   fres vert
-        8   wn amp 2^0
-        9   wn amp 2^1
-       10   wn amp 2^2
-       11   wn amp 2^3
-       12   wn freq sel0
-       13   wn freq sel1
-       14   wn freq sel2
-       15   wn off
-    */
+	    0   cmem access mode
+	    1   x
+	    2   x
+	    3   9-line
+	    4   x
+	    5   16 line hi-res
+	    6   double page
+	    7   fres vert
+	    8   wn amp 2^0
+	    9   wn amp 2^1
+	   10   wn amp 2^2
+	   11   wn amp 2^3
+	   12   wn freq sel0
+	   13   wn freq sel1
+	   14   wn freq sel2
+	   15   wn off
+	*/
 
 	m_cmem = BIT(offset, 0);
 	m_line9 = BIT(offset, 3);
@@ -734,25 +734,25 @@ WRITE8_MEMBER( cdp1869_device::out5_w )
 WRITE8_MEMBER( cdp1869_device::out6_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0   pma0 reg
-        1   pma1 reg
-        2   pma2 reg
-        3   pma3 reg
-        4   pma4 reg
-        5   pma5 reg
-        6   pma6 reg
-        7   pma7 reg
-        8   pma8 reg
-        9   pma9 reg
-       10   pma10 reg
-       11   x
-       12   x
-       13   x
-       14   x
-       15   x
-    */
+	    0   pma0 reg
+	    1   pma1 reg
+	    2   pma2 reg
+	    3   pma3 reg
+	    4   pma4 reg
+	    5   pma5 reg
+	    6   pma6 reg
+	    7   pma7 reg
+	    8   pma8 reg
+	    9   pma9 reg
+	   10   pma10 reg
+	   11   x
+	   12   x
+	   13   x
+	   14   x
+	   15   x
+	*/
 
 	m_pma = offset & 0x7ff;
 }
@@ -765,25 +765,25 @@ WRITE8_MEMBER( cdp1869_device::out6_w )
 WRITE8_MEMBER( cdp1869_device::out7_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0   x
-        1   x
-        2   hma2 reg
-        3   hma3 reg
-        4   hma4 reg
-        5   hma5 reg
-        6   hma6 reg
-        7   hma7 reg
-        8   hma8 reg
-        9   hma9 reg
-       10   hma10 reg
-       11   x
-       12   x
-       13   x
-       14   x
-       15   x
-    */
+	    0   x
+	    1   x
+	    2   hma2 reg
+	    3   hma3 reg
+	    4   hma4 reg
+	    5   hma5 reg
+	    6   hma6 reg
+	    7   hma7 reg
+	    8   hma8 reg
+	    9   hma9 reg
+	   10   hma10 reg
+	   11   x
+	   12   x
+	   13   x
+	   14   x
+	   15   x
+	*/
 
 	m_hma = offset & 0x7fc;
 }

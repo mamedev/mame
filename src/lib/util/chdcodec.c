@@ -79,7 +79,7 @@ private:
 	static void fast_free(voidpf opaque, voidpf address);
 
 	static const int MAX_ZLIB_ALLOCS = 64;
-	UINT32 *				m_allocptr[MAX_ZLIB_ALLOCS];
+	UINT32 *                m_allocptr[MAX_ZLIB_ALLOCS];
 };
 
 
@@ -98,8 +98,8 @@ public:
 
 private:
 	// internal state
-	z_stream				m_deflater;
-	chd_zlib_allocator		m_allocator;
+	z_stream                m_deflater;
+	chd_zlib_allocator      m_allocator;
 };
 
 
@@ -118,8 +118,8 @@ public:
 
 private:
 	// internal state
-	z_stream				m_inflater;
-	chd_zlib_allocator		m_allocator;
+	z_stream                m_inflater;
+	chd_zlib_allocator      m_allocator;
 };
 
 
@@ -139,7 +139,7 @@ private:
 	static void fast_free(void *p, void *address);
 
 	static const int MAX_LZMA_ALLOCS = 64;
-	UINT32 *				m_allocptr[MAX_LZMA_ALLOCS];
+	UINT32 *                m_allocptr[MAX_LZMA_ALLOCS];
 };
 
 
@@ -161,8 +161,8 @@ public:
 
 private:
 	// internal state
-	CLzmaEncProps			m_props;
-	chd_lzma_allocator		m_allocator;
+	CLzmaEncProps           m_props;
+	chd_lzma_allocator      m_allocator;
 };
 
 
@@ -181,8 +181,8 @@ public:
 
 private:
 	// internal state
-	CLzmaDec				m_decoder;
-	chd_lzma_allocator		m_allocator;
+	CLzmaDec                m_decoder;
+	chd_lzma_allocator      m_allocator;
 };
 
 
@@ -200,7 +200,7 @@ public:
 
 private:
 	// internal state
-	huffman_8bit_encoder	m_encoder;
+	huffman_8bit_encoder    m_encoder;
 };
 
 
@@ -218,7 +218,7 @@ public:
 
 private:
 	// internal state
-	huffman_8bit_decoder	m_decoder;
+	huffman_8bit_decoder    m_decoder;
 };
 
 
@@ -239,8 +239,8 @@ public:
 
 private:
 	// internal state
-	bool			m_big_endian;
-	flac_encoder	m_encoder;
+	bool            m_big_endian;
+	flac_encoder    m_encoder;
 };
 
 
@@ -258,8 +258,8 @@ public:
 
 private:
 	// internal state
-	bool			m_big_endian;
-	flac_decoder	m_decoder;
+	bool            m_big_endian;
+	flac_decoder    m_decoder;
 };
 
 
@@ -281,11 +281,11 @@ public:
 
 private:
 	// internal state
-	bool				m_swap_endian;
-	flac_encoder		m_encoder;
-	z_stream			m_deflater;
-	chd_zlib_allocator	m_allocator;
-	dynamic_buffer		m_buffer;
+	bool                m_swap_endian;
+	flac_encoder        m_encoder;
+	z_stream            m_deflater;
+	chd_zlib_allocator  m_allocator;
+	dynamic_buffer      m_buffer;
 };
 
 
@@ -304,11 +304,11 @@ public:
 
 private:
 	// internal state
-	bool				m_swap_endian;
-	flac_decoder		m_decoder;
-	z_stream			m_inflater;
-	chd_zlib_allocator	m_allocator;
-	dynamic_buffer		m_buffer;
+	bool                m_swap_endian;
+	flac_decoder        m_decoder;
+	z_stream            m_inflater;
+	chd_zlib_allocator  m_allocator;
+	dynamic_buffer      m_buffer;
 };
 
 
@@ -321,9 +321,9 @@ public:
 	// construction/destruction
 	chd_cd_compressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 		: chd_compressor(chd, hunkbytes, lossy),
-		  m_base_compressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA, lossy),
-		  m_subcode_compressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA, lossy),
-		  m_buffer(hunkbytes + (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA)
+			m_base_compressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA, lossy),
+			m_subcode_compressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA, lossy),
+			m_buffer(hunkbytes + (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA)
 	{
 		// make sure the CHD's hunk size is an even multiple of the frame size
 		if (hunkbytes % CD_FRAME_SIZE != 0)
@@ -375,9 +375,9 @@ public:
 
 private:
 	// internal state
-	_BaseCompressor		m_base_compressor;
-	_SubcodeCompressor	m_subcode_compressor;
-	dynamic_buffer		m_buffer;
+	_BaseCompressor     m_base_compressor;
+	_SubcodeCompressor  m_subcode_compressor;
+	dynamic_buffer      m_buffer;
 };
 
 
@@ -390,9 +390,9 @@ public:
 	// construction/destruction
 	chd_cd_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 		: chd_decompressor(chd, hunkbytes, lossy),
-		  m_base_decompressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA, lossy),
-		  m_subcode_decompressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA, lossy),
-		  m_buffer(hunkbytes)
+			m_base_decompressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA, lossy),
+			m_subcode_decompressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA, lossy),
+			m_buffer(hunkbytes)
 	{
 		// make sure the CHD's hunk size is an even multiple of the frame size
 		if (hunkbytes % CD_FRAME_SIZE != 0)
@@ -435,9 +435,9 @@ public:
 
 private:
 	// internal state
-	_BaseDecompressor	m_base_decompressor;
+	_BaseDecompressor   m_base_decompressor;
 	_SubcodeDecompressor m_subcode_decompressor;
-	dynamic_buffer		m_buffer;
+	dynamic_buffer      m_buffer;
 };
 
 
@@ -458,8 +458,8 @@ private:
 	void postinit();
 
 	// internal state
-	avhuff_encoder				m_encoder;
-	bool						m_postinit;
+	avhuff_encoder              m_encoder;
+	bool                        m_postinit;
 };
 
 
@@ -478,7 +478,7 @@ public:
 
 private:
 	// internal state
-	avhuff_decoder				m_decoder;
+	avhuff_decoder              m_decoder;
 };
 
 
@@ -491,18 +491,18 @@ private:
 const chd_codec_list::codec_entry chd_codec_list::s_codec_list[] =
 {
 	// general codecs
-	{ CHD_CODEC_ZLIB,		false,	"Deflate",				&chd_codec_list::construct_compressor<chd_zlib_compressor>,		&chd_codec_list::construct_decompressor<chd_zlib_decompressor> },
-	{ CHD_CODEC_LZMA,		false,	"LZMA",					&chd_codec_list::construct_compressor<chd_lzma_compressor>,		&chd_codec_list::construct_decompressor<chd_lzma_decompressor> },
-	{ CHD_CODEC_HUFFMAN,	false,	"Huffman",				&chd_codec_list::construct_compressor<chd_huffman_compressor>,	&chd_codec_list::construct_decompressor<chd_huffman_decompressor> },
-	{ CHD_CODEC_FLAC,		false,	"FLAC",					&chd_codec_list::construct_compressor<chd_flac_compressor>,		&chd_codec_list::construct_decompressor<chd_flac_decompressor> },
+	{ CHD_CODEC_ZLIB,       false,  "Deflate",              &chd_codec_list::construct_compressor<chd_zlib_compressor>,     &chd_codec_list::construct_decompressor<chd_zlib_decompressor> },
+	{ CHD_CODEC_LZMA,       false,  "LZMA",                 &chd_codec_list::construct_compressor<chd_lzma_compressor>,     &chd_codec_list::construct_decompressor<chd_lzma_decompressor> },
+	{ CHD_CODEC_HUFFMAN,    false,  "Huffman",              &chd_codec_list::construct_compressor<chd_huffman_compressor>,  &chd_codec_list::construct_decompressor<chd_huffman_decompressor> },
+	{ CHD_CODEC_FLAC,       false,  "FLAC",                 &chd_codec_list::construct_compressor<chd_flac_compressor>,     &chd_codec_list::construct_decompressor<chd_flac_decompressor> },
 
 	// general codecs with CD frontend
-	{ CHD_CODEC_CD_ZLIB,	false,	"CD Deflate",			&chd_codec_list::construct_compressor<chd_cd_compressor<chd_zlib_compressor, chd_zlib_compressor> >,		&chd_codec_list::construct_decompressor<chd_cd_decompressor<chd_zlib_decompressor, chd_zlib_decompressor> > },
-	{ CHD_CODEC_CD_LZMA,	false,	"CD LZMA",				&chd_codec_list::construct_compressor<chd_cd_compressor<chd_lzma_compressor, chd_zlib_compressor> >,		&chd_codec_list::construct_decompressor<chd_cd_decompressor<chd_lzma_decompressor, chd_zlib_decompressor> > },
-	{ CHD_CODEC_CD_FLAC,	false,	"CD FLAC",				&chd_codec_list::construct_compressor<chd_cd_flac_compressor>,	&chd_codec_list::construct_decompressor<chd_cd_flac_decompressor> },
+	{ CHD_CODEC_CD_ZLIB,    false,  "CD Deflate",           &chd_codec_list::construct_compressor<chd_cd_compressor<chd_zlib_compressor, chd_zlib_compressor> >,        &chd_codec_list::construct_decompressor<chd_cd_decompressor<chd_zlib_decompressor, chd_zlib_decompressor> > },
+	{ CHD_CODEC_CD_LZMA,    false,  "CD LZMA",              &chd_codec_list::construct_compressor<chd_cd_compressor<chd_lzma_compressor, chd_zlib_compressor> >,        &chd_codec_list::construct_decompressor<chd_cd_decompressor<chd_lzma_decompressor, chd_zlib_decompressor> > },
+	{ CHD_CODEC_CD_FLAC,    false,  "CD FLAC",              &chd_codec_list::construct_compressor<chd_cd_flac_compressor>,  &chd_codec_list::construct_decompressor<chd_cd_flac_decompressor> },
 
 	// A/V codecs
-	{ CHD_CODEC_AVHUFF,		false,	"A/V Huffman",			&chd_codec_list::construct_compressor<chd_avhuff_compressor>,	&chd_codec_list::construct_decompressor<chd_avhuff_decompressor> },
+	{ CHD_CODEC_AVHUFF,     false,  "A/V Huffman",          &chd_codec_list::construct_compressor<chd_avhuff_compressor>,   &chd_codec_list::construct_decompressor<chd_avhuff_decompressor> },
 };
 
 
@@ -517,8 +517,8 @@ const chd_codec_list::codec_entry chd_codec_list::s_codec_list[] =
 
 chd_codec::chd_codec(chd_file &chd, UINT32 hunkbytes, bool lossy)
 	: m_chd(chd),
-	  m_hunkbytes(hunkbytes),
-	  m_lossy(lossy)
+		m_hunkbytes(hunkbytes),
+		m_lossy(lossy)
 {
 }
 
@@ -643,9 +643,9 @@ const chd_codec_list::codec_entry *chd_codec_list::find_in_list(chd_codec_type t
 
 chd_compressor_group::chd_compressor_group(chd_file &chd, UINT32 compressor_list[4])
 	: m_hunkbytes(chd.hunk_bytes()),
-	  m_compress_test(m_hunkbytes)
+		m_compress_test(m_hunkbytes)
 #if CHDCODEC_VERIFY_COMPRESSION
-	  ,m_decompressed(m_hunkbytes)
+		,m_decompressed(m_hunkbytes)
 #endif
 {
 	// verify the compression types and initialize the codecs
@@ -853,7 +853,7 @@ chd_zlib_compressor::chd_zlib_compressor(chd_file &chd, UINT32 hunkbytes, bool l
 	: chd_compressor(chd, hunkbytes, lossy)
 {
 	// initialize the deflater
-	m_deflater.next_in = (Bytef *)this;	// bogus, but that's ok
+	m_deflater.next_in = (Bytef *)this; // bogus, but that's ok
 	m_deflater.avail_in = 0;
 	m_allocator.install(m_deflater);
 	int zerr = deflateInit2(&m_deflater, Z_BEST_COMPRESSION, Z_DEFLATED, -MAX_WBITS, 8, Z_DEFAULT_STRATEGY);
@@ -918,7 +918,7 @@ chd_zlib_decompressor::chd_zlib_decompressor(chd_file &chd, UINT32 hunkbytes, bo
 	: chd_decompressor(chd, hunkbytes, lossy)
 {
 	// init the inflater
-	m_inflater.next_in = (Bytef *)this;	// bogus, but that's ok
+	m_inflater.next_in = (Bytef *)this; // bogus, but that's ok
 	m_inflater.avail_in = 0;
 	m_allocator.install(m_inflater);
 	int zerr = inflateInit2(&m_inflater, -MAX_WBITS);
@@ -1394,7 +1394,7 @@ void chd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *
 
 chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 	: chd_compressor(chd, hunkbytes, lossy),
-	  m_buffer(hunkbytes)
+		m_buffer(hunkbytes)
 {
 	// make sure the CHD's hunk size is an even multiple of the frame size
 	if (hunkbytes % CD_FRAME_SIZE != 0)
@@ -1412,7 +1412,7 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, UINT32 hunkbytes, 
 	m_encoder.set_strip_metadata(true);
 
 	// initialize the deflater
-	m_deflater.next_in = (Bytef *)this;	// bogus, but that's ok
+	m_deflater.next_in = (Bytef *)this; // bogus, but that's ok
 	m_deflater.avail_in = 0;
 	m_allocator.install(m_deflater);
 	int zerr = deflateInit2(&m_deflater, Z_BEST_COMPRESSION, Z_DEFLATED, -MAX_WBITS, 8, Z_DEFAULT_STRATEGY);
@@ -1506,7 +1506,7 @@ UINT32 chd_cd_flac_compressor::blocksize(UINT32 bytes)
 
 chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 	: chd_decompressor(chd, hunkbytes, lossy),
-	  m_buffer(hunkbytes)
+		m_buffer(hunkbytes)
 {
 	// make sure the CHD's hunk size is an even multiple of the frame size
 	if (hunkbytes % CD_FRAME_SIZE != 0)
@@ -1518,7 +1518,7 @@ chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, UINT32 hunkbyt
 	m_swap_endian = (native_endian == 1);
 
 	// init the inflater
-	m_inflater.next_in = (Bytef *)this;	// bogus, but that's ok
+	m_inflater.next_in = (Bytef *)this; // bogus, but that's ok
 	m_inflater.avail_in = 0;
 	m_allocator.install(m_inflater);
 	int zerr = inflateInit2(&m_inflater, -MAX_WBITS);
@@ -1595,7 +1595,7 @@ void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT
 
 chd_avhuff_compressor::chd_avhuff_compressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 	: chd_compressor(chd, hunkbytes, lossy),
-	  m_postinit(false)
+		m_postinit(false)
 {
 	try
 	{

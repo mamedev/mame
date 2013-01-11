@@ -37,10 +37,10 @@ const device_type VIDEOBRAIN_EXPANSION_SLOT = &device_creator<videobrain_expansi
 
 device_videobrain_expansion_card_interface::device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_rom(NULL),
-	  m_ram(NULL),
-	  m_rom_mask(0),
-	  m_ram_mask(0)
+		m_rom(NULL),
+		m_ram(NULL),
+		m_rom_mask(0),
+		m_ram_mask(0)
 {
 	m_slot = dynamic_cast<videobrain_expansion_slot_device *>(device.owner());
 }
@@ -99,7 +99,7 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runnin
 //-------------------------------------------------
 
 videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock),
+		device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -133,7 +133,7 @@ void videobrain_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_extres_cb, 0, sizeof(m_out_extres_cb));
+		memset(&m_out_extres_cb, 0, sizeof(m_out_extres_cb));
 	}
 
 	// set brief and instance name

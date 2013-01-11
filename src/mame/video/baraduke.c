@@ -163,13 +163,13 @@ static void scroll_w(address_space &space, int layer, int offset, int data)
 	baraduke_state *state = space.machine().driver_data<baraduke_state>();
 	switch (offset)
 	{
-		case 0:	/* high scroll x */
+		case 0: /* high scroll x */
 			state->m_xscroll[layer] = (state->m_xscroll[layer] & 0xff) | (data << 8);
 			break;
-		case 1:	/* low scroll x */
+		case 1: /* low scroll x */
 			state->m_xscroll[layer] = (state->m_xscroll[layer] & 0xff00) | data;
 			break;
-		case 2:	/* scroll y */
+		case 2: /* scroll y */
 			state->m_yscroll[layer] = data;
 			break;
 	}
@@ -213,7 +213,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	baraduke_state *state = machine.driver_data<baraduke_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x1800;
 	const UINT8 *source = &spriteram[0x0000];
-	const UINT8 *finish = &spriteram[0x0800-16];	/* the last is NOT a sprite */
+	const UINT8 *finish = &spriteram[0x0800-16];    /* the last is NOT a sprite */
 
 	int sprite_xoffs = spriteram[0x07f5] - 256 * (spriteram[0x07f4] & 1);
 	int sprite_yoffs = spriteram[0x07f7];

@@ -68,23 +68,23 @@
 
 struct am9517a_interface
 {
-	devcb_write_line	m_out_hreq_cb;
-	devcb_write_line	m_out_eop_cb;
+	devcb_write_line    m_out_hreq_cb;
+	devcb_write_line    m_out_eop_cb;
 
-	devcb_read8			m_in_memr_cb;
-	devcb_write8		m_out_memw_cb;
+	devcb_read8         m_in_memr_cb;
+	devcb_write8        m_out_memw_cb;
 
-	devcb_read8			m_in_ior_cb[4];
-	devcb_write8		m_out_iow_cb[4];
-	devcb_write_line	m_out_dack_cb[4];
+	devcb_read8         m_in_ior_cb[4];
+	devcb_write8        m_out_iow_cb[4];
+	devcb_write_line    m_out_dack_cb[4];
 };
 
 
 // ======================> am9517a_device
 
 class am9517a_device :  public device_t,
-					    public device_execute_interface,
-					    public am9517a_interface
+						public device_execute_interface,
+						public am9517a_interface
 {
 public:
 	// construction/destruction
@@ -109,7 +109,7 @@ protected:
 	virtual void device_reset();
 	virtual void execute_run();
 
-    int m_icount;
+	int m_icount;
 
 private:
 	inline void dma_request(int channel, int state);
@@ -124,16 +124,16 @@ private:
 	inline void dma_advance();
 	inline void end_of_process();
 
-	devcb_resolved_write_line	m_out_hreq_func;
-	devcb_resolved_write_line	m_out_eop_func;
-	devcb_resolved_read8		m_in_memr_func;
-	devcb_resolved_write8		m_out_memw_func;
+	devcb_resolved_write_line   m_out_hreq_func;
+	devcb_resolved_write_line   m_out_eop_func;
+	devcb_resolved_read8        m_in_memr_func;
+	devcb_resolved_write8       m_out_memw_func;
 
 	struct
 	{
-		devcb_resolved_read8		m_in_ior_func;
-		devcb_resolved_write8		m_out_iow_func;
-		devcb_resolved_write_line	m_out_dack_func;
+		devcb_resolved_read8        m_in_ior_func;
+		devcb_resolved_write8       m_out_iow_func;
+		devcb_resolved_write_line   m_out_dack_func;
 
 		UINT16 m_address;
 		UINT16 m_count;

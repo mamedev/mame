@@ -146,20 +146,20 @@ READ8_MEMBER( pv2000_state::pv2000_keys_mod_r )
 
 READ8_MEMBER( pv2000_state::cass_in )
 {
-    // from what i can tell,
-    // 0 = data in
-    // 1 = must be high
-    // 2 = must be low
-    // bits 1 & 2 are checked while reading and writing tapes
-    // Press STOP key (F1) to cancel LOAD or SAVE
+	// from what i can tell,
+	// 0 = data in
+	// 1 = must be high
+	// 2 = must be low
+	// bits 1 & 2 are checked while reading and writing tapes
+	// Press STOP key (F1) to cancel LOAD or SAVE
 
 	return 2 | ((m_cass->input() > +0.03) ? 1 : 0);
 }
 
 WRITE8_MEMBER( pv2000_state::cass_out )
 {
-    // it outputs 8-bit values here which are not the bytes in the file
-    // result is not readable
+	// it outputs 8-bit values here which are not the bytes in the file
+	// result is not readable
 
 	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);
 }
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8, pv2000_state )
 	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 
 	AM_RANGE(0x7000, 0x7FFF) AM_RAM
-  //AM_RANGE(0x8000, 0xBFFF) ext ram?
+	//AM_RANGE(0x8000, 0xBFFF) ext ram?
 	AM_RANGE(0xC000, 0xFFFF) AM_ROM  //cart
 ADDRESS_MAP_END
 
@@ -305,7 +305,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 {
-    // only if it goes up
+	// only if it goes up
 	if (state && !m_last_state)
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
@@ -359,7 +359,7 @@ static TMS9928A_INTERFACE(pv2000_tms9928a_interface)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -375,7 +375,7 @@ void pv2000_state::machine_reset()
 	m_keyb_column = 0;
 
 	machine().device("maincpu")->execute().set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
-	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
+	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 
 static DEVICE_IMAGE_LOAD( pv2000_cart )
@@ -422,7 +422,7 @@ static const cassette_interface pv2000_cassette_interface =
 static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
 	MCFG_CPU_PROGRAM_MAP(pv2000_map)
 	MCFG_CPU_IO_MAP(pv2000_io_map)
 
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) /* 3.579545 MHz */
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

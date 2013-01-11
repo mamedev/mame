@@ -77,7 +77,7 @@ INTERRUPT_GEN_MEMBER(pitnrun_state::pitnrun_nmi_source)
 
 WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
 {
-        m_nmi = data & 1;
+		m_nmi = data & 1;
 }
 
 WRITE8_MEMBER(pitnrun_state::pitnrun_hflip_w)
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( pitnrun )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW:1,2,3")
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -175,15 +175,15 @@ static INPUT_PORTS_START( pitnrun )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "DSW:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "DSW:5" )
-	PORT_DIPNAME( 0x20, 0x00, "Gasoline Count" )	PORT_DIPLOCATION("DSW:6")
+	PORT_DIPNAME( 0x20, 0x00, "Gasoline Count" )    PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x00, "10 Up or 10 Down" )
 	PORT_DIPSETTING(    0x20, "20 Up or 20 Down" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("DSW:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, "No Hit (Cheat)")		PORT_DIPLOCATION("DSW:8")
+	PORT_DIPNAME( 0x80, 0x00, "No Hit (Cheat)")     PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )		// also enables bootup test
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )       // also enables bootup test
 INPUT_PORTS_END
 
 
@@ -194,9 +194,9 @@ static const gfx_layout spritelayout =
 	3,
 	{ 0,RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
 	32*8
 };
 
@@ -228,16 +228,16 @@ static GFXDECODE_START( pitnrun )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)       /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  pitnrun_nmi_source)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)			/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
 	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)		/* verified on pcb */
+	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_mcu_map)
 
 
@@ -257,11 +257,11 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -339,4 +339,3 @@ ROM_END
 
 GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", GAME_IMPERFECT_SOUND )
 GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", GAME_IMPERFECT_SOUND )
-

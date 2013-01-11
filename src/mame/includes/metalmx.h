@@ -8,11 +8,11 @@ class metalmx_state : public driver_device
 public:
 	metalmx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_gsp(*this, "gsp"),
-		  m_adsp(*this, "adsp"),
-		  m_dsp32c_1(*this, "dsp32c_1"),
-		  m_dsp32c_2(*this, "dsp32c_2") ,
+			m_maincpu(*this, "maincpu"),
+			m_gsp(*this, "gsp"),
+			m_adsp(*this, "adsp"),
+			m_dsp32c_1(*this, "dsp32c_1"),
+			m_dsp32c_2(*this, "dsp32c_2") ,
 		m_adsp_internal_program_ram(*this, "adsp_intprog"),
 		m_gsp_dram(*this, "gsp_dram"),
 		m_gsp_vram(*this, "gsp_vram"){ }

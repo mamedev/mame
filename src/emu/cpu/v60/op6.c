@@ -251,4 +251,3 @@ static UINT32 opC7(v60_state *cpustate) /* TRUSTED */
 	UINT8 appb = OpRead8(cpustate, cpustate->PC + 1);
 	return OpC7Table[appb >> 5](cpustate, appb & 0x1f);
 }
-

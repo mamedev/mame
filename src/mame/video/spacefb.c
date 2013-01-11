@@ -74,17 +74,17 @@ void spacefb_state::video_start()
 	static const int resistances_b [] = {       470, 220 };
 
 	compute_resistor_weights(0, 0xff, -1.0,
-							 3, resistances_rg, m_color_weights_rg, 470, 0,
-							 2, resistances_b,  m_color_weights_b,  470, 0,
-							 0, 0, 0, 0, 0);
+								3, resistances_rg, m_color_weights_rg, 470, 0,
+								2, resistances_b,  m_color_weights_b,  470, 0,
+								0, 0, 0, 0, 0);
 
 	width = machine().primary_screen->width();
 	height = machine().primary_screen->height();
 	m_object_present_map = auto_alloc_array(machine(), UINT8, width * height);
 
 	/* this start value positions the stars to match the flyer screen shot,
-       but most likely, the actual star position is random as the hardware
-       uses whatever value is on the shift register on power-up */
+	   but most likely, the actual star position is random as the hardware
+	   uses whatever value is on the shift register on power-up */
 	m_star_shift_reg = 0x18f89;
 }
 
@@ -96,7 +96,7 @@ void spacefb_state::video_start()
  *
  *************************************/
 
-#define NUM_STARFIELD_PENS	(0x40)
+#define NUM_STARFIELD_PENS  (0x40)
 
 
 INLINE void shift_star_generator(spacefb_state *state)
@@ -201,7 +201,7 @@ static void draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const re
  *
  *************************************/
 
-#define NUM_SPRITE_PENS	(0x40)
+#define NUM_SPRITE_PENS (0x40)
 
 
 static void get_sprite_pens(running_machine &machine, pen_t *pens)
@@ -364,7 +364,7 @@ static void draw_objects(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int flip = state->m_port_0 & 0x01;
 
 	/* since the way the schematics show the bullet color
-       connected is impossible, just use pure red for now */
+	   connected is impossible, just use pure red for now */
 	pen_t bullet_pen = MAKE_RGB(0xff, 0x00, 0x00);
 
 	get_sprite_pens(machine, sprite_pens);

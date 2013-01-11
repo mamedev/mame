@@ -11,8 +11,8 @@
 #define NEOGEO_YM2610_CLOCK                     (NEOGEO_MASTER_CLOCK / 3)
 #define NEOGEO_PIXEL_CLOCK                      (NEOGEO_MASTER_CLOCK / 4)
 #define NEOGEO_HTOTAL                           (0x180)
-#define NEOGEO_HBEND                            (0x01e)	/* this should really be 29.5 */
-#define NEOGEO_HBSTART                          (0x15e)	/* this should really be 349.5 */
+#define NEOGEO_HBEND                            (0x01e) /* this should really be 29.5 */
+#define NEOGEO_HBSTART                          (0x15e) /* this should really be 349.5 */
 #define NEOGEO_VTOTAL                           (0x108)
 #define NEOGEO_VBEND                            (0x010)
 #define NEOGEO_VBSTART                          (0x0f0)
@@ -112,7 +112,7 @@ public:
 	UINT8      m_led2_value;
 	UINT8      m_recurse;
 
-	UINT8	   m_vblank_level;
+	UINT8      m_vblank_level;
 	UINT8      m_raster_level;
 
 	/* protection */

@@ -13,7 +13,7 @@ INLINE UINT16
 nth_word32( const UINT32 *source, int which )
 {
 	source += which/2;
-	which ^= 1;	/* i960 is little-endian */
+	which ^= 1; /* i960 is little-endian */
 	if( which&1 )
 	{
 		return (*source)&0xffff;
@@ -34,7 +34,7 @@ nth_byte32( const UINT32 *pSource, int which )
 {
 		UINT32 data = pSource[which/4];
 
-		which ^= 3;	/* i960 is little-endian */
+		which ^= 3; /* i960 is little-endian */
 		switch( which&3 )
 		{
 		case 0: return data>>24;
@@ -53,8 +53,8 @@ static void namcofl_install_palette(running_machine &machine)
 	UINT32 *pSource;
 
 	/* this is unnecessarily expensive.  Better would be to mark palette entries dirty as
-     * they are modified, and only process those that have changed.
-     */
+	 * they are modified, and only process those that have changed.
+	 */
 	pen = 0;
 	for( page=0; page<4; page++ )
 	{

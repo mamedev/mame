@@ -271,8 +271,8 @@ register. So what is controlling priority.
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define CPU_CLOCK		(XTAL_16MHz / 2)	/* clock for 68000 */
-#define SOUND_CPU_CLOCK		(XTAL_8MHz / 2)		/* clock for Z80 sound CPU */
+#define CPU_CLOCK       (XTAL_16MHz / 2)    /* clock for 68000 */
+#define SOUND_CPU_CLOCK     (XTAL_8MHz / 2)     /* clock for Z80 sound CPU */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -319,10 +319,10 @@ READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
 
 	switch (offset)
 	{
-		case 0x00:	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
+		case 0x00:  /* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 			scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
 			return (scaled + 0x15 + m_opwolf_gun_xoffs);
-		case 0x01:	/* P1Y */
+		case 0x01:  /* P1Y */
 			return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
 	}
 
@@ -331,12 +331,12 @@ READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
 
 READ8_MEMBER(opwolf_state::z80_input1_r)
 {
-	return ioport("IN0")->read();	/* irrelevant mirror ? */
+	return ioport("IN0")->read();   /* irrelevant mirror ? */
 }
 
 READ8_MEMBER(opwolf_state::z80_input2_r)
 {
-	return ioport("IN0")->read();	/* needed for coins */
+	return ioport("IN0")->read();   /* needed for coins */
 }
 
 
@@ -363,39 +363,39 @@ static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x0ffc00, 0x0ffc01) AM_WRITE(opwolf_cchip_bank_w)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)			/* dip switches */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)	// usually 0x4, changes when you fire
-	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)		/* lightgun, read at $11e0/6 */
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP					/* watchdog ?? */
+	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
+	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
+	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("pc080sn", pc080sn_word_r, pc080sn_word_w)
-	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY					/* error in init code (?) */
+	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
 	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)			/* coins and buttons */
+	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)           /* coins and buttons */
 	AM_RANGE(0x0ff000, 0x0fffff) AM_READWRITE(cchip_r,cchip_w)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)			/* dip switches */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)	// usually 0x4, changes when you fire
-	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)		/* lightgun, read at $11e0/6 */
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP					/* watchdog ?? */
+	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
+	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
+	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("pc080sn", pc080sn_word_r, pc080sn_word_w)
-	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY					/* error in init code (?) */
+	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0xc40000, 0xc40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
 	AM_RANGE(0xc50000, 0xc50003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)  /* sprite ram */
 ADDRESS_MAP_END
 
 
@@ -405,10 +405,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( opwolfb_sub_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8800, 0x8800) AM_READ(z80_input1_r)	/* read at PC=$637: poked to $c004 */
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP			/* unknown write, 0 then 1 each interrupt */
-	AM_RANGE(0x9800, 0x9800) AM_READ(z80_input2_r)	/* read at PC=$631: poked to $c005 */
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	/* IRQ acknowledge (unimplemented) */
+	AM_RANGE(0x8800, 0x8800) AM_READ(z80_input1_r)  /* read at PC=$637: poked to $c004 */
+	AM_RANGE(0x9000, 0x9000) AM_WRITENOP            /* unknown write, 0 then 1 each interrupt */
+	AM_RANGE(0x9800, 0x9800) AM_READ(z80_input2_r)  /* read at PC=$631: poked to $c005 */
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP    /* IRQ acknowledge (unimplemented) */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("cchip_ram")
 ADDRESS_MAP_END
 
@@ -629,56 +629,56 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4, 10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout charlayout_b =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout_b =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( opwolf )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )	/* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )	/* scr tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( opwolfb )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_b,  0, 256 )	/* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_b,  0, 256 )	/* scr tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_b,  0, 256 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_b,  0, 256 ) /* scr tiles */
 GFXDECODE_END
 
 
@@ -688,8 +688,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	opwolf_msm5205_vck,	/* VCK function */
-	MSM5205_S48_4B		/* 8 kHz */
+	opwolf_msm5205_vck, /* VCK function */
+	MSM5205_S48_4B      /* 8 kHz */
 };
 
 
@@ -700,8 +700,8 @@ static const msm5205_interface msm5205_config =
 
 static const pc080sn_interface opwolf_pc080sn_intf =
 {
-	1,	 /* gfxnum */
-	0, 0, 0, 0	/* x_offset, y_offset, y_invert, dblwidth */
+	1,   /* gfxnum */
+	0, 0, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
 };
 
 static const pc090oj_interface opwolf_pc090oj_intf =
@@ -717,14 +717,14 @@ static const tc0140syt_interface opwolf_tc0140syt_intf =
 static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET_OVERRIDE(opwolf_state,opwolf)
 
@@ -745,7 +745,7 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK )	/* 4 MHz */
+	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK )  /* 4 MHz */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(opwolf_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
@@ -768,18 +768,18 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(opwolfb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MCFG_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
+	MCFG_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )  /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(opwolfb_sub_z80_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", opwolf_state,  irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 
 	/* video hardware */
@@ -835,12 +835,12 @@ ROM_START( opwolf )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )    /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
@@ -861,12 +861,12 @@ ROM_START( opwolfa )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )    /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
@@ -882,12 +882,12 @@ ROM_START( opwolfj )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )    /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
@@ -903,12 +903,12 @@ ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specif
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )	/* Sprites (16 x 16) */
+	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )    /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
@@ -927,7 +927,7 @@ ROM_START( opwolfb )
 	ROM_LOAD( "opwlfb.09",   0x00000, 0x08000, CRC(ab27a3dd) SHA1(cf589e7a9ccf3e86020b86f917fb91f3d8ba7512) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "opwlfb.08",   0x00000, 0x10000, CRC(134d294e) SHA1(bd05169dbd761c2944f0ac51c1ec114577777452) )	/* SCR tiles (8 x 8) */
+	ROM_LOAD16_BYTE( "opwlfb.08",   0x00000, 0x10000, CRC(134d294e) SHA1(bd05169dbd761c2944f0ac51c1ec114577777452) )    /* SCR tiles (8 x 8) */
 	ROM_LOAD16_BYTE( "opwlfb.06",   0x20000, 0x10000, CRC(317d0e66) SHA1(70298c0ef5243f481b18f904be9404527d1d99d5) )
 	ROM_LOAD16_BYTE( "opwlfb.07",   0x40000, 0x10000, CRC(e1c4095e) SHA1(d5f1d26d6612e78001002f92de670e68e00c6f9e) )
 	ROM_LOAD16_BYTE( "opwlfb.05",   0x60000, 0x10000, CRC(fd9e72c8) SHA1(7a76f57641c3f0198565cd163188b581253173b2) )
@@ -937,7 +937,7 @@ ROM_START( opwolfb )
 	ROM_LOAD16_BYTE( "opwlfb.01",   0x60001, 0x10000, CRC(0a65f256) SHA1(4dfcd3cb138a87d002eb65a02f94e33f4d07676d) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "opwlfb.14",   0x00000, 0x10000, CRC(663786eb) SHA1(a25710f6c16158e51d0934f184390a01ff0a614a) )	/* Sprites (16 x 16) */
+	ROM_LOAD16_BYTE( "opwlfb.14",   0x00000, 0x10000, CRC(663786eb) SHA1(a25710f6c16158e51d0934f184390a01ff0a614a) )    /* Sprites (16 x 16) */
 	ROM_LOAD16_BYTE( "opwlfb.15",   0x20000, 0x10000, CRC(315b8aa9) SHA1(4a904e5532421d933e4c401c03c958eb32b15e03) )
 	ROM_LOAD16_BYTE( "opwlfb.16",   0x40000, 0x10000, CRC(e01099e3) SHA1(4c5391d71978f72c57c140e58a767e138acdce12) )
 	ROM_LOAD16_BYTE( "opwlfb.17",   0x60000, 0x10000, CRC(56fbe61d) SHA1(0e4dce8ee981bdd851e500fa9dca5d40908e142f) )
@@ -946,7 +946,7 @@ ROM_START( opwolfb )
 	ROM_LOAD16_BYTE( "opwlfb.20",   0x40001, 0x10000, CRC(d80b9cc6) SHA1(b189f35eb206da1ab313620e251e6bb10edeee04) )
 	ROM_LOAD16_BYTE( "opwlfb.21",   0x60001, 0x10000, CRC(97d25157) SHA1(cfb3f76ed860d90235dc0e32919a5ec3d3e683dd) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples (interleaved) */
+	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples (interleaved) */
 	ROM_LOAD16_BYTE( "opwlfb.29",   0x00000, 0x10000, CRC(05a9eac0) SHA1(26eb1acc65aeb759920b35bcbcac6d6c2789584c) )
 	ROM_LOAD16_BYTE( "opwlfb.28",   0x20000, 0x10000, CRC(281b2175) SHA1(3789e58da682041226f70eba87b31876cb206906) )
 	ROM_LOAD16_BYTE( "opwlfb.27",   0x40000, 0x10000, CRC(441211a6) SHA1(82e84ae90765df5f7f6b6f32a2bb52ac40132f8d) )

@@ -19,8 +19,8 @@
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
-#define NASCOM1_KEY_RESET	0x02
-#define NASCOM1_KEY_INCR	0x01
+#define NASCOM1_KEY_RESET   0x02
+#define NASCOM1_KEY_INCR    0x01
 
 
 

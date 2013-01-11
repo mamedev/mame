@@ -231,26 +231,26 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
-	DEVCB_NULL							/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),            /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_INPUT_PORT("IN2"),            /* Port C read */
+	DEVCB_NULL                          /* Port C write */
 };
 
 
@@ -266,7 +266,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_CONFIG_START( rgum, rgum_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(rgum_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rgum_state,  nmi_line_pulse)
 
@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( rgum, rgum_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rgum_state, screen_update_royalgum)
 
-	MCFG_MC6845_ADD("crtc", MC6845, 24000000/16, mc6845_intf)	/* unknown clock & type, hand tuned to get ~50 fps (?) */
+	MCFG_MC6845_ADD("crtc", MC6845, 24000000/16, mc6845_intf)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 

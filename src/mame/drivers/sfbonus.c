@@ -439,13 +439,13 @@ public:
 	DECLARE_DRIVER_INIT(robadv);
 	DECLARE_DRIVER_INIT(pirpok2d);
 	void sfbonus_bitswap(UINT8 xor0, UINT8 b00, UINT8 b01, UINT8 b02, UINT8 b03, UINT8 b04, UINT8 b05, UINT8 b06,UINT8 b07,
-                        UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
-	                    UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
-		                UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,
-			            UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,
-				        UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,
-				        UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
-				        UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 );
+						UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
+						UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
+						UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,
+						UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,
+						UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,
+						UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
+						UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 );
 	TILE_GET_INFO_MEMBER(get_sfbonus_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel2_tile_info);
@@ -545,8 +545,8 @@ static INPUT_PORTS_START( amcoebase )
 	/*   This setting should be set per game based on PCB model the game is on */
 	PORT_START("SWITCH1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )
-	PORT_DIPNAME( 0x3e, 0x34, "Enable RS232 Printer Port" )		PORT_DIPLOCATION("SW1:2,3,4,5,6")
-	PORT_DIPSETTING(    0x1a, "Model S2000 PCB" )			/* No other settings shown in any Amcoe manuals */
+	PORT_DIPNAME( 0x3e, 0x34, "Enable RS232 Printer Port" )     PORT_DIPLOCATION("SW1:2,3,4,5,6")
+	PORT_DIPSETTING(    0x1a, "Model S2000 PCB" )           /* No other settings shown in any Amcoe manuals */
 	PORT_DIPSETTING(    0x34, "Non Model S2000 PCBs" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
@@ -572,10 +572,10 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
 
 	PORT_START("SWITCH4")
-	PORT_DIPNAME( 0x01, 0x01, "Password" )			PORT_DIPLOCATION("SW4:1")
+	PORT_DIPNAME( 0x01, 0x01, "Password" )          PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(    0x01, "Required" )
 	PORT_DIPSETTING(    0x00, "Not Required" )
-	PORT_DIPNAME( 0x02, 0x02, "Dual Support Use Only" )	PORT_DIPLOCATION("SW4:2")
+	PORT_DIPNAME( 0x02, 0x02, "Dual Support Use Only" ) PORT_DIPLOCATION("SW4:2")
 	PORT_DIPSETTING(    0x02, "CGA Output" )
 	PORT_DIPSETTING(    0x00, "XVGA Output" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW4:3" )
@@ -586,10 +586,10 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
 
 	PORT_START("SWITCH5")
-	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" )	PORT_DIPLOCATION("SW5:1")
-	PORT_DIPSETTING(    0x01, "Korean Made" )	/* Use for most monitors in the USA */
+	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" )  PORT_DIPLOCATION("SW5:1")
+	PORT_DIPSETTING(    0x01, "Korean Made" )   /* Use for most monitors in the USA */
 	PORT_DIPSETTING(    0x00, "Taiwanese Made" )
-	PORT_DIPNAME( 0x1e, 0x1e, "Link Unit ID" )	PORT_DIPLOCATION("SW5:2,3,4,5")
+	PORT_DIPNAME( 0x1e, 0x1e, "Link Unit ID" )  PORT_DIPLOCATION("SW5:2,3,4,5")
 	PORT_DIPSETTING(    0x1e, "Not Linked" )
 	PORT_DIPSETTING(    0x1c, "Unit 1" )
 	PORT_DIPSETTING(    0x1a, "Unit 2" )
@@ -608,7 +608,7 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPSETTING(    0x00, "Unit 15" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW5:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW5:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Must be OFF!!" )	PORT_DIPLOCATION("SW5:8")
+	PORT_DIPNAME( 0x80, 0x80, "Must be OFF!!" ) PORT_DIPLOCATION("SW5:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -638,8 +638,8 @@ static INPUT_PORTS_START( amcoe1_reels3 )
 	PORT_INCLUDE(amcoecommon)
 
 	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("All Stop / Big")
 	/*        0x08 ? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Double / Hold Help")
@@ -652,8 +652,8 @@ static INPUT_PORTS_START( newer1_reels3 )
 	PORT_INCLUDE(amcoecommon)
 
 	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("All Stop / Big")
 	/*        0x08 ? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Double / Hold Help")
@@ -663,10 +663,10 @@ static INPUT_PORTS_START( newer1_reels3 )
 
 	PORT_MODIFY("SWITCH4")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW4:1" )
-	PORT_DIPNAME( 0xe0, 0xe0, "Operation Mode" )	PORT_DIPLOCATION("SW4:6,7,8")
+	PORT_DIPNAME( 0xe0, 0xe0, "Operation Mode" )    PORT_DIPLOCATION("SW4:6,7,8")
 	PORT_DIPSETTING(    0xe0, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, "Reset All Data" )	/* Will not reset settings */
-	PORT_DIPSETTING(    0x00, "Master Reset" )	/* Resest setting and ALL data */
+	PORT_DIPSETTING(    0x40, "Reset All Data" )    /* Will not reset settings */
+	PORT_DIPSETTING(    0x00, "Master Reset" )  /* Resest setting and ALL data */
 
 	PORT_MODIFY("SWITCH5")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW5:1" )
@@ -683,8 +683,8 @@ static INPUT_PORTS_START( newlk1_reels3 )
 	PORT_INCLUDE(amcoecommon)
 
 	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("All Stop / Big")
 	/*        0x08 ? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Double / Hold Help")
@@ -694,19 +694,19 @@ static INPUT_PORTS_START( newlk1_reels3 )
 
 	PORT_MODIFY("SWITCH4")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW4:1" )
-	PORT_DIPNAME( 0xe0, 0xe0, "Operation Mode" )	PORT_DIPLOCATION("SW4:6,7,8")
+	PORT_DIPNAME( 0xe0, 0xe0, "Operation Mode" )    PORT_DIPLOCATION("SW4:6,7,8")
 	PORT_DIPSETTING(    0xe0, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x80, "Reset Data Except bonus" )	/* Will not reset settings and Bonus */
-	PORT_DIPSETTING(    0x40, "Reset All Data" )		/* Will not reset settings */
-	PORT_DIPSETTING(    0x00, "Master Reset" )		/* Resest setting and ALL data */
+	PORT_DIPSETTING(    0x80, "Reset Data Except bonus" )   /* Will not reset settings and Bonus */
+	PORT_DIPSETTING(    0x40, "Reset All Data" )        /* Will not reset settings */
+	PORT_DIPSETTING(    0x00, "Master Reset" )      /* Resest setting and ALL data */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amcoe1_reels4 )
 	PORT_INCLUDE(amcoecommon)
 
 	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Big")
 	/*        0x08 ? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Double / Hold Help")
@@ -719,8 +719,8 @@ static INPUT_PORTS_START( amcoe1_poker )
 	PORT_INCLUDE(amcoecommon)
 
 	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Big")
 	/*        0x08 ? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Double / Hold Help")
@@ -739,8 +739,8 @@ static INPUT_PORTS_START( amcoe2_reels3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Double / Hold Help")
 	/*        0x10 ? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("All Stop / Big")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amcoe2_reels4 )
@@ -753,8 +753,8 @@ static INPUT_PORTS_START( amcoe2_reels4 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Double / Hold Help")
 	/*        0x10 ? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Big")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amcoe2_poker )
@@ -767,8 +767,8 @@ static INPUT_PORTS_START( amcoe2_poker )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Double / Hold Help")
 	/*        0x10 ? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Big")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)		// causes coin jam if held
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)	// causes service jam if held
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(2)       // causes coin jam if held
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_IMPULSE(2)    // causes service jam if held
 INPUT_PORTS_END
 
 
@@ -1121,53 +1121,53 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 		}
 	}
 #if 0
-    popmessage("%02x %02x %02x %02x %02x %02x %02x %02x -- %02x -- %02x %02x -- %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
-    m_3800_regs[0],
-    m_3800_regs[1],
-    m_3800_regs[2],
-    m_3800_regs[3],
-    m_3800_regs[4],
-    m_3800_regs[5],
-    m_3800_regs[6],
-    m_3800_regs[7],
-    m_3000_regs[0],
-    m_2801_regs[0],
-    m_2c01_regs[0],
-    m_vregs[8],
-    m_vregs[0],
-    m_vregs[10],
-    m_vregs[11],
-    m_vregs[12],
-    m_vregs[13],
-    m_vregs[14],
-    m_vregs[15],
-    m_vregs[16],
-    m_vregs[17],
-    m_vregs[18],
-    m_vregs[19],
-    m_vregs[20],
-    m_vregs[21],
-    m_vregs[22],
-    m_vregs[23],
-    m_vregs[24],
-    m_vregs[25],
-    m_vregs[26],
-    m_vregs[27],
-    m_vregs[28],
-    m_vregs[29],
-    m_vregs[30],
-    m_vregs[31]
-    );
+	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x -- %02x -- %02x %02x -- %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
+	m_3800_regs[0],
+	m_3800_regs[1],
+	m_3800_regs[2],
+	m_3800_regs[3],
+	m_3800_regs[4],
+	m_3800_regs[5],
+	m_3800_regs[6],
+	m_3800_regs[7],
+	m_3000_regs[0],
+	m_2801_regs[0],
+	m_2c01_regs[0],
+	m_vregs[8],
+	m_vregs[0],
+	m_vregs[10],
+	m_vregs[11],
+	m_vregs[12],
+	m_vregs[13],
+	m_vregs[14],
+	m_vregs[15],
+	m_vregs[16],
+	m_vregs[17],
+	m_vregs[18],
+	m_vregs[19],
+	m_vregs[20],
+	m_vregs[21],
+	m_vregs[22],
+	m_vregs[23],
+	m_vregs[24],
+	m_vregs[25],
+	m_vregs[26],
+	m_vregs[27],
+	m_vregs[28],
+	m_vregs[29],
+	m_vregs[30],
+	m_vregs[31]
+	);
 
-    popmessage("-- %02x %02x %02x %02x %02x %02x %02x %02x",
-    m_1800_regs[0],
-    m_1800_regs[1],
-    m_1800_regs[2],
-    m_1800_regs[3],
-    m_1800_regs[4],
-    m_1800_regs[5],
-    m_1800_regs[6],
-    m_1800_regs[7]);
+	popmessage("-- %02x %02x %02x %02x %02x %02x %02x %02x",
+	m_1800_regs[0],
+	m_1800_regs[1],
+	m_1800_regs[2],
+	m_1800_regs[3],
+	m_1800_regs[4],
+	m_1800_regs[5],
+	m_1800_regs[6],
+	m_1800_regs[7]);
 #endif
 
 	ipt = machine().system().ipt;
@@ -1322,10 +1322,10 @@ static const gfx_layout sfbonus32_layout =
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,
-      8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64,
-	  16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
-	  24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64
-	  },
+		8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64,
+		16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
+		24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64
+		},
 	32*64
 };
 
@@ -2901,7 +2901,7 @@ ROM_START( abnudgeo )
 ROM_END
 
 /* Double Challenge */
-ROM_START( dblchal )	// this would be dblchalb1 if an export version would surface
+ROM_START( dblchal )    // this would be dblchalb1 if an export version would surface
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcb15r.bin", 0x00000, 0x40000, CRC(d89a9756) SHA1(7a4cb88da9d02351a996202fb5b4545db042867b) )
 
@@ -2994,7 +2994,7 @@ ROM_START( dblchalo )
 ROM_END
 
 /* Animal Treasure Hunt */
-ROM_START( anithunt )	// this would be anithuntb1 if an export version would surface
+ROM_START( anithunt )   // this would be anithuntb1 if an export version would surface
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "athb19r.bin", 0x00000, 0x40000, CRC(71d0604f) SHA1(c2f40c58dce2f6b69dc0234c0fb7a656ea04168b) )
 
@@ -5881,13 +5881,13 @@ DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 
 void sfbonus_state::sfbonus_bitswap(
 						UINT8 xor0, UINT8 b00, UINT8 b01, UINT8 b02, UINT8 b03, UINT8 b04, UINT8 b05, UINT8 b06,UINT8 b07,
-                        UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
-	                    UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
-		                UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,
-			            UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,
-				        UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,
-				        UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
-				        UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 )
+						UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
+						UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
+						UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,
+						UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,
+						UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,
+						UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
+						UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 )
 {
 
 	int i;

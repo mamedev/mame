@@ -49,7 +49,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ZIP_DECOMPRESS_BUFSIZE	16384
+#define ZIP_DECOMPRESS_BUFSIZE  16384
 
 /* Error types */
 enum zip_error
@@ -74,63 +74,63 @@ enum zip_error
 /* contains extracted file header information */
 struct zip_file_header
 {
-	UINT32			signature;				/* central file header signature */
-	UINT16			version_created;		/* version made by */
-	UINT16			version_needed;			/* version needed to extract */
-	UINT16			bit_flag;				/* general purpose bit flag */
-	UINT16			compression;			/* compression method */
-	UINT16			file_time;				/* last mod file time */
-	UINT16			file_date;				/* last mod file date */
-	UINT32			crc;					/* crc-32 */
-	UINT32			compressed_length;		/* compressed size */
-	UINT32			uncompressed_length;	/* uncompressed size */
-	UINT16			filename_length;		/* filename length */
-	UINT16			extra_field_length;		/* extra field length */
-	UINT16			file_comment_length;	/* file comment length */
-	UINT16			start_disk_number;		/* disk number start */
-	UINT16			internal_attributes;	/* internal file attributes */
-	UINT32			external_attributes;	/* external file attributes */
-	UINT32			local_header_offset;	/* relative offset of local header */
-	const char *	filename;				/* filename */
+	UINT32          signature;              /* central file header signature */
+	UINT16          version_created;        /* version made by */
+	UINT16          version_needed;         /* version needed to extract */
+	UINT16          bit_flag;               /* general purpose bit flag */
+	UINT16          compression;            /* compression method */
+	UINT16          file_time;              /* last mod file time */
+	UINT16          file_date;              /* last mod file date */
+	UINT32          crc;                    /* crc-32 */
+	UINT32          compressed_length;      /* compressed size */
+	UINT32          uncompressed_length;    /* uncompressed size */
+	UINT16          filename_length;        /* filename length */
+	UINT16          extra_field_length;     /* extra field length */
+	UINT16          file_comment_length;    /* file comment length */
+	UINT16          start_disk_number;      /* disk number start */
+	UINT16          internal_attributes;    /* internal file attributes */
+	UINT32          external_attributes;    /* external file attributes */
+	UINT32          local_header_offset;    /* relative offset of local header */
+	const char *    filename;               /* filename */
 
-	UINT8 *			raw;					/* pointer to the raw data */
-	UINT32			rawlength;				/* length of the raw data */
-	UINT8			saved;					/* saved byte from after filename */
+	UINT8 *         raw;                    /* pointer to the raw data */
+	UINT32          rawlength;              /* length of the raw data */
+	UINT8           saved;                  /* saved byte from after filename */
 };
 
 
 /* contains extracted end of central directory information */
 struct zip_ecd
 {
-	UINT32			signature;				/* end of central dir signature */
-	UINT16			disk_number;			/* number of this disk */
-	UINT16			cd_start_disk_number;	/* number of the disk with the start of the central directory */
-	UINT16			cd_disk_entries;		/* total number of entries in the central directory on this disk */
-	UINT16			cd_total_entries;		/* total number of entries in the central directory */
-	UINT32			cd_size;				/* size of the central directory */
-	UINT32			cd_start_disk_offset;	/* offset of start of central directory with respect to the starting disk number */
-	UINT16			comment_length;			/* .ZIP file comment length */
-	const char *	comment;				/* .ZIP file comment */
+	UINT32          signature;              /* end of central dir signature */
+	UINT16          disk_number;            /* number of this disk */
+	UINT16          cd_start_disk_number;   /* number of the disk with the start of the central directory */
+	UINT16          cd_disk_entries;        /* total number of entries in the central directory on this disk */
+	UINT16          cd_total_entries;       /* total number of entries in the central directory */
+	UINT32          cd_size;                /* size of the central directory */
+	UINT32          cd_start_disk_offset;   /* offset of start of central directory with respect to the starting disk number */
+	UINT16          comment_length;         /* .ZIP file comment length */
+	const char *    comment;                /* .ZIP file comment */
 
-	UINT8 *			raw;					/* pointer to the raw data */
-	UINT32			rawlength;				/* length of the raw data */
+	UINT8 *         raw;                    /* pointer to the raw data */
+	UINT32          rawlength;              /* length of the raw data */
 };
 
 
 /* describes an open ZIP file */
 struct zip_file
 {
-	const char *	filename;				/* copy of ZIP filename (for caching) */
-	osd_file *		file;					/* OSD file handle */
-	UINT64			length;					/* length of zip file */
+	const char *    filename;               /* copy of ZIP filename (for caching) */
+	osd_file *      file;                   /* OSD file handle */
+	UINT64          length;                 /* length of zip file */
 
-	zip_ecd			ecd;					/* end of central directory */
+	zip_ecd         ecd;                    /* end of central directory */
 
-	UINT8 *			cd;						/* central directory raw data */
-	UINT32			cd_pos;					/* position in central directory */
-	zip_file_header	header;					/* current file header */
+	UINT8 *         cd;                     /* central directory raw data */
+	UINT32          cd_pos;                 /* position in central directory */
+	zip_file_header header;                 /* current file header */
 
-	UINT8			buffer[ZIP_DECOMPRESS_BUFSIZE];	/* buffer for decompression */
+	UINT8           buffer[ZIP_DECOMPRESS_BUFSIZE]; /* buffer for decompression */
 };
 
 
@@ -164,4 +164,4 @@ const zip_file_header *zip_file_next_file(zip_file *zip);
 zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length);
 
 
-#endif	/* __UNZIP_H__ */
+#endif  /* __UNZIP_H__ */

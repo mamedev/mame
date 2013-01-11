@@ -8,11 +8,11 @@ Atari 2600 SuperCharger support
 #include "formats/a26_cas.h"
 
 
-#define A26_CAS_SIZE			8448
-#define A26_WAV_FREQUENCY		44100
-#define BIT_ZERO_LENGTH			10
-#define BIT_ONE_LENGTH			15
-#define ZEROS_ONES				2755
+#define A26_CAS_SIZE            8448
+#define A26_WAV_FREQUENCY       44100
+#define BIT_ZERO_LENGTH         10
+#define BIT_ONE_LENGTH          15
+#define ZEROS_ONES              2755
 
 static const UINT16 one_wave[BIT_ONE_LENGTH] = {
 	0x2AE5, 0x4E60, 0x644E, 0x68E4, 0x5B56, 0x3DFE, 0x15ED, 0xEA13, 0xC202, 0xA4AA,
@@ -37,7 +37,7 @@ static int a26_cas_output_wave( INT16 **buffer, INT16 wave_data, int length ) {
 
 static int a26_cas_output_bit( INT16 **buffer, int bit ) {
 	int size = 0;
-	int	bit_size = bit ? BIT_ONE_LENGTH : BIT_ZERO_LENGTH;
+	int bit_size = bit ? BIT_ONE_LENGTH : BIT_ZERO_LENGTH;
 	const INT16 *p = bit ? (const INT16 *)one_wave : (const INT16 *)zero_wave;
 	int i;
 
@@ -49,8 +49,8 @@ static int a26_cas_output_bit( INT16 **buffer, int bit ) {
 }
 
 static int a26_cas_output_byte( INT16 **buffer, UINT8 byte ) {
-	int		size = 0;
-	int		i;
+	int     size = 0;
+	int     i;
 
 	for( i = 0; i < 8; i++, byte <<= 1 ) {
 		size += a26_cas_output_bit( buffer, ( ( byte & 0x80 ) ? 1 : 0 ) );
@@ -59,15 +59,15 @@ static int a26_cas_output_byte( INT16 **buffer, UINT8 byte ) {
 }
 
 static int a26_cas_clearing_tone( INT16 **buffer ) {
-	int		size = 0;
+	int     size = 0;
 
 	size += a26_cas_output_wave( buffer, 0, 44100 );
 	return size;
 }
 
 static int a26_cas_zeros_ones( INT16 **buffer ) {
-	int		size = 0;
-	int		i;
+	int     size = 0;
+	int     i;
 
 	for ( i = 0; i < ZEROS_ONES; i++ ) {
 		size += a26_cas_output_bit( buffer, 0 );
@@ -79,8 +79,8 @@ static int a26_cas_zeros_ones( INT16 **buffer ) {
 }
 
 static int a26_cas_output_contents( INT16 **buffer, const UINT8 *bytes ) {
-	int		size = 0;
-	int		i, pages, j;
+	int     size = 0;
+	int     i, pages, j;
 
 	/* There are 8 header bytes */
 	for( i = 0; i < 8; i++ ) {
@@ -102,7 +102,7 @@ static int a26_cas_output_contents( INT16 **buffer, const UINT8 *bytes ) {
 }
 
 static int a26_cas_do_work( INT16 **buffer, const UINT8 *bytes ) {
-	int		size = 0;
+	int     size = 0;
 
 	/* Output clearing tone */
 	size += a26_cas_clearing_tone( buffer );
@@ -120,7 +120,7 @@ static int a26_cas_do_work( INT16 **buffer, const UINT8 *bytes ) {
 }
 
 static int a26_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
-	INT16	*p = buffer;
+	INT16   *p = buffer;
 
 	return a26_cas_do_work( &p, (const UINT8 *)bytes );
 }
@@ -163,4 +163,3 @@ static const struct CassetteFormat a26_cassette_format = {
 CASSETTE_FORMATLIST_START(a26_cassette_formats)
 	CASSETTE_FORMAT(a26_cassette_format)
 CASSETTE_FORMATLIST_END
-

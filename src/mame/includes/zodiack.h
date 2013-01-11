@@ -7,13 +7,13 @@ class zodiack_state : public driver_device
 public:
 	zodiack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_audiocpu(*this, "audiocpu"),
-		  m_videoram(*this, "videoram"),
-		  m_videoram_2(*this, "videoram_2"),
-		  m_attributeram(*this, "attributeram"),
-		  m_spriteram(*this, "spriteram"),
-		  m_bulletsram(*this, "bulletsram")
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_videoram(*this, "videoram"),
+			m_videoram_2(*this, "videoram_2"),
+			m_attributeram(*this, "attributeram"),
+			m_spriteram(*this, "spriteram"),
+			m_bulletsram(*this, "bulletsram")
 	{ m_percuss_hardware = 0; }
 
 	// in drivers/zodiack.c

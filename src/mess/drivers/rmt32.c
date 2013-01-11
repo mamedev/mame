@@ -84,7 +84,7 @@ Notes: (All IC's listed for completeness)
       *3     - R15229863 HG61H20R36F (QFP100, stamped 'BOSS')
       PCM54HP- Burr-Brown PCM54HP 16-Bit Monolithic Digital-to-Analog Converter (DIP28)
       & Various logic ICs - 4051, 74HC27, 74HC00, 74HC02, 74HC04, 74LS05
-      
+
       ROMs -  Filename          Device Type
               ------------------------------------------------------------------------
               ROM.IC26.106      Mitsubishi M5M27C256 (labeled 1.0.6)   read as 27C256
@@ -92,7 +92,7 @@ Notes: (All IC's listed for completeness)
               ROM.IC13.200      Mitsubishi M5M27C128 (labeled 2.0.0)   read as 27C128
               ROM.IC21          Toshiba TC532000P (-7471)              read as TC572000
               ROM.IC22          Toshiba TC532000P (-7472)              read as TC572000
-                  
+
 
 
 Newer version
@@ -149,7 +149,7 @@ Notes: (All IC's listed for completeness)
       *3     - R15229863 HG61H20R36F (QFP100, stamped 'BOSS')
       PCM54HP- Burr-Brown PCM54HP 16-Bit Monolithic Digital-to-Analog Converter (DIP28)
       & Various logic ICs - 4051, 74HC27, 74HC00, 74HC02, 74HC04, 74LS05
-      
+
       ROMs -  Filename     Device Type
               ----------------------------------------------------
               ROM.IC26     Hitachi HN623258PH26   read as 27C256
@@ -316,7 +316,7 @@ WRITE8_MEMBER(mt32_state::so_w)
 	// bit 5   = boss x1
 	// bit 6   = lcd cs, also handled internally by the gate array
 	// bit 7   = lcd clk, also handled internally by the gate array
-	//	logerror("so: x1=%d bank=%d led=%d\n", (data >> 5) & 1, (data >> 1) & 3, data & 1);
+	//  logerror("so: x1=%d bank=%d led=%d\n", (data >> 5) & 1, (data >> 1) & 3, data & 1);
 }
 
 void mt32_state::palette_init()
@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( mt32, mt32_state )
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(mt32_state, screen_update)
-//	MCFG_SCREEN_SIZE(20*6-1, 9)
+//  MCFG_SCREEN_SIZE(20*6-1, 9)
 	MCFG_SCREEN_SIZE(20*6-1, (20*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-2, 0, (20*6-1)*3/4-1)
 	MCFG_PALETTE_LENGTH(2)

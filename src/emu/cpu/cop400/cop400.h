@@ -22,9 +22,9 @@
 enum
 {
 	COP400_PC,
-    COP400_SA,
-    COP400_SB,
-    COP400_SC,
+	COP400_SA,
+	COP400_SB,
+	COP400_SC,
 	COP400_N,
 	COP400_A,
 	COP400_B,
@@ -34,9 +34,9 @@ enum
 	COP400_Q,
 	COP400_R,
 	COP400_EN,
-    COP400_SIO,
-    COP400_SKL,
-    COP400_T,
+	COP400_SIO,
+	COP400_SKL,
+	COP400_T,
 	COP400_GENPC = STATE_GENPC,
 	COP400_GENPCBASE = STATE_GENPCBASE,
 	COP400_GENSP = STATE_GENSP
@@ -98,9 +98,9 @@ enum cop400_microbus {
 /* interface */
 struct cop400_interface
 {
-	cop400_cki_bond		cki;			/* CKI bonding option */
-	cop400_cko_bond		cko;			/* CKO bonding option */
-	cop400_microbus		microbus;		/* microbus option */
+	cop400_cki_bond     cki;            /* CKI bonding option */
+	cop400_cko_bond     cko;            /* CKO bonding option */
+	cop400_microbus     microbus;       /* microbus option */
 };
 #define COP400_INTERFACE(name) const cop400_interface (name) =
 

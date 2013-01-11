@@ -21,7 +21,7 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	int        m_tile_bank;
-	int			m_sprite_bank;
+	int         m_sprite_bank;
 	int        m_flipscreen;
 
 	/* misc */

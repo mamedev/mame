@@ -228,10 +228,10 @@ void cosmicos_state::set_cdp1802_mode(int mode)
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::run )				{ if (!newval) set_cdp1802_mode(MODE_RUN); }
-INPUT_CHANGED_MEMBER( cosmicos_state::load )			{ if (!newval) set_cdp1802_mode(MODE_LOAD); }
-INPUT_CHANGED_MEMBER( cosmicos_state::cosmicos_pause )	{ if (!newval) set_cdp1802_mode(MODE_PAUSE); }
-INPUT_CHANGED_MEMBER( cosmicos_state::reset )			{ if (!newval) set_cdp1802_mode(MODE_RESET); }
+INPUT_CHANGED_MEMBER( cosmicos_state::run )             { if (!newval) set_cdp1802_mode(MODE_RUN); }
+INPUT_CHANGED_MEMBER( cosmicos_state::load )            { if (!newval) set_cdp1802_mode(MODE_LOAD); }
+INPUT_CHANGED_MEMBER( cosmicos_state::cosmicos_pause )  { if (!newval) set_cdp1802_mode(MODE_PAUSE); }
+INPUT_CHANGED_MEMBER( cosmicos_state::reset )           { if (!newval) set_cdp1802_mode(MODE_RESET); }
 
 void cosmicos_state::clear_input_data()
 {
@@ -557,12 +557,12 @@ static DM9368_INTERFACE( led_intf )
 
 static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
-    MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
-    MCFG_CPU_IO_MAP(cosmicos_io)
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
+	MCFG_CPU_IO_MAP(cosmicos_io)
 	MCFG_CPU_CONFIG(cosmicos_config)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
 	MCFG_DM9368_ADD(DM9368_TAG, led_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
@@ -595,8 +595,8 @@ MACHINE_CONFIG_END
 ROM_START( cosmicos )
 	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "hex", "Hex Monitor" )
-	ROMX_LOAD( "hex.ic6",	0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(1) ) /* typed in from manual */
-	ROMX_LOAD( "hex.ic7",	0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(1) ) /* typed in from manual */
+	ROMX_LOAD( "hex.ic6",   0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(1) ) /* typed in from manual */
+	ROMX_LOAD( "hex.ic7",   0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(1) ) /* typed in from manual */
 	ROM_SYSTEM_BIOS( 1, "ascii", "ASCII Monitor" )
 	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(2) )
 	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(2) )
@@ -624,4 +624,4 @@ DRIVER_INIT_MEMBER(cosmicos_state,cosmicos)
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */
-COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos, cosmicos_state,	cosmicos,	"Radio Bulletin",	"Cosmicos",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, cosmicos_state,   cosmicos,   "Radio Bulletin",   "Cosmicos", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

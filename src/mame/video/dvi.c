@@ -24,8 +24,8 @@ struct DVI_Header
 struct AVSS_Header
 {
 	UINT32 av1;       // header ID (AVSS)
-	UINT16 av2;		// header size
-	UINT16 av3;		// header version
+	UINT16 av2;     // header size
+	UINT16 av3;     // header version
 	UINT16 av4;       // number of stream groups
 	UINT16 av5;       // size of each stream group
 	UINT32 av6;       // offset to first stream group
@@ -80,7 +80,7 @@ struct AUDI_Header
 	UINT16 au3;      // header format
 	UINT8  au4[80];  // original media filename
 	UINT32 au5;      // original media frame ID
-	UINT16 au6;	   // original media frame ID
+	UINT16 au6;    // original media frame ID
 	UINT16 au7;      // unused (Pad)
 	UINT32 au8;      // number of frames
 	UINT32 au9;      // offset of next header
@@ -137,7 +137,7 @@ struct FHEAD_Header
 
 struct FDICT_Header
 {
-	UINT32 fd1;	// offset of frame header
+	UINT32 fd1; // offset of frame header
 };
 
 static UINT32 R32(UINT8 **currptr)
@@ -220,38 +220,38 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 	AVSS.av30 = R32(&currptr);
 	for (int i=0;i<32;i++) { AVSS.av31[i] = R8(&currptr); }
 
-	dviprintf("	AVSS Header\n");
-	dviprintf("	Header ID          %08x %c%c%c%c\n", AVSS.av1, (AVSS.av1>>24)&0xff,  (AVSS.av1>>16)&0xff,  (AVSS.av1>>8)&0xff,  (AVSS.av1>>0)&0xff);
-	dviprintf("	Header Size        %04x\n", AVSS.av2);
-	dviprintf("	Header Version     %04x\n", AVSS.av3);
-	dviprintf("	Stream Group Count %04x\n", AVSS.av4);
-	dviprintf("	Stream Group Size  %04x\n", AVSS.av5);
-	dviprintf("	Stream Group Offs  %08x\n", AVSS.av6);
-	dviprintf("	Stream Group Vers  %04x\n", AVSS.av7);
-	dviprintf("	Stream Size        %04x\n", AVSS.av8);
-	dviprintf("	Stream Version     %04x\n", AVSS.av9);
-	dviprintf("	Stream Count       %04x\n", AVSS.av10);
-	dviprintf("	Stream Offset      %08x\n", AVSS.av11);
-	dviprintf("	Header Pool Offset %08x\n", AVSS.av12);
-	dviprintf("	Label Count        %08x\n", AVSS.av13);
-	dviprintf("	Label Offset       %08x\n", AVSS.av14);
-	dviprintf("	Label Size         %04x\n", AVSS.av15);
-	dviprintf("	Label Version      %04x\n", AVSS.av16);
-	dviprintf("	Vid Seq Hdr Offset %08x\n", AVSS.av17);
-	dviprintf("	Vid Seq Hdr Size   %04x\n", AVSS.av18);
-	dviprintf("	Frame Version      %04x\n", AVSS.av19);
-	dviprintf("	Frame Count        %08x\n", AVSS.av20);
-	dviprintf("	Frame Size         %08x\n", AVSS.av21);
-	dviprintf("	First Frame Offset %08x\n", AVSS.av22);
-	dviprintf("	EO Frame Offset    %08x\n", AVSS.av23);
-	dviprintf("	Frame Header Size  %04x\n", AVSS.av24);
-	dviprintf("	Frame Dir Size     %04x\n", AVSS.av25);
-	dviprintf("	Frame Dir Offset   %08x\n", AVSS.av26);
-	dviprintf("	Frame Dir Vers     %04x\n", AVSS.av27);
-	dviprintf("	Frame PerSec       %04x\n", AVSS.av28);
-	dviprintf("	UpdateFlag         %08x\n", AVSS.av29);
-	dviprintf("	FreeBlock          %08x\n", AVSS.av30);
-	dviprintf("	Patch              ");	for (int i=0;i<32;i++) { dviprintf("%02x", AVSS.av31[i]); }; dviprintf("\n");
+	dviprintf(" AVSS Header\n");
+	dviprintf(" Header ID          %08x %c%c%c%c\n", AVSS.av1, (AVSS.av1>>24)&0xff,  (AVSS.av1>>16)&0xff,  (AVSS.av1>>8)&0xff,  (AVSS.av1>>0)&0xff);
+	dviprintf(" Header Size        %04x\n", AVSS.av2);
+	dviprintf(" Header Version     %04x\n", AVSS.av3);
+	dviprintf(" Stream Group Count %04x\n", AVSS.av4);
+	dviprintf(" Stream Group Size  %04x\n", AVSS.av5);
+	dviprintf(" Stream Group Offs  %08x\n", AVSS.av6);
+	dviprintf(" Stream Group Vers  %04x\n", AVSS.av7);
+	dviprintf(" Stream Size        %04x\n", AVSS.av8);
+	dviprintf(" Stream Version     %04x\n", AVSS.av9);
+	dviprintf(" Stream Count       %04x\n", AVSS.av10);
+	dviprintf(" Stream Offset      %08x\n", AVSS.av11);
+	dviprintf(" Header Pool Offset %08x\n", AVSS.av12);
+	dviprintf(" Label Count        %08x\n", AVSS.av13);
+	dviprintf(" Label Offset       %08x\n", AVSS.av14);
+	dviprintf(" Label Size         %04x\n", AVSS.av15);
+	dviprintf(" Label Version      %04x\n", AVSS.av16);
+	dviprintf(" Vid Seq Hdr Offset %08x\n", AVSS.av17);
+	dviprintf(" Vid Seq Hdr Size   %04x\n", AVSS.av18);
+	dviprintf(" Frame Version      %04x\n", AVSS.av19);
+	dviprintf(" Frame Count        %08x\n", AVSS.av20);
+	dviprintf(" Frame Size         %08x\n", AVSS.av21);
+	dviprintf(" First Frame Offset %08x\n", AVSS.av22);
+	dviprintf(" EO Frame Offset    %08x\n", AVSS.av23);
+	dviprintf(" Frame Header Size  %04x\n", AVSS.av24);
+	dviprintf(" Frame Dir Size     %04x\n", AVSS.av25);
+	dviprintf(" Frame Dir Offset   %08x\n", AVSS.av26);
+	dviprintf(" Frame Dir Vers     %04x\n", AVSS.av27);
+	dviprintf(" Frame PerSec       %04x\n", AVSS.av28);
+	dviprintf(" UpdateFlag         %08x\n", AVSS.av29);
+	dviprintf(" FreeBlock          %08x\n", AVSS.av30);
+	dviprintf(" Patch              ");  for (int i=0;i<32;i++) { dviprintf("%02x", AVSS.av31[i]); }; dviprintf("\n");
 	dviprintf("\n");
 
 	for (int s=0;s<AVSS.av10;s++)
@@ -271,19 +271,19 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 		STRM.st11 = R32(&currptr);
 		for (int i=0;i<16;i++) { STRM.st12[i] = R8(&currptr); }
 
-		dviprintf("		STRM Header\n");
-		dviprintf("		Header ID          %08x %c%c%c%c\n", STRM.st1, (STRM.st1>>24)&0xff,  (STRM.st1>>16)&0xff,  (STRM.st1>>8)&0xff,  (STRM.st1>>0)&0xff);
-		dviprintf("		Header Size        %04x\n", STRM.st2);
-		dviprintf("		Type               %04x\n", STRM.st3);
-		dviprintf("		SubType            %04x\n", STRM.st4);
-		dviprintf("		Header Count       %04x\n", STRM.st5);
-		dviprintf("		Next Stream Number %04x\n", STRM.st6);
-		dviprintf("		Stream Group Numbr %04x\n", STRM.st7);
-		dviprintf("		Padding            %04x\n", STRM.st8);
-		dviprintf("		Flag               %04x\n", STRM.st9);
-		dviprintf("		FrameSize          %08x\n", STRM.st10);
-		dviprintf("		FirstHeaderOffset  %08x\n", STRM.st11);
-		dviprintf("		Name               ");	for (int i=0;i<16;i++) { dviprintf("%02x", STRM.st12[i]); }; dviprintf("\n");
+		dviprintf("     STRM Header\n");
+		dviprintf("     Header ID          %08x %c%c%c%c\n", STRM.st1, (STRM.st1>>24)&0xff,  (STRM.st1>>16)&0xff,  (STRM.st1>>8)&0xff,  (STRM.st1>>0)&0xff);
+		dviprintf("     Header Size        %04x\n", STRM.st2);
+		dviprintf("     Type               %04x\n", STRM.st3);
+		dviprintf("     SubType            %04x\n", STRM.st4);
+		dviprintf("     Header Count       %04x\n", STRM.st5);
+		dviprintf("     Next Stream Number %04x\n", STRM.st6);
+		dviprintf("     Stream Group Numbr %04x\n", STRM.st7);
+		dviprintf("     Padding            %04x\n", STRM.st8);
+		dviprintf("     Flag               %04x\n", STRM.st9);
+		dviprintf("     FrameSize          %08x\n", STRM.st10);
+		dviprintf("     FirstHeaderOffset  %08x\n", STRM.st11);
+		dviprintf("     Name               ");  for (int i=0;i<16;i++) { dviprintf("%02x", STRM.st12[i]); }; dviprintf("\n");
 		dviprintf("\n");
 
 		UINT8* subptr = dvi_data+STRM.st11+baseoffset;
@@ -295,7 +295,7 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 
 
 			CIMG.ci1 = R32(&subptr);
-    		CIMG.ci2 = R16(&subptr);
+			CIMG.ci2 = R16(&subptr);
 			CIMG.ci3 = R16(&subptr);
 			for (int i=0;i<80;i++) { CIMG.ci4[i] = R8(&subptr); }
 			CIMG.ci5 = R32(&subptr);
@@ -318,30 +318,30 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 			CIMG.ci22 = R16(&subptr);
 			CIMG.ci23 = R32(&subptr);
 
-			dviprintf("			CIMG Header\n");
-			dviprintf("			Header ID          %08x %c%c%c%c\n", CIMG.ci1, (CIMG.ci1>>24)&0xff,  (CIMG.ci1>>16)&0xff,  (CIMG.ci1>>8)&0xff,  (CIMG.ci1>>0)&0xff);
-			dviprintf("			Header Size        %04x\n", CIMG.ci2);
-			dviprintf("			Version            %04x\n", CIMG.ci3);
-			dviprintf("			Original Name      ");	for (int i=0;i<80;i++) { dviprintf("%02x", CIMG.ci4[i]); }; dviprintf("\n");
-			dviprintf("			Original Frame     %08x\n", CIMG.ci5);
-			dviprintf("			Original Stream    %04x\n", CIMG.ci6);
-			dviprintf("			Padding            %04x\n", CIMG.ci7);
-			dviprintf("			Frame Count        %08x\n", CIMG.ci8);
-			dviprintf("			Next Header Offset %08x\n", CIMG.ci9);
-			dviprintf("			X Position         %04x\n", CIMG.ci10);
-			dviprintf("			Y Position         %04x\n", CIMG.ci11);
-			dviprintf("			X Length           %04x\n", CIMG.ci12);
-			dviprintf("			Y Length           %04x\n", CIMG.ci13);
-			dviprintf("			X Crop             %04x\n", CIMG.ci14);
-			dviprintf("			Y Crop             %04x\n", CIMG.ci15);
-			dviprintf("			Drop Frame         %04x\n", CIMG.ci16);
-			dviprintf("			Drop Phrase        %04x\n", CIMG.ci17);
-			dviprintf("			Still Period       %08x\n", CIMG.ci18);
-			dviprintf("			Buffer Minimum     %04x\n", CIMG.ci19);
-			dviprintf("			Buffer Maximum     %04x\n", CIMG.ci20);
-			dviprintf("			Decode Algorithm   %04x\n", CIMG.ci21);
-			dviprintf("			Padding(2)         %04x\n", CIMG.ci22);
-			dviprintf("			DCFID              %08x\n", CIMG.ci23);
+			dviprintf("         CIMG Header\n");
+			dviprintf("         Header ID          %08x %c%c%c%c\n", CIMG.ci1, (CIMG.ci1>>24)&0xff,  (CIMG.ci1>>16)&0xff,  (CIMG.ci1>>8)&0xff,  (CIMG.ci1>>0)&0xff);
+			dviprintf("         Header Size        %04x\n", CIMG.ci2);
+			dviprintf("         Version            %04x\n", CIMG.ci3);
+			dviprintf("         Original Name      ");  for (int i=0;i<80;i++) { dviprintf("%02x", CIMG.ci4[i]); }; dviprintf("\n");
+			dviprintf("         Original Frame     %08x\n", CIMG.ci5);
+			dviprintf("         Original Stream    %04x\n", CIMG.ci6);
+			dviprintf("         Padding            %04x\n", CIMG.ci7);
+			dviprintf("         Frame Count        %08x\n", CIMG.ci8);
+			dviprintf("         Next Header Offset %08x\n", CIMG.ci9);
+			dviprintf("         X Position         %04x\n", CIMG.ci10);
+			dviprintf("         Y Position         %04x\n", CIMG.ci11);
+			dviprintf("         X Length           %04x\n", CIMG.ci12);
+			dviprintf("         Y Length           %04x\n", CIMG.ci13);
+			dviprintf("         X Crop             %04x\n", CIMG.ci14);
+			dviprintf("         Y Crop             %04x\n", CIMG.ci15);
+			dviprintf("         Drop Frame         %04x\n", CIMG.ci16);
+			dviprintf("         Drop Phrase        %04x\n", CIMG.ci17);
+			dviprintf("         Still Period       %08x\n", CIMG.ci18);
+			dviprintf("         Buffer Minimum     %04x\n", CIMG.ci19);
+			dviprintf("         Buffer Maximum     %04x\n", CIMG.ci20);
+			dviprintf("         Decode Algorithm   %04x\n", CIMG.ci21);
+			dviprintf("         Padding(2)         %04x\n", CIMG.ci22);
+			dviprintf("         DCFID              %08x\n", CIMG.ci23);
 			dviprintf("\n");
 
 			subptr = dvi_data+CIMG.ci9+baseoffset;
@@ -364,7 +364,7 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 
 		FDICT.fd1 = ((FDICT.fd1 & 0xffff0000)>>16) |  ((FDICT.fd1 & 0x0000ffff)<<16);
 
-		dviprintf("	%04d Frame Offset %08x\n", f, FDICT.fd1);
+		dviprintf(" %04d Frame Offset %08x\n", f, FDICT.fd1);
 
 			UINT8* frameptr2 = dvi_data + ((FDICT.fd1 + baseoffset)&(regionsize-1)) ;
 		FHEAD_Header FHEAD;
@@ -372,9 +372,9 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 		FHEAD.fh2 = R32(&frameptr2);
 		FHEAD.fh3 = R32(&frameptr2);
 
-		dviprintf("		Frame Num         %08x\n", FHEAD.fh1);
-		dviprintf("		Previous Offset   %08x\n", FHEAD.fh2);
-		dviprintf("		Frame Checksum    %08x\n", FHEAD.fh3);
+		dviprintf("     Frame Num         %08x\n", FHEAD.fh1);
+		dviprintf("     Previous Offset   %08x\n", FHEAD.fh2);
+		dviprintf("     Frame Checksum    %08x\n", FHEAD.fh3);
 
 
 	}

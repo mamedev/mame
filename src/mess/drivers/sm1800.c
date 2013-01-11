@@ -153,15 +153,15 @@ void sm1800_state::palette_init()
 /* F4 Character Displayer */
 static const gfx_layout sm1800_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( sm1800 )
@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 
 	/* Devices */
 	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )
-	MCFG_I8275_ADD	("i8275", sm1800_i8275_interface)
+	MCFG_I8275_ADD  ("i8275", sm1800_i8275_interface)
 	MCFG_I8251_ADD("i8251", default_i8251_interface)
 MACHINE_CONFIG_END
 
@@ -205,4 +205,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( ????, sm1800,  0,       0,     sm1800,    sm1800, driver_device,     0,   "<unknown>", "SM1800", GAME_NOT_WORKING | GAME_NO_SOUND)
-

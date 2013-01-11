@@ -27,7 +27,7 @@ const device_type M6M80011AP = &device_creator<m6m80011ap_device>;
 
 m6m80011ap_device::m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, M6M80011AP, "m6m80011ap", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this)
+		device_nvram_interface(mconfig, *this)
 {
 
 }
@@ -230,4 +230,3 @@ WRITE_LINE_MEMBER( m6m80011ap_device::set_clock_line )
 		}
 	}
 }
-

@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tomcat_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)
 	AM_RANGE(0x30e0, 0x30e0) AM_NOP // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
-	AM_RANGE(0x5000, 0x507f) AM_RAM	// 6532 ram
+	AM_RANGE(0x5000, 0x507f) AM_RAM // 6532 ram
 	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -341,7 +341,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tomcat_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tomcat )
-	PORT_START("IN0")	/* INPUTS */
+	PORT_START("IN0")   /* INPUTS */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
@@ -392,8 +392,8 @@ static const riot6532_interface tomcat_riot6532_intf =
 */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,	//  PB0 - PB7   OUTPUT  Speech Data
-	DEVCB_NULL	// connected to IRQ line of 6502
+	DEVCB_NULL, //  PB0 - PB7   OUTPUT  Speech Data
+	DEVCB_NULL  // connected to IRQ line of 6502
 };
 
 static const tms52xx_config tms_intf =

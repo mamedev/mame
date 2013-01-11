@@ -65,7 +65,7 @@ WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
 #ifdef UNUSED_FUNCTION
 WRITE16_MEMBER(m90_state::unknown_w)
 {
-    printf("%04x    ",data);
+	printf("%04x    ",data);
 }
 #endif
 
@@ -73,7 +73,7 @@ WRITE16_MEMBER(m90_state::unknown_w)
 
 static ADDRESS_MAP_START( m90_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")	/* Quiz F1 only */
+	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")  /* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
 	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( hasamu )
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
 
-	PORT_START("P3_P4")	/* unused */
+	PORT_START("P3_P4") /* unused */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -225,7 +225,7 @@ static INPUT_PORTS_START( dynablst )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )	PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )    PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
 	PORT_DIPSETTING(      0x0010, "Dynablaster" )
 	PORT_DIPSETTING(      0x0000, "Bomber Man" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( dynablsb )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )	PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )    PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
 	PORT_DIPSETTING(      0x0010, "Dynablaster" )
 	PORT_DIPSETTING(      0x0000, "Bomber Man" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
@@ -312,7 +312,7 @@ static INPUT_PORTS_START( atompunk )
 	PORT_INCLUDE(dynablst)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( bombrman ) /* Does not appear to support 4 players or 
 	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:5" )	/* Manual says "NOT USE" */
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:5" )   /* Manual says "NOT USE" */
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
@@ -347,8 +347,8 @@ static INPUT_PORTS_START( bombrman ) /* Does not appear to support 4 players or 
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )	/* Manual says "NOT USE" */
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )	/* Manual says "NOT USE" */
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )   /* Manual says "NOT USE" */
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )   /* Manual says "NOT USE" */
 	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
@@ -357,7 +357,7 @@ static INPUT_PORTS_START( bombrman ) /* Does not appear to support 4 players or 
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
 
-	PORT_START("P3_P4")	/* unused */
+	PORT_START("P3_P4") /* unused */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -379,7 +379,7 @@ static INPUT_PORTS_START( bbmanw )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )	PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )    PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
 	PORT_DIPSETTING(      0x0010, "Bomber Man World" )
 	PORT_DIPSETTING(      0x0000, "New Dyna Blaster Global Quest" )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
@@ -395,9 +395,9 @@ static INPUT_PORTS_START( bbmanw )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(      0x0400, "2 Player" )
-	PORT_DIPSETTING(      0x0600, "4 Player Separate Coins" )		/* Each player has a separate Coin Slot */
-	PORT_DIPSETTING(      0x0200, "4 Player Shared Coins" )		/* All 4 players Share coin 1&2 */
-	PORT_DIPSETTING(      0x0000, "4 Player 1&2 3&4 Share Coins" )	/* Players 1&2 share coin 1&2, Players 3&4 share coin 3&4 */
+	PORT_DIPSETTING(      0x0600, "4 Player Separate Coins" )       /* Each player has a separate Coin Slot */
+	PORT_DIPSETTING(      0x0200, "4 Player Shared Coins" )     /* All 4 players Share coin 1&2 */
+	PORT_DIPSETTING(      0x0000, "4 Player 1&2 3&4 Share Coins" )  /* Players 1&2 share coin 1&2, Players 3&4 share coin 3&4 */
 	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
@@ -415,7 +415,7 @@ static INPUT_PORTS_START( bbmanwj )
 	PORT_INCLUDE(bbmanw)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -443,8 +443,8 @@ static INPUT_PORTS_START( quizf1 )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Joystick ) )	/* for quiz cabinets with buttons connected to the JAMMA "joystick" pins */
-	PORT_DIPSETTING(      0x0000, "Buttons" )			/* for non-quiz cabinet conversions */
+	PORT_DIPSETTING(      0x0020, DEF_STR( Joystick ) ) /* for quiz cabinets with buttons connected to the JAMMA "joystick" pins */
+	PORT_DIPSETTING(      0x0000, "Buttons" )           /* for non-quiz cabinet conversions */
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -467,7 +467,7 @@ static INPUT_PORTS_START( quizf1 )
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
 
-	PORT_START("P3_P4")	/* unused */
+	PORT_START("P3_P4") /* unused */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -522,7 +522,7 @@ static INPUT_PORTS_START( matchit2 )
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
 
-	PORT_START("P3_P4")	/* unused */
+	PORT_START("P3_P4") /* unused */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -579,7 +579,7 @@ static INPUT_PORTS_START( shisen2 )
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
 
-	PORT_START("P3_P4")	/* unused */
+	PORT_START("P3_P4") /* unused */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -629,7 +629,7 @@ static INPUT_PORTS_START( riskchal )
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
 
-	PORT_START("P3_P4")	/* unused */
+	PORT_START("P3_P4") /* unused */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -709,7 +709,7 @@ static MACHINE_CONFIG_START( m90, m90_state )
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(m90_sound_cpu_map)
 	MCFG_CPU_IO_MAP(m90_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, nmi_line_pulse,  128*60)	/* clocked by V1? (Vigilante) */
+	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, nmi_line_pulse,  128*60)    /* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 
@@ -746,7 +746,7 @@ static MACHINE_CONFIG_DERIVED( hasamu, m90 )
 	MCFG_CPU_CONFIG(hasamu_config)
 MACHINE_CONFIG_END
 
-static const nec_config quizf1_config ={	lethalth_decryption_table, };
+static const nec_config quizf1_config ={    lethalth_decryption_table, };
 static MACHINE_CONFIG_DERIVED( quizf1, m90 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(quizf1_config)
@@ -754,7 +754,7 @@ static MACHINE_CONFIG_DERIVED( quizf1, m90 )
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static const nec_config matchit2_config ={	matchit2_decryption_table, };
+static const nec_config matchit2_config ={  matchit2_decryption_table, };
 static MACHINE_CONFIG_DERIVED( matchit2, m90 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(matchit2_config)
@@ -762,7 +762,7 @@ static MACHINE_CONFIG_DERIVED( matchit2, m90 )
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_CONFIG_END
 
-static const nec_config riskchal_config ={	gussun_decryption_table, };
+static const nec_config riskchal_config ={  gussun_decryption_table, };
 static MACHINE_CONFIG_DERIVED( riskchal, m90 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(riskchal_config)
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_DERIVED( riskchal, m90 )
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static const nec_config bomberman_config ={ 	bomberman_decryption_table, };
+static const nec_config bomberman_config ={     bomberman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( bombrman, m90 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(bomberman_config)
@@ -778,7 +778,7 @@ static MACHINE_CONFIG_DERIVED( bombrman, m90 )
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_CONFIG_END
 
-static const nec_config dynablaster_config ={	dynablaster_decryption_table, };
+static const nec_config dynablaster_config ={   dynablaster_decryption_table, };
 static MACHINE_CONFIG_DERIVED( bbmanwj, m90 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CONFIG(dynablaster_config)
@@ -819,7 +819,7 @@ static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(dynablsb_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, irq0_line_hold,  64*60)	/* half the sample rate of the original */
+	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, irq0_line_hold,  64*60) /* half the sample rate of the original */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
@@ -843,7 +843,7 @@ ROM_START( hasamu )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hasc-p1.bin",  0x00001, 0x20000, CRC(53df9834) SHA1(2e7e38157a497e3def69c4abcae5803f71a098da) )
 	ROM_LOAD16_BYTE( "hasc-p0.bin",  0x00000, 0x20000, CRC(dff0ba6e) SHA1(83e20b3ae10b57c1e58d3d44bfca2ffd5f142056) )
-	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "hasc-sp.bin",    0x0000, 0x10000, CRC(259b1687) SHA1(39c3a89b1d0f5fec2a94a3048cc4639fe96820e2) )
@@ -854,7 +854,7 @@ ROM_START( hasamu )
 	ROM_LOAD( "hasc-c2.bin",    0x040000, 0x20000, CRC(d90f9a68) SHA1(c9eab3e87dd5d3eb88461be493d88f5482c9e257) )
 	ROM_LOAD( "hasc-c3.bin",    0x060000, 0x20000, CRC(6cfe0d39) SHA1(104feeacbbc86b168c41cd37fc5797781d9b5a0f) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 )	/* samples */
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
 	/* No samples */
 ROM_END
 
@@ -862,7 +862,7 @@ ROM_START( dynablst )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm-cp1e.62",   0x00001, 0x20000, CRC(27667681) SHA1(7d5f762026ea01817a65ea13b4b5793640e3e8fd) )
 	ROM_LOAD16_BYTE( "bbm-cp0e.65",   0x00000, 0x20000, CRC(95db7a67) SHA1(1a224d73615a60530cbcc54fdbb526e8d5a6c555) )
-	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
@@ -873,7 +873,7 @@ ROM_START( dynablst )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) )
 ROM_END
 
@@ -881,7 +881,7 @@ ROM_START( bombrman )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm-p1.62",   0x00001, 0x20000, CRC(982bd166) SHA1(ed67393ec319127616bff5fa3b7f84e8ac8e1d93) )
 	ROM_LOAD16_BYTE( "bbm-p0.65",   0x00000, 0x20000, CRC(0a20afcc) SHA1(a42b7458938300b0c84c820c1ea627aed9080f1b) )
-	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
@@ -892,7 +892,7 @@ ROM_START( bombrman )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) )
 ROM_END
 
@@ -900,7 +900,7 @@ ROM_START( atompunk )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm-cp0d.65",   0x00001, 0x20000, CRC(860c0479) SHA1(7556d62955d0d7a7100fbd9d9cb7356b96a4df78) )
 	ROM_LOAD16_BYTE( "bbm-cp1d.62",   0x00000, 0x20000, CRC(be57bf74) SHA1(cd3f887f7ec8a5721551477ec2d4a7336f422c6f) )
-	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
@@ -911,7 +911,7 @@ ROM_START( atompunk )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) ) /* Labeled as 9134HD002 */
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) ) /* Labeled as 9134HD003 */
 
-	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) ) /* Labeled as 9132E9001 */
 ROM_END
 
@@ -919,7 +919,7 @@ ROM_START( dynablstb )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "db2-26.bin",   0x00001, 0x20000, CRC(a78c72f8) SHA1(e3ed1bce0278bada6357b5d0823511fa0241f3cd) )
 	ROM_LOAD16_BYTE( "db3-25.bin",   0x00000, 0x20000, CRC(bf3137c3) SHA1(64bbca4b3a509b552ee8a19b3b50fe6638fd90e2) )
-	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "db1-17.bin",    0x0000, 0x10000, CRC(e693c32f) SHA1(b6f228d26318718eedae765de9479706a3e4c38d) )
@@ -930,15 +930,15 @@ ROM_START( dynablstb )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 )	/* samples */
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
 ROM_START( dynablstb2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
-    ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x020000, CRC(9c3e996a) SHA1(9244f6a8b498d0f488bbfc68465916ea0560f3be) )
-    ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x020000, CRC(697a2ed9) SHA1(d329987f7a0321414347b8e6a6dfc4304fbe4987) )
-    ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x020000, CRC(9c3e996a) SHA1(9244f6a8b498d0f488bbfc68465916ea0560f3be) )
+	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x020000, CRC(697a2ed9) SHA1(d329987f7a0321414347b8e6a6dfc4304fbe4987) )
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "db1-17.bin",    0x0000, 0x10000, CRC(e693c32f) SHA1(b6f228d26318718eedae765de9479706a3e4c38d) )
@@ -949,7 +949,7 @@ ROM_START( dynablstb2 )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 )	/* samples */
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
@@ -996,7 +996,7 @@ ROM_START( bbmanw )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm2-h0-b.77",  0x00001, 0x40000, CRC(567d3709) SHA1(1447fc68798589a8757ee2d133d053b80f052113) )
 	ROM_LOAD16_BYTE( "bbm2-l0-b.79",  0x00000, 0x40000, CRC(e762c22b) SHA1(b389a65adf1348e6529a992d9b68178d7503238e) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp.33",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) )
@@ -1015,7 +1015,7 @@ ROM_START( bbmanwj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm2-h0.77",  0x00001, 0x40000, CRC(e1407b91) SHA1(6c94afc6b1d2a469295890ee5dd9d9d5a02ae5c4) )
 	ROM_LOAD16_BYTE( "bbm2-l0.79",  0x00000, 0x40000, CRC(20873b49) SHA1(30ae595f7961cd56f2506608ae76973b2d0e73ca) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp-b.bin", 0x0000, 0x10000, CRC(b8d8108c) SHA1(ef4fb46d843819c273db2083754eb312f5abd44e) )
@@ -1026,7 +1026,7 @@ ROM_START( bbmanwj )
 	ROM_LOAD( "bbm2-c2.83",  0x100000, 0x40000, CRC(9ac2142f) SHA1(744fe1acae2fcba0051c303b644081546b4aed9e) )
 	ROM_LOAD( "bbm2-c3.84",  0x180000, 0x40000, CRC(47af1750) SHA1(dce176a6ca95852208b6eba7fb88a0d96467c34b) )
 
-	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "bbm2-v0-b.30",  0x0000, 0x20000, CRC(0ae655ff) SHA1(78752182662fd8f5b55bbbc2787c9f2b04096ea1) )
 ROM_END
 
@@ -1034,7 +1034,7 @@ ROM_START( newapunk )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm2-h0-a.77",  0x00001, 0x40000, CRC(7d858682) SHA1(03580e2903becb69766023585c6ecffbb8e0b9c5) )
 	ROM_LOAD16_BYTE( "bbm2-l0-a.79",  0x00000, 0x40000, CRC(c7568031) SHA1(ff4d0809260a088f530098a0173eec16fa6396f1) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp.33",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) )
@@ -1045,7 +1045,7 @@ ROM_START( newapunk )
 	ROM_LOAD( "bbm2-c2.83",  0x100000, 0x40000, CRC(9ac2142f) SHA1(744fe1acae2fcba0051c303b644081546b4aed9e) )
 	ROM_LOAD( "bbm2-c3.84",  0x180000, 0x40000, CRC(47af1750) SHA1(dce176a6ca95852208b6eba7fb88a0d96467c34b) )
 
-	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "bbm2-v0.30",    0x0000, 0x20000, CRC(4ad889ed) SHA1(b685892a2348f17f89c6d6ce91216f6cf1e33751) )
 ROM_END
 
@@ -1053,7 +1053,7 @@ ROM_START( bomblord )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bomblord.3",  0x00001, 0x40000, CRC(65d5c54a) SHA1(f794a193d5927b5fb838ab2351c176d8cbd37236) )
 	ROM_LOAD16_BYTE( "bomblord.4",  0x00000, 0x40000, CRC(cfe65f81) SHA1(8dae94abc67bc53f1c8dbe13243dc08a62fd5d22) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp.33",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) ) // bomblord.1
@@ -1072,9 +1072,9 @@ ROM_START( quizf1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "qf1-h0-.77",   0x000001, 0x40000, CRC(280e3049) SHA1(3b1f303d803f844fd260ed93e4d12a72876e4dbe) )
 	ROM_LOAD16_BYTE( "qf1-l0-.79",   0x000000, 0x40000, CRC(94588a6f) SHA1(ee912739c7719fc2b099da0c63f7473eedcfc718) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
-	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* banked at 80000-8FFFF */
+	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* banked at 80000-8FFFF */
 	ROM_LOAD16_BYTE( "qf1-h1-.78",   0x000001, 0x80000, CRC(c6c2eb2b) SHA1(83de08b0c72da8c3e4786063802d83cb1015032a) )
 	ROM_LOAD16_BYTE( "qf1-l1-.80",   0x000000, 0x80000, CRC(3132c144) SHA1(de3ae35cdfbb1231cab343142ac700df00f9b77a) )
 
@@ -1087,7 +1087,7 @@ ROM_START( quizf1 )
 	ROM_LOAD( "qf1-c2-.83",   0x100000, 0x80000, CRC(0b1460ae) SHA1(c6394e6bb2a4e3722c20d9f291cb6ba7aad5766d) )
 	ROM_LOAD( "qf1-c3-.84",   0x180000, 0x80000, CRC(2d32ff37) SHA1(f414f6bad1ffc4396fd757155e602bdefdc99408) )
 
-	ROM_REGION( 0x40000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
 	ROM_LOAD( "qf1-v0-.30",   0x0000, 0x40000, CRC(b8d16e7c) SHA1(28a20afb171dc68848f9fe793f53571d4c7502dd) )
 ROM_END
 
@@ -1095,7 +1095,7 @@ ROM_START( riskchal )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rc_h0.ic77",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) )
 	ROM_LOAD16_BYTE( "rc_l0.ic79",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "l4_a-sp.ic33",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
@@ -1106,7 +1106,7 @@ ROM_START( riskchal )
 	ROM_LOAD( "rc_c2.rom",    0x100000, 0x80000, CRC(687164d7) SHA1(0f0beb0a85ae5ae4434d1e45a27bbe67f5ee378a) )
 	ROM_LOAD( "rc_c3.rom",    0x180000, 0x80000, CRC(c86be6af) SHA1(c8a66b8b38a62e3eebb4a0e65a85e20f91182097) )
 
-	ROM_REGION( 0x40000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
 	ROM_LOAD( "rc_v0.rom",    0x0000, 0x40000, CRC(cddac360) SHA1(a3b18325991473c6d54b778a02bed86180aad37c) )
 ROM_END
 
@@ -1114,7 +1114,7 @@ ROM_START( gussun )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "l4_a-h0.ic77",    0x00001, 0x40000, CRC(9d585e61) SHA1(e108a9dc2dc1b75c1439271a2391f943c3a53fe1) )
 	ROM_LOAD16_BYTE( "l4_a-l0.ic79",    0x00000, 0x40000, CRC(c7b4c519) SHA1(44887ccf54f5e507d2db4f09a7c2b7b9ea217058) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "l4_a-sp.ic33",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
@@ -1125,7 +1125,7 @@ ROM_START( gussun )
 	ROM_LOAD( "rc_c2.rom",    0x100000, 0x80000, CRC(687164d7) SHA1(0f0beb0a85ae5ae4434d1e45a27bbe67f5ee378a) )
 	ROM_LOAD( "rc_c3.rom",    0x180000, 0x80000, CRC(c86be6af) SHA1(c8a66b8b38a62e3eebb4a0e65a85e20f91182097) )
 
-	ROM_REGION( 0x40000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x40000, "samples", 0 ) /* samples */
 	ROM_LOAD( "rc_v0.rom",    0x0000, 0x40000, CRC(cddac360) SHA1(a3b18325991473c6d54b778a02bed86180aad37c) )
 ROM_END
 
@@ -1133,7 +1133,7 @@ ROM_START( matchit2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sis2-h0-b.bin", 0x00001, 0x40000, CRC(9a2556ac) SHA1(3e4d5ac2869c703c5d5b769c2a09e501b5e6462e) ) /* Actually labeled as "SIS2-H0-B" */
 	ROM_LOAD16_BYTE( "sis2-l0-b.bin", 0x00000, 0x40000, CRC(d35d948a) SHA1(e4f119fa00fd8ede2533323e14d94ad4d5fabbc5) ) /* Actually labeled as "SIS2-L0-B" */
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sis2-sp-.rom", 0x0000, 0x10000, CRC(6fc0ff3a) SHA1(2b8c648c1fb5d516552fc260b8f18ffd56bbe062) )
@@ -1144,7 +1144,7 @@ ROM_START( matchit2 )
 	ROM_LOAD( "ic83.rom",     0x100000, 0x80000, CRC(2bd65dc6) SHA1(b50dec707ea5a71972df0a8dc47141d75e8f874e) )
 	ROM_LOAD( "ic84.rom",     0x180000, 0x80000, CRC(876d5fdb) SHA1(723c58268be60f4973e914df238b264708d3f1e3) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 )	/* samples */
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
 	/* Does this have a sample rom? */
 ROM_END
 
@@ -1152,7 +1152,7 @@ ROM_START( shisen2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sis2-h0-.rom", 0x00001, 0x40000, CRC(6fae0aea) SHA1(7ebecbfdb17e15b8c0ebd293cd42a618c596782e) )
 	ROM_LOAD16_BYTE( "sis2-l0-.rom", 0x00000, 0x40000, CRC(2af25182) SHA1(ec6dcc3913e1b7e7a3958b78610e83f51c404e07) )
-	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sis2-sp-.rom", 0x0000, 0x10000, CRC(6fc0ff3a) SHA1(2b8c648c1fb5d516552fc260b8f18ffd56bbe062) )
@@ -1163,7 +1163,7 @@ ROM_START( shisen2 )
 	ROM_LOAD( "ic83.rom",     0x100000, 0x80000, CRC(2bd65dc6) SHA1(b50dec707ea5a71972df0a8dc47141d75e8f874e) )
 	ROM_LOAD( "ic84.rom",     0x180000, 0x80000, CRC(876d5fdb) SHA1(723c58268be60f4973e914df238b264708d3f1e3) )
 
-	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 )	/* samples */
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 ) /* samples */
 	/* Does this have a sample rom? */
 ROM_END
 
@@ -1207,5 +1207,3 @@ GAME( 1993, riskchal, 0,        riskchal, riskchal, driver_device, 0,        ROT
 GAME( 1993, gussun,   riskchal, riskchal, riskchal, driver_device, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1993, matchit2, 0,        matchit2, matchit2, driver_device, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1993, shisen2,  matchit2, matchit2, shisen2, driver_device,  0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-
-

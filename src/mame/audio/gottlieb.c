@@ -43,9 +43,9 @@
 #include "includes/gottlieb.h"
 
 
-#define SOUND1_CLOCK		XTAL_3_579545MHz
-#define SOUND2_CLOCK		XTAL_4MHz
-#define SOUND2_SPEECH_CLOCK	XTAL_3_12MHz
+#define SOUND1_CLOCK        XTAL_3_579545MHz
+#define SOUND2_CLOCK        XTAL_4MHz
+#define SOUND2_SPEECH_CLOCK XTAL_3_12MHz
 
 
 //**************************************************************************
@@ -162,15 +162,15 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 
 			mame_printf_debug("Votrax played '%s'\n", phonemes);
 
-			if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert & Tylz - Hello, I am turned on */
-                                m_samples->start(0, 42);
-			else if (strcmp(phonemes, "[0]BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
+			if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)   /* Q-Bert & Tylz - Hello, I am turned on */
+								m_samples->start(0, 42);
+			else if (strcmp(phonemes, "[0]BAH1EH1Y") == 0)                            /* Q-Bert - Bye, bye */
 				m_samples->start(0, 43);
-			else if (strcmp(phonemes, "[0]A2YHT LEH2FTTH") == 0)					  /* Reactor - Eight left */
+			else if (strcmp(phonemes, "[0]A2YHT LEH2FTTH") == 0)                      /* Reactor - Eight left */
 				m_samples->start(0, 0);
-			else if (strcmp(phonemes, "[0]SI3KS DTYN LEH2FTTH") == 0)				  /* Reactor - Sixteen left */
+			else if (strcmp(phonemes, "[0]SI3KS DTYN LEH2FTTH") == 0)                 /* Reactor - Sixteen left */
 				m_samples->start(0, 1);
-			else if (strcmp(phonemes, "[0]WO2RNYNG KO2R UH1NSDTABUH1L") == 0)		  /* Reactor - Warning core unstable */
+			else if (strcmp(phonemes, "[0]WO2RNYNG KO2R UH1NSDTABUH1L") == 0)         /* Reactor - Warning core unstable */
 				m_samples->start(0, 5);
 			else if (strcmp(phonemes, "[0]CHAMBERR   AE1EH2KTI1VA1I3DTEH1DT ") == 0) /* Reactor - Chamber activated */
 				m_samples->start(0, 7);
@@ -206,7 +206,7 @@ static const char *const reactor_sample_names[] =
 	"fx_39j", /* "45000" */
 	"fx_39k", /* "50000" */
 	"fx_39l", /* "55000" */
-	0	/* end of array */
+	0   /* end of array */
 };
 
 static const char *const qbert_sample_names[] =
@@ -256,18 +256,18 @@ static const char *const qbert_sample_names[] =
 	"fx_23", /* O1 with varying voice clock */
 	"fx_28",
 	"fx_36",
-	0	/* end of array */
+	0   /* end of array */
 };
 
 static const samples_interface reactor_samples_interface =
 {
-	1,	/* one channel */
+	1,  /* one channel */
 	reactor_sample_names
 };
 
 static const samples_interface qbert_samples_interface =
 {
-	1,	/* one channel */
+	1,  /* one channel */
 	qbert_sample_names
 };
 
@@ -310,12 +310,12 @@ static const char *const qbert_knocker_names[] =
 {
 	"*qbert",
 	"knocker",
-	0	/* end of array */
+	0   /* end of array */
 };
 
 static const samples_interface qbert_knocker_interface =
 {
-	1,	/* one channel */
+	1,  /* one channel */
 	qbert_knocker_names
 };
 
@@ -338,36 +338,36 @@ MACHINE_CONFIG_END
 
 gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", "gotsndr1", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_audiocpu(*this, "audiocpu"),
-	  m_riot(*this, "riot"),
-	  m_dac(*this, "dac"),
-	  m_votrax(*this, "votrax"),
-	  m_populate_votrax(false),
-	  m_last_speech_clock(0)
+		device_mixer_interface(mconfig, *this),
+		m_audiocpu(*this, "audiocpu"),
+		m_riot(*this, "riot"),
+		m_dac(*this, "dac"),
+		m_votrax(*this, "votrax"),
+		m_populate_votrax(false),
+		m_last_speech_clock(0)
 #if USE_FAKE_VOTRAX
-	  , m_samples(*this, ":samples"),
-	  m_score_sample(0),
-	  m_random_offset(0),
-	  m_votrax_queuepos(0)
+		, m_samples(*this, ":samples"),
+		m_score_sample(0),
+		m_random_offset(0),
+		m_votrax_queuepos(0)
 #endif
 {
 }
 
 gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool populate_votrax)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", "gotsndr1", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_audiocpu(*this, "audiocpu"),
-	  m_riot(*this, "riot"),
-	  m_dac(*this, "dac"),
-	  m_votrax(*this, "votrax"),
-	  m_populate_votrax(populate_votrax),
-	  m_last_speech_clock(0)
+		device_mixer_interface(mconfig, *this),
+		m_audiocpu(*this, "audiocpu"),
+		m_riot(*this, "riot"),
+		m_dac(*this, "dac"),
+		m_votrax(*this, "votrax"),
+		m_populate_votrax(populate_votrax),
+		m_last_speech_clock(0)
 #if USE_FAKE_VOTRAX
-	  , m_samples(*this, ":samples"),
-	  m_score_sample(0),
-	  m_random_offset(0),
-	  m_votrax_queuepos(0)
+		, m_samples(*this, ":samples"),
+		m_score_sample(0),
+		m_random_offset(0),
+		m_votrax_queuepos(0)
 #endif
 {
 }
@@ -512,7 +512,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1 )
 	// audio CPU
-	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4)	// the board can be set to /2 as well
+	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r1_map)
 
 	// I/O configuration
@@ -544,7 +544,7 @@ INPUT_PORTS_START( gottlieb_sound_r1 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )			PORT_DIPLOCATION("SB1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, 0x80, IPT_SPECIAL )
@@ -637,23 +637,23 @@ ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() co
 
 gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOTTLIEB_SOUND_REV2, "Gottlieb Sound rev. 2", "gotsndr2", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_audiocpu(*this, "audiocpu"),
-	  m_speechcpu(*this, "speechcpu"),
-	  m_dac(*this, "dac"),
-	  m_ay1(*this, "ay1"),
-	  m_ay2(*this, "ay2"),
-	  m_sp0250(*this, "spsnd"),
-	  m_cobram3_mod(false),
-	  m_nmi_timer(NULL),
-	  m_nmi_state(0),
-	  m_audiocpu_latch(0),
-	  m_speechcpu_latch(0),
-	  m_speech_control(0),
-	  m_last_command(0),
-	  m_psg_latch(0),
-	  m_psg_data_latch(0),
-	  m_sp0250_latch(0)
+		device_mixer_interface(mconfig, *this),
+		m_audiocpu(*this, "audiocpu"),
+		m_speechcpu(*this, "speechcpu"),
+		m_dac(*this, "dac"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2"),
+		m_sp0250(*this, "spsnd"),
+		m_cobram3_mod(false),
+		m_nmi_timer(NULL),
+		m_nmi_state(0),
+		m_audiocpu_latch(0),
+		m_speechcpu_latch(0),
+		m_speech_control(0),
+		m_last_command(0),
+		m_psg_latch(0),
+		m_psg_data_latch(0),
+		m_sp0250_latch(0)
 {
 }
 
@@ -783,7 +783,7 @@ CUSTOM_INPUT_MEMBER( gottlieb_sound_r2_device::speech_drq_custom_r )
 WRITE8_MEMBER( gottlieb_sound_r2_device::dac_w )
 {
 	// dual DAC; the first DAC serves as the reference voltage for the
-    // second, effectively scaling the output
+	// second, effectively scaling the output
 	m_dac_data[offset] = data;
 	m_dac->write_unsigned16(m_dac_data[0] * m_dac_data[1]);
 }
@@ -935,7 +935,7 @@ INPUT_PORTS_START( gottlieb_sound_r2 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB2:4")
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB2:5")
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB2:6")
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )			PORT_DIPLOCATION("SB2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_sound_r2_device, speech_drq_custom_r, NULL)

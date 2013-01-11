@@ -78,6 +78,3 @@ private:
 
 
 extern const device_type VSYSTEM_SPR;
-
-
-

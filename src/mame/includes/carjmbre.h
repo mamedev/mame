@@ -21,7 +21,7 @@ public:
 	UINT8   m_flipscreen;
 	UINT16  m_bgcolor;
 
-	UINT8	m_nmi_mask;
+	UINT8   m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(carjmbre_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(carjmbre_bgcolor_w);

@@ -100,7 +100,7 @@ public:
 	emu_timer *m_lphaser_2_timer;
 	UINT8 m_lphaser_1_latch;
 	UINT8 m_lphaser_2_latch;
-	int m_lphaser_x_offs;	/* Needed to 'calibrate' lphaser; set at cart loading */
+	int m_lphaser_x_offs;   /* Needed to 'calibrate' lphaser; set at cart loading */
 
 	/* Data needed for SegaScope (3D glasses) */
 	UINT8 m_sscope_state;
@@ -204,11 +204,11 @@ DEVICE_START( sms_cart );
 DEVICE_IMAGE_LOAD( sms_cart );
 
 
-#define IO_EXPANSION    (0x80)	/* Expansion slot enable (1= disabled, 0= enabled) */
-#define IO_CARTRIDGE    (0x40)	/* Cartridge slot enable (1= disabled, 0= enabled) */
-#define IO_CARD         (0x20)	/* Card slot disabled (1= disabled, 0= enabled) */
-#define IO_WORK_RAM     (0x10)	/* Work RAM disabled (1= disabled, 0= enabled) */
-#define IO_BIOS_ROM     (0x08)	/* BIOS ROM disabled (1= disabled, 0= enabled) */
-#define IO_CHIP         (0x04)	/* I/O chip disabled (1= disabled, 0= enabled) */
+#define IO_EXPANSION    (0x80)  /* Expansion slot enable (1= disabled, 0= enabled) */
+#define IO_CARTRIDGE    (0x40)  /* Cartridge slot enable (1= disabled, 0= enabled) */
+#define IO_CARD         (0x20)  /* Card slot disabled (1= disabled, 0= enabled) */
+#define IO_WORK_RAM     (0x10)  /* Work RAM disabled (1= disabled, 0= enabled) */
+#define IO_BIOS_ROM     (0x08)  /* BIOS ROM disabled (1= disabled, 0= enabled) */
+#define IO_CHIP         (0x04)  /* I/O chip disabled (1= disabled, 0= enabled) */
 
 #endif /* SMS_H_ */

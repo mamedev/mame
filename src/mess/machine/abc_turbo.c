@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z80_TAG		"z80"
+#define Z80_TAG     "z80"
 
 
 
@@ -84,14 +84,14 @@ static const z80_daisy_config daisy_chain[] =
 
 static const floppy_interface unidisk_floppy_interface =
 {
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSDD,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
+	"floppy_5_25",
 	NULL
 };
 
@@ -131,11 +131,11 @@ machine_config_constructor turbo_kontroller_device::device_mconfig_additions() c
 //-------------------------------------------------
 
 turbo_kontroller_device::turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, TURBO_KONTROLLER, "Turbo-Kontroller", tag, owner, clock),
-	  device_abcbus_card_interface(mconfig, *this),
-	  m_maincpu(*this, Z80_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1)
+	: device_t(mconfig, TURBO_KONTROLLER, "Turbo-Kontroller", tag, owner, clock),
+		device_abcbus_card_interface(mconfig, *this),
+		m_maincpu(*this, Z80_TAG),
+		m_image0(*this, FLOPPY_0),
+		m_image1(*this, FLOPPY_1)
 {
 }
 

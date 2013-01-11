@@ -168,13 +168,13 @@ INPUT_PORTS_END
 
 static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_NULL,										/* callback when change interrupt status */
-	DEVCB_NULL,										/* port A read callback */
-	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_a_w),	/* port A write callback */
-	DEVCB_NULL,										/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_b_r),	/* port B read callback */
-	DEVCB_NULL,										/* port B write callback */
-	DEVCB_NULL										/* portB ready active callback */
+	DEVCB_NULL,                                     /* callback when change interrupt status */
+	DEVCB_NULL,                                     /* port A read callback */
+	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_a_w),   /* port A write callback */
+	DEVCB_NULL,                                     /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_b_r),   /* port B read callback */
+	DEVCB_NULL,                                     /* port B write callback */
+	DEVCB_NULL                                      /* portB ready active callback */
 };
 
 

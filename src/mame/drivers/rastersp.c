@@ -4,12 +4,12 @@
 
     driver by Phil Bennett
 
-	Games supported:
-		* Rise of the Robots (prototype)
+    Games supported:
+        * Rise of the Robots (prototype)
 
-	ROMs wanted:
-		* Zool (prototype)
-		* Football Crazy (need HDD/CD image)
+    ROMs wanted:
+        * Zool (prototype)
+        * Football Crazy (need HDD/CD image)
 
 ****************************************************************************/
 
@@ -28,11 +28,11 @@
  *
  *************************************/
 
-#define	SOUND_CLOCK				XTAL_12_288MHz
-#define PLL_CLOCK				XTAL_14_31818MHz
-#define NVRAM_SIZE				0x8000
+#define SOUND_CLOCK             XTAL_12_288MHz
+#define PLL_CLOCK               XTAL_14_31818MHz
+#define NVRAM_SIZE              0x8000
 
-#define USE_SPEEDUP_HACK		1
+#define USE_SPEEDUP_HACK        1
 
 
 /*************************************
@@ -48,58 +48,58 @@ class rastersp_state : public driver_device
 public:
 	rastersp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_dsp(*this, "dsp"),
-		  m_dram(*this, "dram"),
-		  m_dac_l(*this, "dac_l"),
-		  m_dac_r(*this, "dac_r"),
-		  m_tms_timer1(*this, "tms_timer1"),
-		  m_tms_tx_timer(*this, "tms_tx_timer")
+			m_maincpu(*this, "maincpu"),
+			m_dsp(*this, "dsp"),
+			m_dram(*this, "dram"),
+			m_dac_l(*this, "dac_l"),
+			m_dac_r(*this, "dac_r"),
+			m_tms_timer1(*this, "tms_timer1"),
+			m_tms_tx_timer(*this, "tms_tx_timer")
 	{}
 
-	#define VIDEO_ADDR_MASK		0x3fffffff
+	#define VIDEO_ADDR_MASK     0x3fffffff
 
 	enum tms_regs
 	{
-		DMA_GLOBAL_CTL		=	0x00,
-		DMA_SOURCE_ADDR		=	0x04,
-		DMA_DEST_ADDR		=	0x06,
-		DMA_TRANSFER_COUNT	=	0x08,
+		DMA_GLOBAL_CTL      =   0x00,
+		DMA_SOURCE_ADDR     =   0x04,
+		DMA_DEST_ADDR       =   0x06,
+		DMA_TRANSFER_COUNT  =   0x08,
 
-		TIMER0_GLOBAL_CTL	=	0x20,
-		TIMER0_COUNTER		=	0x24,
-		TIMER0_PERIOD		=	0x28,
+		TIMER0_GLOBAL_CTL   =   0x20,
+		TIMER0_COUNTER      =   0x24,
+		TIMER0_PERIOD       =   0x28,
 
-		TIMER1_GLOBAL_CTL	=	0x30,
-		TIMER1_COUNTER		=	0x34,
-		TIMER1_PERIOD		=	0x38,
+		TIMER1_GLOBAL_CTL   =   0x30,
+		TIMER1_COUNTER      =   0x34,
+		TIMER1_PERIOD       =   0x38,
 
-		SPORT_GLOBAL_CTL	=	0x40,
-		SPORT_TX_CTL		=	0x42,
-		SPORT_RX_CTL		=	0x43,
-		SPORT_TIMER_CTL		=	0x44,
-		SPORT_TIMER_COUNTER	=	0x45,
-		SPORT_TIMER_PERIOD	=	0x46,
-		SPORT_DATA_TX		=	0x48,
-		SPORT_DATA_RX		=	0x4c,
+		SPORT_GLOBAL_CTL    =   0x40,
+		SPORT_TX_CTL        =   0x42,
+		SPORT_RX_CTL        =   0x43,
+		SPORT_TIMER_CTL     =   0x44,
+		SPORT_TIMER_COUNTER =   0x45,
+		SPORT_TIMER_PERIOD  =   0x46,
+		SPORT_DATA_TX       =   0x48,
+		SPORT_DATA_RX       =   0x4c,
 	};
 
 	enum irq_status
 	{
-		IRQ_RTC		= 1,
-		IRQ_UART	= 2,
-		IRQ_DSP		= 4,
-		IRQ_VBLANK	= 5,
-		IRQ_SCSI	= 7,
+		IRQ_RTC     = 1,
+		IRQ_UART    = 2,
+		IRQ_DSP     = 4,
+		IRQ_VBLANK  = 5,
+		IRQ_SCSI    = 7,
 	};
 
-	required_device<cpu_device>		m_maincpu;
-	required_device<cpu_device>		m_dsp;
-	required_shared_ptr<UINT32>		m_dram;
-	required_device<dac_device>		m_dac_l;
-	required_device<dac_device>		m_dac_r;
-	required_device<timer_device>	m_tms_timer1;
-	required_device<timer_device>	m_tms_tx_timer;
+	required_device<cpu_device>     m_maincpu;
+	required_device<cpu_device>     m_dsp;
+	required_shared_ptr<UINT32>     m_dram;
+	required_device<dac_device>     m_dac_l;
+	required_device<dac_device>     m_dac_r;
+	required_device<timer_device>   m_tms_timer1;
+	required_device<timer_device>   m_tms_tx_timer;
 
 	DECLARE_WRITE32_MEMBER(cyrix_cache_w);
 	DECLARE_READ8_MEMBER(nvram_r);
@@ -121,18 +121,18 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_tx_timer);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	UINT8	*m_nvram8;
-	UINT8	m_io_reg;
-	UINT8	m_irq_status;
-	UINT32	m_dpyaddr;
+	UINT8   *m_nvram8;
+	UINT8   m_io_reg;
+	UINT8   m_irq_status;
+	UINT32  m_dpyaddr;
 	UINT16 *m_palette;
-	UINT32	m_speedup_count;
-	UINT32	m_tms_io_regs[0x80];
+	UINT32  m_speedup_count;
+	UINT32  m_tms_io_regs[0x80];
 	bitmap_ind16 m_update_bitmap;
 
-	UINT32	screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void	update_irq(UINT32 which, UINT32 state);
-	void	upload_palette(UINT32 word1, UINT32 word2);
+	UINT32  screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void    update_irq(UINT32 which, UINT32 state);
+	void    upload_palette(UINT32 word1, UINT32 word2);
 
 protected:
 	// driver_device overrides
@@ -281,7 +281,7 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 				upload_palette(word1, word2);
 			}
 		}
-	}	
+	}
 }
 
 
@@ -307,40 +307,40 @@ void rastersp_state::upload_palette(UINT32 word1, UINT32 word2)
 
 /*******************************************************************************
 
-	Display list register:
+    Display list register:
 
-	..xxxxxx xxxxxxxx xxxxxxxx ........	 Display list base (DWORD granularity)
-	........ ........ ........ xxxxxxxx  ? (number of entries? Only seems to be valid for basic stuff)
+    ..xxxxxx xxxxxxxx xxxxxxxx ........  Display list base (DWORD granularity)
+    ........ ........ ........ xxxxxxxx  ? (number of entries? Only seems to be valid for basic stuff)
 
-	Display list format:
+    Display list format:
 
-[0] ..xxxxxx xxxxxxxx xxxxxxxx ........	 Source address (4MB mask?)
+[0] ..xxxxxx xxxxxxxx xxxxxxxx ........  Source address (4MB mask?)
 
 Palette update: (8d000400)
 [1] 1....... ........ ........ ........  ?
     ...0.... ........ ........ ........  0 for palette upload?
-	....11.. ........ ........ ........  ?
+    ....11.. ........ ........ ........  ?
     .......x xxxxxxxx ........ ........  Entry count
     ........ ........ .....1.. ........  ? (Usually 1)
 
 Pixel data: (94040100)
 [2] 1....... ........ ........ ........  ?
     ...1.... ........ ........ ........  1 for video update?
-	.....1.. ........ ........ ........  ?
+    .....1.. ........ ........ ........  ?
     .......x xxxxxxxx ........ ........  Pixel count
     ........ ........ xxxx.... ........  Palette
-	........ ........ ....xxxx xxxxxxxx  Scale (4.8 signed fixed point)
+    ........ ........ ....xxxx xxxxxxxx  Scale (4.8 signed fixed point)
 
 Unknown: (D4000100) - Present at start of a list
 [3] 1....... ........ ........ .........
     .1...... ........ ........ ......... ?
     ..1..... ........ ........ .........
-	.....1.. ........ ........ ......... ?
-	........ ........ .......1 ......... ?
+    .....1.. ........ ........ ......... ?
+    ........ ........ .......1 ......... ?
 
 
-	TODO: I'm not sure about bit 28. When creating the display list if it's 0,
-	0x1000 is added to the source address.
+    TODO: I'm not sure about bit 28. When creating the display list if it's 0,
+    0x1000 is added to the source address.
 
 *******************************************************************************/
 
@@ -807,15 +807,15 @@ static INPUT_PORTS_START( rotr )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "Debug Screen" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x0e, 0x00, "FPGA File Source" )
-	PORT_DIPSETTING(	0x00, "Serial PROMs" )
+	PORT_DIPSETTING(    0x00, "Serial PROMs" )
 	PORT_DIPSETTING(    0x0e, "Cable" )
 
 	PORT_DIPNAME( 0x70, 0x50, "Clock speed" )
-	PORT_DIPSETTING(	0x00, "4" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x10, "8" )
 	PORT_DIPSETTING(    0x20, "16" )
 	PORT_DIPSETTING(    0x30, "20" )
@@ -825,7 +825,7 @@ static INPUT_PORTS_START( rotr )
 	PORT_DIPSETTING(    0x70, "50" )
 
 	PORT_DIPNAME( 0x80, 0x00, "SCSI bus terminated" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 INPUT_PORTS_END
 
@@ -869,7 +869,7 @@ SLOT_INTERFACE_END
 
 static const tms3203x_config tms_config =
 {
-	true	// Boot-loader mode
+	true    // Boot-loader mode
 };
 
 
@@ -904,14 +904,14 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-    MCFG_SCREEN_UPDATE_DRIVER(rastersp_state, screen_update)
-   	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE_DRIVER(rastersp_state, screen_update)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(65536)
 
-    /* Sound */
+	/* Sound */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DAC_ADD("dac_l")
@@ -947,16 +947,16 @@ ROM_START( rotr )
 ROM_END
 
 
-/* 
+/*
   Football Crazy runs on the (c)1997 "RASTERSPEED 2.1 31-599-001 ISS 4" PCB, which seems to be a more modern production version.
   a PCB photo with the rom sticker showing the text below has also been seen
-  
+
   Football Crazy Cashflow
   95 750 956
   STANDARD UK 64K
   VER. FOOT 3.2 BFM
 
-  
+
 
 */
 

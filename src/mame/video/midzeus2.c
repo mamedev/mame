@@ -18,14 +18,14 @@
  *
  *************************************/
 
-#define DUMP_WAVE_RAM		0
-#define TRACK_REG_USAGE		0
+#define DUMP_WAVE_RAM       0
+#define TRACK_REG_USAGE     0
 
-#define WAVERAM0_WIDTH		1024
-#define WAVERAM0_HEIGHT		2048
+#define WAVERAM0_WIDTH      1024
+#define WAVERAM0_HEIGHT     2048
 
-#define WAVERAM1_WIDTH		512
-#define WAVERAM1_HEIGHT		1024
+#define WAVERAM1_WIDTH      512
+#define WAVERAM1_HEIGHT     1024
 
 
 
@@ -37,14 +37,14 @@
 
 struct poly_extra_data
 {
-	const void *	palbase;
-	const void *	texbase;
-	UINT16			solidcolor;
-	INT16			zoffset;
-	UINT16			transcolor;
-	UINT16			texwidth;
-	UINT16			color;
-	UINT32			alpha;
+	const void *    palbase;
+	const void *    texbase;
+	UINT16          solidcolor;
+	INT16           zoffset;
+	UINT16          transcolor;
+	UINT16          texwidth;
+	UINT16          color;
+	UINT32          alpha;
 };
 
 
@@ -122,31 +122,31 @@ static void log_fifo_command(const UINT32 *data, int numwords, const char *suffi
  *
  *************************************/
 
-#define WAVERAM_BLOCK0(blocknum)				((void *)((UINT8 *)waveram[0] + 8 * (blocknum)))
-#define WAVERAM_BLOCK1(blocknum)				((void *)((UINT8 *)waveram[1] + 12 * (blocknum)))
+#define WAVERAM_BLOCK0(blocknum)                ((void *)((UINT8 *)waveram[0] + 8 * (blocknum)))
+#define WAVERAM_BLOCK1(blocknum)                ((void *)((UINT8 *)waveram[1] + 12 * (blocknum)))
 
-#define WAVERAM_PTR8(base, bytenum)				((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
-#define WAVERAM_READ8(base, bytenum)			(*WAVERAM_PTR8(base, bytenum))
-#define WAVERAM_WRITE8(base, bytenum, data)		do { *WAVERAM_PTR8(base, bytenum) = (data); } while (0)
+#define WAVERAM_PTR8(base, bytenum)             ((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
+#define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
+#define WAVERAM_WRITE8(base, bytenum, data)     do { *WAVERAM_PTR8(base, bytenum) = (data); } while (0)
 
-#define WAVERAM_PTR16(base, wordnum)			((UINT16 *)(base) + BYTE_XOR_LE(wordnum))
-#define WAVERAM_READ16(base, wordnum)			(*WAVERAM_PTR16(base, wordnum))
-#define WAVERAM_WRITE16(base, wordnum, data)	do { *WAVERAM_PTR16(base, wordnum) = (data); } while (0)
+#define WAVERAM_PTR16(base, wordnum)            ((UINT16 *)(base) + BYTE_XOR_LE(wordnum))
+#define WAVERAM_READ16(base, wordnum)           (*WAVERAM_PTR16(base, wordnum))
+#define WAVERAM_WRITE16(base, wordnum, data)    do { *WAVERAM_PTR16(base, wordnum) = (data); } while (0)
 
-#define WAVERAM_PTR32(base, dwordnum)			((UINT32 *)(base) + (dwordnum))
-#define WAVERAM_READ32(base, dwordnum)			(*WAVERAM_PTR32(base, dwordnum))
-#define WAVERAM_WRITE32(base, dwordnum, data)	do { *WAVERAM_PTR32(base, dwordnum) = (data); } while (0)
+#define WAVERAM_PTR32(base, dwordnum)           ((UINT32 *)(base) + (dwordnum))
+#define WAVERAM_READ32(base, dwordnum)          (*WAVERAM_PTR32(base, dwordnum))
+#define WAVERAM_WRITE32(base, dwordnum, data)   do { *WAVERAM_PTR32(base, dwordnum) = (data); } while (0)
 
-#define PIXYX_TO_DWORDNUM(y, x)					(((((y) & 0x1ff) << 8) | (((x) & 0x1fe) >> 1)) * 3 + ((x) & 1))
-#define DEPTHYX_TO_DWORDNUM(y, x)				(PIXYX_TO_DWORDNUM(y, (x) & ~1) + 2)
+#define PIXYX_TO_DWORDNUM(y, x)                 (((((y) & 0x1ff) << 8) | (((x) & 0x1fe) >> 1)) * 3 + ((x) & 1))
+#define DEPTHYX_TO_DWORDNUM(y, x)               (PIXYX_TO_DWORDNUM(y, (x) & ~1) + 2)
 
-#define WAVERAM_PTRPIX(base, y, x)				WAVERAM_PTR32(base, PIXYX_TO_DWORDNUM(y, x))
-#define WAVERAM_READPIX(base, y, x)				(*WAVERAM_PTRPIX(base, y, x))
-#define WAVERAM_WRITEPIX(base, y, x, color)		do { *WAVERAM_PTRPIX(base, y, x) = (color);  } while (0)
+#define WAVERAM_PTRPIX(base, y, x)              WAVERAM_PTR32(base, PIXYX_TO_DWORDNUM(y, x))
+#define WAVERAM_READPIX(base, y, x)             (*WAVERAM_PTRPIX(base, y, x))
+#define WAVERAM_WRITEPIX(base, y, x, color)     do { *WAVERAM_PTRPIX(base, y, x) = (color);  } while (0)
 
-#define WAVERAM_PTRDEPTH(base, y, x)			WAVERAM_PTR16(base, DEPTHYX_TO_DWORDNUM(y, x) * 2 + (x & 1))
-#define WAVERAM_READDEPTH(base, y, x)			(*WAVERAM_PTRDEPTH(base, y, x))
-#define WAVERAM_WRITEDEPTH(base, y, x, color)	do { *WAVERAM_PTRDEPTH(base, y, x) = (color);  } while (0)
+#define WAVERAM_PTRDEPTH(base, y, x)            WAVERAM_PTR16(base, DEPTHYX_TO_DWORDNUM(y, x) * 2 + (x & 1))
+#define WAVERAM_READDEPTH(base, y, x)           (*WAVERAM_PTRDEPTH(base, y, x))
+#define WAVERAM_WRITEDEPTH(base, y, x, color)   do { *WAVERAM_PTRDEPTH(base, y, x) = (color);  } while (0)
 
 
 
@@ -468,9 +468,9 @@ READ32_HANDLER( zeus2_r )
 WRITE32_HANDLER( zeus2_w )
 {
 	int logit = (offset != 0x08 &&
-				 (offset != 0x20 || data != 0) &&
-				 offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
-				 offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
+					(offset != 0x20 || data != 0) &&
+					offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
+					offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
 	if (logit)
 		logerror("%06X:zeus2_w", space.device().safe_pc());
 	zeus_register32_w(space.machine(), offset, data, logit);
@@ -549,12 +549,12 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 		case 0x20:
 			/* toggles between two values based on the page:
 
-                Page #      state->m_zeusbase[0x20]      state->m_zeusbase[0x38]
-                ------      --------------      --------------
-                   0          $04000190           $00000000
-                   1          $04000000           $01900000
-            */
-            zeus_pointer_write(state->m_zeusbase[0x20] >> 24, state->m_zeusbase[0x20]);
+			    Page #      state->m_zeusbase[0x20]      state->m_zeusbase[0x38]
+			    ------      --------------      --------------
+			       0          $04000190           $00000000
+			       1          $04000000           $01900000
+			*/
+			zeus_pointer_write(state->m_zeusbase[0x20] >> 24, state->m_zeusbase[0x20]);
 			break;
 
 		case 0x33:
@@ -612,12 +612,12 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 			if (state->m_zeusbase[0x40] == 0x00890000)
 			{
 				/*
-                    state->m_zeusbase[0x4e]:
-                        bit 0-1: which register triggers write through
-                        bit 3:   enable write through via these registers
-                        bit 4:   seems to be set during reads, when 0x41 is used for latching
-                        bit 6:   enable autoincrement on write through
-                */
+				    state->m_zeusbase[0x4e]:
+				        bit 0-1: which register triggers write through
+				        bit 3:   enable write through via these registers
+				        bit 4:   seems to be set during reads, when 0x41 is used for latching
+				        bit 6:   enable autoincrement on write through
+				*/
 				if ((state->m_zeusbase[0x4e] & 0x08) && (offset & 3) == (state->m_zeusbase[0x4e] & 3))
 				{
 					void *dest = waveram0_ptr_from_expanded_addr(state->m_zeusbase[0x41]);
@@ -685,13 +685,13 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 			if (state->m_zeusbase[0x50] == 0x00890000)
 			{
 				/*
-                    state->m_zeusbase[0x5e]:
-                        bit 0-1: which register triggers write through
-                        bit 3:   enable write through via these registers
-                        bit 4:   seems to be set during reads, when 0x51 is used for latching
-                        bit 5:   unknown, currently used to specify ordering, but this is suspect
-                        bit 6:   enable autoincrement on write through
-                */
+				    state->m_zeusbase[0x5e]:
+				        bit 0-1: which register triggers write through
+				        bit 3:   enable write through via these registers
+				        bit 4:   seems to be set during reads, when 0x51 is used for latching
+				        bit 5:   unknown, currently used to specify ordering, but this is suspect
+				        bit 6:   enable autoincrement on write through
+				*/
 				if ((state->m_zeusbase[0x5e] & 0x08) && (offset & 3) == (state->m_zeusbase[0x5e] & 3))
 				{
 					void *dest = waveram1_ptr_from_expanded_addr(state->m_zeusbase[0x51]);
@@ -984,8 +984,8 @@ static void zeus_draw_model(running_machine &machine, UINT32 baseaddr, UINT16 co
 				/* handle the command */
 				switch (cmd)
 				{
-					case 0x21:	/* thegrid */
-					case 0x22:	/* crusnexo */
+					case 0x21:  /* thegrid */
+					case 0x22:  /* crusnexo */
 						if (((databuffer[0] >> 16) & 0xff) == 0x9b)
 						{
 							texoffs = databuffer[1];
@@ -996,19 +996,19 @@ static void zeus_draw_model(running_machine &machine, UINT32 baseaddr, UINT16 co
 							logerror("unknown offset\n");
 						break;
 
-					case 0x31:	/* thegrid */
+					case 0x31:  /* thegrid */
 						if (logit)
 							logerror("sync?\n");
 						break;
 
-					case 0x35:	/* thegrid */
-					case 0x36:	/* crusnexo */
+					case 0x35:  /* thegrid */
+					case 0x36:  /* crusnexo */
 						if (logit)
 							logerror("reg32");
 						zeus_register32_w(machine, (databuffer[0] >> 16) & 0x7f, databuffer[1], logit);
 						break;
 
-					case 0x38:	/* crusnexo/thegrid */
+					case 0x38:  /* crusnexo/thegrid */
 						zeus_draw_quad(machine, databuffer, texoffs, logit);
 						break;
 
@@ -1216,27 +1216,27 @@ In memory:
 	extra = (poly_extra_data *)poly_get_extra_data(poly);
 	switch (texmode)
 	{
-		case 0x01d:		/* crusnexo: RHS of score bar */
-		case 0x05d:		/* crusnexo: background, road */
-		case 0x0dd:		/* crusnexo: license plate letters */
-		case 0x11d:		/* crusnexo: LHS of score bar */
-		case 0x15d:		/* crusnexo */
-		case 0x85d:		/* crusnexo */
-		case 0x95d:		/* crusnexo */
-		case 0xc1d:		/* crusnexo */
-		case 0xc5d:		/* crusnexo */
+		case 0x01d:     /* crusnexo: RHS of score bar */
+		case 0x05d:     /* crusnexo: background, road */
+		case 0x0dd:     /* crusnexo: license plate letters */
+		case 0x11d:     /* crusnexo: LHS of score bar */
+		case 0x15d:     /* crusnexo */
+		case 0x85d:     /* crusnexo */
+		case 0x95d:     /* crusnexo */
+		case 0xc1d:     /* crusnexo */
+		case 0xc5d:     /* crusnexo */
 			extra->texwidth = 256;
 			break;
 
-		case 0x059:		/* crusnexo */
-		case 0x0d9:		/* crusnexo */
-		case 0x119:		/* crusnexo: license plates */
-		case 0x159:		/* crusnexo */
+		case 0x059:     /* crusnexo */
+		case 0x0d9:     /* crusnexo */
+		case 0x119:     /* crusnexo: license plates */
+		case 0x159:     /* crusnexo */
 			extra->texwidth = 128;
 			break;
 
-		case 0x055:		/* crusnexo */
-		case 0x155:		/* crusnexo */
+		case 0x055:     /* crusnexo */
+		case 0x155:     /* crusnexo */
 			extra->texwidth = 64;
 			break;
 

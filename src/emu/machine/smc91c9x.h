@@ -21,7 +21,7 @@ typedef void (*smc91c9x_irq_func)(device_t *device, int state);
 
 struct smc91c9x_config
 {
-	smc91c9x_irq_func	interrupt;
+	smc91c9x_irq_func   interrupt;
 };
 
 

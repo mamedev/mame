@@ -64,12 +64,12 @@ const int REPORT_BLANKS_THRESHOLD = 50;
 
 struct movie_info
 {
-	double	framerate;
-	int		numframes;
-	int		width;
-	int		height;
-	int		samplerate;
-	int		channels;
+	double  framerate;
+	int     numframes;
+	int     width;
+	int     height;
+	int     samplerate;
+	int     channels;
 };
 
 struct video_info

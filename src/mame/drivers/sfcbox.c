@@ -161,14 +161,14 @@ UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap,
 }
 
 static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, sfcbox_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)	/* used by Mode 20 DSP-1 */
+	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)    /* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)    /* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)                       /* ROM (and reserved in Mode 20) */
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)    /* used by Mode 20 DSP-1 */
 	AM_RANGE(0x700000, 0x7dffff) AM_READWRITE_LEGACY(snes_r_bank5, snes_w_bank5)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM					/* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)	/* Mirror and ROM */
-	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
+	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)    /* Mirror and ROM */
+	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)    /* Mirror and ROM */
 ADDRESS_MAP_END
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
@@ -184,8 +184,8 @@ WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 }
 
 static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, sfcbox_state )
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w) /* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)   /* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
 ADDRESS_MAP_END
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER( sfcbox_state::port_83_w )
 
 WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
 {
-	const char *const rom_socket[4] = {	"ROM5", "ROM1/7/12", "ROM3/9", "IC23" };
+	const char *const rom_socket[4] = { "ROM5", "ROM1/7/12", "ROM3/9", "IC23" };
 
 	printf("%s ROM Socket\n",rom_socket[data & 3]);
 	printf("%02x ROM Slot\n",(data & 4) >> 2);
@@ -275,8 +275,8 @@ WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
 WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
 {
 	/* Reserved for ROM DSP SRAM probably means bank ATROM */
-	const char *const rom_dsp_sram[4] = {	"Reserved?", "GSU", "LoROM", "HiROM" };
-	const char *const sram_size[4] = {	"2K", "8K", "Reserved?", "32K" };
+	const char *const rom_dsp_sram[4] = {   "Reserved?", "GSU", "LoROM", "HiROM" };
+	const char *const sram_size[4] = {  "2K", "8K", "Reserved?", "32K" };
 
 	printf("%s ROM / DSP SRAM map 2\n",rom_dsp_sram[data & 3]);
 	printf("%08x SRAM base\n",((data & 0xc) >> 2)*0x8000);
@@ -442,10 +442,10 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( snes, sfcbox_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
+	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
+	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -488,7 +488,7 @@ MACHINE_RESET_MEMBER(sfcbox_state,sfcbox)
 
 static MACHINE_CONFIG_DERIVED( sfcbox, snes )
 
-	MCFG_CPU_ADD("bios", Z180, XTAL_12MHz / 2)	/* HD64180RF6X */
+	MCFG_CPU_ADD("bios", Z180, XTAL_12MHz / 2)  /* HD64180RF6X */
 	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
 	MCFG_CPU_IO_MAP(sfcbox_io)
 
@@ -519,7 +519,7 @@ MACHINE_CONFIG_END
 
 #define SFCBOX_BIOS \
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x100, "sound_ipl", 0 )	\
+	ROM_REGION( 0x100, "sound_ipl", 0 ) \
 	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION( 0x10000, "krom", 0 ) \
 	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) ) \

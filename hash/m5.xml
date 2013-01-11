@@ -57,12 +57,12 @@ Learning Soft:
 
 Programming Languages:
 
- - FLAC
- - FLAC-II
- - BASIC-I
- - BASIC-G
- - BASIC-F
- - DISK BASIC
+	- FLAC
+	- FLAC-II
+	- BASIC-I
+	- BASIC-G
+	- BASIC-F
+	- DISK BASIC
 
 
 what about European carts?
@@ -314,7 +314,7 @@ and why some of the dumps below have weird size?
 
 <!-- Unidentified items -->
 	<software name="basicw">
-        <!-- is this legit?!? might it be Disk BASIC? -->
+		<!-- is this legit?!? might it be Disk BASIC? -->
 		<description>BASIC-W</description>
 		<year>198?</year>
 		<publisher>Sord?</publisher>
@@ -326,7 +326,7 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="m5term">
-        <!-- is this legit?!? might it be M-Editor? -->
+		<!-- is this legit?!? might it be M-Editor? -->
 		<description>M5 Terminal</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

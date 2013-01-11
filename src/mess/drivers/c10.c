@@ -120,15 +120,15 @@ UINT32 c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 /* F4 Character Displayer */
 static const gfx_layout c10_charlayout =
 {
-	8, 9,					/* 8 x 9 characters */
-	512,					/* 512 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 9,                   /* 8 x 9 characters */
+	512,                    /* 512 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( c10 )

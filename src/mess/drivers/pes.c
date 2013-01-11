@@ -51,7 +51,7 @@ Address map:
   port 3.7: write, /RD (general) and /OE (pin 22) for unpopulated 6164 SRAM
 
 */
-#define CPU_CLOCK		XTAL_10_245MHz
+#define CPU_CLOCK       XTAL_10_245MHz
 
 #undef DEBUG_FIFO
 #undef DEBUG_SERIAL_CB

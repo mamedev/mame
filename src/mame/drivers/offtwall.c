@@ -156,7 +156,7 @@ READ16_MEMBER(offtwall_state::bankrom_r)
 	logerror("%06X: %04X\n", space.device().safe_pcbase(), offset);
 
 	/* if the values are $3e000 or $3e002 are being read by code just below the
-        ROM bank area, we need to return the correct value to give the proper checksum */
+	    ROM bank area, we need to return the correct value to give the proper checksum */
 	if ((offset == 0x3000 || offset == 0x3001) && space.device().safe_pcbase() > 0x37000)
 	{
 		UINT32 checksum = (space.read_word(0x3fd210) << 16) | space.read_word(0x3fd212);
@@ -329,12 +329,12 @@ static INPUT_PORTS_START( offtwall )
 	PORT_START("260010")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Controls ) )
-	PORT_DIPSETTING(      0x0000, "Whirly-gigs" )	/* this is official Atari terminology! */
+	PORT_DIPSETTING(      0x0000, "Whirly-gigs" )   /* this is official Atari terminology! */
 	PORT_DIPSETTING(      0x0002, "Joysticks" )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )	/* tested at a454 */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )	/* tested at a466 */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested at a454 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested at a466 */
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )	/* tested before writing to 260040 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested before writing to 260040 */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -354,7 +354,7 @@ static INPUT_PORTS_START( offtwall )
 	PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 INPUT_PORTS_END
 
 
@@ -378,7 +378,7 @@ static const gfx_layout pfmolayout =
 
 
 static GFXDECODE_START( offtwall )
-	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )		/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )      /* sprites & playfield */
 GFXDECODE_END
 
 
@@ -424,11 +424,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( offtwall )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "otw2012.bin", 0x00000, 0x20000, CRC(d08d81eb) SHA1(5a72aa2e4fc6455b94aa59a7719d0ddc8bcc80f2) )
 	ROM_LOAD16_BYTE( "otw2013.bin", 0x00001, 0x20000, CRC(61c2553d) SHA1(343d39f9b75fd236e9769ec21ab65310f85e31ca) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "otw1020.bin", 0x10000, 0x4000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
@@ -446,11 +446,11 @@ ROM_END
 
 
 ROM_START( offtwallc )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "090-2612.rom", 0x00000, 0x20000, CRC(fc891a3f) SHA1(027815a20fbc6c0c9242768581b97362b39941c2) )
 	ROM_LOAD16_BYTE( "090-2613.rom", 0x00001, 0x20000, CRC(805d79d4) SHA1(943ec9f408ba875bdf1794ce7d24803043480401) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "otw1020.bin", 0x10000, 0x4000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 

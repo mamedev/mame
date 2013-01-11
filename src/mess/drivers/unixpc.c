@@ -27,12 +27,12 @@ class unixpc_state : public driver_device
 public:
 	unixpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, RAM_TAG),
-		  m_wd2797(*this, "wd2797"),
-		  m_floppy(*this, FLOPPY_0),
-		  m_mapram(*this, "mapram"),
-		  m_videoram(*this, "videoram"){ }
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG),
+			m_wd2797(*this, "wd2797"),
+			m_floppy(*this, FLOPPY_0),
+			m_mapram(*this, "mapram"),
+			m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

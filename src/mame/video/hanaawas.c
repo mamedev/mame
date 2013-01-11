@@ -54,7 +54,7 @@ void hanaawas_state::palette_init()
 	color_prom += 0x20;
 
 	/* character lookup table.  The 1bpp tiles really only use colors 0-0x0f and the
-       3bpp ones 0x10-0x1f */
+	   3bpp ones 0x10-0x1f */
 	for (i = 0; i < 0x100; i++)
 	{
 		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);

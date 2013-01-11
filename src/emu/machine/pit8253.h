@@ -31,9 +31,9 @@ struct pit8253_config
 {
 	struct
 	{
-		double				clockin;		/* timer clock */
-		devcb_read_line		in_gate_func;	/* gate signal */
-		devcb_write_line	out_out_func;	/* out signal */
+		double              clockin;        /* timer clock */
+		devcb_read_line     in_gate_func;   /* gate signal */
+		devcb_write_line    out_out_func;   /* out signal */
 	} timer[3];
 };
 
@@ -110,4 +110,4 @@ int pit8253_get_output(device_t *device, int timer);
 void pit8253_set_clockin(device_t *device, int timer, double new_clockin);
 
 
-#endif	/* __PIT8253_H__ */
+#endif  /* __PIT8253_H__ */

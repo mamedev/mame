@@ -230,7 +230,7 @@ static const z80dasm mnemonic_ed[256]= {
 	{zIN0,"a,(B)"}, {zOUT0,"(B),a"},{zDB,"?"},      {zDB,"?"},
 	{zTST,"a"},     {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zIN,"b,(c)"},  {zOUT,"(c),b"}, {zSBC,"hl,bc"}, {zLD,"(W),bc"},
-	{zNEG,0},		{zRETN,0},		{zIM,"0"},      {zLD,"i,a"},
+	{zNEG,0},       {zRETN,0},      {zIM,"0"},      {zLD,"i,a"},
 	{zIN,"c,(c)"},  {zOUT,"(c),c"}, {zADC,"hl,bc"}, {zLD,"bc,(W)"},
 	{zMLT,"bc"},    {zRETI,0},      {zIM,"0"},      {zLD,"r,a"},
 	{zIN,"d,(c)"},  {zOUT,"(c),d"}, {zSBC,"hl,de"}, {zLD,"(W),de"},
@@ -253,13 +253,13 @@ static const z80dasm mnemonic_ed[256]= {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zOTDMR,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDI,0},		{zCPI,0},		{zINI,0},		{zOUTI,0},
+	{zLDI,0},       {zCPI,0},       {zINI,0},       {zOUTI,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDD,0},		{zCPD,0},		{zIND,0},		{zOUTD,0},
+	{zLDD,0},       {zCPD,0},       {zIND,0},       {zOUTD,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDIR,0},		{zCPIR,0},		{zINIR,0},		{zOTIR,0},
+	{zLDIR,0},      {zCPIR,0},      {zINIR,0},      {zOTIR,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
-	{zLDDR,0},		{zCPDR,0},		{zINDR,0},		{zOTDR,0},
+	{zLDDR,0},      {zCPDR,0},      {zINDR,0},      {zOTDR,0},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
@@ -347,7 +347,7 @@ static const z80dasm mnemonic_xx[256]= {
 };
 
 static const z80dasm mnemonic_main[256]= {
-	{zNOP,0},		{zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
+	{zNOP,0},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,0},
 	{zEX,"af,af'"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
 	{zINC,"c"},     {zDEC,"c"},     {zLD,"c,B"},    {zRRCA,0},
@@ -415,7 +415,7 @@ static const z80dasm mnemonic_main[256]= {
 
 static char sign(INT8 offset)
 {
- return (offset < 0)? '-':'+';
+	return (offset < 0)? '-':'+';
 }
 
 static int offs(INT8 offset)

@@ -1,15 +1,15 @@
- /**************************************************************************\
- *                  Microchip PIC16C62X Emulator                            *
- *                                                                          *
- *                          Based On                                        *
- *                  Microchip PIC16C5X Emulator                             *
- *                    Copyright Tony La Porta                               *
- *                 Originally written for the MAME project.                 *
- *                                                                          *
- *                                                                          *
- *      Addressing architecture is based on the Harvard addressing scheme.  *
- *                                                                          *
- \**************************************************************************/
+	/**************************************************************************\
+	*                  Microchip PIC16C62X Emulator                            *
+	*                                                                          *
+	*                          Based On                                        *
+	*                  Microchip PIC16C5X Emulator                             *
+	*                    Copyright Tony La Porta                               *
+	*                 Originally written for the MAME project.                 *
+	*                                                                          *
+	*                                                                          *
+	*      Addressing architecture is based on the Harvard addressing scheme.  *
+	*                                                                          *
+	\**************************************************************************/
 
 #pragma once
 
@@ -31,13 +31,13 @@ enum
 {
 	PIC16C62x_PC=1, PIC16C62x_STK0, PIC16C62x_STK1, PIC16C62x_STK2,
 	PIC16C62x_STK3, PIC16C62x_STK4, PIC16C62x_STK5, PIC16C62x_STK6,
-	PIC16C62x_STK7, PIC16C62x_FSR,	PIC16C62x_W,    PIC16C62x_ALU,
-	PIC16C62x_STR,  PIC16C62x_OPT,	PIC16C62x_TMR0, PIC16C62x_PRTA,
+	PIC16C62x_STK7, PIC16C62x_FSR,  PIC16C62x_W,    PIC16C62x_ALU,
+	PIC16C62x_STR,  PIC16C62x_OPT,  PIC16C62x_TMR0, PIC16C62x_PRTA,
 	PIC16C62x_PRTB, PIC16C62x_WDT,  PIC16C62x_TRSA, PIC16C62x_TRSB,
 	PIC16C62x_PSCL
 };
 
-#define PIC16C62x_T0		0
+#define PIC16C62x_T0        0
 
 
 /****************************************************************************
@@ -62,4 +62,4 @@ DECLARE_LEGACY_CPU_DEVICE(PIC16C622A, pic16c622a);
 CPU_DISASSEMBLE( pic16c62x );
 
 
-#endif	/* __PIC16C62X_H__ */
+#endif  /* __PIC16C62X_H__ */

@@ -14,7 +14,7 @@ static int cas_size;
 ********************************************************************/
 static int fmsx_cas_to_wav_size (const UINT8 *casdata, int caslen)
 {
-	int 	pos, size;
+	int     pos, size;
 
 	if (caslen < 8) return -1;
 	if (memcmp (casdata, CasHeader, sizeof (CasHeader) ) ) return -1;
@@ -51,7 +51,7 @@ static int fmsx_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 	cas_pos = 0;
 	samples_pos = 0;
 
-    while (samples_pos < sample_count && cas_pos < cas_size)
+	while (samples_pos < sample_count && cas_pos < cas_size)
 	{
 		/* Check if we need to output a header */
 		if ( cas_pos + 8 < cas_size )
@@ -102,13 +102,13 @@ static int fmsx_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 
 static const struct CassetteLegacyWaveFiller fmsx_legacy_fill_wave =
 {
-	fmsx_cas_fill_wave,						/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	fmsx_cas_to_wav_size,					/* chunk_sample_calc */
-	22050,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	fmsx_cas_fill_wave,                     /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	fmsx_cas_to_wav_size,                   /* chunk_sample_calc */
+	22050,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 

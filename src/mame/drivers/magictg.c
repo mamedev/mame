@@ -135,9 +135,9 @@ public:
 	,
 		m_adsp_pram(*this, "adsp_pram"){ }
 
-	required_device<cpu_device>			m_mips;
-	required_device<adsp2181_device>	m_adsp;
-	required_device<pci_bus_legacy_device>		m_pci;
+	required_device<cpu_device>         m_mips;
+	required_device<adsp2181_device>    m_adsp;
+	required_device<pci_bus_legacy_device>      m_pci;
 
 
 	/* ASIC */
@@ -163,7 +163,7 @@ public:
 
 
 	/* 3Dfx Voodoo */
-	device_t*							m_voodoo[2];
+	device_t*                           m_voodoo[2];
 
 	struct
 	{
@@ -198,7 +198,7 @@ public:
 	DECLARE_READ32_MEMBER( serial_r );
 	DECLARE_WRITE32_MEMBER( serial_w );
 
-	DECLARE_READ32_MEMBER( adsp_idma_data_r	);
+	DECLARE_READ32_MEMBER( adsp_idma_data_r );
 	DECLARE_WRITE32_MEMBER( adsp_idma_data_w );
 	DECLARE_WRITE32_MEMBER( adsp_idma_addr_w );
 
@@ -770,8 +770,8 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 						if (type == 0)
 						{
 							UINT32 src_word =(adsp_rom[src_addr + 0] << 16) |
-											 (adsp_rom[src_addr + 1] << 8) |
-											 (adsp_rom[src_addr + 2]);
+												(adsp_rom[src_addr + 1] << 8) |
+												(adsp_rom[src_addr + 2]);
 
 							addr_space.write_dword(m_adsp_regs.bdma_internal_addr * 4, src_word);
 
@@ -885,13 +885,13 @@ INPUT_PORTS_END
 /* TODO: Unknown */
 static const mips3_config config =
 {
-	16384,				/* code cache size */
-	16384				/* data cache size */
+	16384,              /* code cache size */
+	16384               /* data cache size */
 };
 
 static const adsp21xx_config adsp_config =
 {
-	NULL,						/* callback for serial receive */
+	NULL,                       /* callback for serial receive */
 	0,//sound_tx_callback,      /* callback for serial transmit */
 	0,//timer_enable_callback   /* callback for timer fired */
 };
@@ -1035,4 +1035,3 @@ ROM_END
 
 GAME( 1997, magictg,  0,       magictg, magictg, driver_device, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1997, magictga, magictg, magictg, magictg, driver_device, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-

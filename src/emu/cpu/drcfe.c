@@ -63,8 +63,8 @@ const UINT32 MAX_STACK_DEPTH = 100;
 // an entry that maps branches for our code walking
 struct pc_stack_entry
 {
-	offs_t				targetpc;
-	offs_t				srcpc;
+	offs_t              targetpc;
+	offs_t              srcpc;
 };
 
 
@@ -79,14 +79,14 @@ struct pc_stack_entry
 
 drc_frontend::drc_frontend(device_t &cpu, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
 	: m_window_start(window_start),
-	  m_window_end(window_end),
-	  m_max_sequence(max_sequence),
-	  m_cpudevice(downcast<cpu_device &>(cpu)),
-	  m_program(m_cpudevice.space(AS_PROGRAM)),
-	  m_pageshift(m_cpudevice.space_config(AS_PROGRAM)->m_page_shift),
-	  m_desc_live_list(cpu.machine().respool()),
-	  m_desc_allocator(cpu.machine().respool()),
-	  m_desc_array(auto_alloc_array_clear(cpu.machine(), opcode_desc *, window_end + window_start + 2))
+		m_window_end(window_end),
+		m_max_sequence(max_sequence),
+		m_cpudevice(downcast<cpu_device &>(cpu)),
+		m_program(m_cpudevice.space(AS_PROGRAM)),
+		m_pageshift(m_cpudevice.space_config(AS_PROGRAM)->m_page_shift),
+		m_desc_live_list(cpu.machine().respool()),
+		m_desc_allocator(cpu.machine().respool()),
+		m_desc_array(auto_alloc_array_clear(cpu.machine(), opcode_desc *, window_end + window_start + 2))
 {
 }
 

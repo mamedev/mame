@@ -73,12 +73,12 @@ public:
 struct gpu_
 {
 	/* Memory-mapped registers */
-	UINT16 gr[8];	/* Command parameters */
+	UINT16 gr[8];   /* Command parameters */
 
-	UINT16 bcrw;	/* Screen buffer W control */
-	UINT16 bcrx;	/* Screen buffer X control */
-	UINT16 bcry;	/* Screen buffer Y control */
-	UINT16 bcrz;	/* Screen buffer Z control */
+	UINT16 bcrw;    /* Screen buffer W control */
+	UINT16 bcrx;    /* Screen buffer X control */
+	UINT16 bcry;    /* Screen buffer Y control */
+	UINT16 bcrz;    /* Screen buffer Z control */
 	UINT16 psrw;
 	UINT16 psrx;
 	UINT16 psry;
@@ -88,13 +88,13 @@ struct gpu_
 	UINT16 ctr;
 	UINT16 lfr;
 	UINT16 ifr;
-	UINT16 ecr;		/* Execute command register */
+	UINT16 ecr;     /* Execute command register */
 	UINT16 far;
-	UINT16 mcr;		/* Interrupt control */
+	UINT16 mcr;     /* Interrupt control */
 	UINT16 qlr;
 	UINT16 qar;
 
-	UINT16 dhr;		/* Scanline counter */
+	UINT16 dhr;     /* Scanline counter */
 	UINT16 dlr;
 
 	/* Others */
@@ -365,13 +365,13 @@ void execute_gpu_command(running_machine &machine)
 		case 0x16:
 		{
 			/*
-                Copy screen RAM to color RAM
-                GR0 : Color start X
-                GR1 : Color start Y
-                GR2 : Color table offset
-                GR3 : Size
-                GR4 : Channels to set (R: 0x10, G: 0x20, B: 0x40)
-            */
+			    Copy screen RAM to color RAM
+			    GR0 : Color start X
+			    GR1 : Color start Y
+			    GR2 : Color table offset
+			    GR3 : Size
+			    GR4 : Channels to set (R: 0x10, G: 0x20, B: 0x40)
+			*/
 			int i;
 			int offset = xy_to_screen_addr(gpu.gr[0] - 0x400, gpu.gr[1] - 0x200);
 			int table_offs = gpu.gr[2];
@@ -452,34 +452,34 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 {
 	switch (offset)
 	{
-		case 0x00:	gpu.gr[0] = data;	break;
-		case 0x01:	gpu.gr[1] = data;	break;
-		case 0x02:	gpu.gr[2] = data;	break;
-		case 0x03:	gpu.gr[3] = data;	break;
-		case 0x04:	gpu.gr[4] = data;	break;
-		case 0x05:	gpu.gr[5] = data;	break;
-		case 0x06:	gpu.gr[6] = data;	break;
-		case 0x07:	gpu.gr[7] = data;	break;
+		case 0x00:  gpu.gr[0] = data;   break;
+		case 0x01:  gpu.gr[1] = data;   break;
+		case 0x02:  gpu.gr[2] = data;   break;
+		case 0x03:  gpu.gr[3] = data;   break;
+		case 0x04:  gpu.gr[4] = data;   break;
+		case 0x05:  gpu.gr[5] = data;   break;
+		case 0x06:  gpu.gr[6] = data;   break;
+		case 0x07:  gpu.gr[7] = data;   break;
 
-		case 0x08:	gpu.bcrw = data;	break;
-		case 0x09:	gpu.bcrx = data;	break;
-		case 0x0a:	gpu.bcry = data;	break;
-		case 0x0b:	gpu.bcrz = data;	break;
-		case 0x0c:	gpu.psrw = data;	break;
-		case 0x0d:	gpu.psrx = data;	break;
-		case 0x0e:	gpu.psry = data;	break;
-		case 0x0f:	gpu.psrz = data;	break;
+		case 0x08:  gpu.bcrw = data;    break;
+		case 0x09:  gpu.bcrx = data;    break;
+		case 0x0a:  gpu.bcry = data;    break;
+		case 0x0b:  gpu.bcrz = data;    break;
+		case 0x0c:  gpu.psrw = data;    break;
+		case 0x0d:  gpu.psrx = data;    break;
+		case 0x0e:  gpu.psry = data;    break;
+		case 0x0f:  gpu.psrz = data;    break;
 
-		case 0x14:	gpu.dpr = data;		break;
-		case 0x15:	gpu.ctr = data;		break;
-		case 0x16:	gpu.ifr = data;		break;
+		case 0x14:  gpu.dpr = data;     break;
+		case 0x15:  gpu.ctr = data;     break;
+		case 0x16:  gpu.ifr = data;     break;
 		case 0x17:
 		{
 			gpu.ecr = data;
 			execute_gpu_command(machine());
 			break;
 		}
-		case 0x1a:	gpu.far = data;		break;
+		case 0x1a:  gpu.far = data;     break;
 		case 0x20:
 		{
 			gpu.mcr = data;
@@ -490,8 +490,8 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 			break;
 		}
 
-		case 0x21:	gpu.qlr = data;		break;
-		case 0x22:	gpu.qar = data;		break;
+		case 0x21:  gpu.qlr = data;     break;
+		case 0x22:  gpu.qar = data;     break;
 	}
 }
 
@@ -501,17 +501,17 @@ READ16_MEMBER(atarisy4_state::gpu_r)
 
 	switch (offset)
 	{
-		case 0x08:	res = gpu.bcrw;		break;
-		case 0x09:	res = gpu.bcrx;		break;
-		case 0x0a:	res = gpu.bcry;		break;
-		case 0x0b:	res = gpu.bcrz;		break;
+		case 0x08:  res = gpu.bcrw;     break;
+		case 0x09:  res = gpu.bcrx;     break;
+		case 0x0a:  res = gpu.bcry;     break;
+		case 0x0b:  res = gpu.bcrz;     break;
 
-		case 0x20:	res = gpu.mcr;		break;
+		case 0x20:  res = gpu.mcr;      break;
 
-		case 0x400:	res = 5;			break; // TODO!
-		case 0x420:	res = 5;			break;
+		case 0x400: res = 5;            break; // TODO!
+		case 0x420: res = 5;            break;
 
-		default:	logerror("GPU_R[%x]\n", offset);
+		default:    logerror("GPU_R[%x]\n", offset);
 	}
 
 	return res;
@@ -807,7 +807,7 @@ INLINE UINT8 hex_to_ascii(UINT8 in)
 
 void load_ldafile(address_space &space, const UINT8 *file)
 {
-#define READ_CHAR()		file[i++]
+#define READ_CHAR()     file[i++]
 	int i = 0;
 
 	while (true)
@@ -861,7 +861,7 @@ void load_ldafile(address_space &space, const UINT8 *file)
 /* Load memory space with data from a Tektronix-Extended HEX file */
 void load_hexfile(address_space &space, const UINT8 *file)
 {
-#define READ_HEX_CHAR()		hex_to_ascii(file[i++])
+#define READ_HEX_CHAR()     hex_to_ascii(file[i++])
 
 	UINT32 i = 0;
 	UINT32 line = 1;

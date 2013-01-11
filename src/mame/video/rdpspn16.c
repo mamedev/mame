@@ -77,10 +77,10 @@ void n64_rdp::RGBAZClip(int sr, int sg, int sb, int sa, int *sz, rdp_span_aux *u
 	zanded >>= 17;
 	switch(zanded)
 	{
-		case 0: *sz &= 0x3ffff;											break;
-		case 1:	*sz &= 0x3ffff;											break;
-		case 2: *sz = 0x3ffff;											break;
-		case 3: *sz = 0x3ffff;											break;
+		case 0: *sz &= 0x3ffff;                                         break;
+		case 1: *sz &= 0x3ffff;                                         break;
+		case 2: *sz = 0x3ffff;                                          break;
+		case 3: *sz = 0x3ffff;                                          break;
 	}
 }
 
@@ -241,7 +241,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 				bool rendered = m_rdp->Blender.Blend1Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, userdata, object);
 
-                if (rendered)
+				if (rendered)
 				{
 					((this)->*(_Write[((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1) | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
 
@@ -407,7 +407,7 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 				bool rendered = m_rdp->Blender.Blend2Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, bsel1, userdata, object);
 
-                if (rendered)
+				if (rendered)
 				{
 					((this)->*(_Write[((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1) | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
 					if (object.OtherModes.z_update_en)

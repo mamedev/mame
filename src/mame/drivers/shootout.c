@@ -134,39 +134,39 @@ static INPUT_PORTS_START( shootout )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, shootout_state,coin_inserted, 0)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION( "DSW1:1,2" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION( "DSW1:1,2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION( "DSW1:3,4" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION( "DSW1:3,4" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "DSW1:5" )	/* Manual lists this dip as "Unused" */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION( "DSW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "DSW1:5" )  /* Manual lists this dip as "Unused" */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION( "DSW1:6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION( "DSW1:7" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION( "DSW1:7" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )			PORT_DIPLOCATION( "DSW1:8" )	/* Manual lists this dip as "Unused" */
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )            PORT_DIPLOCATION( "DSW1:8" )    /* Manual lists this dip as "Unused" */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION( "DSW2:1,2" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION( "DSW2:1,2" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION( "DSW2:3,4" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION( "DSW2:3,4" )
 	PORT_DIPSETTING(    0x0c, "20,000 Every 70,000" )
 	PORT_DIPSETTING(    0x08, "30,000 Every 80,000" )
 	PORT_DIPSETTING(    0x04, "40,000 Every 90,000" )
 	PORT_DIPSETTING(    0x00, "70,000" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )	PORT_DIPLOCATION( "DSW2:5,6" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION( "DSW2:5,6" )
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
@@ -179,12 +179,12 @@ static INPUT_PORTS_START( shootouj )
 	PORT_INCLUDE(shootout)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x20, 0x20, "Company Copyright" )		PORT_DIPLOCATION( "DSW1:6" )
+	PORT_DIPNAME( 0x20, 0x20, "Company Copyright" )     PORT_DIPLOCATION( "DSW1:6" )
 	PORT_DIPSETTING(    0x20, "Data East Corp" )
 	PORT_DIPSETTING(    0x00, "Data East USA Inc" )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION( "DSW2:3,4" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION( "DSW2:3,4" )
 	PORT_DIPSETTING(    0x0c, "20,000 Every 50,000" )
 	PORT_DIPSETTING(    0x08, "30,000 Every 60,000" )
 	PORT_DIPSETTING(    0x04, "50,000 Every 70,000" )
@@ -194,30 +194,30 @@ INPUT_PORTS_END
 
 static const gfx_layout char_layout =
 {
-	8,8,	/* 8*8 characters */
-	0x400,	/* 1024 characters */
-	2,	/* 2 bits per pixel */
-	{ 0,4 },	/* the bitplanes are packed in the same byte */
+	8,8,    /* 8*8 characters */
+	0x400,  /* 1024 characters */
+	2,  /* 2 bits per pixel */
+	{ 0,4 },    /* the bitplanes are packed in the same byte */
 	{ (0x2000*8)+0, (0x2000*8)+1, (0x2000*8)+2, (0x2000*8)+3, 0, 1, 2, 3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 static const gfx_layout sprite_layout =
 {
-	16,16,	/* 16*16 sprites */
-	0x800,	/* 2048 sprites */
-	3,	/* 3 bits per pixel */
-	{ 0*0x10000*8, 1*0x10000*8, 2*0x10000*8 },	/* the bitplanes are separated */
+	16,16,  /* 16*16 sprites */
+	0x800,  /* 2048 sprites */
+	3,  /* 3 bits per pixel */
+	{ 0*0x10000*8, 1*0x10000*8, 2*0x10000*8 },  /* the bitplanes are separated */
 	{ 128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every char takes 32 consecutive bytes */
+	32*8    /* every char takes 32 consecutive bytes */
 };
 static const gfx_layout tile_layout =
 {
-	8,8,	/* 8*8 characters */
-	0x800,	/* 2048 characters */
-	2,	/* 2 bits per pixel */
-	{ 0,4 },	/* the bitplanes are packed in the same byte */
+	8,8,    /* 8*8 characters */
+	0x800,  /* 2048 characters */
+	2,  /* 2 bits per pixel */
+	{ 0,4 },    /* the bitplanes are packed in the same byte */
 	{ (0x4000*8)+0, (0x4000*8)+1, (0x4000*8)+2, (0x4000*8)+3, 0, 1, 2, 3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8 /* every char takes 8 consecutive bytes */
@@ -265,7 +265,7 @@ static const ym2203_interface ym2203_interface2 =
 static MACHINE_CONFIG_START( shootout, shootout_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, 2000000)	/* 2 MHz? */
+	MCFG_CPU_ADD("maincpu", DECO_222, 2000000)  /* 2 MHz? */
 	MCFG_CPU_PROGRAM_MAP(shootout_map)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
@@ -295,7 +295,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
+	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz? */
 	MCFG_CPU_PROGRAM_MAP(shootouj_map)
 
 	/* video hardware */
@@ -321,14 +321,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( shootouk, shootouj )
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", DECO_222, 2000000)	/* 2 MHz? */
+	MCFG_CPU_ADD("maincpu", DECO_222, 2000000)  /* 2 MHz? */
 	MCFG_CPU_PROGRAM_MAP(shootouj_map)
 MACHINE_CONFIG_END
 
 
 
 ROM_START( shootout )
-	ROM_REGION( 2*0x20000, "maincpu", 0 )	/* 128k for code + 128k for decrypted opcodes */
+	ROM_REGION( 2*0x20000, "maincpu", 0 )   /* 128k for code + 128k for decrypted opcodes */
 	ROM_LOAD( "cu00.b1",        0x08000, 0x8000, CRC(090edeb6) SHA1(ab849d123dacf3947b1ebd29b70a20e066911a60) ) /* opcodes encrypted */
 	/* banked at 0x4000-0x8000 */
 	ROM_LOAD( "cu02.c3",        0x10000, 0x8000, CRC(2a913730) SHA1(584488278d58c4d34a2eebeaf39518f87cf5eecd) ) /* opcodes encrypted */
@@ -350,17 +350,17 @@ ROM_START( shootout )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "cu10.h17",       0x00000, 0x2000, CRC(3854c877) SHA1(2c8fe4591553ce798c907849e3dbd410e4fe424c) ) /* background tiles */
-	ROM_CONTINUE(				0x04000, 0x2000 )
-	ROM_CONTINUE(				0x02000, 0x2000 )
-	ROM_CONTINUE(				0x06000, 0x2000 )
+	ROM_CONTINUE(               0x04000, 0x2000 )
+	ROM_CONTINUE(               0x02000, 0x2000 )
+	ROM_CONTINUE(               0x06000, 0x2000 )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "gb08.k10",       0x0000, 0x0100, CRC(509c65b6) SHA1(4cec37065a799ced4e7b6552f267aacc7f54ffe3) )
-	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
+	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )  /* priority encoder? (not used) */
 ROM_END
 
 ROM_START( shootoutj )
-	ROM_REGION( 0x20000, "maincpu", 0 )	/* 128k for code  */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 128k for code  */
 	ROM_LOAD( "cg02.bin",    0x08000, 0x8000, CRC(8fc5d632) SHA1(809ac4eba09972229fe741c96fa8036d7139b6a8) )
 	ROM_LOAD( "cg00.bin",    0x10000, 0x8000, CRC(ef6ced1e) SHA1(feea508c7a60fc6cde1efee52cba628accd26028) )
 	ROM_LOAD( "cg01.bin",    0x18000, 0x4000, CRC(74cf11ca) SHA1(59edbc4633cd560e7b928b33e4c42d0125332a1b) )
@@ -375,17 +375,17 @@ ROM_START( shootoutj )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "cu10.h17",       0x00000, 0x2000, CRC(3854c877) SHA1(2c8fe4591553ce798c907849e3dbd410e4fe424c) ) /* background tiles */
-	ROM_CONTINUE(				0x04000, 0x2000 )
-	ROM_CONTINUE(				0x02000, 0x2000 )
-	ROM_CONTINUE(				0x06000, 0x2000 )
+	ROM_CONTINUE(               0x04000, 0x2000 )
+	ROM_CONTINUE(               0x02000, 0x2000 )
+	ROM_CONTINUE(               0x06000, 0x2000 )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "gb08.k10",       0x0000, 0x0100, CRC(509c65b6) SHA1(4cec37065a799ced4e7b6552f267aacc7f54ffe3) )
-	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
+	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )  /* priority encoder? (not used) */
 ROM_END
 
 ROM_START( shootoutb )
-	ROM_REGION( 2*0x20000, "maincpu", 0 )	/* 128k for code + 128k for decrypted opcodes */
+	ROM_REGION( 2*0x20000, "maincpu", 0 )   /* 128k for code + 128k for decrypted opcodes */
 	ROM_LOAD( "shootout.006", 0x08000, 0x8000, CRC(2c054888) SHA1(cb0de2f7d743506789626304e6bcbbc292fbe8bc) )
 	ROM_LOAD( "shootout.008", 0x10000, 0x8000, CRC(9651b656) SHA1(e90eddf2833ef36fa73b7b8d81d28443d2f60220) )
 	ROM_LOAD( "cg01.bin",     0x18000, 0x4000, CRC(74cf11ca) SHA1(59edbc4633cd560e7b928b33e4c42d0125332a1b) )
@@ -400,14 +400,14 @@ ROM_START( shootoutb )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )
 	ROM_LOAD( "cu10.h17",       0x00000, 0x2000, CRC(3854c877) SHA1(2c8fe4591553ce798c907849e3dbd410e4fe424c) ) /* background tiles */
-	ROM_CONTINUE(				0x04000, 0x2000 )
-	ROM_CONTINUE(				0x02000, 0x2000 )
-	ROM_CONTINUE(				0x06000, 0x2000 )
+	ROM_CONTINUE(               0x04000, 0x2000 )
+	ROM_CONTINUE(               0x02000, 0x2000 )
+	ROM_CONTINUE(               0x06000, 0x2000 )
 
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "gb08.k10",       0x0000, 0x0100, CRC(509c65b6) SHA1(4cec37065a799ced4e7b6552f267aacc7f54ffe3) )
-	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
-	ROM_LOAD( "shootclr.003",   0x0200, 0x0020, CRC(6b0c2942) SHA1(7d25acc753923b265792fc78f8fc70175c0e0ec2) )	/* opcode decrypt table (bootleg only) */
+	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )  /* priority encoder? (not used) */
+	ROM_LOAD( "shootclr.003",   0x0200, 0x0020, CRC(6b0c2942) SHA1(7d25acc753923b265792fc78f8fc70175c0e0ec2) )  /* opcode decrypt table (bootleg only) */
 ROM_END
 
 

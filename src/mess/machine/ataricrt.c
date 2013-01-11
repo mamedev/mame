@@ -17,7 +17,7 @@
 /* PCB */
 enum
 {
-    A800_UNKNOWN = 0,
+	A800_UNKNOWN = 0,
 	A800_4K, A800_8K, A800_12K, A800_16K,
 	A800_RIGHT_4K, A800_RIGHT_8K,
 	OSS_034M, OSS_M091, PHOENIX_8K, XEGS_32K,
@@ -327,7 +327,7 @@ static const a800_pcb pcb_list[] =
 
 static int a800_get_pcb_id(const char *pcb)
 {
-	int	i;
+	int i;
 
 	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
 	{
@@ -349,7 +349,7 @@ static void a800_setup_mappers(running_machine &machine, int type)
 		case A800_8K:
 		case A800_16K:
 		case A800_RIGHT_8K:
-		case PHOENIX_8K:	// as normal 8k cart, but it can be disabled by writing to 0xd500-0xdfff
+		case PHOENIX_8K:    // as normal 8k cart, but it can be disabled by writing to 0xd500-0xdfff
 			break;
 		case XEGS_32K:
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd500, 0xd5ff, FUNC(x32_bank_w));
@@ -447,7 +447,7 @@ static int a800_get_type(device_image_interface &image)
 
 static int a800_check_cart_type(device_image_interface &image)
 {
-	const char	*pcb_name;
+	const char  *pcb_name;
 	int type = A800_UNKNOWN;
 
 	if (image.software_entry() == NULL)

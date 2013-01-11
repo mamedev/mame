@@ -4,14 +4,14 @@
 
 ***************************************************************************/
 
-#define ASTROCADE_CLOCK		(XTAL_14_31818MHz/2)
+#define ASTROCADE_CLOCK     (XTAL_14_31818MHz/2)
 
-#define AC_SOUND_PRESENT	(0x01)
-#define AC_LIGHTPEN_INTS	(0x02)
-#define AC_STARS			(0x04)
-#define AC_MONITOR_BW		(0x08)
+#define AC_SOUND_PRESENT    (0x01)
+#define AC_LIGHTPEN_INTS    (0x02)
+#define AC_STARS            (0x04)
+#define AC_MONITOR_BW       (0x08)
 
-#define USE_FAKE_VOTRAX		(1)
+#define USE_FAKE_VOTRAX     (1)
 
 
 class astrocde_state : public driver_device

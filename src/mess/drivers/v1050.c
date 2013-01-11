@@ -175,7 +175,7 @@ static const UINT8 V1050_KEYCODES[4][12][8] =
 		{ 0xb1, 0xb2, 0xb3, 0x83, 0xb0, 0xae, 0x00, 0x00 },
 	},
 
-	{	// shifted
+	{   // shifted
 		{ 0xc1, 0xd5, 0xd9, 0xdd, 0xe1, 0xe5, 0xe9, 0xed },
 		{ 0xf1, 0xfd, 0x91, 0xf5, 0xf9, 0x95, 0xc5, 0xc9 },
 		{ 0xcd, 0xd1, 0x1b, 0x21, 0x40, 0x23, 0x24, 0x25 },
@@ -190,7 +190,7 @@ static const UINT8 V1050_KEYCODES[4][12][8] =
 		{ 0xb2, 0xb3, 0x83, 0xb0, 0xa0, 0x00, 0x00, 0x00 },
 	},
 
-	{	// control
+	{   // control
 		{ 0xc2, 0xd6, 0xda, 0xde, 0xe2, 0xe6, 0xea, 0xee },
 		{ 0xf2, 0xfe, 0x92, 0xf6, 0xfa, 0x96, 0xc6, 0xca },
 		{ 0xce, 0xd2, 0x1b, 0x31, 0x32, 0x33, 0x34, 0x35 },
@@ -205,7 +205,7 @@ static const UINT8 V1050_KEYCODES[4][12][8] =
 		{ 0xb2, 0xb3, 0x83, 0xb0, 0xae, 0x00, 0x00, 0x00 },
 	},
 
-	{	// shift & control
+	{   // shift & control
 		{ 0xc3, 0xd7, 0xdb, 0xdf, 0xe3, 0xe7, 0xeb, 0xef },
 		{ 0xf3, 0xff, 0x93, 0xf7, 0xfb, 0x97, 0xc7, 0xcb },
 		{ 0xcf, 0xd3, 0x1b, 0x21, 0x00, 0x23, 0x24, 0x25 },
@@ -285,7 +285,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 
 READ8_MEMBER( v1050_state::kb_status_r )
 {
-	UINT8 val =	m_uart_kb->status_r(space, 0);
+	UINT8 val = m_uart_kb->status_r(space, 0);
 
 	return val | (m_keyavail ? 0x02 : 0x00);
 }
@@ -367,18 +367,18 @@ READ8_MEMBER( v1050_state::sasi_status_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       REQ-
-        1       BUSY
-        2       MESSAGE
-        3       C/D-
-        4       I-/O
-        5
-        6
-        7
+	    0       REQ-
+	    1       BUSY
+	    2       MESSAGE
+	    3       C/D-
+	    4       I-/O
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -405,18 +405,18 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       SEL
-        1       ACK
-        2
-        3
-        4
-        5
-        6
-        7       RST
+	    0       SEL
+	    1       ACK
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7       RST
 
-    */
+	*/
 
 	m_sasibus->scsi_sel_w(BIT(data, 0));
 
@@ -647,12 +647,12 @@ WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
 
 static I8255A_INTERFACE( disp_ppi_intf )
 {
-	DEVCB_DEVICE_MEMBER(I8255A_M6502_TAG, i8255_device, pb_r),	// Port A read
-	DEVCB_NULL,							// Port A write
-	DEVCB_NULL,							// Port B read
-	DEVCB_NULL,							// Port B write
-	DEVCB_NULL,							// Port C read
-	DEVCB_DRIVER_MEMBER(v1050_state,disp_ppi_pc_w)		// Port C write
+	DEVCB_DEVICE_MEMBER(I8255A_M6502_TAG, i8255_device, pb_r),  // Port A read
+	DEVCB_NULL,                         // Port A write
+	DEVCB_NULL,                         // Port B read
+	DEVCB_NULL,                         // Port B write
+	DEVCB_NULL,                         // Port C read
+	DEVCB_DRIVER_MEMBER(v1050_state,disp_ppi_pc_w)      // Port C write
 };
 
 WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
@@ -666,12 +666,12 @@ WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
 
 static I8255A_INTERFACE( m6502_ppi_intf )
 {
-	DEVCB_DEVICE_MEMBER(I8255A_DISP_TAG, i8255_device, pb_r),	// Port A read
-	DEVCB_NULL,							// Port A write
-	DEVCB_NULL,							// Port B read
-	DEVCB_NULL,							// Port B write
-	DEVCB_NULL,							// Port C read
-	DEVCB_DRIVER_MEMBER(v1050_state,m6502_ppi_pc_w)	// Port C write
+	DEVCB_DEVICE_MEMBER(I8255A_DISP_TAG, i8255_device, pb_r),   // Port A read
+	DEVCB_NULL,                         // Port A write
+	DEVCB_NULL,                         // Port B read
+	DEVCB_NULL,                         // Port B write
+	DEVCB_NULL,                         // Port C read
+	DEVCB_DRIVER_MEMBER(v1050_state,m6502_ppi_pc_w) // Port C write
 };
 
 // Miscellanous 8255A Interface
@@ -680,18 +680,18 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PA0     f_ds<0>     drive 0 select
-        PA1     f_ds<1>     drive 1 select
-        PA2     f_ds<2>     drive 2 select
-        PA3     f_ds<3>     drive 3 select
-        PA4     f_side_1    floppy side select
-        PA5     f_pre_comp  precompensation
-        PA6     f_motor_on* floppy motor
-        PA7     f_dden*     double density select
+	    PA0     f_ds<0>     drive 0 select
+	    PA1     f_ds<1>     drive 1 select
+	    PA2     f_ds<2>     drive 2 select
+	    PA3     f_ds<3>     drive 3 select
+	    PA4     f_side_1    floppy side select
+	    PA5     f_pre_comp  precompensation
+	    PA6     f_motor_on* floppy motor
+	    PA7     f_dden*     double density select
 
-    */
+	*/
 
 	// floppy drive select
 	floppy_image_device *floppy = NULL;
@@ -722,18 +722,18 @@ READ8_MEMBER(v1050_state::misc_ppi_pc_r)
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PC0     pr_strobe   printer strobe
-        PC1     f_int_enb   floppy interrupt enable
-        PC2     baud_sel_a
-        PC3     baud_sel_b
-        PC4     pr_busy*    printer busy
-        PC5     pr_pe*      printer paper end
-        PC6
-        PC7
+	    PC0     pr_strobe   printer strobe
+	    PC1     f_int_enb   floppy interrupt enable
+	    PC2     baud_sel_a
+	    PC3     baud_sel_b
+	    PC4     pr_busy*    printer busy
+	    PC5     pr_pe*      printer paper end
+	    PC6
+	    PC7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -747,18 +747,18 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PC0     pr_strobe   printer strobe
-        PC1     f_int_enb   floppy interrupt enable
-        PC2     baud_sel_a
-        PC3     baud_sel_b
-        PC4     pr_busy*    printer busy
-        PC5     pr_pe*      printer paper end
-        PC6
-        PC7
+	    PC0     pr_strobe   printer strobe
+	    PC1     f_int_enb   floppy interrupt enable
+	    PC2     baud_sel_a
+	    PC3     baud_sel_b
+	    PC4     pr_busy*    printer busy
+	    PC5     pr_pe*      printer paper end
+	    PC6
+	    PC7
 
-    */
+	*/
 
 	// printer strobe
 	m_centronics->strobe_w(BIT(data, 0));
@@ -776,10 +776,10 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 
 		switch (baud_sel)
 		{
-		case 0:	period = attotime::from_hz((double)XTAL_16MHz/4/13/16); break;
-		case 1:	period = attotime::from_hz((double)XTAL_16MHz/4/13/8); break;
-		case 2:	period = attotime::from_hz((double)XTAL_16MHz/4/8); break;
-		case 3:	period = attotime::from_hz((double)XTAL_16MHz/4/13/2); break;
+		case 0: period = attotime::from_hz((double)XTAL_16MHz/4/13/16); break;
+		case 1: period = attotime::from_hz((double)XTAL_16MHz/4/13/8); break;
+		case 2: period = attotime::from_hz((double)XTAL_16MHz/4/8); break;
+		case 3: period = attotime::from_hz((double)XTAL_16MHz/4/13/2); break;
 		}
 
 		m_timer_sio->adjust(attotime::zero, 0, period);
@@ -790,12 +790,12 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 
 static I8255A_INTERFACE( misc_ppi_intf )
 {
-	DEVCB_NULL,							// Port A read
-	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pa_w),		// Port A write
-	DEVCB_NULL,							// Port B read
-	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pb_w),		// Port B write
-	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pc_r),		// Port C read
-	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pc_w)		// Port C write
+	DEVCB_NULL,                         // Port A read
+	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pa_w),        // Port A write
+	DEVCB_NULL,                         // Port B read
+	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pb_w),     // Port B write
+	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pc_r),     // Port C read
+	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pc_w)     // Port C write
 };
 
 // Real Time Clock 8255A Interface
@@ -804,18 +804,18 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PB0                 RS-232
-        PB1                 Winchester
-        PB2                 keyboard
-        PB3                 floppy disk interrupt
-        PB4                 vertical interrupt
-        PB5                 display interrupt
-        PB6                 expansion B
-        PB7                 expansion A
+	    PB0                 RS-232
+	    PB1                 Winchester
+	    PB2                 keyboard
+	    PB3                 floppy disk interrupt
+	    PB4                 vertical interrupt
+	    PB5                 display interrupt
+	    PB6                 expansion B
+	    PB7                 expansion A
 
-    */
+	*/
 
 	m_int_mask = data;
 }
@@ -824,18 +824,18 @@ READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PC0
-        PC1
-        PC2
-        PC3                 clock busy
-        PC4
-        PC5
-        PC6
-        PC7
+	    PC0
+	    PC1
+	    PC2
+	    PC3                 clock busy
+	    PC4
+	    PC5
+	    PC6
+	    PC7
 
-    */
+	*/
 
 	return m_rtc->busy_r() << 3;
 }
@@ -844,18 +844,18 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PC0
-        PC1
-        PC2
-        PC3
-        PC4                 clock address write
-        PC5                 clock data write
-        PC6                 clock data read
-        PC7                 clock device select
+	    PC0
+	    PC1
+	    PC2
+	    PC3
+	    PC4                 clock address write
+	    PC5                 clock data write
+	    PC6                 clock data read
+	    PC7                 clock device select
 
-    */
+	*/
 
 	m_rtc->address_write_w(BIT(data, 4));
 	m_rtc->write_w(BIT(data, 5));
@@ -1063,19 +1063,19 @@ void v1050_state::machine_reset()
 
 static MACHINE_CONFIG_START( v1050, v1050_state )
 	// basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MCFG_CPU_PROGRAM_MAP(v1050_mem)
-    MCFG_CPU_IO_MAP(v1050_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(v1050_mem)
+	MCFG_CPU_IO_MAP(v1050_io)
 	MCFG_QUANTUM_PERFECT_CPU(Z80_TAG)
 
-    MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_15_36MHz/16)
-    MCFG_CPU_PROGRAM_MAP(v1050_crt_mem)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_15_36MHz/16)
+	MCFG_CPU_PROGRAM_MAP(v1050_crt_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	// keyboard HACK
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", v1050_state, v1050_keyboard_tick, attotime::from_hz(60))
 
-    // video hardware
+	// video hardware
 	MCFG_FRAGMENT_ADD(v1050_video)
 
 	// devices
@@ -1131,4 +1131,4 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                     FULLNAME        FLAGS
-COMP( 1983, v1050,	0,		0,		v1050,	v1050, driver_device,	0,		"Visual Technology Inc",	"Visual 1050",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, v1050,  0,      0,      v1050,  v1050, driver_device,   0,      "Visual Technology Inc",    "Visual 1050",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_KEYBOARD )

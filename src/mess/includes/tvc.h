@@ -21,10 +21,10 @@
 #include "machine/tvcexp.h"
 #include "machine/tvc_hbf.h"
 
-#define		TVC_RAM_BANK	1
-#define		TVC_ROM_BANK	2
+#define     TVC_RAM_BANK    1
+#define     TVC_ROM_BANK    2
 
-#define CENTRONICS_TAG	"centronics"
+#define CENTRONICS_TAG  "centronics"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -34,14 +34,14 @@
 
 struct tvc_sound_interface
 {
-	 devcb_write_line		m_sndint_cb;
+		devcb_write_line        m_sndint_cb;
 };
 
 // ======================> tvc_sound_device
 
 class tvc_sound_device : public device_t,
-						 public device_sound_interface,
-						 public tvc_sound_interface
+							public device_sound_interface,
+							public tvc_sound_interface
 {
 public:
 	// construction/destruction
@@ -61,15 +61,15 @@ protected:
 private:
 	static const device_timer_id TIMER_SNDINT = 0;
 
-	sound_stream *	m_stream;
-	int				m_freq;
-	int				m_enabled;
-	int				m_volume;
-	int 			m_incr;
-	int 			m_signal;
-	UINT8			m_ports[3];
-	emu_timer *		m_sndint_timer;
-	devcb_resolved_write_line	m_sndint_func;
+	sound_stream *  m_stream;
+	int             m_freq;
+	int             m_enabled;
+	int             m_volume;
+	int             m_incr;
+	int             m_signal;
+	UINT8           m_ports[3];
+	emu_timer *     m_sndint_timer;
+	devcb_resolved_write_line   m_sndint_func;
 };
 
 
@@ -80,11 +80,11 @@ class tvc_state : public driver_device
 public:
 	tvc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, RAM_TAG),
-		  m_sound(*this, "custom"),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_centronics(*this, CENTRONICS_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG),
+			m_sound(*this, "custom"),
+			m_cassette(*this, CASSETTE_TAG),
+			m_centronics(*this, CENTRONICS_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -118,16 +118,16 @@ public:
 	DECLARE_WRITE8_MEMBER(tvc_expint_ack_w);
 
 	tvcexp_slot_device * m_expansions[4];
-	UINT8		m_video_mode;
-	UINT8		m_keyline;
-	UINT8		m_active_slot;
-	UINT8		m_int_flipflop;
-	UINT8		m_col[4];
-	UINT8		m_bank_type[4];
-	UINT8		m_bank;
-	UINT8		m_vram_bank;
-	UINT8		m_cassette_ff;
-	UINT8		m_centronics_ff;
+	UINT8       m_video_mode;
+	UINT8       m_keyline;
+	UINT8       m_active_slot;
+	UINT8       m_int_flipflop;
+	UINT8       m_col[4];
+	UINT8       m_bank_type[4];
+	UINT8       m_bank;
+	UINT8       m_vram_bank;
+	UINT8       m_cassette_ff;
+	UINT8       m_centronics_ff;
 	virtual void palette_init();
 };
 

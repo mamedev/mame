@@ -10,9 +10,9 @@
 
 
 
-#define TTL74181_MAX_CHIPS		(2)
-#define TTL74181_INPUT_TOTAL	(14)
-#define TTL74181_OUTPUT_TOTAL	(8)
+#define TTL74181_MAX_CHIPS      (2)
+#define TTL74181_INPUT_TOTAL    (14)
+#define TTL74181_OUTPUT_TOTAL   (8)
 
 
 

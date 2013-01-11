@@ -188,7 +188,7 @@ static INPUT_PORTS_START( boogwing )
 	PORT_DIPNAME( 0x1000, 0x1000, "Coin Slots" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, "Common" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x2000, 0x2000, "Stage Reset" ) PORT_DIPLOCATION("SW2:6")	/* At loss of life */
+	PORT_DIPNAME( 0x2000, 0x2000, "Stage Reset" ) PORT_DIPLOCATION("SW2:6") /* At loss of life */
 	PORT_DIPSETTING(      0x2000, "Point of Termination" )
 	PORT_DIPSETTING(      0x0000, "Beginning of Stage" )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Manual shows as OFF and states "Don't Change" */
@@ -260,17 +260,17 @@ static const gfx_layout spritelayout =
 	{ 24,8,16,0 },
 	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
 	32*32
 };
 
 
 static GFXDECODE_START( boogwing )
-	GFXDECODE_ENTRY( "tiles1", 0, tile_8x8_layout,            0, 16 )	/* Tiles (8x8) */
-	GFXDECODE_ENTRY( "tiles2", 0, tile_16x16_layout_5bpp, 0x100, 16 )	/* Tiles (16x16) */
-	GFXDECODE_ENTRY( "tiles3", 0, tile_16x16_layout,      0x300, 32 )	/* Tiles (16x16) */
-	GFXDECODE_ENTRY( "sprites1", 0, spritelayout,           0x500, 32 )	/* Sprites (16x16) */
-	GFXDECODE_ENTRY( "sprites2", 0, spritelayout,           0x700, 16 )	/* Sprites (16x16) */
+	GFXDECODE_ENTRY( "tiles1", 0, tile_8x8_layout,            0, 16 )   /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "tiles2", 0, tile_16x16_layout_5bpp, 0x100, 16 )   /* Tiles (16x16) */
+	GFXDECODE_ENTRY( "tiles3", 0, tile_16x16_layout,      0x300, 32 )   /* Tiles (16x16) */
+	GFXDECODE_ENTRY( "sprites1", 0, spritelayout,           0x500, 32 ) /* Sprites (16x16) */
+	GFXDECODE_ENTRY( "sprites2", 0, spritelayout,           0x700, 16 ) /* Sprites (16x16) */
 GFXDECODE_END
 
 /**********************************************************************************/
@@ -307,7 +307,7 @@ static const deco16ic_interface boogwing_deco16ic_tilegen1_intf =
 	0, 1,
 	0x0f, 0x1f, /* trans masks (pf2 has 5bpp graphics) */
 	0, 0,  /* color base (pf2 is non default) */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	NULL,
 	boogwing_bank_callback,
 	0, 1
@@ -329,7 +329,7 @@ static const deco16ic_interface boogwing_deco16ic_tilegen2_intf =
 static MACHINE_CONFIG_START( boogwing, boogwing_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
+	MCFG_CPU_ADD("maincpu", M68000, 14000000)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(boogwing_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 

@@ -21,10 +21,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define GIME_TAG				"gime"
-#define VDG_TAG					"vdg"
-#define COMPOSITE_SCREEN_TAG	"composite"
-#define RGB_SCREEN_TAG			"rgb"
+#define GIME_TAG                "gime"
+#define VDG_TAG                 "vdg"
+#define COMPOSITE_SCREEN_TAG    "composite"
+#define RGB_SCREEN_TAG          "rgb"
 
 
 
@@ -37,7 +37,7 @@ class coco3_state : public coco_state
 public:
 	coco3_state(const machine_config &mconfig, device_type type, const char *tag)
 	: coco_state(mconfig, type, tag),
-	  m_gime(*this, GIME_TAG) { }
+		m_gime(*this, GIME_TAG) { }
 
 	required_device<gime_base_device> m_gime;
 

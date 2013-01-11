@@ -372,7 +372,7 @@ ROM_START( spacefb )
 	ROM_LOAD( "tst-c-u.5n",      0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
+	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
@@ -398,7 +398,7 @@ ROM_START( spacefbe )
 	ROM_LOAD( "tst-c-e.5n",      0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
+	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
@@ -423,7 +423,7 @@ ROM_START( spacefbe2 )
 	ROM_LOAD( "tst-c-e.5n",      0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
+	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
@@ -449,7 +449,7 @@ ROM_START( spacefba )
 	ROM_LOAD( "tst-c-a.5n",      0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "tst-e-20.bin",    0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
+	ROM_LOAD( "tst-e-20.bin",    0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "tst-v-a.5k",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
@@ -475,7 +475,7 @@ ROM_START( spacefbg )
 	ROM_LOAD( "5n.cpu",      0x3800, 0x0800, CRC(1c9f91ee) SHA1(481a309fe9aa9ce6fd18d7d908c18790f594057d) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
+	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "tst-v.5k",    0x0000, 0x0800, CRC(bacc780d) SHA1(fe498b477bbf7f03fd256de2f799483383a7e819) )
@@ -500,7 +500,7 @@ ROM_START( spacebrd )
 	ROM_LOAD( "sb5n.cpu",    0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
+	ROM_LOAD( "ic20.snd",    0x0000, 0x0400, CRC(1c8670b3) SHA1(609124caa11498fc6a6bdf6cdbb8003bbc249dd8) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "5k.vid",      0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
@@ -526,7 +526,7 @@ ROM_START( spacefbb )
 	ROM_LOAD( "sb5n.cpu",    0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "fb.snd",      0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
+	ROM_LOAD( "fb.snd",      0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "fc59",        0x0000, 0x0800, CRC(a00ad16c) SHA1(6130b2250b492b56e3ea94e44f7b2ddf45908d00) )
@@ -576,7 +576,7 @@ ROM_START( starwarr )
 	ROM_LOAD( "sw58.5n",     0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
-    ROM_LOAD( "sw00.snd",    0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
+	ROM_LOAD( "sw00.snd",    0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
 	ROM_LOAD( "sw59.5k",     0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )

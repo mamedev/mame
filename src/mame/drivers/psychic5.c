@@ -332,10 +332,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::psychic5_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
 }
 
 
@@ -360,7 +360,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 	{
 		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		membank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+		membank("bank1")->set_base(&RAM[bankaddress]);   /* Select 4 banks of 16k */
 	}
 }
 
@@ -373,7 +373,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 	{
 		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		membank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 8 banks of 16k */
+		membank("bank1")->set_base(&RAM[bankaddress]);   /* Select 8 banks of 16k */
 	}
 }
 
@@ -414,7 +414,7 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
 	AM_RANGE(0xf002, 0xf002) AM_READWRITE(psychic5_bankselect_r, psychic5_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
-	AM_RANGE(0xf004, 0xf004) AM_NOP	// ???
+	AM_RANGE(0xf004, 0xf004) AM_NOP // ???
 	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE(psychic5_title_screen_w)
 	AM_RANGE(0xf006, 0xf1ff) AM_NOP
 	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY								// Is this a confirm of some sort?
+	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY                               // Is this a confirm of some sort?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8, psychic5_state )
@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( psychic5 )
-	PORT_START("SYSTEM")	/* system control */
+	PORT_START("SYSTEM")    /* system control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -478,7 +478,7 @@ static INPUT_PORTS_START( psychic5 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("P1")		/* player 1 controls */
+	PORT_START("P1")        /* player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( psychic5 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")		/* player 2 controls */
+	PORT_START("P2")        /* player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -551,7 +551,7 @@ static INPUT_PORTS_START( psychic5 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bombsa )
-	PORT_START("SYSTEM")	/* system control */
+	PORT_START("SYSTEM")    /* system control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -561,7 +561,7 @@ static INPUT_PORTS_START( bombsa )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("P1")		/* player 1 control */
+	PORT_START("P1")        /* player 1 control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -571,7 +571,7 @@ static INPUT_PORTS_START( bombsa )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")		/* player 2 control */
+	PORT_START("P2")        /* player 2 control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -582,13 +582,13 @@ static INPUT_PORTS_START( bombsa )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:8" )			// Coin_B
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:8" )           // Coin_B
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:6" )			// Coin_B
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:5" )			// Coin_B
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:6" )           // Coin_B
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:5" )           // Coin_B
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:3" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, "2 Coins 1 Credit/4 Coins 3 Credits" )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -602,7 +602,7 @@ static INPUT_PORTS_START( bombsa )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:1" )			// flip screen ?
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:1" )           // flip screen ?
 INPUT_PORTS_END
 
 
@@ -610,23 +610,23 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8x8 characters */
-	1024,	/* 1024 characters */
+	1024,   /* 1024 characters */
 	4,      /* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the four bitplanes for pixel are packed into one nibble */
 	{ 0, 4, 8, 12, 16, 20, 24, 28 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8	/* every char takes 32 consecutive bytes */
+	32*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 16x16 characters */
-	1024,	/* 1024 characters */
+	1024,   /* 1024 characters */
 	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },	/* the four bitplanes for pixel are packed into one nibble */
+	{ 0, 1, 2, 3 }, /* the four bitplanes for pixel are packed into one nibble */
 	{ 0, 4, 8, 12, 16, 20, 24, 28, 64*8, 64*8+4, 64*8+8, 64*8+12, 64*8+16, 64*8+20, 64*8+24, 64*8+28 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8, 32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
-	128*8	/* every char takes 128 consecutive bytes */
+	128*8   /* every char takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( psychic5 )
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)				/* Guru says : VSync - 54Hz . HSync - 15.25kHz */
+	MCFG_SCREEN_REFRESH_RATE(54)                /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -757,49 +757,49 @@ MACHINE_CONFIG_END
 
 
 ROM_START( psychic5 )
-	ROM_REGION( 0x20000, "maincpu", 0 ) 					/* Main CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
 	ROM_LOAD( "p5e",          0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
 	ROM_LOAD( "p5a",          0x00000, 0x08000, CRC(50060ecd) SHA1(e6051fb4a1fa9429cfb6084e8a5dfe994a08280b) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprite tiles */
 	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
 	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* background tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
 	ROM_LOAD( "p5g",          0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )
 	ROM_LOAD( "p5h",          0x10000, 0x10000, CRC(c411171a) SHA1(d5893563715ba231e42b084b88f5176bb94a4da9) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )	/* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
 	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 
-	ROM_REGION( 0x08000, "proms", 0 )	/* Proms */
+	ROM_REGION( 0x08000, "proms", 0 )   /* Proms */
 	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
 	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
 
 ROM_START( psychic5a )
-	ROM_REGION( 0x20000, "maincpu", 0 ) 					/* Main CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
 	ROM_LOAD( "myp5d",          0x00000, 0x08000, CRC(1d40a8c7) SHA1(79b36e690ea334c066b55b1e39ceb5fe0688cd7b) )
 	ROM_LOAD( "myp5e",          0x10000, 0x10000, CRC(2fa7e8c0) SHA1(d5096ebec58329346a3292ad2da1be3742fad093) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
 	ROM_LOAD( "myp5a",          0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprite tiles */
 	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
 	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* background tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
 	ROM_LOAD( "myp5g",          0x00000, 0x10000, CRC(617b074b) SHA1(7aaac9fddf5675b6698373333db3e096471d7ad6) )
 	ROM_LOAD( "myp5h",          0x10000, 0x10000, CRC(a9dfbe67) SHA1(f31f75e88f9b37d7fe5b1a1a8e0299151b729ccf) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )	/* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
 	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 
-	ROM_REGION( 0x08000, "proms", 0 )	/* Proms */
+	ROM_REGION( 0x08000, "proms", 0 )   /* Proms */
 	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
 	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
@@ -873,28 +873,28 @@ Notes:
 */
 
 ROM_START( bombsa )
-	ROM_REGION( 0x30000, "maincpu", 0 )					/* Main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )                 /* Main CPU */
 	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
 	/* these fail their self-test... should be checked on real hw (hold start1+start2 on boot) */
 	ROM_LOAD( "5.7c",         0x10000, 0x08000, BAD_DUMP CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) ) // contains palettes etc. but fails rom check??
 	ROM_LOAD( "6.7d",         0x20000, 0x10000, BAD_DUMP CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
 	ROM_LOAD( "1.3a",         0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )	/* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprite tiles */
 	ROM_LOAD( "2.4p",         0x00000, 0x10000, CRC(bd972ff4) SHA1(63bfb455bc0ae1d31e6f1066864ec0c8d2d0cf99) )
 	ROM_LOAD( "3.4s",         0x10000, 0x10000, CRC(9a8a8a97) SHA1(13328631202c196c9d8791cc6063048eb6be0472) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )	/* background tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
 	/* some corrupt 'blank' characters, should also be checked with a redump */
 	ROM_LOAD( "8.2l",         0x00000, 0x10000, BAD_DUMP CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
 	ROM_LOAD( "9.2m",         0x10000, 0x10000, BAD_DUMP CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )	/* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
 	ROM_LOAD( "7.4f",         0x00000, 0x08000, CRC(400114b9) SHA1(db2f3ba05a2005ae0e0e7d19c8739353032cbeab) )
 
-	ROM_REGION( 0x08000, "proms", 0 )	/* Proms */
+	ROM_REGION( 0x08000, "proms", 0 )   /* Proms */
 	ROM_LOAD( "82s131.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
 	ROM_LOAD( "82s137.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END

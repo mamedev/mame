@@ -10,7 +10,7 @@
 #include "includes/cyberbal.h"
 
 
-#define SCREEN_WIDTH		(42*16)
+#define SCREEN_WIDTH        (42*16)
 
 
 
@@ -67,76 +67,76 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 {
 	static const atarimo_desc mo0desc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		1,					/* does the neighbor bit affect the next object? */
-		1024,				/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		1,                  /* does the neighbor bit affect the next object? */
+		1024,               /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x600,				/* base palette entry */
-		0x100,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x600,              /* base palette entry */
+		0x100,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0,0,0x07f8,0 }},	/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0x7fff,0,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0,0,0x000f }},	/* mask for the color */
-		{{ 0,0,0,0xffc0 }},	/* mask for the X position */
-		{{ 0,0xff80,0,0 }},	/* mask for the Y position */
-		{{ 0 }},			/* mask for the width, in tiles*/
-		{{ 0,0x000f,0,0 }},	/* mask for the height, in tiles */
-		{{ 0x8000,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0 }},			/* mask for the priority */
-		{{ 0,0,0,0x0010 }},	/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0,0,0x07f8,0 }}, /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0x7fff,0,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0,0,0x000f }}, /* mask for the color */
+		{{ 0,0,0,0xffc0 }}, /* mask for the X position */
+		{{ 0,0xff80,0,0 }}, /* mask for the Y position */
+		{{ 0 }},            /* mask for the width, in tiles*/
+		{{ 0,0x000f,0,0 }}, /* mask for the height, in tiles */
+		{{ 0x8000,0,0,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0 }},            /* mask for the priority */
+		{{ 0,0,0,0x0010 }}, /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		0					/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		0                   /* callback routine for special entries */
 	};
 
 	static const atarimo_desc mo1desc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		1,					/* does the neighbor bit affect the next object? */
-		1024,				/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		1,                  /* does the neighbor bit affect the next object? */
+		1024,               /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0xe00,				/* base palette entry */
-		0x100,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0xe00,              /* base palette entry */
+		0x100,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0,0,0x07f8,0 }},	/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0x7fff,0,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0,0,0x000f }},	/* mask for the color */
-		{{ 0,0,0,0xffc0 }},	/* mask for the X position */
-		{{ 0,0xff80,0,0 }},	/* mask for the Y position */
-		{{ 0 }},			/* mask for the width, in tiles*/
-		{{ 0,0x000f,0,0 }},	/* mask for the height, in tiles */
-		{{ 0x8000,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0 }},			/* mask for the priority */
-		{{ 0,0,0,0x0010 }},	/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0,0,0x07f8,0 }}, /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0x7fff,0,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0,0,0x000f }}, /* mask for the color */
+		{{ 0,0,0,0xffc0 }}, /* mask for the X position */
+		{{ 0,0xff80,0,0 }}, /* mask for the Y position */
+		{{ 0 }},            /* mask for the width, in tiles*/
+		{{ 0,0x000f,0,0 }}, /* mask for the height, in tiles */
+		{{ 0x8000,0,0,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0 }},            /* mask for the priority */
+		{{ 0,0,0,0x0010 }}, /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		0					/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		0                   /* callback routine for special entries */
 	};
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
@@ -362,7 +362,7 @@ static UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, con
 				if (mo[x])
 				{
 					/* not verified: logic is all controlled in a PAL
-                    */
+					*/
 					pf[x] = mo[x];
 
 					/* erase behind ourselves */

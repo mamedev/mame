@@ -25,51 +25,51 @@ CPU_DISASSEMBLE( ssem );
 // un-reversed before being used.
 INLINE UINT32 reverse(UINT32 v)
 {
-    // Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
-    // swap odd and even bits
-    v = ((v >> 1) & 0x55555555) | ((v & 0x55555555) << 1);
-    // swap consecutive pairs
-    v = ((v >> 2) & 0x33333333) | ((v & 0x33333333) << 2);
-    // swap nibbles ...
-    v = ((v >> 4) & 0x0F0F0F0F) | ((v & 0x0F0F0F0F) << 4);
-    // swap bytes
-    v = ((v >> 8) & 0x00FF00FF) | ((v & 0x00FF00FF) << 8);
-    // swap 2-byte long pairs
-    v = ( v >> 16             ) | ( v               << 16);
+	// Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
+	// swap odd and even bits
+	v = ((v >> 1) & 0x55555555) | ((v & 0x55555555) << 1);
+	// swap consecutive pairs
+	v = ((v >> 2) & 0x33333333) | ((v & 0x33333333) << 2);
+	// swap nibbles ...
+	v = ((v >> 4) & 0x0F0F0F0F) | ((v & 0x0F0F0F0F) << 4);
+	// swap bytes
+	v = ((v >> 8) & 0x00FF00FF) | ((v & 0x00FF00FF) << 8);
+	// swap 2-byte long pairs
+	v = ( v >> 16             ) | ( v               << 16);
 
-    return v;
+	return v;
 }
 
 inline UINT32 ssem_device::program_read32(UINT32 address)
 {
-    UINT32 v = 0;
-    // The MAME core does not have a good way of specifying a minimum datum size that is more than
-    // 8 bits in width.  The minimum datum width on the SSEM is 32 bits, so we need to quadruple
-    // the address value to get the appropriate byte index.
-    address <<= 2;
+	UINT32 v = 0;
+	// The MAME core does not have a good way of specifying a minimum datum size that is more than
+	// 8 bits in width.  The minimum datum width on the SSEM is 32 bits, so we need to quadruple
+	// the address value to get the appropriate byte index.
+	address <<= 2;
 
-    v |= m_program->read_byte(address + 0) << 24;
-    v |= m_program->read_byte(address + 1) << 16;
-    v |= m_program->read_byte(address + 2) <<  8;
-    v |= m_program->read_byte(address + 3) <<  0;
+	v |= m_program->read_byte(address + 0) << 24;
+	v |= m_program->read_byte(address + 1) << 16;
+	v |= m_program->read_byte(address + 2) <<  8;
+	v |= m_program->read_byte(address + 3) <<  0;
 
-    return reverse(v);
+	return reverse(v);
 }
 
 inline void ssem_device::program_write32(UINT32 address, UINT32 data)
 {
-    UINT32 v = reverse(data);
+	UINT32 v = reverse(data);
 
-    // The MAME core does not have a good way of specifying a minimum datum size that is more than
-    // 8 bits in width.  The minimum datum width on the SSEM is 32 bits, so we need to quadruple
-    // the address value to get the appropriate byte index.
-    address <<= 2;
+	// The MAME core does not have a good way of specifying a minimum datum size that is more than
+	// 8 bits in width.  The minimum datum width on the SSEM is 32 bits, so we need to quadruple
+	// the address value to get the appropriate byte index.
+	address <<= 2;
 
-    m_program->write_byte(address + 0, (v >> 24) & 0x000000ff);
-    m_program->write_byte(address + 1, (v >> 16) & 0x000000ff);
-    m_program->write_byte(address + 2, (v >>  8) & 0x000000ff);
-    m_program->write_byte(address + 3, (v >>  0) & 0x000000ff);
-    return;
+	m_program->write_byte(address + 0, (v >> 24) & 0x000000ff);
+	m_program->write_byte(address + 1, (v >> 16) & 0x000000ff);
+	m_program->write_byte(address + 2, (v >>  8) & 0x000000ff);
+	m_program->write_byte(address + 3, (v >>  0) & 0x000000ff);
+	return;
 }
 
 /*****************************************************************************/
@@ -82,14 +82,14 @@ const device_type SSEMCPU = &device_creator<ssem_device>;
 
 ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SSEMCPU, "SSEMCPU", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
-	  m_pc(1),
-	  m_shifted_pc(1<<2),
-	  m_a(0),
-	  m_halt(0),
-      m_icount(0)
+		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
+		m_pc(1),
+		m_shifted_pc(1<<2),
+		m_a(0),
+		m_halt(0),
+		m_icount(0)
 {
-    // Allocate & setup
+	// Allocate & setup
 }
 
 
@@ -101,8 +101,8 @@ void ssem_device::device_start()
 	astring tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_halt).callimport().callexport().formatstr("%1s").noshow();
-	state_add(SSEM_PC,         "PC",    	m_shifted_pc).mask(0xffff);
-	state_add(SSEM_A,          "A",       	m_a).mask(0xffffffff);
+	state_add(SSEM_PC,         "PC",        m_shifted_pc).mask(0xffff);
+	state_add(SSEM_A,          "A",         m_a).mask(0xffffffff);
 	state_add(SSEM_HALT,       "HALT",     m_halt).mask(0xf);
 
 	/* setup regtable */
@@ -120,10 +120,10 @@ void ssem_device::device_stop()
 
 void ssem_device::device_reset()
 {
-    m_pc = 1;
-    m_shifted_pc = m_pc << 2;
-    m_a = 0;
-    m_halt = 0;
+	m_pc = 1;
+	m_shifted_pc = m_pc << 2;
+	m_a = 0;
+	m_halt = 0;
 }
 
 
@@ -247,68 +247,68 @@ void ssem_device::execute_set_input(int inputnum, int state)
 
 void ssem_device::execute_run()
 {
-    UINT32 op;
+	UINT32 op;
 
-    m_pc &= 0x1f;
-    m_shifted_pc = m_pc << 2;
+	m_pc &= 0x1f;
+	m_shifted_pc = m_pc << 2;
 
-    while (m_icount > 0)
-    {
-        debugger_instruction_hook(this, m_pc);
+	while (m_icount > 0)
+	{
+		debugger_instruction_hook(this, m_pc);
 
-        op = program_read32(m_pc);
+		op = program_read32(m_pc);
 
-        if( !m_halt )
-        {
-            m_pc++;
-    		m_shifted_pc = m_pc << 2;
-        }
-        else
-        {
-            op = 0x0000e000;
-        }
+		if( !m_halt )
+		{
+			m_pc++;
+			m_shifted_pc = m_pc << 2;
+		}
+		else
+		{
+			op = 0x0000e000;
+		}
 
-        switch (INSTR)
-        {
-            case 0:
-                // JMP: Move the value at the specified address into the Program Counter.
-                m_pc = program_read32(ADDR) + 1;
-    			m_shifted_pc = m_pc << 2;
-                break;
-            case 1:
-                // JRP: Add the value at the specified address to the Program Counter.
-                m_pc += (INT32)program_read32(ADDR);
-    			m_shifted_pc = m_pc << 2;
-                break;
-            case 2:
-                // LDN: Load the accumulator with the two's-complement negation of the value at the specified address.
-                m_a = (UINT32)(0 - (INT32)program_read32(ADDR));
-                break;
-            case 3:
-                // STO: Store the value in the accumulator at the specified address.
-                program_write32(ADDR, m_a);
-                break;
-            case 4:
-            case 5:
-                // SUB: Subtract the value at the specified address from the accumulator.
-                m_a -= program_read32(ADDR);
-                break;
-            case 6:
-                // CMP: If the accumulator is less than zero, skip the next opcode.
-                if((INT32)(m_a) < 0)
-                {
-                	m_pc++;
-    				m_shifted_pc = m_pc << 2;
-                }
-                break;
-            case 7:
-                // STP: Halt the computer.
-                m_halt = 1;
-                break;
-            default:
-            	break;
-        }
+		switch (INSTR)
+		{
+			case 0:
+				// JMP: Move the value at the specified address into the Program Counter.
+				m_pc = program_read32(ADDR) + 1;
+				m_shifted_pc = m_pc << 2;
+				break;
+			case 1:
+				// JRP: Add the value at the specified address to the Program Counter.
+				m_pc += (INT32)program_read32(ADDR);
+				m_shifted_pc = m_pc << 2;
+				break;
+			case 2:
+				// LDN: Load the accumulator with the two's-complement negation of the value at the specified address.
+				m_a = (UINT32)(0 - (INT32)program_read32(ADDR));
+				break;
+			case 3:
+				// STO: Store the value in the accumulator at the specified address.
+				program_write32(ADDR, m_a);
+				break;
+			case 4:
+			case 5:
+				// SUB: Subtract the value at the specified address from the accumulator.
+				m_a -= program_read32(ADDR);
+				break;
+			case 6:
+				// CMP: If the accumulator is less than zero, skip the next opcode.
+				if((INT32)(m_a) < 0)
+				{
+					m_pc++;
+					m_shifted_pc = m_pc << 2;
+				}
+				break;
+			case 7:
+				// STP: Halt the computer.
+				m_halt = 1;
+				break;
+			default:
+				break;
+		}
 
-        --m_icount;
-    }
+		--m_icount;
+	}
 }

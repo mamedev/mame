@@ -80,8 +80,8 @@ enum
 static const gfx_layout fontlayout =
 {
 	6, 8,           /* 6*8 characters */
-	/*96*/128,				/* 96 characters */
-	1,				/* 1 bit per pixel */
+	/*96*/128,              /* 96 characters */
+	1,              /* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 }, /* straightforward layout */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -106,7 +106,7 @@ void asr733_init(running_machine &machine)
 	UINT8 *dst;
 
 	static const unsigned char fontdata6x8[asrfontdata_size] =
-	{	/* ASCII characters */
+	{   /* ASCII characters */
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00,
 		0x50,0x50,0x50,0x00,0x00,0x00,0x00,0x00,0x00,0x50,0xf8,0x50,0xf8,0x50,0x00,0x00,
 		0x20,0x70,0xc0,0x70,0x18,0xf0,0x20,0x00,0x40,0xa4,0x48,0x10,0x20,0x48,0x94,0x08,
@@ -190,7 +190,7 @@ static DEVICE_START( asr733 )
 static void asr_field_interrupt(device_t *device)
 {
 	asr_t *asr = get_safe_token(device);
-	if ((asr->mode & AM_enint_mask) && (asr->new_status_flag))	/* right??? */
+	if ((asr->mode & AM_enint_mask) && (asr->new_status_flag))  /* right??? */
 	{
 		asr->status |= AS_int_mask;
 		if (asr->int_callback)
@@ -276,10 +276,10 @@ static void asr_linefeed(device_t *device)
 	}
 
 	const rectangle asr_scroll_clear_window(
-		asr_window_offset_x,									/* min_x */
-		asr_window_offset_x+asr_window_width-1,					/* max_x */
-		asr_window_offset_y+asr_window_height-asr_scroll_step,	/* min_y */
-		asr_window_offset_y+asr_window_height-1					/* max_y */
+		asr_window_offset_x,                                    /* min_x */
+		asr_window_offset_x+asr_window_width-1,                 /* max_x */
+		asr_window_offset_y+asr_window_height-asr_scroll_step,  /* min_y */
+		asr_window_offset_y+asr_window_height-1                 /* max_y */
 	);
 	asr->bitmap->fill(0, asr_scroll_clear_window);
 }
@@ -350,7 +350,7 @@ static void asr_transmit(device_t *device, UINT8 data)
 	}
 
 	asr->status |= AS_wrq_mask;
-	asr->new_status_flag = 1;	/* right??? */
+	asr->new_status_flag = 1;   /* right??? */
 	asr_field_interrupt(device);
 }
 
@@ -365,7 +365,7 @@ static void asr_receive_callback(int dummy)
 	asr->OutQueueLen--;
 
 	asr->status |= AS_rrq_mask;
-	asr->new_status_flag = 1;	/* right??? */
+	asr->new_status_flag = 1;   /* right??? */
 	asr_field_interrupt(device);
 }
 #endif
@@ -433,17 +433,17 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 			asr->xmit_buf |= 1 << offset;
 		else
 			asr->xmit_buf &= ~ (1 << offset);
-		if ((offset == 7) && (asr->mode & AM_dtr_mask) && (asr->mode & AM_rts_mask))	/* right??? */
+		if ((offset == 7) && (asr->mode & AM_dtr_mask) && (asr->mode & AM_rts_mask))    /* right??? */
 			asr_transmit(device, asr->xmit_buf);
 		break;
 
-	case 8:		/* not used */
+	case 8:     /* not used */
 		break;
 
-	case 9:		/* data terminal ready (set to 1) */
-	case 10:	/* request to send (set to 1) */
-	case 14:	/* enable interrupts, 1 to enable interrupts */
-	case 15:	/* diagnostic mode, 0 for normal mode */
+	case 9:     /* data terminal ready (set to 1) */
+	case 10:    /* request to send (set to 1) */
+	case 14:    /* enable interrupts, 1 to enable interrupts */
+	case 15:    /* diagnostic mode, 0 for normal mode */
 		if (data)
 			asr->mode |= 1 << (offset - 8);
 		else
@@ -452,13 +452,13 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 			asr_field_interrupt(device);
 		break;
 
-	case 11:	/* clear write request (write any value to execute) */
-	case 12:	/* clear read request (write any value to execute) */
+	case 11:    /* clear write request (write any value to execute) */
+	case 12:    /* clear read request (write any value to execute) */
 		asr->status &= ~ (1 << (offset - 8));
 		asr_field_interrupt(device);
 		break;
 
-	case 13:	/* clear new status flag - whatever it means (write any value to execute) */
+	case 13:    /* clear new status flag - whatever it means (write any value to execute) */
 		asr->new_status_flag = 0;
 		asr_field_interrupt(device);
 		break;
@@ -477,7 +477,7 @@ void asr733_refresh(device_t *device, bitmap_ind16 &bitmap, int x, int y)
 
 static const unsigned char key_translate[3][51] =
 {
-	{	/* unshifted */
+	{   /* unshifted */
 		'1',
 		'2',
 		'3',
@@ -534,7 +534,7 @@ static const unsigned char key_translate[3][51] =
 
 		' '
 	},
-	{	/* shifted */
+	{   /* shifted */
 		'!',
 		'"',
 		'#',
@@ -591,7 +591,7 @@ static const unsigned char key_translate[3][51] =
 
 		' '
 	},
-	{	/* control */
+	{   /* control */
 		'1',
 		'2',
 		'3',
@@ -712,13 +712,13 @@ void asr733_keyboard(device_t *device)
 			if ((repeat_mode) && (++asr->repeat_timer == repeat_delay))
 			{
 				if (asr->status & AS_rrq_mask)
-				{	/* keyboard buffer full */
+				{   /* keyboard buffer full */
 					asr->repeat_timer--;
 				}
 				else
-				{	/* repeat current key */
+				{   /* repeat current key */
 					asr->status |= AS_rrq_mask;
-					asr->new_status_flag = 1;	/* right??? */
+					asr->new_status_flag = 1;   /* right??? */
 					asr_field_interrupt(device);
 					asr->repeat_timer = 0;
 				}
@@ -735,7 +735,7 @@ void asr733_keyboard(device_t *device)
 		asr->last_key_pressed = 0x80;
 
 		if (asr->status & AS_rrq_mask)
-		{	/* keyboard buffer full */
+		{   /* keyboard buffer full */
 			/* do nothing */
 		}
 		else
@@ -751,7 +751,7 @@ void asr733_keyboard(device_t *device)
 
 						asr->recv_buf = (int)key_translate[modifier_state][asr->last_key_pressed];
 						asr->status |= AS_rrq_mask;
-						asr->new_status_flag = 1;	/* right??? */
+						asr->new_status_flag = 1;   /* right??? */
 						asr_field_interrupt(device);
 						return;
 					}

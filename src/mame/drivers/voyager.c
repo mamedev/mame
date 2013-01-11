@@ -30,8 +30,8 @@ class voyager_state : public driver_device
 public:
 	voyager_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
-		  { }
+			m_maincpu(*this, "maincpu")
+			{ }
 
 	UINT32 *m_bios_ram;
 	int m_dma_channel;
@@ -40,11 +40,11 @@ public:
 	UINT8 m_mxtc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
-	device_t	*m_pit8254;
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
-	device_t	*m_dma8237_1;
-	device_t	*m_dma8237_2;
+	device_t    *m_pit8254;
+	device_t    *m_pic8259_1;
+	device_t    *m_pic8259_2;
+	device_t    *m_dma8237_1;
+	device_t    *m_dma8237_2;
 
 	UINT32 m_idle_skip_ram;
 	required_device<cpu_device> m_maincpu;
@@ -234,14 +234,14 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	switch(reg)
 	{
 		//case 0x59:
-		case 0x63:	// PAM0
+		case 0x63:  // PAM0
 		{
 			//if (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
 			if ((data & 0x50) | (data & 0xA0))
 			{
 				state->membank("bank1")->set_base(state->m_bios_ram);
 			}
-			else				// disable RAM access (reads go to BIOS ROM)
+			else                // disable RAM access (reads go to BIOS ROM)
 			{
 				//Execution Hack to avoid crash when switch back from Shadow RAM to Bios ROM, since i386 emu haven't yet pipelined execution structure.
 				//It happens when exit from BIOS SETUP.
@@ -384,7 +384,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 WRITE32_MEMBER(voyager_state::bios_ram_w)
 {
 	//if (m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
-	       if (m_mxtc_config_reg[0x63] & 0x50)
+			if (m_mxtc_config_reg[0x63] & 0x50)
 	{
 		COMBINE_DATA(m_bios_ram + offset);
 	}
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
 	//AM_RANGE(0x18000000, 0x180001ff) AM_RAM
 	//AM_RANGE(0x20000000, 0x200001ff) AM_RAM
 	//AM_RANGE(0x28000000, 0x280001ff) AM_RAM
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
@@ -470,7 +470,7 @@ ADDRESS_MAP_END
 #if 1
 static INPUT_PORTS_START( voyager )
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
@@ -493,13 +493,13 @@ static INPUT_PORTS_START( voyager )
 	PORT_START("pc_keyboard_5")
 
 	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",		KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    	KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",        KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",                      KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 
@@ -707,15 +707,15 @@ static const struct pit8253_config voyager_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -795,7 +795,7 @@ DRIVER_INIT_MEMBER(voyager_state,voyager)
 
 ROM_START( voyager )
 	ROM_REGION( 0x40000, "bios", 0 )
-    ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) )
+	ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) )
 
 	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect,
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
@@ -804,7 +804,7 @@ ROM_START( voyager )
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASE00 )
 
 	DISK_REGION( "drive_0" )
-    DISK_IMAGE_READONLY( "voyager", 0, SHA1(8b94f2420f6abb40148e4ba6eed8819d8e85dbde))
+	DISK_IMAGE_READONLY( "voyager", 0, SHA1(8b94f2420f6abb40148e4ba6eed8819d8e85dbde))
 ROM_END
 
 GAME( 2002, voyager,  0, voyager, voyager, voyager_state,  voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", GAME_NOT_WORKING|GAME_NO_SOUND )

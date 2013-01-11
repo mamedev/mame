@@ -52,7 +52,7 @@
 //  MACROS
 //**************************************************************************
 
-#define CHD_MAKE_TAG(a,b,c,d)		(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
+#define CHD_MAKE_TAG(a,b,c,d)       (((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 
 
 
@@ -90,9 +90,9 @@ public:
 
 private:
 	// internal state
-	chd_file &			m_chd;
-	UINT32				m_hunkbytes;
-	bool				m_lossy;
+	chd_file &          m_chd;
+	UINT32              m_hunkbytes;
+	bool                m_lossy;
 };
 
 
@@ -144,11 +144,11 @@ private:
 	// an entry in the list
 	struct codec_entry
 	{
-		chd_codec_type		m_type;
-		bool				m_lossy;
-		const char *		m_name;
-		chd_compressor *	(*m_construct_compressor)(chd_file &, UINT32, bool);
-		chd_decompressor *	(*m_construct_decompressor)(chd_file &, UINT32, bool);
+		chd_codec_type      m_type;
+		bool                m_lossy;
+		const char *        m_name;
+		chd_compressor *    (*m_construct_compressor)(chd_file &, UINT32, bool);
+		chd_decompressor *  (*m_construct_decompressor)(chd_file &, UINT32, bool);
 	};
 
 	// internal helper functions
@@ -180,12 +180,12 @@ public:
 
 private:
 	// internal state
-	UINT32					m_hunkbytes;		// number of bytes in a hunk
-	chd_compressor *		m_compressor[4];	// array of active codecs
-	dynamic_buffer			m_compress_test;	// test buffer for compression
+	UINT32                  m_hunkbytes;        // number of bytes in a hunk
+	chd_compressor *        m_compressor[4];    // array of active codecs
+	dynamic_buffer          m_compress_test;    // test buffer for compression
 #if CHDCODEC_VERIFY_COMPRESSION
-	chd_decompressor *		m_decompressor[4];	// array of active codecs
-	dynamic_buffer			m_decompressed;		// verification buffer
+	chd_decompressor *      m_decompressor[4];  // array of active codecs
+	dynamic_buffer          m_decompressed;     // verification buffer
 #endif
 };
 
@@ -196,21 +196,21 @@ private:
 //**************************************************************************
 
 // currently-defined codecs
-const chd_codec_type CHD_CODEC_NONE 		= 0;
+const chd_codec_type CHD_CODEC_NONE         = 0;
 
 // general codecs
-const chd_codec_type CHD_CODEC_ZLIB 		= CHD_MAKE_TAG('z','l','i','b');
-const chd_codec_type CHD_CODEC_LZMA 		= CHD_MAKE_TAG('l','z','m','a');
-const chd_codec_type CHD_CODEC_HUFFMAN		= CHD_MAKE_TAG('h','u','f','f');
-const chd_codec_type CHD_CODEC_FLAC			= CHD_MAKE_TAG('f','l','a','c');
+const chd_codec_type CHD_CODEC_ZLIB         = CHD_MAKE_TAG('z','l','i','b');
+const chd_codec_type CHD_CODEC_LZMA         = CHD_MAKE_TAG('l','z','m','a');
+const chd_codec_type CHD_CODEC_HUFFMAN      = CHD_MAKE_TAG('h','u','f','f');
+const chd_codec_type CHD_CODEC_FLAC         = CHD_MAKE_TAG('f','l','a','c');
 
 // general codecs with CD frontend
-const chd_codec_type CHD_CODEC_CD_ZLIB		= CHD_MAKE_TAG('c','d','z','l');
-const chd_codec_type CHD_CODEC_CD_LZMA		= CHD_MAKE_TAG('c','d','l','z');
-const chd_codec_type CHD_CODEC_CD_FLAC		= CHD_MAKE_TAG('c','d','f','l');
+const chd_codec_type CHD_CODEC_CD_ZLIB      = CHD_MAKE_TAG('c','d','z','l');
+const chd_codec_type CHD_CODEC_CD_LZMA      = CHD_MAKE_TAG('c','d','l','z');
+const chd_codec_type CHD_CODEC_CD_FLAC      = CHD_MAKE_TAG('c','d','f','l');
 
 // A/V codecs
-const chd_codec_type CHD_CODEC_AVHUFF		= CHD_MAKE_TAG('a','v','h','u');
+const chd_codec_type CHD_CODEC_AVHUFF       = CHD_MAKE_TAG('a','v','h','u');
 
 // A/V codec configuration parameters
 enum

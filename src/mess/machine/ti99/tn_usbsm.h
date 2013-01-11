@@ -26,8 +26,8 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void	crureadz(offs_t offset, UINT8 *value);
-	void	cruwrite(offs_t offset, UINT8 value);
+	void    crureadz(offs_t offset, UINT8 *value);
+	void    cruwrite(offs_t offset, UINT8 value);
 
 protected:
 	void device_start(void);
@@ -37,19 +37,19 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	UINT16		usbsm_mem_16_r(offs_t offset);
-	void		usbsm_mem_16_w(offs_t offset, UINT16 data);
-	smartmedia_image_device*	m_smartmedia;
-	device_t*	m_strata;
+	UINT16      usbsm_mem_16_r(offs_t offset);
+	void        usbsm_mem_16_w(offs_t offset, UINT16 data);
+	smartmedia_image_device*    m_smartmedia;
+	device_t*   m_strata;
 
-	int			m_feeprom_page;
-	int			m_sram_page;
-	int			m_cru_register;
-	bool		m_tms9995_mode;
+	int         m_feeprom_page;
+	int         m_sram_page;
+	int         m_cru_register;
+	bool        m_tms9995_mode;
 
-	UINT16		m_input_latch;
-	UINT16		m_output_latch;
-	UINT16*		m_ram;
+	UINT16      m_input_latch;
+	UINT16      m_output_latch;
+	UINT16*     m_ram;
 };
 
 #endif

@@ -365,7 +365,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( imolagp_master, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")	/* gas */
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")   /* gas */
 	AM_RANGE(0x2802, 0x2802) AM_READ(steerlatch_r) AM_WRITENOP
 	/*  AM_RANGE(0x2803, 0x2803) ? */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
@@ -373,10 +373,10 @@ static ADDRESS_MAP_START( imolagp_master, AS_PROGRAM, 8, imolagp_state )
 	/*  AM_RANGE(0x37f7, 0x37f7) ? */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(vreg_data_w)
 	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")	/* DSWA */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")   /* DSWA */
 	AM_RANGE(0x5000, 0x50ff) AM_WRITE(imola_ledram_w)
 	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")	/* DSWB */
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")   /* DSWB */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_slave, AS_IO, 8, imolagp_state )
@@ -509,12 +509,12 @@ INTERRUPT_GEN_MEMBER(imolagp_state::vblank_irq)
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,							/* Port A read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B read */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_NULL,							/* Port C read */
-	DEVCB_NULL,							/* Port C write */
+	DEVCB_NULL,                         /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_NULL,                         /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_NULL,                         /* Port C write */
 };
 
 

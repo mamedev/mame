@@ -51,15 +51,15 @@ const device_type OKIM6295 = &device_creator<okim6295_device>;
 // results in silent playback.
 const UINT8 okim6295_device::s_volume_table[16] =
 {
-	0x20,	//   0 dB
-	0x16,	//  -3.2 dB
-	0x10,	//  -6.0 dB
-	0x0b,	//  -9.2 dB
-	0x08,	// -12.0 dB
-	0x06,	// -14.5 dB
-	0x04,	// -18.0 dB
-	0x03,	// -20.5 dB
-	0x02,	// -24.0 dB
+	0x20,   //   0 dB
+	0x16,   //  -3.2 dB
+	0x10,   //  -6.0 dB
+	0x0b,   //  -9.2 dB
+	0x08,   // -12.0 dB
+	0x06,   // -14.5 dB
+	0x04,   // -18.0 dB
+	0x03,   // -20.5 dB
+	0x02,   // -24.0 dB
 	0x00,
 	0x00,
 	0x00,
@@ -86,15 +86,15 @@ ADDRESS_MAP_END
 
 okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM6295, "OKI6295", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(okim6295)),
-	  m_command(-1),
-	  m_bank_installed(false),
-	  m_bank_offs(0),
-	  m_stream(NULL),
-	  m_pin7_state(0),
-	  m_direct(NULL)
+		device_sound_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(okim6295)),
+		m_command(-1),
+		m_bank_installed(false),
+		m_bank_offs(0),
+		m_stream(NULL),
+		m_pin7_state(0),
+		m_direct(NULL)
 {
 }
 
@@ -211,10 +211,10 @@ void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
 {
 	// flush out anything pending (but not on e.g. a state load)
-    if (!bDontUpdateStream)
-    {
-        m_stream->update();
-    }
+	if (!bDontUpdateStream)
+	{
+		m_stream->update();
+	}
 
 	// if we are setting a non-zero base, and we have no bank, allocate one
 	if (!m_bank_installed && base != 0)
@@ -251,7 +251,7 @@ void okim6295_device::set_pin7(int pin7)
 
 UINT8 okim6295_device::read_status()
 {
-	UINT8 result = 0xf0;	// naname expects bits 4-7 to be 1
+	UINT8 result = 0xf0;    // naname expects bits 4-7 to be 1
 
 	// set the bit to 1 if something is playing on a given channel
 	m_stream->update();
@@ -380,10 +380,10 @@ WRITE8_MEMBER( okim6295_device::write )
 
 okim6295_device::okim_voice::okim_voice()
 	: m_playing(false),
-	  m_base_offset(0),
-	  m_sample(0),
-	  m_count(0),
-	  m_volume(0)
+		m_base_offset(0),
+		m_sample(0),
+		m_count(0),
+		m_volume(0)
 {
 }
 
@@ -417,4 +417,3 @@ void okim6295_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
 		}
 	}
 }
-

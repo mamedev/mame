@@ -37,7 +37,7 @@ const device_type COCO_ORCH90 = &device_creator<coco_orch90_device>;
 //-------------------------------------------------
 
 coco_orch90_device::coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, COCO_ORCH90, "CoCo Orch-90 PAK", tag, owner, clock),
+		: device_t(mconfig, COCO_ORCH90, "CoCo Orch-90 PAK", tag, owner, clock),
 		device_cococart_interface( mconfig, *this )
 {
 }

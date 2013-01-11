@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_bg_tile_info)
 		flags |= TILE_FLIPY;
 
 	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
-		 flags |= TILE_FORCE_LAYER0;		/* no transparency */
+			flags |= TILE_FORCE_LAYER0;     /* no transparency */
 
 	if (code & 0xf800)
 	{
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
 		flags |= TILE_FLIPY;
 
 	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
-		 flags |= TILE_FORCE_LAYER0;		/* no transparency */
+			flags |= TILE_FORCE_LAYER0;     /* no transparency */
 
 	if (code & 0xf800)
 	{
@@ -164,7 +164,7 @@ WRITE16_MEMBER(nemesis_state::salamand_control_port_word_w)
 		if (data & 0x0800)
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 
-		m_selected_ip = (~data & 0x1000) >> 12;		/* citybomb steering & accel */
+		m_selected_ip = (~data & 0x1000) >> 12;     /* citybomb steering & accel */
 	}
 }
 
@@ -177,14 +177,14 @@ WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 	data = m_paletteram[offset];
 
 	/* Mish, 30/11/99 - Schematics show the resistor values are:
-        300 Ohms
-        620 Ohms
-        1200 Ohms
-        2400 Ohms
-        4700 Ohms
+	    300 Ohms
+	    620 Ohms
+	    1200 Ohms
+	    2400 Ohms
+	    4700 Ohms
 
-        So the correct weights per bit are 8, 17, 33, 67, 130
-    */
+	    So the correct weights per bit are 8, 17, 33, 67, 130
+	*/
 
 	#define MULTIPLIER 8 * bit1 + 17 * bit2 + 33 * bit3 + 67 * bit4 + 130 * bit5
 
@@ -324,27 +324,27 @@ void nemesis_state::video_start()
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*
-     *  16 bytes per sprite, in memory from 56000-56fff
-     *
-     *  byte    0 : relative priority.
-     *  byte    2 : size (?) value #E0 means not used., bit 0x01 is flipx
-                    0xc0 is upper 2 bits of zoom.
-                    0x38 is size.
-     *  byte    4 : zoom = 0xff
-     *  byte    6 : low bits sprite code.
-     *  byte    8 : color + hi bits sprite code., bit 0x20 is flipy bit. bit 0x01 is high bit of X pos.
-     *  byte    A : X position.
-     *  byte    C : Y position.
-     *  byte    E : not used.
-     */
+	 *  16 bytes per sprite, in memory from 56000-56fff
+	 *
+	 *  byte    0 : relative priority.
+	 *  byte    2 : size (?) value #E0 means not used., bit 0x01 is flipx
+	                0xc0 is upper 2 bits of zoom.
+	                0x38 is size.
+	 *  byte    4 : zoom = 0xff
+	 *  byte    6 : low bits sprite code.
+	 *  byte    8 : color + hi bits sprite code., bit 0x20 is flipy bit. bit 0x01 is high bit of X pos.
+	 *  byte    A : X position.
+	 *  byte    C : Y position.
+	 *  byte    E : not used.
+	 */
 
 	nemesis_state *state = machine.driver_data<nemesis_state>();
 	UINT16 *spriteram = state->m_spriteram;
-	int address;	/* start of sprite in spriteram */
-	int sx;	/* sprite X-pos */
-	int sy;	/* sprite Y-pos */
-	int code;	/* start of sprite in obj RAM */
-	int color;	/* color of the sprite */
+	int address;    /* start of sprite in spriteram */
+	int sx; /* sprite X-pos */
+	int sy; /* sprite Y-pos */
+	int code;   /* start of sprite in obj RAM */
+	int color;  /* color of the sprite */
 	int flipx,flipy;
 	int zoom;
 	int char_type;
@@ -374,7 +374,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				sx = spriteram[address + 5] & 0xff;
 				sy = spriteram[address + 6] & 0xff;
 				if (spriteram[address + 4] & 0x01)
-					sx-=0x100;	/* fixes left side clip */
+					sx-=0x100;  /* fixes left side clip */
 
 				color = (spriteram[address + 4] & 0x1e) >> 1;
 				flipx = spriteram[address + 1] & 0x01;

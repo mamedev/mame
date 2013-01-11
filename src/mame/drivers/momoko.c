@@ -152,8 +152,8 @@ static INPUT_PORTS_START( momoko )
 
 	PORT_START("FAKE")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /****************************************************************************/
@@ -177,7 +177,7 @@ static const gfx_layout spritelayout =
 	{12,8,4,0},
 	{0, 1, 2, 3, 4096*8+0, 4096*8+1, 4096*8+2, 4096*8+3},
 	{0, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-	 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16},
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16},
 	8*32
 };
 
@@ -261,11 +261,11 @@ void momoko_state::machine_reset()
 static MACHINE_CONFIG_START( momoko, momoko_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)	/* 5.0MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.0MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", momoko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2500000)	/* 2.5MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 2500000)  /* 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_sound_map)
 
 

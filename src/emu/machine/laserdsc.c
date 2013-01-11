@@ -51,7 +51,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_SLIDER					0
+#define LOG_SLIDER                  0
 
 
 
@@ -60,15 +60,15 @@
 //**************************************************************************
 
 // these specs code from IEC 60857, for NTSC players
-const UINT32 LEAD_IN_MIN_RADIUS_IN_UM = 53500;		// 53.5 mm
-const UINT32 PROGRAM_MIN_RADIUS_IN_UM = 55000;		// 55 mm
-const UINT32 PROGRAM_MAX_RADIUS_IN_UM = 145000;		// 145 mm
-const UINT32 LEAD_OUT_MIN_SIZE_IN_UM = 2000;		// 2 mm
+const UINT32 LEAD_IN_MIN_RADIUS_IN_UM = 53500;      // 53.5 mm
+const UINT32 PROGRAM_MIN_RADIUS_IN_UM = 55000;      // 55 mm
+const UINT32 PROGRAM_MAX_RADIUS_IN_UM = 145000;     // 145 mm
+const UINT32 LEAD_OUT_MIN_SIZE_IN_UM = 2000;        // 2 mm
 
 // the track pitch is defined as a range; we pick a nominal pitch
 // that ensures we can fit 54,000 tracks
-const UINT32 MIN_TRACK_PITCH_IN_NM = 1400;			// 1.4 um
-const UINT32 MAX_TRACK_PITCH_IN_NM = 2000;			// 2 um
+const UINT32 MIN_TRACK_PITCH_IN_NM = 1400;          // 1.4 um
+const UINT32 MAX_TRACK_PITCH_IN_NM = 2000;          // 2 um
 const UINT32 NOMINAL_TRACK_PITCH_IN_NM = (PROGRAM_MAX_RADIUS_IN_UM - PROGRAM_MIN_RADIUS_IN_UM) * 1000 / 54000;
 
 // we simulate extra lead-in and lead-out tracks
@@ -88,39 +88,39 @@ const UINT32 VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_
 
 laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, shortname, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_screen_name(NULL),
-	  m_overwidth(0),
-	  m_overheight(0),
-	  m_overclip(0, -1, 0, -1),
-	  m_disc(NULL),
-	  m_width(0),
-	  m_height(0),
-	  m_fps_times_1million(0),
-	  m_samplerate(0),
-	  m_readresult(CHDERR_NONE),
-	  m_chdtracks(0),
-	  m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO)),
-	  m_audiosquelch(0),
-	  m_videosquelch(0),
-	  m_fieldnum(0),
-	  m_curtrack(0),
-	  m_maxtrack(0),
-	  m_attospertrack(0),
-	  m_sliderupdate(attotime::zero),
-	  m_videoindex(0),
-	  m_stream(NULL),
-	  m_audiobufsize(0),
-	  m_audiobufin(0),
-	  m_audiobufout(0),
-	  m_audiocursamples(0),
-	  m_audiomaxsamples(0),
-	  m_videoenable(false),
-	  m_videotex(NULL),
-	  m_videopalette(NULL),
-	  m_overenable(false),
-	  m_overindex(0),
-	  m_overtex(NULL)
+		device_sound_interface(mconfig, *this),
+		m_screen_name(NULL),
+		m_overwidth(0),
+		m_overheight(0),
+		m_overclip(0, -1, 0, -1),
+		m_disc(NULL),
+		m_width(0),
+		m_height(0),
+		m_fps_times_1million(0),
+		m_samplerate(0),
+		m_readresult(CHDERR_NONE),
+		m_chdtracks(0),
+		m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO)),
+		m_audiosquelch(0),
+		m_videosquelch(0),
+		m_fieldnum(0),
+		m_curtrack(0),
+		m_maxtrack(0),
+		m_attospertrack(0),
+		m_sliderupdate(attotime::zero),
+		m_videoindex(0),
+		m_stream(NULL),
+		m_audiobufsize(0),
+		m_audiobufin(0),
+		m_audiobufout(0),
+		m_audiocursamples(0),
+		m_audiomaxsamples(0),
+		m_videoenable(false),
+		m_videotex(NULL),
+		m_videopalette(NULL),
+		m_overenable(false),
+		m_overindex(0),
+		m_overtex(NULL)
 {
 	// initialize overlay_config
 	m_orig_config.m_overposx = m_orig_config.m_overposy = 0.0f;
@@ -583,7 +583,7 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, at
 		case LDSTATE_EJECTING:
 			// when time expires, switch to the ejected state
 			if (curtime >= m_player_state.m_endtime)
-			    newstate.m_state = LDSTATE_EJECTED;
+				newstate.m_state = LDSTATE_EJECTED;
 			break;
 
 		case LDSTATE_EJECTED:
@@ -597,14 +597,14 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, at
 		case LDSTATE_LOADING:
 			// when time expires, switch to the spinup state
 			if (curtime >= m_player_state.m_endtime)
-			    newstate.m_state = LDSTATE_SPINUP;
+				newstate.m_state = LDSTATE_SPINUP;
 			advanceby = -GENERIC_SEARCH_SPEED;
 			break;
 
 		case LDSTATE_SPINUP:
 			// when time expires, switch to the playing state
 			if (curtime >= m_player_state.m_endtime)
-			    newstate.m_state = LDSTATE_PLAYING;
+				newstate.m_state = LDSTATE_PLAYING;
 			advanceby = -GENERIC_SEARCH_SPEED;
 			break;
 
@@ -612,8 +612,8 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, at
 			// if he hit the start of a frame, switch to paused state
 			if (is_start_of_frame(vbi))
 			{
-			    newstate.m_state = LDSTATE_PAUSED;
-			    newstate.m_param = fieldnum;
+				newstate.m_state = LDSTATE_PAUSED;
+				newstate.m_param = fieldnum;
 			}
 
 			// else advance until we hit it
@@ -631,8 +631,8 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, at
 			// if we hit the target frame, switch to the paused state
 			if (m_player_state.m_param > 0 && is_start_of_frame(vbi) && frame_from_metadata(vbi) == m_player_state.m_param)
 			{
-			    newstate.m_state = LDSTATE_PAUSED;
-			    newstate.m_param = fieldnum;
+				newstate.m_state = LDSTATE_PAUSED;
+				newstate.m_param = fieldnum;
 			}
 
 			// otherwise after the second field of each frame
@@ -685,14 +685,14 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, at
 			if (is_start_of_frame(vbi))
 			{
 				advanceby = (fieldnum == 1) ? -1 : -2;
-			    newstate.m_state = LDSTATE_PAUSING;
+				newstate.m_state = LDSTATE_PAUSING;
 			}
 			break;
 
 		case LDSTATE_STEPPING_FORWARD:
 			// wait for the first field of the frame and then switch to pausing state
 			if (is_start_of_frame(vbi))
-			    newstate.m_state = LDSTATE_PAUSING;
+				newstate.m_state = LDSTATE_PAUSING;
 			break;
 
 		case LDSTATE_SEEKING:
@@ -700,8 +700,8 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, at
 			frame = frame_from_metadata(vbi);
 			if (m_player_state.m_substate == 1 && is_start_of_frame(vbi) && frame == m_player_state.m_param)
 			{
-			    newstate.m_state = LDSTATE_PAUSED;
-			    newstate.m_param = fieldnum;
+				newstate.m_state = LDSTATE_PAUSED;
+				newstate.m_param = fieldnum;
 			}
 
 			// otherwise, if we got frame data from the VBI, update our seeking logic
@@ -831,9 +831,9 @@ void laserdisc_device::init_video()
 
 		// make a copy of the bitmap that clips out the VBI and horizontal blanking areas
 		frame.m_visbitmap.wrap(&frame.m_bitmap.pix16(44, frame.m_bitmap.width() * 8 / 720),
-							  frame.m_bitmap.width() - 2 * frame.m_bitmap.width() * 8 / 720,
-							  frame.m_bitmap.height() - 44,
-							  frame.m_bitmap.rowpixels());
+								frame.m_bitmap.width() - 2 * frame.m_bitmap.width() * 8 / 720,
+								frame.m_bitmap.height() - 44,
+								frame.m_bitmap.rowpixels());
 		frame.m_visbitmap.set_palette(m_videopalette);
 	}
 
@@ -1245,4 +1245,3 @@ void laserdisc_device::config_save(int config_type, xml_data_node *parentnode)
 			xml_delete_node(ldnode);
 	}
 }
-

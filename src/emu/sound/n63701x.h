@@ -8,7 +8,7 @@
 DECLARE_WRITE8_DEVICE_HANDLER( namco_63701x_w );
 
 class namco_63701x_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

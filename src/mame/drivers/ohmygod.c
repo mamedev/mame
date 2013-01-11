@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x704000, 0x707fff) AM_RAM
-	AM_RANGE(0x708000, 0x70ffff) AM_RAM 	/* Work RAM */
+	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* Work RAM */
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("P2")
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(ohmygod_ctrl_w)
@@ -287,8 +287,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( ohmygod )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )	/* colors   0-255 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 )	/* colors 512-767 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* colors   0-255 */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 ) /* colors 512-767 */
 GFXDECODE_END
 
 
@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 	MCFG_CPU_PROGRAM_MAP(ohmygod_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
 
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
 
 	/* video hardware */

@@ -102,4 +102,4 @@ ROM_START( ddz )
 ROM_END
 
 
-GAME( 200?, ddz,	0,  ddz, ddz, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", GAME_IS_SKELETON )
+GAME( 200?, ddz,    0,  ddz, ddz, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", GAME_IS_SKELETON )

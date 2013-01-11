@@ -34,5 +34,3 @@ UINT32 orao_state::screen_update_orao(screen_device &screen, bitmap_ind16 &bitma
 	}
 	return 0;
 }
-
-

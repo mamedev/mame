@@ -97,13 +97,13 @@
 // callback types
 enum
 {
-	DEVCB_TYPE_NULL = 0,			// NULL callback
-	DEVCB_TYPE_IOPORT,				// I/O port read/write
-	DEVCB_TYPE_DEVICE,				// device read/write
-	DEVCB_TYPE_LEGACY_SPACE,		// legacy address space read/write
-	DEVCB_TYPE_INPUT_LINE,			// device input line write
-	DEVCB_TYPE_CONSTANT,			// constant value read
-	DEVCB_TYPE_UNMAP				// unmapped line
+	DEVCB_TYPE_NULL = 0,            // NULL callback
+	DEVCB_TYPE_IOPORT,              // I/O port read/write
+	DEVCB_TYPE_DEVICE,              // device read/write
+	DEVCB_TYPE_LEGACY_SPACE,        // legacy address space read/write
+	DEVCB_TYPE_INPUT_LINE,          // device input line write
+	DEVCB_TYPE_CONSTANT,            // constant value read
+	DEVCB_TYPE_UNMAP                // unmapped line
 };
 
 
@@ -195,48 +195,48 @@ void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 
 	(target->*_Function)(space, offset, data, mem_mask);
 }
 
-#define DEVCB_NULL								{ DEVCB_TYPE_NULL }
+#define DEVCB_NULL                              { DEVCB_TYPE_NULL }
 
 // standard line or read/write handlers with the calling device passed
-#define DEVCB_LINE(func)						{ DEVCB_TYPE_DEVICE, 0, "", #func, func, NULL, NULL }
-#define DEVCB_LINE_MEMBER(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_HANDLER(func)						{ DEVCB_TYPE_DEVICE, 0, "", #func, NULL, func, NULL }
-#define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
-#define DEVCB_MEMBER16(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
-#define DEVCB_MEMBER32(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
-#define DEVCB_MEMBER64(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
+#define DEVCB_LINE(func)                        { DEVCB_TYPE_DEVICE, 0, "", #func, func, NULL, NULL }
+#define DEVCB_LINE_MEMBER(cls,memb)             { DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_HANDLER(func)                     { DEVCB_TYPE_DEVICE, 0, "", #func, NULL, func, NULL }
+#define DEVCB_MEMBER(cls,memb)                  { DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_MEMBER16(cls,memb)                { DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
+#define DEVCB_MEMBER32(cls,memb)                { DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
+#define DEVCB_MEMBER64(cls,memb)                { DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for the driver device
-#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
-#define DEVCB_DRIVER_MEMBER16(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
-#define DEVCB_DRIVER_MEMBER32(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
-#define DEVCB_DRIVER_MEMBER64(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)      { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DRIVER_MEMBER(cls,memb)           { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_MEMBER16(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_MEMBER32(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_MEMBER64(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for another device
-#define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, 0, tag, #func, func, NULL, NULL }
-#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, 0, tag, #func, NULL, func, NULL }
-#define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
-#define DEVCB_DEVICE_MEMBER16(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
-#define DEVCB_DEVICE_MEMBER32(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
-#define DEVCB_DEVICE_MEMBER64(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_LINE(tag,func)             { DEVCB_TYPE_DEVICE, 0, tag, #func, func, NULL, NULL }
+#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)  { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DEVICE_HANDLER(tag,func)          { DEVCB_TYPE_DEVICE, 0, tag, #func, NULL, func, NULL }
+#define DEVCB_DEVICE_MEMBER(tag,cls,memb)       { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER16(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER32(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER64(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
 
 // constant values
-#define DEVCB_CONSTANT(value)					{ DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }
-#define DEVCB_LINE_GND							DEVCB_CONSTANT(0)
-#define DEVCB_LINE_VCC							DEVCB_CONSTANT(1)
+#define DEVCB_CONSTANT(value)                   { DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }
+#define DEVCB_LINE_GND                          DEVCB_CONSTANT(0)
+#define DEVCB_LINE_VCC                          DEVCB_CONSTANT(1)
 
-#define DEVCB_UNMAPPED							{ DEVCB_TYPE_UNMAP, 0, NULL, NULL, NULL, NULL }
+#define DEVCB_UNMAPPED                          { DEVCB_TYPE_UNMAP, 0, NULL, NULL, NULL, NULL }
 
 // read/write handlers for a given CPU's address space
-#define DEVCB_MEMORY_HANDLER(cpu,space,func)	{ DEVCB_TYPE_LEGACY_SPACE, AS_##space, (cpu), #func, NULL, NULL, func }
+#define DEVCB_MEMORY_HANDLER(cpu,space,func)    { DEVCB_TYPE_LEGACY_SPACE, AS_##space, (cpu), #func, NULL, NULL, func }
 
 // read handlers for an I/O port by tag
-#define DEVCB_INPUT_PORT(tag)					{ DEVCB_TYPE_IOPORT, 0, (tag), NULL, NULL, NULL, NULL }
+#define DEVCB_INPUT_PORT(tag)                   { DEVCB_TYPE_IOPORT, 0, (tag), NULL, NULL, NULL, NULL }
 
 // write handlers for a CPU input line
-#define DEVCB_CPU_INPUT_LINE(tag,line)			{ DEVCB_TYPE_INPUT_LINE, (line), (tag), NULL, NULL, NULL, NULL }
+#define DEVCB_CPU_INPUT_LINE(tag,line)          { DEVCB_TYPE_INPUT_LINE, (line), (tag), NULL, NULL, NULL, NULL }
 
 
 
@@ -249,11 +249,11 @@ void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 
 // resolving a devcb may produce one of the following object types
 union devcb_resolved_objects
 {
-	ioport_port *	port;
-	address_space *				space;
-	device_t *					device;
-	device_execute_interface *	execute;
-	UINT32						constant;
+	ioport_port *   port;
+	address_space *             space;
+	device_t *                  device;
+	device_execute_interface *  execute;
+	UINT32                      constant;
 };
 
 
@@ -262,31 +262,31 @@ union devcb_resolved_objects
 // resolving a devcb may produce one of the following helper functions/additional info
 union devcb_resolved_read_helpers
 {
-	UINT8 *					null_indicator;
-	read_line_device_func	read_line;
-	read8_device_func		read8_device;
-	read8_space_func		read8_space;
-	read16_device_func		read16_device;
-	read16_space_func		read16_space;
-	read32_device_func		read32_device;
-	read32_space_func		read32_space;
-	read64_device_func		read64_device;
-	read64_space_func		read64_space;
+	UINT8 *                 null_indicator;
+	read_line_device_func   read_line;
+	read8_device_func       read8_device;
+	read8_space_func        read8_space;
+	read16_device_func      read16_device;
+	read16_space_func       read16_space;
+	read32_device_func      read32_device;
+	read32_space_func       read32_space;
+	read64_device_func      read64_device;
+	read64_space_func       read64_space;
 };
 
 union devcb_resolved_write_helpers
 {
-	UINT8 *					null_indicator;
-	write_line_device_func	write_line;
-	write8_device_func		write8_device;
-	write8_space_func		write8_space;
-	write16_device_func		write16_device;
-	write16_space_func		write16_space;
-	write32_device_func		write32_device;
-	write32_space_func		write32_space;
-	write64_device_func		write64_device;
-	write64_space_func		write64_space;
-	int						input_line;
+	UINT8 *                 null_indicator;
+	write_line_device_func  write_line;
+	write8_device_func      write8_device;
+	write8_space_func       write8_space;
+	write16_device_func     write16_device;
+	write16_space_func      write16_space;
+	write32_device_func     write32_device;
+	write32_space_func      write32_space;
+	write64_device_func     write64_device;
+	write64_space_func      write64_space;
+	int                     input_line;
 };
 
 
@@ -295,13 +295,13 @@ union devcb_resolved_write_helpers
 // static structure used for device configuration when the desired callback type is a read_line_device_func
 struct devcb_read_line
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	read_line_device_func	readline;		// read line function
-	read8_device_func		readdevice;		// read device function
-	read8_space_func		readspace;		// read space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	read_line_device_func   readline;       // read line function
+	read8_device_func       readdevice;     // read device function
+	read8_space_func        readspace;      // read space function
 };
 
 
@@ -334,9 +334,9 @@ private:
 	int from_unmap();
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_read_helpers 	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_read_helpers     m_helper;
+	static UINT8                    s_null;
 };
 
 
@@ -345,13 +345,13 @@ private:
 // static structure used for device configuration when the desired callback type is a write_line_device_func
 struct devcb_write_line
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	write_line_device_func	writeline;		// write line function
-	write8_device_func		writedevice;	// write device function
-	write8_space_func		writespace;		// write space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	write_line_device_func  writeline;      // write line function
+	write8_device_func      writedevice;    // write device function
+	write8_space_func       writespace;     // write space function
 };
 
 
@@ -385,9 +385,9 @@ private:
 	void to_unmap(int state);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_write_helpers	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_write_helpers    m_helper;
+	static UINT8                    s_null;
 };
 
 
@@ -396,13 +396,13 @@ private:
 // static structure used for device configuration when the desired callback type is a read8_device_func
 struct devcb_read8
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	read_line_device_func	readline;		// read line function
-	read8_device_func		readdevice;		// read device function
-	read8_space_func		readspace;		// read space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	read_line_device_func   readline;       // read line function
+	read8_device_func       readdevice;     // read device function
+	read8_space_func        readspace;      // read space function
 };
 
 
@@ -440,9 +440,9 @@ private:
 	UINT8 from_unmap(offs_t offset, UINT8 mem_mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_read_helpers 	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_read_helpers     m_helper;
+	static UINT8                    s_null;
 };
 
 
@@ -451,13 +451,13 @@ private:
 // static structure used for device configuration when the desired callback type is a write8_device_func
 struct devcb_write8
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	write_line_device_func	writeline;		// write line function
-	write8_device_func		writedevice;	// write device function
-	write8_space_func		writespace;		// write space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	write_line_device_func  writeline;      // write line function
+	write8_device_func      writedevice;    // write device function
+	write8_space_func       writespace;     // write space function
 };
 
 
@@ -496,9 +496,9 @@ private:
 	void to_unmap(offs_t offset, UINT8 data, UINT8 mem_mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_write_helpers	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_write_helpers    m_helper;
+	static UINT8                    s_null;
 };
 
 
@@ -507,13 +507,13 @@ private:
 // static structure used for device configuration when the desired callback type is a read16_device_func
 struct devcb_read16
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	read_line_device_func	readline;		// read line function
-	read16_device_func		readdevice;		// read device function
-	read16_space_func		readspace;		// read space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	read_line_device_func   readline;       // read line function
+	read16_device_func      readdevice;     // read device function
+	read16_space_func       readspace;      // read space function
 };
 
 
@@ -550,9 +550,9 @@ private:
 	UINT16 from_unmap(offs_t offset, UINT16 mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_read_helpers 	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_read_helpers     m_helper;
+	static UINT8                    s_null;
 };
 
 
@@ -561,13 +561,13 @@ private:
 // static structure used for device configuration when the desired callback type is a write16_device_func
 struct devcb_write16
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	write_line_device_func	writeline;		// write line function
-	write16_device_func		writedevice;	// write device function
-	write16_space_func		writespace;		// write space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	write_line_device_func  writeline;      // write line function
+	write16_device_func     writedevice;    // write device function
+	write16_space_func      writespace;     // write space function
 };
 
 
@@ -605,9 +605,9 @@ private:
 	void to_unmap(offs_t offset, UINT16 data, UINT16 mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_write_helpers	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_write_helpers    m_helper;
+	static UINT8                    s_null;
 };
 
 // ======================> devcb_read32
@@ -615,13 +615,13 @@ private:
 // static structure used for device configuration when the desired callback type is a read32_device_func
 struct devcb_read32
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	read_line_device_func	readline;		// read line function
-	read32_device_func		readdevice;		// read device function
-	read32_space_func		readspace;		// read space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	read_line_device_func   readline;       // read line function
+	read32_device_func      readdevice;     // read device function
+	read32_space_func       readspace;      // read space function
 };
 
 
@@ -658,9 +658,9 @@ private:
 	UINT32 from_unmap(offs_t offset, UINT32 mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_read_helpers 	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_read_helpers     m_helper;
+	static UINT8                    s_null;
 };
 
 
@@ -669,13 +669,13 @@ private:
 // static structure used for device configuration when the desired callback type is a write32_device_func
 struct devcb_write32
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	write_line_device_func	writeline;		// write line function
-	write32_device_func		writedevice;	// write device function
-	write32_space_func		writespace;		// write space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	write_line_device_func  writeline;      // write line function
+	write32_device_func     writedevice;    // write device function
+	write32_space_func      writespace;     // write space function
 };
 
 
@@ -713,9 +713,9 @@ private:
 	void to_unmap(offs_t offset, UINT32 data, UINT32 mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_write_helpers	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_write_helpers    m_helper;
+	static UINT8                    s_null;
 };
 
 // ======================> devcb_read64
@@ -723,13 +723,13 @@ private:
 // static structure used for device configuration when the desired callback type is a read64_device_func
 struct devcb_read64
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	read_line_device_func	readline;		// read line function
-	read64_device_func		readdevice;		// read device function
-	read64_space_func		readspace;		// read space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	read_line_device_func   readline;       // read line function
+	read64_device_func      readdevice;     // read device function
+	read64_space_func       readspace;      // read space function
 };
 
 
@@ -766,9 +766,9 @@ private:
 	UINT64 from_unmap(offs_t offset, UINT64 mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_read_helpers 	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_read_helpers     m_helper;
+	static UINT8                    s_null;
 };
 
 
@@ -777,13 +777,13 @@ private:
 // static structure used for device configuration when the desired callback type is a write64_device_func
 struct devcb_write64
 {
-	UINT16					type;			// one of the special DEVCB_TYPE values
-	UINT16					index;			// index related to the above types
-	const char *			tag;			// tag of target, where appropriate
-	const char *			name;			// name of the target function
-	write_line_device_func	writeline;		// write line function
-	write64_device_func		writedevice;	// write device function
-	write64_space_func		writespace;		// write space function
+	UINT16                  type;           // one of the special DEVCB_TYPE values
+	UINT16                  index;          // index related to the above types
+	const char *            tag;            // tag of target, where appropriate
+	const char *            name;           // name of the target function
+	write_line_device_func  writeline;      // write line function
+	write64_device_func     writedevice;    // write device function
+	write64_space_func      writespace;     // write space function
 };
 
 
@@ -821,9 +821,9 @@ private:
 	void to_unmap(offs_t offset, UINT64 data, UINT64 mask);
 
 	// internal state
-	devcb_resolved_objects			m_object;
-	devcb_resolved_write_helpers	m_helper;
-	static UINT8					s_null;
+	devcb_resolved_objects          m_object;
+	devcb_resolved_write_helpers    m_helper;
+	static UINT8                    s_null;
 };
 
-#endif	// __DEVCB_H__
+#endif  // __DEVCB_H__

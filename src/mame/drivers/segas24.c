@@ -344,13 +344,13 @@ Notes:
 #include "includes/segas24.h"
 #include "includes/segaipt.h"
 
-#define MASTER_CLOCK		XTAL_20MHz
-#define VIDEO_CLOCK			XTAL_32MHz
+#define MASTER_CLOCK        XTAL_20MHz
+#define VIDEO_CLOCK         XTAL_32MHz
 #define TIMER_CLOCK         (VIDEO_CLOCK/4)
 #define HSYNC_CLOCK         (VIDEO_CLOCK/2/656.0)
 /* TODO: understand why divisors doesn't match at all with the reference */
-#define FRC_CLOCK_MODE0		(MASTER_CLOCK/2)/24 // /16 according to Charles
-#define FRC_CLOCK_MODE1		(MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
+#define FRC_CLOCK_MODE0     (MASTER_CLOCK/2)/24 // /16 according to Charles
+#define FRC_CLOCK_MODE1     (MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
 
 enum {
 	IRQ_YM2151 = 1,
@@ -1175,10 +1175,10 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
-	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Horizontal split position (ABSEL) */
-	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Scanline trigger position (XHOUT) */
-	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
-	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
+	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Horizontal split position (ABSEL) */
+	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
+	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Frame trigger position (XVOUT) */
+	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
@@ -1216,10 +1216,10 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
-	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Horizontal split position (ABSEL) */
-	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Scanline trigger position (XHOUT) */
-	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
-	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
+	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Horizontal split position (ABSEL) */
+	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
+	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Frame trigger position (XVOUT) */
+	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
@@ -2101,17 +2101,17 @@ ROM_START( bnzabrosj )
 ROM_END
 
 ROM_START( quizmeku ) // Quiz Mekuromeku Story
-	 ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
-	 ROM_LOAD16_BYTE( "epr15343.ic2", 0x000000, 0x20000, CRC(c72399a7) SHA1(bfbf0079ea63f89bca4ce9081aed5d5c1d9d169a) )
-	 ROM_LOAD16_BYTE( "epr15342.ic1", 0x000001, 0x20000, CRC(0968ac84) SHA1(4e1170ac123adaec32819754b5075531ff1925fe) )
+		ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+		ROM_LOAD16_BYTE( "epr15343.ic2", 0x000000, 0x20000, CRC(c72399a7) SHA1(bfbf0079ea63f89bca4ce9081aed5d5c1d9d169a) )
+		ROM_LOAD16_BYTE( "epr15342.ic1", 0x000001, 0x20000, CRC(0968ac84) SHA1(4e1170ac123adaec32819754b5075531ff1925fe) )
 
-	 ROM_REGION16_BE( 0x400000, "romboard", 0)
-	 ROM_LOAD16_BYTE( "epr15345.ic5", 0x000000, 0x80000, CRC(88030b5d) SHA1(d2feeedb9a64c3dc8dd25716209f945d12fa9b53) )
-	 ROM_LOAD16_BYTE( "epr15344.ic4", 0x000001, 0x80000, CRC(dd11b382) SHA1(2b0f49fb307a9aba0f295de64782ee095c557170) )
-	 ROM_LOAD16_BYTE( "mpr15347.ic7", 0x100000, 0x80000, CRC(0472677b) SHA1(93ae57a2817b6b54c99814fca28ef51f7ff5e559) )
-	 ROM_LOAD16_BYTE( "mpr15346.ic6", 0x100001, 0x80000, CRC(746d4d0e) SHA1(7863abe36126684772a4459d5b6f3b24670ec02b) )
-	 ROM_LOAD16_BYTE( "mpr15349.ic9", 0x200000, 0x80000, CRC(770eecf1) SHA1(86cc5b4a325198dc1da1446ecd8e718415b7998a) )
-	 ROM_LOAD16_BYTE( "mpr15348.ic8", 0x200001, 0x80000, CRC(7666e960) SHA1(f3f88d5c8318301a8c73141de60292f8349ac0ce) )
+		ROM_REGION16_BE( 0x400000, "romboard", 0)
+		ROM_LOAD16_BYTE( "epr15345.ic5", 0x000000, 0x80000, CRC(88030b5d) SHA1(d2feeedb9a64c3dc8dd25716209f945d12fa9b53) )
+		ROM_LOAD16_BYTE( "epr15344.ic4", 0x000001, 0x80000, CRC(dd11b382) SHA1(2b0f49fb307a9aba0f295de64782ee095c557170) )
+		ROM_LOAD16_BYTE( "mpr15347.ic7", 0x100000, 0x80000, CRC(0472677b) SHA1(93ae57a2817b6b54c99814fca28ef51f7ff5e559) )
+		ROM_LOAD16_BYTE( "mpr15346.ic6", 0x100001, 0x80000, CRC(746d4d0e) SHA1(7863abe36126684772a4459d5b6f3b24670ec02b) )
+		ROM_LOAD16_BYTE( "mpr15349.ic9", 0x200000, 0x80000, CRC(770eecf1) SHA1(86cc5b4a325198dc1da1446ecd8e718415b7998a) )
+		ROM_LOAD16_BYTE( "mpr15348.ic8", 0x200001, 0x80000, CRC(7666e960) SHA1(f3f88d5c8318301a8c73141de60292f8349ac0ce) )
 ROM_END
 
 ROM_START( sspirits )
@@ -2137,7 +2137,7 @@ ROM_START( sspirtfc )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-02c.key", 0x0000, 0x2000,  CRC(ebae170e) SHA1(b6d1e1b6943a35b96e98e426ecb39bb5a42fb643) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2149,7 +2149,7 @@ ROM_START( sgmast )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-05d.key", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2165,7 +2165,7 @@ ROM_START( sgmastc )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-05c.key", 0x0000, 0x2000, CRC(ae0eabe5) SHA1(692d7565bf9c5b32cc80bb4bd88c9193aa04cbb0) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2177,7 +2177,7 @@ ROM_START( sgmastj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-05b.key", 0x0000, 0x2000, CRC(adc0c83b) SHA1(2328d82d5057062eeb0072fd57f0422218cf24fc) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2189,7 +2189,7 @@ ROM_START( qsww )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-08b.key", 0x0000, 0x2000,  CRC(fe0a336a) SHA1(f7a5b2c1a057d0bb8c1ae0453c58aa8f5fb731b9) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2201,7 +2201,7 @@ ROM_START( gground )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-03d.key", 0x0000, 0x2000,  CRC(e1785bbd) SHA1(b4bebb2829299f1c0815d6a5f317a2526b322f63) ) /* Also labeled "rev-A" but is it different? */
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2213,7 +2213,7 @@ ROM_START( ggroundj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-03b.key", 0x0000, 0x2000,  CRC(84aecdba) SHA1(ceddf967359a6e76543fe1ab00be53d0a11fe1ab) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2225,7 +2225,7 @@ ROM_START( crkdown )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-04c.key", 0x0000, 0x2000,  CRC(16e978cc) SHA1(0e1482b5efa93b732d4cf0990919cb3fc903dca7) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2237,7 +2237,7 @@ ROM_START( crkdownu )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-04d.key", 0x0000, 0x2000,  CRC(934ac358) SHA1(73418e22c9d201bc3fec5c63284858958c010e05) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2249,7 +2249,7 @@ ROM_START( crkdownj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-04b.key", 0x0000, 0x2000,  CRC(4a99a202) SHA1(d7375f09e7246ecd60ba0e48f049e9e252af92a8) ) /* Also labeled "rev-A" but is it different? */
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2285,7 +2285,7 @@ ROM_START( dcclubfd )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-09d.key", 0x0000, 0x2000, CRC(a91ebffb) SHA1(70b8b4272ca456491f254d115b434bb4ce73f049) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2297,7 +2297,7 @@ ROM_START( roughrac )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "subcpu:key", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "subcpu:key", 0 )   /* decryption key */
 	ROM_LOAD( "317-0058-06b.key",    0x000000, 0x2000, CRC(6a5bf536) SHA1(3fc3e93ce8a47d7ee86da889efad2e7eca6e2ee9) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
@@ -2501,7 +2501,7 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
 GAME( 1991, dcclub,   0,        system24, dcclub, segas24_state,   dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
 GAME( 1991, dcclubj,  dcclub,   system24, dcclub, segas24_state,   dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
 GAME( 1991, qrouka,   0,        system24, qrouka, segas24_state,   qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
-GAME( 1992, quizmeku, 0,        system24, quizmeku, segas24_state, quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 )		/* Released in 05.1993 */
+GAME( 1992, quizmeku, 0,        system24, quizmeku, segas24_state, quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 )        /* Released in 05.1993 */
 GAME( 1992, mahmajn,  0,        system24, mahmajn, segas24_state,  mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )
 GAME( 1994, qgh,      0,        system24, qgh, segas24_state,      qgh,      ROT0,   "Sega", "Quiz Ghost Hunter (Japan, ROM Based)", 0 )
 GAME( 1994, mahmajn2, 0,        system24, mahmajn, segas24_state,  mahmajn2, ROT0,   "Sega", "Tokoro San no MahMahjan 2 (Japan, ROM Based)", 0 )

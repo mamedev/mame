@@ -20,12 +20,12 @@ class cvs_state : public driver_device
 public:
 	cvs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_video_ram(*this, "video_ram"),
-		  m_bullet_ram(*this, "bullet_ram"),
-		  m_fo_state(*this, "fo_state"),
-		  m_cvs_4_bit_dac_data(*this, "4bit_dac"),
-		  m_tms5110_ctl_data(*this, "tms5110_ctl"),
-		  m_dac3_state(*this, "dac3_state") { }
+			m_video_ram(*this, "video_ram"),
+			m_bullet_ram(*this, "bullet_ram"),
+			m_fo_state(*this, "fo_state"),
+			m_cvs_4_bit_dac_data(*this, "4bit_dac"),
+			m_tms5110_ctl_data(*this, "tms5110_ctl"),
+			m_dac3_state(*this, "dac3_state") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -67,7 +67,7 @@ public:
 	/* memory */
 	UINT8      m_color_ram[0x400];
 	UINT8      m_palette_ram[0x10];
-	UINT8      m_character_ram[3 * 0x800];	/* only half is used, but
+	UINT8      m_character_ram[3 * 0x800];  /* only half is used, but
                                                by allocating twice the amount,
                                                we can use the same gfx_layout */
 	DECLARE_READ8_MEMBER(cvs_input_r);

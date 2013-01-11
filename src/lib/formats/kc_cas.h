@@ -12,4 +12,3 @@
 CASSETTE_FORMATLIST_EXTERN(kc_cassette_formats);
 
 #endif /* KC_CAS_H */
-

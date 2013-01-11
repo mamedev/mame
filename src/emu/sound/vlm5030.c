@@ -197,14 +197,14 @@ SPC SPB SPA
 */
 static const int vlm5030_speed_table[8] =
 {
- IP_SIZE_NORMAL,
- IP_SIZE_FAST,
- IP_SIZE_FASTER,
- IP_SIZE_FASTER,
- IP_SIZE_NORMAL,
- IP_SIZE_SLOWER,
- IP_SIZE_SLOW,
- IP_SIZE_SLOW
+	IP_SIZE_NORMAL,
+	IP_SIZE_FAST,
+	IP_SIZE_FASTER,
+	IP_SIZE_FASTER,
+	IP_SIZE_NORMAL,
+	IP_SIZE_SLOWER,
+	IP_SIZE_SLOW,
+	IP_SIZE_SLOW
 };
 
 static const char VLM_NAME[] = "VLM5030";
@@ -222,7 +222,7 @@ static int get_bits(vlm5030_state *chip, int sbit,int bits)
 	int data;
 
 	data = chip->rom[offset&chip->address_mask] +
-	       (((int)chip->rom[(offset+1)&chip->address_mask])*256);
+			(((int)chip->rom[(offset+1)&chip->address_mask])*256);
 	data >>= (sbit&7);
 	data &= (0xff>>(8-bits));
 
@@ -244,19 +244,19 @@ static int parse_frame (vlm5030_state *chip)
 	/* command byte check */
 	cmd = chip->rom[chip->address&chip->address_mask];
 	if( cmd & 0x01 )
-	{	/* extend frame */
+	{   /* extend frame */
 		chip->new_energy = chip->new_pitch = 0;
 		for(i=0;i<=9;i++)
 			chip->new_k[i] = 0;
 		chip->address++;
 		if( cmd & 0x02 )
-		{	/* end of speech */
+		{   /* end of speech */
 
 			/* logerror("VLM5030 %04X end \n",chip->address ); */
 			return 0;
 		}
 		else
-		{	/* silent frame */
+		{   /* silent frame */
 			int nums = ( (cmd>>2)+1 )*2;
 			/* logerror("VLM5030 %04X silent %d frame\n",chip->address,nums ); */
 			return nums * FR_SIZE;
@@ -319,7 +319,7 @@ static STREAM_UPDATE( vlm5030_update_callback )
 					/* change to new frame */
 					chip->interp_count = parse_frame(chip); /* with change phase */
 					if ( chip->interp_count == 0 )
-					{	/* end mark found */
+					{   /* end mark found */
 						chip->interp_count = FR_SIZE;
 						chip->sample_count = chip->frame_size; /* end -> stop time */
 						chip->phase = PH_STOP;
@@ -367,7 +367,7 @@ static STREAM_UPDATE( vlm5030_update_callback )
 				current_val = 0x00;
 			}
 			else if (chip->old_pitch <= 1)
-			{	/* generate unvoiced samples here */
+			{   /* generate unvoiced samples here */
 				current_val = (chip->device->machine().rand()&1) ? chip->current_energy : -chip->current_energy;
 			}
 			else
@@ -459,16 +459,16 @@ static void vlm5030_setup_parameter(vlm5030_state *chip, UINT8 param)
 		chip->interp_step = 4; /* 9600bps : no interporator */
 	else if(param&1) /* bit1 = 0 & bit0 = 1 , 4800bps */
 		chip->interp_step = 2; /* 4800bps : 2 interporator */
-	else	/* bit1 = bit0 = 0 : 2400bps */
+	else    /* bit1 = bit0 = 0 : 2400bps */
 		chip->interp_step = 1; /* 2400bps : 4 interporator */
 
 	/* bit 3,4,5 : speed (frame size) */
 	chip->frame_size = vlm5030_speed_table[(param>>3) &7];
 
 	/* bit 6,7 : low / high pitch */
-	if(param&0x80)	/* bit7=1 , high pitch */
+	if(param&0x80)  /* bit7=1 , high pitch */
 		chip->pitch_offset = -8;
-	else if(param&0x40)	/* bit6=1 , low pitch */
+	else if(param&0x40) /* bit6=1 , low pitch */
 		chip->pitch_offset = 8;
 	else
 		chip->pitch_offset = 0;
@@ -548,7 +548,7 @@ void vlm5030_rst (device_t *device, int pin )
 	if( chip->pin_RST )
 	{
 		if( !pin )
-		{	/* H -> L : latch parameters */
+		{   /* H -> L : latch parameters */
 			chip->pin_RST = 0;
 			vlm5030_setup_parameter(chip, chip->latch_data);
 		}
@@ -556,7 +556,7 @@ void vlm5030_rst (device_t *device, int pin )
 	else
 	{
 		if( pin )
-		{	/* L -> H : reset chip */
+		{   /* L -> H : reset chip */
 			chip->pin_RST = 1;
 			if( chip->pin_BSY )
 			{
@@ -585,11 +585,11 @@ void vlm5030_st(device_t *device, int pin )
 	{
 		/* pin level is change */
 		if( !pin )
-		{	/* H -> L */
+		{   /* H -> L */
 			chip->pin_ST = 0;
 
 			if( chip->pin_VCU )
-			{	/* direct access mode & address High */
+			{   /* direct access mode & address High */
 				chip->vcu_addr_h = ((int)chip->latch_data<<8) + 0x01;
 			}
 			else
@@ -597,15 +597,15 @@ void vlm5030_st(device_t *device, int pin )
 				/* start speech */
 				/* check access mode */
 				if( chip->vcu_addr_h )
-				{	/* direct access mode */
+				{   /* direct access mode */
 					chip->address = (chip->vcu_addr_h&0xff00) + chip->latch_data;
 					chip->vcu_addr_h = 0;
 				}
 				else
-				{	/* indirect accedd mode */
+				{   /* indirect accedd mode */
 					table = (chip->latch_data&0xfe) + (((int)chip->latch_data&1)<<8);
 					chip->address = (((int)chip->rom[table&chip->address_mask])<<8)
-					                |        chip->rom[(table+1)&chip->address_mask];
+									|        chip->rom[(table+1)&chip->address_mask];
 #if 0
 /* show unsupported parameter message */
 if( chip->interp_step != 1)
@@ -623,7 +623,7 @@ if( chip->interp_step != 1)
 			}
 		}
 		else
-		{	/* L -> H */
+		{   /* L -> H */
 			chip->pin_ST = 1;
 			/* setup speech , BSY on after 30ms? */
 			chip->phase = PH_SETUP;
@@ -691,7 +691,7 @@ const device_type VLM5030 = &device_creator<vlm5030_device>;
 
 vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(vlm5030_state);
 }
@@ -733,5 +733,3 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

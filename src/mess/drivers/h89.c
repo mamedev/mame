@@ -28,9 +28,9 @@ class h89_state : public driver_device
 public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_uart(*this, "ins8250"),
-		  m_terminal(*this, TERMINAL_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_uart(*this, "ins8250"),
+			m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -59,9 +59,9 @@ static ADDRESS_MAP_START( h89_io, AS_IO, 8, h89_state)
 //  AM_RANGE(0xd0, 0xd7)    8250 UART DCE
 //  AM_RANGE(0xd8, 0xdf)    8250 UART DTE
 //  AM_RANGE(0xe0, 0xe7)    8250 UART LP
-	AM_RANGE(0xe8, 0xef)	AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w) // 8250 UART console
+	AM_RANGE(0xe8, 0xef)    AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w) // 8250 UART console
 //  AM_RANGE(0xf0, 0xf1)    front panel
-	AM_RANGE(0xf2, 0xf2)	AM_WRITE(port_f2_w) AM_READ_PORT("SW501")
+	AM_RANGE(0xf2, 0xf2)    AM_WRITE(port_f2_w) AM_READ_PORT("SW501")
 //  AM_RANGE(0xf8, 0xf9)    cassette
 //  AM_RANGE(0xfa, 0xff)    serial I/O
 ADDRESS_MAP_END

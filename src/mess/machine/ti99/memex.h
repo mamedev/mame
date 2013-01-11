@@ -34,11 +34,11 @@ protected:
 	const rom_entry *device_rom_region() const;
 
 private:
-	bool	access_enabled(offs_t offset);
+	bool    access_enabled(offs_t offset);
 
-	UINT8*	m_ram;
-	UINT8	m_dip_switch[8];
-	int		m_genmod;
+	UINT8*  m_ram;
+	UINT8   m_dip_switch[8];
+	int     m_genmod;
 };
 
 #endif

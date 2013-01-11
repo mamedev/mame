@@ -48,10 +48,10 @@ Known Issues
 
 static const eeprom_interface eeprom_intf =
 {
-	7,				/* address bits */
-	8,				/* data bits */
-	"011000",		/*  read command */
-	"011100",		/* write command */
+	7,              /* address bits */
+	8,              /* data bits */
+	"011000",       /*  read command */
+	"011100",       /* write command */
 	"0100100000000",/* erase command */
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
@@ -162,14 +162,14 @@ static void sound_nmi( device_t *device )
 
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")								// Sprites
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")                               // Sprites
 	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
-	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes
-	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes mirror read
-	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)								// Passthrough to tile roms
-	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)									// VSCCS (board dependent)
-	AM_RANGE(0x170000, 0x170001) AM_WRITENOP												// Watchdog
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")					// Main RAM.  Spec. 180000-1803ff, 180400-187fff
+	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)      // Graphic planes
+	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)      // Graphic planes mirror read
+	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)                               // Passthrough to tile roms
+	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)                                    // VSCCS (board dependent)
+	AM_RANGE(0x170000, 0x170001) AM_WRITENOP                                                // Watchdog
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")                 // Main RAM.  Spec. 180000-1803ff, 180400-187fff
 	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
@@ -206,7 +206,7 @@ static INPUT_PORTS_START( gijoe )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_START3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START4 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SPECIAL )	// EEPROM ready (always 1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SPECIAL ) // EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMOUT" )
@@ -226,21 +226,21 @@ static INPUT_PORTS_START( gijoe )
 
 	PORT_START("P1_P2")
 	KONAMI16_LSB_40(1, IPT_BUTTON3 )
-	PORT_DIPNAME( 0x0080, 0x0000, "Sound" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0080, 0x0000, "Sound" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Mono ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Stereo ) )
 	KONAMI16_MSB_40(2, IPT_BUTTON3 )
-	PORT_DIPNAME( 0x8000, 0x8000, "Coin mechanism" )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x8000, 0x8000, "Coin mechanism" )    PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x8000, "Common" )
 	PORT_DIPSETTING(      0x0000, "Independent" )
 
 	PORT_START("P3_P4")
 	KONAMI16_LSB_40(3, IPT_BUTTON3 )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Players ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Players ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0080, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
 	KONAMI16_MSB_40(4, IPT_BUTTON3 )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:4" )	/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:4" )    /* Listed as "Unused" */
 INPUT_PORTS_END
 
 static const k054539_interface k054539_config =
@@ -292,11 +292,11 @@ void gijoe_state::machine_reset()
 static MACHINE_CONFIG_START( gijoe, gijoe_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* Confirmed */
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(gijoe_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)	/* Amuse & confirmed. z80e */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* Amuse & confirmed. z80e */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 

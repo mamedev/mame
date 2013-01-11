@@ -181,7 +181,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 		if (log)
 			logerror("%.5x vg230 %02x read %.2x\n",(int) m_maincpu->pc(),vg230->index,data);
-      //    data=machine.root_device().memregion("maincpu")->base()[0x4000+offset];
+		//    data=machine.root_device().memregion("maincpu")->base()[0x4000+offset];
 	}
 	else
 		data=vg230->index;
@@ -268,8 +268,8 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 		case 0xac: ems->index=11; break;
 		case 0xb0: ems->index=12; break;
 		case 0xb4: ems->index=13; break;
-      //  case 0xb8: ems->index=14; break;
-      //  case 0xbc: ems->index=15; break;
+		//  case 0xb8: ems->index=14; break;
+		//  case 0xbc: ems->index=15; break;
 		case 0xc0: ems->index=14; break;
 		case 0xc4: ems->index=15; break;
 		case 0xc8: ems->index=16; break;
@@ -472,15 +472,15 @@ static const pit8253_config pc_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}

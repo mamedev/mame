@@ -34,18 +34,18 @@ public:
 	UINT8 m_vimana_credits;
 	UINT8 m_vimana_latch;
 
-	UINT16 *m_pf4_tilevram16;	/*  ||  Drawn in this order */
-	UINT16 *m_pf3_tilevram16;	/*  ||  */
-	UINT16 *m_pf2_tilevram16;	/* \||/ */
-	UINT16 *m_pf1_tilevram16;	/*  \/  */
+	UINT16 *m_pf4_tilevram16;   /*  ||  Drawn in this order */
+	UINT16 *m_pf3_tilevram16;   /*  ||  */
+	UINT16 *m_pf2_tilevram16;   /* \||/ */
+	UINT16 *m_pf1_tilevram16;   /*  \/  */
 
 	optional_shared_ptr<UINT16> m_spriteram;
 	UINT16 *m_buffered_spriteram;
 	UINT16 *m_spritesizeram16;
 	UINT16 *m_buffered_spritesizeram16;
 
-	INT32 m_bcu_flipscreen;		/* Tile   controller flip flag */
-	INT32 m_fcu_flipscreen;		/* Sprite controller flip flag */
+	INT32 m_bcu_flipscreen;     /* Tile   controller flip flag */
+	INT32 m_fcu_flipscreen;     /* Sprite controller flip flag */
 
 	INT32 m_pf_voffs;
 	INT32 m_spriteram_offs;
@@ -76,7 +76,7 @@ public:
 	INT32 m_tiles_offsetx;
 	INT32 m_tiles_offsety;
 
-	int m_reset;		/* Hack! See toaplan1_bcu_control below */
+	int m_reset;        /* Hack! See toaplan1_bcu_control below */
 
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_pf2_tilemap;

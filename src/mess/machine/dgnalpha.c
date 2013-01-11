@@ -194,7 +194,7 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			wd17xx_track_w(m_fdc, space, 0, data);
 			break;
 		case 15:
-            wd17xx_command_w(m_fdc, space, 0, data);
+			wd17xx_command_w(m_fdc, space, 0, data);
 
 			/* disk head is encoded in the command byte */
 			wd17xx_set_side(m_fdc,(data & 0x02) ? 1 : 0);
@@ -226,22 +226,22 @@ WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 	/* always be high (enabling boot rom) */
 	/* PIA FIXME if (pia_get_ddr_a(2) & 0x04) */
 	{
-		page_rom(data & 0x04 ? true : false);	/* bit 2 controls boot or basic rom */
+		page_rom(data & 0x04 ? true : false);   /* bit 2 controls boot or basic rom */
 	}
 
 	/* Bits 0 and 1 for pia2 port a control the BCDIR and BC1 lines of the */
 	/* AY-8912 */
 	switch (data & 0x03)
 	{
-		case 0x00:		/* Inactive, do nothing */
+		case 0x00:      /* Inactive, do nothing */
 			break;
-		case 0x01:		/* Write to selected port */
+		case 0x01:      /* Write to selected port */
 			ay8910_data_w(m_ay8912, space, 0, m_pia_2->b_output());
 			break;
-		case 0x02:		/* Read from selected port */
+		case 0x02:      /* Read from selected port */
 			m_pia_2->portb_w(ay8910_r(m_ay8912, space, 0));
 			break;
-		case 0x03:		/* Select port to write to */
+		case 0x03:      /* Select port to write to */
 			ay8910_address_w(m_ay8912, space, 0, m_pia_2->b_output());
 			break;
 	}
@@ -277,18 +277,18 @@ WRITE_LINE_MEMBER( dragon_alpha_state::pia2_firq_b )
 
 const pia6821_interface dragon_alpha_state::pia2_config =
 {
-	DEVCB_NULL,													/* port A input */
-	DEVCB_NULL,													/* port B input */
-	DEVCB_NULL,													/* CA1 input */
-	DEVCB_NULL,													/* CB1 input */
-	DEVCB_NULL,													/* CA2 input */
-	DEVCB_NULL,													/* CB2 input */
-	DEVCB_DRIVER_MEMBER(dragon_alpha_state, pia2_pa_w),			/* port A output */
-	DEVCB_NULL,													/* port B output */
-	DEVCB_NULL,													/* CA2 output */
-	DEVCB_NULL,													/* CB2 output */
-	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, pia2_firq_a),	/* IRQA output */
-	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, pia2_firq_b)	/* IRQB output */
+	DEVCB_NULL,                                                 /* port A input */
+	DEVCB_NULL,                                                 /* port B input */
+	DEVCB_NULL,                                                 /* CA1 input */
+	DEVCB_NULL,                                                 /* CB1 input */
+	DEVCB_NULL,                                                 /* CA2 input */
+	DEVCB_NULL,                                                 /* CB2 input */
+	DEVCB_DRIVER_MEMBER(dragon_alpha_state, pia2_pa_w),         /* port A output */
+	DEVCB_NULL,                                                 /* port B output */
+	DEVCB_NULL,                                                 /* CA2 output */
+	DEVCB_NULL,                                                 /* CB2 output */
+	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, pia2_firq_a),  /* IRQA output */
+	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, pia2_firq_b)   /* IRQB output */
 };
 
 
@@ -361,10 +361,10 @@ const ay8910_interface dragon_alpha_state::ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(dragon_alpha_state, psg_porta_read),	/* portA read */
-	DEVCB_NULL, 												/* portB read */
-	DEVCB_DRIVER_MEMBER(dragon_alpha_state, psg_porta_write),	/* portA write */
-	DEVCB_NULL													/* portB write */
+	DEVCB_DRIVER_MEMBER(dragon_alpha_state, psg_porta_read),    /* portA read */
+	DEVCB_NULL,                                                 /* portB read */
+	DEVCB_DRIVER_MEMBER(dragon_alpha_state, psg_porta_write),   /* portA write */
+	DEVCB_NULL                                                  /* portB write */
 };
 
 
@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 		{
 			if (m_pia_2->ca2_output_z())
 				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-        }
+		}
 	}
 	else
 	{

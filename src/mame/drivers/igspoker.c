@@ -127,9 +127,9 @@ public:
 
 void igspoker_state::machine_reset()
 {
-	m_nmi_enable	=	0;
-	m_hopper		=	0;
-	m_bg_enable	=	1;
+	m_nmi_enable    =   0;
+	m_hopper        =   0;
+	m_bg_enable =   1;
 }
 
 
@@ -193,8 +193,8 @@ WRITE8_MEMBER(igspoker_state::fg_color_w)
 
 void igspoker_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  32,	64, 8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -213,7 +213,7 @@ UINT32 igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind
 
 VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
 
 UINT32 igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -233,12 +233,12 @@ void igspoker_state::show_out()
 
 WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 {
-	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(machine(), 3,		data & 0x10);	// coin m_out mech
+	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
+	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
+	coin_counter_w(machine(), 2,        data & 0x08);   // key in
+	coin_counter_w(machine(), 3,        data & 0x10);   // coin m_out mech
 
-	set_led_status(machine(), 6,		data & 0x20);	// led for coin m_out / m_hopper active
+	set_led_status(machine(), 6,        data & 0x20);   // led for coin m_out / m_hopper active
 
 	m_nmi_enable = data & 0x80;     // nmi enable?
 #if VERBOSE
@@ -276,14 +276,14 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
     ---x ----  Hold5 lamp.
     xx-- ----  one pulse once bet amount allows start.
 */
-	output_set_lamp_value(1, (data >> 1) & 1);		/* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 5) & 1);		/* Lamp 2 - HOLD 2  */
-	output_set_lamp_value(3, (data >> 4) & 1);		/* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 2) & 1);		/* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data & 1));			/* Lamp 6 - START */
+	output_set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
+	output_set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
+	output_set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
+	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output_set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
+	output_set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
 
-	m_hopper			=	(~data)& 0x80;
+	m_hopper            =   (~data)& 0x80;
 
 	m_out[1] = data;
 	show_out();
@@ -364,17 +364,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
 	AM_RANGE(0x5080, 0x5080) AM_WRITE(igs_nmi_and_coins_w)
-	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")			/* Services */
-	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")			/* Coing & Kbd */
+	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")            /* Services */
+	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")          /* Coing & Kbd */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )			/* Keyboard */
-	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")			/* Not connected */
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )            /* Keyboard */
+	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")           /* Not connected */
 	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE(bg_tile_w )  AM_SHARE("bg_tile_ram")
@@ -449,7 +449,7 @@ static INPUT_PORTS_START( cpoker )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -492,7 +492,7 @@ static INPUT_PORTS_START( cpoker )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -581,7 +581,7 @@ static INPUT_PORTS_START( cpokerx )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -626,7 +626,7 @@ static INPUT_PORTS_START( cpokerx )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Attendent")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -726,7 +726,7 @@ static INPUT_PORTS_START( csk227 )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -771,7 +771,7 @@ static INPUT_PORTS_START( csk227 )
 	PORT_DIPSETTING(    0x06, "10:1" )
 	PORT_DIPSETTING(    0x05, "20:1" )
 	PORT_DIPSETTING(    0x04, "50:1" )
-	PORT_DIPSETTING(    0x03, "100:1" )		/* Bits 1-0 are all equivalents */
+	PORT_DIPSETTING(    0x03, "100:1" )     /* Bits 1-0 are all equivalents */
 	PORT_DIPNAME( 0x08, 0x00, "Card Select" ) PORT_DIPLOCATION("SWE:5")
 	PORT_DIPSETTING(    0x08, "Poker" )
 	PORT_DIPSETTING(    0x00, "Tetris" )
@@ -791,7 +791,7 @@ static INPUT_PORTS_START( csk227 )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")  // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -886,7 +886,7 @@ static INPUT_PORTS_START( csk234 )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x40, "Card Select" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, "Poker" )
 	PORT_DIPSETTING(    0x00, "Symbols" )
@@ -916,7 +916,7 @@ static INPUT_PORTS_START( csk234 )
 	PORT_DIPNAME( 0x20, 0x00, "Anytime Key-in" ) PORT_DIPLOCATION("SWD:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_BIT( 0xC0, IP_ACTIVE_LOW, IPT_UNUSED )			/* Joker and Royal Flush are always enabled */
+	PORT_BIT( 0xC0, IP_ACTIVE_LOW, IPT_UNUSED )         /* Joker and Royal Flush are always enabled */
 
 	PORT_START("DSW5")
 	PORT_DIPNAME( 0x01, 0x00, "Hopper" ) PORT_DIPLOCATION("SWE:8")
@@ -936,7 +936,7 @@ static INPUT_PORTS_START( csk234 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")  // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1025,7 +1025,7 @@ static INPUT_PORTS_START( igs_ncs )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x40, "Ability Pay" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, "All" )
 	PORT_DIPSETTING(    0x00, "1/Time" )
@@ -1070,7 +1070,7 @@ static INPUT_PORTS_START( igs_ncs )
 	PORT_DIPSETTING(    0x06, "10:1" )
 	PORT_DIPSETTING(    0x05, "20:1" )
 	PORT_DIPSETTING(    0x04, "50:1" )
-	PORT_DIPSETTING(    0x03, "100:1" )		/* latest 4 is 100 for ON/OFF */
+	PORT_DIPSETTING(    0x03, "100:1" )     /* latest 4 is 100 for ON/OFF */
 	PORT_DIPNAME( 0x08, 0x08, "Card Select" ) PORT_DIPLOCATION("SWE:5")
 	PORT_DIPSETTING(    0x08, "Poker" )
 	PORT_DIPSETTING(    0x00, "Symbols" )
@@ -1088,7 +1088,7 @@ static INPUT_PORTS_START( igs_ncs )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1118,17 +1118,17 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
 	AM_RANGE(0x4006, 0x4006) AM_READ_PORT("DSW6")
 	AM_RANGE(0x4007, 0x4007) AM_READ_PORT("DSW7")
 	AM_RANGE(0x50f0, 0x50f0) AM_WRITE(igs_nmi_and_coins_w)
-	AM_RANGE(0x5080, 0x5080) AM_READ_PORT("SERVICE")			/* Services */
+	AM_RANGE(0x5080, 0x5080) AM_READ_PORT("SERVICE")            /* Services */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )            /* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1141,16 +1141,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
 	AM_RANGE(0x50f0, 0x50f0) AM_WRITE(igs_nmi_and_coins_w)
-	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")			/* Services */
-	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")			/* Coing & Kbd */
+	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")            /* Services */
+	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")          /* Coing & Kbd */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )            /* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -1224,7 +1224,7 @@ static INPUT_PORTS_START( number10 )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -1358,7 +1358,7 @@ static INPUT_PORTS_START( cpokerpk )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -1408,7 +1408,7 @@ static INPUT_PORTS_START( cpokerpk )
 	PORT_DIPSETTING(    0x00, "100:1" )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1498,7 +1498,7 @@ static INPUT_PORTS_START( chleague )
 	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
-	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPSETTING(    0x10, "Red-Black" )     /* Bit 4 is equal for ON/OFF */
 	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -1543,7 +1543,7 @@ static INPUT_PORTS_START( chleague )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1682,7 +1682,7 @@ static INPUT_PORTS_START( pktet346 )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igspoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW") // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -1712,15 +1712,15 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8, 8,	/* 8*8 characters */
+	8, 8,   /* 8*8 characters */
 	RGN_FRAC(1, 3),
-	6,		/* 6 bits per pixel */
+	6,      /* 6 bits per pixel */
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP8(0,2*8) },
-	8*8*2	/* every char takes 32 consecutive bytes */
+	8*8*2   /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout charlayout2 =
@@ -1729,8 +1729,8 @@ static const gfx_layout charlayout2 =
 	RGN_FRAC(1, 3),
 	6,      /* 6 bits per pixel */
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP32(0,2*8) },
 	8*32*2
@@ -1747,7 +1747,7 @@ GFXDECODE_END
 
 static const gfx_layout charlayoutcpk =
 {
-	8, 8,	/* 8*8 characters */
+	8, 8,   /* 8*8 characters */
 	RGN_FRAC(1, 1),
 	6,
 	{ 2,3,4,5,6,7 },
@@ -2093,7 +2093,7 @@ ROM_START( cpokerx )
 	ROM_COPY( "gfx1", 0, 0, 0x60000 )
 
 	ROM_REGION( 0x4000, "plds", 0 )
-	ROM_LOAD( "16v8b.u31",  0x00000, 0x000892, BAD_DUMP CRC(33dec5f5) SHA1(f5c2e45513fa3657160ff38111a745f76cf679e1) )	// all 0's, seems protected
+	ROM_LOAD( "16v8b.u31",  0x00000, 0x000892, BAD_DUMP CRC(33dec5f5) SHA1(f5c2e45513fa3657160ff38111a745f76cf679e1) )  // all 0's, seems protected
 	ROM_LOAD( "16v8h.u14",  0x01000, 0x000892, CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) )
 	ROM_LOAD( "22v10b.u22", 0x02000, 0x001704, CRC(609a1aaa) SHA1(b123c93929f932e4ee343a7109f8b16717845d8b) )
 ROM_END

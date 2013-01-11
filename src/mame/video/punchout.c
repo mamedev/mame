@@ -211,10 +211,10 @@ static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 		startx = -sx * 0x4000;
 		starty = -sy * 0x10000;
-		startx += 3740 * zoom;	/* adjustment to match the screen shots */
-		starty -= 178 * zoom;	/* and make the hall of fame picture nice */
+		startx += 3740 * zoom;  /* adjustment to match the screen shots */
+		starty -= 178 * zoom;   /* and make the hall of fame picture nice */
 
-		if (state->m_spr1_ctrlram[6] & 1)	/* flip x */
+		if (state->m_spr1_ctrlram[6] & 1)   /* flip x */
 		{
 			startx = ((16 * 8) << 16) - startx - 1;
 			incxx = -incxx;
@@ -224,8 +224,8 @@ static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 		state->m_spr1_tilemap->draw_roz(bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
-			incxx,0,0,incyy,	/* zoom, no rotation */
-			0,	/* no wraparound */
+			incxx,0,0,incyy,    /* zoom, no rotation */
+			0,  /* no wraparound */
 			0,0);
 	}
 }
@@ -256,10 +256,10 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bit
 
 		startx = -sx * 0x4000;
 		starty = -sy * 0x10000;
-		startx += 3740 * zoom;	/* adjustment to match the screen shots */
-		starty -= 178 * zoom;	/* and make the hall of fame picture nice */
+		startx += 3740 * zoom;  /* adjustment to match the screen shots */
+		starty -= 178 * zoom;   /* and make the hall of fame picture nice */
 
-		if (state->m_spr1_ctrlram[6] & 1)	/* flip x */
+		if (state->m_spr1_ctrlram[6] & 1)   /* flip x */
 		{
 			_tilemap = state->m_spr1_tilemap_flipx;
 			startx = ((32 * 8) << 16) - startx - 1;
@@ -272,8 +272,8 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bit
 
 		_tilemap->draw_roz(bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
-			incxx,0,0,incyy,	/* zoom, no rotation */
-			0,	/* no wraparound */
+			incxx,0,0,incyy,    /* zoom, no rotation */
+			0,  /* no wraparound */
 			0,0);
 	}
 }
@@ -286,15 +286,15 @@ static void drawbs2(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 
 	sx = 512 - (state->m_spr2_ctrlram[0] + 256 * (state->m_spr2_ctrlram[1] & 1));
 	if (sx > 512-127) sx -= 512;
-	sx -= 55;	/* adjustment to match the screen shots */
+	sx -= 55;   /* adjustment to match the screen shots */
 
 	sy = -state->m_spr2_ctrlram[2] + 256 * (state->m_spr2_ctrlram[3] & 1);
-	sy += 3;	/* adjustment to match the screen shots */
+	sy += 3;    /* adjustment to match the screen shots */
 
 	sx = -sx << 16;
 	sy = -sy << 16;
 
-	if (state->m_spr2_ctrlram[4] & 1)	/* flip x */
+	if (state->m_spr2_ctrlram[4] & 1)   /* flip x */
 	{
 		sx = ((16 * 8) << 16) - sx - 1;
 		incxx = -1;
@@ -358,7 +358,7 @@ UINT32 punchout_state::screen_update_punchout_top(screen_device &screen, bitmap_
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (m_spr1_ctrlram[7] & 1)	/* display in top monitor */
+	if (m_spr1_ctrlram[7] & 1)  /* display in top monitor */
 		draw_big_sprite(machine(), bitmap, cliprect, 0);
 
 	return 0;
@@ -376,7 +376,7 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 
 	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
+	if (m_spr1_ctrlram[7] & 2)  /* display in bottom monitor */
 		draw_big_sprite(machine(), bitmap, cliprect, 1);
 	drawbs2(machine(), bitmap, cliprect);
 
@@ -391,7 +391,7 @@ UINT32 punchout_state::screen_update_armwrest_top(screen_device &screen, bitmap_
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (m_spr1_ctrlram[7] & 1)	/* display in top monitor */
+	if (m_spr1_ctrlram[7] & 1)  /* display in top monitor */
 		armwrest_draw_big_sprite(machine(), bitmap, cliprect, 0);
 
 	return 0;
@@ -404,7 +404,7 @@ UINT32 punchout_state::screen_update_armwrest_bottom(screen_device &screen, bitm
 
 	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
+	if (m_spr1_ctrlram[7] & 2)  /* display in bottom monitor */
 		armwrest_draw_big_sprite(machine(), bitmap, cliprect, 1);
 	drawbs2(machine(), bitmap, cliprect);
 

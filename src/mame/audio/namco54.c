@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( namco_54xx )
-	MCFG_CPU_ADD("mcu", MB8844, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
+	MCFG_CPU_ADD("mcu", MB8844, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
 	MCFG_CPU_IO_MAP(namco_54xx_map_io)
 MACHINE_CONFIG_END
 
@@ -226,5 +226,3 @@ const rom_entry *namco_54xx_device::device_rom_region() const
 {
 	return ROM_NAME(namco_54xx );
 }
-
-

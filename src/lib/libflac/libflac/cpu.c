@@ -211,8 +211,8 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 #endif
 
 		/*
-         * now have to check for OS support of SSE/SSE2
-         */
+		 * now have to check for OS support of SSE/SSE2
+		 */
 		if(info->data.ia32.fxsr || info->data.ia32.sse || info->data.ia32.sse2) {
 #if defined FLAC__NO_SSE_OS
 			/* assume user knows better than us; turn it off */

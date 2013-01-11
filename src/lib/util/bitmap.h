@@ -54,14 +54,14 @@
 // bitmap_format describes the various bitmap formats we use
 enum bitmap_format
 {
-	BITMAP_FORMAT_INVALID = 0,		// invalid forma
-	BITMAP_FORMAT_IND8,				// 8bpp indexed
-	BITMAP_FORMAT_IND16,			// 16bpp indexed
-	BITMAP_FORMAT_IND32,			// 32bpp indexed
-	BITMAP_FORMAT_IND64,			// 64bpp indexed
-	BITMAP_FORMAT_RGB32,			// 32bpp 8-8-8 RGB
-	BITMAP_FORMAT_ARGB32,			// 32bpp 8-8-8-8 ARGB
-	BITMAP_FORMAT_YUY16,			// 16bpp 8-8 Y/Cb, Y/Cr in sequence
+	BITMAP_FORMAT_INVALID = 0,      // invalid forma
+	BITMAP_FORMAT_IND8,             // 8bpp indexed
+	BITMAP_FORMAT_IND16,            // 16bpp indexed
+	BITMAP_FORMAT_IND32,            // 32bpp indexed
+	BITMAP_FORMAT_IND64,            // 64bpp indexed
+	BITMAP_FORMAT_RGB32,            // 32bpp 8-8-8 RGB
+	BITMAP_FORMAT_ARGB32,           // 32bpp 8-8-8-8 ARGB
+	BITMAP_FORMAT_YUY16,            // 16bpp 8-8 Y/Cb, Y/Cr in sequence
 	BITMAP_FORMAT_LAST
 };
 
@@ -136,10 +136,10 @@ public:
 	void offsety(INT32 delta) { min_y += delta; max_y += delta; }
 
 	// internal state
-	INT32			min_x;			// minimum X, or left coordinate
-	INT32			max_x;			// maximum X, or right coordinate (inclusive)
-	INT32			min_y;			// minimum Y, or top coordinate
-	INT32			max_y;			// maximum Y, or bottom coordinate (inclusive)
+	INT32           min_x;          // minimum X, or left coordinate
+	INT32           max_x;          // maximum X, or right coordinate (inclusive)
+	INT32           min_y;          // minimum Y, or top coordinate
+	INT32           max_y;          // maximum Y, or bottom coordinate (inclusive)
 };
 
 
@@ -205,16 +205,16 @@ private:
 	void compute_base(int xslop, int yslop);
 
 	// internal state
-	UINT8 *			m_alloc;		// pointer to allocated pixel memory
-	UINT32			m_allocbytes;	// size of our allocation
-	void *			m_base;			// pointer to pixel (0,0) (adjusted for padding)
-	INT32			m_rowpixels;	// pixels per row (including padding)
-	INT32			m_width;		// width of the bitmap
-	INT32			m_height;		// height of the bitmap
-	bitmap_format	m_format;		// format of the bitmap
-	UINT8			m_bpp;			// bits per pixel
-	palette_t *		m_palette;		// optional palette
-	rectangle		m_cliprect;		// a clipping rectangle covering the full bitmap
+	UINT8 *         m_alloc;        // pointer to allocated pixel memory
+	UINT32          m_allocbytes;   // size of our allocation
+	void *          m_base;         // pointer to pixel (0,0) (adjusted for padding)
+	INT32           m_rowpixels;    // pixels per row (including padding)
+	INT32           m_width;        // width of the bitmap
+	INT32           m_height;       // height of the bitmap
+	bitmap_format   m_format;       // format of the bitmap
+	UINT8           m_bpp;          // bits per pixel
+	palette_t *     m_palette;      // optional palette
+	rectangle       m_cliprect;     // a clipping rectangle covering the full bitmap
 };
 
 
@@ -438,4 +438,4 @@ public:
 };
 
 
-#endif	// __BITMAP_H__
+#endif  // __BITMAP_H__

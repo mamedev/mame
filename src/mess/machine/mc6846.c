@@ -83,12 +83,12 @@ struct mc6846_t
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-#define PORT								\
-	((mc6846->pdr & mc6846->ddr) |					\
-	 ((!mc6846->in_port.isnull() ? mc6846->in_port( 0 ) : 0) & \
-	  ~mc6846->ddr))
+#define PORT                                \
+	((mc6846->pdr & mc6846->ddr) |                  \
+		((!mc6846->in_port.isnull() ? mc6846->in_port( 0 ) : 0) & \
+		~mc6846->ddr))
 
-#define CTO								\
+#define CTO                             \
 	((MODE == 0x30 || (mc6846->tcr & 0x80)) ? mc6846->cto : 0)
 
 #define MODE (mc6846->tcr & 0x38)
@@ -125,14 +125,14 @@ INLINE void mc6846_update_irq( device_t *device )
 	int cif = 0;
 	/* composite interrupt flag */
 	if ( ( (mc6846->csr & 1) && (mc6846->tcr & 0x40) ) ||
-	     ( (mc6846->csr & 2) && (mc6846->pcr & 1) ) ||
-	     ( (mc6846->csr & 4) && (mc6846->pcr & 8) && ! (mc6846->pcr & 0x20) ) )
+			( (mc6846->csr & 2) && (mc6846->pcr & 1) ) ||
+			( (mc6846->csr & 4) && (mc6846->pcr & 8) && ! (mc6846->pcr & 0x20) ) )
 		cif = 1;
 	if ( mc6846->old_cif != cif )
 	{
 		LOG (( "%f: mc6846 interrupt %i (time=%i cp1=%i cp2=%i)\n",
-		       device->machine().time().as_double(), cif,
-		       mc6846->csr & 1, (mc6846->csr >> 1 ) & 1, (mc6846->csr >> 2 ) & 1 ));
+				device->machine().time().as_double(), cif,
+				mc6846->csr & 1, (mc6846->csr >> 1 ) & 1, (mc6846->csr >> 2 ) & 1 ));
 		mc6846->old_cif = cif;
 	}
 	if ( cif )
@@ -281,9 +281,9 @@ READ8_DEVICE_HANDLER ( mc6846_r )
 	case 0:
 	case 4:
 		LOG (( "$%04x %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
-		       space.machine().firstcpu->pcbase( ), space.machine().time().as_double(),
-		       mc6846->csr, (mc6846->csr >> 7) & 1,
-		       mc6846->csr & 1, (mc6846->csr >> 1) & 1, (mc6846->csr >> 2) & 1 ));
+				space.machine().firstcpu->pcbase( ), space.machine().time().as_double(),
+				mc6846->csr, (mc6846->csr >> 7) & 1,
+				mc6846->csr & 1, (mc6846->csr >> 1) & 1, (mc6846->csr >> 2) & 1 ));
 		mc6846->csr0_to_be_cleared = mc6846->csr & 1;
 		mc6846->csr1_to_be_cleared = mc6846->csr & 2;
 		mc6846->csr2_to_be_cleared = mc6846->csr & 4;
@@ -367,8 +367,8 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 			"latcged,pos-edge", "latcged,pos-edge,intr"
 		};
 		LOG (( "$%04x %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n",
-		       space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), data,
-		       (data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
+				space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), data,
+				(data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
 
 	}
 	mc6846->pcr = data;
@@ -435,10 +435,10 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
 			};
 		LOG (( "$%04x %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n",
-		       space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), data,
-		       (data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
-		       (data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
-		       (data & 1) ? "enabled" : "0" ));
+				space.machine().firstcpu->pcbase( ), space.machine().time().as_double(), data,
+				(data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
+				(data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
+				(data & 1) ? "enabled" : "0" ));
 
 		mc6846->tcr = data;
 		if ( mc6846->tcr & 1 )
@@ -671,5 +671,3 @@ void mc6846_device::device_reset()
 {
 	DEVICE_RESET_NAME( mc6846 )(this);
 }
-
-

@@ -19,13 +19,13 @@
 	</element>
 
 	<view name="Cassette LED">
-	<!--	<bezel name="cass_txt" element="CASSETTE">
+	<!--    <bezel name="cass_txt" element="CASSETTE">
 			<bounds left="0" right="100" top="1030" bottom="1050" />
 		</bezel> -->
 		<bezel name="cass_led" element="red_led">
 			<bounds left="0" right="20" top="1020" bottom="1045" />
 		</bezel>
-	<!--	<bezel element="background">
+	<!--    <bezel element="background">
 			<bounds left="0" top="850" right="1" bottom="855" />
 		</bezel> -->
 		<screen index="0">

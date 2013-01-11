@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "includes/nycaptor.h"
 
-#define NYCAPTOR_DEBUG	0
+#define NYCAPTOR_DEBUG  0
 
 /*
  298 (e298) - spot (0-3) , 299 (e299) - lives
@@ -24,7 +24,7 @@ static int nycaptor_spot( running_machine &machine )
 	else
 		return 0;
 
-    return 0;
+	return 0;
 }
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_spriteram_w)
@@ -321,4 +321,3 @@ UINT32 nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_ind1
 
 	return 0;
 }
-

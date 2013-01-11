@@ -169,8 +169,8 @@ TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
 	exidy440_sound_command(m_custom, param);
 
 	/* It is important that the sound cpu ACKs the sound command
-       quickly. Otherwise the main CPU gives up with sound. Boosting
-       the interleave for a while helps. */
+	   quickly. Otherwise the main CPU gives up with sound. Boosting
+	   the interleave for a while helps. */
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }

@@ -32,10 +32,10 @@ class zippath_directory
 public:
 	zippath_directory()
 		: returned_parent(false),
-		  directory(NULL),
-		  called_zip_first(false),
-		  zipfile(NULL),
-		  returned_dirlist(NULL) { }
+			directory(NULL),
+			called_zip_first(false),
+			zipfile(NULL),
+			returned_dirlist(NULL) { }
 
 	/* common */
 	bool returned_parent;
@@ -481,9 +481,9 @@ static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const cha
 		i = 0;
 		j = 0;
 		last_char = '/';
-                while(((c1 = next_path_char(header->filename, &i)) == (c2 = next_path_char(subpath, &j))) &&
-                        ( c1 != '\0' && c2 != '\0' ))
-                        last_char = c2;
+				while(((c1 = next_path_char(header->filename, &i)) == (c2 = next_path_char(subpath, &j))) &&
+						( c1 != '\0' && c2 != '\0' ))
+						last_char = c2;
 
 
 		if (c2 == '\0')

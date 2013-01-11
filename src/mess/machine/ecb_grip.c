@@ -15,16 +15,16 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SCREEN_TAG			"screen"
-#define Z80_TAG				"grip_z1"
-#define MC6845_TAG			"z30"
-#define HD6345_TAG			"z30"
-#define I8255A_TAG			"z6"
-#define Z80STI_TAG			"z9"
-#define CENTRONICS_TAG		"centronics"
+#define SCREEN_TAG          "screen"
+#define Z80_TAG             "grip_z1"
+#define MC6845_TAG          "z30"
+#define HD6345_TAG          "z30"
+#define I8255A_TAG          "z6"
+#define Z80STI_TAG          "z9"
+#define CENTRONICS_TAG      "centronics"
 
 
-#define VIDEORAM_SIZE		0x10000
+#define VIDEORAM_SIZE       0x10000
 
 
 
@@ -120,9 +120,9 @@ const rom_entry *grip_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( grip_mem, AS_PROGRAM, 8, grip_device )
-    AM_RANGE(0x0000, 0x3fff) AM_ROM
-    AM_RANGE(0x4000, 0x47ff) AM_RAM
-    AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
 ADDRESS_MAP_END
 
 
@@ -320,18 +320,18 @@ READ8_MEMBER( grip_device::ppi_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ECB bus D0
-        PA1     ECB bus D1
-        PA2     ECB bus D2
-        PA3     ECB bus D3
-        PA4     ECB bus D4
-        PA5     ECB bus D5
-        PA6     ECB bus D6
-        PA7     ECB bus D7
+	    PA0     ECB bus D0
+	    PA1     ECB bus D1
+	    PA2     ECB bus D2
+	    PA3     ECB bus D3
+	    PA4     ECB bus D4
+	    PA5     ECB bus D5
+	    PA6     ECB bus D6
+	    PA7     ECB bus D7
 
-    */
+	*/
 
 	return m_ppi_pa;
 }
@@ -340,18 +340,18 @@ WRITE8_MEMBER( grip_device::ppi_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ECB bus D0
-        PA1     ECB bus D1
-        PA2     ECB bus D2
-        PA3     ECB bus D3
-        PA4     ECB bus D4
-        PA5     ECB bus D5
-        PA6     ECB bus D6
-        PA7     ECB bus D7
+	    PA0     ECB bus D0
+	    PA1     ECB bus D1
+	    PA2     ECB bus D2
+	    PA3     ECB bus D3
+	    PA4     ECB bus D4
+	    PA5     ECB bus D5
+	    PA6     ECB bus D6
+	    PA7     ECB bus D7
 
-    */
+	*/
 
 	m_ppi_pa = data;
 }
@@ -360,18 +360,18 @@ READ8_MEMBER( grip_device::ppi_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     Keyboard input
-        PB1     Keyboard input
-        PB2     Keyboard input
-        PB3     Keyboard input
-        PB4     Keyboard input
-        PB5     Keyboard input
-        PB6     Keyboard input
-        PB7     Keyboard input
+	    PB0     Keyboard input
+	    PB1     Keyboard input
+	    PB2     Keyboard input
+	    PB3     Keyboard input
+	    PB4     Keyboard input
+	    PB5     Keyboard input
+	    PB6     Keyboard input
+	    PB7     Keyboard input
 
-    */
+	*/
 
 	return m_keydata;
 }
@@ -380,18 +380,18 @@ WRITE8_MEMBER( grip_device::ppi_pc_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        PC0     INTRB       interrupt B output (keyboard)
-        PC1     KBF         input buffer B full output (keyboard)
-        PC2     _KBSTB      strobe B input (keyboard)
-        PC3     INTRA       interrupt A output (PROF-80)
-        PC4     _STBA       strobe A input (PROF-80)
-        PC5     IBFA        input buffer A full output (PROF-80)
-        PC6     _ACKA       acknowledge A input (PROF-80)
-        PC7     _OBFA       output buffer full output (PROF-80)
+	    PC0     INTRB       interrupt B output (keyboard)
+	    PC1     KBF         input buffer B full output (keyboard)
+	    PC2     _KBSTB      strobe B input (keyboard)
+	    PC3     INTRA       interrupt A output (PROF-80)
+	    PC4     _STBA       strobe A input (PROF-80)
+	    PC5     IBFA        input buffer A full output (PROF-80)
+	    PC6     _ACKA       acknowledge A input (PROF-80)
+	    PC7     _OBFA       output buffer full output (PROF-80)
 
-    */
+	*/
 
 	// keyboard interrupt
 	m_ib = BIT(data, 0);
@@ -410,12 +410,12 @@ WRITE8_MEMBER( grip_device::ppi_pc_w )
 
 static I8255A_INTERFACE( ppi_intf )
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pa_r),	// Port A read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pa_w),	// Port A write
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pb_r),	// Port B read
-	DEVCB_NULL,														// Port B write
-	DEVCB_NULL,														// Port C read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pc_w)	// Port C write
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pa_r),  // Port A read
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pa_w),  // Port A write
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pb_r),  // Port B read
+	DEVCB_NULL,                                                     // Port B write
+	DEVCB_NULL,                                                     // Port C read
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, ppi_pc_w)   // Port C write
 };
 
 
@@ -427,18 +427,18 @@ READ8_MEMBER( grip_device::sti_gpio_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        I0      _CTS        RS-232 clear to send input
-        I1      DE          MC6845 display enable input
-        I2      CURSOR      MC6845 cursor input
-        I3      BUSY        Centronics busy input
-        I4      IB          PPI8255 PC0 input
-        I5      _SKBD       Serial keyboard input
-        I6      EXIN        External interrupt input
-        I7      IA          PPI8255 PC3 input
+	    I0      _CTS        RS-232 clear to send input
+	    I1      DE          MC6845 display enable input
+	    I2      CURSOR      MC6845 cursor input
+	    I3      BUSY        Centronics busy input
+	    I4      IB          PPI8255 PC0 input
+	    I5      _SKBD       Serial keyboard input
+	    I6      EXIN        External interrupt input
+	    I7      IA          PPI8255 PC3 input
 
-    */
+	*/
 
 	UINT8 data = 0x20;
 
@@ -469,17 +469,17 @@ WRITE_LINE_MEMBER( grip_device::speaker_w )
 
 static Z80STI_INTERFACE( sti_intf )
 {
-	0,														// serial receive clock
-	0,														// serial transmit clock
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),			// interrupt
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, sti_gpio_r),	// GPIO read
-	DEVCB_NULL,												// GPIO write
-	DEVCB_NULL,												// serial input
-	DEVCB_NULL,												// serial output
-	DEVCB_NULL,												// timer A output
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, grip_device, speaker_w),	// timer B output
-	DEVCB_LINE(z80sti_tc_w),								// timer C output
-	DEVCB_LINE(z80sti_rc_w)									// timer D output
+	0,                                                      // serial receive clock
+	0,                                                      // serial transmit clock
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),         // interrupt
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, sti_gpio_r),    // GPIO read
+	DEVCB_NULL,                                             // GPIO write
+	DEVCB_NULL,                                             // serial input
+	DEVCB_NULL,                                             // serial output
+	DEVCB_NULL,                                             // timer A output
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, grip_device, speaker_w),    // timer B output
+	DEVCB_LINE(z80sti_tc_w),                                // timer C output
+	DEVCB_LINE(z80sti_rc_w)                                 // timer D output
 };
 
 
@@ -526,19 +526,19 @@ static ASCII_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( grip )
-    // basic machine hardware
+	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_CONFIG(grip_daisy_chain)
-    MCFG_CPU_PROGRAM_MAP(grip_mem)
-    MCFG_CPU_IO_MAP(grip_io)
+	MCFG_CPU_PROGRAM_MAP(grip_mem)
+	MCFG_CPU_IO_MAP(grip_io)
 
-    // video hardware
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-    MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	// video hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -777,18 +777,18 @@ READ8_MEMBER( grip_device::stat_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       LPA0
-        1       LPA1
-        2       LPA2
-        3       SENSE
-        4       JS0
-        5       JS1
-        6       _ERROR
-        7       LPSTB       light pen strobe
+	    0       LPA0
+	    1       LPA1
+	    2       LPA2
+	    3       SENSE
+	    4       JS0
+	    5       JS1
+	    6       _ERROR
+	    7       LPSTB       light pen strobe
 
-    */
+	*/
 
 	UINT8 data = 0;
 	int js0 = 0, js1 = 0;

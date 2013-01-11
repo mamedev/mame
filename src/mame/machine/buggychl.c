@@ -269,5 +269,3 @@ void buggychl_mcu_device::device_reset()
 {
 	DEVICE_RESET_NAME( buggychl_mcu )(this);
 }
-
-

@@ -133,7 +133,7 @@ extern const rgb_t specimx_palette[16];
 /*----------- defined in audio/special.c -----------*/
 
 class specimx_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

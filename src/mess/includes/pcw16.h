@@ -7,7 +7,7 @@
 #ifndef PCW16_H_
 #define PCW16_H_
 
-#include "machine/upd765.h"		/* FDC superio */
+#include "machine/upd765.h"     /* FDC superio */
 
 #define PCW16_BORDER_HEIGHT 8
 #define PCW16_BORDER_WIDTH 8
@@ -15,8 +15,8 @@
 #define PCW16_DISPLAY_WIDTH 640
 #define PCW16_DISPLAY_HEIGHT 480
 
-#define PCW16_SCREEN_WIDTH	(PCW16_DISPLAY_WIDTH + (PCW16_BORDER_WIDTH<<1))
-#define PCW16_SCREEN_HEIGHT	(PCW16_DISPLAY_HEIGHT  + (PCW16_BORDER_HEIGHT<<1))
+#define PCW16_SCREEN_WIDTH  (PCW16_DISPLAY_WIDTH + (PCW16_BORDER_WIDTH<<1))
+#define PCW16_SCREEN_HEIGHT (PCW16_DISPLAY_HEIGHT  + (PCW16_BORDER_HEIGHT<<1))
 
 
 class pcw16_state : public driver_device

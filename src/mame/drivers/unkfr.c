@@ -20,7 +20,7 @@ class unkfr_state : public driver_device
 {
 public:
 	unkfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)	{ }
+		: driver_device(mconfig, type, tag) { }
 };
 
 static INPUT_PORTS_START( unkfr )

@@ -24,7 +24,7 @@
 
 snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_EVPC, "SNUG Enhanced Video Processor Card", tag, owner, clock),
-  device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this)
 {
 	m_shortname = "ti99_evpc";
 }
@@ -72,7 +72,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
 	{
 		if ((offset & m_select_mask)==m_select_value)
 		{
-			if ((offset & 0x1ff0)==0x1ff0)				// Palette control
+			if ((offset & 0x1ff0)==0x1ff0)              // Palette control
 			{
 				switch (offset & 0x000f)
 				{
@@ -365,4 +365,3 @@ ioport_constructor snug_enhanced_video_device::device_input_ports() const
 }
 
 const device_type TI99_EVPC = &device_creator<snug_enhanced_video_device>;
-

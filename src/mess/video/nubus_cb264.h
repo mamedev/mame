@@ -17,8 +17,8 @@ class nubus_cb264_device :
 		public device_nubus_card_interface
 {
 public:
-        // construction/destruction
-        nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		nubus_cb264_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
@@ -27,19 +27,19 @@ public:
 
 		UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 
-        DECLARE_READ32_MEMBER(cb264_r);
-        DECLARE_WRITE32_MEMBER(cb264_w);
-        DECLARE_READ32_MEMBER(cb264_ramdac_r);
-        DECLARE_WRITE32_MEMBER(cb264_ramdac_w);
+		DECLARE_READ32_MEMBER(cb264_r);
+		DECLARE_WRITE32_MEMBER(cb264_w);
+		DECLARE_READ32_MEMBER(cb264_ramdac_r);
+		DECLARE_WRITE32_MEMBER(cb264_ramdac_w);
 
 public:
-        UINT8 *m_vram;
-        UINT32 m_cb264_mode, m_cb264_vbl_disable, m_cb264_toggle;
-        UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
+		UINT8 *m_vram;
+		UINT32 m_cb264_mode, m_cb264_vbl_disable, m_cb264_toggle;
+		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 
 

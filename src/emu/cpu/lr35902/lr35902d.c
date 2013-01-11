@@ -25,12 +25,12 @@
 
 enum e_mnemonics
 {
-	zADC,  zADD,  zAND,  zBIT,	zCALL, zCCF,  zCP,
-	zCPL,  zDAA,  zDB,	 zDEC,	zDI,   zEI,   zHLT,
-	zIN,   zINC,  zJP,	 zJR,	zLD,   zNOP,  zOR,
-	zPOP,  zPUSH, zRES,  zRET,	zRETI, zRL,   zRLA,
-	zRLC,  zRLCA, zRR,	 zRRA,	zRRC,  zRRCA, zRST,
-	zSBC,  zSCF,  zSET,  zSLA,	zSLL,  zSRA,  zSRL,
+	zADC,  zADD,  zAND,  zBIT,  zCALL, zCCF,  zCP,
+	zCPL,  zDAA,  zDB,   zDEC,  zDI,   zEI,   zHLT,
+	zIN,   zINC,  zJP,   zJR,   zLD,   zNOP,  zOR,
+	zPOP,  zPUSH, zRES,  zRET,  zRETI, zRL,   zRLA,
+	zRLC,  zRLCA, zRR,   zRRA,  zRRC,  zRRCA, zRST,
+	zSBC,  zSCF,  zSET,  zSLA,  zSLL,  zSRA,  zSRL,
 	zSTOP, zSUB,  zXOR,  zSWAP
 };
 
@@ -60,7 +60,7 @@ static const UINT32 s_flags[] = {
 
 struct lr35902dasm
 {
-	UINT8	mnemonic;
+	UINT8   mnemonic;
 	const char *arguments;
 };
 
@@ -132,11 +132,11 @@ static const lr35902dasm mnemonic_cb[256] = {
 };
 
 static const lr35902dasm mnemonic_main[256]= {
-	{zNOP,0},		{zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
+	{zNOP,0},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,0},
 	{zLD,"(W),sp"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
 	{zINC,"c"},     {zDEC,"c"},     {zLD,"c,B"},    {zRRCA,0},
-	{zSTOP,0},		{zLD,"de,N"},   {zLD,"(de),a"}, {zINC,"de"},
+	{zSTOP,0},      {zLD,"de,N"},   {zLD,"(de),a"}, {zINC,"de"},
 	{zINC,"d"},     {zDEC,"d"},     {zLD,"d,B"},    {zRLA,0},
 	{zJR,"O"},      {zADD,"hl,de"}, {zLD,"a,(de)"}, {zDEC,"de"},
 	{zINC,"e"},     {zDEC,"e"},     {zLD,"e,B"},    {zRRA,0},

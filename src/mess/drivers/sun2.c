@@ -132,4 +132,3 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
 COMP( 1984, sun2_50,   0,       0,       sun2,      sun2, driver_device,     0,  "Sun Microsystems", "Sun 2/50", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1984, sun2_120,  0,       0,       sun2,      sun2, driver_device,     0,  "Sun Microsystems", "Sun 2/120", GAME_NOT_WORKING | GAME_NO_SOUND)
-

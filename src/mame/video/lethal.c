@@ -80,7 +80,7 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 
 	switch (offset)
 	{
-		case 0:	// 40c8 - PCU1 from schematics
+		case 0: // 40c8 - PCU1 from schematics
 			m_layer_colorbase[0] = ((data & 0x7) - 1) * 0x40;
 			m_layer_colorbase[1] = (((data >> 4) & 0x7) - 1) * 0x40;
 			k056832_mark_plane_dirty(m_k056832, 0);
@@ -94,7 +94,7 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 			k056832_mark_plane_dirty(m_k056832, 3);
 			break;
 
-		case 8:	// 40d0 - PCU3 from schematics
+		case 8: // 40d0 - PCU3 from schematics
 			m_sprite_colorbase = ((data & 0x7) - 1) * 0x40;
 			break;
 	}

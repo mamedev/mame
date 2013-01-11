@@ -21,7 +21,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define IEEE488_TAG			"ieee_bus"
+#define IEEE488_TAG         "ieee_bus"
 
 
 
@@ -30,8 +30,8 @@
 //**************************************************************************
 
 #define MCFG_IEEE488_BUS_ADD(_config) \
-    MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0) \
-    MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 #define IEEE488_INTERFACE(_name) \
@@ -39,7 +39,7 @@
 
 
 #define MCFG_IEEE488_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, IEEE488_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, IEEE488_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	ieee488_slot_device::static_set_slot(*device, _num);
 
@@ -53,14 +53,14 @@
 
 struct ieee488_interface
 {
-	devcb_write_line	m_out_eoi_cb;
-	devcb_write_line	m_out_dav_cb;
-	devcb_write_line	m_out_nrfd_cb;
-	devcb_write_line	m_out_ndac_cb;
-	devcb_write_line	m_out_ifc_cb;
-	devcb_write_line	m_out_srq_cb;
-	devcb_write_line	m_out_atn_cb;
-	devcb_write_line	m_out_ren_cb;
+	devcb_write_line    m_out_eoi_cb;
+	devcb_write_line    m_out_dav_cb;
+	devcb_write_line    m_out_nrfd_cb;
+	devcb_write_line    m_out_ndac_cb;
+	devcb_write_line    m_out_ifc_cb;
+	devcb_write_line    m_out_srq_cb;
+	devcb_write_line    m_out_atn_cb;
+	devcb_write_line    m_out_ren_cb;
 };
 
 
@@ -69,7 +69,7 @@ struct ieee488_interface
 class device_ieee488_interface;
 
 class ieee488_device : public device_t,
-					   public ieee488_interface
+						public ieee488_interface
 {
 public:
 	// construction/destruction
@@ -127,8 +127,8 @@ protected:
 	};
 
 	// device-level overrides
-    virtual void device_start();
-    virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_config_complete();
 	virtual void device_stop();
 
 	class daisy_entry
@@ -137,9 +137,9 @@ protected:
 		daisy_entry(device_t *device);
 		daisy_entry *next() const { return m_next; }
 
-		daisy_entry *				m_next;			// next device
-		device_t *					m_device;		// associated device
-		device_ieee488_interface *	m_interface;	// associated device's daisy interface
+		daisy_entry *               m_next;         // next device
+		device_t *                  m_device;       // associated device
+		device_ieee488_interface *  m_interface;    // associated device's daisy interface
 
 		int m_line[SIGNAL_COUNT];
 		UINT8 m_dio;
@@ -148,14 +148,14 @@ protected:
 	simple_list<daisy_entry> m_device_list;
 
 private:
-	devcb_resolved_write_line	m_out_eoi_func;
-	devcb_resolved_write_line	m_out_dav_func;
-	devcb_resolved_write_line	m_out_nrfd_func;
-	devcb_resolved_write_line	m_out_ndac_func;
-	devcb_resolved_write_line	m_out_ifc_func;
-	devcb_resolved_write_line	m_out_srq_func;
-	devcb_resolved_write_line	m_out_atn_func;
-	devcb_resolved_write_line	m_out_ren_func;
+	devcb_resolved_write_line   m_out_eoi_func;
+	devcb_resolved_write_line   m_out_dav_func;
+	devcb_resolved_write_line   m_out_nrfd_func;
+	devcb_resolved_write_line   m_out_ndac_func;
+	devcb_resolved_write_line   m_out_ifc_func;
+	devcb_resolved_write_line   m_out_srq_func;
+	devcb_resolved_write_line   m_out_atn_func;
+	devcb_resolved_write_line   m_out_ren_func;
 
 	inline void set_signal(device_t *device, int signal, int state);
 	inline int get_signal(int signal);
@@ -179,8 +179,8 @@ public:
 	// device-level overrides
 	virtual void device_start();
 
-    // inline configuration
-    static void static_set_slot(device_t &device, int address);
+	// inline configuration
+	static void static_set_slot(device_t &device, int address);
 
 private:
 	// configuration

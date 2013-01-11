@@ -472,11 +472,11 @@ static MACHINE_CONFIG_START( sprint8, sprint8_state )
 
 	/* sound hardware */
 	/* the proper way is to hook up 4 speakers, but they are not really
-     * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
-	MCFG_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)		/* front */
-	MCFG_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)		/* left */
-	MCFG_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)	/* back */
-	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)		/* right */
+	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
+	MCFG_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)      /* front */
+	MCFG_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)     /* left */
+	MCFG_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)    /* back */
+	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)      /* right */
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(sprint8)

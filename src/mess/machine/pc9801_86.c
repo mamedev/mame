@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	NEC PC-9801-86 sound card
+    NEC PC-9801-86 sound card
 
-	Almost the same thing as PC-9801-86, but this one has YM2608 instead of
-	YM2203
+    Almost the same thing as PC-9801-86, but this one has YM2608 instead of
+    YM2203
 
-	TODO:
-	- joystick code should be shared between -26, -86 and -118
+    TODO:
+    - joystick code should be shared between -26, -86 and -118
 
 ***************************************************************************/
 
@@ -128,7 +128,7 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock),
-//		m_maincpu(*owner, "maincpu"),
+//      m_maincpu(*owner, "maincpu"),
 		m_opna(*this, "opna")
 {
 
@@ -183,7 +183,7 @@ void pc9801_86_device::device_reset()
 {
 	UINT16 port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
 	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_w), this) );
-//	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_w), this) );
+//  install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_w), this) );
 
 }
 

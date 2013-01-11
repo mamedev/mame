@@ -85,11 +85,11 @@ public:
 
 	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_lcd(*this, "lcd")
-    { }
+			m_maincpu(*this, "maincpu"),
+			m_lcd(*this, "lcd")
+	{ }
 
-    required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcd;
 
 	UINT8 cur_p1, cur_p2;
@@ -106,7 +106,7 @@ public:
 
 static ADDRESS_MAP_START( mu100_map, AS_PROGRAM, 16, mu100_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM	// 128K work RAM
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM // 128K work RAM
 ADDRESS_MAP_END
 
 // model detect.  pulled to GND (0) on MU100.
@@ -212,4 +212,3 @@ ROM_START( mu100 )
 ROM_END
 
 CONS( 1997, mu100, 0, 0, mu100, mu100, driver_device, 0, "Yamaha", "MU100", GAME_NOT_WORKING )
-

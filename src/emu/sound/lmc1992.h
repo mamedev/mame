@@ -67,12 +67,12 @@ enum
 
 // ======================> lmc1992_device
 
-class lmc1992_device :	public device_t,
+class lmc1992_device :  public device_t,
 						public device_sound_interface
 {
 public:
-    // construction/destruction
-    lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_config(device_t &device, int clock2);
@@ -82,8 +82,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 
 	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -93,19 +93,19 @@ private:
 
 	sound_stream *m_stream[4];
 
-	int m_enable;					// enable latch
-	int m_data;						// data latch
-	int m_clk;						// clock latch
-	UINT16 m_si;					// serial in shift register
+	int m_enable;                   // enable latch
+	int m_data;                     // data latch
+	int m_clk;                      // clock latch
+	UINT16 m_si;                    // serial in shift register
 
-	int m_input;					// input select
-	int m_bass;						// bass
-	int m_treble;					// treble
-	int m_volume;					// volume
-	int m_fader_rf;					// right front fader
-	int m_fader_lf;					// left front fader
-	int m_fader_rr;					// right rear fader
-	int m_fader_lr;					// left rear fader
+	int m_input;                    // input select
+	int m_bass;                     // bass
+	int m_treble;                   // treble
+	int m_volume;                   // volume
+	int m_fader_rf;                 // right front fader
+	int m_fader_lf;                 // left front fader
+	int m_fader_rr;                 // right rear fader
+	int m_fader_lr;                 // left rear fader
 };
 
 

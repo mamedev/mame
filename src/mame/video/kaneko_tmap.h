@@ -64,4 +64,3 @@ private:
 
 
 extern const device_type KANEKO_TMAP;
-

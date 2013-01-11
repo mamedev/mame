@@ -141,7 +141,7 @@ static DEVICE_START( k056800 )
 {
 	k056800_state *k056800 = k056800_get_safe_token(device);
 	const k056800_interface *intf = k056800_get_interface(device);
-	attotime timer_period = attotime::from_hz(44100) * 128;	// roughly 2.9us
+	attotime timer_period = attotime::from_hz(44100) * 128; // roughly 2.9us
 
 	k056800->irq_cb = intf->irq_cb;
 
@@ -198,5 +198,3 @@ void k056800_device::device_reset()
 {
 	DEVICE_RESET_NAME( k056800 )(this);
 }
-
-

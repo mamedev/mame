@@ -58,7 +58,7 @@ READ16_MEMBER(twincobr_state::twincobr_dsp_r)
 		case 0x50000:  {address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
 						break;}
-		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",space.device().safe_pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w));
 	return input_data;
@@ -69,12 +69,12 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_w)
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
 	switch (m_main_ram_seg) {
-		case 0x30000:	if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		case 0x30000:   if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
 		case 0x40000:
 		case 0x50000:  {address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
 						break;}
-		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",space.device().safe_pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
@@ -104,9 +104,9 @@ READ16_MEMBER(twincobr_state::wardner_dsp_r)
 		case 0x8000:
 		case 0xa000:   {address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 						input_data =  mainspace.read_byte(m_main_ram_seg + (m_dsp_addr_w + 0))
-								   | (mainspace.read_byte(m_main_ram_seg + (m_dsp_addr_w + 1)) << 8);
+									| (mainspace.read_byte(m_main_ram_seg + (m_dsp_addr_w + 1)) << 8);
 						break;}
-		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",space.device().safe_pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w));
 	return input_data;
@@ -117,13 +117,13 @@ WRITE16_MEMBER(twincobr_state::wardner_dsp_w)
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
 	switch (m_main_ram_seg) {
-		case 0x7000:	if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		case 0x7000:    if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
 		case 0x8000:
 		case 0xa000:   {address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 						mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 0), (data & 0xff));
 						mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 1), ((data >> 8) & 0xff));
 						break;}
-		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",space.device().safe_pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",space.device().safe_pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
@@ -204,8 +204,8 @@ static void toaplan0_control_w(running_machine &machine, int offset, int data)
 	LOG(("%s:Writing %08x to %08x.\n",machine.describe_context(),data,toaplan_port_type[state->m_toaplan_main_cpu] - offset));
 
 	if (state->m_toaplan_main_cpu == 1) {
-		if (data == 0x0c) { data = 0x1c; state->m_wardner_sprite_hack=0; }	/* Z80 ? */
-		if (data == 0x0d) { data = 0x1d; state->m_wardner_sprite_hack=1; }	/* Z80 ? */
+		if (data == 0x0c) { data = 0x1c; state->m_wardner_sprite_hack=0; }  /* Z80 ? */
+		if (data == 0x0d) { data = 0x1d; state->m_wardner_sprite_hack=1; }  /* Z80 ? */
 	}
 
 	switch (data) {
@@ -217,8 +217,8 @@ static void toaplan0_control_w(running_machine &machine, int offset, int data)
 		case 0x0009: state->m_bg_ram_bank = 0x1000; break;
 		case 0x000a: state->m_fg_rom_bank = 0x0000; break;
 		case 0x000b: state->m_fg_rom_bank = 0x1000; break;
-		case 0x000c: twincobr_dsp(machine, 1); break;	 /* Enable the INT line to the DSP */
-		case 0x000d: twincobr_dsp(machine, 0); break;	 /* Inhibit the INT line to the DSP */
+		case 0x000c: twincobr_dsp(machine, 1); break;    /* Enable the INT line to the DSP */
+		case 0x000d: twincobr_dsp(machine, 0); break;    /* Inhibit the INT line to the DSP */
 		case 0x000e: twincobr_display(machine, 0); break; /* Turn display off */
 		case 0x000f: twincobr_display(machine, 1); break; /* Turn display on */
 	}
@@ -267,13 +267,13 @@ static void toaplan0_coin_dsp_w(address_space &space, int offset, int data)
 		case 0x0e: coin_lockout_w(space.machine(), 1,1); break;
 		case 0x0f: coin_lockout_w(space.machine(), 1,0); break;
 		/****** The following apply to Flying Shark/Wardner only ******/
-		case 0x00:	/* This means assert the INT line to the DSP */
+		case 0x00:  /* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));
 					space.machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					space.machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
 					space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 					break;
-		case 0x01:	/* This means inhibit the INT line to the DSP */
+		case 0x01:  /* This means inhibit the INT line to the DSP */
 					LOG(("Turning DSP off\n"));
 					space.machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
 					space.machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -304,7 +304,7 @@ WRITE8_MEMBER(twincobr_state::wardner_coin_dsp_w)
 MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 {
 
-	m_toaplan_main_cpu = 0;		/* 68000 */
+	m_toaplan_main_cpu = 0;     /* 68000 */
 	twincobr_display(machine(), 0);
 	m_intenable = 0;
 	m_dsp_addr_w = 0;
@@ -319,7 +319,7 @@ MACHINE_RESET_MEMBER(twincobr_state,wardner)
 {
 	MACHINE_RESET_CALL_MEMBER(twincobr);
 
-	m_toaplan_main_cpu = 1;		/* Z80 */
+	m_toaplan_main_cpu = 1;     /* Z80 */
 	twincobr_display(machine(), 1);
 }
 

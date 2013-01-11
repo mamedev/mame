@@ -150,9 +150,9 @@ const ttl74145_interface sym1_ttl74145_intf =
 	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_74145_output_4_w),  /* connected to DS4 */
 	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_74145_output_5_w),  /* connected to DS5 */
 	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w),
-	DEVCB_NULL,	/* not connected */
-	DEVCB_NULL,	/* not connected */
-	DEVCB_NULL	/* not connected */
+	DEVCB_NULL, /* not connected */
+	DEVCB_NULL, /* not connected */
+	DEVCB_NULL  /* not connected */
 };
 
 
@@ -290,7 +290,7 @@ DRIVER_INIT_MEMBER(sym1_state,sym1)
 void sym1_state::machine_reset()
 {
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
-       so that the CPU can find its reset vectors */
+	   so that the CPU can find its reset vectors */
 	machine().device( "maincpu")->memory().space( AS_PROGRAM ).install_read_bank(0xf800, 0xffff, "bank1");
 	machine().device( "maincpu")->memory().space( AS_PROGRAM ).nop_write(0xf800, 0xffff);
 	membank("bank1")->set_base(m_monitor + 0x800);

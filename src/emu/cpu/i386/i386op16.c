@@ -9,31 +9,31 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 
 		switch( (modrm >> 3) & 0x7 )
 		{
-			case 0:			/* ROL rm16, 1 */
+			case 0:         /* ROL rm16, 1 */
 				cpustate->CF = (src & 0x8000) ? 1 : 0;
 				dst = (src << 1) + cpustate->CF;
 				cpustate->OF = ((src ^ dst) & 0x8000) ? 1 : 0;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 1:			/* ROR rm16, 1 */
+			case 1:         /* ROR rm16, 1 */
 				cpustate->CF = (src & 0x1) ? 1 : 0;
 				dst = (cpustate->CF << 15) | (src >> 1);
 				cpustate->OF = ((src ^ dst) & 0x8000) ? 1 : 0;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 2:			/* RCL rm16, 1 */
+			case 2:         /* RCL rm16, 1 */
 				dst = (src << 1) + cpustate->CF;
 				cpustate->CF = (src & 0x8000) ? 1 : 0;
 				cpustate->OF = ((src ^ dst) & 0x8000) ? 1 : 0;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_CARRY_REG, CYCLES_ROTATE_CARRY_MEM);
 				break;
-			case 3:			/* RCR rm16, 1 */
+			case 3:         /* RCR rm16, 1 */
 				dst = (cpustate->CF << 15) | (src >> 1);
 				cpustate->CF = src & 0x1;
 				cpustate->OF = ((src ^ dst) & 0x8000) ? 1 : 0;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_CARRY_REG, CYCLES_ROTATE_CARRY_MEM);
 				break;
-			case 4:			/* SHL/SAL rm16, 1 */
+			case 4:         /* SHL/SAL rm16, 1 */
 			case 6:
 				dst = src << 1;
 				cpustate->CF = (src & 0x8000) ? 1 : 0;
@@ -41,14 +41,14 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 				SetSZPF16(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 5:			/* SHR rm16, 1 */
+			case 5:         /* SHR rm16, 1 */
 				dst = src >> 1;
 				cpustate->CF = src & 0x1;
 				cpustate->OF = (dst & 0x8000) ? 1 : 0;
 				SetSZPF16(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 7:			/* SAR rm16, 1 */
+			case 7:         /* SAR rm16, 1 */
 				dst = (INT16)(src) >> 1;
 				cpustate->CF = src & 0x1;
 				cpustate->OF = 0;
@@ -60,7 +60,7 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 
 		switch( (modrm >> 3) & 0x7 )
 		{
-			case 0:			/* ROL rm16, i8 */
+			case 0:         /* ROL rm16, i8 */
 				if(!(shift & 15))
 				{
 					if(shift & 16)
@@ -72,12 +72,12 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 				}
 				shift &= 15;
 				dst = ((src & ((UINT16)0xffff >> shift)) << shift) |
-					  ((src & ((UINT16)0xffff << (16-shift))) >> (16-shift));
+						((src & ((UINT16)0xffff << (16-shift))) >> (16-shift));
 				cpustate->CF = dst & 0x1;
 				cpustate->OF = (dst & 1) ^ (dst >> 15);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 1:			/* ROR rm16, i8 */
+			case 1:         /* ROR rm16, i8 */
 				if(!(shift & 15))
 				{
 					if(shift & 16)
@@ -89,30 +89,30 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 				}
 				shift &= 15;
 				dst = ((src & ((UINT16)0xffff << shift)) >> shift) |
-					  ((src & ((UINT16)0xffff >> (16-shift))) << (16-shift));
+						((src & ((UINT16)0xffff >> (16-shift))) << (16-shift));
 				cpustate->CF = (dst >> 15) & 1;
 				cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 2:			/* RCL rm16, i8 */
+			case 2:         /* RCL rm16, i8 */
 				shift %= 17;
 				dst = ((src & ((UINT16)0xffff >> shift)) << shift) |
-					  ((src & ((UINT16)0xffff << (17-shift))) >> (17-shift)) |
-					  (cpustate->CF << (shift-1));
+						((src & ((UINT16)0xffff << (17-shift))) >> (17-shift)) |
+						(cpustate->CF << (shift-1));
 				if(shift) cpustate->CF = (src >> (16-shift)) & 0x1;
 				cpustate->OF = cpustate->CF ^ ((dst >> 15) & 1);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_CARRY_REG, CYCLES_ROTATE_CARRY_MEM);
 				break;
-			case 3:			/* RCR rm16, i8 */
+			case 3:         /* RCR rm16, i8 */
 				shift %= 17;
 				dst = ((src & ((UINT16)0xffff << shift)) >> shift) |
-					  ((src & ((UINT16)0xffff >> (16-shift))) << (17-shift)) |
-					  (cpustate->CF << (16-shift));
+						((src & ((UINT16)0xffff >> (16-shift))) << (17-shift)) |
+						(cpustate->CF << (16-shift));
 				if(shift) cpustate->CF = (src >> (shift-1)) & 0x1;
 				cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_CARRY_REG, CYCLES_ROTATE_CARRY_MEM);
 				break;
-			case 4:			/* SHL/SAL rm16, i8 */
+			case 4:         /* SHL/SAL rm16, i8 */
 			case 6:
 				shift &= 31;
 				dst = src << shift;
@@ -120,14 +120,14 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 				SetSZPF16(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 5:			/* SHR rm16, i8 */
+			case 5:         /* SHR rm16, i8 */
 				shift &= 31;
 				dst = src >> shift;
 				cpustate->CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
-			case 7:			/* SAR rm16, i8 */
+			case 7:         /* SAR rm16, i8 */
 				shift &= 31;
 				dst = (INT16)src >> shift;
 				cpustate->CF = (src & (1 << (shift-1))) ? 1 : 0;
@@ -142,7 +142,7 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 
 
 
-static void I386OP(adc_rm16_r16)(i386_state *cpustate)		// Opcode 0x11
+static void I386OP(adc_rm16_r16)(i386_state *cpustate)      // Opcode 0x11
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -162,7 +162,7 @@ static void I386OP(adc_rm16_r16)(i386_state *cpustate)		// Opcode 0x11
 	}
 }
 
-static void I386OP(adc_r16_rm16)(i386_state *cpustate)		// Opcode 0x13
+static void I386OP(adc_r16_rm16)(i386_state *cpustate)      // Opcode 0x13
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -182,7 +182,7 @@ static void I386OP(adc_r16_rm16)(i386_state *cpustate)		// Opcode 0x13
 	}
 }
 
-static void I386OP(adc_ax_i16)(i386_state *cpustate)		// Opcode 0x15
+static void I386OP(adc_ax_i16)(i386_state *cpustate)        // Opcode 0x15
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -192,7 +192,7 @@ static void I386OP(adc_ax_i16)(i386_state *cpustate)		// Opcode 0x15
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
 
-static void I386OP(add_rm16_r16)(i386_state *cpustate)		// Opcode 0x01
+static void I386OP(add_rm16_r16)(i386_state *cpustate)      // Opcode 0x01
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -212,7 +212,7 @@ static void I386OP(add_rm16_r16)(i386_state *cpustate)		// Opcode 0x01
 	}
 }
 
-static void I386OP(add_r16_rm16)(i386_state *cpustate)		// Opcode 0x03
+static void I386OP(add_r16_rm16)(i386_state *cpustate)      // Opcode 0x03
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -232,7 +232,7 @@ static void I386OP(add_r16_rm16)(i386_state *cpustate)		// Opcode 0x03
 	}
 }
 
-static void I386OP(add_ax_i16)(i386_state *cpustate)		// Opcode 0x05
+static void I386OP(add_ax_i16)(i386_state *cpustate)        // Opcode 0x05
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -242,7 +242,7 @@ static void I386OP(add_ax_i16)(i386_state *cpustate)		// Opcode 0x05
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
 
-static void I386OP(and_rm16_r16)(i386_state *cpustate)		// Opcode 0x21
+static void I386OP(and_rm16_r16)(i386_state *cpustate)      // Opcode 0x21
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -262,7 +262,7 @@ static void I386OP(and_rm16_r16)(i386_state *cpustate)		// Opcode 0x21
 	}
 }
 
-static void I386OP(and_r16_rm16)(i386_state *cpustate)		// Opcode 0x23
+static void I386OP(and_r16_rm16)(i386_state *cpustate)      // Opcode 0x23
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -282,7 +282,7 @@ static void I386OP(and_r16_rm16)(i386_state *cpustate)		// Opcode 0x23
 	}
 }
 
-static void I386OP(and_ax_i16)(i386_state *cpustate)		// Opcode 0x25
+static void I386OP(and_ax_i16)(i386_state *cpustate)        // Opcode 0x25
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -292,7 +292,7 @@ static void I386OP(and_ax_i16)(i386_state *cpustate)		// Opcode 0x25
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
 
-static void I386OP(bsf_r16_rm16)(i386_state *cpustate)		// Opcode 0x0f bc
+static void I386OP(bsf_r16_rm16)(i386_state *cpustate)      // Opcode 0x0f bc
 {
 	UINT16 src, dst, temp;
 	UINT8 modrm = FETCH(cpustate);
@@ -321,7 +321,7 @@ static void I386OP(bsf_r16_rm16)(i386_state *cpustate)		// Opcode 0x0f bc
 	CYCLES(cpustate,CYCLES_BSF_BASE);
 }
 
-static void I386OP(bsr_r16_rm16)(i386_state *cpustate)		// Opcode 0x0f bd
+static void I386OP(bsr_r16_rm16)(i386_state *cpustate)      // Opcode 0x0f bd
 {
 	UINT16 src, dst, temp;
 	UINT8 modrm = FETCH(cpustate);
@@ -351,7 +351,7 @@ static void I386OP(bsr_r16_rm16)(i386_state *cpustate)		// Opcode 0x0f bd
 }
 
 
-static void I386OP(bt_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f a3
+static void I386OP(bt_rm16_r16)(i386_state *cpustate)       // Opcode 0x0f a3
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -382,7 +382,7 @@ static void I386OP(bt_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f a3
 	}
 }
 
-static void I386OP(btc_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f bb
+static void I386OP(btc_rm16_r16)(i386_state *cpustate)      // Opcode 0x0f bb
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -417,7 +417,7 @@ static void I386OP(btc_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f bb
 	}
 }
 
-static void I386OP(btr_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f b3
+static void I386OP(btr_rm16_r16)(i386_state *cpustate)      // Opcode 0x0f b3
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -452,7 +452,7 @@ static void I386OP(btr_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f b3
 	}
 }
 
-static void I386OP(bts_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f ab
+static void I386OP(bts_rm16_r16)(i386_state *cpustate)      // Opcode 0x0f ab
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -487,7 +487,7 @@ static void I386OP(bts_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f ab
 	}
 }
 
-static void I386OP(call_abs16)(i386_state *cpustate)		// Opcode 0x9a
+static void I386OP(call_abs16)(i386_state *cpustate)        // Opcode 0x9a
 {
 	UINT16 offset = FETCH16(cpustate);
 	UINT16 ptr = FETCH16(cpustate);
@@ -505,11 +505,11 @@ static void I386OP(call_abs16)(i386_state *cpustate)		// Opcode 0x9a
 		cpustate->eip = offset;
 		i386_load_segment_descriptor(cpustate,CS);
 	}
-	CYCLES(cpustate,CYCLES_CALL_INTERSEG);		/* TODO: Timing = 17 + m */
+	CYCLES(cpustate,CYCLES_CALL_INTERSEG);      /* TODO: Timing = 17 + m */
 	CHANGE_PC(cpustate,cpustate->eip);
 }
 
-static void I386OP(call_rel16)(i386_state *cpustate)		// Opcode 0xe8
+static void I386OP(call_rel16)(i386_state *cpustate)        // Opcode 0xe8
 {
 	INT16 disp = FETCH16(cpustate);
 
@@ -523,16 +523,16 @@ static void I386OP(call_rel16)(i386_state *cpustate)		// Opcode 0xe8
 		cpustate->eip = (cpustate->eip + disp) & 0xffff;
 	}
 	CHANGE_PC(cpustate,cpustate->eip);
-	CYCLES(cpustate,CYCLES_CALL);		/* TODO: Timing = 7 + m */
+	CYCLES(cpustate,CYCLES_CALL);       /* TODO: Timing = 7 + m */
 }
 
-static void I386OP(cbw)(i386_state *cpustate)				// Opcode 0x98
+static void I386OP(cbw)(i386_state *cpustate)               // Opcode 0x98
 {
 	REG16(AX) = (INT16)((INT8)REG8(AL));
 	CYCLES(cpustate,CYCLES_CBW);
 }
 
-static void I386OP(cmp_rm16_r16)(i386_state *cpustate)		// Opcode 0x39
+static void I386OP(cmp_rm16_r16)(i386_state *cpustate)      // Opcode 0x39
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -550,7 +550,7 @@ static void I386OP(cmp_rm16_r16)(i386_state *cpustate)		// Opcode 0x39
 	}
 }
 
-static void I386OP(cmp_r16_rm16)(i386_state *cpustate)		// Opcode 0x3b
+static void I386OP(cmp_r16_rm16)(i386_state *cpustate)      // Opcode 0x3b
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -568,7 +568,7 @@ static void I386OP(cmp_r16_rm16)(i386_state *cpustate)		// Opcode 0x3b
 	}
 }
 
-static void I386OP(cmp_ax_i16)(i386_state *cpustate)		// Opcode 0x3d
+static void I386OP(cmp_ax_i16)(i386_state *cpustate)        // Opcode 0x3d
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -577,7 +577,7 @@ static void I386OP(cmp_ax_i16)(i386_state *cpustate)		// Opcode 0x3d
 	CYCLES(cpustate,CYCLES_CMP_IMM_ACC);
 }
 
-static void I386OP(cmpsw)(i386_state *cpustate)				// Opcode 0xa7
+static void I386OP(cmpsw)(i386_state *cpustate)             // Opcode 0xa7
 {
 	UINT32 eas, ead;
 	UINT16 src, dst;
@@ -595,7 +595,7 @@ static void I386OP(cmpsw)(i386_state *cpustate)				// Opcode 0xa7
 	CYCLES(cpustate,CYCLES_CMPS);
 }
 
-static void I386OP(cwd)(i386_state *cpustate)				// Opcode 0x99
+static void I386OP(cwd)(i386_state *cpustate)               // Opcode 0x99
 {
 	if( REG16(AX) & 0x8000 ) {
 		REG16(DX) = 0xffff;
@@ -605,66 +605,66 @@ static void I386OP(cwd)(i386_state *cpustate)				// Opcode 0x99
 	CYCLES(cpustate,CYCLES_CWD);
 }
 
-static void I386OP(dec_ax)(i386_state *cpustate)			// Opcode 0x48
+static void I386OP(dec_ax)(i386_state *cpustate)            // Opcode 0x48
 {
 	REG16(AX) = DEC16(cpustate, REG16(AX) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(dec_cx)(i386_state *cpustate)			// Opcode 0x49
+static void I386OP(dec_cx)(i386_state *cpustate)            // Opcode 0x49
 {
 	REG16(CX) = DEC16(cpustate, REG16(CX) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(dec_dx)(i386_state *cpustate)			// Opcode 0x4a
+static void I386OP(dec_dx)(i386_state *cpustate)            // Opcode 0x4a
 {
 	REG16(DX) = DEC16(cpustate, REG16(DX) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(dec_bx)(i386_state *cpustate)			// Opcode 0x4b
+static void I386OP(dec_bx)(i386_state *cpustate)            // Opcode 0x4b
 {
 	REG16(BX) = DEC16(cpustate, REG16(BX) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(dec_sp)(i386_state *cpustate)			// Opcode 0x4c
+static void I386OP(dec_sp)(i386_state *cpustate)            // Opcode 0x4c
 {
 	REG16(SP) = DEC16(cpustate, REG16(SP) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(dec_bp)(i386_state *cpustate)			// Opcode 0x4d
+static void I386OP(dec_bp)(i386_state *cpustate)            // Opcode 0x4d
 {
 	REG16(BP) = DEC16(cpustate, REG16(BP) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(dec_si)(i386_state *cpustate)			// Opcode 0x4e
+static void I386OP(dec_si)(i386_state *cpustate)            // Opcode 0x4e
 {
 	REG16(SI) = DEC16(cpustate, REG16(SI) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(dec_di)(i386_state *cpustate)			// Opcode 0x4f
+static void I386OP(dec_di)(i386_state *cpustate)            // Opcode 0x4f
 {
 	REG16(DI) = DEC16(cpustate, REG16(DI) );
 	CYCLES(cpustate,CYCLES_DEC_REG);
 }
 
-static void I386OP(imul_r16_rm16)(i386_state *cpustate)		// Opcode 0x0f af
+static void I386OP(imul_r16_rm16)(i386_state *cpustate)     // Opcode 0x0f af
 {
 	UINT8 modrm = FETCH(cpustate);
 	INT32 result;
 	INT32 src, dst;
 	if( modrm >= 0xc0 ) {
 		src = (INT32)(INT16)LOAD_RM16(modrm);
-		CYCLES(cpustate,CYCLES_IMUL16_REG_REG);		/* TODO: Correct multiply timing */
+		CYCLES(cpustate,CYCLES_IMUL16_REG_REG);     /* TODO: Correct multiply timing */
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = (INT32)(INT16)READ16(cpustate,ea);
-		CYCLES(cpustate,CYCLES_IMUL16_REG_MEM);		/* TODO: Correct multiply timing */
+		CYCLES(cpustate,CYCLES_IMUL16_REG_MEM);     /* TODO: Correct multiply timing */
 	}
 
 	dst = (INT32)(INT16)LOAD_REG16(modrm);
@@ -675,18 +675,18 @@ static void I386OP(imul_r16_rm16)(i386_state *cpustate)		// Opcode 0x0f af
 	cpustate->CF = cpustate->OF = !(result == (INT32)(INT16)result);
 }
 
-static void I386OP(imul_r16_rm16_i16)(i386_state *cpustate)	// Opcode 0x69
+static void I386OP(imul_r16_rm16_i16)(i386_state *cpustate) // Opcode 0x69
 {
 	UINT8 modrm = FETCH(cpustate);
 	INT32 result;
 	INT32 src, dst;
 	if( modrm >= 0xc0 ) {
 		dst = (INT32)(INT16)LOAD_RM16(modrm);
-		CYCLES(cpustate,CYCLES_IMUL16_REG_IMM_REG);		/* TODO: Correct multiply timing */
+		CYCLES(cpustate,CYCLES_IMUL16_REG_IMM_REG);     /* TODO: Correct multiply timing */
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm,0);
 		dst = (INT32)(INT16)READ16(cpustate,ea);
-		CYCLES(cpustate,CYCLES_IMUL16_MEM_IMM_REG);		/* TODO: Correct multiply timing */
+		CYCLES(cpustate,CYCLES_IMUL16_MEM_IMM_REG);     /* TODO: Correct multiply timing */
 	}
 
 	src = (INT32)(INT16)FETCH16(cpustate);
@@ -697,18 +697,18 @@ static void I386OP(imul_r16_rm16_i16)(i386_state *cpustate)	// Opcode 0x69
 	cpustate->CF = cpustate->OF = !(result == (INT32)(INT16)result);
 }
 
-static void I386OP(imul_r16_rm16_i8)(i386_state *cpustate)	// Opcode 0x6b
+static void I386OP(imul_r16_rm16_i8)(i386_state *cpustate)  // Opcode 0x6b
 {
 	UINT8 modrm = FETCH(cpustate);
 	INT32 result;
 	INT32 src, dst;
 	if( modrm >= 0xc0 ) {
 		dst = (INT32)(INT16)LOAD_RM16(modrm);
-		CYCLES(cpustate,CYCLES_IMUL16_REG_IMM_REG);		/* TODO: Correct multiply timing */
+		CYCLES(cpustate,CYCLES_IMUL16_REG_IMM_REG);     /* TODO: Correct multiply timing */
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm,0);
 		dst = (INT32)(INT16)READ16(cpustate,ea);
-		CYCLES(cpustate,CYCLES_IMUL16_MEM_IMM_REG);		/* TODO: Correct multiply timing */
+		CYCLES(cpustate,CYCLES_IMUL16_MEM_IMM_REG);     /* TODO: Correct multiply timing */
 	}
 
 	src = (INT32)(INT8)FETCH(cpustate);
@@ -719,7 +719,7 @@ static void I386OP(imul_r16_rm16_i8)(i386_state *cpustate)	// Opcode 0x6b
 	cpustate->CF = cpustate->OF = !(result == (INT32)(INT16)result);
 }
 
-static void I386OP(in_ax_i8)(i386_state *cpustate)			// Opcode 0xe5
+static void I386OP(in_ax_i8)(i386_state *cpustate)          // Opcode 0xe5
 {
 	UINT16 port = FETCH(cpustate);
 	UINT16 data = READPORT16(cpustate, port);
@@ -727,7 +727,7 @@ static void I386OP(in_ax_i8)(i386_state *cpustate)			// Opcode 0xe5
 	CYCLES(cpustate,CYCLES_IN_VAR);
 }
 
-static void I386OP(in_ax_dx)(i386_state *cpustate)			// Opcode 0xed
+static void I386OP(in_ax_dx)(i386_state *cpustate)          // Opcode 0xed
 {
 	UINT16 port = REG16(DX);
 	UINT16 data = READPORT16(cpustate, port);
@@ -735,55 +735,55 @@ static void I386OP(in_ax_dx)(i386_state *cpustate)			// Opcode 0xed
 	CYCLES(cpustate,CYCLES_IN);
 }
 
-static void I386OP(inc_ax)(i386_state *cpustate)			// Opcode 0x40
+static void I386OP(inc_ax)(i386_state *cpustate)            // Opcode 0x40
 {
 	REG16(AX) = INC16(cpustate, REG16(AX) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(inc_cx)(i386_state *cpustate)			// Opcode 0x41
+static void I386OP(inc_cx)(i386_state *cpustate)            // Opcode 0x41
 {
 	REG16(CX) = INC16(cpustate, REG16(CX) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(inc_dx)(i386_state *cpustate)			// Opcode 0x42
+static void I386OP(inc_dx)(i386_state *cpustate)            // Opcode 0x42
 {
 	REG16(DX) = INC16(cpustate, REG16(DX) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(inc_bx)(i386_state *cpustate)			// Opcode 0x43
+static void I386OP(inc_bx)(i386_state *cpustate)            // Opcode 0x43
 {
 	REG16(BX) = INC16(cpustate, REG16(BX) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(inc_sp)(i386_state *cpustate)			// Opcode 0x44
+static void I386OP(inc_sp)(i386_state *cpustate)            // Opcode 0x44
 {
 	REG16(SP) = INC16(cpustate, REG16(SP) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(inc_bp)(i386_state *cpustate)			// Opcode 0x45
+static void I386OP(inc_bp)(i386_state *cpustate)            // Opcode 0x45
 {
 	REG16(BP) = INC16(cpustate, REG16(BP) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(inc_si)(i386_state *cpustate)			// Opcode 0x46
+static void I386OP(inc_si)(i386_state *cpustate)            // Opcode 0x46
 {
 	REG16(SI) = INC16(cpustate, REG16(SI) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(inc_di)(i386_state *cpustate)			// Opcode 0x47
+static void I386OP(inc_di)(i386_state *cpustate)            // Opcode 0x47
 {
 	REG16(DI) = INC16(cpustate, REG16(DI) );
 	CYCLES(cpustate,CYCLES_INC_REG);
 }
 
-static void I386OP(iret16)(i386_state *cpustate)			// Opcode 0xcf
+static void I386OP(iret16)(i386_state *cpustate)            // Opcode 0xcf
 {
 	if( PROTECTED_MODE )
 	{
@@ -802,7 +802,7 @@ static void I386OP(iret16)(i386_state *cpustate)			// Opcode 0xcf
 	CYCLES(cpustate,CYCLES_IRET);
 }
 
-static void I386OP(ja_rel16)(i386_state *cpustate)			// Opcode 0x0f 87
+static void I386OP(ja_rel16)(i386_state *cpustate)          // Opcode 0x0f 87
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->CF == 0 && cpustate->ZF == 0 ) {
@@ -815,13 +815,13 @@ static void I386OP(ja_rel16)(i386_state *cpustate)			// Opcode 0x0f 87
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jbe_rel16)(i386_state *cpustate)			// Opcode 0x0f 86
+static void I386OP(jbe_rel16)(i386_state *cpustate)         // Opcode 0x0f 86
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->CF != 0 || cpustate->ZF != 0 ) {
@@ -834,13 +834,13 @@ static void I386OP(jbe_rel16)(i386_state *cpustate)			// Opcode 0x0f 86
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jc_rel16)(i386_state *cpustate)			// Opcode 0x0f 82
+static void I386OP(jc_rel16)(i386_state *cpustate)          // Opcode 0x0f 82
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->CF != 0 ) {
@@ -853,13 +853,13 @@ static void I386OP(jc_rel16)(i386_state *cpustate)			// Opcode 0x0f 82
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jg_rel16)(i386_state *cpustate)			// Opcode 0x0f 8f
+static void I386OP(jg_rel16)(i386_state *cpustate)          // Opcode 0x0f 8f
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->ZF == 0 && (cpustate->SF == cpustate->OF) ) {
@@ -872,13 +872,13 @@ static void I386OP(jg_rel16)(i386_state *cpustate)			// Opcode 0x0f 8f
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jge_rel16)(i386_state *cpustate)			// Opcode 0x0f 8d
+static void I386OP(jge_rel16)(i386_state *cpustate)         // Opcode 0x0f 8d
 {
 	INT16 disp = FETCH16(cpustate);
 	if(cpustate->SF == cpustate->OF) {
@@ -891,13 +891,13 @@ static void I386OP(jge_rel16)(i386_state *cpustate)			// Opcode 0x0f 8d
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jl_rel16)(i386_state *cpustate)			// Opcode 0x0f 8c
+static void I386OP(jl_rel16)(i386_state *cpustate)          // Opcode 0x0f 8c
 {
 	INT16 disp = FETCH16(cpustate);
 	if( (cpustate->SF != cpustate->OF) ) {
@@ -910,13 +910,13 @@ static void I386OP(jl_rel16)(i386_state *cpustate)			// Opcode 0x0f 8c
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jle_rel16)(i386_state *cpustate)			// Opcode 0x0f 8e
+static void I386OP(jle_rel16)(i386_state *cpustate)         // Opcode 0x0f 8e
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->ZF != 0 || (cpustate->SF != cpustate->OF) ) {
@@ -929,13 +929,13 @@ static void I386OP(jle_rel16)(i386_state *cpustate)			// Opcode 0x0f 8e
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jnc_rel16)(i386_state *cpustate)			// Opcode 0x0f 83
+static void I386OP(jnc_rel16)(i386_state *cpustate)         // Opcode 0x0f 83
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->CF == 0 ) {
@@ -948,13 +948,13 @@ static void I386OP(jnc_rel16)(i386_state *cpustate)			// Opcode 0x0f 83
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jno_rel16)(i386_state *cpustate)			// Opcode 0x0f 81
+static void I386OP(jno_rel16)(i386_state *cpustate)         // Opcode 0x0f 81
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->OF == 0 ) {
@@ -967,13 +967,13 @@ static void I386OP(jno_rel16)(i386_state *cpustate)			// Opcode 0x0f 81
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jnp_rel16)(i386_state *cpustate)			// Opcode 0x0f 8b
+static void I386OP(jnp_rel16)(i386_state *cpustate)         // Opcode 0x0f 8b
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->PF == 0 ) {
@@ -986,13 +986,13 @@ static void I386OP(jnp_rel16)(i386_state *cpustate)			// Opcode 0x0f 8b
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jns_rel16)(i386_state *cpustate)			// Opcode 0x0f 89
+static void I386OP(jns_rel16)(i386_state *cpustate)         // Opcode 0x0f 89
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->SF == 0 ) {
@@ -1005,13 +1005,13 @@ static void I386OP(jns_rel16)(i386_state *cpustate)			// Opcode 0x0f 89
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jnz_rel16)(i386_state *cpustate)			// Opcode 0x0f 85
+static void I386OP(jnz_rel16)(i386_state *cpustate)         // Opcode 0x0f 85
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->ZF == 0 ) {
@@ -1024,13 +1024,13 @@ static void I386OP(jnz_rel16)(i386_state *cpustate)			// Opcode 0x0f 85
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jo_rel16)(i386_state *cpustate)			// Opcode 0x0f 80
+static void I386OP(jo_rel16)(i386_state *cpustate)          // Opcode 0x0f 80
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->OF != 0 ) {
@@ -1043,13 +1043,13 @@ static void I386OP(jo_rel16)(i386_state *cpustate)			// Opcode 0x0f 80
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jp_rel16)(i386_state *cpustate)			// Opcode 0x0f 8a
+static void I386OP(jp_rel16)(i386_state *cpustate)          // Opcode 0x0f 8a
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->PF != 0 ) {
@@ -1062,13 +1062,13 @@ static void I386OP(jp_rel16)(i386_state *cpustate)			// Opcode 0x0f 8a
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(js_rel16)(i386_state *cpustate)			// Opcode 0x0f 88
+static void I386OP(js_rel16)(i386_state *cpustate)          // Opcode 0x0f 88
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->SF != 0 ) {
@@ -1081,13 +1081,13 @@ static void I386OP(js_rel16)(i386_state *cpustate)			// Opcode 0x0f 88
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jz_rel16)(i386_state *cpustate)			// Opcode 0x0f 84
+static void I386OP(jz_rel16)(i386_state *cpustate)          // Opcode 0x0f 84
 {
 	INT16 disp = FETCH16(cpustate);
 	if( cpustate->ZF != 0 ) {
@@ -1100,13 +1100,13 @@ static void I386OP(jz_rel16)(i386_state *cpustate)			// Opcode 0x0f 84
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);		/* TODO: Timing = 7 + m */
+		CYCLES(cpustate,CYCLES_JCC_FULL_DISP);      /* TODO: Timing = 7 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCC_FULL_DISP_NOBRANCH);
 	}
 }
 
-static void I386OP(jcxz16)(i386_state *cpustate)			// Opcode 0xe3
+static void I386OP(jcxz16)(i386_state *cpustate)            // Opcode 0xe3
 {
 	INT8 disp = FETCH(cpustate);
 	int val = (cpustate->address_size)?(REG32(ECX) == 0):(REG16(CX) == 0);
@@ -1120,13 +1120,13 @@ static void I386OP(jcxz16)(i386_state *cpustate)			// Opcode 0xe3
 			cpustate->eip = (cpustate->eip + disp) & 0xffff;
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
-		CYCLES(cpustate,CYCLES_JCXZ);		/* TODO: Timing = 9 + m */
+		CYCLES(cpustate,CYCLES_JCXZ);       /* TODO: Timing = 9 + m */
 	} else {
 		CYCLES(cpustate,CYCLES_JCXZ_NOBRANCH);
 	}
 }
 
-static void I386OP(jmp_rel16)(i386_state *cpustate)			// Opcode 0xe9
+static void I386OP(jmp_rel16)(i386_state *cpustate)         // Opcode 0xe9
 {
 	INT16 disp = FETCH16(cpustate);
 
@@ -1139,10 +1139,10 @@ static void I386OP(jmp_rel16)(i386_state *cpustate)			// Opcode 0xe9
 		cpustate->eip = (cpustate->eip + disp) & 0xffff;
 	}
 	CHANGE_PC(cpustate,cpustate->eip);
-	CYCLES(cpustate,CYCLES_JMP);		/* TODO: Timing = 7 + m */
+	CYCLES(cpustate,CYCLES_JMP);        /* TODO: Timing = 7 + m */
 }
 
-static void I386OP(jmp_abs16)(i386_state *cpustate)			// Opcode 0xea
+static void I386OP(jmp_abs16)(i386_state *cpustate)         // Opcode 0xea
 {
 	UINT16 address = FETCH16(cpustate);
 	UINT16 segment = FETCH16(cpustate);
@@ -1162,7 +1162,7 @@ static void I386OP(jmp_abs16)(i386_state *cpustate)			// Opcode 0xea
 	CYCLES(cpustate,CYCLES_JMP_INTERSEG);
 }
 
-static void I386OP(lea16)(i386_state *cpustate)				// Opcode 0x8d
+static void I386OP(lea16)(i386_state *cpustate)             // Opcode 0x8d
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT32 ea = GetNonTranslatedEA(cpustate,modrm,NULL);
@@ -1170,7 +1170,7 @@ static void I386OP(lea16)(i386_state *cpustate)				// Opcode 0x8d
 	CYCLES(cpustate,CYCLES_LEA);
 }
 
-static void I386OP(enter16)(i386_state *cpustate)			// Opcode 0xc8
+static void I386OP(enter16)(i386_state *cpustate)           // Opcode 0xc8
 {
 	UINT16 framesize = FETCH16(cpustate);
 	UINT8 level = FETCH(cpustate) % 32;
@@ -1200,7 +1200,7 @@ static void I386OP(enter16)(i386_state *cpustate)			// Opcode 0xc8
 	CYCLES(cpustate,CYCLES_ENTER);
 }
 
-static void I386OP(leave16)(i386_state *cpustate)			// Opcode 0xc9
+static void I386OP(leave16)(i386_state *cpustate)           // Opcode 0xc9
 {
 	if(!STACK_32BIT)
 		REG16(SP) = REG16(BP);
@@ -1210,7 +1210,7 @@ static void I386OP(leave16)(i386_state *cpustate)			// Opcode 0xc9
 	CYCLES(cpustate,CYCLES_LEAVE);
 }
 
-static void I386OP(lodsw)(i386_state *cpustate)				// Opcode 0xad
+static void I386OP(lodsw)(i386_state *cpustate)             // Opcode 0xad
 {
 	UINT32 eas;
 	if( cpustate->segment_prefix ) {
@@ -1223,7 +1223,7 @@ static void I386OP(lodsw)(i386_state *cpustate)				// Opcode 0xad
 	CYCLES(cpustate,CYCLES_LODS);
 }
 
-static void I386OP(loop16)(i386_state *cpustate)			// Opcode 0xe2
+static void I386OP(loop16)(i386_state *cpustate)            // Opcode 0xe2
 {
 	INT8 disp = FETCH(cpustate);
 	INT32 val = (cpustate->address_size)?(--REG32(ECX)):(--REG16(CX));
@@ -1238,10 +1238,10 @@ static void I386OP(loop16)(i386_state *cpustate)			// Opcode 0xe2
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
 	}
-	CYCLES(cpustate,CYCLES_LOOP);		/* TODO: Timing = 11 + m */
+	CYCLES(cpustate,CYCLES_LOOP);       /* TODO: Timing = 11 + m */
 }
 
-static void I386OP(loopne16)(i386_state *cpustate)			// Opcode 0xe0
+static void I386OP(loopne16)(i386_state *cpustate)          // Opcode 0xe0
 {
 	INT8 disp = FETCH(cpustate);
 	INT32 val = (cpustate->address_size)?(--REG32(ECX)):(--REG16(CX));
@@ -1256,10 +1256,10 @@ static void I386OP(loopne16)(i386_state *cpustate)			// Opcode 0xe0
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
 	}
-	CYCLES(cpustate,CYCLES_LOOPNZ);		/* TODO: Timing = 11 + m */
+	CYCLES(cpustate,CYCLES_LOOPNZ);     /* TODO: Timing = 11 + m */
 }
 
-static void I386OP(loopz16)(i386_state *cpustate)			// Opcode 0xe1
+static void I386OP(loopz16)(i386_state *cpustate)           // Opcode 0xe1
 {
 	INT8 disp = FETCH(cpustate);
 	INT32 val = (cpustate->address_size)?(--REG32(ECX)):(--REG16(CX));
@@ -1274,10 +1274,10 @@ static void I386OP(loopz16)(i386_state *cpustate)			// Opcode 0xe1
 		}
 		CHANGE_PC(cpustate,cpustate->eip);
 	}
-	CYCLES(cpustate,CYCLES_LOOPZ);		/* TODO: Timing = 11 + m */
+	CYCLES(cpustate,CYCLES_LOOPZ);      /* TODO: Timing = 11 + m */
 }
 
-static void I386OP(mov_rm16_r16)(i386_state *cpustate)		// Opcode 0x89
+static void I386OP(mov_rm16_r16)(i386_state *cpustate)      // Opcode 0x89
 {
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
@@ -1293,7 +1293,7 @@ static void I386OP(mov_rm16_r16)(i386_state *cpustate)		// Opcode 0x89
 	}
 }
 
-static void I386OP(mov_r16_rm16)(i386_state *cpustate)		// Opcode 0x8b
+static void I386OP(mov_r16_rm16)(i386_state *cpustate)      // Opcode 0x8b
 {
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
@@ -1309,7 +1309,7 @@ static void I386OP(mov_r16_rm16)(i386_state *cpustate)		// Opcode 0x8b
 	}
 }
 
-static void I386OP(mov_rm16_i16)(i386_state *cpustate)		// Opcode 0xc7
+static void I386OP(mov_rm16_i16)(i386_state *cpustate)      // Opcode 0xc7
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -1324,7 +1324,7 @@ static void I386OP(mov_rm16_i16)(i386_state *cpustate)		// Opcode 0xc7
 	}
 }
 
-static void I386OP(mov_ax_m16)(i386_state *cpustate)		// Opcode 0xa1
+static void I386OP(mov_ax_m16)(i386_state *cpustate)        // Opcode 0xa1
 {
 	UINT32 offset, ea;
 	if( cpustate->address_size ) {
@@ -1342,7 +1342,7 @@ static void I386OP(mov_ax_m16)(i386_state *cpustate)		// Opcode 0xa1
 	CYCLES(cpustate,CYCLES_MOV_MEM_ACC);
 }
 
-static void I386OP(mov_m16_ax)(i386_state *cpustate)		// Opcode 0xa3
+static void I386OP(mov_m16_ax)(i386_state *cpustate)        // Opcode 0xa3
 {
 	UINT32 offset, ea;
 	if( cpustate->address_size ) {
@@ -1360,55 +1360,55 @@ static void I386OP(mov_m16_ax)(i386_state *cpustate)		// Opcode 0xa3
 	CYCLES(cpustate,CYCLES_MOV_ACC_MEM);
 }
 
-static void I386OP(mov_ax_i16)(i386_state *cpustate)		// Opcode 0xb8
+static void I386OP(mov_ax_i16)(i386_state *cpustate)        // Opcode 0xb8
 {
 	REG16(AX) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(mov_cx_i16)(i386_state *cpustate)		// Opcode 0xb9
+static void I386OP(mov_cx_i16)(i386_state *cpustate)        // Opcode 0xb9
 {
 	REG16(CX) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(mov_dx_i16)(i386_state *cpustate)		// Opcode 0xba
+static void I386OP(mov_dx_i16)(i386_state *cpustate)        // Opcode 0xba
 {
 	REG16(DX) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(mov_bx_i16)(i386_state *cpustate)		// Opcode 0xbb
+static void I386OP(mov_bx_i16)(i386_state *cpustate)        // Opcode 0xbb
 {
 	REG16(BX) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(mov_sp_i16)(i386_state *cpustate)		// Opcode 0xbc
+static void I386OP(mov_sp_i16)(i386_state *cpustate)        // Opcode 0xbc
 {
 	REG16(SP) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(mov_bp_i16)(i386_state *cpustate)		// Opcode 0xbd
+static void I386OP(mov_bp_i16)(i386_state *cpustate)        // Opcode 0xbd
 {
 	REG16(BP) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(mov_si_i16)(i386_state *cpustate)		// Opcode 0xbe
+static void I386OP(mov_si_i16)(i386_state *cpustate)        // Opcode 0xbe
 {
 	REG16(SI) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(mov_di_i16)(i386_state *cpustate)		// Opcode 0xbf
+static void I386OP(mov_di_i16)(i386_state *cpustate)        // Opcode 0xbf
 {
 	REG16(DI) = FETCH16(cpustate);
 	CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 }
 
-static void I386OP(movsw)(i386_state *cpustate)				// Opcode 0xa5
+static void I386OP(movsw)(i386_state *cpustate)             // Opcode 0xa5
 {
 	UINT32 eas, ead;
 	UINT16 v;
@@ -1425,7 +1425,7 @@ static void I386OP(movsw)(i386_state *cpustate)				// Opcode 0xa5
 	CYCLES(cpustate,CYCLES_MOVS);
 }
 
-static void I386OP(movsx_r16_rm8)(i386_state *cpustate)		// Opcode 0x0f be
+static void I386OP(movsx_r16_rm8)(i386_state *cpustate)     // Opcode 0x0f be
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -1440,7 +1440,7 @@ static void I386OP(movsx_r16_rm8)(i386_state *cpustate)		// Opcode 0x0f be
 	}
 }
 
-static void I386OP(movzx_r16_rm8)(i386_state *cpustate)		// Opcode 0x0f b6
+static void I386OP(movzx_r16_rm8)(i386_state *cpustate)     // Opcode 0x0f b6
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -1455,7 +1455,7 @@ static void I386OP(movzx_r16_rm8)(i386_state *cpustate)		// Opcode 0x0f b6
 	}
 }
 
-static void I386OP(or_rm16_r16)(i386_state *cpustate)		// Opcode 0x09
+static void I386OP(or_rm16_r16)(i386_state *cpustate)       // Opcode 0x09
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -1475,7 +1475,7 @@ static void I386OP(or_rm16_r16)(i386_state *cpustate)		// Opcode 0x09
 	}
 }
 
-static void I386OP(or_r16_rm16)(i386_state *cpustate)		// Opcode 0x0b
+static void I386OP(or_r16_rm16)(i386_state *cpustate)       // Opcode 0x0b
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -1495,7 +1495,7 @@ static void I386OP(or_r16_rm16)(i386_state *cpustate)		// Opcode 0x0b
 	}
 }
 
-static void I386OP(or_ax_i16)(i386_state *cpustate)			// Opcode 0x0d
+static void I386OP(or_ax_i16)(i386_state *cpustate)         // Opcode 0x0d
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -1505,7 +1505,7 @@ static void I386OP(or_ax_i16)(i386_state *cpustate)			// Opcode 0x0d
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
 
-static void I386OP(out_ax_i8)(i386_state *cpustate)			// Opcode 0xe7
+static void I386OP(out_ax_i8)(i386_state *cpustate)         // Opcode 0xe7
 {
 	UINT16 port = FETCH(cpustate);
 	UINT16 data = REG16(AX);
@@ -1513,7 +1513,7 @@ static void I386OP(out_ax_i8)(i386_state *cpustate)			// Opcode 0xe7
 	CYCLES(cpustate,CYCLES_OUT_VAR);
 }
 
-static void I386OP(out_ax_dx)(i386_state *cpustate)			// Opcode 0xef
+static void I386OP(out_ax_dx)(i386_state *cpustate)         // Opcode 0xef
 {
 	UINT16 port = REG16(DX);
 	UINT16 data = REG16(AX);
@@ -1521,7 +1521,7 @@ static void I386OP(out_ax_dx)(i386_state *cpustate)			// Opcode 0xef
 	CYCLES(cpustate,CYCLES_OUT);
 }
 
-static void I386OP(pop_ax)(i386_state *cpustate)			// Opcode 0x58
+static void I386OP(pop_ax)(i386_state *cpustate)            // Opcode 0x58
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1531,7 +1531,7 @@ static void I386OP(pop_ax)(i386_state *cpustate)			// Opcode 0x58
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_cx)(i386_state *cpustate)			// Opcode 0x59
+static void I386OP(pop_cx)(i386_state *cpustate)            // Opcode 0x59
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1541,7 +1541,7 @@ static void I386OP(pop_cx)(i386_state *cpustate)			// Opcode 0x59
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_dx)(i386_state *cpustate)			// Opcode 0x5a
+static void I386OP(pop_dx)(i386_state *cpustate)            // Opcode 0x5a
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1551,7 +1551,7 @@ static void I386OP(pop_dx)(i386_state *cpustate)			// Opcode 0x5a
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_bx)(i386_state *cpustate)			// Opcode 0x5b
+static void I386OP(pop_bx)(i386_state *cpustate)            // Opcode 0x5b
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1561,7 +1561,7 @@ static void I386OP(pop_bx)(i386_state *cpustate)			// Opcode 0x5b
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_sp)(i386_state *cpustate)			// Opcode 0x5c
+static void I386OP(pop_sp)(i386_state *cpustate)            // Opcode 0x5c
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1571,7 +1571,7 @@ static void I386OP(pop_sp)(i386_state *cpustate)			// Opcode 0x5c
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_bp)(i386_state *cpustate)			// Opcode 0x5d
+static void I386OP(pop_bp)(i386_state *cpustate)            // Opcode 0x5d
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1581,7 +1581,7 @@ static void I386OP(pop_bp)(i386_state *cpustate)			// Opcode 0x5d
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_si)(i386_state *cpustate)			// Opcode 0x5e
+static void I386OP(pop_si)(i386_state *cpustate)            // Opcode 0x5e
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1591,7 +1591,7 @@ static void I386OP(pop_si)(i386_state *cpustate)			// Opcode 0x5e
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
-static void I386OP(pop_di)(i386_state *cpustate)			// Opcode 0x5f
+static void I386OP(pop_di)(i386_state *cpustate)            // Opcode 0x5f
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset+1) == 0)
@@ -1627,27 +1627,27 @@ static bool I386OP(pop_seg16)(i386_state *cpustate, int segment)
 	return true;
 }
 
-static void I386OP(pop_ds16)(i386_state *cpustate)			// Opcode 0x1f
+static void I386OP(pop_ds16)(i386_state *cpustate)          // Opcode 0x1f
 {
 	I386OP(pop_seg16)(cpustate, DS);
 }
 
-static void I386OP(pop_es16)(i386_state *cpustate)			// Opcode 0x07
+static void I386OP(pop_es16)(i386_state *cpustate)          // Opcode 0x07
 {
 	I386OP(pop_seg16)(cpustate, ES);
 }
 
-static void I386OP(pop_fs16)(i386_state *cpustate)			// Opcode 0x0f a1
+static void I386OP(pop_fs16)(i386_state *cpustate)          // Opcode 0x0f a1
 {
 	I386OP(pop_seg16)(cpustate, FS);
 }
 
-static void I386OP(pop_gs16)(i386_state *cpustate)			// Opcode 0x0f a9
+static void I386OP(pop_gs16)(i386_state *cpustate)          // Opcode 0x0f a9
 {
 	I386OP(pop_seg16)(cpustate, GS);
 }
 
-static void I386OP(pop_ss16)(i386_state *cpustate)			// Opcode 0x17
+static void I386OP(pop_ss16)(i386_state *cpustate)          // Opcode 0x17
 {
 	if(!I386OP(pop_seg16)(cpustate, SS)) return;
 	if(cpustate->IF != 0) // if external interrupts are enabled
@@ -1657,7 +1657,7 @@ static void I386OP(pop_ss16)(i386_state *cpustate)			// Opcode 0x17
 	}
 }
 
-static void I386OP(pop_rm16)(i386_state *cpustate)			// Opcode 0x8f
+static void I386OP(pop_rm16)(i386_state *cpustate)          // Opcode 0x8f
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT16 value;
@@ -1688,7 +1688,7 @@ static void I386OP(pop_rm16)(i386_state *cpustate)			// Opcode 0x8f
 	CYCLES(cpustate,CYCLES_POP_RM);
 }
 
-static void I386OP(popa)(i386_state *cpustate)				// Opcode 0x61
+static void I386OP(popa)(i386_state *cpustate)              // Opcode 0x61
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 
@@ -1708,7 +1708,7 @@ static void I386OP(popa)(i386_state *cpustate)				// Opcode 0x61
 	CYCLES(cpustate,CYCLES_POPA);
 }
 
-static void I386OP(popf)(i386_state *cpustate)				// Opcode 0x9d
+static void I386OP(popf)(i386_state *cpustate)              // Opcode 0x9d
 {
 	UINT32 value;
 	UINT32 current = get_flags(cpustate);
@@ -1744,7 +1744,7 @@ static void I386OP(popf)(i386_state *cpustate)				// Opcode 0x9d
 	CYCLES(cpustate,CYCLES_POPF);
 }
 
-static void I386OP(push_ax)(i386_state *cpustate)			// Opcode 0x50
+static void I386OP(push_ax)(i386_state *cpustate)           // Opcode 0x50
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1754,7 +1754,7 @@ static void I386OP(push_ax)(i386_state *cpustate)			// Opcode 0x50
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_cx)(i386_state *cpustate)			// Opcode 0x51
+static void I386OP(push_cx)(i386_state *cpustate)           // Opcode 0x51
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1764,7 +1764,7 @@ static void I386OP(push_cx)(i386_state *cpustate)			// Opcode 0x51
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_dx)(i386_state *cpustate)			// Opcode 0x52
+static void I386OP(push_dx)(i386_state *cpustate)           // Opcode 0x52
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1774,7 +1774,7 @@ static void I386OP(push_dx)(i386_state *cpustate)			// Opcode 0x52
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_bx)(i386_state *cpustate)			// Opcode 0x53
+static void I386OP(push_bx)(i386_state *cpustate)           // Opcode 0x53
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1784,7 +1784,7 @@ static void I386OP(push_bx)(i386_state *cpustate)			// Opcode 0x53
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_sp)(i386_state *cpustate)			// Opcode 0x54
+static void I386OP(push_sp)(i386_state *cpustate)           // Opcode 0x54
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1794,7 +1794,7 @@ static void I386OP(push_sp)(i386_state *cpustate)			// Opcode 0x54
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_bp)(i386_state *cpustate)			// Opcode 0x55
+static void I386OP(push_bp)(i386_state *cpustate)           // Opcode 0x55
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1804,7 +1804,7 @@ static void I386OP(push_bp)(i386_state *cpustate)			// Opcode 0x55
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_si)(i386_state *cpustate)			// Opcode 0x56
+static void I386OP(push_si)(i386_state *cpustate)           // Opcode 0x56
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1814,7 +1814,7 @@ static void I386OP(push_si)(i386_state *cpustate)			// Opcode 0x56
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_di)(i386_state *cpustate)			// Opcode 0x57
+static void I386OP(push_di)(i386_state *cpustate)           // Opcode 0x57
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1824,7 +1824,7 @@ static void I386OP(push_di)(i386_state *cpustate)			// Opcode 0x57
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
-static void I386OP(push_cs16)(i386_state *cpustate)			// Opcode 0x0e
+static void I386OP(push_cs16)(i386_state *cpustate)         // Opcode 0x0e
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1834,7 +1834,7 @@ static void I386OP(push_cs16)(i386_state *cpustate)			// Opcode 0x0e
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
-static void I386OP(push_ds16)(i386_state *cpustate)			// Opcode 0x1e
+static void I386OP(push_ds16)(i386_state *cpustate)         // Opcode 0x1e
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1844,7 +1844,7 @@ static void I386OP(push_ds16)(i386_state *cpustate)			// Opcode 0x1e
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
-static void I386OP(push_es16)(i386_state *cpustate)			// Opcode 0x06
+static void I386OP(push_es16)(i386_state *cpustate)         // Opcode 0x06
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1854,7 +1854,7 @@ static void I386OP(push_es16)(i386_state *cpustate)			// Opcode 0x06
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
-static void I386OP(push_fs16)(i386_state *cpustate)			// Opcode 0x0f a0
+static void I386OP(push_fs16)(i386_state *cpustate)         // Opcode 0x0f a0
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1864,7 +1864,7 @@ static void I386OP(push_fs16)(i386_state *cpustate)			// Opcode 0x0f a0
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
-static void I386OP(push_gs16)(i386_state *cpustate)			// Opcode 0x0f a8
+static void I386OP(push_gs16)(i386_state *cpustate)         // Opcode 0x0f a8
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1874,7 +1874,7 @@ static void I386OP(push_gs16)(i386_state *cpustate)			// Opcode 0x0f a8
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
-static void I386OP(push_ss16)(i386_state *cpustate)			// Opcode 0x16
+static void I386OP(push_ss16)(i386_state *cpustate)         // Opcode 0x16
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1884,7 +1884,7 @@ static void I386OP(push_ss16)(i386_state *cpustate)			// Opcode 0x16
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
-static void I386OP(push_i16)(i386_state *cpustate)			// Opcode 0x68
+static void I386OP(push_i16)(i386_state *cpustate)          // Opcode 0x68
 {
 	UINT16 value = FETCH16(cpustate);
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
@@ -1895,7 +1895,7 @@ static void I386OP(push_i16)(i386_state *cpustate)			// Opcode 0x68
 	CYCLES(cpustate,CYCLES_PUSH_IMM);
 }
 
-static void I386OP(pusha)(i386_state *cpustate)				// Opcode 0x60
+static void I386OP(pusha)(i386_state *cpustate)             // Opcode 0x60
 {
 	UINT16 temp = REG16(SP);
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
@@ -1915,7 +1915,7 @@ static void I386OP(pusha)(i386_state *cpustate)				// Opcode 0x60
 	CYCLES(cpustate,CYCLES_PUSHA);
 }
 
-static void I386OP(pushf)(i386_state *cpustate)				// Opcode 0x9c
+static void I386OP(pushf)(i386_state *cpustate)             // Opcode 0x9c
 {
 	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(i386_limit_check(cpustate,SS,offset-2) == 0)
@@ -1925,23 +1925,23 @@ static void I386OP(pushf)(i386_state *cpustate)				// Opcode 0x9c
 	CYCLES(cpustate,CYCLES_PUSHF);
 }
 
-static void I386OP(ret_near16_i16)(i386_state *cpustate)	// Opcode 0xc2
+static void I386OP(ret_near16_i16)(i386_state *cpustate)    // Opcode 0xc2
 {
 	INT16 disp = FETCH16(cpustate);
 	cpustate->eip = POP16(cpustate);
 	REG16(SP) += disp;
 	CHANGE_PC(cpustate,cpustate->eip);
-	CYCLES(cpustate,CYCLES_RET_IMM);		/* TODO: Timing = 10 + m */
+	CYCLES(cpustate,CYCLES_RET_IMM);        /* TODO: Timing = 10 + m */
 }
 
-static void I386OP(ret_near16)(i386_state *cpustate)		// Opcode 0xc3
+static void I386OP(ret_near16)(i386_state *cpustate)        // Opcode 0xc3
 {
 	cpustate->eip = POP16(cpustate);
 	CHANGE_PC(cpustate,cpustate->eip);
-	CYCLES(cpustate,CYCLES_RET);		/* TODO: Timing = 10 + m */
+	CYCLES(cpustate,CYCLES_RET);        /* TODO: Timing = 10 + m */
 }
 
-static void I386OP(sbb_rm16_r16)(i386_state *cpustate)		// Opcode 0x19
+static void I386OP(sbb_rm16_r16)(i386_state *cpustate)      // Opcode 0x19
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -1961,7 +1961,7 @@ static void I386OP(sbb_rm16_r16)(i386_state *cpustate)		// Opcode 0x19
 	}
 }
 
-static void I386OP(sbb_r16_rm16)(i386_state *cpustate)		// Opcode 0x1b
+static void I386OP(sbb_r16_rm16)(i386_state *cpustate)      // Opcode 0x1b
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -1981,7 +1981,7 @@ static void I386OP(sbb_r16_rm16)(i386_state *cpustate)		// Opcode 0x1b
 	}
 }
 
-static void I386OP(sbb_ax_i16)(i386_state *cpustate)		// Opcode 0x1d
+static void I386OP(sbb_ax_i16)(i386_state *cpustate)        // Opcode 0x1d
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -1991,7 +1991,7 @@ static void I386OP(sbb_ax_i16)(i386_state *cpustate)		// Opcode 0x1d
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
 
-static void I386OP(scasw)(i386_state *cpustate)				// Opcode 0xaf
+static void I386OP(scasw)(i386_state *cpustate)             // Opcode 0xaf
 {
 	UINT32 eas;
 	UINT16 src, dst;
@@ -2003,7 +2003,7 @@ static void I386OP(scasw)(i386_state *cpustate)				// Opcode 0xaf
 	CYCLES(cpustate,CYCLES_SCAS);
 }
 
-static void I386OP(shld16_i8)(i386_state *cpustate)			// Opcode 0x0f a4
+static void I386OP(shld16_i8)(i386_state *cpustate)         // Opcode 0x0f a4
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -2051,7 +2051,7 @@ static void I386OP(shld16_i8)(i386_state *cpustate)			// Opcode 0x0f a4
 	}
 }
 
-static void I386OP(shld16_cl)(i386_state *cpustate)			// Opcode 0x0f a5
+static void I386OP(shld16_cl)(i386_state *cpustate)         // Opcode 0x0f a5
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -2098,7 +2098,7 @@ static void I386OP(shld16_cl)(i386_state *cpustate)			// Opcode 0x0f a5
 	}
 }
 
-static void I386OP(shrd16_i8)(i386_state *cpustate)			// Opcode 0x0f ac
+static void I386OP(shrd16_i8)(i386_state *cpustate)         // Opcode 0x0f ac
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -2145,7 +2145,7 @@ static void I386OP(shrd16_i8)(i386_state *cpustate)			// Opcode 0x0f ac
 	}
 }
 
-static void I386OP(shrd16_cl)(i386_state *cpustate)			// Opcode 0x0f ad
+static void I386OP(shrd16_cl)(i386_state *cpustate)         // Opcode 0x0f ad
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -2192,7 +2192,7 @@ static void I386OP(shrd16_cl)(i386_state *cpustate)			// Opcode 0x0f ad
 	}
 }
 
-static void I386OP(stosw)(i386_state *cpustate)				// Opcode 0xab
+static void I386OP(stosw)(i386_state *cpustate)             // Opcode 0xab
 {
 	UINT32 ead;
 	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI), 1 );
@@ -2201,7 +2201,7 @@ static void I386OP(stosw)(i386_state *cpustate)				// Opcode 0xab
 	CYCLES(cpustate,CYCLES_STOS);
 }
 
-static void I386OP(sub_rm16_r16)(i386_state *cpustate)		// Opcode 0x29
+static void I386OP(sub_rm16_r16)(i386_state *cpustate)      // Opcode 0x29
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2221,7 +2221,7 @@ static void I386OP(sub_rm16_r16)(i386_state *cpustate)		// Opcode 0x29
 	}
 }
 
-static void I386OP(sub_r16_rm16)(i386_state *cpustate)		// Opcode 0x2b
+static void I386OP(sub_r16_rm16)(i386_state *cpustate)      // Opcode 0x2b
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2241,7 +2241,7 @@ static void I386OP(sub_r16_rm16)(i386_state *cpustate)		// Opcode 0x2b
 	}
 }
 
-static void I386OP(sub_ax_i16)(i386_state *cpustate)		// Opcode 0x2d
+static void I386OP(sub_ax_i16)(i386_state *cpustate)        // Opcode 0x2d
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -2251,7 +2251,7 @@ static void I386OP(sub_ax_i16)(i386_state *cpustate)		// Opcode 0x2d
 	CYCLES(cpustate,CYCLES_ALU_IMM_ACC);
 }
 
-static void I386OP(test_ax_i16)(i386_state *cpustate)		// Opcode 0xa9
+static void I386OP(test_ax_i16)(i386_state *cpustate)       // Opcode 0xa9
 {
 	UINT16 src = FETCH16(cpustate);
 	UINT16 dst = REG16(AX);
@@ -2262,7 +2262,7 @@ static void I386OP(test_ax_i16)(i386_state *cpustate)		// Opcode 0xa9
 	CYCLES(cpustate,CYCLES_TEST_IMM_ACC);
 }
 
-static void I386OP(test_rm16_r16)(i386_state *cpustate)		// Opcode 0x85
+static void I386OP(test_rm16_r16)(i386_state *cpustate)     // Opcode 0x85
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2286,7 +2286,7 @@ static void I386OP(test_rm16_r16)(i386_state *cpustate)		// Opcode 0x85
 	}
 }
 
-static void I386OP(xchg_ax_cx)(i386_state *cpustate)		// Opcode 0x91
+static void I386OP(xchg_ax_cx)(i386_state *cpustate)        // Opcode 0x91
 {
 	UINT16 temp;
 	temp = REG16(AX);
@@ -2295,7 +2295,7 @@ static void I386OP(xchg_ax_cx)(i386_state *cpustate)		// Opcode 0x91
 	CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 }
 
-static void I386OP(xchg_ax_dx)(i386_state *cpustate)		// Opcode 0x92
+static void I386OP(xchg_ax_dx)(i386_state *cpustate)        // Opcode 0x92
 {
 	UINT16 temp;
 	temp = REG16(AX);
@@ -2304,7 +2304,7 @@ static void I386OP(xchg_ax_dx)(i386_state *cpustate)		// Opcode 0x92
 	CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 }
 
-static void I386OP(xchg_ax_bx)(i386_state *cpustate)		// Opcode 0x93
+static void I386OP(xchg_ax_bx)(i386_state *cpustate)        // Opcode 0x93
 {
 	UINT16 temp;
 	temp = REG16(AX);
@@ -2313,7 +2313,7 @@ static void I386OP(xchg_ax_bx)(i386_state *cpustate)		// Opcode 0x93
 	CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 }
 
-static void I386OP(xchg_ax_sp)(i386_state *cpustate)		// Opcode 0x94
+static void I386OP(xchg_ax_sp)(i386_state *cpustate)        // Opcode 0x94
 {
 	UINT16 temp;
 	temp = REG16(AX);
@@ -2322,7 +2322,7 @@ static void I386OP(xchg_ax_sp)(i386_state *cpustate)		// Opcode 0x94
 	CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 }
 
-static void I386OP(xchg_ax_bp)(i386_state *cpustate)		// Opcode 0x95
+static void I386OP(xchg_ax_bp)(i386_state *cpustate)        // Opcode 0x95
 {
 	UINT16 temp;
 	temp = REG16(AX);
@@ -2331,7 +2331,7 @@ static void I386OP(xchg_ax_bp)(i386_state *cpustate)		// Opcode 0x95
 	CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 }
 
-static void I386OP(xchg_ax_si)(i386_state *cpustate)		// Opcode 0x96
+static void I386OP(xchg_ax_si)(i386_state *cpustate)        // Opcode 0x96
 {
 	UINT16 temp;
 	temp = REG16(AX);
@@ -2340,7 +2340,7 @@ static void I386OP(xchg_ax_si)(i386_state *cpustate)		// Opcode 0x96
 	CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 }
 
-static void I386OP(xchg_ax_di)(i386_state *cpustate)		// Opcode 0x97
+static void I386OP(xchg_ax_di)(i386_state *cpustate)        // Opcode 0x97
 {
 	UINT16 temp;
 	temp = REG16(AX);
@@ -2349,7 +2349,7 @@ static void I386OP(xchg_ax_di)(i386_state *cpustate)		// Opcode 0x97
 	CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 }
 
-static void I386OP(xchg_r16_rm16)(i386_state *cpustate)		// Opcode 0x87
+static void I386OP(xchg_r16_rm16)(i386_state *cpustate)     // Opcode 0x87
 {
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
@@ -2368,7 +2368,7 @@ static void I386OP(xchg_r16_rm16)(i386_state *cpustate)		// Opcode 0x87
 	}
 }
 
-static void I386OP(xor_rm16_r16)(i386_state *cpustate)		// Opcode 0x31
+static void I386OP(xor_rm16_r16)(i386_state *cpustate)      // Opcode 0x31
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2388,7 +2388,7 @@ static void I386OP(xor_rm16_r16)(i386_state *cpustate)		// Opcode 0x31
 	}
 }
 
-static void I386OP(xor_r16_rm16)(i386_state *cpustate)		// Opcode 0x33
+static void I386OP(xor_r16_rm16)(i386_state *cpustate)      // Opcode 0x33
 {
 	UINT16 src, dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2408,7 +2408,7 @@ static void I386OP(xor_r16_rm16)(i386_state *cpustate)		// Opcode 0x33
 	}
 }
 
-static void I386OP(xor_ax_i16)(i386_state *cpustate)		// Opcode 0x35
+static void I386OP(xor_ax_i16)(i386_state *cpustate)        // Opcode 0x35
 {
 	UINT16 src, dst;
 	src = FETCH16(cpustate);
@@ -2420,7 +2420,7 @@ static void I386OP(xor_ax_i16)(i386_state *cpustate)		// Opcode 0x35
 
 
 
-static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
+static void I386OP(group81_16)(i386_state *cpustate)        // Opcode 0x81
 {
 	UINT32 ea;
 	UINT16 src, dst;
@@ -2428,7 +2428,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 
 	switch( (modrm >> 3) & 0x7 )
 	{
-		case 0:		// ADD Rm16, i16
+		case 0:     // ADD Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2444,7 +2444,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 1:		// OR Rm16, i16
+		case 1:     // OR Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2460,7 +2460,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 2:		// ADC Rm16, i16
+		case 2:     // ADC Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2476,7 +2476,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 3:		// SBB Rm16, i16
+		case 3:     // SBB Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2492,7 +2492,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 4:		// AND Rm16, i16
+		case 4:     // AND Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2508,7 +2508,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 5:		// SUB Rm16, i16
+		case 5:     // SUB Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2524,7 +2524,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 6:		// XOR Rm16, i16
+		case 6:     // XOR Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2540,7 +2540,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 7:		// CMP Rm16, i16
+		case 7:     // CMP Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = FETCH16(cpustate);
@@ -2557,7 +2557,7 @@ static void I386OP(group81_16)(i386_state *cpustate)		// Opcode 0x81
 	}
 }
 
-static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
+static void I386OP(group83_16)(i386_state *cpustate)        // Opcode 0x83
 {
 	UINT32 ea;
 	UINT16 src, dst;
@@ -2565,7 +2565,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 
 	switch( (modrm >> 3) & 0x7 )
 	{
-		case 0:		// ADD Rm16, i16
+		case 0:     // ADD Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
@@ -2581,7 +2581,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 1:		// OR Rm16, i16
+		case 1:     // OR Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
@@ -2597,7 +2597,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 2:		// ADC Rm16, i16
+		case 2:     // ADC Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
@@ -2613,7 +2613,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 3:		// SBB Rm16, i16
+		case 3:     // SBB Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = ((UINT16)(INT16)(INT8)FETCH(cpustate));
@@ -2629,7 +2629,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 4:		// AND Rm16, i16
+		case 4:     // AND Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
@@ -2645,7 +2645,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 5:		// SUB Rm16, i16
+		case 5:     // SUB Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
@@ -2661,7 +2661,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 6:		// XOR Rm16, i16
+		case 6:     // XOR Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
@@ -2677,7 +2677,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 				CYCLES(cpustate,CYCLES_ALU_REG_MEM);
 			}
 			break;
-		case 7:		// CMP Rm16, i16
+		case 7:     // CMP Rm16, i16
 			if( modrm >= 0xc0 ) {
 				dst = LOAD_RM16(modrm);
 				src = (UINT16)(INT16)(INT8)FETCH(cpustate);
@@ -2694,7 +2694,7 @@ static void I386OP(group83_16)(i386_state *cpustate)		// Opcode 0x83
 	}
 }
 
-static void I386OP(groupC1_16)(i386_state *cpustate)		// Opcode 0xc1
+static void I386OP(groupC1_16)(i386_state *cpustate)        // Opcode 0xc1
 {
 	UINT16 dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2714,7 +2714,7 @@ static void I386OP(groupC1_16)(i386_state *cpustate)		// Opcode 0xc1
 	}
 }
 
-static void I386OP(groupD1_16)(i386_state *cpustate)		// Opcode 0xd1
+static void I386OP(groupD1_16)(i386_state *cpustate)        // Opcode 0xd1
 {
 	UINT16 dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2731,7 +2731,7 @@ static void I386OP(groupD1_16)(i386_state *cpustate)		// Opcode 0xd1
 	}
 }
 
-static void I386OP(groupD3_16)(i386_state *cpustate)		// Opcode 0xd3
+static void I386OP(groupD3_16)(i386_state *cpustate)        // Opcode 0xd3
 {
 	UINT16 dst;
 	UINT8 modrm = FETCH(cpustate);
@@ -2748,13 +2748,13 @@ static void I386OP(groupD3_16)(i386_state *cpustate)		// Opcode 0xd3
 	}
 }
 
-static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
+static void I386OP(groupF7_16)(i386_state *cpustate)        // Opcode 0xf7
 {
 	UINT8 modrm = FETCH(cpustate);
 
 	switch( (modrm >> 3) & 0x7 )
 	{
-		case 0:			/* TEST Rm16, i16 */
+		case 0:         /* TEST Rm16, i16 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				UINT16 src = FETCH16(cpustate);
@@ -2772,7 +2772,7 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 				CYCLES(cpustate,CYCLES_TEST_IMM_MEM);
 			}
 			break;
-		case 2:			/* NOT Rm16 */
+		case 2:         /* NOT Rm16 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				dst = ~dst;
@@ -2786,7 +2786,7 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 				CYCLES(cpustate,CYCLES_NOT_MEM);
 			}
 			break;
-		case 3:			/* NEG Rm16 */
+		case 3:         /* NEG Rm16 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				dst = SUB16(cpustate, 0, dst );
@@ -2800,17 +2800,17 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 				CYCLES(cpustate,CYCLES_NEG_MEM);
 			}
 			break;
-		case 4:			/* MUL AX, Rm16 */
+		case 4:         /* MUL AX, Rm16 */
 			{
 				UINT32 result;
 				UINT16 src, dst;
 				if( modrm >= 0xc0 ) {
 					src = LOAD_RM16(modrm);
-					CYCLES(cpustate,CYCLES_MUL16_ACC_REG);		/* TODO: Correct multiply timing */
+					CYCLES(cpustate,CYCLES_MUL16_ACC_REG);      /* TODO: Correct multiply timing */
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm,0);
 					src = READ16(cpustate,ea);
-					CYCLES(cpustate,CYCLES_MUL16_ACC_MEM);		/* TODO: Correct multiply timing */
+					CYCLES(cpustate,CYCLES_MUL16_ACC_MEM);      /* TODO: Correct multiply timing */
 				}
 
 				dst = REG16(AX);
@@ -2821,17 +2821,17 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 				cpustate->CF = cpustate->OF = (REG16(DX) != 0);
 			}
 			break;
-		case 5:			/* IMUL AX, Rm16 */
+		case 5:         /* IMUL AX, Rm16 */
 			{
 				INT32 result;
 				INT32 src, dst;
 				if( modrm >= 0xc0 ) {
 					src = (INT32)(INT16)LOAD_RM16(modrm);
-					CYCLES(cpustate,CYCLES_IMUL16_ACC_REG);		/* TODO: Correct multiply timing */
+					CYCLES(cpustate,CYCLES_IMUL16_ACC_REG);     /* TODO: Correct multiply timing */
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm,0);
 					src = (INT32)(INT16)READ16(cpustate,ea);
-					CYCLES(cpustate,CYCLES_IMUL16_ACC_MEM);		/* TODO: Correct multiply timing */
+					CYCLES(cpustate,CYCLES_IMUL16_ACC_MEM);     /* TODO: Correct multiply timing */
 				}
 
 				dst = (INT32)(INT16)REG16(AX);
@@ -2843,7 +2843,7 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 				cpustate->CF = cpustate->OF = !(result == (INT32)(INT16)result);
 			}
 			break;
-		case 6:			/* DIV AX, Rm16 */
+		case 6:         /* DIV AX, Rm16 */
 			{
 				UINT32 quotient, remainder, result;
 				UINT16 src;
@@ -2875,7 +2875,7 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 				}
 			}
 			break;
-		case 7:			/* IDIV AX, Rm16 */
+		case 7:         /* IDIV AX, Rm16 */
 			{
 				INT32 quotient, remainder, result;
 				UINT16 src;
@@ -2910,13 +2910,13 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 	}
 }
 
-static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
+static void I386OP(groupFF_16)(i386_state *cpustate)        // Opcode 0xff
 {
 	UINT8 modrm = FETCH(cpustate);
 
 	switch( (modrm >> 3) & 0x7 )
 	{
-		case 0:			/* INC Rm16 */
+		case 0:         /* INC Rm16 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				dst = INC16(cpustate,dst);
@@ -2930,7 +2930,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 				CYCLES(cpustate,CYCLES_INC_MEM);
 			}
 			break;
-		case 1:			/* DEC Rm16 */
+		case 1:         /* DEC Rm16 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				dst = DEC16(cpustate,dst);
@@ -2944,23 +2944,23 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 				CYCLES(cpustate,CYCLES_DEC_MEM);
 			}
 			break;
-		case 2:			/* CALL Rm16 */
+		case 2:         /* CALL Rm16 */
 			{
 				UINT16 address;
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
-					CYCLES(cpustate,CYCLES_CALL_REG);		/* TODO: Timing = 7 + m */
+					CYCLES(cpustate,CYCLES_CALL_REG);       /* TODO: Timing = 7 + m */
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ16(cpustate,ea);
-					CYCLES(cpustate,CYCLES_CALL_MEM);		/* TODO: Timing = 10 + m */
+					CYCLES(cpustate,CYCLES_CALL_MEM);       /* TODO: Timing = 10 + m */
 				}
 				PUSH16(cpustate, cpustate->eip );
 				cpustate->eip = address;
 				CHANGE_PC(cpustate,cpustate->eip);
 			}
 			break;
-		case 3:			/* CALL FAR Rm16 */
+		case 3:         /* CALL FAR Rm16 */
 			{
 				UINT16 address, selector;
 				if( modrm >= 0xc0 )
@@ -2972,7 +2972,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ16(cpustate,ea + 0);
 					selector = READ16(cpustate,ea + 2);
-					CYCLES(cpustate,CYCLES_CALL_MEM_INTERSEG);		/* TODO: Timing = 10 + m */
+					CYCLES(cpustate,CYCLES_CALL_MEM_INTERSEG);      /* TODO: Timing = 10 + m */
 
 					if(PROTECTED_MODE && !V8086_MODE)
 					{
@@ -2991,22 +2991,22 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 				}
 			}
 			break;
-		case 4:			/* JMP Rm16 */
+		case 4:         /* JMP Rm16 */
 			{
 				UINT16 address;
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
-					CYCLES(cpustate,CYCLES_JMP_REG);		/* TODO: Timing = 7 + m */
+					CYCLES(cpustate,CYCLES_JMP_REG);        /* TODO: Timing = 7 + m */
 				} else {
 					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ16(cpustate,ea);
-					CYCLES(cpustate,CYCLES_JMP_MEM);		/* TODO: Timing = 10 + m */
+					CYCLES(cpustate,CYCLES_JMP_MEM);        /* TODO: Timing = 10 + m */
 				}
 				cpustate->eip = address;
 				CHANGE_PC(cpustate,cpustate->eip);
 			}
 			break;
-		case 5:			/* JMP FAR Rm16 */
+		case 5:         /* JMP FAR Rm16 */
 			{
 				UINT16 address, selector;
 
@@ -3019,7 +3019,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ16(cpustate,ea + 0);
 					selector = READ16(cpustate,ea + 2);
-					CYCLES(cpustate,CYCLES_JMP_MEM_INTERSEG);		/* TODO: Timing = 10 + m */
+					CYCLES(cpustate,CYCLES_JMP_MEM_INTERSEG);       /* TODO: Timing = 10 + m */
 					if(PROTECTED_MODE && !V8086_MODE)
 					{
 						i386_protected_mode_jump(cpustate,selector,address,1,0);
@@ -3035,7 +3035,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 				}
 			}
 			break;
-		case 6:			/* PUSH Rm16 */
+		case 6:         /* PUSH Rm16 */
 			{
 				UINT16 value;
 				if( modrm >= 0xc0 ) {
@@ -3057,7 +3057,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)		// Opcode 0xff
 	}
 }
 
-static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
+static void I386OP(group0F00_16)(i386_state *cpustate)          // Opcode 0x0f 00
 {
 	UINT32 address, ea;
 	UINT8 modrm = FETCH(cpustate);
@@ -3066,7 +3066,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 
 	switch( (modrm >> 3) & 0x7 )
 	{
-		case 0:			/* SLDT */
+		case 0:         /* SLDT */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
 				if( modrm >= 0xc0 ) {
@@ -3083,7 +3083,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 				i386_trap(cpustate,6, 0, 0);
 			}
 			break;
-		case 1: 		/* STR */
+		case 1:         /* STR */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
 				if( modrm >= 0xc0 ) {
@@ -3100,7 +3100,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 				i386_trap(cpustate,6, 0, 0);
 			}
 			break;
-		case 2:			/* LLDT */
+		case 2:         /* LLDT */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
 				if(cpustate->CPL)
@@ -3127,7 +3127,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 			}
 			break;
 
-		case 3:			/* LTR */
+		case 3:         /* LTR */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
 				if(cpustate->CPL)
@@ -3251,7 +3251,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 	}
 }
 
-static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
+static void I386OP(group0F01_16)(i386_state *cpustate)      // Opcode 0x0f 01
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT16 address;
@@ -3259,7 +3259,7 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 
 	switch( (modrm >> 3) & 0x7 )
 	{
-		case 0:			/* SGDT */
+		case 0:         /* SGDT */
 			{
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
@@ -3272,7 +3272,7 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 				CYCLES(cpustate,CYCLES_SGDT);
 				break;
 			}
-		case 1:			/* SIDT */
+		case 1:         /* SIDT */
 			{
 				if (modrm >= 0xc0)
 				{
@@ -3288,7 +3288,7 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 				CYCLES(cpustate,CYCLES_SIDT);
 				break;
 			}
-		case 2:			/* LGDT */
+		case 2:         /* LGDT */
 			{
 				if(PROTECTED_MODE && cpustate->CPL)
 					FAULT(FAULT_GP,0)
@@ -3303,7 +3303,7 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 				CYCLES(cpustate,CYCLES_LGDT);
 				break;
 			}
-		case 3:			/* LIDT */
+		case 3:         /* LIDT */
 			{
 				if(PROTECTED_MODE && cpustate->CPL)
 					FAULT(FAULT_GP,0)
@@ -3318,7 +3318,7 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 				CYCLES(cpustate,CYCLES_LIDT);
 				break;
 			}
-		case 4:			/* SMSW */
+		case 4:         /* SMSW */
 			{
 				if( modrm >= 0xc0 ) {
 					STORE_RM16(modrm, cpustate->cr[0]);
@@ -3330,7 +3330,7 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 				}
 				break;
 			}
-		case 6:			/* LMSW */
+		case 6:         /* LMSW */
 			{
 				if(PROTECTED_MODE && cpustate->CPL)
 					FAULT(FAULT_GP,0)
@@ -3355,13 +3355,13 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 	}
 }
 
-static void I386OP(group0FBA_16)(i386_state *cpustate)		// Opcode 0x0f ba
+static void I386OP(group0FBA_16)(i386_state *cpustate)      // Opcode 0x0f ba
 {
 	UINT8 modrm = FETCH(cpustate);
 
 	switch( (modrm >> 3) & 0x7 )
 	{
-		case 4:			/* BT Rm16, i8 */
+		case 4:         /* BT Rm16, i8 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				UINT8 bit = FETCH(cpustate);
@@ -3385,7 +3385,7 @@ static void I386OP(group0FBA_16)(i386_state *cpustate)		// Opcode 0x0f ba
 				CYCLES(cpustate,CYCLES_BT_IMM_MEM);
 			}
 			break;
-		case 5:			/* BTS Rm16, i8 */
+		case 5:         /* BTS Rm16, i8 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				UINT8 bit = FETCH(cpustate);
@@ -3413,7 +3413,7 @@ static void I386OP(group0FBA_16)(i386_state *cpustate)		// Opcode 0x0f ba
 				CYCLES(cpustate,CYCLES_BTS_IMM_MEM);
 			}
 			break;
-		case 6:			/* BTR Rm16, i8 */
+		case 6:         /* BTR Rm16, i8 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				UINT8 bit = FETCH(cpustate);
@@ -3441,7 +3441,7 @@ static void I386OP(group0FBA_16)(i386_state *cpustate)		// Opcode 0x0f ba
 				CYCLES(cpustate,CYCLES_BTR_IMM_MEM);
 			}
 			break;
-		case 7:			/* BTC Rm16, i8 */
+		case 7:         /* BTC Rm16, i8 */
 			if( modrm >= 0xc0 ) {
 				UINT16 dst = LOAD_RM16(modrm);
 				UINT8 bit = FETCH(cpustate);
@@ -3603,7 +3603,7 @@ static void I386OP(lsl_r16_rm16)(i386_state *cpustate)  // Opcode 0x0f 0x03
 		i386_trap(cpustate,6, 0, 0);
 }
 
-static void I386OP(bound_r16_m16_m16)(i386_state *cpustate)	// Opcode 0x62
+static void I386OP(bound_r16_m16_m16)(i386_state *cpustate) // Opcode 0x62
 {
 	UINT8 modrm;
 	INT16 val, low, high;
@@ -3633,7 +3633,7 @@ static void I386OP(bound_r16_m16_m16)(i386_state *cpustate)	// Opcode 0x62
 	}
 }
 
-static void I386OP(retf16)(i386_state *cpustate)			// Opcode 0xcb
+static void I386OP(retf16)(i386_state *cpustate)            // Opcode 0xcb
 {
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -3650,7 +3650,7 @@ static void I386OP(retf16)(i386_state *cpustate)			// Opcode 0xcb
 	CYCLES(cpustate,CYCLES_RET_INTERSEG);
 }
 
-static void I386OP(retf_i16)(i386_state *cpustate)			// Opcode 0xca
+static void I386OP(retf_i16)(i386_state *cpustate)          // Opcode 0xca
 {
 	UINT16 count = FETCH16(cpustate);
 
@@ -3685,33 +3685,32 @@ static void I386OP(load_far_pointer16)(i386_state *cpustate, int s)
 	}
 }
 
-static void I386OP(lds16)(i386_state *cpustate)				// Opcode 0xc5
+static void I386OP(lds16)(i386_state *cpustate)             // Opcode 0xc5
 {
 	I386OP(load_far_pointer16)(cpustate, DS);
 	CYCLES(cpustate,CYCLES_LDS);
 }
 
-static void I386OP(lss16)(i386_state *cpustate)				// Opcode 0x0f 0xb2
+static void I386OP(lss16)(i386_state *cpustate)             // Opcode 0x0f 0xb2
 {
 	I386OP(load_far_pointer16)(cpustate, SS);
 	CYCLES(cpustate,CYCLES_LSS);
 }
 
-static void I386OP(les16)(i386_state *cpustate)				// Opcode 0xc4
+static void I386OP(les16)(i386_state *cpustate)             // Opcode 0xc4
 {
 	I386OP(load_far_pointer16)(cpustate, ES);
 	CYCLES(cpustate,CYCLES_LES);
 }
 
-static void I386OP(lfs16)(i386_state *cpustate)				// Opcode 0x0f 0xb4
+static void I386OP(lfs16)(i386_state *cpustate)             // Opcode 0x0f 0xb4
 {
 	I386OP(load_far_pointer16)(cpustate, FS);
 	CYCLES(cpustate,CYCLES_LFS);
 }
 
-static void I386OP(lgs16)(i386_state *cpustate)				// Opcode 0x0f 0xb5
+static void I386OP(lgs16)(i386_state *cpustate)             // Opcode 0x0f 0xb5
 {
 	I386OP(load_far_pointer16)(cpustate, GS);
 	CYCLES(cpustate,CYCLES_LGS);
 }
-

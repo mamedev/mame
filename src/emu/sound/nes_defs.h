@@ -176,33 +176,33 @@ struct apu_t
 /* vblank length table used for squares, triangle, noise */
 static const uint8 vbl_length[32] =
 {
-   5, 127, 10, 1, 19,  2, 40,  3, 80,  4, 30,  5, 7,  6, 13,  7,
-   6,   8, 12, 9, 24, 10, 48, 11, 96, 12, 36, 13, 8, 14, 16, 15
+	5, 127, 10, 1, 19,  2, 40,  3, 80,  4, 30,  5, 7,  6, 13,  7,
+	6,   8, 12, 9, 24, 10, 48, 11, 96, 12, 36, 13, 8, 14, 16, 15
 };
 
 /* frequency limit of square channels */
 static const int freq_limit[8] =
 {
-   0x3FF, 0x555, 0x666, 0x71C, 0x787, 0x7C1, 0x7E0, 0x7F0,
+	0x3FF, 0x555, 0x666, 0x71C, 0x787, 0x7C1, 0x7E0, 0x7F0,
 };
 
 /* table of noise frequencies */
 static const int noise_freq[16] =
 {
-   4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 2046
+	4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 2046
 };
 
 /* dpcm transfer freqs */
 static const int dpcm_clocks[16] =
 {
-   428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54
+	428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 85, 72, 54
 };
 
 /* ratios of pos/neg pulse for square waves */
 /* 2/16 = 12.5%, 4/16 = 25%, 8/16 = 50%, 12/16 = 75% */
 static const int duty_lut[4] =
 {
-   2, 4, 8, 12
+	2, 4, 8, 12
 };
 
 #endif /* __NES_DEFS_H__ */

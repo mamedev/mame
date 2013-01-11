@@ -31,7 +31,7 @@ struct gp9001spritelayer : gp9001layer
 
 
 class gp9001vdp_device : public device_t,
-						  public device_memory_interface
+							public device_memory_interface
 {
 public:
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -44,14 +44,14 @@ public:
 	gp9001tilemaplayer bg, top, fg;
 	gp9001spritelayer sp;
 
-	int	   tile_region; // we also use this to figure out which vdp we're using in some debug logging features
+	int    tile_region; // we also use this to figure out which vdp we're using in some debug logging features
 
 	// technically this is just rom banking, allowing the chip to see more graphic ROM, however it's easier to handle it
 	// in the chip implementation than externally for now (which would require dynamic decoding of the entire charsets every
 	// time the bank was changed)
 	int gp9001_gfxrom_is_banked;
-	int gp9001_gfxrom_bank_dirty;		/* dirty flag of object bank (for Batrider) */
-	UINT16 gp9001_gfxrom_bank[8];		/* Batrider object bank */
+	int gp9001_gfxrom_bank_dirty;       /* dirty flag of object bank (for Batrider) */
+	UINT16 gp9001_gfxrom_bank[8];       /* Batrider object bank */
 
 
 	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap );
@@ -70,8 +70,8 @@ protected:
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
-	address_space_config		m_space_config;
-	UINT8						m_gfxregion;
+	address_space_config        m_space_config;
+	UINT8                       m_gfxregion;
 
 	TILE_GET_INFO_MEMBER(get_top0_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
@@ -80,11 +80,11 @@ protected:
 
 extern const device_type GP9001_VDP;
 
-#define GP9001_BG_VRAM_SIZE   0x1000	/* Background RAM size */
-#define GP9001_FG_VRAM_SIZE   0x1000	/* Foreground RAM size */
-#define GP9001_TOP_VRAM_SIZE  0x1000	/* Top Layer  RAM size */
-#define GP9001_SPRITERAM_SIZE 0x800	/* Sprite     RAM size */
-#define GP9001_SPRITE_FLIPX 0x1000	/* Sprite flip flags */
+#define GP9001_BG_VRAM_SIZE   0x1000    /* Background RAM size */
+#define GP9001_FG_VRAM_SIZE   0x1000    /* Foreground RAM size */
+#define GP9001_TOP_VRAM_SIZE  0x1000    /* Top Layer  RAM size */
+#define GP9001_SPRITERAM_SIZE 0x800 /* Sprite     RAM size */
+#define GP9001_SPRITE_FLIPX 0x1000  /* Sprite flip flags */
 #define GP9001_SPRITE_FLIPY 0x2000
 
 

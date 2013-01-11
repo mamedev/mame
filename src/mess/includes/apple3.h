@@ -13,14 +13,14 @@
 #include "machine/applefdc.h"
 #include "machine/6522via.h"
 
-#define VAR_VM0			0x0001
-#define VAR_VM1			0x0002
-#define VAR_VM2			0x0004
-#define VAR_VM3			0x0008
-#define VAR_EXTA0		0x0010
-#define VAR_EXTA1		0x0020
-#define VAR_EXTPOWER	0x0040
-#define VAR_EXTSIDE		0x0080
+#define VAR_VM0         0x0001
+#define VAR_VM1         0x0002
+#define VAR_VM2         0x0004
+#define VAR_VM3         0x0008
+#define VAR_EXTA0       0x0010
+#define VAR_EXTA1       0x0020
+#define VAR_EXTPOWER    0x0040
+#define VAR_EXTSIDE     0x0080
 
 
 class apple3_state : public apple2_state

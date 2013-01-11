@@ -4,29 +4,29 @@
 
 <!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007
 
-    Apparently many of these have extra data tracks appended on the end, so shouldn't be considered
-    perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these
-    are considered replaceable.
+	Apparently many of these have extra data tracks appended on the end, so shouldn't be considered
+	perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these
+	are considered replaceable.
 
-    Missing CDs (to be confirmed):
-       - Akiyama Jin no Suugaku Mystery - Hihou Indo no Honoo wo Shishu Seyo NHK            NHCD4001    12/10/94
-       - Gakuraito TDF 2                                                     Pack-In-Video  PVCD-0002   01/25/91
-       - Kabuki Ittou Ryoudan                                                Hudson         HCD5070     02/24/95
-       - Super CD-ROM2 Taiken Soft-shuu                                      Hudson         HCD1027     12/13/91
-       - Tengai Makyou Kabuki Den Demo                                       Shogakukan     HCD3053     06/11/93
+	Missing CDs (to be confirmed):
+		- Akiyama Jin no Suugaku Mystery - Hihou Indo no Honoo wo Shishu Seyo NHK            NHCD4001    12/10/94
+		- Gakuraito TDF 2                                                     Pack-In-Video  PVCD-0002   01/25/91
+		- Kabuki Ittou Ryoudan                                                Hudson         HCD5070     02/24/95
+		- Super CD-ROM2 Taiken Soft-shuu                                      Hudson         HCD1027     12/13/91
+		- Tengai Makyou Kabuki Den Demo                                       Shogakukan     HCD3053     06/11/93
 
-    There appear to exist also a prototype of PC Cocoron, still undumped
+	There appear to exist also a prototype of PC Cocoron, still undumped
 
-    The USA CHDs are converted from the "Retro ISO Gaming Guild" (RIGG) which is the most complete and accurate
-    currently known for Turbo Duo CDs, and therefore are included until better reads are available.
+	The USA CHDs are converted from the "Retro ISO Gaming Guild" (RIGG) which is the most complete and accurate
+	currently known for Turbo Duo CDs, and therefore are included until better reads are available.
 
 
-    NOTE: there appears to be a problem with the either the 'REDUMP.ORG' images, or the emulation / cuesheet
-    handling.  The REDUMP.ORG images appear to have each data track as 2 seconds longer causing an additional
-    2 second offset in the cuesheet for each data track, furthermore they refuse to boot simply throwing a
-    'read error' in MESS/MAME.  Is this some kind of protection on the original discs, or just errors in the way
-    various PC software and/or emulators handle them?  There are multiple second audio offset issues with
-    several games in MESS/MAME which could be related.
+	NOTE: there appears to be a problem with the either the 'REDUMP.ORG' images, or the emulation / cuesheet
+	handling.  The REDUMP.ORG images appear to have each data track as 2 seconds longer causing an additional
+	2 second offset in the cuesheet for each data track, furthermore they refuse to boot simply throwing a
+	'read error' in MESS/MAME.  Is this some kind of protection on the original discs, or just errors in the way
+	various PC software and/or emulators handle them?  There are multiple second audio offset issues with
+	several games in MESS/MAME which could be related.
 
 -->
 

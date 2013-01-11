@@ -14,22 +14,22 @@
 
 static const char * glsl_mamebm_vsh_files [GLSL_VERTEX_SHADER_INT_NUMBER] =
 {
-   "/tmp/glsl_general.vsh"								// general
+	"/tmp/glsl_general.vsh"                             // general
 };
 
 static const char * glsl_mamebm_fsh_files [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FEAT_INT_NUMBER] =
 {
- {"/tmp/glsl_plain_idx16_lut.fsh",							// idx16 lut plain
-  "/tmp/glsl_bilinear_idx16_lut.fsh"							// idx16 lut bilinear
- },
+	{"/tmp/glsl_plain_idx16_lut.fsh",                           // idx16 lut plain
+	"/tmp/glsl_bilinear_idx16_lut.fsh"                          // idx16 lut bilinear
+	},
 
- {"/tmp/glsl_plain_rgb32_lut.fsh",							// rgb32 lut plain
-  "/tmp/glsl_bilinear_rgb32_lut.fsh"							// rgb32 lut bilinear
- },
+	{"/tmp/glsl_plain_rgb32_lut.fsh",                           // rgb32 lut plain
+	"/tmp/glsl_bilinear_rgb32_lut.fsh"                          // rgb32 lut bilinear
+	},
 
- {"/tmp/glsl_plain_rgb32_dir.fsh",							// rgb32 dir plain
-  "/tmp/glsl_bilinear_rgb32_dir.fsh"							// rgb32 dir bilinear
- }
+	{"/tmp/glsl_plain_rgb32_dir.fsh",                           // rgb32 dir plain
+	"/tmp/glsl_bilinear_rgb32_dir.fsh"                          // rgb32 dir bilinear
+	}
 };
 
 #else // GLSL_SOURCE_ON_DISK
@@ -47,38 +47,38 @@ static const char * glsl_mamebm_fsh_files [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_
 
 static const char * glsl_mamebm_vsh_sources [GLSL_VERTEX_SHADER_INT_NUMBER] =
 {
-   glsl_general_vsh_src									// general
+	glsl_general_vsh_src                                    // general
 };
 
 static const char * glsl_mamebm_fsh_sources [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FEAT_INT_NUMBER] =
 {
- {glsl_plain_idx16_lut_fsh_src,								// idx16 lut plain
-  glsl_bilinear_idx16_lut_fsh_src							// idx16 lut bilinear
- },
+	{glsl_plain_idx16_lut_fsh_src,                              // idx16 lut plain
+	glsl_bilinear_idx16_lut_fsh_src                         // idx16 lut bilinear
+	},
 
- {glsl_plain_rgb32_lut_fsh_src,								// rgb32 lut plain
-  glsl_bilinear_rgb32_lut_fsh_src							// rgb32 lut bilinear
- },
+	{glsl_plain_rgb32_lut_fsh_src,                              // rgb32 lut plain
+	glsl_bilinear_rgb32_lut_fsh_src                         // rgb32 lut bilinear
+	},
 
- {glsl_plain_rgb32_dir_fsh_src,								// rgb32 dir plain
-  glsl_bilinear_rgb32_dir_fsh_src							// rgb32 dir bilinear
- }
+	{glsl_plain_rgb32_dir_fsh_src,                              // rgb32 dir plain
+	glsl_bilinear_rgb32_dir_fsh_src                         // rgb32 dir bilinear
+	}
 };
 
 #endif // GLSL_SOURCE_ON_DISK
 
 static const char * glsl_mamebm_filter_names [GLSL_SHADER_FEAT_MAX_NUMBER] =
 {
-  "plain",
-  "bilinear",
-  "custom"
+	"plain",
+	"bilinear",
+	"custom"
 };
 
 static GLhandleARB glsl_mamebm_programs [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FEAT_MAX_NUMBER+9] =
 {
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9, .. */
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9, .. */
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9, .. */
+	{  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9, .. */
+	{  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9, .. */
+	{  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9, .. */
 };
 
 /**
@@ -86,8 +86,8 @@ static GLhandleARB glsl_mamebm_programs [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FE
  */
 static int glsl_mamebm_fsh2vsh[GLSL_SHADER_FEAT_MAX_NUMBER] =
 {
-	0,	// plain    -> general
-	0,	// bilinear -> general
+	0,  // plain    -> general
+	0,  // bilinear -> general
 	1,      // custom       -> custom
 };
 
@@ -96,14 +96,14 @@ static GLhandleARB glsl_mamebm_vsh_shader[GLSL_VERTEX_SHADER_MAX_NUMBER+9] =
 
 static GLhandleARB glsl_mamebm_fsh_shader [GLSL_SHADER_TYPE_NUMBER][GLSL_SHADER_FEAT_MAX_NUMBER+9] =
 {
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9 */
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9 */
- {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9 */
+	{  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* idx16 lut: plain, bilinear, custom0-9 */
+	{  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 lut: plain, bilinear, custom0-9 */
+	{  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  /* rgb32 dir: plain, bilinear, custom0-9 */
 };
 
 static GLhandleARB glsl_scrn_programs [10] =
 {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0  /* rgb32: custom0-9, .. */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0  /* rgb32: custom0-9, .. */
 };
 
 static GLhandleARB glsl_scrn_vsh_shader[10] =
@@ -143,7 +143,7 @@ glsl_shader_info *glsl_shader_init(void)
 {
 	int i,j, err;
 
-        err = gl_shader_loadExtention((PFNGLGETPROCADDRESSOS)SDL_GL_GetProcAddress);
+		err = gl_shader_loadExtention((PFNGLGETPROCADDRESSOS)SDL_GL_GetProcAddress);
 	if(err) return NULL;
 
 	for (i=0; !err && i<GLSL_VERTEX_SHADER_INT_NUMBER; i++)
@@ -189,7 +189,7 @@ int glsl_shader_free(glsl_shader_info *shinfo)
 	int i,j;
 
 	pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
-        glFinish();
+		glFinish();
 
 	for (i=0; i<GLSL_VERTEX_SHADER_MAX_NUMBER+9; i++)
 	{
@@ -280,4 +280,3 @@ int glsl_shader_add_scrn(glsl_shader_info *shinfo, const char * custShaderPrefix
 					NULL /*precompiled*/, fname, 0);
 	return err;
 }
-

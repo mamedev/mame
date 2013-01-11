@@ -40,13 +40,13 @@ const device_type VIC20_EXPANSION_SLOT = &device_creator<vic20_expansion_slot_de
 
 device_vic20_expansion_card_interface::device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_blk1(NULL),
-	  m_blk2(NULL),
-	  m_blk3(NULL),
-	  m_blk5(NULL),
-	  m_ram(NULL),
-	  m_nvram(NULL),
-	  m_nvram_size(0)
+		m_blk1(NULL),
+		m_blk2(NULL),
+		m_blk3(NULL),
+		m_blk5(NULL),
+		m_ram(NULL),
+		m_nvram(NULL),
+		m_nvram_size(0)
 {
 	m_slot = dynamic_cast<vic20_expansion_slot_device *>(device.owner());
 }
@@ -164,7 +164,7 @@ device_vic20_expansion_card_interface::~device_vic20_expansion_card_interface()
 //-------------------------------------------------
 
 vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, VIC20_EXPANSION_SLOT, "VIC-20 expansion port", tag, owner, clock),
+		device_t(mconfig, VIC20_EXPANSION_SLOT, "VIC-20 expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -198,9 +198,9 @@ void vic20_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-    	memset(&m_out_res_cb, 0, sizeof(m_out_res_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_res_cb, 0, sizeof(m_out_res_cb));
 	}
 
 	// set brief and instance name

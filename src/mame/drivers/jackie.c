@@ -194,7 +194,7 @@ void jackie_state::video_start()
 	m_reel2_tilemap->set_scroll_cols(64);
 	m_reel3_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -250,10 +250,10 @@ UINT32 jackie_state::screen_update_jackie(screen_device &screen, bitmap_ind16 &b
 
 void jackie_state::machine_reset()
 {
-	m_irq_enable	=	1;
-	m_nmi_enable	=	0;
-	m_hopper		=	0;
-	m_bg_enable	=	1;
+	m_irq_enable    =   1;
+	m_nmi_enable    =   0;
+	m_hopper        =   0;
+	m_bg_enable =   1;
 }
 
 
@@ -293,14 +293,14 @@ WRITE8_MEMBER(jackie_state::jackie_unk_reg3_hi_w){ jackie_unk_reg_hi_w( offset, 
 
 WRITE8_MEMBER(jackie_state::jackie_nmi_and_coins_w)
 {
-	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(machine(), 3,		data & 0x10);	// coin m_out mech
+	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
+	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
+	coin_counter_w(machine(), 2,        data & 0x08);   // key in
+	coin_counter_w(machine(), 3,        data & 0x10);   // coin m_out mech
 
-	set_led_status(machine(), 6,		data & 0x20);	// led for coin m_out / m_hopper active
+	set_led_status(machine(), 6,        data & 0x20);   // led for coin m_out / m_hopper active
 
-	m_exp_bank   = (data & 0x02) ? 1 : 0;		// expram bank number
+	m_exp_bank   = (data & 0x02) ? 1 : 0;       // expram bank number
 	m_nmi_enable = data & 0x80;     // nmi enable?
 
 	m_out[0] = data;
@@ -320,14 +320,14 @@ WRITE8_MEMBER(jackie_state::jackie_lamps_w)
     ---- -x--  Hold5 lamp.
     ---- ---x  Start lamp.
 */
-	output_set_lamp_value(1, (data >> 1) & 1);		/* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 5) & 1);		/* Lamp 2 - HOLD 2  */
-	output_set_lamp_value(3, (data >> 4) & 1);		/* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 2) & 1);		/* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data & 1));			/* Lamp 6 - START */
+	output_set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
+	output_set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
+	output_set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
+	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output_set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
+	output_set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
 
-	m_hopper			=	(~data)& 0x80;
+	m_hopper            =   (~data)& 0x80;
 
 	m_out[1] = data;
 	show_out();
@@ -371,11 +371,11 @@ static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x1000, 0x1107) AM_RAM AM_SHARE("bg_scroll2")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
 	AM_RANGE(0x5080, 0x5080) AM_WRITE(jackie_nmi_and_coins_w)
 	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")
@@ -472,9 +472,9 @@ static INPUT_PORTS_START( jackie )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_NAME("Attendent")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")    // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )	// test (press during boot)
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 
 	PORT_START("COINS")
@@ -482,8 +482,8 @@ static INPUT_PORTS_START( jackie )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Clear")	// pays out
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Togglemode")	// Used
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Clear")   // pays out
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Togglemode") // Used
 	PORT_BIT( 0xC0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BUTTONS1")
@@ -496,12 +496,12 @@ static INPUT_PORTS_START( jackie )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("BUTTONS2")	// OK
+	PORT_START("BUTTONS2")  // OK
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Small / Right Hammer")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)	PORT_NAME("Take/Left Hammer")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3)	PORT_NAME("W-Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Take/Left Hammer")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("W-Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Big / Center Hammer")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -513,8 +513,8 @@ static const gfx_layout layout_8x8x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP8(0,2*8) },
 	8*8*2
@@ -526,8 +526,8 @@ static const gfx_layout layout_8x32x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP32(0,2*8) },
 	8*32*2
@@ -567,7 +567,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::jackie_irq)
 
 	if((scanline % 64) == 32 && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);
-	else if	((scanline % 64) == 0 && m_nmi_enable)
+	else if ((scanline % 64) == 0 && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 

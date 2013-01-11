@@ -57,14 +57,14 @@
 #define V_ADDPOINT(m,h,v,c,i) \
 	vector_add_point (m, ((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, VECTOR_COLOR444(c), (i))
 
-#define ADD(r,s,c)	(((r)  + (s) + (c)) & 0xffff)
+#define ADD(r,s,c)  (((r)  + (s) + (c)) & 0xffff)
 #define SUBR(r,s,c) ((~(r) + (s) + (c)) & 0xffff)
 #define SUBS(r,s,c) (((r) + ~(s) + (c)) & 0xffff)
-#define OR(r,s)		((r) | (s))
-#define AND(r,s)	((r) & (s))
-#define NOTRS(r,s)	(~(r) & (s))
-#define EXOR(r,s)	((r) ^ (s))
-#define EXNOR(r,s)	(~((r) ^ (s)))
+#define OR(r,s)     ((r) | (s))
+#define AND(r,s)    ((r) & (s))
+#define NOTRS(r,s)  (~(r) & (s))
+#define EXOR(r,s)   ((r) ^ (s))
+#define EXNOR(r,s)  (~((r) ^ (s)))
 
 /* values for MC_DST */
 enum {
@@ -293,7 +293,7 @@ static void am2901x4 (am2901 *bsp, microcode *mc)
 		break;
 	case RAMQD:
 		bsp->y = bsp->f;
-		bsp->q = (bsp->q >> 1) & 0x7fff;		  /* Q3 is low */
+		bsp->q = (bsp->q >> 1) & 0x7fff;          /* Q3 is low */
 		bsp->ram[mc->b] = (bsp->f >> 1) | 0x8000; /* IN3 is high! */
 		break;
 	case RAMD:
@@ -340,10 +340,10 @@ static void vertigo_vgen (vector_generator *vg)
 		if (vg->brez) /* H/V counter enabled */
 		{
 			/* Depending on MSB of adder only one or both
-               counters are de-/incremented. This is all
-               defined by the shift register which is
-               latched in bits 12-15 of L1/L2.
-            */
+			   counters are de-/incremented. This is all
+			   defined by the shift register which is
+			   latched in bits 12-15 of L1/L2.
+			*/
 			if (vg->adder_s & 0x800)
 			{
 				if (vg->hc1)
@@ -425,7 +425,7 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 			else
 			{
 				/* Data can be transferred between vector ROM/RAM
-                   and SRAM without going through the 2901 */
+				   and SRAM without going through the 2901 */
 				state->m_vs.sram[cmc->x] = state->m_bsp.d;
 			}
 		}
@@ -487,8 +487,8 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 			break;
 		case 6:
 			/* Loading the c_l counter starts
-             * the vector counters if MSB is set
-             */
+			 * the vector counters if MSB is set
+			 */
 			state->m_vgen.c_l = state->m_bsp.y & 0xfff;
 			break;
 		}
@@ -519,11 +519,11 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 		case S_INTL4:
 			jcond = irq4;
 			/* Detect idle loop. If the code takes a jump
-             on irq4 or !irq4 the destination is a idle loop
-             waiting for irq4 state change. We then take a short
-             cut and run for just 100 cycles to make sure the
-             loop is actually entered.
-            */
+			 on irq4 or !irq4 the destination is a idle loop
+			 waiting for irq4 state change. We then take a short
+			 cut and run for just 100 cycles to make sure the
+			 loop is actually entered.
+			*/
 			if ((cmc->jpos != irq4) && cycles > 100)
 			{
 				cycles=100;
@@ -537,7 +537,7 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 		if (jcond ^ cmc->jpos)
 		{
 			/* Except for JBK, address bit 8 isn't changed
-               in program flow. */
+			   in program flow. */
 			switch (cmc->jmp)
 			{
 			case S_JBK:
@@ -551,8 +551,8 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 				break;
 			case S_OPT:
 				/* OPT is used for microcode jump tables. The first
-                   four address bits are defined by bits 12-15
-                   of 2901 input (D) */
+				   four address bits are defined by bits 12-15
+				   of 2901 input (D) */
 				state->m_vs.pc = (state->m_vs.pc & 0x100) | (cmc->ma & 0xf0) | ((state->m_bsp.d >> 12) & 0xf);
 				break;
 			case S_RETURN:

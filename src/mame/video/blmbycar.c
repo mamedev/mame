@@ -67,8 +67,8 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_palette_w)
 
 ***************************************************************************/
 
-#define DIM_NX		(0x40)
-#define DIM_NY		(0x20)
+#define DIM_NX      (0x40)
+#define DIM_NY      (0x20)
 
 TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_0)
 {
@@ -164,13 +164,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 	UINT16 *source, *finish;
 
-	source = state->m_spriteram + 0x6 / 2;				// !
+	source = state->m_spriteram + 0x6 / 2;              // !
 	finish = state->m_spriteram + state->m_spriteram.bytes() / 2 - 8 / 2;
 
 	/* Find "the end of sprites" marker */
 
 	for ( ; source < finish; source += 8 / 2 )
-		if (source[0] & 0x8000)	break;
+		if (source[0] & 0x8000) break;
 
 	/* Draw sprites in reverse order for pdrawfgfx */
 
@@ -179,20 +179,20 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for ( ; source >= finish; source -= 8 / 2 )
 	{
-		int	y		= source[0];
-		int	code		= source[1];
-		int	attr		= source[2];
-		int	x		= source[3];
+		int y       = source[0];
+		int code        = source[1];
+		int attr        = source[2];
+		int x       = source[3];
 
-		int	flipx		= attr & 0x4000;
-		int	flipy		= attr & 0x8000;
-		int	pri		= (~attr >> 3) & 0x1;		// Priority (1 = Low)
-		int pri_mask	= ~((1 << (pri+1)) - 1);	// Above the first "pri" levels
+		int flipx       = attr & 0x4000;
+		int flipy       = attr & 0x8000;
+		int pri     = (~attr >> 3) & 0x1;       // Priority (1 = Low)
+		int pri_mask    = ~((1 << (pri+1)) - 1);    // Above the first "pri" levels
 
-		if (x & 0x4000)	continue;	// ? To get rid of the "shadow" blocks
+		if (x & 0x4000) continue;   // ? To get rid of the "shadow" blocks
 
-		x	= (x & 0x1ff) - 0x10;
-		y	= 0xf0 - ((y & 0xff)  - (y & 0x100));
+		x   = (x & 0x1ff) - 0x10;
+		y   = 0xf0 - ((y & 0xff)  - (y & 0x100));
 
 		pdrawgfx_transpen(bitmap, cliprect, machine.gfx[0],
 					code,
@@ -228,10 +228,10 @@ if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
 //  if (machine().input().code_pressed(KEYCODE_E))    msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

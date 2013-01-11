@@ -20,7 +20,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 ADDRESS_MAP_END
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-        : nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock)
+		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock)
 {
 }
 
@@ -80,8 +80,8 @@ void ncr5390_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_irq_cb, 0, sizeof(m_irq_cb));
-    	memset(&m_drq_cb, 0, sizeof(m_drq_cb));
+		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
+		memset(&m_drq_cb, 0, sizeof(m_drq_cb));
 	}
 	m_shortname = "ncr5390";
 }
@@ -129,8 +129,8 @@ void ncr5390_device::step(bool timeout)
 
 	if(0)
 		logerror("%s: state=%d.%d %s\n",
-				 tag(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
-				 timeout ? "timeout" : "change");
+					tag(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
+					timeout ? "timeout" : "change");
 
 	if(mode == MODE_I && !(ctrl & S_BSY)) {
 		state = IDLE;
@@ -480,8 +480,8 @@ void ncr5390_device::step(bool timeout)
 
 	default:
 		logerror("%s: step() unexpected state %d.%d\n",
-				 tag(),
-				 state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
+					tag(),
+					state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
 	}
 }
@@ -493,7 +493,7 @@ void ncr5390_device::send_byte()
 
 	state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
 	if((state & STATE_MASK) != INIT_XFR_SEND_PAD &&
-	   ((state & STATE_MASK) != DISC_SEL_SEND_BYTE ||
+		((state & STATE_MASK) != DISC_SEL_SEND_BYTE ||
 		command_length))
 		scsi_bus->data_w(scsi_refid, fifo_pop());
 	else

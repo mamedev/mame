@@ -354,15 +354,15 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
 	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(avgdvg_reset_w)
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")				/* vg_halt */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")				/* DIP SW C4 */
-	AM_RANGE(0x17, 0x17) AM_READ_PORT("DSW2")				/* DIP SW C6 */
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")				/* Player 1 input */
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")				/* Player 2 input */
-	AM_RANGE(0x13, 0x13) AM_WRITE(omegrace_leds_w)			/* coin counters, leds, flip screen */
-	AM_RANGE(0x14, 0x14) AM_WRITE(omegrace_soundlatch_w)	/* Sound command */
-	AM_RANGE(0x15, 0x15) AM_READ(omegrace_spinner1_r)		/* 1st controller */
-	AM_RANGE(0x16, 0x16) AM_READ_PORT("SPIN1")				/* 2nd controller (cocktail) */
+	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")             /* vg_halt */
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")               /* DIP SW C4 */
+	AM_RANGE(0x17, 0x17) AM_READ_PORT("DSW2")               /* DIP SW C6 */
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")                /* Player 1 input */
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")                /* Player 2 input */
+	AM_RANGE(0x13, 0x13) AM_WRITE(omegrace_leds_w)          /* coin counters, leds, flip screen */
+	AM_RANGE(0x14, 0x14) AM_WRITE(omegrace_soundlatch_w)    /* Sound command */
+	AM_RANGE(0x15, 0x15) AM_READ(omegrace_spinner1_r)       /* 1st controller */
+	AM_RANGE(0x16, 0x16) AM_READ_PORT("SPIN1")              /* 2nd controller (cocktail) */
 ADDRESS_MAP_END
 
 
@@ -380,7 +380,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)	/* likely ay8910 input port, not direct */
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) /* likely ay8910 input port, not direct */
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
@@ -395,55 +395,55 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( omegrace )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "1st Bonus Life" )		PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(	0x00, "40k" )
-	PORT_DIPSETTING(	0x01, "50k" )
-	PORT_DIPSETTING(	0x02, "70k" )
-	PORT_DIPSETTING(	0x03, "100k" )
-	PORT_DIPNAME( 0x0c, 0x0c, "2nd & 3rd Bonus Life" )	PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(	0x00, "150k 250k" )
-	PORT_DIPSETTING(	0x04, "250k 500k" )
-	PORT_DIPSETTING(	0x08, "500k 750k" )
-	PORT_DIPSETTING(	0x0c, "750k 1500k" )
-	PORT_DIPNAME( 0x30, 0x30, "Credit(s)/Ships" )		PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(	0x00, "1C/2S 2C/4S" )
-	PORT_DIPSETTING(	0x10, "1C/2S 2C/5S" )
-	PORT_DIPSETTING(	0x20, "1C/3S 2C/6S" )
-	PORT_DIPSETTING(	0x30, "1C/3S 2C/7S" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, "1st Bonus Life" )        PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "40k" )
+	PORT_DIPSETTING(    0x01, "50k" )
+	PORT_DIPSETTING(    0x02, "70k" )
+	PORT_DIPSETTING(    0x03, "100k" )
+	PORT_DIPNAME( 0x0c, 0x0c, "2nd & 3rd Bonus Life" )  PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "150k 250k" )
+	PORT_DIPSETTING(    0x04, "250k 500k" )
+	PORT_DIPSETTING(    0x08, "500k 750k" )
+	PORT_DIPSETTING(    0x0c, "750k 1500k" )
+	PORT_DIPNAME( 0x30, 0x30, "Credit(s)/Ships" )       PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "1C/2S 2C/4S" )
+	PORT_DIPSETTING(    0x10, "1C/2S 2C/5S" )
+	PORT_DIPSETTING(    0x20, "1C/3S 2C/6S" )
+	PORT_DIPSETTING(    0x30, "1C/3S 2C/7S" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(	0x06, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW2:4,5,6")
-	PORT_DIPSETTING(	0x30, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x18, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(	0x28, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("IN0")		/* port 0x11 */
+	PORT_START("IN0")       /* port 0x11 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( omegrace )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("IN1")		/* port 0x12 */
+	PORT_START("IN1")       /* port 0x12 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("2 Players Start (1 credit)")
@@ -463,13 +463,13 @@ static INPUT_PORTS_START( omegrace )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("1 Player Start (1 credit)")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("1 Player Start (2 credits)")
 
-	PORT_START("SPIN0")		/* port 0x15 - spinner */
+	PORT_START("SPIN0")     /* port 0x15 - spinner */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10)
 
-	PORT_START("SPIN1")		/* port 0x16 - second spinner */
+	PORT_START("SPIN1")     /* port 0x16 - second spinner */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_COCKTAIL
 
-	PORT_START("AVGDVG")	/* port 0x0b */
+	PORT_START("AVGDVG")    /* port 0x0b */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 INPUT_PORTS_END
 
@@ -546,23 +546,23 @@ ROM_START( omegrace )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "dvgprom.bin",	0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
+	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
 ROM_START( omegrace2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "o.r._1a.m7",					0x0000, 0x1000, CRC(f8539d46) SHA1(bb0c6bc2a84e904d1cb00822052c53c0a8ff1083) )
-	ROM_LOAD( "o.r._2a.l7",					0x1000, 0x1000, CRC(0ff70783) SHA1(5fceaaea1439c3ae408a45f4d7839ec56b71504c) )
-	ROM_LOAD( "o.r._3a.k7",					0x2000, 0x1000, CRC(6349130d) SHA1(a1ff62044d9e59294f56079e704beeebc65a56aa) )
-	ROM_LOAD( "o.r._4a.j7",					0x3000, 0x1000, CRC(0a5ef64a) SHA1(42bcc5d5bfe11af4b26ba7753d83e121eef4b597) )
-	ROM_LOAD( "o.r._vector_i_6-1-81.e1",	0x9000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
-	ROM_LOAD( "o.r._vector_ii_6-1-81.f1",	0x9800, 0x0800, CRC(d44c0814) SHA1(2f216ee6de88bbe09775619003aee2d5aa8c554d) )
+	ROM_LOAD( "o.r._1a.m7",                 0x0000, 0x1000, CRC(f8539d46) SHA1(bb0c6bc2a84e904d1cb00822052c53c0a8ff1083) )
+	ROM_LOAD( "o.r._2a.l7",                 0x1000, 0x1000, CRC(0ff70783) SHA1(5fceaaea1439c3ae408a45f4d7839ec56b71504c) )
+	ROM_LOAD( "o.r._3a.k7",                 0x2000, 0x1000, CRC(6349130d) SHA1(a1ff62044d9e59294f56079e704beeebc65a56aa) )
+	ROM_LOAD( "o.r._4a.j7",                 0x3000, 0x1000, CRC(0a5ef64a) SHA1(42bcc5d5bfe11af4b26ba7753d83e121eef4b597) )
+	ROM_LOAD( "o.r._vector_i_6-1-81.e1",    0x9000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
+	ROM_LOAD( "o.r._vector_ii_6-1-81.f1",   0x9800, 0x0800, CRC(d44c0814) SHA1(2f216ee6de88bbe09775619003aee2d5aa8c554d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "o.r.r._audio_6-1-81.k5",		0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
+	ROM_LOAD( "o.r.r._audio_6-1-81.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "dvgprom.bin",	0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
+	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
 ROM_START( deltrace )
@@ -578,7 +578,7 @@ ROM_START( deltrace )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
 	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "dvgprom.bin",	0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
+	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
 
@@ -594,10 +594,10 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 	UINT8 *prom = machine().root_device().memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
-     * lines swapped before going into the decoder.
-     * Since all other avg/dvg games connect the PROM
-     * in a consistent way to the decoder, we swap the bits
-     * here. */
+	 * lines swapped before going into the decoder.
+	 * Since all other avg/dvg games connect the PROM
+	 * in a consistent way to the decoder, we swap the bits
+	 * here. */
 	for (i=0; i<len; i++)
 		prom[i] = BITSWAP8(prom[i],7,6,5,4,1,0,3,2);
 }

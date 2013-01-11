@@ -279,25 +279,25 @@ READ8_MEMBER(badlands_state::audio_io_r)
 
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* n/c */
+		case 0x000:     /* n/c */
 			logerror("audio_io_r: Unknown read at %04X\n", offset & 0x206);
 			break;
 
-		case 0x002:		/* /RDP */
+		case 0x002:     /* /RDP */
 			result = m6502_sound_r(space, offset);
 			break;
 
-		case 0x004:		/* /RDIO */
+		case 0x004:     /* /RDIO */
 			/*
-                0x80 = self test
-                0x40 = NMI line state (active low)
-                0x20 = sound output full
-                0x10 = self test
-                0x08 = +5V
-                0x04 = +5V
-                0x02 = coin 2
-                0x01 = coin 1
-            */
+			    0x80 = self test
+			    0x40 = NMI line state (active low)
+			    0x20 = sound output full
+			    0x10 = self test
+			    0x08 = +5V
+			    0x04 = +5V
+			    0x02 = coin 2
+			    0x01 = coin 1
+			*/
 			result = ioport("AUDIO")->read();
 			if (!(ioport("FE4000")->read() & 0x0080)) result ^= 0x90;
 			if (m_cpu_to_sound_ready) result ^= 0x40;
@@ -305,14 +305,14 @@ READ8_MEMBER(badlands_state::audio_io_r)
 			result ^= 0x10;
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /VOICE */
-		case 0x202:		/* /WRP */
-		case 0x204:		/* /WRIO */
-		case 0x206:		/* /MIX */
+		case 0x200:     /* /VOICE */
+		case 0x202:     /* /WRP */
+		case 0x204:     /* /WRIO */
+		case 0x206:     /* /MIX */
 			logerror("audio_io_r: Unknown read at %04X\n", offset & 0x206);
 			break;
 	}
@@ -325,34 +325,34 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 {
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* n/c */
-		case 0x002:		/* /RDP */
-		case 0x004:		/* /RDIO */
+		case 0x000:     /* n/c */
+		case 0x002:     /* /RDP */
+		case 0x004:     /* /RDIO */
 			logerror("audio_io_w: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* n/c */
-		case 0x206:		/* n/c */
+		case 0x200:     /* n/c */
+		case 0x206:     /* n/c */
 			break;
 
-		case 0x202:		/* /WRP */
+		case 0x202:     /* /WRP */
 			m6502_sound_w(space, offset, data);
 			break;
 
-		case 0x204:		/* WRIO */
+		case 0x204:     /* WRIO */
 			/*
-                0xc0 = bank address
-                0x20 = coin counter 2
-                0x10 = coin counter 1
-                0x08 = n/c
-                0x04 = n/c
-                0x02 = n/c
-                0x01 = YM2151 reset (active low)
-            */
+			    0xc0 = bank address
+			    0x20 = coin counter 2
+			    0x10 = coin counter 1
+			    0x08 = n/c
+			    0x04 = n/c
+			    0x02 = n/c
+			    0x01 = YM2151 reset (active low)
+			*/
 
 			/* update the bank */
 			memcpy(m_bank_base, &m_bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -413,7 +413,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( badlands )
-	PORT_START("FE4000")	/* fe4000 */
+	PORT_START("FE4000")    /* fe4000 */
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -421,25 +421,25 @@ static INPUT_PORTS_START( badlands )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("FE6000")	/* fe6000 */
+	PORT_START("FE6000")    /* fe6000 */
 	PORT_BIT( 0x00ff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("FE6002")	/* fe6002 */
+	PORT_START("FE6002")    /* fe6002 */
 	PORT_BIT( 0x00ff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AUDIO")		/* audio port */
+	PORT_START("AUDIO")     /* audio port */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* self test */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* response buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )	/* command buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* self test */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* response buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    /* command buffer full */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
 
-	PORT_START("PEDALS")	/* fake for pedals */
+	PORT_START("PEDALS")    /* fake for pedals */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -534,18 +534,18 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( badlands )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136074-1008.20f",  0x00000, 0x10000, CRC(a3da5774) SHA1(5ab1eb61d25594b2d7c40400cb57e7f47a717598) )
 	ROM_LOAD16_BYTE( "136074-1006.27f",  0x00001, 0x10000, CRC(aa03b4f3) SHA1(5eda60c715ffcefd4ad34bdb90579e8671dc384a) )
 	ROM_LOAD16_BYTE( "136074-1009.17f",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )
 	ROM_LOAD16_BYTE( "136074-1007.24f",  0x20001, 0x10000, CRC(99a20c2c) SHA1(9b0a5a5dafb8816e72330d302c60339b600b49a8) )
 
-	ROM_REGION( 0x14000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136074-1018.9c", 0x10000, 0x4000, CRC(a05fd146) SHA1(d97abbcf7897ca720cc18ff3a323f41cd3b23c34) )
 	ROM_CONTINUE(               0x04000, 0xc000 )
 
 	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "136074-1012.4n",  0x000000, 0x10000, CRC(5d124c6c) SHA1(afebaaf90b3751f5e873fc4c45f1d5385ef86a6e) )	/* playfield */
+	ROM_LOAD( "136074-1012.4n",  0x000000, 0x10000, CRC(5d124c6c) SHA1(afebaaf90b3751f5e873fc4c45f1d5385ef86a6e) )  /* playfield */
 	ROM_LOAD( "136074-1013.2n",  0x010000, 0x10000, CRC(b1ec90d6) SHA1(8d4c7db8e1bf9c050f5869eb38fa573867fdc12b) )
 	ROM_LOAD( "136074-1014.4s",  0x020000, 0x10000, CRC(248a6845) SHA1(086ef0840b889e790ce3fcd09f98589aae932456) )
 	ROM_LOAD( "136074-1015.2s",  0x030000, 0x10000, CRC(792296d8) SHA1(833cdb968064151ca77bb3dbe416ff7127a12de4) )
@@ -553,7 +553,7 @@ ROM_START( badlands )
 	ROM_LOAD( "136074-1017.2u",  0x050000, 0x10000, CRC(ad0071a3) SHA1(472b197e5d320b3424d8a8d8c051b1023a07ae08) )
 
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_INVERT )
-	ROM_LOAD( "136074-1010.14r", 0x000000, 0x10000, CRC(c15f629e) SHA1(944e3479dce6e420cf9a3f4c1438c5ca66e5cb97) )	/* mo */
+	ROM_LOAD( "136074-1010.14r", 0x000000, 0x10000, CRC(c15f629e) SHA1(944e3479dce6e420cf9a3f4c1438c5ca66e5cb97) )  /* mo */
 	ROM_LOAD( "136074-1011.10r", 0x010000, 0x10000, CRC(fb0b6717) SHA1(694ab0f04d673682831a24027757d4b3c40a4e0e) )
 	ROM_LOAD( "136074-1019.14t", 0x020000, 0x10000, CRC(0e26bff6) SHA1(ee018dd37a27c7e7c16a57ea0d32aeb9cdf26bb4) )
 
@@ -682,7 +682,7 @@ MACHINE_RESET_MEMBER(badlands_state,badlandsb)
 static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)	/* Divisor estimated */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)   /* Divisor estimated */
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
 
@@ -709,7 +709,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_20MHz/8)	/* Divisor estimated */
+	MCFG_YM2151_ADD("ymsnd", XTAL_20MHz/8)  /* Divisor estimated */
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -719,7 +719,7 @@ MACHINE_CONFIG_END
 /* bootleg by Playmark, uses Joystick controls */
 ROM_START( badlandsb )
 	/* bootleg 68k Program */
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "blb28.ic21",  0x00000, 0x10000, CRC(dffb025d) SHA1(f2c17607acbbeee7d5d3f3dd2e8dc768b755e991) )
 	ROM_LOAD16_BYTE( "blb22.ic22",  0x00001, 0x10000, CRC(ca3015c4) SHA1(72e1451498143d920239487704f4b4a8a71410e0) )
 	ROM_LOAD16_BYTE( "blb27.ic19",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )
@@ -751,7 +751,7 @@ ROM_END
 
 ROM_START( badlandsb2 )
 	/* bootleg 68k Program */
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "5.ic21",  0x00000, 0x10000, CRC(dffb025d) SHA1(f2c17607acbbeee7d5d3f3dd2e8dc768b755e991) )
 	ROM_LOAD16_BYTE( "2.ic22",  0x00001, 0x10000, CRC(ca3015c4) SHA1(72e1451498143d920239487704f4b4a8a71410e0) )
 	ROM_LOAD16_BYTE( "4.ic19",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )

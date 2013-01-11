@@ -14,11 +14,11 @@ MAX_SECTORS     5       and granules of sectors
 #include "includes/trs80.h"
 
 
-#define IRQ_M1_RTC		0x80	/* RTC on Model I */
-#define IRQ_M1_FDC		0x40	/* FDC on Model I */
-#define IRQ_M4_RTC		0x04	/* RTC on Model 4 */
-#define CASS_RISE		0x01	/* high speed cass on Model III/4) */
-#define CASS_FALL		0x02	/* high speed cass on Model III/4) */
+#define IRQ_M1_RTC      0x80    /* RTC on Model I */
+#define IRQ_M1_FDC      0x40    /* FDC on Model I */
+#define IRQ_M4_RTC      0x04    /* RTC on Model 4 */
+#define CASS_RISE       0x01    /* high speed cass on Model III/4) */
+#define CASS_FALL       0x02    /* high speed cass on Model III/4) */
 #define MODEL4_MASTER_CLOCK 20275200
 
 
@@ -32,8 +32,8 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
 	/* Check for HI-LO transition */
 	if ( m_old_cassette_val > -0.2 && new_val < -0.2 )
 	{
-		m_cassette_data |= 0x80;		/* 500 baud */
-		if (m_mask & CASS_FALL)	/* see if 1500 baud */
+		m_cassette_data |= 0x80;        /* 500 baud */
+		if (m_mask & CASS_FALL) /* see if 1500 baud */
 		{
 			m_cassette_data = 0;
 			m_irq |= CASS_FALL;
@@ -43,7 +43,7 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
 	else
 	if ( m_old_cassette_val < -0.2 && new_val > -0.2 )
 	{
-		if (m_mask & CASS_RISE)	/* 1500 baud */
+		if (m_mask & CASS_RISE) /* 1500 baud */
 		{
 			m_cassette_data = 1;
 			m_irq |= CASS_RISE;
@@ -196,7 +196,7 @@ READ8_MEMBER( trs80_state::trs80m4_ff_r )
     d6..d1 info from write of port EC
     d0 High-speed data */
 
-	m_irq &= 0xfc;	/* clear cassette interrupts */
+	m_irq &= 0xfc;  /* clear cassette interrupts */
 
 	return m_port_ec | m_cassette_data;
 }
@@ -225,9 +225,9 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 
 	switch (data & 3)
 	{
-		case 0:	/* normal operation */
+		case 0: /* normal operation */
 
-			if (m_model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
+			if (m_model4 & 4)   /* Model 4P gets RAM while Model 4 gets ROM */
 			{
 				if (m_model4 & 8)
 					membank("bank1")->set_base(base);
@@ -254,14 +254,14 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 			membank("bank17")->set_base(base + 0x14000);
 			membank("bank18")->set_base(base + 0x1f400);
 			membank("bank19")->set_base(base + 0x1f800);
-			mem.install_readwrite_handler (0x37e8, 0x37e9, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));	/* 3 & 13 */
-			mem.install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 5 */
-			mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 6 & 16 */
+			mem.install_readwrite_handler (0x37e8, 0x37e9, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));    /* 3 & 13 */
+			mem.install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));   /* 5 */
+			mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));  /* 6 & 16 */
 			break;
 
-		case 1:	/* write-only ram backs up the rom */
+		case 1: /* write-only ram backs up the rom */
 
-			if (m_model4 & 4)	/* Model 4P gets RAM while Model 4 gets ROM */
+			if (m_model4 & 4)   /* Model 4P gets RAM while Model 4 gets ROM */
 			{
 				if (m_model4 & 8)
 					membank("bank1")->set_base(base);
@@ -291,11 +291,11 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 			membank("bank17")->set_base(base + 0x14000);
 			membank("bank18")->set_base(base + 0x1f400);
 			membank("bank19")->set_base(base + 0x1f800);
-			mem.install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 5 */
-			mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 6 & 16 */
+			mem.install_read_handler (0x3800, 0x3bff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));   /* 5 */
+			mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));  /* 6 & 16 */
 			break;
 
-		case 2:	/* keyboard and video are moved to high memory, and the rest is ram */
+		case 2: /* keyboard and video are moved to high memory, and the rest is ram */
 			membank("bank1")->set_base(base + 0x10000);
 			membank("bank2")->set_base(base + 0x11000);
 			membank("bank3")->set_base(base + 0x137e8);
@@ -311,12 +311,12 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 			membank("bank16")->set_base(base + 0x13c00);
 			membank("bank17")->set_base(base + 0x14000);
 			membank("bank18")->set_base(base + 0x0a000);
-			mem.install_read_handler (0xf400, 0xf7ff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));	/* 8 */
-			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));	/* 9 & 19 */
+			mem.install_read_handler (0xf400, 0xf7ff, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));   /* 8 */
+			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));  /* 9 & 19 */
 			m_model4++;
 			break;
 
-		case 3:	/* 64k of ram */
+		case 3: /* 64k of ram */
 			membank("bank1")->set_base(base + 0x10000);
 			membank("bank2")->set_base(base + 0x11000);
 			membank("bank3")->set_base(base + 0x137e8);
@@ -344,14 +344,14 @@ WRITE8_MEMBER( trs80_state::trs80m4_90_w )
 	speaker_level_w(m_speaker, ~data & 1);
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4p_9c_w )		/* model 4P only - swaps the ROM with read-only RAM */
+WRITE8_MEMBER( trs80_state::trs80m4p_9c_w )     /* model 4P only - swaps the ROM with read-only RAM */
 {
 	/* Meaning of model4 variable:
-        d5..d4 memory mode (as described in section above)
-        d3 rom switch (1=enabled) only effective in mode0 and 1
-        d2 this is a Model 4P
-        d1 this is a Model 4
-        d0 Video banking exists yes/no (1=not banked) */
+	    d5..d4 memory mode (as described in section above)
+	    d3 rom switch (1=enabled) only effective in mode0 and 1
+	    d2 this is a Model 4P
+	    d1 this is a Model 4
+	    d0 Video banking exists yes/no (1=not banked) */
 
 	m_model4 &= 0xf7;
 	m_model4 |= (data << 3);
@@ -360,10 +360,10 @@ WRITE8_MEMBER( trs80_state::trs80m4p_9c_w )		/* model 4P only - swaps the ROM wi
 	{
 		switch (m_model4 & 8)
 		{
-			case 0:		/* Read-only RAM replaces rom */
+			case 0:     /* Read-only RAM replaces rom */
 				membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
 				break;
-			case 8:		/* Normal setup - rom enabled */
+			case 8:     /* Normal setup - rom enabled */
 				membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 				break;
 		}
@@ -629,7 +629,7 @@ INTERRUPT_GEN_MEMBER(trs80_state::trs80_rtc_interrupt)
     The OS counts one tick for each interrupt. The Model I has 40 ticks per
     second, while the Model III/4 has 30. */
 
-	if (m_model4)	// Model 4
+	if (m_model4)   // Model 4
 	{
 		if (m_mask & IRQ_M4_RTC)
 		{
@@ -637,7 +637,7 @@ INTERRUPT_GEN_MEMBER(trs80_state::trs80_rtc_interrupt)
 			device.execute().set_input_line(0, HOLD_LINE);
 		}
 	}
-	else		// Model 1
+	else        // Model 1
 	{
 		m_irq |= IRQ_M1_RTC;
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -649,13 +649,13 @@ static void trs80_fdc_interrupt_internal(running_machine &machine)
 	trs80_state *state = machine.driver_data<trs80_state>();
 	if (state->m_model4)
 	{
-		if (state->m_nmi_mask & 0x80)	// Model 4 does a NMI
+		if (state->m_nmi_mask & 0x80)   // Model 4 does a NMI
 		{
 			state->m_nmi_data = 0x80;
 			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
-	else		// Model 1 does a IRQ
+	else        // Model 1 does a IRQ
 	{
 		state->m_irq |= IRQ_M1_FDC;
 		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
@@ -709,10 +709,10 @@ READ8_MEMBER( trs80_state::trs80_wd179x_r )
 READ8_MEMBER( trs80_state::trs80_printer_r )
 {
 	/* Bit 7 - 1 = Busy; 0 = Not Busy
-       Bit 6 - 1 = Out of Paper; 0 = Paper
-       Bit 5 - 1 = Printer selected; 0 = Printer not selected
-       Bit 4 - 1 = No Fault; 0 = Fault
-       Bits 3..0 - Not used */
+	   Bit 6 - 1 = Out of Paper; 0 = Paper
+	   Bit 5 - 1 = Printer selected; 0 = Printer not selected
+	   Bit 4 - 1 = No Fault; 0 = Fault
+	   Bits 3..0 - Not used */
 
 	UINT8 data = 0;
 	data |= m_printer->busy_r() << 7;
@@ -778,7 +778,7 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
 		m_head = 0;
 		break;
 	/* These 3 combinations aren't official. Some manufacturers of double-sided disks
-        used drive select 4 to indicate the other side. */
+	    used drive select 4 to indicate the other side. */
 	case 9:
 		drive = 0;
 		m_head = 1;
@@ -794,7 +794,7 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
 	}
 
 	if (drive > 3)
-	{	/* Turn motors off */
+	{   /* Turn motors off */
 		floppy_mon_w(floppy_get_device(machine(), 0), ASSERT_LINE);
 		floppy_mon_w(floppy_get_device(machine(), 1), ASSERT_LINE);
 		floppy_mon_w(floppy_get_device(machine(), 2), ASSERT_LINE);
@@ -883,8 +883,8 @@ MACHINE_RESET_MEMBER(trs80_state,trs80m4)
 	mem.install_write_bank (0x4000, 0xf3ff, "bank17");
 	mem.install_write_bank (0xf400, 0xf7ff, "bank18");
 	mem.install_write_bank (0xf800, 0xffff, "bank19");
-	trs80m4p_9c_w(mem, 0, 1);	/* Enable the ROM */
-	trs80m4_84_w(mem, 0, 0);	/* switch in devices at power-on */
+	trs80m4p_9c_w(mem, 0, 1);   /* Enable the ROM */
+	trs80m4_84_w(mem, 0, 0);    /* switch in devices at power-on */
 }
 
 MACHINE_RESET_MEMBER(trs80_state,lnw80)
@@ -894,4 +894,3 @@ MACHINE_RESET_MEMBER(trs80_state,lnw80)
 	m_reg_load = 1;
 	lnw80_fe_w(space, 0, 0);
 }
-

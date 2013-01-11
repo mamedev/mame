@@ -159,11 +159,11 @@ WRITE8_MEMBER( spectra_state::portb_w )
 
 static const riot6532_interface riot6532_intf =
 {
-	DEVCB_DRIVER_MEMBER(spectra_state, porta_r),	// port a in
-	DEVCB_DRIVER_MEMBER(spectra_state, portb_r),	// port b in
-	DEVCB_DRIVER_MEMBER(spectra_state, porta_w),	// port a out
-	DEVCB_DRIVER_MEMBER(spectra_state, portb_w),	// port b in
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)	// interrupt
+	DEVCB_DRIVER_MEMBER(spectra_state, porta_r),    // port a in
+	DEVCB_DRIVER_MEMBER(spectra_state, portb_r),    // port b in
+	DEVCB_DRIVER_MEMBER(spectra_state, porta_w),    // port a out
+	DEVCB_DRIVER_MEMBER(spectra_state, portb_w),    // port b in
+	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE) // interrupt
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
@@ -209,29 +209,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 
 static const sn76477_interface sn76477_intf =
 {
-	RES_M(1000),	/*  4  noise_res        */
-	RES_M(1000),	/*  5  filter_res       */
-	CAP_N(0),	/*  6  filter_cap       */
-	RES_K(470),	/*  7  decay_res        */
-	CAP_N(1),	/*  8  attack_decay_cap */
-	RES_K(22),	/* 10  attack_res       */
-	RES_K(100),	/* 11  amplitude_res    */
-	RES_K(52),	/* 12  feedback_res     */
-	5.0,	/* 16  vco_voltage      */
-	CAP_U(0.01),	/* 17  vco_cap          */
-	RES_K(390),	/* 18  vco_res          */
+	RES_M(1000),    /*  4  noise_res        */
+	RES_M(1000),    /*  5  filter_res       */
+	CAP_N(0),   /*  6  filter_cap       */
+	RES_K(470), /*  7  decay_res        */
+	CAP_N(1),   /*  8  attack_decay_cap */
+	RES_K(22),  /* 10  attack_res       */
+	RES_K(100), /* 11  amplitude_res    */
+	RES_K(52),  /* 12  feedback_res     */
+	5.0,    /* 16  vco_voltage      */
+	CAP_U(0.01),    /* 17  vco_cap          */
+	RES_K(390), /* 18  vco_res          */
 	0.0,  /* 19  pitch_voltage  */
-	RES_M(1),	/* 20  slf_res          */
-	CAP_U(0.1),	/* 21  slf_cap          */
-	CAP_U(0.47),	/* 23  oneshot_cap      */
-	RES_K(470),		/* 24  oneshot_res  */
-	0,			    /* 22  vco (variable)               */
-	0,			    /* 26  mixer A (grounded)           */
-	0,			    /* 25  mixer B (variable)           */
-	0,			    /* 27  mixer C (variable)           */
-	0,			    /* 1   envelope 1 (variable)        */
-	0,			    /* 28  envelope 2 (grounded)        */
-	1			    /* 9   enable (variable)            */
+	RES_M(1),   /* 20  slf_res          */
+	CAP_U(0.1), /* 21  slf_cap          */
+	CAP_U(0.47),    /* 23  oneshot_cap      */
+	RES_K(470),     /* 24  oneshot_res  */
+	0,              /* 22  vco (variable)               */
+	0,              /* 26  mixer A (grounded)           */
+	0,              /* 25  mixer B (variable)           */
+	0,              /* 27  mixer C (variable)           */
+	0,              /* 1   envelope 1 (variable)        */
+	0,              /* 28  envelope 2 (grounded)        */
+	1               /* 9   enable (variable)            */
 };
 
 

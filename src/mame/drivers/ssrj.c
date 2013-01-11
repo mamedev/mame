@@ -82,46 +82,46 @@ static INPUT_PORTS_START( ssrj )
 	PORT_START("IN2")
 	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_BUTTON2  )  /* code @ $eef  , tested when controls = type4 */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) ) /* ??? code @ $62c */
-	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( Very_Difficult ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "No Hit" )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x07, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x06, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x05, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Controls ) ) /* 'press button to start' message, and wait for button2 */
-	PORT_DIPSETTING(	0x00, "Type 1" )
-	PORT_DIPSETTING(	0x10, "Type 2" )
-	PORT_DIPSETTING(	0x20, "Type 3" )
-	PORT_DIPSETTING(	0x30, "Type 4" )
+	PORT_DIPSETTING(    0x00, "Type 1" )
+	PORT_DIPSETTING(    0x10, "Type 2" )
+	PORT_DIPSETTING(    0x20, "Type 3" )
+	PORT_DIPSETTING(    0x30, "Type 4" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sometimes hangs after game over ($69b) */
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	RGN_FRAC(1,3),	/* 1024 characters */
-	3,	/* 3 bits per pixel */
-	{ 0, RGN_FRAC(2,3), RGN_FRAC(1,3) },	/* the bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	RGN_FRAC(1,3),  /* 1024 characters */
+	3,  /* 3 bits per pixel */
+	{ 0, RGN_FRAC(2,3), RGN_FRAC(1,3) },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static GFXDECODE_START( ssrj )

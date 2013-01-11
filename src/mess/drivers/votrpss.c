@@ -115,11 +115,11 @@ READ8_MEMBER( votrpss_state::votrpss_41_r )
 static ADDRESS_MAP_START(votrpss_mem, AS_PROGRAM, 8, votrpss_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* main roms (in potted module) */
-	AM_RANGE(0x4000, 0x7fff) AM_NOP	/* open bus/space for expansion rom (reads as 0xFF) */
-	AM_RANGE(0x8000, 0x8fff) AM_RAM	/* onboard memory (2x 6116) */
-	AM_RANGE(0x9000, 0xbfff) AM_NOP	/* open bus (space for memory expansion, checked by main roms, will be used if found)*/
+	AM_RANGE(0x4000, 0x7fff) AM_NOP /* open bus/space for expansion rom (reads as 0xFF) */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM /* onboard memory (2x 6116) */
+	AM_RANGE(0x9000, 0xbfff) AM_NOP /* open bus (space for memory expansion, checked by main roms, will be used if found)*/
 	AM_RANGE(0xc000, 0xdfff) AM_ROM /* 'personality rom', containing self-test code and optional user code */
-	AM_RANGE(0xe000, 0xffff) AM_NOP	/* open bus (space for more personality rom, not normally used) */
+	AM_RANGE(0xe000, 0xffff) AM_NOP /* open bus (space for more personality rom, not normally used) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(votrpss_io, AS_IO, 8, votrpss_state)
@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START(votrpss)
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, "Baud Rate" )	PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x00, "Baud Rate" ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "9600" )
 	PORT_DIPSETTING(    0x01, "4800" )
 	PORT_DIPSETTING(    0x02, "2400" )
@@ -151,19 +151,19 @@ static INPUT_PORTS_START(votrpss)
 	PORT_DIPSETTING(    0x05, "300" )
 	PORT_DIPSETTING(    0x06, "150" )
 	PORT_DIPSETTING(    0x07, "75" )
-	PORT_DIPNAME( 0x08, 0x00, "Serial Handshaking" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Serial Handshaking" )    PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "RTS/CTS" )
 	PORT_DIPSETTING(    0x08, "XON/XOFF" )
-	PORT_DIPNAME( 0x10, 0x00, "Parity bit behavior" )	PORT_DIPLOCATION("SW1:5") /* note: only firmware 3.C (1984?) and up handle this bit; on earlier firmwares, its function is 'unused' */
+	PORT_DIPNAME( 0x10, 0x00, "Parity bit behavior" )   PORT_DIPLOCATION("SW1:5") /* note: only firmware 3.C (1984?) and up handle this bit; on earlier firmwares, its function is 'unused' */
 	PORT_DIPSETTING(    0x00, "Bit 8 ignored/zeroed" )
 	PORT_DIPSETTING(    0x10, "Bit 8 treated as data" )
-	PORT_DIPNAME( 0x20, 0x20, "Startup Message" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Startup Message" )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR ( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Default Communications Port" )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, "Default Communications Port" )   PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "Serial/RS-232" )
 	PORT_DIPSETTING(    0x40, "Parallel" )
-	PORT_DIPNAME( 0x80, 0x00, "Self Test Mode" )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Self Test Mode" )    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR ( On )  )
 INPUT_PORTS_END
@@ -239,4 +239,3 @@ ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
 COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, driver_device, 0,      "Votrax",        "Personal Speech System", GAME_NOT_WORKING | GAME_NO_SOUND)
-

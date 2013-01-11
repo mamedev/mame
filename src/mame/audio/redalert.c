@@ -19,18 +19,18 @@
 
 
 
-#define REDALERT_AUDIO_PCB_CLOCK	(XTAL_12_5MHz)
-#define REDALERT_AUDIO_CPU_CLOCK	(REDALERT_AUDIO_PCB_CLOCK / 12)
-#define REDALERT_AY8910_CLOCK		(REDALERT_AUDIO_PCB_CLOCK / 6)
-#define REDALERT_AUDIO_CPU_IRQ_FREQ	(1000000000 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(120), RES_K(2.7), CAP_U(0.01)))
+#define REDALERT_AUDIO_PCB_CLOCK    (XTAL_12_5MHz)
+#define REDALERT_AUDIO_CPU_CLOCK    (REDALERT_AUDIO_PCB_CLOCK / 12)
+#define REDALERT_AY8910_CLOCK       (REDALERT_AUDIO_PCB_CLOCK / 6)
+#define REDALERT_AUDIO_CPU_IRQ_FREQ (1000000000 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(120), RES_K(2.7), CAP_U(0.01)))
 
-#define REDALERT_VOICE_PCB_CLOCK	(XTAL_6MHz)
-#define REDALERT_VOICE_CPU_CLOCK	(REDALERT_VOICE_PCB_CLOCK)
-#define REDALERT_HC55516_CLOCK		(REDALERT_VOICE_PCB_CLOCK / 256)
+#define REDALERT_VOICE_PCB_CLOCK    (XTAL_6MHz)
+#define REDALERT_VOICE_CPU_CLOCK    (REDALERT_VOICE_PCB_CLOCK)
+#define REDALERT_HC55516_CLOCK      (REDALERT_VOICE_PCB_CLOCK / 256)
 
-#define DEMONEYE_AUDIO_PCB_CLOCK	(XTAL_3_579545MHz)
-#define DEMONEYE_AUDIO_CPU_CLOCK	(DEMONEYE_AUDIO_PCB_CLOCK / 4)  /* what's the real divisor? */
-#define DEMONEYE_AY8910_CLOCK		(DEMONEYE_AUDIO_PCB_CLOCK / 2)  /* what's the real divisor? */
+#define DEMONEYE_AUDIO_PCB_CLOCK    (XTAL_3_579545MHz)
+#define DEMONEYE_AUDIO_CPU_CLOCK    (DEMONEYE_AUDIO_PCB_CLOCK / 4)  /* what's the real divisor? */
+#define DEMONEYE_AY8910_CLOCK       (DEMONEYE_AUDIO_PCB_CLOCK / 2)  /* what's the real divisor? */
 
 
 
@@ -43,13 +43,13 @@
 WRITE8_MEMBER(redalert_state::redalert_analog_w)
 {
 	/* this port triggers analog sounds
-       D0 = Formation Aircraft?
-       D1 = Dive bombers?
-       D2 = Helicopters?
-       D3 = Launcher firing?
-       D4 = Explosion #1?
-       D5 = Explosion #2?
-       D6 = Explosion #3? */
+	   D0 = Formation Aircraft?
+	   D1 = Dive bombers?
+	   D2 = Helicopters?
+	   D3 = Launcher firing?
+	   D4 = Explosion #1?
+	   D5 = Explosion #2?
+	   D6 = Explosion #3? */
 
 	logerror("Analog: %02X\n",data);
 }
@@ -68,7 +68,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 	soundlatch_byte_w(space, 0, data);
 
 	/* D7 is also connected to the NMI input of the CPU -
-       the NMI is actually toggled by a 74121 */
+	   the NMI is actually toggled by a 74121 */
 	if ((data & 0x80) == 0x00)
 		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -117,9 +117,9 @@ static const ay8910_interface redalert_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,		/* port A/B read */
+	DEVCB_NULL,     /* port A/B read */
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(redalert_state,redalert_analog_w)	/* port A/B write */
+	DEVCB_DRIVER_MEMBER(redalert_state,redalert_analog_w)   /* port A/B write */
 };
 
 
@@ -173,10 +173,10 @@ READ_LINE_MEMBER(redalert_state::sid_callback)
 
 static I8085_CONFIG( redalert_voice_i8085_config )
 {
-	DEVCB_NULL,					/* STATUS changed callback */
-	DEVCB_NULL,					/* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(redalert_state,sid_callback),	/* SID changed callback (8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(redalert_state,sod_callback)	/* SOD changed callback (8085A only) */
+	DEVCB_NULL,                 /* STATUS changed callback */
+	DEVCB_NULL,                 /* INTE changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(redalert_state,sid_callback),  /* SID changed callback (8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(redalert_state,sod_callback)   /* SOD changed callback (8085A only) */
 };
 
 
@@ -352,26 +352,26 @@ static const ay8910_interface demoneye_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_NULL,	/* port A/B read */
+	DEVCB_NULL, /* port A/B read */
 	DEVCB_NULL,
-	DEVCB_NULL				/* port A/B write */
+	DEVCB_NULL              /* port A/B write */
 };
 
 
 static const pia6821_interface demoneye_pia_intf =
 {
-	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_2_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_data_w),			/* port A out */
-	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_2_r),      /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_data_w),         /* port A out */
+	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_1_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 

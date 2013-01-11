@@ -33,14 +33,14 @@ static const UINT8 kc85_palette[KC85_PALETTE_SIZE * 3] =
 	0xd0, 0xd0, 0xd0,    // white
 
 	// background colours are slightly darker than foreground colours
-	0x00, 0x00, 0x00,	 // black
-	0x00, 0x00, 0xa0,	 // dark blue
-	0xa0, 0x00, 0x00,	 // dark red
-	0xa0, 0x00, 0xa0,	 // dark magenta
-	0x00, 0xa0, 0x00,	 // dark green
-	0x00, 0xa0, 0xa0,	 // dark cyan
-	0xa0, 0xa0, 0x00,	 // dark yellow
-	0xa0, 0xa0, 0xa0	 // dark white (grey)
+	0x00, 0x00, 0x00,    // black
+	0x00, 0x00, 0xa0,    // dark blue
+	0xa0, 0x00, 0x00,    // dark red
+	0xa0, 0x00, 0xa0,    // dark magenta
+	0x00, 0xa0, 0x00,    // dark green
+	0x00, 0xa0, 0xa0,    // dark cyan
+	0xa0, 0xa0, 0x00,    // dark yellow
+	0xa0, 0xa0, 0xa0     // dark white (grey)
 };
 
 
@@ -73,10 +73,10 @@ void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, UINT8 col
 	{
 		/* High resolution: 4 colors for block */
 
-		pens[0] = 0;	// black
-		pens[1] = 2;	// red
-		pens[2] = 5;	// cyan
-		pens[3] = 7;	// white
+		pens[0] = 0;    // black
+		pens[1] = 2;    // red
+		pens[2] = 5;    // cyan
+		pens[3] = 7;    // white
 
 		px = x;
 

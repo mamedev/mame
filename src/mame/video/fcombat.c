@@ -10,7 +10,7 @@
 
 TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 {
-	int tileno, palno;	//32*16 x 32
+	int tileno, palno;  //32*16 x 32
 
 	//palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
 

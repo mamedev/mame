@@ -194,11 +194,11 @@ static  READ8_HANDLER(ts2068_port_ff_r)
 static WRITE8_HANDLER(ts2068_port_ff_w)
 {
 		/* Bits 0-2 Video Mode Select
-           Bits 3-5 64 column mode ink/paper selection
-                    (See ts2068_vh_screenrefresh for more info)
-           Bit  6   17ms Interrupt Inhibit
-           Bit  7   Cartridge (0) / EXROM (1) select
-        */
+		   Bits 3-5 64 column mode ink/paper selection
+		            (See ts2068_vh_screenrefresh for more info)
+		   Bit  6   17ms Interrupt Inhibit
+		   Bit  7   Cartridge (0) / EXROM (1) select
+		*/
 	spectrum_state *state = space.machine().driver_data<spectrum_state>();
 
 	state->m_port_ff_data = data;
@@ -612,15 +612,15 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 /* F4 Character Displayer - tc2048 code is inherited from the spectrum */
 static const gfx_layout ts2068_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	96,                 /* 96 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( ts2068 )
@@ -717,6 +717,6 @@ ROM_START(uk2086)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1984, tc2048,   spectrum, 0,		tc2048,		spectrum, driver_device,	0,		"Timex of Portugal",	"TC-2048" , 0)
-COMP( 1983, ts2068,   spectrum, 0,		ts2068,		spectrum, driver_device,	0,		"Timex Sinclair",		"TS-2068" , 0)
-COMP( 1986, uk2086,   spectrum, 0,		uk2086,		spectrum, driver_device,	0,		"Unipolbrit",			"UK-2086 ver. 1.2" , 0)
+COMP( 1984, tc2048,   spectrum, 0,      tc2048,     spectrum, driver_device,    0,      "Timex of Portugal",    "TC-2048" , 0)
+COMP( 1983, ts2068,   spectrum, 0,      ts2068,     spectrum, driver_device,    0,      "Timex Sinclair",       "TS-2068" , 0)
+COMP( 1986, uk2086,   spectrum, 0,      uk2086,     spectrum, driver_device,    0,      "Unipolbrit",           "UK-2086 ver. 1.2" , 0)

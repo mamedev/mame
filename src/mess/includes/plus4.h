@@ -19,38 +19,38 @@
 #include "machine/pla.h"
 #include "machine/ram.h"
 
-#define MOS7501_TAG			"u2"
-#define MOS7360_TAG			"u1"
-#define MOS6551_TAG			"u3"
-#define MOS6529_USER_TAG	"u5"
-#define MOS6529_KB_TAG		"u27"
-#define T6721_TAG			"t6721"
-#define PLA_TAG				"u19"
-#define SCREEN_TAG			"screen"
+#define MOS7501_TAG         "u2"
+#define MOS7360_TAG         "u1"
+#define MOS6551_TAG         "u3"
+#define MOS6529_USER_TAG    "u5"
+#define MOS6529_KB_TAG      "u27"
+#define T6721_TAG           "t6721"
+#define PLA_TAG             "u19"
+#define SCREEN_TAG          "screen"
 
 class plus4_state : public driver_device
 {
 public:
 	plus4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, MOS7501_TAG),
-		  m_pla(*this, PLA_TAG),
-		  m_ted(*this, MOS7360_TAG),
-		  m_acia(*this, MOS6551_TAG),
-		  m_spi_user(*this, MOS6529_USER_TAG),
-		  m_spi_kb(*this, MOS6529_KB_TAG),
-		  m_t6721(*this, T6721_TAG),
-		  m_iec(*this, CBM_IEC_TAG),
-		  m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
-		  m_user(*this, PLUS4_USER_PORT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		  m_function(NULL),
-		  m_c2(NULL),
-		  m_addr(0),
-		  m_ted_irq(CLEAR_LINE),
-		  m_acia_irq(CLEAR_LINE),
-		  m_exp_irq(CLEAR_LINE)
+			m_maincpu(*this, MOS7501_TAG),
+			m_pla(*this, PLA_TAG),
+			m_ted(*this, MOS7360_TAG),
+			m_acia(*this, MOS6551_TAG),
+			m_spi_user(*this, MOS6529_USER_TAG),
+			m_spi_kb(*this, MOS6529_KB_TAG),
+			m_t6721(*this, T6721_TAG),
+			m_iec(*this, CBM_IEC_TAG),
+			m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
+			m_user(*this, PLUS4_USER_PORT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_function(NULL),
+			m_c2(NULL),
+			m_addr(0),
+			m_ted_irq(CLEAR_LINE),
+			m_acia_irq(CLEAR_LINE),
+			m_exp_irq(CLEAR_LINE)
 	{ }
 
 	required_device<m7501_device> m_maincpu;

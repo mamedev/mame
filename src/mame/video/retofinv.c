@@ -201,7 +201,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 		}
 
 		sy -= 16 * sizey;
-		sy = (sy & 0xff) - 32;	// fix wraparound
+		sy = (sy & 0xff) - 32;  // fix wraparound
 
 		for (y = 0;y <= sizey;y++)
 		{

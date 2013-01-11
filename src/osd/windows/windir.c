@@ -63,10 +63,10 @@
 
 struct osd_directory
 {
-	HANDLE				find;					// handle to the finder
-	int					is_first;				// TRUE if this is the first entry
-	osd_directory_entry	entry;					// current entry's data
-	WIN32_FIND_DATA		data;					// current raw data
+	HANDLE              find;                   // handle to the finder
+	int                 is_first;               // TRUE if this is the first entry
+	osd_directory_entry entry;                  // current entry's data
+	WIN32_FIND_DATA     data;                   // current raw data
 };
 
 
@@ -184,4 +184,3 @@ int osd_is_absolute_path(const char *path)
 	}
 	return result;
 }
-

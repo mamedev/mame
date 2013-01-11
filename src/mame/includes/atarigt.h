@@ -7,47 +7,47 @@
 #include "machine/atarigen.h"
 
 
-#define CRAM_ENTRIES		0x4000
-#define TRAM_ENTRIES		0x4000
-#define MRAM_ENTRIES		0x8000
+#define CRAM_ENTRIES        0x4000
+#define TRAM_ENTRIES        0x4000
+#define MRAM_ENTRIES        0x8000
 
-#define ADDRSEQ_COUNT	4
+#define ADDRSEQ_COUNT   4
 
 class atarigt_state : public atarigen_state
 {
 public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_colorram(*this, "colorram", 32),
-		  m_mo_command(*this, "mo_command") { }
+			m_colorram(*this, "colorram", 32),
+			m_mo_command(*this, "mo_command") { }
 
-	UINT8			m_is_primrage;
+	UINT8           m_is_primrage;
 	required_shared_ptr<UINT16> m_colorram;
 
-	bitmap_ind16 *		m_pf_bitmap;
-	bitmap_ind16 *		m_an_bitmap;
+	bitmap_ind16 *      m_pf_bitmap;
+	bitmap_ind16 *      m_an_bitmap;
 
-	UINT8			m_playfield_tile_bank;
-	UINT8			m_playfield_color_bank;
-	UINT16			m_playfield_xscroll;
-	UINT16			m_playfield_yscroll;
+	UINT8           m_playfield_tile_bank;
+	UINT8           m_playfield_color_bank;
+	UINT16          m_playfield_xscroll;
+	UINT16          m_playfield_yscroll;
 
-	UINT32			m_tram_checksum;
+	UINT32          m_tram_checksum;
 
-	UINT32			m_expanded_mram[MRAM_ENTRIES * 3];
+	UINT32          m_expanded_mram[MRAM_ENTRIES * 3];
 
 	required_shared_ptr<UINT32> m_mo_command;
 
-	void			(*m_protection_w)(address_space &space, offs_t offset, UINT16 data);
-	void			(*m_protection_r)(address_space &space, offs_t offset, UINT16 *data);
+	void            (*m_protection_w)(address_space &space, offs_t offset, UINT16 data);
+	void            (*m_protection_r)(address_space &space, offs_t offset, UINT16 *data);
 
-	UINT8			m_ignore_writes;
-	offs_t			m_protaddr[ADDRSEQ_COUNT];
-	UINT8			m_protmode;
-	UINT16			m_protresult;
-	UINT8			m_protdata[0x800];
+	UINT8           m_ignore_writes;
+	offs_t          m_protaddr[ADDRSEQ_COUNT];
+	UINT8           m_protmode;
+	UINT16          m_protresult;
+	UINT8           m_protdata[0x800];
 
-	device_t *		m_rle;
+	device_t *      m_rle;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ32_MEMBER(special_port2_r);

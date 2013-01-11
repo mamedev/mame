@@ -251,7 +251,7 @@ WRITE8_MEMBER(igs009_state::fg_color_w)
 
 void igs009_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_gp98_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
@@ -268,7 +268,7 @@ void igs009_state::video_start()
 
 VIDEO_START_MEMBER(igs009_state,gp98)
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_gp98_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
@@ -291,9 +291,9 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 	if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-		if (machine().input().code_pressed(KEYCODE_A))	mask |= 4;
+		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_A))  mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
@@ -348,10 +348,10 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 		}
 
 	}
-	else					bitmap.fill(get_black_pen(machine()), cliprect);
+	else                    bitmap.fill(get_black_pen(machine()), cliprect);
 
 
-	if (layers_ctrl & 2)	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -382,14 +382,14 @@ WRITE8_MEMBER(igs009_state::jingbell_nmi_and_coins_w)
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(machine(), 3,		data & 0x10);	// coin m_out mech
+	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
+	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
+	coin_counter_w(machine(), 2,        data & 0x08);   // key in
+	coin_counter_w(machine(), 3,        data & 0x10);   // coin m_out mech
 
-	set_led_status(machine(), 6,		data & 0x40);	// led for coin m_out / m_hopper active
+	set_led_status(machine(), 6,        data & 0x40);   // led for coin m_out / m_hopper active
 
-	m_nmi_enable = data;	//  data & 0x80     // nmi enable?
+	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
 	m_out[0] = data;
 	show_out();
@@ -397,11 +397,11 @@ WRITE8_MEMBER(igs009_state::jingbell_nmi_and_coins_w)
 
 WRITE8_MEMBER(igs009_state::jingbell_video_and_leds_w)
 {
-	set_led_status(machine(), 4,	  data & 0x01);	// start?
-	set_led_status(machine(), 5,	  data & 0x04);	// l_bet?
+	set_led_status(machine(), 4,      data & 0x01); // start?
+	set_led_status(machine(), 5,      data & 0x04); // l_bet?
 
-	m_video_enable	=	  data & 0x40;
-	m_hopper			=	(~data)& 0x80;
+	m_video_enable  =     data & 0x40;
+	m_hopper            =   (~data)& 0x80;
 
 	m_out[1] = data;
 	show_out();
@@ -409,10 +409,10 @@ WRITE8_MEMBER(igs009_state::jingbell_video_and_leds_w)
 
 WRITE8_MEMBER(igs009_state::jingbell_leds_w)
 {
-	set_led_status(machine(), 0, data & 0x01);	// stop_1
-	set_led_status(machine(), 1, data & 0x02);	// stop_2
-	set_led_status(machine(), 2, data & 0x04);	// stop_3
-	set_led_status(machine(), 3, data & 0x08);	// stop
+	set_led_status(machine(), 0, data & 0x01);  // stop_1
+	set_led_status(machine(), 1, data & 0x02);  // stop_2
+	set_led_status(machine(), 2, data & 0x04);  // stop_3
+	set_led_status(machine(), 3, data & 0x08);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -443,11 +443,11 @@ READ8_MEMBER(igs009_state::jingbell_magic_r)
 	switch(m_igs_magic[0])
 	{
 		case 0x00:
-			if ( !(m_igs_magic[1] & 0x01) )	return ioport("DSW1")->read();
-			if ( !(m_igs_magic[1] & 0x02) )	return ioport("DSW2")->read();
-			if ( !(m_igs_magic[1] & 0x04) )	return ioport("DSW3")->read();
-			if ( !(m_igs_magic[1] & 0x08) )	return ioport("DSW4")->read();
-			if ( !(m_igs_magic[1] & 0x10) )	return ioport("DSW5")->read();
+			if ( !(m_igs_magic[1] & 0x01) ) return ioport("DSW1")->read();
+			if ( !(m_igs_magic[1] & 0x02) ) return ioport("DSW2")->read();
+			if ( !(m_igs_magic[1] & 0x04) ) return ioport("DSW3")->read();
+			if ( !(m_igs_magic[1] & 0x08) ) return ioport("DSW4")->read();
+			if ( !(m_igs_magic[1] & 0x10) ) return ioport("DSW5")->read();
 			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", space.device().safe_pc(), m_igs_magic[1]);
 			break;
 
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(jingbell_magic_r, jingbell_magic_w )	// DSW1-5
+	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(jingbell_magic_r, jingbell_magic_w )    // DSW1-5
 
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 
@@ -515,7 +515,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "W-Up Bonus" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	// it's shown in attract mode
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // it's shown in attract mode
 	PORT_DIPNAME( 0x04, 0x04, "Min Bet" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x00, "8" )
@@ -621,11 +621,11 @@ static INPUT_PORTS_START( jingbell )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")	// stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, (void *)0 )	// hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")    // stats, memory
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, (void *)0 )  // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )	// test (press during boot)
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Records")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -634,7 +634,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2         )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")	// pays out
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")    // pays out
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -670,8 +670,8 @@ static const gfx_layout layout_8x8x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP8(0,2*8) },
 	8*8*2
@@ -683,8 +683,8 @@ static const gfx_layout layout_8x32x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP32(0,2*8) },
 	8*32*2
@@ -729,20 +729,20 @@ GFXDECODE_END
 
 void igs009_state::machine_reset()
 {
-	m_nmi_enable		=	0;
-	m_hopper			=	0;
-	m_video_enable	=	1;
+	m_nmi_enable        =   0;
+	m_hopper            =   0;
+	m_video_enable  =   1;
 }
 
 INTERRUPT_GEN_MEMBER(igs009_state::jingbell_interrupt)
 {
-	 if (m_nmi_enable & 0x80)
+		if (m_nmi_enable & 0x80)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( jingbell, igs009_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(jingbell_map)
 	MCFG_CPU_IO_MAP(jingbell_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs009_state, jingbell_interrupt)
@@ -852,16 +852,16 @@ DRIVER_INIT_MEMBER(igs009_state,jingbell)
 		UINT8 x = rom[i];
 		if (i & 0x0080)
 		{
-			if ((i & 0x0420) == 0x0420)	x ^= 0x20;
-			else						x ^= 0x22;
+			if ((i & 0x0420) == 0x0420) x ^= 0x20;
+			else                        x ^= 0x22;
 		}
 		else
 		{
-			if (i & 0x0200)	x ^= 0x02;
-			else			x ^= 0x22;
+			if (i & 0x0200) x ^= 0x02;
+			else            x ^= 0x22;
 		}
 
-		if ((i & 0x1208) == 0x1208)	x ^= 0x01;
+		if ((i & 0x1208) == 0x1208) x ^= 0x01;
 
 		rom[i] = x;
 	}

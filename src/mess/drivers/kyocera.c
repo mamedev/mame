@@ -86,18 +86,18 @@ READ8_MEMBER( pc8201_state::bank_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       LADR1       select address 0 to 7fff
-        1       LADR2       select address 0 to 7fff
-        2       HADR1       select address 8000 to ffff
-        3       HADR2       select address 8000 to ffff
-        4
-        5
-        6       SELB        serial interface status bit 1
-        7       SELA        serial interface status bit 0
+	    0       LADR1       select address 0 to 7fff
+	    1       LADR2       select address 0 to 7fff
+	    2       HADR1       select address 8000 to ffff
+	    3       HADR2       select address 8000 to ffff
+	    4
+	    5
+	    6       SELB        serial interface status bit 1
+	    7       SELA        serial interface status bit 0
 
-    */
+	*/
 
 	return (m_iosel << 5) | m_bank;
 }
@@ -165,18 +165,18 @@ WRITE8_MEMBER( pc8201_state::bank_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       LADR1       select address 0 to 7fff
-        1       LADR2       select address 0 to 7fff
-        2       HADR1       select address 8000 to ffff
-        3       HADR2       select address 8000 to ffff
-        4
-        5
-        6
-        7
+	    0       LADR1       select address 0 to 7fff
+	    1       LADR2       select address 0 to 7fff
+	    2       HADR1       select address 8000 to ffff
+	    3       HADR2       select address 8000 to ffff
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	bankswitch(data);
 }
@@ -185,18 +185,18 @@ WRITE8_MEMBER( pc8201_state::scp_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0
-        1
-        2
-        3       REMOTE      cassette motor
-        4       TSTB        RTC strobe
-        5       PSTB        printer strobe
-        6       SELB        serial interface select bit 1
-        7       SELA        serial interface select bit 0
+	    0
+	    1
+	    2
+	    3       REMOTE      cassette motor
+	    4       TSTB        RTC strobe
+	    5       PSTB        printer strobe
+	    6       SELB        serial interface select bit 1
+	    7       SELA        serial interface select bit 0
 
-    */
+	*/
 
 	/* cassette motor */
 	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -215,24 +215,24 @@ WRITE8_MEMBER( kc85_state::uart_ctrl_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       SBS         stop bit select
-        1       EPE         even parity enable
-        2       PI          parity inhibit
-        3       CLS1        character length select bit 1
-        4       CLS2        character length select bit 2
-        5
-        6
-        7
+	    0       SBS         stop bit select
+	    1       EPE         even parity enable
+	    2       PI          parity inhibit
+	    3       CLS1        character length select bit 1
+	    4       CLS2        character length select bit 2
+	    5
+	    6
+	    7
 
-    */
+	*/
 
-    m_uart->sbs_w(BIT(data, 0));
-    m_uart->epe_w(BIT(data, 1));
-    m_uart->pi_w(BIT(data, 2));
-    m_uart->cls1_w(BIT(data, 3));
-    m_uart->cls2_w(BIT(data, 4));
+	m_uart->sbs_w(BIT(data, 0));
+	m_uart->epe_w(BIT(data, 1));
+	m_uart->pi_w(BIT(data, 2));
+	m_uart->cls1_w(BIT(data, 3));
+	m_uart->cls2_w(BIT(data, 4));
 
 	m_uart->crl_w(1);
 }
@@ -241,18 +241,18 @@ READ8_MEMBER( kc85_state::uart_status_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       CD          carrier detect
-        1       OE          overrun error
-        2       FE          framing error
-        3       PE          parity error
-        4       TBRE        transmit buffer register empty
-        5       RP
-        6       +5V
-        7       _LPS        low power sensor
+	    0       CD          carrier detect
+	    1       OE          overrun error
+	    2       FE          framing error
+	    3       PE          parity error
+	    4       TBRE        transmit buffer register empty
+	    5       RP
+	    6       +5V
+	    7       _LPS        low power sensor
 
-    */
+	*/
 
 	UINT8 data = 0x40;
 
@@ -283,18 +283,18 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       _DCD/_RD    data carrier detect / ring detect
-        1       OE          overrun error
-        2       FE          framing error
-        3       PE          parity error
-        4       TBRE        transmit buffer register empty
-        5       RP
-        6       +5V
-        7       _LPS        low power signal
+	    0       _DCD/_RD    data carrier detect / ring detect
+	    1       OE          overrun error
+	    2       FE          framing error
+	    3       PE          parity error
+	    4       TBRE        transmit buffer register empty
+	    5       RP
+	    6       +5V
+	    7       _LPS        low power signal
 
-    */
+	*/
 
 	UINT8 data = 0x40;
 
@@ -325,18 +325,18 @@ WRITE8_MEMBER( pc8201_state::romah_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       A16
-        1       ROM SEL
-        2
-        3
-        4
-        5
-        6
-        7
+	    0       A16
+	    1       ROM SEL
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	// ROM address bit 16
 	m_rom_addr = (BIT(data, 0) << 16) | (m_rom_addr & 0xffff);
@@ -349,18 +349,18 @@ WRITE8_MEMBER( pc8201_state::romal_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       A0
-        1       A1
-        2       A2
-        3       A3
-        4       A4
-        5       A5
-        6       A6
-        7       A7
+	    0       A0
+	    1       A1
+	    2       A2
+	    3       A3
+	    4       A4
+	    5       A5
+	    6       A6
+	    7       A7
 
-    */
+	*/
 
 	m_rom_addr = (m_rom_addr & 0x1ff00) | data;
 }
@@ -369,18 +369,18 @@ WRITE8_MEMBER( pc8201_state::romam_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       A8
-        1       A9
-        2       A10
-        3       A11
-        4       A12
-        5       A13
-        6       A14
-        7       A15
+	    0       A8
+	    1       A9
+	    2       A10
+	    3       A11
+	    4       A12
+	    5       A13
+	    6       A14
+	    7       A15
 
-    */
+	*/
 
 	m_rom_addr = (m_rom_addr & 0x100ff) | (data << 8);
 }
@@ -401,18 +401,18 @@ WRITE8_MEMBER( kc85_state::modem_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   telephone line signal selection relay output
-        1       EN          MC14412 enable output
-        2
-        3
-        4
-        5
-        6
-        7
+	    0                   telephone line signal selection relay output
+	    1       EN          MC14412 enable output
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	//m_modem->en_w(BIT(data, 1));
 }
@@ -421,18 +421,18 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       _STROM      ROM selection (0=standard, 1=option)
-        1       _STROBE     printer strobe output
-        2       STB         RTC strobe output
-        3       _REMOTE     cassette motor
-        4
-        5
-        6
-        7
+	    0       _STROM      ROM selection (0=standard, 1=option)
+	    1       _STROBE     printer strobe output
+	    2       STB         RTC strobe output
+	    3       _REMOTE     cassette motor
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	/* ROM bank selection */
 	membank("bank1")->set_entry(BIT(data, 0));
@@ -504,18 +504,18 @@ WRITE8_MEMBER( tandy200_state::stbk_w )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        0       _PSTB   printer strobe output
-        1       REMOTE  cassette motor
-        2
-        3
-        4
-        5
-        6
-        7
+	    0       _PSTB   printer strobe output
+	    1       REMOTE  cassette motor
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	/* printer strobe */
 	m_centronics->strobe_w(BIT(data, 0));
@@ -881,7 +881,7 @@ static UPD1990A_INTERFACE( kc85_upd1990a_intf )
 
 static RP5C01_INTERFACE( tandy200_rtc_intf )
 {
-	DEVCB_NULL								/* alarm */
+	DEVCB_NULL                              /* alarm */
 };
 
 /* 8155 Interface */
@@ -890,18 +890,18 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       LCD chip select 0, key scan 0, RTC C0
-        1       LCD chip select 1, key scan 1, RTC C1
-        2       LCD chip select 2, key scan 2, RTC C2
-        3       LCD chip select 3, key scan 3, RTC CLK
-        4       LCD chip select 4, key scan 4, RTC DATA IN
-        5       LCD chip select 5, key scan 5
-        6       LCD chip select 6, key scan 6
-        7       LCD chip select 7, key scan 7
+	    0       LCD chip select 0, key scan 0, RTC C0
+	    1       LCD chip select 1, key scan 1, RTC C1
+	    2       LCD chip select 2, key scan 2, RTC C2
+	    3       LCD chip select 3, key scan 3, RTC CLK
+	    4       LCD chip select 4, key scan 4, RTC DATA IN
+	    5       LCD chip select 5, key scan 5
+	    6       LCD chip select 6, key scan 6
+	    7       LCD chip select 7, key scan 7
 
-    */
+	*/
 
 	/* keyboard */
 	m_keylatch = (m_keylatch & 0x100) | data;
@@ -928,18 +928,18 @@ WRITE8_MEMBER( kc85_state::i8155_pb_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   LCD chip select 8, key scan 8
-        1                   LCD chip select 9
-        2       _MC         melody control output
-        3       DCD/_RD     RS232 DCD/_RD select (0=RS232, 1=modem)
-        4       APO         auto power off output
-        5       BELL        buzzer output (0=ring, 1=not ring)
-        6       _DTR        RS232 data terminal ready output
-        7       _RTS        RS232 request to send output
+	    0                   LCD chip select 8, key scan 8
+	    1                   LCD chip select 9
+	    2       _MC         melody control output
+	    3       DCD/_RD     RS232 DCD/_RD select (0=RS232, 1=modem)
+	    4       APO         auto power off output
+	    5       BELL        buzzer output (0=ring, 1=not ring)
+	    6       _DTR        RS232 data terminal ready output
+	    7       _RTS        RS232 request to send output
 
-    */
+	*/
 
 	/* keyboard */
 	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
@@ -959,16 +959,16 @@ READ8_MEMBER( kc85_state::i8155_pc_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       CDI         clock data input
-        1       SLCT        _BUSY signal from printer
-        2       BUSY        BUSY signal from printer
-        3       BCR         bar code reader data input
-        4       _CTS        RS232 clear to send input
-        5       _DSR        RS232 DSR input
+	    0       CDI         clock data input
+	    1       SLCT        _BUSY signal from printer
+	    2       BUSY        BUSY signal from printer
+	    3       BCR         bar code reader data input
+	    4       _CTS        RS232 clear to send input
+	    5       _DSR        RS232 DSR input
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -995,31 +995,31 @@ WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 
 static I8155_INTERFACE( kc85_8155_intf )
 {
-	DEVCB_NULL,											/* port A read */
-	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pa_w),		/* port A write */
-	DEVCB_NULL,											/* port B read */
-	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pb_w),		/* port B write */
-	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pc_r),		/* port C read */
-	DEVCB_NULL,											/* port C write */
-	DEVCB_DRIVER_LINE_MEMBER(kc85_state, i8155_to_w)	/* timer output */
+	DEVCB_NULL,                                         /* port A read */
+	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pa_w),        /* port A write */
+	DEVCB_NULL,                                         /* port B read */
+	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pb_w),        /* port B write */
+	DEVCB_DRIVER_MEMBER(kc85_state, i8155_pc_r),        /* port C read */
+	DEVCB_NULL,                                         /* port C write */
+	DEVCB_DRIVER_LINE_MEMBER(kc85_state, i8155_to_w)    /* timer output */
 };
 
 WRITE8_MEMBER( tandy200_state::i8155_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       print data 0, key scan 0
-        1       print data 1, key scan 1
-        2       print data 2, key scan 2
-        3       print data 3, key scan 3
-        4       print data 4, key scan 4
-        5       print data 5, key scan 5
-        6       print data 6, key scan 6
-        7       print data 7, key scan 7
+	    0       print data 0, key scan 0
+	    1       print data 1, key scan 1
+	    2       print data 2, key scan 2
+	    3       print data 3, key scan 3
+	    4       print data 4, key scan 4
+	    5       print data 5, key scan 5
+	    6       print data 6, key scan 6
+	    7       print data 7, key scan 7
 
-    */
+	*/
 
 	m_centronics->write(space, 0, data);
 
@@ -1030,18 +1030,18 @@ WRITE8_MEMBER( tandy200_state::i8155_pb_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   key scan 8
-        1       ORIG/ANS    (1=ORIG, 0=ANS)
-        2       _BUZZER     (0=data from 8155 TO, 1=data from PB2)
-        3       _RS232C     (1=modem, 0=RS-232)
-        4       PCS         power cut signal
-        5       BELL        buzzer data output
-        6       MEN         modem enable output
-        7       CALL        connects and disconnects the phone line
+	    0                   key scan 8
+	    1       ORIG/ANS    (1=ORIG, 0=ANS)
+	    2       _BUZZER     (0=data from 8155 TO, 1=data from PB2)
+	    3       _RS232C     (1=modem, 0=RS-232)
+	    4       PCS         power cut signal
+	    5       BELL        buzzer data output
+	    6       MEN         modem enable output
+	    7       CALL        connects and disconnects the phone line
 
-    */
+	*/
 
 	/* keyboard */
 	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
@@ -1057,16 +1057,16 @@ READ8_MEMBER( tandy200_state::i8155_pc_r )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        0       _LPS    low power sense input
-        1       _BUSY   not busy input
-        2       BUSY    busy input
-        3       BCR     bar code reader data input
-        4       CD      carrier detect input
-        5       CDBD    carrier detect break down input
+	    0       _LPS    low power sense input
+	    1       _BUSY   not busy input
+	    2       BUSY    busy input
+	    3       BCR     bar code reader data input
+	    4       CD      carrier detect input
+	    5       CDBD    carrier detect break down input
 
-    */
+	*/
 
 	UINT8 data = 0x01;
 
@@ -1086,13 +1086,13 @@ WRITE_LINE_MEMBER( tandy200_state::i8155_to_w )
 
 static I8155_INTERFACE( tandy200_8155_intf )
 {
-	DEVCB_NULL,												/* port A read */
-	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pa_w),		/* port A write */
-	DEVCB_NULL,												/* port B read */
-	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pb_w),		/* port B write */
-	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pc_r),		/* port C read */
-	DEVCB_NULL,												/* port C write */
-	DEVCB_DRIVER_LINE_MEMBER(tandy200_state, i8155_to_w)	/* timer output */
+	DEVCB_NULL,                                             /* port A read */
+	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pa_w),        /* port A write */
+	DEVCB_NULL,                                             /* port B read */
+	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pb_w),        /* port B write */
+	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pc_r),        /* port C read */
+	DEVCB_NULL,                                             /* port C write */
+	DEVCB_DRIVER_LINE_MEMBER(tandy200_state, i8155_to_w)    /* timer output */
 };
 
 /* IM6402 Interface */
@@ -1283,10 +1283,10 @@ READ_LINE_MEMBER(kc85_state::kc85_sid_r)
 
 static I8085_CONFIG( kc85_i8085_config )
 {
-	DEVCB_NULL,				/* STATUS changed callback */
-	DEVCB_NULL,				/* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sid_r),	/* SID changed callback (I8085A only) */
-	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sod_w)	/* SOD changed callback (I8085A only) */
+	DEVCB_NULL,             /* STATUS changed callback */
+	DEVCB_NULL,             /* INTE changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sid_r),    /* SID changed callback (I8085A only) */
+	DEVCB_DRIVER_LINE_MEMBER(kc85_state,kc85_sod_w) /* SOD changed callback (I8085A only) */
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
@@ -1513,12 +1513,12 @@ ROM_END
 
 ROM_START( trsm100 )
 	/*
-        Board Code  ROM type            ROM Code            Comment
-        -------------------------------------------------------------------
-        PLX110CH1X  custom              LH535618            early North America
-        PLX110EH1X  27C256 compatible   3256C07-3J1/11US    late North America
-        PLX120CH1X  27C256 compatible   3256C05-3E1/11EP    European/Italian
-    */
+	    Board Code  ROM type            ROM Code            Comment
+	    -------------------------------------------------------------------
+	    PLX110CH1X  custom              LH535618            early North America
+	    PLX110EH1X  27C256 compatible   3256C07-3J1/11US    late North America
+	    PLX120CH1X  27C256 compatible   3256C05-3E1/11EP    European/Italian
+	*/
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m100rom.m12",  0x0000, 0x8000, CRC(730a3611) SHA1(094dbc4ac5a4ea5cdf51a1ac581a40a9622bb25d) )
 
@@ -1548,9 +1548,9 @@ ROM_START( tandy200 )
 	ROM_REGION( 0x18000, I8085_TAG, 0 )
 	ROM_LOAD( "rom #1-1.m15", 0x00000, 0x8000, NO_DUMP )
 	ROM_LOAD( "rom #1-2.m13", 0x08000, 0x2000, NO_DUMP )
-	ROM_LOAD( "rom #2.m14",	  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "rom #2.m14",   0x10000, 0x8000, NO_DUMP )
 	ROM_LOAD( "t200rom.bin", 0x0000, 0xa000, BAD_DUMP CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) ) /* Y2K hacked */
-	ROM_CONTINUE(			0x10000, 0x8000 )
+	ROM_CONTINUE(           0x10000, 0x8000 )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
@@ -1558,12 +1558,12 @@ ROM_END
 
 /* System Drivers */
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME */
-COMP( 1983,	kc85,		0,		0,		kc85,		kc85, driver_device,		0,		"Kyosei",				"Kyotronic 85 (Japan)", 0 )
-COMP( 1983, m10,		kc85,	0,		kc85,		olivm10, driver_device,	0,		"Olivetti",				"M-10", 0 )
+COMP( 1983, kc85,       0,      0,      kc85,       kc85, driver_device,        0,      "Kyosei",               "Kyotronic 85 (Japan)", 0 )
+COMP( 1983, m10,        kc85,   0,      kc85,       olivm10, driver_device, 0,      "Olivetti",             "M-10", 0 )
 //COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10, driver_device,    0,      "Olivetti",             "M-10 Modem (US)", 0 )
-COMP( 1983, trsm100,	0,		0,		trsm100,	kc85, driver_device,		0,		"Tandy Radio Shack",	"TRS-80 Model 100", 0 )
-COMP( 1986, tandy102,	trsm100,0,		tandy102,	kc85, driver_device,		0,		"Tandy Radio Shack",	"Tandy 102", 0 )
+COMP( 1983, trsm100,    0,      0,      trsm100,    kc85, driver_device,        0,      "Tandy Radio Shack",    "TRS-80 Model 100", 0 )
+COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85, driver_device,        0,      "Tandy Radio Shack",    "Tandy 102", 0 )
 COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201a, driver_device,    0,      "Nippon Electronic Company",                  "PC-8201 (Japan)", 0 )
-COMP( 1983, pc8201a,	pc8201,	0,		pc8201,		pc8201a, driver_device,	0,		"Nippon Electronic Company",					"PC-8201A", 0 )
+COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a, driver_device, 0,      "Nippon Electronic Company",                    "PC-8201A", 0 )
 COMP( 1987, npc8300,    pc8201, 0,      pc8201,     pc8201a, driver_device,    0,      "Nippon Electronic Company",                  "PC-8300", GAME_NOT_WORKING )
-COMP( 1984, tandy200,	0,		0,		tandy200,	kc85, driver_device,		0,		"Tandy Radio Shack",	"Tandy 200", 0 )
+COMP( 1984, tandy200,   0,      0,      tandy200,   kc85, driver_device,        0,      "Tandy Radio Shack",    "Tandy 200", 0 )

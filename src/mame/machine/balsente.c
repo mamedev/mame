@@ -12,7 +12,7 @@
 #include "sound/cem3394.h"
 
 
-#define LOG_CEM_WRITES		0
+#define LOG_CEM_WRITES      0
 
 
 /* local prototypes */
@@ -203,11 +203,11 @@ static void poly17_init(running_machine &machine)
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)
 	{
-        /* store new values */
+		/* store new values */
 		*p++ = x & 1;
 		*r++ = x >> 3;
 
-        /* calculate next bit */
+		/* calculate next bit */
 		x = ((x << POLY17_SHL) + (x >> POLY17_SHR) + POLY17_ADD) & POLY17_SIZE;
 	}
 }
@@ -1209,4 +1209,3 @@ READ16_MEMBER(balsente_state::shrike_io_68k_r)
 {
 	return ( m_shrike_io[offset] & mem_mask ) >> ( 8 & ~mem_mask );
 }
-

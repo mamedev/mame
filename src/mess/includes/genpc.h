@@ -18,7 +18,7 @@
 #include "imagedev/cassette.h"
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
-    MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
+	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
 	ibm5160_mb_device::static_set_cputag(*device, _cputag); \
 
 // ======================> ibm5160_mb_device
@@ -53,8 +53,8 @@ public:
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
-	UINT8	m_u73_q2;
-	UINT8	m_out1;
+	UINT8   m_u73_q2;
+	UINT8   m_out1;
 	int m_dma_channel;
 	UINT8 m_dma_offset[4];
 	UINT8 m_pc_spkrdata;
@@ -63,15 +63,15 @@ public:
 
 	UINT8 m_nmi_enabled;
 
-	int						m_ppi_portc_switch_high;
-	int						m_ppi_speaker;
-	int						m_ppi_keyboard_clear;
-	UINT8					m_ppi_keyb_clock;
-	UINT8					m_ppi_portb;
-	UINT8					m_ppi_clock_signal;
-	UINT8					m_ppi_data_signal;
-	UINT8					m_ppi_shift_register;
-	UINT8					m_ppi_shift_enable;
+	int                     m_ppi_portc_switch_high;
+	int                     m_ppi_speaker;
+	int                     m_ppi_keyboard_clear;
+	UINT8                   m_ppi_keyb_clock;
+	UINT8                   m_ppi_portb;
+	UINT8                   m_ppi_clock_signal;
+	UINT8                   m_ppi_data_signal;
+	UINT8                   m_ppi_shift_register;
+	UINT8                   m_ppi_shift_enable;
 
 	static IRQ_CALLBACK(pc_irq_callback);
 
@@ -117,8 +117,8 @@ extern const device_type IBM5160_MOTHERBOARD;
 
 
 #define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag) \
-    MCFG_DEVICE_ADD(_tag, IBM5150_MOTHERBOARD, 0) \
-    ibm5150_mb_device::static_set_cputag(*device, _cputag); \
+	MCFG_DEVICE_ADD(_tag, IBM5150_MOTHERBOARD, 0) \
+	ibm5150_mb_device::static_set_cputag(*device, _cputag); \
 
 
 // ======================> ibm5150_mb_device
@@ -135,7 +135,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	required_device<cassette_image_device>	m_cassette;
+	required_device<cassette_image_device>  m_cassette;
 public:
 	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
 	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );

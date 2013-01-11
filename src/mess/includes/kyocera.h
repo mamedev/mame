@@ -20,54 +20,54 @@
 #include "sound/speaker.h"
 #include "rendlay.h"
 
-#define SCREEN_TAG		"screen"
-#define I8085_TAG		"m19"
-#define I8155_TAG		"m25"
-#define UPD1990A_TAG	"m18"
-#define IM6402_TAG		"m22"
-#define MC14412_TAG		"m31"
-#define HD44102_0_TAG	"m1"
-#define HD44102_1_TAG	"m2"
-#define HD44102_2_TAG	"m3"
-#define HD44102_3_TAG	"m4"
-#define HD44102_4_TAG	"m5"
-#define HD44102_5_TAG	"m6"
-#define HD44102_6_TAG	"m7"
-#define HD44102_7_TAG	"m8"
-#define HD44102_8_TAG	"m9"
-#define HD44102_9_TAG	"m10"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define I8085_TAG       "m19"
+#define I8155_TAG       "m25"
+#define UPD1990A_TAG    "m18"
+#define IM6402_TAG      "m22"
+#define MC14412_TAG     "m31"
+#define HD44102_0_TAG   "m1"
+#define HD44102_1_TAG   "m2"
+#define HD44102_2_TAG   "m3"
+#define HD44102_3_TAG   "m4"
+#define HD44102_4_TAG   "m5"
+#define HD44102_5_TAG   "m6"
+#define HD44102_6_TAG   "m7"
+#define HD44102_7_TAG   "m8"
+#define HD44102_8_TAG   "m9"
+#define HD44102_9_TAG   "m10"
+#define CENTRONICS_TAG  "centronics"
 
 //#define I8085_TAG     "m19"
 //#define I8155_TAG     "m12"
 //#define MC14412_TAG   "m8"
-#define RP5C01A_TAG		"m301"
-#define TCM5089_TAG		"m11"
-#define I8251_TAG		"m20"
-#define HD61830_TAG		"m18"
+#define RP5C01A_TAG     "m301"
+#define TCM5089_TAG     "m11"
+#define I8251_TAG       "m20"
+#define HD61830_TAG     "m18"
 
 class kc85_state : public driver_device
 {
 public:
 	kc85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8085_TAG),
-		  m_rtc(*this, UPD1990A_TAG),
-		  m_uart(*this, IM6402_TAG),
-		  m_lcdc0(*this, HD44102_0_TAG),
-		  m_lcdc1(*this, HD44102_1_TAG),
-		  m_lcdc2(*this, HD44102_2_TAG),
-		  m_lcdc3(*this, HD44102_3_TAG),
-		  m_lcdc4(*this, HD44102_4_TAG),
-		  m_lcdc5(*this, HD44102_5_TAG),
-		  m_lcdc6(*this, HD44102_6_TAG),
-		  m_lcdc7(*this, HD44102_7_TAG),
-		  m_lcdc8(*this, HD44102_8_TAG),
-		  m_lcdc9(*this, HD44102_9_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, I8085_TAG),
+			m_rtc(*this, UPD1990A_TAG),
+			m_uart(*this, IM6402_TAG),
+			m_lcdc0(*this, HD44102_0_TAG),
+			m_lcdc1(*this, HD44102_1_TAG),
+			m_lcdc2(*this, HD44102_2_TAG),
+			m_lcdc3(*this, HD44102_3_TAG),
+			m_lcdc4(*this, HD44102_4_TAG),
+			m_lcdc5(*this, HD44102_5_TAG),
+			m_lcdc6(*this, HD44102_6_TAG),
+			m_lcdc7(*this, HD44102_7_TAG),
+			m_lcdc8(*this, HD44102_8_TAG),
+			m_lcdc9(*this, HD44102_9_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -105,14 +105,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
 
 	/* memory state */
-	UINT8 m_bank;			/* memory bank selection */
+	UINT8 m_bank;           /* memory bank selection */
 
 	/* keyboard state */
-	UINT16 m_keylatch;		/* keyboard latch */
+	UINT16 m_keylatch;      /* keyboard latch */
 
 	/* sound state */
-	int m_buzzer;				/* buzzer select */
-	int m_bell;				/* bell output */
+	int m_buzzer;               /* buzzer select */
+	int m_bell;             /* bell output */
 
 	DECLARE_PALETTE_INIT(kc85);
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
@@ -152,7 +152,7 @@ public:
 	UINT32 m_rom_addr;
 
 	/* peripheral state */
-	int m_iosel;				/* serial interface select */
+	int m_iosel;                /* serial interface select */
 };
 
 class tandy200_state : public driver_device
@@ -160,13 +160,13 @@ class tandy200_state : public driver_device
 public:
 	tandy200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8085_TAG),
-		  m_rtc(*this, RP5C01A_TAG),
-		  m_lcdc(*this, HD61830_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, I8085_TAG),
+			m_rtc(*this, RP5C01A_TAG),
+			m_lcdc(*this, HD61830_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -197,15 +197,15 @@ public:
 	void bankswitch(UINT8 data);
 
 	/* memory state */
-	UINT8 m_bank;			/* memory bank selection */
+	UINT8 m_bank;           /* memory bank selection */
 
 	/* keyboard state */
-	UINT16 m_keylatch;		/* keyboard latch */
-	int m_tp;				/* timing pulse */
+	UINT16 m_keylatch;      /* keyboard latch */
+	int m_tp;               /* timing pulse */
 
 	/* sound state */
-	int m_buzzer;			/* buzzer select */
-	int m_bell;				/* bell output */
+	int m_buzzer;           /* buzzer select */
+	int m_bell;             /* bell output */
 };
 
 /* ---------- defined in video/kyocera.c ---------- */

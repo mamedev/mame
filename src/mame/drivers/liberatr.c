@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")	/* overlapping for my convenience */
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x403f) AM_READ(earom_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(port0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")	/* overlapping for my convenience */
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")   /* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x4000) AM_READ(port0_r)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")
 	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_SHARE("base_ram")
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( liberatr )
-	PORT_START("IN0")			/* IN0 - $5000 */
+	PORT_START("IN0")           /* IN0 - $5000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("IN1")			/* IN1 - $5001 */
+	PORT_START("IN1")           /* IN1 - $5001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("DSW1")			/* IN2  -  Game Option switches DSW @ D4 on PCB */
+	PORT_START("DSW1")          /* IN2  -  Game Option switches DSW @ D4 on PCB */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -325,7 +325,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")			/* IN3  -  Pricing Option switches DSW @ A4 on PCB */
+	PORT_START("DSW2")          /* IN3  -  Pricing Option switches DSW @ A4 on PCB */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
@@ -350,7 +350,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_DIPSETTING (   0xc0, "Freeze Mode" )
 	PORT_DIPSETTING (   0xe0, "Freeze Mode" )
 
-	PORT_START("FAKE")			/* IN4 - FAKE - overlaps IN0 in the HW */
+	PORT_START("FAKE")          /* IN4 - FAKE - overlaps IN0 in the HW */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 	PORT_BIT( 0xf0, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 INPUT_PORTS_END
@@ -432,7 +432,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( liberatr )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code and data  */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code and data  */
 	ROM_LOAD( "136012.206",   0x8000, 0x1000, CRC(1a0cb4a0) SHA1(595828a07af729a84aab4e0b51e873046b56b419) )
 	ROM_LOAD( "136012.205",   0x9000, 0x1000, CRC(2f071920) SHA1(8764f3e78451c4968bffb7c7f72d1ed862f4b185) )
 	ROM_LOAD( "136012.204",   0xa000, 0x1000, CRC(bcc91827) SHA1(3bfbe1f1db58437ccd204a857e58695f56819649) )
@@ -440,55 +440,55 @@ ROM_START( liberatr )
 	ROM_LOAD( "136012.202",   0xc000, 0x1000, CRC(569ba7ea) SHA1(4812b255886204192ab999d1370550d48438ea81) )
 	ROM_LOAD( "136012.201",   0xd000, 0x1000, CRC(d12cd6d0) SHA1(94474429cbcdbb406eb045152fb158e2a23cd26d) )
 	ROM_LOAD( "136012.200",   0xe000, 0x1000, CRC(1e98d21a) SHA1(92c7cc033c78ae0ce8127d49debe62263404feb1) )
-	ROM_RELOAD(				  0xf000, 0x1000 )		/* for interrupt/reset vectors  */
+	ROM_RELOAD(               0xf000, 0x1000 )      /* for interrupt/reset vectors  */
 
-	ROM_REGION( 0x4000, "gfx1", 0 )	/* planet image, used at runtime */
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* planet image, used at runtime */
 	ROM_LOAD( "136012.110",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
 	ROM_LOAD( "136012.107",   0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
 	ROM_LOAD( "136012.108",   0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
 	ROM_LOAD( "136012.109",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
 
-	ROM_REGION( 0x100, "user1", 0 )	/* latitude scaler */
+	ROM_REGION( 0x100, "user1", 0 ) /* latitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.123",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
 	ROM_LOAD_NIB_HIGH( "136012.124",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
 
-	ROM_REGION( 0x100, "user2", 0 )	/* longitude scaler */
+	ROM_REGION( 0x100, "user2", 0 ) /* longitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.125",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
 	ROM_LOAD_NIB_HIGH( "136012.126",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-    ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) )	/* write protect PROM */
-    ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )	/* sync PROM */
+	ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) )    /* write protect PROM */
+	ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )    /* sync PROM */
 ROM_END
 
 
 ROM_START( liberatr2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code and data  */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code and data  */
 	ROM_LOAD( "l6.bin",       0x6000, 0x1000, CRC(78093d06) SHA1(0f6ca01e27b32aae384a6ab67a6f14eedd3f1d9c) )
 	ROM_LOAD( "l5.bin",       0x7000, 0x1000, CRC(988db636) SHA1(8fdd07b397d4bef108aafb10c06c2fd53fc1f99a) )
 	ROM_LOAD( "l4.bin",       0x8000, 0x1000, CRC(ec114540) SHA1(eb35510b59f5e9624c3d94fb16dacb4968349030) )
 	ROM_LOAD( "l3.bin",       0x9000, 0x1000, CRC(184c751f) SHA1(e020d2943be89f244c1aeeb34a28b7aa7dbc1454) )
 	ROM_LOAD( "l2.bin",       0xa000, 0x1000, CRC(c3f61f88) SHA1(a56ce094fe7374d3ac341d5eb9e06df083e16b1f) )
 	ROM_LOAD( "l1.bin",       0xb000, 0x1000, CRC(ef6e9f9e) SHA1(b1f7cc9e0a2ea08ec89428ad31161ac81e7faaaf) )
-	ROM_RELOAD(				  0xf000, 0x1000 )		/* for interrupt/reset vectors  */
+	ROM_RELOAD(               0xf000, 0x1000 )      /* for interrupt/reset vectors  */
 
-	ROM_REGION( 0x4000, "gfx1", 0 )	/* planet image, used at runtime */
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* planet image, used at runtime */
 	ROM_LOAD( "136012.110",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
 	ROM_LOAD( "136012.107",   0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
 	ROM_LOAD( "136012.108",   0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
 	ROM_LOAD( "136012.109",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
 
-	ROM_REGION( 0x100, "user1", 0 )	/* latitude scaler */
+	ROM_REGION( 0x100, "user1", 0 ) /* latitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.123",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
 	ROM_LOAD_NIB_HIGH( "136012.124",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
 
-	ROM_REGION( 0x100, "user2", 0 )	/* longitude scaler */
+	ROM_REGION( 0x100, "user2", 0 ) /* longitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.125",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
 	ROM_LOAD_NIB_HIGH( "136012.126",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-    ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) )	/* write protect PROM */
-    ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )	/* sync PROM */
+	ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) )    /* write protect PROM */
+	ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )    /* sync PROM */
 ROM_END
 
 
@@ -501,4 +501,3 @@ ROM_END
 
 GAME( 1982, liberatr, 0,        liberatr, liberatr, driver_device, 0, ROT0, "Atari", "Liberator (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, liberatr2,liberatr, liberat2, liberatr, driver_device, 0, ROT0, "Atari", "Liberator (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-

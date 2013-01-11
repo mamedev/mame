@@ -11,11 +11,11 @@ class toobin_state : public atarigen_state
 public:
 	toobin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_interrupt_scan(*this, "interrupt_scan") { }
+			m_interrupt_scan(*this, "interrupt_scan") { }
 
 	required_shared_ptr<UINT16> m_interrupt_scan;
 
-	double			m_brightness;
+	double          m_brightness;
 	bitmap_ind16 m_pfbitmap;
 	virtual void update_interrupts();
 	DECLARE_WRITE16_MEMBER(interrupt_scan_w);

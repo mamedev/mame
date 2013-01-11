@@ -38,7 +38,7 @@ void bishi_state::video_start()
 
 	// the 55555 is set to "0x10, 0x11, 0x12, 0x13", but these values are almost correct...
 	m_layer_colorbase[0] = 0x00;
-	m_layer_colorbase[1] = 0x40;	// this one is wrong
+	m_layer_colorbase[1] = 0x40;    // this one is wrong
 	m_layer_colorbase[2] = 0x80;
 	m_layer_colorbase[3] = 0xc0;
 }

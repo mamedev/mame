@@ -230,9 +230,9 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 		floppy->ss_w(side);
 	}
 	/*
-        When bit 5 is set CPU is in HALT state and stay there until
-        DRQ is triggered from floppy side
-    */
+	    When bit 5 is set CPU is in HALT state and stay there until
+	    DRQ is triggered from floppy side
+	*/
 
 	if ((data & 0xf0)==0x20) {
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);

@@ -20,15 +20,15 @@
 
 struct harddisk_interface
 {
-	device_image_load_func		m_device_image_load;
-	device_image_unload_func	m_device_image_unload;
-	const char *					m_interface;
-	device_image_display_info_func	m_device_displayinfo;
+	device_image_load_func      m_device_image_load;
+	device_image_unload_func    m_device_image_unload;
+	const char *                    m_interface;
+	device_image_display_info_func  m_device_displayinfo;
 };
 
 // ======================> harddisk_image_device
 
-class harddisk_image_device :	public device_t,
+class harddisk_image_device :   public device_t,
 								public harddisk_interface,
 								public device_image_interface
 {
@@ -61,16 +61,16 @@ public:
 
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
 
 	int internal_load_hd();
 
-	chd_file		*m_chd;
-	chd_file		m_origchd;				/* handle to the original CHD */
-	chd_file		m_diffchd;				/* handle to the diff CHD */
-	hard_disk_file	*m_hard_disk_handle;
+	chd_file        *m_chd;
+	chd_file        m_origchd;              /* handle to the original CHD */
+	chd_file        m_diffchd;              /* handle to the diff CHD */
+	hard_disk_file  *m_hard_disk_handle;
 
 	image_device_format m_format;
 };
@@ -87,6 +87,6 @@ extern const device_type HARDDISK;
 
 #define MCFG_HARDDISK_CONFIG_ADD(_tag,_config) \
 	MCFG_DEVICE_ADD(_tag, HARDDISK, 0) \
-	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_CONFIG(_config) \
 
 #endif /* HARDDRIV_H */

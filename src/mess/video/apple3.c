@@ -11,22 +11,22 @@
 #include "includes/apple3.h"
 #include "machine/ram.h"
 
-#define	BLACK	0
-#define DKRED	1
-#define	DKBLUE	2
-#define PURPLE	3
-#define DKGREEN	4
-#define DKGRAY	5
-#define	BLUE	6
-#define LTBLUE	7
-#define BROWN	8
-#define ORANGE	9
-#define	GRAY	10
-#define PINK	11
-#define GREEN	12
-#define YELLOW	13
-#define AQUA	14
-#define	WHITE	15
+#define BLACK   0
+#define DKRED   1
+#define DKBLUE  2
+#define PURPLE  3
+#define DKGREEN 4
+#define DKGRAY  5
+#define BLUE    6
+#define LTBLUE  7
+#define BROWN   8
+#define ORANGE  9
+#define GRAY    10
+#define PINK    11
+#define GREEN   12
+#define YELLOW  13
+#define AQUA    14
+#define WHITE   15
 
 
 static const UINT32 text_map[] =
@@ -378,7 +378,7 @@ UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &b
 			break;
 
 		case VAR_VM3:
-			apple3_video_graphics_hgr(machine(),bitmap);	/* hgr mode */
+			apple3_video_graphics_hgr(machine(),bitmap);    /* hgr mode */
 			break;
 
 		case VAR_VM3|VAR_VM0:
@@ -395,5 +395,3 @@ UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &b
 	}
 	return 0;
 }
-
-

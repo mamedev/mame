@@ -53,4 +53,4 @@ int pla_parse(const void *data, size_t length, jed_data *result);
 
 
 
-#endif	/* __PLAPARSE_H__ */
+#endif  /* __PLAPARSE_H__ */

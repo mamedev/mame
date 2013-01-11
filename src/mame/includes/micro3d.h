@@ -8,9 +8,9 @@
 #include "cpu/tms34010/tms34010.h"
 
 
-#define HOST_MONITOR_DISPLAY		0
-#define VGB_MONITOR_DISPLAY			0
-#define DRMATH_MONITOR_DISPLAY		0
+#define HOST_MONITOR_DISPLAY        0
+#define VGB_MONITOR_DISPLAY         0
+#define DRMATH_MONITOR_DISPLAY      0
 
 class micro3d_state : public driver_device
 {
@@ -23,59 +23,59 @@ public:
 	{ }
 
 	required_shared_ptr<UINT16> m_shared_ram;
-	device_t			*m_duart68681;
-	UINT8				m_m68681_tx0;
+	device_t            *m_duart68681;
+	UINT8               m_m68681_tx0;
 
 	/* Sound */
-	UINT8				m_sound_port_latch[4];
-	UINT8				m_dac_data;
+	UINT8               m_sound_port_latch[4];
+	UINT8               m_dac_data;
 
 	/* TI UART */
-	UINT8				m_ti_uart[9];
-	int					m_ti_uart_mode_cycle;
-	int					m_ti_uart_sync_cycle;
+	UINT8               m_ti_uart[9];
+	int                 m_ti_uart_mode_cycle;
+	int                 m_ti_uart_sync_cycle;
 
 	/* ADC */
-	UINT8				m_adc_val;
+	UINT8               m_adc_val;
 
 	/* Hardware version-check latch for BOTSS 1.1a */
-	UINT8				m_botss_latch;
+	UINT8               m_botss_latch;
 
 	/* MAC */
 	required_shared_ptr<UINT32> m_mac_sram;
-	UINT32				m_sram_r_addr;
-	UINT32				m_sram_w_addr;
-	UINT32				m_vtx_addr;
-	UINT32				m_mrab11;
-	UINT32				m_mac_stat;
-	UINT32				m_mac_inst;
+	UINT32              m_sram_r_addr;
+	UINT32              m_sram_w_addr;
+	UINT32              m_vtx_addr;
+	UINT32              m_mrab11;
+	UINT32              m_mac_stat;
+	UINT32              m_mac_inst;
 
 	/* 2D video */
 	required_shared_ptr<UINT16> m_micro3d_sprite_vram;
-	UINT16				m_creg;
-	UINT16				m_xfer3dk;
+	UINT16              m_creg;
+	UINT16              m_xfer3dk;
 
 	/* 3D pipeline */
-	UINT32				m_pipe_data;
-	UINT32				m_pipeline_state;
-	INT32				m_vtx_fifo[512];
-	UINT32				m_fifo_idx;
-	UINT32				m_draw_cmd;
-	int					m_draw_state;
-	INT32				m_x_min;
-	INT32				m_x_max;
-	INT32				m_y_min;
-	INT32				m_y_max;
-	INT32				m_z_min;
-	INT32				m_z_max;
-	INT32				m_x_mid;
-	INT32				m_y_mid;
-	int					m_dpram_bank;
-	UINT32				m_draw_dpram[1024];
-	UINT16				*m_frame_buffers[2];
-	UINT16				*m_tmp_buffer;
-	int					m_drawing_buffer;
-	int					m_display_buffer;
+	UINT32              m_pipe_data;
+	UINT32              m_pipeline_state;
+	INT32               m_vtx_fifo[512];
+	UINT32              m_fifo_idx;
+	UINT32              m_draw_cmd;
+	int                 m_draw_state;
+	INT32               m_x_min;
+	INT32               m_x_max;
+	INT32               m_y_min;
+	INT32               m_y_max;
+	INT32               m_z_min;
+	INT32               m_z_max;
+	INT32               m_x_mid;
+	INT32               m_y_mid;
+	int                 m_dpram_bank;
+	UINT32              m_draw_dpram[1024];
+	UINT16              *m_frame_buffers[2];
+	UINT16              *m_tmp_buffer;
+	int                 m_drawing_buffer;
+	int                 m_display_buffer;
 
 	DECLARE_WRITE16_MEMBER(micro3d_ti_uart_w);
 	DECLARE_READ16_MEMBER(micro3d_ti_uart_r);
@@ -138,7 +138,7 @@ void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 void micro3d_noise_sh_w(running_machine &machine, UINT8 data);
 
 class micro3d_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -274,10 +274,10 @@ UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 
 	m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* the fg tilemap handling is a little hacky right now,
-       i'm not sure if it should be a single tilemap with
-       rowscroll / linescroll, or two tilemaps which can be
-       combined, the flipscreen case makes things more
-       difficult to understand */
+	   i'm not sure if it should be a single tilemap with
+	   rowscroll / linescroll, or two tilemaps which can be
+	   combined, the flipscreen case makes things more
+	   difficult to understand */
 
 	if (!m_flipscreen)
 	{
@@ -343,7 +343,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_mcu_sim)
 		m_input_pressed = (m_input_pressed & 0xfb);
 
 	/*0x104/2 is some sort of "start-lock",i.e. used on the girl selection.
-      Without it,the game "steals" one credit if you press the start button on that.*/
+	  Without it,the game "steals" one credit if you press the start button on that.*/
 	if (m_mcu_shared_ram[0x000 / 2] > 0 && m_work_ram[0x104 / 2] & 1)
 	{
 		if (m_coin_input & 0x08)//start 1
@@ -419,10 +419,10 @@ WRITE16_MEMBER(ddealer_state::ddealer_mcu_shared_w)
 		case 0x62e/2: PROT_INPUT(0x62e/2,0x9ca3,0x108/2,0x80008); break;
 		case 0x734/2: PROT_INPUT(0x734/2,0xaba2,0x10c/2,0x8000a); break;
 /*These enables something for sure,maybe the random number generator?*/
- //00054C: 33FC B891 000F E828        move.w  #$b891, $fe828.l
- //000554: 33FC C760 000F E950        move.w  #$c760, $fe950.l
- //00055C: 33FC D45F 000F EA7C        move.w  #$d45f, $fea7c.l
- //000564: 33FC E32E 000F ED4A        move.w  #$e32e, $fed4a.l
+	//00054C: 33FC B891 000F E828        move.w  #$b891, $fe828.l
+	//000554: 33FC C760 000F E950        move.w  #$c760, $fe950.l
+	//00055C: 33FC D45F 000F EA7C        move.w  #$d45f, $fea7c.l
+	//000564: 33FC E32E 000F ED4A        move.w  #$e32e, $fed4a.l
 
 		case 0x40e/2: PROT_JSR(0x40e,0x8011,0x6992); break;//score
 		case 0x41e/2: break;//unused
@@ -670,7 +670,7 @@ READ16_MEMBER(ddealer_state::ddealer_mcu_r)
 
 	res = resp[m_respcount++];
 	if (resp[m_respcount] < 0)
-		 m_respcount = 0;
+			m_respcount = 0;
 
 	return res;
 }

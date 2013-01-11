@@ -1,54 +1,54 @@
- /**************************************************************************\
- *                  Microchip PIC16C62X Emulator                            *
- *                                                                          *
- *                          Based On                                        *
- *                  Microchip PIC16C5X Emulator                             *
- *                    Copyright Tony La Porta                               *
- *                 Originally written for the MAME project.                 *
- *                                                                          *
- *                                                                          *
- *      Addressing architecture is based on the Harvard addressing scheme.  *
- *                                                                          *
- *                                                                          *
- *  **** Change Log ****                                                    *
- *  SZ (22-Oct-2009)                                                        *
- *   - Improvements and tests                                               *
- *  SZ (2-Oct-2009)                                                         *
- *   - Internal ram and registers                                           *
- *  SZ (12-Sep-2009)                                                        *
- *   - Started working on it.                                               *
- *                                                                          *
- *                                                                          *
- *  **** TODO ****                                                          *
- *   - Finish checking opcodes/instructions                                 *
- *   - Internal devices                                                     *
- *   - Interrupts                                                           *
- *   - Everything !                                                         *
- *                                                                          *
- *  **** DONE ****                                                          *
- *   - I/O ports                                                            *
- *   - Savestates                                                           *
- *   - Internal memory                                                      *
- *   - New opcodes                                                          *
- *   - Opcode disassembly                                                   *
- *                                                                          *
- *  **** Notes (from PIC16C5X): ****                                        *
- *  PIC WatchDog Timer has a separate internal clock. For the moment, we're *
- *     basing the count on a 4MHz input clock, since 4MHz is the typical    *
- *     input frequency (but by no means always).                            *
- *  A single scaler is available for the Counter/Timer or WatchDog Timer.   *
- *     When connected to the Counter/Timer, it functions as a Prescaler,    *
- *     hence prescale overflows, tick the Counter/Timer.                    *
- *     When connected to the WatchDog Timer, it functions as a Postscaler   *
- *     hence WatchDog Timer overflows, tick the Postscaler. This scenario   *
- *     means that the WatchDog timeout occurs when the Postscaler has       *
- *     reached the scaler rate value, not when the WatchDog reaches zero.   *
- *  CLRWDT should prevent the WatchDog Timer from timing out and generating *
- *     a device reset, but how is not known. The manual also mentions that  *
- *     the WatchDog Timer can only be disabled during ROM programming, and  *
- *     no other means seem to exist???                                      *
- *                                                                          *
- \**************************************************************************/
+	/**************************************************************************\
+	*                  Microchip PIC16C62X Emulator                            *
+	*                                                                          *
+	*                          Based On                                        *
+	*                  Microchip PIC16C5X Emulator                             *
+	*                    Copyright Tony La Porta                               *
+	*                 Originally written for the MAME project.                 *
+	*                                                                          *
+	*                                                                          *
+	*      Addressing architecture is based on the Harvard addressing scheme.  *
+	*                                                                          *
+	*                                                                          *
+	*  **** Change Log ****                                                    *
+	*  SZ (22-Oct-2009)                                                        *
+	*   - Improvements and tests                                               *
+	*  SZ (2-Oct-2009)                                                         *
+	*   - Internal ram and registers                                           *
+	*  SZ (12-Sep-2009)                                                        *
+	*   - Started working on it.                                               *
+	*                                                                          *
+	*                                                                          *
+	*  **** TODO ****                                                          *
+	*   - Finish checking opcodes/instructions                                 *
+	*   - Internal devices                                                     *
+	*   - Interrupts                                                           *
+	*   - Everything !                                                         *
+	*                                                                          *
+	*  **** DONE ****                                                          *
+	*   - I/O ports                                                            *
+	*   - Savestates                                                           *
+	*   - Internal memory                                                      *
+	*   - New opcodes                                                          *
+	*   - Opcode disassembly                                                   *
+	*                                                                          *
+	*  **** Notes (from PIC16C5X): ****                                        *
+	*  PIC WatchDog Timer has a separate internal clock. For the moment, we're *
+	*     basing the count on a 4MHz input clock, since 4MHz is the typical    *
+	*     input frequency (but by no means always).                            *
+	*  A single scaler is available for the Counter/Timer or WatchDog Timer.   *
+	*     When connected to the Counter/Timer, it functions as a Prescaler,    *
+	*     hence prescale overflows, tick the Counter/Timer.                    *
+	*     When connected to the WatchDog Timer, it functions as a Postscaler   *
+	*     hence WatchDog Timer overflows, tick the Postscaler. This scenario   *
+	*     means that the WatchDog timeout occurs when the Postscaler has       *
+	*     reached the scaler rate value, not when the WatchDog reaches zero.   *
+	*  CLRWDT should prevent the WatchDog Timer from timing out and generating *
+	*     a device reset, but how is not known. The manual also mentions that  *
+	*     the WatchDog Timer can only be disabled during ROM programming, and  *
+	*     no other means seem to exist???                                      *
+	*                                                                          *
+	\**************************************************************************/
 
 #include "emu.h"
 #include "debugger.h"
@@ -60,30 +60,30 @@
 struct pic16c62x_state
 {
 	/******************** CPU Internal Registers *******************/
-	UINT16	PC;
-	UINT16	PREVPC;		/* previous program counter */
-	UINT8	W;
-	UINT8	PCLATH;		/* 0a,8a */
-	UINT8	OPTION;		/* 81 */
-	UINT16	CONFIG;
-	UINT8	ALU;
-	UINT16	WDT;
-	UINT8	TRISA;		/* 85 */
-	UINT8	TRISB;		/* 86 */
-	UINT16	STACK[8];
-	UINT16	prescaler;	/* Note: this is really an 8-bit register */
-	PAIR	opcode;
-	UINT8	*internalram;
+	UINT16  PC;
+	UINT16  PREVPC;     /* previous program counter */
+	UINT8   W;
+	UINT8   PCLATH;     /* 0a,8a */
+	UINT8   OPTION;     /* 81 */
+	UINT16  CONFIG;
+	UINT8   ALU;
+	UINT16  WDT;
+	UINT8   TRISA;      /* 85 */
+	UINT8   TRISB;      /* 86 */
+	UINT16  STACK[8];
+	UINT16  prescaler;  /* Note: this is really an 8-bit register */
+	PAIR    opcode;
+	UINT8   *internalram;
 
-	int		icount;
-	int		reset_vector;
-	int		picmodel;
-	int		delay_timer;
-	UINT16	temp_config;
-	UINT8	old_T0;
-	INT8	old_data;
-	UINT8	picRAMmask;
-	int		inst_cycles;
+	int     icount;
+	int     reset_vector;
+	int     picmodel;
+	int     delay_timer;
+	UINT16  temp_config;
+	UINT8   old_T0;
+	INT8    old_data;
+	UINT8   picRAMmask;
+	int     inst_cycles;
 
 
 	legacy_cpu_device *device;
@@ -97,12 +97,12 @@ INLINE pic16c62x_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PIC16C620 ||
-		   device->type() == PIC16C620A ||
+			device->type() == PIC16C620A ||
 //         device->type() == PIC16CR620A ||
-		   device->type() == PIC16C621 ||
-		   device->type() == PIC16C621A ||
-		   device->type() == PIC16C622 ||
-		   device->type() == PIC16C622A);
+			device->type() == PIC16C621 ||
+			device->type() == PIC16C621A ||
+			device->type() == PIC16C622 ||
+			device->type() == PIC16C622A);
 	return (pic16c62x_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -110,15 +110,15 @@ INLINE pic16c62x_state *get_safe_token(device_t *device)
 /* opcode table entry */
 struct pic16c62x_opcode
 {
-	UINT8	cycles;
-	void	(*function)(pic16c62x_state *);
+	UINT8   cycles;
+	void    (*function)(pic16c62x_state *);
 };
 /* instruction list entry */
 struct pic16c62x_instruction
 {
-	char	*format;
-	void	(*function)(pic16c62x_state *);
-	UINT8	cycles;
+	char    *format;
+	void    (*function)(pic16c62x_state *);
+	UINT8   cycles;
 };
 
 
@@ -135,23 +135,23 @@ INLINE void update_internalram_ptr(pic16c62x_state *cpustate)
 /************  Read the state of the T0 Clock input signal  ************/
 #define PIC16C62x_T0_In           (cpustate->io->read_byte(PIC16C62x_T0) >> 4)
 
-#define M_RDRAM(A)		(((A) == 0) ? cpustate->internalram[0] : PIC16C62x_RAM_RDMEM(A))
-#define M_WRTRAM(A,V)	do { if ((A) == 0) cpustate->internalram[0] = (V); else PIC16C62x_RAM_WRMEM(A,V); } while (0)
-#define M_RDOP(A)		PIC16C62x_RDOP(A)
-#define P_IN(A)			PIC16C62x_In(A)
-#define P_OUT(A,V)		PIC16C62x_Out(A,V)
-#define S_T0_IN			PIC16C62x_T0_In
-#define ADDR_MASK		0x1fff
+#define M_RDRAM(A)      (((A) == 0) ? cpustate->internalram[0] : PIC16C62x_RAM_RDMEM(A))
+#define M_WRTRAM(A,V)   do { if ((A) == 0) cpustate->internalram[0] = (V); else PIC16C62x_RAM_WRMEM(A,V); } while (0)
+#define M_RDOP(A)       PIC16C62x_RDOP(A)
+#define P_IN(A)         PIC16C62x_In(A)
+#define P_OUT(A,V)      PIC16C62x_Out(A,V)
+#define S_T0_IN         PIC16C62x_T0_In
+#define ADDR_MASK       0x1fff
 
 
 
-#define TMR0	internalram[1]
-#define PCL		internalram[2]
-#define STATUS	internalram[3]
-#define FSR		internalram[4]
-#define PORTA	internalram[5]
-#define PORTB	internalram[6]
-#define INDF	M_RDRAM(cpustate->FSR)
+#define TMR0    internalram[1]
+#define PCL     internalram[2]
+#define STATUS  internalram[3]
+#define FSR     internalram[4]
+#define PORTA   internalram[5]
+#define PORTB   internalram[6]
+#define INDF    M_RDRAM(cpustate->FSR)
 
 #define  RISING_EDGE_T0  (( (int)(T0_in - cpustate->old_T0) > 0) ? 1 : 0)
 #define FALLING_EDGE_T0  (( (int)(T0_in - cpustate->old_T0) < 0) ? 1 : 0)
@@ -160,52 +160,52 @@ INLINE void update_internalram_ptr(pic16c62x_state *cpustate)
 /********  The following is the Status Flag register definition.  *********/
 			/* | 7 | 6 | 5 |  4 |  3 | 2 |  1 | 0 | */
 			/* |IRP|RP1|RP0| TO | PD | Z | DC | C | */
-#define IRP_FLAG	0x80	/* IRP  Register Bank Select bit (used for indirect addressing) */
-#define RP1_FLAG	0x40	/* RP1  Register Bank Select bits (used for direct addressing) */
-#define RP0_FLAG	0x20	/* RP0  Register Bank Select bits (used for direct addressing) */
-#define TO_FLAG		0x10	/* TO   Time Out flag (WatchDog) */
-#define PD_FLAG		0x08	/* PD   Power Down flag */
-#define Z_FLAG		0x04	/* Z    Zero Flag */
-#define DC_FLAG		0x02	/* DC   Digit Carry/Borrow flag (Nibble) */
-#define C_FLAG		0x01	/* C    Carry/Borrow Flag (Byte) */
+#define IRP_FLAG    0x80    /* IRP  Register Bank Select bit (used for indirect addressing) */
+#define RP1_FLAG    0x40    /* RP1  Register Bank Select bits (used for direct addressing) */
+#define RP0_FLAG    0x20    /* RP0  Register Bank Select bits (used for direct addressing) */
+#define TO_FLAG     0x10    /* TO   Time Out flag (WatchDog) */
+#define PD_FLAG     0x08    /* PD   Power Down flag */
+#define Z_FLAG      0x04    /* Z    Zero Flag */
+#define DC_FLAG     0x02    /* DC   Digit Carry/Borrow flag (Nibble) */
+#define C_FLAG      0x01    /* C    Carry/Borrow Flag (Byte) */
 
-#define IRP		(cpustate->STATUS & IRP_FLAG)
-#define RP1		(cpustate->STATUS & RP1_FLAG)
-#define RP0		(cpustate->STATUS & RP0_FLAG)
-#define TO		(cpustate->STATUS & TO_FLAG)
-#define PD		(cpustate->STATUS & PD_FLAG)
-#define ZERO	(cpustate->STATUS & Z_FLAG)
-#define DC		(cpustate->STATUS & DC_FLAG)
-#define CARRY	(cpustate->STATUS & C_FLAG)
+#define IRP     (cpustate->STATUS & IRP_FLAG)
+#define RP1     (cpustate->STATUS & RP1_FLAG)
+#define RP0     (cpustate->STATUS & RP0_FLAG)
+#define TO      (cpustate->STATUS & TO_FLAG)
+#define PD      (cpustate->STATUS & PD_FLAG)
+#define ZERO    (cpustate->STATUS & Z_FLAG)
+#define DC      (cpustate->STATUS & DC_FLAG)
+#define CARRY   (cpustate->STATUS & C_FLAG)
 
-#define ADDR	((cpustate->opcode.b.l & 0x7f) | (RP0 << 2))
+#define ADDR    ((cpustate->opcode.b.l & 0x7f) | (RP0 << 2))
 
 /********  The following is the Option Flag register definition.  *********/
 			/* |   7  |   6    |   5  |   4  |  3  | 2 | 1 | 0 | */
 			/* | RBPU | INTEDG | TOCS | TOSE | PSA |    PS     | */
-#define RBPU_FLAG	0x80	/* RBPU     Pull-up Enable */
-#define INTEDG_FLAG	0x40	/* INTEDG   Interrupt Edge Select */
-#define T0CS_FLAG	0x20	/* TOCS     Timer 0 clock source select */
-#define T0SE_FLAG	0x10	/* TOSE     Timer 0 clock source edge select */
-#define PSA_FLAG	0x08	/* PSA      Prescaler Assignment bit */
-#define PS_REG		0x07	/* PS       Prescaler Rate select */
+#define RBPU_FLAG   0x80    /* RBPU     Pull-up Enable */
+#define INTEDG_FLAG 0x40    /* INTEDG   Interrupt Edge Select */
+#define T0CS_FLAG   0x20    /* TOCS     Timer 0 clock source select */
+#define T0SE_FLAG   0x10    /* TOSE     Timer 0 clock source edge select */
+#define PSA_FLAG    0x08    /* PSA      Prescaler Assignment bit */
+#define PS_REG      0x07    /* PS       Prescaler Rate select */
 
-#define T0CS	(cpustate->OPTION & T0CS_FLAG)
-#define T0SE	(cpustate->OPTION & T0SE_FLAG)
-#define PSA		(cpustate->OPTION & PSA_FLAG)
-#define PS		(cpustate->OPTION & PS_REG)
+#define T0CS    (cpustate->OPTION & T0CS_FLAG)
+#define T0SE    (cpustate->OPTION & T0SE_FLAG)
+#define PSA     (cpustate->OPTION & PSA_FLAG)
+#define PS      (cpustate->OPTION & PS_REG)
 
 /********  The following is the Config Flag register definition.  *********/
 	/* | 13 | 12 | 11 | 10 | 9 | 8 | 7 |   6   | 5 | 4 |   3   |   2  | 1 | 0 | */
 	/* |           CP              |   | BODEN |  CP   | PWRTE | WDTE |  FOSC | */
 	/* CP       Code Protect (ROM read protect) */
-#define BODEN_FLAG	0x40	/* BODEN    Brown-out Reset Enable */
-#define PWRTE_FLAG	0x08	/* PWRTE    Power-up Timer Enable */
-#define WDTE_FLAG	0x04	/* WDTE     WatchDog Timer enable */
-#define FOSC_FLAG	0x03	/* FOSC     Oscillator source select */
+#define BODEN_FLAG  0x40    /* BODEN    Brown-out Reset Enable */
+#define PWRTE_FLAG  0x08    /* PWRTE    Power-up Timer Enable */
+#define WDTE_FLAG   0x04    /* WDTE     WatchDog Timer enable */
+#define FOSC_FLAG   0x03    /* FOSC     Oscillator source select */
 
-#define WDTE	(cpustate->CONFIG & WDTE_FLAG)
-#define FOSC	(cpustate->CONFIG & FOSC_FLAG)
+#define WDTE    (cpustate->CONFIG & WDTE_FLAG)
+#define FOSC    (cpustate->CONFIG & FOSC_FLAG)
 
 
 /************************************************************************
@@ -217,7 +217,7 @@ INLINE void update_internalram_ptr(pic16c62x_state *cpustate)
 
 
 /* Easy bit position selectors */
-#define POS	 ((cpustate->opcode.w.l >> 7) & 7)
+#define POS  ((cpustate->opcode.w.l >> 7) & 7)
 static const unsigned int bit_clr[8] = { 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f };
 static const unsigned int bit_set[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
@@ -297,17 +297,17 @@ INLINE void PUSH_STACK(pic16c62x_state *cpustate, UINT16 data)
 
 
 
-INLINE UINT8 GET_REGFILE(pic16c62x_state *cpustate, offs_t addr)	/* Read from internal memory */
+INLINE UINT8 GET_REGFILE(pic16c62x_state *cpustate, offs_t addr)    /* Read from internal memory */
 {
 	UINT8 data;
 
-	if (addr == 0) {						/* Indirect addressing  */
+	if (addr == 0) {                        /* Indirect addressing  */
 		addr = (cpustate->FSR & cpustate->picRAMmask);
 	}
 
 	switch(addr)
 	{
-		case 0x00:	/* Not an actual register, so return 0 */
+		case 0x00:  /* Not an actual register, so return 0 */
 		case 0x80:
 					data = 0;
 					break;
@@ -320,61 +320,61 @@ INLINE UINT8 GET_REGFILE(pic16c62x_state *cpustate, offs_t addr)	/* Read from in
 					data = M_RDRAM(addr & 0x7f);
 					break;
 		case 0x84:
-		case 0x04:	data = (cpustate->FSR | (UINT8)(~cpustate->picRAMmask));
+		case 0x04:  data = (cpustate->FSR | (UINT8)(~cpustate->picRAMmask));
 					break;
-		case 0x05:	data = P_IN(0);
+		case 0x05:  data = P_IN(0);
 					data &= cpustate->TRISA;
 					data |= ((UINT8)(~cpustate->TRISA) & cpustate->PORTA);
-					data &= 0x1f;		/* 5-bit port (only lower 5 bits used) */
+					data &= 0x1f;       /* 5-bit port (only lower 5 bits used) */
 					break;
-		case 0x06:	data = P_IN(1);
+		case 0x06:  data = P_IN(1);
 					data &= cpustate->TRISB;
 					data |= ((UINT8)(~cpustate->TRISB) & cpustate->PORTB);
 					break;
 		case 0x8a:
-		case 0x0a:	data = cpustate->PCLATH;
+		case 0x0a:  data = cpustate->PCLATH;
 					break;
-		case 0x81:	data = cpustate->OPTION;
+		case 0x81:  data = cpustate->OPTION;
 					break;
-		case 0x85:	data = cpustate->TRISA;
+		case 0x85:  data = cpustate->TRISA;
 					break;
-		case 0x86:	data = cpustate->TRISB;
+		case 0x86:  data = cpustate->TRISB;
 					break;
-		default:	data = M_RDRAM(addr);
+		default:    data = M_RDRAM(addr);
 					break;
 	}
 	return data;
 }
 
-INLINE void STORE_REGFILE(pic16c62x_state *cpustate, offs_t addr, UINT8 data)	/* Write to internal memory */
+INLINE void STORE_REGFILE(pic16c62x_state *cpustate, offs_t addr, UINT8 data)   /* Write to internal memory */
 {
-	if (addr == 0) {						/* Indirect addressing  */
+	if (addr == 0) {                        /* Indirect addressing  */
 		addr = (cpustate->FSR & cpustate->picRAMmask);
 	}
 
 	switch(addr)
 	{
 		case 0x80:
-		case 0x00:	/* Not an actual register, nothing to save */
+		case 0x00:  /* Not an actual register, nothing to save */
 					break;
-		case 0x01:	cpustate->delay_timer = 2;		/* Timer starts after next two instructions */
-					if (PSA == 0) cpustate->prescaler = 0;	/* Must clear the Prescaler */
+		case 0x01:  cpustate->delay_timer = 2;      /* Timer starts after next two instructions */
+					if (PSA == 0) cpustate->prescaler = 0;  /* Must clear the Prescaler */
 					cpustate->TMR0 = data;
 					break;
 		case 0x82:
-		case 0x02:	cpustate->PCL = data;
+		case 0x02:  cpustate->PCL = data;
 					cpustate->PC = (cpustate->PCLATH << 8) | data;
 					break;
 		case 0x83:
-		case 0x03:	cpustate->STATUS &= (UINT8)(~(IRP_FLAG|RP1_FLAG|RP0_FLAG)); cpustate->STATUS |= (data & (IRP_FLAG|RP1_FLAG|RP0_FLAG));
+		case 0x03:  cpustate->STATUS &= (UINT8)(~(IRP_FLAG|RP1_FLAG|RP0_FLAG)); cpustate->STATUS |= (data & (IRP_FLAG|RP1_FLAG|RP0_FLAG));
 					break;
 		case 0x84:
-		case 0x04:	cpustate->FSR = (data | (UINT8)(~cpustate->picRAMmask));
+		case 0x04:  cpustate->FSR = (data | (UINT8)(~cpustate->picRAMmask));
 					break;
-		case 0x05:	data &= 0x1f;		/* 5-bit port (only lower 5 bits used) */
+		case 0x05:  data &= 0x1f;       /* 5-bit port (only lower 5 bits used) */
 					P_OUT(0,data & (UINT8)(~cpustate->TRISA)); cpustate->PORTA = data;
 					break;
-		case 0x06:	P_OUT(1,data & (UINT8)(~cpustate->TRISB)); cpustate->PORTB = data;
+		case 0x06:  P_OUT(1,data & (UINT8)(~cpustate->TRISB)); cpustate->PORTB = data;
 					break;
 		case 0x8a:
 		case 0x0a:
@@ -382,12 +382,12 @@ INLINE void STORE_REGFILE(pic16c62x_state *cpustate, offs_t addr, UINT8 data)	/*
 					M_WRTRAM(0x0a, cpustate->PCLATH);
 					break;
 		case 0x8b:
-		case 0x0b:	M_WRTRAM(0x0b, data);
+		case 0x0b:  M_WRTRAM(0x0b, data);
 					break;
-		case 0x81:	cpustate->OPTION = data;
+		case 0x81:  cpustate->OPTION = data;
 					M_WRTRAM(0x81, data);
 					break;
-		case 0x85:	if   (cpustate->TRISA != data)
+		case 0x85:  if   (cpustate->TRISA != data)
 					{
 						cpustate->TRISA = data | 0xf0;
 						P_OUT(2,cpustate->TRISA);
@@ -395,7 +395,7 @@ INLINE void STORE_REGFILE(pic16c62x_state *cpustate, offs_t addr, UINT8 data)	/*
 						M_WRTRAM(addr, data);
 					}
 					break;
-		case 0x86:	if   (cpustate->TRISB != data)
+		case 0x86:  if   (cpustate->TRISB != data)
 					{
 						cpustate->TRISB = data;
 						P_OUT(3,cpustate->TRISB);
@@ -403,7 +403,7 @@ INLINE void STORE_REGFILE(pic16c62x_state *cpustate, offs_t addr, UINT8 data)	/*
 						M_WRTRAM(addr, data);
 					}
 					break;
-		default:	M_WRTRAM(addr, data);
+		default:    M_WRTRAM(addr, data);
 					break;
 	}
 }
@@ -489,7 +489,7 @@ static void btfss(pic16c62x_state *cpustate)
 	{
 		cpustate->PC++ ;
 		cpustate->PCL = cpustate->PC & 0xff;
-		cpustate->inst_cycles += 1;		/* Add NOP cycles */
+		cpustate->inst_cycles += 1;     /* Add NOP cycles */
 	}
 }
 
@@ -499,7 +499,7 @@ static void btfsc(pic16c62x_state *cpustate)
 	{
 		cpustate->PC++ ;
 		cpustate->PCL = cpustate->PC & 0xff;
-		cpustate->inst_cycles += 1;		/* Add NOP cycles */
+		cpustate->inst_cycles += 1;     /* Add NOP cycles */
 	}
 }
 
@@ -553,7 +553,7 @@ static void decfsz(pic16c62x_state *cpustate)
 	{
 		cpustate->PC++ ;
 		cpustate->PCL = cpustate->PC & 0xff;
-		cpustate->inst_cycles += 1;		/* Add NOP cycles */
+		cpustate->inst_cycles += 1;     /* Add NOP cycles */
 	}
 }
 
@@ -579,7 +579,7 @@ static void incfsz(pic16c62x_state *cpustate)
 	{
 		cpustate->PC++ ;
 		cpustate->PCL = cpustate->PC & 0xff;
-		cpustate->inst_cycles += 1;		/* Add NOP cycles */
+		cpustate->inst_cycles += 1;     /* Add NOP cycles */
 	}
 }
 
@@ -703,9 +703,9 @@ static void tris(pic16c62x_state *cpustate)
 
 	switch(cpustate->opcode.b.l & 0x7)
 	{
-		case 05:	STORE_REGFILE(cpustate, 0x85, cpustate->W); break;
-		case 06:	STORE_REGFILE(cpustate, 0x86, cpustate->W); break;
-		default:	illegal(cpustate); break;
+		case 05:    STORE_REGFILE(cpustate, 0x85, cpustate->W); break;
+		case 06:    STORE_REGFILE(cpustate, 0x86, cpustate->W); break;
+		default:    illegal(cpustate); break;
 	}
 }
 
@@ -765,8 +765,8 @@ static const pic16c62x_instruction instructiontable[]=
 	{(char *)"11110xkkkkkkkk", sublw, 1},
 	{(char *)"111010kkkkkkkk", xorlw, 1},
 	{(char *)"00000001100100", clrwdt, 1},
-	{(char *)"00000001100010", option, 1},		// deprecated
-	{(char *)"00000001100fff", tris, 1},		// deprecated
+	{(char *)"00000001100010", option, 1},      // deprecated
+	{(char *)"00000001100fff", tris, 1},        // deprecated
 	{NULL, NULL, 0}
 };
 
@@ -961,7 +961,7 @@ static void pic16c62x_update_watchdog(pic16c62x_state *cpustate, int counts)
 		{
 			if (PSA) {
 				cpustate->prescaler++;
-				if (cpustate->prescaler >= (1 << PS)) {	/* Prescale values from 1 to 128 */
+				if (cpustate->prescaler >= (1 << PS)) { /* Prescale values from 1 to 128 */
 					cpustate->prescaler = 0;
 					CLR(cpustate->STATUS, TO_FLAG);
 					pic16c62x_soft_reset(cpustate);
@@ -984,9 +984,9 @@ static void pic16c62x_update_timer(pic16c62x_state *cpustate, int counts)
 {
 	if (PSA == 0) {
 		cpustate->prescaler += counts;
-		if (cpustate->prescaler >= (2 << PS)) {	/* Prescale values from 2 to 256 */
+		if (cpustate->prescaler >= (2 << PS)) { /* Prescale values from 2 to 256 */
 			cpustate->TMR0 += (cpustate->prescaler / (2 << PS));
-			cpustate->prescaler %= (2 << PS);	/* Overflow prescaler */
+			cpustate->prescaler %= (2 << PS);   /* Overflow prescaler */
 		}
 	}
 	else {
@@ -1008,7 +1008,7 @@ static CPU_EXECUTE( pic16c62x )
 
 	do
 	{
-		if (PD == 0)						/* Sleep Mode */
+		if (PD == 0)                        /* Sleep Mode */
 		{
 			cpustate->inst_cycles = 1;
 			debugger_instruction_hook(device, cpustate->PC);
@@ -1029,22 +1029,22 @@ static CPU_EXECUTE( pic16c62x )
 			cpustate->inst_cycles = opcode_table[cpustate->opcode.w.l & 16383].cycles;
 			(*opcode_table[cpustate->opcode.w.l & 16383].function)(cpustate);
 
-			if (T0CS) {						/* Count mode */
+			if (T0CS) {                     /* Count mode */
 				T0_in = S_T0_IN;
 				if (T0_in) T0_in = 1;
-				if (T0SE) {					/* Count falling edge T0 input */
+				if (T0SE) {                 /* Count falling edge T0 input */
 					if (FALLING_EDGE_T0) {
 						pic16c62x_update_timer(cpustate, 1);
 					}
 				}
-				else {						/* Count rising edge T0 input */
+				else {                      /* Count rising edge T0 input */
 					if (RISING_EDGE_T0) {
 						pic16c62x_update_timer(cpustate, 1);
 					}
 				}
 				cpustate->old_T0 = T0_in;
 			}
-			else {							/* Timer mode */
+			else {                          /* Timer mode */
 				if (cpustate->delay_timer) {
 					cpustate->delay_timer--;
 				}
@@ -1076,27 +1076,27 @@ static CPU_SET_INFO( pic16c62x )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + PIC16C62x_PC:		cpustate->PC = info->i; cpustate->PCL = info->i & 0xff ;break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PC:       cpustate->PC = info->i; cpustate->PCL = info->i & 0xff ;break;
 		/* This is actually not a stack pointer, but the stack contents */
 		/* Stack is a 8 level First In Last Out stack */
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK7:		cpustate->STACK[7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK6:		cpustate->STACK[6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK5:		cpustate->STACK[5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK4:		cpustate->STACK[4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK3:		cpustate->STACK[3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK2:		cpustate->STACK[2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK1:		cpustate->STACK[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK0:		cpustate->STACK[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_W:		cpustate->W      = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_ALU:		cpustate->ALU    = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_OPT:		cpustate->OPTION = info->i & (RBPU_FLAG | INTEDG_FLAG | T0CS_FLAG | T0SE_FLAG | PSA_FLAG | PS_REG);	break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_TMR0:		cpustate->TMR0   = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_WDT:		cpustate->WDT    = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_PSCL:		cpustate->prescaler = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_PRTA:		cpustate->PORTA  = info->i & 0x1f;				break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_PRTB:		cpustate->PORTB  = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_FSR:		cpustate->FSR    = ((info->i & cpustate->picRAMmask) | (UINT8)(~cpustate->picRAMmask));	break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK7:     cpustate->STACK[7] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK6:     cpustate->STACK[6] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK5:     cpustate->STACK[5] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK4:     cpustate->STACK[4] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK3:     cpustate->STACK[3] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK2:     cpustate->STACK[2] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK1:     cpustate->STACK[1] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK0:     cpustate->STACK[0] = info->i;                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_W:        cpustate->W      = info->i;                     break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_ALU:      cpustate->ALU    = info->i;                     break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_OPT:      cpustate->OPTION = info->i & (RBPU_FLAG | INTEDG_FLAG | T0CS_FLAG | T0SE_FLAG | PSA_FLAG | PS_REG); break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_TMR0:     cpustate->TMR0   = info->i;                     break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_WDT:      cpustate->WDT    = info->i;                     break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PSCL:     cpustate->prescaler = info->i;                  break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PRTA:     cpustate->PORTA  = info->i & 0x1f;              break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PRTB:     cpustate->PORTB  = info->i;                     break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_FSR:      cpustate->FSR    = ((info->i & cpustate->picRAMmask) | (UINT8)(~cpustate->picRAMmask)); break;
 	}
 }
 
@@ -1113,105 +1113,105 @@ static CPU_GET_INFO( pic16c62x )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(pic16c62x_state);	break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;						break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;						break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;		break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;						break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;						break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;						break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;						break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;						break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;						break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(pic16c62x_state);  break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                        break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                        break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;        break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                        break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 4;                        break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                        break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                        break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                        break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 2;                        break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 12;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = -1;						break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 5;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 16;                       break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 12;                       break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = -1;                       break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8;                        break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 8;                        break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                        break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                        break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 5;                        break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                        break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->PREVPC;						break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->PREVPC;                     break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + PIC16C62x_PC:		info->i = cpustate->PC;							break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PC:       info->i = cpustate->PC;                         break;
 		/* This is actually not a stack pointer, but the stack contents */
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK7:		info->i = cpustate->STACK[7];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK6:		info->i = cpustate->STACK[6];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK5:		info->i = cpustate->STACK[5];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK4:		info->i = cpustate->STACK[4];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK3:		info->i = cpustate->STACK[3];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK2:		info->i = cpustate->STACK[2];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK1:		info->i = cpustate->STACK[1];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STK0:		info->i = cpustate->STACK[0];					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_W:			info->i = cpustate->W;							break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_ALU:		info->i = cpustate->ALU;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_STR:		info->i = cpustate->STATUS;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_OPT:		info->i = cpustate->OPTION;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_TMR0:		info->i = cpustate->TMR0;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_WDT:		info->i = cpustate->WDT;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_PSCL:		info->i = cpustate->prescaler;					break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_PRTA:		info->i = cpustate->PORTA;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_PRTB:		info->i = cpustate->PORTB;						break;
-		case CPUINFO_INT_REGISTER + PIC16C62x_FSR:		info->i = ((cpustate->FSR & cpustate->picRAMmask) | (UINT8)(~cpustate->picRAMmask));	break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK7:     info->i = cpustate->STACK[7];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK6:     info->i = cpustate->STACK[6];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK5:     info->i = cpustate->STACK[5];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK4:     info->i = cpustate->STACK[4];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK3:     info->i = cpustate->STACK[3];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK2:     info->i = cpustate->STACK[2];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK1:     info->i = cpustate->STACK[1];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STK0:     info->i = cpustate->STACK[0];                   break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_W:            info->i = cpustate->W;                          break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_ALU:      info->i = cpustate->ALU;                        break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_STR:      info->i = cpustate->STATUS;                     break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_OPT:      info->i = cpustate->OPTION;                     break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_TMR0:     info->i = cpustate->TMR0;                       break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_WDT:      info->i = cpustate->WDT;                        break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PSCL:     info->i = cpustate->prescaler;                  break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PRTA:     info->i = cpustate->PORTA;                      break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_PRTB:     info->i = cpustate->PORTB;                      break;
+		case CPUINFO_INT_REGISTER + PIC16C62x_FSR:      info->i = ((cpustate->FSR & cpustate->picRAMmask) | (UINT8)(~cpustate->picRAMmask));    break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pic16c62x);	break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(pic16c62x);			break;
-		case CPUINFO_FCT_RESET:							/* set per-CPU */								break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(pic16c62x);			break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pic16c62x);		break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(pic16c62x);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(pic16c62x);   break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(pic16c62x);          break;
+		case CPUINFO_FCT_RESET:                         /* set per-CPU */                               break;
+		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(pic16c62x);          break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(pic16c62x);        break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                              break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(pic16c62x);    break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C62x");					break;
-		case CPUINFO_STR_FAMILY:						strcpy(info->s, "Microchip");					break;
-		case CPUINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case CPUINFO_STR_CREDITS:						strcpy(info->s, "Copyright Tony La Porta");		break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C62x");                   break;
+		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Microchip");                   break;
+		case CPUINFO_STR_VERSION:                       strcpy(info->s, "1.0");                     break;
+		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                      break;
+		case CPUINFO_STR_CREDITS:                       strcpy(info->s, "Copyright Tony La Porta");     break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%01x%c%c%c%c%c %c%c%c%03x",
-				(cpustate->STATUS & 0xe0) >> 5,			/* Register bank */
-				cpustate->STATUS & 0x10 ? '.':'O',		/* WDT Overflow */
-				cpustate->STATUS & 0x08 ? 'P':'D',		/* Power/Down */
-				cpustate->STATUS & 0x04 ? 'Z':'.',		/* Zero */
-				cpustate->STATUS & 0x02 ? 'c':'b',		/* Nibble Carry/Borrow */
-				cpustate->STATUS & 0x01 ? 'C':'B',		/* Carry/Borrow */
+				(cpustate->STATUS & 0xe0) >> 5,         /* Register bank */
+				cpustate->STATUS & 0x10 ? '.':'O',      /* WDT Overflow */
+				cpustate->STATUS & 0x08 ? 'P':'D',      /* Power/Down */
+				cpustate->STATUS & 0x04 ? 'Z':'.',      /* Zero */
+				cpustate->STATUS & 0x02 ? 'c':'b',      /* Nibble Carry/Borrow */
+				cpustate->STATUS & 0x01 ? 'C':'B',      /* Carry/Borrow */
 
-				cpustate->OPTION & 0x20 ? 'C':'T',		/* Counter/Timer */
-				cpustate->OPTION & 0x10 ? 'N':'P',		/* Negative/Positive */
-				cpustate->OPTION & 0x08 ? 'W':'T',		/* WatchDog/Timer */
+				cpustate->OPTION & 0x20 ? 'C':'T',      /* Counter/Timer */
+				cpustate->OPTION & 0x10 ? 'N':'P',      /* Negative/Positive */
+				cpustate->OPTION & 0x08 ? 'W':'T',      /* WatchDog/Timer */
 				cpustate->OPTION & 0x08 ? (1<<(cpustate->OPTION&7)) : (2<<(cpustate->OPTION&7)) );
 			break;
 
-		case CPUINFO_STR_REGISTER + PIC16C62x_PC:		sprintf(info->s, "PC:%03X",   cpustate->PC);				break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_W:			sprintf(info->s, "W:%02X",    cpustate->W);					break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_ALU:		sprintf(info->s, "ALU:%02X",  cpustate->ALU);				break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STR:		sprintf(info->s, "STR:%02X",  cpustate->STATUS);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_TMR0:		sprintf(info->s, "TMR:%02X",  cpustate->TMR0);				break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_WDT:		sprintf(info->s, "WDT:%04X",  cpustate->WDT);				break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_OPT:		sprintf(info->s, "OPT:%02X",  cpustate->OPTION);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK0:		sprintf(info->s, "STK0:%03X", cpustate->STACK[0]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK1:		sprintf(info->s, "STK1:%03X", cpustate->STACK[1]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK2:		sprintf(info->s, "STK2:%03X", cpustate->STACK[2]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK3:		sprintf(info->s, "STK3:%03X", cpustate->STACK[3]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK4:		sprintf(info->s, "STK4:%03X", cpustate->STACK[4]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK5:		sprintf(info->s, "STK5:%03X", cpustate->STACK[5]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK6:		sprintf(info->s, "STK6:%03X", cpustate->STACK[6]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_STK7:		sprintf(info->s, "STK7:%03X", cpustate->STACK[7]);			break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_PRTA:		sprintf(info->s, "PRTA:%01X", ((cpustate->PORTA) & 0x1f));	break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_PRTB:		sprintf(info->s, "PRTB:%02X", cpustate->PORTB);				break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_TRSA:		sprintf(info->s, "TRSA:%01X", ((cpustate->TRISA) & 0x1f));	break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_TRSB:		sprintf(info->s, "TRSB:%02X", cpustate->TRISB);				break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_FSR:		sprintf(info->s, "FSR:%02X",  ((cpustate->FSR) & cpustate->picRAMmask) | (UINT8)(~cpustate->picRAMmask));	break;
-		case CPUINFO_STR_REGISTER + PIC16C62x_PSCL:		sprintf(info->s, "PSCL:%c%02X", ((cpustate->OPTION & 0x08) ? 'W':'T'), cpustate->prescaler);	break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_PC:       sprintf(info->s, "PC:%03X",   cpustate->PC);                break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_W:            sprintf(info->s, "W:%02X",    cpustate->W);                 break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_ALU:      sprintf(info->s, "ALU:%02X",  cpustate->ALU);               break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STR:      sprintf(info->s, "STR:%02X",  cpustate->STATUS);            break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_TMR0:     sprintf(info->s, "TMR:%02X",  cpustate->TMR0);              break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_WDT:      sprintf(info->s, "WDT:%04X",  cpustate->WDT);               break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_OPT:      sprintf(info->s, "OPT:%02X",  cpustate->OPTION);            break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK0:     sprintf(info->s, "STK0:%03X", cpustate->STACK[0]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK1:     sprintf(info->s, "STK1:%03X", cpustate->STACK[1]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK2:     sprintf(info->s, "STK2:%03X", cpustate->STACK[2]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK3:     sprintf(info->s, "STK3:%03X", cpustate->STACK[3]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK4:     sprintf(info->s, "STK4:%03X", cpustate->STACK[4]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK5:     sprintf(info->s, "STK5:%03X", cpustate->STACK[5]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK6:     sprintf(info->s, "STK6:%03X", cpustate->STACK[6]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_STK7:     sprintf(info->s, "STK7:%03X", cpustate->STACK[7]);          break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_PRTA:     sprintf(info->s, "PRTA:%01X", ((cpustate->PORTA) & 0x1f));  break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_PRTB:     sprintf(info->s, "PRTB:%02X", cpustate->PORTB);             break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_TRSA:     sprintf(info->s, "TRSA:%01X", ((cpustate->TRISA) & 0x1f));  break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_TRSB:     sprintf(info->s, "TRSB:%02X", cpustate->TRISB);             break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_FSR:      sprintf(info->s, "FSR:%02X",  ((cpustate->FSR) & cpustate->picRAMmask) | (UINT8)(~cpustate->picRAMmask));   break;
+		case CPUINFO_STR_REGISTER + PIC16C62x_PSCL:     sprintf(info->s, "PSCL:%c%02X", ((cpustate->OPTION & 0x08) ? 'W':'T'), cpustate->prescaler);    break;
 	}
 }
 
@@ -1263,18 +1263,18 @@ CPU_GET_INFO( pic16c620 )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 9;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 8;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c620);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c620_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c620_ram);	break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(pic16c620);                    break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map16 = ADDRESS_MAP_NAME(pic16c620_rom); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(pic16c620_ram);  break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C620");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C620");           break;
 
-		default:										CPU_GET_INFO_CALL(pic16c62x);			break;
+		default:                                        CPU_GET_INFO_CALL(pic16c62x);           break;
 	}
 }
 
@@ -1326,18 +1326,18 @@ CPU_GET_INFO( pic16c621 )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 10;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 10;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 8;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c621);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c621_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c621_ram);	break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(pic16c621);                    break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map16 = ADDRESS_MAP_NAME(pic16c621_rom); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(pic16c621_ram);  break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C621");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C621");           break;
 
-		default:										CPU_GET_INFO_CALL(pic16c62x);			break;
+		default:                                        CPU_GET_INFO_CALL(pic16c62x);           break;
 	}
 }
 
@@ -1389,18 +1389,18 @@ CPU_GET_INFO( pic16c622 )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 11;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 11;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 8;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c622);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c622_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c622_ram);	break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(pic16c622);                    break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map16 = ADDRESS_MAP_NAME(pic16c622_rom); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(pic16c622_ram);  break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C622");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C622");           break;
 
-		default:										CPU_GET_INFO_CALL(pic16c62x);			break;
+		default:                                        CPU_GET_INFO_CALL(pic16c62x);           break;
 	}
 }
 
@@ -1454,18 +1454,18 @@ CPU_GET_INFO( pic16c620a )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 9;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 9;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 8;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c620a);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c620a_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c620a_ram);	break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(pic16c620a);                   break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map16 = ADDRESS_MAP_NAME(pic16c620a_rom);    break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(pic16c620a_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C620A");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C620A");          break;
 
-		default:										CPU_GET_INFO_CALL(pic16c62x);			break;
+		default:                                        CPU_GET_INFO_CALL(pic16c62x);           break;
 	}
 }
 
@@ -1519,18 +1519,18 @@ CPU_GET_INFO( pic16c621a )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 10;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 10;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 8;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c621a);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c621a_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c621a_ram);	break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(pic16c621a);                   break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map16 = ADDRESS_MAP_NAME(pic16c621a_rom);    break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(pic16c621a_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C621A");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C621A");          break;
 
-		default:										CPU_GET_INFO_CALL(pic16c62x);			break;
+		default:                                        CPU_GET_INFO_CALL(pic16c62x);           break;
 	}
 }
 
@@ -1584,18 +1584,18 @@ CPU_GET_INFO( pic16c622a )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 11;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 11;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 8;                            break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c622a);					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c622a_rom);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c622a_ram);	break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(pic16c622a);                   break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map16 = ADDRESS_MAP_NAME(pic16c622a_rom);    break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(pic16c622a_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C622A");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "PIC16C622A");          break;
 
-		default:										CPU_GET_INFO_CALL(pic16c62x);			break;
+		default:                                        CPU_GET_INFO_CALL(pic16c62x);           break;
 	}
 }
 
@@ -1607,4 +1607,3 @@ DEFINE_LEGACY_CPU_DEVICE(PIC16C621, pic16c621);
 DEFINE_LEGACY_CPU_DEVICE(PIC16C621A, pic16c621a);
 DEFINE_LEGACY_CPU_DEVICE(PIC16C622, pic16c622);
 DEFINE_LEGACY_CPU_DEVICE(PIC16C622A, pic16c622a);
-

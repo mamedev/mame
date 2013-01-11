@@ -92,10 +92,10 @@ enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
 static const eeprom_interface eeprom_intf =
 {
-	7,				/* address bits */
-	8,				/* data bits */
-	"011000",		/* read command */
-	"010100",		/* write command */
+	7,              /* address bits */
+	8,              /* data bits */
+	"011000",       /* read command */
+	"010100",       /* write command */
 	"0100100000000",/* erase command */
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
@@ -164,7 +164,7 @@ READ32_MEMBER(polygonet_state::sound_r)
 {
 	int latch = soundlatch3_byte_r(space, 0);
 
-	if ((latch == 0xd) || (latch == 0xe)) latch = 0xf;	/* hack: until 54539 NMI disable found */
+	if ((latch == 0xd) || (latch == 0xe)) latch = 0xf;  /* hack: until 54539 NMI disable found */
 
 	return latch<<8;
 }
@@ -192,12 +192,12 @@ READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 	UINT32 value;
 	UINT8 hi_addr = offset << 1;
 
-	if (mem_mask == 0x0000ff00)	{ hi_addr++; }	/* Low byte */
-	if (mem_mask == 0xff000000) {}				/* High byte */
+	if (mem_mask == 0x0000ff00) { hi_addr++; }  /* Low byte */
+	if (mem_mask == 0xff000000) {}              /* High byte */
 
 	value = dsp56k_host_interface_read(machine().device("dsp"), hi_addr);
 
-	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
+	if (mem_mask == 0x0000ff00) { value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
 	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, space.device().safe_pc());
@@ -213,23 +213,23 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 	if (mem_mask == 0xffff0000)
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (m_shared_ram[offset] & 0xffff0000) >> 16,
-															   0xc000 + (offset<<1),
-															   space.device().safe_pc());
+																0xc000 + (offset<<1),
+																space.device().safe_pc());
 	}
 	else if (mem_mask == 0x0000ffff)
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (m_shared_ram[offset] & 0x0000ffff),
-															   0xc000 +((offset<<1)+1),
-															   space.device().safe_pc());
+																0xc000 +((offset<<1)+1),
+																space.device().safe_pc());
 	}
 	else
 	{
 		logerror("68k WRITING %04x & %04x to shared ram %x & %x [%08x] (@%x)\n", (m_shared_ram[offset] & 0xffff0000) >> 16,
-																				 (m_shared_ram[offset] & 0x0000ffff),
-																				  0xc000 + (offset<<1),
-																				  0xc000 +((offset<<1)+1),
-																				  mem_mask,
-																				  space.device().safe_pc());
+																					(m_shared_ram[offset] & 0x0000ffff),
+																					0xc000 + (offset<<1),
+																					0xc000 +((offset<<1)+1),
+																					mem_mask,
+																					space.device().safe_pc());
 	}
 
 	/* write to the current dsp56k word */
@@ -273,10 +273,10 @@ WRITE32_MEMBER(polygonet_state::dsp_host_interface_w)
 	UINT8 hi_data = 0x00;
 	UINT8 hi_addr = offset << 1;
 
-	if (mem_mask == 0x0000ff00)	{ hi_addr++; }	/* Low byte */
-	if (mem_mask == 0xff000000) {}				/* High byte */
+	if (mem_mask == 0x0000ff00) { hi_addr++; }  /* Low byte */
+	if (mem_mask == 0xff000000) {}              /* High byte */
 
-	if (mem_mask == 0x0000ff00)	{ hi_data = (data & 0x0000ff00) >> 8;  }
+	if (mem_mask == 0x0000ff00) { hi_data = (data & 0x0000ff00) >> 8;  }
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
 
 	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
@@ -514,7 +514,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x540000, 0x540fff) AM_READWRITE(polygonet_ttl_ram_r, polygonet_ttl_ram_w)
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
-	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP	/* network RAM | registers? */
+	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP /* network RAM | registers? */
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
@@ -527,7 +527,7 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dsp_program_map, AS_PROGRAM, 16, polygonet_state )
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("dsp56k_p_mirror")	/* Unsure of size, but 0x1000 matches bank01 */
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("dsp56k_p_mirror") /* Unsure of size, but 0x1000 matches bank01 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("dsp56k_p_8000")
 	AM_RANGE(0xc000, 0xc000) AM_READ(dsp56k_bootload_r)
 ADDRESS_MAP_END
@@ -535,7 +535,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16, polygonet_state )
 	AM_RANGE(0x0800, 0x5fff) AM_RAM      /* Appears to not be affected by banking? */
 	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x7000 */
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)  /* Mirrored in program space @ 0x7000 */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(dsp56k_shared_ram_read, dsp56k_shared_ram_write)
 	AM_RANGE(0xe000, 0xffbf) AM_READWRITE(dsp56k_ram_bank04_read, dsp56k_ram_bank04_write)
@@ -589,11 +589,11 @@ static const gfx_layout bglayout =
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+		9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 
-	  128*8
+		128*8
 };
 
 static GFXDECODE_START( plygonet )
@@ -607,7 +607,7 @@ void polygonet_state::machine_start()
 	/* Set the dsp56k lines */
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	/* TODO: This should work, but the MAME core appears to do something funny.
-             Not a big deal - it's hacked in dsp_w_lines. */
+	         Not a big deal - it's hacked in dsp_w_lines. */
 	//machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	//machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
 	//machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
@@ -615,16 +615,16 @@ void polygonet_state::machine_start()
 
 static const k053936_interface polygonet_k053936_intf =
 {
-	0, 0, 0	/* wrap, xoff, yoff */
+	0, 0, 0 /* wrap, xoff, yoff */
 };
 
 static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz (xtal is 32.0 MHz) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state,  polygonet_interrupt)
 
-	MCFG_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
+	MCFG_CPU_ADD("dsp", DSP56156, 40000000)     /* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
 	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
 
@@ -673,16 +673,16 @@ static INPUT_PORTS_START( polygonet )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )	PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )	PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )	PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )	PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )   PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -700,16 +700,16 @@ static INPUT_PORTS_START( polynetw )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -741,7 +741,7 @@ DRIVER_INIT_MEMBER(polygonet_state,polygonet)
 	address_space &space = machine().device<dsp56k_device>("dsp")->space(AS_PROGRAM);
 	m_dsp56k_update_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(polygonet_state::plygonet_dsp56k_direct_handler), this));
 
-    /* save states */
+	/* save states */
 	save_item(NAME(m_dsp56k_bank00_ram));
 	save_item(NAME(m_dsp56k_bank01_ram));
 	save_item(NAME(m_dsp56k_bank02_ram));
@@ -814,4 +814,3 @@ ROM_END
 /*          ROM       parent   machine   inp        init */
 GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1993, polynetw, 0,       plygonet, polynetw, polygonet_state,  polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-

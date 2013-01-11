@@ -75,7 +75,7 @@ enum
 	SASI_CMD_SPECIFY = 0xc2
 };
 
-class x68k_hdc_image_device :	public device_t,
+class x68k_hdc_image_device :   public device_t,
 								public device_image_interface
 {
 public:
@@ -99,7 +99,7 @@ public:
 	DECLARE_READ16_MEMBER( hdc_r );
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
@@ -126,4 +126,3 @@ extern const device_type X68KHDC;
 
 #define MCFG_X68KHDC_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, X68KHDC, 0)
-

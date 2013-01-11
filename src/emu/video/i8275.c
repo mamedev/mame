@@ -12,49 +12,49 @@
 #include "emu.h"
 #include "i8275.h"
 
-#define I8275_COMMAND_RESET				0
-#define I8275_COMMAND_START_DISPLAY		1
-#define I8275_COMMAND_STOP_DISPLAY		2
-#define I8275_COMMAND_READ_LIGHT_PEN	3
-#define I8275_COMMAND_LOAD_CURSOR		4
-#define I8275_COMMAND_ENABLE_INTERRUPT	5
-#define I8275_COMMAND_DISABLE_INTERRUPT	6
-#define I8275_COMMAND_PRESET_COUNTERS	7
+#define I8275_COMMAND_RESET             0
+#define I8275_COMMAND_START_DISPLAY     1
+#define I8275_COMMAND_STOP_DISPLAY      2
+#define I8275_COMMAND_READ_LIGHT_PEN    3
+#define I8275_COMMAND_LOAD_CURSOR       4
+#define I8275_COMMAND_ENABLE_INTERRUPT  5
+#define I8275_COMMAND_DISABLE_INTERRUPT 6
+#define I8275_COMMAND_PRESET_COUNTERS   7
 
-#define I8275_PARAM_RESET				4
-#define I8275_PARAM_READ_LIGHT_PEN		2
-#define I8275_PARAM_LOAD_CURSOR			2
+#define I8275_PARAM_RESET               4
+#define I8275_PARAM_READ_LIGHT_PEN      2
+#define I8275_PARAM_LOAD_CURSOR         2
 
-#define I8275_PARAM_NONE				0
-#define I8275_PARAM_READ				1
-#define I8275_PARAM_WRITE				2
+#define I8275_PARAM_NONE                0
+#define I8275_PARAM_READ                1
+#define I8275_PARAM_WRITE               2
 
-#define I8275_STATUS_FIFO_OVERRUN		0x01
-#define I8275_STATUS_DMA_UNDERRUN		0x02
-#define I8275_STATUS_VIDEO_ENABLE		0x04
-#define I8275_STATUS_IMPROPER_COMMAND	0x08
-#define I8275_STATUS_LIGHT_PEN			0x10
-#define I8275_STATUS_INTERRUPT_REQUEST	0x20
-#define I8275_STATUS_INTERRUPT_ENABLE	0x40
+#define I8275_STATUS_FIFO_OVERRUN       0x01
+#define I8275_STATUS_DMA_UNDERRUN       0x02
+#define I8275_STATUS_VIDEO_ENABLE       0x04
+#define I8275_STATUS_IMPROPER_COMMAND   0x08
+#define I8275_STATUS_LIGHT_PEN          0x10
+#define I8275_STATUS_INTERRUPT_REQUEST  0x20
+#define I8275_STATUS_INTERRUPT_ENABLE   0x40
 
-#define I8275_ROW_TYPE_NORMAL			0
-#define I8275_ROW_TYPE_SPACED			1
+#define I8275_ROW_TYPE_NORMAL           0
+#define I8275_ROW_TYPE_SPACED           1
 
-#define I8275_LINE_COUNTER_MODE_0		0
-#define I8275_LINE_COUNTER_MODE_1		1
+#define I8275_LINE_COUNTER_MODE_0       0
+#define I8275_LINE_COUNTER_MODE_1       1
 
-#define I8275_FIELD_ATTRIBUTE_TRANSPARENT		0
-#define I8275_FIELD_ATTRIBUTE_NONTRANSPARENT	1
+#define I8275_FIELD_ATTRIBUTE_TRANSPARENT       0
+#define I8275_FIELD_ATTRIBUTE_NONTRANSPARENT    1
 
-#define I8275_CURSOR_BLINK_REVERSED		0
-#define I8275_CURSOR_BLINK_UNDERLINE	1
-#define I8275_CURSOR_NONBLINK_REVERSED	2
-#define I8275_CURSOR_NONBLINK_UNDERLINE	3
+#define I8275_CURSOR_BLINK_REVERSED     0
+#define I8275_CURSOR_BLINK_UNDERLINE    1
+#define I8275_CURSOR_NONBLINK_REVERSED  2
+#define I8275_CURSOR_NONBLINK_UNDERLINE 3
 
 
-#define	VERBOSE			1
+#define VERBOSE         1
 
-#define	LOG(x)		do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)      do { if (VERBOSE) logerror x; } while (0)
 
 
 struct i8275_t
@@ -179,7 +179,7 @@ WRITE8_MEMBER( i8275_device::write )
 		m_num_of_params = I8275_PARAM_NONE;
 		m_param_type = I8275_PARAM_NONE;
 		switch(m_current_command) {
-			case I8275_COMMAND_RESET		:
+			case I8275_COMMAND_RESET        :
 											m_num_of_params = I8275_PARAM_RESET;
 											m_param_type = I8275_PARAM_WRITE;
 											/* set status register */
@@ -202,11 +202,11 @@ WRITE8_MEMBER( i8275_device::write )
 											m_num_of_params = I8275_PARAM_READ_LIGHT_PEN;
 											m_param_type = I8275_PARAM_READ;
 											break;
-			case I8275_COMMAND_LOAD_CURSOR	:
+			case I8275_COMMAND_LOAD_CURSOR  :
 											m_num_of_params = I8275_PARAM_LOAD_CURSOR;
 											m_param_type = I8275_PARAM_WRITE;
 											break;
-			case I8275_COMMAND_ENABLE_INTERRUPT	:
+			case I8275_COMMAND_ENABLE_INTERRUPT :
 											/* set status register */
 											m_status_reg |= I8275_STATUS_INTERRUPT_ENABLE;
 											break;
@@ -214,7 +214,7 @@ WRITE8_MEMBER( i8275_device::write )
 											/* set status register */
 											m_status_reg &= ~I8275_STATUS_INTERRUPT_ENABLE;
 											break;
-			case I8275_COMMAND_PRESET_COUNTERS	:
+			case I8275_COMMAND_PRESET_COUNTERS  :
 											break;
 		}
 	}
@@ -254,7 +254,7 @@ void i8275_device::draw_char_line()
 		lc = (m_line_counter_mode==1) ? (line - 1) % m_lines_per_row : line;
 		fifo_read = 0;
 		for(xpos=0;xpos<=m_chars_per_row;xpos++) {
-			UINT8 chr =	(m_buffer_used==0) ? m_row_buffer_2[xpos] : m_row_buffer_1[xpos];
+			UINT8 chr = (m_buffer_used==0) ? m_row_buffer_2[xpos] : m_row_buffer_1[xpos];
 			if (m_undeline_line_num & 0x08) {
 				vsp = (line==0 || line==m_lines_per_row) ? 1 : 0;
 			}
@@ -296,7 +296,7 @@ void i8275_device::draw_char_line()
 				lten = 0;
 			}
 
-			m_display_pixels_func(this, m_bitmap, 
+			m_display_pixels_func(this, m_bitmap,
 				xpos * m_width, // x position on screen of starting point
 				m_ypos, // y position on screen
 				lc, // current line of char
@@ -401,7 +401,7 @@ UINT32 i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	
+
 	return 0;
 }
 

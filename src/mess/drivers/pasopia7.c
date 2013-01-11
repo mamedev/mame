@@ -423,20 +423,20 @@ READ8_MEMBER( pasopia7_state::fdc_r )
 
 WRITE8_MEMBER( pasopia7_state::pac2_w )
 {
-    /*
-    select register:
-    4 = ram1;
-    3 = ram2;
-    2 = kanji ROM;
-    1 = joy;
-    anything else is nop
-    */
+	/*
+	select register:
+	4 = ram1;
+	3 = ram2;
+	2 = kanji ROM;
+	1 = joy;
+	anything else is nop
+	*/
 
 	if(m_pac2_bank_select == 3 || m_pac2_bank_select == 4)
 	{
 		switch(offset)
 		{
-			case 0:	m_pac2_index[(m_pac2_bank_select-3) & 1] = (m_pac2_index[(m_pac2_bank_select-3) & 1] & 0x7f00) | (data & 0xff); break;
+			case 0: m_pac2_index[(m_pac2_bank_select-3) & 1] = (m_pac2_index[(m_pac2_bank_select-3) & 1] & 0x7f00) | (data & 0xff); break;
 			case 1: m_pac2_index[(m_pac2_bank_select-3) & 1] = (m_pac2_index[(m_pac2_bank_select-3) & 1] & 0xff) | ((data & 0x7f) << 8); break;
 			case 2: // PAC2 RAM write
 			{
@@ -612,9 +612,9 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 //  else if(io_port == 0x3b)                    { SN2 }
 //  else if(io_port == 0x3c)                    { bankswitch }
 	else
-//	if(io_port >= 0xe0 && io_port <= 0xe6)
-//		return pasopia7_fdc_r(space, offset & 7);
-//	else
+//  if(io_port >= 0xe0 && io_port <= 0xe6)
+//      return pasopia7_fdc_r(space, offset & 7);
+//  else
 	{
 		logerror("(PC=%06x) Read i/o address %02x\n",m_maincpu->pc(),io_port);
 	}
@@ -725,24 +725,24 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 static Z80CTC_INTERFACE( z80ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),		// ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),		// ZC/TO1 callback, beep interface
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)		// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback, beep interface
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
 };
 
 
@@ -754,8 +754,8 @@ READ8_MEMBER( pasopia7_state::mux_r )
 READ8_MEMBER( pasopia7_state::keyb_r )
 {
 	const char *const keynames[3][4] = { { "KEY0", "KEY1", "KEY2", "KEY3" },
-					                     { "KEY4", "KEY5", "KEY6", "KEY7" },
-							             { "KEY8", "KEY9", "KEYA", "KEYB" } };
+											{ "KEY4", "KEY5", "KEY6", "KEY7" },
+											{ "KEY8", "KEY9", "KEYA", "KEYB" } };
 	int i,j;
 	UINT8 res;
 
@@ -839,11 +839,11 @@ WRITE8_MEMBER( pasopia7_state::video_attr_w )
 WRITE8_MEMBER( pasopia7_state::video_misc_w )
 {
 	/*
-        --x- ---- blinking
-        ---x ---- attribute wrap
-        ---- x--- pal disable
-        ---- xx-- palette selector (both bits enables this, odd hook-up)
-    */
+	    --x- ---- blinking
+	    ---x ---- attribute wrap
+	    ---- x--- pal disable
+	    ---- xx-- palette selector (both bits enables this, odd hook-up)
+	*/
 //  if(data & 2)
 //  {
 //    printf("VIDEO MISC %02x\n",data);
@@ -857,11 +857,11 @@ WRITE8_MEMBER( pasopia7_state::video_misc_w )
 WRITE8_MEMBER( pasopia7_state::nmi_mask_w )
 {
 	/*
-    --x- ---- (related to the data rec)
-    ---x ---- data rec out
-    ---- --x- sound off
-    ---- ---x reset NMI & trap
-    */
+	--x- ---- (related to the data rec)
+	---x ---- data rec out
+	---- --x- sound off
+	---- ---x reset NMI & trap
+	*/
 //  printf("SYSTEM MISC %02x\n",data);
 
 	if(data & 1)
@@ -888,9 +888,9 @@ READ8_MEMBER( pasopia7_state::nmi_reg_r )
 WRITE8_MEMBER( pasopia7_state::nmi_reg_w )
 {
 	/*
-        x--- ---- NMI mask
-        -x-- ---- NMI enable trap on PPI8255 2 r/w
-    */
+	    x--- ---- NMI mask
+	    -x-- ---- NMI enable trap on PPI8255 2 r/w
+	*/
 	m_nmi_mask = data & 0x80;
 	m_nmi_enable_reg = data & 0x40;
 }
@@ -907,32 +907,32 @@ READ8_MEMBER( pasopia7_state::nmi_portb_r )
 
 static I8255_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_DRIVER_MEMBER(pasopia7_state, unk_r),			/* Port A read */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, screen_mode_w),	/* Port A write */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, crtc_portb_r),	/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, unk_r),         /* Port A read */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, screen_mode_w), /* Port A write */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, crtc_portb_r),  /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_NULL                      /* Port C write */
 };
 
 static I8255_INTERFACE( ppi8255_intf_1 )
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, plane_reg_w),		/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, video_attr_w),	/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, video_misc_w)		/* Port C write */
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, plane_reg_w),       /* Port A write */
+	DEVCB_NULL,                     /* Port B read */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, video_attr_w),  /* Port B write */
+	DEVCB_NULL,                     /* Port C read */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, video_misc_w)       /* Port C write */
 };
 
 static I8255_INTERFACE( ppi8255_intf_2 )
 {
-	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_porta_r),		/* Port A read */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_mask_w),		/* Port A write */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_portb_r),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_reg_r),		/* Port C read */
-	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_reg_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_porta_r),       /* Port A read */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_mask_w),        /* Port A write */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_portb_r),       /* Port B read */
+	DEVCB_NULL,                     /* Port B write */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_reg_r),     /* Port C read */
+	DEVCB_DRIVER_MEMBER(pasopia7_state, nmi_reg_w)      /* Port C write */
 };
 
 void pasopia7_state::machine_reset()
@@ -988,7 +988,7 @@ SLOT_INTERFACE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( p7_base, pasopia7_state )
@@ -1031,7 +1031,7 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_raster)
 	MCFG_GFXDECODE( pasopia7 )
 
-	MCFG_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 MACHINE_CONFIG_END
 
 
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_lcd)
 	MCFG_GFXDECODE( pasopia7 )
 
-	MCFG_MC6845_ADD("crtc", H46505, LCD_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, LCD_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 MACHINE_CONFIG_END
 

@@ -433,7 +433,7 @@ static const via6522_interface via_interface =
 	/*inputs : A/B         */ DEVCB_DRIVER_MEMBER(atarisy1_state,via_pa_r), DEVCB_DRIVER_MEMBER(atarisy1_state,via_pb_r),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(atarisy1_state,via_pa_w), DEVCB_DRIVER_MEMBER(atarisy1_state,via_pb_w),
-    /*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irq                  */ DEVCB_NULL
 };
 
@@ -460,7 +460,7 @@ WRITE8_MEMBER(atarisy1_state::led_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_ROM	/* slapstic maps here */
+	AM_RANGE(0x080000, 0x087fff) AM_ROM /* slapstic maps here */
 	AM_RANGE(0x2e0000, 0x2e0001) AM_READ_LEGACY(atarisy1_int3state_r)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(atarisy1_xscroll_w) AM_SHARE("xscroll")
@@ -479,7 +479,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf60000, 0xf60003) AM_READ(port4_r)
-	AM_RANGE(0xf80000, 0xf80001) AM_WRITE8(sound_w, 0x00ff)	/* used by roadbls2 */
+	AM_RANGE(0xf80000, 0xf80001) AM_WRITE8(sound_w, 0x00ff) /* used by roadbls2 */
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ8(sound_r, 0x00ff)
 	AM_RANGE(0xfe0000, 0xfe0001) AM_WRITE8(sound_w, 0x00ff)
 ADDRESS_MAP_END
@@ -513,18 +513,18 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( marble )
 	PORT_START("IN0")  /* F20000 */
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("IN1")  /* F20002 */
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("IN2")  /* F20004 */
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("IN3")  /* F20006 */
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2)
 
-	PORT_START("F60000")	/* F60000 */
+	PORT_START("F60000")    /* F60000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -535,7 +535,7 @@ static INPUT_PORTS_START( marble )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")	/* 1820 (sound) */
+	PORT_START("1820")  /* 1820 (sound) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -547,23 +547,23 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( peterpak )
-	PORT_START("IN0")	/* F40000 */
+	PORT_START("IN0")   /* F40000 */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
-	PORT_START("IN1")	/* n/a */
+	PORT_START("IN1")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN2")	/* n/a */
+	PORT_START("IN2")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN3")	/* n/a */
+	PORT_START("IN3")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("F60000")	/* F60000 */
+	PORT_START("F60000")    /* F60000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Throw/P1 Start")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Throw/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Jump")
@@ -574,7 +574,7 @@ static INPUT_PORTS_START( peterpak )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")	/* 1820 (sound) */
+	PORT_START("1820")  /* 1820 (sound) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -586,26 +586,26 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( indytemp )
-	PORT_START("IN0")	/* F40000 */
+	PORT_START("IN0")   /* F40000 */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
-	PORT_START("IN1")	/* n/a */
+	PORT_START("IN1")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN2")	/* n/a */
+	PORT_START("IN2")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN3")	/* n/a */
+	PORT_START("IN3")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("F60000")	/* F60000 */
+	PORT_START("F60000")    /* F60000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Whip/P1 Start")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Whip/P2 Start")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* freeze? */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* freeze? */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -613,7 +613,7 @@ static INPUT_PORTS_START( indytemp )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")	/* 1820 (sound) */
+	PORT_START("1820")  /* 1820 (sound) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -627,7 +627,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( indytemc )
 	PORT_INCLUDE( indytemp )
 
-	PORT_MODIFY("IN0")	/* F40000 */
+	PORT_MODIFY("IN0")  /* F40000 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -637,19 +637,19 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( roadrunn )
-	PORT_START("IN0")	/* F40000 */
+	PORT_START("IN0")   /* F40000 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("IN1")	/* F40002 */
+	PORT_START("IN1")   /* F40002 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("IN2")	/* n/a */
+	PORT_START("IN2")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")	/* n/a */
+	PORT_START("IN3")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("F60000")	/* F60000 */
+	PORT_START("F60000")    /* F60000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Hop/P1 Start")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right Hop/P2 Start")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Unused Button 1")
@@ -660,7 +660,7 @@ static INPUT_PORTS_START( roadrunn )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")	/* 1820 (sound) */
+	PORT_START("1820")  /* 1820 (sound) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -672,19 +672,19 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( roadblst )
-	PORT_START("IN0")	/* F20000 */
+	PORT_START("IN0")   /* F20000 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("IN1")	/* F40000 */
+	PORT_START("IN1")   /* F40000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(64)
 
-	PORT_START("IN2")	/* n/a */
+	PORT_START("IN2")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN3")	/* n/a */
+	PORT_START("IN3")   /* n/a */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("F60000")	/* F60000 */
+	PORT_START("F60000")    /* F60000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Special Weapon")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Lasers")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -695,7 +695,7 @@ static INPUT_PORTS_START( roadblst )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("1820")	/* 1820 (sound) */
+	PORT_START("1820")  /* 1820 (sound) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -814,7 +814,7 @@ MACHINE_CONFIG_END
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
-#define MOTHERBOARD_BIOS											                                                           \
+#define MOTHERBOARD_BIOS                                                                                                       \
 	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )                                                                     \
 	ROM_LOAD16_BYTE_BIOS(0, "136032.205.l13", 0x00000, 0x04000, CRC(88d0be26) SHA1(d124045eccc562ff0423b23a240e27ad740fa0c9) ) \
 	ROM_LOAD16_BYTE_BIOS(0, "136032.206.l12", 0x00001, 0x04000, CRC(3c79ef05) SHA1(20fdca7131478e1ee12691bdafd2d5bb74cbd16f) ) \
@@ -825,7 +825,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_BYTE_BIOS(2, "136032.114.j11", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) \
 	ROM_LOAD16_BYTE_BIOS(2, "136032.115.j10", 0x00001, 0x04000, CRC(7275b4dc) SHA1(0896ab37ea832a1335046353612c1b4c86d8d040) )
 
-#define MOTHERBOARD_ALPHA                                                                           				   \
+#define MOTHERBOARD_ALPHA                                                                                              \
 	ROM_LOAD_BIOS(0, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
 	ROM_LOAD_BIOS(1, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
 	ROM_LOAD_BIOS(2, "136032.107.b2", 0x00000, 0x02000, CRC(315e4bea) SHA1(a00ea23fbdbf075f8f3f184275be83387e8ac82b) )
@@ -839,20 +839,20 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS(1, "136032.103.f7", 0x00000, 0x00001, NO_DUMP ) /* N82S153 */
 
 ROM_START( atarisy1 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 
-	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 )    /* 64k for 6502 code */
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by the TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by the TTL version.) */
+	MOTHERBOARD_PROMS
 
-	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) /* graphics mapping PROMs */
 ROM_END
 
 
@@ -867,8 +867,8 @@ ROM_END
 */
 
 ROM_START( marble )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136033.623",   0x10000, 0x04000, CRC(284ed2e9) SHA1(a24d2fd587dffcc8536ef28fcbcf5c964a6b67a9) )
 	ROM_LOAD16_BYTE( "136033.624",   0x10001, 0x04000, CRC(d541b021) SHA1(978b1565da746f7389eaf7646604990fb28d47ed) )
 	ROM_LOAD16_BYTE( "136033.625",   0x18000, 0x04000, CRC(563755c7) SHA1(a444b72ff4cdecee3b9dd7e636d658c31ecc186c) )
@@ -880,12 +880,12 @@ ROM_START( marble )
 	ROM_LOAD16_BYTE( "136033.107",   0x80000, 0x04000, CRC(f3b8745b) SHA1(4754eac5e6d8547b3ee00f3f48eaa560eb403862) )
 	ROM_LOAD16_BYTE( "136033.108",   0x80001, 0x04000, CRC(e51eecaa) SHA1(37d51a9e9cb33d1156d02a312ac8e202a18d7c20) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136033.421",   0x8000, 0x4000, CRC(78153dc3) SHA1(d4e68226b87df8834dc3d6daa9d683f17896c32e) )
 	ROM_LOAD( "136033.422",   0xc000, 0x4000, CRC(2e66300e) SHA1(49acb9443c5d2c1016cde7f489deab2575dd82ca) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136033.137",   0x00000, 0x04000, CRC(7a45f5c1) SHA1(b826a178660ff2e278558e4779586737751dca5e) )  /* bank 1, plane 0 */
@@ -903,18 +903,18 @@ ROM_START( marble )
 	ROM_LOAD( "136033.151",   0x94000, 0x04000, CRC(84ee1c80) SHA1(5192c0a2887f46b616d130bdbfffbbd5e394e9a3) )  /* bank 2, plane 1 */
 	ROM_LOAD( "136033.153",   0xa4000, 0x04000, CRC(daa02926) SHA1(33c7a38c66fb4d67a6ee88ef2da2bba091439e0c) )  /* bank 2, plane 2 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( marble2 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136033.401",   0x10000, 0x08000, CRC(ecfc25a2) SHA1(45d98bea8d6bed5ecdcde1049c3a3f6e0fa6ee4c) )
 	ROM_LOAD16_BYTE( "136033.402",   0x10001, 0x08000, CRC(7ce9bf53) SHA1(0a5761d4856cd055e8a58b36276945e06c01d08d) )
 	ROM_LOAD16_BYTE( "136033.403",   0x20000, 0x08000, CRC(dafee7a2) SHA1(6e4aa9721b5fd4385422c146a84a5e271124abcb) )
@@ -922,12 +922,12 @@ ROM_START( marble2 )
 	ROM_LOAD16_BYTE( "136033.107",   0x80000, 0x04000, CRC(f3b8745b) SHA1(4754eac5e6d8547b3ee00f3f48eaa560eb403862) )
 	ROM_LOAD16_BYTE( "136033.108",   0x80001, 0x04000, CRC(e51eecaa) SHA1(37d51a9e9cb33d1156d02a312ac8e202a18d7c20) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136033.421",   0x8000, 0x4000, CRC(78153dc3) SHA1(d4e68226b87df8834dc3d6daa9d683f17896c32e) )
 	ROM_LOAD( "136033.422",   0xc000, 0x4000, CRC(2e66300e) SHA1(49acb9443c5d2c1016cde7f489deab2575dd82ca) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136033.137",   0x00000, 0x04000, CRC(7a45f5c1) SHA1(b826a178660ff2e278558e4779586737751dca5e) )  /* bank 1, plane 0 */
@@ -945,18 +945,18 @@ ROM_START( marble2 )
 	ROM_LOAD( "136033.151",   0x94000, 0x04000, CRC(84ee1c80) SHA1(5192c0a2887f46b616d130bdbfffbbd5e394e9a3) )  /* bank 2, plane 1 */
 	ROM_LOAD( "136033.153",   0xa4000, 0x04000, CRC(daa02926) SHA1(33c7a38c66fb4d67a6ee88ef2da2bba091439e0c) )  /* bank 2, plane 2 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( marble3 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136033.201",   0x10000, 0x08000, CRC(9395804d) SHA1(7cca2cc85a9678199c7a60c0976f3e0362f8538f) )
 	ROM_LOAD16_BYTE( "136033.202",   0x10001, 0x08000, CRC(edd313f5) SHA1(f3ec6f5812287e187026446fe286f257b54c426e) )
 	ROM_LOAD16_BYTE( "136033.403",   0x20000, 0x08000, CRC(dafee7a2) SHA1(6e4aa9721b5fd4385422c146a84a5e271124abcb) )
@@ -964,12 +964,12 @@ ROM_START( marble3 )
 	ROM_LOAD16_BYTE( "136033.107",   0x80000, 0x04000, CRC(f3b8745b) SHA1(4754eac5e6d8547b3ee00f3f48eaa560eb403862) )
 	ROM_LOAD16_BYTE( "136033.108",   0x80001, 0x04000, CRC(e51eecaa) SHA1(37d51a9e9cb33d1156d02a312ac8e202a18d7c20) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136033.121",   0x8000, 0x4000, CRC(73fe2b46) SHA1(09fceb60c831972f544c92a84c6d0cbc2481b9f5) )
 	ROM_LOAD( "136033.122",   0xc000, 0x4000, CRC(03bf65c3) SHA1(4f4a4e4b5bd202da2d18c062f585a842082f08db) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136033.137",   0x00000, 0x04000, CRC(7a45f5c1) SHA1(b826a178660ff2e278558e4779586737751dca5e) )  /* bank 1, plane 0 */
@@ -987,18 +987,18 @@ ROM_START( marble3 )
 	ROM_LOAD( "136033.151",   0x94000, 0x04000, CRC(84ee1c80) SHA1(5192c0a2887f46b616d130bdbfffbbd5e394e9a3) )  /* bank 2, plane 1 */
 	ROM_LOAD( "136033.153",   0xa4000, 0x04000, CRC(daa02926) SHA1(33c7a38c66fb4d67a6ee88ef2da2bba091439e0c) )  /* bank 2, plane 2 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( marble4 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136033.323",   0x10000, 0x04000, CRC(4dc2987a) SHA1(abe155f773dfa623aee6c3952941426adb4c8c9c) )
 	ROM_LOAD16_BYTE( "136033.324",   0x10001, 0x04000, CRC(e22e6e11) SHA1(aedb18f25aad846b82690c70b917e97cdcfbd09e) )
 	ROM_LOAD16_BYTE( "136033.225",   0x18000, 0x04000, CRC(743f6c5c) SHA1(b69b7dc9923f514b8de207895bbe0c2038dc519d) )
@@ -1010,12 +1010,12 @@ ROM_START( marble4 )
 	ROM_LOAD16_BYTE( "136033.107",   0x80000, 0x04000, CRC(f3b8745b) SHA1(4754eac5e6d8547b3ee00f3f48eaa560eb403862) )
 	ROM_LOAD16_BYTE( "136033.108",   0x80001, 0x04000, CRC(e51eecaa) SHA1(37d51a9e9cb33d1156d02a312ac8e202a18d7c20) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136033.257",   0x8000, 0x4000, CRC(2e2e0df8) SHA1(e76f7297a3e78ebbc00e3a4c468149f9f7124b16) )
 	ROM_LOAD( "136033.258",   0xc000, 0x4000, CRC(1b9655cd) SHA1(deb8728ee9620718e449f1e55a6fe115256c00c9) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136033.137",   0x00000, 0x04000, CRC(7a45f5c1) SHA1(b826a178660ff2e278558e4779586737751dca5e) )  /* bank 1, plane 0 */
@@ -1033,18 +1033,18 @@ ROM_START( marble4 )
 	ROM_LOAD( "136033.151",   0x94000, 0x04000, CRC(84ee1c80) SHA1(5192c0a2887f46b616d130bdbfffbbd5e394e9a3) )  /* bank 2, plane 1 */
 	ROM_LOAD( "136033.153",   0xa4000, 0x04000, CRC(daa02926) SHA1(33c7a38c66fb4d67a6ee88ef2da2bba091439e0c) )  /* bank 2, plane 2 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( marble5 ) /* LSI Cartridge */
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136033.201", 0x10000, 0x08000, CRC(9395804d) SHA1(7cca2cc85a9678199c7a60c0976f3e0362f8538f) ) /* Located at B10 */
 	ROM_LOAD16_BYTE( "136033.202", 0x10001, 0x08000, CRC(edd313f5) SHA1(f3ec6f5812287e187026446fe286f257b54c426e) ) /* Located at A10 */
 	ROM_LOAD16_BYTE( "136033.203", 0x20000, 0x08000, CRC(dafee7a2) SHA1(6e4aa9721b5fd4385422c146a84a5e271124abcb) ) /* Located at B12 */
@@ -1052,7 +1052,7 @@ ROM_START( marble5 ) /* LSI Cartridge */
 	ROM_LOAD16_BYTE( "136033.107", 0x80000, 0x04000, CRC(f3b8745b) SHA1(4754eac5e6d8547b3ee00f3f48eaa560eb403862) ) /* Located at B16 */
 	ROM_LOAD16_BYTE( "136033.108", 0x80001, 0x04000, CRC(e51eecaa) SHA1(37d51a9e9cb33d1156d02a312ac8e202a18d7c20) ) /* Located at A16 */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD(        "136033.121", 0x08000, 0x04000, CRC(73fe2b46) SHA1(09fceb60c831972f544c92a84c6d0cbc2481b9f5) ) /* Located at D14 */
 	ROM_LOAD(        "136033.122", 0x0c000, 0x04000, CRC(03bf65c3) SHA1(4f4a4e4b5bd202da2d18c062f585a842082f08db) ) /* Located at D16 */
 
@@ -1064,17 +1064,17 @@ ROM_START( marble5 ) /* LSI Cartridge */
 	ROM_LOAD(        "136033.110", 0x10000, 0x08000, CRC(b883ec76) SHA1(ec048e19395fd617f2cd0d3edea728799bdca037) )  /* bank 1, plane 1 - located at B6 */
 	ROM_LOAD(        "136033.111", 0x20000, 0x08000, CRC(c208bd5e) SHA1(e75f7d33c66b58e3c72a83d0dc7a6427a57d0de9) )  /* bank 1, plane 2 - located at C1 */
 	ROM_LOAD(        "136033.112", 0x30000, 0x08000, CRC(042673d4) SHA1(499c1edf82834d5ff6144ee4349b2349db7a57c2) )  /* bank 1, plane 3 - located at C6 */
-    ROM_LOAD(        "136033.113", 0x40000, 0x08000, CRC(b390aef3) SHA1(2cd58071d1c09058af7876c35484c3b571774a06) )  /* bank 1, plane 4 - located at D1 */
+	ROM_LOAD(        "136033.113", 0x40000, 0x08000, CRC(b390aef3) SHA1(2cd58071d1c09058af7876c35484c3b571774a06) )  /* bank 1, plane 4 - located at D1 */
 	ROM_LOAD(        "136033.115", 0x84000, 0x04000, CRC(b6658f06) SHA1(e719d956f4f9d703a12e2c5520cac0a2f47ea058) )  /* bank 2, plane 0 - located at B2 */
 	ROM_LOAD(        "136033.116", 0x94000, 0x04000, CRC(84ee1c80) SHA1(5192c0a2887f46b616d130bdbfffbbd5e394e9a3) )  /* bank 2, plane 1 - located at B7 */
 	ROM_LOAD(        "136033.117", 0xa4000, 0x04000, CRC(daa02926) SHA1(33c7a38c66fb4d67a6ee88ef2da2bba091439e0c) )  /* bank 2, plane 2 - located at C7 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD(        "136033.118", 0x00000, 0x00200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap, located at A7 */
 	ROM_LOAD(        "136033.159", 0x00200, 0x00200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color, located at A5 */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1083,8 +1083,8 @@ ROM_END
 */
 
 ROM_START( peterpak )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136028.142",   0x10000, 0x04000, CRC(4f9fc020) SHA1(7e0d5660ea395ded7e0e4c9122bc41f9bb9a483d) )
 	ROM_LOAD16_BYTE( "136028.143",   0x10001, 0x04000, CRC(9fb257cc) SHA1(5590fc2b4e79a071ae5ba04e23aadb3e35614a73) )
 	ROM_LOAD16_BYTE( "136028.144",   0x18000, 0x04000, CRC(50267619) SHA1(7aec7e4c8b97313d18c8eb55e078157776e29842) )
@@ -1094,12 +1094,12 @@ ROM_START( peterpak )
 	ROM_LOAD16_BYTE( "136028.148",   0x80000, 0x04000, CRC(230e8ba9) SHA1(decda85f3de92ab72bb2a3812a84a92c937a7409) )
 	ROM_LOAD16_BYTE( "136028.149",   0x80001, 0x04000, CRC(0ff0c13a) SHA1(d1912d8e468ca04a930aedaece824f020d8e0357) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136028.101",   0x8000, 0x4000, CRC(ff712aa2) SHA1(07beeb51f41d406782965dddb6fe73fdc49529df) )
 	ROM_LOAD( "136028.102",   0xc000, 0x4000, CRC(89ea21a1) SHA1(a7cb6eceb45d54406d6fc692f50a4e34564d6170) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x180000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136028.138",   0x000000, 0x08000, CRC(53eaa018) SHA1(3f9887d4996e6a7c894732e9c9ebe4408fb60192) )  /* bank 1, plane 0 */
@@ -1117,12 +1117,12 @@ ROM_START( peterpak )
 	ROM_LOAD( "136028.111",   0x124000, 0x04000, CRC(246599f3) SHA1(7902941ce29a784875c17a8eadb50288f1497604) )  /* bank 3, plane 2 */
 	ROM_LOAD( "136028.114",   0x134000, 0x04000, CRC(918a5082) SHA1(0a9b83e0c9f6883bdca1b84805f8642fc660d09d) )  /* bank 3, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136028.136",   0x000, 0x200, CRC(861cfa36) SHA1(d18ca5e28bf48df6506be6bc0283c996c6520ef4) )  /* remap */
 	ROM_LOAD( "136028.137",   0x200, 0x200, CRC(8507e5ea) SHA1(a009a98fe02625a20f4a9d9ab1c70891bf4e45ec) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1131,8 +1131,8 @@ ROM_END
 */
 
 ROM_START( indytemp )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136036.432",   0x10000, 0x08000, CRC(d888cdf1) SHA1(c9cbc0d429755611b3749e018d3817d4d7042425) )
 	ROM_LOAD16_BYTE( "136036.431",   0x10001, 0x08000, CRC(b7ac7431) SHA1(b062258746ca5f9c3f9cf8a6186eb3c370ac3a77) )
 	ROM_LOAD16_BYTE( "136036.434",   0x20000, 0x08000, CRC(802495fd) SHA1(228f48ef067a758fe0d3bfe0508765a52bb579eb) )
@@ -1142,13 +1142,13 @@ ROM_START( indytemp )
 	ROM_LOAD16_BYTE( "136036.358",   0x80000, 0x04000, CRC(d9351106) SHA1(6a11cef7f93701d5bc08e0ce413999322a011d69) )
 	ROM_LOAD16_BYTE( "136036.359",   0x80001, 0x04000, CRC(e731caea) SHA1(71c1445804b5696078a49855852420e4046d77bb) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136036.153",   0x4000, 0x4000, CRC(95294641) SHA1(00f90a0d49d2c77d5288080036f81a74ad31f8bc) )
 	ROM_LOAD( "136036.154",   0x8000, 0x4000, CRC(cbfc6adb) SHA1(ee132eced924435f1214e2997533e866a3e5364b) )
 	ROM_LOAD( "136036.155",   0xc000, 0x4000, CRC(4c8233ac) SHA1(3d2bdb71b8f499a21f0b0e1686be7fe6f23efede) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136036.135",   0x000000, 0x08000, CRC(ffa8749c) SHA1(b0bec9b8364a15606d9f4d11f674dea2ec25279f) )  /* bank 1, plane 0 */
@@ -1171,18 +1171,18 @@ ROM_START( indytemp )
 	ROM_LOAD( "136036.146",   0x1a0000, 0x08000, CRC(8ae5a7b5) SHA1(97ddf916c41d6ddd23501e27611a83c912ec9ad2) )  /* bank 4, plane 2 */
 	ROM_LOAD( "136036.150",   0x1b0000, 0x08000, CRC(a10c4bd9) SHA1(3177f22aff9e18c0f003f3fd1fa4b258308eee07) )  /* bank 4, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( indytemp2 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136036.470",   0x10000, 0x08000, CRC(7fac1dd8) SHA1(043daf709209e76115899a1e301f8fb262b3a749) )
 	ROM_LOAD16_BYTE( "136036.471",   0x10001, 0x08000, CRC(e93272fb) SHA1(bb5741419a9d1a54ae16bfd6d2fcf64627e8a5c3) )
 	ROM_LOAD16_BYTE( "136036.434",   0x20000, 0x08000, CRC(802495fd) SHA1(228f48ef067a758fe0d3bfe0508765a52bb579eb) )
@@ -1192,13 +1192,13 @@ ROM_START( indytemp2 )
 	ROM_LOAD16_BYTE( "136036.358",   0x80000, 0x04000, CRC(d9351106) SHA1(6a11cef7f93701d5bc08e0ce413999322a011d69) )
 	ROM_LOAD16_BYTE( "136036.359",   0x80001, 0x04000, CRC(e731caea) SHA1(71c1445804b5696078a49855852420e4046d77bb) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136036.153",   0x4000, 0x4000, CRC(95294641) SHA1(00f90a0d49d2c77d5288080036f81a74ad31f8bc) )
 	ROM_LOAD( "136036.154",   0x8000, 0x4000, CRC(cbfc6adb) SHA1(ee132eced924435f1214e2997533e866a3e5364b) )
 	ROM_LOAD( "136036.155",   0xc000, 0x4000, CRC(4c8233ac) SHA1(3d2bdb71b8f499a21f0b0e1686be7fe6f23efede) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136036.135",   0x000000, 0x08000, CRC(ffa8749c) SHA1(b0bec9b8364a15606d9f4d11f674dea2ec25279f) )  /* bank 1, plane 0 */
@@ -1221,18 +1221,18 @@ ROM_START( indytemp2 )
 	ROM_LOAD( "136036.146",   0x1a0000, 0x08000, CRC(8ae5a7b5) SHA1(97ddf916c41d6ddd23501e27611a83c912ec9ad2) )  /* bank 4, plane 2 */
 	ROM_LOAD( "136036.150",   0x1b0000, 0x08000, CRC(a10c4bd9) SHA1(3177f22aff9e18c0f003f3fd1fa4b258308eee07) )  /* bank 4, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( indytemp3 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "232.10b",      0x10000, 0x08000, CRC(1e80108f) SHA1(663ef81b865c4d13fd73eca4f82ee64a4bdeaad5) )
 	ROM_LOAD16_BYTE( "231.10a",      0x10001, 0x08000, CRC(8ae54c0c) SHA1(c7ab4a2e2af8f2336baa8c7b2a80af7c9bfd0435) )
 	ROM_LOAD16_BYTE( "234.12b",      0x20000, 0x08000, CRC(86be7e07) SHA1(b6b0d9c6d81d446dab675c71d60f792f6a657c5b) )
@@ -1242,13 +1242,13 @@ ROM_START( indytemp3 )
 	ROM_LOAD16_BYTE( "158.16b",      0x80000, 0x04000, CRC(10372888) SHA1(438a990dc7599325f203d57ffb0a94ae36a00cc7) )
 	ROM_LOAD16_BYTE( "159.16a",      0x80001, 0x04000, CRC(50f890a8) SHA1(7dfdc4512de8fb0039b426e3b5be50e0095f39f7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136036.153",   0x4000, 0x4000, CRC(95294641) SHA1(00f90a0d49d2c77d5288080036f81a74ad31f8bc) )
 	ROM_LOAD( "136036.154",   0x8000, 0x4000, CRC(cbfc6adb) SHA1(ee132eced924435f1214e2997533e866a3e5364b) )
 	ROM_LOAD( "136036.155",   0xc000, 0x4000, CRC(4c8233ac) SHA1(3d2bdb71b8f499a21f0b0e1686be7fe6f23efede) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136036.135",   0x000000, 0x08000, CRC(ffa8749c) SHA1(b0bec9b8364a15606d9f4d11f674dea2ec25279f) )  /* bank 1, plane 0 */
@@ -1271,18 +1271,18 @@ ROM_START( indytemp3 )
 	ROM_LOAD( "136036.146",   0x1a0000, 0x08000, CRC(8ae5a7b5) SHA1(97ddf916c41d6ddd23501e27611a83c912ec9ad2) )  /* bank 4, plane 2 */
 	ROM_LOAD( "136036.150",   0x1b0000, 0x08000, CRC(a10c4bd9) SHA1(3177f22aff9e18c0f003f3fd1fa4b258308eee07) )  /* bank 4, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( indytemp4 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136036.332",   0x10000, 0x08000, CRC(a5563773) SHA1(52701b53e62aae691f7b9483f5e843d805223a0a) )
 	ROM_LOAD16_BYTE( "136036.331",   0x10001, 0x08000, CRC(7d562141) SHA1(a2143ed473e40a5a46679e7751fc37475768885f) )
 	ROM_LOAD16_BYTE( "136036.334",   0x20000, 0x08000, CRC(e40828e5) SHA1(a5c50693bddcc394711859bdc36d9ff93d02b82e) )
@@ -1292,13 +1292,13 @@ ROM_START( indytemp4 )
 	ROM_LOAD16_BYTE( "136036.358",   0x80000, 0x04000, CRC(d9351106) SHA1(6a11cef7f93701d5bc08e0ce413999322a011d69) )
 	ROM_LOAD16_BYTE( "136036.359",   0x80001, 0x04000, CRC(e731caea) SHA1(71c1445804b5696078a49855852420e4046d77bb) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136036.153",   0x4000, 0x4000, CRC(95294641) SHA1(00f90a0d49d2c77d5288080036f81a74ad31f8bc) )
 	ROM_LOAD( "136036.154",   0x8000, 0x4000, CRC(cbfc6adb) SHA1(ee132eced924435f1214e2997533e866a3e5364b) )
 	ROM_LOAD( "136036.155",   0xc000, 0x4000, CRC(4c8233ac) SHA1(3d2bdb71b8f499a21f0b0e1686be7fe6f23efede) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136036.135",   0x000000, 0x08000, CRC(ffa8749c) SHA1(b0bec9b8364a15606d9f4d11f674dea2ec25279f) )  /* bank 1, plane 0 */
@@ -1321,17 +1321,17 @@ ROM_START( indytemp4 )
 	ROM_LOAD( "136036.146",   0x1a0000, 0x08000, CRC(8ae5a7b5) SHA1(97ddf916c41d6ddd23501e27611a83c912ec9ad2) )  /* bank 4, plane 2 */
 	ROM_LOAD( "136036.150",   0x1b0000, 0x08000, CRC(a10c4bd9) SHA1(3177f22aff9e18c0f003f3fd1fa4b258308eee07) )  /* bank 4, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( indytempc ) /* Dedicated boardset marked 'ATARI SYSTEM I LSI CARTRIDGE COCKTAIL A043310' */
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
 	ROM_LOAD16_BYTE( "136032.116",   0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) )
 	ROM_LOAD16_BYTE( "136032.117",   0x00001, 0x04000, CRC(9af9fe29) SHA1(1d5077662e4111ece9f8a5124394dad8b1abdc13) )
 	ROM_LOAD16_BYTE( "136032.632",   0x10000, 0x08000, CRC(d3e1a611) SHA1(edbced6dd64ca44a59aff6a4acca0b3ddb233810) )
@@ -1343,7 +1343,7 @@ ROM_START( indytempc ) /* Dedicated boardset marked 'ATARI SYSTEM I LSI CARTRIDG
 	ROM_LOAD16_BYTE( "136036.358",   0x80000, 0x04000, CRC(d9351106) SHA1(6a11cef7f93701d5bc08e0ce413999322a011d69) )
 	ROM_LOAD16_BYTE( "136036.359",   0x80001, 0x04000, CRC(e731caea) SHA1(71c1445804b5696078a49855852420e4046d77bb) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136036.153",   0x4000, 0x4000, CRC(95294641) SHA1(00f90a0d49d2c77d5288080036f81a74ad31f8bc) )
 	ROM_LOAD( "136036.170",   0x8000, 0x8000, CRC(f318b321) SHA1(8fe9e88fa9f2104526f89926a7119b866051e4ef) )
 
@@ -1371,15 +1371,15 @@ ROM_START( indytempc ) /* Dedicated boardset marked 'ATARI SYSTEM I LSI CARTRIDG
 	ROM_LOAD( "136036.146",   0x1a0000, 0x08000, CRC(8ae5a7b5) SHA1(97ddf916c41d6ddd23501e27611a83c912ec9ad2) )  /* bank 4, plane 2 */
 	ROM_LOAD( "136036.150",   0x1b0000, 0x08000, CRC(a10c4bd9) SHA1(3177f22aff9e18c0f003f3fd1fa4b258308eee07) )  /* bank 4, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.160",   0x200, 0x200, CRC(88c65843) SHA1(81fef378b3dbf4d7228beb7427e2f75cae371808) )  /* color */
 ROM_END
 
 
 ROM_START( indytempd )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136036.462",   0x10000, 0x08000, CRC(317dc430) SHA1(563f09fb1b096bd40e1a73acb7f11d3809f9f19f) )
 	ROM_LOAD16_BYTE( "136036.461",   0x10001, 0x08000, CRC(8c73f974) SHA1(023b55f1d54606f5c51b86b802d417099d775f14) )
 	ROM_LOAD16_BYTE( "136036.464",   0x20000, 0x08000, CRC(3fcb199f) SHA1(11a8a17bf0100b5f16e9148669b2ec5bf81b3d62) )
@@ -1389,13 +1389,13 @@ ROM_START( indytempd )
 	ROM_LOAD16_BYTE( "136036.358",   0x80000, 0x04000, CRC(d9351106) SHA1(6a11cef7f93701d5bc08e0ce413999322a011d69) )
 	ROM_LOAD16_BYTE( "136036.359",   0x80001, 0x04000, CRC(e731caea) SHA1(71c1445804b5696078a49855852420e4046d77bb) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136036.153",   0x4000, 0x4000, CRC(95294641) SHA1(00f90a0d49d2c77d5288080036f81a74ad31f8bc) )
 	ROM_LOAD( "136036.154",   0x8000, 0x4000, CRC(cbfc6adb) SHA1(ee132eced924435f1214e2997533e866a3e5364b) )
 	ROM_LOAD( "136036.155",   0xc000, 0x4000, CRC(4c8233ac) SHA1(3d2bdb71b8f499a21f0b0e1686be7fe6f23efede) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136036.135",   0x000000, 0x08000, CRC(ffa8749c) SHA1(b0bec9b8364a15606d9f4d11f674dea2ec25279f) )  /* bank 1, plane 0 */
@@ -1418,12 +1418,12 @@ ROM_START( indytempd )
 	ROM_LOAD( "136036.146",   0x1a0000, 0x08000, CRC(8ae5a7b5) SHA1(97ddf916c41d6ddd23501e27611a83c912ec9ad2) )  /* bank 4, plane 2 */
 	ROM_LOAD( "136036.150",   0x1b0000, 0x08000, CRC(a10c4bd9) SHA1(3177f22aff9e18c0f003f3fd1fa4b258308eee07) )  /* bank 4, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1432,8 +1432,8 @@ ROM_END
 */
 
 ROM_START( roadrunn )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136040-228.11c",  0x010000, 0x008000, CRC(b66c629a) SHA1(94dc13f2f151a4109ee50016bcc1392aef0d5a22) )
 	ROM_LOAD16_BYTE( "136040-229.11a",  0x010001, 0x008000, CRC(5638959f) SHA1(486bd13ba151558b72bf29de9ecc14944e56435c) )
 	ROM_LOAD16_BYTE( "136040-230.13c",  0x020000, 0x008000, CRC(cd7956a3) SHA1(d72aa90b74a77e5fa49cb34515383c8ab054d654) )
@@ -1447,12 +1447,12 @@ ROM_START( roadrunn )
 	ROM_LOAD16_BYTE( "136040-140.17c",  0x080000, 0x004000, CRC(d1464c88) SHA1(0d600119a9137f4c7cad7f708e0c885da96af207) )
 	ROM_LOAD16_BYTE( "136040-141.17a",  0x080001, 0x004000, CRC(f8f2acdf) SHA1(b9e31c1f96fab5368fb90768e059157f74cbc762) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136040-143.15e",  0x008000, 0x004000, CRC(62b9878e) SHA1(db6072a7c8600d85fb70dac3d940a200d0cb5d0a) )
 	ROM_LOAD( "136040-144.17e",  0x00c000, 0x004000, CRC(6ef1b804) SHA1(176066c6946090c87945213145960754cd315acb) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x300000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136040-101.4b",   0x000000, 0x008000, CRC(26d9f29c) SHA1(e03a03484ede4ea209040faf64e88f0667a0ab40) )  /* bank 1, plane 0 */
@@ -1485,18 +1485,18 @@ ROM_START( roadrunn )
 	ROM_LOAD( "136040-118.1d",   0x2a0000, 0x008000, CRC(f489a968) SHA1(424ef3f11b30b152e03d40e604350098e0c3e9e0) )  /* bank 6, plane 2 */
 	ROM_LOAD( "136040-124.6d",   0x2b0000, 0x008000, CRC(524d65f7) SHA1(3f2b0ee642fe7eebb578b00b44d9821369269791) )  /* bank 6, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136040-126.7a",   0x000000, 0x000200, CRC(1713c0cd) SHA1(237ce1c53d8a17823df3341360f03b2b94cd91bb) )
 	ROM_LOAD( "136040-125.5a",   0x000200, 0x000200, CRC(a9ca8795) SHA1(77583510e7a7179493f313e0c0b25d029dd6e583) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadrunn2 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136040-x28.11c",  0x010000, 0x008000, CRC(fbd43085) SHA1(57f2f2f01e235f4525507583887d52b09f6267b4) )
 	ROM_LOAD16_BYTE( "136040-x29.11a",  0x010001, 0x008000, CRC(f8d8819b) SHA1(dddb44290e3d2728845639611c3a66c3389c8f69) )
 	ROM_LOAD16_BYTE( "136040-x30.13c",  0x020000, 0x008000, CRC(6a273375) SHA1(2e222ad4a4d53ec50f848386fca12f74e98814ed) )
@@ -1510,12 +1510,12 @@ ROM_START( roadrunn2 )
 	ROM_LOAD16_BYTE( "136040-140.17c",  0x080000, 0x004000, CRC(d1464c88) SHA1(0d600119a9137f4c7cad7f708e0c885da96af207) )
 	ROM_LOAD16_BYTE( "136040-141.17a",  0x080001, 0x004000, CRC(f8f2acdf) SHA1(b9e31c1f96fab5368fb90768e059157f74cbc762) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136040-143.15e",  0x008000, 0x004000, CRC(62b9878e) SHA1(db6072a7c8600d85fb70dac3d940a200d0cb5d0a) )
 	ROM_LOAD( "136040-144.17e",  0x00c000, 0x004000, CRC(6ef1b804) SHA1(176066c6946090c87945213145960754cd315acb) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x300000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136040-101.4b",   0x000000, 0x008000, CRC(26d9f29c) SHA1(e03a03484ede4ea209040faf64e88f0667a0ab40) )  /* bank 1, plane 0 */
@@ -1548,18 +1548,18 @@ ROM_START( roadrunn2 )
 	ROM_LOAD( "136040-118.1d",   0x2a0000, 0x008000, CRC(f489a968) SHA1(424ef3f11b30b152e03d40e604350098e0c3e9e0) )  /* bank 6, plane 2 */
 	ROM_LOAD( "136040-124.6d",   0x2b0000, 0x008000, CRC(524d65f7) SHA1(3f2b0ee642fe7eebb578b00b44d9821369269791) )  /* bank 6, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136040-126.7a",   0x000000, 0x000200, CRC(1713c0cd) SHA1(237ce1c53d8a17823df3341360f03b2b94cd91bb) )
 	ROM_LOAD( "136040-125.5a",   0x000200, 0x000200, CRC(a9ca8795) SHA1(77583510e7a7179493f313e0c0b25d029dd6e583) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadrunn1 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136040-128.11c",  0x010000, 0x008000, CRC(5e39d540) SHA1(69fae4c7db247062dffda0138a6e3bfb697f17bf) )
 	ROM_LOAD16_BYTE( "136040-129.11a",  0x010001, 0x008000, CRC(d79bfea1) SHA1(eb265ff5f3f08bbdb3b19f9c7dece7e58dd2c6ba) )
 	ROM_LOAD16_BYTE( "136040-130.13c",  0x020000, 0x008000, CRC(66453b37) SHA1(cb467a9c8109475bbc6d24b4a3559fa2f2edc887) )
@@ -1573,12 +1573,12 @@ ROM_START( roadrunn1 )
 	ROM_LOAD16_BYTE( "136040-140.17c",  0x080000, 0x004000, CRC(d1464c88) SHA1(0d600119a9137f4c7cad7f708e0c885da96af207) )
 	ROM_LOAD16_BYTE( "136040-141.17a",  0x080001, 0x004000, CRC(f8f2acdf) SHA1(b9e31c1f96fab5368fb90768e059157f74cbc762) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136040-143.15e",  0x008000, 0x004000, CRC(62b9878e) SHA1(db6072a7c8600d85fb70dac3d940a200d0cb5d0a) )
 	ROM_LOAD( "136040-144.17e",  0x00c000, 0x004000, CRC(6ef1b804) SHA1(176066c6946090c87945213145960754cd315acb) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x300000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136040-101.4b",   0x000000, 0x008000, CRC(26d9f29c) SHA1(e03a03484ede4ea209040faf64e88f0667a0ab40) )  /* bank 1, plane 0 */
@@ -1611,12 +1611,12 @@ ROM_START( roadrunn1 )
 	ROM_LOAD( "136040-118.1d",   0x2a0000, 0x008000, CRC(f489a968) SHA1(424ef3f11b30b152e03d40e604350098e0c3e9e0) )  /* bank 6, plane 2 */
 	ROM_LOAD( "136040-124.6d",   0x2b0000, 0x008000, CRC(524d65f7) SHA1(3f2b0ee642fe7eebb578b00b44d9821369269791) )  /* bank 6, plane 3 */
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136040-126.7a",   0x000000, 0x000200, CRC(1713c0cd) SHA1(237ce1c53d8a17823df3341360f03b2b94cd91bb) )
 	ROM_LOAD( "136040-125.5a",   0x000200, 0x000200, CRC(a9ca8795) SHA1(77583510e7a7179493f313e0c0b25d029dd6e583) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1632,8 +1632,8 @@ ROM_END
 */
 
 ROM_START( roadblst )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1157.11c", 0x010000, 0x008000, CRC(6d9ad91e) SHA1(15815d3777be5377e053a39c1cef20eb101d9b92) )
 	ROM_LOAD16_BYTE( "136048-1158.11a", 0x010001, 0x008000, CRC(7d4cf151) SHA1(979006149906638b942a3157b237112acc16183d) )
 	ROM_LOAD16_BYTE( "136048-1159.13c", 0x020000, 0x008000, CRC(921c0e34) SHA1(bcc90a73baaecc551e1065037681a79e260905ff) )
@@ -1647,13 +1647,13 @@ ROM_START( roadblst )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -1690,18 +1690,18 @@ ROM_START( roadblst )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblstg )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-2257.11c", 0x010000, 0x008000, CRC(6e9de790) SHA1(348d4953b63f577b2b1ad747c6fb32c8ec55d310) )
 	ROM_LOAD16_BYTE( "136048-2258.11a", 0x010001, 0x008000, CRC(5160c69e) SHA1(a4aa4ae0cf24f0d3c768186332b4b0f8e55d2700) )
 	ROM_LOAD16_BYTE( "136048-2259.13c", 0x020000, 0x008000, CRC(62f10976) SHA1(e3c832304ad9163ed43d128aa68c321af655958d) )
@@ -1715,13 +1715,13 @@ ROM_START( roadblstg )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -1758,18 +1758,18 @@ ROM_START( roadblstg )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblst3 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-3157.11c", 0x010000, 0x008000, CRC(ce88fe34) SHA1(72a311e7e2e5f588226168e048905281f71f0aef) )
 	ROM_LOAD16_BYTE( "136048-3158.11a", 0x010001, 0x008000, CRC(03bf2879) SHA1(27f2622b9e2a3f823557fd231a8b0e3234fea5cb) )
 	ROM_LOAD16_BYTE( "136048-3159.13c", 0x020000, 0x008000, CRC(4305d74a) SHA1(618e0c638efb4110daf0954e89368c7b68a2a155) )
@@ -1783,13 +1783,13 @@ ROM_START( roadblst3 )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -1826,18 +1826,18 @@ ROM_START( roadblst3 )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblstg2 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1239.11c", 0x010000, 0x008000, CRC(3b2bb14b) SHA1(e5eac61a4249a644fbc27908b443a3830d4488e6) )
 	ROM_CONTINUE(                       0x050000, 0x008000 )
 	ROM_LOAD16_BYTE( "136048-1240.11a", 0x010001, 0x008000, CRC(2a5ab597) SHA1(3bdd27c67b05a426bd57e03a5c71948b6b57a40a) )
@@ -1851,13 +1851,13 @@ ROM_START( roadblstg2 )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -1894,18 +1894,18 @@ ROM_START( roadblstg2 )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblst2 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1139.11c", 0x010000, 0x008000, CRC(b73c1bd5) SHA1(c4de0267a75225db22c771bec14b8da2fc9f06bf) )
 	ROM_CONTINUE(                       0x050000, 0x008000 )
 	ROM_LOAD16_BYTE( "136048-1140.11a", 0x010001, 0x008000, CRC(6305429b) SHA1(c4180f6438a539ddc34c12529e5ac6d59c107728) )
@@ -1919,13 +1919,13 @@ ROM_START( roadblst2 )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -1962,18 +1962,18 @@ ROM_START( roadblst2 )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblstg1 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1251.11c", 0x010000, 0x008000, CRC(7e94d6a2) SHA1(985b7537dc484975b458a9ae5780e32a5f742d1c) )
 	ROM_CONTINUE(                       0x050000, 0x008000 )
 	ROM_LOAD16_BYTE( "136048-1252.11a", 0x010001, 0x008000, CRC(d7a66215) SHA1(f9797384f2d01b0dda2ff47c3560ca3489a7a38c) )
@@ -1987,13 +1987,13 @@ ROM_START( roadblstg1 )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -2030,18 +2030,18 @@ ROM_START( roadblstg1 )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblst1 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-2151.11c", 0x010000, 0x008000, CRC(ea6b3060) SHA1(0786f2e528c6a77ad7422ae199d06b7261cb4f2c) )
 	ROM_CONTINUE(                       0x050000, 0x008000 )
 	ROM_LOAD16_BYTE( "136048-2152.11a", 0x010001, 0x008000, CRC(f5c1fbe0) SHA1(1917f2110a8021198b0cdadbaeab44c71b3bb0b5) )
@@ -2055,13 +2055,13 @@ ROM_START( roadblst1 )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -2098,18 +2098,18 @@ ROM_START( roadblst1 )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblstc )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1179.7p",  0x010000, 0x008000, CRC(ef448f96) SHA1(238a6c435e317383a1983702ef0a1f2b757ebe8c) )
 	ROM_LOAD16_BYTE( "136048-1180.8p",  0x010001, 0x008000, CRC(bdb368d5) SHA1(9c79b053708ff619a2733664f881abb849ae2371) )
 	ROM_LOAD16_BYTE( "136048-1181.7r",  0x020000, 0x008000, CRC(d52581da) SHA1(d0a475f9d8199bc7c0ce6e6a663f214df9bffc39) )
@@ -2123,13 +2123,13 @@ ROM_START( roadblstc )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -2166,18 +2166,18 @@ ROM_START( roadblstc )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblstcg )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-1235.7p",  0x010000, 0x008000, CRC(58b2998f) SHA1(7e9f4ca2b15cf60c61e0615f214f9fcc518cb194) )
 	ROM_LOAD16_BYTE( "136048-1236.8p",  0x010001, 0x008000, CRC(02e23a40) SHA1(6525351669e95dab869c7adc7d992d12d9313aee) )
 	ROM_LOAD16_BYTE( "136048-1237.7r",  0x020000, 0x008000, CRC(5e0a7c5d) SHA1(fb3688fbadc05f96980c67f5446ccb250d20b1a3) )
@@ -2191,13 +2191,13 @@ ROM_START( roadblstcg )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -2234,18 +2234,18 @@ ROM_START( roadblstcg )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
 ROM_START( roadblstc1 )
-	ROM_REGION( 0x88000, "maincpu", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
+	ROM_REGION( 0x88000, "maincpu", 0 ) /* 8.5*64k for 68000 code & slapstic ROM */
+	MOTHERBOARD_BIOS
 	ROM_LOAD16_BYTE( "136048-2135.7p",  0x010000, 0x008000, CRC(c0ef86df) SHA1(7dd4d2acba55dc001e009c37fae5a97a53ea1e66) )
 	ROM_LOAD16_BYTE( "136048-2136.8p",  0x010001, 0x008000, CRC(9637e2f0) SHA1(86257e1316356c1a7d86bcf7b57bcaff33ac3df5) )
 	ROM_LOAD16_BYTE( "136048-2137.7r",  0x020000, 0x008000, CRC(5382ab85) SHA1(1511dfaf8537980e506e4180a23ffcfcfec81451) )
@@ -2259,13 +2259,13 @@ ROM_START( roadblstc1 )
 	ROM_LOAD16_BYTE( "136048-2147.7k",  0x080000, 0x004000, CRC(5c1adf67) SHA1(53838a2f5059797991aa337a7bec32f7e694610a) )
 	ROM_LOAD16_BYTE( "136048-2148.8k",  0x080001, 0x004000, CRC(d9ac8966) SHA1(7d056c1eb8184b4261c5713b0d5799b2fd8bde2a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "136048-1149.14e",   0x4000, 0x4000, CRC(2e54f95e) SHA1(5056ddec3c88384ada1d2ee9b1532b9ba9f34e08) )
 	ROM_LOAD( "136048-1169.1516e", 0x8000, 0x4000, CRC(ee318052) SHA1(f66ff39499697b7439dc62567e727fec769c1505) )
 	ROM_LOAD( "136048-1170.17e",   0xc000, 0x4000, CRC(75dfec33) SHA1(3092348b98419bb23181d21406733d5d21cd3d82) )
 
 	ROM_REGION( 0x2000, "alpha", 0 )
-    MOTHERBOARD_ALPHA
+	MOTHERBOARD_ALPHA
 
 	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "136048-1101.2s",  0x000000, 0x008000, CRC(fe342d27) SHA1(72deac16ab9b6b811f49d70d700d6bc3a904f9d5) )  /* bank 1, plane 0 */
@@ -2302,12 +2302,12 @@ ROM_START( roadblstc1 )
 	ROM_LOAD( "136048-1118.3l",  0x330000, 0x008000, CRC(be879b8e) SHA1(dc1d1f7bdb511e922b650fac88307a08ab37ac4c) )  /* bank 7/6, plane 0 */
 	ROM_CONTINUE(                0x2b0000, 0x008000 )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
-    ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
-    MOTHERBOARD_PROMS
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -2322,8 +2322,8 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 {
 	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 103);
 
-	m_joystick_type = 0;	/* none */
-	m_trackball_type = 1;	/* rotated */
+	m_joystick_type = 0;    /* none */
+	m_trackball_type = 1;   /* rotated */
 }
 
 
@@ -2331,8 +2331,8 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 {
 	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 107);
 
-	m_joystick_type = 1;	/* digital */
-	m_trackball_type = 0;	/* none */
+	m_joystick_type = 1;    /* digital */
+	m_trackball_type = 0;   /* none */
 }
 
 
@@ -2340,8 +2340,8 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 {
 	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 105);
 
-	m_joystick_type = 1;	/* digital */
-	m_trackball_type = 0;	/* none */
+	m_joystick_type = 1;    /* digital */
+	m_trackball_type = 0;   /* none */
 }
 
 
@@ -2349,8 +2349,8 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 {
 	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 108);
 
-	m_joystick_type = 2;	/* analog */
-	m_trackball_type = 0;	/* none */
+	m_joystick_type = 2;    /* analog */
+	m_trackball_type = 0;   /* none */
 }
 
 
@@ -2358,8 +2358,8 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadb109)
 {
 	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 109);
 
-	m_joystick_type = 3;	/* pedal */
-	m_trackball_type = 2;	/* steering wheel */
+	m_joystick_type = 3;    /* pedal */
+	m_trackball_type = 2;   /* steering wheel */
 }
 
 
@@ -2367,8 +2367,8 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadb110)
 {
 	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 110);
 
-	m_joystick_type = 3;	/* pedal */
-	m_trackball_type = 2;	/* steering wheel */
+	m_joystick_type = 3;    /* pedal */
+	m_trackball_type = 2;   /* steering wheel */
 }
 
 

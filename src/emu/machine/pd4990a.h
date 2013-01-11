@@ -53,4 +53,4 @@ extern DECLARE_READ8_DEVICE_HANDLER( upd4990a_databit_r );
 extern DECLARE_WRITE16_DEVICE_HANDLER( upd4990a_control_16_w );
 
 
-#endif	/*__PD4990A_H__*/
+#endif  /*__PD4990A_H__*/

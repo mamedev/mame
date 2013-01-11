@@ -70,7 +70,7 @@ READ16_MEMBER(atarig42_state::special_port2_r)
 	int temp = ioport("IN2")->read();
 	if (m_cpu_to_sound_ready) temp ^= 0x0020;
 	if (m_sound_to_cpu_ready) temp ^= 0x0010;
-	temp ^= 0x0008;		/* A2D.EOC always high for now */
+	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return temp;
 }
 
@@ -368,7 +368,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( roadriot )
-	PORT_START("IN0")		/* e00000 */
+	PORT_START("IN0")       /* e00000 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -378,24 +378,24 @@ static INPUT_PORTS_START( roadriot )
 	PORT_START("IN1")      /* e00002 */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")		/* e00010 */
+	PORT_START("IN2")       /* e00010 */
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 
-	PORT_START("A2D0")		/* analog 0 */
+	PORT_START("A2D0")      /* analog 0 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START("A2D1")		/* analog 1 */
+	PORT_START("A2D1")      /* analog 1 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( guardian )
-	PORT_START("IN0")		/* e00000 */
+	PORT_START("IN0")       /* e00000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -429,18 +429,18 @@ static INPUT_PORTS_START( guardian )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START("IN2")		/* e00010 */
+	PORT_START("IN2")       /* e00010 */
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 
-	PORT_START("A2D0")		/* analog 0 */
+	PORT_START("A2D0")      /* analog 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("A2D1")		/* analog 1 */
+	PORT_START("A2D1")      /* analog 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -494,45 +494,45 @@ GFXDECODE_END
 
 static const atarirle_desc modesc_0x200 =
 {
-	"gfx3",		/* region where the GFX data lives */
-	256,		/* number of entries in sprite RAM */
-	0,			/* left clip coordinate */
-	0,			/* right clip coordinate */
+	"gfx3",     /* region where the GFX data lives */
+	256,        /* number of entries in sprite RAM */
+	0,          /* left clip coordinate */
+	0,          /* right clip coordinate */
 
-	0x200,		/* base palette entry */
-	0x400,		/* maximum number of colors */
+	0x200,      /* base palette entry */
+	0x400,      /* maximum number of colors */
 
-	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
-	{{ 0,0x01f0,0,0,0,0,0,0 }},	/* mask for the color */
-	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
-	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
-	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
-	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
-	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
-	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
-	{{ 0 }}						/* mask for the VRAM target */
+	{{ 0x7fff,0,0,0,0,0,0,0 }}, /* mask for the code index */
+	{{ 0,0x01f0,0,0,0,0,0,0 }}, /* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }}, /* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }}, /* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }}, /* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }}, /* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }}, /* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }}, /* mask for the priority */
+	{{ 0 }}                     /* mask for the VRAM target */
 };
 
 
 static const atarirle_desc modesc_0x400 =
 {
-	"gfx3",		/* region where the GFX data lives */
-	256,		/* number of entries in sprite RAM */
-	0,			/* left clip coordinate */
-	0,			/* right clip coordinate */
+	"gfx3",     /* region where the GFX data lives */
+	256,        /* number of entries in sprite RAM */
+	0,          /* left clip coordinate */
+	0,          /* right clip coordinate */
 
-	0x400,		/* base palette entry */
-	0x400,		/* maximum number of colors */
+	0x400,      /* base palette entry */
+	0x400,      /* maximum number of colors */
 
-	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
-	{{ 0,0x03f0,0,0,0,0,0,0 }},	/* mask for the color */
-	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
-	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
-	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
-	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
-	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
-	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
-	{{ 0 }}						/* mask for the VRAM target */
+	{{ 0x7fff,0,0,0,0,0,0,0 }}, /* mask for the code index */
+	{{ 0,0x03f0,0,0,0,0,0,0 }}, /* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }}, /* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }}, /* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }}, /* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }}, /* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }}, /* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }}, /* mask for the priority */
+	{{ 0 }}                     /* mask for the VRAM target */
 };
 
 
@@ -594,16 +594,16 @@ MACHINE_CONFIG_END
 
 
 ROM_START( roadriot )
-	ROM_REGION( 0x80004, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-3114.8d", 0x00000, 0x20000, CRC(a2bd949c) SHA1(f96064d491b4d488cadebd3a63a6d3edf9236046) )
 	ROM_LOAD16_BYTE( "136089-3113.8c", 0x00001, 0x20000, CRC(68c45cb1) SHA1(e38c7ad3f3d301e59a1d9f53e8f2c28e91d691fe) )
 	ROM_LOAD16_BYTE( "136089-2016.9d", 0x40000, 0x20000, CRC(6191653c) SHA1(97d1a84a585149e8f2c49cab7af22dc755dff350) )
 	ROM_LOAD16_BYTE( "136089-2015.9c", 0x40001, 0x20000, CRC(0d34419a) SHA1(f16e9fb4cd537d727611cb7dd5537c030671fe1e) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )	/* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 6502 code */
 	ROM_LOAD( "136089-1047.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -645,23 +645,23 @@ ROM_START( roadriot )
 	ROM_REGION( 0x1000, "eeprom", 0 )
 	ROM_LOAD( "roadriot.nv", 0x0000, 0x1000, CRC(d7f73bad) SHA1(017cccde835ca2e03f606de74bea233e4c5a8533) )
 
-	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
 	ROM_LOAD( "136089-1001.bin",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
 	ROM_LOAD( "136089-1002.bin",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.bin",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
 ROM_END
 
 ROM_START( roadrioto )
-	ROM_REGION( 0x80004, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-2014.8d", 0x00000, 0x20000, CRC(bf8aaafc) SHA1(1594d91b56609d49921c866d8f5796619e79217b) ) /* Program ROMs in Blue labels,  */
 	ROM_LOAD16_BYTE( "136089-2013.8c", 0x00001, 0x20000, CRC(5dd2dd70) SHA1(8f6a0e809ec1f6feea8a18197a789086a7b9dd6a) ) /* other ROMs in Yellow labels   */
 	ROM_LOAD16_BYTE( "136089-2016.9d", 0x40000, 0x20000, CRC(6191653c) SHA1(97d1a84a585149e8f2c49cab7af22dc755dff350) ) /* PALs & BPROMs in White labels */
 	ROM_LOAD16_BYTE( "136089-2015.9c", 0x40001, 0x20000, CRC(0d34419a) SHA1(f16e9fb4cd537d727611cb7dd5537c030671fe1e) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )	/* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 6502 code */
 	ROM_LOAD( "136089-1047.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -703,7 +703,7 @@ ROM_START( roadrioto )
 	ROM_REGION( 0x1000, "eeprom", 0 )
 	ROM_LOAD( "roadriot.nv", 0x0000, 0x1000, CRC(d7f73bad) SHA1(017cccde835ca2e03f606de74bea233e4c5a8533) )
 
-	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
 	ROM_LOAD( "136089-1001.bin",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
 	ROM_LOAD( "136089-1002.bin",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.bin",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
@@ -711,16 +711,16 @@ ROM_END
 
 
 ROM_START( guardian )
-	ROM_REGION( 0x80004, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136092-2021.8e",  0x00000, 0x20000, CRC(efea1e02) SHA1(f0f1ef300f36953aff73b68ffe6d9950ac575f7d) )
 	ROM_LOAD16_BYTE( "136092-2020.8cd", 0x00001, 0x20000, CRC(a8f655ba) SHA1(2defe4d138613e248718a617d103794e051746f7) )
 	ROM_LOAD16_BYTE( "136092-2023.9e",  0x40000, 0x20000, CRC(cfa29316) SHA1(4e0e76304e29ee59bc2ce9a704e3f651dc9d473c) )
 	ROM_LOAD16_BYTE( "136092-2022.9cd", 0x40001, 0x20000, CRC(ed2abc91) SHA1(81531040d5663f6ab82e924210056e3737e17a8d) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )	/* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, NO_DUMP )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 6502 code */
 	ROM_LOAD( "136092-0080-snd.12c", 0x10000, 0x4000, CRC(0388f805) SHA1(49c11313bc4192dbe294cf68b652cb19047889fd) )
 	ROM_CONTINUE(             0x04000, 0xc000 )
 
@@ -752,7 +752,7 @@ ROM_START( guardian )
 	ROM_REGION( 0x1000, "eeprom", 0 )
 	ROM_LOAD( "guardian-eeprom.bin", 0x0000, 0x1000, CRC(fba171dc) SHA1(c53f72b7c25602c5fedc38d34d1342fbd10e4a44) )
 
-	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
 	ROM_LOAD( "136092-1001.bin",  0x0000, 0x0200, CRC(b3251eeb) SHA1(5e83baa70aaa28f07f32657bf974fd87719972d3) )
 	ROM_LOAD( "136092-1002.bin",  0x0200, 0x0200, CRC(0c5314da) SHA1(a9c7ee3ab015c7f3ada4200acd2854eb9a5c74b0) )
 	ROM_LOAD( "136092-1003.bin",  0x0400, 0x0200, CRC(344b406a) SHA1(f4422f8c0d7004d0277a4fc77718d555f80fcf69) )

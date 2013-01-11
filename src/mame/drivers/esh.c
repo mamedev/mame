@@ -33,7 +33,7 @@ class esh_state : public driver_device
 public:
 	esh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") ,
+			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"){ }
 
@@ -177,11 +177,11 @@ static ADDRESS_MAP_START( z80_0_io, AS_IO, 8, esh_state )
 	AM_RANGE(0xf2,0xf2) AM_READ_PORT("IN2")
 	AM_RANGE(0xf3,0xf3) AM_READ_PORT("IN3")
 	AM_RANGE(0xf4,0xf4) AM_READWRITE(ldp_read,ldp_write)
-	AM_RANGE(0xf5,0xf5) AM_WRITE(misc_write)	/* Continuously writes repeating patterns */
+	AM_RANGE(0xf5,0xf5) AM_WRITE(misc_write)    /* Continuously writes repeating patterns */
 	AM_RANGE(0xf8,0xfd) AM_WRITE(led_writes)
-	AM_RANGE(0xfe,0xfe) AM_WRITE(nmi_line_w)	/* Both 0xfe and 0xff flip quickly between 0 and 1 */
-	AM_RANGE(0xff,0xff) AM_NOP					/*   (they're probably not NMI enables - likely LED's like their neighbors :) */
-ADDRESS_MAP_END									/*   (someday 0xf8-0xff will probably be a single handler) */
+	AM_RANGE(0xfe,0xfe) AM_WRITE(nmi_line_w)    /* Both 0xfe and 0xff flip quickly between 0 and 1 */
+	AM_RANGE(0xff,0xff) AM_NOP                  /*   (they're probably not NMI enables - likely LED's like their neighbors :) */
+ADDRESS_MAP_END                                 /*   (someday 0xf8-0xff will probably be a single handler) */
 
 
 /* PORTS */
@@ -301,7 +301,7 @@ void esh_state::machine_start()
 static MACHINE_CONFIG_START( esh, esh_state )
 
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
+	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
 	MCFG_CPU_IO_MAP(z80_0_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
@@ -343,7 +343,7 @@ ROM_START( esh )
 	/* Color (+other) PROMs */
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
-	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )	/* Video timing? */
+	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )    /* Video timing? */
 	ROM_LOAD( "v.c6",   0x300, 0x100, CRC(7157ba22) SHA1(07355f30efe46196d216356eda48a59fc622e43f) )
 
 	DISK_REGION( "laserdisc" )
@@ -365,7 +365,7 @@ ROM_START( esha )
 	/* Color (+other) PROMs */
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
-	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )	/* Video timing? */
+	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )    /* Video timing? */
 	ROM_LOAD( "v.c6",   0x300, 0x100, CRC(7157ba22) SHA1(07355f30efe46196d216356eda48a59fc622e43f) )
 
 	DISK_REGION( "laserdisc" )
@@ -375,7 +375,7 @@ ROM_END
 ROM_START( eshb )
 	/* Main program CPU */
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "1.h8",   0x0000, 0x2000, CRC(8d27d363) SHA1(529d8e4283e736edb5a9193df1ed8d0164471864) )	/* Hand-written ROM label */
+	ROM_LOAD( "1.h8",   0x0000, 0x2000, CRC(8d27d363) SHA1(529d8e4283e736edb5a9193df1ed8d0164471864) )  /* Hand-written ROM label */
 	ROM_LOAD( "is2.f8", 0x2000, 0x2000, CRC(0e3b6e62) SHA1(5e8160180e20705e727329f9d70305fcde176a25) )
 
 	/* Tiles */
@@ -387,7 +387,7 @@ ROM_START( eshb )
 	/* Color (+other) PROMs */
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
-	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )	/* Video timing? */
+	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )    /* Video timing? */
 	ROM_LOAD( "v.c6",   0x300, 0x100, CRC(7157ba22) SHA1(07355f30efe46196d216356eda48a59fc622e43f) )
 
 	DISK_REGION( "laserdisc" )

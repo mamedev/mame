@@ -46,14 +46,14 @@ void s3520cf_device::timer_callback()
 
 	m_rtc.sec++;
 
-	if((m_rtc.sec & 0x0f) >= 0x0a)				{ m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
-	if((m_rtc.sec & 0xf0) >= 0x60)				{ m_rtc.min++; m_rtc.sec = 0; }
-	if((m_rtc.min & 0x0f) >= 0x0a)				{ m_rtc.min+=0x10; m_rtc.min&=0xf0; }
-	if((m_rtc.min & 0xf0) >= 0x60)				{ m_rtc.hour++; m_rtc.min = 0; }
-	if((m_rtc.hour & 0x0f) >= 0x0a)				{ m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
-	if((m_rtc.hour & 0xff) >= 0x24)				{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
-	if(m_rtc.wday >= 7)							{ m_rtc.wday = 0; }
-	if((m_rtc.day & 0x0f) >= 0x0a)				{ m_rtc.day+=0x10; m_rtc.day&=0xf0; }
+	if((m_rtc.sec & 0x0f) >= 0x0a)              { m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
+	if((m_rtc.sec & 0xf0) >= 0x60)              { m_rtc.min++; m_rtc.sec = 0; }
+	if((m_rtc.min & 0x0f) >= 0x0a)              { m_rtc.min+=0x10; m_rtc.min&=0xf0; }
+	if((m_rtc.min & 0xf0) >= 0x60)              { m_rtc.hour++; m_rtc.min = 0; }
+	if((m_rtc.hour & 0x0f) >= 0x0a)             { m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
+	if((m_rtc.hour & 0xff) >= 0x24)             { m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
+	if(m_rtc.wday >= 7)                         { m_rtc.wday = 0; }
+	if((m_rtc.day & 0x0f) >= 0x0a)              { m_rtc.day+=0x10; m_rtc.day&=0xf0; }
 
 	/* TODO: crude leap year support */
 	dpm_count = (m_rtc.month & 0xf) + (((m_rtc.month & 0x10) >> 4)*10)-1;
@@ -64,10 +64,10 @@ void s3520cf_device::timer_callback()
 			{ m_rtc.month++; m_rtc.day = 0x01; }
 	}
 	else if((m_rtc.day & 0xff) >= dpm[dpm_count]+1){ m_rtc.month++; m_rtc.day = 0x01; }
-	if((m_rtc.month & 0x0f) >= 0x0a)			{ m_rtc.month = 0x10; }
-	if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
-	if((m_rtc.year & 0x0f) >= 0x0a)				{ m_rtc.year+=0x10; m_rtc.year&=0xf0; }
-	if((m_rtc.year & 0xf0) >= 0xa0)				{ m_rtc.year = 0; } //1901-2000 possible timeframe
+	if((m_rtc.month & 0x0f) >= 0x0a)            { m_rtc.month = 0x10; }
+	if(m_rtc.month >= 0x13)                     { m_rtc.year++; m_rtc.month = 1; }
+	if((m_rtc.year & 0x0f) >= 0x0a)             { m_rtc.year+=0x10; m_rtc.year&=0xf0; }
+	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //1901-2000 possible timeframe
 }
 
 TIMER_CALLBACK( s3520cf_device::rtc_inc_callback )

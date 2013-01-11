@@ -111,19 +111,19 @@ public:
 	int          m_scroll3x;
 	int          m_scroll3y;
 
-	int          m_stars_enabled[2];		/* Layer enabled [Y/N] */
+	int          m_stars_enabled[2];        /* Layer enabled [Y/N] */
 	int          m_stars1x;
 	int          m_stars1y;
 	int          m_stars2x;
 	int          m_stars2y;
-	int          m_last_sprite_offset;		/* Offset of the last sprite */
-	int          m_cps2_last_sprite_offset;	/* Offset of the last sprite */
-	int          m_pri_ctrl;				/* Sprite layer priorities */
+	int          m_last_sprite_offset;      /* Offset of the last sprite */
+	int          m_cps2_last_sprite_offset; /* Offset of the last sprite */
+	int          m_pri_ctrl;                /* Sprite layer priorities */
 	int          m_objram_bank;
 
 	/* misc */
-	int          m_dial[2];		// forgottn
-	int          m_readpaddle;	// pzloop2
+	int          m_dial[2];     // forgottn
+	int          m_readpaddle;  // pzloop2
 	int          m_cps2networkpresent;
 	int          m_cps2digitalvolumelevel;
 	int          m_cps2disabledigitalvolume;
@@ -162,8 +162,8 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
-	msm5205_device *m_msm_1;	// fcrash
-	msm5205_device *m_msm_2;	// fcrash
+	msm5205_device *m_msm_1;    // fcrash
+	msm5205_device *m_msm_2;    // fcrash
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(forgottn_dial_0_r);
 	DECLARE_READ16_MEMBER(forgottn_dial_1_r);

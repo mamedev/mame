@@ -175,7 +175,7 @@ static imgtoolerr_t os9_write_lsn(imgtool_image *img, UINT32 lsn, int offset, co
 	if (err)
 		return err;
 
-	ferr = floppy_write_sector(imgtool_floppy(img), head, track, sector, offset, buffer, buffer_len, 0);	/* TODO: pass ddam argument from imgtool */
+	ferr = floppy_write_sector(imgtool_floppy(img), head, track, sector, offset, buffer, buffer_len, 0);    /* TODO: pass ddam argument from imgtool */
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -254,19 +254,19 @@ static imgtoolerr_t os9_decode_file_header(imgtool_image *image,
 	if (err)
 		return err;
 
-	info->lsn				= lsn;
-	attributes				= pick_integer_be(header, 0, 1);
-	info->owner_id			= pick_integer_be(header, 1, 2);
-	info->link_count		= pick_integer_be(header, 8, 1);
-	info->file_size			= pick_integer_be(header, 9, 4);
-	info->directory			= (attributes & 0x80) ? 1 : 0;
-	info->non_sharable		= (attributes & 0x40) ? 1 : 0;
-	info->public_execute	= (attributes & 0x20) ? 1 : 0;
-	info->public_write		= (attributes & 0x10) ? 1 : 0;
-	info->public_read		= (attributes & 0x08) ? 1 : 0;
-	info->user_execute		= (attributes & 0x04) ? 1 : 0;
-	info->user_write		= (attributes & 0x02) ? 1 : 0;
-	info->user_read			= (attributes & 0x01) ? 1 : 0;
+	info->lsn               = lsn;
+	attributes              = pick_integer_be(header, 0, 1);
+	info->owner_id          = pick_integer_be(header, 1, 2);
+	info->link_count        = pick_integer_be(header, 8, 1);
+	info->file_size         = pick_integer_be(header, 9, 4);
+	info->directory         = (attributes & 0x80) ? 1 : 0;
+	info->non_sharable      = (attributes & 0x40) ? 1 : 0;
+	info->public_execute    = (attributes & 0x20) ? 1 : 0;
+	info->public_write      = (attributes & 0x10) ? 1 : 0;
+	info->public_read       = (attributes & 0x08) ? 1 : 0;
+	info->user_execute      = (attributes & 0x04) ? 1 : 0;
+	info->user_write        = (attributes & 0x02) ? 1 : 0;
+	info->user_read         = (attributes & 0x01) ? 1 : 0;
 
 	if (info->directory && (info->file_size % 32 != 0))
 		return IMGTOOLERR_CORRUPTIMAGE;
@@ -401,7 +401,7 @@ static imgtoolerr_t os9_set_file_size(imgtool_image *image,
 		}
 
 		/* keep in mind that the sector_map might not parallel our expected
-         * current LSN count; we should tolerate this abnormality */
+		 * current LSN count; we should tolerate this abnormality */
 		current_lsn_count = lsn;
 
 		while(current_lsn_count > new_lsn_count)
@@ -551,7 +551,7 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 		if (index >= dir_size)
 		{
 			/* if we're not creating, or we are creating but we have not fully
-             * transversed the directory, error out */
+			 * transversed the directory, error out */
 			if (!create || path[strlen(path) + 1])
 			{
 				err = IMGTOOLERR_PATHNOTFOUND;
@@ -636,26 +636,26 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
-	info->total_sectors				= pick_integer_be(header,   0, 3);
-	track_size_in_sectors			= pick_integer_be(header,   3, 1);
-	info->allocation_bitmap_bytes	= pick_integer_be(header,   4, 2);
-	info->cluster_size				= pick_integer_be(header,   6, 2);
-	info->root_dir_lsn				= pick_integer_be(header,   8, 3);
-	info->owner_id					= pick_integer_be(header,  11, 2);
+	info->total_sectors             = pick_integer_be(header,   0, 3);
+	track_size_in_sectors           = pick_integer_be(header,   3, 1);
+	info->allocation_bitmap_bytes   = pick_integer_be(header,   4, 2);
+	info->cluster_size              = pick_integer_be(header,   6, 2);
+	info->root_dir_lsn              = pick_integer_be(header,   8, 3);
+	info->owner_id                  = pick_integer_be(header,  11, 2);
 //  attributes                      =
-    pick_integer_be(header,  13, 1);
-	info->disk_id					= pick_integer_be(header,  14, 2);
-	info->format_flags				= pick_integer_be(header,  16, 1);
-	info->sectors_per_track			= pick_integer_be(header,  17, 2);
-	info->bootstrap_lsn				= pick_integer_be(header,  21, 3);
-	info->bootstrap_size			= pick_integer_be(header,  24, 2);
-	info->sector_size				= pick_integer_be(header, 104, 2);
+	pick_integer_be(header,  13, 1);
+	info->disk_id                   = pick_integer_be(header,  14, 2);
+	info->format_flags              = pick_integer_be(header,  16, 1);
+	info->sectors_per_track         = pick_integer_be(header,  17, 2);
+	info->bootstrap_lsn             = pick_integer_be(header,  21, 3);
+	info->bootstrap_size            = pick_integer_be(header,  24, 2);
+	info->sector_size               = pick_integer_be(header, 104, 2);
 
-	info->sides					= (info->format_flags & 0x01) ? 2 : 1;
-	info->double_density		= (info->format_flags & 0x02) ? 1 : 0;
-	info->double_track			= (info->format_flags & 0x04) ? 1 : 0;
-	info->quad_track_density	= (info->format_flags & 0x08) ? 1 : 0;
-	info->octal_track_density	= (info->format_flags & 0x10) ? 1 : 0;
+	info->sides                 = (info->format_flags & 0x01) ? 2 : 1;
+	info->double_density        = (info->format_flags & 0x02) ? 1 : 0;
+	info->double_track          = (info->format_flags & 0x04) ? 1 : 0;
+	info->quad_track_density    = (info->format_flags & 0x08) ? 1 : 0;
+	info->octal_track_density   = (info->format_flags & 0x10) ? 1 : 0;
 
 	pick_string(header, 31, 32, info->name);
 
@@ -775,7 +775,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	place_integer_be(header, 0x3f+0x0d, 1, 3); /* sector interleave factor */
 	place_integer_be(header, 0x3f+0x0e, 1, 8); /* default sectors per allocation */
 
-	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id, 0, header, sector_bytes, 0);	/* TODO: pass ddam argument from imgtool */
+	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id, 0, header, sector_bytes, 0);    /* TODO: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
@@ -805,7 +805,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 			}
 		}
 
-		err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + i, 0, header, sector_bytes, 0);	/* TODO: pass ddam argument from imgtool */
+		err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + i, 0, header, sector_bytes, 0);    /* TODO: pass ddam argument from imgtool */
 		if (err)
 			goto done;
 	}
@@ -830,7 +830,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	place_integer_be(header, 0x10, 3, 1 + allocation_bitmap_lsns + 1);
 	place_integer_be(header, 0x13, 2, 8);
 
-	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);	/* TODO: pass ddam argument from imgtool */
+	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);   /* TODO: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
@@ -840,7 +840,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	header[0x1F] = 1 + allocation_bitmap_lsns;
 	header[0x20] = 0xAE;
 	header[0x3F] = 1 + allocation_bitmap_lsns;
-	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);	/* TOOD: pass ddam argument from imgtool */
+	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);   /* TOOD: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
@@ -915,8 +915,8 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 			pick_string(dir_entry, 0, 28, filename);
 
 			/* we have certain expectations of the directory contents; the
-             * first directory entry should be "..", the second ".", and
-             * subsequent entries should never be "." or ".." */
+			 * first directory entry should be "..", the second ".", and
+			 * subsequent entries should never be "." or ".." */
 			switch(os9enum->index)
 			{
 				case 0:
@@ -1227,30 +1227,30 @@ void os9_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR:		info->i = 1; break;
-		case IMGTOOLINFO_INT_OPEN_IS_STRICT:				info->i = 1; break;
-		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:				info->i = sizeof(os9_diskinfo); break;
-		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:				info->i = sizeof(struct os9_direnum); break;
-		case IMGTOOLINFO_INT_PATH_SEPARATOR:				info->i = '/'; break;
+		case IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR:        info->i = 1; break;
+		case IMGTOOLINFO_INT_OPEN_IS_STRICT:                info->i = 1; break;
+		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:             info->i = sizeof(os9_diskinfo); break;
+		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(struct os9_direnum); break;
+		case IMGTOOLINFO_INT_PATH_SEPARATOR:                info->i = '/'; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "os9"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "OS-9 format"); break;
-		case IMGTOOLINFO_STR_FILE:							strcpy(info->s = imgtool_temp_str(), __FILE__); break;
-		case IMGTOOLINFO_STR_EOLN:							strcpy(info->s = imgtool_temp_str(), "\r"); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "os9"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "OS-9 format"); break;
+		case IMGTOOLINFO_STR_FILE:                          strcpy(info->s = imgtool_temp_str(), __FILE__); break;
+		case IMGTOOLINFO_STR_EOLN:                          strcpy(info->s = imgtool_temp_str(), "\r"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_MAKE_CLASS:					info->make_class = imgtool_floppy_make_class; break;
-		case IMGTOOLINFO_PTR_FLOPPY_CREATE:					info->create = os9_diskimage_create; break;
-		case IMGTOOLINFO_PTR_FLOPPY_OPEN:					info->open = os9_diskimage_open; break;
-		case IMGTOOLINFO_PTR_BEGIN_ENUM:					info->begin_enum = os9_diskimage_beginenum; break;
-		case IMGTOOLINFO_PTR_NEXT_ENUM:						info->next_enum = os9_diskimage_nextenum; break;
-		case IMGTOOLINFO_PTR_FREE_SPACE:					info->free_space = os9_diskimage_freespace; break;
-		case IMGTOOLINFO_PTR_READ_FILE:						info->read_file = os9_diskimage_readfile; break;
-		case IMGTOOLINFO_PTR_WRITE_FILE:					info->write_file = os9_diskimage_writefile; break;
-		case IMGTOOLINFO_PTR_DELETE_FILE:					info->delete_file = os9_diskimage_deletefile; break;
-		case IMGTOOLINFO_PTR_CREATE_DIR:					info->create_dir = os9_diskimage_createdir; break;
-		case IMGTOOLINFO_PTR_DELETE_DIR:					info->delete_dir = os9_diskimage_deletedir; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:					info->p = (void *) floppyoptions_coco; break;
+		case IMGTOOLINFO_PTR_MAKE_CLASS:                    info->make_class = imgtool_floppy_make_class; break;
+		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = os9_diskimage_create; break;
+		case IMGTOOLINFO_PTR_FLOPPY_OPEN:                   info->open = os9_diskimage_open; break;
+		case IMGTOOLINFO_PTR_BEGIN_ENUM:                    info->begin_enum = os9_diskimage_beginenum; break;
+		case IMGTOOLINFO_PTR_NEXT_ENUM:                     info->next_enum = os9_diskimage_nextenum; break;
+		case IMGTOOLINFO_PTR_FREE_SPACE:                    info->free_space = os9_diskimage_freespace; break;
+		case IMGTOOLINFO_PTR_READ_FILE:                     info->read_file = os9_diskimage_readfile; break;
+		case IMGTOOLINFO_PTR_WRITE_FILE:                    info->write_file = os9_diskimage_writefile; break;
+		case IMGTOOLINFO_PTR_DELETE_FILE:                   info->delete_file = os9_diskimage_deletefile; break;
+		case IMGTOOLINFO_PTR_CREATE_DIR:                    info->create_dir = os9_diskimage_createdir; break;
+		case IMGTOOLINFO_PTR_DELETE_DIR:                    info->delete_dir = os9_diskimage_deletedir; break;
+		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_coco; break;
 	}
 }

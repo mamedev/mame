@@ -208,22 +208,22 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 };
 
-#define mc6845_h_char_total 	(m_crtc_vreg[0])
-#define mc6845_h_display		(m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(m_crtc_vreg[2])
-#define mc6845_sync_width		(m_crtc_vreg[3])
-#define mc6845_v_char_total		(m_crtc_vreg[4])
-#define mc6845_v_total_adj		(m_crtc_vreg[5])
-#define mc6845_v_display		(m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(m_crtc_vreg[8])
-#define mc6845_tile_height		(m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((m_crtc_vreg[0x0c]<<8) & 0xff00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((m_crtc_vreg[0x0e]<<8) & 0xff00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((m_crtc_vreg[0x10]<<8) & 0xff00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0xff00) | (m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total     (m_crtc_vreg[0])
+#define mc6845_h_display        (m_crtc_vreg[1])
+#define mc6845_h_sync_pos       (m_crtc_vreg[2])
+#define mc6845_sync_width       (m_crtc_vreg[3])
+#define mc6845_v_char_total     (m_crtc_vreg[4])
+#define mc6845_v_total_adj      (m_crtc_vreg[5])
+#define mc6845_v_display        (m_crtc_vreg[6])
+#define mc6845_v_sync_pos       (m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (m_crtc_vreg[8])
+#define mc6845_tile_height      (m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0xff00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0xff00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0xff00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0xff00) | (m_crtc_vreg[0x13] & 0xff))
 
 
 void z100_state::video_start()
@@ -631,31 +631,31 @@ static const struct pic8259_interface z100_pic8259_slave_config =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 WRITE8_MEMBER( z100_state::video_pia_A_w )
 {
 	/*
-    all bits are active low
-    x--- ---- -> disable video RAM
-    -x-- ---- -> not write multiple blue
-    --x- ---- -> not write multiple green
-    ---x ---- -> not write multiple red
-    ---- x--- -> not flash screen
-    ---- -x-- -> enable blue display
-    ---- --x- -> enable green display
-    ---- ---x -> enable red display
-    */
+	all bits are active low
+	x--- ---- -> disable video RAM
+	-x-- ---- -> not write multiple blue
+	--x- ---- -> not write multiple green
+	---x ---- -> not write multiple red
+	---- x--- -> not flash screen
+	---- -x-- -> enable blue display
+	---- --x- -> enable green display
+	---- ---x -> enable red display
+	*/
 
 	m_vram_enable = ((data & 0x80) >> 7) ^ 1;
 	m_gbank = BITSWAP8(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
@@ -684,34 +684,34 @@ WRITE8_MEMBER( z100_state::video_pia_CB2_w )
 
 static const pia6821_interface pia0_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(z100_state, video_pia_A_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(z100_state, video_pia_B_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(z100_state, video_pia_CA2_w),		/* line CA2 out */
-	DEVCB_DRIVER_MEMBER(z100_state, video_pia_CB2_w),		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(z100_state, video_pia_A_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(z100_state, video_pia_B_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(z100_state, video_pia_CA2_w),      /* line CA2 out */
+	DEVCB_DRIVER_MEMBER(z100_state, video_pia_CB2_w),       /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 static const pia6821_interface pia1_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 static const wd17xx_interface z207_interface =
@@ -789,7 +789,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_14_31818MHz/8, mc6845_intf)	/* unknown clock, hand tuned to get ~50/~60 fps */
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_14_31818MHz/8, mc6845_intf)    /* unknown clock, hand tuned to get ~50/~60 fps */
 
 	MCFG_PIC8259_ADD( "pic8259_master", z100_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", z100_pic8259_slave_config )

@@ -20,18 +20,18 @@
 #include "pr8210.lh"
 
 
-#define APPNAME					"MAME"
-#define APPNAME_LOWER			"mame"
-#define CONFIGNAME				"mame"
-#define APPLONGNAME				"M.A.M.E."
-#define FULLLONGNAME			"Multiple Arcade Machine Emulator"
-#define CAPGAMENOUN				"GAME"
-#define CAPSTARTGAMENOUN		"Game"
-#define GAMENOUN				"game"
-#define GAMESNOUN				"games"
-#define COPYRIGHT				"Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
-#define COPYRIGHT_INFO			"Copyright Nicola Salmoria and the MAME team"
-#define DISCLAIMER				"MAME is an emulator: it reproduces, more or less faithfully, the behaviour of\n" \
+#define APPNAME                 "MAME"
+#define APPNAME_LOWER           "mame"
+#define CONFIGNAME              "mame"
+#define APPLONGNAME             "M.A.M.E."
+#define FULLLONGNAME            "Multiple Arcade Machine Emulator"
+#define CAPGAMENOUN             "GAME"
+#define CAPSTARTGAMENOUN        "Game"
+#define GAMENOUN                "game"
+#define GAMESNOUN               "games"
+#define COPYRIGHT               "Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
+#define COPYRIGHT_INFO          "Copyright Nicola Salmoria and the MAME team"
+#define DISCLAIMER              "MAME is an emulator: it reproduces, more or less faithfully, the behaviour of\n" \
 								"several arcade machines. But hardware is useless without software, so an image\n" \
 								"of the ROMs which run on that hardware is required. Such ROMs, like any other\n" \
 								"commercial software, are copyrighted material and it is therefore illegal to\n" \
@@ -39,10 +39,10 @@
 								"are not distributed together with MAME. Distribution of MAME together with ROM\n" \
 								"images is a violation of copyright law and should be promptly reported to the\n" \
 								"authors so that appropriate legal action can be taken.\n"
-#define USAGE					"Usage:  %s [%s] [options]"
-#define XML_ROOT			    "mame"
-#define XML_TOP 				"game"
-#define STATE_MAGIC_NUM			"MAMESAVE"
+#define USAGE                   "Usage:  %s [%s] [options]"
+#define XML_ROOT                "mame"
+#define XML_TOP                 "game"
+#define STATE_MAGIC_NUM         "MAMESAVE"
 
 const char * emulator_info::get_appname() { return APPNAME;}
 const char * emulator_info::get_appname_lower() { return APPNAME_LOWER;}
@@ -80,8 +80,8 @@ public:
 	// construction/destruction
 	ldplayer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_last_controls(0),
-		  m_playing(false) { }
+			m_last_controls(0),
+			m_playing(false) { }
 
 	// callback hook
 	static chd_file *get_disc_static(device_t *dummy, laserdisc_device &device) { return device.machine().driver_data<ldplayer_state>()->get_disc(); }
@@ -149,9 +149,9 @@ public:
 	// construction/destruction
 	pr8210_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ldplayer_state(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc"),
-		  m_command_buffer_in(0),
-		  m_command_buffer_out(0) { }
+			m_laserdisc(*this, "laserdisc"),
+			m_command_buffer_in(0),
+			m_command_buffer_out(0) { }
 
 protected:
 	// device overrides
@@ -188,7 +188,7 @@ public:
 	// construction/destruction
 	ldv1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ldplayer_state(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+			m_laserdisc(*this, "laserdisc") { }
 
 protected:
 	required_device<pioneer_ldv1000_device> m_laserdisc;

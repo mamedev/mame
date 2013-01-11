@@ -50,4 +50,3 @@ private:
 	if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8); \
 
 extern const device_type ST0020_SPRITES;
-

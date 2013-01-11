@@ -403,9 +403,9 @@
 ************************************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_10MHz			/* unknown */
-#define CPU_CLOCK		MASTER_CLOCK/4		/* guess... seems accurate */
-#define CRTC_CLOCK		MASTER_CLOCK/16		/* it gives 59.410646 fps with current settings */
+#define MASTER_CLOCK    XTAL_10MHz          /* unknown */
+#define CPU_CLOCK       MASTER_CLOCK/4      /* guess... seems accurate */
+#define CRTC_CLOCK      MASTER_CLOCK/16     /* it gives 59.410646 fps with current settings */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -448,22 +448,22 @@ public:
 	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
 };
 
-#define mc6845_h_char_total 	(state->m_crtc_vreg[0])
-#define mc6845_h_display		(m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
-#define mc6845_sync_width		(state->m_crtc_vreg[3])
-#define mc6845_v_char_total		(state->m_crtc_vreg[4])
-#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
-#define mc6845_v_display		(m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
-#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total     (state->m_crtc_vreg[0])
+#define mc6845_h_display        (m_crtc_vreg[1])
+#define mc6845_h_sync_pos       (state->m_crtc_vreg[2])
+#define mc6845_sync_width       (state->m_crtc_vreg[3])
+#define mc6845_v_char_total     (state->m_crtc_vreg[4])
+#define mc6845_v_total_adj      (state->m_crtc_vreg[5])
+#define mc6845_v_display        (m_crtc_vreg[6])
+#define mc6845_v_sync_pos       (state->m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (state->m_crtc_vreg[8])
+#define mc6845_tile_height      (state->m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (state->m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (state->m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
 /*********************************************
@@ -576,7 +576,7 @@ void avt_state::palette_init()
 
 		/* hack to switch cyan->magenta for highlighted background */
 		if (j == 0x40)
-			palette_set_color(machine(), j, MAKE_RGB(g, r, b));	// Why this one has R-G swapped?...
+			palette_set_color(machine(), j, MAKE_RGB(g, r, b)); // Why this one has R-G swapped?...
 		else
 			palette_set_color(machine(), j, MAKE_RGB(r, g, b));
 	}
@@ -632,8 +632,8 @@ static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )
 //  AM_RANGE(0x08, 0x0b) unk, maybe IO
 //  AM_RANGE(0x08, 0x08)  AM_READ_PORT("IN2")
 //  AM_RANGE(0x09, 0x09)  AM_READ_PORT("IN3")
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)		/* AY8910 data */
-	AM_RANGE(0x23, 0x23) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)		/* AY8910 control */
+	AM_RANGE(0x21, 0x21) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)     /* AY8910 data */
+	AM_RANGE(0x23, 0x23) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)      /* AY8910 control */
 	AM_RANGE(0x28, 0x28) AM_WRITE(avt_6845_address_w)
 	AM_RANGE(0x29, 0x29) AM_READWRITE(avt_6845_data_r,avt_6845_data_w)
 ADDRESS_MAP_END
@@ -849,16 +849,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -891,7 +891,7 @@ INTERRUPT_GEN_MEMBER(avt_state::avt_vblank_irq)
 static MACHINE_CONFIG_START( avt, avt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_CPU_PROGRAM_MAP(avt_map)
 	MCFG_CPU_IO_MAP(avt_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", avt_state,  avt_vblank_irq)
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)	/* 240x224 (through CRTC) */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 
 	MCFG_GFXDECODE(avt)
@@ -909,11 +909,11 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_PALETTE_LENGTH(8*16)
 
 
-	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)	/* guess */
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)    /* guess */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2)	/* 1.25 MHz.?? */
+	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -963,7 +963,7 @@ ROM_START( avtbingo )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "bingo.avt",    0x0000, 0x0200, CRC(c1a2ecd9) SHA1(21c7a2599e48fa1efccd4f46cf1c34888add2087) )
-	ROM_LOAD( "avtbingo.u34", 0x0200, 0x0200, CRC(9454c3de) SHA1(df05f24e607b7494856e627c9f995ffa0cc043f7) )	/* unknown */
+	ROM_LOAD( "avtbingo.u34", 0x0200, 0x0200, CRC(9454c3de) SHA1(df05f24e607b7494856e627c9f995ffa0cc043f7) )    /* unknown */
 ROM_END
 
 ROM_START( avtnfl )
@@ -973,8 +973,8 @@ ROM_START( avtnfl )
 	ROM_LOAD( "u40-14.33", 0x4000, 0x2000, CRC(205910dd) SHA1(37fee06926e4dcd89ec6390b4914a852f12a9e25) )
 
 	/* GFX from Symbols for debugging purposes.
-       Original graphics are missing.
-    */
+	   Original graphics are missing.
+	*/
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "avtnfl.blu", 0x0000, 0x2000, BAD_DUMP CRC(ee07339b) SHA1(260ac4739c90efa60597bf815d12fb96cf5391ed) )
 	ROM_LOAD( "avtnfl.grn", 0x2000, 0x2000, BAD_DUMP CRC(1df023ac) SHA1(1919ddb835d525fd1843326de939af74693fc88a) )

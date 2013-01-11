@@ -18,14 +18,14 @@ static int verbose = VERBOSE;
 #include "machine/omti8621.h"
 #include "image.h"
 
-#define LOG(x)	{ logerror ("%s: ", cpu_context(state->device)); logerror x; logerror ("\n"); }
-#define LOG1(x)	{ if (verbose > 0) LOG(x)}
-#define LOG2(x)	{ if (verbose > 1) LOG(x)}
-#define LOG3(x)	{ if (verbose > 2) LOG(x)}
+#define LOG(x)  { logerror ("%s: ", cpu_context(state->device)); logerror x; logerror ("\n"); }
+#define LOG1(x) { if (verbose > 0) LOG(x)}
+#define LOG2(x) { if (verbose > 1) LOG(x)}
+#define LOG3(x) { if (verbose > 2) LOG(x)}
 
-#define DLOG(x)	{ logerror ("%s: ", cpu_context(disk->device)); logerror x; logerror ("\n"); }
-#define DLOG1(x)	{ if (verbose > 0) DLOG(x)}
-#define DLOG2(x)	{ if (verbose > 1) DLOG(x)}
+#define DLOG(x) { logerror ("%s: ", cpu_context(disk->device)); logerror x; logerror ("\n"); }
+#define DLOG1(x)    { if (verbose > 0) DLOG(x)}
+#define DLOG2(x)    { if (verbose > 1) DLOG(x)}
 
 #define OMTI_DISK_SECTOR_SIZE 1056
 
@@ -131,9 +131,9 @@ enum {
 struct disk_data
 {
 	device_t *device;
-    UINT16 type;
-    UINT16 cylinders;
-    UINT16 heads;
+	UINT16 type;
+	UINT16 cylinders;
+	UINT16 heads;
 	UINT16 sectors;
 	UINT32 sectorbytes;
 	UINT32 sector_count;
@@ -357,9 +357,9 @@ static UINT8 check_disk_address(omti8621_state *state, const UINT8 *cdb)
 
 	if (lun > OMTI_MAX_LUN) {
 		sense_code = OMTI_SENSE_CODE_DRIVE_NOT_READY;
-	} else	if (!disk->image->exists()) {
+	} else  if (!disk->image->exists()) {
 		sense_code = OMTI_SENSE_CODE_DRIVE_NOT_READY;
-	} else	if (sector >= OMTI_MAX_BLOCK_COUNT) {
+	} else  if (sector >= OMTI_MAX_BLOCK_COUNT) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
 	} else if (head >= disk->heads) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
@@ -722,7 +722,7 @@ static void do_command(omti8621_state *state,
 		if (check_disk_address(state, cdb)) {
 			// read data from controller
 			read_sectors_from_disk(state, get_disk_address(state, cdb), cdb[4], lun);
-			set_data_transfer(state, state->sector_buffer,	OMTI_DISK_SECTOR_SIZE*cdb[4]);
+			set_data_transfer(state, state->sector_buffer,  OMTI_DISK_SECTOR_SIZE*cdb[4]);
 		}
 		break;
 
@@ -859,7 +859,7 @@ static UINT16 get_data(omti8621_state *state) {
 	} else {
 		LOG(("UNEXPECTED reading OMTI 8621 data (buffer length exceeded)"));
 	}
-    return data;
+	return data;
 }
 
 /***************************************************************************
@@ -1123,7 +1123,7 @@ static void omti_set_jumper(omti8621_state *state, UINT16 disk_type)
 
 
 //##########################################################################
-class omti_disk_image_device :	public device_t,
+class omti_disk_image_device :  public device_t,
 								public device_image_interface
 {
 public:
@@ -1147,7 +1147,7 @@ public:
 	disk_data *token() { return &m_token; }
 protected:
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -1160,8 +1160,8 @@ extern const device_type OMTI_DISK;
 const device_type OMTI_DISK = &device_creator<omti_disk_image_device>;
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, OMTI_DISK, "Winchester", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, OMTI_DISK, "Winchester", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -1367,5 +1367,3 @@ void omti8621_device::device_reset()
 {
 	DEVICE_RESET_NAME( omti8621 )(this);
 }
-
-

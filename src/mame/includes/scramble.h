@@ -6,9 +6,9 @@ class scramble_state : public galaxold_state
 public:
 	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxold_state(mconfig, type, tag),
-		  m_ppi8255_0(*this, "ppi8255_0"),
-		  m_ppi8255_1(*this, "ppi8255_1"),
-		  m_soundram(*this, "soundram")
+			m_ppi8255_0(*this, "ppi8255_0"),
+			m_ppi8255_1(*this, "ppi8255_1"),
+			m_soundram(*this, "soundram")
 	{ }
 
 	optional_device<i8255_device>  m_ppi8255_0;
@@ -107,4 +107,3 @@ DECLARE_WRITE8_DEVICE_HANDLER( harem_portA_w );
 DECLARE_WRITE8_DEVICE_HANDLER( harem_portB_w );
 
 MACHINE_CONFIG_EXTERN( ad2083_audio );
-

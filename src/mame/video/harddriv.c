@@ -16,9 +16,9 @@
  *
  *************************************/
 
-#define DISPLAY_SPEEDUPS			0
+#define DISPLAY_SPEEDUPS            0
 
-#define MASK(n)			NATIVE_ENDIAN_VALUE_LE_BE(0x000000ffUL << ((n) * 8), 0xff000000UL >> (((n) ^ 1) * 8))
+#define MASK(n)         NATIVE_ENDIAN_VALUE_LE_BE(0x000000ffUL << ((n) * 8), 0xff000000UL >> (((n) ^ 1) * 8))
 
 
 

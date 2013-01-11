@@ -67,7 +67,7 @@ class turrett_state : public driver_device
 public:
 	turrett_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -82,7 +82,7 @@ protected:
 };
 
 
-#define R3041_CLOCK		25000000
+#define R3041_CLOCK     25000000
 
 
 void turrett_state::video_start()
@@ -117,9 +117,9 @@ INPUT_PORTS_END
 
 static const r3000_cpu_core r3000_config =
 {
-	0,		/* 1 if we have an FPU, 0 otherwise */
-	2048,	/* code cache size */
-	512		/* data cache size */
+	0,      /* 1 if we have an FPU, 0 otherwise */
+	2048,   /* code cache size */
+	512     /* data cache size */
 };
 
 

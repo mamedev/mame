@@ -14,7 +14,7 @@ const device_type DECO_KARNOVSPRITES = &device_creator<deco_karnovsprites_device
 
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_KARNOVSPRITES, "karnovsprites_device", tag, owner, clock),
-	  m_gfxregion(0)
+		m_gfxregion(0)
 {
 }
 
@@ -53,7 +53,7 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 		fx = spriteram[offs + 1];
 
 		/* the 8-bit implementation had this.
-                   illustrated by enemy projectile explosions in Shackled being left on screen. */
+		           illustrated by enemy projectile explosions in Shackled being left on screen. */
 		if ((fx & 0x1) == 0) continue;
 
 		extra = (fx & 0x10) ? 1 : 0;
@@ -93,9 +93,9 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 				sprite,
 				colour,fx,fy,x,y,0);
 
-    	/* 1 more sprite drawn underneath */
-    	if (extra)
-    		drawgfx_transpen(bitmap,cliprect,machine.gfx[m_gfxregion],
+		/* 1 more sprite drawn underneath */
+		if (extra)
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[m_gfxregion],
 				sprite2,
 				colour,fx,fy,x,y+16,0);
 	}

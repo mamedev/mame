@@ -83,9 +83,9 @@ static INPUT_PORTS_START( dday )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* doesn't seem to be */
-                                                  /* accessed */
+													/* accessed */
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x00, "2" ) PORT_CONDITION("DSW0", 0x80, EQUALS, 0x80)
 	PORT_DIPSETTING(    0x01, "3" ) PORT_CONDITION("DSW0", 0x80, EQUALS, 0x80)
 	PORT_DIPSETTING(    0x02, "4" ) PORT_CONDITION("DSW0", 0x80, EQUALS, 0x80)
@@ -95,26 +95,26 @@ static INPUT_PORTS_START( dday )
 	PORT_DIPSETTING(    0x02, "7" ) PORT_CONDITION("DSW0", 0x80, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x03, "8" ) PORT_CONDITION("DSW0", 0x80, EQUALS, 0x00)
 
-	PORT_DIPNAME( 0x0c, 0x00, "Extended Play At" )		PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, "Extended Play At" )      PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x04, "15000" )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x0c, "25000" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:5") // No Difficulty setting?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )		// Clearly old code revision, ddayc works much better
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:5") // No Difficulty setting?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )      // Clearly old code revision, ddayc works much better
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Start with 20000 Pts" )	PORT_DIPLOCATION("SW3:8") // Works the same as Centuri License, but not as well
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )			// Doesn't mention extended play, just gives lives
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )			// Also alters table for Extended Play
+	PORT_DIPNAME( 0x80, 0x80, "Start with 20000 Pts" )  PORT_DIPLOCATION("SW3:8") // Works the same as Centuri License, but not as well
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )           // Doesn't mention extended play, just gives lives
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )          // Also alters table for Extended Play
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_2C ) ) /* Not shown in manual */
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
@@ -131,7 +131,7 @@ static INPUT_PORTS_START( dday )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_2C ) )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
@@ -161,17 +161,17 @@ static INPUT_PORTS_START( ddayc )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* Distance Button */
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x0c, 0x00, "Extended Play At" )		PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, "Extended Play At" )      PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(    0x00, "4000" )
 	PORT_DIPSETTING(    0x04, "6000" )
 	PORT_DIPSETTING(    0x08, "8000" )
 	PORT_DIPSETTING(    0x0c, "10000" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW3:5,6")
-	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )		// Easy   - No Bombs, No Troop Carriers
-	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )		// Normal - No Bombs, Troop Carriers
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )		// Hard   - Bombs, Troop Carriers
-	PORT_DIPSETTING(    0x00, "Hard (duplicate setting)" )	// Same as 0x10
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW3:7" )		// Doesn't seem to be used
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )     // Easy   - No Bombs, No Troop Carriers
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )       // Normal - No Bombs, Troop Carriers
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )     // Hard   - Bombs, Troop Carriers
+	PORT_DIPSETTING(    0x00, "Hard (duplicate setting)" )  // Same as 0x10
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW3:7" )        // Doesn't seem to be used
 /*
 
  The manual shows these differences:
@@ -194,9 +194,9 @@ INPUT_PORTS_END
 
 static const gfx_layout layout_1bpp =
 {
-	8,8,    		/* 8*8 characters */
-	RGN_FRAC(1,2),	/* 256 characters */
-	1,      		/* 1 bit per pixel */
+	8,8,            /* 8*8 characters */
+	RGN_FRAC(1,2),  /* 256 characters */
+	1,              /* 1 bit per pixel */
 	{ RGN_FRAC(0,1) },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -205,9 +205,9 @@ static const gfx_layout layout_1bpp =
 
 static const gfx_layout layout_2bpp =
 {
-	8,8,    		/* 8*8 characters */
-	RGN_FRAC(1,2),	/* 256 characters */
-	2,      		/* 2 bits per pixel */
+	8,8,            /* 8*8 characters */
+	RGN_FRAC(1,2),  /* 256 characters */
+	2,              /* 2 bits per pixel */
 	{ RGN_FRAC(0,2), RGN_FRAC(1,2) }, /* the bitplanes are separated */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -216,9 +216,9 @@ static const gfx_layout layout_2bpp =
 
 static const gfx_layout layout_3bpp =
 {
-	8,8,    		/* 8*8 characters */
-	RGN_FRAC(1,3),	/* 256 characters */
-	3,      		/* 3 bits per pixel */
+	8,8,            /* 8*8 characters */
+	RGN_FRAC(1,3),  /* 256 characters */
+	3,              /* 3 bits per pixel */
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) }, /* the bitplanes are separated */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -226,10 +226,10 @@ static const gfx_layout layout_3bpp =
 };
 
 static GFXDECODE_START( dday )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_3bpp, 0,       256/8 )	/* background */
-	GFXDECODE_ENTRY( "gfx2", 0, layout_2bpp, 8*4,     8 )		/* foreground */
-	GFXDECODE_ENTRY( "gfx3", 0, layout_2bpp, 8*4+8*4, 8 )		/* text */
-	GFXDECODE_ENTRY( "gfx4", 0, layout_1bpp, 254,     1 )		/* searchlight */
+	GFXDECODE_ENTRY( "gfx1", 0, layout_3bpp, 0,       256/8 )   /* background */
+	GFXDECODE_ENTRY( "gfx2", 0, layout_2bpp, 8*4,     8 )       /* foreground */
+	GFXDECODE_ENTRY( "gfx3", 0, layout_2bpp, 8*4+8*4, 8 )       /* text */
+	GFXDECODE_ENTRY( "gfx4", 0, layout_1bpp, 254,     1 )       /* searchlight */
 GFXDECODE_END
 
 

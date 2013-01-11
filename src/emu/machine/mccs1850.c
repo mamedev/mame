@@ -54,44 +54,44 @@ enum
 
 
 // clock status/interrupt register
-#define STATUS_TM		0x20	// test mode
-#define STATUS_FTU		0x10	// first time up
-#define STATUS_IT		0x08	// interrupt true
-#define STATUS_LB		0x04	// low battery
-#define STATUS_AI		0x02	// alarm
-#define STATUS_RPD		0x01	// request to power down
+#define STATUS_TM       0x20    // test mode
+#define STATUS_FTU      0x10    // first time up
+#define STATUS_IT       0x08    // interrupt true
+#define STATUS_LB       0x04    // low battery
+#define STATUS_AI       0x02    // alarm
+#define STATUS_RPD      0x01    // request to power down
 
 
 // clock control register
-#define CONTROL_STR_STP	0x80	// start/stop
-#define CONTROL_PD		0x40	// power down
-#define CONTROL_AR		0x20	// auto restart
-#define CONTROL_AE		0x10	// alarm enable
-#define CONTROL_AC		0x08	// alarm clear
-#define CONTROL_FTUC	0x04	// first time up clear
-#define CONTROL_LBE		0x02	// low battery enable
-#define CONTROL_RPCD	0x01	// request to power down clear
+#define CONTROL_STR_STP 0x80    // start/stop
+#define CONTROL_PD      0x40    // power down
+#define CONTROL_AR      0x20    // auto restart
+#define CONTROL_AE      0x10    // alarm enable
+#define CONTROL_AC      0x08    // alarm clear
+#define CONTROL_FTUC    0x04    // first time up clear
+#define CONTROL_LBE     0x02    // low battery enable
+#define CONTROL_RPCD    0x01    // request to power down clear
 
 
 // test register 1
-#define TEST1_DIV1		0x80	// divide by 1
-#define TEST1_VOVR		0x40	// Vdd override
-#define TEST1_VDDUP		0x20	// Vdd up
-#define TEST1_VDDON		0x10	// Vdd on
-#define TEST1_VRT		0x08	// valid RAM and time
-#define TEST1_LOW_BAT	0x08	// low battery
-#define TEST1_PCC		0x04	// programmable capacitor C (10.0 pF)
-#define TEST1_PCB		0x02	// programmable capacitor B (5.0 pF)
-#define TEST1_PCA		0x01	// programmable capacitor A (2.5 pF)
+#define TEST1_DIV1      0x80    // divide by 1
+#define TEST1_VOVR      0x40    // Vdd override
+#define TEST1_VDDUP     0x20    // Vdd up
+#define TEST1_VDDON     0x10    // Vdd on
+#define TEST1_VRT       0x08    // valid RAM and time
+#define TEST1_LOW_BAT   0x08    // low battery
+#define TEST1_PCC       0x04    // programmable capacitor C (10.0 pF)
+#define TEST1_PCB       0x02    // programmable capacitor B (5.0 pF)
+#define TEST1_PCA       0x01    // programmable capacitor A (2.5 pF)
 
 
 // test register 2
-#define TEST2_OSCBY		0x80	// oscillator bypass
-#define TEST2_COMPOVR	0x40	// comparator override
-#define TEST2_POR		0x20	// power on reset
-#define TEST2_SELTCK	0x10	// select test clock
-#define TEST2_FRZ		0x08	// freeze mode
-#define TEST2_DV_MASK	0x07	// divider bits select
+#define TEST2_OSCBY     0x80    // oscillator bypass
+#define TEST2_COMPOVR   0x40    // comparator override
+#define TEST2_POR       0x20    // power on reset
+#define TEST2_SELTCK    0x10    // select test clock
+#define TEST2_FRZ       0x08    // freeze mode
+#define TEST2_DV_MASK   0x07    // divider bits select
 
 
 
@@ -117,10 +117,10 @@ inline void mccs1850_device::check_interrupt()
 	UINT8 status = m_ram[REGISTER_STATUS];
 	UINT8 control = m_ram[REGISTER_CONTROL];
 
-	bool interrupt = (((status & STATUS_AI) && (control & CONTROL_AE))		// alarm interrupt
-					|| ((status & STATUS_LB) && (control & CONTROL_LBE))	// low battery
-					|| (status & STATUS_FTU)								// first time up
-					|| (status & STATUS_RPD));								// request to power down
+	bool interrupt = (((status & STATUS_AI) && (control & CONTROL_AE))      // alarm interrupt
+					|| ((status & STATUS_LB) && (control & CONTROL_LBE))    // low battery
+					|| (status & STATUS_FTU)                                // first time up
+					|| (status & STATUS_RPD));                              // request to power down
 
 	if (interrupt)
 	{
@@ -282,15 +282,15 @@ inline void mccs1850_device::advance_seconds()
 
 mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MCCS1850, "MCCS1850", tag, owner, clock),
-	  device_rtc_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_pse(1),
-	  m_ce(0),
-	  m_sck(0),
-	  m_sdo(1),
-	  m_sdi(0),
-	  m_state(STATE_ADDRESS),
-	  m_bits(0)
+		device_rtc_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_pse(1),
+		m_ce(0),
+		m_sck(0),
+		m_sdo(1),
+		m_sdi(0),
+		m_state(STATE_ADDRESS),
+		m_bits(0)
 {
 }
 

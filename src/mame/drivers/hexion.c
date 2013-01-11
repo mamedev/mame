@@ -145,23 +145,23 @@ static INPUT_PORTS_START( hexion )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x70, 0x40, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:5,6,7")
-	PORT_DIPSETTING(    0x70, DEF_STR( Easiest ) )			// "1"
-	PORT_DIPSETTING(    0x60, DEF_STR( Very_Easy) )			// "2"
-	PORT_DIPSETTING(    0x50, DEF_STR( Easy ) )				// "3"
-	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )			// "4"
-	PORT_DIPSETTING(    0x30, DEF_STR( Medium_Hard ) )		// "5"
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )				// "6"
-	PORT_DIPSETTING(    0x10, DEF_STR( Very_Hard ) )		// "7"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )			// "8"
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x70, 0x40, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:5,6,7")
+	PORT_DIPSETTING(    0x70, DEF_STR( Easiest ) )          // "1"
+	PORT_DIPSETTING(    0x60, DEF_STR( Very_Easy) )         // "2"
+	PORT_DIPSETTING(    0x50, DEF_STR( Easy ) )             // "3"
+	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )           // "4"
+	PORT_DIPSETTING(    0x30, DEF_STR( Medium_Hard ) )      // "5"
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )             // "6"
+	PORT_DIPSETTING(    0x10, DEF_STR( Very_Hard ) )        // "7"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          // "8"
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xfa, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
 
@@ -175,7 +175,7 @@ static INPUT_PORTS_START( hexion )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 052591? game waits for it to be 0 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 052591? game waits for it to be 0 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -222,7 +222,7 @@ static const k053252_interface hexion_k053252_intf =
 static MACHINE_CONFIG_START( hexion, hexion_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,24000000/4) /* Z80B 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, hexion_scanline, "screen", 0, 1)
 
@@ -260,15 +260,15 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( hexion )
-	ROM_REGION( 0x34800, "maincpu", 0 )	/* ROMs + space for additional RAM */
+	ROM_REGION( 0x34800, "maincpu", 0 ) /* ROMs + space for additional RAM */
 	ROM_LOAD( "122jab01.bin", 0x00000, 0x20000, CRC(eabc6dd1) SHA1(e74c1f1f2fcf8973f0741a2d544f25c8639448bf) )
-	ROM_RELOAD(               0x10000, 0x20000 )	/* banked at 8000-9fff */
+	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 8000-9fff */
 
-	ROM_REGION( 0x80000, "gfx1", 0 )	/* addressable by the main CPU */
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* addressable by the main CPU */
 	ROM_LOAD( "122a07.bin",   0x00000, 0x40000, CRC(22ae55e3) SHA1(41bdc990f69416b639542e2186a3610c16389063) )
 	ROM_LOAD( "122a06.bin",   0x40000, 0x40000, CRC(438f4388) SHA1(9e23805c9642a237daeaf106187d1e1e0692434d) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* OKIM6295 samples */
 	ROM_LOAD( "122a05.bin",   0x0000, 0x40000, CRC(bcc831bf) SHA1(c3382065dd0069a4dc0bde2d9931ec85b0bffc73) )
 
 	ROM_REGION( 0x0300, "proms", 0 )

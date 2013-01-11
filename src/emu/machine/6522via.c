@@ -30,7 +30,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define TRACE_VIA		0
+#define TRACE_VIA       0
 
 
 /***************************************************************************
@@ -38,65 +38,65 @@
 ***************************************************************************/
 
 /* Macros for PCR */
-#define CA1_LOW_TO_HIGH(c)		(c & 0x01)
-#define CA1_HIGH_TO_LOW(c)		(!(c & 0x01))
+#define CA1_LOW_TO_HIGH(c)      (c & 0x01)
+#define CA1_HIGH_TO_LOW(c)      (!(c & 0x01))
 
-#define CB1_LOW_TO_HIGH(c)		(c & 0x10)
-#define CB1_HIGH_TO_LOW(c)		(!(c & 0x10))
+#define CB1_LOW_TO_HIGH(c)      (c & 0x10)
+#define CB1_HIGH_TO_LOW(c)      (!(c & 0x10))
 
-#define CA2_INPUT(c)			(!(c & 0x08))
-#define CA2_LOW_TO_HIGH(c)		((c & 0x0c) == 0x04)
-#define CA2_HIGH_TO_LOW(c)		((c & 0x0c) == 0x00)
-#define CA2_IND_IRQ(c)			((c & 0x0a) == 0x02)
+#define CA2_INPUT(c)            (!(c & 0x08))
+#define CA2_LOW_TO_HIGH(c)      ((c & 0x0c) == 0x04)
+#define CA2_HIGH_TO_LOW(c)      ((c & 0x0c) == 0x00)
+#define CA2_IND_IRQ(c)          ((c & 0x0a) == 0x02)
 
-#define CA2_OUTPUT(c)			(c & 0x08)
-#define CA2_AUTO_HS(c)			((c & 0x0c) == 0x08)
-#define CA2_HS_OUTPUT(c)		((c & 0x0e) == 0x08)
-#define CA2_PULSE_OUTPUT(c)		((c & 0x0e) == 0x0a)
-#define CA2_FIX_OUTPUT(c)		((c & 0x0c) == 0x0c)
-#define CA2_OUTPUT_LEVEL(c)		((c & 0x02) >> 1)
+#define CA2_OUTPUT(c)           (c & 0x08)
+#define CA2_AUTO_HS(c)          ((c & 0x0c) == 0x08)
+#define CA2_HS_OUTPUT(c)        ((c & 0x0e) == 0x08)
+#define CA2_PULSE_OUTPUT(c)     ((c & 0x0e) == 0x0a)
+#define CA2_FIX_OUTPUT(c)       ((c & 0x0c) == 0x0c)
+#define CA2_OUTPUT_LEVEL(c)     ((c & 0x02) >> 1)
 
-#define CB2_INPUT(c)			(!(c & 0x80))
-#define CB2_LOW_TO_HIGH(c)		((c & 0xc0) == 0x40)
-#define CB2_HIGH_TO_LOW(c)		((c & 0xc0) == 0x00)
-#define CB2_IND_IRQ(c)			((c & 0xa0) == 0x20)
+#define CB2_INPUT(c)            (!(c & 0x80))
+#define CB2_LOW_TO_HIGH(c)      ((c & 0xc0) == 0x40)
+#define CB2_HIGH_TO_LOW(c)      ((c & 0xc0) == 0x00)
+#define CB2_IND_IRQ(c)          ((c & 0xa0) == 0x20)
 
-#define CB2_OUTPUT(c)			(c & 0x80)
-#define CB2_AUTO_HS(c)			((c & 0xc0) == 0x80)
-#define CB2_HS_OUTPUT(c)		((c & 0xe0) == 0x80)
-#define CB2_PULSE_OUTPUT(c)		((c & 0xe0) == 0xa0)
-#define CB2_FIX_OUTPUT(c)		((c & 0xc0) == 0xc0)
-#define CB2_OUTPUT_LEVEL(c)		((c & 0x20) >> 5)
+#define CB2_OUTPUT(c)           (c & 0x80)
+#define CB2_AUTO_HS(c)          ((c & 0xc0) == 0x80)
+#define CB2_HS_OUTPUT(c)        ((c & 0xe0) == 0x80)
+#define CB2_PULSE_OUTPUT(c)     ((c & 0xe0) == 0xa0)
+#define CB2_FIX_OUTPUT(c)       ((c & 0xc0) == 0xc0)
+#define CB2_OUTPUT_LEVEL(c)     ((c & 0x20) >> 5)
 
 /* Macros for ACR */
-#define PA_LATCH_ENABLE(c)		(c & 0x01)
-#define PB_LATCH_ENABLE(c)		(c & 0x02)
+#define PA_LATCH_ENABLE(c)      (c & 0x01)
+#define PB_LATCH_ENABLE(c)      (c & 0x02)
 
-#define SR_DISABLED(c)			(!(c & 0x1c))
-#define SI_T2_CONTROL(c)		((c & 0x1c) == 0x04)
-#define SI_O2_CONTROL(c)		((c & 0x1c) == 0x08)
-#define SI_EXT_CONTROL(c)		((c & 0x1c) == 0x0c)
-#define SO_T2_RATE(c)			((c & 0x1c) == 0x10)
-#define SO_T2_CONTROL(c)		((c & 0x1c) == 0x14)
-#define SO_O2_CONTROL(c)		((c & 0x1c) == 0x18)
-#define SO_EXT_CONTROL(c)		((c & 0x1c) == 0x1c)
+#define SR_DISABLED(c)          (!(c & 0x1c))
+#define SI_T2_CONTROL(c)        ((c & 0x1c) == 0x04)
+#define SI_O2_CONTROL(c)        ((c & 0x1c) == 0x08)
+#define SI_EXT_CONTROL(c)       ((c & 0x1c) == 0x0c)
+#define SO_T2_RATE(c)           ((c & 0x1c) == 0x10)
+#define SO_T2_CONTROL(c)        ((c & 0x1c) == 0x14)
+#define SO_O2_CONTROL(c)        ((c & 0x1c) == 0x18)
+#define SO_EXT_CONTROL(c)       ((c & 0x1c) == 0x1c)
 
-#define T1_SET_PB7(c)			(c & 0x80)
-#define T1_CONTINUOUS(c)		(c & 0x40)
-#define T2_COUNT_PB6(c)			(c & 0x20)
+#define T1_SET_PB7(c)           (c & 0x80)
+#define T1_CONTINUOUS(c)        (c & 0x40)
+#define T2_COUNT_PB6(c)         (c & 0x20)
 
 /* Interrupt flags */
-#define INT_CA2	0x01
-#define INT_CA1	0x02
-#define INT_SR	0x04
-#define INT_CB2	0x08
-#define INT_CB1	0x10
-#define INT_T2	0x20
-#define INT_T1	0x40
-#define INT_ANY	0x80
+#define INT_CA2 0x01
+#define INT_CA1 0x02
+#define INT_SR  0x04
+#define INT_CB2 0x08
+#define INT_CB1 0x10
+#define INT_T2  0x20
+#define INT_T1  0x40
+#define INT_ANY 0x80
 
-#define CLR_PA_INT()	clear_int(INT_CA1 | ((!CA2_IND_IRQ(m_pcr)) ? INT_CA2: 0))
-#define CLR_PB_INT()	clear_int(INT_CB1 | ((!CB2_IND_IRQ(m_pcr)) ? INT_CB2: 0))
+#define CLR_PA_INT()    clear_int(INT_CA1 | ((!CA2_IND_IRQ(m_pcr)) ? INT_CA2: 0))
+#define CLR_PB_INT()    clear_int(INT_CB1 | ((!CB2_IND_IRQ(m_pcr)) ? INT_CB2: 0))
 
 #define IFR_DELAY 3
 
@@ -149,7 +149,7 @@ const device_type VIA6522 = &device_creator<via6522_device>;
 
 via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock),
-	  m_irq(CLEAR_LINE)
+		m_irq(CLEAR_LINE)
 {
 
 }
@@ -571,7 +571,7 @@ READ8_MEMBER( via6522_device::read )
 		CLR_PA_INT();
 
 		/* If CA2 is configured as output and in pulse or handshake mode,
-           CA2 is set now */
+		   CA2 is set now */
 		if (CA2_PULSE_OUTPUT(m_pcr))
 		{
 			/* call the CA2 output function */
@@ -581,7 +581,7 @@ READ8_MEMBER( via6522_device::read )
 			m_ca2_timer->adjust(clocks_to_attotime(1));
 		}
 		/* If CA2 is configured as output and in pulse or handshake mode,
-           CA2 is set now */
+		   CA2 is set now */
 		else if (CA2_AUTO_HS(m_pcr))
 		{
 			if (m_out_ca2)
@@ -735,7 +735,7 @@ WRITE8_MEMBER( via6522_device::write )
 		CLR_PB_INT();
 
 		/* If CB2 is configured as output and in pulse or handshake mode,
-           CB2 is set now */
+		   CB2 is set now */
 		if (CB2_AUTO_HS(m_pcr))
 		{
 			if (m_out_cb2)
@@ -761,7 +761,7 @@ WRITE8_MEMBER( via6522_device::write )
 		CLR_PA_INT();
 
 		/* If CA2 is configured as output and in pulse or handshake mode,
-           CA2 is set now */
+		   CA2 is set now */
 		if (CA2_PULSE_OUTPUT(m_pcr))
 		{
 			/* call the CA2 output function */
@@ -1008,7 +1008,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 			set_int(INT_CA1);
 
 			/* CA2 is configured as output and in pulse or handshake mode,
-               CA2 is cleared now */
+			   CA2 is cleared now */
 			if (CA2_AUTO_HS(m_pcr))
 			{
 				if (!m_out_ca2)
@@ -1082,7 +1082,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			set_int(INT_CB1);
 
 			/* CB2 is configured as output and in pulse or handshake mode,
-               CB2 is cleared now */
+			   CB2 is cleared now */
 			if (CB2_AUTO_HS(m_pcr))
 			{
 				if (!m_out_cb2)

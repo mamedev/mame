@@ -8,7 +8,7 @@
 #define VTECH2_H_
 
 
-#define TRKSIZE_FM	3172	/* size of a standard FM mode track */
+#define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 
 class vtech2_state : public driver_device
 {

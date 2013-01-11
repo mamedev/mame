@@ -17,32 +17,32 @@
 #include "video/msm6255.h"
 #include "rendlay.h"
 
-#define Z80_TAG			"ic1"
-#define I8255A_TAG		"ic4"
-#define WD2797_TAG		"ic5"
-#define I8253_TAG		"ic6"
-#define I8251_TAG		"ic7"
-#define MSM6255_TAG		"ic49"
-#define CENTRONICS_TAG	"centronics"
-#define RS232_TAG		"rs232"
-#define SCREEN_TAG		"screen"
+#define Z80_TAG         "ic1"
+#define I8255A_TAG      "ic4"
+#define WD2797_TAG      "ic5"
+#define I8253_TAG       "ic6"
+#define I8251_TAG       "ic7"
+#define MSM6255_TAG     "ic49"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_TAG       "rs232"
+#define SCREEN_TAG      "screen"
 
 class bw2_state : public driver_device
 {
 public:
 	bw2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_uart(*this, I8251_TAG),
-		  m_fdc(*this, WD2797_TAG),
-		  m_lcdc(*this, MSM6255_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_exp(*this, BW2_EXPANSION_SLOT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, WD2797_TAG":0"),
-		  m_floppy1(*this, WD2797_TAG":1"),
-		  m_floppy(NULL),
-		  m_video_ram(*this, "videoram")
+			m_maincpu(*this, Z80_TAG),
+			m_uart(*this, I8251_TAG),
+			m_fdc(*this, WD2797_TAG),
+			m_lcdc(*this, MSM6255_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_exp(*this, BW2_EXPANSION_SLOT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, WD2797_TAG":0"),
+			m_floppy1(*this, WD2797_TAG":1"),
+			m_floppy(NULL),
+			m_video_ram(*this, "videoram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

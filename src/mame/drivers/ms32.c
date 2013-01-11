@@ -337,7 +337,7 @@ WRITE32_MEMBER(ms32_state::pip_w)
 
 static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
+	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)  // nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
 	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) /* priram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
@@ -356,20 +356,20 @@ static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK("bank1")                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
 
 	/* todo: clean up the mapping of these */
-	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
+	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP /* sound? */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w) /* sound? */
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP // irq ack?
 	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
-	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP	// watchdog? I haven't investigated
+	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP    // watchdog? I haven't investigated
 //  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_SHARE("ms32_fce00000") /* registers not ram? */
-	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
-	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)	// global brightness control
-/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_SHARE("roz_ctrl")		/* roz control registers */
-/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_SHARE("tx_scroll")	/* tx layer scroll */
-/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_SHARE("bg_scroll")	/* bg layer scroll */
-	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)	// ??? layer related? seems to be always 0
+	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)   /* flip screen + other unknown bits */
+	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)    // global brightness control
+/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_SHARE("roz_ctrl")        /* roz control registers */
+/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_SHARE("tx_scroll")   /* tx layer scroll */
+/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_SHARE("bg_scroll")   /* bg layer scroll */
+	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)    // ??? layer related? seems to be always 0
 //  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
 	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
 	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_SHARE("mahjong_select")
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfce00800, 0xfce0085f) AM_RAM // regs?
 
 	/* these two are almost certainly wrong, they just let you see what
-       happens if you generate the FPU ints without breaking other games */
+	   happens if you generate the FPU ints without breaking other games */
 	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(ms32_irq5_guess_w)
 	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_WRITE(ms32_irq2_guess_w)
 
@@ -616,21 +616,21 @@ static INPUT_PORTS_START( ms32 )
 	PORT_DIPUNUSED_DIPLOC( 0x00200000, 0x00200000, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x00400000, 0x00400000, "SW3:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x00800000, 0x00800000, "SW3:1" )
-	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )	// Unused?
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )   // Unused?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ms32_mahjong )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ms32_state,mahjong_ctrl_r, NULL)	// here we read mahjong keys
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ms32_state,mahjong_ctrl_r, NULL)    // here we read mahjong keys
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )	/* Start 1 is already mapped in mahjong inputs */
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )	/* ms32.c mahjongs don't have P2 inputs -> no Start 2*/
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* Start 1 is already mapped in mahjong inputs */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* ms32.c mahjongs don't have P2 inputs -> no Start 2*/
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -812,7 +812,7 @@ static INPUT_PORTS_START( tetrisp )
 	PORT_INCLUDE( ms32 )
 
 	/* There are inputs for players 3 and 4 in the "test mode",
-             but NO addresses are read to check them ! */
+	         but NO addresses are read to check them ! */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00000001, 0x00000001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:8")
@@ -986,15 +986,15 @@ static INPUT_PORTS_START( hayaosi2 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	// "Buzzer" (input 0 in "test mode")
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)	// "Buzzer" (input 0 in "test mode")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)   // "Buzzer" (input 0 in "test mode")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)   // "Buzzer" (input 0 in "test mode")
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	// "Buzzer" (input 0 in "test mode")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)   // "Buzzer" (input 0 in "test mode")
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1012,7 +1012,7 @@ static INPUT_PORTS_START( hayaosi2 )
 	PORT_DIPSETTING(          0x00000004, DEF_STR( On ) )
 	/* Round   Default    More */
 	/*   1       10        15  */
-	PORT_DIPNAME( 0x00000008, 0x00000008, "Questions (VS Mode)" ) PORT_DIPLOCATION("SW2:5")	// TO DO : check all rounds
+	PORT_DIPNAME( 0x00000008, 0x00000008, "Questions (VS Mode)" ) PORT_DIPLOCATION("SW2:5") // TO DO : check all rounds
 	PORT_DIPSETTING(          0x00000008, "Default" )
 	PORT_DIPSETTING(          0x00000000, "More" )
 	/*  Lap    Time    Questions */
@@ -1044,7 +1044,7 @@ static INPUT_PORTS_START( hayaosi3 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00000004, 0x00000004, "SW2:6" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kirarast )	// player 1 inputs done? others?
+static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
 	PORT_INCLUDE( ms32_mahjong )
 
 	PORT_MODIFY("DSW")
@@ -1084,11 +1084,11 @@ static INPUT_PORTS_START( kirarast )	// player 1 inputs done? others?
 	PORT_DIPSETTING(          0x00000020, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( 47pie2 )	// player 1 inputs done? others?
+static INPUT_PORTS_START( 47pie2 )  // player 1 inputs done? others?
 	PORT_INCLUDE( kirarast )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )	 /* coin 2 is unused */
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )    /* coin 2 is unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00000400, 0x00000400, "Campaign Mode" ) PORT_DIPLOCATION("SW1:6")
@@ -1166,7 +1166,7 @@ static INPUT_PORTS_START( wpksocv2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( f1superb )	// Mostly wrong !
+static INPUT_PORTS_START( f1superb )    // Mostly wrong !
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
@@ -1206,14 +1206,14 @@ static INPUT_PORTS_START( f1superb )	// Mostly wrong !
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW3:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW3:1" )
 
-	PORT_START("AN0")	// Acceleration (wrong?)
+	PORT_START("AN0")   // Acceleration (wrong?)
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
 
-	PORT_START("AN1")	// Steering
+	PORT_START("AN1")   // Steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START("AN2?")	// Shift + Brake
+	PORT_START("AN2?")  // Shift + Brake
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1310,13 +1310,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 	if( scanline == 0) irq_raise(machine(), 10);
 	if( scanline == 8) irq_raise(machine(), 9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
-       kirarast needs it too, at least 8 per frame, but waits for a variable amount
-       47pi2 needs ?? per frame (otherwise it hangs when you lose)
-       in different points. Could this be a raster interrupt?
-       Other games using it but not needing it to work:
-       desertwr
-       p47aces
-       */
+	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
+	   47pi2 needs ?? per frame (otherwise it hangs when you lose)
+	   in different points. Could this be a raster interrupt?
+	   Other games using it but not needing it to work:
+	   desertwr
+	   p47aces
+	   */
 	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(machine(), 0);
 }
 
@@ -1472,8 +1472,8 @@ ROM_START( bbbxing )
 	ROM_LOAD( "bbbx22.bin",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "bbbx23.bin",  0x200000, 0x200000, CRC(b7875a23) SHA1(62bb4c1318f98ea68894658d92ce08e84d386d0c) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( 47pie2 )
@@ -1510,8 +1510,8 @@ ROM_START( 47pie2 )
 	ROM_LOAD( "94019-10.22", 0x000000, 0x200000, CRC(745d41ec) SHA1(9118d0f27b65c9d37970326ccf86fdccb81d32f5) )
 	ROM_LOAD( "94019-11.23", 0x200000, 0x200000, CRC(021dc350) SHA1(c71936091f86440201fdbdc94b0d1d22c4018188) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( 47pie2o )
@@ -1548,8 +1548,8 @@ ROM_START( 47pie2o )
 	ROM_LOAD( "94019-10.22", 0x000000, 0x200000, CRC(745d41ec) SHA1(9118d0f27b65c9d37970326ccf86fdccb81d32f5) )
 	ROM_LOAD( "94019-11.23", 0x200000, 0x200000, CRC(021dc350) SHA1(c71936091f86440201fdbdc94b0d1d22c4018188) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( desertwr )
@@ -1588,8 +1588,8 @@ ROM_START( desertwr )
 	ROM_LOAD( "92042-01.33", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "94038-13.34", 0x200000, 0x200000, CRC(b0cac8f2) SHA1(f7d2e32d9c2f301341f7c02678c2c1e09ce655ba) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( f1superb )
@@ -1643,8 +1643,8 @@ ROM_START( f1superb )
 	ROM_LOAD( "f1sb24.bin", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "f1sb23.bin", 0x200000, 0x200000, CRC(bfefa3ab) SHA1(7770cc9b091e258ede7f2780df61a592cc008dd7) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( gratia )
@@ -1680,8 +1680,8 @@ ROM_START( gratia )
 	ROM_LOAD( "92042.01", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common rom?
 	ROM_LOAD( "94019.10", 0x200000, 0x200000, CRC(a751e316) SHA1(3d658370c71b83582fd132b3da441089df9bfd05) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( gratiaa )
@@ -1704,7 +1704,7 @@ ROM_START( gratiaa )
 	ROM_LOAD( "94019.09", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
-	ROM_LOAD( "94019.07", 0x000000, 0x200000, BAD_DUMP CRC(acb75824) SHA1(3b43e00a2d240761565042c8feead25a83ef0eb1)  )	// FIXED BITS (xxxxxxxx11111111)
+	ROM_LOAD( "94019.07", 0x000000, 0x200000, BAD_DUMP CRC(acb75824) SHA1(3b43e00a2d240761565042c8feead25a83ef0eb1)  )  // FIXED BITS (xxxxxxxx11111111)
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
 	ROM_LOAD( "94019.030",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) )
@@ -1717,8 +1717,8 @@ ROM_START( gratiaa )
 	ROM_LOAD( "92042.01", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common rom?
 	ROM_LOAD( "94019.10", 0x200000, 0x200000, CRC(a751e316) SHA1(3d658370c71b83582fd132b3da441089df9bfd05) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( gametngk )
@@ -1757,8 +1757,8 @@ ROM_START( gametngk )
 	ROM_LOAD( "mr94041.13", 0x000000, 0x200000, CRC(fba84caf) SHA1(318270dbf825a8e0f315992c49a2dc34dd1df7c1) )
 	ROM_LOAD( "mr94041.14", 0x200000, 0x200000, CRC(2d6308bd) SHA1(600b6ccdbb976301075e0b287124a9fd5fe7fc1b) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( hayaosi2 )
@@ -1793,8 +1793,8 @@ ROM_START( hayaosi2 )
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr93038.01",  0x200000, 0x200000, CRC(b8a38bfc) SHA1(1aa7b69beebceb6f09a1ee006de054cb84002e94) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 /*
@@ -1898,8 +1898,8 @@ ROM_START( hayaosi3 )
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94027.10",  0x200000, 0x200000, CRC(e7cabe41) SHA1(5d903baed690a98856f7581319cf4dbfe1db47bb) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( kirarast )
@@ -1937,8 +1937,8 @@ ROM_START( kirarast )
 	ROM_LOAD( "mr95025.12",  0x000000, 0x200000, CRC(1dd4f766) SHA1(455befd3a216f2197cd2e7e4899d4f1af7d20bf7) )
 	ROM_LOAD( "mr95025.13",  0x200000, 0x200000, CRC(0adfe5b8) SHA1(02309e5789b58896e5f68603502c76d4a917bd91) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( akiss )
@@ -1975,8 +1975,8 @@ ROM_START( akiss )
 	ROM_LOAD( "95008-11.22",  0x000000, 0x200000, CRC(23b9af76) SHA1(98b4087c142500dc759bda94d71c77634452a7ad))
 	ROM_LOAD( "95008-12.23",  0x200000, 0x200000, CRC(780a2f45) SHA1(770cbf04e34ae7d72e6eb2304bcdfaff483cd8c1))
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( p47aces )
@@ -2015,8 +2015,8 @@ ROM_START( p47aces )
 	ROM_LOAD( "p47-22.bin",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) )
 	ROM_LOAD( "p47-23.bin",  0x200000, 0x200000, CRC(547fa4d4) SHA1(8a5ecb3300646762f63d37a27e643e1f6ce5e775) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( tetrisp )
@@ -2047,8 +2047,8 @@ ROM_START( tetrisp )
 	ROM_LOAD( "mr95024.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr95024.23", 0x200000, 0x200000, CRC(57502a17) SHA1(ce880188854dc17d9ebbfa3c373469cf5e6858c2) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( tp2m32 )
@@ -2078,8 +2078,8 @@ ROM_START( tp2m32 )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "tp2m3205.22", 0x000000, 0x200000, CRC(74aa5c31) SHA1(7e3f86198fb678244fab76bee9c72bbdfc818118) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 
@@ -2117,8 +2117,8 @@ ROM_START( bnstars ) /* ver 1.1 */
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr96004-10.22",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 /*
@@ -2191,8 +2191,8 @@ ROM_START( wpksocv2 )
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) )
 	ROM_LOAD( "mr95033-08.23", 0x200000, 0x200000, CRC(89a291fa) SHA1(7746a0490134fc902ce2dc7b0d33b455d792c105) )
 
-    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 

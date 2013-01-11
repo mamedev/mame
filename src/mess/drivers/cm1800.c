@@ -40,7 +40,7 @@ class cm1800_state : public driver_device
 public:
 	cm1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_terminal(*this, TERMINAL_TAG) { }
+			m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_READ8_MEMBER( term_status_r );
 	DECLARE_READ8_MEMBER( term_r );
@@ -115,4 +115,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1981, cm1800,  0,       0,    cm1800,    cm1800, driver_device,     0,  "<unknown>", "CM-1800", GAME_NO_SOUND_HW)
-

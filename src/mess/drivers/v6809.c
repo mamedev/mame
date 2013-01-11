@@ -116,15 +116,15 @@ INPUT_PORTS_END
 /* F4 Character Displayer */
 static const gfx_layout v6809_charlayout =
 {
-	8, 10,					/* 8 x 10 characters */
-	256,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 10,                  /* 8 x 10 characters */
+	256,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( v6809 )
@@ -174,16 +174,16 @@ void v6809_state::video_start()
 }
 
 static const mc6845_interface v6809_crtc = {
-	"screen",			/* name of screen */
-	8,				/* number of dots per character */
+	"screen",           /* name of screen */
+	8,              /* number of dots per character */
 	NULL,
-	v6809_update_row,		/* handler to display a scanline */
+	v6809_update_row,       /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	v6809_update_addr		/* handler to process transparent mode */
+	v6809_update_addr       /* handler to process transparent mode */
 };
 
 WRITE8_MEMBER( v6809_state::videoram_w )

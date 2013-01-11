@@ -125,9 +125,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	/*
 
-    Sprites are the same to sslam, but using 16x16 sprites instead of 8x8
+	Sprites are the same to sslam, but using 16x16 sprites instead of 8x8
 
-    */
+	*/
 
 	int offs;
 
@@ -293,7 +293,7 @@ static INPUT_PORTS_START( bestleag )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )	// also set "Coin B" to "Free Play"
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )    // also set "Coin B" to "Free Play"
 	/* 0x01 to 0x05 gives 2C_3C */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW.A:5,6,7,8")
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
@@ -306,7 +306,7 @@ static INPUT_PORTS_START( bestleag )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )	// also set "Coin A" to "Free Play"
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )    // also set "Coin A" to "Free Play"
 	/* 0x10 to 0x50 gives 2C_3C */
 
 	PORT_START("DSWB")
@@ -319,10 +319,10 @@ static INPUT_PORTS_START( bestleag )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x18, 0x18, "Timer Speed" ) PORT_DIPLOCATION("SW.B:4,5")
-	PORT_DIPSETTING(    0x08, "Slow" )				// 65
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )	// 50
-	PORT_DIPSETTING(    0x10, "Fast" )				// 35
-	PORT_DIPSETTING(    0x00, "Fastest" )			// 25
+	PORT_DIPSETTING(    0x08, "Slow" )              // 65
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )   // 50
+	PORT_DIPSETTING(    0x10, "Fast" )              // 35
+	PORT_DIPSETTING(    0x00, "Fastest" )           // 25
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW.B:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -462,4 +462,3 @@ ROM_END
 
 GAME( 1993, bestleag, bigstrik, bestleag, bestleag, driver_device, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", GAME_NO_COCKTAIL )
 GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, driver_device, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", GAME_NO_COCKTAIL )
-

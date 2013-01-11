@@ -125,147 +125,147 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 		for(x=0;x<xxx;x++)
 		{
 			/*if(hotblock_port0&0x40)*/bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count)]+0x300;
-            count++;
-        }
-    }
-    return 0;
+			count++;
+		}
+	}
+	return 0;
 }
 
 
 WRITE16_MEMBER(ttchamp_state::paloff_w)
 {
-    COMBINE_DATA(&m_paloff);
+	COMBINE_DATA(&m_paloff);
 }
 
 #ifdef UNUSED_FUNCTION
 WRITE16_MEMBER(ttchamp_state::pcup_prgbank_w)
 {
-    int bank;
-    UINT8 *ROM1 = memregion("user1")->base();
+	int bank;
+	UINT8 *ROM1 = memregion("user1")->base();
 
-    if (ACCESSING_BITS_0_7)
-    {
-        bank = (data>>4) &0x07;
-        membank("bank2")->set_base(&ROM1[0x80000*(bank)]);
-    }
+	if (ACCESSING_BITS_0_7)
+	{
+		bank = (data>>4) &0x07;
+		membank("bank2")->set_base(&ROM1[0x80000*(bank)]);
+	}
 }
 #endif
 
 WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
-    palette_set_color_rgb(machine(),m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+	palette_set_color_rgb(machine(),m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 READ16_MEMBER(ttchamp_state::peno_rand)
 {
-    return 0xffff;// machine().rand();
+	return 0xffff;// machine().rand();
 }
 
 #ifdef UNUSED_FUNCTION
 READ16_MEMBER(ttchamp_state::peno_rand2)
 {
-    return machine().rand();
+	return machine().rand();
 }
 #endif
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
-    AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_READWRITE(penocup_mainram_r, penocup_mainram_w)
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_READWRITE(penocup_mainram_r, penocup_mainram_w)
 
- /* 0x10000 - 0x1ffff is where it writes most image stuff, but other address get written to 0 where the left edge of 'sprites' would be? why? bad code execution, or some kind of write address based blitter?
-   see for example the lines written down the side of where the (not displayed) CREDIT text would go, as well as beside the actual credit number.. also ingame if you can get it to start
- */
+	/* 0x10000 - 0x1ffff is where it writes most image stuff, but other address get written to 0 where the left edge of 'sprites' would be? why? bad code execution, or some kind of write address based blitter?
+	see for example the lines written down the side of where the (not displayed) CREDIT text would go, as well as beside the actual credit number.. also ingame if you can get it to start
+	*/
 
 	AM_RANGE(0x10000, 0xfffff) AM_WRITE(penocup_vid_w)
 
 	// how are these banked? what are the bank sizes? data needed for startup is at 0x20000-0x2ffff (strings) and 0x30000-0x3ffff (code) the rest seems to be graphics..
 	AM_RANGE(0x00000, 0x7ffff) AM_ROMBANK("bank1") // ?
-    AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
+	AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
-    AM_RANGE(0x0000, 0x0001) AM_WRITENOP
+	AM_RANGE(0x0000, 0x0001) AM_WRITENOP
 
-    AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
-    AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
 
 //  AM_RANGE(0x0018, 0x0019) AM_READ(peno_rand2)
 //  AM_RANGE(0x001e, 0x001f) AM_READ(peno_rand2)
 
-    AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
-    AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w)
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
+	AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w)
 
 //  AM_RANGE(0x0010, 0x0010) AM_WRITE(pcup_prgbank_w)
-    AM_RANGE(0x0010, 0x0011) AM_WRITENOP
+	AM_RANGE(0x0010, 0x0011) AM_WRITENOP
 
-    AM_RANGE(0x0020, 0x0021) AM_WRITENOP
+	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
 
-    AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP
+	AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 
 static INPUT_PORTS_START(ttchamp)
-    PORT_START("SYSTEM")
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, "0x000003" )
-    PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "0x000003" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-    PORT_START("P1_P2")
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START("P1_P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 INPUT_PORTS_END
 

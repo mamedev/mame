@@ -32,19 +32,19 @@ static void wswan_setup_palettes(wswan_state *state) {
 
 static void wswan_draw_background( running_machine &machine ) {
 	wswan_state *state = machine.driver_data<wswan_state>();
-	UINT16	map_addr;
-	UINT8	start_column;
-	int	column;
+	UINT16  map_addr;
+	UINT8   start_column;
+	int column;
 
 	map_addr = state->m_vdp.layer_bg_address + ( ( ( state->m_vdp.current_line + state->m_vdp.layer_bg_scroll_y ) & 0xF8 ) << 3 );
 	start_column = ( state->m_vdp.layer_bg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
-		int	tile_data, tile_number, tile_palette, tile_line, tile_address;
-		UINT32	plane0=0, plane1=0, plane2=0, plane3=0;
-		int	x, x_offset;
+		int tile_data, tile_number, tile_palette, tile_line, tile_address;
+		UINT32  plane0=0, plane1=0, plane2=0, plane3=0;
+		int x, x_offset;
 
 		tile_data = ( state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-		            | state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+					| state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
 		tile_number = tile_data & 0x01FF;
 		tile_palette = ( tile_data >> 9 ) & 0x0F;
 
@@ -123,18 +123,18 @@ static void wswan_draw_background( running_machine &machine ) {
 
 static void wswan_draw_foreground_0( running_machine &machine ) {
 	wswan_state *state = machine.driver_data<wswan_state>();
-	UINT16	map_addr;
-	UINT8	start_column;
-	int	column;
+	UINT16  map_addr;
+	UINT8   start_column;
+	int column;
 	map_addr = state->m_vdp.layer_fg_address + ( ( ( state->m_vdp.current_line + state->m_vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
 	start_column = ( state->m_vdp.layer_fg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
-		UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-		int	x, x_offset, tile_line, tile_address;
-		int	tile_data = ( state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-                                    | state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
-		int	tile_number = tile_data & 0x01FF;
-		int	tile_palette = ( tile_data >> 9 ) & 0x0F;
+		UINT32  plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		int x, x_offset, tile_line, tile_address;
+		int tile_data = ( state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
+									| state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+		int tile_number = tile_data & 0x01FF;
+		int tile_palette = ( tile_data >> 9 ) & 0x0F;
 
 		tile_line = ( state->m_vdp.current_line + state->m_vdp.layer_fg_scroll_y ) & 0x07;
 		if ( tile_data & 0x8000 ) {
@@ -164,7 +164,7 @@ static void wswan_draw_foreground_0( running_machine &machine ) {
 		}
 
 		for( x = 0; x < 8; x++ ) {
-			int	col;
+			int col;
 			if ( state->m_vdp.tile_packed ) {
 				if ( state->m_vdp.colors_16 ) {
 					col = plane0 & 0x0F;
@@ -211,18 +211,18 @@ static void wswan_draw_foreground_0( running_machine &machine ) {
 
 static void wswan_draw_foreground_2( running_machine &machine ) {
 	wswan_state *state = machine.driver_data<wswan_state>();
-	UINT16	map_addr;
-	UINT8	start_column;
-	int	column;
+	UINT16  map_addr;
+	UINT8   start_column;
+	int column;
 	map_addr = state->m_vdp.layer_fg_address + ( ( ( state->m_vdp.current_line + state->m_vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
 	start_column = ( state->m_vdp.layer_fg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
-		UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-		int	x, x_offset, tile_line, tile_address;
-		int	tile_data = ( state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-			            | state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
-		int	tile_number = tile_data & 0x01FF;
-		int	tile_palette = ( tile_data >> 9 ) & 0x0F;
+		UINT32  plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		int x, x_offset, tile_line, tile_address;
+		int tile_data = ( state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
+						| state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+		int tile_number = tile_data & 0x01FF;
+		int tile_palette = ( tile_data >> 9 ) & 0x0F;
 
 		tile_line = ( state->m_vdp.current_line + state->m_vdp.layer_fg_scroll_y ) & 0x07;
 		if ( tile_data & 0x8000 ) {
@@ -252,7 +252,7 @@ static void wswan_draw_foreground_2( running_machine &machine ) {
 		}
 
 		for( x = 0; x < 8; x++ ) {
-			int	col;
+			int col;
 			if ( state->m_vdp.tile_packed ) {
 				if ( state->m_vdp.colors_16 ) {
 					col = plane0 & 0x0F;
@@ -299,18 +299,18 @@ static void wswan_draw_foreground_2( running_machine &machine ) {
 
 static void wswan_draw_foreground_3( running_machine &machine ) {
 	wswan_state *state = machine.driver_data<wswan_state>();
-	UINT16	map_addr;
-	UINT8	start_column;
-	int	column;
+	UINT16  map_addr;
+	UINT8   start_column;
+	int column;
 	map_addr = state->m_vdp.layer_fg_address + ( ( ( state->m_vdp.current_line + state->m_vdp.layer_fg_scroll_y ) & 0xF8 ) << 3 );
 	start_column = ( state->m_vdp.layer_fg_scroll_x >> 3 );
 	for( column = 0; column < 29; column++ ) {
-		UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-		int	x, x_offset, tile_line, tile_address;
-		int	tile_data = ( state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
-			            | state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
-		int	tile_number = tile_data & 0x01FF;
-		int	tile_palette = ( tile_data >> 9 ) & 0x0F;
+		UINT32  plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+		int x, x_offset, tile_line, tile_address;
+		int tile_data = ( state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) + 1 ] << 8 )
+						| state->m_vdp.vram[ map_addr + ( ( ( start_column + column ) & 0x1F ) << 1 ) ];
+		int tile_number = tile_data & 0x01FF;
+		int tile_palette = ( tile_data >> 9 ) & 0x0F;
 
 		tile_line = ( state->m_vdp.current_line + state->m_vdp.layer_fg_scroll_y ) & 0x07;
 		if ( tile_data & 0x8000 ) { // vflip
@@ -340,7 +340,7 @@ static void wswan_draw_foreground_3( running_machine &machine ) {
 		}
 
 		for( x = 0; x < 8; x++ ) {
-			int	col;
+			int col;
 			if ( state->m_vdp.tile_packed ) {
 				if ( state->m_vdp.colors_16 ) {
 					col = plane0 & 0x0F;
@@ -387,13 +387,13 @@ static void wswan_draw_foreground_3( running_machine &machine ) {
 
 static void wswan_handle_sprites( running_machine &machine, int mask ) {
 	wswan_state *state = machine.driver_data<wswan_state>();
-	int	i;
+	int i;
 	if ( state->m_vdp.sprite_count == 0 )
 		return;
 	for( i = state->m_vdp.sprite_first + state->m_vdp.sprite_count - 1; i >= state->m_vdp.sprite_first; i-- ) {
-		UINT8	x, y;
-		UINT16	tile_data;
-		int	tile_line;
+		UINT8   x, y;
+		UINT16  tile_data;
+		int tile_line;
 
 		tile_data = ( state->m_vdp.sprite_table_buffer[ i * 4 + 1 ] << 8 ) | state->m_vdp.sprite_table_buffer[ i * 4 ];
 		y = state->m_vdp.sprite_table_buffer[ i * 4 + 2 ];
@@ -401,11 +401,11 @@ static void wswan_handle_sprites( running_machine &machine, int mask ) {
 		tile_line = state->m_vdp.current_line - y;
 		tile_line = tile_line & 0xFF;
 		if ( ( tile_line >= 0 ) && ( tile_line < 8 ) && ( ( tile_data & 0x2000 ) == mask ) ) {
-			UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
-			int	j, x_offset, tile_address;
-			int	tile_number = tile_data & 0x01FF;
-			int	tile_palette = 8 + ( ( tile_data >> 9 ) & 0x07 );
-			int	check_clip = 0;
+			UINT32  plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
+			int j, x_offset, tile_address;
+			int tile_number = tile_data & 0x01FF;
+			int tile_palette = 8 + ( ( tile_data >> 9 ) & 0x07 );
+			int check_clip = 0;
 			if ( tile_data & 0x8000 ) {
 				tile_line = 7 - tile_line;
 			}
@@ -523,36 +523,36 @@ void wswan_refresh_scanline( running_machine &machine )
 	}
 
 	/*
-     * Draw background layer
-     */
+	 * Draw background layer
+	 */
 	if ( state->m_vdp.layer_bg_enable ) {
 		wswan_draw_background(machine);
 	}
 
 	/*
-     * Draw sprites between background and foreground layers
-     */
+	 * Draw sprites between background and foreground layers
+	 */
 	if ( state->m_vdp.sprites_enable ) {
 		wswan_handle_sprites( machine, 0 );
 	}
 
 	/*
-     * Draw foreground layer, taking window settings into account
-     */
+	 * Draw foreground layer, taking window settings into account
+	 */
 	if ( state->m_vdp.layer_fg_enable ) {
 		switch( state->m_vdp.window_fg_mode ) {
-		case 0:	/* FG inside & outside window area */
+		case 0: /* FG inside & outside window area */
 			wswan_draw_foreground_0(machine);
 			break;
-		case 1:	/* ??? */
+		case 1: /* ??? */
 			logerror( "Unknown foreground mode 1 set\n" );
 			break;
-		case 2:	/* FG only inside window area */
+		case 2: /* FG only inside window area */
 			if ( state->m_vdp.current_line >= state->m_vdp.window_fg_top && state->m_vdp.current_line <= state->m_vdp.window_fg_bottom ) {
 				wswan_draw_foreground_2(machine);
 			}
 			break;
-		case 3:	/* FG only outside window area */
+		case 3: /* FG only outside window area */
 			if ( state->m_vdp.current_line < state->m_vdp.window_fg_top || state->m_vdp.current_line > state->m_vdp.window_fg_bottom ) {
 				wswan_draw_foreground_0(machine);
 			} else {
@@ -563,8 +563,8 @@ void wswan_refresh_scanline( running_machine &machine )
 	}
 
 	/*
-     * Draw sprites in front of foreground layer
-     */
+	 * Draw sprites in front of foreground layer
+	 */
 	if ( state->m_vdp.sprites_enable ) {
 		wswan_handle_sprites( machine, 0x2000 );
 	}
@@ -581,4 +581,3 @@ UINT32 wswan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-

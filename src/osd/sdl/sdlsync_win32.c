@@ -30,11 +30,11 @@
 //  DEBUGGING
 //============================================================
 
-#define USE_SCALABLE_LOCKS		(0)
+#define USE_SCALABLE_LOCKS      (0)
 
 struct osd_event
 {
-	void *	ptr;
+	void *  ptr;
 };
 
 struct osd_thread {
@@ -96,14 +96,14 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 struct osd_scalable_lock
 {
 #if USE_SCALABLE_LOCKS
-   struct
-   {
-      volatile INT32	haslock;		// do we have the lock?
-      INT32 			filler[64/4-1];	// assumes a 64-byte cache line
-   } slot[WORK_MAX_THREADS];			// one slot per thread
-   volatile INT32		nextindex;		// index of next slot to use
+	struct
+	{
+		volatile INT32  haslock;        // do we have the lock?
+		INT32           filler[64/4-1]; // assumes a 64-byte cache line
+	} slot[WORK_MAX_THREADS];           // one slot per thread
+	volatile INT32      nextindex;      // index of next slot to use
 #else
-	CRITICAL_SECTION	section;
+	CRITICAL_SECTION    section;
 #endif
 };
 

@@ -568,5 +568,3 @@ adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, d
 	: adc0831_device(mconfig, ADC0838, "A/D Converters 0838", tag, owner, clock)
 {
 }
-
-

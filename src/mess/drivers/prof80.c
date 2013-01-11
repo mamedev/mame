@@ -30,11 +30,11 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define BLK_RAM1	0x0b
-#define BLK_RAM2	0x0a
-#define BLK_RAM3	0x03
-#define BLK_RAM4	0x02
-#define BLK_EPROM	0x00
+#define BLK_RAM1    0x0b
+#define BLK_RAM2    0x0a
+#define BLK_RAM3    0x03
+#define BLK_RAM4    0x02
+#define BLK_EPROM   0x00
 
 
 
@@ -134,7 +134,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		m_c2 = fa;
 		break;
 
-	case 3:	// READY
+	case 3: // READY
 		m_fdc->ready_w(fa);
 		break;
 
@@ -142,11 +142,11 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		m_rtc->clk_w(fa);
 		break;
 
-	case 5:	// IN USE
+	case 5: // IN USE
 		output_set_led_value(0, fa);
 		break;
 
-	case 6:	// _MOTOR
+	case 6: // _MOTOR
 		if (fa)
 		{
 			// trigger floppy motor off NE555 timer
@@ -169,7 +169,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		}
 		break;
 
-	case 7:	// SELECT
+	case 7: // SELECT
 		break;
 	}
 
@@ -220,18 +220,18 @@ WRITE8_MEMBER( prof80_state::flr_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       FB
-        1       SB0
-        2       SB1
-        3       SB2
-        4       SA0
-        5       SA1
-        6       SA2
-        7       FA
+	    0       FB
+	    1       SB0
+	    2       SB1
+	    3       SB2
+	    4       SA0
+	    5       SA1
+	    6       SA2
+	    7       FA
 
-    */
+	*/
 
 	int fa = BIT(data, 7);
 	int sa = (data >> 4) & 0x07;
@@ -251,18 +251,18 @@ READ8_MEMBER( prof80_state::status_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       _RX
-        1
-        2
-        3
-        4       CTS
-        5       _INDEX
-        6
-        7       CTSP
+	    0       _RX
+	    1
+	    2
+	    3
+	    4       CTS
+	    5       _INDEX
+	    6
+	    7       CTSP
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -290,18 +290,18 @@ READ8_MEMBER( prof80_state::status2_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       _MOTOR      floppy motor (0=on, 1=off)
-        1
-        2
-        3
-        4       JS4
-        5       JS5
-        6
-        7       _TDO
+	    0       _MOTOR      floppy motor (0=on, 1=off)
+	    1
+	    2
+	    3
+	    4       JS4
+	    5       JS5
+	    6
+	    7       _TDO
 
-    */
+	*/
 
 	UINT8 data = 0;
 	int js4 = 0, js5 = 0;
@@ -600,10 +600,10 @@ void prof80_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( prof80, prof80_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6MHz)
-    MCFG_CPU_PROGRAM_MAP(prof80_mem)
-    MCFG_CPU_IO_MAP(prof80_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6MHz)
+	MCFG_CPU_PROGRAM_MAP(prof80_mem)
+	MCFG_CPU_IO_MAP(prof80_io)
 
 	// devices
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
@@ -652,4 +652,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1984, prof80,     0,		0,		prof80,	prof80, driver_device,	0,		"Conitec Datensysteme",	"PROF-80",				GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1984, prof80,     0,      0,      prof80, prof80, driver_device,  0,      "Conitec Datensysteme", "PROF-80",              GAME_NOT_WORKING | GAME_NO_SOUND)

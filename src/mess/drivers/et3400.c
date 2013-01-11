@@ -20,7 +20,7 @@ class et3400_state : public driver_device
 public:
 	et3400_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -119,4 +119,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1976, et3400,  0,     0,       et3400,    et3400, driver_device,  0,    "Heath Inc", "Heathkit ET-3400", GAME_NO_SOUND_HW)
-

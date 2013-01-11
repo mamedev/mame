@@ -16,25 +16,25 @@
 struct SVI_318
 {
 	/* general */
-	UINT8	svi318;		/* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
+	UINT8   svi318;     /* Are we dealing with an SVI-318 or a SVI-328 model. 0 = 328, 1 = 318 */
 	/* memory */
-	UINT8	*empty_bank;
-	UINT8	bank_switch;
-	UINT8	bankLow;
-	UINT8	bankHigh1;
-	UINT8	*bankLow_ptr;
-	UINT8	bankLow_read_only;
-	UINT8	*bankHigh1_ptr;
-	UINT8	bankHigh1_read_only;
-	UINT8	*bankHigh2_ptr;
-	UINT8	bankHigh2_read_only;
+	UINT8   *empty_bank;
+	UINT8   bank_switch;
+	UINT8   bankLow;
+	UINT8   bankHigh1;
+	UINT8   *bankLow_ptr;
+	UINT8   bankLow_read_only;
+	UINT8   *bankHigh1_ptr;
+	UINT8   bankHigh1_read_only;
+	UINT8   *bankHigh2_ptr;
+	UINT8   bankHigh2_read_only;
 	/* keyboard */
-	UINT8	keyboard_row;
+	UINT8   keyboard_row;
 	/* SVI-806 80 column card */
-	UINT8	svi806_present;
-	UINT8	svi806_ram_enabled;
-	memory_region	*svi806_ram;
-	UINT8	*svi806_gfx;
+	UINT8   svi806_present;
+	UINT8   svi806_ram_enabled;
+	memory_region   *svi806_ram;
+	UINT8   *svi806_gfx;
 };
 
 struct SVI318_FDC_STRUCT

@@ -76,12 +76,12 @@ ToDo:
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"u39"
-#define Z80SIO_TAG		"u16"
-#define Z80CTCA_TAG		"u37"
-#define Z80CTCB_TAG		"u21"
-#define Z80DMA_TAG		"u62"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "u39"
+#define Z80SIO_TAG      "u16"
+#define Z80CTCA_TAG     "u37"
+#define Z80CTCB_TAG     "u21"
+#define Z80DMA_TAG      "u62"
 
 class bigbord2_state : public driver_device
 {
@@ -122,15 +122,15 @@ public:
 	UINT8 m_term_status;
 
 	/* video state */
-	UINT8 *m_p_chargen;					/* character ROM */
-	UINT8 *m_p_videoram;					/* Video RAM */
-	UINT8 *m_p_attribram;					/* Attribute RAM */
+	UINT8 *m_p_chargen;                 /* character ROM */
+	UINT8 *m_p_videoram;                    /* Video RAM */
+	UINT8 *m_p_attribram;                   /* Attribute RAM */
 
 	/* floppy state */
-	bool m_fdc_irq;						/* interrupt request */
-	bool m_fdc_drq;						/* data request */
-	bool m_8n5;							/* 5.25" / 8" drive select */
-	bool m_dsdd;							/* double sided disk detect */
+	bool m_fdc_irq;                     /* interrupt request */
+	bool m_fdc_drq;                     /* data request */
+	bool m_8n5;                         /* 5.25" / 8" drive select */
+	bool m_dsdd;                            /* double sided disk detect */
 	int m_c8[8];
 
 	required_device<cpu_device> m_maincpu;
@@ -233,22 +233,22 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 {
 	/*
 
-        This port uses a 74LS259, which allows individual bits
-        to be switched on and off, while the other bits are
-        unaffected.
+	    This port uses a 74LS259, which allows individual bits
+	    to be switched on and off, while the other bits are
+	    unaffected.
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       D_S         memory bank
-        1       SIDSEL      side select
-        2       SMC1        u6 data separator pin 5
-        3       SMC2        u6 data separator pin 6
-        4       DDEN        density
-        5       HLD         head load
-        6       MOTOR       disk motor
-        7       BELL        beeper pulse
+	    0       D_S         memory bank
+	    1       SIDSEL      side select
+	    2       SMC1        u6 data separator pin 5
+	    3       SMC2        u6 data separator pin 6
+	    4       DDEN        density
+	    5       HLD         head load
+	    6       MOTOR       disk motor
+	    7       BELL        beeper pulse
 
-    */
+	*/
 
 	m_c8[data&7] = BIT(data, 3);
 
@@ -294,24 +294,24 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0,1,2   operates a 74LS151 for 8 individual inputs to DMA RDY
-          0     W/RDYA      channel A of SIO
-          1     W/RDYB      channel B of SIO
-          2     DRQ         DRQ on fdc
-          3     JB7 pin 1
-          4     JB7 pin 2
-          5     JB7 pin 3
-          6     JB7 pin 4
-          7     JB7 pin 5
-        3       /TEST       test pin on FDC
-        4       DS3         drive 3 select
-        5       DS2         drive 2 select
-        6       DS1         drive 1 select
-        7       DS0         drive 0 select
+	    0,1,2   operates a 74LS151 for 8 individual inputs to DMA RDY
+	      0     W/RDYA      channel A of SIO
+	      1     W/RDYB      channel B of SIO
+	      2     DRQ         DRQ on fdc
+	      3     JB7 pin 1
+	      4     JB7 pin 2
+	      5     JB7 pin 3
+	      6     JB7 pin 4
+	      7     JB7 pin 5
+	    3       /TEST       test pin on FDC
+	    4       DS3         drive 3 select
+	    5       DS2         drive 2 select
+	    6       DS1         drive 1 select
+	    7       DS0         drive 0 select
 
-    */
+	*/
 
 	/* drive select */
 	bool dvsel0 = BIT(data, 7);
@@ -396,12 +396,12 @@ WRITE_LINE_MEMBER(bigbord2_state::bigbord2_interrupt)
 
 const z80sio_interface sio_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, bigbord2_interrupt),	/* interrupt handler */
-	DEVCB_NULL,			/* DTR changed handler */
-	DEVCB_NULL,			/* RTS changed handler */
-	DEVCB_NULL,			/* BREAK changed handler */
-	DEVCB_NULL,			/* transmit handler - which channel is this for? */
-	DEVCB_NULL			/* receive handler - which channel is this for? */
+	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, bigbord2_interrupt),   /* interrupt handler */
+	DEVCB_NULL,         /* DTR changed handler */
+	DEVCB_NULL,         /* RTS changed handler */
+	DEVCB_NULL,         /* BREAK changed handler */
+	DEVCB_NULL,         /* transmit handler - which channel is this for? */
+	DEVCB_NULL          /* receive handler - which channel is this for? */
 };
 
 
@@ -446,17 +446,17 @@ WRITE_LINE_MEMBER( bigbord2_state::frame )
 
 static Z80CTC_INTERFACE( ctca_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL,		/* ZC/TO0 callback - KBDCLK */
-	DEVCB_NULL,		/* ZC/TO1 callback - not connected */
-	DEVCB_NULL		/* ZC/TO2 callback - not connected */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
+	DEVCB_NULL,     /* ZC/TO0 callback - KBDCLK */
+	DEVCB_NULL,     /* ZC/TO1 callback - not connected */
+	DEVCB_NULL      /* ZC/TO2 callback - not connected */
 };
 
 static Z80CTC_INTERFACE( ctcb_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL,		/* ZC/TO0 callback - SIO channel B clock */
-	DEVCB_NULL,		/* ZC/TO1 callback - SIO channel A clock */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
+	DEVCB_NULL,     /* ZC/TO0 callback - SIO channel B clock */
+	DEVCB_NULL,     /* ZC/TO1 callback - SIO channel A clock */
 	DEVCB_DEVICE_LINE_MEMBER(Z80CTCB_TAG, z80ctc_device, trg3) /* ZC/TO2 callback */
 };
 
@@ -618,15 +618,15 @@ static const floppy_interface bigbord2_floppy_interface =
 /* F4 Character Displayer */
 static const gfx_layout bigbord2_charlayout =
 {
-	8, 16,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 8 bytes */
+	8*16                    /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( bigbord2 )
@@ -664,10 +664,10 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 }
 
 static const mc6845_interface bigbord2_crtc = {
-	SCREEN_TAG,			/* name of screen */
-	8,			/* number of dots per character */
+	SCREEN_TAG,         /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	bigbord2_update_row,		/* handler to display a scanline */
+	bigbord2_update_row,        /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

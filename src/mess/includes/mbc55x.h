@@ -24,54 +24,54 @@
 
 #define MAINCPU_TAG "maincpu"
 
-#define SCREEN_TAG		"screen"
+#define SCREEN_TAG      "screen"
 #define SCREEN_WIDTH_PIXELS     640
 #define SCREEN_HEIGHT_LINES     250
 #define SCREEN_NO_COLOURS       8
 
-#define VIDEO_MEM_SIZE		(32*1024)
-#define VID_MC6845_NAME		"mc6845"
+#define VIDEO_MEM_SIZE      (32*1024)
+#define VID_MC6845_NAME     "mc6845"
 
 // Red and blue colour planes sit at a fixed location, green
 // is in main memory.
 
-#define COLOUR_PLANE_SIZE	0x4000
+#define COLOUR_PLANE_SIZE   0x4000
 
-#define	RED_PLANE_OFFSET	(0*COLOUR_PLANE_SIZE)
-#define BLUE_PLANE_OFFSET	(1*COLOUR_PLANE_SIZE)
+#define RED_PLANE_OFFSET    (0*COLOUR_PLANE_SIZE)
+#define BLUE_PLANE_OFFSET   (1*COLOUR_PLANE_SIZE)
 
-#define COLOUR_PLANE_MEMBASE	0xF0000
-#define RED_PLANE_MEMBASE	(COLOUR_PLANE_MEMBASE+RED_PLANE_OFFSET)
-#define BLUE_PLANE_MEMBASE	(COLOUR_PLANE_MEMBASE+BLUE_PLANE_OFFSET)
+#define COLOUR_PLANE_MEMBASE    0xF0000
+#define RED_PLANE_MEMBASE   (COLOUR_PLANE_MEMBASE+RED_PLANE_OFFSET)
+#define BLUE_PLANE_MEMBASE  (COLOUR_PLANE_MEMBASE+BLUE_PLANE_OFFSET)
 
-#define RED_PLANE_TAG		"red"
-#define BLUE_PLANE_TAG		"blue"
+#define RED_PLANE_TAG       "red"
+#define BLUE_PLANE_TAG      "blue"
 
 // Keyboard
 
-#define MBC55X_KEYROWS      	7
-#define KEYBOARD_QUEUE_SIZE 	32
+#define MBC55X_KEYROWS          7
+#define KEYBOARD_QUEUE_SIZE     32
 
-#define KB_BITMASK		0x1000
-#define KB_SHIFTS		12
+#define KB_BITMASK      0x1000
+#define KB_SHIFTS       12
 
-#define KEY_SPECIAL_TAG		"KEY_SPECIAL"
-#define KEY_BIT_LSHIFT		0x01
-#define KEY_BIT_RSHIFT		0x02
-#define KEY_BIT_CTRL		0x04
-#define KEY_BIT_GRAPH		0x08
+#define KEY_SPECIAL_TAG     "KEY_SPECIAL"
+#define KEY_BIT_LSHIFT      0x01
+#define KEY_BIT_RSHIFT      0x02
+#define KEY_BIT_CTRL        0x04
+#define KEY_BIT_GRAPH       0x08
 
-#define PPI8255_TAG		"ppi8255"
-#define PIC8259_TAG		"pic8259"
+#define PPI8255_TAG     "ppi8255"
+#define PIC8259_TAG     "pic8259"
 
 // From tech manual clock c1 is fed from c0, but it approx 100Hz
-#define PIT8253_TAG		"pit8253"
-#define PIT_C0_CLOCK	78600
-#define PIT_C1_CLOCK	100
-#define PIT_C2_CLOCK	1789770
+#define PIT8253_TAG     "pit8253"
+#define PIT_C0_CLOCK    78600
+#define PIT_C1_CLOCK    100
+#define PIT_C2_CLOCK    1789770
 
 #define MONO_TAG                "mono"
-#define I8251A_KB_TAG			"i8251a_kb"
+#define I8251A_KB_TAG           "i8251a_kb"
 #define FDC_TAG                 "wd1793"
 
 
@@ -80,7 +80,7 @@ struct keyboard_t
 	UINT8       keyrows[MBC55X_KEYROWS];
 	emu_timer   *keyscan_timer;
 
-	UINT8		key_special;
+	UINT8       key_special;
 };
 
 
@@ -136,12 +136,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit8253_t2);
 	DECLARE_WRITE_LINE_MEMBER(mbc55x_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(mbc55x_fdc_drq_w);
-	UINT32		m_debug_machine;
-	UINT32		m_debug_video;
-	UINT8		m_video_mem[VIDEO_MEM_SIZE];
-	UINT8		m_vram_page;
+	UINT32      m_debug_machine;
+	UINT32      m_debug_video;
+	UINT8       m_video_mem[VIDEO_MEM_SIZE];
+	UINT8       m_vram_page;
 
-	keyboard_t	m_keyboard;
+	keyboard_t  m_keyboard;
 	DECLARE_READ8_MEMBER(mbcpic8259_r);
 	DECLARE_WRITE8_MEMBER(mbcpic8259_w);
 	DECLARE_READ8_MEMBER(mbcpit8253_r);
@@ -191,12 +191,12 @@ extern const i8251_interface mbc55x_i8251b_interface;
 #define RAM_BANK0D_TAG  "bankd"
 #define RAM_BANK0E_TAG  "banke"
 
-#define RAM_BANK_SIZE	(64*1024)
-#define RAM_BANK_COUNT	15
+#define RAM_BANK_SIZE   (64*1024)
+#define RAM_BANK_COUNT  15
 
 /* Floppy drive interface */
 
-#define FDC_PAUSE				10000
+#define FDC_PAUSE               10000
 
 extern const wd17xx_interface mbc55x_wd17xx_interface;
 

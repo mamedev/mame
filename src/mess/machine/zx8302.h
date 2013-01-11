@@ -67,38 +67,38 @@
 
 struct zx8302_interface
 {
-	int rtc_clock;				// the RTC clock (pin 30) of the chip
+	int rtc_clock;              // the RTC clock (pin 30) of the chip
 
 	// serial
-	devcb_write_line	out_ipl1l_cb;
-	devcb_write_line	out_baudx4_cb;
-	devcb_write_line	out_comdata_cb;
-	devcb_write_line	out_txd1_cb;
-	devcb_write_line	out_txd2_cb;
-	devcb_read_line		in_dtr1_cb;
-	devcb_read_line		in_cts2_cb;
-	devcb_write_line	out_netout_cb;
-	devcb_read_line		in_netin_cb;
+	devcb_write_line    out_ipl1l_cb;
+	devcb_write_line    out_baudx4_cb;
+	devcb_write_line    out_comdata_cb;
+	devcb_write_line    out_txd1_cb;
+	devcb_write_line    out_txd2_cb;
+	devcb_read_line     in_dtr1_cb;
+	devcb_read_line     in_cts2_cb;
+	devcb_write_line    out_netout_cb;
+	devcb_read_line     in_netin_cb;
 
 	// microdrive
-	devcb_write_line	out_mdselck_cb;
-	devcb_write_line	out_mdseld_cb;
-	devcb_write_line	out_mdrdw_cb;
-	devcb_write_line	out_erase_cb;
-	devcb_write_line	out_raw1_cb;
-	devcb_read_line		in_raw1_cb;
-	devcb_write_line	out_raw2_cb;
-	devcb_read_line		in_raw2_cb;
+	devcb_write_line    out_mdselck_cb;
+	devcb_write_line    out_mdseld_cb;
+	devcb_write_line    out_mdrdw_cb;
+	devcb_write_line    out_erase_cb;
+	devcb_write_line    out_raw1_cb;
+	devcb_read_line     in_raw1_cb;
+	devcb_write_line    out_raw2_cb;
+	devcb_read_line     in_raw2_cb;
 };
 
 // ======================> zx8302_device
 
 class zx8302_device :  public device_t,
-                       public zx8302_interface
+						public zx8302_interface
 {
 public:
-    // construction/destruction
-    zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_WRITE8_MEMBER( rtc_w );
@@ -116,8 +116,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( extint_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
@@ -133,54 +133,54 @@ private:
 	static const device_timer_id TIMER_GAP = 3;
 	static const device_timer_id TIMER_IPC = 4;
 
-	devcb_resolved_write_line	m_out_ipl1l_func;
-	devcb_resolved_write_line	m_out_baudx4_func;
-	devcb_resolved_write_line	m_out_comdata_func;
-	devcb_resolved_write_line	m_out_txd1_func;
-	devcb_resolved_write_line	m_out_txd2_func;
-	devcb_resolved_read_line	m_in_dtr1_func;
-	devcb_resolved_read_line	m_in_cts2_func;
-	devcb_resolved_write_line	m_out_netout_func;
-	devcb_resolved_read_line	m_in_netin_func;
+	devcb_resolved_write_line   m_out_ipl1l_func;
+	devcb_resolved_write_line   m_out_baudx4_func;
+	devcb_resolved_write_line   m_out_comdata_func;
+	devcb_resolved_write_line   m_out_txd1_func;
+	devcb_resolved_write_line   m_out_txd2_func;
+	devcb_resolved_read_line    m_in_dtr1_func;
+	devcb_resolved_read_line    m_in_cts2_func;
+	devcb_resolved_write_line   m_out_netout_func;
+	devcb_resolved_read_line    m_in_netin_func;
 
-	devcb_resolved_write_line	m_out_mdselck_func;
-	devcb_resolved_write_line	m_out_mdseld_func;
-	devcb_resolved_write_line	m_out_mdrdw_func;
-	devcb_resolved_write_line	m_out_erase_func;
-	devcb_resolved_write_line	m_out_raw1_func;
-	devcb_resolved_read_line	m_in_raw1_func;
-	devcb_resolved_write_line	m_out_raw2_func;
-	devcb_resolved_read_line	m_in_raw2_func;
+	devcb_resolved_write_line   m_out_mdselck_func;
+	devcb_resolved_write_line   m_out_mdseld_func;
+	devcb_resolved_write_line   m_out_mdrdw_func;
+	devcb_resolved_write_line   m_out_erase_func;
+	devcb_resolved_write_line   m_out_raw1_func;
+	devcb_resolved_read_line    m_in_raw1_func;
+	devcb_resolved_write_line   m_out_raw2_func;
+	devcb_resolved_read_line    m_in_raw2_func;
 
 	// registers
-	UINT8 m_idr;					// IPC data register
-	UINT8 m_tcr;					// transfer control register
-	UINT8 m_tdr;					// transfer data register
-	UINT8 m_irq;					// interrupt register
-	UINT32 m_ctr;					// counter register
-	UINT8 m_status;					// status register
+	UINT8 m_idr;                    // IPC data register
+	UINT8 m_tcr;                    // transfer control register
+	UINT8 m_tdr;                    // transfer data register
+	UINT8 m_irq;                    // interrupt register
+	UINT32 m_ctr;                   // counter register
+	UINT8 m_status;                 // status register
 
 	// IPC communication state
-	int m_comdata;					// communication data
-	int m_comctl;					// communication control
-	int m_ipc_state;				// communication state
-	int m_ipc_rx;					// receiving data from IPC
-	int m_ipc_busy;					// IPC busy
-	int m_baudx4;					// IPC baud x4
+	int m_comdata;                  // communication data
+	int m_comctl;                   // communication control
+	int m_ipc_state;                // communication state
+	int m_ipc_rx;                   // receiving data from IPC
+	int m_ipc_busy;                 // IPC busy
+	int m_baudx4;                   // IPC baud x4
 
 	// serial transmit state
-	int m_tx_bits;					// bits transmitted
+	int m_tx_bits;                  // bits transmitted
 
 	// microdrive state
-	UINT8 m_mdv_data[2];			// track data register
-	int m_track;					// current track
+	UINT8 m_mdv_data[2];            // track data register
+	int m_track;                    // current track
 
 	// timers
-	emu_timer *m_txd_timer;			// transmit timer
-	emu_timer *m_baudx4_timer;		// baud x4 timer
-	emu_timer *m_rtc_timer;			// real time clock timer
-	emu_timer *m_gap_timer;			// microdrive gap timer
-	emu_timer *m_ipc_timer;			// delayed IPC command timer
+	emu_timer *m_txd_timer;         // transmit timer
+	emu_timer *m_baudx4_timer;      // baud x4 timer
+	emu_timer *m_rtc_timer;         // real time clock timer
+	emu_timer *m_gap_timer;         // microdrive gap timer
+	emu_timer *m_ipc_timer;         // delayed IPC command timer
 };
 
 

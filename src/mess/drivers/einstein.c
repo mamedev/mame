@@ -71,8 +71,8 @@
 #include "machine/ram.h"
 #include "includes/einstein.h"
 
-#define VERBOSE_KEYBOARD	0
-#define VERBOSE_DISK		0
+#define VERBOSE_KEYBOARD    0
+#define VERBOSE_DISK        0
 
 FLOPPY_FORMATS_MEMBER( einstein_state::floppy_formats )
 	FLOPPY_DSK_FORMAT
@@ -425,7 +425,7 @@ void einstein_state::machine_reset()
 	einstein_page_rom(machine());
 
 	/* a reset causes the fire int, adc int, keyboard int mask
-    to be set to 1, which causes all these to be DISABLED */
+	to be set to 1, which causes all these to be DISABLED */
 	m_interrupt = 0;
 	m_interrupt_mask = 0;
 
@@ -559,7 +559,7 @@ static INPUT_PORTS_START( einstein )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('\xA3')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\xBA') PORT_CHAR('\xBD')	// is \xBA correct for double vertical bar || ?
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\xBA') PORT_CHAR('\xBD')    // is \xBA correct for double vertical bar || ?
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('@')
 
 	PORT_START("LINE2")
@@ -737,9 +737,9 @@ static const mc6845_interface einstein_crtc6845_interface =
 /* F4 Character Displayer */
 static const gfx_layout einstei2_charlayout =
 {
-	8, 10,					/* 8 x 10 characters */
-	256,					/* 256*2 characters */
-	1,					/* 1 bits per pixel */
+	8, 10,                  /* 8 x 10 characters */
+	256,                    /* 256*2 characters */
+	1,                  /* 1 bits per pixel */
 	{ 0 },
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
-    driver. So we update at 50Hz and hope this is good enough. */
+	driver. So we update at 50Hz and hope this is good enough. */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, einstein_keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
@@ -887,6 +887,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT           INIT  COMPANY   FULLNAME                             FLAGS */
-COMP( 1984, einstein, 0,        0,		einstein, einstein, driver_device,       0,    "Tatung", "Einstein TC-01",                    0 )
-COMP( 1984, einstei2, einstein, 0,		einstei2, einstein_80col, driver_device, 0,    "Tatung", "Einstein TC-01 + 80 column device", 0 )
-COMP( 1984, einst256, 0,        0,		einstein, einstein, driver_device,       0,    "Tatung", "Einstein 256",						 GAME_NOT_WORKING )
+COMP( 1984, einstein, 0,        0,      einstein, einstein, driver_device,       0,    "Tatung", "Einstein TC-01",                    0 )
+COMP( 1984, einstei2, einstein, 0,      einstei2, einstein_80col, driver_device, 0,    "Tatung", "Einstein TC-01 + 80 column device", 0 )
+COMP( 1984, einst256, 0,        0,      einstein, einstein, driver_device,       0,    "Tatung", "Einstein 256",                         GAME_NOT_WORKING )

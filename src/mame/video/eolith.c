@@ -19,7 +19,7 @@ WRITE32_MEMBER(eolith_state::eolith_vram_w)
 			*dest = (*dest & 0xffff0000) | (data & 0x0000ffff);
 	}
 	else if (((mem_mask == 0xffff0000) && (~data & 0x80000000)) ||
-	    	 ((mem_mask == 0x0000ffff) && (~data & 0x00008000)))
+				((mem_mask == 0x0000ffff) && (~data & 0x00008000)))
 		COMBINE_DATA(dest);
 
 }

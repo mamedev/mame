@@ -52,10 +52,10 @@
 //**************************************************************************
 
 // use these to define compile-time internal-format hash strings
-#define CRC(x)				"R" #x
-#define SHA1(x)				"S" #x
-#define NO_DUMP				"!"
-#define BAD_DUMP			"^"
+#define CRC(x)              "R" #x
+#define SHA1(x)             "S" #x
+#define NO_DUMP             "!"
+#define BAD_DUMP            "^"
 
 
 
@@ -84,19 +84,19 @@ public:
 	static const char FLAG_BAD_DUMP = '^';
 
 	// construction/destruction
-    hash_collection();
-    hash_collection(const char *string);
-    hash_collection(const hash_collection &src);
-    ~hash_collection();
+	hash_collection();
+	hash_collection(const char *string);
+	hash_collection(const hash_collection &src);
+	~hash_collection();
 
-    // operators
-    hash_collection &operator=(const hash_collection &src);
-    bool operator==(const hash_collection &rhs) const;
-    bool operator!=(const hash_collection &rhs) const { return !(*this == rhs); }
+	// operators
+	hash_collection &operator=(const hash_collection &src);
+	bool operator==(const hash_collection &rhs) const;
+	bool operator!=(const hash_collection &rhs) const { return !(*this == rhs); }
 
 	// getters
-    bool flag(char flag) const { return (m_flags.chr(0, flag) != -1); }
-    const char *hash_types(astring &buffer) const;
+	bool flag(char flag) const { return (m_flags.chr(0, flag) != -1); }
+	const char *hash_types(astring &buffer) const;
 
 	// hash manipulators
 	void reset();
@@ -112,38 +112,38 @@ public:
 	void add_sha1(sha1_t sha1) { m_has_sha1 = true; m_sha1 = sha1; }
 
 	// string conversion
-    const char *internal_string(astring &buffer) const;
-    const char *macro_string(astring &buffer) const;
-    const char *attribute_string(astring &buffer) const;
-    bool from_internal_string(const char *string);
+	const char *internal_string(astring &buffer) const;
+	const char *macro_string(astring &buffer) const;
+	const char *attribute_string(astring &buffer) const;
+	bool from_internal_string(const char *string);
 
 	// creation
-    void begin(const char *types = NULL);
-    void buffer(const UINT8 *data, UINT32 length);
-    void end();
-    void compute(const UINT8 *data, UINT32 length, const char *types = NULL) { begin(types); buffer(data, length); end(); }
+	void begin(const char *types = NULL);
+	void buffer(const UINT8 *data, UINT32 length);
+	void end();
+	void compute(const UINT8 *data, UINT32 length, const char *types = NULL) { begin(types); buffer(data, length); end(); }
 
 private:
 	// internal helpers
-    void copyfrom(const hash_collection &src);
+	void copyfrom(const hash_collection &src);
 
 	// internal state
-	astring					m_flags;
-	bool					m_has_crc32;
-	crc32_t					m_crc32;
-	bool					m_has_sha1;
-	sha1_t					m_sha1;
+	astring                 m_flags;
+	bool                    m_has_crc32;
+	crc32_t                 m_crc32;
+	bool                    m_has_sha1;
+	sha1_t                  m_sha1;
 
 	// creators
 	struct hash_creator
 	{
-		bool					m_doing_crc32;
-		crc32_creator			m_crc32_creator;
-		bool					m_doing_sha1;
-		sha1_creator			m_sha1_creator;
+		bool                    m_doing_crc32;
+		crc32_creator           m_crc32_creator;
+		bool                    m_doing_sha1;
+		sha1_creator            m_sha1_creator;
 	};
-	hash_creator *			m_creator;
+	hash_creator *          m_creator;
 };
 
 
-#endif	/* __HASH_H__ */
+#endif  /* __HASH_H__ */

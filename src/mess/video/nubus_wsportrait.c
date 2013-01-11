@@ -14,10 +14,10 @@
 #include "emu.h"
 #include "video/nubus_wsportrait.h"
 
-#define WSPORTRAIT_SCREEN_NAME	"wsport_screen"
+#define WSPORTRAIT_SCREEN_NAME  "wsport_screen"
 #define WSPORTRAIT_ROM_REGION  "wsport_rom"
 
-#define VRAM_SIZE	(0x80000)	// 512k max
+#define VRAM_SIZE   (0x80000)   // 512k max
 
 MACHINE_CONFIG_FRAGMENT( wsportrait )
 	MCFG_SCREEN_ADD( WSPORTRAIT_SCREEN_NAME, RASTER)
@@ -67,14 +67,14 @@ const rom_entry *nubus_wsportrait_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_WSPORTRAIT, "Macintosh II Portrait Video Card", tag, owner, clock),
+		device_t(mconfig, NUBUS_WSPORTRAIT, "Macintosh II Portrait Video Card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_wspt";
 }
 
 nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_wspt";
@@ -94,7 +94,7 @@ void nubus_wsportrait_device::device_start()
 
 	slotspace = get_slotspace();
 
-  printf("[wsportrait %p] slotspace = %x\n", this, slotspace);
+	printf("[wsportrait %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	m_vram32 = (UINT32 *)m_vram;
@@ -104,7 +104,7 @@ void nubus_wsportrait_device::device_start()
 	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_wsportrait_device::wsportrait_r), this), write32_delegate(FUNC(nubus_wsportrait_device::wsportrait_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -220,7 +220,7 @@ WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 
 	switch (offset)
 	{
-		case 1:			// mode control
+		case 1:         // mode control
 //          printf("%08x to mode 1\n", data);
 			switch (data & 0xff000000)
 			{
@@ -240,11 +240,11 @@ WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 			}
 			break;
 
-		case 0x4038:	// DAC control
+		case 0x4038:    // DAC control
 			m_clutoffs = (data>>24)&0xff;
 			break;
 
-		case 0x4039:	// DAC data - only 4 bits per component!
+		case 0x4039:    // DAC data - only 4 bits per component!
 			m_colors[m_count] = (data>>24) & 0x0f;
 			m_colors[m_count] |= (m_colors[m_count]<<4);
 			m_count++;
@@ -278,23 +278,23 @@ READ32_MEMBER( nubus_wsportrait_device::wsportrait_r )
 //  printf("wsportrait: Read @ %x, mask %08x\n", offset, mem_mask);
 
 	/*
-      monitor types
+	  monitor types
 
-      0x0 = invalid
-      0x2 = invalid
-      0x4 = color: 640x870 1bpp, 640x480 2bpp and 4bpp
-      0x6 = 1bpp 640x384? and sets weird mode controls
-      0x8 = really odd (bitplaned?)
-      0xa = invalid
-      0xc = 640x480 grayscale
-      0xe = same as 0x6
-    */
+	  0x0 = invalid
+	  0x2 = invalid
+	  0x4 = color: 640x870 1bpp, 640x480 2bpp and 4bpp
+	  0x6 = 1bpp 640x384? and sets weird mode controls
+	  0x8 = really odd (bitplaned?)
+	  0xa = invalid
+	  0xc = 640x480 grayscale
+	  0xe = same as 0x6
+	*/
 
 	switch (offset)
 	{
 		case 0x4004:
 			m_toggle ^= 0x00010000;
-			return m_toggle | 0xfffc0000;	// bit 0 = vbl status, bits 1-3 = monitor type
+			return m_toggle | 0xfffc0000;   // bit 0 = vbl status, bits 1-3 = monitor type
 	}
 	return 0;
 }

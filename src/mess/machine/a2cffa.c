@@ -19,7 +19,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_A2CFFA	1
+#define LOG_A2CFFA  1
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -32,17 +32,17 @@ const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 #define CFFA2_IDE_TAG     "cffa2_ide"
 
 MACHINE_CONFIG_FRAGMENT( cffa2 )
-    MCFG_IDE_CONTROLLER_ADD(CFFA2_IDE_TAG, ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_ADD(CFFA2_IDE_TAG, ide_image_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 ROM_START( cffa2 )
 	ROM_REGION(0x1000, CFFA2_ROM_REGION, 0)
-    ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) )
+	ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) )
 ROM_END
 
 ROM_START( cffa2_6502 )
 	ROM_REGION(0x1000, CFFA2_ROM_REGION, 0)
-    ROM_LOAD( "cffa20ee02.bin", 0x000000, 0x001000, CRC(3ecafce5) SHA1(d600692ed9626668233a22a48236af639410cb7b) )
+	ROM_LOAD( "cffa20ee02.bin", 0x000000, 0x001000, CRC(3ecafce5) SHA1(d600692ed9626668233a22a48236af639410cb7b) )
 ROM_END
 
 /***************************************************************************
@@ -79,21 +79,21 @@ const rom_entry *a2bus_cffa2_6502_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-    device_t(mconfig, type, name, tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this),
-    m_ide(*this, CFFA2_IDE_TAG)
+	device_t(mconfig, type, name, tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_ide(*this, CFFA2_IDE_TAG)
 {
 }
 
 a2bus_cffa2_device::a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)", tag, owner, clock),
+	a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)", tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {
 	m_shortname = "a2cffa2";
 }
 
 a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)", tag, owner, clock),
+	a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)", tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {
 	m_shortname = "a2cffa02";
@@ -207,10 +207,10 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 
 UINT8 a2bus_cffa2000_device::read_cnxx(address_space &space, UINT8 offset)
 {
-    int slotimg = m_slot * 0x100;
+	int slotimg = m_slot * 0x100;
 
-    // ROM contains a CnXX image for each of slots 1-7
-    return m_eeprom[offset+slotimg];
+	// ROM contains a CnXX image for each of slots 1-7
+	return m_eeprom[offset+slotimg];
 }
 
 /*-------------------------------------------------
@@ -219,7 +219,7 @@ UINT8 a2bus_cffa2000_device::read_cnxx(address_space &space, UINT8 offset)
 
 UINT8 a2bus_cffa2000_device::read_c800(address_space &space, UINT16 offset)
 {
-    return m_eeprom[offset+0x800];
+	return m_eeprom[offset+0x800];
 }
 
 void a2bus_cffa2000_device::write_c800(address_space &space, UINT16 offset, UINT8 data)
@@ -261,4 +261,3 @@ void a2bus_cffa2_6502_device::nvram_write(emu_file &file)
 {
 	file.write(m_eeprom, 0x1000);
 }
-

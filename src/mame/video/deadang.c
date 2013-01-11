@@ -135,15 +135,15 @@ UINT32 deadang_state::screen_update_deadang(screen_device &screen, bitmap_ind16 
 	m_pf2_layer->set_scrollx(0, ((m_scroll_ram[0x29]&0xf0)<<4)+((m_scroll_ram[0x2a]&0x7f)<<1)+((m_scroll_ram[0x2a]&0x80)>>7) );
 
 	/* Control byte:
-        0x01: Background playfield disable
-        0x02: Middle playfield disable
-        0x04: Top playfield disable
-        0x08: ?  Toggles at start of game
-        0x10: Sprite disable
-        0x20: Unused?
-        0x40: Flipscreen
-        0x80: Always set?
-    */
+	    0x01: Background playfield disable
+	    0x02: Middle playfield disable
+	    0x04: Top playfield disable
+	    0x08: ?  Toggles at start of game
+	    0x10: Sprite disable
+	    0x20: Unused?
+	    0x40: Flipscreen
+	    0x80: Always set?
+	*/
 	m_pf3_layer->enable(!(m_scroll_ram[0x34]&1));
 	m_pf1_layer->enable(!(m_scroll_ram[0x34]&2));
 	m_pf2_layer->enable(!(m_scroll_ram[0x34]&4));

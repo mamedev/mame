@@ -113,37 +113,37 @@ has twice the steps, happening twice as fast.
  *
  *************************************/
 
-#define ENABLE_REGISTER_TEST		(0)		/* Enable preprogrammed registers */
+#define ENABLE_REGISTER_TEST        (0)     /* Enable preprogrammed registers */
 
 #define MAX_OUTPUT 0x7fff
 #define NUM_CHANNELS 3
 
 /* register id's */
-#define AY_AFINE	(0)
-#define AY_ACOARSE	(1)
-#define AY_BFINE	(2)
-#define AY_BCOARSE	(3)
-#define AY_CFINE	(4)
-#define AY_CCOARSE	(5)
-#define AY_NOISEPER	(6)
-#define AY_ENABLE	(7)
-#define AY_AVOL		(8)
-#define AY_BVOL		(9)
-#define AY_CVOL		(10)
-#define AY_EFINE	(11)
-#define AY_ECOARSE	(12)
-#define AY_ESHAPE	(13)
+#define AY_AFINE    (0)
+#define AY_ACOARSE  (1)
+#define AY_BFINE    (2)
+#define AY_BCOARSE  (3)
+#define AY_CFINE    (4)
+#define AY_CCOARSE  (5)
+#define AY_NOISEPER (6)
+#define AY_ENABLE   (7)
+#define AY_AVOL     (8)
+#define AY_BVOL     (9)
+#define AY_CVOL     (10)
+#define AY_EFINE    (11)
+#define AY_ECOARSE  (12)
+#define AY_ESHAPE   (13)
 
-#define AY_PORTA	(14)
-#define AY_PORTB	(15)
+#define AY_PORTA    (14)
+#define AY_PORTB    (15)
 
-#define NOISE_ENABLEQ(_psg, _chan)	(((_psg)->regs[AY_ENABLE] >> (3 + _chan)) & 1)
-#define TONE_ENABLEQ(_psg, _chan)	(((_psg)->regs[AY_ENABLE] >> (_chan)) & 1)
-#define TONE_PERIOD(_psg, _chan)	( (_psg)->regs[(_chan) << 1] | (((_psg)->regs[((_chan) << 1) | 1] & 0x0f) << 8) )
-#define NOISE_PERIOD(_psg)			( (_psg)->regs[AY_NOISEPER] & 0x1f)
-#define TONE_VOLUME(_psg, _chan)	( (_psg)->regs[AY_AVOL + (_chan)] & 0x0f)
-#define TONE_ENVELOPE(_psg, _chan)	(((_psg)->regs[AY_AVOL + (_chan)] >> 4) & (((_psg)->device->type() == AY8914) ? 3 : 1))
-#define ENVELOPE_PERIOD(_psg)		(((_psg)->regs[AY_EFINE] | ((_psg)->regs[AY_ECOARSE]<<8)))
+#define NOISE_ENABLEQ(_psg, _chan)  (((_psg)->regs[AY_ENABLE] >> (3 + _chan)) & 1)
+#define TONE_ENABLEQ(_psg, _chan)   (((_psg)->regs[AY_ENABLE] >> (_chan)) & 1)
+#define TONE_PERIOD(_psg, _chan)    ( (_psg)->regs[(_chan) << 1] | (((_psg)->regs[((_chan) << 1) | 1] & 0x0f) << 8) )
+#define NOISE_PERIOD(_psg)          ( (_psg)->regs[AY_NOISEPER] & 0x1f)
+#define TONE_VOLUME(_psg, _chan)    ( (_psg)->regs[AY_AVOL + (_chan)] & 0x0f)
+#define TONE_ENVELOPE(_psg, _chan)  (((_psg)->regs[AY_AVOL + (_chan)] >> 4) & (((_psg)->device->type() == AY8914) ? 3 : 1))
+#define ENVELOPE_PERIOD(_psg)       (((_psg)->regs[AY_EFINE] | ((_psg)->regs[AY_ECOARSE]<<8)))
 
 /*************************************
  *
@@ -198,14 +198,14 @@ INLINE ay8910_context *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AY8910 ||
-		   device->type() == AY8912 ||
-		   device->type() == AY8913 ||
-		   device->type() == AY8914 ||
-		   device->type() == AY8930 ||
-		   device->type() == YM2149 ||
-		   device->type() == YM3439 ||
-		   device->type() == YMZ284 ||
-		   device->type() == YMZ294);
+			device->type() == AY8912 ||
+			device->type() == AY8913 ||
+			device->type() == AY8914 ||
+			device->type() == AY8930 ||
+			device->type() == YM2149 ||
+			device->type() == YM3439 ||
+			device->type() == YMZ284 ||
+			device->type() == YMZ294);
 	return (ay8910_context *)downcast<ay8910_device *>(device)->token();
 }
 
@@ -221,7 +221,7 @@ static const ay_ym_param ym2149_param =
 	630, 801,
 	16,
 	{ 73770, 37586, 27458, 21451, 15864, 12371, 8922,  6796,
-	   4763,  3521,  2403,  1737,  1123,   762,  438,   251 },
+		4763,  3521,  2403,  1737,  1123,   762,  438,   251 },
 };
 
 static const ay_ym_param ym2149_param_env =
@@ -229,9 +229,9 @@ static const ay_ym_param ym2149_param_env =
 	630, 801,
 	32,
 	{ 103350, 73770, 52657, 37586, 32125, 27458, 24269, 21451,
-	   18447, 15864, 14009, 12371, 10506,  8922,  7787,  6796,
-	    5689,  4763,  4095,  3521,  2909,  2403,  2043,  1737,
-	    1397,  1123,   925,   762,   578,   438,   332,   251 },
+		18447, 15864, 14009, 12371, 10506,  8922,  7787,  6796,
+		5689,  4763,  4095,  3521,  2909,  2403,  2043,  1737,
+		1397,  1123,   925,   762,   578,   438,   332,   251 },
 };
 
 #if 0
@@ -241,7 +241,7 @@ static const ay_ym_param ay8910_param =
 	664, 913,
 	16,
 	{ 85785, 34227, 26986, 20398, 14886, 10588,  7810,  4856,
-	   4120,  2512,  1737,  1335,  1005,   747,   586,    451 },
+		4120,  2512,  1737,  1335,  1005,   747,   586,    451 },
 };
 
 /*
@@ -254,7 +254,7 @@ static const ay_ym_param ay8910_param =
 	930, 454,
 	16,
 	{ 85066, 34179, 27027, 20603, 15046, 10724, 7922, 4935,
-	   4189,  2557,  1772,  1363,  1028,  766,   602,  464 },
+		4189,  2557,  1772,  1363,  1028,  766,   602,  464 },
 };
 
 /*
@@ -267,7 +267,7 @@ static const ay_ym_param ay8910_param =
 	1371, 313,
 	16,
 	{ 93399, 33289, 25808, 19285, 13940, 9846,  7237,  4493,
-	   3814,  2337,  1629,  1263,   962,  727,   580,   458 },
+		3814,  2337,  1629,  1263,   962,  727,   580,   458 },
 };
 
 /*
@@ -278,7 +278,7 @@ static const ay_ym_param ay8910_param =
 	5806, 300,
 	16,
 	{ 118996, 42698, 33105, 24770, 17925, 12678,  9331,  5807,
-        4936,  3038,  2129,  1658,  1271,   969,   781,   623 }
+		4936,  3038,  2129,  1658,  1271,   969,   781,   623 }
 };
 #endif
 
@@ -326,7 +326,7 @@ static const ay_ym_param ay8910_param =
 	800000, 8000000,
 	16,
 	{ 15950, 15350, 15090, 14760, 14275, 13620, 12890, 11370,
-      10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
+		10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
 };
 
 /*************************************
@@ -488,14 +488,14 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			break;
 		case AY_ENABLE:
 			if ((psg->last_enable == -1) ||
-			    ((psg->last_enable & 0x40) != (psg->regs[AY_ENABLE] & 0x40)))
+				((psg->last_enable & 0x40) != (psg->regs[AY_ENABLE] & 0x40)))
 			{
 				/* write out 0xff if port set to input */
 				psg->portAwrite(0, (psg->regs[AY_ENABLE] & 0x40) ? psg->regs[AY_PORTA] : 0xff);
 			}
 
 			if ((psg->last_enable == -1) ||
-			    ((psg->last_enable & 0x80) != (psg->regs[AY_ENABLE] & 0x80)))
+				((psg->last_enable & 0x80) != (psg->regs[AY_ENABLE] & 0x80)))
 			{
 				/* write out 0xff if port set to input */
 				psg->portBwrite(0, (psg->regs[AY_ENABLE] & 0x80) ? psg->regs[AY_PORTB] : 0xff);
@@ -600,7 +600,7 @@ static STREAM_UPDATE( ay8910_update )
 		if (psg->count_noise >= NOISE_PERIOD(psg))
 		{
 			/* Is noise output going to change? */
-			if ((psg->rng + 1) & 2)	/* (bit0^bit1)? */
+			if ((psg->rng + 1) & 2) /* (bit0^bit1)? */
 			{
 				psg->output_noise ^= 1;
 			}
@@ -683,8 +683,8 @@ static STREAM_UPDATE( ay8910_update )
 			*(buf[0]++) = mix_3D(psg);
 #if 0
 			*(buf[0]) = (  vol_enabled[0] * psg->vol_table[psg->Vol[0]]
-			             + vol_enabled[1] * psg->vol_table[psg->Vol[1]]
-			             + vol_enabled[2] * psg->vol_table[psg->Vol[2]]) / psg->step;
+							+ vol_enabled[1] * psg->vol_table[psg->Vol[1]]
+							+ vol_enabled[2] * psg->vol_table[psg->Vol[2]]) / psg->step;
 #endif
 		}
 		samples--;
@@ -693,8 +693,8 @@ static STREAM_UPDATE( ay8910_update )
 
 static void build_mixer_table(ay8910_context *psg)
 {
-	int	normalize = 0;
-	int	chan;
+	int normalize = 0;
+	int chan;
 
 	if ((psg->intf->flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
@@ -708,9 +708,9 @@ static void build_mixer_table(ay8910_context *psg)
 		build_single_table(psg->intf->res_load[chan], psg->par_env, normalize, psg->env_table[chan], 0);
 	}
 	/*
-     * The previous implementation added all three channels up instead of averaging them.
-     * The factor of 3 will force the same levels if normalizing is used.
-     */
+	 * The previous implementation added all three channels up instead of averaging them.
+	 * The factor of 3 will force the same levels if normalizing is used.
+	 */
 	build_3D_table(psg->intf->res_load[0], psg->par, psg->par_env, normalize, 3, psg->zero_is_off, psg->vol3d_table);
 }
 
@@ -773,7 +773,7 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 		info->step = 2;
 		info->par = &ay8910_param;
 		info->par_env = &ay8910_param;
-		info->zero_is_off = 0;		/* FIXME: Remove after verification that off=vol(0) */
+		info->zero_is_off = 0;      /* FIXME: Remove after verification that off=vol(0) */
 		info->env_step_mask = 0x0F;
 	}
 	else
@@ -821,7 +821,7 @@ void ay8910_reset_ym(void *chip)
 	psg->count_noise = 0;
 	psg->count_env = 0;
 	psg->output_noise = 0x01;
-	psg->last_enable = -1;	/* force a write */
+	psg->last_enable = -1;  /* force a write */
 	for (i = 0;i < AY_PORTA;i++)
 		ay8910_write_reg(psg,i,0);
 	psg->ready = 1;
@@ -864,7 +864,7 @@ void ay8910_write_ym(void *chip, int addr, int data)
 	ay8910_context *psg = (ay8910_context *)chip;
 
 	if (addr & 1)
-	{	/* Data port */
+	{   /* Data port */
 		int r = psg->register_latch;
 
 		if (r > 15) return;
@@ -877,7 +877,7 @@ void ay8910_write_ym(void *chip, int addr, int data)
 		ay8910_write_reg(psg,r,data);
 	}
 	else
-	{	/* Register port */
+	{   /* Register port */
 		psg->register_latch = data & 0x0f;
 	}
 }
@@ -899,9 +899,9 @@ int ay8910_read_ym(void *chip)
 		if ((psg->regs[AY_ENABLE] & 0x40) != 0)
 			logerror("warning: read from 8910 '%s' Port A set as output\n",psg->device->tag());
 		/*
-           even if the port is set as output, we still need to return the external
-           data. Some games, like kidniki, need this to work.
-         */
+		   even if the port is set as output, we still need to return the external
+		   data. Some games, like kidniki, need this to work.
+		 */
 		if (!psg->portAread.isnull())
 			psg->regs[AY_PORTA] = psg->portAread(0);
 		else
@@ -918,11 +918,11 @@ int ay8910_read_ym(void *chip)
 	}
 
 	/* Depending on chip type, unused bits in registers may or may not be accessible.
-    Untested chips are assumed to regard them as 'ram'
-    Tested and confirmed on hardware:
-    - AY-3-8910: inaccessible bits (see masks below) read back as 0
-    - YM2149: no anomaly
-    */
+	Untested chips are assumed to regard them as 'ram'
+	Tested and confirmed on hardware:
+	- AY-3-8910: inaccessible bits (see masks below) read back as 0
+	- YM2149: no anomaly
+	*/
 	if (chip_type == AY8910) {
 		const UINT8 mask[0x10]={
 			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x1f,0x1f,0x1f,0xff,0xff,0x0f,0xff,0xff
@@ -1040,13 +1040,13 @@ const device_type AY8910 = &device_creator<ay8910_device>;
 
 ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ay8910_context);
 }
 ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ay8910_context);
 }
@@ -1254,5 +1254,3 @@ void ymz294_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

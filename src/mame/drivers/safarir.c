@@ -125,13 +125,13 @@ WRITE8_MEMBER(safarir_state::ram_bank_w)
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 chars */
-	128,	/* 128 characters */
-	1,		/* 1 bit per pixel */
+	8,8,    /* 8*8 chars */
+	128,    /* 128 characters */
+	1,      /* 1 bit per pixel */
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 
@@ -159,7 +159,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 	UINT8 code = ram_r(space,tile_index | 0x400);
 
 	if (code & 0x80)
-		color = 6;	/* yellow */
+		color = 6;  /* yellow */
 	else
 	{
 		color = ((~tile_index & 0x04) >> 2) | ((tile_index & 0x04) >> 1);
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 	UINT8 code = ram_r(space,tile_index);
 
 	if (code & 0x80)
-		color = 7;	/* white */
+		color = 7;  /* white */
 	else
 		color = (~tile_index & 0x04) | ((tile_index >> 1) & 0x03);
 
@@ -218,24 +218,24 @@ UINT32 safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-#define SAMPLE_SOUND1_1		0
-#define SAMPLE_SOUND1_2		1
-#define SAMPLE_SOUND2		2
-#define SAMPLE_SOUND3		3
-#define SAMPLE_SOUND4_1		4
-#define SAMPLE_SOUND4_2		5
-#define SAMPLE_SOUND5_1		6
-#define SAMPLE_SOUND5_2		7
-#define SAMPLE_SOUND6		8
-#define SAMPLE_SOUND7		9
-#define SAMPLE_SOUND8		10
+#define SAMPLE_SOUND1_1     0
+#define SAMPLE_SOUND1_2     1
+#define SAMPLE_SOUND2       2
+#define SAMPLE_SOUND3       3
+#define SAMPLE_SOUND4_1     4
+#define SAMPLE_SOUND4_2     5
+#define SAMPLE_SOUND5_1     6
+#define SAMPLE_SOUND5_2     7
+#define SAMPLE_SOUND6       8
+#define SAMPLE_SOUND7       9
+#define SAMPLE_SOUND8       10
 
-#define CHANNEL_SOUND1		0
-#define CHANNEL_SOUND2		1
-#define CHANNEL_SOUND3		2
-#define CHANNEL_SOUND4		3
-#define CHANNEL_SOUND5		4
-#define CHANNEL_SOUND6		5
+#define CHANNEL_SOUND1      0
+#define CHANNEL_SOUND2      1
+#define CHANNEL_SOUND3      2
+#define CHANNEL_SOUND4      3
+#define CHANNEL_SOUND5      4
+#define CHANNEL_SOUND6      5
 
 
 WRITE8_MEMBER(safarir_state::safarir_audio_w)
@@ -296,7 +296,7 @@ static const char *const safarir_sample_names[] =
 
 static const samples_interface safarir_samples_interface =
 {
-	6,	/* 6 channels */
+	6,  /* 6 channels */
 	safarir_sample_names
 };
 
@@ -345,8 +345,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, safarir_state )
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ram_r, ram_w) AM_SHARE("ram")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READNOP AM_WRITE(ram_bank_w)
 	AM_RANGE(0x2c00, 0x2cff) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_SHARE("bg_scroll")
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)	/* goes to SN76477 */
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITENOP	/* cleared at the beginning */
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)    /* goes to SN76477 */
+	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITENOP  /* cleared at the beginning */
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS") AM_WRITENOP
 	AM_RANGE(0x3c00, 0x3cff) AM_MIRROR(0x03ff) AM_READ_PORT("DSW") AM_WRITENOP
 ADDRESS_MAP_END
@@ -403,7 +403,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( safarir, safarir_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)	/* 1.5 MHz ? */
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)  /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 

@@ -37,15 +37,15 @@ TODO:
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
-    if( VERBOSE_LEVEL >= n_level )
-    {
-        va_list v;
-        char buf[ 32768 ];
-        va_start( v, s_fmt );
-        vsprintf( buf, s_fmt, v );
-        va_end( v );
-        logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
-    }
+	if( VERBOSE_LEVEL >= n_level )
+	{
+		va_list v;
+		char buf[ 32768 ];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+	}
 }
 #else
 #define verboselog(x,y,z,...)
@@ -56,23 +56,23 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 *************************/
 
 static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
-    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
-    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
+	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
 #if ENABLE_UART_PRINTING
-    AM_RANGE(0x00301400, 0x00301403) AM_READ_LEGACY(uart_loopback_enable)
+	AM_RANGE(0x00301400, 0x00301403) AM_READ_LEGACY(uart_loopback_enable)
 #endif
 	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE_LEGACY("cdic", cdic_ram_r, cdic_ram_w)
-    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_SHARE("cdic_regs.ram")
+	//AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_SHARE("cdic_regs.ram")
 	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE_LEGACY("cdic", cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE_LEGACY("slave", slave_r, slave_w)
-    //AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-    AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8_LEGACY("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
-    AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-    AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE_LEGACY(mcd212_r, mcd212_w)
-    //AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-    AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
-    //AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-    AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE_LEGACY(scc68070_periphs_r, scc68070_periphs_w)
+	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
+	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8_LEGACY("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
+	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE_LEGACY(mcd212_r, mcd212_w)
+	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+	//AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
+	AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE_LEGACY(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
 /*************************
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 {
-    scc68070_regs_t *scc68070 = &m_scc68070_regs;
+	scc68070_regs_t *scc68070 = &m_scc68070_regs;
 	bool send = false;
 
 	switch((FPTR)param)
@@ -128,14 +128,14 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 
 static INPUT_PORTS_START( cdi )
 	PORT_START("MOUSEX")
-    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 
 	PORT_START("MOUSEY")
-    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
+	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DEBUG")
@@ -171,59 +171,59 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( quizard )
 	PORT_INCLUDE( cdi )
 
-    PORT_START("INPUT1")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x39)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x37)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x31)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x32)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x33)
-    PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("INPUT1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x39)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x37)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x31)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x32)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x33)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-    PORT_START("INPUT2")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x30)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x38)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x34)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x35)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x36)
-    PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("INPUT2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x30)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x38)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x34)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x35)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x36)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
 void cdi_state::machine_start()
 {
 
-    scc68070_register_globals(machine(), &m_scc68070_regs);
+	scc68070_register_globals(machine(), &m_scc68070_regs);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,cdi)
 {
-    UINT16 *src   = (UINT16*)memregion("maincpu")->base();
-    UINT16 *dst   = m_planea;
-    //device_t *cdrom_dev = machine().device("cdrom");
-    memcpy(dst, src, 0x8);
+	UINT16 *src   = (UINT16*)memregion("maincpu")->base();
+	UINT16 *dst   = m_planea;
+	//device_t *cdrom_dev = machine().device("cdrom");
+	memcpy(dst, src, 0x8);
 
-    scc68070_init(machine(), &m_scc68070_regs);
+	scc68070_init(machine(), &m_scc68070_regs);
 
-    machine().device("maincpu")->reset();
+	machine().device("maincpu")->reset();
 
-    m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-    m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
+	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
+	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrd12)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-    scc68070_set_quizard_mcu_value(machine(), 0x021f);
-    scc68070_set_quizard_mcu_ack(machine(), 0x5a);
+	scc68070_set_quizard_mcu_value(machine(), 0x021f);
+	scc68070_set_quizard_mcu_ack(machine(), 0x5a);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrd17)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-    scc68070_set_quizard_mcu_value(machine(), 0x021f);
-    scc68070_set_quizard_mcu_ack(machine(), 0x5a);
+	scc68070_set_quizard_mcu_value(machine(), 0x021f);
+	scc68070_set_quizard_mcu_ack(machine(), 0x5a);
 }
 
 /* Untested - copied from quizrd17 */
@@ -231,8 +231,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd18)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-    scc68070_set_quizard_mcu_value(machine(), 0x021f);
-    scc68070_set_quizard_mcu_ack(machine(), 0x5a);
+	scc68070_set_quizard_mcu_value(machine(), 0x021f);
+	scc68070_set_quizard_mcu_ack(machine(), 0x5a);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrd22)
@@ -244,7 +244,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd22)
 	// 0x188: German
 
 	scc68070_set_quizard_mcu_value(machine(), 0x188);
-    scc68070_set_quizard_mcu_ack(machine(), 0x59);
+	scc68070_set_quizard_mcu_ack(machine(), 0x59);
 }
 
 /* Untested - copied from quizrd22 */
@@ -257,7 +257,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd23)
 	// 0x188: German
 
 	scc68070_set_quizard_mcu_value(machine(), 0x188);
-    scc68070_set_quizard_mcu_ack(machine(), 0x59);
+	scc68070_set_quizard_mcu_ack(machine(), 0x59);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrd32)
@@ -265,7 +265,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd32)
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
 	scc68070_set_quizard_mcu_value(machine(), 0x00ae);
-    scc68070_set_quizard_mcu_ack(machine(), 0x58);
+	scc68070_set_quizard_mcu_ack(machine(), 0x58);
 }
 
 /* Untested - copied from quizrd32 */
@@ -274,7 +274,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd34)
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
 	scc68070_set_quizard_mcu_value(machine(), 0x00ae);
-    scc68070_set_quizard_mcu_ack(machine(), 0x58);
+	scc68070_set_quizard_mcu_ack(machine(), 0x58);
 }
 
 /* Untested - copied from quizrr41 */
@@ -323,46 +323,46 @@ static DEVICE_IMAGE_DISPLAY_INFO(cdi_cdinfo)
 
 static MACHINE_CONFIG_START( cdi, cdi_state )
 
-    MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
-    MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
+	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
+	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-    MCFG_SCREEN_SIZE(384, 302)
-    MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 22, 302-1) //dynamic resolution,TODO
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(384, 302)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 22, 302-1) //dynamic resolution,TODO
 	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1)
 
-    MCFG_SCREEN_ADD("lcd", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-    MCFG_SCREEN_SIZE(192, 22)
-    MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 22-1)
+	MCFG_SCREEN_ADD("lcd", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(192, 22)
+	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 22-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1_lcd)
 
-    MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100)
 
-    MCFG_DEFAULT_LAYOUT(layout_cdi)
+	MCFG_DEFAULT_LAYOUT(layout_cdi)
 
 
 
-    MCFG_CDICDIC_ADD( "cdic" )
-    MCFG_CDISLAVE_ADD( "slave" )
+	MCFG_CDICDIC_ADD( "cdic" )
+	MCFG_CDISLAVE_ADD( "slave" )
 
-    /* sound hardware */
-    MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-    MCFG_SOUND_ADD( "dac1", DMADAC, 0 )
-    MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+	MCFG_SOUND_ADD( "dac1", DMADAC, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 
-    MCFG_SOUND_ADD( "dac2", DMADAC, 0 )
-    MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	MCFG_SOUND_ADD( "dac2", DMADAC, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-    MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-    MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
-    MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-    MCFG_MK48T08_ADD( "mk48t08" )
+	MCFG_MK48T08_ADD( "mk48t08" )
 MACHINE_CONFIG_END
 
 struct cdrom_interface cdi_cdrom =
@@ -383,9 +383,9 @@ static MACHINE_CONFIG_DERIVED( cdimono1, cdi_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizard, cdi_base )
-    MCFG_CPU_MODIFY("maincpu")
-    MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
-    MCFG_CPU_VBLANK_INT("screen", scc68070_mcu_frame)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
+	MCFG_CPU_VBLANK_INT("screen", scc68070_mcu_frame)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd12, quizard )
@@ -448,11 +448,11 @@ ROM_START( cdimono1 )
 	//ROM_SYSTEM_BIOS( 3, "pcdi910m", "Philips CD-i 910" )
 	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 ROM_END
 
 
@@ -469,150 +469,150 @@ ROM_START( cdibios )
 	//ROM_SYSTEM_BIOS( 3, "pcdi910m", "Philips CD-i 910" )
 	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 ROM_END
 ROM_START( quizard )
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrd32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 ROM_END
 
 ROM_START( quizrd22 )
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrd22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 ROM_END
 
 ROM_START( quizrd17 )
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrd17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 ROM_END
 
 ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrd12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 ROM_END
 
 ROM_START( quizrd18 ) /* CD-ROM printed ??/?? */
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrd18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 ROM_END
 
 ROM_START( quizrd23 ) /* CD-ROM printed ??/?? */
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrd23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
 ROM_END
 
 ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrd34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 ROM_END
 
 ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrr42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 ROM_END
 
 ROM_START( quizrr41 )
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrr41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 ROM_END
 
 ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
-    ROM_REGION(0x80000, "maincpu", 0)
-    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
-    ROM_REGION(0x2000, "cdic", 0)
-    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    ROM_REGION(0x2000, "slave", 0)
-    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-    DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizrr40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 ROM_END
 
 
@@ -625,7 +625,7 @@ CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0, 
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
-GAME( 1995, cdibios,  0,    		 cdi_base,      quizard, driver_device,      0, ROT0,     "Philips",	  "CD-i Bios", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_IS_BIOS_ROOT )
+GAME( 1995, cdibios,  0,             cdi_base,      quizard, driver_device,      0, ROT0,     "Philips",      "CD-i Bios", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_IS_BIOS_ROOT )
 // Working
 GAME( 1995, quizrd12, cdibios,      quizrd12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizrd17, cdibios,      quizrd17,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
@@ -640,4 +640,3 @@ GAME( 1996, quizard,  cdibios,      quizrd32,      quizard, driver_device,      
 GAME( 1997, quizrr40, cdibios,      quizrr40,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.0", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1998, quizrr41, cdibios,      quizrr41,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1998, quizrr42, cdibios,      quizrr42,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-

@@ -25,10 +25,10 @@
 /* output lines on the CoCo cartridge slot */
 enum cococart_line
 {
-	COCOCART_LINE_CART,				/* connects to PIA1 CB1 */
-	COCOCART_LINE_NMI,				/* connects to NMI line on CPU */
-	COCOCART_LINE_HALT,				/* connects to HALT line on CPU */
-	COCOCART_LINE_SOUND_ENABLE		/* sound enable */
+	COCOCART_LINE_CART,             /* connects to PIA1 CB1 */
+	COCOCART_LINE_NMI,              /* connects to NMI line on CPU */
+	COCOCART_LINE_HALT,             /* connects to HALT line on CPU */
+	COCOCART_LINE_SOUND_ENABLE      /* sound enable */
 };
 
 /* since we have a special value "Q" - we have to use a special enum here */
@@ -41,22 +41,22 @@ enum cococart_line_value
 
 struct coco_cartridge_line
 {
-	emu_timer					*timer[TIMER_POOL];
-	int                 		timer_index;
-	int							delay;
-	cococart_line_value			value;
-	int							line;
-	int							q_count;
-	devcb_resolved_write_line	callback;
+	emu_timer                   *timer[TIMER_POOL];
+	int                         timer_index;
+	int                         delay;
+	cococart_line_value         value;
+	int                         line;
+	int                         q_count;
+	devcb_resolved_write_line   callback;
 };
 
 // ======================> cococart_interface
 
 struct cococart_interface
 {
-    devcb_write_line	m_cart_callback;
-    devcb_write_line	m_nmi_callback;
-    devcb_write_line	m_halt_callback;
+	devcb_write_line    m_cart_callback;
+	devcb_write_line    m_nmi_callback;
+	devcb_write_line    m_halt_callback;
 };
 
 // ======================> cococart_base_update_delegate
@@ -69,9 +69,9 @@ typedef delegate<void (UINT8 *)> cococart_base_update_delegate;
 class device_cococart_interface;
 
 class cococart_slot_device : public device_t,
-							 public cococart_interface,
-							 public device_slot_interface,
-							 public device_image_interface
+								public cococart_interface,
+								public device_slot_interface,
+								public device_image_interface
 {
 public:
 	// construction/destruction
@@ -105,7 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 	/* sets a cartridge line */
-    void cart_set_line(cococart_line line, cococart_line_value value);
+	void cart_set_line(cococart_line line, cococart_line_value value);
 
 	/* hack to support twiddling the Q line */
 	void twiddle_q_lines();
@@ -124,11 +124,11 @@ protected:
 	void twiddle_line_if_q(coco_cartridge_line *line);
 
 	// configuration
-	coco_cartridge_line			m_cart_line;
-	coco_cartridge_line			m_nmi_line;
-	coco_cartridge_line			m_halt_line;
+	coco_cartridge_line         m_cart_line;
+	coco_cartridge_line         m_nmi_line;
+	coco_cartridge_line         m_halt_line;
 
-	device_cococart_interface	*m_cart;
+	device_cococart_interface   *m_cart;
 };
 
 // device type definition
@@ -165,7 +165,7 @@ private:
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
-#define MCFG_COCO_CARTRIDGE_REMOVE(_tag)		\
-    MCFG_DEVICE_REMOVE(_tag)
+#define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
+	MCFG_DEVICE_REMOVE(_tag)
 
 #endif /* __COCOCART_H__ */

@@ -256,23 +256,23 @@ public:
 	virtual void machine_reset();
 
 	// Some values to keep
-	tms9995_device		*m_cpu;
-	tms9901_device		*m_tms9901;
-	gromport_device		*m_gromport;
-	peribox_device		*m_peribox;
-	ti998_mapper_device	*m_mapper;
-	joyport_device* 	m_joyport;
-	ti_video_device*	m_video;
+	tms9995_device      *m_cpu;
+	tms9901_device      *m_tms9901;
+	gromport_device     *m_gromport;
+	peribox_device      *m_peribox;
+	ti998_mapper_device *m_mapper;
+	joyport_device*     m_joyport;
+	ti_video_device*    m_video;
 
-	int 	m_firstjoy;			// First joystick. 14 for TI-99/8
+	int     m_firstjoy;         // First joystick. 14 for TI-99/8
 
-	int		m_ready_line, m_ready_line1;
+	int     m_ready_line, m_ready_line1;
 
 private:
 	/* Keyboard support */
-	void	set_keyboard_column(int number, int data);
-	int		m_keyboard_column;
-	int		m_alphalock_line;
+	void    set_keyboard_column(int number, int data);
+	int     m_keyboard_column;
+	int     m_alphalock_line;
 };
 
 /*
@@ -427,41 +427,41 @@ static GROM_CONFIG(grom2_config)
 #define pascal0_region "pascal0_region"
 #define pascal12_region "pascal12_region"
 
-#define MCFG_GROM_LIBRARY_ADD(_tag, _config)	\
-	MCFG_DEVICE_ADD(#_tag "0", GROM, 0)	\
+#define MCFG_GROM_LIBRARY_ADD(_tag, _config)    \
+	MCFG_DEVICE_ADD(#_tag "0", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##0) \
-	MCFG_DEVICE_ADD(#_tag "1", GROM, 0)	\
+	MCFG_DEVICE_ADD(#_tag "1", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##1) \
-	MCFG_DEVICE_ADD(#_tag "2", GROM, 0)	\
+	MCFG_DEVICE_ADD(#_tag "2", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##2) \
-	MCFG_DEVICE_ADD(#_tag "3", GROM, 0)	\
+	MCFG_DEVICE_ADD(#_tag "3", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##3) \
-	MCFG_DEVICE_ADD(#_tag "4", GROM, 0)	\
+	MCFG_DEVICE_ADD(#_tag "4", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##4) \
-	MCFG_DEVICE_ADD(#_tag "5", GROM, 0)	\
+	MCFG_DEVICE_ADD(#_tag "5", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##5) \
-	MCFG_DEVICE_ADD(#_tag "6", GROM, 0)	\
+	MCFG_DEVICE_ADD(#_tag "6", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##6) \
-	MCFG_DEVICE_ADD(#_tag "7", GROM, 0)	\
+	MCFG_DEVICE_ADD(#_tag "7", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##7)
 
 #define GROM_LIBRARY_CONFIG(_conf, _region) \
 static GROM_CONFIG(_conf##0) \
-{	false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
+{   false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##1) \
-{	false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
+{   false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##2) \
-{	false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
+{   false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##3) \
-{	false, 3, _region, 0x6000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
+{   false, 3, _region, 0x6000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##4) \
-{	false, 4, _region, 0x8000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
+{   false, 4, _region, 0x8000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##5) \
-{	false, 5, _region, 0xa000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
+{   false, 5, _region, 0xa000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##6) \
-{	false, 6, _region, 0xc000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
+{   false, 6, _region, 0xc000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ }; \
 static GROM_CONFIG(_conf##7) \
-{	false, 7, _region, 0xe000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ };
+{   false, 7, _region, 0xe000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready), GROMFREQ };
 
 GROM_LIBRARY_CONFIG(pascal0, pascal0_region)
 GROM_LIBRARY_CONFIG(pascal1, pascal12_region)
@@ -475,10 +475,10 @@ static GROMPORT_CONFIG(console_cartslot)
 
 static PERIBOX_CONFIG( peribox_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, extint),			// INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, notconnected),		// INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready),	// READY
-	0x70000												// Address bus prefix (AMA/AMB/AMC)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, extint),         // INTA
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, notconnected),       // INTB
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready),  // READY
+	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
 };
 
 READ8_MEMBER( ti99_8_state::cruread )
@@ -592,8 +592,8 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 */
 void ti99_8_state::set_keyboard_column(int number, int data)
 {
-	if (data != 0)		m_keyboard_column |= 1 << number;
-	else				m_keyboard_column &= ~(1 << number);
+	if (data != 0)      m_keyboard_column |= 1 << number;
+	else                m_keyboard_column &= ~(1 << number);
 
 	if (m_keyboard_column >= m_firstjoy)
 	{
@@ -792,17 +792,17 @@ WRITE_LINE_MEMBER( ti99_8_state::clock_out )
 static TMS9995_CONFIG( ti99_8_processor_config )
 {
 	DEVCB_DRIVER_MEMBER(ti99_8_state, external_operation),
-	DEVCB_NULL,		// Instruction acquisition
+	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, clock_out),
-	DEVCB_NULL,		// wait
-	DEVCB_NULL,		// HOLDA
+	DEVCB_NULL,     // wait
+	DEVCB_NULL,     // HOLDA
 	NO_INTERNAL_RAM,
 	NO_OVERFLOW_INT
 };
 
 static TI_SOUND_CONFIG( sound_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready)	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready)   // READY
 };
 
 /*
@@ -841,13 +841,13 @@ static TI_SOUND_CONFIG( sound_conf )
 */
 
 #define PASCAL_GROM_LIB(_tag, _addr) \
-	{ _tag "0",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },	\
-	{ _tag "1",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },	\
-	{ _tag "2",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },	\
-	{ _tag "3",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },	\
-	{ _tag "4",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },	\
-	{ _tag "5",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },	\
-	{ _tag "6",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },	\
+	{ _tag "0",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
+	{ _tag "1",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
+	{ _tag "2",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
+	{ _tag "3",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
+	{ _tag "4",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
+	{ _tag "5",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
+	{ _tag "6",     PATGEN, CONT, _addr, 0xfff1, 0x0000    },   \
 	{ _tag "7",     PATGEN, CONT, _addr, 0xfff1, 0x0000    }
 
 
@@ -857,58 +857,58 @@ static const mapper8_list_entry mapper_devices[] =
 	// GROMs: According to the spec, the 99/8 supports up to 4 GROM libraries
 	// (99/4A supports 256 libraries)
 	// at 9800, 9804, 9808, 980c. Address counter access is at 9802,6,a,e. Write access +0400.
-	{ ROM0NAME,			TI99EM, STOP, 0x0000, 0xe000, 0x0000	},	// 0000-1fff
+	{ ROM0NAME,         TI99EM, STOP, 0x0000, 0xe000, 0x0000    },  // 0000-1fff
 
-	{ TISOUND_TAG,  	TI99EM, STOP, 0x8400, 0xfff0, 0x0000	},	// 8400-840f
-	{ VIDEO_SYSTEM_TAG,	TI99EM, STOP, 0x8800, 0xfffd, 0x0400	},	// 8800,8802 / 8c00,8c02
-	{ SPEECH_TAG,		TI99EM, STOP, 0x9000, 0xfff0, 0x0400	},	// 9000-900f / 9400-940f
-	{ SRAMNAME,			TI99EM, STOP, 0x8000, 0xf800, 0x0000	},	// 8000-87ff; must follow the sound generator
-	{ MAPPER_TAG,		TI99EM, STOP, 0x8810, 0xfff0, 0x0000	},
+	{ TISOUND_TAG,      TI99EM, STOP, 0x8400, 0xfff0, 0x0000    },  // 8400-840f
+	{ VIDEO_SYSTEM_TAG, TI99EM, STOP, 0x8800, 0xfffd, 0x0400    },  // 8800,8802 / 8c00,8c02
+	{ SPEECH_TAG,       TI99EM, STOP, 0x9000, 0xfff0, 0x0400    },  // 9000-900f / 9400-940f
+	{ SRAMNAME,         TI99EM, STOP, 0x8000, 0xf800, 0x0000    },  // 8000-87ff; must follow the sound generator
+	{ MAPPER_TAG,       TI99EM, STOP, 0x8810, 0xfff0, 0x0000    },
 
-	{ GROM0_TAG,    	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// 9800,2,4,...e/9c00,2,4,...e
-	{ GROM1_TAG,    	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// dto.
-	{ GROM2_TAG,    	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// dto. (GROMs are connected in parallel,
-	{ GROMPORT_TAG, 	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// dto.  use internal address counter and id)
+	{ GROM0_TAG,        TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // 9800,2,4,...e/9c00,2,4,...e
+	{ GROM1_TAG,        TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // dto.
+	{ GROM2_TAG,        TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // dto. (GROMs are connected in parallel,
+	{ GROMPORT_TAG,     TI99EM, CONT, 0x9800, 0xfff1, 0x0400    },  // dto.  use internal address counter and id)
 
 	// TI-99/8 mode
-	{ SRAMNAME,			NATIVE, STOP, 0xf000, 0xf800, 0x0000	},	// f000-f7ff
-	{ TISOUND_TAG,  	NATIVE, STOP, 0xf800, 0xfff0, 0x0000	},	// f800-f80f
-	{ VIDEO_SYSTEM_TAG,	NATIVE, STOP, 0xf810, 0xfffd, 0x0000	},	// f810,2 (unlike 99/4A, no different read/write ports)
-	{ SPEECH_TAG,		NATIVE, STOP, 0xf820, 0xfff0, 0x0000	},	// f820-f82f
-	{ MAPPER_TAG,		NATIVE, STOP, 0xf870, 0xfff0, 0x0000	},
+	{ SRAMNAME,         NATIVE, STOP, 0xf000, 0xf800, 0x0000    },  // f000-f7ff
+	{ TISOUND_TAG,      NATIVE, STOP, 0xf800, 0xfff0, 0x0000    },  // f800-f80f
+	{ VIDEO_SYSTEM_TAG, NATIVE, STOP, 0xf810, 0xfffd, 0x0000    },  // f810,2 (unlike 99/4A, no different read/write ports)
+	{ SPEECH_TAG,       NATIVE, STOP, 0xf820, 0xfff0, 0x0000    },  // f820-f82f
+	{ MAPPER_TAG,       NATIVE, STOP, 0xf870, 0xfff0, 0x0000    },
 
-	{ GROM0_TAG,	    NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},	// f830-f83e (4 banks), no different read/write ports
-	{ GROM1_TAG,		NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},
-	{ GROM2_TAG,		NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},
-	{ GROMPORT_TAG, 	NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},
+	{ GROM0_TAG,        NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },  // f830-f83e (4 banks), no different read/write ports
+	{ GROM1_TAG,        NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },
+	{ GROM2_TAG,        NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },
+	{ GROMPORT_TAG,     NATIVE, CONT, 0xf830, 0xfff1, 0x0000    },
 
 	PASCAL_GROM_LIB("pascal0_grom", 0xf840),
-	PASCAL_GROM_LIB("pascal1_grom", 0xf880),		// lib1 and 2 are zeroed. We don't have good dumps for them yet.
-	PASCAL_GROM_LIB("pascal2_grom", 0xf8c0),		// Anyway, we keep them in order to check whether/when they are accessed.
+	PASCAL_GROM_LIB("pascal1_grom", 0xf880),        // lib1 and 2 are zeroed. We don't have good dumps for them yet.
+	PASCAL_GROM_LIB("pascal2_grom", 0xf8c0),        // Anyway, we keep them in order to check whether/when they are accessed.
 
 	// Physical (need to pack this in here as well to keep config simple)
 	// but these lines will be put into a separate list
-	{ DRAMNAME, 		PHYSIC, STOP, 0x000000, 0xff0000, 0x000000	},	// 000000-00ffff 64 KiB DRAM
-	{ MAPPER_TAG,		PHYSIC, CONT, 0xff4000, 0xffe000, 0x000000	},	// ff4000-ff5fff Internal DSR
-	{ GROMPORT_TAG,		PHYSIC, STOP, 0xff6000, 0xffe000, 0x000000	},	// ff6000-ff7fff Cartridge ROM space
-	{ GROMPORT_TAG,		PHYSIC, STOP, 0xff8000, 0xffe000, 0x000000	},	// ff8000-ff9fff Cartridge ROM space
-	{ ROM1NAME, 		PHYSIC, STOP, 0xffa000, 0xffe000, 0x000000	},	// ffa000-ffbfff ROM1
-	{ ROM1ANAME,		PHYSIC, STOP, 0xffc000, 0xffe000, 0x000000	},	// ffc000-ffdfff ROM1
-	{ INTSNAME, 		PHYSIC, STOP, 0xffe000, 0xfffff0, 0x000000	},	// ffe000-ffe00f Interrupt level sense
-	{ PERIBOX_TAG,		PHYSIC, STOP, 0x000000, 0x000000, 0x000000	},	// Peripheral Expansion Box
+	{ DRAMNAME,         PHYSIC, STOP, 0x000000, 0xff0000, 0x000000  },  // 000000-00ffff 64 KiB DRAM
+	{ MAPPER_TAG,       PHYSIC, CONT, 0xff4000, 0xffe000, 0x000000  },  // ff4000-ff5fff Internal DSR
+	{ GROMPORT_TAG,     PHYSIC, STOP, 0xff6000, 0xffe000, 0x000000  },  // ff6000-ff7fff Cartridge ROM space
+	{ GROMPORT_TAG,     PHYSIC, STOP, 0xff8000, 0xffe000, 0x000000  },  // ff8000-ff9fff Cartridge ROM space
+	{ ROM1NAME,         PHYSIC, STOP, 0xffa000, 0xffe000, 0x000000  },  // ffa000-ffbfff ROM1
+	{ ROM1ANAME,        PHYSIC, STOP, 0xffc000, 0xffe000, 0x000000  },  // ffc000-ffdfff ROM1
+	{ INTSNAME,         PHYSIC, STOP, 0xffe000, 0xfffff0, 0x000000  },  // ffe000-ffe00f Interrupt level sense
+	{ PERIBOX_TAG,      PHYSIC, STOP, 0x000000, 0x000000, 0x000000  },  // Peripheral Expansion Box
 
 	{ NULL, 0, 0, 0, 0, 0  }
 };
 
 static MAPPER8_CONFIG( mapper_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_mapper),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_mapper),   // READY
 	mapper_devices
 };
 
 static SPEECH8_CONFIG( speech_config )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready),  // READY
 };
 
 static JOYPORT_CONFIG( joyport8_60 )
@@ -1049,11 +1049,11 @@ MACHINE_CONFIG_END
 ROM_START(ti99_8)
 	/*CPU memory space*/
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD("998rom.bin", 0x0000, 0x8000, CRC(b7a06ffd) SHA1(17dc8529fa808172fc47089982efb0bf0548c80c))		/* system ROMs */
+	ROM_LOAD("998rom.bin", 0x0000, 0x8000, CRC(b7a06ffd) SHA1(17dc8529fa808172fc47089982efb0bf0548c80c))        /* system ROMs */
 
 	/*GROM memory space*/
 	ROM_REGION(0x10000, region_grom, 0)
-	ROM_LOAD("998grom.bin", 0x0000, 0x6000, CRC(c63806bc) SHA1(cbfa8b04b4aefbbd9a713c54267ad4dd179c13a3))	/* system GROMs */
+	ROM_LOAD("998grom.bin", 0x0000, 0x6000, CRC(c63806bc) SHA1(cbfa8b04b4aefbbd9a713c54267ad4dd179c13a3))   /* system GROMs */
 
 	/* Pascal GROMs. Sadly, P-System fails to start. */
 	ROM_REGION(0x10000, pascal0_region, 0)
@@ -1074,5 +1074,5 @@ ROM_END
 #define rom_ti99_8e rom_ti99_8
 
 /*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT   INIT      COMPANY                 FULLNAME */
-COMP(	1983,	ti99_8,		0,		0,	ti99_8_60hz,ti99_8, driver_device,	0,		"Texas Instruments",	"TI-99/8 Computer (US)" , 0)
-COMP(	1983,	ti99_8e,	ti99_8,	0,	ti99_8_50hz,ti99_8, driver_device,	0,		"Texas Instruments",	"TI-99/8 Computer (Europe)" , 0 )
+COMP(   1983,   ti99_8,     0,      0,  ti99_8_60hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (US)" , 0)
+COMP(   1983,   ti99_8e,    ti99_8, 0,  ti99_8_50hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (Europe)" , 0 )

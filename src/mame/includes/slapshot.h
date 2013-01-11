@@ -69,4 +69,3 @@ public:
 	INTERRUPT_GEN_MEMBER(slapshot_interrupt);
 	TIMER_CALLBACK_MEMBER(slapshot_interrupt6);
 };
-

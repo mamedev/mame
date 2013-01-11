@@ -21,7 +21,7 @@ OP_HANDLER( illegal )
 
 void m6809_base_device::IIError()
 {
-	illegal();		// Vector to Trap handler
+	illegal();      // Vector to Trap handler
 }
 
 /* $00 NEG direct ?**** */
@@ -178,10 +178,10 @@ OP_HANDLER( sync )
 	/* SYNC stops processing instructions until an interrupt request happens. */
 	/* This doesn't require the corresponding interrupt to be enabled: if it */
 	/* is disabled, execution continues with the next instruction. */
-	m_int_state |= M6809_SYNC;	 /* HJB 990227 */
+	m_int_state |= M6809_SYNC;   /* HJB 990227 */
 	check_irq_lines();
 	/* if M6809_SYNC has not been cleared by check_irq_lines(),
-     * stop execution until the interrupt lines change. */
+	 * stop execution until the interrupt lines change. */
 	if( m_int_state & M6809_SYNC )
 		if (m_icount > 0) m_icount = 0;
 }
@@ -228,7 +228,7 @@ OP_HANDLER( orcc )
 	UINT8 t;
 	IMMBYTE(t);
 	CC |= t;
-	check_irq_lines();	/* HJB 990116 */
+	check_irq_lines();  /* HJB 990116 */
 }
 
 /* $1B ILLEGAL */
@@ -239,7 +239,7 @@ OP_HANDLER( andcc )
 	UINT8 t;
 	IMMBYTE(t);
 	CC &= t;
-	check_irq_lines();	/* HJB 990116 */
+	check_irq_lines();  /* HJB 990116 */
 }
 
 /* $1D SEX inherent -**-- */
@@ -260,7 +260,7 @@ OP_HANDLER( exg )
 	UINT8 tb;
 
 	IMMBYTE(tb);
-	if( (tb^(tb>>4)) & 0x08 )	/* HJB 990225: mixed 8/16 bit case? */
+	if( (tb^(tb>>4)) & 0x08 )   /* HJB 990225: mixed 8/16 bit case? */
 	{
 		/* transfer $ff to both registers */
 		t1 = t2 = 0xff;
@@ -292,7 +292,7 @@ OP_HANDLER( exg )
 			case 10: t2 = CC; break;
 			case 11: t2 = DP; break;
 			default: t2 = 0xff;
-        }
+		}
 	}
 	switch(tb>>4) {
 		case  0: D = t2;  break;
@@ -327,11 +327,11 @@ OP_HANDLER( tfr )
 	UINT16 t;
 
 	IMMBYTE(tb);
-	if( (tb^(tb>>4)) & 0x08 )	/* HJB 990225: mixed 8/16 bit case? */
+	if( (tb^(tb>>4)) & 0x08 )   /* HJB 990225: mixed 8/16 bit case? */
 	{
 		/* transfer $ff to register */
 		t = 0xff;
-    }
+	}
 	else
 	{
 		switch(tb>>4) {
@@ -346,7 +346,7 @@ OP_HANDLER( tfr )
 			case 10: t = CC; break;
 			case 11: t = DP; break;
 			default: t = 0xff;
-        }
+		}
 	}
 	switch(tb&15) {
 		case  0: D = t;  break;
@@ -359,7 +359,7 @@ OP_HANDLER( tfr )
 		case  9: B = t;  break;
 		case 10: CC = t; break;
 		case 11: DP = t; break;
-    }
+	}
 }
 
 /* $20 BRA relative ----- */
@@ -669,7 +669,7 @@ OP_HANDLER( rti )
 {
 	UINT8 t;
 	PULLBYTE(CC);
-	t = CC & CC_E;		/* HJB 990225: entire state saved? */
+	t = CC & CC_E;      /* HJB 990225: entire state saved? */
 	if(t)
 	{
 		m_icount -= 9;
@@ -681,7 +681,7 @@ OP_HANDLER( rti )
 		PULLWORD(UD);
 	}
 	PULLWORD(PCD);
-	check_irq_lines();	/* HJB 990116 */
+	check_irq_lines();  /* HJB 990116 */
 }
 
 /* $3C CWAI inherent ----1 */
@@ -691,11 +691,11 @@ OP_HANDLER( cwai )
 	IMMBYTE(t);
 	CC &= t;
 	/*
-     * CWAI stacks the entire machine state on the hardware stack,
-     * then waits for an interrupt; when the interrupt is taken
-     * later, the state is *not* saved again after CWAI.
-     */
-	CC |= CC_E; 		/* HJB 990225: save entire state */
+	 * CWAI stacks the entire machine state on the hardware stack,
+	 * then waits for an interrupt; when the interrupt is taken
+	 * later, the state is *not* saved again after CWAI.
+	 */
+	CC |= CC_E;         /* HJB 990225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -704,7 +704,7 @@ OP_HANDLER( cwai )
 	PUSHBYTE(B);
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
-	m_int_state |= M6809_CWAI;	 /* HJB 990228 */
+	m_int_state |= M6809_CWAI;   /* HJB 990228 */
 	check_irq_lines();    /* HJB 990116 */
 	if( m_int_state & M6809_CWAI )
 		if( m_icount > 0 )
@@ -725,7 +725,7 @@ OP_HANDLER( mul )
 /* $3F SWI (SWI2 SWI3) absolute indirect ----- */
 OP_HANDLER( swi )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -734,14 +734,14 @@ OP_HANDLER( swi )
 	PUSHBYTE(B);
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
-	CC |= CC_IF | CC_II;	/* inhibit FIRQ and IRQ */
+	CC |= CC_IF | CC_II;    /* inhibit FIRQ and IRQ */
 	PCD=RM16(0xfffa);
 }
 
 /* $103F SWI2 absolute indirect ----- */
 OP_HANDLER( swi2 )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -756,7 +756,7 @@ OP_HANDLER( swi2 )
 /* $113F SWI3 absolute indirect ----- */
 OP_HANDLER( swi3 )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -1257,7 +1257,7 @@ OP_HANDLER( suba_im )
 /* $81 CMPA immediate ?**** */
 OP_HANDLER( cmpa_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1267,7 +1267,7 @@ OP_HANDLER( cmpa_im )
 /* $82 SBCA immediate ?**** */
 OP_HANDLER( sbca_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -1478,7 +1478,7 @@ OP_HANDLER( sty_im )
 /* $90 SUBA direct ?**** */
 OP_HANDLER( suba_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1489,7 +1489,7 @@ OP_HANDLER( suba_di )
 /* $91 CMPA direct ?**** */
 OP_HANDLER( cmpa_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1499,7 +1499,7 @@ OP_HANDLER( cmpa_di )
 /* $92 SBCA direct ?**** */
 OP_HANDLER( sbca_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -1729,7 +1729,7 @@ OP_HANDLER( cmpa_ix )
 /* $a2 SBCA indexed ?**** */
 OP_HANDLER( sbca_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address();
 	t = RM(EAD);
 	r = A - t - (CC & CC_C);
@@ -1944,7 +1944,7 @@ OP_HANDLER( sty_ix )
 /* $b0 SUBA extended ?**** */
 OP_HANDLER( suba_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1955,7 +1955,7 @@ OP_HANDLER( suba_ex )
 /* $b1 CMPA extended ?**** */
 OP_HANDLER( cmpa_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t;
 	CLR_NZVC;
@@ -1965,7 +1965,7 @@ OP_HANDLER( cmpa_ex )
 /* $b2 SBCA extended ?**** */
 OP_HANDLER( sbca_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2171,7 +2171,7 @@ OP_HANDLER( sty_ex )
 /* $c0 SUBB immediate ?**** */
 OP_HANDLER( subb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -2182,7 +2182,7 @@ OP_HANDLER( subb_im )
 /* $c1 CMPB immediate ?**** */
 OP_HANDLER( cmpb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B - t;
 	CLR_NZVC; SET_FLAGS8(B,t,r);
@@ -2191,7 +2191,7 @@ OP_HANDLER( cmpb_im )
 /* $c2 SBCB immediate ?**** */
 OP_HANDLER( sbcb_im )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2308,7 +2308,7 @@ OP_HANDLER( std_im )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-    IMM16;
+	IMM16;
 	WM16(EAD,&pD);
 }
 
@@ -2335,7 +2335,7 @@ OP_HANDLER( stu_im )
 {
 	CLR_NZV;
 	SET_NZ16(U);
-    IMM16;
+	IMM16;
 	WM16(EAD,&pU);
 }
 
@@ -2345,14 +2345,14 @@ OP_HANDLER( sts_im )
 {
 	CLR_NZV;
 	SET_NZ16(S);
-    IMM16;
+	IMM16;
 	WM16(EAD,&pS);
 }
 
 /* $d0 SUBB direct ?**** */
 OP_HANDLER( subb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -2363,7 +2363,7 @@ OP_HANDLER( subb_di )
 /* $d1 CMPB direct ?**** */
 OP_HANDLER( cmpb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -2373,7 +2373,7 @@ OP_HANDLER( cmpb_di )
 /* $d2 SBCB direct ?**** */
 OP_HANDLER( sbcb_di )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2530,7 +2530,7 @@ OP_HANDLER( sts_di )
 /* $e0 SUBB indexed ?**** */
 OP_HANDLER( subb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address();
 	t = RM(EAD);
 	r = B - t;
@@ -2542,7 +2542,7 @@ OP_HANDLER( subb_ix )
 /* $e1 CMPB indexed ?**** */
 OP_HANDLER( cmpb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address();
 	t = RM(EAD);
 	r = B - t;
@@ -2553,7 +2553,7 @@ OP_HANDLER( cmpb_ix )
 /* $e2 SBCB indexed ?**** */
 OP_HANDLER( sbcb_ix )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	fetch_effective_address();
 	t = RM(EAD);
 	r = B - t - (CC & CC_C);
@@ -2566,8 +2566,8 @@ OP_HANDLER( sbcb_ix )
 OP_HANDLER( addd_ix )
 {
 	UINT32 r,d;
-    PAIR b;
-    fetch_effective_address();
+	PAIR b;
+	fetch_effective_address();
 	b.d=RM16(EAD);
 	d = D;
 	r = d + b.d;
@@ -2608,7 +2608,7 @@ OP_HANDLER( ldb_ix )
 OP_HANDLER( stb_ix )
 {
 	fetch_effective_address();
-    CLR_NZV;
+	CLR_NZV;
 	SET_NZ8(B);
 	WM(EAD,B);
 }
@@ -2714,7 +2714,7 @@ OP_HANDLER( sts_ix )
 /* $f0 SUBB extended ?**** */
 OP_HANDLER( subb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -2725,7 +2725,7 @@ OP_HANDLER( subb_ex )
 /* $f1 CMPB extended ?**** */
 OP_HANDLER( cmpb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B - t;
 	CLR_NZVC;
@@ -2735,7 +2735,7 @@ OP_HANDLER( cmpb_ex )
 /* $f2 SBCB extended ?**** */
 OP_HANDLER( sbcb_ex )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2896,57 +2896,57 @@ OP_HANDLER( pref10 )
 	PC++;
 	switch( ireg2 )
 	{
-		case 0x21: lbrn();		m_icount-=5;	break;
-		case 0x22: lbhi();		m_icount-=5;	break;
-		case 0x23: lbls();		m_icount-=5;	break;
-		case 0x24: lbcc();		m_icount-=5;	break;
-		case 0x25: lbcs();		m_icount-=5;	break;
-		case 0x26: lbne();		m_icount-=5;	break;
-		case 0x27: lbeq();		m_icount-=5;	break;
-		case 0x28: lbvc();		m_icount-=5;	break;
-		case 0x29: lbvs();		m_icount-=5;	break;
-		case 0x2a: lbpl();		m_icount-=5;	break;
-		case 0x2b: lbmi();		m_icount-=5;	break;
-		case 0x2c: lbge();		m_icount-=5;	break;
-		case 0x2d: lblt();		m_icount-=5;	break;
-		case 0x2e: lbgt();		m_icount-=5;	break;
-		case 0x2f: lble();		m_icount-=5;	break;
+		case 0x21: lbrn();      m_icount-=5;    break;
+		case 0x22: lbhi();      m_icount-=5;    break;
+		case 0x23: lbls();      m_icount-=5;    break;
+		case 0x24: lbcc();      m_icount-=5;    break;
+		case 0x25: lbcs();      m_icount-=5;    break;
+		case 0x26: lbne();      m_icount-=5;    break;
+		case 0x27: lbeq();      m_icount-=5;    break;
+		case 0x28: lbvc();      m_icount-=5;    break;
+		case 0x29: lbvs();      m_icount-=5;    break;
+		case 0x2a: lbpl();      m_icount-=5;    break;
+		case 0x2b: lbmi();      m_icount-=5;    break;
+		case 0x2c: lbge();      m_icount-=5;    break;
+		case 0x2d: lblt();      m_icount-=5;    break;
+		case 0x2e: lbgt();      m_icount-=5;    break;
+		case 0x2f: lble();      m_icount-=5;    break;
 
-		case 0x3f: swi2();		m_icount-=20;	break;
+		case 0x3f: swi2();      m_icount-=20;   break;
 
-		case 0x83: cmpd_im();	m_icount-=5;	break;
-		case 0x8c: cmpy_im();	m_icount-=5;	break;
-		case 0x8e: ldy_im();	m_icount-=4;	break;
-		case 0x8f: sty_im();	m_icount-=4;	break;
+		case 0x83: cmpd_im();   m_icount-=5;    break;
+		case 0x8c: cmpy_im();   m_icount-=5;    break;
+		case 0x8e: ldy_im();    m_icount-=4;    break;
+		case 0x8f: sty_im();    m_icount-=4;    break;
 
-		case 0x93: cmpd_di();	m_icount-=7;	break;
-		case 0x9c: cmpy_di();	m_icount-=7;	break;
-		case 0x9e: ldy_di();	m_icount-=6;	break;
-		case 0x9f: sty_di();	m_icount-=6;	break;
+		case 0x93: cmpd_di();   m_icount-=7;    break;
+		case 0x9c: cmpy_di();   m_icount-=7;    break;
+		case 0x9e: ldy_di();    m_icount-=6;    break;
+		case 0x9f: sty_di();    m_icount-=6;    break;
 
-		case 0xa3: cmpd_ix();	m_icount-=7;	break;
-		case 0xac: cmpy_ix();	m_icount-=7;	break;
-		case 0xae: ldy_ix();	m_icount-=6;	break;
-		case 0xaf: sty_ix();	m_icount-=6;	break;
+		case 0xa3: cmpd_ix();   m_icount-=7;    break;
+		case 0xac: cmpy_ix();   m_icount-=7;    break;
+		case 0xae: ldy_ix();    m_icount-=6;    break;
+		case 0xaf: sty_ix();    m_icount-=6;    break;
 
-		case 0xb3: cmpd_ex();	m_icount-=8;	break;
-		case 0xbc: cmpy_ex();	m_icount-=8;	break;
-		case 0xbe: ldy_ex();	m_icount-=7;	break;
-		case 0xbf: sty_ex();	m_icount-=7;	break;
+		case 0xb3: cmpd_ex();   m_icount-=8;    break;
+		case 0xbc: cmpy_ex();   m_icount-=8;    break;
+		case 0xbe: ldy_ex();    m_icount-=7;    break;
+		case 0xbf: sty_ex();    m_icount-=7;    break;
 
-		case 0xce: lds_im();	m_icount-=4;	break;
-		case 0xcf: sts_im();	m_icount-=4;	break;
+		case 0xce: lds_im();    m_icount-=4;    break;
+		case 0xcf: sts_im();    m_icount-=4;    break;
 
-		case 0xde: lds_di();	m_icount-=6;	break;
-		case 0xdf: sts_di();	m_icount-=6;	break;
+		case 0xde: lds_di();    m_icount-=6;    break;
+		case 0xdf: sts_di();    m_icount-=6;    break;
 
-		case 0xee: lds_ix();	m_icount-=6;	break;
-		case 0xef: sts_ix();	m_icount-=6;	break;
+		case 0xee: lds_ix();    m_icount-=6;    break;
+		case 0xef: sts_ix();    m_icount-=6;    break;
 
-		case 0xfe: lds_ex();	m_icount-=7;	break;
-		case 0xff: sts_ex();	m_icount-=7;	break;
+		case 0xfe: lds_ex();    m_icount-=7;    break;
+		case 0xff: sts_ex();    m_icount-=7;    break;
 
-		default:   IIError();					break;
+		default:   IIError();                   break;
 	}
 }
 
@@ -2957,21 +2957,20 @@ OP_HANDLER( pref11 )
 	PC++;
 	switch( ireg2 )
 	{
-		case 0x3f: swi3();		m_icount-=20;	break;
+		case 0x3f: swi3();      m_icount-=20;   break;
 
-		case 0x83: cmpu_im();	m_icount-=5;	break;
-		case 0x8c: cmps_im();	m_icount-=5;	break;
+		case 0x83: cmpu_im();   m_icount-=5;    break;
+		case 0x8c: cmps_im();   m_icount-=5;    break;
 
-		case 0x93: cmpu_di();	m_icount-=7;	break;
-		case 0x9c: cmps_di();	m_icount-=7;	break;
+		case 0x93: cmpu_di();   m_icount-=7;    break;
+		case 0x9c: cmps_di();   m_icount-=7;    break;
 
-		case 0xa3: cmpu_ix();	m_icount-=7;	break;
-		case 0xac: cmps_ix();	m_icount-=7;	break;
+		case 0xa3: cmpu_ix();   m_icount-=7;    break;
+		case 0xac: cmps_ix();   m_icount-=7;    break;
 
-		case 0xb3: cmpu_ex();	m_icount-=8;	break;
-		case 0xbc: cmps_ex();	m_icount-=8;	break;
+		case 0xb3: cmpu_ex();   m_icount-=8;    break;
+		case 0xbc: cmps_ex();   m_icount-=8;    break;
 
-		default:   IIError();					break;
+		default:   IIError();                   break;
 	}
 }
-

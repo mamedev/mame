@@ -105,10 +105,10 @@ static void spaceod_bg_init_palette(running_machine &machine)
 	int i;
 
 	/* compute the color output resistor weights at startup */
-	compute_resistor_weights(0,	255, -1.0,
-			2,	resistances, trweights, 220, 0,
-			2,	resistances, tgweights, 220, 0,
-			2,	resistances, tbweights, 220, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			2,  resistances, trweights, 220, 0,
+			2,  resistances, tgweights, 220, 0,
+			2,  resistances, tbweights, 220, 0);
 
 	/* initialize the fixed background palette */
 	for (i = 0; i < 64; i++)
@@ -184,10 +184,10 @@ void segag80r_state::video_start()
 	static const int b_resistances[2] = { 2000, 1000 };
 
 	/* compute the color output resistor weights at startup */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	rg_resistances, m_rweights, 220, 0,
-			3,	rg_resistances, m_gweights, 220, 0,
-			2,	b_resistances,  m_bweights, 220, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  rg_resistances, m_rweights, 220, 0,
+			3,  rg_resistances, m_gweights, 220, 0,
+			2,  b_resistances,  m_bweights, 220, 0);
 
 	machine().gfx[0]->set_source(&videoram[0x800]);
 
@@ -286,11 +286,11 @@ READ8_MEMBER(segag80r_state::segag80r_video_port_r)
 	else
 	{
 		/*
-            D0 = 555 timer output from U10 (goes to EDGINT as well)
-            D1 = current latched FLIP state
-            D2 = interrupt enable state
-            D3 = n/c
-        */
+		    D0 = 555 timer output from U10 (goes to EDGINT as well)
+		    D1 = current latched FLIP state
+		    D2 = interrupt enable state
+		    D3 = n/c
+		*/
 		return (m_vblank_latch << 0) | (m_video_flip << 1) | (m_video_control & 0x04) | 0xf8;
 	}
 }
@@ -305,12 +305,12 @@ WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
 	else
 	{
 		/*
-            D0 = FLIP (latched at VSYNC)
-            D1 = if low, allows writes to the upper 4k of video RAM
-               = if high, allows writes to palette RAM
-            D2 = interrupt enable
-            D3 = n/c (used as flip by many background boards)
-        */
+		    D0 = FLIP (latched at VSYNC)
+		    D1 = if low, allows writes to the upper 4k of video RAM
+		       = if high, allows writes to palette RAM
+		    D2 = interrupt enable
+		    D3 = n/c (used as flip by many background boards)
+		*/
 		m_video_control = data;
 	}
 }
@@ -338,12 +338,12 @@ WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
 	{
 		/* port 0: latches D0-D7 into LS377 at U39 (SH4)
 
-            d0 = counter direction: controls U/D on LS191 counters
-            d1 = horizontal (0) or vertical (1) scrolling
-            d2 = character bank (0/1)
-            d6 = background ROM select 0
-            d7 = background ROM select 1
-        */
+		    d0 = counter direction: controls U/D on LS191 counters
+		    d1 = horizontal (0) or vertical (1) scrolling
+		    d2 = character bank (0/1)
+		    d6 = background ROM select 0
+		    d7 = background ROM select 1
+		*/
 		case 0:
 			if ((m_spaceod_bg_control ^ data) & 0xc4)
 			{
@@ -450,15 +450,15 @@ WRITE8_MEMBER(segag80r_state::monsterb_back_port_w)
 
 		/* port 4: main control latch
 
-            d0 = CG0 - BG MSB ROM bank select bit 0
-            d1 = CG1 - BG MSB ROM bank select bit 1
-            d2 = CG2 - BG LSB ROM bank select bit 0
-            d3 = CG3 - BG LSB ROM bank select bit 1
-            d4 = SCN0 - background select bit 0
-            d5 = SCN1 - background select bit 1
-            d6 = SCN2 - background select bit 2
-            d7 = BKGEN - background enable
-         */
+		    d0 = CG0 - BG MSB ROM bank select bit 0
+		    d1 = CG1 - BG MSB ROM bank select bit 1
+		    d2 = CG2 - BG LSB ROM bank select bit 0
+		    d3 = CG3 - BG LSB ROM bank select bit 1
+		    d4 = SCN0 - background select bit 0
+		    d5 = SCN1 - background select bit 1
+		    d6 = SCN2 - background select bit 2
+		    d7 = BKGEN - background enable
+		 */
 		case 4:
 			if ((m_bg_char_bank ^ data) & 0x0f)
 				m_bg_tilemap->mark_all_dirty();
@@ -536,14 +536,14 @@ WRITE8_MEMBER(segag80r_state::pignewt_back_port_w)
 
 		/* port 4: background character bank control
 
-            d0 = CG0 - BG MSB ROM bank select bit 0
-            d1 = CG1 - BG MSB ROM bank select bit 1
-            d2 = CG2 - BG LSB ROM bank select bit 0
-            d3 = CG3 - BG LSB ROM bank select bit 1
+		    d0 = CG0 - BG MSB ROM bank select bit 0
+		    d1 = CG1 - BG MSB ROM bank select bit 1
+		    d2 = CG2 - BG LSB ROM bank select bit 0
+		    d3 = CG3 - BG LSB ROM bank select bit 1
 
-            at least, that's the theory; however, monster2 sets this = 0x03 wanting
-            bank 1, so I'm assuming that only d3 and d0 really matter
-         */
+		    at least, that's the theory; however, monster2 sets this = 0x03 wanting
+		    bank 1, so I'm assuming that only d3 and d0 really matter
+		 */
 		case 4:
 			data = (data & 0x09) | ((data >> 2) & 0x02) | ((data << 2) & 0x04);
 			if ((m_bg_char_bank ^ data) & 0x0f)
@@ -593,15 +593,15 @@ WRITE8_MEMBER(segag80r_state::sindbadm_back_port_w)
 
 		/* port 1: background control
 
-            d0 = BG ROM bank select bit 0
-            d1 = BG ROM bank select bit 1
-            d2 = BG page select (X scroll bit 0)
-            d3 = BG page select (X scroll bit 1)
-            d4 = BG page select (Y scroll bit 0)
-            d5 = BG page select (Y scroll bit 1)
-            d6 = BG page select (Y scroll bit 2)
-            d7 = BG enable
-        */
+		    d0 = BG ROM bank select bit 0
+		    d1 = BG ROM bank select bit 1
+		    d2 = BG page select (X scroll bit 0)
+		    d3 = BG page select (X scroll bit 1)
+		    d4 = BG page select (Y scroll bit 0)
+		    d5 = BG page select (Y scroll bit 1)
+		    d6 = BG page select (Y scroll bit 2)
+		    d7 = BG enable
+		*/
 		case 1:
 			m_bg_enable = data & 0x80;
 			m_bg_scrollx = (data << 6) & 0x300;
@@ -682,18 +682,18 @@ static void draw_background_spaceod(running_machine &machine, bitmap_ind16 &bitm
 			UINT8 bgpix = src[effx & xmask] & 0x3f;
 
 			/* the background detect flag is set if:
-                - bgpix != 0 AND
-                - fgpix != 0 AND
-                - the original tile color == DIP switches
-            */
+			    - bgpix != 0 AND
+			    - fgpix != 0 AND
+			    - the original tile color == DIP switches
+			*/
 			if (bgpix != 0 && fgpix != 0 && (dst[x] >> 2) == spaceod_bg_detect_tile_color)
 				state->m_spaceod_bg_detect = 1;
 
 			/* the background graphics are only displayed if:
-                - fgpix == 0 AND
-                - !EXTBLK (not blanked) AND
-                - state->m_bg_enable == 0
-            */
+			    - fgpix == 0 AND
+			    - !EXTBLK (not blanked) AND
+			    - state->m_bg_enable == 0
+			*/
 			if (fgpix == 0 && state->m_bg_enable == 0)
 				dst[x] = bgpix | state->m_spaceod_fixed_color | 0x40;
 		}

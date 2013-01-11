@@ -120,12 +120,12 @@ READ8_MEMBER( sdk86_state::kbd_r )
 
 static I8279_INTERFACE( sdk86_intf )
 {
-	DEVCB_NULL,	// irq
-	DEVCB_DRIVER_MEMBER(sdk86_state, scanlines_w),	// scan SL lines
-	DEVCB_DRIVER_MEMBER(sdk86_state, digit_w),		// display A&B
-	DEVCB_NULL,						// BD
-	DEVCB_DRIVER_MEMBER(sdk86_state, kbd_r),		// kbd RL lines
-	DEVCB_LINE_GND,						// Shift key
+	DEVCB_NULL, // irq
+	DEVCB_DRIVER_MEMBER(sdk86_state, scanlines_w),  // scan SL lines
+	DEVCB_DRIVER_MEMBER(sdk86_state, digit_w),      // display A&B
+	DEVCB_NULL,                     // BD
+	DEVCB_DRIVER_MEMBER(sdk86_state, kbd_r),        // kbd RL lines
+	DEVCB_LINE_GND,                     // Shift key
 	DEVCB_LINE_GND
 };
 
@@ -154,13 +154,13 @@ ROM_START( sdk86 )
 	ROM_LOAD16_BYTE( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b)) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
 
 	/* proms:
-     * dumped 11/21/09 through 11/29/09 by LN
-     * purposes: (according to sdk-86 user manual from http://www.bitsavers.org/pdf/intel/8086/9800698A_SDK-86_Users_Man_Apr79.pdf)
-     * A12: main address decoding (selects ram or rom or open bus/offboard, see page 2-7)
-     * A22: I/O decoding for 8251, 8279 and optional pair of 8255 chips (in the FFE8-FFFF I/O area; see page 2-6)
-     * A26: ROM address decoding for selecting which of the 4 pairs of roms is active (note that to use the FCxxx and FDxxx pairs requires wiring them into the prototype area, they are not standard; see page 2-5)
-     * A29: RAM address decoding (see page 2-4)
-     */
+	 * dumped 11/21/09 through 11/29/09 by LN
+	 * purposes: (according to sdk-86 user manual from http://www.bitsavers.org/pdf/intel/8086/9800698A_SDK-86_Users_Man_Apr79.pdf)
+	 * A12: main address decoding (selects ram or rom or open bus/offboard, see page 2-7)
+	 * A22: I/O decoding for 8251, 8279 and optional pair of 8255 chips (in the FFE8-FFFF I/O area; see page 2-6)
+	 * A26: ROM address decoding for selecting which of the 4 pairs of roms is active (note that to use the FCxxx and FDxxx pairs requires wiring them into the prototype area, they are not standard; see page 2-5)
+	 * A29: RAM address decoding (see page 2-4)
+	 */
 	ROM_REGION(0x1000, "proms", 0 ) // all are Intel D3625A 1kx4 (82s137A equivalent)
 	ROM_LOAD( "0036_101993-001.a12", 0x0000, 0x0400, CRC(bb7edbfd) SHA1(8847f9815c7cb8695986743199673920a7d4390d)) /* Label: "iD3625A 0036 // 8142 // 101993-001" */
 	ROM_LOAD( "0035_101992-001.a22", 0x0400, 0x0400, CRC(76aced0c) SHA1(89fa39473e19d8cb6b65d6430d3d683ae2398fb3)) /* Label: "iD3625A 0035 // 8142 // 101992-001" */

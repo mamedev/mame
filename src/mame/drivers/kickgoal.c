@@ -55,14 +55,14 @@ lev 7 : 0x7c : 0000 0000 - x
 #ifdef UNUSED_DEFINITION
 static const UINT8 kickgoal_cmd_snd[128] =
 {
-/*00*/	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-/*08*/	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
-/*10*/	0x72, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
-/*18*/	0x15, 0x16, 0x17, 0x18, 0x19, 0x73, 0x74, 0x75,
-/*20*/	0x76, 0x1a, 0x1b, 0x1c, 0x1d, 0x00, 0x1f, 0x6c,
+/*00*/  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+/*08*/  0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
+/*10*/  0x72, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+/*18*/  0x15, 0x16, 0x17, 0x18, 0x19, 0x73, 0x74, 0x75,
+/*20*/  0x76, 0x1a, 0x1b, 0x1c, 0x1d, 0x00, 0x1f, 0x6c,
 /*28*/  0x1e, 0x65, 0x00, 0x00, 0x60, 0x20, 0x69, 0x65,
-/*30*/	0x00, 0x00, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
-/*38*/	0x29, 0x2a, 0x2b, 0x00, 0x6b, 0x00, 0x00, 0x00
+/*30*/  0x00, 0x00, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+/*38*/  0x29, 0x2a, 0x2b, 0x00, 0x6b, 0x00, 0x00, 0x00
 };
 #endif
 
@@ -158,7 +158,7 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
 		logerror("PC:%06x Writing %04x to Sound CPU\n",space.device().safe_pcbase(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
-				oki->write(0,0x40);	/* Stop playing the melody */
+				oki->write(0,0x40); /* Stop playing the melody */
 				m_melody      = 0x00;
 				m_melody_loop = 0x00;
 			}
@@ -167,7 +167,7 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
 			}
 		}
 		else if (data == 0) {
-			oki->write(0,0x38);		/* Stop playing effects */
+			oki->write(0,0x38);     /* Stop playing effects */
 		}
 		else {
 			kickgoal_sound = kickgoal_cmd_snd[data];
@@ -215,10 +215,10 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	switch (data)
 	{
-		case 0xfc:	oki->set_bank_base((0 * 0x40000)); break;
-		case 0xfd:	oki->set_bank_base((2 * 0x40000)); break;
-		case 0xfe:	oki->set_bank_base((1 * 0x40000)); break;
-		case 0xff:	oki->set_bank_base((3 * 0x40000)); break;
+		case 0xfc:  oki->set_bank_base((0 * 0x40000)); break;
+		case 0xfd:  oki->set_bank_base((2 * 0x40000)); break;
+		case 0xfe:  oki->set_bank_base((1 * 0x40000)); break;
+		case 0xff:  oki->set_bank_base((3 * 0x40000)); break;
 		case 0x78:
 				oki->write_command(data);
 				m_snd_sam[0] = 00; m_snd_sam[1]= 00; m_snd_sam[2] = 00; m_snd_sam[3] = 00;
@@ -300,26 +300,26 @@ INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 	{
 		switch(m_melody_loop)
 		{
-			case 0x060:	m_melody_loop = 0x061; break;
-			case 0x061:	m_melody_loop = 0x062; break;
-			case 0x062:	m_melody_loop = 0x060; break;
+			case 0x060: m_melody_loop = 0x061; break;
+			case 0x061: m_melody_loop = 0x062; break;
+			case 0x062: m_melody_loop = 0x060; break;
 
-			case 0x065:	m_melody_loop = 0x165; break;
-			case 0x165:	m_melody_loop = 0x265; break;
-			case 0x265:	m_melody_loop = 0x365; break;
-			case 0x365:	m_melody_loop = 0x066; break;
-			case 0x066:	m_melody_loop = 0x067; break;
-			case 0x067:	m_melody_loop = 0x068; break;
-			case 0x068:	m_melody_loop = 0x065; break;
+			case 0x065: m_melody_loop = 0x165; break;
+			case 0x165: m_melody_loop = 0x265; break;
+			case 0x265: m_melody_loop = 0x365; break;
+			case 0x365: m_melody_loop = 0x066; break;
+			case 0x066: m_melody_loop = 0x067; break;
+			case 0x067: m_melody_loop = 0x068; break;
+			case 0x068: m_melody_loop = 0x065; break;
 
-			case 0x063:	m_melody_loop = 0x063; break;
-			case 0x064:	m_melody_loop = 0x064; break;
-			case 0x069:	m_melody_loop = 0x069; break;
-			case 0x06a:	m_melody_loop = 0x06a; break;
-			case 0x06b:	m_melody_loop = 0x06b; break;
-			case 0x06c:	m_melody_loop = 0x06c; break;
+			case 0x063: m_melody_loop = 0x063; break;
+			case 0x064: m_melody_loop = 0x064; break;
+			case 0x069: m_melody_loop = 0x069; break;
+			case 0x06a: m_melody_loop = 0x06a; break;
+			case 0x06b: m_melody_loop = 0x06b; break;
+			case 0x06c: m_melody_loop = 0x06c; break;
 
-			default:	m_melody_loop = 0x00; break;
+			default:    m_melody_loop = 0x00; break;
 		}
 
 		if (m_melody_loop)
@@ -605,14 +605,14 @@ static const gfx_layout bg3232_charlayout =
 };
 
 static GFXDECODE_START( kickgoal )
-	GFXDECODE_ENTRY( "gfx1", 0, fg88_charlayout,	0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, fg88_charlayout,    0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,  0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg3232_charlayout,  0x000, 0x40 )
 GFXDECODE_END
 
 static GFXDECODE_START( actionhw )
-	GFXDECODE_ENTRY( "gfx1", 0, fg88_alt_charlayout,	0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,		0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, fg88_alt_charlayout,    0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,      0x000, 0x40 )
 GFXDECODE_END
 
 /* MACHINE drivers ***********************************************************/
@@ -645,13 +645,13 @@ void kickgoal_state::machine_reset()
 static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)	/* 3MHz ? */
-	MCFG_DEVICE_DISABLE()	/* Disables since the internal rom isn't dumped */
+	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
+	MCFG_DEVICE_DISABLE()   /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(kickgoal_sound_io_map)
 
@@ -681,11 +681,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)    /* verified on pcb */
 	MCFG_DEVICE_DISABLE() /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(actionhw_io_map)
@@ -718,11 +718,11 @@ MACHINE_CONFIG_END
 /* Rom Loading ***************************************************************/
 
 ROM_START( kickgoal )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "ic6",   0x000000, 0x40000, CRC(498ca792) SHA1(c638c3a1755870010c5961b58bcb02458ff4e238) )
 	ROM_LOAD16_BYTE( "ic5",   0x000001, 0x40000, CRC(d528740a) SHA1(d56a71004aabc839b0833a6bf383e5ef9d4948fa) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 )	/* sound? (missing) */
+	ROM_REGION( 0x1000, "audiocpu", 0 ) /* sound? (missing) */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
 	ROM_LOAD( "pic16c57",     0x0000, 0x0800, NO_DUMP )
 
@@ -734,7 +734,7 @@ ROM_START( kickgoal )
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0x100000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "ic13",        0x00000, 0x40000, BAD_DUMP CRC(c6cb56e9) SHA1(835773b3f0647d3c553180bcf10e57ad44d68353) ) // BAD ADDRESS LINES (mask=010000)
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
@@ -744,11 +744,11 @@ ROM_START( kickgoal )
 ROM_END
 
 ROM_START( actionhw )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "2.ic6",  0x000000, 0x80000, CRC(2b71d58c) SHA1(3e58531fa56d41a3c7944e3beab4850907564a89) )
 	ROM_LOAD16_BYTE( "1.ic5",  0x000001, 0x80000, CRC(136b9711) SHA1(553f9fdd99bb9ce2e1492d0755633075e59ba587) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 )	/* sound? (missing) */
+	ROM_REGION( 0x1000, "audiocpu", 0 ) /* sound? (missing) */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
 	ROM_LOAD( "pic16c57",     0x0000, 0x0800, NO_DUMP )
 

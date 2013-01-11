@@ -38,17 +38,17 @@ int osd_num_processors = 0;
 //  DEBUGGING
 //============================================================
 
-#define KEEP_STATISTICS			(0)
+#define KEEP_STATISTICS         (0)
 
 //============================================================
 //  PARAMETERS
 //============================================================
 
-#define SDLENV_PROCESSORS				"OSDPROCESSORS"
-#define SDLENV_CPUMASKS					"OSDCPUMASKS"
+#define SDLENV_PROCESSORS               "OSDPROCESSORS"
+#define SDLENV_CPUMASKS                 "OSDCPUMASKS"
 
-#define INFINITE				(osd_ticks_per_second() *  (osd_ticks_t) 10000)
-#define SPIN_LOOP_TIME			(osd_ticks_per_second() / 10000)
+#define INFINITE                (osd_ticks_per_second() *  (osd_ticks_t) 10000)
+#define SPIN_LOOP_TIME          (osd_ticks_per_second() / 10000)
 
 
 //============================================================
@@ -56,13 +56,13 @@ int osd_num_processors = 0;
 //============================================================
 
 #if KEEP_STATISTICS
-#define add_to_stat(v,x)		do { atomic_add32((v), (x)); } while (0)
-#define begin_timing(v)			do { (v) -= get_profile_ticks(); } while (0)
-#define end_timing(v)			do { (v) += get_profile_ticks(); } while (0)
+#define add_to_stat(v,x)        do { atomic_add32((v), (x)); } while (0)
+#define begin_timing(v)         do { (v) -= get_profile_ticks(); } while (0)
+#define end_timing(v)           do { (v) += get_profile_ticks(); } while (0)
 #else
-#define add_to_stat(v,x)		do { } while (0)
-#define begin_timing(v)			do { } while (0)
-#define end_timing(v)			do { } while (0)
+#define add_to_stat(v,x)        do { } while (0)
+#define begin_timing(v)         do { } while (0)
+#define end_timing(v)           do { } while (0)
 #endif
 
 
@@ -73,55 +73,55 @@ int osd_num_processors = 0;
 
 struct work_thread_info
 {
-	osd_work_queue *	queue;			// pointer back to the queue
-	osd_thread *		handle;			// handle to the thread
-	osd_event *			wakeevent;		// wake event for the thread
-	volatile INT32		active;			// are we actively processing work?
+	osd_work_queue *    queue;          // pointer back to the queue
+	osd_thread *        handle;         // handle to the thread
+	osd_event *         wakeevent;      // wake event for the thread
+	volatile INT32      active;         // are we actively processing work?
 
 #if KEEP_STATISTICS
-	INT32				itemsdone;
-	osd_ticks_t			actruntime;
-	osd_ticks_t			runtime;
-	osd_ticks_t			spintime;
-	osd_ticks_t			waittime;
+	INT32               itemsdone;
+	osd_ticks_t         actruntime;
+	osd_ticks_t         runtime;
+	osd_ticks_t         spintime;
+	osd_ticks_t         waittime;
 #endif
 };
 
 
 struct osd_work_queue
 {
-	osd_scalable_lock *	lock;			// lock for protecting the queue
-	osd_work_item * volatile list;		// list of items in the queue
-	osd_work_item ** volatile tailptr;	// pointer to the tail pointer of work items in the queue
-	osd_work_item * volatile free;		// free list of work items
-	volatile INT32		items;			// items in the queue
-	volatile INT32		livethreads;	// number of live threads
-	volatile INT32		waiting;		// is someone waiting on the queue to complete?
-	volatile UINT8		exiting;		// should the threads exit on their next opportunity?
-	UINT32				threads;		// number of threads in this queue
-	UINT32				flags;			// creation flags
-	work_thread_info *	thread;			// array of thread information
-	osd_event	*		doneevent;		// event signalled when work is complete
+	osd_scalable_lock * lock;           // lock for protecting the queue
+	osd_work_item * volatile list;      // list of items in the queue
+	osd_work_item ** volatile tailptr;  // pointer to the tail pointer of work items in the queue
+	osd_work_item * volatile free;      // free list of work items
+	volatile INT32      items;          // items in the queue
+	volatile INT32      livethreads;    // number of live threads
+	volatile INT32      waiting;        // is someone waiting on the queue to complete?
+	volatile UINT8      exiting;        // should the threads exit on their next opportunity?
+	UINT32              threads;        // number of threads in this queue
+	UINT32              flags;          // creation flags
+	work_thread_info *  thread;         // array of thread information
+	osd_event   *       doneevent;      // event signalled when work is complete
 
 #if KEEP_STATISTICS
-	volatile INT32		itemsqueued;	// total items queued
-	volatile INT32		setevents;		// number of times we called SetEvent
-	volatile INT32		extraitems;		// how many extra items we got after the first in the queue loop
-	volatile INT32		spinloops;		// how many times spinning bought us more items
+	volatile INT32      itemsqueued;    // total items queued
+	volatile INT32      setevents;      // number of times we called SetEvent
+	volatile INT32      extraitems;     // how many extra items we got after the first in the queue loop
+	volatile INT32      spinloops;      // how many times spinning bought us more items
 #endif
 };
 
 
 struct osd_work_item
 {
-	osd_work_item *		next;			// pointer to next item
-	osd_work_queue *	queue;			// pointer back to the owning queue
-	osd_work_callback	callback;		// callback function
-	void *				param;			// callback parameter
-	void *				result;			// callback result
-	osd_event *			event;			// event signalled when complete
-	UINT32				flags;			// creation flags
-	volatile INT32		done;			// is the item done?
+	osd_work_item *     next;           // pointer to next item
+	osd_work_queue *    queue;          // pointer back to the owning queue
+	osd_work_callback   callback;       // callback function
+	void *              param;          // callback parameter
+	void *              result;         // callback result
+	osd_event *         event;          // event signalled when complete
+	UINT32              flags;          // creation flags
+	volatile INT32      done;           // is the item done?
 };
 
 typedef void *PVOID;
@@ -163,7 +163,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	queue->flags = flags;
 
 	// allocate events for the queue
-	queue->doneevent = osd_event_alloc(TRUE, TRUE);		// manual reset, signalled
+	queue->doneevent = osd_event_alloc(TRUE, TRUE);     // manual reset, signalled
 	if (queue->doneevent == NULL)
 		goto error;
 
@@ -199,7 +199,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		thread->queue = queue;
 
 		// create the per-thread wake event
-		thread->wakeevent = osd_event_alloc(FALSE, FALSE);	// auto-reset, not signalled
+		thread->wakeevent = osd_event_alloc(FALSE, FALSE);  // auto-reset, not signalled
 		if (thread->wakeevent == NULL)
 			goto error;
 
@@ -504,9 +504,9 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 
 	// if we don't have an event, create one
 	if (item->event == NULL)
-		item->event = osd_event_alloc(TRUE, FALSE);		// manual reset, not signalled
+		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
 	else
-		 osd_event_reset(item->event);
+			osd_event_reset(item->event);
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
 	if (item->event == NULL)
@@ -568,7 +568,7 @@ static int effective_num_processors(void)
 	int numprocs = 0;
 	int physprocs = osd_get_num_processors();
 
-    // osd_num_processors == 0 for 'auto'
+	// osd_num_processors == 0 for 'auto'
 	if (osd_num_processors > 0)
 		return MIN(4 * physprocs, osd_num_processors);
 	else
@@ -589,9 +589,9 @@ static int effective_num_processors(void)
 
 static UINT32 effective_cpu_mask(int index)
 {
-	char	*s;
-	char	buf[5];
-	UINT32	mask = 0xFFFF;
+	char    *s;
+	char    buf[5];
+	UINT32  mask = 0xFFFF;
 
 	s = osd_getenv(SDLENV_CPUMASKS);
 	if (s != NULL && strcmp(s,"none"))

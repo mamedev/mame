@@ -23,8 +23,8 @@ DECLARE_WRITE8_DEVICE_HANDLER( y8950_control_port_w );
 DECLARE_WRITE8_DEVICE_HANDLER( y8950_write_port_w );
 
 class y8950_device : public device_t,
-                     public device_sound_interface,
-					 public y8950_interface
+						public device_sound_interface,
+						public y8950_interface
 {
 public:
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

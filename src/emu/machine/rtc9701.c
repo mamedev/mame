@@ -32,10 +32,10 @@ const device_type rtc9701 = &device_creator<rtc9701_device>;
 
 rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, rtc9701, "rtc9701", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this),
-	  m_latch(0),
-	  m_reset_line(CLEAR_LINE),
-	  m_clock_line(CLEAR_LINE)
+		device_nvram_interface(mconfig, *this),
+		m_latch(0),
+		m_reset_line(CLEAR_LINE),
+		m_clock_line(CLEAR_LINE)
 {
 
 }
@@ -47,14 +47,14 @@ void rtc9701_device::timer_callback()
 
 	m_rtc.sec++;
 
-	if((m_rtc.sec & 0x0f) >= 0x0a)				{ m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
-	if((m_rtc.sec & 0xf0) >= 0x60)				{ m_rtc.min++; m_rtc.sec = 0; }
-	if((m_rtc.min & 0x0f) >= 0x0a)				{ m_rtc.min+=0x10; m_rtc.min&=0xf0; }
-	if((m_rtc.min & 0xf0) >= 0x60)				{ m_rtc.hour++; m_rtc.min = 0; }
-	if((m_rtc.hour & 0x0f) >= 0x0a)				{ m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
-	if((m_rtc.hour & 0xff) >= 0x24)				{ m_rtc.day++; m_rtc.wday<<=1; m_rtc.hour = 0; }
-	if(m_rtc.wday & 0x80)						{ m_rtc.wday = 1; }
-	if((m_rtc.day & 0x0f) >= 0x0a)				{ m_rtc.day+=0x10; m_rtc.day&=0xf0; }
+	if((m_rtc.sec & 0x0f) >= 0x0a)              { m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
+	if((m_rtc.sec & 0xf0) >= 0x60)              { m_rtc.min++; m_rtc.sec = 0; }
+	if((m_rtc.min & 0x0f) >= 0x0a)              { m_rtc.min+=0x10; m_rtc.min&=0xf0; }
+	if((m_rtc.min & 0xf0) >= 0x60)              { m_rtc.hour++; m_rtc.min = 0; }
+	if((m_rtc.hour & 0x0f) >= 0x0a)             { m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
+	if((m_rtc.hour & 0xff) >= 0x24)             { m_rtc.day++; m_rtc.wday<<=1; m_rtc.hour = 0; }
+	if(m_rtc.wday & 0x80)                       { m_rtc.wday = 1; }
+	if((m_rtc.day & 0x0f) >= 0x0a)              { m_rtc.day+=0x10; m_rtc.day&=0xf0; }
 
 	/* TODO: crude leap year support */
 	dpm_count = (m_rtc.month & 0xf) + (((m_rtc.month & 0x10) >> 4)*10)-1;
@@ -65,10 +65,10 @@ void rtc9701_device::timer_callback()
 			{ m_rtc.month++; m_rtc.day = 0x01; }
 	}
 	else if((m_rtc.day & 0xff) >= dpm[dpm_count]+1){ m_rtc.month++; m_rtc.day = 0x01; }
-	if((m_rtc.month & 0x0f) >= 0x0a)			{ m_rtc.month = 0x10; }
-	if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
-	if((m_rtc.year & 0x0f) >= 0x0a)				{ m_rtc.year+=0x10; m_rtc.year&=0xf0; }
-	if((m_rtc.year & 0xf0) >= 0xa0)				{ m_rtc.year = 0; } //2000-2099 possible timeframe
+	if((m_rtc.month & 0x0f) >= 0x0a)            { m_rtc.month = 0x10; }
+	if(m_rtc.month >= 0x13)                     { m_rtc.year++; m_rtc.month = 1; }
+	if((m_rtc.year & 0x0f) >= 0x0a)             { m_rtc.year+=0x10; m_rtc.year&=0xf0; }
+	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //2000-2099 possible timeframe
 }
 
 TIMER_CALLBACK( rtc9701_device::rtc_inc_callback )
@@ -467,5 +467,3 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 		}
 	}
 }
-
-

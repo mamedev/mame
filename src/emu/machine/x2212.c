@@ -37,13 +37,13 @@ const device_type X2212 = &device_creator<x2212_device>;
 
 x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, X2212, "X2212", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_auto_save(false),
-	  m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map)),
-	  m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map)),
-	  m_store(false),
-	  m_array_recall(false)
+		device_memory_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_auto_save(false),
+		m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map)),
+		m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map)),
+		m_store(false),
+		m_array_recall(false)
 {
 }
 

@@ -153,7 +153,7 @@ MSX_SLOT_INIT(rammm)
 	if (i == 6)
 	{
 		logerror ("ram mapper: error: must be 64kb, 128kb, 256kb, 512kb, "
-				  "1mb, 2mb or 4mb\n");
+					"1mb, 2mb or 4mb\n");
 		return 1;
 	}
 	state->m_mem = auto_alloc_array(machine, UINT8, size);
@@ -716,7 +716,7 @@ MSX_SLOT_WRITE(ascii8_sram)
 	{
 		bank = addr < 0xa000 ? 2 : 3;
 		if (!(state->m_banks[bank] & state->m_cart.sram.empty_mask) &&
-		     (state->m_banks[bank] & state->m_cart.sram.sram_mask))
+				(state->m_banks[bank] & state->m_cart.sram.sram_mask))
 		{
 			state->m_cart.sram.mem[addr & 0x1fff] = val;
 		}
@@ -876,7 +876,7 @@ MSX_SLOT_WRITE(ascii16_sram)
 	else if (addr >= 0x8000 && addr < 0xc000)
 	{
 		if (!(state->m_banks[1] & state->m_cart.sram.empty_mask) &&
-		     (state->m_banks[1] & state->m_cart.sram.sram_mask))
+				(state->m_banks[1] & state->m_cart.sram.sram_mask))
 		{
 			int offset, i;
 
@@ -1697,7 +1697,7 @@ MSX_SLOT_WRITE(fmpac)
 
 		state->m_cart.fmpac.sram_active =
 				(state->m_cart.fmpac.mem[0x1ffe] == 0x4d &&
-				 state->m_cart.fmpac.mem[0x1fff] == 0x69);
+					state->m_cart.fmpac.mem[0x1fff] == 0x69);
 	}
 
 	switch (addr)
@@ -1810,7 +1810,7 @@ MSX_SLOT_INIT(superloderunner)
 	if (size != 0x20000)
 	{
 		logerror ("superloderunner: error: rom file should be exactly "
-				  "128kb\n");
+					"128kb\n");
 		return 1;
 	}
 	state->m_type = SLOT_SUPERLODERUNNER;
@@ -2486,4 +2486,3 @@ MSX_SLOT_START
 	MSX_SLOT_NULL (SLOT_CARTRIDGE2)
 	MSX_SLOT (SLOT_DISK_ROM2, diskrom2)
 MSX_SLOT_END
-

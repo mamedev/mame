@@ -40,10 +40,10 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	ti99_grom_device*	m_grom[8];
-	UINT8*				m_rom;
-	int					m_bank_select;
-	bool				m_switch;
+	ti99_grom_device*   m_grom[8];
+	UINT8*              m_rom;
+	int                 m_bank_select;
+	bool                m_switch;
 };
 
 #endif

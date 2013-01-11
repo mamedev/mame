@@ -107,4 +107,3 @@ const rom_entry *ti_32k_expcard_device::device_rom_region() const
 }
 
 const device_type TI_32KMEM = &device_creator<ti_32k_expcard_device>;
-

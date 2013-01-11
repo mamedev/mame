@@ -345,7 +345,7 @@ To Do:
 #include "includes/toaplan1.h"
 #include "sound/3812intf.h"
 
-#define PIXEL_CLOCK			(XTAL_28MHz/4)
+#define PIXEL_CLOCK         (XTAL_28MHz/4)
 
 /* freq      V Hz       H kHz
 Fire Shark   57.6132    14.82  -->  472.33 * 257.23
@@ -358,13 +358,13 @@ Rally Bike   55.14      ?
 Vimana       55.14      ?
 
 */
-#define HTOTAL				(473)
-#define HBEND				(0)
-#define HBSTART				(320)
+#define HTOTAL              (473)
+#define HBEND               (0)
+#define HBSTART             (320)
 
-#define VTOTAL				(257)
-#define VBEND				(0)
-#define VBSTART				(240)
+#define VTOTAL              (257)
+#define VBEND               (0)
+#define VBSTART             (240)
 
 
 /***************************** 68000 Memory Map *****************************/
@@ -479,7 +479,7 @@ static ADDRESS_MAP_START( demonwld_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0xe00000, 0xe00003) AM_WRITE(toaplan1_tile_offsets_w)
 	AM_RANGE(0xe00006, 0xe00007) AM_WRITE(toaplan1_fcu_flipscreen_w)
 	AM_RANGE(0xe00008, 0xe00009) AM_WRITE(toaplan1_reset_sound)
-	AM_RANGE(0xe0000a, 0xe0000b) AM_WRITE(demonwld_dsp_ctrl_w)	/* DSP Comms control */
+	AM_RANGE(0xe0000a, 0xe0000b) AM_WRITE(demonwld_dsp_ctrl_w)  /* DSP Comms control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( samesame_main_map, AS_PROGRAM, 16, toaplan1_state )
@@ -487,7 +487,7 @@ static ADDRESS_MAP_START( samesame_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(toaplan1_tile_offsets_w)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM			/* Frame done at $c1ada */
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM         /* Frame done at $c1ada */
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(?? video frame related ??)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(toaplan1_intenable_w)
@@ -499,8 +499,8 @@ static ADDRESS_MAP_START( samesame_main_map, AS_PROGRAM, 16, toaplan1_state )
 	AM_RANGE(0x140004, 0x140005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x140006, 0x140007) AM_READ_PORT("DSWB")
 	AM_RANGE(0x140008, 0x140009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x14000a, 0x14000b) AM_READ(samesame_port_6_word_r)	/* Territory, and MCU ready */
-	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(samesame_coin_w)	/* Coin counter/lockout */
+	AM_RANGE(0x14000a, 0x14000b) AM_READ(samesame_port_6_word_r)    /* Territory, and MCU ready */
+	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(samesame_coin_w)  /* Coin counter/lockout */
 //  AM_RANGE(0x14000e, 0x14000f) AM_WRITE_LEGACY(samesame_mcu_w)   /* Commands sent to HD647180 */
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(toaplan1_bcu_flipscreen_w)
 	AM_RANGE(0x180002, 0x180003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
@@ -576,7 +576,7 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x30) AM_WRITE(rallybik_coin_w)	/* Coin counter/lockout */
+	AM_RANGE(0x30, 0x30) AM_WRITE(rallybik_coin_w)  /* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START( truxton_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
+	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
@@ -599,7 +599,7 @@ static ADDRESS_MAP_START( hellfire_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSWB")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
-	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
+	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("P2")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
@@ -614,7 +614,7 @@ static ADDRESS_MAP_START( zerowing_sound_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x28, 0x28) AM_READ_PORT("DSWB")
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x88, 0x88) AM_READ_PORT("TJUMP")
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
 	AM_RANGE(0xa8, 0xa9) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( demonwld_sound_io_map, AS_IO, 8, toaplan1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
-	AM_RANGE(0x40, 0x40) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
+	AM_RANGE(0x40, 0x40) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("DSWB")
@@ -633,7 +633,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( outzone_sound_io_map, AS_IO, 8, toaplan1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
+	AM_RANGE(0x04, 0x04) AM_WRITE(toaplan1_coin_w)  /* Coin counter/lockout */
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSWA")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSWB")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
@@ -662,8 +662,8 @@ ADDRESS_MAP_END
 /***************************** HD647180 Memory Map **************************/
 
 static ADDRESS_MAP_START( hd647180_mem_map, AS_PROGRAM, 8, toaplan1_state )
-	AM_RANGE(0x00000, 0x03fff) AM_ROM	/* Internal 16k byte ROM */
-	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM	/* Internal 512 byte RAM */
+	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
+	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
 ADDRESS_MAP_END
 
 
@@ -705,30 +705,30 @@ static INPUT_PORTS_START( toaplan1_3b )
 INPUT_PORTS_END
 #endif
 
-#define  TOAPLAN1_PLAYER_INPUT( player, button3, options )										\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY		\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) options PORT_8WAY	\
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) options PORT_8WAY	\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) options PORT_8WAY	\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) options					\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) options					\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, button3 ) PORT_PLAYER(player) options						\
+#define  TOAPLAN1_PLAYER_INPUT( player, button3, options )                                      \
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY     \
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) options PORT_8WAY   \
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) options PORT_8WAY   \
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) options PORT_8WAY  \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) options                   \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) options                   \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, button3 ) PORT_PLAYER(player) options                       \
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-#define  TOAPLAN1_SYSTEM_INPUTS						\
-	PORT_START("SYSTEM")						\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )	\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )		\
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )		\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )		\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )	\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )	\
+#define  TOAPLAN1_SYSTEM_INPUTS                     \
+	PORT_START("SYSTEM")                        \
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )  \
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )      \
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )   \
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )     \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )     \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )    \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )    \
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-#define  TOAPLAN1_VBLANK_INPUT						\
-	PORT_START("VBLANK")						\
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	\
+#define  TOAPLAN1_VBLANK_INPUT                      \
+	PORT_START("VBLANK")                        \
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")    \
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 
@@ -756,8 +756,8 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPSETTING(    0x30, "USA (Romstar license)" )     /* Taito America Corp. */
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */
 	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   /* not on race 1 */
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -796,8 +796,8 @@ static INPUT_PORTS_START( truxton )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -834,7 +834,7 @@ static INPUT_PORTS_START( hellfire )
 	PORT_START("P2")
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, )
 
-	PORT_START("DSWA")		/* DSW A */
+	PORT_START("DSWA")      /* DSW A */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -856,7 +856,7 @@ static INPUT_PORTS_START( hellfire )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
-	PORT_START("DSWB")		/* DSWB */
+	PORT_START("DSWB")      /* DSWB */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
@@ -881,7 +881,7 @@ static INPUT_PORTS_START( hellfire )
 
 	TOAPLAN1_SYSTEM_INPUTS
 
-	PORT_START("TJUMP")		/* Territory Jumper block */
+	PORT_START("TJUMP")     /* Territory Jumper block */
 	PORT_DIPNAME( 0x03, 0x02, "Territory" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 //  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )
@@ -994,7 +994,7 @@ static INPUT_PORTS_START( demonwld )
 	PORT_START("P2")
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
 
-	PORT_START("DSWA")		/* DSW A */
+	PORT_START("DSWA")      /* DSW A */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1016,7 +1016,7 @@ static INPUT_PORTS_START( demonwld )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
-	PORT_START("DSWB")		/* DSW B */
+	PORT_START("DSWB")      /* DSW B */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
@@ -1041,7 +1041,7 @@ static INPUT_PORTS_START( demonwld )
 
 	TOAPLAN1_SYSTEM_INPUTS
 
-	PORT_START("TJUMP")		/* Territory Jumper Block */
+	PORT_START("TJUMP")     /* Territory Jumper Block */
 	PORT_DIPNAME( 0x01, 0x01, "Territory/Copyright" )
 	PORT_DIPSETTING(    0x01, "Toaplan" )
 	PORT_DIPSETTING(    0x00, "Japan/Taito Corp" )
@@ -1060,7 +1060,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( demonwld1 )
 	PORT_INCLUDE( demonwld )
 
-	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_MODIFY("TJUMP")        /* Territory Jumper Block */
 	PORT_DIPNAME( 0x03, 0x02, "Territory/Copyright" )
 	PORT_DIPSETTING(    0x02, "World/Taito Japan" )
 	PORT_DIPSETTING(    0x03, "US/Toaplan" )
@@ -1078,7 +1078,7 @@ static INPUT_PORTS_START( fireshrk )
 	PORT_START("P2")
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
 
-	PORT_START("DSWA")		/* DSW A */
+	PORT_START("DSWA")      /* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -1100,7 +1100,7 @@ static INPUT_PORTS_START( fireshrk )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
-	PORT_START("DSWB")		/* DSW B */
+	PORT_START("DSWB")      /* DSW B */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
@@ -1125,7 +1125,7 @@ static INPUT_PORTS_START( fireshrk )
 
 	TOAPLAN1_SYSTEM_INPUTS
 
-	PORT_START("TJUMP")		/* Territory Jumper Block */
+	PORT_START("TJUMP")     /* Territory Jumper Block */
 	PORT_DIPNAME( 0x06, 0x02, "Territory" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )
@@ -1136,7 +1136,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( samesame )
 	PORT_INCLUDE( fireshrk )
 
-	PORT_MODIFY("DSWA")		/* DSW A */
+	PORT_MODIFY("DSWA")     /* DSW A */
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -1162,7 +1162,7 @@ static INPUT_PORTS_START( samesame )
     PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 */
 
-	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_MODIFY("TJUMP")        /* Territory Jumper Block */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1184,12 +1184,12 @@ static INPUT_PORTS_START( samesame2 )
 	PORT_MODIFY("P2")
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, )
 
-	PORT_MODIFY("DSWA")		/* DSW A */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )	/* No cocktail */
+	PORT_MODIFY("DSWA")     /* DSW A */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )  /* No cocktail */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
-	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_MODIFY("TJUMP")        /* Territory Jumper Block */
 /* settings listed in service mode, but not actually used
     PORT_DIPNAME( 0x03, 0x00, "Territory" )
 //  PORT_DIPSETTING(    0x01, DEF_STR( Europe ) )
@@ -1203,7 +1203,7 @@ static INPUT_PORTS_START( samesame2 )
 //  PORT_DIPNAME( 0x02, 0x00, "Show Territory Notice" ) /* Same as Bit 1 */
 //  PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_BIT( 0xf2, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Mask bit 2 aswell */
+	PORT_BIT( 0xf2, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Mask bit 2 aswell */
 INPUT_PORTS_END
 
 
@@ -1216,7 +1216,7 @@ static INPUT_PORTS_START( outzone )
 	PORT_START("P2")
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
 
-	PORT_START("DSWA")		/* DSW A */
+	PORT_START("DSWA")      /* DSW A */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1238,7 +1238,7 @@ static INPUT_PORTS_START( outzone )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
-	PORT_START("DSWB")		/* DSW B */
+	PORT_START("DSWB")      /* DSW B */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
@@ -1263,7 +1263,7 @@ static INPUT_PORTS_START( outzone )
 
 	TOAPLAN1_SYSTEM_INPUTS
 
-	PORT_START("TJUMP")		/* Territory Jumper Block */
+	PORT_START("TJUMP")     /* Territory Jumper Block */
 	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
@@ -1287,7 +1287,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( outzoneb )
 	PORT_INCLUDE( outzone )
 
-	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_MODIFY("TJUMP")        /* Territory Jumper Block */
 	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
@@ -1305,7 +1305,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( outzonec )
 	PORT_INCLUDE( outzone )
 
-	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
+	PORT_MODIFY("TJUMP")        /* Territory Jumper Block */
 	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
@@ -1461,9 +1461,9 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	8,8,	/* 8x8 */
-	16384,	/* 16384 tiles */
-	4,		/* 4 bits per pixel */
+	8,8,    /* 8x8 */
+	16384,  /* 16384 tiles */
+	4,      /* 4 bits per pixel */
 	{ 3*8*0x20000, 2*8*0x20000, 1*8*0x20000, 0*8*0x20000 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38 },
@@ -1472,21 +1472,21 @@ static const gfx_layout tilelayout =
 
 static const gfx_layout rallybik_spr_layout =
 {
-	16,16,	/* 16*16 sprites */
-	2048,	/* 2048 sprites */
-	4,		/* 4 bits per pixel */
+	16,16,  /* 16*16 sprites */
+	2048,   /* 2048 sprites */
+	4,      /* 4 bits per pixel */
 	{ 0*2048*32*8, 1*2048*32*8, 2*2048*32*8, 3*2048*32*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout vm_tilelayout =
 {
-	8,8,	/* 8x8 */
-	32768,	/* 32768 tiles */
-	4,		/* 4 bits per pixel */
+	8,8,    /* 8x8 */
+	32768,  /* 32768 tiles */
+	4,      /* 4 bits per pixel */
 	{ 8*0x80000+8, 8*0x80000, 8, 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70 },
@@ -1495,22 +1495,22 @@ static const gfx_layout vm_tilelayout =
 
 
 static GFXDECODE_START( toaplan1 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,		0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,	64*16, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,       0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( rallybik )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,			  0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,             0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rallybik_spr_layout, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( outzone )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, vm_tilelayout,	0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,	64*16, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, vm_tilelayout,    0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( vm )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,		0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,       0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, vm_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
@@ -1723,9 +1723,9 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(samesame_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)    /* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)
-	MCFG_DEVICE_DISABLE()		/* Internal code is not dumped */
+	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped */
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1791,13 +1791,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( vimana, toaplan1_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)	/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(vimana_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)    /* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)
-	MCFG_DEVICE_DISABLE()		/* Internal code is not dumped */
+	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped */
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,vimana)
 
@@ -1817,7 +1817,7 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)	/* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)   /* verified on pcb */
 	MCFG_SOUND_CONFIG(ym3812_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1832,13 +1832,13 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( rallybik )
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "b45-02.rom",  0x000000, 0x08000, CRC(383386d7) SHA1(fc420b6adc79a408a68f0661d0c62ed7dbe8b6d7) )
 	ROM_LOAD16_BYTE( "b45-01.rom",  0x000001, 0x08000, CRC(7602f6a7) SHA1(2939c261a4bc63586681080f5643916c85e81c7d) )
 	ROM_LOAD16_BYTE( "b45-04.rom",  0x040000, 0x20000, CRC(e9b005b1) SHA1(19b5acfd5fb2683a56a701400b11ee6f64a9bdf1) )
 	ROM_LOAD16_BYTE( "b45-03.rom",  0x040001, 0x20000, CRC(555344ce) SHA1(398963f488fe6f19c0b8518d80c946c242d0fc45) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "b45-05.rom",  0x0000, 0x4000, CRC(10814601) SHA1(bad7a834d8849752a7f3000bb5154ec0fa50d695) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1853,19 +1853,19 @@ ROM_START( rallybik )
 	ROM_LOAD( "b45-12.rom",  0x20000, 0x10000, CRC(cf5aae4e) SHA1(5832c52d2e9b86414d8ee2926fa190abe9e41da4) )
 	ROM_LOAD( "b45-13.rom",  0x30000, 0x10000, CRC(1683b07c) SHA1(54356893357cd1297f24f1d85b7289d80740262d) )
 
-	ROM_REGION( 0x240, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "b45-15.bpr",  0x000, 0x100, CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )	/* sprite priority control ?? */
-	ROM_LOAD( "b45-16.bpr",  0x100, 0x100, CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )	/* sprite priority control ?? */
-	ROM_LOAD( "b45-14.bpr",  0x200, 0x020, CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )	/* sprite control ?? */
-	ROM_LOAD( "b45-17.bpr",  0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
+	ROM_REGION( 0x240, "proms", 0 )     /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "b45-15.bpr",  0x000, 0x100, CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )   /* sprite priority control ?? */
+	ROM_LOAD( "b45-16.bpr",  0x100, 0x100, CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )   /* sprite priority control ?? */
+	ROM_LOAD( "b45-14.bpr",  0x200, 0x020, CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )   /* sprite control ?? */
+	ROM_LOAD( "b45-17.bpr",  0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
 ROM_END
 
 ROM_START( truxton )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "b65_11.bin",  0x000000, 0x20000, CRC(1a62379a) SHA1(b9470d4b70c38f2523b22636874d742abe4099eb) )
 	ROM_LOAD16_BYTE( "b65_10.bin",  0x000001, 0x20000, CRC(aff5195d) SHA1(a7f379dc35e3acf9e7a8ae8a47a9b5b4193f93a1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "b65_09.bin",  0x0000, 0x8000, CRC(f1c0f410) SHA1(05deb759f8acb14fff92c56b536134cfd84516a8) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1880,17 +1880,17 @@ ROM_START( truxton )
 	ROM_LOAD( "b65_02.bin",  0x40000, 0x20000, CRC(1dd55161) SHA1(c537456ac56801dea0ac48fb1389228530d00a61) )
 	ROM_LOAD( "b65_01.bin",  0x60000, 0x20000, CRC(e974937f) SHA1(ab282472c04ce6d9ed368956c427403275bc9080) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "b65_12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "b65_13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "b65_12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "b65_13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( hellfire )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "b90_14.0",   0x000000, 0x20000, CRC(101df9f5) SHA1(27e1430d4c96fe2c830143999a760470c8381ada) )
 	ROM_LOAD16_BYTE( "b90_15.1",   0x000001, 0x20000, CRC(e67fd452) SHA1(baec2a702238f000d0499705d79d7c7577fc2279) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "b90_03.2",   0x0000, 0x8000, CRC(4058fa67) SHA1(155c364273c270cd74955f447efc804bb4c9b560) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1905,17 +1905,17 @@ ROM_START( hellfire )
 	ROM_LOAD( "b90_09.8",   0x40000, 0x20000, CRC(cf01009e) SHA1(e260c479fa97f23a65c220e5071aaf2dc2baf46d) )
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
-	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( hellfire1 )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "b90_14x.0",   0x000000, 0x20000, CRC(a3141ea5) SHA1(9b456cb908e193198110a628d98567a3b8351591) )
 	ROM_LOAD16_BYTE( "b90_15x.1",   0x000001, 0x20000, CRC(e864daf4) SHA1(382f02df8419310cef5d7fb68a9376eeac2f3685) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "b90_03x.2",  0x0000, 0x8000, CRC(f58c368f) SHA1(2ee5396a4b70a3374f3a3bbd791b1d962f6a8a52) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1930,17 +1930,17 @@ ROM_START( hellfire1 )
 	ROM_LOAD( "b90_09.8",   0x40000, 0x20000, CRC(cf01009e) SHA1(e260c479fa97f23a65c220e5071aaf2dc2baf46d) )
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
-	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( hellfire2 )/* Original version, by rom numbers (IE: 01 & 02) */
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "b90_01.0",   0x000000, 0x20000, CRC(c94acf53) SHA1(5710861dbe976fe53b93d3428147d1ce7aaae18a) ) /* Territory block seems to have no effect and it's licensed */
 	ROM_LOAD16_BYTE( "b90_02.1",   0x000001, 0x20000, CRC(d17f03c3) SHA1(ac41e6c29aa507872caeeaec6a3bc24c705a3702) ) /* to "Taito Corp." the later set shows "Taito Corporation" */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "b90_03x.2",  0x0000, 0x8000, CRC(f58c368f) SHA1(2ee5396a4b70a3374f3a3bbd791b1d962f6a8a52) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1955,17 +1955,17 @@ ROM_START( hellfire2 )/* Original version, by rom numbers (IE: 01 & 02) */
 	ROM_LOAD( "b90_09.8",   0x40000, 0x20000, CRC(cf01009e) SHA1(e260c479fa97f23a65c220e5071aaf2dc2baf46d) )
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
-	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( hellfire3 )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "b90_01.10m",  0x000000, 0x20000, CRC(034966d3) SHA1(f987d8e7ebe6a546be621fe4d5a59de1284c4ebb) ) /* Same labels as hellfire2 but different data */
 	ROM_LOAD16_BYTE( "b90_02.9m",   0x000001, 0x20000, CRC(06dd24c7) SHA1(a990de7ffac6bd0dd219c7bf9f773ccb41395be6) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "b90_03.2",   0x0000, 0x8000, CRC(4058fa67) SHA1(155c364273c270cd74955f447efc804bb4c9b560) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -1980,19 +1980,19 @@ ROM_START( hellfire3 )
 	ROM_LOAD( "b90_09.8",   0x40000, 0x20000, CRC(cf01009e) SHA1(e260c479fa97f23a65c220e5071aaf2dc2baf46d) )
 	ROM_LOAD( "b90_08.7",   0x60000, 0x20000, CRC(3404a5e3) SHA1(f717b9e31c2a093dbb060b8ea54a8c3f52688d7a) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* N82S123AN bprom - sprite attribute (flip/position) ?? */
-	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* N82S123AN bprom -  ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "13.3w",     0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* N82S123AN bprom - sprite attribute (flip/position) ?? */
+	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* N82S123AN bprom -  ??? */
 ROM_END
 
 ROM_START( zerowing )
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o15-11.rom",  0x000000, 0x08000, CRC(6ff2b9a0) SHA1(c9f2a631f185689dfc42a451d85fac23c2f4b64b) )
 	ROM_LOAD16_BYTE( "o15-12.rom",  0x000001, 0x08000, CRC(9773e60b) SHA1(b733e9d38a233d010cc5ea41e7e61695082c3a22) )
 	ROM_LOAD16_BYTE( "o15-09.rom",  0x040000, 0x20000, CRC(13764e95) SHA1(61da49b73ba81edd951e96e9ce6673c1c3bd65f2) )
 	ROM_LOAD16_BYTE( "o15-10.rom",  0x040001, 0x20000, CRC(351ba71a) SHA1(937331549140506711b08252497cc0f2efa58268) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "o15-13.rom",  0x0000, 0x8000, CRC(e7b72383) SHA1(ea1f6f33a86d14d58bd396fd46081462f00177d5) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2007,19 +2007,19 @@ ROM_START( zerowing )
 	ROM_LOAD( "o15-01.rom",  0x40000, 0x20000, CRC(70570e43) SHA1(acc9baec71b0930cb2f193677e0663efa5d5551d) )
 	ROM_LOAD( "o15-02.rom",  0x60000, 0x20000, CRC(724b487f) SHA1(06af31520866eea69aebbd5d428f80e882289a15) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp015_14.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp015_14.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 ROM_START( zerowing2 ) /* 2 player simultaneous version */
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o15-11iiw.bin",  0x000000, 0x08000, CRC(38b0bb5b) SHA1(e5a4c0b6c279a55701c82bf9e285a806054f8d23) )
 	ROM_LOAD16_BYTE( "o15-12iiw.bin",  0x000001, 0x08000, CRC(74c91e6f) SHA1(8cf5d10a5f4efda0903a4c5d56599861ccc8f1c1) )
 	ROM_LOAD16_BYTE( "o15-09.rom",     0x040000, 0x20000, CRC(13764e95) SHA1(61da49b73ba81edd951e96e9ce6673c1c3bd65f2) )
 	ROM_LOAD16_BYTE( "o15-10.rom",     0x040001, 0x20000, CRC(351ba71a) SHA1(937331549140506711b08252497cc0f2efa58268) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "o15-13.rom",  0x0000, 0x8000, CRC(e7b72383) SHA1(ea1f6f33a86d14d58bd396fd46081462f00177d5) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2034,20 +2034,20 @@ ROM_START( zerowing2 ) /* 2 player simultaneous version */
 	ROM_LOAD( "o15-01.rom",  0x40000, 0x20000, CRC(70570e43) SHA1(acc9baec71b0930cb2f193677e0663efa5d5551d) )
 	ROM_LOAD( "o15-02.rom",  0x60000, 0x20000, CRC(724b487f) SHA1(06af31520866eea69aebbd5d428f80e882289a15) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp015_14.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp015_14.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 ROM_START( demonwld )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.v2", 0x000000, 0x20000, CRC(ca8194f3) SHA1(176da6739b35ba38b40150fc62380108bcae5a24) )
 	ROM_LOAD16_BYTE( "o16-09.v2", 0x000001, 0x20000, CRC(7baea7ba) SHA1(ae2b40f9efb4440ff7edbcc4f80641655f7c4671) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11.v2",  0x0000, 0x8000, CRC(dbe08c85) SHA1(536a242bfe916d15744b079261507af6f12b5b50) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
+	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
 	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
 	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
@@ -2063,20 +2063,20 @@ ROM_START( demonwld )
 	ROM_LOAD( "rom03",  0x40000, 0x20000, CRC(2cacdcd0) SHA1(92216d1c6859e05d39363c30e0beb45bc0ae4e1c) )
 	ROM_LOAD( "rom04",  0x60000, 0x20000, CRC(76fd3201) SHA1(7a12737bf90bd9760074132edeb22f3fd3e16b4f) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( demonwld1 )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.rom", 0x000000, 0x20000, CRC(036ee46c) SHA1(60868e5e08e0c9a538ae786de0de6b2531b30b11) )
 	ROM_LOAD16_BYTE( "o16-09.rom", 0x000001, 0x20000, CRC(bed746e3) SHA1(056668edb7df99bbd240e387af17cf252d1448f3) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
+	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
 	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
 	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
@@ -2092,20 +2092,20 @@ ROM_START( demonwld1 )
 	ROM_LOAD( "rom03",  0x40000, 0x20000, CRC(2cacdcd0) SHA1(92216d1c6859e05d39363c30e0beb45bc0ae4e1c) )
 	ROM_LOAD( "rom04",  0x60000, 0x20000, CRC(76fd3201) SHA1(7a12737bf90bd9760074132edeb22f3fd3e16b4f) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( demonwld2 )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10-2.bin", 0x000000, 0x20000, CRC(84ee5218) SHA1(dc2b017ee630330163be320008d8a0d761cb0cfb) ) // aka o16_10ii
 	ROM_LOAD16_BYTE( "o16-09-2.bin", 0x000001, 0x20000, CRC(cf474cb2) SHA1(5c049082b8d7118e0d2e50c6ae07f9d3d0110498) ) // aka o16_09ii
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
+	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
 	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
 	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
@@ -2121,20 +2121,20 @@ ROM_START( demonwld2 )
 	ROM_LOAD( "rom03",  0x40000, 0x20000, CRC(2cacdcd0) SHA1(92216d1c6859e05d39363c30e0beb45bc0ae4e1c) )
 	ROM_LOAD( "rom04",  0x60000, 0x20000, CRC(76fd3201) SHA1(7a12737bf90bd9760074132edeb22f3fd3e16b4f) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( demonwld3 )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.bin", 0x000000, 0x20000, CRC(6f7468e0) SHA1(87ef7733fd0d00d0d375dbf30332cf0614480dc2) )
 	ROM_LOAD16_BYTE( "o16-09.bin", 0x000001, 0x20000, CRC(a572f5f7) SHA1(3d6a443cecd46734c7e1b761130909482c7a9914) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
+	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
 	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
 	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
@@ -2150,19 +2150,19 @@ ROM_START( demonwld3 )
 	ROM_LOAD( "rom03",  0x40000, 0x20000, CRC(2cacdcd0) SHA1(92216d1c6859e05d39363c30e0beb45bc0ae4e1c) )
 	ROM_LOAD( "rom04",  0x60000, 0x20000, CRC(76fd3201) SHA1(7a12737bf90bd9760074132edeb22f3fd3e16b4f) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( samesame )
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o17_09.bin",  0x000000, 0x08000, CRC(3f69e437) SHA1(f2a40fd42cb5ecb2e514b72e7550aa479a9f9ad6) )
 	ROM_LOAD16_BYTE( "o17_10.bin",  0x000001, 0x08000, CRC(4e723e0a) SHA1(e06394d50addeda1045c02c646964afbc6005a82) )
 	ROM_LOAD16_BYTE( "o17_11.bin",  0x040000, 0x20000, CRC(be07d101) SHA1(1eda14ba24532b565d6ad57490b73ff312f98b53) )
 	ROM_LOAD16_BYTE( "o17_12.bin",  0x040001, 0x20000, CRC(ef698811) SHA1(4c729704eba0bf469599c79009327e4fa5dc540b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2178,19 +2178,19 @@ ROM_START( samesame )
 	ROM_LOAD( "o17_03.5d",  0x40000, 0x20000, CRC(68723dc9) SHA1(4f1b7aa2469c955e03737b611a7d2524f1e4f61e) )
 	ROM_LOAD( "o17_04.7d",  0x60000, 0x20000, CRC(fe0ecb13) SHA1(634a49262b9c092c25f11b14c6757fe94ea9eddc) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( samesame2 )
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o17_09x.bin", 0x000000, 0x08000, CRC(3472e03e) SHA1(a0f12622a1963bfac2d5f357afbfb5d7db2cd8df) )
 	ROM_LOAD16_BYTE( "o17_10x.bin", 0x000001, 0x08000, CRC(a3ac49b5) SHA1(c5adf026b9129b64acee5a079e102377a8488220) )
 	ROM_LOAD16_BYTE( "o17_11ii.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12ii.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2206,19 +2206,19 @@ ROM_START( samesame2 )
 	ROM_LOAD( "o17_03.5d",  0x40000, 0x20000, CRC(68723dc9) SHA1(4f1b7aa2469c955e03737b611a7d2524f1e4f61e) )
 	ROM_LOAD( "o17_04.7d",  0x60000, 0x20000, CRC(fe0ecb13) SHA1(634a49262b9c092c25f11b14c6757fe94ea9eddc) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( fireshrk )
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "09.bin",      0x000000, 0x08000, CRC(f0c70e6f) SHA1(037690448786d61aa116b24b638430c577ea78e2) )
 	ROM_LOAD16_BYTE( "10.bin",      0x000001, 0x08000, CRC(9d253d77) SHA1(0414d1f475abb9ccfd7daa11c2f400a14f25db09) )
 	ROM_LOAD16_BYTE( "o17_11ii.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12ii.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2234,19 +2234,19 @@ ROM_START( fireshrk )
 	ROM_LOAD( "o17_03.5d",  0x40000, 0x20000, CRC(68723dc9) SHA1(4f1b7aa2469c955e03737b611a7d2524f1e4f61e) )
 	ROM_LOAD( "o17_04.7d",  0x60000, 0x20000, CRC(fe0ecb13) SHA1(634a49262b9c092c25f11b14c6757fe94ea9eddc) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( fireshrkd )
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o17_09dyn.8j",0x000000, 0x10000, CRC(e25eee27) SHA1(1ff3f838123180a0b6672c9beee6c0f0092a0f94) )
 	ROM_LOAD16_BYTE( "o17_10dyn.8l",0x000001, 0x10000, CRC(c4c58cf6) SHA1(5867ecf66cd6c16cfcc54a581d3f4a8b666fd839) )
 	ROM_LOAD16_BYTE( "o17_11ii.7j", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12ii.7l", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2262,19 +2262,19 @@ ROM_START( fireshrkd )
 	ROM_LOAD( "o17_03.5d",  0x40000, 0x20000, CRC(68723dc9) SHA1(4f1b7aa2469c955e03737b611a7d2524f1e4f61e) )
 	ROM_LOAD( "o17_04.7d",  0x60000, 0x20000, CRC(fe0ecb13) SHA1(634a49262b9c092c25f11b14c6757fe94ea9eddc) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( fireshrkdh )
-	ROM_REGION( 0x080000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o17_09dyh.8j",0x000000, 0x10000, CRC(7b4c14dd) SHA1(d40dcf223f16c0f507aeb282d1524dbf1349c536) )
 	ROM_LOAD16_BYTE( "o17_10dyh.8l",0x000001, 0x10000, CRC(a3f159f9) SHA1(afc9630ca38da730f7cf4954d1333954e8d75787) )
 	ROM_LOAD16_BYTE( "o17_11x.bin", 0x040000, 0x20000, CRC(6beac378) SHA1(041ba98a89a4bac32575858db8a061bdf7804594) )
 	ROM_LOAD16_BYTE( "o17_12x.bin", 0x040001, 0x20000, CRC(6adb6eb5) SHA1(9b6e63aa50d271c2bb0b4cf822fc6f3684f10230) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.017",  0x00000, 0x08000, NO_DUMP )
 
@@ -2290,9 +2290,9 @@ ROM_START( fireshrkdh )
 	ROM_LOAD( "o17_03.5d",  0x40000, 0x20000, CRC(68723dc9) SHA1(4f1b7aa2469c955e03737b611a7d2524f1e4f61e) )
 	ROM_LOAD( "o17_04.7d",  0x60000, 0x20000, CRC(fe0ecb13) SHA1(634a49262b9c092c25f11b14c6757fe94ea9eddc) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "prom14.25b",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "prom15.20c",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 
@@ -2306,11 +2306,11 @@ Out Zone - Seems to be a later version, Differences:
 */
 
 ROM_START( outzone )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp018_7.bin",  0x000000, 0x20000, CRC(0c2ac02d) SHA1(78fda906ef7e0bb8e4ad44f34a8ac934b75d4bd8) )
 	ROM_LOAD16_BYTE( "tp018_8.bin",  0x000001, 0x20000, CRC(ca7e48aa) SHA1(c5073e6c124d74f16d01e67949965fdca929a886) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2323,17 +2323,17 @@ ROM_START( outzone )
 	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
 	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 ROM_START( outzonea )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "18.bin",  0x000000, 0x20000, CRC(31a171bb) SHA1(4ee707e758ab21d2809b65daf0081f86bd9328d9) )
 	ROM_LOAD16_BYTE( "19.bin",  0x000001, 0x20000, CRC(804ecfd1) SHA1(7dead8064445c6d44ebd0889583deb5e17b1954a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2364,18 +2364,18 @@ ROM_START( outzonea )
 	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
 	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 /* is this a prototype? */
-ROM_START( outzoneb )					/* From board serial number 2122 */
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+ROM_START( outzoneb )                   /* From board serial number 2122 */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "rom7.bin",  0x000000, 0x20000, CRC(936e25d8) SHA1(ffb7990ea1539d868a9ad2fb711b0febd90f098d) )
 	ROM_LOAD16_BYTE( "rom8.bin",  0x000001, 0x20000, CRC(d19b3ecf) SHA1(b406999b9f1e2104d958b42cc745bf79dbfe50b3) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2388,18 +2388,18 @@ ROM_START( outzoneb )					/* From board serial number 2122 */
 	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
 	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 /* from a bootleg board, but probably an alt original set with different licenses */
 ROM_START( outzonec )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "prg2.bin",  0x000001, 0x20000, CRC(9704db16) SHA1(12b43a6961a7f63f29563eb77aaacb70d3c368dd) )
 	ROM_LOAD16_BYTE( "prg1.bin",  0x000000, 0x20000, CRC(127a38d7) SHA1(d7f1ed91ff7d4de9e8215aa3b5cb65693145e433) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "rom9.bin",  0x0000, 0x8000, CRC(73d8e235) SHA1(f37ad497259a467cdf2ec8b3e6e7d3e873087e6c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2412,17 +2412,17 @@ ROM_START( outzonec )
 	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
 	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 ROM_START( outzoned )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp07.bin",  0x000000, 0x20000, CRC(a85a1d48) SHA1(74f16ef5126f0ce3d94a66849ccd7c28338e3974) )
 	ROM_LOAD16_BYTE( "tp08.bin",  0x000001, 0x20000, CRC(d8cc44af) SHA1(da9c07e3670e5c7a2c1f9bc433e604a2a13b8a54) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "tp09.bin",  0x0000, 0x8000, CRC(dd56041f) SHA1(a481b8959b349761624166906175f8efcbebb7e7) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2435,17 +2435,17 @@ ROM_START( outzoned )
 	ROM_LOAD( "rom3.bin",  0x40000, 0x20000, CRC(ec903c07) SHA1(75906f31200877fc8f6e78c2606ad5be49778165) )
 	ROM_LOAD( "rom4.bin",  0x60000, 0x20000, CRC(50cbf1a8) SHA1(cfab1504746654b4a61912155e9aeca746c65321) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp018_10.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp018_11.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
-ROM_START( vimana )			/* From board serial number 1547.04 (July '94) */
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+ROM_START( vimana )         /* From board serial number 1547.04 (July '94) */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp019-7a.bin",  0x000000, 0x20000, CRC(5a4bf73e) SHA1(9a43d822bc24b59278f294d0b3275595de997d16) )
 	ROM_LOAD16_BYTE( "tp019-8a.bin",  0x000001, 0x20000, CRC(03ba27e8) SHA1(edb5fe741d2a6a7fe5cde9a82317ea1e9447cf73) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.019",  0x00000, 0x08000, NO_DUMP )
 
@@ -2459,17 +2459,17 @@ ROM_START( vimana )			/* From board serial number 1547.04 (July '94) */
 	ROM_LOAD( "vim1.bin",  0x00000, 0x80000, CRC(cdde26cd) SHA1(27893af4692ec7bcbaac9e790c0707c98df84e62) )
 	ROM_LOAD( "vim2.bin",  0x80000, 0x80000, CRC(1dbfc118) SHA1(4fd039a3172f73ad910349b2d360e8ae77ccddb2) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp019-09.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp019-10.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp019-09.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp019-10.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 ROM_START( vimanan )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "tp019-07.rom",  0x000000, 0x20000, CRC(78888ff2) SHA1(7e1d248f806d585952eb35ceec6a7e63ae4e22f9) )
 	ROM_LOAD16_BYTE( "tp019-08.rom",  0x000001, 0x20000, CRC(6cd2dc3c) SHA1(029d974eb938c5e2fbe7575f0dda342b4b12b731) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.019",  0x00000, 0x08000, NO_DUMP )
 
@@ -2483,17 +2483,17 @@ ROM_START( vimanan )
 	ROM_LOAD( "vim1.bin",  0x00000, 0x80000, CRC(cdde26cd) SHA1(27893af4692ec7bcbaac9e790c0707c98df84e62) )
 	ROM_LOAD( "vim2.bin",  0x80000, 0x80000, CRC(1dbfc118) SHA1(4fd039a3172f73ad910349b2d360e8ae77ccddb2) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp019-09.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp019-10.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp019-09.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp019-10.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 ROM_START( vimanaj )
-	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "vim07.bin",  0x000000, 0x20000, CRC(1efaea84) SHA1(f9c5d2365d8948fa66dbe61d355919db15843a28) )
 	ROM_LOAD16_BYTE( "vim08.bin",  0x000001, 0x20000, CRC(e45b7def) SHA1(6b92a91d64581954da8ecdbeb5fed79bcc9c5217) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.019",  0x00000, 0x08000, NO_DUMP )
 
@@ -2507,9 +2507,9 @@ ROM_START( vimanaj )
 	ROM_LOAD( "vim1.bin",  0x00000, 0x80000, CRC(cdde26cd) SHA1(27893af4692ec7bcbaac9e790c0707c98df84e62) )
 	ROM_LOAD( "vim2.bin",  0x80000, 0x80000, CRC(1dbfc118) SHA1(4fd039a3172f73ad910349b2d360e8ae77ccddb2) )
 
-	ROM_REGION( 0x40, "proms", 0 )		/* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "tp019-09.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )	/* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "tp019-10.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp019-09.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp019-10.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
 

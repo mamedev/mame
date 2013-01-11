@@ -91,40 +91,40 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 ***********************************************************************************************/
 
-#define LOG_COMMANDS			0
-#define RAINE_CHECK				0
-#define MAKE_WAVS				0
+#define LOG_COMMANDS            0
+#define RAINE_CHECK             0
+#define MAKE_WAVS               0
 
 #if MAKE_WAVS
 #include "wavwrite.h"
 #endif
 
 
-#define MAX_SAMPLE_CHUNK		10000
-#define ULAW_MAXBITS			8
+#define MAX_SAMPLE_CHUNK        10000
+#define ULAW_MAXBITS            8
 
-#define CONTROL_BS1				0x8000
-#define CONTROL_BS0				0x4000
-#define CONTROL_CMPD			0x2000
-#define CONTROL_CA2				0x1000
-#define CONTROL_CA1				0x0800
-#define CONTROL_CA0				0x0400
-#define CONTROL_LP4				0x0200
-#define CONTROL_LP3				0x0100
-#define CONTROL_IRQ				0x0080
-#define CONTROL_DIR				0x0040
-#define CONTROL_IRQE			0x0020
-#define CONTROL_BLE				0x0010
-#define CONTROL_LPE				0x0008
-#define CONTROL_LEI				0x0004
-#define CONTROL_STOP1			0x0002
-#define CONTROL_STOP0			0x0001
+#define CONTROL_BS1             0x8000
+#define CONTROL_BS0             0x4000
+#define CONTROL_CMPD            0x2000
+#define CONTROL_CA2             0x1000
+#define CONTROL_CA1             0x0800
+#define CONTROL_CA0             0x0400
+#define CONTROL_LP4             0x0200
+#define CONTROL_LP3             0x0100
+#define CONTROL_IRQ             0x0080
+#define CONTROL_DIR             0x0040
+#define CONTROL_IRQE            0x0020
+#define CONTROL_BLE             0x0010
+#define CONTROL_LPE             0x0008
+#define CONTROL_LEI             0x0004
+#define CONTROL_STOP1           0x0002
+#define CONTROL_STOP0           0x0001
 
-#define CONTROL_BSMASK			(CONTROL_BS1 | CONTROL_BS0)
-#define CONTROL_CAMASK			(CONTROL_CA2 | CONTROL_CA1 | CONTROL_CA0)
-#define CONTROL_LPMASK			(CONTROL_LP4 | CONTROL_LP3)
-#define CONTROL_LOOPMASK		(CONTROL_BLE | CONTROL_LPE)
-#define CONTROL_STOPMASK		(CONTROL_STOP1 | CONTROL_STOP0)
+#define CONTROL_BSMASK          (CONTROL_BS1 | CONTROL_BS0)
+#define CONTROL_CAMASK          (CONTROL_CA2 | CONTROL_CA1 | CONTROL_CA0)
+#define CONTROL_LPMASK          (CONTROL_LP4 | CONTROL_LP3)
+#define CONTROL_LOOPMASK        (CONTROL_BLE | CONTROL_LPE)
+#define CONTROL_STOPMASK        (CONTROL_STOP1 | CONTROL_STOP0)
 
 
 
@@ -138,63 +138,63 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 struct es5506_voice
 {
 	/* external state */
-	UINT32		control;				/* control register */
-	UINT32		freqcount;				/* frequency count register */
-	UINT32		start;					/* start register */
-	UINT32		lvol;					/* left volume register */
-	UINT32		end;					/* end register */
-	UINT32		lvramp;					/* left volume ramp register */
-	UINT32		accum;					/* accumulator register */
-	UINT32		rvol;					/* right volume register */
-	UINT32		rvramp;					/* right volume ramp register */
-	UINT32		ecount;					/* envelope count register */
-	UINT32		k2;						/* k2 register */
-	UINT32		k2ramp;					/* k2 ramp register */
-	UINT32		k1;						/* k1 register */
-	UINT32		k1ramp;					/* k1 ramp register */
-	INT32		o4n1;					/* filter storage O4(n-1) */
-	INT32		o3n1;					/* filter storage O3(n-1) */
-	INT32		o3n2;					/* filter storage O3(n-2) */
-	INT32		o2n1;					/* filter storage O2(n-1) */
-	INT32		o2n2;					/* filter storage O2(n-2) */
-	INT32		o1n1;					/* filter storage O1(n-1) */
-	UINT32		exbank;					/* external address bank */
+	UINT32      control;                /* control register */
+	UINT32      freqcount;              /* frequency count register */
+	UINT32      start;                  /* start register */
+	UINT32      lvol;                   /* left volume register */
+	UINT32      end;                    /* end register */
+	UINT32      lvramp;                 /* left volume ramp register */
+	UINT32      accum;                  /* accumulator register */
+	UINT32      rvol;                   /* right volume register */
+	UINT32      rvramp;                 /* right volume ramp register */
+	UINT32      ecount;                 /* envelope count register */
+	UINT32      k2;                     /* k2 register */
+	UINT32      k2ramp;                 /* k2 ramp register */
+	UINT32      k1;                     /* k1 register */
+	UINT32      k1ramp;                 /* k1 ramp register */
+	INT32       o4n1;                   /* filter storage O4(n-1) */
+	INT32       o3n1;                   /* filter storage O3(n-1) */
+	INT32       o3n2;                   /* filter storage O3(n-2) */
+	INT32       o2n1;                   /* filter storage O2(n-1) */
+	INT32       o2n2;                   /* filter storage O2(n-2) */
+	INT32       o1n1;                   /* filter storage O1(n-1) */
+	UINT32      exbank;                 /* external address bank */
 
 	/* internal state */
-	UINT8		index;					/* index of this voice */
-	UINT8		filtcount;				/* filter count */
-	UINT32		accum_mask;
+	UINT8       index;                  /* index of this voice */
+	UINT8       filtcount;              /* filter count */
+	UINT32      accum_mask;
 };
 
 struct es5506_state
 {
-	sound_stream *stream;				/* which stream are we using */
-	int			sample_rate;			/* current sample rate */
-	UINT16 *	region_base[4];			/* pointer to the base of the region */
-	UINT32		write_latch;			/* currently accumulated data for write */
-	UINT32		read_latch;				/* currently accumulated data for read */
-	UINT32		master_clock;			/* master clock frequency */
-	void		(*irq_callback)(device_t *, int);	/* IRQ callback */
-	UINT16		(*port_read)(device_t *);		/* input port read */
+	sound_stream *stream;               /* which stream are we using */
+	int         sample_rate;            /* current sample rate */
+	UINT16 *    region_base[4];         /* pointer to the base of the region */
+	UINT32      write_latch;            /* currently accumulated data for write */
+	UINT32      read_latch;             /* currently accumulated data for read */
+	UINT32      master_clock;           /* master clock frequency */
+	void        (*irq_callback)(device_t *, int);   /* IRQ callback */
+	UINT16      (*port_read)(device_t *);       /* input port read */
 
-	UINT8		current_page;			/* current register page */
-	UINT8		active_voices;			/* number of active voices */
-	UINT8		mode;					/* MODE register */
-	UINT8		wst;					/* W_ST register */
-	UINT8		wend;					/* W_END register */
-	UINT8		lrend;					/* LR_END register */
-	UINT8		irqv;					/* IRQV register */
+	UINT8       current_page;           /* current register page */
+	UINT8       active_voices;          /* number of active voices */
+	UINT8       mode;                   /* MODE register */
+	UINT8       wst;                    /* W_ST register */
+	UINT8       wend;                   /* W_END register */
+	UINT8       lrend;                  /* LR_END register */
+	UINT8       irqv;                   /* IRQV register */
 
-	es5506_voice voice[32];				/* the 32 voices */
+	es5506_voice voice[32];             /* the 32 voices */
 
-	INT32 *		scratch;
+	INT32 *     scratch;
 
-	INT16 *		ulaw_lookup;
-	UINT16 *	volume_lookup;
+	INT16 *     ulaw_lookup;
+	UINT16 *    volume_lookup;
 	device_t *device;
 
 #if MAKE_WAVS
-	void *		wavraw;					/* raw waveform */
+	void *      wavraw;                 /* raw waveform */
 #endif
 };
 
@@ -235,12 +235,12 @@ static void update_internal_irq_state(es5506_state *chip)
 {
 	/*  Host (cpu) has just read the voice interrupt vector (voice IRQ ack).
 
-        Reset the voice vector to show the IRQB line is low (top bit set).
-        If we have any stacked interrupts (other voices waiting to be
-        processed - with their IRQ bit set) then they will be moved into
-        the vector next time the voice is processed.  In emulation
-        terms they get updated next time generate_samples() is called.
-    */
+	    Reset the voice vector to show the IRQB line is low (top bit set).
+	    If we have any stacked interrupts (other voices waiting to be
+	    processed - with their IRQ bit set) then they will be moved into
+	    the vector next time the voice is processed.  In emulation
+	    terms they get updated next time generate_samples() is called.
+	*/
 
 	chip->irqv=0x80;
 
@@ -298,9 +298,9 @@ static void compute_tables(es5506_state *chip)
 
 ***********************************************************************************************/
 
-#define interpolate(sample1, sample2, accum)								\
-		(sample1 * (INT32)(0x800 - (accum & 0x7ff)) +						\
-		 sample2 * (INT32)(accum & 0x7ff)) >> 11;
+#define interpolate(sample1, sample2, accum)                                \
+		(sample1 * (INT32)(0x800 - (accum & 0x7ff)) +                       \
+			sample2 * (INT32)(accum & 0x7ff)) >> 11;
 
 
 
@@ -310,65 +310,65 @@ static void compute_tables(es5506_state *chip)
 
 ***********************************************************************************************/
 
-#define apply_filters(voice, sample)															\
-do																								\
-{																								\
-	/* pole 1 is always low-pass using K1 */													\
-	sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o1n1) / 16384) + voice->o1n1;			\
-	voice->o1n1 = sample;																		\
+#define apply_filters(voice, sample)                                                            \
+do                                                                                              \
+{                                                                                               \
+	/* pole 1 is always low-pass using K1 */                                                    \
+	sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o1n1) / 16384) + voice->o1n1;          \
+	voice->o1n1 = sample;                                                                       \
 																								\
-	/* pole 2 is always low-pass using K1 */													\
-	sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o2n1) / 16384) + voice->o2n1;			\
-	voice->o2n2 = voice->o2n1;																	\
-	voice->o2n1 = sample;																		\
+	/* pole 2 is always low-pass using K1 */                                                    \
+	sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o2n1) / 16384) + voice->o2n1;          \
+	voice->o2n2 = voice->o2n1;                                                                  \
+	voice->o2n1 = sample;                                                                       \
 																								\
-	/* remaining poles depend on the current filter setting */									\
-	switch (voice->control & CONTROL_LPMASK)													\
-	{																							\
-		case 0:																					\
-			/* pole 3 is high-pass using K2 */													\
+	/* remaining poles depend on the current filter setting */                                  \
+	switch (voice->control & CONTROL_LPMASK)                                                    \
+	{                                                                                           \
+		case 0:                                                                                 \
+			/* pole 3 is high-pass using K2 */                                                  \
 			sample = sample - voice->o2n2 + ((INT32)(voice->k2 >> 2) * voice->o3n1) / 32768 + voice->o3n1 / 2; \
-			voice->o3n2 = voice->o3n1;															\
-			voice->o3n1 = sample;																\
+			voice->o3n2 = voice->o3n1;                                                          \
+			voice->o3n1 = sample;                                                               \
 																								\
-			/* pole 4 is high-pass using K2 */													\
+			/* pole 4 is high-pass using K2 */                                                  \
 			sample = sample - voice->o3n2 + ((INT32)(voice->k2 >> 2) * voice->o4n1) / 32768 + voice->o4n1 / 2; \
-			voice->o4n1 = sample;																\
-			break;																				\
+			voice->o4n1 = sample;                                                               \
+			break;                                                                              \
 																								\
-		case CONTROL_LP3:																		\
-			/* pole 3 is low-pass using K1 */													\
-			sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o3n1) / 16384) + voice->o3n1;	\
-			voice->o3n2 = voice->o3n1;															\
-			voice->o3n1 = sample;																\
+		case CONTROL_LP3:                                                                       \
+			/* pole 3 is low-pass using K1 */                                                   \
+			sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o3n1) / 16384) + voice->o3n1;  \
+			voice->o3n2 = voice->o3n1;                                                          \
+			voice->o3n1 = sample;                                                               \
 																								\
-			/* pole 4 is high-pass using K2 */													\
+			/* pole 4 is high-pass using K2 */                                                  \
 			sample = sample - voice->o3n2 + ((INT32)(voice->k2 >> 2) * voice->o4n1) / 32768 + voice->o4n1 / 2; \
-			voice->o4n1 = sample;																\
-			break;																				\
+			voice->o4n1 = sample;                                                               \
+			break;                                                                              \
 																								\
-		case CONTROL_LP4:																		\
-			/* pole 3 is low-pass using K2 */													\
-			sample = ((INT32)(voice->k2 >> 2) * (sample - voice->o3n1) / 16384) + voice->o3n1;	\
-			voice->o3n2 = voice->o3n1;															\
-			voice->o3n1 = sample;																\
+		case CONTROL_LP4:                                                                       \
+			/* pole 3 is low-pass using K2 */                                                   \
+			sample = ((INT32)(voice->k2 >> 2) * (sample - voice->o3n1) / 16384) + voice->o3n1;  \
+			voice->o3n2 = voice->o3n1;                                                          \
+			voice->o3n1 = sample;                                                               \
 																								\
-			/* pole 4 is low-pass using K2 */													\
-			sample = ((INT32)(voice->k2 >> 2) * (sample - voice->o4n1) / 16384) + voice->o4n1;	\
-			voice->o4n1 = sample;																\
-			break;																				\
+			/* pole 4 is low-pass using K2 */                                                   \
+			sample = ((INT32)(voice->k2 >> 2) * (sample - voice->o4n1) / 16384) + voice->o4n1;  \
+			voice->o4n1 = sample;                                                               \
+			break;                                                                              \
 																								\
-		case CONTROL_LP4 | CONTROL_LP3:															\
-			/* pole 3 is low-pass using K1 */													\
-			sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o3n1) / 16384) + voice->o3n1;	\
-			voice->o3n2 = voice->o3n1;															\
-			voice->o3n1 = sample;																\
+		case CONTROL_LP4 | CONTROL_LP3:                                                         \
+			/* pole 3 is low-pass using K1 */                                                   \
+			sample = ((INT32)(voice->k1 >> 2) * (sample - voice->o3n1) / 16384) + voice->o3n1;  \
+			voice->o3n2 = voice->o3n1;                                                          \
+			voice->o3n1 = sample;                                                               \
 																								\
-			/* pole 4 is low-pass using K2 */													\
-			sample = ((INT32)(voice->k2 >> 2) * (sample - voice->o4n1) / 16384) + voice->o4n1;	\
-			voice->o4n1 = sample;																\
-			break;																				\
-	}																							\
+			/* pole 4 is low-pass using K2 */                                                   \
+			sample = ((INT32)(voice->k2 >> 2) * (sample - voice->o4n1) / 16384) + voice->o4n1;  \
+			voice->o4n1 = sample;                                                               \
+			break;                                                                              \
+	}                                                                                           \
 } while (0)
 
 
@@ -379,48 +379,48 @@ do																								\
 
 ***********************************************************************************************/
 
-#define update_envelopes(voice, samples)											\
-do																					\
-{																					\
-	int count = (samples > 1 && samples > voice->ecount) ? voice->ecount : samples;	\
+#define update_envelopes(voice, samples)                                            \
+do                                                                                  \
+{                                                                                   \
+	int count = (samples > 1 && samples > voice->ecount) ? voice->ecount : samples; \
 																					\
-	/* decrement the envelope counter */											\
-	voice->ecount -= count;															\
+	/* decrement the envelope counter */                                            \
+	voice->ecount -= count;                                                         \
 																					\
-	/* ramp left volume */															\
-	if (voice->lvramp)																\
-	{																				\
-		voice->lvol += (INT8)voice->lvramp * count;									\
-		if ((INT32)voice->lvol < 0) voice->lvol = 0;								\
-		else if (voice->lvol > 0xffff) voice->lvol = 0xffff;						\
-	}																				\
+	/* ramp left volume */                                                          \
+	if (voice->lvramp)                                                              \
+	{                                                                               \
+		voice->lvol += (INT8)voice->lvramp * count;                                 \
+		if ((INT32)voice->lvol < 0) voice->lvol = 0;                                \
+		else if (voice->lvol > 0xffff) voice->lvol = 0xffff;                        \
+	}                                                                               \
 																					\
-	/* ramp right volume */															\
-	if (voice->rvramp)																\
-	{																				\
-		voice->rvol += (INT8)voice->rvramp * count;									\
-		if ((INT32)voice->rvol < 0) voice->rvol = 0;								\
-		else if (voice->rvol > 0xffff) voice->rvol = 0xffff;						\
-	}																				\
+	/* ramp right volume */                                                         \
+	if (voice->rvramp)                                                              \
+	{                                                                               \
+		voice->rvol += (INT8)voice->rvramp * count;                                 \
+		if ((INT32)voice->rvol < 0) voice->rvol = 0;                                \
+		else if (voice->rvol > 0xffff) voice->rvol = 0xffff;                        \
+	}                                                                               \
 																					\
-	/* ramp k1 filter constant */													\
-	if (voice->k1ramp && ((INT32)voice->k1ramp >= 0 || !(voice->filtcount & 7)))	\
-	{																				\
-		voice->k1 += (INT8)voice->k1ramp * count;									\
-		if ((INT32)voice->k1 < 0) voice->k1 = 0;									\
-		else if (voice->k1 > 0xffff) voice->k1 = 0xffff;							\
-	}																				\
+	/* ramp k1 filter constant */                                                   \
+	if (voice->k1ramp && ((INT32)voice->k1ramp >= 0 || !(voice->filtcount & 7)))    \
+	{                                                                               \
+		voice->k1 += (INT8)voice->k1ramp * count;                                   \
+		if ((INT32)voice->k1 < 0) voice->k1 = 0;                                    \
+		else if (voice->k1 > 0xffff) voice->k1 = 0xffff;                            \
+	}                                                                               \
 																					\
-	/* ramp k2 filter constant */													\
-	if (voice->k2ramp && ((INT32)voice->k2ramp >= 0 || !(voice->filtcount & 7)))	\
-	{																				\
-		voice->k2 += (INT8)voice->k2ramp * count;									\
-		if ((INT32)voice->k2 < 0) voice->k2 = 0;									\
-		else if (voice->k2 > 0xffff) voice->k2 = 0xffff;							\
-	}																				\
+	/* ramp k2 filter constant */                                                   \
+	if (voice->k2ramp && ((INT32)voice->k2ramp >= 0 || !(voice->filtcount & 7)))    \
+	{                                                                               \
+		voice->k2 += (INT8)voice->k2ramp * count;                                   \
+		if ((INT32)voice->k2 < 0) voice->k2 = 0;                                    \
+		else if (voice->k2 > 0xffff) voice->k2 = 0xffff;                            \
+	}                                                                               \
 																					\
-	/* update the filter constant counter */										\
-	voice->filtcount += count;														\
+	/* update the filter constant counter */                                        \
+	voice->filtcount += count;                                                      \
 																					\
 } while (0)
 
@@ -433,81 +433,81 @@ do																					\
 
 ***********************************************************************************************/
 
-#define check_for_end_forward(voice, accum)											\
-do																					\
-{																					\
-	/* are we past the end? */														\
-	if (accum > voice->end && !(voice->control & CONTROL_LEI))						\
-	{																				\
-		/* generate interrupt if required */										\
-		if (voice->control&CONTROL_IRQE)											\
-			voice->control |= CONTROL_IRQ;											\
+#define check_for_end_forward(voice, accum)                                         \
+do                                                                                  \
+{                                                                                   \
+	/* are we past the end? */                                                      \
+	if (accum > voice->end && !(voice->control & CONTROL_LEI))                      \
+	{                                                                               \
+		/* generate interrupt if required */                                        \
+		if (voice->control&CONTROL_IRQE)                                            \
+			voice->control |= CONTROL_IRQ;                                          \
 																					\
-		/* handle the different types of looping */									\
-		switch (voice->control & CONTROL_LOOPMASK)									\
-		{																			\
-			/* non-looping */														\
-			case 0:																	\
-				voice->control |= CONTROL_STOP0;									\
-				goto alldone;														\
+		/* handle the different types of looping */                                 \
+		switch (voice->control & CONTROL_LOOPMASK)                                  \
+		{                                                                           \
+			/* non-looping */                                                       \
+			case 0:                                                                 \
+				voice->control |= CONTROL_STOP0;                                    \
+				goto alldone;                                                       \
 																					\
-			/* uni-directional looping */											\
-			case CONTROL_LPE:														\
-				accum = (voice->start + (accum - voice->end)) & voice->accum_mask;	\
-				break;																\
+			/* uni-directional looping */                                           \
+			case CONTROL_LPE:                                                       \
+				accum = (voice->start + (accum - voice->end)) & voice->accum_mask;  \
+				break;                                                              \
 																					\
-			/* trans-wave looping */												\
-			case CONTROL_BLE:														\
-				accum = (voice->start + (accum - voice->end)) & voice->accum_mask;	\
+			/* trans-wave looping */                                                \
+			case CONTROL_BLE:                                                       \
+				accum = (voice->start + (accum - voice->end)) & voice->accum_mask;  \
 				voice->control = (voice->control & ~CONTROL_LOOPMASK) | CONTROL_LEI;\
-				break;																\
+				break;                                                              \
 																					\
-			/* bi-directional looping */											\
-			case CONTROL_LPE | CONTROL_BLE:											\
-				accum = (voice->end - (accum - voice->end)) & voice->accum_mask;	\
-				voice->control ^= CONTROL_DIR;										\
-				goto reverse;														\
-		}																			\
-	}																				\
+			/* bi-directional looping */                                            \
+			case CONTROL_LPE | CONTROL_BLE:                                         \
+				accum = (voice->end - (accum - voice->end)) & voice->accum_mask;    \
+				voice->control ^= CONTROL_DIR;                                      \
+				goto reverse;                                                       \
+		}                                                                           \
+	}                                                                               \
 } while (0)
 
 
-#define check_for_end_reverse(voice, accum)											\
-do																					\
-{																					\
-	/* are we past the end? */														\
-	if (accum < voice->start && !(voice->control & CONTROL_LEI))					\
-	{																				\
-		/* generate interrupt if required */										\
-		if (voice->control&CONTROL_IRQE)											\
-			voice->control |= CONTROL_IRQ;											\
+#define check_for_end_reverse(voice, accum)                                         \
+do                                                                                  \
+{                                                                                   \
+	/* are we past the end? */                                                      \
+	if (accum < voice->start && !(voice->control & CONTROL_LEI))                    \
+	{                                                                               \
+		/* generate interrupt if required */                                        \
+		if (voice->control&CONTROL_IRQE)                                            \
+			voice->control |= CONTROL_IRQ;                                          \
 																					\
-		/* handle the different types of looping */									\
-		switch (voice->control & CONTROL_LOOPMASK)									\
-		{																			\
-			/* non-looping */														\
-			case 0:																	\
-				voice->control |= CONTROL_STOP0;									\
-				goto alldone;														\
+		/* handle the different types of looping */                                 \
+		switch (voice->control & CONTROL_LOOPMASK)                                  \
+		{                                                                           \
+			/* non-looping */                                                       \
+			case 0:                                                                 \
+				voice->control |= CONTROL_STOP0;                                    \
+				goto alldone;                                                       \
 																					\
-			/* uni-directional looping */											\
-			case CONTROL_LPE:														\
-				accum = (voice->end - (voice->start - accum)) & voice->accum_mask;	\
-				break;																\
+			/* uni-directional looping */                                           \
+			case CONTROL_LPE:                                                       \
+				accum = (voice->end - (voice->start - accum)) & voice->accum_mask;  \
+				break;                                                              \
 																					\
-			/* trans-wave looping */												\
-			case CONTROL_BLE:														\
-				accum = (voice->end - (voice->start - accum)) & voice->accum_mask;	\
+			/* trans-wave looping */                                                \
+			case CONTROL_BLE:                                                       \
+				accum = (voice->end - (voice->start - accum)) & voice->accum_mask;  \
 				voice->control = (voice->control & ~CONTROL_LOOPMASK) | CONTROL_LEI;\
-				break;																\
+				break;                                                              \
 																					\
-			/* bi-directional looping */											\
-			case CONTROL_LPE | CONTROL_BLE:											\
+			/* bi-directional looping */                                            \
+			case CONTROL_LPE | CONTROL_BLE:                                         \
 				accum = (voice->start + (voice->start - accum)) & voice->accum_mask;\
-				voice->control ^= CONTROL_DIR;										\
-				goto reverse;														\
-		}																			\
-	}																				\
+				voice->control ^= CONTROL_DIR;                                      \
+				goto reverse;                                                       \
+		}                                                                           \
+	}                                                                               \
 } while (0)
 
 
@@ -1039,74 +1039,74 @@ INLINE void es5506_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 {
 	switch (offset)
 	{
-		case 0x00/8:	/* CR */
+		case 0x00/8:    /* CR */
 			voice->control = data & 0xffff;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, control=%04x\n", chip->current_page & 0x1f, voice->control);
 			break;
 
-		case 0x08/8:	/* FC */
+		case 0x08/8:    /* FC */
 			voice->freqcount = data & 0x1ffff;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, freq count=%08x\n", chip->current_page & 0x1f, voice->freqcount);
 			break;
 
-		case 0x10/8:	/* LVOL */
+		case 0x10/8:    /* LVOL */
 			voice->lvol = data & 0xffff;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, left vol=%04x\n", chip->current_page & 0x1f, voice->lvol);
 			break;
 
-		case 0x18/8:	/* LVRAMP */
+		case 0x18/8:    /* LVRAMP */
 			voice->lvramp = (data & 0xff00) >> 8;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, left vol ramp=%04x\n", chip->current_page & 0x1f, voice->lvramp);
 			break;
 
-		case 0x20/8:	/* RVOL */
+		case 0x20/8:    /* RVOL */
 			voice->rvol = data & 0xffff;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, right vol=%04x\n", chip->current_page & 0x1f, voice->rvol);
 			break;
 
-		case 0x28/8:	/* RVRAMP */
+		case 0x28/8:    /* RVRAMP */
 			voice->rvramp = (data & 0xff00) >> 8;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, right vol ramp=%04x\n", chip->current_page & 0x1f, voice->rvramp);
 			break;
 
-		case 0x30/8:	/* ECOUNT */
+		case 0x30/8:    /* ECOUNT */
 			voice->ecount = data & 0x1ff;
 			voice->filtcount = 0;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, envelope count=%04x\n", chip->current_page & 0x1f, voice->ecount);
 			break;
 
-		case 0x38/8:	/* K2 */
+		case 0x38/8:    /* K2 */
 			voice->k2 = data & 0xffff;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, K2=%04x\n", chip->current_page & 0x1f, voice->k2);
 			break;
 
-		case 0x40/8:	/* K2RAMP */
+		case 0x40/8:    /* K2RAMP */
 			voice->k2ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, K2 ramp=%04x\n", chip->current_page & 0x1f, voice->k2ramp);
 			break;
 
-		case 0x48/8:	/* K1 */
+		case 0x48/8:    /* K1 */
 			voice->k1 = data & 0xffff;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, K1=%04x\n", chip->current_page & 0x1f, voice->k1);
 			break;
 
-		case 0x50/8:	/* K1RAMP */
+		case 0x50/8:    /* K1RAMP */
 			voice->k1ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, K1 ramp=%04x\n", chip->current_page & 0x1f, voice->k1ramp);
 			break;
 
-		case 0x58/8:	/* ACTV */
+		case 0x58/8:    /* ACTV */
 		{
 			chip->active_voices = data & 0x1f;
 			chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
@@ -1117,15 +1117,15 @@ INLINE void es5506_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 			break;
 		}
 
-		case 0x60/8:	/* MODE */
+		case 0x60/8:    /* MODE */
 			chip->mode = data & 0x1f;
 			break;
 
-		case 0x68/8:	/* PAR - read only */
-		case 0x70/8:	/* IRQV - read only */
+		case 0x68/8:    /* PAR - read only */
+		case 0x70/8:    /* IRQV - read only */
 			break;
 
-		case 0x78/8:	/* PAGE */
+		case 0x78/8:    /* PAGE */
 			chip->current_page = data & 0x7f;
 			break;
 	}
@@ -1136,83 +1136,83 @@ INLINE void es5506_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 {
 	switch (offset)
 	{
-		case 0x00/8:	/* CR */
+		case 0x00/8:    /* CR */
 			voice->control = data & 0xffff;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, control=%04x\n", chip->current_page & 0x1f, voice->control);
 			break;
 
-		case 0x08/8:	/* START */
+		case 0x08/8:    /* START */
 			voice->start = data & 0xfffff800;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, loop start=%08x\n", chip->current_page & 0x1f, voice->start);
 			break;
 
-		case 0x10/8:	/* END */
+		case 0x10/8:    /* END */
 			voice->end = data & 0xffffff80;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, loop end=%08x\n", chip->current_page & 0x1f, voice->end);
 			break;
 
-		case 0x18/8:	/* ACCUM */
+		case 0x18/8:    /* ACCUM */
 			voice->accum = data;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, accum=%08x\n", chip->current_page & 0x1f, voice->accum);
 			break;
 
-		case 0x20/8:	/* O4(n-1) */
+		case 0x20/8:    /* O4(n-1) */
 			voice->o4n1 = (INT32)(data << 14) >> 14;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, O4(n-1)=%05x\n", chip->current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
-		case 0x28/8:	/* O3(n-1) */
+		case 0x28/8:    /* O3(n-1) */
 			voice->o3n1 = (INT32)(data << 14) >> 14;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, O3(n-1)=%05x\n", chip->current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
-		case 0x30/8:	/* O3(n-2) */
+		case 0x30/8:    /* O3(n-2) */
 			voice->o3n2 = (INT32)(data << 14) >> 14;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, O3(n-2)=%05x\n", chip->current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
-		case 0x38/8:	/* O2(n-1) */
+		case 0x38/8:    /* O2(n-1) */
 			voice->o2n1 = (INT32)(data << 14) >> 14;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, O2(n-1)=%05x\n", chip->current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
-		case 0x40/8:	/* O2(n-2) */
+		case 0x40/8:    /* O2(n-2) */
 			voice->o2n2 = (INT32)(data << 14) >> 14;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, O2(n-2)=%05x\n", chip->current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
-		case 0x48/8:	/* O1(n-1) */
+		case 0x48/8:    /* O1(n-1) */
 			voice->o1n1 = (INT32)(data << 14) >> 14;
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "voice %d, O1(n-1)=%05x\n", chip->current_page & 0x1f, voice->o1n1 & 0x3ffff);
 			break;
 
-		case 0x50/8:	/* W_ST */
+		case 0x50/8:    /* W_ST */
 			chip->wst = data & 0x7f;
 			break;
 
-		case 0x58/8:	/* W_END */
+		case 0x58/8:    /* W_END */
 			chip->wend = data & 0x7f;
 			break;
 
-		case 0x60/8:	/* LR_END */
+		case 0x60/8:    /* LR_END */
 			chip->lrend = data & 0x7f;
 			break;
 
-		case 0x68/8:	/* PAR - read only */
-		case 0x70/8:	/* IRQV - read only */
+		case 0x68/8:    /* PAR - read only */
+		case 0x70/8:    /* IRQV - read only */
 			break;
 
-		case 0x78/8:	/* PAGE */
+		case 0x78/8:    /* PAGE */
 			chip->current_page = data & 0x7f;
 			break;
 	}
@@ -1222,76 +1222,76 @@ INLINE void es5506_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 {
 	switch (offset)
 	{
-		case 0x00/8:	/* CHANNEL 0 LEFT */
+		case 0x00/8:    /* CHANNEL 0 LEFT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 0 left test write %08x\n", data);
 			break;
 
-		case 0x08/8:	/* CHANNEL 0 RIGHT */
+		case 0x08/8:    /* CHANNEL 0 RIGHT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 0 right test write %08x\n", data);
 			break;
 
-		case 0x10/8:	/* CHANNEL 1 LEFT */
+		case 0x10/8:    /* CHANNEL 1 LEFT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 1 left test write %08x\n", data);
 			break;
 
-		case 0x18/8:	/* CHANNEL 1 RIGHT */
+		case 0x18/8:    /* CHANNEL 1 RIGHT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 1 right test write %08x\n", data);
 			break;
 
-		case 0x20/8:	/* CHANNEL 2 LEFT */
+		case 0x20/8:    /* CHANNEL 2 LEFT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 2 left test write %08x\n", data);
 			break;
 
-		case 0x28/8:	/* CHANNEL 2 RIGHT */
+		case 0x28/8:    /* CHANNEL 2 RIGHT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 2 right test write %08x\n", data);
 			break;
 
-		case 0x30/8:	/* CHANNEL 3 LEFT */
+		case 0x30/8:    /* CHANNEL 3 LEFT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 3 left test write %08x\n", data);
 			break;
 
-		case 0x38/8:	/* CHANNEL 3 RIGHT */
+		case 0x38/8:    /* CHANNEL 3 RIGHT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 3 right test write %08x\n", data);
 			break;
 
-		case 0x40/8:	/* CHANNEL 4 LEFT */
+		case 0x40/8:    /* CHANNEL 4 LEFT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 4 left test write %08x\n", data);
 			break;
 
-		case 0x48/8:	/* CHANNEL 4 RIGHT */
+		case 0x48/8:    /* CHANNEL 4 RIGHT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 4 right test write %08x\n", data);
 			break;
 
-		case 0x50/8:	/* CHANNEL 5 LEFT */
+		case 0x50/8:    /* CHANNEL 5 LEFT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 5 left test write %08x\n", data);
 			break;
 
-		case 0x58/8:	/* CHANNEL 6 RIGHT */
+		case 0x58/8:    /* CHANNEL 6 RIGHT */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Channel 5 right test write %08x\n", data);
 			break;
 
-		case 0x60/8:	/* EMPTY */
+		case 0x60/8:    /* EMPTY */
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "Test write EMPTY %08x\n", data);
 			break;
 
-		case 0x68/8:	/* PAR - read only */
-		case 0x70/8:	/* IRQV - read only */
+		case 0x68/8:    /* PAR - read only */
+		case 0x70/8:    /* IRQV - read only */
 			break;
 
-		case 0x78/8:	/* PAGE */
+		case 0x78/8:    /* PAGE */
 			chip->current_page = data & 0x7f;
 			break;
 	}
@@ -1339,69 +1339,69 @@ INLINE UINT32 es5506_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_
 
 	switch (offset)
 	{
-		case 0x00/8:	/* CR */
+		case 0x00/8:    /* CR */
 			result = voice->control;
 			break;
 
-		case 0x08/8:	/* FC */
+		case 0x08/8:    /* FC */
 			result = voice->freqcount;
 			break;
 
-		case 0x10/8:	/* LVOL */
+		case 0x10/8:    /* LVOL */
 			result = voice->lvol;
 			break;
 
-		case 0x18/8:	/* LVRAMP */
+		case 0x18/8:    /* LVRAMP */
 			result = voice->lvramp << 8;
 			break;
 
-		case 0x20/8:	/* RVOL */
+		case 0x20/8:    /* RVOL */
 			result = voice->rvol;
 			break;
 
-		case 0x28/8:	/* RVRAMP */
+		case 0x28/8:    /* RVRAMP */
 			result = voice->rvramp << 8;
 			break;
 
-		case 0x30/8:	/* ECOUNT */
+		case 0x30/8:    /* ECOUNT */
 			result = voice->ecount;
 			break;
 
-		case 0x38/8:	/* K2 */
+		case 0x38/8:    /* K2 */
 			result = voice->k2;
 			break;
 
-		case 0x40/8:	/* K2RAMP */
+		case 0x40/8:    /* K2RAMP */
 			result = (voice->k2ramp << 8) | (voice->k2ramp >> 31);
 			break;
 
-		case 0x48/8:	/* K1 */
+		case 0x48/8:    /* K1 */
 			result = voice->k1;
 			break;
 
-		case 0x50/8:	/* K1RAMP */
+		case 0x50/8:    /* K1RAMP */
 			result = (voice->k1ramp << 8) | (voice->k1ramp >> 31);
 			break;
 
-		case 0x58/8:	/* ACTV */
+		case 0x58/8:    /* ACTV */
 			result = chip->active_voices;
 			break;
 
-		case 0x60/8:	/* MODE */
+		case 0x60/8:    /* MODE */
 			result = chip->mode;
 			break;
 
-		case 0x68/8:	/* PAR */
+		case 0x68/8:    /* PAR */
 			if (chip->port_read)
 				result = (*chip->port_read)(chip->device);
 			break;
 
-		case 0x70/8:	/* IRQV */
+		case 0x70/8:    /* IRQV */
 			result = chip->irqv;
 			update_internal_irq_state(chip);
 			break;
 
-		case 0x78/8:	/* PAGE */
+		case 0x78/8:    /* PAGE */
 			result = chip->current_page;
 			break;
 	}
@@ -1415,69 +1415,69 @@ INLINE UINT32 es5506_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 
 	switch (offset)
 	{
-		case 0x00/8:	/* CR */
+		case 0x00/8:    /* CR */
 			result = voice->control;
 			break;
 
-		case 0x08/8:	/* START */
+		case 0x08/8:    /* START */
 			result = voice->start;
 			break;
 
-		case 0x10/8:	/* END */
+		case 0x10/8:    /* END */
 			result = voice->end;
 			break;
 
-		case 0x18/8:	/* ACCUM */
+		case 0x18/8:    /* ACCUM */
 			result = voice->accum;
 			break;
 
-		case 0x20/8:	/* O4(n-1) */
+		case 0x20/8:    /* O4(n-1) */
 			result = voice->o4n1 & 0x3ffff;
 			break;
 
-		case 0x28/8:	/* O3(n-1) */
+		case 0x28/8:    /* O3(n-1) */
 			result = voice->o3n1 & 0x3ffff;
 			break;
 
-		case 0x30/8:	/* O3(n-2) */
+		case 0x30/8:    /* O3(n-2) */
 			result = voice->o3n2 & 0x3ffff;
 			break;
 
-		case 0x38/8:	/* O2(n-1) */
+		case 0x38/8:    /* O2(n-1) */
 			result = voice->o2n1 & 0x3ffff;
 			break;
 
-		case 0x40/8:	/* O2(n-2) */
+		case 0x40/8:    /* O2(n-2) */
 			result = voice->o2n2 & 0x3ffff;
 			break;
 
-		case 0x48/8:	/* O1(n-1) */
+		case 0x48/8:    /* O1(n-1) */
 			result = voice->o1n1 & 0x3ffff;
 			break;
 
-		case 0x50/8:	/* W_ST */
+		case 0x50/8:    /* W_ST */
 			result = chip->wst;
 			break;
 
-		case 0x58/8:	/* W_END */
+		case 0x58/8:    /* W_END */
 			result = chip->wend;
 			break;
 
-		case 0x60/8:	/* LR_END */
+		case 0x60/8:    /* LR_END */
 			result = chip->lrend;
 			break;
 
-		case 0x68/8:	/* PAR */
+		case 0x68/8:    /* PAR */
 			if (chip->port_read)
 				result = (*chip->port_read)(chip->device);
 			break;
 
-		case 0x70/8:	/* IRQV */
+		case 0x70/8:    /* IRQV */
 			result = chip->irqv;
 			update_internal_irq_state(chip);
 			break;
 
-		case 0x78/8:	/* PAGE */
+		case 0x78/8:    /* PAGE */
 			result = chip->current_page;
 			break;
 	}
@@ -1490,16 +1490,16 @@ INLINE UINT32 es5506_reg_read_test(es5506_state *chip, es5506_voice *voice, offs
 
 	switch (offset)
 	{
-		case 0x68/8:	/* PAR */
+		case 0x68/8:    /* PAR */
 			if (chip->port_read)
 				result = (*chip->port_read)(chip->device);
 			break;
 
-		case 0x70/8:	/* IRQV */
+		case 0x70/8:    /* IRQV */
 			result = chip->irqv;
 			break;
 
-		case 0x78/8:	/* PAGE */
+		case 0x78/8:    /* PAGE */
 			result = chip->current_page;
 			break;
 	}
@@ -1580,7 +1580,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 
 	switch (offset)
 	{
-		case 0x00:	/* CR */
+		case 0x00:  /* CR */
 			if (ACCESSING_BITS_0_7)
 			{
 #if RAINE_CHECK
@@ -1589,20 +1589,20 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->control &= ~(CONTROL_STOPMASK | CONTROL_BS0 | CONTROL_LOOPMASK | CONTROL_IRQE | CONTROL_DIR | CONTROL_IRQ);
 #endif
 				voice->control |= (data & (CONTROL_STOPMASK | CONTROL_LOOPMASK | CONTROL_IRQE | CONTROL_DIR | CONTROL_IRQ)) |
-								  ((data << 12) & CONTROL_BS0);
+									((data << 12) & CONTROL_BS0);
 			}
 			if (ACCESSING_BITS_8_15)
 			{
 				voice->control &= ~(CONTROL_CA0 | CONTROL_CA1 | CONTROL_LPMASK);
 				voice->control |= ((data >> 2) & CONTROL_LPMASK) |
-								  ((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
+									((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
 			}
 
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine.describe_context(), chip->current_page & 0x1f, voice->control, data, mem_mask ^ 0xffff);
 			break;
 
-		case 0x01:	/* FC */
+		case 0x01:  /* FC */
 			if (ACCESSING_BITS_0_7)
 				voice->freqcount = (voice->freqcount & ~0x001fe) | ((data & 0x00ff) << 1);
 			if (ACCESSING_BITS_8_15)
@@ -1611,7 +1611,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, freq count=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->freqcount);
 			break;
 
-		case 0x02:	/* STRT (hi) */
+		case 0x02:  /* STRT (hi) */
 			if (ACCESSING_BITS_0_7)
 				voice->start = (voice->start & ~0x03fc0000) | ((data & 0x00ff) << 18);
 			if (ACCESSING_BITS_8_15)
@@ -1620,7 +1620,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, loop start=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->start);
 			break;
 
-		case 0x03:	/* STRT (lo) */
+		case 0x03:  /* STRT (lo) */
 			if (ACCESSING_BITS_0_7)
 				voice->start = (voice->start & ~0x00000380) | ((data & 0x00e0) << 2);
 			if (ACCESSING_BITS_8_15)
@@ -1629,7 +1629,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, loop start=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->start);
 			break;
 
-		case 0x04:	/* END (hi) */
+		case 0x04:  /* END (hi) */
 			if (ACCESSING_BITS_0_7)
 				voice->end = (voice->end & ~0x03fc0000) | ((data & 0x00ff) << 18);
 			if (ACCESSING_BITS_8_15)
@@ -1641,7 +1641,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, loop end=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->end);
 			break;
 
-		case 0x05:	/* END (lo) */
+		case 0x05:  /* END (lo) */
 			if (ACCESSING_BITS_0_7)
 				voice->end = (voice->end & ~0x00000380) | ((data & 0x00e0) << 2);
 			if (ACCESSING_BITS_8_15)
@@ -1653,7 +1653,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, loop end=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->end);
 			break;
 
-		case 0x06:	/* K2 */
+		case 0x06:  /* K2 */
 			if (ACCESSING_BITS_0_7)
 				voice->k2 = (voice->k2 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
@@ -1662,7 +1662,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, K2=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->k2);
 			break;
 
-		case 0x07:	/* K1 */
+		case 0x07:  /* K1 */
 			if (ACCESSING_BITS_0_7)
 				voice->k1 = (voice->k1 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
@@ -1671,21 +1671,21 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, K1=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->k1);
 			break;
 
-		case 0x08:	/* LVOL */
+		case 0x08:  /* LVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->lvol = (voice->lvol & ~0xff00) | (data & 0xff00);
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "%s:voice %d, left vol=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->lvol);
 			break;
 
-		case 0x09:	/* RVOL */
+		case 0x09:  /* RVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->rvol = (voice->rvol & ~0xff00) | (data & 0xff00);
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "%s:voice %d, right vol=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->rvol);
 			break;
 
-		case 0x0a:	/* ACC (hi) */
+		case 0x0a:  /* ACC (hi) */
 			if (ACCESSING_BITS_0_7)
 				voice->accum = (voice->accum & ~0x03fc0000) | ((data & 0x00ff) << 18);
 			if (ACCESSING_BITS_8_15)
@@ -1694,7 +1694,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, accum=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->accum);
 			break;
 
-		case 0x0b:	/* ACC (lo) */
+		case 0x0b:  /* ACC (lo) */
 			if (ACCESSING_BITS_0_7)
 				voice->accum = (voice->accum & ~0x000003fc) | ((data & 0x00ff) << 2);
 			if (ACCESSING_BITS_8_15)
@@ -1703,10 +1703,10 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				fprintf(eslog, "%s:voice %d, accum=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->accum);
 			break;
 
-		case 0x0c:	/* unused */
+		case 0x0c:  /* unused */
 			break;
 
-		case 0x0d:	/* ACT */
+		case 0x0d:  /* ACT */
 			if (ACCESSING_BITS_0_7)
 			{
 				chip->active_voices = data & 0x1f;
@@ -1718,10 +1718,10 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 			}
 			break;
 
-		case 0x0e:	/* IRQV - read only */
+		case 0x0e:  /* IRQV - read only */
 			break;
 
-		case 0x0f:	/* PAGE */
+		case 0x0f:  /* PAGE */
 			if (ACCESSING_BITS_0_7)
 				chip->current_page = data & 0x7f;
 			break;
@@ -1735,24 +1735,24 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 
 	switch (offset)
 	{
-		case 0x00:	/* CR */
+		case 0x00:  /* CR */
 			if (ACCESSING_BITS_0_7)
 			{
 				voice->control &= ~(CONTROL_STOPMASK | CONTROL_BS0 | CONTROL_LOOPMASK | CONTROL_IRQE | CONTROL_DIR | CONTROL_IRQ);
 				voice->control |= (data & (CONTROL_STOPMASK | CONTROL_LOOPMASK | CONTROL_IRQE | CONTROL_DIR | CONTROL_IRQ)) |
-								  ((data << 12) & CONTROL_BS0);
+									((data << 12) & CONTROL_BS0);
 			}
 			if (ACCESSING_BITS_8_15)
 			{
 				voice->control &= ~(CONTROL_CA0 | CONTROL_CA1 | CONTROL_LPMASK);
 				voice->control |= ((data >> 2) & CONTROL_LPMASK) |
-								  ((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
+									((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
 			}
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine.describe_context(), chip->current_page & 0x1f, voice->control, data, mem_mask);
 			break;
 
-		case 0x01:	/* O4(n-1) */
+		case 0x01:  /* O4(n-1) */
 			if (ACCESSING_BITS_0_7)
 				voice->o4n1 = (voice->o4n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1761,7 +1761,7 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				fprintf(eslog, "%s:voice %d, O4(n-1)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
-		case 0x02:	/* O3(n-1) */
+		case 0x02:  /* O3(n-1) */
 			if (ACCESSING_BITS_0_7)
 				voice->o3n1 = (voice->o3n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1770,7 +1770,7 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				fprintf(eslog, "%s:voice %d, O3(n-1)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
-		case 0x03:	/* O3(n-2) */
+		case 0x03:  /* O3(n-2) */
 			if (ACCESSING_BITS_0_7)
 				voice->o3n2 = (voice->o3n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1779,7 +1779,7 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				fprintf(eslog, "%s:voice %d, O3(n-2)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
-		case 0x04:	/* O2(n-1) */
+		case 0x04:  /* O2(n-1) */
 			if (ACCESSING_BITS_0_7)
 				voice->o2n1 = (voice->o2n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1788,7 +1788,7 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				fprintf(eslog, "%s:voice %d, O2(n-1)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
-		case 0x05:	/* O2(n-2) */
+		case 0x05:  /* O2(n-2) */
 			if (ACCESSING_BITS_0_7)
 				voice->o2n2 = (voice->o2n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1797,7 +1797,7 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				fprintf(eslog, "%s:voice %d, O2(n-2)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
-		case 0x06:	/* O1(n-1) */
+		case 0x06:  /* O1(n-1) */
 			if (ACCESSING_BITS_0_7)
 				voice->o1n1 = (voice->o1n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
@@ -1811,10 +1811,10 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-		case 0x0c:	/* unused */
+		case 0x0c:  /* unused */
 			break;
 
-		case 0x0d:	/* ACT */
+		case 0x0d:  /* ACT */
 			if (ACCESSING_BITS_0_7)
 			{
 				chip->active_voices = data & 0x1f;
@@ -1826,10 +1826,10 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 			}
 			break;
 
-		case 0x0e:	/* IRQV - read only */
+		case 0x0e:  /* IRQV - read only */
 			break;
 
-		case 0x0f:	/* PAGE */
+		case 0x0f:  /* PAGE */
 			if (ACCESSING_BITS_0_7)
 				chip->current_page = data & 0x7f;
 			break;
@@ -1841,24 +1841,24 @@ INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 {
 	switch (offset)
 	{
-		case 0x00:	/* CH0L */
-		case 0x01:	/* CH0R */
-		case 0x02:	/* CH1L */
-		case 0x03:	/* CH1R */
-		case 0x04:	/* CH2L */
-		case 0x05:	/* CH2R */
-		case 0x06:	/* CH3L */
-		case 0x07:	/* CH3R */
+		case 0x00:  /* CH0L */
+		case 0x01:  /* CH0R */
+		case 0x02:  /* CH1L */
+		case 0x03:  /* CH1R */
+		case 0x04:  /* CH2L */
+		case 0x05:  /* CH2R */
+		case 0x06:  /* CH3L */
+		case 0x07:  /* CH3R */
 			break;
 
-		case 0x08:	/* SERMODE */
+		case 0x08:  /* SERMODE */
 			chip->mode = data & 0x0007;
 			break;
 
-		case 0x09:	/* PAR */
+		case 0x09:  /* PAR */
 			break;
 
-		case 0x0d:	/* ACT */
+		case 0x0d:  /* ACT */
 			if (ACCESSING_BITS_0_7)
 			{
 				chip->active_voices = data & 0x1f;
@@ -1870,10 +1870,10 @@ INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 			}
 			break;
 
-		case 0x0e:	/* IRQV - read only */
+		case 0x0e:  /* IRQV - read only */
 			break;
 
-		case 0x0f:	/* PAGE */
+		case 0x0f:  /* PAGE */
 			if (ACCESSING_BITS_0_7)
 				chip->current_page = data & 0x7f;
 			break;
@@ -1914,71 +1914,71 @@ INLINE UINT16 es5505_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_
 
 	switch (offset)
 	{
-		case 0x00:	/* CR */
+		case 0x00:  /* CR */
 			result = (voice->control & (CONTROL_STOPMASK | CONTROL_LOOPMASK | CONTROL_IRQE | CONTROL_DIR | CONTROL_IRQ)) |
-					 ((voice->control & CONTROL_BS0) >> 12) |
-					 ((voice->control & CONTROL_LPMASK) << 2) |
-					 ((voice->control & (CONTROL_CA0 | CONTROL_CA1)) >> 2) |
-					 0xf000;
+						((voice->control & CONTROL_BS0) >> 12) |
+						((voice->control & CONTROL_LPMASK) << 2) |
+						((voice->control & (CONTROL_CA0 | CONTROL_CA1)) >> 2) |
+						0xf000;
 			break;
 
-		case 0x01:	/* FC */
+		case 0x01:  /* FC */
 			result = voice->freqcount >> 1;
 			break;
 
-		case 0x02:	/* STRT (hi) */
+		case 0x02:  /* STRT (hi) */
 			result = voice->start >> 18;
 			break;
 
-		case 0x03:	/* STRT (lo) */
+		case 0x03:  /* STRT (lo) */
 			result = voice->start >> 2;
 			break;
 
-		case 0x04:	/* END (hi) */
+		case 0x04:  /* END (hi) */
 			result = voice->end >> 18;
 			break;
 
-		case 0x05:	/* END (lo) */
+		case 0x05:  /* END (lo) */
 			result = voice->end >> 2;
 			break;
 
-		case 0x06:	/* K2 */
+		case 0x06:  /* K2 */
 			result = voice->k2;
 			break;
 
-		case 0x07:	/* K1 */
+		case 0x07:  /* K1 */
 			result = voice->k1;
 			break;
 
-		case 0x08:	/* LVOL */
+		case 0x08:  /* LVOL */
 			result = voice->lvol;
 			break;
 
-		case 0x09:	/* RVOL */
+		case 0x09:  /* RVOL */
 			result = voice->rvol;
 			break;
 
-		case 0x0a:	/* ACC (hi) */
+		case 0x0a:  /* ACC (hi) */
 			result = voice->accum >> 18;
 			break;
 
-		case 0x0b:	/* ACC (lo) */
+		case 0x0b:  /* ACC (lo) */
 			result = voice->accum >> 2;
 			break;
 
-		case 0x0c:	/* unused */
+		case 0x0c:  /* unused */
 			break;
 
-		case 0x0d:	/* ACT */
+		case 0x0d:  /* ACT */
 			result = chip->active_voices;
 			break;
 
-		case 0x0e:	/* IRQV */
+		case 0x0e:  /* IRQV */
 			result = chip->irqv;
 			update_internal_irq_state(chip);
 			break;
 
-		case 0x0f:	/* PAGE */
+		case 0x0f:  /* PAGE */
 			result = chip->current_page;
 			break;
 	}
@@ -1992,35 +1992,35 @@ INLINE UINT16 es5505_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 
 	switch (offset)
 	{
-		case 0x00:	/* CR */
+		case 0x00:  /* CR */
 			result = (voice->control & (CONTROL_STOPMASK | CONTROL_LOOPMASK | CONTROL_IRQE | CONTROL_DIR | CONTROL_IRQ)) |
-					 ((voice->control & CONTROL_BS0) >> 12) |
-					 ((voice->control & CONTROL_LPMASK) << 2) |
-					 ((voice->control & (CONTROL_CA0 | CONTROL_CA1)) >> 2) |
-					 0xf000;
+						((voice->control & CONTROL_BS0) >> 12) |
+						((voice->control & CONTROL_LPMASK) << 2) |
+						((voice->control & (CONTROL_CA0 | CONTROL_CA1)) >> 2) |
+						0xf000;
 			break;
 
-		case 0x01:	/* O4(n-1) */
+		case 0x01:  /* O4(n-1) */
 			result = voice->o4n1;
 			break;
 
-		case 0x02:	/* O3(n-1) */
+		case 0x02:  /* O3(n-1) */
 			result = voice->o3n1;
 			break;
 
-		case 0x03:	/* O3(n-2) */
+		case 0x03:  /* O3(n-2) */
 			result = voice->o3n2;
 			break;
 
-		case 0x04:	/* O2(n-1) */
+		case 0x04:  /* O2(n-1) */
 			result = voice->o2n1;
 			break;
 
-		case 0x05:	/* O2(n-2) */
+		case 0x05:  /* O2(n-2) */
 			result = voice->o2n2;
 			break;
 
-		case 0x06:	/* O1(n-1) */
+		case 0x06:  /* O1(n-1) */
 			/* special case for the Taito F3 games: they set the accumulator on a stopped */
 			/* voice and assume the filters continue to process the data. They then read */
 			/* the O1(n-1) in order to extract raw data from the sound ROMs. Since we don't */
@@ -2040,19 +2040,19 @@ INLINE UINT16 es5505_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-		case 0x0c:	/* unused */
+		case 0x0c:  /* unused */
 			break;
 
-		case 0x0d:	/* ACT */
+		case 0x0d:  /* ACT */
 			result = chip->active_voices;
 			break;
 
-		case 0x0e:	/* IRQV */
+		case 0x0e:  /* IRQV */
 			result = chip->irqv;
 			update_internal_irq_state(chip);
 			break;
 
-		case 0x0f:	/* PAGE */
+		case 0x0f:  /* PAGE */
 			result = chip->current_page;
 			break;
 	}
@@ -2066,26 +2066,26 @@ INLINE UINT16 es5505_reg_read_test(es5506_state *chip, es5506_voice *voice, offs
 
 	switch (offset)
 	{
-		case 0x00:	/* CH0L */
-		case 0x01:	/* CH0R */
-		case 0x02:	/* CH1L */
-		case 0x03:	/* CH1R */
-		case 0x04:	/* CH2L */
-		case 0x05:	/* CH2R */
-		case 0x06:	/* CH3L */
-		case 0x07:	/* CH3R */
+		case 0x00:  /* CH0L */
+		case 0x01:  /* CH0R */
+		case 0x02:  /* CH1L */
+		case 0x03:  /* CH1R */
+		case 0x04:  /* CH2L */
+		case 0x05:  /* CH2R */
+		case 0x06:  /* CH3L */
+		case 0x07:  /* CH3R */
 			break;
 
-		case 0x08:	/* SERMODE */
+		case 0x08:  /* SERMODE */
 			result = chip->mode;
 			break;
 
-		case 0x09:	/* PAR */
+		case 0x09:  /* PAR */
 			if (chip->port_read)
 				result = (*chip->port_read)(chip->device);
 			break;
 
-		case 0x0f:	/* PAGE */
+		case 0x0f:  /* PAGE */
 			result = chip->current_page;
 			break;
 	}
@@ -2135,14 +2135,14 @@ const device_type ES5506 = &device_creator<es5506_device>;
 
 es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ES5506, "ES5506", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(es5506_state);
 }
 
 es5506_device::es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(es5506_state);
 }

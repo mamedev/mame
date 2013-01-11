@@ -19,7 +19,7 @@ class sumt8035_state : public driver_device
 public:
 	sumt8035_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -117,8 +117,8 @@ static INPUT_PORTS_START( summit )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2	 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3	 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2     )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3     )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )

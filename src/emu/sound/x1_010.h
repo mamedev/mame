@@ -8,7 +8,7 @@
 
 struct x1_010_interface
 {
-	int adr;	/* address */
+	int adr;    /* address */
 };
 
 
@@ -21,7 +21,7 @@ DECLARE_WRITE16_DEVICE_HANDLER( seta_sound_word_w );
 void seta_sound_enable_w(device_t *device, int data);
 
 class x1_010_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

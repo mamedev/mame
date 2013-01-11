@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	NEC PC-9801-118 sound card
+    NEC PC-9801-118 sound card
 
-	YMF288 + some extra ports
+    YMF288 + some extra ports
 
-	TODO:
-	- preliminary, presumably needs CS-4231 too
-	- joystick code should be shared between -26, -86 and -118
+    TODO:
+    - preliminary, presumably needs CS-4231 too
+    - joystick code should be shared between -26, -86 and -118
 
 ***************************************************************************/
 
@@ -128,7 +128,7 @@ const rom_entry *pc9801_118_device::device_rom_region() const
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC9801_118, "pc9801_118", tag, owner, clock),
-//		m_maincpu(*owner, "maincpu"),
+//      m_maincpu(*owner, "maincpu"),
 		m_opn3(*this, "opn3")
 {
 
@@ -209,7 +209,7 @@ WRITE8_MEMBER(pc9801_118_device::pc9801_118_w)
 	if(((offset & 5) == 0) || m_ext_reg)
 		ym2608_w(m_opn3,space, offset >> 1,data);
 	//else // odd
-	//	printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+	//  printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
 
 READ8_MEMBER( pc9801_118_device::pc9801_118_ext_r )

@@ -180,7 +180,7 @@ static const gfx_layout charlayout =
 	{ 1024*16*8+4, 1024*16*8+0, 4, 0 },
 	{ 8+3, 8+2, 8+1, 8+0, 3, 2, 1, 0 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },   /* characters are rotated 90 degrees */
-	16*8	   /* every char takes 16 bytes */
+	16*8       /* every char takes 16 bytes */
 };
 
 static const gfx_layout tilelayout =
@@ -210,8 +210,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( speedbal )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	 256, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,	 512, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  512, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
@@ -220,12 +220,12 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( speedbal, speedbal_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ??? */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
+	MCFG_CPU_ADD("audiocpu", Z80, 2660000)  /* 2.66 MHz ???  Maybe yes */
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_IO_MAP(sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 8*60)

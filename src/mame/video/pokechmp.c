@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(pokechmp_state::get_bg_tile_info)
 void pokechmp_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pokechmp_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

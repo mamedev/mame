@@ -115,25 +115,25 @@
 ****************************************************************************/
 
 /* mask for flags that are always handled dynamically or ignored */
-#define DYNAMIC_COMMAND_MASK	0x00000704
-#define DYNAMIC_FLAGS_MASK		0xffe0fe04
+#define DYNAMIC_COMMAND_MASK    0x00000704
+#define DYNAMIC_FLAGS_MASK      0xffe0fe04
 
-#define STATIC_COMMAND_MASK		(~DYNAMIC_COMMAND_MASK)
-#define STATIC_FLAGS_MASK		(~DYNAMIC_FLAGS_MASK)
+#define STATIC_COMMAND_MASK     (~DYNAMIC_COMMAND_MASK)
+#define STATIC_FLAGS_MASK       (~DYNAMIC_FLAGS_MASK)
 
 
 /* blitter registers */
 enum
 {
-	A1_BASE,	A1_FLAGS,	A1_CLIP,	A1_PIXEL,
-	A1_STEP,	A1_FSTEP,	A1_FPIXEL,	A1_INC,
-	A1_FINC,	A2_BASE,	A2_FLAGS,	A2_MASK,
-	A2_PIXEL,	A2_STEP,	B_CMD,		B_COUNT,
-	B_SRCD_H,	B_SRCD_L,	B_DSTD_H,	B_DSTD_L,
-	B_DSTZ_H,	B_DSTZ_L,	B_SRCZ1_H,	B_SRCZ1_L,
-	B_SRCZ2_H,	B_SRCZ2_L,	B_PATD_H,	B_PATD_L,
-	B_IINC,		B_ZINC,		B_STOP,		B_I3,
-	B_I2,		B_I1,		B_I0,		B_Z3,
-	B_Z2,		B_Z1,		B_Z0,
+	A1_BASE,    A1_FLAGS,   A1_CLIP,    A1_PIXEL,
+	A1_STEP,    A1_FSTEP,   A1_FPIXEL,  A1_INC,
+	A1_FINC,    A2_BASE,    A2_FLAGS,   A2_MASK,
+	A2_PIXEL,   A2_STEP,    B_CMD,      B_COUNT,
+	B_SRCD_H,   B_SRCD_L,   B_DSTD_H,   B_DSTD_L,
+	B_DSTZ_H,   B_DSTZ_L,   B_SRCZ1_H,  B_SRCZ1_L,
+	B_SRCZ2_H,  B_SRCZ2_L,  B_PATD_H,   B_PATD_L,
+	B_IINC,     B_ZINC,     B_STOP,     B_I3,
+	B_I2,       B_I1,       B_I0,       B_Z3,
+	B_Z2,       B_Z1,       B_Z0,
 	BLITTER_REGS
 };

@@ -25,27 +25,27 @@
 
 #define LOG 1
 
-#define OPTION_ID_0			0x13
-#define OPTION_ID_1			0x17
+#define OPTION_ID_0         0x13
+#define OPTION_ID_1         0x17
 
-#define UPD7720_0_TAG		"upd7220_0"
-#define UPD7720_1_TAG		"upd7220_1"
-#define SCREEN_TAG			"screen"
+#define UPD7720_0_TAG       "upd7220_0"
+#define UPD7720_1_TAG       "upd7220_1"
+#define SCREEN_TAG          "screen"
 
-#define DMA_GRAPHICS		BIT(m_option, 0)
-#define DMA_DREQ1			BIT(m_option, 1)
-#define DMA_DREQ2			BIT(m_option, 2)
-#define DMA_DREQ3			BIT(m_option, 3)
-#define DMA_ID				BIT(m_option, 4)
+#define DMA_GRAPHICS        BIT(m_option, 0)
+#define DMA_DREQ1           BIT(m_option, 1)
+#define DMA_DREQ2           BIT(m_option, 2)
+#define DMA_DREQ3           BIT(m_option, 3)
+#define DMA_ID              BIT(m_option, 4)
 
-#define ATTR_ALT_FONT		BIT(data, 8)
-#define ATTR_UNDERSCORE		BIT(data, 9)
-#define ATTR_BLINK			BIT(data, 10)
-#define ATTR_REVERSE		BIT(data, 11)
-#define ATTR_BLANK			BIT(data, 12)
-#define ATTR_BOLD			BIT(data, 13)
-#define ATTR_SUBSCRIPT		BIT(data, 14)
-#define ATTR_SUPERSCRIPT	BIT(data, 15)
+#define ATTR_ALT_FONT       BIT(data, 8)
+#define ATTR_UNDERSCORE     BIT(data, 9)
+#define ATTR_BLINK          BIT(data, 10)
+#define ATTR_REVERSE        BIT(data, 11)
+#define ATTR_BLANK          BIT(data, 12)
+#define ATTR_BOLD           BIT(data, 13)
+#define ATTR_SUBSCRIPT      BIT(data, 14)
+#define ATTR_SUPERSCRIPT    BIT(data, 15)
 
 
 

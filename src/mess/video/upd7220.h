@@ -77,46 +77,46 @@ struct upd7220_interface
 {
 	const char *m_screen_tag;
 
-	upd7220_display_pixels_func	m_display_cb;
+	upd7220_display_pixels_func m_display_cb;
 	upd7220_draw_text_line m_draw_text_cb;
 
-	devcb_write_line		m_out_drq_cb;
-	devcb_write_line		m_out_hsync_cb;
-	devcb_write_line		m_out_vsync_cb;
-	devcb_write_line		m_out_blank_cb;
+	devcb_write_line        m_out_drq_cb;
+	devcb_write_line        m_out_hsync_cb;
+	devcb_write_line        m_out_vsync_cb;
+	devcb_write_line        m_out_blank_cb;
 };
 
 // ======================> upd7220_device
 
-class upd7220_device :	public device_t,
+class upd7220_device :  public device_t,
 						public device_memory_interface,
-                        public upd7220_interface
+						public upd7220_interface
 {
 public:
-    // construction/destruction
-    upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
-    DECLARE_READ8_MEMBER( dack_r );
-    DECLARE_WRITE8_MEMBER( dack_w );
+	DECLARE_READ8_MEMBER( dack_r );
+	DECLARE_WRITE8_MEMBER( dack_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ext_sync_w );
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );
 
-    DECLARE_WRITE8_MEMBER( bank_w );
-    DECLARE_READ8_MEMBER( vram_r );
-    DECLARE_WRITE8_MEMBER( vram_w );
+	DECLARE_WRITE8_MEMBER( bank_w );
+	DECLARE_READ8_MEMBER( vram_r );
+	DECLARE_WRITE8_MEMBER( vram_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
@@ -154,74 +154,74 @@ private:
 	void draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
-	devcb_resolved_write_line	m_out_drq_func;
-	devcb_resolved_write_line	m_out_hsync_func;
-	devcb_resolved_write_line	m_out_vsync_func;
-	devcb_resolved_write_line	m_out_blank_func;
+	devcb_resolved_write_line   m_out_drq_func;
+	devcb_resolved_write_line   m_out_hsync_func;
+	devcb_resolved_write_line   m_out_vsync_func;
+	devcb_resolved_write_line   m_out_blank_func;
 
 	screen_device *m_screen;
 
-	UINT16 m_mask;					// mask register
-	UINT8 m_pitch;					// number of word addresses in display memory in the horizontal direction
-	UINT32 m_ead;					// execute word address
-	UINT16 m_dad;					// dot address within the word
-	UINT32 m_lad;					// light pen address
+	UINT16 m_mask;                  // mask register
+	UINT8 m_pitch;                  // number of word addresses in display memory in the horizontal direction
+	UINT32 m_ead;                   // execute word address
+	UINT16 m_dad;                   // dot address within the word
+	UINT32 m_lad;                   // light pen address
 
-	UINT8 m_ra[16];					// parameter RAM
-	int m_ra_addr;					// parameter RAM address
+	UINT8 m_ra[16];                 // parameter RAM
+	int m_ra_addr;                  // parameter RAM address
 
-	UINT8 m_sr;						// status register
-	UINT8 m_cr;						// command register
-	UINT8 m_pr[17];					// parameter byte register
-	int m_param_ptr;				// parameter pointer
+	UINT8 m_sr;                     // status register
+	UINT8 m_cr;                     // command register
+	UINT8 m_pr[17];                 // parameter byte register
+	int m_param_ptr;                // parameter pointer
 
-	UINT8 m_fifo[16];				// FIFO data queue
-	int m_fifo_flag[16];			// FIFO flag queue
-	int m_fifo_ptr;					// FIFO pointer
-	int m_fifo_dir;					// FIFO direction
+	UINT8 m_fifo[16];               // FIFO data queue
+	int m_fifo_flag[16];            // FIFO flag queue
+	int m_fifo_ptr;                 // FIFO pointer
+	int m_fifo_dir;                 // FIFO direction
 
-	UINT8 m_mode;					// mode of operation
-	UINT8 m_draw_mode;				// mode of drawing
+	UINT8 m_mode;                   // mode of operation
+	UINT8 m_draw_mode;              // mode of drawing
 
-	int m_de;						// display enabled
-	int m_m;						// 0 = accept external vertical sync (slave mode) / 1 = generate & output vertical sync (master mode)
-	int m_aw;						// active display words per line - 2 (must be even number with bit 0 = 0)
-	int m_al;						// active display lines per video field
-	int m_vs;						// vertical sync width - 1
-	int m_vfp;						// vertical front porch width - 1
-	int m_vbp;						// vertical back porch width - 1
-	int m_hs;						// horizontal sync width - 1
-	int m_hfp;						// horizontal front porch width - 1
-	int m_hbp;						// horizontal back porch width - 1
+	int m_de;                       // display enabled
+	int m_m;                        // 0 = accept external vertical sync (slave mode) / 1 = generate & output vertical sync (master mode)
+	int m_aw;                       // active display words per line - 2 (must be even number with bit 0 = 0)
+	int m_al;                       // active display lines per video field
+	int m_vs;                       // vertical sync width - 1
+	int m_vfp;                      // vertical front porch width - 1
+	int m_vbp;                      // vertical back porch width - 1
+	int m_hs;                       // horizontal sync width - 1
+	int m_hfp;                      // horizontal front porch width - 1
+	int m_hbp;                      // horizontal back porch width - 1
 
-	int m_dc;						// display cursor
-	int m_sc;						// 0 = blinking cursor / 1 = steady cursor
-	int m_br;						// blink rate
-	int m_ctop;						// cursor top line number in the row
-	int m_cbot;						// cursor bottom line number in the row (CBOT < LR)
-	int m_lr;						// lines per character row - 1
+	int m_dc;                       // display cursor
+	int m_sc;                       // 0 = blinking cursor / 1 = steady cursor
+	int m_br;                       // blink rate
+	int m_ctop;                     // cursor top line number in the row
+	int m_cbot;                     // cursor bottom line number in the row (CBOT < LR)
+	int m_lr;                       // lines per character row - 1
 
-	int m_disp;						// display zoom factor
-	int m_gchr;						// zoom factor for graphics character writing and area filling
+	int m_disp;                     // display zoom factor
+	int m_gchr;                     // zoom factor for graphics character writing and area filling
 
 	UINT8 m_bitmap_mod;
 
 	struct {
-		UINT8 m_dir;				// figs param 0: drawing direction
-		UINT8 m_figure_type;		// figs param 1: figure type
-		UINT16 m_dc;				// figs param 2:
-		UINT16 m_d;					// figs param 3:
-		UINT16 m_d1;				// figs param 4:
-		UINT16 m_d2;				// figs param 5:
-		UINT16 m_dm;				// figs param 6:
+		UINT8 m_dir;                // figs param 0: drawing direction
+		UINT8 m_figure_type;        // figs param 1: figure type
+		UINT16 m_dc;                // figs param 2:
+		UINT16 m_d;                 // figs param 3:
+		UINT16 m_d1;                // figs param 4:
+		UINT16 m_d2;                // figs param 5:
+		UINT16 m_dm;                // figs param 6:
 	} m_figs;
 
 	// timers
-	emu_timer *m_vsync_timer;		// vertical sync timer
-	emu_timer *m_hsync_timer;		// horizontal sync timer
-	emu_timer *m_blank_timer;		// CRT blanking timer
+	emu_timer *m_vsync_timer;       // vertical sync timer
+	emu_timer *m_hsync_timer;       // horizontal sync timer
+	emu_timer *m_blank_timer;       // CRT blanking timer
 
-	const address_space_config		m_space_config;
+	const address_space_config      m_space_config;
 };
 
 

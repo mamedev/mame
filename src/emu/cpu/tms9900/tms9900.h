@@ -83,10 +83,10 @@ enum
 	TMS99110A_ID = 12
 };
 
-#define MCFG_TMS99xx_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)		\
-	MCFG_DEVICE_ADD(_tag, _device, _clock)		\
-	MCFG_DEVICE_PROGRAM_MAP(_prgmap)			\
-	MCFG_DEVICE_IO_MAP(_iomap)					\
+#define MCFG_TMS99xx_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)       \
+	MCFG_DEVICE_ADD(_tag, _device, _clock)      \
+	MCFG_DEVICE_PROGRAM_MAP(_prgmap)            \
+	MCFG_DEVICE_IO_MAP(_iomap)                  \
 	MCFG_DEVICE_CONFIG(_config)
 
 enum
@@ -103,7 +103,7 @@ static const char opname[][5] =
 	"CI  ", "CB  ", "CKOF", "CKON", "CLR ", "COC ", "CZC ", "DEC ", "DECT", "DIV ",
 	"IDLE", "INC ", "INCT", "INV ", "JEQ ", "JGT ", "JH  ", "JHE ", "JL  ", "JLE ",
 	"JLT ", "JMP ", "JNC ", "JNE ", "JNO ", "JOC ", "JOP ", "LDCR", "LI  ", "LIMI",
-	"LREX", "LWPI", "MOV ", "MOVB", "MPY ", "NEG ", "ORI ", "RSET",	"RTWP", "S   ",
+	"LREX", "LWPI", "MOV ", "MOVB", "MPY ", "NEG ", "ORI ", "RSET", "RTWP", "S   ",
 	"SB  ", "SBO ", "SBZ ", "SETO", "SLA ", "SOC ", "SOCB", "SRA ", "SRC ", "SRL ",
 	"STCR", "STST", "STWP", "SWPB", "SZC ", "SZCB", "TB  ", "X   ", "XOP ", "XOR ",
 	"*int"
@@ -111,12 +111,12 @@ static const char opname[][5] =
 
 struct tms99xx_config
 {
-	devcb_write8		external_callback;
-	devcb_read8			irq_level;
-	devcb_write_line	instruction_acquisition;
-	devcb_write_line	clock_out;
-	devcb_write_line	wait_line;
-	devcb_write_line	holda_line;
+	devcb_write8        external_callback;
+	devcb_read8         irq_level;
+	devcb_write_line    instruction_acquisition;
+	devcb_write_line    clock_out;
+	devcb_write_line    wait_line;
+	devcb_write_line    holda_line;
 };
 
 #define TMS99xx_CONFIG(name) \
@@ -141,57 +141,57 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void		device_start();
-	virtual void		device_stop();
-	virtual void		device_reset();
+	virtual void        device_start();
+	virtual void        device_stop();
+	virtual void        device_reset();
 
 	// device_execute_interface overrides
-	virtual UINT32		execute_min_cycles() const;
-	virtual UINT32		execute_max_cycles() const;
-	virtual UINT32		execute_input_lines() const;
-	virtual void		execute_set_input(int irqline, int state);
-	virtual void		execute_run();
+	virtual UINT32      execute_min_cycles() const;
+	virtual UINT32      execute_max_cycles() const;
+	virtual UINT32      execute_input_lines() const;
+	virtual void        execute_set_input(int irqline, int state);
+	virtual void        execute_run();
 
 	// device_disasm_interface overrides
-	virtual UINT32		disasm_min_opcode_bytes() const;
-	virtual UINT32		disasm_max_opcode_bytes() const;
-	virtual offs_t		disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32      disasm_min_opcode_bytes() const;
+	virtual UINT32      disasm_max_opcode_bytes() const;
+	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	const address_space_config* memory_space_config(address_spacenum spacenum) const;
 
 	// Let these methods be overloaded by the TMS9980.
-	virtual void		mem_read(void);
-	virtual void		mem_write(void);
-	virtual void		acquire_instruction(void);
-	void				decode(UINT16 inst);
+	virtual void        mem_read(void);
+	virtual void        mem_write(void);
+	virtual void        acquire_instruction(void);
+	void                decode(UINT16 inst);
 
-	const address_space_config	m_program_config;
-	const address_space_config	m_io_config;
-	address_space*			m_prgspace;
-	address_space*			m_cru;
+	const address_space_config  m_program_config;
+	const address_space_config  m_io_config;
+	address_space*          m_prgspace;
+	address_space*          m_cru;
 
-	virtual UINT16	read_workspace_register_debug(int reg);
-	virtual void	write_workspace_register_debug(int reg, UINT16 data);
+	virtual UINT16  read_workspace_register_debug(int reg);
+	virtual void    write_workspace_register_debug(int reg, UINT16 data);
 
 	// Cycle counter
-	int 	m_icount;
+	int     m_icount;
 
 	// TMS9900 hardware registers
-	UINT16	WP; 	// Workspace pointer
-	UINT16	PC; 	// Program counter
-	UINT16	ST; 	// Status register
+	UINT16  WP;     // Workspace pointer
+	UINT16  PC;     // Program counter
+	UINT16  ST;     // Status register
 
 	// Internal register
-	UINT16	IR;		// Instruction register
+	UINT16  IR;     // Instruction register
 
 	// Stored address
-	UINT16	m_address;
+	UINT16  m_address;
 
 	// Stores the recently read word or the word to be written
-	UINT16	m_current_value;
+	UINT16  m_current_value;
 
 	// Decoded command
-	UINT16	m_command;
+	UINT16  m_command;
 
 	// Is it a byte operation? Only format 1 commands with the byte flag set
 	// and CRU commands with less than 9 bits to transfer are byte operations.
@@ -203,57 +203,57 @@ protected:
 	// For multi-pass operations. For instance, memory word accesses are
 	// executed as two consecutive byte accesses. CRU accesses are repeated
 	// single-bit accesses. (Needed for TMS9980)
-	int		m_pass;
+	int     m_pass;
 
 	// Data bus width. Needed for TMS9980.
-	int 	m_databus_width;
+	int     m_databus_width;
 
 	// Needed for TMS9980
-	bool	m_lowbyte;
+	bool    m_lowbyte;
 
 	// Check the READY line?
-	bool	m_check_ready;
+	bool    m_check_ready;
 
 	// Max address
 	const UINT16  m_prgaddr_mask;
 	const UINT16  m_cruaddr_mask;
 
-	bool	m_load_state;
-	bool	m_irq_state;
-	bool	m_reset;
+	bool    m_load_state;
+	bool    m_irq_state;
+	bool    m_reset;
 
 	// Determine the interrupt level using the IC0-IC2/3 lines
 	virtual int get_intlevel(int state);
 
 	// Interrupt level as acquired from input lines (TMS9900: IC0-IC3, TMS9980: IC0-IC2)
 	// We assume all values right-justified, i.e. TMS9980 also counts up by one
-	int 	m_irq_level;
+	int     m_irq_level;
 
 	// Used to display the number of consumed cycles in the log.
-	int		m_first_cycle;
+	int     m_first_cycle;
 
 	// Signal to the outside world that we are now getting an instruction
-	devcb_resolved_write_line	m_iaq_line;
+	devcb_resolved_write_line   m_iaq_line;
 
 	// Get the value of the interrupt level lines
-	devcb_resolved_read8	m_get_intlevel;
+	devcb_resolved_read8    m_get_intlevel;
 
 private:
 	// Indicates if this is a byte-oriented command
-	inline bool 	byte_operation();
+	inline bool     byte_operation();
 
 	// Processor states
-	bool	m_idle_state;
-	bool	m_ready_state;
-	bool	m_wait_state;
-	bool	m_hold_state;
+	bool    m_idle_state;
+	bool    m_ready_state;
+	bool    m_wait_state;
+	bool    m_hold_state;
 
 	// State / debug management
-	UINT16	m_state_any;
+	UINT16  m_state_any;
 	static const char* s_statename[];
-	void	state_import(const device_state_entry &entry);
-	void	state_export(const device_state_entry &entry);
-	void	state_string_export(const device_state_entry &entry, astring &string);
+	void    state_import(const device_state_entry &entry);
+	void    state_export(const device_state_entry &entry);
+	void    state_string_export(const device_state_entry &entry, astring &string);
 
 	// Interrupt handling
 	void service_interrupt();
@@ -272,10 +272,10 @@ private:
 	// Opcode list entry
 	struct tms_instruction
 	{
-		UINT16				opcode;
-		int					id;
-		int					format;
-		microprogram		prog;		// Microprogram
+		UINT16              opcode;
+		int                 id;
+		int                 format;
+		microprogram        prog;       // Microprogram
 	};
 
 	// Lookup table entry
@@ -286,10 +286,10 @@ private:
 	};
 
 	// Pointer to the lookup table
-	lookup_entry*	m_command_lookup_table;
+	lookup_entry*   m_command_lookup_table;
 
 	// List of allocated tables (used for easy clean-up on exit)
-	lookup_entry*	m_lotables[32];
+	lookup_entry*   m_lotables[32];
 
 	// List of pointers for micro-operations
 	static const tms99xx_device::ophandler s_microoperation[];
@@ -298,74 +298,74 @@ private:
 	static const tms99xx_device::tms_instruction s_command[];
 
 	// Micro-operation declarations
-	void	register_read(void);
-	void	register_write(void);
-	void	cru_input_operation(void);
-	void	cru_output_operation(void);
-	void	data_derivation_subprogram(void);
-	void	return_from_subprogram(void);
-	void	command_completed(void);
+	void    register_read(void);
+	void    register_write(void);
+	void    cru_input_operation(void);
+	void    cru_output_operation(void);
+	void    data_derivation_subprogram(void);
+	void    return_from_subprogram(void);
+	void    command_completed(void);
 
-	void	alu_nop(void);
-	void	alu_clear(void);
-	void	alu_source(void);
-	void	alu_setaddr(void);
-	void	alu_addone(void);
-	void	alu_setaddr_addone(void);
-	void	alu_pcaddr_advance(void);
-	void	alu_add_register(void);
+	void    alu_nop(void);
+	void    alu_clear(void);
+	void    alu_source(void);
+	void    alu_setaddr(void);
+	void    alu_addone(void);
+	void    alu_setaddr_addone(void);
+	void    alu_pcaddr_advance(void);
+	void    alu_add_register(void);
 
-	void	alu_imm(void);
-	void	alu_reg(void);
+	void    alu_imm(void);
+	void    alu_reg(void);
 
-	void	alu_f1(void);
-	void	alu_comp(void);
-	void	alu_f3(void);
-	void	alu_multiply(void);
-	void	alu_divide(void);
-	void	alu_xop(void);
-	void	alu_clr_swpb(void);
-	void	alu_abs(void);
-	void	alu_x(void);
-	void	alu_b(void);
-	void	alu_bl(void);
-	void	alu_blwp(void);
-	void	alu_ldcr(void);
-	void	alu_stcr(void);
-	void	alu_sbz_sbo(void);
-	void	alu_tb(void);
-	void	alu_jmp(void);
-	void	alu_shift(void);
-	void	alu_ai_ori(void);
-	void	alu_ci(void);
-	void	alu_li(void);
-	void	alu_lwpi(void);
-	void	alu_limi(void);
-	void	alu_stwp_stst(void);
-	void	alu_external(void);
-	void	alu_rtwp(void);
-	void	alu_int(void);
+	void    alu_f1(void);
+	void    alu_comp(void);
+	void    alu_f3(void);
+	void    alu_multiply(void);
+	void    alu_divide(void);
+	void    alu_xop(void);
+	void    alu_clr_swpb(void);
+	void    alu_abs(void);
+	void    alu_x(void);
+	void    alu_b(void);
+	void    alu_bl(void);
+	void    alu_blwp(void);
+	void    alu_ldcr(void);
+	void    alu_stcr(void);
+	void    alu_sbz_sbo(void);
+	void    alu_tb(void);
+	void    alu_jmp(void);
+	void    alu_shift(void);
+	void    alu_ai_ori(void);
+	void    alu_ci(void);
+	void    alu_li(void);
+	void    alu_lwpi(void);
+	void    alu_limi(void);
+	void    alu_stwp_stst(void);
+	void    alu_external(void);
+	void    alu_rtwp(void);
+	void    alu_int(void);
 
-	void	abort_operation(void);
+	void    abort_operation(void);
 
 	// Micro-operation
-	UINT8	m_op;
+	UINT8   m_op;
 
 	// Micro-operation program counter (as opposed to the program counter PC)
-	int 	MPC;
+	int     MPC;
 
 	// Current microprogram
-	const UINT8*	m_program;
+	const UINT8*    m_program;
 
 	// Calling microprogram (used when data derivation is called)
-	const UINT8*	m_caller;
-	int 			m_caller_MPC;
+	const UINT8*    m_caller;
+	int             m_caller_MPC;
 
 	// State of the micro-operation. Needed for repeated ALU calls.
-	int 	m_state;
+	int     m_state;
 
 	// Has HOLD been acknowledged yet?
-	bool	m_hold_acknowledged;
+	bool    m_hold_acknowledged;
 
 	// Signal the wait state via the external line
 	inline void set_wait_state(bool state);
@@ -382,32 +382,32 @@ private:
 	// Intermediate storage for the source operand
 	UINT16 m_source_address;
 	UINT16 m_source_value;
-	UINT16	m_address_saved;
+	UINT16  m_address_saved;
 
 	// Another copy of the address
-	UINT16	m_address_copy;
+	UINT16  m_address_copy;
 
 	// Stores the recently read register contents
-	UINT16	m_register_contents;
+	UINT16  m_register_contents;
 
 	// Stores the register number for the next register access
-	int 	m_regnumber;
+	int     m_regnumber;
 
 	// CRU support: Stores the CRU address
-	UINT16	m_cru_address;
+	UINT16  m_cru_address;
 
 	// CRU support: Stores the number of bits to be transferred
-	int		m_count;
+	int     m_count;
 
 	// Copy of the value
-	UINT16	m_value_copy;
+	UINT16  m_value_copy;
 
 	// Another internal register, storing intermediate values
 	// Using 32 bits to support MPY
-	UINT32	m_value;
+	UINT32  m_value;
 
 	// For two-argument commands. Indicates whether this is the second operand.
-	bool	m_get_destination;
+	bool    m_get_destination;
 
 	// Status register update
 	inline void set_status_bit(int bit, bool state);
@@ -436,18 +436,18 @@ private:
 	// We could realize this via the CRU access as well, but the data bus access
 	// is not that simple to emulate. For the sake of homogenity between the
 	// chip emulations we use a dedicated callback.
-	devcb_resolved_write8	m_external_operation;
+	devcb_resolved_write8   m_external_operation;
 
 	// Clock output. This is not a pin of the TMS9900 because the TMS9900
 	// needs an external clock, and usually one of those external lines is
 	// used for this purpose.
-	devcb_resolved_write_line	m_clock_out_line;
+	devcb_resolved_write_line   m_clock_out_line;
 
 	// Wait output. When asserted (high), the CPU is in a wait state.
-	devcb_resolved_write_line	m_wait_line;
+	devcb_resolved_write_line   m_wait_line;
 
 	// HOLD Acknowledge line. When asserted (high), the CPU is in HOLD state.
-	devcb_resolved_write_line	m_holda_line;
+	devcb_resolved_write_line   m_holda_line;
 };
 
 /*****************************************************************************/

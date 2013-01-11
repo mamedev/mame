@@ -106,30 +106,30 @@ private:
 	void output_via_delegate(output_delegate &delegate, const char *format, ...);
 
 	// internal driver list
-	driver_enumerator		m_drivlist;
+	driver_enumerator       m_drivlist;
 
 	// error tracking
-	int						m_errors;
-	int						m_warnings;
-	astring					m_error_text;
-	astring					m_warning_text;
+	int                     m_errors;
+	int                     m_warnings;
+	astring                 m_error_text;
+	astring                 m_warning_text;
 
 	// maps for finding duplicates
-	game_driver_map 		m_names_map;
-	game_driver_map 		m_descriptions_map;
-	game_driver_map 		m_roms_map;
-	int_map 				m_defstr_map;
+	game_driver_map         m_names_map;
+	game_driver_map         m_descriptions_map;
+	game_driver_map         m_roms_map;
+	int_map                 m_defstr_map;
 
 	// current state
-	const game_driver *		m_current_driver;
-	const machine_config *	m_current_config;
-	const device_t *		m_current_device;
-	const char *			m_current_ioport;
-	int_map 				m_region_map;
+	const game_driver *     m_current_driver;
+	const machine_config *  m_current_config;
+	const device_t *        m_current_device;
+	const char *            m_current_ioport;
+	int_map                 m_region_map;
 
 	// callbacks
-	output_delegate			m_saved_error_output;
-	output_delegate			m_saved_warning_output;
+	output_delegate         m_saved_error_output;
+	output_delegate         m_saved_warning_output;
 };
 
 #endif

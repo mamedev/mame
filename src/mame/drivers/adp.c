@@ -157,8 +157,8 @@ class adp_state : public driver_device
 public:
 	adp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_h63484(*this, "h63484"),
-		  m_microtouch(*this, "microtouch")
+			m_h63484(*this, "h63484"),
+			m_microtouch(*this, "microtouch")
 		{ }
 
 	required_device<h63484_device> m_h63484;
@@ -235,7 +235,7 @@ if (!machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
 		int h = hd63484_regs_r(m_hd63484, 0x96/2, 0xffff) & 0x0fff;
 		int sx = ((hd63484_regs_r(m_hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(m_hd63484, 0x84/2, 0xffff) >> 8)) * 2 * 2;
 		int w = (hd63484_regs_r(m_hd63484, 0x92/2, 0xffff) & 0xff) * 2;
-		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
+		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
 
 		b = (((hd63484_regs_r(m_hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(m_hd63484, 0xde/2, 0xffff));
 
@@ -312,13 +312,13 @@ MACHINE_START_MEMBER(adp_state,skattv)
 
 	#if 0
 	/*
-        ACRTC memory:
+	    ACRTC memory:
 
-        00000-3ffff = RAM
-        40000-7ffff = ROM
-        80000-bffff = unused
-        c0000-fffff = unused
-    */
+	    00000-3ffff = RAM
+	    40000-7ffff = ROM
+	    80000-bffff = unused
+	    c0000-fffff = unused
+	*/
 
 	// hack to handle acrt rom
 	{
@@ -355,31 +355,31 @@ static const duart68681_config skattv_duart68681_config =
 
 PALETTE_INIT_MEMBER(adp_state,adp)
 {
-    int i;
+	int i;
 
-    for (i = 0; i < machine().total_colors(); i++)
-    {
-        int bit0, bit1, bit2, r, g, b;
+	for (i = 0; i < machine().total_colors(); i++)
+	{
+		int bit0, bit1, bit2, r, g, b;
 
 
-        // red component
-        bit0 = (i >> 0) & 0x01;
-        bit1 = (i >> 3) & 0x01;
-        bit2 = (i >> 0) & 0x01;
-        r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-        // green component
-        bit0 = (i >> 1) & 0x01;
-        bit1 = (i >> 3) & 0x01;
-        bit2 = (i >> 1) & 0x01;
-        g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-        // blue component
-        bit0 = (i >> 2) & 0x01;
-        bit1 = (i >> 3) & 0x01;
-        bit2 = (i >> 2) & 0x01;
-        b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = (i >> 0) & 0x01;
+		bit1 = (i >> 3) & 0x01;
+		bit2 = (i >> 0) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = (i >> 1) & 0x01;
+		bit1 = (i >> 3) & 0x01;
+		bit2 = (i >> 1) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = (i >> 2) & 0x01;
+		bit1 = (i >> 3) & 0x01;
+		bit2 = (i >> 2) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-        palette_set_color(machine(), i, MAKE_RGB(r,g,b));
-    }
+		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+	}
 }
 
 READ16_MEMBER(adp_state::test_r)

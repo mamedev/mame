@@ -74,13 +74,13 @@ UINT16 seibucrtc_sc0bank;
 /*******************************
 * 0x1a - Layer Dynamic Paging?
 *******************************/
-#define SEIBU_CRTC_DYN_PAGING	(seibucrtc_vregs[0x001a/2])
+#define SEIBU_CRTC_DYN_PAGING   (seibucrtc_vregs[0x001a/2])
 #define SEIBU_CRTC_SC3_PAGE_SEL (SEIBU_CRTC_DYN_PAGING & 0x0002)
 
 /*******************************
 * 0x1c - Layer Enable
 *******************************/
-#define SEIBU_CRTC_LAYER_EN 	(seibucrtc_vregs[0x001c/2])
+#define SEIBU_CRTC_LAYER_EN     (seibucrtc_vregs[0x001c/2])
 #define SEIBU_CRTC_ENABLE_SC0   (!(SEIBU_CRTC_LAYER_EN & 0x0001))
 #define SEIBU_CRTC_ENABLE_SC2   (!(SEIBU_CRTC_LAYER_EN & 0x0002))
 #define SEIBU_CRTC_ENABLE_SC1   (!(SEIBU_CRTC_LAYER_EN & 0x0004))
@@ -90,42 +90,42 @@ UINT16 seibucrtc_sc0bank;
 /************************************
 * 0x20 - Screen 0 (BG) scroll x
 ************************************/
-#define SEIBU_CRTC_SC0_SX	(seibucrtc_vregs[0x0020/2])
+#define SEIBU_CRTC_SC0_SX   (seibucrtc_vregs[0x0020/2])
 
 /************************************
 * 0x22 - Screen 0 (BG) scroll y
 ************************************/
-#define SEIBU_CRTC_SC0_SY	(seibucrtc_vregs[0x0022/2])
+#define SEIBU_CRTC_SC0_SY   (seibucrtc_vregs[0x0022/2])
 
 /************************************
 * 0x24 - Screen 1 (FG) scroll x
 ************************************/
-#define SEIBU_CRTC_SC1_SX	(seibucrtc_vregs[0x0028/2])
+#define SEIBU_CRTC_SC1_SX   (seibucrtc_vregs[0x0028/2])
 
 /************************************
 * 0x26 - Screen 1 (FG) scroll y
 ************************************/
-#define SEIBU_CRTC_SC1_SY	(seibucrtc_vregs[0x002a/2])
+#define SEIBU_CRTC_SC1_SY   (seibucrtc_vregs[0x002a/2])
 
 /************************************
 * 0x28 - Screen 2 (MD) scroll x
 ************************************/
-#define SEIBU_CRTC_SC2_SX	(seibucrtc_vregs[0x0024/2])
+#define SEIBU_CRTC_SC2_SX   (seibucrtc_vregs[0x0024/2])
 
 /************************************
 * 0x2a - Screen 2 (MD) scroll y
 ************************************/
-#define SEIBU_CRTC_SC2_SY	(seibucrtc_vregs[0x0026/2])
+#define SEIBU_CRTC_SC2_SY   (seibucrtc_vregs[0x0026/2])
 
 /************************************
 * 0x2c - Fix screen scroll x (global)
 ************************************/
-#define SEIBU_CRTC_FIX_SX	(seibucrtc_vregs[0x002c/2])
+#define SEIBU_CRTC_FIX_SX   (seibucrtc_vregs[0x002c/2])
 
 /************************************
 * 0x2e - Fix screen scroll y (global)
 ************************************/
-#define SEIBU_CRTC_FIX_SY	(seibucrtc_vregs[0x002e/2])
+#define SEIBU_CRTC_FIX_SY   (seibucrtc_vregs[0x002e/2])
 
 
 /*******************************

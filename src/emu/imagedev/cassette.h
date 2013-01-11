@@ -16,21 +16,21 @@
 enum cassette_state
 {
 	/* this part of the state is controlled by the UI */
-	CASSETTE_STOPPED			= 0,
-	CASSETTE_PLAY				= 1,
-	CASSETTE_RECORD				= 2,
+	CASSETTE_STOPPED            = 0,
+	CASSETTE_PLAY               = 1,
+	CASSETTE_RECORD             = 2,
 
 	/* this part of the state is controlled by drivers */
-	CASSETTE_MOTOR_ENABLED		= 0,
-	CASSETTE_MOTOR_DISABLED		= 4,
-	CASSETTE_SPEAKER_ENABLED	= 0,
-	CASSETTE_SPEAKER_MUTED		= 8,
+	CASSETTE_MOTOR_ENABLED      = 0,
+	CASSETTE_MOTOR_DISABLED     = 4,
+	CASSETTE_SPEAKER_ENABLED    = 0,
+	CASSETTE_SPEAKER_MUTED      = 8,
 
 	/* masks */
-	CASSETTE_MASK_UISTATE		= 3,
-	CASSETTE_MASK_MOTOR			= 4,
-	CASSETTE_MASK_SPEAKER		= 8,
-	CASSETTE_MASK_DRVSTATE		= 12
+	CASSETTE_MASK_UISTATE       = 3,
+	CASSETTE_MASK_MOTOR         = 4,
+	CASSETTE_MASK_SPEAKER       = 8,
+	CASSETTE_MASK_DRVSTATE      = 12
 };
 
 
@@ -42,16 +42,16 @@ enum cassette_state
 
 struct cassette_interface
 {
-	const struct CassetteFormat*	const *m_formats;
-	const struct CassetteOptions	*m_create_opts;
-	cassette_state					m_default_state;
-	const char *					m_interface;
-	device_image_display_info_func	m_device_displayinfo;
+	const struct CassetteFormat*    const *m_formats;
+	const struct CassetteOptions    *m_create_opts;
+	cassette_state                  m_default_state;
+	const char *                    m_interface;
+	device_image_display_info_func  m_device_displayinfo;
 };
 
 // ======================> cassette_image_device
 
-class cassette_image_device :	public device_t,
+class cassette_image_device :   public device_t,
 								public cassette_interface,
 								public device_image_interface
 {
@@ -101,18 +101,18 @@ protected:
 	void update();
 
 	// device-level overrides
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 	virtual void device_start();
 private:
-	cassette_image	*m_cassette;
-	cassette_state	m_state;
-	double			m_position;
-	double			m_position_time;
-	INT32			m_value;
-	int				m_channel;
-	double			m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
-	int				m_direction; // direction select
-	char			m_extension_list[256];
+	cassette_image  *m_cassette;
+	cassette_state  m_state;
+	double          m_position;
+	double          m_position_time;
+	INT32           m_value;
+	int             m_channel;
+	double          m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
+	int             m_direction; // direction select
+	char            m_extension_list[256];
 };
 
 // device type definition
@@ -124,15 +124,15 @@ typedef device_type_iterator<&device_creator<cassette_image_device>, cassette_im
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define CASSETTE_TAG		"cassette"
-#define CASSETTE2_TAG		"cassette2"
+#define CASSETTE_TAG        "cassette"
+#define CASSETTE2_TAG       "cassette2"
 
-#define MCFG_CASSETTE_ADD(_tag, _config)	\
-	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)			\
+#define MCFG_CASSETTE_ADD(_tag, _config)    \
+	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)          \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_CASSETTE_MODIFY(_tag, _config)	\
-	MCFG_DEVICE_MODIFY(_tag)		\
+#define MCFG_CASSETTE_MODIFY(_tag, _config) \
+	MCFG_DEVICE_MODIFY(_tag)        \
 	MCFG_DEVICE_CONFIG(_config)
 
 extern const cassette_interface default_cassette_interface;

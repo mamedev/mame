@@ -47,10 +47,10 @@
 
 
     The uPD1771 internal workings are described to some extent by the Bristow book
-    and the IEEE article "A Single-Chip Sound Synthesis Microcomputer" which complements the book 
+    and the IEEE article "A Single-Chip Sound Synthesis Microcomputer" which complements the book
     and are covered by at least four US patents:
     4184152 - on IGFET-based DAC stuff
-    4488061 - on the IGFET-based drive circuit part of the DAC. 
+    4488061 - on the IGFET-based drive circuit part of the DAC.
     4408094 - covers the 3 pin DAC with the volume control/vref pin. Not all that interesting,
               except it might describe to some extent how the (9->5bit?) PWM works in the text.
     4470113 - covers the multiplexed PB0/1/2/3 pins and their use as /CS /WR /RD and ALE
@@ -190,25 +190,25 @@ const char WAVEFORMS[8][32]={
 #define NOISE_SIZE 255
 
 
- static unsigned char noise_tbl[]=
- {
-  0x1c,0x86,0x8a,0x8f,0x98,0xa1,0xad,0xbe,0xd9,0x8a,0x66,0x4d,0x40,0x33,0x2b,0x23,
-  0x1e,0x8a,0x90,0x97,0xa4,0xae,0xb8,0xd6,0xec,0xe9,0x69,0x4a,0x3e,0x34,0x2d,0x27,
-  0x24,0x24,0x89,0x8e,0x93,0x9c,0xa5,0xb0,0xc1,0xdd,0x40,0x36,0x30,0x29,0x27,0x24,
-  0x8b,0x90,0x96,0x9e,0xa7,0xb3,0xc4,0xe1,0x25,0x21,0x8a,0x8f,0x93,0x9d,0xa5,0xb2,
-  0xc2,0xdd,0xdd,0x98,0xa2,0xaf,0xbf,0xd8,0xfd,0x65,0x4a,0x3c,0x31,0x2b,0x24,0x22,
-  0x1e,0x87,0x8c,0x91,0x9a,0xa3,0xaf,0xc0,0xdb,0xbe,0xd9,0x8c,0x66,0x4d,0x40,0x34,
-  0x2c,0x24,0x1f,0x88,0x90,0x9a,0xa4,0xb2,0xc2,0xda,0xff,0x67,0x4d,0x3d,0x34,0x2d,
-  0x26,0x24,0x20,0x89,0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xde,0xc1,0xda,0xff,0x67,0x4d,
-  0x3d,0x33,0x2d,0x26,0x24,0x20,0x89,0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xdd,0xa3,0xb0,
-  0xc0,0xd9,0xfe,0x66,0x4b,0x3c,0x32,0x2b,0x24,0x23,0x1e,0x88,0x8d,0x92,0x9b,0xa4,
-  0xb0,0xc1,0xdc,0xad,0xbe,0xda,0x22,0x20,0x1c,0x85,0x8a,0x8f,0x98,0xa1,0xad,0xbe,
-  0xda,0x20,0x1b,0x85,0x8d,0x97,0xa1,0xaf,0xbf,0xd8,0xfd,0x64,0x49,0x3a,0x30,0x2a,
-  0x23,0x21,0x1d,0x86,0x8b,0x91,0x9a,0xa2,0xae,0xc0,0xdb,0x33,0x2b,0x24,0x1f,0x88,
-  0x90,0x9a,0xa4,0xb2,0xc2,0xda,0xff,0x67,0x4c,0x3e,0x33,0x2d,0x25,0x24,0x1f,0x89,
-  0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xde,0x85,0x8e,0x98,0xa2,0xb0,0xc0,0xd9,0xfe,0x64,
-  0x4b,0x3b,0x31,0x2a,0x23,0x22,0x1e,0x88,0x8c,0x91,0x9b,0xa3,0xaf,0xc1,0xdc,0xdc
-  };
+	static unsigned char noise_tbl[]=
+	{
+	0x1c,0x86,0x8a,0x8f,0x98,0xa1,0xad,0xbe,0xd9,0x8a,0x66,0x4d,0x40,0x33,0x2b,0x23,
+	0x1e,0x8a,0x90,0x97,0xa4,0xae,0xb8,0xd6,0xec,0xe9,0x69,0x4a,0x3e,0x34,0x2d,0x27,
+	0x24,0x24,0x89,0x8e,0x93,0x9c,0xa5,0xb0,0xc1,0xdd,0x40,0x36,0x30,0x29,0x27,0x24,
+	0x8b,0x90,0x96,0x9e,0xa7,0xb3,0xc4,0xe1,0x25,0x21,0x8a,0x8f,0x93,0x9d,0xa5,0xb2,
+	0xc2,0xdd,0xdd,0x98,0xa2,0xaf,0xbf,0xd8,0xfd,0x65,0x4a,0x3c,0x31,0x2b,0x24,0x22,
+	0x1e,0x87,0x8c,0x91,0x9a,0xa3,0xaf,0xc0,0xdb,0xbe,0xd9,0x8c,0x66,0x4d,0x40,0x34,
+	0x2c,0x24,0x1f,0x88,0x90,0x9a,0xa4,0xb2,0xc2,0xda,0xff,0x67,0x4d,0x3d,0x34,0x2d,
+	0x26,0x24,0x20,0x89,0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xde,0xc1,0xda,0xff,0x67,0x4d,
+	0x3d,0x33,0x2d,0x26,0x24,0x20,0x89,0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xdd,0xa3,0xb0,
+	0xc0,0xd9,0xfe,0x66,0x4b,0x3c,0x32,0x2b,0x24,0x23,0x1e,0x88,0x8d,0x92,0x9b,0xa4,
+	0xb0,0xc1,0xdc,0xad,0xbe,0xda,0x22,0x20,0x1c,0x85,0x8a,0x8f,0x98,0xa1,0xad,0xbe,
+	0xda,0x20,0x1b,0x85,0x8d,0x97,0xa1,0xaf,0xbf,0xd8,0xfd,0x64,0x49,0x3a,0x30,0x2a,
+	0x23,0x21,0x1d,0x86,0x8b,0x91,0x9a,0xa2,0xae,0xc0,0xdb,0x33,0x2b,0x24,0x1f,0x88,
+	0x90,0x9a,0xa4,0xb2,0xc2,0xda,0xff,0x67,0x4c,0x3e,0x33,0x2d,0x25,0x24,0x1f,0x89,
+	0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xde,0x85,0x8e,0x98,0xa2,0xb0,0xc0,0xd9,0xfe,0x64,
+	0x4b,0x3b,0x31,0x2a,0x23,0x22,0x1e,0x88,0x8c,0x91,0x9b,0xa3,0xaf,0xc1,0xdc,0xdc
+	};
 
 
 
@@ -219,45 +219,45 @@ const char WAVEFORMS[8][32]={
 
 struct upd1771_state
 {
-    sound_stream *channel;
-    devcb_resolved_write_line ack_out_func;
-    emu_timer *timer;
+	sound_stream *channel;
+	devcb_resolved_write_line ack_out_func;
+	emu_timer *timer;
 
-    UINT8   packet[MAX_PACKET_SIZE];
-    UINT32  index;
-    UINT8   expected_bytes;
+	UINT8   packet[MAX_PACKET_SIZE];
+	UINT32  index;
+	UINT8   expected_bytes;
 
-    UINT8   state;//0:silence, 1 noise, 2 tone
-	UINT8	pc3;
+	UINT8   state;//0:silence, 1 noise, 2 tone
+	UINT8   pc3;
 
-    //tone
-    UINT8    t_timbre; //[0;  7]
-    UINT8    t_offset; //[0; 32]
-    UINT16   t_period; //[0;255]
-    UINT8    t_volume; //[0; 31]
-    UINT8    t_tpos;//timbre pos
-    UINT16   t_ppos;//period pos
+	//tone
+	UINT8    t_timbre; //[0;  7]
+	UINT8    t_offset; //[0; 32]
+	UINT16   t_period; //[0;255]
+	UINT8    t_volume; //[0; 31]
+	UINT8    t_tpos;//timbre pos
+	UINT16   t_ppos;//period pos
 
-    //noise wavetable LFSR
-    UINT8    nw_timbre; //[0;  7]
-    UINT8    nw_volume; //[0; 31]
-    UINT32   nw_period;
-    UINT32   nw_tpos;   //timbre pos
-    UINT32   nw_ppos;   //period pos
+	//noise wavetable LFSR
+	UINT8    nw_timbre; //[0;  7]
+	UINT8    nw_volume; //[0; 31]
+	UINT32   nw_period;
+	UINT32   nw_tpos;   //timbre pos
+	UINT32   nw_ppos;   //period pos
 
-    //noise pulse components
-    UINT8    n_value[3];  //[0;1]
-    UINT16   n_volume[3]; //[0; 31]
-    UINT32   n_period[3];
-    UINT32   n_ppos[3];   //period pos
+	//noise pulse components
+	UINT8    n_value[3];  //[0;1]
+	UINT16   n_volume[3]; //[0; 31]
+	UINT32   n_period[3];
+	UINT32   n_ppos[3];   //period pos
 };
 
 
 INLINE upd1771_state *get_safe_token(device_t *device)
 {
-    assert(device != NULL);
-    assert(device->type() == UPD1771C);
-    return (upd1771_state *)downcast<upd1771c_device *>(device)->token();
+	assert(device != NULL);
+	assert(device->type() == UPD1771C);
+	return (upd1771_state *)downcast<upd1771c_device *>(device)->token();
 }
 
 
@@ -330,12 +330,12 @@ Byte9: 0b???VVVVV  Low Freq2 volume
 
 WRITE8_DEVICE_HANDLER( upd1771_w )
 {
-    upd1771_state *state = get_safe_token( device );
+	upd1771_state *state = get_safe_token( device );
 
-    //if (LOG)
-    //  logerror( "upd1771_w: received byte 0x%02x\n", data );
+	//if (LOG)
+	//  logerror( "upd1771_w: received byte 0x%02x\n", data );
 
-    state->ack_out_func(0);
+	state->ack_out_func(0);
 
 	if (state->index < MAX_PACKET_SIZE)
 		state->packet[state->index++]=data;
@@ -344,57 +344,57 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 		return;
 	}
 
-    switch(state->packet[0]){
+	switch(state->packet[0]){
 
-        case 0:
-        {
-            state->state = STATE_SILENCE;
-            state->index = 0;
-            //logerror( "upd1771_w: ----------------silence  state reset\n");
-        }break;
-
-        case 1:
+		case 0:
 		{
-            if (state->index == 10){
-                state->state = STATE_NOISE;
-                state->index = 0;
-
-                state->nw_timbre = (state->packet[1] & 0xE0) >> 5;
-                state->nw_period =  ((UINT32)state->packet[2]+1)<<7;
-                state->nw_volume =  state->packet[3] & 0x1f;
-
-                //very long clocked periods.. used for engine drones
-                state->n_period[0] = (((UINT32)state->packet[4])+1)<<7;
-                state->n_period[1] = (((UINT32)state->packet[5])+1)<<7;
-                state->n_period[2] = (((UINT32)state->packet[6])+1)<<7;
-
-                state->n_volume[0] = state->packet[7]& 0x1f;
-                state->n_volume[1] = state->packet[8]& 0x1f;
-                state->n_volume[2] = state->packet[9]& 0x1f;
-
-                //logerror( "upd1771_w: ----------------noise state reset\n");
-            }
-            else
-                state->timer->adjust( attotime::from_ticks( 512, device->clock() ) );
+			state->state = STATE_SILENCE;
+			state->index = 0;
+			//logerror( "upd1771_w: ----------------silence  state reset\n");
 		}break;
 
-        case 2:
+		case 1:
 		{
-            if (state->index == 4){
-                //logerror( "upd1771_w: ----------------tone  state reset\n");
-                state->t_timbre = (state->packet[1] & 0xE0) >> 5;
-                state->t_offset = (state->packet[1] & 0x1F);
-                state->t_period =  state->packet[2];
-                //smaller periods dont all equal to 0x20
-                if (state->t_period < 0x20)
-                    state->t_period = 0x20;
+			if (state->index == 10){
+				state->state = STATE_NOISE;
+				state->index = 0;
 
-                state->t_volume =  state->packet[3] & 0x1f;
-                state->state = STATE_TONE;
-                state->index = 0;
-            }
-            else
-                state->timer->adjust( attotime::from_ticks( 512, device->clock() ) );
+				state->nw_timbre = (state->packet[1] & 0xE0) >> 5;
+				state->nw_period =  ((UINT32)state->packet[2]+1)<<7;
+				state->nw_volume =  state->packet[3] & 0x1f;
+
+				//very long clocked periods.. used for engine drones
+				state->n_period[0] = (((UINT32)state->packet[4])+1)<<7;
+				state->n_period[1] = (((UINT32)state->packet[5])+1)<<7;
+				state->n_period[2] = (((UINT32)state->packet[6])+1)<<7;
+
+				state->n_volume[0] = state->packet[7]& 0x1f;
+				state->n_volume[1] = state->packet[8]& 0x1f;
+				state->n_volume[2] = state->packet[9]& 0x1f;
+
+				//logerror( "upd1771_w: ----------------noise state reset\n");
+			}
+			else
+				state->timer->adjust( attotime::from_ticks( 512, device->clock() ) );
+		}break;
+
+		case 2:
+		{
+			if (state->index == 4){
+				//logerror( "upd1771_w: ----------------tone  state reset\n");
+				state->t_timbre = (state->packet[1] & 0xE0) >> 5;
+				state->t_offset = (state->packet[1] & 0x1F);
+				state->t_period =  state->packet[2];
+				//smaller periods dont all equal to 0x20
+				if (state->t_period < 0x20)
+					state->t_period = 0x20;
+
+				state->t_volume =  state->packet[3] & 0x1f;
+				state->state = STATE_TONE;
+				state->index = 0;
+			}
+			else
+				state->timer->adjust( attotime::from_ticks( 512, device->clock() ) );
 
 		}break;
 
@@ -405,22 +405,22 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 			//end capture
 			if (state->index >= 2 && state->packet[state->index-2] == 0xFE &&
 				state->packet[state->index-1] == 0x00){
-                //TODO play capture!
+				//TODO play capture!
 				state->index = 0;
 				state->packet[0]=0;
-                state->state = STATE_ADPCM;
+				state->state = STATE_ADPCM;
 			}
 			else
 				state->timer->adjust( attotime::from_ticks( 512, device->clock() ) );
 
 		}break;
 
-        //garbage: wipe stack
-        default:
-            state->state = STATE_SILENCE;
+		//garbage: wipe stack
+		default:
+			state->state = STATE_SILENCE;
 			state->index = 0;
-        break;
-    }
+		break;
+	}
 }
 
 
@@ -441,119 +441,119 @@ WRITE_LINE_DEVICE_HANDLER( upd1771_pcm_w )
 
 static STREAM_UPDATE( upd1771c_update )
 {
-    upd1771_state *state = get_safe_token( device );
-    stream_sample_t *buffer = outputs[0];
+	upd1771_state *state = get_safe_token( device );
+	stream_sample_t *buffer = outputs[0];
 
-    switch(state->state){
-        case STATE_TONE:
-        {
-            //logerror( "upd1771_STATE_TONE samps:%d %d %d %d %d %d\n",(int)samples,
-            //    (int)state->t_timbre,(int)state->t_offset,(int)state->t_volume,(int)state->t_period,(int)state->t_tpos);
+	switch(state->state){
+		case STATE_TONE:
+		{
+			//logerror( "upd1771_STATE_TONE samps:%d %d %d %d %d %d\n",(int)samples,
+			//    (int)state->t_timbre,(int)state->t_offset,(int)state->t_volume,(int)state->t_period,(int)state->t_tpos);
 
-            while ( --samples >= 0 ){
+			while ( --samples >= 0 ){
 
-                *buffer++ = (WAVEFORMS[state->t_timbre][state->t_tpos])*state->t_volume * 2;
+				*buffer++ = (WAVEFORMS[state->t_timbre][state->t_tpos])*state->t_volume * 2;
 
-                state->t_ppos++;
-                if (state->t_ppos >= state->t_period){
+				state->t_ppos++;
+				if (state->t_ppos >= state->t_period){
 
-                    state->t_tpos++;
-                    if (state->t_tpos == 32)
-                       state->t_tpos = state->t_offset;
+					state->t_tpos++;
+					if (state->t_tpos == 32)
+						state->t_tpos = state->t_offset;
 
-                   state->t_ppos = 0;
-                }
-            }
-        }break;
+					state->t_ppos = 0;
+				}
+			}
+		}break;
 
-        case STATE_NOISE:
-        {
-            while (--samples >= 0 ){
+		case STATE_NOISE:
+		{
+			while (--samples >= 0 ){
 
-                *buffer = 0;
+				*buffer = 0;
 
-                //"wavetable-LFSR" component
-                int wlfsr_val = ((int)noise_tbl[state->nw_tpos])-127;//data too wide
+				//"wavetable-LFSR" component
+				int wlfsr_val = ((int)noise_tbl[state->nw_tpos])-127;//data too wide
 
-                state->nw_ppos++;
-                if (state->nw_ppos >= state->nw_period){
-                    state->nw_tpos++;
-                    if (state->nw_tpos == NOISE_SIZE)
-                       state->nw_tpos = 0;
-                   state->nw_ppos = 0;
-                }
+				state->nw_ppos++;
+				if (state->nw_ppos >= state->nw_period){
+					state->nw_tpos++;
+					if (state->nw_tpos == NOISE_SIZE)
+						state->nw_tpos = 0;
+					state->nw_ppos = 0;
+				}
 
-                //mix in each of the noise's 3 pulse components
-                char res[3];
-                for (size_t i=0;i<3;++i){
+				//mix in each of the noise's 3 pulse components
+				char res[3];
+				for (size_t i=0;i<3;++i){
 
-                    res[i] = state->n_value[i]* 127;
-                    state->n_ppos[i]++;
-                    if (state->n_ppos[i] >= state->n_period[i]){
-                        state->n_ppos[i] = 0;
-                        state->n_value[i] = !state->n_value[i];
-                    }
-                }
-                //not quite, but close.
-                *buffer+= (
-					       (wlfsr_val*state->nw_volume) |
-					       (res[0]*state->n_volume[0]) |
-                           (res[1]*state->n_volume[1]) |
-                           (res[2]*state->n_volume[2])
-                           ) ;
+					res[i] = state->n_value[i]* 127;
+					state->n_ppos[i]++;
+					if (state->n_ppos[i] >= state->n_period[i]){
+						state->n_ppos[i] = 0;
+						state->n_value[i] = !state->n_value[i];
+					}
+				}
+				//not quite, but close.
+				*buffer+= (
+							(wlfsr_val*state->nw_volume) |
+							(res[0]*state->n_volume[0]) |
+							(res[1]*state->n_volume[1]) |
+							(res[2]*state->n_volume[2])
+							) ;
 
-                buffer++;
-            }
-        }break;
+				buffer++;
+			}
+		}break;
 
-        default:
-        {
-            //fill buffer with silence
-            while (--samples >= 0 ){
-                *buffer++ = 0;
-            }
-        }
+		default:
+		{
+			//fill buffer with silence
+			while (--samples >= 0 ){
+				*buffer++ = 0;
+			}
+		}
 
-        break;
-    }
+		break;
+	}
 
 }
 
 
 static TIMER_CALLBACK( upd1771c_callback )
 {
-    device_t *device = (device_t *)ptr;
-    upd1771_state *state = get_safe_token( device );
+	device_t *device = (device_t *)ptr;
+	upd1771_state *state = get_safe_token( device );
 
-    state->ack_out_func(1);
+	state->ack_out_func(1);
 }
 
 
 static DEVICE_START( upd1771c )
 {
-    const upd1771_interface *intf = (const upd1771_interface *)device->static_config();
-    upd1771_state *state = get_safe_token( device );
-    int sample_rate = device->clock() / 4;
+	const upd1771_interface *intf = (const upd1771_interface *)device->static_config();
+	upd1771_state *state = get_safe_token( device );
+	int sample_rate = device->clock() / 4;
 
-    /* resolve callbacks */
-    state->ack_out_func.resolve(intf->ack_callback, *device);
+	/* resolve callbacks */
+	state->ack_out_func.resolve(intf->ack_callback, *device);
 
-    state->timer = device->machine().scheduler().timer_alloc(FUNC(upd1771c_callback), (void *)device );
+	state->timer = device->machine().scheduler().timer_alloc(FUNC(upd1771c_callback), (void *)device );
 
-    state->channel = device->machine().sound().stream_alloc( *device, 0, 1, sample_rate, state, upd1771c_update );
+	state->channel = device->machine().sound().stream_alloc( *device, 0, 1, sample_rate, state, upd1771c_update );
 
-    device->save_item( NAME(state->packet) );
-    device->save_item(NAME(state->index) );
-    device->save_item(NAME(state->expected_bytes) );
+	device->save_item( NAME(state->packet) );
+	device->save_item(NAME(state->index) );
+	device->save_item(NAME(state->expected_bytes) );
 }
 
 
 static DEVICE_RESET( upd1771c )
 {
-    upd1771_state *state = get_safe_token( device );
+	upd1771_state *state = get_safe_token( device );
 
-    state->index = 0;
-    state->expected_bytes = 0;
+	state->index = 0;
+	state->expected_bytes = 0;
 	state->pc3 = 0;
 }
 
@@ -567,7 +567,7 @@ const device_type UPD1771C = &device_creator<upd1771c_device>;
 
 upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD1771C, "NEC uPD1771C 017", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(upd1771_state);
 }
@@ -618,6 +618,3 @@ void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-
-

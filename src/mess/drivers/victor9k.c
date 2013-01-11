@@ -67,10 +67,10 @@ INPUT_PORTS_END
 
 // Video
 
-#define CODE_NON_DISPLAY	0x1000
-#define CODE_UNDERLINE		0x2000
-#define CODE_LOW_INTENSITY	0x4000
-#define CODE_REVERSE_VIDEO	0x8000
+#define CODE_NON_DISPLAY    0x1000
+#define CODE_UNDERLINE      0x2000
+#define CODE_LOW_INTENSITY  0x4000
+#define CODE_REVERSE_VIDEO  0x8000
 
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
@@ -181,31 +181,31 @@ static UPD7201_INTERFACE( mpsc_intf )
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir1_w), // interrupt
 	{
 		{
-			0,					// receive clock
-			0,					// transmit clock
-			DEVCB_NULL,			// receive DRQ
-			DEVCB_NULL,			// transmit DRQ
-			DEVCB_NULL,			// receive data
-			DEVCB_NULL,			// transmit data
-			DEVCB_NULL,			// clear to send
-			DEVCB_NULL,			// data carrier detect
-			DEVCB_NULL,			// ready to send
-			DEVCB_NULL,			// data terminal ready
-			DEVCB_NULL,			// wait
-			DEVCB_NULL			// sync output
+			0,                  // receive clock
+			0,                  // transmit clock
+			DEVCB_NULL,         // receive DRQ
+			DEVCB_NULL,         // transmit DRQ
+			DEVCB_NULL,         // receive data
+			DEVCB_NULL,         // transmit data
+			DEVCB_NULL,         // clear to send
+			DEVCB_NULL,         // data carrier detect
+			DEVCB_NULL,         // ready to send
+			DEVCB_NULL,         // data terminal ready
+			DEVCB_NULL,         // wait
+			DEVCB_NULL          // sync output
 		}, {
-			0,					// receive clock
-			0,					// transmit clock
-			DEVCB_NULL,			// receive DRQ
-			DEVCB_NULL,			// transmit DRQ
-			DEVCB_NULL,			// receive data
-			DEVCB_NULL,			// transmit data
-			DEVCB_NULL,			// clear to send
-			DEVCB_NULL,			// data carrier detect
-			DEVCB_NULL,			// ready to send
-			DEVCB_NULL,			// data terminal ready
-			DEVCB_NULL,			// wait
-			DEVCB_NULL			// sync output
+			0,                  // receive clock
+			0,                  // transmit clock
+			DEVCB_NULL,         // receive DRQ
+			DEVCB_NULL,         // transmit DRQ
+			DEVCB_NULL,         // receive data
+			DEVCB_NULL,         // transmit data
+			DEVCB_NULL,         // clear to send
+			DEVCB_NULL,         // data carrier detect
+			DEVCB_NULL,         // ready to send
+			DEVCB_NULL,         // data terminal ready
+			DEVCB_NULL,         // wait
+			DEVCB_NULL          // sync output
 		}
 	}
 };
@@ -238,18 +238,18 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     DIO1
-        PA1     DIO2
-        PA2     DIO3
-        PA3     DIO4
-        PA4     DIO5
-        PA5     DIO6
-        PA6     DIO7
-        PA7     DIO8
+	    PA0     DIO1
+	    PA1     DIO2
+	    PA2     DIO3
+	    PA3     DIO4
+	    PA4     DIO5
+	    PA5     DIO6
+	    PA6     DIO7
+	    PA7     DIO8
 
-    */
+	*/
 
 	m_ieee488->dio_w(data);
 }
@@ -258,18 +258,18 @@ READ8_MEMBER( victor9k_state::via1_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DAV
-        PB1     EOI
-        PB2     REN
-        PB3     ATN
-        PB4     IFC
-        PB5     SRQ
-        PB6     NRFD
-        PB7     NDAC
+	    PB0     DAV
+	    PB1     EOI
+	    PB2     REN
+	    PB3     ATN
+	    PB4     IFC
+	    PB5     SRQ
+	    PB6     NRFD
+	    PB7     NDAC
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -304,18 +304,18 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     DAV
-        PB1     EOI
-        PB2     REN
-        PB3     ATN
-        PB4     IFC
-        PB5     SRQ
-        PB6     NRFD
-        PB7     NDAC
+	    PB0     DAV
+	    PB1     EOI
+	    PB2     REN
+	    PB3     ATN
+	    PB4     IFC
+	    PB5     SRQ
+	    PB6     NRFD
+	    PB7     NDAC
 
-    */
+	*/
 
 	// data valid
 	m_ieee488->dav_w(BIT(data, 0));
@@ -376,18 +376,18 @@ READ8_MEMBER( victor9k_state::via2_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0
-        PA1
-        PA2     RIA
-        PA3     DSRA
-        PA4     RIB
-        PA5     DSRB
-        PA6     KBDATA
-        PA7     VERT
+	    PA0
+	    PA1
+	    PA2     RIA
+	    PA3     DSRA
+	    PA4     RIB
+	    PA5     DSRB
+	    PA6     KBDATA
+	    PA7     VERT
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -404,36 +404,36 @@ WRITE8_MEMBER( victor9k_state::via2_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     _INT/EXTA
-        PA1     _INT/EXTB
-        PA2
-        PA3
-        PA4
-        PA5
-        PA6
-        PA7
+	    PA0     _INT/EXTA
+	    PA1     _INT/EXTB
+	    PA2
+	    PA3
+	    PA4
+	    PA5
+	    PA6
+	    PA7
 
-    */
+	*/
 }
 
 WRITE8_MEMBER( victor9k_state::via2_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     TALK/LISTEN
-        PB1     KBACKCTL
-        PB2     BRT0
-        PB3     BRT1
-        PB4     BRT2
-        PB5     CONT0
-        PB6     CONT1
-        PB7     CONT2
+	    PB0     TALK/LISTEN
+	    PB1     KBACKCTL
+	    PB2     BRT0
+	    PB3     BRT1
+	    PB4     BRT2
+	    PB5     CONT0
+	    PB6     CONT1
+	    PB7     CONT2
 
-    */
+	*/
 
 	// keyboard acknowledge
 	m_kb->kback_w(BIT(data, 1));
@@ -475,18 +475,18 @@ READ8_MEMBER( victor9k_state::via3_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     J5-16
-        PA1     J5-18
-        PA2     J5-20
-        PA3     J5-22
-        PA4     J5-24
-        PA5     J5-26
-        PA6     J5-28
-        PA7     J5-30
+	    PA0     J5-16
+	    PA1     J5-18
+	    PA2     J5-20
+	    PA3     J5-22
+	    PA4     J5-24
+	    PA5     J5-26
+	    PA6     J5-28
+	    PA7     J5-30
 
-    */
+	*/
 
 	return 0;
 }
@@ -495,36 +495,36 @@ WRITE8_MEMBER( victor9k_state::via3_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     J5-16
-        PA1     J5-18
-        PA2     J5-20
-        PA3     J5-22
-        PA4     J5-24
-        PA5     J5-26
-        PA6     J5-28
-        PA7     J5-30
+	    PA0     J5-16
+	    PA1     J5-18
+	    PA2     J5-20
+	    PA3     J5-22
+	    PA4     J5-24
+	    PA5     J5-26
+	    PA6     J5-28
+	    PA7     J5-30
 
-    */
+	*/
 }
 
 READ8_MEMBER( victor9k_state::via3_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     J5-32
-        PB1     J5-34
-        PB2     J5-36
-        PB3     J5-38
-        PB4     J5-40
-        PB5     J5-42
-        PB6     J5-44
-        PB7     J5-46
+	    PB0     J5-32
+	    PB1     J5-34
+	    PB2     J5-36
+	    PB3     J5-38
+	    PB4     J5-40
+	    PB5     J5-42
+	    PB6     J5-44
+	    PB7     J5-46
 
-    */
+	*/
 
 	return 0;
 }
@@ -533,18 +533,18 @@ WRITE8_MEMBER( victor9k_state::via3_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     J5-32
-        PB1     J5-34
-        PB2     J5-36
-        PB3     J5-38
-        PB4     J5-40
-        PB5     J5-42
-        PB6     J5-44
-        PB7     J5-46
+	    PB0     J5-32
+	    PB1     J5-34
+	    PB2     J5-36
+	    PB3     J5-38
+	    PB4     J5-40
+	    PB5     J5-42
+	    PB6     J5-44
+	    PB7     J5-46
 
-    */
+	*/
 
 	// codec clock output
 	m_ssda->rx_clk_w(BIT(data, 7));
@@ -581,18 +581,18 @@ WRITE8_MEMBER( victor9k_state::via4_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     L0MS0
-        PA1     L0MS1
-        PA2     L0MS2
-        PA3     L0MS3
-        PA4     ST0A
-        PA5     ST0B
-        PA6     ST0C
-        PA7     ST0D
+	    PA0     L0MS0
+	    PA1     L0MS1
+	    PA2     L0MS2
+	    PA3     L0MS3
+	    PA4     ST0A
+	    PA5     ST0B
+	    PA6     ST0C
+	    PA7     ST0D
 
-    */
+	*/
 
 	m_st[0] = data >> 4;
 }
@@ -601,18 +601,18 @@ WRITE8_MEMBER( victor9k_state::via4_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     L1MS0
-        PB1     L1MS1
-        PB2     L1MS2
-        PB3     L1MS3
-        PB4     ST1A
-        PB5     ST1B
-        PB6     ST1C
-        PB7     ST1D
+	    PB0     L1MS0
+	    PB1     L1MS1
+	    PB2     L1MS2
+	    PB3     L1MS3
+	    PB4     ST1A
+	    PB5     ST1B
+	    PB6     ST1C
+	    PB7     ST1D
 
-    */
+	*/
 
 	m_st[1] = data >> 4;
 }
@@ -651,18 +651,18 @@ READ8_MEMBER( victor9k_state::via5_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     E0
-        PA1     E1
-        PA2     I1
-        PA3     E2
-        PA4     E4
-        PA5     E5
-        PA6     I7
-        PA7     E6
+	    PA0     E0
+	    PA1     E1
+	    PA2     I1
+	    PA3     E2
+	    PA4     E4
+	    PA5     E5
+	    PA6     I7
+	    PA7     E6
 
-    */
+	*/
 
 	return 0;
 }
@@ -671,18 +671,18 @@ WRITE8_MEMBER( victor9k_state::via5_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     WD0
-        PB1     WD1
-        PB2     WD2
-        PB3     WD3
-        PB4     WD4
-        PB5     WD5
-        PB6     WD6
-        PB7     WD7
+	    PB0     WD0
+	    PB1     WD1
+	    PB2     WD2
+	    PB3     WD3
+	    PB4     WD4
+	    PB5     WD5
+	    PB6     WD6
+	    PB7     WD7
 
-    */
+	*/
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
@@ -715,18 +715,18 @@ READ8_MEMBER( victor9k_state::via6_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0
-        PA1     TRK0D0
-        PA2
-        PA3     TRK0D1
-        PA4
-        PA5
-        PA6     WPS
-        PA7     SYNC
+	    PA0
+	    PA1     TRK0D0
+	    PA2
+	    PA3     TRK0D1
+	    PA4
+	    PA5
+	    PA6     WPS
+	    PA7     SYNC
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -748,18 +748,18 @@ WRITE8_MEMBER( victor9k_state::via6_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     LED0A
-        PA1
-        PA2     LED1A
-        PA3
-        PA4     SIDE SELECT
-        PA5     DRIVE SELECT
-        PA6
-        PA7
+	    PA0     LED0A
+	    PA1
+	    PA2     LED1A
+	    PA3
+	    PA4     SIDE SELECT
+	    PA5     DRIVE SELECT
+	    PA6
+	    PA7
 
-    */
+	*/
 
 	// LED, drive A
 	output_set_led_value(LED_A, BIT(data, 0));
@@ -778,18 +778,18 @@ READ8_MEMBER( victor9k_state::via6_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     RDY0
-        PB1     RDY1
-        PB2
-        PB3     _DS1
-        PB4     _DS0
-        PB5     SINGLE/_DOUBLE SIDED
-        PB6
-        PB7
+	    PB0     RDY0
+	    PB1     RDY1
+	    PB2
+	    PB3     _DS1
+	    PB4     _DS0
+	    PB5     SINGLE/_DOUBLE SIDED
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -811,18 +811,18 @@ WRITE8_MEMBER( victor9k_state::via6_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0
-        PB1
-        PB2     SCRESET
-        PB3
-        PB4
-        PB5
-        PB6     stepper enable A
-        PB7     stepper enable B
+	    PB0
+	    PB1
+	    PB2     SCRESET
+	    PB3
+	    PB4
+	    PB5
+	    PB6     stepper enable A
+	    PB7     stepper enable B
 
-    */
+	*/
 
 	// motor speed controller reset
 	m_fdc_cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 2));
@@ -940,13 +940,13 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MCFG_CPU_IO_MAP(floppy_io)
 
-    // video hardware
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-    MCFG_SCREEN_UPDATE_DEVICE(HD46505S_TAG, hd6845_device, screen_update)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	// video hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_UPDATE_DEVICE(HD46505S_TAG, hd6845_device, screen_update)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -1001,4 +1001,4 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY                     FULLNAME        FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",	GAME_NOT_WORKING )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",   GAME_NOT_WORKING )

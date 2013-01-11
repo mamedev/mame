@@ -38,25 +38,25 @@ static const int sub_right[]={B,C,A,C, I,I,I,I, A,B,C,D, B,C,A,C};
 static void saturn_invalid3( saturn_state *cpustate, int op1, int op2, int op3 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x at %05x\n",
-		  cpustate->device->tag(), op1, op2, op3, cpustate->pc-3 );
+			cpustate->device->tag(), op1, op2, op3, cpustate->pc-3 );
 }
 
 static void saturn_invalid4( saturn_state *cpustate, int op1, int op2, int op3, int op4 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x%x at %05x\n",
-		  cpustate->device->tag(), op1, op2, op3, op4, cpustate->pc-4 );
+			cpustate->device->tag(), op1, op2, op3, op4, cpustate->pc-4 );
 }
 
 static void saturn_invalid5( saturn_state *cpustate, int op1, int op2, int op3, int op4, int op5 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x%x%x at %05x\n",
-		  cpustate->device->tag(), op1, op2, op3, op4, op5, cpustate->pc-5 );
+			cpustate->device->tag(), op1, op2, op3, op4, op5, cpustate->pc-5 );
 }
 
 static void saturn_invalid6( saturn_state *cpustate, int op1, int op2, int op3, int op4, int op5, int op6 )
 {
 	logerror( "SATURN '%s' invalid opcode %x%x%x%x%x%x at %05x\n",
-		  cpustate->device->tag(), op1, op2, op3, op4, op5, op6, cpustate->pc-6 );
+			cpustate->device->tag(), op1, op2, op3, op4, op5, op6, cpustate->pc-6 );
 }
 
 

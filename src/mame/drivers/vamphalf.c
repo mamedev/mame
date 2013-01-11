@@ -73,10 +73,10 @@ class vamphalf_state : public driver_device
 public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_tiles(*this,"tiles"),
-		  m_wram(*this,"wram"),
-		  m_tiles32(*this,"tiles32"),
-		  m_wram32(*this,"wram32")
+			m_tiles(*this,"tiles"),
+			m_wram(*this,"wram"),
+			m_tiles32(*this,"tiles32"),
+			m_wram32(*this,"wram32")
 		{
 			m_has_extra_gfx = 0;
 		}
@@ -983,7 +983,7 @@ static QS1000_INTERFACE( qs1000_intf )
 
 
 static MACHINE_CONFIG_START( common, vamphalf_state )
-	MCFG_CPU_ADD("maincpu", E116T, 50000000)	/* 50 MHz */
+	MCFG_CPU_ADD("maincpu", E116T, 50000000)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_DERIVED( vamphalf, common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( misncrft, common )
-	MCFG_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", GMS30C2116, 50000000)   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_IO_MAP(misncrft_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1072,7 +1072,7 @@ static MACHINE_CONFIG_DERIVED( jmpbreak, common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrdig, common )
-	MCFG_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", GMS30C2116, 50000000)   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mrdig_io)
@@ -1082,7 +1082,7 @@ static MACHINE_CONFIG_DERIVED( mrdig, common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wyvernwg, common )
-	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(wyvernwg_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_DERIVED( wyvernwg, common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( finalgdr, common )
-	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(finalgdr_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1102,7 +1102,7 @@ static MACHINE_CONFIG_DERIVED( finalgdr, common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrkicker, common )
-	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", E132T, 50000000)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(mrkicker_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1113,7 +1113,7 @@ static MACHINE_CONFIG_DERIVED( mrkicker, common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( aoh, vamphalf_state )
-	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(aoh_map)
 	MCFG_CPU_IO_MAP(aoh_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1897,7 +1897,7 @@ ROM_START( misncrft )
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "prg-rom2.bin", 0x80000, 0x80000, CRC(059ae8c1) SHA1(2c72fcf560166cb17cd8ad665beae302832d551c) ) /* Version 2.4 */
 
-	ROM_REGION( 0x080000, "qs1000:cpu", 0 )	/* QDSP (8052) Code */
+	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
 	ROM_LOAD( "snd-rom2.us1", 0x00000, 0x20000, CRC(8821e5b9) SHA1(4b8df97bc61b48aa16ed411614fcd7ed939cac33) )
 	ROM_RELOAD(      0x20000, 0x20000 )
 	ROM_RELOAD(      0x40000, 0x20000 )
@@ -2662,4 +2662,4 @@ GAME( 2001, toyland,  0,        coolmini, common, vamphalf_state,   toyland,  RO
 GAME( 2001, wyvernwg, 0,        wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND )
 GAME( 2001, wyvernwga,wyvernwg, wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_IMPERFECT_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh, vamphalf_state,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
-GAME( 2001, boonggab, 0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",	   "Boong-Ga Boong-Ga (Spank'em!)", 0 )
+GAME( 2001, boonggab, 0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",       "Boong-Ga Boong-Ga (Spank'em!)", 0 )

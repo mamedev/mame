@@ -91,7 +91,7 @@ extern const device_type MIDWAY_SQUAWK_N_TALK;
 
 // ======================> midway_ssio_device
 
-class midway_ssio_device :	public device_t,
+class midway_ssio_device :  public device_t,
 							public device_mixer_interface
 {
 public:
@@ -157,7 +157,7 @@ private:
 
 // ======================> midway_chip_squeak_deluxe_device
 
-class midway_chip_squeak_deluxe_device :	public device_t,
+class midway_chip_squeak_deluxe_device :    public device_t,
 											public device_mixer_interface
 {
 public:
@@ -197,7 +197,7 @@ private:
 
 // ======================> midway_sounds_good_device
 
-class midway_sounds_good_device :	public device_t,
+class midway_sounds_good_device :   public device_t,
 									public device_mixer_interface
 {
 public:
@@ -235,7 +235,7 @@ private:
 
 // ======================> midway_turbo_chip_squeak_device
 
-class midway_turbo_chip_squeak_device :	public device_t,
+class midway_turbo_chip_squeak_device : public device_t,
 										public device_mixer_interface
 {
 public:
@@ -273,7 +273,7 @@ private:
 
 // ======================> midway_squawk_n_talk_device
 
-class midway_squawk_n_talk_device :	public device_t,
+class midway_squawk_n_talk_device : public device_t,
 									public device_mixer_interface
 {
 public:

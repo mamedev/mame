@@ -15,13 +15,13 @@
 
 struct ti99grom_config
 {
-	bool				writable;
-	int 				ident;
-	const char			*regionname;
-	offs_t				offset_reg;
-	int					size;
-	devcb_write_line	ready;
-	int					clockrate;
+	bool                writable;
+	int                 ident;
+	const char          *regionname;
+	offs_t              offset_reg;
+	int                 size;
+	devcb_write_line    ready;
+	int                 clockrate;
 };
 
 #define GROM_CONFIG(name) \
@@ -42,22 +42,22 @@ public:
 
 private:
 	// Is this a GRAM (never seen actually, but obviously planned)
-	bool		m_writable;
+	bool        m_writable;
 
 	// Identification of this GROM (0-7)
-	int 		m_ident;
+	int         m_ident;
 
 	// If the GROM has only 6 KiB, the remaining 2 KiB are filled with a
 	// specific byte pattern which is created by a logical OR of lower
 	// regions
-	int			m_size;
+	int         m_size;
 
 	// Ready callback. This line is usually connected to the READY pin of the CPU.
-	devcb_resolved_write_line	m_gromready;
+	devcb_resolved_write_line   m_gromready;
 
 	// Frequency of the incoming GROM clock. In most application cases the
 	// GROM gets its clock from the video display processor (TMS9918)
-	int		m_clockrate;
+	int     m_clockrate;
 
 	/* Address pointer. */
 	// This value is always expected to be in the range 0x0000 - 0xffff, even
@@ -95,8 +95,8 @@ private:
 };
 
 
-#define MCFG_GROM_ADD(_tag, _config)	\
-	MCFG_DEVICE_ADD(_tag, GROM, 0)	\
+#define MCFG_GROM_ADD(_tag, _config)    \
+	MCFG_DEVICE_ADD(_tag, GROM, 0)  \
 	MCFG_DEVICE_CONFIG(_config)
 
 #endif

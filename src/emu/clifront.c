@@ -122,8 +122,8 @@ cli_options::cli_options()
 
 cli_frontend::cli_frontend(cli_options &options, osd_interface &osd)
 	: m_options(options),
-	  m_osd(osd),
-	  m_result(MAMERR_NONE)
+		m_osd(osd),
+		m_result(MAMERR_NONE)
 {
 	// begin tracking memory
 	track_memory(true);
@@ -1637,24 +1637,24 @@ void cli_frontend::execute_commands(const char *exename)
 		void (cli_frontend::*function)(const char *gamename);
 	} info_commands[] =
 	{
-		{ CLICOMMAND_LISTXML,		&cli_frontend::listxml },
-		{ CLICOMMAND_LISTFULL,		&cli_frontend::listfull },
-		{ CLICOMMAND_LISTSOURCE,	&cli_frontend::listsource },
-		{ CLICOMMAND_LISTCLONES,	&cli_frontend::listclones },
-		{ CLICOMMAND_LISTBROTHERS,	&cli_frontend::listbrothers },
-		{ CLICOMMAND_LISTCRC,		&cli_frontend::listcrc },
-		{ CLICOMMAND_LISTDEVICES,	&cli_frontend::listdevices },
-		{ CLICOMMAND_LISTSLOTS,	    &cli_frontend::listslots },
-		{ CLICOMMAND_LISTROMS,		&cli_frontend::listroms },
-		{ CLICOMMAND_LISTSAMPLES,	&cli_frontend::listsamples },
-		{ CLICOMMAND_VERIFYROMS,	&cli_frontend::verifyroms },
-		{ CLICOMMAND_VERIFYSAMPLES,	&cli_frontend::verifysamples },
-		{ CLICOMMAND_LISTMEDIA,		&cli_frontend::listmedia },
+		{ CLICOMMAND_LISTXML,       &cli_frontend::listxml },
+		{ CLICOMMAND_LISTFULL,      &cli_frontend::listfull },
+		{ CLICOMMAND_LISTSOURCE,    &cli_frontend::listsource },
+		{ CLICOMMAND_LISTCLONES,    &cli_frontend::listclones },
+		{ CLICOMMAND_LISTBROTHERS,  &cli_frontend::listbrothers },
+		{ CLICOMMAND_LISTCRC,       &cli_frontend::listcrc },
+		{ CLICOMMAND_LISTDEVICES,   &cli_frontend::listdevices },
+		{ CLICOMMAND_LISTSLOTS,     &cli_frontend::listslots },
+		{ CLICOMMAND_LISTROMS,      &cli_frontend::listroms },
+		{ CLICOMMAND_LISTSAMPLES,   &cli_frontend::listsamples },
+		{ CLICOMMAND_VERIFYROMS,    &cli_frontend::verifyroms },
+		{ CLICOMMAND_VERIFYSAMPLES, &cli_frontend::verifysamples },
+		{ CLICOMMAND_LISTMEDIA,     &cli_frontend::listmedia },
 		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
-		{ CLICOMMAND_VERIFYSOFTWARE,	&cli_frontend::verifysoftware },
-		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident },
+		{ CLICOMMAND_VERIFYSOFTWARE,    &cli_frontend::verifysoftware },
+		{ CLICOMMAND_ROMIDENT,      &cli_frontend::romident },
 		{ CLICOMMAND_GETSOFTLIST,   &cli_frontend::getsoftlist },
-		{ CLICOMMAND_VERIFYSOFTLIST,	&cli_frontend::verifysoftlist },
+		{ CLICOMMAND_VERIFYSOFTLIST,    &cli_frontend::verifysoftlist },
 		{ CLICOMMAND_LIST_MIDI_DEVICES, &cli_frontend::listmididevices },
 	};
 
@@ -1684,12 +1684,12 @@ void cli_frontend::display_help()
 	mame_printf_info("%s\n", emulator_info::get_disclaimer());
 	emulator_info::printf_usage(emulator_info::get_appname(),emulator_info::get_gamenoun());
 	mame_printf_info("\n\n"
-		   "        %s -showusage    for a brief list of options\n"
-		   "        %s -showconfig   for a list of configuration options\n"
-		   "        %s -listmedia    for a full list of supported media\n"
-		   "        %s -createconfig to create a %s.ini\n\n"
-		   "For usage instructions, please consult the files config.txt and windows.txt.\n",emulator_info::get_appname(),
-		   emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_configname());
+			"        %s -showusage    for a brief list of options\n"
+			"        %s -showconfig   for a list of configuration options\n"
+			"        %s -listmedia    for a full list of supported media\n"
+			"        %s -createconfig to create a %s.ini\n\n"
+			"For usage instructions, please consult the files config.txt and windows.txt.\n",emulator_info::get_appname(),
+			emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_appname(),emulator_info::get_configname());
 }
 
 
@@ -1713,9 +1713,9 @@ void cli_frontend::display_suggestions(const char *gamename)
 
 media_identifier::media_identifier(cli_options &options)
 	: m_drivlist(options),
-	  m_total(0),
-	  m_matches(0),
-	  m_nonroms(0)
+		m_total(0),
+		m_matches(0),
+		m_nonroms(0)
 {
 }
 

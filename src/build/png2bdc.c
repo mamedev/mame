@@ -58,8 +58,8 @@
     CONSTANTS & DEFINES
 ***************************************************************************/
 
-#define CACHED_CHAR_SIZE		12
-#define CACHED_HEADER_SIZE		16
+#define CACHED_CHAR_SIZE        12
+#define CACHED_HEADER_SIZE      16
 
 
 
@@ -70,19 +70,19 @@
 /* a render_font contains information about a single character in a font */
 struct render_font_char
 {
-	INT32				width;				/* width from this character to the next */
-	INT32				xoffs, yoffs;		/* X and Y offset from baseline to top,left of bitmap */
-	INT32				bmwidth, bmheight;	/* width and height of bitmap */
-	bitmap_argb32 *		bitmap;				/* pointer to the bitmap containing the raw data */
+	INT32               width;              /* width from this character to the next */
+	INT32               xoffs, yoffs;       /* X and Y offset from baseline to top,left of bitmap */
+	INT32               bmwidth, bmheight;  /* width and height of bitmap */
+	bitmap_argb32 *     bitmap;             /* pointer to the bitmap containing the raw data */
 };
 
 
 /* a render_font contains information about a font */
 struct render_font
 {
-	int					height;				/* height of the font, from ascent to descent */
-	int					yoffs;				/* y offset from baseline to descent */
-	render_font_char	chars[65536];		/* array of characters */
+	int                 height;             /* height of the font, from ascent to descent */
+	int                 yoffs;              /* y offset from baseline to descent */
+	render_font_char    chars[65536];       /* array of characters */
 };
 
 
@@ -396,12 +396,12 @@ int main(int argc, char *argv[])
 	int curarg;
 
 	/* validate arguments */
-    if (argc < 3)
-    {
-    	fprintf(stderr, "Usage:\n%s <input.png> [<input2.png> [...]] <output.bdc>\n", argv[0]);
-    	return 1;
-    }
-    bdcname = argv[argc - 1];
+	if (argc < 3)
+	{
+		fprintf(stderr, "Usage:\n%s <input.png> [<input2.png> [...]] <output.bdc>\n", argv[0]);
+		return 1;
+	}
+	bdcname = argv[argc - 1];
 
 	/* allocate a font */
 	font = (render_font *)malloc(sizeof(*font));
@@ -412,16 +412,16 @@ int main(int argc, char *argv[])
 	/* iterate over input files */
 	for (curarg = 1; curarg < argc - 1; curarg++)
 	{
-	    /* load the png file */
+		/* load the png file */
 		const char *pngname = argv[curarg];
 		core_file *file;
 		file_error filerr = core_fopen(pngname, OPEN_FLAG_READ, &file);
 		if (filerr != FILERR_NONE)
-	    {
-	    	fprintf(stderr, "Error %d attempting to open PNG file\n", filerr);
-	    	error = TRUE;
-	    	break;
-	    }
+		{
+			fprintf(stderr, "Error %d attempting to open PNG file\n", filerr);
+			error = TRUE;
+			break;
+		}
 
 		bitmap_argb32 bitmap;
 		png_error pngerr = png_read_bitmap(file, bitmap);
@@ -445,5 +445,5 @@ int main(int argc, char *argv[])
 
 	/* cleanup after ourselves */
 	free(font);
-    return error;
+	return error;
 }

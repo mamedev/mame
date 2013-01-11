@@ -25,15 +25,15 @@
 // ======================> vic10_standard_cartridge_device
 
 class vic10_standard_cartridge_device :  public device_t,
-										 public device_vic10_expansion_card_interface
+											public device_vic10_expansion_card_interface
 {
 public:
-    // construction/destruction
-    vic10_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	vic10_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "vic10_standard"; }
 
 	// device_vic10_expansion_card_interface overrides

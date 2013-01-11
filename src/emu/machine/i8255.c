@@ -49,13 +49,13 @@ enum
 };
 
 
-#define CONTROL_PORT_C_LOWER_INPUT	0x01
-#define CONTROL_PORT_B_INPUT		0x02
-#define CONTROL_GROUP_B_MODE_1		0x04
-#define CONTROL_PORT_C_UPPER_INPUT	0x08
-#define CONTROL_PORT_A_INPUT		0x10
-#define CONTROL_GROUP_A_MODE_MASK	0x60
-#define CONTROL_MODE_SET			0x80
+#define CONTROL_PORT_C_LOWER_INPUT  0x01
+#define CONTROL_PORT_B_INPUT        0x02
+#define CONTROL_GROUP_B_MODE_1      0x04
+#define CONTROL_PORT_C_UPPER_INPUT  0x08
+#define CONTROL_PORT_A_INPUT        0x10
+#define CONTROL_GROUP_A_MODE_MASK   0x60
+#define CONTROL_MODE_SET            0x80
 
 
 
@@ -260,7 +260,7 @@ inline int i8255_device::port_c_upper_mode()
 //-------------------------------------------------
 
 i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, I8255, "I8255", tag, owner, clock)
+	: device_t(mconfig, I8255, "I8255", tag, owner, clock)
 {
 	m_intr[PORT_A] = m_intr[PORT_B] = 0;
 }

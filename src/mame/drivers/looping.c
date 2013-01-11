@@ -67,25 +67,25 @@ L056-6    9A          "      "      VLI-8-4 7A         "
  *
  *************************************/
 
-#define MAIN_CPU_CLOCK		(12000000)
-#define SOUND_CLOCK			(8000000)
-#define COP_CLOCK			(SOUND_CLOCK/2)		/* unknown guess */
-#define TMS_CLOCK			(640000)
+#define MAIN_CPU_CLOCK      (12000000)
+#define SOUND_CLOCK         (8000000)
+#define COP_CLOCK           (SOUND_CLOCK/2)     /* unknown guess */
+#define TMS_CLOCK           (640000)
 
 /* the schematics are very blurry here and don't actually specify the clock */
 /* values; however, everything else about the sync chain implies the standard */
 /* 18.432MHz master clock, like is used in similar hardware of the time */
-#define MASTER_CLOCK		(18432000)
+#define MASTER_CLOCK        (18432000)
 
-#define PIXEL_CLOCK			(MASTER_CLOCK/3)
+#define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
-#define HTOTAL				(384)
-#define HBEND				(0)
-#define HBSTART				(256)
+#define HTOTAL              (384)
+#define HBEND               (0)
+#define HBSTART             (256)
 
-#define VTOTAL				(264)
-#define VBEND				(16)
-#define VBSTART				(224+16)
+#define VTOTAL              (264)
+#define VBEND               (16)
+#define VBSTART             (224+16)
 
 
 /*************************************
@@ -107,15 +107,15 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
-	UINT8 *		m_cop_io;
+	UINT8 *     m_cop_io;
 
 	/* tilemaps */
-	tilemap_t *	m_bg_tilemap;
+	tilemap_t * m_bg_tilemap;
 
 	/* sound state */
-	UINT8		m_sound[8];
+	UINT8       m_sound[8];
 
-	int		m_last;
+	int     m_last;
 	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(looping_videoram_w);
@@ -162,10 +162,10 @@ void looping_state::palette_init()
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[0], rweights, 470, 0,
-			3,	&resistances[0], gweights, 470, 0,
-			2,	&resistances[1], bweights, 470, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  &resistances[0], rweights, 470, 0,
+			3,  &resistances[0], gweights, 470, 0,
+			2,  &resistances[1], bweights, 470, 0);
 
 	/* initialize the palette with these colors */
 	for (i = 0; i < 32; i++)
@@ -386,14 +386,14 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 	dac_device *device = machine().device<dac_device>("dac");
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
-        0001 = ASOV
-        0002 = AVOL2
-        0003 = AVOL1
-        0004 = ADECAY1
-        0005 = ADECAY
-        0006 = ASA
-        0007 = AFA
-    */
+	    0001 = ASOV
+	    0002 = AVOL2
+	    0003 = AVOL1
+	    0004 = ADECAY1
+	    0005 = ADECAY
+	    0006 = ASA
+	    0007 = AFA
+	*/
 
 	m_sound[offset + 1] = data ^ 1;
 	device->write_unsigned8(((m_sound[2] << 7) + (m_sound[3] << 6)) * m_sound[7]);
@@ -520,9 +520,9 @@ static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE(flip_screen_y_w)
 
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE(out_0_w)					/* /OUT0 */
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE(looping_soundlatch_w)	/* /OUT1 */
-	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE(out_2_w)				/* /OUT2 */
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE(out_0_w)                 /* /OUT0 */
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE(looping_soundlatch_w)    /* /OUT1 */
+	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE(out_2_w)                /* /OUT2 */
 	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE(adc_r, adc_w)
 ADDRESS_MAP_END
 
@@ -536,7 +536,7 @@ static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x407, 0x407) AM_WRITE(watchdog_reset_w)
 
-	AM_RANGE(0x10000, 0x10000) AM_NOP		/* external IDLE signal -- we can ignore it */
+	AM_RANGE(0x10000, 0x10000) AM_NOP       /* external IDLE signal -- we can ignore it */
 ADDRESS_MAP_END
 
 
@@ -610,8 +610,8 @@ GFXDECODE_END
 
 static const tms52xx_config tms5220interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(looping_state,looping_spcint),		// IRQ
-	DEVCB_NULL						// READYQ
+	DEVCB_DRIVER_LINE_MEMBER(looping_state,looping_spcint),     // IRQ
+	DEVCB_NULL                      // READYQ
 };
 
 static const ay8910_interface ay8910_config =
@@ -720,9 +720,9 @@ static INPUT_PORTS_START( looping )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		// Check code at 0x2c00
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      // Check code at 0x2c00
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
@@ -754,15 +754,15 @@ INPUT_PORTS_END
 
 ROM_START( loopingv )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
-	ROM_LOAD( "vli3.5a",		0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
-	ROM_LOAD( "vli1.2a",		0x2000, 0x2000, CRC(97755fd4) SHA1(4a6ef02b0128cd516ff95083a7caaad8f3756f09) )
-	ROM_LOAD( "l056-6.9a",		0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
-	ROM_LOAD( "vli9-5.8a",		0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
+	ROM_LOAD( "vli3.5a",        0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
+	ROM_LOAD( "vli1.2a",        0x2000, 0x2000, CRC(97755fd4) SHA1(4a6ef02b0128cd516ff95083a7caaad8f3756f09) )
+	ROM_LOAD( "l056-6.9a",      0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
+	ROM_LOAD( "vli9-5.8a",      0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
-	ROM_LOAD( "i-o.13c",		0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
-	ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
+	ROM_LOAD( "i-o.13c",        0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
+	ROM_LOAD( "i-o.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
+	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
@@ -771,35 +771,35 @@ ROM_START( loopingv )
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
 */
-	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
-	ROM_LOAD( "log1-9-3.6a",	0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
+	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
-	ROM_LOAD( "18s030.11b",		0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "18s030.11b",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( loopingva )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
-	ROM_LOAD( "vli3.5a",		0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
-	ROM_LOAD( "vli-4-3",		0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
-	ROM_LOAD( "vli-8-4",		0x3000, 0x1000, CRC(611e1dbf) SHA1(0ab6669f1dec30c3f7bca49e158e4790a78fa308) )
-	ROM_LOAD( "l056-6.9a",		0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
-	ROM_LOAD( "vli9-5.8a",		0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
+	ROM_LOAD( "vli3.5a",        0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
+	ROM_LOAD( "vli-4-3",        0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
+	ROM_LOAD( "vli-8-4",        0x3000, 0x1000, CRC(611e1dbf) SHA1(0ab6669f1dec30c3f7bca49e158e4790a78fa308) )
+	ROM_LOAD( "l056-6.9a",      0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
+	ROM_LOAD( "vli9-5.8a",      0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
-	ROM_LOAD( "i-o-v2.13c",		0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
-	ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
-	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
+	ROM_LOAD( "i-o-v2.13c",     0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
+	ROM_LOAD( "i-o.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
+	ROM_LOAD( "i-o.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
@@ -808,68 +808,68 @@ ROM_START( loopingva )
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
 */
-	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
-	ROM_LOAD( "log1-9-3.6a",	0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
+	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
-	ROM_LOAD( "18s030.11b",		0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "18s030.11b",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( looping )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
-	ROM_LOAD( "loop551.bin",		0x0000, 0x1000, CRC(d6bb6db6) SHA1(074eb3bc101096bfe67c3107f306df829ae38548) )
-	ROM_LOAD( "loop552.bin",		0x1000, 0x1000, CRC(bc32956d) SHA1(6ef8d76df1d5b1ed52a4057eae2bf4eb394e4c54) )
-	ROM_LOAD( "loop553.bin",		0x2000, 0x1000, CRC(5f8b9aed) SHA1(32be61788e3d54b23d1663025365b1ab6b96dc91) )
-	ROM_LOAD( "loop554b.bin",		0x3000, 0x1000, CRC(381a9625) SHA1(07d775125be1f761dad568f8ccce600414a9d15f) )
-	ROM_LOAD( "loop555.bin",		0x4000, 0x1000, CRC(0ef4c922) SHA1(df6db0897a51aa10e106865a643588d866ef8c4e) )
-	ROM_LOAD( "loop556.bin",		0x5000, 0x1000, CRC(3419a5d5) SHA1(2b0249c54985ab5e12de17c0e3d62caa0c7575e3) )
-	ROM_LOAD( "loop557.bin",		0x6000, 0x1000, CRC(d430e287) SHA1(b0edd25ef4d2468cc1f8c10ac49c545a89d398d7) )
+	ROM_LOAD( "loop551.bin",        0x0000, 0x1000, CRC(d6bb6db6) SHA1(074eb3bc101096bfe67c3107f306df829ae38548) )
+	ROM_LOAD( "loop552.bin",        0x1000, 0x1000, CRC(bc32956d) SHA1(6ef8d76df1d5b1ed52a4057eae2bf4eb394e4c54) )
+	ROM_LOAD( "loop553.bin",        0x2000, 0x1000, CRC(5f8b9aed) SHA1(32be61788e3d54b23d1663025365b1ab6b96dc91) )
+	ROM_LOAD( "loop554b.bin",       0x3000, 0x1000, CRC(381a9625) SHA1(07d775125be1f761dad568f8ccce600414a9d15f) )
+	ROM_LOAD( "loop555.bin",        0x4000, 0x1000, CRC(0ef4c922) SHA1(df6db0897a51aa10e106865a643588d866ef8c4e) )
+	ROM_LOAD( "loop556.bin",        0x5000, 0x1000, CRC(3419a5d5) SHA1(2b0249c54985ab5e12de17c0e3d62caa0c7575e3) )
+	ROM_LOAD( "loop557.bin",        0x6000, 0x1000, CRC(d430e287) SHA1(b0edd25ef4d2468cc1f8c10ac49c545a89d398d7) )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
-	ROM_LOAD( "loopc13.bin",		0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) )
-	ROM_LOAD( "loopa13.bin",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "loopa11.bin",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
+	ROM_LOAD( "loopc13.bin",        0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) )
+	ROM_LOAD( "loopa13.bin",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
+	ROM_LOAD( "loopa11.bin",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 	/* taken from the other sets */
-	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "loopaa8.bin",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
-	ROM_LOAD( "loopaa6.bin",	0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
+	ROM_LOAD( "loopaa8.bin",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "loopaa6.bin",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
-	ROM_LOAD( "loopvp1.bin",		0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "loopvp1.bin",        0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( skybump )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
-	ROM_LOAD( "cpu.5a",			0x0000, 0x2000, CRC(dca38df0) SHA1(86abe04cbabf81399f842f53668fe7a3f7ed3757) )
-	ROM_LOAD( "cpu.2a",			0x2000, 0x2000, CRC(6bcc211a) SHA1(245ebae3934df9c3920743a941546d96bb2e7c03) )
-	ROM_LOAD( "cpu.9a",			0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
-	ROM_LOAD( "cpu.8a",			0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
+	ROM_LOAD( "cpu.5a",         0x0000, 0x2000, CRC(dca38df0) SHA1(86abe04cbabf81399f842f53668fe7a3f7ed3757) )
+	ROM_LOAD( "cpu.2a",         0x2000, 0x2000, CRC(6bcc211a) SHA1(245ebae3934df9c3920743a941546d96bb2e7c03) )
+	ROM_LOAD( "cpu.9a",         0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
+	ROM_LOAD( "cpu.8a",         0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
 
 	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
-	ROM_LOAD( "snd.13c",		0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
-	ROM_LOAD( "snd.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
-	ROM_LOAD( "snd.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
+	ROM_LOAD( "snd.13c",        0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
+	ROM_LOAD( "snd.13a",        0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
+	ROM_LOAD( "snd.11a",        0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
 /*
@@ -878,21 +878,21 @@ ROM_START( skybump )
     ROM_CONTINUE(           0x0000, 0x0400)
     ROM_CONTINUE(           0x0000, 0x0400)
 */
-	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
-	ROM_CONTINUE(			0x00c2, 0x033e)
-	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_LOAD( "cop.bin",        0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
+	ROM_CONTINUE(           0x00c2, 0x033e)
+	ROM_CONTINUE(           0x0000, 0x00c2)
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "vid.8a",			0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
-	ROM_LOAD( "vid.6a",			0x0800, 0x800, CRC(12ebbe74) SHA1(0f87c81a45d1bf3b8c6a70ee5e1a014069f67755) )
+	ROM_LOAD( "vid.8a",         0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
+	ROM_LOAD( "vid.6a",         0x0800, 0x800, CRC(12ebbe74) SHA1(0f87c81a45d1bf3b8c6a70ee5e1a014069f67755) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
-	ROM_LOAD( "vid.clr",		0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "vid.clr",        0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 

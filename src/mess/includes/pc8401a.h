@@ -14,30 +14,30 @@
 #include "video/mc6845.h"
 #include "video/sed1330.h"
 
-#define SCREEN_TAG		"screen"
-#define CRT_SCREEN_TAG	"screen2"
+#define SCREEN_TAG      "screen"
+#define CRT_SCREEN_TAG  "screen2"
 
-#define Z80_TAG			"z80"
-#define I8255A_TAG		"i8255a"
-#define UPD1990A_TAG	"upd1990a"
-#define AY8910_TAG		"ay8910"
-#define SED1330_TAG		"sed1330"
-#define MC6845_TAG		"mc6845"
-#define I8251_TAG		"i8251"
+#define Z80_TAG         "z80"
+#define I8255A_TAG      "i8255a"
+#define UPD1990A_TAG    "upd1990a"
+#define AY8910_TAG      "ay8910"
+#define SED1330_TAG     "sed1330"
+#define MC6845_TAG      "mc6845"
+#define I8251_TAG       "i8251"
 
-#define PC8401A_CRT_VIDEORAM_SIZE	0x2000
+#define PC8401A_CRT_VIDEORAM_SIZE   0x2000
 
 class pc8401a_state : public driver_device
 {
 public:
 	pc8401a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_rtc(*this, UPD1990A_TAG),
-		  m_lcdc(*this, SED1330_TAG),
-		  m_crtc(*this, MC6845_TAG),
-		  m_screen_lcd(*this, SCREEN_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_rtc(*this, UPD1990A_TAG),
+			m_lcdc(*this, SED1330_TAG),
+			m_crtc(*this, MC6845_TAG),
+			m_screen_lcd(*this, SCREEN_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -70,14 +70,14 @@ public:
 	void bankswitch(UINT8 data);
 
 	// keyboard state
-	int m_key_strobe;			// key pressed
+	int m_key_strobe;           // key pressed
 
 	// memory state
-	UINT8 m_mmr;				// memory mapping register
-	UINT32 m_io_addr;			// I/O ROM address counter
+	UINT8 m_mmr;                // memory mapping register
+	UINT32 m_io_addr;           // I/O ROM address counter
 
 	// video state
-	UINT8 *m_crt_ram;			// CRT video RAM
+	UINT8 *m_crt_ram;           // CRT video RAM
 
 	UINT8 m_key_latch;
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);

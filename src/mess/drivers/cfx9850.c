@@ -35,7 +35,7 @@ public:
 	DECLARE_READ8_MEMBER(cfx9850_battery_level_r);
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_display_ram;
-	UINT16 m_ko;				/* KO lines KO1 - KO14 */
+	UINT16 m_ko;                /* KO lines KO1 - KO14 */
 	virtual void palette_init();
 	UINT32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -225,7 +225,7 @@ UINT32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 
 
 
 static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
-	MCFG_CPU_ADD( "maincpu", HCD62121, 4300000 )	/* 4.3 MHz */
+	MCFG_CPU_ADD( "maincpu", HCD62121, 4300000 )    /* 4.3 MHz */
 	MCFG_CPU_PROGRAM_MAP( cfx9850 )
 	MCFG_CPU_IO_MAP( cfx9850_io )
 

@@ -38,7 +38,7 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 
 	// calculate xor to use
 	j = (address ^ select_xor) & 0x0f;
-	if (address & 0x40000) j ^= 2;	// boogwing
+	if (address & 0x40000) j ^= 2;  // boogwing
 	xorval = xors[j];
 
 	// decrypt

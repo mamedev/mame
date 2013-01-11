@@ -15,10 +15,10 @@ WRITE8_MEMBER(atarifb_state::atarifb_out1_w)
 
 	m_CTRLD = data;
 
-	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);		// Whistle
-	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);			// Hit
-	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);			// Noise Enable / Kicker
+	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 }
 
 
@@ -28,10 +28,10 @@ WRITE8_MEMBER(atarifb_state::atarifb4_out1_w)
 
 	m_CTRLD = data;
 
-	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);		// Whistle
-	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);			// Hit
-	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);			// Noise Enable / Kicker
+	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
 	coin_counter_w(machine(), 1, data & 0x80);
 }
@@ -43,10 +43,10 @@ WRITE8_MEMBER(atarifb_state::abaseb_out1_w)
 
 	m_CTRLD = data;
 
-	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);		// Whistle
-	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);			// Hit
-	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);			// Noise Enable / Kicker
+	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
 	if (data & 0x80)
 	{
@@ -73,14 +73,14 @@ WRITE8_MEMBER(atarifb_state::soccer_out1_w)
 	/* bit 1 = hit */
 	/* bit 2 = kicker */
 	/* bit 3 = unused */
-	/* bit 4 = 2/4 Player LED */	// Say what?
+	/* bit 4 = 2/4 Player LED */    // Say what?
 	/* bit 5-6 = trackball CTRL bits */
 	/* bit 7 = Rule LED */
 
-	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);		// Whistle
-	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);			// Hit
-	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);			// Noise Enable / Kicker
+	discrete_sound_w(discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	discrete_sound_w(discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	discrete_sound_w(discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	discrete_sound_w(discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
 //  set_led_status(machine(), 0, data & 0x10);  // !!!!!!!!!! Is this correct????
 	set_led_status(machine(), 1, data & 0x80);
@@ -91,7 +91,7 @@ WRITE8_MEMBER(atarifb_state::atarifb_out2_w)
 {
 	device_t *discrete = machine().device("discrete");
 
-	discrete_sound_w(discrete, space, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	discrete_sound_w(discrete, space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
 	coin_counter_w (machine(), 0, data & 0x10);
 }
@@ -101,7 +101,7 @@ WRITE8_MEMBER(atarifb_state::soccer_out2_w)
 {
 	device_t *discrete = machine().device("discrete");
 
-	discrete_sound_w(discrete, space, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	discrete_sound_w(discrete, space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
 	coin_counter_w (machine(), 0, data & 0x10);
 	coin_counter_w (machine(), 1, data & 0x20);
@@ -151,10 +151,10 @@ READ8_MEMBER(atarifb_state::atarifb_in0_r)
 		int val;
 
 		val = (m_sign_y_2 >> 7) |
-			  (m_sign_x_2 >> 6) |
-			  (m_sign_y_1 >> 5) |
-			  (m_sign_x_1 >> 4) |
-			  ioport("IN0")->read();
+				(m_sign_x_2 >> 6) |
+				(m_sign_y_1 >> 5) |
+				(m_sign_x_1 >> 4) |
+				ioport("IN0")->read();
 		return val;
 	}
 	else
@@ -220,13 +220,13 @@ READ8_MEMBER(atarifb_state::atarifb4_in0_r)
 		int val;
 
 		val = (m_sign_x_4 >> 7) |
-			  (m_sign_y_4 >> 6) |
-			  (m_sign_x_2 >> 5) |
-			  (m_sign_y_2 >> 4) |
-			  (m_sign_x_3 >> 3) |
-			  (m_sign_y_3 >> 2) |
-			  (m_sign_x_1 >> 1) |
-			  (m_sign_y_1 >> 0);
+				(m_sign_y_4 >> 6) |
+				(m_sign_x_2 >> 5) |
+				(m_sign_y_2 >> 4) |
+				(m_sign_x_3 >> 3) |
+				(m_sign_y_3 >> 2) |
+				(m_sign_x_1 >> 1) |
+				(m_sign_y_1 >> 0);
 		return val;
 	}
 	else if ((m_CTRLD & 0x60) == 0x60)

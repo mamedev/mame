@@ -11,9 +11,9 @@ class blstroid_state : public atarigen_state
 public:
 	blstroid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_priorityram(*this, "priorityram") { }
+			m_priorityram(*this, "priorityram") { }
 
-	required_shared_ptr<UINT16>	m_priorityram;
+	required_shared_ptr<UINT16> m_priorityram;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_WRITE16_MEMBER(blstroid_halt_until_hblank_0_w);

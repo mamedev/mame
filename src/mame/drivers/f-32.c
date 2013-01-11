@@ -22,11 +22,11 @@ class mosaicf2_state : public driver_device
 public:
 	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") ,
+			m_maincpu(*this, "maincpu") ,
 		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	required_device<e132xn_device>	m_maincpu;
+	required_device<e132xn_device>  m_maincpu;
 	required_shared_ptr<UINT32> m_videoram;
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 	UINT32 screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -134,7 +134,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_IO_MAP(mosaicf2_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)

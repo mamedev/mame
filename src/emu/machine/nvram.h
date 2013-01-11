@@ -100,7 +100,7 @@ typedef device_delegate<void (nvram_device &, void *, size_t)> nvram_init_delega
 
 // ======================> nvram_device
 
-class nvram_device :	public device_t,
+class nvram_device :    public device_t,
 						public device_nvram_interface
 {
 public:
@@ -137,12 +137,12 @@ protected:
 	void determine_final_base();
 
 	// configuration state
-	default_value				m_default_value;
-	nvram_init_delegate			m_custom_handler;
+	default_value               m_default_value;
+	nvram_init_delegate         m_custom_handler;
 
 	// runtime state
-	void *						m_base;
-	size_t						m_length;
+	void *                      m_base;
+	size_t                      m_length;
 };
 
 

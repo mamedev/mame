@@ -83,26 +83,26 @@ enum machine_notification
 // output channels
 enum output_channel
 {
-    OUTPUT_CHANNEL_ERROR,
-    OUTPUT_CHANNEL_WARNING,
-    OUTPUT_CHANNEL_INFO,
-    OUTPUT_CHANNEL_DEBUG,
-    OUTPUT_CHANNEL_VERBOSE,
-    OUTPUT_CHANNEL_LOG,
-    OUTPUT_CHANNEL_COUNT
+	OUTPUT_CHANNEL_ERROR,
+	OUTPUT_CHANNEL_WARNING,
+	OUTPUT_CHANNEL_INFO,
+	OUTPUT_CHANNEL_DEBUG,
+	OUTPUT_CHANNEL_VERBOSE,
+	OUTPUT_CHANNEL_LOG,
+	OUTPUT_CHANNEL_COUNT
 };
 
 
 // debug flags
-const int DEBUG_FLAG_ENABLED		= 0x00000001;		// debugging is enabled
-const int DEBUG_FLAG_CALL_HOOK		= 0x00000002;		// CPU cores must call instruction hook
-const int DEBUG_FLAG_WPR_PROGRAM	= 0x00000010;		// watchpoints are enabled for PROGRAM memory reads
-const int DEBUG_FLAG_WPR_DATA		= 0x00000020;		// watchpoints are enabled for DATA memory reads
-const int DEBUG_FLAG_WPR_IO			= 0x00000040;		// watchpoints are enabled for IO memory reads
-const int DEBUG_FLAG_WPW_PROGRAM	= 0x00000100;		// watchpoints are enabled for PROGRAM memory writes
-const int DEBUG_FLAG_WPW_DATA		= 0x00000200;		// watchpoints are enabled for DATA memory writes
-const int DEBUG_FLAG_WPW_IO			= 0x00000400;		// watchpoints are enabled for IO memory writes
-const int DEBUG_FLAG_OSD_ENABLED	= 0x00001000;		// The OSD debugger is enabled
+const int DEBUG_FLAG_ENABLED        = 0x00000001;       // debugging is enabled
+const int DEBUG_FLAG_CALL_HOOK      = 0x00000002;       // CPU cores must call instruction hook
+const int DEBUG_FLAG_WPR_PROGRAM    = 0x00000010;       // watchpoints are enabled for PROGRAM memory reads
+const int DEBUG_FLAG_WPR_DATA       = 0x00000020;       // watchpoints are enabled for DATA memory reads
+const int DEBUG_FLAG_WPR_IO         = 0x00000040;       // watchpoints are enabled for IO memory reads
+const int DEBUG_FLAG_WPW_PROGRAM    = 0x00000100;       // watchpoints are enabled for PROGRAM memory writes
+const int DEBUG_FLAG_WPW_DATA       = 0x00000200;       // watchpoints are enabled for DATA memory writes
+const int DEBUG_FLAG_WPW_IO         = 0x00000400;       // watchpoints are enabled for IO memory writes
+const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is enabled
 
 
 
@@ -111,29 +111,29 @@ const int DEBUG_FLAG_OSD_ENABLED	= 0x00001000;		// The OSD debugger is enabled
 //**************************************************************************
 
 // NULL versions
-#define machine_start_0 			NULL
-#define machine_reset_0 			NULL
-#define sound_start_0				NULL
-#define sound_reset_0				NULL
-#define video_start_0				NULL
-#define video_reset_0				NULL
-#define palette_init_0				NULL
+#define machine_start_0             NULL
+#define machine_reset_0             NULL
+#define sound_start_0               NULL
+#define sound_reset_0               NULL
+#define video_start_0               NULL
+#define video_reset_0               NULL
+#define palette_init_0              NULL
 
 
 
 // global allocation helpers
-#define auto_alloc(m, t)				pool_alloc(static_cast<running_machine &>(m).respool(), t)
-#define auto_alloc_clear(m, t)			pool_alloc_clear(static_cast<running_machine &>(m).respool(), t)
-#define auto_alloc_array(m, t, c)		pool_alloc_array(static_cast<running_machine &>(m).respool(), t, c)
-#define auto_alloc_array_clear(m, t, c)	pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
-#define auto_free(m, v)					pool_free(static_cast<running_machine &>(m).respool(), v)
+#define auto_alloc(m, t)                pool_alloc(static_cast<running_machine &>(m).respool(), t)
+#define auto_alloc_clear(m, t)          pool_alloc_clear(static_cast<running_machine &>(m).respool(), t)
+#define auto_alloc_array(m, t, c)       pool_alloc_array(static_cast<running_machine &>(m).respool(), t, c)
+#define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
+#define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
 
-#define auto_bitmap_alloc(m, w, h, f)	auto_alloc(m, bitmap_t(w, h, f))
-#define auto_bitmap_ind8_alloc(m, w, h)	auto_alloc(m, bitmap_ind8(w, h))
-#define auto_bitmap_ind16_alloc(m, w, h)	auto_alloc(m, bitmap_ind16(w, h))
-#define auto_bitmap_ind32_alloc(m, w, h)	auto_alloc(m, bitmap_ind32(w, h))
-#define auto_bitmap_rgb32_alloc(m, w, h)	auto_alloc(m, bitmap_rgb32(w, h))
-#define auto_strdup(m, s)				strcpy(auto_alloc_array(m, char, strlen(s) + 1), s)
+#define auto_bitmap_alloc(m, w, h, f)   auto_alloc(m, bitmap_t(w, h, f))
+#define auto_bitmap_ind8_alloc(m, w, h) auto_alloc(m, bitmap_ind8(w, h))
+#define auto_bitmap_ind16_alloc(m, w, h)    auto_alloc(m, bitmap_ind16(w, h))
+#define auto_bitmap_ind32_alloc(m, w, h)    auto_alloc(m, bitmap_ind32(w, h))
+#define auto_bitmap_rgb32_alloc(m, w, h)    auto_alloc(m, bitmap_rgb32(w, h))
+#define auto_strdup(m, s)               strcpy(auto_alloc_array(m, char, strlen(s) + 1), s)
 
 
 
@@ -172,20 +172,20 @@ public:
 	{
 		void set(struct tm &t);
 
-		UINT8		second;		// seconds (0-59)
-		UINT8		minute;		// minutes (0-59)
-		UINT8		hour;		// hours (0-23)
-		UINT8		mday;		// day of month (1-31)
-		UINT8		month;		// month (0-11)
-		INT32		year;		// year (1=1 AD)
-		UINT8		weekday;	// day of week (0-6)
-		UINT16		day;		// day of year (0-365)
-		UINT8		is_dst;		// is this daylight savings?
+		UINT8       second;     // seconds (0-59)
+		UINT8       minute;     // minutes (0-59)
+		UINT8       hour;       // hours (0-23)
+		UINT8       mday;       // day of month (1-31)
+		UINT8       month;      // month (0-11)
+		INT32       year;       // year (1=1 AD)
+		UINT8       weekday;    // day of week (0-6)
+		UINT16      day;        // day of year (0-365)
+		UINT8       is_dst;     // is this daylight savings?
 	};
 
-	INT64			time;		// number of seconds elapsed since midnight, January 1 1970 UTC
-	full_time		local_time;	// local time
-	full_time		utc_time;	// UTC coordinated time
+	INT64           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
+	full_time       local_time; // local time
+	full_time       utc_time;   // UTC coordinated time
 };
 
 
@@ -205,7 +205,7 @@ class running_machine
 	typedef void (*logerror_callback)(running_machine &machine, const char *string);
 
 	// must be at top of member variables
-	resource_pool			m_respool;				// pool of resources for this machine
+	resource_pool           m_respool;              // pool of resources for this machine
 
 public:
 	// construction/destruction
@@ -287,27 +287,27 @@ public:
 	const char *describe_context();
 
 	// CPU information
-	cpu_device *			firstcpu;			// first CPU
+	cpu_device *            firstcpu;           // first CPU
 
 	// video-related information
-	gfx_element *			gfx[MAX_GFX_ELEMENTS];// array of pointers to graphic sets (chars, sprites)
-	screen_device *			primary_screen;		// the primary screen device, or NULL if screenless
-	palette_t *				palette;			// global palette object
+	gfx_element *           gfx[MAX_GFX_ELEMENTS];// array of pointers to graphic sets (chars, sprites)
+	screen_device *         primary_screen;     // the primary screen device, or NULL if screenless
+	palette_t *             palette;            // global palette object
 
 	// palette-related information
-	const pen_t *			pens;				// remapped palette pen numbers
-	colortable_t *			colortable;			// global colortable for remapping
-	pen_t *					shadow_table;		// table for looking up a shadowed pen
-	bitmap_ind8				priority_bitmap;	// priority bitmap
+	const pen_t *           pens;               // remapped palette pen numbers
+	colortable_t *          colortable;         // global colortable for remapping
+	pen_t *                 shadow_table;       // table for looking up a shadowed pen
+	bitmap_ind8             priority_bitmap;    // priority bitmap
 
 	// debugger-related information
-	UINT32					debug_flags;		// the current debug flags
+	UINT32                  debug_flags;        // the current debug flags
 
 	// internal core information
-	palette_private *		palette_data;		// internal data from palette.c
-	romload_private *		romload_data;		// internal data from romload.c
-	ui_input_private *		ui_input_data;		// internal data from uiinput.c
-	debugcpu_private *		debugcpu_data;		// internal data from debugcpu.c
+	palette_private *       palette_data;       // internal data from palette.c
+	romload_private *       romload_data;       // internal data from romload.c
+	ui_input_private *      ui_input_data;      // internal data from uiinput.c
+	debugcpu_private *      debugcpu_data;      // internal data from debugcpu.c
 	generic_machine_private *generic_machine_data; // internal data from machine/generic.c
 
 private:
@@ -331,41 +331,41 @@ private:
 	void postload_all_devices();
 
 	// internal state
-	const machine_config &	m_config;				// reference to the constructed machine_config
-	const game_driver &		m_system;				// reference to the definition of the game machine
-	osd_interface &			m_osd;					// reference to OSD system
+	const machine_config &  m_config;               // reference to the constructed machine_config
+	const game_driver &     m_system;               // reference to the definition of the game machine
+	osd_interface &         m_osd;                  // reference to OSD system
 
 	// managers
-	cheat_manager *			m_cheat;				// internal data from cheat.c
-	render_manager *		m_render;				// internal data from render.c
-	input_manager *			m_input;				// internal data from input.c
-	sound_manager *			m_sound;				// internal data from sound.c
-	video_manager *			m_video;				// internal data from video.c
-	tilemap_manager *		m_tilemap;				// internal data from tilemap.c
-	debug_view_manager *	m_debug_view;			// internal data from debugvw.c
+	cheat_manager *         m_cheat;                // internal data from cheat.c
+	render_manager *        m_render;               // internal data from render.c
+	input_manager *         m_input;                // internal data from input.c
+	sound_manager *         m_sound;                // internal data from sound.c
+	video_manager *         m_video;                // internal data from video.c
+	tilemap_manager *       m_tilemap;              // internal data from tilemap.c
+	debug_view_manager *    m_debug_view;           // internal data from debugvw.c
 
 	// system state
-	machine_phase			m_current_phase;		// current execution phase
-	bool					m_paused;				// paused?
-	bool					m_hard_reset_pending;	// is a hard reset pending?
-	bool					m_exit_pending;			// is an exit pending?
-	bool					m_exit_to_game_select;	// when we exit, go we go back to the game select?
-	const game_driver *		m_new_driver_pending;	// pointer to the next pending driver
-	emu_timer *				m_soft_reset_timer;		// timer used to schedule a soft reset
+	machine_phase           m_current_phase;        // current execution phase
+	bool                    m_paused;               // paused?
+	bool                    m_hard_reset_pending;   // is a hard reset pending?
+	bool                    m_exit_pending;         // is an exit pending?
+	bool                    m_exit_to_game_select;  // when we exit, go we go back to the game select?
+	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
+	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
 
 	// watchdog state
-	bool					m_watchdog_enabled;		// is the watchdog enabled?
-	INT32					m_watchdog_counter;		// counter for watchdog tracking
-	emu_timer *				m_watchdog_timer;		// timer for watchdog tracking
+	bool                    m_watchdog_enabled;     // is the watchdog enabled?
+	INT32                   m_watchdog_counter;     // counter for watchdog tracking
+	emu_timer *             m_watchdog_timer;       // timer for watchdog tracking
 
 	// misc state
-	UINT32					m_rand_seed;			// current random number seed
-	bool					m_ui_active;			// ui active or not (useful for games / systems with keyboard inputs)
-	time_t					m_base_time;			// real time at initial emulation time
-	astring					m_basename;				// basename used for game-related paths
-	astring					m_context;				// context string buffer
-	int						m_sample_rate;			// the digital audio sample rate
-	emu_file *				m_logfile;				// pointer to the active log file
+	UINT32                  m_rand_seed;            // current random number seed
+	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
+	time_t                  m_base_time;            // real time at initial emulation time
+	astring                 m_basename;             // basename used for game-related paths
+	astring                 m_context;              // context string buffer
+	int                     m_sample_rate;          // the digital audio sample rate
+	emu_file *              m_logfile;              // pointer to the active log file
 
 	// load/save management
 	enum saveload_schedule
@@ -374,10 +374,10 @@ private:
 		SLS_SAVE,
 		SLS_LOAD
 	};
-	saveload_schedule		m_saveload_schedule;
-	attotime				m_saveload_schedule_time;
-	astring					m_saveload_pending_file;
-	const char *			m_saveload_searchpath;
+	saveload_schedule       m_saveload_schedule;
+	attotime                m_saveload_schedule_time;
+	astring                 m_saveload_pending_file;
+	const char *            m_saveload_searchpath;
 
 	// notifier callbacks
 	struct notifier_callback_item
@@ -389,8 +389,8 @@ private:
 		notifier_callback_item *next() const { return m_next; }
 
 		// state
-		notifier_callback_item *	m_next;
-		machine_notify_delegate		m_func;
+		notifier_callback_item *    m_next;
+		machine_notify_delegate     m_func;
 	};
 	simple_list<notifier_callback_item> m_notifier_list[MACHINE_NOTIFY_COUNT];
 
@@ -405,17 +405,17 @@ private:
 		logerror_callback_item *next() const { return m_next; }
 
 		// state
-		logerror_callback_item *	m_next;
-		logerror_callback			m_func;
+		logerror_callback_item *    m_next;
+		logerror_callback           m_func;
 	};
 	simple_list<logerror_callback_item> m_logerror_list;
 
 	// embedded managers and objects
-	save_manager			m_save;					// save manager
-	memory_manager			m_memory;				// memory manager
-	ioport_manager			m_ioport;				// I/O port manager
-	device_scheduler		m_scheduler;			// scheduler object
+	save_manager            m_save;                 // save manager
+	memory_manager          m_memory;               // memory manager
+	ioport_manager          m_ioport;               // I/O port manager
+	device_scheduler        m_scheduler;            // scheduler object
 };
 
 
-#endif	/* __MACHINE_H__ */
+#endif  /* __MACHINE_H__ */

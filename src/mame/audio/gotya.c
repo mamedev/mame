@@ -27,7 +27,7 @@ static const struct gotya_sample gotya_samples[] =
 
 	{ 0x10, 3, 0 },
 	{ 0x11, 3, 0 },
-	{ 0x12, 0, 0 },		/* this should stop the main tune */
+	{ 0x12, 0, 0 },     /* this should stop the main tune */
 	{ 0x13, 3, 0 },
 	{ 0x14, 3, 0 },
 	{ 0x15, 3, 0 },
@@ -36,7 +36,7 @@ static const struct gotya_sample gotya_samples[] =
 	{ 0x18, 3, 0 },
 	{ 0x19, 3, 0 },
 	{ 0x1a, 3, 0 },
-	{   -1, 0, 0 }		/* end of array */
+	{   -1, 0, 0 }      /* end of array */
 };
 
 WRITE8_MEMBER(gotya_state::gotya_soundlatch_w)

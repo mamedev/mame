@@ -71,13 +71,13 @@ class digel804_state : public driver_device
 public:
 	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_speaker(*this, "speaker"),
-		  m_acia(*this, "acia"),
-		  m_vfd(*this, "vfd"),
-		  m_kb(*this, "74c923"),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_terminal(*this, TERMINAL_TAG),
+			m_speaker(*this, "speaker"),
+			m_acia(*this, "acia"),
+			m_vfd(*this, "vfd"),
+			m_kb(*this, "74c923"),
+			m_ram(*this, RAM_TAG)
 		//, m_main_ram(*this, "main_ram")
 		{ }
 
@@ -193,31 +193,31 @@ WRITE8_MEMBER( digel804_state::op42 ) // eprom address hi and control write
 READ8_MEMBER( digel804_state::ip43 )
 {
 	/* Register 0x43: status/mode register read
-     bits 76543210
-          |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic, writing to R43 sets this to ok)
-          ||||||\-- debug jumper X5 on the board; reads as 1 unless jumper is present
-          |||||\--- /INT status (any key pressed on keypad (0 = one or more pressed, 1 = none pressed) OR ACIA has thrown an int)
-          ||||\---- remote mode selected (0 = selected, 1 = not) \
-          |||\----- key mode selected (0 = selected, 1 = not)     > if all 3 of these are 1, unit is going to standby
-          ||\------ sim mode selected (0 = selected, 1 = not)    /
-          |\------- power failure status (1 = power has failed, 0 = ok; writes to R44 set this to ok)
-          \-------- chip insert detect state 'PIN' (1 = no chip or cmos chip which ammeter cannot detect; 0 = nmos or detectable chip inserted)
-     after power failure (in key mode):
-     0xEE 11101110 when no keypad key pressed
-     0xEA 11101010 when keypad key pressed
-     in key mode:
-     0xAE 10101110 when no keypad key pressed
-     0xAA 10101010 when keypad key pressed
-     in remote mode:
-     0xB6 10110110 when no keypad key pressed
-     0xB2 10110010 when keypad key pressed
-     in sim mode:
-     0x9E 10011110 when no keypad key pressed
-     0x9A 10011010 when keypad key pressed
-     in off mode (before z80 is powered down):
-     0xFE 11111110
+	 bits 76543210
+	      |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic, writing to R43 sets this to ok)
+	      ||||||\-- debug jumper X5 on the board; reads as 1 unless jumper is present
+	      |||||\--- /INT status (any key pressed on keypad (0 = one or more pressed, 1 = none pressed) OR ACIA has thrown an int)
+	      ||||\---- remote mode selected (0 = selected, 1 = not) \
+	      |||\----- key mode selected (0 = selected, 1 = not)     > if all 3 of these are 1, unit is going to standby
+	      ||\------ sim mode selected (0 = selected, 1 = not)    /
+	      |\------- power failure status (1 = power has failed, 0 = ok; writes to R44 set this to ok)
+	      \-------- chip insert detect state 'PIN' (1 = no chip or cmos chip which ammeter cannot detect; 0 = nmos or detectable chip inserted)
+	 after power failure (in key mode):
+	 0xEE 11101110 when no keypad key pressed
+	 0xEA 11101010 when keypad key pressed
+	 in key mode:
+	 0xAE 10101110 when no keypad key pressed
+	 0xAA 10101010 when keypad key pressed
+	 in remote mode:
+	 0xB6 10110110 when no keypad key pressed
+	 0xB2 10110010 when keypad key pressed
+	 in sim mode:
+	 0x9E 10011110 when no keypad key pressed
+	 0x9A 10011010 when keypad key pressed
+	 in off mode (before z80 is powered down):
+	 0xFE 11111110
 
-    */
+	*/
 
 #ifdef PORT43_R_VERBOSE
 	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
@@ -242,12 +242,12 @@ WRITE8_MEMBER( digel804_state::op00 )
 WRITE8_MEMBER( digel804_state::op43 )
 {
 	/* writes to 0x43 control the ram banking on firmware which supports it
-     * bits:76543210
-     *      |||||\\\- select ram bank for 4000-bfff area based on these bits (2.0 hardware)
-     *      \\\\\\\-- CTL lines
+	 * bits:76543210
+	 *      |||||\\\- select ram bank for 4000-bfff area based on these bits (2.0 hardware)
+	 *      \\\\\\\-- CTL lines
 
-     * all writes to port 43 will reset the overload state unless the ammeter detects the overload is ongoing
-     */
+	 * all writes to port 43 will reset the overload state unless the ammeter detects the overload is ongoing
+	 */
 	m_overload_state = 0; // writes to port 43 clear overload state
 #ifdef PORT43_W_VERBOSE
 	logerror("Digel804: port 0x43 ram bank had %02x written to it!\n", data);
@@ -268,18 +268,18 @@ WRITE8_MEMBER( digel804_state::op43_1_4 )
 WRITE8_MEMBER( digel804_state::op44 ) // state write
 {
 	/* writes to 0x44 control the 10937 vfd chip, z80 power/busrq, eprom driving and some eprom power ctl lines
-     * bits:76543210
-     *      |||||||\- 10937 VFDC '/SCK' serial clock '/CDIS'
-     *      ||||||\-- controls '/KEYEN' (which enables the four mode buttons when active)
-     *      |||||\--- z80 and system power control (0 = power on, 1 = power off/standby), also controls '/MEMEN' which secondarily controls POR(power on/reset) for the VFDC chip
-     *      ||||\---- controls the z80 /BUSRQ line (0 = idle/high, 1 = asserted/low) '/BRQ'
-     *      |||\----- when 1, enables the output drivers of op40 to the rom data pins
-     *      ||\------ controls 'CTL8'
-     *      |\------- controls 'CTL9'
-     *      \-------- 10937 VFDC 'DATA' serial data '/DDIS'
+	 * bits:76543210
+	 *      |||||||\- 10937 VFDC '/SCK' serial clock '/CDIS'
+	 *      ||||||\-- controls '/KEYEN' (which enables the four mode buttons when active)
+	 *      |||||\--- z80 and system power control (0 = power on, 1 = power off/standby), also controls '/MEMEN' which secondarily controls POR(power on/reset) for the VFDC chip
+	 *      ||||\---- controls the z80 /BUSRQ line (0 = idle/high, 1 = asserted/low) '/BRQ'
+	 *      |||\----- when 1, enables the output drivers of op40 to the rom data pins
+	 *      ||\------ controls 'CTL8'
+	 *      |\------- controls 'CTL9'
+	 *      \-------- 10937 VFDC 'DATA' serial data '/DDIS'
 
-     * all writes to port 44 will reset the powerfail state
-     */
+	 * all writes to port 44 will reset the powerfail state
+	 */
 	m_powerfail_state = 0; // writes to port 44 clear powerfail state
 	m_keyen_state = BIT(data, 1);
 #ifdef PORT44_W_VERBOSE
@@ -306,38 +306,38 @@ WRITE8_MEMBER( digel804_state::op45 ) // speaker write
 READ8_MEMBER( digel804_state::ip46 ) // keypad read
 {
 	/* reads E* for a keypad number 0-F
-     * reads F0 for enter
-     * reads F4 for next
-     * reads F8 for rept
-     * reads FC for clear
-     * F* takes precedence over E*
-     * higher numbers take precedence over lower ones
-     * this value auto-latches on a key press and remains through multiple reads
-     * this is done by a 74C923 integrated circuit
-    */
+	 * reads F0 for enter
+	 * reads F4 for next
+	 * reads F8 for rept
+	 * reads FC for clear
+	 * F* takes precedence over E*
+	 * higher numbers take precedence over lower ones
+	 * this value auto-latches on a key press and remains through multiple reads
+	 * this is done by a 74C923 integrated circuit
+	*/
 	UINT8 kbd = m_kb->data_out_r();
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning %02X for port 46 keypad read\n", kbd);
 #endif
 
-	return BITSWAP8(kbd,7,6,5,4,1,0,3,2);	// verified from schematics
+	return BITSWAP8(kbd,7,6,5,4,1,0,3,2);   // verified from schematics
 }
 
 WRITE8_MEMBER( digel804_state::op46 )
 {
 	/* writes to 0x46 control the LEDS on the front panel
-     * bits:76543210
-     *      ||||\\\\- these four bits choose which of the 16 function leds is lit; the number is INVERTED first
-     *      |||\----- if this bit is 1, the function leds are disabled
-     *      ||\------ this bit controls the 'error' led; 1 = on
-     *      |\------- this bit controls the 'busy' led; 1 = on
-     *      \-------- this bit controls the 'input' led; 1 = on
-     */
+	 * bits:76543210
+	 *      ||||\\\\- these four bits choose which of the 16 function leds is lit; the number is INVERTED first
+	 *      |||\----- if this bit is 1, the function leds are disabled
+	 *      ||\------ this bit controls the 'error' led; 1 = on
+	 *      |\------- this bit controls the 'busy' led; 1 = on
+	 *      \-------- this bit controls the 'input' led; 1 = on
+	 */
 #ifdef PORT46_W_VERBOSE
-	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
+		logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
 #endif
-	 //popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
-	 //fprintf("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
+		//popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
+		//fprintf("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 
 	output_set_value("input_led", BIT(data,7));
 	output_set_value("busy_led",  BIT(data,6));
@@ -517,40 +517,40 @@ ADDRESS_MAP_END
 ******************************************************************************/
 static INPUT_PORTS_START( digel804 )
 	PORT_START("LINE0") /* KEY ROW 0, 'X1' */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)	PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)	PORT_CHAR('1')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)	PORT_CHAR('2')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)	PORT_CHAR('3')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTR/INCR") PORT_CODE(KEYCODE_ENTER)	PORT_CHAR('^')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTR/INCR") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('^')
 
 	PORT_START("LINE1") /* KEY ROW 1, 'X2' */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)	PORT_CHAR('4')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)	PORT_CHAR('5')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)	PORT_CHAR('6')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)	PORT_CHAR('7')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT/DECR") PORT_CODE(KEYCODE_DOWN)	PORT_CHAR('V')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT/DECR") PORT_CODE(KEYCODE_DOWN)  PORT_CHAR('V')
 
 	PORT_START("LINE2") /* KEY ROW 2, 'X3' */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)	PORT_CHAR('9')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)	PORT_CHAR('A')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)	PORT_CHAR('B')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REPT") PORT_CODE(KEYCODE_X)	PORT_CHAR('X')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REPT") PORT_CODE(KEYCODE_X)  PORT_CHAR('X')
 
 	PORT_START("LINE3") /* KEY ROW 3, 'X4' */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)	PORT_CHAR('C')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)	PORT_CHAR('D')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)	PORT_CHAR('E')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLR") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLR") PORT_CODE(KEYCODE_MINUS)   PORT_CHAR('-')
 
 	PORT_START("MODE") // TODO, connects entirely separately from the keypad through some complicated latching logic
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KEY") PORT_CODE(KEYCODE_K)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_KEY )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REM") PORT_CODE(KEYCODE_R)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_REM )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SIM") PORT_CODE(KEYCODE_S)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_SIM )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OFF") PORT_CODE(KEYCODE_O)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_OFF )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KEY") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_KEY )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REM") PORT_CODE(KEYCODE_R)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_REM )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SIM") PORT_CODE(KEYCODE_S)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_SIM )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OFF") PORT_CODE(KEYCODE_O)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_OFF )
 
-	PORT_START("DEBUG")	// debug jumper on the board
+	PORT_START("DEBUG") // debug jumper on the board
 	PORT_DIPNAME( 0x01, 0x01, "Debug Mode" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -576,8 +576,8 @@ WRITE_LINE_MEMBER( digel804_state::da_w )
 }
 static MM74C923_INTERFACE( digel804_keypad_intf )
 {
-	0,	// FIXME
-	0,	// FIXME
+	0,  // FIXME
+	0,  // FIXME
 	DEVCB_DRIVER_LINE_MEMBER(digel804_state, da_w),
 	DEVCB_INPUT_PORT("LINE0"),
 	DEVCB_INPUT_PORT("LINE1"),
@@ -617,7 +617,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ep804, digel804 )
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")	/* Z80, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io_1_2)
 

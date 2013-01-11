@@ -21,25 +21,25 @@ static const UINT32 extyoffs[] =
 
 static const gfx_layout backlayout =
 {
-	8,8*32,	/* 8*(8*32) characters */
-	4,		/* 4 characters */
-	1,		/* 1 bit per pixel */
+	8,8*32, /* 8*(8*32) characters */
+	4,      /* 4 characters */
+	1,      /* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	EXTENDED_YOFFS,
-	32*8*8,	/* every char takes 8 consecutive bytes */
+	32*8*8, /* every char takes 8 consecutive bytes */
 	NULL, extyoffs
 };
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	1,		/* 1 bit per pixel */
+	8,8,    /* 8*8 characters */
+	256,    /* 256 characters */
+	1,      /* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)

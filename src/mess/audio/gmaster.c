@@ -23,7 +23,7 @@ static gmaster_sound *get_token(device_t *device)
 
 
 int gmaster_io_callback(device_t *device, int ioline, int state)
-{	/* comes across with cpu device - need to use sound device */
+{   /* comes across with cpu device - need to use sound device */
 	gmaster_sound *token = get_token(device->machine().device("custom"));
 
 	switch (ioline)
@@ -69,7 +69,7 @@ const device_type GMASTER = &device_creator<gmaster_sound_device>;
 
 gmaster_sound_device::gmaster_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GMASTER, "Game Master Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(gmaster_sound);
 }
@@ -102,5 +102,3 @@ void gmaster_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

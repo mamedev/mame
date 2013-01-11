@@ -61,9 +61,9 @@
 #else
 
 #ifdef FLACPP_API_EXPORTS
-#define	FLACPP_API	_declspec(dllexport)
+#define FLACPP_API  _declspec(dllexport)
 #else
-#define FLACPP_API	_declspec(dllimport)
+#define FLACPP_API  _declspec(dllimport)
 
 #endif
 #endif

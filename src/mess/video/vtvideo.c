@@ -17,9 +17,9 @@
     PARAMETERS
 ***************************************************************************/
 
-#define	VERBOSE			0
+#define VERBOSE         0
 
-#define	LOG(x)		do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)      do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -27,11 +27,11 @@
 
 struct vt_video_t
 {
-	devcb_resolved_read8		in_ram_func;
-	devcb_resolved_write8		clear_video_interrupt;
+	devcb_resolved_read8        in_ram_func;
+	devcb_resolved_write8       clear_video_interrupt;
 
-	screen_device *screen;	/* screen */
-	UINT8 *gfx;		/* content of char rom */
+	screen_device *screen;  /* screen */
+	UINT8 *gfx;     /* content of char rom */
 
 	int lba7;
 
@@ -188,12 +188,12 @@ static void vt_video_display_char(device_t *device,bitmap_ind16 &bitmap, UINT8 c
 
 		switch(display_type) {
 			case 0 : // bottom half, double height
-					 j = (i >> 1)+5; break;
+						j = (i >> 1)+5; break;
 			case 1 : // top half, double height
-					 j = (i >> 1); break;
+						j = (i >> 1); break;
 			case 2 : // double width
 			case 3 : // normal
-					 j = i;	break;
+						j = i;  break;
 			default : j = 0; break;
 		}
 		// modify line since that is how it is stored in rom
@@ -298,12 +298,12 @@ static void rainbow_video_display_char(device_t *device,bitmap_ind16 &bitmap, UI
 
 		switch(display_type) {
 			case 0 : // bottom half, double height
-					 j = (i >> 1)+5; break;
+						j = (i >> 1)+5; break;
 			case 1 : // top half, double height
-					 j = (i >> 1); break;
+						j = (i >> 1); break;
 			case 2 : // double width
 			case 3 : // normal
-					 j = i;	break;
+						j = i;  break;
 			default : j = 0; break;
 		}
 		// modify line since that is how it is stored in rom
@@ -482,5 +482,3 @@ void vt100_video_device::device_reset()
 {
 	DEVICE_RESET_NAME( vt_video )(this);
 }
-
-

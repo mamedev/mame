@@ -44,12 +44,12 @@ class savquest_state : public driver_device
 public:
 	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_pit8254(*this, "pit8254"),
-		  m_dma8237_1(*this, "dma8237_1"),
-		  m_dma8237_2(*this, "dma8237_2"),
-		  m_pic8259_1(*this, "pic8259_1"),
-		  m_pic8259_2(*this, "pic8259_2")
+			m_maincpu(*this, "maincpu"),
+			m_pit8254(*this, "pit8254"),
+			m_dma8237_1(*this, "dma8237_1"),
+			m_dma8237_2(*this, "dma8237_2"),
+			m_pic8259_1(*this, "pic8259_1"),
+			m_pic8259_2(*this, "pic8259_2")
 	{ }
 
 	UINT32 *m_bios_f0000_ram;
@@ -122,57 +122,57 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	#if 1
 	switch(reg)
 	{
-		case 0x59:		// PAM0
+		case 0x59:      // PAM0
 		{
-			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
+			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
 				state->membank("bios_f0000")->set_base(state->m_bios_f0000_ram);
 			}
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 			{
 				state->membank("bios_f0000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x30000);
 			}
 			break;
 		}
 
-		case 0x5e:		// PAM5
+		case 0x5e:      // PAM5
 		{
-			if (data & 0x10)		// enable RAM access to region 0xe4000 - 0xe7fff
+			if (data & 0x10)        // enable RAM access to region 0xe4000 - 0xe7fff
 			{
 				state->membank("bios_e4000")->set_base(state->m_bios_e4000_ram);
 			}
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 			{
 				state->membank("bios_e4000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x24000);
 			}
 
-			if (data & 1)		// enable RAM access to region 0xe0000 - 0xe3fff
+			if (data & 1)       // enable RAM access to region 0xe0000 - 0xe3fff
 			{
 				state->membank("bios_e0000")->set_base(state->m_bios_e0000_ram);
 			}
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 			{
 				state->membank("bios_e0000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x20000);
 			}
 			break;
 		}
 
-		case 0x5f:		// PAM6
+		case 0x5f:      // PAM6
 		{
-			if (data & 0x10)		// enable RAM access to region 0xec000 - 0xeffff
+			if (data & 0x10)        // enable RAM access to region 0xec000 - 0xeffff
 			{
 				state->membank("bios_ec000")->set_base(state->m_bios_ec000_ram);
 			}
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 			{
 				state->membank("bios_ec000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x2c000);
 			}
 
-			if (data & 1)		// enable RAM access to region 0xe8000 - 0xebfff
+			if (data & 1)       // enable RAM access to region 0xe8000 - 0xebfff
 			{
 				state->membank("bios_e8000")->set_base(state->m_bios_e8000_ram);
 			}
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 			{
 				state->membank("bios_e8000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x28000);
 			}
@@ -299,7 +299,7 @@ WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
 {
 	//if (m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_f0000_ram + offset);
 	}
@@ -310,7 +310,7 @@ WRITE32_MEMBER(savquest_state::bios_e0000_ram_w)
 {
 	//if (m_mxtc_config_reg[0x5e] & 2)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5e] & 2)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5e] & 2)        // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_e0000_ram + offset);
 	}
@@ -321,7 +321,7 @@ WRITE32_MEMBER(savquest_state::bios_e4000_ram_w)
 {
 	//if (m_mxtc_config_reg[0x5e] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5e] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_e4000_ram + offset);
 	}
@@ -332,7 +332,7 @@ WRITE32_MEMBER(savquest_state::bios_e8000_ram_w)
 {
 	//if (m_mxtc_config_reg[0x5f] & 2)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5f] & 2)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5f] & 2)        // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_e8000_ram + offset);
 	}
@@ -343,7 +343,7 @@ WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 {
 	//if (m_mxtc_config_reg[0x5f] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
-	if (m_mxtc_config_reg[0x5f] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ec000_ram + offset);
 	}
@@ -501,7 +501,7 @@ static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ec000") AM_WRITE(bios_ec000_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 //  AM_RANGE(0x02000000, 0x02000003) // protection dongle lies there?
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
@@ -533,15 +533,15 @@ static const struct pit8253_config savquest_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -638,7 +638,7 @@ void savquest_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( savquest, savquest_state )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000)	// actually Pentium II 450
+	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
 	MCFG_CPU_IO_MAP(savquest_io)
 

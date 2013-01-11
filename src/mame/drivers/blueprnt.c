@@ -158,43 +158,43 @@ static INPUT_PORTS_START( blueprnt )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DILSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DILSW1:1" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("DILSW1:2,3")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DILSW1:1" )     /* Listed as "Unused" */
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("DILSW1:2,3")
 	PORT_DIPSETTING(    0x00, "20K" )
 	PORT_DIPSETTING(    0x02, "30K" )
 	PORT_DIPSETTING(    0x04, "40K" )
 	PORT_DIPSETTING(    0x06, "50K" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("DILSW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("DILSW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "Maze Monster Appears In" ) PORT_DIPLOCATION("DILSW1:5")
 	PORT_DIPSETTING(    0x00, "2nd Maze" )
 	PORT_DIPSETTING(    0x10, "3rd Maze" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DILSW1:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DILSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DILSW1:7") /* Listed as "Unused" */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DILSW1:7") /* Listed as "Unused" */
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW1:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW1:8" )     /* Listed as "Unused" */
 
 	PORT_START("DILSW2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("DILSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("DILSW2:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DILSW2:3" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DILSW2:4")
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DILSW2:3" )     /* Listed as "Unused" */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DILSW2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("DILSW2:5,6")
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DILSW2:5,6")
 	PORT_DIPSETTING(    0x00, "Level 1" )
 	PORT_DIPSETTING(    0x10, "Level 2" )
 	PORT_DIPSETTING(    0x20, "Level 3" )
 	PORT_DIPSETTING(    0x30, "Level 4" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DILSW2:7" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DILSW2:7" )     /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW2:8" )     /* Listed as "Unused" */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( saturn )
@@ -208,14 +208,14 @@ static INPUT_PORTS_START( saturn )
 
 	PORT_MODIFY("DILSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DILSW1:1" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DILSW1:2")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DILSW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW1:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DILSW1:6" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("DILSW1:7,8")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("DILSW1:7,8")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -223,10 +223,10 @@ static INPUT_PORTS_START( saturn )
 
 	PORT_MODIFY("DILSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DILSW2:1" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DILSW2:2")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DILSW2:2")
 	PORT_DIPSETTING(    0x02, "A 2/1 B 1/3" )
 	PORT_DIPSETTING(    0x00, "A 1/1 B 1/6" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DILSW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DILSW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW2:4" )
@@ -264,17 +264,17 @@ static INPUT_PORTS_START( grasspin )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW1:4" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DILSW1:2,3") // 2 should be infinite lives according to pcb
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DILSW1:2,3") // 2 should be infinite lives according to pcb
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x00, "Freeze" )				PORT_DIPLOCATION("DILSW1:1") // ok
+	PORT_DIPNAME( 0x80, 0x00, "Freeze" )                PORT_DIPLOCATION("DILSW1:1") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DILSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("DILSW2:7,8")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("DILSW2:7,8")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -282,10 +282,10 @@ static INPUT_PORTS_START( grasspin )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW2:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW2:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW2:4" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DILSW2:3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DILSW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, "Freeze" )				PORT_DIPLOCATION("DILSW2:2") // should be flip screen according to pcb
+	PORT_DIPNAME( 0x40, 0x00, "Freeze" )                PORT_DIPLOCATION("DILSW2:2") // should be flip screen according to pcb
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW2:1" )
@@ -299,14 +299,14 @@ INPUT_PORTS_END
 
 static const gfx_layout spritelayout =
 {
-	8,16,	/* 8*16 sprites */
-	RGN_FRAC(1,3),	/* 256 sprites */
-	3,	/* 3 bits per pixel */
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },	/* the bitplanes are separated */
+	8,16,   /* 8*16 sprites */
+	RGN_FRAC(1,3),  /* 256 sprites */
+	3,  /* 3 bits per pixel */
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	16*8	/* every sprite takes 16 consecutive bytes */
+	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
 
@@ -364,14 +364,14 @@ void blueprnt_state::machine_reset()
 static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 7000000/2)	// 3.5 MHz
+	MCFG_CPU_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
 	MCFG_CPU_PROGRAM_MAP(blueprnt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blueprnt_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
+	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)   // 1.25 MHz (2H)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60)	// IRQs connected to 32V
+	MCFG_CPU_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

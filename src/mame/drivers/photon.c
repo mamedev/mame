@@ -214,28 +214,28 @@ UINT32 photon_state::screen_update_photon(screen_device &screen, bitmap_ind16 &b
 
 static MACHINE_CONFIG_START( photon, photon_state )
 
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8080, 1780000)
-    MCFG_CPU_PROGRAM_MAP(pk8000_mem)
-    MCFG_CPU_IO_MAP(pk8000_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8080, 1780000)
+	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
+	MCFG_CPU_IO_MAP(pk8000_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", photon_state,  pk8000_interrupt)
 
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_SIZE(256+32, 192+32)
-    MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(256+32, 192+32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon_state, screen_update_photon)
-    MCFG_PALETTE_LENGTH(16)
-    MCFG_PALETTE_INIT(pk8000)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(pk8000)
 
 
-    MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
-    MCFG_I8255_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
+	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )
 
-    /* audio hardware */
+	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

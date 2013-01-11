@@ -8,10 +8,10 @@
 
 struct pf_layer_info
 {
-	tilemap_t *		tmap;
-	tilemap_t *		wide_tmap;
-	UINT16			vram_base;
-	UINT16			control[4];
+	tilemap_t *     tmap;
+	tilemap_t *     wide_tmap;
+	UINT16          vram_base;
+	UINT16          control[4];
 };
 
 class m92_state : public driver_device
@@ -19,11 +19,11 @@ class m92_state : public driver_device
 public:
 	m92_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram"),
-		  m_vram_data(*this, "vram_data"),
-		  m_spritecontrol(*this, "spritecontrol"),
-		  m_maincpu(*this, "maincpu"),
-		  m_soundcpu(*this, "soundcpu")
+			m_spriteram(*this, "spriteram"),
+			m_vram_data(*this, "vram_data"),
+			m_spritecontrol(*this, "spritecontrol"),
+			m_maincpu(*this, "maincpu"),
+			m_soundcpu(*this, "soundcpu")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;

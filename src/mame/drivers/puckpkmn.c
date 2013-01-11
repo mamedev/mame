@@ -54,7 +54,7 @@ Notes:
 
 /* Puckman Pockimon Input Ports */
 static INPUT_PORTS_START( puckpkmn )
-	PORT_START("P2")	/* $700011.b */
+	PORT_START("P2")    /* $700011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -64,7 +64,7 @@ static INPUT_PORTS_START( puckpkmn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("P1")	/* $700013.b */
+	PORT_START("P1")    /* $700013.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -74,9 +74,9 @@ static INPUT_PORTS_START( puckpkmn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("UNK")	/* $700015.b */
+	PORT_START("UNK")   /* $700015.b */
 
-	PORT_START("DSW1")	/* $700017.b */
+	PORT_START("DSW1")  /* $700017.b */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -101,7 +101,7 @@ static INPUT_PORTS_START( puckpkmn )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("DSW2")	/* $700019.b */
+	PORT_START("DSW2")  /* $700019.b */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -130,7 +130,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jzth )
-	PORT_START("P2")	/* $700011.b */
+	PORT_START("P2")    /* $700011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -140,7 +140,7 @@ static INPUT_PORTS_START( jzth )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START("P1")	/* $700013.b */
+	PORT_START("P1")    /* $700013.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( jzth )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
-	PORT_START("UNK")	/* $700015.b */
+	PORT_START("UNK")   /* $700015.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -161,7 +161,7 @@ static INPUT_PORTS_START( jzth )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 
-	PORT_START("DSW1")	/* $700017.b */
+	PORT_START("DSW1")  /* $700017.b */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -186,7 +186,7 @@ static INPUT_PORTS_START( jzth )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("DSW2")	/* $700019.b */
+	PORT_START("DSW2")  /* $700019.b */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -213,7 +213,7 @@ INPUT_PORTS_END
 
 
 static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM								/* Main 68k Program Roms */
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM                             /* Main 68k Program Roms */
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("UNK")
@@ -226,13 +226,13 @@ static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
 
 	/* Unknown reads/writes: */
-	AM_RANGE(0xa00000, 0xa00551) AM_WRITENOP							/* ? */
+	AM_RANGE(0xa00000, 0xa00551) AM_WRITENOP                            /* ? */
 //  AM_RANGE(0xa10000, 0xa10001) AM_READNOP                                             /* ? once */
-	AM_RANGE(0xa10002, 0xa10005) AM_NOP								/* ? alternative way of reading inputs ? */
-	AM_RANGE(0xa11100, 0xa11101) AM_NOP								/* ? */
+	AM_RANGE(0xa10002, 0xa10005) AM_NOP                             /* ? alternative way of reading inputs ? */
+	AM_RANGE(0xa11100, 0xa11101) AM_NOP                             /* ? */
 //  AM_RANGE(0xa10008, 0xa1000d) AM_WRITENOP                                            /* ? once */
 //  AM_RANGE(0xa14000, 0xa14003) AM_WRITENOP                                            /* ? once */
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITENOP							/* ? */
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITENOP                            /* ? */
 ADDRESS_MAP_END
 
 

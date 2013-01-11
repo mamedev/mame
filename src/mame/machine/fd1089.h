@@ -53,9 +53,9 @@ protected:
 	void decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT16 *dataptr);
 
 	// internal state
-	const UINT8 *			m_key;
-	dynamic_array<UINT16>	m_plaintext;
-	dynamic_array<UINT16>	m_decrypted_opcodes;
+	const UINT8 *           m_key;
+	dynamic_array<UINT16>   m_plaintext;
+	dynamic_array<UINT16>   m_decrypted_opcodes;
 
 	// internal types
 	struct decrypt_parameters

@@ -309,39 +309,39 @@ TIMER_CALLBACK_MEMBER(namconb1_state::namconb1_TriggerPOSIRQ)
 INTERRUPT_GEN_MEMBER(namconb1_state::namconb1_interrupt)
 {
 	/**
-     * 400000 0x00
-     * 400001 0x00
-     * 400002 0x00
-     * 400003 0x00
-     * 400004 0x35 // irq levels
-     * 400005 0x00
-     * 400006 0x00
-     * 400007 0x00
-     * 400008 0x00
-     * 400009 0x00 VBLANK ack
-     * 40000a 0x00
-     * 40000b 0x03
-     * 40000c 0x07
-     * 40000d 0x01
-     * 40000e 0x10
-     * 40000f 0x03
-     * 400010 0x00
-     * 400011 0x07
-     * 400012 0x10
-     * 400013 0x10
-     * 400014 0x00
-     * 400015 0x01
-     * 400016 (watchdog)
-     * 400017 0x00
-     * 400018 0x01
-     * 400019 0x00
-     * 40001a 0x00
-     * 40001b 0x00
-     * 40001c 0x00
-     * 40001d 0x00
-     * 40001e 0x00
-     * 40001f 0x00
-     */
+	 * 400000 0x00
+	 * 400001 0x00
+	 * 400002 0x00
+	 * 400003 0x00
+	 * 400004 0x35 // irq levels
+	 * 400005 0x00
+	 * 400006 0x00
+	 * 400007 0x00
+	 * 400008 0x00
+	 * 400009 0x00 VBLANK ack
+	 * 40000a 0x00
+	 * 40000b 0x03
+	 * 40000c 0x07
+	 * 40000d 0x01
+	 * 40000e 0x10
+	 * 40000f 0x03
+	 * 400010 0x00
+	 * 400011 0x07
+	 * 400012 0x10
+	 * 400013 0x10
+	 * 400014 0x00
+	 * 400015 0x01
+	 * 400016 (watchdog)
+	 * 400017 0x00
+	 * 400018 0x01
+	 * 400019 0x00
+	 * 40001a 0x00
+	 * 40001b 0x00
+	 * 40001c 0x00
+	 * 40001d 0x00
+	 * 40001e 0x00
+	 * 40001f 0x00
+	 */
 	int scanline = (m_generic_paletteram_32[0x1808/4]&0xffff)-32;
 
 	if((!m_vblank_irq_active) && (m_namconb_cpureg[0x04] & 0xf0)) {
@@ -370,34 +370,34 @@ TIMER_CALLBACK_MEMBER(namconb1_state::namconb2_TriggerPOSIRQ)
 INTERRUPT_GEN_MEMBER(namconb1_state::namconb2_interrupt)
 {
 	/**
-     * f00000 0x01 // VBLANK irq level
-     * f00001 0x00
-     * f00002 0x05 // POSIRQ level
-     * f00003 0x00
-     *
-     * f00004 VBLANK ack
-     * f00005
-     * f00006 POSIRQ ack
-     * f00007
-     *
-     * f00008
-     *
-     * f00009 0x62
-     * f0000a 0x0f
-     * f0000b 0x41
-     * f0000c 0x70
-     * f0000d 0x70
-     * f0000e 0x23
-     * f0000f 0x50
-     * f00010 0x00
-     * f00011 0x64
-     * f00012 0x18
-     * f00013 0xe7
-     * f00014 (watchdog)
-     * f00016 0x00
-     * f0001e 0x00
-     * f0001f 0x01
-     */
+	 * f00000 0x01 // VBLANK irq level
+	 * f00001 0x00
+	 * f00002 0x05 // POSIRQ level
+	 * f00003 0x00
+	 *
+	 * f00004 VBLANK ack
+	 * f00005
+	 * f00006 POSIRQ ack
+	 * f00007
+	 *
+	 * f00008
+	 *
+	 * f00009 0x62
+	 * f0000a 0x0f
+	 * f0000b 0x41
+	 * f0000c 0x70
+	 * f0000d 0x70
+	 * f0000e 0x23
+	 * f0000f 0x50
+	 * f00010 0x00
+	 * f00011 0x64
+	 * f00012 0x18
+	 * f00013 0xe7
+	 * f00014 (watchdog)
+	 * f00016 0x00
+	 * f0001e 0x00
+	 * f0001f 0x01
+	 */
 	int scanline = (m_generic_paletteram_32[0x1808/4]&0xffff)-32;
 
 	if((!m_vblank_irq_active) && m_namconb_cpureg[0x00]) {
@@ -789,14 +789,14 @@ static const gfx_layout roz_layout =
 }; /* roz_layout */
 
 static GFXDECODE_START( namconb1 )
-	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,	0, tile_layout,	0x1000, 0x10 )
-	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,	0, obj_layout,		0x0000, 0x10 )
+	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x10 )
+	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,      0x0000, 0x10 )
 GFXDECODE_END /* gfxdecodeinfo */
 
 static GFXDECODE_START( 2 )
-	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,	0, tile_layout,	0x1000, 0x08 )
-	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,	0, obj_layout,		0x0000, 0x10 )
-	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION,	0, roz_layout,		0x1800, 0x08 )
+	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x08 )
+	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,      0x0000, 0x10 )
+	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION, 0, roz_layout,      0x1800, 0x08 )
 GFXDECODE_END /* gfxdecodeinfo2 */
 
 /***************************************************************/
@@ -823,9 +823,9 @@ READ32_MEMBER(namconb1_state::randgen_r)
 WRITE32_MEMBER(namconb1_state::srand_w)
 {
 	/**
-     * Used to seed the hardware random number generator.
-     * We don't yet know the algorithm that is used, so for now this is a NOP.
-     */
+	 * Used to seed the hardware random number generator.
+	 * We don't yet know the algorithm that is used, so for now this is a NOP.
+	 */
 } /* srand_w */
 
 READ32_MEMBER(namconb1_state::namconb_share_r)
@@ -899,7 +899,7 @@ WRITE16_MEMBER(namconb1_state::nbmcu_shared_w)
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		space.device().execute().spin_until_time(downcast<cpu_device *>(&space.device())->cycles_to_attotime(300));	// was 300
+		space.device().execute().spin_until_time(downcast<cpu_device *>(&space.device())->cycles_to_attotime(300)); // was 300
 	}
 }
 
@@ -1737,7 +1737,7 @@ ROM_START( outfxies )
 	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTMASKREGION, 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,	CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, NAMCONB1_SPRITEGFXREGION, 0 )
 	ROM_LOAD16_BYTE( "ou1obj0l.4c", 0x0000001, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -1782,7 +1782,7 @@ ROM_START( outfxiesj )
 	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTMASKREGION, 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,	CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, NAMCONB1_SPRITEGFXREGION, 0 )
 	ROM_LOAD16_BYTE( "ou1obj0l.4c", 0x0000001, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )

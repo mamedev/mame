@@ -101,24 +101,24 @@ DECLARE_WRITE8_HANDLER ( cgenie_colorram_w );
 DECLARE_WRITE8_HANDLER ( cgenie_fontram_w );
 
 DECLARE_WRITE8_HANDLER ( cgenie_port_ff_w );
- DECLARE_READ8_HANDLER ( cgenie_port_ff_r );
+	DECLARE_READ8_HANDLER ( cgenie_port_ff_r );
 int cgenie_port_xx_r(int offset);
 
- DECLARE_READ8_HANDLER ( cgenie_status_r );
- DECLARE_READ8_HANDLER ( cgenie_track_r );
- DECLARE_READ8_HANDLER ( cgenie_sector_r );
- DECLARE_READ8_HANDLER ( cgenie_data_r );
+	DECLARE_READ8_HANDLER ( cgenie_status_r );
+	DECLARE_READ8_HANDLER ( cgenie_track_r );
+	DECLARE_READ8_HANDLER ( cgenie_sector_r );
+	DECLARE_READ8_HANDLER ( cgenie_data_r );
 
 DECLARE_WRITE8_HANDLER ( cgenie_command_w );
 DECLARE_WRITE8_HANDLER ( cgenie_track_w );
 DECLARE_WRITE8_HANDLER ( cgenie_sector_w );
 DECLARE_WRITE8_HANDLER ( cgenie_data_w );
 
- DECLARE_READ8_HANDLER ( cgenie_irq_status_r );
+	DECLARE_READ8_HANDLER ( cgenie_irq_status_r );
 
 DECLARE_WRITE8_HANDLER ( cgenie_motor_w );
 
- DECLARE_READ8_HANDLER ( cgenie_keyboard_r );
+	DECLARE_READ8_HANDLER ( cgenie_keyboard_r );
 int cgenie_videoram_r(running_machine &machine,int offset);
 DECLARE_WRITE8_HANDLER ( cgenie_videoram_w );
 

@@ -7,14 +7,14 @@
 
 #include "video/tms34061.h"
 
-#define YBUFFER_COUNT	15
+#define YBUFFER_COUNT   15
 
 class itech8_state : public driver_device
 {
 public:
 	itech8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_visarea(0, 0, 0, 0){ }
+			m_visarea(0, 0, 0, 0){ }
 
 	rectangle m_visarea;
 	UINT8 m_grom_bank;
@@ -116,4 +116,3 @@ DECLARE_WRITE8_HANDLER( slikz80_port_w );
 DECLARE_READ8_HANDLER( slikshot_z80_r );
 DECLARE_READ8_HANDLER( slikshot_z80_control_r );
 DECLARE_WRITE8_HANDLER( slikshot_z80_control_w );
-

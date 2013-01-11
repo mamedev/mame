@@ -35,7 +35,7 @@ ROM_END
 
 ROM_START( appleenet )
 	ROM_REGION(0x4000, MAC8390_ROM_REGION, 0)
-    ROM_LOAD( "aenet1",       0x000000, 0x004000, CRC(e3ae8c26) SHA1(01ddc15ee84b17128203cb812f29bac6b20fd642) )
+	ROM_LOAD( "aenet1",       0x000000, 0x004000, CRC(e3ae8c26) SHA1(01ddc15ee84b17128203cb812f29bac6b20fd642) )
 ROM_END
 
 //**************************************************************************
@@ -79,20 +79,20 @@ const rom_entry *nubus_appleenet_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_ASNTMC3NB, name, tag, owner, clock),
+		device_t(mconfig, NUBUS_ASNTMC3NB, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this),
 		m_dp83902(*this, MAC8390_839X)
 {
 }
 
 nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, "Asante MC3NB Ethernet card", tag, owner, clock)
+		nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, "Asante MC3NB Ethernet card", tag, owner, clock)
 {
 	m_shortname = "nb_amc3b";
 }
 
 nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        nubus_mac8390_device(mconfig, NUBUS_APPLEENET, "Apple NuBus Ethernet card", tag, owner, clock)
+		nubus_mac8390_device(mconfig, NUBUS_APPLEENET, "Apple NuBus Ethernet card", tag, owner, clock)
 {
 	m_shortname = "nb_aenet";
 }
@@ -119,8 +119,8 @@ void nubus_mac8390_device::device_start()
 
 //  printf("[ASNTMC3NB %p] slotspace = %x\n", this, slotspace);
 
-    // TODO: move 24-bit mirroring down into nubus.c
-    UINT32 ofs_24bit = m_slot<<20;
+	// TODO: move 24-bit mirroring down into nubus.c
+	UINT32 ofs_24bit = m_slot<<20;
 	m_nubus->install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
 	m_nubus->install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(FUNC(nubus_mac8390_device::en_r), this), write32_delegate(FUNC(nubus_mac8390_device::en_w), this));
 	m_nubus->install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
@@ -133,72 +133,72 @@ void nubus_mac8390_device::device_start()
 
 void nubus_mac8390_device::device_reset()
 {
-    m_dp83902->dp8390_reset(0);
-    m_dp83902->dp8390_cs(0);
+	m_dp83902->dp8390_reset(0);
+	m_dp83902->dp8390_cs(0);
 	memcpy(m_prom, m_dp83902->get_mac(), 6);
 }
 
 WRITE8_MEMBER( nubus_mac8390_device::asntm3b_ram_w )
 {
 //    printf("MC3NB: CPU wrote %02x to RAM @ %x\n", data, offset);
-    m_ram[offset] = data;
+	m_ram[offset] = data;
 }
 
 READ8_MEMBER( nubus_mac8390_device::asntm3b_ram_r )
 {
 //    printf("MC3NB: CPU read %02x @ RAM %x\n", m_ram[offset], offset);
-    return m_ram[offset];
+	return m_ram[offset];
 }
 
 WRITE32_MEMBER( nubus_mac8390_device::en_w )
 {
-    if (mem_mask == 0xff000000)
-    {
+	if (mem_mask == 0xff000000)
+	{
 //        printf("%02x to 8390 @ %x\n", data>>24, 0xf-offset);
-        m_dp83902->dp8390_w(space, 0xf-offset, data>>24);
-    }
-    else if (mem_mask == 0xffff0000)
-    {
-        m_dp83902->dp8390_cs(1);
-        m_dp83902->dp8390_w(space, 0xf-offset, data>>16);
-        m_dp83902->dp8390_cs(0);
-    }
-    else
-    {
-        fatalerror("asntmc3nb: write %08x to DP83902 @ %x with unhandled mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
-    }
+		m_dp83902->dp8390_w(space, 0xf-offset, data>>24);
+	}
+	else if (mem_mask == 0xffff0000)
+	{
+		m_dp83902->dp8390_cs(1);
+		m_dp83902->dp8390_w(space, 0xf-offset, data>>16);
+		m_dp83902->dp8390_cs(0);
+	}
+	else
+	{
+		fatalerror("asntmc3nb: write %08x to DP83902 @ %x with unhandled mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+	}
 }
 
 READ32_MEMBER( nubus_mac8390_device::en_r )
 {
-    if (mem_mask == 0xff000000)
-    {
-        return (m_dp83902->dp8390_r(space, 0xf-offset)<<24);
-    }
-    else if (mem_mask == 0xffff0000)
-    {
-        m_dp83902->dp8390_cs(1);
-        return (m_dp83902->dp8390_r(space, 0xf-offset)<<16);
-        m_dp83902->dp8390_cs(0);
-    }
-    else
-    {
-        fatalerror("asntmc3nb: read DP83902 @ %x with unhandled mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
-    }
+	if (mem_mask == 0xff000000)
+	{
+		return (m_dp83902->dp8390_r(space, 0xf-offset)<<24);
+	}
+	else if (mem_mask == 0xffff0000)
+	{
+		m_dp83902->dp8390_cs(1);
+		return (m_dp83902->dp8390_r(space, 0xf-offset)<<16);
+		m_dp83902->dp8390_cs(0);
+	}
+	else
+	{
+		fatalerror("asntmc3nb: read DP83902 @ %x with unhandled mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+	}
 
-    return 0;
+	return 0;
 }
 
 WRITE_LINE_MEMBER( nubus_mac8390_device::dp_irq_w )
 {
-    if (state)
-    {
-        raise_slot_irq();
-    }
-    else
-    {
-        lower_slot_irq();
-    }
+	if (state)
+	{
+		raise_slot_irq();
+	}
+	else
+	{
+		lower_slot_irq();
+	}
 }
 
 READ8_MEMBER( nubus_mac8390_device::dp_mem_read )

@@ -53,14 +53,14 @@ public:
 
 /*----------- timings -----------*/
 
-#define BAGMAN_MAIN_CLOCK	XTAL_18_432MHz
-#define BAGMAN_HCLK			(BAGMAN_MAIN_CLOCK / 3)
-#define BAGMAN_H0			(BAGMAN_HCLK / 2)
-#define BAGMAN_H1			(BAGMAN_H0   / 2)
-#define HTOTAL				((0x100-0x40)*2)
-#define HBEND				(0x00)
-#define HBSTART				(0x100)
-#define VTOTAL				((0x100-0x7c)*2)
+#define BAGMAN_MAIN_CLOCK   XTAL_18_432MHz
+#define BAGMAN_HCLK         (BAGMAN_MAIN_CLOCK / 3)
+#define BAGMAN_H0           (BAGMAN_HCLK / 2)
+#define BAGMAN_H1           (BAGMAN_H0   / 2)
+#define HTOTAL              ((0x100-0x40)*2)
+#define HBEND               (0x00)
+#define HBSTART             (0x100)
+#define VTOTAL              ((0x100-0x7c)*2)
 
 /* the following VBEND/VBSTART are used for compsync
  * #define VBEND                (0x08)
@@ -68,5 +68,5 @@ public:
  *
  * However VBSYQ (and INTQ) is generated using the following values:
  */
-#define VBEND				(0x0f)
-#define VBSTART				(0xef)
+#define VBEND               (0x0f)
+#define VBSTART             (0xef)

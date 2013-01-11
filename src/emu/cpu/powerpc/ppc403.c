@@ -2,20 +2,20 @@
 
 static void ppc403_dma_exec(int ch);
 
-#define DMA_CE		0x80000000
-#define DMA_CIE		0x40000000
-#define DMA_TD		0x20000000
-#define DMA_PL		0x10000000
-#define DMA_DAI		0x02000000
-#define DMA_SAI		0x01000000
-#define DMA_CP		0x00800000
-#define DMA_ETD		0x00000200
-#define DMA_TCE		0x00000100
-#define DMA_CH		0x00000080
-#define DMA_BME		0x00000040
-#define DMA_ECE		0x00000020
-#define DMA_TCD		0x00000010
-#define DMA_PCE		0x00000008
+#define DMA_CE      0x80000000
+#define DMA_CIE     0x40000000
+#define DMA_TD      0x20000000
+#define DMA_PL      0x10000000
+#define DMA_DAI     0x02000000
+#define DMA_SAI     0x01000000
+#define DMA_CP      0x00800000
+#define DMA_ETD     0x00000200
+#define DMA_TCE     0x00000100
+#define DMA_CH      0x00000080
+#define DMA_BME     0x00000040
+#define DMA_ECE     0x00000020
+#define DMA_TCD     0x00000010
+#define DMA_PCE     0x00000008
 
 static SPU_RX_HANDLER spu_rx_handler;
 static SPU_TX_HANDLER spu_tx_handler;
@@ -36,37 +36,37 @@ INLINE void ppc_set_dcr(int dcr, UINT32 value)
 {
 	switch(dcr)
 	{
-		case DCR_BEAR:		ppc.bear = value; break;
-		case DCR_BESR:		ppc.besr = value; break;
-		case DCR_BR0:		ppc.br[0] = value; break;
-		case DCR_BR1:		ppc.br[1] = value; break;
-		case DCR_BR2:		ppc.br[2] = value; break;
-		case DCR_BR3:		ppc.br[3] = value; break;
-		case DCR_BR4:		ppc.br[4] = value; break;
-		case DCR_BR5:		ppc.br[5] = value; break;
-		case DCR_BR6:		ppc.br[6] = value; break;
-		case DCR_BR7:		ppc.br[7] = value; break;
+		case DCR_BEAR:      ppc.bear = value; break;
+		case DCR_BESR:      ppc.besr = value; break;
+		case DCR_BR0:       ppc.br[0] = value; break;
+		case DCR_BR1:       ppc.br[1] = value; break;
+		case DCR_BR2:       ppc.br[2] = value; break;
+		case DCR_BR3:       ppc.br[3] = value; break;
+		case DCR_BR4:       ppc.br[4] = value; break;
+		case DCR_BR5:       ppc.br[5] = value; break;
+		case DCR_BR6:       ppc.br[6] = value; break;
+		case DCR_BR7:       ppc.br[7] = value; break;
 
-		case DCR_EXISR:		ppc.exisr &= ~value; break;
-		case DCR_EXIER:		EXIER = value; ppc.exisr &= EXIER; break;
-		case DCR_IOCR:		ppc.iocr = value; break;
-		case DCR_DMASR:		break;		/* TODO */
-		case DCR_DMADA0:	ppc.dma[0].da = value; break;
-		case DCR_DMADA1:	ppc.dma[1].da = value; break;
-		case DCR_DMADA2:	ppc.dma[2].da = value; break;
-		case DCR_DMADA3:	ppc.dma[3].da = value; break;
-		case DCR_DMASA0:	ppc.dma[0].sa = value; break;
-		case DCR_DMASA1:	ppc.dma[1].sa = value; break;
-		case DCR_DMASA2:	ppc.dma[2].sa = value; break;
-		case DCR_DMASA3:	ppc.dma[3].sa = value; break;
-		case DCR_DMACT0:	ppc.dma[0].ct = value; break;
-		case DCR_DMACT1:	ppc.dma[1].ct = value; break;
-		case DCR_DMACT2:	ppc.dma[2].ct = value; break;
-		case DCR_DMACT3:	ppc.dma[3].ct = value; break;
-		case DCR_DMACR0:	ppc.dma[0].cr = value; ppc403_dma_exec(0); break;
-		case DCR_DMACR1:	ppc.dma[1].cr = value; ppc403_dma_exec(1); break;
-		case DCR_DMACR2:	ppc.dma[2].cr = value; ppc403_dma_exec(2); break;
-		case DCR_DMACR3:	ppc.dma[3].cr = value; ppc403_dma_exec(3); break;
+		case DCR_EXISR:     ppc.exisr &= ~value; break;
+		case DCR_EXIER:     EXIER = value; ppc.exisr &= EXIER; break;
+		case DCR_IOCR:      ppc.iocr = value; break;
+		case DCR_DMASR:     break;      /* TODO */
+		case DCR_DMADA0:    ppc.dma[0].da = value; break;
+		case DCR_DMADA1:    ppc.dma[1].da = value; break;
+		case DCR_DMADA2:    ppc.dma[2].da = value; break;
+		case DCR_DMADA3:    ppc.dma[3].da = value; break;
+		case DCR_DMASA0:    ppc.dma[0].sa = value; break;
+		case DCR_DMASA1:    ppc.dma[1].sa = value; break;
+		case DCR_DMASA2:    ppc.dma[2].sa = value; break;
+		case DCR_DMASA3:    ppc.dma[3].sa = value; break;
+		case DCR_DMACT0:    ppc.dma[0].ct = value; break;
+		case DCR_DMACT1:    ppc.dma[1].ct = value; break;
+		case DCR_DMACT2:    ppc.dma[2].ct = value; break;
+		case DCR_DMACT3:    ppc.dma[3].ct = value; break;
+		case DCR_DMACR0:    ppc.dma[0].cr = value; ppc403_dma_exec(0); break;
+		case DCR_DMACR1:    ppc.dma[1].cr = value; ppc403_dma_exec(1); break;
+		case DCR_DMACR2:    ppc.dma[2].cr = value; ppc403_dma_exec(2); break;
+		case DCR_DMACR3:    ppc.dma[3].cr = value; ppc403_dma_exec(3); break;
 
 		default:
 			fatalerror("ppc: set_dcr: Unimplemented DCR %X\n", dcr);
@@ -78,36 +78,36 @@ INLINE UINT32 ppc_get_dcr(int dcr)
 {
 	switch(dcr)
 	{
-		case DCR_BEAR:		return ppc.bear;
-		case DCR_BESR:		return ppc.besr;
-		case DCR_BR0:		return ppc.br[0];
-		case DCR_BR1:		return ppc.br[1];
-		case DCR_BR2:		return ppc.br[2];
-		case DCR_BR3:		return ppc.br[3];
-		case DCR_BR4:		return ppc.br[4];
-		case DCR_BR5:		return ppc.br[5];
-		case DCR_BR6:		return ppc.br[6];
-		case DCR_BR7:		return ppc.br[7];
-		case DCR_EXISR:		return EXISR;
-		case DCR_EXIER:		return EXIER;
-		case DCR_IOCR:		return ppc.iocr;
-		case DCR_DMASR:		return ppc.dmasr;
-		case DCR_DMADA0:	return ppc.dma[0].da;
-		case DCR_DMADA1:	return ppc.dma[1].da;
-		case DCR_DMADA2:	return ppc.dma[2].da;
-		case DCR_DMADA3:	return ppc.dma[3].da;
-		case DCR_DMASA0:	return ppc.dma[0].sa;
-		case DCR_DMASA1:	return ppc.dma[1].sa;
-		case DCR_DMASA2:	return ppc.dma[2].sa;
-		case DCR_DMASA3:	return ppc.dma[3].sa;
-		case DCR_DMACT0:	return ppc.dma[0].ct;
-		case DCR_DMACT1:	return ppc.dma[1].ct;
-		case DCR_DMACT2:	return ppc.dma[2].ct;
-		case DCR_DMACT3:	return ppc.dma[3].ct;
-		case DCR_DMACR0:	return ppc.dma[0].cr;
-		case DCR_DMACR1:	return ppc.dma[1].cr;
-		case DCR_DMACR2:	return ppc.dma[2].cr;
-		case DCR_DMACR3:	return ppc.dma[3].cr;
+		case DCR_BEAR:      return ppc.bear;
+		case DCR_BESR:      return ppc.besr;
+		case DCR_BR0:       return ppc.br[0];
+		case DCR_BR1:       return ppc.br[1];
+		case DCR_BR2:       return ppc.br[2];
+		case DCR_BR3:       return ppc.br[3];
+		case DCR_BR4:       return ppc.br[4];
+		case DCR_BR5:       return ppc.br[5];
+		case DCR_BR6:       return ppc.br[6];
+		case DCR_BR7:       return ppc.br[7];
+		case DCR_EXISR:     return EXISR;
+		case DCR_EXIER:     return EXIER;
+		case DCR_IOCR:      return ppc.iocr;
+		case DCR_DMASR:     return ppc.dmasr;
+		case DCR_DMADA0:    return ppc.dma[0].da;
+		case DCR_DMADA1:    return ppc.dma[1].da;
+		case DCR_DMADA2:    return ppc.dma[2].da;
+		case DCR_DMADA3:    return ppc.dma[3].da;
+		case DCR_DMASA0:    return ppc.dma[0].sa;
+		case DCR_DMASA1:    return ppc.dma[1].sa;
+		case DCR_DMASA2:    return ppc.dma[2].sa;
+		case DCR_DMASA3:    return ppc.dma[3].sa;
+		case DCR_DMACT0:    return ppc.dma[0].ct;
+		case DCR_DMACT1:    return ppc.dma[1].ct;
+		case DCR_DMACT2:    return ppc.dma[2].ct;
+		case DCR_DMACT3:    return ppc.dma[3].ct;
+		case DCR_DMACR0:    return ppc.dma[0].cr;
+		case DCR_DMACR1:    return ppc.dma[1].cr;
+		case DCR_DMACR2:    return ppc.dma[2].cr;
+		case DCR_DMACR3:    return ppc.dma[3].cr;
 
 		default:
 			fatalerror("ppc: get_dcr: Unimplemented DCR %X\n", dcr);
@@ -181,11 +181,11 @@ static CPU_EXECUTE( ppc403 )
 
 		switch(opcode >> 26)
 		{
-			case 19:	ppc.optable19[(opcode >> 1) & 0x3ff](opcode); break;
-			case 31:	ppc.optable31[(opcode >> 1) & 0x3ff](opcode); break;
-			case 59:	ppc.optable59[(opcode >> 1) & 0x3ff](opcode); break;
-			case 63:	ppc.optable63[(opcode >> 1) & 0x3ff](opcode); break;
-			default:	ppc.optable[opcode >> 26](opcode); break;
+			case 19:    ppc.optable19[(opcode >> 1) & 0x3ff](opcode); break;
+			case 31:    ppc.optable31[(opcode >> 1) & 0x3ff](opcode); break;
+			case 59:    ppc.optable59[(opcode >> 1) & 0x3ff](opcode); break;
+			case 63:    ppc.optable63[(opcode >> 1) & 0x3ff](opcode); break;
+			default:    ppc.optable[opcode >> 26](opcode); break;
 		}
 
 		ppc_icount--;
@@ -199,7 +199,7 @@ static CPU_EXECUTE( ppc403 )
 				if (ppc.pit_int_enable) {
 					ppc.interrupt_pending |= 0x2;
 				}
-				if (ppc.tcr & 0x00400000)	// Automatic reload
+				if (ppc.tcr & 0x00400000)   // Automatic reload
 				{
 					ppc.pit_counter = ppc.pit;
 				}
@@ -249,7 +249,7 @@ void ppc403_exception(int exception)
 {
 	switch( exception )
 	{
-		case EXCEPTION_IRQ:		/* External Interrupt */
+		case EXCEPTION_IRQ:     /* External Interrupt */
 		{
 			if( ppc_get_msr() & MSR_EE ) {
 				UINT32 msr = ppc_get_msr();
@@ -257,7 +257,7 @@ void ppc403_exception(int exception)
 				SRR0 = ppc.npc;
 				SRR1 = msr;
 
-				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);	// Clear WE, PR, EE, PR
+				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);    // Clear WE, PR, EE, PR
 				if( msr & MSR_LE )
 					msr |= MSR_ILE;
 				else
@@ -271,14 +271,14 @@ void ppc403_exception(int exception)
 			break;
 		}
 
-		case EXCEPTION_TRAP:			/* Program exception / Trap */
+		case EXCEPTION_TRAP:            /* Program exception / Trap */
 		{
 				UINT32 msr = ppc_get_msr();
 
 				SRR0 = ppc.pc;
 				SRR1 = msr;
 
-				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);	// Clear WE, PR, EE, PR
+				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);    // Clear WE, PR, EE, PR
 				if( msr & MSR_ILE )
 					msr |= MSR_LE;
 				else
@@ -292,14 +292,14 @@ void ppc403_exception(int exception)
 			break;
 		}
 
-		case EXCEPTION_SYSTEM_CALL:		/* System call */
+		case EXCEPTION_SYSTEM_CALL:     /* System call */
 		{
 				UINT32 msr = ppc_get_msr();
 
 				SRR0 = ppc.npc;
 				SRR1 = msr;
 
-				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);	// Clear WE, PR, EE, PR
+				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);    // Clear WE, PR, EE, PR
 				if( msr & MSR_ILE )
 					msr |= MSR_LE;
 				else
@@ -321,7 +321,7 @@ void ppc403_exception(int exception)
 				SRR0 = ppc.npc;
 				SRR1 = msr;
 
-				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);	// Clear WE, PR, EE, PR
+				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);    // Clear WE, PR, EE, PR
 				if( msr & MSR_LE )
 					msr |= MSR_ILE;
 				else
@@ -330,13 +330,13 @@ void ppc403_exception(int exception)
 
 				ppc.npc = EVPR | 0x1000;
 
-				ppc.tsr |= 0x08000000;		// PIT interrupt
+				ppc.tsr |= 0x08000000;      // PIT interrupt
 				ppc.interrupt_pending &= ~0x2;
 			}
 			break;
 		}
 
-		case EXCEPTION_FIXED_INTERVAL_TIMER:		/* Fixed Interval Timer */
+		case EXCEPTION_FIXED_INTERVAL_TIMER:        /* Fixed Interval Timer */
 		{
 			if( ppc_get_msr() & MSR_EE ) {
 				UINT32 msr = ppc_get_msr();
@@ -344,7 +344,7 @@ void ppc403_exception(int exception)
 				SRR0 = ppc.npc;
 				SRR1 = msr;
 
-				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);	// Clear WE, PR, EE, PR
+				msr &= ~(MSR_WE | MSR_PR | MSR_EE | MSR_PE);    // Clear WE, PR, EE, PR
 				if( msr & MSR_LE )
 					msr |= MSR_ILE;
 				else
@@ -357,7 +357,7 @@ void ppc403_exception(int exception)
 			break;
 		}
 
-		case EXCEPTION_WATCHDOG_TIMER:				/* Watchdog Timer */
+		case EXCEPTION_WATCHDOG_TIMER:              /* Watchdog Timer */
 		{
 			UINT32 msr = ppc_get_msr();
 
@@ -557,15 +557,15 @@ static UINT8 ppc403_spu_r(UINT32 a)
 {
 	switch(a & 0xf)
 	{
-		case 0x0:		return ppc.spu.spls | 0x6;		/* transmit buffer is always empty */
-		case 0x2:		return ppc.spu.sphs;
-		case 0x4:		return (ppc.spu.brd >> 8) & 0xf;
-		case 0x5:		return (ppc.spu.brd & 0xff);
-		case 0x6:		return ppc.spu.spctl;
-		case 0x7:		return ppc.spu.sprc;
-		case 0x8:		return ppc.spu.sptc;
-		case 0x9:		return ppc.spu.sprb;
-		default:		fatalerror("ppc: spu_r: %02X\n", a & 0xf);
+		case 0x0:       return ppc.spu.spls | 0x6;      /* transmit buffer is always empty */
+		case 0x2:       return ppc.spu.sphs;
+		case 0x4:       return (ppc.spu.brd >> 8) & 0xf;
+		case 0x5:       return (ppc.spu.brd & 0xff);
+		case 0x6:       return ppc.spu.spctl;
+		case 0x7:       return ppc.spu.sprc;
+		case 0x8:       return ppc.spu.sptc;
+		case 0x9:       return ppc.spu.sprb;
+		default:        fatalerror("ppc: spu_r: %02X\n", a & 0xf);
 	}
 }
 
@@ -574,11 +574,11 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 	switch(a & 0xf)
 	{
 		case 0x0:
-			if( d & 0x80 )	ppc.spu.spls &= ~0x80;
-			if( d & 0x40 )	ppc.spu.spls &= ~0x40;
-			if( d & 0x20 )	ppc.spu.spls &= ~0x20;
-			if( d & 0x10 )	ppc.spu.spls &= ~0x10;
-			if( d & 0x08 )	ppc.spu.spls &= ~0x08;
+			if( d & 0x80 )  ppc.spu.spls &= ~0x80;
+			if( d & 0x40 )  ppc.spu.spls &= ~0x40;
+			if( d & 0x20 )  ppc.spu.spls &= ~0x20;
+			if( d & 0x10 )  ppc.spu.spls &= ~0x10;
+			if( d & 0x08 )  ppc.spu.spls &= ~0x08;
 			break;
 
 		case 0x2:
@@ -606,16 +606,16 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 
 		case 0x7:
 			ppc.spu.sprc = d;
-			if (ppc.spu.sprc & 0x80)	/* enable RX */
+			if (ppc.spu.sprc & 0x80)    /* enable RX */
 			{
 				/*
-                int baud_rate;
-                if (ppc.iocr & 0x2) {
-                    baud_rate = (3686400 / (ppc.spu.brd + 1)) / 16;
-                } else {
-                    baud_rate = (33333333 / (ppc.spu.brd + 1)) / 16;
-                }
-                */
+				int baud_rate;
+				if (ppc.iocr & 0x2) {
+				    baud_rate = (3686400 / (ppc.spu.brd + 1)) / 16;
+				} else {
+				    baud_rate = (33333333 / (ppc.spu.brd + 1)) / 16;
+				}
+				*/
 
 				/* check if serial port is hooked to a DMA channel */
 				/* if so, do a DMA operation */
@@ -656,7 +656,7 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 #endif
 				}
 			}
-			else						/* disable RX */
+			else                        /* disable RX */
 			{
 			}
 			break;
@@ -779,23 +779,23 @@ static void ppc403_dma_exec(int ch)
 		if( ppc.dma[ch].cr & DMA_DAI )
 			dai = width;
 		else
-			dai = 0;		/* DA not incremented */
+			dai = 0;        /* DA not incremented */
 
 		if( ppc.dma[ch].cr & DMA_SAI )
 			sai = width;
 		else
-			sai = 0;		/* SA not incremented */
+			sai = 0;        /* SA not incremented */
 
 
 		/* transfer mode */
 		switch( (ppc.dma[ch].cr >> 21) & 0x3 )
 		{
-			case 0:		/* buffered DMA */
-				if( ppc.dma[ch].cr & DMA_TD )	/* peripheral to mem */
+			case 0:     /* buffered DMA */
+				if( ppc.dma[ch].cr & DMA_TD )   /* peripheral to mem */
 				{
 					// nothing to do for now */
 				}
-				else							/* mem to peripheral */
+				else                            /* mem to peripheral */
 				{
 
 					/* check if the serial port is hooked to channel 2 or 3 */
@@ -827,16 +827,16 @@ static void ppc403_dma_exec(int ch)
 				}
 				break;
 
-			case 1:		/* fly-by DMA */
+			case 1:     /* fly-by DMA */
 				fatalerror("ppc: dma_exec: fly-by DMA not implemented\n");
 				break;
 
-			case 2:		/* software initiated mem-to-mem DMA */
+			case 2:     /* software initiated mem-to-mem DMA */
 				//mame_printf_debug("ppc: DMA (%d, SW mem-to-mem): SA = %08X, DA = %08X, CT = %08X\n", ch, ppc.dma[ch].sa, ppc.dma[ch].da, ppc.dma[ch].ct);
 
 				switch(width)
 				{
-					case 1:		/* Byte transfer */
+					case 1:     /* Byte transfer */
 						for (i=0; i < ppc.dma[ch].ct; i++)
 						{
 							UINT8 b = READ8(ppc.dma[ch].sa);
@@ -845,7 +845,7 @@ static void ppc403_dma_exec(int ch)
 							ppc.dma[ch].da += dai;
 						}
 						break;
-					case 2:		/* Word transfer */
+					case 2:     /* Word transfer */
 						for (i=0; i < ppc.dma[ch].ct; i++)
 						{
 							UINT16 w = READ16(ppc.dma[ch].sa);
@@ -854,7 +854,7 @@ static void ppc403_dma_exec(int ch)
 							ppc.dma[ch].da += dai;
 						}
 						break;
-					case 4:		/* Double word transfer */
+					case 4:     /* Double word transfer */
 						for (i=0; i < ppc.dma[ch].ct; i++)
 						{
 							UINT32 d = READ32(ppc.dma[ch].sa);
@@ -863,7 +863,7 @@ static void ppc403_dma_exec(int ch)
 							ppc.dma[ch].da += dai;
 						}
 						break;
-					case 16:	/* 16-byte transfer */
+					case 16:    /* 16-byte transfer */
 						for (i=0; i < ppc.dma[ch].ct; i++)
 						{
 							UINT32 d1 = READ32(ppc.dma[ch].sa+0);
@@ -883,7 +883,7 @@ static void ppc403_dma_exec(int ch)
 				}
 				break;
 
-			case 3:		/* hardware initiated mem-to-mem DMA */
+			case 3:     /* hardware initiated mem-to-mem DMA */
 				fatalerror("ppc: dma_exec: HW mem-to-mem DMA not implemented\n");
 				break;
 		}
@@ -908,17 +908,17 @@ static void ppc403_dma_exec(int ch)
 
 static UINT8 ppc403_read8(address_space &space, UINT32 a)
 {
-	if(a >= 0x40000000 && a <= 0x4000000f)		/* Serial Port */
+	if(a >= 0x40000000 && a <= 0x4000000f)      /* Serial Port */
 		return ppc403_spu_r(a);
 	return space.read_byte(a);
 }
 
-#define ppc403_read16	memory_read_word_32be
-#define ppc403_read32	memory_read_dword_32be
+#define ppc403_read16   memory_read_word_32be
+#define ppc403_read32   memory_read_dword_32be
 
 static void ppc403_write8(address_space &space, UINT32 a, UINT8 d)
 {
-	if( a >= 0x40000000 && a <= 0x4000000f )		/* Serial Port */
+	if( a >= 0x40000000 && a <= 0x4000000f )        /* Serial Port */
 	{
 		ppc403_spu_w(a, d);
 		return;
@@ -926,8 +926,8 @@ static void ppc403_write8(address_space &space, UINT32 a, UINT8 d)
 	space.write_byte(a, d);
 }
 
-#define ppc403_write16	memory_write_word_32be
-#define ppc403_write32	memory_write_dword_32be
+#define ppc403_write16  memory_write_word_32be
+#define ppc403_write32  memory_write_dword_32be
 
 static UINT16 ppc403_read16_unaligned(address_space &space, UINT32 a)
 {
@@ -950,4 +950,3 @@ static void ppc403_write32_unaligned(address_space &space, UINT32 a, UINT32 d)
 {
 	fatalerror("ppc: Unaligned write32 %08X, %08X at %08X\n", a, d, ppc.pc);
 }
-

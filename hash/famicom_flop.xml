@@ -3,29 +3,29 @@
 <softwarelist name="famicom_flop" description="Nintendo Famicom Disk images">
 
 <!--
-    Some disks are marked as bad dumps due to spurious data being present on the dump,
-    e.g. because the disk was used on a system and data have been saved. In the case
-    of prototypes it's unlikely we will ever have access to a pristine disk, but still it is worth marking them.
-    Overall, anyway, all dumps are in .fds format which might be eventually replaced by a more
-    accurate format!
+	Some disks are marked as bad dumps due to spurious data being present on the dump,
+	e.g. because the disk was used on a system and data have been saved. In the case
+	of prototypes it's unlikely we will ever have access to a pristine disk, but still it is worth marking them.
+	Overall, anyway, all dumps are in .fds format which might be eventually replaced by a more
+	accurate format!
 -->
 
 <!--
-    Undumped disks:
-    * Tanigawa Kouji no Shougi Shinan II - Tsumeshougi Ji no Itte ~ 谷川浩司の将棋指南II 詰め将棋・次の一手 (19880810, Pony Canyon, PNF-SH2)
+	Undumped disks:
+	* Tanigawa Kouji no Shougi Shinan II - Tsumeshougi Ji no Itte ~ 谷川浩司の将棋指南II 詰め将棋・次の一手 (19880810, Pony Canyon, PNF-SH2)
 
 Re-releases (probably the same as the original release, but listed while waiting for confirmation):
-    * Ultraman - Kaijuu Teikoku no Gyakushuu ~ ウルトラマン 怪獣帝国の逆襲 書き換え版 (19870326, Bandai, BAN-UL1)
-    * Konamic Ice Hockey ~ コナミック アイスホッケー 書き換え版 (19880909, Konami, KDS-HOC)
+	* Ultraman - Kaijuu Teikoku no Gyakushuu ~ ウルトラマン 怪獣帝国の逆襲 書き換え版 (19870326, Bandai, BAN-UL1)
+	* Konamic Ice Hockey ~ コナミック アイスホッケー 書き換え版 (19880909, Konami, KDS-HOC)
 -->
 
 <!--
-    WARNING: These disks do not contain the 0x10 header some emulator expects!!!
-    To use them in such emulators, you have to open the image with an hex editor and add
-    at the beginning of the file the following string (in hex):
-      "46 44 53 1A XX 00 00 00 00 00 00 00 00 00 00 00"
-    where XX must be 01, 02 or 04 depending on the number of sides of the disk
-    (easy way to compute it: XX = size of the FDS file / 65500)
+	WARNING: These disks do not contain the 0x10 header some emulator expects!!!
+	To use them in such emulators, you have to open the image with an hex editor and add
+	at the beginning of the file the following string (in hex):
+		"46 44 53 1A XX 00 00 00 00 00 00 00 00 00 00 00"
+	where XX must be 01, 02 or 04 depending on the number of sides of the disk
+	(easy way to compute it: XX = size of the FDS file / 65500)
 -->
 
 <!-- Unsupported games showing Error 01/07 simply lack support of disk write! -->

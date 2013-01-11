@@ -24,8 +24,8 @@ static const res_net_info tagteam_net_info =
 
 static const res_net_decode_info tagteam_decode_info =
 {
-	1,				/* single PROM per color */
-	0x000, 0x01f,	/* start/end */
+	1,              /* single PROM per color */
+	0x000, 0x01f,   /* start/end */
 	/* R     G     B */
 	{  0x00, 0x00, 0x00 }, /* offsets */
 	{  0x00, 0x03, 0x06 }, /* shifts */
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(tagteam_state::get_bg_tile_info)
 void tagteam_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

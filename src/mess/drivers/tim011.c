@@ -17,12 +17,12 @@ class tim011_state : public driver_device
 public:
 	tim011_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_fdc(*this, FDC9266_TAG),
-		  m_floppy0(*this, FDC9266_TAG ":0:35dd"),
-		  m_floppy1(*this, FDC9266_TAG ":1:35dd"),
-		  m_floppy2(*this, FDC9266_TAG ":2:35dd"),
-		  m_floppy3(*this, FDC9266_TAG ":3:35dd") { }
+			m_maincpu(*this, "maincpu"),
+			m_fdc(*this, FDC9266_TAG),
+			m_floppy0(*this, FDC9266_TAG ":0:35dd"),
+			m_floppy1(*this, FDC9266_TAG ":1:35dd"),
+			m_floppy2(*this, FDC9266_TAG ":2:35dd"),
+			m_floppy3(*this, FDC9266_TAG ":3:35dd") { }
 
 	virtual void machine_reset();
 	virtual void video_start();
@@ -53,7 +53,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tim011_io, AS_IO, 8, tim011_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM	/* Z180 internal registers */
+	AM_RANGE(0x0000, 0x007f) AM_RAM /* Z180 internal registers */
 	AM_RANGE(0x0080, 0x009f) AM_DEVICE(FDC9266_TAG, upd765a_device, map)
 	//AM_RANGE(0x00a0, 0x00a0) AM_MIRROR(0x001f)  AM_WRITE(fdc_dma_w)
 	//AM_RANGE(0x00c0, 0x00c1) AM_MIRROR(0x000e)  AM_READWRITE(print_r,print_w)

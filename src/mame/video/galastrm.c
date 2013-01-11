@@ -96,7 +96,7 @@ static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
 	int dimension,total_chunks,bad_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
-       while processing sprite ram and then draw them all at the end */
+	   while processing sprite ram and then draw them all at the end */
 	state->m_sprite_ptr_pre = state->m_spritelist;
 
 	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
@@ -120,14 +120,14 @@ static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
 		y =        (data & 0x000003ff);
 
 		bad_chunks = 0;
-		dimension = ((dblsize*2) + 2);	// 2 or 4
-		total_chunks = ((dblsize*3) + 1) << 2;	// 4 or 16
+		dimension = ((dblsize*2) + 2);  // 2 or 4
+		total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
 		map_offset = tilenum << 2;
 
 		zoomx += 1;
 		zoomy += 1;
 
-		if (x > 713) x -= 1024;		/* 1024x512 */
+		if (x > 713) x -= 1024;     /* 1024x512 */
 		if (y < 117) y += 512;
 
 		y = (-y & 0x3ff);
@@ -163,8 +163,8 @@ static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
 			if (sprites_flipscreen)
 			{
 				/* -zx/y is there to fix zoomed sprite coords in screenflip.
-                    drawgfxzoom does not know to draw from flip-side of sprites when
-                    screen is flipped; so we must correct the coords ourselves. */
+				    drawgfxzoom does not know to draw from flip-side of sprites when
+				    screen is flipped; so we must correct the coords ourselves. */
 
 				curx = 320 - curx - zx;
 				cury = 256 - cury - zy;
@@ -448,10 +448,10 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	tc0480scp_tilemap_update(tc0480scp);
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
-	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
 	layer[2] = (priority & 0x00f0) >>  4;
-	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
+	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
 	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
@@ -492,7 +492,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 			{
 				pri = &priority_bitmap.pix8(y, x);
 				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
-					 *pri |= 0x04;
+						*pri |= 0x04;
 			}
 		}
 	}
@@ -539,7 +539,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 			{
 				pri = &priority_bitmap.pix8(y, x);
 				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
-					 *pri |= 0x04;
+						*pri |= 0x04;
 			}
 		}
 	}

@@ -52,9 +52,9 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define WD1015_TAG		"u6"
-#define WD11C00_17_TAG	"u11"
-#define WD2010A_TAG		"u7"
+#define WD1015_TAG      "u6"
+#define WD11C00_17_TAG  "u11"
+#define WD2010A_TAG     "u7"
 
 
 
@@ -212,11 +212,11 @@ machine_config_constructor wdxt_gen_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, WDXT_GEN, "Western Digital WDXT-GEN (Amstrad PC1512/1640)", tag, owner, clock),
-	  device_isa8_card_interface(mconfig, *this),
-	  m_maincpu(*this, WD1015_TAG),
-	  m_host(*this, WD11C00_17_TAG),
-	  m_hdc(*this, WD2010A_TAG)
+	: device_t(mconfig, WDXT_GEN, "Western Digital WDXT-GEN (Amstrad PC1512/1640)", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),
+		m_maincpu(*this, WD1015_TAG),
+		m_host(*this, WD11C00_17_TAG),
+		m_hdc(*this, WD2010A_TAG)
 {
 }
 
@@ -292,18 +292,18 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P10
-        P11
-        P12
-        P13
-        P14
-        P15
-        P16
-        P17
+	    P10
+	    P11
+	    P12
+	    P13
+	    P14
+	    P15
+	    P16
+	    P17
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -321,18 +321,18 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P10     HSEL0
-        P11     HSEL1
-        P12     HSEL2
-        P13     _DSEL0
-        P14     _DSEL1
-        P15
-        P16     IREQ
-        P17     _DIRIN
+	    P10     HSEL0
+	    P11     HSEL1
+	    P12     HSEL2
+	    P13     _DSEL0
+	    P14     _DSEL1
+	    P15
+	    P16     IREQ
+	    P17     _DIRIN
 
-    */
+	*/
 
 	logerror("%s P1 %02x\n", machine().describe_context(), data);
 
@@ -348,18 +348,18 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P20
-        P21
-        P22
-        P23
-        P24
-        P25
-        P26     TK000
-        P27     ECC NOT 0
+	    P20
+	    P21
+	    P22
+	    P23
+	    P24
+	    P25
+	    P26     TK000
+	    P27     ECC NOT 0
 
-    */
+	*/
 
 	UINT8 data = 0x40;
 
@@ -379,18 +379,18 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        P20     STEP
-        P21     ?
-        P22     MODE?
-        P23     ?
-        P24     ?
-        P25     ?
-        P26
-        P27
+	    P20     STEP
+	    P21     ?
+	    P22     MODE?
+	    P23     ?
+	    P24     ?
+	    P25     ?
+	    P26
+	    P27
 
-    */
+	*/
 
 	logerror("%s P2 %02x\n", machine().describe_context(), data);
 

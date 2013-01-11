@@ -167,7 +167,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			}
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				buffered_spriteram[offs],
-				((buffered_spriteram[offs+2] >> 1) & 3)	|
+				((buffered_spriteram[offs+2] >> 1) & 3) |
 					((buffered_spriteram[offs+2] << 2) & 4) | (state->m_slapfight_palette_bank << 3),
 				state->m_flipscreen, state->m_flipscreen,
 				sx, sy,0);

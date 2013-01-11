@@ -37,13 +37,13 @@
 
 static const res_net_decode_info phoenix_decode_info =
 {
-	2,		// there may be two proms needed to construct color
-	0,		// start at 0
-	255,	// end at 255
+	2,      // there may be two proms needed to construct color
+	0,      // start at 0
+	255,    // end at 255
 	//  R,   G,   B,   R,   G,   B
-	{   0,   0,   0, 256, 256, 256},		// offsets
-	{   0,   2,   1,  -1,   1,   0},		// shifts
-	{0x01,0x01,0x01,0x02,0x02,0x02}			// masks
+	{   0,   0,   0, 256, 256, 256},        // offsets
+	{   0,   2,   1,  -1,   1,   0},        // shifts
+	{0x01,0x01,0x01,0x02,0x02,0x02}         // masks
 };
 
 static const res_net_info phoenix_net_info =
@@ -80,7 +80,7 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
-	rgb_t	*rgb;
+	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &phoenix_net_info);
 	/* native order */
@@ -98,7 +98,7 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
-	rgb_t	*rgb;
+	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &survival_net_info);
 	/* native order */
@@ -116,7 +116,7 @@ PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
-	rgb_t	*rgb;
+	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &pleiades_net_info);
 	/* native order */
@@ -279,8 +279,8 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 
 
 	/* the palette table is at $0420-$042f and is set by $06bc.
-       Four palette changes by level.  The palette selection is
-       wrong, but the same paletter is used for both layers. */
+	   Four palette changes by level.  The palette selection is
+	   wrong, but the same paletter is used for both layers. */
 
 	if (m_palette_bank != ((data >> 1) & 3))
 	{

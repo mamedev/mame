@@ -24,8 +24,8 @@ Acorn Archimedes KART interface
 
 struct aakart_interface
 {
-	devcb_write_line		m_out_tx_cb;
-	devcb_write_line		m_out_rx_cb;
+	devcb_write_line        m_out_tx_cb;
+	devcb_write_line        m_out_rx_cb;
 };
 
 enum{
@@ -44,7 +44,7 @@ enum{
 // ======================> aakart_device
 
 class aakart_device : public device_t,
-                      public aakart_interface
+						public aakart_interface
 {
 public:
 	// construction/destruction
@@ -67,13 +67,13 @@ private:
 	static const device_timer_id TX_TIMER = 2;
 	static const device_timer_id MOUSE_TIMER = 3;
 	static const device_timer_id KEYB_TIMER = 4;
-	emu_timer *			m_rxtimer;
-	emu_timer *			m_txtimer;
-	emu_timer *			m_mousetimer;
-	emu_timer *			m_keybtimer;
+	emu_timer *         m_rxtimer;
+	emu_timer *         m_txtimer;
+	emu_timer *         m_mousetimer;
+	emu_timer *         m_keybtimer;
 
-	devcb_resolved_write_line	m_out_tx_func;
-	devcb_resolved_write_line	m_out_rx_func;
+	devcb_resolved_write_line   m_out_tx_func;
+	devcb_resolved_write_line   m_out_rx_func;
 	int m_tx_latch, m_rx_latch;
 	int m_rx;
 	int m_new_command;

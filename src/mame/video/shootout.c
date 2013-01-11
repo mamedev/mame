@@ -101,14 +101,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		int attributes = source[1];
 		/*
-            76543210
-            xxx-----    bank
-            ---x----    vertical size
-            ----x---    priority
-            -----x--    horizontal flip
-            ------x-    flicker
-            -------x    enable
-        */
+		    76543210
+		    xxx-----    bank
+		    ---x----    vertical size
+		    ----x---    priority
+		    -----x--    horizontal flip
+		    ------x-    flicker
+		    -------x    enable
+		*/
 		if ( attributes & 0x01 ){ /* visible */
 			if( state->m_bFlicker || (attributes&0x02)==0 ){
 				int priority_mask = (attributes&0x08)?0x2:0;

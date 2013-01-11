@@ -23,40 +23,40 @@
 //  DEBUGGING
 //============================================================
 
-#define LOG_SOUND		0
+#define LOG_SOUND       0
 
 //============================================================
 //  PARAMETERS
 //============================================================
 
 // number of samples per SDL callback
-#define SDL_XFER_SAMPLES	(512)
+#define SDL_XFER_SAMPLES    (512)
 
 static int sdl_xfer_samples = SDL_XFER_SAMPLES;
 static int stream_in_initialized = 0;
 static int stream_loop = 0;
 
 // maximum audio latency
-#define MAX_AUDIO_LATENCY		5
+#define MAX_AUDIO_LATENCY       5
 
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
 
-static int				attenuation = 0;
+static int              attenuation = 0;
 
-static int				initialized_audio = 0;
-static int				buf_locked;
+static int              initialized_audio = 0;
+static int              buf_locked;
 
-static INT8				*stream_buffer;
-static volatile INT32	stream_playpos;
+static INT8             *stream_buffer;
+static volatile INT32   stream_playpos;
 
-static UINT32			stream_buffer_size;
-static UINT32			stream_buffer_in;
+static UINT32           stream_buffer_size;
+static UINT32           stream_buffer_in;
 
 // buffer over/underflow counts
-static int				buffer_underflows;
-static int				buffer_overflows;
+static int              buffer_underflows;
+static int              buffer_overflows;
 
 // debugging
 static FILE *sound_log;
@@ -69,12 +69,12 @@ static int snd_enabled;
 //  PROTOTYPES
 //============================================================
 
-static int			sdl_init(running_machine &machine);
-static void			sdl_kill(running_machine &machine);
-static int			sdl_create_buffers(void);
-static void			sdl_destroy_buffers(void);
-static void			sdl_cleanup_audio(running_machine &machine);
-static void			SDLCALL sdl_callback(void *userdata, Uint8 *stream, int len);
+static int          sdl_init(running_machine &machine);
+static void         sdl_kill(running_machine &machine);
+static int          sdl_create_buffers(void);
+static void         sdl_destroy_buffers(void);
+static void         sdl_cleanup_audio(running_machine &machine);
+static void         SDLCALL sdl_callback(void *userdata, Uint8 *stream, int len);
 
 
 
@@ -143,7 +143,7 @@ static int lock_buffer(running_machine &machine, long offset, long size, void **
 			lstart = offset;
 			lend = lstart+size;
 			while (((pstart >= lstart) && (pstart <= lend)) ||
-			       ((pend >= lstart) && (pend <= lend)))
+					((pend >= lstart) && (pend <= lend)))
 			{
 				pstart = stream_playpos;
 				pend = pstart + sdl_xfer_samples;
@@ -174,7 +174,7 @@ static int lock_buffer(running_machine &machine, long offset, long size, void **
 
 	if (LOG_SOUND)
 		fprintf(sound_log, "locking %ld bytes at offset %ld (total %d, playpos %d): len1 %ld len2 %ld\n",
-	        size, offset, stream_buffer_size, stream_playpos, *length1, *length2);
+			size, offset, stream_buffer_size, stream_playpos, *length1, *length2);
 
 	return 0;
 }
@@ -421,9 +421,9 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 //============================================================
 static int sdl_init(running_machine &machine)
 {
-	int			n_channels = 2;
-	int			audio_latency;
-	SDL_AudioSpec	aspec, obtained;
+	int         n_channels = 2;
+	int         audio_latency;
+	SDL_AudioSpec   aspec, obtained;
 	char audio_driver[16] = "";
 
 	if (initialized_audio)
@@ -447,7 +447,7 @@ static int sdl_init(running_machine &machine)
 
 	// set up the audio specs
 	aspec.freq = machine.sample_rate();
-	aspec.format = AUDIO_S16SYS;	// keep endian independent
+	aspec.format = AUDIO_S16SYS;    // keep endian independent
 	aspec.channels = n_channels;
 	aspec.samples = sdl_xfer_samples;
 	aspec.callback = sdl_callback;
@@ -460,7 +460,7 @@ static int sdl_init(running_machine &machine)
 	snd_enabled = 1;
 
 	mame_printf_verbose("Audio: frequency: %d, channels: %d, samples: %d\n",
-	                    obtained.freq, obtained.channels, obtained.samples);
+						obtained.freq, obtained.channels, obtained.samples);
 
 	sdl_xfer_samples = obtained.samples;
 
@@ -542,4 +542,3 @@ static void sdl_destroy_buffers(void)
 		global_free(stream_buffer);
 	stream_buffer = NULL;
 }
-

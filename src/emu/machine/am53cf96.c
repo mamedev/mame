@@ -40,7 +40,7 @@ READ8_MEMBER( am53cf96_device::read )
 
 	if (offset == REG_IRQSTATE)
 	{
-		scsi_regs[REG_STATUS] &= ~0x80;	// clear IRQ flag
+		scsi_regs[REG_STATUS] &= ~0x80; // clear IRQ flag
 	}
 
 	return rv;
@@ -48,8 +48,8 @@ READ8_MEMBER( am53cf96_device::read )
 
 void am53cf96_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	scsi_regs[REG_IRQSTATE] = 8;	// indicate success
-	scsi_regs[REG_STATUS] |= 0x80;	// indicate IRQ
+	scsi_regs[REG_IRQSTATE] = 8;    // indicate success
+	scsi_regs[REG_STATUS] |= 0x80;  // indicate IRQ
 	m_irq_handler(1);
 }
 
@@ -65,7 +65,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 
 	if (offset == REG_XFERCNTLOW || offset == REG_XFERCNTMID || offset == REG_XFERCNTHI)
 	{
-		scsi_regs[REG_STATUS] &= ~0x10;	// clear CTZ bit
+		scsi_regs[REG_STATUS] &= ~0x10; // clear CTZ bit
 	}
 
 	// FIFO
@@ -86,12 +86,12 @@ WRITE8_MEMBER( am53cf96_device::write )
 		fptr = 0;
 		switch (data & 0x7f)
 		{
-			case 0:	// NOP
-				scsi_regs[REG_IRQSTATE] = 8;	// indicate success
+			case 0: // NOP
+				scsi_regs[REG_IRQSTATE] = 8;    // indicate success
 				xfer_state = 0;
 				break;
 			case 2: // reset device
-				scsi_regs[REG_IRQSTATE] = 8;	// indicate success
+				scsi_regs[REG_IRQSTATE] = 8;    // indicate success
 
 				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, space.device().safe_pc());
 				if (devices[last_id])
@@ -105,12 +105,12 @@ WRITE8_MEMBER( am53cf96_device::write )
 
 				xfer_state = 0;
 				break;
-			case 3:	// reset SCSI bus
-				scsi_regs[REG_INTSTATE] = 4;	// command sent OK
+			case 3: // reset SCSI bus
+				scsi_regs[REG_INTSTATE] = 4;    // command sent OK
 				xfer_state = 0;
 				m_transfer_timer->adjust( attotime::from_hz( 16384 ) );
 				break;
-			case 0x42:  	// select with ATN steps
+			case 0x42:      // select with ATN steps
 				m_transfer_timer->adjust( attotime::from_hz( 16384 ) );
 				if ((fifo[1] == 0) || (fifo[1] == 0x48) || (fifo[1] == 0x4b))
 				{
@@ -135,14 +135,14 @@ WRITE8_MEMBER( am53cf96_device::write )
 				}
 				xfer_state = 0;
 				break;
-			case 0x44:	// enable selection/reselection
+			case 0x44:  // enable selection/reselection
 				xfer_state = 0;
 				break;
-			case 0x10:	// information transfer (must not change xfer_state)
-			case 0x11:	// second phase of information transfer
-			case 0x12:	// message accepted
+			case 0x10:  // information transfer (must not change xfer_state)
+			case 0x11:  // second phase of information transfer
+			case 0x12:  // message accepted
 				m_transfer_timer->adjust( attotime::from_hz( 16384 ) );
-				scsi_regs[REG_INTSTATE] = 6;	// command sent OK
+				scsi_regs[REG_INTSTATE] = 6;    // command sent OK
 				break;
 			default:
 				printf( "unsupported command %02x\n", data );
@@ -195,7 +195,7 @@ void am53cf96_device::device_start()
 // retrieve data from the SCSI controller
 void am53cf96_device::dma_read_data(int bytes, UINT8 *pData)
 {
-	scsi_regs[REG_STATUS] |= 0x10;	// indicate DMA finished
+	scsi_regs[REG_STATUS] |= 0x10;  // indicate DMA finished
 
 	if (devices[last_id])
 	{
@@ -212,7 +212,7 @@ void am53cf96_device::dma_write_data(int bytes, UINT8 *pData)
 {
 //  int i;
 
-	scsi_regs[REG_STATUS] |= 0x10;	// indicate DMA finished
+	scsi_regs[REG_STATUS] |= 0x10;  // indicate DMA finished
 
 	if (devices[last_id])
 	{

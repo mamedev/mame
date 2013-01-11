@@ -49,7 +49,7 @@ class speeddrv_state : public driver_device
 public:
 	speeddrv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -82,7 +82,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( speeddrv )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */
 	ROM_LOAD( "mainbios", 0x0000, 0x040000, NO_DUMP )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
@@ -93,7 +93,7 @@ ROM_START( speeddrv )
 ROM_END
 
 ROM_START( eztouch )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */
 	ROM_LOAD( "szz_bios.rom", 0x0000, 0x040000, CRC(9b09f094) SHA1(a9c533afa29218339bbd4f12075f34f9574e3bf6) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */

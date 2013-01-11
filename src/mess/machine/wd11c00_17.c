@@ -19,17 +19,17 @@
 
 
 // status register
-#define STATUS_IRQ		0x20
-#define STATUS_DRQ		0x10
-#define STATUS_BUSY		0x08
-#define STATUS_C_D		0x04
-#define STATUS_I_O		0x02
-#define STATUS_REQ		0x01
+#define STATUS_IRQ      0x20
+#define STATUS_DRQ      0x10
+#define STATUS_BUSY     0x08
+#define STATUS_C_D      0x04
+#define STATUS_I_O      0x02
+#define STATUS_REQ      0x01
 
 
 // mask register
-#define MASK_IRQ		0x02
-#define MASK_DMA		0x01
+#define MASK_IRQ        0x02
+#define MASK_DMA        0x01
 
 
 
@@ -209,13 +209,13 @@ inline void wd11c00_17_device::select()
 //-------------------------------------------------
 
 wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, WD11C00_17, "Western Digital WD11C00-17", tag, owner, clock),
-	  m_status(0),
-	  m_irq5(CLEAR_LINE),
-	  m_drq3(CLEAR_LINE),
-	  m_busy(1),
-	  m_req(0),
-	  m_ra3(0)
+	: device_t(mconfig, WD11C00_17, "Western Digital WD11C00-17", tag, owner, clock),
+		m_status(0),
+		m_irq5(CLEAR_LINE),
+		m_drq3(CLEAR_LINE),
+		m_busy(1),
+		m_req(0),
+		m_ra3(0)
 {
 }
 
@@ -306,7 +306,7 @@ WRITE8_MEMBER( wd11c00_17_device::io_w )
 		software_reset();
 		break;
 
-	case 2:	// Board Select
+	case 2: // Board Select
 		if (LOG) logerror("%s WD11C00-17 '%s' Select\n", machine().describe_context(), tag());
 		increment_address(); // HACK
 		select();

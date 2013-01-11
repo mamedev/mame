@@ -90,11 +90,11 @@ public:
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 
-	device_t	*m_pit8254;
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
-	device_t	*m_dma8237_1;
-	device_t	*m_dma8237_2;
+	device_t    *m_pit8254;
+	device_t    *m_pic8259_1;
+	device_t    *m_pic8259_2;
+	device_t    *m_dma8237_1;
+	device_t    *m_dma8237_2;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
@@ -214,13 +214,13 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 
 	switch(reg)
 	{
-		case 0x59:		// PAM0
+		case 0x59:      // PAM0
 		{
-			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
+			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
 				state->membank("bank1")->set_base(state->m_bios_ram);
 			}
-			else					// disable RAM access (reads go to BIOS ROM)
+			else                    // disable RAM access (reads go to BIOS ROM)
 			{
 				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x30000);
 			}
@@ -390,7 +390,7 @@ WRITE32_MEMBER(gamecstl_state::fdc_w)
 
 WRITE32_MEMBER(gamecstl_state::bios_ram_w)
 {
-	if (m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ram + offset);
 	}
@@ -521,7 +521,7 @@ static ADDRESS_MAP_START( gamecstl_map, AS_PROGRAM, 32, gamecstl_state )
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32, gamecstl_state )
@@ -548,16 +548,16 @@ ADDRESS_MAP_END
 
 static const gfx_layout CGA_charlayout =
 {
-	8,8,					/* 8 x 16 characters */
-    256,                    /* 256 characters */
-    1,                      /* 1 bits per pixel */
-    { 0 },                  /* no bitplanes; 1 bit per pixel */
-    /* x offsets */
-    { 0,1,2,3,4,5,6,7 },
-    /* y offsets */
+	8,8,                    /* 8 x 16 characters */
+	256,                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes; 1 bit per pixel */
+	/* x offsets */
+	{ 0,1,2,3,4,5,6,7 },
+	/* y offsets */
 	{ 0*8,1*8,2*8,3*8,
-	  4*8,5*8,6*8,7*8 },
-    8*8                     /* every char takes 8 bytes */
+		4*8,5*8,6*8,7*8 },
+	8*8                     /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( CGA )
@@ -573,7 +573,7 @@ GFXDECODE_END
 
 static INPUT_PORTS_START(gamecstl)
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
@@ -591,13 +591,13 @@ static INPUT_PORTS_START(gamecstl)
 	PORT_START("pc_keyboard_5")
 
 	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
@@ -669,15 +669,15 @@ static const struct pit8253_config gamecstl_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}

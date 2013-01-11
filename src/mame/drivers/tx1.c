@@ -108,28 +108,28 @@ WRITE16_MEMBER(tx1_state::z80_shared_w)
 static INPUT_PORTS_START( tx1 )
 	PORT_START("DSW")
 	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
-	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )			PORT_DIPLOCATION("DS.2:1,2")
+	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )         PORT_DIPLOCATION("DS.2:1,2")
 	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
 	PORT_DIPSETTING(      0x0004, "2 Coin Units for 1 Credit" )
 	PORT_DIPSETTING(      0x0008, "3 Coin Units for 1 Credit" )
 	PORT_DIPSETTING(      0x000c, "4 Coin Units for 1 Credit" )
 
-	PORT_DIPNAME( 0x0010, 0x0000, "Left Coin Mechanism" )		PORT_DIPLOCATION("DS.2:3")
+	PORT_DIPNAME( 0x0010, 0x0000, "Left Coin Mechanism" )       PORT_DIPLOCATION("DS.2:3")
 	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
 	PORT_DIPSETTING(      0x0010, "1 Coin for 2 Coin Units" )
 
-	PORT_DIPNAME( 0x0060, 0x0000, "Right Coin Mechanism" )		PORT_DIPLOCATION("DS.2:4,5")
+	PORT_DIPNAME( 0x0060, 0x0000, "Right Coin Mechanism" )      PORT_DIPLOCATION("DS.2:4,5")
 	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
 	PORT_DIPSETTING(      0x0020, "1 Coin for 4 Coin Units" )
 	PORT_DIPSETTING(      0x0040, "1 Coin for 5 Coin Units" )
 	PORT_DIPSETTING(      0x0060, "1 Coin for 6 Coin Units" )
 
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DS.2:6") /* Manual states switches 6 to 8 unused (physically it's only 6 switches) */
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DS.2:6") /* Manual states switches 6 to 8 unused (physically it's only 6 switches) */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
-	PORT_DIPNAME( 0x0700, 0x0300, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("DS.1:1,2,3")
+	PORT_DIPNAME( 0x0700, 0x0300, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DS.1:1,2,3")
 	PORT_DIPSETTING(      0x0000, "A (Easiest)" )
 	PORT_DIPSETTING(      0x0100, "B" )
 	PORT_DIPSETTING(      0x0200, "C" )
@@ -139,13 +139,13 @@ static INPUT_PORTS_START( tx1 )
 	PORT_DIPSETTING(      0x0600, "G" )
 	PORT_DIPSETTING(      0x0700, "H (Hardest)" )
 
-	PORT_DIPNAME( 0x1800, 0x1000, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("DS.1:4,5")
+	PORT_DIPNAME( 0x1800, 0x1000, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("DS.1:4,5")
 	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0800, "B" )
 	PORT_DIPSETTING(      0x1000, "C" )
 	PORT_DIPSETTING(      0x1800, "D (Shortest)" )
 
-	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )		PORT_DIPLOCATION("DS.1:6,7,8")
+	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )       PORT_DIPLOCATION("DS.1:6,7,8")
 	PORT_DIPSETTING(      0x0000, "No Bonus" )
 	PORT_DIPSETTING(      0x2000, "2 Coin Units for 1 Credit" )
 	PORT_DIPSETTING(      0x4000, "3 Coin Units for 1 Credit" )
@@ -185,7 +185,7 @@ static INPUT_PORTS_START( tx1j )
 
 	PORT_MODIFY("DSW")
 	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
-	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("DS.2:1,2,3") /* As silkscreened on the PCB */
+	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("DS.2:1,2,3") /* As silkscreened on the PCB */
 	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -195,7 +195,7 @@ static INPUT_PORTS_START( tx1j )
 	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("DS.2:4,5,6") /* As silkscreened on the PCB */
+	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("DS.2:4,5,6") /* As silkscreened on the PCB */
 	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -206,7 +206,7 @@ static INPUT_PORTS_START( tx1j )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_6C ) )
 
 	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DS.1:6,7,8")
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DS.1:6,7,8")
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x2000, "1" )
 	PORT_DIPSETTING(      0x4000, "2" )
@@ -221,33 +221,33 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( buggyboy )
 	PORT_START("DSW")
 	/* Dipswitch 0 is unconnected */
-	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )	PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
+	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )    PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0001, "1" )
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
 
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )	PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
 
-	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )	PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )  PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )     PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0010, "B" )
 	PORT_DIPSETTING(      0x0020, "C" )
 	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
 
-	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )		PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )     PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x0000, "A (Easy)")
 	PORT_DIPSETTING(      0x0040, "B" )
 	PORT_DIPSETTING(      0x0080, "C" )
 	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
 
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6")
 	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -257,13 +257,13 @@ static INPUT_PORTS_START( buggyboy )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0xe000, "Free-Play" )
 
-	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,4")
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_5C ) )
 
-	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )	PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
+	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )    PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0200, "2" )
@@ -305,33 +305,33 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( buggybjr )
 	PORT_START("DSW")
 	/* Dipswitch 0 is unconnected */
-	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )	PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
+	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )    PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0001, "1" )
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
 
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )	PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
 
-	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )	PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )  PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )     PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x0000, "A (Longest)" )
 	PORT_DIPSETTING(      0x0010, "B" )
 	PORT_DIPSETTING(      0x0020, "C" )
 	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
 
-	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )		PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )     PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x0000, "A (Easy)")
 	PORT_DIPSETTING(      0x0040, "B" )
 	PORT_DIPSETTING(      0x0080, "C" )
 	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
 
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6")
 	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
@@ -341,13 +341,13 @@ static INPUT_PORTS_START( buggybjr )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0xe000, "Free-Play" )
 
-	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,4")
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_6C ) )
 
-	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )	PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
+	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )    PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0200, "2" )
@@ -475,22 +475,22 @@ READ8_MEMBER(tx1_state::bbjr_analog_r)
 /* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
 static I8255A_INTERFACE( buggyboy_ppi8255_intf )
 {
-	DEVCB_INPUT_PORT("PPI_PORTA"),						/* Port A read */
-	DEVCB_NULL,											/* Port A write */
-	DEVCB_NULL,											/* Port B read */
-	DEVCB_DRIVER_MEMBER(tx1_state,bb_coin_cnt_w),		/* Port B write */
-	DEVCB_INPUT_PORT("PPI_PORTC"),						/* Port C read */
-	DEVCB_NULL											/* Port C write */
+	DEVCB_INPUT_PORT("PPI_PORTA"),                      /* Port A read */
+	DEVCB_NULL,                                         /* Port A write */
+	DEVCB_NULL,                                         /* Port B read */
+	DEVCB_DRIVER_MEMBER(tx1_state,bb_coin_cnt_w),       /* Port B write */
+	DEVCB_INPUT_PORT("PPI_PORTC"),                      /* Port C read */
+	DEVCB_NULL                                          /* Port C write */
 };
 
 static I8255A_INTERFACE( tx1_ppi8255_intf )
 {
-	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_porta_r),		/* Port A read */
-	DEVCB_NULL,											/* Port A write */
-	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_portb_r),		/* Port B read */
-	DEVCB_NULL,											/* Port B write */
-	DEVCB_INPUT_PORT("PPI_PORTC"),						/* Port C read */
-	DEVCB_DRIVER_MEMBER(tx1_state,tx1_coin_cnt_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_porta_r),     /* Port A read */
+	DEVCB_NULL,                                         /* Port A write */
+	DEVCB_DRIVER_MEMBER(tx1_state,tx1_ppi_portb_r),     /* Port B read */
+	DEVCB_NULL,                                         /* Port B write */
+	DEVCB_INPUT_PORT("PPI_PORTC"),                      /* Port C read */
+	DEVCB_DRIVER_MEMBER(tx1_state,tx1_coin_cnt_w)       /* Port C write */
 };
 
 
@@ -503,7 +503,7 @@ static I8255A_INTERFACE( tx1_ppi8255_intf )
 static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
-	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_SHARE("nvram")
+	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x06000, 0x06fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("rcram")

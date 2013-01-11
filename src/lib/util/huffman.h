@@ -78,11 +78,11 @@ protected:
 	// a node in the huffman tree
 	struct node_t
 	{
-		node_t *			m_parent;				// pointer to parent node
-		UINT32				m_count;				// number of hits on this node
-		UINT32				m_weight;				// assigned weight of this node
-		UINT32				m_bits;					// bits used to encode the node
-		UINT8				m_numbits;				// number of bits needed for this node
+		node_t *            m_parent;               // pointer to parent node
+		UINT32              m_count;                // number of hits on this node
+		UINT32              m_weight;               // assigned weight of this node
+		UINT32              m_bits;                 // bits used to encode the node
+		UINT8               m_numbits;              // number of bits needed for this node
 	};
 
 	// construction/destruction
@@ -108,13 +108,13 @@ protected:
 
 protected:
 	// internal state
-	UINT32					m_numcodes;				// number of total codes being processed
-	UINT8					m_maxbits;				// maximum bits per code
-	UINT8					m_prevdata;				// value of the previous data (for delta-RLE encoding)
-	int						m_rleremaining;			// number of RLE bytes remaining (for delta-RLE encoding)
-	lookup_value *			m_lookup;				// pointer to the lookup table
-	UINT32 *				m_datahisto;			// histogram of data values
-	node_t *				m_huffnode;				// array of nodes
+	UINT32                  m_numcodes;             // number of total codes being processed
+	UINT8                   m_maxbits;              // maximum bits per code
+	UINT8                   m_prevdata;             // value of the previous data (for delta-RLE encoding)
+	int                     m_rleremaining;         // number of RLE bytes remaining (for delta-RLE encoding)
+	lookup_value *          m_lookup;               // pointer to the lookup table
+	UINT32 *                m_datahisto;            // histogram of data values
+	node_t *                m_huffnode;             // array of nodes
 };
 
 
@@ -141,8 +141,8 @@ public:
 
 private:
 	// array versions of the info we need
-	UINT32					m_datahisto_array[_NumCodes];
-	node_t					m_huffnode_array[_NumCodes * 2];
+	UINT32                  m_datahisto_array[_NumCodes];
+	node_t                  m_huffnode_array[_NumCodes * 2];
 };
 
 
@@ -166,8 +166,8 @@ public:
 
 private:
 	// array versions of the info we need
-	node_t					m_huffnode_array[_NumCodes];
-	lookup_value			m_lookup_array[1 << _MaxBits];
+	node_t                  m_huffnode_array[_NumCodes];
+	lookup_value            m_lookup_array[1 << _MaxBits];
 };
 
 

@@ -38,9 +38,9 @@ static const gfx_layout layout_16x8x8_2 =
 	16,8,
 	0x400000/(16*8),
 	8,
-	{	STEP8(0,1)		},
-	{	STEP16(0,8)		},
-	{	STEP8(0,16*8)	},
+	{   STEP8(0,1)      },
+	{   STEP16(0,8)     },
+	{   STEP8(0,16*8)   },
 	16*8*8
 };
 
@@ -153,11 +153,11 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 
 		case 0xca/2:
 		{
-			UINT32 src	=	(st0020_blitram[0xc0/2] + (st0020_blitram[0xc2/2] << 16)) << 1;
-			UINT32 dst	=	(st0020_blitram[0xc4/2] + (st0020_blitram[0xc6/2] << 16)) << 4;
-			UINT32 len	=	(st0020_blitram[0xc8/2]) << 4;
+			UINT32 src  =   (st0020_blitram[0xc0/2] + (st0020_blitram[0xc2/2] << 16)) << 1;
+			UINT32 dst  =   (st0020_blitram[0xc4/2] + (st0020_blitram[0xc6/2] << 16)) << 4;
+			UINT32 len  =   (st0020_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	memregion(":st0020")->base();
+			UINT8 *rom  =   memregion(":st0020")->base();
 
 
 			if (!rom)
@@ -166,14 +166,14 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 				return;
 			}
 
-			size_t size	=	memregion(":st0020")->bytes();
+			size_t size =   memregion(":st0020")->bytes();
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
 				memcpy( &m_st0020_gfxram[dst/2], &rom[src], len );
 
-				if (len % (16*8))	len = len / (16*8) + 1;
-				else				len = len / (16*8);
+				if (len % (16*8))   len = len / (16*8) + 1;
+				else                len = len / (16*8);
 
 				dst /= 16*8;
 				while (len--)
@@ -258,8 +258,8 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 {
 	/* Sprites list */
 	UINT16 *spriteram16_2 = m_st0020_spriteram;
-	UINT16 *s1	=	spriteram16_2;
-	UINT16 *end1	=	spriteram16_2 + 0x02000/2;
+	UINT16 *s1  =   spriteram16_2;
+	UINT16 *end1    =   spriteram16_2 + 0x02000/2;
 
 	priority <<= 4;
 
@@ -271,18 +271,18 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 
 		if (!m_is_st0032)
 		{
-			xoffs	=		s1[ 0 ];
-			yoffs	=		s1[ 1 ];
-			sprite	=		s1[ 2 ];
-			num		=		s1[ 3 ] % 0x101; // how many?
+			xoffs   =       s1[ 0 ];
+			yoffs   =       s1[ 1 ];
+			sprite  =       s1[ 2 ];
+			num     =       s1[ 3 ] % 0x101; // how many?
 		}
 		else
 		{
 			// these seem to be swapped around on the st0032
-			xoffs	=		s1[ 2 ];
-			yoffs	=		s1[ 3 ];
-			sprite	=		s1[ 1 ];
-			num		=		s1[ 0 ] % 0x101; // how many?
+			xoffs   =       s1[ 2 ];
+			yoffs   =       s1[ 3 ];
+			sprite  =       s1[ 1 ];
+			num     =       s1[ 0 ] % 0x101; // how many?
 
 		}
 
@@ -296,20 +296,20 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 
 		for( ; num > 0; num--,s2+=16/2 )
 		{
-			code	=	spriteram16_2[(spritebase + s2 + 0 )&0x3ffff];
-			attr	=	spriteram16_2[(spritebase + s2 + 1 )&0x3ffff];
-			sx		=	spriteram16_2[(spritebase + s2 + 2 )&0x3ffff];
-			sy		=	spriteram16_2[(spritebase + s2 + 3 )&0x3ffff];
-			zoom	=	spriteram16_2[(spritebase + s2 + 4 )&0x3ffff];
-			size	=	spriteram16_2[(spritebase + s2 + 5 )&0x3ffff];
+			code    =   spriteram16_2[(spritebase + s2 + 0 )&0x3ffff];
+			attr    =   spriteram16_2[(spritebase + s2 + 1 )&0x3ffff];
+			sx      =   spriteram16_2[(spritebase + s2 + 2 )&0x3ffff];
+			sy      =   spriteram16_2[(spritebase + s2 + 3 )&0x3ffff];
+			zoom    =   spriteram16_2[(spritebase + s2 + 4 )&0x3ffff];
+			size    =   spriteram16_2[(spritebase + s2 + 5 )&0x3ffff];
 
 
 
 			if (priority != (size & 0xf0))
 				break;
 
-			flipx	=	(attr & 0x8000);
-			flipy	=	(attr & 0x4000);
+			flipx   =   (attr & 0x8000);
+			flipy   =   (attr & 0x4000);
 
 /*
             if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
@@ -322,7 +322,7 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
             }
 */
 
-			color	=	(attr & 0x0400) ? attr : attr * 4;
+			color   =   (attr & 0x0400) ? attr : attr * 4;
 
 			/* Single-sprite tile size */
 			xnum = 1 << ((size >> 0) & 3);
@@ -330,21 +330,21 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 
 			xnum = (xnum + 1) / 2;
 
-			if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
-			else		{ xstart = 0;       xend = xnum;  xinc = +1; }
+			if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
+			else        { xstart = 0;       xend = xnum;  xinc = +1; }
 
-			if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
-			else		{ ystart = 0;       yend = ynum;  yinc = +1; }
+			if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
+			else        { ystart = 0;       yend = ynum;  yinc = +1; }
 
 			/* Apply global offsets */
-			sx	+=	xoffs;
-			sy	+=	yoffs;
+			sx  +=  xoffs;
+			sy  +=  yoffs;
 
 			/* Sign extend the position */
-			sx	=	(sx & 0x1ff) - (sx & 0x200);
-			sy	=	(sy & 0x1ff) - (sy & 0x200);
+			sx  =   (sx & 0x1ff) - (sx & 0x200);
+			sy  =   (sy & 0x1ff) - (sy & 0x200);
 
-			sy	=	-sy;
+			sy  =   -sy;
 
 			// otherwise everything is off-screen
 			if (m_is_jclub2)
@@ -354,16 +354,16 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			sx <<= 16;
 			sy <<= 16;
 
-			xdim	=	( ( ((zoom >> 0) & 0xff) + 1) << 16 ) / xnum;
-			ydim	=	( ( ((zoom >> 8) & 0xff) + 1) << 16 ) / ynum;
+			xdim    =   ( ( ((zoom >> 0) & 0xff) + 1) << 16 ) / xnum;
+			ydim    =   ( ( ((zoom >> 8) & 0xff) + 1) << 16 ) / ynum;
 
-			xscale	=	xdim / 16;
-			yscale	=	ydim / 8;
+			xscale  =   xdim / 16;
+			yscale  =   ydim / 8;
 
 			/* Let's approximate to the nearest greater integer value
-               to avoid holes in between tiles */
-			if (xscale & 0xffff)	xscale += (1<<16) / 16;
-			if (yscale & 0xffff)	yscale += (1<<16) / 8;
+			   to avoid holes in between tiles */
+			if (xscale & 0xffff)    xscale += (1<<16) / 16;
+			if (yscale & 0xffff)    yscale += (1<<16) / 8;
 
 			/* Draw the tiles */
 
@@ -383,18 +383,18 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 
 
 #if 0 /* doesn't compile in a device context (can't use ui_draw_text? */
-			if (machine.input().code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
+			if (machine.input().code_pressed(KEYCODE_Z))    /* Display some info on each sprite */
 			{
 				char buf[10];
 				sprintf(buf, "%X",size);
 				ui_draw_text(&machine.render().ui_container(), buf, sx / 0x10000, sy / 0x10000);
 			}
 #endif
-		}	/* single-sprites */
+		}   /* single-sprites */
 
 
 
-	}	/* sprites list */
+	}   /* sprites list */
 }
 
 
@@ -404,4 +404,3 @@ void st0020_device::st0020_draw_all(running_machine &machine, bitmap_ind16 &bitm
 	for (int pri = 0; pri <= 0xf; pri++)
 		st0020_draw_zooming_sprites(machine, bitmap, cliprect, pri);
 }
-

@@ -77,9 +77,9 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 	m_p_ram[offset] = data;
 	switch( offset )
 	{
-	case SM8521_P2:		switch( ( m_p_ram[SM8521_P1] << 8 ) | data )
+	case SM8521_P2:     switch( ( m_p_ram[SM8521_P1] << 8 ) | data )
 				{
-				case 0xFBFF:	/* column #0 */
+				case 0xFBFF:    /* column #0 */
 						/* P0 bit 0 cleared => 01 */
 						/* P0 bit 1 cleared => 0E */
 						/* P0 bit 2 cleared => 1B */
@@ -92,43 +92,43 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 						/* P1 bit 1 cleared => */
 					handle_stylus_press(0);
 					break;
-				case 0xF7FF:	/* column #1 */
+				case 0xF7FF:    /* column #1 */
 					handle_stylus_press(1);
 					break;
-				case 0xEFFF:	/* column #2 */
+				case 0xEFFF:    /* column #2 */
 					handle_stylus_press(2);
 					break;
-				case 0xDFFF:	/* column #3 */
+				case 0xDFFF:    /* column #3 */
 					handle_stylus_press(3);
 					break;
-				case 0xBFFF:	/* column #4 */
+				case 0xBFFF:    /* column #4 */
 					handle_stylus_press(4);
 					break;
-				case 0x7FFF:	/* column #5 */
+				case 0x7FFF:    /* column #5 */
 					handle_stylus_press(5);
 					break;
-				case 0xFFFE:	/* column #6 */
+				case 0xFFFE:    /* column #6 */
 					handle_stylus_press(6);
 					break;
-				case 0xFFFD:	/* column #7 */
+				case 0xFFFD:    /* column #7 */
 					handle_stylus_press(7);
 					break;
-				case 0xFFFB:	/* column #8 */
+				case 0xFFFB:    /* column #8 */
 					handle_stylus_press(8);
 					break;
-				case 0xFFF7:	/* column #9 */
+				case 0xFFF7:    /* column #9 */
 					handle_stylus_press(9);
 					break;
-				case 0xFFEF:	/* column #10 */
+				case 0xFFEF:    /* column #10 */
 					handle_stylus_press(10);
 					break;
-				case 0xFFDF:	/* column #11 */
+				case 0xFFDF:    /* column #11 */
 					handle_stylus_press(11);
 					break;
-				case 0xFFBF:	/* column #12 */
+				case 0xFFBF:    /* column #12 */
 					handle_stylus_press(12);
 					break;
-				case 0xFF7F:	/* keys #1 */
+				case 0xFF7F:    /* keys #1 */
 						/* P0 bit 0 cleared => 83 (up) */
 						/* P0 bit 1 cleared => 84 (down) */
 						/* P0 bit 2 cleared => 85 (left) */
@@ -142,7 +142,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 					m_p_ram[SM8521_P0] = ioport("IN0")->read();
 					m_p_ram[SM8521_P1] = (m_p_ram[SM8521_P1] & 0xFC) | ( ioport("IN1")->read() & 3 );
 					break;
-				case 0xFFFF:	/* keys #2 */
+				case 0xFFFF:    /* keys #2 */
 						/* P0 bit 0 cleared => 88 (power) */
 						/* P0 bit 1 cleared => 8E (button D) */
 						/* P0 bit 2 cleared => A0 */
@@ -186,7 +186,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 	offset += 0x20;
 	switch( offset )
 	{
-	case SM8521_MMU0:	/* disable bootstrap ROM? most likely not written to on game.com */
+	case SM8521_MMU0:   /* disable bootstrap ROM? most likely not written to on game.com */
 		logerror( "Write to MMU0\n" );
 		break;
 	case SM8521_MMU1:
@@ -224,7 +224,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 		m_timer[1].state_count = 0;
 		m_p_ram[SM8521_TM1D] = 0;
 		break;
-	case SM8521_CLKT:	/* bit 6-7 */
+	case SM8521_CLKT:   /* bit 6-7 */
 		if ( data & 0x80 )
 		{
 			/* timer run */
@@ -633,4 +633,3 @@ DEVICE_IMAGE_LOAD( gamecom_cart2 )
 	if (filesize < 0x1c0000) { memcpy(state->m_cartridge2 + 0x100000, state->m_cartridge2, 0x100000); } /* -> >=1.8MB */
 	return IMAGE_INIT_PASS;
 }
-

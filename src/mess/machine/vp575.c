@@ -60,37 +60,37 @@ WRITE_LINE_MEMBER( vp575_device::exp5_dma_in_w ) { m_dma_in[4] = state; update_i
 
 static VIP_EXPANSION_INTERFACE( expansion1_intf )
 {
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp1_int_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp1_dma_out_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp1_dma_in_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp1_int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp1_dma_out_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp1_dma_in_w)
 };
 
 static VIP_EXPANSION_INTERFACE( expansion2_intf )
 {
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp2_int_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp2_dma_out_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp2_dma_in_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp2_int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp2_dma_out_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp2_dma_in_w)
 };
 
 static VIP_EXPANSION_INTERFACE( expansion3_intf )
 {
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp3_int_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp3_dma_out_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp3_dma_in_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp3_int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp3_dma_out_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp3_dma_in_w)
 };
 
 static VIP_EXPANSION_INTERFACE( expansion4_intf )
 {
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp4_int_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp4_dma_out_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp4_dma_in_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp4_int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp4_dma_out_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp4_dma_in_w)
 };
 
 static VIP_EXPANSION_INTERFACE( expansion5_intf )
 {
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp5_int_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp5_dma_out_w),
-    DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp5_dma_in_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp5_int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp5_dma_out_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vp575_device, exp5_dma_in_w)
 };
 
 
@@ -99,11 +99,11 @@ static VIP_EXPANSION_INTERFACE( expansion5_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp575 )
-    MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, expansion1_intf, vip_expansion_cards, NULL, NULL)
-    MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, expansion2_intf, vip_expansion_cards, NULL, NULL)
-    MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, expansion3_intf, vip_expansion_cards, NULL, NULL)
-    MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, expansion4_intf, vip_expansion_cards, NULL, NULL)
-    MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, expansion5_intf, vip_expansion_cards, NULL, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, expansion1_intf, vip_expansion_cards, NULL, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, expansion2_intf, vip_expansion_cards, NULL, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, expansion3_intf, vip_expansion_cards, NULL, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, expansion4_intf, vip_expansion_cards, NULL, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, expansion5_intf, vip_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
 

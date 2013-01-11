@@ -74,10 +74,10 @@ public:
 	DECLARE_READ32_MEMBER(spotty_speedup_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
 
-    DECLARE_READ8_MEMBER(qs1000_p1_r);
-    DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-    DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-    DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	DECLARE_READ8_MEMBER(qs1000_p1_r);
+	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
+	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
+	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(sb2003);
 	DECLARE_DRIVER_INIT(dynabomb);
@@ -221,7 +221,7 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
 *****************************************************************************************************/
 
 static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("mainram")
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_SHARE("md_videoram")
@@ -248,7 +248,7 @@ ADDRESS_MAP_END
 /* Spotty memory map */
 
 static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("mainram")
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_SHARE("md_videoram")
@@ -426,8 +426,8 @@ static void draw_sprites(running_machine &machine, UINT32 *sprites, const rectan
 	limenko_state *state = machine.driver_data<limenko_state>();
 	int i;
 
-	UINT8 *base_gfx	= state->memregion("gfx1")->base();
-	UINT8 *gfx_max	= base_gfx + state->memregion("gfx1")->bytes();
+	UINT8 *base_gfx = state->memregion("gfx1")->base();
+	UINT8 *gfx_max  = base_gfx + state->memregion("gfx1")->bytes();
 
 	UINT8 *gfxdata;
 
@@ -457,7 +457,7 @@ static void draw_sprites(running_machine &machine, UINT32 *sprites, const rectan
 			pri = 2;
 		}
 
-		gfxdata	= base_gfx + 64 * code;
+		gfxdata = base_gfx + 64 * code;
 
 		/* Bounds checking */
 		if ( (gfxdata + width * height - 1) >= gfx_max )
@@ -749,7 +749,7 @@ static QS1000_INTERFACE( qs1000_intf )
 
 
 static MACHINE_CONFIG_START( limenko, limenko_state )
-	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(limenko_map)
 	MCFG_CPU_IO_MAP(limenko_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
@@ -777,12 +777,12 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spotty, limenko_state )
-	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
+	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(spotty_map)
 	MCFG_CPU_IO_MAP(spotty_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)	/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
 	MCFG_CPU_IO_MAP(spotty_sound_io_map)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -861,8 +861,8 @@ ROM_START( dynabomb )
 	ROM_LOAD32_BYTE( "rom.u4", 0x000003, 0x200000, CRC(88b24e3c) SHA1(5f267f08144b413b55ef5e15c52e9cda096b80e7) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
-    ROM_LOAD( "rom.u18",  0x000000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de) )
-    ROM_LOAD( "rom.u17",  0x080000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907) )
+	ROM_LOAD( "rom.u18",  0x000000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de) )
+	ROM_LOAD( "rom.u17",  0x080000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907) )
 	ROM_LOAD( "qs1003.u4",0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 	// U19 empty
 	// U20 empty
@@ -888,7 +888,7 @@ ROM_START( sb2003 ) /* No specific Country/Region */
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP wavetable ROMs */
 	ROM_LOAD( "06.u18",    0x000000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
 	ROM_LOAD( "qs1003.u4", 0x200000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
-    // U17 empty
+	// U17 empty
 	// U19 empty
 	// U20 (S-ROM) empty
 ROM_END

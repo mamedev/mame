@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "okim6376.h"
 
-#define MAX_SAMPLE_CHUNK	10000
+#define MAX_SAMPLE_CHUNK    10000
 //#define MAX_WORDS           111
 
 #define OKIVERBOSE 0
@@ -23,36 +23,36 @@
 /* struct describing a single playing ADPCM voice */
 struct ADPCMVoice
 {
-	UINT8 playing;			/* 1 if we are actively playing */
+	UINT8 playing;          /* 1 if we are actively playing */
 
-	UINT32 base_offset;		/* pointer to the base memory location */
-	UINT32 sample;			/* current sample number */
-	UINT32 count;			/* total samples to play */
+	UINT32 base_offset;     /* pointer to the base memory location */
+	UINT32 sample;          /* current sample number */
+	UINT32 count;           /* total samples to play */
 
-	UINT32 volume;			/* output volume */
+	UINT32 volume;          /* output volume */
 	INT32 signal;
 	INT32 step;
 };
 
 struct okim6376_state
 {
-	#define OKIM6376_VOICES		2
+	#define OKIM6376_VOICES     2
 	struct ADPCMVoice voice[OKIM6376_VOICES];
 	INT32 command[OKIM6376_VOICES];
-	INT32 latch;			/* Command data is held before transferring to either channel */
+	INT32 latch;            /* Command data is held before transferring to either channel */
 	UINT8 stage[OKIM6376_VOICES];/* If a sample is playing, flag that we have a command staged */
-	UINT8 *region_base;		/* pointer to the base of the region */
-	sound_stream *stream;	/* which stream are we playing on? */
-	UINT32 master_clock;	/* master clock frequency */
-	UINT8 divisor;			/* can be 8,10,16, and is read out of ROM data */
+	UINT8 *region_base;     /* pointer to the base of the region */
+	sound_stream *stream;   /* which stream are we playing on? */
+	UINT32 master_clock;    /* master clock frequency */
+	UINT8 divisor;          /* can be 8,10,16, and is read out of ROM data */
 	UINT8 channel;
-	UINT8 nar;				/* Next Address Ready */
+	UINT8 nar;              /* Next Address Ready */
 	UINT8 nartimer;
 	UINT8 busy;
-	UINT8 ch2;				/* 2CH pin - enables Channel 2 operation */
-	UINT8 st;				/* STart */
-	UINT8 st_pulses;		/* Keep track of attenuation */
-	UINT8 ch2_update;		/* Pulse shape */
+	UINT8 ch2;              /* 2CH pin - enables Channel 2 operation */
+	UINT8 st;               /* STart */
+	UINT8 st_pulses;        /* Keep track of attenuation */
+	UINT8 ch2_update;       /* Pulse shape */
 	UINT8 st_update;
 };
 
@@ -67,9 +67,9 @@ static int diff_lookup[49*16];
    channel*/
 static const int volume_table[3] =
 {
-	0x20,	//   0 dB
-	0x10,	//  -6.0 dB
-	0x08,	// -12.0 dB
+	0x20,   //   0 dB
+	0x10,   //  -6.0 dB
+	0x08,   // -12.0 dB
 };
 
 /* divisor lookup table. When an individual word is selected, it can be assigned one of three different 'rates'.
@@ -125,9 +125,9 @@ static void compute_tables(void)
 		{
 			diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
 				(stepval   * nbl2bit[nib][1] +
-				 stepval/2 * nbl2bit[nib][2] +
-				 stepval/4 * nbl2bit[nib][3] +
-				 stepval/8);
+					stepval/2 * nbl2bit[nib][2] +
+					stepval/4 * nbl2bit[nib][3] +
+					stepval/8);
 		}
 	}
 
@@ -622,7 +622,7 @@ const device_type OKIM6376 = &device_creator<okim6376_device>;
 
 okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(okim6376_state);
 }
@@ -664,5 +664,3 @@ void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

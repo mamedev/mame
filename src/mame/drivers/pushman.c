@@ -223,25 +223,25 @@ static INPUT_PORTS_START( pushman )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Debug Mode (Cheat)") 		PORT_DIPLOCATION("SW1:1")	 /* Listed as "Screen Skip" */
+	PORT_DIPNAME( 0x0001, 0x0001, "Debug Mode (Cheat)")         PORT_DIPLOCATION("SW1:1")    /* Listed as "Screen Skip" */
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Pull Option" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x0002, 0x0002, "Pull Option" )           PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, "5" )
 	PORT_DIPSETTING(      0x0000, "9" )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Level_Select ) ) 	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Level_Select ) )     PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0020, IP_ACTIVE_LOW, "SW1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
@@ -250,7 +250,7 @@ static INPUT_PORTS_START( pushman )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW2:5" )
@@ -265,16 +265,16 @@ static INPUT_PORTS_START( bballs )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Open/Close Gate")	// Open/Close gate
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Zap")	// Use Zap
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Open/Close Gate")   // Open/Close gate
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Zap")   // Use Zap
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	// BUTTON3 in "test mode"
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )  // BUTTON3 in "test mode"
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Open/Close Gate")	// Open/Close gate
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Zap")	// Use Zap
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Open/Close Gate")   // Open/Close gate
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Zap")   // Use Zap
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // BUTTON3 in "test mode"
 
@@ -290,7 +290,7 @@ static INPUT_PORTS_START( bballs )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -299,33 +299,33 @@ static INPUT_PORTS_START( bballs )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )			// less bubbles before cycling
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )			// more bubbles before cycling
-	PORT_DIPNAME( 0x0010, 0x0000, "Music (In-game)" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )         // less bubbles before cycling
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )         // more bubbles before cycling
+	PORT_DIPNAME( 0x0010, 0x0000, "Music (In-game)" )       PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, "Music (Attract Mode)" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0000, "Music (Attract Mode)" )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(      0x00c0, "1" )
 	PORT_DIPSETTING(      0x0080, "2" )
 	PORT_DIPSETTING(      0x0040, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0100, 0x0100, "Zaps" )				PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x0100, 0x0100, "Zaps" )              PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0x0200, 0x0000, "Display Next Ball" ) 		PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0200, 0x0000, "Display Next Ball" )         PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0400, 0x0400, "SW2:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW2:5" )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:6")	// code at 0x0054ac, 0x0054f2, 0x0056fc
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")   // code at 0x0054ac, 0x0054f2, 0x0056fc
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Service_Mode ) ) 	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Service_Mode ) )     PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0xc000, DEF_STR( Off ) )
 //  PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, "Inputs/Outputs" )
@@ -376,9 +376,9 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( pushman )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,   0x300, 16 )	/* colors 0x300-0x33f */
-	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout, 0x200, 16 )	/* colors 0x200-0x2ff */
-	GFXDECODE_ENTRY( "gfx3", 0x000000, tilelayout,   0x100, 16 )	/* colors 0x100-0x1ff */
+	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,   0x300, 16 )    /* colors 0x300-0x33f */
+	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout, 0x200, 16 )    /* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( "gfx3", 0x000000, tilelayout,   0x100, 16 )    /* colors 0x100-0x1ff */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( pushman, pushman_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* ElSemi. Reversed the CPU order so the sound callback works with bballs */
-	MCFG_CPU_ADD("mcu", M68705, 4000000)	/* No idea */
+	MCFG_CPU_ADD("mcu", M68705, 4000000)    /* No idea */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
@@ -541,7 +541,7 @@ ROM_START( pushman )
 	ROM_LOAD( "pushman.007", 0x20000, 0x10000, CRC(b70020bd) SHA1(218ca4a08b87b7dc5c1eed99960f4098c4fc7e0c) )
 	ROM_LOAD( "pushman.009", 0x30000, 0x10000, CRC(cc555667) SHA1(6c79e14fc18d1d836392044779cb3219494a3447) )
 
-	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
+	ROM_REGION( 0x10000, "gfx4", 0 )    /* bg tilemaps */
 	ROM_LOAD( "pushman.010", 0x00000, 0x08000, CRC(a500132d) SHA1(26b02c9fea69b51c5f7dc1b43b838cd336ebf862) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
@@ -574,7 +574,7 @@ ROM_START( pushmana )
 	ROM_LOAD( "pushman.007", 0x20000, 0x10000, CRC(b70020bd) SHA1(218ca4a08b87b7dc5c1eed99960f4098c4fc7e0c) ) // .132
 	ROM_LOAD( "pushman.009", 0x30000, 0x10000, CRC(cc555667) SHA1(6c79e14fc18d1d836392044779cb3219494a3447) ) // .149
 
-	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
+	ROM_REGION( 0x10000, "gfx4", 0 )    /* bg tilemaps */
 	ROM_LOAD( "pushmana.189", 0x00000, 0x10000, CRC(59f25598) SHA1(ace33afd6e6d07376ed01048db99b13bcec790d7) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
@@ -607,7 +607,7 @@ ROM_START( pushmans )
 	ROM_LOAD( "pman-7.ic132", 0x20000, 0x10000, CRC(208cb197) SHA1(161633b6b0acf25447a5c0b3c6fbf18adc6e2243) )
 	ROM_LOAD( "pman-9.ic149", 0x30000, 0x10000, CRC(77ee8577) SHA1(63d13683dd097d8e7cb71ad3abe04e11f2a58bd3) )
 
-	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
+	ROM_REGION( 0x10000, "gfx4", 0 )    /* bg tilemaps */
 	ROM_LOAD( "pman-10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
@@ -640,7 +640,7 @@ ROM_START( pushmant ) /* Single plane PCB */
 	ROM_LOAD( "7.ic132", 0x20000, 0x10000, CRC(208cb197) SHA1(161633b6b0acf25447a5c0b3c6fbf18adc6e2243) )
 	ROM_LOAD( "9.ic149", 0x30000, 0x10000, CRC(77ee8577) SHA1(63d13683dd097d8e7cb71ad3abe04e11f2a58bd3) )
 
-	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
+	ROM_REGION( 0x10000, "gfx4", 0 )    /* bg tilemaps */
 	ROM_LOAD( "10.ic189", 0x00000, 0x08000, CRC(5f9ae9a1) SHA1(87619918c28c942780f6dbd3818d4cc69932eefc) ) /* Same as the Sammy set */
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
@@ -673,11 +673,11 @@ ROM_START( bballs )
 	ROM_LOAD( "bb7.h2", 0x20000, 0x10000, CRC(a352d53b) SHA1(c71e976b7c28630d7af11fffe0d1cfd7d611ee8b) )
 	ROM_LOAD( "bb9.j2", 0x30000, 0x10000, CRC(78d185ac) SHA1(6ed6e1f5eeb93129eeeab6bae22b640c9782f7fc) )
 
-	ROM_REGION( 0x10000, "gfx4", 0 )	/* bg tilemaps */
+	ROM_REGION( 0x10000, "gfx4", 0 )    /* bg tilemaps */
 	ROM_LOAD( "bb10.l6", 0x00000, 0x08000, CRC(d06498f9) SHA1(9f33bbc40ebe11c03aec29289f76f1c3ca5bf009) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* this is the same as tiger road / f1-dream */
-	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) N82S129 BPROM */
+	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) N82S129 BPROM */
 ROM_END
 
 GAME( 1990, pushman,  0,       pushman, pushman, driver_device, 0, ROT0, "Comad", "Pushman (Korea, set 1)", GAME_SUPPORTS_SAVE )

@@ -15,7 +15,7 @@
 
 struct serial_port_interface
 {
-	devcb_write_line	m_out_rx_cb;
+	devcb_write_line    m_out_rx_cb;
 };
 
 class device_serial_port_interface : public device_slot_card_interface
@@ -56,11 +56,11 @@ extern const device_type SERIAL_PORT;
 
 struct rs232_port_interface
 {
-	devcb_write_line	m_out_rx_cb;
-	devcb_write_line	m_out_dcd_cb;
-	devcb_write_line	m_out_dsr_cb;
-	devcb_write_line	m_out_ri_cb;
-	devcb_write_line	m_out_cts_cb;
+	devcb_write_line    m_out_rx_cb;
+	devcb_write_line    m_out_dcd_cb;
+	devcb_write_line    m_out_dsr_cb;
+	devcb_write_line    m_out_ri_cb;
+	devcb_write_line    m_out_cts_cb;
 };
 
 class device_rs232_port_interface : public device_serial_port_interface

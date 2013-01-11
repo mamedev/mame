@@ -4,7 +4,7 @@
 <!--
 
 Titles, serial #s, publishers and release dates taken from:
-  - Oh!FM-7 ( http://retropc.net/fm-7/ )
+	- Oh!FM-7 ( http://retropc.net/fm-7/ )
 
 -->
 
@@ -562,9 +562,9 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="probbfan">
 <!-- Keys listed in readme:
 キー操作/ 1P/ テンキー:方向 "_"キー:Aボタン ":"キー:Bボタン
-     2P/ Rキー:↑ Vキー:↓ Gキー:→ Dキー:←
-     F1～F5:各種コマンド
-     操作の要領は基本的にファミスタ準拠 -->
+		2P/ Rキー:↑ Vキー:↓ Gキー:→ Dキー:←
+		F1～F5:各種コマンド
+		操作の要領は基本的にファミスタ準拠 -->
 		<description>Pro Yakyu Fan</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -1129,7 +1129,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>Kyoto Media</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="hfe87210 (a).d77" size="348848" crc="1adb0fae" sha1="c6d25f73a7e14bfa7993d429528758aa801a6f9b" offset="0"/>
+				<rom name="hfe87210 (a).d77" size="348848" crc="1adb0fae" sha1="c6d25f73a7e14bfa7993d429528758aa801a6f9b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

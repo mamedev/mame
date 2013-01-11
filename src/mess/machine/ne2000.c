@@ -19,7 +19,7 @@ machine_config_constructor ne2000_device::device_mconfig_additions() const {
 }
 
 ne2000_device::ne2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-        : device_t(mconfig, NE2000, "NE2000 Network Adapter", tag, owner, clock),
+		: device_t(mconfig, NE2000, "NE2000 Network Adapter", tag, owner, clock),
 		device_isa16_card_interface(mconfig, *this),
 		m_dp8390(*this, "dp8390d") {
 }
@@ -45,7 +45,7 @@ READ16_MEMBER(ne2000_device::ne2000_port_r) {
 	if(offset < 16) {
 		m_dp8390->dp8390_cs(CLEAR_LINE);
 		return m_dp8390->dp8390_r(space, offset, 0xff) |
-			   m_dp8390->dp8390_r(space, offset+1, 0xff) << 8;
+				m_dp8390->dp8390_r(space, offset+1, 0xff) << 8;
 	}
 	if(mem_mask == 0xff00) offset++;
 	switch(offset) {

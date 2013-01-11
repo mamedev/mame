@@ -27,7 +27,7 @@
 //**************************************************************************
 
 class epson_tf20_device : public device_t,
-                          public device_epson_sio_interface
+							public device_epson_sio_interface
 {
 public:
 	// construction/destruction

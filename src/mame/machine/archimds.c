@@ -169,7 +169,7 @@ void archimedes_state::vidc_audio_tick()
 		372,   356,   340,   324,   308,   292,   276,   260,
 		244,   228,   212,   196,   180,   164,   148,   132,
 		120,   112,   104,    96,    88,    80,    72,    64,
-		 56,    48,    40,    32,    24,    16,     8,     0
+			56,    48,    40,    32,    24,    16,     8,     0
 	};
 
 	for(ch=0;ch<8;ch++)
@@ -207,7 +207,7 @@ void archimedes_state::a310_set_timer(int tmr)
 	{
 		case 0:
 		case 1:
-            m_timer[tmr]->adjust(attotime::from_usec(m_ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
+			m_timer[tmr]->adjust(attotime::from_usec(m_ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
 			break;
 		case 2:
 			freq = 1000000.0 / (double)(m_ioc_timercnt[tmr]+1);
@@ -243,12 +243,12 @@ void archimedes_state::archimedes_reset()
 {
 	int i;
 
-	m_memc_latchrom = 1;			// map in the boot ROM
+	m_memc_latchrom = 1;            // map in the boot ROM
 
 	// kill all memc mappings
 	for (i = 0; i < (32*1024*1024)/(4096); i++)
 	{
-		m_memc_pages[i] = -1;		// indicate unmapped
+		m_memc_pages[i] = -1;       // indicate unmapped
 	}
 
 	m_ioc_regs[IRQ_STATUS_A] = 0x10 | 0x80; //set up POR (Power On Reset) and Force IRQ at start-up
@@ -367,20 +367,20 @@ READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 
 		if (m_memc_pages[page] != -1)
 		{
-            /******************* DRAM Emulator - gal20v - Aristocrat Mark 5 ************************
-            A Dynamic RAM emulator is provided which avoids the need to execute code
-            in DRAM in those regulatory environments where it is not needed.
+			/******************* DRAM Emulator - gal20v - Aristocrat Mark 5 ************************
+			A Dynamic RAM emulator is provided which avoids the need to execute code
+			in DRAM in those regulatory environments where it is not needed.
 
-            When pin 5 of U36 ( gal20v ) is low, the pin 25 output is high and enables the
-            logic buffer inputs and provides a fixed jmp address to a plurality
-            of rom addresses ( 0xEAD0000A  shown on logic buffer arrangement in schematics )
+			When pin 5 of U36 ( gal20v ) is low, the pin 25 output is high and enables the
+			logic buffer inputs and provides a fixed jmp address to a plurality
+			of rom addresses ( 0xEAD0000A  shown on logic buffer arrangement in schematics )
 
-            In this state, DRAM memory space is disabled.
+			In this state, DRAM memory space is disabled.
 
-            ****************************************************************************************/
-            if(!(m_memc_pages[page] & 0x10)  && (offset <= 0x3ff))
-                return 0xEAD0000A;
-            return m_archimedes_memc_physmem[((m_memc_pages[page] * page_sizes[m_memc_pagesize]) + poffs)>>2];
+			****************************************************************************************/
+			if(!(m_memc_pages[page] & 0x10)  && (offset <= 0x3ff))
+				return 0xEAD0000A;
+			return m_archimedes_memc_physmem[((m_memc_pages[page] * page_sizes[m_memc_pagesize]) + poffs)>>2];
 		}
 		else
 		{
@@ -401,44 +401,44 @@ void archimedes_state::archimedes_driver_init()
 
 static const char *const ioc_regnames[] =
 {
-	"(rw) Control",					// 0
-	"(read) Keyboard receive (write) keyboard send",	// 1
+	"(rw) Control",                 // 0
+	"(read) Keyboard receive (write) keyboard send",    // 1
 	"?",
 	"?",
-	"(read) IRQ status A",				// 4
-	"(read) IRQ request A (write) IRQ clear",	// 5
-	"(rw) IRQ mask A",				// 6
+	"(read) IRQ status A",              // 4
+	"(read) IRQ request A (write) IRQ clear",   // 5
+	"(rw) IRQ mask A",              // 6
 	"?",
-	"(read) IRQ status B",		// 8
-	"(read) IRQ request B",		// 9
-	"(rw) IRQ mask B",		// 10
+	"(read) IRQ status B",      // 8
+	"(read) IRQ request B",     // 9
+	"(rw) IRQ mask B",      // 10
 	"?",
-	"(read) FIQ status",		// 12
-	"(read) FIQ request",		// 13
-	"(rw) FIQ mask",		// 14
+	"(read) FIQ status",        // 12
+	"(read) FIQ request",       // 13
+	"(rw) FIQ mask",        // 14
 	"?",
-	"(read) Timer 0 count low (write) Timer 0 latch low",		// 16
-	"(read) Timer 0 count high (write) Timer 0 latch high",		// 17
-	"(write) Timer 0 go command",					// 18
-	"(write) Timer 0 latch command",				// 19
-	"(read) Timer 1 count low (write) Timer 1 latch low",		// 20
-	"(read) Timer 1 count high (write) Timer 1 latch high",		// 21
-	"(write) Timer 1 go command",					// 22
-	"(write) Timer 1 latch command",				// 23
-	"(read) Timer 2 count low (write) Timer 2 latch low",		// 24
-	"(read) Timer 2 count high (write) Timer 2 latch high",		// 25
-	"(write) Timer 2 go command",					// 26
-	"(write) Timer 2 latch command",				// 27
-	"(read) Timer 3 count low (write) Timer 3 latch low",		// 28
-	"(read) Timer 3 count high (write) Timer 3 latch high",		// 29
-	"(write) Timer 3 go command",					// 30
-	"(write) Timer 3 latch command"					// 31
+	"(read) Timer 0 count low (write) Timer 0 latch low",       // 16
+	"(read) Timer 0 count high (write) Timer 0 latch high",     // 17
+	"(write) Timer 0 go command",                   // 18
+	"(write) Timer 0 latch command",                // 19
+	"(read) Timer 1 count low (write) Timer 1 latch low",       // 20
+	"(read) Timer 1 count high (write) Timer 1 latch high",     // 21
+	"(write) Timer 1 go command",                   // 22
+	"(write) Timer 1 latch command",                // 23
+	"(read) Timer 2 count low (write) Timer 2 latch low",       // 24
+	"(read) Timer 2 count high (write) Timer 2 latch high",     // 25
+	"(write) Timer 2 go command",                   // 26
+	"(write) Timer 2 latch command",                // 27
+	"(read) Timer 3 count low (write) Timer 3 latch low",       // 28
+	"(read) Timer 3 count high (write) Timer 3 latch high",     // 29
+	"(write) Timer 3 go command",                   // 30
+	"(write) Timer 3 latch command"                 // 31
 };
 
 void archimedes_state::latch_timer_cnt(int tmr)
 {
 	double time = m_timer[tmr]->elapsed().as_double();
-	time *= 2000000.0;	// find out how many 2 MHz ticks have gone by
+	time *= 2000000.0;  // find out how many 2 MHz ticks have gone by
 	m_ioc_timerout[tmr] = m_ioc_timercnt[tmr] - (UINT32)time;
 }
 
@@ -464,7 +464,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 			return (flyback) | (m_ioc_regs[CONTROL] & 0x7c) | (m_i2c_clk<<1) | i2c_data;
 		}
 
-		case KART:	// keyboard read
+		case KART:  // keyboard read
 			return m_kart->read(space,0);
 
 		case IRQ_STATUS_A:
@@ -522,7 +522,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 
 	switch (offset&0x1f)
 	{
-		case CONTROL:	// I2C bus control
+		case CONTROL:   // I2C bus control
 			//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
 			i2cmem_sda_write(machine().device("i2cmem"), data & 0x01);
 			i2cmem_scl_write(machine().device("i2cmem"), (data & 0x02) >> 1);
@@ -553,11 +553,11 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 		case FIQ_MASK:
 			m_ioc_regs[FIQ_MASK] = data & 0xff;
 
-		    /* bit 7 forces a FIRQ trap */
+			/* bit 7 forces a FIRQ trap */
 			archimedes_request_fiq((data & 0x80) ? ARCHIMEDES_FIQ_FORCE : 0);
 			break;
 
-		case IRQ_REQUEST_A: 	// IRQ clear A
+		case IRQ_REQUEST_A:     // IRQ clear A
 			m_ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
 
 			// check pending irqs
@@ -584,38 +584,38 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			m_ioc_regs[offset&0x1f] = data & 0xff;
 			break;
 
-		case T0_LATCH:	// Timer 0 latch
+		case T0_LATCH:  // Timer 0 latch
 			latch_timer_cnt(0);
 			break;
 
-		case T1_LATCH:	// Timer 1 latch
+		case T1_LATCH:  // Timer 1 latch
 			latch_timer_cnt(1);
 			break;
 
-		case T2_LATCH:	// Timer 2 latch
+		case T2_LATCH:  // Timer 2 latch
 			latch_timer_cnt(2);
 			break;
 
-		case T3_LATCH:	// Timer 3 latch
+		case T3_LATCH:  // Timer 3 latch
 			latch_timer_cnt(3);
 			break;
 
-		case T0_GO:	// Timer 0 start
+		case T0_GO: // Timer 0 start
 			m_ioc_timercnt[0] = m_ioc_regs[T0_LATCH_HI]<<8 | m_ioc_regs[T0_LATCH_LO];
 			a310_set_timer(0);
 			break;
 
-		case T1_GO:	// Timer 1 start
+		case T1_GO: // Timer 1 start
 			m_ioc_timercnt[1] = m_ioc_regs[T1_LATCH_HI]<<8 | m_ioc_regs[T1_LATCH_LO];
 			a310_set_timer(1);
 			break;
 
-		case T2_GO:	// Timer 2 start
+		case T2_GO: // Timer 2 start
 			m_ioc_timercnt[2] = m_ioc_regs[T2_LATCH_HI]<<8 | m_ioc_regs[T2_LATCH_LO];
 			a310_set_timer(2);
 			break;
 
-		case T3_GO:	// Timer 3 start
+		case T3_GO: // Timer 3 start
 			m_ioc_timercnt[3] = m_ioc_regs[T3_LATCH_HI]<<8 | m_ioc_regs[T3_LATCH_LO];
 			a310_set_timer(3);
 			break;
@@ -731,9 +731,9 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 
 							case 0x40: // latch A
 								if (data & 1) { wd17xx_set_drive(fdc,0); }
-								if (data & 2) {	wd17xx_set_drive(fdc,1); }
+								if (data & 2) { wd17xx_set_drive(fdc,1); }
 								if (data & 4) { wd17xx_set_drive(fdc,2); }
-								if (data & 8) {	wd17xx_set_drive(fdc,3); }
+								if (data & 8) { wd17xx_set_drive(fdc,3); }
 
 								wd17xx_set_side(fdc,(data & 0x10)>>4);
 								//bit 5 is motor on
@@ -758,19 +758,19 @@ void archimedes_state::vidc_dynamic_res_change()
 {
 	/* sanity checks - first pass */
 	/*
-        total cycles + border end
-    */
+	    total cycles + border end
+	*/
 	if(m_vidc_regs[VIDC_HCR] && m_vidc_regs[VIDC_HBER] &&
-	   m_vidc_regs[VIDC_VCR] && m_vidc_regs[VIDC_VBER])
+		m_vidc_regs[VIDC_VCR] && m_vidc_regs[VIDC_VBER])
 	{
 		/* sanity checks - second pass */
 		/*
-        total cycles >= border end >= border start
-        */
+		total cycles >= border end >= border start
+		*/
 		if((m_vidc_regs[VIDC_HCR] >= m_vidc_regs[VIDC_HBER]) &&
-		   (m_vidc_regs[VIDC_HBER] >= m_vidc_regs[VIDC_HBSR]) &&
-		   (m_vidc_regs[VIDC_VCR] >= m_vidc_regs[VIDC_VBER]) &&
-		   (m_vidc_regs[VIDC_VBER] >= m_vidc_regs[VIDC_VBSR]))
+			(m_vidc_regs[VIDC_HBER] >= m_vidc_regs[VIDC_HBSR]) &&
+			(m_vidc_regs[VIDC_VCR] >= m_vidc_regs[VIDC_VBER]) &&
+			(m_vidc_regs[VIDC_VBER] >= m_vidc_regs[VIDC_VBSR]))
 		{
 			rectangle visarea;
 			attoseconds_t refresh;
@@ -864,21 +864,21 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 	{
 		switch(reg)
 		{
-			case VIDC_HCR:  m_vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1;	break;
+			case VIDC_HCR:  m_vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1;    break;
 //          case VIDC_HSWR: m_vidc_regs[VIDC_HSWR] = (val >> 14)+1;   break;
-			case VIDC_HBSR: m_vidc_regs[VIDC_HBSR] = ((val >> 14)<<1)+1;	break;
-			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14);	break;
-			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14);	break;
-			case VIDC_HBER: m_vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;	break;
+			case VIDC_HBSR: m_vidc_regs[VIDC_HBSR] = ((val >> 14)<<1)+1;    break;
+			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14);   break;
+			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14);   break;
+			case VIDC_HBER: m_vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;    break;
 //          #define VIDC_HCSR       0x98
 //          #define VIDC_HIR        0x9c
 
-			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14)<<1)+1;	break;
+			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14)<<1)+1; break;
 //          #define VIDC_VSWR       0xa4
-			case VIDC_VBSR: m_vidc_regs[VIDC_VBSR] = (val >> 14)+1;	break;
-			case VIDC_VDSR: m_vidc_regs[VIDC_VDSR] = (val >> 14)+1;	break;
-			case VIDC_VDER: m_vidc_regs[VIDC_VDER] = (val >> 14)+1;	break;
-			case VIDC_VBER: m_vidc_regs[VIDC_VBER] = (val >> 14)+1;	break;
+			case VIDC_VBSR: m_vidc_regs[VIDC_VBSR] = (val >> 14)+1; break;
+			case VIDC_VDSR: m_vidc_regs[VIDC_VDSR] = (val >> 14)+1; break;
+			case VIDC_VDER: m_vidc_regs[VIDC_VDER] = (val >> 14)+1; break;
+			case VIDC_VBER: m_vidc_regs[VIDC_VBER] = (val >> 14)+1; break;
 //          #define VIDC_VCSR       0xb8
 //          #define VIDC_VCER       0xbc
 		}
@@ -931,7 +931,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				//logerror("MEMC: VIDEND %08x\n",vidc_vidend);
 				break;
 
-			case 4:	/* sound start */
+			case 4: /* sound start */
 				//logerror("MEMC: SNDSTART %08x\n",data);
 				archimedes_clear_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 				m_vidc_sndstart = 0x2000000 | ((data>>2)&0x7fff)*16;
@@ -947,7 +947,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				archimedes_request_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 				break;
 
-			case 7:	/* Control */
+			case 7: /* Control */
 				m_memc_pagesize = ((data>>2) & 3);
 
 				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", space.device().safe_pc(), data & 0x1ffc, page_sizes[m_memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
@@ -1057,4 +1057,3 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_page_w)
 
 //  printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", space.device().safe_pc(),memc_pagesize, data, log, phys, memc, perms);
 }
-

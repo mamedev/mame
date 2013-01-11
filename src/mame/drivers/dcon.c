@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( common )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -209,9 +209,9 @@ INPUT_PORTS_END
 
 static const gfx_layout dcon_charlayout =
 {
-	8,8,		/* 8*8 characters */
+	8,8,        /* 8*8 characters */
 	RGN_FRAC(1,2),
-	4,			/* 4 bits per pixel */
+	4,          /* 4 bits per pixel */
 	{ 0,4,(0x10000*8)+0,0x10000*8+4 },
 	{ 3,2,1,0, 11,10,9,8 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
@@ -220,9 +220,9 @@ static const gfx_layout dcon_charlayout =
 
 static const gfx_layout dcon_tilelayout =
 {
-	16,16,	/* 16*16 tiles */
+	16,16,  /* 16*16 tiles */
 	RGN_FRAC(1,1),
-	4,		/* 4 bits per pixel */
+	4,      /* 4 bits per pixel */
 	{ 8, 12, 0,4 },
 	{
 		3,2,1,0,19,18,17,16,
@@ -309,7 +309,7 @@ ROM_START( dcon )
 	ROM_LOAD16_BYTE("p1-0",   0x040000, 0x20000, CRC(3ec1ef7d) SHA1(6195f1402dba5b3d3913e97cd78ba1e8865f7692) )
 	ROM_LOAD16_BYTE("p1-1",   0x040001, 0x20000, CRC(4b8de320) SHA1(14a3ab347fc468869355951294c3e3a8f9211b6a) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )	 /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k code for sound Z80 */
 	ROM_LOAD( "fmsnd",           0x000000, 0x08000, CRC(50450faa) SHA1(d4add7d357951b51d53ed7f143ece7f3bde7f4cb) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -333,24 +333,24 @@ ROM_START( dcon )
 	ROM_LOAD( "obj2",  0x100000, 0x80000, CRC(24e0b51c) SHA1(434b4d58f785eefb5380c08a0704c8dea6609268) )
 	ROM_LOAD( "obj3",  0x180000, 0x80000, CRC(5274f02d) SHA1(69b94363624177c92e1b3413244ce649c2e5a696) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "pcm", 0x000000, 0x20000, CRC(d2133b85) SHA1(a2e61c9893da8a95c35c0b47e2c43c315b654de8) )
 ROM_END
 
 ROM_START( sdgndmps )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "911-a01.25",   0x00000, 0x20000, CRC(3362915d) SHA1(d98e2d4de402ca549664e148c9a6fe94fccfd5e9) )
 	ROM_LOAD16_BYTE( "911-a02.29",   0x00001, 0x20000, CRC(fbc78285) SHA1(85d40b0e7bb923a0daacbd78ce7d5bb9c80b9ffc) )
 	ROM_LOAD16_BYTE( "911-a03.27",   0x40000, 0x20000, CRC(6c24b4f2) SHA1(e9fb82884f47694bebcad9254cb57a0b01dcd9c8) )
 	ROM_LOAD16_BYTE( "911-a04.28",   0x40001, 0x20000, CRC(6ff9d716) SHA1(303faec19a84afd6cbcf3ca5d4877693c11d406e) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "911-a05.010",   0x00000, 0x08000, CRC(90455406) SHA1(dd2c5b96ac4b51251a3d34d97cc9af360afaa38c) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 	ROM_COPY( "audiocpu", 0,  0x18000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "911-a08.66",   0x000000, 0x10000, CRC(e7e04823) SHA1(d9b1ace5cd8218d5a4767cf5adbc267dce7c0668) )	/* chars */
+	ROM_LOAD( "911-a08.66",   0x000000, 0x10000, CRC(e7e04823) SHA1(d9b1ace5cd8218d5a4767cf5adbc267dce7c0668) ) /* chars */
 	ROM_LOAD( "911-a07.73",   0x010000, 0x10000, CRC(6f40d4a9) SHA1(8abadb2dc07ac22081b2970358e9f92b90b174b0) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
@@ -363,10 +363,10 @@ ROM_START( sdgndmps )
 	ROM_LOAD( "911-a13.64",   0x000000, 0x100000, CRC(f38a584a) SHA1(16dd8e7086949d14e9185c37313290024d6dafdc) )
 
 	ROM_REGION( 0x200000, "gfx5", 0 )
-	ROM_LOAD( "911-a10.73",   0x000000, 0x100000, CRC(80e341fb) SHA1(619e71aefd0b13a01a6a2ed5d8613fe56242d209) )	/* sprites */
+	ROM_LOAD( "911-a10.73",   0x000000, 0x100000, CRC(80e341fb) SHA1(619e71aefd0b13a01a6a2ed5d8613fe56242d209) )    /* sprites */
 	ROM_LOAD( "911-a09.74",   0x100000, 0x100000, CRC(98f34519) SHA1(20319d546df104485ee553ce0e58364f927d1135) )
 
-	ROM_REGION( 0x040000, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "911-a06.97",   0x00000, 0x40000, CRC(12c79440) SHA1(9e9987527f64dfd8a51a2ab49afc465e76c5e7ac) )
 
 	ROM_REGION( 512, "proms", 0 )

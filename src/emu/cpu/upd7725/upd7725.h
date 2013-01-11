@@ -34,14 +34,14 @@ class upd96050_device;
 
 struct necdsp_interface
 {
-	devcb_read_line		m_in_int_cb;
+	devcb_read_line     m_in_int_cb;
 	//devcb_read8       m_in_si_cb;
 	//devcb_read_line   m_in_sck_cb;
 	//devcb_read_line   m_in_sien_cb;
 	//devcb_read_line   m_in_soen_cb;
 	//devcb_read_line   m_in_dack_cb;
-	devcb_write_line	m_out_p0_cb;
-	devcb_write_line	m_out_p1_cb;
+	devcb_write_line    m_out_p0_cb;
+	devcb_write_line    m_out_p1_cb;
 	//devcb_write8      m_out_so_cb;
 	//devcb_write_line  m_out_sorq_cb;
 	//devcb_write_line  m_out_drq_cb;
@@ -117,8 +117,8 @@ private:
 		inline operator unsigned() const
 		{
 			return (rqm << 15) + (usf1 << 14) + (usf0 << 13) + (drs << 12)
-			   + (dma << 11) + (drc  << 10) + (soc  <<  9) + (sic <<  8)
-			   + (ei  <<  7) + (p1   <<  1) + (p0   <<  0);
+				+ (dma << 11) + (drc  << 10) + (soc  <<  9) + (sic <<  8)
+				+ (ei  <<  7) + (p1   <<  1) + (p0   <<  0);
 		}
 
 		inline unsigned operator=(unsigned d)
@@ -132,11 +132,11 @@ private:
 
 	struct Regs
 	{
-		UINT16 pc;			//program counter
-		UINT16 stack[16];	//LIFO
-		UINT16 rp;			//ROM pointer
-		UINT16 dp;			//data pointer
-		UINT8  sp;			//stack pointer
+		UINT16 pc;          //program counter
+		UINT16 stack[16];   //LIFO
+		UINT16 rp;          //ROM pointer
+		UINT16 dp;          //data pointer
+		UINT8  sp;          //stack pointer
 		INT16  k;
 		INT16  l;
 		INT16  m;
@@ -154,30 +154,30 @@ private:
 		UINT16 idb;
 	} regs;
 
-  void exec_op(UINT32 opcode);
-  void exec_rt(UINT32 opcode);
-  void exec_jp(UINT32 opcode);
-  void exec_ld(UINT32 opcode);
+	void exec_op(UINT32 opcode);
+	void exec_rt(UINT32 opcode);
+	void exec_jp(UINT32 opcode);
+	void exec_ld(UINT32 opcode);
 
-  void stack_push();
-  void stack_pull();
+	void stack_push();
+	void stack_pull();
 
-  int m_icount;
-  int m_irq; // old irq line state, for detecting rising edges.
+	int m_icount;
+	int m_irq; // old irq line state, for detecting rising edges.
 
-  address_space *m_program, *m_data;
-  direct_read_data *m_direct;
+	address_space *m_program, *m_data;
+	direct_read_data *m_direct;
 
 protected:
 // device callbacks
-	devcb_resolved_read_line	m_in_int_func;
+	devcb_resolved_read_line    m_in_int_func;
 	//devcb_resolved_read8      m_in_si_func;
 	//devcb_resolved_read_line  m_in_sck_func;
 	//devcb_resolved_read_line  m_in_sien_func;
 	//devcb_resolved_read_line  m_in_soen_func;
 	//devcb_resolved_read_line  m_in_dack_func;
-	devcb_resolved_write_line	m_out_p0_func;
-	devcb_resolved_write_line	m_out_p1_func;
+	devcb_resolved_write_line   m_out_p0_func;
+	devcb_resolved_write_line   m_out_p1_func;
 	//devcb_resolved_write8     m_out_so_func;
 	//devcb_resolved_write_line m_out_sorq_func;
 	//devcb_resolved_write_line m_out_drq_func;

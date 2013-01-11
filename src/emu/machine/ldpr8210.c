@@ -56,9 +56,9 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_VBLANK_VBI				0
-#define LOG_SERIAL					0
-#define LOG_SIMUTREK				0
+#define LOG_VBLANK_VBI              0
+#define LOG_SERIAL                  0
+#define LOG_SIMUTREK                0
 
 
 
@@ -67,28 +67,28 @@
 //**************************************************************************
 
 // Overlay constants, related to 720-pixel wide capture
-#define OVERLAY_GROUP0_X				(82.0f / 720.0f)
-#define OVERLAY_GROUP1_X				(162.0f / 720.0f)
-#define OVERLAY_GROUP2_X				(322.0f / 720.0f)
-#define OVERLAY_GROUP3_X				(483.0f / 720.0f)
-#define OVERLAY_Y						(104/2)
-#define OVERLAY_PIXEL_WIDTH				(4.5f / 720.0f)
-#define OVERLAY_PIXEL_HEIGHT			2
-#define OVERLAY_X_PIXELS				5
-#define OVERLAY_Y_PIXELS				7
+#define OVERLAY_GROUP0_X                (82.0f / 720.0f)
+#define OVERLAY_GROUP1_X                (162.0f / 720.0f)
+#define OVERLAY_GROUP2_X                (322.0f / 720.0f)
+#define OVERLAY_GROUP3_X                (483.0f / 720.0f)
+#define OVERLAY_Y                       (104/2)
+#define OVERLAY_PIXEL_WIDTH             (4.5f / 720.0f)
+#define OVERLAY_PIXEL_HEIGHT            2
+#define OVERLAY_X_PIXELS                5
+#define OVERLAY_Y_PIXELS                7
 
 // scanning speeds
-#define SCAN_SPEED						(2000 / 30)			// 2000 frames/second
-#define SEEK_FAST_SPEED					(4000 / 30)			// 4000 frames/second
+#define SCAN_SPEED                      (2000 / 30)         // 2000 frames/second
+#define SEEK_FAST_SPEED                 (4000 / 30)         // 4000 frames/second
 
 // serial timing, mostly from the service manual, derived from the XTAL
-#define SERIAL_CLOCK					XTAL_455kHz
-#define SERIAL_0_BIT_TIME				attotime::from_hz((double)SERIAL_CLOCK / 512)
-#define SERIAL_1_BIT_TIME				attotime::from_hz((double)SERIAL_CLOCK / 1024)
-#define SERIAL_MIDPOINT_TIME			attotime::from_hz((double)SERIAL_CLOCK / 600)
-#define SERIAL_MAX_BIT_TIME				attotime::from_hz((double)SERIAL_CLOCK / 4096)
-#define SERIAL_MAX_WORD_TIME			attotime::from_hz((double)SERIAL_CLOCK / 11520)
-#define SERIAL_REJECT_DUPLICATE_TIME	attotime::from_hz((double)SERIAL_CLOCK / 11520 / 4)
+#define SERIAL_CLOCK                    XTAL_455kHz
+#define SERIAL_0_BIT_TIME               attotime::from_hz((double)SERIAL_CLOCK / 512)
+#define SERIAL_1_BIT_TIME               attotime::from_hz((double)SERIAL_CLOCK / 1024)
+#define SERIAL_MIDPOINT_TIME            attotime::from_hz((double)SERIAL_CLOCK / 600)
+#define SERIAL_MAX_BIT_TIME             attotime::from_hz((double)SERIAL_CLOCK / 4096)
+#define SERIAL_MAX_WORD_TIME            attotime::from_hz((double)SERIAL_CLOCK / 11520)
+#define SERIAL_REJECT_DUPLICATE_TIME    attotime::from_hz((double)SERIAL_CLOCK / 11520 / 4)
 
 
 
@@ -104,71 +104,71 @@ const device_type SIMUTREK_SPECIAL = &device_creator<simutrek_special_device>;
 // bitmaps for the characters
 static const UINT8 text_bitmap[0x40][7] =
 {
-	{ 0 },									// @
-	{ 0x20,0x50,0x88,0x88,0xf8,0x88,0x88 },	// A
-	{ 0 },									// B
-	{ 0x70,0x88,0x80,0x80,0x80,0x88,0x70 },	// C
-	{ 0 },									// D
-	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0xf8 },	// E
-	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0x80 },	// F
-	{ 0 },									// G
-	{ 0x88,0x88,0x88,0xf8,0x88,0x88,0x88 },	// H
-	{ 0 },									// I
-	{ 0 },									// J
-	{ 0 },									// K
-	{ 0 },									// L
-	{ 0x88,0xd8,0xa8,0xa8,0xa8,0x88,0x88 },	// M
-	{ 0 },									// N
-	{ 0 },									// O
-	{ 0xf0,0x88,0x88,0xf0,0x80,0x80,0x80 },	// P
-	{ 0 },									// Q
-	{ 0xf0,0x88,0x88,0xf0,0xa0,0x90,0x88 },	// R
-	{ 0x70,0x88,0x80,0x70,0x08,0x88,0x70 },	// S
-	{ 0 },									// T
-	{ 0 },									// U
-	{ 0 },									// V
-	{ 0 },									// W
-	{ 0 },									// X
-	{ 0 },									// Y
-	{ 0 },									// Z
-	{ 0 },									// [
-	{ 0 },									// <backslash>
-	{ 0 },									// ]
-	{ 0 },									// ^
-	{ 0 },									// _
+	{ 0 },                                  // @
+	{ 0x20,0x50,0x88,0x88,0xf8,0x88,0x88 }, // A
+	{ 0 },                                  // B
+	{ 0x70,0x88,0x80,0x80,0x80,0x88,0x70 }, // C
+	{ 0 },                                  // D
+	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0xf8 }, // E
+	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0x80 }, // F
+	{ 0 },                                  // G
+	{ 0x88,0x88,0x88,0xf8,0x88,0x88,0x88 }, // H
+	{ 0 },                                  // I
+	{ 0 },                                  // J
+	{ 0 },                                  // K
+	{ 0 },                                  // L
+	{ 0x88,0xd8,0xa8,0xa8,0xa8,0x88,0x88 }, // M
+	{ 0 },                                  // N
+	{ 0 },                                  // O
+	{ 0xf0,0x88,0x88,0xf0,0x80,0x80,0x80 }, // P
+	{ 0 },                                  // Q
+	{ 0xf0,0x88,0x88,0xf0,0xa0,0x90,0x88 }, // R
+	{ 0x70,0x88,0x80,0x70,0x08,0x88,0x70 }, // S
+	{ 0 },                                  // T
+	{ 0 },                                  // U
+	{ 0 },                                  // V
+	{ 0 },                                  // W
+	{ 0 },                                  // X
+	{ 0 },                                  // Y
+	{ 0 },                                  // Z
+	{ 0 },                                  // [
+	{ 0 },                                  // <backslash>
+	{ 0 },                                  // ]
+	{ 0 },                                  // ^
+	{ 0 },                                  // _
 
-	{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00 },	// <space>
-	{ 0 },									// !
-	{ 0 },									// "
-	{ 0 },									// #
-	{ 0 },									// $
-	{ 0 },									// %
-	{ 0 },									// &
-	{ 0 },									// '
-	{ 0 },									// (
-	{ 0 },									// )
-	{ 0 },									// *
-	{ 0 },									// +
-	{ 0 },									// ,
-	{ 0 },									// -
-	{ 0x00,0x00,0x00,0x00,0x00,0x00,0x40 },	// .
-	{ 0 },									// /
-	{ 0x70,0x88,0x88,0x88,0x88,0x88,0x70 },	// 0
-	{ 0x20,0x60,0x20,0x20,0x20,0x20,0x70 },	// 1
-	{ 0x70,0x88,0x08,0x70,0x80,0x80,0xf8 },	// 2
-	{ 0xf8,0x08,0x10,0x30,0x08,0x88,0x70 },	// 3
-	{ 0x10,0x30,0x50,0x90,0xf8,0x10,0x10 },	// 4
-	{ 0xf8,0x80,0xf0,0x08,0x08,0x88,0x70 },	// 5
-	{ 0x78,0x80,0x80,0xf0,0x88,0x88,0x70 },	// 6
-	{ 0xf8,0x08,0x08,0x10,0x20,0x40,0x80 },	// 7
-	{ 0x70,0x88,0x88,0x70,0x88,0x88,0x70 },	// 8
-	{ 0x70,0x88,0x88,0x78,0x08,0x08,0xf0 },	// 9
-	{ 0 },									// :
-	{ 0 },									// ;
-	{ 0 },									// <
-	{ 0 },									// =
-	{ 0 },									// >
-	{ 0 }									// ?
+	{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00 }, // <space>
+	{ 0 },                                  // !
+	{ 0 },                                  // "
+	{ 0 },                                  // #
+	{ 0 },                                  // $
+	{ 0 },                                  // %
+	{ 0 },                                  // &
+	{ 0 },                                  // '
+	{ 0 },                                  // (
+	{ 0 },                                  // )
+	{ 0 },                                  // *
+	{ 0 },                                  // +
+	{ 0 },                                  // ,
+	{ 0 },                                  // -
+	{ 0x00,0x00,0x00,0x00,0x00,0x00,0x40 }, // .
+	{ 0 },                                  // /
+	{ 0x70,0x88,0x88,0x88,0x88,0x88,0x70 }, // 0
+	{ 0x20,0x60,0x20,0x20,0x20,0x20,0x70 }, // 1
+	{ 0x70,0x88,0x08,0x70,0x80,0x80,0xf8 }, // 2
+	{ 0xf8,0x08,0x10,0x30,0x08,0x88,0x70 }, // 3
+	{ 0x10,0x30,0x50,0x90,0xf8,0x10,0x10 }, // 4
+	{ 0xf8,0x80,0xf0,0x08,0x08,0x88,0x70 }, // 5
+	{ 0x78,0x80,0x80,0xf0,0x88,0x88,0x70 }, // 6
+	{ 0xf8,0x08,0x08,0x10,0x20,0x40,0x80 }, // 7
+	{ 0x70,0x88,0x88,0x70,0x88,0x88,0x70 }, // 8
+	{ 0x70,0x88,0x88,0x78,0x08,0x08,0xf0 }, // 9
+	{ 0 },                                  // :
+	{ 0 },                                  // ;
+	{ 0 },                                  // <
+	{ 0 },                                  // =
+	{ 0 },                                  // >
+	{ 0 }                                   // ?
 };
 
 
@@ -210,33 +210,33 @@ ROM_END
 
 pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, PIONEER_PR8210, "Pioneer PR-8210", "pr8210", tag, owner, clock),
-	  m_control(0),
-	  m_lastcommand(0),
-	  m_accumulator(0),
-	  m_lastcommandtime(attotime::zero),
-	  m_lastbittime(attotime::zero),
-	  m_firstbittime(attotime::zero),
-	  m_i8049_cpu(*this, "pr8210"),
-	  m_slowtrg(attotime::zero),
-	  m_vsync(false),
-	  m_i8049_port1(0),
-	  m_i8049_port2(0)
+		m_control(0),
+		m_lastcommand(0),
+		m_accumulator(0),
+		m_lastcommandtime(attotime::zero),
+		m_lastbittime(attotime::zero),
+		m_firstbittime(attotime::zero),
+		m_i8049_cpu(*this, "pr8210"),
+		m_slowtrg(attotime::zero),
+		m_vsync(false),
+		m_i8049_port1(0),
+		m_i8049_port2(0)
 {
 }
 
 pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, type, name, shortname, tag, owner, clock),
-	  m_control(0),
-	  m_lastcommand(0),
-	  m_accumulator(0),
-	  m_lastcommandtime(attotime::zero),
-	  m_lastbittime(attotime::zero),
-	  m_firstbittime(attotime::zero),
-	  m_i8049_cpu(*this, "pr8210"),
-	  m_slowtrg(attotime::zero),
-	  m_vsync(false),
-	  m_i8049_port1(0),
-	  m_i8049_port2(0)
+		m_control(0),
+		m_lastcommand(0),
+		m_accumulator(0),
+		m_lastcommandtime(attotime::zero),
+		m_lastbittime(attotime::zero),
+		m_firstbittime(attotime::zero),
+		m_i8049_cpu(*this, "pr8210"),
+		m_slowtrg(attotime::zero),
+		m_vsync(false),
+		m_i8049_port1(0),
+		m_i8049_port2(0)
 {
 }
 
@@ -291,8 +291,8 @@ void pioneer_pr8210_device::control_w(UINT8 data)
 			m_pia.porta = BITSWAP8(newcommand, 0,1,2,3,4,5,6,7);
 
 			// the MCU logic requires a 0 to execute many commands; however, nobody
-            // consistently sends a 0, whereas they do tend to send duplicate commands...
-            // if we assume that each duplicate causes a 0, we get the correct results
+			// consistently sends a 0, whereas they do tend to send duplicate commands...
+			// if we assume that each duplicate causes a 0, we get the correct results
 			attotime rejectuntil = m_lastcommandtime + SERIAL_REJECT_DUPLICATE_TIME;
 			m_lastcommandtime = curtime;
 			if (m_pia.porta == m_lastcommand && curtime < rejectuntil)
@@ -514,13 +514,13 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_pia_r )
 	switch (offset)
 	{
 		// (20-26) 7 characters for the chapter/frame
-		case 0x20:	case 0x21:
-		case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
+		case 0x20:  case 0x21:
+		case 0x22:  case 0x23:  case 0x24:  case 0x25:  case 0x26:
 			result = m_pia.frame[offset - 0x20];
 			break;
 
 		// (1D-1F,27) invalid read but normal
-		case 0x1d:	case 0x1e:	case 0x1f:
+		case 0x1d:  case 0x1e:  case 0x1f:
 		case 0x27:
 			break;
 
@@ -562,10 +562,10 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 	switch (offset)
 	{
 		// (20-30) 17 characters for the display
-		case 0x20:	case 0x21:
-		case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
-		case 0x27:	case 0x28:	case 0x29:	case 0x2a:	case 0x2b:
-		case 0x2c:	case 0x2d:	case 0x2e:	case 0x2f:	case 0x30:
+		case 0x20:  case 0x21:
+		case 0x22:  case 0x23:  case 0x24:  case 0x25:  case 0x26:
+		case 0x27:  case 0x28:  case 0x29:  case 0x2a:  case 0x2b:
+		case 0x2c:  case 0x2d:  case 0x2e:  case 0x2f:  case 0x30:
 			m_pia.text[offset - 0x20] = data;
 			break;
 
@@ -630,15 +630,15 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 READ8_MEMBER( pioneer_pr8210_device::i8049_bus_r )
 {
 	/*
-       $80 = n/c
-       $40 = (in) slider pot interrupt source (slider position limit detector, inside and outside)
-       $20 = n/c
-       $10 = (in) /FOCUS LOCK
-       $08 = (in) /SPDL LOCK
-       $04 = (in) SIZE 8/12
-       $02 = (in) FG via op-amp (spindle motor stop detector)
-       $01 = (in) SLOW TIMER OUT
-    */
+	   $80 = n/c
+	   $40 = (in) slider pot interrupt source (slider position limit detector, inside and outside)
+	   $20 = n/c
+	   $10 = (in) /FOCUS LOCK
+	   $08 = (in) /SPDL LOCK
+	   $04 = (in) SIZE 8/12
+	   $02 = (in) FG via op-amp (spindle motor stop detector)
+	   $01 = (in) SLOW TIMER OUT
+	*/
 
 	UINT8 result = 0x00;
 
@@ -674,15 +674,15 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_bus_r )
 WRITE8_MEMBER( pioneer_pr8210_device::i8049_port1_w )
 {
 	/*
-       $80 = (out) SCAN C (F/R)
-       $40 = (out) AUDIO SQ
-       $20 = (out) VIDEO SQ
-       $10 = (out) /SPDL ON
-       $08 = (out) /FOCUS ON
-       $04 = (out) SCAN B (L/H)
-       $02 = (out) SCAN A (/SCAN)
-       $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
-    */
+	   $80 = (out) SCAN C (F/R)
+	   $40 = (out) AUDIO SQ
+	   $20 = (out) VIDEO SQ
+	   $10 = (out) /SPDL ON
+	   $08 = (out) /FOCUS ON
+	   $04 = (out) SCAN B (L/H)
+	   $02 = (out) SCAN A (/SCAN)
+	   $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
+	*/
 
 	// set the new value
 	UINT8 prev = m_i8049_port1;
@@ -731,15 +731,15 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port1_w )
 WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
 {
 	/*
-       $80 = (out) /CS on PIA
-       $40 = (out) 0 to self-generate IRQ
-       $20 = (out) SLOW TRG
-       $10 = (out) STANDBY LED
-       $08 = (out) TP2
-       $04 = (out) TP1
-       $02 = (out) ???
-       $01 = (out) LASER ON
-    */
+	   $80 = (out) /CS on PIA
+	   $40 = (out) 0 to self-generate IRQ
+	   $20 = (out) SLOW TRG
+	   $10 = (out) STANDBY LED
+	   $08 = (out) TP2
+	   $04 = (out) TP1
+	   $02 = (out) ???
+	   $01 = (out) LASER ON
+	*/
 
 	// set the new value
 	UINT8 prev = m_i8049_port2;
@@ -920,13 +920,13 @@ ROM_END
 
 simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, "Simutrek Modified PR-8210", "simutrek", tag, owner, clock),
-	  m_i8748_cpu(*this, "simutrek"),
-	  m_audio_squelch(0),
-	  m_data(0),
-	  m_data_ready(false),
-	  m_i8748_port2(0),
-	  m_controlnext(0),
-	  m_controlthis(0)
+		m_i8748_cpu(*this, "simutrek"),
+		m_audio_squelch(0),
+		m_data(0),
+		m_data_ready(false),
+		m_i8748_port2(0),
+		m_controlnext(0),
+		m_controlthis(0)
 {
 }
 

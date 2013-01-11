@@ -6,17 +6,17 @@
 #include "rk_cas.h"
 
 
-#define RK_WAV_FREQUENCY	44000
-#define WAVE_HIGH		32767
-#define WAVE_LOW		-32768
+#define RK_WAV_FREQUENCY    44000
+#define WAVE_HIGH       32767
+#define WAVE_LOW        -32768
 
-#define RK_HEADER_LEN	256
+#define RK_HEADER_LEN   256
 
 #define RK_SIZE_20 20
 #define RK_SIZE_22 22
 #define RK_SIZE_60 60
 
-static int  	data_size;
+static int      data_size;
 
 static INT16 *rk_emit_level(INT16 *p, int count, int level)
 {
@@ -42,7 +42,7 @@ static INT16* rk_output_bit(INT16 *p, UINT8 b,int bitsize)
 		p = rk_emit_level (p, bitsize, WAVE_HIGH);
 
 	}
-    return p;
+	return p;
 }
 
 static INT16* rk_output_byte(INT16 *p, UINT8 byte,int bitsize)
@@ -138,13 +138,13 @@ static int gam_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 }
 
 static const struct CassetteLegacyWaveFiller rk20_legacy_fill_wave = {
-	rk20_cas_fill_wave,			/* fill_wave */
-	-1,					/* chunk_size */
-	0,					/* chunk_samples */
-	rk20_cas_to_wav_size,			/* chunk_sample_calc */
-	RK_WAV_FREQUENCY,			/* sample_frequency */
-	0,					/* header_samples */
-	0					/* trailer_samples */
+	rk20_cas_fill_wave,         /* fill_wave */
+	-1,                 /* chunk_size */
+	0,                  /* chunk_samples */
+	rk20_cas_to_wav_size,           /* chunk_sample_calc */
+	RK_WAV_FREQUENCY,           /* sample_frequency */
+	0,                  /* header_samples */
+	0                   /* trailer_samples */
 };
 
 static casserr_t rk20_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
@@ -156,13 +156,13 @@ static casserr_t rk20_cassette_load( cassette_image *cassette ) {
 }
 
 static const struct CassetteLegacyWaveFiller rk22_legacy_fill_wave = {
-	rk22_cas_fill_wave,			/* fill_wave */
-	-1,					/* chunk_size */
-	0,					/* chunk_samples */
-	rk22_cas_to_wav_size,			/* chunk_sample_calc */
-	RK_WAV_FREQUENCY,			/* sample_frequency */
-	0,					/* header_samples */
-	0					/* trailer_samples */
+	rk22_cas_fill_wave,         /* fill_wave */
+	-1,                 /* chunk_size */
+	0,                  /* chunk_samples */
+	rk22_cas_to_wav_size,           /* chunk_sample_calc */
+	RK_WAV_FREQUENCY,           /* sample_frequency */
+	0,                  /* header_samples */
+	0                   /* trailer_samples */
 };
 
 static casserr_t rk22_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
@@ -174,13 +174,13 @@ static casserr_t rk22_cassette_load( cassette_image *cassette ) {
 }
 
 static const struct CassetteLegacyWaveFiller gam_legacy_fill_wave = {
-	gam_cas_fill_wave,			/* fill_wave */
-	-1,					/* chunk_size */
-	0,					/* chunk_samples */
-	gam_cas_to_wav_size,			/* chunk_sample_calc */
-	RK_WAV_FREQUENCY,			/* sample_frequency */
-	0,					/* header_samples */
-	0					/* trailer_samples */
+	gam_cas_fill_wave,          /* fill_wave */
+	-1,                 /* chunk_size */
+	0,                  /* chunk_samples */
+	gam_cas_to_wav_size,            /* chunk_sample_calc */
+	RK_WAV_FREQUENCY,           /* sample_frequency */
+	0,                  /* header_samples */
+	0                   /* trailer_samples */
 };
 
 static casserr_t gam_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
@@ -192,13 +192,13 @@ static casserr_t gam_cassette_load( cassette_image *cassette ) {
 }
 
 static const struct CassetteLegacyWaveFiller rk60_legacy_fill_wave = {
-	rk60_cas_fill_wave,			/* fill_wave */
-	-1,					/* chunk_size */
-	0,					/* chunk_samples */
-	rk60_cas_to_wav_size,			/* chunk_sample_calc */
-	RK_WAV_FREQUENCY,			/* sample_frequency */
-	0,					/* header_samples */
-	0					/* trailer_samples */
+	rk60_cas_fill_wave,         /* fill_wave */
+	-1,                 /* chunk_size */
+	0,                  /* chunk_samples */
+	rk60_cas_to_wav_size,           /* chunk_sample_calc */
+	RK_WAV_FREQUENCY,           /* sample_frequency */
+	0,                  /* header_samples */
+	0                   /* trailer_samples */
 };
 
 static casserr_t rk60_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {

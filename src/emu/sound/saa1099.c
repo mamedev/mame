@@ -67,18 +67,18 @@
 #include "saa1099.h"
 
 
-#define LEFT	0x00
-#define RIGHT	0x01
+#define LEFT    0x00
+#define RIGHT   0x01
 
 /* this structure defines a channel */
 struct saa1099_channel
 {
-	int frequency;			/* frequency (0x00..0xff) */
-	int freq_enable;		/* frequency enable */
-	int noise_enable;		/* noise enable */
-	int octave; 			/* octave (0x00..0x07) */
-	int amplitude[2];		/* amplitude (0x00..0x0f) */
-	int envelope[2];		/* envelope (0x00..0x0f or 0x10 == off) */
+	int frequency;          /* frequency (0x00..0xff) */
+	int freq_enable;        /* frequency enable */
+	int noise_enable;       /* noise enable */
+	int octave;             /* octave (0x00..0x07) */
+	int amplitude[2];       /* amplitude (0x00..0x0f) */
+	int envelope[2];        /* envelope (0x00..0x0f or 0x10 == off) */
 
 	/* vars to simulate the square wave */
 	double counter;
@@ -92,77 +92,77 @@ struct saa1099_noise
 	/* vars to simulate the noise generator output */
 	double counter;
 	double freq;
-	int level;						/* noise polynomal shifter */
+	int level;                      /* noise polynomal shifter */
 };
 
 /* this structure defines a SAA1099 chip */
 struct saa1099_state
 {
 	device_t *device;
-	sound_stream * stream;			/* our stream */
-	int noise_params[2];			/* noise generators parameters */
-	int env_enable[2];				/* envelope generators enable */
-	int env_reverse_right[2];		/* envelope reversed for right channel */
-	int env_mode[2];				/* envelope generators mode */
-	int env_bits[2];				/* non zero = 3 bits resolution */
-	int env_clock[2];				/* envelope clock mode (non-zero external) */
+	sound_stream * stream;          /* our stream */
+	int noise_params[2];            /* noise generators parameters */
+	int env_enable[2];              /* envelope generators enable */
+	int env_reverse_right[2];       /* envelope reversed for right channel */
+	int env_mode[2];                /* envelope generators mode */
+	int env_bits[2];                /* non zero = 3 bits resolution */
+	int env_clock[2];               /* envelope clock mode (non-zero external) */
 	int env_step[2];                /* current envelope step */
-	int all_ch_enable;				/* all channels enable */
-	int sync_state;					/* sync all channels */
-	int selected_reg;				/* selected register */
+	int all_ch_enable;              /* all channels enable */
+	int sync_state;                 /* sync all channels */
+	int selected_reg;               /* selected register */
 	struct saa1099_channel channels[6];    /* channels */
-	struct saa1099_noise noise[2];	/* noise generators */
+	struct saa1099_noise noise[2];  /* noise generators */
 	double sample_rate;
 };
 
 static const int amplitude_lookup[16] = {
-	 0*32767/16,  1*32767/16,  2*32767/16,	3*32767/16,
-	 4*32767/16,  5*32767/16,  6*32767/16,	7*32767/16,
-	 8*32767/16,  9*32767/16, 10*32767/16, 11*32767/16,
+		0*32767/16,  1*32767/16,  2*32767/16,   3*32767/16,
+		4*32767/16,  5*32767/16,  6*32767/16,   7*32767/16,
+		8*32767/16,  9*32767/16, 10*32767/16, 11*32767/16,
 	12*32767/16, 13*32767/16, 14*32767/16, 15*32767/16
 };
 
 static const UINT8 envelope[8][64] = {
 	/* zero amplitude */
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	/* maximum amplitude */
-    {15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
-	 15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
-	 15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
-     15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15, },
+	{15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
+		15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
+		15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
+		15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15, },
 	/* single decay */
 	{15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	/* repetitive decay */
 	{15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-	 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-	 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-	 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
+		15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+		15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+		15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* single triangular */
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-	 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+		15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	/* repetitive triangular */
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-	 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-	 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
+		15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+		15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* single attack */
-    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-	  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	/* repetitive attack */
-    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15 }
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15 }
 };
 
 
@@ -179,16 +179,16 @@ static void saa1099_envelope(saa1099_state *saa, int ch)
 	if (saa->env_enable[ch])
 	{
 		int step, mode, mask;
-        mode = saa->env_mode[ch];
+		mode = saa->env_mode[ch];
 		/* step from 0..63 and then loop in steps 32..63 */
 		step = saa->env_step[ch] =
 			((saa->env_step[ch] + 1) & 0x3f) | (saa->env_step[ch] & 0x20);
 
 		mask = 15;
-        if (saa->env_bits[ch])
-			mask &= ~1; 	/* 3 bit resolution, mask LSB */
+		if (saa->env_bits[ch])
+			mask &= ~1;     /* 3 bit resolution, mask LSB */
 
-        saa->channels[ch*3+0].envelope[ LEFT] =
+		saa->channels[ch*3+0].envelope[ LEFT] =
 		saa->channels[ch*3+1].envelope[ LEFT] =
 		saa->channels[ch*3+2].envelope[ LEFT] = envelope[mode][step] & mask;
 		if (saa->env_reverse_right[ch] & 0x01)
@@ -202,7 +202,7 @@ static void saa1099_envelope(saa1099_state *saa, int ch)
 			saa->channels[ch*3+0].envelope[RIGHT] =
 			saa->channels[ch*3+1].envelope[RIGHT] =
 			saa->channels[ch*3+2].envelope[RIGHT] = envelope[mode][step] & mask;
-        }
+		}
 	}
 	else
 	{
@@ -213,14 +213,14 @@ static void saa1099_envelope(saa1099_state *saa, int ch)
 		saa->channels[ch*3+0].envelope[RIGHT] =
 		saa->channels[ch*3+1].envelope[RIGHT] =
 		saa->channels[ch*3+2].envelope[RIGHT] = 16;
-    }
+	}
 }
 
 
 static STREAM_UPDATE( saa1099_update )
 {
 	saa1099_state *saa = (saa1099_state *)param;
-    int j, ch;
+	int j, ch;
 
 	/* if the channels are disabled we're done */
 	if (!saa->all_ch_enable)
@@ -228,11 +228,11 @@ static STREAM_UPDATE( saa1099_update )
 		/* init output data */
 		memset(outputs[LEFT],0,samples*sizeof(*outputs[LEFT]));
 		memset(outputs[RIGHT],0,samples*sizeof(*outputs[RIGHT]));
-        return;
+		return;
 	}
 
-    for (ch = 0; ch < 2; ch++)
-    {
+	for (ch = 0; ch < 2; ch++)
+	{
 		switch (saa->noise_params[ch])
 		{
 		case 0: saa->noise[ch].freq = 31250.0 * 2; break;
@@ -242,7 +242,7 @@ static STREAM_UPDATE( saa1099_update )
 		}
 	}
 
-    /* fill all data needed */
+	/* fill all data needed */
 	for( j = 0; j < samples; j++ )
 	{
 		int output_l = 0, output_r = 0;
@@ -250,12 +250,12 @@ static STREAM_UPDATE( saa1099_update )
 		/* for each channel */
 		for (ch = 0; ch < 6; ch++)
 		{
-            if (saa->channels[ch].freq == 0.0)
-                saa->channels[ch].freq = (double)((2 * 15625) << saa->channels[ch].octave) /
-                    (511.0 - (double)saa->channels[ch].frequency);
+			if (saa->channels[ch].freq == 0.0)
+				saa->channels[ch].freq = (double)((2 * 15625) << saa->channels[ch].octave) /
+					(511.0 - (double)saa->channels[ch].frequency);
 
-            /* check the actual position in the square wave */
-            saa->channels[ch].counter -= saa->channels[ch].freq;
+			/* check the actual position in the square wave */
+			saa->channels[ch].counter -= saa->channels[ch].freq;
 			while (saa->channels[ch].counter < 0)
 			{
 				/* calculate new frequency now after the half wave is updated */
@@ -309,7 +309,7 @@ static STREAM_UPDATE( saa1099_update )
 					saa->noise[ch].level <<= 1;
 			}
 		}
-        /* write sound data to the buffer */
+		/* write sound data to the buffer */
 		outputs[LEFT][j] = output_l / 6;
 		outputs[RIGHT][j] = output_r / 6;
 	}
@@ -336,18 +336,18 @@ WRITE8_DEVICE_HANDLER( saa1099_control_w )
 	if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-                logerror("%s: (SAA1099 '%s') Unknown register selected\n",device->machine().describe_context(), device->tag());
+				logerror("%s: (SAA1099 '%s') Unknown register selected\n",device->machine().describe_context(), device->tag());
 	}
 
 	saa->selected_reg = data & 0x1f;
 	if (saa->selected_reg == 0x18 || saa->selected_reg == 0x19)
 	{
 		/* clock the envelope channels */
-        if (saa->env_clock[0])
+		if (saa->env_clock[0])
 			saa1099_envelope(saa,0);
 		if (saa->env_clock[1])
 			saa1099_envelope(saa,1);
-    }
+	}
 }
 
 
@@ -363,18 +363,18 @@ WRITE8_DEVICE_HANDLER( saa1099_data_w )
 	switch (reg)
 	{
 	/* channel i amplitude */
-	case 0x00:	case 0x01:	case 0x02:	case 0x03:	case 0x04:	case 0x05:
+	case 0x00:  case 0x01:  case 0x02:  case 0x03:  case 0x04:  case 0x05:
 		ch = reg & 7;
 		saa->channels[ch].amplitude[LEFT] = amplitude_lookup[data & 0x0f];
 		saa->channels[ch].amplitude[RIGHT] = amplitude_lookup[(data >> 4) & 0x0f];
 		break;
 	/* channel i frequency */
-	case 0x08:	case 0x09:	case 0x0a:	case 0x0b:	case 0x0c:	case 0x0d:
+	case 0x08:  case 0x09:  case 0x0a:  case 0x0b:  case 0x0c:  case 0x0d:
 		ch = reg & 7;
 		saa->channels[ch].frequency = data & 0xff;
 		break;
 	/* channel i octave */
-	case 0x10:	case 0x11:	case 0x12:
+	case 0x10:  case 0x11:  case 0x12:
 		ch = (reg - 0x10) << 1;
 		saa->channels[ch + 0].octave = data & 0x07;
 		saa->channels[ch + 1].octave = (data >> 4) & 0x07;
@@ -403,7 +403,7 @@ WRITE8_DEVICE_HANDLER( saa1099_data_w )
 		saa->noise_params[1] = (data >> 4) & 0x03;
 		break;
 	/* envelope generators parameters */
-	case 0x18:	case 0x19:
+	case 0x18:  case 0x19:
 		ch = reg - 0x18;
 		saa->env_reverse_right[ch] = data & 0x01;
 		saa->env_mode[ch] = (data >> 1) & 0x07;
@@ -425,12 +425,12 @@ WRITE8_DEVICE_HANDLER( saa1099_data_w )
 			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n",device->machine().describe_context(), device->tag());
 			for (i = 0; i < 6; i++)
 			{
-                saa->channels[i].level = 0;
+				saa->channels[i].level = 0;
 				saa->channels[i].counter = 0.0;
 			}
 		}
 		break;
-	default:	/* Error! */
+	default:    /* Error! */
 		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n",device->machine().describe_context(), device->tag(), reg, data);
 	}
 }
@@ -439,7 +439,7 @@ const device_type SAA1099 = &device_creator<saa1099_device>;
 
 saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAA1099, "SAA1099", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(saa1099_state);
 }
@@ -472,5 +472,3 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

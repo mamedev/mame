@@ -160,7 +160,7 @@
 #include "includes/kangaroo.h"
 
 
-#define MASTER_CLOCK		XTAL_10MHz
+#define MASTER_CLOCK        XTAL_10MHz
 
 
 
@@ -497,10 +497,10 @@ ROM_START( kangaroo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* On TVG-1-CPU-B board */
 	ROM_LOAD( "tvg_81.8",    0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) ) /* IC24 */
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* internal ROM from the 8841 custom MCU */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* internal ROM from the 8841 custom MCU */
 	ROM_LOAD( "mb8841.ic29",    0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x0800, "user1", 0 )	/* data for the 8841 custom MCU */
+	ROM_REGION( 0x0800, "user1", 0 )    /* data for the 8841 custom MCU */
 	ROM_LOAD( "tvg_82.12",   0x0000, 0x0800, CRC(57766f69) SHA1(94a7a557d8325799523d5e1a88653a9a3fbe34f9) ) /* IC28 */
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* On TVG-1-VIDEO-B board */
@@ -523,10 +523,10 @@ ROM_START( kangarooa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "136008-107.ic24",   0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* internal ROM from the 8841 custom MCU */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* internal ROM from the 8841 custom MCU */
 	ROM_LOAD( "mb8841.ic29",          0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x0800, "user1", 0 )	/* data for the 8841 custom MCU */
+	ROM_REGION( 0x0800, "user1", 0 )    /* data for the 8841 custom MCU */
 	ROM_LOAD( "136008-112.ic28",   0x0000, 0x0800, CRC(57766f69) SHA1(94a7a557d8325799523d5e1a88653a9a3fbe34f9) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )

@@ -12,8 +12,8 @@
 #include "video/s2636.h"
 
 
-#define SPRITE_PEN_BASE		(0x820)
-#define BULLET_STAR_PEN		(0x828)
+#define SPRITE_PEN_BASE     (0x820)
+#define BULLET_STAR_PEN     (0x828)
 
 
 /******************************************************
@@ -94,8 +94,8 @@ WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 	if (data & 0x04)   logerror("           SCREEN ROTATE\n");
 	if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
 
-	set_led_status(machine(), 1, data & 0x10);	/* lamp 1 */
-	set_led_status(machine(), 2, data & 0x20);	/* lamp 2 */
+	set_led_status(machine(), 1, data & 0x10);  /* lamp 1 */
+	set_led_status(machine(), 2, data & 0x20);  /* lamp 2 */
 
 	if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
 	if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");

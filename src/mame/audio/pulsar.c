@@ -11,21 +11,21 @@
 
 
 /* output port 0x01 definitions - sound effect drive outputs */
-#define OUT_PORT_1_CLANG		0x01
-#define OUT_PORT_1_KEY			0x02
-#define OUT_PORT_1_ALIENHIT		0x04
-#define OUT_PORT_1_PHIT			0x08
-#define OUT_PORT_1_ASHOOT		0x10
-#define OUT_PORT_1_PSHOOT		0x20
-#define OUT_PORT_1_BONUS		0x40
-#define OUT_PORT_1_HBEAT_RATE	0x80	/* currently not used */
+#define OUT_PORT_1_CLANG        0x01
+#define OUT_PORT_1_KEY          0x02
+#define OUT_PORT_1_ALIENHIT     0x04
+#define OUT_PORT_1_PHIT         0x08
+#define OUT_PORT_1_ASHOOT       0x10
+#define OUT_PORT_1_PSHOOT       0x20
+#define OUT_PORT_1_BONUS        0x40
+#define OUT_PORT_1_HBEAT_RATE   0x80    /* currently not used */
 
 /* output port 0x02 definitions - sound effect drive outputs */
-#define OUT_PORT_2_SIZZLE		0x01
-#define OUT_PORT_2_GATE			0x02
-#define OUT_PORT_2_BIRTH		0x04
-#define OUT_PORT_2_HBEAT		0x08
-#define OUT_PORT_2_MOVMAZE		0x10
+#define OUT_PORT_2_SIZZLE       0x01
+#define OUT_PORT_2_GATE         0x02
+#define OUT_PORT_2_BIRTH        0x04
+#define OUT_PORT_2_HBEAT        0x08
+#define OUT_PORT_2_MOVMAZE      0x10
 
 
 #define PLAY(samp,id,loop)           samp->start( id, id, loop )

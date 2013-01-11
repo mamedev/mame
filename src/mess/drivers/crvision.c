@@ -511,17 +511,17 @@ static TMS9928A_INTERFACE( vdp_intf )
 WRITE8_MEMBER( crvision_state::pia_pa_w )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PA0     Keyboard raster player 1 output (joystick)
-        PA1     Keyboard raster player 1 output (hand keys)
-        PA2     Keyboard raster player 2 output (joystick)
-        PA3     Keyboard raster player 2 output (hand keys)
-        PA4     ?
-        PA5     ?
-        PA6     Cassette motor
-        PA7     Cassette data in/out
-    */
+	    PA0     Keyboard raster player 1 output (joystick)
+	    PA1     Keyboard raster player 1 output (hand keys)
+	    PA2     Keyboard raster player 2 output (joystick)
+	    PA3     Keyboard raster player 2 output (hand keys)
+	    PA4     ?
+	    PA5     ?
+	    PA6     Cassette motor
+	    PA7     Cassette data in/out
+	*/
 
 	/* keyboard raster */
 	m_keylatch = ~data & 0x0f;
@@ -564,15 +564,15 @@ UINT8 crvision_state::read_keyboard(int pa)
 READ8_MEMBER( crvision_state::pia_pa_r )
 {
 	/*
-        PA0     Keyboard raster player 1 output (joystick)
-        PA1     Keyboard raster player 1 output (hand keys)
-        PA2     Keyboard raster player 2 output (joystick)
-        PA3     Keyboard raster player 2 output (hand keys)
-        PA4     ?
-        PA5     ?
-        PA6     Cassette motor
-        PA7     Cassette data in/out
-    */
+	    PA0     Keyboard raster player 1 output (joystick)
+	    PA1     Keyboard raster player 1 output (hand keys)
+	    PA2     Keyboard raster player 2 output (joystick)
+	    PA3     Keyboard raster player 2 output (hand keys)
+	    PA4     ?
+	    PA5     ?
+	    PA6     Cassette motor
+	    PA7     Cassette data in/out
+	*/
 
 	UINT8 data = 0x7f;
 
@@ -584,17 +584,17 @@ READ8_MEMBER( crvision_state::pia_pa_r )
 READ8_MEMBER( crvision_state::pia_pb_r )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PB0     Keyboard input
-        PB1     Keyboard input
-        PB2     Keyboard input
-        PB3     Keyboard input
-        PB4     Keyboard input
-        PB5     Keyboard input
-        PB6     Keyboard input
-        PB7     Keyboard input
-    */
+	    PB0     Keyboard input
+	    PB1     Keyboard input
+	    PB2     Keyboard input
+	    PB3     Keyboard input
+	    PB4     Keyboard input
+	    PB5     Keyboard input
+	    PB6     Keyboard input
+	    PB7     Keyboard input
+	*/
 
 	UINT8 data = 0xff;
 
@@ -608,18 +608,18 @@ READ8_MEMBER( crvision_state::pia_pb_r )
 
 static const pia6821_interface pia_intf =
 {
-	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_r),		// input A
-	DEVCB_DRIVER_MEMBER(crvision_state, pia_pb_r),		// input B
-	DEVCB_LINE_VCC,										// input CA1 (+5V)
-	DEVCB_DEVICE_LINE_MEMBER(SN76489_TAG, sn76496_base_device, ready_r),	// input CB1
-	DEVCB_LINE_VCC,										// input CA2 (+5V)
-	DEVCB_LINE_VCC,										// input CB2 (+5V)
-	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_w),		// output A
-	DEVCB_DEVICE_MEMBER(SN76489_TAG, sn76496_base_device, write),		// output B
-	DEVCB_NULL,											// output CA2
-	DEVCB_NULL,											// output CB2 (SN76489 pin CE_)
-	DEVCB_NULL,											// irq A
-	DEVCB_NULL											// irq B
+	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_r),      // input A
+	DEVCB_DRIVER_MEMBER(crvision_state, pia_pb_r),      // input B
+	DEVCB_LINE_VCC,                                     // input CA1 (+5V)
+	DEVCB_DEVICE_LINE_MEMBER(SN76489_TAG, sn76496_base_device, ready_r),    // input CB1
+	DEVCB_LINE_VCC,                                     // input CA2 (+5V)
+	DEVCB_LINE_VCC,                                     // input CB2 (+5V)
+	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_w),      // output A
+	DEVCB_DEVICE_MEMBER(SN76489_TAG, sn76496_base_device, write),       // output B
+	DEVCB_NULL,                                         // output CA2
+	DEVCB_NULL,                                         // output CB2 (SN76489 pin CE_)
+	DEVCB_NULL,                                         // irq A
+	DEVCB_NULL                                          // irq B
 };
 
 /*-------------------------------------------------
@@ -629,17 +629,17 @@ static const pia6821_interface pia_intf =
 READ8_MEMBER( laser2001_state::pia_pa_r )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PA0     Keyboard column 0
-        PA1     Keyboard column 1
-        PA2     Keyboard column 2
-        PA3     Keyboard column 3
-        PA4     Keyboard column 4
-        PA5     Keyboard column 5
-        PA6     Keyboard column 6
-        PA7     Keyboard column 7
-    */
+	    PA0     Keyboard column 0
+	    PA1     Keyboard column 1
+	    PA2     Keyboard column 2
+	    PA3     Keyboard column 3
+	    PA4     Keyboard column 4
+	    PA5     Keyboard column 5
+	    PA6     Keyboard column 6
+	    PA7     Keyboard column 7
+	*/
 
 	UINT8 data = 0xff;
 
@@ -658,15 +658,15 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 WRITE8_MEMBER( laser2001_state::pia_pa_w )
 {
 	/*
-        PA0     Joystick player 1 output 0
-        PA1     Joystick player 1 output 1
-        PA2     Joystick player 2 output 0
-        PA3     Joystick player 2 output 1
-        PA4     ?
-        PA5     ?
-        PA6     ?
-        PA7     ?
-    */
+	    PA0     Joystick player 1 output 0
+	    PA1     Joystick player 1 output 1
+	    PA2     Joystick player 2 output 0
+	    PA3     Joystick player 2 output 1
+	    PA4     ?
+	    PA5     ?
+	    PA6     ?
+	    PA7     ?
+	*/
 
 	m_joylatch = data;
 }
@@ -686,17 +686,17 @@ READ8_MEMBER( laser2001_state::pia_pb_r )
 WRITE8_MEMBER( laser2001_state::pia_pb_w )
 {
 	/*
-        Signal  Description
+	    Signal  Description
 
-        PB0     Keyboard row 0, PSG data 7, centronics data 0
-        PB1     Keyboard row 1, PSG data 6, centronics data 1
-        PB2     Keyboard row 2, PSG data 5, centronics data 2
-        PB3     Keyboard row 3, PSG data 4, centronics data 3
-        PB4     Keyboard row 4, PSG data 3, centronics data 4
-        PB5     Keyboard row 5, PSG data 2, centronics data 5
-        PB6     Keyboard row 6, PSG data 1, centronics data 6
-        PB7     Keyboard row 7, PSG data 0, centronics data 7
-    */
+	    PB0     Keyboard row 0, PSG data 7, centronics data 0
+	    PB1     Keyboard row 1, PSG data 6, centronics data 1
+	    PB2     Keyboard row 2, PSG data 5, centronics data 2
+	    PB3     Keyboard row 3, PSG data 4, centronics data 3
+	    PB4     Keyboard row 4, PSG data 3, centronics data 4
+	    PB5     Keyboard row 5, PSG data 2, centronics data 5
+	    PB6     Keyboard row 6, PSG data 1, centronics data 6
+	    PB7     Keyboard row 7, PSG data 0, centronics data 7
+	*/
 
 	/* keyboard latch */
 	m_keylatch = data;
@@ -735,18 +735,18 @@ WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 
 static const pia6821_interface lasr2001_pia_intf =
 {
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pa_r),				// input A
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pb_r),				// input B
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_ca1_r),		// input CA1
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_cb1_r),		// input CB1
-	DEVCB_LINE_GND,												// input CA2
-	DEVCB_LINE_VCC,												// input CB2 (+5V)
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pa_w),				// output A
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pb_w),				// output B
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_ca2_w),		// output CA2
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_cb2_w),		// output CB2
-	DEVCB_NULL,													// irq A (floating)
-	DEVCB_NULL													// irq B (floating)
+	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pa_r),             // input A
+	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pb_r),             // input B
+	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_ca1_r),       // input CA1
+	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_cb1_r),       // input CB1
+	DEVCB_LINE_GND,                                             // input CA2
+	DEVCB_LINE_VCC,                                             // input CB2 (+5V)
+	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pa_w),             // output A
+	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pb_w),             // output B
+	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_ca2_w),       // output CA2
+	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_cb2_w),       // output CB2
+	DEVCB_NULL,                                                 // irq A (floating)
+	DEVCB_NULL                                                  // irq B (floating)
 };
 
 /*-------------------------------------------------
@@ -871,71 +871,71 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	switch (size)
 	{
 	case 0x1000: // 4K
-		memcpy(mem + 0x9000, temp_copy, 0x1000);			// load 4KB at 0x9000
-		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);			// mirror 4KB at 0xb000
+		memcpy(mem + 0x9000, temp_copy, 0x1000);            // load 4KB at 0x9000
+		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);         // mirror 4KB at 0xb000
 		program.install_read_bank(0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x1800: // 6K
-		memcpy(mem + 0x9000, temp_copy, 0x1000);			// load lower 4KB at 0x9000
-		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);			// mirror lower 4KB at 0xb000
-		memcpy(mem + 0x8000, temp_copy + 0x1000, 0x0800);	// load higher 2KB at 0x8000
-		memcpy(mem + 0x8800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0x8800
-		memcpy(mem + 0xa000, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa000
-		memcpy(mem + 0xa800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa800
+		memcpy(mem + 0x9000, temp_copy, 0x1000);            // load lower 4KB at 0x9000
+		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);         // mirror lower 4KB at 0xb000
+		memcpy(mem + 0x8000, temp_copy + 0x1000, 0x0800);   // load higher 2KB at 0x8000
+		memcpy(mem + 0x8800, mem + 0x8000, 0x0800);         // mirror higher 2KB at 0x8800
+		memcpy(mem + 0xa000, mem + 0x8000, 0x0800);         // mirror higher 2KB at 0xa000
+		memcpy(mem + 0xa800, mem + 0x8000, 0x0800);         // mirror higher 2KB at 0xa800
 		program.install_read_bank(0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x2000: // 8K
-		memcpy(mem + 0x8000, temp_copy, 0x2000);			// load 8KB at 0x8000
-		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror 8KB at 0xa000
+		memcpy(mem + 0x8000, temp_copy, 0x2000);            // load 8KB at 0x8000
+		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);         // mirror 8KB at 0xa000
 		program.install_read_bank(0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x2800: // 10K
-		memcpy(mem + 0x8000, temp_copy, 0x2000);			// load lower 8KB at 0x8000
-		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror lower 8KB at 0xa000
-		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x0800);	// load higher 2KB at 0x4000
-		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x4800
-		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5000
-		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5800
-		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6000
-		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6800
-		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7000
-		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7800
+		memcpy(mem + 0x8000, temp_copy, 0x2000);            // load lower 8KB at 0x8000
+		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);         // mirror lower 8KB at 0xa000
+		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x0800);   // load higher 2KB at 0x4000
+		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x4800
+		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5000
+		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5800
+		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6000
+		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6800
+		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7000
+		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7800
 		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
 		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
 		break;
 
 	case 0x3000: // 12K
-		memcpy(mem + 0x8000, temp_copy, 0x2000);			// load lower 8KB at 0x8000
-		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror lower 8KB at 0xa000
-		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x1000);	// load higher 4KB at 0x4000
-		memcpy(mem + 0x5000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x5000
-		memcpy(mem + 0x6000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x6000
-		memcpy(mem + 0x7000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x7000
+		memcpy(mem + 0x8000, temp_copy, 0x2000);            // load lower 8KB at 0x8000
+		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);         // mirror lower 8KB at 0xa000
+		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x1000);   // load higher 4KB at 0x4000
+		memcpy(mem + 0x5000, mem + 0x4000, 0x1000);         // mirror higher 4KB at 0x5000
+		memcpy(mem + 0x6000, mem + 0x4000, 0x1000);         // mirror higher 4KB at 0x6000
+		memcpy(mem + 0x7000, mem + 0x4000, 0x1000);         // mirror higher 4KB at 0x7000
 		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
 		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
 		break;
 
 	case 0x4000: // 16K
-		memcpy(mem + 0xa000, temp_copy, 0x2000);			// load lower 8KB at 0xa000
-		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);	// load higher 8KB at 0x8000
+		memcpy(mem + 0xa000, temp_copy, 0x2000);            // load lower 8KB at 0xa000
+		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);   // load higher 8KB at 0x8000
 		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
 		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
 		break;
 
 	case 0x4800: // 18K
-		memcpy(mem + 0xa000, temp_copy, 0x2000);			// load lower 8KB at 0xa000
-		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);	// load higher 8KB at 0x8000
-		memcpy(mem + 0x4000, temp_copy + 0x4000, 0x0800);	// load higher 2KB at 0x4000
-		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x4800
-		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5000
-		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5800
-		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6000
-		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x6800
-		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7000
-		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x7800
+		memcpy(mem + 0xa000, temp_copy, 0x2000);            // load lower 8KB at 0xa000
+		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);   // load higher 8KB at 0x8000
+		memcpy(mem + 0x4000, temp_copy + 0x4000, 0x0800);   // load higher 2KB at 0x4000
+		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x4800
+		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5000
+		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x5800
+		memcpy(mem + 0x6000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6000
+		memcpy(mem + 0x6800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x6800
+		memcpy(mem + 0x7000, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7000
+		memcpy(mem + 0x7800, mem + 0x4000, 0x0800);         // mirror higher 2KB at 0x7800
 		program.install_read_bank(0x8000, 0xbfff, BANK_ROM1);
 		program.install_read_bank(0x4000, 0x7fff, BANK_ROM2);
 		break;
@@ -992,7 +992,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
+	MCFG_RAM_DEFAULT_SIZE("1K") // MAIN RAM
 	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 
 	// software lists
@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 static MACHINE_CONFIG_DERIVED( ntsc, creativision )
-    // video hardware
+	// video hardware
 	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9918, vdp_intf )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9918_device, screen_update )
@@ -1070,13 +1070,13 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( crvision )
-    ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "crvision.u20", 0x0000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
+	ROM_REGION( 0x10000, M6502_TAG, 0 )
+	ROM_LOAD( "crvision.u20", 0x0000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
 ROM_END
 
 ROM_START( fnvision )
-    ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "funboot.rom",  0x0000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
+	ROM_REGION( 0x10000, M6502_TAG, 0 )
+	ROM_LOAD( "funboot.rom",  0x0000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 
 #define rom_wizzard rom_crvision
@@ -1086,9 +1086,9 @@ ROM_END
 #define rom_vz2000 rom_fnvision
 
 ROM_START( manager )
-    ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "01", 0x0000, 0x2000, CRC(702f4cf5) SHA1(cd14ee74e787d24b76c166de484dae24206e219b) )
-    ROM_LOAD( "23", 0x2000, 0x2000, CRC(46489d88) SHA1(467f5bcd62d0b4117c443e13373df8f3c45df7b2) )
+	ROM_REGION( 0x10000, M6502_TAG, 0 )
+	ROM_LOAD( "01", 0x0000, 0x2000, CRC(702f4cf5) SHA1(cd14ee74e787d24b76c166de484dae24206e219b) )
+	ROM_LOAD( "23", 0x2000, 0x2000, CRC(46489d88) SHA1(467f5bcd62d0b4117c443e13373df8f3c45df7b2) )
 
 	ROM_REGION( 0x1000, "disk", 0 )
 	ROM_LOAD( "floppy interface cartridge", 0x0000, 0x1000, NO_DUMP )
@@ -1099,13 +1099,13 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-CONS( 1982,	crvision,   0,          0,		pal,		crvision, driver_device,	0,		"Video Technology",			"CreatiVision", 0 )
-CONS( 1982,	fnvision,   crvision,   0,		pal,		crvision, driver_device,	0,		"Video Technology",			"FunVision", 0 )
-CONS( 1982,	crvisioj,   crvision,   0,		ntsc,		crvision, driver_device,	0,		"Cheryco",					"CreatiVision (Japan)", 0 )
-CONS( 1982,	wizzard,    crvision,   0,		pal,		crvision, driver_device,	0,		"Dick Smith Electronics",	"Wizzard (Oceania)", 0 )
-CONS( 1982,	rameses,    crvision,   0,		pal,		crvision, driver_device,	0,		"Hanimex",					"Rameses (Oceania)", 0 )
-CONS( 1983,	vz2000,     crvision,   0,		pal,		crvision, driver_device,	0,		"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
-CONS( 1983,	crvisio2,   crvision,   0,		pal,		crvision, driver_device,	0,		"Video Technology",			"CreatiVision MK-II (Europe)", 0 )
+CONS( 1982, crvision,   0,          0,      pal,        crvision, driver_device,    0,      "Video Technology",         "CreatiVision", 0 )
+CONS( 1982, fnvision,   crvision,   0,      pal,        crvision, driver_device,    0,      "Video Technology",         "FunVision", 0 )
+CONS( 1982, crvisioj,   crvision,   0,      ntsc,       crvision, driver_device,    0,      "Cheryco",                  "CreatiVision (Japan)", 0 )
+CONS( 1982, wizzard,    crvision,   0,      pal,        crvision, driver_device,    0,      "Dick Smith Electronics",   "Wizzard (Oceania)", 0 )
+CONS( 1982, rameses,    crvision,   0,      pal,        crvision, driver_device,    0,      "Hanimex",                  "Rameses (Oceania)", 0 )
+CONS( 1983, vz2000,     crvision,   0,      pal,        crvision, driver_device,    0,      "Dick Smith Electronics",   "VZ 2000 (Oceania)", 0 )
+CONS( 1983, crvisio2,   crvision,   0,      pal,        crvision, driver_device,    0,      "Video Technology",         "CreatiVision MK-II (Europe)", 0 )
 //COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001, driver_device,   0,      "Video Technology",         "Laser 2001", GAME_NOT_WORKING )
 //COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001, driver_device,   0,      "Dick Smith Electronics",   "VZ 2001 (Oceania)", GAME_NOT_WORKING )
-COMP( 1983,	manager,	0,			0,		lasr2001,	manager, driver_device,	0,		"Salora",					"Manager (Finland)", 0 )
+COMP( 1983, manager,    0,          0,      lasr2001,   manager, driver_device, 0,      "Salora",                   "Manager (Finland)", 0 )

@@ -51,15 +51,15 @@
 //**************************************************************************
 
 // register flags 0
-#define REGFLAG_R(n)					(((n) == 0) ? 0 : (1 << (n)))
+#define REGFLAG_R(n)                    (((n) == 0) ? 0 : (1 << (n)))
 
 // register flags 1
-#define REGFLAG_CPR1(n)					(1 << (n))
+#define REGFLAG_CPR1(n)                 (1 << (n))
 
 // register flags 2
-#define REGFLAG_LO						(1 << 0)
-#define REGFLAG_HI						(1 << 1)
-#define REGFLAG_FCC						(1 << 2)
+#define REGFLAG_LO                      (1 << 0)
+#define REGFLAG_HI                      (1 << 1)
+#define REGFLAG_FCC                     (1 << 2)
 
 
 

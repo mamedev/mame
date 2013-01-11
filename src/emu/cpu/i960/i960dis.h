@@ -3,9 +3,9 @@
 
 struct disassemble_t
 {
-	char		*buffer;	// output buffer
-	unsigned long	IP;
-	unsigned long	IPinc;
+	char        *buffer;    // output buffer
+	unsigned long   IP;
+	unsigned long   IPinc;
 	const UINT8 *oprom;
 	UINT32 disflags;
 };

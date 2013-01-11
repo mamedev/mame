@@ -120,12 +120,12 @@
 #define VERBOSE 1
 #define LOG logerror
 
-#define RAMSIZE 		0x020000
-#define GRAMSIZE		0x020000
+#define RAMSIZE         0x020000
+#define GRAMSIZE        0x020000
 
 #define DSR_EEPROM "u9_dsr"
 #define GROM_B_EEPROM "u4_grom"
-#define	GROM_A_EEPROM "u1_grom"
+#define GROM_A_EEPROM "u1_grom"
 #define ROM6_EEPROM "u6_rom6"
 
 snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -308,7 +308,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 	port = m_current_grom_port = (offset & 0x3fc) >> 2;
 
 	if (offset & 2)
-	{	// Read GPL address. This must be available even when the rest
+	{   // Read GPL address. This must be available even when the rest
 		// of the card is offline (card_enabled=0).
 		m_waddr_LSB = false;
 
@@ -324,7 +324,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 		}
 	}
 	else
-	{	/* read GPL data */
+	{   /* read GPL data */
 		// It is not clear what effect a CRDENA=0 really has.
 		// At least GROMs 0-2 must remain visible, or the console will lock up.
 		if (m_card_enabled || m_grom_address < 0x6000)
@@ -414,11 +414,11 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 	{
 		m_current_bank = (offset>>1) & 3;
 		if (VERBOSE>7) LOG("hsgpl cart select bank %02x\n", m_current_bank);
-		return;		/* right??? */
+		return;     /* right??? */
 	}
 
 	if ((m_mbx_enabled) && (offset==0x6ffe))
-	{	/* MBX: mapper at 0x6ffe */
+	{   /* MBX: mapper at 0x6ffe */
 		m_current_bank = data & 0x03;
 		return;
 	}
@@ -433,7 +433,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 			m_ram6_memory[(offset & 0x1fff) | (m_current_bank<<13) | (m_current_grom_port<<15) ] = data;
 		}
 		else
-		{	// keep in mind that these lines are also reached for port < 2
+		{   // keep in mind that these lines are also reached for port < 2
 			// and !ram_enabled
 			if (m_current_grom_port < 16)
 			{
@@ -472,7 +472,7 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 	port = m_current_grom_port = (offset & 0x3fc) >> 2;
 
 	if (offset & 2)
-	{	// Write GPL address. This must be available even when the rest
+	{   // Write GPL address. This must be available even when the rest
 		// of the card is offline (card_enabled=0).
 		m_raddr_LSB = false;
 
@@ -568,9 +568,9 @@ void snug_high_speed_gpl_device::device_reset()
 	if (VERBOSE>5) LOG("hsgpl: reset\n");
 	m_dsr_enabled = false;
 	m_gram_enabled = false;
-	m_bank_enabled = true;	// important, assumed to be enabled by default (won't start up otherwise!)
+	m_bank_enabled = true;  // important, assumed to be enabled by default (won't start up otherwise!)
 	m_dsr_page = 0;
-	m_card_enabled = true;	// important, assumed to be enabled by default
+	m_card_enabled = true;  // important, assumed to be enabled by default
 	m_write_enabled = false;
 	m_supercart_enabled = false;
 	m_led_on = false;

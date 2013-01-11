@@ -28,15 +28,15 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_back_color;
 	optional_shared_ptr<UINT8> m_chip_data;
-	optional_shared_ptr<UINT8> m_bitmap_ram;	/* 0x2000 bytes for a 256 x 256 x 1 bitmap */
+	optional_shared_ptr<UINT8> m_bitmap_ram;    /* 0x2000 bytes for a 256 x 256 x 1 bitmap */
 	optional_shared_ptr<UINT8> m_last_colors;
 	optional_shared_ptr<UINT8> m_track_scroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_track_tilemap;
-	UINT8    m_gfxbank;		/* used by lasso, chameleo, wwjgtin and pinbo */
-	UINT8    m_track_enable;	/* used by wwjgtin */
+	UINT8    m_gfxbank;     /* used by lasso, chameleo, wwjgtin and pinbo */
+	UINT8    m_track_enable;    /* used by wwjgtin */
 
 	/* devices */
 	cpu_device *m_maincpu;

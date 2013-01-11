@@ -16,7 +16,7 @@ SAMPLES_START( suna8_sh_start )
 	suna8_state *state = device.machine().driver_data<suna8_state>();
 	running_machine &machine = device.machine();
 
-	int i, len = state->memregion("samples")->bytes() * 2;	// 2 samples per byte
+	int i, len = state->memregion("samples")->bytes() * 2;  // 2 samples per byte
 	UINT8 *ROM = state->memregion("samples")->base();
 
 	state->m_samplebuf = auto_alloc_array(machine, INT16, len);
@@ -62,7 +62,7 @@ WRITE8_MEMBER(suna8_state::suna8_play_samples_w)
 		{
 			play_sample((m_sample & 3) + 7);
 		}
-		else if ( ~data & 0x40 )	// sparkman, second sample rom
+		else if ( ~data & 0x40 )    // sparkman, second sample rom
 		{
 			play_sample(m_sample + 0x10);
 		}
@@ -73,7 +73,7 @@ WRITE8_MEMBER(suna8_state::rranger_play_samples_w)
 {
 	if (data)
 	{
-		if (( m_sample != 0 ) && ( ~data & 0x30 ))	// don't play sample zero when those bits are active
+		if (( m_sample != 0 ) && ( ~data & 0x30 ))  // don't play sample zero when those bits are active
 		{
 			play_sample(m_sample);
 		}

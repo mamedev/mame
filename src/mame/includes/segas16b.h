@@ -55,28 +55,28 @@ public:
 	// construction/destruction
 	segas16b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-		  m_mapper(*this, "mapper"),
-		  m_maincpu(*this, "maincpu"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_mcu(*this, "mcu"),
-		  m_ym2151(*this, "ym2151"),
-		  m_ym2413(*this, "ym2413"),
-		  m_upd7759(*this, "upd"),
-		  m_multiplier(*this, "multiplier"),
-		  m_cmptimer_1(*this, "cmptimer_1"),
-		  m_cmptimer_2(*this, "cmptimer_2"),
-		  m_nvram(*this, "nvram"),
-		  m_sprites(*this, "sprites"),
-		  m_workram(*this, "workram"),
-		  m_romboard(ROM_BOARD_INVALID),
-		  m_tilemap_type(SEGAIC16_TILEMAP_16B),
-		  m_disable_screen_blanking(false),
-		  m_i8751_initial_config(NULL),
-		  m_atomicp_sound_divisor(0),
-		  m_atomicp_sound_count(0),
-		  m_hwc_input_value(0),
-		  m_mj_input_num(0),
-		  m_mj_last_val(0)
+			m_mapper(*this, "mapper"),
+			m_maincpu(*this, "maincpu"),
+			m_soundcpu(*this, "soundcpu"),
+			m_mcu(*this, "mcu"),
+			m_ym2151(*this, "ym2151"),
+			m_ym2413(*this, "ym2413"),
+			m_upd7759(*this, "upd"),
+			m_multiplier(*this, "multiplier"),
+			m_cmptimer_1(*this, "cmptimer_1"),
+			m_cmptimer_2(*this, "cmptimer_2"),
+			m_nvram(*this, "nvram"),
+			m_sprites(*this, "sprites"),
+			m_workram(*this, "workram"),
+			m_romboard(ROM_BOARD_INVALID),
+			m_tilemap_type(SEGAIC16_TILEMAP_16B),
+			m_disable_screen_blanking(false),
+			m_i8751_initial_config(NULL),
+			m_atomicp_sound_divisor(0),
+			m_atomicp_sound_count(0),
+			m_hwc_input_value(0),
+			m_mj_input_num(0),
+			m_mj_last_val(0)
 	{ }
 
 	// memory mapping
@@ -159,12 +159,12 @@ protected:
 	enum segas16b_rom_board
 	{
 		ROM_BOARD_INVALID,
-		ROM_BOARD_171_5358_SMALL,		// 171-5358 with smaller ROMs
-		ROM_BOARD_171_5358,				// 171-5358
-		ROM_BOARD_171_5521,				// 171-5521
-		ROM_BOARD_171_5704,				// 171-5704 - don't know any diff between this and 171-5521
-		ROM_BOARD_171_5797,				// 171-5797
-		ROM_BOARD_KOREAN				// (custom Korean)
+		ROM_BOARD_171_5358_SMALL,       // 171-5358 with smaller ROMs
+		ROM_BOARD_171_5358,             // 171-5358
+		ROM_BOARD_171_5521,             // 171-5521
+		ROM_BOARD_171_5704,             // 171-5704 - don't know any diff between this and 171-5521
+		ROM_BOARD_171_5797,             // 171-5797
+		ROM_BOARD_KOREAN                // (custom Korean)
 	};
 
 	// device overrides
@@ -213,20 +213,20 @@ protected:
 	required_shared_ptr<UINT16> m_workram;
 
 	// configuration
-	segas16b_rom_board	m_romboard;
-	int					m_tilemap_type;
-	read16_delegate		m_custom_io_r;
-	write16_delegate	m_custom_io_w;
-	bool				m_disable_screen_blanking;
-	const UINT8 *		m_i8751_initial_config;
-	i8751_sim_delegate	m_i8751_vblank_hook;
-	UINT8				m_atomicp_sound_divisor;
+	segas16b_rom_board  m_romboard;
+	int                 m_tilemap_type;
+	read16_delegate     m_custom_io_r;
+	write16_delegate    m_custom_io_w;
+	bool                m_disable_screen_blanking;
+	const UINT8 *       m_i8751_initial_config;
+	i8751_sim_delegate  m_i8751_vblank_hook;
+	UINT8               m_atomicp_sound_divisor;
 
 	// game-specific state
-	UINT8				m_atomicp_sound_count;
-	UINT8				m_hwc_input_value;
-	UINT8				m_mj_input_num;
-	UINT8				m_mj_last_val;
+	UINT8               m_atomicp_sound_count;
+	UINT8               m_hwc_input_value;
+	UINT8               m_mj_input_num;
+	UINT8               m_mj_last_val;
 };
 
 
@@ -238,19 +238,19 @@ public:
 	// construction/destruction
 	isgsm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: segas16b_state(mconfig, type, tag),
-		  m_read_xor(0),
-		  m_cart_addrlatch(0),
-		  m_cart_addr(0),
-		  m_data_type(0),
-		  m_data_addr(0),
-		  m_data_mode(0),
-		  m_addr_latch(0),
-		  m_security_value(0),
-		  m_security_latch(0),
-		  m_rle_control_position(8),
-		  m_rle_control_byte(0),
-		  m_rle_latched(false),
-		  m_rle_byte(0)
+			m_read_xor(0),
+			m_cart_addrlatch(0),
+			m_cart_addr(0),
+			m_data_type(0),
+			m_data_addr(0),
+			m_data_mode(0),
+			m_addr_latch(0),
+			m_security_value(0),
+			m_security_latch(0),
+			m_rle_control_position(8),
+			m_rle_control_byte(0),
+			m_rle_latched(false),
+			m_rle_byte(0)
 	{ }
 
 	// driver init
@@ -283,21 +283,21 @@ public:
 	virtual void machine_reset();
 
 	// configuration
-	UINT8			m_read_xor;
+	UINT8           m_read_xor;
 	typedef delegate<UINT32 (UINT32)> security_callback_delegate;
 	security_callback_delegate m_security_callback;
 
 	// internal state
-	UINT16			m_cart_addrlatch;
-	UINT32			m_cart_addr;
-	UINT8			m_data_type;
-	UINT32			m_data_addr;
-	UINT8			m_data_mode;
-	UINT16			m_addr_latch;
-	UINT32			m_security_value;
-	UINT16			m_security_latch;
-	UINT8			m_rle_control_position;
-	UINT8			m_rle_control_byte;
-	bool			m_rle_latched;
-	UINT8			m_rle_byte;
+	UINT16          m_cart_addrlatch;
+	UINT32          m_cart_addr;
+	UINT8           m_data_type;
+	UINT32          m_data_addr;
+	UINT8           m_data_mode;
+	UINT16          m_addr_latch;
+	UINT32          m_security_value;
+	UINT16          m_security_latch;
+	UINT8           m_rle_control_position;
+	UINT8           m_rle_control_byte;
+	bool            m_rle_latched;
+	UINT8           m_rle_byte;
 };

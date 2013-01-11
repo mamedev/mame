@@ -88,10 +88,10 @@ TILE_GET_INFO_MEMBER(tehkanwc_state::get_fg_tile_info)
 void tehkanwc_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tehkanwc_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 16, 8, 32, 32);
+			16, 8, 32, 32);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tehkanwc_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

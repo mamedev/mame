@@ -247,10 +247,10 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
 	AM_RANGE(0x1700, 0x1700) AM_READNOP // ???
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")	/* DSW 0 */
-	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")	/* Controls */
-	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")	/* Coins */
-	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")	/* DSW 1 */
+	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")   /* DSW 0 */
+	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")    /* Controls */
+	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")    /* Coins */
+	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")   /* DSW 1 */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP // ???
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(exprraid_flipscreen_w)
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x2800, 0x2803) AM_WRITE(exprraid_bgselect_w)
 	AM_RANGE(0x2804, 0x2804) AM_WRITE(exprraid_scrolly_w)
 	AM_RANGE(0x2805, 0x2806) AM_WRITE(exprraid_scrollx_w)
-	AM_RANGE(0x2807, 0x2807) AM_WRITENOP	// Scroll related ?
+	AM_RANGE(0x2807, 0x2807) AM_WRITENOP    // Scroll related ?
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -286,10 +286,10 @@ INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
 }
 
 static INPUT_PORTS_START( exprraid )
-	PORT_START("IN0")	/* 0x3800 */
+	PORT_START("IN0")   /* 0x3800 */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("DSW0")	/* 0x1800 */
+	PORT_START("DSW0")  /* 0x1800 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
@@ -319,7 +319,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 
-	PORT_START("IN1")	/* 0x1801 */
+	PORT_START("IN1")   /* 0x1801 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2")	/* 0x1802 */
+	PORT_START("IN2")   /* 0x1802 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
@@ -339,12 +339,12 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
 
-	PORT_START("DSW1")	/* 0x1803 */
+	PORT_START("DSW1")  /* 0x1803 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Infinite ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:3")     /* see notes */
 	PORT_DIPSETTING(    0x00, "50k 80k" )
 	PORT_DIPSETTING(    0x04, "50k only" )
@@ -364,38 +364,38 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( exprboot )
 	PORT_INCLUDE( exprraid )
-	PORT_MODIFY("IN2")	/* 0x1802 */
+	PORT_MODIFY("IN2")  /* 0x1802 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_nmi, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_nmi, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	2,	/* 2 bits per pixel */
-	{ 0, 4 },	/* the bitplanes are packed in the same byte */
+	8,8,    /* 8*8 characters */
+	1024,   /* 1024 characters */
+	2,  /* 2 bits per pixel */
+	{ 0, 4 },   /* the bitplanes are packed in the same byte */
 	{ (0x2000*8)+0, (0x2000*8)+1, (0x2000*8)+2, (0x2000*8)+3, 0, 1, 2, 3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	2048,	/* 2048 sprites */
-	3,	/* 3 bits per pixel */
-	{ 2*2048*32*8, 2048*32*8, 0 },	/* the bitplanes are separated */
+	16,16,  /* 16*16 sprites */
+	2048,   /* 2048 sprites */
+	3,  /* 3 bits per pixel */
+	{ 2*2048*32*8, 2048*32*8, 0 },  /* the bitplanes are separated */
 	{ 128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every char takes 32 consecutive bytes */
+	32*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout tile1 =
 {
-	16,16,	/* 16*16 tiles */
-	128,	/* 128 tiles */
-	3,	/* 3 bits per pixel */
+	16,16,  /* 16*16 tiles */
+	128,    /* 128 tiles */
+	3,  /* 3 bits per pixel */
 	{ 4, 0x10000*8+0, 0x10000*8+4 },
 	{ 0, 1, 2, 3, 1024*32*2,1024*32*2+1,1024*32*2+2,1024*32*2+3,
 		128+0,128+1,128+2,128+3,128+1024*32*2,128+1024*32*2+1,128+1024*32*2+2,128+1024*32*2+3 }, /* BOGUS */
@@ -406,9 +406,9 @@ static const gfx_layout tile1 =
 
 static const gfx_layout tile2 =
 {
-	16,16,	/* 16*16 tiles */
-	128,	/* 128 tiles */
-	3,	/* 3 bits per pixel */
+	16,16,  /* 16*16 tiles */
+	128,    /* 128 tiles */
+	3,  /* 3 bits per pixel */
 	{ 0, 0x11000*8+0, 0x11000*8+4  },
 	{ 0, 1, 2, 3, 1024*32*2,1024*32*2+1,1024*32*2+2,1024*32*2+3,
 		128+0,128+1,128+2,128+3,128+1024*32*2,128+1024*32*2+1,128+1024*32*2+2,128+1024*32*2+3 }, /* BOGUS */
@@ -537,14 +537,14 @@ ROM_START( exprraid )
 	ROM_LOAD( "cz01-2e.16b", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
 	ROM_LOAD( "cz00-4e.15a", 0x8000, 0x8000, CRC(910f6ccc) SHA1(1dbf164a7add9335d90ee07b6db9a162a28e407b) )
 
-	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
+	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )    /* characters */
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )	/* sprites */
+	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )   /* sprites */
 	ROM_LOAD( "cz08.14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
 	ROM_LOAD( "cz13.16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
 	ROM_LOAD( "cz12.14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
@@ -552,10 +552,10 @@ ROM_START( exprraid )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )	/* tiles */
+	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )    /* tiles */
 	/* Save 0x08000-0x0ffff to expand the previous so we can decode the thing */
-	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )	/* tiles */
-	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )	/* tiles */
+	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )    /* tiles */
+	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )    /* tiles */
 
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cz03.12d", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
@@ -576,14 +576,14 @@ ROM_START( exprraidu )
 	ROM_LOAD( "cz01-5a.16b", 0x4000, 0x4000, CRC(dc8f9fba) SHA1(cae6af54fc0081d606b6884e8873aed356a37ba9) )
 	ROM_LOAD( "cz00-5.15a",  0x8000, 0x8000, CRC(a81290bc) SHA1(ddb0acda6124427bee691f9926c41fda27ed816e) )
 
-	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
+	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )    /* characters */
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )	/* sprites */
+	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )   /* sprites */
 	ROM_LOAD( "cz08.14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
 	ROM_LOAD( "cz13.16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
 	ROM_LOAD( "cz12.14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
@@ -591,10 +591,10 @@ ROM_START( exprraidu )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )	/* tiles */
+	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )    /* tiles */
 	/* Save 0x08000-0x0ffff to expand the previous so we can decode the thing */
-	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )	/* tiles */
-	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )	/* tiles */
+	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )    /* tiles */
+	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )    /* tiles */
 
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cz03.12d", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
@@ -615,14 +615,14 @@ ROM_START( exprraidi ) /* PCB manufactured in Italy by Gecas under Data East lic
 	ROM_LOAD( "cz01-2e.16b",  0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
 	ROM_LOAD( "exraidi6.15a", 0x8000, 0x8000, CRC(a3d98118) SHA1(d35f0fcabef045afcec5119f95ae6da2cae547db) )
 
-	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
+	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )    /* characters */
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )	/* sprites */
+	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )   /* sprites */
 	ROM_LOAD( "cz08.14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
 	ROM_LOAD( "cz13.16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
 	ROM_LOAD( "cz12.14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
@@ -630,10 +630,10 @@ ROM_START( exprraidi ) /* PCB manufactured in Italy by Gecas under Data East lic
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )	/* tiles */
+	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )    /* tiles */
 	/* Save 0x08000-0x0ffff to expand the previous so we can decode the thing */
-	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )	/* tiles */
-	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )	/* tiles */
+	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )    /* tiles */
+	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )    /* tiles */
 
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cz03.12d", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
@@ -654,14 +654,14 @@ ROM_START( wexpress )
 	ROM_LOAD( "cy01-2.16b", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
 	ROM_LOAD( "cy00-4.15a", 0x8000, 0x8000, CRC(c66d4dd3) SHA1(3c354e7379b3c3e709039ee2f3dbad7edddfc517) )
 
-	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the sub cpu */
 	ROM_LOAD( "cy02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
+	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )    /* characters */
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )	/* sprites */
+	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )   /* sprites */
 	ROM_LOAD( "cz08.14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
 	ROM_LOAD( "cz13.16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
 	ROM_LOAD( "cz12.14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
@@ -669,10 +669,10 @@ ROM_START( wexpress )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )	/* tiles */
+	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )    /* tiles */
 	/* Save 0x08000-0x0ffff to expand the previous so we can decode the thing */
-	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )	/* tiles */
-	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )	/* tiles */
+	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )    /* tiles */
+	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )    /* tiles */
 
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cy03.12d", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
@@ -693,14 +693,14 @@ ROM_START( wexpressb1 )
 	ROM_LOAD( "2.16b", 0x4000, 0x4000, CRC(ea5e5a8f) SHA1(fa92bcb6b97c2966cd330b309eba73f9c059f14e) )
 	ROM_LOAD( "1.15a", 0x8000, 0x8000, CRC(a7daae12) SHA1(a97f4bc05a3ec096d8c717bdf096f4b0e59dc2c2) )
 
-	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the sub cpu */
 	ROM_LOAD( "cy02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
+	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )    /* characters */
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )	/* sprites */
+	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )   /* sprites */
 	ROM_LOAD( "cz08.14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
 	ROM_LOAD( "cz13.16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
 	ROM_LOAD( "cz12.14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
@@ -708,10 +708,10 @@ ROM_START( wexpressb1 )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )	/* tiles */
+	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )    /* tiles */
 	/* Save 0x08000-0x0ffff to expand the previous so we can decode the thing */
-	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )	/* tiles */
-	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )	/* tiles */
+	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )    /* tiles */
+	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )    /* tiles */
 
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cy03.12d", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
@@ -732,14 +732,14 @@ ROM_START( wexpressb2 )
 	ROM_LOAD( "wexpress.3", 0x4000, 0x4000, CRC(b4dd0fa4) SHA1(8d17eb28ae92486c67859871ea2bef8f50f39dbd) )
 	ROM_LOAD( "wexpress.1", 0x8000, 0x8000, CRC(e8466596) SHA1(dbbd3b84d0f017292595fc19f7412b984851221a) )
 
-	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the sub cpu */
 	ROM_LOAD( "cy02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
+	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )    /* characters */
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )	/* sprites */
+	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )   /* sprites */
 	ROM_LOAD( "cz08.14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
 	ROM_LOAD( "cz13.16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
 	ROM_LOAD( "cz12.14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
@@ -747,10 +747,10 @@ ROM_START( wexpressb2 )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )	/* tiles */
+	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )    /* tiles */
 	/* Save 0x08000-0x0ffff to expand the previous so we can decode the thing */
-	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )	/* tiles */
-	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )	/* tiles */
+	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )    /* tiles */
+	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )    /* tiles */
 
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "cy03.12d", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
@@ -767,14 +767,14 @@ ROM_START( wexpressb3 )
 	ROM_LOAD( "s2.16b", 0x4000, 0x4000, CRC(40d70fcb) SHA1(1327d39f872a39e020972952e5756ca59c55f9d0) )
 	ROM_LOAD( "s1.15a", 0x8000, 0x8000, CRC(7c573824) SHA1(f5e4d4f0866c08c88d012a77e8aa2e74a779f986) )
 
-	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
+	ROM_REGION( 0x10000, "slave", 0 )   /* 64k for the sub cpu */
 	ROM_LOAD( "cy02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )	/* characters */
+	ROM_LOAD( "cz07.5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )    /* characters */
 
 	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )	/* sprites */
+	ROM_LOAD( "cz09.16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )   /* sprites */
 	ROM_LOAD( "cz08.14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
 	ROM_LOAD( "cz13.16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
 	ROM_LOAD( "cz12.14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
@@ -782,10 +782,10 @@ ROM_START( wexpressb3 )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )	/* tiles */
+	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )    /* tiles */
 	/* Save 0x08000-0x0ffff to expand the previous so we can decode the thing */
-	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )	/* tiles */
-	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )	/* tiles */
+	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )    /* tiles */
+	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )    /* tiles */
 
 	ROM_REGION( 0x8000, "gfx4", 0 )     /* background tilemaps */
 	ROM_LOAD( "3.12d", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
@@ -802,7 +802,7 @@ static void exprraid_gfx_expand(running_machine &machine)
 {
 	/* Expand the background rom so we can use regular decode routines */
 
-	UINT8	*gfx = machine.root_device().memregion("gfx3")->base();
+	UINT8   *gfx = machine.root_device().memregion("gfx3")->base();
 	int offs = 0x10000 - 0x1000;
 	int i;
 

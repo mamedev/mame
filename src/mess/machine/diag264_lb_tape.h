@@ -25,17 +25,17 @@
 // ======================> diag264_cassette_loopback_device
 
 class diag264_cassette_loopback_device :  public device_t,
-										  public device_pet_datassette_port_interface
+											public device_pet_datassette_port_interface
 {
 
 public:
-    // construction/destruction
-    diag264_cassette_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	diag264_cassette_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete() { m_shortname = "diag264_loopback_cassette"; }
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "diag264_loopback_cassette"; }
+	virtual void device_start();
 
 	// device_pet_datassette_port_interface overrides
 	virtual int datassette_read();

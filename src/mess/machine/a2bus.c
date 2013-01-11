@@ -87,13 +87,13 @@ const device_type A2BUS_SLOT = &device_creator<a2bus_slot_device>;
 //  a2bus_slot_device - constructor
 //-------------------------------------------------
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock),
+		device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
 
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -146,9 +146,9 @@ void a2bus_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-    	memset(&m_out_inh_cb, 0, sizeof(m_out_inh_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_inh_cb, 0, sizeof(m_out_inh_cb));
 	}
 }
 
@@ -161,12 +161,12 @@ void a2bus_device::device_config_complete()
 //-------------------------------------------------
 
 a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock)
+		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock)
 {
 }
 
 a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock)
+		device_t(mconfig, type, name, tag, owner, clock)
 {
 }
 //-------------------------------------------------
@@ -177,16 +177,16 @@ void a2bus_device::device_start()
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 
-    // resolve callbacks
+	// resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
 	m_out_inh_func.resolve(m_out_inh_cb, *this);
 
-    // clear slots
-    for (int i = 0; i < 8; i++)
-    {
-        m_device_list[i] = NULL;
-    }
+	// clear slots
+	for (int i = 0; i < 8; i++)
+	{
+		m_device_list[i] = NULL;
+	}
 }
 
 //-------------------------------------------------
@@ -199,12 +199,12 @@ void a2bus_device::device_reset()
 
 device_a2bus_card_interface *a2bus_device::get_a2bus_card(int slot)
 {
-    if (slot < 0)
-    {
-        return NULL;
-    }
+	if (slot < 0)
+	{
+		return NULL;
+	}
 
-    return m_device_list[slot];
+	return m_device_list[slot];
 }
 
 void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
@@ -214,17 +214,17 @@ void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
 
 void a2bus_device::set_irq_line(int state)
 {
-    m_out_irq_func(state);
+	m_out_irq_func(state);
 }
 
 void a2bus_device::set_nmi_line(int state)
 {
-    m_out_nmi_func(state);
+	m_out_nmi_func(state);
 }
 
 void a2bus_device::set_inh_slotnum(int slot)
 {
-    m_out_inh_func(slot);
+	m_out_inh_func(slot);
 }
 
 // interrupt request from a2bus card
@@ -246,8 +246,8 @@ WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_func(state); }
 
 device_a2bus_card_interface::device_a2bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-	  m_a2bus(NULL),
-	  m_a2bus_tag(NULL)
+		m_a2bus(NULL),
+		m_a2bus_tag(NULL)
 {
 }
 
@@ -282,4 +282,3 @@ void device_a2bus_card_interface::set_a2bus_device()
 	m_a2bus = dynamic_cast<a2bus_device *>(device().machine().device(m_a2bus_tag));
 	m_a2bus->add_a2bus_card(m_slot, this);
 }
-

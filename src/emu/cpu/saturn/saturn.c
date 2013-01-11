@@ -46,7 +46,7 @@ typedef SaturnNib Saturn64[16];
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
 /****************************************************************************
@@ -62,7 +62,7 @@ struct saturn_state
 
 	SaturnNib p; // 4 bit pointer
 
-        UINT16 out; // 12 bit (packed)
+		UINT16 out; // 12 bit (packed)
 	UINT8  carry, decimal;
 	UINT16 st; // status 16 bit
 
@@ -72,14 +72,14 @@ struct saturn_state
 #define SR 4 // Service Request
 #define MP 8 // Module Pulled
 
-	UINT8	nmi_state;
+	UINT8   nmi_state;
 	UINT8   irq_state;
 	UINT8   irq_enable;     /* INTON / INTOFF */
 	UINT8   in_irq;         /* already servicing IRQ */
-	UINT8	pending_irq;	/* IRQ is pending */
+	UINT8   pending_irq;    /* IRQ is pending */
 	UINT8   sleeping;       /* low-consumption state */
-	int 	monitor_id;
-	int		monitor_in;
+	int     monitor_id;
+	int     monitor_in;
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
@@ -248,37 +248,37 @@ static CPU_SET_INFO( saturn )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-	        case CPUINFO_INT_INPUT_STATE + SATURN_NMI_LINE:	        saturn_set_nmi_line(cpustate, info->i);	break;
-	        case CPUINFO_INT_INPUT_STATE + SATURN_IRQ_LINE:	        saturn_set_irq_line(cpustate, info->i);	break;
-	        case CPUINFO_INT_INPUT_STATE + SATURN_WAKEUP_LINE:	saturn_set_wakeup_line(cpustate, info->i);	break;
+			case CPUINFO_INT_INPUT_STATE + SATURN_NMI_LINE:         saturn_set_nmi_line(cpustate, info->i); break;
+			case CPUINFO_INT_INPUT_STATE + SATURN_IRQ_LINE:         saturn_set_irq_line(cpustate, info->i); break;
+			case CPUINFO_INT_INPUT_STATE + SATURN_WAKEUP_LINE:  saturn_set_wakeup_line(cpustate, info->i);  break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SATURN_PC:			cpustate->pc = info->i; 							break;
-		case CPUINFO_INT_REGISTER + SATURN_D0:			cpustate->d[0] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_D1:			cpustate->d[1] = info->i;							break;
-	        case CPUINFO_INT_REGISTER + SATURN_A:			IntReg64(cpustate->reg[A], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_B:			IntReg64(cpustate->reg[B], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_C:			IntReg64(cpustate->reg[C], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_D:			IntReg64(cpustate->reg[D], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_R0:			IntReg64(cpustate->reg[R0], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_R1:			IntReg64(cpustate->reg[R1], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_R2:			IntReg64(cpustate->reg[R2], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_R3:			IntReg64(cpustate->reg[R3], info->i);							break;
-	        case CPUINFO_INT_REGISTER + SATURN_R4:			IntReg64(cpustate->reg[R4], info->i);							break;
-		case CPUINFO_INT_REGISTER + SATURN_P:			cpustate->p = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_OUT:			cpustate->out = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_CARRY:		cpustate->carry = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_ST:			cpustate->st = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_HST:			cpustate->hst = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK0:		cpustate->rstk[0] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK1:		cpustate->rstk[1] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK2:		cpustate->rstk[2] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK3:		cpustate->rstk[3] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK4:		cpustate->rstk[4] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK5:		cpustate->rstk[5] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK6:		cpustate->rstk[6] = info->i;							break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK7:		cpustate->rstk[7] = info->i;							break;
-                case CPUINFO_INT_REGISTER + SATURN_SLEEPING:		cpustate->sleeping = info->i;
+		case CPUINFO_INT_REGISTER + SATURN_PC:          cpustate->pc = info->i;                             break;
+		case CPUINFO_INT_REGISTER + SATURN_D0:          cpustate->d[0] = info->i;                           break;
+		case CPUINFO_INT_REGISTER + SATURN_D1:          cpustate->d[1] = info->i;                           break;
+			case CPUINFO_INT_REGISTER + SATURN_A:           IntReg64(cpustate->reg[A], info->i);                            break;
+			case CPUINFO_INT_REGISTER + SATURN_B:           IntReg64(cpustate->reg[B], info->i);                            break;
+			case CPUINFO_INT_REGISTER + SATURN_C:           IntReg64(cpustate->reg[C], info->i);                            break;
+			case CPUINFO_INT_REGISTER + SATURN_D:           IntReg64(cpustate->reg[D], info->i);                            break;
+			case CPUINFO_INT_REGISTER + SATURN_R0:          IntReg64(cpustate->reg[R0], info->i);                           break;
+			case CPUINFO_INT_REGISTER + SATURN_R1:          IntReg64(cpustate->reg[R1], info->i);                           break;
+			case CPUINFO_INT_REGISTER + SATURN_R2:          IntReg64(cpustate->reg[R2], info->i);                           break;
+			case CPUINFO_INT_REGISTER + SATURN_R3:          IntReg64(cpustate->reg[R3], info->i);                           break;
+			case CPUINFO_INT_REGISTER + SATURN_R4:          IntReg64(cpustate->reg[R4], info->i);                           break;
+		case CPUINFO_INT_REGISTER + SATURN_P:           cpustate->p = info->i;                          break;
+		case CPUINFO_INT_REGISTER + SATURN_OUT:         cpustate->out = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_CARRY:       cpustate->carry = info->i;                          break;
+		case CPUINFO_INT_REGISTER + SATURN_ST:          cpustate->st = info->i;                         break;
+		case CPUINFO_INT_REGISTER + SATURN_HST:         cpustate->hst = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK0:       cpustate->rstk[0] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK1:       cpustate->rstk[1] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK2:       cpustate->rstk[2] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK3:       cpustate->rstk[3] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK4:       cpustate->rstk[4] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK5:       cpustate->rstk[5] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK6:       cpustate->rstk[6] = info->i;                            break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK7:       cpustate->rstk[7] = info->i;                            break;
+				case CPUINFO_INT_REGISTER + SATURN_SLEEPING:        cpustate->sleeping = info->i;
 	}
 }
 
@@ -305,106 +305,106 @@ CPU_GET_INFO( saturn )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(saturn_state);				break;
-		case CPUINFO_INT_INPUT_LINES:						info->i = 1;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20; /* 20 nibbles max */		break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 21;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(saturn_state);             break;
+		case CPUINFO_INT_INPUT_LINES:                       info->i = 1;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 20; /* 20 nibbles max */      break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 21;                           break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 20;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 20;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE + SATURN_NMI_LINE:	        info->i = cpustate->nmi_state;				break;
-		case CPUINFO_INT_INPUT_STATE + SATURN_IRQ_LINE:	        info->i = cpustate->irq_state;				break;
+		case CPUINFO_INT_INPUT_STATE + SATURN_NMI_LINE:         info->i = cpustate->nmi_state;              break;
+		case CPUINFO_INT_INPUT_STATE + SATURN_IRQ_LINE:         info->i = cpustate->irq_state;              break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->oldpc;					break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->oldpc;                  break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SATURN_PC:			info->i = cpustate->pc;					break;
-		case CPUINFO_INT_REGISTER + SATURN_D0:			info->i = cpustate->d[0];					break;
-		case CPUINFO_INT_REGISTER + SATURN_D1:			info->i = cpustate->d[1];					break;
+		case CPUINFO_INT_REGISTER + SATURN_PC:          info->i = cpustate->pc;                 break;
+		case CPUINFO_INT_REGISTER + SATURN_D0:          info->i = cpustate->d[0];                   break;
+		case CPUINFO_INT_REGISTER + SATURN_D1:          info->i = cpustate->d[1];                   break;
 
-    	        case CPUINFO_INT_REGISTER + SATURN_A:			info->i = Reg64Int(cpustate->reg[A]);				break;
-                case CPUINFO_INT_REGISTER + SATURN_B:			info->i = Reg64Int(cpustate->reg[B]);				break;
-                case CPUINFO_INT_REGISTER + SATURN_C:			info->i = Reg64Int(cpustate->reg[C]);				break;
-                case CPUINFO_INT_REGISTER + SATURN_D:			info->i = Reg64Int(cpustate->reg[D]);				break;
-                case CPUINFO_INT_REGISTER + SATURN_R0:			info->i = Reg64Int(cpustate->reg[R0]);				break;
-	        case CPUINFO_INT_REGISTER + SATURN_R1:			info->i = Reg64Int(cpustate->reg[R1]);				break;
-    	        case CPUINFO_INT_REGISTER + SATURN_R2:			info->i = Reg64Int(cpustate->reg[R2]);				break;
-	        case CPUINFO_INT_REGISTER + SATURN_R3:			info->i = Reg64Int(cpustate->reg[R3]);				break;
-	        case CPUINFO_INT_REGISTER + SATURN_R4:			info->i = Reg64Int(cpustate->reg[R4]);				break;
+				case CPUINFO_INT_REGISTER + SATURN_A:           info->i = Reg64Int(cpustate->reg[A]);               break;
+				case CPUINFO_INT_REGISTER + SATURN_B:           info->i = Reg64Int(cpustate->reg[B]);               break;
+				case CPUINFO_INT_REGISTER + SATURN_C:           info->i = Reg64Int(cpustate->reg[C]);               break;
+				case CPUINFO_INT_REGISTER + SATURN_D:           info->i = Reg64Int(cpustate->reg[D]);               break;
+				case CPUINFO_INT_REGISTER + SATURN_R0:          info->i = Reg64Int(cpustate->reg[R0]);              break;
+			case CPUINFO_INT_REGISTER + SATURN_R1:          info->i = Reg64Int(cpustate->reg[R1]);              break;
+				case CPUINFO_INT_REGISTER + SATURN_R2:          info->i = Reg64Int(cpustate->reg[R2]);              break;
+			case CPUINFO_INT_REGISTER + SATURN_R3:          info->i = Reg64Int(cpustate->reg[R3]);              break;
+			case CPUINFO_INT_REGISTER + SATURN_R4:          info->i = Reg64Int(cpustate->reg[R4]);              break;
 
-		case CPUINFO_INT_REGISTER + SATURN_P:			info->i = cpustate->p;						break;
-		case CPUINFO_INT_REGISTER + SATURN_OUT:			info->i = cpustate->out;					break;
-		case CPUINFO_INT_REGISTER + SATURN_CARRY:		info->i = cpustate->carry;					break;
-		case CPUINFO_INT_REGISTER + SATURN_ST:			info->i = cpustate->st;					break;
-		case CPUINFO_INT_REGISTER + SATURN_HST:			info->i = cpustate->hst;					break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK0:		info->i = cpustate->rstk[0];				break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK1:		info->i = cpustate->rstk[1];				break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK2:		info->i = cpustate->rstk[2];				break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK3:		info->i = cpustate->rstk[3];				break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK4:		info->i = cpustate->rstk[4];				break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK5:		info->i = cpustate->rstk[5];				break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK6:		info->i = cpustate->rstk[6];				break;
-		case CPUINFO_INT_REGISTER + SATURN_RSTK7:		info->i = cpustate->rstk[7];				break;
-	        case CPUINFO_INT_REGISTER + SATURN_SLEEPING:		info->i = cpustate->sleeping;
+		case CPUINFO_INT_REGISTER + SATURN_P:           info->i = cpustate->p;                      break;
+		case CPUINFO_INT_REGISTER + SATURN_OUT:         info->i = cpustate->out;                    break;
+		case CPUINFO_INT_REGISTER + SATURN_CARRY:       info->i = cpustate->carry;                  break;
+		case CPUINFO_INT_REGISTER + SATURN_ST:          info->i = cpustate->st;                 break;
+		case CPUINFO_INT_REGISTER + SATURN_HST:         info->i = cpustate->hst;                    break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK0:       info->i = cpustate->rstk[0];                break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK1:       info->i = cpustate->rstk[1];                break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK2:       info->i = cpustate->rstk[2];                break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK3:       info->i = cpustate->rstk[3];                break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK4:       info->i = cpustate->rstk[4];                break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK5:       info->i = cpustate->rstk[5];                break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK6:       info->i = cpustate->rstk[6];                break;
+		case CPUINFO_INT_REGISTER + SATURN_RSTK7:       info->i = cpustate->rstk[7];                break;
+			case CPUINFO_INT_REGISTER + SATURN_SLEEPING:        info->i = cpustate->sleeping;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(saturn);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(saturn);					break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(saturn);					break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(saturn);				break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;							break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(saturn);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(saturn);          break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(saturn);                 break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(saturn);                   break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(saturn);               break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                          break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(saturn);       break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;               break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Saturn");	break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Saturn");	break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0alpha");	break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);	break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Peter Trauner, all rights reserved.");	break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Saturn");  break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Saturn");  break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0alpha");    break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);  break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Peter Trauner, all rights reserved.");   break;
 
-		case CPUINFO_STR_REGISTER + SATURN_PC:		sprintf(info->s, "PC:   %.5x", cpustate->pc);break;
-		case CPUINFO_STR_REGISTER + SATURN_D0:		sprintf(info->s, "D0:   %.5x", cpustate->d[0]);break;
-		case CPUINFO_STR_REGISTER + SATURN_D1:		sprintf(info->s, "D1:   %.5x", cpustate->d[1]);break;
-    	        case CPUINFO_STR_REGISTER + SATURN_A:		sprintf(info->s, "A: " Reg64Format, Reg64Data(cpustate->reg[A]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_B:		sprintf(info->s, "B: " Reg64Format, Reg64Data(cpustate->reg[B]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_C:		sprintf(info->s, "C: " Reg64Format, Reg64Data(cpustate->reg[C]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_D:		sprintf(info->s, "D: " Reg64Format, Reg64Data(cpustate->reg[D]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_R0:		sprintf(info->s, "R0: " Reg64Format, Reg64Data(cpustate->reg[R0]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_R1:		sprintf(info->s, "R1: " Reg64Format, Reg64Data(cpustate->reg[R1]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_R2:		sprintf(info->s, "R2: " Reg64Format, Reg64Data(cpustate->reg[R2]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_R3:		sprintf(info->s, "R3: " Reg64Format, Reg64Data(cpustate->reg[R3]));break;
-    	        case CPUINFO_STR_REGISTER + SATURN_R4:		sprintf(info->s, "R4: " Reg64Format, Reg64Data(cpustate->reg[R4]));break;
-		case CPUINFO_STR_REGISTER + SATURN_P:		sprintf(info->s, "P:%x", cpustate->p);break;
-		case CPUINFO_STR_REGISTER + SATURN_OUT:		sprintf(info->s, "OUT:%.3x", cpustate->out);break;
-		case CPUINFO_STR_REGISTER + SATURN_CARRY:	sprintf(info->s, "Carry: %d", cpustate->carry);break;
-		case CPUINFO_STR_REGISTER + SATURN_ST:		sprintf(info->s, "ST:%.4x", cpustate->st);break;
-		case CPUINFO_STR_REGISTER + SATURN_HST:		sprintf(info->s, "HST:%x", cpustate->hst);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK0:	sprintf(info->s, "RSTK0:%.5x", cpustate->rstk[0]);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK1:	sprintf(info->s, "RSTK1:%.5x", cpustate->rstk[1]);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK2:	sprintf(info->s, "RSTK2:%.5x", cpustate->rstk[2]);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK3:	sprintf(info->s, "RSTK3:%.5x", cpustate->rstk[3]);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK4:	sprintf(info->s, "RSTK4:%.5x", cpustate->rstk[4]);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK5:	sprintf(info->s, "RSTK5:%.5x", cpustate->rstk[5]);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK6:	sprintf(info->s, "RSTK6:%.5x", cpustate->rstk[6]);break;
-		case CPUINFO_STR_REGISTER + SATURN_RSTK7:	sprintf(info->s, "RSTK7:%.5x", cpustate->rstk[7]);break;
-	        case CPUINFO_STR_REGISTER + SATURN_IRQ_STATE:	sprintf(info->s, "IRQ:%c%c%c%i", cpustate->in_irq?'S':'.', cpustate->irq_enable?'e':'.', cpustate->pending_irq?'p':'.', cpustate->irq_state); break;
-	        case CPUINFO_STR_FLAGS:				sprintf(info->s, "%c%c", cpustate->decimal?'D':'.', cpustate->carry ? 'C':'.'); break;
-	        case CPUINFO_STR_REGISTER + SATURN_SLEEPING:	sprintf(info->s, "sleep:%c", cpustate->sleeping?'S':'.'); break;
+		case CPUINFO_STR_REGISTER + SATURN_PC:      sprintf(info->s, "PC:   %.5x", cpustate->pc);break;
+		case CPUINFO_STR_REGISTER + SATURN_D0:      sprintf(info->s, "D0:   %.5x", cpustate->d[0]);break;
+		case CPUINFO_STR_REGISTER + SATURN_D1:      sprintf(info->s, "D1:   %.5x", cpustate->d[1]);break;
+				case CPUINFO_STR_REGISTER + SATURN_A:       sprintf(info->s, "A: " Reg64Format, Reg64Data(cpustate->reg[A]));break;
+				case CPUINFO_STR_REGISTER + SATURN_B:       sprintf(info->s, "B: " Reg64Format, Reg64Data(cpustate->reg[B]));break;
+				case CPUINFO_STR_REGISTER + SATURN_C:       sprintf(info->s, "C: " Reg64Format, Reg64Data(cpustate->reg[C]));break;
+				case CPUINFO_STR_REGISTER + SATURN_D:       sprintf(info->s, "D: " Reg64Format, Reg64Data(cpustate->reg[D]));break;
+				case CPUINFO_STR_REGISTER + SATURN_R0:      sprintf(info->s, "R0: " Reg64Format, Reg64Data(cpustate->reg[R0]));break;
+				case CPUINFO_STR_REGISTER + SATURN_R1:      sprintf(info->s, "R1: " Reg64Format, Reg64Data(cpustate->reg[R1]));break;
+				case CPUINFO_STR_REGISTER + SATURN_R2:      sprintf(info->s, "R2: " Reg64Format, Reg64Data(cpustate->reg[R2]));break;
+				case CPUINFO_STR_REGISTER + SATURN_R3:      sprintf(info->s, "R3: " Reg64Format, Reg64Data(cpustate->reg[R3]));break;
+				case CPUINFO_STR_REGISTER + SATURN_R4:      sprintf(info->s, "R4: " Reg64Format, Reg64Data(cpustate->reg[R4]));break;
+		case CPUINFO_STR_REGISTER + SATURN_P:       sprintf(info->s, "P:%x", cpustate->p);break;
+		case CPUINFO_STR_REGISTER + SATURN_OUT:     sprintf(info->s, "OUT:%.3x", cpustate->out);break;
+		case CPUINFO_STR_REGISTER + SATURN_CARRY:   sprintf(info->s, "Carry: %d", cpustate->carry);break;
+		case CPUINFO_STR_REGISTER + SATURN_ST:      sprintf(info->s, "ST:%.4x", cpustate->st);break;
+		case CPUINFO_STR_REGISTER + SATURN_HST:     sprintf(info->s, "HST:%x", cpustate->hst);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK0:   sprintf(info->s, "RSTK0:%.5x", cpustate->rstk[0]);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK1:   sprintf(info->s, "RSTK1:%.5x", cpustate->rstk[1]);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK2:   sprintf(info->s, "RSTK2:%.5x", cpustate->rstk[2]);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK3:   sprintf(info->s, "RSTK3:%.5x", cpustate->rstk[3]);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK4:   sprintf(info->s, "RSTK4:%.5x", cpustate->rstk[4]);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK5:   sprintf(info->s, "RSTK5:%.5x", cpustate->rstk[5]);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK6:   sprintf(info->s, "RSTK6:%.5x", cpustate->rstk[6]);break;
+		case CPUINFO_STR_REGISTER + SATURN_RSTK7:   sprintf(info->s, "RSTK7:%.5x", cpustate->rstk[7]);break;
+			case CPUINFO_STR_REGISTER + SATURN_IRQ_STATE:   sprintf(info->s, "IRQ:%c%c%c%i", cpustate->in_irq?'S':'.', cpustate->irq_enable?'e':'.', cpustate->pending_irq?'p':'.', cpustate->irq_state); break;
+			case CPUINFO_STR_FLAGS:             sprintf(info->s, "%c%c", cpustate->decimal?'D':'.', cpustate->carry ? 'C':'.'); break;
+			case CPUINFO_STR_REGISTER + SATURN_SLEEPING:    sprintf(info->s, "sleep:%c", cpustate->sleeping?'S':'.'); break;
 	}
 }
 

@@ -11,10 +11,10 @@ enum {
 
 struct tms0980_config {
 	/* O-output PLA configuration 5bit -> 8/11bit translation */
-	UINT16			o_pla[0x20];
-	devcb_read8		read_k;
-	devcb_write16	write_o;		/* tms1270 has 10 O-outputs */
-	devcb_write16	write_r;
+	UINT16          o_pla[0x20];
+	devcb_read8     read_k;
+	devcb_write16   write_o;        /* tms1270 has 10 O-outputs */
+	devcb_write16   write_r;
 };
 
 
@@ -34,4 +34,3 @@ extern CPU_DISASSEMBLE( tms1000 );
 extern CPU_DISASSEMBLE( tms1100 );
 
 #endif /* _TMS0980_H_ */
-

@@ -4,7 +4,7 @@
 #include "53c810.h"
 #include "machine/scsihle.h"
 
-#define DMA_MAX_ICOUNT	512		/* Maximum number of DMA Scripts opcodes to run */
+#define DMA_MAX_ICOUNT  512     /* Maximum number of DMA Scripts opcodes to run */
 #define DASM_OPCODES 0
 
 UINT32 lsi53c810_device::FETCH()
@@ -38,8 +38,8 @@ void lsi53c810_device::dmaop_interrupt()
 	}
 	dsps = FETCH();
 
-	istat |= 0x1;	/* DMA interrupt pending */
-	dstat |= 0x4;	/* SIR (SCRIPTS Interrupt Instruction Received) */
+	istat |= 0x1;   /* DMA interrupt pending */
+	dstat |= 0x4;   /* SIR (SCRIPTS Interrupt Instruction Received) */
 
 	if(irq_callback != NULL) {
 		irq_callback(machine(), 1);
@@ -108,11 +108,11 @@ void lsi53c810_device::dmaop_select()
 		/* initiator mode */
 		logerror("53c810: SELECT: our ID %d, target ID %d\n", scid&7, (dcmd>>16)&7);
 
-		sstat1 &= ~0x07;	// clear current bus phase
-		if (dcmd & 0x01000000)	// select with ATN
+		sstat1 &= ~0x07;    // clear current bus phase
+		if (dcmd & 0x01000000)  // select with ATN
 		{
 			mame_printf_debug("53c810: want select with ATN, setting message phase\n");
-			sstat1 |= 0x7;	// ATN means we want message in phase
+			sstat1 |= 0x7;  // ATN means we want message in phase
 		}
 	}
 }
@@ -137,7 +137,7 @@ void lsi53c810_device::dmaop_wait_disconnect()
 
 void lsi53c810_device::dmaop_wait_reselect()
 {
-  //  UINT32 operand;
+	//  UINT32 operand;
 
 //  operand = FETCH();
 
@@ -321,7 +321,7 @@ void lsi53c810_device::dmaop_jump()
 	}
 	else
 	{
-		FETCH();	// skip operand to continue on
+		FETCH();    // skip operand to continue on
 	}
 }
 
@@ -337,7 +337,7 @@ void lsi53c810_device::dmaop_call()
 	}
 	else
 	{
-		FETCH();	// skip operand to continue on
+		FETCH();    // skip operand to continue on
 	}
 }
 
@@ -351,7 +351,7 @@ void lsi53c810_device::dmaop_return()
 	}
 	else
 	{
-		FETCH();	// skip operand to continue on
+		FETCH();    // skip operand to continue on
 	}
 }
 
@@ -396,37 +396,37 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 //  logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, space.device().safe_pc());
 	switch(offset)
 	{
-		case 0x00:		/* SCNTL0 */
+		case 0x00:      /* SCNTL0 */
 			return scntl0;
-		case 0x01:		/* SCNTL1 */
+		case 0x01:      /* SCNTL1 */
 			return scntl1;
-		case 0x02:		/* SCNTL2 */
+		case 0x02:      /* SCNTL2 */
 			return scntl2;
-		case 0x03:		/* SCNTL3 */
+		case 0x03:      /* SCNTL3 */
 			return scntl3;
-		case 0x04:		/* SCID */
+		case 0x04:      /* SCID */
 			return scid;
-		case 0x05:		/* SXFER */
+		case 0x05:      /* SXFER */
 			return sxfer;
-		case 0x09:		/* SOCL */
+		case 0x09:      /* SOCL */
 			return socl;
-		case 0x0c:		/* DSTAT */
+		case 0x0c:      /* DSTAT */
 			return dstat;
-		case 0x0d:		/* SSTAT0 */
+		case 0x0d:      /* SSTAT0 */
 			return sstat0;
-		case 0x0e:		/* SSTAT1 */
+		case 0x0e:      /* SSTAT1 */
 			return sstat1;
-		case 0x0f:		/* SSTAT2 */
+		case 0x0f:      /* SSTAT2 */
 			return sstat2;
-		case 0x10:		/* DSA [7-0] */
+		case 0x10:      /* DSA [7-0] */
 			return dsa & 0xff;
-		case 0x11:		/* DSA [15-8] */
+		case 0x11:      /* DSA [15-8] */
 			return (dsa >> 8) & 0xff;
-		case 0x12:		/* DSA [23-16] */
+		case 0x12:      /* DSA [23-16] */
 			return (dsa >> 16) & 0xff;
-		case 0x13:		/* DSA [31-24] */
+		case 0x13:      /* DSA [31-24] */
 			return (dsa >> 24) & 0xff;
-		case 0x14:		/* ISTAT */
+		case 0x14:      /* ISTAT */
 			// clear the interrupt on service
 			if(irq_callback != NULL)
 			{
@@ -434,34 +434,34 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 			}
 
 			return istat;
-		case 0x2c:		/* DSP [7-0] */
+		case 0x2c:      /* DSP [7-0] */
 			return dsp & 0xff;
-		case 0x2d:		/* DSP [15-8] */
+		case 0x2d:      /* DSP [15-8] */
 			return (dsp >> 8) & 0xff;
-		case 0x2e:		/* DSP [23-16] */
+		case 0x2e:      /* DSP [23-16] */
 			return (dsp >> 16) & 0xff;
-		case 0x2f:		/* DSP [31-24] */
+		case 0x2f:      /* DSP [31-24] */
 			return (dsp >> 24) & 0xff;
-		case 0x34:		/* SCRATCH A */
+		case 0x34:      /* SCRATCH A */
 		case 0x35:
 		case 0x36:
 		case 0x37:
 			return scratch_a[offset % 4];
-		case 0x39:		/* DIEN */
+		case 0x39:      /* DIEN */
 			return dien;
-		case 0x3b:		/* DCNTL */
+		case 0x3b:      /* DCNTL */
 			return dcntl;
-		case 0x40:		/* SIEN0 */
+		case 0x40:      /* SIEN0 */
 			return sien0;
-		case 0x41:		/* SIEN1 */
+		case 0x41:      /* SIEN1 */
 			return sien1;
-		case 0x48:		/* STIME0 */
+		case 0x48:      /* STIME0 */
 			return stime0;
-		case 0x4a:		/* RESPID */
+		case 0x4a:      /* RESPID */
 			return respid;
-		case 0x4d:		/* STEST1 */
+		case 0x4d:      /* STEST1 */
 			return stest1;
-		case 0x5c:		/* SCRATCH B */
+		case 0x5c:      /* SCRATCH B */
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
@@ -479,68 +479,68 @@ void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 //  logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, space.device().safe_pc());
 	switch(offset)
 	{
-		case 0x00:		/* SCNTL0 */
+		case 0x00:      /* SCNTL0 */
 			scntl0 = data;
 			break;
-		case 0x01:		/* SCNTL1 */
+		case 0x01:      /* SCNTL1 */
 			scntl1 = data;
 			break;
-		case 0x02:		/* SCNTL2 */
+		case 0x02:      /* SCNTL2 */
 			scntl2 = data;
 			break;
-		case 0x03:		/* SCNTL3 */
+		case 0x03:      /* SCNTL3 */
 			scntl3 = data;
 			break;
-		case 0x04:		/* SCID */
+		case 0x04:      /* SCID */
 			scid = data;
 			break;
-		case 0x05:		/* SXFER */
+		case 0x05:      /* SXFER */
 			sxfer = data;
 			break;
-		case 0x09:		/* SOCL */
+		case 0x09:      /* SOCL */
 			socl = data;
 			break;
-		case 0x0d:		/* SSTAT0 */
+		case 0x0d:      /* SSTAT0 */
 			sstat0 = data;
 			break;
-		case 0x0e:		/* SSTAT1 */
+		case 0x0e:      /* SSTAT1 */
 			sstat1 = data;
 			break;
-		case 0x0f:		/* SSTAT2 */
+		case 0x0f:      /* SSTAT2 */
 			sstat2 = data;
 			break;
-		case 0x10:		/* DSA [7-0] */
+		case 0x10:      /* DSA [7-0] */
 			dsa &= 0xffffff00;
 			dsa |= data;
 			break;
-		case 0x11:		/* DSA [15-8] */
+		case 0x11:      /* DSA [15-8] */
 			dsa &= 0xffff00ff;
 			dsa |= data << 8;
 			break;
-		case 0x12:		/* DSA [23-16] */
+		case 0x12:      /* DSA [23-16] */
 			dsa &= 0xff00ffff;
 			dsa |= data << 16;
 			break;
-		case 0x13:		/* DSA [31-24] */
+		case 0x13:      /* DSA [31-24] */
 			dsa &= 0x00ffffff;
 			dsa |= data << 24;
 			break;
-		case 0x14:		/* ISTAT */
+		case 0x14:      /* ISTAT */
 			istat = data;
 			break;
-		case 0x2c:		/* DSP [7-0] */
+		case 0x2c:      /* DSP [7-0] */
 			dsp &= 0xffffff00;
 			dsp |= data;
 			break;
-		case 0x2d:		/* DSP [15-8] */
+		case 0x2d:      /* DSP [15-8] */
 			dsp &= 0xffff00ff;
 			dsp |= data << 8;
 			break;
-		case 0x2e:		/* DSP [23-16] */
+		case 0x2e:      /* DSP [23-16] */
 			dsp &= 0xff00ffff;
 			dsp |= data << 16;
 			break;
-		case 0x2f:		/* DSP [31-24] */
+		case 0x2f:      /* DSP [31-24] */
 			dsp &= 0x00ffffff;
 			dsp |= data << 24;
 			halted = 0;
@@ -548,55 +548,55 @@ void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 				dma_exec();
 			}
 			break;
-		case 0x34:		/* SCRATCH A */
+		case 0x34:      /* SCRATCH A */
 		case 0x35:
 		case 0x36:
 		case 0x37:
 			scratch_a[offset % 4] = data;
 			break;
-		case 0x38:		/* DMODE */
+		case 0x38:      /* DMODE */
 			dmode = data;
 			break;
-		case 0x39:		/* DIEN */
+		case 0x39:      /* DIEN */
 			dien = data;
 			break;
-		case 0x3b:		/* DCNTL */
+		case 0x3b:      /* DCNTL */
 			dcntl = data;
 
-			if(dcntl & 0x14 && !halted)		/* single-step & start DMA */
+			if(dcntl & 0x14 && !halted)     /* single-step & start DMA */
 			{
 				int op;
 				dcmd = FETCH();
 				op = (dcmd >> 24) & 0xff;
 				dma_opcode[op]();
 
-				istat |= 0x3;	/* DMA interrupt pending */
-				dstat |= 0x8;	/* SSI (Single Step Interrupt) */
+				istat |= 0x3;   /* DMA interrupt pending */
+				dstat |= 0x8;   /* SSI (Single Step Interrupt) */
 				if(irq_callback != NULL) {
 					irq_callback(machine(), 1);
 				}
 			}
-			else if(dcntl & 0x04 && !halted)	/* manual start DMA */
+			else if(dcntl & 0x04 && !halted)    /* manual start DMA */
 			{
 				dma_exec();
 			}
 			break;
-		case 0x40:		/* SIEN0 */
+		case 0x40:      /* SIEN0 */
 			sien0 = data;
 			break;
-		case 0x41:		/* SIEN1 */
+		case 0x41:      /* SIEN1 */
 			sien1 = data;
 			break;
-		case 0x48:		/* STIME0 */
+		case 0x48:      /* STIME0 */
 			stime0 = data;
 			break;
-		case 0x4a:		/* RESPID */
+		case 0x4a:      /* RESPID */
 			respid = data;
 			break;
-		case 0x4d:		/* STEST1 */
+		case 0x4d:      /* STEST1 */
 			stest1 = data;
 			break;
-		case 0x5c:		/* SCRATCH B */
+		case 0x5c:      /* SCRATCH B */
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
@@ -619,7 +619,7 @@ void lsi53c810_device::add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate 
 }
 
 lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, LSI53C810, "53C810 SCSI", tag, owner, clock)
+	: device_t(mconfig, LSI53C810, "53C810 SCSI", tag, owner, clock)
 {
 }
 

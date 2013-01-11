@@ -43,8 +43,8 @@
 class i8243_device :  public device_t
 {
 public:
-    // construction/destruction
-    i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }
@@ -56,22 +56,22 @@ public:
 	DECLARE_WRITE8_MEMBER(i8243_prog_w);
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_post_load() { }
+	virtual void device_clock_changed() { }
 
 private:
 
-	UINT8		m_p[4];				/* 4 ports' worth of data */
-	UINT8		m_p2out;			/* port 2 bits that will be returned */
-	UINT8		m_p2;				/* most recent port 2 value */
-	UINT8		m_opcode;			/* latched opcode */
-	UINT8		m_prog;				/* previous PROG state */
+	UINT8       m_p[4];             /* 4 ports' worth of data */
+	UINT8       m_p2out;            /* port 2 bits that will be returned */
+	UINT8       m_p2;               /* most recent port 2 value */
+	UINT8       m_opcode;           /* latched opcode */
+	UINT8       m_prog;             /* previous PROG state */
 
-	devcb2_read8	m_readhandler;
-	devcb2_write8	m_writehandler;
+	devcb2_read8    m_readhandler;
+	devcb2_write8   m_writehandler;
 };
 
 

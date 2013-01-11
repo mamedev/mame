@@ -48,15 +48,15 @@
 
 #define VERBOSE 1
 
-#define VHDSTATUS_OK					0x00
-#define VHDSTATUS_NO_VHD_ATTACHED		0x02
-#define VHDSTATUS_ACCESS_DENIED			0x05
-#define VHDSTATUS_UNKNOWN_COMMAND		0xFE
-#define VHDSTATUS_POWER_ON_STATE		0xFF
+#define VHDSTATUS_OK                    0x00
+#define VHDSTATUS_NO_VHD_ATTACHED       0x02
+#define VHDSTATUS_ACCESS_DENIED         0x05
+#define VHDSTATUS_UNKNOWN_COMMAND       0xFE
+#define VHDSTATUS_POWER_ON_STATE        0xFF
 
-#define VHDCMD_READ		0
-#define VHDCMD_WRITE	1
-#define VHDCMD_FLUSH	2
+#define VHDCMD_READ     0
+#define VHDCMD_WRITE    1
+#define VHDCMD_FLUSH    2
 
 
 /***************************************************************************
@@ -70,8 +70,8 @@ const device_type COCO_VHD = &device_creator<coco_vhd_image_device>;
 //-------------------------------------------------
 
 coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, COCO_VHD, "Virtual Hard Disk", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, COCO_VHD, "Virtual Hard Disk", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 
 }

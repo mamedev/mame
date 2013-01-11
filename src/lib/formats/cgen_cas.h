@@ -14,4 +14,3 @@
 CASSETTE_FORMATLIST_EXTERN(cgenie_cassette_formats);
 
 #endif /* __CGEN_CAS_H */
-

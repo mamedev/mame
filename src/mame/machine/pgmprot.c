@@ -28,26 +28,26 @@ static void asic3_compute_hold(running_machine &machine)
 	case 1:
 		state->m_asic3_hold =
 			(state->m_asic3_hold << 1)
-			 ^ 0x2bad
-			 ^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
-			 ^ BIT(state->m_asic3_z, state->m_asic3_y)
-			 ^ (BIT(state->m_asic3_x, 0) << 1) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 14);
+				^ 0x2bad
+				^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
+				^ BIT(state->m_asic3_z, state->m_asic3_y)
+				^ (BIT(state->m_asic3_x, 0) << 1) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 14);
 		break;
 	case 2:
 		state->m_asic3_hold =
 			(state->m_asic3_hold << 1)
-			 ^ 0x2bad
-			 ^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 7) ^ BIT(state->m_asic3_hold, 6) ^ BIT(state->m_asic3_hold, 5)
-			 ^ BIT(state->m_asic3_z, state->m_asic3_y)
-			 ^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
+				^ 0x2bad
+				^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 7) ^ BIT(state->m_asic3_hold, 6) ^ BIT(state->m_asic3_hold, 5)
+				^ BIT(state->m_asic3_z, state->m_asic3_y)
+				^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
 		break;
 	case 3:
 		state->m_asic3_hold =
 			(state->m_asic3_hold << 1)
-			 ^ 0x2bad
-			 ^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
-			 ^ BIT(state->m_asic3_z, state->m_asic3_y)
-			 ^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
+				^ 0x2bad
+				^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
+				^ BIT(state->m_asic3_z, state->m_asic3_y)
+				^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
 		break;
 	}
 }
@@ -181,7 +181,7 @@ INPUT_PORTS_START( orlegend )
 	PORT_MODIFY("Region")
 	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( World ) )
-    PORT_CONFSETTING(      0x0001, "World (duplicate)" ) // again?
+	PORT_CONFSETTING(      0x0001, "World (duplicate)" ) // again?
 	PORT_CONFSETTING(      0x0002, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0003, DEF_STR( China ) )
 INPUT_PORTS_END
@@ -190,9 +190,9 @@ INPUT_PORTS_START( orld105k )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")
-	PORT_DIPNAME( 0x0003, 0x0002, DEF_STR( Unused ) )	// region switch
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )		// if enabled, game gives
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )		// "incorrect version" error
+	PORT_DIPNAME( 0x0003, 0x0002, DEF_STR( Unused ) )   // region switch
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )      // if enabled, game gives
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )       // "incorrect version" error
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START( pgm_asic3, pgm_asic3_state )

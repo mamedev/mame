@@ -49,4 +49,3 @@ WRITE16_MEMBER(wrally_state::wrally_coin_lockout_w)
 {
 	coin_lockout_w( machine(), (offset >> 3) & 0x01, ~data & 0x01);
 }
-

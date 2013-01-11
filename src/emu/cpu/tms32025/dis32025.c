@@ -1,14 +1,14 @@
- /**************************************************************************\
- *              Texas Instruments TMS320x25 DSP Disassembler                *
- *                                                                          *
- *                 Copyright Tony La Porta                                  *
- *                      Written for the MAME project.                       *
- *                                                                          *
- *      Notes : Data is expected to be read from source file as MSB first.  *
- *              This is a word based microcontroller, with addressing       *
- *                  architecture based on the Harvard addressing scheme.    *
- *                                                                          *
- \**************************************************************************/
+	/**************************************************************************\
+	*              Texas Instruments TMS320x25 DSP Disassembler                *
+	*                                                                          *
+	*                 Copyright Tony La Porta                                  *
+	*                      Written for the MAME project.                       *
+	*                                                                          *
+	*      Notes : Data is expected to be read from source file as MSB first.  *
+	*              This is a word based microcontroller, with addressing       *
+	*                  architecture based on the Harvard addressing scheme.    *
+	*                                                                          *
+	\**************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -102,7 +102,7 @@ int main(int argc,char *argv[])
 			printf("$%04lX: ",Counter);
 			for (ii = 0; ii < disasm_words; ii++)
 			{
-				if (((Counter*2) + ii) > filelength)	/* Past end of length to dump ? */
+				if (((Counter*2) + ii) > filelength)    /* Past end of length to dump ? */
 				{
 					sprintf(String_Output,"???? dw %02.2X%02.2Xh (Past end of disassembly !)",Buffer[((Counter-1)*2)],Buffer[((Counter-1)*2)+1]);
 				}

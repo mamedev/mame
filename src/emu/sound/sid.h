@@ -14,17 +14,17 @@
 /* private area */
 struct SID6581_t
 {
-    device_t *device;
-    sound_stream *mixer_channel; // mame stream/ mixer channel
+	device_t *device;
+	sound_stream *mixer_channel; // mame stream/ mixer channel
 
 	devcb_resolved_read8 in_potx_func;
 	devcb_resolved_read8 in_poty_func;
 
-    SIDTYPE type;
-    UINT32 clock;
+	SIDTYPE type;
+	UINT32 clock;
 
-    UINT16 PCMfreq; // samplerate of the current systems soundcard/DAC
-    UINT32 PCMsid, PCMsidNoise;
+	UINT16 PCMfreq; // samplerate of the current systems soundcard/DAC
+	UINT32 PCMsid, PCMsidNoise;
 
 #if 0
 	/* following depends on type */
@@ -53,7 +53,7 @@ struct SID6581_t
 	} filter;
 
 	sidOperator optr1, optr2, optr3;
-    int optr3_outputmask;
+	int optr3_outputmask;
 };
 
 void sid6581_init (SID6581_t *This);

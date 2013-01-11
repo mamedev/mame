@@ -12,12 +12,12 @@
 
 struct latch8_t
 {
-	latch8_config	*intf;
-	UINT8			 value;
-	UINT8			 has_node_map;
-	UINT8			 has_devread;
-	UINT8			 has_read;
-	device_t	*devices[8];
+	latch8_config   *intf;
+	UINT8            value;
+	UINT8            has_node_map;
+	UINT8            has_devread;
+	UINT8            has_read;
+	device_t    *devices[8];
 };
 
 /* ----------------------------------------------------------------------- */
@@ -234,7 +234,7 @@ static DEVICE_RESET( latch8 )
 const device_type LATCH8 = &device_creator<latch8_device>;
 
 latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-       : device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock)
+		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock)
 {
 	m_token = global_alloc_clear(latch8_t);
 	memset((void*)&m_inline_config,0,sizeof(m_inline_config));

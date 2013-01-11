@@ -30,15 +30,15 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed );
 
 
 static const mc6845_interface mc6845_t1000_intf = {
-	T1000_SCREEN_NAME,		/* screen number */
-	8,						/* numbers of pixels per video memory address */
-	NULL,					/* begin_update */
-	t1000_update_row,		/* update_row */
-	NULL,					/* end_update */
-	DEVCB_LINE(t1000_de_changed),		/* on_de_changed */
-	DEVCB_NULL,					/* on_cur_changed */
-	DEVCB_NULL,					/* on_hsync_changed */
-	DEVCB_LINE(t1000_vsync_changed),		/* on_vsync_changed */
+	T1000_SCREEN_NAME,      /* screen number */
+	8,                      /* numbers of pixels per video memory address */
+	NULL,                   /* begin_update */
+	t1000_update_row,       /* update_row */
+	NULL,                   /* end_update */
+	DEVCB_LINE(t1000_de_changed),       /* on_de_changed */
+	DEVCB_NULL,                 /* on_cur_changed */
+	DEVCB_NULL,                 /* on_hsync_changed */
+	DEVCB_LINE(t1000_vsync_changed),        /* on_vsync_changed */
 	NULL,
 };
 
@@ -58,15 +58,15 @@ MACHINE_CONFIG_END
 
 
 static const mc6845_interface mc6845_pcjr_intf = {
-	T1000_SCREEN_NAME,		/* screen number */
-	8,						/* numbers of pixels per video memory address */
-	NULL,					/* begin_update */
-	t1000_update_row,		/* update_row */
-	NULL,					/* end_update */
-	DEVCB_LINE(t1000_de_changed),		/* on_de_chaged */
-	DEVCB_NULL,					/* on_cur_changed */
-	DEVCB_NULL,					/* on_hsync_changed */
-	DEVCB_LINE(pcjr_vsync_changed),		/* on_vsync_changed */
+	T1000_SCREEN_NAME,      /* screen number */
+	8,                      /* numbers of pixels per video memory address */
+	NULL,                   /* begin_update */
+	t1000_update_row,       /* update_row */
+	NULL,                   /* end_update */
+	DEVCB_LINE(t1000_de_changed),       /* on_de_chaged */
+	DEVCB_NULL,                 /* on_cur_changed */
+	DEVCB_NULL,                 /* on_hsync_changed */
+	DEVCB_LINE(pcjr_vsync_changed),     /* on_vsync_changed */
 	NULL
 };
 
@@ -123,13 +123,13 @@ static struct
 		UINT8 index;
 		UINT8 data[0x20];
 		/* see vgadoc
-           0 mode control 1
-           1 palette mask
-           2 border color
-           3 mode control 2
-           4 reset
-           0x10-0x1f palette registers
-        */
+		   0 mode control 1
+		   1 palette mask
+		   2 border color
+		   3 mode control 2
+		   4 reset
+		   0x10-0x1f palette registers
+		*/
 	} reg;
 
 	UINT8 bank;
@@ -140,15 +140,15 @@ static struct
 	UINT8 *t1_displayram;
 
 	UINT8 *chr_gen;
-	UINT8	chr_size;
+	UINT8   chr_size;
 
-	UINT8	address_data_ff;
+	UINT8   address_data_ff;
 
-	mc6845_update_row_func	update_row;
-	UINT8	display_enable;
-	UINT8	vsync;
-	UINT8	palette_base;
-	UINT8	*jxkanji;
+	mc6845_update_row_func  update_row;
+	UINT8   display_enable;
+	UINT8   vsync;
+	UINT8   palette_base;
+	UINT8   *jxkanji;
 } pcjr = { 0 };
 
 
@@ -188,7 +188,7 @@ static MC6845_UPDATE_ROW( t1000_text_inten_update_row )
 static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT32	*p = &bitmap.pix32(y);
+	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
@@ -270,8 +270,8 @@ static MC6845_UPDATE_ROW( pcjx_text_update_row )
 static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT32	*p = &bitmap.pix32(y);
-	UINT8	*vid = pcjr.displayram + ( ra << 13 );
+	UINT32  *p = &bitmap.pix32(y);
+	UINT8   *vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
@@ -298,7 +298,7 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row )
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32  *p = &bitmap.pix32(y);
-	UINT8	*vid = pcjr.displayram + ( ra << 13 );
+	UINT8   *vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
@@ -349,8 +349,8 @@ static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT32	*p = &bitmap.pix32(y);
-	UINT8	*vid = pcjr.displayram + ( ra << 13 );
+	UINT32  *p = &bitmap.pix32(y);
+	UINT8   *vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
 	if ( y == 0 ) logerror("t1000_gfx_2bpp_tga_update_row\n");
@@ -377,9 +377,9 @@ static MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row )
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32  *p = &bitmap.pix32(y);
-	UINT8	*vid = pcjr.displayram + ( ra << 13 );
-	UINT8	fg = pcjr.palette_base + pcjr.reg.data[0x11];
-	UINT8	bg = pcjr.palette_base + pcjr.reg.data[0x10];
+	UINT8   *vid = pcjr.displayram + ( ra << 13 );
+	UINT8   fg = pcjr.palette_base + pcjr.reg.data[0x11];
+	UINT8   bg = pcjr.palette_base + pcjr.reg.data[0x10];
 	int i;
 
 	if ( y == 0 ) logerror("t1000_gfx_1bpp_update_row\n");
@@ -514,7 +514,7 @@ static void pc_pcjr_mode_switch( running_machine &machine )
 
 	switch( pcjr.reg.data[0] & 0x1A )
 	{
-	case 0x08:		/* 01x0x */
+	case 0x08:      /* 01x0x */
 		if(pcjr.jxkanji)
 		{
 			pcjr.update_row = pcjx_text_update_row;
@@ -529,7 +529,7 @@ static void pc_pcjr_mode_switch( running_machine &machine )
 			pcjr.update_row = t1000_text_inten_update_row;
 		}
 		break;
-	case 0x0A:		/* 01x1x */
+	case 0x0A:      /* 01x1x */
 		/* By default use medium resolution mode */
 		pcjr.update_row = t1000_gfx_2bpp_update_row;
 
@@ -543,10 +543,10 @@ static void pc_pcjr_mode_switch( running_machine &machine )
 			pcjr.update_row = t1000_gfx_1bpp_update_row;
 		}
 		break;
-	case 0x18:		/* 11x0x - invalid?? */
+	case 0x18:      /* 11x0x - invalid?? */
 		pcjr.update_row = NULL;
 		break;
-	case 0x1A:		/* 11x1x */
+	case 0x1A:      /* 11x1x */
 		pcjr.update_row = t1000_gfx_4bpp_update_row;
 		break;
 	default:
@@ -581,8 +581,8 @@ static void pc_t1t_mode_control_w(int data)
 
 static int pc_t1t_mode_control_r(void)
 {
-    int data = pcjr.mode_control;
-    return data;
+	int data = pcjr.mode_control;
+	return data;
 }
 
 /*
@@ -598,7 +598,7 @@ static void pc_t1t_color_select_w(int data)
 static int pc_t1t_color_select_r(void)
 {
 	int data = pcjr.color_select;
-    return data;
+	return data;
 }
 
 /*  Bitfields for T1T status register:
@@ -619,11 +619,11 @@ static int pc_t1t_color_select_r(void)
  */
 static int pc_t1t_status_r(void)
 {
-    int data = pcjr.vsync | pcjr.status | pcjr.display_enable;
+	int data = pcjr.vsync | pcjr.status | pcjr.display_enable;
 	/* HACK HACK HACK */
 	data |= ( pcjr.display_enable ? 0x10 : 0x00 );
 	/* end HACK */
-    return data;
+	return data;
 }
 
 /*
@@ -646,28 +646,28 @@ static void pc_t1t_vga_index_w(int data)
 
 static void pc_t1t_vga_data_w(int data)
 {
-    pcjr.reg.data[pcjr.reg.index] = data;
+	pcjr.reg.data[pcjr.reg.index] = data;
 
 	switch (pcjr.reg.index)
 	{
-        case 0x00: /* mode control 1 */
-            break;
-        case 0x01: /* palette mask (bits 3-0) */
-            break;
-        case 0x02: /* border color (bits 3-0) */
-            break;
-        case 0x03: /* mode control 2 */
-            break;
-        case 0x04: /* reset register */
-            break;
-        /* palette array */
-        case 0x10: case 0x11: case 0x12: case 0x13:
-        case 0x14: case 0x15: case 0x16: case 0x17:
-        case 0x18: case 0x19: case 0x1a: case 0x1b:
-        case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+		case 0x00: /* mode control 1 */
+			break;
+		case 0x01: /* palette mask (bits 3-0) */
+			break;
+		case 0x02: /* border color (bits 3-0) */
+			break;
+		case 0x03: /* mode control 2 */
+			break;
+		case 0x04: /* reset register */
+			break;
+		/* palette array */
+		case 0x10: case 0x11: case 0x12: case 0x13:
+		case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x18: case 0x19: case 0x1a: case 0x1b:
+		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			pcjr.reg.data[pcjr.reg.index] = data & 0x0F;
-            break;
-    }
+			break;
+	}
 }
 
 
@@ -677,7 +677,7 @@ static void pc_pcjr_vga_data_w(running_machine &machine, int data)
 
 	switch (pcjr.reg.index)
 	{
-		case 0x00:	/* mode control 1 */
+		case 0x00:  /* mode control 1 */
 					/* bit0 - 0 = low bandwidth, 1 = high bandwidth */
 					/* bit1 - 0 = alpha, 1 = graphics */
 					/* bit2 - 0 = color, 1 = b/w */
@@ -685,16 +685,16 @@ static void pc_pcjr_vga_data_w(running_machine &machine, int data)
 					/* bit4 - 1 = 16 color graphics */
 			pc_pcjr_mode_switch(machine);
 			break;
-		case 0x01:	/* palette mask (bits 3-0) */
+		case 0x01:  /* palette mask (bits 3-0) */
 			break;
-		case 0x02:	/* border color (bits 3-0) */
+		case 0x02:  /* border color (bits 3-0) */
 			break;
-		case 0x03:	/* mode control 2 */
+		case 0x03:  /* mode control 2 */
 					/* bit1 - 1 = enable blink */
 					/* bit3 - 1 = 2 color graphics */
 			pc_pcjr_mode_switch(machine);
 			break;
-		case 0x04:	/* reset register */
+		case 0x04:  /* reset register */
 			break;
 					/* palette array */
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -713,23 +713,23 @@ static int pc_t1t_vga_data_r(void)
 
 	switch (pcjr.reg.index)
 	{
-        case 0x00: /* mode control 1 */
-            break;
-        case 0x01: /* palette mask (bits 3-0) */
-            break;
-        case 0x02: /* border color (bits 3-0) */
-            break;
-        case 0x03: /* mode control 2 */
-            break;
-        case 0x04: /* reset register */
-            break;
-        /* palette array */
-        case 0x10: case 0x11: case 0x12: case 0x13:
-        case 0x14: case 0x15: case 0x16: case 0x17:
-        case 0x18: case 0x19: case 0x1a: case 0x1b:
-        case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-            break;
-    }
+		case 0x00: /* mode control 1 */
+			break;
+		case 0x01: /* palette mask (bits 3-0) */
+			break;
+		case 0x02: /* border color (bits 3-0) */
+			break;
+		case 0x03: /* mode control 2 */
+			break;
+		case 0x04: /* reset register */
+			break;
+		/* palette array */
+		case 0x10: case 0x11: case 0x12: case 0x13:
+		case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x18: case 0x19: case 0x1a: case 0x1b:
+		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+			break;
+	}
 	return data;
 }
 
@@ -868,7 +868,7 @@ WRITE8_HANDLER ( pc_T1T_w )
 		case 15:
 			pc_t1t_bank_w(space.machine(), data);
 			break;
-    }
+	}
 }
 
 
@@ -918,7 +918,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 READ8_HANDLER ( pc_T1T_r )
 {
 	mc6845_device *mc6845;
-	int				data = 0xff;
+	int             data = 0xff;
 
 	switch( offset )
 	{
@@ -950,16 +950,16 @@ READ8_HANDLER ( pc_T1T_r )
 
 		case 12:
 		case 13:
-            break;
+			break;
 
 		case 14:
 			data = pc_t1t_vga_data_r();
-            break;
+			break;
 
-        case 15:
+		case 15:
 			data = pc_t1t_bank_r();
 			break;
-    }
+	}
 	return data;
 }
 

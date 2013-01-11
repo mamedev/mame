@@ -17,10 +17,10 @@ Not nice, but it works...
 #include "uef_cas.h"
 
 
-#define UEF_WAV_FREQUENCY	4800
-#define WAVE_LOW	-32768
-#define WAVE_HIGH	32767
-#define WAVE_NULL	0
+#define UEF_WAV_FREQUENCY   4800
+#define WAVE_LOW    -32768
+#define WAVE_HIGH   32767
+#define WAVE_NULL   0
 
 static const UINT8 UEF_HEADER[10] = { 0x55, 0x45, 0x46, 0x20, 0x46, 0x69, 0x6c, 0x65, 0x21, 0x00 };
 
@@ -32,12 +32,12 @@ static const UINT8 UEF_HEADER[10] = { 0x55, 0x45, 0x46, 0x20, 0x46, 0x69, 0x6c, 
 */
 
 /* gzip flag byte */
-#define ASCII_FLAG	0x01 /* bit 0 set: file probably ascii text */
-#define HEAD_CRC	0x02 /* bit 1 set: header CRC present */
-#define EXTRA_FIELD	0x04 /* bit 2 set: extra field present */
-#define ORIG_NAME	0x08 /* bit 3 set: original file name present */
-#define COMMENT		0x10 /* bit 4 set: file comment present */
-#define RESERVED	0xE0 /* bits 5..7: reserved */
+#define ASCII_FLAG  0x01 /* bit 0 set: file probably ascii text */
+#define HEAD_CRC    0x02 /* bit 1 set: header CRC present */
+#define EXTRA_FIELD 0x04 /* bit 2 set: extra field present */
+#define ORIG_NAME   0x08 /* bit 3 set: original file name present */
+#define COMMENT     0x10 /* bit 4 set: file comment present */
+#define RESERVED    0xE0 /* bits 5..7: reserved */
 
 static const UINT8* skip_gz_header( const UINT8 *p ) {
 	UINT8 method, flags;
@@ -81,7 +81,7 @@ static float get_uef_float( const UINT8 *Float)
 		int Exponent;
 
 		/* assume a four byte array named Float exists, where Float[0]
-        was the first byte read from the UEF, Float[1] the second, etc */
+		was the first byte read from the UEF, Float[1] the second, etc */
 
 		/* decode mantissa */
 		Mantissa = Float[0] | (Float[1] << 8) | ((Float[2]&0x7f)|0x80) << 16;
@@ -103,7 +103,7 @@ static float get_uef_float( const UINT8 *Float)
 }
 
 static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
-	int	pos, size;
+	int pos, size;
 
 	if ( casdata[0] == 0x1f && casdata[1] == 0x8b ) {
 		int err;
@@ -162,14 +162,14 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 
 		pos += 6;
 		switch( chunk_type ) {
-		case 0x0100:	/* implicit start/stop bit data block */
+		case 0x0100:    /* implicit start/stop bit data block */
 			size += ( chunk_length * 10 ) * 4;
 			break;
-		case 0x0101:	/* multiplexed data block */
+		case 0x0101:    /* multiplexed data block */
 		case 0x0103:
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
-		case 0x0102:	/* explicit tape data block */
+		case 0x0102:    /* explicit tape data block */
 			size += ( ( chunk_length * 10 ) - casdata[pos] ) * 4;
 			break;
 		case 0x0104:
@@ -303,13 +303,13 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 }
 
 static const struct CassetteLegacyWaveFiller uef_legacy_fill_wave = {
-	uef_cas_fill_wave,				/* fill_wave */
-	-1,						/* chunk_size */
-	0,						/* chunk_samples */
-	uef_cas_to_wav_size,				/* chunk_sample_calc */
-	UEF_WAV_FREQUENCY,				/* sample_frequency */
-	0,						/* header_samples */
-	0						/* trailer_samples */
+	uef_cas_fill_wave,              /* fill_wave */
+	-1,                     /* chunk_size */
+	0,                      /* chunk_samples */
+	uef_cas_to_wav_size,                /* chunk_sample_calc */
+	UEF_WAV_FREQUENCY,              /* sample_frequency */
+	0,                      /* header_samples */
+	0                       /* trailer_samples */
 };
 
 static casserr_t uef_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
@@ -330,4 +330,3 @@ const struct CassetteFormat uef_cassette_format = {
 CASSETTE_FORMATLIST_START(uef_cassette_formats)
 	CASSETTE_FORMAT(uef_cassette_format)
 CASSETTE_FORMATLIST_END
-

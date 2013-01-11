@@ -26,7 +26,7 @@ class gp2x_state : public driver_device
 public:
 	gp2x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	,
 		m_ram(*this, "ram"){ }
 
@@ -73,7 +73,7 @@ static const char *const gp2x_regnames[0x200] =
 	"HSYNC width",
 	"HSYNC start",
 	"HSYNC end",
-	"VSYNC control",	// 20
+	"VSYNC control",    // 20
 	"VSYNC end",
 	"",
 	"DE Control",
@@ -81,7 +81,7 @@ static const char *const gp2x_regnames[0x200] =
 	"FG Control",
 	"LP Control",
 	"CLKV Control",
-	"CLKV Control 2",	// 30
+	"CLKV Control 2",   // 30
 	"POL Control",
 	"CIS Sync Control",
 	"",
@@ -89,7 +89,7 @@ static const char *const gp2x_regnames[0x200] =
 	"Luma blank level",
 	"Chroma blank level",
 	"Luma pos sync",
-	"Luma neg sync",	// 40
+	"Luma neg sync",    // 40
 	"Chroma pos sync",
 	"Chroma neg sync",
 	"Interrupt control",
@@ -97,7 +97,7 @@ static const char *const gp2x_regnames[0x200] =
 	"",
 	"",
 	"",
-	"",			// 50
+	"",         // 50
 	"",
 	"",
 	"",
@@ -105,7 +105,7 @@ static const char *const gp2x_regnames[0x200] =
 	"",
 	"",
 	"",
-	"",			// 60
+	"",         // 60
 	"",
 	"",
 	"",
@@ -113,7 +113,7 @@ static const char *const gp2x_regnames[0x200] =
 	"",
 	"",
 	"",
-	"",			// 70
+	"",         // 70
 	"",
 	"",
 	"",
@@ -121,7 +121,7 @@ static const char *const gp2x_regnames[0x200] =
 	"",
 	"",
 	"",
-	"Overlay control",	// 80
+	"Overlay control",  // 80
 	"Image effect",
 	"Image control",
 	"Scale factor A top",
@@ -129,7 +129,7 @@ static const char *const gp2x_regnames[0x200] =
 	"Scale factor A top 2 H",
 	"Scale factor A top 2 L",
 	"Scale factor A bottom 2 H",
-	"Scale factor A bottom 2 L",	// 90
+	"Scale factor A bottom 2 L",    // 90
 	"Width region A top",
 	"Width region A bottom",
 	"H Offset region A",
@@ -137,7 +137,7 @@ static const char *const gp2x_regnames[0x200] =
 	"V Start region A",
 	"V End region A top",
 	"V End region A bottom",
-	"YUV Source region A L",	// a0
+	"YUV Source region A L",    // a0
 	"YUV Source region A H",
 };
 #endif
@@ -214,7 +214,7 @@ READ32_MEMBER( gp2x_state::nand_r )
 				{
 					return ROM[m_nand_ptr++];
 				}
-				else if (mem_mask == 0x000000ff)	// byte-wide reads?
+				else if (mem_mask == 0x000000ff)    // byte-wide reads?
 				{
 					switch (m_nand_subword_stage++)
 					{
@@ -236,16 +236,16 @@ READ32_MEMBER( gp2x_state::nand_r )
 				}
 				break;
 
-			case 0x50:	// read out-of-band data
+			case 0x50:  // read out-of-band data
 				return 0xff;
 
-			case 0x90:	// read ID
+			case 0x90:  // read ID
 				switch (m_nand_stage++)
 				{
 					case 0:
-						return 0xec;	// Samsung
+						return 0xec;    // Samsung
 					case 1:
-						return 0x76;	// 64MB
+						return 0x76;    // 64MB
 				}
 				break;
 
@@ -264,14 +264,14 @@ WRITE32_MEMBER( gp2x_state::nand_w )
 {
 	switch (offset)
 	{
-		case 4:	// command
+		case 4: // command
 			m_nand_cmd = data;
 //          printf("NAND: command %x (PC %x0)\n", data, m_maincpu->pc());
 			m_nand_stage = 0;
 			m_nand_subword_stage = 0;
 			break;
 
-		case 6:	// address
+		case 6: // address
 			if (m_nand_cmd == 0)
 			{
 				switch (m_nand_stage)
@@ -308,7 +308,7 @@ WRITE32_MEMBER( gp2x_state::nand_w )
 
 READ32_MEMBER( gp2x_state::tx_status_r )
 {
-	return 0x6;	// tx ready, tx empty
+	return 0x6; // tx ready, tx empty
 }
 
 WRITE32_MEMBER( gp2x_state::tx_xmit_w )
@@ -323,7 +323,7 @@ READ32_MEMBER( gp2x_state::timer_r )
 
 READ32_MEMBER( gp2x_state::nand_ctrl_r )
 {
-	return 0x8000<<16;		// timed out
+	return 0x8000<<16;      // timed out
 }
 
 WRITE32_MEMBER( gp2x_state::nand_ctrl_w )
@@ -333,12 +333,12 @@ WRITE32_MEMBER( gp2x_state::nand_ctrl_w )
 
 READ32_MEMBER( gp2x_state::sdcard_r )
 {
-	return 0xffff<<16;	// at 3e146b0 - indicate timeout & CRC error
+	return 0xffff<<16;  // at 3e146b0 - indicate timeout & CRC error
 }
 
 static ADDRESS_MAP_START( gp2x_map, AS_PROGRAM, 32, gp2x_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_ROM
-	AM_RANGE(0x01000000, 0x04ffffff) AM_RAM	AM_SHARE("ram") // 64 MB of RAM
+	AM_RANGE(0x01000000, 0x04ffffff) AM_RAM AM_SHARE("ram") // 64 MB of RAM
 	AM_RANGE(0x9c000000, 0x9c00001f) AM_READWRITE(nand_r, nand_w)
 	AM_RANGE(0xc0000a00, 0xc0000a03) AM_READ(timer_r)
 	AM_RANGE(0xc0001208, 0xc000120b) AM_READ(tx_status_r)
@@ -368,7 +368,7 @@ static MACHINE_CONFIG_START( gp2x, gp2x_state )
 MACHINE_CONFIG_END
 
 ROM_START(gp2x)
-	ROM_REGION( 0x600000, "maincpu", 0 )	// contents of NAND flash
+	ROM_REGION( 0x600000, "maincpu", 0 )    // contents of NAND flash
 	ROM_SYSTEM_BIOS(0, "v2", "version 2.0")
 	ROMX_LOAD( "gp2xboot.img",   0x000000, 0x05b264, CRC(9d82937e) SHA1(9655f04c11f78526b3b8a4613897070df3119ead), ROM_BIOS(1))
 	ROMX_LOAD( "gp2xkernel.img", 0x080000, 0x09a899, CRC(e272eac9) SHA1(9d814ad6c27d22812ba3f101a7358698d1b035eb), ROM_BIOS(1))

@@ -76,7 +76,7 @@ WRITE8_MEMBER(pastelg_state::pastelg_blitter_w)
 				/* writing here also starts the blit */
 				pastelg_gfxdraw(machine());
 				break;
-		case 6:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+		case 6: m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 				m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 				m_flipscreen = (data & 0x04) ? 0 : 1;
 				m_dispflag = (data & 0x08) ? 0 : 1;

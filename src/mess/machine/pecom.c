@@ -98,11 +98,11 @@ READ8_MEMBER(pecom_state::pecom_keyboard_r)
 		"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25"
 	};
 	/*
-       INP command BUS -> M(R(X)) BUS -> D
-       so on each input, address is also set, 8 lower bits are used as input for keyboard
-       Address is available on address bus during reading of value from port, and that is
-       used to determine keyboard line reading
-    */
+	   INP command BUS -> M(R(X)) BUS -> D
+	   so on each input, address is also set, 8 lower bits are used as input for keyboard
+	   Address is available on address bus during reading of value from port, and that is
+	   used to determine keyboard line reading
+	*/
 	UINT16 addr = machine().device(CDP1802_TAG)->state().state_int(COSMAC_R0 + machine().device(CDP1802_TAG)->state().state_int(COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;

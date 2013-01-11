@@ -46,39 +46,39 @@ VIDEO_START_MEMBER(vindictr_state,vindictr)
 {
 	static const atarimo_desc modesc =
 	{
-		0,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		0,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		8,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		0,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		0,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		8,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x100,				/* base palette entry */
-		0x100,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x100,              /* base palette entry */
+		0x100,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0,0,0,0x03ff }},	/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0x7fff,0,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0x000f,0,0 }},	/* mask for the color */
-		{{ 0,0xff80,0,0 }},	/* mask for the X position */
-		{{ 0,0,0xff80,0 }},	/* mask for the Y position */
-		{{ 0,0,0x0038,0 }},	/* mask for the width, in tiles*/
-		{{ 0,0,0x0007,0 }},	/* mask for the height, in tiles */
-		{{ 0,0,0x0040,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0,0x0070,0,0 }},	/* mask for the priority */
-		{{ 0 }},			/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0,0,0,0x03ff }}, /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0x7fff,0,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0x000f,0,0 }}, /* mask for the color */
+		{{ 0,0xff80,0,0 }}, /* mask for the X position */
+		{{ 0,0,0xff80,0 }}, /* mask for the Y position */
+		{{ 0,0,0x0038,0 }}, /* mask for the width, in tiles*/
+		{{ 0,0,0x0007,0 }}, /* mask for the height, in tiles */
+		{{ 0,0,0x0040,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0,0x0070,0,0 }}, /* mask for the priority */
+		{{ 0 }},            /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		NULL				/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		NULL                /* callback routine for special entries */
 	};
 
 	/* initialize the playfield */
@@ -154,7 +154,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 
 		switch ((data >> 9) & 7)
 		{
-			case 2:		/* /PFB */
+			case 2:     /* /PFB */
 				if (m_playfield_tile_bank != (data & 7))
 				{
 					screen.update_partial(scanline - 1);
@@ -163,7 +163,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				}
 				break;
 
-			case 3:		/* /PFHSLD */
+			case 3:     /* /PFHSLD */
 				if (m_playfield_xscroll != (data & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
@@ -172,7 +172,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				}
 				break;
 
-			case 4:		/* /MOHS */
+			case 4:     /* /MOHS */
 				if (atarimo_get_xscroll(0) != (data & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
@@ -180,14 +180,14 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				}
 				break;
 
-			case 5:		/* /PFSPC */
+			case 5:     /* /PFSPC */
 				break;
 
-			case 6:		/* /VIRQ */
+			case 6:     /* /VIRQ */
 				scanline_int_gen(*subdevice("maincpu"));
 				break;
 
-			case 7:		/* /PFVS */
+			case 7:     /* /PFVS */
 			{
 				/* a new vscroll latches the offset into a counter; we must adjust for this */
 				int offset = scanline;
@@ -236,13 +236,13 @@ UINT32 vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_ind1
 				{
 					/* partially verified via schematics (there are a lot of PALs involved!):
 
-                        SHADE = PAL(MPR1-0, LB7-0, PFX6-5, PFX3-2, PF/M)
+					    SHADE = PAL(MPR1-0, LB7-0, PFX6-5, PFX3-2, PF/M)
 
-                        if (SHADE)
-                            CRA |= 0x100
+					    if (SHADE)
+					        CRA |= 0x100
 
-                        MOG3-1 = ~MAT3-1 if MAT6==1 and MSD3==1
-                    */
+					    MOG3-1 = ~MAT3-1 if MAT6==1 and MSD3==1
+					*/
 					int mopriority = mo[x] >> ATARIMO_PRIORITY_SHIFT;
 
 					/* upper bit of MO priority signals special rendering and doesn't draw anything */

@@ -59,11 +59,11 @@
 
 struct mc6854_t
 {
-	devcb_resolved_write_line	out_irq_func;
-	devcb_resolved_read_line	in_rxd_func;
-	devcb_resolved_write_line	out_txd_func;
-	devcb_resolved_write_line	out_rts_func;
-	devcb_resolved_write_line	out_dtr_func;
+	devcb_resolved_write_line   out_irq_func;
+	devcb_resolved_read_line    in_rxd_func;
+	devcb_resolved_write_line   out_txd_func;
+	devcb_resolved_write_line   out_rts_func;
+	devcb_resolved_write_line   out_dtr_func;
 
 	/* interface */
 	const mc6854_interface* iface;
@@ -808,21 +808,21 @@ READ8_DEVICE_HANDLER ( mc6854_r )
 	case 0: /* status register 1 */
 		mc6854_update_sr1( mc6854 );
 		LOG(( "%f $%04x mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
-		      space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->sr1,
-		      ( mc6854->sr1 & RDA) ? 1 : 0, ( mc6854->sr1 & S2RQ) ? 1 : 0,
-		      ( mc6854->sr1 & FD ) ? 1 : 0, ( mc6854->sr1 & CTS ) ? 1 : 0,
-		      ( mc6854->sr1 & TU ) ? 1 : 0, ( mc6854->sr1 & TDRA) ? 1 : 0,
-		      ( mc6854->sr1 & IRQ) ? 1 : 0 ));
+				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->sr1,
+				( mc6854->sr1 & RDA) ? 1 : 0, ( mc6854->sr1 & S2RQ) ? 1 : 0,
+				( mc6854->sr1 & FD ) ? 1 : 0, ( mc6854->sr1 & CTS ) ? 1 : 0,
+				( mc6854->sr1 & TU ) ? 1 : 0, ( mc6854->sr1 & TDRA) ? 1 : 0,
+				( mc6854->sr1 & IRQ) ? 1 : 0 ));
 		return mc6854->sr1;
 
 	case 1: /* status register 2 */
 		mc6854_update_sr2( mc6854 );
 		LOG(( "%f $%04x mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
-		      space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->sr2,
-		      ( mc6854->sr2 & AP   ) ? 1 : 0, ( mc6854->sr2 & FV  ) ? 1 : 0,
-		      ( mc6854->sr2 & RIDLE) ? 1 : 0, ( mc6854->sr2 & RABT) ? 1 : 0,
-		      ( mc6854->sr2 & ERR  ) ? 1 : 0, ( mc6854->sr2 & DCD ) ? 1 : 0,
-		      ( mc6854->sr2 & OVRN ) ? 1 : 0, ( mc6854->sr2 & RDA2) ? 1 : 0 ));
+				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->sr2,
+				( mc6854->sr2 & AP   ) ? 1 : 0, ( mc6854->sr2 & FV  ) ? 1 : 0,
+				( mc6854->sr2 & RIDLE) ? 1 : 0, ( mc6854->sr2 & RABT) ? 1 : 0,
+				( mc6854->sr2 & ERR  ) ? 1 : 0, ( mc6854->sr2 & DCD ) ? 1 : 0,
+				( mc6854->sr2 & OVRN ) ? 1 : 0, ( mc6854->sr2 & RDA2) ? 1 : 0 ));
 		return mc6854->sr2;
 
 	case 2: /* receiver data register */
@@ -830,7 +830,7 @@ READ8_DEVICE_HANDLER ( mc6854_r )
 	{
 		UINT8 data = mc6854_rfifo_pop( device );
 		LOG(( "%f $%04x mc6854_r: get data $%02X\n",
-		      space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), data ));
+				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), data ));
 		return data;
 	}
 
@@ -851,15 +851,15 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 	case 0: /* control register 1 */
 		mc6854->cr1 = data;
 		LOG(( "%f $%04x mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n",
-		      space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->cr1,
-		      AC ? 1 : 0,
-		      RIE ? 'r' : '-', TIE ? 't' : '-',
-		      DISCONTINUE ? "discontinue," : "",
-		      RRESET ? 'r' : '-', TRESET ? 't' : '-'
-			    ));
+				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->cr1,
+				AC ? 1 : 0,
+				RIE ? 'r' : '-', TIE ? 't' : '-',
+				DISCONTINUE ? "discontinue," : "",
+				RRESET ? 'r' : '-', TRESET ? 't' : '-'
+				));
 		if ( mc6854->cr1 & 0xc )
 			logerror( "$%04x mc6854 DMA not handled (CR1=$%02X)\n",
-				  space.machine().firstcpu->pcbase( ), mc6854->cr1 );
+					space.machine().firstcpu->pcbase( ), mc6854->cr1 );
 		if ( DISCONTINUE )
 		{
 			/* abort receive FIFO but keeps shift register & synchro */
@@ -888,11 +888,11 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 			/* control register 3 */
 			mc6854->cr3 = data;
 			LOG(( "%f $%04x mc6854_w: set CR3=$%02X (lcf=%i,aex=%i,idl=%i,fdse=%i,loop=%i,tst=%i,dtr=%i)\n",
-			      space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->cr3,
-			      LCF ? (CEX ? 16 : 8) : 0,  AEX ? 1 : 0,
-			      IDL0 ? 0 : 1, FDSE ? 1 : 0, LOOP ? 1 : 0,
-			      TST ? 1 : 0, DTR ? 1 : 0
-				    ));
+					space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->cr3,
+					LCF ? (CEX ? 16 : 8) : 0,  AEX ? 1 : 0,
+					IDL0 ? 0 : 1, FDSE ? 1 : 0, LOOP ? 1 : 0,
+					TST ? 1 : 0, DTR ? 1 : 0
+					));
 			if ( LOOP )
 				logerror( "$%04x mc6854 loop mode not handled (CR3=$%02X)\n", space.machine().firstcpu->pcbase( ), mc6854->cr3 );
 			if ( TST )
@@ -906,11 +906,11 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 			/* control register 2 */
 			mc6854->cr2 = data;
 			LOG(( "%f $%04x mc6854_w: set CR2=$%02X (pse=%i,bytes=%i,fmidle=%i,%s,tlast=%i,clr=%c%c,rts=%i)\n",
-			      space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->cr2,
-			      PSE ? 1 : 0,  TWOBYTES ? 2 : 1,  FMIDLE ? 1 : 0,
-			      FCTDRA ? "fc" : "tdra", TLAST ? 1 : 0,
-			      data & 0x20 ? 'r' : '-',  data & 0x40 ? 't' : '-',
-			      RTS ? 1 : 0 ));
+					space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->cr2,
+					PSE ? 1 : 0,  TWOBYTES ? 2 : 1,  FMIDLE ? 1 : 0,
+					FCTDRA ? "fc" : "tdra", TLAST ? 1 : 0,
+					data & 0x20 ? 'r' : '-',  data & 0x40 ? 't' : '-',
+					RTS ? 1 : 0 ));
 			if ( PSE )
 				logerror( "$%04x mc6854 status prioritization not handled (CR2=$%02X)\n", space.machine().firstcpu->pcbase( ), mc6854->cr2 );
 			if ( TLAST )
@@ -946,10 +946,10 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 			/* control register 4 */
 			mc6854->cr4 = data;
 			LOG(( "%f $%04x mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6854->cr4,
-			      TWOINTER ? 2 : 1,
-			      TWL, RWL,
-			      ABT ? ( ABTEX ? "abort-ext," : "abort,") : "",
-			      NRZ ? "nrz" : "nrzi" ));
+					TWOINTER ? 2 : 1,
+					TWL, RWL,
+					ABT ? ( ABTEX ? "abort-ext," : "abort,") : "",
+					NRZ ? "nrz" : "nrzi" ));
 			if ( ABT )
 			{
 				mc6854->tstate = 0;
@@ -1074,5 +1074,3 @@ void mc6854_device::device_reset()
 {
 	DEVICE_RESET_NAME( mc6854 )(this);
 }
-
-

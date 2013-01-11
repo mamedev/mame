@@ -71,18 +71,18 @@ WRITE8_MEMBER(tryout_state::tryout_videoram_w)
 WRITE8_MEMBER(tryout_state::tryout_vram_w)
 {
 	/*  There are eight banks of vram - in bank 0 the first 0x400 bytes
-    is reserved for the tilemap.  In banks 2, 4 and 6 the game never
-    writes to the first 0x400 bytes - I suspect it's either
-    unused, or it actually mirrors the tilemap ram from the first bank.
+	is reserved for the tilemap.  In banks 2, 4 and 6 the game never
+	writes to the first 0x400 bytes - I suspect it's either
+	unused, or it actually mirrors the tilemap ram from the first bank.
 
-    The rest of the vram is tile data which has the bitplanes arranged
-    in a very strange format.  For Mame's sake we reformat this on
-    the fly for easier gfx decode.
+	The rest of the vram is tile data which has the bitplanes arranged
+	in a very strange format.  For Mame's sake we reformat this on
+	the fly for easier gfx decode.
 
-    Bit 0 of the bank register seems special - it's kept low when uploading
-    gfx data and then set high from that point onwards.
+	Bit 0 of the bank register seems special - it's kept low when uploading
+	gfx data and then set high from that point onwards.
 
-    */
+	*/
 	const UINT8 bank=(m_vram_bank>>1)&0x7;
 
 
@@ -95,13 +95,13 @@ WRITE8_MEMBER(tryout_state::tryout_vram_w)
 	}
 
 	/*
-        Bit planes for tiles are arranged as follows within vram (split into high/low nibbles):
-            0x0400 (0) + 0x0400 (4) + 0x0800(0) - tiles 0x00 to 0x0f
-            0x0800 (4) + 0x0c00 (0) + 0x0c00(4) - tiles 0x10 to 0x1f
-            0x1400 (0) + 0x1400 (4) + 0x1800(0) - tiles 0x20 to 0x2f
-            0x1800 (4) + 0x1c00 (0) + 0x1c00(4) - tiles 0x30 to 0x3f
-            etc.
-    */
+	    Bit planes for tiles are arranged as follows within vram (split into high/low nibbles):
+	        0x0400 (0) + 0x0400 (4) + 0x0800(0) - tiles 0x00 to 0x0f
+	        0x0800 (4) + 0x0c00 (0) + 0x0c00(4) - tiles 0x10 to 0x1f
+	        0x1400 (0) + 0x1400 (4) + 0x1800(0) - tiles 0x20 to 0x2f
+	        0x1800 (4) + 0x1c00 (0) + 0x1c00(4) - tiles 0x30 to 0x3f
+	        etc.
+	*/
 
 	offset=(offset&0x7ff) | (bank<<11);
 	m_vram[offset]=data;

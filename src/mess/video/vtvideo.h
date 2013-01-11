@@ -50,12 +50,12 @@ extern const device_type VT100_VIDEO;
 
 struct vt_video_interface
 {
-	const char *screen_tag;		/* screen we are acting on */
+	const char *screen_tag;     /* screen we are acting on */
 	const char *char_rom_region_tag; /* character rom region */
 
 	/* this gets called for every memory read */
-	devcb_read8			in_ram_func;
-	devcb_write8		clear_video_interrupt;
+	devcb_read8         in_ram_func;
+	devcb_write8        clear_video_interrupt;
 };
 
 /***************************************************************************

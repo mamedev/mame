@@ -51,12 +51,12 @@
 
 struct iq151cart_interface
 {
-    devcb_write_line				m_out_irq0_cb;
-    devcb_write_line				m_out_irq1_cb;
-	devcb_write_line				m_out_irq2_cb;
-	devcb_write_line				m_out_irq3_cb;
-	devcb_write_line				m_out_irq4_cb;
-	devcb_write_line				m_out_drq_cb;
+	devcb_write_line                m_out_irq0_cb;
+	devcb_write_line                m_out_irq1_cb;
+	devcb_write_line                m_out_irq2_cb;
+	devcb_write_line                m_out_irq3_cb;
+	devcb_write_line                m_out_irq4_cb;
+	devcb_write_line                m_out_drq_cb;
 };
 
 
@@ -83,9 +83,9 @@ public:
 // ======================> iq151cart_slot_device
 
 class iq151cart_slot_device : public device_t,
-							  public iq151cart_interface,
-							  public device_slot_interface,
-							  public device_image_interface
+								public iq151cart_interface,
+								public device_slot_interface,
+								public device_image_interface
 {
 public:
 	// construction/destruction
@@ -120,14 +120,14 @@ public:
 	virtual void io_write(offs_t offset, UINT8 data);
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	devcb_resolved_write_line	m_out_irq0_func;
-	devcb_resolved_write_line	m_out_irq1_func;
-	devcb_resolved_write_line	m_out_irq2_func;
-	devcb_resolved_write_line	m_out_irq3_func;
-	devcb_resolved_write_line	m_out_irq4_func;
-	devcb_resolved_write_line	m_out_drq_func;
+	devcb_resolved_write_line   m_out_irq0_func;
+	devcb_resolved_write_line   m_out_irq1_func;
+	devcb_resolved_write_line   m_out_irq2_func;
+	devcb_resolved_write_line   m_out_irq3_func;
+	devcb_resolved_write_line   m_out_irq4_func;
+	devcb_resolved_write_line   m_out_drq_func;
 
-	device_iq151cart_interface*	m_cart;
+	device_iq151cart_interface* m_cart;
 };
 
 

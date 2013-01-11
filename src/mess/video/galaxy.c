@@ -131,4 +131,3 @@ UINT32 galaxy_state::screen_update_galaxy(screen_device &screen, bitmap_ind16 &b
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-

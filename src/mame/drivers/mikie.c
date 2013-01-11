@@ -46,9 +46,9 @@ Stephh's notes (based on the games M6809 code and some tests) :
 
 #define MIKIE_TIMER_RATE 512
 
-#define XTAL	14318180
-#define OSC		18432000
-#define CLK		XTAL/4
+#define XTAL    14318180
+#define OSC     18432000
+#define CLK     XTAL/4
 
 
 /*************************************
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x2100, 0x2100) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(mikie_palettebank_w)
-	AM_RANGE(0x2300, 0x2300) AM_WRITENOP	// ???
+	AM_RANGE(0x2300, 0x2300) AM_WRITENOP    // ???
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x2401, 0x2401) AM_READ_PORT("P1")
 	AM_RANGE(0x2402, 0x2402) AM_READ_PORT("P2")
@@ -112,21 +112,21 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x2890, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x5fff) AM_ROM	// Machine checks for extra rom
+	AM_RANGE(0x4000, 0x5fff) AM_ROM // Machine checks for extra rom
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_WRITENOP	// sound command latch
-	AM_RANGE(0x8001, 0x8001) AM_WRITENOP	// ???
-	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76489a_device, write)	// trigger read of latch
+	AM_RANGE(0x8000, 0x8000) AM_WRITENOP    // sound command latch
+	AM_RANGE(0x8001, 0x8001) AM_WRITENOP    // ???
+	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76489a_device, write) // trigger read of latch
 	AM_RANGE(0x8003, 0x8003) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("sn2", sn76489a_device, write)	// trigger read of latch
+	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("sn2", sn76489a_device, write) // trigger read of latch
 	AM_RANGE(0x8005, 0x8005) AM_READ(mikie_sh_timer_r)
-	AM_RANGE(0x8079, 0x8079) AM_WRITENOP	// ???
-	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	// ???
+	AM_RANGE(0x8079, 0x8079) AM_WRITENOP    // ???
+	AM_RANGE(0xa003, 0xa003) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
 /*************************************
@@ -151,25 +151,25 @@ static INPUT_PORTS_START( mikie )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20k 70k 50k+" )
 	PORT_DIPSETTING(    0x10, "30K 90k 60k+" )
 	PORT_DIPSETTING(    0x08, "30k only" )
 	PORT_DIPSETTING(    0x00, "40K only" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(	0x60, DEF_STR( Easy ) )             /* 1 */
-	PORT_DIPSETTING(	0x40, DEF_STR( Medium ) )           /* 2 */
-	PORT_DIPSETTING(	0x20, DEF_STR( Hard ) )             /* 3 */
-	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )          /* 4 */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )             /* 1 */
+	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )           /* 2 */
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )             /* 3 */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          /* 4 */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -206,15 +206,15 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-	16,16,	     /* 16*16 sprites */
-	256,	        /* 256 sprites */
-	4,	           /* 4 bits per pixel */
+	16,16,       /* 16*16 sprites */
+	256,            /* 256 sprites */
+	4,             /* 4 bits per pixel */
 	{ 0, 4, 256*128*8+0, 256*128*8+4 },
 	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
 			0, 1, 2, 3, 48*8+0, 48*8+1, 48*8+2, 48*8+3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 			32*16, 33*16, 34*16, 35*16, 36*16, 37*16, 38*16, 39*16 },
-	128*8	/* every sprite takes 64 bytes */
+	128*8   /* every sprite takes 64 bytes */
 };
 
 static GFXDECODE_START( mikie )
@@ -237,7 +237,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -331,11 +331,11 @@ ROM_START( mikie )
 	ROM_LOAD( "007.h3",  0xc000, 0x4000, CRC(31afc153) SHA1(31ca33f585fddb86131ef61de73e3563fa027455) )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "d19.1i",  0x0000, 0x0100, CRC(8b83e7cf) SHA1(4fce779947f9f318023c7c54a71a4751f6bb8eb1) )	// red component
-	ROM_LOAD( "d21.3i",  0x0100, 0x0100, CRC(3556304a) SHA1(6f4fc3ef6b1b44278e7c8c1034ee4fbef90cf85a) )	// green component
-	ROM_LOAD( "d20.2i",  0x0200, 0x0100, CRC(676a0669) SHA1(14236a831204d52cdf8c2ef318a565d6c5587ce0) )	// blue component
-	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) )	// character lookup table
-	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) )	// sprite lookup table
+	ROM_LOAD( "d19.1i",  0x0000, 0x0100, CRC(8b83e7cf) SHA1(4fce779947f9f318023c7c54a71a4751f6bb8eb1) ) // red component
+	ROM_LOAD( "d21.3i",  0x0100, 0x0100, CRC(3556304a) SHA1(6f4fc3ef6b1b44278e7c8c1034ee4fbef90cf85a) ) // green component
+	ROM_LOAD( "d20.2i",  0x0200, 0x0100, CRC(676a0669) SHA1(14236a831204d52cdf8c2ef318a565d6c5587ce0) ) // blue component
+	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) ) // character lookup table
+	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) ) // sprite lookup table
 ROM_END
 
 ROM_START( mikiej )
@@ -357,11 +357,11 @@ ROM_START( mikiej )
 	ROM_LOAD( "q07.h3",  0xc000, 0x4000, CRC(15dc093b) SHA1(0b5a5aea25283b8edb7f534fc84b13f5176e26d6) )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "d19.1i",  0x0000, 0x0100, CRC(8b83e7cf) SHA1(4fce779947f9f318023c7c54a71a4751f6bb8eb1) )	// red component
-	ROM_LOAD( "d21.3i",  0x0100, 0x0100, CRC(3556304a) SHA1(6f4fc3ef6b1b44278e7c8c1034ee4fbef90cf85a) )	// green component
-	ROM_LOAD( "d20.2i",  0x0200, 0x0100, CRC(676a0669) SHA1(14236a831204d52cdf8c2ef318a565d6c5587ce0) )	// blue component
-	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) )	// character lookup table
-	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) )	// sprite lookup table
+	ROM_LOAD( "d19.1i",  0x0000, 0x0100, CRC(8b83e7cf) SHA1(4fce779947f9f318023c7c54a71a4751f6bb8eb1) ) // red component
+	ROM_LOAD( "d21.3i",  0x0100, 0x0100, CRC(3556304a) SHA1(6f4fc3ef6b1b44278e7c8c1034ee4fbef90cf85a) ) // green component
+	ROM_LOAD( "d20.2i",  0x0200, 0x0100, CRC(676a0669) SHA1(14236a831204d52cdf8c2ef318a565d6c5587ce0) ) // blue component
+	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) ) // character lookup table
+	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) ) // sprite lookup table
 ROM_END
 
 ROM_START( mikiehs )
@@ -383,11 +383,11 @@ ROM_START( mikiehs )
 	ROM_LOAD( "i07.h3",  0xc000, 0x4000, CRC(ceeba6ac) SHA1(ca5f715dece88540d9ed0e0146cff09f6868d09f) )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "d19.1i",  0x0000, 0x0100, CRC(8b83e7cf) SHA1(4fce779947f9f318023c7c54a71a4751f6bb8eb1) )	// red component
-	ROM_LOAD( "d21.3i",  0x0100, 0x0100, CRC(3556304a) SHA1(6f4fc3ef6b1b44278e7c8c1034ee4fbef90cf85a) )	// green component
-	ROM_LOAD( "d20.2i",  0x0200, 0x0100, CRC(676a0669) SHA1(14236a831204d52cdf8c2ef318a565d6c5587ce0) )	// blue component
-	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) )	// character lookup table
-	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) )	// sprite lookup table
+	ROM_LOAD( "d19.1i",  0x0000, 0x0100, CRC(8b83e7cf) SHA1(4fce779947f9f318023c7c54a71a4751f6bb8eb1) ) // red component
+	ROM_LOAD( "d21.3i",  0x0100, 0x0100, CRC(3556304a) SHA1(6f4fc3ef6b1b44278e7c8c1034ee4fbef90cf85a) ) // green component
+	ROM_LOAD( "d20.2i",  0x0200, 0x0100, CRC(676a0669) SHA1(14236a831204d52cdf8c2ef318a565d6c5587ce0) ) // blue component
+	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) ) // character lookup table
+	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) ) // sprite lookup table
 ROM_END
 
 /*************************************

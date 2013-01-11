@@ -17,11 +17,11 @@ class fidelz80_state : public driver_device
 public:
 	fidelz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_speech(*this, "speech"),
-		  m_beep(*this, BEEPER_TAG),
-		  m_i8041(*this, "mcu"),
-		  m_i8243(*this, "i8243")
+			m_maincpu(*this, "maincpu"),
+			m_speech(*this, "speech"),
+			m_beep(*this, BEEPER_TAG),
+			m_i8041(*this, "mcu"),
+			m_i8243(*this, "i8243")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -30,11 +30,11 @@ public:
 	optional_device<cpu_device> m_i8041;
 	optional_device<i8243_device> m_i8243;
 
-	UINT16 m_kp_matrix;			// keypad/leds matrix
-	UINT8 m_led_data;			// data for the two individual leds, in 0bxxxx12xx format
-	UINT8 m_led_selected;		// 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
-	UINT16 m_digit_data;		// data for seg leds
-	UINT8 m_digit_line_status[4];	// prevent overwrite of m_digit_data
+	UINT16 m_kp_matrix;         // keypad/leds matrix
+	UINT8 m_led_data;           // data for the two individual leds, in 0bxxxx12xx format
+	UINT8 m_led_selected;       // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
+	UINT16 m_digit_data;        // data for seg leds
+	UINT8 m_digit_line_status[4];   // prevent overwrite of m_digit_data
 
 	virtual void machine_reset();
 
@@ -74,4 +74,4 @@ public:
 };
 
 
-#endif	// _FIDELZ80_H_
+#endif  // _FIDELZ80_H_

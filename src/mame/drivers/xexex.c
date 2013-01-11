@@ -75,10 +75,10 @@ Unresolved Issues:
 
 static const eeprom_interface eeprom_intf =
 {
-	7,				/* address bits */
-	8,				/* data bits */
-	"011000",		/*  read command */
-	"011100",		/* write command */
+	7,              /* address bits */
+	8,              /* data bits */
+	"011000",       /*  read command */
+	"011100",       /* write command */
 	"0100100000000",/* erase command */
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
@@ -312,28 +312,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("workram")			// work RAM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("workram")         // work RAM
 
 #if XE_SKIPIDLE
-	AM_RANGE(0x080014, 0x080015) AM_READ(xexex_waitskip_r)				// helps sound CPU by giving back control as early as possible
+	AM_RANGE(0x080014, 0x080015) AM_READ(xexex_waitskip_r)              // helps sound CPU by giving back control as early as possible
 #endif
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("spriteram")			// K053247 sprite RAM
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram_mirror_r, spriteram_mirror_w)	// K053247 sprite RAM mirror read
-	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)				// VACSET (K054157)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)				// OBJSET1
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)				// Passthrough to sprite roms
-	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_t, ram_r, ram_w)	// K053250 "road" RAM
+	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("spriteram")           // K053247 sprite RAM
+	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram_mirror_r, spriteram_mirror_w)   // K053247 sprite RAM mirror read
+	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)              // VACSET (K054157)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)              // OBJSET1
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)               // Passthrough to sprite roms
+	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_t, ram_r, ram_w)    // K053250 "road" RAM
 	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_t, reg_r, reg_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)				// CLTC
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)				// priority encoder
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)              // CLTC
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)               // priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r,k053252_w,0x00ff)                // CCU
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM									// sound regs fall through
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)				// VSCCS regs
+	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM                                 // sound regs fall through
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)                // VSCCS regs
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("SYSTEM")
@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)		// Passthrough to tile roms
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)       // Passthrough to tile roms
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_t, rom_r)
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( xexex )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -510,7 +510,7 @@ void xexex_state::machine_reset()
 static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	// 16MHz (32MHz xtal)
+	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) // 16MHz (32MHz xtal)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xexex_state, xexex_interrupt, "screen", 0, 1)
 

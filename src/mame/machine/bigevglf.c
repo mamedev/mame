@@ -103,4 +103,3 @@ READ8_MEMBER(bigevglf_state::bigevglf_mcu_status_r)
 
 	return res;
 }
-

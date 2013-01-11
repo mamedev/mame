@@ -68,31 +68,31 @@
 
 struct z8536_interface
 {
-	devcb_write_line		m_out_int_cb;
+	devcb_write_line        m_out_int_cb;
 
-	devcb_read8				m_in_pa_cb;
-	devcb_write8			m_out_pa_cb;
+	devcb_read8             m_in_pa_cb;
+	devcb_write8            m_out_pa_cb;
 
-	devcb_read8				m_in_pb_cb;
-	devcb_write8			m_out_pb_cb;
+	devcb_read8             m_in_pb_cb;
+	devcb_write8            m_out_pb_cb;
 
-	devcb_read8				m_in_pc_cb;
-	devcb_write8			m_out_pc_cb;
+	devcb_read8             m_in_pc_cb;
+	devcb_write8            m_out_pc_cb;
 };
 
 
 // ======================> z8536_device
 
 class z8536_device :  public device_t,
-					  public device_z80daisy_interface,
-                      public z8536_interface
+						public device_z80daisy_interface,
+						public z8536_interface
 {
 public:
-    // construction/destruction
-    z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	int intack_r();
 
@@ -120,10 +120,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc3_w );
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_z80daisy_interface overrides
@@ -160,16 +160,16 @@ private:
 	inline void match_pattern(int port);
 	inline void external_port_w(int port, int bit, int state);
 
-	devcb_resolved_write_line		m_out_int_func;
+	devcb_resolved_write_line       m_out_int_func;
 
-	devcb_resolved_read8			m_in_pa_func;
-	devcb_resolved_write8			m_out_pa_func;
+	devcb_resolved_read8            m_in_pa_func;
+	devcb_resolved_write8           m_out_pa_func;
 
-	devcb_resolved_read8			m_in_pb_func;
-	devcb_resolved_write8			m_out_pb_func;
+	devcb_resolved_read8            m_in_pb_func;
+	devcb_resolved_write8           m_out_pb_func;
 
-	devcb_resolved_read8			m_in_pc_func;
-	devcb_resolved_write8			m_out_pc_func;
+	devcb_resolved_read8            m_in_pc_func;
+	devcb_resolved_write8           m_out_pc_func;
 
 	// interrupt state
 	int m_int;

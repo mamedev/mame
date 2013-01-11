@@ -26,7 +26,7 @@
 #include "includes/a7800.h"
 
 
-#define TRIGGER_HSYNC	64717
+#define TRIGGER_HSYNC   64717
 
 #define READ_MEM(x) space.read_byte(x)
 
@@ -309,10 +309,10 @@ static void maria_draw_scanline(running_machine &machine)
 						inc_hpos_by_2();
 						break;
 
-				}	/* endswitch (mode) */
-			}	/* endwhile (ind_bytes > 0)*/
-		}	/* endfor (x=0; x<width; x++) */
-	}	/* endwhile (READ_MEM(dl + 1) != 0) */
+				}   /* endswitch (mode) */
+			}   /* endwhile (ind_bytes > 0)*/
+		}   /* endfor (x=0; x<width; x++) */
+	}   /* endwhile (READ_MEM(dl + 1) != 0) */
 }
 
 
@@ -345,7 +345,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 		m_maria_vblank=0;
 		if( m_maria_dmaon || m_maria_dodma )
 		{
-			m_maria_dodma = 1;	/* if dma allowed, start it */
+			m_maria_dodma = 1;  /* if dma allowed, start it */
 
 			m_maria_dll = (ROM[DPPH] << 8) | ROM[DPPL];
 			m_maria_dl = (READ_MEM(m_maria_dll+1) << 8) | READ_MEM(m_maria_dll+2);
@@ -360,9 +360,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 	}
 
 	/*  moved start of vblank up (to prevent dma/dli happen on line -4)
-        this fix made PR Baseball happy
-        Kung-Fu Master looks worse
-        don't know about others yet */
+	    this fix made PR Baseball happy
+	    Kung-Fu Master looks worse
+	    don't know about others yet */
 	if( frame_scanline == ( m_lines - 4 ) )
 	{
 		/* vblank starts 4 scanlines before end of screen */
@@ -370,19 +370,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 		m_maria_vblank = 0x80;
 
 		/* fixed 2002/05/14 kubecj
-                when going vblank, dma must be stopped
-                otherwise system tries to read past end of dll
-                causing false dlis to occur, mainly causing wild
-                screen flickering
+		        when going vblank, dma must be stopped
+		        otherwise system tries to read past end of dll
+		        causing false dlis to occur, mainly causing wild
+		        screen flickering
 
-                games fixed:
-                Ace of Aces
-                Mean 18
-                Ninja Golf (end of levels)
-                Choplifter
-                Impossible Mission
-                Jinks
-        */
+		        games fixed:
+		        Ace of Aces
+		        Mean 18
+		        Ninja Golf (end of levels)
+		        Choplifter
+		        Impossible Mission
+		        Jinks
+		*/
 
 		m_maria_dodma = 0;
 		/*logerror( "vblank on line %d\n\n", frame_scanline );*/
@@ -558,12 +558,12 @@ WRITE8_MEMBER(a7800_state::a7800_MARIA_w)
 			m_maria_rm = data & 0x03;
 
 			/*logerror( "MARIA CTRL: CK:%d DMA:%d CW:%d BC:%d KM:%d RM:%d\n",
-                    m_maria_color_kill ? 1 : 0,
-                    ( data & 0x60 ) >> 5,
-                    m_maria_cwidth ? 1 : 0,
-                    m_maria_bcntl ? 1 : 0,
-                    m_maria_kangaroo ? 1 : 0,
-                    m_maria_rm );*/
+			        m_maria_color_kill ? 1 : 0,
+			        ( data & 0x60 ) >> 5,
+			        m_maria_cwidth ? 1 : 0,
+			        m_maria_bcntl ? 1 : 0,
+			        m_maria_kangaroo ? 1 : 0,
+			        m_maria_rm );*/
 
 			break;
 		case 0x1D:
@@ -578,4 +578,3 @@ WRITE8_MEMBER(a7800_state::a7800_MARIA_w)
 	}
 	ROM[ 0x20 + offset ] = data;
 }
-

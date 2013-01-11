@@ -26,24 +26,24 @@ struct  DView;
 
 struct DViewClass
 {
-  GtkContainerClass parent_class;
-  PangoFontDescription *fixedfont;
-  int fixedfont_width, fixedfont_height;
+	GtkContainerClass parent_class;
+	PangoFontDescription *fixedfont;
+	int fixedfont_width, fixedfont_height;
 };
 
 struct DView
 {
-  GtkContainer parent;
-  GtkAdjustment *hadj, *vadj;
-  GtkWidget *hscrollbar, *vscrollbar;
-  int hsz, vsz;
-  int hs, vs;
-  int tr, tc;
-  gchar *name;
-  PangoLayout *playout;
-  GdkGC *gc;
-  debug_view *view;
-  int dv_type;
+	GtkContainer parent;
+	GtkAdjustment *hadj, *vadj;
+	GtkWidget *hscrollbar, *vscrollbar;
+	int hsz, vsz;
+	int hs, vs;
+	int tr, tc;
+	gchar *name;
+	PangoLayout *playout;
+	GdkGC *gc;
+	debug_view *view;
+	int dv_type;
 };
 
 

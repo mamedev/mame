@@ -25,7 +25,7 @@
 // ======================> wangpc_lic_device
 
 class wangpc_lic_device : public device_t,
-							 public device_wangpcbus_card_interface
+								public device_wangpcbus_card_interface
 {
 public:
 	// construction/destruction

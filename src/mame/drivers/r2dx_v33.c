@@ -302,18 +302,18 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 
 	// both new zero team and raiden2/dx v33 version upload the same table..
 #if 0
-    {
+	{
 		char tmp[64];
-        FILE *fp;
-	    sprintf(tmp,"cop3_%s.data", machine().system().name);
+		FILE *fp;
+		sprintf(tmp,"cop3_%s.data", machine().system().name);
 
 		fp=fopen(tmp, "w+b");
-        if (fp)
-        {
-            fwrite(mcu_prog, 0x400, 2, fp);
-            fclose(fp);
-        }
-    }
+		if (fp)
+		{
+			fwrite(mcu_prog, 0x400, 2, fp);
+			fclose(fp);
+		}
+	}
 #endif
 }
 
@@ -441,8 +441,8 @@ READ16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_r)
 {
 	switch(offset+0x780)
 	{
-		case (0x788/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x78c/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x788/2): return seibu_main_word_r(space,2,0xffff);
+		case (0x78c/2): return seibu_main_word_r(space,3,0xffff);
 		case (0x794/2): return seibu_main_word_r(space,5,0xffff);
 	}
 
@@ -512,7 +512,7 @@ ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);	/* VBL */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
 }
 
 static const gfx_layout rdx_v33_charlayout =
@@ -600,7 +600,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( nzerotea )
-	SEIBU_COIN_INPUTS_INVERT	/* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS_INVERT    /* coin inputs read through sound cpu */
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -885,7 +885,7 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",       0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) /* Same as some of other Zero Team sets */
-	ROM_CONTINUE(            0x010000, 0x08000 )	/* banked stuff */
+	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
@@ -916,7 +916,7 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "syz-02.u019",  0x000000, 0x08000, CRC(55371073) SHA1(f6e182fa64630595dc8c25ac820e12983cfbed12) ) /* PCB silkscreened SOUND */
-	ROM_CONTINUE(             0x010000, 0x08000 )	/* banked stuff */
+	ROM_CONTINUE(             0x010000, 0x08000 )   /* banked stuff */
 	ROM_COPY( "audiocpu", 0,  0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */

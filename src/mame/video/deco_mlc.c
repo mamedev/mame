@@ -71,11 +71,11 @@ static void mlc_drawgfxzoom(
 	if (!scalex || !scaley) return;
 
 	/*
-    scalex and scaley are 16.16 fixed point numbers
-    1<<15 : shrink to 50%
-    1<<16 : uniform scale
-    1<<17 : double to 200%
-    */
+	scalex and scaley are 16.16 fixed point numbers
+	1<<15 : shrink to 50%
+	1<<16 : uniform scale
+	1<<17 : double to 200%
+	*/
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
@@ -240,42 +240,42 @@ static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap,const re
 			continue;
 
 		/*
-            Spriteram (1) format (16 bit):
+		    Spriteram (1) format (16 bit):
 
-            Word 0: 0x8000 - Sprite enable
-                    0x4000 - Use ROM or RAM for spriteram 2 (really top bit of index)
-                    0x3fff - Index into spriteram 2
-            Word 1: 0x8000 - X flip
-                    0x4000 - Y flip
-                    0x2000 - Auto-flicker (display sprite only every other frame)
-                    0x1000 - If set combine this 4bpp sprite & next one, into 8bpp sprite
-                    0x0800 - ?  (Not seen used anywhere)
-                    0x0400 - Use raster IRQ lookup table when drawing object
-                    0x0300 - Selects clipping window to use
-                    0x00ff - Colour/alpha shadow enable
-            Word 2: 0x07ff - Y position
-            Word 3: 0x07ff - X position
-            Word 4: 0x03ff - X scale
-            Word 5: 0x03ff - Y scale
+		    Word 0: 0x8000 - Sprite enable
+		            0x4000 - Use ROM or RAM for spriteram 2 (really top bit of index)
+		            0x3fff - Index into spriteram 2
+		    Word 1: 0x8000 - X flip
+		            0x4000 - Y flip
+		            0x2000 - Auto-flicker (display sprite only every other frame)
+		            0x1000 - If set combine this 4bpp sprite & next one, into 8bpp sprite
+		            0x0800 - ?  (Not seen used anywhere)
+		            0x0400 - Use raster IRQ lookup table when drawing object
+		            0x0300 - Selects clipping window to use
+		            0x00ff - Colour/alpha shadow enable
+		    Word 2: 0x07ff - Y position
+		    Word 3: 0x07ff - X position
+		    Word 4: 0x03ff - X scale
+		    Word 5: 0x03ff - Y scale
 
-            Spriteram (2) format (16 bit):
+		    Spriteram (2) format (16 bit):
 
-            Word 0: 0xe000 - ? (Always 0x2000?)
-                    0x1000 - X flip
-                    0x0f00 - Width in tiles (0==16)
-                    0x00ff - X position offset
-            Word 1: 0xe000 - ? (Always 0x2000?)
-                    0x1000 - Y flip
-                    0x0f00 - Height in tiles (0==16)
-                    0x00ff - Y position offset
-            Word 2: 0xff00 - ? (Always 0?)
-                    0x00c0 - If set use tile index as pointer into tile index array, else use as tile index directly
-                    0x0080 - If set tile index array format is 12 bit tile, 4 bit colour
-                    0x0040 - If set tile index array is 16 bit tile, 0 bit colour
-                    0x003c - Hi-bits of tile index after array lookup
-                    0x0003 - Hi-bits of tile index, selects ROM or RAM for array
-            Word 3: 0xffff - Low-bits of tile index
-        */
+		    Word 0: 0xe000 - ? (Always 0x2000?)
+		            0x1000 - X flip
+		            0x0f00 - Width in tiles (0==16)
+		            0x00ff - X position offset
+		    Word 1: 0xe000 - ? (Always 0x2000?)
+		            0x1000 - Y flip
+		            0x0f00 - Height in tiles (0==16)
+		            0x00ff - Y position offset
+		    Word 2: 0xff00 - ? (Always 0?)
+		            0x00c0 - If set use tile index as pointer into tile index array, else use as tile index directly
+		            0x0080 - If set tile index array format is 12 bit tile, 4 bit colour
+		            0x0040 - If set tile index array is 16 bit tile, 0 bit colour
+		            0x003c - Hi-bits of tile index after array lookup
+		            0x0003 - Hi-bits of tile index, selects ROM or RAM for array
+		    Word 3: 0xffff - Low-bits of tile index
+		*/
 
 		y = mlc_spriteram[offs+2]&0x7ff;
 		x = mlc_spriteram[offs+3]&0x7ff;
@@ -294,7 +294,7 @@ static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap,const re
 		colorOffset = 0;
 
 		/* Clip windows - this mapping seems odd, but is correct for Skull Fang and StadHr96,
-        however there are space for 8 clipping windows, where is the high bit? (Or is it ~0x400?) */
+		however there are space for 8 clipping windows, where is the high bit? (Or is it ~0x400?) */
 		clipper=((clipper&2)>>1)|((clipper&1)<<1); // Swap low two bits
 
 		user_clip.min_y=state->m_mlc_clip_ram[(clipper*4)+0];
@@ -499,10 +499,10 @@ void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 	if (state)
 	{
 		/* Spriteram is definitely double buffered, as the vram lookup tables
-        are often updated a frame after spriteram is setup to point to a new
-        lookup table.  Without buffering incorrect one frame glitches are seen
-        in several places, especially in Hoops.
-        */
+		are often updated a frame after spriteram is setup to point to a new
+		lookup table.  Without buffering incorrect one frame glitches are seen
+		in several places, especially in Hoops.
+		*/
 		memcpy(m_mlc_buffered_spriteram, m_spriteram, 0x3000);
 	}
 }

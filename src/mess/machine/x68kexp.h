@@ -68,7 +68,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define X68K_EXP_SLOT_TAG		"x68kexp"
+#define X68K_EXP_SLOT_TAG       "x68kexp"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -79,8 +79,8 @@
 
 
 #define MCFG_X68K_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, X68K_EXPANSION_SLOT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, X68K_EXPANSION_SLOT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 //**************************************************************************
@@ -91,10 +91,10 @@
 
 struct x68k_expansion_slot_interface
 {
-    devcb_write_line	m_out_irq2_cb;
-    devcb_write_line	m_out_irq4_cb;
-    devcb_write_line	m_out_nmi_cb;
-    devcb_write_line	m_out_reset_cb;
+	devcb_write_line    m_out_irq2_cb;
+	devcb_write_line    m_out_irq4_cb;
+	devcb_write_line    m_out_nmi_cb;
+	devcb_write_line    m_out_reset_cb;
 };
 
 // ======================> device_x68k_expansion_card_interface
@@ -115,8 +115,8 @@ public:
 // ======================> x68k_expansion_slot_device
 
 class x68k_expansion_slot_device : public device_t,
-								  public x68k_expansion_slot_interface,
-								  public device_slot_interface
+									public x68k_expansion_slot_interface,
+									public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -134,10 +134,10 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-	devcb_resolved_write_line	m_out_irq2_func;
-	devcb_resolved_write_line	m_out_irq4_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_reset_func;
+	devcb_resolved_write_line   m_out_irq2_func;
+	devcb_resolved_write_line   m_out_irq4_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_reset_func;
 
 	device_x68k_expansion_card_interface *m_card;
 };

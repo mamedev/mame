@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
 
 	/* should we really be using these to read the i/o in the BOOTLEG?
-      these look like i/o through protection ... */
+	  these look like i/o through protection ... */
 	AM_RANGE(0x167842, 0x167843) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x167c4c, 0x167c4d) AM_READ_PORT("DSW")
 	AM_RANGE(0x167db2, 0x167db3) AM_READ_PORT("SYSTEM")
@@ -189,7 +189,7 @@ static INPUT_PORTS_START( pktgaldx )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
@@ -198,7 +198,7 @@ static INPUT_PORTS_START( pktgaldx )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
@@ -207,28 +207,28 @@ static INPUT_PORTS_START( pktgaldx )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "2 Coins to Start, 1 to Continue" )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "2 Coins to Start, 1 to Continue" )   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0100, "3" )
 	PORT_DIPSETTING(      0x0300, "4" )
 	PORT_DIPSETTING(      0x0200, "5" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Time"  )					PORT_DIPLOCATION("SW2:3,4") /* Listed as "Difficulty" */
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Time"  )                 PORT_DIPLOCATION("SW2:3,4") /* Listed as "Difficulty" */
 	PORT_DIPSETTING(      0x0000, "60" )
 	PORT_DIPSETTING(      0x0400, "80" )
 	PORT_DIPSETTING(      0x0c00, "100" )
 	PORT_DIPSETTING(      0x0800, "120" )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW2:5" )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Free_Play ) )			PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Free_Play ) )            PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -263,14 +263,14 @@ static const gfx_layout spritelayout =
 	{ 24,8,16,0 },
 	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
 	32*32
 };
 
 static GFXDECODE_START( pktgaldx )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )	/* Tiles (8x8) */
-	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )	/* Tiles (16x16) */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )	/* Sprites (16x16) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )    /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )    /* Tiles (16x16) */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
 static const gfx_layout bootleg_spritelayout =
@@ -281,7 +281,7 @@ static const gfx_layout bootleg_spritelayout =
 	{ 0,1,2,3 },
 	{ 48,52,56,60,32,36,40,44,16,20,24,28,0,4,8,12 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64},
+		8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64},
 	16*64
 };
 
@@ -304,7 +304,7 @@ static const deco16ic_interface pktgaldx_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
 	0x0f, 0x0f, /* color masks (default values) */
 	NULL,

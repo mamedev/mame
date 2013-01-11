@@ -12,10 +12,10 @@
 #define LOG(x) do { if (VERBOSE) mame_printf_debug x; } while (0)
 
 /* All post-i286 CPUs have a 16MB address space */
-#define AMASK	cpustate->amask
+#define AMASK   cpustate->amask
 
 
-#define INPUT_LINE_A20		1
+#define INPUT_LINE_A20      1
 
 #include "i286.h"
 
@@ -28,22 +28,22 @@
 /* I86 registers */
 union i80286basicregs
 {                   /* eight general registers */
-    UINT16 w[8];    /* viewed as 16 bits registers */
-    UINT8  b[16];   /* or as 8 bit registers */
+	UINT16 w[8];    /* viewed as 16 bits registers */
+	UINT8  b[16];   /* or as 8 bit registers */
 };
 
 struct i80286_state
 {
-    i80286basicregs regs;
-    offs_t fetch_xor;
-	UINT32	amask;			/* address mask */
-    UINT32  pc;
-    UINT32  prevpc;
-	UINT16	flags;
-	UINT16	msw;
-	UINT32	base[4];
-	UINT16	sregs[4];
-	UINT16	limit[4];
+	i80286basicregs regs;
+	offs_t fetch_xor;
+	UINT32  amask;          /* address mask */
+	UINT32  pc;
+	UINT32  prevpc;
+	UINT16  flags;
+	UINT16  msw;
+	UINT32  base[4];
+	UINT16  sregs[4];
+	UINT16  limit[4];
 	UINT8 rights[4];
 	bool valid[4];
 	struct {
@@ -61,25 +61,25 @@ struct i80286_state
 	address_space *program;
 	direct_read_data *direct;
 	address_space *io;
-	INT32	AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
-	UINT8	ParityVal;
-	UINT8	TF, IF; 	/* 0 or 1 valued flags */
-	UINT8	int_vector;
-	INT8	nmi_state;
-	INT8	irq_state;
-	INT8	test_state;
+	INT32   AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
+	UINT8   ParityVal;
+	UINT8   TF, IF;     /* 0 or 1 valued flags */
+	UINT8   int_vector;
+	INT8    nmi_state;
+	INT8    irq_state;
+	INT8    test_state;
 	UINT8 rep_in_progress;
-	INT32	extra_cycles;       /* extra cycles for interrupts */
+	INT32   extra_cycles;       /* extra cycles for interrupts */
 
 	int halted;         /* Is the CPU halted ? */
 	int trap_level;
 
 	int icount;
 	char seg_prefix;
-	UINT8	prefix_seg;
+	UINT8   prefix_seg;
 	unsigned ea;
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
-	UINT8 ea_seg;	/* effective segment of the address */
+	UINT8 ea_seg;   /* effective segment of the address */
 };
 
 INLINE i80286_state *get_safe_token(device_t *device)
@@ -254,7 +254,7 @@ static CPU_EXECUTE( i80286 )
 		{
 			i80286_trap2(cpustate,e);
 		}
-    }
+	}
 
 	/* adjust for any interrupts that came in */
 	cpustate->icount -= cpustate->extra_cycles;
@@ -340,10 +340,10 @@ static CPU_SET_INFO( i80286 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(cpustate, 0, info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + 0:               set_irq_line(cpustate, 0, info->i);             break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  set_irq_line(cpustate, INPUT_LINE_NMI, info->i);    break;
 
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_A20:	i80286_set_a20_line(cpustate, info->i);			break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_A20:  i80286_set_a20_line(cpustate, info->i);         break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + I80286_PC:
@@ -362,7 +362,7 @@ static CPU_SET_INFO( i80286 )
 			}
 			break;
 
-		case CPUINFO_INT_REGISTER + I80286_IP:			cpustate->pc = cpustate->base[CS] + info->i;			break;
+		case CPUINFO_INT_REGISTER + I80286_IP:          cpustate->pc = cpustate->base[CS] + info->i;            break;
 		case CPUINFO_INT_SP:
 			if (PM)
 			{
@@ -383,20 +383,20 @@ static CPU_SET_INFO( i80286 )
 			}
 			break;
 
-		case CPUINFO_INT_REGISTER + I80286_SP:			cpustate->regs.w[SP] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_FLAGS:		cpustate->flags = info->i;	ExpandFlags(info->i); break;
-		case CPUINFO_INT_REGISTER + I80286_AX:			cpustate->regs.w[AX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_CX:			cpustate->regs.w[CX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_DX:			cpustate->regs.w[DX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_BX:			cpustate->regs.w[BX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_BP:			cpustate->regs.w[BP] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_SI:			cpustate->regs.w[SI] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_DI:			cpustate->regs.w[DI] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I80286_ES:			cpustate->sregs[ES] = info->i;	cpustate->base[ES] = SegBase(ES); break;
-		case CPUINFO_INT_REGISTER + I80286_CS:			cpustate->sregs[CS] = info->i;	cpustate->base[CS] = SegBase(CS); break;
-		case CPUINFO_INT_REGISTER + I80286_SS:			cpustate->sregs[SS] = info->i;	cpustate->base[SS] = SegBase(SS); break;
-		case CPUINFO_INT_REGISTER + I80286_DS:			cpustate->sregs[DS] = info->i;	cpustate->base[DS] = SegBase(DS); break;
-		case CPUINFO_INT_REGISTER + I80286_VECTOR:		cpustate->int_vector = info->i; 				break;
+		case CPUINFO_INT_REGISTER + I80286_SP:          cpustate->regs.w[SP] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_FLAGS:       cpustate->flags = info->i;  ExpandFlags(info->i); break;
+		case CPUINFO_INT_REGISTER + I80286_AX:          cpustate->regs.w[AX] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_CX:          cpustate->regs.w[CX] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_DX:          cpustate->regs.w[DX] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_BX:          cpustate->regs.w[BX] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_BP:          cpustate->regs.w[BP] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_SI:          cpustate->regs.w[SI] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_DI:          cpustate->regs.w[DI] = info->i;                 break;
+		case CPUINFO_INT_REGISTER + I80286_ES:          cpustate->sregs[ES] = info->i;  cpustate->base[ES] = SegBase(ES); break;
+		case CPUINFO_INT_REGISTER + I80286_CS:          cpustate->sregs[CS] = info->i;  cpustate->base[CS] = SegBase(CS); break;
+		case CPUINFO_INT_REGISTER + I80286_SS:          cpustate->sregs[SS] = info->i;  cpustate->base[SS] = SegBase(SS); break;
+		case CPUINFO_INT_REGISTER + I80286_DS:          cpustate->sregs[DS] = info->i;  cpustate->base[DS] = SegBase(DS); break;
+		case CPUINFO_INT_REGISTER + I80286_VECTOR:      cpustate->int_vector = info->i;                 break;
 	}
 }
 
@@ -413,76 +413,76 @@ CPU_GET_INFO( i80286 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(i80286_state);					break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 50;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(i80286_state);                 break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0xff;                         break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 10;                           break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 50;                           break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;                  break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 16;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 16;                   break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_state;					break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;					break;
+		case CPUINFO_INT_INPUT_STATE + 0:               info->i = cpustate->irq_state;                  break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = cpustate->nmi_state;                  break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->prevpc;						break;
+		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->prevpc;                     break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + I80286_PC:			info->i = cpustate->pc;							break;
-		case CPUINFO_INT_REGISTER + I80286_IP:			info->i = cpustate->pc - cpustate->base[CS];			break;
-		case CPUINFO_INT_SP:							info->i = cpustate->base[SS] + cpustate->regs.w[SP];	break;
-		case CPUINFO_INT_REGISTER + I80286_SP:			info->i = cpustate->regs.w[SP];					break;
-		case CPUINFO_INT_REGISTER + I80286_FLAGS:		cpustate->flags = CompressFlags(); info->i = cpustate->flags; break;
-		case CPUINFO_INT_REGISTER + I80286_AX:			info->i = cpustate->regs.w[AX];					break;
-		case CPUINFO_INT_REGISTER + I80286_CX:			info->i = cpustate->regs.w[CX];					break;
-		case CPUINFO_INT_REGISTER + I80286_DX:			info->i = cpustate->regs.w[DX];					break;
-		case CPUINFO_INT_REGISTER + I80286_BX:			info->i = cpustate->regs.w[BX];					break;
-		case CPUINFO_INT_REGISTER + I80286_BP:			info->i = cpustate->regs.w[BP];					break;
-		case CPUINFO_INT_REGISTER + I80286_SI:			info->i = cpustate->regs.w[SI];					break;
-		case CPUINFO_INT_REGISTER + I80286_DI:			info->i = cpustate->regs.w[DI];					break;
-		case CPUINFO_INT_REGISTER + I80286_ES:			info->i = cpustate->sregs[ES];					break;
-		case CPUINFO_INT_REGISTER + I80286_CS:			info->i = cpustate->sregs[CS];					break;
-		case CPUINFO_INT_REGISTER + I80286_SS:			info->i = cpustate->sregs[SS];					break;
-		case CPUINFO_INT_REGISTER + I80286_DS:			info->i = cpustate->sregs[DS];					break;
-		case CPUINFO_INT_REGISTER + I80286_VECTOR:		info->i = cpustate->int_vector;					break;
-		case CPUINFO_INT_REGISTER + I80286_MSW:			info->i = cpustate->msw;						break;
-		case CPUINFO_INT_REGISTER + I80286_GDTR_BASE:	info->i = cpustate->gdtr.base;					break;
-		case CPUINFO_INT_REGISTER + I80286_GDTR_LIMIT:	info->i = cpustate->gdtr.limit;					break;
-		case CPUINFO_INT_REGISTER + I80286_IDTR_BASE:	info->i = cpustate->idtr.base;					break;
-		case CPUINFO_INT_REGISTER + I80286_IDTR_LIMIT:	info->i = cpustate->idtr.limit;					break;
-		case CPUINFO_INT_REGISTER + I80286_LDTR_BASE:	info->i = cpustate->ldtr.base;					break;
-		case CPUINFO_INT_REGISTER + I80286_LDTR_LIMIT:	info->i = cpustate->ldtr.limit;					break;
-		case CPUINFO_INT_REGISTER + I80286_TR_BASE:		info->i = cpustate->tr.base;					break;
-		case CPUINFO_INT_REGISTER + I80286_TR_LIMIT:	info->i = cpustate->tr.limit;					break;
+		case CPUINFO_INT_REGISTER + I80286_PC:          info->i = cpustate->pc;                         break;
+		case CPUINFO_INT_REGISTER + I80286_IP:          info->i = cpustate->pc - cpustate->base[CS];            break;
+		case CPUINFO_INT_SP:                            info->i = cpustate->base[SS] + cpustate->regs.w[SP];    break;
+		case CPUINFO_INT_REGISTER + I80286_SP:          info->i = cpustate->regs.w[SP];                 break;
+		case CPUINFO_INT_REGISTER + I80286_FLAGS:       cpustate->flags = CompressFlags(); info->i = cpustate->flags; break;
+		case CPUINFO_INT_REGISTER + I80286_AX:          info->i = cpustate->regs.w[AX];                 break;
+		case CPUINFO_INT_REGISTER + I80286_CX:          info->i = cpustate->regs.w[CX];                 break;
+		case CPUINFO_INT_REGISTER + I80286_DX:          info->i = cpustate->regs.w[DX];                 break;
+		case CPUINFO_INT_REGISTER + I80286_BX:          info->i = cpustate->regs.w[BX];                 break;
+		case CPUINFO_INT_REGISTER + I80286_BP:          info->i = cpustate->regs.w[BP];                 break;
+		case CPUINFO_INT_REGISTER + I80286_SI:          info->i = cpustate->regs.w[SI];                 break;
+		case CPUINFO_INT_REGISTER + I80286_DI:          info->i = cpustate->regs.w[DI];                 break;
+		case CPUINFO_INT_REGISTER + I80286_ES:          info->i = cpustate->sregs[ES];                  break;
+		case CPUINFO_INT_REGISTER + I80286_CS:          info->i = cpustate->sregs[CS];                  break;
+		case CPUINFO_INT_REGISTER + I80286_SS:          info->i = cpustate->sregs[SS];                  break;
+		case CPUINFO_INT_REGISTER + I80286_DS:          info->i = cpustate->sregs[DS];                  break;
+		case CPUINFO_INT_REGISTER + I80286_VECTOR:      info->i = cpustate->int_vector;                 break;
+		case CPUINFO_INT_REGISTER + I80286_MSW:         info->i = cpustate->msw;                        break;
+		case CPUINFO_INT_REGISTER + I80286_GDTR_BASE:   info->i = cpustate->gdtr.base;                  break;
+		case CPUINFO_INT_REGISTER + I80286_GDTR_LIMIT:  info->i = cpustate->gdtr.limit;                 break;
+		case CPUINFO_INT_REGISTER + I80286_IDTR_BASE:   info->i = cpustate->idtr.base;                  break;
+		case CPUINFO_INT_REGISTER + I80286_IDTR_LIMIT:  info->i = cpustate->idtr.limit;                 break;
+		case CPUINFO_INT_REGISTER + I80286_LDTR_BASE:   info->i = cpustate->ldtr.base;                  break;
+		case CPUINFO_INT_REGISTER + I80286_LDTR_LIMIT:  info->i = cpustate->ldtr.limit;                 break;
+		case CPUINFO_INT_REGISTER + I80286_TR_BASE:     info->i = cpustate->tr.base;                    break;
+		case CPUINFO_INT_REGISTER + I80286_TR_LIMIT:    info->i = cpustate->tr.limit;                   break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i80286);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80286);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(i80286);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = NULL;						break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80286);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80286);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(i80286);      break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(i80286);             break;
+		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(i80286);               break;
+		case CPUINFO_FCT_EXIT:                          info->exit = NULL;                      break;
+		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(i80286);           break;
+		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
+		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80286);       break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "80286");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Intel 80286");			break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.4");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Real mode i286 emulator v1.4 by Fabrice Frances\n(initial work cpustate->based on David Hedley's pcemu)"); break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "80286");               break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Intel 80286");         break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.4");                 break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Real mode i286 emulator v1.4 by Fabrice Frances\n(initial work cpustate->based on David Hedley's pcemu)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			cpustate->flags = CompressFlags();
@@ -505,35 +505,35 @@ CPU_GET_INFO( i80286 )
 					cpustate->flags & 0x0001 ? 'C' : '.');
 			break;
 
-		case CPUINFO_STR_REGISTER + I80286_PC:			sprintf(info->s, "PC:%06X", cpustate->pc); break;
-		case CPUINFO_STR_REGISTER + I80286_IP:			sprintf(info->s, "IP: %04X", cpustate->pc - cpustate->base[CS]); break;
-		case CPUINFO_STR_REGISTER + I80286_SP:			sprintf(info->s, "SP: %04X", cpustate->regs.w[SP]); break;
-		case CPUINFO_STR_REGISTER + I80286_FLAGS:		sprintf(info->s, "F:%04X", cpustate->flags); break;
-		case CPUINFO_STR_REGISTER + I80286_AX:			sprintf(info->s, "AX:%04X", cpustate->regs.w[AX]); break;
-		case CPUINFO_STR_REGISTER + I80286_CX:			sprintf(info->s, "CX:%04X", cpustate->regs.w[CX]); break;
-		case CPUINFO_STR_REGISTER + I80286_DX:			sprintf(info->s, "DX:%04X", cpustate->regs.w[DX]); break;
-		case CPUINFO_STR_REGISTER + I80286_BX:			sprintf(info->s, "BX:%04X", cpustate->regs.w[BX]); break;
-		case CPUINFO_STR_REGISTER + I80286_BP:			sprintf(info->s, "BP:%04X", cpustate->regs.w[BP]); break;
-		case CPUINFO_STR_REGISTER + I80286_SI:			sprintf(info->s, "SI: %04X", cpustate->regs.w[SI]); break;
-		case CPUINFO_STR_REGISTER + I80286_DI:			sprintf(info->s, "DI: %04X", cpustate->regs.w[DI]); break;
-		case CPUINFO_STR_REGISTER + I80286_CS:			sprintf(info->s, "CS:  %04X %02X", cpustate->sregs[CS], cpustate->rights[CS]); break;
-		case CPUINFO_STR_REGISTER + I80286_CS_2:		sprintf(info->s, "CSDESC: %06X %04X", cpustate->base[CS], cpustate->limit[CS]); break;
-		case CPUINFO_STR_REGISTER + I80286_SS:			sprintf(info->s, "SS:  %04X %02X", cpustate->sregs[SS], cpustate->rights[SS]); break;
-		case CPUINFO_STR_REGISTER + I80286_SS_2:		sprintf(info->s, "SSDESC: %06X %04X", cpustate->base[SS], cpustate->limit[SS]); break;
-		case CPUINFO_STR_REGISTER + I80286_DS:			sprintf(info->s, "DS:  %04X %02X", cpustate->sregs[DS], cpustate->rights[DS]); break;
-		case CPUINFO_STR_REGISTER + I80286_DS_2:		sprintf(info->s, "DSDESC: %06X %04X", cpustate->base[DS], cpustate->limit[DS]); break;
-		case CPUINFO_STR_REGISTER + I80286_ES:			sprintf(info->s, "ES:  %04X %02X", cpustate->sregs[ES], cpustate->rights[ES]); break;
-		case CPUINFO_STR_REGISTER + I80286_ES_2:		sprintf(info->s, "ESDESC: %06X %04X", cpustate->base[ES], cpustate->limit[ES]); break;
-		case CPUINFO_STR_REGISTER + I80286_VECTOR:		sprintf(info->s, "V:%02X", cpustate->int_vector); break;
-		case CPUINFO_STR_REGISTER + I80286_MSW:			sprintf(info->s, "MSW:%04X", cpustate->msw); break;
-		case CPUINFO_STR_REGISTER + I80286_TR_BASE:		sprintf(info->s, "TRBASE: %06X", cpustate->tr.base); break;
-		case CPUINFO_STR_REGISTER + I80286_TR_LIMIT:	sprintf(info->s, "TRLIM: %04X", cpustate->tr.limit); break;
-		case CPUINFO_STR_REGISTER + I80286_GDTR_BASE:	sprintf(info->s, "GDTRBASE: %06X", cpustate->gdtr.base); break;
-		case CPUINFO_STR_REGISTER + I80286_GDTR_LIMIT:	sprintf(info->s, "GDTRLIM: %04X", cpustate->gdtr.limit); break;
-		case CPUINFO_STR_REGISTER + I80286_LDTR_BASE:	sprintf(info->s, "LDTR: %04X %02X", cpustate->ldtr.sel, cpustate->ldtr.rights); break;
-		case CPUINFO_STR_REGISTER + I80286_LDTR_LIMIT:	sprintf(info->s, "LDTRDESC: %06X %04X", cpustate->ldtr.base, cpustate->ldtr.limit); break;
-		case CPUINFO_STR_REGISTER + I80286_IDTR_BASE:	sprintf(info->s, "IDTRBASE: %06X", cpustate->idtr.base); break;
-		case CPUINFO_STR_REGISTER + I80286_IDTR_LIMIT:	sprintf(info->s, "IDTRLIM: %04X", cpustate->idtr.limit); break;
+		case CPUINFO_STR_REGISTER + I80286_PC:          sprintf(info->s, "PC:%06X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + I80286_IP:          sprintf(info->s, "IP: %04X", cpustate->pc - cpustate->base[CS]); break;
+		case CPUINFO_STR_REGISTER + I80286_SP:          sprintf(info->s, "SP: %04X", cpustate->regs.w[SP]); break;
+		case CPUINFO_STR_REGISTER + I80286_FLAGS:       sprintf(info->s, "F:%04X", cpustate->flags); break;
+		case CPUINFO_STR_REGISTER + I80286_AX:          sprintf(info->s, "AX:%04X", cpustate->regs.w[AX]); break;
+		case CPUINFO_STR_REGISTER + I80286_CX:          sprintf(info->s, "CX:%04X", cpustate->regs.w[CX]); break;
+		case CPUINFO_STR_REGISTER + I80286_DX:          sprintf(info->s, "DX:%04X", cpustate->regs.w[DX]); break;
+		case CPUINFO_STR_REGISTER + I80286_BX:          sprintf(info->s, "BX:%04X", cpustate->regs.w[BX]); break;
+		case CPUINFO_STR_REGISTER + I80286_BP:          sprintf(info->s, "BP:%04X", cpustate->regs.w[BP]); break;
+		case CPUINFO_STR_REGISTER + I80286_SI:          sprintf(info->s, "SI: %04X", cpustate->regs.w[SI]); break;
+		case CPUINFO_STR_REGISTER + I80286_DI:          sprintf(info->s, "DI: %04X", cpustate->regs.w[DI]); break;
+		case CPUINFO_STR_REGISTER + I80286_CS:          sprintf(info->s, "CS:  %04X %02X", cpustate->sregs[CS], cpustate->rights[CS]); break;
+		case CPUINFO_STR_REGISTER + I80286_CS_2:        sprintf(info->s, "CSDESC: %06X %04X", cpustate->base[CS], cpustate->limit[CS]); break;
+		case CPUINFO_STR_REGISTER + I80286_SS:          sprintf(info->s, "SS:  %04X %02X", cpustate->sregs[SS], cpustate->rights[SS]); break;
+		case CPUINFO_STR_REGISTER + I80286_SS_2:        sprintf(info->s, "SSDESC: %06X %04X", cpustate->base[SS], cpustate->limit[SS]); break;
+		case CPUINFO_STR_REGISTER + I80286_DS:          sprintf(info->s, "DS:  %04X %02X", cpustate->sregs[DS], cpustate->rights[DS]); break;
+		case CPUINFO_STR_REGISTER + I80286_DS_2:        sprintf(info->s, "DSDESC: %06X %04X", cpustate->base[DS], cpustate->limit[DS]); break;
+		case CPUINFO_STR_REGISTER + I80286_ES:          sprintf(info->s, "ES:  %04X %02X", cpustate->sregs[ES], cpustate->rights[ES]); break;
+		case CPUINFO_STR_REGISTER + I80286_ES_2:        sprintf(info->s, "ESDESC: %06X %04X", cpustate->base[ES], cpustate->limit[ES]); break;
+		case CPUINFO_STR_REGISTER + I80286_VECTOR:      sprintf(info->s, "V:%02X", cpustate->int_vector); break;
+		case CPUINFO_STR_REGISTER + I80286_MSW:         sprintf(info->s, "MSW:%04X", cpustate->msw); break;
+		case CPUINFO_STR_REGISTER + I80286_TR_BASE:     sprintf(info->s, "TRBASE: %06X", cpustate->tr.base); break;
+		case CPUINFO_STR_REGISTER + I80286_TR_LIMIT:    sprintf(info->s, "TRLIM: %04X", cpustate->tr.limit); break;
+		case CPUINFO_STR_REGISTER + I80286_GDTR_BASE:   sprintf(info->s, "GDTRBASE: %06X", cpustate->gdtr.base); break;
+		case CPUINFO_STR_REGISTER + I80286_GDTR_LIMIT:  sprintf(info->s, "GDTRLIM: %04X", cpustate->gdtr.limit); break;
+		case CPUINFO_STR_REGISTER + I80286_LDTR_BASE:   sprintf(info->s, "LDTR: %04X %02X", cpustate->ldtr.sel, cpustate->ldtr.rights); break;
+		case CPUINFO_STR_REGISTER + I80286_LDTR_LIMIT:  sprintf(info->s, "LDTRDESC: %06X %04X", cpustate->ldtr.base, cpustate->ldtr.limit); break;
+		case CPUINFO_STR_REGISTER + I80286_IDTR_BASE:   sprintf(info->s, "IDTRBASE: %06X", cpustate->idtr.base); break;
+		case CPUINFO_STR_REGISTER + I80286_IDTR_LIMIT:  sprintf(info->s, "IDTRLIM: %04X", cpustate->idtr.limit); break;
 	}
 }
 

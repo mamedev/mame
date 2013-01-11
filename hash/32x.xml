@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-    Notes on GameId:
-    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
-      a -5x appended to the end, depending on the country/language (generic English titles have a -50)
+	Notes on GameId:
+	- first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
+		a -5x appended to the end, depending on the country/language (generic English titles have a -50)
 
 
-    Undumped:
-     - Motherbase (Euro)
+	Undumped:
+		- Motherbase (Euro)
 
-    Known undumped prototypes:
-     - Spot Goes to Hollywood
+	Known undumped prototypes:
+		- Spot Goes to Hollywood
 
 -->
 <softwarelist name="32x" description="Sega 32X cartridges">
@@ -364,7 +364,7 @@
 	</software>
 
 	<software name="doomp2" cloneof="doom">
-        <!-- the same checksum is shared by the prototype (19940927), released by drx -->
+		<!-- the same checksum is shared by the prototype (19940927), released by drx -->
 		<description>Doom (USA, Prototype, 19940928)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>

@@ -34,14 +34,14 @@ WRITE8_MEMBER( draco_state::sound_bankswitch_w )
 {
 	/*
 
-        pin     description
+	    pin     description
 
-        D0      not connected
-        D1      not connected
-        D2      not connected
-        D3      2716 A10
+	    D0      not connected
+	    D1      not connected
+	    D2      not connected
+	    D3      2716 A10
 
-    */
+	*/
 
 	int bank = BIT(data, 3);
 
@@ -52,14 +52,14 @@ WRITE8_MEMBER( draco_state::sound_g_w )
 {
 	/*
 
-     G1 G0  description
+	 G1 G0  description
 
-      0  0  IAB     inactive
-      0  1  DWS     write to PSG
-      1  0  DTB     read from PSG
-      1  1  INTAK   latch address
+	  0  0  IAB     inactive
+	  0  1  DWS     write to PSG
+	  1  0  DTB     read from PSG
+	  1  1  INTAK   latch address
 
-    */
+	*/
 
 	switch (data)
 	{
@@ -97,17 +97,17 @@ WRITE8_MEMBER( draco_state::psg_w )
 WRITE8_MEMBER( cidelsa_state::destryer_out1_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
-    */
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
+	*/
 }
 
 /* CDP1852 Interfaces */
@@ -115,17 +115,17 @@ WRITE8_MEMBER( cidelsa_state::destryer_out1_w )
 WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0   S1 (CARTUCHO)
-        1   S2 (CARTUCHO)
-        2   S3 (CARTUCHO)
-        3   LG1
-        4   LG2
-        5   LGF
-        6   CONT. M2
-        7   CONT. M1
-    */
+	    0   S1 (CARTUCHO)
+	    1   S2 (CARTUCHO)
+	    2   S3 (CARTUCHO)
+	    3   LG1
+	    4   LG2
+	    5   LGF
+	    6   CONT. M2
+	    7   CONT. M1
+	*/
 
 	set_led_status(machine(), 0, data & 0x08); // 1P
 	set_led_status(machine(), 1, data & 0x10); // 2P
@@ -135,17 +135,17 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 WRITE8_MEMBER( draco_state::out1_w )
 {
 	/*
-      bit   description
+	  bit   description
 
-        0   3K9 -> Green signal
-        1   820R -> Blue signal
-        2   510R -> Red signal
-        3   1K -> not connected
-        4   not connected
-        5   SONIDO A -> COP402 IN0
-        6   SONIDO B -> COP402 IN1
-        7   SONIDO C -> COP402 IN2
-    */
+	    0   3K9 -> Green signal
+	    1   820R -> Blue signal
+	    2   510R -> Red signal
+	    3   1K -> not connected
+	    4   not connected
+	    5   SONIDO A -> COP402 IN0
+	    6   SONIDO B -> COP402 IN1
+	    7   SONIDO C -> COP402 IN2
+	*/
 
 	m_sound = (data & 0xe0) >> 5;
 }
@@ -493,10 +493,10 @@ static MACHINE_CONFIG_START( altair, cidelsa_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* input/output hardware */
-	MCFG_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1869 CMSEL (pin 37) */
+	MCFG_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)  /* clock is really tied to CDP1869 CMSEL (pin 37) */
 	MCFG_CDP1852_ADD("ic24", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
 	MCFG_CDP1852_ADD("ic25", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
-	MCFG_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
+	MCFG_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)     /* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(altair_video)
@@ -516,10 +516,10 @@ static MACHINE_CONFIG_START( draco, draco_state )
 	MCFG_CPU_CONFIG(draco_cop_intf)
 
 	/* input/output hardware */
-	MCFG_CDP1852_ADD("ic29", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1876 CMSEL (pin 32) */
+	MCFG_CDP1852_ADD("ic29", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)  /* clock is really tied to CDP1876 CMSEL (pin 32) */
 	MCFG_CDP1852_ADD("ic30", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
 	MCFG_CDP1852_ADD("ic31", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
-	MCFG_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
+	MCFG_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)       /* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(draco_video)

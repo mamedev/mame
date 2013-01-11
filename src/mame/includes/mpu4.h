@@ -14,7 +14,7 @@
 
 
 #define MPU4_MASTER_CLOCK (6880000)
-#define VIDEO_MASTER_CLOCK			XTAL_10MHz
+#define VIDEO_MASTER_CLOCK          XTAL_10MHz
 
 
 #ifdef MAME_DEBUG
@@ -33,12 +33,12 @@
 #define MPU4VERBOSE 0
 #endif
 
-#define LOG(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_CHR(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_CHR_FULL(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_IC3(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_IC8(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_SS(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
+#define LOG_CHR(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
+#define LOG_CHR_FULL(x) do { if (MPU4VERBOSE) logerror x; } while (0)
+#define LOG_IC3(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
+#define LOG_IC8(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
+#define LOG_SS(x)   do { if (MPU4VERBOSE) logerror x; } while (0)
 
 
 
@@ -49,31 +49,31 @@ static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 
 static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
-#define STANDARD_REEL  0	// As originally designed 3/4 reels
-#define FIVE_REEL_5TO8 1	// Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel
-#define FIVE_REEL_8TO5 2	// Mounted backwards for space reasons, but different board
-#define FIVE_REEL_3TO6 3	// Connected to the centre of the meter connector, taking up meters 3 to 6
-#define SIX_REEL_1TO8  4	// Two reels on the meter drives
-#define SIX_REEL_5TO8  5	// Like FIVE_REEL_5TO8, but with an extra reel elsewhere
-#define SEVEN_REEL     6	// Mainly club machines, significant reworking of reel hardware
-#define FLUTTERBOX     7	// Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel
+#define STANDARD_REEL  0    // As originally designed 3/4 reels
+#define FIVE_REEL_5TO8 1    // Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel
+#define FIVE_REEL_8TO5 2    // Mounted backwards for space reasons, but different board
+#define FIVE_REEL_3TO6 3    // Connected to the centre of the meter connector, taking up meters 3 to 6
+#define SIX_REEL_1TO8  4    // Two reels on the meter drives
+#define SIX_REEL_5TO8  5    // Like FIVE_REEL_5TO8, but with an extra reel elsewhere
+#define SEVEN_REEL     6    // Mainly club machines, significant reworking of reel hardware
+#define FLUTTERBOX     7    // Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel
 
-#define NO_EXTENDER			0 // As originally designed
-#define SMALL_CARD			1
-#define LARGE_CARD_A		2 //96 Lamps
-#define LARGE_CARD_B		3 //96 Lamps, 16 LEDs - as used by BwB
-#define LARGE_CARD_C		4 //Identical to B, no built in LED support
+#define NO_EXTENDER         0 // As originally designed
+#define SMALL_CARD          1
+#define LARGE_CARD_A        2 //96 Lamps
+#define LARGE_CARD_B        3 //96 Lamps, 16 LEDs - as used by BwB
+#define LARGE_CARD_C        4 //Identical to B, no built in LED support
 
-#define CARD_A			1
-#define CARD_B			2
-#define CARD_C			3
+#define CARD_A          1
+#define CARD_B          2
+#define CARD_C          3
 
-#define TUBES				0
-#define HOPPER_DUART_A		1
-#define HOPPER_DUART_B		2
-#define HOPPER_DUART_C		3
-#define HOPPER_NONDUART_A	4
-#define HOPPER_NONDUART_B	5
+#define TUBES               0
+#define HOPPER_DUART_A      1
+#define HOPPER_DUART_B      2
+#define HOPPER_DUART_C      3
+#define HOPPER_NONDUART_A   4
+#define HOPPER_NONDUART_B   5
 
 /* Lookup table for CHR data */
 
@@ -94,15 +94,15 @@ class mpu4_state : public driver_device
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vfd(*this, "vfd"),
-		  m_6840ptm(*this, "ptm_ic2"),
-		  m_pia3(*this, "pia_ic3"),
-		  m_pia4(*this, "pia_ic4"),
-		  m_pia5(*this, "pia_ic5"),
-		  m_pia6(*this, "pia_ic6"),
-		  m_pia7(*this, "pia_ic7"),
-		  m_pia8(*this, "pia_ic8")
-		   { }
+			m_vfd(*this, "vfd"),
+			m_6840ptm(*this, "ptm_ic2"),
+			m_pia3(*this, "pia_ic3"),
+			m_pia4(*this, "pia_ic4"),
+			m_pia5(*this, "pia_ic5"),
+			m_pia6(*this, "pia_ic6"),
+			m_pia7(*this, "pia_ic7"),
+			m_pia8(*this, "pia_ic8")
+			{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
@@ -271,4 +271,3 @@ extern MACHINE_START( mod2     );
 extern const ay8910_interface ay8910_config;
 
 INPUT_PORTS_EXTERN( mpu4 );
-

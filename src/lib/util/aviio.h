@@ -89,12 +89,12 @@ enum avi_datatype
     MACROS
 ***************************************************************************/
 
-#define AVI_FOURCC(a,b,c,d)		((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+#define AVI_FOURCC(a,b,c,d)     ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 
-#define FORMAT_UYVY				AVI_FOURCC('U','Y','V','Y')
-#define FORMAT_VYUY				AVI_FOURCC('V','Y','U','Y')
-#define FORMAT_YUY2				AVI_FOURCC('Y','U','Y','2')
-#define FORMAT_HFYU				AVI_FOURCC('H','F','Y','U')
+#define FORMAT_UYVY             AVI_FOURCC('U','Y','V','Y')
+#define FORMAT_VYUY             AVI_FOURCC('V','Y','U','Y')
+#define FORMAT_YUY2             AVI_FOURCC('Y','U','Y','2')
+#define FORMAT_HFYU             AVI_FOURCC('H','F','Y','U')
 
 
 
@@ -107,21 +107,21 @@ struct avi_file;
 
 struct avi_movie_info
 {
-	UINT32			video_format;				/* format of video data */
-	UINT32			video_timescale;			/* timescale for video data */
-	UINT32			video_sampletime;			/* duration of a single video sample (frame) */
-	UINT32			video_numsamples;			/* total number of video samples */
-	UINT32			video_width;				/* width of the video */
-	UINT32			video_height;				/* height of the video */
-	UINT32			video_depth;				/* depth of the video */
+	UINT32          video_format;               /* format of video data */
+	UINT32          video_timescale;            /* timescale for video data */
+	UINT32          video_sampletime;           /* duration of a single video sample (frame) */
+	UINT32          video_numsamples;           /* total number of video samples */
+	UINT32          video_width;                /* width of the video */
+	UINT32          video_height;               /* height of the video */
+	UINT32          video_depth;                /* depth of the video */
 
-	UINT32			audio_format;				/* format of audio data */
-	UINT32			audio_timescale;			/* timescale for audio data */
-	UINT32			audio_sampletime;			/* duration of a single audio sample */
-	UINT32			audio_numsamples;			/* total number of audio samples */
-	UINT32			audio_channels;				/* number of audio channels */
-	UINT32			audio_samplebits;			/* number of bits per channel */
-	UINT32			audio_samplerate;			/* sample rate of audio */
+	UINT32          audio_format;               /* format of audio data */
+	UINT32          audio_timescale;            /* timescale for audio data */
+	UINT32          audio_sampletime;           /* duration of a single audio sample */
+	UINT32          audio_numsamples;           /* total number of audio samples */
+	UINT32          audio_channels;             /* number of audio channels */
+	UINT32          audio_samplebits;           /* number of bits per channel */
+	UINT32          audio_samplerate;           /* sample rate of audio */
 };
 
 

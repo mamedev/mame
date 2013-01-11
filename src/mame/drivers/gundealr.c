@@ -66,10 +66,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gundealr_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("IN0")
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("IN1")
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN2")
-	AM_RANGE(0xc010, 0xc013) AM_WRITE(yamyam_fg_scroll_w)		/* Yam Yam only */
+	AM_RANGE(0xc010, 0xc013) AM_WRITE(yamyam_fg_scroll_w)       /* Yam Yam only */
 	AM_RANGE(0xc014, 0xc014) AM_WRITE(gundealr_flipscreen_w)
 	AM_RANGE(0xc016, 0xc016) AM_WRITE(yamyam_bankswitch_w)
-	AM_RANGE(0xc020, 0xc023) AM_WRITE(gundealr_fg_scroll_w)	/* Gun Dealer only */
+	AM_RANGE(0xc020, 0xc023) AM_WRITE(gundealr_fg_scroll_w) /* Gun Dealer only */
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(gundealr_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gundealr_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(gundealr_fg_videoram_w) AM_SHARE("fg_videoram")
@@ -85,32 +85,32 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gundealr )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8") /* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8") /* Listed in the manual as always OFF */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7") /* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7") /* Listed in the manual as always OFF */
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4") /* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4") /* Listed in the manual as always OFF */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3") /* Listed in the manual as always OFF */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:8,7,6")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:8,7,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -119,7 +119,7 @@ static INPUT_PORTS_START( gundealr )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW2:5,4,3")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:5,4,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -128,7 +128,7 @@ static INPUT_PORTS_START( gundealr )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:2,1") /* Both switch 1 & 2 are listed in the manual as always OFF */
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:2,1") /* Both switch 1 & 2 are listed in the manual as always OFF */
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
@@ -151,8 +151,8 @@ static INPUT_PORTS_START( gundealr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
@@ -161,8 +161,8 @@ static INPUT_PORTS_START( gundealr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gundealt )
@@ -223,8 +223,8 @@ static INPUT_PORTS_START( gundealt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
@@ -233,8 +233,8 @@ static INPUT_PORTS_START( gundealt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -249,31 +249,31 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( yamyam )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, "Difficulty?" )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, "Difficulty?" )       PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, "Easy?" )
 	PORT_DIPSETTING(    0x04, "Medium?" )
 	PORT_DIPSETTING(    0x08, "Hard?" )
 	PORT_DIPSETTING(    0x0c, "Hardest?" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( yamyam )
 /*  PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) ) */
 /*  PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) ) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
@@ -291,7 +291,7 @@ static INPUT_PORTS_START( yamyam )
 /*  PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) ) */
 /*  PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) ) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(   0x80, IP_ACTIVE_LOW, "SW2:8" )
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( yamyam )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )	/* "TEST" */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )   /* "TEST" */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -313,8 +313,8 @@ static INPUT_PORTS_START( yamyam )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
@@ -323,8 +323,8 @@ static INPUT_PORTS_START( yamyam )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 INPUT_PORTS_END
 
 
@@ -354,8 +354,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gundealr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )	/* colors 0-255 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )	/* colors 256-511 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* colors 0-255 */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 ) /* colors 256-511 */
 GFXDECODE_END
 
 
@@ -407,7 +407,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_CONFIG_START( gundealr, gundealr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* 8 MHz ??? */
+	MCFG_CPU_ADD("maincpu", Z80, 8000000)   /* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, gundealr_scanline, "screen", 0, 1)
@@ -447,14 +447,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 		case 0x03:
 			m_rambase[0x001] = 0x03;
 			/*
-                read dip switches
-                3a 00 c0  ld   a,($c000)
-                47        ld   b,a
-                3a 01 c0  ld   a,($c001)
-                c9        ret
-            */
-        	for(i=0;i<8;i++)
-        		m_rambase[0x010+i] = snipped_cmd03[i];
+			    read dip switches
+			    3a 00 c0  ld   a,($c000)
+			    47        ld   b,a
+			    3a 01 c0  ld   a,($c001)
+			    c9        ret
+			*/
+			for(i=0;i<8;i++)
+				m_rambase[0x010+i] = snipped_cmd03[i];
 
 			break;
 		case 0x04:
@@ -463,24 +463,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 		case 0x05:
 			m_rambase[0x001] = 0x05;
 			/*
-                add a to hl
-                c5          push    bc
-                01 00 00    ld      bc,#0000
-                4f          ld      c,a
-                09          add     hl,bc
-                c1          pop     bc
-                c9          ret
-            */
-        	for(i=0;i<8;i++)
+			    add a to hl
+			    c5          push    bc
+			    01 00 00    ld      bc,#0000
+			    4f          ld      c,a
+			    09          add     hl,bc
+			    c1          pop     bc
+			    c9          ret
+			*/
+			for(i=0;i<8;i++)
 				m_rambase[0x020+i] = snipped_cmd05_2[i];
 
 			/*
-                lookup data in table
-                cd 20 e0    call    #e020
-                7e          ld      a,(hl)
-                c9          ret
-            */
-        	for(i=0;i<5;i++)
+			    lookup data in table
+			    cd 20 e0    call    #e020
+			    7e          ld      a,(hl)
+			    c9          ret
+			*/
+			for(i=0;i<5;i++)
 				m_rambase[0x010+i] = snipped_cmd05_1[i];
 
 			break;
@@ -510,9 +510,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( gundealr )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "gundealr.1",   0x00000, 0x10000, CRC(5797e830) SHA1(54bd9fbcafdf3fff55d73ecfe26d8e8df0dd55d9) )
-	ROM_RELOAD(               0x10000, 0x10000 )	/* banked at 0x8000-0xbfff */
+	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
@@ -522,9 +522,9 @@ ROM_START( gundealr )
 ROM_END
 
 ROM_START( gundealra )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "gundeala.1",   0x00000, 0x10000, CRC(d87e24f1) SHA1(5ac3e20e5848b9cab2a23e083d2566bfd54502d4) )
-	ROM_RELOAD(               0x10000, 0x10000 )	/* banked at 0x8000-0xbfff */
+	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "gundeala.3",   0x00000, 0x10000, CRC(836cf1a3) SHA1(ca57e7fc3e4497d249af963d1c8610e80ca65aa7) )
@@ -534,9 +534,9 @@ ROM_START( gundealra )
 ROM_END
 
 ROM_START( gundealrt )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.3j",         0x00000, 0x10000, CRC(1d951292) SHA1(a8bd34dfaf31c7dc4f9e0ec1fd7d4e10c5b29a85) )
-	ROM_RELOAD(               0x10000, 0x10000 )	/* banked at 0x8000-0xbfff */
+	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(01f99de2) SHA1(2d9e9c50b0669811beb6fa53c0ff1b240fa939c7) )
@@ -546,9 +546,9 @@ ROM_START( gundealrt )
 ROM_END
 
 ROM_START( yamyam )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "b3.f10",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
-	ROM_RELOAD(               0x10000, 0x20000 )	/* banked at 0x8000-0xbfff */
+	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "mcu", 0 ) //unknown type, there must be one
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
@@ -562,9 +562,9 @@ ROM_END
 
 /* only gfx are different, code is the same */
 ROM_START( wiseguy )
-	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "b3.f10",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
-	ROM_RELOAD(               0x10000, 0x20000 )	/* banked at 0x8000-0xbfff */
+	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "mcu", 0 ) //unknown type, there must be one
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)

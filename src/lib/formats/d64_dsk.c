@@ -26,27 +26,27 @@
     PARAMETERS
 ***************************************************************************/
 
-#define MAX_HEADS			2
-#define MAX_TRACKS			84
-#define MAX_ERROR_SECTORS	4166
-#define SECTOR_SIZE			256
-#define SECTOR_SIZE_GCR		368
+#define MAX_HEADS           2
+#define MAX_TRACKS          84
+#define MAX_ERROR_SECTORS   4166
+#define SECTOR_SIZE         256
+#define SECTOR_SIZE_GCR     368
 
-#define INVALID_OFFSET		0xbadbad
+#define INVALID_OFFSET      0xbadbad
 
-#define D64_SIZE_35_TRACKS				 174848
-#define D64_SIZE_35_TRACKS_WITH_ERRORS	 175531
-#define D64_SIZE_40_TRACKS				 196608
-#define D64_SIZE_40_TRACKS_WITH_ERRORS	 197376
-#define D64_SIZE_42_TRACKS				 205312
-#define D64_SIZE_42_TRACKS_WITH_ERRORS	 206114
-#define D67_SIZE_35_TRACKS				 176640
-#define D71_SIZE_70_TRACKS				 349696
-#define D71_SIZE_70_TRACKS_WITH_ERRORS	 351062
-#define D80_SIZE_77_TRACKS				 533248
-#define D80_SIZE_77_TRACKS_WITH_ERRORS	 535331
-#define D82_SIZE_154_TRACKS				1066496
-#define D82_SIZE_154_TRACKS_WITH_ERRORS	1070662
+#define D64_SIZE_35_TRACKS               174848
+#define D64_SIZE_35_TRACKS_WITH_ERRORS   175531
+#define D64_SIZE_40_TRACKS               196608
+#define D64_SIZE_40_TRACKS_WITH_ERRORS   197376
+#define D64_SIZE_42_TRACKS               205312
+#define D64_SIZE_42_TRACKS_WITH_ERRORS   206114
+#define D67_SIZE_35_TRACKS               176640
+#define D71_SIZE_70_TRACKS               349696
+#define D71_SIZE_70_TRACKS_WITH_ERRORS   351062
+#define D80_SIZE_77_TRACKS               533248
+#define D80_SIZE_77_TRACKS_WITH_ERRORS   535331
+#define D82_SIZE_154_TRACKS             1066496
+#define D82_SIZE_154_TRACKS_WITH_ERRORS 1070662
 
 enum
 {
@@ -60,17 +60,17 @@ static const char *const DOS_VERSION[] = { "1.0", "2.0", "2.5" };
 enum
 {
 	ERROR_00 = 1,
-	ERROR_20,		/* header block not found */
-	ERROR_21,		/* no sync character */
-	ERROR_22,		/* data block not present */
-	ERROR_23,		/* checksum error in data block */
-	ERROR_24,		/* write verify (on format) UNIMPLEMENTED */
-	ERROR_25,		/* write verify error UNIMPLEMENTED */
-	ERROR_26,		/* write protect on UNIMPLEMENTED */
-	ERROR_27,		/* checksum error in header block */
-	ERROR_28,		/* write error UNIMPLEMENTED */
-	ERROR_29,		/* disk ID mismatch */
-	ERROR_74,		/* disk not ready (no device 1) UNIMPLEMENTED */
+	ERROR_20,       /* header block not found */
+	ERROR_21,       /* no sync character */
+	ERROR_22,       /* data block not present */
+	ERROR_23,       /* checksum error in data block */
+	ERROR_24,       /* write verify (on format) UNIMPLEMENTED */
+	ERROR_25,       /* write verify error UNIMPLEMENTED */
+	ERROR_26,       /* write protect on UNIMPLEMENTED */
+	ERROR_27,       /* checksum error in header block */
+	ERROR_28,       /* write error UNIMPLEMENTED */
+	ERROR_29,       /* disk ID mismatch */
+	ERROR_74,       /* disk not ready (no device 1) UNIMPLEMENTED */
 };
 
 static const char *const ERROR_CODE[] = { "00", "00", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "74" };
@@ -129,21 +129,21 @@ static const int DOS2_SECTORS_PER_TRACK[] =
 static const int DOS25_SECTORS_PER_TRACK[] =
 {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,		/* 1-39 */
-	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,							/* 40-53 */
-	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,										/* 54-64 */
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,								/* 65-77 */
-	23, 23, 23, 23, 23, 23, 23														/* 78-84 */
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,     /* 1-39 */
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,                         /* 40-53 */
+	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,                                     /* 54-64 */
+	23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,                             /* 65-77 */
+	23, 23, 23, 23, 23, 23, 23                                                      /* 78-84 */
 };
 
 static const int DOS25_SPEED_ZONE[] =
 {
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,	/* 1-39 */
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,					/* 40-53 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,							/* 54-64 */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,						/* 65-77 */
-	0, 0, 0, 0, 0, 0, 0											/* 78-84 */
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,    /* 1-39 */
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,                   /* 40-53 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                            /* 54-64 */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                      /* 65-77 */
+	0, 0, 0, 0, 0, 0, 0                                         /* 78-84 */
 };
 
 /***************************************************************************
@@ -152,17 +152,17 @@ static const int DOS25_SPEED_ZONE[] =
 
 struct d64dsk_tag
 {
-	int dos;									/* CBM DOS version */
-	int heads;									/* number of physical heads */
-	int tracks;									/* number of physical tracks */
-	int dos_tracks;								/* number of logical tracks */
-	int track_offset[MAX_HEADS][MAX_TRACKS];	/* offset within image for each physical track */
-	UINT32 speed_zone[MAX_TRACKS];				/* speed zone for each physical track */
-	bool has_errors;							/* flag to check for available error codes */
-	UINT8 error[MAX_ERROR_SECTORS];				/* error code for each logical sector */
-	int error_offset[MAX_HEADS][MAX_TRACKS];	/* offset within error array for sector 0 of each logical track */
+	int dos;                                    /* CBM DOS version */
+	int heads;                                  /* number of physical heads */
+	int tracks;                                 /* number of physical tracks */
+	int dos_tracks;                             /* number of logical tracks */
+	int track_offset[MAX_HEADS][MAX_TRACKS];    /* offset within image for each physical track */
+	UINT32 speed_zone[MAX_TRACKS];              /* speed zone for each physical track */
+	bool has_errors;                            /* flag to check for available error codes */
+	UINT8 error[MAX_ERROR_SECTORS];             /* error code for each logical sector */
+	int error_offset[MAX_HEADS][MAX_TRACKS];    /* offset within error array for sector 0 of each logical track */
 
-	UINT8 id1, id2;								/* DOS disk format ID */
+	UINT8 id1, id2;                             /* DOS disk format ID */
 };
 
 /***************************************************************************
@@ -214,9 +214,9 @@ static int d64_get_sectors_per_track(floppy_image_legacy *floppy, int head, int 
 
 	switch (get_tag(floppy)->dos)
 	{
-	case DOS1:	sectors_per_track = DOS1_SECTORS_PER_TRACK[track / 2]; break;
-	case DOS2:	sectors_per_track = DOS2_SECTORS_PER_TRACK[track / 2]; break;
-	case DOS25:	sectors_per_track = DOS25_SECTORS_PER_TRACK[track];    break;
+	case DOS1:  sectors_per_track = DOS1_SECTORS_PER_TRACK[track / 2]; break;
+	case DOS2:  sectors_per_track = DOS2_SECTORS_PER_TRACK[track / 2]; break;
+	case DOS25: sectors_per_track = DOS25_SECTORS_PER_TRACK[track];    break;
 	}
 
 	return sectors_per_track;
@@ -436,13 +436,13 @@ static floperr_t d64_read_track(floppy_image_legacy *floppy, int head, int track
 			int i;
 
 			/*
-                1. Header sync       FF FF FF FF FF (40 'on' bits, not GCR encoded)
-                2. Header info       52 54 B5 29 4B 7A 5E 95 55 55 (10 GCR bytes)
-                3. Header gap        55 55 55 55 55 55 55 55 55 (9 bytes, never read)
-                4. Data sync         FF FF FF FF FF (40 'on' bits, not GCR encoded)
-                5. Data block        55...4A (325 GCR bytes)
-                6. Inter-sector gap  55 55 55 55...55 55 (4 to 19 bytes, never read)
-            */
+			    1. Header sync       FF FF FF FF FF (40 'on' bits, not GCR encoded)
+			    2. Header info       52 54 B5 29 4B 7A 5E 95 55 55 (10 GCR bytes)
+			    3. Header gap        55 55 55 55 55 55 55 55 55 (9 bytes, never read)
+			    4. Data sync         FF FF FF FF FF (40 'on' bits, not GCR encoded)
+			    5. Data block        55...4A (325 GCR bytes)
+			    6. Inter-sector gap  55 55 55 55...55 55 (4 to 19 bytes, never read)
+			*/
 
 			if (sector_error == ERROR_29)
 				id1 ^= 0xff;
@@ -499,11 +499,11 @@ static floperr_t d64_read_track(floppy_image_legacy *floppy, int head, int track
 				sector_checksum ^= 0xff;
 
 			/*
-                $00      - data block ID ($07)
-                $01-100  - 256 bytes sector data
-                $101     - data block checksum (EOR of $01-100)
-                $102-103 - $00 ("off" bytes, to make the sector size a multiple of 5)
-            */
+			    $00      - data block ID ($07)
+			    $01-100  - 256 bytes sector data
+			    $101     - data block checksum (EOR of $01-100)
+			    $102-103 - $00 ("off" bytes, to make the sector size a multiple of 5)
+			*/
 			gcr_double_2_gcr(data_block_id, d64_track_data[d64_pos], d64_track_data[d64_pos + 1], d64_track_data[d64_pos + 2], gcr_track_data + gcr_pos);
 			gcr_pos += 5;
 
@@ -536,7 +536,7 @@ static floperr_t d64_read_track(floppy_image_legacy *floppy, int head, int track
 
 		LOG_FORMATS("D64 track %.1f length %u\n", get_dos_track(track), gcr_track_size);
 	}
-	else	/* half tracks */
+	else    /* half tracks */
 	{
 		/* set track length to 0 */
 		memset(buffer, 0, buflen);
@@ -566,27 +566,27 @@ static void d64_identify(floppy_image_legacy *floppy, int *dos, int *heads, int 
 	switch (floppy_image_size(floppy))
 	{
 	/* 2040/3040 */
-	case D67_SIZE_35_TRACKS:				*dos = DOS1;  *heads = 1; *tracks = 35; *has_errors = false; break;
+	case D67_SIZE_35_TRACKS:                *dos = DOS1;  *heads = 1; *tracks = 35; *has_errors = false; break;
 
 	/* 4040/2031/1541/1551 */
-	case D64_SIZE_35_TRACKS:				*dos = DOS2;  *heads = 1; *tracks = 35; *has_errors = false; break;
-	case D64_SIZE_35_TRACKS_WITH_ERRORS:	*dos = DOS2;  *heads = 1; *tracks = 35; *has_errors = true;  break;
-	case D64_SIZE_40_TRACKS:				*dos = DOS2;  *heads = 1; *tracks = 40; *has_errors = false; break;
-	case D64_SIZE_40_TRACKS_WITH_ERRORS:	*dos = DOS2;  *heads = 1; *tracks = 40; *has_errors = true;  break;
-	case D64_SIZE_42_TRACKS:				*dos = DOS2;  *heads = 1; *tracks = 42; *has_errors = false; break;
-	case D64_SIZE_42_TRACKS_WITH_ERRORS:	*dos = DOS2;  *heads = 1; *tracks = 42; *has_errors = true;  break;
+	case D64_SIZE_35_TRACKS:                *dos = DOS2;  *heads = 1; *tracks = 35; *has_errors = false; break;
+	case D64_SIZE_35_TRACKS_WITH_ERRORS:    *dos = DOS2;  *heads = 1; *tracks = 35; *has_errors = true;  break;
+	case D64_SIZE_40_TRACKS:                *dos = DOS2;  *heads = 1; *tracks = 40; *has_errors = false; break;
+	case D64_SIZE_40_TRACKS_WITH_ERRORS:    *dos = DOS2;  *heads = 1; *tracks = 40; *has_errors = true;  break;
+	case D64_SIZE_42_TRACKS:                *dos = DOS2;  *heads = 1; *tracks = 42; *has_errors = false; break;
+	case D64_SIZE_42_TRACKS_WITH_ERRORS:    *dos = DOS2;  *heads = 1; *tracks = 42; *has_errors = true;  break;
 
 	/* 1571 */
-	case D71_SIZE_70_TRACKS:				*dos = DOS2;  *heads = 2; *tracks = 35; *has_errors = false; break;
-	case D71_SIZE_70_TRACKS_WITH_ERRORS:	*dos = DOS2;  *heads = 2; *tracks = 35; *has_errors = true;  break;
+	case D71_SIZE_70_TRACKS:                *dos = DOS2;  *heads = 2; *tracks = 35; *has_errors = false; break;
+	case D71_SIZE_70_TRACKS_WITH_ERRORS:    *dos = DOS2;  *heads = 2; *tracks = 35; *has_errors = true;  break;
 
 	/* 8050 */
-	case D80_SIZE_77_TRACKS:				*dos = DOS25; *heads = 1; *tracks = 77; *has_errors = false; break;
-	case D80_SIZE_77_TRACKS_WITH_ERRORS:	*dos = DOS25; *heads = 1; *tracks = 77; *has_errors = true;  break;
+	case D80_SIZE_77_TRACKS:                *dos = DOS25; *heads = 1; *tracks = 77; *has_errors = false; break;
+	case D80_SIZE_77_TRACKS_WITH_ERRORS:    *dos = DOS25; *heads = 1; *tracks = 77; *has_errors = true;  break;
 
 	/* 8250/SFD1001 */
-	case D82_SIZE_154_TRACKS:				*dos = DOS25; *heads = 2; *tracks = 77; *has_errors = false; break;
-	case D82_SIZE_154_TRACKS_WITH_ERRORS:	*dos = DOS25; *heads = 2; *tracks = 77; *has_errors = true;  break;
+	case D82_SIZE_154_TRACKS:               *dos = DOS25; *heads = 2; *tracks = 77; *has_errors = false; break;
+	case D82_SIZE_154_TRACKS_WITH_ERRORS:   *dos = DOS25; *heads = 2; *tracks = 77; *has_errors = true;  break;
 	}
 }
 
@@ -803,11 +803,11 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 	/* read format ID from directory */
 	/*
-    id1, id2 are the same for extended d64 (i.e. with error tables), for d67 and for d71
+	id1, id2 are the same for extended d64 (i.e. with error tables), for d67 and for d71
 
-    for d81 they are at track 40 bytes 0x17 & 0x18
-    for d80 & d82 they are at track 39 bytes 0x18 & 0x19
-    */
+	for d81 they are at track 40 bytes 0x17 & 0x18
+	for d80 & d82 they are at track 39 bytes 0x18 & 0x19
+	*/
 	if (dos == DOS25)
 		floppy_image_read(floppy, id, tag->track_offset[0][38] + 0x18, 2);
 	else

@@ -301,50 +301,50 @@ void special_state::erik_set_bank()
 
 	switch(bank1)
 	{
-		case	1:
-		case	2:
-		case	3:
+		case    1:
+		case    2:
+		case    3:
 			membank("bank1")->set_base(ram + 0x10000*(bank1-1));
 			break;
-		case	0:
+		case    0:
 			space.unmap_write(0x0000, 0x3fff);
 			membank("bank1")->set_base(mem + 0x10000);
 			break;
 	}
 	switch(bank2)
 	{
-		case	1:
-		case	2:
-		case	3:
+		case    1:
+		case    2:
+		case    3:
 			membank("bank2")->set_base(ram + 0x10000*(bank2-1) + 0x4000);
 			break;
-		case	0:
+		case    0:
 			space.unmap_write(0x4000, 0x8fff);
 			membank("bank2")->set_base(mem + 0x14000);
 			break;
 	}
 	switch(bank3)
 	{
-		case	1:
-		case	2:
-		case	3:
+		case    1:
+		case    2:
+		case    3:
 			membank("bank3")->set_base(ram + 0x10000*(bank3-1) + 0x9000);
 			break;
-		case	0:
+		case    0:
 			space.unmap_write(0x9000, 0xbfff);
 			membank("bank3")->set_base(mem + 0x19000);
 			break;
 	}
 	switch(bank4)
 	{
-		case	1:
-		case	2:
-		case	3:
+		case    1:
+		case    2:
+		case    3:
 			membank("bank4")->set_base(ram + 0x10000*(bank4-1) + 0x0c000);
 			membank("bank5")->set_base(ram + 0x10000*(bank4-1) + 0x0f000);
 			membank("bank6")->set_base(ram + 0x10000*(bank4-1) + 0x0f800);
 			break;
-		case	0:
+		case    0:
 			space.unmap_write(0xc000, 0xefff);
 			membank("bank4")->set_base(mem + 0x1c000);
 			space.unmap_write(0xf000, 0xf7ff);

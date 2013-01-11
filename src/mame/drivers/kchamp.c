@@ -308,34 +308,34 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	8,8,	/* tile size */
-	256*8,	/* number of tiles */
-	2,	/* bits per pixel */
+	8,8,    /* tile size */
+	256*8,  /* number of tiles */
+	2,  /* bits per pixel */
 	{ 0x4000*8, 0 }, /* plane offsets */
 	{ 0,1,2,3,4,5,6,7 }, /* x offsets */
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 }, /* y offsets */
-	8*8	/* offset to next tile */
+	8*8 /* offset to next tile */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* tile size */
-	512,	/* number of tiles */
-	2,	/* bits per pixel */
+	16,16,  /* tile size */
+	512,    /* number of tiles */
+	2,  /* bits per pixel */
 	{ 0xC000*8, 0 }, /* plane offsets */
 	{ 0,1,2,3,4,5,6,7,
 		0x2000*8+0,0x2000*8+1,0x2000*8+2,0x2000*8+3,
 		0x2000*8+4,0x2000*8+5,0x2000*8+6,0x2000*8+7 }, /* x offsets */
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
 	8*8,9*8,10*8,11*8,12*8,13*8,14*8, 15*8 }, /* y offsets */
-	16*8	/* ofset to next tile */
+	16*8    /* ofset to next tile */
 };
 
 static GFXDECODE_START( kchamp )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,	32*4, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0x08000, spritelayout,	0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x04000, spritelayout,	0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,	0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   32*4, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0x08000, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x04000, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -366,8 +366,8 @@ static void msmint( device_t *device )
 
 static const msm5205_interface msm_interface =
 {
-	msmint,			/* interrupt function */
-	MSM5205_S96_4B	/* 1 / 96 = 3906.25Hz playback */
+	msmint,         /* interrupt function */
+	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback */
 };
 
 /********************
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_sound_map)
-	MCFG_CPU_IO_MAP(kchampvs_sound_io_map)		/* irq's triggered from main cpu */
+	MCFG_CPU_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
@@ -455,15 +455,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kchamp, kchamp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)	/* 12MHz / 4 = 3.0 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_map)
 	MCFG_CPU_IO_MAP(kchamp_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)	/* 12MHz / 4 = 3.0 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_sound_map)
 	MCFG_CPU_IO_MAP(kchamp_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125)	/* Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125) /* Hz */
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */
 
@@ -732,22 +732,22 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 	int A;
 
 	/*
-        Note that the first 4 opcodes that the program
-        executes aren't encrypted for some obscure reason.
-        The address for the 2nd opcode (a jump) is encrypted too.
-        It's not clear what the 3rd and 4th opcode are supposed to do,
-        they just write to a RAM location. This write might be what
-        turns the encryption on, but this doesn't explain the
-        encrypted address for the jump.
-     */
-	decrypted[0] = rom[0];	/* this is a jump */
+	    Note that the first 4 opcodes that the program
+	    executes aren't encrypted for some obscure reason.
+	    The address for the 2nd opcode (a jump) is encrypted too.
+	    It's not clear what the 3rd and 4th opcode are supposed to do,
+	    they just write to a RAM location. This write might be what
+	    turns the encryption on, but this doesn't explain the
+	    encrypted address for the jump.
+	 */
+	decrypted[0] = rom[0];  /* this is a jump */
 	A = rom[1] + 256 * rom[2];
-	decrypted[A] = rom[A];	/* fix opcode on first jump address (again, a jump) */
-	rom[A+1] ^= 0xee;		/* fix address of the second jump */
+	decrypted[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
+	rom[A+1] ^= 0xee;       /* fix address of the second jump */
 	A = rom[A+1] + 256 * rom[A+2];
-	decrypted[A] = rom[A];	/* fix third opcode (ld a,$xx) */
+	decrypted[A] = rom[A];  /* fix third opcode (ld a,$xx) */
 	A += 2;
-	decrypted[A] = rom[A];	/* fix fourth opcode (ld ($xxxx),a */
+	decrypted[A] = rom[A];  /* fix fourth opcode (ld ($xxxx),a */
 	/* and from here on, opcodes are encrypted */
 
 	m_counter = 0;

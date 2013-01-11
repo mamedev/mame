@@ -14,49 +14,49 @@
 #include "emu.h"
 #include "strata.h"
 
-#define MAX_STRATA	1
+#define MAX_STRATA  1
 
-#define FEEPROM_SIZE		0x800000	// 64Mbit
-#define BLOCK_SIZE			0x020000
+#define FEEPROM_SIZE        0x800000    // 64Mbit
+#define BLOCK_SIZE          0x020000
 
 #define BLOCKLOCK_SIZE ((FEEPROM_SIZE/BLOCK_SIZE+7)/8)
 #define WRBUF_SIZE 32
 #define PROT_REGS_SIZE 18
 
 #define ADDRESS_MASK        0x7fffff
-#define BLOCK_ADDRESS_MASK	0x7e0000
-#define BLOCK_ADDRESS_SHIFT	17
-#define BYTE_ADDRESS_MASK	0x01ffff
+#define BLOCK_ADDRESS_MASK  0x7e0000
+#define BLOCK_ADDRESS_SHIFT 17
+#define BYTE_ADDRESS_MASK   0x01ffff
 
 enum fm_mode_t
 {
-	FM_NORMAL,		// normal read/write
-	FM_READID,		// read ID
-	FM_READQUERY,	// read query
-	FM_READSTATUS,	// read status
-	FM_WRITEPART1,	// first half of programming, awaiting second
-	FM_WRBUFPART1,	// first part of write to buffer, awaiting second
-	FM_WRBUFPART2,	// second part of write to buffer, awaiting third
-	FM_WRBUFPART3,	// third part of write to buffer, awaiting fourth
-	FM_WRBUFPART4,	// fourth part of write to buffer
-	FM_CLEARPART1,	// first half of clear, awaiting second
-	FM_SETLOCK,		// first half of set master lock/set block lock
-	FM_CONFPART1,	// first half of configuration, awaiting second
-	FM_WRPROTPART1	// first half of protection program, awaiting second
+	FM_NORMAL,      // normal read/write
+	FM_READID,      // read ID
+	FM_READQUERY,   // read query
+	FM_READSTATUS,  // read status
+	FM_WRITEPART1,  // first half of programming, awaiting second
+	FM_WRBUFPART1,  // first part of write to buffer, awaiting second
+	FM_WRBUFPART2,  // second part of write to buffer, awaiting third
+	FM_WRBUFPART3,  // third part of write to buffer, awaiting fourth
+	FM_WRBUFPART4,  // fourth part of write to buffer
+	FM_CLEARPART1,  // first half of clear, awaiting second
+	FM_SETLOCK,     // first half of set master lock/set block lock
+	FM_CONFPART1,   // first half of configuration, awaiting second
+	FM_WRPROTPART1  // first half of protection program, awaiting second
 };
 struct strata_t
 {
-	fm_mode_t mode;				// current operation mode
-	int hard_unlock;	// 1 if RP* pin is at Vhh (not fully implemented)
-	int status;			// current status
-	int master_lock;	// master lock flag
-	offs_t wrbuf_base;	// start address in write buffer command
-	int wrbuf_len;		// count converted into byte length in write buffer command
-	int wrbuf_count;	// current count in write buffer command
-	UINT8 *wrbuf;		// write buffer used by write buffer command
-	UINT8 *data_ptr;	// main FEEPROM area
-	UINT8 *blocklock;	// block lock flags
-	UINT8 *prot_regs;	// protection registers
+	fm_mode_t mode;             // current operation mode
+	int hard_unlock;    // 1 if RP* pin is at Vhh (not fully implemented)
+	int status;         // current status
+	int master_lock;    // master lock flag
+	offs_t wrbuf_base;  // start address in write buffer command
+	int wrbuf_len;      // count converted into byte length in write buffer command
+	int wrbuf_count;    // current count in write buffer command
+	UINT8 *wrbuf;       // write buffer used by write buffer command
+	UINT8 *data_ptr;    // main FEEPROM area
+	UINT8 *blocklock;   // block lock flags
+	UINT8 *prot_regs;   // protection registers
 };
 
 /* accessors for individual block lock flags */
@@ -188,7 +188,7 @@ int strataflash_save(device_t *device, emu_file *file)
 		return 1;
 
 	/* chip state: lower boot block lockout, higher boot block lockout,
-    software data protect */
+	software data protect */
 	buf = strata->master_lock;
 	if (file->write(& buf, 1) != 1)
 		return 1;
@@ -269,7 +269,7 @@ static int strataflash_r(device_t *device, offs_t offset, bus_width_t bus_width)
 		return 0x80;
 	case FM_READID:
 		if ((offset >= 0x100) && (offset < 0x112))
-		{	/* protection registers */
+		{   /* protection registers */
 			switch (bus_width)
 			{
 			case bw_8:
@@ -281,16 +281,16 @@ static int strataflash_r(device_t *device, offs_t offset, bus_width_t bus_width)
 		else
 			switch (offset >> 1)
 			{
-			case 0:	// maker ID
-				return 0x89;	// Intel
-			case 1:	// chip ID
-				return 0x15;	// 64 Mbit
+			case 0: // maker ID
+				return 0x89;    // Intel
+			case 1: // chip ID
+				return 0x15;    // 64 Mbit
 			default:
 				if (((offset & BYTE_ADDRESS_MASK) >> 1) == 2)
-				{	// block lock config
+				{   // block lock config
 					return READ_BLOCKLOCK(strata, offset >> BLOCK_ADDRESS_SHIFT);
 				}
-				return 0;	// default case
+				return 0;   // default case
 			case 3: // master lock config
 				if (strata->master_lock)
 					return 1;
@@ -301,16 +301,16 @@ static int strataflash_r(device_t *device, offs_t offset, bus_width_t bus_width)
 	case FM_READQUERY:
 		switch (offset >> 1)
 		{
-		case 0x00:	// maker ID
-			return 0x89;	// Intel
-		case 0x01:	// chip ID
-			return 0x15;	// 64 Mbit
+		case 0x00:  // maker ID
+			return 0x89;    // Intel
+		case 0x01:  // chip ID
+			return 0x15;    // 64 Mbit
 		default:
 			if (((offset & BYTE_ADDRESS_MASK) >> 1) == 2)
-			{	// block lock config
+			{   // block lock config
 				return READ_BLOCKLOCK(strata, offset >> BLOCK_ADDRESS_SHIFT);
 			}
-			return 0;	// default case
+			return 0;   // default case
 #if 0
 		case 0x03: // master lock config
 			if (strata->flash_master_lock)
@@ -452,51 +452,51 @@ static void strataflash_w(device_t *device, offs_t offset, int data, bus_width_t
 	case FM_READSTATUS:
 		switch (data)
 		{
-		case 0xff:	// read array
+		case 0xff:  // read array
 			strata->mode = FM_NORMAL;
 			break;
-		case 0x90:	// read identifier codes
+		case 0x90:  // read identifier codes
 			strata->mode = FM_READID;
 			break;
-		case 0x98:	// read query
+		case 0x98:  // read query
 			strata->mode = FM_READQUERY;
 			break;
-		case 0x70:	// read status register
+		case 0x70:  // read status register
 			strata->mode = FM_READSTATUS;
 			break;
-		case 0x50:	// clear status register
+		case 0x50:  // clear status register
 			strata->mode = FM_READSTATUS;
 			strata->status &= 0xC5;
 			break;
-		case 0xe8:	// write to buffer
+		case 0xe8:  // write to buffer
 			strata->mode = FM_WRBUFPART1;
 			strata->wrbuf_base = offset & BLOCK_ADDRESS_MASK;
 			/*strata->status &= 0xC5;*/
 			break;
 		case 0x40:
-		case 0x10:	// program
+		case 0x10:  // program
 			strata->mode = FM_WRITEPART1;
 			strata->status &= 0xC5;
 			break;
-		case 0x20:	// block erase
+		case 0x20:  // block erase
 			strata->mode = FM_CLEARPART1;
 			strata->status &= 0xC5;
 			break;
-		case 0xb0:	// block erase, program suspend
+		case 0xb0:  // block erase, program suspend
 			/* not emulated (erase is instantaneous) */
 			break;
-		case 0xd0:	// block erase, program resume
+		case 0xd0:  // block erase, program resume
 			/* not emulated (erase is instantaneous) */
 			break;
-		case 0xb8:	// configuration
+		case 0xb8:  // configuration
 			strata->mode = FM_CONFPART1;
 			strata->status &= 0xC5;
 			break;
-		case 0x60:	// set master lock
+		case 0x60:  // set master lock
 			strata->mode = FM_SETLOCK;
 			strata->status &= 0xC5;
 			break;
-		case 0xc0:	// protection program
+		case 0xc0:  // protection program
 			strata->mode = FM_WRPROTPART1;
 			strata->status &= 0xC5;
 			break;
@@ -538,7 +538,7 @@ static void strataflash_w(device_t *device, offs_t offset, int data, bus_width_t
 		}
 		else
 			strata->wrbuf_base = offset;
-		memset(strata->wrbuf, 0xff, strata->wrbuf_len);	/* right??? */
+		memset(strata->wrbuf, 0xff, strata->wrbuf_len); /* right??? */
 	case FM_WRBUFPART3:
 		if ((offset < strata->wrbuf_base) || (offset >= (strata->wrbuf_base + strata->wrbuf_len)))
 			strata->status |= 0x30;
@@ -634,7 +634,7 @@ static void strataflash_w(device_t *device, offs_t offset, int data, bus_width_t
 			else
 				CLEAR_BLOCKLOCK(strata, offset >> BLOCK_ADDRESS_SHIFT);
 			break;
-		case 0x03:	// Set Read configuration
+		case 0x03:  // Set Read configuration
 			/* ignore command */
 			break;
 		default:
@@ -646,7 +646,7 @@ static void strataflash_w(device_t *device, offs_t offset, int data, bus_width_t
 	case FM_CONFPART1:
 		/* configuration register is not emulated because the sts pin is not */
 		//strata->configuration = data;
-		strata->mode = FM_READSTATUS;	/* right??? */
+		strata->mode = FM_READSTATUS;   /* right??? */
 		break;
 	case FM_WRPROTPART1:
 		if ((offset < 0x100) || (offset >= 0x112))
@@ -665,7 +665,7 @@ static void strataflash_w(device_t *device, offs_t offset, int data, bus_width_t
 				break;
 			}
 		}
-		strata->mode = FM_READSTATUS;	/* right??? */
+		strata->mode = FM_READSTATUS;   /* right??? */
 		break;
 	}
 }

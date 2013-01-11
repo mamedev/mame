@@ -213,8 +213,8 @@ INLINE void rgbaint_subr(rgbaint *color1, const rgbaint *color2)
 
 extern const struct _rgbvmx_statics
 {
-	rgbaint	maxbyte;
-	rgbaint	scale_table[256];
+	rgbaint maxbyte;
+	rgbaint scale_table[256];
 } rgbvmx_statics;
 
 
@@ -318,11 +318,11 @@ INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbint *colors
 
 INLINE rgb_t rgb_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
 {
-	rgb_t	result;
-	rgbint	color00 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb00), vec_splat_s32(0), vec_lvsl(0, &rgb00));
-	rgbint	color01 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb01), vec_splat_s32(0), vec_lvsl(0, &rgb01));
-	rgbint	color10 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb10), vec_splat_s32(0), vec_lvsl(0, &rgb10));
-	rgbint	color11 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb11), vec_splat_s32(0), vec_lvsl(0, &rgb11));
+	rgb_t   result;
+	rgbint  color00 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb00), vec_splat_s32(0), vec_lvsl(0, &rgb00));
+	rgbint  color01 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb01), vec_splat_s32(0), vec_lvsl(0, &rgb01));
+	rgbint  color10 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb10), vec_splat_s32(0), vec_lvsl(0, &rgb10));
+	rgbint  color11 = (rgbint)vec_perm((vector signed int)vec_lde(0, &rgb11), vec_splat_s32(0), vec_lvsl(0, &rgb11));
 
 	/* interleave color01 and color00 at the byte level */
 	color01 = (rgbint)vec_mergeh((vector signed char)color01, (vector signed char)color00);
@@ -350,11 +350,11 @@ INLINE rgb_t rgb_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rg
 
 INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t rgb11, UINT8 u, UINT8 v)
 {
-	rgb_t	result;
-	rgbaint	color00 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb00), vec_splat_s32(0), vec_lvsl(0, &rgb00));
-	rgbaint	color01 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb01), vec_splat_s32(0), vec_lvsl(0, &rgb01));
-	rgbaint	color10 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb10), vec_splat_s32(0), vec_lvsl(0, &rgb10));
-	rgbaint	color11 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb11), vec_splat_s32(0), vec_lvsl(0, &rgb11));
+	rgb_t   result;
+	rgbaint color00 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb00), vec_splat_s32(0), vec_lvsl(0, &rgb00));
+	rgbaint color01 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb01), vec_splat_s32(0), vec_lvsl(0, &rgb01));
+	rgbaint color10 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb10), vec_splat_s32(0), vec_lvsl(0, &rgb10));
+	rgbaint color11 = (rgbaint)vec_perm((vector signed int)vec_lde(0, &rgb11), vec_splat_s32(0), vec_lvsl(0, &rgb11));
 
 	/* interleave color01 and color00 at the byte level */
 	color01 = (rgbaint)vec_mergeh((vector signed char)color01, (vector signed char)color00);

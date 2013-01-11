@@ -172,4 +172,3 @@ void m68307_serial::reset(void)
 {
 
 }
-

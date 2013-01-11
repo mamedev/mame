@@ -27,4 +27,3 @@ void sh4_handle_tcnt1_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
 void sh4_handle_tcnt2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
 void sh4_handle_tocr_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
 void sh4_handle_tcpr2_addr_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
-

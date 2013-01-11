@@ -94,18 +94,18 @@ const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
 //**************************************************************************
 
 // convert between a double and attoseconds
-#define ATTOSECONDS_TO_DOUBLE(x)		((double)(x) * 1e-18)
-#define DOUBLE_TO_ATTOSECONDS(x)		((attoseconds_t)((x) * 1e18))
+#define ATTOSECONDS_TO_DOUBLE(x)        ((double)(x) * 1e-18)
+#define DOUBLE_TO_ATTOSECONDS(x)        ((attoseconds_t)((x) * 1e18))
 
 // convert between hertz (as a double) and attoseconds
-#define ATTOSECONDS_TO_HZ(x)			((double)ATTOSECONDS_PER_SECOND / (double)(x))
-#define HZ_TO_ATTOSECONDS(x)			((attoseconds_t)(ATTOSECONDS_PER_SECOND / (x)))
+#define ATTOSECONDS_TO_HZ(x)            ((double)ATTOSECONDS_PER_SECOND / (double)(x))
+#define HZ_TO_ATTOSECONDS(x)            ((attoseconds_t)(ATTOSECONDS_PER_SECOND / (x)))
 
 // macros for converting other seconds types to attoseconds
-#define ATTOSECONDS_IN_SEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_SECOND)
-#define ATTOSECONDS_IN_MSEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_MILLISECOND)
-#define ATTOSECONDS_IN_USEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_MICROSECOND)
-#define ATTOSECONDS_IN_NSEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_NANOSECOND)
+#define ATTOSECONDS_IN_SEC(x)           ((attoseconds_t)(x) * ATTOSECONDS_PER_SECOND)
+#define ATTOSECONDS_IN_MSEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_MILLISECOND)
+#define ATTOSECONDS_IN_USEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_MICROSECOND)
+#define ATTOSECONDS_IN_NSEC(x)          ((attoseconds_t)(x) * ATTOSECONDS_PER_NANOSECOND)
 
 
 
@@ -120,11 +120,11 @@ public:
 	// construction/destruction
 	attotime()
 		: seconds(0),
-		  attoseconds(0) { }
+			attoseconds(0) { }
 
 	attotime(seconds_t secs, attoseconds_t attos)
 		: seconds(secs),
-		  attoseconds(attos) { }
+			attoseconds(attos) { }
 
 	// queries
 	bool is_zero() const { return (seconds == 0 && attoseconds == 0); }
@@ -152,8 +152,8 @@ public:
 	attotime &operator/=(UINT32 factor);
 
 	// members
-	seconds_t		seconds;
-	attoseconds_t	attoseconds;
+	seconds_t       seconds;
+	attoseconds_t   attoseconds;
 
 	// constants
 	static const attotime never;
@@ -431,4 +431,4 @@ inline attotime attotime::from_double(double _time)
 }
 
 
-#endif	// __ATTOTIME_H__
+#endif  // __ATTOTIME_H__

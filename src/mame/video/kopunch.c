@@ -7,7 +7,7 @@ void kopunch_state::palette_init()
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
-	color_prom += 24;	/* first 24 colors are black */
+	color_prom += 24;   /* first 24 colors are black */
 	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;

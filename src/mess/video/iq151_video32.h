@@ -35,8 +35,8 @@ protected:
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT8 * 	m_videoram;
-	UINT8 *		m_chargen;
+	UINT8 *     m_videoram;
+	UINT8 *     m_chargen;
 };
 
 

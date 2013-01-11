@@ -12,10 +12,10 @@
 
 static const char *const reg[32] =
 {
-	"0",	"r1",	"r2",	"r3",	"r4",	"r5",	"r6",	"r7",
-	"r8",	"r9",	"r10",	"r11",	"r12",	"r13",	"r14",	"r15",
-	"r16",	"r17",	"r18",	"r19",	"r20",	"r21",	"r22",	"r23",
-	"r24",	"r25",	"r26",	"r27",	"r28",	"r29",	"r30",	"r31"
+	"0",    "r1",   "r2",   "r3",   "r4",   "r5",   "r6",   "r7",
+	"r8",   "r9",   "r10",  "r11",  "r12",  "r13",  "r14",  "r15",
+	"r16",  "r17",  "r18",  "r19",  "r20",  "r21",  "r22",  "r23",
+	"r24",  "r25",  "r26",  "r27",  "r28",  "r29",  "r30",  "r31"
 };
 
 static const char *const setcond[2] =
@@ -56,9 +56,9 @@ CPU_DISASSEMBLE( asap )
 
 	switch (opcode)
 	{
-		case 0x00:	sprintf(buffer, "trap   $00"); flags = DASMFLAG_STEP_OVER;								break;
-		case 0x01:	sprintf(buffer, "b%s    $%08x", condition[rdst & 15], pc + ((INT32)(op << 10) >> 8));	break;
-		case 0x02:	if ((op & 0x003fffff) == 3)
+		case 0x00:  sprintf(buffer, "trap   $00"); flags = DASMFLAG_STEP_OVER;                              break;
+		case 0x01:  sprintf(buffer, "b%s    $%08x", condition[rdst & 15], pc + ((INT32)(op << 10) >> 8));   break;
+		case 0x02:  if ((op & 0x003fffff) == 3)
 					{
 						UINT32 nextop = oprom[4] | (oprom[5] << 8) | (oprom[6] << 16) | (oprom[7] << 24);
 						if ((nextop >> 27) == 0x10 && ((nextop >> 22) & 31) == rdst && (nextop & 0xffff) == 0)
@@ -76,48 +76,48 @@ CPU_DISASSEMBLE( asap )
 					else
 						sprintf(buffer, "bra    $%08x", pc + ((INT32)(op << 10) >> 8));
 					break;
-		case 0x03:	sprintf(buffer, "lea%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);	break;
-		case 0x04:	sprintf(buffer, "leah%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);	break;
-		case 0x05:	sprintf(buffer, "subr%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x06:	sprintf(buffer, "xor%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x07:	sprintf(buffer, "xorn%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x08:	if (!rsrc1 && !rdst && rsrc2_iszero)
+		case 0x03:  sprintf(buffer, "lea%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);  break;
+		case 0x04:  sprintf(buffer, "leah%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);  break;
+		case 0x05:  sprintf(buffer, "subr%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x06:  sprintf(buffer, "xor%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x07:  sprintf(buffer, "xorn%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x08:  if (!rsrc1 && !rdst && rsrc2_iszero)
 					sprintf(buffer, "nop");
 					else if (!rsrc1)
 					sprintf(buffer, "mov%s  %s,%s", setcond[cond], src2(op,0), reg[rdst]);
 					else if (rsrc2_iszero)
 					sprintf(buffer, "mov%s  %s,%s", setcond[cond], reg[rsrc1], reg[rdst]);
 					else
-					sprintf(buffer, "add%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x09:	sprintf(buffer, "sub%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x0a:	sprintf(buffer, "addc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x0b:	sprintf(buffer, "subc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x0c:	sprintf(buffer, "and%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x0d:	sprintf(buffer, "andn%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x0e:	if (!rsrc1 && !rdst && rsrc2_iszero)
+					sprintf(buffer, "add%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x09:  sprintf(buffer, "sub%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x0a:  sprintf(buffer, "addc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x0b:  sprintf(buffer, "subc%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x0c:  sprintf(buffer, "and%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x0d:  sprintf(buffer, "andn%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x0e:  if (!rsrc1 && !rdst && rsrc2_iszero)
 					sprintf(buffer, "nop");
 					else if (!rsrc1)
 					sprintf(buffer, "mov%s  %s,%s", setcond[cond], src2(op,0), reg[rdst]);
 					else if (rsrc2_iszero)
 					sprintf(buffer, "mov%s  %s,%s", setcond[cond], reg[rsrc1], reg[rdst]);
 					else
-					sprintf(buffer, "or%s   %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x0f:	sprintf(buffer, "orn%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x10:	sprintf(buffer, "ld%s   %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);	break;
-		case 0x11:	sprintf(buffer, "ldh%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);	break;
-		case 0x12:	sprintf(buffer, "lduh%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);	break;
-		case 0x13:	sprintf(buffer, "sth%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);	break;
-		case 0x14:	sprintf(buffer, "st%s   %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);	break;
-		case 0x15:	sprintf(buffer, "ldb%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x16:	sprintf(buffer, "ldub%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x17:	sprintf(buffer, "stb%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x18:	sprintf(buffer, "ashr%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x19:	sprintf(buffer, "lshr%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x1a:	sprintf(buffer, "ashl%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x1b:	sprintf(buffer, "rotl%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);	break;
-		case 0x1c:	sprintf(buffer, "getps  %s", reg[rdst]);												break;
-		case 0x1d:	sprintf(buffer, "putps  %s", src2(op,0));												break;
-		case 0x1e:	if (rdst && rsrc2_iszero)
+					sprintf(buffer, "or%s   %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x0f:  sprintf(buffer, "orn%s  %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x10:  sprintf(buffer, "ld%s   %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);  break;
+		case 0x11:  sprintf(buffer, "ldh%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);  break;
+		case 0x12:  sprintf(buffer, "lduh%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);  break;
+		case 0x13:  sprintf(buffer, "sth%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);  break;
+		case 0x14:  sprintf(buffer, "st%s   %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);  break;
+		case 0x15:  sprintf(buffer, "ldb%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);  break;
+		case 0x16:  sprintf(buffer, "ldub%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);  break;
+		case 0x17:  sprintf(buffer, "stb%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);  break;
+		case 0x18:  sprintf(buffer, "ashr%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x19:  sprintf(buffer, "lshr%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x1a:  sprintf(buffer, "ashl%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x1b:  sprintf(buffer, "rotl%s %s,%s,%s", setcond[cond], reg[rsrc1], src2(op,0), reg[rdst]);   break;
+		case 0x1c:  sprintf(buffer, "getps  %s", reg[rdst]);                                                break;
+		case 0x1d:  sprintf(buffer, "putps  %s", src2(op,0));                                               break;
+		case 0x1e:  if (rdst && rsrc2_iszero)
 					{
 						flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 						sprintf(buffer, "jsr%s  %s,%s", setcond[cond], reg[rdst], reg[rsrc1]);
@@ -136,7 +136,7 @@ CPU_DISASSEMBLE( asap )
 					else
 						sprintf(buffer, "jmp%s  %s[%s]", setcond[cond], reg[rsrc1], src2(op,2));
 					break;
-		case 0x1f:	sprintf(buffer, "trap   $1f"); flags = DASMFLAG_STEP_OVER;								break;
+		case 0x1f:  sprintf(buffer, "trap   $1f"); flags = DASMFLAG_STEP_OVER;                              break;
 	}
 	return 4 | flags | DASMFLAG_SUPPORTED;
 }

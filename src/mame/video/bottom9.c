@@ -57,7 +57,7 @@ void bottom9_zoom_callback( running_machine &machine, int *code, int *color, int
 void bottom9_state::video_start()
 {
 
-	m_layer_colorbase[0] = 0;	/* not used */
+	m_layer_colorbase[0] = 0;   /* not used */
 	m_layer_colorbase[1] = 0;
 	m_layer_colorbase[2] = 16;
 	m_sprite_colorbase = 32;

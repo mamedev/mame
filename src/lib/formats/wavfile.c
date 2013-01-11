@@ -17,7 +17,7 @@ static const char magic2[4] = { 'W', 'A', 'V', 'E' };
 static const char format_tag_id[4] = { 'f', 'm', 't', ' ' };
 static const char data_tag_id[4] = { 'd', 'a', 't', 'a' };
 
-#define WAV_FORMAT_PCM		1
+#define WAV_FORMAT_PCM      1
 
 
 
@@ -104,12 +104,12 @@ static casserr_t wavfile_process(cassette_image *cassette, struct CassetteOption
 
 			cassette_image_read(cassette, format_tag, offset, sizeof(format_tag));
 
-			format_type				= get_leuint16(&format_tag[0]);
-			opts->channels			= get_leuint16(&format_tag[2]);
-			opts->sample_frequency	= get_leuint32(&format_tag[4]);
-			bytes_per_second		= get_leuint32(&format_tag[8]);
+			format_type             = get_leuint16(&format_tag[0]);
+			opts->channels          = get_leuint16(&format_tag[2]);
+			opts->sample_frequency  = get_leuint32(&format_tag[4]);
+			bytes_per_second        = get_leuint32(&format_tag[8]);
 //          block_align             = get_leuint16(&format_tag[12]);
-			opts->bits_per_sample	= get_leuint16(&format_tag[14]);
+			opts->bits_per_sample   = get_leuint16(&format_tag[14]);
 
 			if (format_type != WAV_FORMAT_PCM)
 				return CASSETTE_ERROR_INVALIDIMAGE;
@@ -119,7 +119,7 @@ static casserr_t wavfile_process(cassette_image *cassette, struct CassetteOption
 			switch(opts->bits_per_sample)
 			{
 				case 8:
-					waveform_flags = CASSETTE_WAVEFORM_8BIT | CASSETTE_WAVEFORM_UNSIGNED;	// 8-bits wav are stored unsigned
+					waveform_flags = CASSETTE_WAVEFORM_8BIT | CASSETTE_WAVEFORM_UNSIGNED;   // 8-bits wav are stored unsigned
 					break;
 				case 16:
 					waveform_flags = CASSETTE_WAVEFORM_16BITLE;
@@ -176,10 +176,10 @@ static casserr_t wavfile_save(cassette_image *cassette, const struct CassetteInf
 {
 	casserr_t err;
 	UINT8 consolidated_header[12 + 8 + 16 + 8];
-	UINT8 *header				= &consolidated_header[0];
-	UINT8 *format_tag_header	= &consolidated_header[12];
-	UINT8 *format_tag_data		= &consolidated_header[12 + 8];
-	UINT8 *data_tag_header		= &consolidated_header[12 + 8 + 16];
+	UINT8 *header               = &consolidated_header[0];
+	UINT8 *format_tag_header    = &consolidated_header[12];
+	UINT8 *format_tag_data      = &consolidated_header[12 + 8];
+	UINT8 *data_tag_header      = &consolidated_header[12 + 8 + 16];
 	UINT32 file_size;
 	UINT32 bytes_per_second;
 	UINT16 bits_per_sample;
@@ -195,23 +195,23 @@ static casserr_t wavfile_save(cassette_image *cassette, const struct CassetteInf
 	block_align = (UINT16) (bytes_per_sample * info->channels);
 
 	/* set up header */
-	memcpy(&header[0],					magic1, 4);
-	memcpy(&header[8],					magic2, 4);
-	put_leuint32(&header[4],			file_size);
+	memcpy(&header[0],                  magic1, 4);
+	memcpy(&header[8],                  magic2, 4);
+	put_leuint32(&header[4],            file_size);
 
 	/* set up format tag */
-	memcpy(&format_tag_header[0],		format_tag_id, 4);
-	put_leuint32(&format_tag_header[4],	16);
-	put_leuint16(&format_tag_data[0],	WAV_FORMAT_PCM);
-	put_leuint16(&format_tag_data[2],	info->channels);
-	put_leuint32(&format_tag_data[4],	info->sample_frequency);
-	put_leuint32(&format_tag_data[8],	bytes_per_second);
-	put_leuint16(&format_tag_data[12],	block_align);
-	put_leuint16(&format_tag_data[14],	bits_per_sample);
+	memcpy(&format_tag_header[0],       format_tag_id, 4);
+	put_leuint32(&format_tag_header[4], 16);
+	put_leuint16(&format_tag_data[0],   WAV_FORMAT_PCM);
+	put_leuint16(&format_tag_data[2],   info->channels);
+	put_leuint32(&format_tag_data[4],   info->sample_frequency);
+	put_leuint32(&format_tag_data[8],   bytes_per_second);
+	put_leuint16(&format_tag_data[12],  block_align);
+	put_leuint16(&format_tag_data[14],  bits_per_sample);
 
 	/* set up data tag */
-	memcpy(&data_tag_header[0],			data_tag_id, 4);
-	put_leuint32(&data_tag_header[4],	data_size);
+	memcpy(&data_tag_header[0],         data_tag_id, 4);
+	put_leuint32(&data_tag_header[4],   data_size);
 
 	/* write consolidated header */
 	cassette_image_write(cassette, consolidated_header, 0, sizeof(consolidated_header));
@@ -286,6 +286,3 @@ void wavfile_testload(const char *fname)
 	fclose(f);
 }
 #endif
-
-
-

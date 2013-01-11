@@ -26,51 +26,51 @@ TODO:
 
 struct mcd212_channel_t
 {
-    UINT8 csrr;
-    UINT16 csrw;
-    UINT16 dcr;
-    UINT16 vsr;
-    UINT16 ddr;
-    UINT16 dcp;
-    UINT32 dca;
-    UINT8 clut_r[256];
-    UINT8 clut_g[256];
-    UINT8 clut_b[256];
-    UINT32 image_coding_method;
-    UINT32 transparency_control;
-    UINT32 plane_order;
-    UINT32 clut_bank;
-    UINT32 transparent_color_a;
-    UINT32 reserved0;
-    UINT32 transparent_color_b;
-    UINT32 mask_color_a;
-    UINT32 reserved1;
-    UINT32 mask_color_b;
-    UINT32 dyuv_abs_start_a;
-    UINT32 dyuv_abs_start_b;
-    UINT32 reserved2;
-    UINT32 cursor_position;
-    UINT32 cursor_control;
-    UINT32 cursor_pattern[16];
-    UINT32 region_control[8];
-    UINT32 backdrop_color;
-    UINT32 mosaic_hold_a;
-    UINT32 mosaic_hold_b;
-    UINT8 weight_factor_a[768];
-    UINT8 weight_factor_b[768];
+	UINT8 csrr;
+	UINT16 csrw;
+	UINT16 dcr;
+	UINT16 vsr;
+	UINT16 ddr;
+	UINT16 dcp;
+	UINT32 dca;
+	UINT8 clut_r[256];
+	UINT8 clut_g[256];
+	UINT8 clut_b[256];
+	UINT32 image_coding_method;
+	UINT32 transparency_control;
+	UINT32 plane_order;
+	UINT32 clut_bank;
+	UINT32 transparent_color_a;
+	UINT32 reserved0;
+	UINT32 transparent_color_b;
+	UINT32 mask_color_a;
+	UINT32 reserved1;
+	UINT32 mask_color_b;
+	UINT32 dyuv_abs_start_a;
+	UINT32 dyuv_abs_start_b;
+	UINT32 reserved2;
+	UINT32 cursor_position;
+	UINT32 cursor_control;
+	UINT32 cursor_pattern[16];
+	UINT32 region_control[8];
+	UINT32 backdrop_color;
+	UINT32 mosaic_hold_a;
+	UINT32 mosaic_hold_b;
+	UINT8 weight_factor_a[768];
+	UINT8 weight_factor_b[768];
 };
 
 struct mcd212_regs_t
 {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
-    mcd212_channel_t channel[2];
-    emu_timer *scan_timer;
-    UINT8 region_flag_0[768];
-    UINT8 region_flag_1[768];
+	mcd212_channel_t channel[2];
+	emu_timer *scan_timer;
+	UINT8 region_flag_0[768];
+	UINT8 region_flag_1[768];
 
-    running_machine *m_machine;
-    bitmap_rgb32 m_bitmap;
+	running_machine *m_machine;
+	bitmap_rgb32 m_bitmap;
 };
 
 #define MCD212_CURCNT_COLOR         0x00000f    // Cursor color
@@ -159,29 +159,29 @@ typedef INT16 SWORD68K;
 
 struct mcd212_ab_t
 {
-    //* Color limit array.
-    BYTE68K limit[3 * BYTE68K_MAX];
+	//* Color limit array.
+	BYTE68K limit[3 * BYTE68K_MAX];
 
-    //* Color clamp array.
-    BYTE68K clamp[3 * BYTE68K_MAX];
+	//* Color clamp array.
+	BYTE68K clamp[3 * BYTE68K_MAX];
 
-    //* U-to-B matrix array.
-    SWORD68K matrixUB[BYTE68K_MAX + 1];
+	//* U-to-B matrix array.
+	SWORD68K matrixUB[BYTE68K_MAX + 1];
 
-    //* U-to-G matrix array.
-    SWORD68K matrixUG[BYTE68K_MAX + 1];
+	//* U-to-G matrix array.
+	SWORD68K matrixUG[BYTE68K_MAX + 1];
 
-    //* V-to-G matrix array.
-    SWORD68K matrixVG[BYTE68K_MAX + 1];
+	//* V-to-G matrix array.
+	SWORD68K matrixVG[BYTE68K_MAX + 1];
 
-    //* V-to-R matrix array.
-    SWORD68K matrixVR[BYTE68K_MAX + 1];
+	//* V-to-R matrix array.
+	SWORD68K matrixVR[BYTE68K_MAX + 1];
 
-    //* Delta-Y decoding array.
-    BYTE68K deltaY[BYTE68K_MAX + 1];
+	//* Delta-Y decoding array.
+	BYTE68K deltaY[BYTE68K_MAX + 1];
 
-    //* Delta-U/V decoding array.
-    BYTE68K deltaUV[BYTE68K_MAX + 1];
+	//* Delta-U/V decoding array.
+	BYTE68K deltaUV[BYTE68K_MAX + 1];
 };
 
 // Member functions

@@ -57,7 +57,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_22_1184MHz
+#define MASTER_CLOCK    XTAL_22_1184MHz
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
@@ -168,15 +168,15 @@ READ8_MEMBER(nsmpoker_state::debug_r)
 
 static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8, nsmpoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x9000, 0xafff) AM_RAM	// OK... cleared at beginning.
-	AM_RANGE(0xb000, 0xcfff) AM_ROM	// WRONG... just to map the last rom somewhere.
+	AM_RANGE(0x9000, 0xafff) AM_RAM // OK... cleared at beginning.
+	AM_RANGE(0xb000, 0xcfff) AM_ROM // WRONG... just to map the last rom somewhere.
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_SHARE("videoram") // WRONG... just a placeholder.
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_SHARE("colorram") // WRONG... just a placeholder.
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8, nsmpoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)	// kind of trap at beginning
+	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)   // kind of trap at beginning
 ADDRESS_MAP_END
 
 /* I/O byte R/W
@@ -364,7 +364,7 @@ static const gfx_layout charlayout =
 	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },    /* bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
@@ -375,7 +375,7 @@ static const gfx_layout tilelayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 
@@ -396,7 +396,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9995L, MASTER_CLOCK/2)	/* guess */
+	MCFG_CPU_ADD("maincpu", TMS9995L, MASTER_CLOCK/2)   /* guess */
 	MCFG_CPU_PROGRAM_MAP(nsmpoker_map)
 	MCFG_CPU_IO_MAP(nsmpoker_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nsmpoker_state,  nsmpoker_interrupt)
@@ -432,11 +432,11 @@ ROM_START( nsmpoker )
 //  ROM_LOAD( "113_281.2g", 0x6000, 0x2000, CRC(4b9b448a) SHA1(3ca1f5714cf5535d2ea1e7e03bca456c89af222c) )
 
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "113_277.6e",	0x0000, 0x2000, CRC(247ad554) SHA1(5cfdfb95920d7e89e3e485a06d0099191e8d41a0) )
-	ROM_LOAD( "113_278.6g",	0x2000, 0x2000, CRC(08eb7305) SHA1(4e555aa481c6b4476b71909ddabf405dd6f767ed) )
-	ROM_LOAD( "113_279.5g",	0x4000, 0x2000, CRC(ac6ab327) SHA1(1012dc581b2be7df5e079ace44a721d17d21366a) )
-	ROM_LOAD( "113_280.3g",	0x6000, 0x2000, CRC(9b9be79d) SHA1(8301e74c4869d04eba680d156de9edaadd7ff83b) )
-	ROM_LOAD( "113_281.2g",	0xb000, 0x2000, CRC(4b9b448a) SHA1(3ca1f5714cf5535d2ea1e7e03bca456c89af222c) )
+	ROM_LOAD( "113_277.6e", 0x0000, 0x2000, CRC(247ad554) SHA1(5cfdfb95920d7e89e3e485a06d0099191e8d41a0) )
+	ROM_LOAD( "113_278.6g", 0x2000, 0x2000, CRC(08eb7305) SHA1(4e555aa481c6b4476b71909ddabf405dd6f767ed) )
+	ROM_LOAD( "113_279.5g", 0x4000, 0x2000, CRC(ac6ab327) SHA1(1012dc581b2be7df5e079ace44a721d17d21366a) )
+	ROM_LOAD( "113_280.3g", 0x6000, 0x2000, CRC(9b9be79d) SHA1(8301e74c4869d04eba680d156de9edaadd7ff83b) )
+	ROM_LOAD( "113_281.2g", 0xb000, 0x2000, CRC(4b9b448a) SHA1(3ca1f5714cf5535d2ea1e7e03bca456c89af222c) )
 ROM_END
 
 

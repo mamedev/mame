@@ -59,11 +59,11 @@ READ8Z_MEMBER( ti_std_video_device::readz )
 WRITE8_MEMBER( ti_std_video_device::write )
 {
 	if (offset & 2)
-	{	/* write VDP address */
+	{   /* write VDP address */
 		m_tms9928a->register_write(*(this->m_space), 0, data);
 	}
 	else
-	{	/* write VDP data */
+	{   /* write VDP data */
 		m_tms9928a->vram_write(*(this->m_space), 0, data);
 	}
 }
@@ -76,11 +76,11 @@ WRITE8_MEMBER( ti_std_video_device::write )
 READ16_MEMBER( ti_exp_video_device::read16 )
 {
 	if (offset & 1)
-	{	/* read VDP status */
+	{   /* read VDP status */
 		return ((int) m_v9938->status_r()) << 8;
 	}
 	else
-	{	/* read VDP RAM */
+	{   /* read VDP RAM */
 		return ((int) m_v9938->vram_r()) << 8;
 	}
 }
@@ -116,11 +116,11 @@ WRITE16_MEMBER( ti_exp_video_device::write16 )
 READ8Z_MEMBER( ti_exp_video_device::readz )
 {
 	if (offset & 2)
-	{	/* read VDP status */
+	{   /* read VDP status */
 		*value = m_v9938->status_r();
 	}
 	else
-	{	/* read VDP RAM */
+	{   /* read VDP RAM */
 		*value = m_v9938->vram_r();
 	}
 }
@@ -206,14 +206,14 @@ WRITE_LINE_MEMBER( ti_sound_system_device::sound_ready )
 
 MACHINE_CONFIG_FRAGMENT( sn94624 )
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SOUND_CONFIG(sound_config)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( sn76496 )
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SOUND_CONFIG(sound_config)
 MACHINE_CONFIG_END

@@ -103,7 +103,7 @@ extern const upd765_interface pcjr_fdc_upd765_interface;
 void pc_fdc_reset(running_machine &machine);
 void pc_fdc_init(running_machine &machine, const struct pc_fdc_interface *iface);
 void pc_fdc_set_tc_state(running_machine &machine, int state);
-int	pc_fdc_dack_r(running_machine &machine, address_space &space);
+int pc_fdc_dack_r(running_machine &machine, address_space &space);
 void pc_fdc_dack_w(running_machine &machine, address_space &space, int data);
 
 DECLARE_READ8_HANDLER(pc_fdc_r);
@@ -112,5 +112,3 @@ DECLARE_WRITE8_HANDLER ( pcjr_fdc_w );
 
 #endif
 #endif /* PC_FDC_H */
-
-

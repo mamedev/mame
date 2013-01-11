@@ -19,25 +19,25 @@
 		</rect>
 	</element>
 
-	<element name="input">	<text string="INPUT" align="1"/>	</element>
-	<element name="busy">	<text string="BUSY " align="1"/>	</element>
-	<element name="error">	<text string="ERROR" align="1"/>	</element>
-	<element name="l0">		<text string="0  INITIALIZE" align="1"/>	</element>
-	<element name="l1">		<text string="1  IN: KEYBOARD" align="1"/>	</element>
-	<element name="l2">		<text string="2  IN: EPROM" align="1"/>	</element>
-	<element name="l3">		<text string="3  IN: RS 232 C" align="1"/>	</element>
-	<element name="l4">		<text string="4  FILL CONSTANT" align="1"/>	</element>
-	<element name="l5">		<text string="5  MOVE" align="1"/>	</element>
-	<element name="l6">		<text string="6  SEARCH" align="1"/>	</element>
-	<element name="l7">		<text string="7  SPLIT/SHUFFLE" align="1"/>	</element>
-	<element name="l8">		<text string="8  OUT: DISPLAY" align="1"/>	</element>
-	<element name="l9">		<text string="9  OUT: RS 232 C" align="1"/>	</element>
-	<element name="la">		<text string="A  CHECK" align="1"/>	</element>
-	<element name="lb">		<text string="B  VERIFY" align="1"/>	</element>
-	<element name="lc">		<text string="C  PROGRAM" align="1"/>	</element>
-	<element name="ld">		<text string="D  ERASE" align="1"/>	</element>
-	<element name="le">		<text string="E  OUT: DISPLAY" align="1"/>	</element>
-	<element name="lf">		<text string="F  OUT: RS 232 C" align="1"/>	</element>
+	<element name="input">  <text string="INPUT" align="1"/>    </element>
+	<element name="busy">   <text string="BUSY " align="1"/>    </element>
+	<element name="error">  <text string="ERROR" align="1"/>    </element>
+	<element name="l0">     <text string="0  INITIALIZE" align="1"/>    </element>
+	<element name="l1">     <text string="1  IN: KEYBOARD" align="1"/>  </element>
+	<element name="l2">     <text string="2  IN: EPROM" align="1"/> </element>
+	<element name="l3">     <text string="3  IN: RS 232 C" align="1"/>  </element>
+	<element name="l4">     <text string="4  FILL CONSTANT" align="1"/> </element>
+	<element name="l5">     <text string="5  MOVE" align="1"/>  </element>
+	<element name="l6">     <text string="6  SEARCH" align="1"/>    </element>
+	<element name="l7">     <text string="7  SPLIT/SHUFFLE" align="1"/> </element>
+	<element name="l8">     <text string="8  OUT: DISPLAY" align="1"/>  </element>
+	<element name="l9">     <text string="9  OUT: RS 232 C" align="1"/> </element>
+	<element name="la">     <text string="A  CHECK" align="1"/> </element>
+	<element name="lb">     <text string="B  VERIFY" align="1"/>    </element>
+	<element name="lc">     <text string="C  PROGRAM" align="1"/>   </element>
+	<element name="ld">     <text string="D  ERASE" align="1"/> </element>
+	<element name="le">     <text string="E  OUT: DISPLAY" align="1"/>  </element>
+	<element name="lf">     <text string="F  OUT: RS 232 C" align="1"/> </element>
 
 	<view name="Default Layout">
 		<backdrop name="background" element="background" state="0">

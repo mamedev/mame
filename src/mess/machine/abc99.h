@@ -22,7 +22,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define ABC99_TAG	"abc99"
+#define ABC99_TAG   "abc99"
 
 
 
@@ -31,7 +31,7 @@
 //**************************************************************************
 
 #define MCFG_ABC99_ADD(_config) \
-    MCFG_DEVICE_ADD(ABC99_TAG, ABC99, 0) \
+	MCFG_DEVICE_ADD(ABC99_TAG, ABC99, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -48,18 +48,18 @@
 
 struct abc99_interface
 {
-	devcb_write_line	m_out_clock_cb;
-	devcb_write_line	m_out_keydown_cb;
+	devcb_write_line    m_out_clock_cb;
+	devcb_write_line    m_out_keydown_cb;
 };
 
 // ======================> abc99_device
 
 class abc99_device :  public device_t,
-                      public abc99_interface
+						public abc99_interface
 {
 public:
-    // construction/destruction
-    abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -83,11 +83,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 
 private:
 	static const device_timer_id TIMER_SERIAL = 0;
@@ -99,8 +99,8 @@ private:
 	inline void key_down(int state);
 	inline void scan_mouse();
 
-	devcb_resolved_write_line	m_out_clock_func;
-	devcb_resolved_write_line	m_out_keydown_func;
+	devcb_resolved_write_line   m_out_clock_func;
+	devcb_resolved_write_line   m_out_keydown_func;
 
 	emu_timer *m_serial_timer;
 	emu_timer *m_mouse_timer;

@@ -3,9 +3,9 @@
 
 #include "cpu/sh4/sh4.h"
 
-#define MCFG_NAOMI_G1_ADD(_tag, type, _maincpu_tag, _irq_cb)			\
-	MCFG_DEVICE_ADD(_tag, type, 0)										\
-	naomi_g1_device::static_set_maincpu_tag(*device, _maincpu_tag);		\
+#define MCFG_NAOMI_G1_ADD(_tag, type, _maincpu_tag, _irq_cb)            \
+	MCFG_DEVICE_ADD(_tag, type, 0)                                      \
+	naomi_g1_device::static_set_maincpu_tag(*device, _maincpu_tag);     \
 	naomi_g1_device::static_set_irq_cb(*device, _irq_cb);
 
 class naomi_g1_device : public device_t

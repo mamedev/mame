@@ -33,23 +33,23 @@
 
 // ======================> msm6255_device
 
-class msm6255_device :	public device_t,
+class msm6255_device :  public device_t,
 						public device_memory_interface
 {
 public:
-    // construction/destruction
-    msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// inline configuration helpers
 	static void static_set_config(device_t &device, int char_clock, const char *screen_tag);
 
-    DECLARE_READ8_MEMBER( read );
-    DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	UINT32 screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "msm6255"; }
 	virtual void device_start();
 	virtual void device_reset();
@@ -70,19 +70,19 @@ private:
 	screen_device *m_screen;
 	int m_char_clock;
 
-	UINT8 m_ir;						// instruction register
-	UINT8 m_mor;					// mode control register
-	UINT8 m_pr;						// character pitch register
-	UINT8 m_hnr;					// horizontal character number register
-	UINT8 m_dvr;					// duty number register
-	UINT8 m_cpr;					// cursor form register
-	UINT8 m_slr;					// start address (lower) register
-	UINT8 m_sur;					// start address (upper) register
-	UINT8 m_clr;					// cursor address (lower) register
-	UINT8 m_cur;					// cursor address (upper) register
+	UINT8 m_ir;                     // instruction register
+	UINT8 m_mor;                    // mode control register
+	UINT8 m_pr;                     // character pitch register
+	UINT8 m_hnr;                    // horizontal character number register
+	UINT8 m_dvr;                    // duty number register
+	UINT8 m_cpr;                    // cursor form register
+	UINT8 m_slr;                    // start address (lower) register
+	UINT8 m_sur;                    // start address (upper) register
+	UINT8 m_clr;                    // cursor address (lower) register
+	UINT8 m_cur;                    // cursor address (upper) register
 
-	int m_cursor;					// is cursor displayed
-	int m_frame;					// frame counter
+	int m_cursor;                   // is cursor displayed
+	int m_frame;                    // frame counter
 };
 
 

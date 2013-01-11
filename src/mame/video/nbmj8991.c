@@ -82,33 +82,33 @@ WRITE8_MEMBER(nbmj8991_state::nbmj8991_blitter_w)
 
 	switch (offset)
 	{
-		case 0x00:	m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 0x02:	break;
-		case 0x03:	break;
-		case 0x04:	m_blitter_sizex = data; break;
-		case 0x05:	m_blitter_sizey = data;
+		case 0x00:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x02:  break;
+		case 0x03:  break;
+		case 0x04:  m_blitter_sizex = data; break;
+		case 0x05:  m_blitter_sizey = data;
 					/* writing here also starts the blit */
 					nbmj8991_gfxdraw(machine());
 					break;
-		case 0x06:	m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+		case 0x06:  m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 					m_flipscreen = (data & 0x04) ? 0 : 1;
 					m_dispflag = (data & 0x10) ? 0 : 1;
 					nbmj8991_vramflip(machine());
 					break;
-		case 0x07:	break;
-		case 0x10:	m_blitter_destx = (m_blitter_destx & 0xff00) | data; break;
-		case 0x20:	m_blitter_desty = (m_blitter_desty & 0xff00) | data; break;
-		case 0x30:	m_scrollx = (m_scrollx & 0xff00) | data; break;
-		case 0x40:	m_scrolly = (m_scrolly & 0xff00) | data; break;
-		case 0x50:	m_blitter_destx = (m_blitter_destx & 0x00ff) | ((data & 0x01) << 8);
+		case 0x07:  break;
+		case 0x10:  m_blitter_destx = (m_blitter_destx & 0xff00) | data; break;
+		case 0x20:  m_blitter_desty = (m_blitter_desty & 0xff00) | data; break;
+		case 0x30:  m_scrollx = (m_scrollx & 0xff00) | data; break;
+		case 0x40:  m_scrolly = (m_scrolly & 0xff00) | data; break;
+		case 0x50:  m_blitter_destx = (m_blitter_destx & 0x00ff) | ((data & 0x01) << 8);
 					m_blitter_desty = (m_blitter_desty & 0x00ff) | ((data & 0x02) << 7);
 					m_scrollx = (m_scrollx & 0x00ff) | ((data & 0x04) << 6);
 					m_scrolly = (m_scrolly & 0x00ff) | ((data & 0x08) << 5);
 					break;
-		case 0x60:	m_gfxrom = data; break;
-		case 0x70:	m_clutsel = data; break;
+		case 0x60:  m_gfxrom = data; break;
+		case 0x70:  m_clutsel = data; break;
 	}
 
 	if ((0x20000 * m_gfxrom) > (gfxlen - 1))

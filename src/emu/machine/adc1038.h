@@ -65,4 +65,4 @@ extern READ_LINE_DEVICE_HANDLER( adc1038_sars_read );
 extern WRITE_LINE_DEVICE_HANDLER( adc1038_di_write );
 extern WRITE_LINE_DEVICE_HANDLER( adc1038_clk_write );
 
-#endif	/* __ADC1038_H__ */
+#endif  /* __ADC1038_H__ */

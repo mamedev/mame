@@ -51,12 +51,12 @@
 #include "formats/imageutl.h"
 #include "imghd.h"
 
-#define FAT_SECLEN	512
+#define FAT_SECLEN  512
 
 static OPTION_GUIDE_START( pc_chd_create_optionguide )
-	OPTION_INT('T', "cylinders",	"Cylinders" )
-	OPTION_INT('H', "heads",		"Heads" )
-	OPTION_INT('S', "sectors",		"Sectors" )
+	OPTION_INT('T', "cylinders",    "Cylinders" )
+	OPTION_INT('H', "heads",        "Heads" )
+	OPTION_INT('S', "sectors",      "Sectors" )
 OPTION_GUIDE_END
 
 static const char pc_chd_create_optionspec[] = "H1-[16]S1-[32]-63T10/20/30/40/50/60/70/80/90/[100]/110/120/130/140/150/160/170/180/190/200";
@@ -211,16 +211,16 @@ static imgtoolerr_t pc_chd_read_partition_header(imgtool_image *image)
 	{
 		partition_info = &buffer[446 + i * 16];
 
-		info->partitions[i].partition_type	= partition_info[4];
-		info->partitions[i].starting_head	= partition_info[1];
-		info->partitions[i].starting_track	= ((partition_info[2] << 2) & 0xFF00) | partition_info[3];
-		info->partitions[i].starting_sector	= partition_info[2] & 0x3F;
-		info->partitions[i].ending_head		= partition_info[5];
-		info->partitions[i].ending_track	= ((partition_info[6] << 2) & 0xFF00) | partition_info[7];
-		info->partitions[i].ending_sector	= partition_info[6] & 0x3F;
+		info->partitions[i].partition_type  = partition_info[4];
+		info->partitions[i].starting_head   = partition_info[1];
+		info->partitions[i].starting_track  = ((partition_info[2] << 2) & 0xFF00) | partition_info[3];
+		info->partitions[i].starting_sector = partition_info[2] & 0x3F;
+		info->partitions[i].ending_head     = partition_info[5];
+		info->partitions[i].ending_track    = ((partition_info[6] << 2) & 0xFF00) | partition_info[7];
+		info->partitions[i].ending_sector   = partition_info[6] & 0x3F;
 
-		info->partitions[i].sector_index	= pick_integer_le(partition_info,  8, 4);
-		info->partitions[i].total_sectors	= pick_integer_le(partition_info, 12, 4);
+		info->partitions[i].sector_index    = pick_integer_le(partition_info,  8, 4);
+		info->partitions[i].total_sectors   = pick_integer_le(partition_info, 12, 4);
 
 		if (info->partitions[i].starting_track > info->partitions[i].ending_track)
 			return IMGTOOLERR_CORRUPTIMAGE;
@@ -322,7 +322,7 @@ static imgtoolerr_t pc_chd_image_get_geometry(imgtool_image *image, UINT32 *trac
 
 
 
-static imgtoolerr_t	pc_chd_image_getsectorsize(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
+static imgtoolerr_t pc_chd_image_getsectorsize(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);
@@ -348,7 +348,7 @@ static UINT32 pc_chd_calc_lbasector(pc_chd_image_info *info, UINT32 track, UINT3
 
 
 
-static imgtoolerr_t	pc_chd_image_readsector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len)
+static imgtoolerr_t pc_chd_image_readsector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);
@@ -359,7 +359,7 @@ static imgtoolerr_t	pc_chd_image_readsector(imgtool_image *image, UINT32 track, 
 
 
 
-static imgtoolerr_t	pc_chd_image_writesector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
+static imgtoolerr_t pc_chd_image_writesector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);
@@ -397,33 +397,33 @@ static imgtoolerr_t pc_chd_list_partitions(imgtool_image *image, imgtool_partiti
 
 	for (i = 0; i < MIN(4, len); i++)
 	{
-		partitions[i].base_block	= info->partitions[i].sector_index;
-		partitions[i].block_count	= info->partitions[i].total_sectors;
+		partitions[i].base_block    = info->partitions[i].sector_index;
+		partitions[i].block_count   = info->partitions[i].total_sectors;
 
 		switch(info->partitions[i].partition_type)
 		{
-			case 0x00:	/* Empty Partition */
+			case 0x00:  /* Empty Partition */
 				partitions[i].get_info = NULL;
 				break;
 
-			case 0x01:	/* FAT12 */
-			case 0x04:	/* FAT16 (-32 MB) */
-			case 0x06:	/* FAT16 (32+ MB) */
-			case 0x0B:	/* FAT32 */
-			case 0x0C:	/* FAT32 (LBA Mapped) */
-			case 0x0E:	/* FAT16 (LBA Mapped) */
-			case 0x11:	/* OS/2 FAT12 */
-			case 0x14:	/* OS/2 FAT16 (-32 MB) */
-			case 0x16:	/* OS/2 FAT16 (32+ MB) */
-			case 0x1B:	/* Hidden Win95 FAT32 */
-			case 0x1C:	/* Hidden Win95 FAT32 (LBA Mapped) */
-			case 0x1D:	/* Hidden Win95 FAT16 (LBA Mapped) */
-			case 0xC1:	/* DR-DOS FAT12 */
-			case 0xC4:	/* DR-DOS FAT16 (-32 MB) */
-			case 0xC6:	/* DR-DOS FAT16 (32+ MB) */
-			case 0xD1:	/* Old Multiuser DOS FAT12 */
-			case 0xD4:	/* Old Multiuser DOS FAT16 (-32 MB) */
-			case 0xD6:	/* Old Multiuser DOS FAT16 (32+ MB) */
+			case 0x01:  /* FAT12 */
+			case 0x04:  /* FAT16 (-32 MB) */
+			case 0x06:  /* FAT16 (32+ MB) */
+			case 0x0B:  /* FAT32 */
+			case 0x0C:  /* FAT32 (LBA Mapped) */
+			case 0x0E:  /* FAT16 (LBA Mapped) */
+			case 0x11:  /* OS/2 FAT12 */
+			case 0x14:  /* OS/2 FAT16 (-32 MB) */
+			case 0x16:  /* OS/2 FAT16 (32+ MB) */
+			case 0x1B:  /* Hidden Win95 FAT32 */
+			case 0x1C:  /* Hidden Win95 FAT32 (LBA Mapped) */
+			case 0x1D:  /* Hidden Win95 FAT16 (LBA Mapped) */
+			case 0xC1:  /* DR-DOS FAT12 */
+			case 0xC4:  /* DR-DOS FAT16 (-32 MB) */
+			case 0xC6:  /* DR-DOS FAT16 (32+ MB) */
+			case 0xD1:  /* Old Multiuser DOS FAT12 */
+			case 0xD4:  /* Old Multiuser DOS FAT16 (-32 MB) */
+			case 0xD6:  /* Old Multiuser DOS FAT16 (32+ MB) */
 				partitions[i].get_info = fat_get_info;
 				break;
 
@@ -442,27 +442,27 @@ void pc_chd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtooli
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case IMGTOOLINFO_INT_BLOCK_SIZE:					info->i = FAT_SECLEN; break;
-		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:				info->i = sizeof(pc_chd_image_info); break;
-		case IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS:	info->i = 1; break;
+		case IMGTOOLINFO_INT_BLOCK_SIZE:                    info->i = FAT_SECLEN; break;
+		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:             info->i = sizeof(pc_chd_image_info); break;
+		case IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS:   info->i = 1; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "pc_chd"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "PC CHD disk image"); break;
-		case IMGTOOLINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = imgtool_temp_str(), "chd"); break;
-		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:			strcpy(info->s = imgtool_temp_str(), pc_chd_create_optionspec); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "pc_chd"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "PC CHD disk image"); break;
+		case IMGTOOLINFO_STR_FILE_EXTENSIONS:               strcpy(info->s = imgtool_temp_str(), "chd"); break;
+		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:           strcpy(info->s = imgtool_temp_str(), pc_chd_create_optionspec); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_CREATE:						info->create = pc_chd_image_create; break;
-		case IMGTOOLINFO_PTR_OPEN:							info->open = pc_chd_image_open; break;
-		case IMGTOOLINFO_PTR_CLOSE:							info->close = pc_chd_image_close; break;
-		case IMGTOOLINFO_PTR_READ_SECTOR:					info->read_sector = pc_chd_image_readsector; break;
-		case IMGTOOLINFO_PTR_WRITE_SECTOR:					info->write_sector = pc_chd_image_writesector; break;
-		case IMGTOOLINFO_PTR_READ_BLOCK:					info->read_block = pc_chd_image_readblock; break;
-		case IMGTOOLINFO_PTR_WRITE_BLOCK:					info->write_block = pc_chd_image_writeblock; break;
-		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:				info->get_sector_size = pc_chd_image_getsectorsize; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:			info->createimage_optguide = pc_chd_create_optionguide; break;
-		case IMGTOOLINFO_PTR_GET_GEOMETRY:					info->get_geometry = pc_chd_image_get_geometry; break;
-		case IMGTOOLINFO_PTR_LIST_PARTITIONS:				info->list_partitions = pc_chd_list_partitions; break;
+		case IMGTOOLINFO_PTR_CREATE:                        info->create = pc_chd_image_create; break;
+		case IMGTOOLINFO_PTR_OPEN:                          info->open = pc_chd_image_open; break;
+		case IMGTOOLINFO_PTR_CLOSE:                         info->close = pc_chd_image_close; break;
+		case IMGTOOLINFO_PTR_READ_SECTOR:                   info->read_sector = pc_chd_image_readsector; break;
+		case IMGTOOLINFO_PTR_WRITE_SECTOR:                  info->write_sector = pc_chd_image_writesector; break;
+		case IMGTOOLINFO_PTR_READ_BLOCK:                    info->read_block = pc_chd_image_readblock; break;
+		case IMGTOOLINFO_PTR_WRITE_BLOCK:                   info->write_block = pc_chd_image_writeblock; break;
+		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:               info->get_sector_size = pc_chd_image_getsectorsize; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = pc_chd_create_optionguide; break;
+		case IMGTOOLINFO_PTR_GET_GEOMETRY:                  info->get_geometry = pc_chd_image_get_geometry; break;
+		case IMGTOOLINFO_PTR_LIST_PARTITIONS:               info->list_partitions = pc_chd_list_partitions; break;
 	}
 }

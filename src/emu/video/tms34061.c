@@ -14,7 +14,7 @@
 #include "tms34061.h"
 
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 
 
 /*************************************
@@ -25,15 +25,15 @@
 
 struct tms34061_data
 {
-	UINT16				regs[TMS34061_REGCOUNT];
-	UINT16				xmask;
-	UINT8				yshift;
-	UINT32				vrammask;
-	UINT8 *				vram;
-	UINT8 *				latchram;
-	UINT8				latchdata;
-	UINT8 *				shiftreg;
-	emu_timer *			timer;
+	UINT16              regs[TMS34061_REGCOUNT];
+	UINT16              xmask;
+	UINT8               yshift;
+	UINT32              vrammask;
+	UINT8 *             vram;
+	UINT8 *             latchram;
+	UINT8               latchdata;
+	UINT8 *             shiftreg;
+	emu_timer *         timer;
 	struct tms34061_interface intf;
 	screen_device *screen;
 };
@@ -50,11 +50,11 @@ static struct tms34061_data tms34061;
 
 static const char *const regnames[] =
 {
-	"HORENDSYNC",	"HORENDBLNK",	"HORSTARTBLNK",		"HORTOTAL",
-	"VERENDSYNC",	"VERENDBLNK",	"VERSTARTBLNK",		"VERTOTAL",
-	"DISPUPDATE",	"DISPSTART",	"VERINT",			"CONTROL1",
-	"CONTROL2",		"STATUS",		"XYOFFSET",			"XYADDRESS",
-	"DISPADDRESS",	"VERCOUNTER"
+	"HORENDSYNC",   "HORENDBLNK",   "HORSTARTBLNK",     "HORTOTAL",
+	"VERENDSYNC",   "VERENDBLNK",   "VERSTARTBLNK",     "VERTOTAL",
+	"DISPUPDATE",   "DISPSTART",    "VERINT",           "CONTROL1",
+	"CONTROL2",     "STATUS",       "XYOFFSET",         "XYADDRESS",
+	"DISPADDRESS",  "VERCOUNTER"
 };
 
 
@@ -203,15 +203,15 @@ static void register_w(address_space &space, offs_t offset, UINT8 data)
 		case TMS34061_XYOFFSET:
 			switch (tms34061.regs[TMS34061_XYOFFSET] & 0x00ff)
 			{
-				case 0x01:	tms34061.yshift = 2;	break;
-				case 0x02:	tms34061.yshift = 3;	break;
-				case 0x04:	tms34061.yshift = 4;	break;
-				case 0x08:	tms34061.yshift = 5;	break;
-				case 0x10:	tms34061.yshift = 6;	break;
-				case 0x20:	tms34061.yshift = 7;	break;
-				case 0x40:	tms34061.yshift = 8;	break;
-				case 0x80:	tms34061.yshift = 9;	break;
-				default:	logerror("Invalid value for XYOFFSET = %04x\n", tms34061.regs[TMS34061_XYOFFSET]);	break;
+				case 0x01:  tms34061.yshift = 2;    break;
+				case 0x02:  tms34061.yshift = 3;    break;
+				case 0x04:  tms34061.yshift = 4;    break;
+				case 0x08:  tms34061.yshift = 5;    break;
+				case 0x10:  tms34061.yshift = 6;    break;
+				case 0x20:  tms34061.yshift = 7;    break;
+				case 0x40:  tms34061.yshift = 8;    break;
+				case 0x80:  tms34061.yshift = 9;    break;
+				default:    logerror("Invalid value for XYOFFSET = %04x\n", tms34061.regs[TMS34061_XYOFFSET]);  break;
 			}
 			tms34061.xmask = (1 << tms34061.yshift) - 1;
 			break;
@@ -279,78 +279,78 @@ INLINE void adjust_xyaddress(int offset)
 	/* note that carries are allowed if the Y coordinate isn't being modified */
 	switch (offset & 0x1e)
 	{
-		case 0x00:	/* no change */
+		case 0x00:  /* no change */
 			break;
 
-		case 0x02:	/* X + 1 */
+		case 0x02:  /* X + 1 */
 			tms34061.regs[TMS34061_XYADDRESS]++;
 			break;
 
-		case 0x04:	/* X - 1 */
+		case 0x04:  /* X - 1 */
 			tms34061.regs[TMS34061_XYADDRESS]--;
 			break;
 
-		case 0x06:	/* X = 0 */
+		case 0x06:  /* X = 0 */
 			tms34061.regs[TMS34061_XYADDRESS] &= ~tms34061.xmask;
 			break;
 
-		case 0x08:	/* Y + 1 */
+		case 0x08:  /* Y + 1 */
 			tms34061.regs[TMS34061_XYADDRESS] += 1 << tms34061.yshift;
 			break;
 
-		case 0x0a:	/* X + 1, Y + 1 */
+		case 0x0a:  /* X + 1, Y + 1 */
 			tms34061.regs[TMS34061_XYADDRESS] = (tms34061.regs[TMS34061_XYADDRESS] & ~tms34061.xmask) |
 					((tms34061.regs[TMS34061_XYADDRESS] + 1) & tms34061.xmask);
 			tms34061.regs[TMS34061_XYADDRESS] += 1 << tms34061.yshift;
 			break;
 
-		case 0x0c:	/* X - 1, Y + 1 */
+		case 0x0c:  /* X - 1, Y + 1 */
 			tms34061.regs[TMS34061_XYADDRESS] = (tms34061.regs[TMS34061_XYADDRESS] & ~tms34061.xmask) |
 					((tms34061.regs[TMS34061_XYADDRESS] - 1) & tms34061.xmask);
 			tms34061.regs[TMS34061_XYADDRESS] += 1 << tms34061.yshift;
 			break;
 
-		case 0x0e:	/* X = 0, Y + 1 */
+		case 0x0e:  /* X = 0, Y + 1 */
 			tms34061.regs[TMS34061_XYADDRESS] &= ~tms34061.xmask;
 			tms34061.regs[TMS34061_XYADDRESS] += 1 << tms34061.yshift;
 			break;
 
-		case 0x10:	/* Y - 1 */
+		case 0x10:  /* Y - 1 */
 			tms34061.regs[TMS34061_XYADDRESS] -= 1 << tms34061.yshift;
 			break;
 
-		case 0x12:	/* X + 1, Y - 1 */
+		case 0x12:  /* X + 1, Y - 1 */
 			tms34061.regs[TMS34061_XYADDRESS] = (tms34061.regs[TMS34061_XYADDRESS] & ~tms34061.xmask) |
 					((tms34061.regs[TMS34061_XYADDRESS] + 1) & tms34061.xmask);
 			tms34061.regs[TMS34061_XYADDRESS] -= 1 << tms34061.yshift;
 			break;
 
-		case 0x14:	/* X - 1, Y - 1 */
+		case 0x14:  /* X - 1, Y - 1 */
 			tms34061.regs[TMS34061_XYADDRESS] = (tms34061.regs[TMS34061_XYADDRESS] & ~tms34061.xmask) |
 					((tms34061.regs[TMS34061_XYADDRESS] - 1) & tms34061.xmask);
 			tms34061.regs[TMS34061_XYADDRESS] -= 1 << tms34061.yshift;
 			break;
 
-		case 0x16:	/* X = 0, Y - 1 */
+		case 0x16:  /* X = 0, Y - 1 */
 			tms34061.regs[TMS34061_XYADDRESS] &= ~tms34061.xmask;
 			tms34061.regs[TMS34061_XYADDRESS] -= 1 << tms34061.yshift;
 			break;
 
-		case 0x18:	/* Y = 0 */
+		case 0x18:  /* Y = 0 */
 			tms34061.regs[TMS34061_XYADDRESS] &= tms34061.xmask;
 			break;
 
-		case 0x1a:	/* X + 1, Y = 0 */
+		case 0x1a:  /* X + 1, Y = 0 */
 			tms34061.regs[TMS34061_XYADDRESS]++;
 			tms34061.regs[TMS34061_XYADDRESS] &= tms34061.xmask;
 			break;
 
-		case 0x1c:	/* X - 1, Y = 0 */
+		case 0x1c:  /* X - 1, Y = 0 */
 			tms34061.regs[TMS34061_XYADDRESS]--;
 			tms34061.regs[TMS34061_XYADDRESS] &= tms34061.xmask;
 			break;
 
-		case 0x1e:	/* X = 0, Y = 0 */
+		case 0x1e:  /* X = 0, Y = 0 */
 			tms34061.regs[TMS34061_XYADDRESS] = 0;
 			break;
 	}

@@ -167,8 +167,8 @@ WRITE16_MEMBER(drtomy_state::drtomy_okibank_w)
 }
 
 static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_SHARE("videorafg")	/* Video RAM FG */
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM /* ROM */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_SHARE("videorafg")   /* Video RAM FG */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_SHARE("videorabg") /* Video RAM BG */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
@@ -178,14 +178,14 @@ static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(drtomy_okibank_w) /* OKI banking */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) /* OKI 6295*/
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM	/* Work RAM */
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* Work RAM */
 ADDRESS_MAP_END
 
 static const gfx_layout tilelayout8=
 {
-	8,8,									/* 8x8 tiles */
-	RGN_FRAC(1,4),							/* number of tiles */
-	4,										/* bitplanes */
+	8,8,                                    /* 8x8 tiles */
+	RGN_FRAC(1,4),                          /* number of tiles */
+	4,                                      /* bitplanes */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* plane offsets */
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
@@ -194,9 +194,9 @@ static const gfx_layout tilelayout8=
 
 static const gfx_layout tilelayout16 =
 {
-	16,16,									/* 16x16 tiles */
-	RGN_FRAC(1,4),							/* number of tiles */
-	4,										/* bitplanes */
+	16,16,                                  /* 16x16 tiles */
+	RGN_FRAC(1,4),                          /* number of tiles */
+	4,                                      /* bitplanes */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* plane offsets */
 	{ 0,1,2,3,4,5,6,7, 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
@@ -212,7 +212,7 @@ GFXDECODE_END
 
 static INPUT_PORTS_START( drtomy )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:8,7,6,5")
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x00, "5 Coins/4 Credits" )
@@ -224,7 +224,7 @@ static INPUT_PORTS_START( drtomy )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:4,3,2,1")
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x00, "5 Coins/4 Credits" )
@@ -238,26 +238,26 @@ static INPUT_PORTS_START( drtomy )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Time" )			PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x01, 0x01, "Time" )          PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "Less" )
 	PORT_DIPSETTING(    0x01, "More" )
-	PORT_DIPNAME( 0x02, 0x02, "Number of Virus" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x02, 0x02, "Number of Virus" )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x02, "Less" )
 	PORT_DIPSETTING(    0x00, "More" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x08, IP_ACTIVE_LOW, "SW2:5" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Italian ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -298,7 +298,7 @@ void drtomy_state::machine_reset()
 static MACHINE_CONFIG_START( drtomy, drtomy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)			/* ? MHz */
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(drtomy_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
 
@@ -324,18 +324,18 @@ MACHINE_CONFIG_END
 
 
 ROM_START( drtomy )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "15.u21", 0x00001, 0x20000, CRC(0b8d763b) SHA1(082005985a2de7b941ea227bbf6e761a197132e6) )
 	ROM_LOAD16_BYTE( "16.u22", 0x00000, 0x20000, CRC(206f4d65) SHA1(f4a28bc6041981d50a03477e63e90d5ff8ffb765) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "20.u80",	0x000000, 0x40000, CRC(4d4d86ff) SHA1(60df0bf8ba62fea42ff756cd7c5485b57f597098) )
-	ROM_LOAD( "19.u81",	0x100000, 0x40000, CRC(49ecbfe2) SHA1(16889663bdd3b7d0a350d5b18e221480413f6b4f) )
+	ROM_LOAD( "20.u80", 0x000000, 0x40000, CRC(4d4d86ff) SHA1(60df0bf8ba62fea42ff756cd7c5485b57f597098) )
+	ROM_LOAD( "19.u81", 0x100000, 0x40000, CRC(49ecbfe2) SHA1(16889663bdd3b7d0a350d5b18e221480413f6b4f) )
 	ROM_LOAD( "18.u82", 0x200000, 0x40000, CRC(8ee5c921) SHA1(6ba43eeb3b633c3db22f7b18b8fe91f250da2242) )
-	ROM_LOAD( "17.u83",	0x300000, 0x40000, CRC(42044b1c) SHA1(6fd01911932e0fb800ffefec595a9e7c524faa8f) )
+	ROM_LOAD( "17.u83", 0x300000, 0x40000, CRC(42044b1c) SHA1(6fd01911932e0fb800ffefec595a9e7c524faa8f) )
 
 	ROM_REGION( 0x80000, "user1", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "14.u23",	0x00000, 0x80000, CRC(479614ec) SHA1(b6300b344422f0a64146b853411f5285eaaada28) )
+	ROM_LOAD( "14.u23", 0x00000, 0x80000, CRC(479614ec) SHA1(b6300b344422f0a64146b853411f5285eaaada28) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_COPY( "user1", 0x00000, 0x00000, 0x20000)

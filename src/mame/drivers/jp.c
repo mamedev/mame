@@ -7,7 +7,7 @@ class jp_state : public driver_device
 public:
 	jp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -175,12 +175,12 @@ ROM_START(petaco2)
 	ROM_LOAD("jpsonid7.dat", 0x30000, 0x8000, CRC(ff430b1b) SHA1(423592a40eba174108dfc6817e549c643bb3c80f))
 ROM_END
 
-GAME(1986,	america,	0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"America 1492",			GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,	aqualand,	0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Aqualand",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,	faeton,		0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Faeton",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1987,	lortium,	0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Lortium",				GAME_IS_SKELETON_MECHANICAL)
-GAME(19??,	pimbal,		0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Pimbal (Pinball 3000)",GAME_IS_SKELETON_MECHANICAL)
-GAME(1984,	petaco,		0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Petaco",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,	petaco2,	0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Petaco 2",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,	halley,		0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Halley Comet",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1986,	olympus,	0,		jp,	jp, jp_state,	jp,	ROT0,	"Juegos Populares",				"Olympus",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  america,    0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "America 1492",         GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  aqualand,   0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Aqualand",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  faeton,     0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Faeton",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  lortium,    0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Lortium",              GAME_IS_SKELETON_MECHANICAL)
+GAME(19??,  pimbal,     0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Pimbal (Pinball 3000)",GAME_IS_SKELETON_MECHANICAL)
+GAME(1984,  petaco,     0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Petaco",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,  petaco2,    0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Petaco 2",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  halley,     0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Halley Comet",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  olympus,    0,      jp, jp, jp_state,   jp, ROT0,   "Juegos Populares",             "Olympus",              GAME_IS_SKELETON_MECHANICAL)

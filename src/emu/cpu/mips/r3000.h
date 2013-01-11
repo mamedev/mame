@@ -34,12 +34,12 @@ enum
     INTERRUPT CONSTANTS
 ***************************************************************************/
 
-#define R3000_IRQ0		0		/* IRQ0 */
-#define R3000_IRQ1		1		/* IRQ1 */
-#define R3000_IRQ2		2		/* IRQ2 */
-#define R3000_IRQ3		3		/* IRQ3 */
-#define R3000_IRQ4		4		/* IRQ4 */
-#define R3000_IRQ5		5		/* IRQ5 */
+#define R3000_IRQ0      0       /* IRQ0 */
+#define R3000_IRQ1      1       /* IRQ1 */
+#define R3000_IRQ2      2       /* IRQ2 */
+#define R3000_IRQ3      3       /* IRQ3 */
+#define R3000_IRQ4      4       /* IRQ4 */
+#define R3000_IRQ5      5       /* IRQ5 */
 
 
 /***************************************************************************
@@ -48,9 +48,9 @@ enum
 
 struct r3000_cpu_core
 {
-	UINT8		hasfpu;			/* 1 if we have an FPU, 0 otherwise */
-	size_t		icache;			/* code cache size */
-	size_t		dcache;			/* data cache size */
+	UINT8       hasfpu;         /* 1 if we have an FPU, 0 otherwise */
+	size_t      icache;         /* code cache size */
+	size_t      dcache;         /* data cache size */
 };
 
 

@@ -201,15 +201,15 @@ static void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 
 
 	/*
-    bank 1
-    xxxx xxxx [0] sprite offset
-    ---x xxxx [1] color offset
-    bank 2
-    xxxx xxxx [0] y offs
-    xxxx xxxx [1] x offs
-    bank 3
-    ---- ---x [1] sprite enable flag?
-    */
+	bank 1
+	xxxx xxxx [0] sprite offset
+	---x xxxx [1] color offset
+	bank 2
+	xxxx xxxx [0] y offs
+	xxxx xxxx [1] x offs
+	bank 3
+	---- ---x [1] sprite enable flag?
+	*/
 static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
@@ -219,13 +219,13 @@ static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	INT16 x,y;
 
 	/*
-    0x3b-0x3c-0x3d tire (0x13 0x00 / 0x17 0x00 )
-    0x3b- shirt (0x16 0x00)
-    0x20 tire stick (0x16 0x00)
-    0x2e go sign (0x11 0x00)
-    0x18 trampoline (0x13 0x00)
-    0x27 cone (0x13 0x00)
-    */
+	0x3b-0x3c-0x3d tire (0x13 0x00 / 0x17 0x00 )
+	0x3b- shirt (0x16 0x00)
+	0x20 tire stick (0x16 0x00)
+	0x2e go sign (0x11 0x00)
+	0x18 trampoline (0x13 0x00)
+	0x27 cone (0x13 0x00)
+	*/
 
 	for(i=0;i<0x40;i+=2)
 	{
@@ -333,7 +333,7 @@ static void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		if(state->m_obj3_ram[i+1] & 1)
 			x |= 0x100;
 
-		 x = 0x138 - x;
+			x = 0x138 - x;
 
 		spr_offs = (state->m_obj1_ram[i+0]);
 		spr_offs += ((state->m_obj3_ram[i+0] & 3) << 8);
@@ -515,15 +515,15 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 				break;
 			case 1:
 				/*
-                status codes:
-                0x06 sub NG IOX2
-                0x05 sub NG IOX1
-                0x04 sub NG CIOS
-                0x03 sub NG OPN
-                0x02 sub NG ROM
-                0x01 sub NG RAM
-                0x00 ok
-                */
+				status codes:
+				0x06 sub NG IOX2
+				0x05 sub NG IOX1
+				0x04 sub NG CIOS
+				0x03 sub NG OPN
+				0x02 sub NG ROM
+				0x01 sub NG RAM
+				0x00 ok
+				*/
 				m_mcu[0].rxd = 0x40;
 				m_mcu[0].rst = 0;
 				break;
@@ -989,29 +989,29 @@ ROM_START( skydest )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pd1-1.1a",     0x000000, 0x002000, CRC(78951c75) SHA1(f6d36a1b9b35a346a1e7389956e90332ada07454) )
 	ROM_LOAD( "pd0-2.1b",     0x002000, 0x002000, CRC(da2d48cd) SHA1(5f4871f66bca8515505e4ef887cadf41a4e88f4d) )
-    ROM_LOAD( "pd0-3.1c",     0x004000, 0x002000, CRC(28ef8eda) SHA1(c2ca346b1170e8ca7239bee4040225c50923e527) )
-    ROM_LOAD( "pd1-4.1e",     0x006000, 0x002000, CRC(b8ec9938) SHA1(79f9be7ba74af9542488247c83a4aa731ebb7917) )
+	ROM_LOAD( "pd0-3.1c",     0x004000, 0x002000, CRC(28ef8eda) SHA1(c2ca346b1170e8ca7239bee4040225c50923e527) )
+	ROM_LOAD( "pd1-4.1e",     0x006000, 0x002000, CRC(b8ec9938) SHA1(79f9be7ba74af9542488247c83a4aa731ebb7917) )
 
 	ROM_REGION( 0x4000, "audiocpu", 0 )
-    ROM_LOAD( "pd0-15.10c",   0x000000, 0x002000, CRC(f8b3d3f7) SHA1(447907f982362f5995d7eb646628cf0e07ba8f64) )
-    ROM_LOAD( "pd0-16.10d",   0x002000, 0x002000, CRC(19ce8106) SHA1(31186d3b1c0d124da82310930a002a481941ebb1) )
+	ROM_LOAD( "pd0-15.10c",   0x000000, 0x002000, CRC(f8b3d3f7) SHA1(447907f982362f5995d7eb646628cf0e07ba8f64) )
+	ROM_LOAD( "pd0-16.10d",   0x002000, 0x002000, CRC(19ce8106) SHA1(31186d3b1c0d124da82310930a002a481941ebb1) )
 
 	ROM_REGION( 0x4000, "tilemap_data", ROMREGION_INVERT )
-    ROM_LOAD( "pd0-20.1h",    0x000000, 0x004000, CRC(8b2137f2) SHA1(1f83e081cab116c69a8349fd33ba1916b1c91826) ) // on daughterboard
+	ROM_LOAD( "pd0-20.1h",    0x000000, 0x004000, CRC(8b2137f2) SHA1(1f83e081cab116c69a8349fd33ba1916b1c91826) ) // on daughterboard
 
 	ROM_REGION( 0x10000, "sprite_data", ROMREGION_ERASEFF )
-    ROM_LOAD( "pd0-7.1k",     0x000000, 0x002000, CRC(83137d42) SHA1(7e35f28577d6bfeee184a0ac3095b478999d6477) ) //ok
+	ROM_LOAD( "pd0-7.1k",     0x000000, 0x002000, CRC(83137d42) SHA1(7e35f28577d6bfeee184a0ac3095b478999d6477) ) //ok
 	ROM_LOAD( "pd1-8.1l",     0x002000, 0x002000, CRC(b810858b) SHA1(385e625fc989a1dfa18559a62c99363b62c66a67) ) //ok
-    ROM_LOAD( "pd0-9.1m",     0x004000, 0x002000, CRC(6f558bee) SHA1(0539feaa848d6cfb9f90a46a851f73fb74e82676) ) //ok
-    ROM_LOAD( "pd1-10.1n",    0x006000, 0x002000, CRC(5840b5b5) SHA1(1b5b188023c4d3198402c946b8c5a51d7f512a07) )
-    ROM_LOAD( "pd0-11.1r",    0x008000, 0x002000, CRC(29e5fce4) SHA1(59748e3a192a45dce7920e8d5a7a11d5145915b0) ) //ok
+	ROM_LOAD( "pd0-9.1m",     0x004000, 0x002000, CRC(6f558bee) SHA1(0539feaa848d6cfb9f90a46a851f73fb74e82676) ) //ok
+	ROM_LOAD( "pd1-10.1n",    0x006000, 0x002000, CRC(5840b5b5) SHA1(1b5b188023c4d3198402c946b8c5a51d7f512a07) )
+	ROM_LOAD( "pd0-11.1r",    0x008000, 0x002000, CRC(29e5fce4) SHA1(59748e3a192a45dce7920e8d5a7a11d5145915b0) ) //ok
 	ROM_LOAD( "pd0-12.1s",    0x00a000, 0x002000, CRC(06234942) SHA1(1cc40a8c8e24ab6db1dc7dc88979be23b7a9cab6) )
-    ROM_LOAD( "pd1-13.1t",    0x00c000, 0x002000, CRC(3cca5b95) SHA1(74baec7c128254c394dd3162df7abacf5ed5a99b) ) //ok
-    ROM_LOAD( "pd0-14.1u",    0x00e000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
+	ROM_LOAD( "pd1-13.1t",    0x00c000, 0x002000, CRC(3cca5b95) SHA1(74baec7c128254c394dd3162df7abacf5ed5a99b) ) //ok
+	ROM_LOAD( "pd0-14.1u",    0x00e000, 0x002000, CRC(7ef05b01) SHA1(f36ad1c0dac201729def78dc18feacda8fcf1a3f) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "green.11t",    0x000, 0x100, CRC(f803beb7) SHA1(9c979a296de04728d43c94e9e06f8d8600dc9cfb) )
-    ROM_LOAD( "red.11u",      0x100, 0x100, CRC(24b7b6f3) SHA1(c2f6477baa5be038c41f5f2ecd16522a6b8d84db) )
+	ROM_LOAD( "red.11u",      0x100, 0x100, CRC(24b7b6f3) SHA1(c2f6477baa5be038c41f5f2ecd16522a6b8d84db) )
 
 	ROM_REGION( 0x40, "timing_proms", 0 ) //???
 	ROM_LOAD( "p1.2e",        0x000, 0x020, NO_DUMP )

@@ -29,10 +29,10 @@ void cloud9_state::video_start()
 	m_priprom = machine().root_device().memregion("proms")->base() + 0x300;
 
 	/* compute the color output resistor weights at startup */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	resistances, m_rweights, 1000, 0,
-			3,	resistances, m_gweights, 1000, 0,
-			3,	resistances, m_bweights, 1000, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  resistances, m_rweights, 1000, 0,
+			3,  resistances, m_gweights, 1000, 0,
+			3,  resistances, m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
 	machine().primary_screen->register_screen_bitmap(m_spritebitmap);
@@ -115,17 +115,17 @@ INLINE void cloud9_write_vram( running_machine &machine, UINT16 addr, UINT8 data
 	UINT8 wpbits;
 
 	/*
-        Inputs to the write-protect PROM:
+	    Inputs to the write-protect PROM:
 
-        Bit 7 = BITMD
-        Bit 6 = video_control[4]
-        Bit 5 = video_control[6]
-        Bit 4 = 1 if (A15-A12 != 4)
-        Bit 3 = !(A13 | A12 | A11)
-        Bit 2 = A9 & A10
-        Bit 1 = PIXB
-        Bit 0 = PIXA
-    */
+	    Bit 7 = BITMD
+	    Bit 6 = video_control[4]
+	    Bit 5 = video_control[6]
+	    Bit 4 = 1 if (A15-A12 != 4)
+	    Bit 3 = !(A13 | A12 | A11)
+	    Bit 2 = A9 & A10
+	    Bit 1 = PIXB
+	    Bit 0 = PIXA
+	*/
 	promaddr |= bitmd << 7;
 	promaddr |= state->m_video_control[4] << 6;
 	promaddr |= state->m_video_control[6] << 5;
@@ -161,11 +161,11 @@ INLINE void bitmode_autoinc( running_machine &machine )
 	cloud9_state *state = machine.driver_data<cloud9_state>();
 
 	/* auto increment in the x-direction if it's enabled */
-	if (!state->m_video_control[0])	/* /AX */
+	if (!state->m_video_control[0]) /* /AX */
 		state->m_bitmode_addr[0]++;
 
 	/* auto increment in the y-direction if it's enabled */
-	if (!state->m_video_control[1])	/* /AY */
+	if (!state->m_video_control[1]) /* /AY */
 		state->m_bitmode_addr[1]++;
 }
 
@@ -244,7 +244,7 @@ WRITE8_MEMBER(cloud9_state::cloud9_bitmode_addr_w)
 UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteaddr = m_spriteram;
-	int flip = m_video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
+	int flip = m_video_control[5] ? 0xff : 0x00;    /* PLAYER2 */
 	pen_t black = get_black_pen(machine());
 	int x, y, offs;
 

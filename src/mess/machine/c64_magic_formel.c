@@ -15,9 +15,9 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MC6821_TAG		"mc6821"
+#define MC6821_TAG      "mc6821"
 
-#define PA4 	(m_pb7_ff ? m_ram_oe : 0)
+#define PA4     (m_pb7_ff ? m_ram_oe : 0)
 
 
 //**************************************************************************
@@ -35,18 +35,18 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     ROM A13
-        PA1     ROM A14
-        PA2     ROM A15
-        PA3     ROM _OE
-        PA4     RAM _OE
-        PA5
-        PA6
-        PA7
+	    PA0     ROM A13
+	    PA1     ROM A14
+	    PA2     ROM A15
+	    PA3     ROM _OE
+	    PA4     RAM _OE
+	    PA5
+	    PA6
+	    PA7
 
-    */
+	*/
 
 	logerror("PA %02x\n",data);
 	m_rom_bank = data & 0x0f;
@@ -60,18 +60,18 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     RAM A10
-        PB1     RAM A11
-        PB2     RAM A9
-        PB3     RAM A8
-        PB4     RAM A12
-        PB5
-        PB6
-        PB7     ROMH enable
+	    PB0     RAM A10
+	    PB1     RAM A11
+	    PB2     RAM A9
+	    PB3     RAM A8
+	    PB4     RAM A12
+	    PB5
+	    PB6
+	    PB7     ROMH enable
 
-    */
+	*/
 	logerror("PB %02x\n",data);
 	m_ram_bank = data & 0x1f;
 
@@ -93,18 +93,18 @@ WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 
 static const pia6821_interface pia_intf =
 {
-	DEVCB_NULL,		// input A
-	DEVCB_NULL,		// input B
-	DEVCB_NULL,										// input CA1
-	DEVCB_NULL,											// input CB1
-	DEVCB_NULL,											// input CA2
-	DEVCB_NULL,											// input CB2
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_pa_w),		// output A
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_pb_w),		// output B
-	DEVCB_NULL,											// output CA2
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_cb2_w),		// output CB2
-	DEVCB_NULL,											// irq A
-	DEVCB_NULL											// irq B
+	DEVCB_NULL,     // input A
+	DEVCB_NULL,     // input B
+	DEVCB_NULL,                                     // input CA1
+	DEVCB_NULL,                                         // input CB1
+	DEVCB_NULL,                                         // input CA2
+	DEVCB_NULL,                                         // input CB2
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_pa_w),        // output A
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_pb_w),        // output B
+	DEVCB_NULL,                                         // output CA2
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_cb2_w),      // output CB2
+	DEVCB_NULL,                                         // irq A
+	DEVCB_NULL                                          // irq B
 };
 
 
@@ -134,16 +134,16 @@ machine_config_constructor c64_magic_formel_cartridge_device::device_mconfig_add
 
 INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
 {
-    if (!newval && (m_pb7_ff & m_cb2_ff))
-    {
-        m_cb2_ff = 0;
+	if (!newval && (m_pb7_ff & m_cb2_ff))
+	{
+		m_cb2_ff = 0;
 
-        m_slot->nmi_w(ASSERT_LINE);
-    }
-    else
-    {
-        m_slot->nmi_w(CLEAR_LINE);
-    }
+		m_slot->nmi_w(ASSERT_LINE);
+	}
+	else
+	{
+		m_slot->nmi_w(CLEAR_LINE);
+	}
 }
 
 static INPUT_PORTS_START( c64_magic_formel )

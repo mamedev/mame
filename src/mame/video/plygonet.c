@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 
 	code = m_ttl_vram[tile_index]&0xfff;
 
-	attr = m_ttl_vram[tile_index]>>12;	/* palette in all 4 bits? */
+	attr = m_ttl_vram[tile_index]>>12;  /* palette in all 4 bits? */
 
 	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
 }
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 {
 	int attr, code;
 
-	attr = (m_roz_vram[tile_index] >> 12) + 16;	/* roz base palette is palette 16 */
+	attr = (m_roz_vram[tile_index] >> 12) + 16; /* roz base palette is palette 16 */
 	code = m_roz_vram[tile_index] & 0x3ff;
 
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
@@ -82,12 +82,12 @@ void polygonet_state::video_start()
 {
 	static const gfx_layout charlayout =
 	{
-		8, 8,	/* 8x8 */
-		4096,	/* # of tiles */
-		4,		/* 4bpp */
-		{ 0, 1, 2, 3 },	/* plane offsets */
-		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },	/* X offsets */
-		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },	/* Y offsets */
+		8, 8,   /* 8x8 */
+		4096,   /* # of tiles */
+		4,      /* 4bpp */
+		{ 0, 1, 2, 3 }, /* plane offsets */
+		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 }, /* X offsets */
+		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 }, /* Y offsets */
 		8*8*4
 	};
 
@@ -127,4 +127,3 @@ UINT32 polygonet_state::screen_update_polygonet(screen_device &screen, bitmap_in
 	m_ttl_tilemap->draw(bitmap, cliprect, 0, 1<<0);
 	return 0;
 }
-

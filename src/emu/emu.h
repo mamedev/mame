@@ -144,4 +144,4 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "machine/generic.h"
 #include "video/generic.h"
 
-#endif	/* __EMU_H__ */
+#endif  /* __EMU_H__ */

@@ -12,9 +12,9 @@ public:
 	relief_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag) { }
 
-	UINT8			m_ym2413_volume;
-	UINT8			m_overall_volume;
-	UINT32			m_adpcm_bank_base;
+	UINT8           m_ym2413_volume;
+	UINT8           m_overall_volume;
+	UINT32          m_adpcm_bank_base;
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(relief_atarivc_r);
 	DECLARE_WRITE16_MEMBER(relief_atarivc_w);

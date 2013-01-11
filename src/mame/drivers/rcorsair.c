@@ -76,31 +76,31 @@ static ADDRESS_MAP_START( rcorsair_map, AS_PROGRAM, 8, rcorsair_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( inports )
-    PORT_START("IN0")
-    PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x10, 0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x40, 0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME(   0x80, 0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_START("IN0")
+	PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(   0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(   0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(   0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(   0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(   0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(   0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -131,9 +131,9 @@ UINT32 rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
 
 	/* Main CPU is probably inside Custom Block with
-       program code, unknown type */
+	   program code, unknown type */
 
-	MCFG_CPU_ADD("maincpu", I8085A,8000000)		 /* Sound CPU? */
+	MCFG_CPU_ADD("maincpu", I8085A,8000000)      /* Sound CPU? */
 	MCFG_CPU_PROGRAM_MAP(rcorsair_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
 

@@ -45,7 +45,7 @@ class scobra_state : public scramble_state
 public:
 	scobra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: scramble_state(mconfig, type, tag),
-		  m_soundram(*this, "soundram") { }
+			m_soundram(*this, "soundram") { }
 
 	optional_shared_ptr<UINT8> m_soundram;
 	DECLARE_READ8_MEMBER(scobra_soundram_r);
@@ -118,8 +118,8 @@ static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(galaxold_videoram_w)	/* mirror */
-	AM_RANGE(0x8c00, 0x8fff) AM_READ(galaxold_videoram_r)	/* mirror */
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(galaxold_videoram_w)  /* mirror */
+	AM_RANGE(0x8c00, 0x8fff) AM_READ(galaxold_videoram_r)   /* mirror */
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x8860, 0x887f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x8880, 0x88ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror */
 	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(scobra_type2_ppi8255_0_r, scobra_type2_ppi8255_0_w)
 	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(scobra_type2_ppi8255_1_r, scobra_type2_ppi8255_1_w)
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xa80e, 0xa80e) AM_WRITENOP	/* coin counters */
+	AM_RANGE(0xa80e, 0xa80e) AM_WRITENOP    /* coin counters */
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xd000, 0xd01f) AM_READWRITE(hustler_ppi8255_0_r, hustler_ppi8255_0_w)
 	AM_RANGE(0xe000, 0xe01f) AM_READWRITE(hustler_ppi8255_1_r, hustler_ppi8255_1_w)
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xa802, 0xa802) AM_WRITENOP	/* coin counters */
+	AM_RANGE(0xa802, 0xa802) AM_WRITENOP    /* coin counters */
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
+	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror */
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
@@ -260,7 +260,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hustler_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-    AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_io_map, AS_IO, 8, scobra_state )
@@ -330,7 +330,7 @@ static INPUT_PORTS_START( stratgyx )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scobra_state,stratgyx_coinage_r, (void *)0x04) /* upper 2 coinage DIPs */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scobra_state,stratgyx_coinage_r, (void *)0x08) /* upper 2 coinage DIPs */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	/* none of these appear to be used */
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  /* none of these appear to be used */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
@@ -352,20 +352,20 @@ static INPUT_PORTS_START( stratgyx )
 	PORT_START("IN4")      /* fake coinage DIPs.  read via IN2 and IN3 */
 	PORT_DIPNAME( 0x0f, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x0a, "A 2/1  B 1/3" )
-  /*PORT_DIPSETTING(    0x02, "A 2/1  B 1/3" )*/
+	/*PORT_DIPSETTING(    0x02, "A 2/1  B 1/3" )*/
 	PORT_DIPSETTING(    0x09, "A 2/1  B 1/6" )
 	PORT_DIPSETTING(    0x03, "A 4/3  B 1/3" )
 	PORT_DIPSETTING(    0x0c, "A 1/1  B 2/1" )
 	PORT_DIPSETTING(    0x07, "A 1/1  B 1/2" )
 	PORT_DIPSETTING(    0x01, "A 1/1  B 1/3" )
 	PORT_DIPSETTING(    0x06, "A 1/1  B 1/5" )
-  /*PORT_DIPSETTING(    0x0b, "A 1/1  B 1/5" )*/
+	/*PORT_DIPSETTING(    0x0b, "A 1/1  B 1/5" )*/
 	PORT_DIPSETTING(    0x05, "A 1/1  B 1/7" )
 	PORT_DIPSETTING(    0x0d, "A 1/2  B 1/1" )
 	PORT_DIPSETTING(    0x0e, "A 1/3  B 3/1" )
 	PORT_DIPSETTING(    0x0f, "A 1/4  B 4/1" )
 	PORT_DIPSETTING(    0x04, "A 1/99  B 2/1" )
-  /*PORT_DIPSETTING(    0x08, "A 1/99  B 2/1" )*/
+	/*PORT_DIPSETTING(    0x08, "A 1/99  B 2/1" )*/
 	PORT_DIPSETTING(    0x00, "A 1/99  B 1/3" )
 INPUT_PORTS_END
 
@@ -373,8 +373,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( darkplnt )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	// and START1
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )	// and START2
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    // and START1
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    // and START2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( darkplnt )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_BIT( 0xfc, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,scobra_state, darkplnt_custom_r, "DIAL")	/* scrambled dial */
+	PORT_BIT( 0xfc, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,scobra_state, darkplnt_custom_r, "DIAL") /* scrambled dial */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( darkplnt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DIAL")
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)	/* scrambled dial */
+	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) /* scrambled dial */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tazmania )
@@ -636,15 +636,15 @@ static INPUT_PORTS_START( hustlerb3 )
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_6C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_6C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )	PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )    PORT_CONDITION("IN1", 0x40, EQUALS, 0x00)
 	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
@@ -728,10 +728,10 @@ static const ay8910_interface scobra_ay8910_interface_2 =
 static MACHINE_CONFIG_START( type1, scobra_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(type1_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)	/* 1.78975 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(scobra_sound_map)
 	MCFG_CPU_IO_MAP(scobra_sound_io_map)
 
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 
 	MCFG_GFXDECODE(scobra)
-	MCFG_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
+	MCFG_PALETTE_LENGTH(32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
 	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
@@ -781,7 +781,7 @@ static MACHINE_CONFIG_DERIVED( rescue, type1 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_LENGTH(32+64+2+128)	/* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
+	MCFG_PALETTE_LENGTH(32+64+2+128)    /* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
 
 	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,rescue)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
@@ -794,7 +794,7 @@ static MACHINE_CONFIG_DERIVED( minefld, type1 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_LENGTH(32+64+2+256)	/* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
+	MCFG_PALETTE_LENGTH(32+64+2+256)    /* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
 
 	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,minefld)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
@@ -828,7 +828,7 @@ static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
+	MCFG_PALETTE_LENGTH(32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,stratgyx)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,stratgyx)
@@ -850,10 +850,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hustler, scobra_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(hustler_map)
 
-	MCFG_CPU_ADD("audiocpu",Z80,14318000/8)	/* 1.78975 MHz */
+	MCFG_CPU_ADD("audiocpu",Z80,14318000/8) /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(hustler_sound_map)
 	MCFG_CPU_IO_MAP(hustler_sound_io_map)
 
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 
 	MCFG_GFXDECODE(scobra)
-	MCFG_PALETTE_LENGTH(32+64+2)	/* 32 for characters, 64 for stars, 2 for bullets */
+	MCFG_PALETTE_LENGTH(32+64+2)    /* 32 for characters, 64 for stars, 2 for bullets */
 
 	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
@@ -925,7 +925,7 @@ ROM_START( stratgyx )
 	ROM_LOAD( "2j_5.bin",     0x4000, 0x1000, CRC(78b9b898) SHA1(158e11352d68ed9e4277efbcb7e927e9bdc662f8) )
 	ROM_LOAD( "2l_6.bin",     0x5000, 0x1000, CRC(20bae414) SHA1(cd3c03d3b6a3abb64cb86cffa733d5494cb226f7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
 	ROM_LOAD( "s1.bin",       0x0000, 0x1000, CRC(713a5db8) SHA1(8ec41cb93cfd856dc5aecace6238240a5d114ce1) )
 	ROM_LOAD( "s2.bin",       0x1000, 0x1000, CRC(46079411) SHA1(72bfc39979818309ac5a49654a825f9e4bd0236c) )
 
@@ -937,7 +937,7 @@ ROM_START( stratgyx )
 	ROM_LOAD( "strategy.6e",  0x0000, 0x0020, CRC(51a629e1) SHA1(f9826202c91a4a3deb8d815cbaa107b29dce5835) )
 
 	ROM_REGION( 0x0020, "user1", 0 )
-	ROM_LOAD( "strategy.10k", 0x0000, 0x0020, CRC(d95c0318) SHA1(83e5355fdca7b4e1fb5a0e6eeaacfbf9561e2c36) )	/* background color map */
+	ROM_LOAD( "strategy.10k", 0x0000, 0x0020, CRC(d95c0318) SHA1(83e5355fdca7b4e1fb5a0e6eeaacfbf9561e2c36) )    /* background color map */
 ROM_END
 
 ROM_START( stratgys )
@@ -949,7 +949,7 @@ ROM_START( stratgys )
 	ROM_LOAD( "2j.cpu",       0x4000, 0x1000, CRC(66e84cde) SHA1(c1e6b9fe0052fe1f521c943a69d60f65fa392147) )
 	ROM_LOAD( "2l.cpu",       0x5000, 0x1000, CRC(62b032d0) SHA1(592866f801839550e60a515978a2d97dd414c87a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
 	ROM_LOAD( "s1.bin",       0x0000, 0x1000, CRC(713a5db8) SHA1(8ec41cb93cfd856dc5aecace6238240a5d114ce1) )
 	ROM_LOAD( "s2.bin",       0x1000, 0x1000, CRC(46079411) SHA1(72bfc39979818309ac5a49654a825f9e4bd0236c) )
 
@@ -973,7 +973,7 @@ ROM_START( strongx )
 	ROM_LOAD( "2j_5.bin",     0x4000, 0x1000, CRC(78b9b898) SHA1(158e11352d68ed9e4277efbcb7e927e9bdc662f8) )
 	ROM_LOAD( "2l_6.bin",     0x5000, 0x1000, CRC(20bae414) SHA1(cd3c03d3b6a3abb64cb86cffa733d5494cb226f7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
 	ROM_LOAD( "s1.bin",       0x0000, 0x1000, CRC(713a5db8) SHA1(8ec41cb93cfd856dc5aecace6238240a5d114ce1) )
 	ROM_LOAD( "s2.bin",       0x1000, 0x1000, CRC(46079411) SHA1(72bfc39979818309ac5a49654a825f9e4bd0236c) )
 
@@ -985,7 +985,7 @@ ROM_START( strongx )
 	ROM_LOAD( "strategy.6e",  0x0000, 0x0020, CRC(51a629e1) SHA1(f9826202c91a4a3deb8d815cbaa107b29dce5835) )
 
 	ROM_REGION( 0x0020, "user1", 0 )
-	ROM_LOAD( "strategy.10k", 0x0000, 0x0020, CRC(d95c0318) SHA1(83e5355fdca7b4e1fb5a0e6eeaacfbf9561e2c36) )	/* background color map */
+	ROM_LOAD( "strategy.10k", 0x0000, 0x0020, CRC(d95c0318) SHA1(83e5355fdca7b4e1fb5a0e6eeaacfbf9561e2c36) )    /* background color map */
 ROM_END
 
 ROM_START( darkplnt )
@@ -1208,7 +1208,7 @@ ROM_START( hustlerb2 )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "b4.r2",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
-	ROM_LOAD( "b5", 	 0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // broken rom, assumed to be the same
+	ROM_LOAD( "b5",      0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // broken rom, assumed to be the same
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "27s19.bin",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
@@ -1236,18 +1236,18 @@ ROM_END
 
 ROM_START( mimonkey )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mm1.2e",		  0x0000, 0x1000, CRC(9019f1b1) SHA1(0c45f64e39b9a182f6162ab520ced6ef0686466c) )
-	ROM_LOAD( "mm2.2e",		  0x1000, 0x1000, CRC(043e97d6) SHA1(924c0165dfcf01182696b0d259718ac625573d9a) )
-	ROM_LOAD( "mm3.2f",		  0x2000, 0x1000, CRC(1052726a) SHA1(2fdd3064f02babd2d496a38c7aee094cb3666f24) )
-	ROM_LOAD( "mm4.2h",		  0x3000, 0x1000, CRC(7b3f35ff) SHA1(b52c46c3f166346d3b25cd2ab09781afc703de08) )
-	ROM_LOAD( "mm5.2j",		  0xc000, 0x1000, CRC(b4e5c32d) SHA1(18e53519e8f4e813109cfaf45f2f66444e6fa1a2) )
-	ROM_LOAD( "mm6.2l",		  0xd000, 0x1000, CRC(409036c4) SHA1(a9640da91156504bfc8fedcda30f81169b28a0c9) )
-	ROM_LOAD( "mm7.2m",		  0xe000, 0x1000, CRC(119c08fa) SHA1(6e19ab874b735fe7339bcf651111664263ea4ef9) )
-	ROM_LOAD( "mm8.2p",		  0xf000, 0x1000, CRC(f7989f04) SHA1(d6e301414a807f5e9feed92ce53ab73d6bd46c45) )
+	ROM_LOAD( "mm1.2e",       0x0000, 0x1000, CRC(9019f1b1) SHA1(0c45f64e39b9a182f6162ab520ced6ef0686466c) )
+	ROM_LOAD( "mm2.2e",       0x1000, 0x1000, CRC(043e97d6) SHA1(924c0165dfcf01182696b0d259718ac625573d9a) )
+	ROM_LOAD( "mm3.2f",       0x2000, 0x1000, CRC(1052726a) SHA1(2fdd3064f02babd2d496a38c7aee094cb3666f24) )
+	ROM_LOAD( "mm4.2h",       0x3000, 0x1000, CRC(7b3f35ff) SHA1(b52c46c3f166346d3b25cd2ab09781afc703de08) )
+	ROM_LOAD( "mm5.2j",       0xc000, 0x1000, CRC(b4e5c32d) SHA1(18e53519e8f4e813109cfaf45f2f66444e6fa1a2) )
+	ROM_LOAD( "mm6.2l",       0xd000, 0x1000, CRC(409036c4) SHA1(a9640da91156504bfc8fedcda30f81169b28a0c9) )
+	ROM_LOAD( "mm7.2m",       0xe000, 0x1000, CRC(119c08fa) SHA1(6e19ab874b735fe7339bcf651111664263ea4ef9) )
+	ROM_LOAD( "mm8.2p",       0xf000, 0x1000, CRC(f7989f04) SHA1(d6e301414a807f5e9feed92ce53ab73d6bd46c45) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "mm13.11d",	  0x0000, 0x1000, CRC(2d14c527) SHA1(062414ce0415b6c471149319ecae22f465df3a4f) )
-	ROM_LOAD( "mm14.10d",	  0x1000, 0x1000, CRC(35ed0f96) SHA1(5aaacae5c2acf97540b72491f71ea823f5eeae1a) )
+	ROM_LOAD( "mm13.11d",     0x0000, 0x1000, CRC(2d14c527) SHA1(062414ce0415b6c471149319ecae22f465df3a4f) )
+	ROM_LOAD( "mm14.10d",     0x1000, 0x1000, CRC(35ed0f96) SHA1(5aaacae5c2acf97540b72491f71ea823f5eeae1a) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "mm12.5h",      0x0000, 0x1000, CRC(f73a8412) SHA1(9baf4336cceb9b039372b0a1c733910aeab5ec6d) )
@@ -1271,12 +1271,12 @@ ROM_START( mimonsco )
 	ROM_LOAD( "fra_4b",       0xf000, 0x1000, CRC(d700fd03) SHA1(3e804a42ecc166d8723f0b0a4906212addbbad7b) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "mmsound1",	  0x0000, 0x1000, CRC(2d14c527) SHA1(062414ce0415b6c471149319ecae22f465df3a4f) )
-	ROM_LOAD( "mmsnd2a",	  0x1000, 0x1000, CRC(35ed0f96) SHA1(5aaacae5c2acf97540b72491f71ea823f5eeae1a) )
+	ROM_LOAD( "mmsound1",     0x0000, 0x1000, CRC(2d14c527) SHA1(062414ce0415b6c471149319ecae22f465df3a4f) )
+	ROM_LOAD( "mmsnd2a",      0x1000, 0x1000, CRC(35ed0f96) SHA1(5aaacae5c2acf97540b72491f71ea823f5eeae1a) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "mmgfx1",		  0x0000, 0x2000, CRC(4af47337) SHA1(225f7bcfbb61e3a163ecaed675d4c81b3609562f) )
-	ROM_LOAD( "mmgfx2",		  0x2000, 0x2000, CRC(def47da8) SHA1(8e62e5dc5c810efaa204d0fcb3d02bc84f61ba35) )
+	ROM_LOAD( "mmgfx1",       0x0000, 0x2000, CRC(4af47337) SHA1(225f7bcfbb61e3a163ecaed675d4c81b3609562f) )
+	ROM_LOAD( "mmgfx2",       0x2000, 0x2000, CRC(def47da8) SHA1(8e62e5dc5c810efaa204d0fcb3d02bc84f61ba35) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
@@ -1300,4 +1300,3 @@ GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd
 GAME( 1981, hustlerb3, hustler,  hustlerb3, hustlerb3, scramble_state,  hustlerd,     ROT90,  "bootleg (Videotron)", "Video Pool (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
-

@@ -25,7 +25,7 @@ void vlm5030_vcu(device_t *device, int pin );
 void vlm5030_st(device_t *device, int pin );
 
 class vlm5030_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

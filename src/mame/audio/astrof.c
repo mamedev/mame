@@ -16,20 +16,20 @@
  *
  *************************************/
 
-#define SAMPLE_FIRE		 0
-#define SAMPLE_EKILLED	 1
-#define SAMPLE_WAVE		 2
+#define SAMPLE_FIRE      0
+#define SAMPLE_EKILLED   1
+#define SAMPLE_WAVE      2
 #define SAMPLE_BOSSFIRE  6
-#define SAMPLE_FUEL		 7
-#define SAMPLE_DEATH	 8
-#define SAMPLE_BOSSHIT	 9
+#define SAMPLE_FUEL      7
+#define SAMPLE_DEATH     8
+#define SAMPLE_BOSSHIT   9
 #define SAMPLE_BOSSKILL  10
 
-#define CHANNEL_FIRE	  0
+#define CHANNEL_FIRE      0
 #define CHANNEL_EXPLOSION 1
 #define CHANNEL_WAVE      2   /* background humm */
-#define CHANNEL_BOSSFIRE  2	  /* there is no background humm on the boss level */
-#define CHANNEL_FUEL	  3
+#define CHANNEL_BOSSFIRE  2   /* there is no background humm on the boss level */
+#define CHANNEL_FUEL      3
 
 
 WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
@@ -46,7 +46,7 @@ WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
 	if (rising_bits & 0x04)
 	{
 		/* I *know* that the effect select port will be written shortly
-           after this one, so this works */
+		   after this one, so this works */
 		m_astrof_start_explosion = 1;
 	}
 
@@ -85,8 +85,8 @@ WRITE8_MEMBER(astrof_state::astrof_audio_2_w)
 	if (m_astrof_start_explosion)
 	{
 		/* this is really a compound effect, made up of I believe 3 sound
-           effects, but since our sample contains them all, disable playing
-           the other effects while the explosion is playing */
+		   effects, but since our sample contains them all, disable playing
+		   the other effects while the explosion is playing */
 
 		logerror("Explosion: %x\n", data);
 		if (data & 0x04)
@@ -141,7 +141,7 @@ static const char *const astrof_sample_names[] =
 
 static const samples_interface astrof_samples_interface =
 {
-	4,	/* 4 channels */
+	4,  /* 4 channels */
 	astrof_sample_names
 };
 
@@ -204,29 +204,29 @@ WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 
 static const sn76477_interface tomahawk_sn76477_interface =
 {
-	0,				/*  4 noise_res (N/C)        */
-	0,				/*  5 filter_res (N/C)       */
-	0,				/*  6 filter_cap (N/C)       */
-	0,				/*  7 decay_res (N/C)        */
-	0,				/*  8 attack_decay_cap (N/C) */
-	0,				/* 10 attack_res (N/C)       */
-	RES_K(47),		/* 11 amplitude_res          */
-	RES_K(47),		/* 12 feedback_res           */
-	0,				/* 16 vco_voltage (N/C)      */
-	CAP_U(0.033),	/* 17 vco_cap                */
-	RES_K(33),		/* 18 vco_res                */
-	5.0,			/* 19 pitch_voltage          */
-	RES_K(47),		/* 20 slf_res                */
-	CAP_U(2.2),		/* 21 slf_cap                */
-	0,				/* 23 oneshot_cap (N/C)      */
-	0,				/* 24 oneshot_res (N/C)      */
-	1,				/* 22 vco                    */
-	0,				/* 26 mixer A                */
-	0,				/* 25 mixer B                */
-	0,				/* 27 mixer C                */
-	0,				/* 1  envelope 1             */
-	0,				/* 28 envelope 2             */
-	1				/* 9  enable (variable)      */
+	0,              /*  4 noise_res (N/C)        */
+	0,              /*  5 filter_res (N/C)       */
+	0,              /*  6 filter_cap (N/C)       */
+	0,              /*  7 decay_res (N/C)        */
+	0,              /*  8 attack_decay_cap (N/C) */
+	0,              /* 10 attack_res (N/C)       */
+	RES_K(47),      /* 11 amplitude_res          */
+	RES_K(47),      /* 12 feedback_res           */
+	0,              /* 16 vco_voltage (N/C)      */
+	CAP_U(0.033),   /* 17 vco_cap                */
+	RES_K(33),      /* 18 vco_res                */
+	5.0,            /* 19 pitch_voltage          */
+	RES_K(47),      /* 20 slf_res                */
+	CAP_U(2.2),     /* 21 slf_cap                */
+	0,              /* 23 oneshot_cap (N/C)      */
+	0,              /* 24 oneshot_res (N/C)      */
+	1,              /* 22 vco                    */
+	0,              /* 26 mixer A                */
+	0,              /* 25 mixer B                */
+	0,              /* 27 mixer C                */
+	0,              /* 1  envelope 1             */
+	0,              /* 28 envelope 2             */
+	1               /* 9  enable (variable)      */
 };
 
 

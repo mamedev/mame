@@ -13,10 +13,10 @@
 #include "emu.h"
 #include "video/nubus_spec8.h"
 
-#define SPEC8S3_SCREEN_NAME	"spec8s3_screen"
+#define SPEC8S3_SCREEN_NAME "spec8s3_screen"
 #define SPEC8S3_ROM_REGION  "spec8s3_rom"
 
-#define VRAM_SIZE	(0xc0000)   // 768k of VRAM for 1024x768 @ 8 bit
+#define VRAM_SIZE   (0xc0000)   // 768k of VRAM for 1024x768 @ 8 bit
 
 MACHINE_CONFIG_FRAGMENT( spec8s3 )
 	MCFG_SCREEN_ADD( SPEC8S3_SCREEN_NAME, RASTER)
@@ -66,14 +66,14 @@ const rom_entry *nubus_spec8s3_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_SPEC8S3, "SuperMac Spectrum/8 Series III video card", tag, owner, clock),
+		device_t(mconfig, NUBUS_SPEC8S3, "SuperMac Spectrum/8 Series III video card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_sp8s3";
 }
 
 nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_sp8s3";
@@ -102,7 +102,7 @@ void nubus_spec8s3_device::device_start()
 	m_nubus->install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
 
 	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;	// can we look this up now?
+	m_screen = NULL;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -233,7 +233,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 {
 	switch (offset)
 	{
-		case 0x385c:	// IRQ enable
+		case 0x385c:    // IRQ enable
 			if (data & 0x10)
 			{
 				m_vbl_disable = 1;

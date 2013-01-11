@@ -62,7 +62,7 @@ WRITE8_HANDLER(pc1403_lcd_write)
 	state->m_reg[offset]=data;
 }
 
-static const POCKETC_FIGURE	line={ /* simple line */
+static const POCKETC_FIGURE line={ /* simple line */
 	"11111",
 	"11111",
 	"11111e"
@@ -212,52 +212,50 @@ UINT32 pc1403_state::screen_update_pc1403(screen_device &screen, bitmap_ind16 &b
 		pocketc_draw_special(bitmap, m_RIGHT, m_DOWN-13, busy, color[0]);
 
 	pocketc_draw_special(bitmap, m_RIGHT+18, m_DOWN-13, def,
-			 m_reg[0x3d] & 0x02 ? color[1] : color[0]);
+				m_reg[0x3d] & 0x02 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+43, m_DOWN-13, shift,
-			 m_reg[0x3d] & 0x04 ? color[1] : color[0]);
+				m_reg[0x3d] & 0x04 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+63, m_DOWN-13, hyp,
-			 m_reg[0x3d] & 0x08 ? color[1] : color[0]);
+				m_reg[0x3d] & 0x08 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, m_RIGHT+155, m_DOWN-13, kana,
-			 m_reg[0x3c] & 0x01 ? color[1] : color[0]);
+				m_reg[0x3c] & 0x01 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+167, m_DOWN-13, shoo,
-			 m_reg[0x3c] & 0x02 ? color[1] : color[0]);
+				m_reg[0x3c] & 0x02 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+178, m_DOWN-13, sml,
-			 m_reg[0x3c] & 0x04 ? color[1] : color[0]);
+				m_reg[0x3c] & 0x04 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, m_RIGHT+191, m_DOWN-13, de,
-			 m_reg[0x7c] & 0x20 ? color[1] : color[0]);
+				m_reg[0x7c] & 0x20 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+199, m_DOWN-13, g,
-			 m_reg[0x7c] & 0x10 ? color[1] : color[0]);
+				m_reg[0x7c] & 0x10 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+203, m_DOWN-13, rad,
-			 m_reg[0x7c] & 0x08 ? color[1] : color[0]);
+				m_reg[0x7c] & 0x08 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, m_RIGHT+266, m_DOWN-13, braces,
-			 m_reg[0x7c] & 0x04 ? color[1] : color[0]);
+				m_reg[0x7c] & 0x04 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+274, m_DOWN-13, m,
-			 m_reg[0x7c] & 0x02 ? color[1] : color[0]);
+				m_reg[0x7c] & 0x02 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+281, m_DOWN-13, e,
-			 m_reg[0x7c] & 0x01 ? color[1] : color[0]);
+				m_reg[0x7c] & 0x01 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, m_RIGHT+10, m_DOWN+27, line /* empty */,
-			 m_reg[0x3c] & 0x40 ? color[1] : color[0]);
+				m_reg[0x3c] & 0x40 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+31, m_DOWN+27, line /*calc*/,
-			 m_reg[0x3d] & 0x40 ? color[1] : color[0]);
+				m_reg[0x3d] & 0x40 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+52, m_DOWN+27, line/*run*/,
-			 m_reg[0x3d] & 0x20 ? color[1] : color[0]);
+				m_reg[0x3d] & 0x20 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+73, m_DOWN+27, line/*prog*/,
-			 m_reg[0x3d] & 0x10 ? color[1] : color[0]);
+				m_reg[0x3d] & 0x10 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+94, m_DOWN+27, line /* empty */,
-			 m_reg[0x3c] & 0x20 ? color[1] : color[0]);
+				m_reg[0x3c] & 0x20 ? color[1] : color[0]);
 
 	pocketc_draw_special(bitmap, m_RIGHT+232, m_DOWN+27, line/*matrix*/,
-			 m_reg[0x3c] & 0x10 ? color[1] : color[0]);
+				m_reg[0x3c] & 0x10 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+253, m_DOWN+27, line/*stat*/,
-			 m_reg[0x3c] & 0x08 ? color[1] : color[0]);
+				m_reg[0x3c] & 0x08 ? color[1] : color[0]);
 	pocketc_draw_special(bitmap, m_RIGHT+274, m_DOWN+27, line/*print*/,
-			 m_reg[0x7c] & 0x40 ? color[1] : color[0]);
+				m_reg[0x7c] & 0x40 ? color[1] : color[0]);
 
 	return 0;
 }
-
-

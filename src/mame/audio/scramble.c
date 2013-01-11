@@ -19,7 +19,7 @@
 #include "sound/ay8910.h"
 #include "includes/scramble.h"
 
-#define AD2083_TMS5110_CLOCK		XTAL_640kHz
+#define AD2083_TMS5110_CLOCK        XTAL_640kHz
 
 /* The timer clock in Scramble which feeds the upper 4 bits of          */
 /* AY-3-8910 port A is based on the same clock                          */
@@ -101,8 +101,8 @@ static IRQ_CALLBACK(scramble_sh_irq_callback)
 	ttl7474_device *target = device->machine().device<ttl7474_device>("konami_7474");
 
 	/* interrupt acknowledge clears the flip-flop --
-       we need to pulse the CLR line because MAME's core never clears this
-       line, only asserts it */
+	   we need to pulse the CLR line because MAME's core never clears this
+	   line, only asserts it */
 	target->clear_w(0);
 
 	target->clear_w(1);
@@ -137,9 +137,9 @@ static void filter_w(device_t *device, int data)
 
 	C = 0;
 	if (data & 1)
-		C += 220000;	/* 220000pF = 0.220uF */
+		C += 220000;    /* 220000pF = 0.220uF */
 	if (data & 2)
-		C +=  47000;	/*  47000pF = 0.047uF */
+		C +=  47000;    /*  47000pF = 0.047uF */
 	if (device != NULL)
 		filter_rc_set_RC(device,FLT_RC_LOWPASS,1000,5100,0,CAP_P(C));
 }
@@ -323,38 +323,38 @@ static SOUND_START( ad2083 )
 
 static const tmsprom_interface prom_intf =
 {
-	"5110ctrl",						/* prom memory region - sound region is automatically assigned */
-	0x1000,							/* individual rom_size */
-	1,								/* bit # of pdc line */
+	"5110ctrl",                     /* prom memory region - sound region is automatically assigned */
+	0x1000,                         /* individual rom_size */
+	1,                              /* bit # of pdc line */
 	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	8,								/* bit # of ctl1 line */
-	2,								/* bit # of ctl2 line */
-	8,								/* bit # of ctl4 line */
-	2,								/* bit # of ctl8 line */
-	6,								/* bit # of rom reset */
-	7,								/* bit # of stop */
-	DEVCB_DEVICE_LINE("tms", tms5110_pdc_w),		/* tms pdc func */
-	DEVCB_DEVICE_HANDLER("tms", tms5110_ctl_w)		/* tms ctl func */
+	8,                              /* bit # of ctl1 line */
+	2,                              /* bit # of ctl2 line */
+	8,                              /* bit # of ctl4 line */
+	2,                              /* bit # of ctl8 line */
+	6,                              /* bit # of rom reset */
+	7,                              /* bit # of stop */
+	DEVCB_DEVICE_LINE("tms", tms5110_pdc_w),        /* tms pdc func */
+	DEVCB_DEVICE_HANDLER("tms", tms5110_ctl_w)      /* tms ctl func */
 };
 
 static const tms5110_interface ad2083_tms5110_interface =
 {
 	/* legacy interface */
-	NULL,											/* function to be called when chip requests another bit */
-	NULL,											/* speech ROM load address callback */
+	NULL,                                           /* function to be called when chip requests another bit */
+	NULL,                                           /* speech ROM load address callback */
 	/* new rom controller interface */
-	DEVCB_DEVICE_LINE("tmsprom", tmsprom_m0_w),		/* the M0 line */
-	DEVCB_NULL,										/* the M1 line */
-	DEVCB_NULL,										/* Write to ADD1,2,4,8 - 4 address bits */
-	DEVCB_DEVICE_LINE("tmsprom", tmsprom_data_r),	/* Read one bit from ADD8/Data - voice data */
-	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
+	DEVCB_DEVICE_LINE("tmsprom", tmsprom_m0_w),     /* the M0 line */
+	DEVCB_NULL,                                     /* the M1 line */
+	DEVCB_NULL,                                     /* Write to ADD1,2,4,8 - 4 address bits */
+	DEVCB_DEVICE_LINE("tmsprom", tmsprom_data_r),   /* Read one bit from ADD8/Data - voice data */
+	DEVCB_NULL                                      /* rom clock - Only used to drive the data lines */
 };
 
 
 
 MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)
 	MCFG_CPU_IO_MAP(ad2083_sound_io_map)
 

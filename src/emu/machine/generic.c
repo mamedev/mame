@@ -31,13 +31,13 @@ static void counters_save(running_machine &machine, int config_type, xml_data_no
 struct generic_machine_private
 {
 	/* tickets and coin counters */
-	UINT32		dispensed_tickets;
-	UINT32		coin_count[COIN_COUNTERS];
-	UINT32		coinlockedout[COIN_COUNTERS];
-	UINT32		lastcoin[COIN_COUNTERS];
+	UINT32      dispensed_tickets;
+	UINT32      coin_count[COIN_COUNTERS];
+	UINT32      coinlockedout[COIN_COUNTERS];
+	UINT32      lastcoin[COIN_COUNTERS];
 
 	/* memory card status */
-	int 		memcard_inserted;
+	int         memcard_inserted;
 };
 
 

@@ -11,12 +11,12 @@
 #include "includes/cclimber.h"
 
 
-#define CCLIMBER_FLIP_X		(state->m_flip_screen[0] & 0x01)
-#define CCLIMBER_FLIP_Y		(state->m_flip_screen[1] & 0x01)
-#define CCLIMBER_BG_PEN		(0)
-#define SWIMMER_SIDE_BG_PEN	(0x120)
-#define SWIMMER_BG_SPLIT	(0x18 * 8)
-#define YAMATO_SKY_PEN_BASE	(0x60)
+#define CCLIMBER_FLIP_X     (state->m_flip_screen[0] & 0x01)
+#define CCLIMBER_FLIP_Y     (state->m_flip_screen[1] & 0x01)
+#define CCLIMBER_BG_PEN     (0)
+#define SWIMMER_SIDE_BG_PEN (0x120)
+#define SWIMMER_BG_SPLIT    (0x18 * 8)
+#define YAMATO_SKY_PEN_BASE (0x60)
 
 
 /***************************************************************************
@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
@@ -355,8 +355,8 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
 		tile_index = tile_index ^ 0x20;
 
 	code = ((m_colorram[tile_index] & 0x10) << 5) |
-		   ((m_colorram[tile_index] & 0x20) << 3) |
-			 m_videoram[tile_index];
+			((m_colorram[tile_index] & 0x20) << 3) |
+				m_videoram[tile_index];
 
 	color = m_colorram[tile_index] & 0x0f;
 
@@ -445,7 +445,7 @@ VIDEO_START_MEMBER(cclimber_state,cclimber)
 	m_bs_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_bs_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
-	m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
+	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
 	m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
 }
 
@@ -459,7 +459,7 @@ VIDEO_START_MEMBER(cclimber_state,swimmer)
 	m_bs_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_bs_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
-	m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
+	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
 	m_bs_tilemap->set_transmask(1, 0xff, 0);  /* all 8 pens are transparent */
 }
 
@@ -475,7 +475,7 @@ VIDEO_START_MEMBER(cclimber_state,toprollr)
 	m_bs_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::toprollr_get_bs_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
-	m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
+	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
 	m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
 }
 
@@ -487,7 +487,7 @@ static void draw_playfield(running_machine &machine, bitmap_ind16 &bitmap, const
 
 	state->m_pf_tilemap->mark_all_dirty();
 	state->m_pf_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-								 (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+									(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
 	for (i = 0; i < 32; i++)
 		state->m_pf_tilemap->set_scrolly(i, state->m_column_scroll[i]);
 
@@ -512,7 +512,7 @@ static void cclimber_draw_bigsprite(running_machine &machine, bitmap_ind16 &bitm
 	state->m_bs_tilemap->mark_all_dirty();
 
 	state->m_bs_tilemap->set_flip((bigsprite_flip_x ? TILEMAP_FLIPX : 0) |
-								 (CCLIMBER_FLIP_Y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
+									(CCLIMBER_FLIP_Y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
 
 	state->m_bs_tilemap->set_scrollx(0, x);
 	state->m_bs_tilemap->set_scrolly(0, y);
@@ -544,18 +544,18 @@ static void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	int offs;
 
 	/* draw the sprites -- note that it is important to draw them exactly in this
-       order, to have the correct priorities. */
+	   order, to have the correct priorities. */
 	for (offs = 0x1c; offs >= 0; offs -= 4)
 	{
 		int x = state->m_spriteram[offs + 3] + 1;
 		/* x + 1 is evident in cclimber and ckong. It looks worse,
-        but it has been confirmed on several PCBs. */
+		but it has been confirmed on several PCBs. */
 
 		int y = 240 - state->m_spriteram[offs + 2];
 
 		int code = ((state->m_spriteram[offs + 1] & 0x10) << 3) |
-				   ((state->m_spriteram[offs + 1] & 0x20) << 1) |
-				   ( state->m_spriteram[offs + 0] & 0x3f);
+					((state->m_spriteram[offs + 1] & 0x20) << 1) |
+					( state->m_spriteram[offs + 0] & 0x3f);
 
 		int color = state->m_spriteram[offs + 1] & 0x0f;
 
@@ -585,15 +585,15 @@ static void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	int offs;
 
 	/* draw the sprites -- note that it is important to draw them exactly in this
-       order, to have the correct priorities. */
+	   order, to have the correct priorities. */
 	for (offs = 0x1c; offs >= 0; offs -= 4)
 	{
 		int x = state->m_spriteram[offs + 3];
 		int y = 240 - state->m_spriteram[offs + 2];
 
 		int code = ((state->m_spriteram[offs + 1] & 0x10) << 3) |
-				   ((state->m_spriteram[offs + 1] & 0x20) << 1) |
-				   ( state->m_spriteram[offs + 0] & 0x3f);
+					((state->m_spriteram[offs + 1] & 0x20) << 1) |
+					( state->m_spriteram[offs + 0] & 0x3f);
 
 		int color = state->m_spriteram[offs + 1] & 0x0f;
 
@@ -623,14 +623,14 @@ static void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int offs;
 
 	/* draw the sprites -- note that it is important to draw them exactly in this
-       order, to have the correct priorities. */
+	   order, to have the correct priorities. */
 	for (offs = 0x1c; offs >= 0; offs -= 4)
 	{
 		int x = state->m_spriteram[offs + 3];
 		int y = 240 - state->m_spriteram[offs + 2];
 
 		int code = ((state->m_spriteram[offs + 1] & 0x10) << 2) |
-				   (state->m_spriteram[offs + 0] & 0x3f);
+					(state->m_spriteram[offs + 0] & 0x3f);
 
 		int color = ((*state->m_swimmer_palettebank & 0x01) << 4) |
 					(state->m_spriteram[offs + 1] & 0x0f);
@@ -777,7 +777,7 @@ UINT32 cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_ind1
 
 	m_toproller_bg_tilemap->set_scrollx(0, m_toprollr_bg_videoram[0]);
 	m_toproller_bg_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-										   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+											(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
 	m_toproller_bg_tilemap->mark_all_dirty();
 	m_toproller_bg_tilemap->draw(bitmap, scroll_area_clip, 0, 0);
 
@@ -797,7 +797,7 @@ UINT32 cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_ind1
 
 	m_pf_tilemap->mark_all_dirty();
 	m_pf_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
-								 (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+									(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
 	m_pf_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

@@ -94,14 +94,14 @@ static const UINT8 asic_unlock_seq[15] =
    The following tables show the possible ram configurations :*/
 static const int RamConfigurations[8 * 4] =
 {
-	0, 1, 2, 3, 					   /* config 0 */
-	0, 1, 2, 7, 					   /* config 1 */
-	4, 5, 6, 7, 					   /* config 2 */
-	0, 3, 2, 7, 					   /* config 3 */
-	0, 4, 2, 3, 					   /* config 4 */
-	0, 5, 2, 3, 					   /* config 5 */
-	0, 6, 2, 3, 					   /* config 6 */
-	0, 7, 2, 3					     /* config 7 */
+	0, 1, 2, 3,                        /* config 0 */
+	0, 1, 2, 7,                        /* config 1 */
+	4, 5, 6, 7,                        /* config 2 */
+	0, 3, 2, 7,                        /* config 3 */
+	0, 4, 2, 3,                        /* config 4 */
+	0, 5, 2, 3,                        /* config 5 */
+	0, 6, 2, 3,                        /* config 6 */
+	0, 7, 2, 3                       /* config 7 */
 };
 
 
@@ -120,38 +120,38 @@ The hardware allows selection of 32 colours, but these extra colours are copies 
 
 static const rgb_t amstrad_palette[32] =
 {
-	MAKE_RGB(0x060, 0x060, 0x060),			   /* white */
-	MAKE_RGB(0x060, 0x060, 0x060),			   /* white */
-	MAKE_RGB(0x000, 0x0ff, 0x060),			   /* sea green */
-	MAKE_RGB(0x0ff, 0x0ff, 0x060),			   /* pastel yellow */
-	MAKE_RGB(0x000, 0x000, 0x060),			   /* blue */
-	MAKE_RGB(0x0ff, 0x000, 0x060),			   /* purple */
-	MAKE_RGB(0x000, 0x060, 0x060),			   /* cyan */
-	MAKE_RGB(0x0ff, 0x060, 0x060),			   /* pink */
-	MAKE_RGB(0x0ff, 0x000, 0x060),			   /* purple */
-	MAKE_RGB(0x0ff, 0x0ff, 0x060),			   /* pastel yellow */
-	MAKE_RGB(0x0ff, 0x0ff, 0x000),			   /* bright yellow */
-	MAKE_RGB(0x0ff, 0x0ff, 0x0ff),			   /* bright white */
-	MAKE_RGB(0x0ff, 0x000, 0x000),			   /* bright red */
-	MAKE_RGB(0x0ff, 0x000, 0x0ff),			   /* bright magenta */
-	MAKE_RGB(0x0ff, 0x060, 0x000),			   /* orange */
-	MAKE_RGB(0x0ff, 0x060, 0x0ff),			   /* pastel magenta */
-	MAKE_RGB(0x000, 0x000, 0x060),			   /* blue */
-	MAKE_RGB(0x000, 0x0ff, 0x060),			   /* sea green */
-	MAKE_RGB(0x000, 0x0ff, 0x000),			   /* bright green */
-	MAKE_RGB(0x000, 0x0ff, 0x0ff),			   /* bright cyan */
-	MAKE_RGB(0x000, 0x000, 0x000),			   /* black */
-	MAKE_RGB(0x000, 0x000, 0x0ff),			   /* bright blue */
-	MAKE_RGB(0x000, 0x060, 0x000),			   /* green */
-	MAKE_RGB(0x000, 0x060, 0x0ff),			   /* sky blue */
-	MAKE_RGB(0x060, 0x000, 0x060),			   /* magenta */
-	MAKE_RGB(0x060, 0x0ff, 0x060),			   /* pastel green */
-	MAKE_RGB(0x060, 0x0ff, 0x060),			   /* lime */
-	MAKE_RGB(0x060, 0x0ff, 0x0ff),			   /* pastel cyan */
-	MAKE_RGB(0x060, 0x000, 0x000),			   /* Red */
-	MAKE_RGB(0x060, 0x000, 0x0ff),			   /* mauve */
-	MAKE_RGB(0x060, 0x060, 0x000),			   /* yellow */
-	MAKE_RGB(0x060, 0x060, 0x0ff)			   /* pastel blue */
+	MAKE_RGB(0x060, 0x060, 0x060),             /* white */
+	MAKE_RGB(0x060, 0x060, 0x060),             /* white */
+	MAKE_RGB(0x000, 0x0ff, 0x060),             /* sea green */
+	MAKE_RGB(0x0ff, 0x0ff, 0x060),             /* pastel yellow */
+	MAKE_RGB(0x000, 0x000, 0x060),             /* blue */
+	MAKE_RGB(0x0ff, 0x000, 0x060),             /* purple */
+	MAKE_RGB(0x000, 0x060, 0x060),             /* cyan */
+	MAKE_RGB(0x0ff, 0x060, 0x060),             /* pink */
+	MAKE_RGB(0x0ff, 0x000, 0x060),             /* purple */
+	MAKE_RGB(0x0ff, 0x0ff, 0x060),             /* pastel yellow */
+	MAKE_RGB(0x0ff, 0x0ff, 0x000),             /* bright yellow */
+	MAKE_RGB(0x0ff, 0x0ff, 0x0ff),             /* bright white */
+	MAKE_RGB(0x0ff, 0x000, 0x000),             /* bright red */
+	MAKE_RGB(0x0ff, 0x000, 0x0ff),             /* bright magenta */
+	MAKE_RGB(0x0ff, 0x060, 0x000),             /* orange */
+	MAKE_RGB(0x0ff, 0x060, 0x0ff),             /* pastel magenta */
+	MAKE_RGB(0x000, 0x000, 0x060),             /* blue */
+	MAKE_RGB(0x000, 0x0ff, 0x060),             /* sea green */
+	MAKE_RGB(0x000, 0x0ff, 0x000),             /* bright green */
+	MAKE_RGB(0x000, 0x0ff, 0x0ff),             /* bright cyan */
+	MAKE_RGB(0x000, 0x000, 0x000),             /* black */
+	MAKE_RGB(0x000, 0x000, 0x0ff),             /* bright blue */
+	MAKE_RGB(0x000, 0x060, 0x000),             /* green */
+	MAKE_RGB(0x000, 0x060, 0x0ff),             /* sky blue */
+	MAKE_RGB(0x060, 0x000, 0x060),             /* magenta */
+	MAKE_RGB(0x060, 0x0ff, 0x060),             /* pastel green */
+	MAKE_RGB(0x060, 0x0ff, 0x060),             /* lime */
+	MAKE_RGB(0x060, 0x0ff, 0x0ff),             /* pastel cyan */
+	MAKE_RGB(0x060, 0x000, 0x000),             /* Red */
+	MAKE_RGB(0x060, 0x000, 0x0ff),             /* mauve */
+	MAKE_RGB(0x060, 0x060, 0x000),             /* yellow */
+	MAKE_RGB(0x060, 0x060, 0x0ff)              /* pastel blue */
 };
 
 
@@ -384,25 +384,25 @@ static void amstrad_vh_update_mode( amstrad_state *state )
 		/* select a cpc plus mode */
 		switch ( state->m_gate_array.mrer & 0x03 )
 		{
-		case 0:		/* Mode 0: 160x200, 16 colours */
+		case 0:     /* Mode 0: 160x200, 16 colours */
 			state->m_gate_array.mode_lookup = state->m_mode0_lookup;
 			state->m_gate_array.max_colour_ticks = 4;
 			state->m_gate_array.ticks_increment = 1;
 			break;
 
-		case 1:		/* Mode 1: 320x200, 4 colous */
+		case 1:     /* Mode 1: 320x200, 4 colous */
 			state->m_gate_array.mode_lookup = state->m_mode1_lookup;
 			state->m_gate_array.max_colour_ticks = 2;
 			state->m_gate_array.ticks_increment = 1;
 			break;
 
-		case 2:		/* Mode 2: 640x200, 2 colours */
+		case 2:     /* Mode 2: 640x200, 2 colours */
 			state->m_gate_array.mode_lookup = state->m_mode2_lookup;
 			state->m_gate_array.max_colour_ticks = 1;
 			state->m_gate_array.ticks_increment = 1;
 			break;
 
-		case 3:		/* Mode 3: 160x200, 4 colours */
+		case 3:     /* Mode 3: 160x200, 4 colours */
 			state->m_gate_array.mode_lookup = state->m_mode0_lookup;
 			state->m_gate_array.max_colour_ticks = 4;
 			state->m_gate_array.ticks_increment = 1;
@@ -416,25 +416,25 @@ static void amstrad_vh_update_mode( amstrad_state *state )
 			/* select an aleste mode */
 			switch ( state->m_gate_array.mrer & 0x03 )
 			{
-			case 0:		/* Aleste Mode 0 (= Amstrad CPC mode 2): 640x200, 2 colours */
+			case 0:     /* Aleste Mode 0 (= Amstrad CPC mode 2): 640x200, 2 colours */
 				state->m_gate_array.mode_lookup = state->m_mode2_lookup;
 				state->m_gate_array.max_colour_ticks = 1;
 				state->m_gate_array.ticks_increment = 1;
 				break;
 
-			case 1:		/* Aleste mode 1 (= Amstrad CPC mode 1): 320x200, 4 colours */
+			case 1:     /* Aleste mode 1 (= Amstrad CPC mode 1): 320x200, 4 colours */
 				state->m_gate_array.mode_lookup = state->m_mode1_lookup;
 				state->m_gate_array.max_colour_ticks = 2;
 				state->m_gate_array.ticks_increment = 1;
 				break;
 
-			case 2:		/* Aleste mode 2: 4 colours */
+			case 2:     /* Aleste mode 2: 4 colours */
 				state->m_gate_array.mode_lookup = state->m_mode1_lookup;
 				state->m_gate_array.max_colour_ticks = 1;
 				state->m_gate_array.ticks_increment = 2;
 				break;
 
-			case 3:		/* Aleste mode 3: 16 colours */
+			case 3:     /* Aleste mode 3: 16 colours */
 				state->m_gate_array.mode_lookup = state->m_mode0_lookup;
 				state->m_gate_array.max_colour_ticks = 2;
 				state->m_gate_array.ticks_increment = 2;
@@ -446,25 +446,25 @@ static void amstrad_vh_update_mode( amstrad_state *state )
 			/* select an original cpc mode */
 			switch ( state->m_gate_array.mrer & 0x03 )
 			{
-			case 0:		/* Mode 0: 160x200, 16 colours */
+			case 0:     /* Mode 0: 160x200, 16 colours */
 				state->m_gate_array.mode_lookup = state->m_mode0_lookup;
 				state->m_gate_array.max_colour_ticks = 4;
 				state->m_gate_array.ticks_increment = 1;
 				break;
 
-			case 1:		/* Mode 1: 320x200, 4 colous */
+			case 1:     /* Mode 1: 320x200, 4 colous */
 				state->m_gate_array.mode_lookup = state->m_mode1_lookup;
 				state->m_gate_array.max_colour_ticks = 2;
 				state->m_gate_array.ticks_increment = 1;
 				break;
 
-			case 2:		/* Mode 2: 640x200, 2 colours */
+			case 2:     /* Mode 2: 640x200, 2 colours */
 				state->m_gate_array.mode_lookup = state->m_mode2_lookup;
 				state->m_gate_array.max_colour_ticks = 1;
 				state->m_gate_array.ticks_increment = 1;
 				break;
 
-			case 3:		/* Mode 3: 160x200, 4 colours */
+			case 3:     /* Mode 3: 160x200, 4 colours */
 				state->m_gate_array.mode_lookup = state->m_mode0_lookup;
 				state->m_gate_array.max_colour_ticks = 4;
 				state->m_gate_array.ticks_increment = 1;
@@ -662,7 +662,7 @@ INLINE void amstrad_update_video( running_machine &machine )
 					state->m_gate_array.colour = state->m_GateArray_render_colours[ state->m_gate_array.mode_lookup[state->m_gate_array.data] ];
 					break;
 				case 16:
-					state->m_gate_array.ma += 1;						/* If we were synced with the 6845 mc6845_get_ma should return this value */
+					state->m_gate_array.ma += 1;                        /* If we were synced with the 6845 mc6845_get_ma should return this value */
 					amstrad_gate_array_get_video_data( machine );
 					break;
 				}
@@ -752,7 +752,7 @@ INLINE void amstrad_plus_update_video( running_machine &machine )
 						}
 						break;
 					case 16:
-						state->m_gate_array.ma += 1;						/* If we were synced with the 6845 mc6845_get_ma should return this value */
+						state->m_gate_array.ma += 1;                        /* If we were synced with the 6845 mc6845_get_ma should return this value */
 						amstrad_plus_gate_array_get_video_data( machine );
 						break;
 					}
@@ -776,7 +776,7 @@ INLINE void amstrad_plus_update_video( running_machine &machine )
 INLINE void amstrad_plus_update_video_sprites( running_machine &machine )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	UINT16	*p = &state->m_gate_array.bitmap->pix16(state->m_gate_array.y, state->m_asic.h_start );
+	UINT16  *p = &state->m_gate_array.bitmap->pix16(state->m_gate_array.y, state->m_asic.h_start );
 	int i;
 
 	if ( state->m_gate_array.y < 0 )
@@ -784,14 +784,14 @@ INLINE void amstrad_plus_update_video_sprites( running_machine &machine )
 
 	for ( i = 15 * 8; i >= 0; i -= 8 )
 	{
-		UINT8	xmag = ( state->m_asic.ram[ 0x2000 + i + 4 ] >> 2 ) & 0x03;
-		UINT8	ymag = state->m_asic.ram[ 0x2000 + i + 4 ] & 0x03;
+		UINT8   xmag = ( state->m_asic.ram[ 0x2000 + i + 4 ] >> 2 ) & 0x03;
+		UINT8   ymag = state->m_asic.ram[ 0x2000 + i + 4 ] & 0x03;
 
 		/* Check if sprite is enabled */
 		if ( xmag && ymag )
 		{
-			INT16	spr_x = state->m_asic.ram[ 0x2000 + i ] + ( state->m_asic.ram[ 0x2001 + i ] << 8 );
-			INT16	spr_y = state->m_asic.ram[ 0x2002 + i ] + ( state->m_asic.ram[ 0x2003 + i ] << 8 );
+			INT16   spr_x = state->m_asic.ram[ 0x2000 + i ] + ( state->m_asic.ram[ 0x2001 + i ] << 8 );
+			INT16   spr_y = state->m_asic.ram[ 0x2002 + i ] + ( state->m_asic.ram[ 0x2003 + i ] << 8 );
 
 			xmag -= 1;
 			ymag -= 1;
@@ -799,8 +799,8 @@ INLINE void amstrad_plus_update_video_sprites( running_machine &machine )
 			/* Check if sprite would appear on this scanline */
 			if ( spr_y <= state->m_asic.vpos && state->m_asic.vpos < spr_y + ( 16 << ymag ) && spr_x < ( state->m_asic.h_end - state->m_asic.h_start ) && spr_x + ( 16 << xmag ) > 0 )
 			{
-				UINT16	spr_addr = i * 32 + ( ( ( state->m_asic.vpos - spr_y ) >> ymag ) * 16 );
-				int		j, k;
+				UINT16  spr_addr = i * 32 + ( ( ( state->m_asic.vpos - spr_y ) >> ymag ) * 16 );
+				int     j, k;
 
 				for ( j = 0; j < 16; j++ )
 				{
@@ -810,7 +810,7 @@ INLINE void amstrad_plus_update_video_sprites( running_machine &machine )
 
 						if ( x >= 0 && x < ( state->m_asic.h_end - state->m_asic.h_start ) )
 						{
-							UINT8	spr_col = ( state->m_asic.ram[ spr_addr + j ] & 0x0f ) * 2;
+							UINT8   spr_col = ( state->m_asic.ram[ spr_addr + j ] & 0x0f ) * 2;
 
 							if ( spr_col )
 								p[x] = state->m_asic.ram[ 0x2420 + spr_col ] + ( state->m_asic.ram[ 0x2421 + spr_col ] << 8 );
@@ -928,7 +928,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 			// CPC+/GX4000 Split screen registers  (disabled if &6801 in ASIC RAM is 0)
 			if(m_asic.ram[0x2801] != 0)
 			{
-				if ( m_asic.ram[0x2801] == m_asic.vpos - 1 )	// split occurs here (hopefully)
+				if ( m_asic.ram[0x2801] == m_asic.vpos - 1 )    // split occurs here (hopefully)
 				{
 					logerror("SSCR: Split screen occurred at scanline %d\n",m_asic.ram[0x2801]);
 				}
@@ -1071,30 +1071,30 @@ UINT32 amstrad_state::screen_update_amstrad(screen_device &screen, bitmap_ind16 
 
 const mc6845_interface amstrad_mc6845_intf =
 {
-	NULL,									/* screen name */
-	16,										/* number of pixels per video memory address */
-	NULL,									/* begin_update */
-	NULL,									/* update_row */
-	NULL,									/* end_update */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_de_changed),			/* on_de_changed */
-	DEVCB_NULL,								/* on_cur_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_hsync_changed),		/* on_hsync_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_vsync_changed),		/* on_vsync_changed */
+	NULL,                                   /* screen name */
+	16,                                     /* number of pixels per video memory address */
+	NULL,                                   /* begin_update */
+	NULL,                                   /* update_row */
+	NULL,                                   /* end_update */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_de_changed),         /* on_de_changed */
+	DEVCB_NULL,                             /* on_cur_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_hsync_changed),      /* on_hsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_vsync_changed),      /* on_vsync_changed */
 	NULL
 };
 
 
 const mc6845_interface amstrad_plus_mc6845_intf =
 {
-	NULL,										/* screen name */
-	16,											/* number of pixels per video memory address */
-	NULL,										/* begin_update */
-	NULL,										/* update_row */
-	NULL,										/* end_update */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_de_changed),		/* on_de_changed */
-	DEVCB_NULL,									/* on_cur_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_hsync_changed),		/* on_hsync_changed */
-	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_vsync_changed),		/* on_vsync_changed */
+	NULL,                                       /* screen name */
+	16,                                         /* number of pixels per video memory address */
+	NULL,                                       /* begin_update */
+	NULL,                                       /* update_row */
+	NULL,                                       /* end_update */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_de_changed),        /* on_de_changed */
+	DEVCB_NULL,                                 /* on_cur_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_hsync_changed),     /* on_hsync_changed */
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state,amstrad_plus_vsync_changed),     /* on_vsync_changed */
 	NULL
 };
 
@@ -1674,8 +1674,8 @@ Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper
 Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 	case 0x02:
 		/* If bit 5 is enabled on a CPC Plus/GX4000 when the ASIC is unlocked, sets the lower ROM position and cart bank
-           b5 = 1, b4b3 = RAM position for lower ROM area and if the ASIC registers are visible at &4000,
-           b2b1b0 = cartridge bank to read from lower ROM area (0-7 only) */
+		   b5 = 1, b4b3 = RAM position for lower ROM area and if the ASIC registers are visible at &4000,
+		   b2b1b0 = cartridge bank to read from lower ROM area (0-7 only) */
 		if ( state->m_system_type == SYSTEM_PLUS || state->m_system_type == SYSTEM_GX4000 )
 		{
 			if ( state->m_asic.enabled && (dataToGateArray & 0x20) )
@@ -1693,7 +1693,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		}
 
 		/* If bit 4 of the "Select screen mode and rom configuration" register of the Gate-Array is set to "1"
-         then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
+		 then the interrupt request is cleared and the 6-bit counter is reset to "0".  */
 		if ( state->m_gate_array.mrer & 0x10 )
 		{
 			state->m_gate_array.hsync_counter = 0;
@@ -1883,7 +1883,7 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 			data = mc6845->status_r( space, 0 );
 #if 0
 			/* CRTC Type 1 : Read Status Register
-               CRTC Type 3 or 4 : Read from selected internal 6845 register */
+			   CRTC Type 3 or 4 : Read from selected internal 6845 register */
 			switch(crtc_type) {
 			case M6845_PERSONALITY_UM6845R:
 				data = amstrad_CRTC_CR; /* Read Status Register */
@@ -2015,7 +2015,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	{
 		switch ((offset & 0x0300) >> 8) // r1r0
 		{
-		case 0x00:		/* Select internal 6845 register Write Only */
+		case 0x00:      /* Select internal 6845 register Write Only */
 			mc6845->address_w( space, 0, data );
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
 				amstrad_plus_seqcheck(data);
@@ -2026,7 +2026,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 
 			m_asic.addr_6845 = data;
 			break;
-		case 0x01:		/* Write to selected internal 6845 register Write Only */
+		case 0x01:      /* Write to selected internal 6845 register Write Only */
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
 				machine().scheduler().timer_set( attotime::from_usec(0), timer_expired_delegate(FUNC(amstrad_state::amstrad_video_update_timer),this),1);
 			else
@@ -2072,12 +2072,12 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	}
 
 	/* if b11 = 0 : 8255 PPI Write selected - bits 9 and 8 then define the PPI function access as shown below:
-    b9 b8 | PPI Function Read/Write status
-    0  0  | Port A data  Read/Write
-    0  1  | Port B data  Read/Write
-    1  0  | Port C data  Read/Write
-    1  1  | Control      Write Only
-    */
+	b9 b8 | PPI Function Read/Write status
+	0  0  | Port A data  Read/Write
+	0  1  | Port B data  Read/Write
+	1  0  | Port C data  Read/Write
+	1  1  | Control      Write Only
+	*/
 	if ((offset & (1<<11)) == 0)
 	{
 		unsigned int Index = ((offset & 0x0300) >> 8);
@@ -2115,8 +2115,8 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 				{
 				case 0x00: {
 					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-                     * "1" the FDD motor will be active.
-                     * "0" the FDD motor will be in-active.*/
+					 * "1" the FDD motor will be active.
+					 * "0" the FDD motor will be in-active.*/
 					floppy_image_device *floppy;
 					floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
 					if(floppy)
@@ -2124,7 +2124,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 					floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
 					if(floppy)
 						floppy->mon_w(!BIT(data, 0));
-				  break;
+					break;
 				}
 
 				case 0x03: /* Write Data register of FDC */
@@ -2139,12 +2139,12 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	}
 
 	/*  Aleste Extend Port:
-        D0 - VRAM Bank 0/1 (64K)
-        D1 - MODE 0-Norm ,1-High resolution
-        D2 - MAPMOD 0-Amstrad ,1-Yamaha mapper
-        D3 - MAP Page 0/1 (256K)
-        D4 - 580WI53
-        D5 - 0-AY8910 ,1-512WI1 */
+	    D0 - VRAM Bank 0/1 (64K)
+	    D1 - MODE 0-Norm ,1-High resolution
+	    D2 - MAPMOD 0-Amstrad ,1-Yamaha mapper
+	    D3 - MAP Page 0/1 (256K)
+	    D4 - 580WI53
+	    D5 - 0-AY8910 ,1-512WI1 */
 	if(offset == 0xfabf)
 	{
 		m_aleste_mode = data;
@@ -2330,7 +2330,7 @@ static void amstrad_rethinkMemory(running_machine &machine)
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	cpc_multiface2_device* mface2;
 	/* the following is used for banked memory read/writes and for setting up
-     * opcode and opcode argument reads */
+	 * opcode and opcode argument reads */
 
 	/* bank 0 - 0x0000..0x03fff */
 	amstrad_setLowerRom(machine);
@@ -2642,8 +2642,8 @@ When port B is defined as input (bit 7 of register 7 is set to "0"), a read of t
 READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 {
 	/* Read CPC Keyboard
-   If keyboard matrix line 11-14 are selected, the byte is always &ff.
-   After testing on a real CPC, it is found that these never change, they always return &FF. */
+	If keyboard matrix line 11-14 are selected, the byte is always &ff.
+	After testing on a real CPC, it is found that these never change, they always return &FF. */
 
 	static const char *const keynames[] = {
 		"keyboard_row_0", "keyboard_row_1", "keyboard_row_2", "keyboard_row_3", "keyboard_row_4",
@@ -2697,82 +2697,82 @@ static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
 
 /* the following timings have been measured! */
 static const UINT8 amstrad_cycle_table_op[256] = {
-	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
+		4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
 	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
-	 8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
-	 8, 12, 16,  8, 12, 12, 12,  4,  8, 12, 16,  8,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 8,  8,  8,  8,  8,  8,  4,  8,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
-	 8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
-	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
+		8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
+		8, 12, 16,  8, 12, 12, 12,  4,  8, 12, 16,  8,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		8,  8,  8,  8,  8,  8,  4,  8,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
+		8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
+		8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
+		8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
 };
 
 static const UINT8 amstrad_cycle_table_cb[256]=
 {
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-	 4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4
 };
 
 static const UINT8 amstrad_cycle_table_ed[256]=
 {
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	12, 12, 12, 20,  4, 12,  4,  8, 12, 12, 12, 20,  4, 12,  4,  8,
 	12, 12, 12, 20,  4, 12,  4,  8, 12, 12, 12, 20,  4, 12,  4,  8,
 	12, 12, 12, 20,  4, 12,  4, 16, 12, 12, 12, 20,  4, 12,  4, 16,
 	12, 12, 12, 20,  4, 12,  4,  4, 12, 12, 12, 20,  4, 12,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	16, 12, 16, 16,  4,  4,  4,  4, 16, 12, 16, 16,  4,  4,  4,  4,
 	16, 12, 16, 16,  4,  4,  4,  4, 16, 12, 16, 16,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4
 };
 
 static const UINT8 amstrad_cycle_table_xy[256]=
 {
-	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
+		4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
 	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
-	 8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
-	 8, 12, 16,  8, 20, 20, 20,  4,  8, 12, 16,  8,  4,  4,  8,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+		8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
+		8, 12, 16,  8, 20, 20, 20,  4,  8, 12, 16,  8,  4,  4,  8,  4,
+		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
 	16, 16, 16, 16, 16, 16,  4, 16,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
-	 8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
-	 8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
-	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
+		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+		8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
+		8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
+		8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
+		8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
 };
 
 static const UINT8 amstrad_cycle_table_xycb[256]=
@@ -2797,22 +2797,22 @@ static const UINT8 amstrad_cycle_table_xycb[256]=
 
 static const UINT8 amstrad_cycle_table_ex[256]=
 {
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 4,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
-	 4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 4,  8,  4,  4,  0,  0,  0,  0,  4,  8,  4,  4,  0,  0,  0,  0,
-	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		4,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
+		4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		4,  8,  4,  4,  0,  0,  0,  0,  4,  8,  4,  4,  0,  0,  0,  0,
+		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
+		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
+		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
+		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
 };
 
 static void amstrad_common_init(running_machine &machine)
@@ -2878,15 +2878,15 @@ static void amstrad_common_init(running_machine &machine)
 		state->m_maincpu->set_input_line_vector(0, 0x00);
 
 	/* The opcode timing in the Amstrad is different to the opcode
-    timing in the core for the Z80 CPU.
+	timing in the core for the Z80 CPU.
 
-    The Amstrad hardware issues a HALT for each memory fetch.
-    This has the effect of stretching the timing for Z80 opcodes,
-    so that they are all multiple of 4 T states long. All opcode
-    timings are a multiple of 1us in length. */
+	The Amstrad hardware issues a HALT for each memory fetch.
+	This has the effect of stretching the timing for Z80 opcodes,
+	so that they are all multiple of 4 T states long. All opcode
+	timings are a multiple of 1us in length. */
 
 	/* Using the cool code Juergen has provided, I will override
-    the timing tables with the values for the amstrad */
+	the timing tables with the values for the amstrad */
 	z80_set_cycle_tables(state->m_maincpu,
 		(const UINT8*)amstrad_cycle_table_op,
 		(const UINT8*)amstrad_cycle_table_cb,
@@ -3073,10 +3073,10 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 	kccomp_reset_machine(machine());
 
 	/* bit 1 = /TEST. When 0, KC compact will enter data transfer
-    sequence, where another system using the expansion port signals
-    DATA2,DATA1, /STROBE and DATA7 can transfer 256 bytes of program.
-    When the program has been transfered, it will be executed. This
-    is not supported in the driver */
+	sequence, where another system using the expansion port signals
+	DATA2,DATA1, /STROBE and DATA7 can transfer 256 bytes of program.
+	When the program has been transfered, it will be executed. This
+	is not supported in the driver */
 	/* bit 3,4 are tied to +5V, bit 2 is tied to 0V */
 	m_ppi_port_inputs[amstrad_ppi_PortB] = (1<<4) | (1<<3) | 2;
 }
@@ -3179,7 +3179,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	if (strncmp((char *)header, "RIFF", 4) != 0)
 	{
 		logerror("IMG: raw CPC+ cartridge file\n");
-		offset -= 12;	// no header, so we go back to the start of the file
+		offset -= 12;   // no header, so we go back to the start of the file
 
 		// not an RIFF format file, assume raw binary (*.bin)
 		while (offset < size)
@@ -3195,7 +3195,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 			offset += 0x4000;
 		}
 	}
-	else if (image.software_entry() == NULL)	// we have no CPR carts in our gx4000 softlist
+	else if (image.software_entry() == NULL)    // we have no CPR carts in our gx4000 softlist
 	{
 		// Is RIFF format (*.cpr)
 		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
@@ -3256,7 +3256,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 			}
 		}
 	}
-	else	// CPR carts in our softlist
+	else    // CPR carts in our softlist
 	{
 		logerror("Gamelist cart in RIFF format\n");
 		auto_free(image.device().machine(), temp_copy);

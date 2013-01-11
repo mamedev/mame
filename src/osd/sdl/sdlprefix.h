@@ -77,12 +77,11 @@ void *__cdecl _alloca(size_t);
 #endif
 
 #ifdef __GNUC__
-#define alloca	__builtin_alloca
+#define alloca  __builtin_alloca
 #endif
 
 //============================================================
 // misc.
 //============================================================
 
-#define PATH_SEPARATOR		"/"
-
+#define PATH_SEPARATOR      "/"

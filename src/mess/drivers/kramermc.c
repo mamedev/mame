@@ -18,15 +18,15 @@ GFXDECODE_END
 
 /* Address maps */
 static ADDRESS_MAP_START(kramermc_mem, AS_PROGRAM, 8, kramermc_state )
-    AM_RANGE( 0x0000, 0x03ff ) AM_ROM  // Monitor
-    AM_RANGE( 0x0400, 0x07ff ) AM_ROM  // Debugger
-    AM_RANGE( 0x0800, 0x0bff ) AM_ROM  // Reassembler
-    AM_RANGE( 0x0c00, 0x0fff ) AM_RAM  // System RAM
-    AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // User RAM
-    AM_RANGE( 0x8000, 0xafff ) AM_ROM  // BASIC
-    AM_RANGE( 0xc000, 0xc3ff ) AM_ROM  // Editor
-    AM_RANGE( 0xc400, 0xdfff ) AM_ROM  // Assembler
-    AM_RANGE( 0xfc00, 0xffff ) AM_RAM  // Video RAM
+	AM_RANGE( 0x0000, 0x03ff ) AM_ROM  // Monitor
+	AM_RANGE( 0x0400, 0x07ff ) AM_ROM  // Debugger
+	AM_RANGE( 0x0800, 0x0bff ) AM_ROM  // Reassembler
+	AM_RANGE( 0x0c00, 0x0fff ) AM_RAM  // System RAM
+	AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // User RAM
+	AM_RANGE( 0x8000, 0xafff ) AM_ROM  // BASIC
+	AM_RANGE( 0xc000, 0xc3ff ) AM_ROM  // Editor
+	AM_RANGE( 0xc400, 0xdfff ) AM_ROM  // Assembler
+	AM_RANGE( 0xfc00, 0xffff ) AM_RAM  // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kramermc_io, AS_IO, 8, kramermc_state )
@@ -135,7 +135,7 @@ ROM_START( kramermc )
 	ROM_LOAD( "reass.kmc",    0x0800, 0x0400, CRC(7cc8e605) SHA1(3319a96aad710441af30dace906b9725e07ca92c) )
 	ROM_LOAD( "basic.kmc",  0x8000, 0x3000, CRC(7531801e) SHA1(61d055495ffcc4a281ef0abc3e299ea95f42544b) )
 	ROM_LOAD( "editor.kmc", 0xc000, 0x0400, CRC(2fd4cb84) SHA1(505615a218865aa8becde13848a23e1241a14b96) )
-	ROM_LOAD( "ass.kmc",		0xc400, 0x1c00, CRC(9a09422e) SHA1(a578d2cf0ea6eb35dcd13e4107e15187de906097) )
+	ROM_LOAD( "ass.kmc",        0xc400, 0x1c00, CRC(9a09422e) SHA1(a578d2cf0ea6eb35dcd13e4107e15187de906097) )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("chargen.kmc", 0x0000, 0x0800, CRC(1ba52f9f) SHA1(71bbad90dd427d0132c871a4d3848ab3d4d84b8a))
 ROM_END
@@ -143,4 +143,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT                 COMPANY                 FULLNAME   FLAGS */
-COMP( 1987, kramermc,     0,      0,	kramermc,	kramermc, kramermc_state,	kramermc,"Manfred Kramer", "Kramer MC",		 GAME_NO_SOUND)
+COMP( 1987, kramermc,     0,      0,    kramermc,   kramermc, kramermc_state,   kramermc,"Manfred Kramer", "Kramer MC",      GAME_NO_SOUND)

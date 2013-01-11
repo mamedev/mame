@@ -54,7 +54,7 @@ public:
 DECLARE_WRITE8_DEVICE_HANDLER( geebee_sound_w );
 
 class geebee_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -84,7 +84,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( warpwarp_music1_w );
 DECLARE_WRITE8_DEVICE_HANDLER( warpwarp_music2_w );
 
 class warpwarp_sound_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -105,4 +105,3 @@ private:
 };
 
 extern const device_type WARPWARP;
-

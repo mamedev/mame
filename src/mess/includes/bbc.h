@@ -25,13 +25,13 @@ class bbc_state : public driver_device
 public:
 	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_sn(*this, "sn76489"),
-		  m_trom(*this, "saa505x"),
-		  m_ACCCON_IRR(CLEAR_LINE),
-		  m_via_system_irq(CLEAR_LINE),
-		  m_via_user_irq(CLEAR_LINE),
-		  m_acia_irq(CLEAR_LINE)
+			m_maincpu(*this, "maincpu"),
+			m_sn(*this, "sn76489"),
+			m_trom(*this, "saa505x"),
+			m_ACCCON_IRR(CLEAR_LINE),
+			m_via_system_irq(CLEAR_LINE),
+			m_via_user_irq(CLEAR_LINE),
+			m_acia_irq(CLEAR_LINE)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -40,43 +40,43 @@ public:
 
 	void check_interrupts();
 
-	int m_RAMSize;			// BBC Memory Size
-	int m_DFSType;			// this stores the DIP switch setting for the DFS type being used
-	int m_SWRAMtype;		// this stores the DIP switch setting for the SWRAM type being used
-	int m_Master;			// if 0 then we are emulating a BBC B style machine
+	int m_RAMSize;          // BBC Memory Size
+	int m_DFSType;          // this stores the DIP switch setting for the DFS type being used
+	int m_SWRAMtype;        // this stores the DIP switch setting for the SWRAM type being used
+	int m_Master;           // if 0 then we are emulating a BBC B style machine
 							// if 1 then we are emulating a BBC Master style machine
 
-	int m_ACCCON_IRR;		//  IRQ inputs
+	int m_ACCCON_IRR;       //  IRQ inputs
 
-	int m_rombank;			// This is the latch that holds the sideways ROM bank to read
+	int m_rombank;          // This is the latch that holds the sideways ROM bank to read
 
-	int m_userport;			// This stores the sideways RAM latch type.
+	int m_userport;         // This stores the sideways RAM latch type.
 							// Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
 							// Solidisc use the BBC's userport to select the write bank to be used (type 1)
 
-	int m_pagedRAM;			// BBC B+ memory handling
-	int m_vdusel;			// BBC B+ memory handling
+	int m_pagedRAM;         // BBC B+ memory handling
+	int m_vdusel;           // BBC B+ memory handling
 
 							/*
-                            ACCCON
+							ACCCON
 
-                            b7 IRR  1=Causes an IRQ to the processor
-                            b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
-                            b5 IFJ  1=Internal 1 MHz bus
-                                    0=External 1MHz bus
-                            b4 ITU  1=Internal Tube
-                                    0=External Tube
-                            b3 Y    1=Read/Write HAZEL &C000-&DFFF RAM
-                                    0=Read/Write ROM &C000-&DFFF OS-ROM
-                            b2 X    1=Read/Write LYNNE
-                                    0=Read/WRITE main memory &3000-&8000
-                            b1 E    1=Causes shadow if VDU code
-                                    0=Main all the time
-                            b0 D    1=Display LYNNE as screen
-                                    0=Display main RAM screen
+							b7 IRR  1=Causes an IRQ to the processor
+							b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
+							b5 IFJ  1=Internal 1 MHz bus
+							        0=External 1MHz bus
+							b4 ITU  1=Internal Tube
+							        0=External Tube
+							b3 Y    1=Read/Write HAZEL &C000-&DFFF RAM
+							        0=Read/Write ROM &C000-&DFFF OS-ROM
+							b2 X    1=Read/Write LYNNE
+							        0=Read/WRITE main memory &3000-&8000
+							b1 E    1=Causes shadow if VDU code
+							        0=Main all the time
+							b0 D    1=Display LYNNE as screen
+							        0=Display main RAM screen
 
-                            ACCCON is a read/write register
-                            */
+							ACCCON is a read/write register
+							*/
 
 	int m_ACCCON;
 	int m_ACCCON_TST;
@@ -89,26 +89,26 @@ public:
 
 
 							/*
-                            The addressable latch
-                            This 8 bit addressable latch is operated from port B lines 0-3.
-                            PB0-PB2 are set to the required address of the output bit to be set.
-                            PB3 is set to the value which should be programmed at that bit.
-                            The function of the 8 output bits from this latch are:-
+							The addressable latch
+							This 8 bit addressable latch is operated from port B lines 0-3.
+							PB0-PB2 are set to the required address of the output bit to be set.
+							PB3 is set to the value which should be programmed at that bit.
+							The function of the 8 output bits from this latch are:-
 
-                            B0 - Write Enable to the sound generator IC
-                            B1 - READ select on the speech processor
-                            B2 - WRITE select on the speech processor
-                            B3 - Keyboard write enable
-                            B4,B5 - these two outputs define the number to be added to the
-                            start of screen address in hardware to control hardware scrolling:-
-                            Mode    Size    Start of screen  Number to add  B5      B4
-                            0,1,2   20K &3000        12K        1       1
-                            3       16K &4000        16K        0   0
-                            4,5     10K &5800 (or &1800) 22K        1   0
-                            6       8K  &6000 (or &2000) 24K        0   1
-                            B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
-                            B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
-                            */
+							B0 - Write Enable to the sound generator IC
+							B1 - READ select on the speech processor
+							B2 - WRITE select on the speech processor
+							B3 - Keyboard write enable
+							B4,B5 - these two outputs define the number to be added to the
+							start of screen address in hardware to control hardware scrolling:-
+							Mode    Size    Start of screen  Number to add  B5      B4
+							0,1,2   20K &3000        12K        1       1
+							3       16K &4000        16K        0   0
+							4,5     10K &5800 (or &1800) 22K        1   0
+							6       8K  &6000 (or &2000) 24K        0   1
+							B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
+							B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
+							*/
 
 	int m_b0_sound;
 	int m_b1_speech_read;
@@ -119,22 +119,22 @@ public:
 	int m_b6_caps_lock_led;
 	int m_b7_shift_lock_led;
 
-	int m_MC146818_WR;		// FE30 bit 1 replaces  b1_speech_read
-	int m_MC146818_DS;		// FE30 bit 2 replaces  b2_speech_write
-	int m_MC146818_AS;		// 6522 port b bit 7
-	int m_MC146818_CE;		// 6522 port b bit 6
+	int m_MC146818_WR;      // FE30 bit 1 replaces  b1_speech_read
+	int m_MC146818_DS;      // FE30 bit 2 replaces  b2_speech_write
+	int m_MC146818_AS;      // 6522 port b bit 7
+	int m_MC146818_CE;      // 6522 port b bit 6
 
 	int m_via_system_porta;
 	int m_via_system_irq;
 	int m_via_user_irq;
 	int m_acia_irq;
 
-	int m_column;			// this is a counter in the keyboard circuit
+	int m_column;           // this is a counter in the keyboard circuit
 
 
 							/***************************************
-                              BBC 2C199 Serial Interface Cassette
-                            ****************************************/
+							  BBC 2C199 Serial Interface Cassette
+							****************************************/
 
 	double m_last_dev_val;
 	int m_wav_len;
@@ -147,16 +147,16 @@ public:
 
 
 							/**************************************
-                               i8271 disc control
-                            ***************************************/
+							   i8271 disc control
+							***************************************/
 
-	int m_previous_i8271_int_state;	// 8271 interupt status
+	int m_previous_i8271_int_state; // 8271 interupt status
 
 
 
 							/**************************************
-                               WD1770 disc control
-                            ***************************************/
+							   WD1770 disc control
+							***************************************/
 	int m_drive_control;
 	int m_wd177x_irq_state;
 	int m_wd177x_drq_state;
@@ -164,15 +164,15 @@ public:
 	int m_1770_IntEnabled;
 
 							/**************************************
-                               Opus Challenger Disc control
-                            ***************************************/
+							   Opus Challenger Disc control
+							***************************************/
 	int m_opusbank;
 
 
 
 							/**************************************
-                               Video Code
-                            ***************************************/
+							   Video Code
+							***************************************/
 
 	int m_memorySize;
 

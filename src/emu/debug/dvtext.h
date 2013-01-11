@@ -65,9 +65,9 @@ protected:
 
 private:
 	// internal state
-	text_buffer &		m_textbuf;				/* pointer to the text buffer */
-	bool				m_at_bottom;				/* are we tracking new stuff being added? */
-	UINT32				m_topseq;					/* sequence number of the top line */
+	text_buffer &       m_textbuf;              /* pointer to the text buffer */
+	bool                m_at_bottom;                /* are we tracking new stuff being added? */
+	UINT32              m_topseq;                   /* sequence number of the top line */
 };
 
 

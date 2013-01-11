@@ -222,18 +222,18 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        PC0     TC+
-        PC1     RDY+
-        PC2     FDIE+
-        PC3     SL0-
-        PC4     SL1-
-        PC5     MOT-
-        PC6     PCRMP-
-        PC7     FRES+
+	    PC0     TC+
+	    PC1     RDY+
+	    PC2     FDIE+
+	    PC3     SL0-
+	    PC4     SL1-
+	    PC5     MOT-
+	    PC6     PCRMP-
+	    PC7     FRES+
 
-    */
+	*/
 
 	// floppy terminal count
 	m_fdc->tc_w(BIT(data, 0));
@@ -284,18 +284,18 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        PB0     FDI+
-        PB1     WP+
-        PB2     RG-
-        PB3     CD-
-        PB4     BUSY
-        PB5     PAPER
-        PB6     SEL
-        PB7     FAULT-
+	    PB0     FDI+
+	    PB1     WP+
+	    PB2     RG-
+	    PB3     CD-
+	    PB4     BUSY
+	    PB5     PAPER
+	    PB6     SEL
+	    PB7     FAULT-
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -323,18 +323,18 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        PC0     PRES-
-        PC1     U8 SC+
-        PC2     SI+
-        PC3     LEDR+
-        PC4     STROBE-
-        PC5     PRIME-
-        PC6     U38 CL-
-        PC7     RMI-
+	    PC0     PRES-
+	    PC1     U8 SC+
+	    PC2     SI+
+	    PC3     LEDR+
+	    PC4     STROBE-
+	    PC5     PRIME-
+	    PC6     U38 CL-
+	    PC7     RMI-
 
-    */
+	*/
 
 	if (!BIT(data, 0))
 	{
@@ -477,7 +477,7 @@ static const i8251_interface usart1_intf =
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( sage2_floppies )
-	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 void sage2_state::update_fdc_int()

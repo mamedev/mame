@@ -2,10 +2,10 @@
 #include "video/vdc.h"
 
 /* VDC segments */
-#define STATE_VSW		0
-#define STATE_VDS		1
-#define STATE_VDW		2
-#define STATE_VCR		3
+#define STATE_VSW       0
+#define STATE_VDS       1
+#define STATE_VDW       2
+#define STATE_VCR       3
 
 /* todo: replace this with the PAIR structure */
 union pair
@@ -22,16 +22,16 @@ union pair
 
 struct VDC
 {
-	int dvssr_write;			/* Set when the DVSSR register has been written to */
-	int physical_width;			/* Width of the display */
-	int physical_height;		/* Height of the display */
-	UINT16 sprite_ram[64*4];	/* Sprite RAM */
-	int curline;				/* the current scanline we're on */
-	int current_segment;		/* current segment of display */
-	int current_segment_line;	/* current line inside a segment of display */
-	int vblank_triggered;		/* to indicate whether vblank has been triggered */
-	int raster_count;			/* counter to compare RCR against */
-	int satb_countdown;			/* scanlines to wait to trigger the SATB irq */
+	int dvssr_write;            /* Set when the DVSSR register has been written to */
+	int physical_width;         /* Width of the display */
+	int physical_height;        /* Height of the display */
+	UINT16 sprite_ram[64*4];    /* Sprite RAM */
+	int curline;                /* the current scanline we're on */
+	int current_segment;        /* current segment of display */
+	int current_segment_line;   /* current line inside a segment of display */
+	int vblank_triggered;       /* to indicate whether vblank has been triggered */
+	int raster_count;           /* counter to compare RCR against */
+	int satb_countdown;         /* scanlines to wait to trigger the SATB irq */
 	UINT8 *vram;
 	UINT8   inc;
 	UINT8 vdc_register;
@@ -42,11 +42,11 @@ struct VDC
 };
 
 struct VCE {
-	UINT8	vce_control;			/* VCE control register */
-	pair	vce_address;			/* Current address in the palette */
-	pair	vce_data[512];			/* Palette data */
-	int		current_bitmap_line;	/* The current line in the display we are on */
-	bitmap_ind16	*bmp;
+	UINT8   vce_control;            /* VCE control register */
+	pair    vce_address;            /* Current address in the palette */
+	pair    vce_data[512];          /* Palette data */
+	int     current_bitmap_line;    /* The current line in the display we are on */
+	bitmap_ind16    *bmp;
 };
 
 struct VPC_PRIO {
@@ -57,11 +57,11 @@ struct VPC_PRIO {
 
 struct VPC {
 	VPC_PRIO vpc_prio[4];
-	UINT8	prio_map[512];		/* Pre-calculated priority map */
-	pair	priority;			/* Priority settings registers */
-	pair	window1;			/* Window 1 setting */
-	pair	window2;			/* Window 2 setting */
-	UINT8	vdc_select;			/* Which VDC do the ST0, ST1, and ST2 instructions write to */
+	UINT8   prio_map[512];      /* Pre-calculated priority map */
+	pair    priority;           /* Priority settings registers */
+	pair    window1;            /* Window 1 setting */
+	pair    window2;            /* Window 2 setting */
+	UINT8   vdc_select;         /* Which VDC do the ST0, ST1, and ST2 instructions write to */
 };
 
 static VDC vdc[2];
@@ -92,8 +92,8 @@ TIMER_DEVICE_CALLBACK( pce_interrupt )
 		if ( vdc[0].current_segment == STATE_VDW )
 		{
 			/* 0 - no sprite and background pixels drawn
-               1 - background pixel drawn
-               otherwise is 2 + sprite# */
+			   1 - background pixel drawn
+			   otherwise is 2 + sprite# */
 			UINT8 drawn[VDC_WPF];
 			/* our line buffer */
 			UINT16 *line_buffer = &vce.bmp->pix16(vce.current_bitmap_line, 86 );
@@ -137,8 +137,8 @@ TIMER_DEVICE_CALLBACK( sgx_interrupt )
 		if ( vdc[0].current_segment == STATE_VDW )
 		{
 			/* 0 - no sprite and background pixels drawn
-               1 - background pixel drawn
-               otherwise is 2 + sprite# */
+			   1 - background pixel drawn
+			   otherwise is 2 + sprite# */
 			UINT8 drawn[2][512];
 			UINT16 *line_buffer;
 			UINT16 temp_buffer[2][512];
@@ -180,7 +180,7 @@ TIMER_DEVICE_CALLBACK( sgx_interrupt )
 					{
 						switch( vpc.vpc_prio[cur_prio].prio )
 						{
-						case 0:	/* BG1 SP1 BG0 SP0 */
+						case 0: /* BG1 SP1 BG0 SP0 */
 							if ( drawn[0][i] )
 							{
 								line_buffer[i] = temp_buffer[0][i];
@@ -190,7 +190,7 @@ TIMER_DEVICE_CALLBACK( sgx_interrupt )
 								line_buffer[i] = temp_buffer[1][i];
 							}
 							break;
-						case 1:	/* BG1 BG0 SP1 SP0 */
+						case 1: /* BG1 BG0 SP1 SP0 */
 							if ( drawn[0][i] )
 							{
 								if ( drawn[0][i] > 1 )
@@ -293,7 +293,7 @@ static void vdc_advance_line(running_machine &machine, int which)
 		{
 			if ( vdc[which].vdc_data[DCR].w & DCR_DSC )
 			{
-				vdc[which].status |= VDC_DS;	/* set satb done flag */
+				vdc[which].status |= VDC_DS;    /* set satb done flag */
 				ret = 1;
 			}
 		}
@@ -376,8 +376,8 @@ static void vdc_advance_line(running_machine &machine, int which)
 
 		vdc[which].vblank_triggered = 1;
 		if(vdc[which].vdc_data[CR].w & CR_VR)
-		{	/* generate IRQ1 if enabled */
-			vdc[which].status |= VDC_VD;	/* set vblank flag */
+		{   /* generate IRQ1 if enabled */
+			vdc[which].status |= VDC_VD;    /* set vblank flag */
 			ret = 1;
 		}
 
@@ -512,19 +512,19 @@ static void vdc_w( running_machine &machine, int which, offs_t offset, UINT8 dat
 {
 	switch(offset&3)
 	{
-		case 0x00:	/* VDC register select */
+		case 0x00:  /* VDC register select */
 			vdc[which].vdc_register = (data & 0x1F);
 			break;
 
-		case 0x02:	/* VDC data (LSB) */
+		case 0x02:  /* VDC data (LSB) */
 			vdc[which].vdc_data[vdc[which].vdc_register].b.l = data;
 			switch(vdc[which].vdc_register)
 			{
-				case VxR:	/* LSB of data to write to VRAM */
+				case VxR:   /* LSB of data to write to VRAM */
 					vdc[which].vdc_latch = data;
 					break;
 
-			    case BYR:
+				case BYR:
 					vdc[which].y_scroll=vdc[which].vdc_data[BYR].w;
 					break;
 
@@ -550,11 +550,11 @@ static void vdc_w( running_machine &machine, int which, offs_t offset, UINT8 dat
 			}
 			break;
 
-		case 0x03:	/* VDC data (MSB) */
+		case 0x03:  /* VDC data (MSB) */
 			vdc[which].vdc_data[vdc[which].vdc_register].b.h = data;
 			switch(vdc[which].vdc_register)
 			{
-				case VxR:	/* MSB of data to write to VRAM */
+				case VxR:   /* MSB of data to write to VRAM */
 					vram_write(which, vdc[which].vdc_data[MAWR].w*2+0, vdc[which].vdc_latch);
 					vram_write(which, vdc[which].vdc_data[MAWR].w*2+1, data);
 					vdc[which].vdc_data[MAWR].w += vdc[which].inc;
@@ -622,10 +622,10 @@ static UINT8 vdc_r( running_machine &machine, int which, offs_t offset )
 	return (temp);
 }
 
-WRITE8_HANDLER( vdc_0_w ) {	vdc_w( space.machine(), 0, offset, data ); }
-WRITE8_HANDLER( vdc_1_w ) {	vdc_w( space.machine(), 1, offset, data ); }
-READ8_HANDLER( vdc_0_r ) {	return vdc_r( space.machine(), 0, offset ); }
-READ8_HANDLER( vdc_1_r ) {	return vdc_r( space.machine(), 1, offset ); }
+WRITE8_HANDLER( vdc_0_w ) { vdc_w( space.machine(), 0, offset, data ); }
+WRITE8_HANDLER( vdc_1_w ) { vdc_w( space.machine(), 1, offset, data ); }
+READ8_HANDLER( vdc_0_r ) {  return vdc_r( space.machine(), 0, offset ); }
+READ8_HANDLER( vdc_1_r ) {  return vdc_r( space.machine(), 1, offset ); }
 
 PALETTE_INIT( vce )
 {
@@ -642,16 +642,16 @@ PALETTE_INIT( vce )
 	}
 }
 
- READ8_HANDLER ( vce_r )
+	READ8_HANDLER ( vce_r )
 {
 	int temp = 0xFF;
 	switch(offset & 7)
 	{
-		case 0x04:	/* color table data (LSB) */
+		case 0x04:  /* color table data (LSB) */
 			temp = vce.vce_data[vce.vce_address.w].b.l;
 			break;
 
-		case 0x05:	/* color table data (MSB) */
+		case 0x05:  /* color table data (MSB) */
 			temp = vce.vce_data[vce.vce_address.w].b.h;
 			temp |= 0xFE;
 			vce.vce_address.w = (vce.vce_address.w + 1) & 0x01FF;
@@ -665,25 +665,25 @@ WRITE8_HANDLER ( vce_w )
 {
 	switch(offset & 7)
 	{
-		case 0x00:	/* control reg. */
+		case 0x00:  /* control reg. */
 			vce.vce_control = data;
 			break;
 
-		case 0x02:	/* color table address (LSB) */
+		case 0x02:  /* color table address (LSB) */
 			vce.vce_address.b.l = data;
 			vce.vce_address.w &= 0x1FF;
 			break;
 
-		case 0x03:	/* color table address (MSB) */
+		case 0x03:  /* color table address (MSB) */
 			vce.vce_address.b.h = data;
 			vce.vce_address.w &= 0x1FF;
 			break;
 
-		case 0x04:	/* color table data (LSB) */
+		case 0x04:  /* color table data (LSB) */
 			vce.vce_data[vce.vce_address.w].b.l = data;
 			break;
 
-		case 0x05:	/* color table data (MSB) */
+		case 0x05:  /* color table data (MSB) */
 			vce.vce_data[vce.vce_address.w].b.h = data & 0x01;
 
 			/* bump internal address */
@@ -695,44 +695,44 @@ WRITE8_HANDLER ( vce_w )
 
 static void pce_refresh_line(int which, int line, int external_input, UINT8 *drawn, UINT16 *line_buffer)
 {
-    static const int width_table[4] = {5, 6, 7, 7};
+	static const int width_table[4] = {5, 6, 7, 7};
 
-    int scroll_y = ( vdc[which].y_scroll & 0x01FF);
-    int scroll_x = (vdc[which].vdc_data[BXR].w & 0x03FF);
-    int nt_index;
+	int scroll_y = ( vdc[which].y_scroll & 0x01FF);
+	int scroll_x = (vdc[which].vdc_data[BXR].w & 0x03FF);
+	int nt_index;
 
-    /* is virtual map 32 or 64 characters tall ? (256 or 512 pixels) */
-    int v_line = (scroll_y) & (vdc[which].vdc_data[MWR].w & 0x0040 ? 0x1FF : 0x0FF);
+	/* is virtual map 32 or 64 characters tall ? (256 or 512 pixels) */
+	int v_line = (scroll_y) & (vdc[which].vdc_data[MWR].w & 0x0040 ? 0x1FF : 0x0FF);
 
-    /* row within character */
-    int v_row = (v_line & 7);
+	/* row within character */
+	int v_row = (v_line & 7);
 
-    /* row of characters in BAT */
-    int nt_row = (v_line >> 3);
+	/* row of characters in BAT */
+	int nt_row = (v_line >> 3);
 
-    /* virtual X size (# bits to shift) */
-    int v_width =        width_table[(vdc[which].vdc_data[MWR].w >> 4) & 3];
+	/* virtual X size (# bits to shift) */
+	int v_width =        width_table[(vdc[which].vdc_data[MWR].w >> 4) & 3];
 
-    /* pointer to the name table (Background Attribute Table) in VRAM */
-    UINT8 *bat = &(vdc[which].vram[nt_row << (v_width+1)]);
+	/* pointer to the name table (Background Attribute Table) in VRAM */
+	UINT8 *bat = &(vdc[which].vram[nt_row << (v_width+1)]);
 
 	/* Are we in greyscale mode or in color mode? */
 	int color_base = vce.vce_control & 0x80 ? 512 : 0;
 
-    int b0, b1, b2, b3;
-    int i0, i1, i2, i3;
-    int cell_pattern_index;
-    int cell_palette;
-    int x, c, i;
+	int b0, b1, b2, b3;
+	int i0, i1, i2, i3;
+	int cell_pattern_index;
+	int cell_palette;
+	int x, c, i;
 
-    /* character blanking bit */
-    if(!(vdc[which].vdc_data[CR].w & CR_BB))
-    {
+	/* character blanking bit */
+	if(!(vdc[which].vdc_data[CR].w & CR_BB))
+	{
 		return;
-    }
+	}
 	else
 	{
-		int	pixel = 0;
+		int pixel = 0;
 		int phys_x = - ( scroll_x & 0x07 );
 
 		for(i=0;i<(vdc[which].physical_width >> 3) + 1;i++)
@@ -826,7 +826,7 @@ static void conv_obj(int which, int i, int l, int hf, int vf, char *buf)
 
 static void pce_refresh_sprites(running_machine &machine, int which, int line, UINT8 *drawn, UINT16 *line_buffer)
 {
-    int i;
+	int i;
 	UINT8 sprites_drawn = 0;
 
 	/* Are we in greyscale mode or in color mode? */
@@ -989,8 +989,8 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 				}
 
 				/* 32 pixel wide sprites are counted as 2 sprites and the right half
-                   is only drawn if there are 2 open slots.
-                */
+				   is only drawn if there are 2 open slots.
+				*/
 				sprites_drawn++;
 				if( sprites_drawn > 16 )
 				{
@@ -1072,10 +1072,10 @@ static void vdc_do_dma(running_machine &machine, int which)
 		vram_write(which, 1+(dst<<1),h);
 
 		if(sid) src = (src - 1) & 0xFFFF;
-		else	src = (src + 1) & 0xFFFF;
+		else    src = (src + 1) & 0xFFFF;
 
 		if(did) dst = (dst - 1) & 0xFFFF;
-		else	dst = (dst + 1) & 0xFFFF;
+		else    dst = (dst + 1) & 0xFFFF;
 
 		len = (len - 1) & 0xFFFF;
 
@@ -1116,7 +1116,7 @@ WRITE8_HANDLER( vpc_w )
 //printf("VPC write offset %02X, data %02X\n", offset, data );
 	switch( offset & 0x07 )
 	{
-	case 0x00:	/* Priority register #0 */
+	case 0x00:  /* Priority register #0 */
 		vpc.priority.b.l = data;
 		vpc.vpc_prio[0].prio = ( data >> 2 ) & 3;
 		vpc.vpc_prio[0].vdc0_enabled = data & 1;
@@ -1125,7 +1125,7 @@ WRITE8_HANDLER( vpc_w )
 		vpc.vpc_prio[1].vdc0_enabled = data & 0x10;
 		vpc.vpc_prio[1].vdc1_enabled = data & 0x20;
 		break;
-	case 0x01:	/* Priority register #1 */
+	case 0x01:  /* Priority register #1 */
 		vpc.priority.b.h = data;
 		vpc.vpc_prio[2].prio = ( data >> 2 ) & 3;
 		vpc.vpc_prio[2].vdc0_enabled = data & 1;
@@ -1134,23 +1134,23 @@ WRITE8_HANDLER( vpc_w )
 		vpc.vpc_prio[3].vdc0_enabled = data & 0x10;
 		vpc.vpc_prio[3].vdc1_enabled = data & 0x20;
 		break;
-	case 0x02:	/* Window 1 LSB */
+	case 0x02:  /* Window 1 LSB */
 		vpc.window1.b.l = data;
 		vpc_update_prio_map();
 		break;
-	case 0x03:	/* Window 1 MSB */
+	case 0x03:  /* Window 1 MSB */
 		vpc.window1.b.h = data & 3;
 		vpc_update_prio_map();
 		break;
-	case 0x04:	/* Window 2 LSB */
+	case 0x04:  /* Window 2 LSB */
 		vpc.window2.b.l = data;
 		vpc_update_prio_map();
 		break;
-	case 0x05:	/* Window 2 MSB */
+	case 0x05:  /* Window 2 MSB */
 		vpc.window2.b.h = data & 3;
 		vpc_update_prio_map();
 		break;
-	case 0x06:	/* VDC I/O select */
+	case 0x06:  /* VDC I/O select */
 		vpc.vdc_select = data & 1;
 		break;
 	}
@@ -1209,4 +1209,3 @@ READ8_HANDLER( sgx_vdc_r )
 {
 	return ( vpc.vdc_select ) ? vdc_1_r( space, offset ) : vdc_0_r( space, offset );
 }
-

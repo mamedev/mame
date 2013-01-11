@@ -6,14 +6,14 @@
 
 #include "video/polynew.h"
 
-#define MIDVUNIT_VIDEO_CLOCK	33000000
+#define MIDVUNIT_VIDEO_CLOCK    33000000
 
 struct midvunit_object_data
 {
-	UINT16 *	destbase;
-	UINT8 *		texbase;
-	UINT16		pixdata;
-	UINT8		dither;
+	UINT16 *    destbase;
+	UINT8 *     texbase;
+	UINT16      pixdata;
+	UINT8       dither;
 };
 
 class midvunit_state;
@@ -39,15 +39,15 @@ class midvunit_state : public driver_device
 public:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram"),
-		  m_ram_base(*this, "ram_base"),
-		  m_fastram_base(*this, "fastram_base"),
-		  m_tms32031_control(*this, "32031_control"),
-		  m_midvplus_misc(*this, "midvplus_misc"),
-		  m_videoram(*this, "videoram", 32),
-		  m_textureram(*this, "textureram") { }
+			m_nvram(*this, "nvram"),
+			m_ram_base(*this, "ram_base"),
+			m_fastram_base(*this, "fastram_base"),
+			m_tms32031_control(*this, "32031_control"),
+			m_midvplus_misc(*this, "midvplus_misc"),
+			m_videoram(*this, "videoram", 32),
+			m_textureram(*this, "textureram") { }
 
-	optional_shared_ptr<UINT32>	m_nvram;
+	optional_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
 	optional_shared_ptr<UINT32> m_fastram_base;
 	required_shared_ptr<UINT32> m_tms32031_control;

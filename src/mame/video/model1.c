@@ -5,7 +5,7 @@
 
 #define LOG_TGP_VIDEO 0
 
-#define LOG_TGP(x)	do { if (LOG_TGP_VIDEO) logerror x; } while (0)
+#define LOG_TGP(x)  do { if (LOG_TGP_VIDEO) logerror x; } while (0)
 
 
 // Model 1 geometrizer TGP and rasterizer simulation
@@ -245,10 +245,10 @@ static void fill_quad(bitmap_rgb32 &bitmap, struct view *view, const struct quad
 	if(color < 0) {
 		color = -1-color;
 		LOG_TGP(("VIDEOD: Q (%d, %d)-(%d, %d)-(%d, %d)-(%d, %d)\n",
-				 q->p[0]->s.x, q->p[0]->s.y,
-				 q->p[1]->s.x, q->p[1]->s.y,
-				 q->p[2]->s.x, q->p[2]->s.y,
-				 q->p[3]->s.x, q->p[3]->s.y));
+					q->p[0]->s.x, q->p[0]->s.y,
+					q->p[1]->s.x, q->p[1]->s.y,
+					q->p[2]->s.x, q->p[2]->s.y,
+					q->p[3]->s.x, q->p[3]->s.y));
 	}
 
 	for(i=0; i<4; i++) {
@@ -344,9 +344,9 @@ static void draw_line(bitmap_rgb32 &bitmap, struct view *view, int color, int x1
 	int x, y;
 
 	if((x1 < view->x1 && x2 < view->x1) ||
-	   (x1 > view->x2 && x2 > view->x2) ||
-	   (y1 < view->y1 && y2 < view->y1) ||
-	   (y1 > view->y2 && y2 > view->y2))
+		(x1 > view->x2 && x2 > view->x2) ||
+		(y1 < view->y1 && y2 < view->y1) ||
+		(y1 > view->y2 && y2 > view->y2))
 		return;
 
 	x = x1;
@@ -569,7 +569,7 @@ static const struct {
 static void fclip_push_quad(model1_state *state, int level, struct quad_m1 *q);
 
 static void fclip_push_quad_next(model1_state *state, int level, struct quad_m1 *q,
-								 struct point *p1, struct point *p2, struct point *p3, struct point *p4)
+									struct point *p1, struct point *p2, struct point *p3, struct point *p4)
 {
 	struct quad_m1 q2;
 	q2.col = q->col;
@@ -800,10 +800,10 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 	for(i=0; i<size; i++) {
 #if 0
 		LOG_TGP(("VIDEO:     %08x (%f, %f, %f) (%f, %f, %f) (%f, %f, %f)\n",
-				 *(UINT32 *)(poly_data+poly_adr) & ~(0x01800303),
-				 poly_data[poly_adr+1], poly_data[poly_adr+2], poly_data[poly_adr+3],
-				 poly_data[poly_adr+4], poly_data[poly_adr+5], poly_data[poly_adr+6],
-				 poly_data[poly_adr+7], poly_data[poly_adr+8], poly_data[poly_adr+9]));
+					*(UINT32 *)(poly_data+poly_adr) & ~(0x01800303),
+					poly_data[poly_adr+1], poly_data[poly_adr+2], poly_data[poly_adr+3],
+					poly_data[poly_adr+4], poly_data[poly_adr+5], poly_data[poly_adr+6],
+					poly_data[poly_adr+7], poly_data[poly_adr+8], poly_data[poly_adr+9]));
 #endif
 		flags = *(UINT32 *)(poly_data+poly_adr);
 
@@ -846,20 +846,20 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 #if 0
 		if(dump)
 			LOG_TGP(("VIDEO:     %08x (%f, %f, %f) (%f, %f, %f)\n",
-					 *(UINT32 *)(poly_data+poly_adr),
-					 p0->x, p0->y, p0->z,
-					 p1->x, p1->y, p1->z));
+						*(UINT32 *)(poly_data+poly_adr),
+						p0->x, p0->y, p0->z,
+						p1->x, p1->y, p1->z));
 #endif
 
 
 #if 0
 		if(1 || dump) {
 			LOG_TGP(("VIDEO:     %08x (%d, %d) (%d, %d) (%d, %d) (%d, %d)\n",
-					 *(UINT32 *)(poly_data+poly_adr),
-					 old_p0->s.x, old_p0->s.y,
-					 old_p1->s.x, old_p1->s.y,
-					 p0->s.x, p0->s.y,
-					 p1->s.x, p1->s.y));
+						*(UINT32 *)(poly_data+poly_adr),
+						old_p0->s.x, old_p0->s.y,
+						old_p1->s.x, old_p1->s.y,
+						p0->s.x, p0->s.y,
+						p1->s.x, p1->s.y));
 		}
 #endif
 
@@ -907,7 +907,7 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
 			int b=(color>>0xA)&0x1f;
-			lumval>>=2;	//there must be a luma translation table somewhere
+			lumval>>=2; //there must be a luma translation table somewhere
 			if(lumval>0x3f) lumval=0x3f;
 			else if(lumval<0) lumval=0;
 			r=(state->m_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
@@ -965,8 +965,8 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 
 	LOG_TGP(("VIDEOD start direct\n"));
 	LOG_TGP(("VIDEOD (%f, %f, %f) (%f, %f, %f)\n",
-			 old_p0->x, old_p0->y, old_p0->z,
-			 old_p1->x, old_p1->y, old_p1->z));
+				old_p0->x, old_p0->y, old_p0->z,
+				old_p1->x, old_p1->y, old_p1->z));
 
 	//transform_point(view, old_p0);
 	//transform_point(view, old_p1);
@@ -1007,8 +1007,8 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 			p0->z = readf(list+10);
 			z = p0->z;
 			LOG_TGP(("VIDEOD %08x %08x (%f, %f, %f)\n",
-					 flags, lum,
-					 p0->x, p0->y, p0->z));
+						flags, lum,
+						p0->x, p0->y, p0->z));
 			*p1 = *p0;
 			list += 12;
 		} else {
@@ -1020,9 +1020,9 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 			p1->z = readf(list+18);
 			z     = readf(list+12);
 			LOG_TGP(("VIDEOD %08x %08x (%f, %f, %f) (%f, %f, %f)\n",
-					 flags, lum,
-					 p0->x, p0->y, p0->z,
-					 p1->x, p1->y, p1->z));
+						flags, lum,
+						p0->x, p0->y, p0->z,
+						p1->x, p1->y, p1->z));
 			list += 20;
 		}
 
@@ -1038,16 +1038,16 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 #if 1
 		if(old_p0 && old_p1)
 			LOG_TGP(("VIDEOD:     %08x (%d, %d) (%d, %d) (%d, %d) (%d, %d)\n",
-					 flags,
-					 old_p0->s.x, old_p0->s.y,
-					 old_p1->s.x, old_p1->s.y,
-					 p0->s.x, p0->s.y,
-					 p1->s.x, p1->s.y));
+						flags,
+						old_p0->s.x, old_p0->s.y,
+						old_p1->s.x, old_p1->s.y,
+						p0->s.x, p0->s.y,
+						p1->s.x, p1->s.y));
 		else
 			LOG_TGP(("VIDEOD:     %08x (%d, %d) (%d, %d)\n",
-					 flags,
-					 p0->s.x, p0->s.y,
-					 p1->s.x, p1->s.y));
+						flags,
+						p0->s.x, p0->s.y,
+						p1->s.x, p1->s.y));
 
 #endif
 
@@ -1065,7 +1065,7 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
 			int b=(color>>0xA)&0x1f;
-			lumval>>=2;	//there must be a luma translation table somewhere
+			lumval>>=2; //there must be a luma translation table somewhere
 			if(lumval>0x3f) lumval=0x3f;
 			else if(lumval<0) lumval=0;
 			r=(state->m_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
@@ -1221,9 +1221,9 @@ static void tgp_render(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 				break;
 			case 3:
 				LOG_TGP(("VIDEO:   viewport (%d, %d, %d, %d, %d, %d, %d)\n",
-						 readi(list+2),
-						 readi16(list+4), readi16(list+6), readi16(list+8),
-						 readi16(list+10), readi16(list+12), readi16(list+14)));
+							readi(list+2),
+							readi16(list+4), readi16(list+6), readi16(list+8),
+							readi16(list+10), readi16(list+12), readi16(list+14)));
 
 				draw_objects(state, bitmap, cliprect);
 
@@ -1305,10 +1305,10 @@ static void tgp_render(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 			case 0xb: {
 				int i;
 				LOG_TGP(("VIDEO:   matrix (%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)\n",
-						 readf(list+2), readf(list+4), readf(list+6),
-						 readf(list+8), readf(list+10), readf(list+12),
-						 readf(list+14), readf(list+16), readf(list+18),
-						 readf(list+20), readf(list+22), readf(list+24)));
+							readf(list+2), readf(list+4), readf(list+6),
+							readf(list+8), readf(list+10), readf(list+12),
+							readf(list+14), readf(list+16), readf(list+18),
+							readf(list+20), readf(list+22), readf(list+24)));
 				for(i=0; i<12; i++)
 					view->trans_mat[i] = readf(list+2+2*i);
 				list += 26;
@@ -1342,16 +1342,16 @@ static void tgp_scan(running_machine &machine)
 	struct view *view = state->m_view;
 #if 0
 	if (machine.input().code_pressed_once(KEYCODE_F))
-        {
+		{
 		FILE *fp;
 		fp=fopen("tgp-ram.bin", "w+b");
 		if (fp)
-                {
+				{
 			fwrite(state->m_tgp_ram, (0x100000-0x40000)*2, 1, fp);
 			fclose(fp);
-                }
+				}
 		exit(0);
-        }
+		}
 #endif
 	if(!state->m_render_done && (state->m_listctl[1] & 0x1f) == 0x1f) {
 		UINT16 *list = get_list(state);

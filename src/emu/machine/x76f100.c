@@ -69,9 +69,9 @@ void x76f100_device::nvram_default()
 		// Ensure the size is correct though
 		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+SIZE_READ_PASSWORD+SIZE_DATA)
 			logerror("x76f100 %s: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
-					 tag(),
-					 SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+SIZE_READ_PASSWORD+SIZE_DATA,
-					 m_region->bytes());
+						tag(),
+						SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+SIZE_READ_PASSWORD+SIZE_DATA,
+						m_region->bytes());
 		else {
 			UINT8 *rb = m_region->base();
 			int offset = 0;

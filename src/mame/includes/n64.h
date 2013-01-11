@@ -29,7 +29,7 @@ public:
 /*----------- devices -----------*/
 
 #define MCFG_N64_PERIPHS_ADD(_tag) \
-    MCFG_DEVICE_ADD(_tag, N64PERIPH, 0)
+	MCFG_DEVICE_ADD(_tag, N64PERIPH, 0)
 
 #define AUDIO_DMA_DEPTH     2
 
@@ -50,8 +50,8 @@ private:
 	};
 
 public:
-    // construction/destruction
-    n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ32_MEMBER( is64_r );
 	DECLARE_WRITE32_MEMBER( is64_w );
@@ -122,9 +122,9 @@ public:
 	UINT32 dp_clock;
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	address_space *mem_map;
@@ -239,38 +239,38 @@ extern const device_type N64PERIPH;
 
 /*----------- defined in video/n64.c -----------*/
 
-#define DACRATE_NTSC	(48681812)
-#define DACRATE_PAL	(49656530)
-#define DACRATE_MPAL	(48628316)
+#define DACRATE_NTSC    (48681812)
+#define DACRATE_PAL (49656530)
+#define DACRATE_MPAL    (48628316)
 
 /*----------- defined in machine/n64.c -----------*/
 
-#define SP_INTERRUPT	0x1
-#define SI_INTERRUPT	0x2
-#define AI_INTERRUPT	0x4
-#define VI_INTERRUPT	0x8
-#define PI_INTERRUPT	0x10
-#define DP_INTERRUPT	0x20
+#define SP_INTERRUPT    0x1
+#define SI_INTERRUPT    0x2
+#define AI_INTERRUPT    0x4
+#define VI_INTERRUPT    0x8
+#define PI_INTERRUPT    0x10
+#define DP_INTERRUPT    0x20
 
-#define SP_STATUS_HALT			0x0001
-#define SP_STATUS_BROKE			0x0002
-#define SP_STATUS_DMABUSY		0x0004
-#define SP_STATUS_DMAFULL		0x0008
-#define SP_STATUS_IOFULL		0x0010
-#define SP_STATUS_SSTEP			0x0020
-#define SP_STATUS_INTR_BREAK	0x0040
-#define SP_STATUS_SIGNAL0		0x0080
-#define SP_STATUS_SIGNAL1		0x0100
-#define SP_STATUS_SIGNAL2		0x0200
-#define SP_STATUS_SIGNAL3		0x0400
-#define SP_STATUS_SIGNAL4		0x0800
-#define SP_STATUS_SIGNAL5		0x1000
-#define SP_STATUS_SIGNAL6		0x2000
-#define SP_STATUS_SIGNAL7		0x4000
+#define SP_STATUS_HALT          0x0001
+#define SP_STATUS_BROKE         0x0002
+#define SP_STATUS_DMABUSY       0x0004
+#define SP_STATUS_DMAFULL       0x0008
+#define SP_STATUS_IOFULL        0x0010
+#define SP_STATUS_SSTEP         0x0020
+#define SP_STATUS_INTR_BREAK    0x0040
+#define SP_STATUS_SIGNAL0       0x0080
+#define SP_STATUS_SIGNAL1       0x0100
+#define SP_STATUS_SIGNAL2       0x0200
+#define SP_STATUS_SIGNAL3       0x0400
+#define SP_STATUS_SIGNAL4       0x0800
+#define SP_STATUS_SIGNAL5       0x1000
+#define SP_STATUS_SIGNAL6       0x2000
+#define SP_STATUS_SIGNAL7       0x4000
 
-#define DP_STATUS_XBUS_DMA		0x01
-#define DP_STATUS_FREEZE		0x02
-#define DP_STATUS_FLUSH			0x04
+#define DP_STATUS_XBUS_DMA      0x01
+#define DP_STATUS_FREEZE        0x02
+#define DP_STATUS_FLUSH         0x04
 
 extern const rsp_config n64_rsp_config;
 

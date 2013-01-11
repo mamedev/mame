@@ -45,7 +45,7 @@ protected:
 	virtual UINT8 vcs_pot_x_r();
 	virtual UINT8 vcs_pot_y_r();
 
-	UINT8	m_column;
+	UINT8   m_column;
 };
 
 

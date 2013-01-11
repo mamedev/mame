@@ -257,7 +257,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-    <!-- or is it the PC8001 version? -->
+	<!-- or is it the PC8001 version? -->
 	<software name="digdug">
 		<description>Dig Dug</description>
 		<year>1983</year>

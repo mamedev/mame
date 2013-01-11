@@ -228,8 +228,8 @@ MACHINE_RESET_MEMBER(cshooter_state,airraid)
 READ8_MEMBER(cshooter_state::cshooter_coin_r)
 {
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
-       Code at 0x5061 is executed once during P.O.S.T. where there is one read.
-       Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
+	   Code at 0x5061 is executed once during P.O.S.T. where there is one read.
+	   Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
 	return ( (m_counter++ & 1) ? 0xff : ioport("COIN")->read() );
 }
 
@@ -269,18 +269,18 @@ READ8_MEMBER(cshooter_state::pal_r)
 static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
-	AM_RANGE(0xb000, 0xb0ff) AM_READONLY			// sound related ?
+	AM_RANGE(0xb000, 0xb0ff) AM_READONLY            // sound related ?
 	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_SHARE("paletteram")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("IN1")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("IN2")
 	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc205, 0xc205) AM_READ(cshooter_coin_r)	// hack until I understand
+	AM_RANGE(0xc205, 0xc205) AM_READ(cshooter_coin_r)   // hack until I understand
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
-	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
+	AM_RANGE(0xc600, 0xc600) AM_WRITENOP            // see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
+	AM_RANGE(0xc801, 0xc801) AM_WRITENOP            // see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -307,9 +307,9 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
-	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
+	AM_RANGE(0xc600, 0xc600) AM_WRITENOP            // see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
+	AM_RANGE(0xc801, 0xc801) AM_WRITENOP            // see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_SHARE("paletteram")
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
@@ -331,7 +331,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( cshooter )
-	PORT_START("IN0")	/* IN0  (0xc200) */
+	PORT_START("IN0")   /* IN0  (0xc200) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1  (0xc201) */
+	PORT_START("IN1")   /* IN1  (0xc201) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -351,7 +351,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* START    (0xc202) */
+	PORT_START("IN2")   /* START    (0xc202) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -361,18 +361,18 @@ static INPUT_PORTS_START( cshooter )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW2")	/* DSW2 (0xc203) */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_START("DSW2")  /* DSW2 (0xc203) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "2k 10k 20k" )
 	PORT_DIPSETTING(    0x08, "5k 20k 40k" )
 	PORT_DIPSETTING(    0x04, "6k 30k 60k" )
 	PORT_DIPSETTING(    0x00, "7k 40k 80k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
@@ -380,15 +380,15 @@ static INPUT_PORTS_START( cshooter )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START("DSW1")	/* DSW1 (0xc204) */
-	PORT_DIPNAME( 0x01, 0x01, "Coin Slots" )		PORT_DIPLOCATION("SW1:1")
+	PORT_START("DSW1")  /* DSW1 (0xc204) */
+	PORT_DIPNAME( 0x01, 0x01, "Coin Slots" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_SERVICE_DIPLOC(  0x02, IP_ACTIVE_LOW, "SW1:2" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -400,7 +400,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	PORT_START("COIN")	/* COIN (0xc205) */
+	PORT_START("COIN")  /* COIN (0xc205) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -422,9 +422,9 @@ INPUT_PORTS_END
 
 static const gfx_layout cshooter_charlayout =
 {
-	8,8,		/* 8*8 characters */
-	RGN_FRAC(1,1),		/* 512 characters */
-	2,			/* 4 bits per pixel */
+	8,8,        /* 8*8 characters */
+	RGN_FRAC(1,1),      /* 512 characters */
+	2,          /* 4 bits per pixel */
 	{ 0,4 },
 	{ 8,9,10,11,0,1,2,3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
@@ -438,11 +438,11 @@ static GFXDECODE_START( cshooter )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( cshooter, cshooter_state )
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cshooter_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(cshooter_state,cshooter)
@@ -465,11 +465,11 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( airraid, cshooter_state )
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
 
-	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)		 /* verified on pcb */
+	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)      /* verified on pcb */
 
 	MCFG_MACHINE_RESET_OVERRIDE(cshooter_state,airraid)
 
@@ -545,29 +545,29 @@ data in the custom SIPs. I am not sure though.
 
 
 ROM_START( cshooter )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// Main CPU?
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU?
 	ROM_LOAD( "r1",  0x00000, 0x08000, CRC(fbe8c518) SHA1(bff8319f4892e6d06f1c7a679f67dc8407279cfa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	// Sub/Sound CPU?
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sub/Sound CPU?
 	ROM_LOAD( "r4",  0x00000, 0x08000, CRC(84fed017) SHA1(9a564c9379eb48569cfba48562889277991864d8) )
 
 	// not hooked up yet (Taito version has this instead of encryption!
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "cpu2", 0 ) /* 2k for the microcontroller */
 	ROM_LOAD( "crshooter.3j",    0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )	// TX Layer
-	ROM_LOAD( "r3",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )	// only 1 byte difference with 3.f11, bad dump?
+	ROM_REGION( 0x02000, "gfx1", 0 )    // TX Layer
+	ROM_LOAD( "r3",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )   // only 1 byte difference with 3.f11, bad dump?
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "gfx.bin",    0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "user1", 0 )	// Sprites & Backgrounds ?
+	ROM_REGION( 0x10000, "user1", 0 )   // Sprites & Backgrounds ?
 	ROM_LOAD( "r2",  0x00000, 0x10000, CRC(5ddf9f4e) SHA1(69e4d422ca272bf2e9f00edbe7d23760485fdfe6) )
 
 	ROM_REGION( 0x220, "proms", 0 )
-	ROM_LOAD( "0.bpr", 0x0000, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) )	/* priority? (not used) */
-	ROM_LOAD( "1.bpr", 0x0020, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) )	/* timing? (not used) */
-	ROM_LOAD( "2.bpr", 0x0120, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* timing? (not used) */
+	ROM_LOAD( "0.bpr", 0x0000, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) )   /* priority? (not used) */
+	ROM_LOAD( "1.bpr", 0x0020, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) )   /* timing? (not used) */
+	ROM_LOAD( "2.bpr", 0x0120, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )   /* timing? (not used) */
 ROM_END
 
 /*
@@ -602,20 +602,20 @@ Note, all ROMs have official sticker, "(C) SEIBU KAIHATSU INC." and a number.
 */
 
 ROM_START( cshootere )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// Main CPU?
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU?
 	ROM_LOAD( "1.k19",  0x00000, 0x08000, CRC(71418952) SHA1(9745ca006576381c9e9595d8e42ab276bab80a41) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	// Sub/Sound CPU?
-	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )	// 5.g6
-	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )	// 4.g8
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sub/Sound CPU?
+	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) ) // 5.g6
+	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
-	ROM_REGION( 0x02000, "gfx1",  ROMREGION_INVERT )	// TX Layer
-	ROM_LOAD( "3.f11",  0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )	// only 1 byte difference with R3, bad dump?
+	ROM_REGION( 0x02000, "gfx1",  ROMREGION_INVERT )    // TX Layer
+	ROM_LOAD( "3.f11",  0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )    // only 1 byte difference with R3, bad dump?
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "gfx.bin",    0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "user1", 0 )	// Sprites & Backgrounds ?
+	ROM_REGION( 0x10000, "user1", 0 )   // Sprites & Backgrounds ?
 	ROM_LOAD( "2.k20",  0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )
@@ -644,20 +644,20 @@ SEI0030BU          SEI0060BU                             sw1 xx xxxxx
 */
 
 ROM_START( airraid )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// Main CPU?
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU?
 	ROM_LOAD( "1.16j",  0x00000, 0x08000, CRC(7ac2cedf) SHA1(272831f51a2731e067b5aec6dba6bddd3c5350c9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	// Sub/Sound CPU?
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sub/Sound CPU?
 	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
 	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_INVERT )	// TX Layer
+	ROM_REGION( 0x02000, "gfx1", ROMREGION_INVERT ) // TX Layer
 	ROM_LOAD( "3.13e",  0x00000, 0x02000, CRC(672ec0e8) SHA1(a11cd90d6494251ceee3bc7c72f4e7b1580b77e2) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
 	ROM_LOAD( "gfx.bin",    0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "user1", 0 )	// bg maps
+	ROM_REGION( 0x10000, "user1", 0 )   // bg maps
 	ROM_LOAD( "2.19j",  0x00000, 0x10000, CRC(842ae6c2) SHA1(0468445e4ab6f42bac786f9a258df3972fd1fde9) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )
@@ -718,4 +718,3 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 GAME( 1987, cshooter,  0,        cshooter, cshooter, cshooter_state, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1987, cshootere, cshooter,  airraid,  airraid, cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING )
 GAME( 1987, airraid,   cshooter,  airraid,  airraid, cshooter_state, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (encrypted)", GAME_NOT_WORKING )
-

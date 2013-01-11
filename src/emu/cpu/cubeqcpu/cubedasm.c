@@ -189,18 +189,18 @@ CPU_DISASSEMBLE( cquestrot )
 
 	int t       = (inshig >> 20) & 0xfff;
 	int jmp     = (inshig >> 16) & 0xf;
-	int spf		= (inshig >> 12) & 0xf;
+	int spf     = (inshig >> 12) & 0xf;
 //  int rsrc    = (inshig >> 11) & 0x1;
-	int yout	= (inshig >> 8) & 0x7;
-	int sel		= (inshig >> 6) & 0x3;
+	int yout    = (inshig >> 8) & 0x7;
+	int sel     = (inshig >> 6) & 0x3;
 //  int dsrc    = (inshig >> 4) & 0x3;
-	int b		= (inshig >> 0) & 0xf;
-	int a		= (inslow >> 28) & 0xf;
-	int i8_6	= (inslow >> 24) & 0x7;
-	int ci		= (inslow >> 23) & 0x1;
-	int i5_3	= (inslow >> 20) & 0x7;
+	int b       = (inshig >> 0) & 0xf;
+	int a       = (inslow >> 28) & 0xf;
+	int i8_6    = (inslow >> 24) & 0x7;
+	int ci      = (inslow >> 23) & 0x1;
+	int i5_3    = (inslow >> 20) & 0x7;
 //  int _sex    = (inslow >> 19) & 0x1;
-	int i2_0	= (inslow >> 16) & 0x7;
+	int i2_0    = (inslow >> 16) & 0x7;
 
 	sprintf(buffer, "%s %s,%s %x,%x,%c %d %s %s %s %.2x",
 			ins[i5_3],
@@ -274,17 +274,17 @@ CPU_DISASSEMBLE( cquestlin )
 	UINT32 inshig = inst >> 32;
 
 	int t       = (inshig >> 24) & 0xff;
-	int jmp		= (inshig >> 20) & 0xf;
-	int latch	= (inshig >> 16) & 0x7;
-	int op		= (inshig >> 15) & 0x1;
-	int spf		= (inshig >> 12) & 0x7;
-	int b		= (inshig >> 8) & 0xf;
-	int a		= (inshig >> 4) & 0xf;
-	int i8_6	= (inshig >> 0) & 0x7;
-	int ci		= (inslow >> 31) & 0x1;
-	int i5_3	= (inslow >> 28) & 0x7;
-	int _pbcs	= (inslow >> 27) & 0x1;
-	int i2_0	= (inslow >> 24) & 0x7;
+	int jmp     = (inshig >> 20) & 0xf;
+	int latch   = (inshig >> 16) & 0x7;
+	int op      = (inshig >> 15) & 0x1;
+	int spf     = (inshig >> 12) & 0x7;
+	int b       = (inshig >> 8) & 0xf;
+	int a       = (inshig >> 4) & 0xf;
+	int i8_6    = (inshig >> 0) & 0x7;
+	int ci      = (inslow >> 31) & 0x1;
+	int i5_3    = (inslow >> 28) & 0x7;
+	int _pbcs   = (inslow >> 27) & 0x1;
+	int i2_0    = (inslow >> 24) & 0x7;
 
 	sprintf(buffer, "%s %s,%s %x,%x %c %s %.2x %s %s %s %s",
 			ins[i5_3],

@@ -13,11 +13,11 @@ static char *output;
 
 static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 {
-    va_list vl;
+	va_list vl;
 
-    va_start(vl, fmt);
-    vsprintf(output, fmt, vl);
-    va_end(vl);
+	va_start(vl, fmt);
+	vsprintf(output, fmt, vl);
+	va_end(vl);
 }
 
 /*****************************************************************************/
@@ -43,13 +43,13 @@ static const char *alu[] =
 
 /*****************************************************************************/
 
-#define OP0		(op >> 12)
-#define OPA		((op >> 9) & 7)
-#define OP1		((op >> 6) & 7)
-#define OPN		((op >> 3) & 7)
-#define OPB		(op & 7)
-#define OPIMM	(op & 0x3f)
-#define OP2X	((OP0 < 14 && OP1 == 4 && (OPN >= 1 && OPN <= 3)) || (OP0 == 15 && (OP1 == 1 || OP1 == 2)))
+#define OP0     (op >> 12)
+#define OPA     ((op >> 9) & 7)
+#define OP1     ((op >> 6) & 7)
+#define OPN     ((op >> 3) & 7)
+#define OPB     (op & 7)
+#define OPIMM   (op & 0x3f)
+#define OP2X    ((OP0 < 14 && OP1 == 4 && (OPN >= 1 && OPN <= 3)) || (OP0 == 15 && (OP1 == 1 || OP1 == 2)))
 
 /*****************************************************************************/
 
@@ -266,5 +266,5 @@ CPU_DISASSEMBLE( unsp )
 			}
 			return UNSP_DASM_OK;
 	}
-    return UNSP_DASM_OK;
+	return UNSP_DASM_OK;
 }

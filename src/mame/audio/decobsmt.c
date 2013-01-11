@@ -10,8 +10,8 @@
 #include "emu.h"
 #include "audio/decobsmt.h"
 
-#define	M6809_TAG	"soundcpu"
-#define BSMT_TAG	"bsmt"
+#define M6809_TAG   "soundcpu"
+#define BSMT_TAG    "bsmt"
 
 static ADDRESS_MAP_START( decobsmt_map, AS_PROGRAM, 8, decobsmt_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
@@ -39,11 +39,11 @@ static void bsmt_ready_callback(bsmt2000_device &device)
 }
 
 MACHINE_CONFIG_FRAGMENT( decobsmt )
-    MCFG_CPU_ADD(M6809_TAG, M6809, (3579580/2))
+	MCFG_CPU_ADD(M6809_TAG, M6809, (3579580/2))
 	MCFG_CPU_PROGRAM_MAP(decobsmt_map)
 	MCFG_CPU_PERIODIC_INT(decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
-    MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_BSMT2000_ADD(BSMT_TAG, 24000000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, bsmt_map)
 	MCFG_BSMT2000_READY_CALLBACK(bsmt_ready_callback)
@@ -77,7 +77,7 @@ machine_config_constructor decobsmt_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, DECOBSMT, "Data East/Sega/Stern BSMT2000 Sound Board", tag, owner, clock),
+		device_t(mconfig, DECOBSMT, "Data East/Sega/Stern BSMT2000 Sound Board", tag, owner, clock),
 	m_ourcpu(*this, M6809_TAG),
 	m_bsmt(*this, BSMT_TAG)
 {
@@ -139,6 +139,5 @@ WRITE8_MEMBER(decobsmt_device::bsmt_comms_w)
 
 WRITE_LINE_MEMBER(decobsmt_device::bsmt_reset_line)
 {
-    m_ourcpu->set_input_line(INPUT_LINE_RESET, state);
+	m_ourcpu->set_input_line(INPUT_LINE_RESET, state);
 }
-

@@ -246,7 +246,7 @@ enum
 ***************************************************************************/
 
 enum
-{	SPR_VAB	 = 0,
+{   SPR_VAB  = 0,
 	SPR_OPS  = 1,
 	SPR_CPS  = 2,
 	SPR_CFG  = 3,
@@ -271,7 +271,7 @@ enum
 	SPR_CR   = 135,
 	SPR_FPE  = 160,
 	SPR_INTE = 161,
-	SPR_FPS	 = 162,
+	SPR_FPS  = 162,
 };
 
 
@@ -290,34 +290,34 @@ enum
 
 enum
 {
-	EXCEPTION_ILLEGAL_OPCODE			= 0,
-	EXCEPTION_UNALIGNED_ACCESS			= 1,
-	EXCEPTION_OUT_OF_RANGE				= 2,
-	EXCEPTION_COPRO_NOT_PRESENT			= 3,
-	EXCEPTION_COPRO_EXCEPTION			= 4,
-	EXCEPTION_PROTECTION_VIOLATION		= 5,
-	EXCEPTION_INST_ACCESS_VIOLATION 	= 6,
-	EXCEPTION_DATA_ACCESS_VIOLATION 	= 7,
-	EXCEPTION_USER_INST_TLB_MISS		= 8,
-	EXCEPTION_USER_DATA_TLB_MISS		= 9,
-	EXCEPTION_SUPER_INST_TLB_MISS		= 10,
-	EXCEPTION_SUPER_DATA_TLB_MISS		= 11,
-	EXCEPTION_INST_TLB_PROT_VIOLATION	= 12,
-	EXCEPTION_DATA_TLB_PROT_VIOLATION	= 13,
-	EXCEPTION_TIMER						= 14,
-	EXCEPTION_TRACE						= 15,
-	EXCEPTION_INTR0						= 16,
-	EXCEPTION_INTR1						= 17,
-	EXCEPTION_INTR2						= 18,
-	EXCEPTION_INTR3						= 19,
-	EXCEPTION_TRAP0						= 20,
-	EXCEPTION_TRAP1						= 21,
-	EXCEPTION_FLOATING_POINT_EXCEPTION	= 22,
-	EXCEPTION_MULTM						= 30,
-	EXCEPTION_MULTMU					= 31,
-	EXCEPTION_MULTIPLY					= 32,
-	EXCEPTION_DIVIDE					= 33,
-	EXCEPTION_MULTIPLU					= 44,      // TODO: FINISH ME
+	EXCEPTION_ILLEGAL_OPCODE            = 0,
+	EXCEPTION_UNALIGNED_ACCESS          = 1,
+	EXCEPTION_OUT_OF_RANGE              = 2,
+	EXCEPTION_COPRO_NOT_PRESENT         = 3,
+	EXCEPTION_COPRO_EXCEPTION           = 4,
+	EXCEPTION_PROTECTION_VIOLATION      = 5,
+	EXCEPTION_INST_ACCESS_VIOLATION     = 6,
+	EXCEPTION_DATA_ACCESS_VIOLATION     = 7,
+	EXCEPTION_USER_INST_TLB_MISS        = 8,
+	EXCEPTION_USER_DATA_TLB_MISS        = 9,
+	EXCEPTION_SUPER_INST_TLB_MISS       = 10,
+	EXCEPTION_SUPER_DATA_TLB_MISS       = 11,
+	EXCEPTION_INST_TLB_PROT_VIOLATION   = 12,
+	EXCEPTION_DATA_TLB_PROT_VIOLATION   = 13,
+	EXCEPTION_TIMER                     = 14,
+	EXCEPTION_TRACE                     = 15,
+	EXCEPTION_INTR0                     = 16,
+	EXCEPTION_INTR1                     = 17,
+	EXCEPTION_INTR2                     = 18,
+	EXCEPTION_INTR3                     = 19,
+	EXCEPTION_TRAP0                     = 20,
+	EXCEPTION_TRAP1                     = 21,
+	EXCEPTION_FLOATING_POINT_EXCEPTION  = 22,
+	EXCEPTION_MULTM                     = 30,
+	EXCEPTION_MULTMU                    = 31,
+	EXCEPTION_MULTIPLY                  = 32,
+	EXCEPTION_DIVIDE                    = 33,
+	EXCEPTION_MULTIPLU                  = 44,      // TODO: FINISH ME
 };
 
 
@@ -325,96 +325,96 @@ enum
     SPECIAL PURPOSE REGISTER FIELDS
 ***************************************************************************/
 
-#define PRL_AM29000				(0 << 3)
-#define PRL_AM29050				(1 << 3)
-#define PRL_REV_A				(0)
-#define PRL_REV_B				(1)
-#define PRL_REV_C				(2)
-#define PRL_REV_D				(3)
+#define PRL_AM29000             (0 << 3)
+#define PRL_AM29050             (1 << 3)
+#define PRL_REV_A               (0)
+#define PRL_REV_B               (1)
+#define PRL_REV_C               (2)
+#define PRL_REV_D               (3)
 
-#define PROCESSOR_REL_FIELD		(PRL_AM29000 | PRL_REV_D)
+#define PROCESSOR_REL_FIELD     (PRL_AM29000 | PRL_REV_D)
 
-#define VAB_SHIFT				(16)
-#define VAB_MASK				(0xffff)
+#define VAB_SHIFT               (16)
+#define VAB_MASK                (0xffff)
 
-#define CPS_CA					(1 << 15)
-#define CPS_IP					(1 << 14)
-#define CPS_TE					(1 << 13)
-#define CPS_TP					(1 << 12)
-#define CPS_TU					(1 << 11)
-#define CPS_FZ					(1 << 10)
-#define CPS_LK					(1 << 9)
-#define CPS_RE					(1 << 8)
-#define CPS_WM					(1 << 7)
-#define CPS_PD					(1 << 6)
-#define CPS_PI					(1 << 5)
-#define CPS_SM					(1 << 4)
-#define CPS_IM_SHIFT			(2)
-#define CPS_IM_MASK				(3)
-#define CPS_DI					(1 << 1)
-#define CPS_DA					(1 << 0)
+#define CPS_CA                  (1 << 15)
+#define CPS_IP                  (1 << 14)
+#define CPS_TE                  (1 << 13)
+#define CPS_TP                  (1 << 12)
+#define CPS_TU                  (1 << 11)
+#define CPS_FZ                  (1 << 10)
+#define CPS_LK                  (1 << 9)
+#define CPS_RE                  (1 << 8)
+#define CPS_WM                  (1 << 7)
+#define CPS_PD                  (1 << 6)
+#define CPS_PI                  (1 << 5)
+#define CPS_SM                  (1 << 4)
+#define CPS_IM_SHIFT            (2)
+#define CPS_IM_MASK             (3)
+#define CPS_DI                  (1 << 1)
+#define CPS_DA                  (1 << 0)
 
-#define CFG_PRL_MASK			(0xff)
-#define CFG_PRL_SHIFT			(24)
-#define CFG_DW					(1 << 5)
-#define CFG_VF					(1 << 4)
-#define CFG_RV					(1 << 3)
-#define CFG_BO					(1 << 2)
-#define CFG_CP					(1 << 1)
-#define CFG_CD					(1 << 0)
+#define CFG_PRL_MASK            (0xff)
+#define CFG_PRL_SHIFT           (24)
+#define CFG_DW                  (1 << 5)
+#define CFG_VF                  (1 << 4)
+#define CFG_RV                  (1 << 3)
+#define CFG_BO                  (1 << 2)
+#define CFG_CP                  (1 << 1)
+#define CFG_CD                  (1 << 0)
 
-#define CHC_CE_CNTL_MASK		(0xff)
-#define CHC_CE_CNTL_SHIFT		(24)
-#define CHC_CR_MASK				(0xff)
-#define CHC_CR_SHIFT			(16)
-#define CHC_LS					(1 << 15)
-#define CHC_ML					(1 << 14)
-#define CHC_ST					(1 << 13)
-#define CHC_LA					(1 << 12)
-#define CHC_TF					(1 << 11)
-#define CHC_TR_MASK				(0xff)
-#define CHC_TR_SHIFT			(2)
-#define CHC_NN					(1 << 1)
-#define CHC_CV					(1 << 0)
+#define CHC_CE_CNTL_MASK        (0xff)
+#define CHC_CE_CNTL_SHIFT       (24)
+#define CHC_CR_MASK             (0xff)
+#define CHC_CR_SHIFT            (16)
+#define CHC_LS                  (1 << 15)
+#define CHC_ML                  (1 << 14)
+#define CHC_ST                  (1 << 13)
+#define CHC_LA                  (1 << 12)
+#define CHC_TF                  (1 << 11)
+#define CHC_TR_MASK             (0xff)
+#define CHC_TR_SHIFT            (2)
+#define CHC_NN                  (1 << 1)
+#define CHC_CV                  (1 << 0)
 
-#define RBP_MASK				(0xffff)
+#define RBP_MASK                (0xffff)
 
-#define TCV_MASK				(0x00ffffff)
-#define TCV_SHIFT				(0)
+#define TCV_MASK                (0x00ffffff)
+#define TCV_SHIFT               (0)
 
-#define TMR_OV					(1 << 26)
-#define TMR_IN					(1 << 25)
-#define TMR_IE					(1 << 24)
-#define TMR_TRV_MASK			(0x00ffffff)
-#define TMR_TRV_SHIFT			(0)
+#define TMR_OV                  (1 << 26)
+#define TMR_IN                  (1 << 25)
+#define TMR_IE                  (1 << 24)
+#define TMR_TRV_MASK            (0x00ffffff)
+#define TMR_TRV_SHIFT           (0)
 
-#define PC_MASK					(0xfffffffc)
+#define PC_MASK                 (0xfffffffc)
 
-#define MMU_PS_MASK				(3)
-#define MMU_PS_SHIFT			(8)
-#define MMU_PID_MASK			(0xff)
-#define MMU_PID_SHIFT			(0)
+#define MMU_PS_MASK             (3)
+#define MMU_PS_SHIFT            (8)
+#define MMU_PID_MASK            (0xff)
+#define MMU_PID_SHIFT           (0)
 
-#define LRU_MASK				(0x3f)
-#define LRU_SHIFT				(1)
+#define LRU_MASK                (0x3f)
+#define LRU_SHIFT               (1)
 
-#define ALU_DF_SHIFT			(11)
-#define ALU_DF					(1 << 11)
-#define ALU_V_SHIFT				(10)
-#define ALU_V					(1 << 10)
-#define ALU_N_SHIFT				(9)
-#define ALU_N					(1 << 9)
-#define ALU_Z_SHIFT				(8)
-#define ALU_Z					(1 << 8)
-#define ALU_C_SHIFT				(7)
-#define ALU_C					(1 << 7)
-#define ALU_BP_MASK				(3)
-#define ALU_BP_SHIFT			(5)
-#define ALU_FC_MASK				(0x1f)
-#define ALU_FC_SHIFT			(0)
+#define ALU_DF_SHIFT            (11)
+#define ALU_DF                  (1 << 11)
+#define ALU_V_SHIFT             (10)
+#define ALU_V                   (1 << 10)
+#define ALU_N_SHIFT             (9)
+#define ALU_N                   (1 << 9)
+#define ALU_Z_SHIFT             (8)
+#define ALU_Z                   (1 << 8)
+#define ALU_C_SHIFT             (7)
+#define ALU_C                   (1 << 7)
+#define ALU_BP_MASK             (3)
+#define ALU_BP_SHIFT            (5)
+#define ALU_FC_MASK             (0x1f)
+#define ALU_FC_SHIFT            (0)
 
-#define IPX_MASK				(0xff)
-#define IPX_SHIFT				(2)
+#define IPX_MASK                (0xff)
+#define IPX_SHIFT               (2)
 
 
 
@@ -423,10 +423,10 @@ enum
     INTERRUPT CONSTANTS
 ***************************************************************************/
 
-#define AM29000_INTR0		0
-#define AM29000_INTR1		1
-#define AM29000_INTR2		2
-#define AM29000_INTR3		3
+#define AM29000_INTR0       0
+#define AM29000_INTR1       1
+#define AM29000_INTR2       2
+#define AM29000_INTR3       3
 
 
 /***************************************************************************

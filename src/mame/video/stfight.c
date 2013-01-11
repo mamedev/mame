@@ -188,7 +188,7 @@ WRITE8_MEMBER(stfight_state::stfight_text_attr_w)
 WRITE8_MEMBER(stfight_state::stfight_sprite_bank_w)
 {
 	m_sprite_base = ( ( data & 0x04 ) << 7 ) |
-				          ( ( data & 0x01 ) << 8 );
+							( ( data & 0x01 ) << 8 );
 }
 
 WRITE8_MEMBER(stfight_state::stfight_vh_latch_w)
@@ -264,7 +264,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if( sx >= 0xf0 )
 			{
 				if (attr & 0x80)
-				    sx -= 0x100;
+					sx -= 0x100;
 			}
 
 			if (state->flip_screen())
@@ -277,12 +277,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			code = state->m_sprite_base + state->m_sprite_ram[offs];
 
 			pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
-				     code,
-					 color,
-					 flipx,state->flip_screen(),
-					 sx,sy,
-				     machine.priority_bitmap,
-					 pri ? 0x02 : 0,0x0f);
+						code,
+						color,
+						flipx,state->flip_screen(),
+						sx,sy,
+						machine.priority_bitmap,
+						pri ? 0x02 : 0,0x0f);
 		}
 	}
 }
@@ -294,7 +294,7 @@ UINT32 stfight_state::screen_update_stfight(screen_device &screen, bitmap_ind16 
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap.fill(0, cliprect);	/* in case m_bg_tilemap is disabled */
+	bitmap.fill(0, cliprect);   /* in case m_bg_tilemap is disabled */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
 

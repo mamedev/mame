@@ -14,15 +14,15 @@ void IPR_set(dsp56k_core* cpustate, UINT16 value)
 	IPR = value;
 }
 
-INT8  irqa_ipl(dsp56k_core* cpustate)	{ return ((IPR & 0x0003) >> 0) - 1;  }
+INT8  irqa_ipl(dsp56k_core* cpustate)   { return ((IPR & 0x0003) >> 0) - 1;  }
 UINT8 irqa_trigger(dsp56k_core* cpustate){ return  (IPR & 0x0004) >> 2;       }
-INT8  irqb_ipl(dsp56k_core* cpustate)	{ return ((IPR & 0x0018) >> 3) - 1;  }
+INT8  irqb_ipl(dsp56k_core* cpustate)   { return ((IPR & 0x0018) >> 3) - 1;  }
 UINT8 irqb_trigger(dsp56k_core* cpustate){ return  (IPR & 0x0002) >> 5;       }
-INT8  codec_ipl(dsp56k_core* cpustate)	{ return ((IPR & 0x00c0) >> 6) - 1;  }
-INT8  host_ipl(dsp56k_core* cpustate)	{ return ((IPR & 0x0300) >> 8) - 1;  }
-INT8  ssi0_ipl(dsp56k_core* cpustate)	{ return ((IPR & 0x0c00) >> 10) - 1; }
-INT8  ssi1_ipl(dsp56k_core* cpustate)	{ return ((IPR & 0x3000) >> 12) - 1; }
-INT8  tm_ipl(dsp56k_core* cpustate)		{ return ((IPR & 0xc000) >> 14) - 1; }
+INT8  codec_ipl(dsp56k_core* cpustate)  { return ((IPR & 0x00c0) >> 6) - 1;  }
+INT8  host_ipl(dsp56k_core* cpustate)   { return ((IPR & 0x0300) >> 8) - 1;  }
+INT8  ssi0_ipl(dsp56k_core* cpustate)   { return ((IPR & 0x0c00) >> 10) - 1; }
+INT8  ssi1_ipl(dsp56k_core* cpustate)   { return ((IPR & 0x3000) >> 12) - 1; }
+INT8  tm_ipl(dsp56k_core* cpustate)     { return ((IPR & 0xc000) >> 14) - 1; }
 
 void mem_reset(dsp56k_core* cpustate)
 {
@@ -192,7 +192,7 @@ void HF1_bit_host_set(dsp56k_core* cpustate, UINT8 value)
 	ICR &= ~(0x10);
 	ICR |=  (value << 4);
 
-	HF1_bit_set(cpustate, value);		// 5-14
+	HF1_bit_set(cpustate, value);       // 5-14
 }
 void HF0_bit_host_set(dsp56k_core* cpustate, UINT8 value)
 {
@@ -200,7 +200,7 @@ void HF0_bit_host_set(dsp56k_core* cpustate, UINT8 value)
 	ICR &= ~(0x08);
 	ICR |=  (value << 3);
 
-	HF0_bit_set(cpustate, value);		// 5-13
+	HF0_bit_set(cpustate, value);       // 5-13
 }
 void TREQ_bit_set(dsp56k_core* cpustate, UINT8 value)
 {
@@ -241,7 +241,7 @@ void HC_bit_set(dsp56k_core* cpustate, UINT8 value)
 	CVR &= ~(0x80);
 	CVR |=  (value << 7);
 
-	HCP_bit_set(cpustate, value);	// 5-9 & 5-11
+	HCP_bit_set(cpustate, value);   // 5-9 & 5-11
 }
 void HV_bits_set(dsp56k_core* cpustate, UINT8 value)
 {
@@ -306,19 +306,19 @@ void dsp56k_host_interface_reset(dsp56k_core* cpustate)
 	cpustate->HI.bootstrap_offset = 0x0000;
 
 	/* HCR */
-	HCR_set(cpustate, 0x0000);	// 5-10
+	HCR_set(cpustate, 0x0000);  // 5-10
 
 	/* HSR */
-	HRDF_bit_set(cpustate, 0);	// 5-11
-	HTDE_bit_set(cpustate, 1);	// 5-11
-	HCP_bit_set(cpustate, 0);	// 5-11
-	HF0_bit_set(cpustate, 0);	// 5-12
-	HF1_bit_set(cpustate, 0);	// 5-12
-	DMA_bit_set(cpustate, 0);	// 5-12
+	HRDF_bit_set(cpustate, 0);  // 5-11
+	HTDE_bit_set(cpustate, 1);  // 5-11
+	HCP_bit_set(cpustate, 0);   // 5-11
+	HF0_bit_set(cpustate, 0);   // 5-12
+	HF1_bit_set(cpustate, 0);   // 5-12
+	DMA_bit_set(cpustate, 0);   // 5-12
 
 	/* CVR*/
-	HV_bits_set(cpustate, 0x16);	// 5-7
-	HC_bit_set(cpustate, 0);		// 5-9
+	HV_bits_set(cpustate, 0x16);    // 5-7
+	HC_bit_set(cpustate, 0);        // 5-9
 
 	/* TODO: ISR (at least) */
 }
@@ -564,7 +564,7 @@ READ16_HANDLER( peripheral_register_r )
 				return 0xbeef;
 			else
 			{
-				UINT16 value = HRX;		// TODO: Maybe not exactly right?  Just being safe.
+				UINT16 value = HRX;     // TODO: Maybe not exactly right?  Just being safe.
 				DSP56K::HRDF_bit_set(cpustate, 0);
 				return value;
 			}
@@ -722,7 +722,7 @@ WRITE16_HANDLER( peripheral_register_w )
 		// HTX/HRX: Host TX/RX Register
 		case 0xffe5:
 			HTX = data;
-			DSP56K::HTDE_bit_set(cpustate, 0);	// 5-5
+			DSP56K::HTDE_bit_set(cpustate, 0);  // 5-5
 			break;
 
 		// COSR
@@ -796,9 +796,9 @@ void dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data)
 
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
-    if (!host_interface_active())
-        logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
-    */
+	if (!host_interface_active())
+	    logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
+	*/
 
 	switch (offset)
 	{
@@ -850,10 +850,10 @@ void dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data)
 			{
 				cpustate->program_ram[cpustate->HI.bootstrap_offset] &= 0x00ff;
 				cpustate->program_ram[cpustate->HI.bootstrap_offset] |= (data << 8);
-				break;	/* Probably the right thing to do, given this is a hack */
+				break;  /* Probably the right thing to do, given this is a hack */
 			}
 
-			if (DSP56K::TXDE_bit(cpustate))	// 5-5
+			if (DSP56K::TXDE_bit(cpustate)) // 5-5
 			{
 				TXH = data;
 			}
@@ -872,10 +872,10 @@ void dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data)
 				{
 					cpustate->bootstrap_mode = BOOTSTRAP_OFF;
 				}
-				break;	/* Probably the right thing to do, given this is a hack */
+				break;  /* Probably the right thing to do, given this is a hack */
 			}
 
-			if (DSP56K::TXDE_bit(cpustate))	// 5-5
+			if (DSP56K::TXDE_bit(cpustate)) // 5-5
 			{
 				TXL = data;
 				DSP56K::TXDE_bit_set(cpustate, 0);
@@ -892,9 +892,9 @@ UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset)
 
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
-    if (!host_interface_active())
-        logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
-    */
+	if (!host_interface_active())
+	    logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
+	*/
 
 	switch (offset)
 	{
@@ -939,7 +939,7 @@ UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset)
 				return 0xbf;
 			else
 			{
-				UINT8 value = RXL;	// TODO: Maybe not exactly right?  I'm just being safe.
+				UINT8 value = RXL;  // TODO: Maybe not exactly right?  I'm just being safe.
 				DSP56K::RXDF_bit_set(cpustate, 0);
 				return value;
 			}
@@ -958,5 +958,3 @@ UINT16 dsp56k_get_peripheral_memory(device_t* device, UINT16 addr)
 	dsp56k_core* cpustate = get_safe_token(device);
 	return cpustate->peripheral_ram[A2O(addr)];
 }
-
-

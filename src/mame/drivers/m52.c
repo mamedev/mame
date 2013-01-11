@@ -49,7 +49,7 @@
 #include "includes/m52.h"
 
 
-#define MASTER_CLOCK		XTAL_18_432MHz
+#define MASTER_CLOCK        XTAL_18_432MHz
 
 
 /*************************************
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m52_state )
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r)
 	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07fc) AM_WRITE_LEGACY(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(m52_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(m52_flipscreen_w)   /* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07f8) AM_READ_PORT("IN0")
 	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")
 	AM_RANGE(0xd002, 0xd002) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( m52 )
 	PORT_START("IN0")
 	/* Start 1 & 2 also restarts and freezes the game with stop mode on
-       and are used in test mode to enter and esc the various tests */
+	   and are used in test mode to enter and esc the various tests */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	/* coin input must be active for 19 frames to be consistently recognized */

@@ -289,13 +289,13 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 #include "video/voodoo.h"
 
 #define VIPER_DEBUG_LOG
-#define VIPER_DEBUG_EPIC_INTS		1
-#define VIPER_DEBUG_EPIC_TIMERS		0
-#define VIPER_DEBUG_EPIC_REGS		0
-#define VIPER_DEBUG_EPIC_I2C		0
+#define VIPER_DEBUG_EPIC_INTS       1
+#define VIPER_DEBUG_EPIC_TIMERS     0
+#define VIPER_DEBUG_EPIC_REGS       0
+#define VIPER_DEBUG_EPIC_I2C        0
 
 
-#define SDRAM_CLOCK			166666666		// Main SDRAMs run at 166MHz
+#define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
 
 static UINT32 *workram;
 
@@ -456,35 +456,35 @@ WRITE64_MEMBER(viper_state::pci_config_data_w)
 
 static void mpc8240_interrupt(running_machine &machine, int irq);
 
-#define MPC8240_IRQ0				0
-#define MPC8240_IRQ1				1
-#define MPC8240_IRQ2				2
-#define MPC8240_IRQ3				3
-#define MPC8240_IRQ4				4
-#define MPC8240_IRQ5				5
-#define MPC8240_IRQ6				6
-#define MPC8240_IRQ7				7
-#define MPC8240_IRQ8				8
-#define MPC8240_IRQ9				9
-#define MPC8240_IRQ10				10
-#define MPC8240_IRQ11				11
-#define MPC8240_IRQ12				12
-#define MPC8240_IRQ13				13
-#define MPC8240_IRQ14				14
-#define MPC8240_IRQ15				15
-#define MPC8240_I2C_IRQ				16
-#define MPC8240_DMA0_IRQ			17
-#define MPC8240_DMA1_IRQ			18
-#define MPC8240_MSG_IRQ				19
-#define MPC8240_GTIMER0_IRQ			20
-#define MPC8240_GTIMER1_IRQ			21
-#define MPC8240_GTIMER2_IRQ			22
-#define MPC8240_GTIMER3_IRQ			23
+#define MPC8240_IRQ0                0
+#define MPC8240_IRQ1                1
+#define MPC8240_IRQ2                2
+#define MPC8240_IRQ3                3
+#define MPC8240_IRQ4                4
+#define MPC8240_IRQ5                5
+#define MPC8240_IRQ6                6
+#define MPC8240_IRQ7                7
+#define MPC8240_IRQ8                8
+#define MPC8240_IRQ9                9
+#define MPC8240_IRQ10               10
+#define MPC8240_IRQ11               11
+#define MPC8240_IRQ12               12
+#define MPC8240_IRQ13               13
+#define MPC8240_IRQ14               14
+#define MPC8240_IRQ15               15
+#define MPC8240_I2C_IRQ             16
+#define MPC8240_DMA0_IRQ            17
+#define MPC8240_DMA1_IRQ            18
+#define MPC8240_MSG_IRQ             19
+#define MPC8240_GTIMER0_IRQ         20
+#define MPC8240_GTIMER1_IRQ         21
+#define MPC8240_GTIMER2_IRQ         22
+#define MPC8240_GTIMER3_IRQ         23
 
-#define MPC8240_NUM_INTERRUPTS		24
+#define MPC8240_NUM_INTERRUPTS      24
 
-#define I2C_STATE_ADDRESS_CYCLE		1
-#define I2C_STATE_DATA_TRANSFER		2
+#define I2C_STATE_ADDRESS_CYCLE     1
+#define I2C_STATE_DATA_TRANSFER     2
 
 
 struct MPC8240_IRQ
@@ -539,11 +539,11 @@ static const char* epic_get_register_name(UINT32 reg)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x3000:	return "I2CADR";
-				case 0x3004:	return "I2CFDR";
-				case 0x3008:	return "I2CCR";
-				case 0x300c:	return "I2CSR";
-				case 0x3010:	return "I2CDR";
+				case 0x3000:    return "I2CADR";
+				case 0x3004:    return "I2CFDR";
+				case 0x3008:    return "I2CCR";
+				case 0x300c:    return "I2CSR";
+				case 0x3010:    return "I2CDR";
 			}
 		}
 
@@ -552,29 +552,29 @@ static const char* epic_get_register_name(UINT32 reg)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x1000:	return "FRR";
-				case 0x1020:	return "GCR";
-				case 0x1030:	return "EICR";
-				case 0x1080:	return "EVI";
-				case 0x1090:	return "PI";
-				case 0x10e0:	return "SVR";
-				case 0x10f0:	return "TFRR";
-				case 0x1100:	return "GTCCR0";
-				case 0x1110:	return "GTBCR0";
-				case 0x1120:	return "GTVPR0";
-				case 0x1130:	return "GTDR0";
-				case 0x1140:	return "GTCCR1";
-				case 0x1150:	return "GTBCR1";
-				case 0x1160:	return "GTVPR1";
-				case 0x1170:	return "GTDR1";
-				case 0x1180:	return "GTCCR2";
-				case 0x1190:	return "GTBCR2";
-				case 0x11a0:	return "GTVPR2";
-				case 0x11b0:	return "GTDR2";
-				case 0x11c0:	return "GTCCR3";
-				case 0x11d0:	return "GTBCR3";
-				case 0x11e0:	return "GTVPR3";
-				case 0x11f0:	return "GTDR3";
+				case 0x1000:    return "FRR";
+				case 0x1020:    return "GCR";
+				case 0x1030:    return "EICR";
+				case 0x1080:    return "EVI";
+				case 0x1090:    return "PI";
+				case 0x10e0:    return "SVR";
+				case 0x10f0:    return "TFRR";
+				case 0x1100:    return "GTCCR0";
+				case 0x1110:    return "GTBCR0";
+				case 0x1120:    return "GTVPR0";
+				case 0x1130:    return "GTDR0";
+				case 0x1140:    return "GTCCR1";
+				case 0x1150:    return "GTBCR1";
+				case 0x1160:    return "GTVPR1";
+				case 0x1170:    return "GTDR1";
+				case 0x1180:    return "GTCCR2";
+				case 0x1190:    return "GTBCR2";
+				case 0x11a0:    return "GTVPR2";
+				case 0x11b0:    return "GTDR2";
+				case 0x11c0:    return "GTCCR3";
+				case 0x11d0:    return "GTBCR3";
+				case 0x11e0:    return "GTVPR3";
+				case 0x11f0:    return "GTDR3";
 			}
 			break;
 		}
@@ -584,46 +584,46 @@ static const char* epic_get_register_name(UINT32 reg)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x0200:	return "IVPR0";
-				case 0x0210:	return "IDR0";
-				case 0x0220:	return "IVPR1";
-				case 0x0230:	return "IDR1";
-				case 0x0240:	return "IVPR2";
-				case 0x0250:	return "IDR2";
-				case 0x0260:	return "IVPR3";
-				case 0x0270:	return "IDR3";
-				case 0x0280:	return "IVPR4";
-				case 0x0290:	return "IDR4";
-				case 0x02a0:	return "SVPR5";
-				case 0x02b0:	return "SDR5";
-				case 0x02c0:	return "SVPR6";
-				case 0x02d0:	return "SDR6";
-				case 0x02e0:	return "SVPR7";
-				case 0x02f0:	return "SDR7";
-				case 0x0300:	return "SVPR8";
-				case 0x0310:	return "SDR8";
-				case 0x0320:	return "SVPR9";
-				case 0x0330:	return "SDR9";
-				case 0x0340:	return "SVPR10";
-				case 0x0350:	return "SDR10";
-				case 0x0360:	return "SVPR11";
-				case 0x0370:	return "SDR11";
-				case 0x0380:	return "SVPR12";
-				case 0x0390:	return "SDR12";
-				case 0x03a0:	return "SVPR13";
-				case 0x03b0:	return "SDR13";
-				case 0x03c0:	return "SVPR14";
-				case 0x03d0:	return "SDR14";
-				case 0x03e0:	return "SVPR15";
-				case 0x03f0:	return "SDR15";
-				case 0x1020:	return "IIVPR0";
-				case 0x1030:	return "IIDR0";
-				case 0x1040:	return "IIVPR1";
-				case 0x1050:	return "IIDR1";
-				case 0x1060:	return "IIVPR2";
-				case 0x1070:	return "IIDR2";
-				case 0x10c0:	return "IIVPR3";
-				case 0x10d0:	return "IIDR3";
+				case 0x0200:    return "IVPR0";
+				case 0x0210:    return "IDR0";
+				case 0x0220:    return "IVPR1";
+				case 0x0230:    return "IDR1";
+				case 0x0240:    return "IVPR2";
+				case 0x0250:    return "IDR2";
+				case 0x0260:    return "IVPR3";
+				case 0x0270:    return "IDR3";
+				case 0x0280:    return "IVPR4";
+				case 0x0290:    return "IDR4";
+				case 0x02a0:    return "SVPR5";
+				case 0x02b0:    return "SDR5";
+				case 0x02c0:    return "SVPR6";
+				case 0x02d0:    return "SDR6";
+				case 0x02e0:    return "SVPR7";
+				case 0x02f0:    return "SDR7";
+				case 0x0300:    return "SVPR8";
+				case 0x0310:    return "SDR8";
+				case 0x0320:    return "SVPR9";
+				case 0x0330:    return "SDR9";
+				case 0x0340:    return "SVPR10";
+				case 0x0350:    return "SDR10";
+				case 0x0360:    return "SVPR11";
+				case 0x0370:    return "SDR11";
+				case 0x0380:    return "SVPR12";
+				case 0x0390:    return "SDR12";
+				case 0x03a0:    return "SVPR13";
+				case 0x03b0:    return "SDR13";
+				case 0x03c0:    return "SVPR14";
+				case 0x03d0:    return "SDR14";
+				case 0x03e0:    return "SVPR15";
+				case 0x03f0:    return "SDR15";
+				case 0x1020:    return "IIVPR0";
+				case 0x1030:    return "IIDR0";
+				case 0x1040:    return "IIVPR1";
+				case 0x1050:    return "IIDR1";
+				case 0x1060:    return "IIVPR2";
+				case 0x1070:    return "IIDR2";
+				case 0x10c0:    return "IIVPR3";
+				case 0x10d0:    return "IIDR3";
 			}
 			break;
 		}
@@ -633,9 +633,9 @@ static const char* epic_get_register_name(UINT32 reg)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x0080:	return "PCTPR";
-				case 0x00a0:	return "IACK";
-				case 0x00b0:	return "EOI";
+				case 0x0080:    return "PCTPR";
+				case 0x00a0:    return "IACK";
+				case 0x00b0:    return "EOI";
 			}
 			break;
 		}
@@ -723,7 +723,7 @@ READ32_MEMBER(viper_state::epic_r)
 	reg = offset * 4;
 
 #if VIPER_DEBUG_EPIC_REGS
-	if (reg != 0x600a0)		// IACK is spammy
+	if (reg != 0x600a0)     // IACK is spammy
 	{
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
@@ -746,29 +746,29 @@ READ32_MEMBER(viper_state::epic_r)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x3000:			// Offset 0x3000 - I2CADR
+				case 0x3000:            // Offset 0x3000 - I2CADR
 				{
 					ret = epic.i2c_adr;
 					break;
 				}
-				case 0x3004:			// Offset 0x3004 - I2CFDR
+				case 0x3004:            // Offset 0x3004 - I2CFDR
 				{
 					ret = epic.i2c_freq_div | (epic.i2c_freq_sample_rate << 8);
 					break;
 				}
-				case 0x3008:			// Offset 0x3008 - I2CCR
+				case 0x3008:            // Offset 0x3008 - I2CCR
 				{
 					ret = epic.i2c_cr;
 					break;
 				}
-				case 0x300c:			// Offset 0x300c - I2CSR
+				case 0x300c:            // Offset 0x300c - I2CSR
 				{
 					ret = epic.i2c_sr;
 					break;
 				}
-				case 0x3010:			// Offset 0x3010 - I2CDR
+				case 0x3010:            // Offset 0x3010 - I2CDR
 				{
-					if (epic.i2c_cr & 0x80)		// only do anything if the I2C module is enabled
+					if (epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
 					{
 						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
 						{
@@ -800,13 +800,13 @@ READ32_MEMBER(viper_state::epic_r)
 
 							// generate interrupt if interrupt are enabled
 							/*if (epic.i2c_cr & 0x40)
-                            {
-                                printf("I2C interrupt\n");
-                                mpc8240_interrupt(machine, MPC8240_I2C_IRQ);
+							{
+							    printf("I2C interrupt\n");
+							    mpc8240_interrupt(machine, MPC8240_I2C_IRQ);
 
-                                // set interrupt flag in status register
-                                epic.i2c_sr |= 0x2;
-                            }*/
+							    // set interrupt flag in status register
+							    epic.i2c_sr |= 0x2;
+							}*/
 						}
 					}
 					break;
@@ -820,10 +820,10 @@ READ32_MEMBER(viper_state::epic_r)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x1120:			// Offset 0x41120 - Global Timer 0 vector/priority register
-				case 0x1160:			// Offset 0x41160 - Global Timer 1 vector/priority register
-				case 0x11a0:			// Offset 0x411a0 - Global Timer 2 vector/priority register
-				case 0x11e0:			// Offset 0x411e0 - Global Timer 3 vector/priority register
+				case 0x1120:            // Offset 0x41120 - Global Timer 0 vector/priority register
+				case 0x1160:            // Offset 0x41160 - Global Timer 1 vector/priority register
+				case 0x11a0:            // Offset 0x411a0 - Global Timer 2 vector/priority register
+				case 0x11e0:            // Offset 0x411e0 - Global Timer 3 vector/priority register
 				{
 					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
 
@@ -842,22 +842,22 @@ READ32_MEMBER(viper_state::epic_r)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x0200:			// Offset 0x50200 - IRQ0 vector/priority register
-				case 0x0220:			// Offset 0x50220 - IRQ1 vector/priority register
-				case 0x0240:			// Offset 0x50240 - IRQ2 vector/priority register
-				case 0x0260:			// Offset 0x50260 - IRQ3 vector/priority register
-				case 0x0280:			// Offset 0x50280 - IRQ4 vector/priority register
-				case 0x02a0:			// Offset 0x502a0 - IRQ5 vector/priority register
-				case 0x02c0:			// Offset 0x502c0 - IRQ6 vector/priority register
-				case 0x02e0:			// Offset 0x502e0 - IRQ7 vector/priority register
-				case 0x0300:			// Offset 0x50300 - IRQ8 vector/priority register
-				case 0x0320:			// Offset 0x50320 - IRQ9 vector/priority register
-				case 0x0340:			// Offset 0x50340 - IRQ10 vector/priority register
-				case 0x0360:			// Offset 0x50360 - IRQ11 vector/priority register
-				case 0x0380:			// Offset 0x50380 - IRQ12 vector/priority register
-				case 0x03a0:			// Offset 0x503a0 - IRQ13 vector/priority register
-				case 0x03c0:			// Offset 0x503c0 - IRQ14 vector/priority register
-				case 0x03e0:			// Offset 0x503e0 - IRQ15 vector/priority register
+				case 0x0200:            // Offset 0x50200 - IRQ0 vector/priority register
+				case 0x0220:            // Offset 0x50220 - IRQ1 vector/priority register
+				case 0x0240:            // Offset 0x50240 - IRQ2 vector/priority register
+				case 0x0260:            // Offset 0x50260 - IRQ3 vector/priority register
+				case 0x0280:            // Offset 0x50280 - IRQ4 vector/priority register
+				case 0x02a0:            // Offset 0x502a0 - IRQ5 vector/priority register
+				case 0x02c0:            // Offset 0x502c0 - IRQ6 vector/priority register
+				case 0x02e0:            // Offset 0x502e0 - IRQ7 vector/priority register
+				case 0x0300:            // Offset 0x50300 - IRQ8 vector/priority register
+				case 0x0320:            // Offset 0x50320 - IRQ9 vector/priority register
+				case 0x0340:            // Offset 0x50340 - IRQ10 vector/priority register
+				case 0x0360:            // Offset 0x50360 - IRQ11 vector/priority register
+				case 0x0380:            // Offset 0x50380 - IRQ12 vector/priority register
+				case 0x03a0:            // Offset 0x503a0 - IRQ13 vector/priority register
+				case 0x03c0:            // Offset 0x503c0 - IRQ14 vector/priority register
+				case 0x03e0:            // Offset 0x503e0 - IRQ15 vector/priority register
 				{
 					int irq = ((reg & 0xffff) - 0x200) >> 5;
 
@@ -867,7 +867,7 @@ READ32_MEMBER(viper_state::epic_r)
 					ret |= epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
 					break;
 				}
-				case 0x1020:			// Offset 0x51020 - I2C IRQ vector/priority register
+				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
 				{
 					ret |= epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
 					ret |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
@@ -884,7 +884,7 @@ READ32_MEMBER(viper_state::epic_r)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x00a0:			// Offset 0x600A0 - IACK
+				case 0x00a0:            // Offset 0x600A0 - IACK
 				{
 					epic_update_interrupts(machine());
 
@@ -916,7 +916,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 	data = FLIPENDIAN_INT32(data);
 
 #if VIPER_DEBUG_EPIC_REGS
-	if (reg != 0x600b0)		// interrupt clearing is spammy
+	if (reg != 0x600b0)     // interrupt clearing is spammy
 	{
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
@@ -936,18 +936,18 @@ WRITE32_MEMBER(viper_state::epic_w)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x3000:			// Offset 0x3000 - I2CADR
+				case 0x3000:            // Offset 0x3000 - I2CADR
 				{
 					epic.i2c_adr = data;
 					break;
 				}
-				case 0x3004:			// Offset 0x3004 - I2CFDR
+				case 0x3004:            // Offset 0x3004 - I2CFDR
 				{
 					epic.i2c_freq_div = data & 0x3f;
 					epic.i2c_freq_sample_rate = (data >> 8) & 0x3f;
 					break;
 				}
-				case 0x3008:			// Offset 0x3008 - I2CCR
+				case 0x3008:            // Offset 0x3008 - I2CCR
 				{
 					if ((epic.i2c_cr & 0x80) == 0 && (data & 0x80) != 0)
 					{
@@ -960,16 +960,16 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic.i2c_cr = data;
 					break;
 				}
-				case 0x300c:			// Offset 0x300c - I2CSR
+				case 0x300c:            // Offset 0x300c - I2CSR
 				{
 					epic.i2c_sr = data;
 					break;
 				}
-				case 0x3010:			// Offset 0x3010 - I2CDR
+				case 0x3010:            // Offset 0x3010 - I2CDR
 				{
-					if (epic.i2c_cr & 0x80)		// only do anything if the I2C module is enabled
+					if (epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
 					{
-						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)			// waiting for address cycle
+						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
 						{
 							//int rw = data & 1;
 
@@ -994,7 +994,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 								epic.i2c_sr |= 0x2;
 							}
 						}
-						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)		// waiting for data transfer
+						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
 						{
 #if VIPER_DEBUG_EPIC_I2C
 							printf("I2C data transfer, data = %02X\n", data);
@@ -1028,22 +1028,22 @@ WRITE32_MEMBER(viper_state::epic_w)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x1030:			// Offset 0x41030 - EICR
+				case 0x1030:            // Offset 0x41030 - EICR
 				{
 					epic.eicr = data;
 					if (data & 0x08000000)
 						fatalerror("EPIC: serial interrupts mode not implemented\n");
 					break;
 				}
-				case 0x10e0:			// Offset 0x410E0 - Spurious Vector Register
+				case 0x10e0:            // Offset 0x410E0 - Spurious Vector Register
 				{
 					epic.svr = data;
 					break;
 				}
-				case 0x1120:			// Offset 0x41120 - Global timer 0 vector/priority register
-				case 0x1160:			// Offset 0x41160 - Global timer 1 vector/priority register
-				case 0x11a0:			// Offset 0x411A0 - Global timer 2 vector/priority register
-				case 0x11e0:			// Offset 0x411E0 - Global timer 3 vector/priority register
+				case 0x1120:            // Offset 0x41120 - Global timer 0 vector/priority register
+				case 0x1160:            // Offset 0x41160 - Global timer 1 vector/priority register
+				case 0x11a0:            // Offset 0x411A0 - Global timer 2 vector/priority register
+				case 0x11e0:            // Offset 0x411E0 - Global timer 3 vector/priority register
 				{
 					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
 
@@ -1054,10 +1054,10 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic_update_interrupts(machine());
 					break;
 				}
-				case 0x1130:			// Offset 0x41130 - Global timer 0 destination register
-				case 0x1170:			// Offset 0x41170 - Global timer 1 destination register
-				case 0x11b0:			// Offset 0x411B0 - Global timer 2 destination register
-				case 0x11f0:			// Offset 0x411F0 - Global timer 3 destination register
+				case 0x1130:            // Offset 0x41130 - Global timer 0 destination register
+				case 0x1170:            // Offset 0x41170 - Global timer 1 destination register
+				case 0x11b0:            // Offset 0x411B0 - Global timer 2 destination register
+				case 0x11f0:            // Offset 0x411F0 - Global timer 3 destination register
 				{
 					int timer_num = ((reg & 0xffff) - 0x1130) >> 6;
 
@@ -1066,10 +1066,10 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic_update_interrupts(machine());
 					break;
 				}
-				case 0x1110:			// Offset 0x41110 - Global timer 0 base count register
-				case 0x1150:			// Offset 0x41150 - Global timer 1 base count register
-				case 0x1190:			// Offset 0x41190 - Global timer 2 base count register
-				case 0x11d0:			// Offset 0x411d0 - Global timer 3 base count register
+				case 0x1110:            // Offset 0x41110 - Global timer 0 base count register
+				case 0x1150:            // Offset 0x41150 - Global timer 1 base count register
+				case 0x1190:            // Offset 0x41190 - Global timer 2 base count register
+				case 0x11d0:            // Offset 0x411d0 - Global timer 3 base count register
 				{
 					int timer_num = ((reg & 0xffff) - 0x1110) >> 6;
 
@@ -1100,22 +1100,22 @@ WRITE32_MEMBER(viper_state::epic_w)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x0200:			// Offset 0x50200 - IRQ0 vector/priority register
-				case 0x0220:			// Offset 0x50220 - IRQ1 vector/priority register
-				case 0x0240:			// Offset 0x50240 - IRQ2 vector/priority register
-				case 0x0260:			// Offset 0x50260 - IRQ3 vector/priority register
-				case 0x0280:			// Offset 0x50280 - IRQ4 vector/priority register
-				case 0x02a0:			// Offset 0x502a0 - IRQ5 vector/priority register
-				case 0x02c0:			// Offset 0x502c0 - IRQ6 vector/priority register
-				case 0x02e0:			// Offset 0x502e0 - IRQ7 vector/priority register
-				case 0x0300:			// Offset 0x50300 - IRQ8 vector/priority register
-				case 0x0320:			// Offset 0x50320 - IRQ9 vector/priority register
-				case 0x0340:			// Offset 0x50340 - IRQ10 vector/priority register
-				case 0x0360:			// Offset 0x50360 - IRQ11 vector/priority register
-				case 0x0380:			// Offset 0x50380 - IRQ12 vector/priority register
-				case 0x03a0:			// Offset 0x503a0 - IRQ13 vector/priority register
-				case 0x03c0:			// Offset 0x503c0 - IRQ14 vector/priority register
-				case 0x03e0:			// Offset 0x503e0 - IRQ15 vector/priority register
+				case 0x0200:            // Offset 0x50200 - IRQ0 vector/priority register
+				case 0x0220:            // Offset 0x50220 - IRQ1 vector/priority register
+				case 0x0240:            // Offset 0x50240 - IRQ2 vector/priority register
+				case 0x0260:            // Offset 0x50260 - IRQ3 vector/priority register
+				case 0x0280:            // Offset 0x50280 - IRQ4 vector/priority register
+				case 0x02a0:            // Offset 0x502a0 - IRQ5 vector/priority register
+				case 0x02c0:            // Offset 0x502c0 - IRQ6 vector/priority register
+				case 0x02e0:            // Offset 0x502e0 - IRQ7 vector/priority register
+				case 0x0300:            // Offset 0x50300 - IRQ8 vector/priority register
+				case 0x0320:            // Offset 0x50320 - IRQ9 vector/priority register
+				case 0x0340:            // Offset 0x50340 - IRQ10 vector/priority register
+				case 0x0360:            // Offset 0x50360 - IRQ11 vector/priority register
+				case 0x0380:            // Offset 0x50380 - IRQ12 vector/priority register
+				case 0x03a0:            // Offset 0x503a0 - IRQ13 vector/priority register
+				case 0x03c0:            // Offset 0x503c0 - IRQ14 vector/priority register
+				case 0x03e0:            // Offset 0x503e0 - IRQ15 vector/priority register
 				{
 					int irq = ((reg & 0xffff) - 0x200) >> 5;
 
@@ -1126,7 +1126,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic_update_interrupts(machine());
 					break;
 				}
-				case 0x1020:			// Offset 0x51020 - I2C IRQ vector/priority register
+				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
 				{
 					epic.irq[MPC8240_I2C_IRQ].mask = (data & 0x80000000) ? 1 : 0;
 					epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
@@ -1135,22 +1135,22 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic_update_interrupts(machine());
 					break;
 				}
-				case 0x0210:			// Offset 0x50210 - IRQ0 destination register
-				case 0x0230:			// Offset 0x50230 - IRQ1 destination register
-				case 0x0250:			// Offset 0x50250 - IRQ2 destination register
-				case 0x0270:			// Offset 0x50270 - IRQ3 destination register
-				case 0x0290:			// Offset 0x50290 - IRQ4 destination register
-				case 0x02b0:			// Offset 0x502b0 - IRQ5 destination register
-				case 0x02d0:			// Offset 0x502d0 - IRQ6 destination register
-				case 0x02f0:			// Offset 0x502f0 - IRQ7 destination register
-				case 0x0310:			// Offset 0x50310 - IRQ8 destination register
-				case 0x0330:			// Offset 0x50330 - IRQ9 destination register
-				case 0x0350:			// Offset 0x50350 - IRQ10 destination register
-				case 0x0370:			// Offset 0x50370 - IRQ11 destination register
-				case 0x0390:			// Offset 0x50390 - IRQ12 destination register
-				case 0x03b0:			// Offset 0x503b0 - IRQ13 destination register
-				case 0x03d0:			// Offset 0x503d0 - IRQ14 destination register
-				case 0x03f0:			// Offset 0x503f0 - IRQ15 destination register
+				case 0x0210:            // Offset 0x50210 - IRQ0 destination register
+				case 0x0230:            // Offset 0x50230 - IRQ1 destination register
+				case 0x0250:            // Offset 0x50250 - IRQ2 destination register
+				case 0x0270:            // Offset 0x50270 - IRQ3 destination register
+				case 0x0290:            // Offset 0x50290 - IRQ4 destination register
+				case 0x02b0:            // Offset 0x502b0 - IRQ5 destination register
+				case 0x02d0:            // Offset 0x502d0 - IRQ6 destination register
+				case 0x02f0:            // Offset 0x502f0 - IRQ7 destination register
+				case 0x0310:            // Offset 0x50310 - IRQ8 destination register
+				case 0x0330:            // Offset 0x50330 - IRQ9 destination register
+				case 0x0350:            // Offset 0x50350 - IRQ10 destination register
+				case 0x0370:            // Offset 0x50370 - IRQ11 destination register
+				case 0x0390:            // Offset 0x50390 - IRQ12 destination register
+				case 0x03b0:            // Offset 0x503b0 - IRQ13 destination register
+				case 0x03d0:            // Offset 0x503d0 - IRQ14 destination register
+				case 0x03f0:            // Offset 0x503f0 - IRQ15 destination register
 				{
 					int irq = ((reg & 0xffff) - 0x210) >> 5;
 
@@ -1159,7 +1159,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic_update_interrupts(machine());
 					break;
 				}
-				case 0x1030:			// Offset 0x51030 - I2C IRQ destination register
+				case 0x1030:            // Offset 0x51030 - I2C IRQ destination register
 				{
 					epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
 					epic_update_interrupts(machine());
@@ -1174,7 +1174,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 		{
 			switch (reg & 0xffff)
 			{
-				case 0x00b0:			// Offset 0x600B0 - EOI
+				case 0x00b0:            // Offset 0x600B0 - EOI
 #if VIPER_DEBUG_EPIC_INTS
 					if (epic.active_irq > 4 && epic.active_irq < 20)
 						printf("EPIC IRQ%d cleared.\n", epic.active_irq);
@@ -1235,15 +1235,15 @@ static void mpc8240_epic_reset(void)
 
 static const UINT8 cf_card_tuples[] =
 {
-	0x01,		// Device Tuple
-	0x01,		// Tuple size
-	0xd0,		// Device Type Func Spec
+	0x01,       // Device Tuple
+	0x01,       // Tuple size
+	0xd0,       // Device Type Func Spec
 
-	0x1a,		// Config Tuple
-	0xff,		// Tuple size (last?)
-	0x03,		// CCR base size
-	0x00,		// last config index?
-	0x00, 0x01, 0x00, 0x00,		// CCR base (0x00000100)
+	0x1a,       // Config Tuple
+	0xff,       // Tuple size (last?)
+	0x03,       // CCR base size
+	0x00,       // last config index?
+	0x00, 0x01, 0x00, 0x00,     // CCR base (0x00000100)
 };
 
 READ64_MEMBER(viper_state::cf_card_data_r)
@@ -1255,7 +1255,7 @@ READ64_MEMBER(viper_state::cf_card_data_r)
 	{
 		switch (offset & 0xf)
 		{
-			case 0x8:	// Duplicate Even RD Data
+			case 0x8:   // Duplicate Even RD Data
 			{
 				r |= ide_bus_r(device, 0, 0) << 16;
 				break;
@@ -1277,7 +1277,7 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 	{
 		switch (offset & 0xf)
 		{
-			case 0x8:	// Duplicate Even RD Data
+			case 0x8:   // Duplicate Even RD Data
 			{
 				ide_bus_w(device, 0, 0, (data >> 16) & 0xffff);
 				break;
@@ -1302,14 +1302,14 @@ READ64_MEMBER(viper_state::cf_card_r)
 		{
 			switch (offset & 0xf)
 			{
-				case 0x0:	// Even RD Data
-				case 0x1:	// Error
-				case 0x2:	// Sector Count
-				case 0x3:	// Sector No.
-				case 0x4:	// Cylinder Low
-				case 0x5:	// Cylinder High
-				case 0x6:	// Select Card/Head
-				case 0x7:	// Status
+				case 0x0:   // Even RD Data
+				case 0x1:   // Error
+				case 0x2:   // Sector Count
+				case 0x3:   // Sector No.
+				case 0x4:   // Cylinder Low
+				case 0x5:   // Cylinder High
+				case 0x6:   // Select Card/Head
+				case 0x7:   // Status
 				{
 					r |= ide_bus_r(device, 0, offset & 7) << 16;
 					break;
@@ -1318,13 +1318,13 @@ READ64_MEMBER(viper_state::cf_card_r)
 				//case 0x8: // Duplicate Even RD Data
 				//case 0x9: // Duplicate Odd RD Data
 
-				case 0xd:	// Duplicate Error
+				case 0xd:   // Duplicate Error
 				{
 					r |= ide_bus_r(device, 0, 1) << 16;
 					break;
 				}
-				case 0xe:	// Alt Status
-				case 0xf:	// Drive Address
+				case 0xe:   // Alt Status
+				case 0xf:   // Drive Address
 				{
 					r |= ide_bus_r(device, 1, offset & 7) << 16;
 					break;
@@ -1369,14 +1369,14 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 		{
 			switch (offset & 0xf)
 			{
-				case 0x0:	// Even WR Data
-				case 0x1:	// Features
-				case 0x2:	// Sector Count
-				case 0x3:	// Sector No.
-				case 0x4:	// Cylinder Low
-				case 0x5:	// Cylinder High
-				case 0x6:	// Select Card/Head
-				case 0x7:	// Command
+				case 0x0:   // Even WR Data
+				case 0x1:   // Features
+				case 0x2:   // Sector Count
+				case 0x3:   // Sector No.
+				case 0x4:   // Cylinder Low
+				case 0x5:   // Cylinder High
+				case 0x6:   // Select Card/Head
+				case 0x7:   // Command
 				{
 					ide_bus_w(device, 0, offset & 7, (data >> 16) & 0xffff);
 					break;
@@ -1385,13 +1385,13 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 				//case 0x8: // Duplicate Even WR Data
 				//case 0x9: // Duplicate Odd WR Data
 
-				case 0xd:	// Duplicate Features
+				case 0xd:   // Duplicate Features
 				{
 					ide_bus_w(device, 0, 1, (data >> 16) & 0xffff);
 					break;
 				}
-				case 0xe:	// Device Ctl
-				case 0xf:	// Reserved
+				case 0xe:   // Device Ctl
+				case 0xf:   // Reserved
 				{
 					ide_bus_w(device, 1, offset & 7, (data >> 16) & 0xffff);
 					break;
@@ -1481,31 +1481,31 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 
 	switch (reg)
 	{
-		case 0x00:		// PCI Vendor ID (0x121a = 3dfx), Device ID (0x0005 = Voodoo 3)
+		case 0x00:      // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0005 = Voodoo 3)
 		{
 			return 0x0005121a;
 		}
-		case 0x08:		// Device class code
+		case 0x08:      // Device class code
 		{
 			return 0x03000000;
 		}
-		case 0x10:		// memBaseAddr0
+		case 0x10:      // memBaseAddr0
 		{
 			return state->m_voodoo3_pci_reg[0x10/4];
 		}
-		case 0x14:		// memBaseAddr1
+		case 0x14:      // memBaseAddr1
 		{
 			return state->m_voodoo3_pci_reg[0x14/4];
 		}
-		case 0x18:		// memBaseAddr1
+		case 0x18:      // memBaseAddr1
 		{
 			return state->m_voodoo3_pci_reg[0x18/4];
 		}
-		case 0x40:		// fabId
+		case 0x40:      // fabId
 		{
 			return state->m_voodoo3_pci_reg[0x40/4];
 		}
-		case 0x50:		// cfgScratch
+		case 0x50:      // cfgScratch
 		{
 			return state->m_voodoo3_pci_reg[0x50/4];
 		}
@@ -1524,12 +1524,12 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 
 	switch (reg)
 	{
-		case 0x04:		// Command register
+		case 0x04:      // Command register
 		{
 			state->m_voodoo3_pci_reg[0x04/4] = data;
 			break;
 		}
-		case 0x10:		// memBaseAddr0
+		case 0x10:      // memBaseAddr0
 		{
 			if (data == 0xffffffff)
 			{
@@ -1541,7 +1541,7 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 			}
 			break;
 		}
-		case 0x14:		// memBaseAddr1
+		case 0x14:      // memBaseAddr1
 		{
 			if (data == 0xffffffff)
 			{
@@ -1553,7 +1553,7 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 			}
 			break;
 		}
-		case 0x18:		// ioBaseAddr
+		case 0x18:      // ioBaseAddr
 		{
 			if (data == 0xffffffff)
 			{
@@ -1565,16 +1565,16 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 			}
 			break;
 		}
-		case 0x3c:		// InterruptLine
+		case 0x3c:      // InterruptLine
 		{
 			break;
 		}
-		case 0x40:		// fabId
+		case 0x40:      // fabId
 		{
 			state->m_voodoo3_pci_reg[0x40/4] = data;
 			break;
 		}
-		case 0x50:		// cfgScratch
+		case 0x50:      // cfgScratch
 		{
 			state->m_voodoo3_pci_reg[0x50/4] = data;
 			break;
@@ -1626,12 +1626,12 @@ WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 
 
 
-#define DS2430_STATE_ROM_COMMAND			1
-#define DS2430_STATE_MEM_COMMAND			2
-#define DS2430_STATE_READ_ROM				3
-#define DS2430_STATE_MEM_FUNCTION			4
-#define DS2430_STATE_READ_MEM				5
-#define DS2430_STATE_READ_MEM_ADDRESS		6
+#define DS2430_STATE_ROM_COMMAND            1
+#define DS2430_STATE_MEM_COMMAND            2
+#define DS2430_STATE_READ_ROM               3
+#define DS2430_STATE_MEM_FUNCTION           4
+#define DS2430_STATE_READ_MEM               5
+#define DS2430_STATE_READ_MEM_ADDRESS       6
 
 static int unk1_bit = 1;
 static UINT8 ds2430_data;
@@ -1671,7 +1671,7 @@ READ64_MEMBER(viper_state::unk1_r)
 	{
 		UINT64 reg = 0;
 		reg |= (unk1_bit << 5);
-		reg |= 0x40;		// if this bit is 0, loads a disk copier instead
+		reg |= 0x40;        // if this bit is 0, loads a disk copier instead
 		//r |= 0x04;    // screen flip
 		//reg |= 0x08;      // memory card check (1 = enable)
 
@@ -1734,9 +1734,9 @@ static void DS2430_w(int bit)
 				printf("DS2430_w: rom command %02X\n", ds2430_cmd);
 				switch (ds2430_cmd)
 				{
-					case 0x33:		ds2430_state = DS2430_STATE_READ_ROM; break;
-					case 0xcc:		ds2430_state = DS2430_STATE_MEM_FUNCTION; break;
-					default:		fatalerror("DS2430_w: unimplemented rom command %02X\n", ds2430_cmd); break;
+					case 0x33:      ds2430_state = DS2430_STATE_READ_ROM; break;
+					case 0xcc:      ds2430_state = DS2430_STATE_MEM_FUNCTION; break;
+					default:        fatalerror("DS2430_w: unimplemented rom command %02X\n", ds2430_cmd); break;
 				}
 			}
 			break;
@@ -1749,8 +1749,8 @@ static void DS2430_w(int bit)
 				printf("DS2430_w: mem function %02X\n", ds2430_cmd);
 				switch (ds2430_cmd)
 				{
-					case 0xf0:		ds2430_state = DS2430_STATE_READ_MEM_ADDRESS; break;
-					default:		fatalerror("DS2430_w: unimplemented mem function %02X\n", ds2430_cmd); break;
+					case 0xf0:      ds2430_state = DS2430_STATE_READ_MEM_ADDRESS; break;
+					default:        fatalerror("DS2430_w: unimplemented mem function %02X\n", ds2430_cmd); break;
 				}
 			}
 			break;
@@ -1827,7 +1827,7 @@ WRITE64_MEMBER(viper_state::e70000_w)
 	{
 		if (!ds2430_reset)
 		{
-			ds2430_timer->adjust(attotime::from_usec(40), 1);	// presence pulse for 240 microsecs
+			ds2430_timer->adjust(attotime::from_usec(40), 1);   // presence pulse for 240 microsecs
 
 			unk1_bit = 1;
 //          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, space.device().safe_pc());
@@ -1919,8 +1919,8 @@ static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	AM_RANGE(0xffe70000, 0xffe7000f) AM_READWRITE(e70000_r, e70000_w)
 	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE(unk1a_w)
 	AM_RANGE(0xffe88000, 0xffe88007) AM_WRITE(unk1b_w)
-	AM_RANGE(0xffe9a000, 0xffe9bfff) AM_RAM								// World Combat uses this
-	AM_RANGE(0xfff00000, 0xfff3ffff) AM_ROM AM_REGION("user1", 0)		// Boot ROM
+	AM_RANGE(0xffe9a000, 0xffe9bfff) AM_RAM                             // World Combat uses this
+	AM_RANGE(0xfff00000, 0xfff3ffff) AM_ROM AM_REGION("user1", 0)       // Boot ROM
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1929,7 +1929,7 @@ static INPUT_PORTS_START( viper )
 	PORT_START("IN0")
 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// Shift down
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)     // Shift down
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1946,7 +1946,7 @@ static INPUT_PORTS_START( viper )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// Shift up
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)     // Shift up
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x80, 0x80, "DIP1" ) PORT_DIPLOCATION("SW:1")
@@ -2021,9 +2021,9 @@ void viper_state::machine_reset()
 	UINT8 *ide_features = ide->ide_get_features(0);
 
 	// Viper expects these settings or the BIOS fails
-	ide_features[51*2+0] = 0;			/* 51: PIO data transfer cycle timing mode */
+	ide_features[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */
 	ide_features[51*2+1] = 2;
-	ide_features[67*2+0] = 0xf0;		/* 67: minimum PIO transfer cycle time without flow control */
+	ide_features[67*2+0] = 0xf0;        /* 67: minimum PIO transfer cycle time without flow control */
 	ide_features[67*2+1] = 0x00;
 }
 
@@ -2095,7 +2095,7 @@ DRIVER_INIT_MEMBER(viper_state,vipercf)
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define VIPER_BIOS \
-	ROM_REGION64_BE(0x40000, "user1", 0)	/* Boot ROM */ \
+	ROM_REGION64_BE(0x40000, "user1", 0)    /* Boot ROM */ \
 	ROM_SYSTEM_BIOS(0, "bios0", "GM941B01 (01/15/01)") \
 		ROM_LOAD_BIOS(0, "941b01.u25", 0x00000, 0x40000, CRC(233e5159) SHA1(66ff268d5bf78fbfa48cdc3e1b08f8956cfd6cfb)) \
 	ROM_SYSTEM_BIOS(1, "bios1", "GM941A01 (03/10/00)") \
@@ -2105,10 +2105,10 @@ DRIVER_INIT_MEMBER(viper_state,vipercf)
 ROM_START(kviper)
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 ROM_END
 
 
@@ -2116,10 +2116,10 @@ ROM_END
 ROM_START(ppp2nd)
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "ppp2nd", 0, SHA1(b8b90483d515c83eac05ffa617af19612ea990b0))
@@ -2129,10 +2129,10 @@ ROM_END
 ROM_START(boxingm) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a45jaa_nvram.u39", 0x00000, 0x2000, CRC(c24e29fc) SHA1(efb6ecaf25cbdf9d8dfcafa85e38a195fa5ff6c4))
 
 	DISK_REGION( "drive_0" )
@@ -2142,10 +2142,10 @@ ROM_END
 ROM_START(code1d) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )
@@ -2155,10 +2155,10 @@ ROM_END
 ROM_START(code1db) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )
@@ -2168,10 +2168,10 @@ ROM_END
 ROM_START(gticlub2) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239)) //old dump, probably has non-default settings.
 	ROM_LOAD("941jab_nvram.u39", 0x00000, 0x2000, CRC(6c4a852f) SHA1(2753dda42cdd81af22dc6780678f1ddeb3c62013))
 
@@ -2182,7 +2182,7 @@ ROM_END
 ROM_START(gticlub2ea) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
 
 	DISK_REGION( "drive_0" )
@@ -2192,10 +2192,10 @@ ROM_END
 ROM_START(jpark3) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b41ebc_nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
 
 	DISK_REGION( "drive_0" )
@@ -2206,10 +2206,10 @@ ROM_END
 ROM_START(mocapglf) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x1ff8, BAD_DUMP CRC(0f0ba988) SHA1(5618c03b21fc2ba14b2e159cee3aab7f53c2c34d)) //data looks plain bad (compared to the other games)
 
 	DISK_REGION( "drive_0" )
@@ -2219,10 +2219,10 @@ ROM_END
 ROM_START(mocapb) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a29aaa_nvram.u39", 0x000000, 0x2000, CRC(14b9fe68) SHA1(3c59e6df1bb46bc1835c13fd182b1bb092c08759)) //supposed to be aab version?
 
 	DISK_REGION( "drive_0" )
@@ -2232,10 +2232,10 @@ ROM_END
 ROM_START(mocapbj) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a29jaa_nvram.u39", 0x000000, 0x2000, CRC(2f7cdf27) SHA1(0b69d8728be12909e235268268a312982f81d46a))
 
 	DISK_REGION( "drive_0" )
@@ -2245,10 +2245,10 @@ ROM_END
 ROM_START(p911) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00uad_nvram.u39", 0x000000, 0x2000, CRC(cca056ca) SHA1(de1a00d84c1311d48bbe6d24f5b36e22ecf5e85a))
 
 	DISK_REGION( "drive_0" )
@@ -2258,10 +2258,10 @@ ROM_END
 ROM_START(p911uc) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00uac_nvram.u39", 0x000000, 0x2000,  NO_DUMP )
 
 	DISK_REGION( "drive_0" )
@@ -2271,10 +2271,10 @@ ROM_END
 ROM_START(p911kc) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00kac_nvram.u39", 0x000000, 0x2000,  CRC(8ddc921c) SHA1(901538da237679fc74966a301278b36d1335671f) )
 
 	DISK_REGION( "drive_0" )
@@ -2284,10 +2284,10 @@ ROM_END
 ROM_START(p911e) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
 
 	DISK_REGION( "drive_0" )
@@ -2297,10 +2297,10 @@ ROM_END
 ROM_START(p911j) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00jaa_nvram.u39", 0x000000, 0x2000, CRC(9ecf70dc) SHA1(4769a99b0cc28563e219860b8d480f32d1e21f60))
 
 	DISK_REGION( "drive_0" )
@@ -2310,10 +2310,10 @@ ROM_END
 ROM_START(p9112) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )
@@ -2323,10 +2323,10 @@ ROM_END
 ROM_START(popn9) //Note: this is actually a Konami Pyson HW! (PlayStation 2-based) move out of here.
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )
@@ -2336,10 +2336,10 @@ ROM_END
 ROM_START(sscopex)
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a13uaa_nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
 
 	DISK_REGION( "drive_0" )
@@ -2351,10 +2351,10 @@ ROM_END
 ROM_START(sogeki) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2f325c55) SHA1(0bc44f40f981a815c8ce64eae95ae55db510c565))
 
 	DISK_REGION( "drive_0" )
@@ -2364,10 +2364,10 @@ ROM_END
 ROM_START(thrild2) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a41ebb_nvram.u39", 0x00000, 0x2000, CRC(22f59ac0) SHA1(e14ea2ba95b72edf0a3331ab82c192760bfdbce3))
 //  a41eba_nvram == a41ebb_nvram
 
@@ -2378,10 +2378,10 @@ ROM_END
 ROM_START(thrild2a) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
 
 	DISK_REGION( "drive_0" )
@@ -2392,10 +2392,10 @@ ROM_END
 ROM_START(thrild2c) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )
@@ -2405,10 +2405,10 @@ ROM_END
 ROM_START(tsurugi) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a30eab_nvram.u39", 0x00000, 0x2000, CRC(c123342c) SHA1(55416767608fe0311a362854a16b214b04435a31))
 
 	DISK_REGION( "drive_0" )
@@ -2418,10 +2418,10 @@ ROM_END
 ROM_START(tsurugij) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a30jac_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )
@@ -2432,10 +2432,10 @@ ROM_END
 ROM_START(wcombat) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombat_nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
 
 	DISK_REGION( "drive_0" )
@@ -2445,7 +2445,7 @@ ROM_END
 ROM_START(wcombatk) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatk_nvram.u39", 0x00000, 0x2000, CRC(ebd4d645) SHA1(2fa7e2c6b113214f3eb1900c8ceef4d5fcf0bb76))
 
 	DISK_REGION( "drive_0" )
@@ -2455,10 +2455,10 @@ ROM_END
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatj_nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
 	DISK_REGION( "drive_0" )
@@ -2468,10 +2468,10 @@ ROM_END
 ROM_START(xtrial) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b4xjab_nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
 
 	DISK_REGION( "drive_0" )
@@ -2529,10 +2529,10 @@ CF card and NVRAM are swapped....
 ROM_START(mfightc) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(9fb551a5) SHA1(a33d185e186d404c3bf62277d7e34e5ad0000b09)) //likely non-default settings
 	ROM_LOAD("c09jad_nvram.u39", 0x00000, 0x2000, CRC(33e960b7) SHA1(a9a249e68c89b18d4685f1859fe35dc21df18e14))
 
@@ -2544,10 +2544,10 @@ ROM_END
 ROM_START(mfightcc) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("c09jac_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
 	DISK_REGION( "drive_0" )

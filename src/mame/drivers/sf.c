@@ -34,7 +34,7 @@ WRITE16_MEMBER(sf_state::sf_coin_w)
 		coin_counter_w(machine(), 1,  data & 0x02);
 		coin_lockout_w(machine(), 0, ~data & 0x10);
 		coin_lockout_w(machine(), 1, ~data & 0x20);
-		coin_lockout_w(machine(), 2, ~data & 0x40);	/* is there a third coin input? */
+		coin_lockout_w(machine(), 2, ~data & 0x40); /* is there a third coin input? */
 	}
 }
 
@@ -314,7 +314,7 @@ static INPUT_PORTS_START( sf )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )	/* Flip Screen not available */
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )  /* Flip Screen not available */
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, "Attract Music" )
@@ -798,8 +798,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	0,				/* interrupt function */
-	MSM5205_SEX_4B	/* 8KHz playback ?    */
+	0,              /* interrupt function */
+	MSM5205_SEX_4B  /* 8KHz playback ?    */
 };
 
 void sf_state::machine_start()
@@ -825,16 +825,16 @@ void sf_state::machine_reset()
 static MACHINE_CONFIG_START( sf, sf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ? (xtal is 16MHz) */
 	MCFG_CPU_PROGRAM_MAP(sf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are caused by the main CPU */
 
 
-	MCFG_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audio2", Z80, 3579545)    /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
 	MCFG_CPU_IO_MAP(sound2_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000)
@@ -904,10 +904,10 @@ ROM_START( sf )
 	ROM_LOAD16_BYTE("sfe-21", 0x40000, 0x10000, CRC(2547192b) SHA1(aaf07c613a6c42ec1dc82ffa86d00044b4ea27fc) )
 	ROM_LOAD16_BYTE("sfe-24", 0x40001, 0x10000, CRC(79680f4e) SHA1(df596fa5b49a336fe462c2be7b454e695f5382db) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sf-02.bin", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
-	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
+	ROM_REGION( 0x40000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "sfu-00",    0x00000, 0x20000, CRC(a7cce903) SHA1(76f521c9a00abd95a3491ab95e8eccd0fc7ea0e5) )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
@@ -918,7 +918,7 @@ ROM_START( sf )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )	/* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -948,17 +948,17 @@ ROM_START( sf )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.bin", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )	/* background tilemaps */
+	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.bin", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.bin", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.bin", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mb7114h.12k",  0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) )	/* unknown */
-	ROM_LOAD( "mb7114h.11h",  0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) )	/* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )	/* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )	/* unknown */
+	ROM_LOAD( "mb7114h.12k",  0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) )    /* unknown */
+	ROM_LOAD( "mb7114h.11h",  0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) )    /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
 ROM_END
 
 ROM_START( sfu )
@@ -970,10 +970,10 @@ ROM_START( sfu )
 	ROM_LOAD16_BYTE("sfd-21", 0x40000, 0x10000, CRC(e8db799b) SHA1(8443ba6a9b9ad29d5985d434658e685fd46d8f1e) )
 	ROM_LOAD16_BYTE("sfd-24", 0x40001, 0x10000, CRC(466a3440) SHA1(689823763bfdbc12ac11ff176acfd22f352e2658) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sf-02.bin", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
-	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
+	ROM_REGION( 0x40000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "sfu-00",    0x00000, 0x20000, CRC(a7cce903) SHA1(76f521c9a00abd95a3491ab95e8eccd0fc7ea0e5) )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
@@ -984,7 +984,7 @@ ROM_START( sfu )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )	/* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -1014,17 +1014,17 @@ ROM_START( sfu )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.bin", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )	/* background tilemaps */
+	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.bin", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.bin", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.bin", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mb7114h.12k",  0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) )	/* unknown */
-	ROM_LOAD( "mb7114h.11h",  0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) )	/* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )	/* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )	/* unknown */
+	ROM_LOAD( "mb7114h.12k",  0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) )    /* unknown */
+	ROM_LOAD( "mb7114h.11h",  0x0100, 0x0100, CRC(c0e56586) SHA1(2abf93aef48af34f869b30f63c130513a97f86a3) )    /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
 ROM_END
 
 
@@ -1037,10 +1037,10 @@ ROM_START( sfua )
 	ROM_LOAD16_BYTE("sfs21u.3a", 0x40000, 0x10000, CRC(004a418b) SHA1(1048afe2e0dbc22969d79a031394f3c8ab4c8901) )
 	ROM_LOAD16_BYTE("sfs24u.3b", 0x40001, 0x10000, CRC(2b4545ff) SHA1(19bdae7947d13b861ace25b96e46f199ee9a6eb2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sf-02.bin", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
-	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
+	ROM_REGION( 0x40000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "sfu-00",    0x00000, 0x20000, CRC(a7cce903) SHA1(76f521c9a00abd95a3491ab95e8eccd0fc7ea0e5) )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
@@ -1054,7 +1054,7 @@ ROM_START( sfua )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )	/* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -1084,17 +1084,17 @@ ROM_START( sfua )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.bin", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )	/* background tilemaps */
+	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.bin", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.bin", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.bin", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )	/* unknown */
-	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )	/* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )	/* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )	/* unknown */
+	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )    /* unknown */
+	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )    /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
 ROM_END
 
 
@@ -1107,10 +1107,10 @@ ROM_START( sfj )
 	ROM_LOAD16_BYTE("sf-21.bin", 0x40000, 0x10000, CRC(e086bc4c) SHA1(782134978ff0a7133768d9cc8050bc3b5016580b) )
 	ROM_LOAD16_BYTE("sf-24.bin", 0x40001, 0x10000, CRC(13a6696b) SHA1(c01f9b700928e427bc9914c61beeaa6bcbde4546) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sf-02.bin", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
-	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
+	ROM_REGION( 0x40000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "sf-00.bin", 0x00000, 0x20000, CRC(4b733845) SHA1(f7ff46e02f8ce6682d6e573588271bae2edfa90f) )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
 
@@ -1124,7 +1124,7 @@ ROM_START( sfj )
 	ROM_LOAD( "sf-40.bin", 0x060000, 0x020000, CRC(c70b30de) SHA1(26112ee1720b6ad0e2e29e2d25ee2ec76fca0e3a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )	/* Background m planes 0-1 */
+	ROM_LOAD( "sf-25.bin", 0x000000, 0x020000, CRC(7f23042e) SHA1(a355fd7047fb1a71ab5cd08e1afd82c2558494c1) )   /* Background m planes 0-1 */
 	ROM_LOAD( "sf-28.bin", 0x020000, 0x020000, CRC(92f8b91c) SHA1(6d958bc45131810d7b0af02be939ce37a39c35e8) )
 	ROM_LOAD( "sf-30.bin", 0x040000, 0x020000, CRC(b1399856) SHA1(7c956d49b2e73291182ea1ec4cebd3411d1322a1) )
 	ROM_LOAD( "sf-34.bin", 0x060000, 0x020000, CRC(96b6ae2e) SHA1(700e050463b7a29a1eb08007a2add045afdcd8a0) )
@@ -1154,17 +1154,17 @@ ROM_START( sfj )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.bin", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )	/* background tilemaps */
+	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.bin", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.bin", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.bin", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
 	ROM_LOAD( "sf-33.bin", 0x030000, 0x010000, CRC(3e99d3d5) SHA1(9168a977e80f8c23c6126b9e64eb176290cf941a) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )	/* unknown */
-	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )	/* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )	/* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )	/* unknown */
+	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )    /* unknown */
+	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )    /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
 ROM_END
 
 
@@ -1173,10 +1173,10 @@ ROM_START( sfp )
 	ROM_LOAD16_BYTE("prg8.2a", 0x00000, 0x20000, CRC(d48d06a3) SHA1(d899771c66c1e7a5caa11f67a1122adb6f0f4d28) )
 	ROM_LOAD16_BYTE("prg0.2c", 0x00001, 0x20000, CRC(e8606c1a) SHA1(be94203cba733e337993e6f386ff5ce1e76d8913) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the music CPU */
 	ROM_LOAD( "sound.9j", 0x0000, 0x8000, CRC(43cd32ae) SHA1(42e59becde5761eb5d5bc310d2bc690f6f16882a) )
 
-	ROM_REGION( 0x10000, "audio2", 0 )	/* 256k for the samples CPU */
+	ROM_REGION( 0x10000, "audio2", 0 )  /* 256k for the samples CPU */
 	ROM_LOAD( "voice.1g", 0x00000, 0x10000, CRC(3f23c180) SHA1(fb4e3bb835d94a733eacc0b1df9fe19fa1120997) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -1186,7 +1186,7 @@ ROM_START( sfp )
 	ROM_LOAD( "bkchr.3k", 0x060000, 0x020000, CRC(6bb2b050) SHA1(d36419dabdc0a90b76e295b746928d9e1e69674a) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mchr.1d", 0x000000, 0x020000, CRC(ab06a60b) SHA1(44febaa2ac8f060ed297b69af1fd258164ff565d) )	/* Background m planes 0-1 */
+	ROM_LOAD( "mchr.1d", 0x000000, 0x020000, CRC(ab06a60b) SHA1(44febaa2ac8f060ed297b69af1fd258164ff565d) ) /* Background m planes 0-1 */
 	ROM_LOAD( "mchr.1e", 0x020000, 0x020000, CRC(d221387d) SHA1(012dc8c646a6a4b8bf905d859e3465b4bcaaed67) )
 	ROM_LOAD( "mchr.1g", 0x040000, 0x020000, CRC(1e4c1712) SHA1(543b47a865d11dd91331c0236c5578dbe7549881) )
 	ROM_LOAD( "mchr.1h", 0x060000, 0x020000, CRC(a381f529) SHA1(7e427894f8440c23c92ce5d1f118b7a1d70b0282) )
@@ -1196,10 +1196,10 @@ ROM_START( sfp )
 	ROM_LOAD( "mchr.2h", 0x0e0000, 0x020000, CRC(cc6bf05c) SHA1(4e83dd55c88d5b539ab1dcae5bfd16195bcd2565) )
 
 	/* these graphic roms seem mismatched with this version of the prototype, they don't contain the graphics needed
-       for the bonus round, or have complete tile sets graphic set for 2 of the characters which are used by the prototype
-       (all of Joe is missing, many of Mike's poses are missing) If you use the original ROMs instead the graphics are
-       correct, so the prototype is clearly already referencing the final tile arrangement for them.  The glitches
-       therefore are not emulation bugs, if the PCB contained the same mismatched ROMs it would exhibit the same glitches. */
+	   for the bonus round, or have complete tile sets graphic set for 2 of the characters which are used by the prototype
+	   (all of Joe is missing, many of Mike's poses are missing) If you use the original ROMs instead the graphics are
+	   correct, so the prototype is clearly already referencing the final tile arrangement for them.  The glitches
+	   therefore are not emulation bugs, if the PCB contained the same mismatched ROMs it would exhibit the same glitches. */
 	ROM_REGION( 0x1c0000, "gfx3", ROMREGION_ERASE00 )
 	/* Sprites planes 1-2 */
 	ROM_LOAD( "b1m.bin", 0x000000, 0x010000, CRC(64758232) SHA1(20d21677b791a7f96afed54b286ee92adb80456d) )
@@ -1219,17 +1219,17 @@ ROM_START( sfp )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "vram.4d", 0x000000, 0x004000, CRC(bfadfb32) SHA1(8443ad9f02da5fb032017fc0c657b1bdc15e4f27) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )	/* background tilemaps */
+	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
 	ROM_LOAD( "bks1j10.5h", 0x000000, 0x010000, CRC(4934aacd) SHA1(15274ae8b26799e15c7a66ff89ffd386de1659d3) )
 	ROM_LOAD( "bks1j18.3h", 0x010000, 0x010000, CRC(551ffc88) SHA1(4f9213f4e80033f910dd8aae44b2c6d9ba760d61) )
 	ROM_LOAD( "ms1j10.3g",  0x020000, 0x010000, CRC(f92958b8) SHA1(da8fa64ea9ad27c737225681c49f7c57cc7afeed) )
 	ROM_LOAD( "ms1j18.5g",  0x030000, 0x010000, CRC(89e35dc1) SHA1(368d0cce3bc39b3762d79df0c023242018fbbcb8) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )	/* unknown */
-	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )	/* unknown */
-	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )	/* unknown */
-	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )	/* unknown */
+	ROM_LOAD( "sfb05.bin",    0x0000, 0x0100, CRC(864199ad) SHA1(b777df20b19fa7b7536120191df1875101e9d7af) )    /* unknown */
+	ROM_LOAD( "sfb00.bin",    0x0100, 0x0100, CRC(bd3f8c5d) SHA1(c31ee9f466f05a21612f5ea29fb8c7c25dc9e011) )    /* unknown */
+	ROM_LOAD( "mb7114h.12j",  0x0200, 0x0100, CRC(4c734b64) SHA1(7a122b643bad3e3586821980efff023a63e5a029) )    /* unknown */
+	ROM_LOAD( "mmi-7603.13h", 0x0300, 0x0020, CRC(06bcda53) SHA1(fa69b77697bb12aa6012d82ef5b504d3a1d20232) )    /* unknown */
 ROM_END
 
 

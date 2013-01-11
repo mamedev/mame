@@ -197,7 +197,7 @@ READ8_DEVICE_HANDLER( irem_ga20_r )
 
 	switch (offset & 0x7)
 	{
-		case 7:	// voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
+		case 7: // voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
 			return chip->channel[channel].play ? 1 : 0;
 
 		default:
@@ -267,7 +267,7 @@ const device_type IREMGA20 = &device_creator<iremga20_device>;
 
 iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IREMGA20, "Irem GA20", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(ga20_state);
 }
@@ -309,5 +309,3 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

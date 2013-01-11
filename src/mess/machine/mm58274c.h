@@ -38,8 +38,8 @@ extern const device_type MM58274C;
 */
 struct mm58274c_interface
 {
-	int	mode24;		/* 24/12 mode */
-	int	day1;		/* first day of week */
+	int mode24;     /* 24/12 mode */
+	int day1;       /* first day of week */
 };
 
 DECLARE_READ8_DEVICE_HANDLER ( mm58274c_r );

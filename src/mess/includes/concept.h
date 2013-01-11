@@ -15,8 +15,8 @@
 #include "machine/wd17xx.h"
 #include "machine/6551acia.h"
 
-#define ACIA_0_TAG	"acia0"
-#define ACIA_1_TAG	"acia1"
+#define ACIA_0_TAG  "acia0"
+#define ACIA_1_TAG  "acia1"
 
 /* keyboard interface */
 enum

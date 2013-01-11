@@ -94,4 +94,3 @@ public:
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_data_real_r);
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_status_real_w);
 };
-

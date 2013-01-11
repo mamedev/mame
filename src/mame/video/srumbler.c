@@ -117,17 +117,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	for (offs = state->m_spriteram->bytes()-4; offs>=0;offs -= 4)
 	{
 		/* SPRITES
-        =====
-        Attribute
-        0x80 Code MSB
-        0x40 Code MSB
-        0x20 Code MSB
-        0x10 Colour
-        0x08 Colour
-        0x04 Colour
-        0x02 y Flip
-        0x01 X MSB
-        */
+		=====
+		Attribute
+		0x80 Code MSB
+		0x40 Code MSB
+		0x20 Code MSB
+		0x10 Colour
+		0x08 Colour
+		0x04 Colour
+		0x02 y Flip
+		0x01 X MSB
+		*/
 
 
 		int code,colour,sx,sy,flipy;

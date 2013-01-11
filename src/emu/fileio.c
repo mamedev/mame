@@ -46,7 +46,7 @@
 #include "fileio.h"
 
 
-const UINT32 OPEN_FLAG_HAS_CRC	= 0x10000;
+const UINT32 OPEN_FLAG_HAS_CRC  = 0x10000;
 
 
 
@@ -60,8 +60,8 @@ const UINT32 OPEN_FLAG_HAS_CRC	= 0x10000;
 
 path_iterator::path_iterator(const char *rawsearchpath)
 	: m_base(rawsearchpath),
-	  m_current(m_base),
-	  m_index(0)
+		m_current(m_base),
+		m_index(0)
 {
 }
 
@@ -110,8 +110,8 @@ bool path_iterator::next(astring &buffer, const char *name)
 
 file_enumerator::file_enumerator(const char *searchpath)
 	: m_iterator(searchpath),
-	  m_curdir(NULL),
-	  m_buflen(0)
+		m_curdir(NULL),
+		m_buflen(0)
 {
 }
 
@@ -172,16 +172,16 @@ const osd_directory_entry *file_enumerator::next()
 
 emu_file::emu_file(UINT32 openflags)
 	: m_file(NULL),
-	  m_iterator(""),
-	  m_crc(0),
-	  m_openflags(openflags),
-	  m_zipfile(NULL),
-	  m_zipdata(NULL),
-	  m_ziplength(0),
-	  m__7zfile(NULL),
-	  m__7zdata(NULL),
-	  m__7zlength(0),
-	  m_remove_on_close(false)
+		m_iterator(""),
+		m_crc(0),
+		m_openflags(openflags),
+		m_zipfile(NULL),
+		m_zipdata(NULL),
+		m_ziplength(0),
+		m__7zfile(NULL),
+		m__7zdata(NULL),
+		m__7zlength(0),
+		m_remove_on_close(false)
 {
 	// sanity check the open flags
 	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))
@@ -190,16 +190,16 @@ emu_file::emu_file(UINT32 openflags)
 
 emu_file::emu_file(const char *searchpath, UINT32 openflags)
 	: m_file(NULL),
-	  m_iterator(searchpath),
-	  m_crc(0),
-	  m_openflags(openflags),
-	  m_zipfile(NULL),
-	  m_zipdata(NULL),
-	  m_ziplength(0),
-	  m__7zfile(NULL),
-	  m__7zdata(NULL),
-	  m__7zlength(0),
-	  m_remove_on_close(false)
+		m_iterator(searchpath),
+		m_crc(0),
+		m_openflags(openflags),
+		m_zipfile(NULL),
+		m_zipdata(NULL),
+		m_ziplength(0),
+		m__7zfile(NULL),
+		m__7zdata(NULL),
+		m__7zlength(0),
+		m_remove_on_close(false)
 {
 	// sanity check the open flags
 	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))

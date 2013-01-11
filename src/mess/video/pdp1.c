@@ -119,7 +119,7 @@ enum
 	y_panel_mb_offset = y_panel_ma_offset+2*8,
 	y_panel_ac_offset = y_panel_mb_offset+2*8,
 	y_panel_io_offset = y_panel_ac_offset+2*8,
-	y_panel_ta_offset = y_panel_io_offset+2*8,	/* test address and extend switch */
+	y_panel_ta_offset = y_panel_io_offset+2*8,  /* test address and extend switch */
 	y_panel_tw_offset = y_panel_ta_offset+2*8,
 
 	/* column 2: 1-bit indicators */
@@ -254,7 +254,7 @@ static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_ind16 &bit
 {
 	pdp1_state *state = machine.driver_data<pdp1_state>();
 	/* fill with black */
-	const rectangle panel_bitmap_bounds(0, panel_window_width-1,	0, panel_window_height-1);
+	const rectangle panel_bitmap_bounds(0, panel_window_width-1,    0, panel_window_height-1);
 	state->m_panel_bitmap.fill(pen_panel_bg, panel_bitmap_bounds);
 
 	/* column 1: registers, test word, test address */
@@ -319,7 +319,7 @@ static void pdp1_draw_panel(running_machine &machine, bitmap_ind16 &bitmap)
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, machine.device("maincpu")->state().state_int(PDP1_RUN));
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cyc_offset, machine.device("maincpu")->state().state_int(PDP1_CYC));
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_defer_offset, machine.device("maincpu")->state().state_int(PDP1_DEFER));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_hs_cyc_offset, 0);	/* not emulated */
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_hs_cyc_offset, 0);  /* not emulated */
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_1_offset, machine.device("maincpu")->state().state_int(PDP1_BRK_CTR) & 1);
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_2_offset, machine.device("maincpu")->state().state_int(PDP1_BRK_CTR) & 2);
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ov_offset, machine.device("maincpu")->state().state_int(PDP1_OV));
@@ -331,8 +331,8 @@ static void pdp1_draw_panel(running_machine &machine, bitmap_ind16 &bitmap)
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, machine.device("maincpu")->state().state_int(PDP1_IOS));
 
 	/* column 3: power, single step, single inst, sense, flags, instr... */
-	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_power_offset, 1);	/* always on */
-	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_power_offset, 1);	/* always on */
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_power_offset, 1);   /* always on */
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_power_offset, 1);  /* always on */
 	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_step_offset, machine.device("maincpu")->state().state_int(PDP1_SNGL_STEP));
 	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_step_offset, machine.device("maincpu")->state().state_int(PDP1_SNGL_STEP));
 	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, machine.device("maincpu")->state().state_int(PDP1_SNGL_INST));
@@ -376,7 +376,7 @@ static void pdp1_typewriter_linefeed(running_machine &machine)
 		draw_scanline8(state->m_typewriter_bitmap, 0, y, typewriter_window_width, buf, machine.pens);
 	}
 
-	const rectangle typewriter_scroll_clear_window(0, typewriter_window_width-1,	typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1);
+	const rectangle typewriter_scroll_clear_window(0, typewriter_window_width-1,    typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1);
 	state->m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_scroll_clear_window);
 }
 
@@ -384,42 +384,42 @@ void pdp1_typewriter_drawchar(running_machine &machine, int character)
 {
 	pdp1_state *state = machine.driver_data<pdp1_state>();
 	static const char ascii_table[2][64] =
-	{	/* n-s = non-spacing */
-		{	/* lower case */
-			' ',				'1',				'2',				'3',
-			'4',				'5',				'6',				'7',
-			'8',				'9',				'*',				'*',
-			'*',				'*',				'*',				'*',
-			'0',				'/',				's',				't',
-			'u',				'v',				'w',				'x',
-			'y',				'z',				'*',				',',
-			'*',/*black*/		'*',/*red*/			'*',/*Tab*/			'*',
-			'\200',/*n-s middle dot*/'j',			'k',				'l',
-			'm',				'n',				'o',				'p',
-			'q',				'r',				'*',				'*',
-			'-',				')',				'\201',/*n-s overstrike*/'(',
-			'*',				'a',				'b',				'c',
-			'd',				'e',				'f',				'g',
-			'h',				'i',				'*',/*Lower Case*/	'.',
-			'*',/*Upper Case*/	'*',/*Backspace*/	'*',				'*'/*Carriage Return*/
+	{   /* n-s = non-spacing */
+		{   /* lower case */
+			' ',                '1',                '2',                '3',
+			'4',                '5',                '6',                '7',
+			'8',                '9',                '*',                '*',
+			'*',                '*',                '*',                '*',
+			'0',                '/',                's',                't',
+			'u',                'v',                'w',                'x',
+			'y',                'z',                '*',                ',',
+			'*',/*black*/       '*',/*red*/         '*',/*Tab*/         '*',
+			'\200',/*n-s middle dot*/'j',           'k',                'l',
+			'm',                'n',                'o',                'p',
+			'q',                'r',                '*',                '*',
+			'-',                ')',                '\201',/*n-s overstrike*/'(',
+			'*',                'a',                'b',                'c',
+			'd',                'e',                'f',                'g',
+			'h',                'i',                '*',/*Lower Case*/  '.',
+			'*',/*Upper Case*/  '*',/*Backspace*/   '*',                '*'/*Carriage Return*/
 		},
-		{	/* upper case */
-			' ',				'"',				'\'',				'~',
-			'\202',/*implies*/	'\203',/*or*/		'\204',/*and*/		'<',
-			'>',				'\205',/*up arrow*/	'*',				'*',
-			'*',				'*',				'*',				'*',
-			'\206',/*right arrow*/'?',				'S',				'T',
-			'U',				'V',				'W',				'X',
-			'Y',				'Z',				'*',				'=',
-			'*',/*black*/		'*',/*red*/			'*',/*Tab*/			'*',
-			'_',/*n-s???*/		'J',				'K',				'L',
-			'M',				'N',				'O',				'P',
-			'Q',				'R',				'*',				'*',
-			'+',				']',				'|',/*n-s???*/		'[',
-			'*',				'A',				'B',				'C',
-			'D',				'E',				'F',				'G',
-			'H',				'I',				'*',/*Lower Case*/	'\207',/*multiply*/
-			'*',/*Upper Case*/	'*',/*Backspace*/	'*',				'*'/*Carriage Return*/
+		{   /* upper case */
+			' ',                '"',                '\'',               '~',
+			'\202',/*implies*/  '\203',/*or*/       '\204',/*and*/      '<',
+			'>',                '\205',/*up arrow*/ '*',                '*',
+			'*',                '*',                '*',                '*',
+			'\206',/*right arrow*/'?',              'S',                'T',
+			'U',                'V',                'W',                'X',
+			'Y',                'Z',                '*',                '=',
+			'*',/*black*/       '*',/*red*/         '*',/*Tab*/         '*',
+			'_',/*n-s???*/      'J',                'K',                'L',
+			'M',                'N',                'O',                'P',
+			'Q',                'R',                '*',                '*',
+			'+',                ']',                '|',/*n-s???*/      '[',
+			'*',                'A',                'B',                'C',
+			'D',                'E',                'F',                'G',
+			'H',                'I',                '*',/*Lower Case*/  '\207',/*multiply*/
+			'*',/*Upper Case*/  '*',/*Backspace*/   '*',                '*'/*Carriage Return*/
 		}
 	};
 
@@ -470,18 +470,18 @@ void pdp1_typewriter_drawchar(running_machine &machine, int character)
 		/* Any printable character... */
 
 		if (state->m_pos >= 80)
-		{	/* if past right border, wrap around. (Right???) */
-			pdp1_typewriter_linefeed(machine);	/* next line */
-			state->m_pos = 0;					/* return to start of line */
+		{   /* if past right border, wrap around. (Right???) */
+			pdp1_typewriter_linefeed(machine);  /* next line */
+			state->m_pos = 0;                   /* return to start of line */
 		}
 
 		/* print character (lookup ASCII equivalent in table) */
 		pdp1_draw_char(machine, state->m_typewriter_bitmap, ascii_table[state->m_case_shift][character],
 						8*state->m_pos, typewriter_write_offset_y,
-						state->m_typewriter_color);	/* print char */
+						state->m_typewriter_color); /* print char */
 
-		if ((character!= 040) && (character!= 056))	/* 040 and 056 are non-spacing characters */
-			state->m_pos++;		/* step carriage forward */
+		if ((character!= 040) && (character!= 056)) /* 040 and 056 are non-spacing characters */
+			state->m_pos++;     /* step carriage forward */
 
 		break;
 	}

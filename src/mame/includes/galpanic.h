@@ -5,9 +5,9 @@ class galpanic_state : public kaneko16_state
 public:
 	galpanic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
-		  m_bgvideoram(*this, "bgvideoram"),
-		  m_fgvideoram(*this, "fgvideoram"),
-		  m_spriteram(*this, "spriteram") { }
+			m_bgvideoram(*this, "bgvideoram"),
+			m_fgvideoram(*this, "fgvideoram"),
+			m_spriteram(*this, "spriteram") { }
 
 	required_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_fgvideoram;

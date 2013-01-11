@@ -208,8 +208,8 @@ static const ptm6840_interface ptm_intf =
 	XTAL_10MHz/10,
 	{ 0, 0, 0 },
 	{ DEVCB_NULL,
-	  DEVCB_NULL,
-	  DEVCB_NULL },
+		DEVCB_NULL,
+		DEVCB_NULL },
 	DEVCB_NULL
 };
 
@@ -267,11 +267,11 @@ WRITE_LINE_MEMBER(ob68k1a_state::rx_tx_1_w)
 
 static COM8116_INTERFACE( dbrg_intf )
 {
-	DEVCB_NULL,		/* fX/4 output */
+	DEVCB_NULL,     /* fX/4 output */
 	DEVCB_DRIVER_LINE_MEMBER(ob68k1a_state,rx_tx_0_w),
 	DEVCB_DRIVER_LINE_MEMBER(ob68k1a_state,rx_tx_1_w),
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* receiver divisor ROM */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },			/* transmitter divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* receiver divisor ROM */
+	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* transmitter divisor ROM */
 };
 
 
@@ -340,9 +340,9 @@ void ob68k1a_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
-    MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
+	// basic machine hardware
+	MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
 
 	// devices
 	MCFG_PIA6821_ADD(MC6821_0_TAG, pia0_intf)
@@ -370,7 +370,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( ob68k1a )
-    ROM_REGION16_BE( 0x10000, MC68000L10_TAG, 0 )
+	ROM_REGION16_BE( 0x10000, MC68000L10_TAG, 0 )
 	ROM_LOAD16_BYTE( "macsbug.u60",    0x0000, 0x2000, CRC(7c8905ff) SHA1(eba6c70f6b5b40d60e2885c2bd33dd93ec2aae48) )
 	ROM_LOAD16_BYTE( "macsbug.u61",    0x0001, 0x2000, CRC(b5069252) SHA1(b310465d8ece944bd694cc9726d03fed0f4b2c0f) )
 	ROM_LOAD16_BYTE( "idris_boot.u62", 0x4000, 0x2000, CRC(091e900e) SHA1(ea0c9f3ad5179eab2e743459c8afb707c059f0e2) )
@@ -392,4 +392,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, ob68k1a,  0,       0,	ob68k1a,	ob68k1a, driver_device,	 0,  "Omnibyte",   "OB68K1A",	GAME_NO_SOUND_HW )
+COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, driver_device,  0,  "Omnibyte",   "OB68K1A",   GAME_NO_SOUND_HW )

@@ -24,11 +24,11 @@
     CONSTANTS
 ***************************************************************************/
 
-#define CONSOLE_BUF_SIZE	(1024 * 1024)
-#define CONSOLE_MAX_LINES	(CONSOLE_BUF_SIZE / 20)
+#define CONSOLE_BUF_SIZE    (1024 * 1024)
+#define CONSOLE_MAX_LINES   (CONSOLE_BUF_SIZE / 20)
 
-#define ERRORLOG_BUF_SIZE	(1024 * 1024)
-#define ERRORLOG_MAX_LINES	(ERRORLOG_BUF_SIZE / 20)
+#define ERRORLOG_BUF_SIZE   (1024 * 1024)
+#define ERRORLOG_MAX_LINES  (ERRORLOG_BUF_SIZE / 20)
 
 
 
@@ -38,16 +38,16 @@
 
 struct debug_command
 {
-	debug_command *	next;
-	char			command[32];
-	const char *	params;
-	const char *	help;
-	void			(*handler)(running_machine &machine, int ref, int params, const char **param);
-	void			(*handler_ex)(int ref);
-	UINT32			flags;
-	int				ref;
-	int				minparams;
-	int				maxparams;
+	debug_command * next;
+	char            command[32];
+	const char *    params;
+	const char *    help;
+	void            (*handler)(running_machine &machine, int ref, int params, const char **param);
+	void            (*handler_ex)(int ref);
+	UINT32          flags;
+	int             ref;
+	int             minparams;
+	int             maxparams;
 };
 
 
@@ -296,20 +296,20 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 			{
 				switch (c)
 				{
-					case '"':	instring = TRUE; break;
+					case '"':   instring = TRUE; break;
 					case '(':
 					case '[':
-					case '{':	parens[parendex++] = c; break;
-					case ')':	if (parendex == 0 || parens[--parendex] != '(') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
-					case ']':	if (parendex == 0 || parens[--parendex] != '[') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
-					case '}':	if (parendex == 0 || parens[--parendex] != '{') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
-					case ',':	if (parendex == 0) params[paramcount++] = p; break;
-					case ';':	if (parendex == 0) foundend = TRUE; break;
-					case '-':	if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = TRUE; *p = c; break;
-					case '+':	if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = TRUE; *p = c; break;
-					case '=':	if (parendex == 0 && paramcount == 1) isexpr = TRUE; *p = c; break;
-					case 0:		foundend = TRUE; break;
-					default:	*p = tolower((UINT8)c); break;
+					case '{':   parens[parendex++] = c; break;
+					case ')':   if (parendex == 0 || parens[--parendex] != '(') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
+					case ']':   if (parendex == 0 || parens[--parendex] != '[') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
+					case '}':   if (parendex == 0 || parens[--parendex] != '{') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
+					case ',':   if (parendex == 0) params[paramcount++] = p; break;
+					case ';':   if (parendex == 0) foundend = TRUE; break;
+					case '-':   if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = TRUE; *p = c; break;
+					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = TRUE; *p = c; break;
+					case '=':   if (parendex == 0 && paramcount == 1) isexpr = TRUE; *p = c; break;
+					case 0:     foundend = TRUE; break;
+					default:    *p = tolower((UINT8)c); break;
 				}
 			}
 		}
@@ -448,14 +448,14 @@ const char *debug_cmderr_to_string(CMDERR error)
 {
 	switch (CMDERR_ERROR_CLASS(error))
 	{
-		case CMDERR_UNKNOWN_COMMAND:		return "unknown command";
-		case CMDERR_AMBIGUOUS_COMMAND:		return "ambiguous command";
-		case CMDERR_UNBALANCED_PARENS:		return "unbalanced parentheses";
-		case CMDERR_UNBALANCED_QUOTES:		return "unbalanced quotes";
-		case CMDERR_NOT_ENOUGH_PARAMS:		return "not enough parameters for command";
-		case CMDERR_TOO_MANY_PARAMS:		return "too many parameters for command";
-		case CMDERR_EXPRESSION_ERROR:		return "error in assignment expression";
-		default:							return "unknown error";
+		case CMDERR_UNKNOWN_COMMAND:        return "unknown command";
+		case CMDERR_AMBIGUOUS_COMMAND:      return "ambiguous command";
+		case CMDERR_UNBALANCED_PARENS:      return "unbalanced parentheses";
+		case CMDERR_UNBALANCED_QUOTES:      return "unbalanced quotes";
+		case CMDERR_NOT_ENOUGH_PARAMS:      return "not enough parameters for command";
+		case CMDERR_TOO_MANY_PARAMS:        return "too many parameters for command";
+		case CMDERR_EXPRESSION_ERROR:       return "error in assignment expression";
+		default:                            return "unknown error";
 	}
 }
 
@@ -564,4 +564,3 @@ text_buffer *debug_errorlog_get_textbuf(void)
 {
 	return errorlog_textbuf;
 }
-

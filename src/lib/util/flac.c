@@ -305,12 +305,12 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 
 flac_decoder::flac_decoder()
 	: m_decoder(FLAC__stream_decoder_new()),
-	  m_file(NULL),
-	  m_compressed_offset(0),
-	  m_compressed_start(NULL),
-	  m_compressed_length(0),
-	  m_compressed2_start(NULL),
-	  m_compressed2_length(0)
+		m_file(NULL),
+		m_compressed_offset(0),
+		m_compressed_start(NULL),
+		m_compressed_length(0),
+		m_compressed2_start(NULL),
+		m_compressed2_length(0)
 {
 }
 
@@ -321,12 +321,12 @@ flac_decoder::flac_decoder()
 
 flac_decoder::flac_decoder(const void *buffer, UINT32 length, const void *buffer2, UINT32 length2)
 	: m_decoder(FLAC__stream_decoder_new()),
-	  m_file(NULL),
-	  m_compressed_offset(0),
-	  m_compressed_start(reinterpret_cast<const FLAC__byte *>(buffer)),
-	  m_compressed_length(length),
-	  m_compressed2_start(reinterpret_cast<const FLAC__byte *>(buffer2)),
-	  m_compressed2_length(length2)
+		m_file(NULL),
+		m_compressed_offset(0),
+		m_compressed_start(reinterpret_cast<const FLAC__byte *>(buffer)),
+		m_compressed_length(length),
+		m_compressed2_start(reinterpret_cast<const FLAC__byte *>(buffer2)),
+		m_compressed2_length(length2)
 {
 	reset();
 }
@@ -338,12 +338,12 @@ flac_decoder::flac_decoder(const void *buffer, UINT32 length, const void *buffer
 
 flac_decoder::flac_decoder(core_file &file)
 	: m_decoder(FLAC__stream_decoder_new()),
-	  m_file(&file),
-	  m_compressed_offset(0),
-	  m_compressed_start(NULL),
-	  m_compressed_length(0),
-	  m_compressed2_start(NULL),
-	  m_compressed2_length(0)
+		m_file(&file),
+		m_compressed_offset(0),
+		m_compressed_start(NULL),
+		m_compressed_length(0),
+		m_compressed2_start(NULL),
+		m_compressed2_length(0)
 {
 	reset();
 }
@@ -406,19 +406,19 @@ bool flac_decoder::reset(UINT32 sample_rate, UINT8 num_channels, UINT32 block_si
 	// modify the template header with our parameters
 	static const UINT8 s_header_template[0x2a] =
 	{
-		0x66, 0x4C, 0x61, 0x43, 						// +00: 'fLaC' stream header
-		0x80,											// +04: metadata block type 0 (STREAMINFO),
+		0x66, 0x4C, 0x61, 0x43,                         // +00: 'fLaC' stream header
+		0x80,                                           // +04: metadata block type 0 (STREAMINFO),
 														//      flagged as last block
-		0x00, 0x00, 0x22,								// +05: metadata block length = 0x22
-		0x00, 0x00, 									// +08: minimum block size
-		0x00, 0x00,										// +0A: maximum block size
-		0x00, 0x00, 0x00,								// +0C: minimum frame size (0 == unknown)
-		0x00, 0x00, 0x00,								// +0F: maximum frame size (0 == unknown)
+		0x00, 0x00, 0x22,                               // +05: metadata block length = 0x22
+		0x00, 0x00,                                     // +08: minimum block size
+		0x00, 0x00,                                     // +0A: maximum block size
+		0x00, 0x00, 0x00,                               // +0C: minimum frame size (0 == unknown)
+		0x00, 0x00, 0x00,                               // +0F: maximum frame size (0 == unknown)
 		0x0A, 0xC4, 0x42, 0xF0, 0x00, 0x00, 0x00, 0x00, // +12: sample rate (0x0ac44 == 44100),
 														//      numchannels (2), sample bits (16),
 														//      samples in stream (0 == unknown)
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // +1A: MD5 signature (0 == none)
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00	//
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  //
 														// +2A: start of stream data
 	};
 	memcpy(m_custom_header, s_header_template, sizeof(s_header_template));

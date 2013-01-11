@@ -9,9 +9,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- double spaced rows
+    - double spaced rows
 
 */
 
@@ -26,37 +26,37 @@
 const int DMA_BURST_SPACING[] = { 0, 7, 15, 23, 31, 39, 47, 55 };
 
 #define DOUBLE_SPACED_ROWS \
-    BIT(m_param[REG_SCN1], 7)
+	BIT(m_param[REG_SCN1], 7)
 
 #define CHARACTERS_PER_ROW \
-    ((m_param[REG_SCN1] & 0x7f) + 1)
+	((m_param[REG_SCN1] & 0x7f) + 1)
 
 #define VRTC_ROW_COUNT \
-    ((m_param[REG_SCN2] >> 5) + 1)
+	((m_param[REG_SCN2] >> 5) + 1)
 
 #define CHARACTER_ROWS_PER_FRAME \
-    ((m_param[REG_SCN2] & 0x3f) + 1)
+	((m_param[REG_SCN2] & 0x3f) + 1)
 
 #define UNDERLINE \
-    (m_param[REG_SCN3] >> 4)
+	(m_param[REG_SCN3] >> 4)
 
 #define SCANLINES_PER_ROW \
-    ((m_param[REG_SCN3] & 0x0f) + 1)
+	((m_param[REG_SCN3] & 0x0f) + 1)
 
 #define OFFSET_LINE_COUNTER \
-    BIT(m_param[REG_SCN4], 7)
+	BIT(m_param[REG_SCN4], 7)
 
 #define VISIBLE_FIELD_ATTRIBUTE \
-    BIT(m_param[REG_SCN4], 6)
+	BIT(m_param[REG_SCN4], 6)
 
 #define CURSOR_FORMAT \
-    ((m_param[REG_SCN4] >> 4) & 0x03)
+	((m_param[REG_SCN4] >> 4) & 0x03)
 
 #define HRTC_COUNT \
-    (((m_param[REG_SCN4] & 0x0f) + 1) * 2)
+	(((m_param[REG_SCN4] & 0x0f) + 1) * 2)
 
 #define DMA_BURST_COUNT \
-    (1 << (m_param[REG_DMA] & 0x03))
+	(1 << (m_param[REG_DMA] & 0x03))
 
 #define DMA_BURST_SPACE \
 	DMA_BURST_SPACING[(m_param[REG_DMA] >> 2) & 0x07]
@@ -80,23 +80,23 @@ const device_type I8275x = &device_creator<i8275x_device>;
 //-------------------------------------------------
 
 i8275x_device::i8275x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, I8275x, "I8275", tag, owner, clock),
-      m_status(0),
-      m_param_idx(0),
-      m_param_end(0),
-      m_buffer_idx(0),
-      m_fifo_next(false),
-      m_buffer_dma(0),
-      m_lpen(0),
-      m_hlgt(0),
-      m_vsp(0),
-      m_gpa(0),
-      m_rvv(0),
-      m_lten(0),
-      m_scanline(0),
-      m_du(false),
-      m_cursor_blink(0),
-      m_char_blink(0)
+	: device_t(mconfig, I8275x, "I8275", tag, owner, clock),
+		m_status(0),
+		m_param_idx(0),
+		m_param_end(0),
+		m_buffer_idx(0),
+		m_fifo_next(false),
+		m_buffer_dma(0),
+		m_lpen(0),
+		m_hlgt(0),
+		m_vsp(0),
+		m_gpa(0),
+		m_rvv(0),
+		m_lten(0),
+		m_scanline(0),
+		m_du(false),
+		m_cursor_blink(0),
+		m_char_blink(0)
 {
 }
 
@@ -253,10 +253,10 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_lten = 0;
 
 			m_du = false;
-			
+
 			m_cursor_blink++;
 			m_cursor_blink &= 0x1f;
-			
+
 			m_char_blink++;
 			m_char_blink &= 0x3f;
 		}
@@ -267,7 +267,7 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_buffer_dma = !m_buffer_dma;
 			m_buffer_idx = 0;
 			m_fifo_idx = 0;
-	
+
 			if (!m_du && ((m_scanline < m_vrtc_scanline - SCANLINES_PER_ROW) || (m_scanline == m_vrtc_drq_scanline)))
 			{
 				// start DMA burst
@@ -299,9 +299,9 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 						if (!VISIBLE_FIELD_ATTRIBUTE)
 						{
 							int fifo_idx = 0;
-							
+
 							data = m_fifo[!m_buffer_dma][fifo_idx];
-							
+
 							fifo_idx++;
 							fifo_idx &= 0xf;
 						}
@@ -345,7 +345,7 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					lc = (lc - 1) & 0x0f;
 				}
 
-				m_display_pixels_func(this, m_bitmap, 
+				m_display_pixels_func(this, m_bitmap,
 					sx * m_hpixels_per_column, // x position on screen of starting point
 					m_scanline, // y position on screen
 					lc, // current line of char
@@ -395,7 +395,7 @@ READ8_MEMBER( i8275x_device::read )
 		if (m_param_idx > m_param_end)
 		{
 			m_status |= ST_IC;
-		}	
+		}
 	}
 
 	return data;
@@ -417,10 +417,10 @@ WRITE8_MEMBER( i8275x_device::write )
 		case CMD_RESET:
 			logerror("I8275 '%s' Reset\n", tag());
 
-			m_status &= ~ST_IE;			
+			m_status &= ~ST_IE;
 			logerror("I8275 '%s' IRQ 0\n", tag());
 			m_out_irq_func(CLEAR_LINE);
-			
+
 			m_param_idx = REG_SCN1;
 			m_param_end = REG_SCN4;
 			break;
@@ -474,7 +474,7 @@ WRITE8_MEMBER( i8275x_device::write )
 
 		if (m_param_idx == REG_SCN4)
 		{
-			recompute_parameters();		
+			recompute_parameters();
 		}
 
 		m_param_idx++;
@@ -505,7 +505,7 @@ WRITE8_MEMBER( i8275x_device::dack_w )
 	else
 	{
 		m_buffer[m_buffer_dma][m_buffer_idx++] = data;
-		
+
 		if (!VISIBLE_FIELD_ATTRIBUTE && ((data & 0xc0) == 0x80))
 		{
 			m_fifo_next = true;

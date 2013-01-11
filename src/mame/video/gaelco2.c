@@ -207,7 +207,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
 
 ***************************************************************************/
 
-#define RGB_CHG		0x08
+#define RGB_CHG     0x08
 #define ADJUST_COLOR(c) ((c < 0) ? 0 : ((c > 255) ? 255 : c))
 
 /* table used for color adjustment */
@@ -239,7 +239,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 	/* update shadow/highligh palettes */
 	for (i = 1; i < 16; i++){
 		/* because the last palette entry is reserved for shadows and highlights, we
-        don't use it and that way we save some colors so the UI looks fine ;-) */
+		don't use it and that way we save some colors so the UI looks fine ;-) */
 		if ((offset >= 0xff0) && (offset <= 0xfff)) return;
 
 		auxr = ADJUST_COLOR(r + pen_color_adjust[i]);

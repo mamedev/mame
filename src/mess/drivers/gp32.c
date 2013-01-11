@@ -57,11 +57,11 @@ static void s3c240x_dma_request_pwm( running_machine &machine);
 // LCD CONTROLLER
 
 
-#define BPPMODE_TFT_01	0x08
-#define BPPMODE_TFT_02	0x09
-#define BPPMODE_TFT_04	0x0A
-#define BPPMODE_TFT_08	0x0B
-#define BPPMODE_TFT_16	0x0C
+#define BPPMODE_TFT_01  0x08
+#define BPPMODE_TFT_02  0x09
+#define BPPMODE_TFT_04  0x0A
+#define BPPMODE_TFT_08  0x0B
+#define BPPMODE_TFT_16  0x0C
 
 static rgb_t s3c240x_get_color_5551( UINT16 data)
 {

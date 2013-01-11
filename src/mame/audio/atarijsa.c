@@ -47,7 +47,7 @@ ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in 
 #include "audio/atarijsa.h"
 
 
-#define JSA_MASTER_CLOCK			XTAL_3_579545MHz
+#define JSA_MASTER_CLOCK            XTAL_3_579545MHz
 
 
 static UINT8 *bank_base;
@@ -208,25 +208,25 @@ static READ8_HANDLER( jsa1_io_r )
 
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* n/c */
+		case 0x000:     /* n/c */
 			logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
 
-		case 0x002:		/* /RDP */
+		case 0x002:     /* /RDP */
 			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
-		case 0x004:		/* /RDIO */
+		case 0x004:     /* /RDIO */
 			/*
-                0x80 = self test
-                0x40 = NMI line state (active low)
-                0x20 = sound output full
-                0x10 = TMS5220 ready (active low)
-                0x08 = +5V
-                0x04 = +5V
-                0x02 = coin 2
-                0x01 = coin 1
-            */
+			    0x80 = self test
+			    0x40 = NMI line state (active low)
+			    0x20 = sound output full
+			    0x10 = TMS5220 ready (active low)
+			    0x08 = +5V
+			    0x04 = +5V
+			    0x02 = coin 2
+			    0x01 = coin 1
+			*/
 			result = space.machine().root_device().ioport("JSAI")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x80;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
@@ -237,14 +237,14 @@ static READ8_HANDLER( jsa1_io_r )
 				result &= ~0x10;
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /VOICE */
-		case 0x202:		/* /WRP */
-		case 0x204:		/* /WRIO */
-		case 0x206:		/* /MIX */
+		case 0x200:     /* /VOICE */
+		case 0x202:     /* /WRP */
+		case 0x204:     /* /WRIO */
+		case 0x206:     /* /MIX */
 			logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
 	}
@@ -257,35 +257,35 @@ static WRITE8_HANDLER( jsa1_io_w )
 {
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* n/c */
-		case 0x002:		/* /RDP */
-		case 0x004:		/* /RDIO */
+		case 0x000:     /* n/c */
+		case 0x002:     /* /RDP */
+		case 0x004:     /* /RDIO */
 			logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /VOICE */
+		case 0x200:     /* /VOICE */
 			if (tms5220 != NULL)
 				tms5220_data_w(tms5220, space, 0, data);
 			break;
 
-		case 0x202:		/* /WRP */
+		case 0x202:     /* /WRP */
 			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
-		case 0x204:		/* WRIO */
+		case 0x204:     /* WRIO */
 			/*
-                0xc0 = bank address
-                0x20 = coin counter 2
-                0x10 = coin counter 1
-                0x08 = squeak (tweaks the 5220 frequency)
-                0x04 = TMS5220 reset (actually the read strobe) (active low)
-                0x02 = TMS5220 write strobe (active low)
-                0x01 = YM2151 reset (active low)
-            */
+			    0xc0 = bank address
+			    0x20 = coin counter 2
+			    0x10 = coin counter 1
+			    0x08 = squeak (tweaks the 5220 frequency)
+			    0x04 = TMS5220 reset (actually the read strobe) (active low)
+			    0x02 = TMS5220 write strobe (active low)
+			    0x01 = YM2151 reset (active low)
+			*/
 
 			/* handle TMS5220 I/O */
 			if (tms5220 != NULL)
@@ -308,13 +308,13 @@ static WRITE8_HANDLER( jsa1_io_w )
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
 			break;
 
-		case 0x206:		/* MIX */
+		case 0x206:     /* MIX */
 			/*
-                0xc0 = TMS5220 volume (0-3)
-                0x30 = POKEY volume (0-3)
-                0x0e = YM2151 volume (0-7)
-                0x01 = low-pass filter enable
-            */
+			    0xc0 = TMS5220 volume (0-3)
+			    0x30 = POKEY volume (0-3)
+			    0x0e = YM2151 volume (0-7)
+			    0x01 = low-pass filter enable
+			*/
 			tms5220_volume = ((data >> 6) & 3) * 100 / 3;
 			pokey_volume = ((data >> 4) & 3) * 100 / 3;
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -338,42 +338,42 @@ static READ8_HANDLER( jsa2_io_r )
 
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* /RDV */
+		case 0x000:     /* /RDV */
 			if (oki6295 != NULL)
 				result = oki6295->read(space, offset);
 			else
 				logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
 
-		case 0x002:		/* /RDP */
+		case 0x002:     /* /RDP */
 			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
-		case 0x004:		/* /RDIO */
+		case 0x004:     /* /RDIO */
 			/*
-                0x80 = self test
-                0x40 = NMI line state (active low)
-                0x20 = sound output full
-                0x10 = +5V
-                0x08 = +5V
-                0x04 = +5V
-                0x02 = coin 2
-                0x01 = coin 1
-            */
+			    0x80 = self test
+			    0x40 = NMI line state (active low)
+			    0x20 = sound output full
+			    0x10 = +5V
+			    0x08 = +5V
+			    0x04 = +5V
+			    0x02 = coin 2
+			    0x01 = coin 1
+			*/
 			result = space.machine().root_device().ioport("JSAII")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x80;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /WRV */
-		case 0x202:		/* /WRP */
-		case 0x204:		/* /WRIO */
-		case 0x206:		/* /MIX */
+		case 0x200:     /* /WRV */
+		case 0x202:     /* /WRP */
+		case 0x204:     /* /WRIO */
+		case 0x206:     /* /MIX */
 			logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
 	}
@@ -386,37 +386,37 @@ static WRITE8_HANDLER( jsa2_io_w )
 {
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* /RDV */
-		case 0x002:		/* /RDP */
-		case 0x004:		/* /RDIO */
+		case 0x000:     /* /RDV */
+		case 0x002:     /* /RDP */
+		case 0x004:     /* /RDIO */
 			logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /WRV */
+		case 0x200:     /* /WRV */
 			if (oki6295 != NULL)
 				oki6295->write(space, offset, data);
 			else
 				logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
 
-		case 0x202:		/* /WRP */
+		case 0x202:     /* /WRP */
 			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
-		case 0x204:		/* /WRIO */
+		case 0x204:     /* /WRIO */
 			/*
-                0xc0 = bank address
-                0x20 = coin counter 2
-                0x10 = coin counter 1
-                0x08 = voice frequency (tweaks the OKI6295 frequency)
-                0x04 = OKI6295 reset (active low)
-                0x02 = n/c
-                0x01 = YM2151 reset (active low)
-            */
+			    0xc0 = bank address
+			    0x20 = coin counter 2
+			    0x10 = coin counter 1
+			    0x08 = voice frequency (tweaks the OKI6295 frequency)
+			    0x04 = OKI6295 reset (active low)
+			    0x02 = n/c
+			    0x01 = YM2151 reset (active low)
+			*/
 
 			/* reset the YM2151 if needed */
 			if ((data&1) == 0) space.machine().device("ymsnd")->reset();
@@ -433,14 +433,14 @@ static WRITE8_HANDLER( jsa2_io_w )
 				oki6295->set_pin7(data & 8);
 			break;
 
-		case 0x206:		/* /MIX */
+		case 0x206:     /* /MIX */
 			/*
-                0xc0 = n/c
-                0x20 = low-pass filter enable
-                0x10 = n/c
-                0x0e = YM2151 volume (0-7)
-                0x01 = OKI6295 volume (0-1)
-            */
+			    0xc0 = n/c
+			    0x20 = low-pass filter enable
+			    0x10 = n/c
+			    0x0e = YM2151 volume (0-7)
+			    0x01 = OKI6295 volume (0-1)
+			*/
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
 			oki6295_volume = 50 + (data & 1) * 50;
 			update_all_volumes(space.machine());
@@ -463,40 +463,40 @@ static READ8_HANDLER( jsa3_io_r )
 
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* /RDV */
+		case 0x000:     /* /RDV */
 			if (oki6295 != NULL)
 				result = oki6295->read(space, offset);
 			break;
 
-		case 0x002:		/* /RDP */
+		case 0x002:     /* /RDP */
 			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
-		case 0x004:		/* /RDIO */
+		case 0x004:     /* /RDIO */
 			/*
-                0x80 = self test (active high)
-                0x40 = NMI line state (active high)
-                0x20 = sound output full (active high)
-                0x10 = self test (active high)
-                0x08 = service (active high)
-                0x04 = tilt (active high)
-                0x02 = coin L (active high)
-                0x01 = coin R (active high)
-            */
+			    0x80 = self test (active high)
+			    0x40 = NMI line state (active high)
+			    0x20 = sound output full (active high)
+			    0x10 = self test (active high)
+			    0x08 = service (active high)
+			    0x04 = tilt (active high)
+			    0x02 = coin L (active high)
+			    0x01 = coin R (active high)
+			*/
 			result = space.machine().root_device().ioport("JSAIII")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x90;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /WRV */
-		case 0x202:		/* /WRP */
-		case 0x204:		/* /WRIO */
-		case 0x206:		/* /MIX */
+		case 0x200:     /* /WRV */
+		case 0x202:     /* /WRP */
+		case 0x204:     /* /WRIO */
+		case 0x206:     /* /MIX */
 			logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
 	}
@@ -509,39 +509,39 @@ static WRITE8_HANDLER( jsa3_io_w )
 {
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* /RDV */
+		case 0x000:     /* /RDV */
 			overall_volume = data * 100 / 127;
 			update_all_volumes(space.machine());
 			break;
 
-		case 0x002:		/* /RDP */
-		case 0x004:		/* /RDIO */
+		case 0x002:     /* /RDP */
+		case 0x004:     /* /RDIO */
 			logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /WRV */
+		case 0x200:     /* /WRV */
 			if (oki6295 != NULL)
 				oki6295->write(space, offset, data);
 			break;
 
-		case 0x202:		/* /WRP */
+		case 0x202:     /* /WRP */
 			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
-		case 0x204:		/* /WRIO */
+		case 0x204:     /* /WRIO */
 			/*
-                0xc0 = bank address
-                0x20 = coin counter 2
-                0x10 = coin counter 1
-                0x08 = voice frequency (tweaks the OKI6295 frequency)
-                0x04 = OKI6295 reset (active low)
-                0x02 = OKI6295 bank bit 0
-                0x01 = YM2151 reset (active low)
-            */
+			    0xc0 = bank address
+			    0x20 = coin counter 2
+			    0x10 = coin counter 1
+			    0x08 = voice frequency (tweaks the OKI6295 frequency)
+			    0x04 = OKI6295 reset (active low)
+			    0x02 = OKI6295 bank bit 0
+			    0x01 = YM2151 reset (active low)
+			*/
 
 			/* reset the YM2151 if needed */
 			if ((data&1) == 0) space.machine().device("ymsnd")->reset();
@@ -561,14 +561,14 @@ static WRITE8_HANDLER( jsa3_io_w )
 			if (oki6295 != NULL) oki6295->set_pin7(data & 8);
 			break;
 
-		case 0x206:		/* /MIX */
+		case 0x206:     /* /MIX */
 			/*
-                0xc0 = n/c
-                0x20 = low-pass filter enable
-                0x10 = OKI6295 bank bit 1
-                0x0e = YM2151 volume (0-7)
-                0x01 = OKI6295 volume (0-1)
-            */
+			    0xc0 = n/c
+			    0x20 = low-pass filter enable
+			    0x10 = OKI6295 bank bit 1
+			    0x0e = YM2151 volume (0-7)
+			    0x01 = OKI6295 volume (0-1)
+			*/
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
@@ -597,40 +597,40 @@ static READ8_HANDLER( jsa3s_io_r )
 
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* /RDV */
+		case 0x000:     /* /RDV */
 			if (oki6295_l != NULL)
 				result = ((offset & 1) ? oki6295_r : oki6295_l)->read(space, offset);
 			break;
 
-		case 0x002:		/* /RDP */
+		case 0x002:     /* /RDP */
 			result = atarigen->m6502_sound_r(space, offset);
 			break;
 
-		case 0x004:		/* /RDIO */
+		case 0x004:     /* /RDIO */
 			/*
-                0x80 = self test (active high)
-                0x40 = NMI line state (active high)
-                0x20 = sound output full (active high)
-                0x10 = self test (active high)
-                0x08 = service (active high)
-                0x04 = tilt (active high)
-                0x02 = coin L (active high)
-                0x01 = coin R (active high)
-            */
+			    0x80 = self test (active high)
+			    0x40 = NMI line state (active high)
+			    0x20 = sound output full (active high)
+			    0x10 = self test (active high)
+			    0x08 = service (active high)
+			    0x04 = tilt (active high)
+			    0x02 = coin L (active high)
+			    0x01 = coin R (active high)
+			*/
 			result = space.machine().root_device().ioport("JSAIII")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x90;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			atarigen->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /WRV */
-		case 0x202:		/* /WRP */
-		case 0x204:		/* /WRIO */
-		case 0x206:		/* /MIX */
+		case 0x200:     /* /WRV */
+		case 0x202:     /* /WRP */
+		case 0x204:     /* /WRIO */
+		case 0x206:     /* /MIX */
 			logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
 	}
@@ -643,39 +643,39 @@ static WRITE8_HANDLER( jsa3s_io_w )
 {
 	switch (offset & 0x206)
 	{
-		case 0x000:		/* /RDV */
+		case 0x000:     /* /RDV */
 			overall_volume = data * 100 / 127;
 			update_all_volumes(space.machine());
 			break;
 
-		case 0x002:		/* /RDP */
-		case 0x004:		/* /RDIO */
+		case 0x002:     /* /RDP */
+		case 0x004:     /* /RDIO */
 			logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
 
-		case 0x006:		/* /IRQACK */
+		case 0x006:     /* /IRQACK */
 			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
 			break;
 
-		case 0x200:		/* /WRV */
+		case 0x200:     /* /WRV */
 			if (oki6295_l != NULL)
 				((offset & 1) ? oki6295_r : oki6295_l)->write(space, 0, data);
 			break;
 
-		case 0x202:		/* /WRP */
+		case 0x202:     /* /WRP */
 			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
 			break;
 
-		case 0x204:		/* /WRIO */
+		case 0x204:     /* /WRIO */
 			/*
-                0xc0 = bank address
-                0x20 = coin counter 2
-                0x10 = coin counter 1
-                0x08 = voice frequency (tweaks the OKI6295 frequency)
-                0x04 = OKI6295 reset (active low)
-                0x02 = left OKI6295 bank bit 0
-                0x01 = YM2151 reset (active low)
-            */
+			    0xc0 = bank address
+			    0x20 = coin counter 2
+			    0x10 = coin counter 1
+			    0x08 = voice frequency (tweaks the OKI6295 frequency)
+			    0x04 = OKI6295 reset (active low)
+			    0x02 = left OKI6295 bank bit 0
+			    0x01 = YM2151 reset (active low)
+			*/
 
 			/* reset the YM2151 if needed */
 			if ((data&1) == 0) space.machine().device("ymsnd")->reset();
@@ -695,14 +695,14 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			oki6295_r->set_pin7(data & 8);
 			break;
 
-		case 0x206:		/* /MIX */
+		case 0x206:     /* /MIX */
 			/*
-                0xc0 = right OKI6295 bank bits 0-1
-                0x20 = low-pass filter enable
-                0x10 = left OKI6295 bank bit 1
-                0x0e = YM2151 volume (0-7)
-                0x01 = OKI6295 volume (0-1)
-            */
+			    0xc0 = right OKI6295 bank bits 0-1
+			    0x20 = low-pass filter enable
+			    0x10 = left OKI6295 bank bit 1
+			    0x0e = YM2151 volume (0-7)
+			    0x01 = OKI6295 volume (0-1)
+			*/
 
 			/* update the OKI bank */
 			space.machine().root_device().membank("bank12")->set_entry((space.machine().root_device().membank("bank12")->entry() & 1) | ((data >> 3) & 2));
@@ -938,10 +938,10 @@ INPUT_PORTS_START( atarijsa_i )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	/* speech chip ready */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	/* output buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )		/* input buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )	/* self test */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    /* speech chip ready */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    /* output buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )     /* input buffer full */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )    /* self test */
 INPUT_PORTS_END
 
 INPUT_PORTS_START( atarijsa_ii )
@@ -951,9 +951,9 @@ INPUT_PORTS_START( atarijsa_ii )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	/* output buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )		/* input buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )	/* self test */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    /* output buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )     /* input buffer full */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )    /* self test */
 INPUT_PORTS_END
 
 INPUT_PORTS_START( atarijsa_iii )
@@ -962,8 +962,8 @@ INPUT_PORTS_START( atarijsa_iii )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	/* self test */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	/* output buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )	/* input buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )	/* self test */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    /* self test */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    /* output buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )    /* input buffer full */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )    /* self test */
 INPUT_PORTS_END

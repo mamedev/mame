@@ -5,14 +5,14 @@
 
 #include "devlegcy.h"
 
-#define BEEPER_TAG		"beeper"
+#define BEEPER_TAG      "beeper"
 
 void beep_set_state(device_t *device, int on);
 void beep_set_frequency(device_t *device, int frequency);
 void beep_set_volume(device_t *device, int volume);
 
 class beep_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	beep_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

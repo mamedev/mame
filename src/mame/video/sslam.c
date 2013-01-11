@@ -190,7 +190,7 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 		return 0;
 	}
 
-	m_tx_tilemap->set_scrollx(0, m_regs[0]+1);	/* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
+	m_tx_tilemap->set_scrollx(0, m_regs[0]+1);  /* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
 	m_tx_tilemap->set_scrolly(0, (m_regs[1] & 0xff)+8);
 	m_md_tilemap->set_scrollx(0, m_regs[2]+2);
 	m_md_tilemap->set_scrolly(0, m_regs[3]+8);

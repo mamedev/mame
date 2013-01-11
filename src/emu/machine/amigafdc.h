@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 
-#define MCFG_AMIGA_FDC_ADD(_tag, _clock)	\
+#define MCFG_AMIGA_FDC_ADD(_tag, _clock)    \
 	MCFG_DEVICE_ADD(_tag, AMIGA_FDC, _clock)
 
 class amiga_fdc : public device_t {
@@ -29,8 +29,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
-    virtual void device_start();
-    virtual void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:

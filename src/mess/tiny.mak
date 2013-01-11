@@ -3,7 +3,7 @@
 #   tiny.mak
 #
 #   Small driver-specific example makefile
-#	Use make TARGET=mess SUBTARGET=tiny to build
+#   Use make TARGET=mess SUBTARGET=tiny to build
 #
 #   As an example this makefile builds MESS with the three Colecovision
 #   drivers enabled only.

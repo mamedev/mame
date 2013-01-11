@@ -58,8 +58,8 @@ const rom_entry *saa5050_device::device_rom_region() const
 {
 	switch (m_variant)
 	{
-		default:		return ROM_NAME( saa5050 );
-		case TYPE_5052:	return ROM_NAME( saa5052 );
+		default:        return ROM_NAME( saa5050 );
+		case TYPE_5052: return ROM_NAME( saa5052 );
 	}
 }
 
@@ -129,21 +129,21 @@ static const rgb_t PALETTE[] =
 //-------------------------------------------------
 
 saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-    : device_t(mconfig, type, name, tag, owner, clock),
-      m_frame_count(0),
-      m_variant(variant)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		m_frame_count(0),
+		m_variant(variant)
 {
 }
 
 saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock),
-      m_frame_count(0),
-      m_variant(TYPE_5050)
+	: device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock),
+		m_frame_count(0),
+		m_variant(TYPE_5050)
 {
 }
 
 saa5052_device::saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, TYPE_5052)
+	: saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, TYPE_5052)
 {
 }
 
@@ -169,8 +169,8 @@ void saa5050_device::device_config_complete()
 
 	switch (m_variant)
 	{
-		default:		m_shortname = "saa5050"; break;
-		case TYPE_5052:	m_shortname = "saa5052"; break;
+		default:        m_shortname = "saa5050"; break;
+		case TYPE_5052: m_shortname = "saa5052"; break;
 	}
 }
 

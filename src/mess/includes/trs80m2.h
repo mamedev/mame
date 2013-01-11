@@ -20,38 +20,38 @@
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"u12"
-#define Z80CTC_TAG		"u19"
-#define Z80DMA_TAG		"u20"
-#define Z80PIO_TAG		"u22"
-#define Z80SIO_TAG		"u18"
-#define FD1791_TAG		"u6"
-#define MC6845_TAG		"u11"
-#define CENTRONICS_TAG	"j2"
-#define M68000_TAG		"m16_u22"
-#define AM9519A_TAG		"m16_u11"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "u12"
+#define Z80CTC_TAG      "u19"
+#define Z80DMA_TAG      "u20"
+#define Z80PIO_TAG      "u22"
+#define Z80SIO_TAG      "u18"
+#define FD1791_TAG      "u6"
+#define MC6845_TAG      "u11"
+#define CENTRONICS_TAG  "j2"
+#define M68000_TAG      "m16_u22"
+#define AM9519A_TAG     "m16_u11"
 
 class trs80m2_state : public driver_device
 {
 public:
 	trs80m2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_dmac(*this, Z80DMA_TAG),
-		  m_pio(*this, Z80PIO_TAG),
-		  m_crtc(*this, MC6845_TAG),
-		  m_fdc(*this, FD1791_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_floppy0(*this, FD1791_TAG":0"),
-		  m_floppy1(*this, FD1791_TAG":1"),
-		  m_floppy2(*this, FD1791_TAG":2"),
-		  m_floppy3(*this, FD1791_TAG":3"),
-		  m_floppy(NULL),
-		  m_ram(*this, RAM_TAG),
-		  m_kb(*this, TRS80M2_KEYBOARD_TAG),
-		  m_video_ram(*this, "video_ram")
+			m_maincpu(*this, Z80_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_dmac(*this, Z80DMA_TAG),
+			m_pio(*this, Z80PIO_TAG),
+			m_crtc(*this, MC6845_TAG),
+			m_fdc(*this, FD1791_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_floppy0(*this, FD1791_TAG":0"),
+			m_floppy1(*this, FD1791_TAG":1"),
+			m_floppy2(*this, FD1791_TAG":2"),
+			m_floppy3(*this, FD1791_TAG":3"),
+			m_floppy(NULL),
+			m_ram(*this, RAM_TAG),
+			m_kb(*this, TRS80M2_KEYBOARD_TAG),
+			m_video_ram(*this, "video_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -130,8 +130,8 @@ class trs80m16_state : public trs80m2_state
 public:
 	trs80m16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: trs80m2_state(mconfig, type, tag),
-		  m_subcpu(*this, M68000_TAG),
-		  m_pic(*this, AM9519A_TAG)
+			m_subcpu(*this, M68000_TAG),
+			m_pic(*this, AM9519A_TAG)
 	{ }
 
 	required_device<cpu_device> m_subcpu;

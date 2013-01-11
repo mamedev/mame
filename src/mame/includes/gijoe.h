@@ -26,8 +26,8 @@ public:
 	int         m_sprite_colorbase;
 
 	/* misc */
-	UINT16  	m_cur_control2;
-	emu_timer	*m_dmadelay_timer;
+	UINT16      m_cur_control2;
+	emu_timer   *m_dmadelay_timer;
 
 	/* devices */
 	cpu_device *m_maincpu;

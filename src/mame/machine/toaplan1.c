@@ -24,18 +24,18 @@ enum {
 
 static const UINT8 toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER+1][2][4] =
 {
-	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } },	/* TOAPLAN1_REGION_JAPAN */
-	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } },	/* TOAPLAN1_REGION_US */
-	{ { 1, 2, 3, 4 }, { 1, 1, 1, 1 } },	/* TOAPLAN1_REGION_WORLD */
-	{ { 1, 1, 1, 1 }, { 1, 1, 1, 1 } }	/* TOAPLAN1_REGION_OTHER */
+	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } }, /* TOAPLAN1_REGION_JAPAN */
+	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } }, /* TOAPLAN1_REGION_US */
+	{ { 1, 2, 3, 4 }, { 1, 1, 1, 1 } }, /* TOAPLAN1_REGION_WORLD */
+	{ { 1, 1, 1, 1 }, { 1, 1, 1, 1 } }  /* TOAPLAN1_REGION_OTHER */
 };
 
 static const UINT8 toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4] =
 {
-	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } },	/* TOAPLAN1_REGION_JAPAN */
-	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } },	/* TOAPLAN1_REGION_US */
-	{ { 1, 1, 1, 1 }, { 2, 3, 4, 6 } },	/* TOAPLAN1_REGION_WORLD */
-	{ { 1, 1, 1, 1 }, { 1, 1, 1, 1 } },	/* TOAPLAN1_REGION_OTHER */
+	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } }, /* TOAPLAN1_REGION_JAPAN */
+	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } }, /* TOAPLAN1_REGION_US */
+	{ { 1, 1, 1, 1 }, { 2, 3, 4, 6 } }, /* TOAPLAN1_REGION_WORLD */
+	{ { 1, 1, 1, 1 }, { 1, 1, 1, 1 } }, /* TOAPLAN1_REGION_OTHER */
 };
 
 
@@ -81,7 +81,7 @@ READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 		case 0xc00000: {address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
 						break;}
-		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
+		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
 	}
 	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n", space.device().safe_pcbase(), input_data, m_main_ram_seg + m_dsp_addr_w);
 	return input_data;
@@ -96,7 +96,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_w)
 						address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
 						break;}
-		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
+		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
 	}
 	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", space.device().safe_pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
 }
@@ -167,9 +167,9 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
 	{
 		switch (data)
 		{
-			case 0x00:	demonwld_dsp(machine(), 1); break;	/* Enable the INT line to the DSP */
-			case 0x01:	demonwld_dsp(machine(), 0); break;	/* Inhibit the INT line to the DSP */
-			default:	logerror("68000:%04x  Writing unknown command %08x to %08x\n",space.device().safe_pcbase() ,data ,0xe0000a + offset); break;
+			case 0x00:  demonwld_dsp(machine(), 1); break;  /* Enable the INT line to the DSP */
+			case 0x01:  demonwld_dsp(machine(), 0); break;  /* Inhibit the INT line to the DSP */
+			default:    logerror("68000:%04x  Writing unknown command %08x to %08x\n",space.device().safe_pcbase() ,data ,0xe0000a + offset); break;
 		}
 	}
 	else
@@ -277,8 +277,8 @@ WRITE16_MEMBER(toaplan1_state::vimana_mcu_w)
 {
 	switch (offset)
 	{
-		case 0:	break;
-		case 1:	break;
+		case 0: break;
+		case 1: break;
 		case 2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -348,18 +348,18 @@ WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
 		case 0xe2: coin_counter_w(machine(), 1,1); coin_counter_w(machine(), 1,0); coin_lockout_w(machine(), 1,1); break;
 		case 0xe1: coin_counter_w(machine(), 0,1); coin_counter_w(machine(), 0,0); coin_lockout_w(machine(), 0,1); break;
 
-		case 0xec: coin_lockout_global_w(machine(), 0); break;	/* ??? count games played */
-		case 0xe8: break;	/* ??? Maximum credits reached with coin/credit ratio */
-		case 0xe4: break;	/* ??? Reset coin system */
+		case 0xec: coin_lockout_global_w(machine(), 0); break;  /* ??? count games played */
+		case 0xe8: break;   /* ??? Maximum credits reached with coin/credit ratio */
+		case 0xe4: break;   /* ??? Reset coin system */
 
-		case 0x0c: coin_lockout_global_w(machine(), 0); break;	/* Unlock all coin slots */
-		case 0x08: coin_lockout_w(machine(), 2,0); break;	/* Unlock coin slot C */
-		case 0x09: coin_lockout_w(machine(), 0,0); break;	/* Unlock coin slot A */
-		case 0x0a: coin_lockout_w(machine(), 1,0); break;	/* Unlock coin slot B */
+		case 0x0c: coin_lockout_global_w(machine(), 0); break;  /* Unlock all coin slots */
+		case 0x08: coin_lockout_w(machine(), 2,0); break;   /* Unlock coin slot C */
+		case 0x09: coin_lockout_w(machine(), 0,0); break;   /* Unlock coin slot A */
+		case 0x0a: coin_lockout_w(machine(), 1,0); break;   /* Unlock coin slot B */
 
-		case 0x02: coin_lockout_w(machine(), 1,1); break;	/* Lock coin slot B */
-		case 0x01: coin_lockout_w(machine(), 0,1); break;	/* Lock coin slot A */
-		case 0x00: coin_lockout_global_w(machine(), 1); break;	/* Lock all coin slots */
+		case 0x02: coin_lockout_w(machine(), 1,1); break;   /* Lock coin slot B */
+		case 0x01: coin_lockout_w(machine(), 0,1); break;   /* Lock coin slot A */
+		case 0x00: coin_lockout_global_w(machine(), 1); break;  /* Lock all coin slots */
 		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",space.device().safe_pcbase(),data); break;
 	}
 }

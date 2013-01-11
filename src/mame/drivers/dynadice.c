@@ -298,7 +298,7 @@ DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 	UINT8 *gfx1 = machine().root_device().memregion("gfx1")->base();
 	UINT8 *gfx2 = machine().root_device().memregion("gfx2")->base();
 
-	cpu2[0x0b] = 0x23;	/* bug in game code  Dec HL -> Inc HL*/
+	cpu2[0x0b] = 0x23;  /* bug in game code  Dec HL -> Inc HL*/
 
 	/* 1bpp tiles -> 3bpp tiles (dy_5.bin  contains bg/fg color data for each tile line) */
 	for (i = 0; i < 0x800; i++)

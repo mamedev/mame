@@ -170,8 +170,8 @@ WRITE8_MEMBER(tigeroad_state::msm5205_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM		/* still part of OBJ RAM */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)	/* char bank, coin counters, + ? */
+	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM     /* still part of OBJ RAM */
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)   /* char bank, coin counters, + ? */
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
 /*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
@@ -510,8 +510,8 @@ static const ym2203_interface ym2203_config =
 
 static const msm5205_interface msm5205_config =
 {
-	0,				/* interrupt function */
-	MSM5205_SEX_4B	/* 4KHz playback ?  */
+	0,              /* interrupt function */
+	MSM5205_SEX_4B  /* 4KHz playback ?  */
 };
 
 
@@ -563,7 +563,7 @@ static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
 	MCFG_CPU_ADD("sample", Z80, 3579545) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sample_map)
 	MCFG_CPU_IO_MAP(sample_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tigeroad_state, irq0_line_hold, 4000)	/* ? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(tigeroad_state, irq0_line_hold, 4000)  /* ? */
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
@@ -608,11 +608,11 @@ ROM_START( tigeroad )
 	ROM_LOAD( "tr-11a.bin",   0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
 	ROM_LOAD( "tr-12a.bin",   0x60000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
-	ROM_REGION( 0x08000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "tr13.bin",     0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) */
+	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
 ROM_END
 
 ROM_START( toramich )
@@ -645,11 +645,11 @@ ROM_START( toramich )
 	ROM_LOAD( "tr-11a.bin",   0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
 	ROM_LOAD( "tr-12a.bin",   0x60000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
-	ROM_REGION( 0x08000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "tr13.bin",     0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) */
+	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
 ROM_END
 
 ROM_START( tigeroadb )
@@ -684,11 +684,11 @@ ROM_START( tigeroadb )
 	ROM_LOAD( "tr-11a.bin",   0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
 	ROM_LOAD( "tr-12a.bin",   0x60000, 0x20000, CRC(7d8a99d0) SHA1(af8221cfd2ce9aa3bf296981fb7fddd1e9ef4599) )
 
-	ROM_REGION( 0x08000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "tr13.bin",     0x0000, 0x8000, CRC(a79be1eb) SHA1(4191ccd48f7650930f9a4c2be0790239d7420bb1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) */
+	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
 ROM_END
 
 ROM_START( f1dream )
@@ -699,7 +699,7 @@ ROM_START( f1dream )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x008000, "text", 0 )
@@ -719,11 +719,11 @@ ROM_START( f1dream )
 	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
 	ROM_LOAD( "02d_07.bin",   0x30000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
-	ROM_REGION( 0x08000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) */
+	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
 ROM_END
 
 ROM_START( f1dreamb )
@@ -753,11 +753,11 @@ ROM_START( f1dreamb )
 	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
 	ROM_LOAD( "02d_07.bin",   0x30000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
-	ROM_REGION( 0x08000, "gfx4", 0 )	/* background tilemaps */
+	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) */
+	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
 ROM_END
 
 

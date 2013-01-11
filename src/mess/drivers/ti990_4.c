@@ -168,10 +168,10 @@ UINT32 ti990_4_state::screen_update_ti990_4(screen_device &screen, bitmap_ind16 
 */
 
 static ADDRESS_MAP_START(ti990_4_memmap, AS_PROGRAM, 16, ti990_4_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM	/* dynamic RAM */
-	AM_RANGE(0x8000, 0xf7ff) AM_NOP	/* reserved for expansion */
-	AM_RANGE(0xf800, 0xfbff) AM_RAM	/* static RAM? */
-	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* LOAD ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_RAM /* dynamic RAM */
+	AM_RANGE(0x8000, 0xf7ff) AM_NOP /* reserved for expansion */
+	AM_RANGE(0xf800, 0xfbff) AM_RAM /* static RAM? */
+	AM_RANGE(0xfc00, 0xffff) AM_ROM /* LOAD ROM */
 ADDRESS_MAP_END
 
 
@@ -222,7 +222,7 @@ ADDRESS_MAP_END
 #if 0
 static const tms9900reset_param reset_params =
 {
-    idle_callback
+	idle_callback
 };
 #endif
 
@@ -297,7 +297,7 @@ ROM_START(ti990_4)
 
 #if 0
 	/* ROM set 945121-5: "733 ASR ROM loader with self test (prototyping)"
-    (cf 945401-9701 pp. 1-19) */
+	(cf 945401-9701 pp. 1-19) */
 
 	/* test ROM */
 	ROMX_LOAD("94519209.u39", 0xFC00, 0x100, CRC(0a0b0c42), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1))
@@ -313,7 +313,7 @@ ROM_START(ti990_4)
 
 #else
 	/* ROM set 945121-4(?): "Floppy disc loader with self test" (cf 945401-9701
-    pp. 1-19) */
+	pp. 1-19) */
 
 	ROM_LOAD16_WORD("ti9904.rom", 0xFC00, 0x400, CRC(691e7d19) SHA1(58d9bed80490fdf71c743bfd3077c70840b7df8c))
 
@@ -347,4 +347,4 @@ INPUT_PORTS_END
 
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1976,	ti990_4,	0,		0,		ti990_4,	ti990_4, ti990_4_state,	ti990_4,	"Texas Instruments",	"TI Model 990/4 Microcomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4,    0,      0,      ti990_4,    ti990_4, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )

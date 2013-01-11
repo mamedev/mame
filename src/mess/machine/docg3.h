@@ -18,7 +18,7 @@
 // ======================> diskonchip_g3_device
 
 class diskonchip_g3_device : public device_t,
-							 public device_nvram_interface
+								public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -26,8 +26,8 @@ public:
 
 	void set_size(int _size) { m_size = _size; }
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_nvram_interface overrides

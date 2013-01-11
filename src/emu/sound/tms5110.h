@@ -6,8 +6,8 @@
 #include "devlegcy.h"
 
 /* TMS5110 commands */
-                                     /* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
-                                     /* (MSB)             (LSB) | required */
+										/* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
+										/* (MSB)             (LSB) | required */
 #define TMS5110_CMD_RESET        (0) /*    0     0     0     x  |     1    */
 #define TMS5110_CMD_LOAD_ADDRESS (2) /*    0     0     1     x  |     2    */
 #define TMS5110_CMD_OUTPUT       (4) /*    0     1     0     x  |     3    */
@@ -24,18 +24,18 @@
 struct tms5110_interface
 {
 	/* legacy interface */
-	int (*M0_callback)(device_t *device);	/* function to be called when chip requests another bit */
-	void (*load_address)(device_t *device, int addr);	/* speech ROM load address callback */
+	int (*M0_callback)(device_t *device);   /* function to be called when chip requests another bit */
+	void (*load_address)(device_t *device, int addr);   /* speech ROM load address callback */
 	/* new rom controller interface */
-	devcb_write_line m0_func;		/* the M0 line */
-	devcb_write_line m1_func;		/* the M1 line */
-	devcb_write8 addr_func;			/* Write to ADD1,2,4,8 - 4 address bits */
-	devcb_read_line data_func;		/* Read one bit from ADD8/Data - voice data */
+	devcb_write_line m0_func;       /* the M0 line */
+	devcb_write_line m1_func;       /* the M1 line */
+	devcb_write8 addr_func;         /* Write to ADD1,2,4,8 - 4 address bits */
+	devcb_read_line data_func;      /* Read one bit from ADD8/Data - voice data */
 	/* on a real chip rom_clk is running all the time
-     * Here, we only use it to properly emulate the protocol.
-     * Do not rely on it to be a timed signal.
-     */
-	devcb_write_line romclk_func;	/* rom clock - Only used to drive the data lines */
+	 * Here, we only use it to properly emulate the protocol.
+	 * Do not rely on it to be a timed signal.
+	 */
+	devcb_write_line romclk_func;   /* rom clock - Only used to drive the data lines */
 };
 
 DECLARE_WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
@@ -56,7 +56,7 @@ int tms5110_ready_r(device_t *device);
 void tms5110_set_frequency(device_t *device, int frequency);
 
 class tms5110_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -170,18 +170,18 @@ extern const device_type M58817;
 
 struct tmsprom_interface
 {
-	const char *prom_region;		/* prom memory region - sound region is automatically assigned */
-	UINT32 rom_size;				/* individual rom_size */
-	UINT8 pdc_bit;					/* bit # of pdc line */
+	const char *prom_region;        /* prom memory region - sound region is automatically assigned */
+	UINT32 rom_size;                /* individual rom_size */
+	UINT8 pdc_bit;                  /* bit # of pdc line */
 	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	UINT8 ctl1_bit;					/* bit # of ctl1 line */
-	UINT8 ctl2_bit;					/* bit # of ctl2 line */
-	UINT8 ctl4_bit;					/* bit # of ctl4 line */
-	UINT8 ctl8_bit;					/* bit # of ctl8 line */
-	UINT8 reset_bit;				/* bit # of rom reset */
-	UINT8 stop_bit;					/* bit # of stop */
-	devcb_write_line pdc_func;		/* tms pdc func */
-	devcb_write8 ctl_func;			/* tms ctl func */
+	UINT8 ctl1_bit;                 /* bit # of ctl1 line */
+	UINT8 ctl2_bit;                 /* bit # of ctl2 line */
+	UINT8 ctl4_bit;                 /* bit # of ctl4 line */
+	UINT8 ctl8_bit;                 /* bit # of ctl8 line */
+	UINT8 reset_bit;                /* bit # of rom reset */
+	UINT8 stop_bit;                 /* bit # of stop */
+	devcb_write_line pdc_func;      /* tms pdc func */
+	devcb_write8 ctl_func;          /* tms ctl func */
 };
 
 WRITE_LINE_DEVICE_HANDLER( tmsprom_m0_w );

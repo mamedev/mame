@@ -2,124 +2,124 @@
 
     DECO Cassette System video
 
-	The video system has clearly been designed for Highway Chase,
-	which unsurprisingly is the first game on the system.  The
-	background 'tilemap' is very much like the road layer on the
-	standalone Highway Chase with a concept of left/right edges
-	with semi-independent scrolling, and the ability to transition
-	between scrolling different sections.
+    The video system has clearly been designed for Highway Chase,
+    which unsurprisingly is the first game on the system.  The
+    background 'tilemap' is very much like the road layer on the
+    standalone Highway Chase with a concept of left/right edges
+    with semi-independent scrolling, and the ability to transition
+    between scrolling different sections.
 
-	Additionally it supports the headlight effect also needed for
-	a Highway Chase style game.
+    Additionally it supports the headlight effect also needed for
+    a Highway Chase style game.
 
-	---
+    ---
 
-	Notes with reference to video recordings.
-	These video recordings should be from real hardware because
-	they predate the emulation and include undumped games, so
-	unless they're from some other private / unreleased emulator
-	then they can't be anything else. 
+    Notes with reference to video recordings.
+    These video recordings should be from real hardware because
+    they predate the emulation and include undumped games, so
+    unless they're from some other private / unreleased emulator
+    then they can't be anything else.
 
-	Mirrored from NicoVideo
-	-=====================-
+    Mirrored from NicoVideo
+    -=====================-
 
-	mamedev.emulab.it/haze/reference/sm18976245-DISCO_NO1.mp4
-		- no notes
+    mamedev.emulab.it/haze/reference/sm18976245-DISCO_NO1.mp4
+        - no notes
 
-	mamedev.emulab.it/haze/reference/sm18976058-ASTRO_FANTASIA.mp4
-		- different game revision to emulated version, main
-		  boss enemy shown at the top of the scoreboard differs
-		  so notes below could be invalid
+    mamedev.emulab.it/haze/reference/sm18976058-ASTRO_FANTASIA.mp4
+        - different game revision to emulated version, main
+          boss enemy shown at the top of the scoreboard differs
+          so notes below could be invalid
 
-		- bullets should be white, not black
-		- BG layer changes to orange colours for first level
-		  (this would require a palette bitplane re-order we
-		   don't currently support)
+        - bullets should be white, not black
+        - BG layer changes to orange colours for first level
+          (this would require a palette bitplane re-order we
+           don't currently support)
 
-	mamedev.emulab.it/haze/reference/sm18975592-HWY_CHASE.mp4
-		- road / bg colour should be darkish blue outside of tunnels
-		- road / bg colour should be black in tunnels
-		- headlight should be the same darkish blue as the road
-		  at all times, so only visible in tunnels
-		- our headlight is misplaced (should be simple fix)
-		- center line of road does not exist on hw!
-		- enemies are hidden in tunnels (like madalien)
-		- road / bg flashs regular blue when enemy is hit revealing
-		  them
-		- some glitchy enemies visible even over tunnel bg for
-		  some frames
-		- colours of BG tilemap are glitchy even on hardware eg.
-		  Pink desert after first tunnel, Green water after 2nd
-		  tunnel even when the right palettes exist!
-		- enemy bullets are red
-		
-	mamedev.emulab.it/haze/reference/sm17433759-PRO_BOWLING.mp4
-		- no notes
+    mamedev.emulab.it/haze/reference/sm18975592-HWY_CHASE.mp4
+        - road / bg colour should be darkish blue outside of tunnels
+        - road / bg colour should be black in tunnels
+        - headlight should be the same darkish blue as the road
+          at all times, so only visible in tunnels
+        - our headlight is misplaced (should be simple fix)
+        - center line of road does not exist on hw!
+        - enemies are hidden in tunnels (like madalien)
+        - road / bg flashs regular blue when enemy is hit revealing
+          them
+        - some glitchy enemies visible even over tunnel bg for
+          some frames
+        - colours of BG tilemap are glitchy even on hardware eg.
+          Pink desert after first tunnel, Green water after 2nd
+          tunnel even when the right palettes exist!
+        - enemy bullets are red
 
-	mamedev.emulab.it/haze/reference/sm17401258-GRAPLOP.mp4
-		- different game revision to emulated version, this
-		  seems to be a more finished version of cgralop2, the
-		  emulated version lacks a title screen (the parent
-		  cgraplop has a cluster buster title, but that is
-		  again different)
+    mamedev.emulab.it/haze/reference/sm17433759-PRO_BOWLING.mp4
+        - no notes
 
-
-	mamedev.emulab.it/haze/reference/sm17387280-BURNIN_RUBBER.mp4
-		- seems to be the cburnrub2 set, or close to it, plain
-		  white title text
-
-	mamedev.emulab.it/haze/reference/sm17370209-NIGHT_STAR.mp4
-		- no notes
-
-	mamedev.emulab.it/haze/reference/sm17203184-HAMBURGER.mp4
-		- no notes
-
-	mamedev.emulab.it/haze/reference/sm17202585-SUPER_DOUBLE_TENNIS.mp4
-		- background colours during high-score / title ar shades of
-		  blue, they appear green in our emulation
-
-	mamedev.emulab.it/haze/reference/sm17202201-SKATER.mp4
-		- shadow handling (headlight sprite) positioning is wrong, the
-		  game also turns on the 'cross' bit, why?
-
-	mamedev.emulab.it/haze/reference/sm17201813-ZEROIZE.mp4
-		- no notes
-
-	mamedev.emulab.it/haze/reference/sm17183561-FISHING.mp4
-		- first title screen has no background, this is not a bug in
-		  our emulation
-		- can show glitchy tiles when constructing the background,
-		  this is not a bug in our emulation either
-
-	mamedev.emulab.it/haze/reference/sm17181931-MISSION_X.mp4
-		- no notes
-
-	mamedev.emulab.it/haze/reference/sm17180950-DSTELEJAN.mp4
-		- no notes
-
-	Mirrored from YouTube
-	-===================-
-
-	mamedev.emulab.it/haze/reference/manhattan01-04.webm
-	mamedev.emulab.it/haze/reference/manhattan05-08.webm
-	mamedev.emulab.it/haze/reference/manhattan09-12.webm
-		- the BG tilemap pen ordering changes between levels, most of
-		  the arrangements aren't supported by our current code, and
-		  I can't find the writes to change it!  Level 1 in the
-		  video uses what we have as palette 1, not 0.
-		  ToDo: list combinations
-
-	mamedev.emulab.it/haze/reference/flashboy.webm
-		- game is not emulated
+    mamedev.emulab.it/haze/reference/sm17401258-GRAPLOP.mp4
+        - different game revision to emulated version, this
+          seems to be a more finished version of cgralop2, the
+          emulated version lacks a title screen (the parent
+          cgraplop has a cluster buster title, but that is
+          again different)
 
 
-	---
+    mamedev.emulab.it/haze/reference/sm17387280-BURNIN_RUBBER.mp4
+        - seems to be the cburnrub2 set, or close to it, plain
+          white title text
 
-	I'd quite like a reference video for the Cassette Pro Soccer,
-	the game appears ugly (center circle vanishing as soon as you do
-	a long ball etc.) but the ugly backwards scrolling after you kick
-	the ball still happens even on the standalone version, so I'm
-	wondering if it's just a glitchy game.
+    mamedev.emulab.it/haze/reference/sm17370209-NIGHT_STAR.mp4
+        - no notes
+
+    mamedev.emulab.it/haze/reference/sm17203184-HAMBURGER.mp4
+        - no notes
+
+    mamedev.emulab.it/haze/reference/sm17202585-SUPER_DOUBLE_TENNIS.mp4
+        - background colours during high-score / title ar shades of
+          blue, they appear green in our emulation
+
+    mamedev.emulab.it/haze/reference/sm17202201-SKATER.mp4
+        - shadow handling (headlight sprite) positioning is wrong, the
+          game also turns on the 'cross' bit, why?
+
+    mamedev.emulab.it/haze/reference/sm17201813-ZEROIZE.mp4
+        - no notes
+
+    mamedev.emulab.it/haze/reference/sm17183561-FISHING.mp4
+        - first title screen has no background, this is not a bug in
+          our emulation
+        - can show glitchy tiles when constructing the background,
+          this is not a bug in our emulation either
+
+    mamedev.emulab.it/haze/reference/sm17181931-MISSION_X.mp4
+        - no notes
+
+    mamedev.emulab.it/haze/reference/sm17180950-DSTELEJAN.mp4
+        - no notes
+
+    Mirrored from YouTube
+    -===================-
+
+    mamedev.emulab.it/haze/reference/manhattan01-04.webm
+    mamedev.emulab.it/haze/reference/manhattan05-08.webm
+    mamedev.emulab.it/haze/reference/manhattan09-12.webm
+        - the BG tilemap pen ordering changes between levels, most of
+          the arrangements aren't supported by our current code, and
+          I can't find the writes to change it!  Level 1 in the
+          video uses what we have as palette 1, not 0.
+          ToDo: list combinations
+
+    mamedev.emulab.it/haze/reference/flashboy.webm
+        - game is not emulated
+
+
+    ---
+
+    I'd quite like a reference video for the Cassette Pro Soccer,
+    the game appears ugly (center circle vanishing as soon as you do
+    a long ball etc.) but the ugly backwards scrolling after you kick
+    the ball still happens even on the standalone version, so I'm
+    wondering if it's just a glitchy game.
 
  ***********************************************************************/
 
@@ -288,9 +288,9 @@ void decocass_state::draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect
 WRITE8_MEMBER(decocass_state::decocass_paletteram_w )
 {
 	/*
-     * RGB output is inverted and A4 is inverted too
-     * (ME/ input on 1st paletteram, inverter -> ME/ on 2nd)
-     */
+	 * RGB output is inverted and A4 is inverted too
+	 * (ME/ input on 1st paletteram, inverter -> ME/ on 2nd)
+	 */
 	m_paletteram[offset] = data;
 
 	offset = (offset & 31) ^ 16;
@@ -366,10 +366,10 @@ WRITE8_MEMBER(decocass_state::decocass_color_missiles_w )
 {
 	LOG(1,("decocass_color_missiles_w: $%02x\n", data));
 	/* only bits D0-D2 and D4-D6 are connected to
-     * the color RAM demux:
-     * D0-D2 to the IC0 inputs
-     * D4-D6 to the IC1 inputs
-     */
+	 * the color RAM demux:
+	 * D0-D2 to the IC0 inputs
+	 * D4-D6 to the IC1 inputs
+	 */
 	m_color_missiles = data & 0x77;
 }
 
@@ -406,15 +406,15 @@ WRITE8_MEMBER(decocass_state::decocass_color_center_bot_w )
 		return;
 	LOG(1,("decocass_color_center_bot_w: $%02x (color:%d, center_bot:%d)\n", data, data & 3, data >> 4));
 	/*
-     * D7   CL3/4 (swap 2+4)
-     * D6   CL1
-     * D5   CL2
-     * D4   CL4
-     * D3   nc
-     * D2   nc
-     * D1   CLD4
-     * D0   CLD3
-     */
+	 * D7   CL3/4 (swap 2+4)
+	 * D6   CL1
+	 * D5   CL2
+	 * D4   CL4
+	 * D3   nc
+	 * D2   nc
+	 * D1   CLD4
+	 * D0   CLD3
+	 */
 
 	if ((m_color_center_bot ^ data) & 0x80)
 	{
@@ -540,7 +540,7 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &clipre
 	int i, offs, x;
 
 	/* Draw the missiles (16 of them) seemingly with alternating colors
-     * from the E302 latch (color_missiles) */
+	 * from the E302 latch (color_missiles) */
 	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
 	{
 		int sx, sy;
@@ -618,7 +618,7 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	int y,x;
 
-//	printf("m_mode_set %d\n", m_mode_set & 0x3);
+//  printf("m_mode_set %d\n", m_mode_set & 0x3);
 
 	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
 	//  see note above this funciton
@@ -631,12 +631,12 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		for (x=clip.min_x; x<=clip.max_x;x++)
 		{
 			int srccol = 0;
-			
+
 			// 2 bits control the x scroll mode, allowing it to wrap either half of the tilemap, or transition one way or the other between the two halves
 
 			switch (m_mode_set & 3)
 			{
-				case 0x00: srccol = ((x + scrollx) & 0xff); break; // hwy normal case 
+				case 0x00: srccol = ((x + scrollx) & 0xff); break; // hwy normal case
 				case 0x01: srccol = (x + scrollx + 0x100) & 0x1ff; break; // manhattan building top
 				case 0x02: srccol = ((x + scrollx) & 0xff) + 0x100; break; // manhattan normal case
 				case 0x03: srccol = (x + scrollx) & 0x1ff; break; // hwy, burnrub etc.
@@ -672,7 +672,7 @@ void decocass_state::video_start()
 
 	/* background videoram bits D0-D3 are shared with the tileram */
 	m_bgvideoram = m_tileram;
-	m_bgvideoram_size = 0x0400;	/* d000-d3ff */
+	m_bgvideoram_size = 0x0400; /* d000-d3ff */
 
 	machine().gfx[0]->set_source(m_charram);
 	machine().gfx[1]->set_source(m_charram);
@@ -680,7 +680,7 @@ void decocass_state::video_start()
 	machine().gfx[3]->set_source(m_objectram);
 
 	/* This should ensure that the fake 17th tile is left blank
-     * now that dirty-tile tracking is handled by the core */
+	 * now that dirty-tile tracking is handled by the core */
 	machine().gfx[2]->decode(16);
 }
 
@@ -720,7 +720,7 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0, cliprect);
 
-	if (m_mode_set & 0x08)	/* bkg_ena on ? */
+	if (m_mode_set & 0x08)  /* bkg_ena on ? */
 	{
 		draw_edge(bitmap,cliprect,0,true);
 		draw_edge(bitmap,cliprect,1,true);
@@ -735,7 +735,7 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 	{
 		draw_object(bitmap, cliprect);
 		draw_center(bitmap, cliprect);
-		if (m_mode_set & 0x08)	/* bkg_ena on ? */
+		if (m_mode_set & 0x08)  /* bkg_ena on ? */
 		{
 			draw_edge(bitmap,cliprect,0,false);
 			draw_edge(bitmap,cliprect,1,false);

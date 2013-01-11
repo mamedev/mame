@@ -65,7 +65,7 @@ void mcs96_device::device_start()
 		sprintf(buf, "R%02x", i*2+0x18);
 		state_add(MCS96_R+i,   buf,         R[i]);
 	}
-		
+
 	memset(R, 0, sizeof(R));
 }
 
@@ -162,22 +162,22 @@ void mcs96_device::state_string_export(const device_state_entry &entry, astring 
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 	case MCS96_PSW:
-		string.printf("%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c",	
-					  PSW & F_Z  ? 'Z' : '.',
-					  PSW & F_N  ? 'N' : '.',
-					  PSW & F_V  ? 'V' : '.',
-					  PSW & F_VT ? 'v' : '.',
-					  PSW & F_C  ? 'C' : '.',
-					  PSW & F_I  ? 'I' : '.',
-					  PSW & F_ST ? 'S' : '.',
-					  PSW & 0x80 ? '7' : '.',
-					  PSW & 0x40 ? '6' : '.',
-					  PSW & 0x20 ? '5' : '.',
-					  PSW & 0x10 ? '4' : '.',
-					  PSW & 0x08 ? '3' : '.',
-					  PSW & 0x04 ? '2' : '.',
-					  PSW & 0x02 ? '1' : '.',
-					  PSW & 0x01 ? '0' : '.');
+		string.printf("%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c",
+						PSW & F_Z  ? 'Z' : '.',
+						PSW & F_N  ? 'N' : '.',
+						PSW & F_V  ? 'V' : '.',
+						PSW & F_VT ? 'v' : '.',
+						PSW & F_C  ? 'C' : '.',
+						PSW & F_I  ? 'I' : '.',
+						PSW & F_ST ? 'S' : '.',
+						PSW & 0x80 ? '7' : '.',
+						PSW & 0x40 ? '6' : '.',
+						PSW & 0x20 ? '5' : '.',
+						PSW & 0x10 ? '4' : '.',
+						PSW & 0x08 ? '3' : '.',
+						PSW & 0x04 ? '2' : '.',
+						PSW & 0x02 ? '1' : '.',
+						PSW & 0x01 ? '0' : '.');
 		break;
 	}
 }

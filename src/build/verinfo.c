@@ -15,10 +15,10 @@
 
 typedef unsigned char UINT8;
 
-#define ARRAY_LENGTH(x)		(sizeof(x) / sizeof(x[0]))
-#define BUILD_MAME		(0)
-#define BUILD_MESS			(1)
-#define BUILD_UME			(2)
+#define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))
+#define BUILD_MAME      (0)
+#define BUILD_MESS          (1)
+#define BUILD_UME           (2)
 
 //============================================================
 //  TYPE DEFINITIONS

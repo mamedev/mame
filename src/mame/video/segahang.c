@@ -155,4 +155,3 @@ UINT32 segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	return 0;
 }
-

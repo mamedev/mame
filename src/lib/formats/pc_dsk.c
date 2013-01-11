@@ -22,17 +22,17 @@ struct pc_disk_sizes
 
 static const struct pc_disk_sizes disk_sizes[] =
 {
-	{ 8*1*40*512,  8, 1},	/* 5 1/4 inch double density single sided */
-	{ 8*2*40*512,  8, 2},	/* 5 1/4 inch double density */
-	{ 9*1*40*512,  9, 1},	/* 5 1/4 inch double density single sided */
-	{ 9*2*40*512,  9, 2},	/* 5 1/4 inch double density */
-	{10*2*40*512, 10, 2},	/* 5 1/4 inch double density single sided */
-	{ 9*2*80*512,  9, 2},	/* 80 tracks 5 1/4 inch drives rare in PCs */
-	{ 9*2*80*512,  9, 2},	/* 3 1/2 inch double density */
-	{15*2*80*512, 15, 2},	/* 5 1/4 inch high density (or japanese 3 1/2 inch high density) */
-	{18*2*80*512, 18, 2},	/* 3 1/2 inch high density */
-	{21*2*80*512, 21, 2},	/* 3 1/2 inch high density DMF */
-	{36*2*80*512, 36, 2}	/* 3 1/2 inch enhanced density */
+	{ 8*1*40*512,  8, 1},   /* 5 1/4 inch double density single sided */
+	{ 8*2*40*512,  8, 2},   /* 5 1/4 inch double density */
+	{ 9*1*40*512,  9, 1},   /* 5 1/4 inch double density single sided */
+	{ 9*2*40*512,  9, 2},   /* 5 1/4 inch double density */
+	{10*2*40*512, 10, 2},   /* 5 1/4 inch double density single sided */
+	{ 9*2*80*512,  9, 2},   /* 80 tracks 5 1/4 inch drives rare in PCs */
+	{ 9*2*80*512,  9, 2},   /* 3 1/2 inch double density */
+	{15*2*80*512, 15, 2},   /* 5 1/4 inch high density (or japanese 3 1/2 inch high density) */
+	{18*2*80*512, 18, 2},   /* 3 1/2 inch high density */
+	{21*2*80*512, 21, 2},   /* 3 1/2 inch high density DMF */
+	{36*2*80*512, 36, 2}    /* 3 1/2 inch enhanced density */
 };
 
 
@@ -61,9 +61,9 @@ static floperr_t pc_dsk_compute_geometry(floppy_image_legacy *floppy, struct bas
 	if (size >= 0x1a)
 	{
 		/*
-         * get info from boot sector.
-         * not correct on all disks
-         */
+		 * get info from boot sector.
+		 * not correct on all disks
+		 */
 		UINT8 scl, spt, heads;
 		floppy_image_read(floppy, &scl, 0x0c, 1);
 		floppy_image_read(floppy, &spt, 0x18, 1);
@@ -131,7 +131,7 @@ static FLOPPY_CONSTRUCT(pc_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( pc )
-	LEGACY_FLOPPY_OPTION( pc_dsk, "dsk,ima,img,ufi,360",		"PC floppy disk image",	pc_dsk_identify, pc_dsk_construct, NULL,
+	LEGACY_FLOPPY_OPTION( pc_dsk, "dsk,ima,img,ufi,360",        "PC floppy disk image", pc_dsk_identify, pc_dsk_construct, NULL,
 		HEADS([1]-2)
 		TRACKS(40/[80])
 		SECTORS(8/[9]/10/15/18/36))
@@ -157,49 +157,49 @@ const char *pc_format::extensions() const
 }
 
 const pc_format::format pc_format::formats[] = {
-	{	/*  160K 5 1/4 inch double density single sided */
+	{   /*  160K 5 1/4 inch double density single sided */
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000,  8, 40, 1, 512, {}, 1, {}, 80, 50, 22, 80
 	},
-	{	/*  320K 5 1/4 inch double density */
+	{   /*  320K 5 1/4 inch double density */
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000,  8, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
-	{	/*  180K 5 1/4 inch double density single sided */
+	{   /*  180K 5 1/4 inch double density single sided */
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000,  9, 40, 1, 512, {}, 1, {}, 80, 50, 22, 80
 	},
-	{	/*  360K 5 1/4 inch double density */
+	{   /*  360K 5 1/4 inch double density */
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000,  9, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
-	{	/*  400K 5 1/4 inch double density - gaps unverified */
+	{   /*  400K 5 1/4 inch double density - gaps unverified */
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 10, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
-	{	/*  720K 5 1/4 inch quad density - gaps unverified */
+	{   /*  720K 5 1/4 inch quad density - gaps unverified */
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
 		2000,  9, 80, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
-	{	/* 1200K 5 1/4 inch high density */
+	{   /* 1200K 5 1/4 inch high density */
 		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1200, 15, 40, 2, 512, {}, 1, {}, 80, 50, 22, 84
 	},
-	{	/*  720K 3 1/2 inch double density */
+	{   /*  720K 3 1/2 inch double density */
 		floppy_image::FF_35,  floppy_image::DSDD, floppy_image::MFM,
 		2000,  9, 80, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
-	{	/* 1200K 3 1/2 inch high density (japanese variant) - gaps unverified */
+	{   /* 1200K 3 1/2 inch high density (japanese variant) - gaps unverified */
 		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,
 		1200, 15, 40, 2, 512, {}, 1, {}, 80, 50, 22, 84
 	},
-	{	/* 1440K 3 1/2 inch high density */
+	{   /* 1440K 3 1/2 inch high density */
 		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,
 		1000, 18, 80, 2, 512, {}, 1, {}, 80, 50, 22, 108
 	},
-	{	/* 2880K 3 1/2 inch extended density - gaps unverified */
+	{   /* 2880K 3 1/2 inch extended density - gaps unverified */
 		floppy_image::FF_35,  floppy_image::DSED, floppy_image::MFM,
-		 500, 36, 80, 2, 512, {}, 1, {}, 80, 50, 41, 80
+			500, 36, 80, 2, 512, {}, 1, {}, 80, 50, 41, 80
 	},
 	{}
 };

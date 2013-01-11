@@ -159,10 +159,10 @@ static void i80286_data_descriptor_full(i80286_state *cpustate, int reg, UINT16 
 		UINT8 r;
 		UINT32 addr;
 		/* selector format
-           15..3 number/address in descriptor table
-           2: 0 global, 1 local descriptor table
-           1,0: requested privileg level
-           must be higher or same as current privileg level in code selector */
+		   15..3 number/address in descriptor table
+		   2: 0 global, 1 local descriptor table
+		   1,0: requested privileg level
+		   must be higher or same as current privileg level in code selector */
 		if ((reg != SS) && !IDXTBL(selector)) {
 			cpustate->sregs[reg]=0;
 			cpustate->limit[reg]=0;
@@ -324,10 +324,10 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 		UINT8 r;
 		UINT32 addr;
 		/* selector format
-           15..3 number/address in descriptor table
-           2: 0 global, 1 local descriptor table
-           1,0: requested privileg level
-           must be higher or same as current privileg level in code selector */
+		   15..3 number/address in descriptor table
+		   2: 0 global, 1 local descriptor table
+		   1,0: requested privileg level
+		   must be higher or same as current privileg level in code selector */
 		if ((addr = i80286_selector_address(cpustate,selector)) == -1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
 		desc[0] = ReadWord(addr);
 		desc[1] = ReadWord(addr+2);
@@ -574,7 +574,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 		break;
 	case 1:
 		/* lgdt, lldt in protected mode privilege level 0 required else common protection
-           failure 0xd */
+		   failure 0xd */
 		ModRM = FETCHOP;
 		switch (ModRM&0x38) {
 		case 0: /* sgdt */
@@ -648,7 +648,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 		if (PM&&(CPL!=0)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 		cpustate->msw =        (cpustate->msw&1)|ReadWord(0x806);
 		cpustate->tr.sel =     ReadWord(0x816);
-		tmp =	               ReadWord(0x818);
+		tmp =                  ReadWord(0x818);
 		ExpandFlags(tmp);
 		cpustate->flags = tmp;
 		cpustate->flags = CompressFlags();
@@ -839,7 +839,7 @@ static void PREFIX286(_escape)(i8086_state *cpustate)    /* Opcodes 0xd8, 0xd9, 
 	if ((cpustate->msw&8) || (cpustate->msw&4)) throw TRAP(FPU_UNAVAILABLE,-1);
 	unsigned ModRM = FETCH;
 	ICOUNT -= timing.nop;
-    GetRMByte(ModRM);
+	GetRMByte(ModRM);
 }
 
 static void PREFIX286(_escape_7)(i8086_state *cpustate)    /* Opcode 0xdf */
@@ -847,7 +847,7 @@ static void PREFIX286(_escape_7)(i8086_state *cpustate)    /* Opcode 0xdf */
 	if ((cpustate->msw&8) || (cpustate->msw&4)) throw TRAP(FPU_UNAVAILABLE,-1);
 	unsigned ModRM = FETCH;
 	ICOUNT -= timing.nop;
-    GetRMByte(ModRM);
+	GetRMByte(ModRM);
 	if (ModRM == 0xe0) cpustate->regs.w[AX] = 0xffff;  // FPU not present
 }
 
@@ -865,4 +865,3 @@ static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT
 		if (trap) throw TRAP(trap, 0);
 	}
 }
-

@@ -147,8 +147,8 @@
  *
  *************************************/
 
-#define CPU_CLOCK			8000000
-#define VIDEO_CLOCK			15468480
+#define CPU_CLOCK           8000000
+#define VIDEO_CLOCK         15468480
 
 
 
@@ -219,9 +219,9 @@ WRITE8_MEMBER(segag80v_state::vectorram_w)
 INLINE UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
-		   ((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
-		   ((d3d2 << 3) & 0x08) | ((d3d2 >> 2) & 0x04) |
-		   ((d1d0 << 1) & 0x02) | ((d1d0 >> 4) & 0x01);
+			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
+			((d3d2 << 3) & 0x08) | ((d3d2 >> 2) & 0x04) |
+			((d1d0 << 1) & 0x02) | ((d1d0 >> 4) & 0x01);
 }
 
 
@@ -373,8 +373,8 @@ WRITE8_MEMBER(segag80v_state::unknown_w)
 
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80v_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
-	AM_RANGE(0x0800, 0xbfff) AM_ROM		/* PROM board ROM area */
+	AM_RANGE(0x0000, 0x07ff) AM_ROM     /* CPU board ROM */
+	AM_RANGE(0x0800, 0xbfff) AM_ROM     /* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_SHARE("vectorram")
 ADDRESS_MAP_END
@@ -403,24 +403,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( g80v_generic )
 	PORT_START("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)	/* P1.5 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)	/* P1.8 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.13 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.14 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )					/* n/c */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)  /* P1.5 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)  /* P1.8 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.13 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.14 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 /* n/c */
 
 	PORT_START("D5D4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )				/* P1.10 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )					/* P1.15 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.16 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.17 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.18 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )					/* P1.19 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.20 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.21 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )               /* P1.10 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                 /* P1.15 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.16 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.17 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.18 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )                 /* P1.19 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.20 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.21 */
 
 	PORT_START("D3D2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )
@@ -434,49 +434,49 @@ static INPUT_PORTS_START( g80v_generic )
 
 	PORT_START("D1D0")
 	PORT_DIPNAME( 0x0f, 0x03, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW2:8,7,6,5")
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(	0x09, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(	0x0a, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(	0x0b, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(	0x0c, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(	0x0d, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(	0x04, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(	0x0f, "1 Coin/2 Credits 4/9" )
-	PORT_DIPSETTING(	0x0e, "1 Coin/2 Credits 5/11" )
-	PORT_DIPSETTING(	0x05, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(	0x06, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(	0x07, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(	0x08, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x09, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x0a, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x0b, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x0c, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x0d, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x0f, "1 Coin/2 Credits 4/9" )
+	PORT_DIPSETTING(    0x0e, "1 Coin/2 Credits 5/11" )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ))
 	PORT_DIPNAME( 0xf0, 0x30, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW2:4,3,2,1")
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(	0x10, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(	0x90, "2 Coins/1 Credit 5/3 6/4" )
-	PORT_DIPSETTING(	0xa0, "2 Coins/1 Credit 4/3" )
-	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(	0x30, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(	0xb0, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(	0xc0, "1 Coin/1 Credit 4/5" )
-	PORT_DIPSETTING(	0xd0, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(	0xf0, "1 Coin/2 Credits 4/9" )
-	PORT_DIPSETTING(	0xe0, "1 Coin/2 Credits 5/11" )
-	PORT_DIPSETTING(	0x50, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(	0x60, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(	0x70, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x90, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0xa0, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0xb0, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0xc0, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0xd0, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0xf0, "1 Coin/2 Credits 4/9" )
+	PORT_DIPSETTING(    0xe0, "1 Coin/2 Credits 5/11" )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_6C ))
 
 	PORT_START("FC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.23 */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.24 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.25 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.26 */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.27 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.28 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.29 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.30 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.23 */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.24 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.25 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.26 */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.27 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.28 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.29 */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )                /* P1.30 */
 
 	PORT_START("SERVICESW")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, segag80v_state,service_switch, 0)
@@ -505,24 +505,24 @@ static INPUT_PORTS_START( elim2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 
 	PORT_MODIFY("D3D2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))		// This switch is not documented in the manual
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ))       // This switch is not documented in the manual
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
 	//"SW1:7" unused                                    // Unused according to manual
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))			PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(	0x04, "3" )
-	PORT_DIPSETTING(	0x08, "4" )
-	PORT_DIPSETTING(	0x0c, "5" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SW1:4,3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ))			// This option is not documented in the manual
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ))
-	PORT_DIPSETTING(	0x20, DEF_STR( Hard ))
-	PORT_DIPSETTING(	0x30, DEF_STR( Hardest ))
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ))	PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(	0xc0, DEF_STR( None ))
-	PORT_DIPSETTING(	0x80, "10000" )
-	PORT_DIPSETTING(	0x40, "20000" )
-	PORT_DIPSETTING(	0x00, "30000" )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))         PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ))          // This option is not documented in the manual
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ))
+	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ))
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ))    PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0xc0, DEF_STR( None ))
+	PORT_DIPSETTING(    0x80, "10000" )
+	PORT_DIPSETTING(    0x40, "20000" )
+	PORT_DIPSETTING(    0x00, "30000" )
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -554,7 +554,7 @@ static INPUT_PORTS_START( elim4 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segag80v_state,elim4_joint_coin_r, NULL)	/* combination of all four coin inputs */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segag80v_state,elim4_joint_coin_r, NULL)   /* combination of all four coin inputs */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -568,24 +568,24 @@ static INPUT_PORTS_START( elim4 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 
 	PORT_MODIFY("D3D2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))		// This switch is not documented in the manual
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ))       // This switch is not documented in the manual
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
 	//"SW1:7" unused                                    // This switch is not documented in the manual
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))			PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(	0x04, "3" )
-	PORT_DIPSETTING(	0x08, "4" )
-	PORT_DIPSETTING(	0x0c, "5" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SW1:4,3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ))			// This option is not documented in the manual
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ))
-	PORT_DIPSETTING(	0x20, DEF_STR( Hard ))
-	PORT_DIPSETTING(	0x30, DEF_STR( Hardest ))
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ))	PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(	0xc0, DEF_STR( None ))
-	PORT_DIPSETTING(	0x80, "10000" )
-	PORT_DIPSETTING(	0x40, "20000" )
-	PORT_DIPSETTING(	0x00, "30000" )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))         PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ))          // This option is not documented in the manual
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ))
+	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ))
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ))    PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0xc0, DEF_STR( None ))
+	PORT_DIPSETTING(    0x80, "10000" )
+	PORT_DIPSETTING(    0x40, "20000" )
+	PORT_DIPSETTING(    0x00, "30000" )
 
 	PORT_MODIFY("D1D0")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:8" )
@@ -593,15 +593,15 @@ static INPUT_PORTS_START( elim4 )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:4" )
-	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ))		PORT_DIPLOCATION("SW2:3,2,1")
-	PORT_DIPSETTING(	0xe0, DEF_STR( 8C_1C ))
-	PORT_DIPSETTING(	0xc0, DEF_STR( 7C_1C ))
-	PORT_DIPSETTING(	0xa0, DEF_STR( 6C_1C ))
-	PORT_DIPSETTING(	0x80, DEF_STR( 5C_1C ))
-	PORT_DIPSETTING(	0x60, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(	0x40, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ))
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ))        PORT_DIPLOCATION("SW2:3,2,1")
+	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ))
+	PORT_DIPSETTING(    0xc0, DEF_STR( 7C_1C ))
+	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ))
+	PORT_DIPSETTING(    0x80, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
@@ -634,27 +634,27 @@ static INPUT_PORTS_START( spacfury )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_MODIFY("D3D2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ))			PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x04, "3" )
-	PORT_DIPSETTING(	0x08, "4" )
-	PORT_DIPSETTING(	0x0c, "5" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SW1:4,3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ))
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ))
-	PORT_DIPSETTING(	0x20, DEF_STR( Hard ))
-	PORT_DIPSETTING(	0x30, DEF_STR( Hardest ))
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))	PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(	0x00, "10000" )
-	PORT_DIPSETTING(	0x40, "20000" )
-	PORT_DIPSETTING(	0x80, "30000" )
-	PORT_DIPSETTING(	0xc0, "40000" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ))         PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ))
+	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ))
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))    PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x40, "20000" )
+	PORT_DIPSETTING(    0x80, "30000" )
+	PORT_DIPSETTING(    0xc0, "40000" )
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -668,31 +668,31 @@ static INPUT_PORTS_START( zektor )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D3D2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ))			PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x04, "3" )
-	PORT_DIPSETTING(	0x08, "4" )
-	PORT_DIPSETTING(	0x0c, "5" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SW1:4,3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ))
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ))
-	PORT_DIPSETTING(	0x20, DEF_STR( Hard ))
-	PORT_DIPSETTING(	0x30, DEF_STR( Hardest ))
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))	PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(	0x00, DEF_STR( None ))			// These switches are not documented in the manual
-	PORT_DIPSETTING(	0xc0, "10000" )
-	PORT_DIPSETTING(	0x80, "20000" )
-	PORT_DIPSETTING(	0x40, "30000" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ))         PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ))
+	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ))
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))    PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ))          // These switches are not documented in the manual
+	PORT_DIPSETTING(    0xc0, "10000" )
+	PORT_DIPSETTING(    0x80, "20000" )
+	PORT_DIPSETTING(    0x40, "30000" )
 
 	PORT_MODIFY("D5D4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.15 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.19 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.15 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.19 */
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -709,31 +709,31 @@ static INPUT_PORTS_START( tacscan )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D3D2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ))			// This switch isn't documented in the manual
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x0c, 0x0c, "Number of Ships" )		PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x04, "4" )
-	PORT_DIPSETTING(	0x08, "6" )
-	PORT_DIPSETTING(	0x0c, "8" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SW1:4,3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ))
-	PORT_DIPSETTING(	0x10, DEF_STR( Normal ))
-	PORT_DIPSETTING(	0x20, DEF_STR( Hard ))			// This option isn't documented in the manual
-	PORT_DIPSETTING(	0x30, DEF_STR( Very_Hard ))
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))	PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(	0x00, DEF_STR( None ))
-	PORT_DIPSETTING(	0xc0, "10000" )
-	PORT_DIPSETTING(	0x80, "20000" )
-	PORT_DIPSETTING(	0x40, "30000" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))           // This switch isn't documented in the manual
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x0c, 0x0c, "Number of Ships" )       PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x08, "6" )
+	PORT_DIPSETTING(    0x0c, "8" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ))          // This option isn't documented in the manual
+	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ))
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))    PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ))
+	PORT_DIPSETTING(    0xc0, "10000" )
+	PORT_DIPSETTING(    0x80, "20000" )
+	PORT_DIPSETTING(    0x40, "30000" )
 
 	PORT_MODIFY("D5D4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.15 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.19 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.15 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.19 */
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -750,31 +750,31 @@ static INPUT_PORTS_START( startrek )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D3D2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x01, DEF_STR( Upright ))		// This switch isn't documented in the manual
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ))
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x0c, 0x0c, "Photon Torpedoes" )		PORT_DIPLOCATION("SW1:6,5")
-	PORT_DIPSETTING(	0x00, "1" )
-	PORT_DIPSETTING(	0x04, "2" )
-	PORT_DIPSETTING(	0x08, "3" )
-	PORT_DIPSETTING(	0x0c, "4" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SW1:4,3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ))
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ))
-	PORT_DIPSETTING(	0x20, DEF_STR( Hard ))
-	PORT_DIPSETTING(	0x30, "Tournament" )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))	PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(	0x00, "10000" )
-	PORT_DIPSETTING(	0x40, "20000" )
-	PORT_DIPSETTING(	0x80, "30000" )
-	PORT_DIPSETTING(	0xc0, "40000" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ))       // This switch isn't documented in the manual
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x0c, 0x0c, "Photon Torpedoes" )      PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "4" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ))
+	PORT_DIPSETTING(    0x30, "Tournament" )
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Bonus_Life ))    PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x40, "20000" )
+	PORT_DIPSETTING(    0x80, "30000" )
+	PORT_DIPSETTING(    0xc0, "40000" )
 
 	PORT_MODIFY("D5D4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.15 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.19 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.15 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 /* P1.19 */
 
 
 	PORT_MODIFY("FC")
@@ -812,12 +812,12 @@ static const char *const elim_sample_names[] =
 	"elim10",
 	"elim11",
 	"elim12",
-	0	/* end of array */
+	0   /* end of array */
 };
 
 static const samples_interface elim2_samples_interface =
 {
-	8,	/* 8 channels */
+	8,  /* 8 channels */
 	elim_sample_names
 };
 
@@ -843,13 +843,13 @@ static const char *const spacfury_sample_names[] =
 	"sfury8",
 	"sfury9",
 	"sfury10",
-	0	/* end of array */
+	0   /* end of array */
 };
 
 
 static const samples_interface spacfury_samples_interface =
 {
-	8,	/* 8 channels */
+	8,  /* 8 channels */
 	spacfury_sample_names
 };
 
@@ -989,8 +989,8 @@ ROM_START( elim2 )
 	ROM_LOAD( "1345.prom-u13", 0x6800, 0x0800, CRC(40597a92) SHA1(ee1ae2b424c38b40d2cbeda4aba3328e6d3f9c81) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
 ROM_END
 
 ROM_START( elim2a )
@@ -1011,8 +1011,8 @@ ROM_START( elim2a )
 	ROM_LOAD( "1170a.prom-u13", 0x6800, 0x0800, CRC(8cdacd35) SHA1(f24f8a74cb4b8452ddbd42e61d3b0366bbee7f98) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )  /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )  /* CPU board addressing */
 ROM_END
 
 ROM_START( elim2c )
@@ -1033,8 +1033,8 @@ ROM_START( elim2c )
 	ROM_LOAD( "1212.prom-u13", 0x6800, 0x0800, CRC(152cf376) SHA1(56c3141598b8bac81e85b1fc7052fdd19cd95609) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
 ROM_END
 
 ROM_START( elim4 )
@@ -1056,8 +1056,8 @@ ROM_START( elim4 )
 	ROM_LOAD( "1360.prom-u14", 0x7000, 0x0800, CRC(96d48238) SHA1(76a7b49081cd2d0dd1976077aa66b6d5ae5b2b43) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
 ROM_END
 
 ROM_START( elim4p )
@@ -1079,8 +1079,8 @@ ROM_START( elim4p )
 	ROM_LOAD( "swe.prom-u14",  0x7000, 0x0800, CRC(ec4cc343) SHA1(00e107eaf530ce6bec2afffd7d7bedd7763cfb17) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )   /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15", 0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )   /* CPU board addressing */
 ROM_END
 
 
@@ -1106,9 +1106,9 @@ ROM_START( spacfury ) /* Revision C */
 	ROM_LOAD( "972c.speech-u4",  0x2000, 0x1000, CRC(fad9346d) SHA1(784e5ab0fb00235cfd733c502baf23960923504f) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) )	/* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
 ROM_END
 
 ROM_START( spacfurya ) /* Revision A */
@@ -1133,9 +1133,9 @@ ROM_START( spacfurya ) /* Revision A */
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) )	/* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
 ROM_END
 
 ROM_START( spacfuryb ) /* Revision B */
@@ -1160,9 +1160,9 @@ ROM_START( spacfuryb ) /* Revision B */
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) )	/* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
 ROM_END
 
 
@@ -1200,9 +1200,9 @@ ROM_START( zektor )
 	ROM_LOAD( "1610.speech-u4",  0x2000, 0x1000, CRC(2915c7bd) SHA1(3ed98747b5237aa1b3bab6866292370dc2c7655a) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) )	/* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
 ROM_END
 
 
@@ -1232,8 +1232,8 @@ ROM_START( tacscan )
 	ROM_LOAD( "1710a.prom-u21", 0xa800, 0x0800, CRC(6203be22) SHA1(89731c7c88d0125a11368d707f566eb53c783266) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
+	ROM_LOAD( "s-c.xyt-u39",    0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )  /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15",  0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )  /* CPU board addressing */
 ROM_END
 
 
@@ -1272,9 +1272,9 @@ ROM_START( startrek )
 	ROM_LOAD( "1872.speech-u5",  0x1000, 0x1000, CRC(ebb5c3a9) SHA1(533b6f0499b311f561cf7aba14a7f48ca7c47321) )
 
 	ROM_REGION( 0x0440, "proms", 0 )
-	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) )	/* sine table */
-	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) )	/* CPU board addressing */
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) )	/* speech board addressing */
+	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) /* sine table */
+	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* CPU board addressing */
+	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* speech board addressing */
 ROM_END
 
 

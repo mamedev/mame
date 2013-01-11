@@ -83,9 +83,9 @@ public:
 		// construction/destruction
 		entry_t(const char *tag, UINT32 fullhash, _ElementType object)
 			: m_next(NULL),
-			  m_fullhash(fullhash),
-			  m_tag(tag),
-			  m_object(object) { }
+				m_fullhash(fullhash),
+				m_tag(tag),
+				m_object(object) { }
 
 		// accessors
 		const astring &tag() const { return m_tag; }
@@ -100,10 +100,10 @@ public:
 		UINT32 fullhash() const { return m_fullhash; }
 
 		// internal state
-		entry_t *		m_next;
-		UINT32			m_fullhash;
-		astring			m_tag;
-		_ElementType	m_object;
+		entry_t *       m_next;
+		UINT32          m_fullhash;
+		astring         m_tag;
+		_ElementType    m_object;
 	};
 
 	// construction/destruction
@@ -204,7 +204,7 @@ private:
 	}
 
 	// internal state
-	entry_t *		m_table[_HashSize];
+	entry_t *       m_table[_HashSize];
 };
 
 

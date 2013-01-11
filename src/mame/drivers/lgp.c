@@ -74,7 +74,7 @@ class lgp_state : public driver_device
 public:
 	lgp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") ,
+			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"){ }
 
@@ -152,8 +152,8 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, lgp_state )
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
 	AM_RANGE(0xef80,0xef80) AM_READWRITE(ldp_read,ldp_write)
-	AM_RANGE(0xefb8,0xefb8) AM_READ(ldp_read)		/* Likely not right, calms it down though */
-	AM_RANGE(0xefc0,0xefc0) AM_READ_PORT("DSWA")	/* Not tested */
+	AM_RANGE(0xefb8,0xefb8) AM_READ(ldp_read)       /* Likely not right, calms it down though */
+	AM_RANGE(0xefc0,0xefc0) AM_READ_PORT("DSWA")    /* Not tested */
 	AM_RANGE(0xefc8,0xefc8) AM_READ_PORT("DSWB")
 	AM_RANGE(0xefd0,0xefd0) AM_READ_PORT("DSWC")
 	AM_RANGE(0xefd8,0xefd8) AM_READ_PORT("IN0")
@@ -164,8 +164,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, lgp_state )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0x8000,0x83ff) AM_RAM
-	AM_RANGE(0x8400,0x8407) AM_RAM		/* Needs handler!  Communications? */
-	AM_RANGE(0x8800,0x8803) AM_RAM		/* Needs handler!  Communications? */
+	AM_RANGE(0x8400,0x8407) AM_RAM      /* Needs handler!  Communications? */
+	AM_RANGE(0x8800,0x8803) AM_RAM      /* Needs handler!  Communications? */
 ADDRESS_MAP_END
 
 
@@ -270,7 +270,7 @@ static INPUT_PORTS_START( lgp )
 
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )	/* Manual says service switch simply increases credit count. */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )   /* Manual says service switch simply increases credit count. */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -322,9 +322,9 @@ static const gfx_layout lgp_gfx_layout_16x32 =
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-	  8*128, 9*128,10*128,11*128,12*128,13*128,14*128,15*128,
-	 16*128,17*128,18*128,19*128,20*128,21*128,22*128,23*128,
-	 24*128,25*128,26*128,27*128,28*128,29*128,30*128,31*128},
+		8*128, 9*128,10*128,11*128,12*128,13*128,14*128,15*128,
+		16*128,17*128,18*128,19*128,20*128,21*128,22*128,23*128,
+		24*128,25*128,26*128,27*128,28*128,29*128,30*128,31*128},
 	32*128
 };
 
@@ -439,7 +439,7 @@ ROM_START( lgp )
 	/* Sound CPU - on Sound PCB */
 	ROM_REGION( 0x4000, "audiocpu", 0 )
 	ROM_LOAD( "a02_29.ic11", 0x0000, 0x2000, CRC(c44026db) SHA1(93a6e8f272ca826c05a7be59e14a1a0c848fbaa0) )
-	ROM_LOAD( "a02_30.ic17", 0x2000, 0x2000, CRC(8c324556) SHA1(9e1f6f00d4023d9cfd414d3cc02af55be49dde2c) )	/* Sound data? */
+	ROM_LOAD( "a02_30.ic17", 0x2000, 0x2000, CRC(8c324556) SHA1(9e1f6f00d4023d9cfd414d3cc02af55be49dde2c) ) /* Sound data? */
 
 
 	/* OBJ PCB */

@@ -33,11 +33,11 @@ public:
 	UINT8 m_at_pages[0x10];
 	UINT8 m_vga_address;
 
-	device_t	*m_pit8253;
-	device_t	*m_pic8259_1;
-	device_t	*m_pic8259_2;
-	device_t	*m_dma8237_1;
-	device_t	*m_dma8237_2;
+	device_t    *m_pit8253;
+	device_t    *m_pic8259_1;
+	device_t    *m_pic8259_2;
+	device_t    *m_dma8237_1;
+	device_t    *m_dma8237_2;
 	DECLARE_READ32_MEMBER(ide_r);
 	DECLARE_WRITE32_MEMBER(ide_w);
 	DECLARE_READ32_MEMBER(fdc_r);
@@ -251,15 +251,15 @@ static const struct pit8253_config at_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(photoply_state,at_pit8254_out0_changed)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(photoply_state,at_pit8254_out2_changed)
 		}
@@ -303,7 +303,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( photoply )
 	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
@@ -321,13 +321,13 @@ static INPUT_PORTS_START( photoply )
 	PORT_START("pc_keyboard_5")
 
 	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
@@ -355,12 +355,12 @@ void photoply_state::machine_start()
 static const gfx_layout CGA_charlayout =
 {
 	8,8,
-    256,
-    1,
-    { 0 },
-    { 0,1,2,3,4,5,6,7 },
+	256,
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-    8*8
+	8*8
 };
 
 static GFXDECODE_START( photoply )
@@ -370,7 +370,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( photoply, photoply_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 75000000)	/* I486DX4, 75 or 100 Mhz */
+	MCFG_CPU_ADD("maincpu", I486, 75000000) /* I486DX4, 75 or 100 Mhz */
 	MCFG_CPU_PROGRAM_MAP(photoply_map)
 	MCFG_CPU_IO_MAP(photoply_io)
 
@@ -393,7 +393,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START(photoply)
-	ROM_REGION(0x20000, "bios", 0)	/* motherboard bios */
+	ROM_REGION(0x20000, "bios", 0)  /* motherboard bios */
 	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) )
 
 	ROM_REGION(0x10000, "ex_bios", 0) /* multifunction board with a ESS AudioDrive chip,  M27128A */

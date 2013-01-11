@@ -28,8 +28,8 @@ const device_type DIAG264_SERIAL_LOOPBACK = &device_creator<diag264_serial_loopb
 //-------------------------------------------------
 
 diag264_serial_loopback_device::diag264_serial_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, DIAG264_SERIAL_LOOPBACK, "Diag264 Serial Loopback", tag, owner, clock),
-	  device_cbm_iec_interface(mconfig, *this)
+	: device_t(mconfig, DIAG264_SERIAL_LOOPBACK, "Diag264 Serial Loopback", tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this)
 {
 }
 

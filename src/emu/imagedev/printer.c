@@ -18,8 +18,8 @@ const device_type PRINTER = &device_creator<printer_image_device>;
 //-------------------------------------------------
 
 printer_image_device::printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, PRINTER, "Printer", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, PRINTER, "Printer", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 
 }
@@ -48,7 +48,7 @@ void printer_image_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_online, 0, sizeof(m_online));
+		memset(&m_online, 0, sizeof(m_online));
 	}
 
 	// set brief and instance name
@@ -62,7 +62,7 @@ void printer_image_device::device_config_complete()
 
 void printer_image_device::device_start()
 {
-    m_online_func.resolve(m_online, *this);
+	m_online_func.resolve(m_online, *this);
 }
 
 /***************************************************************************
@@ -125,4 +125,3 @@ void printer_image_device::call_unload()
 	if (!m_online_func.isnull())
 		m_online_func(FALSE);
 }
-

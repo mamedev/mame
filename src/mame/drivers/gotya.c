@@ -95,34 +95,34 @@ static INPUT_PORTS_START( gotya )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
-	PORT_DIPNAME( 0x80, 0x80, "Game Type" )			/* Manual Says:  Before main switch on: Test Pattern */
-	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )	/*                After main switch on: Endless game */
+	PORT_DIPNAME( 0x80, 0x80, "Game Type" )         /* Manual Says:  Before main switch on: Test Pattern */
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )   /*                After main switch on: Endless game */
 	PORT_DIPSETTING(    0x00, "Endless" )
 INPUT_PORTS_END
 
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	2,	    /* 2 bits per pixel */
-	{ 0, 4 },	/* the bitplanes are packed in one byte */
+	8,8,    /* 8*8 characters */
+	256,    /* 256 characters */
+	2,      /* 2 bits per pixel */
+	{ 0, 4 },   /* the bitplanes are packed in one byte */
 	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-	16*8	/* every char takes 16 consecutive bytes */
+	16*8    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 characters */
-	64,		/* 64 characters */
-	2,	    /* 2 bits per pixel */
-	{ 0, 4 },	/* the bitplanes are packed in one byte */
+	16,16,  /* 16*16 characters */
+	64,     /* 64 characters */
+	2,      /* 2 bits per pixel */
+	{ 0, 4 },   /* the bitplanes are packed in one byte */
 	{ 0, 1, 2, 3, 24*8+0, 24*8+1, 24*8+2, 24*8+3,
-	  16*8+0, 16*8+1, 16*8+2, 16*8+3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
+		16*8+0, 16*8+1, 16*8+2, 16*8+3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
 	{ 39*8, 38*8, 37*8, 36*8, 35*8, 34*8, 33*8, 32*8,
-	   7*8,  6*8,  5*8,  4*8,  3*8,  2*8,  1*8,  0*8 },
-	64*8	/* every char takes 64 consecutive bytes */
+		7*8,  6*8,  5*8,  4*8,  3*8,  2*8,  1*8,  0*8 },
+	64*8    /* every char takes 64 consecutive bytes */
 };
 
 static GFXDECODE_START( gotya )
@@ -132,44 +132,44 @@ GFXDECODE_END
 
 
 static const char *const sample_names[] =
-{												// Address triggered at
+{                                               // Address triggered at
 	"*thehand",
-	"01",	/* game start tune */			// 075f
-	"02",	/* coin in */					// 0074
-	"03",	/* eat dot */					// 0e45
-	"05",	/* eat dollar sign */			// 0e45
+	"01",   /* game start tune */           // 075f
+	"02",   /* coin in */                   // 0074
+	"03",   /* eat dot */                   // 0e45
+	"05",   /* eat dollar sign */           // 0e45
 
-	"06",	/* door open */					// 19e1
-	"07",	/* door close */				// 1965
+	"06",   /* door open */                 // 19e1
+	"07",   /* door close */                // 1965
 
-	"08",	/* theme song */				// 0821
+	"08",   /* theme song */                // 0821
 	//"09"                                  // 1569
 
 	/* one of these two is played after eating the last dot */
-	"0a",	/* piccolo */					// 17af
-	"0b",	/* tune */						// 17af
+	"0a",   /* piccolo */                   // 17af
+	"0b",   /* tune */                      // 17af
 
 	//"0f"                                  // 08ee
-	"10",	/* 'We're even. Bye Bye!' */	// 162a
-	"11",	/* 'You got me!' */				// 1657
-	"12",	/* 'You have lost out' */		// 085e
+	"10",   /* 'We're even. Bye Bye!' */    // 162a
+	"11",   /* 'You got me!' */             // 1657
+	"12",   /* 'You have lost out' */       // 085e
 
-	"13",	/* 'Rock' */					// 14de
-	"14",	/* 'Scissors' */				// 14f3
-	"15",	/* 'Paper' */					// 1508
+	"13",   /* 'Rock' */                    // 14de
+	"14",   /* 'Scissors' */                // 14f3
+	"15",   /* 'Paper' */                   // 1508
 
 	/* one of these is played when going by the girl between levels */
-	"16",	/* 'Very good!' */				// 194a
-	"17",	/* 'Wonderful!' */				// 194a
-	"18",	/* 'Come on!' */				// 194a
-	"19",	/* 'I love you!' */				// 194a
-	"1a",	/* 'See you again!' */			// 194a
+	"16",   /* 'Very good!' */              // 194a
+	"17",   /* 'Wonderful!' */              // 194a
+	"18",   /* 'Come on!' */                // 194a
+	"19",   /* 'I love you!' */             // 194a
+	"1a",   /* 'See you again!' */          // 194a
 	0
 };
 
 static const samples_interface gotya_samples_interface =
 {
-	4,	/* 4 channels */
+	4,  /* 4 channels */
 	sample_names
 };
 
@@ -193,7 +193,7 @@ void gotya_state::machine_reset()
 static MACHINE_CONFIG_START( gotya, gotya_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
+	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(gotya_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
 
@@ -225,58 +225,58 @@ MACHINE_CONFIG_END
 
 ROM_START( thehand )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hand6.bin",	0x0000, 0x1000, CRC(a33b806c) SHA1(1e552af5362e7b003f55e78bb59589e1db55557c) )
-	ROM_LOAD( "hand5.bin",	0x1000, 0x1000, CRC(89bcde82) SHA1(d074bb6a1975160eb533d5fd9289170a68209046) )
-	ROM_LOAD( "hand4.bin",	0x2000, 0x1000, CRC(c6844a83) SHA1(84e220dce3f5ddee9dd0377f3bebdd4027fc9108) )
-	ROM_LOAD( "gb-03.bin",	0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )
+	ROM_LOAD( "hand6.bin",  0x0000, 0x1000, CRC(a33b806c) SHA1(1e552af5362e7b003f55e78bb59589e1db55557c) )
+	ROM_LOAD( "hand5.bin",  0x1000, 0x1000, CRC(89bcde82) SHA1(d074bb6a1975160eb533d5fd9289170a68209046) )
+	ROM_LOAD( "hand4.bin",  0x2000, 0x1000, CRC(c6844a83) SHA1(84e220dce3f5ddee9dd0377f3bebdd4027fc9108) )
+	ROM_LOAD( "gb-03.bin",  0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )
 
-	ROM_REGION( 0x1000,  "gfx1", 0 )	/* characters */
-	ROM_LOAD( "hand12.bin",	0x0000, 0x1000, CRC(95773b46) SHA1(db8d7ace4eafd4c72edfeff6003ca6e96e0239b5) )
+	ROM_REGION( 0x1000,  "gfx1", 0 )    /* characters */
+	ROM_LOAD( "hand12.bin", 0x0000, 0x1000, CRC(95773b46) SHA1(db8d7ace4eafd4c72edfeff6003ca6e96e0239b5) )
 
-	ROM_REGION( 0x1000,  "gfx2", 0 )	/* sprites */
-	ROM_LOAD( "gb-11.bin",	0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
+	ROM_REGION( 0x1000,  "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "gb-11.bin",  0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
 
 	ROM_REGION( 0x0120,  "proms", 0 )
 	ROM_LOAD( "prom.1a",    0x0000, 0x0020, CRC(4864a5a0) SHA1(5b49f60b085fa026d4e8d4a5ad28ee7037a8ff9c) )    /* color PROM */
 	ROM_LOAD( "prom.4c",    0x0020, 0x0100, CRC(4745b5f6) SHA1(02a7f759e9bc8089cbd9213a71bbe671f9641638) )    /* lookup table */
 
-	ROM_REGION( 0x1000,  "user1", 0 )		/* no idea what these are */
-	ROM_LOAD( "hand1.bin",	0x0000, 0x0800, CRC(ccc537e0) SHA1(471fd49225aa14b91d085178e1b58b6c4ae76481) )
-	ROM_LOAD( "gb-02.bin",	0x0800, 0x0800, CRC(65a7e284) SHA1(91e9c34dcf20608863ad5475dc0c4309971c8eee) )
+	ROM_REGION( 0x1000,  "user1", 0 )       /* no idea what these are */
+	ROM_LOAD( "hand1.bin",  0x0000, 0x0800, CRC(ccc537e0) SHA1(471fd49225aa14b91d085178e1b58b6c4ae76481) )
+	ROM_LOAD( "gb-02.bin",  0x0800, 0x0800, CRC(65a7e284) SHA1(91e9c34dcf20608863ad5475dc0c4309971c8eee) )
 
-	ROM_REGION( 0x8000,  "user2", 0 )		/* HD38880 code/samples? */
-	ROM_LOAD( "gb-10.bin",	0x4000, 0x1000, CRC(8101915f) SHA1(c4d21b1938ea7e0d47c48e74037f005280ac101b) )
-	ROM_LOAD( "gb-09.bin",	0x5000, 0x1000, CRC(619bba76) SHA1(2a2deffe6f058fc840329fbfffbc0c70a0147c14) )
-	ROM_LOAD( "gb-08.bin",	0x6000, 0x1000, CRC(82f59528) SHA1(6bfa2329eb291040bfc229c56420865253b0132a) )
-	ROM_LOAD( "hand7.bin",	0x7000, 0x1000, CRC(fbf1c5de) SHA1(dd3181a8da1972e3c997678bb868256a10f33d04) )
+	ROM_REGION( 0x8000,  "user2", 0 )       /* HD38880 code/samples? */
+	ROM_LOAD( "gb-10.bin",  0x4000, 0x1000, CRC(8101915f) SHA1(c4d21b1938ea7e0d47c48e74037f005280ac101b) )
+	ROM_LOAD( "gb-09.bin",  0x5000, 0x1000, CRC(619bba76) SHA1(2a2deffe6f058fc840329fbfffbc0c70a0147c14) )
+	ROM_LOAD( "gb-08.bin",  0x6000, 0x1000, CRC(82f59528) SHA1(6bfa2329eb291040bfc229c56420865253b0132a) )
+	ROM_LOAD( "hand7.bin",  0x7000, 0x1000, CRC(fbf1c5de) SHA1(dd3181a8da1972e3c997678bb868256a10f33d04) )
 ROM_END
 
 ROM_START( gotya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gb-06.bin",	0x0000, 0x1000, CRC(7793985a) SHA1(23aa8bd161e700bea59b92075423cdf55e9a26c3) )
-	ROM_LOAD( "gb-05.bin",	0x1000, 0x1000, CRC(683d188b) SHA1(5341c62f5cf384c73be0d7a0a230bb8cebfbe709) )
-	ROM_LOAD( "gb-04.bin",	0x2000, 0x1000, CRC(15b72f09) SHA1(bd941722ed1310d5c8ca8a44899368cba3815f3b) )
-	ROM_LOAD( "gb-03.bin",	0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )    /* this is the only ROM that passes the ROM test */
+	ROM_LOAD( "gb-06.bin",  0x0000, 0x1000, CRC(7793985a) SHA1(23aa8bd161e700bea59b92075423cdf55e9a26c3) )
+	ROM_LOAD( "gb-05.bin",  0x1000, 0x1000, CRC(683d188b) SHA1(5341c62f5cf384c73be0d7a0a230bb8cebfbe709) )
+	ROM_LOAD( "gb-04.bin",  0x2000, 0x1000, CRC(15b72f09) SHA1(bd941722ed1310d5c8ca8a44899368cba3815f3b) )
+	ROM_LOAD( "gb-03.bin",  0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )    /* this is the only ROM that passes the ROM test */
 
-	ROM_REGION( 0x1000,  "gfx1", 0 )	/* characters */
-	ROM_LOAD( "gb-12.bin",	0x0000, 0x1000, CRC(4993d735) SHA1(9e47876238a8af3659721191a5f75c33507ed1a5) )
+	ROM_REGION( 0x1000,  "gfx1", 0 )    /* characters */
+	ROM_LOAD( "gb-12.bin",  0x0000, 0x1000, CRC(4993d735) SHA1(9e47876238a8af3659721191a5f75c33507ed1a5) )
 
-	ROM_REGION( 0x1000,  "gfx2", 0 )	/* sprites */
-	ROM_LOAD( "gb-11.bin",	0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
+	ROM_REGION( 0x1000,  "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "gb-11.bin",  0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
 
 	ROM_REGION( 0x0120,  "proms", 0 )
 	ROM_LOAD( "prom.1a",    0x0000, 0x0020, CRC(4864a5a0) SHA1(5b49f60b085fa026d4e8d4a5ad28ee7037a8ff9c) )    /* color PROM */
 	ROM_LOAD( "prom.4c",    0x0020, 0x0100, CRC(4745b5f6) SHA1(02a7f759e9bc8089cbd9213a71bbe671f9641638) )    /* lookup table */
 
-	ROM_REGION( 0x1000,  "user1", 0 )		/* no idea what these are */
-	ROM_LOAD( "gb-01.bin",	0x0000, 0x0800, CRC(c31dba64) SHA1(15ae54b7d475ca3f0a3acc45cd8da2916c5fdef2) )
-	ROM_LOAD( "gb-02.bin",	0x0800, 0x0800, CRC(65a7e284) SHA1(91e9c34dcf20608863ad5475dc0c4309971c8eee) )
+	ROM_REGION( 0x1000,  "user1", 0 )       /* no idea what these are */
+	ROM_LOAD( "gb-01.bin",  0x0000, 0x0800, CRC(c31dba64) SHA1(15ae54b7d475ca3f0a3acc45cd8da2916c5fdef2) )
+	ROM_LOAD( "gb-02.bin",  0x0800, 0x0800, CRC(65a7e284) SHA1(91e9c34dcf20608863ad5475dc0c4309971c8eee) )
 
-	ROM_REGION( 0x8000,  "user2", 0 )		/* HD38880 code/samples? */
-	ROM_LOAD( "gb-10.bin",	0x4000, 0x1000, CRC(8101915f) SHA1(c4d21b1938ea7e0d47c48e74037f005280ac101b) )
-	ROM_LOAD( "gb-09.bin",	0x5000, 0x1000, CRC(619bba76) SHA1(2a2deffe6f058fc840329fbfffbc0c70a0147c14) )
-	ROM_LOAD( "gb-08.bin",	0x6000, 0x1000, CRC(82f59528) SHA1(6bfa2329eb291040bfc229c56420865253b0132a) )
-	ROM_LOAD( "gb-07.bin",	0x7000, 0x1000, CRC(92a9f8bf) SHA1(9231cd86f24f1e6a585c3a919add50c1f8e42a4c) )
+	ROM_REGION( 0x8000,  "user2", 0 )       /* HD38880 code/samples? */
+	ROM_LOAD( "gb-10.bin",  0x4000, 0x1000, CRC(8101915f) SHA1(c4d21b1938ea7e0d47c48e74037f005280ac101b) )
+	ROM_LOAD( "gb-09.bin",  0x5000, 0x1000, CRC(619bba76) SHA1(2a2deffe6f058fc840329fbfffbc0c70a0147c14) )
+	ROM_LOAD( "gb-08.bin",  0x6000, 0x1000, CRC(82f59528) SHA1(6bfa2329eb291040bfc229c56420865253b0132a) )
+	ROM_LOAD( "gb-07.bin",  0x7000, 0x1000, CRC(92a9f8bf) SHA1(9231cd86f24f1e6a585c3a919add50c1f8e42a4c) )
 ROM_END
 
 GAME( 1981, thehand, 0,       gotya, gotya, driver_device, 0, ROT270, "T.I.C.",      "The Hand",                        GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

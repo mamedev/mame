@@ -41,7 +41,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 		1
+#define LOG         1
 
 
 
@@ -57,20 +57,20 @@ WRITE8_MEMBER( vidbrain_state::keyboard_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       keyboard column 0, sound data 0
-        1       keyboard column 1, sound data 1
-        2       keyboard column 2
-        3       keyboard column 3
-        4       keyboard column 4
-        5       keyboard column 5
-        6       keyboard column 6
-        7       keyboard column 7
+	    0       keyboard column 0, sound data 0
+	    1       keyboard column 1, sound data 1
+	    2       keyboard column 2
+	    3       keyboard column 3
+	    4       keyboard column 4
+	    5       keyboard column 5
+	    6       keyboard column 6
+	    7       keyboard column 7
 
-    */
+	*/
 
-    if (LOG) logerror("Keyboard %02x\n", data);
+	if (LOG) logerror("Keyboard %02x\n", data);
 
 	m_keylatch = data;
 }
@@ -84,18 +84,18 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       keyboard row 0, joystick 1 fire
-        1       keyboard row 1, joystick 2 fire
-        2       keyboard row 2, joystick 3 fire
-        3       keyboard row 3, joystick 4 fire
-        4
-        5
-        6
-        7
+	    0       keyboard row 0, joystick 1 fire
+	    1       keyboard row 1, joystick 2 fire
+	    2       keyboard row 2, joystick 3 fire
+	    3       keyboard row 3, joystick 4 fire
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	UINT8 data = ioport("JOY-R")->read();
 
@@ -121,20 +121,20 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4       sound clock
-        5       accessory jack pin 5
-        6       accessory jack pin 1
-        7       joystick enable
+	    0
+	    1
+	    2
+	    3
+	    4       sound clock
+	    5       accessory jack pin 5
+	    6       accessory jack pin 1
+	    7       joystick enable
 
-    */
+	*/
 
-    if (LOG) logerror("Sound %02x\n", data);
+	if (LOG) logerror("Sound %02x\n", data);
 
 	// sound clock
 	int sound_clk = BIT(data, 4);
@@ -402,12 +402,12 @@ static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
 	vidbrain_state *state = device->machine().driver_data<vidbrain_state>();
 
 	state->m_vector = addr;
-    state->m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level);
+	state->m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level);
 }
 
 static const f3853_interface smi_intf =
 {
-    f3853_int_req_w
+	f3853_int_req_w
 };
 
 
@@ -567,10 +567,10 @@ void vidbrain_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
-    MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
-    MCFG_CPU_IO_MAP(vidbrain_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
+	MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
+	MCFG_CPU_IO_MAP(vidbrain_io)
 
 	// video hardware
 	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
@@ -610,10 +610,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( vidbrain )
-    ROM_REGION( 0x800, "res1", 0 )
+	ROM_REGION( 0x800, "res1", 0 )
 	ROM_LOAD( "uvres 1n.d67", 0x000, 0x800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
 
-    ROM_REGION( 0x800, "res2", 0 )
+	ROM_REGION( 0x800, "res2", 0 )
 	ROM_LOAD( "resn2.e5", 0x000, 0x800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
 
 	ROM_REGION( 0x800, F3870_TAG, 0 )
@@ -627,4 +627,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain, driver_device,	0,		"VideoBrain Computer Company",	"VideoBrain FamilyComputer",	GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1977, vidbrain,   0,      0,      vidbrain,   vidbrain, driver_device,    0,      "VideoBrain Computer Company",  "VideoBrain FamilyComputer",    GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )

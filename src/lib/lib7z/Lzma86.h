@@ -63,13 +63,13 @@ Return code:
 
 enum ESzFilterMode
 {
-  SZ_FILTER_NO,
-  SZ_FILTER_YES,
-  SZ_FILTER_AUTO
+	SZ_FILTER_NO,
+	SZ_FILTER_YES,
+	SZ_FILTER_AUTO
 };
 
 SRes Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
-    int level, UInt32 dictSize, int filterMode);
+	int level, UInt32 dictSize, int filterMode);
 
 
 /*

@@ -34,23 +34,23 @@ Theory of operation:
 
 struct point
 {
-	int intensity;		/* current intensity of the pixel */
+	int intensity;      /* current intensity of the pixel */
 							/* a node is not in the list when (intensity == -1) */
-	int next;			/* index of next pixel in list */
+	int next;           /* index of next pixel in list */
 };
 
 enum
 {
-	intensity_pixel_not_in_list = -1	/* special value that tells that the node is not in list */
+	intensity_pixel_not_in_list = -1    /* special value that tells that the node is not in list */
 };
 
 struct crt_t
 {
-	point *list;		/* array of (crt_window_width*crt_window_height) point */
-	int *list_head;	/* head of the list of lit pixels (index in the array) */
+	point *list;        /* array of (crt_window_width*crt_window_height) point */
+	int *list_head; /* head of the list of lit pixels (index in the array) */
 							/* keep a separate list for each display line (makes the video code slightly faster) */
 
-	int decay_counter;	/* incremented each frame (tells for how many frames the CRT has decayed between two screen refresh) */
+	int decay_counter;  /* incremented each frame (tells for how many frames the CRT has decayed between two screen refresh) */
 
 	/* CRT window */
 	int num_intensity_levels;
@@ -152,7 +152,7 @@ void crt_plot(device_t *device, int x, int y)
 	node = &crt->list[list_index];
 
 	if (node->intensity == intensity_pixel_not_in_list)
-	{	/* insert node in list if it is not in it */
+	{   /* insert node in list if it is not in it */
 		node->next = crt->list_head[y];
 		crt->list_head[y] = list_index;
 	}
@@ -214,9 +214,9 @@ void crt_update(device_t *device, bitmap_ind16 &bitmap)
 				line[x] = node->intensity;
 
 				if (node->intensity != 0)
-					p_i = i;	/* current node will be next iteration's previous node */
+					p_i = i;    /* current node will be next iteration's previous node */
 				else
-				{	/* delete current node */
+				{   /* delete current node */
 					node->intensity = intensity_pixel_not_in_list;
 					if (p_i != -1)
 						crt->list[p_i].next = node->next;

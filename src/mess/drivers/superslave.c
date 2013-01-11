@@ -120,4 +120,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1983, superslv,  0,      0,      superslave,  superslave, driver_device,  0,      "Advanced Digital Corporation",	"Super Slave",	GAME_IS_SKELETON )
+COMP( 1983, superslv,  0,      0,      superslave,  superslave, driver_device,  0,      "Advanced Digital Corporation", "Super Slave",  GAME_IS_SKELETON )

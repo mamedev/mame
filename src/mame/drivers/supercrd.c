@@ -154,7 +154,7 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_16MHz
+#define MASTER_CLOCK    XTAL_16MHz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -196,10 +196,10 @@ PALETTE_INIT_MEMBER(supercrd_state, supercrd)
 	static const int resistances_g [2] = { 470, 220 };
 	double weights_r[3], weights_b[3], weights_g[2];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rb,	weights_r,	100,	0,
-			3,	resistances_rb,	weights_b,	100,	0,
-			2,	resistances_g,	weights_g,	100,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_rb, weights_r,  100,    0,
+			3,  resistances_rb, weights_b,  100,    0,
+			2,  resistances_g,  weights_g,  100,    0);
 
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -249,7 +249,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 	int offs = tile_index;
 	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
 	int code = attr & 0xfff;
-	int color = m_colorram[offs] >> 4;	// 4 bits for color.
+	int color = m_colorram[offs] >> 4;  // 4 bits for color.
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -274,8 +274,8 @@ UINT32 supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_ind1
 
 static ADDRESS_MAP_START( supercrd_map, AS_PROGRAM, 8, supercrd_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(supercrd_videoram_w) AM_SHARE("videoram")	// wrong
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(supercrd_colorram_w) AM_SHARE("colorram")	// wrong
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(supercrd_videoram_w) AM_SHARE("videoram") // wrong
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(supercrd_colorram_w) AM_SHARE("colorram") // wrong
 //  AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -390,7 +390,7 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( supercrd )	/* Adressing the first half of the palette */
+static GFXDECODE_START( supercrd )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -445,8 +445,8 @@ GFXDECODE_END
 **************************/
 
 static MACHINE_CONFIG_START( supercrd, supercrd_state )
-    /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 2MHz, guess */
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(supercrd_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
@@ -454,13 +454,13 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 //  MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 //  MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
 
-    /* video hardware */
+	/* video hardware */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06 */
+	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 
 	MCFG_GFXDECODE(supercrd)
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 
 //  MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)
 
-    /* sound hardware */
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -484,8 +484,8 @@ MACHINE_CONFIG_END
 
 ROM_START( supercrd )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "supca_417_ce1.ic37", 0x00000, 0x10000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )	// wrong
-	ROM_LOAD( "supca_417_ce2.ic51", 0x10000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )	// wrong
+	ROM_LOAD( "supca_417_ce1.ic37", 0x00000, 0x10000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )    // wrong
+	ROM_LOAD( "supca_417_ce2.ic51", 0x10000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )    // wrong
 	ROM_IGNORE(                     0x8000)
 
 //  ROM_LOAD( "supca_417_ce1.ic37", 0x0000, 0x8000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )
@@ -498,14 +498,14 @@ ROM_START( supercrd )
 	ROM_LOAD( "supca_410_zg1.ic10", 0x10000, 0x10000, CRC(d3d9ae13) SHA1(4825677bbab2b77ce5aa6500c55a61874932b319) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_COPY( "gfxtemp",            0x08000, 0x0000, 0x8000 )	// ok
-	ROM_COPY( "gfxtemp",            0x18000, 0x8000, 0x8000 )	// ok
+	ROM_COPY( "gfxtemp",            0x08000, 0x0000, 0x8000 )   // ok
+	ROM_COPY( "gfxtemp",            0x18000, 0x8000, 0x8000 )   // ok
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "82s147_bad",	    0x0000, 0x0200, CRC(8a220b4b) SHA1(4ce4f1e13526e0598a87eee731295e925c2e7d3f) )	// dump attempt #1
-	ROM_LOAD( "82s147_bad_1",	0x0200, 0x0200, CRC(306be196) SHA1(531d876cd48984b5b167ebafd6e61ea66e3e60b2) )	// dump attempt #2
-	ROM_LOAD( "82s147_bad_2",	0x0400, 0x0200, CRC(39cb5cf4) SHA1(2eb5d6de673bafdfcb8811d0355197864c2f7ee8) )	// dump attempt #3
-	ROM_LOAD( "tbp24s10n.ic6",	0x0600, 0x0200, CRC(6f9c6934) SHA1(1f424f8cf5755a0e5feb4724f3282308c0774f1f) )	// other bp...
+	ROM_LOAD( "82s147_bad",     0x0000, 0x0200, CRC(8a220b4b) SHA1(4ce4f1e13526e0598a87eee731295e925c2e7d3f) )  // dump attempt #1
+	ROM_LOAD( "82s147_bad_1",   0x0200, 0x0200, CRC(306be196) SHA1(531d876cd48984b5b167ebafd6e61ea66e3e60b2) )  // dump attempt #2
+	ROM_LOAD( "82s147_bad_2",   0x0400, 0x0200, CRC(39cb5cf4) SHA1(2eb5d6de673bafdfcb8811d0355197864c2f7ee8) )  // dump attempt #3
+	ROM_LOAD( "tbp24s10n.ic6",  0x0600, 0x0200, CRC(6f9c6934) SHA1(1f424f8cf5755a0e5feb4724f3282308c0774f1f) )  // other bp...
 ROM_END
 
 

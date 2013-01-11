@@ -69,15 +69,15 @@ READ8_HANDLER( battles_customio0_r )
 
 READ8_HANDLER( battles_customio3_r )
 {
-	int	return_data;
+	int return_data;
 
 	if( space.device().safe_pc() == 0xAE ){
 		/* CPU4 0xAA - 0xB9 : waiting for MB8851 ? */
-		return_data =	( (battles_customio_command & 0x10) << 3)
+		return_data =   ( (battles_customio_command & 0x10) << 3)
 						| 0x00
 						| (battles_customio_command & 0x0f);
 	}else{
-		return_data =	( (battles_customio_prev_command & 0x10) << 3)
+		return_data =   ( (battles_customio_prev_command & 0x10) << 3)
 						| 0x60
 						| (battles_customio_prev_command & 0x0f);
 	}
@@ -144,8 +144,8 @@ WRITE8_HANDLER( battles_customio_data3_w )
 
 WRITE8_HANDLER( battles_CPU4_coin_w )
 {
-	set_led_status(space.machine(), 0,data & 0x02);	// Start 1
-	set_led_status(space.machine(), 1,data & 0x01);	// Start 2
+	set_led_status(space.machine(), 0,data & 0x02); // Start 1
+	set_led_status(space.machine(), 1,data & 0x01); // Start 2
 
 	coin_counter_w(space.machine(), 0,data & 0x20);
 	coin_counter_w(space.machine(), 1,data & 0x10);
@@ -186,4 +186,3 @@ INTERRUPT_GEN_MEMBER(xevious_state::battles_interrupt_4)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
-

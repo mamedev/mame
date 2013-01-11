@@ -517,12 +517,12 @@ static void aerfboo2_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 					code = state->m_spriteram2[map_start % (state->m_spriteram2.bytes()/2)];
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx + chip],
-							 code,
-							 color,
-							 flipx,flipy,
-							 sx,sy,
-							 zoomx << 11, zoomy << 11,
-							 machine.priority_bitmap,pri ? 0 : 2,15);
+								code,
+								color,
+								flipx,flipy,
+								sx,sy,
+								zoomx << 11, zoomy << 11,
+								machine.priority_bitmap,pri ? 0 : 2,15);
 				map_start++;
 			}
 

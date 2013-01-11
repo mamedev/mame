@@ -129,7 +129,7 @@ CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 ******************************************************************************/
 
 static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM			// main rom
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM         // main rom
 
 //  AM_RANGE(0x100000, 0x100007) AM_WRITENOP    // ?
 
@@ -141,21 +141,21 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)	// sound command
+	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)   // sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram_xGGGGGBBBBBRRRRR_word_w) AM_SHARE("paletteram")						// palette ram
-	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")									// bg raster ram
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")		// bg ram
-	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")		// text ram
-	AM_RANGE(0x404000, 0x40ffff) AM_RAM	// ?? mirror (3on3dunk)
-	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram1")							// sprite table + sprite attribute
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("spriteram2")											// cell table
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram_xGGGGGBBBBBRRRRR_word_w) AM_SHARE("paletteram")                        // palette ram
+	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")                                  // bg raster ram
+	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")     // bg ram
+	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")     // text ram
+	AM_RANGE(0x404000, 0x40ffff) AM_RAM // ?? mirror (3on3dunk)
+	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram1")                          // sprite table + sprite attribute
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("spriteram2")                                          // cell table
 
-	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w)	// bg & text palettebank register
-	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)	// bg & text scroll register
+	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w) // bg & text palettebank register
+	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)  // bg & text scroll register
 //  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
 
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM	// data rom
+	AM_RANGE(0x800000, 0xbfffff) AM_ROM // data rom
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, NULL)	// pending sound command
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, NULL)    // pending sound command
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 3on3dunk cares about something in here, possibly a vblank flag
 
 	PORT_START( "EEPROMOUT" )
@@ -302,15 +302,15 @@ static const gfx_layout spritelayout_alt =
 };
 
 static GFXDECODE_START( inufuku )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )	// bg
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )	// text
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 256*16 )	// sprite
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 256*16 )  // sprite
 GFXDECODE_END
 
 static GFXDECODE_START( _3on3dunk )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )	// bg
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )	// text
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_alt,  0, 256*16 )	// sprite
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_alt,  0, 256*16 )  // sprite
 GFXDECODE_END
 
 
@@ -373,11 +373,11 @@ void inufuku_state::machine_reset()
 static MACHINE_CONFIG_START( inufuku, inufuku_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16.00 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(inufuku_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32000000/4)		/* 8.00 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(inufuku_sound_map)
 	MCFG_CPU_IO_MAP(inufuku_sound_io_map)
 								/* IRQs are triggered by the YM2610 */
@@ -430,45 +430,45 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START( inufuku )
-	ROM_REGION( 0x1000000, "maincpu", 0 )	// main cpu + data
+	ROM_REGION( 0x1000000, "maincpu", 0 )   // main cpu + data
 	ROM_LOAD16_WORD_SWAP( "u147.bin",     0x0000000, 0x080000, CRC(ab72398c) SHA1(f5dc266ffa936ea6528b46a34113f5e2f8141d71) )
 	ROM_LOAD16_WORD_SWAP( "u146.bin",     0x0080000, 0x080000, CRC(e05e9bd4) SHA1(af0fdf31c2bdf851bf15c9de725dcbbb58464d54) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5l28.148", 0x0800000, 0x400000, CRC(802d17e7) SHA1(43b26efea65fd051c094d19784cb977ced39a1a0) )
 
-	ROM_REGION( 0x0020000, "audiocpu", 0 )	// sound cpu
+	ROM_REGION( 0x0020000, "audiocpu", 0 )  // sound cpu
 	ROM_LOAD( "u107.bin", 0x0000000, 0x020000, CRC(1744ef90) SHA1(e019f4ca83e21aa25710cc0ca40ffe765c7486c9) )
 
-	ROM_REGION( 0x0400000, "gfx1", 0 )	// bg
+	ROM_REGION( 0x0400000, "gfx1", 0 )  // bg
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku8.u40", 0x0000000, 0x400000, CRC(8cbca80a) SHA1(063e9be97f5a1f021f8326f2994b51f9af5e1eaf) )
 
-	ROM_REGION( 0x0400000, "gfx2", 0 )	// text
+	ROM_REGION( 0x0400000, "gfx2", 0 )  // text
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku7.u8",  0x0000000, 0x400000, CRC(a6c0f07f) SHA1(971803d1933d8296767d8766ea9f04dcd6ab065c) )
 
-	ROM_REGION( 0x0c00000, "gfx3", 0 )	// sprite
+	ROM_REGION( 0x0c00000, "gfx3", 0 )  // sprite
 	ROM_LOAD16_WORD_SWAP( "lhmn5kub.u34", 0x0000000, 0x400000, CRC(7753a7b6) SHA1(a2e8747ce83ea5a57e2fe62f2452de355d7f48b6) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5kua.u36", 0x0400000, 0x400000, CRC(1ac4402a) SHA1(c15acc6fce4fe0b54e92d14c31a1bd78acf2c8fc) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku9.u38", 0x0800000, 0x400000, CRC(e4e9b1b6) SHA1(4d4ad85fbe6a442d4f8cafad748bcae4af6245b7) )
 
-	ROM_REGION( 0x0400000, "ymsnd", 0 )	// adpcm data
+	ROM_REGION( 0x0400000, "ymsnd", 0 ) // adpcm data
 	ROM_LOAD( "lhmn5ku6.u53", 0x0000000, 0x400000, CRC(b320c5c9) SHA1(7c99da2d85597a3c008ed61a3aa5f47ad36186ec) )
 ROM_END
 
 ROM_START( 3on3dunk )
-	ROM_REGION( 0x1000000, "maincpu", 0 )	// main cpu + data
+	ROM_REGION( 0x1000000, "maincpu", 0 )   // main cpu + data
 	ROM_LOAD16_WORD_SWAP( "prog0_2_4_usa.u147",     0x0000000, 0x080000, CRC(957924ab) SHA1(6fe8ca711d11239310d58188e9d6d28cd27bc5af) )
 	ROM_LOAD16_WORD_SWAP( "prog1_2_4_usa.u146",     0x0080000, 0x080000, CRC(2479e236) SHA1(729e6c85d34d6925c8d6557b138e2bed43e1de6a) )
 	ROM_LOAD16_WORD_SWAP( "lh535l5y.u148", 0x0800000, 0x400000, CRC(aa33e02a) SHA1(86381ecf18fba9065cbc02112751c435bbf8b8b4) )
 
-	ROM_REGION( 0x0020000, "audiocpu", 0 )	// sound cpu
+	ROM_REGION( 0x0020000, "audiocpu", 0 )  // sound cpu
 	ROM_LOAD( "sound_prog_97_1_13.u107", 0x0000000, 0x020000, CRC(d9d42805) SHA1(ab5cb7c141d9c9ed5121ba4dbc1d0fa187bd9f68) )
 
-	ROM_REGION( 0x0400000, "gfx1", 0 )	// bg
+	ROM_REGION( 0x0400000, "gfx1", 0 )  // bg
 	ROM_LOAD16_WORD_SWAP( "lh525kwy.u40", 0x0000000, 0x400000, CRC(aaa426d1) SHA1(2f9a2981f336caf3188baec9a34f61452dee2203) )
 
-	ROM_REGION( 0x0400000, "gfx2", 0 )	// text
+	ROM_REGION( 0x0400000, "gfx2", 0 )  // text
 	ROM_LOAD16_WORD_SWAP( "lh537nn4.u8",  0x0000000, 0x200000, CRC(2b7be1d8) SHA1(aac274a8f4028db7429478601a1761e61ab4f9a2) )
 
-	ROM_REGION( 0x2000000, "gfx3", 0 )	// sprite
+	ROM_REGION( 0x2000000, "gfx3", 0 )  // sprite
 	ROM_LOAD( "lh535kwz.u34", 0x0000000, 0x400000, CRC(7372ce78) SHA1(ed2a861986357fad7ef983750cd906c3d722b862) )
 	ROM_LOAD( "lh535kv0.u36", 0x0400000, 0x400000, CRC(247e5741) SHA1(8d71d964791fb4b86e390bcdf7744f616d6357b1) )
 	ROM_LOAD( "lh535kv2.u38", 0x0800000, 0x400000, CRC(76449b1e) SHA1(b63d50c6f0dc91dc94dbcdda9842598529c1c26e) )
@@ -476,7 +476,7 @@ ROM_START( 3on3dunk )
 	/*               0x0e00000, 0x200000 empty */
 	ROM_LOAD( "lh536pnm.u32", 0x1000000, 0x400000, CRC(bc39e449) SHA1(5aea90b66ee03c70797ddc42dbcb064d83ce8cc7) )
 
-	ROM_REGION( 0x0400000, "ymsnd", 0 )	// ADPCM data
+	ROM_REGION( 0x0400000, "ymsnd", 0 ) // ADPCM data
 	ROM_LOAD( "lh5388r1.u53", 0x0000000, 0x100000, CRC(765d892f) SHA1(9b078c879d0437d1669bf4301fd52a768aa4d293) )
 
 	ROM_REGION( 0x400000, "ymsnd.deltat", 0 ) // speech

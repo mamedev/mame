@@ -106,7 +106,7 @@ unsigned short ccitt_crc16(unsigned short crc, const unsigned char *buffer, size
 
 unsigned short ccitt_crc16_one( unsigned short crc, const unsigned char data )
 {
-    return (crc << 8) ^ ccitt_crc16_table[(crc >> 8) ^ data];
+	return (crc << 8) ^ ccitt_crc16_table[(crc >> 8) ^ data];
 }
 
 
@@ -220,4 +220,3 @@ void image_specify_extension(char *buffer, size_t buffer_len, const char *extens
 		}
 	}
 }
-

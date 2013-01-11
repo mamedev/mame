@@ -13,7 +13,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( saa1099_control_w );
 DECLARE_WRITE8_DEVICE_HANDLER( saa1099_data_w );
 
 class saa1099_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

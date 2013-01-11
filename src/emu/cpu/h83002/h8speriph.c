@@ -95,10 +95,10 @@ const UINT8 H8S_RESET_H8S_IO_2323[0x1C0] = // values from "rej09b0220_h8s2329.pd
 	0x00, 0xC0, 0x00, 0x00, 0x40, 0xC0, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, // FFF0
 };
 
-#define SCR_TIE		0x80
-#define SCR_RIE		0x40
-#define SCR_TE		0x20
-#define SCR_RE		0x10
+#define SCR_TIE     0x80
+#define SCR_RIE     0x40
+#define SCR_TE      0x20
+#define SCR_RE      0x10
 
 #define SSR_TDRE  0x80
 #define SSR_RDRF  0x40
@@ -184,42 +184,42 @@ enum
 	PIN_PG0, PIN_PG1, PIN_PG2, PIN_PG3, PIN_PG4
 };
 
-#define PIN_TIOCA0	PIN_P10
-#define PIN_TIOCB0	PIN_P11
-#define PIN_TIOCC0	PIN_P12
-#define PIN_TIOCD0	PIN_P13
-#define PIN_TIOCA1	PIN_P14
-#define PIN_TIOCB1	PIN_P15
-#define PIN_TIOCA2	PIN_P16
-#define PIN_TIOCB2	PIN_P17
+#define PIN_TIOCA0  PIN_P10
+#define PIN_TIOCB0  PIN_P11
+#define PIN_TIOCC0  PIN_P12
+#define PIN_TIOCD0  PIN_P13
+#define PIN_TIOCA1  PIN_P14
+#define PIN_TIOCB1  PIN_P15
+#define PIN_TIOCA2  PIN_P16
+#define PIN_TIOCB2  PIN_P17
 
-#define PIN_TCLKA	PIN_P12
-#define PIN_TCLKB	PIN_P13
-#define PIN_TCLKC	PIN_P15
-#define PIN_TCLKD	PIN_P17
+#define PIN_TCLKA   PIN_P12
+#define PIN_TCLKB   PIN_P13
+#define PIN_TCLKC   PIN_P15
+#define PIN_TCLKD   PIN_P17
 
-#define PIN_TXD0	PIN_P30
-#define PIN_TXD1	PIN_P31
-#define PIN_RXD0	PIN_P32
-#define PIN_RXD1	PIN_P33
-#define PIN_SCK0	PIN_P34
-#define PIN_SCK1	PIN_P35
+#define PIN_TXD0    PIN_P30
+#define PIN_TXD1    PIN_P31
+#define PIN_RXD0    PIN_P32
+#define PIN_RXD1    PIN_P33
+#define PIN_SCK0    PIN_P34
+#define PIN_SCK1    PIN_P35
 
-#define PIN_TIOCA3	PIN_P20
-#define PIN_TIOCB3	PIN_P21
-#define PIN_TIOCC3	PIN_P22
-#define PIN_TIOCD3	PIN_P23
-#define PIN_TIOCA4	PIN_P24
-#define PIN_TIOCB4	PIN_P25
-#define PIN_TIOCA5	PIN_P26
-#define PIN_TIOCB5	PIN_P27
+#define PIN_TIOCA3  PIN_P20
+#define PIN_TIOCB3  PIN_P21
+#define PIN_TIOCC3  PIN_P22
+#define PIN_TIOCD3  PIN_P23
+#define PIN_TIOCA4  PIN_P24
+#define PIN_TIOCB4  PIN_P25
+#define PIN_TIOCA5  PIN_P26
+#define PIN_TIOCB5  PIN_P27
 
-#define PIN_TMRI0	PIN_P22
-#define PIN_TMCI0	PIN_P23
-#define PIN_TMRI1	PIN_P24
-#define PIN_TMCI1	PIN_P25
-#define PIN_TMO0	PIN_P26
-#define PIN_TMO1	PIN_P27
+#define PIN_TMRI0   PIN_P22
+#define PIN_TMCI0   PIN_P23
+#define PIN_TMRI1   PIN_P24
+#define PIN_TMCI1   PIN_P25
+#define PIN_TMO0    PIN_P26
+#define PIN_TMO1    PIN_P27
 
 const int TPU_0_DIV[] = { 1, 4, 16, 64, 0, 0, 0,0 };
 const int TPU_1_DIV[] = { 1, 4, 16, 64, 0, 0, 256, 0 };
@@ -1319,7 +1319,7 @@ void h8s_onchip_reg_write_8(h83xx_state *h8, int offset, UINT8 data)
 		case H8S_IO_BRR0  : h8->per_regs[offset] = data; h8s_sci_rate(h8, 0); h8s_sci_start(h8, 0); break;
 		// SCI 1
 		case H8S_IO_SSR1  : h8->per_regs[offset] = data; if ((data & H8S_SSR_TDRE) == 0) h8s_sci_execute(h8, 1); break;
-		case H8S_IO_SCR1  :	h8->per_regs[offset] = data; if (data & H8S_SCR_RIE) h8s2xxx_interrupt_request(h8,  h8s_sci_entry(1)->int_rx); break;
+		case H8S_IO_SCR1  : h8->per_regs[offset] = data; if (data & H8S_SCR_RIE) h8s2xxx_interrupt_request(h8,  h8s_sci_entry(1)->int_rx); break;
 		case H8S_IO_BRR1  : h8->per_regs[offset] = data; h8s_sci_rate(h8, 1); h8s_sci_start(h8, 1); break;
 		// SCI 2
 		case H8S_IO_SSR2  : h8->per_regs[offset] = data; if ((data & H8S_SSR_TDRE) == 0) h8s_sci_execute(h8, 2); break;
@@ -1390,7 +1390,7 @@ void h8s_onchip_reg_write_8_ddr(h83xx_state *h8, int offset, UINT8 data)
 		case H8S_IO_BRR0  : h8->per_regs[offset] = data; h8s_sci_rate(h8, 0); h8s_sci_start(h8, 0); break;
 		// SCI 1
 		case H8S_IO_SSR1  : h8->per_regs[offset] = data; if ((data & H8S_SSR_TDRE) == 0) h8s_sci_execute(h8, 1); break;
-		case H8S_IO_SCR1  :	h8->per_regs[offset] = data; if (data & H8S_SCR_RIE) h8s2xxx_interrupt_request(h8,  h8s_sci_entry(1)->int_rx); break;
+		case H8S_IO_SCR1  : h8->per_regs[offset] = data; if (data & H8S_SCR_RIE) h8s2xxx_interrupt_request(h8,  h8s_sci_entry(1)->int_rx); break;
 		case H8S_IO_BRR1  : h8->per_regs[offset] = data; h8s_sci_rate(h8, 1); h8s_sci_start(h8, 1); break;
 		// SCI 2
 		case H8S_IO_SSR2  : h8->per_regs[offset] = data; if ((data & H8S_SSR_TDRE) == 0) h8s_sci_execute(h8, 2); break;
@@ -1408,28 +1408,28 @@ void h8s_onchip_reg_write_8_ddr(h83xx_state *h8, int offset, UINT8 data)
 		case H8S_IO_TCORB1 : h8s_tmr_x_write_tcorb( h8, 1, data); break;
 
 		case H8S_IO_IER:
-        case H8S_IO_IFR:
+		case H8S_IO_IFR:
 			h8->per_regs[offset] = data;
-            break;
+			break;
 
-        case H8S_IO_P1DDR : case H8S_IO_P2DDR : case H8S_IO_P3DDR : case H8S_IO_P5DDR : case H8S_IO_P6DDR :
-        case H8S_IO_PADDR : case H8S_IO_PBDDR : case H8S_IO_PCDDR : case H8S_IO_PDDDR : case H8S_IO_PEDDR :
-        case H8S_IO_PFDDR : case H8S_IO_PGDDR :
-            h8->ddrs[offset - H8S_IO_P1DDR] = data;
-            break;
+		case H8S_IO_P1DDR : case H8S_IO_P2DDR : case H8S_IO_P3DDR : case H8S_IO_P5DDR : case H8S_IO_P6DDR :
+		case H8S_IO_PADDR : case H8S_IO_PBDDR : case H8S_IO_PCDDR : case H8S_IO_PDDDR : case H8S_IO_PEDDR :
+		case H8S_IO_PFDDR : case H8S_IO_PGDDR :
+			h8->ddrs[offset - H8S_IO_P1DDR] = data;
+			break;
 
 		case H8S_IO_P1DR : case H8S_IO_P2DR : case H8S_IO_P3DR : case H8S_IO_P5DR : case H8S_IO_P6DR :
 		case H8S_IO_PADR : case H8S_IO_PBDR : case H8S_IO_PCDR : case H8S_IO_PDDR : case H8S_IO_PEDR :
-        case H8S_IO_PFDR : case H8S_IO_PGDR :
-            {
-                int port = (offset - H8S_IO_P1DR);
-                h8->drs[port] = data;
-                h8->io->write_byte(H8_PORT_1 + port, data & h8->ddrs[port]);
-            }
-            break;
+		case H8S_IO_PFDR : case H8S_IO_PGDR :
+			{
+				int port = (offset - H8S_IO_P1DR);
+				h8->drs[port] = data;
+				h8->io->write_byte(H8_PORT_1 + port, data & h8->ddrs[port]);
+			}
+			break;
 
 		// ...
-        // TPU
+		// TPU
 		case H8S_IO_TSTR  : h8s_tpu_write_tstr( h8, data); break;
 		// DMA
 		case H8S_IO_DMABCRL :
@@ -1532,9 +1532,9 @@ UINT8 h8s_onchip_reg_read_8(h83xx_state *h8, int offset)
 		case H8S_IO_PORTA : case H8S_IO_PORTB : case H8S_IO_PORTC : case H8S_IO_PORTD : case H8S_IO_PORTE :
 		case H8S_IO_PORTF : data = h8->io->read_byte( H8S_IO_ADDR( offset)); break;
 		// ...
-        case H8S_IO_P1DR : case H8S_IO_P2DR : case H8S_IO_P3DR : case H8S_IO_P4DR : case H8S_IO_P5DR :
-        case H8S_IO_PADR : case H8S_IO_PBDR : case H8S_IO_PCDR : case H8S_IO_PDDR : case H8S_IO_PEDR :
-        case H8S_IO_PFDR : case H8S_IO_PGDR : data = h8->io->read_byte( H8S_IO_ADDR( offset)); break;
+		case H8S_IO_P1DR : case H8S_IO_P2DR : case H8S_IO_P3DR : case H8S_IO_P4DR : case H8S_IO_P5DR :
+		case H8S_IO_PADR : case H8S_IO_PBDR : case H8S_IO_PCDR : case H8S_IO_PDDR : case H8S_IO_PEDR :
+		case H8S_IO_PFDR : case H8S_IO_PGDR : data = h8->io->read_byte( H8S_IO_ADDR( offset)); break;
 		// TMR 0
 		case H8S_IO_TCNT0 : data = h8s_tmr_x_read_tcnt( h8, 0); break;
 		// TMR 1
@@ -1552,7 +1552,7 @@ UINT8 h8s_onchip_reg_read_8_ddr(h83xx_state *h8, int offset)
 	UINT8 data;
 	switch (offset)
 	{
-        #if 0
+		#if 0
 		// SCI 0
 		case H8S_IO_SSR0  : data = H8S_SSR_TDRE | H8S_SSR_TEND; break;
 		case H8S_IO_RDR0  : data = h8->io->read_byte( H8S_IO_ADDR( offset)); break;
@@ -1565,38 +1565,38 @@ UINT8 h8s_onchip_reg_read_8_ddr(h83xx_state *h8, int offset)
 			if (!(h8->per_regs[H8S_IO_SCR2] & H8S_SCR_TE)) data |= H8S_SSR_TDRE;
 		}
 		break;
-        #endif
+		#endif
 
-        case H8S_IO_IFR:
-            data = h8->per_regs[offset];
-            break;
+		case H8S_IO_IFR:
+			data = h8->per_regs[offset];
+			break;
 
-    // ports
-        case H8S_IO_PORT1 : case H8S_IO_PORT2 : case H8S_IO_PORT3 : case H8S_IO_PORT4 : case H8S_IO_PORT5 : case H8S_IO_PORT6 :
-        case H8S_IO_PORTA : case H8S_IO_PORTB : case H8S_IO_PORTC : case H8S_IO_PORTD : case H8S_IO_PORTE : case H8S_IO_PORTF :
-        case H8S_IO_PORTG :
-            {
-                int port = (offset - H8S_IO_PORT1);
-                data = h8->drs[port] & h8->ddrs[port];   // result = data register for DDR "1" bits, live read for DDR "0" bits
-                data |= (h8->io->read_byte(H8_PORT_1 + port) & (h8->ddrs[port] ^ 0xff));
-            }
-            break;
+	// ports
+		case H8S_IO_PORT1 : case H8S_IO_PORT2 : case H8S_IO_PORT3 : case H8S_IO_PORT4 : case H8S_IO_PORT5 : case H8S_IO_PORT6 :
+		case H8S_IO_PORTA : case H8S_IO_PORTB : case H8S_IO_PORTC : case H8S_IO_PORTD : case H8S_IO_PORTE : case H8S_IO_PORTF :
+		case H8S_IO_PORTG :
+			{
+				int port = (offset - H8S_IO_PORT1);
+				data = h8->drs[port] & h8->ddrs[port];   // result = data register for DDR "1" bits, live read for DDR "0" bits
+				data |= (h8->io->read_byte(H8_PORT_1 + port) & (h8->ddrs[port] ^ 0xff));
+			}
+			break;
 
 		// the manual is ambivalent, but the invqix code very much implies that reading DR also reads the pin states
-        case H8S_IO_P1DR : case H8S_IO_P2DR : case H8S_IO_P3DR : case H8S_IO_P5DR : case H8S_IO_P6DR :
-        case H8S_IO_PADR : case H8S_IO_PBDR : case H8S_IO_PCDR : case H8S_IO_PDDR : case H8S_IO_PEDR :
-        case H8S_IO_PFDR : case H8S_IO_PGDR :
-            {
-                int port = (offset - H8S_IO_P1DR);
-                data = h8->drs[port] & h8->ddrs[port];
-                data |= (h8->io->read_byte(H8_PORT_1 + port) & (h8->ddrs[port] ^ 0xff));
-            }
-            break;
+		case H8S_IO_P1DR : case H8S_IO_P2DR : case H8S_IO_P3DR : case H8S_IO_P5DR : case H8S_IO_P6DR :
+		case H8S_IO_PADR : case H8S_IO_PBDR : case H8S_IO_PCDR : case H8S_IO_PDDR : case H8S_IO_PEDR :
+		case H8S_IO_PFDR : case H8S_IO_PGDR :
+			{
+				int port = (offset - H8S_IO_P1DR);
+				data = h8->drs[port] & h8->ddrs[port];
+				data |= (h8->io->read_byte(H8_PORT_1 + port) & (h8->ddrs[port] ^ 0xff));
+			}
+			break;
 
 		// ADCSR
-		case H8S_IO_ADCSR:	data = ADCSR_ADF; break;
+		case H8S_IO_ADCSR:  data = ADCSR_ADF; break;
 
-        // TMR 0
+		// TMR 0
 		case H8S_IO_TCNT0 : data = h8s_tmr_x_read_tcnt( h8, 0); break;
 		// TMR 1
 		case H8S_IO_TCNT1 : data = h8s_tmr_x_read_tcnt( h8, 1); break;
@@ -1741,4 +1741,3 @@ UINT16 h8s2655_per_regs_read_16(h83xx_state *h8, int offset)
 {
 	return h8s_onchip_reg_read_16(h8, offset);
 }
-

@@ -53,7 +53,7 @@
 ***************************************************************************/
 
 
-#define MASTER_CLOCK		XTAL_21_4772MHz		/* Dumper notes poorly refers to a 21.?727 Xtal. */
+#define MASTER_CLOCK        XTAL_21_4772MHz     /* Dumper notes poorly refers to a 21.?727 Xtal. */
 
 
 #include "emu.h"
@@ -68,7 +68,7 @@ class big10_state : public driver_device
 public:
 	big10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_v9938(*this, "v9938") { }
+			m_v9938(*this, "v9938") { }
 
 	required_device<v9938_device> m_v9938;
 	UINT8 m_mux_data;
@@ -141,8 +141,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io, AS_IO, 8, big10_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(mux_r)			/* present in test mode */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")	/* coins and service */
+	AM_RANGE(0x00, 0x00) AM_READ(mux_r)         /* present in test mode */
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") /* coins and service */
 	AM_RANGE(0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD_LEGACY("aysnd", ay8910_r) /* Dip-Switches routes here. */
@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( big10 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE	/* Service Mode */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE    /* Service Mode */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_W) PORT_NAME("Payout")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
@@ -193,24 +193,24 @@ static INPUT_PORTS_START( big10 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Main Game Rate" )			PORT_DIPLOCATION("DSW1:4,3")
+	PORT_DIPNAME( 0x30, 0x30, "Main Game Rate" )            PORT_DIPLOCATION("DSW1:4,3")
 	PORT_DIPSETTING(    0x00, "60%" )
 	PORT_DIPSETTING(    0x10, "70%" )
 	PORT_DIPSETTING(    0x20, "80%" )
 	PORT_DIPSETTING(    0x30, "90%" )
-	PORT_DIPNAME( 0xC0, 0xc0, "Coinage (A=1; B=5; C=10)" )	PORT_DIPLOCATION("DSW1:2,1")
+	PORT_DIPNAME( 0xC0, 0xc0, "Coinage (A=1; B=5; C=10)" )  PORT_DIPLOCATION("DSW1:2,1")
 	PORT_DIPSETTING(    0x00, "x1" )
 	PORT_DIPSETTING(    0x40, "x2" )
 	PORT_DIPSETTING(    0x80, "x5" )
@@ -244,7 +244,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( big10, big10_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", big10_state, big10_interrupt, "screen", 0, 1)
@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)	/* guess */
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

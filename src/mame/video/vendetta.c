@@ -32,7 +32,7 @@ void esckids_tile_callback( running_machine &machine, int layer, int bank, int *
 void vendetta_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
 	vendetta_state *state = machine.driver_data<vendetta_state>();
-	int pri = (*color & 0x03e0) >> 4;	/* ??????? */
+	int pri = (*color & 0x03e0) >> 4;   /* ??????? */
 	if (pri <= state->m_layerpri[2])
 		*priority_mask = 0;
 	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])

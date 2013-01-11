@@ -146,4 +146,3 @@ DISCRETE_SOUND_EXTERN( polaris );
 extern const sn76477_interface lupin3_sn76477_interface;
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
-

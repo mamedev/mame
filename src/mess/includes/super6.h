@@ -15,32 +15,32 @@
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 
-#define Z80_TAG			"u30"
-#define Z80CTC_TAG		"u20"
-#define Z80DART_TAG		"u38"
-#define Z80DMA_TAG		"u21"
-#define Z80PIO_TAG		"u7"
-#define WD2793_TAG		"u27"
-#define BR1945_TAG		"u31"
-#define SCREEN_TAG		"screen"
-#define TERMINAL_TAG	"terminal"
+#define Z80_TAG         "u30"
+#define Z80CTC_TAG      "u20"
+#define Z80DART_TAG     "u38"
+#define Z80DMA_TAG      "u21"
+#define Z80PIO_TAG      "u7"
+#define WD2793_TAG      "u27"
+#define BR1945_TAG      "u31"
+#define SCREEN_TAG      "screen"
+#define TERMINAL_TAG    "terminal"
 
 class super6_state : public driver_device
 {
 public:
 	super6_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_dart(*this, Z80DART_TAG),
-		  m_dma(*this, Z80DMA_TAG),
-		  m_pio(*this, Z80PIO_TAG),
-		  m_fdc(*this, WD2793_TAG),
-		  m_brg(*this, BR1945_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, WD2793_TAG":0"),
-		  m_floppy1(*this, WD2793_TAG":1"),
-		  m_terminal(*this, TERMINAL_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_dart(*this, Z80DART_TAG),
+			m_dma(*this, Z80DMA_TAG),
+			m_pio(*this, Z80PIO_TAG),
+			m_fdc(*this, WD2793_TAG),
+			m_brg(*this, BR1945_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, WD2793_TAG":0"),
+			m_floppy1(*this, WD2793_TAG":1"),
+			m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

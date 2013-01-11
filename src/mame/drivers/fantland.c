@@ -182,8 +182,8 @@ READ8_MEMBER(fantland_state::borntofi_inputs_r)
 	switch (ioport("Controls")->read() & 0x03)
 	{
 		case 3:
-		case 1:	return ioport(offset ? "P2_GUN" : "P1_GUN")->read();	// Lightgun buttons
-		case 2:	return ioport(offset ? "P2_JOY" : "P1_JOY")->read();	// Joystick
+		case 1: return ioport(offset ? "P2_GUN" : "P1_GUN")->read();    // Lightgun buttons
+		case 2: return ioport(offset ? "P2_JOY" : "P1_JOY")->read();    // Joystick
 	}
 
 	// Trackball
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( wheelrun_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
 	AM_RANGE(0x70000, 0x7ffff) AM_ROM
 
-	AM_RANGE(0x52000, 0x521ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w	) AM_SHARE( "paletteram"	)
+	AM_RANGE(0x52000, 0x521ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w   ) AM_SHARE( "paletteram"    )
 
 	AM_RANGE(0x53000, 0x53000) AM_READ_PORT( "53000" ) AM_WRITE(borntofi_nmi_enable_w )
 	AM_RANGE(0x53001, 0x53001) AM_READ_PORT( "53001" )
@@ -343,9 +343,9 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 		// Play / Stop
 		switch(data)
 		{
-			case 0x00:		borntofi_adpcm_stop(msm, voice); break;
-			case 0x03:		borntofi_adpcm_start(msm, voice); break;
-			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", space.device().safe_pc(), reg, data);
+			case 0x00:      borntofi_adpcm_stop(msm, voice); break;
+			case 0x03:      borntofi_adpcm_start(msm, voice); break;
+			default:        logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", space.device().safe_pc(), reg, data);
 		}
 	}
 	else
@@ -416,10 +416,10 @@ static ADDRESS_MAP_START( wheelrun_sound_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r, ym3526_w )
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// on a car crash / hit
-	AM_RANGE(0xc000, 0xc000) AM_WRITENOP	// ""
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // on a car crash / hit
+	AM_RANGE(0xc000, 0xc000) AM_WRITENOP    // ""
 
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r )	// during NMI
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r )    // during NMI
 ADDRESS_MAP_END
 
 
@@ -435,7 +435,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( fantland )
-	PORT_START("a3000")	/* a3000 */
+	PORT_START("a3000") /* a3000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -448,14 +448,14 @@ static INPUT_PORTS_START( fantland )
 	/* a3001 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)	// used in test mode only
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)   // used in test mode only
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("a3002")	/* a3002 */
+	PORT_START("a3002") /* a3002 */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0002, DEF_STR( 3C_1C ) )
@@ -496,10 +496,10 @@ static INPUT_PORTS_START( fantland )
 	PORT_DIPSETTING(    0x2000, "1600k" )
 	PORT_DIPSETTING(    0x1000, "2400k" )
 	PORT_DIPSETTING(    0x0000, "3200k" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )	//unused?
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  //unused?
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )	//unused?
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )  //unused?
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -509,7 +509,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( galaxygn )
-	PORT_START("P1")	/* 53000 */
+	PORT_START("P1")    /* 53000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -519,7 +519,7 @@ static INPUT_PORTS_START( galaxygn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START("P2")	/* 53001 */
+	PORT_START("P2")    /* 53001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -529,7 +529,7 @@ static INPUT_PORTS_START( galaxygn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("DSW1")	/* 53002 */
+	PORT_START("DSW1")  /* 53002 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -539,10 +539,10 @@ static INPUT_PORTS_START( galaxygn )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	// Demo Sounds? doesn't work
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  // Demo Sounds? doesn't work
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	// Allow Continue? doesn't work
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  // Allow Continue? doesn't work
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )
@@ -570,10 +570,10 @@ static INPUT_PORTS_START( galaxygn )
 	PORT_DIPSETTING(    0x20, "20k" )
 	PORT_DIPSETTING(    0x10, "30k" )
 	PORT_DIPSETTING(    0x00, "40k" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	//unused?
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  //unused?
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	//unused?
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  //unused?
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -584,68 +584,68 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( borntofi )
-	PORT_START("P1_GUN")	/* 53000 (Lightgun) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_START("P1_GUN")    /* 53000 (Lightgun) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
 
-	PORT_START("P2_GUN")	/* 53001 (Lightgun) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_START("P2_GUN")    /* 53001 (Lightgun) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x03)
 
-	PORT_START("P1_TRACK")	/* 53000 (Trackball) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
+	PORT_START("P1_TRACK")  /* 53000 (Trackball) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START1 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
 
-	PORT_START("P2_TRACK")	/* 53001 (Trackball) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) PORT_PLAYER(2)
+	PORT_START("P2_TRACK")  /* 53001 (Trackball) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START2 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) PORT_PLAYER(2)
 
-	PORT_START("P1_JOY")	/* 53000 (Joystick) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_START("P1_JOY")    /* 53000 (Joystick) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
 
-	PORT_START("P2_JOY")	/* 53001 (Joystick) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
+	PORT_START("P2_JOY")    /* 53001 (Joystick) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x02)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x02) PORT_PLAYER(2)
 
-	PORT_START("DSW")	/* 53002 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_START("DSW")   /* 53002 */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
@@ -654,33 +654,33 @@ static INPUT_PORTS_START( borntofi )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("DSW1:6,7")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DSW1:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium_Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )	PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 //  PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START( "Controls" )	/* IN7 - 53003 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Controls ) )		PORT_DIPLOCATION("DSW2:1,2")
+	PORT_START( "Controls" )    /* IN7 - 53003 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Controls ) )     PORT_DIPLOCATION("DSW2:1,2")
 //  PORT_DIPSETTING(    0x01, "Lightgun" )
 	PORT_DIPSETTING(    0x03, "Lightgun" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Trackball ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x04, 0x04, "Sound Test" )		PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Sound Test" )        PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Free Bullets" )		PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Free Bullets" )      PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x0010, "DSW2:5" )
@@ -688,28 +688,28 @@ static INPUT_PORTS_START( borntofi )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x0040, "DSW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x0080, "DSW2:8" )
 
-	PORT_START("P1 Lightgun Y")		/* 57000 */
+	PORT_START("P1 Lightgun Y")     /* 57000 */
 	PORT_BIT( 0xff, 0xb0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (352.0 - 12) / 352, 12.0 / 352, 0) PORT_MINMAX(0x80,0xfc) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
-	PORT_START("P1 Lightgun X")		/* 57001 */
+	PORT_START("P1 Lightgun X")     /* 57001 */
 	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x07,0xb7) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
 
-	PORT_START("P2 Lightgun Y")		/* 57002 */
+	PORT_START("P2 Lightgun Y")     /* 57002 */
 	PORT_BIT( 0xff, 0xb0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (352.0 - 12) / 352, 12.0 / 352, 0) PORT_MINMAX(0x80,0xfc) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P2 Lightgun X")		/* 57003 */
+	PORT_START("P2 Lightgun X")     /* 57003 */
 	PORT_BIT( 0xff, 0x70, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x07,0xb7) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P1 Trackball Y")	/* 53000 */
+	PORT_START("P1 Trackball Y")    /* 53000 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
 
-	PORT_START("P1 Trackball X")	/* 53000 */
+	PORT_START("P1 Trackball X")    /* 53000 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
 
-	PORT_START("P2 Trackball Y")	/* 53001 */
+	PORT_START("P2 Trackball Y")    /* 53001 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-	PORT_START("P2 Trackball X")	/* 53001 */
+	PORT_START("P2 Trackball X")    /* 53001 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -724,15 +724,15 @@ CUSTOM_INPUT_MEMBER(fantland_state::wheelrun_wheel_r)
 	int delta = ioport(player ? "WHEEL1" : "WHEEL0")->read();
 	delta = (delta & 0x7f) - (delta & 0x80) + 4;
 
-	if		(delta > 7)	delta = 7;
-	else if	(delta < 1)	delta = 1;
+	if      (delta > 7) delta = 7;
+	else if (delta < 1) delta = 1;
 
 //  if (player == 0)    popmessage("%x",delta);
 	return delta;
 }
 
 static INPUT_PORTS_START( wheelrun )
-	PORT_START("53000")		/* 53000 */
+	PORT_START("53000")     /* 53000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -740,7 +740,7 @@ static INPUT_PORTS_START( wheelrun )
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fantland_state,wheelrun_wheel_r, (void *)0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("53001")		/* 53001 */
+	PORT_START("53001")     /* 53001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -748,7 +748,7 @@ static INPUT_PORTS_START( wheelrun )
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fantland_state,wheelrun_wheel_r, (void *)1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("53002")		/* 53002 */
+	PORT_START("53002")     /* 53002 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -771,7 +771,7 @@ static INPUT_PORTS_START( wheelrun )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("53003")		/* 53003 */
+	PORT_START("53003")     /* 53003 */
 	PORT_DIPNAME( 0xff, 0xdf, "Wheel Sensitivity" )
 	PORT_DIPSETTING(    0x7f, "0" )
 	PORT_DIPSETTING(    0xbf, "1" )
@@ -856,7 +856,7 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
 	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(8000))	// sound irq must feed the DAC at 8kHz
+	MCFG_QUANTUM_TIME(attotime::from_hz(8000))  // sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -926,23 +926,23 @@ MACHINE_CONFIG_END
 // OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
 static const msm5205_interface msm5205_config_0 =
 {
-	borntofi_adpcm_int_0,	/* IRQ handler */
-	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
+	borntofi_adpcm_int_0,   /* IRQ handler */
+	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 static const msm5205_interface msm5205_config_1 =
 {
-	borntofi_adpcm_int_1,	/* IRQ handler */
-	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
+	borntofi_adpcm_int_1,   /* IRQ handler */
+	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 static const msm5205_interface msm5205_config_2 =
 {
-	borntofi_adpcm_int_2,	/* IRQ handler */
-	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
+	borntofi_adpcm_int_2,   /* IRQ handler */
+	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 static const msm5205_interface msm5205_config_3 =
 {
-	borntofi_adpcm_int_3,	/* IRQ handler */
-	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
+	borntofi_adpcm_int_3,   /* IRQ handler */
+	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 
 MACHINE_START_MEMBER(fantland_state,borntofi)
@@ -1008,7 +1008,7 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)	// 54 Hz
+	MCFG_SCREEN_REFRESH_RATE(54)    // 54 Hz
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
@@ -1035,11 +1035,11 @@ static const ym3526_interface wheelrun_ym3526_interface =
 static MACHINE_CONFIG_START( wheelrun, fantland_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V20, XTAL_18MHz/2)		// D701080C-8 (V20)
+	MCFG_CPU_ADD("maincpu", V20, XTAL_18MHz/2)      // D701080C-8 (V20)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/2)		// Z8400BB1 (Z80B)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/2)     // Z8400BB1 (Z80B)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_sound_map)
 	// IRQ by YM3526, NMI when soundlatch is written
 
@@ -1096,19 +1096,19 @@ Fantasy.05, 06, 07 was read as if it was a 27c040
 ***************************************************************************/
 
 ROM_START( fantland )
-	ROM_REGION( 0x100000, "maincpu", 0 )					// Main CPU
+	ROM_REGION( 0x100000, "maincpu", 0 )                    // Main CPU
 	ROM_LOAD16_BYTE( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) )
 	ROM_LOAD16_BYTE( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) )
 	ROM_COPY( "maincpu",     0x00000, 0x40000, 0x40000 )
 	ROM_LOAD16_BYTE( "fantasyl.ev1", 0xe0000, 0x10000, CRC(70e0ee30) SHA1(5253213da56b3f97e2811f2b10927d0e542447f0) )
 	ROM_LOAD16_BYTE( "fantasyl.od1", 0xe0001, 0x10000, CRC(577b4bd7) SHA1(1f08202d99c3e39e0dd1ed4947b928b695a5b411) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 )					// Sound CPU
-	ROM_LOAD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) )	// samples (8 bit unsigned)
+	ROM_REGION( 0x100000, "audiocpu", 0 )                   // Sound CPU
+	ROM_LOAD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) )   // samples (8 bit unsigned)
 	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) )
 	ROM_COPY( "audiocpu",          0xc0000, 0xe0000, 0x20000 )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )	// Sprites
+	ROM_REGION( 0x480000, "gfx1", 0 )   // Sprites
 	ROMX_LOAD( "fantasyl.m00", 0x000000, 0x80000, CRC(82d819ff) SHA1(2b5b0759de8260eaa84ddded9dc2d12a6e0f5ec9) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.m01", 0x0c0000, 0x80000, CRC(70a94139) SHA1(689fbfa267d60821cde13d5dc2dfe1dea67b434a) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.05",  0x000002, 0x80000, CRC(62b9a00b) SHA1(ecd18e5e7a5e3535956fb693d2f7e35d2bb7ede9) , ROM_SKIP(2) )
@@ -1125,19 +1125,19 @@ ROM_END
 
 /* this dump had several roms half size however they all appear to be data & gfx roms, the main program looks ok */
 ROM_START( fantlanda )
-	ROM_REGION( 0x100000, "maincpu", 0 )					// Main CPU
+	ROM_REGION( 0x100000, "maincpu", 0 )                    // Main CPU
 	ROM_LOAD16_BYTE( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) ) // 04.bin (was first half only)
 	ROM_LOAD16_BYTE( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) ) // 03.bin (was first half only)
 	ROM_COPY( "maincpu",     0x00000, 0x40000, 0x40000 )
 	ROM_LOAD16_BYTE( "02.bin",       0xe0000, 0x10000, CRC(8b835eed) SHA1(6a6b3fe116145f685b91dcd5301165f17973697c) )
 	ROM_LOAD16_BYTE( "01.bin",       0xe0001, 0x10000, CRC(4fa3eb8b) SHA1(56da42a4e2972a696ef28811116cbc20bb5ba3e8) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 )					// Sound CPU
+	ROM_REGION( 0x100000, "audiocpu", 0 )                   // Sound CPU
 	ROM_LOAD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) ) // 05.bin (was first half only)
 	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) ) // 06.bin (was first half only)
 	ROM_COPY( "audiocpu",          0xc0000, 0xe0000, 0x20000 )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )	// Sprites
+	ROM_REGION( 0x480000, "gfx1", 0 )   // Sprites
 	ROMX_LOAD( "fantasyl.m00", 0x000000, 0x80000, CRC(82d819ff) SHA1(2b5b0759de8260eaa84ddded9dc2d12a6e0f5ec9) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.m01", 0x0c0000, 0x80000, CRC(70a94139) SHA1(689fbfa267d60821cde13d5dc2dfe1dea67b434a) , ROM_GROUPWORD | ROM_SKIP(1) )
 	ROMX_LOAD( "fantasyl.05",  0x000002, 0x80000, CRC(62b9a00b) SHA1(ecd18e5e7a5e3535956fb693d2f7e35d2bb7ede9) , ROM_SKIP(2) )
@@ -1157,19 +1157,19 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( galaxygn )
-	ROM_REGION( 0x100000, "maincpu", 0 )					// Main CPU
+	ROM_REGION( 0x100000, "maincpu", 0 )                    // Main CPU
 	ROM_LOAD( "gg03.bin", 0x10000, 0x10000, CRC(9e469189) SHA1(07e5d36ca9665bdd13e3bb4241d34b9042371b79) )
 	ROM_LOAD( "gg02.bin", 0x20000, 0x10000, CRC(b87a438f) SHA1(96c39cc4d51a2fc0779f148971220117967173c0) )
 	ROM_LOAD( "gg01.bin", 0xf0000, 0x10000, CRC(ad0e5b29) SHA1(f9a7ebce9f47a009af213e4e10811bb1c26f891a) )
 	ROM_COPY( "maincpu",0xf0000, 0x70000, 0x10000 )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 )					// Sound CPU
+	ROM_REGION( 0x100000, "audiocpu", 0 )                   // Sound CPU
 	ROM_LOAD( "gg20.bin", 0xc0000, 0x10000, CRC(f5c65a85) SHA1(a094fa9531ea4e68ec0a448568e7d4b2307c8185) )
 	ROM_COPY( "audiocpu", 0xc0000, 0xd0000, 0x10000 )
 	ROM_COPY( "audiocpu", 0xc0000, 0xe0000, 0x10000 )
 	ROM_COPY( "audiocpu", 0xc0000, 0xf0000, 0x10000 )
 
-	ROM_REGION( 0x1b0000, "gfx1", 0 )	// Sprites
+	ROM_REGION( 0x1b0000, "gfx1", 0 )   // Sprites
 	ROMX_LOAD( "gg54.bin", 0x000000, 0x10000, CRC(b3621119) SHA1(66ade772077e57f872ef1c8f45e244f4006023f0) , ROM_SKIP(2) )
 	ROMX_LOAD( "gg38.bin", 0x000001, 0x10000, CRC(52b70f3e) SHA1(65f11d5700337d6d9b6325ff70c86d076e1bdc26) , ROM_SKIP(2) )
 	ROMX_LOAD( "gg22.bin", 0x000002, 0x10000, CRC(ea49fee4) SHA1(29ae3e5dfade421a5e97efe5be1cb17862fdcea1) , ROM_SKIP(2) )
@@ -1380,7 +1380,7 @@ ROM_START( wheelrun )
 	ROM_COPY( "maincpu", 0x70000, 0xf0000, 0x10000 )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 ) // Z80
-	ROM_LOAD( "1.1", 0x00000, 0x10000, CRC(67b5f31f) SHA1(5553b132077686221fb7a21a0246fd55cb443332) )	// 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "1.1", 0x00000, 0x10000, CRC(67b5f31f) SHA1(5553b132077686221fb7a21a0246fd55cb443332) )   // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0xc0000, "gfx1",0 ) // gfx
 	ROMX_LOAD( "7.7",   0x00000, 0x10000, CRC(e0e5ff64) SHA1(e2ed5ea5b75ed627a9d305864196160267cad438), ROM_SKIP(2) )
@@ -1395,9 +1395,9 @@ ROM_START( wheelrun )
 	ROMX_LOAD( "13.13", 0x60001, 0x10000, CRC(8b0aae8d) SHA1(413821fdbf599004b57f3588360ccf881547e104), ROM_SKIP(2) )
 	ROMX_LOAD( "17.17", 0x60002, 0x10000, CRC(be8ab48d) SHA1(1520d70eb9c65f84deddc2d7c8de7ae2cbb1ec09), ROM_SKIP(2) )
 
-	ROMX_LOAD( "10.10", 0x90000, 0x10000, CRC(c5bdd367) SHA1(c432762d23b8799643fd5f1775a44d31582e7290), ROM_SKIP(2) )	// 1111xxxxxxxxxxxx = 0x00
+	ROMX_LOAD( "10.10", 0x90000, 0x10000, CRC(c5bdd367) SHA1(c432762d23b8799643fd5f1775a44d31582e7290), ROM_SKIP(2) )   // 1111xxxxxxxxxxxx = 0x00
 	ROMX_LOAD( "14.14", 0x90001, 0x10000, CRC(e592302f) SHA1(d4f668d259ec649e3126db27d990a2e5fa9cad8d), ROM_SKIP(2) )
-	ROMX_LOAD( "18.18", 0x90002, 0x10000, CRC(6bd42d8e) SHA1(0745428a54da85707d4435f20cc2094576a95e5b), ROM_SKIP(2) )	// 1111xxxxxxxxxxxx = 0x00
+	ROMX_LOAD( "18.18", 0x90002, 0x10000, CRC(6bd42d8e) SHA1(0745428a54da85707d4435f20cc2094576a95e5b), ROM_SKIP(2) )   // 1111xxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x144, "plds",0 ) // pals
 	ROM_LOAD( "pal16r6cn.pal3",        0x000, 0x104, NO_DUMP )

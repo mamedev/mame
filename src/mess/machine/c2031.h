@@ -31,11 +31,11 @@
 // ======================> c2031_device
 
 class c2031_device :  public device_t,
-					  public device_ieee488_interface
+						public device_ieee488_interface
 {
 public:
-    // construction/destruction
-    c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	DECLARE_READ8_MEMBER( via0_pa_r );
@@ -54,9 +54,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete() { m_shortname = "c2031"; }
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "c2031"; }
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_ieee488_interface overrides
@@ -72,13 +72,13 @@ protected:
 	required_device<legacy_floppy_image_device> m_image;
 
 	// IEEE-488 bus
-	int m_nrfd_out;				// not ready for data
-	int m_ndac_out;				// not data accepted
-	int m_atna;					// attention acknowledge
+	int m_nrfd_out;             // not ready for data
+	int m_ndac_out;             // not data accepted
+	int m_atna;                 // attention acknowledge
 
 	// interrupts
-	int m_via0_irq;				// VIA #0 interrupt request
-	int m_via1_irq;				// VIA #1 interrupt request
+	int m_via0_irq;             // VIA #0 interrupt request
+	int m_via1_irq;             // VIA #1 interrupt request
 };
 
 

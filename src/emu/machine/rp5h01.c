@@ -32,10 +32,10 @@ enum {
 struct rp5h01_state
 {
 	int counter;
-	int counter_mode;	/* test pin */
-	int enabled;		/* chip enable */
-	int old_reset;		/* reset pin state (level-triggered) */
-	int old_clock;		/* clock pin state (level-triggered) */
+	int counter_mode;   /* test pin */
+	int enabled;        /* chip enable */
+	int old_reset;      /* reset pin state (level-triggered) */
+	int old_clock;      /* clock pin state (level-triggered) */
 	UINT8 *data;
 };
 
@@ -256,5 +256,3 @@ void rp5h01_device::device_reset()
 {
 	DEVICE_RESET_NAME( rp5h01 )(this);
 }
-
-

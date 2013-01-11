@@ -105,8 +105,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mosaic_io_map, AS_IO, 8, mosaic_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_WRITENOP	/* Z180 internal registers */
-	AM_RANGE(0x30, 0x30) AM_READNOP	/* Z180 internal registers */
+	AM_RANGE(0x00, 0x3f) AM_WRITENOP    /* Z180 internal registers */
+	AM_RANGE(0x30, 0x30) AM_READNOP /* Z180 internal registers */
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x72, 0x72) AM_READWRITE(protection_r, protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
@@ -115,8 +115,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gfire2_io_map, AS_IO, 8, mosaic_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_WRITENOP	/* Z180 internal registers */
-	AM_RANGE(0x30, 0x30) AM_READNOP	/* Z180 internal registers */
+	AM_RANGE(0x00, 0x3f) AM_WRITENOP    /* Z180 internal registers */
+	AM_RANGE(0x30, 0x30) AM_READNOP /* Z180 internal registers */
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x72, 0x72) AM_READWRITE(gfire2_protection_r, gfire2_protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
@@ -221,7 +221,7 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,4),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{	RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+0, RGN_FRAC(0,4)+0,
+	{   RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+0, RGN_FRAC(0,4)+0,
 		RGN_FRAC(3,4)+8, RGN_FRAC(2,4)+8, RGN_FRAC(1,4)+8, RGN_FRAC(0,4)+8 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
@@ -264,7 +264,7 @@ void mosaic_state::machine_reset()
 static MACHINE_CONFIG_START( mosaic, mosaic_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, 7000000)	/* ??? */
+	MCFG_CPU_ADD("maincpu", Z180, 7000000)  /* ??? */
 	MCFG_CPU_PROGRAM_MAP(mosaic_map)
 	MCFG_CPU_IO_MAP(mosaic_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
@@ -305,7 +305,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( mosaic )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024k for Z180 address space */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
 	ROM_LOAD( "mosaic.9", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
@@ -322,7 +322,7 @@ ROM_START( mosaic )
 ROM_END
 
 ROM_START( mosaica )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024k for Z180 address space */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
 	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
@@ -339,7 +339,7 @@ ROM_START( mosaica )
 ROM_END
 
 ROM_START( gfire2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024k for Z180 address space */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
 	ROM_LOAD( "goldf2_i.7e",         0x00000, 0x10000, CRC(a102f7d0) SHA1(cfde51d0e9e69e9653fdfd70d4e4f4649b662005) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -360,4 +360,3 @@ ROM_END
 GAME( 1990, mosaic,  0,      mosaic, mosaic, driver_device, 0, ROT0, "Space", "Mosaic", 0 )
 GAME( 1990, mosaica, mosaic, mosaic, mosaic, driver_device, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", 0 )
 GAME( 1992, gfire2,  0,      gfire2, gfire2, driver_device, 0, ROT0, "Topis Corp", "Golden Fire II", 0 )
-

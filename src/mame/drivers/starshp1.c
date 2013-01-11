@@ -194,29 +194,29 @@ static INPUT_PORTS_START( starshp1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x20, 0x20, "Extended Play" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,starshp1_analog_r, NULL)	/* analog in */
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,starshp1_analog_r, NULL)   /* analog in */
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("COINAGE")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,collision_latch_r, NULL)	/* collision latch */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starshp1_state,collision_latch_r, NULL)   /* collision latch */
 	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* ground */
 
 	PORT_START("PLAYTIME")
 	PORT_DIPNAME( 0x3f, 0x20, "Play Time" ) /* potentiometer */
-	PORT_DIPSETTING(	0x00, "60 Seconds" )
-	PORT_DIPSETTING(	0x20, "90 Seconds" )
-	PORT_DIPSETTING(	0x3f, "120 Seconds" )
+	PORT_DIPSETTING(    0x00, "60 Seconds" )
+	PORT_DIPSETTING(    0x20, "90 Seconds" )
+	PORT_DIPSETTING(    0x3f, "120 Seconds" )
 
 	PORT_START("STICKY")
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(0,63) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
@@ -240,7 +240,7 @@ static const gfx_layout tilelayout =
 		0x0000, 0x0400, 0x0800, 0x0c00,
 		0x1000, 0x1400, 0x1800, 0x1c00
 	},
-	8	    /* step */
+	8       /* step */
 };
 
 
@@ -257,7 +257,7 @@ static const gfx_layout spritelayout =
 	{
 		0x00, 0x20, 0x40, 0x60, 0x80, 0xa0, 0xc0, 0xe0
 	},
-	0x100	/* step */
+	0x100   /* step */
 };
 
 static const UINT32 shiplayout_xoffset[64] =
@@ -338,14 +338,14 @@ ROM_START( starshp1 )
 	ROM_RELOAD(                      0xf800, 0x0800 )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "7513-01.n7",	 0x0000, 0x0400, CRC(8fb0045d) SHA1(fb311c6977dec6e2a04179406e9ffdb920989a47) )
+	ROM_LOAD( "7513-01.n7",  0x0000, 0x0400, CRC(8fb0045d) SHA1(fb311c6977dec6e2a04179406e9ffdb920989a47) )
 
 	ROM_REGION( 0x0100, "gfx2", 0 )
-	ROM_LOAD( "7515-01.j5",	 0x0000, 0x0100, CRC(fcbcbf2e) SHA1(adf3cc43b77ad18eddbe39ee11625e552d1abab9) )
+	ROM_LOAD( "7515-01.j5",  0x0000, 0x0100, CRC(fcbcbf2e) SHA1(adf3cc43b77ad18eddbe39ee11625e552d1abab9) )
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "7517-01.r1",	 0x0000, 0x0400, CRC(1531f85f) SHA1(291822614fc6d3a71bf56607c796e18779f8cfc9) )
-	ROM_LOAD( "7516-01.p1",	 0x0400, 0x0400, CRC(64fbfe4c) SHA1(b2dfdcc1c9927c693fe43b2e1411d0f14375fdeb) )
+	ROM_LOAD( "7517-01.r1",  0x0000, 0x0400, CRC(1531f85f) SHA1(291822614fc6d3a71bf56607c796e18779f8cfc9) )
+	ROM_LOAD( "7516-01.p1",  0x0400, 0x0400, CRC(64fbfe4c) SHA1(b2dfdcc1c9927c693fe43b2e1411d0f14375fdeb) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "7518-01.r10", 0x0000, 0x0100, CRC(80877f7e) SHA1(8b28f48936a4247c583ca6713bfbaf4772c7a4f5) ) /* video output */

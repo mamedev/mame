@@ -13,8 +13,8 @@
 #define NC_SCREEN_WIDTH        480
 #define NC_SCREEN_HEIGHT       64
 
-#define NC200_SCREEN_WIDTH		480
-#define NC200_SCREEN_HEIGHT		128
+#define NC200_SCREEN_WIDTH      480
+#define NC200_SCREEN_HEIGHT     128
 
 #define NC200_NUM_COLOURS 4
 

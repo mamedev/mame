@@ -219,24 +219,24 @@ WRITE8_MEMBER(maygay1b_state::m1_8279_w)
 		{
 			/* command 0: set mode */
 			/*
-                Display modes:
+			    Display modes:
 
-                00 = 8 x 8-bit character display -- left entry
-                01 = 16 x 8-bit character display -- left entry
-                10 = 8 x 8-bit character display -- right entry
-                11 = 16 x 8-bit character display -- right entry
+			    00 = 8 x 8-bit character display -- left entry
+			    01 = 16 x 8-bit character display -- left entry
+			    10 = 8 x 8-bit character display -- right entry
+			    11 = 16 x 8-bit character display -- right entry
 
-                Keyboard modes:
+			    Keyboard modes:
 
-                000 = Encoded scan keyboard -- 2 key lockout
-                001 = Decoded scan keyboard -- 2 key lockout
-                010 = Encoded scan keyboard -- N-key rollover
-                011 = Decoded scan keyboard -- N-key rollover
-                100 = Encoded scan sensor matrix
-                101 = Decoded scan sensor matrix
-                110 = Strobed input, encoded display scan
-                111 = Strobed input, decoded display scan
-            */
+			    000 = Encoded scan keyboard -- 2 key lockout
+			    001 = Decoded scan keyboard -- 2 key lockout
+			    010 = Encoded scan keyboard -- N-key rollover
+			    011 = Decoded scan keyboard -- N-key rollover
+			    100 = Encoded scan sensor matrix
+			    101 = Decoded scan sensor matrix
+			    110 = Strobed input, encoded display scan
+			    111 = Strobed input, decoded display scan
+			*/
 			case 0x00:
 				logerror("8279A: display mode = %d, keyboard mode = %d\n", (data >> 3) & 3, data & 7);
 				chip->mode = data & 0x1f;
@@ -378,24 +378,24 @@ WRITE8_MEMBER(maygay1b_state::m1_8279_2_w)
 		{
 			/* command 0: set mode */
 			/*
-                Display modes:
+			    Display modes:
 
-                00 = 8 x 8-bit character display -- left entry
-                01 = 16 x 8-bit character display -- left entry
-                10 = 8 x 8-bit character display -- right entry
-                11 = 16 x 8-bit character display -- right entry
+			    00 = 8 x 8-bit character display -- left entry
+			    01 = 16 x 8-bit character display -- left entry
+			    10 = 8 x 8-bit character display -- right entry
+			    11 = 16 x 8-bit character display -- right entry
 
-                Keyboard modes:
+			    Keyboard modes:
 
-                000 = Encoded scan keyboard -- 2 key lockout
-                001 = Decoded scan keyboard -- 2 key lockout
-                010 = Encoded scan keyboard -- N-key rollover
-                011 = Decoded scan keyboard -- N-key rollover
-                100 = Encoded scan sensor matrix
-                101 = Decoded scan sensor matrix
-                110 = Strobed input, encoded display scan
-                111 = Strobed input, decoded display scan
-            */
+			    000 = Encoded scan keyboard -- 2 key lockout
+			    001 = Decoded scan keyboard -- 2 key lockout
+			    010 = Encoded scan keyboard -- N-key rollover
+			    011 = Decoded scan keyboard -- N-key rollover
+			    100 = Encoded scan sensor matrix
+			    101 = Decoded scan sensor matrix
+			    110 = Strobed input, encoded display scan
+			    111 = Strobed input, decoded display scan
+			*/
 			case 0x00:
 				logerror("8279A: display mode = %d, keyboard mode = %d\n", (data >> 3) & 3, data & 7);
 				chip->mode = data & 0x1f;
@@ -470,7 +470,7 @@ static void m1_stepper_reset(running_machine &machine)
 
 void maygay1b_state::machine_reset()
 {
-	m_vfd->reset();	// reset display1
+	m_vfd->reset(); // reset display1
 	m_duart68681 = machine().device( "duart68681" );
 	m1_stepper_reset(machine());
 }
@@ -536,23 +536,23 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 {
 	int i;
 	for (i=0; i<8; i++)
-		if ( data & (1 << i) )		output_set_indexed_value("triac", i, data & (1 << i));
+		if ( data & (1 << i) )      output_set_indexed_value("triac", i, data & (1 << i));
 }
 
 static const pia6821_interface m1_pia_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_porta_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_portb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_porta_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_portb_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 // input ports for M1 board ////////////////////////////////////////
@@ -739,7 +739,7 @@ WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 	int i;
 
 	for (i=0; i<8; i++)
-	if ( data & (1 << i) )	MechMtr_update(i, data & (1 << i) );
+	if ( data & (1 << i) )  MechMtr_update(i, data & (1 << i) );
 }
 
 WRITE8_MEMBER(maygay1b_state::m1_latch_w)
@@ -933,5 +933,3 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 		}
 	}
 }
-
-

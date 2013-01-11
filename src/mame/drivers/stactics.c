@@ -57,30 +57,30 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
 {
 
 	/* if the motor is self-centering, but not centered yet */
-    return ((*m_motor_on & 0x01) == 0) &&
-    	   ((m_horiz_pos != 0) || (m_vert_pos != 0));
+	return ((*m_motor_on & 0x01) == 0) &&
+			((m_horiz_pos != 0) || (m_vert_pos != 0));
 }
 
 
 READ8_MEMBER(stactics_state::vert_pos_r)
 {
 
-    return 0x70 - m_vert_pos;
+	return 0x70 - m_vert_pos;
 }
 
 
 READ8_MEMBER(stactics_state::horiz_pos_r)
 {
 
-    return m_horiz_pos + 0x88;
+	return m_horiz_pos + 0x88;
 }
 
 
 static void move_motor(running_machine &machine, stactics_state *state)
 {
-	 /* monitor motor under joystick control */
-    if (*state->m_motor_on & 0x01)
-    {
+		/* monitor motor under joystick control */
+	if (*state->m_motor_on & 0x01)
+	{
 		int ip3 = machine.root_device().ioport("IN3")->read();
 		int ip4 = machine.root_device().ioport("FAKE")->read();
 
@@ -99,21 +99,21 @@ static void move_motor(running_machine &machine, stactics_state *state)
 		/* right */
 		if (((ip3 & 0x40) == 0) && (state->m_horiz_pos > -128))
 			state->m_horiz_pos--;
-    }
+	}
 
-	 /* monitor motor under self-centering control */
-    else
-    {
-        if (state->m_horiz_pos > 0)
-            state->m_horiz_pos--;
-        else if (state->m_horiz_pos < 0)
-            state->m_horiz_pos++;
+		/* monitor motor under self-centering control */
+	else
+	{
+		if (state->m_horiz_pos > 0)
+			state->m_horiz_pos--;
+		else if (state->m_horiz_pos < 0)
+			state->m_horiz_pos++;
 
-        if (state->m_vert_pos > 0)
-            state->m_vert_pos--;
-        else if (state->m_vert_pos < 0)
-            state->m_vert_pos++;
-    }
+		if (state->m_vert_pos > 0)
+			state->m_vert_pos--;
+		else if (state->m_vert_pos < 0)
+			state->m_vert_pos++;
+	}
 }
 
 
@@ -156,7 +156,7 @@ INTERRUPT_GEN_MEMBER(stactics_state::stactics_interrupt)
 
 	move_motor(machine(), this);
 
-    device.execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -168,33 +168,33 @@ INTERRUPT_GEN_MEMBER(stactics_state::stactics_interrupt)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, stactics_state )
-    AM_RANGE(0x0000, 0x2fff) AM_ROM
-    AM_RANGE(0x4000, 0x40ff) AM_MIRROR(0x0700) AM_RAM
-    AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ_PORT("IN0")
-    AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ_PORT("IN1")
-    AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(stactics_coin_lockout_w)
-    AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITENOP
-    AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("palette")
- /* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE_LEGACY(stactics_sound_w) */
-    AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("motor_on")  /* Note: This overlaps rocket sound */
-    AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("lamps")
-    AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE(stactics_speed_latch_w)
-    AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_trigger_w)
-    AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_flag_clear_w)
-    AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITEONLY AM_SHARE("display_buffer")
-    AM_RANGE(0x6070, 0x609f) AM_MIRROR(0x0f00) AM_WRITENOP
- /* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE_LEGACY(stactics_sound2_w) */
-    AM_RANGE(0x60f0, 0x60ff) AM_MIRROR(0x0f00) AM_WRITENOP
-    AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ_PORT("IN2")
-    AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ_PORT("IN3")
-    AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE(stactics_scroll_ram_w)
-    AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(vert_pos_r)
-    AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(horiz_pos_r)
-    AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("videoram_b")
-    AM_RANGE(0xc000, 0xcfff) AM_NOP
-    AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram_d")
-    AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("videoram_e")
-    AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram_f")
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x4000, 0x40ff) AM_MIRROR(0x0700) AM_RAM
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ_PORT("IN0")
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ_PORT("IN1")
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(stactics_coin_lockout_w)
+	AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITENOP
+	AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("palette")
+	/* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE_LEGACY(stactics_sound_w) */
+	AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("motor_on")  /* Note: This overlaps rocket sound */
+	AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITEONLY AM_SHARE("lamps")
+	AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE(stactics_speed_latch_w)
+	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_trigger_w)
+	AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_flag_clear_w)
+	AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITEONLY AM_SHARE("display_buffer")
+	AM_RANGE(0x6070, 0x609f) AM_MIRROR(0x0f00) AM_WRITENOP
+	/* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE_LEGACY(stactics_sound2_w) */
+	AM_RANGE(0x60f0, 0x60ff) AM_MIRROR(0x0f00) AM_WRITENOP
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ_PORT("IN2")
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ_PORT("IN3")
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE(stactics_scroll_ram_w)
+	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(vert_pos_r)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(horiz_pos_r)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("videoram_b")
+	AM_RANGE(0xc000, 0xcfff) AM_NOP
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram_d")
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("videoram_e")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram_f")
 ADDRESS_MAP_END
 
 
@@ -206,71 +206,71 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( stactics )
-    PORT_START("IN0")	/*  IN0 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 )
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,get_motor_not_ready, NULL)
+	PORT_START("IN0")   /*  IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,get_motor_not_ready, NULL)
 
-    PORT_START("IN1")	/* IN1 */
-    PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-    PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-    PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(    0x28, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-    PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
-    PORT_DIPNAME( 0x40, 0x00, "High Score Initial Entry" )
-    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN1")   /* IN1 */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x40, 0x00, "High Score Initial Entry" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-    PORT_START("IN2")	/* IN2 */
-    PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,get_rng, NULL)
-    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,stactics_get_frame_count_d3, NULL)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
-    PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_START("IN2")   /* IN2 */
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,get_rng, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,stactics_get_frame_count_d3, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-    PORT_START("IN3")	/* IN3 */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,stactics_get_shot_standby, NULL)
-    PORT_DIPNAME( 0x04, 0x04, "Number of Barriers" )
-    PORT_DIPSETTING(    0x04, "4" )
-    PORT_DIPSETTING(    0x00, "6" )
-    PORT_DIPNAME( 0x08, 0x08, "Bonus Barriers" )
-    PORT_DIPSETTING(    0x08, "1" )
-    PORT_DIPSETTING(    0x00, "2" )
-    PORT_DIPNAME( 0x10, 0x00, "Extended Play" )
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,stactics_get_not_shot_arrive, NULL)
+	PORT_START("IN3")   /* IN3 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,stactics_get_shot_standby, NULL)
+	PORT_DIPNAME( 0x04, 0x04, "Number of Barriers" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x08, 0x08, "Bonus Barriers" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x10, 0x00, "Extended Play" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state,stactics_get_not_shot_arrive, NULL)
 
-	PORT_START("FAKE")	/* FAKE */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_START("FAKE")  /* FAKE */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 INPUT_PORTS_END
 
 

@@ -151,11 +151,11 @@ INTERRUPT_GEN_MEMBER(skydiver_state::skydiver_interrupt)
 
 	/* Convert range data to divide value and write to sound */
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-	discrete_sound_w(discrete, space, SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
+	discrete_sound_w(discrete, space, SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);   // Range 0-2
 
-	discrete_sound_w(discrete, space, SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);		// Range 3 - note disable
-	discrete_sound_w(discrete, space, SKYDIVER_NOTE_DATA, ~m_videoram[0x395] & 0xff);		// Note - freq
-	discrete_sound_w(discrete, space, SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
+	discrete_sound_w(discrete, space, SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);       // Range 3 - note disable
+	discrete_sound_w(discrete, space, SKYDIVER_NOTE_DATA, ~m_videoram[0x395] & 0xff);       // Note - freq
+	discrete_sound_w(discrete, space, SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);  // NAM - Noise Amplitude
 
 	if (m_nmion)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -192,8 +192,8 @@ WRITE8_MEMBER(skydiver_state::skydiver_whistle_w)
 static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8, skydiver_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x4300) AM_READWRITE(skydiver_wram_r, skydiver_wram_w)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_RAM		/* RAM B1 */
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(skydiver_videoram_w) AM_SHARE("videoram")		/* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_RAM       /* RAM B1 */
+	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(skydiver_videoram_w) AM_SHARE("videoram")       /* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
 	AM_RANGE(0x0800, 0x0801) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_s_w)
 	AM_RANGE(0x0802, 0x0803) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_k_w)
 	AM_RANGE(0x0804, 0x0805) AM_MIRROR(0x47f0) AM_WRITE(skydiver_start_lamp_1_w)
@@ -249,13 +249,13 @@ static INPUT_PORTS_START( skydiver )
 
 	PORT_START("IN2")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* Jump 1 */
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* Chute 1 */
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* Jump 1 */
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* Chute 1 */
 
 	PORT_START("IN3")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	/* Jump 2 */
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	/* Chute 2 */
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* Jump 2 */
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* Chute 2 */
 
 	PORT_START("IN4")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -354,9 +354,9 @@ static const gfx_layout motion_layout =
 	1,
 	{ 0 },
 	{ 4, 5, 6, 7, 4 + 0x400*8, 5 + 0x400*8, 6 + 0x400*8, 7 + 0x400*8,
-	  12, 13, 14, 15, 12 + 0x400*8, 13 + 0x400*8, 14 + 0x400*8, 15 + 0x400*8 },
+		12, 13, 14, 15, 12 + 0x400*8, 13 + 0x400*8, 14 + 0x400*8, 15 + 0x400*8 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-	  8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	8*32
 };
 
@@ -377,10 +377,10 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( skydiver, skydiver_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */
+	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)     /* ???? */
 	MCFG_CPU_PROGRAM_MAP(skydiver_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(skydiver_state, skydiver_interrupt,  5*60)
-	MCFG_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
+	MCFG_WATCHDOG_VBLANK_INIT(8)    // 128V clocks the same as VBLANK
 
 
 	/* video hardware */

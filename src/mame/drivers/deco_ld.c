@@ -117,14 +117,14 @@ class deco_ld_state : public driver_device
 public:
 	deco_ld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_audiocpu(*this, "audiocpu"),
-		  m_laserdisc(*this, "laserdisc"),
-		  m_vram0(*this, "vram0"),
-		  m_attr0(*this, "attr0"),
-		  m_vram1(*this, "vram1"),
-		  m_attr1(*this, "attr1")
-		  { }
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_laserdisc(*this, "laserdisc"),
+			m_vram0(*this, "vram0"),
+			m_attr0(*this, "attr0"),
+			m_vram1(*this, "vram1"),
+			m_attr1(*this, "attr1")
+			{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -156,13 +156,13 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int i,spr_offs,x,y,col,fx,fy;
 
 	/*
-    [+0] ---- -x-- flip X
-    [+0] ---- --x- flip Y
-    [+0] ---- ---x enable this sprite
-    [+1] tile number
-    [+2] y coord
-    [+3] x coord
-    */
+	[+0] ---- -x-- flip X
+	[+0] ---- --x- flip Y
+	[+0] ---- ---x enable this sprite
+	[+1] tile number
+	[+2] y coord
+	[+3] x coord
+	*/
 
 	for(i=0;i<0x20;i+=4)
 	{

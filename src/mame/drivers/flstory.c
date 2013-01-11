@@ -69,11 +69,11 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(flstory_mcu_r, flstory_mcu_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_WRITENOP	/* coin lock out? */
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
+	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_NOP	/* unknown */
+	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
@@ -87,19 +87,19 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM	/* work RAM */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(onna34ro_mcu_r, onna34ro_mcu_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_WRITENOP	/* coin lock out? */
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
+	AM_RANGE(0xd002, 0xd002) AM_WRITENOP    /* coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_NOP	/* unknown */
+	AM_RANGE(0xd403, 0xd403) AM_NOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
@@ -126,10 +126,10 @@ CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_NOP	/* unknown read & coin lock out? */
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
+	AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
@@ -138,14 +138,14 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")	/* also mcu */
+	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")   /* also mcu */
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
-	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
+	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
@@ -175,15 +175,15 @@ READ8_MEMBER(flstory_state::rumba_mcu_r)
 		case 0x42:
 		{
 			/* TODO: subtle behaviour for transitioning from level 16 to level 17 (loop clear?). Command is:
-            0xc0 -> param -> 0xc1 -> param -> ... 0xc7 -> param -> 0x0e (end of packet) then reads at 0x40 -> 0x41 and 0x42
+			0xc0 -> param -> 0xc1 -> param -> ... 0xc7 -> param -> 0x0e (end of packet) then reads at 0x40 -> 0x41 and 0x42
 
-            Params written doesn't make any sense, they are copies from RAM addresses at 0xe450-7 and they looks like ... garbage.
-            It's possible that all of this it just increments by one an internal RAM address in the MCU and then it sends a six when this counter
-            has bits 0-3 == 0 (BCD operation?), but then the question is ... how it determines game over?
+			Params written doesn't make any sense, they are copies from RAM addresses at 0xe450-7 and they looks like ... garbage.
+			It's possible that all of this it just increments by one an internal RAM address in the MCU and then it sends a six when this counter
+			has bits 0-3 == 0 (BCD operation?), but then the question is ... how it determines game over?
 
-            According to a PCB test, game should roll back to level 1 layout but level counter should say "17" instead of current "11". Some of these ports also appears to control
-            game-play speed and who is playing between player 1 and 2.
-            */
+			According to a PCB test, game should roll back to level 1 layout but level counter should say "17" instead of current "11". Some of these ports also appears to control
+			game-play speed and who is playing between player 1 and 2.
+			*/
 			//static UINT8 level_val;
 
 			//level_val = read_byte(0xe247);
@@ -221,8 +221,8 @@ WRITE8_MEMBER(flstory_state::rumba_mcu_w)
 			case 0xb0: // counter, used by command 0xb1 (and something else?
 			{
 				/*
-                sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
-                */
+				sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
+				*/
 
 				m_mcu_counter = data;
 
@@ -245,8 +245,8 @@ WRITE8_MEMBER(flstory_state::rumba_mcu_w)
 			case 0xb2: // player sprite hook-up param when he throws the wheel
 			{
 				/*
-                sends 0xb2 -> param -> 0x02 (end of cmd packet?) then 0x33 for reply
-                */
+				sends 0xb2 -> param -> 0x02 (end of cmd packet?) then 0x33 for reply
+				*/
 
 				switch(data)
 				{
@@ -260,8 +260,8 @@ WRITE8_MEMBER(flstory_state::rumba_mcu_w)
 			case 0xbb: // when you start a level, lives
 			{
 				/*
-                sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
-                */
+				sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
+				*/
 
 				m_mcu_bb_res = data;
 				//printf("PC=%04x W %02x -> %02x\n",space.device().safe_pc(),m_mcu_cmd,data);
@@ -274,8 +274,8 @@ WRITE8_MEMBER(flstory_state::rumba_mcu_w)
 				//popmessage("%02x",m_mcu_b4_cmd);
 
 				/*
-                sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
-                */
+				sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
+				*/
 
 				#if 0
 				switch(data)
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_SHARE("videoram")
 //  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(rumba_mcu_r, rumba_mcu_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP    /* watchdog? */
 //  AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")	/* also mcu */
+	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")   /* also mcu */
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
@@ -362,9 +362,9 @@ MACHINE_RESET_MEMBER(flstory_state,ta7630)
 {
 	int i;
 
-	double db			= 0.0;
-	double db_step		= 1.50;	/* 1.50 dB step (at least, maybe more) */
-	double db_step_inc	= 0.125;
+	double db           = 0.0;
+	double db_step      = 1.50; /* 1.50 dB step (at least, maybe more) */
+	double db_step_inc  = 0.125;
 	for (i = 0; i < 16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
@@ -375,7 +375,7 @@ MACHINE_RESET_MEMBER(flstory_state,ta7630)
 	}
 
 	/* for (i = 0; i < 8; i++)
-        logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i)); */
+	    logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i)); */
 /*
   channels 0-2 AY#0
   channels 3,4 MSM5232 group1,group2
@@ -392,10 +392,10 @@ WRITE8_MEMBER(flstory_state::sound_control_0_w)
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(1, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(2, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	sound->set_output_gain(1, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	sound->set_output_gain(2, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
+	sound->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
 WRITE8_MEMBER(flstory_state::sound_control_1_w)
@@ -406,10 +406,10 @@ WRITE8_MEMBER(flstory_state::sound_control_1_w)
 	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	sound->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	sound->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	sound->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
 WRITE8_MEMBER(flstory_state::sound_control_2_w)
@@ -423,7 +423,7 @@ WRITE8_MEMBER(flstory_state::sound_control_2_w)
 	device_sound_interface *sound;
 	device->interface(sound);
 	for (i = 0; i < 3; i++)
-		sound->set_output_gain(i, m_vol_ctrl[(m_snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
+		sound->set_output_gain(i, m_vol_ctrl[(m_snd_ctrl2 >> 4) & 15] / 100.0); /* ym2149f all */
 }
 
 WRITE8_MEMBER(flstory_state::sound_control_3_w)/* unknown */
@@ -442,10 +442,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r) AM_WRITE(to_main_w)
-	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w)			/* unknown read*/
+	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w)          /* unknown read*/
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_device, write_unsigned8)	/* signed 8-bit DAC &  unknown read */
-	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
+	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_device, write_unsigned8) /* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xe000, 0xefff) AM_ROM                                         /* space for diagnostics ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flstory_m68705_map, AS_PROGRAM, 8, flstory_state )
@@ -485,7 +485,7 @@ static INPUT_PORTS_START( flstory )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x18, "5" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x20, 0x20, "Debug Mode" )			// Check code at 0x0679
+	PORT_DIPNAME( 0x20, 0x20, "Debug Mode" )            // Check code at 0x0679
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
@@ -539,9 +539,9 @@ static INPUT_PORTS_START( flstory )
 	PORT_DIPNAME( 0x10, 0x10, "Attract Animation" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Leave Off")				// Check code at 0x7859
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )			// (must be OFF or the game will
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )			// hang after the game is over !)
+	PORT_DIPNAME( 0x20, 0x20, "Leave Off")              // Check code at 0x7859
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )          // (must be OFF or the game will
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )           // hang after the game is over !)
 	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -556,8 +556,8 @@ static INPUT_PORTS_START( flstory )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* "BAD IO" if low */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* "BAD IO" if low */
 
 	PORT_START("P1")      /* D804 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -667,8 +667,8 @@ static INPUT_PORTS_START( onna34ro )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "BAD IO" if low */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* "BAD IO" if low */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* "BAD IO" if low */
 
 	PORT_START("P1")      /* D804 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -768,8 +768,8 @@ static INPUT_PORTS_START( victnine )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P1")      /* D804 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    // A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    // C
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -779,8 +779,8 @@ static INPUT_PORTS_START( victnine )
 
 	PORT_START("EXTRA_P1")      /* D805 */
 	/* bits 0,1 are MCU related:
-        - bit 0: mcu is ready to receive data from main cpu
-        - bit 1: mcu has sent data to the main cpu       */
+	    - bit 0: mcu is ready to receive data from main cpu
+	    - bit 1: mcu has sent data to the main cpu       */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, flstory_state,victnine_mcu_status_bit01_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
@@ -790,8 +790,8 @@ static INPUT_PORTS_START( victnine )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")      /* D806 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL	// A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL	// C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL  // A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // C
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -827,12 +827,12 @@ static INPUT_PORTS_START( rumba )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "6")
-    PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 	PORT_DIPNAME(0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(   0x80, DEF_STR( Cocktail ) )
@@ -875,30 +875,30 @@ static INPUT_PORTS_START( rumba )
 	PORT_DIPSETTING(   0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW2")      /* D802 */
-    PORT_DIPNAME( 0x01,   0x01, "Training Stage" )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01,   0x01, "Training Stage" )
+	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04,   0x00, DEF_STR( Language ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( Japanese ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( English ) )
-    PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20,   0x20, "Copyright String" )
-    PORT_DIPSETTING(      0x20, "Taito Corp. MCMLXXXIV" )
-    PORT_DIPSETTING(      0x00, "Taito Corporation" )
-    PORT_DIPNAME( 0x40,   0x40, "Infinite Lives" ) //???
-    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04,   0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(      0x04, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( English ) )
+	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20,   0x20, "Copyright String" )
+	PORT_DIPSETTING(      0x20, "Taito Corp. MCMLXXXIV" )
+	PORT_DIPSETTING(      0x00, "Taito Corporation" )
+	PORT_DIPNAME( 0x40,   0x40, "Infinite Lives" ) //???
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")      /* D803 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -911,8 +911,8 @@ static INPUT_PORTS_START( rumba )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P1")      /* D804 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    // A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    // C
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -922,8 +922,8 @@ static INPUT_PORTS_START( rumba )
 
 	PORT_START("EXTRA_P1")      /* D805 */
 	/* bits 0,1 are MCU related:
-        - bit 0: mcu is ready to receive data from main cpu
-        - bit 1: mcu has sent data to the main cpu       */
+	    - bit 0: mcu is ready to receive data from main cpu
+	    - bit 1: mcu has sent data to the main cpu       */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, flstory_state,victnine_mcu_status_bit01_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -933,8 +933,8 @@ static INPUT_PORTS_START( rumba )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")      /* D806 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL	// A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL	// C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL  // A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // C
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -996,7 +996,7 @@ static const ay8910_interface ay8910_config =
 
 static const msm5232_interface msm5232_config =
 {
-	{ 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6 },	/* 1.0 uF capacitors (verified on real PCB) */
+	{ 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6 }, /* 1.0 uF capacitors (verified on real PCB) */
 	DEVCB_NULL
 };
 
@@ -1085,13 +1085,13 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_8MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)	/* IRQ generated by ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
-	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)	/* verified on pcb */
+	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(flstory_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
@@ -1117,14 +1117,14 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -1136,19 +1136,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( onna34ro, flstory_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,10733000/2)		/* ??? */
+	MCFG_CPU_ADD("maincpu", Z80,10733000/2)     /* ??? */
 	MCFG_CPU_PROGRAM_MAP(onna34ro_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)	/* IRQ generated by ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
 //  MCFG_CPU_ADD("mcu", M68705,4000000)  /* ??? */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
@@ -1174,14 +1174,14 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -1193,19 +1193,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( victnine, flstory_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)		/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(victnine_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)	/* IRQ generated by ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
 //  MCFG_CPU_ADD("mcu", M68705,4000000)  /* ??? */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
@@ -1231,14 +1231,14 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -1256,19 +1256,19 @@ MACHINE_RESET_MEMBER(flstory_state,rumba)
 static MACHINE_CONFIG_START( rumba, flstory_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)		/* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(rumba_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)	/* IRQ generated by ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
 //  MCFG_CPU_ADD("mcu", M68705,18432000/6)  /* ??? */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,rumba)
 
@@ -1294,14 +1294,14 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
 	MCFG_SOUND_CONFIG(msm5232_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
@@ -1317,16 +1317,16 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( flstory )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
 	ROM_LOAD( "cpu-a45.15",   0x0000, 0x4000, CRC(f03fc969) SHA1(c8dd25ca25fd413b1a29bd4e58ce5820e5f852b2) )
 	ROM_LOAD( "cpu-a45.16",   0x4000, 0x4000, CRC(311aa82e) SHA1(c2dd806f70ea917818ec844a275fb2fecc2e6c19) )
 	ROM_LOAD( "cpu-a45.17",   0x8000, 0x4000, CRC(a2b5d17d) SHA1(0198d048aedcbd2498d490a5c0c506f8fc66ed03) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "snd.22",       0x0000, 0x2000, CRC(d58b201d) SHA1(1c9c2936ec95a8fa920d58668bea420c5e15008f) )
 	ROM_LOAD( "snd.23",       0x2000, 0x2000, CRC(25e7fd9d) SHA1(b9237459e3d8acf8502a693914e50714a37d515e) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a45.mcu",      0x0000, 0x0800, CRC(5378253c) SHA1(e1ae1ab01e470b896c1d74ad4088928602a21a1b) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
@@ -1341,16 +1341,16 @@ ROM_START( flstory )
 ROM_END
 
 ROM_START( flstoryj )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
 	ROM_LOAD( "cpu-a45.15",   0x0000, 0x4000, CRC(f03fc969) SHA1(c8dd25ca25fd413b1a29bd4e58ce5820e5f852b2) )
 	ROM_LOAD( "cpu-a45.16",   0x4000, 0x4000, CRC(311aa82e) SHA1(c2dd806f70ea917818ec844a275fb2fecc2e6c19) )
 	ROM_LOAD( "cpu-a45.17",   0x8000, 0x4000, CRC(a2b5d17d) SHA1(0198d048aedcbd2498d490a5c0c506f8fc66ed03) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a45_12.8",     0x0000, 0x2000, CRC(d6f593fb) SHA1(8551ef22c2cdd9df8d7949a178883f56ea56a4a2) )
 	ROM_LOAD( "a45_13.9",     0x2000, 0x2000, CRC(451f92f9) SHA1(f4196e6d3420983b74001303936d086a48b10827) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a45.mcu",      0x0000, 0x0800, CRC(5378253c) SHA1(e1ae1ab01e470b896c1d74ad4088928602a21a1b) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
@@ -1365,19 +1365,19 @@ ROM_START( flstoryj )
 ROM_END
 
 ROM_START( onna34ro )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
 	ROM_LOAD( "a52-01-1.40c", 0x0000, 0x4000, CRC(ffddcb02) SHA1(d7002e8a577a5f9c2f63ec8d93076cd720443e05) )
 	ROM_LOAD( "a52-02-1.41c", 0x4000, 0x4000, CRC(da97150d) SHA1(9b18f4d0bff811e332f6d2e151c7583400d60f23) )
 	ROM_LOAD( "a52-03-1.42c", 0x8000, 0x4000, CRC(b9749a53) SHA1(15fd9624a500512f7b2c6766ed96f3734f61f160) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a52-12.08s",   0x0000, 0x2000, CRC(28f48096) SHA1(20aa5041cd71003e0981c32e34005bcbad53f707) )
 	ROM_LOAD( "a52-13.09s",   0x2000, 0x2000, CRC(4d3b16f3) SHA1(8687b76398da875f69e9565277f00478c2b82a99) )
 	ROM_LOAD( "a52-14.10s",   0x4000, 0x2000, CRC(90a6f4e8) SHA1(101767a90e963f3031e0830fd25a537ca8296de9) )
 	ROM_LOAD( "a52-15.37s",   0x6000, 0x2000, CRC(5afc21d0) SHA1(317d5fb3a48ce5e13e02c5c6431fa08ada115d27) )
 	ROM_LOAD( "a52-16.38s",   0x8000, 0x2000, CRC(ccf42aee) SHA1(a6eb01c5384724999631b55700dade430b71ca95) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "cpu2", 0 ) /* 2k for the microcontroller */
 	ROM_LOAD( "a52-17.54c",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
@@ -1392,19 +1392,19 @@ ROM_START( onna34ro )
 ROM_END
 
 ROM_START( onna34roa )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
 	ROM_LOAD( "ry-08.rom",    0x0000, 0x4000, CRC(e4587b85) SHA1(2fc4439953dd086eac11ba6d7937d8075fc39639) )
 	ROM_LOAD( "ry-07.rom",    0x4000, 0x4000, CRC(6ffda515) SHA1(429e7bb22c66eb3c6d31981c2021af61c44ed51b) )
 	ROM_LOAD( "ry-06.rom",    0x8000, 0x4000, CRC(6fefcda8) SHA1(f532e254a8bd7372bd9f8f21c907e44e0f5f4f32) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a52-12.08s",   0x0000, 0x2000, CRC(28f48096) SHA1(20aa5041cd71003e0981c32e34005bcbad53f707) )
 	ROM_LOAD( "a52-13.09s",   0x2000, 0x2000, CRC(4d3b16f3) SHA1(8687b76398da875f69e9565277f00478c2b82a99) )
 	ROM_LOAD( "a52-14.10s",   0x4000, 0x2000, CRC(90a6f4e8) SHA1(101767a90e963f3031e0830fd25a537ca8296de9) )
 	ROM_LOAD( "a52-15.37s",   0x6000, 0x2000, CRC(5afc21d0) SHA1(317d5fb3a48ce5e13e02c5c6431fa08ada115d27) )
 	ROM_LOAD( "a52-16.38s",   0x8000, 0x2000, CRC(ccf42aee) SHA1(a6eb01c5384724999631b55700dade430b71ca95) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "cpu2", 0 ) /* 2k for the microcontroller */
 	ROM_LOAD( "a52-17.54c",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
@@ -1503,7 +1503,7 @@ A16_11-1.91     4DD6h
 */
 
 ROM_START( victnine )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
 	ROM_LOAD( "a16-19.1",     0x0000, 0x2000, CRC(deb7c439) SHA1(e87c8f95bc31d8450a3deed7a14b5fe139778d47) )
 	ROM_LOAD( "a16-20.2",     0x2000, 0x2000, CRC(60cdb6ae) SHA1(65f09ef624d758b138a87c4cc80bc3539cc89507) )
 	ROM_LOAD( "a16-21.3",     0x4000, 0x2000, CRC(121bea03) SHA1(4925b56a3f5725f1e00bd6aa87949aca5caf476b) )
@@ -1511,7 +1511,7 @@ ROM_START( victnine )
 	ROM_LOAD( "a16-23.5",     0x8000, 0x2000, CRC(95fe9cb7) SHA1(cfd7c0123940f680365500a516c8435330ed5f60) )
 	ROM_LOAD( "a16-24.6",     0xa000, 0x2000, CRC(32b5c155) SHA1(34d25f3d4fae580757b69431b8b58f6f86d2282e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a16-12.8",     0x0000, 0x2000, CRC(4b9bff43) SHA1(4bcd52d6d72213f8fa7b544dbdd344312a9e2115) )
 	ROM_LOAD( "a16-13.9",     0x2000, 0x2000, CRC(355121b9) SHA1(69cbe31eed53456f49a81c37b6661f7ba4a72fa6) )
 	ROM_LOAD( "a16-14.10",    0x4000, 0x2000, CRC(0f33ef4d) SHA1(6916016d7cf43870d2e19fc1e6f1b20e48e07d76) )
@@ -1519,7 +1519,7 @@ ROM_START( victnine )
 	ROM_LOAD( "a16-16.38",    0x8000, 0x2000, CRC(9395351b) SHA1(8f97bdf03dec47bcaaa62fb66c545566776116be) )
 	ROM_LOAD( "a16-17.39",    0xa000, 0x2000, CRC(872270b3) SHA1(2298cb8ced6c3e9afb430faab1b38ba8f2fa93b5) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "cpu2", 0 ) /* 2k for the microcontroller */
 	ROM_LOAD( "a16-18.mcu",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_INVERT )
@@ -1578,17 +1578,17 @@ Dumped by Corrado Tomaselli on 9/12/2010
 */
 
 ROM_START( rumba )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
 	ROM_LOAD( "a23_01-1.bin",   0x0000, 0x4000, CRC(4bea6e18) SHA1(b9a85e65105773b5f93dcc5fc1e7c588b2d25056) )
 	ROM_LOAD( "a23_02-1.bin",   0x4000, 0x4000, CRC(08f98c6f) SHA1(f2a850b1138cfefab6ff1d1adcda9e084f52e9c2) )
 	ROM_LOAD( "a23_03-1.bin",   0x8000, 0x4000, CRC(ab595427) SHA1(1ff51740e1c7915e1f79a55801d11c8fdce764c8) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a23_08-1.bin",     0x0000, 0x2000, CRC(a18eae00) SHA1(6ac1ad07bb5a97c6edaaf0e1fb842e1741f4cf1e) )
 	ROM_LOAD( "a23_09.bin",       0x2000, 0x2000, CRC(d0a101d3) SHA1(c92bb1ce67bec394fd8ce303d9e61eac12493b5d) )
 	ROM_LOAD( "a23_10.bin",       0x4000, 0x2000, CRC(f9447bd4) SHA1(68c02249ca0e5b923cddb4bff8d090963b9c78e4) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a23-11.mc68705p5s", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT )

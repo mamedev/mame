@@ -54,7 +54,7 @@ class sgi_ip2_state : public driver_device
 public:
 	sgi_ip2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_terminal(*this, TERMINAL_TAG) ,
+			m_terminal(*this, TERMINAL_TAG) ,
 		m_mainram(*this, "mainram"),
 		m_bss(*this, "bss"),
 		m_ptmap(*this, "ptmap"){ }
@@ -132,11 +132,11 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
     MACHINE FUNCTIONS
 ***************************************************************************/
 
-#define MBUT_RIGHT		0x01	/* Right button */
-#define MBUT_MIDDLE		0x02	/* Middle button */
-#define MBUT_LEFT		0x04	/* Left button */
-#define BOARD_REV1		0x60	/* Board revision - #1 */
-#define BOARD_REV2		0x50	/* Board revision - #2 */
+#define MBUT_RIGHT      0x01    /* Right button */
+#define MBUT_MIDDLE     0x02    /* Middle button */
+#define MBUT_LEFT       0x04    /* Left button */
+#define BOARD_REV1      0x60    /* Board revision - #1 */
+#define BOARD_REV2      0x50    /* Board revision - #2 */
 
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_r)
@@ -151,10 +151,10 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_w)
 	m_mbut = data;
 }
 
-#define MOUSE_XFIRE		0x01	/* X Quadrature Fired, active low */
-#define MOUSE_XCHANGE	0x02	/* MOUSE_XCHANGE ? x-- : x++ */
-#define MOUSE_YFIRE		0x04	/* Y Quadrature Fired, active low */
-#define MOUSE_YCHANGE	0x08	/* MOUSE_YCHANGE ? y-- : y++ */
+#define MOUSE_XFIRE     0x01    /* X Quadrature Fired, active low */
+#define MOUSE_XCHANGE   0x02    /* MOUSE_XCHANGE ? x-- : x++ */
+#define MOUSE_YFIRE     0x04    /* Y Quadrature Fired, active low */
+#define MOUSE_YCHANGE   0x08    /* MOUSE_YCHANGE ? y-- : y++ */
 
 
 READ16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_r)
@@ -249,14 +249,14 @@ WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_status_w)
 	}
 }
 
-#define PAR_UR		0x01	/* Check parity on user-mode reads */
-#define PAR_UW		0x02	/* Check parity on user-mode writes */
-#define PAR_KR		0x04	/* Check parity on kernel-mode reads */
-#define PAR_KW		0x08	/* Check parity on kernel-mode writes */
-#define PAR_DIS0	0x10	/* Disable access to DUART0 and LEDs */
-#define PAR_DIS1	0x20	/* Disable access to DUART1 */
-#define PAR_MBR		0x40	/* Check parity on multibus reads */
-#define PAR_MBW		0x80	/* Check parity on multibus writes */
+#define PAR_UR      0x01    /* Check parity on user-mode reads */
+#define PAR_UW      0x02    /* Check parity on user-mode writes */
+#define PAR_KR      0x04    /* Check parity on kernel-mode reads */
+#define PAR_KW      0x08    /* Check parity on kernel-mode writes */
+#define PAR_DIS0    0x10    /* Disable access to DUART0 and LEDs */
+#define PAR_DIS1    0x20    /* Disable access to DUART1 */
+#define PAR_MBR     0x40    /* Check parity on multibus reads */
+#define PAR_MBW     0x80    /* Check parity on multibus writes */
 
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_r)
@@ -271,14 +271,14 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_w)
 	m_parctl = data;
 }
 
-#define MBP_DCACC	0x01	/* Display controller access (I/O page 4) */
-#define MBP_UCACC	0x02	/* Update controller access (I/O page 3) */
-#define MBP_GFACC	0x04	/* Allow GF access (I/O page 1) */
-#define MBP_DMACC	0x08	/* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
-#define MBP_LIOACC	0x10	/* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
-#define MBP_HIOACC	0x20	/* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
-#define MBP_LMACC	0x40	/* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
-#define MBP_HMACC	0x80	/* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
+#define MBP_DCACC   0x01    /* Display controller access (I/O page 4) */
+#define MBP_UCACC   0x02    /* Update controller access (I/O page 3) */
+#define MBP_GFACC   0x04    /* Allow GF access (I/O page 1) */
+#define MBP_DMACC   0x08    /* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
+#define MBP_LIOACC  0x10    /* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
+#define MBP_HIOACC  0x20    /* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
+#define MBP_LMACC   0x40    /* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
+#define MBP_HMACC   0x80    /* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
 
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_mbp_r)
@@ -390,23 +390,23 @@ static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_SHARE("bss") // ??? I don't understand the need for this...
 	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r, 		sgi_ip2_m_but_w,		0xffffffff)
-	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,		sgi_ip2_m_quad_w,		0xffffffff)
-	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,										0xffffffff)
-	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8_LEGACY("duart68681a",		duart68681_r,		duart68681_w, 0xffffffff)
-	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8_LEGACY("duart68681b",		duart68681_r,		duart68681_w, 0xffffffff)
+	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r,         sgi_ip2_m_but_w,        0xffffffff)
+	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,       sgi_ip2_m_quad_w,       0xffffffff)
+	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,                                     0xffffffff)
+	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8_LEGACY("duart68681a",     duart68681_r,       duart68681_w, 0xffffffff)
+	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8_LEGACY("duart68681b",     duart68681_r,       duart68681_w, 0xffffffff)
 	AM_RANGE(0x33000000, 0x330007ff) AM_RAM
-	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8(sgi_ip2_clock_ctl_r, 	sgi_ip2_clock_ctl_w,	0xffffffff)
-	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8(sgi_ip2_clock_data_r,	sgi_ip2_clock_data_w,	0xffffffff)
-	AM_RANGE(0x36000000, 0x36000003) AM_READWRITE8(sgi_ip2_os_base_r,		sgi_ip2_os_base_w,		0xffffffff)
-	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE16(sgi_ip2_status_r,		sgi_ip2_status_w,		0xffffffff)
-	AM_RANGE(0x39000000, 0x39000003) AM_READWRITE8(sgi_ip2_parctl_r,		sgi_ip2_parctl_w,		0xffffffff)
-	AM_RANGE(0x3a000000, 0x3a000003) AM_READWRITE8(sgi_ip2_mbp_r,			sgi_ip2_mbp_w,			0xffffffff)
+	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8(sgi_ip2_clock_ctl_r,     sgi_ip2_clock_ctl_w,    0xffffffff)
+	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8(sgi_ip2_clock_data_r,    sgi_ip2_clock_data_w,   0xffffffff)
+	AM_RANGE(0x36000000, 0x36000003) AM_READWRITE8(sgi_ip2_os_base_r,       sgi_ip2_os_base_w,      0xffffffff)
+	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE16(sgi_ip2_status_r,       sgi_ip2_status_w,       0xffffffff)
+	AM_RANGE(0x39000000, 0x39000003) AM_READWRITE8(sgi_ip2_parctl_r,        sgi_ip2_parctl_w,       0xffffffff)
+	AM_RANGE(0x3a000000, 0x3a000003) AM_READWRITE8(sgi_ip2_mbp_r,           sgi_ip2_mbp_w,          0xffffffff)
 	AM_RANGE(0x3b000000, 0x3b003fff) AM_READWRITE(sgi_ip2_ptmap_r, sgi_ip2_ptmap_w) AM_SHARE("ptmap")
-	AM_RANGE(0x3c000000, 0x3c000003) AM_READWRITE16(sgi_ip2_tdbase_r,		sgi_ip2_tdbase_w,		0xffffffff)
-	AM_RANGE(0x3d000000, 0x3d000003) AM_READWRITE16(sgi_ip2_tdlmt_r,		sgi_ip2_tdlmt_w,		0xffffffff)
-	AM_RANGE(0x3e000000, 0x3e000003) AM_READWRITE16(sgi_ip2_stkbase_r,		sgi_ip2_stkbase_w,		0xffffffff)
-	AM_RANGE(0x3f000000, 0x3f000003) AM_READWRITE16(sgi_ip2_stklmt_r,		sgi_ip2_stklmt_w,		0xffffffff)
+	AM_RANGE(0x3c000000, 0x3c000003) AM_READWRITE16(sgi_ip2_tdbase_r,       sgi_ip2_tdbase_w,       0xffffffff)
+	AM_RANGE(0x3d000000, 0x3d000003) AM_READWRITE16(sgi_ip2_tdlmt_r,        sgi_ip2_tdlmt_w,        0xffffffff)
+	AM_RANGE(0x3e000000, 0x3e000003) AM_READWRITE16(sgi_ip2_stkbase_r,      sgi_ip2_stkbase_w,      0xffffffff)
+	AM_RANGE(0x3f000000, 0x3f000003) AM_READWRITE16(sgi_ip2_stklmt_r,       sgi_ip2_stklmt_w,       0xffffffff)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -485,8 +485,8 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)
 
-    MCFG_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-    MCFG_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 
 	/* sound hardware */
@@ -496,50 +496,50 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )
-    PORT_START("SWTCH")
+	PORT_START("SWTCH")
 	PORT_DIPNAME( 0x8000, 0x8000, "Master/Slave" )
-	PORT_DIPSETTING(	0x0000, "Slave" )
-	PORT_DIPSETTING(	0x8000, "Master" )
+	PORT_DIPSETTING(    0x0000, "Slave" )
+	PORT_DIPSETTING(    0x8000, "Master" )
 	PORT_BIT( 0x6000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x1800, 0x1800, "RS232 Console Speed" )
-	PORT_DIPSETTING(	0x0000, "9600 Baud" )
-	PORT_DIPSETTING(	0x0800, "300 Baud" )
-	PORT_DIPSETTING(	0x1000, "1200 Baud" )
-	PORT_DIPSETTING(	0x1800, "19200 Baud" )
+	PORT_DIPSETTING(    0x0000, "9600 Baud" )
+	PORT_DIPSETTING(    0x0800, "300 Baud" )
+	PORT_DIPSETTING(    0x1000, "1200 Baud" )
+	PORT_DIPSETTING(    0x1800, "19200 Baud" )
 	PORT_DIPNAME( 0x0700, 0x0000, "Display Setting" )
-	PORT_DIPSETTING(	0x0000, "60Hz Non-Interlaced / 60Hz Non-Interlaced" )
-	PORT_DIPSETTING(	0x0100, "60Hz Non-Interlaced / 30Hz Interlaced" )
-	PORT_DIPSETTING(	0x0200, "60Hz Non-Interlaced / NTSC RS 170A" )
-	PORT_DIPSETTING(	0x0300, "60Hz Non-Interlaced / PAL" )
-	PORT_DIPSETTING(	0x0400, "30Hz Interlaced / 60Hz Non-Interlaced" )
-	PORT_DIPSETTING(	0x0500, "30Hz Interlaced / 30Hz Interlaced" )
-	PORT_DIPSETTING(	0x0600, "30Hz Interlaced / NTSC RS 170A" )
-	PORT_DIPSETTING(	0x0700, "30Hz Interlaced / PAL" )
+	PORT_DIPSETTING(    0x0000, "60Hz Non-Interlaced / 60Hz Non-Interlaced" )
+	PORT_DIPSETTING(    0x0100, "60Hz Non-Interlaced / 30Hz Interlaced" )
+	PORT_DIPSETTING(    0x0200, "60Hz Non-Interlaced / NTSC RS 170A" )
+	PORT_DIPSETTING(    0x0300, "60Hz Non-Interlaced / PAL" )
+	PORT_DIPSETTING(    0x0400, "30Hz Interlaced / 60Hz Non-Interlaced" )
+	PORT_DIPSETTING(    0x0500, "30Hz Interlaced / 30Hz Interlaced" )
+	PORT_DIPSETTING(    0x0600, "30Hz Interlaced / NTSC RS 170A" )
+	PORT_DIPSETTING(    0x0700, "30Hz Interlaced / PAL" )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0000, "Enable Dual-Head Display" )
-	PORT_DIPSETTING(	0x0000, "Use Primary Display" )
-	PORT_DIPSETTING(	0x0040, "Use Secondary Display" )
+	PORT_DIPSETTING(    0x0000, "Use Primary Display" )
+	PORT_DIPSETTING(    0x0040, "Use Secondary Display" )
 	PORT_DIPNAME( 0x0020, 0x0000, "Verbose Boot" )
-	PORT_DIPSETTING(	0x0000, "Be Verbose" )
-	PORT_DIPSETTING(	0x0020, "Be Quiet" )
+	PORT_DIPSETTING(    0x0000, "Be Verbose" )
+	PORT_DIPSETTING(    0x0020, "Be Quiet" )
 	PORT_DIPNAME( 0x0010, 0x0000, "Auto-Boot" )
-	PORT_DIPSETTING(	0x0000, "Enter PROM Monitor" )
-	PORT_DIPSETTING(	0x0010, "Auto-Boot" )
+	PORT_DIPSETTING(    0x0000, "Enter PROM Monitor" )
+	PORT_DIPSETTING(    0x0010, "Auto-Boot" )
 	PORT_DIPNAME( 0x000f, 0x0005, "Boot Media" )
-	PORT_DIPSETTING(	0x0000, "Hard Disk (IP, SD, MD)" )
-	PORT_DIPSETTING(	0x0001, "Cartridge Tape" )
-	PORT_DIPSETTING(	0x0002, "Floppy Disk (SF, MF)" )
-	PORT_DIPSETTING(	0x0003, "Ethernet using XNS" )
-	PORT_DIPSETTING(	0x0005, "Enter PROM Monitor" )
-	PORT_DIPSETTING(	0x0006, "Boot from PROM Board" )
-	PORT_DIPSETTING(	0x0007, "TCP/UDP Netboot" )
-	PORT_DIPSETTING(	0x0009, "Interphase SMD Disk Boot" )
-	PORT_DIPSETTING(	0x000a, "Storager Tape Boot (1)" )
-	PORT_DIPSETTING(	0x000b, "Storager Tape Boot (2)" )
-	PORT_DIPSETTING(	0x000c, "Stoarger Hard Disk Boot" )
-	PORT_DIPSETTING(	0x000d, "DSD Tape Boot (1)" )
-	PORT_DIPSETTING(	0x000e, "DSD Tape Boot (2)" )
-	PORT_DIPSETTING(	0x000f, "DSD Hard Disk Boot" )
+	PORT_DIPSETTING(    0x0000, "Hard Disk (IP, SD, MD)" )
+	PORT_DIPSETTING(    0x0001, "Cartridge Tape" )
+	PORT_DIPSETTING(    0x0002, "Floppy Disk (SF, MF)" )
+	PORT_DIPSETTING(    0x0003, "Ethernet using XNS" )
+	PORT_DIPSETTING(    0x0005, "Enter PROM Monitor" )
+	PORT_DIPSETTING(    0x0006, "Boot from PROM Board" )
+	PORT_DIPSETTING(    0x0007, "TCP/UDP Netboot" )
+	PORT_DIPSETTING(    0x0009, "Interphase SMD Disk Boot" )
+	PORT_DIPSETTING(    0x000a, "Storager Tape Boot (1)" )
+	PORT_DIPSETTING(    0x000b, "Storager Tape Boot (2)" )
+	PORT_DIPSETTING(    0x000c, "Stoarger Hard Disk Boot" )
+	PORT_DIPSETTING(    0x000d, "DSD Tape Boot (1)" )
+	PORT_DIPSETTING(    0x000e, "DSD Tape Boot (2)" )
+	PORT_DIPSETTING(    0x000f, "DSD Hard Disk Boot" )
 
 INPUT_PORTS_END
 

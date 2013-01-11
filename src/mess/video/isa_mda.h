@@ -20,8 +20,8 @@ class isa8_mda_device :
 public:
 		friend class isa8_hercules_device;
 
-        // construction/destruction
-        isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
@@ -36,20 +36,20 @@ public:
 		virtual DECLARE_WRITE8_MEMBER(mode_control_w);
 
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 public:
-		int	m_framecnt;
+		int m_framecnt;
 
-		UINT8	m_mode_control;
+		UINT8   m_mode_control;
 
 		mc6845_update_row_func  m_update_row;
 		UINT8   *m_chr_gen;
 		UINT8   m_vsync;
 		UINT8   m_hsync;
-		UINT8	*m_videoram;
-		UINT8	m_pixel;
+		UINT8   *m_videoram;
+		UINT8   m_pixel;
 };
 
 
@@ -62,8 +62,8 @@ class isa8_hercules_device :
 		public isa8_mda_device
 {
 public:
-        // construction/destruction
-        isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		// construction/destruction
+		isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
@@ -74,12 +74,12 @@ public:
 		virtual DECLARE_WRITE8_MEMBER(mode_control_w);
 
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 
 private:
-        // internal state
+		// internal state
 public:
 		UINT8 m_configuration_switch; //hercules
 };

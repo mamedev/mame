@@ -112,25 +112,25 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
+	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP    /* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ_LEGACY(bagman_ls259_r) /*just for debugging purposes*/
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_SHARE("video_enable")
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram")	/* hidden portion of color RAM */
+	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram") /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0xa800, 0xa805) AM_WRITE(bagman_ls259_w) /* TMS5110 driving state machine */
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READNOP								/* looks like watchdog from schematics */
+	AM_RANGE(0xb800, 0xb800) AM_READNOP                             /* looks like watchdog from schematics */
 
 #if 0
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* ???? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	/* ???? */
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP	/* ???? */
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP    /* ???? */
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    /* ???? */
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP    /* ???? */
 #endif
 ADDRESS_MAP_END
 
@@ -141,10 +141,10 @@ static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram")	/* hidden portion of color RAM */
+	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram") /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
-	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
+	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP    /* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_SHARE("video_enable")
@@ -152,9 +152,9 @@ static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
 
-	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	/* ???? */
-	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* ???? */
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* ???? */
+	AM_RANGE(0xa005, 0xa005) AM_WRITENOP    /* ???? */
+	AM_RANGE(0xa006, 0xa006) AM_WRITENOP    /* ???? */
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP    /* ???? */
 
 	/* guess */
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
@@ -192,28 +192,28 @@ static INPUT_PORTS_START( bagman )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(	0x03, "2" )
-	PORT_DIPSETTING(	0x02, "3" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(	0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
-	PORT_DIPSETTING(	0x04, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(	0x18, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(	0x20, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( French ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x40, "30000" )
-	PORT_DIPSETTING(	0x00, "40000" )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
+	PORT_DIPSETTING(    0x04, "1C/1C 1C/2C 1C/6C 1C/14C" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x00, "40000" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) /* Cabinet type set through edge connector, not dip switch (verified on real pcb) */
-	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bagmans )
@@ -221,8 +221,8 @@ static INPUT_PORTS_START( bagmans )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR ( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x00, DEF_STR ( Off ) )
-	PORT_DIPSETTING(	0x20, DEF_STR ( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR ( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbagman )
@@ -239,31 +239,31 @@ static INPUT_PORTS_START( pickin )
 	PORT_INCLUDE( bagman )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(	0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
-	PORT_DIPSETTING(	0x01, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(	0x06, "2" )
-	PORT_DIPSETTING(	0x04, "3" )
-	PORT_DIPSETTING(	0x02, "4" )
-	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
+	PORT_DIPSETTING(    0x01, "1C/1C 1C/2C 1C/6C 1C/14C" )
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x40, DEF_STR( English ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( French ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botanic )
 	PORT_INCLUDE( bagman )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x08, 0x08, "Invulnerability Fruits" )	PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(	0x08, "3" )
-	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x08, 0x08, "Invulnerability Fruits" )    PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
@@ -292,41 +292,41 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
-    PORT_DIPNAME(    0x01, 0x01, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:1")
-    PORT_DIPSETTING( 0x00, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING( 0x01, DEF_STR( 1C_1C ) )
-    PORT_DIPNAME(    0x06, 0x06, "Max Points" ) PORT_DIPLOCATION("SW:2,3")
-    PORT_DIPSETTING( 0x06, "7" )
-    PORT_DIPSETTING( 0x04, "11" )
-    PORT_DIPSETTING( 0x02, "15" )
-    PORT_DIPSETTING( 0x00, "21" )
-    PORT_DIPNAME(    0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:4,5")
-    PORT_DIPSETTING( 0x00, "Level 1" )
-    PORT_DIPSETTING( 0x08, "Level 2" )
-    PORT_DIPSETTING( 0x10, "Level 3" )
-    PORT_DIPSETTING( 0x18, "Level 4" )
-    PORT_DIPNAME(    0x20, 0x20, DEF_STR( Language ) ) PORT_DIPLOCATION("SW:6")
-    PORT_DIPSETTING( 0x20, DEF_STR( Spanish ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( English ) )
-    PORT_DIPNAME(    0x40, 0x40, "Body Fault" ) PORT_DIPLOCATION("SW:7")
-    PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-    PORT_DIPNAME(    0x80, 0x00, "Protection?" )	/* Left empty in the dips scan */
-    PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME(    0x01, 0x01, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING( 0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME(    0x06, 0x06, "Max Points" ) PORT_DIPLOCATION("SW:2,3")
+	PORT_DIPSETTING( 0x06, "7" )
+	PORT_DIPSETTING( 0x04, "11" )
+	PORT_DIPSETTING( 0x02, "15" )
+	PORT_DIPSETTING( 0x00, "21" )
+	PORT_DIPNAME(    0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:4,5")
+	PORT_DIPSETTING( 0x00, "Level 1" )
+	PORT_DIPSETTING( 0x08, "Level 2" )
+	PORT_DIPSETTING( 0x10, "Level 3" )
+	PORT_DIPSETTING( 0x18, "Level 4" )
+	PORT_DIPNAME(    0x20, 0x20, DEF_STR( Language ) ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING( 0x20, DEF_STR( Spanish ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( English ) )
+	PORT_DIPNAME(    0x40, 0x40, "Body Fault" ) PORT_DIPLOCATION("SW:7")
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME(    0x80, 0x00, "Protection?" )    /* Left empty in the dips scan */
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("DIAL_P1")
-    PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
 	PORT_START("DIAL_P2")
-    PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	2,	/* 2 bits per pixel */
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	2,  /* 2 bits per pixel */
 	{ 0, 512*8*8 }, /* the two bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 }, /* pretty straightforward layout */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -334,28 +334,28 @@ static const gfx_layout charlayout =
 };
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	128,	/* 128 sprites */
-	2,	/* 2 bits per pixel */
-	{ 0, 128*16*16 },	/* the two bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,	/* pretty straightforward layout */
+	16,16,  /* 16*16 sprites */
+	128,    /* 128 sprites */
+	2,  /* 2 bits per pixel */
+	{ 0, 128*16*16 },   /* the two bitplanes are separated */
+	{ 0, 1, 2, 3, 4, 5, 6, 7,   /* pretty straightforward layout */
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 
 
 static GFXDECODE_START( bagman )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,		0, 16 )	/* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,	0, 16 )	/* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,		0, 16 )	/* char set #2 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 16 ) /* char set #2 */
 GFXDECODE_END
 
 static GFXDECODE_START( pickin )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,		0, 16 )	/* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,	0, 16 )	/* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 ) /* sprites */
 	/* no gfx2 */
 GFXDECODE_END
 
@@ -435,31 +435,31 @@ static const ay8910_interface ay8910_interface_2 =
 
 static const tmsprom_interface prom_intf =
 {
-	"5110ctrl",						/* prom memory region - sound region is automatically assigned */
-	0x1000,							/* individual rom_size */
-	1,								/* bit # of pdc line */
+	"5110ctrl",                     /* prom memory region - sound region is automatically assigned */
+	0x1000,                         /* individual rom_size */
+	1,                              /* bit # of pdc line */
 	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	8,								/* bit # of ctl1 line */
-	2,								/* bit # of ctl2 line */
-	8,								/* bit # of ctl4 line */
-	2,								/* bit # of ctl8 line */
-	6,								/* bit # of rom reset */
-	7,								/* bit # of stop */
-	DEVCB_DEVICE_LINE("tms", tms5110_pdc_w),		/* tms pdc func */
-	DEVCB_DEVICE_HANDLER("tms", tms5110_ctl_w)		/* tms ctl func */
+	8,                              /* bit # of ctl1 line */
+	2,                              /* bit # of ctl2 line */
+	8,                              /* bit # of ctl4 line */
+	2,                              /* bit # of ctl8 line */
+	6,                              /* bit # of rom reset */
+	7,                              /* bit # of stop */
+	DEVCB_DEVICE_LINE("tms", tms5110_pdc_w),        /* tms pdc func */
+	DEVCB_DEVICE_HANDLER("tms", tms5110_ctl_w)      /* tms ctl func */
 };
 
 static const tms5110_interface bagman_tms5110_interface =
 {
 	/* legacy interface */
-	NULL,											/* function to be called when chip requests another bit */
-	NULL,											/* speech ROM load address callback */
+	NULL,                                           /* function to be called when chip requests another bit */
+	NULL,                                           /* speech ROM load address callback */
 	/* new rom controller interface */
-	DEVCB_DEVICE_LINE("tmsprom", tmsprom_m0_w),		/* the M0 line */
-	DEVCB_NULL,										/* the M1 line */
-	DEVCB_NULL,										/* Write to ADD1,2,4,8 - 4 address bits */
-	DEVCB_DEVICE_LINE("tmsprom", tmsprom_data_r),	/* Read one bit from ADD8/Data - voice data */
-	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
+	DEVCB_DEVICE_LINE("tmsprom", tmsprom_m0_w),     /* the M0 line */
+	DEVCB_NULL,                                     /* the M1 line */
+	DEVCB_NULL,                                     /* Write to ADD1,2,4,8 - 4 address bits */
+	DEVCB_DEVICE_LINE("tmsprom", tmsprom_data_r),   /* Read one bit from ADD8/Data - voice data */
+	DEVCB_NULL                                      /* rom clock - Only used to drive the data lines */
 };
 
 INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
@@ -759,15 +759,15 @@ ROM_START( sbagman )
 	ROM_LOAD( "9.9m",         0x4000, 0x1000, CRC(601f34ba) SHA1(1b7ee61a341b9a87abe4fe10b0c647a9b0b97d38) )
 	ROM_LOAD( "10.9n",        0x5000, 0x1000, CRC(5f750918) SHA1(3dc44f259e88999dbb95b4d4376281cc81c1ab87) )
 	ROM_LOAD( "13.8d",        0xc000, 0x0e00, CRC(944a4453) SHA1(cd64d9267d2c5cea39464ba9308752c690e7fd24) )
-	ROM_CONTINUE(			  0xfe00, 0x0200 )
+	ROM_CONTINUE(             0xfe00, 0x0200 )
 	ROM_LOAD( "14.8f",        0xd000, 0x0400, CRC(83b10139) SHA1(8a1880c6ab8a345676fe30465351d69cc1b416b2) )
-	ROM_CONTINUE(			  0xe400, 0x0200 )
-	ROM_CONTINUE(			  0xd600, 0x0a00 )
+	ROM_CONTINUE(             0xe400, 0x0200 )
+	ROM_CONTINUE(             0xd600, 0x0a00 )
 	ROM_LOAD( "15.8j",        0xe000, 0x0400, CRC(fe924879) SHA1(b80cbf9cba91e553f7685aef348854c02f0619c7) )
-	ROM_CONTINUE(			  0xd400, 0x0200 )
-	ROM_CONTINUE(			  0xe600, 0x0a00 )
+	ROM_CONTINUE(             0xd400, 0x0200 )
+	ROM_CONTINUE(             0xe600, 0x0a00 )
 	ROM_LOAD( "16.8k",        0xf000, 0x0e00, CRC(b77eb1f5) SHA1(ef94c1b449e3fa230491052fc3bd4db3f1239263) )
-	ROM_CONTINUE(			  0xce00, 0x0200 )
+	ROM_CONTINUE(             0xce00, 0x0200 )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "2.1e",         0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
@@ -798,15 +798,15 @@ ROM_START( sbagmans )
 	ROM_LOAD( "sbag_9m.bin",  0x4000, 0x1000, CRC(b21e246e) SHA1(39d2e93ac5240bb45e76c30c535d12e302690dde) )
 	ROM_LOAD( "10.9n",        0x5000, 0x1000, CRC(5f750918) SHA1(3dc44f259e88999dbb95b4d4376281cc81c1ab87) )
 	ROM_LOAD( "13.8d",        0xc000, 0x0e00, CRC(944a4453) SHA1(cd64d9267d2c5cea39464ba9308752c690e7fd24) )
-	ROM_CONTINUE(			  0xfe00, 0x0200 )
+	ROM_CONTINUE(             0xfe00, 0x0200 )
 	ROM_LOAD( "sbag_f8.bin",  0xd000, 0x0400, CRC(0f3e6de4) SHA1(a7e50d210630b500e534d626d76110dee4aeb18d) )
-	ROM_CONTINUE(			  0xe400, 0x0200 )
-	ROM_CONTINUE(			  0xd600, 0x0a00 )
+	ROM_CONTINUE(             0xe400, 0x0200 )
+	ROM_CONTINUE(             0xd600, 0x0a00 )
 	ROM_LOAD( "15.8j",        0xe000, 0x0400, CRC(fe924879) SHA1(b80cbf9cba91e553f7685aef348854c02f0619c7) )
-	ROM_CONTINUE(			  0xd400, 0x0200 )
-	ROM_CONTINUE(			  0xe600, 0x0a00 )
+	ROM_CONTINUE(             0xd400, 0x0200 )
+	ROM_CONTINUE(             0xe600, 0x0a00 )
 	ROM_LOAD( "16.8k",        0xf000, 0x0e00, CRC(b77eb1f5) SHA1(ef94c1b449e3fa230491052fc3bd4db3f1239263) )
-	ROM_CONTINUE(			  0xce00, 0x0200 )
+	ROM_CONTINUE(             0xce00, 0x0200 )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "2.1e",         0x0000, 0x1000, CRC(f4d3d4e6) SHA1(167ad0259578966fe86384df844e69cf2cc77443) )
@@ -931,7 +931,7 @@ DRIVER_INIT_MEMBER(bagman_state,bagman)
 {
 
 	/* Unmap video enable register, not available on earlier hardware revision(s)
-       Bagman is supposed to have glitches during screen transitions */
+	   Bagman is supposed to have glitches during screen transitions */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xa003, 0xa003);
 	*m_video_enable = 1;
 }

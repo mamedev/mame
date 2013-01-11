@@ -31,7 +31,7 @@ needs more color combination to render its graphics.
 #include "video/resnet.h"
 #include "includes/rallyx.h"
 
-#define STARS_COLOR_BASE	(0x104)
+#define STARS_COLOR_BASE    (0x104)
 
 
 /***************************************************************************
@@ -64,7 +64,7 @@ PALETTE_INIT_MEMBER(rallyx_state,rallyx)
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights,    0, 0,
 			3, &resistances_rg[0], gweights,    0, 0,
 			2, &resistances_b[0],  bweights, 1000, 0);
@@ -125,12 +125,12 @@ PALETTE_INIT_MEMBER(rallyx_state,jungler)
 	int i;
 
 	/* compute the color output resistor weights */
-	double scale = compute_resistor_weights(0,	255, -1.0,
+	double scale = compute_resistor_weights(0,  255, -1.0,
 						2, resistances_star, rweights_star, 0, 0,
 						2, resistances_star, gweights_star, 0, 0,
 						2, resistances_star, bweights_star, 0, 0);
 
-				   compute_resistor_weights(0,	255, scale,
+					compute_resistor_weights(0, 255, scale,
 						3, resistances_rg, rweights, 1000, 0,
 						3, resistances_rg, gweights, 1000, 0,
 						2, resistances_b,  bweights, 1000, 0);
@@ -594,11 +594,11 @@ static void locomotn_draw_bullets( running_machine &machine, bitmap_ind16 &bitma
 
 
 		/* it looks like in commsega the addresses used are
-           a000-a003  a004-a00f
-           8020-8023  8034-803f
-           8820-8823  8834-883f
-           so 8024-8033 and 8824-8833 are not used
-        */
+		   a000-a003  a004-a00f
+		   8020-8023  8034-803f
+		   8820-8823  8834-883f
+		   so 8024-8033 and 8824-8833 are not used
+		*/
 
 		x = state->m_radarx[offs] + ((~state->m_radarattr[offs & 0x0f] & 0x08) << 5);
 		y = 252 - state->m_radary[offs];
@@ -624,7 +624,7 @@ static void locomotn_draw_bullets( running_machine &machine, bitmap_ind16 &bitma
 UINT32 rallyx_state::screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
-       the screen, and clip it to only the position where it is supposed to be shown */
+	   the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
@@ -657,7 +657,7 @@ UINT32 rallyx_state::screen_update_rallyx(screen_device &screen, bitmap_ind16 &b
 UINT32 rallyx_state::screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
-       the screen, and clip it to only the position where it is supposed to be shown */
+	   the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 
@@ -694,7 +694,7 @@ UINT32 rallyx_state::screen_update_jungler(screen_device &screen, bitmap_ind16 &
 UINT32 rallyx_state::screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
-       the screen, and clip it to only the position where it is supposed to be shown */
+	   the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 

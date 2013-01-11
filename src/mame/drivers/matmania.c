@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_SHARE("pageselect")
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP	/* ?? */
+	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP   /* ?? */
 	AM_RANGE(0x3040, 0x3040) AM_READWRITE_LEGACY(maniach_mcu_r,maniach_mcu_w)
 	AM_RANGE(0x3041, 0x3041) AM_READ_LEGACY(maniach_mcu_status_r)
 	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_SHARE("paletteram")
@@ -159,48 +159,48 @@ static INPUT_PORTS_START( matmania )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME(0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(   0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(   0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(   0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(   0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME(0x0c, 0x0c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME(0x0c, 0x0c, DEF_STR( Coin_B ) )        PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(   0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(   0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(   0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME(0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME(0x10, 0x10, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(   0x10, DEF_STR( On ) )
-	PORT_DIPNAME(0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )		/* The default setting should be cocktail. */
+	PORT_DIPNAME(0x20, 0x00, DEF_STR( Cabinet ) )       PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )       /* The default setting should be cocktail. */
 	PORT_DIPSETTING(   0x20, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")		/* Listed as always ON among DIPs in the manual */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")      /* Listed as always ON among DIPs in the manual */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME(0x03, 0x02, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME(0x03, 0x02, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(   0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(   0x02, DEF_STR( Medium ) )		/* According to the manual, default is Medium */
+	PORT_DIPSETTING(   0x02, DEF_STR( Medium ) )        /* According to the manual, default is Medium */
 	PORT_DIPSETTING(   0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME(0x0c, 0x0c, "Tournament Time" )		PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(   0x00, "2:12" )					/* Tournament time is always 3:00, but time per 1 second is shorter. */
+	PORT_DIPNAME(0x0c, 0x0c, "Tournament Time" )        PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(   0x00, "2:12" )                   /* Tournament time is always 3:00, but time per 1 second is shorter. */
 	PORT_DIPSETTING(   0x04, "2:24" )
 	PORT_DIPSETTING(   0x08, "2:30" )
 	PORT_DIPSETTING(   0x0c, "2:36" )
-	PORT_DIPUNUSED_DIPLOC(0x10, IP_ACTIVE_LOW, "SW2:5")	/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC(0x20, IP_ACTIVE_LOW, "SW2:6")	/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC(0x40, IP_ACTIVE_LOW, "SW2:7")	/* Listed as Unused */
-	PORT_DIPUNUSED_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8")	/* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC(0x10, IP_ACTIVE_LOW, "SW2:5") /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC(0x20, IP_ACTIVE_LOW, "SW2:6") /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC(0x40, IP_ACTIVE_LOW, "SW2:7") /* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8") /* Listed as Unused */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( maniach )
 	PORT_INCLUDE( matmania )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME(0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(   0x03, DEF_STR( Easy ) )			/* According to the manual, default for this game is Easy */
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(   0x03, DEF_STR( Easy ) )          /* According to the manual, default for this game is Easy */
 	PORT_DIPSETTING(   0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(   0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( Hardest ) )
@@ -215,65 +215,65 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	3,	/* 3 bits per pixel */
-	{ 2*1024*8*8, 1024*8*8, 0 },	/* the bitplanes are separated */
+	8,8,    /* 8*8 characters */
+	1024,   /* 1024 characters */
+	3,  /* 3 bits per pixel */
+	{ 2*1024*8*8, 1024*8*8, 0 },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
 	16,16,  /* 16*16 tiles */
 	512,    /* 512 tiles */
-	3,	/* 3 bits per pixel */
-	{ 2*512*16*16, 512*16*16, 0 },	/* the bitplanes are separated */
+	3,  /* 3 bits per pixel */
+	{ 2*512*16*16, 512*16*16, 0 },  /* the bitplanes are separated */
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
 			0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every tile takes 16 consecutive bytes */
+	32*8    /* every tile takes 16 consecutive bytes */
 };
 
 static const gfx_layout matmania_spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	3584,    /* 3584 sprites */
-	3,	/* 3 bits per pixel */
-	{ 2*3584*16*16, 3584*16*16, 0 },	/* the bitplanes are separated */
+	3,  /* 3 bits per pixel */
+	{ 2*3584*16*16, 3584*16*16, 0 },    /* the bitplanes are separated */
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
 			0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 16 consecutive bytes */
+	32*8    /* every sprite takes 16 consecutive bytes */
 };
 
 static const gfx_layout maniach_spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	3584,    /* 3584 sprites */
-	3,	/* 3 bits per pixel */
-	{ 0, 3584*16*16, 2*3584*16*16 },	/* the bitplanes are separated */
+	3,  /* 3 bits per pixel */
+	{ 0, 3584*16*16, 2*3584*16*16 },    /* the bitplanes are separated */
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
 			0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 16 consecutive bytes */
+	32*8    /* every sprite takes 16 consecutive bytes */
 };
 
 static const gfx_layout maniach_tilelayout =
 {
 	16,16,  /* 16*16 tiles */
 	1024,    /* 1024 tiles */
-	3,	/* 3 bits per pixel */
-	{ 2*1024*16*16, 1024*16*16, 0 },	/* the bitplanes are separated */
+	3,  /* 3 bits per pixel */
+	{ 2*1024*16*16, 1024*16*16, 0 },    /* the bitplanes are separated */
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
 			0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every tile takes 16 consecutive bytes */
+	32*8    /* every tile takes 16 consecutive bytes */
 };
 
 static GFXDECODE_START( matmania )
@@ -307,13 +307,13 @@ MACHINE_START_MEMBER(matmania_state,matmania)
 static MACHINE_CONFIG_START( matmania, matmania_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(matmania_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1200000)	/* 1.2 MHz ???? */
+	MCFG_CPU_ADD("audiocpu", M6502, 1200000)    /* 1.2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(matmania_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(matmania_state, nmi_line_pulse, 15*60)	/* ???? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(matmania_state, nmi_line_pulse, 15*60) /* ???? */
 								/* IRQs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -392,18 +392,18 @@ MACHINE_RESET_MEMBER(matmania_state,maniach)
 static MACHINE_CONFIG_START( maniach, matmania_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(maniach_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(maniach_sound_map)
 								/* IRQs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
+	MCFG_CPU_ADD("mcu", M68705, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
 	MCFG_CPU_PROGRAM_MAP(maniach_mcu_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
 	MCFG_MACHINE_START_OVERRIDE(matmania_state,maniach)
 	MCFG_MACHINE_RESET_OVERRIDE(matmania_state,maniach)
@@ -443,22 +443,22 @@ ROM_START( matmania )
 	ROM_LOAD( "k1-03",        0x8000, 0x4000, CRC(3b3c3f08) SHA1(65f0c5dba0b8eeb5c2d42b050cac37c475e6a398) )
 	ROM_LOAD( "k2-03",        0xc000, 0x4000, CRC(286c0917) SHA1(50d6133406e7db0694b02858c7d06725744cf243) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for audio code */
 	ROM_LOAD( "k4-0",         0x8000, 0x4000, CRC(86dab489) SHA1(27f6eea29b0287e461e0e321fd7bfaada52c39dc) )
 	ROM_LOAD( "k5-0",         0xc000, 0x4000, CRC(4c41cdba) SHA1(a0af0c019bd6d9456cbbe83ecdeee689bc5f1bea) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
-	ROM_LOAD( "ku-02",        0x00000, 0x2000, CRC(613c8698) SHA1(07acb2fe150a64029fd15d177c8b6481fcd9eb0b) )	/* Character ROMs - 1024 chars, 3 bpp */
+	ROM_LOAD( "ku-02",        0x00000, 0x2000, CRC(613c8698) SHA1(07acb2fe150a64029fd15d177c8b6481fcd9eb0b) )   /* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "kv-02",        0x02000, 0x2000, CRC(274ce14b) SHA1(58ed8c8fe0cc157d642aae596e41f2099c1ea6b1) )
 	ROM_LOAD( "kw-02",        0x04000, 0x2000, CRC(7588a9c4) SHA1(0c197a8fea1acb6c9a99071845be54c949ec83b1) )
 
 	ROM_REGION( 0x0c000, "gfx2", 0 )
-	ROM_LOAD( "kt-02",        0x00000, 0x4000, CRC(5d817c70) SHA1(f7759be40a8850d325440d336241ecd05b80c0bd) )	/* tile set */
+	ROM_LOAD( "kt-02",        0x00000, 0x4000, CRC(5d817c70) SHA1(f7759be40a8850d325440d336241ecd05b80c0bd) )   /* tile set */
 	ROM_LOAD( "ks-02",        0x04000, 0x4000, CRC(2e9f3ba0) SHA1(21d6686580de6ecfe57e458821fa92e966a42d95) )
 	ROM_LOAD( "kr-02",        0x08000, 0x4000, CRC(b057d3e3) SHA1(24216b22a69c1ecc7eabd7ae10de381e1ff0afc1) )
 
 	ROM_REGION( 0x54000, "gfx3", 0 )
-	ROM_LOAD( "k6-00",        0x00000, 0x4000, CRC(294d0878) SHA1(0aaae97e35d504dbf6c479ddf04b981847a23ea6) )	/* sprites */
+	ROM_LOAD( "k6-00",        0x00000, 0x4000, CRC(294d0878) SHA1(0aaae97e35d504dbf6c479ddf04b981847a23ea6) )   /* sprites */
 	ROM_LOAD( "k7-00",        0x04000, 0x4000, CRC(0908c2f5) SHA1(acc34c578f9a3521855ad4dd8fbd554e05c3f63c) )
 	ROM_LOAD( "k8-00",        0x08000, 0x4000, CRC(ae8341e1) SHA1(ca198087b3aec320543a19921015861324ace8a2) )
 	ROM_LOAD( "k9-00",        0x0c000, 0x4000, CRC(752ac2c6) SHA1(309fe4e396616b569b9b25654e3dc2751d7b1605) )
@@ -493,22 +493,22 @@ ROM_START( excthour )
 	ROM_LOAD( "e28",          0x08000, 0x4000, CRC(17b63708) SHA1(01c868b7ea32c4857f7187ce73a4cab5b4def246) )
 	ROM_LOAD( "e27",          0x0c000, 0x4000, CRC(269ab3bc) SHA1(f2f307c5fc6d50167be8904bef8c7ef21209be50) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for audio code */
 	ROM_LOAD( "k4-0",         0x8000, 0x4000, CRC(86dab489) SHA1(27f6eea29b0287e461e0e321fd7bfaada52c39dc) )
 	ROM_LOAD( "k5-0",         0xc000, 0x4000, CRC(4c41cdba) SHA1(a0af0c019bd6d9456cbbe83ecdeee689bc5f1bea) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
-	ROM_LOAD( "e30",          0x00000, 0x2000, CRC(b2875329) SHA1(b37a8b95eb09f1ddc422cc981184b3ea40a5730d) )	/* Character ROMs - 1024 chars, 3 bpp */
+	ROM_LOAD( "e30",          0x00000, 0x2000, CRC(b2875329) SHA1(b37a8b95eb09f1ddc422cc981184b3ea40a5730d) )   /* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "e31",          0x02000, 0x2000, CRC(c9506de8) SHA1(1036f9acd8b391c03e6408fe1db3406e105373d9) )
 	ROM_LOAD( "e32",          0x04000, 0x2000, CRC(00d1635f) SHA1(3a7a20ff949d333ec4d3c0287d73e15dcfefdc71) )
 
 	ROM_REGION( 0x0c000, "gfx2", 0 )
-	ROM_LOAD( "e5",           0x00000, 0x4000, CRC(0604dc55) SHA1(dc4e36dac1a820d4e649132206a8b16603d08192) )	/* tile set */
+	ROM_LOAD( "e5",           0x00000, 0x4000, CRC(0604dc55) SHA1(dc4e36dac1a820d4e649132206a8b16603d08192) )   /* tile set */
 	ROM_LOAD( "ks-02",        0x04000, 0x4000, CRC(2e9f3ba0) SHA1(21d6686580de6ecfe57e458821fa92e966a42d95) )
 	ROM_LOAD( "e3",           0x08000, 0x4000, CRC(ebd273c6) SHA1(415f68ee10499583f5557aae6a41b5499013b5d2) )
 
 	ROM_REGION( 0x54000, "gfx3", 0 )
-	ROM_LOAD( "k6-00",        0x00000, 0x4000, CRC(294d0878) SHA1(0aaae97e35d504dbf6c479ddf04b981847a23ea6) )	/* sprites */
+	ROM_LOAD( "k6-00",        0x00000, 0x4000, CRC(294d0878) SHA1(0aaae97e35d504dbf6c479ddf04b981847a23ea6) )   /* sprites */
 	ROM_LOAD( "k7-00",        0x04000, 0x4000, CRC(0908c2f5) SHA1(acc34c578f9a3521855ad4dd8fbd554e05c3f63c) )
 	ROM_LOAD( "k8-00",        0x08000, 0x4000, CRC(ae8341e1) SHA1(ca198087b3aec320543a19921015861324ace8a2) )
 	ROM_LOAD( "k9-00",        0x0c000, 0x4000, CRC(752ac2c6) SHA1(309fe4e396616b569b9b25654e3dc2751d7b1605) )
@@ -543,26 +543,26 @@ ROM_START( maniach )
 	ROM_LOAD( "mc-ma2.bin",   0x08000, 0x4000, CRC(84583323) SHA1(f1512fec6f3e03dc633a96917a114b0b6369c577) )
 	ROM_LOAD( "mc-m92.bin",   0x0c000, 0x4000, CRC(e209a500) SHA1(d1a3ab91ffbc321a51c99a2170aca3e217b22576) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for audio code */
 	ROM_LOAD( "mc-m50.bin",   0x4000, 0x4000, CRC(ba415d68) SHA1(484af7a1f109cc9546f17d19b53d284c934705db) )
 	ROM_LOAD( "mc-m40.bin",   0x8000, 0x4000, CRC(2a217ed0) SHA1(b06f7c9a2c96ffe78a7065e5edadfdbf985305a5) )
 	ROM_LOAD( "mc-m30.bin",   0xc000, 0x4000, CRC(95af1723) SHA1(691ca3f7400d10897e805ff691c904fb2d5bb53a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "01",           0x0000, 0x0800, CRC(00c7f80c) SHA1(d2216f660eb8310b1530fa5dc844d26ba90c5e9c) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
-	ROM_LOAD( "mc-m60.bin",   0x00000, 0x2000, CRC(1cdbb117) SHA1(cce99c7380fa2a7ae070c7e2d64866866c976085) )	/* Character ROMs - 1024 chars, 3 bpp */
+	ROM_LOAD( "mc-m60.bin",   0x00000, 0x2000, CRC(1cdbb117) SHA1(cce99c7380fa2a7ae070c7e2d64866866c976085) )   /* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "mc-m70.bin",   0x02000, 0x2000, CRC(553f0780) SHA1(eacce92ae7b872a35f289f79b33383f5442082d5) )
 	ROM_LOAD( "mc-m80.bin",   0x04000, 0x2000, CRC(9392ecb7) SHA1(fb4be39fc2f1c826b146bb5b4dd10eb56b23c300) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "mc-m01.bin",   0x00000, 0x8000, CRC(da558e4d) SHA1(0635f4cded061b0b3649ed1497f087ecd53d54a3) )	/* tile set */
+	ROM_LOAD( "mc-m01.bin",   0x00000, 0x8000, CRC(da558e4d) SHA1(0635f4cded061b0b3649ed1497f087ecd53d54a3) )   /* tile set */
 	ROM_LOAD( "mc-m10.bin",   0x08000, 0x8000, CRC(619a02f8) SHA1(18de76277c263c76b8d8d9093b3c1aebbf2b7ae4) )
 	ROM_LOAD( "mc-m20.bin",   0x10000, 0x8000, CRC(a617c6c1) SHA1(dccae543daa9987f2778327145fc785472f41228) )
 
 	ROM_REGION( 0x54000, "gfx3", 0 )
-	ROM_LOAD( "mc-mc0.bin",   0x00000, 0x4000, CRC(133d644f) SHA1(5378e0cb665c0aa65d7ad76c3f7c04a3bc301f64) )	/* sprites */
+	ROM_LOAD( "mc-mc0.bin",   0x00000, 0x4000, CRC(133d644f) SHA1(5378e0cb665c0aa65d7ad76c3f7c04a3bc301f64) )   /* sprites */
 	ROM_LOAD( "mc-md0.bin",   0x04000, 0x4000, CRC(e387b036) SHA1(828a42789d9ced9f9fcdfd08a43530008dcbbf2f) )
 	ROM_LOAD( "mc-me0.bin",   0x08000, 0x4000, CRC(b36b1283) SHA1(9d12ea9f7a0f12aad532c0f2d3608cf4a86933a6) )
 	ROM_LOAD( "mc-mf0.bin",   0x0c000, 0x4000, CRC(2584d8a9) SHA1(f24b4cb827421cd51cb35b581622c41646f3f4d8) )
@@ -603,26 +603,26 @@ ROM_START( maniach2 )
 	ROM_LOAD( "ic41-ma1",     0x08000, 0x4000, CRC(85ec8279) SHA1(dada5fa6981573a1fbb235becbc647e1e2d497e1) )
 	ROM_LOAD( "ic42-m91",     0x0c000, 0x4000, CRC(a14b86dd) SHA1(73172dfeb34846beaa713c8886d56ed691139d06) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for audio code */
 	ROM_LOAD( "mc-m50.bin",   0x4000, 0x4000, CRC(ba415d68) SHA1(484af7a1f109cc9546f17d19b53d284c934705db) )
 	ROM_LOAD( "mc-m40.bin",   0x8000, 0x4000, CRC(2a217ed0) SHA1(b06f7c9a2c96ffe78a7065e5edadfdbf985305a5) )
 	ROM_LOAD( "mc-m30.bin",   0xc000, 0x4000, CRC(95af1723) SHA1(691ca3f7400d10897e805ff691c904fb2d5bb53a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
 	ROM_LOAD( "01",           0x0000, 0x0800, CRC(00c7f80c) SHA1(d2216f660eb8310b1530fa5dc844d26ba90c5e9c) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
-	ROM_LOAD( "mc-m60.bin",   0x00000, 0x2000, CRC(1cdbb117) SHA1(cce99c7380fa2a7ae070c7e2d64866866c976085) )	/* Character ROMs - 1024 chars, 3 bpp */
+	ROM_LOAD( "mc-m60.bin",   0x00000, 0x2000, CRC(1cdbb117) SHA1(cce99c7380fa2a7ae070c7e2d64866866c976085) )   /* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "mc-m70.bin",   0x02000, 0x2000, CRC(553f0780) SHA1(eacce92ae7b872a35f289f79b33383f5442082d5) )
 	ROM_LOAD( "mc-m80.bin",   0x04000, 0x2000, CRC(9392ecb7) SHA1(fb4be39fc2f1c826b146bb5b4dd10eb56b23c300) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "mc-m01.bin",   0x00000, 0x8000, CRC(da558e4d) SHA1(0635f4cded061b0b3649ed1497f087ecd53d54a3) )	/* tile set */
+	ROM_LOAD( "mc-m01.bin",   0x00000, 0x8000, CRC(da558e4d) SHA1(0635f4cded061b0b3649ed1497f087ecd53d54a3) )   /* tile set */
 	ROM_LOAD( "mc-m10.bin",   0x08000, 0x8000, CRC(619a02f8) SHA1(18de76277c263c76b8d8d9093b3c1aebbf2b7ae4) )
 	ROM_LOAD( "mc-m20.bin",   0x10000, 0x8000, CRC(a617c6c1) SHA1(dccae543daa9987f2778327145fc785472f41228) )
 
 	ROM_REGION( 0x54000, "gfx3", 0 )
-	ROM_LOAD( "mc-mc0.bin",   0x00000, 0x4000, CRC(133d644f) SHA1(5378e0cb665c0aa65d7ad76c3f7c04a3bc301f64) )	/* sprites */
+	ROM_LOAD( "mc-mc0.bin",   0x00000, 0x4000, CRC(133d644f) SHA1(5378e0cb665c0aa65d7ad76c3f7c04a3bc301f64) )   /* sprites */
 	ROM_LOAD( "mc-md0.bin",   0x04000, 0x4000, CRC(e387b036) SHA1(828a42789d9ced9f9fcdfd08a43530008dcbbf2f) )
 	ROM_LOAD( "mc-me0.bin",   0x08000, 0x4000, CRC(b36b1283) SHA1(9d12ea9f7a0f12aad532c0f2d3608cf4a86933a6) )
 	ROM_LOAD( "mc-mf0.bin",   0x0c000, 0x4000, CRC(2584d8a9) SHA1(f24b4cb827421cd51cb35b581622c41646f3f4d8) )
@@ -668,4 +668,4 @@ ROM_END
 GAME( 1985, matmania, 0,        matmania, matmania, driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", GAME_SUPPORTS_SAVE )
 GAME( 1985, excthour, matmania, matmania, maniach, driver_device,  0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", GAME_SUPPORTS_SAVE )
 GAME( 1986, maniach,  0,        maniach,  maniach, driver_device,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach, driver_device,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", GAME_SUPPORTS_SAVE )	/* earlier version? */
+GAME( 1986, maniach2, maniach,  maniach,  maniach, driver_device,  0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", GAME_SUPPORTS_SAVE )  /* earlier version? */

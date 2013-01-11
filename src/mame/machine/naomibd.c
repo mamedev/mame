@@ -209,4 +209,3 @@ void naomi_board::board_write(offs_t offset, UINT16 data)
 {
 	logerror("NAOMIBD: unhandled board write %08x, %04x\n", offset, data);
 }
-

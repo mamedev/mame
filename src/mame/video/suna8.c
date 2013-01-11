@@ -147,31 +147,31 @@ WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 	{
 		rgb ^= 0x4444;
 
-		r	=	(rgb >> 12) & 0x0f;
-		g	=	(rgb >>  8) & 0x0f;
-		b	=	(rgb >>  4) & 0x0f;
+		r   =   (rgb >> 12) & 0x0f;
+		g   =   (rgb >>  8) & 0x0f;
+		b   =   (rgb >>  4) & 0x0f;
 	}
 	// see code at 697b
 	else if (m_prot2_prev == 0xa8 && m_prot2 == 0x00)
 	{
-		r	=	(((rgb & (1<<0xc))?1:0)<<0) |
+		r   =   (((rgb & (1<<0xc))?1:0)<<0) |
 				(((rgb & (1<<0xb))?1:0)<<1) |
 				(((rgb & (1<<0xe))?1:0)<<2) |
 				(((rgb & (1<<0xf))?1:0)<<3);
-		g	=	(((rgb & (1<<0x8))?1:0)<<0) |
+		g   =   (((rgb & (1<<0x8))?1:0)<<0) |
 				(((rgb & (1<<0x9))?1:0)<<1) |
 				(((rgb & (1<<0xa))?1:0)<<2) |
 				(((rgb & (1<<0xd))?1:0)<<3);
-		b	=	(((rgb & (1<<0x4))?1:0)<<0) |
+		b   =   (((rgb & (1<<0x4))?1:0)<<0) |
 				(((rgb & (1<<0x3))?1:0)<<1) |
 				(((rgb & (1<<0x6))?1:0)<<2) |
 				(((rgb & (1<<0x7))?1:0)<<3);
 	}
 	else
 	{
-		r	=	(rgb >> 12) & 0x0f;
-		g	=	(rgb >>  8) & 0x0f;
-		b	=	(rgb >>  4) & 0x0f;
+		r   =   (rgb >> 12) & 0x0f;
+		g   =   (rgb >>  8) & 0x0f;
+		b   =   (rgb >>  4) & 0x0f;
 	}
 
 	palette_set_color_rgb(machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
@@ -181,18 +181,18 @@ WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 
 void suna8_state::suna8_vh_start_common(int text_dim, GFXBANK_TYPE_T gfxbank_type)
 {
-	m_text_dim		=	text_dim;
-	m_spritebank	=	0;
-	m_gfxbank		=	0;
-	m_gfxbank_type	=	gfxbank_type;
-	m_palettebank	=	0;
+	m_text_dim      =   text_dim;
+	m_spritebank    =   0;
+	m_gfxbank       =   0;
+	m_gfxbank_type  =   gfxbank_type;
+	m_palettebank   =   0;
 
 	if (!m_text_dim)
 	{
 		m_banked_paletteram.allocate(0x200 * 2);
 
-		m_spriteram.allocate(0x2000 * 2 * 2);	// 2 RAM banks, sparkman has 2 "chips"
-		memset(m_spriteram,0,0x2000 * 2 * 2);	// helps debugging
+		m_spriteram.allocate(0x2000 * 2 * 2);   // 2 RAM banks, sparkman has 2 "chips"
+		memset(m_spriteram,0,0x2000 * 2 * 2);   // helps debugging
 	}
 
 #if TILEMAPS
@@ -204,11 +204,11 @@ void suna8_state::suna8_vh_start_common(int text_dim, GFXBANK_TYPE_T gfxbank_typ
 #endif
 }
 
-VIDEO_START_MEMBER(suna8_state,suna8_textdim8)			{ suna8_vh_start_common(  8, GFXBANK_TYPE_SPARKMAN); }
-VIDEO_START_MEMBER(suna8_state,suna8_textdim12)			{ suna8_vh_start_common( 12, GFXBANK_TYPE_SPARKMAN); }
-VIDEO_START_MEMBER(suna8_state,suna8_sparkman)			{ suna8_vh_start_common(  0, GFXBANK_TYPE_SPARKMAN); }
-VIDEO_START_MEMBER(suna8_state,suna8_brickzn)			{ suna8_vh_start_common(  0, GFXBANK_TYPE_BRICKZN);  }
-VIDEO_START_MEMBER(suna8_state,suna8_starfigh)			{ suna8_vh_start_common(  0, GFXBANK_TYPE_STARFIGH); }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim8)          { suna8_vh_start_common(  8, GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,suna8_textdim12)         { suna8_vh_start_common( 12, GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,suna8_sparkman)          { suna8_vh_start_common(  0, GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,suna8_brickzn)           { suna8_vh_start_common(  0, GFXBANK_TYPE_BRICKZN);  }
+VIDEO_START_MEMBER(suna8_state,suna8_starfigh)          { suna8_vh_start_common(  0, GFXBANK_TYPE_STARFIGH); }
 
 /***************************************************************************
 
@@ -225,7 +225,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 	UINT8 *spriteram = state->m_spriteram + which * 0x2000 * 2;
 
 	int i;
-	int mx = 0;	// multisprite x counter
+	int mx = 0; // multisprite x counter
 
 	int max_x = machine.primary_screen->width() - 8;
 	int max_y = machine.primary_screen->height() - 8;
@@ -235,10 +235,10 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 		int srcpg, srcx,srcy, dimx,dimy, tx, ty;
 		int gfxbank, colorbank = 0, flipx,flipy, multisprite;
 
-		int y		=	spriteram[i + 0];
-		int code	=	spriteram[i + 1];
-		int x		=	spriteram[i + 2];
-		int bank	=	spriteram[i + 3];
+		int y       =   spriteram[i + 0];
+		int code    =   spriteram[i + 1];
+		int x       =   spriteram[i + 2];
+		int bank    =   spriteram[i + 3];
 
 		if (state->m_text_dim)
 		{
@@ -249,14 +249,14 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 			switch( code & 0x80 )
 			{
 			case 0x80:
-				dimx = 2;					dimy =	32;
-				srcx  = (code & 0xf) * 2;	srcy = 0;
+				dimx = 2;                   dimy =  32;
+				srcx  = (code & 0xf) * 2;   srcy = 0;
 				srcpg = (code >> 4) & 3;
 				break;
 			case 0x00:
 			default:
-				dimx = 2;					dimy =	2;
-				srcx  = (code & 0xf) * 2;	srcy = ((code >> 5) & 0x3) * 8 + 6;
+				dimx = 2;                   dimy =  2;
+				srcx  = (code & 0xf) * 2;   srcy = ((code >> 5) & 0x3) * 8 + 6;
 				srcpg = (code >> 4) & 1;
 				break;
 			}
@@ -268,16 +268,16 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 			switch( code & 0xc0 )
 			{
 			case 0xc0:
-				dimx = 4;					dimy = 32;
-				srcx  = (code & 0xe) * 2;	srcy = 0;
+				dimx = 4;                   dimy = 32;
+				srcx  = (code & 0xe) * 2;   srcy = 0;
 				flipx = (code & 0x1);
 				flipy = 0;
 				gfxbank = bank & 0x1f;
 				srcpg = (code >> 4) & 3;
 				break;
 			case 0x80:
-				dimx = 2;					dimy = 32;
-				srcx  = (code & 0xf) * 2;	srcy = 0;
+				dimx = 2;                   dimy = 32;
+				srcx  = (code & 0xf) * 2;   srcy = 0;
 				flipx = 0;
 				flipy = 0;
 				gfxbank = bank & 0x1f;
@@ -285,7 +285,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				break;
 // hardhea2: fire code=52/54 bank=a4; player code=02/04/06 bank=08; arrow:code=16 bank=27
 			case 0x40:
-				dimx = 4;					dimy = 4;
+				dimx = 4;                   dimy = 4;
 				srcx  = (code & 0xe) * 2;
 				flipx = code & 0x01;
 				flipy = bank & 0x10;
@@ -298,7 +298,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 						break;
 
 					case suna8_state::GFXBANK_TYPE_BRICKZN:
-						gfxbank += 4;	// brickzn: 06,a6,a2,b2->6
+						gfxbank += 4;   // brickzn: 06,a6,a2,b2->6
 						break;
 
 					case suna8_state::GFXBANK_TYPE_STARFIGH:
@@ -321,7 +321,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				break;
 			case 0x00:
 			default:
-				dimx = 2;					dimy = 2;
+				dimx = 2;                   dimy = 2;
 				srcx  = (code & 0xf) * 2;
 				flipx = 0;
 				flipy = 0;
@@ -349,40 +349,40 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 		y = (0x100 - y - dimy*8 ) & 0xff;
 
 		/* Multi Sprite */
-		if ( multisprite )	{	mx += dimx*8;	x = mx;	}
-		else					mx = x;
+		if ( multisprite )  {   mx += dimx*8;   x = mx; }
+		else                    mx = x;
 
-		gfxbank	*= 0x400;
+		gfxbank *= 0x400;
 
 		for (ty = 0; ty < dimy; ty ++)
 		{
 			for (tx = 0; tx < dimx; tx ++)
 			{
-				int addr	=	(srcpg * 0x20 * 0x20) +
+				int addr    =   (srcpg * 0x20 * 0x20) +
 								((srcx + (flipx?dimx-tx-1:tx)) & 0x1f) * 0x20 +
 								((srcy + (flipy?dimy-ty-1:ty)) & 0x1f);
 
-				int tile	=	spriteram[addr*2 + 0];
-				int attr	=	spriteram[addr*2 + 1];
+				int tile    =   spriteram[addr*2 + 0];
+				int attr    =   spriteram[addr*2 + 1];
 
-				int tile_flipx	=	attr & 0x40;
-				int tile_flipy	=	attr & 0x80;
+				int tile_flipx  =   attr & 0x40;
+				int tile_flipy  =   attr & 0x80;
 
-				int sx		=	 x + tx * 8;
-				int sy		=	(y + ty * 8) & 0xff;
+				int sx      =    x + tx * 8;
+				int sy      =   (y + ty * 8) & 0xff;
 
-				if (flipx)	tile_flipx = !tile_flipx;
-				if (flipy)	tile_flipy = !tile_flipy;
+				if (flipx)  tile_flipx = !tile_flipx;
+				if (flipy)  tile_flipy = !tile_flipy;
 
 				if (state->flip_screen())
 				{
-					sx = max_x - sx;	tile_flipx = !tile_flipx;
-					sy = max_y - sy;	tile_flipy = !tile_flipy;
+					sx = max_x - sx;    tile_flipx = !tile_flipx;
+					sy = max_y - sy;    tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(	bitmap, cliprect, machine.gfx[which],
+				drawgfx_transpen(   bitmap, cliprect, machine.gfx[which],
 							tile + (attr & 0x3)*0x100 + gfxbank,
-							(((attr >> 2) & 0xf) | colorbank) + 0x10 * state->m_palettebank,	// hardhea2 player2
+							(((attr >> 2) & 0xf) | colorbank) + 0x10 * state->m_palettebank,    // hardhea2 player2
 							tile_flipx, tile_flipy,
 							sx, sy, 0xf);
 			}
@@ -404,48 +404,48 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 	{
 		int srcpg, srcx,srcy, dimx,dimy, tx, ty;
 
-		int y		=	spriteram[i + 0];
-		int code	=	spriteram[i + 1];
-		int x		=	spriteram[i + 2];
-		int bank	=	spriteram[i + 3];
+		int y       =   spriteram[i + 0];
+		int code    =   spriteram[i + 1];
+		int x       =   spriteram[i + 2];
+		int bank    =   spriteram[i + 3];
 
-		if (~code & 0x80)	continue;
+		if (~code & 0x80)   continue;
 
-		dimx = 2;					dimy = state->m_text_dim;
-		srcx  = (code & 0xf) * 2;	srcy = (y & 0xf0) / 8;
+		dimx = 2;                   dimy = state->m_text_dim;
+		srcx  = (code & 0xf) * 2;   srcy = (y & 0xf0) / 8;
 		srcpg = (code >> 4) & 3;
 
 		x = x - ((bank & 0x40) ? 0x100 : 0);
 		y = 0;
 
-		bank	=	(bank & 0x3f) * 0x400;
+		bank    =   (bank & 0x3f) * 0x400;
 
 		for (ty = 0; ty < dimy; ty ++)
 		{
 			for (tx = 0; tx < dimx; tx ++)
 			{
-				int real_ty	=	(ty < (dimy/2)) ? ty : (ty + 0x20 - dimy);
+				int real_ty =   (ty < (dimy/2)) ? ty : (ty + 0x20 - dimy);
 
-				int addr	=	(srcpg * 0x20 * 0x20) +
+				int addr    =   (srcpg * 0x20 * 0x20) +
 								((srcx + tx) & 0x1f) * 0x20 +
 								((srcy + real_ty) & 0x1f);
 
-				int tile	=	spriteram[addr*2 + 0];
-				int attr	=	spriteram[addr*2 + 1];
+				int tile    =   spriteram[addr*2 + 0];
+				int attr    =   spriteram[addr*2 + 1];
 
-				int flipx	=	attr & 0x40;
-				int flipy	=	attr & 0x80;
+				int flipx   =   attr & 0x40;
+				int flipy   =   attr & 0x80;
 
-				int sx		=	 x + tx * 8;
-				int sy		=	(y + real_ty * 8) & 0xff;
+				int sx      =    x + tx * 8;
+				int sy      =   (y + real_ty * 8) & 0xff;
 
 				if (state->flip_screen())
 				{
-					sx = max_x - sx;	flipx = !flipx;
-					sy = max_y - sy;	flipy = !flipy;
+					sx = max_x - sx;    flipx = !flipx;
+					sy = max_y - sy;    flipy = !flipy;
 				}
 
-				drawgfx_transpen(	bitmap,cliprect,machine.gfx[0],
+				drawgfx_transpen(   bitmap,cliprect,machine.gfx[0],
 							tile + (attr & 0x3)*0x100 + bank,
 							(attr >> 2) & 0xf,
 							flipx, flipy,
@@ -475,16 +475,16 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 	{
 		int max_tiles = memregion("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (machine().input().code_pressed_once(KEYCODE_Q))	{ m_page--;		machine().tilemap().mark_all_dirty();	}
-		if (machine().input().code_pressed_once(KEYCODE_W))	{ m_page++;		machine().tilemap().mark_all_dirty();	}
-		if (machine().input().code_pressed_once(KEYCODE_E))	{ m_tiles--;	machine().tilemap().mark_all_dirty();	}
-		if (machine().input().code_pressed_once(KEYCODE_R))	{ m_tiles++;	machine().tilemap().mark_all_dirty();	}
-		if (machine().input().code_pressed_once(KEYCODE_A))	{ m_trombank--;	machine().tilemap().mark_all_dirty();	}
-		if (machine().input().code_pressed_once(KEYCODE_S))	{ m_trombank++;	machine().tilemap().mark_all_dirty();	}
+		if (machine().input().code_pressed_once(KEYCODE_Q)) { m_page--;     machine().tilemap().mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_W)) { m_page++;     machine().tilemap().mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_E)) { m_tiles--;    machine().tilemap().mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_R)) { m_tiles++;    machine().tilemap().mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_A)) { m_trombank--; machine().tilemap().mark_all_dirty();   }
+		if (machine().input().code_pressed_once(KEYCODE_S)) { m_trombank++; machine().tilemap().mark_all_dirty();   }
 
-		m_trombank	&=	0xf;
-		m_page		&=	m_text_dim ? 3 : (machine().gfx[1] ? 15 : 7);
-		m_tiles		%=	max_tiles;
+		m_trombank  &=  0xf;
+		m_page      &=  m_text_dim ? 3 : (machine().gfx[1] ? 15 : 7);
+		m_tiles     %=  max_tiles;
 		if (m_tiles < 0) m_tiles += max_tiles;
 
 		m_bg_tilemap->set_scrollx(0, 0x100 * m_page);

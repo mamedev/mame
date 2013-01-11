@@ -41,7 +41,7 @@ void cop01_state::palette_init()
 	for (i = 0x10; i < 0x90; i++)
 	{
 		UINT8 ctabentry = 0xc0 | ((i - 0x10) & 0x30) |
-						  (color_prom[(((i - 0x10) & 0x40) >> 2) | ((i - 0x10) & 0x0f)] & 0x0f);
+							(color_prom[(((i - 0x10) & 0x40) >> 2) | ((i - 0x10) & 0x0f)] & 0x0f);
 		colortable_entry_set_value(machine().colortable, i, ctabentry);
 	}
 
@@ -68,15 +68,15 @@ TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
 	int pri = (attr & 0x80) >> 7;
 
 	/* kludge: priority is not actually pen based, but color based. Since the
-     * game uses a lookup table, the two are not the same thing.
-     * Palette entries with bits 2&3 set have priority over sprites.
-     * tilemap.c can't handle that yet, so I'm cheating, because I know that
-     * color codes using the second row of the lookup table don't use palette
-     * entries 12-15.
-     * The only place where this has any effect is the beach at the bottom of
-     * the screen right at the beginning of mightguy. cop01 doesn't seem to
-     * use priority at all.
-     */
+	 * game uses a lookup table, the two are not the same thing.
+	 * Palette entries with bits 2&3 set have priority over sprites.
+	 * tilemap.c can't handle that yet, so I'm cheating, because I know that
+	 * color codes using the second row of the lookup table don't use palette
+	 * entries 12-15.
+	 * The only place where this has any effect is the beach at the bottom of
+	 * the screen right at the beginning of mightguy. cop01 doesn't seem to
+	 * use priority at all.
+	 */
 	if (attr & 0x10)
 		pri = 0;
 
@@ -133,16 +133,16 @@ WRITE8_MEMBER(cop01_state::cop01_foreground_w)
 WRITE8_MEMBER(cop01_state::cop01_vreg_w)
 {
 	/*  0x40: --xx---- sprite bank, coin counters, flip screen
-     *        -----x-- flip screen
-     *        ------xx coin counters
-     *  0x41: xxxxxxxx xscroll
-     *  0x42: ---xx--- ? matches the bg tile color most of the time, but not
-     *                 during level transitions. Maybe sprite palette bank?
-     *                 (the four banks in the PROM are identical)
-     *        ------x- unused (xscroll overflow)
-     *        -------x msb xscroll
-     *  0x43: xxxxxxxx yscroll
-     */
+	 *        -----x-- flip screen
+	 *        ------xx coin counters
+	 *  0x41: xxxxxxxx xscroll
+	 *  0x42: ---xx--- ? matches the bg tile color most of the time, but not
+	 *                 during level transitions. Maybe sprite palette bank?
+	 *                 (the four banks in the PROM are identical)
+	 *        ------x- unused (xscroll overflow)
+	 *        -------x msb xscroll
+	 *  0x43: xxxxxxxx yscroll
+	 */
 	m_vreg[offset] = data;
 
 	if (offset == 0)
@@ -171,9 +171,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		code = state->m_spriteram[offs + 1];
 		attr = state->m_spriteram[offs + 2];
 		/* xxxx---- color
-         * ----xx-- flipy,flipx
-         * -------x msbx
-         */
+		 * ----xx-- flipy,flipx
+		 * -------x msbx
+		 */
 		color = attr>>4;
 		flipx = attr & 0x04;
 		flipy = attr & 0x08;

@@ -46,7 +46,7 @@ UINT32 dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind16 
 
 static const struct t11_setup t11_data =
 {
-	0x1403			/* according to specs */
+	0x1403          /* according to specs */
 };
 
 static MACHINE_CONFIG_START( dct11em, dct11em_state )

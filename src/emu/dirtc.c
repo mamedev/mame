@@ -80,7 +80,7 @@ void device_rtc_interface::set_current_time(running_machine &machine)
 	machine.base_datetime(systime);
 
 	set_time(true, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday, systime.local_time.weekday + 1,
-		systime.local_time.hour, systime.local_time.minute,	systime.local_time.second);
+		systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
 }
 
 

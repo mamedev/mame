@@ -23,8 +23,8 @@ const device_type DS2404 = &device_creator<ds2404_device>;
 //-------------------------------------------------
 
 ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, DS2404, "DS2404", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, DS2404, "DS2404", tag, owner, clock),
+		device_nvram_interface(mconfig, *this)
 {
 }
 
@@ -99,7 +99,7 @@ void ds2404_device::ds2404_rom_cmd(UINT8 cmd)
 {
 	switch(cmd)
 	{
-		case 0xcc:		/* Skip ROM */
+		case 0xcc:      /* Skip ROM */
 			m_state[0] = DS2404_STATE_COMMAND;
 			m_state_ptr = 0;
 			break;
@@ -114,7 +114,7 @@ void ds2404_device::ds2404_cmd(UINT8 cmd)
 {
 	switch(cmd)
 	{
-		case 0x0f:		/* Write scratchpad */
+		case 0x0f:      /* Write scratchpad */
 			m_state[0] = DS2404_STATE_ADDRESS1;
 			m_state[1] = DS2404_STATE_ADDRESS2;
 			m_state[2] = DS2404_STATE_INIT_COMMAND;
@@ -122,7 +122,7 @@ void ds2404_device::ds2404_cmd(UINT8 cmd)
 			m_state_ptr = 0;
 			break;
 
-		case 0x55:		/* Copy scratchpad */
+		case 0x55:      /* Copy scratchpad */
 			m_state[0] = DS2404_STATE_ADDRESS1;
 			m_state[1] = DS2404_STATE_ADDRESS2;
 			m_state[2] = DS2404_STATE_OFFSET;
@@ -131,7 +131,7 @@ void ds2404_device::ds2404_cmd(UINT8 cmd)
 			m_state_ptr = 0;
 			break;
 
-		case 0xf0:		/* Read memory */
+		case 0xf0:      /* Read memory */
 			m_state[0] = DS2404_STATE_ADDRESS1;
 			m_state[1] = DS2404_STATE_ADDRESS2;
 			m_state[2] = DS2404_STATE_INIT_COMMAND;

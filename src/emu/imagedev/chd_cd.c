@@ -12,7 +12,7 @@
 
 
 static OPTION_GUIDE_START(cd_option_guide)
-	OPTION_INT('K', "hunksize",			"Hunk Bytes")
+	OPTION_INT('K', "hunksize",         "Hunk Bytes")
 OPTION_GUIDE_END
 
 static const char cd_option_spec[] = "K512/1024/2048/[4096]";
@@ -25,8 +25,8 @@ const device_type CDROM = &device_creator<cdrom_image_device>;
 //-------------------------------------------------
 
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CDROM, "Cdrom", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	: device_t(mconfig, CDROM, "Cdrom", tag, owner, clock),
+		device_image_interface(mconfig, *this)
 {
 
 }
@@ -55,19 +55,19 @@ void cdrom_image_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_interface, 0, sizeof(m_interface));
+		memset(&m_interface, 0, sizeof(m_interface));
 		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
 	}
 
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
 	image_device_format *format = global_alloc_clear(image_device_format);;
-	format->m_index 	  = 0;
+	format->m_index       = 0;
 	format->m_name        = "chdcd";
 	format->m_description = "CD-ROM drive";
 	format->m_extensions  = m_extension_list;
 	format->m_optspec     = cd_option_spec;
-	format->m_next		  = NULL;
+	format->m_next        = NULL;
 
 	m_formatlist = format;
 
@@ -106,8 +106,8 @@ void cdrom_image_device::device_stop()
 
 bool cdrom_image_device::call_load()
 {
-	chd_error	err = (chd_error)0;
-	chd_file	*chd = NULL;
+	chd_error   err = (chd_error)0;
+	chd_file    *chd = NULL;
 	astring tempstring;
 
 	if (m_cdrom_handle)
@@ -116,7 +116,7 @@ bool cdrom_image_device::call_load()
 	if (software_entry() == NULL)
 	{
 		if (strstr(m_image_name,".chd") && is_loaded()) {
-			err = m_self_chd.open( *image_core_file() );	/* CDs are never writeable */
+			err = m_self_chd.open( *image_core_file() );    /* CDs are never writeable */
 			if ( err )
 				goto error;
 			chd = &m_self_chd;

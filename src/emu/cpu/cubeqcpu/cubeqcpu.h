@@ -120,19 +120,19 @@ typedef void (*cubeqst_dac_w_func)(device_t *, UINT16);
 
 struct cubeqst_snd_config
 {
-	cubeqst_dac_w_func	dac_w;
-	const char *		sound_data_region;
+	cubeqst_dac_w_func  dac_w;
+	const char *        sound_data_region;
 
 };
 
 struct cubeqst_lin_config
 {
-	const char *		rot_cpu_tag;
+	const char *        rot_cpu_tag;
 };
 
 struct cubeqst_rot_config
 {
-	const char *		lin_cpu_tag;
+	const char *        lin_cpu_tag;
 };
 
 /***************************************************************************

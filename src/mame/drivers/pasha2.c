@@ -415,7 +415,7 @@ void pasha2_state::machine_reset()
 static MACHINE_CONFIG_START( pasha2, pasha2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E116XT, 20000000*4)		/* 4x internal multiplier */
+	MCFG_CPU_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(pasha2_map)
 	MCFG_CPU_IO_MAP(pasha2_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)

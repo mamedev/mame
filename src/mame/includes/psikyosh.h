@@ -1,6 +1,6 @@
 #include "video/bufsprite.h"
 
-#define MASTER_CLOCK 57272700	// main oscillator frequency
+#define MASTER_CLOCK 57272700   // main oscillator frequency
 
 /* Psikyo PS6406B */
 #define FLIPSCREEN (((state->m_vidregs[3] & 0x0000c000) == 0x0000c000) ? 1:0)
@@ -22,7 +22,7 @@ class psikyosh_state : public driver_device
 public:
 	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") ,
+			m_spriteram(*this, "spriteram") ,
 		m_bgram(*this, "bgram"),
 		m_paletteram(*this, "paletteram"),
 		m_zoomram(*this, "zoomram"),

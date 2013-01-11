@@ -152,10 +152,10 @@ static emu_timer *dmadelay_timer;
    would have been much more difficult without it.
  */
 
-#define ESC_INIT_CONSTANT	0x0108db04
-#define ESC_OBJECT_MAGIC_ID	0xfef724fb
-#define ESTATE_END	2
-#define ESTATE_ERROR	3
+#define ESC_INIT_CONSTANT   0x0108db04
+#define ESC_OBJECT_MAGIC_ID 0xfef724fb
+#define ESTATE_END  2
+#define ESTATE_ERROR    3
 
 //    opcode 1
 // dragoonj
@@ -372,7 +372,7 @@ WRITE32_MEMBER(konamigx_state::esc_w)
 	opcode = (space.read_word(data+2))|(space.read_word(data)<<16);
 
 	/* if there's an OBJECT_MAGIC_ID, that means
-       there is a valid ESC command packet. */
+	   there is a valid ESC command packet. */
 	if (opcode == ESC_OBJECT_MAGIC_ID)
 	{
 		int i;
@@ -422,7 +422,7 @@ WRITE32_MEMBER(konamigx_state::esc_w)
 	else
 	{
 		/* INIT_CONSTANT means just for the ESC to initialize itself,
-           there is not normal command parsing here. */
+		   there is not normal command parsing here. */
 		if (opcode == ESC_INIT_CONSTANT)
 		{
 //          logerror("Got ESC_INIT_CONSTANT, 'booting' ESC\n");
@@ -449,15 +449,15 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 	{
 		odata = data >> 24;
 		/*
-          bit 7: afr
-          bit 6: objscan
-          bit 5: background color select: 0 = 338 solid color, 1 = 5^5 gradient
-          bit 4: coin counter 2
-          bit 3: coin counter 1
-          bit 2: eeprom clock
-          bit 1: eeprom chip select
-          bit 0: eeprom data
-        */
+		  bit 7: afr
+		  bit 6: objscan
+		  bit 5: background color select: 0 = 338 solid color, 1 = 5^5 gradient
+		  bit 4: coin counter 2
+		  bit 3: coin counter 1
+		  bit 2: eeprom clock
+		  bit 1: eeprom chip select
+		  bit 0: eeprom data
+		*/
 
 		ioport("EEPROMOUT")->write(odata, 0xff);
 
@@ -467,15 +467,15 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		/*
-          bit 7 = mask all IRQ
-          bit 6 = LAN IRQ enable
-          bit 5 = CCU2 IRQ enable
-          bit 4 = ESC IRQ enable
-          bit 3 = EXCPU IRQ enable
-          bit 2 = OBJ IRQ enable
-          bit 1 = CCU1-INT2 enable
-          bit 0 = CCU1-INT1 enable
-        */
+		  bit 7 = mask all IRQ
+		  bit 6 = LAN IRQ enable
+		  bit 5 = CCU2 IRQ enable
+		  bit 4 = ESC IRQ enable
+		  bit 3 = EXCPU IRQ enable
+		  bit 2 = OBJ IRQ enable
+		  bit 1 = CCU1-INT2 enable
+		  bit 0 = CCU1-INT1 enable
+		*/
 
 		konamigx_wrport1_1 = (data>>16)&0xff;
 //      logerror("write %x to IRQ register (PC=%x)\n", konamigx_wrport1_1, space.device().safe_pc());
@@ -526,13 +526,13 @@ WRITE32_MEMBER(konamigx_state::control_w)
 /* IRQ controllers */
 
 #define ADD_SKIPPER32(PC, BASE, START, END, DATA, MASK){ \
-  waitskip.pc   = PC;        \
-  waitskip.offs = START/4;   \
-  waitskip.data = DATA;      \
-  waitskip.mask = MASK;      \
-  resume_trigger= 1000;      \
-  space.install_legacy_read_handler \
-  ((BASE+START)&~3, (BASE+END)|3, FUNC(waitskip_r));}
+	waitskip.pc   = PC;        \
+	waitskip.offs = START/4;   \
+	waitskip.data = DATA;      \
+	waitskip.mask = MASK;      \
+	resume_trigger= 1000;      \
+	space.install_legacy_read_handler \
+	((BASE+START)&~3, (BASE+END)|3, FUNC(waitskip_r));}
 
 static int suspension_active, resume_trigger;
 #ifdef UNUSED_FUNCTION
@@ -683,7 +683,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_hbinterrupt)
 
 		dmastart_callback(0);
 	}
-	else if(scanline < 240)	// hblank
+	else if(scanline < 240) // hblank
 	{
 		// IRQ 2 is a programmable interrupt with scanline resolution
 		if (gx_syncen & 0x40)
@@ -703,7 +703,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_hbinterrupt)
 /**********************************************************************************/
 /* sound communication handlers */
 
-static UINT8 sndto000[16], sndto020[16];	/* read/write split mapping */
+static UINT8 sndto000[16], sndto020[16];    /* read/write split mapping */
 static int snd020_hack;
 
 READ32_MEMBER(konamigx_state::sound020_r)
@@ -741,10 +741,10 @@ READ32_MEMBER(konamigx_state::sound020_r)
 			if (space.device().safe_pc() == 0x24f0b6) rv = 0xffffffff;
 			if (space.device().safe_pc() == 0x24f122) rv = 0xc0c0c0c0;
 			break;
-		case 4:	// Rushing Heroes
+		case 4: // Rushing Heroes
 			if (space.device().safe_pc() == 0x20eda6) rv = 0xc0c0c0c0;
 			break;
-		case 5:	// Vs. Net Soccer ver. UAB
+		case 5: // Vs. Net Soccer ver. UAB
 			if (space.device().safe_pc() == 0x24c5d2) rv = 0xffffffff;
 			if (space.device().safe_pc() == 0x24c63e) rv = 0xc0c0c0c0;
 			break;
@@ -752,15 +752,15 @@ READ32_MEMBER(konamigx_state::sound020_r)
 			if (space.device().safe_pc() == 0x24f1b0) rv = 0xffffffff;
 			if (space.device().safe_pc() == 0x24f21c) rv = 0xc0c0c0c0;
 			break;
-		case 7:	// Vs. Net Soccer ver. AAA
+		case 7: // Vs. Net Soccer ver. AAA
 			if (space.device().safe_pc() == 0x24c6b6) rv = 0xffffffff;
 			if (space.device().safe_pc() == 0x24c722) rv = 0xc0c0c0c0;
 			break;
-		case 8:	// Vs. Net Soccer ver. EAD
+		case 8: // Vs. Net Soccer ver. EAD
 			if (space.device().safe_pc() == 0x24c416) rv = 0xffffffff;
 			if (space.device().safe_pc() == 0x24c482) rv = 0xc0c0c0c0;
 			break;
-		case 9:	// Vs. Net Soccer ver. EAB
+		case 9: // Vs. Net Soccer ver. EAB
 			if (space.device().safe_pc() == 0x24c400) rv = 0xffffffff;
 			if (space.device().safe_pc() == 0x24c46c) rv = 0xc0c0c0c0;
 			break;
@@ -937,7 +937,7 @@ READ32_MEMBER(konamigx_state::type1_roz_r2)
 READ32_MEMBER(konamigx_state::type3_sync_r)
 {
 	if(konamigx_current_frame==0)
-		return -1;	//  return 0xfffffffe | 1;
+		return -1;  //  return 0xfffffffe | 1;
 	else
 		return 0;// return 0xfffffffe | 0;
 }
@@ -1040,14 +1040,14 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 
 //              mame_printf_debug("type 4 prot command: %x\n", last_prot_op);
 				/*
-                    known commands:
-                    rng2   rushhero  vsnet  winspike   what
-                    ------------------------------------------------------------------------------
-                        0a56   0d96  0d14   0d1c       memcpy from c01000 to c01400 for 0x400 bytes
-                    0b16                               generate sprite list at c01000 or c08400 (not sure entirely, see routine at 209922 in rungun2)
-                           0d97  0515              parse big DMA list at c10200
-                                 57a       copy 4 bytes from c00f10 to c10f00 and 4 bytes from c00f30 to c0fe00
-                */
+				    known commands:
+				    rng2   rushhero  vsnet  winspike   what
+				    ------------------------------------------------------------------------------
+				        0a56   0d96  0d14   0d1c       memcpy from c01000 to c01400 for 0x400 bytes
+				    0b16                               generate sprite list at c01000 or c08400 (not sure entirely, see routine at 209922 in rungun2)
+				           0d97  0515              parse big DMA list at c10200
+				                 57a       copy 4 bytes from c00f10 to c10f00 and 4 bytes from c00f30 to c0fe00
+				*/
 				if ((last_prot_op == 0xa56) || (last_prot_op == 0xd96) || (last_prot_op == 0xd14) || (last_prot_op == 0xd1c))
 				{
 					// memcpy from c01000 to c01400 for 0x400 bytes (startup check for type 4 games)
@@ -1056,7 +1056,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 						space.write_word(0xc01400+i, space.read_word(0xc01000+i));
 					}
 				}
-				else if(last_prot_op == 0x57a)	// winspike
+				else if(last_prot_op == 0x57a)  // winspike
 				{
 					/* player 1 input buffer protection */
 					space.write_dword(0xc10f00, space.read_dword(0xc00f10));
@@ -1068,7 +1068,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 					space.write_dword(0xc0fe00, space.read_dword(0xc00f30));
 					space.write_dword(0xc0fe04, space.read_dword(0xc00f34));
 				}
-				else if(last_prot_op == 0xd97)	// rushhero
+				else if(last_prot_op == 0xd97)  // rushhero
 				{
 					int src = 0xc09ff0;
 					int dst = 0xd20000;
@@ -1150,10 +1150,10 @@ WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// BIOS ROM
-	AM_RANGE(0x200000, 0x3fffff) AM_ROM	// main program ROM
-	AM_RANGE(0x400000, 0x7fffff) AM_ROM	// data ROM
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("workram")	// work RAM
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM // BIOS ROM
+	AM_RANGE(0x200000, 0x3fffff) AM_ROM // main program ROM
+	AM_RANGE(0x400000, 0x7fffff) AM_ROM // data ROM
+	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("workram") // work RAM
 	AM_RANGE(0xd00000, 0xd01fff) AM_READ_LEGACY(K056832_5bpp_rom_long_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(K053247_long_r, K053247_long_w)
 	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
@@ -1182,22 +1182,22 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)	// sprite ROM readback
+	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)   // sprite ROM readback
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM			// LAN RAM? (Racin' Force has, Open Golf doesn't)
-	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP	// LAN board
+	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
+	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP // LAN board
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
 	AM_RANGE(0xddc000, 0xddcfff) AM_READ_PORT("ADC-RDPORT")
 	AM_RANGE(0xdde000, 0xdde003) AM_WRITE(type1_cablamps_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_SHARE("k053936_0_ctrl")
 	AM_RANGE(0xe20000, 0xe2000f) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
-	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_SHARE("k053936_0_line")	// chips 21L+19L / S
+	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_SHARE("k053936_0_line")  // chips 21L+19L / S
 	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE(konamigx_t1_psacmap_w) AM_SHARE("psacram")  // chips 20J+23J+18J / S
-	AM_RANGE(0xf00000, 0xf3ffff) AM_READ(type1_roz_r1)	// ROM readback
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)	// ROM readback
-	AM_RANGE(0xf80000, 0xf80fff) AM_RAM	// chip 21Q / S
-	AM_RANGE(0xfc0000, 0xfc00ff) AM_RAM	// chip 22N / S
+	AM_RANGE(0xf00000, 0xf3ffff) AM_READ(type1_roz_r1)  // ROM readback
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)  // ROM readback
+	AM_RANGE(0xf80000, 0xf80fff) AM_RAM // chip 21Q / S
+	AM_RANGE(0xfc0000, 0xfc00ff) AM_RAM // chip 22N / S
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
@@ -1214,7 +1214,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_SHARE("psac2_bank")
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_SHARE("k053936_0_line")
-	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram")	// main monitor palette
+	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram")  // main monitor palette
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_SHARE("subpaletteram")
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
@@ -1230,8 +1230,8 @@ static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_SHARE("k053936_0_line")  // 29C & 29G (PSAC2 line control)
 	AM_RANGE(0xe80000, 0xe87fff) AM_RAM AM_SHARE("paletteram") // 11G/13G/15G (main screen palette RAM)
 	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_SHARE("subpaletteram") // 5G/7G/9G (sub screen palette RAM)
-	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
-	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_SHARE("psacram")	// PSAC2 tilemap
+	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)      // type 4 polls this too
+	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_SHARE("psacram")    // PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
@@ -1373,7 +1373,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )	/* DIP#1 & DIP#2 */
+	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )   /* DIP#1 & DIP#2 */
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
@@ -1449,7 +1449,7 @@ static INPUT_PORTS_START( racinfrc )
 	PORT_START("ADC-RDPORT")
 	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0834", adc083x_do_read)
 
-	PORT_START("AN0")	/* mask default type                     sens delta min max */
+	PORT_START("AN0")   /* mask default type                     sens delta min max */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
 
 	PORT_START("AN1")
@@ -1460,14 +1460,14 @@ static INPUT_PORTS_START( le2 )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* Unmapped P2 B1 for gun games */
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* Unmapped P1 B1 for gun games */
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )          /* Unmapped P2 B1 for gun games */
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )          /* Unmapped P1 B1 for gun games */
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	/* for gun games */
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   /* for gun games */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	/* for gun games */
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   /* for gun games */
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1501,7 +1501,7 @@ static INPUT_PORTS_START( le2 )
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 
-	PORT_START("LIGHT0_X")	/* mask default type                     sens delta min max */
+	PORT_START("LIGHT0_X")  /* mask default type                     sens delta min max */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("LIGHT0_Y")
@@ -1698,7 +1698,7 @@ static const gfx_layout t1_charlayout6 =
 	{ 20, 16, 12, 8, 4, 0 },
 	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
 	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-	  12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
+		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 	16*16*6
 };
 
@@ -1710,7 +1710,7 @@ static const gfx_layout t1_charlayout8 =
 	{ 28, 24, 20, 16, 12, 8, 4, 0 },
 	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
 	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
+		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
 	16*16*8
 };
 #endif
@@ -1723,9 +1723,9 @@ static const gfx_layout t1_charlayout6 =
 	6,
 	{ 20, 16, 12, 8, 4, 0 },
 	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-	  12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
+		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
-  16*16*6
+	16*16*6
 };
 
 static const gfx_layout t1_charlayout8 =
@@ -1735,9 +1735,9 @@ static const gfx_layout t1_charlayout8 =
 	8,
 	{ 28, 24, 20, 16, 12, 8, 4, 0 },
 	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
+		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
 	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
-  16*16*8
+	16*16*8
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
@@ -1787,7 +1787,7 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
 	/* These parameters are actual value written to the CCU.
-    tbyahhoo attract mode desync is caused by another matter. */
+	tbyahhoo attract mode desync is caused by another matter. */
 
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -1960,7 +1960,7 @@ ROM_START(konamigx)
 ROM_END
 
 #define SPR_WOR_DROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(5))
-#define SPR_5TH_ROM_LOAD(name,offset,length,crc)	 ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(5))
+#define SPR_5TH_ROM_LOAD(name,offset,length,crc)     ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(5))
 
 #define TILE_WORD_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPDWORD | ROM_SKIP(1))
 #define TILE_BYTE_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(4))
@@ -1971,8 +1971,8 @@ ROM_END
 #define T1_PSAC6_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(2))
 #define T1_PSAC8_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(3))
 
-#define _48_WORD_ROM_LOAD(name,offset,length,crc)	ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(4))
-#define _64_WORD_ROM_LOAD(name,offset,length,crc)	ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(6))
+#define _48_WORD_ROM_LOAD(name,offset,length,crc)   ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(4))
+#define _64_WORD_ROM_LOAD(name,offset,length,crc)   ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(6))
 
 
 /* Gokujou Parodius version JAD (Japan) */
@@ -3283,9 +3283,9 @@ ROM_START( le2j )
 	GX_BIOS
 
 	ROM_LOAD32_BYTE( "312jaa05.26b", 0x200000, 0x020000, CRC(7eaa6ce2) SHA1(59d3460be98ac32ebea0422c2a9962556a9e964e) )
-    ROM_LOAD32_BYTE( "312jaa04.28b", 0x200001, 0x020000, CRC(c3d19ddc) SHA1(3bc3e705567e8e59e56a40ae64381082c4f22271) )
-    ROM_LOAD32_BYTE( "312jaa03.30b", 0x200002, 0x020000, CRC(9ad95a7c) SHA1(397b301f8bc4d5f039f47263ad73da5afc14712c) )
-    ROM_LOAD32_BYTE( "312jaa02.33b", 0x200003, 0x020000, CRC(e971cb87) SHA1(53e2e7c4b96e4331df27d4788aa1bb81efddf9f0) )
+	ROM_LOAD32_BYTE( "312jaa04.28b", 0x200001, 0x020000, CRC(c3d19ddc) SHA1(3bc3e705567e8e59e56a40ae64381082c4f22271) )
+	ROM_LOAD32_BYTE( "312jaa03.30b", 0x200002, 0x020000, CRC(9ad95a7c) SHA1(397b301f8bc4d5f039f47263ad73da5afc14712c) )
+	ROM_LOAD32_BYTE( "312jaa02.33b", 0x200003, 0x020000, CRC(e971cb87) SHA1(53e2e7c4b96e4331df27d4788aa1bb81efddf9f0) )
 
 	/* sound program */
 	ROM_REGION( 0x40000, "soundcpu", 0 )
@@ -3745,12 +3745,12 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 
 			switch (gameDefs[i].special)
 	{
-				case 1:	// LE2 guns
+				case 1: // LE2 guns
 					machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32_delegate(FUNC(konamigx_state::le2_gun_H_r),this));
 					machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32_delegate(FUNC(konamigx_state::le2_gun_V_r),this));
 					break;
 
-				case 2:	// tkmmpzdm hack
+				case 2: // tkmmpzdm hack
 	{
 		UINT32 *rom = (UINT32*)memregion("maincpu")->base();
 
@@ -3770,7 +3770,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 		esc_cb = dragoonj_esc;
 					break;
 
-				case 4:	// sexyparo
+				case 4: // sexyparo
 		esc_cb = sexyparo_esc;
 					break;
 
@@ -3782,7 +3782,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 		esc_cb = sal2_esc;
 					break;
 
-				case 7:	// install type 4 Xilinx protection for non-type 3/4 games
+				case 7: // install type 4 Xilinx protection for non-type 3/4 games
 		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32_delegate(FUNC(konamigx_state::type4_prot_w),this));
 					break;
 

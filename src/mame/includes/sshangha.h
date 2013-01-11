@@ -5,9 +5,9 @@ class sshangha_state : public driver_device
 public:
 	sshangha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		 m_deco_tilegen1(*this, "tilegen1"),
-		 m_spriteram(*this, "spriteram"),
-		 m_spriteram2(*this, "spriteram2"),
+			m_deco_tilegen1(*this, "tilegen1"),
+			m_spriteram(*this, "spriteram"),
+			m_spriteram2(*this, "spriteram2"),
 		m_sound_shared_ram(*this, "sound_shared"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),

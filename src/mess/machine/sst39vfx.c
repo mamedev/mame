@@ -158,22 +158,22 @@ void sst39vfx_save(device_t *device, emu_file *file)
 #if 0
 NVRAM_HANDLER( sst39vfx )
 {
-    _logerror( 0, ("nvram_handler_sst39vfx (%p/%d)\n", file, read_or_write));
-    if (read_or_write)
-    {
-        sst39vfx_save( file);
-    }
-    else
-    {
-        if (file)
-        {
-            sst39vfx_load( file);
-        }
-        else
-        {
-            memset( flash->data, 0xFF, flash->size);
-        }
-    }
+	_logerror( 0, ("nvram_handler_sst39vfx (%p/%d)\n", file, read_or_write));
+	if (read_or_write)
+	{
+		sst39vfx_save( file);
+	}
+	else
+	{
+		if (file)
+		{
+			sst39vfx_load( file);
+		}
+		else
+		{
+			memset( flash->data, 0xFF, flash->size);
+		}
+	}
 }
 #endif
 
@@ -225,5 +225,3 @@ void sst39vf400a_device::device_start()
 {
 	DEVICE_START_NAME( sst39vf400a )(this);
 }
-
-

@@ -36,10 +36,10 @@ static void plot_pattern( running_machine &machine, bitmap_ind16 &bitmap, int x,
 
 	for (ybit = 0; ybit < 2; ybit++)
 	{
-	    if (y + ybit < 0 || y + ybit >= VERT_RES * VERT_CHR)
-		    return;
+		if (y + ybit < 0 || y + ybit >= VERT_RES * VERT_CHR)
+			return;
 
-	    for (xbit = 0; xbit < size; xbit++)
+		for (xbit = 0; xbit < size; xbit++)
 		{
 			if (x + xbit < 0 || x + xbit >= HORZ_RES * HORZ_CHR)
 				continue;

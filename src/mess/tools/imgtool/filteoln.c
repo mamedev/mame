@@ -117,9 +117,9 @@ void filter_eoln_getinfo(UINT32 state, union filterinfo *info)
 {
 	switch(state)
 	{
-		case FILTINFO_STR_NAME:			info->s = "ascii"; break;
-		case FILTINFO_STR_HUMANNAME:	info->s = "Ascii"; break;
-		case FILTINFO_PTR_READFILE:		info->read_file = ascii_readfile; break;
-		case FILTINFO_PTR_WRITEFILE:	info->write_file = ascii_writefile; break;
+		case FILTINFO_STR_NAME:         info->s = "ascii"; break;
+		case FILTINFO_STR_HUMANNAME:    info->s = "Ascii"; break;
+		case FILTINFO_PTR_READFILE:     info->read_file = ascii_readfile; break;
+		case FILTINFO_PTR_WRITEFILE:    info->write_file = ascii_writefile; break;
 	}
 }

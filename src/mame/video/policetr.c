@@ -10,10 +10,10 @@
 
 
 /* constants */
-#define SRCBITMAP_WIDTH		4096
+#define SRCBITMAP_WIDTH     4096
 
-#define DSTBITMAP_WIDTH		512
-#define DSTBITMAP_HEIGHT	256
+#define DSTBITMAP_WIDTH     512
+#define DSTBITMAP_HEIGHT    256
 
 
 /*************************************
@@ -293,7 +293,7 @@ READ32_MEMBER(policetr_state::policetr_video_r)
 			return m_srcbitmap[(m_src_yoffs & m_srcbitmap_height_mask) * SRCBITMAP_WIDTH + m_src_xoffs % SRCBITMAP_WIDTH] << 24;
 
 		/* latch 0x50 is read at IRQ 4; the top 2 bits are checked. If they're not 0,
-            they skip the rest of the interrupt processing */
+		    they skip the rest of the interrupt processing */
 		case 0x50:
 			return 0;
 	}

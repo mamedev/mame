@@ -52,19 +52,19 @@
 
 struct image_data_chunk
 {
-	image_data_chunk *	next;
-	int					length;
-	UINT8 *				data;
+	image_data_chunk *  next;
+	int                 length;
+	UINT8 *             data;
 };
 
 
 struct png_private
 {
-	png_info *			pnginfo;
-	image_data_chunk *	idata;
-	image_data_chunk **	idata_next;
-	UINT8				bpp;
-	UINT32				rowbytes;
+	png_info *          pnginfo;
+	image_data_chunk *  idata;
+	image_data_chunk ** idata_next;
+	UINT8               bpp;
+	UINT32              rowbytes;
 };
 
 
@@ -815,8 +815,8 @@ static png_error write_deflated_chunk(core_file *fp, UINT8 *data, UINT32 type, U
 {
 	UINT64 lengthpos = core_ftell(fp);
 	UINT8 tempbuff[8192];
-    UINT32 zlength = 0;
-    z_stream stream;
+	UINT32 zlength = 0;
+	z_stream stream;
 	UINT32 crc;
 	int zerr;
 
@@ -833,9 +833,9 @@ static png_error write_deflated_chunk(core_file *fp, UINT8 *data, UINT32 type, U
 	memset(&stream, 0, sizeof(stream));
 	stream.next_in = data;
 	stream.avail_in = length;
-    zerr = deflateInit(&stream, Z_DEFAULT_COMPRESSION);
-    if (zerr != Z_OK)
-    	return PNGERR_COMPRESS_ERROR;
+	zerr = deflateInit(&stream, Z_DEFAULT_COMPRESSION);
+	if (zerr != Z_OK)
+		return PNGERR_COMPRESS_ERROR;
 
 	/* now loop until we run out of data */
 	for ( ; ; )
@@ -1138,7 +1138,7 @@ png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
 	put_32bit(mhdr + 8, rate);
 	put_32bit(mhdr + 24, 0x0041); /* Simplicity profile */
 	/* frame count and play time unspecified because
-       we don't know at this stage */
+	   we don't know at this stage */
 	error = write_chunk(fp, mhdr, MNG_CN_MHDR, 28);
 	if (error != PNGERR_NONE)
 		return error;

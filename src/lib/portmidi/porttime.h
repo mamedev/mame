@@ -9,7 +9,7 @@
 
 #ifdef WIN32
 #ifndef INT32_DEFINED
-// rather than having users install a special .h file for windows, 
+// rather than having users install a special .h file for windows,
 // just put the required definitions inline here. portmidi.h uses
 // these too, so the definitions are (unfortunately) duplicated there
 typedef int int32_t;
@@ -25,15 +25,15 @@ extern "C" {
 #endif
 
 #ifndef PMEXPORT
-#define PMEXPORT 
+#define PMEXPORT
 #endif
 
 typedef enum {
-    ptNoError = 0,         /* success */
-    ptHostError = -10000,  /* a system-specific error occurred */
-    ptAlreadyStarted,      /* cannot start timer because it is already started */
-    ptAlreadyStopped,      /* cannot stop timer because it is already stopped */
-    ptInsufficientMemory   /* memory could not be allocated */
+	ptNoError = 0,         /* success */
+	ptHostError = -10000,  /* a system-specific error occurred */
+	ptAlreadyStarted,      /* cannot start timer because it is already started */
+	ptAlreadyStopped,      /* cannot stop timer because it is already stopped */
+	ptInsufficientMemory   /* memory could not be allocated */
 } PtError;
 
 
@@ -69,7 +69,7 @@ PMEXPORT PtError Pt_Stop(void);
 */
 PMEXPORT int Pt_Started(void);
 
-/* 
+/*
     Pt_Time() returns the current time in ms.
 */
 PMEXPORT PtTimestamp Pt_Time(void);
@@ -77,7 +77,7 @@ PMEXPORT PtTimestamp Pt_Time(void);
 /*
     Pt_Sleep() pauses, allowing other threads to run.
 
-    duration is the length of the pause in ms. The true duration 
+    duration is the length of the pause in ms. The true duration
     of the pause may be rounded to the nearest or next clock tick
     as determined by resolution in Pt_Start().
 */

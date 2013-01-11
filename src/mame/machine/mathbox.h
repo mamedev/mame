@@ -45,4 +45,3 @@ private:
 };
 
 extern const device_type MATHBOX;
-

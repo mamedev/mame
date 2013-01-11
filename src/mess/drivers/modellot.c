@@ -15,8 +15,8 @@ class modellot_state : public driver_device
 public:
 	modellot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") ,
-		  m_video_ram(*this, "video_ram")
+			m_maincpu(*this, "maincpu") ,
+			m_video_ram(*this, "video_ram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -65,14 +65,14 @@ void modellot_state::machine_reset()
 
 const gfx_layout modellot_charlayout =
 {
-	8, 16,				/* 8x16 characters */
-	128,				/* 128 characters */
-	1,				/* 1 bits per pixel */
-	{0},				/* no bitplanes; 1 bit per pixel */
+	8, 16,              /* 8x16 characters */
+	128,                /* 128 characters */
+	1,              /* 1 bits per pixel */
+	{0},                /* no bitplanes; 1 bit per pixel */
 	{0,1,2,3,4,5,6,7},
 	{0, 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
-	 0x400*8, 0x401*8, 0x402*8, 0x403*8, 0x404*8, 0x405*8, 0x406*8, 0x407*8},
-	8*8				/* space between characters */
+		0x400*8, 0x401*8, 0x402*8, 0x403*8, 0x404*8, 0x405*8, 0x406*8, 0x407*8},
+	8*8             /* space between characters */
 };
 
 static GFXDECODE_START( modellot )

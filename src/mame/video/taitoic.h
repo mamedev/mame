@@ -39,7 +39,7 @@ struct tc0080vco_interface
 	int                bg_xoffs, bg_yoffs;
 	int                bg_flip_yoffs;
 
-	int                has_fg0;	/* for debug */
+	int                has_fg0; /* for debug */
 };
 
 struct tc0100scn_interface
@@ -81,7 +81,7 @@ struct tc0480scp_interface
 
 struct tc0150rod_interface
 {
-	const char      *gfx_region;	/* gfx region for the road */
+	const char      *gfx_region;    /* gfx region for the road */
 };
 
 
@@ -502,10 +502,10 @@ void tc0150rod_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cli
 
 /** TC0110PCR **/
 DECLARE_READ16_DEVICE_HANDLER( tc0110pcr_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_word_w );	/* color index goes up in step of 2 */
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_word_w );	/* color index goes up in step of 1 */
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_rbswap_word_w );	/* swaps red and blue components */
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w );	/* only 4 bits per color gun */
+DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_word_w ); /* color index goes up in step of 2 */
+DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_word_w );   /* color index goes up in step of 1 */
+DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_rbswap_word_w );    /* swaps red and blue components */
+DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w );  /* only 4 bits per color gun */
 
 
 /** TC0180VCU **/

@@ -49,18 +49,18 @@ READ8_MEMBER(pet_state::pia0_pa_r)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     KEY A
-        PA1     KEY B
-        PA2     KEY C
-        PA3     KEY D
-        PA4     #1 CASS SWITCH
-        PA5     #2 CASS SWITCH
-        PA6     _EOI IN
-        PA7     DIAG JUMPER
+	    PA0     KEY A
+	    PA1     KEY B
+	    PA2     KEY C
+	    PA3     KEY D
+	    PA4     #1 CASS SWITCH
+	    PA5     #2 CASS SWITCH
+	    PA6     _EOI IN
+	    PA7     DIAG JUMPER
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -86,18 +86,18 @@ WRITE8_MEMBER(pet_state::pia0_pa_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PA0     KEY A
-        PA1     KEY B
-        PA2     KEY C
-        PA3     KEY D
-        PA4     #1 CASS SWITCH
-        PA5     #2 CASS SWITCH
-        PA6     _EOI IN
-        PA7     DIAG JUMPER
+	    PA0     KEY A
+	    PA1     KEY B
+	    PA2     KEY C
+	    PA3     KEY D
+	    PA4     #1 CASS SWITCH
+	    PA5     #2 CASS SWITCH
+	    PA6     _EOI IN
+	    PA7     DIAG JUMPER
 
-    */
+	*/
 
 	/* key */
 	m_keyline_select = data & 0x0f;
@@ -108,18 +108,18 @@ READ8_MEMBER(pet_state::kin_r)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     KIN0
-        PB1     KIN1
-        PB2     KIN2
-        PB3     KIN3
-        PB4     KIN4
-        PB5     KIN5
-        PB6     KIN6
-        PB7     KIN7
+	    PB0     KIN0
+	    PB1     KIN1
+	    PB2     KIN2
+	    PB3     KIN3
+	    PB4     KIN4
+	    PB5     KIN5
+	    PB6     KIN6
+	    PB7     KIN7
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 	static const char *const keynames[] = {
@@ -177,7 +177,7 @@ WRITE8_MEMBER(pet_state::cass1_motor_w)
 	if (!data)
 	{
 		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		m_datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		m_datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));    // I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
@@ -196,34 +196,34 @@ WRITE_LINE_MEMBER(pet_state::pia0_irq_w)
 
 const pia6821_interface pet_pia0 =
 {
-	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_r),		/* in_a_func */
-	DEVCB_DRIVER_MEMBER(pet_state,kin_r),			/* in_b_func */
-	DEVCB_DRIVER_MEMBER(pet_state,cass1_r),			/* in_ca1_func */
-	DEVCB_NULL,						/* in_cb1_func */
-	DEVCB_NULL,						/* in_ca2_func */
-	DEVCB_NULL,						/* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_w),		/* out_a_func */
-	DEVCB_NULL,						/* out_b_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),			/* out_ca2_func */
-	DEVCB_DRIVER_MEMBER(pet_state,cass1_motor_w),	/* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w),			/* irq_a_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w)			/* irq_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_r),       /* in_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,kin_r),           /* in_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_r),         /* in_ca1_func */
+	DEVCB_NULL,                     /* in_cb1_func */
+	DEVCB_NULL,                     /* in_ca2_func */
+	DEVCB_NULL,                     /* in_cb2_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_w),       /* out_a_func */
+	DEVCB_NULL,                     /* out_b_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),           /* out_ca2_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_motor_w),   /* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w),         /* irq_a_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w)          /* irq_b_func */
 };
 
 const pia6821_interface petb_pia0 =
 {
-	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_r),		/* in_a_func */
-	DEVCB_DRIVER_MEMBER(pet_state,petb_kin_r),		/* in_b_func */
-	DEVCB_DRIVER_MEMBER(pet_state,cass1_r),			/* in_ca1_func */
-	DEVCB_NULL,						/* in_cb1_func */
-	DEVCB_NULL,						/* in_ca2_func */
-	DEVCB_NULL,						/* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_w),		/* out_a_func */
-	DEVCB_NULL,						/* out_b_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),			/* out_ca2_func */
-	DEVCB_DRIVER_MEMBER(pet_state,cass1_motor_w),	/* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w),			/* irq_a_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w)			/* irq_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_r),       /* in_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,petb_kin_r),      /* in_b_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_r),         /* in_ca1_func */
+	DEVCB_NULL,                     /* in_cb1_func */
+	DEVCB_NULL,                     /* in_ca2_func */
+	DEVCB_NULL,                     /* in_cb2_func */
+	DEVCB_DRIVER_MEMBER(pet_state,pia0_pa_w),       /* out_a_func */
+	DEVCB_NULL,                     /* out_b_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),           /* out_ca2_func */
+	DEVCB_DRIVER_MEMBER(pet_state,cass1_motor_w),   /* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w),         /* irq_a_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia0_irq_w)          /* irq_b_func */
 };
 
 /* pia at 0xe820 (ieee488)
@@ -246,17 +246,17 @@ WRITE_LINE_MEMBER(pet_state::pia1_irq_w)
 const pia6821_interface pet_pia1 =
 {
 	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),/* in_a_func */
-	DEVCB_NULL,								/* in_b_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, atn_r),	/* in_ca1_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_r),	/* in_cb1_func */
-	DEVCB_NULL,								/* in_ca2_func */
-	DEVCB_NULL,								/* in_cb2_func */
-	DEVCB_NULL,								/* out_a_func */
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),					/* out_b_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_w),					/* out_ca2_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, dav_w),					/* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia1_irq_w),					/* irq_a_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia1_irq_w)					/* irq_b_func */
+	DEVCB_NULL,                             /* in_b_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, atn_r),   /* in_ca1_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_r),   /* in_cb1_func */
+	DEVCB_NULL,                             /* in_ca2_func */
+	DEVCB_NULL,                             /* in_cb2_func */
+	DEVCB_NULL,                             /* out_a_func */
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),                    /* out_b_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_w),                  /* out_ca2_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, dav_w),                   /* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia1_irq_w),                 /* irq_a_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,pia1_irq_w)                  /* irq_b_func */
 };
 
 /* userport, cassettes, rest ieee488
@@ -280,18 +280,18 @@ READ8_MEMBER(pet_state::via_pb_r)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     _NDAC IN
-        PB1     _NRFD OUT
-        PB2     _ATN OUT
-        PB3     CASS WRITE
-        PB4     #2 CASS MOTOR
-        PB5     SYNC IN
-        PB6     _NRFD IN
-        PB7     _DAV IN
+	    PB0     _NDAC IN
+	    PB1     _NRFD OUT
+	    PB2     _ATN OUT
+	    PB3     CASS WRITE
+	    PB4     #2 CASS MOTOR
+	    PB5     SYNC IN
+	    PB6     _NRFD IN
+	    PB7     _DAV IN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -319,18 +319,18 @@ WRITE8_MEMBER(pet_state::via_pb_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     _NDAC IN
-        PB1     _NRFD OUT
-        PB2     _ATN OUT
-        PB3     CASS WRITE
-        PB4     #2 CASS MOTOR
-        PB5     SYNC IN
-        PB6     _NRFD IN
-        PB7     _DAV IN
+	    PB0     _NDAC IN
+	    PB1     _NRFD OUT
+	    PB2     _ATN OUT
+	    PB3     CASS WRITE
+	    PB4     #2 CASS MOTOR
+	    PB5     SYNC IN
+	    PB6     _NRFD IN
+	    PB7     _DAV IN
 
-    */
+	*/
 
 	/* not ready for data out */
 	m_ieee->nrfd_w(BIT(data, 1));
@@ -346,7 +346,7 @@ WRITE8_MEMBER(pet_state::via_pb_w)
 	if (BIT(data, 4))
 	{
 		machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));	// I put 48000 because I was given some .wav with this freq
+		m_datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));    // I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
@@ -372,19 +372,19 @@ WRITE_LINE_MEMBER(pet_state::via_irq_w)
 
 const via6522_interface pet_via =
 {
-	DEVCB_NULL,					/* in_a_func */
-	DEVCB_DRIVER_MEMBER(pet_state,via_pb_r),	/* in_b_func */
-	DEVCB_NULL,					/* in_ca1_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,cass2_r),		/* in_cb1_func */
-	DEVCB_NULL,					/* in_ca2_func */
-	DEVCB_NULL,					/* in_cb2_func */
-	DEVCB_NULL,					/* out_a_func */
-	DEVCB_DRIVER_MEMBER(pet_state,via_pb_w),	/* out_b_func */
-	DEVCB_NULL,					/* out_ca1_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,gb_w),			/* out_ca2_func */
-	DEVCB_NULL,					/* out_ca2_func */
-	DEVCB_NULL,					/* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(pet_state,via_irq_w)		/* out_irq_func */
+	DEVCB_NULL,                 /* in_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,via_pb_r),    /* in_b_func */
+	DEVCB_NULL,                 /* in_ca1_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,cass2_r),        /* in_cb1_func */
+	DEVCB_NULL,                 /* in_ca2_func */
+	DEVCB_NULL,                 /* in_cb2_func */
+	DEVCB_NULL,                 /* out_a_func */
+	DEVCB_DRIVER_MEMBER(pet_state,via_pb_w),    /* out_b_func */
+	DEVCB_NULL,                 /* out_ca1_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,gb_w),           /* out_ca2_func */
+	DEVCB_NULL,                 /* out_ca2_func */
+	DEVCB_NULL,                 /* out_cb2_func */
+	DEVCB_DRIVER_LINE_MEMBER(pet_state,via_irq_w)       /* out_irq_func */
 };
 
 
@@ -584,8 +584,8 @@ WRITE8_HANDLER( superpet_w )
 		case 2:
 		case 3:
 			/* 3: 1 pull down diagnostic pin on the userport
-               1: 1 if jumpered programable ram r/w
-               0: 0 if jumpered programable m6809, 1 m6502 selected */
+			   1: 1 if jumpered programable ram r/w
+			   0: 0 if jumpered programable m6809, 1 m6502 selected */
 			break;
 
 		case 4:
@@ -764,7 +764,7 @@ INTERRUPT_GEN_MEMBER(pet_state::pet_frame_interrupt)
 		}
 	}
 
-	set_led_status (machine(),1, machine().root_device().ioport("SPECIAL")->read() & 0x80 ? 1 : 0);		/* Shift Lock */
+	set_led_status (machine(),1, machine().root_device().ioport("SPECIAL")->read() & 0x80 ? 1 : 0);     /* Shift Lock */
 }
 
 

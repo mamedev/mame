@@ -193,13 +193,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int y    = spriteram[i + 2] - 2;
 		int attr = spriteram[i + 3];
 
-		int flipx = 0;	// ?
+		int flipx = 0;  // ?
 		int flipy = 0;
 
 		if (state->flip_screen())
 		{
-			x = 0xf0 - x;	flipx = !flipx;
-			y = 0xf0 - y;	flipy = !flipy;
+			x = 0xf0 - x;   flipx = !flipx;
+			y = 0xf0 - y;   flipy = !flipy;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
@@ -238,27 +238,27 @@ UINT32 paradise_state::screen_update_paradise(screen_device &screen, bitmap_ind1
 if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int mask = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))	mask |= 4;
-	if (machine().input().code_pressed(KEYCODE_R))	mask |= 8;
-	if (machine().input().code_pressed(KEYCODE_A))	mask |= 16;
+	if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))  mask |= 4;
+	if (machine().input().code_pressed(KEYCODE_R))  mask |= 8;
+	if (machine().input().code_pressed(KEYCODE_A))  mask |= 16;
 	if (mask != 0) layers_ctrl &= mask;
 }
 #endif
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	if (!(m_priority & 4))	/* Screen blanking */
+	if (!(m_priority & 4))  /* Screen blanking */
 		return 0;
 
 	if (m_priority & 1)
 		if (layers_ctrl & 16)
 			draw_sprites(screen.machine(), bitmap, cliprect);
 
-	if (layers_ctrl & 1)	m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 2)	m_tilemap_1->draw(bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 4)	copybitmap_trans(bitmap, m_tmpbitmap, flip_screen(), flip_screen(), 0, 0, cliprect, 0x80f);
+	if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 4)    copybitmap_trans(bitmap, m_tmpbitmap, flip_screen(), flip_screen(), 0, 0, cliprect, 0x80f);
 
 	if (m_priority & 2)
 	{
@@ -285,7 +285,7 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	if (!(m_priority & 2))	/* Screen blanking */
+	if (!(m_priority & 2))  /* Screen blanking */
 		return 0;
 
 	if (m_priority & 1)

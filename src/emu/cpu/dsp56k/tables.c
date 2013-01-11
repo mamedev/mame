@@ -311,23 +311,23 @@ void decode_KKK_table(const UINT16 KKK, reg_id& D1, reg_id& D2)
 void decode_NN_table(UINT16 NN, reg_id& ret)
 {
 	switch(NN)
-    {
-        case 0x0: ret = iN0; break;
-        case 0x1: ret = iN1; break;
-        case 0x2: ret = iN2; break;
-        case 0x3: ret = iN3; break;
-    }
+	{
+		case 0x0: ret = iN0; break;
+		case 0x1: ret = iN1; break;
+		case 0x2: ret = iN2; break;
+		case 0x3: ret = iN3; break;
+	}
 }
 
 void decode_TT_table(UINT16 TT, reg_id& ret)
 {
 	switch(TT)
-    {
-        case 0x0: ret = iR0; break;
-        case 0x1: ret = iR1; break;
-        case 0x2: ret = iR2; break;
-        case 0x3: ret = iR3; break;
-    }
+	{
+		case 0x0: ret = iR0; break;
+		case 0x1: ret = iR1; break;
+		case 0x2: ret = iR2; break;
+		case 0x3: ret = iR3; break;
+	}
 }
 
 void decode_QQF_table(const UINT16 QQ, const UINT16 F, reg_id& S1, reg_id& S2, reg_id& D)
@@ -392,23 +392,23 @@ void decode_QQQF_table(const UINT16 QQQ, const UINT16 F, reg_id& S1, reg_id& S2,
 void decode_RR_table(UINT16 RR, reg_id& ret)
 {
 	switch(RR)
-    {
-        case 0x0: ret = iR0; break;
-        case 0x1: ret = iR1; break;
-        case 0x2: ret = iR2; break;
-        case 0x3: ret = iR3; break;
-    }
+	{
+		case 0x0: ret = iR0; break;
+		case 0x1: ret = iR1; break;
+		case 0x2: ret = iR2; break;
+		case 0x3: ret = iR3; break;
+	}
 }
 
 void decode_rr_table(UINT16 rr, reg_id& ret)
 {
 	switch(rr)
-    {
-        case 0x0: ret = iR0; break;
-        case 0x1: ret = iR1; break;
-        case 0x2: ret = iR2; break;
-        case 0x3: ret = iR3; break;
-    }
+	{
+		case 0x0: ret = iR0; break;
+		case 0x1: ret = iR1; break;
+		case 0x2: ret = iR2; break;
+		case 0x3: ret = iR3; break;
+	}
 }
 
 void decode_s_table(const UINT16 s, op_mnem& arithmetic)
@@ -489,7 +489,7 @@ void assemble_ea_from_m_table(const UINT16 m, const int n, astring& ea)
 	char temp[32];
 	switch(m)
 	{
-		case 0x0: sprintf(temp, "(R%d)+",n)	      ; break;
+		case 0x0: sprintf(temp, "(R%d)+",n)       ; break;
 		case 0x1: sprintf(temp, "(R%d)+N%d", n, n); break;
 	}
 	ea = temp;
@@ -501,14 +501,14 @@ void assemble_eas_from_mm_table(UINT16 mm, int n1, int n2, astring& ea1, astring
 	char temp2[32];
 	switch(mm)
 	{
-		case 0x0: sprintf(temp1, "(R%d)+",	n1)	;
-				  sprintf(temp2, "(R%d)+",	n2)	; break;
-		case 0x1: sprintf(temp1, "(R%d)+",	n1)	;
-				  sprintf(temp2, "(R%d)+N%d", n2, n2); break;
+		case 0x0: sprintf(temp1, "(R%d)+",  n1) ;
+					sprintf(temp2, "(R%d)+",    n2) ; break;
+		case 0x1: sprintf(temp1, "(R%d)+",  n1) ;
+					sprintf(temp2, "(R%d)+N%d", n2, n2); break;
 		case 0x2: sprintf(temp1, "(R%d)+N%d", n1, n1);
-				  sprintf(temp2, "(R%d)+",	n2)	; break;
+					sprintf(temp2, "(R%d)+",    n2) ; break;
 		case 0x3: sprintf(temp1, "(R%d)+N%d", n1, n1);
-				  sprintf(temp2, "(R%d)+N%d", n2, n2); break;
+					sprintf(temp2, "(R%d)+N%d", n2, n2); break;
 	}
 	ea1 = temp1;
 	ea2 = temp2;
@@ -519,9 +519,9 @@ void assemble_ea_from_MM_table(UINT16 MM, int n, astring& ea)
 	char temp[32];
 	switch(MM)
 	{
-		case 0x0: sprintf(temp, "(R%d)",	 n)   ; break;
-		case 0x1: sprintf(temp, "(R%d)+",	n)   ; break;
-		case 0x2: sprintf(temp, "(R%d)-",	n)   ; break;
+		case 0x0: sprintf(temp, "(R%d)",     n)   ; break;
+		case 0x1: sprintf(temp, "(R%d)+",   n)   ; break;
+		case 0x2: sprintf(temp, "(R%d)-",   n)   ; break;
 		case 0x3: sprintf(temp, "(R%d)+N%d", n, n); break;
 	}
 	ea = temp;
@@ -533,7 +533,7 @@ void assemble_ea_from_q_table(UINT16 q, int n, astring& ea)
 	switch(q)
 	{
 		case 0x0: sprintf(temp, "(R%d+N%d)", n, n); break;
-		case 0x1: sprintf(temp, "-(R%d)",	n)   ; break;
+		case 0x1: sprintf(temp, "-(R%d)",   n)   ; break;
 	}
 	ea = temp;
 }
@@ -556,7 +556,7 @@ void assemble_ea_from_z_table(UINT16 z, int n, astring& ea)
 	char temp[32];
 	switch(z)
 	{
-		case 0x0: sprintf(temp, "(R%d)-",	n)   ; break;
+		case 0x0: sprintf(temp, "(R%d)-",   n)   ; break;
 		case 0x1: sprintf(temp, "(R%d)+N%d", n, n); break;
 	}
 	ea = temp;
@@ -565,7 +565,7 @@ void assemble_ea_from_z_table(UINT16 z, int n, astring& ea)
 void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, astring& D)
 {
 	char temp[32];
-	astring fullAddy;	 /* Convert Short Absolute Address to full 16-bit */
+	astring fullAddy;    /* Convert Short Absolute Address to full 16-bit */
 
 	switch(P)
 	{
@@ -583,7 +583,7 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, astring& D)
 }
 
 void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const astring& ea,
-									 astring& source, astring& destination)
+										astring& source, astring& destination)
 {
 	char temp[32];
 	sprintf(temp, "%c:%s", ma, ea.cstr());
@@ -595,7 +595,7 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const 
 }
 
 void assemble_arguments_from_W_table(UINT16 W, char ma, const astring& SD, const astring& ea,
-									 astring& source, astring& destination)
+										astring& source, astring& destination)
 {
 	char temp[32];
 	sprintf(temp, "%c:%s", ma, ea.cstr());
@@ -695,205 +695,204 @@ bool registerOverlap(const reg_id& r0, const size_t bmd, const reg_id& r1)
 
 UINT16 regValue16(dsp56k_core* cpustate, const reg_id& reg)
 {
-    if (reg == iX0) return X0;
-    if (reg == iX1) return X1;
-    if (reg == iY0) return Y0;
-    if (reg == iY1) return Y1;
+	if (reg == iX0) return X0;
+	if (reg == iX1) return X1;
+	if (reg == iY0) return Y0;
+	if (reg == iY1) return Y1;
 
-    if (reg == iA0) return A0;
-    if (reg == iA1) return A1;
-    if (reg == iB0) return B0;
-    if (reg == iB1) return B1;
+	if (reg == iA0) return A0;
+	if (reg == iA1) return A1;
+	if (reg == iB0) return B0;
+	if (reg == iB1) return B1;
 
-    if (reg == iR0) return R0;
-    if (reg == iR1) return R1;
-    if (reg == iR2) return R2;
-    if (reg == iR3) return R3;
+	if (reg == iR0) return R0;
+	if (reg == iR1) return R1;
+	if (reg == iR2) return R2;
+	if (reg == iR3) return R3;
 
-    if (reg == iN0) return N0;
-    if (reg == iN1) return N1;
-    if (reg == iN2) return N2;
-    if (reg == iN3) return N3;
+	if (reg == iN0) return N0;
+	if (reg == iN1) return N1;
+	if (reg == iN2) return N2;
+	if (reg == iN3) return N3;
 
-    if (reg == iM0) return M0;
-    if (reg == iM1) return M1;
-    if (reg == iM2) return M2;
-    if (reg == iM3) return M3;
+	if (reg == iM0) return M0;
+	if (reg == iM1) return M1;
+	if (reg == iM2) return M2;
+	if (reg == iM3) return M3;
 
-    mame_printf_debug("The dsp561xx core is requesting a 16 bit value from non-16 bit register!");
-    return 0xdead;
+	mame_printf_debug("The dsp561xx core is requesting a 16 bit value from non-16 bit register!");
+	return 0xdead;
 }
 
 void setReg16(dsp56k_core* cpustate, const UINT16& value, const reg_id& reg)
 {
-    if (reg == iX0) X0 = value;
-    if (reg == iX1) X1 = value;
-    if (reg == iY0) Y0 = value;
-    if (reg == iY1) Y1 = value;
+	if (reg == iX0) X0 = value;
+	if (reg == iX1) X1 = value;
+	if (reg == iY0) Y0 = value;
+	if (reg == iY1) Y1 = value;
 
-    if (reg == iA0) A0 = value;
-    if (reg == iA1) A1 = value;
-    if (reg == iB0) B0 = value;
-    if (reg == iB1) B1 = value;
+	if (reg == iA0) A0 = value;
+	if (reg == iA1) A1 = value;
+	if (reg == iB0) B0 = value;
+	if (reg == iB1) B1 = value;
 
-    if (reg == iR0) R0 = value;
-    if (reg == iR1) R1 = value;
-    if (reg == iR2) R2 = value;
-    if (reg == iR3) R3 = value;
+	if (reg == iR0) R0 = value;
+	if (reg == iR1) R1 = value;
+	if (reg == iR2) R2 = value;
+	if (reg == iR3) R3 = value;
 
-    if (reg == iN0) N0 = value;
-    if (reg == iN1) N1 = value;
-    if (reg == iN2) N2 = value;
-    if (reg == iN3) N3 = value;
+	if (reg == iN0) N0 = value;
+	if (reg == iN1) N1 = value;
+	if (reg == iN2) N2 = value;
+	if (reg == iN3) N3 = value;
 
-    if (reg == iM0) M0 = value;
-    if (reg == iM1) M1 = value;
-    if (reg == iM2) M2 = value;
-    if (reg == iM3) M3 = value;
+	if (reg == iM0) M0 = value;
+	if (reg == iM1) M1 = value;
+	if (reg == iM2) M2 = value;
+	if (reg == iM3) M3 = value;
 }
 
 astring regIdAsString(const reg_id& regId)
 {
-    switch(regId)
-    {
-        case iX:  return "X";
-        case iX0: return "X0";
-        case iX1: return "X1";
-        case iY:  return "Y";
-        case iY0: return "Y0";
-        case iY1: return "Y1";
-        case iA:  return "A";
-        case iA0: return "A0";
-        case iA1: return "A1";
-        case iA2: return "A2";
-        case iB:  return "B";
-        case iB0: return "B0";
-        case iB1: return "B1";
-        case iB2: return "B2";
-        case iR0: return "R0";
-        case iR1: return "R1";
-        case iR2: return "R2";
-        case iR3: return "R3";
-        case iN0: return "N0";
-        case iN1: return "N1";
-        case iN2: return "N2";
-        case iN3: return "N3";
-        case iM0: return "M0";
-        case iM1: return "M1";
-        case iM2: return "M2";
-        case iM3: return "M3";
-        case iLC: return "LC";
-        case iSR: return "SR";
-        case iOMR: return "OMR";
-        case iSP:  return "SP";
-        case iSSH: return "SSH";
-        case iSSL: return "SSL";
-        case iLA:  return "LA";
-        case iMR:  return "MR";
-        case iCCR: return "CCR";
-        case iF:   return "F";
-        case iFHAT: return "^F";
-        case iINVALID: return "!!";
-        case iWEIRD: return "?";
-    }
+	switch(regId)
+	{
+		case iX:  return "X";
+		case iX0: return "X0";
+		case iX1: return "X1";
+		case iY:  return "Y";
+		case iY0: return "Y0";
+		case iY1: return "Y1";
+		case iA:  return "A";
+		case iA0: return "A0";
+		case iA1: return "A1";
+		case iA2: return "A2";
+		case iB:  return "B";
+		case iB0: return "B0";
+		case iB1: return "B1";
+		case iB2: return "B2";
+		case iR0: return "R0";
+		case iR1: return "R1";
+		case iR2: return "R2";
+		case iR3: return "R3";
+		case iN0: return "N0";
+		case iN1: return "N1";
+		case iN2: return "N2";
+		case iN3: return "N3";
+		case iM0: return "M0";
+		case iM1: return "M1";
+		case iM2: return "M2";
+		case iM3: return "M3";
+		case iLC: return "LC";
+		case iSR: return "SR";
+		case iOMR: return "OMR";
+		case iSP:  return "SP";
+		case iSSH: return "SSH";
+		case iSSL: return "SSL";
+		case iLA:  return "LA";
+		case iMR:  return "MR";
+		case iCCR: return "CCR";
+		case iF:   return "F";
+		case iFHAT: return "^F";
+		case iINVALID: return "!!";
+		case iWEIRD: return "?";
+	}
 
-    return "INVALID_REG_ID";
+	return "INVALID_REG_ID";
 }
 
 astring opMnemonicAsString(const op_mnem& mnem)
 {
-    switch(mnem)
-    {
-        case oCC: return "cc";
-        case oGE: return "ge";
-        case oNE: return "ne";
-        case oPL: return "pl";
-        case oNN: return "nn";
-        case oEC: return "ec";
-        case oLC: return "lc";
-        case oGT: return "gt";
-        case oCS: return "cs";
-        case oLT: return "lt";
-        case oEQ: return "eq";
-        case oMI: return "mi";
-        case oNR: return "nr";
-        case oES: return "es";
-        case oLS: return "ls";
-        case oLE: return "le";
+	switch(mnem)
+	{
+		case oCC: return "cc";
+		case oGE: return "ge";
+		case oNE: return "ne";
+		case oPL: return "pl";
+		case oNN: return "nn";
+		case oEC: return "ec";
+		case oLC: return "lc";
+		case oGT: return "gt";
+		case oCS: return "cs";
+		case oLT: return "lt";
+		case oEQ: return "eq";
+		case oMI: return "mi";
+		case oNR: return "nr";
+		case oES: return "es";
+		case oLS: return "ls";
+		case oLE: return "le";
 
-        case oSS: return "ss";
-        case oSU: return "su";
-        case oUU: return "uu";
-        case oINVALID: return "!!";
-    }
+		case oSS: return "ss";
+		case oSU: return "su";
+		case oUU: return "uu";
+		case oINVALID: return "!!";
+	}
 
-    return "INVALID_OPCODE_MNEMONIC";
+	return "INVALID_OPCODE_MNEMONIC";
 }
 
 reg_id stringAsRegID(const astring& str)
 {
-    if (str == "X") return iX;
-    if (str == "X0") return iX0;
-    if (str == "X1") return iX1;
-    if (str == "Y") return iY;
-    if (str == "Y0") return iY0;
-    if (str == "Y1") return iY1;
-    if (str == "A") return iA;
-    if (str == "A0") return iA0;
-    if (str == "A1") return iA1;
-    if (str == "A2") return iA2;
-    if (str == "B") return iB;
-    if (str == "B0") return iB0;
-    if (str == "B1") return iB1;
-    if (str == "B2") return iB2;
-    if (str == "R0") return iR0;
-    if (str == "R1") return iR1;
-    if (str == "R2") return iR2;
-    if (str == "R3") return iR3;
-    if (str == "N0") return iN0;
-    if (str == "N1") return iN1;
-    if (str == "N2") return iN2;
-    if (str == "N3") return iN3;
-    if (str == "M0") return iM0;
-    if (str == "M1") return iM1;
-    if (str == "M2") return iM2;
-    if (str == "M3") return iM3;
-    if (str == "LC") return iLC;
-    if (str == "SR") return iSR;
-    if (str == "OMR") return iOMR;
-    if (str == "SP") return iSP;
-    if (str == "SSH") return iSSH;
-    if (str == "SSL") return iSSL;
-    if (str == "LA") return iLA;
-    if (str == "MR") return iMR;
-    if (str == "CCR") return iCCR;
-    if (str == "F") return iF;
-    if (str == "^F") return iFHAT;
-    if (str == "!!") return iINVALID;
-    if (str == "?") return iWEIRD;
+	if (str == "X") return iX;
+	if (str == "X0") return iX0;
+	if (str == "X1") return iX1;
+	if (str == "Y") return iY;
+	if (str == "Y0") return iY0;
+	if (str == "Y1") return iY1;
+	if (str == "A") return iA;
+	if (str == "A0") return iA0;
+	if (str == "A1") return iA1;
+	if (str == "A2") return iA2;
+	if (str == "B") return iB;
+	if (str == "B0") return iB0;
+	if (str == "B1") return iB1;
+	if (str == "B2") return iB2;
+	if (str == "R0") return iR0;
+	if (str == "R1") return iR1;
+	if (str == "R2") return iR2;
+	if (str == "R3") return iR3;
+	if (str == "N0") return iN0;
+	if (str == "N1") return iN1;
+	if (str == "N2") return iN2;
+	if (str == "N3") return iN3;
+	if (str == "M0") return iM0;
+	if (str == "M1") return iM1;
+	if (str == "M2") return iM2;
+	if (str == "M3") return iM3;
+	if (str == "LC") return iLC;
+	if (str == "SR") return iSR;
+	if (str == "OMR") return iOMR;
+	if (str == "SP") return iSP;
+	if (str == "SSH") return iSSH;
+	if (str == "SSL") return iSSL;
+	if (str == "LA") return iLA;
+	if (str == "MR") return iMR;
+	if (str == "CCR") return iCCR;
+	if (str == "F") return iF;
+	if (str == "^F") return iFHAT;
+	if (str == "!!") return iINVALID;
+	if (str == "?") return iWEIRD;
 
-    return iINVALID;
+	return iINVALID;
 }
 
 UINT8 regIDAsNum(const reg_id& regId)
 {
-    if (regId == iR0) return 0;
-    if (regId == iR1) return 1;
-    if (regId == iR2) return 2;
-    if (regId == iR3) return 3;
+	if (regId == iR0) return 0;
+	if (regId == iR1) return 1;
+	if (regId == iR2) return 2;
+	if (regId == iR3) return 3;
 
-    if (regId == iN0) return 0;
-    if (regId == iN1) return 1;
-    if (regId == iN2) return 2;
-    if (regId == iN3) return 3;
+	if (regId == iN0) return 0;
+	if (regId == iN1) return 1;
+	if (regId == iN2) return 2;
+	if (regId == iN3) return 3;
 
-    if (regId == iM0) return 0;
-    if (regId == iM1) return 1;
-    if (regId == iM2) return 2;
-    if (regId == iM3) return 3;
+	if (regId == iM0) return 0;
+	if (regId == iM1) return 1;
+	if (regId == iM2) return 2;
+	if (regId == iM3) return 3;
 
-    return 255;
+	return 255;
 }
 
 }
-

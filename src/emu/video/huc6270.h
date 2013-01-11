@@ -25,21 +25,21 @@ enum huc6270_h_state {
 };
 
 
-#define MCFG_HUC6270_ADD( _tag, _intrf )	\
-	MCFG_DEVICE_ADD( _tag, HUC6270, 0 )		\
+#define MCFG_HUC6270_ADD( _tag, _intrf )    \
+	MCFG_DEVICE_ADD( _tag, HUC6270, 0 )     \
 	MCFG_DEVICE_CONFIG( _intrf )
 
 
 struct huc6270_interface
 {
 	/* Size of Video ram (mandatory) */
-	UINT32				vram_size;
+	UINT32              vram_size;
 	/* Callback for when the irq line may have changed (mandatory) */
-	devcb_write_line	irq_changed;
+	devcb_write_line    irq_changed;
 };
 
 
-class huc6270_device :	public device_t,
+class huc6270_device :  public device_t,
 						public huc6270_interface
 {
 public:
@@ -75,38 +75,38 @@ protected:
 
 private:
 	/* Callbacks */
-	devcb_resolved_write_line	m_irq_changed;
+	devcb_resolved_write_line   m_irq_changed;
 
-	UINT8	m_register_index;
+	UINT8   m_register_index;
 
 	/* HuC6270 registers */
-	UINT16	m_mawr;
-	UINT16	m_marr;
-	UINT16	m_vrr;
-	UINT16	m_vwr;
-	UINT16	m_cr;
-	UINT16	m_rcr;
-	UINT16	m_bxr;
-	UINT16	m_byr;
-	UINT16	m_mwr;
-	UINT16	m_hsr;
-	UINT16	m_hdr;
-	UINT16	m_vpr;
-	UINT16	m_vdw;
-	UINT16	m_vcr;
-	UINT16	m_dcr;
-	UINT16	m_sour;
-	UINT16	m_desr;
-	UINT16	m_lenr;
-	UINT16	m_dvssr;
-	UINT8	m_status;
+	UINT16  m_mawr;
+	UINT16  m_marr;
+	UINT16  m_vrr;
+	UINT16  m_vwr;
+	UINT16  m_cr;
+	UINT16  m_rcr;
+	UINT16  m_bxr;
+	UINT16  m_byr;
+	UINT16  m_mwr;
+	UINT16  m_hsr;
+	UINT16  m_hdr;
+	UINT16  m_vpr;
+	UINT16  m_vdw;
+	UINT16  m_vcr;
+	UINT16  m_dcr;
+	UINT16  m_sour;
+	UINT16  m_desr;
+	UINT16  m_lenr;
+	UINT16  m_dvssr;
+	UINT8   m_status;
 
 	/* To keep track of external hsync and vsync signals */
 	int m_hsync;
 	int m_vsync;
 
 	/* internal variables */
-	huc6270_v_state	m_vert_state;
+	huc6270_v_state m_vert_state;
 	huc6270_h_state m_horz_state;
 	int m_vd_triggered;
 	int m_vert_to_go;
@@ -124,14 +124,14 @@ private:
 	UINT16 m_bat_column;
 	UINT8 m_bat_tile_row[8];
 	/* Internal sprite attribute table. SATB DMA is used to transfer data
-       from VRAM to this internal table.
-    */
+	   from VRAM to this internal table.
+	*/
 	UINT16 m_sat[4*64];
 	int m_sprites_this_line;
 	int m_sprite_row_index;
-	UINT16	m_sprite_row[1024];
-	UINT16	*m_vram;
-	UINT16	m_vram_mask;
+	UINT16  m_sprite_row[1024];
+	UINT16  *m_vram;
+	UINT16  m_vram_mask;
 
 	const static UINT8 vram_increments[4];
 };
@@ -141,4 +141,3 @@ extern const device_type HUC6270;
 
 
 #endif
-

@@ -58,8 +58,8 @@
 #include "includes/atarigt.h"
 
 
-#define LOG_PROTECTION		(0)
-#define HACK_TMEK_CONTROLS	(0)
+#define LOG_PROTECTION      (0)
+#define HACK_TMEK_CONTROLS  (0)
 
 
 
@@ -123,8 +123,8 @@ static void cage_irq_callback(running_machine &machine, int reason)
 READ32_MEMBER(atarigt_state::special_port2_r)
 {
 	int temp = ioport("SERVICE")->read();
-	temp ^= 0x0001;		/* /A2DRDY always high for now */
-	temp ^= 0x0008;		/* A2D.EOC always high for now */
+	temp ^= 0x0001;     /* /A2DRDY always high for now */
+	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
 
@@ -145,27 +145,27 @@ INLINE void compute_fake_pots(int *pots)
 
 	pots[0] = pots[1] = pots[2] = pots[3] = 0x80;
 
-	if (fake & 0x01)			/* up */
+	if (fake & 0x01)            /* up */
 	{
-		if (fake & 0x04)		/* up and left */
+		if (fake & 0x04)        /* up and left */
 			pots[3] = 0x00;
-		else if (fake & 0x08)	/* up and right */
+		else if (fake & 0x08)   /* up and right */
 			pots[1] = 0x00;
-		else					/* up only */
+		else                    /* up only */
 			pots[1] = pots[3] = 0x00;
 	}
-	else if (fake & 0x02)		/* down */
+	else if (fake & 0x02)       /* down */
 	{
-		if (fake & 0x04)		/* down and left */
+		if (fake & 0x04)        /* down and left */
 			pots[3] = 0xff;
-		else if (fake & 0x08)	/* down and right */
+		else if (fake & 0x08)   /* down and right */
 			pots[1] = 0xff;
-		else					/* down only */
+		else                    /* down only */
 			pots[1] = pots[3] = 0xff;
 	}
-	else if (fake & 0x04)		/* left only */
+	else if (fake & 0x04)       /* left only */
 		pots[1] = 0xff, pots[3] = 0x00;
-	else if (fake & 0x08)		/* right only */
+	else if (fake & 0x08)       /* right only */
 		pots[3] = 0xff, pots[1] = 0x00;
 }
 #endif
@@ -205,15 +205,15 @@ READ32_MEMBER(atarigt_state::analog_port1_r)
 WRITE32_MEMBER(atarigt_state::latch_w)
 {
 	/*
-        D13 = 68.DISA
-        D12 = ERASE
-        D11 = /MOGO
-        D8  = VCR
-        D5  = /XRESET
-        D4  = /SNDRES
-        D3  = CC.L
-        D0  = CC.R
-    */
+	    D13 = 68.DISA
+	    D12 = ERASE
+	    D11 = /MOGO
+	    D8  = VCR
+	    D5  = /XRESET
+	    D4  = /SNDRES
+	    D3  = CC.L
+	    D0  = CC.R
+	*/
 
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
@@ -654,7 +654,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( common )
-	PORT_START("P1_P2")				/* 68.SW (A1=0, A1=1) */
+	PORT_START("P1_P2")             /* 68.SW (A1=0, A1=1) */
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -674,25 +674,25 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("SERVICE")		/* 68.STATUS (A2=0) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /A2DRDY */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_TILT )		/* TILT */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /XIRQ23 */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* A2D.EOC */
-	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )	/* NC */
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )			/* SELFTEST */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")	/* VBLANK */
+	PORT_START("SERVICE")       /* 68.STATUS (A2=0) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /A2DRDY */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_TILT )     /* TILT */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ23 */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )   /* NC */
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           /* SELFTEST */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")    /* VBLANK */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("COIN")			/* 68.STATUS (A2=1) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /VBIRQ */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /4MSIRQ */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /XIRQ0 */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /XIRQ1 */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /SERVICER */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )	/* /SER.L */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )	/* COINR */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )	/* COINL */
+	PORT_START("COIN")          /* 68.STATUS (A2=1) */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /VBIRQ */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /4MSIRQ */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ0 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ1 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SERVICER */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SER.L */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )    /* COINR */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )    /* COINL */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -700,7 +700,7 @@ static INPUT_PORTS_START( tmek )
 	PORT_INCLUDE( common )
 
 #if (HACK_TMEK_CONTROLS)
-	PORT_START("FAKE")		/* single digital joystick */
+	PORT_START("FAKE")      /* single digital joystick */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -802,23 +802,23 @@ GFXDECODE_END
 
 static const atarirle_desc modesc =
 {
-	"gfx3",		/* region where the GFX data lives */
-	256,		/* number of entries in sprite RAM */
-	0,			/* left clip coordinate */
-	0,			/* right clip coordinate */
+	"gfx3",     /* region where the GFX data lives */
+	256,        /* number of entries in sprite RAM */
+	0,          /* left clip coordinate */
+	0,          /* right clip coordinate */
 
-	0x0000,		/* base palette entry */
-	0x1000,		/* maximum number of colors */
+	0x0000,     /* base palette entry */
+	0x1000,     /* maximum number of colors */
 
-	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
-	{{ 0,0x0ff0,0,0,0,0,0,0 }},	/* mask for the color */
-	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
-	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
-	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
-	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
-	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
-	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
-	{{ 0,0x8000,0,0,0,0,0,0 }}	/* mask for the VRAM target */
+	{{ 0x7fff,0,0,0,0,0,0,0 }}, /* mask for the code index */
+	{{ 0,0x0ff0,0,0,0,0,0,0 }}, /* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }}, /* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }}, /* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }}, /* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }}, /* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }}, /* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }}, /* mask for the priority */
+	{{ 0,0x8000,0,0,0,0,0,0 }}  /* mask for the VRAM target */
 };
 
 
@@ -869,16 +869,16 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( tmek )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "0044d", 0x00000, 0x20000, CRC(1cd62725) SHA1(7685794d9fbe3fe7a9978d12e489447b4fba5282) )
 	ROM_LOAD32_BYTE( "0043d", 0x00001, 0x20000, CRC(82185051) SHA1(a21aad4f6ec948d9cd47efb89e7811c5c2e4850b) )
 	ROM_LOAD32_BYTE( "0042d", 0x00002, 0x20000, CRC(ef9feda4) SHA1(9fb6e91d4c22e28ced61d0d1f28f5e43191c8762) )
 	ROM_LOAD32_BYTE( "0041d", 0x00003, 0x20000, CRC(179da056) SHA1(5f7ddf44aab55beaf2c377b0c93279acb6273255) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078c", 0x000000, 0x080000, CRC(ff5b979a) SHA1(deb8ee454b6b7c7bddb2ba0c808869e45b19e55f) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "0077",  0x400000, 0x200000, CRC(8f650f8b) SHA1(e3b48ff4e2093d709134b6bf62cecd101ab5cef4) )
 	ROM_LOAD32_BYTE( "2501a", 0x400002, 0x080000, CRC(98e51103) SHA1(420d0aac6b1de1bd990b9e4219041192400299f8) )
 	ROM_LOAD32_BYTE( "2500a", 0x400003, 0x080000, CRC(49c0136c) SHA1(1ad463b1e50df9843abb8c645cbe8a79e42cbb87) )
@@ -917,23 +917,23 @@ ROM_START( tmek )
 	ROM_LOAD16_BYTE( "0315", 0xe00000, 0x100000, CRC(28e97d06) SHA1(ef115f393c568822cb2cb3cca92c7656e1ee07f9) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )	/* microcode for growth renderer */
+	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )  /* microcode for growth renderer */
 	ROM_LOAD( "0001b",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "0001c",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
 ROM_START( tmek51p )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "prog0", 0x00000, 0x20000, CRC(df16ffc1) SHA1(9b63493bc9fae4c6c58883050921fed1ae8f0cf3) )
 	ROM_LOAD32_BYTE( "prog1", 0x00001, 0x20000, CRC(a5ab6b62) SHA1(7c12c6f78e795b61c7dd40b871e7f1461c199cab) )
 	ROM_LOAD32_BYTE( "prog2", 0x00002, 0x20000, CRC(bdcf5942) SHA1(21c54694bfe1e5663e67a54afed2a0f37b0f00de) )
 	ROM_LOAD32_BYTE( "prog3", 0x00003, 0x20000, CRC(7b59022a) SHA1(7395063ff0ecda0453dc7d981ca0b90b8411b715) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078c", 0x000000, 0x080000, CRC(ff5b979a) SHA1(deb8ee454b6b7c7bddb2ba0c808869e45b19e55f) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "0077",  0x400000, 0x200000, CRC(8f650f8b) SHA1(e3b48ff4e2093d709134b6bf62cecd101ab5cef4) )
 	ROM_LOAD32_BYTE( "2501a", 0x400002, 0x080000, CRC(98e51103) SHA1(420d0aac6b1de1bd990b9e4219041192400299f8) )
 	ROM_LOAD32_BYTE( "2500a", 0x400003, 0x080000, CRC(49c0136c) SHA1(1ad463b1e50df9843abb8c645cbe8a79e42cbb87) )
@@ -972,23 +972,23 @@ ROM_START( tmek51p )
 	ROM_LOAD16_BYTE( "0315", 0xe00000, 0x100000, CRC(28e97d06) SHA1(ef115f393c568822cb2cb3cca92c7656e1ee07f9) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )	/* microcode for growth renderer */
+	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )  /* microcode for growth renderer */
 	ROM_LOAD( "0001b",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "0001c",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
 ROM_START( tmek45 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "0044c", 0x00000, 0x20000, CRC(6079fc3f) SHA1(f8caedd9708108ce7c2d1300661dadaf2e3a6319) )
 	ROM_LOAD32_BYTE( "0043c", 0x00001, 0x20000, CRC(23d6388b) SHA1(6144c845ae28777809776d863c0ed5ee3dff5c58) )
 	ROM_LOAD32_BYTE( "0042c", 0x00002, 0x20000, CRC(ba8745be) SHA1(139a3132ea2c69e37e63868402fcf10852953e9b) )
 	ROM_LOAD32_BYTE( "0041c", 0x00003, 0x20000, CRC(0285bc17) SHA1(346d9fcbea4b22986be04971074531bc0c014c79) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078b", 0x000000, 0x080000, CRC(a952771c) SHA1(49982ea864a99c07f45886ada7e2c9427a75f775) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "0077",  0x400000, 0x200000, CRC(8f650f8b) SHA1(e3b48ff4e2093d709134b6bf62cecd101ab5cef4) )
 	ROM_LOAD32_BYTE( "2501a", 0x400002, 0x080000, CRC(98e51103) SHA1(420d0aac6b1de1bd990b9e4219041192400299f8) )
 	ROM_LOAD32_BYTE( "2500a", 0x400003, 0x080000, CRC(49c0136c) SHA1(1ad463b1e50df9843abb8c645cbe8a79e42cbb87) )
@@ -1027,23 +1027,23 @@ ROM_START( tmek45 )
 	ROM_LOAD16_BYTE( "0315", 0xe00000, 0x100000, CRC(28e97d06) SHA1(ef115f393c568822cb2cb3cca92c7656e1ee07f9) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )	/* microcode for growth renderer */
+	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )  /* microcode for growth renderer */
 	ROM_LOAD( "0001b",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "0001c",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
 ROM_START( tmek44 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "0044b", 0x00000, 0x20000, CRC(f7cc0590) SHA1(b60df7535b3ce0c94ca14a2430a3a414d77fc751) )
 	ROM_LOAD32_BYTE( "0043b", 0x00001, 0x20000, CRC(9fb8e072) SHA1(5904bebf17f31922998f9b31e388abc2ac244385) )
 	ROM_LOAD32_BYTE( "0042b", 0x00002, 0x20000, CRC(ce68a9b3) SHA1(47b7a0ac8cce3d40f3f7559ec1b137dfdeaf1d83) )
 	ROM_LOAD32_BYTE( "0041b", 0x00003, 0x20000, CRC(b71ec759) SHA1(d4bed4bbab2c3bd278da4cd0f53580d7f66d8152) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078a", 0x000000, 0x080000, CRC(314d736f) SHA1(b23946fde6ea47d6a6e3430a9df4b06d453a94c8) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "0077",  0x400000, 0x200000, CRC(8f650f8b) SHA1(e3b48ff4e2093d709134b6bf62cecd101ab5cef4) )
 	ROM_LOAD32_BYTE( "2501a", 0x400002, 0x080000, CRC(98e51103) SHA1(420d0aac6b1de1bd990b9e4219041192400299f8) )
 	ROM_LOAD32_BYTE( "2500a", 0x400003, 0x080000, CRC(49c0136c) SHA1(1ad463b1e50df9843abb8c645cbe8a79e42cbb87) )
@@ -1082,23 +1082,23 @@ ROM_START( tmek44 )
 	ROM_LOAD16_BYTE( "0315", 0xe00000, 0x100000, CRC(28e97d06) SHA1(ef115f393c568822cb2cb3cca92c7656e1ee07f9) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )	/* microcode for growth renderer */
+	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )  /* microcode for growth renderer */
 	ROM_LOAD( "0001b",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "0001c",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
 ROM_START( tmek20 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "pgm0", 0x00000, 0x20000, CRC(f5f7f7be) SHA1(66be472e7c0ef26e2ce2b45488a8e4cfc1b0f80a) )
 	ROM_LOAD32_BYTE( "pgm1", 0x00001, 0x20000, CRC(284f7971) SHA1(5327f6368abd2ab9740a5150a8660c420f750476) )
 	ROM_LOAD32_BYTE( "pgm2", 0x00002, 0x20000, CRC(ce9a77d4) SHA1(025143b59d85180286086940b05c8e5ea0b4a7fe) )
 	ROM_LOAD32_BYTE( "pgm3", 0x00003, 0x20000, CRC(28b0e210) SHA1(7567671beecc7d30e9d4b61cf7d3448bb1dbb072) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078", 0x000000, 0x080000, BAD_DUMP CRC(314d736f) SHA1(b23946fde6ea47d6a6e3430a9df4b06d453a94c8) ) // not dumped from this pcb, rom taken from another set instead
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "0077",  0x400000, 0x200000, CRC(8f650f8b) SHA1(e3b48ff4e2093d709134b6bf62cecd101ab5cef4) )
 	ROM_LOAD32_BYTE( "2501a", 0x400002, 0x080000, CRC(98e51103) SHA1(420d0aac6b1de1bd990b9e4219041192400299f8) )
 	ROM_LOAD32_BYTE( "2500a", 0x400003, 0x080000, CRC(49c0136c) SHA1(1ad463b1e50df9843abb8c645cbe8a79e42cbb87) )
@@ -1137,23 +1137,23 @@ ROM_START( tmek20 )
 	ROM_LOAD16_BYTE( "0315", 0xe00000, 0x100000, CRC(28e97d06) SHA1(ef115f393c568822cb2cb3cca92c7656e1ee07f9) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )	/* microcode for growth renderer */
+	ROM_LOAD( "0001a",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )  /* microcode for growth renderer */
 	ROM_LOAD( "0001b",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "0001c",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
 ROM_START( primrage )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "136102-1044b.29l", 0x000000, 0x80000, CRC(35c9c34b) SHA1(4bd1d35cc7c68574819afd648405eedb8db25b4c) )
 	ROM_LOAD32_BYTE( "136102-1043b.28l", 0x000001, 0x80000, CRC(86322829) SHA1(e0e72888def0931d078921f099bae6788738a291) )
 	ROM_LOAD32_BYTE( "136102-1042b.27l", 0x000002, 0x80000, CRC(750e8095) SHA1(4660637136b1a25169d8c43646c8b87081763987) )
 	ROM_LOAD32_BYTE( "136102-1041b.25l", 0x000003, 0x80000, CRC(6a90d283) SHA1(7c18c97cb5e5cdd26a52cd6bc099fbce87055311) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "136102-1078a.11a", 0x000000, 0x080000, CRC(0656435f) SHA1(f8e498171e754eb8703dad6b2351509bbb27e06b) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "136102-0075",  0x400000, 0x200000, CRC(b685a88e) SHA1(998b8fe54971f6cd96e4c22b19e3831f29d8172d) )
 	ROM_LOAD32_WORD( "136102-0077",  0x400002, 0x200000, CRC(3283cea8) SHA1(fb7333ca951053a56c501f2ce0eb197c8fcafaf7) )
 
@@ -1194,52 +1194,52 @@ ROM_START( primrage )
 	ROM_LOAD16_BYTE( "136102-0331.moh0.7", 0x1e00000, 0x100000, CRC(c6a64dad) SHA1(ee54514463ab61cbaef70da064cf5de591e5861f) )
 
 	ROM_REGION( 0x0600, "proms", 0 ) /* N82S147AN */
-	ROM_LOAD( "136094-0001a.13s", 0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )	/* microcode for growth renderer */
+	ROM_LOAD( "136094-0001a.13s", 0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )    /* microcode for growth renderer */
 	ROM_LOAD( "136094-0002a.14s", 0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "136094-0003a.15s", 0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 
-    ROM_REGION( 0x0012, "mainbd_pals", 0 ) /* Dump attempted but security fuse blown */
+	ROM_REGION( 0x0012, "mainbd_pals", 0 ) /* Dump attempted but security fuse blown */
 	ROM_LOAD( "136101-0021a.22a.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-15LP */
-    ROM_LOAD( "136101-1025b.22e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0013a.23e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-15LP */
-    ROM_LOAD( "136101-0018a.24e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0017a.25e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL22V10B-10LP */
-    ROM_LOAD( "136101-1220a.22u.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
-    ROM_LOAD( "136094-0015a.17p.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136094-0007a.17s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-1008a.13m.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0011a.11k.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-1022a.12k.bin", 0x0000, 0x0001, NO_DUMP) /* GAL22V10B-15LP */
-    ROM_LOAD( "136094-0014a.12s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136094-0016a.11s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0009a.10m.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0012a.9n.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0010b.8k.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0019a.7k.bin",  0x0000, 0x0001, NO_DUMP) /* GAL20V8B-25LP */
-    ROM_LOAD( "136101-0006a.1s.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
+	ROM_LOAD( "136101-1025b.22e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0013a.23e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-15LP */
+	ROM_LOAD( "136101-0018a.24e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0017a.25e.bin", 0x0000, 0x0001, NO_DUMP) /* GAL22V10B-10LP */
+	ROM_LOAD( "136101-1220a.22u.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
+	ROM_LOAD( "136094-0015a.17p.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136094-0007a.17s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-1008a.13m.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0011a.11k.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-1022a.12k.bin", 0x0000, 0x0001, NO_DUMP) /* GAL22V10B-15LP */
+	ROM_LOAD( "136094-0014a.12s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136094-0016a.11s.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0009a.10m.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0012a.9n.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0010b.8k.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0019a.7k.bin",  0x0000, 0x0001, NO_DUMP) /* GAL20V8B-25LP */
+	ROM_LOAD( "136101-0006a.1s.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
 
-    ROM_REGION( 0x0002, "rombd_pals", 0 ) /* Dump attempted but security fuse blown */
+	ROM_REGION( 0x0002, "rombd_pals", 0 ) /* Dump attempted but security fuse blown */
 	ROM_LOAD( "136102-0261a.bnkdec.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-15LP */
-    ROM_LOAD( "136102-0260a.romdec.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
+	ROM_LOAD( "136102-0260a.romdec.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-10LP */
 
-    ROM_REGION( 0x0003, "sndbd_pals", 0 ) /* Dump attempted but security fuse blown */
-    ROM_LOAD( "136101-0070a.9f.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_REGION( 0x0003, "sndbd_pals", 0 ) /* Dump attempted but security fuse blown */
+	ROM_LOAD( "136101-0070a.9f.bin",  0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
 	ROM_LOAD( "136102-0071a.10f.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
-    ROM_LOAD( "136101-0073a.11f.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
+	ROM_LOAD( "136101-0073a.11f.bin", 0x0000, 0x0001, NO_DUMP) /* GAL16V8B-25LP */
 ROM_END
 
 
 ROM_START( primrage20 )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "136102-0044b.29l", 0x000000, 0x80000, CRC(26139575) SHA1(22e59ab621d58e56969b64701fc59aec085193dd) )
 	ROM_LOAD32_BYTE( "136102-0043b.28l", 0x000001, 0x80000, CRC(928d2447) SHA1(9bbbdbf056a7b986d985d79be889b9876a710631) )
 	ROM_LOAD32_BYTE( "136102-0042b.27l", 0x000002, 0x80000, CRC(cd6062b9) SHA1(2973fb561ab68cd48ec132b6720c04d10bedfd19) )
 	ROM_LOAD32_BYTE( "136102-0041b.25l", 0x000003, 0x80000, CRC(3008f6f0) SHA1(45aac457b4584ee3bd3561e3b2e34e49aa61fbc5) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "136102-0078a.11a", 0x000000, 0x080000, CRC(91df8d8f) SHA1(6d361f88de604b8f11dd9bfe85ff18bcd322862d) )
 
-	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "136102-0075",  0x400000, 0x200000, CRC(b685a88e) SHA1(998b8fe54971f6cd96e4c22b19e3831f29d8172d) )
 	ROM_LOAD32_WORD( "136102-0077",  0x400002, 0x200000, CRC(3283cea8) SHA1(fb7333ca951053a56c501f2ce0eb197c8fcafaf7) )
 
@@ -1280,7 +1280,7 @@ ROM_START( primrage20 )
 	ROM_LOAD16_BYTE( "136102-0331.moh0.7", 0x1e00000, 0x100000, CRC(c6a64dad) SHA1(ee54514463ab61cbaef70da064cf5de591e5861f) )
 
 	ROM_REGION( 0x0600, "proms", 0 ) /* N82S147AN */
-	ROM_LOAD( "136094-0001a.13s", 0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )	/* microcode for growth renderer */
+	ROM_LOAD( "136094-0001a.13s", 0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )    /* microcode for growth renderer */
 	ROM_LOAD( "136094-0002a.14s", 0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "136094-0003a.15s", 0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END

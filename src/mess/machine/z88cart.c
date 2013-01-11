@@ -15,7 +15,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define CLOSE_FLAP_TIME		attotime::from_msec(200)
+#define CLOSE_FLAP_TIME     attotime::from_msec(200)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -55,7 +55,7 @@ device_z88cart_interface::~device_z88cart_interface()
 //  z88cart_slot_device - constructor
 //-------------------------------------------------
 z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock),
+		device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_slot_interface(mconfig, *this)
 {
@@ -102,7 +102,7 @@ void z88cart_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_flp_cb, 0, sizeof(m_out_flp_cb));
+		memset(&m_out_flp_cb, 0, sizeof(m_out_flp_cb));
 	}
 
 	// set brief and instance name

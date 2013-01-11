@@ -50,8 +50,8 @@ READ8_MEMBER(vsnes_state::gun_in0_r)
 	/* shift */
 	m_input_latch[0] >>= 1;
 
-	ret |= ioport("COINS")->read();				/* merge coins, etc */
-	ret |= (ioport("DSW0")->read() & 3) << 3;		/* merge 2 dipswitches */
+	ret |= ioport("COINS")->read();             /* merge coins, etc */
+	ret |= (ioport("DSW0")->read() & 3) << 3;       /* merge 2 dipswitches */
 
 /* The gun games expect a 1 returned on every 5th read after sound_fix is reset*/
 /* Info Supplied by Ben Parnell <xodnizel@home.com> of FCE Ultra fame */
@@ -75,8 +75,8 @@ READ8_MEMBER(vsnes_state::vsnes_in0_r)
 	/* shift */
 	m_input_latch[0] >>= 1;
 
-	ret |= ioport("COINS")->read();				/* merge coins, etc */
-	ret |= (ioport("DSW0")->read() & 3) << 3;		/* merge 2 dipswitches */
+	ret |= ioport("COINS")->read();             /* merge coins, etc */
+	ret |= (ioport("DSW0")->read() & 3) << 3;       /* merge 2 dipswitches */
 
 	return ret;
 
@@ -86,7 +86,7 @@ READ8_MEMBER(vsnes_state::vsnes_in1_r)
 {
 	int ret = (m_input_latch[1]) & 1;
 
-	ret |= ioport("DSW0")->read() & ~3;			/* merge the rest of the dipswitches */
+	ret |= ioport("DSW0")->read() & ~3;         /* merge the rest of the dipswitches */
 
 	/* shift */
 	m_input_latch[1] >>= 1;
@@ -112,8 +112,8 @@ READ8_MEMBER(vsnes_state::vsnes_in0_1_r)
 	/* shift */
 	m_input_latch[2] >>= 1;
 
-	ret |= ioport("COINS2")->read();				/* merge coins, etc */
-	ret |= (ioport("DSW1")->read() & 3) << 3;		/* merge 2 dipswitches */
+	ret |= ioport("COINS2")->read();                /* merge coins, etc */
+	ret |= (ioport("DSW1")->read() & 3) << 3;       /* merge 2 dipswitches */
 	return ret;
 }
 
@@ -121,7 +121,7 @@ READ8_MEMBER(vsnes_state::vsnes_in1_1_r)
 {
 	int ret = (m_input_latch[3]) & 1;
 
-	ret |= ioport("DSW1")->read() & ~3;			/* merge the rest of the dipswitches */
+	ret |= ioport("DSW1")->read() & ~3;         /* merge the rest of the dipswitches */
 
 	/* shift */
 	m_input_latch[3] >>= 1;
@@ -383,13 +383,13 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 		m_input_latch[1] = ioport("IN1")->read();
 	}
 
-    if ((m_zapstore & 1) && (!(data & 1)))
+	if ((m_zapstore & 1) && (!(data & 1)))
 	/* reset sound_fix to keep sound from hanging */
-    {
+	{
 		m_sound_fix = 0;
 	}
 
-    m_zapstore = data;
+	m_zapstore = data;
 }
 
 DRIVER_INIT_MEMBER(vsnes_state,vsgun)
@@ -508,7 +508,7 @@ WRITE8_MEMBER(vsnes_state::drmario_rom_banking)
 		/* apply data to registers */
 		switch (reg)
 		{
-			case 0:		/* mirroring and options */
+			case 0:     /* mirroring and options */
 				{
 					int mirroring;
 
@@ -541,7 +541,7 @@ WRITE8_MEMBER(vsnes_state::drmario_rom_banking)
 				}
 			break;
 
-			case 1:	/* video rom banking - bank 0 - 4k or 8k */
+			case 1: /* video rom banking - bank 0 - 4k or 8k */
 				if (!m_vram)
 					v_set_videorom_bank(machine(), 0, (m_vrom4k) ? 4 : 8, m_drmario_shiftreg * 4);
 			break;
@@ -551,7 +551,7 @@ WRITE8_MEMBER(vsnes_state::drmario_rom_banking)
 					v_set_videorom_bank(machine(), 4, 4, m_drmario_shiftreg * 4);
 			break;
 
-			case 3:	/* program banking */
+			case 3: /* program banking */
 				{
 					int bank = (m_drmario_shiftreg & 0x03) * 0x4000;
 					UINT8 *prg = memregion("maincpu")->base();
@@ -652,7 +652,7 @@ static void mapper4_set_chr( running_machine &machine )
 	v_set_videorom_bank(machine, chr_page ^ 7, 1, state->m_MMC3_chr_bank[5]);
 }
 
-#define BOTTOM_VISIBLE_SCANLINE	239		/* The bottommost visible scanline */
+#define BOTTOM_VISIBLE_SCANLINE 239     /* The bottommost visible scanline */
 #define NUM_SCANLINE 262
 
 static void mapper4_irq( device_t *device, int scanline, int vblank, int blanked )
@@ -699,7 +699,7 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 			cmd = m_MMC3_cmd & 0x07;
 			switch (cmd)
 			{
-				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
+				case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
 					m_MMC3_chr_bank[cmd] = data;
 					mapper4_set_chr(machine());
@@ -802,13 +802,13 @@ READ8_MEMBER(vsnes_state::rbi_hack_r)
 		switch(m_VSindex++)
 		{
 			case 9:
-    			return 0x6F;
+				return 0x6F;
 
 			case 14:
 				return 0x94;
 
 			default:
-    			return 0xB4;
+				return 0xB4;
 		}
 	}
 }
@@ -950,7 +950,7 @@ DRIVER_INIT_MEMBER(vsnes_state,platoon)
 {
 
 	/* when starting a mapper 68 game  the first 16K ROM bank in the cart is loaded into $8000
-    the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
+	the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
 
 	UINT8 *prg = machine().root_device().memregion("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
@@ -1019,4 +1019,3 @@ DRIVER_INIT_MEMBER(vsnes_state,vsdual)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
 	machine().device("sub")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
 }
-

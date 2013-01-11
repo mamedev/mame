@@ -213,33 +213,33 @@ protected:
 	void trapf();
 
 	// internal state
-	const address_space_config		m_program_config;
-	UINT32				m_pc;
+	const address_space_config      m_program_config;
+	UINT32              m_pc;
 
 	// expanded flags
-	UINT32				m_pflag;
-	UINT32				m_iflag;
-	UINT32				m_cflag;
-	UINT32				m_vflag;
-	UINT32				m_znflag;
-	UINT32				m_flagsio;
+	UINT32              m_pflag;
+	UINT32              m_iflag;
+	UINT32              m_cflag;
+	UINT32              m_vflag;
+	UINT32              m_znflag;
+	UINT32              m_flagsio;
 
 	// internal stuff
-	UINT32				m_op;
-	UINT32				m_ppc;
-	UINT32				m_nextpc;
-	UINT8				m_irq_state;
-	int					m_icount;
-	address_space *		m_program;
-	direct_read_data *	m_direct;
+	UINT32              m_op;
+	UINT32              m_ppc;
+	UINT32              m_nextpc;
+	UINT8               m_irq_state;
+	int                 m_icount;
+	address_space *     m_program;
+	direct_read_data *  m_direct;
 
 	// src2val table, registers are at the end
-	UINT32				m_src2val[65536];
+	UINT32              m_src2val[65536];
 
 	// opcode/condition tables
 	typedef void (asap_device::*ophandler)();
 
-	ophandler			m_opcode[32 * 32 * 2];
+	ophandler           m_opcode[32 * 32 * 2];
 
 	static const ophandler s_opcodetable[32][4];
 	static const ophandler s_conditiontable[16];

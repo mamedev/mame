@@ -121,11 +121,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2")	/* DSW2 (inverted bits) */
-	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")	/* IN0 I/O: Coin slots, service, 1P/2P buttons */
-	AM_RANGE(0x81a0, 0x81a0) AM_MIRROR(0x000f) AM_READ_PORT("IN1")	/* IN1: Player 1 I/O */
-	AM_RANGE(0x81c0, 0x81c0) AM_MIRROR(0x000f) AM_READ_PORT("IN2")	/* IN2: Player 2 I/O */
-	AM_RANGE(0x81e0, 0x81e0) AM_MIRROR(0x000f) AM_READ_PORT("DSW1")	/* DSW1 (inverted bits) */
+	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2") /* DSW2 (inverted bits) */
+	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")  /* IN0 I/O: Coin slots, service, 1P/2P buttons */
+	AM_RANGE(0x81a0, 0x81a0) AM_MIRROR(0x000f) AM_READ_PORT("IN1")  /* IN1: Player 1 I/O */
+	AM_RANGE(0x81c0, 0x81c0) AM_MIRROR(0x000f) AM_READ_PORT("IN2")  /* IN2: Player 2 I/O */
+	AM_RANGE(0x81e0, 0x81e0) AM_MIRROR(0x000f) AM_READ_PORT("DSW1") /* DSW1 (inverted bits) */
 	AM_RANGE(0x8200, 0x8200) AM_MIRROR(0x00f8) AM_READNOP AM_WRITE(irq_enable_w)
 	AM_RANGE(0x8202, 0x8203) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_coin_counter_w)
 	AM_RANGE(0x8204, 0x8204) AM_MIRROR(0x00f8) AM_WRITENOP // starfield?
@@ -218,7 +218,7 @@ MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* 1.5 MHz ??? */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)   /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tutankhm_state,  tutankhm_interrupt)
 
@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
 	MCFG_SCREEN_UPDATE_DRIVER(tutankhm_state, screen_update_tutankhm)
 
 	/* sound hardware */
@@ -252,7 +252,7 @@ MACHINE_CONFIG_END
 */
 
 ROM_START( tutankhm )
-    /* ROMS located on the  KT-3203-1B board. */
+	/* ROMS located on the  KT-3203-1B board. */
 	ROM_REGION( 0x20000, "maincpu", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
 	ROM_LOAD( "m1.1h", 0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
 	ROM_LOAD( "m2.2h", 0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
@@ -271,7 +271,7 @@ ROM_START( tutankhm )
 	ROM_LOAD( "c9.9i", 0x18000, 0x1000, CRC(8ea9c6a6) SHA1(fe1b299f8760fc5418179d3569932ee2c4dff461) )
 	/* the other banks (1900-1fff) are empty */
 
-    /* ROMS located on the KT-5112-2B board. */
+	/* ROMS located on the KT-5112-2B board. */
 	ROM_REGION(  0x10000 , "tpsound", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "s1.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "s2.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
@@ -279,7 +279,7 @@ ROM_END
 
 
 ROM_START( tutankhms )
-    /* ROMS located on the KT-3203-1B board. */
+	/* ROMS located on the KT-3203-1B board. */
 	ROM_REGION( 0x20000, "maincpu", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
 	ROM_LOAD( "m1.1h", 0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
 	ROM_LOAD( "m2.2h", 0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
@@ -298,7 +298,7 @@ ROM_START( tutankhms )
 	ROM_LOAD( "c9.9i", 0x18000, 0x1000, CRC(8ea9c6a6) SHA1(fe1b299f8760fc5418179d3569932ee2c4dff461) )
 	/* the other banks (1900-1fff) are empty */
 
-    /* ROMS located on the KT-5112-2B board. */
+	/* ROMS located on the KT-5112-2B board. */
 	ROM_REGION(  0x10000, "tpsound", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "s1.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "s2.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )

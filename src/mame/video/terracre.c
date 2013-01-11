@@ -13,8 +13,8 @@
 TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
 {
 	/* xxxx.----.----.----
-     * ----.xx--.----.----
-     * ----.--xx.xxxx.xxxx */
+	 * ----.xx--.----.----
+	 * ----.--xx.xxxx.xxxx */
 	unsigned data = m_amazon_videoram[tile_index];
 	unsigned color = data>>11;
 	SET_TILE_INFO_MEMBER( 1,data&0x3ff,color,0 );

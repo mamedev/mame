@@ -29,8 +29,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 
 protected:
-	UINT16	m_o;
-	UINT16	m_r;
+	UINT16  m_o;
+	UINT16  m_r;
 };
 
 
@@ -197,7 +197,7 @@ static const tms0980_config merlin_tms0980_config =
 
 
 static MACHINE_CONFIG_START( merlin, merlin_state )
-	MCFG_CPU_ADD( "maincpu", TMS1100, 500000 )	/* Clock may be wrong */
+	MCFG_CPU_ADD( "maincpu", TMS1100, 500000 )  /* Clock may be wrong */
 	MCFG_CPU_CONFIG( merlin_tms0980_config )
 
 	MCFG_DEFAULT_LAYOUT(layout_merlin)
@@ -225,4 +225,3 @@ ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY            FULLNAME      FLAGS */
 CONS( 1978, merlin,     0,      0,      merlin,     merlin, driver_device,  0,      "Parker Brothers", "Merlin", 0 )
-

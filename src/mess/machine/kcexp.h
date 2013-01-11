@@ -17,9 +17,9 @@
 
 struct kcexp_interface
 {
-    devcb_write_line				m_out_irq_cb;
-    devcb_write_line				m_out_nmi_cb;
-	devcb_write_line				m_out_halt_cb;
+	devcb_write_line                m_out_irq_cb;
+	devcb_write_line                m_out_nmi_cb;
+	devcb_write_line                m_out_halt_cb;
 };
 
 
@@ -46,8 +46,8 @@ public:
 // ======================> kcexp_slot_device
 
 class kcexp_slot_device : public device_t,
-						  public kcexp_interface,
-						  public device_slot_interface
+							public kcexp_interface,
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -72,20 +72,20 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
 	virtual DECLARE_WRITE_LINE_MEMBER( meo_w );
 
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_halt_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_halt_func;
 
-	device_kcexp_interface*		m_cart;
+	device_kcexp_interface*     m_cart;
 
-	const char*					m_next_slot_tag;
-	kcexp_slot_device*			m_next_slot;
+	const char*                 m_next_slot_tag;
+	kcexp_slot_device*          m_next_slot;
 };
 
 // ======================> kccart_slot_device
 
 class kccart_slot_device : public kcexp_slot_device,
-						   public device_image_interface
+							public device_image_interface
 {
 public:
 	// construction/destruction

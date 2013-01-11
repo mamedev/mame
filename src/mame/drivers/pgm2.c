@@ -92,9 +92,9 @@ static const gfx_layout tiles32x32x8_layout =
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 2*8, 1*8, 3*8, 4*8, 6*8, 5*8, 7*8, 8*8, 10*8, 9*8, 11*8, 12*8, 14*8, 13*8, 15*8,
-	 16*8, 18*8, 17*8, 19*8, 20*8, 22*8, 21*8, 23*8, 24*8, 26*8, 25*8, 27*8, 28*8, 30*8, 29*8, 31*8 },
+		16*8, 18*8, 17*8, 19*8, 20*8, 22*8, 21*8, 23*8, 24*8, 26*8, 25*8, 27*8, 28*8, 30*8, 29*8, 31*8 },
 	{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256, 8*256, 9*256, 10*256, 11*256, 12*256, 13*256, 14*256, 15*256,
-	 16*256, 17*256, 18*256, 19*256, 20*256, 21*256, 22*256, 23*256, 24*256, 25*256, 26*256, 27*256, 28*256, 29*256, 30*256, 31*256
+		16*256, 17*256, 18*256, 19*256, 20*256, 21*256, 22*256, 23*256, 24*256, 25*256, 26*256, 27*256, 28*256, 29*256, 30*256, 31*256
 	},
 	256*32
 };
@@ -128,7 +128,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( pgm2, pgm2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 20000000)	// ?? unknown CPU, has internal ROM.
+	MCFG_CPU_ADD("maincpu", ARM7, 20000000) // ?? unknown CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
 //  MCFG_DEVICE_DISABLE()
 
@@ -148,7 +148,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-    MCFG_YMZ770_ADD("ymz770", 16384000)  // Actually a YMZ774 on-board
+	MCFG_YMZ770_ADD("ymz770", 16384000)  // Actually a YMZ774 on-board
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

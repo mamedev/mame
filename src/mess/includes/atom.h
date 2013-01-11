@@ -22,32 +22,32 @@
 #include "sound/speaker.h"
 #include "video/mc6847.h"
 
-#define SY6502_TAG		"ic22"
-#define INS8255_TAG		"ic25"
-#define MC6847_TAG		"ic31"
-#define R6522_TAG		"ic1"
-#define I8271_TAG		"ic13"
-#define MC6854_TAG		"econet_ic1"
-#define SCREEN_TAG		"screen"
-#define CENTRONICS_TAG	"centronics"
-#define BASERAM_TAG		"baseram"
-#define EXTROM_TAG		"a000"
-#define DOSROM_TAG		"e000"
+#define SY6502_TAG      "ic22"
+#define INS8255_TAG     "ic25"
+#define MC6847_TAG      "ic31"
+#define R6522_TAG       "ic1"
+#define I8271_TAG       "ic13"
+#define MC6854_TAG      "econet_ic1"
+#define SCREEN_TAG      "screen"
+#define CENTRONICS_TAG  "centronics"
+#define BASERAM_TAG     "baseram"
+#define EXTROM_TAG      "a000"
+#define DOSROM_TAG      "e000"
 
 
-#define X1	XTAL_3_579545MHz	// MC6847 Clock
-#define X2	XTAL_4MHz			// CPU Clock - a divider reduces it to 1MHz
+#define X1  XTAL_3_579545MHz    // MC6847 Clock
+#define X2  XTAL_4MHz           // CPU Clock - a divider reduces it to 1MHz
 
 class atom_state : public driver_device
 {
 public:
 	atom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, SY6502_TAG),
-		  m_vdg(*this, MC6847_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_speaker(*this, SPEAKER_TAG)
+			m_maincpu(*this, SY6502_TAG),
+			m_vdg(*this, MC6847_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_speaker(*this, SPEAKER_TAG)
 	,
 		m_video_ram(*this, "video_ram"){ }
 

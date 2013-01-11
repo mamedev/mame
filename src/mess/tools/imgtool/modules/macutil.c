@@ -85,4 +85,3 @@ void pascal_from_c_string(unsigned char *pstring, size_t pstring_len, const char
 	while(i < pstring_len - 1)
 		pstring[1 + i++] = '\0';
 }
-

@@ -19,7 +19,7 @@ public:
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
-	int 	     m_scrollx[2];
+	int          m_scrollx[2];
 	int        m_flipscreen;
 
 	/* devices */

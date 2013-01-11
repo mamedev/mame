@@ -44,22 +44,22 @@ private:
 	bool poll_joystick(int num);
 	void set_acknowledge(int data);
 
-	int		m_ack;
-	bool	m_clock_high;
-	int		m_buf;
-	int		m_buflen;
-	UINT8	previous_joy[MAX_HANDSETS];
-	UINT8	previous_key[MAX_HANDSETS];
+	int     m_ack;
+	bool    m_clock_high;
+	int     m_buf;
+	int     m_buflen;
+	UINT8   previous_joy[MAX_HANDSETS];
+	UINT8   previous_key[MAX_HANDSETS];
 
 	emu_timer *m_delay_timer;
 	emu_timer *m_poll_timer;
 };
 
-#define MCFG_HANDSET_ADD(_tag, _intf, _clock )	\
-	MCFG_DEVICE_ADD(_tag, HANDSET, _clock)	\
+#define MCFG_HANDSET_ADD(_tag, _intf, _clock )  \
+	MCFG_DEVICE_ADD(_tag, HANDSET, _clock)  \
 	MCFG_DEVICE_CONFIG(_intf)
 
-#define TI99_HANDSET_INTERFACE(name)	\
+#define TI99_HANDSET_INTERFACE(name)    \
 	const ti99_handset_intf(name) =
 
 /****************************************************************************/
@@ -83,7 +83,7 @@ private:
 	// Which joystick is selected?
 	// In reality this is no latch but GND is put on one of the selector lines
 	// and then routed back to the port via the joystick
-	int	m_joystick;
+	int m_joystick;
 };
 
 

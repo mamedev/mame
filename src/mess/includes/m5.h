@@ -3,31 +3,31 @@
 
 #include "machine/z80ctc.h"
 
-#define Z80_TAG			"ic17"
-#define Z80CTC_TAG		"ic19"
-#define SN76489AN_TAG	"ic15"
-#define TMS9918A_TAG	"ic10"
-#define TMS9929A_TAG	"ic10"
-#define I8255A_TAG		"i8255a"
-#define Z80_FD5_TAG		"z80fd5"
-#define UPD765_TAG		"upd765"
-#define CENTRONICS_TAG	"centronics"
-#define SCREEN_TAG		"screen"
+#define Z80_TAG         "ic17"
+#define Z80CTC_TAG      "ic19"
+#define SN76489AN_TAG   "ic15"
+#define TMS9918A_TAG    "ic10"
+#define TMS9929A_TAG    "ic10"
+#define I8255A_TAG      "i8255a"
+#define Z80_FD5_TAG     "z80fd5"
+#define UPD765_TAG      "upd765"
+#define CENTRONICS_TAG  "centronics"
+#define SCREEN_TAG      "screen"
 
 class m5_state : public driver_device
 {
 public:
 	m5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_fd5cpu(*this, Z80_FD5_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_ppi(*this, I8255A_TAG),
-		  m_fdc(*this, UPD765_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:525dd")
+			m_maincpu(*this, Z80_TAG),
+			m_fd5cpu(*this, Z80_FD5_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_ppi(*this, I8255A_TAG),
+			m_fdc(*this, UPD765_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_ram(*this, RAM_TAG),
+			m_floppy0(*this, UPD765_TAG ":0:525dd")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

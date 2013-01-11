@@ -32,4 +32,3 @@ public:
 /*----------- defined in audio/m79amb.c -----------*/
 
 DISCRETE_SOUND_EXTERN( m79amb );
-

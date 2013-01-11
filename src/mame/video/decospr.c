@@ -161,14 +161,14 @@ const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock),
-	  m_gfxregion(0),
-	  m_pricallback(NULL),
-	  m_colcallback(decospr_default_colour_callback),
-	  m_is_bootleg(false),
-	  m_x_offset(0),
-	  m_y_offset(0),
-	  m_flipallx(0),
-	  m_transpen(0)
+		m_gfxregion(0),
+		m_pricallback(NULL),
+		m_colcallback(decospr_default_colour_callback),
+		m_is_bootleg(false),
+		m_x_offset(0),
+		m_y_offset(0),
+		m_flipallx(0),
+		m_transpen(0)
 {
 }
 
@@ -270,7 +270,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 				fx = y & 0x2000;
 				fy = y & 0x4000;
-				multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
+				multi = (1 << ((y & 0x0600) >> 9)) - 1; /* 1x, 2x, 4x, 8x height */
 
 				/* bootleg support (esd16.c) */
 				if (flipscreen) x = ((x&0x1ff) - m_x_offset)&0x1ff;
@@ -475,7 +475,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											sprite + yy + h * xx,
 											colour,
 											fx,fy,
-											 x + mult * (w-xx),ypos,
+												x + mult * (w-xx),ypos,
 											machine().priority_bitmap,pri,m_transpen);
 								}
 

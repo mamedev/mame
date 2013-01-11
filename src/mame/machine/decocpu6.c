@@ -29,4 +29,3 @@ UINT8 deco_cpu6_device::mi_decrypt::read_decrypted(UINT16 adr)
 	else
 		return direct->read_raw_byte(adr);
 }
-

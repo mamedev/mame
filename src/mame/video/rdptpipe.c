@@ -2,7 +2,7 @@
 #include "includes/n64.h"
 #include "video/n64.h"
 
-#define RELATIVE(x, y)	((((x) >> 3) - (y)) << 3) | (x & 7);
+#define RELATIVE(x, y)  ((((x) >> 3) - (y)) << 3) | (x & 7);
 
 void N64TexturePipeT::SetMachine(running_machine &machine)
 {
@@ -113,8 +113,8 @@ void N64TexturePipeT::ShiftCycle(INT32* S, INT32* T, INT32* maxs, INT32* maxt, U
 	{
 		*T >>= tile[num].shift_t;
 	}
-    else
-    {
+	else
+	{
 		*T <<= (16 - tile[num].shift_t);
 	}
 	*T = SIGN16(*T);
@@ -141,8 +141,8 @@ void N64TexturePipeT::ShiftCopy(INT32* S, INT32* T, UINT32 num, const rdp_poly_s
 	{
 		*T >>= tile[num].shift_t;
 	}
-    else
-    {
+	else
+	{
 		*T <<= (16 - tile[num].shift_t);
 	}
 	*T = SIGN16(*T);
@@ -250,7 +250,7 @@ void N64TexturePipeT::Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT3
 {
 	const N64Tile* tile = object.m_tiles;
 
-#define TRELATIVE(x, y) 	((((x) >> 3) - (y)) << 3) | (x & 7);
+#define TRELATIVE(x, y)     ((((x) >> 3) - (y)) << 3) | (x & 7);
 	INT32 bilerp = cycle ? object.OtherModes.bi_lerp1 : object.OtherModes.bi_lerp0;
 	int convert = object.OtherModes.convert_one && cycle;
 	Color t0;
@@ -376,7 +376,7 @@ void N64TexturePipeT::Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT3
 
 		ClampCycleLight(&sss1, &sst1, maxs, maxt, tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
-        Mask(&sss1, &sst1, tilenum, object);
+		Mask(&sss1, &sst1, tilenum, object);
 
 		t0.c = Fetch(sss1, sst1, tilenum, object, userdata);
 		if (bilerp)
@@ -1366,11 +1366,11 @@ UINT32 N64TexturePipeT::Fetch(INT32 s, INT32 t, INT32 tilenum, const rdp_poly_st
 {
 	const N64Tile* tile = object.m_tiles;
 	UINT32 tformat = tile[tilenum].format;
-	UINT32 tsize =	tile[tilenum].size;
+	UINT32 tsize =  tile[tilenum].size;
 
 	UINT32 tbase = (tile[tilenum].line * t) & 0x1ff;
 	tbase += tile[tilenum].tmem;
-	UINT32 tpal	= tile[tilenum].palette;
+	UINT32 tpal = tile[tilenum].palette;
 
 	UINT32 index = (tformat << 4) | (tsize << 2) | ((UINT32) object.OtherModes.en_tlut << 1) | (UINT32) object.OtherModes.tlut_type;
 

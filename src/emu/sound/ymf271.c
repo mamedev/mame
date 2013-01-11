@@ -15,21 +15,21 @@
 #include "emu.h"
 #include "ymf271.h"
 
-#define VERBOSE		(1)
+#define VERBOSE     (1)
 
-#define MAXOUT		(+32767)
-#define MINOUT		(-32768)
+#define MAXOUT      (+32767)
+#define MINOUT      (-32768)
 
-#define SIN_BITS		10
-#define SIN_LEN			(1<<SIN_BITS)
-#define SIN_MASK		(SIN_LEN-1)
+#define SIN_BITS        10
+#define SIN_LEN         (1<<SIN_BITS)
+#define SIN_MASK        (SIN_LEN-1)
 
-#define LFO_LENGTH		256
-#define LFO_SHIFT		8
-#define PLFO_MAX		(+1.0)
-#define PLFO_MIN		(-1.0)
-#define ALFO_MAX		(+65536)
-#define ALFO_MIN		(0)
+#define LFO_LENGTH      256
+#define LFO_SHIFT       8
+#define PLFO_MAX        (+1.0)
+#define PLFO_MIN        (-1.0)
+#define ALFO_MAX        (+65536)
+#define ALFO_MIN        (0)
 
 //#define log2(n) (log((float) n)/log((float) 2))
 
@@ -69,7 +69,7 @@ struct YMF271Slot
 	// envelope generator
 	INT32 volume;
 	INT32 env_state;
-	INT32 env_attack_step;		// volume increase step in attack state
+	INT32 env_attack_step;      // volume increase step in attack state
 	INT32 env_decay1_step;
 	INT32 env_decay2_step;
 	INT32 env_release_step;
@@ -122,37 +122,37 @@ static INT16 *wavetable[8];
 static double plfo_table[4][8][LFO_LENGTH];
 static int alfo_table[4][LFO_LENGTH];
 
-#define ENV_ATTACK		0
-#define ENV_DECAY1		1
-#define ENV_DECAY2		2
-#define ENV_RELEASE		3
+#define ENV_ATTACK      0
+#define ENV_DECAY1      1
+#define ENV_DECAY2      2
+#define ENV_RELEASE     3
 
-#define ENV_VOLUME_SHIFT	16
+#define ENV_VOLUME_SHIFT    16
 
-#define INF		100000000.0
+#define INF     100000000.0
 
 static const double ARTime[] =
 {
-	INF,		INF,		INF,		INF,		6188.12,	4980.68,	4144.76,	3541.04,
-	3094.06,	2490.34,	2072.38,	1770.52,	1547.03,	1245.17,	1036.19,	885.26,
-	773.51,		622.59,		518.10,		441.63,		386.76,		311.29,		259.05,		221.32,
-	193.38,		155.65,		129.52,		110.66,		96.69,		77.82,		64.76,		55.33,
-	48.34,		38.91,		32.38,		27.66,		24.17,		19.46,		16.19,		13.83,
-	12.09,		9.73,		8.10,		6.92,		6.04,		4.86,		4.05,		3.46,
-	3.02,		2.47,		2.14,		1.88,		1.70,		1.38,		1.16,		1.02,
-	0.88,		0.70,		0.57,		0.48,		0.43,		0.43,		0.43,		0.07
+	INF,        INF,        INF,        INF,        6188.12,    4980.68,    4144.76,    3541.04,
+	3094.06,    2490.34,    2072.38,    1770.52,    1547.03,    1245.17,    1036.19,    885.26,
+	773.51,     622.59,     518.10,     441.63,     386.76,     311.29,     259.05,     221.32,
+	193.38,     155.65,     129.52,     110.66,     96.69,      77.82,      64.76,      55.33,
+	48.34,      38.91,      32.38,      27.66,      24.17,      19.46,      16.19,      13.83,
+	12.09,      9.73,       8.10,       6.92,       6.04,       4.86,       4.05,       3.46,
+	3.02,       2.47,       2.14,       1.88,       1.70,       1.38,       1.16,       1.02,
+	0.88,       0.70,       0.57,       0.48,       0.43,       0.43,       0.43,       0.07
 };
 
 static const double DCTime[] =
 {
-	INF,		INF,		INF,		INF,		93599.64,	74837.91,	62392.02,	53475.56,
-	46799.82,	37418.96,	31196.01,	26737.78,	23399.91,	18709.48,	15598.00,	13368.89,
-	11699.95,	9354.74,	7799.00,	6684.44,	5849.98,	4677.37,	3899.50,	3342.22,
-	2924.99,	2338.68,	1949.75,	1671.11,	1462.49,	1169.34,	974.88,		835.56,
-	731.25,		584.67,		487.44,		417.78,		365.62,		292.34,		243.72,		208.89,
-	182.81,		146.17,		121.86,		104.44,		91.41,		73.08,		60.93,		52.22,
-	45.69,		36.55,		33.85,		26.09,		22.83,		18.28,		15.22,		13.03,
-	11.41,		9.12,		7.60,		6.51,		5.69,		5.69,		5.69,		5.69
+	INF,        INF,        INF,        INF,        93599.64,   74837.91,   62392.02,   53475.56,
+	46799.82,   37418.96,   31196.01,   26737.78,   23399.91,   18709.48,   15598.00,   13368.89,
+	11699.95,   9354.74,    7799.00,    6684.44,    5849.98,    4677.37,    3899.50,    3342.22,
+	2924.99,    2338.68,    1949.75,    1671.11,    1462.49,    1169.34,    974.88,     835.56,
+	731.25,     584.67,     487.44,     417.78,     365.62,     292.34,     243.72,     208.89,
+	182.81,     146.17,     121.86,     104.44,     91.41,      73.08,      60.93,      52.22,
+	45.69,      36.55,      33.85,      26.09,      22.83,      18.28,      15.22,      13.03,
+	11.41,      9.12,       7.60,       6.51,       5.69,       5.69,       5.69,       5.69
 };
 
 /* Notes about the LFO Frequency Table below:
@@ -187,38 +187,38 @@ lfo_freq = 44100 / lfo_period                    }
 
 static const double LFO_frequency_table[256] =
 {
-	0.00066,	0.00068,	0.00070,	0.00073,	0.00075,	0.00078,	0.00081,	0.00084,
-	0.00088,	0.00091,	0.00096,	0.00100,	0.00105,	0.00111,	0.00117,	0.00124,
-	0.00131,	0.00136,	0.00140,	0.00145,	0.00150,	0.00156,	0.00162,	0.00168,
-	0.00175,	0.00183,	0.00191,	0.00200,	0.00210,	0.00221,	0.00234,	0.00247,
-	0.00263,	0.00271,	0.00280,	0.00290,	0.00300,	0.00312,	0.00324,	0.00336,
-	0.00350,	0.00366,	0.00382,	0.00401,	0.00421,	0.00443,	0.00467,	0.00495,
-	0.00526,	0.00543,	0.00561,	0.00580,	0.00601,	0.00623,	0.00647,	0.00673,
-	0.00701,	0.00731,	0.00765,	0.00801,	0.00841,	0.00885,	0.00935,	0.00990,
-	0.01051,	0.01085,	0.01122,	0.01160,	0.01202,	0.01246,	0.01294,	0.01346,
-	0.01402,	0.01463,	0.01529,	0.01602,	0.01682,	0.01771,	0.01869,	0.01979,
-	0.02103,	0.02171,	0.02243,	0.02320,	0.02403,	0.02492,	0.02588,	0.02692,
-	0.02804,	0.02926,	0.03059,	0.03204,	0.03365,	0.03542,	0.03738,	0.03958,
-	0.04206,	0.04341,	0.04486,	0.04641,	0.04807,	0.04985,	0.05176,	0.05383,
-	0.05608,	0.05851,	0.06117,	0.06409,	0.06729,	0.07083,	0.07477,	0.07917,
-	0.08411,	0.08683,	0.08972,	0.09282,	0.09613,	0.09969,	0.10353,	0.10767,
-	0.11215,	0.11703,	0.12235,	0.12817,	0.13458,	0.14167,	0.14954,	0.15833,
-	0.16823,	0.17365,	0.17944,	0.18563,	0.19226,	0.19938,	0.20705,	0.21533,
-	0.22430,	0.23406,	0.24470,	0.25635,	0.26917,	0.28333,	0.29907,	0.31666,
-	0.33646,	0.34731,	0.35889,	0.37126,	0.38452,	0.39876,	0.41410,	0.43066,
-	0.44861,	0.46811,	0.48939,	0.51270,	0.53833,	0.56666,	0.59814,	0.63333,
-	0.67291,	0.69462,	0.71777,	0.74252,	0.76904,	0.79753,	0.82820,	0.86133,
-	0.89722,	0.93623,	0.97878,	1.02539,	1.07666,	1.13333,	1.19629,	1.26666,
-	1.34583,	1.38924,	1.43555,	1.48505,	1.53809,	1.59509,	1.65640,	1.72266,
-	1.79443,	1.87245,	1.95756,	2.05078,	2.15332,	2.26665,	2.39258,	2.53332,
-	2.69165,	2.77848,	2.87109,	2.97010,	3.07617,	3.19010,	3.31280,	3.44531,
-	3.58887,	3.74490,	3.91513,	4.10156,	4.30664,	4.53331,	4.78516,	5.06664,
-	5.38330,	5.55696,	5.74219,	5.94019,	6.15234,	6.38021,	6.62560,	6.89062,
-	7.17773,	7.48981,	7.83026,	8.20312,	8.61328,	9.06661,	9.57031,	10.13327,
-	10.76660,	11.11391,	11.48438,	11.88039,	12.30469,	12.76042,	13.25120,	13.78125,
-	14.35547,	14.97962,	15.66051,	16.40625,	17.22656,	18.13322,	19.14062,	20.26654,
-	21.53320,	22.96875,	24.60938,	26.50240,	28.71094,	31.32102,	34.45312,	38.28125,
-	43.06641,	49.21875,	57.42188,	68.90625,	86.13281,	114.84375,	172.26562,	344.53125
+	0.00066,    0.00068,    0.00070,    0.00073,    0.00075,    0.00078,    0.00081,    0.00084,
+	0.00088,    0.00091,    0.00096,    0.00100,    0.00105,    0.00111,    0.00117,    0.00124,
+	0.00131,    0.00136,    0.00140,    0.00145,    0.00150,    0.00156,    0.00162,    0.00168,
+	0.00175,    0.00183,    0.00191,    0.00200,    0.00210,    0.00221,    0.00234,    0.00247,
+	0.00263,    0.00271,    0.00280,    0.00290,    0.00300,    0.00312,    0.00324,    0.00336,
+	0.00350,    0.00366,    0.00382,    0.00401,    0.00421,    0.00443,    0.00467,    0.00495,
+	0.00526,    0.00543,    0.00561,    0.00580,    0.00601,    0.00623,    0.00647,    0.00673,
+	0.00701,    0.00731,    0.00765,    0.00801,    0.00841,    0.00885,    0.00935,    0.00990,
+	0.01051,    0.01085,    0.01122,    0.01160,    0.01202,    0.01246,    0.01294,    0.01346,
+	0.01402,    0.01463,    0.01529,    0.01602,    0.01682,    0.01771,    0.01869,    0.01979,
+	0.02103,    0.02171,    0.02243,    0.02320,    0.02403,    0.02492,    0.02588,    0.02692,
+	0.02804,    0.02926,    0.03059,    0.03204,    0.03365,    0.03542,    0.03738,    0.03958,
+	0.04206,    0.04341,    0.04486,    0.04641,    0.04807,    0.04985,    0.05176,    0.05383,
+	0.05608,    0.05851,    0.06117,    0.06409,    0.06729,    0.07083,    0.07477,    0.07917,
+	0.08411,    0.08683,    0.08972,    0.09282,    0.09613,    0.09969,    0.10353,    0.10767,
+	0.11215,    0.11703,    0.12235,    0.12817,    0.13458,    0.14167,    0.14954,    0.15833,
+	0.16823,    0.17365,    0.17944,    0.18563,    0.19226,    0.19938,    0.20705,    0.21533,
+	0.22430,    0.23406,    0.24470,    0.25635,    0.26917,    0.28333,    0.29907,    0.31666,
+	0.33646,    0.34731,    0.35889,    0.37126,    0.38452,    0.39876,    0.41410,    0.43066,
+	0.44861,    0.46811,    0.48939,    0.51270,    0.53833,    0.56666,    0.59814,    0.63333,
+	0.67291,    0.69462,    0.71777,    0.74252,    0.76904,    0.79753,    0.82820,    0.86133,
+	0.89722,    0.93623,    0.97878,    1.02539,    1.07666,    1.13333,    1.19629,    1.26666,
+	1.34583,    1.38924,    1.43555,    1.48505,    1.53809,    1.59509,    1.65640,    1.72266,
+	1.79443,    1.87245,    1.95756,    2.05078,    2.15332,    2.26665,    2.39258,    2.53332,
+	2.69165,    2.77848,    2.87109,    2.97010,    3.07617,    3.19010,    3.31280,    3.44531,
+	3.58887,    3.74490,    3.91513,    4.10156,    4.30664,    4.53331,    4.78516,    5.06664,
+	5.38330,    5.55696,    5.74219,    5.94019,    6.15234,    6.38021,    6.62560,    6.89062,
+	7.17773,    7.48981,    7.83026,    8.20312,    8.61328,    9.06661,    9.57031,    10.13327,
+	10.76660,   11.11391,   11.48438,   11.88039,   12.30469,   12.76042,   13.25120,   13.78125,
+	14.35547,   14.97962,   15.66051,   16.40625,   17.22656,   18.13322,   19.14062,   20.26654,
+	21.53320,   22.96875,   24.60938,   26.50240,   28.71094,   31.32102,   34.45312,   38.28125,
+	43.06641,   49.21875,   57.42188,   68.90625,   86.13281,   114.84375,  172.26562,  344.53125
 };
 
 static const int RKS_Table[32][8] =
@@ -351,7 +351,7 @@ INLINE void calculate_step(YMF271Slot *slot)
 {
 	double st;
 
-	if (slot->waveform == 7)	// external waveform (PCM)
+	if (slot->waveform == 7)    // external waveform (PCM)
 	{
 		st = (double)(2 * (slot->fns | 2048)) * pow_table[slot->block] * fs_frequency[slot->fs];
 		st = st * multiple_table[slot->multiple];
@@ -359,11 +359,11 @@ INLINE void calculate_step(YMF271Slot *slot)
 		// LFO phase modulation
 		st *= slot->lfo_phasemod;
 
-		st /= (double)(524288/65536);		// pre-multiply with 65536
+		st /= (double)(524288/65536);       // pre-multiply with 65536
 
 		slot->step = (UINT64)st;
 	}
-	else						// internal waveform (FM)
+	else                        // internal waveform (FM)
 	{
 		st = (double)(2 * slot->fns) * pow_table[slot->block];
 		st = st * multiple_table[slot->multiple] * (double)(SIN_LEN);
@@ -371,7 +371,7 @@ INLINE void calculate_step(YMF271Slot *slot)
 		// LFO phase modulation
 		st *= slot->lfo_phasemod;
 
-		st /= (double)(536870912/65536);	// pre-multiply with 65536
+		st /= (double)(536870912/65536);    // pre-multiply with 65536
 
 		slot->step = (UINT64)st;
 	}
@@ -451,7 +451,7 @@ static void init_envelope(YMF271Slot *slot)
 	rate = GET_KEYSCALED_RATE(slot->ar * 2, keycode, slot->keyscale);
 	time = ARTime[rate];
 
-	attack_length = (UINT32)((time * 44100.0) / 1000.0);		// attack end time in samples
+	attack_length = (UINT32)((time * 44100.0) / 1000.0);        // attack end time in samples
 	slot->env_attack_step = (int)(((double)(160-0) / (double)(attack_length)) * 65536.0);
 
 	// init decay1 state
@@ -475,7 +475,7 @@ static void init_envelope(YMF271Slot *slot)
 	release_length = (UINT32)((time * 44100.0) / 1000.0);
 	slot->env_release_step = (int)(((double)(255-0) / (double)(release_length)) * 65536.0);
 
-	slot->volume = (255-160) << ENV_VOLUME_SHIFT;		// -60db
+	slot->volume = (255-160) << ENV_VOLUME_SHIFT;       // -60db
 	slot->env_state = ENV_ATTACK;
 }
 
@@ -506,10 +506,10 @@ INLINE int calculate_slot_volume(YMF271Slot *slot)
 
 	switch (slot->ams)
 	{
-		case 0: lfo_volume = 65536; break;	// 0dB
-		case 1: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 33124) >> 16); break;	// 5.90625dB
-		case 2: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 16742) >> 16); break;	// 11.8125dB
-		case 3: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 4277) >> 16); break;	// 23.625dB
+		case 0: lfo_volume = 65536; break;  // 0dB
+		case 1: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 33124) >> 16); break;  // 5.90625dB
+		case 2: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 16742) >> 16); break;  // 11.8125dB
+		case 3: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 4277) >> 16); break;   // 23.625dB
 	}
 
 	env_volume = ((UINT64)env_volume_table[255 - (slot->volume >> ENV_VOLUME_SHIFT)] * (UINT64)lfo_volume) >> 16;
@@ -727,7 +727,7 @@ static STREAM_UPDATE( ymf271_update )
 
 		switch (slot_group->sync)
 		{
-			case 0:		// 4 operator FM
+			case 0:     // 4 operator FM
 			{
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
@@ -913,7 +913,7 @@ static STREAM_UPDATE( ymf271_update )
 				break;
 			}
 
-			case 1:		// 2x 2 operator FM
+			case 1:     // 2x 2 operator FM
 			{
 				for (op = 0; op < 2; op++)
 				{
@@ -967,7 +967,7 @@ static STREAM_UPDATE( ymf271_update )
 				break;
 			}
 
-			case 2:		// 3 operator FM + PCM
+			case 2:     // 3 operator FM + PCM
 			{
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
@@ -1062,7 +1062,7 @@ static STREAM_UPDATE( ymf271_update )
 				break;
 			}
 
-			case 3:		// PCM
+			case 3:     // PCM
 			{
 				update_pcm(chip, j + (0*12), mixp, samples);
 				update_pcm(chip, j + (1*12), mixp, samples);
@@ -1254,19 +1254,19 @@ static void ymf271_write_fm(YMF271Chip *chip, int grp, int adr, int data)
 	sync_mode = 0;
 	switch (chip->groups[slot_group].sync)
 	{
-		case 0:		// 4 slot mode
+		case 0:     // 4 slot mode
 		{
 			if (grp == 0)
 				sync_mode = 1;
 			break;
 		}
-		case 1:		// 2x 2 slot mode
+		case 1:     // 2x 2 slot mode
 		{
 			if (grp == 0 || grp == 1)
 				sync_mode = 1;
 			break;
 		}
-		case 2:		// 3 slot + 1 slot mode
+		case 2:     // 3 slot + 1 slot mode
 		{
 			if (grp == 0)
 				sync_mode = 1;
@@ -1277,11 +1277,11 @@ static void ymf271_write_fm(YMF271Chip *chip, int grp, int adr, int data)
 			break;
 	}
 
-	if (sync_mode && sync_reg)		// key-on slot & synced register
+	if (sync_mode && sync_reg)      // key-on slot & synced register
 	{
 		switch (chip->groups[slot_group].sync)
 		{
-			case 0:		// 4 slot mode
+			case 0:     // 4 slot mode
 			{
 				write_register(chip, (12 * 0) + slot_group, reg, data);
 				write_register(chip, (12 * 1) + slot_group, reg, data);
@@ -1289,21 +1289,21 @@ static void ymf271_write_fm(YMF271Chip *chip, int grp, int adr, int data)
 				write_register(chip, (12 * 3) + slot_group, reg, data);
 				break;
 			}
-			case 1:		// 2x 2 slot mode
+			case 1:     // 2x 2 slot mode
 			{
-				if (grp == 0)		// Slot 1 - Slot 3
+				if (grp == 0)       // Slot 1 - Slot 3
 				{
 					write_register(chip, (12 * 0) + slot_group, reg, data);
 					write_register(chip, (12 * 2) + slot_group, reg, data);
 				}
-				else				// Slot 2 - Slot 4
+				else                // Slot 2 - Slot 4
 				{
 					write_register(chip, (12 * 1) + slot_group, reg, data);
 					write_register(chip, (12 * 3) + slot_group, reg, data);
 				}
 				break;
 			}
-			case 2:		// 3 slot + 1 slot mode
+			case 2:     // 3 slot + 1 slot mode
 			{
 				// 1 slot is handled normally
 				write_register(chip, (12 * 0) + slot_group, reg, data);
@@ -1315,7 +1315,7 @@ static void ymf271_write_fm(YMF271Chip *chip, int grp, int adr, int data)
 				break;
 		}
 	}
-	else		// write register normally
+	else        // write register normally
 	{
 		write_register(chip, (12 * grp) + slot_group, reg, data);
 	}
@@ -1461,11 +1461,11 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 
 			case 0x13:
 				if (data & 1)
-				{	// timer A load
+				{   // timer A load
 					chip->timerAVal = chip->timerA;
 				}
 				if (data & 2)
-				{	// timer B load
+				{   // timer B load
 					chip->timerBVal = chip->timerB;
 				}
 				if (data & 4)
@@ -1479,7 +1479,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->enable |= 8;
 				}
 				if (data & 0x10)
-				{	// timer A reset
+				{   // timer A reset
 					chip->irqstate &= ~1;
 					chip->status &= ~1;
 					chip->timerAVal |= 0x300;
@@ -1491,7 +1491,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->timA->adjust(period, 0, period);
 				}
 				if (data & 0x20)
-				{	// timer B reset
+				{   // timer B reset
 					chip->irqstate &= ~2;
 					chip->status &= ~2;
 
@@ -1814,7 +1814,7 @@ const device_type YMF271 = &device_creator<ymf271_device>;
 
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(YMF271Chip);
 }
@@ -1856,5 +1856,3 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

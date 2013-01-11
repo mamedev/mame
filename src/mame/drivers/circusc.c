@@ -73,15 +73,15 @@ void circusc_state::machine_reset()
 READ8_MEMBER(circusc_state::circusc_sh_timer_r)
 {
 	/* This port reads the output of a counter clocked from the CPU clock.
-     * The CPU XTAL is 14.31818MHz divided by 4.  It then goes through 10
-     * /2 stages to clock a 4 bit counter.  The output of the counter goes
-     * to D1-D4.
-     *
-     * The following:
-     * clock = m_audiocpu->total_cycles() >> 10;
-     * return (clock & 0x0f) << 1;
-     * Can be shortened to:
-     */
+	 * The CPU XTAL is 14.31818MHz divided by 4.  It then goes through 10
+	 * /2 stages to clock a 4 bit counter.  The output of the counter goes
+	 * to D1-D4.
+	 *
+	 * The following:
+	 * clock = m_audiocpu->total_cycles() >> 10;
+	 * return (clock & 0x0f) << 1;
+	 * Can be shortened to:
+	 */
 
 	int clock;
 
@@ -141,14 +141,14 @@ WRITE8_MEMBER(circusc_state::irq_mask_w)
 }
 
 static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8, circusc_state )
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x03f8) AM_WRITE(circusc_flipscreen_w)		/* FLIP */
-	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0x03f8) AM_WRITE(irq_mask_w)					/* INTST */
+	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x03f8) AM_WRITE(circusc_flipscreen_w)       /* FLIP */
+	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0x03f8) AM_WRITE(irq_mask_w)                 /* INTST */
 //  AM_RANGE(0x0002, 0x0002) AM_MIRROR(0x03f8) AM_WRITENOP                          /* MUT - not used /*
-	AM_RANGE(0x0003, 0x0004) AM_MIRROR(0x03f8) AM_WRITE(circusc_coin_counter_w)		/* COIN1, COIN2 */
+	AM_RANGE(0x0003, 0x0004) AM_MIRROR(0x03f8) AM_WRITE(circusc_coin_counter_w)     /* COIN1, COIN2 */
 	AM_RANGE(0x0005, 0x0005) AM_MIRROR(0x03f8) AM_WRITEONLY AM_SHARE("spritebank") /* OBJ CHENG */
-	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)			/* WDOG */
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_WRITE(soundlatch_byte_w)				/* SOUND DATA */
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_WRITE(circusc_sh_irqtrigger_w)	/* SOUND-ON causes interrupt on audio CPU */
+	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)           /* WDOG */
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_WRITE(soundlatch_byte_w)              /* SOUND DATA */
+	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_WRITE(circusc_sh_irqtrigger_w)    /* SOUND-ON causes interrupt on audio CPU */
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03fc) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x03fc) AM_READ_PORT("P1")
 	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x03fc) AM_READ_PORT("P2")
@@ -168,9 +168,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, circusc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)		/* CS0 */
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(circusc_sh_timer_r)	/* CS1 */
-	AM_RANGE(0xa000, 0xa07f) AM_MIRROR(0x1f80) AM_WRITE(circusc_sound_w)	/* CS2 - CS6 */
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)       /* CS0 */
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(circusc_sh_timer_r)  /* CS1 */
+	AM_RANGE(0xa000, 0xa07f) AM_MIRROR(0x1f80) AM_WRITE(circusc_sound_w)    /* CS2 - CS6 */
 ADDRESS_MAP_END
 
 
@@ -182,32 +182,32 @@ static INPUT_PORTS_START( circusc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* SW7 of 8 on unpopulated DIPSW 3 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* SW7 of 8 on unpopulated DIPSW 3 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )	/* 1P UP - unused */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	/* 1P DOWN - unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* 1P UP - unused */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* 1P DOWN - unused */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )	/* 1P SHOOT2 - unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) /* 1P SHOOT2 - unused */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )	/* 2P UP - unused */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	/* 2P DOWN - unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* 2P UP - unused */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* 2P DOWN - unused */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )	/* 2P SHOOT2 - unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) /* 2P SHOOT2 - unused */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -224,7 +224,7 @@ static INPUT_PORTS_START( circusc )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -243,24 +243,24 @@ static INPUT_PORTS_START( circusc )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "20k 90k 70k+" )
 	PORT_DIPSETTING(    0x00, "30k 110k 80k+" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW2:5" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -310,14 +310,14 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
 static const discrete_mixer_desc circusc_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(2.2), RES_K(2.2), RES_K(10)},
-		{0,0,0},	// no variable resistors
+		{0,0,0},    // no variable resistors
 		{0,0,0},  // no node capacitors
 		0, RES_K(1),
 		CAP_U(0.1),

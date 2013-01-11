@@ -35,41 +35,41 @@ INPUT_PORTS_EXTERN( coco_rtc );
 SLOT_INTERFACE_EXTERN( coco_cart );
 
 /* constants */
-#define JOYSTICK_DELTA			10
-#define JOYSTICK_SENSITIVITY	100
+#define JOYSTICK_DELTA          10
+#define JOYSTICK_SENSITIVITY    100
 
 /* devices */
-#define MAINCPU_TAG					"maincpu"
-#define PIA0_TAG					"pia0"
-#define PIA1_TAG					"pia1"
-#define SAM_TAG						"sam"
-#define VDG_TAG						"vdg"
-#define SCREEN_TAG					"screen"
-#define DAC_TAG						"dac"
-#define CARTRIDGE_TAG				"ext"
-#define BITBANGER_TAG				"bitbanger"
-#define VHD0_TAG					"vhd0"
-#define VHD1_TAG					"vhd1"
+#define MAINCPU_TAG                 "maincpu"
+#define PIA0_TAG                    "pia0"
+#define PIA1_TAG                    "pia1"
+#define SAM_TAG                     "sam"
+#define VDG_TAG                     "vdg"
+#define SCREEN_TAG                  "screen"
+#define DAC_TAG                     "dac"
+#define CARTRIDGE_TAG               "ext"
+#define BITBANGER_TAG               "bitbanger"
+#define VHD0_TAG                    "vhd0"
+#define VHD1_TAG                    "vhd1"
 
 /* inputs */
-#define CTRL_SEL_TAG				"ctrl_sel"
-#define HIRES_INTF_TAG				"hires_intf"
-#define CART_AUTOSTART_TAG			"cart_autostart"
-#define JOYSTICK_RX_TAG				"joystick_rx"
-#define JOYSTICK_RY_TAG				"joystick_ry"
-#define JOYSTICK_LX_TAG				"joystick_lx"
-#define JOYSTICK_LY_TAG				"joystick_ly"
-#define JOYSTICK_BUTTONS_TAG		"joystick_buttons"
-#define RAT_MOUSE_RX_TAG			"rat_mouse_rx"
-#define RAT_MOUSE_RY_TAG			"rat_mouse_ry"
-#define RAT_MOUSE_LX_TAG			"rat_mouse_lx"
-#define RAT_MOUSE_LY_TAG			"rat_mouse_ly"
-#define RAT_MOUSE_BUTTONS_TAG		"rat_mouse_buttons"
-#define DIECOM_LIGHTGUN_RX_TAG		"dclg_rx"
-#define DIECOM_LIGHTGUN_RY_TAG		"dclg_ry"
-#define DIECOM_LIGHTGUN_LX_TAG		"dclg_lx"
-#define DIECOM_LIGHTGUN_LY_TAG		"dclg_ly"
-#define DIECOM_LIGHTGUN_BUTTONS_TAG	"dclg_triggers"
+#define CTRL_SEL_TAG                "ctrl_sel"
+#define HIRES_INTF_TAG              "hires_intf"
+#define CART_AUTOSTART_TAG          "cart_autostart"
+#define JOYSTICK_RX_TAG             "joystick_rx"
+#define JOYSTICK_RY_TAG             "joystick_ry"
+#define JOYSTICK_LX_TAG             "joystick_lx"
+#define JOYSTICK_LY_TAG             "joystick_ly"
+#define JOYSTICK_BUTTONS_TAG        "joystick_buttons"
+#define RAT_MOUSE_RX_TAG            "rat_mouse_rx"
+#define RAT_MOUSE_RY_TAG            "rat_mouse_ry"
+#define RAT_MOUSE_LX_TAG            "rat_mouse_lx"
+#define RAT_MOUSE_LY_TAG            "rat_mouse_ly"
+#define RAT_MOUSE_BUTTONS_TAG       "rat_mouse_buttons"
+#define DIECOM_LIGHTGUN_RX_TAG      "dclg_rx"
+#define DIECOM_LIGHTGUN_RY_TAG      "dclg_ry"
+#define DIECOM_LIGHTGUN_LX_TAG      "dclg_lx"
+#define DIECOM_LIGHTGUN_LY_TAG      "dclg_ly"
+#define DIECOM_LIGHTGUN_BUTTONS_TAG "dclg_triggers"
 
 MACHINE_CONFIG_EXTERN( coco_sound );
 
@@ -84,17 +84,17 @@ class coco_state : public driver_device
 public:
 	coco_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, MAINCPU_TAG),
-	  m_pia_0(*this, PIA0_TAG),
-	  m_pia_1(*this, PIA1_TAG),
-	  m_dac(*this, DAC_TAG),
-	  m_wave(*this, WAVE_TAG),
-	  m_cococart(*this, CARTRIDGE_TAG),
-	  m_ram(*this, RAM_TAG),
-	  m_cassette(*this, CASSETTE_TAG),
-	  m_bitbanger(*this, BITBANGER_TAG),
-	  m_vhd_0(*this, VHD0_TAG),
-	  m_vhd_1(*this, VHD1_TAG)
+		m_maincpu(*this, MAINCPU_TAG),
+		m_pia_0(*this, PIA0_TAG),
+		m_pia_1(*this, PIA1_TAG),
+		m_dac(*this, DAC_TAG),
+		m_wave(*this, WAVE_TAG),
+		m_cococart(*this, CARTRIDGE_TAG),
+		m_ram(*this, RAM_TAG),
+		m_cassette(*this, CASSETTE_TAG),
+		m_bitbanger(*this, BITBANGER_TAG),
+		m_vhd_0(*this, VHD0_TAG),
+		m_vhd_1(*this, VHD1_TAG)
 	{
 	}
 
@@ -132,7 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ff60_write );
 
 	/* floating bus */
-	DECLARE_READ8_MEMBER( floating_bus_read )	{ return floating_bus_read(); }
+	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
 
 protected:
 	/* device-level overrides */
@@ -234,10 +234,10 @@ private:
 	void diecom_lightgun_clock(void);
 
 	/* thin wrappers for PIA output */
-	UINT8 dac_output(void)	{ return m_dac_output; }	/* PA drives the DAC */
-	bool sel1(void)			{ return m_pia_0->ca2_output() ? true : false; }
-	bool sel2(void)			{ return m_pia_0->cb2_output() ? true : false; }
-	bool snden(void)		{ return m_pia_1->cb2_output() ? true : false; }
+	UINT8 dac_output(void)  { return m_dac_output; }    /* PA drives the DAC */
+	bool sel1(void)         { return m_pia_0->ca2_output() ? true : false; }
+	bool sel2(void)         { return m_pia_0->cb2_output() ? true : false; }
+	bool snden(void)        { return m_pia_1->cb2_output() ? true : false; }
 
 	/* VHD selection */
 	coco_vhd_image_device *current_vhd(void);

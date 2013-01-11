@@ -48,7 +48,7 @@ private:
 		const char *long_name;
 	};
 
-	const software_list_device *swlist;	/* currently selected list */
+	const software_list_device *swlist; /* currently selected list */
 	const char *interface;
 	astring &result;
 	entry_info *entrylist;
@@ -71,4 +71,4 @@ private:
 	const software_list_device **result;
 };
 
-#endif	/* __UISWLIST_H__ */
+#endif  /* __UISWLIST_H__ */

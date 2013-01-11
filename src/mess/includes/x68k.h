@@ -12,8 +12,8 @@
 #include "machine/rp5c15.h"
 #include "machine/upd765.h"
 
-#define MC68901_TAG		"mc68901"
-#define RP5C15_TAG		"rp5c15"
+#define MC68901_TAG     "mc68901"
+#define RP5C15_TAG      "rp5c15"
 
 #define GFX16     0
 #define GFX256    1
@@ -44,21 +44,21 @@ class x68k_state : public driver_device
 public:
 	x68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_mfpdev(*this, MC68901_TAG),
-		  m_rtc(*this, RP5C15_TAG),
-		  m_nvram16(*this, "nvram16"),
-		  m_nvram32(*this, "nvram32"),
-		  m_gvram16(*this, "gvram16"),
-		  m_tvram16(*this, "tvram16"),
-		  m_gvram32(*this, "gvram32"),
-		  m_tvram32(*this, "tvram32")
+			m_mfpdev(*this, MC68901_TAG),
+			m_rtc(*this, RP5C15_TAG),
+			m_nvram16(*this, "nvram16"),
+			m_nvram32(*this, "nvram32"),
+			m_gvram16(*this, "gvram16"),
+			m_tvram16(*this, "tvram16"),
+			m_gvram32(*this, "gvram32"),
+			m_tvram32(*this, "tvram32")
 	{ }
 
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
 
-	optional_shared_ptr<UINT16>	m_nvram16;
-	optional_shared_ptr<UINT32>	m_nvram32;
+	optional_shared_ptr<UINT16> m_nvram16;
+	optional_shared_ptr<UINT32> m_nvram32;
 
 	optional_shared_ptr<UINT16> m_gvram16;
 	optional_shared_ptr<UINT16> m_tvram16;

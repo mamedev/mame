@@ -59,39 +59,39 @@ VIDEO_START_MEMBER(batman_state,batman)
 {
 	static const atarimo_desc modesc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		1,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		8,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		1,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		8,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x100,				/* base palette entry */
-		0x100,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x100,              /* base palette entry */
+		0x100,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0x03ff,0,0,0 }},	/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0,0x7fff,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0,0x000f,0 }},	/* mask for the color */
-		{{ 0,0,0xff80,0 }},	/* mask for the X position */
-		{{ 0,0,0,0xff80 }},	/* mask for the Y position */
-		{{ 0,0,0,0x0070 }},	/* mask for the width, in tiles*/
-		{{ 0,0,0,0x0007 }},	/* mask for the height, in tiles */
-		{{ 0,0x8000,0,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0,0,0x0070,0 }},	/* mask for the priority */
-		{{ 0 }},			/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0x03ff,0,0,0 }}, /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0,0x7fff,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0,0x000f,0 }}, /* mask for the color */
+		{{ 0,0,0xff80,0 }}, /* mask for the X position */
+		{{ 0,0,0,0xff80 }}, /* mask for the Y position */
+		{{ 0,0,0,0x0070 }}, /* mask for the width, in tiles*/
+		{{ 0,0,0,0x0007 }}, /* mask for the height, in tiles */
+		{{ 0,0x8000,0,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0,0,0x0070,0 }}, /* mask for the priority */
+		{{ 0 }},            /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		NULL				/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		NULL                /* callback routine for special entries */
 	};
 
 	/* initialize the playfield */
@@ -219,21 +219,21 @@ UINT32 batman_state::screen_update_batman(screen_device &screen, bitmap_ind16 &b
 				{
 					/* verified on real hardware:
 
-                        for all MO colors, MO priority 0:
-                            obscured by low fg playfield pens priority 1-3
-                            obscured by high fg playfield pens priority 3 only
-                            obscured by bg playfield priority 3 only
+					    for all MO colors, MO priority 0:
+					        obscured by low fg playfield pens priority 1-3
+					        obscured by high fg playfield pens priority 3 only
+					        obscured by bg playfield priority 3 only
 
-                        for all MO colors, MO priority 1:
-                            obscured by low fg playfield pens priority 2-3
-                            obscured by high fg playfield pens priority 3 only
-                            obscured by bg playfield priority 3 only
+					    for all MO colors, MO priority 1:
+					        obscured by low fg playfield pens priority 2-3
+					        obscured by high fg playfield pens priority 3 only
+					        obscured by bg playfield priority 3 only
 
-                        for all MO colors, MO priority 2-3:
-                            obscured by low fg playfield pens priority 3 only
-                            obscured by high fg playfield pens priority 3 only
-                            obscured by bg playfield priority 3 only
-                    */
+					    for all MO colors, MO priority 2-3:
+					        obscured by low fg playfield pens priority 3 only
+					        obscured by high fg playfield pens priority 3 only
+					        obscured by bg playfield priority 3 only
+					*/
 					int mopriority = mo[x] >> ATARIMO_PRIORITY_SHIFT;
 
 					/* upper bit of MO priority signals special rendering and doesn't draw anything */

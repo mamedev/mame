@@ -295,15 +295,15 @@ UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &b
 	m_bg19_tilemap->set_scrollx(0, -dx);
 	m_bg19_tilemap->set_scrolly(0, -dy);
 
-	if (m_cur_ctrl & 0x20)	/* display enable */
+	if (m_cur_ctrl & 0x20)  /* display enable */
 	{
 		machine().priority_bitmap.fill(0, cliprect);
 
 		m_bg19_tilemap->draw(bitmap, cliprect, 0, 0);
 
-		if (m_cur_ctrl & 0x08)	/* sprites always over BG1 */
+		if (m_cur_ctrl & 0x08)  /* sprites always over BG1 */
 			m_bg18_tilemap->draw(bitmap, cliprect, 0, 0);
-		else					/* split priority */
+		else                    /* split priority */
 			m_bg18_tilemap->draw(bitmap, cliprect, 0,1);
 
 		draw_sprites(machine(), bitmap, cliprect);

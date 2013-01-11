@@ -8,14 +8,14 @@
 
 #include "tvc_cas.h"
 
-#define TVC64_BIT0_FREQ		1812
-#define TVC64_BIT1_FREQ		2577
-#define TVC64_PRE_FREQ		2128
-#define TVC64_SYNC_FREQ		1359
+#define TVC64_BIT0_FREQ     1812
+#define TVC64_BIT1_FREQ     2577
+#define TVC64_PRE_FREQ      2128
+#define TVC64_SYNC_FREQ     1359
 
-#define WAVE_AMPLITUDE  	0x3fffffff
-#define TVC64_HEADER_BYTES	0x90
-#define TVC64_HEADER_BYTES	0x90
+#define WAVE_AMPLITUDE      0x3fffffff
+#define TVC64_HEADER_BYTES  0x90
+#define TVC64_HEADER_BYTES  0x90
 
 static void tvc64_emit_level(cassette_image *cass, double &time, int freq, int level)
 {
@@ -91,26 +91,26 @@ static casserr_t tvc64_cassette_load(cassette_image *cassette)
 	// tape header
 	tmp_buff[buff_idx++] = 0x00;
 	tmp_buff[buff_idx++] = 0x6a;
-	tmp_buff[buff_idx++] = 0xff;			// head sector
-	tmp_buff[buff_idx++] = 0x11;			// not puffered
-	tmp_buff[buff_idx++] = 0x00;			// not write protected
-	tmp_buff[buff_idx++] = 0x01;			// 1 sector
-	tmp_buff[buff_idx++] = 0x00;			// sector number
-	tmp_buff[buff_idx++] = 0x12;			// head size
-	tmp_buff[buff_idx++] = 0x01;			// name size
-	tmp_buff[buff_idx++] = ' ';				// name
+	tmp_buff[buff_idx++] = 0xff;            // head sector
+	tmp_buff[buff_idx++] = 0x11;            // not puffered
+	tmp_buff[buff_idx++] = 0x00;            // not write protected
+	tmp_buff[buff_idx++] = 0x01;            // 1 sector
+	tmp_buff[buff_idx++] = 0x00;            // sector number
+	tmp_buff[buff_idx++] = 0x12;            // head size
+	tmp_buff[buff_idx++] = 0x01;            // name size
+	tmp_buff[buff_idx++] = ' ';             // name
 	tmp_buff[buff_idx++] = 0x00;
-	tmp_buff[buff_idx++] = header[0x81];	// type
-	tmp_buff[buff_idx++] = header[0x82];	// size LSB
-	tmp_buff[buff_idx++] = header[0x83];	// size MSB
+	tmp_buff[buff_idx++] = header[0x81];    // type
+	tmp_buff[buff_idx++] = header[0x82];    // size LSB
+	tmp_buff[buff_idx++] = header[0x83];    // size MSB
 	tmp_buff[buff_idx++] = header[0x84];    // autostart
 
-	 // sector fill
+		// sector fill
 	for (int i=0; i<10 ; i++)
 		tmp_buff[buff_idx++] = 0x00;
 
-	tmp_buff[buff_idx++] = 0x00;	// file version
-	tmp_buff[buff_idx++] = 0x00;	// no last sector
+	tmp_buff[buff_idx++] = 0x00;    // file version
+	tmp_buff[buff_idx++] = 0x00;    // no last sector
 
 	// updates the header CRC
 	UINT16 crc = tvc64_calc_crc(tmp_buff, buff_idx);
@@ -148,16 +148,16 @@ static casserr_t tvc64_cassette_load(cassette_image *cassette)
 	buff_idx = 0;
 	tmp_buff[buff_idx++] = 0x00;
 	tmp_buff[buff_idx++] = 0x6a;
-	tmp_buff[buff_idx++] = 0x00;		// data sector
-	tmp_buff[buff_idx++] = 0x11;		// not puffered
-	tmp_buff[buff_idx++] = 0x00;		// not write protected
-	tmp_buff[buff_idx++] = (UINT8)((cas_size / 256) + ((cas_size % 256) > 0 ? 1 : 0));	// number of sectors
+	tmp_buff[buff_idx++] = 0x00;        // data sector
+	tmp_buff[buff_idx++] = 0x11;        // not puffered
+	tmp_buff[buff_idx++] = 0x00;        // not write protected
+	tmp_buff[buff_idx++] = (UINT8)((cas_size / 256) + ((cas_size % 256) > 0 ? 1 : 0));  // number of sectors
 
 	UINT8 sect_num = 1;
 	int sector_num = cas_size / 256;
 	for (int i=0; i<=sector_num; i++)
 	{
-		tmp_buff[buff_idx++] = sect_num++;		// sector number
+		tmp_buff[buff_idx++] = sect_num++;      // sector number
 
 		// sector size
 		if (i == sector_num)
@@ -171,9 +171,9 @@ static casserr_t tvc64_cassette_load(cassette_image *cassette)
 			cassette_image_read(cassette, &tmp_buff[buff_idx++], TVC64_HEADER_BYTES + i*256 + z, 1);
 
 		if (i == sector_num || ((i+1) == sector_num && (cas_size % 256 ) == 0))
-			tmp_buff[buff_idx++] = 0xff;	// last sector
+			tmp_buff[buff_idx++] = 0xff;    // last sector
 		else
-			tmp_buff[buff_idx++] = 0x00;	// no last sector
+			tmp_buff[buff_idx++] = 0x00;    // no last sector
 
 		// sector crc
 		crc = tvc64_calc_crc(tmp_buff, buff_idx);

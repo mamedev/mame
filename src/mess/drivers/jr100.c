@@ -258,19 +258,19 @@ WRITE_LINE_MEMBER(jr100_state::jr100_via_write_cb2)
 }
 static const via6522_interface jr100_via_intf =
 {
-	DEVCB_NULL,											/* in_a_func */
-	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_read_b),					/* in_b_func */
-	DEVCB_NULL,     									/* in_ca1_func */
-	DEVCB_NULL,     									/* in_cb1_func */
-	DEVCB_NULL,     									/* in_ca2_func */
-	DEVCB_NULL,     									/* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_a),					/* out_a_func */
-	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_b), 				/* out_b_func */
-	DEVCB_NULL,     									/* out_ca1_func */
-	DEVCB_NULL,											/* out_cb1_func */
-	DEVCB_NULL,     									/* out_ca2_func */
-	DEVCB_DRIVER_LINE_MEMBER(jr100_state, jr100_via_write_cb2), 				/* out_cb2_func */
-	DEVCB_NULL  										/* irq_func */
+	DEVCB_NULL,                                         /* in_a_func */
+	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_read_b),                  /* in_b_func */
+	DEVCB_NULL,                                         /* in_ca1_func */
+	DEVCB_NULL,                                         /* in_cb1_func */
+	DEVCB_NULL,                                         /* in_ca2_func */
+	DEVCB_NULL,                                         /* in_cb2_func */
+	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_a),                 /* out_a_func */
+	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_b),                 /* out_b_func */
+	DEVCB_NULL,                                         /* out_ca1_func */
+	DEVCB_NULL,                                         /* out_cb1_func */
+	DEVCB_NULL,                                         /* out_ca2_func */
+	DEVCB_DRIVER_LINE_MEMBER(jr100_state, jr100_via_write_cb2),                 /* out_cb2_func */
+	DEVCB_NULL                                          /* irq_func */
 };
 static const cassette_interface jr100_cassette_interface =
 {
@@ -332,35 +332,35 @@ static QUICKLOAD_LOAD(jr100)
 	pos += len; // skip name
 	UINT32 start_address = readByLittleEndian(buf,pos); pos+= 4;
 	UINT32 code_length   = readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 flag 		 = readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 flag          = readByLittleEndian(buf,pos); pos+= 4;
 
 	UINT32 end_address = start_address + code_length - 1;
 	// copy code
 	memcpy(state->m_ram + start_address,buf + pos,code_length);
 	if (flag == 0) {
-      state->m_ram[end_address + 1] =  0xdf;
-      state->m_ram[end_address + 2] =  0xdf;
-      state->m_ram[end_address + 3] =  0xdf;
-      state->m_ram[6 ] = (end_address >> 8 & 0xFF);
-      state->m_ram[7 ] = (end_address & 0xFF);
-      state->m_ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
-      state->m_ram[9 ] = ((end_address + 1) & 0xFF);
-      state->m_ram[10] = ((end_address + 2) >> 8 & 0xFF);
-      state->m_ram[11] = ((end_address + 2) & 0xFF);
-      state->m_ram[12] = ((end_address + 3) >> 8 & 0xFF);
-      state->m_ram[13] = ((end_address + 3) & 0xFF);
-    }
+		state->m_ram[end_address + 1] =  0xdf;
+		state->m_ram[end_address + 2] =  0xdf;
+		state->m_ram[end_address + 3] =  0xdf;
+		state->m_ram[6 ] = (end_address >> 8 & 0xFF);
+		state->m_ram[7 ] = (end_address & 0xFF);
+		state->m_ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
+		state->m_ram[9 ] = ((end_address + 1) & 0xFF);
+		state->m_ram[10] = ((end_address + 2) >> 8 & 0xFF);
+		state->m_ram[11] = ((end_address + 2) & 0xFF);
+		state->m_ram[12] = ((end_address + 3) >> 8 & 0xFF);
+		state->m_ram[13] = ((end_address + 3) & 0xFF);
+	}
 
 	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_CONFIG_START( jr100, jr100_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
-    MCFG_CPU_PROGRAM_MAP(jr100_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
+	MCFG_CPU_PROGRAM_MAP(jr100_mem)
 
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -369,8 +369,8 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 
 	MCFG_GFXDECODE(jr100)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 
 	MCFG_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)
@@ -395,17 +395,17 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( jr100 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "jr100.rom", 0xe000, 0x2000, CRC(951d08a1) SHA1(edae3daaa94924e444bbe485ac2bcd5cb5b22ca2))
 ROM_END
 
 ROM_START( jr100u )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "jr100u.rom", 0xe000, 0x2000, CRC(f589dd8d) SHA1(78a51f2ae055bf4dc1b0887a6277f5dbbd8ba512))
 ROM_END
 
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1981, jr100,  0,  	  0,	jr100,	jr100, driver_device,	 0, 	  "National",   "JR-100",		0)
-COMP( 1981, jr100u, jr100,    0,	jr100,	jr100, driver_device,	 0, 	  "Panasonic",   "JR-100U",		0)
+COMP( 1981, jr100,  0,        0,    jr100,  jr100, driver_device,    0,       "National",   "JR-100",       0)
+COMP( 1981, jr100u, jr100,    0,    jr100,  jr100, driver_device,    0,       "Panasonic",   "JR-100U",     0)

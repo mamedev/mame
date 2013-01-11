@@ -119,9 +119,9 @@ WRITE64_MEMBER(dc_cons_state::dc_arm_w )
 }
 
 
- // SB_LMMODE0
+	// SB_LMMODE0
 WRITE64_MEMBER(dc_cons_state::ta_texture_directpath0_w )
- {
+	{
 	int mode = pvrctrl_regs[SB_LMMODE0]&1;
 	if (mode&1)
 	{
@@ -132,11 +132,11 @@ WRITE64_MEMBER(dc_cons_state::ta_texture_directpath0_w )
 	{
 		COMBINE_DATA(&dc_texture_ram[offset]);
 	}
- }
+	}
 
- // SB_LMMODE1
+	// SB_LMMODE1
 WRITE64_MEMBER(dc_cons_state::ta_texture_directpath1_w )
- {
+	{
 	int mode = pvrctrl_regs[SB_LMMODE1]&1;
 	if (mode&1)
 	{
@@ -147,11 +147,11 @@ WRITE64_MEMBER(dc_cons_state::ta_texture_directpath1_w )
 	{
 		COMBINE_DATA(&dc_texture_ram[offset]);
 	}
- }
+	}
 
 static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
-	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)	// flash
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP             // BIOS
+	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)  // flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE_LEGACY(dc_mess_gdrom_r, dc_mess_gdrom_w )
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 3 */
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
 	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
-	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram")	// another RAM mirror
+	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram")  // another RAM mirror
 
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_cons_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_cons_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("dc_sound_ram")		/* shared with SH-4 */
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("dc_sound_ram")        /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_CPU_PROGRAM_MAP(dc_map)
 	MCFG_CPU_IO_MAP(dc_port)
 
-	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
@@ -259,36 +259,36 @@ MACHINE_CONFIG_END
 
 ROM_START(dc)
 	ROM_REGION(0x220000, "maincpu", 0)
-        ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )	// BIOS
-        ROM_LOAD( "dcus_ntsc.bin", 0x200000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )	// Flash
+		ROM_LOAD( "dc101d_us.bin", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )   // BIOS
+		ROM_LOAD( "dcus_ntsc.bin", 0x200000, 0x020000, CRC(c611b498) SHA1(94d44d7f9529ec1642ba3771ed3c5f756d5bc872) )   // Flash
 ROM_END
 
 ROM_START( dceu )
 	ROM_REGION(0x220000, "maincpu", 0)
 		ROM_SYSTEM_BIOS(0, "101d", "v1.01d")
-        ROMX_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))	// BIOS
+		ROMX_LOAD( "dc101d_eu.bin", 0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf),ROM_BIOS(1))   // BIOS
 		ROM_SYSTEM_BIOS(1, "101c", "v1.01c")
-		ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))	// BIOS
-        ROM_LOAD( "dceu_pal.bin", 0x200000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )	// Flash
+		ROMX_LOAD( "dc101c_eu.bin", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434),ROM_BIOS(2))   // BIOS
+		ROM_LOAD( "dceu_pal.bin", 0x200000, 0x020000, CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )    // Flash
 ROM_END
 
 ROM_START( dcjp )
 	ROM_REGION(0x220000, "maincpu", 0)
-        ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )	// BIOS
-        /* ROM_LOAD( "dcjp_ntsc.bad", 0x200000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-        ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+		ROM_LOAD( "dc1004jp.bin", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )    // BIOS
+		/* ROM_LOAD( "dcjp_ntsc.bad", 0x200000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
+		ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
 ROM_END
 
 ROM_START( dcdev )
 	ROM_REGION(0x220000, "maincpu", 0)
-        ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186E0E5) SHA1(6BD18FB83F8FDB56F1941E079580E5DD672A6DAD) )		// BIOS
-        ROM_LOAD( "hkt-0120-flash.bin", 0x200000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )	// Flash
+		ROM_LOAD( "hkt-0120.bin", 0x000000, 0x200000, CRC(2186E0E5) SHA1(6BD18FB83F8FDB56F1941E079580E5DD672A6DAD) )        // BIOS
+		ROM_LOAD( "hkt-0120-flash.bin", 0x200000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )  // Flash
 ROM_END
 
 ROM_START( dcprt )
-    ROM_REGION(0x220000, "maincpu", 0)
-    ROM_LOAD( "katana-set5-v0.41-98-08-27.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) ) // BIOS
-    ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+	ROM_REGION(0x220000, "maincpu", 0)
+	ROM_LOAD( "katana-set5-v0.41-98-08-27.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) ) // BIOS
+	ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
 ROM_END
 
 static INPUT_PORTS_START( dc )
@@ -381,4 +381,3 @@ CONS( 1998, dcjp,   0,      0,      dc,     dc, dc_cons_state,     dcjp,   "Sega
 CONS( 1999, dceu,   dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (Europe, PAL)", GAME_NOT_WORKING )
 CONS( 1998, dcdev,  dcjp,   0,      dc,     dc, dc_cons_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
 CONS( 1998, dcprt,  dcjp,   0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Katana Set 5 Prototype", GAME_NOT_WORKING )
-

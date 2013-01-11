@@ -45,7 +45,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define	VERBOSE			0
+#define VERBOSE         0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
@@ -89,46 +89,46 @@ enum
 	FIFO_COMMAND
 };
 
-#define UPD7220_COMMAND_RESET			0x00
-#define UPD7220_COMMAND_SYNC			0x0e // & 0xfe
-#define UPD7220_COMMAND_VSYNC			0x6e // & 0xfe
-#define UPD7220_COMMAND_CCHAR			0x4b
-#define UPD7220_COMMAND_START			0x6b
-#define UPD7220_COMMAND_BCTRL			0x0c // & 0xfe
-#define UPD7220_COMMAND_ZOOM			0x46
-#define UPD7220_COMMAND_CURS			0x49
-#define UPD7220_COMMAND_PRAM			0x70 // & 0xf0
-#define UPD7220_COMMAND_PITCH			0x47
-#define UPD7220_COMMAND_WDAT			0x20 // & 0xe4
-#define UPD7220_COMMAND_MASK			0x4a
-#define UPD7220_COMMAND_FIGS			0x4c
-#define UPD7220_COMMAND_FIGD			0x6c
-#define UPD7220_COMMAND_GCHRD			0x68
-#define UPD7220_COMMAND_RDAT			0xa0 // & 0xe4
-#define UPD7220_COMMAND_CURD			0xe0
-#define UPD7220_COMMAND_LPRD			0xc0
-#define UPD7220_COMMAND_DMAR			0xa4 // & 0xe4
-#define UPD7220_COMMAND_DMAW			0x24 // & 0xe4
-#define UPD7220_COMMAND_5A				0x5a
+#define UPD7220_COMMAND_RESET           0x00
+#define UPD7220_COMMAND_SYNC            0x0e // & 0xfe
+#define UPD7220_COMMAND_VSYNC           0x6e // & 0xfe
+#define UPD7220_COMMAND_CCHAR           0x4b
+#define UPD7220_COMMAND_START           0x6b
+#define UPD7220_COMMAND_BCTRL           0x0c // & 0xfe
+#define UPD7220_COMMAND_ZOOM            0x46
+#define UPD7220_COMMAND_CURS            0x49
+#define UPD7220_COMMAND_PRAM            0x70 // & 0xf0
+#define UPD7220_COMMAND_PITCH           0x47
+#define UPD7220_COMMAND_WDAT            0x20 // & 0xe4
+#define UPD7220_COMMAND_MASK            0x4a
+#define UPD7220_COMMAND_FIGS            0x4c
+#define UPD7220_COMMAND_FIGD            0x6c
+#define UPD7220_COMMAND_GCHRD           0x68
+#define UPD7220_COMMAND_RDAT            0xa0 // & 0xe4
+#define UPD7220_COMMAND_CURD            0xe0
+#define UPD7220_COMMAND_LPRD            0xc0
+#define UPD7220_COMMAND_DMAR            0xa4 // & 0xe4
+#define UPD7220_COMMAND_DMAW            0x24 // & 0xe4
+#define UPD7220_COMMAND_5A              0x5a
 
-#define UPD7220_SR_DATA_READY			0x01
-#define UPD7220_SR_FIFO_FULL			0x02
-#define UPD7220_SR_FIFO_EMPTY			0x04
-#define UPD7220_SR_DRAWING_IN_PROGRESS	0x08
-#define UPD7220_SR_DMA_EXECUTE			0x10
-#define UPD7220_SR_VSYNC_ACTIVE			0x20
-#define UPD7220_SR_HBLANK_ACTIVE		0x40
-#define UPD7220_SR_LIGHT_PEN_DETECT		0x80
+#define UPD7220_SR_DATA_READY           0x01
+#define UPD7220_SR_FIFO_FULL            0x02
+#define UPD7220_SR_FIFO_EMPTY           0x04
+#define UPD7220_SR_DRAWING_IN_PROGRESS  0x08
+#define UPD7220_SR_DMA_EXECUTE          0x10
+#define UPD7220_SR_VSYNC_ACTIVE         0x20
+#define UPD7220_SR_HBLANK_ACTIVE        0x40
+#define UPD7220_SR_LIGHT_PEN_DETECT     0x80
 
-#define UPD7220_MODE_S					0x01
-#define UPD7220_MODE_REFRESH_RAM		0x04
-#define UPD7220_MODE_I					0x08
-#define UPD7220_MODE_DRAW_ON_RETRACE	0x10
-#define UPD7220_MODE_DISPLAY_MASK		0x22
-#define UPD7220_MODE_DISPLAY_MIXED		0x00
-#define UPD7220_MODE_DISPLAY_GRAPHICS	0x02
-#define UPD7220_MODE_DISPLAY_CHARACTER	0x20
-#define UPD7220_MODE_DISPLAY_INVALID	0x22
+#define UPD7220_MODE_S                  0x01
+#define UPD7220_MODE_REFRESH_RAM        0x04
+#define UPD7220_MODE_I                  0x08
+#define UPD7220_MODE_DRAW_ON_RETRACE    0x10
+#define UPD7220_MODE_DISPLAY_MASK       0x22
+#define UPD7220_MODE_DISPLAY_MIXED      0x00
+#define UPD7220_MODE_DISPLAY_GRAPHICS   0x02
+#define UPD7220_MODE_DISPLAY_CHARACTER  0x20
+#define UPD7220_MODE_DISPLAY_INVALID    0x22
 
 static const int x_dir[8] = { 0, 1, 1, 1, 0,-1,-1,-1};
 static const int y_dir[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
@@ -455,13 +455,13 @@ inline void upd7220_device::reset_figs_param()
 
 inline void upd7220_device::advance_ead()
 {
-	#define EAD			m_ead
-	#define DAD			m_dad
-	#define P			x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch)
-	#define MSB(value)	(BIT(value, 15))
-	#define LSB(value)	(BIT(value, 0))
-	#define LR(value)	((value << 1) | MSB(value))
-	#define RR(value)	((LSB(value) << 15) | (value >> 1))
+	#define EAD         m_ead
+	#define DAD         m_dad
+	#define P           x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch)
+	#define MSB(value)  (BIT(value, 15))
+	#define LSB(value)  (BIT(value, 0))
+	#define LR(value)   ((value << 1) | MSB(value))
+	#define RR(value)   ((LSB(value) << 15) | (value >> 1))
 
 	switch (m_draw_mode & 0x07)
 	{
@@ -679,41 +679,41 @@ inline void upd7220_device::get_graphics_partition(int index, UINT32 *sad, UINT1
 //-------------------------------------------------
 
 upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_mask(0),
-	  m_pitch(0),
-	  m_ead(0),
-	  m_dad(0),
-	  m_lad(0),
-	  m_ra_addr(0),
-	  m_sr(UPD7220_SR_FIFO_EMPTY),
-	  m_cr(0),
-	  m_param_ptr(0),
-	  m_fifo_ptr(-1),
-	  m_fifo_dir(0),
-	  m_mode(0),
-	  m_draw_mode(0),
-	  m_de(0),
-	  m_m(0),
-	  m_aw(0),
-	  m_al(0),
-	  m_vs(0),
-	  m_vfp(0),
-	  m_vbp(0),
-	  m_hs(0),
-	  m_hfp(0),
-	  m_hbp(0),
-	  m_dc(0),
-	  m_sc(0),
-	  m_br(0),
-	  m_ctop(0),
-	  m_cbot(0),
-	  m_lr(0),
-	  m_disp(0),
-	  m_gchr(0),
-	  m_bitmap_mod(0),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
+	: device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock),
+		device_memory_interface(mconfig, *this),
+		m_mask(0),
+		m_pitch(0),
+		m_ead(0),
+		m_dad(0),
+		m_lad(0),
+		m_ra_addr(0),
+		m_sr(UPD7220_SR_FIFO_EMPTY),
+		m_cr(0),
+		m_param_ptr(0),
+		m_fifo_ptr(-1),
+		m_fifo_dir(0),
+		m_mode(0),
+		m_draw_mode(0),
+		m_de(0),
+		m_m(0),
+		m_aw(0),
+		m_al(0),
+		m_vs(0),
+		m_vfp(0),
+		m_vbp(0),
+		m_hs(0),
+		m_hfp(0),
+		m_hbp(0),
+		m_dc(0),
+		m_sc(0),
+		m_br(0),
+		m_ctop(0),
+		m_cbot(0),
+		m_lr(0),
+		m_disp(0),
+		m_gchr(0),
+		m_bitmap_mod(0),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
 {
 	m_shortname = "upd7220";
 	for (int i = 0; i < 16; i++)
@@ -751,10 +751,10 @@ void upd7220_device::device_start()
 	m_blank_timer = timer_alloc(TIMER_BLANK);
 
 	// resolve callbacks
-    m_out_drq_func.resolve(m_out_drq_cb, *this);
-    m_out_hsync_func.resolve(m_out_hsync_cb, *this);
-    m_out_vsync_func.resolve(m_out_vsync_cb, *this);
-    m_out_blank_func.resolve(m_out_blank_cb, *this);
+	m_out_drq_func.resolve(m_out_drq_cb, *this);
+	m_out_hsync_func.resolve(m_out_hsync_cb, *this);
+	m_out_vsync_func.resolve(m_out_vsync_cb, *this);
+	m_out_blank_func.resolve(m_out_blank_cb, *this);
 
 	// find screen
 	m_screen = machine().device<screen_device>(m_screen_tag);
@@ -1025,11 +1025,11 @@ void upd7220_device::draw_char(int x, int y)
 		switch(m_figs.m_dir & 7)
 		{
 			case 0: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break; // TODO
-			case 2:	tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
-			case 6:	tile_data = BITSWAP8(m_ra[((ysize-1-yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
+			case 2: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],0,1,2,3,4,5,6,7); break;
+			case 6: tile_data = BITSWAP8(m_ra[((ysize-1-yi) & 7) | 8],7,6,5,4,3,2,1,0); break;
 			default: tile_data = BITSWAP8(m_ra[((yi) & 7) | 8],7,6,5,4,3,2,1,0);
-					 printf("%d %d %d\n",m_figs.m_dir,xsize,ysize);
-					 break;
+						printf("%d %d %d\n",m_figs.m_dir,xsize,ysize);
+						break;
 		}
 
 		for(xi=0;xi<xsize;xi++)
@@ -1056,25 +1056,25 @@ int upd7220_device::translate_command(UINT8 data)
 
 	switch (data)
 	{
-	case UPD7220_COMMAND_RESET:	command = COMMAND_RESET; break;
-	case UPD7220_COMMAND_CCHAR:	command = COMMAND_CCHAR; break;
-	case UPD7220_COMMAND_START:	command = COMMAND_START; break;
-	case UPD7220_COMMAND_ZOOM:	command = COMMAND_ZOOM;  break;
-	case UPD7220_COMMAND_CURS:	command = COMMAND_CURS;  break;
-	case UPD7220_COMMAND_PITCH:	command = COMMAND_PITCH; break;
-	case UPD7220_COMMAND_MASK:	command = COMMAND_MASK;	 break;
-	case UPD7220_COMMAND_FIGS:	command = COMMAND_FIGS;	 break;
-	case UPD7220_COMMAND_FIGD:	command = COMMAND_FIGD;  break;
-	case UPD7220_COMMAND_GCHRD:	command = COMMAND_GCHRD; break;
-	case UPD7220_COMMAND_CURD:	command = COMMAND_CURD;  break;
-	case UPD7220_COMMAND_LPRD:	command = COMMAND_LPRD;	 break;
-	case UPD7220_COMMAND_5A:	command = COMMAND_5A;    break;
+	case UPD7220_COMMAND_RESET: command = COMMAND_RESET; break;
+	case UPD7220_COMMAND_CCHAR: command = COMMAND_CCHAR; break;
+	case UPD7220_COMMAND_START: command = COMMAND_START; break;
+	case UPD7220_COMMAND_ZOOM:  command = COMMAND_ZOOM;  break;
+	case UPD7220_COMMAND_CURS:  command = COMMAND_CURS;  break;
+	case UPD7220_COMMAND_PITCH: command = COMMAND_PITCH; break;
+	case UPD7220_COMMAND_MASK:  command = COMMAND_MASK;  break;
+	case UPD7220_COMMAND_FIGS:  command = COMMAND_FIGS;  break;
+	case UPD7220_COMMAND_FIGD:  command = COMMAND_FIGD;  break;
+	case UPD7220_COMMAND_GCHRD: command = COMMAND_GCHRD; break;
+	case UPD7220_COMMAND_CURD:  command = COMMAND_CURD;  break;
+	case UPD7220_COMMAND_LPRD:  command = COMMAND_LPRD;  break;
+	case UPD7220_COMMAND_5A:    command = COMMAND_5A;    break;
 	default:
 		switch (data & 0xfe)
 		{
 		case UPD7220_COMMAND_SYNC:  command = COMMAND_SYNC;  break;
 		case UPD7220_COMMAND_VSYNC: command = COMMAND_VSYNC; break;
-		case UPD7220_COMMAND_BCTRL:	command = COMMAND_BCTRL; break;
+		case UPD7220_COMMAND_BCTRL: command = COMMAND_BCTRL; break;
 		default:
 			switch (data & 0xf0)
 			{
@@ -1531,16 +1531,16 @@ WRITE_LINE_MEMBER( upd7220_device::ext_sync_w )
 WRITE_LINE_MEMBER( upd7220_device::lpen_w )
 {
 	/* only if 2 rising edges on the lpen input occur at the same
-       point during successive video fields are the pulses accepted */
+	   point during successive video fields are the pulses accepted */
 
 	/*
 
-        1. compute the address of the location on the CRT
-        2. compare with LAD
-        3. if not equal move address to LAD
-        4. if equal set LPEN DETECT flag to 1
+	    1. compute the address of the location on the CRT
+	    2. compare with LAD
+	    3. if not equal move address to LAD
+	    4. if equal set LPEN DETECT flag to 1
 
-    */
+	*/
 }
 
 

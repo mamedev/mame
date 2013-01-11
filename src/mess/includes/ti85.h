@@ -17,16 +17,16 @@ class ti85_state : public driver_device
 public:
 	ti85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_speaker(*this, SPEAKER_TAG),
+			m_maincpu(*this, "maincpu"),
+			m_speaker(*this, SPEAKER_TAG),
 //        m_serial(*this, "tiserial"),
-		  m_nvram(*this, "nvram")
+			m_nvram(*this, "nvram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
 	//optional_device<> m_serial;
-	optional_shared_ptr<UINT8>	m_nvram;
+	optional_shared_ptr<UINT8>  m_nvram;
 
 	UINT8 m_LCD_memory_base;
 	UINT8 m_LCD_contrast;

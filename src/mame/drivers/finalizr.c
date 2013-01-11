@@ -56,9 +56,9 @@ WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 {
 
 	/*  bit 0x80 goes active low, indicating that the
-        external IRQ being serviced is complete
-        bit 0x40 goes active high to enable the DAC ?
-    */
+	    external IRQ being serviced is complete
+	    bit 0x40 goes active high to enable the DAC ?
+	*/
 
 	if ((data & 0x80) == 0)
 		m_audio_cpu->execute().set_input_line(0, CLEAR_LINE);
@@ -68,14 +68,14 @@ READ8_MEMBER(finalizr_state::i8039_T1_r)
 {
 
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
-        here (See the i8039_T0_w handler below).
-        The frequency of this clock cannot be greater than I8039 CLKIN / 45
-        Accounting for the I8039 input clock, and internal/external divisors
-        the frequency here should be 192KHz (I8039 CLKIN / 48)
+	    here (See the i8039_T0_w handler below).
+	    The frequency of this clock cannot be greater than I8039 CLKIN / 45
+	    Accounting for the I8039 input clock, and internal/external divisors
+	    the frequency here should be 192KHz (I8039 CLKIN / 48)
 
-        Here we apply a positive edge every 3.2 reads, to simulate 192KHz
-        based on the I8039 main xtal clock input frequency of 9.216MHz
-    */
+	    Here we apply a positive edge every 3.2 reads, to simulate 192KHz
+	    based on the I8039 main xtal clock input frequency of 9.216MHz
+	*/
 
 	m_T1_line++;
 	m_T1_line %= 16;
@@ -85,11 +85,11 @@ READ8_MEMBER(finalizr_state::i8039_T1_r)
 WRITE8_MEMBER(finalizr_state::i8039_T0_w)
 {
 	/*  This becomes a clock output at a frequency of 3.072MHz (derived
-        by internally dividing the main xtal clock input by a factor of 3).
-        This output is divided by a factor of 16, then used as a 192KHz
-        input clock to the T1 input line.
-        The I8039 core currently doesn't support clock out on this pin.
-    */
+	    by internally dividing the main xtal clock input by a factor of 3).
+	    This output is divided by a factor of 16, then used as a 192KHz
+	    input clock to the T1 input line.
+	    The I8039 core currently doesn't support clock out on this pin.
+	*/
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
@@ -105,10 +105,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
-	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76489a_device, write)	/* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
-	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
-	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_byte_w)			/* custom sound chip */
+	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76489a_device, write)   /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0x081b, 0x081b) AM_WRITENOP        /* Loads the snd command into the snd latch */
+	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w) /* custom sound chip */
+	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_byte_w)            /* custom sound chip */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("colorram2")
@@ -151,33 +151,33 @@ static INPUT_PORTS_START( finalizr )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30000 150000" )
 	PORT_DIPSETTING(    0x10, "50000 300000" )
 	PORT_DIPSETTING(    0x08, "30000" )
 	PORT_DIPSETTING(    0x00, "50000" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )			PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )         PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
@@ -189,7 +189,7 @@ static INPUT_PORTS_START( finalizrb )
 	PORT_INCLUDE( finalizr )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20000 100000" )
 	PORT_DIPSETTING(    0x10, "30000 150000" )
 	PORT_DIPSETTING(    0x08, "20000" )
@@ -247,7 +247,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -276,11 +276,11 @@ void finalizr_state::machine_reset()
 static MACHINE_CONFIG_START( finalizr, finalizr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/6)	/* ??? */
+	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/6) /* ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2)	/* 9.216MHz clkin ?? */
+	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2)    /* 9.216MHz clkin ?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -322,8 +322,8 @@ ROM_START( finalizr )
 	ROM_LOAD( "523k02.12c",   0x8000, 0x4000, CRC(1bccc696) SHA1(3c29f4a030e76660b5a25347e042e344b0653343) )
 	ROM_LOAD( "523k03.13c",   0xc000, 0x4000, CRC(c48927c6) SHA1(9cf6b285034670370ba0246c33e1fe0a057457e7) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 )	/* 8039 */
-	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, BAD_DUMP CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )	/* this comes from the bootleg, the original has a custom IC */
+	ROM_REGION( 0x1000, "audiocpu", 0 ) /* 8039 */
+	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, BAD_DUMP CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )   /* this comes from the bootleg, the original has a custom IC */
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
@@ -346,7 +346,7 @@ ROM_START( finalizrb )
 	ROM_LOAD( "finalizr.5",   0x4000, 0x8000, CRC(a55e3f14) SHA1(47f6da214b36cc56be547fa4313afcc5572508a2) )
 	ROM_LOAD( "finalizr.6",   0xc000, 0x4000, CRC(ce177f6e) SHA1(034cbe0c1e2baf9577741b3c222a8b4a8ac8c919) )
 
-	ROM_REGION( 0x1000, "audiocpu", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "audiocpu", 0 ) /* 8039 */
 	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )

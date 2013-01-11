@@ -53,7 +53,7 @@ TODO
 #include "profiler.h"
 #include "huc6270.h"
 
-#define LOG	0
+#define LOG 0
 
 enum {
 	MAWR = 0x00,
@@ -78,13 +78,13 @@ enum {
 
 
 /* Bits in the VDC status register */
-#define HUC6270_BSY			0x40	/* Set when the VDC accesses VRAM */
-#define HUC6270_VD			0x20	/* Set when in the vertical blanking period */
-#define HUC6270_DV			0x10	/* Set when a VRAM > VRAM DMA transfer is done */
-#define HUC6270_DS			0x08	/* Set when a VRAM > SATB DMA transfer is done */
-#define HUC6270_RR			0x04	/* Set when the current scanline equals the RCR register */
-#define HUC6270_OR			0x02	/* Set when there are more than 16 sprites on a line */
-#define HUC6270_CR			0x01	/* Set when sprite #0 overlaps with another sprite */
+#define HUC6270_BSY         0x40    /* Set when the VDC accesses VRAM */
+#define HUC6270_VD          0x20    /* Set when in the vertical blanking period */
+#define HUC6270_DV          0x10    /* Set when a VRAM > VRAM DMA transfer is done */
+#define HUC6270_DS          0x08    /* Set when a VRAM > SATB DMA transfer is done */
+#define HUC6270_RR          0x04    /* Set when the current scanline equals the RCR register */
+#define HUC6270_OR          0x02    /* Set when there are more than 16 sprites on a line */
+#define HUC6270_CR          0x01    /* Set when sprite #0 overlaps with another sprite */
 
 
 const device_type HUC6270 = &device_creator<huc6270_device>;
@@ -308,8 +308,8 @@ inline void huc6270_device::handle_vblank()
 		}
 
 		/* Should we initiate a VRAM->SATB DMA transfer.
-           The timing for this is incorrect.
-         */
+		   The timing for this is incorrect.
+		 */
 		if ( m_dvssr_written || ( m_dcr & 0x10 ) )
 		{
 			int i;
@@ -512,8 +512,8 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 			handle_vblank();
 
 			/* Should we perform VRAM-VRAM dma.
-               The timing for this is incorrect.
-             */
+			   The timing for this is incorrect.
+			 */
 			if ( m_dma_enabled )
 			{
 				int desr_inc = ( m_dcr & 0x0008 ) ? -1 : +1;
@@ -593,7 +593,7 @@ READ8_MEMBER( huc6270_device::read )
 
 	switch ( offset & 3 )
 	{
-		case 0x00:	/* status */
+		case 0x00:  /* status */
 			data = m_status;
 			m_status &= ~( HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS );
 			m_irq_changed( CLEAR_LINE );
@@ -622,31 +622,31 @@ WRITE8_MEMBER( huc6270_device::write )
 
 	switch ( offset & 3 )
 	{
-		case 0x00:	/* VDC register select */
+		case 0x00:  /* VDC register select */
 			m_register_index = data & 0x1F;
 			break;
 
-		case 0x02:	/* VDC data LSB */
+		case 0x02:  /* VDC data LSB */
 			switch ( m_register_index )
 			{
-				case MAWR:		/* memory address write register LSB */
+				case MAWR:      /* memory address write register LSB */
 					m_mawr = ( m_mawr & 0xFF00 ) | data;
 					break;
 
-				case MARR:		/* memory address read register LSB */
+				case MARR:      /* memory address read register LSB */
 					m_marr = ( m_marr & 0xFF00 ) | data;
 					m_vrr = m_vram[ m_marr & m_vram_mask ];
 					break;
 
-				case VxR:		/* vram write data LSB */
+				case VxR:       /* vram write data LSB */
 					m_vwr = ( m_vwr & 0xFF00 ) | data;
 					break;
 
-				case CR:		/* control register LSB */
+				case CR:        /* control register LSB */
 					m_cr = ( m_cr & 0xFF00 ) | data;
 					break;
 
-				case RCR:		/* raster compare register LSB */
+				case RCR:       /* raster compare register LSB */
 					m_rcr = ( m_rcr & 0x0300 ) | data;
 //printf("%s: RCR set to %03x\n", machine().describe_context(), m_rcr);
 //                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
@@ -657,87 +657,87 @@ WRITE8_MEMBER( huc6270_device::write )
 //if (LOG) printf("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen) );
 					break;
 
-				case BXR:		/* background x-scroll register LSB */
+				case BXR:       /* background x-scroll register LSB */
 					m_bxr = ( m_bxr & 0x0300 ) | data;
 //if (LOG) printf("*********************** BXR written %d at %d,%d\n", m_bxr, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen) );
 					break;
 
-				case BYR:		/* background y-scroll register LSB */
+				case BYR:       /* background y-scroll register LSB */
 					m_byr = ( m_byr & 0x0100 ) | data;
 					m_byr_latched = m_byr;
 //if (LOG) printf("******************** BYR written %d at %d,%d\n", huc6270->m_byr, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen) );
 					break;
 
-				case MWR:		/* memory width register LSB */
+				case MWR:       /* memory width register LSB */
 					m_mwr = ( m_mwr & 0xFF00 ) | data;
 					break;
 
-				case HSR:		/* horizontal sync register LSB */
+				case HSR:       /* horizontal sync register LSB */
 					m_hsr = ( m_hsr & 0xFF00 ) | data;
 					break;
 
-				case HDR:		/* horizontal display register LSB */
+				case HDR:       /* horizontal display register LSB */
 					m_hdr = ( m_hdr & 0xFF00 ) | data;
 					break;
 
-				case VPR:		/* vertical sync register LSB */
+				case VPR:       /* vertical sync register LSB */
 					m_vpr = ( m_vpr & 0xFF00 ) | data;
 					break;
 
-				case VDW:		/* vertical display register LSB */
+				case VDW:       /* vertical display register LSB */
 					m_vdw = ( m_vdw & 0xFF00 ) | data;
 					break;
 
-				case VCR:		/* vertical display end position register LSB */
+				case VCR:       /* vertical display end position register LSB */
 					m_vcr = ( m_vcr & 0xFF00 ) | data;
 					break;
 
-				case DCR:		/* DMA control register LSB */
+				case DCR:       /* DMA control register LSB */
 					m_dcr = ( m_dcr & 0xFF00 ) | data;
 					break;
 
-				case SOUR:		/* DMA source address register LSB */
+				case SOUR:      /* DMA source address register LSB */
 					m_sour = ( m_sour & 0xFF00 ) | data;
 					break;
 
-				case DESR:		/* DMA destination address register LSB */
+				case DESR:      /* DMA destination address register LSB */
 					m_desr = ( m_desr & 0xFF00 ) | data;
 					break;
 
-				case LENR:		/* DMA length register LSB */
+				case LENR:      /* DMA length register LSB */
 					m_lenr = ( m_lenr & 0xFF00 ) | data;
 					break;
 
-				case DVSSR:		/* Sprite attribute table LSB */
+				case DVSSR:     /* Sprite attribute table LSB */
 					m_dvssr = ( m_dvssr & 0xFF00 ) | data;
 					m_dvssr_written = 1;
 					break;
 			}
 			break;
 
-		case 0x03:	/* VDC data MSB */
+		case 0x03:  /* VDC data MSB */
 			switch ( m_register_index )
 			{
-				case MAWR:		/* memory address write register MSB */
+				case MAWR:      /* memory address write register MSB */
 					m_mawr = ( m_mawr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case MARR:		/* memory address read register MSB */
+				case MARR:      /* memory address read register MSB */
 					m_marr = ( m_marr & 0x00FF ) | ( data << 8 );
 					m_vrr = m_vram[ m_marr & m_vram_mask ];
 					break;
 
-				case VxR:		/* vram write data MSB */
+				case VxR:       /* vram write data MSB */
 					m_vwr = ( m_vwr & 0x00FF ) | ( data << 8 );
 					m_vram[ m_mawr & m_vram_mask ] = m_vwr;
 					m_mawr += vram_increments[ ( m_cr >> 11 ) & 3 ];
 					break;
 
-				case CR:		/* control register MSB */
+				case CR:        /* control register MSB */
 					m_cr = ( m_cr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case RCR:		/* raster compare register MSB */
+				case RCR:       /* raster compare register MSB */
 					m_rcr = ( m_rcr & 0x00FF ) | ( ( data & 0x03 ) << 8 );
 //printf("%s: RCR set to %03x\n", machine().describe_context(), m_rcr);
 //                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
@@ -747,58 +747,58 @@ WRITE8_MEMBER( huc6270_device::write )
 //                  }
 					break;
 
-				case BXR:		/* background x-scroll register MSB */
+				case BXR:       /* background x-scroll register MSB */
 					m_bxr = ( m_bxr & 0x00FF ) | ( ( data & 0x03 ) << 8 );
 					break;
 
-				case BYR:		/* background y-scroll register MSB */
+				case BYR:       /* background y-scroll register MSB */
 					m_byr = ( m_byr & 0x00FF ) | ( ( data & 0x01 ) << 8 );
 					m_byr_latched = m_byr;
 					break;
 
-				case MWR:		/* memory width register MSB */
+				case MWR:       /* memory width register MSB */
 					m_mwr = ( m_mwr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case HSR:		/* horizontal sync register MSB */
+				case HSR:       /* horizontal sync register MSB */
 					m_hsr = ( m_hsr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case HDR:		/* horizontal display register MSB */
+				case HDR:       /* horizontal display register MSB */
 					m_hdr = ( m_hdr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case VPR:		/* vertical sync register MSB */
+				case VPR:       /* vertical sync register MSB */
 					m_vpr = ( m_vpr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case VDW:		/* vertical display register MSB */
+				case VDW:       /* vertical display register MSB */
 					m_vdw = ( m_vdw & 0x00FF ) | ( data << 8 );
 					break;
 
-				case VCR:		/* vertical display end position register MSB */
+				case VCR:       /* vertical display end position register MSB */
 					m_vcr = ( m_vcr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case DCR:		/* DMA control register MSB */
+				case DCR:       /* DMA control register MSB */
 					m_dcr = ( m_dcr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case SOUR:		/* DMA source address register MSB */
+				case SOUR:      /* DMA source address register MSB */
 					m_sour = ( m_sour & 0x00FF ) | ( data << 8 );
 					break;
 
-				case DESR:		/* DMA destination address register MSB */
+				case DESR:      /* DMA destination address register MSB */
 					m_desr = ( m_desr & 0x00FF ) | ( data << 8 );
 					break;
 
-				case LENR:		/* DMA length register MSB */
+				case LENR:      /* DMA length register MSB */
 					m_lenr = ( m_lenr & 0x00FF ) | ( data << 8 );
 					m_dma_enabled = 1;
 //logerror("DMA is not supported yet.\n");
 					break;
 
-				case DVSSR:		/* Sprite attribute table MSB */
+				case DVSSR:     /* Sprite attribute table MSB */
 					m_dvssr = ( m_dvssr & 0x00FF ) | ( data << 8 );
 					m_dvssr_written = 1;
 					break;
@@ -832,9 +832,9 @@ void huc6270_device::device_reset()
 	m_bxr = 0;
 	m_byr = 0;
 	m_mwr = 0;
-	m_hsr = 0x0202;		/* Take some defaults for horizontal timing */
+	m_hsr = 0x0202;     /* Take some defaults for horizontal timing */
 	m_hdr = 0x041f;
-	m_vpr = 0x0f02;		/* Take some defaults for vertical timing */
+	m_vpr = 0x0f02;     /* Take some defaults for vertical timing */
 	m_vdw = 0x00ef;
 	m_vcr = 0x0004;
 	m_dcr = 0;
@@ -847,4 +847,3 @@ void huc6270_device::device_reset()
 	m_satb_countdown = 0;
 	m_raster_count = 0x4000;
 }
-

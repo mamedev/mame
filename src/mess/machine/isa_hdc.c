@@ -7,67 +7,67 @@
 #include "emu.h"
 #include "machine/isa_hdc.h"
 
-#define LOG_HDC_STATUS		0
-#define LOG_HDC_CALL		0
-#define LOG_HDC_DATA		0
+#define LOG_HDC_STATUS      0
+#define LOG_HDC_CALL        0
+#define LOG_HDC_DATA        0
 
 #define CMD_TESTREADY   0x00
 #define CMD_RECALIBRATE 0x01
-#define CMD_SENSE		0x03
-#define CMD_FORMATDRV	0x04
-#define CMD_VERIFY		0x05
-#define CMD_FORMATTRK	0x06
-#define CMD_FORMATBAD	0x07
-#define CMD_READ		0x08
-#define CMD_WRITE		0x0a
-#define CMD_SEEK		0x0b
+#define CMD_SENSE       0x03
+#define CMD_FORMATDRV   0x04
+#define CMD_VERIFY      0x05
+#define CMD_FORMATTRK   0x06
+#define CMD_FORMATBAD   0x07
+#define CMD_READ        0x08
+#define CMD_WRITE       0x0a
+#define CMD_SEEK        0x0b
 
-#define CMD_SETPARAM	0x0c
-#define CMD_GETECC		0x0d
+#define CMD_SETPARAM    0x0c
+#define CMD_GETECC      0x0d
 
-#define CMD_READSBUFF	0x0e
-#define CMD_WRITESBUFF	0x0f
+#define CMD_READSBUFF   0x0e
+#define CMD_WRITESBUFF  0x0f
 
-#define CMD_RAMDIAG 	0xe0
+#define CMD_RAMDIAG     0xe0
 #define CMD_DRIVEDIAG   0xe3
-#define CMD_INTERNDIAG	0xe4
-#define CMD_READLONG	0xe5
-#define CMD_WRITELONG	0xe6
+#define CMD_INTERNDIAG  0xe4
+#define CMD_READLONG    0xe5
+#define CMD_WRITELONG   0xe6
 
 /* Bits for command status byte */
 #define CSB_ERROR       0x02
-#define CSB_LUN 		0x20
+#define CSB_LUN         0x20
 
 /* XT hard disk controller status bits */
-#define STA_READY		0x01
-#define STA_INPUT		0x02
-#define STA_COMMAND 	0x04
-#define STA_SELECT		0x08
-#define STA_REQUEST 	0x10
-#define STA_INTERRUPT	0x20
+#define STA_READY       0x01
+#define STA_INPUT       0x02
+#define STA_COMMAND     0x04
+#define STA_SELECT      0x08
+#define STA_REQUEST     0x10
+#define STA_INTERRUPT   0x20
 
 /* XT hard disk controller control bits */
-#define CTL_PIO 		0x00
-#define CTL_DMA 		0x01
+#define CTL_PIO         0x00
+#define CTL_DMA         0x01
 
 static const char *const hdc_command_names[] =
 {
-	"CMD_TESTREADY",		/* 0x00 */
-	"CMD_RECALIBRATE",		/* 0x01 */
-	NULL,					/* 0x02 */
-	"CMD_SENSE",			/* 0x03 */
-	"CMD_FORMATDRV",		/* 0x04 */
-	"CMD_VERIFY",			/* 0x05 */
-	"CMD_FORMATTRK",		/* 0x06 */
-	"CMD_FORMATBAD",		/* 0x07 */
-	"CMD_READ",				/* 0x08 */
-	NULL,					/* 0x09 */
-	"CMD_WRITE",			/* 0x0A */
-	"CMD_SEEK",				/* 0x0B */
-	"CMD_SETPARAM",			/* 0x0C */
-	"CMD_GETECC",			/* 0x0D */
-	"CMD_READSBUFF",		/* 0x0E */
-	"CMD_WRITESBUFF",		/* 0x0F */
+	"CMD_TESTREADY",        /* 0x00 */
+	"CMD_RECALIBRATE",      /* 0x01 */
+	NULL,                   /* 0x02 */
+	"CMD_SENSE",            /* 0x03 */
+	"CMD_FORMATDRV",        /* 0x04 */
+	"CMD_VERIFY",           /* 0x05 */
+	"CMD_FORMATTRK",        /* 0x06 */
+	"CMD_FORMATBAD",        /* 0x07 */
+	"CMD_READ",             /* 0x08 */
+	NULL,                   /* 0x09 */
+	"CMD_WRITE",            /* 0x0A */
+	"CMD_SEEK",             /* 0x0B */
+	"CMD_SETPARAM",         /* 0x0C */
+	"CMD_GETECC",           /* 0x0D */
+	"CMD_READSBUFF",        /* 0x0E */
+	"CMD_WRITESBUFF",       /* 0x0F */
 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x10-0x17 */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0x18-0x1F */
@@ -96,14 +96,14 @@ static const char *const hdc_command_names[] =
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xD0-0xD7 */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xD8-0xDF */
 
-	"CMD_RAMDIAG",			/* 0xE0 */
-	NULL,					/* 0xE1 */
-	NULL,					/* 0xE2 */
-	"CMD_DRIVEDIAG",		/* 0xE3 */
-	"CMD_INTERNDIAG",		/* 0xE4 */
-	"CMD_READLONG",			/* 0xE5 */
-	"CMD_WRITELONG",		/* 0xE6 */
-	NULL,					/* 0xE7 */
+	"CMD_RAMDIAG",          /* 0xE0 */
+	NULL,                   /* 0xE1 */
+	NULL,                   /* 0xE2 */
+	"CMD_DRIVEDIAG",        /* 0xE3 */
+	"CMD_INTERNDIAG",       /* 0xE4 */
+	"CMD_READLONG",         /* 0xE5 */
+	"CMD_WRITELONG",        /* 0xE6 */
+	NULL,                   /* 0xE7 */
 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xE8-0xEF */
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, /* 0xF0-0xF7 */
@@ -158,7 +158,7 @@ const rom_entry *isa8_hdc_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_HDC, "Fixed Disk Controller Card", tag, owner, clock),
+		device_t(mconfig, ISA8_HDC, "Fixed Disk Controller Card", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "hdc";
@@ -250,7 +250,7 @@ void isa8_hdc_device::pc_hdc_result(int set_error_info)
 
 	if (set_error_info && ( csb & CSB_ERROR ) )
 	{
-        buffer[data_cnt++] = error;
+		buffer[data_cnt++] = error;
 		if (error & 0x80)
 		{
 			buffer[data_cnt++] = (drv << 5) | head[drv];
@@ -267,8 +267,8 @@ void isa8_hdc_device::pc_hdc_result(int set_error_info)
 		{
 			if (LOG_HDC_STATUS)
 				logerror("pc_hdc_result(): result [%02x]\n", buffer[data_cnt-1]);
-        }
-    }
+		}
+	}
 	status |= STA_INTERRUPT | STA_INPUT | STA_REQUEST | STA_COMMAND | STA_READY;
 }
 
@@ -338,12 +338,12 @@ int isa8_hdc_device::pc_hdc_dack_r()
 		if (sector[drv] >= info->sectors)
 		{
 			sector[drv] = 0;
-			if (++head[drv] >= info->heads)		/* beyond heads? */
+			if (++head[drv] >= info->heads)     /* beyond heads? */
 			{
-				head[drv] = 0;					/* reset head */
-				cylinder[drv]++;				/* next cylinder */
-            }
-        }
+				head[drv] = 0;                  /* reset head */
+				cylinder[drv]++;                /* next cylinder */
+			}
+		}
 	}
 
 	if (!no_dma())
@@ -375,18 +375,18 @@ void isa8_hdc_device::pc_hdc_dack_w(int data)
 		hdcdma_write = 512;
 		hdcdma_size -= 512;
 
-        /* end of cylinder ? */
+		/* end of cylinder ? */
 		if( ++sector[drv] >= info->sectors )
 		{
 			sector[drv] = 0;
-			if (++head[drv] >= info->heads)		/* beyond heads? */
+			if (++head[drv] >= info->heads)     /* beyond heads? */
 			{
-				head[drv] = 0;					/* reset head */
-				cylinder[drv]++;				/* next cylinder */
-            }
-        }
-        hdcdma_dst = hdcdma_data;
-    }
+				head[drv] = 0;                  /* reset head */
+				cylinder[drv]++;                /* next cylinder */
+			}
+		}
+		hdcdma_dst = hdcdma_data;
+	}
 
 	if (!no_dma())
 	{
@@ -473,7 +473,7 @@ void isa8_hdc_device::get_chsn()
 	sector_cnt[drv] = buffer[4];
 	control[drv] = buffer[5];   /* 7: no retry, 6: no ecc retry, 210: step rate */
 
-	error = 0x80;	/* a potential error has C/H/S/N info */
+	error = 0x80;   /* a potential error has C/H/S/N info */
 }
 
 int isa8_hdc_device::test_ready()
@@ -481,7 +481,7 @@ int isa8_hdc_device::test_ready()
 	if( !pc_hdc_file(drv) )
 	{
 		csb |= CSB_ERROR;
-		error |= 0x04;	/* drive not ready */
+		error |= 0x04;  /* drive not ready */
 		return 0;
 	}
 	return 1;
@@ -490,7 +490,7 @@ int isa8_hdc_device::test_ready()
 void isa8_hdc_device::hdc_command()
 {
 	int set_error_info = 1;
-	int old_error = error;			/* Previous error data is needed for CMD_SENSE */
+	int old_error = error;          /* Previous error data is needed for CMD_SENSE */
 	UINT8 cmd;
 	const char *command_name;
 
@@ -514,7 +514,7 @@ void isa8_hdc_device::hdc_command()
 		case CMD_TESTREADY:
 			set_error_info = 0;
 			test_ready();
-            break;
+			break;
 		case CMD_SENSE:
 			/* Perform error code translation. This may need to be expanded in the future. */
 			buffer[data_cnt++] = ( old_error & 0xC0 ) | ( ( old_error & 0x04 ) ? 0x04 : 0x00 ) ;
@@ -525,7 +525,7 @@ void isa8_hdc_device::hdc_command()
 			break;
 		case CMD_RECALIBRATE:
 			get_chsn();
-            break;
+			break;
 
 		case CMD_FORMATDRV:
 		case CMD_VERIFY:
@@ -535,7 +535,7 @@ void isa8_hdc_device::hdc_command()
 		case CMD_DRIVEDIAG:
 			get_chsn();
 			test_ready();
-            break;
+			break;
 
 		case CMD_READ:
 		case CMD_READLONG:
@@ -622,8 +622,8 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 		if (LOG_HDC_DATA)
 			logerror("hdc_data_w $%02x: ", data);
 
-        buffer_ptr = buffer;
-		data_cnt = 6;	/* expect 6 bytes including this one */
+		buffer_ptr = buffer;
+		data_cnt = 6;   /* expect 6 bytes including this one */
 		status &= ~STA_READY;
 		status &= ~STA_INPUT;
 		switch (data)
@@ -643,14 +643,14 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 			case CMD_WRITE:
 			case CMD_SEEK:
 			case CMD_GETECC:
-            case CMD_READSBUFF:
+			case CMD_READSBUFF:
 			case CMD_WRITESBUFF:
 			case CMD_RAMDIAG:
-            case CMD_DRIVEDIAG:
+			case CMD_DRIVEDIAG:
 			case CMD_INTERNDIAG:
 			case CMD_READLONG:
 			case CMD_WRITELONG:
-                break;
+				break;
 
 			default:
 				data_cnt = 0;
@@ -675,13 +675,13 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 			if (LOG_HDC_STATUS)
 				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) machine().firstcpu->pc());
 
-            status &= ~STA_COMMAND;
+			status &= ~STA_COMMAND;
 			status &= ~STA_REQUEST;
 			status &= ~STA_READY;
 			status |= STA_INPUT;
 
 			timer->adjust(attotime::from_msec(1),0);
-        }
+		}
 	}
 }
 
@@ -742,7 +742,7 @@ UINT8 isa8_hdc_device::pc_hdc_data_r()
 			status |= STA_COMMAND;
 		}
 	}
-    return data;
+	return data;
 }
 
 
@@ -785,12 +785,12 @@ UINT8 isa8_hdc_device::pc_hdc_dipswitch_r()
 static READ8_DEVICE_HANDLER(pc_HDC_r )
 {
 	UINT8 data = 0xff;
-	isa8_hdc_device	*hdc  = downcast<isa8_hdc_device *>(device);
+	isa8_hdc_device *hdc  = downcast<isa8_hdc_device *>(device);
 
 	switch( offset )
 	{
-		case 0: data = hdc->pc_hdc_data_r();	 break;
-		case 1: data = hdc->pc_hdc_status_r();	 break;
+		case 0: data = hdc->pc_hdc_data_r();     break;
+		case 1: data = hdc->pc_hdc_status_r();   break;
 		case 2: data = hdc->pc_hdc_dipswitch_r(); break;
 		case 3: break;
 	}
@@ -803,14 +803,14 @@ static READ8_DEVICE_HANDLER(pc_HDC_r )
 
 static WRITE8_DEVICE_HANDLER( pc_HDC_w )
 {
-	isa8_hdc_device	*hdc  = downcast<isa8_hdc_device *>(device);
+	isa8_hdc_device *hdc  = downcast<isa8_hdc_device *>(device);
 	if (LOG_HDC_CALL)
 		logerror("pc_HDC_w(): pc=%06X offs=%d data=0x%02x\n", space.machine().firstcpu->pc(), offset, data);
 
 	switch( offset )
 	{
-		case 0: hdc->pc_hdc_data_w(data);	 break;
-		case 1: hdc->pc_hdc_reset_w(data);	 break;
+		case 0: hdc->pc_hdc_data_w(data);    break;
+		case 1: hdc->pc_hdc_reset_w(data);   break;
 		case 2: hdc->pc_hdc_select_w(data);  break;
 		case 3: hdc->pc_hdc_control_w(data); break;
 	}

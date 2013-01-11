@@ -40,4 +40,3 @@ UINT32 irisha_state::screen_update_irisha(screen_device &screen, bitmap_ind16 &b
 
 	return 0;
 }
-

@@ -700,19 +700,19 @@ WRITE8_MEMBER(williams_state::williams2_7segment_w)
 
 	switch (data & 0x7F)
 	{
-		case 0x40:	n = 0; break;
-		case 0x79:	n = 1; break;
-		case 0x24:	n = 2; break;
-		case 0x30:	n = 3; break;
-		case 0x19:	n = 4; break;
-		case 0x12:	n = 5; break;
-		case 0x02:	n = 6; break;
-		case 0x03:	n = 6; break;
-		case 0x78:	n = 7; break;
-		case 0x00:	n = 8; break;
-		case 0x18:	n = 9; break;
-		case 0x10:	n = 9; break;
-		default:	n =-1; break;
+		case 0x40:  n = 0; break;
+		case 0x79:  n = 1; break;
+		case 0x24:  n = 2; break;
+		case 0x30:  n = 3; break;
+		case 0x19:  n = 4; break;
+		case 0x12:  n = 5; break;
+		case 0x02:  n = 6; break;
+		case 0x03:  n = 6; break;
+		case 0x78:  n = 7; break;
+		case 0x00:  n = 8; break;
+		case 0x18:  n = 9; break;
+		case 0x10:  n = 9; break;
+		default:    n =-1; break;
 	}
 
 	if ((data & 0x80) == 0x00)

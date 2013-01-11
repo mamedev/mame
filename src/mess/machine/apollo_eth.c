@@ -140,10 +140,10 @@ static TIMER_CALLBACK(receive_interrupt)
 	device_t *device = (device_t *) ptr;
 
 	/*
-     * Save the socket's current mode, and put it in non-blocking mode;
-     * we drain it by reading packets until we get an error
-     * (which is normally a "nothing more to be read" error).
-     */
+	 * Save the socket's current mode, and put it in non-blocking mode;
+	 * we drain it by reading packets until we get an error
+	 * (which is normally a "nothing more to be read" error).
+	 */
 	int save_mode = fcntl(eth_socket, F_GETFL, 0);
 	if (save_mode == -1)
 	{
@@ -196,22 +196,22 @@ int apollo_eth_transmit(device_t *device, const UINT8 data[], int length) {
 int apollo_eth_setfilter(device_t *device, int node_id)
 {
 	/*
-    tcpdump -i eth0 -dd ether dst 08:00:1e:01:ae:a5 or ether dst 09:00:1e:00:00:00 or ether dst 09:00:1e:00:00:01 or ether broadcast
+	tcpdump -i eth0 -dd ether dst 08:00:1e:01:ae:a5 or ether dst 09:00:1e:00:00:00 or ether dst 09:00:1e:00:00:01 or ether broadcast
 
-    (000) ld       [2]
-    (001) jeq      #0x1e01aea5      jt 2    jf 4
-    (002) ldh      [0]
-    (003) jeq      #0x800           jt 11   jf 12
-    (004) jeq      #0x1e000000      jt 6    jf 5
-    (005) jeq      #0x1e000001      jt 6    jf 8
-    (006) ldh      [0]
-    (007) jeq      #0x900           jt 11   jf 12
-    (008) jeq      #0xffffffff      jt 9    jf 12
-    (009) ldh      [0]
-    (010) jeq      #0xffff          jt 11   jf 12
-    (011) ret      #65535
-    (012) ret      #0
-    */
+	(000) ld       [2]
+	(001) jeq      #0x1e01aea5      jt 2    jf 4
+	(002) ldh      [0]
+	(003) jeq      #0x800           jt 11   jf 12
+	(004) jeq      #0x1e000000      jt 6    jf 5
+	(005) jeq      #0x1e000001      jt 6    jf 8
+	(006) ldh      [0]
+	(007) jeq      #0x900           jt 11   jf 12
+	(008) jeq      #0xffffffff      jt 9    jf 12
+	(009) ldh      [0]
+	(010) jeq      #0xffff          jt 11   jf 12
+	(011) ret      #65535
+	(012) ret      #0
+	*/
 	static struct sock_filter bpf_code[]= {
 		{ 0x20, 0, 0, 0x00000002 },
 		{ 0x15, 0, 2, 0x1e01aea5 },

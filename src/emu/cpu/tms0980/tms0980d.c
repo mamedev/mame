@@ -349,4 +349,3 @@ CPU_DISASSEMBLE( tms1100 ) {
 
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
 }
-

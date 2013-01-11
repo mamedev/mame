@@ -24,8 +24,8 @@ extern const device_type JOYPORT;
 
 struct joyport_config
 {
-	devcb_write_line		interrupt;
-	int						vdp_clock;
+	devcb_write_line        interrupt;
+	int                     vdp_clock;
 };
 
 #define JOYPORT_CONFIG(name) \
@@ -45,7 +45,7 @@ public:
 
 protected:
 	void device_config_complete();
-	joyport_device*	m_joyport;
+	joyport_device* m_joyport;
 
 private:
 	virtual UINT8 read_dev() =0;
@@ -59,34 +59,34 @@ class joyport_device : public device_t, public device_slot_interface
 {
 public:
 	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	UINT8	read_port();
-	void	write_port(int data);
-	void	set_interrupt(int state);
+	UINT8   read_port();
+	void    write_port(int data);
+	void    set_interrupt(int state);
 
 protected:
 	void device_start() { };
 	void device_config_complete();
 
 private:
-	devcb_resolved_write_line	m_interrupt;
-	joyport_attached_device*	m_connected;
+	devcb_resolved_write_line   m_interrupt;
+	joyport_attached_device*    m_connected;
 };
 
 SLOT_INTERFACE_EXTERN(joystick_port);
 SLOT_INTERFACE_EXTERN(joystick_port_994);
 SLOT_INTERFACE_EXTERN(joystick_port_gen);
 
-#define MCFG_GENEVE_JOYPORT_ADD( _tag, _conf )	\
+#define MCFG_GENEVE_JOYPORT_ADD( _tag, _conf )  \
 	MCFG_DEVICE_ADD(_tag, JOYPORT, 0) \
 	MCFG_DEVICE_CONFIG( _conf ) \
 	MCFG_DEVICE_SLOT_INTERFACE(joystick_port_gen, "twinjoy", NULL, false)
 
-#define MCFG_TI_JOYPORT4A_ADD( _tag, _conf )	\
+#define MCFG_TI_JOYPORT4A_ADD( _tag, _conf )    \
 	MCFG_DEVICE_ADD(_tag, JOYPORT, 0) \
 	MCFG_DEVICE_CONFIG( _conf ) \
 	MCFG_DEVICE_SLOT_INTERFACE(joystick_port, "twinjoy", NULL, false)
 
-#define MCFG_TI_JOYPORT4_ADD( _tag, _conf )	\
+#define MCFG_TI_JOYPORT4_ADD( _tag, _conf ) \
 	MCFG_DEVICE_ADD(_tag, JOYPORT, 0) \
 	MCFG_DEVICE_CONFIG( _conf ) \
 	MCFG_DEVICE_SLOT_INTERFACE(joystick_port_994, "twinjoy", NULL, false)

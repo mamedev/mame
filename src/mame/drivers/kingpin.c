@@ -124,22 +124,22 @@ INPUT_PORTS_END
 
 static I8255A_INTERFACE( ppi8255_0_intf )
 {
-	DEVCB_NULL,					/* Port A read = watchdog? */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_INPUT_PORT("DSW1"),	/* Port B read */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_NULL,					/* Port C read = unused? */
-	DEVCB_NULL					/* Port C write */
+	DEVCB_NULL,                 /* Port A read = watchdog? */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_INPUT_PORT("DSW1"),   /* Port B read */
+	DEVCB_NULL,                 /* Port B write */
+	DEVCB_NULL,                 /* Port C read = unused? */
+	DEVCB_NULL                  /* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_1_intf )
 {
-	DEVCB_INPUT_PORT("IN0"),	/* Port A read */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_INPUT_PORT("IN1"),	/* Port B read */
-	DEVCB_NULL,					/* Port B write */
-	DEVCB_NULL,					/* Port C read */
-	DEVCB_NULL					/* Port C write = unknown */
+	DEVCB_INPUT_PORT("IN0"),    /* Port A read */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_INPUT_PORT("IN1"),    /* Port B read */
+	DEVCB_NULL,                 /* Port B write */
+	DEVCB_NULL,                 /* Port C read */
+	DEVCB_NULL                  /* Port C write = unknown */
 };
 
 WRITE_LINE_MEMBER(kingpin_state::vdp_interrupt)

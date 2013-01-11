@@ -72,22 +72,22 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 
-#define mc6845_h_char_total 	(m_crtc_vreg[0])
-#define mc6845_h_display		(m_crtc_vreg[1])
-#define mc6845_h_sync_pos		(m_crtc_vreg[2])
-#define mc6845_sync_width		(m_crtc_vreg[3])
-#define mc6845_v_char_total		(m_crtc_vreg[4])
-#define mc6845_v_total_adj		(m_crtc_vreg[5])
-#define mc6845_v_display		(m_crtc_vreg[6])
-#define mc6845_v_sync_pos		(m_crtc_vreg[7])
-#define mc6845_mode_ctrl		(m_crtc_vreg[8])
-#define mc6845_tile_height		(m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start	(m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end 	(m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total     (m_crtc_vreg[0])
+#define mc6845_h_display        (m_crtc_vreg[1])
+#define mc6845_h_sync_pos       (m_crtc_vreg[2])
+#define mc6845_sync_width       (m_crtc_vreg[3])
+#define mc6845_v_char_total     (m_crtc_vreg[4])
+#define mc6845_v_total_adj      (m_crtc_vreg[5])
+#define mc6845_v_display        (m_crtc_vreg[6])
+#define mc6845_v_sync_pos       (m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (m_crtc_vreg[8])
+#define mc6845_tile_height      (m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 void multi8_state::video_start()
 {
@@ -559,16 +559,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 void multi8_state::palette_init()
@@ -583,10 +583,10 @@ READ8_MEMBER( multi8_state::porta_r )
 {
 	int vsync = (ioport("VBLANK")->read() & 0x1) << 5;
 	/*
-    -x-- ---- kanji rom is present (0) yes
-    --x- ---- vsync
-    ---- --x- fdc rom is present (0) yes
-    */
+	-x-- ---- kanji rom is present (0) yes
+	--x- ---- vsync
+	---- --x- fdc rom is present (0) yes
+	*/
 
 	return 0x9f | vsync | 0x00;
 }
@@ -595,11 +595,11 @@ READ8_MEMBER( multi8_state::porta_r )
 WRITE8_MEMBER( multi8_state::portb_w )
 {
 	/*
-        x--- ---- color mode
-        -x-- ---- screen width (80 / 40)
-        ---- x--- memory bank status
-        ---- -xxx page screen graphics in B/W mode
-    */
+	    x--- ---- color mode
+	    -x-- ---- screen width (80 / 40)
+	    ---- x--- memory bank status
+	    ---- -xxx page screen graphics in B/W mode
+	*/
 
 	m_display_reg = data;
 }
@@ -617,12 +617,12 @@ WRITE8_MEMBER( multi8_state::portc_w )
 
 static I8255_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_DRIVER_MEMBER(multi8_state, porta_r),	/* Port A read */
-	DEVCB_NULL,					/* Port B read */
-	DEVCB_NULL,					/* Port C read */
-	DEVCB_DRIVER_MEMBER(multi8_state, portb_w),	/* Port B write */
-	DEVCB_NULL,					/* Port A write */
-	DEVCB_DRIVER_MEMBER(multi8_state, portc_w)	/* Port C write */
+	DEVCB_DRIVER_MEMBER(multi8_state, porta_r), /* Port A read */
+	DEVCB_NULL,                 /* Port B read */
+	DEVCB_NULL,                 /* Port C read */
+	DEVCB_DRIVER_MEMBER(multi8_state, portb_w), /* Port B write */
+	DEVCB_NULL,                 /* Port A write */
+	DEVCB_DRIVER_MEMBER(multi8_state, portc_w)  /* Port C write */
 };
 
 WRITE8_MEMBER( multi8_state::ym2203_porta_w )
@@ -685,7 +685,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 MACHINE_CONFIG_END
 

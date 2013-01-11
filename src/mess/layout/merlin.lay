@@ -270,95 +270,95 @@
 	</element>
 
 	<element name="new_game" defstate="0">
-        <rect>
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.1" green="0.1" blue="0.1" />
-        </rect>
-        <rect state="0">
-            <bounds x="0" y="0" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="NEW GAME" state="0">
-            <bounds x="8" y="24" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
-        <rect state="1">
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="NEW GAME" state="1">
-            <bounds x="10" y="26" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
+		<rect>
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<bounds x="0" y="0" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="NEW GAME" state="0">
+			<bounds x="8" y="24" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<rect state="1">
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="NEW GAME" state="1">
+			<bounds x="10" y="26" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
 	</element>
 
 	<element name="same_game" defstate="0">
-        <rect>
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.1" green="0.1" blue="0.1" />
-        </rect>
-        <rect state="0">
-            <bounds x="0" y="0" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="SAME GAME" state="0">
-            <bounds x="8" y="24" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
-        <rect state="1">
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="SAME GAME" state="1">
-            <bounds x="10" y="26" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
+		<rect>
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<bounds x="0" y="0" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="SAME GAME" state="0">
+			<bounds x="8" y="24" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<rect state="1">
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="SAME GAME" state="1">
+			<bounds x="10" y="26" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
 	</element>
 
 	<element name="hit_me" defstate="0">
-        <rect>
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.1" green="0.1" blue="0.1" />
-        </rect>
-        <rect state="0">
-            <bounds x="0" y="0" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="HIT ME" state="0">
-            <bounds x="8" y="24" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
-        <rect state="1">
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="HIT ME" state="1">
-            <bounds x="10" y="26" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
+		<rect>
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<bounds x="0" y="0" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="HIT ME" state="0">
+			<bounds x="8" y="24" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<rect state="1">
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="HIT ME" state="1">
+			<bounds x="10" y="26" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
 	</element>
 
 	<element name="comp_turn" defstate="0">
-        <rect>
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.1" green="0.1" blue="0.1" />
-        </rect>
-        <rect state="0">
-            <bounds x="0" y="0" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="COMP TURN" state="0">
-            <bounds x="8" y="24" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
-        <rect state="1">
-            <bounds x="2" y="2" width="48" height="48"/>
-            <color red="0.25" green="0.25" blue="0.25" />
-        </rect>
-        <text string="COMP TURN" state="1">
-            <bounds x="10" y="26" width="40" height="20"/>
-            <color red="1.0" green="1.0" blue="1.0" />
-        </text>
+		<rect>
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<bounds x="0" y="0" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="COMP TURN" state="0">
+			<bounds x="8" y="24" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<rect state="1">
+			<bounds x="2" y="2" width="48" height="48"/>
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<text string="COMP TURN" state="1">
+			<bounds x="10" y="26" width="40" height="20"/>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
 	</element>
 
 	<view name="Default Layout">

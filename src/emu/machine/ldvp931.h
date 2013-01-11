@@ -77,8 +77,8 @@ public:
 	// types
 	typedef delegate<void (phillips_22vp931_device &, int)> data_ready_delegate;
 
-    // construction/destruction
-    phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// input and output
 	void data_w(UINT8 data) { synchronize(TID_DEFERRED_DATA, data); }
@@ -133,35 +133,35 @@ public:
 
 protected:
 	// internal state
-	required_device<i8049_device> m_i8049_cpu;		// CPU index of the 8049
-	emu_timer *			m_tracktimer;				// timer device
-	data_ready_delegate	m_data_ready;				// data ready callback
+	required_device<i8049_device> m_i8049_cpu;      // CPU index of the 8049
+	emu_timer *         m_tracktimer;               // timer device
+	data_ready_delegate m_data_ready;               // data ready callback
 
 	// I/O port states
-	UINT8				m_i8049_out0;				// output 0 state
-	UINT8				m_i8049_out1;				// output 1 state
-	UINT8				m_i8049_port1;				// port 1 state
+	UINT8               m_i8049_out0;               // output 0 state
+	UINT8               m_i8049_out1;               // output 1 state
+	UINT8               m_i8049_port1;              // port 1 state
 
 	// DATIC circuit implementation
-	UINT8				m_daticval;					// latched DATIC value
-	UINT8				m_daticerp;					// /ERP value from DATIC
-	UINT8				m_datastrobe;				// DATA STROBE line from DATIC
+	UINT8               m_daticval;                 // latched DATIC value
+	UINT8               m_daticerp;                 // /ERP value from DATIC
+	UINT8               m_datastrobe;               // DATA STROBE line from DATIC
 
 	// communication status
-	UINT8				m_reset_state;				// state of the reset input
-	UINT8				m_fromcontroller;			// command byte from the controller
-	bool				m_fromcontroller_pending;	// true if data is pending
-	UINT8				m_tocontroller;				// command byte to the controller
-	bool				m_tocontroller_pending;		// true if data is pending
+	UINT8               m_reset_state;              // state of the reset input
+	UINT8               m_fromcontroller;           // command byte from the controller
+	bool                m_fromcontroller_pending;   // true if data is pending
+	UINT8               m_tocontroller;             // command byte to the controller
+	bool                m_tocontroller_pending;     // true if data is pending
 
 	// tracking
-	INT8				m_trackdir;					// direction of tracking
-	UINT8				m_trackstate;				// state of tracking
+	INT8                m_trackdir;                 // direction of tracking
+	UINT8               m_trackstate;               // state of tracking
 
 	// debugging
-	UINT8				m_cmdbuf[3];				// 3 bytes worth of commands
-	UINT8				m_cmdcount;					// number of command bytes seen
-	INT16				m_advanced;					// number of frames advanced
+	UINT8               m_cmdbuf[3];                // 3 bytes worth of commands
+	UINT8               m_cmdcount;                 // number of command bytes seen
+	INT16               m_advanced;                 // number of frames advanced
 };
 
 

@@ -57,7 +57,7 @@ Expansion bus stuff:
 #include "includes/3do.h"
 #include "cpu/arm7/arm7core.h"
 
-#define	VERBOSE			1
+#define VERBOSE         1
 #define LOG(x) do { if (VERBOSE) printf x; } while (0)
 
 /*
@@ -118,10 +118,10 @@ void _3do_state::m_3do_request_fiq(UINT32 irq_req, UINT8 type)
 TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 {
 	/*
-		x--- fablode flag (wtf?)
-		-x-- cascade flag
-		--x- reload flag
-		---x decrement flag (enable)
+	    x--- fablode flag (wtf?)
+	    -x-- cascade flag
+	    --x- reload flag
+	    ---x decrement flag (enable)
 	*/
 	UINT8 timer_flag;
 	UINT8 carry_val;
@@ -195,7 +195,7 @@ READ32_MEMBER(_3do_state::_3do_slow2_r){
 	logerror( "%08X: UNK_318 read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset );
 
 	switch( offset ) {
-	case 0:		/* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
+	case 0:     /* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
 		data = m_slow2.cg_output & 0x00000001;
 		m_slow2.cg_output = m_slow2.cg_output >> 1;
 		m_slow2.cg_w_count = 0;
@@ -210,7 +210,7 @@ WRITE32_MEMBER(_3do_state::_3do_slow2_w)
 
 	switch( offset )
 	{
-		case 0:		/* Boot ROM writes 03180000 here and then starts reading some things */
+		case 0:     /* Boot ROM writes 03180000 here and then starts reading some things */
 		{
 			/* disable ROM overlay */
 			membank("bank1")->set_entry(0);
@@ -242,17 +242,17 @@ READ32_MEMBER(_3do_state::_3do_svf_r)
 
 	switch( offset & ( 0xE000 / 4 ) )
 	{
-	case 0x0000/4:		/* SPORT transfer */
+	case 0x0000/4:      /* SPORT transfer */
 		for ( int i = 0; i < 512; i++ )
 		{
 			m_svf.sport[i] = p[i];
 		}
 		break;
-	case 0x2000/4:		/* Write to color register */
+	case 0x2000/4:      /* Write to color register */
 		return m_svf.color;
-	case 0x4000/4:		/* Flash write */
+	case 0x4000/4:      /* Flash write */
 		break;
-	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
+	case 0x6000/4:      /* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
 		break;
 	}
 	return 0;
@@ -267,7 +267,7 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 
 	switch( offset & ( 0xe000 / 4 ) )
 	{
-	case 0x0000/4:		/* SPORT transfer */
+	case 0x0000/4:      /* SPORT transfer */
 		{
 			UINT32 keep_bits = data ^ 0xffffffff;
 
@@ -277,10 +277,10 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 			}
 		}
 		break;
-	case 0x2000/4:		/* Write to color register */
+	case 0x2000/4:      /* Write to color register */
 		m_svf.color = data;
 		break;
-	case 0x4000/4:		/* Flash write */
+	case 0x4000/4:      /* Flash write */
 		{
 			UINT32 keep_bits = data ^ 0xffffffff;
 			UINT32 new_bits = m_svf.color & data;
@@ -291,7 +291,7 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 			}
 		}
 		break;
-	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
+	case 0x6000/4:      /* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
 		break;
 	}
 }
@@ -302,7 +302,7 @@ READ32_MEMBER(_3do_state::_3do_madam_r){
 	logerror( "%08X: MADAM read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset*4 );
 
 	switch( offset ) {
-	case 0x0000/4:		/* 03300000 - Revision */
+	case 0x0000/4:      /* 03300000 - Revision */
 		return m_madam.revision;
 	case 0x0004/4:
 		return m_madam.msysbits;
@@ -476,7 +476,7 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 		else
 			printf("%c",data);
 		break;
-	case 0x0004/4:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
+	case 0x0004/4:  /* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
 		m_madam.msysbits = data;
 		break;
 	case 0x0008/4:
@@ -499,15 +499,15 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 		break;
 
 	/* CEL */
-	case 0x0100/4:	/* 03300100 - SPRSTRT - Start the CEL engine (W) */
-	case 0x0104/4:	/* 03300104 - SPRSTOP - Stop the CEL engine (W) */
-	case 0x0108/4:	/* 03300108 - SPRCNTU - Continue the CEL engine (W) */
-	case 0x010c/4:	/* 0330010c - SPRPAUS - Pause the the CEL engine (W) */
+	case 0x0100/4:  /* 03300100 - SPRSTRT - Start the CEL engine (W) */
+	case 0x0104/4:  /* 03300104 - SPRSTOP - Stop the CEL engine (W) */
+	case 0x0108/4:  /* 03300108 - SPRCNTU - Continue the CEL engine (W) */
+	case 0x010c/4:  /* 0330010c - SPRPAUS - Pause the the CEL engine (W) */
 		break;
-	case 0x0110/4:	/* 03300110 - CCOBCTL0 - CCoB control (RW) */
+	case 0x0110/4:  /* 03300110 - CCOBCTL0 - CCoB control (RW) */
 		m_madam.ccobctl0 = data;
 		break;
-	case 0x0129/4:	/* 03300120 - PPMPC (RW) */
+	case 0x0129/4:  /* 03300120 - PPMPC (RW) */
 		m_madam.ppmpc = data;
 		break;
 
@@ -639,7 +639,7 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 	case 0x07f4/4:
 		m_madam.mult_control &= ~data;
 		break;
-	case 0x07fc/4:	/* Start process */
+	case 0x07fc/4:  /* Start process */
 		break;
 
 	default:
@@ -663,8 +663,8 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	if (!space.debugger_access())
 	{
 		if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
-		   offset != 0x118/4 && offset != 0x11c/4)
-	   logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
+			offset != 0x118/4 && offset != 0x11c/4)
+		logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
 	}
 
 	/* TODO: for debug, to be removed once that we write the CPU core */
@@ -727,15 +727,15 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	case 0x0088/4:
 		return m_clio.adbctl;
 
-	case 0x0100/4:	case 0x0108/4:	case 0x0110/4:	case 0x0118/4:
-	case 0x0120/4:	case 0x0128/4:	case 0x0130/4:	case 0x0138/4:
-	case 0x0140/4:	case 0x0148/4:	case 0x0150/4:  case 0x0158/4:
-	case 0x0160/4:	case 0x0168/4:	case 0x0170/4:	case 0x0178/4:
+	case 0x0100/4:  case 0x0108/4:  case 0x0110/4:  case 0x0118/4:
+	case 0x0120/4:  case 0x0128/4:  case 0x0130/4:  case 0x0138/4:
+	case 0x0140/4:  case 0x0148/4:  case 0x0150/4:  case 0x0158/4:
+	case 0x0160/4:  case 0x0168/4:  case 0x0170/4:  case 0x0178/4:
 		return m_clio.timer_count[((offset & 0x3f) >> 1)+0];
-	case 0x0104/4:	case 0x010c/4:	case 0x0114/4:	case 0x011c/4:
-	case 0x0124/4:	case 0x012c/4:	case 0x0134/4:	case 0x013c/4:
-	case 0x0144/4:	case 0x014c/4:	case 0x0154/4:	case 0x015c/4:
-	case 0x0164/4:	case 0x016c/4:	case 0x0174/4:	case 0x017c/4:
+	case 0x0104/4:  case 0x010c/4:  case 0x0114/4:  case 0x011c/4:
+	case 0x0124/4:  case 0x012c/4:  case 0x0134/4:  case 0x013c/4:
+	case 0x0144/4:  case 0x014c/4:  case 0x0154/4:  case 0x015c/4:
+	case 0x0164/4:  case 0x016c/4:  case 0x0174/4:  case 0x017c/4:
 		return m_clio.timer_backup[((offset & 0x3f) >> 1)];
 
 	case 0x0200/4:
@@ -788,7 +788,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 WRITE32_MEMBER(_3do_state::_3do_clio_w)
 {
 	if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
-	   offset != 0x118/4 && offset != 0x11c/4)
+		offset != 0x118/4 && offset != 0x11c/4)
 		logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 
 	/* TODO: for debug, to be removed once that we write the CPU core */
@@ -838,13 +838,13 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x0020/4:
 		m_clio.audin = data;
 		break;
-	case 0x0024/4:	/* 03400024 - c0020f0f is written here during boot */
+	case 0x0024/4:  /* 03400024 - c0020f0f is written here during boot */
 		m_clio.audout = data;
 		break;
-	case 0x0028/4:	/* 03400028 - bits 0,1, and 6 are tested (reset source) */
+	case 0x0028/4:  /* 03400028 - bits 0,1, and 6 are tested (reset source) */
 		m_clio.cstatbits = data;
 		break;
-	case 0x002c/4:	/* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
+	case 0x002c/4:  /* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
 		m_clio.wdog = data;
 		break;
 	case 0x0030/4:
@@ -919,16 +919,16 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		break;
 
 	/* only lower 16-bits can be written */
-	case 0x0100/4:	case 0x0108/4:	case 0x0110/4:	case 0x0118/4:
-	case 0x0120/4:	case 0x0128/4:	case 0x0130/4:	case 0x0138/4:
-	case 0x0140/4:	case 0x0148/4:	case 0x0150/4:  case 0x0158/4:
-	case 0x0160/4:	case 0x0168/4:	case 0x0170/4:	case 0x0178/4:
+	case 0x0100/4:  case 0x0108/4:  case 0x0110/4:  case 0x0118/4:
+	case 0x0120/4:  case 0x0128/4:  case 0x0130/4:  case 0x0138/4:
+	case 0x0140/4:  case 0x0148/4:  case 0x0150/4:  case 0x0158/4:
+	case 0x0160/4:  case 0x0168/4:  case 0x0170/4:  case 0x0178/4:
 		m_clio.timer_count[((offset & 0x3f) >> 1)] = data & 0xffff;
 		break;
-	case 0x0104/4:	case 0x010c/4:	case 0x0114/4:	case 0x011c/4:
-	case 0x0124/4:	case 0x012c/4:	case 0x0134/4:	case 0x013c/4:
-	case 0x0144/4:	case 0x014c/4:	case 0x0154/4:	case 0x015c/4:
-	case 0x0164/4:	case 0x016c/4:	case 0x0174/4:	case 0x017c/4:
+	case 0x0104/4:  case 0x010c/4:  case 0x0114/4:  case 0x011c/4:
+	case 0x0124/4:  case 0x012c/4:  case 0x0134/4:  case 0x013c/4:
+	case 0x0144/4:  case 0x014c/4:  case 0x0154/4:  case 0x015c/4:
+	case 0x0164/4:  case 0x016c/4:  case 0x0174/4:  case 0x017c/4:
 		m_clio.timer_backup[((offset & 0x3f) >> 1)] = data & 0xffff;
 		break;
 
@@ -1029,9 +1029,9 @@ void _3do_clio_init( running_machine &machine, screen_device *screen )
 	memset( &state->m_clio, 0, sizeof(CLIO) );
 	state->m_clio.screen = screen;
 	state->m_clio.revision = 0x02022000 /* 0x04000000 */;
-	state->m_clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
+	state->m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 	state->m_clio.unclerev = 0x03800000;
-	state->m_clio.expctl = 0x80;	/* ARM has the expansion bus */
+	state->m_clio.expctl = 0x80;    /* ARM has the expansion bus */
 	state->m_dspp.N = auto_alloc_array(machine, UINT16, 0x800 );
 	state->m_dspp.EI = auto_alloc_array(machine, UINT16, 0x200 );
 	state->m_dspp.EO = auto_alloc_array(machine, UINT16, 0x200 );
@@ -1047,10 +1047,10 @@ void _3do_clio_init( running_machine &machine, screen_device *screen )
 VIDEO_START_MEMBER(_3do_state,_3do)
 {
 	/* We only keep the odd bits and get rid of the even bits */
-//	for ( int i = 0; i < 512; i++ )
-//	{
-//		m_video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
-//	}
+//  for ( int i = 0; i < 512; i++ )
+//  {
+//      m_video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
+//  }
 }
 
 
@@ -1060,8 +1060,8 @@ UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitma
 
 	for ( int y = 0; y < 120; y++ )
 	{
-		UINT32	*dest_p0 = &bitmap.pix32(22 + y * 2, 254 );
-		UINT32	*dest_p1 = &bitmap.pix32(22 + y * 2 + 1, 254 );
+		UINT32  *dest_p0 = &bitmap.pix32(22 + y * 2, 254 );
+		UINT32  *dest_p1 = &bitmap.pix32(22 + y * 2 + 1, 254 );
 
 		for ( int x = 0; x < 320; x++ )
 		{
@@ -1103,4 +1103,3 @@ UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitma
 
 	return 0;
 }
-

@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 Titles, publishers and release dates taken from:
-  - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
+	- X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
 but the website only covers post 1985 titles...
 
 Games I haven't managed to start (possibly due to my mistakes):
@@ -234,12 +234,12 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="アルゴー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
-                <rom name="argos_1.2d" size="327680" crc="4c63544e" sha1="c7da6aeb8879a3cf81b7c774ad2e9e9ccd0d8878" offset="0" />
+				<rom name="argos_1.2d" size="327680" crc="4c63544e" sha1="c7da6aeb8879a3cf81b7c774ad2e9e9ccd0d8878" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
-                <rom name="argos_2.2d" size="327680" crc="eb210fa5" sha1="dc5e281f12e14455cf6149edb1db2825459a595d" offset="0" />
+				<rom name="argos_2.2d" size="327680" crc="eb210fa5" sha1="dc5e281f12e14455cf6149edb1db2825459a595d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -819,7 +819,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="gyajiko1.d88" size="348848" crc="5063936e" sha1="76649c85bf4b7bd97428bacfa455ec1e33e43723" offset="0" />
+				<rom name="gyajiko1.d88" size="348848" crc="5063936e" sha1="76649c85bf4b7bd97428bacfa455ec1e33e43723" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -832,7 +832,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="gyajiko2.d88" size="348848" crc="81a7c4eb" sha1="71c15c75f46810ac8159b4784a4500c54e85b198" offset="0" />
+				<rom name="gyajiko2.d88" size="348848" crc="81a7c4eb" sha1="71c15c75f46810ac8159b4784a4500c54e85b198" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1659,17 +1659,17 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
-                <rom name="disk1.d88" size="348848" crc="3c17cce4" sha1="defff082c7ba49ac0f5e807c3cd1e9a9f4c7f1ab" offset="0" />
+				<rom name="disk1.d88" size="348848" crc="3c17cce4" sha1="defff082c7ba49ac0f5e807c3cd1e9a9f4c7f1ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
-                <rom name="disk2.d88" size="348848" crc="50f1b9c7" sha1="1b1bfbe1cd1b1891be78c78dba6f44b735a78b48" offset="0" />
+				<rom name="disk2.d88" size="348848" crc="50f1b9c7" sha1="1b1bfbe1cd1b1891be78c78dba6f44b735a78b48" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-    <!-- is this correct or is it "Makai-wo" by Bond Soft (198603) [disk is broken in current svn] -->
+	<!-- is this correct or is it "Makai-wo" by Bond Soft (198603) [disk is broken in current svn] -->
 	<software name="makaifuk">
 		<description>Makai Fukkatsu</description>
 		<year>1987</year>
@@ -1949,12 +1949,12 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="王子ビンビン物語"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="unk_disk1_a.d88" size="348848" crc="2aa58976" sha1="3640c60c8b54961de8ef20e6f2cb0c668c88bcd1" offset="0" />
+				<rom name="unk_disk1_a.d88" size="348848" crc="2aa58976" sha1="3640c60c8b54961de8ef20e6f2cb0c668c88bcd1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="unk_disk1_b.d88" size="348848" crc="8de42d9f" sha1="20bfecef331af8496dfea010a5c271ca6cb03b6d" offset="0" />
+				<rom name="unk_disk1_b.d88" size="348848" crc="8de42d9f" sha1="20bfecef331af8496dfea010a5c271ca6cb03b6d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2364,7 +2364,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="新竹取物語"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="363536">
-                <rom name="shin take to monogatari.d88" size="363536" crc="b16b9f10" sha1="c049117e2243c51fa5d6133dc4fcfd9da0102086" offset="0" />
+				<rom name="shin take to monogatari.d88" size="363536" crc="b16b9f10" sha1="c049117e2243c51fa5d6133dc4fcfd9da0102086" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3333,12 +3333,12 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="うっでぃぽこ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="wodypoco.d88" size="348848" crc="6c9dc652" sha1="0003c6916a1d2b5b1ac8f09a7be046d29eeaade6" offset="0" />
+				<rom name="wodypoco.d88" size="348848" crc="6c9dc652" sha1="0003c6916a1d2b5b1ac8f09a7be046d29eeaade6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="wodydata.d88" size="537520" crc="3ff620b9" sha1="0a6682318141c08c3e8c0f8865d824a44417da44" offset="0" />
+				<rom name="wodydata.d88" size="537520" crc="3ff620b9" sha1="0a6682318141c08c3e8c0f8865d824a44417da44" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5288,7 +5288,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 			<dataarea name="flop" size="1089776">
 				<rom name="cz-8fb02 turbo basic.d88" size="1089776" crc="228f1da3" sha1="6a4cbaf9be49b8b5433a4cb453a15929f2fd30cd" offset="0" />
 			</dataarea>
-        </part>
+		</part>
 	</software>
 
 	<software name="turbobasa" cloneof="turbobas">
@@ -5452,7 +5452,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="jetterm">
-    <!-- From readme:
+	<!-- From readme:
 このソフトはパソコン通信用のソフトですが、
 CDOSというMS-DOSと同様なコマンドライン作動させることが出来ます。
 -->
@@ -5569,7 +5569,7 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-                <rom name="unk_disk.d88" size="348848" crc="821d3e69" sha1="8de8f1855fa97a2381b9a3328c331c14d3d79300" offset="0" />
+				<rom name="unk_disk.d88" size="348848" crc="821d3e69" sha1="8de8f1855fa97a2381b9a3328c331c14d3d79300" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5617,13 +5617,13 @@ systems, for the moment they stay here!
 
 	<software name="game6">
 <!-- From GAME6.txt:
-    ウォーロイド(ASCII)
-    テニス(任天堂のあれ)
-    マイナー2049(COMPTIQ)
-    ドアドア(ENIX)
-    デーモンクリスタル(電波新聞)
-    コスモ・トラベラー(APOLO TECHNICA)
-    ボンバーマンはないです(^^；
+	ウォーロイド(ASCII)
+	テニス(任天堂のあれ)
+	マイナー2049(COMPTIQ)
+	ドアドア(ENIX)
+	デーモンクリスタル(電波新聞)
+	コスモ・トラベラー(APOLO TECHNICA)
+	ボンバーマンはないです(^^；
 [i.e. Bomberman is not included even if listed in the menu (probably it did
 not fit the disk)]
 -->
@@ -5663,7 +5663,7 @@ not fit the disk)]
 8. ちゃっくんぽっぷ
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
- 起動してください。
+	起動してください。
 -->
 		<description>Game 02</description>
 		<year>19??</year>
@@ -5683,7 +5683,7 @@ not fit the disk)]
 8. Building Hopper
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
- 起動してください。
+	起動してください。
 -->
 		<description>Game 03</description>
 		<year>19??</year>
@@ -5723,7 +5723,7 @@ not fit the disk)]
 5. Mr.Pac!
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
- 起動してください。
+	起動してください。
 -->
 		<description>Game 05</description>
 		<year>19??</year>
@@ -5931,7 +5931,7 @@ not fit the disk)]
 6. スターライトアドベンチャーⅡ
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
- 起動してください。
+	起動してください。
 -->
 		<description>Game 16</description>
 		<year>19??</year>
@@ -5952,7 +5952,7 @@ not fit the disk)]
 7. キャノンボール
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
- 起動してください。
+	起動してください。
 -->
 		<description>Game 17</description>
 		<year>19??</year>
@@ -6006,7 +6006,7 @@ MB-GAME Disk Utility No.2
 
 	<software name="game20">
 <!--
- From GAME1-25_List.txt:
+	From GAME1-25_List.txt:
 1. ハイドライド
 2. チョップリフター
 3. ファンタジアン
@@ -6172,13 +6172,13 @@ From GAME1-25_List.txt:
 
 	<software name="gamee">
 <!-- From GAME_E.txt:
-   1. ASTEROID CHALLENGER
-   2. Super Billiards          (HAL研)
-   3. NUTS & MILK              (HUDSON)
-   4. HARVEST                  (Micronet)
-   5. ドクロンの館             (ENIX)
-   6. THEえんま大王            (HUDSON)
-   7. MINER 2049er             (COMPTIQ)
+	1. ASTEROID CHALLENGER
+	2. Super Billiards          (HAL研)
+	3. NUTS & MILK              (HUDSON)
+	4. HARVEST                  (Micronet)
+	5. ドクロンの館             (ENIX)
+	6. THEえんま大王            (HUDSON)
+	7. MINER 2049er             (COMPTIQ)
 -->
 		<description>Game E</description>
 		<year>19??</year>
@@ -6276,10 +6276,10 @@ HP Osho
 
 	<software name="gamepk2">
 <!-- From GAMEPK2.txt:
-  1. UOOTOY
-  2. ZEPLIS ][
-  3. 妖魔仕事人 魔童
-  4. STAR BEE
+	1. UOOTOY
+	2. ZEPLIS ][
+	3. 妖魔仕事人 魔童
+	4. STAR BEE
 -->
 		<description>GAMEPK2</description>
 		<year>19??</year>

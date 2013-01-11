@@ -75,9 +75,9 @@ extern const device_type CRT5057;
 /* interface */
 struct tms9927_interface
 {
-	const char *screen_tag;			/* screen we are acting on */
-	int hpixels_per_column;			/* number of pixels per video memory address */
-	const char *selfload_region;	/* name of the region with self-load data */
+	const char *screen_tag;         /* screen we are acting on */
+	int hpixels_per_column;         /* number of pixels per video memory address */
+	const char *selfload_region;    /* name of the region with self-load data */
 };
 
 extern const tms9927_interface tms9927_null_interface;

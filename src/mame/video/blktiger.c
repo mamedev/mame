@@ -27,7 +27,7 @@ TILEMAP_MAPPER_MEMBER(blktiger_state::bg4x8_scan)
 TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 {
 	/* the tile priority table is a guess compiled by looking at the game. It
-       was not derived from a PROM so it could be wrong. */
+	   was not derived from a PROM so it could be wrong. */
 	static const UINT8 split_table[16] =
 	{
 		3,3,0,0,
@@ -78,10 +78,10 @@ void blktiger_state::video_start()
 
 	m_tx_tilemap->set_transparent_pen(3);
 
-	m_bg_tilemap8x4->set_transmask(0, 0xffff, 0x8000);	/* split type 0 is totally transparent in front half */
-	m_bg_tilemap8x4->set_transmask(1, 0xfff0, 0x800f);	/* split type 1 has pens 4-15 transparent in front half */
-	m_bg_tilemap8x4->set_transmask(2, 0xff00, 0x80ff);	/* split type 1 has pens 8-15 transparent in front half */
-	m_bg_tilemap8x4->set_transmask(3, 0xf000, 0x8fff);	/* split type 1 has pens 12-15 transparent in front half */
+	m_bg_tilemap8x4->set_transmask(0, 0xffff, 0x8000);  /* split type 0 is totally transparent in front half */
+	m_bg_tilemap8x4->set_transmask(1, 0xfff0, 0x800f);  /* split type 1 has pens 4-15 transparent in front half */
+	m_bg_tilemap8x4->set_transmask(2, 0xff00, 0x80ff);  /* split type 1 has pens 8-15 transparent in front half */
+	m_bg_tilemap8x4->set_transmask(3, 0xf000, 0x8fff);  /* split type 1 has pens 12-15 transparent in front half */
 	m_bg_tilemap4x8->set_transmask(0, 0xffff, 0x8000);
 	m_bg_tilemap4x8->set_transmask(1, 0xfff0, 0x800f);
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);

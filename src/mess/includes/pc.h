@@ -33,9 +33,9 @@ public:
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
-	UINT8	m_u73_q2;
-	UINT8	m_out1;
-	UINT8	m_memboard[4];		/* used only by ec1840 and ec1841 */
+	UINT8   m_u73_q2;
+	UINT8   m_out1;
+	UINT8   m_memboard[4];      /* used only by ec1840 and ec1841 */
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	int m_cur_eop;
@@ -48,15 +48,15 @@ public:
 	UINT8 m_pcjx_1ff_bankval;
 	UINT8 m_pcjx_1ff_bank[20][2];
 
-	int						m_ppi_portc_switch_high;
-	int						m_ppi_speaker;
-	int						m_ppi_keyboard_clear;
-	UINT8					m_ppi_keyb_clock;
-	UINT8					m_ppi_portb;
-	UINT8					m_ppi_clock_signal;
-	UINT8					m_ppi_data_signal;
-	UINT8					m_ppi_shift_register;
-	UINT8					m_ppi_shift_enable;
+	int                     m_ppi_portc_switch_high;
+	int                     m_ppi_speaker;
+	int                     m_ppi_keyboard_clear;
+	UINT8                   m_ppi_keyb_clock;
+	UINT8                   m_ppi_portb;
+	UINT8                   m_ppi_clock_signal;
+	UINT8                   m_ppi_data_signal;
+	UINT8                   m_ppi_shift_register;
+	UINT8                   m_ppi_shift_enable;
 
 	// interface to the keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );

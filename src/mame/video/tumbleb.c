@@ -512,4 +512,3 @@ UINT32 tumbleb_state::screen_update_suprtrio(screen_device &screen, bitmap_ind16
 	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
 }
-

@@ -39,12 +39,12 @@
 WRITE8_MEMBER(starwars_state::quad_pokeyn_w)
 {
 	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
-    int pokey_num = (offset >> 3) & ~0x04;
-    int control = (offset & 0x20) >> 2;
-    int pokey_reg = (offset % 8) | control;
+	int pokey_num = (offset >> 3) & ~0x04;
+	int control = (offset & 0x20) >> 2;
+	int pokey_reg = (offset % 8) | control;
 	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
-    pokey->write(pokey_reg, data);
+	pokey->write(pokey_reg, data);
 }
 
 /*************************************
@@ -137,10 +137,10 @@ DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
 		offs_t pc = direct.space().device().safe_pc();
 
 		/* filter out duplicates; we get these because the handler gets called for
-           multiple reasons:
-            1. Because we have read/write handlers backing the current address
-            2. Because the CPU core executed a jump to a new address
-        */
+		   multiple reasons:
+		    1. Because we have read/write handlers backing the current address
+		    2. Because the CPU core executed a jump to a new address
+		*/
 		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
 		{
 			m_slapstic_last_pc = pc;
@@ -162,12 +162,12 @@ DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0)
-	AM_RANGE(0x3000, 0x3fff) AM_ROM								/* vector_rom */
+	AM_RANGE(0x3000, 0x3fff) AM_ROM                             /* vector_rom */
 	AM_RANGE(0x4300, 0x431f) AM_READ_PORT("IN0")
 	AM_RANGE(0x4320, 0x433f) AM_READ_PORT("IN1")
 	AM_RANGE(0x4340, 0x435f) AM_READ_PORT("DSW0")
 	AM_RANGE(0x4360, 0x437f) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)			/* a-d control result */
+	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)            /* a-d control result */
 	AM_RANGE(0x4400, 0x4400) AM_READWRITE(starwars_main_read_r, starwars_main_wr_w)
 	AM_RANGE(0x4401, 0x4401) AM_READ(starwars_main_ready_flag_r)
 	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE("x2212", x2212_device, read, write)
@@ -182,11 +182,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4700, 0x4707) AM_WRITE(starwars_math_w)
 	AM_RANGE(0x4700, 0x4700) AM_READ(starwars_div_reh_r)
 	AM_RANGE(0x4701, 0x4701) AM_READ(starwars_div_rel_r)
-	AM_RANGE(0x4703, 0x4703) AM_READ(starwars_prng_r)			/* pseudo random number generator */
-	AM_RANGE(0x4800, 0x4fff) AM_RAM								/* CPU and Math RAM */
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("mathram")	/* CPU and Math RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM								/* rest of main_rom */
+	AM_RANGE(0x4703, 0x4703) AM_READ(starwars_prng_r)           /* pseudo random number generator */
+	AM_RANGE(0x4800, 0x4fff) AM_RAM                             /* CPU and Math RAM */
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("mathram") /* CPU and Math RAM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* rest of main_rom */
 ADDRESS_MAP_END
 
 
@@ -199,13 +199,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(starwars_sout_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(starwars_sin_r)		/* SIN Read */
-	AM_RANGE(0x1000, 0x107f) AM_RAM							/* 6532 ram */
+	AM_RANGE(0x0800, 0x0fff) AM_READ(starwars_sin_r)        /* SIN Read */
+	AM_RANGE(0x1000, 0x107f) AM_RAM                         /* 6532 ram */
 	AM_RANGE(0x1080, 0x109f) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1800, 0x183f) AM_WRITE(quad_pokeyn_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM							/* program RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM							/* sound roms */
-	AM_RANGE(0xb000, 0xffff) AM_ROM							/* more sound roms */
+	AM_RANGE(0x2000, 0x27ff) AM_RAM                         /* program RAM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROM                         /* sound roms */
+	AM_RANGE(0xb000, 0xffff) AM_ROM                         /* more sound roms */
 ADDRESS_MAP_END
 
 
@@ -271,13 +271,13 @@ static INPUT_PORTS_START( starwars )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-        /* Manual shows Coin_B (Right) as Bit 4,5 - actually Bit 3,4 */
+		/* Manual shows Coin_B (Right) as Bit 4,5 - actually Bit 3,4 */
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )  PORT_DIPLOCATION("10EF:3,4")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x04, "*4" )
 	PORT_DIPSETTING(    0x08, "*5" )
 	PORT_DIPSETTING(    0x0c, "*6" )
-        /* Manual shows Coin_A (Left) as Bit 3 - actually Bit 5 */
+		/* Manual shows Coin_A (Left) as Bit 3 - actually Bit 5 */
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("10EF:5")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x10, "*2" )

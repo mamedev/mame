@@ -37,7 +37,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
 
 static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(hcastle_pf1_control_w)
-	AM_RANGE(0x0020, 0x003f) AM_RAM	/* rowscroll? */
+	AM_RANGE(0x0020, 0x003f) AM_RAM /* rowscroll? */
 	AM_RANGE(0x0200, 0x0207) AM_WRITE(hcastle_pf2_control_w)
 	AM_RANGE(0x0220, 0x023f) AM_RAM /* rowscroll? */
 	AM_RANGE(0x0400, 0x0400) AM_WRITE(hcastle_bankswitch_w)
@@ -102,34 +102,34 @@ static INPUT_PORTS_START( hcastle )
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )		/* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x10, "Difficulty 1 (Game)" )		PORT_DIPLOCATION("SW2:4,5")	/* Overall difficulty of game */
+	PORT_DIPNAME( 0x18, 0x10, "Difficulty 1 (Game)" )       PORT_DIPLOCATION("SW2:4,5") /* Overall difficulty of game */
 	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x60, 0x40, "Difficulty 2 (Strength)" )		PORT_DIPLOCATION("SW2:6,7")	/* Listed in manual as "Strength of Player" */
-	PORT_DIPSETTING(    0x00, "Very Weak" )							/* Takes most damage per hit */
-	PORT_DIPSETTING(    0x20, "Weak" )							/* Takes more damage per hit */
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )						/* Takes average damage per hit */
-	PORT_DIPSETTING(    0x60, "Strong" )							/* Takes least damage per hit */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x60, 0x40, "Difficulty 2 (Strength)" )       PORT_DIPLOCATION("SW2:6,7") /* Listed in manual as "Strength of Player" */
+	PORT_DIPSETTING(    0x00, "Very Weak" )                         /* Takes most damage per hit */
+	PORT_DIPSETTING(    0x20, "Weak" )                          /* Takes more damage per hit */
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )                       /* Takes average damage per hit */
+	PORT_DIPSETTING(    0x60, "Strong" )                            /* Takes least damage per hit */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )		PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, "Up to 3 Times" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -149,8 +149,8 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( hcastle )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 8*16 )	/* 007121 #0 */
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 8*16*16, 8*16 )	/* 007121 #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 8*16 ) /* 007121 #0 */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 8*16*16, 8*16 ) /* 007121 #1 */
 GFXDECODE_END
 
 /*****************************************************************************/
@@ -169,7 +169,7 @@ static void volume_callback(device_t *device, int v)
 
 static const k007232_interface k007232_config =
 {
-	volume_callback	/* external port callback */
+	volume_callback /* external port callback */
 };
 
 static const ym3812_interface ym3812_config =
@@ -207,7 +207,7 @@ void hcastle_state::machine_reset()
 static MACHINE_CONFIG_START( hcastle, hcastle_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)	/* Derived from 24 MHz clock */
+	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */
 	MCFG_CPU_PROGRAM_MAP(hcastle_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hcastle_state,  irq0_line_hold)
 
@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second verified by comparison with real board */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second verified by comparison with real board */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hcastle_state, screen_update_hcastle)
@@ -268,13 +268,13 @@ ROM_START( hcastle )
 	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #1 sprite lookup table (same) */
-	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #1 char lookup table (same) */
-	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )	/* priority encoder (not used) */
+	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #1 sprite lookup table (same) */
+	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
+	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 )	/* 512k for the samples */
+	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -295,13 +295,13 @@ ROM_START( hcastlek )
 	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #1 sprite lookup table (same) */
-	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #1 char lookup table (same) */
-	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )	/* priority encoder (not used) */
+	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #1 sprite lookup table (same) */
+	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
+	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 )	/* 512k for the samples */
+	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -322,13 +322,13 @@ ROM_START( hcastlee )
 	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #1 sprite lookup table (same) */
-	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #1 char lookup table (same) */
-	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )	/* priority encoder (not used) */
+	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #1 sprite lookup table (same) */
+	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
+	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 )	/* 512k for the samples */
+	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -349,13 +349,13 @@ ROM_START( akumajou )
 	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #1 sprite lookup table (same) */
-	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #1 char lookup table (same) */
-	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )	/* priority encoder (not used) */
+	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #1 sprite lookup table (same) */
+	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
+	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 )	/* 512k for the samples */
+	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -376,13 +376,13 @@ ROM_START( akumajoun )
 	ROM_LOAD( "768c05.j6",    0x080000, 0x80000, CRC(65a2f227) SHA1(43f368e533d6a164dc68d54130b81883e0d1bafe) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #0 sprite lookup table */
-	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #0 char lookup table */
-	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )	/* 007121 #1 sprite lookup table (same) */
-	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )	/* 007121 #1 char lookup table (same) */
-	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )	/* priority encoder (not used) */
+	ROM_LOAD( "768c13.j21",   0x0000, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "768c14.j22",   0x0100, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "768c11.i4",    0x0200, 0x0100, CRC(f5de80cb) SHA1(e8cc3e14a5d23b25fb7bf790e64786c6aa2df8b7) )    /* 007121 #1 sprite lookup table (same) */
+	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
+	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 )	/* 512k for the samples */
+	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 

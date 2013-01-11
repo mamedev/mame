@@ -97,12 +97,12 @@ public:
 
 static const res_net_decode_info meyc8088_decode_info =
 {
-	1,		// there may be two proms needed to construct color
-	0, 31,	// start/end
+	1,      // there may be two proms needed to construct color
+	0, 31,  // start/end
 	//  R,   G,   B,
-	{   0,   0,   0, },		// offsets
-	{   1,   5,   3, },		// shifts
-	{0x03,0x03,0x03, }	    // masks
+	{   0,   0,   0, },     // offsets
+	{   1,   5,   3, },     // shifts
+	{0x03,0x03,0x03, }      // masks
 };
 
 static const res_net_info meyc8088_net_info =
@@ -320,24 +320,24 @@ static INPUT_PORTS_START( gldarrow )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // hopper coin switch?
 
 	PORT_START("C0")
-	PORT_DIPNAME( 0x03, 0x00, "Payout Percentage" )		PORT_DIPLOCATION("BSW:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Payout Percentage" )     PORT_DIPLOCATION("BSW:1,2")
 	PORT_DIPSETTING(    0x03, "85%")
 	PORT_DIPSETTING(    0x02, "88%")
 	PORT_DIPSETTING(    0x01, "90%")
 	PORT_DIPSETTING(    0x00, "93%")
-	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )			PORT_DIPLOCATION("BSW:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bit Switch 3" )          PORT_DIPLOCATION("BSW:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bonus Award" )			PORT_DIPLOCATION("BSW:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bonus Award" )           PORT_DIPLOCATION("BSW:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("BSW:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("BSW:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )			PORT_DIPLOCATION("BSW:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bit Switch 6" )          PORT_DIPLOCATION("BSW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )			PORT_DIPLOCATION("BSW:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bit Switch 7" )          PORT_DIPLOCATION("BSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "BSW:8" )

@@ -143,7 +143,7 @@ WRITE16_MEMBER(snk68_state::pow_flipscreen16_w)
 		m_flipscreen = data & 0x08;
 		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-		m_sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
+		m_sprite_flip_axis = data & 0x04;   // for streetsm? though might not be present on this board
 
 		if (m_fg_tile_offset != ((data & 0x70) << 4))
 		{

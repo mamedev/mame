@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8048_TAG		"m1"
+#define I8048_TAG       "m1"
 
 enum
 {
@@ -232,11 +232,11 @@ ioport_constructor tandy2k_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock),
-	  m_maincpu(*this, I8048_TAG),
-	  m_keylatch(0xffff),
-	  m_clock(0),
-	  m_data(0)
+	: device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock),
+		m_maincpu(*this, I8048_TAG),
+		m_keylatch(0xffff),
+		m_clock(0),
+		m_data(0)
 {
 }
 
@@ -248,8 +248,8 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 void tandy2k_keyboard_device::device_start()
 {
 	// resolve callbacks
-    m_out_clock_func.resolve(m_out_clock_cb, *this);
-    m_out_data_func.resolve(m_out_data_cb, *this);
+	m_out_clock_func.resolve(m_out_clock_cb, *this);
+	m_out_data_func.resolve(m_out_data_cb, *this);
 
 	// state saving
 	save_item(NAME(m_keylatch));
@@ -314,20 +314,20 @@ READ_LINE_MEMBER( tandy2k_keyboard_device::data_r )
 
 READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
 {
-  /*
+	/*
 
-        bit     description
+	    bit     description
 
-        0       X0
-        1       X1
-        2       X2
-        3       X3
-        4       X4
-        5       X5
-        6       X6
-        7       X7
+	    0       X0
+	    1       X1
+	    2       X2
+	    3       X3
+	    4       X4
+	    5       X5
+	    6       X6
+	    7       X7
 
-    */
+	*/
 
 	UINT8 data = 0xff;
 
@@ -356,18 +356,18 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p1_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Y0
-        1       Y1
-        2       Y2
-        3       Y3
-        4       Y4
-        5       Y5
-        6       Y6
-        7       Y7
+	    0       Y0
+	    1       Y1
+	    2       Y2
+	    3       Y3
+	    4       Y4
+	    5       Y5
+	    6       Y6
+	    7       Y7
 
-    */
+	*/
 
 	// keyboard row
 	m_keylatch = (m_keylatch & 0xff00) | data;
@@ -382,18 +382,18 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Y8
-        1       Y9
-        2       Y10
-        3       Y11
-        4       LED 2
-        5       LED 1
-        6       CLOCK
-        7       DATA
+	    0       Y8
+	    1       Y9
+	    2       Y10
+	    3       Y11
+	    4       LED 2
+	    5       LED 1
+	    6       CLOCK
+	    7       DATA
 
-    */
+	*/
 
 	// keyboard row
 	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);

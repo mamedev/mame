@@ -47,7 +47,7 @@
 
 #define VERBOSE 0
 
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -58,8 +58,8 @@
 // internal trigger IDs
 enum
 {
-	TRIGGER_INT 		= -2000,
-	TRIGGER_YIELDTIME	= -3000,
+	TRIGGER_INT         = -2000,
+	TRIGGER_YIELDTIME   = -3000,
 	TRIGGER_SUSPENDTIME = -4000
 };
 
@@ -75,17 +75,17 @@ enum
 
 emu_timer::emu_timer()
 	: m_machine(NULL),
-	  m_next(NULL),
-	  m_prev(NULL),
-	  m_param(0),
-	  m_ptr(NULL),
-	  m_enabled(false),
-	  m_temporary(false),
-	  m_period(attotime::zero),
-	  m_start(attotime::zero),
-	  m_expire(attotime::never),
-	  m_device(NULL),
-	  m_id(0)
+		m_next(NULL),
+		m_prev(NULL),
+		m_param(0),
+		m_ptr(NULL),
+		m_enabled(false),
+		m_temporary(false),
+		m_period(attotime::zero),
+		m_start(attotime::zero),
+		m_expire(attotime::never),
+		m_device(NULL),
+		m_id(0)
 {
 }
 
@@ -996,5 +996,3 @@ void device_scheduler::dump_timers() const
 		timer->dump();
 	logerror("=============================================\n");
 }
-
-

@@ -12,12 +12,12 @@
 // palette info from Popper (OEC 1983, very similar video hw)
 static const res_net_decode_info carjmbre_decode_info =
 {
-	1,		// there may be two proms needed to construct color
-	0, 63,	// start/end
+	1,      // there may be two proms needed to construct color
+	0, 63,  // start/end
 	//  R,   G,   B,
-	{   0,   0,   0, },		// offsets
-	{   0,   3,   6, },		// shifts
-	{0x07,0x07,0x03, }	    // masks
+	{   0,   0,   0, },     // offsets
+	{   0,   3,   6, },     // shifts
+	{0x07,0x07,0x03, }      // masks
 };
 
 static const res_net_info carjmbre_net_info =

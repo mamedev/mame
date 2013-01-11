@@ -155,28 +155,28 @@ private:
 		#define MAX_BITMAPS 32
 
 		// internal state
-		component *			m_next;						// link to next component
-		component_type		m_type;						// type of component
-		int					m_state;					// state where this component is visible (-1 means all states)
-		render_bounds		m_bounds;					// bounds of the element
-		render_color		m_color;					// color of the element
-		astring				m_string;					// string for text components
-		int					m_digits;					// number of digits for simple counters
-		int					m_textalign;				// text alignment to box
-		bitmap_argb32		m_bitmap[MAX_BITMAPS];		// source bitmap for images
-		astring				m_dirname;					// directory name of image file (for lazy loading)
-		emu_file *			m_file[MAX_BITMAPS];		// file object for reading image/alpha files
-		astring				m_imagefile[MAX_BITMAPS];	// name of the image file (for lazy loading)
-		astring				m_alphafile[MAX_BITMAPS];	// name of the alpha file (for lazy loading)
-		bool				m_hasalpha[MAX_BITMAPS];	// is there any alpha component present?
+		component *         m_next;                     // link to next component
+		component_type      m_type;                     // type of component
+		int                 m_state;                    // state where this component is visible (-1 means all states)
+		render_bounds       m_bounds;                   // bounds of the element
+		render_color        m_color;                    // color of the element
+		astring             m_string;                   // string for text components
+		int                 m_digits;                   // number of digits for simple counters
+		int                 m_textalign;                // text alignment to box
+		bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
+		astring             m_dirname;                  // directory name of image file (for lazy loading)
+		emu_file *          m_file[MAX_BITMAPS];        // file object for reading image/alpha files
+		astring             m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
+		astring             m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
+		bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
 
 		// stuff for fruit machine reels
 		// basically made up of multiple text strings / gfx
-		int					m_numstops;
-		astring				m_stopnames[MAX_BITMAPS];
-		int					m_stateoffset;
-		int					m_reelreversed;
-		int					m_numsymbolsvisible;
+		int                 m_numstops;
+		astring             m_stopnames[MAX_BITMAPS];
+		int                 m_stateoffset;
+		int                 m_reelreversed;
+		int                 m_numsymbolsvisible;
 
 	};
 
@@ -187,22 +187,22 @@ private:
 		texture();
 		~texture();
 
-		layout_element *	m_element;		// pointer back to the element
-		render_texture *	m_texture;		// texture for this state
-		int					m_state;		// associated state number
+		layout_element *    m_element;      // pointer back to the element
+		render_texture *    m_texture;      // texture for this state
+		int                 m_state;        // associated state number
 	};
 
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 	// internal state
-	layout_element *	m_next;				// link to next element
-	running_machine &	m_machine;			// reference to the owning machine
-	astring				m_name;				// name of this element
-	simple_list<component> m_complist;		// list of components
-	int					m_defstate;			// default state of this element
-	int					m_maxstate;			// maximum state value for all components
-	texture *			m_elemtex;			// array of element textures used for managing the scaled bitmaps
+	layout_element *    m_next;             // link to next element
+	running_machine &   m_machine;          // reference to the owning machine
+	astring             m_name;             // name of this element
+	simple_list<component> m_complist;      // list of components
+	int                 m_defstate;         // default state of this element
+	int                 m_maxstate;         // maximum state value for all components
+	texture *           m_elemtex;          // array of element textures used for managing the scaled bitmaps
 };
 
 
@@ -241,16 +241,16 @@ public:
 
 	private:
 		// internal state
-		item *				m_next;				// link to next item
-		layout_element *	m_element;			// pointer to the associated element (non-screens only)
-		astring				m_output_name;		// name of this item
-		astring				m_input_tag;		// input tag of this item
-		ioport_value		m_input_mask;		// input mask of this item
-		screen_device *		m_screen;			// pointer to screen
-		int					m_orientation;		// orientation of this item
-		render_bounds		m_bounds;			// bounds of the item
-		render_bounds		m_rawbounds;		// raw (original) bounds of the item
-		render_color		m_color;			// color of the item
+		item *              m_next;             // link to next item
+		layout_element *    m_element;          // pointer to the associated element (non-screens only)
+		astring             m_output_name;      // name of this item
+		astring             m_input_tag;        // input tag of this item
+		ioport_value        m_input_mask;       // input mask of this item
+		screen_device *     m_screen;           // pointer to screen
+		int                 m_orientation;      // orientation of this item
+		render_bounds       m_bounds;           // bounds of the item
+		render_bounds       m_rawbounds;        // raw (original) bounds of the item
+		render_color        m_color;            // color of the item
 	};
 
 	// construction/destruction
@@ -273,21 +273,21 @@ public:
 
 private:
 	// internal state
-	layout_view *		m_next;				// pointer to next layout in the list
-	astring				m_name;				// name of the layout
-	float				m_aspect;			// X/Y of the layout
-	float				m_scraspect;		// X/Y of the screen areas
-	render_screen_list	m_screens;			// list of active screens
-	render_bounds		m_bounds;			// computed bounds of the view
-	render_bounds		m_scrbounds;		// computed bounds of the screens within the view
-	render_bounds		m_expbounds;		// explicit bounds of the view
-	bool				m_layenabled[ITEM_LAYER_MAX]; // is this layer enabled?
-	simple_list<item>	m_backdrop_list;	// list of backdrop items
-	simple_list<item>	m_screen_list;		// list of screen items
-	simple_list<item>	m_overlay_list;		// list of overlay items
-	simple_list<item>	m_bezel_list;		// list of bezel items
-	simple_list<item>	m_cpanel_list;		// list of marquee items
-	simple_list<item>	m_marquee_list;		// list of marquee items
+	layout_view *       m_next;             // pointer to next layout in the list
+	astring             m_name;             // name of the layout
+	float               m_aspect;           // X/Y of the layout
+	float               m_scraspect;        // X/Y of the screen areas
+	render_screen_list  m_screens;          // list of active screens
+	render_bounds       m_bounds;           // computed bounds of the view
+	render_bounds       m_scrbounds;        // computed bounds of the screens within the view
+	render_bounds       m_expbounds;        // explicit bounds of the view
+	bool                m_layenabled[ITEM_LAYER_MAX]; // is this layer enabled?
+	simple_list<item>   m_backdrop_list;    // list of backdrop items
+	simple_list<item>   m_screen_list;      // list of screen items
+	simple_list<item>   m_overlay_list;     // list of overlay items
+	simple_list<item>   m_bezel_list;       // list of bezel items
+	simple_list<item>   m_cpanel_list;      // list of marquee items
+	simple_list<item>   m_marquee_list;     // list of marquee items
 };
 
 
@@ -310,9 +310,9 @@ public:
 
 private:
 	// internal state
-	layout_file *		m_next;				// pointer to the next file in the list
-	simple_list<layout_element> m_elemlist;	// list of shared layout elements
-	simple_list<layout_view> m_viewlist;	// list of views
+	layout_file *       m_next;             // pointer to the next file in the list
+	simple_list<layout_element> m_elemlist; // list of shared layout elements
+	simple_list<layout_view> m_viewlist;    // list of views
 };
 
 
@@ -322,25 +322,25 @@ private:
 //**************************************************************************
 
 // no screens layouts
-extern const char layout_noscreens[];	// for screenless systems
+extern const char layout_noscreens[];   // for screenless systems
 
 // single screen layouts
-extern const char layout_horizont[];	// horizontal 4:3 screens
-extern const char layout_vertical[];	// vertical 4:3 screens
+extern const char layout_horizont[];    // horizontal 4:3 screens
+extern const char layout_vertical[];    // vertical 4:3 screens
 
 // dual screen layouts
-extern const char layout_dualhsxs[];	// dual 4:3 screens side-by-side
-extern const char layout_dualhovu[];	// dual 4:3 screens above and below
-extern const char layout_dualhuov[];	// dual 4:3 screens below and above
+extern const char layout_dualhsxs[];    // dual 4:3 screens side-by-side
+extern const char layout_dualhovu[];    // dual 4:3 screens above and below
+extern const char layout_dualhuov[];    // dual 4:3 screens below and above
 
 // triple screen layouts
-extern const char layout_triphsxs[];	// triple 4:3 screens side-by-side
+extern const char layout_triphsxs[];    // triple 4:3 screens side-by-side
 
 // quad screen layouts
-extern const char layout_quadhsxs[];	// quad 4:3 screens side-by-side
+extern const char layout_quadhsxs[];    // quad 4:3 screens side-by-side
 
 // LCD screen layouts
-extern const char layout_lcd[];			// generic 1:1 lcd screen layout
-extern const char layout_lcd_rot[];		// same, for use with ROT90 or ROT270
+extern const char layout_lcd[];         // generic 1:1 lcd screen layout
+extern const char layout_lcd_rot[];     // same, for use with ROT90 or ROT270
 
-#endif	// __RENDLAY_H__
+#endif  // __RENDLAY_H__

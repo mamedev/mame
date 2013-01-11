@@ -113,15 +113,15 @@ struct d3d_present_parameters
 
 struct d3d_adapter_identifier
 {
-    char            Driver[512];
-    char            Description[512];
-    LARGE_INTEGER   DriverVersion;
-    DWORD           VendorId;
-    DWORD           DeviceId;
-    DWORD           SubSysId;
-    DWORD           Revision;
-    GUID            DeviceIdentifier;
-    DWORD           WHQLLevel;
+	char            Driver[512];
+	char            Description[512];
+	LARGE_INTEGER   DriverVersion;
+	DWORD           VendorId;
+	DWORD           DeviceId;
+	DWORD           SubSysId;
+	DWORD           Revision;
+	GUID            DeviceIdentifier;
+	DWORD           WHQLLevel;
 };
 
 
@@ -265,16 +265,16 @@ struct d3d_effect_interface
 struct d3d_base
 {
 	// internal objects
-	int							version;
-	void *						d3dobj;
-	HINSTANCE					dllhandle;
-	bool						post_fx_available;
+	int                         version;
+	void *                      d3dobj;
+	HINSTANCE                   dllhandle;
+	bool                        post_fx_available;
 
 	// interface pointers
-	d3d_interface				d3d;
-	d3d_device_interface		device;
-	d3d_surface_interface		surface;
-	d3d_texture_interface		texture;
+	d3d_interface               d3d;
+	d3d_device_interface        device;
+	d3d_surface_interface       surface;
+	d3d_texture_interface       texture;
 	d3d_vertex_buffer_interface vertexbuf;
 	d3d_effect_interface        effect;
 };

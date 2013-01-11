@@ -134,14 +134,14 @@
 // temporary: set this to 1 to enable the originally defined behavior that
 // a field specified via PORT_MODIFY which intersects a previously-defined
 // field completely wipes out the previous definition
-#define INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS	1
+#define INPUT_PORT_OVERRIDE_FULLY_NUKES_PREVIOUS    1
 
 
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_NATURAL_KEYBOARD	0
+#define LOG_NATURAL_KEYBOARD    0
 
 
 
@@ -192,46 +192,46 @@ private:
 	INT32 apply_inverse_sensitivity(INT32 value) const;
 
 	// internal state
-	analog_field *		m_next;					// link to the next analog state for this port
-	ioport_field &		m_field;				// pointer to the input field referenced
+	analog_field *      m_next;                 // link to the next analog state for this port
+	ioport_field &      m_field;                // pointer to the input field referenced
 
 	// adjusted values (right-justified and tweaked)
-	UINT8				m_shift;				// shift to align final value in the port
-	INT32				m_adjdefvalue;			// adjusted default value from the config
-	INT32				m_adjmin;				// adjusted minimum value from the config
-	INT32				m_adjmax;				// adjusted maximum value from the config
+	UINT8               m_shift;                // shift to align final value in the port
+	INT32               m_adjdefvalue;          // adjusted default value from the config
+	INT32               m_adjmin;               // adjusted minimum value from the config
+	INT32               m_adjmax;               // adjusted maximum value from the config
 
 	// live values of configurable parameters
-	INT32				m_sensitivity;			// current live sensitivity (100=normal)
-	bool				m_reverse;				// current live reverse flag
-	INT32				m_delta;				// current live delta to apply each frame a digital inc/dec key is pressed
-	INT32				m_centerdelta;			// current live delta to apply each frame no digital inputs are pressed
+	INT32               m_sensitivity;          // current live sensitivity (100=normal)
+	bool                m_reverse;              // current live reverse flag
+	INT32               m_delta;                // current live delta to apply each frame a digital inc/dec key is pressed
+	INT32               m_centerdelta;          // current live delta to apply each frame no digital inputs are pressed
 
 	// live analog value tracking
-	INT32				m_accum;				// accumulated value (including relative adjustments)
-	INT32				m_previous;				// previous adjusted value
-	INT32				m_previousanalog;		// previous analog value
+	INT32               m_accum;                // accumulated value (including relative adjustments)
+	INT32               m_previous;             // previous adjusted value
+	INT32               m_previousanalog;       // previous analog value
 
 	// parameters for modifying live values
-	INT32				m_minimum;				// minimum adjusted value
-	INT32				m_maximum;				// maximum adjusted value
-	INT32				m_center;				// center adjusted value for autocentering
-	INT32				m_reverse_val;			// value where we subtract from to reverse directions
+	INT32               m_minimum;              // minimum adjusted value
+	INT32               m_maximum;              // maximum adjusted value
+	INT32               m_center;               // center adjusted value for autocentering
+	INT32               m_reverse_val;          // value where we subtract from to reverse directions
 
 	// scaling factors
-	INT64				m_scalepos;				// scale factor to apply to positive adjusted values
-	INT64				m_scaleneg;				// scale factor to apply to negative adjusted values
-	INT64				m_keyscalepos;			// scale factor to apply to the key delta field when pos
-	INT64				m_keyscaleneg;			// scale factor to apply to the key delta field when neg
-	INT64				m_positionalscale;		// scale factor to divide a joystick into positions
+	INT64               m_scalepos;             // scale factor to apply to positive adjusted values
+	INT64               m_scaleneg;             // scale factor to apply to negative adjusted values
+	INT64               m_keyscalepos;          // scale factor to apply to the key delta field when pos
+	INT64               m_keyscaleneg;          // scale factor to apply to the key delta field when neg
+	INT64               m_positionalscale;      // scale factor to divide a joystick into positions
 
 	// misc flags
-	bool				m_absolute;				// is this an absolute or relative input?
-	bool				m_wraps;				// does the control wrap around?
-	bool				m_autocenter;			// autocenter this input?
-	bool				m_single_scale;			// scale joystick differently if default is between min/max
-	bool				m_interpolate;			// should we do linear interpolation for mid-frame reads?
-	bool				m_lastdigital;			// was the last modification caused by a digital form?
+	bool                m_absolute;             // is this an absolute or relative input?
+	bool                m_wraps;                // does the control wrap around?
+	bool                m_autocenter;           // autocenter this input?
+	bool                m_single_scale;         // scale joystick differently if default is between min/max
+	bool                m_interpolate;          // should we do linear interpolation for mid-frame reads?
+	bool                m_lastdigital;          // was the last modification caused by a digital form?
 };
 
 
@@ -254,10 +254,10 @@ public:
 
 private:
 	// internal state
-	dynamic_field *			m_next;				// linked list of info for this port
-	ioport_field &			m_field;			// reference to the input field
-	UINT8					m_shift;			// shift to apply to the final result
-	ioport_value			m_oldval;			// last value
+	dynamic_field *         m_next;             // linked list of info for this port
+	ioport_field &          m_field;            // reference to the input field
+	UINT8                   m_shift;            // shift to apply to the final result
+	ioport_value            m_oldval;           // last value
 };
 
 
@@ -268,14 +268,14 @@ struct ioport_field_live
 	ioport_field_live(ioport_field &field, analog_field *analog);
 
 	// public state
-	analog_field *			analog;				// pointer to live analog data if this is an analog field
-	digital_joystick *		joystick;			// pointer to digital joystick information
-	input_seq				seq[SEQ_TYPE_TOTAL];// currently configured input sequences
-	ioport_value			value;				// current value of this port
-	UINT8					impulse;			// counter for impulse controls
-	bool					last;				// were we pressed last time?
-	digital_joystick::direction_t joydir;		// digital joystick direction index
-	astring					name;				// overridden name
+	analog_field *          analog;             // pointer to live analog data if this is an analog field
+	digital_joystick *      joystick;           // pointer to digital joystick information
+	input_seq               seq[SEQ_TYPE_TOTAL];// currently configured input sequences
+	ioport_value            value;              // current value of this port
+	UINT8                   impulse;            // counter for impulse controls
+	bool                    last;               // were we pressed last time?
+	digital_joystick::direction_t joydir;       // digital joystick direction index
+	astring                 name;               // overridden name
 };
 
 
@@ -286,12 +286,12 @@ struct ioport_port_live
 	ioport_port_live(ioport_port &port);
 
 	// public state
-	simple_list<analog_field> analoglist;		// list of analog port info
-	simple_list<dynamic_field> readlist;		// list of dynamic read fields
-	simple_list<dynamic_field> writelist;		// list of dynamic write fields
-	ioport_value			defvalue;			// combined default value across the port
-	ioport_value			digital;			// current value from all digital inputs
-	ioport_value			outputvalue;		// current value for outputs
+	simple_list<analog_field> analoglist;       // list of analog port info
+	simple_list<dynamic_field> readlist;        // list of dynamic read fields
+	simple_list<dynamic_field> writelist;       // list of dynamic write fields
+	ioport_value            defvalue;           // combined default value across the port
+	ioport_value            digital;            // current value from all digital inputs
+	ioport_value            outputvalue;        // current value for outputs
 };
 
 
@@ -300,7 +300,7 @@ struct char_info
 {
 	unicode_char ch;
 	const char *name;
-	const char *alternate;	// alternative string, in UTF-8
+	const char *alternate;  // alternative string, in UTF-8
 
 	static const char_info *find(unicode_char target);
 };
@@ -355,296 +355,296 @@ static const char *const seqtypestrings[] = { "standard", "increment", "decremen
 // master character info table
 static const char_info charinfo[] =
 {
-	{ 0x0008,					"Backspace",	NULL },		// Backspace
-	{ 0x0009,					"Tab",			"    " },	// Tab
-	{ 0x000c,					"Clear",		NULL },		// Clear
-	{ 0x000d,					"Enter",		NULL },		// Enter
-	{ 0x001a,					"Esc",			NULL },		// Esc
-	{ 0x0020,					"Space",		" " },		// Space
-	{ 0x0061,					NULL,			"A" },		// a
-	{ 0x0062,					NULL,			"B" },		// b
-	{ 0x0063,					NULL,			"C" },		// c
-	{ 0x0064,					NULL,			"D" },		// d
-	{ 0x0065,					NULL,			"E" },		// e
-	{ 0x0066,					NULL,			"F" },		// f
-	{ 0x0067,					NULL,			"G" },		// g
-	{ 0x0068,					NULL,			"H" },		// h
-	{ 0x0069,					NULL,			"I" },		// i
-	{ 0x006a,					NULL,			"J" },		// j
-	{ 0x006b,					NULL,			"K" },		// k
-	{ 0x006c,					NULL,			"L" },		// l
-	{ 0x006d,					NULL,			"M" },		// m
-	{ 0x006e,					NULL,			"N" },		// n
-	{ 0x006f,					NULL,			"O" },		// o
-	{ 0x0070,					NULL,			"P" },		// p
-	{ 0x0071,					NULL,			"Q" },		// q
-	{ 0x0072,					NULL,			"R" },		// r
-	{ 0x0073,					NULL,			"S" },		// s
-	{ 0x0074,					NULL,			"T" },		// t
-	{ 0x0075,					NULL,			"U" },		// u
-	{ 0x0076,					NULL,			"V" },		// v
-	{ 0x0077,					NULL,			"W" },		// w
-	{ 0x0078,					NULL,			"X" },		// x
-	{ 0x0079,					NULL,			"Y" },		// y
-	{ 0x007a,					NULL,			"Z" },		// z
-	{ 0x00a0,					NULL,			" " },		// non breaking space
-	{ 0x00a1,					NULL,			"!" },		// inverted exclaimation mark
-	{ 0x00a6,					NULL,			"|" },		// broken bar
-	{ 0x00a9,					NULL,			"(c)" },	// copyright sign
-	{ 0x00ab,					NULL,			"<<" },		// left pointing double angle
-	{ 0x00ae,					NULL,			"(r)" },	// registered sign
-	{ 0x00bb,					NULL,			">>" },		// right pointing double angle
-	{ 0x00bc,					NULL,			"1/4" },	// vulgar fraction one quarter
-	{ 0x00bd,					NULL,			"1/2" },	// vulgar fraction one half
-	{ 0x00be,					NULL,			"3/4" },	// vulgar fraction three quarters
-	{ 0x00bf,					NULL,			"?" },		// inverted question mark
-	{ 0x00c0,					NULL,			"A" },		// 'A' grave
-	{ 0x00c1,					NULL,			"A" },		// 'A' acute
-	{ 0x00c2,					NULL,			"A" },		// 'A' circumflex
-	{ 0x00c3,					NULL,			"A" },		// 'A' tilde
-	{ 0x00c4,					NULL,			"A" },		// 'A' diaeresis
-	{ 0x00c5,					NULL,			"A" },		// 'A' ring above
-	{ 0x00c6,					NULL,			"AE" },		// 'AE' ligature
-	{ 0x00c7,					NULL,			"C" },		// 'C' cedilla
-	{ 0x00c8,					NULL,			"E" },		// 'E' grave
-	{ 0x00c9,					NULL,			"E" },		// 'E' acute
-	{ 0x00ca,					NULL,			"E" },		// 'E' circumflex
-	{ 0x00cb,					NULL,			"E" },		// 'E' diaeresis
-	{ 0x00cc,					NULL,			"I" },		// 'I' grave
-	{ 0x00cd,					NULL,			"I" },		// 'I' acute
-	{ 0x00ce,					NULL,			"I" },		// 'I' circumflex
-	{ 0x00cf,					NULL,			"I" },		// 'I' diaeresis
-	{ 0x00d0,					NULL,			"D" },		// 'ETH'
-	{ 0x00d1,					NULL,			"N" },		// 'N' tilde
-	{ 0x00d2,					NULL,			"O" },		// 'O' grave
-	{ 0x00d3,					NULL,			"O" },		// 'O' acute
-	{ 0x00d4,					NULL,			"O" },		// 'O' circumflex
-	{ 0x00d5,					NULL,			"O" },		// 'O' tilde
-	{ 0x00d6,					NULL,			"O" },		// 'O' diaeresis
-	{ 0x00d7,					NULL,			"X" },		// multiplication sign
-	{ 0x00d8,					NULL,			"O" },		// 'O' stroke
-	{ 0x00d9,					NULL,			"U" },		// 'U' grave
-	{ 0x00da,					NULL,			"U" },		// 'U' acute
-	{ 0x00db,					NULL,			"U" },		// 'U' circumflex
-	{ 0x00dc,					NULL,			"U" },		// 'U' diaeresis
-	{ 0x00dd,					NULL,			"Y" },		// 'Y' acute
-	{ 0x00df,					NULL,			"SS" },		// sharp S
-	{ 0x00e0,					NULL,			"a" },		// 'a' grave
-	{ 0x00e1,					NULL,			"a" },		// 'a' acute
-	{ 0x00e2,					NULL,			"a" },		// 'a' circumflex
-	{ 0x00e3,					NULL,			"a" },		// 'a' tilde
-	{ 0x00e4,					NULL,			"a" },		// 'a' diaeresis
-	{ 0x00e5,					NULL,			"a" },		// 'a' ring above
-	{ 0x00e6,					NULL,			"ae" },		// 'ae' ligature
-	{ 0x00e7,					NULL,			"c" },		// 'c' cedilla
-	{ 0x00e8,					NULL,			"e" },		// 'e' grave
-	{ 0x00e9,					NULL,			"e" },		// 'e' acute
-	{ 0x00ea,					NULL,			"e" },		// 'e' circumflex
-	{ 0x00eb,					NULL,			"e" },		// 'e' diaeresis
-	{ 0x00ec,					NULL,			"i" },		// 'i' grave
-	{ 0x00ed,					NULL,			"i" },		// 'i' acute
-	{ 0x00ee,					NULL,			"i" },		// 'i' circumflex
-	{ 0x00ef,					NULL,			"i" },		// 'i' diaeresis
-	{ 0x00f0,					NULL,			"d" },		// 'eth'
-	{ 0x00f1,					NULL,			"n" },		// 'n' tilde
-	{ 0x00f2,					NULL,			"o" },		// 'o' grave
-	{ 0x00f3,					NULL,			"o" },		// 'o' acute
-	{ 0x00f4,					NULL,			"o" },		// 'o' circumflex
-	{ 0x00f5,					NULL,			"o" },		// 'o' tilde
-	{ 0x00f6,					NULL,			"o" },		// 'o' diaeresis
-	{ 0x00f8,					NULL,			"o" },		// 'o' stroke
-	{ 0x00f9,					NULL,			"u" },		// 'u' grave
-	{ 0x00fa,					NULL,			"u" },		// 'u' acute
-	{ 0x00fb,					NULL,			"u" },		// 'u' circumflex
-	{ 0x00fc,					NULL,			"u" },		// 'u' diaeresis
-	{ 0x00fd,					NULL,			"y" },		// 'y' acute
-	{ 0x00ff,					NULL,			"y" },		// 'y' diaeresis
-	{ 0x2010,					NULL,			"-" },		// hyphen
-	{ 0x2011,					NULL,			"-" },		// non-breaking hyphen
-	{ 0x2012,					NULL,			"-" },		// figure dash
-	{ 0x2013,					NULL,			"-" },		// en dash
-	{ 0x2014,					NULL,			"-" },		// em dash
-	{ 0x2015,					NULL,			"-" },		// horizontal dash
-	{ 0x2018,					NULL,			"\'" },		// left single quotation mark
-	{ 0x2019,					NULL,			"\'" },		// right single quotation mark
-	{ 0x201a,					NULL,			"\'" },		// single low quotation mark
-	{ 0x201b,					NULL,			"\'" },		// single high reversed quotation mark
-	{ 0x201c,					NULL,			"\"" },		// left double quotation mark
-	{ 0x201d,					NULL,			"\"" },		// right double quotation mark
-	{ 0x201e,					NULL,			"\"" },		// double low quotation mark
-	{ 0x201f,					NULL,			"\"" },		// double high reversed quotation mark
-	{ 0x2024,					NULL,			"." },		// one dot leader
-	{ 0x2025,					NULL,			".." },		// two dot leader
-	{ 0x2026,					NULL,			"..." },	// horizontal ellipsis
-	{ 0x2047,					NULL,			"??" },		// double question mark
-	{ 0x2048,					NULL,			"?!" },		// question exclamation mark
-	{ 0x2049,					NULL,			"!?" },		// exclamation question mark
-	{ 0xff01,					NULL,			"!" },		// fullwidth exclamation point
-	{ 0xff02,					NULL,			"\"" },		// fullwidth quotation mark
-	{ 0xff03,					NULL,			"#" },		// fullwidth number sign
-	{ 0xff04,					NULL,			"$" },		// fullwidth dollar sign
-	{ 0xff05,					NULL,			"%" },		// fullwidth percent sign
-	{ 0xff06,					NULL,			"&" },		// fullwidth ampersand
-	{ 0xff07,					NULL,			"\'" },		// fullwidth apostrophe
-	{ 0xff08,					NULL,			"(" },		// fullwidth left parenthesis
-	{ 0xff09,					NULL,			")" },		// fullwidth right parenthesis
-	{ 0xff0a,					NULL,			"*" },		// fullwidth asterisk
-	{ 0xff0b,					NULL,			"+" },		// fullwidth plus
-	{ 0xff0c,					NULL,			"," },		// fullwidth comma
-	{ 0xff0d,					NULL,			"-" },		// fullwidth minus
-	{ 0xff0e,					NULL,			"." },		// fullwidth period
-	{ 0xff0f,					NULL,			"/" },		// fullwidth slash
-	{ 0xff10,					NULL,			"0" },		// fullwidth zero
-	{ 0xff11,					NULL,			"1" },		// fullwidth one
-	{ 0xff12,					NULL,			"2" },		// fullwidth two
-	{ 0xff13,					NULL,			"3" },		// fullwidth three
-	{ 0xff14,					NULL,			"4" },		// fullwidth four
-	{ 0xff15,					NULL,			"5" },		// fullwidth five
-	{ 0xff16,					NULL,			"6" },		// fullwidth six
-	{ 0xff17,					NULL,			"7" },		// fullwidth seven
-	{ 0xff18,					NULL,			"8" },		// fullwidth eight
-	{ 0xff19,					NULL,			"9" },		// fullwidth nine
-	{ 0xff1a,					NULL,			":" },		// fullwidth colon
-	{ 0xff1b,					NULL,			";" },		// fullwidth semicolon
-	{ 0xff1c,					NULL,			"<" },		// fullwidth less than sign
-	{ 0xff1d,					NULL,			"=" },		// fullwidth equals sign
-	{ 0xff1e,					NULL,			">" },		// fullwidth greater than sign
-	{ 0xff1f,					NULL,			"?" },		// fullwidth question mark
-	{ 0xff20,					NULL,			"@" },		// fullwidth at sign
-	{ 0xff21,					NULL,			"A" },		// fullwidth 'A'
-	{ 0xff22,					NULL,			"B" },		// fullwidth 'B'
-	{ 0xff23,					NULL,			"C" },		// fullwidth 'C'
-	{ 0xff24,					NULL,			"D" },		// fullwidth 'D'
-	{ 0xff25,					NULL,			"E" },		// fullwidth 'E'
-	{ 0xff26,					NULL,			"F" },		// fullwidth 'F'
-	{ 0xff27,					NULL,			"G" },		// fullwidth 'G'
-	{ 0xff28,					NULL,			"H" },		// fullwidth 'H'
-	{ 0xff29,					NULL,			"I" },		// fullwidth 'I'
-	{ 0xff2a,					NULL,			"J" },		// fullwidth 'J'
-	{ 0xff2b,					NULL,			"K" },		// fullwidth 'K'
-	{ 0xff2c,					NULL,			"L" },		// fullwidth 'L'
-	{ 0xff2d,					NULL,			"M" },		// fullwidth 'M'
-	{ 0xff2e,					NULL,			"N" },		// fullwidth 'N'
-	{ 0xff2f,					NULL,			"O" },		// fullwidth 'O'
-	{ 0xff30,					NULL,			"P" },		// fullwidth 'P'
-	{ 0xff31,					NULL,			"Q" },		// fullwidth 'Q'
-	{ 0xff32,					NULL,			"R" },		// fullwidth 'R'
-	{ 0xff33,					NULL,			"S" },		// fullwidth 'S'
-	{ 0xff34,					NULL,			"T" },		// fullwidth 'T'
-	{ 0xff35,					NULL,			"U" },		// fullwidth 'U'
-	{ 0xff36,					NULL,			"V" },		// fullwidth 'V'
-	{ 0xff37,					NULL,			"W" },		// fullwidth 'W'
-	{ 0xff38,					NULL,			"X" },		// fullwidth 'X'
-	{ 0xff39,					NULL,			"Y" },		// fullwidth 'Y'
-	{ 0xff3a,					NULL,			"Z" },		// fullwidth 'Z'
-	{ 0xff3b,					NULL,			"[" },		// fullwidth left bracket
-	{ 0xff3c,					NULL,			"\\" },		// fullwidth backslash
-	{ 0xff3d,					NULL,			"]"	},		// fullwidth right bracket
-	{ 0xff3e,					NULL,			"^" },		// fullwidth caret
-	{ 0xff3f,					NULL,			"_" },		// fullwidth underscore
-	{ 0xff40,					NULL,			"`" },		// fullwidth backquote
-	{ 0xff41,					NULL,			"a" },		// fullwidth 'a'
-	{ 0xff42,					NULL,			"b" },		// fullwidth 'b'
-	{ 0xff43,					NULL,			"c" },		// fullwidth 'c'
-	{ 0xff44,					NULL,			"d" },		// fullwidth 'd'
-	{ 0xff45,					NULL,			"e" },		// fullwidth 'e'
-	{ 0xff46,					NULL,			"f" },		// fullwidth 'f'
-	{ 0xff47,					NULL,			"g" },		// fullwidth 'g'
-	{ 0xff48,					NULL,			"h" },		// fullwidth 'h'
-	{ 0xff49,					NULL,			"i" },		// fullwidth 'i'
-	{ 0xff4a,					NULL,			"j" },		// fullwidth 'j'
-	{ 0xff4b,					NULL,			"k" },		// fullwidth 'k'
-	{ 0xff4c,					NULL,			"l" },		// fullwidth 'l'
-	{ 0xff4d,					NULL,			"m" },		// fullwidth 'm'
-	{ 0xff4e,					NULL,			"n" },		// fullwidth 'n'
-	{ 0xff4f,					NULL,			"o" },		// fullwidth 'o'
-	{ 0xff50,					NULL,			"p" },		// fullwidth 'p'
-	{ 0xff51,					NULL,			"q" },		// fullwidth 'q'
-	{ 0xff52,					NULL,			"r" },		// fullwidth 'r'
-	{ 0xff53,					NULL,			"s" },		// fullwidth 's'
-	{ 0xff54,					NULL,			"t" },		// fullwidth 't'
-	{ 0xff55,					NULL,			"u" },		// fullwidth 'u'
-	{ 0xff56,					NULL,			"v" },		// fullwidth 'v'
-	{ 0xff57,					NULL,			"w" },		// fullwidth 'w'
-	{ 0xff58,					NULL,			"x" },		// fullwidth 'x'
-	{ 0xff59,					NULL,			"y" },		// fullwidth 'y'
-	{ 0xff5a,					NULL,			"z" },		// fullwidth 'z'
-	{ 0xff5b,					NULL,			"{" },		// fullwidth left brace
-	{ 0xff5c,					NULL,			"|" },		// fullwidth vertical bar
-	{ 0xff5d,					NULL,			"}" },		// fullwidth right brace
-	{ 0xff5e,					NULL,			"~" },		// fullwidth tilde
-	{ 0xff5f,					NULL,			"((" },		// fullwidth double left parenthesis
-	{ 0xff60,					NULL,			"))" },		// fullwidth double right parenthesis
-	{ 0xffe0,					NULL,			"\xC2\xA2" },		// fullwidth cent sign
-	{ 0xffe1,					NULL,			"\xC2\xA3" },		// fullwidth pound sign
-	{ 0xffe4,					NULL,			"\xC2\xA4" },		// fullwidth broken bar
-	{ 0xffe5,					NULL,			"\xC2\xA5" },		// fullwidth yen sign
-	{ 0xffe6,					NULL,			"\xE2\x82\xA9" },	// fullwidth won sign
-	{ 0xffe9,					NULL,			"\xE2\x86\x90" },	// fullwidth left arrow
-	{ 0xffea,					NULL,			"\xE2\x86\x91" },	// fullwidth up arrow
-	{ 0xffeb,					NULL,			"\xE2\x86\x92" },	// fullwidth right arrow
-	{ 0xffec,					NULL,			"\xE2\x86\x93" },	// fullwidth down arrow
-	{ 0xffed,					NULL,			"\xE2\x96\xAA" },	// fullwidth solid box
-	{ 0xffee,					NULL,			"\xE2\x97\xA6" },	// fullwidth open circle
-	{ UCHAR_SHIFT_1,			"Shift",		NULL },		// Shift key
-	{ UCHAR_SHIFT_2,			"Ctrl",			NULL },		// Ctrl key
-	{ UCHAR_MAMEKEY(F1),		"F1",			NULL },		// F1 function key
-	{ UCHAR_MAMEKEY(F2),		"F2",			NULL },		// F2 function key
-	{ UCHAR_MAMEKEY(F3),		"F3",			NULL },		// F3 function key
-	{ UCHAR_MAMEKEY(F4),		"F4",			NULL },		// F4 function key
-	{ UCHAR_MAMEKEY(F5),		"F5",			NULL },		// F5 function key
-	{ UCHAR_MAMEKEY(F6),		"F6",			NULL },		// F6 function key
-	{ UCHAR_MAMEKEY(F7),		"F7",			NULL },		// F7 function key
-	{ UCHAR_MAMEKEY(F8),		"F8",			NULL },		// F8 function key
-	{ UCHAR_MAMEKEY(F9),		"F9",			NULL },		// F9 function key
-	{ UCHAR_MAMEKEY(F10),		"F10",			NULL },		// F10 function key
-	{ UCHAR_MAMEKEY(F11),		"F11",			NULL },		// F11 function key
-	{ UCHAR_MAMEKEY(F12),		"F12",			NULL },		// F12 function key
-	{ UCHAR_MAMEKEY(F13),		"F13",			NULL },		// F13 function key
-	{ UCHAR_MAMEKEY(F14),		"F14",			NULL },		// F14 function key
-	{ UCHAR_MAMEKEY(F15),		"F15",			NULL },		// F15 function key
-	{ UCHAR_MAMEKEY(ESC),		"Esc",			"\033" },	// Esc key
-	{ UCHAR_MAMEKEY(INSERT),	"Insert",		NULL },		// Insert key
-	{ UCHAR_MAMEKEY(DEL),		"Delete",		"\010" },	// Delete key
-	{ UCHAR_MAMEKEY(HOME),		"Home",			"\014" },	// Home key
-	{ UCHAR_MAMEKEY(END),		"End",			NULL },		// End key
-	{ UCHAR_MAMEKEY(PGUP),		"Page Up",		NULL },		// Page Up key
-	{ UCHAR_MAMEKEY(PGDN),		"Page Down",	NULL },		// Page Down key
-	{ UCHAR_MAMEKEY(LEFT),		"Cursor Left",	NULL },		// Cursor Left
-	{ UCHAR_MAMEKEY(RIGHT),		"Cursor Right",	NULL },		// Cursor Right
-	{ UCHAR_MAMEKEY(UP),		"Cursor Up",	NULL },		// Cursor Up
-	{ UCHAR_MAMEKEY(DOWN),		"Cursor Down",	NULL },		// Cursor Down
-	{ UCHAR_MAMEKEY(0_PAD),		"Keypad 0",		NULL },		// 0 on the numeric keypad
-	{ UCHAR_MAMEKEY(1_PAD),		"Keypad 1",		NULL },		// 1 on the numeric keypad
-	{ UCHAR_MAMEKEY(2_PAD),		"Keypad 2",		NULL },		// 2 on the numeric keypad
-	{ UCHAR_MAMEKEY(3_PAD),		"Keypad 3",		NULL },		// 3 on the numeric keypad
-	{ UCHAR_MAMEKEY(4_PAD),		"Keypad 4",		NULL },		// 4 on the numeric keypad
-	{ UCHAR_MAMEKEY(5_PAD),		"Keypad 5",		NULL },		// 5 on the numeric keypad
-	{ UCHAR_MAMEKEY(6_PAD),		"Keypad 6",		NULL },		// 6 on the numeric keypad
-	{ UCHAR_MAMEKEY(7_PAD),		"Keypad 7",		NULL },		// 7 on the numeric keypad
-	{ UCHAR_MAMEKEY(8_PAD),		"Keypad 8",		NULL },		// 8 on the numeric keypad
-	{ UCHAR_MAMEKEY(9_PAD),		"Keypad 9",		NULL },		// 9 on the numeric keypad
-	{ UCHAR_MAMEKEY(SLASH_PAD),	"Keypad /",		NULL },		// / on the numeric keypad
-	{ UCHAR_MAMEKEY(ASTERISK),	"Keypad *",		NULL },		// * on the numeric keypad
-	{ UCHAR_MAMEKEY(MINUS_PAD),	"Keypad -",		NULL },		// - on the numeric Keypad
-	{ UCHAR_MAMEKEY(PLUS_PAD),	"Keypad +",		NULL },		// + on the numeric Keypad
-	{ UCHAR_MAMEKEY(DEL_PAD),	"Keypad .",		NULL },		// . on the numeric keypad
-	{ UCHAR_MAMEKEY(ENTER_PAD),	"Keypad Enter",	NULL },		// Enter on the numeric keypad
-	{ UCHAR_MAMEKEY(PRTSCR),	"Print Screen",	NULL },		// Print Screen key
-	{ UCHAR_MAMEKEY(PAUSE),		"Pause",		NULL },		// Pause key
-	{ UCHAR_MAMEKEY(LSHIFT),	"Left Shift",	NULL },		// Left Shift key
-	{ UCHAR_MAMEKEY(RSHIFT),	"Right Shift",	NULL },		// Right Shift key
-	{ UCHAR_MAMEKEY(LCONTROL),	"Left Ctrl",	NULL },		// Left Control key
-	{ UCHAR_MAMEKEY(RCONTROL),	"Right Ctrl",	NULL },		// Right Control key
-	{ UCHAR_MAMEKEY(LALT),		"Left Alt",		NULL },		// Left Alt key
-	{ UCHAR_MAMEKEY(RALT),		"Right Alt",	NULL },		// Right Alt key
-	{ UCHAR_MAMEKEY(SCRLOCK),	"Scroll Lock",	NULL },		// Scroll Lock key
-	{ UCHAR_MAMEKEY(NUMLOCK),	"Num Lock",		NULL },		// Num Lock key
-	{ UCHAR_MAMEKEY(CAPSLOCK),	"Caps Lock",	NULL },		// Caps Lock key
-	{ UCHAR_MAMEKEY(LWIN),		"Left Win",		NULL },		// Left Win key
-	{ UCHAR_MAMEKEY(RWIN),		"Right Win",	NULL },		// Right Win key
-	{ UCHAR_MAMEKEY(MENU),		"Menu",			NULL },		// Menu key
-	{ UCHAR_MAMEKEY(CANCEL),	"Break",		NULL }		// Break/Pause key
+	{ 0x0008,                   "Backspace",    NULL },     // Backspace
+	{ 0x0009,                   "Tab",          "    " },   // Tab
+	{ 0x000c,                   "Clear",        NULL },     // Clear
+	{ 0x000d,                   "Enter",        NULL },     // Enter
+	{ 0x001a,                   "Esc",          NULL },     // Esc
+	{ 0x0020,                   "Space",        " " },      // Space
+	{ 0x0061,                   NULL,           "A" },      // a
+	{ 0x0062,                   NULL,           "B" },      // b
+	{ 0x0063,                   NULL,           "C" },      // c
+	{ 0x0064,                   NULL,           "D" },      // d
+	{ 0x0065,                   NULL,           "E" },      // e
+	{ 0x0066,                   NULL,           "F" },      // f
+	{ 0x0067,                   NULL,           "G" },      // g
+	{ 0x0068,                   NULL,           "H" },      // h
+	{ 0x0069,                   NULL,           "I" },      // i
+	{ 0x006a,                   NULL,           "J" },      // j
+	{ 0x006b,                   NULL,           "K" },      // k
+	{ 0x006c,                   NULL,           "L" },      // l
+	{ 0x006d,                   NULL,           "M" },      // m
+	{ 0x006e,                   NULL,           "N" },      // n
+	{ 0x006f,                   NULL,           "O" },      // o
+	{ 0x0070,                   NULL,           "P" },      // p
+	{ 0x0071,                   NULL,           "Q" },      // q
+	{ 0x0072,                   NULL,           "R" },      // r
+	{ 0x0073,                   NULL,           "S" },      // s
+	{ 0x0074,                   NULL,           "T" },      // t
+	{ 0x0075,                   NULL,           "U" },      // u
+	{ 0x0076,                   NULL,           "V" },      // v
+	{ 0x0077,                   NULL,           "W" },      // w
+	{ 0x0078,                   NULL,           "X" },      // x
+	{ 0x0079,                   NULL,           "Y" },      // y
+	{ 0x007a,                   NULL,           "Z" },      // z
+	{ 0x00a0,                   NULL,           " " },      // non breaking space
+	{ 0x00a1,                   NULL,           "!" },      // inverted exclaimation mark
+	{ 0x00a6,                   NULL,           "|" },      // broken bar
+	{ 0x00a9,                   NULL,           "(c)" },    // copyright sign
+	{ 0x00ab,                   NULL,           "<<" },     // left pointing double angle
+	{ 0x00ae,                   NULL,           "(r)" },    // registered sign
+	{ 0x00bb,                   NULL,           ">>" },     // right pointing double angle
+	{ 0x00bc,                   NULL,           "1/4" },    // vulgar fraction one quarter
+	{ 0x00bd,                   NULL,           "1/2" },    // vulgar fraction one half
+	{ 0x00be,                   NULL,           "3/4" },    // vulgar fraction three quarters
+	{ 0x00bf,                   NULL,           "?" },      // inverted question mark
+	{ 0x00c0,                   NULL,           "A" },      // 'A' grave
+	{ 0x00c1,                   NULL,           "A" },      // 'A' acute
+	{ 0x00c2,                   NULL,           "A" },      // 'A' circumflex
+	{ 0x00c3,                   NULL,           "A" },      // 'A' tilde
+	{ 0x00c4,                   NULL,           "A" },      // 'A' diaeresis
+	{ 0x00c5,                   NULL,           "A" },      // 'A' ring above
+	{ 0x00c6,                   NULL,           "AE" },     // 'AE' ligature
+	{ 0x00c7,                   NULL,           "C" },      // 'C' cedilla
+	{ 0x00c8,                   NULL,           "E" },      // 'E' grave
+	{ 0x00c9,                   NULL,           "E" },      // 'E' acute
+	{ 0x00ca,                   NULL,           "E" },      // 'E' circumflex
+	{ 0x00cb,                   NULL,           "E" },      // 'E' diaeresis
+	{ 0x00cc,                   NULL,           "I" },      // 'I' grave
+	{ 0x00cd,                   NULL,           "I" },      // 'I' acute
+	{ 0x00ce,                   NULL,           "I" },      // 'I' circumflex
+	{ 0x00cf,                   NULL,           "I" },      // 'I' diaeresis
+	{ 0x00d0,                   NULL,           "D" },      // 'ETH'
+	{ 0x00d1,                   NULL,           "N" },      // 'N' tilde
+	{ 0x00d2,                   NULL,           "O" },      // 'O' grave
+	{ 0x00d3,                   NULL,           "O" },      // 'O' acute
+	{ 0x00d4,                   NULL,           "O" },      // 'O' circumflex
+	{ 0x00d5,                   NULL,           "O" },      // 'O' tilde
+	{ 0x00d6,                   NULL,           "O" },      // 'O' diaeresis
+	{ 0x00d7,                   NULL,           "X" },      // multiplication sign
+	{ 0x00d8,                   NULL,           "O" },      // 'O' stroke
+	{ 0x00d9,                   NULL,           "U" },      // 'U' grave
+	{ 0x00da,                   NULL,           "U" },      // 'U' acute
+	{ 0x00db,                   NULL,           "U" },      // 'U' circumflex
+	{ 0x00dc,                   NULL,           "U" },      // 'U' diaeresis
+	{ 0x00dd,                   NULL,           "Y" },      // 'Y' acute
+	{ 0x00df,                   NULL,           "SS" },     // sharp S
+	{ 0x00e0,                   NULL,           "a" },      // 'a' grave
+	{ 0x00e1,                   NULL,           "a" },      // 'a' acute
+	{ 0x00e2,                   NULL,           "a" },      // 'a' circumflex
+	{ 0x00e3,                   NULL,           "a" },      // 'a' tilde
+	{ 0x00e4,                   NULL,           "a" },      // 'a' diaeresis
+	{ 0x00e5,                   NULL,           "a" },      // 'a' ring above
+	{ 0x00e6,                   NULL,           "ae" },     // 'ae' ligature
+	{ 0x00e7,                   NULL,           "c" },      // 'c' cedilla
+	{ 0x00e8,                   NULL,           "e" },      // 'e' grave
+	{ 0x00e9,                   NULL,           "e" },      // 'e' acute
+	{ 0x00ea,                   NULL,           "e" },      // 'e' circumflex
+	{ 0x00eb,                   NULL,           "e" },      // 'e' diaeresis
+	{ 0x00ec,                   NULL,           "i" },      // 'i' grave
+	{ 0x00ed,                   NULL,           "i" },      // 'i' acute
+	{ 0x00ee,                   NULL,           "i" },      // 'i' circumflex
+	{ 0x00ef,                   NULL,           "i" },      // 'i' diaeresis
+	{ 0x00f0,                   NULL,           "d" },      // 'eth'
+	{ 0x00f1,                   NULL,           "n" },      // 'n' tilde
+	{ 0x00f2,                   NULL,           "o" },      // 'o' grave
+	{ 0x00f3,                   NULL,           "o" },      // 'o' acute
+	{ 0x00f4,                   NULL,           "o" },      // 'o' circumflex
+	{ 0x00f5,                   NULL,           "o" },      // 'o' tilde
+	{ 0x00f6,                   NULL,           "o" },      // 'o' diaeresis
+	{ 0x00f8,                   NULL,           "o" },      // 'o' stroke
+	{ 0x00f9,                   NULL,           "u" },      // 'u' grave
+	{ 0x00fa,                   NULL,           "u" },      // 'u' acute
+	{ 0x00fb,                   NULL,           "u" },      // 'u' circumflex
+	{ 0x00fc,                   NULL,           "u" },      // 'u' diaeresis
+	{ 0x00fd,                   NULL,           "y" },      // 'y' acute
+	{ 0x00ff,                   NULL,           "y" },      // 'y' diaeresis
+	{ 0x2010,                   NULL,           "-" },      // hyphen
+	{ 0x2011,                   NULL,           "-" },      // non-breaking hyphen
+	{ 0x2012,                   NULL,           "-" },      // figure dash
+	{ 0x2013,                   NULL,           "-" },      // en dash
+	{ 0x2014,                   NULL,           "-" },      // em dash
+	{ 0x2015,                   NULL,           "-" },      // horizontal dash
+	{ 0x2018,                   NULL,           "\'" },     // left single quotation mark
+	{ 0x2019,                   NULL,           "\'" },     // right single quotation mark
+	{ 0x201a,                   NULL,           "\'" },     // single low quotation mark
+	{ 0x201b,                   NULL,           "\'" },     // single high reversed quotation mark
+	{ 0x201c,                   NULL,           "\"" },     // left double quotation mark
+	{ 0x201d,                   NULL,           "\"" },     // right double quotation mark
+	{ 0x201e,                   NULL,           "\"" },     // double low quotation mark
+	{ 0x201f,                   NULL,           "\"" },     // double high reversed quotation mark
+	{ 0x2024,                   NULL,           "." },      // one dot leader
+	{ 0x2025,                   NULL,           ".." },     // two dot leader
+	{ 0x2026,                   NULL,           "..." },    // horizontal ellipsis
+	{ 0x2047,                   NULL,           "??" },     // double question mark
+	{ 0x2048,                   NULL,           "?!" },     // question exclamation mark
+	{ 0x2049,                   NULL,           "!?" },     // exclamation question mark
+	{ 0xff01,                   NULL,           "!" },      // fullwidth exclamation point
+	{ 0xff02,                   NULL,           "\"" },     // fullwidth quotation mark
+	{ 0xff03,                   NULL,           "#" },      // fullwidth number sign
+	{ 0xff04,                   NULL,           "$" },      // fullwidth dollar sign
+	{ 0xff05,                   NULL,           "%" },      // fullwidth percent sign
+	{ 0xff06,                   NULL,           "&" },      // fullwidth ampersand
+	{ 0xff07,                   NULL,           "\'" },     // fullwidth apostrophe
+	{ 0xff08,                   NULL,           "(" },      // fullwidth left parenthesis
+	{ 0xff09,                   NULL,           ")" },      // fullwidth right parenthesis
+	{ 0xff0a,                   NULL,           "*" },      // fullwidth asterisk
+	{ 0xff0b,                   NULL,           "+" },      // fullwidth plus
+	{ 0xff0c,                   NULL,           "," },      // fullwidth comma
+	{ 0xff0d,                   NULL,           "-" },      // fullwidth minus
+	{ 0xff0e,                   NULL,           "." },      // fullwidth period
+	{ 0xff0f,                   NULL,           "/" },      // fullwidth slash
+	{ 0xff10,                   NULL,           "0" },      // fullwidth zero
+	{ 0xff11,                   NULL,           "1" },      // fullwidth one
+	{ 0xff12,                   NULL,           "2" },      // fullwidth two
+	{ 0xff13,                   NULL,           "3" },      // fullwidth three
+	{ 0xff14,                   NULL,           "4" },      // fullwidth four
+	{ 0xff15,                   NULL,           "5" },      // fullwidth five
+	{ 0xff16,                   NULL,           "6" },      // fullwidth six
+	{ 0xff17,                   NULL,           "7" },      // fullwidth seven
+	{ 0xff18,                   NULL,           "8" },      // fullwidth eight
+	{ 0xff19,                   NULL,           "9" },      // fullwidth nine
+	{ 0xff1a,                   NULL,           ":" },      // fullwidth colon
+	{ 0xff1b,                   NULL,           ";" },      // fullwidth semicolon
+	{ 0xff1c,                   NULL,           "<" },      // fullwidth less than sign
+	{ 0xff1d,                   NULL,           "=" },      // fullwidth equals sign
+	{ 0xff1e,                   NULL,           ">" },      // fullwidth greater than sign
+	{ 0xff1f,                   NULL,           "?" },      // fullwidth question mark
+	{ 0xff20,                   NULL,           "@" },      // fullwidth at sign
+	{ 0xff21,                   NULL,           "A" },      // fullwidth 'A'
+	{ 0xff22,                   NULL,           "B" },      // fullwidth 'B'
+	{ 0xff23,                   NULL,           "C" },      // fullwidth 'C'
+	{ 0xff24,                   NULL,           "D" },      // fullwidth 'D'
+	{ 0xff25,                   NULL,           "E" },      // fullwidth 'E'
+	{ 0xff26,                   NULL,           "F" },      // fullwidth 'F'
+	{ 0xff27,                   NULL,           "G" },      // fullwidth 'G'
+	{ 0xff28,                   NULL,           "H" },      // fullwidth 'H'
+	{ 0xff29,                   NULL,           "I" },      // fullwidth 'I'
+	{ 0xff2a,                   NULL,           "J" },      // fullwidth 'J'
+	{ 0xff2b,                   NULL,           "K" },      // fullwidth 'K'
+	{ 0xff2c,                   NULL,           "L" },      // fullwidth 'L'
+	{ 0xff2d,                   NULL,           "M" },      // fullwidth 'M'
+	{ 0xff2e,                   NULL,           "N" },      // fullwidth 'N'
+	{ 0xff2f,                   NULL,           "O" },      // fullwidth 'O'
+	{ 0xff30,                   NULL,           "P" },      // fullwidth 'P'
+	{ 0xff31,                   NULL,           "Q" },      // fullwidth 'Q'
+	{ 0xff32,                   NULL,           "R" },      // fullwidth 'R'
+	{ 0xff33,                   NULL,           "S" },      // fullwidth 'S'
+	{ 0xff34,                   NULL,           "T" },      // fullwidth 'T'
+	{ 0xff35,                   NULL,           "U" },      // fullwidth 'U'
+	{ 0xff36,                   NULL,           "V" },      // fullwidth 'V'
+	{ 0xff37,                   NULL,           "W" },      // fullwidth 'W'
+	{ 0xff38,                   NULL,           "X" },      // fullwidth 'X'
+	{ 0xff39,                   NULL,           "Y" },      // fullwidth 'Y'
+	{ 0xff3a,                   NULL,           "Z" },      // fullwidth 'Z'
+	{ 0xff3b,                   NULL,           "[" },      // fullwidth left bracket
+	{ 0xff3c,                   NULL,           "\\" },     // fullwidth backslash
+	{ 0xff3d,                   NULL,           "]" },      // fullwidth right bracket
+	{ 0xff3e,                   NULL,           "^" },      // fullwidth caret
+	{ 0xff3f,                   NULL,           "_" },      // fullwidth underscore
+	{ 0xff40,                   NULL,           "`" },      // fullwidth backquote
+	{ 0xff41,                   NULL,           "a" },      // fullwidth 'a'
+	{ 0xff42,                   NULL,           "b" },      // fullwidth 'b'
+	{ 0xff43,                   NULL,           "c" },      // fullwidth 'c'
+	{ 0xff44,                   NULL,           "d" },      // fullwidth 'd'
+	{ 0xff45,                   NULL,           "e" },      // fullwidth 'e'
+	{ 0xff46,                   NULL,           "f" },      // fullwidth 'f'
+	{ 0xff47,                   NULL,           "g" },      // fullwidth 'g'
+	{ 0xff48,                   NULL,           "h" },      // fullwidth 'h'
+	{ 0xff49,                   NULL,           "i" },      // fullwidth 'i'
+	{ 0xff4a,                   NULL,           "j" },      // fullwidth 'j'
+	{ 0xff4b,                   NULL,           "k" },      // fullwidth 'k'
+	{ 0xff4c,                   NULL,           "l" },      // fullwidth 'l'
+	{ 0xff4d,                   NULL,           "m" },      // fullwidth 'm'
+	{ 0xff4e,                   NULL,           "n" },      // fullwidth 'n'
+	{ 0xff4f,                   NULL,           "o" },      // fullwidth 'o'
+	{ 0xff50,                   NULL,           "p" },      // fullwidth 'p'
+	{ 0xff51,                   NULL,           "q" },      // fullwidth 'q'
+	{ 0xff52,                   NULL,           "r" },      // fullwidth 'r'
+	{ 0xff53,                   NULL,           "s" },      // fullwidth 's'
+	{ 0xff54,                   NULL,           "t" },      // fullwidth 't'
+	{ 0xff55,                   NULL,           "u" },      // fullwidth 'u'
+	{ 0xff56,                   NULL,           "v" },      // fullwidth 'v'
+	{ 0xff57,                   NULL,           "w" },      // fullwidth 'w'
+	{ 0xff58,                   NULL,           "x" },      // fullwidth 'x'
+	{ 0xff59,                   NULL,           "y" },      // fullwidth 'y'
+	{ 0xff5a,                   NULL,           "z" },      // fullwidth 'z'
+	{ 0xff5b,                   NULL,           "{" },      // fullwidth left brace
+	{ 0xff5c,                   NULL,           "|" },      // fullwidth vertical bar
+	{ 0xff5d,                   NULL,           "}" },      // fullwidth right brace
+	{ 0xff5e,                   NULL,           "~" },      // fullwidth tilde
+	{ 0xff5f,                   NULL,           "((" },     // fullwidth double left parenthesis
+	{ 0xff60,                   NULL,           "))" },     // fullwidth double right parenthesis
+	{ 0xffe0,                   NULL,           "\xC2\xA2" },       // fullwidth cent sign
+	{ 0xffe1,                   NULL,           "\xC2\xA3" },       // fullwidth pound sign
+	{ 0xffe4,                   NULL,           "\xC2\xA4" },       // fullwidth broken bar
+	{ 0xffe5,                   NULL,           "\xC2\xA5" },       // fullwidth yen sign
+	{ 0xffe6,                   NULL,           "\xE2\x82\xA9" },   // fullwidth won sign
+	{ 0xffe9,                   NULL,           "\xE2\x86\x90" },   // fullwidth left arrow
+	{ 0xffea,                   NULL,           "\xE2\x86\x91" },   // fullwidth up arrow
+	{ 0xffeb,                   NULL,           "\xE2\x86\x92" },   // fullwidth right arrow
+	{ 0xffec,                   NULL,           "\xE2\x86\x93" },   // fullwidth down arrow
+	{ 0xffed,                   NULL,           "\xE2\x96\xAA" },   // fullwidth solid box
+	{ 0xffee,                   NULL,           "\xE2\x97\xA6" },   // fullwidth open circle
+	{ UCHAR_SHIFT_1,            "Shift",        NULL },     // Shift key
+	{ UCHAR_SHIFT_2,            "Ctrl",         NULL },     // Ctrl key
+	{ UCHAR_MAMEKEY(F1),        "F1",           NULL },     // F1 function key
+	{ UCHAR_MAMEKEY(F2),        "F2",           NULL },     // F2 function key
+	{ UCHAR_MAMEKEY(F3),        "F3",           NULL },     // F3 function key
+	{ UCHAR_MAMEKEY(F4),        "F4",           NULL },     // F4 function key
+	{ UCHAR_MAMEKEY(F5),        "F5",           NULL },     // F5 function key
+	{ UCHAR_MAMEKEY(F6),        "F6",           NULL },     // F6 function key
+	{ UCHAR_MAMEKEY(F7),        "F7",           NULL },     // F7 function key
+	{ UCHAR_MAMEKEY(F8),        "F8",           NULL },     // F8 function key
+	{ UCHAR_MAMEKEY(F9),        "F9",           NULL },     // F9 function key
+	{ UCHAR_MAMEKEY(F10),       "F10",          NULL },     // F10 function key
+	{ UCHAR_MAMEKEY(F11),       "F11",          NULL },     // F11 function key
+	{ UCHAR_MAMEKEY(F12),       "F12",          NULL },     // F12 function key
+	{ UCHAR_MAMEKEY(F13),       "F13",          NULL },     // F13 function key
+	{ UCHAR_MAMEKEY(F14),       "F14",          NULL },     // F14 function key
+	{ UCHAR_MAMEKEY(F15),       "F15",          NULL },     // F15 function key
+	{ UCHAR_MAMEKEY(ESC),       "Esc",          "\033" },   // Esc key
+	{ UCHAR_MAMEKEY(INSERT),    "Insert",       NULL },     // Insert key
+	{ UCHAR_MAMEKEY(DEL),       "Delete",       "\010" },   // Delete key
+	{ UCHAR_MAMEKEY(HOME),      "Home",         "\014" },   // Home key
+	{ UCHAR_MAMEKEY(END),       "End",          NULL },     // End key
+	{ UCHAR_MAMEKEY(PGUP),      "Page Up",      NULL },     // Page Up key
+	{ UCHAR_MAMEKEY(PGDN),      "Page Down",    NULL },     // Page Down key
+	{ UCHAR_MAMEKEY(LEFT),      "Cursor Left",  NULL },     // Cursor Left
+	{ UCHAR_MAMEKEY(RIGHT),     "Cursor Right", NULL },     // Cursor Right
+	{ UCHAR_MAMEKEY(UP),        "Cursor Up",    NULL },     // Cursor Up
+	{ UCHAR_MAMEKEY(DOWN),      "Cursor Down",  NULL },     // Cursor Down
+	{ UCHAR_MAMEKEY(0_PAD),     "Keypad 0",     NULL },     // 0 on the numeric keypad
+	{ UCHAR_MAMEKEY(1_PAD),     "Keypad 1",     NULL },     // 1 on the numeric keypad
+	{ UCHAR_MAMEKEY(2_PAD),     "Keypad 2",     NULL },     // 2 on the numeric keypad
+	{ UCHAR_MAMEKEY(3_PAD),     "Keypad 3",     NULL },     // 3 on the numeric keypad
+	{ UCHAR_MAMEKEY(4_PAD),     "Keypad 4",     NULL },     // 4 on the numeric keypad
+	{ UCHAR_MAMEKEY(5_PAD),     "Keypad 5",     NULL },     // 5 on the numeric keypad
+	{ UCHAR_MAMEKEY(6_PAD),     "Keypad 6",     NULL },     // 6 on the numeric keypad
+	{ UCHAR_MAMEKEY(7_PAD),     "Keypad 7",     NULL },     // 7 on the numeric keypad
+	{ UCHAR_MAMEKEY(8_PAD),     "Keypad 8",     NULL },     // 8 on the numeric keypad
+	{ UCHAR_MAMEKEY(9_PAD),     "Keypad 9",     NULL },     // 9 on the numeric keypad
+	{ UCHAR_MAMEKEY(SLASH_PAD), "Keypad /",     NULL },     // / on the numeric keypad
+	{ UCHAR_MAMEKEY(ASTERISK),  "Keypad *",     NULL },     // * on the numeric keypad
+	{ UCHAR_MAMEKEY(MINUS_PAD), "Keypad -",     NULL },     // - on the numeric Keypad
+	{ UCHAR_MAMEKEY(PLUS_PAD),  "Keypad +",     NULL },     // + on the numeric Keypad
+	{ UCHAR_MAMEKEY(DEL_PAD),   "Keypad .",     NULL },     // . on the numeric keypad
+	{ UCHAR_MAMEKEY(ENTER_PAD), "Keypad Enter", NULL },     // Enter on the numeric keypad
+	{ UCHAR_MAMEKEY(PRTSCR),    "Print Screen", NULL },     // Print Screen key
+	{ UCHAR_MAMEKEY(PAUSE),     "Pause",        NULL },     // Pause key
+	{ UCHAR_MAMEKEY(LSHIFT),    "Left Shift",   NULL },     // Left Shift key
+	{ UCHAR_MAMEKEY(RSHIFT),    "Right Shift",  NULL },     // Right Shift key
+	{ UCHAR_MAMEKEY(LCONTROL),  "Left Ctrl",    NULL },     // Left Control key
+	{ UCHAR_MAMEKEY(RCONTROL),  "Right Ctrl",   NULL },     // Right Control key
+	{ UCHAR_MAMEKEY(LALT),      "Left Alt",     NULL },     // Left Alt key
+	{ UCHAR_MAMEKEY(RALT),      "Right Alt",    NULL },     // Right Alt key
+	{ UCHAR_MAMEKEY(SCRLOCK),   "Scroll Lock",  NULL },     // Scroll Lock key
+	{ UCHAR_MAMEKEY(NUMLOCK),   "Num Lock",     NULL },     // Num Lock key
+	{ UCHAR_MAMEKEY(CAPSLOCK),  "Caps Lock",    NULL },     // Caps Lock key
+	{ UCHAR_MAMEKEY(LWIN),      "Left Win",     NULL },     // Left Win key
+	{ UCHAR_MAMEKEY(RWIN),      "Right Win",    NULL },     // Right Win key
+	{ UCHAR_MAMEKEY(MENU),      "Menu",         NULL },     // Menu key
+	{ UCHAR_MAMEKEY(CANCEL),    "Break",        NULL }      // Break/Pause key
 };
 
 
@@ -833,22 +833,22 @@ void ioport_list::append(device_t &device, astring &errorbuf)
 
 input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard)
 	: m_next(NULL),
-	  m_type(type),
-	  m_group(group),
-	  m_player(player),
-	  m_token(token),
-	  m_name(name)
+		m_type(type),
+		m_group(group),
+		m_player(player),
+		m_token(token),
+		m_name(name)
 {
 	m_defseq[SEQ_TYPE_STANDARD] = m_seq[SEQ_TYPE_STANDARD] = standard;
 }
 
 input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment)
 	: m_next(NULL),
-	  m_type(type),
-	  m_group(group),
-	  m_player(player),
-	  m_token(token),
-	  m_name(name)
+		m_type(type),
+		m_group(group),
+		m_player(player),
+		m_token(token),
+		m_name(name)
 {
 	m_defseq[SEQ_TYPE_STANDARD] = m_seq[SEQ_TYPE_STANDARD] = standard;
 	m_defseq[SEQ_TYPE_INCREMENT] = m_seq[SEQ_TYPE_INCREMENT] = increment;
@@ -879,10 +879,10 @@ void input_type_entry::configure_osd(const char *token, const char *name)
 
 digital_joystick::digital_joystick(int player, int number)
 	: m_player(player),
-	  m_number(number),
-	  m_current(0),
-	  m_current4way(0),
-	  m_previous(0)
+		m_number(number),
+		m_current(0),
+		m_current4way(0),
+		m_previous(0)
 {
 }
 
@@ -984,12 +984,12 @@ void digital_joystick::frame_update()
 
 natural_keyboard::natural_keyboard(running_machine &machine)
 	: m_machine(machine),
-	  m_bufbegin(0),
-	  m_bufend(0),
-	  m_status_keydown(false),
-	  m_last_cr(false),
-	  m_timer(NULL),
-	  m_current_rate(attotime::zero)
+		m_bufbegin(0),
+		m_bufend(0),
+		m_status_keydown(false),
+		m_last_cr(false),
+		m_timer(NULL),
+		m_current_rate(attotime::zero)
 {
 	m_queue_chars = ioport_queue_chars_delegate();
 	m_accept_char = ioport_accept_char_delegate();
@@ -1147,34 +1147,34 @@ void natural_keyboard::post_coded(const char *text, size_t length, attotime rate
 		unicode_char code;
 	} codes[] =
 	{
-		{ "BACKSPACE",	8 },
-		{ "BS",			8 },
-		{ "BKSP",		8 },
-		{ "DEL",		UCHAR_MAMEKEY(DEL) },
-		{ "DELETE",		UCHAR_MAMEKEY(DEL) },
-		{ "END",		UCHAR_MAMEKEY(END) },
-		{ "ENTER",		13 },
-		{ "ESC",		'\033' },
-		{ "HOME",		UCHAR_MAMEKEY(HOME) },
-		{ "INS",		UCHAR_MAMEKEY(INSERT) },
-		{ "INSERT",		UCHAR_MAMEKEY(INSERT) },
-		{ "PGDN",		UCHAR_MAMEKEY(PGDN) },
-		{ "PGUP",		UCHAR_MAMEKEY(PGUP) },
-		{ "SPACE",		32 },
-		{ "TAB",		9 },
-		{ "F1",			UCHAR_MAMEKEY(F1) },
-		{ "F2",			UCHAR_MAMEKEY(F2) },
-		{ "F3",			UCHAR_MAMEKEY(F3) },
-		{ "F4",			UCHAR_MAMEKEY(F4) },
-		{ "F5",			UCHAR_MAMEKEY(F5) },
-		{ "F6",			UCHAR_MAMEKEY(F6) },
-		{ "F7",			UCHAR_MAMEKEY(F7) },
-		{ "F8",			UCHAR_MAMEKEY(F8) },
-		{ "F9",			UCHAR_MAMEKEY(F9) },
-		{ "F10",		UCHAR_MAMEKEY(F10) },
-		{ "F11",		UCHAR_MAMEKEY(F11) },
-		{ "F12",		UCHAR_MAMEKEY(F12) },
-		{ "QUOTE",		'\"' }
+		{ "BACKSPACE",  8 },
+		{ "BS",         8 },
+		{ "BKSP",       8 },
+		{ "DEL",        UCHAR_MAMEKEY(DEL) },
+		{ "DELETE",     UCHAR_MAMEKEY(DEL) },
+		{ "END",        UCHAR_MAMEKEY(END) },
+		{ "ENTER",      13 },
+		{ "ESC",        '\033' },
+		{ "HOME",       UCHAR_MAMEKEY(HOME) },
+		{ "INS",        UCHAR_MAMEKEY(INSERT) },
+		{ "INSERT",     UCHAR_MAMEKEY(INSERT) },
+		{ "PGDN",       UCHAR_MAMEKEY(PGDN) },
+		{ "PGUP",       UCHAR_MAMEKEY(PGUP) },
+		{ "SPACE",      32 },
+		{ "TAB",        9 },
+		{ "F1",         UCHAR_MAMEKEY(F1) },
+		{ "F2",         UCHAR_MAMEKEY(F2) },
+		{ "F3",         UCHAR_MAMEKEY(F3) },
+		{ "F4",         UCHAR_MAMEKEY(F4) },
+		{ "F5",         UCHAR_MAMEKEY(F5) },
+		{ "F6",         UCHAR_MAMEKEY(F6) },
+		{ "F7",         UCHAR_MAMEKEY(F7) },
+		{ "F8",         UCHAR_MAMEKEY(F8) },
+		{ "F9",         UCHAR_MAMEKEY(F9) },
+		{ "F10",        UCHAR_MAMEKEY(F10) },
+		{ "F11",        UCHAR_MAMEKEY(F11) },
+		{ "F12",        UCHAR_MAMEKEY(F12) },
+		{ "QUOTE",      '\"' }
 	};
 
 	// set the fixed rate
@@ -1398,10 +1398,10 @@ const char *natural_keyboard::unicode_to_string(astring &buffer, unicode_char ch
 	switch (ch)
 	{
 		// check some magic values
-		case '\0':	buffer.cpy("\\0");		break;
-		case '\r':	buffer.cpy("\\r");		break;
-		case '\n':	buffer.cpy("\\n");		break;
-		case '\t':	buffer.cpy("\\t");		break;
+		case '\0':  buffer.cpy("\\0");      break;
+		case '\r':  buffer.cpy("\\r");      break;
+		case '\n':  buffer.cpy("\\n");      break;
+		case '\t':  buffer.cpy("\\t");      break;
 
 		default:
 			// seven bit ASCII is easy
@@ -1572,13 +1572,13 @@ bool ioport_condition::eval(device_t &device) const
 	ioport_value condvalue = device.ioport(m_tag)->read();
 	switch (m_condition)
 	{
-		case ALWAYS:			return true;
-		case EQUALS:			return ((condvalue & m_mask) == m_value);
-		case NOTEQUALS:			return ((condvalue & m_mask) != m_value);
-		case GREATERTHAN:		return ((condvalue & m_mask) > m_value);
-		case NOTGREATERTHAN:	return ((condvalue & m_mask) <= m_value);
-		case LESSTHAN:			return ((condvalue & m_mask) < m_value);
-		case NOTLESSTHAN:		return ((condvalue & m_mask) >= m_value);
+		case ALWAYS:            return true;
+		case EQUALS:            return ((condvalue & m_mask) == m_value);
+		case NOTEQUALS:         return ((condvalue & m_mask) != m_value);
+		case GREATERTHAN:       return ((condvalue & m_mask) > m_value);
+		case NOTGREATERTHAN:    return ((condvalue & m_mask) <= m_value);
+		case LESSTHAN:          return ((condvalue & m_mask) < m_value);
+		case NOTLESSTHAN:       return ((condvalue & m_mask) >= m_value);
 	}
 	return true;
 }
@@ -1595,9 +1595,9 @@ bool ioport_condition::eval(device_t &device) const
 
 ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const char *_name)
 	: m_next(NULL),
-	  m_field(field),
-	  m_value(_value),
-	  m_name(_name)
+		m_field(field),
+		m_value(_value),
+		m_name(_name)
 {
 }
 
@@ -1613,9 +1613,9 @@ ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const c
 
 ioport_diplocation::ioport_diplocation(const char *name, UINT8 swnum, bool invert)
 	: m_next(NULL),
-	  m_name(name),
-	  m_number(swnum),
-	  m_invert(invert)
+		m_name(name),
+		m_number(swnum),
+		m_invert(invert)
 {
 }
 
@@ -1631,30 +1631,30 @@ ioport_diplocation::ioport_diplocation(const char *name, UINT8 swnum, bool inver
 
 ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value defvalue, ioport_value maskbits, const char *name)
 	: m_next(NULL),
-	  m_port(port),
-	  m_live(NULL),
-	  m_modcount(port.modcount()),
-	  m_mask(maskbits),
-	  m_defvalue(defvalue & maskbits),
-	  m_type(type),
-	  m_player(0),
-	  m_flags(0),
-	  m_impulse(0),
-	  m_name(name),
-	  m_read_param(NULL),
-	  m_write_param(NULL),
-	  m_min(0),
-	  m_max(maskbits),
-	  m_sensitivity(0),
-	  m_delta(0),
-	  m_centerdelta(0),
-	  m_crosshair_axis(CROSSHAIR_AXIS_NONE),
-	  m_crosshair_scale(1.0),
-	  m_crosshair_offset(0),
-	  m_crosshair_altaxis(0),
-	  m_full_turn_count(0),
-	  m_remap_table(NULL),
-	  m_way(0)
+		m_port(port),
+		m_live(NULL),
+		m_modcount(port.modcount()),
+		m_mask(maskbits),
+		m_defvalue(defvalue & maskbits),
+		m_type(type),
+		m_player(0),
+		m_flags(0),
+		m_impulse(0),
+		m_name(name),
+		m_read_param(NULL),
+		m_write_param(NULL),
+		m_min(0),
+		m_max(maskbits),
+		m_sensitivity(0),
+		m_delta(0),
+		m_centerdelta(0),
+		m_crosshair_axis(CROSSHAIR_AXIS_NONE),
+		m_crosshair_scale(1.0),
+		m_crosshair_offset(0),
+		m_crosshair_altaxis(0),
+		m_full_turn_count(0),
+		m_remap_table(NULL),
+		m_way(0)
 {
 	// reset sequences and chars
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
@@ -2311,11 +2311,11 @@ void ioport_field::init_live_state(analog_field *analog)
 
 ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	: analog(analog),
-	  joystick(NULL),
-	  value(field.defvalue()),
-	  impulse(0),
-	  last(0),
-	  joydir(digital_joystick::JOYDIR_COUNT)
+		joystick(NULL),
+		value(field.defvalue()),
+		impulse(0),
+		last(0),
+		joydir(digital_joystick::JOYDIR_COUNT)
 {
 	// fill in the basic values
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
@@ -2362,11 +2362,11 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 
 ioport_port::ioport_port(device_t &owner, const char *tag)
 	: m_next(NULL),
-	  m_device(owner),
-	  m_tag(tag),
-	  m_modcount(0),
-	  m_active(0),
-	  m_live(NULL)
+		m_device(owner),
+		m_tag(tag),
+		m_modcount(0),
+		m_active(0),
+		m_live(NULL)
 {
 }
 
@@ -2572,8 +2572,8 @@ void ioport_port::init_live_state()
 
 ioport_port_live::ioport_port_live(ioport_port &port)
 	: defvalue(0),
-	  digital(0),
-	  outputvalue(0)
+		digital(0),
+		outputvalue(0)
 {
 	// iterate over fields
 	for (ioport_field *field = port.first_field(); field != NULL; field = field->next())
@@ -2608,14 +2608,14 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 
 ioport_manager::ioport_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_safe_to_read(false),
-	  m_natkeyboard(machine),
-	  m_last_frame_time(attotime::zero),
-	  m_last_delta_nsec(0),
-	  m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
-	  m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ),
-	  m_playback_accumulated_speed(0),
-	  m_playback_accumulated_frames(0)
+		m_safe_to_read(false),
+		m_natkeyboard(machine),
+		m_last_frame_time(attotime::zero),
+		m_last_delta_nsec(0),
+		m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
+		m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ),
+		m_playback_accumulated_speed(0),
+		m_playback_accumulated_frames(0)
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -3753,11 +3753,11 @@ void ioport_manager::record_port(ioport_port &port)
 
 ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, astring &errorbuf)
 	: m_owner(owner),
-	  m_portlist(portlist),
-	  m_errorbuf(errorbuf),
-	  m_curport(NULL),
-	  m_curfield(NULL),
-	  m_cursetting(NULL)
+		m_portlist(portlist),
+		m_errorbuf(errorbuf),
+		m_curport(NULL),
+		m_curfield(NULL),
+		m_cursetting(NULL)
 {
 }
 
@@ -3975,9 +3975,9 @@ const char_info *char_info::find(unicode_char target)
 
 dynamic_field::dynamic_field(ioport_field &field)
 	: m_next(NULL),
-	  m_field(field),
-	  m_shift(0),
-	  m_oldval(field.defvalue())
+		m_field(field),
+		m_shift(0),
+		m_oldval(field.defvalue())
 {
 	// fill in the data
 	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
@@ -4033,33 +4033,33 @@ void dynamic_field::write(ioport_value newval)
 
 analog_field::analog_field(ioport_field &field)
 	: m_next(NULL),
-	  m_field(field),
-	  m_shift(0),
-	  m_adjdefvalue(field.defvalue() & field.mask()),
-	  m_adjmin(field.minval() & field.mask()),
-	  m_adjmax(field.maxval() & field.mask()),
-	  m_sensitivity(field.sensitivity()),
-	  m_reverse(field.analog_reverse()),
-	  m_delta(field.delta()),
-	  m_centerdelta(field.centerdelta()),
-	  m_accum(0),
-	  m_previous(0),
-	  m_previousanalog(0),
-	  m_minimum(INPUT_ABSOLUTE_MIN),
-	  m_maximum(INPUT_ABSOLUTE_MAX),
-	  m_center(0),
-	  m_reverse_val(0),
-	  m_scalepos(0),
-	  m_scaleneg(0),
-	  m_keyscalepos(0),
-	  m_keyscaleneg(0),
-	  m_positionalscale(0),
-	  m_absolute(false),
-	  m_wraps(false),
-	  m_autocenter(false),
-	  m_single_scale(false),
-	  m_interpolate(false),
-	  m_lastdigital(false)
+		m_field(field),
+		m_shift(0),
+		m_adjdefvalue(field.defvalue() & field.mask()),
+		m_adjmin(field.minval() & field.mask()),
+		m_adjmax(field.maxval() & field.mask()),
+		m_sensitivity(field.sensitivity()),
+		m_reverse(field.analog_reverse()),
+		m_delta(field.delta()),
+		m_centerdelta(field.centerdelta()),
+		m_accum(0),
+		m_previous(0),
+		m_previousanalog(0),
+		m_minimum(INPUT_ABSOLUTE_MIN),
+		m_maximum(INPUT_ABSOLUTE_MAX),
+		m_center(0),
+		m_reverse_val(0),
+		m_scalepos(0),
+		m_scaleneg(0),
+		m_keyscalepos(0),
+		m_keyscaleneg(0),
+		m_positionalscale(0),
+		m_absolute(false),
+		m_wraps(false),
+		m_autocenter(false),
+		m_single_scale(false),
+		m_interpolate(false),
+		m_lastdigital(false)
 {
 	// compute the shift amount and number of bits
 	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
@@ -4586,5 +4586,3 @@ int validate_natural_keyboard_statics(void)
     return error;
 }
 */
-
-

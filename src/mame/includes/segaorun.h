@@ -52,20 +52,20 @@ public:
 	// construction/destruction
 	segaorun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-		  m_mapper(*this, "mapper"),
-		  m_maincpu(*this, "maincpu"),
-		  m_subcpu(*this, "subcpu"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_i8255(*this, "i8255"),
-		  m_nvram(*this, "nvram"),
-		  m_sprites(*this, "sprites"),
-		  m_workram(*this, "workram"),
-		  m_custom_map(NULL),
-		  m_shangon_video(false),
-		  m_scanline_timer(NULL),
-		  m_irq2_state(0),
-		  m_adc_select(0),
-		  m_vblank_irq_state(0)
+			m_mapper(*this, "mapper"),
+			m_maincpu(*this, "maincpu"),
+			m_subcpu(*this, "subcpu"),
+			m_soundcpu(*this, "soundcpu"),
+			m_i8255(*this, "i8255"),
+			m_nvram(*this, "nvram"),
+			m_sprites(*this, "sprites"),
+			m_workram(*this, "workram"),
+			m_custom_map(NULL),
+			m_shangon_video(false),
+			m_scanline_timer(NULL),
+			m_irq2_state(0),
+			m_adc_select(0),
+			m_vblank_irq_state(0)
 	{ }
 
 	// PPI read/write handlers
@@ -142,14 +142,14 @@ protected:
 	required_shared_ptr<UINT16> m_workram;
 
 	// configuration
-	read16_delegate		m_custom_io_r;
-	write16_delegate	m_custom_io_w;
-	const UINT8 *		m_custom_map;
-	bool				m_shangon_video;
+	read16_delegate     m_custom_io_r;
+	write16_delegate    m_custom_io_w;
+	const UINT8 *       m_custom_map;
+	bool                m_shangon_video;
 
 	// internal state
-	emu_timer *			m_scanline_timer;
-	UINT8				m_irq2_state;
-	UINT8				m_adc_select;
-	UINT8				m_vblank_irq_state;
+	emu_timer *         m_scanline_timer;
+	UINT8               m_irq2_state;
+	UINT8               m_adc_select;
+	UINT8               m_vblank_irq_state;
 };

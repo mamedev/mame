@@ -101,7 +101,7 @@ struct k056832_interface
 	int                deinterleave;
 	k056832_callback   callback;
 
-	const char         *k055555;	// tbyahhoo uses the k056832 together with a k055555
+	const char         *k055555;    // tbyahhoo uses the k056832 together with a k055555
 };
 
 struct k054338_interface
@@ -719,7 +719,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( k007121_ctrl_w );
 /* shall we move source in the interface? */
 /* also notice that now we directly pass *gfx[chip] instead of **gfx !! */
 void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
-						  const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask );
+							const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask );
 
 
 /**  Konami 007342  **/
@@ -836,7 +836,7 @@ DECLARE_READ16_DEVICE_HANDLER( k053244_lsb_r );
 DECLARE_WRITE16_DEVICE_HANDLER( k053244_lsb_w );
 DECLARE_READ16_DEVICE_HANDLER( k053244_word_r );
 DECLARE_WRITE16_DEVICE_HANDLER( k053244_word_w );
-void k053244_bankselect(device_t *device, int bank);	/* used by TMNT2, Asterix and Premier Soccer for ROM testing */
+void k053244_bankselect(device_t *device, int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
 void k053245_sprites_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 void k053245_sprites_draw_lethal(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect); /* for lethal enforcers */
 void k053245_clear_buffer(device_t *device);
@@ -860,8 +860,8 @@ Callback procedures for non-standard shadows:
 2) shift shadow code left by K053247_SHDSHIFT and add the K053247_CUSTOMSHADOW flag
 3) combine the result with sprite color
 */
-#define K053247_CUSTOMSHADOW	0x20000000
-#define K053247_SHDSHIFT		20
+#define K053247_CUSTOMSHADOW    0x20000000
+#define K053247_SHDSHIFT        20
 
 DECLARE_READ8_DEVICE_HANDLER( k053247_r );
 DECLARE_WRITE8_DEVICE_HANDLER( k053247_w );
@@ -917,12 +917,12 @@ void k051316_wraparound_enable(device_t *device, int status);
 
 /**  Konami 053936  **/
 DECLARE_WRITE16_DEVICE_HANDLER( k053936_ctrl_w );
-DECLARE_READ16_DEVICE_HANDLER( k053936_ctrl_r );	// FIXME: this is probably unused... to be checked!
+DECLARE_READ16_DEVICE_HANDLER( k053936_ctrl_r );    // FIXME: this is probably unused... to be checked!
 DECLARE_WRITE16_DEVICE_HANDLER( k053936_linectrl_w );
 DECLARE_READ16_DEVICE_HANDLER( k053936_linectrl_r );
 void k053936_zoom_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);
-void k053936_wraparound_enable(device_t *device, int status);	// shall we merge this into the configuration intf?
-void k053936_set_offset(device_t *device, int xoffs, int yoffs);	// shall we merge this into the configuration intf?
+void k053936_wraparound_enable(device_t *device, int status);   // shall we merge this into the configuration intf?
+void k053936_set_offset(device_t *device, int xoffs, int yoffs);    // shall we merge this into the configuration intf?
 
 
 /**  Konami 053251 **/
@@ -961,7 +961,7 @@ DECLARE_READ8_DEVICE_HANDLER( k051733_r );
 
 
 /**  Konami 056832 **/
-void k056832_SetExtLinescroll(device_t *device);	/* Lethal Enforcers */
+void k056832_SetExtLinescroll(device_t *device);    /* Lethal Enforcers */
 
 DECLARE_READ16_DEVICE_HANDLER( k056832_ram_word_r );
 DECLARE_WRITE16_DEVICE_HANDLER( k056832_ram_word_w );
@@ -1001,8 +1001,8 @@ int  k056832_is_irq_enabled(device_t *device, int irqline);
 void k056832_read_avac(device_t *device, int *mode, int *data);
 int  k056832_read_register(device_t *device, int regnum);
 int k056832_get_current_rambank(device_t *device);
-int k056832_get_lookup(device_t *device, int bits);	/* Asterix */
-void k056832_set_tile_bank(device_t *device, int bank);	/* Asterix */
+int k056832_get_lookup(device_t *device, int bits); /* Asterix */
+void k056832_set_tile_bank(device_t *device, int bank); /* Asterix */
 
 DECLARE_READ32_DEVICE_HANDLER( k056832_ram_long_r );
 DECLARE_READ32_DEVICE_HANDLER( k056832_rom_long_r );
@@ -1013,13 +1013,13 @@ DECLARE_WRITE32_DEVICE_HANDLER( k056832_long_w );
 DECLARE_WRITE32_DEVICE_HANDLER( k056832_b_long_w );
 
 /* bit depths for the 56832 */
-#define K056832_BPP_4	0
-#define K056832_BPP_5	1
-#define K056832_BPP_6	2
-#define K056832_BPP_8	3
-#define K056832_BPP_4dj	4
-#define K056832_BPP_8LE	5
-#define K056832_BPP_8TASMAN	6
+#define K056832_BPP_4   0
+#define K056832_BPP_5   1
+#define K056832_BPP_6   2
+#define K056832_BPP_8   3
+#define K056832_BPP_4dj 4
+#define K056832_BPP_8LE 5
+#define K056832_BPP_8TASMAN 6
 
 /**  Konami 055555  **/
 void k055555_write_reg(device_t *device, UINT8 regnum, UINT8 regdat);
@@ -1031,58 +1031,58 @@ int k055555_get_palette_index(device_t *device, int idx);
 
 /* K055555 registers */
 /* priority inputs */
-#define K55_PALBASE_BG        0	// background palette
-#define K55_CONTROL           1	// control register
-#define K55_COLSEL_0          2	// layer A, B color depth
-#define K55_COLSEL_1          3	// layer C, D color depth
-#define K55_COLSEL_2          4	// object, S1 color depth
-#define K55_COLSEL_3          5	// S2, S3 color depth
+#define K55_PALBASE_BG        0 // background palette
+#define K55_CONTROL           1 // control register
+#define K55_COLSEL_0          2 // layer A, B color depth
+#define K55_COLSEL_1          3 // layer C, D color depth
+#define K55_COLSEL_2          4 // object, S1 color depth
+#define K55_COLSEL_3          5 // S2, S3 color depth
 
-#define K55_PRIINP_0          7	// layer A pri 0
-#define K55_PRIINP_1          8	// layer A pri 1
-#define K55_PRIINP_2          9	// layer A "COLPRI"
-#define K55_PRIINP_3          10	// layer B pri 0
-#define K55_PRIINP_4          11	// layer B pri 1
-#define K55_PRIINP_5          12	// layer B "COLPRI"
-#define K55_PRIINP_6          13	// layer C pri
-#define K55_PRIINP_7          14	// layer D pri
-#define K55_PRIINP_8          15	// OBJ pri
-#define K55_PRIINP_9          16	// sub 1 (GP:PSAC) pri
-#define K55_PRIINP_10         17	// sub 2 (GX:PSAC) pri
-#define K55_PRIINP_11         18	// sub 3 pri
+#define K55_PRIINP_0          7 // layer A pri 0
+#define K55_PRIINP_1          8 // layer A pri 1
+#define K55_PRIINP_2          9 // layer A "COLPRI"
+#define K55_PRIINP_3          10    // layer B pri 0
+#define K55_PRIINP_4          11    // layer B pri 1
+#define K55_PRIINP_5          12    // layer B "COLPRI"
+#define K55_PRIINP_6          13    // layer C pri
+#define K55_PRIINP_7          14    // layer D pri
+#define K55_PRIINP_8          15    // OBJ pri
+#define K55_PRIINP_9          16    // sub 1 (GP:PSAC) pri
+#define K55_PRIINP_10         17    // sub 2 (GX:PSAC) pri
+#define K55_PRIINP_11         18    // sub 3 pri
 
-#define K55_OINPRI_ON         19	// object priority bits selector
+#define K55_OINPRI_ON         19    // object priority bits selector
 
-#define K55_PALBASE_A         23	// layer A palette
-#define K55_PALBASE_B         24	// layer B palette
-#define K55_PALBASE_C         25	// layer C palette
-#define K55_PALBASE_D         26	// layer D palette
-#define K55_PALBASE_OBJ       27	// OBJ palette
-#define K55_PALBASE_SUB1      28	// SUB1 palette
-#define K55_PALBASE_SUB2      29	// SUB2 palette
-#define K55_PALBASE_SUB3      30	// SUB3 palette
+#define K55_PALBASE_A         23    // layer A palette
+#define K55_PALBASE_B         24    // layer B palette
+#define K55_PALBASE_C         25    // layer C palette
+#define K55_PALBASE_D         26    // layer D palette
+#define K55_PALBASE_OBJ       27    // OBJ palette
+#define K55_PALBASE_SUB1      28    // SUB1 palette
+#define K55_PALBASE_SUB2      29    // SUB2 palette
+#define K55_PALBASE_SUB3      30    // SUB3 palette
 
-#define K55_BLEND_ENABLES     33	// blend enables for tilemaps
-#define K55_VINMIX_ON         34	// additional blend enables for tilemaps
-#define K55_OSBLEND_ENABLES   35	// obj/sub blend enables
-#define K55_OSBLEND_ON        36	// not sure, related to obj/sub blend
+#define K55_BLEND_ENABLES     33    // blend enables for tilemaps
+#define K55_VINMIX_ON         34    // additional blend enables for tilemaps
+#define K55_OSBLEND_ENABLES   35    // obj/sub blend enables
+#define K55_OSBLEND_ON        36    // not sure, related to obj/sub blend
 
-#define K55_SHAD1_PRI         37	// shadow/highlight 1 priority
-#define K55_SHAD2_PRI         38	// shadow/highlight 2 priority
-#define K55_SHAD3_PRI         39	// shadow/highlight 3 priority
-#define K55_SHD_ON            40	// shadow/highlight
-#define K55_SHD_PRI_SEL       41	// shadow/highlight
+#define K55_SHAD1_PRI         37    // shadow/highlight 1 priority
+#define K55_SHAD2_PRI         38    // shadow/highlight 2 priority
+#define K55_SHAD3_PRI         39    // shadow/highlight 3 priority
+#define K55_SHD_ON            40    // shadow/highlight
+#define K55_SHD_PRI_SEL       41    // shadow/highlight
 
-#define K55_VBRI              42	// VRAM layer brightness enable
-#define K55_OSBRI             43	// obj/sub brightness enable, part 1
-#define K55_OSBRI_ON          44	// obj/sub brightness enable, part 2
-#define K55_INPUT_ENABLES     45	// input enables
+#define K55_VBRI              42    // VRAM layer brightness enable
+#define K55_OSBRI             43    // obj/sub brightness enable, part 1
+#define K55_OSBRI_ON          44    // obj/sub brightness enable, part 2
+#define K55_INPUT_ENABLES     45    // input enables
 
 /* bit masks for the control register */
-#define K55_CTL_GRADDIR       0x01	// 0=vertical, 1=horizontal
-#define K55_CTL_GRADENABLE    0x02	// 0=BG is base color only, 1=gradient
-#define K55_CTL_FLIPPRI       0x04	// 0=standard Konami priority, 1=reverse
-#define K55_CTL_SDSEL         0x08	// 0=normal shadow timing, 1=(not used by GX)
+#define K55_CTL_GRADDIR       0x01  // 0=vertical, 1=horizontal
+#define K55_CTL_GRADENABLE    0x02  // 0=BG is base color only, 1=gradient
+#define K55_CTL_FLIPPRI       0x04  // 0=standard Konami priority, 1=reverse
+#define K55_CTL_SDSEL         0x08  // 0=normal shadow timing, 1=(not used by GX)
 
 /* bit masks for the input enables */
 #define K55_INP_VRAM_A        0x01
@@ -1101,26 +1101,26 @@ int k055555_get_palette_index(device_t *device, int idx);
 DECLARE_WRITE16_DEVICE_HANDLER( k054338_word_w ); // "CLCT" registers
 DECLARE_WRITE32_DEVICE_HANDLER( k054338_long_w );
 int k054338_register_r(device_t *device, int reg);
-void k054338_update_all_shadows(device_t *device, int rushingheroes_hack);			// called at the beginning of SCREEN_UPDATE()
-void k054338_fill_solid_bg(device_t *device, bitmap_ind16 &bitmap);				// solid backcolor fill
-void k054338_fill_backcolor(device_t *device, bitmap_rgb32 &bitmap, int mode);	// unified fill, 0=solid, 1=gradient (by using a k055555)
-int  k054338_set_alpha_level(device_t *device, int pblend);							// blend style 0-2
-void k054338_invert_alpha(device_t *device, int invert);								// 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
+void k054338_update_all_shadows(device_t *device, int rushingheroes_hack);          // called at the beginning of SCREEN_UPDATE()
+void k054338_fill_solid_bg(device_t *device, bitmap_ind16 &bitmap);             // solid backcolor fill
+void k054338_fill_backcolor(device_t *device, bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient (by using a k055555)
+int  k054338_set_alpha_level(device_t *device, int pblend);                         // blend style 0-2
+void k054338_invert_alpha(device_t *device, int invert);                                // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
 //void K054338_export_config(device_t *device, int **shdRGB);
 
-#define K338_REG_BGC_R		0
-#define K338_REG_BGC_GB		1
-#define K338_REG_SHAD1R		2
-#define K338_REG_BRI3		11
-#define K338_REG_PBLEND		13
-#define K338_REG_CONTROL	15
+#define K338_REG_BGC_R      0
+#define K338_REG_BGC_GB     1
+#define K338_REG_SHAD1R     2
+#define K338_REG_BRI3       11
+#define K338_REG_PBLEND     13
+#define K338_REG_CONTROL    15
 
-#define K338_CTL_KILL		0x01	/* 0 = no video output, 1 = enable */
-#define K338_CTL_MIXPRI		0x02
-#define K338_CTL_SHDPRI		0x04
-#define K338_CTL_BRTPRI		0x08
-#define K338_CTL_WAILSL		0x10
-#define K338_CTL_CLIPSL		0x20
+#define K338_CTL_KILL       0x01    /* 0 = no video output, 1 = enable */
+#define K338_CTL_MIXPRI     0x02
+#define K338_CTL_SHDPRI     0x04
+#define K338_CTL_BRTPRI     0x08
+#define K338_CTL_WAILSL     0x10
+#define K338_CTL_CLIPSL     0x20
 
 
 /**  Konami 001006  **/

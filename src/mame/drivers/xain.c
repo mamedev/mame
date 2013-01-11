@@ -143,10 +143,10 @@ Updates by Bryan McPhail, 12/12/2004:
 #include "sound/2203intf.h"
 #include "includes/xain.h"
 
-#define MASTER_CLOCK		XTAL_12MHz
-#define CPU_CLOCK			MASTER_CLOCK / 8
-#define MCU_CLOCK			MASTER_CLOCK / 4
-#define PIXEL_CLOCK			MASTER_CLOCK / 2
+#define MASTER_CLOCK        XTAL_12MHz
+#define CPU_CLOCK           MASTER_CLOCK / 8
+#define MCU_CLOCK           MASTER_CLOCK / 4
+#define PIXEL_CLOCK         MASTER_CLOCK / 2
 
 
 /*
@@ -199,7 +199,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xain_state::xain_scanline)
 	}
 
 	/* VBLANK input bit is held high from scanlines 248-255 */
-	if (vcount >= 248-1)	// -1 is a hack - see notes above
+	if (vcount >= 248-1)    // -1 is a hack - see notes above
 	{
 		m_vblank = 1;
 	}
@@ -465,46 +465,46 @@ static INPUT_PORTS_START( xsleena )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "Slow" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, "Fast" )
 	PORT_DIPSETTING(    0x00, "Very Fast" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "20k 70k and every 70k" )
 	PORT_DIPSETTING(    0x20, "30k 80k and every 80k" )
 	PORT_DIPSETTING(    0x10, "20k and 80k" )
 	PORT_DIPSETTING(    0x00, "30k and 80k" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0xc0, "3")
 	PORT_DIPSETTING(    0x80, "4")
 	PORT_DIPSETTING(    0x40, "6")
@@ -514,7 +514,7 @@ static INPUT_PORTS_START( xsleena )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
 	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state,mcu_status_r, NULL)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state,xain_vblank_r, NULL)	/* VBLANK */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state,xain_vblank_r, NULL)   /* VBLANK */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -542,10 +542,10 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( xain )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )	/* 8x8 text */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 256, 8 )	/* 16x16 Background */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 384, 8 )	/* 16x16 Background */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 128, 8 )	/* Sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )    /* 8x8 text */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 256, 8 )    /* 16x16 Background */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 384, 8 )    /* 16x16 Background */
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 128, 8 )    /* Sprites */
 GFXDECODE_END
 
 
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)	/* based on ddragon driver */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   /* based on ddragon driver */
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update_xain)
 
 	MCFG_GFXDECODE(xain)

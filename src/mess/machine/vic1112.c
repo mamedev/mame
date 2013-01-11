@@ -15,8 +15,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6522_0_TAG		"u4"
-#define M6522_1_TAG		"u5"
+#define M6522_0_TAG     "u4"
+#define M6522_1_TAG     "u5"
 
 
 
@@ -59,18 +59,18 @@ READ8_MEMBER( vic1112_device::via0_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0
-        PB1
-        PB2
-        PB3     _EOI
-        PB4     _DAV IN
-        PB5     _NRFD IN
-        PB6     _NDAC IN
-        PB7     _ATN IN
+	    PB0
+	    PB1
+	    PB2
+	    PB3     _EOI
+	    PB4     _DAV IN
+	    PB5     _NRFD IN
+	    PB6     _NDAC IN
+	    PB7     _ATN IN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -87,18 +87,18 @@ WRITE8_MEMBER( vic1112_device::via0_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        PB0     _DAV OUT
-        PB1     _NRFD OUT
-        PB2     _NDAC OUT
-        PB3
-        PB4
-        PB5
-        PB6
-        PB7
+	    PB0     _DAV OUT
+	    PB1     _NRFD OUT
+	    PB2     _NDAC OUT
+	    PB3
+	    PB4
+	    PB5
+	    PB6
+	    PB7
 
-    */
+	*/
 
 	m_bus->dav_w(BIT(data, 0));
 	m_bus->nrfd_w(BIT(data, 1));
@@ -189,11 +189,11 @@ machine_config_constructor vic1112_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, VIC1112, "VIC1112", tag, owner, clock),
-	  device_vic20_expansion_card_interface(mconfig, *this),
-	  m_via0(*this, M6522_0_TAG),
-	  m_via1(*this, M6522_1_TAG),
-	  m_bus(*this, IEEE488_TAG)
+	: device_t(mconfig, VIC1112, "VIC1112", tag, owner, clock),
+		device_vic20_expansion_card_interface(mconfig, *this),
+		m_via0(*this, M6522_0_TAG),
+		m_via1(*this, M6522_1_TAG),
+		m_bus(*this, IEEE488_TAG)
 {
 }
 

@@ -6,7 +6,7 @@ Support for TRS80 .cas cassette images
 
 #include "formats/trs_cas.h"
 
-#define SILENCE	0
+#define SILENCE 0
 #define SMPLO   -32768
 #define SMPHI   32767
 
@@ -46,15 +46,15 @@ INLINE int trs80l2_cas_cycle(INT16 *buffer, int sample_pos, int silence, int hig
 
 static int trs80l2_handle_cas(INT16 *buffer, const UINT8 *casdata)
 {
-	int	data_pos, sample_count;
+	int data_pos, sample_count;
 
 	data_pos = 0;
 	sample_count = 0;
 
 	while( data_pos < cas_size )
 	{
-		UINT8	data = casdata[data_pos];
-		int		i;
+		UINT8   data = casdata[data_pos];
+		int     i;
 
 		for ( i = 0; i < 8; i++ )
 		{
@@ -97,13 +97,13 @@ static int trs80l2_cas_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller trs80l2_cas_legacy_fill_wave =
 {
-	trs80l2_cas_fill_wave,					/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	trs80l2_cas_to_wav_size,				/* chunk_sample_calc */
-	44100,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	trs80l2_cas_fill_wave,                  /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	trs80l2_cas_to_wav_size,                /* chunk_sample_calc */
+	44100,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 
@@ -131,4 +131,3 @@ static const struct CassetteFormat trs80l2_cas_format =
 CASSETTE_FORMATLIST_START(trs80l2_cassette_formats)
 	CASSETTE_FORMAT(trs80l2_cas_format)
 CASSETTE_FORMATLIST_END
-

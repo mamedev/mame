@@ -94,7 +94,7 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 	m_flipscreen = *m_vreg & 0x04;
 
 	/* copy the background graphics */
-	if (*m_vreg & 0x40)		/* background disable */
+	if (*m_vreg & 0x40)     /* background disable */
 		bitmap.fill(0, cliprect);
 	else
 	{
@@ -125,14 +125,14 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 				UINT32 LS283;
 				UINT32 prom_data;
 
-				LS283 =	scroll_h + h;
+				LS283 = scroll_h + h;
 
 				if (!map_v_scr_100)
 				{
 					if (h & 0x80)
-						LS283 =	LS283 + (rom18B[ map_v_scr_1fe_6 + (h ^ 0xff) ] ^ 0xff);
+						LS283 = LS283 + (rom18B[ map_v_scr_1fe_6 + (h ^ 0xff) ] ^ 0xff);
 					else
-						LS283 =	LS283 + rom18B[ map_v_scr_1fe_6 + h ] + 0xff01;
+						LS283 = LS283 + rom18B[ map_v_scr_1fe_6 + h ] + 0xff01;
 				}
 
 				prom_data = m_prom_tab[ (LS283 >> 6) & 0xff ];
@@ -197,7 +197,7 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 				flipy = !flipy;
 			}
 
-			if (code & 0x80)	/* sprite bankswitch */
+			if (code & 0x80)    /* sprite bankswitch */
 				code += (*m_vreg & 0x30) * 0x8;
 
 			drawgfx_transmask(bitmap, cliprect, machine().gfx[1],
@@ -209,7 +209,7 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 		}
 	}
 
-	if (!(*m_vreg & 0x40))		/* background disable */
+	if (!(*m_vreg & 0x40))      /* background disable */
 		copybitmap_trans(bitmap, m_bitmap, m_flipscreen,m_flipscreen,0,0, cliprect, 0);
 
 	/* draw the foreground characters */

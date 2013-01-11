@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	MPEG audio support.  Only layer2 and variants for now.
+    MPEG audio support.  Only layer2 and variants for now.
 
 ***************************************************************************/
 
@@ -46,8 +46,8 @@ public:
 	// 1152 in the amm case, <1152 indicating end of stream).
 
 	bool decode_buffer(int &pos, int limit, short *output,
-					   int &output_samples, int &sample_rate, int &channels);
-	
+						int &output_samples, int &sample_rate, int &channels);
+
 
 	// Change the base pointer
 	void set_base(const void *base);

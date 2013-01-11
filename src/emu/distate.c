@@ -80,13 +80,13 @@ const UINT64 device_state_entry::k_decimal_divisor[] =
 
 device_state_entry::device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size)
 	: m_next(NULL),
-	  m_index(index),
-	  m_datamask(0),
-	  m_datasize(size),
-	  m_flags(0),
-	  m_symbol(symbol),
-	  m_default_format(true),
-	  m_sizemask(0)
+		m_index(index),
+		m_datamask(0),
+		m_datasize(size),
+		m_flags(0),
+		m_symbol(symbol),
+		m_default_format(true),
+		m_sizemask(0)
 {
 	// set the data pointer
 	m_dataptr.v = dataptr;
@@ -166,10 +166,10 @@ UINT64 device_state_entry::value() const
 	switch (m_datasize)
 	{
 		default:
-		case 1:	result = *m_dataptr.u8;		break;
-		case 2:	result = *m_dataptr.u16;	break;
-		case 4:	result = *m_dataptr.u32;	break;
-		case 8:	result = *m_dataptr.u64;	break;
+		case 1: result = *m_dataptr.u8;     break;
+		case 2: result = *m_dataptr.u16;    break;
+		case 4: result = *m_dataptr.u32;    break;
+		case 8: result = *m_dataptr.u64;    break;
 	}
 	return result & m_datamask;
 }
@@ -231,8 +231,8 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 				break;
 
 			// 1-9 accumulate into the width
-			case '1':	case '2':	case '3':	case '4':	case '5':
-			case '6':	case '7':	case '8':	case '9':
+			case '1':   case '2':   case '3':   case '4':   case '5':
+			case '6':   case '7':   case '8':   case '9':
 				width = width * 10 + (*fptr - '0');
 				break;
 
@@ -355,10 +355,10 @@ void device_state_entry::set_value(UINT64 value) const
 	switch (m_datasize)
 	{
 		default:
-		case 1:	*m_dataptr.u8 = value;		break;
-		case 2:	*m_dataptr.u16 = value;		break;
-		case 4:	*m_dataptr.u32 = value;		break;
-		case 8:	*m_dataptr.u64 = value;		break;
+		case 1: *m_dataptr.u8 = value;      break;
+		case 2: *m_dataptr.u16 = value;     break;
+		case 4: *m_dataptr.u32 = value;     break;
+		case 8: *m_dataptr.u64 = value;     break;
 	}
 }
 

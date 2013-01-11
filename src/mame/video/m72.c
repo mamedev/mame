@@ -262,7 +262,7 @@ READ16_MEMBER(m72_state::m72_palette1_r)
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return m_generic_paletteram_16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return m_generic_paletteram_16[offset] | 0xffe0;    /* only D0-D4 are connected */
 }
 
 READ16_MEMBER(m72_state::m72_palette2_r)
@@ -270,7 +270,7 @@ READ16_MEMBER(m72_state::m72_palette2_r)
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return m_generic_paletteram2_16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return m_generic_paletteram2_16[offset] | 0xffe0;   /* only D0-D4 are connected */
 }
 
 INLINE void changecolor(running_machine &machine,int color,int r,int g,int b)

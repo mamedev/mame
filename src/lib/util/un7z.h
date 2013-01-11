@@ -59,8 +59,8 @@ void SZipFreeTemp(void *p, void *address);
 struct CSzFile
 {
 	long _7z_currfpos;
-	UINT64			_7z_length;
-	osd_file *		_7z_osdfile;					/* OSD file handle */
+	UINT64          _7z_length;
+	osd_file *      _7z_osdfile;                    /* OSD file handle */
 
 };
 
@@ -121,11 +121,11 @@ enum _7z_error
 /* describes an open _7Z file */
 struct  _7z_file
 {
-	const char *	filename;				/* copy of _7Z filename (for caching) */
+	const char *    filename;               /* copy of _7Z filename (for caching) */
 
-	int	curr_file_idx;						/* current file index */
-	UINT64 uncompressed_length;				/* current file uncompressed length */
-	UINT64 crc;								/* current file crc */
+	int curr_file_idx;                      /* current file index */
+	UINT64 uncompressed_length;             /* current file uncompressed length */
+	UINT64 crc;                             /* current file crc */
 
 	CFileInStream archiveStream;
 	CLookToRead lookStream;
@@ -169,4 +169,4 @@ int _7z_search_crc_match(_7z_file *new_7z, UINT32 crc, const char *search_filena
 _7z_error _7z_file_decompress(_7z_file *_7z, void *buffer, UINT32 length);
 
 
-#endif	/* __UN_7Z_H__ */
+#endif  /* __UN_7Z_H__ */

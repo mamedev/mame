@@ -252,7 +252,7 @@ static void equites_draw_sprites_block( running_machine &machine, bitmap_ind16 &
 	for (offs = end - 2; offs >= start; offs -= 2)
 	{
 		int attr = state->m_spriteram[offs + 1];
-		if (!(attr & 0x800))	// disable or x MSB?
+		if (!(attr & 0x800))    // disable or x MSB?
 		{
 			int tile = attr & 0x1ff;
 			int fx = ~attr & 0x400;
@@ -328,7 +328,7 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 	// note that sprites are actually 30x30, contained in 32x32 squares. The outer edge is not used.
 
-	for (offs = 0x3f; offs < 0x6f; offs += 2)	// 24 sprites
+	for (offs = 0x3f; offs < 0x6f; offs += 2)   // 24 sprites
 	{
 		int data = state->m_spriteram[offs];
 		int fx = (data & 0x2000) >> 13;
@@ -366,7 +366,7 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			int const line = yromline[yy];
 			int yhalf;
 
-			for (yhalf = 0; yhalf < 2; ++yhalf)	// top or bottom half
+			for (yhalf = 0; yhalf < 2; ++yhalf) // top or bottom half
 			{
 				int const y = yhalf ? sy + 1 + yy : sy - yy;
 
@@ -378,7 +378,7 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 						if (bx >= cliprect.min_x && bx <= cliprect.max_x)
 						{
-							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;	// FIXME This is wrong. Should use the PROM.
+							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;   // FIXME This is wrong. Should use the PROM.
 							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line) ) * gfx->rowbytes();
 
 							int pen = srcgfx[offset];

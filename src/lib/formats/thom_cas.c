@@ -31,8 +31,8 @@
 
 #define PRINT(x) printf x
 
-#define LOG(x)	do { if (VERBOSE > 0) printf x; } while (0)
-#define VLOG(x)	do { if (VERBOSE > 1) printf x; } while (0)
+#define LOG(x)  do { if (VERBOSE > 0) printf x; } while (0)
+#define VLOG(x) do { if (VERBOSE > 1) printf x; } while (0)
 
 
 #define TO7_BIT_LENGTH 0.001114
@@ -127,75 +127,75 @@ static casserr_t to7_k7_load( cassette_image *cass )
 #define K7_PUT( PERIOD )
 #else
 #define K7_PUT( PERIOD ) \
-	do								\
-	{								\
-		casserr_t err;						\
+	do                              \
+	{                               \
+		casserr_t err;                      \
 		err = cassette_put_samples( cass, 0, time, (PERIOD), 2, 1, \
-					    square_wave, CASSETTE_WAVEFORM_8BIT ); \
-		if ( err )						\
-			return err;					\
-		time += (PERIOD);					\
+						square_wave, CASSETTE_WAVEFORM_8BIT ); \
+		if ( err )                      \
+			return err;                 \
+		time += (PERIOD);                   \
 	} while (0)
 #endif
 
 /* store one bit */
 #define K7_PUT_BIT( BIT ) \
-	do								\
-	{								\
-		int b;							\
-		if ( BIT )						\
-		{							\
-			for ( b = 0; b < 7; b++ )			\
-				K7_PUT( TO7_PERIOD_CASS_1 );		\
-		}							\
-		else							\
-		{							\
-			for ( b = 0; b < 5; b++ )			\
-				K7_PUT( TO7_PERIOD_CASS_0 );		\
-		}							\
-		if ( to7_k7_bitsize + 1 >= bitmax )			\
-		{							\
-			UINT8* a = (UINT8*)malloc(bitmax * 2);		\
-			memcpy ( a, to7_k7_bits, bitmax );		\
-			bitmax *= 2;					\
-			to7_k7_bits = a;				\
-		}							\
-		to7_k7_bits[ to7_k7_bitsize++ ] = (BIT);		\
+	do                              \
+	{                               \
+		int b;                          \
+		if ( BIT )                      \
+		{                           \
+			for ( b = 0; b < 7; b++ )           \
+				K7_PUT( TO7_PERIOD_CASS_1 );        \
+		}                           \
+		else                            \
+		{                           \
+			for ( b = 0; b < 5; b++ )           \
+				K7_PUT( TO7_PERIOD_CASS_0 );        \
+		}                           \
+		if ( to7_k7_bitsize + 1 >= bitmax )         \
+		{                           \
+			UINT8* a = (UINT8*)malloc(bitmax * 2);      \
+			memcpy ( a, to7_k7_bits, bitmax );      \
+			bitmax *= 2;                    \
+			to7_k7_bits = a;                \
+		}                           \
+		to7_k7_bits[ to7_k7_bitsize++ ] = (BIT);        \
 	} while (0)
 
 /* store one byte, with start / stop bits */
 #define K7_PUT_BYTE( BYTE ) \
-	do							\
-	{							\
-		UINT8 x;					\
-		K7_PUT_BIT( 0 );				\
-		for ( x = 0; x < 8; x++ )			\
-			K7_PUT_BIT( ( (BYTE) >> x ) & 1 );	\
-		K7_PUT_BIT( 1 );				\
-		K7_PUT_BIT( 1 );				\
+	do                          \
+	{                           \
+		UINT8 x;                    \
+		K7_PUT_BIT( 0 );                \
+		for ( x = 0; x < 8; x++ )           \
+			K7_PUT_BIT( ( (BYTE) >> x ) & 1 );  \
+		K7_PUT_BIT( 1 );                \
+		K7_PUT_BIT( 1 );                \
 	} while (0)
 
 #define K7_FILL_1( SIZE ) \
-	do								\
-	{								\
-		if ( (SIZE) > 0 ) {					\
-			int ii;						\
+	do                              \
+	{                               \
+		if ( (SIZE) > 0 ) {                 \
+			int ii;                     \
 			LOG (( "to7_k7_load: 1-filler size=%i bitstart=%i\n", \
-			       (SIZE), to7_k7_bitsize ));		\
+					(SIZE), to7_k7_bitsize ));      \
 			for ( ii = 0; ii < (SIZE); ii++ ) K7_PUT_BIT( 1 ); \
-		}							\
+		}                           \
 	} while (0)
 
 #define K7_FILL_ff( SIZE ) \
-	do								\
-	{								\
-		if ( (SIZE) > 0 )					\
-		{							\
-			int ii;						\
+	do                              \
+	{                               \
+		if ( (SIZE) > 0 )                   \
+		{                           \
+			int ii;                     \
 			LOG (( "to7_k7_load: 0xff filler size=%i bitstart=%i\n",  (SIZE), to7_k7_bitsize )); \
-			for ( ii = 0; ii < (SIZE); ii++ )		\
-				K7_PUT_BYTE( 0xff );			\
-		}							\
+			for ( ii = 0; ii < (SIZE); ii++ )       \
+				K7_PUT_BYTE( 0xff );            \
+		}                           \
 	} while (0)
 
 	/* check format */
@@ -241,8 +241,8 @@ static casserr_t to7_k7_load( cassette_image *cass )
 		{
 			cassette_image_read( cass, &in, pos, 1 );
 			/* actually, we are bit laxist and treat as 0xff bytes with at least
-               5 bits out of 8 set to 1
-            */
+			   5 bits out of 8 set to 1
+			*/
 			for ( i = 0; in; in >>= 1 )
 				i += (in & 1);
 			if ( i < 5 )
@@ -299,10 +299,10 @@ static casserr_t to7_k7_load( cassette_image *cass )
 					name[i] = '?';
 			}
 			PRINT (( "to7_k7_load: file \"%s\" type=%s,%s at %imn %is\n",
-				 name,
-				 (t==0) ? "bas" : (t==1) ? "dat" : (t==2) ? "bin" : "???",
-				 (u == 0) ? "a" : (u == 0xff) ? "b" : "?",
-				 p / 60, p % 60 ));
+					name,
+					(t==0) ? "bas" : (t==1) ? "dat" : (t==2) ? "bin" : "???",
+					(u == 0) ? "a" : (u == 0xff) ? "b" : "?",
+					p / 60, p % 60 ));
 		}
 
 		/* extra 1-fillers */
@@ -311,8 +311,8 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	}
 
 	/* trailing data with invalid block structure
-       => dump it in a raw form, but stay alert for hidden block starts
-    */
+	   => dump it in a raw form, but stay alert for hidden block starts
+	*/
 	if ( pos < size )
 	{
 		invalid++;
@@ -373,7 +373,7 @@ static const struct CassetteFormat to7_k7 =
 
 
 static casserr_t to7_wav_identify ( cassette_image *cass,
-				    struct CassetteOptions *opts )
+					struct CassetteOptions *opts )
 {
 	casserr_t e = wavfile_format.identify( cass, opts );
 	return e;
@@ -401,9 +401,9 @@ static casserr_t to7_wav_load ( cassette_image *cass )
 	len = (double) info.sample_count / info.sample_frequency;
 
 	PRINT (( "to7_wav_load: loading cassette, length %imn %is, %i Hz, %i bps, %i bits\n",
-		 (int) len / 60, (int) len % 60,
-		 info.sample_frequency, info.bits_per_sample,
-		 (int) (len / TO7_BIT_LENGTH) ));
+			(int) len / 60, (int) len % 60,
+			info.sample_frequency, info.bits_per_sample,
+			(int) (len / TO7_BIT_LENGTH) ));
 
 	return CASSETTE_ERROR_SUCCESS;
 }
@@ -430,7 +430,7 @@ static const struct CassetteFormat to7_wav =
 
 
 static casserr_t mo5_k5_identify ( cassette_image *cass,
-				   struct CassetteOptions *opts )
+					struct CassetteOptions *opts )
 {
 	opts -> bits_per_sample = 8;
 	opts -> channels = 1;
@@ -471,64 +471,64 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 	PRINT (( "mo5_k5_load: open cassette, length: %li bytes\n", (long) size ));
 
 	/* store a half-bit */
-#define K5_PUT_HBIT							\
-	do								\
-	{								\
+#define K5_PUT_HBIT                         \
+	do                              \
+	{                               \
 		cassette_put_sample ( cass, 0, hbitsize * MO5_HBIT_LENGTH, MO5_HBIT_LENGTH, (hbit ? 1 : -1) << 30 ); \
-		hbitsize++;						\
+		hbitsize++;                     \
 	} while ( 0 )
 
 	/* store one bit */
-#define K5_PUT_BIT( BIT )			\
-	do					\
-	{					\
-		if ( BIT )			\
-		{				\
-			K5_PUT_HBIT;		\
-			hbit = !hbit;		\
-			K5_PUT_HBIT;		\
-		}				\
-		else				\
-		{				\
-			K5_PUT_HBIT;		\
-			K5_PUT_HBIT;		\
-		}				\
-		hbit = !hbit;			\
+#define K5_PUT_BIT( BIT )           \
+	do                  \
+	{                   \
+		if ( BIT )          \
+		{               \
+			K5_PUT_HBIT;        \
+			hbit = !hbit;       \
+			K5_PUT_HBIT;        \
+		}               \
+		else                \
+		{               \
+			K5_PUT_HBIT;        \
+			K5_PUT_HBIT;        \
+		}               \
+		hbit = !hbit;           \
 	} while (0)
 
 	/* store one byte, no start / stop bit, converse order from TO7 */
 #define K5_PUT_BYTE( BYTE ) \
-	do							\
-	{							\
-		UINT8 b = BYTE;					\
-		int x;						\
-		for ( x = 0; x < 8; x++ )			\
-			K5_PUT_BIT( (b >> (7 - x)) & 1 );	\
+	do                          \
+	{                           \
+		UINT8 b = BYTE;                 \
+		int x;                      \
+		for ( x = 0; x < 8; x++ )           \
+			K5_PUT_BIT( (b >> (7 - x)) & 1 );   \
 	} while (0)
 
 	/* store filler */
 #define K5_FILL_0( SIZE ) \
-	do								\
-	{								\
-		if ( (SIZE) > 0 )					\
-		{							\
-			int j;						\
+	do                              \
+	{                               \
+		if ( (SIZE) > 0 )                   \
+		{                           \
+			int j;                      \
 			LOG (( "mo5_k5_load: 0-filler size=%i hbitstart=%i\n", (SIZE), hbitsize )); \
-			for ( j = 0; j < (SIZE); j++ )			\
-				K5_PUT_BIT( 0 );			\
-		}							\
+			for ( j = 0; j < (SIZE); j++ )          \
+				K5_PUT_BIT( 0 );            \
+		}                           \
 	} while (0)
 
-#define K5_FILL_01( SIZE )						\
-	do								\
-	{								\
-		if ( (SIZE) > 0 )					\
-		{							\
-			int j;						\
+#define K5_FILL_01( SIZE )                      \
+	do                              \
+	{                               \
+		if ( (SIZE) > 0 )                   \
+		{                           \
+			int j;                      \
 			LOG (( "mo5_k5_load: 0x01 filler size=%i bitstart=%i\n", (SIZE), hbitsize )); \
-			for ( j = 0; j < (SIZE); j++ )			\
-				K5_PUT_BYTE( 0x01 );			\
-		}							\
+			for ( j = 0; j < (SIZE); j++ )          \
+				K5_PUT_BYTE( 0x01 );            \
+		}                           \
 	} while (0)
 
 	/* check format */
@@ -645,10 +645,10 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 					name[i] = '?';
 			}
 			PRINT (( "mo5_k5_load: file \"%s\" type=%s,%s at %imn %is\n",
-				 name,
-				 (t==0) ? "bas" : (t==1) ? "dat" : (t==2) ? "bin" : "???",
-				 (u == 0) ? "a" : (u == 0xff) ? "b" : "?",
-				 p / 60, p % 60 ));
+					name,
+					(t==0) ? "bas" : (t==1) ? "dat" : (t==2) ? "bin" : "???",
+					(u == 0) ? "a" : (u == 0xff) ? "b" : "?",
+					p / 60, p % 60 ));
 		}
 
 		/* 0-fillers */
@@ -737,7 +737,7 @@ static const struct CassetteFormat mo5_k5 =
 
 
 static casserr_t mo5_wav_identify ( cassette_image *cass,
-			     struct CassetteOptions *opts )
+					struct CassetteOptions *opts )
 {
 	casserr_t e = wavfile_format.identify( cass, opts );
 	return e;

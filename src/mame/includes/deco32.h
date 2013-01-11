@@ -120,10 +120,10 @@ class dragngun_state : public deco32_state
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag),
-		  m_dragngun_sprite_layout_0_ram(*this, "dragngun_lay0"),
-		  m_dragngun_sprite_layout_1_ram(*this, "dragngun_lay1"),
-		  m_dragngun_sprite_lookup_0_ram(*this, "dragngun_look0"),
-		  m_dragngun_sprite_lookup_1_ram(*this, "dragngun_look1") { }
+			m_dragngun_sprite_layout_0_ram(*this, "dragngun_lay0"),
+			m_dragngun_sprite_layout_1_ram(*this, "dragngun_lay1"),
+			m_dragngun_sprite_lookup_0_ram(*this, "dragngun_look0"),
+			m_dragngun_sprite_lookup_1_ram(*this, "dragngun_look1") { }
 
 	required_shared_ptr<UINT32> m_dragngun_sprite_layout_0_ram;
 	required_shared_ptr<UINT32> m_dragngun_sprite_layout_1_ram;

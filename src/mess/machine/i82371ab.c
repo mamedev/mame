@@ -21,7 +21,7 @@ const device_type I82371AB = &device_creator<i82371ab_device>;
 
 
 i82371ab_device::i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : southbridge_device(mconfig, I82371AB, "Intel 82371AB", tag, owner, clock),
+		: southbridge_device(mconfig, I82371AB, "Intel 82371AB", tag, owner, clock),
 		pci_device_interface( mconfig, *this )
 {
 }
@@ -260,4 +260,3 @@ void i82371ab_device::device_reset()
 	regs32[3][0x08] = 0x06800000;
 	regs32[3][0x0c] = 0x02800000;
 }
-

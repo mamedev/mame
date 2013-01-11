@@ -43,4 +43,3 @@ protected:
 };
 
 static const device_type DECO_C10707 = &device_creator<deco_c10707_device>;
-

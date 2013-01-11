@@ -43,4 +43,3 @@ UINT32 ondra_state::screen_update_ondra(screen_device &screen, bitmap_ind16 &bit
 	}
 	return 0;
 }
-

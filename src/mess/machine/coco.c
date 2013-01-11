@@ -66,7 +66,7 @@ DAC and bitbanger values written should be reflected in the read.
 //  CONSTANTS
 //**************************************************************************
 
-#define LOG_INTERRUPTS		0
+#define LOG_INTERRUPTS      0
 
 
 
@@ -365,18 +365,18 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 
 const pia6821_interface coco_state::pia0_config =
 {
-	DEVCB_NULL,													/* port A input */
-	DEVCB_NULL,													/* port B input */
-	DEVCB_NULL,													/* CA1 input */
-	DEVCB_NULL,													/* CB1 input */
-	DEVCB_NULL,													/* CA2 input */
-	DEVCB_NULL,													/* CB2 input */
-	DEVCB_DRIVER_MEMBER(coco_state, pia0_pa_w),					/* port A output */
-	DEVCB_DRIVER_MEMBER(coco_state, pia0_pb_w),					/* port B output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_ca2_w),			/* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_cb2_w),			/* CB2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_irq_a),			/* IRQA output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_irq_b)			/* IRQB output */
+	DEVCB_NULL,                                                 /* port A input */
+	DEVCB_NULL,                                                 /* port B input */
+	DEVCB_NULL,                                                 /* CA1 input */
+	DEVCB_NULL,                                                 /* CB1 input */
+	DEVCB_NULL,                                                 /* CA2 input */
+	DEVCB_NULL,                                                 /* CB2 input */
+	DEVCB_DRIVER_MEMBER(coco_state, pia0_pa_w),                 /* port A output */
+	DEVCB_DRIVER_MEMBER(coco_state, pia0_pb_w),                 /* port B output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_ca2_w),           /* CA2 output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_cb2_w),           /* CB2 output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_irq_a),           /* IRQA output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_irq_b)            /* IRQB output */
 };
 
 
@@ -546,18 +546,18 @@ WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
 
 const pia6821_interface coco_state::pia1_config =
 {
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pa_r),					/* port A input */
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pb_r),					/* port B input */
-	DEVCB_NULL,													/* CA1 input */
-	DEVCB_NULL,													/* CB1 input */
-	DEVCB_NULL,													/* CA2 input */
-	DEVCB_NULL,													/* CB2 input */
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pa_w),					/* port A output */
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pb_w),					/* port B output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_ca2_w),			/* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_cb2_w),			/* CB2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_firq_a),			/* IRQA output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_firq_b)			/* IRQB output */
+	DEVCB_DRIVER_MEMBER(coco_state, pia1_pa_r),                 /* port A input */
+	DEVCB_DRIVER_MEMBER(coco_state, pia1_pb_r),                 /* port B input */
+	DEVCB_NULL,                                                 /* CA1 input */
+	DEVCB_NULL,                                                 /* CB1 input */
+	DEVCB_NULL,                                                 /* CA2 input */
+	DEVCB_NULL,                                                 /* CB2 input */
+	DEVCB_DRIVER_MEMBER(coco_state, pia1_pa_w),                 /* port A output */
+	DEVCB_DRIVER_MEMBER(coco_state, pia1_pb_w),                 /* port B output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_ca2_w),           /* CA2 output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_cb2_w),           /* CB2 output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_firq_a),          /* IRQA output */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_firq_b)           /* IRQB output */
 };
 
 
@@ -672,11 +672,11 @@ coco_state::soundmux_status_t coco_state::soundmux_status(void)
 void coco_state::update_sound(void)
 {
 	/* PB1 will drive the sound output.  This is a rarely
-     * used single bit sound mode. It is always connected thus
-     * cannot be disabled.
-     *
-     * Source:  Page 31 of the Tandy Color Computer Serice Manual
-     */
+	 * used single bit sound mode. It is always connected thus
+	 * cannot be disabled.
+	 *
+	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
+	 */
 	UINT8 single_bit_sound = (m_pia_1->b_output() & 0x02) ? 0x80 : 0x00;
 
 	/* determine the sound mux status */
@@ -1049,10 +1049,10 @@ WRITE_LINE_MEMBER( coco_state::bitbanger_callback )
 
 const bitbanger_config coco_state::coco_bitbanger_config =
 {
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, bitbanger_callback),	/* callback */
-	BITBANGER_PRINTER,											/* default mode */
-	BITBANGER_600,												/* default output baud */
-	BITBANGER_0PERCENT											/* default fine tune adjustment */
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, bitbanger_callback),   /* callback */
+	BITBANGER_PRINTER,                                          /* default mode */
+	BITBANGER_600,                                              /* default output baud */
+	BITBANGER_0PERCENT                                          /* default fine tune adjustment */
 };
 
 
@@ -1139,9 +1139,9 @@ coco_vhd_image_device *coco_state::current_vhd(void)
 {
 	switch(m_vhd_select)
 	{
-		case 0:		return m_vhd_0;
-		case 1:		return m_vhd_1;
-		default:	return NULL;
+		case 0:     return m_vhd_0;
+		case 1:     return m_vhd_1;
+		default:    return NULL;
 	}
 }
 
@@ -1231,9 +1231,9 @@ void coco_state::cart_w(bool state)
 
 const cococart_interface coco_state::cartridge_config =
 {
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, cart_w),		// coco_cart_w,
-	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_NMI),	// coco_nmi_w,
-	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_HALT)	// coco_halt_w
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, cart_w),       // coco_cart_w,
+	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_NMI),  // coco_nmi_w,
+	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_HALT)  // coco_halt_w
 };
 
 

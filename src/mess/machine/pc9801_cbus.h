@@ -23,7 +23,7 @@
 
 
 #define MCFG_PC9801CBUS_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, PC9801CBUS_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, PC9801CBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -52,7 +52,7 @@ public:
 // ======================> pc9801_slot_device
 
 class pc9801_slot_device : public device_t,
-							   public device_slot_interface
+								public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -62,7 +62,7 @@ public:
 	virtual void device_start();
 	virtual void device_config_complete();
 //private:
-//	device_pc9801_slot_card_interface *m_card;
+//  device_pc9801_slot_card_interface *m_card;
 
 };
 

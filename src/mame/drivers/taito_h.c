@@ -183,44 +183,44 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8	port = tc0220ioc_port_r(m_tc0220ioc, space, 0);	/* read port number */
+	UINT8   port = tc0220ioc_port_r(m_tc0220ioc, space, 0); /* read port number */
 
 	switch( port )
 	{
-		case 0x08:				/* trackball y coords bottom 8 bits for 2nd player */
+		case 0x08:              /* trackball y coords bottom 8 bits for 2nd player */
 			return ioport(P2TRACKY_PORT_TAG)->read();
 
-		case 0x09:				/* trackball y coords top 8 bits for 2nd player */
-			if (ioport(P2TRACKY_PORT_TAG)->read() & 0x80)	/* y- direction (negative value) */
+		case 0x09:              /* trackball y coords top 8 bits for 2nd player */
+			if (ioport(P2TRACKY_PORT_TAG)->read() & 0x80)   /* y- direction (negative value) */
 				return 0xff;
-			else												/* y+ direction (positive value) */
+			else                                                /* y+ direction (positive value) */
 				return 0x00;
 
-		case 0x0a:				/* trackball x coords bottom 8 bits for 2nd player */
+		case 0x0a:              /* trackball x coords bottom 8 bits for 2nd player */
 			return ioport(P2TRACKX_PORT_TAG)->read();
 
-		case 0x0b:				/* trackball x coords top 8 bits for 2nd player */
-			if (ioport(P2TRACKX_PORT_TAG)->read() & 0x80)	/* x- direction (negative value) */
+		case 0x0b:              /* trackball x coords top 8 bits for 2nd player */
+			if (ioport(P2TRACKX_PORT_TAG)->read() & 0x80)   /* x- direction (negative value) */
 				return 0xff;
-			else												/* x+ direction (positive value) */
+			else                                                /* x+ direction (positive value) */
 				return 0x00;
 
-		case 0x0c:				/* trackball y coords bottom 8 bits for 1st player */
+		case 0x0c:              /* trackball y coords bottom 8 bits for 1st player */
 			return ioport(P1TRACKY_PORT_TAG)->read();
 
-		case 0x0d:				/* trackball y coords top 8 bits for 1st player */
-			if (ioport(P1TRACKY_PORT_TAG)->read() & 0x80)	/* y- direction (negative value) */
+		case 0x0d:              /* trackball y coords top 8 bits for 1st player */
+			if (ioport(P1TRACKY_PORT_TAG)->read() & 0x80)   /* y- direction (negative value) */
 				return 0xff;
-			else												/* y+ direction (positive value) */
+			else                                                /* y+ direction (positive value) */
 				return 0x00;
 
-		case 0x0e:				/* trackball x coords bottom 8 bits for 1st player */
+		case 0x0e:              /* trackball x coords bottom 8 bits for 1st player */
 			return ioport(P1TRACKX_PORT_TAG)->read();
 
-		case 0x0f:				/* trackball x coords top 8 bits for 1st player */
-			if (ioport(P1TRACKX_PORT_TAG)->read() & 0x80)	/* x- direction (negative value) */
+		case 0x0f:              /* trackball x coords top 8 bits for 1st player */
+			if (ioport(P1TRACKX_PORT_TAG)->read() & 0x80)   /* x- direction (negative value) */
 				return 0xff;
-			else												/* x+ direction (positive value) */
+			else                                                /* x+ direction (positive value) */
 				return 0x00;
 
 		default:
@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE_LEGACY("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* ?? writes zero once per frame */
+	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* ?? writes zero once per frame */
 ADDRESS_MAP_END
 
 
@@ -288,10 +288,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoh_state )
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITENOP		/* pan control */
+	AM_RANGE(0xe400, 0xe403) AM_WRITENOP        /* pan control */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP		/* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP		/* ? */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP        /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP        /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -311,20 +311,20 @@ static INPUT_PORTS_START( syvalion )
 	/* 0x200000 (port 1) -> 0x102843.b (-$57bd,A5) */
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1000k" )
 	PORT_DIPSETTING(    0x0c, "1500k" )
 	PORT_DIPSETTING(    0x04, "2000k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:7") /* code at 0x002af8 - see notes */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7") /* code at 0x002af8 - see notes */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -420,7 +420,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dleague )
 	/* 0x200000 -> 0x100526.b ($526,A5) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1") /* see notes */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:1") /* see notes */
 	PORT_DIPSETTING(    0x01, "Constant" )
 	PORT_DIPSETTING(    0x00, "Based on Inning" )
 	TAITO_DSWA_BITS_1_TO_3_LOC(SW1)
@@ -428,9 +428,9 @@ static INPUT_PORTS_START( dleague )
 
 	/* 0x200002 -> 0x100527.b ($527,A5) */
 	PORT_START("DSWB")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )		/* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )        /* see notes */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Extra Credit Needed" )	PORT_DIPLOCATION("SW2:3,4") /* see notes */
+	PORT_DIPNAME( 0x0c, 0x0c, "Extra Credit Needed" )   PORT_DIPLOCATION("SW2:3,4") /* see notes */
 	PORT_DIPSETTING(    0x08, "After Inning 6" )
 	PORT_DIPSETTING(    0x00, "After Innings 5 and 7" )
 	PORT_DIPSETTING(    0x0c, "After Innings 3 and 6" )
@@ -480,12 +480,12 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16x16 pixels */
-	32768,	/* 32768 tiles */
+	16,16,  /* 16x16 pixels */
+	32768,  /* 32768 tiles */
 	4,
 	{ 0, 1, 2, 3 },
 	{ 4, 0, 12, 8, 0x100000*8+4, 0x100000*8, 0x100000*8+12, 0x100000*8+8,
-	    0x200000*8+4, 0x200000*8, 0x200000*8+12, 0x200000*8+8, 0x300000*8+4, 0x300000*8, 0x300000*8+12, 0x300000*8+8 },
+		0x200000*8+4, 0x200000*8, 0x200000*8+12, 0x200000*8+8, 0x300000*8+4, 0x300000*8, 0x300000*8+12, 0x300000*8+8 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	16*16
@@ -493,9 +493,9 @@ static const gfx_layout tilelayout =
 
 static const gfx_layout charlayout =
 {
-	8, 8,	/* 8x8 pixels */
-	256,	/* 256 chars */
-	4,		/* 4 bit per pixel */
+	8, 8,   /* 8x8 pixels */
+	256,    /* 256 chars */
+	4,      /* 4 bit per pixel */
 	{ 0x1000*8 + 8, 0x1000*8, 8, 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7 },
@@ -538,14 +538,14 @@ void taitoh_state::machine_start()
 
 static const tc0080vco_interface syvalion_tc0080vco_intf =
 {
-	0, 1,	/* gfxnum, txnum */
+	0, 1,   /* gfxnum, txnum */
 	1, 1, -2,
 	1
 };
 
 static const tc0080vco_interface recordbr_tc0080vco_intf =
 {
-	0, 1,	/* gfxnum, txnum */
+	0, 1,   /* gfxnum, txnum */
 	1, 1, -2,
 	0
 };
@@ -553,7 +553,7 @@ static const tc0080vco_interface recordbr_tc0080vco_intf =
 static const tc0220ioc_interface taitoh_io_intf =
 {
 	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")	/* port read handlers */
+	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
 };
 
 static const tc0140syt_interface taitoh_tc0140syt_intf =
@@ -564,11 +564,11 @@ static const tc0140syt_interface taitoh_tc0140syt_intf =
 static MACHINE_CONFIG_START( syvalion, taitoh_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)		/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(syvalion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -605,11 +605,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( recordbr, taitoh_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)		/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(recordbr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -646,11 +646,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dleague, taitoh_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)		/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(dleague_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)		/* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -691,13 +691,13 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( syvalion )
-	ROM_REGION( 0x80000, "maincpu", 0 )		/* main cpu */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "b51-20.bin", 0x00000, 0x20000, CRC(440b6418) SHA1(262b65f39eb13c11ae7b87013951097ab0a9cb63) )
 	ROM_LOAD16_BYTE( "b51-22.bin", 0x00001, 0x20000, CRC(e6c61079) SHA1(b786ef1bfc72706347c12c17616652bc8302a98c) )
 	ROM_LOAD16_BYTE( "b51-19.bin", 0x40000, 0x20000, CRC(2abd762c) SHA1(97cdb9f1dba5b11b96b5d3431937669de5220512) )
 	ROM_LOAD16_BYTE( "b51-21.bin", 0x40001, 0x20000, CRC(aa111f30) SHA1(77da4a8db49999f5fa2cf0209028d0f70e26dfe3) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b51-23.bin", 0x00000, 0x04000, CRC(734662de) SHA1(0058d6de68f26cd58b9eb8859e15f3ced6bd3489) )
 	ROM_CONTINUE(           0x10000, 0x0c000 )
 
@@ -719,21 +719,21 @@ ROM_START( syvalion )
 	ROM_LOAD16_BYTE( "b51-05.bin", 0x340000, 0x20000, CRC(47976ae9) SHA1(a2b19a39d8968b886412a85c082806917e02d9fd) )
 	ROM_LOAD16_BYTE( "b51-01.bin", 0x340001, 0x20000, CRC(8dab004a) SHA1(1772cdcb9d0ca5ebf429f371c041b9ae12fafcd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
 	ROM_LOAD( "b51-18.bin", 0x00000, 0x80000, CRC(8b23ac83) SHA1(340b9e7f09c1809a332b41d3fb579f5f8cd6367f) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
 	ROM_LOAD( "b51-17.bin", 0x00000, 0x80000, CRC(d85096aa) SHA1(dac39ed182e9eda06575f1667c4c1ff9a4a56599) )
 ROM_END
 
 ROM_START( recordbr )
-	ROM_REGION( 0x80000, "maincpu", 0 )		/* main cpu */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "b56-17.bin", 0x00000, 0x20000, CRC(3e0a9c35) SHA1(900a741b2abbbbe883b9d78162a88b4397af1a56) )
 	ROM_LOAD16_BYTE( "b56-16.bin", 0x00001, 0x20000, CRC(b447f12c) SHA1(58ee30337836f260c7fbda728dac93f06d861ec4) )
 	ROM_LOAD16_BYTE( "b56-15.bin", 0x40000, 0x20000, CRC(b346e282) SHA1(f6b4a2e9093a33d19c2eaf3ef9801179f39a83a3) )
 	ROM_LOAD16_BYTE( "b56-21.bin", 0x40001, 0x20000, CRC(e5f63790) SHA1(b81db7690a989146c438609d9633ddcb1fd219dd) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b56-19.bin", 0x00000, 0x04000, CRC(c68085ee) SHA1(78634216a622a08c20dae0422283c4a7ed360546) )
 	ROM_CONTINUE(           0x10000, 0x0c000 )
 
@@ -747,10 +747,10 @@ ROM_START( recordbr )
 	ROM_LOAD16_BYTE( "b56-01.bin", 0x300000, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
 	ROM_LOAD16_BYTE( "b56-05.bin", 0x300001, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
 	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
 
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
@@ -758,13 +758,13 @@ ROM_START( recordbr )
 ROM_END
 
 ROM_START( gogold )
-	ROM_REGION( 0x80000, "maincpu", 0 )		/* main cpu */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "b56-17.bin", 0x00000, 0x20000, CRC(3e0a9c35) SHA1(900a741b2abbbbe883b9d78162a88b4397af1a56) )
 	ROM_LOAD16_BYTE( "b56-16.bin", 0x00001, 0x20000, CRC(b447f12c) SHA1(58ee30337836f260c7fbda728dac93f06d861ec4) )
 	ROM_LOAD16_BYTE( "b56-15.bin", 0x40000, 0x20000, CRC(b346e282) SHA1(f6b4a2e9093a33d19c2eaf3ef9801179f39a83a3) )
 	ROM_LOAD16_BYTE( "b56-14.bin", 0x40001, 0x20000, CRC(b6c195b9) SHA1(80541d9a686fdc1850d764d8e00ba03526e7174c) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "b56-19.bin", 0x00000, 0x04000, CRC(c68085ee) SHA1(78634216a622a08c20dae0422283c4a7ed360546) )
 	ROM_CONTINUE(           0x10000, 0x0c000 )
 
@@ -778,10 +778,10 @@ ROM_START( gogold )
 	ROM_LOAD16_BYTE( "b56-01.bin", 0x300000, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
 	ROM_LOAD16_BYTE( "b56-05.bin", 0x300001, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
 	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
 
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
@@ -816,7 +816,7 @@ ROM_START( dleague )
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "c02-18.22", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
 	ROM_LOAD( "c02-01.31", 0x00000, 0x80000, CRC(d5a3d1aa) SHA1(544f807015b5d854a4d8cb73e4dbae4b953fd440) )
 ROM_END
 
@@ -848,7 +848,7 @@ ROM_START( dleaguej )
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "c02-18.22", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
 	ROM_LOAD( "c02-01.31", 0x00000, 0x80000, CRC(d5a3d1aa) SHA1(544f807015b5d854a4d8cb73e4dbae4b953fd440) )
 ROM_END
 

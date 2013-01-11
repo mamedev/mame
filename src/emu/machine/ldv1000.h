@@ -76,8 +76,8 @@ extern const device_type PIONEER_LDV1000;
 class pioneer_ldv1000_device : public laserdisc_device
 {
 public:
-    // construction/destruction
-    pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// input and output
 	void data_w(UINT8 data);
@@ -129,29 +129,29 @@ public:
 
 protected:
 	// internal state
-	required_device<z80_device> m_z80_cpu;					/* CPU index of the Z80 */
-	required_device<z80ctc_device> m_z80_ctc;					/* CTC device */
-	emu_timer *			m_multitimer;			/* multi-jump timer device */
+	required_device<z80_device> m_z80_cpu;                  /* CPU index of the Z80 */
+	required_device<z80ctc_device> m_z80_ctc;                   /* CTC device */
+	emu_timer *         m_multitimer;           /* multi-jump timer device */
 
 	/* communication status */
-	UINT8				m_command;				/* command byte to the player */
-	UINT8				m_status;					/* status byte from the player */
-	bool				m_vsync;					/* VSYNC state */
+	UINT8               m_command;              /* command byte to the player */
+	UINT8               m_status;                   /* status byte from the player */
+	bool                m_vsync;                    /* VSYNC state */
 
 	/* I/O port states */
-	UINT8				m_counter_start;			/* starting value for counter */
-	UINT8				m_counter;				/* current counter value */
-	UINT8				m_portc0;					/* port C on PPI 0 */
-	UINT8				m_portb1;					/* port B on PPI 1 */
-	UINT8				m_portc1;					/* port C on PPI 1 */
+	UINT8               m_counter_start;            /* starting value for counter */
+	UINT8               m_counter;              /* current counter value */
+	UINT8               m_portc0;                   /* port C on PPI 0 */
+	UINT8               m_portb1;                   /* port B on PPI 1 */
+	UINT8               m_portc1;                   /* port C on PPI 1 */
 
 	/* display/decode circuit emulation */
-	UINT8				m_portselect;				/* selection of which port to access */
-	UINT8				m_display[2][20];			/* display lines */
-	UINT8				m_dispindex;				/* index within the display line */
-	UINT8				m_vbi[7*3];				/* VBI data */
-	bool				m_vbiready;				/* VBI ready flag */
-	UINT8				m_vbiindex;				/* index within the VBI data */
+	UINT8               m_portselect;               /* selection of which port to access */
+	UINT8               m_display[2][20];           /* display lines */
+	UINT8               m_dispindex;                /* index within the display line */
+	UINT8               m_vbi[7*3];             /* VBI data */
+	bool                m_vbiready;             /* VBI ready flag */
+	UINT8               m_vbiindex;             /* index within the VBI data */
 };
 
 

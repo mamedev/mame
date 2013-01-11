@@ -15,22 +15,22 @@
 class cdi_state : public driver_device
 {
 public:
-    cdi_state(const machine_config &mconfig, device_type type, const char *tag)
-        : driver_device(mconfig, type, tag) ,
+	cdi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) ,
 		m_planea(*this, "planea"),
 		m_planeb(*this, "planeb"){ }
 
 	required_shared_ptr<UINT16> m_planea;
 	required_shared_ptr<UINT16> m_planeb;
 
-    dmadac_sound_device *m_dmadac[2];
+	dmadac_sound_device *m_dmadac[2];
 
-    UINT8 m_timer_set;
-    emu_timer *m_test_timer;
-    bitmap_rgb32 m_lcdbitmap;
-    scc68070_regs_t m_scc68070_regs;
-    mcd212_regs_t m_mcd212_regs;
-    mcd212_ab_t m_mcd212_ab;
+	UINT8 m_timer_set;
+	emu_timer *m_test_timer;
+	bitmap_rgb32 m_lcdbitmap;
+	scc68070_regs_t m_scc68070_regs;
+	mcd212_regs_t m_mcd212_regs;
+	mcd212_ab_t m_mcd212_ab;
 	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
 	virtual void machine_start();
 	virtual void video_start();

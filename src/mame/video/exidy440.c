@@ -8,22 +8,22 @@
 #include "includes/exidy440.h"
 
 
-#define PIXEL_CLOCK			(EXIDY440_MASTER_CLOCK / 2)
-#define HTOTAL				(0x1a0)
-#define HBEND				(0x000)
-#define HBSTART				(0x140)
-#define HSEND				(0x178)
-#define HSSTART				(0x160)
-#define VTOTAL				(0x104)
-#define VBEND				(0x000)
-#define VBSTART				(0x0f0)
-#define VSEND				(0x0f8)
-#define VSSTART				(0x0f0)
+#define PIXEL_CLOCK         (EXIDY440_MASTER_CLOCK / 2)
+#define HTOTAL              (0x1a0)
+#define HBEND               (0x000)
+#define HBSTART             (0x140)
+#define HSEND               (0x178)
+#define HSSTART             (0x160)
+#define VTOTAL              (0x104)
+#define VBEND               (0x000)
+#define VBSTART             (0x0f0)
+#define VSEND               (0x0f8)
+#define VSSTART             (0x0f0)
 
 /* Top Secret has a larger VBLANK area */
-#define TOPSECEX_VBSTART	(0x0ec)
+#define TOPSECEX_VBSTART    (0x0ec)
 
-#define SPRITE_COUNT		(0x28)
+#define SPRITE_COUNT        (0x28)
 
 
 /* function prototypes */
@@ -138,7 +138,7 @@ READ8_MEMBER(exidy440_state::exidy440_horizontal_pos_r)
 	exidy440_update_firq(machine());
 
 	/* according to the schems, this value is only latched on an FIRQ
-     * caused by collision or beam */
+	 * caused by collision or beam */
 	return m_latched_x;
 }
 
@@ -148,9 +148,9 @@ READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
 	int result;
 
 	/* according to the schems, this value is latched on any FIRQ
-     * caused by collision or beam, ORed together with CHRCLK,
-     * which probably goes off once per scanline; for now, we just
-     * always return the current scanline */
+	 * caused by collision or beam, ORed together with CHRCLK,
+	 * which probably goes off once per scanline; for now, we just
+	 * always return the current scanline */
 	result = machine().primary_screen->vpos();
 	return (result < 255) ? result : 255;
 }
@@ -290,7 +290,7 @@ TIMER_CALLBACK_MEMBER(exidy440_state::collide_firq_callback)
  *************************************/
 
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,
-						 int scroll_offset, int check_collision)
+							int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
 	int i;
@@ -391,7 +391,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
  *************************************/
 
 static void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,
-						  int scroll_offset, int check_collision)
+							int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
 	int y, sy;
@@ -434,11 +434,11 @@ UINT32 exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_ind1
 		int beamy = ((machine().root_device().ioport("AN1")->read() & 0xff) * (VBSTART - VBEND)) >> 8;
 
 		/* The timing of this FIRQ is very important. The games look for an FIRQ
-            and then wait about 650 cycles, clear the old FIRQ, and wait a
-            very short period of time (~130 cycles) for another one to come in.
-            From this, it appears that they are expecting to get beams over
-            a 12 scanline period, and trying to pick roughly the middle one.
-            This is how it is implemented. */
+		    and then wait about 650 cycles, clear the old FIRQ, and wait a
+		    very short period of time (~130 cycles) for another one to come in.
+		    From this, it appears that they are expecting to get beams over
+		    a 12 scanline period, and trying to pick roughly the middle one.
+		    This is how it is implemented. */
 		attotime increment = screen.scan_period();
 		attotime time = screen.time_until_pos(beamy, beamx) - increment * 6;
 		for (i = 0; i <= 12; i++)

@@ -392,13 +392,13 @@ Notes:
 #include "machine/scsicd.h"
 #include "machine/wd33c93.h"
 
-#define MASTER_CLOCK	42954500
+#define MASTER_CLOCK    42954500
 
 #define DEBUG_PRINTF 0
 
 
 
-#define DMA_XOR(a)		((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,2))
+#define DMA_XOR(a)      ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,2))
 
 #define USER4REGION_LENGTH 0x800000*2
 #define USER5REGION_LENGTH 0x800000*10
@@ -432,11 +432,11 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_el
 //  }
 
 	/*
-    scalex and scaley are 16.16 fixed point numbers
-    1<<15 : shrink to 50%
-    1<<16 : uniform scale
-    1<<17 : double to 200%
-    */
+	scalex and scaley are 16.16 fixed point numbers
+	1<<15 : shrink to 50%
+	1<<16 : uniform scale
+	1<<17 : double to 200%
+	*/
 
 
 	/* force clip to bitmap boundary */
@@ -627,8 +627,8 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_el
 
 static UINT16 rotate_left(UINT16 value, int n)
 {
-   int aux = value>>(16-n);
-   return ((value<<n)|aux)%0x10000;
+	int aux = value>>(16-n);
+	return ((value<<n)|aux)%0x10000;
 }
 
 static UINT16 rotxor(UINT16 val, UINT16 xorval)
@@ -716,7 +716,7 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 	state->m_decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);
 
 	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
-     - this prevents MAME from crashing */
+	 - this prevents MAME from crashing */
 	state->m_nops = auto_alloc(machine, UINT32);
 	state->m_nops[0] = 0x00090009;
 
@@ -755,7 +755,7 @@ static const gfx_layout cps3_tiles16x16_layout =
 	8,
 	{ 0,1,2,3,4,5,6,7 },
 	{ 3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
-	  11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8 },
+		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8 },
 	{ 0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128},
 	8*256
 };
@@ -948,8 +948,8 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 //  decode_charram();
 
 	/* registers are normally 002a006f 01ef01c6
-            widescreen mode = 00230076 026501c6
-      only SFIII2 uses widescreen, I don't know exactly which register controls it */
+	        widescreen mode = 00230076 026501c6
+	  only SFIII2 uses widescreen, I don't know exactly which register controls it */
 	if (((m_fullscreenzoom[1]&0xffff0000)>>16)==0x0265)
 	{
 		if (m_screenwidth!=496)
@@ -992,8 +992,8 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 		//printf("Spritelist start:\n");
 		for (i=0x00000/4;i<0x2000/4;i+=4)
 		{
-			int xpos =  	(m_spriteram[i+1]&0x03ff0000)>>16;
-			int ypos =  	m_spriteram[i+1]&0x000003ff;
+			int xpos =      (m_spriteram[i+1]&0x03ff0000)>>16;
+			int ypos =      m_spriteram[i+1]&0x000003ff;
 			int j;
 			int gscroll =      (m_spriteram[i+0]&0x70000000)>>28;
 			int length =    (m_spriteram[i+0]&0x01ff0000)>>16; // how many entries in the sprite table
@@ -1017,9 +1017,9 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 			for (j=0;j<(length)*4;j+=4)
 			{
 
-				UINT32 value1 = 	(m_spriteram[start+j+0]);
-				UINT32 value2 = 	(m_spriteram[start+j+1]);
-				UINT32 value3 = 	(m_spriteram[start+j+2]);
+				UINT32 value1 =     (m_spriteram[start+j+0]);
+				UINT32 value2 =     (m_spriteram[start+j+1]);
+				UINT32 value3 =     (m_spriteram[start+j+2]);
 
 
 				//UINT8* srcdata = (UINT8*)m_char_ram;
@@ -1075,7 +1075,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 
 
 					/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
-                       which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
+					   which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
 					//for (uu=startline;uu<endline+1;uu++)
 
 					if (bg_drawn[tilemapnum]==0)
@@ -1371,22 +1371,22 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 
 	if(DEBUG_PRINTF) printf("gfxflash_r\n");
 
-	if (ACCESSING_BITS_24_31)	// GFX Flash 1
+	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
 		logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1));
 		result |= chip0->read( (offset<<1) ) << 24;
 	}
-	if (ACCESSING_BITS_16_23)	// GFX Flash 2
+	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1));
 		result |= chip1->read( (offset<<1) ) << 16;
 	}
-	if (ACCESSING_BITS_8_15)	// GFX Flash 1
+	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		logerror("read GFX flash chip %s addr %02x\n", chip0->tag(), (offset<<1)+1);
 		result |= chip0->read( (offset<<1)+0x1 ) << 8;
 	}
-	if (ACCESSING_BITS_0_7)	// GFX Flash 2
+	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
 		logerror("read GFX flash chip %s addr %02x\n", chip1->tag(), (offset<<1)+1);
 		result |= chip1->read( (offset<<1)+0x1 ) << 0;
@@ -1410,25 +1410,25 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 //  if(DEBUG_PRINTF) printf("cps3_gfxflash_w %08x %08x %08x\n", offset *2, data, mem_mask);
 
 
-	if (ACCESSING_BITS_24_31)	// GFX Flash 1
+	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
 		command = (data >> 24) & 0xff;
 		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1), command);
 		chip0->write( (offset<<1), command);
 	}
-	if (ACCESSING_BITS_16_23)	// GFX Flash 2
+	if (ACCESSING_BITS_16_23)   // GFX Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1), command);
 		chip1->write( (offset<<1), command);
 	}
-	if (ACCESSING_BITS_8_15)	// GFX Flash 1
+	if (ACCESSING_BITS_8_15)    // GFX Flash 1
 	{
 		command = (data >> 8) & 0xff;
 		logerror("write to GFX flash chip %s addr %02x cmd %02x\n", chip0->tag(), (offset<<1)+1, command);
 		chip0->write( (offset<<1)+0x1, command);
 	}
-	if (ACCESSING_BITS_0_7)	// GFX Flash 2
+	if (ACCESSING_BITS_0_7) // GFX Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		//if ( ((offset<<1)+1) != 0x555) printf("write to GFX flash chip %s addr %02x cmd %02x\n", chip1->tag(), (offset<<1)+1, command);
@@ -1444,9 +1444,9 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 		real_offset = ((m_cram_gfxflash_bank&0x3e) * 0x200000) + offset*4;
 
 		newdata =((chip0->read_raw(((offset*2)&0xfffffffe)+0)<<8) |
-			      (chip0->read_raw(((offset*2)&0xfffffffe)+1)<<24) |
-                  (chip1->read_raw(((offset*2)&0xfffffffe)+0)<<0)  |
-                  (chip1->read_raw(((offset*2)&0xfffffffe)+1)<<16));
+					(chip0->read_raw(((offset*2)&0xfffffffe)+1)<<24) |
+					(chip1->read_raw(((offset*2)&0xfffffffe)+0)<<0)  |
+					(chip1->read_raw(((offset*2)&0xfffffffe)+1)<<16));
 
 //      printf("flashcrap %08x %08x %08x\n", offset *2, romdata[real_offset/4], newdata);
 		romdata[real_offset/4] = newdata;
@@ -1463,22 +1463,22 @@ static UINT32 cps3_flashmain_r(address_space &space, int which, UINT32 offset, U
 	if (state->m_simm[which][0] == NULL || state->m_simm[which][1] == NULL || state->m_simm[which][2] == NULL || state->m_simm[which][3] == NULL)
 		return 0xffffffff;
 
-	if (ACCESSING_BITS_24_31)	// Flash 1
+	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+0, offset*4 );
 		result |= (state->m_simm[which][0]->read(offset)<<24);
 	}
-	if (ACCESSING_BITS_16_23)	// Flash 1
+	if (ACCESSING_BITS_16_23)   // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+1, offset*4 );
 		result |= (state->m_simm[which][1]->read(offset)<<16);
 	}
-	if (ACCESSING_BITS_8_15)	// Flash 1
+	if (ACCESSING_BITS_8_15)    // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+2, offset*4 );
 		result |= (state->m_simm[which][2]->read(offset)<<8);
 	}
-	if (ACCESSING_BITS_0_7)	// Flash 1
+	if (ACCESSING_BITS_0_7) // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+3, offset*4 );
 		result |= (state->m_simm[which][3]->read(offset)<<0);
@@ -1519,25 +1519,25 @@ static void cps3_flashmain_w(running_machine &machine, int which, UINT32 offset,
 	if (state->m_simm[which][0] == NULL || state->m_simm[which][1] == NULL || state->m_simm[which][2] == NULL || state->m_simm[which][3] == NULL)
 		return;
 
-	if (ACCESSING_BITS_24_31)	// Flash 1
+	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 		command = (data >> 24) & 0xff;
 		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][0]->tag(), offset, command);
 		state->m_simm[which][0]->write(offset, command);
 	}
-	if (ACCESSING_BITS_16_23)	// Flash 2
+	if (ACCESSING_BITS_16_23)   // Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][1]->tag(), offset, command);
 		state->m_simm[which][1]->write(offset, command);
 	}
-	if (ACCESSING_BITS_8_15)	// Flash 2
+	if (ACCESSING_BITS_8_15)    // Flash 2
 	{
 		command = (data >> 8) & 0xff;
 		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][2]->tag(), offset, command);
 		state->m_simm[which][2]->write(offset, command);
 	}
-	if (ACCESSING_BITS_0_7)	// Flash 2
+	if (ACCESSING_BITS_0_7) // Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][3]->tag(), offset, command);
@@ -1561,9 +1561,9 @@ static void cps3_flashmain_w(running_machine &machine, int which, UINT32 offset,
 		}
 
 		newdata = (state->m_simm[which][0]->read_raw(offset)<<24) |
-			      (state->m_simm[which][1]->read_raw(offset)<<16) |
-                  (state->m_simm[which][2]->read_raw(offset)<<8) |
-                  (state->m_simm[which][3]->read_raw(offset)<<0);
+					(state->m_simm[which][1]->read_raw(offset)<<16) |
+					(state->m_simm[which][2]->read_raw(offset)<<8) |
+					(state->m_simm[which][3]->read_raw(offset)<<0);
 
 		//printf("%08x %08x %08x %08x %08x\n",offset, romdata2[offset], romdata[offset], newdata,  newdata^cps3_mask(0x6000000+real_offset, state->m_key1, state->m_key2)  );
 
@@ -1725,7 +1725,7 @@ WRITE32_MEMBER(cps3_state::cps3_ss_bank_base_w)
 
 WRITE32_MEMBER(cps3_state::cps3_ss_pal_base_w)
 {
-	 if(DEBUG_PRINTF) printf ("cps3_ss_pal_base_w %08x %08x\n", data, mem_mask);
+		if(DEBUG_PRINTF) printf ("cps3_ss_pal_base_w %08x %08x\n", data, mem_mask);
 
 	if(ACCESSING_BITS_24_31)
 	{
@@ -1902,7 +1902,7 @@ static UINT32 ProcessByte8(running_machine &machine,UINT8 b,UINT32 dst_offset)
 	UINT8* destRAM = (UINT8*)state->m_char_ram;
 	int l=0;
 
-	if(state->m_lastb==state->m_lastb2)	//rle
+	if(state->m_lastb==state->m_lastb2) //rle
 	{
 		int i;
 		int rle=(b+1)&0xff;
@@ -1990,7 +1990,7 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 		/* 0x01000000 is the end of list marker, 0x13131313 is our default fill */
 		if ((dat1 == 0x01000000) || (dat1 == 0x13131313)) break;
 
-        //printf("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
+		//printf("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
 		if  ((dat1 & 0x00e00000) == 0x00800000)
 		{
@@ -2004,7 +2004,7 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 		else if  ((dat1 & 0x00e00000) == 0x00400000)
 		{
 			/* 6bpp DMA decompression
-              - this is used for the majority of sprites and backgrounds */
+			  - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma( machine, real_source, real_destination, real_length );
 			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 
@@ -2012,7 +2012,7 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 		else if  ((dat1 & 0x00e00000) == 0x00600000)
 		{
 			/* 8bpp DMA decompression
-              - this is used on SFIII NG Sean's Stage ONLY */
+			  - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma( machine, real_source, real_destination, real_length);
 			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 		}
@@ -2124,7 +2124,7 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 	AM_RANGE(0x040C0000, 0x040C0003) AM_READ(cps3_40C0000_r)//?? every frame
 	AM_RANGE(0x040C0004, 0x040C0007) AM_READ(cps3_40C0004_r)//AM_READ(cps3_40C0004_r) // warzard reads this!
 //  AM_RANGE(0x040C0008, 0x040C000b) AM_WRITENOP//??
-    AM_RANGE(0x040C000c, 0x040C000f) AM_READ(cps3_vbl_r)// AM_WRITENOP/
+	AM_RANGE(0x040C000c, 0x040C000f) AM_READ(cps3_vbl_r)// AM_WRITENOP/
 
 	AM_RANGE(0x040C0000, 0x040C001f) AM_WRITE(cps3_unk_vidregs_w)
 	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITEONLY AM_SHARE("tmap20_regs")
@@ -2262,7 +2262,7 @@ INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
 
 static const struct WD33C93interface wd33c93_intf =
 {
-	NULL			/* command completion IRQ */
+	NULL            /* command completion IRQ */
 };
 
 void cps3_state::machine_reset()
@@ -2330,9 +2330,9 @@ static void copy_from_nvram(running_machine &machine)
 				for (i=0;i<0x200000;i+=2)
 				{
 					UINT32 dat = (flash0->read_raw(i+0)<<8) |
-						         (flash0->read_raw(i+1)<<24) |
-								 (flash1->read_raw(i+0)<<0) |
-								 (flash1->read_raw(i+1)<<16);
+									(flash0->read_raw(i+1)<<24) |
+									(flash1->read_raw(i+0)<<0) |
+									(flash1->read_raw(i+1)<<16);
 
 					//printf("%08x %08x\n",romdata[countoffset],dat);
 					romdata[countoffset] = dat;
@@ -2346,20 +2346,20 @@ static void copy_from_nvram(running_machine &machine)
 
 
 	/*
-    {
-        FILE *fp;
-        const char *gamename = machine.system().name;
-        char filename[256];
-        sprintf(filename, "%s_bios.dump", gamename);
+	{
+	    FILE *fp;
+	    const char *gamename = machine.system().name;
+	    char filename[256];
+	    sprintf(filename, "%s_bios.dump", gamename);
 
-        fp=fopen(filename, "w+b");
-        if (fp)
-        {
-            fwrite(rom, 0x080000, 1, fp);
-            fclose(fp);
-        }
-    }
-    */
+	    fp=fopen(filename, "w+b");
+	    if (fp)
+	    {
+	        fwrite(rom, 0x080000, 1, fp);
+	        fclose(fp);
+	    }
+	}
+	*/
 
 }
 
@@ -2368,13 +2368,13 @@ static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 da
 {
 	cps3_state *state = device->machine().driver_data<cps3_state>();
 	/*
-      on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
+	  on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
 
-      to handle this in MAME we use this callback, and reverse the effect of the
-      encryption that would otherwise be applied.  this allows us to avoid per-game,
-      per-PC hacks.  this approach is however still a little messy.
+	  to handle this in MAME we use this callback, and reverse the effect of the
+	  encryption that would otherwise be applied.  this allows us to avoid per-game,
+	  per-PC hacks.  this approach is however still a little messy.
 
-    */
+	*/
 
 	/* I doubt this is endian safe.. needs checking / fixing */
 	if (size==0)
@@ -2410,8 +2410,8 @@ static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 da
 	if (size==0)
 	{
 		if ((src&3)==0) data >>=24;
-		if ((src&3)==1)	data >>=16;
-		if ((src&3)==2)	data >>=8;
+		if ((src&3)==1) data >>=16;
+		if ((src&3)==2) data >>=8;
 		if ((src&3)==3) data >>=0;
 
 		data &=0x000000ff;

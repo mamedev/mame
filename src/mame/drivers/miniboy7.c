@@ -142,7 +142,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_12_4725MHz    /* 12.4725 MHz */
+#define MASTER_CLOCK    XTAL_12_4725MHz    /* 12.4725 MHz */
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -198,10 +198,10 @@ TILE_GET_INFO_MEMBER(miniboy7_state::get_bg_tile_info)
 
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
-	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color? */
+	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
+	int color = (attr & 0x3c);  /* bits 2-3-4-5 for color? */
 
-	if (bank == 1)	/* temporary hack to point to the 3rd gfx bank */
+	if (bank == 1)  /* temporary hack to point to the 3rd gfx bank */
 		bank = 2;
 
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
@@ -271,16 +271,16 @@ void miniboy7_state::palette_init()
 ***********************************/
 
 static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM	AM_SHARE("nvram") /* battery backed RAM? */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM? */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x25ff) AM_RAM	/* looks like videoram */
+	AM_RANGE(0x1800, 0x25ff) AM_RAM /* looks like videoram */
 	AM_RANGE(0x2600, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_address_data_w)	// FIXME
+	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_address_data_w)  // FIXME
 	AM_RANGE(0x3080, 0x3083) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x3800, 0x3800) AM_READNOP	// R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
+	AM_RANGE(0x3800, 0x3800) AM_READNOP // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -375,14 +375,14 @@ static const gfx_layout tilelayout =
 ****************************************/
 
 static GFXDECODE_START( miniboy7 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800,	charlayout, 0, 16 )	/* text layer 1 */
-	GFXDECODE_ENTRY( "gfx1", 0x0000,	charlayout, 0, 16 )	/* text layer 2 */
+	GFXDECODE_ENTRY( "gfx1", 0x0800,    charlayout, 0, 16 ) /* text layer 1 */
+	GFXDECODE_ENTRY( "gfx1", 0x0000,    charlayout, 0, 16 ) /* text layer 2 */
 
-    /* 0x000 cards
-       0x100 joker
-       0x200 dices
-       0x300 bigtxt */
-	GFXDECODE_ENTRY( "gfx2", 0,	tilelayout, 0, 16 )
+	/* 0x000 cards
+	   0x100 joker
+	   0x200 dices
+	   0x300 bigtxt */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 
 GFXDECODE_END
 
@@ -393,16 +393,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -412,18 +412,18 @@ static const mc6845_interface mc6845_intf =
 
 static const pia6821_interface miniboy7_pia0_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -449,7 +449,7 @@ static const ay8910_interface miniboy7_ay8910_intf =
 static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
 	MCFG_CPU_PROGRAM_MAP(miniboy7_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", miniboy7_state,  nmi_line_pulse)
 
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* guess */
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
 	MCFG_SOUND_CONFIG(miniboy7_ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -512,23 +512,23 @@ MACHINE_CONFIG_END
 ROM_START( miniboy7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mb7_6-4.a8",   0x4000, 0x2000, CRC(a3fdea08) SHA1(2f1a74274005b8c77eb4254d0220206ae4175834) )
-	ROM_LOAD( "mb7_2-4.a7",	  0x6000, 0x2000, CRC(396e7250) SHA1(8f8c86cc412269157b16ad883638b38bb21345d7) )
-	ROM_LOAD( "mb7_3-4.a6",	  0x8000, 0x2000, CRC(360a7f7c) SHA1(d98bcfd320680e88b07182d78b4e56fc5579874d) )
-	ROM_LOAD( "mb7_4-4.a4",	  0xa000, 0x2000, CRC(bff8e334) SHA1(1d09a86b4dbfec6522b326683febaf7426f723e0) )
-	ROM_LOAD( "mb7_5-4.a3",	  0xc000, 0x2000, CRC(d610bed3) SHA1(67e44ce2345d5429d6ccf4833de207ff6518c534) )
-	ROM_LOAD( "nosticker.a1", 0xe000, 0x2000, CRC(5f715a12) SHA1(eabe0e4ee2e110c6ce4fd58c9d36ba80a612d4b5) )	/* ROM 1-4? */
+	ROM_LOAD( "mb7_2-4.a7",   0x6000, 0x2000, CRC(396e7250) SHA1(8f8c86cc412269157b16ad883638b38bb21345d7) )
+	ROM_LOAD( "mb7_3-4.a6",   0x8000, 0x2000, CRC(360a7f7c) SHA1(d98bcfd320680e88b07182d78b4e56fc5579874d) )
+	ROM_LOAD( "mb7_4-4.a4",   0xa000, 0x2000, CRC(bff8e334) SHA1(1d09a86b4dbfec6522b326683febaf7426f723e0) )
+	ROM_LOAD( "mb7_5-4.a3",   0xc000, 0x2000, CRC(d610bed3) SHA1(67e44ce2345d5429d6ccf4833de207ff6518c534) )
+	ROM_LOAD( "nosticker.a1", 0xe000, 0x2000, CRC(5f715a12) SHA1(eabe0e4ee2e110c6ce4fd58c9d36ba80a612d4b5) )    /* ROM 1-4? */
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mb7_asc_cg.d11",	0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )	/* text layer */
+	ROM_LOAD( "mb7_asc_cg.d11", 0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )  /* text layer */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "mb7_cg1.d12",	0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )	/* bitplane 1 */
-	ROM_LOAD( "mb7_cg2.d13",	0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )	/* bitplane 2 */
-	ROM_LOAD( "mb7_cg3.d14",	0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )	/* bitplane 3 */
+	ROM_LOAD( "mb7_cg1.d12",    0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )  /* bitplane 1 */
+	ROM_LOAD( "mb7_cg2.d13",    0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )  /* bitplane 2 */
+	ROM_LOAD( "mb7_cg3.d14",    0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )  /* bitplane 3 */
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* both bipolar PROMs are identical */
-	ROM_LOAD( "j.e7",	0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) )
-	ROM_LOAD( "j.f10",	0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) )
+	ROM_REGION( 0x0200, "proms", 0 )    /* both bipolar PROMs are identical */
+	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) )
+	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) )
 ROM_END
 
 /*
@@ -537,23 +537,23 @@ ROM_END
 */
 ROM_START( miniboy7a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mb7111.8a",	0x4000, 0x2000,  BAD_DUMP CRC(1b7ac5f0) SHA1(a52052771fcce688afccf9f0c3e3c2b5e7cec4e4) )    /* marked as BAD for the dumper but seems OK */
-	ROM_LOAD( "mb7211.7a",	0x6000, 0x2000, CRC(ac9b66a6) SHA1(66a33e475de4fb3ffdd9a68a24932574e7d78116) )
-	ROM_LOAD( "mb7311.6a",	0x8000, 0x2000,  BAD_DUMP CRC(99f2a063) SHA1(94108cdc574c7e9400fe8a249b78ba190d10502b) )    /* marked as BAD for the dumper */
-	ROM_LOAD( "mb7411.5a",	0xa000, 0x2000, CRC(99f8268f) SHA1(a4ca98dfb5df86fe45f33e291bf0c40d1f43ae7c) )
-	ROM_LOAD( "mb7511.4a",	0xc000, 0x2000,  BAD_DUMP CRC(2820ae91) SHA1(70f9b3823733ae39d153948a4006a5972204f482) )    /* marked as BAD for the dumper */
-	ROM_LOAD( "mb7611.3a",	0xe000, 0x2000, CRC(ca9b9b20) SHA1(c6cd793a15948601faa051a4643b14fd3d8bda0b) )
+	ROM_LOAD( "mb7111.8a",  0x4000, 0x2000,  BAD_DUMP CRC(1b7ac5f0) SHA1(a52052771fcce688afccf9f0c3e3c2b5e7cec4e4) )    /* marked as BAD for the dumper but seems OK */
+	ROM_LOAD( "mb7211.7a",  0x6000, 0x2000, CRC(ac9b66a6) SHA1(66a33e475de4fb3ffdd9a68a24932574e7d78116) )
+	ROM_LOAD( "mb7311.6a",  0x8000, 0x2000,  BAD_DUMP CRC(99f2a063) SHA1(94108cdc574c7e9400fe8a249b78ba190d10502b) )    /* marked as BAD for the dumper */
+	ROM_LOAD( "mb7411.5a",  0xa000, 0x2000, CRC(99f8268f) SHA1(a4ca98dfb5df86fe45f33e291bf0c40d1f43ae7c) )
+	ROM_LOAD( "mb7511.4a",  0xc000, 0x2000,  BAD_DUMP CRC(2820ae91) SHA1(70f9b3823733ae39d153948a4006a5972204f482) )    /* marked as BAD for the dumper */
+	ROM_LOAD( "mb7611.3a",  0xe000, 0x2000, CRC(ca9b9b20) SHA1(c6cd793a15948601faa051a4643b14fd3d8bda0b) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mb70.11d",	0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
+	ROM_LOAD( "mb70.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "mb71.12d",	0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )
-	ROM_LOAD( "mb72.13d",	0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
-	ROM_LOAD( "mb73.14d",	0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
+	ROM_LOAD( "mb71.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )
+	ROM_LOAD( "mb72.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
+	ROM_LOAD( "mb73.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "mb7_24s10n.bin",	0x0000, 0x0100, NO_DUMP) /* PROM dump needed */
+	ROM_LOAD( "mb7_24s10n.bin", 0x0000, 0x0100, NO_DUMP) /* PROM dump needed */
 ROM_END
 
 
@@ -564,4 +564,3 @@ ROM_END
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT   ROT    COMPANY                     FULLNAME             FLAGS  */
 GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
-

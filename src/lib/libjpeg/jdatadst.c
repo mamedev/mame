@@ -20,7 +20,7 @@
 #include "jpeglib.h"
 #include "jerror.h"
 
-#ifndef HAVE_STDLIB_H		/* <stdlib.h> should declare malloc(),free() */
+#ifndef HAVE_STDLIB_H       /* <stdlib.h> should declare malloc(),free() */
 extern void * malloc JPP((size_t size));
 extern void free JPP((void *ptr));
 #endif
@@ -29,27 +29,27 @@ extern void free JPP((void *ptr));
 /* Expanded data destination object for stdio output */
 
 typedef struct {
-  struct jpeg_destination_mgr pub; /* public fields */
+	struct jpeg_destination_mgr pub; /* public fields */
 
-  FILE * outfile;		/* target stream */
-  JOCTET * buffer;		/* start of buffer */
+	FILE * outfile;     /* target stream */
+	JOCTET * buffer;        /* start of buffer */
 } my_destination_mgr;
 
 typedef my_destination_mgr * my_dest_ptr;
 
-#define OUTPUT_BUF_SIZE  4096	/* choose an efficiently fwrite'able size */
+#define OUTPUT_BUF_SIZE  4096   /* choose an efficiently fwrite'able size */
 
 
 /* Expanded data destination object for memory output */
 
 typedef struct {
-  struct jpeg_destination_mgr pub; /* public fields */
+	struct jpeg_destination_mgr pub; /* public fields */
 
-  unsigned char ** outbuffer;	/* target buffer */
-  unsigned long * outsize;
-  unsigned char * newbuffer;	/* newly allocated buffer */
-  JOCTET * buffer;		/* start of buffer */
-  size_t bufsize;
+	unsigned char ** outbuffer; /* target buffer */
+	unsigned long * outsize;
+	unsigned char * newbuffer;  /* newly allocated buffer */
+	JOCTET * buffer;        /* start of buffer */
+	size_t bufsize;
 } my_mem_destination_mgr;
 
 typedef my_mem_destination_mgr * my_mem_dest_ptr;
@@ -63,21 +63,21 @@ typedef my_mem_destination_mgr * my_mem_dest_ptr;
 METHODDEF(void)
 init_destination (j_compress_ptr cinfo)
 {
-  my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
+	my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
 
-  /* Allocate the output buffer --- it will be released when done with image */
-  dest->buffer = (JOCTET *)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-				  OUTPUT_BUF_SIZE * SIZEOF(JOCTET));
+	/* Allocate the output buffer --- it will be released when done with image */
+	dest->buffer = (JOCTET *)
+		(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
+					OUTPUT_BUF_SIZE * SIZEOF(JOCTET));
 
-  dest->pub.next_output_byte = dest->buffer;
-  dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
+	dest->pub.next_output_byte = dest->buffer;
+	dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
 }
 
 METHODDEF(void)
 init_mem_destination (j_compress_ptr cinfo)
 {
-  /* no work necessary here */
+	/* no work necessary here */
 }
 
 
@@ -107,46 +107,46 @@ init_mem_destination (j_compress_ptr cinfo)
 METHODDEF(boolean)
 empty_output_buffer (j_compress_ptr cinfo)
 {
-  my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
+	my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
 
-  if (JFWRITE(dest->outfile, dest->buffer, OUTPUT_BUF_SIZE) !=
-      (size_t) OUTPUT_BUF_SIZE)
-    ERREXIT(cinfo, JERR_FILE_WRITE);
+	if (JFWRITE(dest->outfile, dest->buffer, OUTPUT_BUF_SIZE) !=
+		(size_t) OUTPUT_BUF_SIZE)
+	ERREXIT(cinfo, JERR_FILE_WRITE);
 
-  dest->pub.next_output_byte = dest->buffer;
-  dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
+	dest->pub.next_output_byte = dest->buffer;
+	dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
 
-  return TRUE;
+	return TRUE;
 }
 
 METHODDEF(boolean)
 empty_mem_output_buffer (j_compress_ptr cinfo)
 {
-  size_t nextsize;
-  JOCTET * nextbuffer;
-  my_mem_dest_ptr dest = (my_mem_dest_ptr) cinfo->dest;
+	size_t nextsize;
+	JOCTET * nextbuffer;
+	my_mem_dest_ptr dest = (my_mem_dest_ptr) cinfo->dest;
 
-  /* Try to allocate new buffer with double size */
-  nextsize = dest->bufsize * 2;
-  nextbuffer = (JOCTET*)malloc(nextsize);
+	/* Try to allocate new buffer with double size */
+	nextsize = dest->bufsize * 2;
+	nextbuffer = (JOCTET*)malloc(nextsize);
 
-  if (nextbuffer == NULL)
-    ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
+	if (nextbuffer == NULL)
+	ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
 
-  MEMCOPY(nextbuffer, dest->buffer, dest->bufsize);
+	MEMCOPY(nextbuffer, dest->buffer, dest->bufsize);
 
-  if (dest->newbuffer != NULL)
-    free(dest->newbuffer);
+	if (dest->newbuffer != NULL)
+	free(dest->newbuffer);
 
-  dest->newbuffer = nextbuffer;
+	dest->newbuffer = nextbuffer;
 
-  dest->pub.next_output_byte = nextbuffer + dest->bufsize;
-  dest->pub.free_in_buffer = dest->bufsize;
+	dest->pub.next_output_byte = nextbuffer + dest->bufsize;
+	dest->pub.free_in_buffer = dest->bufsize;
 
-  dest->buffer = nextbuffer;
-  dest->bufsize = nextsize;
+	dest->buffer = nextbuffer;
+	dest->bufsize = nextsize;
 
-  return TRUE;
+	return TRUE;
 }
 
 
@@ -162,27 +162,27 @@ empty_mem_output_buffer (j_compress_ptr cinfo)
 METHODDEF(void)
 term_destination (j_compress_ptr cinfo)
 {
-  my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
-  size_t datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
+	my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
+	size_t datacount = OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
 
-  /* Write any data remaining in the buffer */
-  if (datacount > 0) {
-    if (JFWRITE(dest->outfile, dest->buffer, datacount) != datacount)
-      ERREXIT(cinfo, JERR_FILE_WRITE);
-  }
-  fflush(dest->outfile);
-  /* Make sure we wrote the output file OK */
-  if (ferror(dest->outfile))
-    ERREXIT(cinfo, JERR_FILE_WRITE);
+	/* Write any data remaining in the buffer */
+	if (datacount > 0) {
+	if (JFWRITE(dest->outfile, dest->buffer, datacount) != datacount)
+		ERREXIT(cinfo, JERR_FILE_WRITE);
+	}
+	fflush(dest->outfile);
+	/* Make sure we wrote the output file OK */
+	if (ferror(dest->outfile))
+	ERREXIT(cinfo, JERR_FILE_WRITE);
 }
 
 METHODDEF(void)
 term_mem_destination (j_compress_ptr cinfo)
 {
-  my_mem_dest_ptr dest = (my_mem_dest_ptr) cinfo->dest;
+	my_mem_dest_ptr dest = (my_mem_dest_ptr) cinfo->dest;
 
-  *dest->outbuffer = dest->buffer;
-  *dest->outsize = dest->bufsize - dest->pub.free_in_buffer;
+	*dest->outbuffer = dest->buffer;
+	*dest->outsize = dest->bufsize - dest->pub.free_in_buffer;
 }
 
 
@@ -195,25 +195,25 @@ term_mem_destination (j_compress_ptr cinfo)
 GLOBAL(void)
 jpeg_stdio_dest (j_compress_ptr cinfo, FILE * outfile)
 {
-  my_dest_ptr dest;
+	my_dest_ptr dest;
 
-  /* The destination object is made permanent so that multiple JPEG images
-   * can be written to the same file without re-executing jpeg_stdio_dest.
-   * This makes it dangerous to use this manager and a different destination
-   * manager serially with the same JPEG object, because their private object
-   * sizes may be different.  Caveat programmer.
-   */
-  if (cinfo->dest == NULL) {	/* first time for this JPEG object? */
-    cinfo->dest = (struct jpeg_destination_mgr *)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				  SIZEOF(my_destination_mgr));
-  }
+	/* The destination object is made permanent so that multiple JPEG images
+	* can be written to the same file without re-executing jpeg_stdio_dest.
+	* This makes it dangerous to use this manager and a different destination
+	* manager serially with the same JPEG object, because their private object
+	* sizes may be different.  Caveat programmer.
+	*/
+	if (cinfo->dest == NULL) {  /* first time for this JPEG object? */
+	cinfo->dest = (struct jpeg_destination_mgr *)
+		(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
+					SIZEOF(my_destination_mgr));
+	}
 
-  dest = (my_dest_ptr) cinfo->dest;
-  dest->pub.init_destination = init_destination;
-  dest->pub.empty_output_buffer = empty_output_buffer;
-  dest->pub.term_destination = term_destination;
-  dest->outfile = outfile;
+	dest = (my_dest_ptr) cinfo->dest;
+	dest->pub.init_destination = init_destination;
+	dest->pub.empty_output_buffer = empty_output_buffer;
+	dest->pub.term_destination = term_destination;
+	dest->outfile = outfile;
 }
 
 
@@ -230,38 +230,38 @@ jpeg_stdio_dest (j_compress_ptr cinfo, FILE * outfile)
 
 GLOBAL(void)
 jpeg_mem_dest (j_compress_ptr cinfo,
-	       unsigned char ** outbuffer, unsigned long * outsize)
+			unsigned char ** outbuffer, unsigned long * outsize)
 {
-  my_mem_dest_ptr dest;
+	my_mem_dest_ptr dest;
 
-  if (outbuffer == NULL || outsize == NULL)	/* sanity check */
-    ERREXIT(cinfo, JERR_BUFFER_SIZE);
+	if (outbuffer == NULL || outsize == NULL)   /* sanity check */
+	ERREXIT(cinfo, JERR_BUFFER_SIZE);
 
-  /* The destination object is made permanent so that multiple JPEG images
-   * can be written to the same buffer without re-executing jpeg_mem_dest.
-   */
-  if (cinfo->dest == NULL) {	/* first time for this JPEG object? */
-    cinfo->dest = (struct jpeg_destination_mgr *)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				  SIZEOF(my_mem_destination_mgr));
-  }
+	/* The destination object is made permanent so that multiple JPEG images
+	* can be written to the same buffer without re-executing jpeg_mem_dest.
+	*/
+	if (cinfo->dest == NULL) {  /* first time for this JPEG object? */
+	cinfo->dest = (struct jpeg_destination_mgr *)
+		(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
+					SIZEOF(my_mem_destination_mgr));
+	}
 
-  dest = (my_mem_dest_ptr) cinfo->dest;
-  dest->pub.init_destination = init_mem_destination;
-  dest->pub.empty_output_buffer = empty_mem_output_buffer;
-  dest->pub.term_destination = term_mem_destination;
-  dest->outbuffer = outbuffer;
-  dest->outsize = outsize;
-  dest->newbuffer = NULL;
+	dest = (my_mem_dest_ptr) cinfo->dest;
+	dest->pub.init_destination = init_mem_destination;
+	dest->pub.empty_output_buffer = empty_mem_output_buffer;
+	dest->pub.term_destination = term_mem_destination;
+	dest->outbuffer = outbuffer;
+	dest->outsize = outsize;
+	dest->newbuffer = NULL;
 
-  if (*outbuffer == NULL || *outsize == 0) {
-    /* Allocate initial buffer */
-    dest->newbuffer = *outbuffer = (unsigned char*)malloc(OUTPUT_BUF_SIZE);
-    if (dest->newbuffer == NULL)
-      ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
-    *outsize = OUTPUT_BUF_SIZE;
-  }
+	if (*outbuffer == NULL || *outsize == 0) {
+	/* Allocate initial buffer */
+	dest->newbuffer = *outbuffer = (unsigned char*)malloc(OUTPUT_BUF_SIZE);
+	if (dest->newbuffer == NULL)
+		ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
+	*outsize = OUTPUT_BUF_SIZE;
+	}
 
-  dest->pub.next_output_byte = dest->buffer = *outbuffer;
-  dest->pub.free_in_buffer = dest->bufsize = *outsize;
+	dest->pub.next_output_byte = dest->buffer = *outbuffer;
+	dest->pub.free_in_buffer = dest->bufsize = *outsize;
 }

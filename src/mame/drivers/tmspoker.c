@@ -206,7 +206,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_6MHz	/* confirmed */
+#define MASTER_CLOCK    XTAL_6MHz   /* confirmed */
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
@@ -522,12 +522,12 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8, 8,
-	RGN_FRAC(1,1),	/* 256 tiles */
+	RGN_FRAC(1,1),  /* 256 tiles */
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 
@@ -546,16 +546,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -566,7 +566,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/4)	/* guess */
+	MCFG_CPU_ADD("maincpu", TMS9980L, MASTER_CLOCK/4)   /* guess */
 	MCFG_CPU_PROGRAM_MAP(tmspoker_map)
 	MCFG_CPU_IO_MAP(tmspoker_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
@@ -597,14 +597,14 @@ MACHINE_CONFIG_END
 
 ROM_START( tmspoker )
 	ROM_REGION( 0x4000, "maincpu", 0 ) /* TMS9980 selectable code */
-	ROM_LOAD( "0.bin",	0x0000, 0x1000, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )	/* Program 1 */
-	ROM_LOAD( "8.bin",	0x1000, 0x1000, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )	/* Program 2 */
+	ROM_LOAD( "0.bin",  0x0000, 0x1000, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  /* Program 1 */
+	ROM_LOAD( "8.bin",  0x1000, 0x1000, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  /* Program 2 */
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "3.bin",	0x0000, 0x0800, CRC(55458dae) SHA1(bf96d1b287292ff89bc2dbd9451a88a2ab941f3e) )
+	ROM_LOAD( "3.bin",  0x0000, 0x0800, CRC(55458dae) SHA1(bf96d1b287292ff89bc2dbd9451a88a2ab941f3e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tibp22.bin",	0x0000, 0x0100, CRC(74ec6bbd) SHA1(3ab696506de03c69d9f40d49c5fc6d3ac6601acf) )
+	ROM_LOAD( "tibp22.bin", 0x0000, 0x0100, CRC(74ec6bbd) SHA1(3ab696506de03c69d9f40d49c5fc6d3ac6601acf) )
 ROM_END
 
 
@@ -626,20 +626,20 @@ DRIVER_INIT_MEMBER(tmspoker_state,bus)
 
 	/* still need to decode the addressing lines */
 	/* text found in the ROM (A at 6, B at 8, etc: consistent with gfx rom byte offsets) suggests
-       that the lower address lines are good already:
+	   that the lower address lines are good already:
 
-    ROM offset    TEXT
-    -----------------------
-    $0914-$0919   POINTS
-    $091e-$0920   BET
-    $0924-$0927   GAME
-    $092c-$092f   OVER
-    $0934-$0938   RESET
-    $093c-$0941   WINNER
-    $0946-$0949   TEST
+	ROM offset    TEXT
+	-----------------------
+	$0914-$0919   POINTS
+	$091e-$0920   BET
+	$0924-$0927   GAME
+	$092c-$092f   OVER
+	$0934-$0938   RESET
+	$093c-$0941   WINNER
+	$0946-$0949   TEST
 
-    the same 53 bytes blob of data ("POINTS" to "TEST", text control codes included) is also located at offset $190c-$1941
-    */
+	the same 53 bytes blob of data ("POINTS" to "TEST", text control codes included) is also located at offset $190c-$1941
+	*/
 }
 
 

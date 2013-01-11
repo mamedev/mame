@@ -22,7 +22,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define PC1512_KEYBOARD_TAG	"pc1512_keyboard"
+#define PC1512_KEYBOARD_TAG "pc1512_keyboard"
 
 
 
@@ -31,7 +31,7 @@
 //**************************************************************************
 
 #define MCFG_PC1512_KEYBOARD_ADD(_config) \
-    MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0) \
+	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -48,8 +48,8 @@
 
 struct pc1512_keyboard_interface
 {
-	devcb_write_line	m_out_data_cb;
-	devcb_write_line	m_out_clock_cb;
+	devcb_write_line    m_out_data_cb;
+	devcb_write_line    m_out_clock_cb;
 };
 
 
@@ -59,8 +59,8 @@ class pc1512_keyboard_device :  public device_t,
 								public pc1512_keyboard_interface
 {
 public:
-    // construction/destruction
-    pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -80,15 +80,15 @@ public:
 	DECLARE_READ8_MEMBER( kb_t1_r );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-    virtual void device_config_complete();
+	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line	m_out_data_func;
-	devcb_resolved_write_line	m_out_clock_func;
+	devcb_resolved_write_line   m_out_data_func;
+	devcb_resolved_write_line   m_out_clock_func;
 
 	required_device<cpu_device> m_maincpu;
 

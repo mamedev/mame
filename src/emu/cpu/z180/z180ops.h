@@ -1,35 +1,35 @@
 /***************************************************************
  * Enter HALT state; write 1 to fake port on first execution
  ***************************************************************/
-#define ENTER_HALT(cs) {										\
-	(cs)->_PC--;												\
-	(cs)->HALT = 1;												\
+#define ENTER_HALT(cs) {                                        \
+	(cs)->_PC--;                                                \
+	(cs)->HALT = 1;                                             \
 }
 
 /***************************************************************
  * Leave HALT state; write 0 to fake port
  ***************************************************************/
-#define LEAVE_HALT(cs) {										\
-	if( (cs)->HALT )											\
-	{															\
-		(cs)->HALT = 0;											\
-		(cs)->_PC++;											\
-	}															\
+#define LEAVE_HALT(cs) {                                        \
+	if( (cs)->HALT )                                            \
+	{                                                           \
+		(cs)->HALT = 0;                                         \
+		(cs)->_PC++;                                            \
+	}                                                           \
 }
 
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-#define IN(cs,port)												\
-	(((port ^ (cs)->IO_IOCR) & 0xffc0) == 0) ?					\
+#define IN(cs,port)                                             \
+	(((port ^ (cs)->IO_IOCR) & 0xffc0) == 0) ?                  \
 		z180_readcontrol(cs, port) : (cs)->iospace->read_byte(port)
 
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-#define OUT(cs,port,value)										\
-	if (((port ^ (cs)->IO_IOCR) & 0xffc0) == 0)					\
-		z180_writecontrol(cs,port,value);						\
+#define OUT(cs,port,value)                                      \
+	if (((port ^ (cs)->IO_IOCR) & 0xffc0) == 0)                 \
+		z180_writecontrol(cs,port,value);                       \
 	else (cs)->iospace->write_byte(port,value)
 
 /***************************************************************
@@ -66,7 +66,7 @@ INLINE void z180_mmu(z180_state *cpustate)
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(cs,addr)	(cs)->program->read_byte(MMU_REMAP_ADDR(cs,addr))
+#define RM(cs,addr) (cs)->program->read_byte(MMU_REMAP_ADDR(cs,addr))
 #ifdef UNUSED_FUNCTION
 UINT8 z180_readmem(device_t *device, offs_t offset)
 {
@@ -157,134 +157,134 @@ INLINE UINT32 ARG16(z180_state *cpustate)
 /***************************************************************
  * JP
  ***************************************************************/
-#define JP {													\
-	cpustate->_PCD = ARG16(cpustate);											\
+#define JP {                                                    \
+	cpustate->_PCD = ARG16(cpustate);                                           \
 }
 
 /***************************************************************
  * JP_COND
  ***************************************************************/
 
-#define JP_COND(cond)											\
-	if( cond )													\
-	{															\
-		cpustate->_PCD = ARG16(cpustate);										\
-	}															\
-	else														\
-	{															\
-		cpustate->_PC += 2;												\
+#define JP_COND(cond)                                           \
+	if( cond )                                                  \
+	{                                                           \
+		cpustate->_PCD = ARG16(cpustate);                                       \
+	}                                                           \
+	else                                                        \
+	{                                                           \
+		cpustate->_PC += 2;                                             \
 	}
 
 /***************************************************************
  * JR
  ***************************************************************/
-#define JR()													\
-{																\
-	INT8 arg = (INT8)ARG(cpustate); /* ARG(cpustate) also increments cpustate->_PC */	\
-	cpustate->_PC += arg;			/* so don't do cpustate->_PC += ARG(cpustate) */      \
+#define JR()                                                    \
+{                                                               \
+	INT8 arg = (INT8)ARG(cpustate); /* ARG(cpustate) also increments cpustate->_PC */   \
+	cpustate->_PC += arg;           /* so don't do cpustate->_PC += ARG(cpustate) */      \
 }
 
 /***************************************************************
  * JR_COND
  ***************************************************************/
-#define JR_COND(cond,opcode)									\
-	if( cond )													\
-	{															\
+#define JR_COND(cond,opcode)                                    \
+	if( cond )                                                  \
+	{                                                           \
 		INT8 arg = (INT8)ARG(cpustate); /* ARG(cpustate) also increments cpustate->_PC */ \
-		cpustate->_PC += arg;			/* so don't do cpustate->_PC += ARG(cpustate) */  \
-		CC(ex,opcode);											\
-	}															\
-	else cpustate->_PC++;												\
+		cpustate->_PC += arg;           /* so don't do cpustate->_PC += ARG(cpustate) */  \
+		CC(ex,opcode);                                          \
+	}                                                           \
+	else cpustate->_PC++;                                               \
 
 /***************************************************************
  * CALL
  ***************************************************************/
-#define CALL()													\
-	cpustate->ea = ARG16(cpustate);												\
-	PUSH(cpustate,  PC );												\
+#define CALL()                                                  \
+	cpustate->ea = ARG16(cpustate);                                             \
+	PUSH(cpustate,  PC );                                               \
 	cpustate->_PCD = cpustate->ea;
 
 /***************************************************************
  * CALL_COND
  ***************************************************************/
-#define CALL_COND(cond,opcode)									\
-	if( cond )													\
-	{															\
-		cpustate->ea = ARG16(cpustate);											\
-		PUSH(cpustate,  PC );											\
-		cpustate->_PCD = cpustate->ea;												\
-		CC(ex,opcode);											\
-	}															\
-	else														\
-	{															\
-		cpustate->_PC+=2;												\
+#define CALL_COND(cond,opcode)                                  \
+	if( cond )                                                  \
+	{                                                           \
+		cpustate->ea = ARG16(cpustate);                                         \
+		PUSH(cpustate,  PC );                                           \
+		cpustate->_PCD = cpustate->ea;                                              \
+		CC(ex,opcode);                                          \
+	}                                                           \
+	else                                                        \
+	{                                                           \
+		cpustate->_PC+=2;                                               \
 	}
 
 /***************************************************************
  * RET_COND
  ***************************************************************/
-#define RET_COND(cond,opcode)									\
-	if( cond )													\
-	{															\
-		POP(cpustate, PC);												\
-		CC(ex,opcode);											\
+#define RET_COND(cond,opcode)                                   \
+	if( cond )                                                  \
+	{                                                           \
+		POP(cpustate, PC);                                              \
+		CC(ex,opcode);                                          \
 	}
 
 /***************************************************************
  * RETN
  ***************************************************************/
-#define RETN	{												\
+#define RETN    {                                               \
 	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", cpustate->device->tag(), cpustate->IFF1, cpustate->IFF2)); \
-	POP(cpustate, PC);													\
-	cpustate->IFF1 = cpustate->IFF2;												\
+	POP(cpustate, PC);                                                  \
+	cpustate->IFF1 = cpustate->IFF2;                                                \
 }
 
 /***************************************************************
  * RETI
  ***************************************************************/
-#define RETI	{												\
-	POP(cpustate, PC);													\
-/* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */	\
-/*  cpustate->IFF1 = cpustate->IFF2;  */											\
-	cpustate->daisy.call_reti_device();					\
+#define RETI    {                                               \
+	POP(cpustate, PC);                                                  \
+/* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */  \
+/*  cpustate->IFF1 = cpustate->IFF2;  */                                            \
+	cpustate->daisy.call_reti_device();                 \
 }
 
 /***************************************************************
  * LD   R,A
  ***************************************************************/
-#define LD_R_A {												\
-	cpustate->R = cpustate->_A;													\
-	cpustate->R2 = cpustate->_A & 0x80;				/* keep bit 7 of R */		\
+#define LD_R_A {                                                \
+	cpustate->R = cpustate->_A;                                                 \
+	cpustate->R2 = cpustate->_A & 0x80;             /* keep bit 7 of R */       \
 }
 
 /***************************************************************
  * LD   A,R
  ***************************************************************/
-#define LD_A_R {												\
-	cpustate->_A = (cpustate->R & 0x7f) | cpustate->R2; 									\
-	cpustate->_F = (cpustate->_F & CF) | SZ[cpustate->_A] | ( cpustate->IFF2 << 2 );					\
+#define LD_A_R {                                                \
+	cpustate->_A = (cpustate->R & 0x7f) | cpustate->R2;                                     \
+	cpustate->_F = (cpustate->_F & CF) | SZ[cpustate->_A] | ( cpustate->IFF2 << 2 );                    \
 }
 
 /***************************************************************
  * LD   I,A
  ***************************************************************/
-#define LD_I_A {												\
-	cpustate->I = cpustate->_A;													\
+#define LD_I_A {                                                \
+	cpustate->I = cpustate->_A;                                                 \
 }
 
 /***************************************************************
  * LD   A,I
  ***************************************************************/
-#define LD_A_I {												\
-	cpustate->_A = cpustate->I;													\
-	cpustate->_F = (cpustate->_F & CF) | SZ[cpustate->_A] | ( cpustate->IFF2 << 2 );					\
+#define LD_A_I {                                                \
+	cpustate->_A = cpustate->I;                                                 \
+	cpustate->_F = (cpustate->_F & CF) | SZ[cpustate->_A] | ( cpustate->IFF2 << 2 );                    \
 }
 
 /***************************************************************
  * RST
  ***************************************************************/
-#define RST(addr)												\
-	PUSH(cpustate,  PC );												\
+#define RST(addr)                                               \
+	PUSH(cpustate,  PC );                                               \
 	cpustate->_PCD = addr;
 
 /***************************************************************
@@ -310,234 +310,234 @@ INLINE UINT8 DEC(z180_state *cpustate, UINT8 value)
 /***************************************************************
  * RLCA
  ***************************************************************/
-#define RLCA													\
-	cpustate->_A = (cpustate->_A << 1) | (cpustate->_A >> 7);								\
+#define RLCA                                                    \
+	cpustate->_A = (cpustate->_A << 1) | (cpustate->_A >> 7);                               \
 	cpustate->_F = (cpustate->_F & (SF | ZF | PF)) | (cpustate->_A & (YF | XF | CF))
 
 /***************************************************************
  * RRCA
  ***************************************************************/
-#define RRCA													\
-	cpustate->_F = (cpustate->_F & (SF | ZF | PF)) | (cpustate->_A & (YF | XF | CF));		\
+#define RRCA                                                    \
+	cpustate->_F = (cpustate->_F & (SF | ZF | PF)) | (cpustate->_A & (YF | XF | CF));       \
 	cpustate->_A = (cpustate->_A >> 1) | (cpustate->_A << 7)
 
 /***************************************************************
  * RLA
  ***************************************************************/
-#define RLA {													\
-	UINT8 res = (cpustate->_A << 1) | (cpustate->_F & CF);							\
-	UINT8 c = (cpustate->_A & 0x80) ? CF : 0;							\
-	cpustate->_F = (cpustate->_F & (SF | ZF | PF)) | c | (res & (YF | XF)); 		\
-	cpustate->_A = res;													\
+#define RLA {                                                   \
+	UINT8 res = (cpustate->_A << 1) | (cpustate->_F & CF);                          \
+	UINT8 c = (cpustate->_A & 0x80) ? CF : 0;                           \
+	cpustate->_F = (cpustate->_F & (SF | ZF | PF)) | c | (res & (YF | XF));         \
+	cpustate->_A = res;                                                 \
 }
 
 /***************************************************************
  * RRA
  ***************************************************************/
-#define RRA {													\
-	UINT8 res = (cpustate->_A >> 1) | (cpustate->_F << 7);							\
-	UINT8 c = (cpustate->_A & 0x01) ? CF : 0;							\
-	cpustate->_F = (cpustate->_F & (SF | ZF | PF)) | c | (res & (YF | XF)); 		\
-	cpustate->_A = res;													\
+#define RRA {                                                   \
+	UINT8 res = (cpustate->_A >> 1) | (cpustate->_F << 7);                          \
+	UINT8 c = (cpustate->_A & 0x01) ? CF : 0;                           \
+	cpustate->_F = (cpustate->_F & (SF | ZF | PF)) | c | (res & (YF | XF));         \
+	cpustate->_A = res;                                                 \
 }
 
 /***************************************************************
  * RRD
  ***************************************************************/
-#define RRD {													\
-	UINT8 n = RM(cpustate, cpustate->_HL);											\
-	WM(cpustate,  cpustate->_HL, (n >> 4) | (cpustate->_A << 4) );							\
-	cpustate->_A = (cpustate->_A & 0xf0) | (n & 0x0f);								\
-	cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_A];									\
+#define RRD {                                                   \
+	UINT8 n = RM(cpustate, cpustate->_HL);                                          \
+	WM(cpustate,  cpustate->_HL, (n >> 4) | (cpustate->_A << 4) );                          \
+	cpustate->_A = (cpustate->_A & 0xf0) | (n & 0x0f);                              \
+	cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_A];                                 \
 }
 
 /***************************************************************
  * RLD
  ***************************************************************/
-#define RLD {													\
-	UINT8 n = RM(cpustate, cpustate->_HL);											\
-	WM(cpustate,  cpustate->_HL, (n << 4) | (cpustate->_A & 0x0f) );							\
-	cpustate->_A = (cpustate->_A & 0xf0) | (n >> 4);								\
-	cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_A];									\
+#define RLD {                                                   \
+	UINT8 n = RM(cpustate, cpustate->_HL);                                          \
+	WM(cpustate,  cpustate->_HL, (n << 4) | (cpustate->_A & 0x0f) );                            \
+	cpustate->_A = (cpustate->_A & 0xf0) | (n >> 4);                                \
+	cpustate->_F = (cpustate->_F & CF) | SZP[cpustate->_A];                                 \
 }
 
 /***************************************************************
  * ADD  A,n
  ***************************************************************/
-#define ADD(value)												\
-{																\
-	UINT32 ah = cpustate->_AFD & 0xff00;									\
-	UINT32 res = (UINT8)((ah >> 8) + value);					\
-	cpustate->_F = SZHVC_add[ah | res];									\
-	cpustate->_A = res;													\
+#define ADD(value)                                              \
+{                                                               \
+	UINT32 ah = cpustate->_AFD & 0xff00;                                    \
+	UINT32 res = (UINT8)((ah >> 8) + value);                    \
+	cpustate->_F = SZHVC_add[ah | res];                                 \
+	cpustate->_A = res;                                                 \
 }
 
 /***************************************************************
  * ADC  A,n
  ***************************************************************/
-#define ADC(value)												\
-{																\
-	UINT32 ah = cpustate->_AFD & 0xff00, c = cpustate->_AFD & 1;					\
-	UINT32 res = (UINT8)((ah >> 8) + value + c);				\
-	cpustate->_F = SZHVC_add[(c << 16) | ah | res];						\
-	cpustate->_A = res;													\
+#define ADC(value)                                              \
+{                                                               \
+	UINT32 ah = cpustate->_AFD & 0xff00, c = cpustate->_AFD & 1;                    \
+	UINT32 res = (UINT8)((ah >> 8) + value + c);                \
+	cpustate->_F = SZHVC_add[(c << 16) | ah | res];                     \
+	cpustate->_A = res;                                                 \
 }
 
 /***************************************************************
  * SUB  n
  ***************************************************************/
-#define SUB(value)												\
-{																\
-	UINT32 ah = cpustate->_AFD & 0xff00;									\
-	UINT32 res = (UINT8)((ah >> 8) - value);					\
-	cpustate->_F = SZHVC_sub[ah | res];									\
-	cpustate->_A = res;													\
+#define SUB(value)                                              \
+{                                                               \
+	UINT32 ah = cpustate->_AFD & 0xff00;                                    \
+	UINT32 res = (UINT8)((ah >> 8) - value);                    \
+	cpustate->_F = SZHVC_sub[ah | res];                                 \
+	cpustate->_A = res;                                                 \
 }
 
 /***************************************************************
  * SBC  A,n
  ***************************************************************/
-#define SBC(value)												\
-{																\
-	UINT32 ah = cpustate->_AFD & 0xff00, c = cpustate->_AFD & 1;					\
-	UINT32 res = (UINT8)((ah >> 8) - value - c);				\
-	cpustate->_F = SZHVC_sub[(c<<16) | ah | res];						\
-	cpustate->_A = res;													\
+#define SBC(value)                                              \
+{                                                               \
+	UINT32 ah = cpustate->_AFD & 0xff00, c = cpustate->_AFD & 1;                    \
+	UINT32 res = (UINT8)((ah >> 8) - value - c);                \
+	cpustate->_F = SZHVC_sub[(c<<16) | ah | res];                       \
+	cpustate->_A = res;                                                 \
 }
 
 /***************************************************************
  * NEG
  ***************************************************************/
-#define NEG {													\
-	UINT8 value = cpustate->_A;											\
-	cpustate->_A = 0;													\
-	SUB(value); 												\
+#define NEG {                                                   \
+	UINT8 value = cpustate->_A;                                         \
+	cpustate->_A = 0;                                                   \
+	SUB(value);                                                 \
 }
 
 /***************************************************************
  * DAA
  ***************************************************************/
-#define DAA {													\
-	UINT8 r = cpustate->_A;											\
-	if (cpustate->_F&NF) {											\
-		if ((cpustate->_F&HF)|((cpustate->_A&0xf)>9)) r-=6;						\
-		if ((cpustate->_F&CF)|(cpustate->_A>0x99)) r-=0x60;						\
-	}													\
-	else {													\
-		if ((cpustate->_F&HF)|((cpustate->_A&0xf)>9)) r+=6;						\
-		if ((cpustate->_F&CF)|(cpustate->_A>0x99)) r+=0x60;						\
-	}													\
-	cpustate->_F=(cpustate->_F&3)|(cpustate->_A>0x99)|((cpustate->_A^r)&HF)|SZP[r];				\
-	cpustate->_A=r;												\
+#define DAA {                                                   \
+	UINT8 r = cpustate->_A;                                         \
+	if (cpustate->_F&NF) {                                          \
+		if ((cpustate->_F&HF)|((cpustate->_A&0xf)>9)) r-=6;                     \
+		if ((cpustate->_F&CF)|(cpustate->_A>0x99)) r-=0x60;                     \
+	}                                                   \
+	else {                                                  \
+		if ((cpustate->_F&HF)|((cpustate->_A&0xf)>9)) r+=6;                     \
+		if ((cpustate->_F&CF)|(cpustate->_A>0x99)) r+=0x60;                     \
+	}                                                   \
+	cpustate->_F=(cpustate->_F&3)|(cpustate->_A>0x99)|((cpustate->_A^r)&HF)|SZP[r];             \
+	cpustate->_A=r;                                             \
 }
 
 /***************************************************************
  * AND  n
  ***************************************************************/
-#define AND(value)												\
-	cpustate->_A &= value;												\
+#define AND(value)                                              \
+	cpustate->_A &= value;                                              \
 	cpustate->_F = SZP[cpustate->_A] | HF
 
 /***************************************************************
  * OR   n
  ***************************************************************/
-#define OR(value)												\
-	cpustate->_A |= value;												\
+#define OR(value)                                               \
+	cpustate->_A |= value;                                              \
 	cpustate->_F = SZP[cpustate->_A]
 
 /***************************************************************
  * XOR  n
  ***************************************************************/
-#define XOR(value)												\
-	cpustate->_A ^= value;												\
+#define XOR(value)                                              \
+	cpustate->_A ^= value;                                              \
 	cpustate->_F = SZP[cpustate->_A]
 
 /***************************************************************
  * CP   n
  ***************************************************************/
-#define CP(value)												\
-{																\
-	UINT32 ah = cpustate->_AFD & 0xff00;									\
-	UINT32 res = (UINT8)((ah >> 8) - value);					\
-	cpustate->_F = SZHVC_sub[ah | res];									\
+#define CP(value)                                               \
+{                                                               \
+	UINT32 ah = cpustate->_AFD & 0xff00;                                    \
+	UINT32 res = (UINT8)((ah >> 8) - value);                    \
+	cpustate->_F = SZHVC_sub[ah | res];                                 \
 }
 
 /***************************************************************
  * EX   AF,AF'
  ***************************************************************/
-#define EX_AF { 												\
-	PAIR tmp;													\
-	tmp = cpustate->AF; cpustate->AF = cpustate->AF2; cpustate->AF2 = tmp;			\
+#define EX_AF {                                                 \
+	PAIR tmp;                                                   \
+	tmp = cpustate->AF; cpustate->AF = cpustate->AF2; cpustate->AF2 = tmp;          \
 }
 
 /***************************************************************
  * EX   DE,HL
  ***************************************************************/
-#define EX_DE_HL {												\
-	PAIR tmp;													\
-	tmp = cpustate->DE; cpustate->DE = cpustate->HL; cpustate->HL = tmp;			\
+#define EX_DE_HL {                                              \
+	PAIR tmp;                                                   \
+	tmp = cpustate->DE; cpustate->DE = cpustate->HL; cpustate->HL = tmp;            \
 }
 
 /***************************************************************
  * EXX
  ***************************************************************/
-#define EXX {													\
-	PAIR tmp;													\
-	tmp = cpustate->BC; cpustate->BC = cpustate->BC2; cpustate->BC2 = tmp;			\
-	tmp = cpustate->DE; cpustate->DE = cpustate->DE2; cpustate->DE2 = tmp;			\
-	tmp = cpustate->HL; cpustate->HL = cpustate->HL2; cpustate->HL2 = tmp;			\
+#define EXX {                                                   \
+	PAIR tmp;                                                   \
+	tmp = cpustate->BC; cpustate->BC = cpustate->BC2; cpustate->BC2 = tmp;          \
+	tmp = cpustate->DE; cpustate->DE = cpustate->DE2; cpustate->DE2 = tmp;          \
+	tmp = cpustate->HL; cpustate->HL = cpustate->HL2; cpustate->HL2 = tmp;          \
 }
 
 /***************************************************************
  * EX   (SP),r16
  ***************************************************************/
-#define EXSP(DR)												\
-{																\
-	PAIR tmp = { { 0, 0, 0, 0 } };								\
-	RM16(cpustate,  cpustate->_SPD, &tmp ); 										\
-	WM16(cpustate,  cpustate->_SPD, &cpustate->DR );									\
-	cpustate->DR = tmp;												\
+#define EXSP(DR)                                                \
+{                                                               \
+	PAIR tmp = { { 0, 0, 0, 0 } };                              \
+	RM16(cpustate,  cpustate->_SPD, &tmp );                                         \
+	WM16(cpustate,  cpustate->_SPD, &cpustate->DR );                                    \
+	cpustate->DR = tmp;                                             \
 }
 
 
 /***************************************************************
  * ADD16
  ***************************************************************/
-#define ADD16(DR,SR)											\
-{																\
-	UINT32 res = cpustate->DR.d + cpustate->SR.d;						\
-	cpustate->_F = (cpustate->_F & (SF | ZF | VF)) |								\
-		(((cpustate->DR.d ^ res ^ cpustate->SR.d) >> 8) & HF) |			\
-		((res >> 16) & CF); 									\
-	cpustate->DR.w.l = (UINT16)res;									\
+#define ADD16(DR,SR)                                            \
+{                                                               \
+	UINT32 res = cpustate->DR.d + cpustate->SR.d;                       \
+	cpustate->_F = (cpustate->_F & (SF | ZF | VF)) |                                \
+		(((cpustate->DR.d ^ res ^ cpustate->SR.d) >> 8) & HF) |         \
+		((res >> 16) & CF);                                     \
+	cpustate->DR.w.l = (UINT16)res;                                 \
 }
 
 /***************************************************************
  * ADC  r16,r16
  ***************************************************************/
-#define ADC16(DR)												\
-{																\
-	UINT32 res = cpustate->_HLD + cpustate->DR.d + (cpustate->_F & CF);					\
-	cpustate->_F = (((cpustate->_HLD ^ res ^ cpustate->DR.d) >> 8) & HF) |				\
-		((res >> 16) & CF) |									\
-		((res >> 8) & SF) | 									\
-		((res & 0xffff) ? 0 : ZF) | 							\
+#define ADC16(DR)                                               \
+{                                                               \
+	UINT32 res = cpustate->_HLD + cpustate->DR.d + (cpustate->_F & CF);                 \
+	cpustate->_F = (((cpustate->_HLD ^ res ^ cpustate->DR.d) >> 8) & HF) |              \
+		((res >> 16) & CF) |                                    \
+		((res >> 8) & SF) |                                     \
+		((res & 0xffff) ? 0 : ZF) |                             \
 		(((cpustate->DR.d ^ cpustate->_HLD ^ 0x8000) & (cpustate->DR.d ^ res) & 0x8000) >> 13); \
-	cpustate->_HL = (UINT16)res;											\
+	cpustate->_HL = (UINT16)res;                                            \
 }
 
 /***************************************************************
  * SBC  r16,r16
  ***************************************************************/
-#define SBC16(DR)												\
-{																\
-	UINT32 res = cpustate->_HLD - cpustate->DR.d - (cpustate->_F & CF);					\
-	cpustate->_F = (((cpustate->_HLD ^ res ^ cpustate->DR.d) >> 8) & HF) | NF |			\
-		((res >> 16) & CF) |									\
-		((res >> 8) & SF) | 									\
-		((res & 0xffff) ? 0 : ZF) | 							\
-		(((cpustate->DR.d ^ cpustate->_HLD) & (cpustate->_HLD ^ res) &0x8000) >> 13);	\
-	cpustate->_HL = (UINT16)res;											\
+#define SBC16(DR)                                               \
+{                                                               \
+	UINT32 res = cpustate->_HLD - cpustate->DR.d - (cpustate->_F & CF);                 \
+	cpustate->_F = (((cpustate->_HLD ^ res ^ cpustate->DR.d) >> 8) & HF) | NF |         \
+		((res >> 16) & CF) |                                    \
+		((res >> 8) & SF) |                                     \
+		((res & 0xffff) ? 0 : ZF) |                             \
+		(((cpustate->DR.d ^ cpustate->_HLD) & (cpustate->_HLD ^ res) &0x8000) >> 13);   \
+	cpustate->_HL = (UINT16)res;                                            \
 }
 
 /***************************************************************
@@ -640,13 +640,13 @@ INLINE UINT8 SRL(z180_state *cpustate, UINT8 value)
  * BIT  bit,r8
  ***************************************************************/
 #undef BIT
-#define BIT(bit,reg)											\
+#define BIT(bit,reg)                                            \
 	cpustate->_F = (cpustate->_F & CF) | HF | SZ_BIT[reg & (1<<bit)]
 
 /***************************************************************
  * BIT  bit,(IX/Y+o)
  ***************************************************************/
-#define BIT_XY(bit,reg) 										\
+#define BIT_XY(bit,reg)                                         \
 	cpustate->_F = (cpustate->_F & CF) | HF | (SZ_BIT[reg & (1<<bit)] & ~(YF|XF)) | ((cpustate->ea>>8) & (YF|XF))
 
 /***************************************************************
@@ -668,287 +668,286 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 /***************************************************************
  * LDI
  ***************************************************************/
-#define LDI {													\
-	UINT8 io = RM(cpustate, cpustate->_HL); 										\
-	WM(cpustate,  cpustate->_DE, io );												\
-	cpustate->_F &= SF | ZF | CF;										\
-	if( (cpustate->_A + io) & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */		\
-	if( (cpustate->_A + io) & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */		\
-	cpustate->_HL++; cpustate->_DE++; cpustate->_BC--;										\
-	if( cpustate->_BC ) cpustate->_F |= VF; 										\
+#define LDI {                                                   \
+	UINT8 io = RM(cpustate, cpustate->_HL);                                         \
+	WM(cpustate,  cpustate->_DE, io );                                              \
+	cpustate->_F &= SF | ZF | CF;                                       \
+	if( (cpustate->_A + io) & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */      \
+	if( (cpustate->_A + io) & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */      \
+	cpustate->_HL++; cpustate->_DE++; cpustate->_BC--;                                      \
+	if( cpustate->_BC ) cpustate->_F |= VF;                                         \
 }
 
 /***************************************************************
  * CPI
  ***************************************************************/
-#define CPI {													\
-	UINT8 val = RM(cpustate, cpustate->_HL);										\
-	UINT8 res = cpustate->_A - val;										\
-	cpustate->_HL++; cpustate->_BC--;												\
+#define CPI {                                                   \
+	UINT8 val = RM(cpustate, cpustate->_HL);                                        \
+	UINT8 res = cpustate->_A - val;                                     \
+	cpustate->_HL++; cpustate->_BC--;                                               \
 	cpustate->_F = (cpustate->_F & CF) | (SZ[res] & ~(YF|XF)) | ((cpustate->_A ^ val ^ res) & HF) | NF;  \
-	if( cpustate->_F & HF ) res -= 1;									\
-	if( res & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */			\
-	if( res & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */			\
-	if( cpustate->_BC ) cpustate->_F |= VF; 										\
+	if( cpustate->_F & HF ) res -= 1;                                   \
+	if( res & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */          \
+	if( res & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */          \
+	if( cpustate->_BC ) cpustate->_F |= VF;                                         \
 }
 
 /***************************************************************
  * INI
  ***************************************************************/
-#define INI {													\
-	UINT8 io = IN(cpustate, cpustate->_BC); 										\
-	cpustate->_B--;														\
-	WM(cpustate,  cpustate->_HL, io );												\
-	cpustate->_HL++;														\
-	cpustate->_F = SZ[cpustate->_B];												\
-	if( io & SF ) cpustate->_F |= NF;									\
-	if( (cpustate->_C + io + 1) & 0x100 ) cpustate->_F |= HF | CF;					\
-	if( (irep_tmp1[cpustate->_C & 3][io & 3] ^							\
-		 breg_tmp2[cpustate->_B] ^										\
-		 (cpustate->_C >> 2) ^											\
-		 (io >> 2)) & 1 )										\
-		cpustate->_F |= PF;												\
+#define INI {                                                   \
+	UINT8 io = IN(cpustate, cpustate->_BC);                                         \
+	cpustate->_B--;                                                     \
+	WM(cpustate,  cpustate->_HL, io );                                              \
+	cpustate->_HL++;                                                        \
+	cpustate->_F = SZ[cpustate->_B];                                                \
+	if( io & SF ) cpustate->_F |= NF;                                   \
+	if( (cpustate->_C + io + 1) & 0x100 ) cpustate->_F |= HF | CF;                  \
+	if( (irep_tmp1[cpustate->_C & 3][io & 3] ^                          \
+			breg_tmp2[cpustate->_B] ^                                       \
+			(cpustate->_C >> 2) ^                                           \
+			(io >> 2)) & 1 )                                        \
+		cpustate->_F |= PF;                                             \
 }
 
 /***************************************************************
  * OUTI
  ***************************************************************/
-#define OUTI {													\
-	UINT8 io = RM(cpustate, cpustate->_HL); 										\
-	cpustate->_B--;														\
-	OUT(cpustate,  cpustate->_BC, io ); 											\
-	cpustate->_HL++;														\
-	cpustate->_F = SZ[cpustate->_B];												\
-	if( io & SF ) cpustate->_F |= NF;									\
-	if( (cpustate->_C + io + 1) & 0x100 ) cpustate->_F |= HF | CF;					\
-	if( (irep_tmp1[cpustate->_C & 3][io & 3] ^							\
-		 breg_tmp2[cpustate->_B] ^										\
-		 (cpustate->_C >> 2) ^											\
-		 (io >> 2)) & 1 )										\
-		cpustate->_F |= PF;												\
+#define OUTI {                                                  \
+	UINT8 io = RM(cpustate, cpustate->_HL);                                         \
+	cpustate->_B--;                                                     \
+	OUT(cpustate,  cpustate->_BC, io );                                             \
+	cpustate->_HL++;                                                        \
+	cpustate->_F = SZ[cpustate->_B];                                                \
+	if( io & SF ) cpustate->_F |= NF;                                   \
+	if( (cpustate->_C + io + 1) & 0x100 ) cpustate->_F |= HF | CF;                  \
+	if( (irep_tmp1[cpustate->_C & 3][io & 3] ^                          \
+			breg_tmp2[cpustate->_B] ^                                       \
+			(cpustate->_C >> 2) ^                                           \
+			(io >> 2)) & 1 )                                        \
+		cpustate->_F |= PF;                                             \
 }
 
 /***************************************************************
  * LDD
  ***************************************************************/
-#define LDD {													\
-	UINT8 io = RM(cpustate, cpustate->_HL); 										\
-	WM(cpustate,  cpustate->_DE, io );												\
-	cpustate->_F &= SF | ZF | CF;										\
-	if( (cpustate->_A + io) & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */		\
-	if( (cpustate->_A + io) & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */		\
-	cpustate->_HL--; cpustate->_DE--; cpustate->_BC--;										\
-	if( cpustate->_BC ) cpustate->_F |= VF; 										\
+#define LDD {                                                   \
+	UINT8 io = RM(cpustate, cpustate->_HL);                                         \
+	WM(cpustate,  cpustate->_DE, io );                                              \
+	cpustate->_F &= SF | ZF | CF;                                       \
+	if( (cpustate->_A + io) & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */      \
+	if( (cpustate->_A + io) & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */      \
+	cpustate->_HL--; cpustate->_DE--; cpustate->_BC--;                                      \
+	if( cpustate->_BC ) cpustate->_F |= VF;                                         \
 }
 
 /***************************************************************
  * CPD
  ***************************************************************/
-#define CPD {													\
-	UINT8 val = RM(cpustate, cpustate->_HL);										\
-	UINT8 res = cpustate->_A - val;										\
-	cpustate->_HL--; cpustate->_BC--;												\
+#define CPD {                                                   \
+	UINT8 val = RM(cpustate, cpustate->_HL);                                        \
+	UINT8 res = cpustate->_A - val;                                     \
+	cpustate->_HL--; cpustate->_BC--;                                               \
 	cpustate->_F = (cpustate->_F & CF) | (SZ[res] & ~(YF|XF)) | ((cpustate->_A ^ val ^ res) & HF) | NF;  \
-	if( cpustate->_F & HF ) res -= 1;									\
-	if( res & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */			\
-	if( res & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */			\
-	if( cpustate->_BC ) cpustate->_F |= VF; 										\
+	if( cpustate->_F & HF ) res -= 1;                                   \
+	if( res & 0x02 ) cpustate->_F |= YF; /* bit 1 -> flag 5 */          \
+	if( res & 0x08 ) cpustate->_F |= XF; /* bit 3 -> flag 3 */          \
+	if( cpustate->_BC ) cpustate->_F |= VF;                                         \
 }
 
 /***************************************************************
  * IND
  ***************************************************************/
-#define IND {													\
-	UINT8 io = IN(cpustate, cpustate->_BC); 										\
-	cpustate->_B--;														\
-	WM(cpustate,  cpustate->_HL, io );												\
-	cpustate->_HL--;														\
-	cpustate->_F = SZ[cpustate->_B];												\
-	if( io & SF ) cpustate->_F |= NF;									\
-	if( (cpustate->_C + io - 1) & 0x100 ) cpustate->_F |= HF | CF;					\
-	if( (drep_tmp1[cpustate->_C & 3][io & 3] ^							\
-		 breg_tmp2[cpustate->_B] ^										\
-		 (cpustate->_C >> 2) ^											\
-		 (io >> 2)) & 1 )										\
-		cpustate->_F |= PF;												\
+#define IND {                                                   \
+	UINT8 io = IN(cpustate, cpustate->_BC);                                         \
+	cpustate->_B--;                                                     \
+	WM(cpustate,  cpustate->_HL, io );                                              \
+	cpustate->_HL--;                                                        \
+	cpustate->_F = SZ[cpustate->_B];                                                \
+	if( io & SF ) cpustate->_F |= NF;                                   \
+	if( (cpustate->_C + io - 1) & 0x100 ) cpustate->_F |= HF | CF;                  \
+	if( (drep_tmp1[cpustate->_C & 3][io & 3] ^                          \
+			breg_tmp2[cpustate->_B] ^                                       \
+			(cpustate->_C >> 2) ^                                           \
+			(io >> 2)) & 1 )                                        \
+		cpustate->_F |= PF;                                             \
 }
 
 /***************************************************************
  * OUTD
  ***************************************************************/
-#define OUTD {													\
-	UINT8 io = RM(cpustate, cpustate->_HL); 										\
-	cpustate->_B--;														\
-	OUT(cpustate,  cpustate->_BC, io ); 											\
-	cpustate->_HL--;														\
-	cpustate->_F = SZ[cpustate->_B];												\
-	if( io & SF ) cpustate->_F |= NF;									\
-	if( (cpustate->_C + io - 1) & 0x100 ) cpustate->_F |= HF | CF;					\
-	if( (drep_tmp1[cpustate->_C & 3][io & 3] ^							\
-		 breg_tmp2[cpustate->_B] ^										\
-		 (cpustate->_C >> 2) ^											\
-		 (io >> 2)) & 1 )										\
-		cpustate->_F |= PF;												\
+#define OUTD {                                                  \
+	UINT8 io = RM(cpustate, cpustate->_HL);                                         \
+	cpustate->_B--;                                                     \
+	OUT(cpustate,  cpustate->_BC, io );                                             \
+	cpustate->_HL--;                                                        \
+	cpustate->_F = SZ[cpustate->_B];                                                \
+	if( io & SF ) cpustate->_F |= NF;                                   \
+	if( (cpustate->_C + io - 1) & 0x100 ) cpustate->_F |= HF | CF;                  \
+	if( (drep_tmp1[cpustate->_C & 3][io & 3] ^                          \
+			breg_tmp2[cpustate->_B] ^                                       \
+			(cpustate->_C >> 2) ^                                           \
+			(io >> 2)) & 1 )                                        \
+		cpustate->_F |= PF;                                             \
 }
 
 /***************************************************************
  * LDIR
  ***************************************************************/
-#define LDIR													\
-	LDI;														\
-	if( cpustate->_BC )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb0);											\
+#define LDIR                                                    \
+	LDI;                                                        \
+	if( cpustate->_BC )                                                 \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb0);                                            \
 	}
 
 /***************************************************************
  * CPIR
  ***************************************************************/
-#define CPIR													\
-	CPI;														\
-	if( cpustate->_BC && !(cpustate->_F & ZF) ) 									\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb1);											\
+#define CPIR                                                    \
+	CPI;                                                        \
+	if( cpustate->_BC && !(cpustate->_F & ZF) )                                     \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb1);                                            \
 	}
 
 /***************************************************************
  * INIR
  ***************************************************************/
-#define INIR													\
-	INI;														\
-	if( cpustate->_B )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb2);											\
+#define INIR                                                    \
+	INI;                                                        \
+	if( cpustate->_B )                                                  \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb2);                                            \
 	}
 
 /***************************************************************
  * OTIR
  ***************************************************************/
-#define OTIR													\
-	OUTI;														\
-	if( cpustate->_B )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb3);											\
+#define OTIR                                                    \
+	OUTI;                                                       \
+	if( cpustate->_B )                                                  \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb3);                                            \
 	}
 
 /***************************************************************
  * LDDR
  ***************************************************************/
-#define LDDR													\
-	LDD;														\
-	if( cpustate->_BC )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb8);											\
+#define LDDR                                                    \
+	LDD;                                                        \
+	if( cpustate->_BC )                                                 \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb8);                                            \
 	}
 
 /***************************************************************
  * CPDR
  ***************************************************************/
-#define CPDR													\
-	CPD;														\
-	if( cpustate->_BC && !(cpustate->_F & ZF) ) 									\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb9);											\
+#define CPDR                                                    \
+	CPD;                                                        \
+	if( cpustate->_BC && !(cpustate->_F & ZF) )                                     \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb9);                                            \
 	}
 
 /***************************************************************
  * INDR
  ***************************************************************/
-#define INDR													\
-	IND;														\
-	if( cpustate->_B )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xba);											\
+#define INDR                                                    \
+	IND;                                                        \
+	if( cpustate->_B )                                                  \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xba);                                            \
 	}
 
 /***************************************************************
  * OTDR
  ***************************************************************/
-#define OTDR													\
-	OUTD;														\
-	if( cpustate->_B )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xbb);											\
+#define OTDR                                                    \
+	OUTD;                                                       \
+	if( cpustate->_B )                                                  \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xbb);                                            \
 	}
 
 /***************************************************************
  * EI
  ***************************************************************/
-#define EI {													\
-	cpustate->IFF1 = cpustate->IFF2 = 1;											\
-	cpustate->after_EI = 1;											\
+#define EI {                                                    \
+	cpustate->IFF1 = cpustate->IFF2 = 1;                                            \
+	cpustate->after_EI = 1;                                         \
 }
 
 /***************************************************************
  * TST  n
  ***************************************************************/
-#define TST(value)												\
+#define TST(value)                                              \
 	cpustate->_F = SZP[cpustate->_A & value] | HF
 
 /***************************************************************
  * MLT  rr
  ***************************************************************/
-#define MLT(DR) {												\
-	cpustate->DR.w.l = cpustate->DR.b.l * cpustate->DR.b.h;					\
+#define MLT(DR) {                                               \
+	cpustate->DR.w.l = cpustate->DR.b.l * cpustate->DR.b.h;                 \
 }
 
 /***************************************************************
  * OTIM
  ***************************************************************/
-#define OTIM {													\
-	cpustate->_B--;														\
-	OUT(cpustate,  cpustate->_C, RM(cpustate, cpustate->_HL) ); 										\
-	cpustate->_HL++;														\
-	cpustate->_C++;														\
-	cpustate->_F = (cpustate->_B) ? NF : NF | ZF;									\
+#define OTIM {                                                  \
+	cpustate->_B--;                                                     \
+	OUT(cpustate,  cpustate->_C, RM(cpustate, cpustate->_HL) );                                         \
+	cpustate->_HL++;                                                        \
+	cpustate->_C++;                                                     \
+	cpustate->_F = (cpustate->_B) ? NF : NF | ZF;                                   \
 }
 
 /***************************************************************
  * OTDM
  ***************************************************************/
-#define OTDM {													\
-	cpustate->_B--;														\
-	OUT(cpustate,  cpustate->_C, RM(cpustate, cpustate->_HL) ); 										\
-	cpustate->_HL--;														\
-	cpustate->_C--;														\
-	cpustate->_F = (cpustate->_B) ? NF : NF | ZF;									\
+#define OTDM {                                                  \
+	cpustate->_B--;                                                     \
+	OUT(cpustate,  cpustate->_C, RM(cpustate, cpustate->_HL) );                                         \
+	cpustate->_HL--;                                                        \
+	cpustate->_C--;                                                     \
+	cpustate->_F = (cpustate->_B) ? NF : NF | ZF;                                   \
 }
 
 /***************************************************************
  * OTIMR
  ***************************************************************/
-#define OTIMR													\
-	OTIM;														\
-	if( cpustate->_B )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb3);											\
+#define OTIMR                                                   \
+	OTIM;                                                       \
+	if( cpustate->_B )                                                  \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb3);                                            \
 	}
 
 /***************************************************************
  * OTDMR
  ***************************************************************/
-#define OTDMR													\
-	OTDM;														\
-	if( cpustate->_B )													\
-	{															\
-		cpustate->_PC -= 2;												\
-		CC(ex,0xb3);											\
+#define OTDMR                                                   \
+	OTDM;                                                       \
+	if( cpustate->_B )                                                  \
+	{                                                           \
+		cpustate->_PC -= 2;                                             \
+		CC(ex,0xb3);                                            \
 	}
 
 /***************************************************************
  * OTDMR
  ***************************************************************/
-#define SLP {													\
-	cpustate->icount = 0;											\
-	cpustate->HALT = 2;													\
+#define SLP {                                                   \
+	cpustate->icount = 0;                                           \
+	cpustate->HALT = 2;                                                 \
 }
-

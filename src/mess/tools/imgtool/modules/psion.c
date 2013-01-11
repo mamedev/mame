@@ -574,17 +574,17 @@ static imgtoolerr_t datapack_write_file( imgtool_partition *partition, const cha
 
 	switch (type)
 	{
-		case 1:		//OB3 file
+		case 1:     //OB3 file
 			put_name_record(pack->stream, filename, 0x83, file_id);
 			stream_write(pack->stream, data_head, 4);
 			size = put_ob3(sourcef, pack->stream);
 			break;
-		case 2:		//OPL file
+		case 2:     //OPL file
 			put_name_record(pack->stream, filename, 0x83, file_id);
 			stream_write(pack->stream, data_head, 4);
 			size = put_opl(sourcef, pack->stream);
 			break;
-		case 3:		//ODB file
+		case 3:     //ODB file
 			put_name_record(pack->stream, filename, 0x81, file_id);
 			size = put_odb(sourcef, pack->stream, file_id);
 			break;

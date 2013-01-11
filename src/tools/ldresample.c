@@ -74,18 +74,18 @@ const UINT32 MINIMUM_SIGNAL_COUNT = 20;
 
 struct movie_info
 {
-	double			framerate;
-	int				iframerate;
-	int				numfields;
-	int				width;
-	int				height;
-	int				samplerate;
-	int				channels;
-	int				interlaced;
-	bitmap_yuy16	bitmap;
+	double          framerate;
+	int             iframerate;
+	int             numfields;
+	int             width;
+	int             height;
+	int             samplerate;
+	int             channels;
+	int             interlaced;
+	bitmap_yuy16    bitmap;
 	dynamic_array<INT16> lsound;
 	dynamic_array<INT16> rsound;
-	UINT32			samples;
+	UINT32          samples;
 };
 
 
@@ -97,9 +97,9 @@ public:
 	// construction/destruction
 	chd_resample_compressor(chd_file &source, movie_info &info, INT64 ioffset, INT64 islope)
 		: m_source(source),
-		  m_info(info),
-		  m_ioffset(ioffset),
-		  m_islope(islope) { }
+			m_info(info),
+			m_ioffset(ioffset),
+			m_islope(islope) { }
 
 	// read interface
 	virtual UINT32 read_data(void *_dest, UINT64 offset, UINT32 length)
@@ -124,10 +124,10 @@ private:
 	void generate_one_frame(UINT8 *dest, UINT32 datasize, UINT32 fieldnum);
 
 	// internal state
-	chd_file &					m_source;
-	movie_info &				m_info;
-	INT64						m_ioffset;
-	INT64						m_islope;
+	chd_file &                  m_source;
+	movie_info &                m_info;
+	INT64                       m_ioffset;
+	INT64                       m_islope;
 };
 
 
@@ -334,7 +334,7 @@ static bool find_edge_near_field(chd_file &srcfile, UINT32 fieldnum, movie_info 
 	}
 
 	// for each sample in the collection, find the highest deltas over the
-    // next few samples, and take the nth highest value (to remove outliers)
+	// next few samples, and take the nth highest value (to remove outliers)
 	for (UINT32 sampnum = 0; sampnum < soundend - MAXIMUM_WINDOW_SIZE; sampnum++)
 	{
 		// scan forward over the maximum window
@@ -375,7 +375,7 @@ static bool find_edge_near_field(chd_file &srcfile, UINT32 fieldnum, movie_info 
 	firstrdev = sqrt(double(firstrdev) / firstfieldend);
 
 	// scan forward through the samples, counting consecutive samples more than
-    // SIGNAL_DEVIATIONS standard deviations away from silence
+	// SIGNAL_DEVIATIONS standard deviations away from silence
 	UINT32 lcount = 0;
 	UINT32 rcount = 0;
 	UINT32 sampnum = 0;

@@ -231,7 +231,7 @@ static int decrypt_type2b(int val,int param,int swap)
 	val ^= (1<<7)|(1<<3)|(1<<2)|(1<<1);
 
 	if (BIT(param,3)) val ^= (1<<6)|(1<<3)|(1<<1);
-	if (BIT(param,2)) val ^= (1<<7)|(1<<6)|(1<<5)|(1<<3)|(1<<2)|(1<<1);	// same as the other three combined
+	if (BIT(param,2)) val ^= (1<<7)|(1<<6)|(1<<5)|(1<<3)|(1<<2)|(1<<1); // same as the other three combined
 	if (BIT(param,1)) val ^= (1<<7);
 	if (BIT(param,0)) val ^= (1<<5)|(1<<2);
 

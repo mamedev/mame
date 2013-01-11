@@ -83,10 +83,10 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MMU_XM		0x01
-#define MMU_ROM		0x02
-#define MMU_VRAMS	0x04
-#define MMU_RAM		0x08
+#define MMU_XM      0x01
+#define MMU_ROM     0x02
+#define MMU_VRAMS   0x04
+#define MMU_RAM     0x08
 
 
 
@@ -466,22 +466,22 @@ INPUT_PORTS_END
 
 static const sn76477_interface csg_intf =
 {
-	RES_K(47),		//  4  noise_res        R26 47k
-	RES_K(330),		//  5  filter_res       R24 330k
-	CAP_P(390),		//  6  filter_cap       C52 390p
-	RES_K(47),		//  7  decay_res        R23 47k
-	CAP_U(10),		//  8  attack_decay_cap C50 10u/35V
-	RES_K(2.2),		// 10  attack_res       R21 2.2k
-	RES_K(33),		// 11  amplitude_res    R19 33k
-	RES_K(10),		// 12  feedback_res     R18 10k
-	0,				// 16  vco_voltage      0V or 2.5V
-	CAP_N(10) ,		// 17  vco_cap          C48 10n
-	RES_K(100),		// 18  vco_res          R20 100k
-	0,				// 19  pitch_voltage    N/C
-	RES_K(220),		// 20  slf_res          R22 220k
-	CAP_U(1),		// 21  slf_cap          C51 1u/35V
-	CAP_U(0.1),		// 23  oneshot_cap      C53 0.1u
-	RES_K(330)		// 24  oneshot_res      R25 330k
+	RES_K(47),      //  4  noise_res        R26 47k
+	RES_K(330),     //  5  filter_res       R24 330k
+	CAP_P(390),     //  6  filter_cap       C52 390p
+	RES_K(47),      //  7  decay_res        R23 47k
+	CAP_U(10),      //  8  attack_decay_cap C50 10u/35V
+	RES_K(2.2),     // 10  attack_res       R21 2.2k
+	RES_K(33),      // 11  amplitude_res    R19 33k
+	RES_K(10),      // 12  feedback_res     R18 10k
+	0,              // 16  vco_voltage      0V or 2.5V
+	CAP_N(10) ,     // 17  vco_cap          C48 10n
+	RES_K(100),     // 18  vco_res          R20 100k
+	0,              // 19  pitch_voltage    N/C
+	RES_K(220),     // 20  slf_res          R22 220k
+	CAP_U(1),       // 21  slf_cap          C51 1u/35V
+	CAP_U(0.1),     // 23  oneshot_cap      C53 0.1u
+	RES_K(330)      // 24  oneshot_res      R25 330k
 };
 
 
@@ -493,26 +493,26 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 {
 	/*
 
-        PIO Port A
+	    PIO Port A
 
-        bit     description
+	    bit     description
 
-        0       keyboard data
-        1       keyboard data
-        2       keyboard data
-        3       keyboard data
-        4       keyboard data
-        5       keyboard data
-        6       keyboard data
-        7       keyboard strobe
+	    0       keyboard data
+	    1       keyboard data
+	    2       keyboard data
+	    3       keyboard data
+	    4       keyboard data
+	    5       keyboard data
+	    6       keyboard data
+	    7       keyboard strobe
 
-    */
+	*/
 
-    UINT8 data = 0;
+	UINT8 data = 0;
 
-    //data |= m_kb->data_r();
-    data |= m_key_data;
-    data |= (m_key_strobe << 7);
+	//data |= m_kb->data_r();
+	data |= m_key_data;
+	data |= (m_key_strobe << 7);
 
 	return data;
 };
@@ -521,18 +521,18 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 {
 	/*
 
-        PIO Channel B
+	    PIO Channel B
 
-        0  R    RS-232C RxD
-        1  R    RS-232C _CTS
-        2  R    RS-232C _DCD
-        3  W    RS-232C TxD
-        4  W    RS-232C _RTS
-        5  W    Cassette Motor
-        6  W    Cassette Data
-        7  R    Cassette Data
+	    0  R    RS-232C RxD
+	    1  R    RS-232C _CTS
+	    2  R    RS-232C _DCD
+	    3  W    RS-232C TxD
+	    4  W    RS-232C _RTS
+	    5  W    Cassette Motor
+	    6  W    Cassette Data
+	    7  R    Cassette Data
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -557,24 +557,24 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 {
 	/*
 
-        PIO Channel B
+	    PIO Channel B
 
-        0  R    RS-232C RxD
-        1  R    RS-232C _CTS
-        2  R    RS-232C _DCD
-        3  W    RS-232C TxD
-        4  W    RS-232C _RTS
-        5  W    Cassette Motor
-        6  W    Cassette Data
-        7  R    Cassette Data
+	    0  R    RS-232C RxD
+	    1  R    RS-232C _CTS
+	    2  R    RS-232C _DCD
+	    3  W    RS-232C TxD
+	    4  W    RS-232C _RTS
+	    5  W    Cassette Motor
+	    6  W    Cassette Data
+	    7  R    Cassette Data
 
-    */
+	*/
 
-    // transmit data
-    m_rs232->tx(BIT(data, 3));
+	// transmit data
+	m_rs232->tx(BIT(data, 3));
 
-    // request to send
-    m_rs232->rts_w(BIT(data, 4));
+	// request to send
+	m_rs232->rts_w(BIT(data, 4));
 
 	// cassette motor
 	if (BIT(data, 5))
@@ -604,13 +604,13 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 
 static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(abc80_state, pio_pa_r),		/* port A read callback */
-	DEVCB_NULL,										/* port A write callback */
-	DEVCB_NULL,										/* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_r),		/* port B read callback */
-	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_w),		/* port B write callback */
-	DEVCB_NULL										/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(abc80_state, pio_pa_r),     /* port A read callback */
+	DEVCB_NULL,                                     /* port A write callback */
+	DEVCB_NULL,                                     /* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_r),     /* port B read callback */
+	DEVCB_DRIVER_MEMBER(abc80_state, pio_pb_w),     /* port B write callback */
+	DEVCB_NULL                                      /* portB ready active callback */
 };
 
 
@@ -782,7 +782,7 @@ void abc80_state::machine_start()
 
 static MACHINE_CONFIG_START( abc80, abc80_state )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_11_9808MHz/2/2)	// 2.9952 MHz
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_11_9808MHz/2/2) // 2.9952 MHz
 	MCFG_CPU_PROGRAM_MAP(abc80_mem)
 	MCFG_CPU_IO_MAP(abc80_io)
 	MCFG_CPU_CONFIG(abc80_daisy_chain)
@@ -861,4 +861,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  INIT                  COMPANY                FULLNAME    FLAGS
-COMP( 1978, abc80,  0,      0,      abc80,  abc80, driver_device,  0,      "Luxor Datorer AB",	"ABC 80",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_KEYBOARD )
+COMP( 1978, abc80,  0,      0,      abc80,  abc80, driver_device,  0,      "Luxor Datorer AB",  "ABC 80",   GAME_SUPPORTS_SAVE | GAME_IMPERFECT_KEYBOARD )

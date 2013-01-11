@@ -46,8 +46,8 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define TEMP_STRING_POOL_ENTRIES		16
-#define MAX_STRING_LENGTH				256
+#define TEMP_STRING_POOL_ENTRIES        16
+#define MAX_STRING_LENGTH               256
 
 
 
@@ -98,33 +98,33 @@ resource_pool &machine_get_pool(running_machine &machine)
 
 device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: m_type(type),
-	  m_name(name),
-	  m_owner(owner),
-	  m_next(NULL),
+		m_name(name),
+		m_owner(owner),
+		m_next(NULL),
 
-	  m_interface_list(NULL),
-	  m_execute(NULL),
-	  m_memory(NULL),
-	  m_state(NULL),
+		m_interface_list(NULL),
+		m_execute(NULL),
+		m_memory(NULL),
+		m_state(NULL),
 
-	  m_configured_clock(clock),
-	  m_unscaled_clock(clock),
-	  m_clock(clock),
-	  m_clock_scale(1.0),
-	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
+		m_configured_clock(clock),
+		m_unscaled_clock(clock),
+		m_clock(clock),
+		m_clock_scale(1.0),
+		m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
 
-	  m_debug(NULL),
-	  m_region(NULL),
-	  m_machine_config(mconfig),
-	  m_static_config(NULL),
-	  m_input_defaults(NULL),
+		m_debug(NULL),
+		m_region(NULL),
+		m_machine_config(mconfig),
+		m_static_config(NULL),
+		m_input_defaults(NULL),
 
-	  m_machine(NULL),
-	  m_save(NULL),
-	  m_basetag(tag),
-	  m_config_complete(false),
-	  m_started(false),
-	  m_auto_finder_list(NULL)
+		m_machine(NULL),
+		m_save(NULL),
+		m_basetag(tag),
+		m_config_complete(false),
+		m_started(false),
+		m_auto_finder_list(NULL)
 {
 	if (owner != NULL)
 		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
@@ -136,35 +136,35 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 
 device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
 	: m_type(type),
-	  m_name(name),
-	  m_shortname(shortname),
-	  m_searchpath(shortname),
-	  m_owner(owner),
-	  m_next(NULL),
+		m_name(name),
+		m_shortname(shortname),
+		m_searchpath(shortname),
+		m_owner(owner),
+		m_next(NULL),
 
-	  m_interface_list(NULL),
-	  m_execute(NULL),
-	  m_memory(NULL),
-	  m_state(NULL),
+		m_interface_list(NULL),
+		m_execute(NULL),
+		m_memory(NULL),
+		m_state(NULL),
 
-	  m_configured_clock(clock),
-	  m_unscaled_clock(clock),
-	  m_clock(clock),
-	  m_clock_scale(1.0),
-	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
+		m_configured_clock(clock),
+		m_unscaled_clock(clock),
+		m_clock(clock),
+		m_clock_scale(1.0),
+		m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
 
-	  m_debug(NULL),
-	  m_region(NULL),
-	  m_machine_config(mconfig),
-	  m_static_config(NULL),
-	  m_input_defaults(NULL),
+		m_debug(NULL),
+		m_region(NULL),
+		m_machine_config(mconfig),
+		m_static_config(NULL),
+		m_input_defaults(NULL),
 
-	  m_machine(NULL),
-	  m_save(NULL),
-	  m_basetag(tag),
-	  m_config_complete(false),
-	  m_started(false),
-	  m_auto_finder_list(NULL)
+		m_machine(NULL),
+		m_save(NULL),
+		m_basetag(tag),
+		m_config_complete(false),
+		m_started(false),
+		m_auto_finder_list(NULL)
 {
 	if (owner != NULL)
 		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
@@ -895,8 +895,8 @@ device_t::finder_base *device_t::register_auto_finder(finder_base &autodev)
 
 device_t::finder_base::finder_base(device_t &base, const char *tag)
 	: m_next(base.register_auto_finder(*this)),
-	  m_base(base),
-	  m_tag(tag)
+		m_base(base),
+		m_tag(tag)
 {
 }
 
@@ -965,7 +965,7 @@ bool device_t::finder_base::report_missing(bool found, const char *objname, bool
 
 device_interface::device_interface(device_t &device)
 	: m_interface_next(NULL),
-	  m_device(device)
+		m_device(device)
 {
 	device_interface **tailptr;
 	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;

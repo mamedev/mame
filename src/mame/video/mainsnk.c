@@ -92,9 +92,9 @@ WRITE8_MEMBER(mainsnk_state::mainsnk_c600_w)
 	m_tx_tilemap->set_palette_offset((data & 0x07) << 4);
 
 	bank = 0;
-	if (total_elements == 0x400)	// mainsnk
+	if (total_elements == 0x400)    // mainsnk
 		bank = ((data & 0x30) >> 4);
-	else if (total_elements == 0x800)	// canvas
+	else if (total_elements == 0x800)   // canvas
 		bank = ((data & 0x40) >> 6) | ((data & 0x30) >> 3);
 
 	if (m_bg_tile_offset != (bank << 8))

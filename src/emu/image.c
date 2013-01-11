@@ -157,7 +157,7 @@ static int write_config(emu_options &options, const char *filename, const game_d
 static void image_options_extract(running_machine &machine)
 {
 	/* only extract the device options if we've added them
-       no need to assert in case they are missing */
+	   no need to assert in case they are missing */
 	{
 		int index = 0;
 
@@ -264,7 +264,7 @@ void image_postdevice_init(running_machine &machine)
 	/* make sure that any required devices have been allocated */
 	image_interface_iterator iter(machine.root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
-    {
+	{
 			int result = image->finish_load();
 			/* did the image load fail? */
 			if (result)
@@ -438,19 +438,19 @@ astring &image_info_astring(running_machine &machine, astring &string)
 
 void image_battery_load_by_name(emu_options &options, const char *filename, void *buffer, int length, int fill)
 {
-    file_error filerr;
-    int bytes_read = 0;
+	file_error filerr;
+	int bytes_read = 0;
 
-    assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
-    /* try to open the battery file and read it in, if possible */
-    emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
-    filerr = file.open(filename);
-    if (filerr == FILERR_NONE)
-        bytes_read = file.read(buffer, length);
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(filename);
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
 
-    /* fill remaining bytes (if necessary) */
-    memset(((char *) buffer) + bytes_read, fill, length - bytes_read);
+	/* fill remaining bytes (if necessary) */
+	memset(((char *) buffer) + bytes_read, fill, length - bytes_read);
 }
 
 /*-------------------------------------------------
@@ -460,11 +460,11 @@ void image_battery_load_by_name(emu_options &options, const char *filename, void
 -------------------------------------------------*/
 void image_battery_save_by_name(emu_options &options, const char *filename, const void *buffer, int length)
 {
-    assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
-    /* try to open the battery file and write it out, if possible */
-    emu_file file(options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-    file_error filerr = file.open(filename);
-    if (filerr == FILERR_NONE)
-        file.write(buffer, length);
+	/* try to open the battery file and write it out, if possible */
+	emu_file file(options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(filename);
+	if (filerr == FILERR_NONE)
+		file.write(buffer, length);
 }

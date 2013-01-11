@@ -127,18 +127,18 @@ void c64_final3_cartridge_device::c64_cd_w(address_space &space, offs_t offset, 
 	{
 		/*
 
-            bit     description
+		    bit     description
 
-            0       A14
-            1       A15
-            2
-            3
-            4       EXROM
-            5       GAME
-            6       NMI
-            7       hide register
+		    0       A14
+		    1       A15
+		    2
+		    3
+		    4       EXROM
+		    5       GAME
+		    6       NMI
+		    7       hide register
 
-        */
+		*/
 
 		m_bank = data & 0x03;
 

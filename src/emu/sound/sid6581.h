@@ -32,7 +32,7 @@ struct sid6581_interface
 struct SID6581_t;
 
 class sid6581_device : public device_t,
-                       public device_sound_interface
+						public device_sound_interface
 {
 public:
 	sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

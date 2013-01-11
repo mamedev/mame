@@ -5,21 +5,21 @@ VIDEO_START( pce );
 SCREEN_UPDATE_IND16( pce );
 DECLARE_WRITE8_HANDLER ( vdc_0_w );
 DECLARE_WRITE8_HANDLER ( vdc_1_w );
- DECLARE_READ8_HANDLER ( vdc_0_r );
- DECLARE_READ8_HANDLER ( vdc_1_r );
+	DECLARE_READ8_HANDLER ( vdc_0_r );
+	DECLARE_READ8_HANDLER ( vdc_1_r );
 PALETTE_INIT( vce );
- DECLARE_READ8_HANDLER ( vce_r );
+	DECLARE_READ8_HANDLER ( vce_r );
 DECLARE_WRITE8_HANDLER ( vce_w );
 DECLARE_WRITE8_HANDLER( vpc_w );
- DECLARE_READ8_HANDLER( vpc_r );
+	DECLARE_READ8_HANDLER( vpc_r );
 DECLARE_WRITE8_HANDLER( sgx_vdc_w );
- DECLARE_READ8_HANDLER( sgx_vdc_r );
+	DECLARE_READ8_HANDLER( sgx_vdc_r );
 TIMER_DEVICE_CALLBACK( pce_interrupt );
 TIMER_DEVICE_CALLBACK( sgx_interrupt );
 
 /* Screen timing stuff */
 
-#define VDC_WPF			684		/* width of a line in frame including blanking areas */
+#define VDC_WPF         684     /* width of a line in frame including blanking areas */
 #define VDC_LPF         262     /* number of lines in a single frame */
 
 /* Bits in the VDC status register */
@@ -51,4 +51,3 @@ TIMER_DEVICE_CALLBACK( sgx_interrupt );
 
 /* just to keep things simple... */
 enum vdc_regs {MAWR = 0, MARR, VxR, reg3, reg4, CR, RCR, BXR, BYR, MWR, HSR, HDR, VPR, VDW, VCR, DCR, SOUR, DESR, LENR, DVSSR };
-

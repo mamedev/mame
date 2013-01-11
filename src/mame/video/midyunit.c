@@ -10,7 +10,7 @@
 
 
 /* compile-time options */
-#define LOG_DMA				0		/* DMAs are logged if the 'L' key is pressed */
+#define LOG_DMA             0       /* DMAs are logged if the 'L' key is pressed */
 
 
 /* constants for the DMA chip */
@@ -195,18 +195,18 @@ void midyunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftr
 WRITE16_MEMBER(midyunit_state::midyunit_control_w)
 {
 	/*
-     * Narc system register
-     * ------------------
-     *
-     *   | Bit              | Use
-     * --+-FEDCBA9876543210-+------------
-     *   | xxxxxxxx-------- |   7 segment led on CPU board
-     *   | --------xx------ |   CMOS page
-     *   | ----------x----- | - OBJ PAL RAM select
-     *   | -----------x---- | - autoerase enable
-     *   | ---------------- | - watchdog
-     *
-     */
+	 * Narc system register
+	 * ------------------
+	 *
+	 *   | Bit              | Use
+	 * --+-FEDCBA9876543210-+------------
+	 *   | xxxxxxxx-------- |   7 segment led on CPU board
+	 *   | --------xx------ |   CMOS page
+	 *   | ----------x----- | - OBJ PAL RAM select
+	 *   | -----------x---- | - autoerase enable
+	 *   | ---------------- | - watchdog
+	 *
+	 */
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -284,16 +284,16 @@ static void dma_draw(running_machine &machine, UINT16 command)
 		/* switch off the zero/non-zero options */
 		switch (command)
 		{
-			case 0x00:	/* draw nothing */
+			case 0x00:  /* draw nothing */
 				break;
 
-			case 0x01:	/* draw only 0 pixels */
+			case 0x01:  /* draw only 0 pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					if (base[o++] == 0)
 						dest[tx] = pal;
 				break;
 
-			case 0x02:	/* draw only non-0 pixels */
+			case 0x02:  /* draw only non-0 pixels */
 				for (x = 0; x < width; x++, tx += dx)
 				{
 					int pixel = base[o++];
@@ -302,20 +302,20 @@ static void dma_draw(running_machine &machine, UINT16 command)
 				}
 				break;
 
-			case 0x03:	/* draw all pixels */
+			case 0x03:  /* draw all pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					dest[tx] = pal | base[o++];
 				break;
 
-			case 0x04:	/* color only 0 pixels */
-			case 0x05:	/* color only 0 pixels */
+			case 0x04:  /* color only 0 pixels */
+			case 0x05:  /* color only 0 pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					if (base[o++] == 0)
 						dest[tx] = color;
 				break;
 
-			case 0x06:	/* color only 0 pixels, copy the rest */
-			case 0x07:	/* color only 0 pixels, copy the rest */
+			case 0x06:  /* color only 0 pixels, copy the rest */
+			case 0x07:  /* color only 0 pixels, copy the rest */
 				for (x = 0; x < width; x++, tx += dx)
 				{
 					int pixel = base[o++];
@@ -323,15 +323,15 @@ static void dma_draw(running_machine &machine, UINT16 command)
 				}
 				break;
 
-			case 0x08:	/* color only non-0 pixels */
-			case 0x0a:	/* color only non-0 pixels */
+			case 0x08:  /* color only non-0 pixels */
+			case 0x0a:  /* color only non-0 pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					if (base[o++] != 0)
 						dest[tx] = color;
 				break;
 
-			case 0x09:	/* color only non-0 pixels, copy the rest */
-			case 0x0b:	/* color only non-0 pixels, copy the rest */
+			case 0x09:  /* color only non-0 pixels, copy the rest */
+			case 0x0b:  /* color only non-0 pixels, copy the rest */
 				for (x = 0; x < width; x++, tx += dx)
 				{
 					int pixel = base[o++];
@@ -339,10 +339,10 @@ static void dma_draw(running_machine &machine, UINT16 command)
 				}
 				break;
 
-			case 0x0c:	/* color all pixels */
-			case 0x0d:	/* color all pixels */
-			case 0x0e:	/* color all pixels */
-			case 0x0f:	/* color all pixels */
+			case 0x0c:  /* color all pixels */
+			case 0x0d:  /* color all pixels */
+			case 0x0e:  /* color all pixels */
+			case 0x0f:  /* color all pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					dest[tx] = color;
 				break;

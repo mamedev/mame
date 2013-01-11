@@ -213,63 +213,63 @@ static void socrates_check_kb_latch( running_machine &machine ) // if kb[1] is f
 
 void socrates_state::machine_reset()
 {
- m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
- socrates_set_rom_bank( machine() );
- m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
- socrates_set_ram_bank( machine() );
- m_kb_latch_low[0] = 0xFF;
- m_kb_latch_high[0] = 0x8F;
- m_kb_latch_low[1] = 0x00;
- m_kb_latch_high[1] = 0x01;
- m_kb_latch_mouse = 0;
- m_kbmcu_rscount = 0;
- m_io40_latch = 0;
- m_hblankstate = 0;
- m_vblankstate = 0;
- m_speech_running = 0;
- m_speech_address = 0;
- m_speech_settings = 0;
- m_speech_dummy_read = 0;
- m_speech_load_address_count = 0;
- m_speech_load_settings_count = 0;
+	m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
+	socrates_set_rom_bank( machine() );
+	m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
+	socrates_set_ram_bank( machine() );
+	m_kb_latch_low[0] = 0xFF;
+	m_kb_latch_high[0] = 0x8F;
+	m_kb_latch_low[1] = 0x00;
+	m_kb_latch_high[1] = 0x01;
+	m_kb_latch_mouse = 0;
+	m_kbmcu_rscount = 0;
+	m_io40_latch = 0;
+	m_hblankstate = 0;
+	m_vblankstate = 0;
+	m_speech_running = 0;
+	m_speech_address = 0;
+	m_speech_settings = 0;
+	m_speech_dummy_read = 0;
+	m_speech_load_address_count = 0;
+	m_speech_load_settings_count = 0;
 }
 
 DRIVER_INIT_MEMBER(socrates_state,socrates)
 {
 	UINT8 *gfx = machine().root_device().memregion("vram")->base();
 	int i;
-    /* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
-    for (i = 0; i < 0x10000; i++)
-        gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
+	for (i = 0; i < 0x10000; i++)
+		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 // init sound channels to both be on lowest pitch and max volume
-    machine().device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	machine().device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 READ8_MEMBER(socrates_state::socrates_rom_bank_r)
 {
- return m_rom_bank;
+	return m_rom_bank;
 }
 
 WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
 {
- m_rom_bank = data;
- socrates_set_rom_bank(machine());
+	m_rom_bank = data;
+	socrates_set_rom_bank(machine());
 }
 
 READ8_MEMBER(socrates_state::socrates_ram_bank_r)
 {
- return m_ram_bank;
+	return m_ram_bank;
 }
 
 WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
 {
- m_ram_bank = data&0xF;
- socrates_set_ram_bank(machine());
+	m_ram_bank = data&0xF;
+	socrates_set_ram_bank(machine());
 }
 
 READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
 {
- return 0xF3;
+	return 0xF3;
 }
 
 WRITE8_MEMBER(socrates_state::kbmcu_strobe) // strobe the keyboard MCU
@@ -449,16 +449,16 @@ end hd38880 info.*/
 
 READ8_MEMBER(socrates_state::socrates_keyboard_low_r)// keyboard code low
 {
- socrates_update_kb(machine());
- socrates_check_kb_latch(machine());
- return m_kb_latch_low[0];
+	socrates_update_kb(machine());
+	socrates_check_kb_latch(machine());
+	return m_kb_latch_low[0];
 }
 
 READ8_MEMBER(socrates_state::socrates_keyboard_high_r)// keyboard code high
 {
- socrates_update_kb(machine());
- socrates_check_kb_latch(machine());
- return m_kb_latch_high[0];
+	socrates_update_kb(machine());
+	socrates_check_kb_latch(machine());
+	return m_kb_latch_high[0];
 }
 
 WRITE8_MEMBER(socrates_state::socrates_keyboard_clear)// keyboard latch shift/clear
@@ -471,13 +471,13 @@ WRITE8_MEMBER(socrates_state::socrates_keyboard_clear)// keyboard latch shift/cl
 
 WRITE8_MEMBER(socrates_state::reset_speech)// i/o 60: reset speech synth
 {
- m_speech_running = 0;
- m_speech_address = 0;
- m_speech_settings = 0;
- m_speech_dummy_read = 0;
- m_speech_load_address_count = 0;
- m_speech_load_settings_count = 0;
- m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
+	m_speech_running = 0;
+	m_speech_address = 0;
+	m_speech_settings = 0;
+	m_speech_dummy_read = 0;
+	m_speech_load_address_count = 0;
+	m_speech_load_settings_count = 0;
+	m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
 logerror("write to i/o 0x60 of %x\n",data);
 }
 
@@ -485,24 +485,24 @@ logerror("write to i/o 0x60 of %x\n",data);
 
 WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 {
- if (offset == 0)
- m_scroll_offset = (m_scroll_offset&0x100) | data;
- else
- m_scroll_offset = (m_scroll_offset&0xFF) | ((data&1)<<8);
+	if (offset == 0)
+	m_scroll_offset = (m_scroll_offset&0x100) | data;
+	else
+	m_scroll_offset = (m_scroll_offset&0xFF) | ((data&1)<<8);
 }
 
 /* NTSC-based Palette stuff */
 // max for I and Q
 #define M_I 0.5957
 #define M_Q 0.5226
- /* luma amplitudes, measured on scope */
+	/* luma amplitudes, measured on scope */
 #define LUMAMAX 1.420
 #define LUMA_COL_0 0.355, 0.139, 0.205, 0, 0.569, 0.355, 0.419, 0.205, 0.502, 0.288, 0.358, 0.142, 0.720, 0.502, 0.571, 0.358,
 #define LUMA_COL_COMMON 0.52, 0.52, 0.52, 0.52, 0.734, 0.734, 0.734, 0.734, 0.667, 0.667, 0.667, 0.667, 0.885, 0.885, 0.885, 0.885,
 #define LUMA_COL_2 0.574, 0.6565, 0.625, 0.71, 0.792, 0.87, 0.8425, 0.925, 0.724, 0.8055, 0.7825, 0.865, 0.94275, 1.0225, 0.99555, 1.07525,
 #define LUMA_COL_5 0.4585, 0.382, 0.4065, 0.337, 0.6715, 0.5975, 0.6205, 0.5465, 0.6075, 0.531, 0.5555, 0.45, 0.8255, 0.7455, 0.774, 0.6985,
 #define LUMA_COL_F 0.690, 0.904, 0.830, 1.053, 0.910, 1.120, 1.053, 1.270, 0.840, 1.053, 0.990, 1.202, 1.053, 1.270, 1.202, 1.420
- /* chroma amplitudes, measured on scope */
+	/* chroma amplitudes, measured on scope */
 #define CHROMAMAX 0.42075
 #define CHROMA_COL_COMMON 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075, 0.148, 0.3125, 0.26475, 0.42075,
 #define CHROMA_COL_2 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875, 0.125125, 0.27525, 0.230225, 0.384875,
@@ -512,84 +512,84 @@ WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 
 static rgb_t socrates_create_color(UINT8 color)
 {
-  rgb_t composedcolor;
-  static const double lumatable[256] = {
-    LUMA_COL_0
-    LUMA_COL_COMMON
-    LUMA_COL_2
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_5
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_COMMON
-    LUMA_COL_F
-  };
-  static const double chromaintensity[256] = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    CHROMA_COL_COMMON
-    CHROMA_COL_2
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_5
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-    CHROMA_COL_COMMON
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-  };
-  /* chroma colors and phases:
-     0: black-through-grey (0 assumed chroma)
-     1: purple (90 chroma seems correct)
-     2: light blue/green (210 or 240 chroma, 210 seems slightly closer)
-     3: bright blue (150 seems correct)
-     4: green (270 seems correct)
-     5: red (30 seems correct, does have some blue in it)
-     6: orange (0 seems correct, does have some red in it)
-     7: yellow/gold (330 is closest but conflicts with color C, hence 315 seems close, and must have its own delay line separate from the other phases which use a standard 12 phase scheme)
-     8: blue with a hint of green in it (180 seems correct)
-     9: blue-green (210 seems correct)
-     A: forest green (240 seems correct)
-     B: yellow-green (300 seems correct)
-     C: yellow-orange (330 is close but this conflicts with color 7, and is not quite the same; color 7 has more green in it than color C)
-     D: magenta (60 is closest)
-     E: blue-purple (more blue than color 1, 120 is closest)
-     F: grey-through-white (0 assumed chroma)
-  */
-  static const double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
-  int chromaindex = color&0x0F;
-  int swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
-  double finalY, finalI, finalQ, finalR, finalG, finalB;
-  finalY = (1/LUMAMAX) * lumatable[swappedcolor];
-  finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-  finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-  if (finalY > 1) finalY = 1; // clamp luma
-  /* calculate the R, G and B values here, neato matrix math */
-  finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
-  finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
-  finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
-  /* scale/clamp to 0-255 range */
-  if (finalR<0) finalR = 0;
-  if (finalR>1) finalR = 1;
-  if (finalG<0) finalG = 0;
-  if (finalG>1) finalG = 1;
-  if (finalB<0) finalB = 0;
-  if (finalB>1) finalB = 1;
-  // gamma correction: 1.0 to GAMMA:
-  finalR = pow(finalR, 1/GAMMA)*255;
-  finalG = pow(finalG, 1/GAMMA)*255;
-  finalB = pow(finalB, 1/GAMMA)*255;
+	rgb_t composedcolor;
+	static const double lumatable[256] = {
+	LUMA_COL_0
+	LUMA_COL_COMMON
+	LUMA_COL_2
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_5
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_COMMON
+	LUMA_COL_F
+	};
+	static const double chromaintensity[256] = {
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	CHROMA_COL_COMMON
+	CHROMA_COL_2
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_5
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	CHROMA_COL_COMMON
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	};
+	/* chroma colors and phases:
+	 0: black-through-grey (0 assumed chroma)
+	 1: purple (90 chroma seems correct)
+	 2: light blue/green (210 or 240 chroma, 210 seems slightly closer)
+	 3: bright blue (150 seems correct)
+	 4: green (270 seems correct)
+	 5: red (30 seems correct, does have some blue in it)
+	 6: orange (0 seems correct, does have some red in it)
+	 7: yellow/gold (330 is closest but conflicts with color C, hence 315 seems close, and must have its own delay line separate from the other phases which use a standard 12 phase scheme)
+	 8: blue with a hint of green in it (180 seems correct)
+	 9: blue-green (210 seems correct)
+	 A: forest green (240 seems correct)
+	 B: yellow-green (300 seems correct)
+	 C: yellow-orange (330 is close but this conflicts with color 7, and is not quite the same; color 7 has more green in it than color C)
+	 D: magenta (60 is closest)
+	 E: blue-purple (more blue than color 1, 120 is closest)
+	 F: grey-through-white (0 assumed chroma)
+	*/
+	static const double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
+	int chromaindex = color&0x0F;
+	int swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
+	double finalY, finalI, finalQ, finalR, finalG, finalB;
+	finalY = (1/LUMAMAX) * lumatable[swappedcolor];
+	finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	if (finalY > 1) finalY = 1; // clamp luma
+	/* calculate the R, G and B values here, neato matrix math */
+	finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
+	finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
+	finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
+	/* scale/clamp to 0-255 range */
+	if (finalR<0) finalR = 0;
+	if (finalR>1) finalR = 1;
+	if (finalG<0) finalG = 0;
+	if (finalG>1) finalG = 1;
+	if (finalB<0) finalB = 0;
+	if (finalB>1) finalB = 1;
+	// gamma correction: 1.0 to GAMMA:
+	finalR = pow(finalR, 1/GAMMA)*255;
+	finalG = pow(finalG, 1/GAMMA)*255;
+	finalB = pow(finalB, 1/GAMMA)*255;
 composedcolor = MAKE_RGB((int)finalR,(int)finalG,(int)finalB);
 return composedcolor;
 }
@@ -600,7 +600,7 @@ void socrates_state::palette_init()
 	int i; // iterator
 	for (i = 0; i < 256; i++)
 	{
-	 m_palette[i] = socrates_create_color(i);
+		m_palette[i] = socrates_create_color(i);
 	}
 	palette_set_colors(machine(), 0, m_palette, ARRAY_LENGTH(m_palette));
 }
@@ -677,11 +677,11 @@ WRITE8_MEMBER(socrates_state::socrates_sound_w)
 ******************************************************************************/
 
 static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, socrates_state )
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
-    AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
-    AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2") /* banked ram 'window' 0 */
-    AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3") /* banked ram 'window' 1 */
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2") /* banked ram 'window' 0 */
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3") /* banked ram 'window' 1 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
@@ -816,18 +816,18 @@ static INPUT_PORTS_START( socrates )
 	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Right D-pad Button") // 20 80
 	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 	/* alt w/left and right keypad keys swapped
-    PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Left D-pad Right") // 00 81
-    PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Left D-pad Up") // 00 82
-    PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left D-pad Left") // 00 84
-    PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Left D-pad Down") // 00 88
-    PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Right D-pad Down") // 01 80
-    PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Right D-pad Left") // 02 80
-    PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Right D-pad Up") // 04 80
-    PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Right D-pad Right") // 08 80
-    PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Left D-pad Button") // 10 80
-    PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Right D-pad Button") // 20 80
-    PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
-    */
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("Left D-pad Right") // 00 81
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("Left D-pad Up") // 00 82
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("Left D-pad Left") // 00 84
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("Left D-pad Down") // 00 88
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_NAME("Right D-pad Down") // 01 80
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_NAME("Right D-pad Left") // 02 80
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_NAME("Right D-pad Up") // 04 80
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_NAME("Right D-pad Right") // 08 80
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Left D-pad Button") // 10 80
+	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Right D-pad Button") // 20 80
+	PORT_BIT(0xfffffc00, IP_ACTIVE_HIGH, IPT_UNUSED)
+	*/
 
 	PORT_START("keyboard_50") // lowest 'row' (technically the shift key is on the 5th row but it has its own keycode)
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_NAME("SHIFT") // 5x xx
@@ -920,15 +920,15 @@ INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 }
 
 static MACHINE_CONFIG_START( socrates, socrates_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-    MCFG_CPU_PROGRAM_MAP(z80_mem)
-    MCFG_CPU_IO_MAP(z80_io)
-    MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
-    //MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
+	//MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -939,7 +939,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_PALETTE_LENGTH(256)
 
 
-    /* sound hardware */
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -954,15 +954,15 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( socrates_pal, socrates_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_26_601712MHz/6)  /* Toshiba TMPZ84C00AP @ 4.433 MHz? /6 or 7 or 8? TODO: verify divider!*/
-    MCFG_CPU_PROGRAM_MAP(z80_mem)
-    MCFG_CPU_IO_MAP(z80_io)
-    MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_26_601712MHz/6)  /* Toshiba TMPZ84C00AP @ 4.433 MHz? /6 or 7 or 8? TODO: verify divider!*/
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
-    //MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
+	//MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -973,7 +973,7 @@ static MACHINE_CONFIG_START( socrates_pal, socrates_state )
 	MCFG_PALETTE_LENGTH(256)
 
 
-    /* sound hardware */
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("soc_snd", SOCRATES, XTAL_26_601712MHz/(512+256)) // TODO: verify divider for pal mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1005,99 +1005,99 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START(socrates)
-    ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 */
-    /* Socrates US NTSC */
+	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 */
+	/* Socrates US NTSC */
 	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
 	/* cart port pinout:
-    (looking into end of disk-shaped cartridge with label/top side pointing to the right)
-    A15 -> 19  18 -- VCC
-    A14 -> 20  17 <- A16
-    A13 -> 21  16 <- A12
-     A8 -> 22  15 <- A7
-     A9 -> 23  14 <- A6
-    A11 -> 24  13 <- A5
-     A3 -> 25  12 <- A4
-     A2 -> 26  11 <- A10
-     D7 <- 27  10 <- A1
-     D6 <- 28  9 <- A0
-     D5 <- 29  8 -> D0
-     D4 <- 30  7 -> D1
-     D3 <- 31  6 -> D2
-      ? ?? 32  5 ?? ?
-    A17 -> 33  4 ?? ?
-      ? ?? 34  3 ?? ?
-    /CE -> 35  2 ?? ?
-    GND -- 36  1 -- GND
-    Note that a17 goes to what would be pin 2 if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
+	(looking into end of disk-shaped cartridge with label/top side pointing to the right)
+	A15 -> 19  18 -- VCC
+	A14 -> 20  17 <- A16
+	A13 -> 21  16 <- A12
+	 A8 -> 22  15 <- A7
+	 A9 -> 23  14 <- A6
+	A11 -> 24  13 <- A5
+	 A3 -> 25  12 <- A4
+	 A2 -> 26  11 <- A10
+	 D7 <- 27  10 <- A1
+	 D6 <- 28  9 <- A0
+	 D5 <- 29  8 -> D0
+	 D4 <- 30  7 -> D1
+	 D3 <- 31  6 -> D2
+	  ? ?? 32  5 ?? ?
+	A17 -> 33  4 ?? ?
+	  ? ?? 34  3 ?? ?
+	/CE -> 35  2 ?? ?
+	GND -- 36  1 -- GND
+	Note that a17 goes to what would be pin 2 if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
 
-    Cartridge check procedure by socrates is, after screen init and check for speech synth,
-    bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
-    do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
-    * read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
-    * read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
-    * read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
-    * read 0x7ff3(0x3ff3 in cart rom) and compare to 0x18
-    if all tests passed, jump to 0x4000 (0x0000 in cart rom)
-    */
-    ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
-    ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
+	Cartridge check procedure by socrates is, after screen init and check for speech synth,
+	bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
+	do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
+	* read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
+	* read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
+	* read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
+	* read 0x7ff3(0x3ff3 in cart rom) and compare to 0x18
+	if all tests passed, jump to 0x4000 (0x0000 in cart rom)
+	*/
+	ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
+	ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
-    ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
-    ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-    ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
+	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
-    /* english speech cart has a green QC sticker */
-    ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-    ROM_LOAD_OPTIONAL("speech_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
+	/* english speech cart has a green QC sticker */
+	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
+	ROM_LOAD_OPTIONAL("speech_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-    ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33AF6A21BA6D826071C9D48557B1C9012752570B)) // 16k in serial rom
-    ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3DFA853B02DF756A9B72DEF94A39310992EE11C7)) // 16k in serial rom
-    ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(FFCB1D633CA6BFFC7F481EC505DA447E5B847F16)) // 16k in serial rom
-    ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33AF6A21BA6D826071C9D48557B1C9012752570B)) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3DFA853B02DF756A9B72DEF94A39310992EE11C7)) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(FFCB1D633CA6BFFC7F481EC505DA447E5B847F16)) // 16k in serial rom
+	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
 ROM_START(socratfc)
-    ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
-    /* Socrates SAITOUT (French Canadian) NTSC */
-    ROM_LOAD("27-00884-001-000.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-    ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
+	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
+	/* Socrates SAITOUT (French Canadian) NTSC */
+	ROM_LOAD("27-00884-001-000.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
+	ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
-    ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
-    ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-    ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
+	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
-    ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-    ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
+	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
+	ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
 
-    ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-    ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
-    ROM_LOAD_OPTIONAL("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
-    ROM_LOAD_OPTIONAL("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
-    ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
+	ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
 ROM_START(profweis)
-    ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
-    /* Yeno Professor Weiss-Alles (German PAL) */
-    ROM_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-    ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
+	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
+	/* Yeno Professor Weiss-Alles (German PAL) */
+	ROM_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
+	ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
 
-    ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
-    ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-    ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
+	ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
-    ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-    ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
+	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
+	ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
 
-    ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-    ROM_LOAD_OPTIONAL("speech_ger_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
-    ROM_LOAD_OPTIONAL("speech_ger_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
-    ROM_LOAD_OPTIONAL("speech_ger_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
-    ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
+	ROM_LOAD_OPTIONAL("speech_ger_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_ger_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_ger_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
 

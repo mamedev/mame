@@ -177,22 +177,22 @@ READ8_MEMBER( pasopia_state::vram_latch_r )
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_NULL,		/* Port A read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_addr_lo_w),		/* Port A write */
-	DEVCB_NULL,		/* Port B read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_latch_w),		/* Port B write */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_latch_r),		/* Port C read */
-	DEVCB_NULL		/* Port C write */
+	DEVCB_NULL,     /* Port A read */
+	DEVCB_DRIVER_MEMBER(pasopia_state, vram_addr_lo_w),     /* Port A write */
+	DEVCB_NULL,     /* Port B read */
+	DEVCB_DRIVER_MEMBER(pasopia_state, vram_latch_w),       /* Port B write */
+	DEVCB_DRIVER_MEMBER(pasopia_state, vram_latch_r),       /* Port C read */
+	DEVCB_NULL      /* Port C write */
 };
 
 READ8_MEMBER( pasopia_state::portb_1_r )
 {
 	/*
-    x--- ---- attribute latch
-    -x-- ---- hblank
-    --x- ---- vblank
-    ---x ---- LCD system mode, active low
-    */
+	x--- ---- attribute latch
+	-x-- ---- hblank
+	--x- ---- vblank
+	---x ---- LCD system mode, active low
+	*/
 	UINT8 grph_latch,lcd_mode;
 
 	m_hblank ^= 0x40; //TODO
@@ -225,12 +225,12 @@ WRITE8_MEMBER( pasopia_state::screen_mode_w )
 
 static I8255A_INTERFACE( ppi8255_intf_1 )
 {
-	DEVCB_NULL,		/* Port A read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, screen_mode_w),		/* Port A write */
-	DEVCB_DRIVER_MEMBER(pasopia_state, portb_1_r),		/* Port B read */
-	DEVCB_NULL,		/* Port B write */
-	DEVCB_NULL,		/* Port C read */
-	DEVCB_DRIVER_MEMBER(pasopia_state, vram_addr_hi_w)		/* Port C write */
+	DEVCB_NULL,     /* Port A read */
+	DEVCB_DRIVER_MEMBER(pasopia_state, screen_mode_w),      /* Port A write */
+	DEVCB_DRIVER_MEMBER(pasopia_state, portb_1_r),      /* Port B read */
+	DEVCB_NULL,     /* Port B write */
+	DEVCB_NULL,     /* Port C read */
+	DEVCB_DRIVER_MEMBER(pasopia_state, vram_addr_hi_w)      /* Port C write */
 };
 
 READ8_MEMBER( pasopia_state::rombank_r )
@@ -240,20 +240,20 @@ READ8_MEMBER( pasopia_state::rombank_r )
 
 static I8255A_INTERFACE( ppi8255_intf_2 )
 {
-	DEVCB_NULL,		/* Port A read */
-	DEVCB_NULL,		/* Port A write */
-	DEVCB_NULL,		/* Port B read */
-	DEVCB_NULL,		/* Port B write */
-	DEVCB_DRIVER_MEMBER(pasopia_state, rombank_r),		/* Port C read */
-	DEVCB_NULL		/* Port C write */
+	DEVCB_NULL,     /* Port A read */
+	DEVCB_NULL,     /* Port A write */
+	DEVCB_NULL,     /* Port B read */
+	DEVCB_NULL,     /* Port B write */
+	DEVCB_DRIVER_MEMBER(pasopia_state, rombank_r),      /* Port C read */
+	DEVCB_NULL      /* Port C write */
 };
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),		// ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),		// ZC/TO1 callback, beep interface
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)		// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback, beep interface
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
 };
 
 READ8_MEMBER( pasopia_state::mux_r )
@@ -264,8 +264,8 @@ READ8_MEMBER( pasopia_state::mux_r )
 READ8_MEMBER( pasopia_state::keyb_r )
 {
 	const char *const keynames[3][4] = { { "KEY0", "KEY1", "KEY2", "KEY3" },
-					                     { "KEY4", "KEY5", "KEY6", "KEY7" },
-							             { "KEY8", "KEY9", "KEYA", "KEYB" } };
+											{ "KEY4", "KEY5", "KEY6", "KEY7" },
+											{ "KEY8", "KEY9", "KEYA", "KEYB" } };
 	int i,j;
 	UINT8 res;
 
@@ -293,26 +293,26 @@ WRITE8_MEMBER( pasopia_state::mux_w )
 static Z80PIO_INTERFACE( z80pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //IRQ
-	DEVCB_DRIVER_MEMBER(pasopia_state, mux_r),	// in port A
-	DEVCB_DRIVER_MEMBER(pasopia_state, mux_w),	// out port A
+	DEVCB_DRIVER_MEMBER(pasopia_state, mux_r),  // in port A
+	DEVCB_DRIVER_MEMBER(pasopia_state, mux_w),  // out port A
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pasopia_state, keyb_r),	// in port B
-	DEVCB_NULL,					// out port B
+	DEVCB_DRIVER_MEMBER(pasopia_state, keyb_r), // in port B
+	DEVCB_NULL,                 // out port B
 	DEVCB_NULL
 };
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,		/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	pasopia_update_row,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,      /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	pasopia_update_row,     /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 static const gfx_layout p7_chars_8x8 =
@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/4, mc6845_intf)   /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )

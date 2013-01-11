@@ -3,8 +3,8 @@ class seta2_state : public driver_device
 public:
 	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this,"maincpu"),
-		  m_nvram(*this, "nvram") ,
+			m_maincpu(*this,"maincpu"),
+			m_nvram(*this, "nvram") ,
 		m_spriteram(*this, "spriteram", 0),
 		m_vregs(*this, "vregs", 0),
 		m_coldfire_regs(*this, "coldfire_regs"),

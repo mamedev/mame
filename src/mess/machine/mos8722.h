@@ -48,7 +48,7 @@
 //**************************************************************************
 
 #define MCFG_MOS8722_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS8722, 0)	\
+	MCFG_DEVICE_ADD(_tag, MOS8722, 0)   \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -65,18 +65,18 @@
 
 struct mos8722_interface
 {
-	devcb_write_line	m_out_z80en_cb;
-	devcb_write_line	m_out_fsdir_cb;
-	devcb_read_line		m_in_game_cb;
-	devcb_read_line		m_in_exrom_cb;
-	devcb_read_line		m_in_sense40_cb;
+	devcb_write_line    m_out_z80en_cb;
+	devcb_write_line    m_out_fsdir_cb;
+	devcb_read_line     m_in_game_cb;
+	devcb_read_line     m_in_exrom_cb;
+	devcb_read_line     m_in_sense40_cb;
 };
 
 
 // ======================> mos8722_device
 
-class mos8722_device :	public device_t,
-                        public mos8722_interface
+class mos8722_device :  public device_t,
+						public mos8722_interface
 {
 public:
 	// construction/destruction
@@ -96,11 +96,11 @@ protected:
 	virtual void device_reset();
 
 private:
-	devcb_resolved_write_line	m_out_z80en_func;
-	devcb_resolved_write_line	m_out_fsdir_func;
-	devcb_resolved_read_line	m_in_game_func;
-	devcb_resolved_read_line	m_in_exrom_func;
-	devcb_resolved_read_line	m_in_sense40_func;
+	devcb_resolved_write_line   m_out_z80en_func;
+	devcb_resolved_write_line   m_out_fsdir_func;
+	devcb_resolved_read_line    m_in_game_func;
+	devcb_resolved_read_line    m_in_exrom_func;
+	devcb_resolved_read_line    m_in_sense40_func;
 
 	UINT8 m_reg[16];
 

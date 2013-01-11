@@ -16,14 +16,14 @@
  ************************************************************************/
 
 
-#define DSS_INPUT__GAIN		DISCRETE_INPUT(0)
-#define DSS_INPUT__OFFSET	DISCRETE_INPUT(1)
-#define DSS_INPUT__INIT		DISCRETE_INPUT(2)
+#define DSS_INPUT__GAIN     DISCRETE_INPUT(0)
+#define DSS_INPUT__OFFSET   DISCRETE_INPUT(1)
+#define DSS_INPUT__INIT     DISCRETE_INPUT(2)
 
 READ8_DEVICE_HANDLER(discrete_sound_r)
 {
 	discrete_device *disc_device = downcast<discrete_device *>(device);
-	return	disc_device->read( disc_device->machine().firstcpu->space(), offset, 0xff);
+	return  disc_device->read( disc_device->machine().firstcpu->space(), offset, 0xff);
 }
 
 
@@ -46,12 +46,12 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
  * input[6]    -
  *
  ************************************************************************/
-#define DSS_ADJUSTMENT__MIN		DISCRETE_INPUT(0)
-#define DSS_ADJUSTMENT__MAX		DISCRETE_INPUT(1)
-#define DSS_ADJUSTMENT__LOG		DISCRETE_INPUT(2)
-#define DSS_ADJUSTMENT__PORT	DISCRETE_INPUT(3)
-#define DSS_ADJUSTMENT__PMIN	DISCRETE_INPUT(4)
-#define DSS_ADJUSTMENT__PMAX	DISCRETE_INPUT(5)
+#define DSS_ADJUSTMENT__MIN     DISCRETE_INPUT(0)
+#define DSS_ADJUSTMENT__MAX     DISCRETE_INPUT(1)
+#define DSS_ADJUSTMENT__LOG     DISCRETE_INPUT(2)
+#define DSS_ADJUSTMENT__PORT    DISCRETE_INPUT(3)
+#define DSS_ADJUSTMENT__PMIN    DISCRETE_INPUT(4)
+#define DSS_ADJUSTMENT__PMAX    DISCRETE_INPUT(5)
 
 DISCRETE_STEP(dss_adjustment)
 {
@@ -112,7 +112,7 @@ DISCRETE_RESET(dss_adjustment)
  * input[0]    - Constant value
  *
  ************************************************************************/
-#define DSS_CONSTANT__INIT	DISCRETE_INPUT(0)
+#define DSS_CONSTANT__INIT  DISCRETE_INPUT(0)
 
 DISCRETE_RESET(dss_constant)
 {
@@ -250,9 +250,9 @@ void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, UINT8 data 
  * input[2]    - Offset value
  *
  ************************************************************************/
-#define DSS_INPUT_STREAM__STREAM	DISCRETE_INPUT(0)
-#define DSS_INPUT_STREAM__GAIN		DISCRETE_INPUT(1)
-#define DSS_INPUT_STREAM__OFFSET	DISCRETE_INPUT(2)
+#define DSS_INPUT_STREAM__STREAM    DISCRETE_INPUT(0)
+#define DSS_INPUT_STREAM__GAIN      DISCRETE_INPUT(1)
+#define DSS_INPUT_STREAM__OFFSET    DISCRETE_INPUT(2)
 
 STREAM_UPDATE( discrete_dss_input_stream_node::static_stream_generate )
 {
@@ -265,7 +265,7 @@ void discrete_dss_input_stream_node::stream_generate(stream_sample_t **inputs, s
 	int samplenum = samples;
 
 	while (samplenum-- > 0)
-	  *(ptr++) = m_data;
+		*(ptr++) = m_data;
 }
 DISCRETE_STEP(dss_input_stream)
 {

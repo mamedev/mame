@@ -2,9 +2,9 @@
 #include "debugger.h"
 #include "hd61700.h"
 
-#define EXT_ROM		(pc > 0x0c00)
-#define INC_POS		pos += (type+1)
-#define POS			(pos + type)
+#define EXT_ROM     (pc > 0x0c00)
+#define INC_POS     pos += (type+1)
+#define POS         (pos + type)
 
 static const char *const reg_5b[4] =  {"sx", "sy", "sz", "sz"};
 static const char *const reg_8b[8] =  {"pe", "pd", "ib", "ua", "ia", "ie", "tm", "tm"};
@@ -42,9 +42,9 @@ enum
 struct hd61700_dasm
 {
 	const char *str;
-	UINT8		arg1;
-	UINT8		arg2;
-	bool		optjr;
+	UINT8       arg1;
+	UINT8       arg2;
+	bool        optjr;
 };
 
 static const hd61700_dasm hd61700_ops[256] =
@@ -334,7 +334,7 @@ int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int
 		case OP_IM7:
 			{
 				int tmp = oprom[POS];
-				if (tmp&0x80)		tmp = 0x80 - tmp;
+				if (tmp&0x80)       tmp = 0x80 - tmp;
 
 				buffer += sprintf( buffer, "0x%04x", (pc + tmp + EXT_ROM) & 0xffff );
 				INC_POS;
@@ -357,7 +357,7 @@ int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int
 			{
 				UINT8 tmp1 = oprom[POS];
 				INC_POS;
-				if (!EXT_ROM && arg == OP_IM16A)	INC_POS;
+				if (!EXT_ROM && arg == OP_IM16A)    INC_POS;
 				UINT8 tmp2 = oprom[POS];
 				buffer += sprintf( buffer, "0x%04x", ((tmp2<<8) | tmp1));
 				INC_POS;
@@ -375,18 +375,18 @@ UINT32 get_dasmflags(UINT8 op)
 {
 	switch (op)
 	{
-		case 0x30: case 0x31: case 0x32: case 0x33:	//jp
-		case 0x34: case 0x35: case 0x36: case 0x37:	//jp
-		case 0x70: case 0x71: case 0x72: case 0x73:	//cal
-		case 0x74: case 0x75: case 0x76: case 0x77:	//cal
-		case 0xb0: case 0xb1: case 0xb2: case 0xb3:	//jr
-		case 0xb4: case 0xb5: case 0xb6: case 0xb7:	//jr
-		case 0xde:									//jp
-		case 0xdf:									//jp
+		case 0x30: case 0x31: case 0x32: case 0x33: //jp
+		case 0x34: case 0x35: case 0x36: case 0x37: //jp
+		case 0x70: case 0x71: case 0x72: case 0x73: //cal
+		case 0x74: case 0x75: case 0x76: case 0x77: //cal
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3: //jr
+		case 0xb4: case 0xb5: case 0xb6: case 0xb7: //jr
+		case 0xde:                                  //jp
+		case 0xdf:                                  //jp
 			return DASMFLAG_STEP_OVER;
-		case 0xf0: case 0xf1: case 0xf2: case 0xf3:	//rtn
-		case 0xf4: case 0xf5: case 0xf6: case 0xf7:	//rtn
-		case 0xfd:									//rtni
+		case 0xf0: case 0xf1: case 0xf2: case 0xf3: //rtn
+		case 0xf4: case 0xf5: case 0xf6: case 0xf7: //rtn
+		case 0xfd:                                  //rtni
 			return DASMFLAG_STEP_OUT;
 	}
 

@@ -146,34 +146,34 @@ MACHINE_RESET_MEMBER( s11a_state, s11a )
 
 static const pia6821_interface pia21_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),       /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia24_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_LINE_GND,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_LINE_VCC,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_LINE_GND,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_LINE_VCC,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 WRITE8_MEMBER( s11a_state::dig0_w )
@@ -190,66 +190,66 @@ WRITE8_MEMBER( s11a_state::dig0_w )
 
 static const pia6821_interface pia28_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, dig1_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, dig1_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),       /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia2c_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, pia2c_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia2c_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, pia2c_pa_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia2c_pb_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia30_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, switch_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_LINE_GND,		/* line CA1 in */
-	DEVCB_LINE_GND,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_LINE_VCC,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, switch_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_r),       /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_LINE_GND,     /* line CA1 in */
+	DEVCB_LINE_GND,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_LINE_VCC,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_w),       /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 static const pia6821_interface pia34_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, pia34_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, pia34_pa_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),       /* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
 };
 
 WRITE8_MEMBER( s11a_state::bgbank_w )
@@ -259,34 +259,34 @@ WRITE8_MEMBER( s11a_state::bgbank_w )
 
 static const pia6821_interface pias_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, dac_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),		/* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),        /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),       /* line CB2 out */
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),       /* IRQA */
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)        /* IRQB */
 };
 
 static const pia6821_interface pia40_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_LINE_VCC,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_cb2_w),		/* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),		/* IRQA */
-	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_NULL,     /* port B in */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),        /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_LINE_VCC,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),     /* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca2_w),        /* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_cb2_w),        /* line CB2 out */
+	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),     /* IRQA */
+	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)       /* IRQB */
 };
 
 DRIVER_INIT_MEMBER( s11a_state, s11a )

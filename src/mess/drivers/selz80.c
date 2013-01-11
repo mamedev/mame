@@ -135,12 +135,12 @@ READ8_MEMBER( selz80_state::kbd_r )
 
 static I8279_INTERFACE( selz80_intf )
 {
-	DEVCB_NULL,	// irq
-	DEVCB_DRIVER_MEMBER(selz80_state, scanlines_w),	// scan SL lines
-	DEVCB_DRIVER_MEMBER(selz80_state, digit_w),		// display A&B
-	DEVCB_NULL,						// BD
-	DEVCB_DRIVER_MEMBER(selz80_state, kbd_r),		// kbd RL lines
-	DEVCB_LINE_VCC,						// Shift key
+	DEVCB_NULL, // irq
+	DEVCB_DRIVER_MEMBER(selz80_state, scanlines_w), // scan SL lines
+	DEVCB_DRIVER_MEMBER(selz80_state, digit_w),     // display A&B
+	DEVCB_NULL,                     // BD
+	DEVCB_DRIVER_MEMBER(selz80_state, kbd_r),       // kbd RL lines
+	DEVCB_LINE_VCC,                     // Shift key
 	DEVCB_LINE_VCC
 };
 

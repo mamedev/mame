@@ -226,8 +226,8 @@ WRITE16_MEMBER( dm7000_state::dm7000_enet_w )
 */
 static ADDRESS_MAP_START( dm7000_mem, AS_PROGRAM, 32, dm7000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM										// RAM page 0 - 32MB
-	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM										// RAM page 1 - 32MB
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM                                     // RAM page 0 - 32MB
+	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM                                     // RAM page 1 - 32MB
 
 	AM_RANGE(0x40030000, 0x4003000f) AM_READWRITE8(dm7000_iic0_r, dm7000_iic0_w, 0xffffffff)
 	AM_RANGE(0x40040000, 0x40040007) AM_READWRITE8(dm7000_scc0_r, dm7000_scc0_w, 0xffffffff)

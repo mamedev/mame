@@ -11,20 +11,20 @@
 #include "video/konicdev.h"
 #include "includes/wecleman.h"
 
-#define BMP_PAD		8
-#define BLEND_STEPS	16
-#define BLEND_MIN	0
-#define BLEND_MAX	(BLEND_STEPS*0x20-1)
-#define BLEND_INC	1
-#define BLEND_DEC	-8
+#define BMP_PAD     8
+#define BLEND_STEPS 16
+#define BLEND_MIN   0
+#define BLEND_MAX   (BLEND_STEPS*0x20-1)
+#define BLEND_INC   1
+#define BLEND_DEC   -8
 
-#define SPRITE_FLIPX	0x01
-#define SPRITE_FLIPY	0x02
-#define NUM_SPRITES		256
+#define SPRITE_FLIPX    0x01
+#define SPRITE_FLIPY    0x02
+#define NUM_SPRITES     256
 
 struct sprite
 {
-	UINT8 *pen_data;	/* points to top left corner of tile data */
+	UINT8 *pen_data;    /* points to top left corner of tile data */
 	int line_offset;
 
 	const pen_t *pal_data;
@@ -32,7 +32,7 @@ struct sprite
 
 	int x_offset, y_offset;
 	int tile_width, tile_height;
-	int total_width, total_height;	/* in screen coordinates */
+	int total_width, total_height;  /* in screen coordinates */
 	int x, y;
 	int shadow_mode, flags;
 };
@@ -118,7 +118,7 @@ static void get_sprite_info(running_machine &machine)
 
 		gfx <<= 3;
 		sprite->tile_width <<= 3;
-		sprite->tile_height = (sprite->total_height * 0x80) / (0x80 - (zoom >> 8));	// needs work
+		sprite->tile_height = (sprite->total_height * 0x80) / (0x80 - (zoom >> 8)); // needs work
 
 		if ((gfx + sprite->tile_width * sprite->tile_height - 1) >= gfx_max) continue;
 
@@ -259,7 +259,7 @@ static void do_blit_zoom32(wecleman_state *state, _BitmapClass &bitmap, const re
 		src_fpx = src_f0x;
 		typename _BitmapClass::pixel_t *dst_ptr = &bitmap.pix(sy);
 
-		if (bitmap.format() == BITMAP_FORMAT_RGB32)	// Wec Le Mans
+		if (bitmap.format() == BITMAP_FORMAT_RGB32) // Wec Le Mans
 		{
 			if (!sprite->shadow_mode)
 			{
@@ -289,7 +289,7 @@ static void do_blit_zoom32(wecleman_state *state, _BitmapClass &bitmap, const re
 				}
 			}
 		}
-		else	// Hot Chase
+		else    // Hot Chase
 		{
 			pen_t base = sprite->pal_base;
 
@@ -335,13 +335,13 @@ static void sprite_draw(running_machine &machine, _BitmapClass &bitmap, const re
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i;
 
-	if (state->m_gameid == 0)	// Wec Le Mans
+	if (state->m_gameid == 0)   // Wec Le Mans
 	{
 		sortsprite(state->m_spr_idx_list, state->m_spr_pri_list, state->m_spr_count);
 
 		for (i=0; i<state->m_spr_count; i++) do_blit_zoom32(state, bitmap, cliprect, state->m_spr_ptr_list[state->m_spr_idx_list[i]]);
 	}
-	else	// Hot Chase
+	else    // Hot Chase
 	{
 		for (i=0; i<state->m_spr_count; i++) do_blit_zoom32(state, bitmap, cliprect, state->m_spr_ptr_list[i]);
 	}
@@ -408,10 +408,10 @@ static void sprite_draw(running_machine &machine, _BitmapClass &bitmap, const re
                                 WEC Le Mans 24
 ***************************************************************************/
 
-#define PAGE_GFX		(0)
-#define PAGE_NX			(0x40)
-#define PAGE_NY			(0x20)
-#define TILEMAP_DIMY	(PAGE_NY * 2 * 8)
+#define PAGE_GFX        (0)
+#define PAGE_NX         (0x40)
+#define PAGE_NY         (0x20)
+#define TILEMAP_DIMY    (PAGE_NY * 2 * 8)
 
 /*------------------------------------------------------------------------
                 [ Frontmost (text) layer + video registers ]
@@ -430,7 +430,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_txtram_w)
 
 	if ( old_data != new_data )
 	{
-		if (offset >= 0xE00/2 )	/* Video registers */
+		if (offset >= 0xE00/2 ) /* Video registers */
 		{
 			/* pages selector for the background */
 			if (offset == 0xEFE/2)
@@ -551,12 +551,12 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 
 	static const pen_t road_color[48] =
 	{
-		0x3f1,0x3f3,0x3f5,0x3fd,0x3fd,0x3fb,0x3fd,0x7ff,	// road color 0
-		0x3f0,0x3f2,0x3f4,0x3fc,0x3fc,0x3fb,0x3fc,0x7fe,	// road color 1
-		    0,    0,    0,0x3f9,0x3f9,    0,    0,    0,	// midcurb color 0
-		    0,    0,    0,0x3f8,0x3f8,    0,    0,    0,	// midcurb color 1
-		    0,    0,    0,0x3f7,    0,    0,    0,    0,	// topcurb color 0
-		    0,    0,    0,0x3f6,    0,    0,    0,    0		// topcutb color 1
+		0x3f1,0x3f3,0x3f5,0x3fd,0x3fd,0x3fb,0x3fd,0x7ff,    // road color 0
+		0x3f0,0x3f2,0x3f4,0x3fc,0x3fc,0x3fb,0x3fc,0x7fe,    // road color 1
+			0,    0,    0,0x3f9,0x3f9,    0,    0,    0,    // midcurb color 0
+			0,    0,    0,0x3f8,0x3f8,    0,    0,    0,    // midcurb color 1
+			0,    0,    0,0x3f7,    0,    0,    0,    0,    // topcurb color 0
+			0,    0,    0,0x3f6,    0,    0,    0,    0     // topcutb color 1
 	};
 
 
@@ -653,13 +653,13 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 
 // blends two 8x8x16bpp direct RGB tilemaps
 static void draw_cloud(bitmap_rgb32 &bitmap,
-				 gfx_element *gfx,
-				 UINT16 *tm_base,
-				 int x0, int y0,				// target coordinate
-				 int xcount, int ycount,		// number of tiles to draw in x and y
-				 int scrollx, int scrolly,		// tilemap scroll position
-				 int tmw_l2, int tmh_l2,		// tilemap width and height in log(2)
-				 int alpha, int pal_offset )	// alpha(0-3f), # of color codes to shift
+					gfx_element *gfx,
+					UINT16 *tm_base,
+					int x0, int y0,             // target coordinate
+					int xcount, int ycount,     // number of tiles to draw in x and y
+					int scrollx, int scrolly,       // tilemap scroll position
+					int tmw_l2, int tmh_l2,     // tilemap width and height in log(2)
+					int alpha, int pal_offset ) // alpha(0-3f), # of color codes to shift
 {
 	wecleman_state *state = gfx->machine().driver_data<wecleman_state>();
 	const UINT8 *src_ptr;
@@ -881,9 +881,9 @@ WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
 VIDEO_START_MEMBER(wecleman_state,wecleman)
 {
 	/*
-        Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
-        This game has ROMs for 16 banks
-    */
+	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
+	    This game has ROMs for 16 banks
+	*/
 	static const int bank[0x40] =
 	{
 		0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,
@@ -896,7 +896,7 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 	int i, j;
 
 	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
-	buffer = auto_alloc_array(machine(), UINT8, 0x12c00);	// working buffer for sprite operations
+	buffer = auto_alloc_array(machine(), UINT8, 0x12c00);   // working buffer for sprite operations
 
 	m_gameid = 0;
 	m_gfx_bank = bank;
@@ -942,16 +942,16 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 								PAGE_NX * 2, PAGE_NY * 2);
 
 	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_txt_tile_info),this),
-								 TILEMAP_SCAN_ROWS,
+									TILEMAP_SCAN_ROWS,
 
-								 8,8,
-								 PAGE_NX * 1, PAGE_NY * 1);
+									8,8,
+									PAGE_NX * 1, PAGE_NY * 1);
 
-	m_bg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
+	m_bg_tilemap->set_scroll_rows(TILEMAP_DIMY);    /* Screen-wise scrolling */
 	m_bg_tilemap->set_scroll_cols(1);
 	m_bg_tilemap->set_transparent_pen(0);
 
-	m_fg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
+	m_fg_tilemap->set_scroll_rows(TILEMAP_DIMY);    /* Screen-wise scrolling */
 	m_fg_tilemap->set_scroll_cols(1);
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -983,9 +983,9 @@ void hotchase_zoom_callback_1(running_machine &machine, int *code,int *color,int
 VIDEO_START_MEMBER(wecleman_state,hotchase)
 {
 	/*
-        Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
-        This game has ROMs for 0x30 banks
-    */
+	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
+	    This game has ROMs for 0x30 banks
+	*/
 	static const int bank[0x40] =
 	{
 		0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
@@ -996,7 +996,7 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
 
 	UINT8 *buffer;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x400);	// reserve 1k for sprite list
+	buffer = auto_alloc_array(machine(), UINT8, 0x400); // reserve 1k for sprite list
 
 	m_gameid = 1;
 	m_gfx_bank = bank;
@@ -1026,7 +1026,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 
 	video_on = m_irqctrl & 0x40;
 
-	set_led_status(machine(), 0, m_selected_ip & 0x04);	// Start lamp
+	set_led_status(machine(), 0, m_selected_ip & 0x04); // Start lamp
 
 	fg_y = (m_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
 	bg_y = (m_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
@@ -1115,7 +1115,7 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	video_on = m_irqctrl & 0x40;
 
-	set_led_status(machine(), 0, m_selected_ip & 0x04);	// Start lamp
+	set_led_status(machine(), 0, m_selected_ip & 0x04); // Start lamp
 
 	get_sprite_info(machine());
 

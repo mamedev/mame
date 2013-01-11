@@ -25,8 +25,8 @@
 #include "emu.h"
 #include "k051649.h"
 
-#define FREQ_BITS	16
-#define DEF_GAIN	8
+#define FREQ_BITS   16
+#define DEF_GAIN    8
 
 
 /* this structure defines the parameters for a channel */
@@ -175,8 +175,8 @@ WRITE8_DEVICE_HANDLER( k051649_waveform_w )
 
 	info->stream->update();
 
-    if (offset >= 0x60)
-    {
+	if (offset >= 0x60)
+	{
 		/* channel 5 shares waveram with channel 4 */
 		info->channel_list[3].waveram[offset&0x1f]=data;
 		info->channel_list[4].waveram[offset&0x1f]=data;
@@ -284,7 +284,7 @@ const device_type K051649 = &device_creator<k051649_device>;
 
 k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K051649, "K051649", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(k051649_state);
 }
@@ -326,5 +326,3 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

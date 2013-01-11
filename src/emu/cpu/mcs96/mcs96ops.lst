@@ -1496,7 +1496,7 @@ c0    st    direct_2
 	next(4);
 
 c1    bmov  direct_2 196
-	
+
 c2    st    indirect_2
 	any_w16(OP1, reg_r16(OP2));
 	post_indirect 2 7 8 // +4 when external

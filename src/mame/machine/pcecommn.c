@@ -4,12 +4,12 @@
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 
-#define TG_16_JOY_SIG		0x00
-#define PCE_JOY_SIG			0x40
-#define NO_CD_SIG			0x80
-#define CD_SIG				0x00
+#define TG_16_JOY_SIG       0x00
+#define PCE_JOY_SIG         0x40
+#define NO_CD_SIG           0x80
+#define CD_SIG              0x00
 /* these might be used to indicate something, but they always seem to return 1 */
-#define CONST_SIG			0x30
+#define CONST_SIG           0x30
 
 /* joystick related data*/
 #define JOY_CLOCK   0x01
@@ -20,20 +20,20 @@
 WRITE8_MEMBER(pce_common_state::pce_joystick_w)
 {
 	machine().device<h6280_device>("maincpu")->io_set_buffer(data);
-    /* bump counter on a low-to-high transition of bit 1 */
-    if((!m_joystick_data_select) && (data & JOY_CLOCK))
-    {
-        m_joystick_port_select = (m_joystick_port_select + 1) & 0x07;
-    }
+	/* bump counter on a low-to-high transition of bit 1 */
+	if((!m_joystick_data_select) && (data & JOY_CLOCK))
+	{
+		m_joystick_port_select = (m_joystick_port_select + 1) & 0x07;
+	}
 
-    /* do we want buttons or direction? */
-    m_joystick_data_select = data & JOY_CLOCK;
+	/* do we want buttons or direction? */
+	m_joystick_data_select = data & JOY_CLOCK;
 
-    /* clear counter if bit 2 is set */
-    if(data & JOY_RESET)
-    {
-        m_joystick_port_select = 0;
-    }
+	/* clear counter if bit 2 is set */
+	if(data & JOY_RESET)
+	{
+		m_joystick_port_select = 0;
+	}
 }
 
 UINT8 pce_common_state::joy_read()
@@ -57,4 +57,3 @@ DRIVER_INIT_MEMBER(pce_common_state,pce_common)
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
-

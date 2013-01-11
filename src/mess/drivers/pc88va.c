@@ -312,21 +312,21 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 			switch(attr_mode)
 			{
 				/*
-                xxxx ---- foreground color
-                ---- xxxx background color
-                */
+				xxxx ---- foreground color
+				---- xxxx background color
+				*/
 				case 0:
 					fg_col = (attr & 0xf0) >> 4;
 					bg_col = (attr & 0x0f) >> 0;
 					break;
 				/*
-                xxxx ---- foreground color
-                ---- x--- horizontal line
-                ---- -x-- reverse
-                ---- --x- blink
-                ---- ---x secret (hide text)
-                background color is defined by screen control table values
-                */
+				xxxx ---- foreground color
+				---- x--- horizontal line
+				---- -x-- reverse
+				---- --x- blink
+				---- ---x secret (hide text)
+				background color is defined by screen control table values
+				*/
 				case 1:
 					fg_col = (attr & 0xf0) >> 4;
 					bg_col = screen_bg_col;
@@ -336,15 +336,15 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 					secret = (attr & 0x01) >> 0;
 					break;
 				/*
-                x--- ---- dwidc
-                -x-- ---- dwid
-                --x- ---- uline
-                ---x ---- hline
-                ---- -x-- reverse
-                ---- --x- blink
-                ---- ---x secret (hide text)
-                background and foreground colors are defined by screen control table values
-                */
+				x--- ---- dwidc
+				-x-- ---- dwid
+				--x- ---- uline
+				---x ---- hline
+				---- -x-- reverse
+				---- --x- blink
+				---- ---x secret (hide text)
+				background and foreground colors are defined by screen control table values
+				*/
 				case 2:
 					fg_col = screen_fg_col;
 					bg_col = screen_bg_col;
@@ -357,20 +357,20 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 					secret = (attr & 0x01) >> 0;
 					break;
 				/*
-                ---- x--- mixes between mode 0 and 2
+				---- x--- mixes between mode 0 and 2
 
-                xxxx 1--- foreground color
-                ---- 1xxx background color
-                2)
-                x--- 0--- dwidc
-                -x-- 0--- dwid
-                --x- 0--- uline
-                ---x 0--- hline
-                ---- 0x-- reverse
-                ---- 0-x- blink
-                ---- 0--x secret (hide text)
-                background and foreground colors are defined by screen control table values
-                */
+				xxxx 1--- foreground color
+				---- 1xxx background color
+				2)
+				x--- 0--- dwidc
+				-x-- 0--- dwid
+				--x- 0--- uline
+				---x 0--- hline
+				---- 0x-- reverse
+				---- 0-x- blink
+				---- 0--x secret (hide text)
+				background and foreground colors are defined by screen control table values
+				*/
 				case 3:
 					{
 						if(attr & 0x8)
@@ -393,21 +393,21 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 					}
 					break;
 				/*
-                x--- ---- blink
-                -xxx ---- background color
-                ---- xxxx foreground color
-                */
+				x--- ---- blink
+				-xxx ---- background color
+				---- xxxx foreground color
+				*/
 				case 4:
 					fg_col = (attr & 0x0f) >> 0;
 					bg_col = (attr & 0x70) >> 4;
 					//blink = (attr & 0x80) >> 7;
 					break;
 				/*
-                x--- ---- blink
-                -xxx ---- background color
-                ---- xxxx foreground color
-                hline is enabled if foreground color is 1 or 9
-                */
+				x--- ---- blink
+				-xxx ---- background color
+				---- xxxx foreground color
+				hline is enabled if foreground color is 1 or 9
+				*/
 				case 5:
 					fg_col = (attr & 0x0f) >> 0;
 					bg_col = (attr & 0x70) >> 4;
@@ -462,17 +462,17 @@ UINT32 pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 &b
 		return 0;
 
 	/*
-    m_video_pri_reg[0]
-    xxxx ---- ---- ---- priority 3
-    ---- xxxx ---- ---- priority 2
-    ---- ---- xxxx ---- priority 1
-    ---- ---- ---- xxxx priority 0
-    m_video_pri_reg[1]
-    ---- ---- xxxx ---- priority 5
-    ---- ---- ---- xxxx priority 4
+	m_video_pri_reg[0]
+	xxxx ---- ---- ---- priority 3
+	---- xxxx ---- ---- priority 2
+	---- ---- xxxx ---- priority 1
+	---- ---- ---- xxxx priority 0
+	m_video_pri_reg[1]
+	---- ---- xxxx ---- priority 5
+	---- ---- ---- xxxx priority 4
 
-    Note that orthogonality level is actually REVERSED than the level number it indicates, so we have to play a little with the data for an easier usage ...
-    */
+	Note that orthogonality level is actually REVERSED than the level number it indicates, so we have to play a little with the data for an easier usage ...
+	*/
 
 	screen_pri = (m_video_pri_reg[1] & 0x00f0) >> 4; // priority 5
 	screen_pri|= (m_video_pri_reg[1] & 0x000f) << 4; // priority 4
@@ -686,10 +686,10 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 
 		/* 0x81 - SPROV: set SPRite OVerflow information */
 		/*
-        -x-- ---- Sprite Over flag
-        --x- ---- Sprite Collision flag
-        ---x xxxx First sprite that caused Sprite Over event
-        */
+		-x-- ---- Sprite Over flag
+		--x- ---- Sprite Collision flag
+		---x xxxx First sprite that caused Sprite Over event
+		*/
 		case SPROV:  m_cmd = SPROV; /* TODO: where it returns the info? */ break;
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
@@ -710,22 +710,22 @@ static void execute_sync_cmd(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-        ???? ???? [0] - unknown
-        ???? ???? [1] - unknown
-        --xx xxxx [2] - h blank start
-        --xx xxxx [3] - h border start
-        xxxx xxxx [4] - h visible area
-        --xx xxxx [5] - h border end
-        --xx xxxx [6] - h blank end
-        --xx xxxx [7] - h sync
-        --xx xxxx [8] - v blank start
-        --xx xxxx [9] - v border start
-        xxxx xxxx [A] - v visible area
-        -x-- ---- [B] - v visible area (bit 9)
-        --xx xxxx [C] - v border end
-        --xx xxxx [D] - v blank end
-        --xx xxxx [E] - v sync
-    */
+	    ???? ???? [0] - unknown
+	    ???? ???? [1] - unknown
+	    --xx xxxx [2] - h blank start
+	    --xx xxxx [3] - h border start
+	    xxxx xxxx [4] - h visible area
+	    --xx xxxx [5] - h border end
+	    --xx xxxx [6] - h blank end
+	    --xx xxxx [7] - h sync
+	    --xx xxxx [8] - v blank start
+	    --xx xxxx [9] - v border start
+	    xxxx xxxx [A] - v visible area
+	    -x-- ---- [B] - v visible area (bit 9)
+	    --xx xxxx [C] - v border end
+	    --xx xxxx [D] - v blank end
+	    --xx xxxx [E] - v sync
+	*/
 	rectangle visarea;
 	attoseconds_t refresh;
 	UINT16 x_vis_area,y_vis_area;
@@ -755,10 +755,10 @@ static void execute_dspon_cmd(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-    [0] text table offset (hi word)
-    [1] unknown
-    [2] unknown
-    */
+	[0] text table offset (hi word)
+	[1] unknown
+	[2] unknown
+	*/
 	state->m_tsp.tvram_vreg_offset = state->m_buf_ram[0] << 8;
 	state->m_tsp.disp_on = 1;
 }
@@ -767,13 +767,13 @@ static void execute_dspdef_cmd(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-    [0] attr offset (lo word)
-    [1] attr offset (hi word)
-    [2] pitch (character code interval x 16, i.e. 0x20 = 2 bytes
-    [3] line height
-    [4] hline vertical position
-    [5] blink number
-    */
+	[0] attr offset (lo word)
+	[1] attr offset (hi word)
+	[2] pitch (character code interval x 16, i.e. 0x20 = 2 bytes
+	[3] line height
+	[4] hline vertical position
+	[5] blink number
+	*/
 	state->m_tsp.attr_offset = state->m_buf_ram[0] | state->m_buf_ram[1] << 8;
 	state->m_tsp.pitch = (state->m_buf_ram[2] & 0xf0) >> 4;
 	state->m_tsp.line_height = state->m_buf_ram[3] + 1;
@@ -785,10 +785,10 @@ static void execute_curdef_cmd(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-    xxxx x--- [0] Sprite Cursor number (sprite RAM entry)
-    ---- --x- [0] show cursor bit (actively modifies the spriteram entry)
-    ---- ---x [0] Blink Enable
-    */
+	xxxx x--- [0] Sprite Cursor number (sprite RAM entry)
+	---- --x- [0] show cursor bit (actively modifies the spriteram entry)
+	---- ---x [0] Blink Enable
+	*/
 
 	/* TODO: needs basic sprite emulation */
 	state->m_tsp.curn = (state->m_buf_ram[0] & 0xf8);
@@ -801,9 +801,9 @@ static void execute_actscr_cmd(running_machine &machine)
 {
 	//pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-    This command assigns a strip where the cursor is located.
-    xxxx xxxx [0] strip ID * 32 (???)
-    */
+	This command assigns a strip where the cursor is located.
+	xxxx xxxx [0] strip ID * 32 (???)
+	*/
 
 	/* TODO: no idea about this command */
 	//printf("ACTSCR: %02x\n",state->m_buf_ram[0]);
@@ -813,11 +813,11 @@ static void execute_curs_cmd(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-    [0] Cursor Position Y (lo word)
-    [1] Cursor Position Y (hi word)
-    [2] Cursor Position X (lo word)
-    [3] Cursor Position X (hi word)
-    */
+	[0] Cursor Position Y (lo word)
+	[1] Cursor Position Y (hi word)
+	[2] Cursor Position X (lo word)
+	[3] Cursor Position X (hi word)
+	*/
 
 	state->m_tsp.cur_pos_y = state->m_buf_ram[0] | state->m_buf_ram[1] << 8;
 	state->m_tsp.cur_pos_x = state->m_buf_ram[2] | state->m_buf_ram[3] << 8;
@@ -826,11 +826,11 @@ static void execute_curs_cmd(running_machine &machine)
 static void execute_emul_cmd(running_machine &machine)
 {
 	/*
-    [0] Emulate target strip ID x 32
-    [1] The number of chars
-    [2] The number of attributes
-    [3] The number of lines
-    */
+	[0] Emulate target strip ID x 32
+	[1] The number of chars
+	[2] The number of attributes
+	[3] The number of lines
+	*/
 
 	// TODO: this starts 3301 video emulation
 	//popmessage("Warning: TSP executes EMUL command, contact MESSdev");
@@ -840,12 +840,12 @@ static void execute_spron_cmd(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-    [0] Sprite Table Offset (hi word)
-    [1] (unknown / reserved)
-    xxxx x--- [2] HSPN: Maximum number of sprites in one raster (num + 1) for Sprite Over
-    ---- --x- [2] MG: all sprites are 2x zoomed vertically when 1
-    ---- ---x [2] GR: 1 to enable the group collision detection
-    */
+	[0] Sprite Table Offset (hi word)
+	[1] (unknown / reserved)
+	xxxx x--- [2] HSPN: Maximum number of sprites in one raster (num + 1) for Sprite Over
+	---- --x- [2] MG: all sprites are 2x zoomed vertically when 1
+	---- ---x [2] GR: 1 to enable the group collision detection
+	*/
 	state->m_tsp.spr_offset = state->m_buf_ram[0] << 8;
 	state->m_tsp.spr_on = 1;
 	printf("SPR TABLE %02x %02x %02x\n",state->m_buf_ram[0],state->m_buf_ram[1],state->m_buf_ram[2]);
@@ -855,10 +855,10 @@ static void execute_sprsw_cmd(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
-    Toggle an individual sprite in the sprite ram entry
-    [0] xxxx x--- target sprite number
-    [0] ---- --x- sprite off/on switch
-    */
+	Toggle an individual sprite in the sprite ram entry
+	[0] xxxx x--- target sprite number
+	[0] ---- --x- sprite off/on switch
+	*/
 
 	tsp_sprite_enable(machine, 0xa0000 + state->m_tsp.spr_offset + (state->m_buf_ram[0] & 0xf8), (state->m_buf_ram[0] & 2) << 8);
 }
@@ -876,15 +876,15 @@ WRITE8_MEMBER(pc88va_state::idp_param_w)
 		m_buf_index = 0;
 		switch(m_cmd)
 		{
-			case SYNC:		execute_sync_cmd(machine());	break;
-			case DSPON: 	execute_dspon_cmd(machine());	break;
-			case DSPDEF:	execute_dspdef_cmd(machine()); break;
-			case CURDEF:	execute_curdef_cmd(machine()); break;
-			case ACTSCR:	execute_actscr_cmd(machine()); break;
-			case CURS:		execute_curs_cmd(machine());   break;
-			case EMUL:		execute_emul_cmd(machine());   break;
-			case SPRON:		execute_spron_cmd(machine());  break;
-			case SPRSW:		execute_sprsw_cmd(machine());	break;
+			case SYNC:      execute_sync_cmd(machine());    break;
+			case DSPON:     execute_dspon_cmd(machine());   break;
+			case DSPDEF:    execute_dspdef_cmd(machine()); break;
+			case CURDEF:    execute_curdef_cmd(machine()); break;
+			case ACTSCR:    execute_actscr_cmd(machine()); break;
+			case CURS:      execute_curs_cmd(machine());   break;
+			case EMUL:      execute_emul_cmd(machine());   break;
+			case SPRON:     execute_spron_cmd(machine());  break;
+			case SPRSW:     execute_sprsw_cmd(machine());   break;
 
 			default:
 				//printf("%02x\n",data);
@@ -923,12 +923,12 @@ READ16_MEMBER(pc88va_state::bios_bank_r)
 WRITE16_MEMBER(pc88va_state::bios_bank_w)
 {
 	/*
-    -x-- ---- ---- ---- SMM (compatibility mode)
-    ---x ---- ---- ---- GMSP (VRAM drawing Mode)
-    ---- xxxx ---- ---- SMBC (0xa0000 - 0xdffff RAM bank)
-    ---- ---- xxxx ---- RBC1 (0xf0000 - 0xfffff ROM bank)
-    ---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
-    */
+	-x-- ---- ---- ---- SMM (compatibility mode)
+	---x ---- ---- ---- GMSP (VRAM drawing Mode)
+	---- xxxx ---- ---- SMBC (0xa0000 - 0xdffff RAM bank)
+	---- ---- xxxx ---- RBC1 (0xf0000 - 0xfffff ROM bank)
+	---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
+	*/
 	if ((mem_mask&0xffff) == 0xffff)
 		m_bank_reg = data;
 	else if ((mem_mask & 0xffff) == 0xff00)
@@ -962,9 +962,9 @@ READ8_MEMBER(pc88va_state::key_r)
 {
 	// note row D bit 2 does something at POST ... some kind of test mode?
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-	                                        "KEY4", "KEY5", "KEY6", "KEY7",
-	                                        "KEY8", "KEY9", "KEYA", "KEYB",
-	                                        "KEYC", "KEYD", "KEYE", "KEYF" };
+											"KEY4", "KEY5", "KEY6", "KEY7",
+											"KEY8", "KEY9", "KEYA", "KEYB",
+											"KEYC", "KEYD", "KEYE", "KEYF" };
 
 	return ioport(keynames[offset])->read();
 }
@@ -1043,8 +1043,8 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 	switch(offset<<1)
 	{
 		/*
-        ---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
-        */
+		---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
+		*/
 		case 0x00: // FDC mode register
 			m_fdc_mode = data & 1;
 			#if TEST_SUBFDC
@@ -1052,11 +1052,11 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 			#endif
 			break;
 		/*
-        --x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
-        ---x ---- DS1: Prohibition of the drive selection of FDC (0) Permission (1) Prohibition
-        ---- xx-- TD1/TD0: Drive 1/0 track density (0) 48 TPI (1) 96 TPI
-        ---- --xx RV1/RV0: Drive 1/0 mode selection (0) 2D and 2DD mode (1) 2HD mode
-        */
+		--x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
+		---x ---- DS1: Prohibition of the drive selection of FDC (0) Permission (1) Prohibition
+		---- xx-- TD1/TD0: Drive 1/0 track density (0) 48 TPI (1) 96 TPI
+		---- --xx RV1/RV0: Drive 1/0 mode selection (0) 2D and 2DD mode (1) 2HD mode
+		*/
 		case 0x02: // FDC control port 0
 			machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(data & 0x01 ? 360 : 300);
 			machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
@@ -1064,9 +1064,9 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 			machine().device<upd765a_device>("upd765")->set_rate(data & 0x20 ? 500000 : 250000);
 			break;
 		/*
-        ---- x--- PCM: ?
-        ---- --xx M1/M0: Drive 1/0 motor control (0) NOP (1) Change motor status
-        */
+		---- x--- PCM: ?
+		---- --xx M1/M0: Drive 1/0 motor control (0) NOP (1) Change motor status
+		*/
 		case 0x04:
 			if(data & 1)
 			{
@@ -1088,12 +1088,12 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 
 			break;
 		/*
-        x--- ---- FDCRST: FDC Reset
-        -xx- ---- FDCFRY FRYCEN: FDC force ready control
-        ---x ---- DMAE: DMA Enable (0) Prohibit DMA (1) Enable DMA
-        ---- -x-- XTMASK: FDC timer IRQ mask (0) Disable (1) Enable
-        ---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
-        */
+		x--- ---- FDCRST: FDC Reset
+		-xx- ---- FDCFRY FRYCEN: FDC force ready control
+		---x ---- DMAE: DMA Enable (0) Prohibit DMA (1) Enable DMA
+		---- -x-- XTMASK: FDC timer IRQ mask (0) Disable (1) Enable
+		---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
+		*/
 		case 0x06:
 			//printf("%02x\n",data);
 			if(data & 1)
@@ -1146,9 +1146,9 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
 {
 	/*
-    x--- ---- MINTEN (TCU irq enable)
-    ---- --xx general purpose timer 3 interval (120, 60, 30, 15)
-    */
+	x--- ---- MINTEN (TCU irq enable)
+	---- --xx general purpose timer 3 interval (120, 60, 30, 15)
+	*/
 	m_timer3_io_reg = data;
 
 	if(data & 0x80)
@@ -1533,12 +1533,12 @@ WRITE8_MEMBER(pc88va_state::cpu_8255_c_w)
 
 static I8255A_INTERFACE( master_fdd_intf )
 {
-	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pb_r),	// Port A read
-	DEVCB_NULL,							// Port A write
+	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pb_r),    // Port A read
+	DEVCB_NULL,                         // Port A write
 	DEVCB_DEVICE_MEMBER("d8255_2s", i8255_device, pa_r), // Port B read
-	DEVCB_NULL,							// Port B write
-	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_r),		// Port C read
-	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_w)			// Port C write
+	DEVCB_NULL,                         // Port B write
+	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_r),     // Port C read
+	DEVCB_DRIVER_MEMBER(pc88va_state,cpu_8255_c_w)          // Port C write
 };
 
 READ8_MEMBER(pc88va_state::fdc_8255_c_r)
@@ -1553,12 +1553,12 @@ WRITE8_MEMBER(pc88va_state::fdc_8255_c_w)
 
 static I8255A_INTERFACE( slave_fdd_intf )
 {
-	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pb_r),	// Port A read
-	DEVCB_NULL,							// Port A write
+	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pb_r), // Port A read
+	DEVCB_NULL,                         // Port A write
 	DEVCB_DEVICE_MEMBER("d8255_2", i8255_device, pa_r), // Port B read
-	DEVCB_NULL,							// Port B write
-	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_r),		// Port C read
-	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_w)			// Port C write
+	DEVCB_NULL,                         // Port B write
+	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_r),     // Port C read
+	DEVCB_DRIVER_MEMBER(pc88va_state,fdc_8255_c_w)          // Port C write
 };
 
 READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
@@ -1605,12 +1605,12 @@ WRITE8_MEMBER(pc88va_state::r232_ctrl_portc_w)
 
 static I8255_INTERFACE( r232c_ctrl_intf )
 {
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_r),						/* Port A read */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_w),						/* Port A write */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_r),						/* Port B read */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_w),						/* Port B write */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_r),						/* Port C read */
-	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_w)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_r),                        /* Port A read */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_porta_w),                        /* Port A write */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_r),                        /* Port B read */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portb_w),                        /* Port B write */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_r),                        /* Port C read */
+	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_w)                     /* Port C write */
 };
 
 static IRQ_CALLBACK(pc88va_irq_callback)
@@ -1866,7 +1866,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", 0, pc88va_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
-    MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)
+	MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym", YM2203, 3993600) //unknown clock / divider
@@ -1937,6 +1937,6 @@ ROM_END
 
 
 
-COMP( 1987, pc88va,         0,		0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA2", GAME_NOT_WORKING | GAME_NO_SOUND )
 //COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA3", GAME_NOT_WORKING )

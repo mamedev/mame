@@ -107,17 +107,17 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 READ16_MEMBER(thunderj_state::thunderj_atarivc_r)
 {
 	/* Sigh. CPU #1 reads the video controller register twice per frame, once at
-       the beginning of interrupt and once near the end. It stores these values in a
-       table starting at $163484. CPU #2 periodically looks at this table to make
-       sure that it is getting interrupts at the appropriate times, and that the
-       VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space.device())
-       calls we make to synchronize the two CPUs, we occasionally get out of time
-       and generate the interrupt outside of the tight tolerances CPU #2 expects.
+	   the beginning of interrupt and once near the end. It stores these values in a
+	   table starting at $163484. CPU #2 periodically looks at this table to make
+	   sure that it is getting interrupts at the appropriate times, and that the
+	   VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(&space.device())
+	   calls we make to synchronize the two CPUs, we occasionally get out of time
+	   and generate the interrupt outside of the tight tolerances CPU #2 expects.
 
-       So we fake it. Returning scanlines $f5 and $f7 alternately provides the
-       correct answer that causes CPU #2 to be happy and not aggressively trash
-       memory (which is what it does if this interrupt test fails -- see the code
-       at $1E56 to see!) */
+	   So we fake it. Returning scanlines $f5 and $f7 alternately provides the
+	   correct answer that causes CPU #2 to be happy and not aggressively trash
+	   memory (which is what it does if this interrupt test fails -- see the code
+	   at $1E56 to see!) */
 
 	/* Use these lines to detect when things go south: */
 
@@ -215,8 +215,8 @@ static INPUT_PORTS_START( thunderj )
 	PORT_START("260012")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )	/* Input buffer full (@260030) */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )	/* Output buffer full (@360030) */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )   /* Input buffer full (@260030) */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   /* Output buffer full (@360030) */
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( thunderj )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )     /* audio board port */
 INPUT_PORTS_END
 
 
@@ -263,9 +263,9 @@ static const gfx_layout pfmolayout =
 
 
 static GFXDECODE_START( thunderj )
-	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  512,  96 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 112 )	/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx3", 0, anlayout,      0, 512 )	/* characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  512,  96 ) /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 112 ) /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx3", 0, anlayout,      0, 512 ) /* characters 8x8 */
 GFXDECODE_END
 
 
@@ -318,7 +318,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( thunderj )
-	ROM_REGION( 0xa0000, "maincpu", 0 )	/* 10*64k for 68000 code */
+	ROM_REGION( 0xa0000, "maincpu", 0 ) /* 10*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136076-2001.14e",   0x00000, 0x10000, CRC(f6a71532) SHA1(b1c55968d7da9b64bde737d66aa8f0ddcdcfee27) )
 	ROM_LOAD16_BYTE( "136076-2002.14c",   0x00001, 0x10000, CRC(173ec10d) SHA1(e32eca9194336f3d7e289b2a187ed125ed03688c) )
 	ROM_LOAD16_BYTE( "136076-2003.15e",   0x20000, 0x10000, CRC(6e155469) SHA1(ba87d0a510304fd8a0f91c81580c4f09fc4d1886) )
@@ -330,29 +330,29 @@ ROM_START( thunderj )
 	ROM_LOAD16_BYTE( "136076-1007.17e",   0x80000, 0x10000, CRC(9c2a8aba) SHA1(10e4fc04e64bb6a5083a56f630224b5d1af241b2) )
 	ROM_LOAD16_BYTE( "136076-1008.17c",   0x80001, 0x10000, CRC(22109d16) SHA1(8725696271c4a617f9f050d9d483fe4141bf1e00) )
 
-	ROM_REGION( 0x80000, "extra", 0 )	/* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "extra", 0 )   /* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136076-1011.17l",    0x00000, 0x10000, CRC(bbbbca45) SHA1(977e785e0272a84c8d7e28e25f45064d1b37aad1) )
 	ROM_LOAD16_BYTE( "136076-1012.17n",    0x00001, 0x10000, CRC(53e5e638) SHA1(75593e5d328ede105b8db64005dd5d1c5cae11ed) )
 	ROM_COPY( "maincpu", 0x60000, 0x60000, 0x20000 )
 
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136076-2015.1b", 0x10000, 0x4000, CRC(d8feb7fb) SHA1(684ebf2f0c0df742c98e7f45f74de86a11c8d6e8) )
 	ROM_CONTINUE(               0x04000, 0xc000 )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "136076-1021.5s",   0x000000, 0x10000, CRC(d8432766) SHA1(04e7d820974c0890fde1257b4710cf7b520d7d48) )	/* graphics, plane 0 */
+	ROM_LOAD( "136076-1021.5s",   0x000000, 0x10000, CRC(d8432766) SHA1(04e7d820974c0890fde1257b4710cf7b520d7d48) ) /* graphics, plane 0 */
 	ROM_LOAD( "136076-1025.5r",   0x010000, 0x10000, CRC(839feed5) SHA1(c683ef5b78f8fd63dd557a630544f1e21aebe665) )
 	ROM_LOAD( "136076-1029.3p",   0x020000, 0x10000, CRC(fa887662) SHA1(5d19022e8d40be86b85d0bcc28c97207ab9ec403) )
 	ROM_LOAD( "136076-1033.6p",   0x030000, 0x10000, CRC(2addda79) SHA1(5a04c718055a5637b7549598ec39ca3cc9883698) )
-	ROM_LOAD( "136076-1022.9s",   0x040000, 0x10000, CRC(dcf50371) SHA1(566e71e1dcb8e0266ca870af04b11f7bbee21b18) )	/* graphics, plane 1 */
+	ROM_LOAD( "136076-1022.9s",   0x040000, 0x10000, CRC(dcf50371) SHA1(566e71e1dcb8e0266ca870af04b11f7bbee21b18) ) /* graphics, plane 1 */
 	ROM_LOAD( "136076-1026.9r",   0x050000, 0x10000, CRC(216e72c8) SHA1(b6155584c8760c4dee3cf2a6320c53ea2161464b) )
 	ROM_LOAD( "136076-1030.10s",  0x060000, 0x10000, CRC(dc51f606) SHA1(aa401808d915b2e6cdb17a1d58814a753648c9bb) )
 	ROM_LOAD( "136076-1034.10r",  0x070000, 0x10000, CRC(f8e35516) SHA1(dcb23ed69f5a70ac842c6004039ec403bac68d72) )
-	ROM_LOAD( "136076-1023.13s",  0x080000, 0x10000, CRC(b6dc3f13) SHA1(c3369b58012e02ad2fd85f1c9643ee5792f4b3de) )	/* graphics, plane 2 */
+	ROM_LOAD( "136076-1023.13s",  0x080000, 0x10000, CRC(b6dc3f13) SHA1(c3369b58012e02ad2fd85f1c9643ee5792f4b3de) ) /* graphics, plane 2 */
 	ROM_LOAD( "136076-1027.13r",  0x090000, 0x10000, CRC(621cc2ce) SHA1(15db80d61f1c624c09085ed86341f8577bfac168) )
 	ROM_LOAD( "136076-1031.14s",  0x0a0000, 0x10000, CRC(4682ceb5) SHA1(609ccd20f654982e01bcc6aea89801c01afe083e) )
 	ROM_LOAD( "136076-1035.14r",  0x0b0000, 0x10000, CRC(7a0e1b9e) SHA1(b9a2270ee7e3b3dcf05a47085890d87bf5b3e167) )
-	ROM_LOAD( "136076-1024.17s",  0x0c0000, 0x10000, CRC(d84452b5) SHA1(29bc994e37bc08fa40326b811339e7aa3290302c) )	/* graphics, plane 3 */
+	ROM_LOAD( "136076-1024.17s",  0x0c0000, 0x10000, CRC(d84452b5) SHA1(29bc994e37bc08fa40326b811339e7aa3290302c) ) /* graphics, plane 3 */
 	ROM_LOAD( "136076-1028.17r",  0x0d0000, 0x10000, CRC(0cc20245) SHA1(ebdcb47909374508abe9d0252fd88d6274a0f729) )
 	ROM_LOAD( "136076-1032.14p",  0x0e0000, 0x10000, CRC(f639161a) SHA1(cc2549f7fdd251fa44735a6cd5fdb8ffb97948be) )
 	ROM_LOAD( "136076-1036.16p",  0x0f0000, 0x10000, CRC(b342443d) SHA1(fa7865f8a90c0e761e1cc5e155931d0574f2d81c) )
@@ -376,9 +376,9 @@ ROM_START( thunderj )
 	ROM_LOAD( "136076-1052.16r",  0x0f0000, 0x10000, CRC(74711ef1) SHA1(c1429d6b54dc4352defdd6cf83f1a5734784e703) )
 
 	ROM_REGION( 0x010000, "gfx3", 0 )
-	ROM_LOAD( "136076-1020.4m",   0x000000, 0x10000, CRC(65470354) SHA1(9895d26fa9e01c254a3d15e657152cac717c68a3) )	/* alphanumerics */
+	ROM_LOAD( "136076-1020.4m",   0x000000, 0x10000, CRC(65470354) SHA1(9895d26fa9e01c254a3d15e657152cac717c68a3) ) /* alphanumerics */
 
-	ROM_REGION( 0x40000, "adpcm", 0 )	/* 256k for ADPCM */
+	ROM_REGION( 0x40000, "adpcm", 0 )   /* 256k for ADPCM */
 	ROM_LOAD( "136076-1016.7k",  0x00000, 0x10000, CRC(c10bdf73) SHA1(a0371c6ddef2a95193c68879044b3338d481fc96) )
 	ROM_LOAD( "136076-1017.7j",  0x10000, 0x10000, CRC(4e5e25e8) SHA1(373c946abd24ce8dd5221f1a0409af4537610d3d) )
 	ROM_LOAD( "136076-1018.7e",  0x20000, 0x10000, CRC(ec81895d) SHA1(56acffb0700d3b70ca705fba9d240a82950fd320) )

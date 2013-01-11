@@ -62,8 +62,8 @@ static ADDRESS_MAP_START( carjmbre_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 //  AM_RANGE(0x8800, 0x8800) AM_READNOP         // watchdog?
 	AM_RANGE(0x8803, 0x8803) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x8805, 0x8805) AM_WRITE(carjmbre_bgcolor_w)	// guessed
-	AM_RANGE(0x8806, 0x8806) AM_WRITE(carjmbre_8806_w)		// video related?
+	AM_RANGE(0x8805, 0x8805) AM_WRITE(carjmbre_bgcolor_w)   // guessed
+	AM_RANGE(0x8806, 0x8806) AM_WRITE(carjmbre_8806_w)      // video related?
 	AM_RANGE(0x8807, 0x8807) AM_WRITE(carjmbre_flipscreen_w)
 //  AM_RANGE(0x8fc1, 0x8fc1) AM_WRITENOP        // overrun during initial screen clear
 //  AM_RANGE(0x8fe1, 0x8fe1) AM_WRITENOP        // overrun during initial screen clear
@@ -83,12 +83,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( carjmbre_sound_io_map, AS_IO, 8, carjmbre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP			//?? written on init/0xff sound command reset
+	AM_RANGE(0x10, 0x10) AM_WRITENOP            //?? written on init/0xff sound command reset
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x22, 0x22) AM_WRITENOP			//?? written before and after 0x21 with same value
-	AM_RANGE(0x24, 0x24) AM_READNOP				//??
+	AM_RANGE(0x22, 0x22) AM_WRITENOP            //?? written before and after 0x21 with same value
+	AM_RANGE(0x24, 0x24) AM_READNOP             //??
 	AM_RANGE(0x30, 0x31) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x32, 0x32) AM_WRITENOP			//?? written before and after 0x31 with same value
+	AM_RANGE(0x32, 0x32) AM_WRITENOP            //?? written before and after 0x31 with same value
 ADDRESS_MAP_END
 
 /*************************************
@@ -99,8 +99,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( carjmbre )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )		//coin error if held high for 1s
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )		//or if many coins inserted quickly
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     //coin error if held high for 1s
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )     //or if many coins inserted quickly
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -119,26 +119,26 @@ static INPUT_PORTS_START( carjmbre )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x18, "Free") // 250 (cheat)
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "10k, then every 100k" )
 	PORT_DIPSETTING(    0x20, "20k, then every 100k" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END

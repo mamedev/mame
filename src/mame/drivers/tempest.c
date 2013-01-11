@@ -304,10 +304,10 @@ public:
 #define MASTER_CLOCK (XTAL_12_096MHz)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
-#define TEMPEST_KNOB_P1_TAG	("KNOBP1")
-#define TEMPEST_KNOB_P2_TAG	("KNOBP2")
-#define TEMPEST_BUTTONS_P1_TAG	("BUTTONSP1")
-#define TEMPEST_BUTTONS_P2_TAG	("BUTTONSP2")
+#define TEMPEST_KNOB_P1_TAG ("KNOBP1")
+#define TEMPEST_KNOB_P2_TAG ("KNOBP2")
+#define TEMPEST_BUTTONS_P1_TAG  ("BUTTONSP1")
+#define TEMPEST_BUTTONS_P2_TAG  ("BUTTONSP2")
 
 
 
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
+	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 
@@ -446,9 +446,9 @@ static INPUT_PORTS_START( tempest )
 	PORT_START("IN1/DSW0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_knob_r, NULL)
 	/* The next one is reponsible for cocktail mode.
-     * According to the documentation, this is not a switch, although
-     * it may have been planned to put it on the Math Box PCB, D/E2 )
-     */
+	 * According to the documentation, this is not a switch, although
+	 * it may have been planned to put it on the Math Box PCB, D/E2 )
+	 */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -470,7 +470,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")	/* N13 on analog vector generator PCB */
+	PORT_START("DSW1")  /* N13 on analog vector generator PCB */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("N13:8,7")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -494,7 +494,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPSETTING(    0xc0, "Freeze Mode" )
 	PORT_DIPSETTING(    0xe0, "Freeze Mode" )
 
-	PORT_START("DSW2")	/* L12 on analog vector generator PCB */
+	PORT_START("DSW2")  /* L12 on analog vector generator PCB */
 	PORT_DIPNAME( 0x01, 0x00, "Minimum" ) PORT_DIPLOCATION("L12:8")
 	PORT_DIPSETTING(    0x00, "1 Credit" )
 	PORT_DIPSETTING(    0x01, "2 Credit" )

@@ -499,9 +499,9 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
 #define VERBOSE_LEVEL ( 0 )
 
-#define ATAPI_CYCLES_PER_SECTOR (5000)	// plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
+#define ATAPI_CYCLES_PER_SECTOR (5000)  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
-#define ATAPI_STAT_BSY	   0x80
+#define ATAPI_STAT_BSY     0x80
 #define ATAPI_STAT_DRDY    0x40
 #define ATAPI_STAT_DMARDDF 0x20
 #define ATAPI_STAT_SERVDSC 0x10
@@ -513,14 +513,14 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #define ATAPI_INTREASON_IO      0x02
 #define ATAPI_INTREASON_RELEASE 0x04
 
-#define ATAPI_REG_DATA		0
-#define ATAPI_REG_ERRFEAT	1
-#define ATAPI_REG_INTREASON	2
-#define ATAPI_REG_SAMTAG	3
-#define ATAPI_REG_COUNTLOW	4
-#define ATAPI_REG_COUNTHIGH	5
-#define ATAPI_REG_DRIVESEL	6
-#define ATAPI_REG_CMDSTATUS	7
+#define ATAPI_REG_DATA      0
+#define ATAPI_REG_ERRFEAT   1
+#define ATAPI_REG_INTREASON 2
+#define ATAPI_REG_SAMTAG    3
+#define ATAPI_REG_COUNTLOW  4
+#define ATAPI_REG_COUNTHIGH 5
+#define ATAPI_REG_DRIVESEL  6
+#define ATAPI_REG_CMDSTATUS 7
 #define ATAPI_REG_MAX 16
 
 #define ATAPI_DATA_SIZE ( 64 * 1024 )
@@ -827,7 +827,7 @@ READ32_MEMBER(ksys573_state::atapi_r)
 	UINT8 *atapi_regs = m_atapi_regs;
 	int reg, data;
 
-	if (mem_mask == 0x0000ffff)	// word-wide command read
+	if (mem_mask == 0x0000ffff) // word-wide command read
 	{
 //      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
 
@@ -952,7 +952,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 
 	verboselog( machine(), 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	if (mem_mask == 0x0000ffff)	// word-wide command write
+	if (mem_mask == 0x0000ffff) // word-wide command write
 	{
 		verboselog( machine(), 2, "atapi_w: data=%04x\n", data );
 
@@ -1049,7 +1049,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 //              mame_printf_debug("ATAPI: SCSI device returned error!\n");
 
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;	// sense key = ILLEGAL REQUEST
+				atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;   // sense key = ILLEGAL REQUEST
 				atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 				atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 			}
@@ -1101,7 +1101,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 
 			switch (data)
 			{
-				case 0xa0:	// PACKET
+				case 0xa0:  // PACKET
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
@@ -1115,7 +1115,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 					m_atapi_cdata_wait = 0;
 					break;
 
-				case 0xa1:	// IDENTIFY PACKET DEVICE
+				case 0xa1:  // IDENTIFY PACKET DEVICE
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
 					m_atapi_data_ptr = 0;
@@ -1127,7 +1127,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 
 					memset( atapi_data, 0, m_atapi_data_len );
 
-					atapi_data[ 0 ^ 1 ] = 0x85;	// ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
+					atapi_data[ 0 ^ 1 ] = 0x85; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
 					atapi_data[ 1 ^ 1 ] = 0x00;
 
 					memset( &atapi_data[ 46 ], ' ', 8 );
@@ -1162,7 +1162,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 					m_psxirq->intin10(1);
 					break;
 
-				case 0xef:	// SET FEATURES
+				case 0xef:  // SET FEATURES
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
 					m_atapi_data_ptr = 0;
@@ -1349,16 +1349,16 @@ WRITE16_MEMBER(ksys573_state::flash_w)
 }
 
 static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE16( flash_r, flash_w, 0xffffffff )
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
 	AM_RANGE(0x1f400004, 0x1f400007) AM_READ(jamma_r )
 	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT( "IN2" )
 	AM_RANGE(0x1f40000c, 0x1f40000f) AM_READ_PORT( "IN3" )
-	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE(atapi_r, atapi_w )	// IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
-	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE(control_r, control_w )	// Konami can't make a game without a "control" register.
+	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE(atapi_r, atapi_w )    // IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
+	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE(control_r, control_w )    // Konami can't make a game without a "control" register.
 	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE(atapi_reset_w )
-	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP				// watchdog?
+	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP                // watchdog?
 	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0x00ff00ff)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE(security_r, security_w )
@@ -2107,9 +2107,9 @@ WRITE32_MEMBER(ksys573_state::gx894pwbba_w)
 		if( ACCESSING_BITS_16_31 )
 		{
 			logerror("FPGA MPEG control %c%c%c\n",
-					 data & 0x80000000 ? '#' : '.',
-					 data & 0x40000000 ? '#' : '.',
-					 data & 0x20000000 ? '#' : '.');
+						data & 0x80000000 ? '#' : '.',
+						data & 0x40000000 ? '#' : '.',
+						data & 0x20000000 ? '#' : '.');
 		}
 		break;
 	case 0x2c:
@@ -3383,7 +3383,7 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0834", adc083x_do_read)
 //  PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* x76f041/zs01 sda */
-    PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* skip hang at startup */
 	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* skip hang at startup */
 //  PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3775,7 +3775,7 @@ INPUT_PORTS_END
 	ROMX_LOAD( "700b01.22g",   0x0000000, 0x080000, CRC(6cf852af) NO_DUMP, ROM_BIOS(3) )
 
 #define SYS573_DIGITAL_ID \
-	ROM_REGION( 0x000008, "digital_id", 0 ) /* digital board id */		\
+	ROM_REGION( 0x000008, "digital_id", 0 ) /* digital board id */      \
 	ROM_LOAD( "digital-id.bin",   0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
 
 // BIOS
@@ -5266,7 +5266,7 @@ ROM_END
 ROM_START( gunmania )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x000008, "gunmania_id", 0 ) /* digital board id */		\
+	ROM_REGION( 0x000008, "gunmania_id", 0 ) /* digital board id */     \
 	ROM_LOAD( "ds2401",        0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
 
 	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */

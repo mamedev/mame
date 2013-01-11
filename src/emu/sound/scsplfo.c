@@ -8,20 +8,20 @@
     MAME/M1 conversion and cleanup by R. Belmont
 */
 
-#define LFO_SHIFT	8
+#define LFO_SHIFT   8
 
 struct LFO_t
 {
-    unsigned short phase;
-    UINT32 phase_step;
-    int *table;
-    int *scale;
+	unsigned short phase;
+	UINT32 phase_step;
+	int *table;
+	int *scale;
 };
 
-#define LFIX(v)	((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
+#define LFIX(v) ((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v)	LFIX(pow(10.0,v/20.0))
+#define DB(v)   LFIX(pow(10.0,v/20.0))
 
 //Convert cents to step increment
 #define CENTS(v) LFIX(pow(2.0,v/1200.0))
@@ -40,9 +40,9 @@ static int ASCALES[8][256];
 
 static void LFO_Init(running_machine &machine)
 {
-    int i,s;
-    for(i=0;i<256;++i)
-    {
+	int i,s;
+	for(i=0;i<256;++i)
+	{
 		int a,p;
 //      float TL;
 		//Saw
@@ -90,7 +90,7 @@ static void LFO_Init(running_machine &machine)
 		p=128-a;
 		ALFO_NOI[i]=a;
 		PLFO_NOI[i]=p;
-    }
+	}
 
 	for(s=0;s<8;++s)
 	{
@@ -110,11 +110,11 @@ static void LFO_Init(running_machine &machine)
 INLINE signed int PLFO_Step(LFO_t *LFO)
 {
 	int p;
-    LFO->phase+=LFO->phase_step;
+	LFO->phase+=LFO->phase_step;
 #if LFO_SHIFT!=8
-    LFO->phase&=(1<<(LFO_SHIFT+8))-1;
+	LFO->phase&=(1<<(LFO_SHIFT+8))-1;
 #endif
-    p=LFO->table[LFO->phase>>LFO_SHIFT];
+	p=LFO->table[LFO->phase>>LFO_SHIFT];
 	p=LFO->scale[p+128];
 	return p<<(SHIFT-LFO_SHIFT);
 }
@@ -122,21 +122,21 @@ INLINE signed int PLFO_Step(LFO_t *LFO)
 INLINE signed int ALFO_Step(LFO_t *LFO)
 {
 	int p;
-    LFO->phase+=LFO->phase_step;
+	LFO->phase+=LFO->phase_step;
 #if LFO_SHIFT!=8
-    LFO->phase&=(1<<(LFO_SHIFT+8))-1;
+	LFO->phase&=(1<<(LFO_SHIFT+8))-1;
 #endif
-    p=LFO->table[LFO->phase>>LFO_SHIFT];
+	p=LFO->table[LFO->phase>>LFO_SHIFT];
 	p=LFO->scale[p];
 	return p<<(SHIFT-LFO_SHIFT);
 }
 
 static void LFO_ComputeStep(LFO_t *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO)
 {
-    float step=(float) LFOFreq[LFOF]*256.0/(float)44100;
-    LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
-    if(ALFO)
-    {
+	float step=(float) LFOFreq[LFOF]*256.0/(float)44100;
+	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
+	if(ALFO)
+	{
 		switch(LFOWS)
 		{
 			case 0: LFO->table=ALFO_SAW; break;
@@ -150,10 +150,10 @@ static void LFO_ComputeStep(LFO_t *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int 
 	{
 		switch(LFOWS)
 		{
-		    case 0: LFO->table=PLFO_SAW; break;
-		    case 1: LFO->table=PLFO_SQR; break;
+			case 0: LFO->table=PLFO_SAW; break;
+			case 1: LFO->table=PLFO_SQR; break;
 			case 2: LFO->table=PLFO_TRI; break;
-		    case 3: LFO->table=PLFO_NOI; break;
+			case 3: LFO->table=PLFO_NOI; break;
 		}
 		LFO->scale=PSCALES[LFOS];
 	}

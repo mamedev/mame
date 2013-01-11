@@ -8,7 +8,7 @@ DECLARE_WRITE8_HANDLER( konami_SN76496_latch_w );
 DECLARE_WRITE8_DEVICE_HANDLER( konami_SN76496_w );
 
 class trackfld_audio_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -30,4 +30,3 @@ private:
 };
 
 extern const device_type TRACKFLD_AUDIO;
-

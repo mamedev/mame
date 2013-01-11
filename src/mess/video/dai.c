@@ -15,28 +15,28 @@
 #include "emu.h"
 #include "includes/dai.h"
 
-#define DEBUG_DAI_VIDEO	0
+#define DEBUG_DAI_VIDEO 0
 
 #define LOG_DAI_VIDEO_LINE(_mode, _unit, _resolution, _repeat, _scan) do { if (DEBUG_DAI_VIDEO) logerror ("Mode: %02x, Unit: %02x, Resolution: %02x, Repeat: %d, Current line: %d\n", _mode, _unit, _resolution, _repeat, _scan); } while (0)
 
 const unsigned char dai_palette[16*3] =
 {
-	0x00, 0x00, 0x00,	/*  0 Black     */
-	0x00, 0x00, 0x8b,	/*  1 Dark Blue     */
-	0xb1, 0x00, 0x95,	/*  2 Purple Red    */
-	0xff, 0x00, 0x00,	/*  3 Red       */
-	0x75, 0x2e, 0x50,	/*  4 Purple Brown  */
-	0x00, 0xb2, 0x38,	/*  5 Emerald Green */
-	0x98, 0x62, 0x00,	/*  6 Kakhi Brown   */
-	0xae, 0x7a, 0x00,	/*  7 Mustard Brown */
-	0x89, 0x89, 0x89,	/*  8 Grey      */
-	0xa1, 0x6f, 0xff,	/*  9 Middle Blue   */
-	0xff, 0xa5, 0x00,	/* 10 Orange        */
-	0xff, 0x99, 0xff,	/* 11 Pink      */
-	0x9e, 0xf4, 0xff,	/* 12 Light Blue    */
-	0xb3, 0xff, 0xbb,	/* 13 Light Green   */
-	0xff, 0xff, 0x28,	/* 14 Light Yellow  */
-	0xff, 0xff, 0xff,	/* 15 White     */
+	0x00, 0x00, 0x00,   /*  0 Black     */
+	0x00, 0x00, 0x8b,   /*  1 Dark Blue     */
+	0xb1, 0x00, 0x95,   /*  2 Purple Red    */
+	0xff, 0x00, 0x00,   /*  3 Red       */
+	0x75, 0x2e, 0x50,   /*  4 Purple Brown  */
+	0x00, 0xb2, 0x38,   /*  5 Emerald Green */
+	0x98, 0x62, 0x00,   /*  6 Kakhi Brown   */
+	0xae, 0x7a, 0x00,   /*  7 Mustard Brown */
+	0x89, 0x89, 0x89,   /*  8 Grey      */
+	0xa1, 0x6f, 0xff,   /*  9 Middle Blue   */
+	0xff, 0xa5, 0x00,   /* 10 Orange        */
+	0xff, 0x99, 0xff,   /* 11 Pink      */
+	0x9e, 0xf4, 0xff,   /* 12 Light Blue    */
+	0xb3, 0xff, 0xbb,   /* 13 Light Green   */
+	0xff, 0xff, 0x28,   /* 14 Light Yellow  */
+	0xff, 0xff, 0xff,   /* 15 White     */
 };
 
 
@@ -63,31 +63,31 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT8* char_rom = memregion("gfx1")->base();
 
 	UINT16 dai_video_memory_start = 0xbfff;
-	UINT16 dai_scan_lines = 604;	/* scan lines of PAL tv */
+	UINT16 dai_scan_lines = 604;    /* scan lines of PAL tv */
 
 	UINT16 current_scan_line = 0;
 	UINT16 current_video_memory_address = dai_video_memory_start;
 
-	UINT8 mode;			/* mode byte of line
+	UINT8 mode;         /* mode byte of line
                        bits 0-3 - line repeat count
                        bits 4-5 - resolution control
                        bits 6-7 - display mode control */
-	UINT8 colour;			/* colour byte of line
+	UINT8 colour;           /* colour byte of line
                        bits 0-3 - one of 16 colours
                        bits 4-5 - colour register for update
                        bit  6   - if unset force 'unit colour mode'
                        bit  7   - enable coulor change
                                   if unset bits 0-5 are ignored */
-	UINT8 line_repeat_count;	/* number of horizontalraster scans
+	UINT8 line_repeat_count;    /* number of horizontalraster scans
                        for which same data will be displayed
                        0000 - 2 lines
                        each additional repeat adds 2 scans */
-	UINT8 horizontal_resolution;	/* number of blobs per line
+	UINT8 horizontal_resolution;    /* number of blobs per line
                        00 - 88 (low resolution graphics)
                        01 - 176 (medium resolution graphics)
                        10 - 352 (high resolution graphics)
                        11 - 528 (text with 66 chars per line) */
-	UINT8 display_mode;		/* determine how data will be used
+	UINT8 display_mode;     /* determine how data will be used
                        to generate the picture
                        00 - four colour graphics
                        01 - four colour characters
@@ -114,11 +114,11 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 		switch (display_mode)
 		{
 
-		case 0x00:	/* 4 colour grahics modes */
+		case 0x00:  /* 4 colour grahics modes */
 			switch (horizontal_resolution)
 			{
 
-			case 0x00:	/* 88 pixels */
+			case 0x00:  /* 88 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -158,7 +158,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				break;
 
-			case 0x01:	/* 176 pixels */
+			case 0x01:  /* 176 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -197,7 +197,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				break;
 
-			case 0x02:	/* 352 pixels */
+			case 0x02:  /* 352 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -235,7 +235,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				break;
 
-			case 0x03:	/* 528 pixels */
+			case 0x03:  /* 528 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -275,11 +275,11 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 			break;
 
-		case 0x01:	/* 4 colour characters */
+		case 0x01:  /* 4 colour characters */
 			switch (horizontal_resolution)
 			{
 
-			case 0x00:	/* 11 chars */
+			case 0x00:  /* 11 chars */
 				switch (unit_mode)
 				{
 				case 0:
@@ -320,7 +320,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 					break;
 				}
 				break;
-			case 0x01:	/* 22 chars */
+			case 0x01:  /* 22 chars */
 				switch (unit_mode)
 				{
 				case 0:
@@ -361,7 +361,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 					break;
 				}
 				break;
-			case 0x02:	/* 44 chars */
+			case 0x02:  /* 44 chars */
 				switch (unit_mode)
 				{
 				case 0:
@@ -400,7 +400,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 					break;
 				}
 				break;
-			case 0x03:	/* 66 chars */
+			case 0x03:  /* 66 chars */
 				switch (unit_mode)
 				{
 				case 0:
@@ -441,11 +441,11 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				break;
 			}
 			break;
-                case 0x02:	/* 16 colour graphics */
+				case 0x02:  /* 16 colour graphics */
 			switch (horizontal_resolution)
 			{
 
-			case 0x00:	/* 88 pixels */
+			case 0x00:  /* 88 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -485,7 +485,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				break;
 
-			case 0x01:	/* 176 pixels */
+			case 0x01:  /* 176 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -524,7 +524,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				break;
 
-			case 0x02:	/* 352 pixels */
+			case 0x02:  /* 352 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -562,7 +562,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				break;
 
-			case 0x03:	/* 528 pixels */
+			case 0x03:  /* 528 pixels */
 				switch (unit_mode)
 				{
 				case 0:
@@ -601,11 +601,11 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				break;
 			}
 			break;
-		case 0x03:	/* 16 colour characters */
+		case 0x03:  /* 16 colour characters */
 			switch (horizontal_resolution)
 			{
 
-			case 0x00:	/* 11 chars */
+			case 0x00:  /* 11 chars */
 				switch (unit_mode)
 				{
 				case 0:
@@ -644,7 +644,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 					break;
 				}
 				break;
-			case 0x01:	/* 22 chars */
+			case 0x01:  /* 22 chars */
 				switch (unit_mode)
 				{
 				case 0:
@@ -683,7 +683,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 					break;
 				}
 				break;
-			case 0x02:	/* 44 chars */
+			case 0x02:  /* 44 chars */
 				switch (unit_mode)
 				{
 				case 0:
@@ -720,7 +720,7 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 					break;
 				}
 				break;
-			case 0x03:	/* 66 chars */
+			case 0x03:  /* 66 chars */
 				switch (unit_mode)
 				{
 				case 0:

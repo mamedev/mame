@@ -93,7 +93,7 @@ public:
 	int m_sample_buffer;
 	int m_sample_select;
 
-	UINT8 *m_soundbank_ptr;		/* Pointer to currently selected portion of ROM */
+	UINT8 *m_soundbank_ptr;     /* Pointer to currently selected portion of ROM */
 
 	/* sys18 */
 	UINT8 *m_sound_bank;
@@ -105,7 +105,7 @@ public:
 	int     m_refreshenable;
 	int     m_system18;
 
-	UINT8 *m_decrypted_region;	// goldnaxeb1 & bayrouteb1
+	UINT8 *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
 
 	/* devices */
 	cpu_device *m_maincpu;

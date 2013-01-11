@@ -35,7 +35,7 @@ private:
 extern const device_type ER59256;
 
 
-#define MCFG_ER59256_ADD(_tag)	\
+#define MCFG_ER59256_ADD(_tag)  \
 	MCFG_DEVICE_ADD((_tag), ER59256, 0)
 
 /***************************************************************************

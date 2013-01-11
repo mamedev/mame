@@ -78,8 +78,8 @@ static const struct { write8_space_func func; const char *name; } io_bank_handle
 
 static WRITE8_HANDLER( namcos1_3dcs_w )
 {
-	if (offset & 1)	popmessage("LEFT");
-	else			popmessage("RIGHT");
+	if (offset & 1) popmessage("LEFT");
+	else            popmessage("RIGHT");
 }
 
 
@@ -518,18 +518,18 @@ static READ8_HANDLER( key_type3_r )
 //  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
-       using it as temporary storage, so maybe it expects to act as RAM, however
-       it happens to work correctly also using the standard handling for 0058.
-       The schematics don't show A11 being used, so I go for this handling.
-      */
+	   using it as temporary storage, so maybe it expects to act as RAM, however
+	   it happens to work correctly also using the standard handling for 0058.
+	   The schematics don't show A11 being used, so I go for this handling.
+	  */
 
 	op = (offset & 0x70) >> 4;
 
-	if (op == state->m_key_reg)		return state->m_key_id;
-	if (op == state->m_key_rng)		return space.machine().rand();
-	if (op == state->m_key_swap4)	return (state->m_key[state->m_key_swap4_arg] << 4) | (state->m_key[state->m_key_swap4_arg] >> 4);
-	if (op == state->m_key_bottom4)	return (offset << 4) | (state->m_key[state->m_key_swap4_arg] & 0x0f);
-	if (op == state->m_key_top4)		return (offset << 4) | (state->m_key[state->m_key_swap4_arg] >> 4);
+	if (op == state->m_key_reg)     return state->m_key_id;
+	if (op == state->m_key_rng)     return space.machine().rand();
+	if (op == state->m_key_swap4)   return (state->m_key[state->m_key_swap4_arg] << 4) | (state->m_key[state->m_key_swap4_arg] >> 4);
+	if (op == state->m_key_bottom4) return (offset << 4) | (state->m_key[state->m_key_swap4_arg] & 0x0f);
+	if (op == state->m_key_top4)        return (offset << 4) | (state->m_key[state->m_key_swap4_arg] >> 4);
 
 	popmessage("CPU %s PC %08x: keychip read %04x", space.device().tag(), space.device().safe_pc(), offset);
 
@@ -763,7 +763,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_subcpu_bank_w)
 *******************************************************************************/
 
 static void namcos1_install_bank(namcos1_state *state, int start,int end,read8_space_func hr,write8_space_func hw,
-			  int offset,UINT8 *pointer)
+				int offset,UINT8 *pointer)
 {
 	int i;
 	for(i=start;i<=end;i++)
@@ -788,12 +788,12 @@ static void namcos1_build_banks(running_machine &machine,read8_space_func key_r,
 	UINT8 *dummyrom = auto_alloc_array(machine, UINT8, 0x2000);
 
 	/* when the games want to reset because the test switch has been flipped (or
-       because the protection checks failed!) they just set the top bits of bank #7
-       to 0, effectively crashing and waiting for the watchdog to kick in.
-       To avoid crashes in MAME, I prepare a dummy ROM containing just BRA -2 so
-       the program doesn't start executing code in unmapped areas.
-       Conveniently, the opcode for BRA -2 is 20 FE, and FE 20 FE is LDU $20FE,
-       so misaligned entry points get immediatly corrected. */
+	   because the protection checks failed!) they just set the top bits of bank #7
+	   to 0, effectively crashing and waiting for the watchdog to kick in.
+	   To avoid crashes in MAME, I prepare a dummy ROM containing just BRA -2 so
+	   the program doesn't start executing code in unmapped areas.
+	   Conveniently, the opcode for BRA -2 is 20 FE, and FE 20 FE is LDU $20FE,
+	   so misaligned entry points get immediatly corrected. */
 	for (i = 0;i < 0x2000;i+=2)
 	{
 		dummyrom[i]   = 0x20;
@@ -907,13 +907,13 @@ WRITE8_MEMBER(namcos1_state::namcos1_mcu_bankswitch_w)
 	/* bit 2-7 : chip select line of ROM chip */
 	switch (data & 0xfc)
 	{
-		case 0xf8: addr = 0x10000; data ^= 2; break;	/* bit 2 : ROM 0 (bit 1 is inverted in that case) */
-		case 0xf4: addr = 0x30000; break;				/* bit 3 : ROM 1 */
-		case 0xec: addr = 0x50000; break;				/* bit 4 : ROM 2 */
-		case 0xdc: addr = 0x70000; break;				/* bit 5 : ROM 3 */
-		case 0xbc: addr = 0x90000; break;				/* bit 6 : ROM 4 */
-		case 0x7c: addr = 0xb0000; break;				/* bit 7 : ROM 5 */
-		default:   addr = 0x10000; break;				/* illegal */
+		case 0xf8: addr = 0x10000; data ^= 2; break;    /* bit 2 : ROM 0 (bit 1 is inverted in that case) */
+		case 0xf4: addr = 0x30000; break;               /* bit 3 : ROM 1 */
+		case 0xec: addr = 0x50000; break;               /* bit 4 : ROM 2 */
+		case 0xdc: addr = 0x70000; break;               /* bit 5 : ROM 3 */
+		case 0xbc: addr = 0x90000; break;               /* bit 6 : ROM 4 */
+		case 0x7c: addr = 0xb0000; break;               /* bit 7 : ROM 5 */
+		default:   addr = 0x10000; break;               /* illegal */
 	}
 
 	/* bit 0-1 : address line A15-A16 */
@@ -1334,7 +1334,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 #ifdef PRESSURE_SENSITIVE
 			static int counter[4];
 
-			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
+			sprintf(portname,"IN%d",inp);   /* IN0-IN3 */
 			res = space.machine().root_device().ioport(portname)->read();
 			if (res & 0x80)
 			{
@@ -1358,11 +1358,11 @@ static READ8_HANDLER( berabohm_buttons_r )
 			else
 				counter[inp] = -1;
 #else
-			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
+			sprintf(portname,"IN%d",inp);   /* IN0-IN3 */
 			res = space.machine().root_device().ioport(portname)->read();
-			if (res & 1) res = 0x7f;		/* weak */
-			else if (res & 2) res = 0x48;	/* medium */
-			else if (res & 4) res = 0x40;	/* strong */
+			if (res & 1) res = 0x7f;        /* weak */
+			else if (res & 2) res = 0x48;   /* medium */
+			else if (res & 4) res = 0x40;   /* strong */
 #endif
 		}
 
@@ -1373,9 +1373,9 @@ static READ8_HANDLER( berabohm_buttons_r )
 		res = space.machine().root_device().ioport("CONTROL1")->read() & 0x8f;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
-           much time reading the inputs and won't have enough cycles to play two
-           digital sounds at once. This value is enough to read all inputs at least
-           once per frame */
+		   much time reading the inputs and won't have enough cycles to play two
+		   digital sounds at once. This value is enough to read all inputs at least
+		   once per frame */
 		if (++strobe_count > 4)
 		{
 			strobe_count = 0;
@@ -1421,9 +1421,9 @@ static READ8_HANDLER( faceoff_inputs_r )
 		res = space.machine().root_device().ioport("CONTROL1")->read() & 0x80;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
-           much time reading the inputs and won't have enough cycles to play two
-           digital sounds at once. This value is enough to read all inputs at least
-           once per frame */
+		   much time reading the inputs and won't have enough cycles to play two
+		   digital sounds at once. This value is enough to read all inputs at least
+		   once per frame */
 		if (++strobe_count > 8)
 		{
 			strobe_count = 0;

@@ -251,4 +251,3 @@ void jvs_device::handle_output(const char *tag, UINT8 id, UINT8 val)
 
 	machine().root_device().ioport(tag)->write_safe(jvs_outputs, m);
 }
-

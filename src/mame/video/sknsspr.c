@@ -69,100 +69,100 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 /* Zooming blitter, zoom is by way of both source and destination offsets */
 /* We are working in .6 fixed point if you hadn't guessed */
 
-#define z_decls(step)				\
-	UINT16 zxs = 0x40-(zx_m>>2);			\
-	UINT16 zxd = 0x40-(zx_s>>2);		\
-	UINT16 zys = 0x40-(zy_m>>2);			\
-	UINT16 zyd = 0x40-(zy_s>>2);		\
-	int xs, ys, xd, yd, old, old2;		\
-	int step_spr = step;				\
-	int bxs = 0, bys = 0;				\
-	rectangle clip;					\
-	clip.min_x = cliprect.min_x<<6;					\
-	clip.max_x = (cliprect.max_x+1)<<6;					\
-	clip.min_y = cliprect.min_y<<6;					\
-	clip.max_y = (cliprect.max_y+1)<<6;					\
-	sx <<= 6;					\
-	sy <<= 6;					\
-	x <<= 6;					\
+#define z_decls(step)               \
+	UINT16 zxs = 0x40-(zx_m>>2);            \
+	UINT16 zxd = 0x40-(zx_s>>2);        \
+	UINT16 zys = 0x40-(zy_m>>2);            \
+	UINT16 zyd = 0x40-(zy_s>>2);        \
+	int xs, ys, xd, yd, old, old2;      \
+	int step_spr = step;                \
+	int bxs = 0, bys = 0;               \
+	rectangle clip;                 \
+	clip.min_x = cliprect.min_x<<6;                 \
+	clip.max_x = (cliprect.max_x+1)<<6;                 \
+	clip.min_y = cliprect.min_y<<6;                 \
+	clip.max_y = (cliprect.max_y+1)<<6;                 \
+	sx <<= 6;                   \
+	sy <<= 6;                   \
+	x <<= 6;                    \
 	y <<= 6;
 
-#define z_clamp_x_min()			\
-	if(x < clip.min_x) {					\
-		do {					\
-			bxs += zxs;				\
-			x += zxd;					\
-		} while(x < clip.min_x);				\
+#define z_clamp_x_min()         \
+	if(x < clip.min_x) {                    \
+		do {                    \
+			bxs += zxs;             \
+			x += zxd;                   \
+		} while(x < clip.min_x);                \
 	}
 
-#define z_clamp_x_max()			\
-	if(x > clip.max_x) {				\
-		do {					\
-			bxs += zxs;				\
-			x -= zxd;					\
-		} while(x > clip.max_x);				\
+#define z_clamp_x_max()         \
+	if(x > clip.max_x) {                \
+		do {                    \
+			bxs += zxs;             \
+			x -= zxd;                   \
+		} while(x > clip.max_x);                \
 	}
 
-#define z_clamp_y_min()			\
-	if(y < clip.min_y) {					\
-		do {					\
-			bys += zys;				\
-			y += zyd;					\
-		} while(y < clip.min_y);				\
-		src += (bys>>6)*step_spr;			\
+#define z_clamp_y_min()         \
+	if(y < clip.min_y) {                    \
+		do {                    \
+			bys += zys;             \
+			y += zyd;                   \
+		} while(y < clip.min_y);                \
+		src += (bys>>6)*step_spr;           \
 	}
 
-#define z_clamp_y_max()			\
-	if(y > clip.max_y) {				\
-		do {					\
-			bys += zys;				\
-			y -= zyd;					\
-		} while(y > clip.max_y);				\
-		src += (bys>>6)*step_spr;			\
+#define z_clamp_y_max()         \
+	if(y > clip.max_y) {                \
+		do {                    \
+			bys += zys;             \
+			y -= zyd;                   \
+		} while(y > clip.max_y);                \
+		src += (bys>>6)*step_spr;           \
 	}
 
-#define z_loop_x()			\
-	xs = bxs;					\
-	xd = x;					\
+#define z_loop_x()          \
+	xs = bxs;                   \
+	xd = x;                 \
 	while(xs < sx && xd <= clip.max_x)
 
-#define z_loop_x_flip()			\
-	xs = bxs;					\
-	xd = x;					\
+#define z_loop_x_flip()         \
+	xs = bxs;                   \
+	xd = x;                 \
 	while(xs < sx && xd >= clip.min_x)
 
-#define z_loop_y()			\
-	ys = bys;					\
-	yd = y;					\
+#define z_loop_y()          \
+	ys = bys;                   \
+	yd = y;                 \
 	while(ys < sy && yd <= clip.max_y)
 
-#define z_loop_y_flip()			\
-	ys = bys;					\
-	yd = y;					\
+#define z_loop_y_flip()         \
+	ys = bys;                   \
+	yd = y;                 \
 	while(ys < sy && yd >= clip.min_y)
 
-#define z_draw_pixel()				\
-	UINT8 val = src[xs >> 6];			\
-	if(val)					\
+#define z_draw_pixel()              \
+	UINT8 val = src[xs >> 6];           \
+	if(val)                 \
 		bitmap.pix16(yd>>6, xd>>6) = val + colour;
 
-#define z_x_dst(op)			\
-	old = xd;					\
-	do {						\
-		xs += zxs;					\
-		xd op zxd;					\
+#define z_x_dst(op)         \
+	old = xd;                   \
+	do {                        \
+		xs += zxs;                  \
+		xd op zxd;                  \
 	} while(!((xd^old) & ~0x3f));
 
-#define z_y_dst(op)			\
-	old = yd;					\
-	old2 = ys;					\
-	do {						\
-		ys += zys;					\
-		yd op zyd;					\
-	} while(!((yd^old) & ~0x3f));			\
-	while((ys^old2) & ~0x3f) {			\
-		src += step_spr;				\
-		old2 += 0x40;				\
+#define z_y_dst(op)         \
+	old = yd;                   \
+	old2 = ys;                  \
+	do {                        \
+		ys += zys;                  \
+		yd op zyd;                  \
+	} while(!((yd^old) & ~0x3f));           \
+	while((ys^old2) & ~0x3f) {          \
+		src += step_spr;                \
+		old2 += 0x40;               \
 	}
 
 static void blit_nf_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
@@ -232,35 +232,35 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &b
 {
 	/*- SPR RAM Format -**
 
-      16 bytes per sprite
+	  16 bytes per sprite
 
 0x00  --ss --SS  z--- ----  jjjg g-ff  ppcc cccc
 
-      s = y size
-      S = x size
-      j = joint
-      g = group sprite is part of (if groups are enabled)
-      f = flip
-      p = priority
-      c = palette
+	  s = y size
+	  S = x size
+	  j = joint
+	  g = group sprite is part of (if groups are enabled)
+	  f = flip
+	  p = priority
+	  c = palette
 
 0x04  ---- -aaa  aaaa aaaa  aaaa aaaa  aaaa aaaa
 
-      a = ROM address of sprite data
+	  a = ROM address of sprite data
 
 0x08  ZZZZ ZZ--  zzzz zz--  xxxx xxxx  xx-- ----
 
-      Z = horizontal zoom table
-      z = horizontal zoom subtable
-      x = x position
+	  Z = horizontal zoom table
+	  z = horizontal zoom subtable
+	  x = x position
 
 0x0C  ZZZZ ZZ--  zzzz zz--  yyyy yyyy  yy-- ----
 
-      Z = vertical zoom table
-      z = vertical zoom subtable
-      x = y position
+	  Z = vertical zoom table
+	  z = vertical zoom subtable
+	  x = y position
 
-    **- End of Comments -*/
+	**- End of Comments -*/
 
 	/* sprite ram start / end is not really fixed registers change it */
 
@@ -328,7 +328,7 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &b
 	//  popmessage("A: %x %x B: %x %x", skns_v3_regs[0x10/4]>>3, skns_v3_regs[0x10/4]&7, skns_v3_regs[0x34/4]>>3, skns_v3_regs[0x34/4]&7);
 
 		/* Seems that sprites are consistently off by a fixed no. of pixels in different games
-           (Patterns emerge through Manufacturer/Date/Orientation) */
+		   (Patterns emerge through Manufacturer/Date/Orientation) */
 		sprite_x_scroll += sprite_kludge_x;
 		sprite_y_scroll += sprite_kludge_y;
 
@@ -364,15 +364,15 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &b
 					group_number = (source[0] & 0x00001800) >> 11;
 
 					/* the group positioning doesn't seem to be working as i'd expect,
-                       if I apply the x position the cursor on galpani4 ends up moving
-                       from the correct position to too far right, also the y offset
-                       seems to cause the position to be off by one in galpans2 even if
-                       it fixes the position in galpani4?
+					   if I apply the x position the cursor on galpani4 ends up moving
+					   from the correct position to too far right, also the y offset
+					   seems to cause the position to be off by one in galpans2 even if
+					   it fixes the position in galpani4?
 
-                       even if I take into account the global sprite scroll registers
-                       it isn't right
+					   even if I take into account the global sprite scroll registers
+					   it isn't right
 
-                       global offset kludged using game specific offset -pjp */
+					   global offset kludged using game specific offset -pjp */
 
 					xpos += group_x_offset[group_number];
 					ypos += group_y_offset[group_number];
@@ -558,4 +558,3 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &b
 		}
 	}
 }
-

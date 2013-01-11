@@ -21,31 +21,31 @@
 #include "sound/dac.h"
 #include "sound/mos6560.h"
 
-#define M6502_TAG		"ue10"
-#define M6522_0_TAG		"uab3"
-#define M6522_1_TAG		"uab1"
-#define M6560_TAG		"ub7"
-#define M6561_TAG		"ub7"
-#define IEC_TAG			"iec"
-#define SCREEN_TAG		"screen"
-#define CONTROL1_TAG	"joy1"
+#define M6502_TAG       "ue10"
+#define M6522_0_TAG     "uab3"
+#define M6522_1_TAG     "uab1"
+#define M6560_TAG       "ub7"
+#define M6561_TAG       "ub7"
+#define IEC_TAG         "iec"
+#define SCREEN_TAG      "screen"
+#define CONTROL1_TAG    "joy1"
 
 class vic20_state : public driver_device
 {
 public:
 	vic20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M6502_TAG),
-		  m_via0(*this, M6522_0_TAG),
-		  m_via1(*this, M6522_1_TAG),
-		  m_vic(*this, M6560_TAG),
-		  m_iec(*this, CBM_IEC_TAG),
-		  m_joy1(*this, CONTROL1_TAG),
-		  m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
-		  m_user(*this, VIC20_USER_PORT_TAG),
-		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_color_ram(*this, "color_ram")
+			m_maincpu(*this, M6502_TAG),
+			m_via0(*this, M6522_0_TAG),
+			m_via1(*this, M6522_1_TAG),
+			m_vic(*this, M6560_TAG),
+			m_iec(*this, CBM_IEC_TAG),
+			m_joy1(*this, CONTROL1_TAG),
+			m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
+			m_user(*this, VIC20_USER_PORT_TAG),
+			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_color_ram(*this, "color_ram")
 	{ }
 
 	required_device<m6502_device> m_maincpu;

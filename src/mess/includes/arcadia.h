@@ -56,7 +56,7 @@ public:
 			// 0x1800
 			UINT8 chars1[13][16];
 			UINT8 ram1[2][16];
-			struct	{ UINT8 y,x; } pos[4];
+			struct  { UINT8 y,x; } pos[4];
 			UINT8 ram2[4];
 			UINT8 vpos;
 			UINT8 sound1, sound2;

@@ -27,17 +27,17 @@
 #include "emu.h"
 
 
-#define TMS9928A_PALETTE_SIZE				16
+#define TMS9928A_PALETTE_SIZE               16
 
 
 /* Some defines used in defining the screens */
-#define TMS9928A_TOTAL_HORZ					342
-#define TMS9928A_TOTAL_VERT_NTSC			262
-#define TMS9928A_TOTAL_VERT_PAL				313
+#define TMS9928A_TOTAL_HORZ                 342
+#define TMS9928A_TOTAL_VERT_NTSC            262
+#define TMS9928A_TOTAL_VERT_PAL             313
 
-#define TMS9928A_HORZ_DISPLAY_START			(2 + 14 + 8 + 13)
-#define TMS9928A_VERT_DISPLAY_START_PAL		(13 + 51)
-#define TMS9928A_VERT_DISPLAY_START_NTSC	(13 + 27)
+#define TMS9928A_HORZ_DISPLAY_START         (2 + 14 + 8 + 13)
+#define TMS9928A_VERT_DISPLAY_START_PAL     (13 + 51)
+#define TMS9928A_VERT_DISPLAY_START_NTSC    (13 + 27)
 
 
 #define TMS9928A_INTERFACE(name) \
@@ -52,13 +52,13 @@
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
 	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
 	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
-		 TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
+			TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
 
 
 #define MCFG_TMS9928A_SCREEN_ADD_PAL(_screen_tag) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12,	\
-		 TMS9928A_TOTAL_VERT_PAL, TMS9928A_VERT_DISPLAY_START_PAL - 12, TMS9928A_VERT_DISPLAY_START_PAL + 192 + 12 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
+			TMS9928A_TOTAL_VERT_PAL, TMS9928A_VERT_DISPLAY_START_PAL - 12, TMS9928A_VERT_DISPLAY_START_PAL + 192 + 12 )
 
 
 extern const device_type TMS9918;
@@ -73,14 +73,14 @@ extern const device_type TMS9129;
 
 struct tms9928a_interface
 {
-	const char			*m_screen_tag;
-	int					m_vram_size;	/* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
-	devcb_write_line	m_out_int_line;	/* Callback is called whenever the state of the INT output changes */
-	const char			*m_regionname;		// Alternatively, get the name of the region (if vram size is 0)
+	const char          *m_screen_tag;
+	int                 m_vram_size;    /* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
+	devcb_write_line    m_out_int_line; /* Callback is called whenever the state of the INT output changes */
+	const char          *m_regionname;      // Alternatively, get the name of the region (if vram size is 0)
 };
 
 
-class tms9928a_device :	public device_t,
+class tms9928a_device : public device_t,
 						public device_memory_interface,
 						public tms9928a_interface
 {
@@ -119,40 +119,40 @@ private:
 
 	static const device_timer_id TIMER_LINE = 0;
 
-	screen_device	*m_screen;
+	screen_device   *m_screen;
 
 	/* TMS9928A internal settings */
-	UINT8	m_ReadAhead;
-	UINT8	m_Regs[8];
-	UINT8	m_StatusReg;
-	UINT8	m_FifthSprite;
-	UINT8	m_latch;
-	UINT8	m_INT;
-	UINT16	m_Addr;
-	UINT16	m_colour;
-	UINT16	m_pattern;
-	UINT16	m_nametbl;
-	UINT16	m_spriteattribute;
-	UINT16	m_spritepattern;
-	int		m_colourmask;
-	int		m_patternmask;
-	devcb_resolved_write_line	m_irq_changed;
-	bool	m_50hz;
-	bool	m_reva;
-	bool	m_99;
-	rgb_t	m_palette[16];
+	UINT8   m_ReadAhead;
+	UINT8   m_Regs[8];
+	UINT8   m_StatusReg;
+	UINT8   m_FifthSprite;
+	UINT8   m_latch;
+	UINT8   m_INT;
+	UINT16  m_Addr;
+	UINT16  m_colour;
+	UINT16  m_pattern;
+	UINT16  m_nametbl;
+	UINT16  m_spriteattribute;
+	UINT16  m_spritepattern;
+	int     m_colourmask;
+	int     m_patternmask;
+	devcb_resolved_write_line   m_irq_changed;
+	bool    m_50hz;
+	bool    m_reva;
+	bool    m_99;
+	rgb_t   m_palette[16];
 
 	/* memory */
-	const address_space_config		m_space_config;
-	address_space*					m_vram_space;
+	const address_space_config      m_space_config;
+	address_space*                  m_vram_space;
 
 	bitmap_rgb32 m_tmpbmp;
-	emu_timer	*m_line_timer;
-	UINT8		m_mode;
+	emu_timer   *m_line_timer;
+	UINT8       m_mode;
 
 	/* emulation settings */
-	int			m_top_border;
-	int			m_vertical_size;
+	int         m_top_border;
+	int         m_vertical_size;
 };
 
 
@@ -164,7 +164,7 @@ public:
 };
 
 
-class tms9918a_device :	public tms9928a_device
+class tms9918a_device : public tms9928a_device
 {
 public:
 	tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

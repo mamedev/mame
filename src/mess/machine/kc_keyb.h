@@ -18,13 +18,13 @@
 
 struct kc_keyb_interface
 {
-    devcb_write_line				m_keyboard_out_cb;
+	devcb_write_line                m_keyboard_out_cb;
 };
 
 // ======================> kc_keyboard_device
 
 class kc_keyboard_device : public device_t,
-						   public kc_keyb_interface
+							public kc_keyb_interface
 {
 public:
 	// construction/destruction
@@ -49,8 +49,8 @@ private:
 	static const device_timer_id TIMER_TRANSMIT_PULSE = 1;
 
 	// internal state
-	emu_timer *					m_timer_transmit_pulse;
-	devcb_resolved_write_line	m_keyboard_out_func;
+	emu_timer *                 m_timer_transmit_pulse;
+	devcb_resolved_write_line   m_keyboard_out_func;
 
 	// pulses to transmit
 	struct

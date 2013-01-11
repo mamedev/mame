@@ -111,12 +111,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */
+	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP        /* probably not used */
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
-	AM_RANGE(0xd80082, 0xd80083) AM_READNOP	/* stored but not read back ? check code at 0x01f440 */
+	AM_RANGE(0xd80082, 0xd80083) AM_READNOP /* stored but not read back ? check code at 0x01f440 */
 	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd80086, 0xd80087) AM_READ(aquarium_coins_r)
-	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP		/* ?? video related */
+	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP        /* ?? video related */
 	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE(aquarium_sound_w)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -138,24 +138,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aquarium )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x000c, 0x000c, "Winning Rounds (Player VS CPU)" )	PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x000c, 0x000c, "Winning Rounds (Player VS CPU)" )    PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x000c, "1/1" )
 	PORT_DIPSETTING(      0x0008, "2/3" )
 	PORT_DIPSETTING(      0x0004, "3/5" )
 //  PORT_DIPSETTING(      0x0000, "1/1" )                   /* Not used or listed in manual */
-	PORT_DIPNAME( 0x0030, 0x0030, "Winning Rounds (Player VS Player)" )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x0030, 0x0030, "Winning Rounds (Player VS Player)" ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0030, "1/1" )
 	PORT_DIPSETTING(      0x0020, "2/3" )
 	PORT_DIPSETTING(      0x0010, "3/5" )
 //  PORT_DIPSETTING(      0x0000, "1/1" )                   /* Not used or listed in manual */
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )			/* Listed in the manual as always OFF */
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )			/* Listed in the manual as always OFF */
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )            /* Listed in the manual as always OFF */
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )            /* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
@@ -164,15 +164,15 @@ static INPUT_PORTS_START( aquarium )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW2:4" )			/* Listed in the manual as always OFF */
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW2:5")
+	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW2:4" )            /* Listed in the manual as always OFF */
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )			/* Listed in the manual as always OFF */
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )			/* Listed in the manual as always OFF */
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )            /* Listed in the manual as always OFF */
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )            /* Listed in the manual as always OFF */
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -181,7 +181,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* used in testmode, but not in game? */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* used in testmode, but not in game? */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -189,7 +189,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* used in testmode, but not in game? */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* used in testmode, but not in game? */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("SYSTEM")
@@ -201,40 +201,40 @@ static INPUT_PORTS_START( aquarium )
 	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* sound status */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound status */
 INPUT_PORTS_END
 
 static const gfx_layout char5bpplayout =
 {
-	16,16,	/* 16*16 characters */
+	16,16,  /* 16*16 characters */
 	RGN_FRAC(1,2),
-	5,	/* 4 bits per pixel */
+	5,  /* 4 bits per pixel */
 	{  RGN_FRAC(1,2), 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4, 2*4+32, 3*4+32, 0*4+32, 1*4+32, 6*4+32, 7*4+32, 4*4+32, 5*4+32 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout char_8x8_layout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16*16 sprites */
+	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
-	4,	/* 4 bits per pixel */
+	4,  /* 4 bits per pixel */
 	{ 48, 16, 32, 0 },
 	{ 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
 DRIVER_INIT_MEMBER(aquarium_state,aquarium)
@@ -242,8 +242,8 @@ DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 	UINT8 *Z80 = machine().root_device().memregion("audiocpu")->base();
 
 	/* The BG tiles are 5bpp, this rearranges the data from
-       the roms containing the 1bpp data so we can decode it
-       correctly */
+	   the roms containing the 1bpp data so we can decode it
+	   correctly */
 	UINT8 *DAT2 = machine().root_device().memregion("gfx1")->base() + 0x080000;
 	UINT8 *DAT = machine().root_device().memregion("user1")->base();
 	int len = 0x0200000;

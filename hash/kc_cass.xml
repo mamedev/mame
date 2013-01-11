@@ -2,13 +2,13 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-    Loading instructions:
-    - execute the LOAD command.
+	Loading instructions:
+	- execute the LOAD command.
 
 	Notes:
-    - for KC 85/3-2 most games require a memory expansion, the M011 is installed by default, but
-      must be enabled executing SWITCH 8 3 before the LOAD command.
-    - KC85/2 doesn't have BASIC ROM and requires the M006 module for run BASIC games.
+	- for KC 85/3-2 most games require a memory expansion, the M011 is installed by default, but
+		must be enabled executing SWITCH 8 3 before the LOAD command.
+	- KC85/2 doesn't have BASIC ROM and requires the M006 module for run BASIC games.
 -->
 
 <softwarelist name="kc_cass" description="VEB Mikroelektronik KC 85 cassette images">
@@ -60,7 +60,7 @@
 		</part>
 	</software>
 
-	<software name="gatecr" supported="no">		<!-- keyboard doesn't works in KC85/4-5 -->
+	<software name="gatecr" supported="no">     <!-- keyboard doesn't works in KC85/4-5 -->
 		<!-- C0161 Spiele 8 -->
 		<description>Gatecrasher</description>
 		<year>1988</year>
@@ -418,7 +418,7 @@
 		</part>
 	</software>
 
-	<software name="digger4">	<!-- require mid-frame changes emulation -->
+	<software name="digger4">   <!-- require mid-frame changes emulation -->
 		<!-- C0169 Spiele 7 -->
 		<description>Digger/4</description>
 		<year>1988</year>
@@ -431,7 +431,7 @@
 		</part>
 	</software>
 
-	<software name="digger3">	<!-- require mid-frame changes emulation -->
+	<software name="digger3">   <!-- require mid-frame changes emulation -->
 		<!-- C0169 Spiele 7 -->
 		<description>Digger/3</description>
 		<year>1988</year>
@@ -720,7 +720,7 @@
 		</part>
 	</software>
 
-	<software name="pharao4" supported="no">		<!-- video problems -->
+	<software name="pharao4" supported="no">        <!-- video problems -->
 		<description>Pharao/4</description>
 		<year>1989</year>
 		<publisher>HIGHSOFT</publisher>
@@ -732,7 +732,7 @@
 		</part>
 	</software>
 
-	<software name="pharao3" supported="no">		<!-- keyboard doesn't works -->
+	<software name="pharao3" supported="no">        <!-- keyboard doesn't works -->
 		<description>Pharao/3</description>
 		<year>1989</year>
 		<publisher>HIGHSOFT</publisher>

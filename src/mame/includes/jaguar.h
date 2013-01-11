@@ -13,8 +13,8 @@
 #endif
 
 /* CoJag and Jaguar have completely different XTALs, pixel clock in Jaguar is the same as the GPU one */
-#define COJAG_PIXEL_CLOCK		XTAL_14_31818MHz
-#define JAGUAR_CLOCK			XTAL_25_590906MHz // NTSC
+#define COJAG_PIXEL_CLOCK       XTAL_14_31818MHz
+#define JAGUAR_CLOCK            XTAL_25_590906MHz // NTSC
 // XTAL_25_593900MHz PAL, TODO
 
 class jaguar_state : public driver_device
@@ -22,36 +22,36 @@ class jaguar_state : public driver_device
 public:
 	jaguar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_main_cpu(*this, "maincpu"),
-		  m_gpu(*this, "gpu"),
-		  m_dsp(*this, "dsp"),
-		  m_dac1(*this, "dac1"),
-		  m_dac2(*this, "dac2"),
-		  m_nvram(*this, "nvram"),
-		  m_rom_base(*this, "rom"),
-		  m_cart_base(*this, "cart"),
-		  m_dsp_ram(*this, "dspram"),
-		  m_wave_rom(*this, "waverom"),
-		  m_shared_ram(*this, "sharedram"),
-		  m_gpu_ram(*this, "gpuram"),
-		  m_gpu_clut(*this, "gpuclut"),
-		  m_is_r3000(false),
-		  m_is_cojag(false),
-		  m_hacks_enabled(false),
-		  m_using_cart(false),
-		  m_misc_control_data(0),
-		  m_eeprom_enable(true),
-		  m_gpu_jump_address(NULL),
-		  m_gpu_command_pending(false),
-		  m_gpu_spin_pc(0),
-		  m_main_speedup(NULL),
-		  m_main_speedup_hits(0),
-		  m_main_speedup_last_cycles(0),
-		  m_main_speedup_max_cycles(0),
-		  m_main_gpu_wait(NULL),
-		  m_joystick_data(0),
-		  m_eeprom_bit_count(0),
-		  m_protection_check(0) { }
+			m_main_cpu(*this, "maincpu"),
+			m_gpu(*this, "gpu"),
+			m_dsp(*this, "dsp"),
+			m_dac1(*this, "dac1"),
+			m_dac2(*this, "dac2"),
+			m_nvram(*this, "nvram"),
+			m_rom_base(*this, "rom"),
+			m_cart_base(*this, "cart"),
+			m_dsp_ram(*this, "dspram"),
+			m_wave_rom(*this, "waverom"),
+			m_shared_ram(*this, "sharedram"),
+			m_gpu_ram(*this, "gpuram"),
+			m_gpu_clut(*this, "gpuclut"),
+			m_is_r3000(false),
+			m_is_cojag(false),
+			m_hacks_enabled(false),
+			m_using_cart(false),
+			m_misc_control_data(0),
+			m_eeprom_enable(true),
+			m_gpu_jump_address(NULL),
+			m_gpu_command_pending(false),
+			m_gpu_spin_pc(0),
+			m_main_speedup(NULL),
+			m_main_speedup_hits(0),
+			m_main_speedup_last_cycles(0),
+			m_main_speedup_max_cycles(0),
+			m_main_gpu_wait(NULL),
+			m_joystick_data(0),
+			m_eeprom_bit_count(0),
+			m_protection_check(0) { }
 
 	// devices
 	required_device<cpu_device> m_main_cpu;
@@ -61,9 +61,9 @@ public:
 	required_device<dac_device> m_dac2;
 
 	// memory
-	optional_shared_ptr<UINT32>	m_nvram;		// not used on console
+	optional_shared_ptr<UINT32> m_nvram;        // not used on console
 	required_shared_ptr<UINT32> m_rom_base;
-	optional_shared_ptr<UINT32> m_cart_base;	// not used in cojag
+	optional_shared_ptr<UINT32> m_cart_base;    // not used in cojag
 	required_shared_ptr<UINT32> m_dsp_ram;
 	required_shared_ptr<UINT32> m_wave_rom;
 	required_shared_ptr<UINT32> m_shared_ram;
@@ -91,7 +91,7 @@ public:
 	// driver data
 	UINT32 m_joystick_data;
 	UINT8 m_eeprom_bit_count;
-	UINT8 m_protection_check;	/* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
+	UINT8 m_protection_check;   /* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
 
 	// audio data
 	UINT16 m_dsp_regs[0x40/2];

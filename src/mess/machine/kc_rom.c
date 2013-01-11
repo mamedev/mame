@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "kc_rom.h"
 
-#define REGION_TAG			"rom"
+#define REGION_TAG          "rom"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -41,13 +41,13 @@ const device_type KC_M033     = &device_creator<kc_m033_device>;
 //-------------------------------------------------
 
 kc_8k_device::kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, KC_STANDARD, "Standard", tag, owner, clock),
+		: device_t(mconfig, KC_STANDARD, "Standard", tag, owner, clock),
 		device_kcexp_interface( mconfig, *this )
 {
 }
 
 kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, type, name, tag, owner, clock),
+		: device_t(mconfig, type, name, tag, owner, clock),
 		device_kcexp_interface( mconfig, *this )
 {
 }
@@ -141,7 +141,7 @@ WRITE_LINE_MEMBER( kc_8k_device::mei_w )
 //-------------------------------------------------
 
 kc_m006_device::kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_8k_device(mconfig, KC_M006, "M006 BASIC", tag, owner, clock)
+		: kc_8k_device(mconfig, KC_M006, "M006 BASIC", tag, owner, clock)
 {
 }
 
@@ -183,7 +183,7 @@ void kc_m006_device::read(offs_t offset, UINT8 &data)
 //-------------------------------------------------
 
 kc_m033_device::kc_m033_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_8k_device(mconfig, KC_M033, "M033 TypeStar", tag, owner, clock)
+		: kc_8k_device(mconfig, KC_M033, "M033 TypeStar", tag, owner, clock)
 {
 }
 

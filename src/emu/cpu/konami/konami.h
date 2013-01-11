@@ -16,7 +16,7 @@ enum
 
 #define KONAMI_SETLINES_CALLBACK(name) void name(device_t *device, int lines)
 
-#define KONAMI_IRQ_LINE	0	/* IRQ line number */
+#define KONAMI_IRQ_LINE 0   /* IRQ line number */
 #define KONAMI_FIRQ_LINE 1   /* FIRQ line number */
 
 /* PUBLIC FUNCTIONS */

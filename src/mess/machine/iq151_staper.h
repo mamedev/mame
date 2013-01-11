@@ -44,11 +44,11 @@ private:
 
 	static const device_timer_id TIMER_PRINTER = 0;
 
-	required_device<i8255_device>			m_ppi;
-	required_device<printer_image_device>	m_printer;
+	required_device<i8255_device>           m_ppi;
+	required_device<printer_image_device>   m_printer;
 
-	emu_timer*		m_printer_timer;
-	UINT8			m_ppi_portc;
+	emu_timer*      m_printer_timer;
+	UINT8           m_ppi_portc;
 };
 
 

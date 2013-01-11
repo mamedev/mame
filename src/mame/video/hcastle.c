@@ -68,7 +68,7 @@ static void set_pens(running_machine &machine)
 TILEMAP_MAPPER_MEMBER(hcastle_state::tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
-	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);	/* skip 0x400 */
+	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);    /* skip 0x400 */
 }
 
 TILE_GET_INFO_MEMBER(hcastle_state::get_fg_tile_info)

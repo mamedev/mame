@@ -50,7 +50,7 @@ void bfm_decode_mainrom(running_machine &machine, const char *rom_region, UINT8*
 
 		for ( address = 0; address < 0x10000; address++)
 		{
-			int	newaddress,pattern;
+			int newaddress,pattern;
 			UINT16 *tab;
 
 			tab      = (UINT16*)AddressDecode;

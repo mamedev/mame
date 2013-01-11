@@ -26,12 +26,12 @@
 
 // interrupts
 
-#define PSXCPU_IRQ0	( 0 )
-#define PSXCPU_IRQ1	( 1 )
-#define PSXCPU_IRQ2	( 2 )
-#define PSXCPU_IRQ3	( 3 )
-#define PSXCPU_IRQ4	( 4 )
-#define PSXCPU_IRQ5	( 5 )
+#define PSXCPU_IRQ0 ( 0 )
+#define PSXCPU_IRQ1 ( 1 )
+#define PSXCPU_IRQ2 ( 2 )
+#define PSXCPU_IRQ3 ( 3 )
+#define PSXCPU_IRQ4 ( 4 )
+#define PSXCPU_IRQ5 ( 5 )
 
 // register enumeration
 
@@ -184,7 +184,7 @@ protected:
 	UINT32 m_hi;
 	UINT32 m_lo;
 
-    // internal stuff
+	// internal stuff
 	UINT32 m_op;
 
 	// memory access
@@ -198,7 +198,7 @@ protected:
 	direct_read_data *m_direct;
 
 	// other internal states
-    int m_icount;
+	int m_icount;
 	UINT32 m_com_delay;
 	UINT32 m_delayv;
 	UINT32 m_delayr;

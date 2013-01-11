@@ -15,8 +15,8 @@
  *
  *************************************/
 
-#define DSTBITMAP_WIDTH		512
-#define DSTBITMAP_HEIGHT	512
+#define DSTBITMAP_WIDTH     512
+#define DSTBITMAP_HEIGHT    512
 
 
 /*************************************
@@ -174,7 +174,7 @@ static void do_blit( running_machine &machine )
 	int yend = state->m_blitter_yparam[15];
 	int color = (state->m_blitter_color[0] << 8) & 0xff00;
 	int mask = (state->m_blitter_color[0] >> 8) & 0x00ff;
-	int opaque = (dxdx | dxdy | dydx | dydy) == 0;	/* bit of a hack for fredmem */
+	int opaque = (dxdx | dxdy | dydx | dydy) == 0;  /* bit of a hack for fredmem */
 	int x, y;
 
 	/* loop over target rows */
@@ -256,34 +256,34 @@ WRITE16_MEMBER(dcheese_state::madmax_blitter_vidparam_w)
 
 	switch (offset)
 	{
-		case 0x10/2:		/* horiz front porch */
-		case 0x12/2:		/* horiz display start */
-		case 0x14/2:		/* horiz display end */
-		case 0x16/2:		/* horiz back porch */
+		case 0x10/2:        /* horiz front porch */
+		case 0x12/2:        /* horiz display start */
+		case 0x14/2:        /* horiz display end */
+		case 0x16/2:        /* horiz back porch */
 
-		case 0x18/2:		/* vert front porch */
-		case 0x1a/2:		/* vert display start */
-		case 0x1c/2:		/* vert display end */
-		case 0x1e/2:		/* vert back porch */
+		case 0x18/2:        /* vert front porch */
+		case 0x1a/2:        /* vert display start */
+		case 0x1c/2:        /* vert display end */
+		case 0x1e/2:        /* vert back porch */
 			break;
 
-		case 0x22/2:		/* scanline interrupt */
+		case 0x22/2:        /* scanline interrupt */
 			update_scanline_irq(machine());
 			break;
 
-		case 0x24/2:		/* writes here after writing to 0x28 */
+		case 0x24/2:        /* writes here after writing to 0x28 */
 			break;
 
-		case 0x28/2:		/* display starting y */
-		case 0x2a/2:		/* clear end y */
-		case 0x2c/2:		/* clear start y */
+		case 0x28/2:        /* display starting y */
+		case 0x2a/2:        /* clear end y */
+		case 0x2c/2:        /* clear start y */
 			break;
 
-		case 0x38/2:		/* blit */
+		case 0x38/2:        /* blit */
 			do_blit(machine());
 			break;
 
-		case 0x3e/2:		/* clear */
+		case 0x3e/2:        /* clear */
 			do_clear(machine());
 			break;
 

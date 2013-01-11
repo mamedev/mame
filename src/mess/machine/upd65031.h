@@ -18,7 +18,7 @@
 //**************************************************************************
 
 #define MCFG_UPD65031_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), UPD65031, _clock)	\
+	MCFG_DEVICE_ADD((_tag), UPD65031, _clock)   \
 	MCFG_DEVICE_CONFIG(_config)
 
 #define UPD65031_INTERFACE(name) \
@@ -40,22 +40,22 @@ typedef void (*upd65031_memory_update_func)(device_t &device, int bank, UINT16 p
 
 struct upd65031_interface
 {
-	upd65031_screen_update_func	m_screen_update_cb;  // callback for update the LCD
-	upd65031_memory_update_func	m_out_mem_cb;		 // callback for update bankswitch
-	devcb_read8					m_in_kb_cb;			 // kb read input
-	devcb_write_line			m_out_int_cb;		 // INT line out
-	devcb_write_line			m_out_nmi_cb;		 // NMI line out
-	devcb_write_line			m_out_spkr_cb;		 // Speaker line out
+	upd65031_screen_update_func m_screen_update_cb;  // callback for update the LCD
+	upd65031_memory_update_func m_out_mem_cb;        // callback for update bankswitch
+	devcb_read8                 m_in_kb_cb;          // kb read input
+	devcb_write_line            m_out_int_cb;        // INT line out
+	devcb_write_line            m_out_nmi_cb;        // NMI line out
+	devcb_write_line            m_out_spkr_cb;       // Speaker line out
 };
 
 
 // ======================> upd65031_device
 
-class upd65031_device :	public device_t,
+class upd65031_device : public device_t,
 						public upd65031_interface
 {
 public:
-    // construction/destruction
+	// construction/destruction
 	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( read );
@@ -79,24 +79,24 @@ private:
 	static const device_timer_id TIMER_FLASH = 1;
 	static const device_timer_id TIMER_SPEAKER = 2;
 
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_nmi_func;
-	devcb_resolved_write_line	m_out_spkr_func;
-	devcb_resolved_read8		m_int_kb_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_nmi_func;
+	devcb_resolved_write_line   m_out_spkr_func;
+	devcb_resolved_read8        m_int_kb_func;
 
-	int		m_mode;
-	UINT16	m_lcd_regs[5];		// LCD registers
-	UINT8	m_tim[5];			// RTC registers
-	UINT8	m_sr[4];			// segment registers
-	UINT8	m_sta;				// interrupt status
-	UINT8	m_int;				// interrupts mask
-	UINT8	m_ack;				// interrupts acknowledge
-	UINT8	m_tsta;				// timer interrupt status
-	UINT8	m_tmk;				// timer interrupt mask
-	UINT8	m_tack;				// timer interrupts acknowledge
-	UINT8	m_com;				// command register
-	int		m_flash;			// cursor flash
-	int		m_speaker_state;	// spkr line
+	int     m_mode;
+	UINT16  m_lcd_regs[5];      // LCD registers
+	UINT8   m_tim[5];           // RTC registers
+	UINT8   m_sr[4];            // segment registers
+	UINT8   m_sta;              // interrupt status
+	UINT8   m_int;              // interrupts mask
+	UINT8   m_ack;              // interrupts acknowledge
+	UINT8   m_tsta;             // timer interrupt status
+	UINT8   m_tmk;              // timer interrupt mask
+	UINT8   m_tack;             // timer interrupts acknowledge
+	UINT8   m_com;              // command register
+	int     m_flash;            // cursor flash
+	int     m_speaker_state;    // spkr line
 
 	// timers
 	emu_timer *m_rtc_timer;

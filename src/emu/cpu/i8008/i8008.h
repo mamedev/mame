@@ -69,24 +69,24 @@ protected:
 	void take_interrupt();
 	void init_tables(void);
 
-	int	m_pc_pos; // PC possition in ADDR
-	int	m_icount;
+	int m_pc_pos; // PC possition in ADDR
+	int m_icount;
 
 	// configuration
-	const address_space_config		m_program_config;
-	const address_space_config		m_io_config;
+	const address_space_config      m_program_config;
+	const address_space_config      m_io_config;
 
-	UINT8	m_A,m_B,m_C,m_D,m_E,m_H,m_L;
-	PAIR	m_PC; // It is in fact one of ADDR regs
-	PAIR	m_ADDR[8]; // Address registers
-	UINT8	m_CF; // Carry flag
-	UINT8	m_ZF; // Zero flag
-	UINT8	m_SF; // Sign flag
-	UINT8	m_PF; // Parity flag
-	UINT8	m_HALT;
-	UINT8	m_flags; // temporary I/O only
+	UINT8   m_A,m_B,m_C,m_D,m_E,m_H,m_L;
+	PAIR    m_PC; // It is in fact one of ADDR regs
+	PAIR    m_ADDR[8]; // Address registers
+	UINT8   m_CF; // Carry flag
+	UINT8   m_ZF; // Zero flag
+	UINT8   m_SF; // Sign flag
+	UINT8   m_PF; // Parity flag
+	UINT8   m_HALT;
+	UINT8   m_flags; // temporary I/O only
 
-	UINT8	m_irq_state;
+	UINT8   m_irq_state;
 
 	UINT8 m_PARITY[256];
 

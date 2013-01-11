@@ -11,7 +11,7 @@
 #pragma once
 
 #ifndef __CCPU_H__
-#define	__CCPU_H__
+#define __CCPU_H__
 
 
 /***************************************************************************
@@ -43,8 +43,8 @@ typedef void (*ccpu_vector_func)(device_t *device, INT16 sx, INT16 sy, INT16 ex,
 
 struct ccpu_config
 {
-	ccpu_input_func		external_input;		/* if NULL, assume JMI jumper is present */
-	ccpu_vector_func	vector_callback;
+	ccpu_input_func     external_input;     /* if NULL, assume JMI jumper is present */
+	ccpu_vector_func    vector_callback;
 };
 
 

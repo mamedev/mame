@@ -267,10 +267,10 @@ UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind1
 	draw_foreground(machine(), bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels).
-     * also, bit 1 of the video_flags register (6A) is
-     * combined with the headlight signal through NOR gate 1A,
-     * which is used to light up the tunnel when an alien explodes
-    */
+	 * also, bit 1 of the video_flags register (6A) is
+	 * combined with the headlight signal through NOR gate 1A,
+	 * which is used to light up the tunnel when an alien explodes
+	*/
 	if (scroll_mode != 1 || *m_video_flags & 2)
 	{
 		int x;
@@ -379,16 +379,16 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 

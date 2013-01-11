@@ -34,11 +34,11 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	int		get_base(int offset);
-	UINT8*	m_ram;
-	UINT8*	m_dsrrom;
-	int 	m_bank;
-	int		m_size;
+	int     get_base(int offset);
+	UINT8*  m_ram;
+	UINT8*  m_dsrrom;
+	int     m_bank;
+	int     m_size;
 };
 
 #endif

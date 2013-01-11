@@ -292,7 +292,7 @@ void snug_bwg_device::cruwrite(offs_t offset, UINT8 data)
 		case 1:
 			/* Activate motor */
 			if (data && !m_strobe_motor)
-			{	/* on rising edge, set motor_running for 4.23s */
+			{   /* on rising edge, set motor_running for 4.23s */
 				m_DVENA = ASSERT_LINE;
 				handle_hold();
 				m_motor_on_timer->adjust(attotime::from_msec(4230));
@@ -317,12 +317,12 @@ void snug_bwg_device::cruwrite(offs_t offset, UINT8 data)
 		case 8:
 			/* Select drive 0-2 (DSK1-DSK3) (bits 4-6) */
 			/* Select drive 3 (DSK4) (bit 8) */
-			drive = (bit == 8) ? 3 : (bit - 4);		/* drive # (0-3) */
+			drive = (bit == 8) ? 3 : (bit - 4);     /* drive # (0-3) */
 			drivebit = 1<<drive;
 
 			if (data != 0)
 			{
-				if ((m_DSEL & drivebit) == 0)			/* select drive */
+				if ((m_DSEL & drivebit) == 0)           /* select drive */
 				{
 					if (m_DSEL != 0)
 						logerror("bwg: Multiple drives selected, %02x\n", m_DSEL);
@@ -435,7 +435,7 @@ const wd17xx_interface bwg_wd17xx_interface =
 
 static const mm58274c_interface floppy_mm58274c_interface =
 {
-	1,	/*  mode 24*/
+	1,  /*  mode 24*/
 	0   /*  first day of week */
 };
 
@@ -486,4 +486,3 @@ ioport_constructor snug_bwg_device::device_input_ports() const
 }
 
 const device_type TI99_BWG = &device_creator<snug_bwg_device>;
-

@@ -69,7 +69,7 @@ void gijoe_state::video_start()
 	save_item(NAME(m_avac_vrc));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_avac_occupancy));
-	save_item(NAME(m_avac_bits));	// these could possibly be re-created at postload k056832 elements
+	save_item(NAME(m_avac_bits));   // these could possibly be re-created at postload k056832 elements
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layer_pri));
 }
@@ -122,11 +122,11 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	/*
-        Layer A is supposed to be a non-scrolling status display with static X-offset.
-        The weird thing is tilemap alignment only follows the 832 standard when 2 is
-        written to the layer's X-scroll register otherwise the chip expects totally
-        different alignment values.
-    */
+	    Layer A is supposed to be a non-scrolling status display with static X-offset.
+	    The weird thing is tilemap alignment only follows the 832 standard when 2 is
+	    written to the layer's X-scroll register otherwise the chip expects totally
+	    different alignment values.
+	*/
 	if (k056832_read_register(m_k056832, 0x14) == 2)
 	{
 		k056832_set_layer_offs(m_k056832, 0,  2, 0);

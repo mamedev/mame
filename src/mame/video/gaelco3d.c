@@ -13,27 +13,27 @@
 #include "video/poly.h"
 
 
-#define MAX_POLYGONS		4096
-#define MAX_POLYDATA		(MAX_POLYGONS * 21)
-#define MAX_VERTICES		32
+#define MAX_POLYGONS        4096
+#define MAX_POLYDATA        (MAX_POLYGONS * 21)
+#define MAX_VERTICES        32
 
-#define DISPLAY_TEXTURE		0
-#define LOG_POLYGONS		0
-#define DISPLAY_STATS		0
+#define DISPLAY_TEXTURE     0
+#define LOG_POLYGONS        0
+#define DISPLAY_STATS       0
 
-#define IS_POLYEND(x)		(((x) ^ ((x) >> 1)) & 0x4000)
+#define IS_POLYEND(x)       (((x) ^ ((x) >> 1)) & 0x4000)
 
 
 gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
-	  m_state(state),
-	  m_screenbits(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
-	  m_zbuffer(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
-	  m_polygons(0),
-	  m_texture_size(state.machine().root_device().memregion("gfx1")->bytes()),
-	  m_texmask_size(state.machine().root_device().memregion("gfx2")->bytes() * 8),
-	  m_texture(auto_alloc_array(state.machine(), UINT8, m_texture_size)),
-	  m_texmask(auto_alloc_array(state.machine(), UINT8, m_texmask_size))
+		m_state(state),
+		m_screenbits(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
+		m_zbuffer(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
+		m_polygons(0),
+		m_texture_size(state.machine().root_device().memregion("gfx1")->bytes()),
+		m_texmask_size(state.machine().root_device().memregion("gfx2")->bytes() * 8),
+		m_texture(auto_alloc_array(state.machine(), UINT8, m_texture_size)),
+		m_texmask(auto_alloc_array(state.machine(), UINT8, m_texmask_size))
 {
 	state_save_register_global_bitmap(state.machine(), &m_screenbits);
 	state_save_register_global_bitmap(state.machine(), &m_zbuffer);

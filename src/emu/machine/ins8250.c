@@ -90,7 +90,7 @@ const device_type NS16550 = &device_creator<ns16550_device>;
 
 ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, type, name, tag, owner, clock),
-		  device_serial_interface(mconfig, *this)
+			device_serial_interface(mconfig, *this)
 {
 }
 
@@ -113,7 +113,7 @@ ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, d
 }
 
 /* int's pending */
-#define COM_INT_PENDING_RECEIVED_DATA_AVAILABLE	0x0001
+#define COM_INT_PENDING_RECEIVED_DATA_AVAILABLE 0x0001
 #define COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY 0x0002
 #define COM_INT_PENDING_RECEIVER_LINE_STATUS 0x0004
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
@@ -267,7 +267,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			{
 				m_regs.mcr = data & 0x1f;
 
-				if ( m_regs.mcr & 0x10 )		/* loopback test */
+				if ( m_regs.mcr & 0x10 )        /* loopback test */
 				{
 					data = ( ( m_regs.mcr & 0x0c ) << 4 ) | ( ( m_regs.mcr & 0x01 ) << 5 ) | ( ( m_regs.mcr & 0x02 ) << 3 );
 					if ( ( m_regs.msr & 0x20 ) != ( data & 0x20 ) )
@@ -288,13 +288,13 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 					m_out_out2_func(m_regs.mcr & 8);
 				}
 			}
-            break;
+			break;
 		case 5:
 			/*
-              This register can be written, but if you write a 1 bit into any of
-              bits 5 - 0, you could cause an interrupt if the appropriate IER bit
-              is set.
-            */
+			  This register can be written, but if you write a 1 bit into any of
+			  bits 5 - 0, you could cause an interrupt if the appropriate IER bit
+			  is set.
+			*/
 			m_regs.lsr = data;
 
 			tmp = 0;
@@ -306,10 +306,10 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			break;
 		case 6:
 			/*
-              This register can be written, but if you write a 1 bit into any of
-              bits 3 - 0, you could cause an interrupt if the appropriate IER bit
-              is set.
-             */
+			  This register can be written, but if you write a 1 bit into any of
+			  bits 3 - 0, you could cause an interrupt if the appropriate IER bit
+			  is set.
+			 */
 			m_regs.msr = data;
 
 			if ( m_regs.msr & 0x0f )
@@ -317,7 +317,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			break;
 		case 7:
 			m_regs.scr = data;
-            break;
+			break;
 	}
 }
 
@@ -348,20 +348,20 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 				data = (m_regs.dl >> 8);
 			else
 				data = m_regs.ier & 0x0f;
-            break;
+			break;
 		case 2:
 			data = m_regs.iir;
 			/* The documentation says that reading this register will
-            clear the int if this is the source of the int */
+			clear the int if this is the source of the int */
 			if ( m_regs.ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY )
 				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
-            break;
+			break;
 		case 3:
 			data = m_regs.lcr;
-            break;
+			break;
 		case 4:
 			data = m_regs.mcr;
-            break;
+			break;
 		case 5:
 			data = m_regs.lsr;
 			if( m_regs.lsr & 0x1f )
@@ -369,7 +369,7 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 
 			/* reading line status register clears int */
 			clear_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
-            break;
+			break;
 		case 6:
 			data = m_regs.msr;
 			m_regs.msr &= 0xf0; /* reset delta values */
@@ -382,7 +382,7 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 			data = m_regs.scr;
 			break;
 	}
-    return data;
+	return data;
 }
 
 void ns16550_device::rcv_complete()

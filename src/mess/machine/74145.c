@@ -75,7 +75,7 @@ const device_type TTL74145 = &device_creator<ttl74145_device>;
 //-------------------------------------------------
 
 ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, TTL74145, "TTL74145", tag, owner, clock)
+	: device_t(mconfig, TTL74145, "TTL74145", tag, owner, clock)
 {
 }
 
@@ -173,6 +173,3 @@ UINT16 ttl74145_device::read()
 {
 	return (1 << m_number) & 0x3ff;
 }
-
-
-

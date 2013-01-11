@@ -15,57 +15,57 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 		1
+#define LOG         1
 
 
 // screen parameters
-#define SCREEN_WIDTH				232
-#define SCREEN_HEIGHT				262
-#define VISAREA_WIDTH				193
-#define VBLANK_WIDTH				21
-#define HBLANK_WIDTH				39
-#define HSYNC_WIDTH					18
-#define HFP_WIDTH					16
-#define HBP_WIDTH					5
-#define HBLANK_END					HSYNC_WIDTH + HFP_WIDTH
-#define HBLANK_START				HBLANK_END + VISAREA_WIDTH
+#define SCREEN_WIDTH                232
+#define SCREEN_HEIGHT               262
+#define VISAREA_WIDTH               193
+#define VBLANK_WIDTH                21
+#define HBLANK_WIDTH                39
+#define HSYNC_WIDTH                 18
+#define HFP_WIDTH                   16
+#define HBP_WIDTH                   5
+#define HBLANK_END                  HSYNC_WIDTH + HFP_WIDTH
+#define HBLANK_START                HBLANK_END + VISAREA_WIDTH
 
 
 // write-only registers
-#define REGISTER_COMMAND			0xf7
-#define REGISTER_BACKGROUND			0xf5
-#define REGISTER_FINAL_MODIFIER		0xf2
-#define REGISTER_Y_INTERRUPT		0xf0
+#define REGISTER_COMMAND            0xf7
+#define REGISTER_BACKGROUND         0xf5
+#define REGISTER_FINAL_MODIFIER     0xf2
+#define REGISTER_Y_INTERRUPT        0xf0
 
 
 // read-only registers
-#define REGISTER_X_FREEZE			0xf8
-#define REGISTER_Y_FREEZE_LOW		0xf9
-#define REGISTER_Y_FREEZE_HIGH		0xfa
-#define REGISTER_CURRENT_Y_LOW		0xfb
+#define REGISTER_X_FREEZE           0xf8
+#define REGISTER_Y_FREEZE_LOW       0xf9
+#define REGISTER_Y_FREEZE_HIGH      0xfa
+#define REGISTER_CURRENT_Y_LOW      0xfb
 
 
 // read/write registers - RAM memory
-#define RAM_RP_LO					0x00	// cartridge pointer low order
-#define RAM_RP_HI_COLOR				0x10	// cartridge pointer high order and color
-#define RAM_DX_INT_XCOPY			0x20	// dX, intensity, X-copy
-#define RAM_DY						0x30	// dY
-#define RAM_X						0x40	// X value
-#define RAM_Y_LO_A					0x50	// Y value low order list A
-#define RAM_Y_LO_B					0x60	// Y value low order list B
-#define RAM_XY_HI_A					0x70	// Y value high order and X order list A
-#define RAM_XY_HI_B					0x80	// Y value high order and X order list B
+#define RAM_RP_LO                   0x00    // cartridge pointer low order
+#define RAM_RP_HI_COLOR             0x10    // cartridge pointer high order and color
+#define RAM_DX_INT_XCOPY            0x20    // dX, intensity, X-copy
+#define RAM_DY                      0x30    // dY
+#define RAM_X                       0x40    // X value
+#define RAM_Y_LO_A                  0x50    // Y value low order list A
+#define RAM_Y_LO_B                  0x60    // Y value low order list B
+#define RAM_XY_HI_A                 0x70    // Y value high order and X order list A
+#define RAM_XY_HI_B                 0x80    // Y value high order and X order list B
 
 
 // command register bits
-#define COMMAND_YINT_H_O			0x80
-#define COMMAND_A_B					0x40
-#define COMMAND_Y_ZM				0x20
-#define COMMAND_KBD					0x10
-#define COMMAND_INT					0x08
-#define COMMAND_ENB					0x04
-#define COMMAND_FRZ					0x02
-#define COMMAND_X_ZM				0x01
+#define COMMAND_YINT_H_O            0x80
+#define COMMAND_A_B                 0x40
+#define COMMAND_Y_ZM                0x20
+#define COMMAND_KBD                 0x10
+#define COMMAND_INT                 0x08
+#define COMMAND_ENB                 0x04
+#define COMMAND_FRZ                 0x02
+#define COMMAND_X_ZM                0x01
 
 
 #define IS_CHANGED(_bit) \
@@ -98,7 +98,7 @@ const device_type UV201 = &device_creator<uv201_device>;
 //-------------------------------------------------
 
 uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, UV201, "UV201", tag, owner, clock)
+	: device_t(mconfig, UV201, "UV201", tag, owner, clock)
 {
 }
 
@@ -331,18 +331,18 @@ READ8_MEMBER( uv201_device::read )
 	case REGISTER_Y_FREEZE_HIGH:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       Y-F8        Y freeze high order (MSB) bit
-            1       Y-C8        current Y counter high order (MSB) bit
-            2
-            3
-            4
-            5
-            6
-            7       O/_E        odd/even field
+		    0       Y-F8        Y freeze high order (MSB) bit
+		    1       Y-C8        current Y counter high order (MSB) bit
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7       O/_E        odd/even field
 
-        */
+		*/
 
 		data = (get_field() << 7) | (BIT(get_field_vpos(), 8) << 1) | BIT(m_freeze_y, 8);
 
@@ -387,18 +387,18 @@ WRITE8_MEMBER( uv201_device::write )
 	case REGISTER_FINAL_MODIFIER:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       RED         red
-            1       GREEN       green
-            2       BLUE        blue
-            3       INT 0       intensity 0
-            4       INT 1       intensity 1
-            5       not used
-            6       not used
-            7       not used
+		    0       RED         red
+		    1       GREEN       green
+		    2       BLUE        blue
+		    3       INT 0       intensity 0
+		    4       INT 1       intensity 1
+		    5       not used
+		    6       not used
+		    7       not used
 
-        */
+		*/
 
 		if (LOG) logerror("Final Modifier %02x\n", data);
 
@@ -409,18 +409,18 @@ WRITE8_MEMBER( uv201_device::write )
 	case REGISTER_BACKGROUND:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       RED         red
-            1       GREEN       green
-            2       BLUE        blue
-            3       INT 0       intensity 0
-            4       INT 1       intensity 1
-            5       not used
-            6       not used
-            7       not used
+		    0       RED         red
+		    1       GREEN       green
+		    2       BLUE        blue
+		    3       INT 0       intensity 0
+		    4       INT 1       intensity 1
+		    5       not used
+		    6       not used
+		    7       not used
 
-        */
+		*/
 
 		if (LOG) logerror("Background %02x\n", data);
 
@@ -431,18 +431,18 @@ WRITE8_MEMBER( uv201_device::write )
 	case REGISTER_COMMAND:
 		/*
 
-            bit     signal      description
+		    bit     signal      description
 
-            0       X-ZM        X zoom
-            1       FRZ         freeze
-            2       ENB         video enable
-            3       INT         interrupt enable
-            4       KBD         general purpose output
-            5       Y-ZM        Y zoom
-            6       A/_B        list selection
-            7       YINT H.O.   Y COMMAND_INT register high order bit
+		    0       X-ZM        X zoom
+		    1       FRZ         freeze
+		    2       ENB         video enable
+		    3       INT         interrupt enable
+		    4       KBD         general purpose output
+		    5       Y-ZM        Y zoom
+		    6       A/_B        list selection
+		    7       YINT H.O.   Y COMMAND_INT register high order bit
 
-        */
+		*/
 
 		if (LOG) logerror("Command %02x\n", data);
 

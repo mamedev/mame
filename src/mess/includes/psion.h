@@ -20,7 +20,7 @@
 
 // ======================> psion_custom_lcdc
 
-class psion_custom_lcdc :	public hd44780_device
+class psion_custom_lcdc :   public hd44780_device
 {
 
 public:
@@ -40,11 +40,11 @@ class psion_state : public driver_device
 public:
 	psion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_lcdc(*this, "hd44780"),
-		  m_beep(*this, BEEPER_TAG),
-		  m_pack1(*this, "pack1"),
-		  m_pack2(*this, "pack2"),
+			m_maincpu(*this, "maincpu"),
+			m_lcdc(*this, "hd44780"),
+			m_beep(*this, BEEPER_TAG),
+			m_pack1(*this, "pack1"),
+			m_pack2(*this, "pack2"),
 		m_sys_register(*this, "sys_register"),
 		m_ram(*this, "ram"){ }
 
@@ -61,10 +61,10 @@ public:
 	UINT8 m_stby_pwr;
 	UINT8 m_pulse;
 
-	UINT8 m_port2_ddr;	// datapack i/o ddr
-	UINT8 m_port2;		// datapack i/o data bus
-	UINT8 m_port6_ddr;	// datapack control lines ddr
-	UINT8 m_port6;		// datapack control lines
+	UINT8 m_port2_ddr;  // datapack i/o ddr
+	UINT8 m_port2;      // datapack i/o data bus
+	UINT8 m_port6_ddr;  // datapack control lines ddr
+	UINT8 m_port6;      // datapack control lines
 
 	// RAM/ROM banks
 	required_shared_ptr<UINT8> m_ram;
@@ -92,4 +92,4 @@ public:
 // device type definition
 extern const device_type PSION_CUSTOM_LCDC;
 
-#endif	// _PSION_H_
+#endif  // _PSION_H_

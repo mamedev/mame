@@ -33,7 +33,7 @@
 #define DBG_LOG(N,M,A) \
 	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine().time().as_double(),(char*)M ); logerror A; }
 
-#define VERBOSE_JOY 0		/* JOY (joystick port) */
+#define VERBOSE_JOY 0       /* JOY (joystick port) */
 #define JOY_LOG(N,M,A) \
 	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine().time().as_double(),(char*)M ); logerror A; }
 
@@ -310,15 +310,15 @@ static const struct pit8253_config at_pit8254_config =
 {
 	{
 		{
-			4772720/4,				/* heartbeat IRQ */
+			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_LINE(at_pit8254_out0_changed)
 		}, {
-			4772720/4,				/* dram refresh */
+			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_LINE(at_pit8254_out2_changed)
 		}

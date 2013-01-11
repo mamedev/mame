@@ -56,8 +56,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn1", sn76489_device, write)
 	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0xd807, 0xd807) AM_READNOP		/* unknown read */
-	AM_RANGE(0xd817, 0xd817) AM_READNOP		/* unknown read */
+	AM_RANGE(0xd807, 0xd807) AM_READNOP     /* unknown read */
+	AM_RANGE(0xd817, 0xd817) AM_READNOP     /* unknown read */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( kncljoe )
 	PORT_DIPNAME( 0x20, 0x20, "Infinite Energy (Cheat)")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Free Play (Not Working)")	// Not working due to code at 0x296f
+	PORT_DIPNAME( 0x40, 0x40, "Free Play (Not Working)")    // Not working due to code at 0x296f
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -189,7 +189,7 @@ static INPUT_PORTS_START( kncljoe )
 	PORT_DIPSETTING(    0x10, "20k and every 40k" )
 	PORT_DIPSETTING(    0x08, "30k and every 60k" )
 	PORT_DIPSETTING(    0x00, "40k and every 80k" )
-	PORT_DIPNAME( 0x60, 0x60, "Difficulty?" )			// Stored at 0xf018
+	PORT_DIPNAME( 0x60, 0x60, "Difficulty?" )           // Stored at 0xf018
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
@@ -225,8 +225,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( kncljoe )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )	/* colors 0x00-0x7f direct mapped */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 16 )	/* colors 0x80-0x8f with lookup table */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )    /* colors 0x00-0x7f direct mapped */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 16 )    /* colors 0x80-0x8f with lookup table */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x80, 16 )
 GFXDECODE_END
 
@@ -243,7 +243,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -338,17 +338,17 @@ ROM_START( kncljoe )
 	ROM_REGION( 0x8000, "soundcpu", 0 )  /* 64k for audio code */
 	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
-	ROM_REGION( 0xc000, "gfx1", 0 )	/* tiles */
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "kj-10.bin", 0x0000,  0x4000, CRC(74d3ba33) SHA1(c7887d690cb7f7a7b24d59d490ffc088fb6cc49c) )
 	ROM_LOAD( "kj-11.bin", 0x4000,  0x4000, CRC(8ea01455) SHA1(b4b42fe373a1019b4f2a4b763a8a7219a5c9987e) )
 	ROM_LOAD( "kj-12.bin", 0x8000,  0x4000, CRC(33367c41) SHA1(e6c56bcad008f3af4bc0f7d7afe8e23c8eb9d943) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x18000, "gfx2", 0 )    /* sprites */
 	ROM_LOAD( "kj-4.bin", 0x00000,  0x8000, CRC(a499ea10) SHA1(cb671cc75b3c6029dd3529e62d83025f78b45271) )
 	ROM_LOAD( "kj-6.bin", 0x08000,  0x8000, CRC(815f5c0a) SHA1(ad0b59eeebb2e57035a3f643ac0ef575569bec0f) )
 	ROM_LOAD( "kj-5.bin", 0x10000,  0x8000, CRC(11111759) SHA1(504c62fc6778a4afa86cba69634652708535bef6) )
 
-	ROM_REGION( 0xc000, "gfx3", 0 )	/* sprites */
+	ROM_REGION( 0xc000, "gfx3", 0 ) /* sprites */
 	ROM_LOAD( "kj-7.bin", 0x0000,   0x4000, CRC(121fcccb) SHA1(77f3e7e49787d6a893c5d8c0c3ac612b1180e866) )
 	ROM_LOAD( "kj-9.bin", 0x4000,   0x4000, CRC(affbe3eb) SHA1(056111fc5b04ff14b114b5f724d02789c8e3ee10) )
 	ROM_LOAD( "kj-8.bin", 0x8000,   0x4000, CRC(e057e72a) SHA1(3a85750c72caaa027f302dc6ca4086bdbd49b5ff) )
@@ -370,17 +370,17 @@ ROM_START( kncljoea )
 	ROM_REGION( 0x8000, "soundcpu", 0 )  /* 64k for audio code */
 	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
-	ROM_REGION( 0xc000, "gfx1", 0 )	/* tiles */
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "kj-10.bin", 0x0000,  0x4000, CRC(74d3ba33) SHA1(c7887d690cb7f7a7b24d59d490ffc088fb6cc49c) )
 	ROM_LOAD( "kj-11.bin", 0x4000,  0x4000, CRC(8ea01455) SHA1(b4b42fe373a1019b4f2a4b763a8a7219a5c9987e) )
 	ROM_LOAD( "kj-12.bin", 0x8000,  0x4000, CRC(33367c41) SHA1(e6c56bcad008f3af4bc0f7d7afe8e23c8eb9d943) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x18000, "gfx2", 0 )    /* sprites */
 	ROM_LOAD( "kj-4.bin", 0x00000,  0x8000, CRC(a499ea10) SHA1(cb671cc75b3c6029dd3529e62d83025f78b45271) )
 	ROM_LOAD( "kj-6.bin", 0x08000,  0x8000, CRC(815f5c0a) SHA1(ad0b59eeebb2e57035a3f643ac0ef575569bec0f) )
 	ROM_LOAD( "kj-5.bin", 0x10000,  0x8000, CRC(11111759) SHA1(504c62fc6778a4afa86cba69634652708535bef6) )
 
-	ROM_REGION( 0xc000, "gfx3", 0 )	/* sprites */
+	ROM_REGION( 0xc000, "gfx3", 0 ) /* sprites */
 	ROM_LOAD( "kj-7.bin", 0x0000,   0x4000, CRC(121fcccb) SHA1(77f3e7e49787d6a893c5d8c0c3ac612b1180e866) )
 	ROM_LOAD( "kj-9.bin", 0x4000,   0x4000, CRC(affbe3eb) SHA1(056111fc5b04ff14b114b5f724d02789c8e3ee10) )
 	ROM_LOAD( "kj-8.bin", 0x8000,   0x4000, CRC(e057e72a) SHA1(3a85750c72caaa027f302dc6ca4086bdbd49b5ff) )
@@ -402,17 +402,17 @@ ROM_START( bcrusher )
 	ROM_REGION( 0x8000, "soundcpu", 0 )  /* 64k for audio code */
 	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
-	ROM_REGION( 0xc000, "gfx1", 0 )	/* tiles */
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "bcrush10.bin", 0x0000,  0x4000, CRC(a62f4572) SHA1(4e38e175e25a955e5f83cac8c935163e2e861e94) )
 	ROM_LOAD( "bcrush11.bin", 0x4000,  0x4000, CRC(79cc5644) SHA1(bc356065a2475d0e0921fc5c84fa46f6629caae7) )
 	ROM_LOAD( "bcrush12.bin", 0x8000,  0x4000, CRC(8f09641d) SHA1(5ccc423b15148d96c0a348d41a3f4fff7bbae7b9) )
 
-	ROM_REGION( 0x18000, "gfx2", 0 )	/* sprites */
+	ROM_REGION( 0x18000, "gfx2", 0 )    /* sprites */
 	ROM_LOAD( "kj-4.bin", 0x00000,  0x8000, CRC(a499ea10) SHA1(cb671cc75b3c6029dd3529e62d83025f78b45271) )
 	ROM_LOAD( "kj-6.bin", 0x08000,  0x8000, CRC(815f5c0a) SHA1(ad0b59eeebb2e57035a3f643ac0ef575569bec0f) )
 	ROM_LOAD( "kj-5.bin", 0x10000,  0x8000, CRC(11111759) SHA1(504c62fc6778a4afa86cba69634652708535bef6) )
 
-	ROM_REGION( 0xc000, "gfx3", 0 )	/* sprites */
+	ROM_REGION( 0xc000, "gfx3", 0 ) /* sprites */
 	ROM_LOAD( "kj-7.bin", 0x0000,   0x4000, CRC(121fcccb) SHA1(77f3e7e49787d6a893c5d8c0c3ac612b1180e866) )
 	ROM_LOAD( "kj-9.bin", 0x4000,   0x4000, CRC(affbe3eb) SHA1(056111fc5b04ff14b114b5f724d02789c8e3ee10) )
 	ROM_LOAD( "kj-8.bin", 0x8000,   0x4000, CRC(e057e72a) SHA1(3a85750c72caaa027f302dc6ca4086bdbd49b5ff) )

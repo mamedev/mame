@@ -80,12 +80,12 @@ int gl_shader_loadExtention(PFNGLGETPROCADDRESSOS GetProcAddress)
 	pfn_glUniform4ivARB           = (PFNGLUNIFORM4IVARBPROC) GetProcAddress ("glUniform4ivARB");
 
 	if ( pfn_glGetObjectParameterivARB && pfn_glGetInfoLogARB && pfn_glDeleteObjectARB && pfn_glCreateShaderObjectARB &&
-	     pfn_glShaderSourceARB && pfn_glCompileShaderARB && pfn_glCreateProgramObjectARB && pfn_glAttachObjectARB &&
-	     pfn_glLinkProgramARB && pfn_glValidateProgramARB && pfn_glUseProgramObjectARB && pfn_glGetUniformLocationARB &&
-	     pfn_glGetUniformLocationARB && pfn_glUniform1fARB && pfn_glUniform1iARB &&
-	     pfn_glUniform1fvARB && pfn_glUniform2fvARB && pfn_glUniform3fvARB && pfn_glUniform4fvARB &&
-	     pfn_glUniform1ivARB && pfn_glUniform2ivARB && pfn_glUniform3ivARB && pfn_glUniform4ivARB
-	   )
+			pfn_glShaderSourceARB && pfn_glCompileShaderARB && pfn_glCreateProgramObjectARB && pfn_glAttachObjectARB &&
+			pfn_glLinkProgramARB && pfn_glValidateProgramARB && pfn_glUseProgramObjectARB && pfn_glGetUniformLocationARB &&
+			pfn_glGetUniformLocationARB && pfn_glUniform1fARB && pfn_glUniform1iARB &&
+			pfn_glUniform1fvARB && pfn_glUniform2fvARB && pfn_glUniform3fvARB && pfn_glUniform4fvARB &&
+			pfn_glUniform1ivARB && pfn_glUniform2ivARB && pfn_glUniform3ivARB && pfn_glUniform4ivARB
+		)
 	{
 		return 0;
 	}
@@ -120,37 +120,37 @@ int gl_shader_loadExtention(PFNGLGETPROCADDRESSOS GetProcAddress)
 
 int gl_check_error(GLSLCheckMode m, const char *file, const int line)
 {
-        GLenum glerr = glGetError();
+		GLenum glerr = glGetError();
 
-        if (GL_NO_ERROR != glerr)
-        {
-                if ( CHECK_VERBOSE <= m )
-                {
+		if (GL_NO_ERROR != glerr)
+		{
+				if ( CHECK_VERBOSE <= m )
+				{
 			mame_printf_warning( "%s:%d: GL Error: %d 0x%X\n", file, line, (int)glerr, (unsigned int)glerr);
-                }
-        }
+				}
+		}
 	return (GL_NO_ERROR != glerr)? glerr : 0;
 }
 
 int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, const char *file, const int line)
 {
-    GLsizei length;
-    GLcharARB buffer[255];
-    GLenum glerr;
-    GLint  param;
-    int    res=0;
+	GLsizei length;
+	GLcharARB buffer[255];
+	GLenum glerr;
+	GLint  param;
+	int    res=0;
 
-    glerr = gl_check_error(m, file, line);
+	glerr = gl_check_error(m, file, line);
 
 	if(!obj)
 		return glerr;
 
 	if(obj_query != GL_OBJECT_TYPE_ARB            &&
-	   obj_query != GL_OBJECT_DELETE_STATUS_ARB   &&
-	   obj_query != GL_OBJECT_COMPILE_STATUS_ARB  &&
-	   obj_query != GL_OBJECT_LINK_STATUS_ARB     &&
-	   obj_query != GL_OBJECT_VALIDATE_STATUS_ARB
-	  )
+		obj_query != GL_OBJECT_DELETE_STATUS_ARB   &&
+		obj_query != GL_OBJECT_COMPILE_STATUS_ARB  &&
+		obj_query != GL_OBJECT_LINK_STATUS_ARB     &&
+		obj_query != GL_OBJECT_VALIDATE_STATUS_ARB
+		)
 	{
 		mame_printf_warning("%s:%d: GL Error: gl_shader_check_error unsupported object query 0x%X\n", file, line, (unsigned int)obj_query);
 		return -1;
@@ -160,7 +160,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 
 	switch(obj_query)
 	{
-	  case GL_OBJECT_TYPE_ARB:
+		case GL_OBJECT_TYPE_ARB:
 		if( param!=GL_PROGRAM_OBJECT_ARB && param!=GL_SHADER_OBJECT_ARB )
 		{
 			if ( CHECK_VERBOSE <= m )
@@ -174,7 +174,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 				mame_printf_warning("%s:%d: GL Info: object type 0x%X is SHADER, successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
-	  case GL_OBJECT_DELETE_STATUS_ARB:
+		case GL_OBJECT_DELETE_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_ALWAYS_VERBOSE <= m )
@@ -184,7 +184,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			mame_printf_warning("%s:%d: GL Info: object 0x%X deletion successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
-	  case GL_OBJECT_COMPILE_STATUS_ARB:
+		case GL_OBJECT_COMPILE_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_VERBOSE <= m )
@@ -195,7 +195,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			mame_printf_warning("%s:%d: GL Info: object 0x%X compiled successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
-	  case GL_OBJECT_LINK_STATUS_ARB:
+		case GL_OBJECT_LINK_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_VERBOSE <= m )
@@ -206,7 +206,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			mame_printf_warning("%s:%d: GL Info: object 0x%X linked successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
-	  case GL_OBJECT_VALIDATE_STATUS_ARB:
+		case GL_OBJECT_VALIDATE_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_VERBOSE <= m )
@@ -217,7 +217,7 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 			mame_printf_warning("%s:%d: GL Info: object 0x%X validation successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
-	 }
+		}
 
 	if ( res<0 || CHECK_ALWAYS_VERBOSE <= m )
 	{
@@ -247,28 +247,28 @@ int gl_round_to_pow2(int v)
 }
 
 int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height,
-                          GLint border, GLenum format, GLenum type,
-			  GLint *avail_width, GLint *avail_height,
-			  int verbose)
+							GLint border, GLenum format, GLenum type,
+				GLint *avail_width, GLint *avail_height,
+				int verbose)
 {
-    int err=1;
-    GLenum texTargetProxy = (target==GL_TEXTURE_RECTANGLE_ARB)?GL_PROXY_TEXTURE_RECTANGLE_ARB:GL_PROXY_TEXTURE_2D;
+	int err=1;
+	GLenum texTargetProxy = (target==GL_TEXTURE_RECTANGLE_ARB)?GL_PROXY_TEXTURE_RECTANGLE_ARB:GL_PROXY_TEXTURE_2D;
 
-    if ( !avail_width || !avail_height)
+	if ( !avail_width || !avail_height)
 	return -1;
 
-    *avail_width  = 0;
-    *avail_height = 0;
+	*avail_width  = 0;
+	*avail_height = 0;
 
-    GL_CHECK_ERROR_QUIET();
+	GL_CHECK_ERROR_QUIET();
 
-    /* Test the max texture size */
-    while(err && width>=1 && height>=1 /* && width>=64 && height>=64 */)
-    {
+	/* Test the max texture size */
+	while(err && width>=1 && height>=1 /* && width>=64 && height>=64 */)
+	{
 	glTexImage2D (texTargetProxy, level,
-		    internalFormat,
-		    width, height,
-		    border, format, type, NULL);
+			internalFormat,
+			width, height,
+			border, format, type, NULL);
 	if ( 0!=(err=GL_CHECK_ERROR_NORMAL() )) return err;
 
 	glGetTexLevelParameteriv( texTargetProxy, level, GL_TEXTURE_WIDTH,  avail_width);
@@ -282,10 +282,10 @@ int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsi
 		if(verbose)
 		{
 			mame_printf_warning("gl_texture_size_check: "
-			  "TexImage2D(0x%X, %d, 0x%X, %d, %d, %d, 0x%X, 0x%X): returned size does not match: %dx%d\n",
+				"TexImage2D(0x%X, %d, 0x%X, %d, %d, %d, 0x%X, 0x%X): returned size does not match: %dx%d\n",
 				(unsigned int)target, (int)level, (int)internalFormat,
 				(int)width, (int)height, (int)border, (unsigned int)format, (unsigned int)type,
-                                (int)*avail_width, (int)*avail_height);
+								(int)*avail_width, (int)*avail_height);
 		}
 
 		if ( (*avail_width)  == width   )
@@ -293,9 +293,9 @@ int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsi
 		else if ( (*avail_height) == height )
 			width /= 2;
 		else if (width > height)
-			  width /= 2;
+				width /= 2;
 		else
-			  height /= 2;
+				height /= 2;
 		if(verbose)
 		{
 			fprintf (stderr, "gl_texture_size_check: trying [%dx%d] !\n", (int)height, (int)width);
@@ -303,13 +303,13 @@ int gl_texture_check_size(GLenum target, GLint level, GLint internalFormat, GLsi
 	} else {
 		err=0;
 	}
-    }
-    if(!err)
-    {
-	    *avail_width  = width;
-	    *avail_height = height;
-    }
-    return err;
+	}
+	if(!err)
+	{
+		*avail_width  = width;
+		*avail_height = height;
+	}
+	return err;
 }
 
 static int delete_shader_tool( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader, int externalcall)
@@ -345,12 +345,12 @@ static int delete_shader_tool( GLhandleARB *program, GLhandleARB *vertex_shader,
 		*fragment_shader=0;
 	}
 
-        return res;
+		return res;
 }
 
 int gl_compile_shader_source( GLhandleARB *shader, GLenum type, const char * shader_source, int verbose )
 {
-        int err = 0;
+		int err = 0;
 
 	if(shader==NULL || shader_source==NULL)
 	{
@@ -360,15 +360,15 @@ int gl_compile_shader_source( GLhandleARB *shader, GLenum type, const char * sha
 			mame_printf_warning("error: gl_compile_shader_source: NULL shader source passed\n");
 		return -1;
 	}
-        *shader = pfn_glCreateShaderObjectARB(type);
+		*shader = pfn_glCreateShaderObjectARB(type);
 	err=GL_SHADER_CHECK(*shader, GL_OBJECT_TYPE_ARB);
-        if(err) goto errout;
+		if(err) goto errout;
 
-        pfn_glShaderSourceARB(*shader, 1, (const GLcharARB **)&shader_source, NULL);
+		pfn_glShaderSourceARB(*shader, 1, (const GLcharARB **)&shader_source, NULL);
 
-        pfn_glCompileShaderARB(*shader);
-        err=GL_SHADER_CHECK(*shader, GL_OBJECT_COMPILE_STATUS_ARB);
-        if(err) goto errout;
+		pfn_glCompileShaderARB(*shader);
+		err=GL_SHADER_CHECK(*shader, GL_OBJECT_COMPILE_STATUS_ARB);
+		if(err) goto errout;
 
 	if(verbose)
 		mame_printf_warning( "<%s>\n", shader_source);
@@ -381,12 +381,12 @@ errout:
 		pfn_glDeleteObjectARB(*shader);
 	}
 	mame_printf_warning("failed to process shader: <%s>\n", shader_source);
-        return err;
+		return err;
 }
 
 int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shader_file, int verbose )
 {
-    int err = 0, i, c;
+	int err = 0, i, c;
 	FILE * file = NULL;
 	const int buffer_len=8192;
 	GLcharARB *buffer=NULL;
@@ -410,7 +410,7 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 	buffer = (GLcharARB *) malloc(buffer_len);
 	memset(buffer, 0, buffer_len);
 
-        /* Load Shader Sources */
+		/* Load Shader Sources */
 	i=0;
 	while( i<buffer_len-1 && EOF!=(c=fgetc(file)) )
 		buffer[i++]=(char)c;
@@ -418,7 +418,7 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 	buffer[i]='\0';
 
 	err=gl_compile_shader_source(shader, type, buffer, verbose);
-        if(err) goto errout;
+		if(err) goto errout;
 
 	free(buffer);
 
@@ -430,15 +430,15 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 errout:
 	free(buffer);
 	mame_printf_warning("failed to process shader_file: %s\n", shader_file);
-        return err;
+		return err;
 }
 
 
 int gl_compile_shader_files( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader,
-                             const char * vertex_shader_file,
-                             const char * fragment_shader_file,
-			     int verbose
-                           )
+								const char * vertex_shader_file,
+								const char * fragment_shader_file,
+					int verbose
+							)
 {
 	int err;
 
@@ -461,9 +461,9 @@ int gl_compile_shader_files( GLhandleARB *program, GLhandleARB *vertex_shader, G
 		goto errout;
 	}
 
-        *program = pfn_glCreateProgramObjectARB();
-        err=GL_SHADER_CHECK(*program, GL_OBJECT_TYPE_ARB);
-        if(err) goto errout;
+		*program = pfn_glCreateProgramObjectARB();
+		err=GL_SHADER_CHECK(*program, GL_OBJECT_TYPE_ARB);
+		if(err) goto errout;
 
 	if(!vertex_shader_file)
 	{
@@ -479,7 +479,7 @@ int gl_compile_shader_files( GLhandleARB *program, GLhandleARB *vertex_shader, G
 		err = gl_compile_shader_file(vertex_shader, GL_VERTEX_SHADER_ARB, vertex_shader_file, verbose);
 		if(err) return err;
 	}
-        pfn_glAttachObjectARB(*program, *vertex_shader);
+		pfn_glAttachObjectARB(*program, *vertex_shader);
 
 	if(!fragment_shader_file)
 	{
@@ -495,30 +495,30 @@ int gl_compile_shader_files( GLhandleARB *program, GLhandleARB *vertex_shader, G
 		err = gl_compile_shader_file(fragment_shader, GL_FRAGMENT_SHADER_ARB, fragment_shader_file, verbose);
 		if(err) return err;
 	}
-        pfn_glAttachObjectARB(*program, *fragment_shader);
+		pfn_glAttachObjectARB(*program, *fragment_shader);
 
-        pfn_glLinkProgramARB(*program);
-        err=GL_SHADER_CHECK(*program, GL_OBJECT_LINK_STATUS_ARB);
-        if(err) goto errout;
+		pfn_glLinkProgramARB(*program);
+		err=GL_SHADER_CHECK(*program, GL_OBJECT_LINK_STATUS_ARB);
+		if(err) goto errout;
 
-        pfn_glValidateProgramARB(*program);
-        err=GL_SHADER_CHECK(*program, GL_OBJECT_VALIDATE_STATUS_ARB);
-        if(err) goto errout;
+		pfn_glValidateProgramARB(*program);
+		err=GL_SHADER_CHECK(*program, GL_OBJECT_VALIDATE_STATUS_ARB);
+		if(err) goto errout;
 
-        return 0;
+		return 0;
 
 errout:
-        delete_shader_tool(program, vertex_shader, fragment_shader, 0);
-        return err;
+		delete_shader_tool(program, vertex_shader, fragment_shader, 0);
+		return err;
 
 }
 
 int gl_compile_shader_sources( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandleARB *fragment_shader,
-                               const GLcharARB * vertex_shader_source,
-                               const GLcharARB * fragment_shader_source
-                             )
+								const GLcharARB * vertex_shader_source,
+								const GLcharARB * fragment_shader_source
+								)
 {
-        int err = 0;
+		int err = 0;
 
 	if (!program)
 	{
@@ -539,9 +539,9 @@ int gl_compile_shader_sources( GLhandleARB *program, GLhandleARB *vertex_shader,
 		goto errout;
 	}
 
-        *program = pfn_glCreateProgramObjectARB();
-        err=GL_SHADER_CHECK(*program, GL_OBJECT_TYPE_ARB);
-        if(err) goto errout;
+		*program = pfn_glCreateProgramObjectARB();
+		err=GL_SHADER_CHECK(*program, GL_OBJECT_TYPE_ARB);
+		if(err) goto errout;
 
 	if(!vertex_shader_source)
 	{
@@ -571,38 +571,38 @@ int gl_compile_shader_sources( GLhandleARB *program, GLhandleARB *vertex_shader,
 		err=gl_compile_shader_source(vertex_shader, GL_VERTEX_SHADER_ARB, vertex_shader_source, 0);
 		if(err) goto errout;
 	}
-        pfn_glAttachObjectARB(*program, *vertex_shader);
+		pfn_glAttachObjectARB(*program, *vertex_shader);
 
 	if(fragment_shader_source)
 	{
 		err=gl_compile_shader_source(fragment_shader, GL_FRAGMENT_SHADER_ARB, fragment_shader_source, 0);
 		if(err) goto errout;
 	}
-        pfn_glAttachObjectARB(*program, *fragment_shader);
+		pfn_glAttachObjectARB(*program, *fragment_shader);
 
-        pfn_glLinkProgramARB(*program);
-        err=GL_SHADER_CHECK(*program, GL_OBJECT_LINK_STATUS_ARB);
-        if(err) {
+		pfn_glLinkProgramARB(*program);
+		err=GL_SHADER_CHECK(*program, GL_OBJECT_LINK_STATUS_ARB);
+		if(err) {
 		mame_printf_warning("failed to link program\n");
 		mame_printf_warning("vertex shader: <%s>\n", vertex_shader_source);
 		mame_printf_warning("fragment shader: <%s>\n", fragment_shader_source);
 		goto errout;
 	}
 
-        pfn_glValidateProgramARB(*program);
-        err=GL_SHADER_CHECK(*program, GL_OBJECT_VALIDATE_STATUS_ARB);
-        if(err) {
+		pfn_glValidateProgramARB(*program);
+		err=GL_SHADER_CHECK(*program, GL_OBJECT_VALIDATE_STATUS_ARB);
+		if(err) {
 		mame_printf_warning("failed to validate program\n");
 		mame_printf_warning("vertex shader: <%s>\n", vertex_shader_source);
 		mame_printf_warning("fragment shader: <%s>\n", fragment_shader_source);
 		goto errout;
 	}
 
-        return 0;
+		return 0;
 
 errout:
-        delete_shader_tool(program, vertex_shader, fragment_shader, 0);
-        return err;
+		delete_shader_tool(program, vertex_shader, fragment_shader, 0);
+		return err;
 
 }
 
@@ -611,5 +611,3 @@ int gl_delete_shader( GLhandleARB *program, GLhandleARB *vertex_shader, GLhandle
 {
 	return delete_shader_tool(program, vertex_shader, fragment_shader, 1);
 }
-
-

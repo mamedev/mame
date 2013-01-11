@@ -6,8 +6,8 @@
 
 struct namco_62xx_interface
 {
-	devcb_read8 	in[4];		/* read handlers for ports A-D */
-	devcb_write8	out[2];		/* write handlers for ports A-B */
+	devcb_read8     in[4];      /* read handlers for ports A-D */
+	devcb_write8    out[2];     /* write handlers for ports A-B */
 };
 
 
@@ -43,4 +43,4 @@ extern const device_type NAMCO_62XX;
 
 
 
-#endif	/* NAMCO62_H */
+#endif  /* NAMCO62_H */

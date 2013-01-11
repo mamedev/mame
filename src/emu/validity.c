@@ -154,12 +154,12 @@ void validity_checker::validate_tag(const char *tag)
 
 validity_checker::validity_checker(emu_options &options)
 	: m_drivlist(options),
-	  m_errors(0),
-	  m_warnings(0),
-	  m_current_driver(NULL),
-	  m_current_config(NULL),
-	  m_current_device(NULL),
-	  m_current_ioport(NULL)
+		m_errors(0),
+		m_warnings(0),
+		m_current_driver(NULL),
+		m_current_config(NULL),
+		m_current_device(NULL),
+		m_current_ioport(NULL)
 {
 	// pre-populate the defstr map with all the default strings
 	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
@@ -934,7 +934,7 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
-					 strindex >= next_strindex && setting->condition() == setting->next()->condition())
+						strindex >= next_strindex && setting->condition() == setting->next()->condition())
 			{
 				mame_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting->name(), setting->next()->name());
 				coin_error = true;

@@ -26,67 +26,67 @@
 #include "video/mc6845.h"
 #include "video/mos6566.h"
 
-#define M6509_TAG		"u13"
-#define PLA1_TAG		"u78"
-#define PLA2_TAG		"u88"
-#define MOS6567_TAG		"u23"
-#define MOS6569_TAG		"u23"
-#define MC68B45_TAG		"u10"
-#define MOS6851_TAG		"u4"
-#define MOS6525_1_TAG	"u20"
-#define MOS6525_2_TAG	"u102"
-#define MOS6551A_TAG	"u19"
-#define MOS6526_TAG		"u2"
-#define DS75160A_TAG	"u3"
-#define DS75161A_TAG	"u7"
-#define SCREEN_TAG		"screen"
-#define CONTROL1_TAG	"joy1"
-#define CONTROL2_TAG	"joy2"
+#define M6509_TAG       "u13"
+#define PLA1_TAG        "u78"
+#define PLA2_TAG        "u88"
+#define MOS6567_TAG     "u23"
+#define MOS6569_TAG     "u23"
+#define MC68B45_TAG     "u10"
+#define MOS6851_TAG     "u4"
+#define MOS6525_1_TAG   "u20"
+#define MOS6525_2_TAG   "u102"
+#define MOS6551A_TAG    "u19"
+#define MOS6526_TAG     "u2"
+#define DS75160A_TAG    "u3"
+#define DS75161A_TAG    "u7"
+#define SCREEN_TAG      "screen"
+#define CONTROL1_TAG    "joy1"
+#define CONTROL2_TAG    "joy2"
 
-#define EXT_I8088_TAG	"ext_u1"
-#define EXT_I8087_TAG	"ext_u4"
-#define EXT_I8259A_TAG	"ext_u3"
-#define EXT_MOS6526_TAG	"ext_u15"
-#define EXT_MOS6525_TAG	"ext_u16"
+#define EXT_I8088_TAG   "ext_u1"
+#define EXT_I8087_TAG   "ext_u4"
+#define EXT_I8259A_TAG  "ext_u3"
+#define EXT_MOS6526_TAG "ext_u15"
+#define EXT_MOS6525_TAG "ext_u16"
 
 class cbm2_state : public driver_device
 {
 public:
 	cbm2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M6509_TAG),
-		  m_pla1(*this, PLA1_TAG),
-		  m_crtc(*this, MC68B45_TAG),
-		  m_sid(*this, MOS6851_TAG),
-		  m_tpi1(*this, MOS6525_1_TAG),
-		  m_tpi2(*this, MOS6525_2_TAG),
-		  m_acia(*this, MOS6551A_TAG),
-		  m_cia(*this, MOS6526_TAG),
-		  m_ieee1(*this, DS75160A_TAG),
-		  m_ieee2(*this, DS75161A_TAG),
-		  m_joy1(*this, CONTROL1_TAG),
-		  m_joy2(*this, CONTROL2_TAG),
-		  m_exp(*this, CBM2_EXPANSION_SLOT_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		  m_ieee(*this, IEEE488_TAG),
-		  m_ext_cpu(*this, EXT_I8088_TAG),
-		  m_ext_pic(*this, EXT_I8259A_TAG),
-		  m_ext_cia(*this, EXT_MOS6526_TAG),
-		  m_ext_tpi(*this, EXT_MOS6525_TAG),
-		  m_buffer_ram(*this, "buffer_ram"),
-		  m_extbuf_ram(*this, "extbuf_ram"),
-		  m_dramon(1),
-		  m_video_ram(*this, "video_ram"),
-		  m_video_ram_size(0x800),
-		  m_graphics(1),
-		  m_todclk(0),
-		  m_tpi1_irq(CLEAR_LINE),
-		  m_cass_rd(1),
-		  m_user_flag(0),
-		  m_user_irq(CLEAR_LINE),
-		  m_tpi2_pa(0),
-		  m_tpi2_pb(0)
+			m_maincpu(*this, M6509_TAG),
+			m_pla1(*this, PLA1_TAG),
+			m_crtc(*this, MC68B45_TAG),
+			m_sid(*this, MOS6851_TAG),
+			m_tpi1(*this, MOS6525_1_TAG),
+			m_tpi2(*this, MOS6525_2_TAG),
+			m_acia(*this, MOS6551A_TAG),
+			m_cia(*this, MOS6526_TAG),
+			m_ieee1(*this, DS75160A_TAG),
+			m_ieee2(*this, DS75161A_TAG),
+			m_joy1(*this, CONTROL1_TAG),
+			m_joy2(*this, CONTROL2_TAG),
+			m_exp(*this, CBM2_EXPANSION_SLOT_TAG),
+			m_ram(*this, RAM_TAG),
+			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_ieee(*this, IEEE488_TAG),
+			m_ext_cpu(*this, EXT_I8088_TAG),
+			m_ext_pic(*this, EXT_I8259A_TAG),
+			m_ext_cia(*this, EXT_MOS6526_TAG),
+			m_ext_tpi(*this, EXT_MOS6525_TAG),
+			m_buffer_ram(*this, "buffer_ram"),
+			m_extbuf_ram(*this, "extbuf_ram"),
+			m_dramon(1),
+			m_video_ram(*this, "video_ram"),
+			m_video_ram_size(0x800),
+			m_graphics(1),
+			m_todclk(0),
+			m_tpi1_irq(CLEAR_LINE),
+			m_cass_rd(1),
+			m_user_flag(0),
+			m_user_irq(CLEAR_LINE),
+			m_tpi2_pa(0),
+			m_tpi2_pb(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -216,13 +216,13 @@ class p500_state : public cbm2_state
 public:
 	p500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cbm2_state(mconfig, type, tag),
-		  m_pla2(*this, PLA2_TAG),
-		  m_vic(*this, MOS6569_TAG),
-		  m_color_ram(*this, "color_ram"),
-		  m_statvid(1),
-		  m_vicdotsel(1),
-		  m_vicbnksel(0x03),
-		  m_vic_irq(CLEAR_LINE)
+			m_pla2(*this, PLA2_TAG),
+			m_vic(*this, MOS6569_TAG),
+			m_color_ram(*this, "color_ram"),
+			m_statvid(1),
+			m_vicdotsel(1),
+			m_vicbnksel(0x03),
+			m_vic_irq(CLEAR_LINE)
 	{ }
 
 	required_device<pls100_device> m_pla2;

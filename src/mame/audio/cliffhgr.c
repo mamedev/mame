@@ -1,13 +1,13 @@
 #include "emu.h"
 #include "sound/discrete.h"
 
-#define CLIFF_ENABLE_SND_1	NODE_01
-#define CLIFF_ENABLE_SND_2	NODE_02
+#define CLIFF_ENABLE_SND_1  NODE_01
+#define CLIFF_ENABLE_SND_2  NODE_02
 
 static const discrete_555_desc desc_cliffhgr_555 =
 {
 	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
-	5,	/* B+ voltage of 555 */
+	5,  /* B+ voltage of 555 */
 	DEFAULT_555_VALUES
 };
 

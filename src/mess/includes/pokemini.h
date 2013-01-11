@@ -16,31 +16,31 @@
 
 struct PRC
 {
-	UINT8		colors_inverted;
-	UINT8		background_enabled;
-	UINT8		sprites_enabled;
-	UINT8		copy_enabled;
-	UINT8		map_size;
-	UINT8		map_size_x;
-	UINT8		frame_count;
-	UINT8		max_frame_count;
-	UINT32		bg_tiles;
-	UINT32		spr_tiles;
-	UINT8		count;
-	emu_timer	*count_timer;
+	UINT8       colors_inverted;
+	UINT8       background_enabled;
+	UINT8       sprites_enabled;
+	UINT8       copy_enabled;
+	UINT8       map_size;
+	UINT8       map_size_x;
+	UINT8       frame_count;
+	UINT8       max_frame_count;
+	UINT32      bg_tiles;
+	UINT32      spr_tiles;
+	UINT8       count;
+	emu_timer   *count_timer;
 };
 
 
 struct TIMERS
 {
-	emu_timer	*seconds_timer;
-	emu_timer	*hz256_timer;
-	emu_timer	*timer1;				/* Timer 1 low or 16bit */
-	emu_timer	*timer1_hi;				/* Timer 1 hi */
-	emu_timer	*timer2;				/* Timer 2 low or 16bit */
-	emu_timer	*timer2_hi;				/* Timer 2 high */
-	emu_timer	*timer3;				/* Timer 3 low or 16bit */
-	emu_timer	*timer3_hi;				/* Timer 3 high */
+	emu_timer   *seconds_timer;
+	emu_timer   *hz256_timer;
+	emu_timer   *timer1;                /* Timer 1 low or 16bit */
+	emu_timer   *timer1_hi;             /* Timer 1 hi */
+	emu_timer   *timer2;                /* Timer 2 low or 16bit */
+	emu_timer   *timer2_hi;             /* Timer 2 high */
+	emu_timer   *timer3;                /* Timer 3 low or 16bit */
+	emu_timer   *timer3_hi;             /* Timer 3 high */
 };
 
 

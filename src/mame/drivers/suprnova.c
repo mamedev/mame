@@ -175,8 +175,8 @@ static void hit_calc_orig(UINT16 p, UINT16 s, UINT16 org, UINT16 *l, UINT16 *r)
 }
 
 static void hit_calc_axis(UINT16 x1p, UINT16 x1s, UINT16 x2p, UINT16 x2s, UINT16 org,
-			  UINT16 *x1_p1, UINT16 *x1_p2, UINT16 *x2_p1, UINT16 *x2_p2,
-			  INT16 *x_in, UINT16 *x1tox2)
+				UINT16 *x1_p1, UINT16 *x1_p2, UINT16 *x2_p1, UINT16 *x2_p2,
+				INT16 *x_in, UINT16 *x1tox2)
 {
 	UINT16 x1l=0, x1r=0, x2l=0, x2r=0;
 	hit_calc_orig(x1p, x1s, org,      &x1l, &x1r);
@@ -459,7 +459,7 @@ CUSTOM_INPUT_MEMBER(skns_state::paddle_r)
 	return ioport(tag)->read();
 }
 
-static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
+static INPUT_PORTS_START( skns )        /* 3 buttons, 2 players */
 	PORT_START("400000")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START1 )
@@ -532,21 +532,21 @@ static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( skns_1p )		/* 2 buttons, 1 player */
+static INPUT_PORTS_START( skns_1p )     /* 2 buttons, 1 player */
 	PORT_INCLUDE( skns )
 
 	PORT_MODIFY("400000")
 	/* jjparads and jjparad2 are 1 player only games
-       ryouran and teljan have an unemulated feature
-       that allows to play them in two player mode
-       via a cable-network connection (untestable)
-       Service mode test shows only P1 inputs */
+	   ryouran and teljan have an unemulated feature
+	   that allows to play them in two player mode
+	   via a cable-network connection (untestable)
+	   Service mode test shows only P1 inputs */
 	PORT_BIT( 0x00ff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 	/* same as above, coin 2 and start 2 are untestable
-       in ryouran and teljan. So I left disabled for now */
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED )	/* Start 2 */
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED )	/* Coin 2 */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 3 */
+	   in ryouran and teljan. So I left disabled for now */
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED )   /* Start 2 */
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED )   /* Coin 2 */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
 
 	PORT_MODIFY("400004")
 	PORT_DIPNAME( 0x00000010, 0x00000010, "Test Mode" )
@@ -554,30 +554,30 @@ static INPUT_PORTS_START( skns_1p )		/* 2 buttons, 1 player */
 	PORT_DIPSETTING(          0x00000000, DEF_STR(On) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cyvern )		/* 2 buttons, 2 players */
+static INPUT_PORTS_START( cyvern )      /* 2 buttons, 2 players */
 	PORT_INCLUDE( skns )
 
 	PORT_MODIFY("400000")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 3 */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 3 */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( galpanis )	/* 1 button, 2 players */
+static INPUT_PORTS_START( galpanis )    /* 1 button, 2 players */
 	PORT_INCLUDE( skns )
 
 	PORT_MODIFY("400000")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 2 */
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 3 */
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 2 */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 3 */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 2 */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 2 */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( puzzloop )	/* 2 buttons, 2 players, paddle */
+static INPUT_PORTS_START( puzzloop )    /* 2 buttons, 2 players, paddle */
 	PORT_INCLUDE( skns )
 
 	PORT_MODIFY("400000")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 3 */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* No Button 3 */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
 
 	PORT_MODIFY("Paddle A")  /* Paddle A */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
@@ -586,7 +586,7 @@ static INPUT_PORTS_START( puzzloop )	/* 2 buttons, 2 players, paddle */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( vblokbrk )	/* 3 buttons, 2 players, paddle */
+static INPUT_PORTS_START( vblokbrk )    /* 3 buttons, 2 players, paddle */
 	PORT_INCLUDE( skns )
 
 	PORT_MODIFY("Paddle A")  /* Paddle A */
@@ -713,9 +713,9 @@ static const gfx_layout skns_tilemap_layout =
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-	  8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+		8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 	16*16*8
 };
 
@@ -726,14 +726,14 @@ static const gfx_layout skns_4bpptilemap_layout =
 	4,
 	{ 0, 1, 2, 3  },
 	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-	 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
+		9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	16*16*4
 };
 
 static GFXDECODE_START( skns_bg )
-   /* "gfx1" is sprites, RLE encoded */
+	/* "gfx1" is sprites, RLE encoded */
 	GFXDECODE_ENTRY( "gfx2", 0, skns_tilemap_layout, 0x000, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, skns_tilemap_layout, 0x000, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, skns_4bpptilemap_layout, 0x000, 128 )
@@ -744,7 +744,7 @@ GFXDECODE_END
 
 static const ymz280b_interface ymz280b_intf =
 {
-	0	// irq ?
+	0   // irq ?
 };
 
 

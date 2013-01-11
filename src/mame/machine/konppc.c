@@ -6,7 +6,7 @@
 #include "video/voodoo.h"
 #include "konppc.h"
 
-#define MAX_CG_BOARDS	2
+#define MAX_CG_BOARDS   2
 
 static UINT32 dsp_comm_ppc[MAX_CG_BOARDS][2];
 static UINT32 dsp_comm_sharc[MAX_CG_BOARDS][2];
@@ -18,8 +18,8 @@ static INT32 num_cgboards;
 
 static UINT32 *dsp_shared_ram[MAX_CG_BOARDS];
 
-#define DSP_BANK_SIZE			0x10000
-#define DSP_BANK_SIZE_WORD		(DSP_BANK_SIZE / 4)
+#define DSP_BANK_SIZE           0x10000
+#define DSP_BANK_SIZE_WORD      (DSP_BANK_SIZE / 4)
 
 static UINT32 dsp_state[MAX_CG_BOARDS];
 static UINT32 nwk_device_sel[MAX_CG_BOARDS];
@@ -157,7 +157,7 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 				if (data & 0x80000000)
 					dsp_state[cgboard_id] |= 0x10;
 
-				if (k033906 != NULL)	/* zr107.c has no PCI and some games only have one PCI Bridge */
+				if (k033906 != NULL)    /* zr107.c has no PCI and some games only have one PCI Bridge */
 					k033906_set_reg(k033906, (data & 0x20000000) ? 1 : 0);
 
 				if (data & 0x10000000)
@@ -198,7 +198,7 @@ WRITE32_HANDLER( cgboard_dsp_shared_w_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-		space.machine().scheduler().trigger(10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
+		space.machine().scheduler().trigger(10000);     // Remove the timeout (a part of the GTI Club FIFO test workaround)
 		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
 	}
 }
@@ -533,7 +533,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_1_w)
 
 /*****************************************************************************/
 
-#define LED_ON		0xff00ff00
+#define LED_ON      0xff00ff00
 
 void draw_7segment_led(bitmap_rgb32 &bitmap, int x, int y, UINT8 value)
 {

@@ -107,7 +107,7 @@ static INPUT_PORTS_START( gng )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8,7,6,5")
 	PORT_DIPSETTING( 0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING( 0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING( 0x08, DEF_STR( 2C_1C ) )
@@ -124,37 +124,37 @@ static INPUT_PORTS_START( gng )
 	PORT_DIPSETTING( 0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING( 0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x10, "Coinage affects" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Coinage affects" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING( 0x10, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x40, IP_ACTIVE_LOW, "SW1:2" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:8,7")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:8,7")
 	PORT_DIPSETTING( 0x03, "3" )
 	PORT_DIPSETTING( 0x02, "4" )
 	PORT_DIPSETTING( 0x01, "5" )
 	PORT_DIPSETTING( 0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING( 0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING( 0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,4")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5,4")
 	PORT_DIPSETTING( 0x18, "20K 70K Every 70K" )
 	PORT_DIPSETTING( 0x10, "30K 80K Every 80K" )
 	PORT_DIPSETTING( 0x08, "20K and 80K Only" )
 	PORT_DIPSETTING( 0x00, "30K and 80K Only" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,2")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,2")
 	PORT_DIPSETTING( 0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING( 0x60, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:1" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:1" )        /* Listed as "Unused" */
 INPUT_PORTS_END
 
 /* identical to gng, but the "unknown" dip switch is Invulnerability */
@@ -162,9 +162,9 @@ static INPUT_PORTS_START( makaimur )
 	PORT_INCLUDE( gng )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")    PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( diamond )
@@ -200,56 +200,56 @@ static INPUT_PORTS_START( diamond )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x01, "3" )
-	PORT_DIPSETTING(	0x02, "4" )
-	PORT_DIPSETTING(	0x03, "5" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x00, "*1" )
-	PORT_DIPSETTING(	0x04, "*2" )
-	PORT_DIPSETTING(	0x08, "*3" )
-	PORT_DIPSETTING(	0x0c, "*4" )
+	PORT_DIPSETTING(    0x00, "*1" )
+	PORT_DIPSETTING(    0x04, "*2" )
+	PORT_DIPSETTING(    0x08, "*3" )
+	PORT_DIPSETTING(    0x0c, "*4" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(	0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x40, 0x00, "Unknown DSW1 7" )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x07, "Energy Loss" )
-	PORT_DIPSETTING(	0x00, "Slowest" )
-	PORT_DIPSETTING(	0x01, "-6 Slower" )
-	PORT_DIPSETTING(	0x02, "-5 Slower" )
-	PORT_DIPSETTING(	0x03, "-4 Slower" )
-	PORT_DIPSETTING(	0x04, "-3 Slower" )
-	PORT_DIPSETTING(	0x05, "-2 Slower" )
-	PORT_DIPSETTING(	0x06, "-1 Slower" )
-	PORT_DIPSETTING(	0x07, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x08, "+1 Faster" )
-	PORT_DIPSETTING(	0x09, "+2 Faster" )
-	PORT_DIPSETTING(	0x0a, "+3 Faster" )
-	PORT_DIPSETTING(	0x0b, "+4 Faster" )
-	PORT_DIPSETTING(	0x0c, "+5 Faster" )
-	PORT_DIPSETTING(	0x0d, "+6 Faster" )
-	PORT_DIPSETTING(	0x0e, "+7 Faster" )
-	PORT_DIPSETTING(	0x0f, "Fastest" )
+	PORT_DIPSETTING(    0x00, "Slowest" )
+	PORT_DIPSETTING(    0x01, "-6 Slower" )
+	PORT_DIPSETTING(    0x02, "-5 Slower" )
+	PORT_DIPSETTING(    0x03, "-4 Slower" )
+	PORT_DIPSETTING(    0x04, "-3 Slower" )
+	PORT_DIPSETTING(    0x05, "-2 Slower" )
+	PORT_DIPSETTING(    0x06, "-1 Slower" )
+	PORT_DIPSETTING(    0x07, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, "+1 Faster" )
+	PORT_DIPSETTING(    0x09, "+2 Faster" )
+	PORT_DIPSETTING(    0x0a, "+3 Faster" )
+	PORT_DIPSETTING(    0x0b, "+4 Faster" )
+	PORT_DIPSETTING(    0x0c, "+5 Faster" )
+	PORT_DIPSETTING(    0x0d, "+6 Faster" )
+	PORT_DIPSETTING(    0x0e, "+7 Faster" )
+	PORT_DIPSETTING(    0x0f, "Fastest" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x00, "*1" )
-	PORT_DIPSETTING(	0x10, "*2" )
-	PORT_DIPSETTING(	0x20, "*3" )
-	PORT_DIPSETTING(	0x30, "*4" )
+	PORT_DIPSETTING(    0x00, "*1" )
+	PORT_DIPSETTING(    0x10, "*2" )
+	PORT_DIPSETTING(    0x20, "*3" )
+	PORT_DIPSETTING(    0x30, "*4" )
 	PORT_DIPNAME( 0x40, 0x00, "Unknown DSW2 7" )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Unknown DSW2 8" )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -292,9 +292,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gng )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	 0x80, 16 )	/* colors 0x80-0xbf */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,	 0x00,	8 )	/* colors 0x00-0x3f */
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x40,	4 )	/* colors 0x40-0x7f */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x80, 16 ) /* colors 0x80-0xbf */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0x00,  8 ) /* colors 0x00-0x3f */
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x40, 4 ) /* colors 0x40-0x7f */
 GFXDECODE_END
 
 
@@ -323,7 +323,7 @@ void gng_state::machine_reset()
 		int i;
 
 		/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
-                 For now let's fill everything with white colors until we have better info about it */
+		         For now let's fill everything with white colors until we have better info about it */
 		for(i=0;i<0x100;i+=4)
 		{
 			m_generic_paletteram_8[i] = m_generic_paletteram2_8[i] = 0x00;
@@ -341,11 +341,11 @@ void gng_state::machine_reset()
 static MACHINE_CONFIG_START( gng, gng_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)		/* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gng_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gng_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)		/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(gng_state, irq0_line_hold, 4*60)
 
@@ -368,13 +368,13 @@ static MACHINE_CONFIG_START( gng, gng_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)		/* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)		/* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)

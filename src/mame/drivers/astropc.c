@@ -18,7 +18,7 @@ class astropc_state : public driver_device
 public:
 	astropc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -52,7 +52,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( blackbd )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -69,7 +69,7 @@ ROM_END
 
 
 ROM_START( blackbda )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -84,7 +84,7 @@ ROM_START( blackbda )
 ROM_END
 
 ROM_START( blackbdb )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -96,7 +96,7 @@ ROM_START( blackbdb )
 ROM_END
 
 ROM_START( dslayrr )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -108,7 +108,7 @@ ROM_START( dslayrr )
 ROM_END
 
 ROM_START( dslayrra )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -120,7 +120,7 @@ ROM_START( dslayrra )
 ROM_END
 
 ROM_START( hawaii )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -132,7 +132,7 @@ ROM_START( hawaii )
 ROM_END
 
 ROM_START( oligam )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -144,7 +144,7 @@ ROM_START( oligam )
 ROM_END
 
 ROM_START( rasce )
-	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */  // wasn't in this set!
+	ROM_REGION32_LE(0x40000, "bios", 0) /* motherboard bios */  // wasn't in this set!
 	ROM_LOAD( "bios.002", 0x0000, 0x040000, CRC(45333544) SHA1(bcc03b4f77b2e447192a1e5ed9f4cc09d0289714) )
 
 	ROM_REGION(0x20000, "rom", 0)
@@ -161,15 +161,15 @@ DRIVER_INIT_MEMBER(astropc_state,astropc)
 
 }
 
-GAME( 2002, blackbd,   0,		 astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", GAME_IS_SKELETON )
+GAME( 2002, blackbd,   0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", GAME_IS_SKELETON )
 GAME( 2002, blackbda,  blackbd,  astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 2)", GAME_IS_SKELETON )
 GAME( 2002, blackbdb,  blackbd,  astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 3)", GAME_IS_SKELETON )
 
-GAME( 2002, dslayrr,   0,		 astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 1)", GAME_IS_SKELETON )
-GAME( 2002, dslayrra,  dslayrr,	 astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 2)", GAME_IS_SKELETON )
+GAME( 2002, dslayrr,   0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 1)", GAME_IS_SKELETON )
+GAME( 2002, dslayrra,  dslayrr,  astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Dragon Slayer (Russia, set 2)", GAME_IS_SKELETON )
 
-GAME( 2002, hawaii,	   0,	     astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Hawaii (Russia)", GAME_IS_SKELETON )
+GAME( 2002, hawaii,    0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Hawaii (Russia)", GAME_IS_SKELETON )
 
-GAME( 2002, oligam,	   0,	     astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Olympian Games (Russia)", GAME_IS_SKELETON )
+GAME( 2002, oligam,    0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Olympian Games (Russia)", GAME_IS_SKELETON )
 
-GAME( 2002, rasce,	   0,	     astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Ra Sceptor (Russia)", GAME_IS_SKELETON )
+GAME( 2002, rasce,     0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Ra Sceptor (Russia)", GAME_IS_SKELETON )

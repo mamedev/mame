@@ -37,8 +37,8 @@ class thayers_state : public driver_device
 public:
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_pr7820(*this, "laserdisc"),
-		  m_ldv1000(*this, "ldv1000") { }
+			m_pr7820(*this, "laserdisc"),
+			m_ldv1000(*this, "ldv1000") { }
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
@@ -126,18 +126,18 @@ READ8_MEMBER(thayers_state::irqstate_r)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2       SSI263 A/_R
-        3       tied to +5V
-        4       _TIMER INT
-        5       _DATA RDY INT
-        6       _CART PRES
-        7
+	    0
+	    1
+	    2       SSI263 A/_R
+	    3       tied to +5V
+	    4       _TIMER INT
+	    5       _DATA RDY INT
+	    6       _CART PRES
+	    7
 
-    */
+	*/
 
 	return (m_data_rdy_int << 5) | (m_timer_int << 4) | 0x08 | (m_ssi_data_request << 2);
 }
@@ -160,14 +160,14 @@ WRITE8_MEMBER(thayers_state::cop_d_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        D0      _TIMER INT
-        D1      _DATA RDY INT
-        D2
-        D3
+	    D0      _TIMER INT
+	    D1      _DATA RDY INT
+	    D2
+	    D3
 
-    */
+	*/
 
 	if (!BIT(data, 0))
 	{
@@ -222,14 +222,14 @@ READ8_MEMBER(thayers_state::cop_g_r)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        G0      U16 Q0
-        G1      U16 Q1
-        G2      U16 Q2
-        G3
+	    G0      U16 Q0
+	    G1      U16 Q1
+	    G2      U16 Q2
+	    G3
 
-    */
+	*/
 
 	return m_cop_cmd_latch;
 }
@@ -238,18 +238,18 @@ WRITE8_MEMBER(thayers_state::control_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1       _CS128A
-        2       _BANKSEL1
-        3
-        4
-        5       COP G0
-        6       COP G1
-        7       COP G2
+	    0
+	    1       _CS128A
+	    2       _BANKSEL1
+	    3
+	    4
+	    5       COP G0
+	    6       COP G1
+	    7       COP G2
 
-    */
+	*/
 
 	m_cop_cmd_latch = (data >> 5) & 0x07;
 }
@@ -258,14 +258,14 @@ WRITE8_MEMBER(thayers_state::cop_g_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        G0
-        G1
-        G2
-        G3      U17 enable
+	    G0
+	    G1
+	    G2
+	    G3      U17 enable
 
-    */
+	*/
 
 	m_cop_data_latch_enable = BIT(data, 3);
 }
@@ -278,11 +278,11 @@ READ8_MEMBER(thayers_state::cop_si_r)
 
 	/*
 
-        Serial communications format
+	    Serial communications format
 
-        1, 1, 0, 1, Q8, P0, P1, P2, P3, 0
+	    1, 1, 0, 1, Q8, P0, P1, P2, P3, 0
 
-    */
+	*/
 
 	switch (m_rx_bit)
 	{
@@ -342,18 +342,18 @@ WRITE8_MEMBER(thayers_state::control2_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1       _RESOI (?)
-        2       _ENCARTDET
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1       _RESOI (?)
+	    2       _ENCARTDET
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	if ((!BIT(data, 2)) & m_cart_present)
 	{
@@ -382,18 +382,18 @@ WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4       coin counter
-        5       U16 output enable
-        6       ENTER if switch B5 closed
-        7       INT/_EXT
+	    0
+	    1
+	    2
+	    3
+	    4       coin counter
+	    5       U16 output enable
+	    6       ENTER if switch B5 closed
+	    7       INT/_EXT
 
-    */
+	*/
 
 	coin_counter_w(machine(), 0, BIT(data, 4));
 
@@ -418,18 +418,18 @@ WRITE8_MEMBER(thayers_state::den1_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DD0
-        1       DD1
-        2       DD2
-        3       DD3
-        4       DA0
-        5       DA1
-        6       DA2
-        7       DA3
+	    0       DD0
+	    1       DD1
+	    2       DD2
+	    3       DD3
+	    4       DA0
+	    5       DA1
+	    6       DA2
+	    7       DA3
 
-    */
+	*/
 
 	output_set_digit_value(data >> 4, led_map[data & 0x0f]);
 }
@@ -438,18 +438,18 @@ WRITE8_MEMBER(thayers_state::den2_w)
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DD0
-        1       DD1
-        2       DD2
-        3       DD3
-        4       DA0
-        5       DA1
-        6       DA2
-        7       DA3
+	    0       DD0
+	    1       DD1
+	    2       DD2
+	    3       DD3
+	    4       DA0
+	    5       DA1
+	    6       DA2
+	    7       DA3
 
-    */
+	*/
 
 	output_set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
 }
@@ -836,5 +836,5 @@ ROM_END
 /* Game Drivers */
 
 /*     YEAR  NAME      PARENT   MACHINE  INPUT    INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                             LAYOUT */
-GAMEL( 1984, thayers,  0,       thayers, thayers, driver_device, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
-GAMEL( 1984, thayersa, thayers, thayers, thayers, driver_device, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
+GAMEL( 1984, thayers,  0,       thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
+GAMEL( 1984, thayersa, thayers, thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)

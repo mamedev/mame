@@ -33,7 +33,7 @@
 // ======================> c2040_device
 
 class c2040_device :  public device_t,
-					  public device_ieee488_interface
+						public device_ieee488_interface
 {
 public:
 	enum
@@ -48,8 +48,8 @@ public:
 	};
 
 	// construction/destruction
-    c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
-    c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// not really public
 	static void on_disk0_change(device_image_interface &image);
@@ -77,9 +77,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -105,41 +105,41 @@ protected:
 
 	struct {
 		// motors
-		int m_stp;								// stepper motor phase
-		int m_mtr;								// spindle motor on
+		int m_stp;                              // stepper motor phase
+		int m_mtr;                              // spindle motor on
 
 		// track
-		UINT8 m_track_buffer[G64_BUFFER_SIZE];	// track data buffer
-		int m_track_len;						// track length
-		int m_buffer_pos;						// byte position within track buffer
-		int m_bit_pos;							// bit position within track buffer byte
+		UINT8 m_track_buffer[G64_BUFFER_SIZE];  // track data buffer
+		int m_track_len;                        // track length
+		int m_buffer_pos;                       // byte position within track buffer
+		int m_bit_pos;                          // bit position within track buffer byte
 
 		// devices
 		device_t *m_image;
 	} m_unit[2];
 
-	int m_drive;						// selected drive
-	int m_side;							// selected side
+	int m_drive;                        // selected drive
+	int m_side;                         // selected side
 
 	// IEEE-488 bus
-	int m_rfdo;							// not ready for data output
-	int m_daco;							// not data accepted output
-	int m_atna;							// attention acknowledge
+	int m_rfdo;                         // not ready for data output
+	int m_daco;                         // not data accepted output
+	int m_atna;                         // attention acknowledge
 
 	// track
-	int m_ds;							// density select
-	int m_bit_count;					// GCR bit counter
-	UINT16 m_sr;						// GCR data shift register
-	UINT8 m_pi;							// parallel data input
-	const UINT8* m_gcr;					// GCR encoder/decoder ROM
-	UINT16 m_i;							// GCR encoder/decoded ROM address
-	UINT8 m_e;							// GCR encoder/decoded ROM data
+	int m_ds;                           // density select
+	int m_bit_count;                    // GCR bit counter
+	UINT16 m_sr;                        // GCR data shift register
+	UINT8 m_pi;                         // parallel data input
+	const UINT8* m_gcr;                 // GCR encoder/decoder ROM
+	UINT16 m_i;                         // GCR encoder/decoded ROM address
+	UINT8 m_e;                          // GCR encoder/decoded ROM data
 
 	// signals
-	int m_ready;						// byte ready
-	int m_mode;							// mode select
-	int m_rw;							// read/write select
-	int m_miot_irq;						// MIOT interrupt
+	int m_ready;                        // byte ready
+	int m_mode;                         // mode select
+	int m_rw;                           // read/write select
+	int m_miot_irq;                     // MIOT interrupt
 
 	// timers
 	emu_timer *m_bit_timer;
@@ -153,8 +153,8 @@ protected:
 class c3040_device :  public c2040_device
 {
 public:
-    // construction/destruction
-    c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -163,8 +163,8 @@ public:
 class c4040_device :  public c2040_device
 {
 public:
-    // construction/destruction
-    c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -174,8 +174,8 @@ class c8050_device :  public c2040_device
 {
 public:
 	// construction/destruction
-    c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    c8050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
@@ -189,8 +189,8 @@ public:
 class c8250_device :  public c8050_device
 {
 public:
-    // construction/destruction
-    c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -199,8 +199,8 @@ public:
 class c8250lp_device :  public c8050_device
 {
 public:
-    // construction/destruction
-    c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -209,8 +209,8 @@ public:
 class sfd1001_device :  public c8050_device
 {
 public:
-    // construction/destruction
-    sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -26,12 +26,12 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define G65SC02PI2_TAG	"m6502"
-#define R65C02P4_TAG	"m6502"
-#define G65SC22P2_TAG	"m6522"
-#define DP8473V_TAG		"dp8473"
-#define PC8477AV1_TAG	"pc8477av1"
-#define DS1216E_TAG		"ds1216e"
+#define G65SC02PI2_TAG  "m6502"
+#define R65C02P4_TAG    "m6502"
+#define G65SC22P2_TAG   "m6522"
+#define DP8473V_TAG     "dp8473"
+#define PC8477AV1_TAG   "pc8477av1"
+#define DS1216E_TAG     "ds1216e"
 
 
 
@@ -122,18 +122,18 @@ READ8_MEMBER( fd2000_device::via_pa_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	return 0;
 }
@@ -142,36 +142,36 @@ WRITE8_MEMBER( fd2000_device::via_pa_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5       FAST DIR
-        6
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5       FAST DIR
+	    6
+	    7
 
-    */
+	*/
 }
 
 READ8_MEMBER( fd2000_device::via_pb_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5
-        6
-        7       FDC INTRQ
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7       FDC INTRQ
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -185,18 +185,18 @@ WRITE8_MEMBER( fd2000_device::via_pb_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4
-        5       LED
-        6       LED
-        7
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5       LED
+	    6       LED
+	    7
 
-    */
+	*/
 }
 
 static const via6522_interface via_intf =
@@ -311,22 +311,22 @@ void fd2000_device::device_config_complete()
 //-------------------------------------------------
 
 fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, FD2000, "FD-2000", tag, owner, clock),
-	  device_cbm_iec_interface(mconfig, *this),
-	  m_maincpu(*this, G65SC02PI2_TAG),
-	  m_fdc(*this, DP8473V_TAG),
-	  m_floppy0(*this, DP8473V_TAG":0"),
-	  m_variant(TYPE_FD2000)
+	: device_t(mconfig, FD2000, "FD-2000", tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this),
+		m_maincpu(*this, G65SC02PI2_TAG),
+		m_fdc(*this, DP8473V_TAG),
+		m_floppy0(*this, DP8473V_TAG":0"),
+		m_variant(TYPE_FD2000)
 {
 }
 
 fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  device_cbm_iec_interface(mconfig, *this),
-	  m_maincpu(*this, R65C02P4_TAG),
-	  m_fdc(*this, PC8477AV1_TAG),
-	  m_floppy0(*this, PC8477AV1_TAG":0"),
-	  m_variant(variant)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this),
+		m_maincpu(*this, R65C02P4_TAG),
+		m_fdc(*this, PC8477AV1_TAG),
+		m_floppy0(*this, PC8477AV1_TAG":0"),
+		m_variant(variant)
 {
 }
 
@@ -336,7 +336,7 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 //-------------------------------------------------
 
 fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : fd2000_device(mconfig, FD4000, "FD-4000", tag, owner, clock, TYPE_FD4000) { }
+	: fd2000_device(mconfig, FD4000, "FD-4000", tag, owner, clock, TYPE_FD4000) { }
 
 
 //-------------------------------------------------

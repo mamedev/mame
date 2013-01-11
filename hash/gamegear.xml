@@ -2,23 +2,23 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 The following games existed according to VGRebirth
-  - FIFA 95 (USA) by Electronic Arts
-  - NBA Jam T.E. (Jpn) by Acclaim
-  - NFL Quarterback Club 95 (Jpn) by Acclaim
-  - Robocop 3 (Jpn) by Acclaim
-  - Scratch Golf (USA) by Vic Tokai
-  - Sonic Drift (Euro) by Sega
-  - Super Golf (USA) by Sage's Creations
-  - Terminator 2 - Judgement Day (Jpn) by Acclaim
-  - Zool (Euro) by Gremlin Interactive
+	- FIFA 95 (USA) by Electronic Arts
+	- NBA Jam T.E. (Jpn) by Acclaim
+	- NFL Quarterback Club 95 (Jpn) by Acclaim
+	- Robocop 3 (Jpn) by Acclaim
+	- Scratch Golf (USA) by Vic Tokai
+	- Sonic Drift (Euro) by Sega
+	- Super Golf (USA) by Sage's Creations
+	- Terminator 2 - Judgement Day (Jpn) by Acclaim
+	- Zool (Euro) by Gremlin Interactive
 
 Other undumped games:
-  - Woody Pop (Jpn) by Sega
+	- Woody Pop (Jpn) by Sega
 
 A few games have been listed as rumored, but they might very well be fake (please let us know if you have any info):
-  - "Outrunners",
-  - "Sports Illustrated Golf",
-  - "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
+	- "Outrunners",
+	- "Sports Illustrated Golf",
+	- "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
 -->
 
 <softwarelist name="gamegear" description="Sega Game Gear cartridges">
@@ -1993,7 +1993,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="serial" value="G-3340"/>
 		<info name="release" value="19940304"/>
 		<info name="alt_title" value="マクドナルド ドナルドのマジカルワールド"/>
-        <part name="cart" interface="gamegear_cart">
+		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="donald no magical world (japan) (en,ja).bin" size="524288" crc="87b8b612" sha1="5f9afdd5720f88f7cc18715f8e50fc5635b15323" offset="000000" />
 			</dataarea>
@@ -7254,7 +7254,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 <!-- Apparently, the development of both Sports Trivia and Sports Trivia CE went on in parallel... hard to say which
-     version the QTEST/ALOGTEST/etc. protos were for (more info are needed on these, or some code analysis/comparison) -->
+		version the QTEST/ALOGTEST/etc. protos were for (more info are needed on these, or some code analysis/comparison) -->
 	<software name="sporttrvp12" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950308)</description>
 		<year>1995</year>

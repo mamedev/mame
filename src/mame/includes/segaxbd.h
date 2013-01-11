@@ -51,20 +51,20 @@ public:
 	// construction/destruction
 	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_subcpu(*this, "subcpu"),
-		  m_soundcpu(*this, "soundcpu"),
-		  m_soundcpu2(*this, "soundcpu2"),
-		  m_mcu(*this, "mcu"),
-		  m_cmptimer_1(*this, "cmptimer_main"),
-		  m_sprites(*this, "sprites"),
-		  m_gprider_hack(false),
-		  m_road_priority(1),
-		  m_scanline_timer(NULL),
-		  m_timer_irq_state(0),
-		  m_vblank_irq_state(0),
-		  m_loffire_sync(NULL),
-		  m_lastsurv_mux(0)
+			m_maincpu(*this, "maincpu"),
+			m_subcpu(*this, "subcpu"),
+			m_soundcpu(*this, "soundcpu"),
+			m_soundcpu2(*this, "soundcpu2"),
+			m_mcu(*this, "mcu"),
+			m_cmptimer_1(*this, "cmptimer_main"),
+			m_sprites(*this, "sprites"),
+			m_gprider_hack(false),
+			m_road_priority(1),
+			m_scanline_timer(NULL),
+			m_timer_irq_state(0),
+			m_vblank_irq_state(0),
+			m_loffire_sync(NULL),
+			m_lastsurv_mux(0)
 	{
 		memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 		memset(m_iochip_regs, 0, sizeof(m_iochip_regs));
@@ -150,19 +150,19 @@ protected:
 	required_device<sega_xboard_sprite_device> m_sprites;
 
 	// configuration
-	bool			m_gprider_hack;
-	bool			m_adc_reverse[8];
-	ioread_delegate	m_iochip_custom_io_r[2][8];
+	bool            m_gprider_hack;
+	bool            m_adc_reverse[8];
+	ioread_delegate m_iochip_custom_io_r[2][8];
 	iowrite_delegate m_iochip_custom_io_w[2][8];
-	UINT8			m_road_priority;
+	UINT8           m_road_priority;
 
 	// internal state
-	emu_timer *		m_scanline_timer;
-	UINT8			m_timer_irq_state;
-	UINT8			m_vblank_irq_state;
-	UINT8			m_iochip_regs[2][8];
+	emu_timer *     m_scanline_timer;
+	UINT8           m_timer_irq_state;
+	UINT8           m_vblank_irq_state;
+	UINT8           m_iochip_regs[2][8];
 
 	// game-specific state
-	UINT16 *		m_loffire_sync;
-	UINT8			m_lastsurv_mux;
+	UINT16 *        m_loffire_sync;
+	UINT8           m_lastsurv_mux;
 };

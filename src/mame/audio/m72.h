@@ -19,7 +19,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( rtype2_sample_addr_w );
 DECLARE_WRITE8_DEVICE_HANDLER( poundfor_sample_addr_w );
 
 class m72_audio_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -41,4 +41,3 @@ private:
 };
 
 extern const device_type M72;
-

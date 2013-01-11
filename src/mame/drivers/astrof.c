@@ -61,15 +61,15 @@
 #include "includes/astrof.h"
 
 
-#define MASTER_CLOCK		(XTAL_10_595MHz)
-#define MAIN_CPU_CLOCK  	(MASTER_CLOCK / 16)
-#define PIXEL_CLOCK 		(MASTER_CLOCK / 2)
-#define HTOTAL				(0x150)
-#define HBEND				(0x000)
-#define HBSTART				(0x100)
-#define VTOTAL				(0x118)
-#define VBEND				(0x000)
-#define VBSTART				(0x100)
+#define MASTER_CLOCK        (XTAL_10_595MHz)
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 16)
+#define PIXEL_CLOCK         (MASTER_CLOCK / 2)
+#define HTOTAL              (0x150)
+#define HBEND               (0x000)
+#define HBSTART             (0x100)
+#define VTOTAL              (0x118)
+#define VBEND               (0x000)
+#define VBSTART             (0x100)
 
 
 
@@ -128,8 +128,8 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 	UINT32 ret;
 
 	/* on an upright cabinet, a single set of controls
-       is connected to both sets of pins on the edge
-       connector */
+	   is connected to both sets of pins on the edge
+	   connector */
 	if (ioport("CAB")->read())
 		ret = ioport("P2")->read();
 	else
@@ -144,8 +144,8 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 	UINT32 ret;
 
 	/* on a cocktail cabinet, two sets of controls are
-       multiplexed on a single set of inputs
-         (not verified on pcb) */
+	   multiplexed on a single set of inputs
+	     (not verified on pcb) */
 
 	if (m_flipscreen)
 		ret = ioport("P2")->read();
@@ -163,8 +163,8 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
  *
  *************************************/
 
-#define ASTROF_NUM_PENS		(0x10)
-#define TOMAHAWK_NUM_PENS	(0x20)
+#define ASTROF_NUM_PENS     (0x10)
+#define TOMAHAWK_NUM_PENS   (0x20)
 
 
 void astrof_state::video_start()
@@ -188,7 +188,7 @@ static rgb_t make_pen( running_machine &machine, UINT8 data )
 	UINT8 b2_bit = (data >> 5) & 0x01;
 
 	/* this is probably not quite right, but I don't have the
-       knowledge to figure out the actual weights - ZV */
+	   knowledge to figure out the actual weights - ZV */
 	UINT8 r = (0xc0 * r1_bit) + (0x3f * r2_bit);
 	UINT8 g = (0xc0 * g1_bit) + (0x3f * g2_bit);
 	UINT8 b = (0xc0 * b1_bit) + (0x3f * b2_bit);
@@ -1090,7 +1090,7 @@ ROM_START( abattle )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "8f-clr.bin",   0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
 
-	ROM_REGION( 0x0100, "user1", 0 )	/* decryption table */
+	ROM_REGION( 0x0100, "user1", 0 )    /* decryption table */
 	ROM_LOAD( "2h-prot.bin",  0x0000, 0x0100, CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
 ROM_END
 
@@ -1113,7 +1113,7 @@ ROM_START( abattle2 )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "8f-clr.bin",   0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
 
-	ROM_REGION( 0x0100, "user1", 0 )	/* decryption table */
+	ROM_REGION( 0x0100, "user1", 0 )    /* decryption table */
 	ROM_LOAD( "2h-prot.bin",  0x0000, 0x0100, CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
 ROM_END
 

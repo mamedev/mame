@@ -22,13 +22,13 @@ class super80_state : public driver_device
 public:
 	super80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_pio(*this, "z80pio"),
-		  m_cass(*this, CASSETTE_TAG),
-		  m_wave(*this, WAVE_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_centronics(*this, "centronics"),
-		  m_6845(*this, "crtc")
+			m_maincpu(*this, "maincpu"),
+			m_pio(*this, "z80pio"),
+			m_cass(*this, CASSETTE_TAG),
+			m_wave(*this, WAVE_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_centronics(*this, "centronics"),
+			m_6845(*this, "crtc")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

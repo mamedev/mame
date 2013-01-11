@@ -13,7 +13,7 @@
 // ======================> z88_32k_rom_device
 
 class z88_32k_rom_device : public device_t,
-						   public device_z88cart_interface
+							public device_z88cart_interface
 {
 public:
 	// construction/destruction
@@ -32,12 +32,12 @@ protected:
 
 protected:
 	// internal state
-	UINT8 *		m_rom;
+	UINT8 *     m_rom;
 };
 
 // ======================> z88_128k_rom_device
 
-class z88_128k_rom_device :	public z88_32k_rom_device
+class z88_128k_rom_device : public z88_32k_rom_device
 {
 public:
 	// construction/destruction

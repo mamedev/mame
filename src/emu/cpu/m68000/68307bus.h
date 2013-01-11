@@ -18,4 +18,3 @@ class m68307_mbus
 
 	void reset(void);
 };
-

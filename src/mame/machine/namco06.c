@@ -323,5 +323,3 @@ void namco_06xx_device::device_reset()
 {
 	DEVICE_RESET_NAME( namco_06xx )(this);
 }
-
-

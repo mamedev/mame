@@ -114,9 +114,9 @@ static void ComputeTables (msm5205_state *voice)
 		{
 			voice->diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
 				(stepval   * nbl2bit[nib][1] +
-				 stepval/2 * nbl2bit[nib][2] +
-				 stepval/4 * nbl2bit[nib][3] +
-				 stepval/8);
+					stepval/2 * nbl2bit[nib][2] +
+					stepval/4 * nbl2bit[nib][3] +
+					stepval/8);
 		}
 	}
 }
@@ -344,13 +344,13 @@ const device_type MSM5205 = &device_creator<msm5205_device>;
 
 msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(msm5205_state);
 }
 msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(msm5205_state);
 }
@@ -410,5 +410,3 @@ void msm6585_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

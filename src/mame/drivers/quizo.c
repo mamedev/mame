@@ -46,8 +46,8 @@ public:
 };
 
 
-#define XTAL1	 8000000
-#define XTAL2	21477270
+#define XTAL1    8000000
+#define XTAL2   21477270
 
 
 static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};

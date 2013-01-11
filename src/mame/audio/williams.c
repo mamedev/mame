@@ -69,14 +69,14 @@
 #include "sound/dac.h"
 
 
-#define NARC_MASTER_CLOCK		XTAL_8MHz
-#define NARC_FM_CLOCK			XTAL_3_579545MHz
+#define NARC_MASTER_CLOCK       XTAL_8MHz
+#define NARC_FM_CLOCK           XTAL_3_579545MHz
 
-#define CVSD_MASTER_CLOCK		XTAL_8MHz
-#define CVSD_FM_CLOCK			XTAL_3_579545MHz
+#define CVSD_MASTER_CLOCK       XTAL_8MHz
+#define CVSD_FM_CLOCK           XTAL_3_579545MHz
 
-#define ADPCM_MASTER_CLOCK		XTAL_8MHz
-#define ADPCM_FM_CLOCK			XTAL_3_579545MHz
+#define ADPCM_MASTER_CLOCK      XTAL_8MHz
+#define ADPCM_FM_CLOCK          XTAL_3_579545MHz
 
 
 
@@ -100,11 +100,11 @@ extern const device_type WILLIAMS_ADPCM_SOUND = &device_creator<williams_adpcm_s
 
 williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WILLIAMS_CVSD_SOUND, "Williams CVSD Sound Board", "wmscvsd", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_cpu(*this, "cpu"),
-	  m_pia(*this, "pia"),
-	  m_hc55516(*this, "cvsd"),
-	  m_talkback(0)
+		device_mixer_interface(mconfig, *this),
+		m_cpu(*this, "cpu"),
+		m_pia(*this, "pia"),
+		m_hc55516(*this, "cvsd"),
+		m_talkback(0)
 {
 }
 
@@ -237,18 +237,18 @@ ADDRESS_MAP_END
 
 static const pia6821_interface cvsd_pia_intf =
 {
-	DEVCB_NULL,		// port A in
-	DEVCB_NULL,		// port B in
-	DEVCB_NULL,		// line CA1 in
-	DEVCB_NULL,		// line CB1 in
-	DEVCB_NULL,		// line CA2 in
-	DEVCB_NULL,		// line CB2 in
-	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8),		// port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, talkback_w),		// port B out
-	DEVCB_NULL,		// line CA2 out
-	DEVCB_NULL,		// port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, pia_irqa),	// IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, pia_irqb)	// IRQB
+	DEVCB_NULL,     // port A in
+	DEVCB_NULL,     // port B in
+	DEVCB_NULL,     // line CA1 in
+	DEVCB_NULL,     // line CB1 in
+	DEVCB_NULL,     // line CA2 in
+	DEVCB_NULL,     // line CB2 in
+	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8),        // port A out
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, talkback_w),     // port B out
+	DEVCB_NULL,     // line CA2 out
+	DEVCB_NULL,     // port CB2 out
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, pia_irqa),  // IRQA
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, pia_irqb)   // IRQB
 };
 
 
@@ -296,10 +296,10 @@ void williams_cvsd_sound_device::device_start()
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
-        //  D0/D1 -> selects: 0=U4 1=U19 2=U20 3=n/c
-        //  D2 -> A15
-        //  D3 -> A16
-        //
+		//  D0/D1 -> selects: 0=U4 1=U19 2=U20 3=n/c
+		//  D2 -> A15
+		//  D3 -> A16
+		//
 		offs_t offset = 0x8000 * ((bank >> 2) & 3) + 0x20000 * (bank & 3);
 		membank("rombank")->configure_entry(bank, &rom[0x10000 + offset]);
 	}
@@ -350,15 +350,15 @@ void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id 
 
 williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WILLIAMS_NARC_SOUND, "Williams NARC Sound Board", "wmsnarc", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_cpu0(*this, "cpu0"),
-	  m_cpu1(*this, "cpu1"),
-	  m_hc55516(*this, "cvsd"),
-	  m_latch(0),
-	  m_latch2(0),
-	  m_talkback(0),
-	  m_audio_sync(0),
-	  m_sound_int_state(0)
+		device_mixer_interface(mconfig, *this),
+		m_cpu0(*this, "cpu0"),
+		m_cpu1(*this, "cpu1"),
+		m_hc55516(*this, "cvsd"),
+		m_latch(0),
+		m_latch2(0),
+		m_talkback(0),
+		m_audio_sync(0),
+		m_sound_int_state(0)
 {
 }
 
@@ -634,10 +634,10 @@ void williams_narc_sound_device::device_start()
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
-        //  D0 -> A15
-        //  D1/D2 -> selects: 0=n/c 1=U3 2=U4 3=U5
-        //  D3 -> A16
-        //
+		//  D0 -> A15
+		//  D1/D2 -> selects: 0=n/c 1=U3 2=U4 3=U5
+		//  D3 -> A16
+		//
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
 		membank("masterbank")->configure_entry(bank, &rom[0x10000 + offset]);
 	}
@@ -648,10 +648,10 @@ void williams_narc_sound_device::device_start()
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
-        //  D0 -> A15
-        //  D1/D2 -> selects: 0=U35 1=U36 2=U37 3=U38
-        //  D3 -> A16
-        //
+		//  D0 -> A15
+		//  D1/D2 -> selects: 0=U35 1=U36 2=U37 3=U38
+		//  D3 -> A16
+		//
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
 		membank("slavebank")->configure_entry(bank, &rom[0x10000 + offset]);
 	}
@@ -723,11 +723,11 @@ void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id 
 
 williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, "Williams ADPCM Sound Board", "wmsadpcm", tag, owner, clock),
-	  device_mixer_interface(mconfig, *this),
-	  m_cpu(*this, "cpu"),
-	  m_latch(0),
-	  m_talkback(0),
-	  m_sound_int_state(0)
+		device_mixer_interface(mconfig, *this),
+		m_cpu(*this, "cpu"),
+		m_latch(0),
+		m_talkback(0),
+		m_sound_int_state(0)
 {
 }
 
@@ -805,7 +805,7 @@ READ8_MEMBER(williams_adpcm_sound_device::command_r)
 	m_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
 	// don't clear the external IRQ state for a short while; this allows the
-    // self-tests to pass
+	// self-tests to pass
 	timer_set(attotime::from_usec(10), TID_IRQ_CLEAR);
 	return m_latch;
 }

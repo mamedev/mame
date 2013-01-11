@@ -21,8 +21,8 @@ class vga_device :  public device_t
 	friend class ibm8514a_device;
 
 public:
-    // construction/destruction
-    vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 
@@ -40,9 +40,9 @@ public:
 	virtual WRITE8_MEMBER(mem_linear_w);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 
 	void vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect);
@@ -101,44 +101,44 @@ protected:
 			UINT8 data[0x100];
 			UINT16 horz_total;
 			UINT16 horz_disp_end;
-	/**/	UINT8 horz_blank_start;
-	/**/	UINT8 horz_blank_end;
-	/**/	UINT8 horz_retrace_start;
-	/**/	UINT8 horz_retrace_skew;
-	/**/	UINT8 horz_retrace_end;
-	/**/	UINT8 disp_enable_skew;
-	/**/	UINT8 evra;
+	/**/    UINT8 horz_blank_start;
+	/**/    UINT8 horz_blank_end;
+	/**/    UINT8 horz_retrace_start;
+	/**/    UINT8 horz_retrace_skew;
+	/**/    UINT8 horz_retrace_end;
+	/**/    UINT8 disp_enable_skew;
+	/**/    UINT8 evra;
 			UINT16 vert_total;
 			UINT16 vert_disp_end;
-	/**/	UINT16 vert_retrace_start;
-	/**/	UINT8 vert_retrace_end;
-	/**/	UINT16 vert_blank_start;
+	/**/    UINT16 vert_retrace_start;
+	/**/    UINT8 vert_retrace_end;
+	/**/    UINT16 vert_blank_start;
 			UINT16 line_compare;
-	/**/	UINT32 cursor_addr;
-	/**/	UINT8 byte_panning;
-	/**/	UINT8 preset_row_scan;
+	/**/    UINT32 cursor_addr;
+	/**/    UINT8 byte_panning;
+	/**/    UINT8 preset_row_scan;
 			UINT8 scan_doubling;
-	/**/	UINT8 maximum_scan_line;
-	/**/	UINT8 cursor_enable;
-	/**/	UINT8 cursor_scan_start;
-	/**/	UINT8 cursor_skew;
-	/**/	UINT8 cursor_scan_end;
+	/**/    UINT8 maximum_scan_line;
+	/**/    UINT8 cursor_enable;
+	/**/    UINT8 cursor_scan_start;
+	/**/    UINT8 cursor_skew;
+	/**/    UINT8 cursor_scan_end;
 			UINT32 start_addr;
 			UINT32 start_addr_latch;
-	/**/	UINT8 protect_enable;
-	/**/	UINT8 bandwidth;
-	/**/	UINT8 offset;
-	/**/	UINT8 word_mode;
-	/**/	UINT8 dw;
-	/**/	UINT8 div4;
-	/**/	UINT8 underline_loc;
-	/**/	UINT8 vert_blank_end;
+	/**/    UINT8 protect_enable;
+	/**/    UINT8 bandwidth;
+	/**/    UINT8 offset;
+	/**/    UINT8 word_mode;
+	/**/    UINT8 dw;
+	/**/    UINT8 div4;
+	/**/    UINT8 underline_loc;
+	/**/    UINT8 vert_blank_end;
 			UINT8 sync_en;
-	/**/	UINT8 aw;
-	/**/	UINT8 div2;
-	/**/	UINT8 sldiv;
-	/**/	UINT8 map14;
-	/**/	UINT8 map13;
+	/**/    UINT8 aw;
+	/**/    UINT8 div2;
+	/**/    UINT8 sldiv;
+	/**/    UINT8 map14;
+	/**/    UINT8 map13;
 		} crtc;
 
 		struct
@@ -199,7 +199,7 @@ extern const device_type VGA;
 class svga_device :  public vga_device
 {
 public:
-    // construction/destruction
+	// construction/destruction
 	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -410,8 +410,8 @@ extern const device_type MACH8;
 class tseng_vga_device :  public svga_device
 {
 public:
-    // construction/destruction
-    tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual READ8_MEMBER(port_03b0_r);
 	virtual WRITE8_MEMBER(port_03b0_w);
@@ -453,8 +453,8 @@ extern const device_type TSENG_VGA;
 class trident_vga_device :  public svga_device
 {
 public:
-    // construction/destruction
-    trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual READ8_MEMBER(port_03c0_r);
 	virtual WRITE8_MEMBER(port_03c0_w);
@@ -481,9 +481,9 @@ extern const device_type TRIDENT_VGA;
 class ati_vga_device :  public svga_device
 {
 public:
-    // construction/destruction
-    ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
@@ -497,7 +497,7 @@ public:
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
-    virtual void device_start();
+	virtual void device_start();
 private:
 	void ati_define_video_mode();
 	struct
@@ -517,8 +517,8 @@ extern const device_type ATI_VGA;
 class s3_vga_device :  public ati_vga_device
 {
 public:
-    // construction/destruction
-    s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual READ8_MEMBER(port_03b0_r);
 	virtual WRITE8_MEMBER(port_03b0_w);
@@ -535,8 +535,8 @@ public:
 
 	ibm8514a_device* get_8514() { return m_8514; }
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	struct
 	{
 		UINT8 memory_config;
@@ -582,8 +582,8 @@ extern const device_type S3_VGA;
 class gamtor_vga_device :  public svga_device
 {
 public:
-    // construction/destruction
-    gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
 	virtual READ8_MEMBER(port_03b0_r);
@@ -608,14 +608,14 @@ extern const device_type GAMTOR_VGA;
 class cirrus_vga_device :  public svga_device
 {
 public:
-    // construction/destruction
-    cirrus_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	cirrus_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual READ8_MEMBER(port_03c0_r);
 	virtual WRITE8_MEMBER(port_03c0_w);
 protected:
 	// device-level overrides
-    virtual void device_start();
+	virtual void device_start();
 private:
 	void cirrus_define_video_mode();
 	UINT8 cirrus_seq_reg_read(UINT8 index);
@@ -666,4 +666,3 @@ extern const device_type CIRRUS_VGA;
 
 
 #endif /* PC_VGA_H */
-

@@ -88,9 +88,9 @@ static const UINT8 t6834_cmd_len[0x47] =
 
 struct x07_kb
 {
-	const char *tag;		//input port tag
-	UINT8		mask;		//bit mask
-	UINT8		codes[7];	//port codes
+	const char *tag;        //input port tag
+	UINT8       mask;       //bit mask
+	UINT8       codes[7];   //port codes
 };
 
 static const x07_kb x07_keycodes[56] =
@@ -158,11 +158,11 @@ class x07_state : public driver_device
 public:
 	x07_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_printer(*this, "printer"),
-		  m_beep(*this, BEEPER_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_printer(*this, "printer"),
+			m_beep(*this, BEEPER_TAG),
+			m_ram(*this, RAM_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -242,7 +242,7 @@ public:
 
 	/* keyboard */
 	UINT8 m_kb_on;
-	UINT8 m_repeat_key;			//not supported
+	UINT8 m_repeat_key;         //not supported
 	UINT8 m_kb_size;
 
 	/* cassette */

@@ -49,52 +49,52 @@ READ8_MEMBER(mcr68_state::zwackery_port_3_r)
 
 const pia6821_interface zwackery_pia0_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_INPUT_PORT("IN0"),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia0_w),		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq)		/* IRQB */
+	DEVCB_NULL,     /* port A in */
+	DEVCB_INPUT_PORT("IN0"),        /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia0_w),       /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq),     /* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq)      /* IRQB */
 };
 
 
 const pia6821_interface zwackery_pia1_intf =
 {
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_1_r),		/* port A in */
-	DEVCB_DRIVER_MEMBER(mcr68_state, zwackery_port_2_r),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia1_w),		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_ca2_w),		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_1_r),     /* port A in */
+	DEVCB_DRIVER_MEMBER(mcr68_state, zwackery_port_2_r),        /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia1_w),       /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_ca2_w),       /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
 const pia6821_interface zwackery_pia2_intf =
 {
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_3_r),		/* port A in */
-	DEVCB_INPUT_PORT("DSW"),				/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_3_r),     /* port A in */
+	DEVCB_INPUT_PORT("DSW"),                /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -137,9 +137,9 @@ static void mcr68_common_init(running_machine &machine)
 	int i;
 
 	/* reset the 6840's */
-	state->m_m6840_counter_periods[0] = attotime::from_hz(30);			/* clocked by /VBLANK */
-	state->m_m6840_counter_periods[1] = attotime::never;					/* grounded */
-	state->m_m6840_counter_periods[2] = attotime::from_hz(512 * 30);	/* clocked by /HSYNC */
+	state->m_m6840_counter_periods[0] = attotime::from_hz(30);          /* clocked by /VBLANK */
+	state->m_m6840_counter_periods[1] = attotime::never;                    /* grounded */
+	state->m_m6840_counter_periods[2] = attotime::from_hz(512 * 30);    /* clocked by /HSYNC */
 
 	state->m_m6840_status = 0x00;
 	state->m_m6840_status_read_since_int = 0x00;
@@ -606,4 +606,3 @@ READ16_MEMBER(mcr68_state::mcr68_6840_lower_r)
 {
 	return mcr68_6840_r_common(space,offset,0) | 0xff00;
 }
-

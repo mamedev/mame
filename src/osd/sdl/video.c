@@ -168,16 +168,16 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	monitor->center_width = dmode.w;
 	monitor->center_height = dmode.h;
 	#else
-	#if defined(SDLMAME_WIN32)	// Win32 version
+	#if defined(SDLMAME_WIN32)  // Win32 version
 	MONITORINFOEX info;
 	info.cbSize = sizeof(info);
-    GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
+	GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
 	monitor->center_width = monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 	monitor->center_height = monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
 	char *temp = utf8_from_wstring(info.szDevice);
 	strcpy(monitor->monitor_device, temp);
 	osd_free(temp);
-	#elif defined(SDLMAME_MACOSX)	// Mac OS X Core Imaging version
+	#elif defined(SDLMAME_MACOSX)   // Mac OS X Core Imaging version
 	CGDirectDisplayID primary;
 	CGRect dbounds;
 
@@ -188,7 +188,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	monitor->center_width = monitor->monitor_width = dbounds.size.width - dbounds.origin.x;
 	monitor->center_height = monitor->monitor_height = dbounds.size.height - dbounds.origin.y;
 	strcpy(monitor->monitor_device, "Mac OS X display");
-    #elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
+	#elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
 		#if defined(SDLMAME_X11)
 		// X11 version
@@ -208,7 +208,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				XineramaScreenInfo *xineinfo;
 				int numscreens;
 
-    				xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
+					xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
 
 				monitor->center_width = xineinfo[0].width;
 				monitor->center_height = xineinfo[0].height;
@@ -262,7 +262,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			monitor->center_height = ch;
 		}
 	}
-	#elif defined(SDLMAME_OS2)		// OS2 version
+	#elif defined(SDLMAME_OS2)      // OS2 version
 	monitor->center_width = monitor->monitor_width = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
 	monitor->center_height = monitor->monitor_height = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
 	strcpy(monitor->monitor_device, "OS/2 display");
@@ -401,9 +401,9 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	// copy in the data
 
 #ifdef PTR64
-    monitor->handle = (UINT64)handle;
+	monitor->handle = (UINT64)handle;
 #else
-    monitor->handle = (UINT32)handle;
+	monitor->handle = (UINT32)handle;
 #endif
 	monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
 	monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
@@ -463,14 +463,14 @@ static void init_monitors(void)
 			monitor->monitor_height = dmode.h;
 			monitor->center_width = dmode.w;
 			monitor->center_height = dmode.h;
-	        monitor->handle = i;
-	        // guess the aspect ratio assuming square pixels
-	        monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
-	        mame_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
+			monitor->handle = i;
+			// guess the aspect ratio assuming square pixels
+			monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
+			mame_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
 
-	        // save the primary monitor handle
-	        if (i == 0)
-	        	primary_monitor = monitor;
+			// save the primary monitor handle
+			if (i == 0)
+				primary_monitor = monitor;
 
 			// hook us into the list
 			*tailptr = monitor;
@@ -515,7 +515,7 @@ static sdl_monitor_info *pick_monitor(sdl_options &options, int index)
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-    for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
+	for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
 		if (index-- == 0)
 			goto finishit;
 
@@ -830,4 +830,3 @@ static void get_resolution(const char *defdata, const char *data, sdl_window_con
 	if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
 		mame_printf_error("Illegal resolution value = %s\n", data);
 }
-

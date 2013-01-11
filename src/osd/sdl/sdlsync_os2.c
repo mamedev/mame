@@ -10,7 +10,7 @@
 //============================================================
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE 	// for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
+#define _GNU_SOURCE     // for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
 #endif
 
 #include "sdlinc.h"
@@ -34,20 +34,20 @@
 #define pthread_self    _gettid
 
 struct osd_lock {
-	volatile pthread_t	holder;
-	INT32				count;
+	volatile pthread_t  holder;
+	INT32               count;
 #ifdef PTR64
-	INT8				padding[52];	// Fill a 64-byte cache line
+	INT8                padding[52];    // Fill a 64-byte cache line
 #else
-	INT8				padding[56];	// A bit more padding
+	INT8                padding[56];    // A bit more padding
 #endif
 };
 
 struct osd_event {
-    HMTX                hmtx;
-    HEV                 hev;
-    volatile INT32      autoreset;
-    INT8                padding[52];    // Fill a 64-byte cache line
+	HMTX                hmtx;
+	HEV                 hev;
+	volatile INT32      autoreset;
+	INT8                padding[52];    // Fill a 64-byte cache line
 };
 
 //============================================================
@@ -55,7 +55,7 @@ struct osd_event {
 //============================================================
 
 struct osd_thread {
-	pthread_t			thread;
+	pthread_t           thread;
 	osd_thread_callback callback;
 	void *param;
 };
@@ -64,10 +64,10 @@ struct osd_scalable_lock
 {
 	struct
 	{
-		volatile INT32	haslock;		// do we have the lock?
-		INT32			filler[64/4-1];	// assumes a 64-byte cache line
-	} slot[WORK_MAX_THREADS];			// one slot per thread
-	volatile INT32		nextindex;		// index of next slot to use
+		volatile INT32  haslock;        // do we have the lock?
+		INT32           filler[64/4-1]; // assumes a 64-byte cache line
+	} slot[WORK_MAX_THREADS];           // one slot per thread
+	volatile INT32      nextindex;      // index of next slot to use
 };
 
 
@@ -260,9 +260,9 @@ void osd_lock_acquire(osd_lock *lock)
 #endif
 #if 0
 			/* If you mean to use locks as a blocking mechanism for extended
-             * periods of time, you should do something like this.  However,
-             * it kills the performance of gaelco3d.
-             */
+			 * periods of time, you should do something like this.  However,
+			 * it kills the performance of gaelco3d.
+			 */
 			if (spin == 0)
 			{
 				struct timespec sleep = { 0, 100000 }, remaining;
@@ -332,15 +332,15 @@ void osd_lock_free(osd_lock *lock)
 
 osd_event *osd_event_alloc(int manualreset, int initialstate)
 {
-    osd_event *ev;
+	osd_event *ev;
 
-    ev = (osd_event *)calloc(1, sizeof(osd_event));
+	ev = (osd_event *)calloc(1, sizeof(osd_event));
 
-    DosCreateMutexSem(NULL, &ev->hmtx, 0, FALSE);
-    DosCreateEventSem(NULL, &ev->hev, 0, initialstate);
-    ev->autoreset = !manualreset;
+	DosCreateMutexSem(NULL, &ev->hmtx, 0, FALSE);
+	DosCreateEventSem(NULL, &ev->hev, 0, initialstate);
+	ev->autoreset = !manualreset;
 
-    return ev;
+	return ev;
 }
 
 //============================================================
@@ -349,9 +349,9 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 
 void osd_event_free(osd_event *event)
 {
-    DosCloseMutexSem(event->hmtx);
-    DosCloseEventSem(event->hev);
-    free(event);
+	DosCloseMutexSem(event->hmtx);
+	DosCloseEventSem(event->hev);
+	free(event);
 }
 
 //============================================================
@@ -360,7 +360,7 @@ void osd_event_free(osd_event *event)
 
 void osd_event_set(osd_event *event)
 {
-    DosPostEventSem(event->hev);
+	DosPostEventSem(event->hev);
 }
 
 //============================================================
@@ -369,9 +369,9 @@ void osd_event_set(osd_event *event)
 
 void osd_event_reset(osd_event *event)
 {
-    ULONG ulCount;
+	ULONG ulCount;
 
-    DosResetEventSem(event->hev, &ulCount);
+	DosResetEventSem(event->hev, &ulCount);
 }
 
 //============================================================
@@ -380,24 +380,24 @@ void osd_event_reset(osd_event *event)
 
 int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
-    ULONG rc;
+	ULONG rc;
 
-    if(event->autoreset)
-        DosRequestMutexSem(event->hmtx, -1);
+	if(event->autoreset)
+		DosRequestMutexSem(event->hmtx, -1);
 
-    rc = DosWaitEventSem(event->hev, timeout * 1000 / osd_ticks_per_second());
+	rc = DosWaitEventSem(event->hev, timeout * 1000 / osd_ticks_per_second());
 
-    if(event->autoreset)
-    {
-        ULONG ulCount;
+	if(event->autoreset)
+	{
+		ULONG ulCount;
 
-        if(rc == 0)
-            DosResetEventSem(event->hev, &ulCount);
+		if(rc == 0)
+			DosResetEventSem(event->hev, &ulCount);
 
-        DosReleaseMutexSem(event->hmtx);
-    }
+		DosReleaseMutexSem(event->hmtx);
+	}
 
-    return (rc == 0);
+	return (rc == 0);
 }
 
 //============================================================
@@ -406,25 +406,25 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 
 static void worker_thread_entry(void *param)
 {
-     osd_thread *thread = (osd_thread *) param;
+		osd_thread *thread = (osd_thread *) param;
 
-     thread->callback(thread->param);
+		thread->callback(thread->param);
 }
 
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 {
-    osd_thread *thread;
+	osd_thread *thread;
 
-    thread = (osd_thread *)calloc(1, sizeof(osd_thread));
-    thread->callback = callback;
-    thread->param = cbparam;
-    thread->thread = _beginthread(worker_thread_entry, NULL, 65535, thread);
-    if ( thread->thread == -1 )
-    {
-        free(thread);
-        return NULL;
-    }
-    return thread;
+	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	thread->callback = callback;
+	thread->param = cbparam;
+	thread->thread = _beginthread(worker_thread_entry, NULL, 65535, thread);
+	if ( thread->thread == -1 )
+	{
+		free(thread);
+		return NULL;
+	}
+	return thread;
 }
 
 //============================================================
@@ -433,16 +433,16 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 
 int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 {
-    PTIB ptib;
+	PTIB ptib;
 
-    DosGetInfoBlocks(&ptib, NULL);
+	DosGetInfoBlocks(&ptib, NULL);
 
-    if ( DosSetPriority(PRTYS_THREAD, PRTYC_NOCHANGE,
-                        ((BYTE)ptib->tib_ptib2->tib2_ulpri) + adjust, thread->thread ))
-        return FALSE;
+	if ( DosSetPriority(PRTYS_THREAD, PRTYC_NOCHANGE,
+						((BYTE)ptib->tib_ptib2->tib2_ulpri) + adjust, thread->thread ))
+		return FALSE;
 
 
-    return TRUE;
+	return TRUE;
 }
 
 //============================================================
@@ -451,7 +451,7 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 
 int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 {
-    return TRUE;
+	return TRUE;
 }
 
 //============================================================
@@ -460,10 +460,10 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 
 void osd_thread_wait_free(osd_thread *thread)
 {
-    TID tid = thread->thread;
+	TID tid = thread->thread;
 
-    DosWaitThread(&tid, 0);
-    free(thread);
+	DosWaitThread(&tid, 0);
+	free(thread);
 }
 
 //============================================================
@@ -472,8 +472,8 @@ void osd_thread_wait_free(osd_thread *thread)
 
 void osd_process_kill(void)
 {
-    PPIB ppib;
+	PPIB ppib;
 
-    DosGetInfoBlocks(NULL, &ppib);
-    DosKillProcess(DKP_PROCESSTREE, ppib->pib_ulpid);
+	DosGetInfoBlocks(NULL, &ppib);
+	DosKillProcess(DKP_PROCESSTREE, ppib->pib_ulpid);
 }

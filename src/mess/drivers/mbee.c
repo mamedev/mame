@@ -105,7 +105,7 @@ static ADDRESS_MAP_START(mbee_mem, AS_PROGRAM, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* Needed because quickload to here will crash MESS otherwise */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP    /* Needed because quickload to here will crash MESS otherwise */
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbee_high_r, mbee_high_w)
@@ -362,7 +362,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHAR(0x1d)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("^") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~') PORT_CHAR(0x1e)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete") PORT_CODE(KEYCODE_DEL) PORT_CHAR(8) PORT_CHAR(0x5f) PORT_CHAR(0x1f)	// port_char not working - hijacked
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete") PORT_CODE(KEYCODE_DEL) PORT_CHAR(8) PORT_CHAR(0x5f) PORT_CHAR(0x1f)  // port_char not working - hijacked
 
 	PORT_START("X4") /* IN4 KEY ROW 4 [200] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -551,15 +551,15 @@ static const z80_daisy_config mbee_daisy_chain[] =
 /**************************** F4 CHARACTER DISPLAYER */
 static const gfx_layout mbee_charlayout =
 {
-	8,16,					/* 8 x 16 characters */
+	8,16,                   /* 8 x 16 characters */
 	RGN_FRAC(1,1),
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( mbee )
@@ -615,55 +615,55 @@ static const floppy_interface mbee_floppy_interface =
 };
 
 static const mc6845_interface mbee_crtc = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	mbee_update_row,		/* handler to display a scanline */
+	mbee_update_row,        /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	mbee_update_addr		/* handler to process transparent mode */
+	mbee_update_addr        /* handler to process transparent mode */
 };
 
 static const mc6845_interface mbeeic_crtc = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	mbeeic_update_row,		/* handler to display a scanline */
+	mbeeic_update_row,      /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	mbee_update_addr		/* handler to process transparent mode */
+	mbee_update_addr        /* handler to process transparent mode */
 };
 
 static const mc6845_interface mbeeppc_crtc = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	mbeeppc_update_row,		/* handler to display a scanline */
+	mbeeppc_update_row,     /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	mbee_update_addr		/* handler to process transparent mode */
+	mbee_update_addr        /* handler to process transparent mode */
 };
 
 static const mc6845_interface mbee256_crtc = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character */
 	NULL,
-	mbeeppc_update_row,		/* handler to display a scanline */
+	mbeeppc_update_row,     /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	mbee256_update_addr		/* handler to process transparent mode */
+	mbee256_update_addr     /* handler to process transparent mode */
 };
 
 static MACHINE_CONFIG_START( mbee, mbee_state )
@@ -680,7 +680,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 19*16)			/* need at least 17 lines for NET */
+	MCFG_SCREEN_SIZE(64*8, 19*16)           /* need at least 17 lines for NET */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
@@ -859,7 +859,7 @@ ROM_START( mbee )
 	ROM_RELOAD( 0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0000,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0000,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 ROM_END
@@ -883,7 +883,7 @@ ROM_START( mbeeic )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
@@ -909,7 +909,7 @@ ROM_START( mbeepc )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
@@ -939,7 +939,7 @@ ROM_START( mbeepc85 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
@@ -970,7 +970,7 @@ ROM_START( mbeepc85b )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
@@ -999,7 +999,7 @@ ROM_START( mbeepc85s )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
@@ -1070,7 +1070,7 @@ ROM_START( mbee56 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
@@ -1088,7 +1088,7 @@ ROM_START( mbee64 ) // CIAB (Computer-In-A-Book)
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )	/* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
@@ -1118,7 +1118,7 @@ ROM_START( mbee256 ) // 256tc
 
 	ROM_REGION(0x9800, "gfx", 0)
 	ROM_LOAD("char256.bin",           0x1000,  0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
-	ROM_IGNORE( 0x1000 )	// throw away swedish characters for now
+	ROM_IGNORE( 0x1000 )    // throw away swedish characters for now
 	ROM_COPY( "gfx", 0x1000, 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
@@ -1133,16 +1133,15 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT       COMPANY         FULLNAME */
-COMP( 1982, mbee,     0,	0,	mbee,     mbee, mbee_state,     mbee,   		"Applied Technology",  "Microbee 16 Standard" , 0 )
-COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee, mbee_state,     mbeeic, 		"Applied Technology",  "Microbee 32 IC" , 0 )
-COMP( 1982, mbeepc,   mbee,	0,	mbeepc,   mbee, mbee_state,     mbeepc, 		"Applied Technology",  "Microbee Personal Communicator" , 0 )
-COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee, mbee_state,     mbeepc85,		"Applied Technology",  "Microbee PC85" , 0 )
-COMP( 1985, mbeepc85b,mbee,	0,	mbeepc85b,mbee, mbee_state,     mbeepc85,		"Applied Technology",  "Microbee PC85 (New version)" , 0 )
-COMP( 1985, mbeepc85s,mbee,	0,	mbeepc85, mbee, mbee_state,     mbeepc85,		"Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
-COMP( 1986, mbeeppc,  mbee,	0,	mbeeppc,  mbee, mbee_state,     mbeeppc,		"Applied Technology",  "Microbee Premium PC85" , 0 )
-COMP( 1986, mbeett,   mbee,	0,	mbeett,   mbee256, mbee_state,  mbeett,		"Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
-COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee, mbee_state,     mbee56, 		"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
-COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee, mbee_state,     mbee64, 		"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
-COMP( 1986, mbee128,  mbee,	0,	mbee128,  mbee, mbee_state,     mbee128,		"Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
-COMP( 1987, mbee256,  mbee,	0,	mbee256,  mbee256, mbee_state,  mbee256,		"Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
-
+COMP( 1982, mbee,     0,    0,  mbee,     mbee, mbee_state,     mbee,           "Applied Technology",  "Microbee 16 Standard" , 0 )
+COMP( 1982, mbeeic,   mbee, 0,  mbeeic,   mbee, mbee_state,     mbeeic,         "Applied Technology",  "Microbee 32 IC" , 0 )
+COMP( 1982, mbeepc,   mbee, 0,  mbeepc,   mbee, mbee_state,     mbeepc,         "Applied Technology",  "Microbee Personal Communicator" , 0 )
+COMP( 1985, mbeepc85, mbee, 0,  mbeepc85, mbee, mbee_state,     mbeepc85,       "Applied Technology",  "Microbee PC85" , 0 )
+COMP( 1985, mbeepc85b,mbee, 0,  mbeepc85b,mbee, mbee_state,     mbeepc85,       "Applied Technology",  "Microbee PC85 (New version)" , 0 )
+COMP( 1985, mbeepc85s,mbee, 0,  mbeepc85, mbee, mbee_state,     mbeepc85,       "Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
+COMP( 1986, mbeeppc,  mbee, 0,  mbeeppc,  mbee, mbee_state,     mbeeppc,        "Applied Technology",  "Microbee Premium PC85" , 0 )
+COMP( 1986, mbeett,   mbee, 0,  mbeett,   mbee256, mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
+COMP( 1986, mbee56,   mbee, 0,  mbee56,   mbee, mbee_state,     mbee56,         "Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
+COMP( 1986, mbee64,   mbee, 0,  mbee64,   mbee, mbee_state,     mbee64,         "Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
+COMP( 1986, mbee128,  mbee, 0,  mbee128,  mbee, mbee_state,     mbee128,        "Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
+COMP( 1987, mbee256,  mbee, 0,  mbee256,  mbee256, mbee_state,  mbee256,        "Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )

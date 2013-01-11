@@ -42,9 +42,9 @@ class dim68k_state : public driver_device
 public:
 	dim68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_crtc(*this, "crtc"),
-		  m_speaker(*this, SPEAKER_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_crtc(*this, "crtc"),
+			m_speaker(*this, SPEAKER_TAG)
 	,
 		m_ram(*this, "ram"){ }
 
@@ -133,13 +133,13 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
 	switch (data & 0x18)
 	{
 		case 0x00: m_crtc->set_clock(XTAL_14MHz);
-		           break;
+					break;
 		case 0x08: m_crtc->set_clock(XTAL_3_579545MHz);
-		           break;
+					break;
 		case 0x10: m_crtc->set_clock(XTAL_14MHz / 2);
-		           break;
+					break;
 		case 0x18: m_crtc->set_clock(XTAL_3_579545MHz / 2);
-		           break;
+					break;
 	}
 }
 
@@ -268,15 +268,15 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 /* F4 Character Displayer */
 static const gfx_layout dim68k_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* 8 x 16 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( dim68k )
@@ -284,10 +284,10 @@ static GFXDECODE_START( dim68k )
 GFXDECODE_END
 
 static const mc6845_interface dim68k_crtc = {
-	"screen",			/* name of screen */
-	8,			/* number of dots per character - switchable 7 or 8 */
+	"screen",           /* name of screen */
+	8,          /* number of dots per character - switchable 7 or 8 */
 	NULL,
-	dim68k_update_row,		/* handler to display a scanline */
+	dim68k_update_row,      /* handler to display a scanline */
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -356,7 +356,7 @@ ROM_START( dim68k )
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "mc105e.bin", 0x0000, 0x1000, CRC(7a09daa8) SHA1(844bfa579293d7c3442fcbfa21bda75fff930394))
 
-    // The remaining roms may not be in the correct positions or being loaded correctly
+	// The remaining roms may not be in the correct positions or being loaded correctly
 	ROM_REGION( 0x1000, "cop6512", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "mc106.bin", 0x0000, 0x0100, CRC(11530d8a) SHA1(e3eae266535383bcaee2d84d7bed6052d40e4e4a))
 	ROM_LOAD16_WORD_SWAP( "mc107.bin", 0x0100, 0x0100, CRC(966db11b) SHA1(3c3105ac842602d8e01b0f924152fd672a85f00c))
@@ -371,7 +371,7 @@ ROM_START( dim68k )
 	ROM_LOAD16_WORD_SWAP( "mc112.bin", 0x0000, 0x0100, CRC(dfd4cdbb) SHA1(a7831d415943fa86c417066807038bccbabb2573))
 	ROM_LOAD( "mc113.bin", 0x0100, 0x00ef, CRC(594bdf05) SHA1(36db911a27d930e023fa12683e86e9eecfffdba6))
 
-	ROM_REGION( 0x1000, "mb", ROMREGION_ERASEFF )	// mainboard unknown
+	ROM_REGION( 0x1000, "mb", ROMREGION_ERASEFF )   // mainboard unknown
 	ROM_LOAD( "mc102.bin", 0x0000, 0x00fa, CRC(38e2abac) SHA1(0d7e730b46fc162764c69c51dea3bbe8337b1a7d))
 	ROM_LOAD( "mc101.bin", 0x0100, 0x00fa, CRC(caffb3a0) SHA1(36f5140b306565794c4d856e0c20589b8f2a37f4))
 ROM_END
@@ -380,4 +380,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1984, dim68k,  0,       0,     dim68k,   dim68k, driver_device,   0,     "Micro Craft", "Dimension 68000", GAME_NOT_WORKING)
-

@@ -92,536 +92,536 @@ const UINT32 m68ki_shift_32_table[65] =
 const UINT8 m68ki_exception_cycle_table[7][256] =
 {
 	{ /* 000 */
-		 40, /*  0: Reset - Initial Stack Pointer                      */
-		  4, /*  1: Reset - Initial Program Counter                    */
-		 50, /*  2: Bus Error                             (unemulated) */
-		 50, /*  3: Address Error                         (unemulated) */
-		 34, /*  4: Illegal Instruction                                */
-		 38, /*  5: Divide by Zero                                     */
-		 40, /*  6: CHK                                                */
-		 34, /*  7: TRAPV                                              */
-		 34, /*  8: Privilege Violation                                */
-		 34, /*  9: Trace                                              */
-		  4, /* 10: 1010                                               */
-		  4, /* 11: 1111                                               */
-		  4, /* 12: RESERVED                                           */
-		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
-		  4, /* 14: Format Error                                       */
-		 44, /* 15: Uninitialized Interrupt                            */
-		  4, /* 16: RESERVED                                           */
-		  4, /* 17: RESERVED                                           */
-		  4, /* 18: RESERVED                                           */
-		  4, /* 19: RESERVED                                           */
-		  4, /* 20: RESERVED                                           */
-		  4, /* 21: RESERVED                                           */
-		  4, /* 22: RESERVED                                           */
-		  4, /* 23: RESERVED                                           */
-		 44, /* 24: Spurious Interrupt                                 */
-		 44, /* 25: Level 1 Interrupt Autovector                       */
-		 44, /* 26: Level 2 Interrupt Autovector                       */
-		 44, /* 27: Level 3 Interrupt Autovector                       */
-		 44, /* 28: Level 4 Interrupt Autovector                       */
-		 44, /* 29: Level 5 Interrupt Autovector                       */
-		 44, /* 30: Level 6 Interrupt Autovector                       */
-		 44, /* 31: Level 7 Interrupt Autovector                       */
-		 34, /* 32: TRAP #0                                            */
-		 34, /* 33: TRAP #1                                            */
-		 34, /* 34: TRAP #2                                            */
-		 34, /* 35: TRAP #3                                            */
-		 34, /* 36: TRAP #4                                            */
-		 34, /* 37: TRAP #5                                            */
-		 34, /* 38: TRAP #6                                            */
-		 34, /* 39: TRAP #7                                            */
-		 34, /* 40: TRAP #8                                            */
-		 34, /* 41: TRAP #9                                            */
-		 34, /* 42: TRAP #10                                           */
-		 34, /* 43: TRAP #11                                           */
-		 34, /* 44: TRAP #12                                           */
-		 34, /* 45: TRAP #13                                           */
-		 34, /* 46: TRAP #14                                           */
-		 34, /* 47: TRAP #15                                           */
-		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
-		  4, /* 49: FP Inexact Result                     (unemulated) */
-		  4, /* 50: FP Divide by Zero                     (unemulated) */
-		  4, /* 51: FP Underflow                          (unemulated) */
-		  4, /* 52: FP Operand Error                      (unemulated) */
-		  4, /* 53: FP Overflow                           (unemulated) */
-		  4, /* 54: FP Signaling NAN                      (unemulated) */
-		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
-		  4, /* 56: MMU Configuration Error               (unemulated) */
-		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
-		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
-		  4, /* 59: RESERVED                                           */
-		  4, /* 60: RESERVED                                           */
-		  4, /* 61: RESERVED                                           */
-		  4, /* 62: RESERVED                                           */
-		  4, /* 63: RESERVED                                           */
-		     /* 64-255: User Defined                                   */
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+			40, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
+			50, /*  2: Bus Error                             (unemulated) */
+			50, /*  3: Address Error                         (unemulated) */
+			34, /*  4: Illegal Instruction                                */
+			38, /*  5: Divide by Zero                                     */
+			40, /*  6: CHK                                                */
+			34, /*  7: TRAPV                                              */
+			34, /*  8: Privilege Violation                                */
+			34, /*  9: Trace                                              */
+			4, /* 10: 1010                                               */
+			4, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			44, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			44, /* 24: Spurious Interrupt                                 */
+			44, /* 25: Level 1 Interrupt Autovector                       */
+			44, /* 26: Level 2 Interrupt Autovector                       */
+			44, /* 27: Level 3 Interrupt Autovector                       */
+			44, /* 28: Level 4 Interrupt Autovector                       */
+			44, /* 29: Level 5 Interrupt Autovector                       */
+			44, /* 30: Level 6 Interrupt Autovector                       */
+			44, /* 31: Level 7 Interrupt Autovector                       */
+			34, /* 32: TRAP #0                                            */
+			34, /* 33: TRAP #1                                            */
+			34, /* 34: TRAP #2                                            */
+			34, /* 35: TRAP #3                                            */
+			34, /* 36: TRAP #4                                            */
+			34, /* 37: TRAP #5                                            */
+			34, /* 38: TRAP #6                                            */
+			34, /* 39: TRAP #7                                            */
+			34, /* 40: TRAP #8                                            */
+			34, /* 41: TRAP #9                                            */
+			34, /* 42: TRAP #10                                           */
+			34, /* 43: TRAP #11                                           */
+			34, /* 44: TRAP #12                                           */
+			34, /* 45: TRAP #13                                           */
+			34, /* 46: TRAP #14                                           */
+			34, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 	{ /* 010 */
-		 40, /*  0: Reset - Initial Stack Pointer                      */
-		  4, /*  1: Reset - Initial Program Counter                    */
+			40, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
 		126, /*  2: Bus Error                             (unemulated) */
 		126, /*  3: Address Error                         (unemulated) */
-		 38, /*  4: Illegal Instruction                                */
-		 44, /*  5: Divide by Zero                                     */
-		 44, /*  6: CHK                                                */
-		 34, /*  7: TRAPV                                              */
-		 38, /*  8: Privilege Violation                                */
-		 38, /*  9: Trace                                              */
-		  4, /* 10: 1010                                               */
-		  4, /* 11: 1111                                               */
-		  4, /* 12: RESERVED                                           */
-		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
-		  4, /* 14: Format Error                                       */
-		 44, /* 15: Uninitialized Interrupt                            */
-		  4, /* 16: RESERVED                                           */
-		  4, /* 17: RESERVED                                           */
-		  4, /* 18: RESERVED                                           */
-		  4, /* 19: RESERVED                                           */
-		  4, /* 20: RESERVED                                           */
-		  4, /* 21: RESERVED                                           */
-		  4, /* 22: RESERVED                                           */
-		  4, /* 23: RESERVED                                           */
-		 46, /* 24: Spurious Interrupt                                 */
-		 46, /* 25: Level 1 Interrupt Autovector                       */
-		 46, /* 26: Level 2 Interrupt Autovector                       */
-		 46, /* 27: Level 3 Interrupt Autovector                       */
-		 46, /* 28: Level 4 Interrupt Autovector                       */
-		 46, /* 29: Level 5 Interrupt Autovector                       */
-		 46, /* 30: Level 6 Interrupt Autovector                       */
-		 46, /* 31: Level 7 Interrupt Autovector                       */
-		 38, /* 32: TRAP #0                                            */
-		 38, /* 33: TRAP #1                                            */
-		 38, /* 34: TRAP #2                                            */
-		 38, /* 35: TRAP #3                                            */
-		 38, /* 36: TRAP #4                                            */
-		 38, /* 37: TRAP #5                                            */
-		 38, /* 38: TRAP #6                                            */
-		 38, /* 39: TRAP #7                                            */
-		 38, /* 40: TRAP #8                                            */
-		 38, /* 41: TRAP #9                                            */
-		 38, /* 42: TRAP #10                                           */
-		 38, /* 43: TRAP #11                                           */
-		 38, /* 44: TRAP #12                                           */
-		 38, /* 45: TRAP #13                                           */
-		 38, /* 46: TRAP #14                                           */
-		 38, /* 47: TRAP #15                                           */
-		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
-		  4, /* 49: FP Inexact Result                     (unemulated) */
-		  4, /* 50: FP Divide by Zero                     (unemulated) */
-		  4, /* 51: FP Underflow                          (unemulated) */
-		  4, /* 52: FP Operand Error                      (unemulated) */
-		  4, /* 53: FP Overflow                           (unemulated) */
-		  4, /* 54: FP Signaling NAN                      (unemulated) */
-		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
-		  4, /* 56: MMU Configuration Error               (unemulated) */
-		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
-		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
-		  4, /* 59: RESERVED                                           */
-		  4, /* 60: RESERVED                                           */
-		  4, /* 61: RESERVED                                           */
-		  4, /* 62: RESERVED                                           */
-		  4, /* 63: RESERVED                                           */
-		     /* 64-255: User Defined                                   */
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+			38, /*  4: Illegal Instruction                                */
+			44, /*  5: Divide by Zero                                     */
+			44, /*  6: CHK                                                */
+			34, /*  7: TRAPV                                              */
+			38, /*  8: Privilege Violation                                */
+			38, /*  9: Trace                                              */
+			4, /* 10: 1010                                               */
+			4, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			44, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			46, /* 24: Spurious Interrupt                                 */
+			46, /* 25: Level 1 Interrupt Autovector                       */
+			46, /* 26: Level 2 Interrupt Autovector                       */
+			46, /* 27: Level 3 Interrupt Autovector                       */
+			46, /* 28: Level 4 Interrupt Autovector                       */
+			46, /* 29: Level 5 Interrupt Autovector                       */
+			46, /* 30: Level 6 Interrupt Autovector                       */
+			46, /* 31: Level 7 Interrupt Autovector                       */
+			38, /* 32: TRAP #0                                            */
+			38, /* 33: TRAP #1                                            */
+			38, /* 34: TRAP #2                                            */
+			38, /* 35: TRAP #3                                            */
+			38, /* 36: TRAP #4                                            */
+			38, /* 37: TRAP #5                                            */
+			38, /* 38: TRAP #6                                            */
+			38, /* 39: TRAP #7                                            */
+			38, /* 40: TRAP #8                                            */
+			38, /* 41: TRAP #9                                            */
+			38, /* 42: TRAP #10                                           */
+			38, /* 43: TRAP #11                                           */
+			38, /* 44: TRAP #12                                           */
+			38, /* 45: TRAP #13                                           */
+			38, /* 46: TRAP #14                                           */
+			38, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 	{ /* 020 */
-		  4, /*  0: Reset - Initial Stack Pointer                      */
-		  4, /*  1: Reset - Initial Program Counter                    */
-		 50, /*  2: Bus Error                             (unemulated) */
-		 50, /*  3: Address Error                         (unemulated) */
-		 20, /*  4: Illegal Instruction                                */
-		 38, /*  5: Divide by Zero                                     */
-		 40, /*  6: CHK                                                */
-		 20, /*  7: TRAPV                                              */
-		 34, /*  8: Privilege Violation                                */
-		 25, /*  9: Trace                                              */
-		 20, /* 10: 1010                                               */
-		 20, /* 11: 1111                                               */
-		  4, /* 12: RESERVED                                           */
-		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
-		  4, /* 14: Format Error                                       */
-		 30, /* 15: Uninitialized Interrupt                            */
-		  4, /* 16: RESERVED                                           */
-		  4, /* 17: RESERVED                                           */
-		  4, /* 18: RESERVED                                           */
-		  4, /* 19: RESERVED                                           */
-		  4, /* 20: RESERVED                                           */
-		  4, /* 21: RESERVED                                           */
-		  4, /* 22: RESERVED                                           */
-		  4, /* 23: RESERVED                                           */
-		 30, /* 24: Spurious Interrupt                                 */
-		 30, /* 25: Level 1 Interrupt Autovector                       */
-		 30, /* 26: Level 2 Interrupt Autovector                       */
-		 30, /* 27: Level 3 Interrupt Autovector                       */
-		 30, /* 28: Level 4 Interrupt Autovector                       */
-		 30, /* 29: Level 5 Interrupt Autovector                       */
-		 30, /* 30: Level 6 Interrupt Autovector                       */
-		 30, /* 31: Level 7 Interrupt Autovector                       */
-		 20, /* 32: TRAP #0                                            */
-		 20, /* 33: TRAP #1                                            */
-		 20, /* 34: TRAP #2                                            */
-		 20, /* 35: TRAP #3                                            */
-		 20, /* 36: TRAP #4                                            */
-		 20, /* 37: TRAP #5                                            */
-		 20, /* 38: TRAP #6                                            */
-		 20, /* 39: TRAP #7                                            */
-		 20, /* 40: TRAP #8                                            */
-		 20, /* 41: TRAP #9                                            */
-		 20, /* 42: TRAP #10                                           */
-		 20, /* 43: TRAP #11                                           */
-		 20, /* 44: TRAP #12                                           */
-		 20, /* 45: TRAP #13                                           */
-		 20, /* 46: TRAP #14                                           */
-		 20, /* 47: TRAP #15                                           */
-		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
-		  4, /* 49: FP Inexact Result                     (unemulated) */
-		  4, /* 50: FP Divide by Zero                     (unemulated) */
-		  4, /* 51: FP Underflow                          (unemulated) */
-		  4, /* 52: FP Operand Error                      (unemulated) */
-		  4, /* 53: FP Overflow                           (unemulated) */
-		  4, /* 54: FP Signaling NAN                      (unemulated) */
-		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
-		  4, /* 56: MMU Configuration Error               (unemulated) */
-		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
-		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
-		  4, /* 59: RESERVED                                           */
-		  4, /* 60: RESERVED                                           */
-		  4, /* 61: RESERVED                                           */
-		  4, /* 62: RESERVED                                           */
-		  4, /* 63: RESERVED                                           */
-		     /* 64-255: User Defined                                   */
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+			4, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
+			50, /*  2: Bus Error                             (unemulated) */
+			50, /*  3: Address Error                         (unemulated) */
+			20, /*  4: Illegal Instruction                                */
+			38, /*  5: Divide by Zero                                     */
+			40, /*  6: CHK                                                */
+			20, /*  7: TRAPV                                              */
+			34, /*  8: Privilege Violation                                */
+			25, /*  9: Trace                                              */
+			20, /* 10: 1010                                               */
+			20, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			30, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			30, /* 24: Spurious Interrupt                                 */
+			30, /* 25: Level 1 Interrupt Autovector                       */
+			30, /* 26: Level 2 Interrupt Autovector                       */
+			30, /* 27: Level 3 Interrupt Autovector                       */
+			30, /* 28: Level 4 Interrupt Autovector                       */
+			30, /* 29: Level 5 Interrupt Autovector                       */
+			30, /* 30: Level 6 Interrupt Autovector                       */
+			30, /* 31: Level 7 Interrupt Autovector                       */
+			20, /* 32: TRAP #0                                            */
+			20, /* 33: TRAP #1                                            */
+			20, /* 34: TRAP #2                                            */
+			20, /* 35: TRAP #3                                            */
+			20, /* 36: TRAP #4                                            */
+			20, /* 37: TRAP #5                                            */
+			20, /* 38: TRAP #6                                            */
+			20, /* 39: TRAP #7                                            */
+			20, /* 40: TRAP #8                                            */
+			20, /* 41: TRAP #9                                            */
+			20, /* 42: TRAP #10                                           */
+			20, /* 43: TRAP #11                                           */
+			20, /* 44: TRAP #12                                           */
+			20, /* 45: TRAP #13                                           */
+			20, /* 46: TRAP #14                                           */
+			20, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 	{ /* 030 - not correct */
-		  4, /*  0: Reset - Initial Stack Pointer                      */
-		  4, /*  1: Reset - Initial Program Counter                    */
-		 50, /*  2: Bus Error                             (unemulated) */
-		 50, /*  3: Address Error                         (unemulated) */
-		 20, /*  4: Illegal Instruction                                */
-		 38, /*  5: Divide by Zero                                     */
-		 40, /*  6: CHK                                                */
-		 20, /*  7: TRAPV                                              */
-		 34, /*  8: Privilege Violation                                */
-		 25, /*  9: Trace                                              */
-		 20, /* 10: 1010                                               */
-		 20, /* 11: 1111                                               */
-		  4, /* 12: RESERVED                                           */
-		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
-		  4, /* 14: Format Error                                       */
-		 30, /* 15: Uninitialized Interrupt                            */
-		  4, /* 16: RESERVED                                           */
-		  4, /* 17: RESERVED                                           */
-		  4, /* 18: RESERVED                                           */
-		  4, /* 19: RESERVED                                           */
-		  4, /* 20: RESERVED                                           */
-		  4, /* 21: RESERVED                                           */
-		  4, /* 22: RESERVED                                           */
-		  4, /* 23: RESERVED                                           */
-		 30, /* 24: Spurious Interrupt                                 */
-		 30, /* 25: Level 1 Interrupt Autovector                       */
-		 30, /* 26: Level 2 Interrupt Autovector                       */
-		 30, /* 27: Level 3 Interrupt Autovector                       */
-		 30, /* 28: Level 4 Interrupt Autovector                       */
-		 30, /* 29: Level 5 Interrupt Autovector                       */
-		 30, /* 30: Level 6 Interrupt Autovector                       */
-		 30, /* 31: Level 7 Interrupt Autovector                       */
-		 20, /* 32: TRAP #0                                            */
-		 20, /* 33: TRAP #1                                            */
-		 20, /* 34: TRAP #2                                            */
-		 20, /* 35: TRAP #3                                            */
-		 20, /* 36: TRAP #4                                            */
-		 20, /* 37: TRAP #5                                            */
-		 20, /* 38: TRAP #6                                            */
-		 20, /* 39: TRAP #7                                            */
-		 20, /* 40: TRAP #8                                            */
-		 20, /* 41: TRAP #9                                            */
-		 20, /* 42: TRAP #10                                           */
-		 20, /* 43: TRAP #11                                           */
-		 20, /* 44: TRAP #12                                           */
-		 20, /* 45: TRAP #13                                           */
-		 20, /* 46: TRAP #14                                           */
-		 20, /* 47: TRAP #15                                           */
-		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
-		  4, /* 49: FP Inexact Result                     (unemulated) */
-		  4, /* 50: FP Divide by Zero                     (unemulated) */
-		  4, /* 51: FP Underflow                          (unemulated) */
-		  4, /* 52: FP Operand Error                      (unemulated) */
-		  4, /* 53: FP Overflow                           (unemulated) */
-		  4, /* 54: FP Signaling NAN                      (unemulated) */
-		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
-		  4, /* 56: MMU Configuration Error               (unemulated) */
-		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
-		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
-		  4, /* 59: RESERVED                                           */
-		  4, /* 60: RESERVED                                           */
-		  4, /* 61: RESERVED                                           */
-		  4, /* 62: RESERVED                                           */
-		  4, /* 63: RESERVED                                           */
-		     /* 64-255: User Defined                                   */
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+			4, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
+			50, /*  2: Bus Error                             (unemulated) */
+			50, /*  3: Address Error                         (unemulated) */
+			20, /*  4: Illegal Instruction                                */
+			38, /*  5: Divide by Zero                                     */
+			40, /*  6: CHK                                                */
+			20, /*  7: TRAPV                                              */
+			34, /*  8: Privilege Violation                                */
+			25, /*  9: Trace                                              */
+			20, /* 10: 1010                                               */
+			20, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			30, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			30, /* 24: Spurious Interrupt                                 */
+			30, /* 25: Level 1 Interrupt Autovector                       */
+			30, /* 26: Level 2 Interrupt Autovector                       */
+			30, /* 27: Level 3 Interrupt Autovector                       */
+			30, /* 28: Level 4 Interrupt Autovector                       */
+			30, /* 29: Level 5 Interrupt Autovector                       */
+			30, /* 30: Level 6 Interrupt Autovector                       */
+			30, /* 31: Level 7 Interrupt Autovector                       */
+			20, /* 32: TRAP #0                                            */
+			20, /* 33: TRAP #1                                            */
+			20, /* 34: TRAP #2                                            */
+			20, /* 35: TRAP #3                                            */
+			20, /* 36: TRAP #4                                            */
+			20, /* 37: TRAP #5                                            */
+			20, /* 38: TRAP #6                                            */
+			20, /* 39: TRAP #7                                            */
+			20, /* 40: TRAP #8                                            */
+			20, /* 41: TRAP #9                                            */
+			20, /* 42: TRAP #10                                           */
+			20, /* 43: TRAP #11                                           */
+			20, /* 44: TRAP #12                                           */
+			20, /* 45: TRAP #13                                           */
+			20, /* 46: TRAP #14                                           */
+			20, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 	{ /* 040 */ // TODO: these values are not correct
-		  4, /*  0: Reset - Initial Stack Pointer                      */
-		  4, /*  1: Reset - Initial Program Counter                    */
-		 50, /*  2: Bus Error                             (unemulated) */
-		 50, /*  3: Address Error                         (unemulated) */
-		 20, /*  4: Illegal Instruction                                */
-		 38, /*  5: Divide by Zero                                     */
-		 40, /*  6: CHK                                                */
-		 20, /*  7: TRAPV                                              */
-		 34, /*  8: Privilege Violation                                */
-		 25, /*  9: Trace                                              */
-		 20, /* 10: 1010                                               */
-		 20, /* 11: 1111                                               */
-		  4, /* 12: RESERVED                                           */
-		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
-		  4, /* 14: Format Error                                       */
-		 30, /* 15: Uninitialized Interrupt                            */
-		  4, /* 16: RESERVED                                           */
-		  4, /* 17: RESERVED                                           */
-		  4, /* 18: RESERVED                                           */
-		  4, /* 19: RESERVED                                           */
-		  4, /* 20: RESERVED                                           */
-		  4, /* 21: RESERVED                                           */
-		  4, /* 22: RESERVED                                           */
-		  4, /* 23: RESERVED                                           */
-		 30, /* 24: Spurious Interrupt                                 */
-		 30, /* 25: Level 1 Interrupt Autovector                       */
-		 30, /* 26: Level 2 Interrupt Autovector                       */
-		 30, /* 27: Level 3 Interrupt Autovector                       */
-		 30, /* 28: Level 4 Interrupt Autovector                       */
-		 30, /* 29: Level 5 Interrupt Autovector                       */
-		 30, /* 30: Level 6 Interrupt Autovector                       */
-		 30, /* 31: Level 7 Interrupt Autovector                       */
-		 20, /* 32: TRAP #0                                            */
-		 20, /* 33: TRAP #1                                            */
-		 20, /* 34: TRAP #2                                            */
-		 20, /* 35: TRAP #3                                            */
-		 20, /* 36: TRAP #4                                            */
-		 20, /* 37: TRAP #5                                            */
-		 20, /* 38: TRAP #6                                            */
-		 20, /* 39: TRAP #7                                            */
-		 20, /* 40: TRAP #8                                            */
-		 20, /* 41: TRAP #9                                            */
-		 20, /* 42: TRAP #10                                           */
-		 20, /* 43: TRAP #11                                           */
-		 20, /* 44: TRAP #12                                           */
-		 20, /* 45: TRAP #13                                           */
-		 20, /* 46: TRAP #14                                           */
-		 20, /* 47: TRAP #15                                           */
-		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
-		  4, /* 49: FP Inexact Result                     (unemulated) */
-		  4, /* 50: FP Divide by Zero                     (unemulated) */
-		  4, /* 51: FP Underflow                          (unemulated) */
-		  4, /* 52: FP Operand Error                      (unemulated) */
-		  4, /* 53: FP Overflow                           (unemulated) */
-		  4, /* 54: FP Signaling NAN                      (unemulated) */
-		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
-		  4, /* 56: MMU Configuration Error               (unemulated) */
-		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
-		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
-		  4, /* 59: RESERVED                                           */
-		  4, /* 60: RESERVED                                           */
-		  4, /* 61: RESERVED                                           */
-		  4, /* 62: RESERVED                                           */
-		  4, /* 63: RESERVED                                           */
-		     /* 64-255: User Defined                                   */
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+			4, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
+			50, /*  2: Bus Error                             (unemulated) */
+			50, /*  3: Address Error                         (unemulated) */
+			20, /*  4: Illegal Instruction                                */
+			38, /*  5: Divide by Zero                                     */
+			40, /*  6: CHK                                                */
+			20, /*  7: TRAPV                                              */
+			34, /*  8: Privilege Violation                                */
+			25, /*  9: Trace                                              */
+			20, /* 10: 1010                                               */
+			20, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			30, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			30, /* 24: Spurious Interrupt                                 */
+			30, /* 25: Level 1 Interrupt Autovector                       */
+			30, /* 26: Level 2 Interrupt Autovector                       */
+			30, /* 27: Level 3 Interrupt Autovector                       */
+			30, /* 28: Level 4 Interrupt Autovector                       */
+			30, /* 29: Level 5 Interrupt Autovector                       */
+			30, /* 30: Level 6 Interrupt Autovector                       */
+			30, /* 31: Level 7 Interrupt Autovector                       */
+			20, /* 32: TRAP #0                                            */
+			20, /* 33: TRAP #1                                            */
+			20, /* 34: TRAP #2                                            */
+			20, /* 35: TRAP #3                                            */
+			20, /* 36: TRAP #4                                            */
+			20, /* 37: TRAP #5                                            */
+			20, /* 38: TRAP #6                                            */
+			20, /* 39: TRAP #7                                            */
+			20, /* 40: TRAP #8                                            */
+			20, /* 41: TRAP #9                                            */
+			20, /* 42: TRAP #10                                           */
+			20, /* 43: TRAP #11                                           */
+			20, /* 44: TRAP #12                                           */
+			20, /* 45: TRAP #13                                           */
+			20, /* 46: TRAP #14                                           */
+			20, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 	{ /* 68340 */
-		  4, /*  0: Reset - Initial Stack Pointer                      */
-		  4, /*  1: Reset - Initial Program Counter                    */
-		 50, /*  2: Bus Error                             (unemulated) */
-		 50, /*  3: Address Error                         (unemulated) */
-		 20, /*  4: Illegal Instruction                                */
-		 38, /*  5: Divide by Zero                                     */
-		 40, /*  6: CHK                                                */
-		 20, /*  7: TRAPV                                              */
-		 34, /*  8: Privilege Violation                                */
-		 25, /*  9: Trace                                              */
-		 20, /* 10: 1010                                               */
-		 20, /* 11: 1111                                               */
-		  4, /* 12: RESERVED                                           */
-		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
-		  4, /* 14: Format Error                                       */
-		 30, /* 15: Uninitialized Interrupt                            */
-		  4, /* 16: RESERVED                                           */
-		  4, /* 17: RESERVED                                           */
-		  4, /* 18: RESERVED                                           */
-		  4, /* 19: RESERVED                                           */
-		  4, /* 20: RESERVED                                           */
-		  4, /* 21: RESERVED                                           */
-		  4, /* 22: RESERVED                                           */
-		  4, /* 23: RESERVED                                           */
-		 30, /* 24: Spurious Interrupt                                 */
-		 30, /* 25: Level 1 Interrupt Autovector                       */
-		 30, /* 26: Level 2 Interrupt Autovector                       */
-		 30, /* 27: Level 3 Interrupt Autovector                       */
-		 30, /* 28: Level 4 Interrupt Autovector                       */
-		 30, /* 29: Level 5 Interrupt Autovector                       */
-		 30, /* 30: Level 6 Interrupt Autovector                       */
-		 30, /* 31: Level 7 Interrupt Autovector                       */
-		 20, /* 32: TRAP #0                                            */
-		 20, /* 33: TRAP #1                                            */
-		 20, /* 34: TRAP #2                                            */
-		 20, /* 35: TRAP #3                                            */
-		 20, /* 36: TRAP #4                                            */
-		 20, /* 37: TRAP #5                                            */
-		 20, /* 38: TRAP #6                                            */
-		 20, /* 39: TRAP #7                                            */
-		 20, /* 40: TRAP #8                                            */
-		 20, /* 41: TRAP #9                                            */
-		 20, /* 42: TRAP #10                                           */
-		 20, /* 43: TRAP #11                                           */
-		 20, /* 44: TRAP #12                                           */
-		 20, /* 45: TRAP #13                                           */
-		 20, /* 46: TRAP #14                                           */
-		 20, /* 47: TRAP #15                                           */
-		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
-		  4, /* 49: FP Inexact Result                     (unemulated) */
-		  4, /* 50: FP Divide by Zero                     (unemulated) */
-		  4, /* 51: FP Underflow                          (unemulated) */
-		  4, /* 52: FP Operand Error                      (unemulated) */
-		  4, /* 53: FP Overflow                           (unemulated) */
-		  4, /* 54: FP Signaling NAN                      (unemulated) */
-		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
-		  4, /* 56: MMU Configuration Error               (unemulated) */
-		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
-		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
-		  4, /* 59: RESERVED                                           */
-		  4, /* 60: RESERVED                                           */
-		  4, /* 61: RESERVED                                           */
-		  4, /* 62: RESERVED                                           */
-		  4, /* 63: RESERVED                                           */
-		     /* 64-255: User Defined                                   */
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+			4, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
+			50, /*  2: Bus Error                             (unemulated) */
+			50, /*  3: Address Error                         (unemulated) */
+			20, /*  4: Illegal Instruction                                */
+			38, /*  5: Divide by Zero                                     */
+			40, /*  6: CHK                                                */
+			20, /*  7: TRAPV                                              */
+			34, /*  8: Privilege Violation                                */
+			25, /*  9: Trace                                              */
+			20, /* 10: 1010                                               */
+			20, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			30, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			30, /* 24: Spurious Interrupt                                 */
+			30, /* 25: Level 1 Interrupt Autovector                       */
+			30, /* 26: Level 2 Interrupt Autovector                       */
+			30, /* 27: Level 3 Interrupt Autovector                       */
+			30, /* 28: Level 4 Interrupt Autovector                       */
+			30, /* 29: Level 5 Interrupt Autovector                       */
+			30, /* 30: Level 6 Interrupt Autovector                       */
+			30, /* 31: Level 7 Interrupt Autovector                       */
+			20, /* 32: TRAP #0                                            */
+			20, /* 33: TRAP #1                                            */
+			20, /* 34: TRAP #2                                            */
+			20, /* 35: TRAP #3                                            */
+			20, /* 36: TRAP #4                                            */
+			20, /* 37: TRAP #5                                            */
+			20, /* 38: TRAP #6                                            */
+			20, /* 39: TRAP #7                                            */
+			20, /* 40: TRAP #8                                            */
+			20, /* 41: TRAP #9                                            */
+			20, /* 42: TRAP #10                                           */
+			20, /* 43: TRAP #11                                           */
+			20, /* 44: TRAP #12                                           */
+			20, /* 45: TRAP #13                                           */
+			20, /* 46: TRAP #14                                           */
+			20, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 	{ /* ColdFire - not correct */
-		  4, /*  0: Reset - Initial Stack Pointer                      */
-		  4, /*  1: Reset - Initial Program Counter                    */
-		 50, /*  2: Bus Error                             (unemulated) */
-		 50, /*  3: Address Error                         (unemulated) */
-		 20, /*  4: Illegal Instruction                                */
-		 38, /*  5: Divide by Zero                                     */
-		 40, /*  6: CHK                                                */
-		 20, /*  7: TRAPV                                              */
-		 34, /*  8: Privilege Violation                                */
-		 25, /*  9: Trace                                              */
-		 20, /* 10: 1010                                               */
-		 20, /* 11: 1111                                               */
-		  4, /* 12: RESERVED                                           */
-		  4, /* 13: Coprocessor Protocol Violation        (unemulated) */
-		  4, /* 14: Format Error                                       */
-		 30, /* 15: Uninitialized Interrupt                            */
-		  4, /* 16: RESERVED                                           */
-		  4, /* 17: RESERVED                                           */
-		  4, /* 18: RESERVED                                           */
-		  4, /* 19: RESERVED                                           */
-		  4, /* 20: RESERVED                                           */
-		  4, /* 21: RESERVED                                           */
-		  4, /* 22: RESERVED                                           */
-		  4, /* 23: RESERVED                                           */
-		 30, /* 24: Spurious Interrupt                                 */
-		 30, /* 25: Level 1 Interrupt Autovector                       */
-		 30, /* 26: Level 2 Interrupt Autovector                       */
-		 30, /* 27: Level 3 Interrupt Autovector                       */
-		 30, /* 28: Level 4 Interrupt Autovector                       */
-		 30, /* 29: Level 5 Interrupt Autovector                       */
-		 30, /* 30: Level 6 Interrupt Autovector                       */
-		 30, /* 31: Level 7 Interrupt Autovector                       */
-		 20, /* 32: TRAP #0                                            */
-		 20, /* 33: TRAP #1                                            */
-		 20, /* 34: TRAP #2                                            */
-		 20, /* 35: TRAP #3                                            */
-		 20, /* 36: TRAP #4                                            */
-		 20, /* 37: TRAP #5                                            */
-		 20, /* 38: TRAP #6                                            */
-		 20, /* 39: TRAP #7                                            */
-		 20, /* 40: TRAP #8                                            */
-		 20, /* 41: TRAP #9                                            */
-		 20, /* 42: TRAP #10                                           */
-		 20, /* 43: TRAP #11                                           */
-		 20, /* 44: TRAP #12                                           */
-		 20, /* 45: TRAP #13                                           */
-		 20, /* 46: TRAP #14                                           */
-		 20, /* 47: TRAP #15                                           */
-		  4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
-		  4, /* 49: FP Inexact Result                     (unemulated) */
-		  4, /* 50: FP Divide by Zero                     (unemulated) */
-		  4, /* 51: FP Underflow                          (unemulated) */
-		  4, /* 52: FP Operand Error                      (unemulated) */
-		  4, /* 53: FP Overflow                           (unemulated) */
-		  4, /* 54: FP Signaling NAN                      (unemulated) */
-		  4, /* 55: FP Unimplemented Data Type            (unemulated) */
-		  4, /* 56: MMU Configuration Error               (unemulated) */
-		  4, /* 57: MMU Illegal Operation Error           (unemulated) */
-		  4, /* 58: MMU Access Level Violation Error      (unemulated) */
-		  4, /* 59: RESERVED                                           */
-		  4, /* 60: RESERVED                                           */
-		  4, /* 61: RESERVED                                           */
-		  4, /* 62: RESERVED                                           */
-		  4, /* 63: RESERVED                                           */
-		     /* 64-255: User Defined                                   */
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-		  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+			4, /*  0: Reset - Initial Stack Pointer                      */
+			4, /*  1: Reset - Initial Program Counter                    */
+			50, /*  2: Bus Error                             (unemulated) */
+			50, /*  3: Address Error                         (unemulated) */
+			20, /*  4: Illegal Instruction                                */
+			38, /*  5: Divide by Zero                                     */
+			40, /*  6: CHK                                                */
+			20, /*  7: TRAPV                                              */
+			34, /*  8: Privilege Violation                                */
+			25, /*  9: Trace                                              */
+			20, /* 10: 1010                                               */
+			20, /* 11: 1111                                               */
+			4, /* 12: RESERVED                                           */
+			4, /* 13: Coprocessor Protocol Violation        (unemulated) */
+			4, /* 14: Format Error                                       */
+			30, /* 15: Uninitialized Interrupt                            */
+			4, /* 16: RESERVED                                           */
+			4, /* 17: RESERVED                                           */
+			4, /* 18: RESERVED                                           */
+			4, /* 19: RESERVED                                           */
+			4, /* 20: RESERVED                                           */
+			4, /* 21: RESERVED                                           */
+			4, /* 22: RESERVED                                           */
+			4, /* 23: RESERVED                                           */
+			30, /* 24: Spurious Interrupt                                 */
+			30, /* 25: Level 1 Interrupt Autovector                       */
+			30, /* 26: Level 2 Interrupt Autovector                       */
+			30, /* 27: Level 3 Interrupt Autovector                       */
+			30, /* 28: Level 4 Interrupt Autovector                       */
+			30, /* 29: Level 5 Interrupt Autovector                       */
+			30, /* 30: Level 6 Interrupt Autovector                       */
+			30, /* 31: Level 7 Interrupt Autovector                       */
+			20, /* 32: TRAP #0                                            */
+			20, /* 33: TRAP #1                                            */
+			20, /* 34: TRAP #2                                            */
+			20, /* 35: TRAP #3                                            */
+			20, /* 36: TRAP #4                                            */
+			20, /* 37: TRAP #5                                            */
+			20, /* 38: TRAP #6                                            */
+			20, /* 39: TRAP #7                                            */
+			20, /* 40: TRAP #8                                            */
+			20, /* 41: TRAP #9                                            */
+			20, /* 42: TRAP #10                                           */
+			20, /* 43: TRAP #11                                           */
+			20, /* 44: TRAP #12                                           */
+			20, /* 45: TRAP #13                                           */
+			20, /* 46: TRAP #14                                           */
+			20, /* 47: TRAP #15                                           */
+			4, /* 48: FP Branch or Set on Unknown Condition (unemulated) */
+			4, /* 49: FP Inexact Result                     (unemulated) */
+			4, /* 50: FP Divide by Zero                     (unemulated) */
+			4, /* 51: FP Underflow                          (unemulated) */
+			4, /* 52: FP Operand Error                      (unemulated) */
+			4, /* 53: FP Overflow                           (unemulated) */
+			4, /* 54: FP Signaling NAN                      (unemulated) */
+			4, /* 55: FP Unimplemented Data Type            (unemulated) */
+			4, /* 56: MMU Configuration Error               (unemulated) */
+			4, /* 57: MMU Illegal Operation Error           (unemulated) */
+			4, /* 58: MMU Access Level Violation Error      (unemulated) */
+			4, /* 59: RESERVED                                           */
+			4, /* 60: RESERVED                                           */
+			4, /* 61: RESERVED                                           */
+			4, /* 62: RESERVED                                           */
+			4, /* 63: RESERVED                                           */
+				/* 64-255: User Defined                                   */
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
 };
 
 const UINT8 m68ki_ea_idx_cycle_table[64] =
 {
-	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	 0, /* ..01.000 no memory indirect, base NULL             */
-	 5, /* ..01..01 memory indirect,    base NULL, outer NULL */
-	 7, /* ..01..10 memory indirect,    base NULL, outer 16   */
-	 7, /* ..01..11 memory indirect,    base NULL, outer 32   */
-	 0,  5,  7,  7,  0,  5,  7,  7,  0,  5,  7,  7,
-	 2, /* ..10.000 no memory indirect, base 16               */
-	 7, /* ..10..01 memory indirect,    base 16,   outer NULL */
-	 9, /* ..10..10 memory indirect,    base 16,   outer 16   */
-	 9, /* ..10..11 memory indirect,    base 16,   outer 32   */
-	 0,  7,  9,  9,  0,  7,  9,  9,  0,  7,  9,  9,
-	 6, /* ..11.000 no memory indirect, base 32               */
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0, /* ..01.000 no memory indirect, base NULL             */
+		5, /* ..01..01 memory indirect,    base NULL, outer NULL */
+		7, /* ..01..10 memory indirect,    base NULL, outer 16   */
+		7, /* ..01..11 memory indirect,    base NULL, outer 32   */
+		0,  5,  7,  7,  0,  5,  7,  7,  0,  5,  7,  7,
+		2, /* ..10.000 no memory indirect, base 16               */
+		7, /* ..10..01 memory indirect,    base 16,   outer NULL */
+		9, /* ..10..10 memory indirect,    base 16,   outer 16   */
+		9, /* ..10..11 memory indirect,    base 16,   outer 32   */
+		0,  7,  9,  9,  0,  7,  9,  9,  0,  7,  9,  9,
+		6, /* ..11.000 no memory indirect, base 32               */
 	11, /* ..11..01 memory indirect,    base 32,   outer NULL */
 	13, /* ..11..10 memory indirect,    base 32,   outer 16   */
 	13, /* ..11..11 memory indirect,    base 32,   outer 32   */
-	 0, 11, 13, 13,  0, 11, 13, 13,  0, 11, 13, 13
+		0, 11, 13, 13,  0, 11, 13, 13,  0, 11, 13, 13
 };
 
 
@@ -630,13 +630,13 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
     CPU STATE DESCRIPTION
 ***************************************************************************/
 
-#define MASK_ALL				(CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340 )
-#define MASK_24BIT_SPACE			(CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)
-#define MASK_32BIT_SPACE			(CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340 )
-#define MASK_010_OR_LATER			(CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340)
-#define MASK_020_OR_LATER			(CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340)
-#define MASK_030_OR_LATER			(CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)
-#define MASK_040_OR_LATER			(CPU_TYPE_040 | CPU_TYPE_EC040)
+#define MASK_ALL                (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340 )
+#define MASK_24BIT_SPACE            (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)
+#define MASK_32BIT_SPACE            (CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340 )
+#define MASK_010_OR_LATER           (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340)
+#define MASK_020_OR_LATER           (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340)
+#define MASK_030_OR_LATER           (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)
+#define MASK_040_OR_LATER           (CPU_TYPE_040 | CPU_TYPE_EC040)
 
 
 
@@ -679,7 +679,7 @@ static void m68k_postload(m68ki_cpu_core *m68k)
 {
 	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
 	m68k->stopped = m68k->save_stopped ? STOP_LEVEL_STOP : 0
-		        | m68k->save_halted  ? STOP_LEVEL_HALT : 0;
+				| m68k->save_halted  ? STOP_LEVEL_HALT : 0;
 	m68ki_jump(m68k, REG_PC(m68k));
 }
 
@@ -782,7 +782,7 @@ static CPU_EXECUTE( m68k )
 	/* Make sure we're not stopped */
 	if(!m68k->stopped)
 	{
-        /* Return point if we had an address error */
+		/* Return point if we had an address error */
 		m68ki_set_address_error_trap(m68k); /* auto-disable (see m68kcpu.h) */
 
 		/* Main loop.  Keep going until we run out of clock cycles */
@@ -902,8 +902,8 @@ static CPU_INIT( m68k )
 	m68k->int_ack_callback = irqcallback;
 
 	/* disable all MMUs */
-	m68k->has_pmmu	       = 0;
-	m68k->has_hmmu	       = 0;
+	m68k->has_pmmu         = 0;
+	m68k->has_hmmu         = 0;
 	m68k->pmmu_enabled     = 0;
 	m68k->hmmu_enabled     = 0;
 
@@ -1192,50 +1192,50 @@ static CPU_GET_INFO( m68k )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68ki_cpu_core);		break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 4;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(m68ki_cpu_core);       break;
+		case CPUINFO_INT_INPUT_LINES:                   info->i = 8;                            break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = -1;                           break;
+		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;               break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
+		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 10;                           break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 4;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 158;                          break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 16;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 24;                           break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 0;                            break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (m68k->virq_state >> 1) & 1;	break;
-		case CPUINFO_INT_INPUT_STATE + 2:				info->i = (m68k->virq_state >> 2) & 1;	break;
-		case CPUINFO_INT_INPUT_STATE + 3:				info->i = (m68k->virq_state >> 3) & 1;	break;
-		case CPUINFO_INT_INPUT_STATE + 4:				info->i = (m68k->virq_state >> 4) & 1;	break;
-		case CPUINFO_INT_INPUT_STATE + 5:				info->i = (m68k->virq_state >> 5) & 1;	break;
-		case CPUINFO_INT_INPUT_STATE + 6:				info->i = (m68k->virq_state >> 6) & 1;	break;
-		case CPUINFO_INT_INPUT_STATE + 7:				info->i = (m68k->virq_state >> 7) & 1;	break;
+		case CPUINFO_INT_INPUT_STATE + 0:               info->i = 0;  /* there is no level 0 */ break;
+		case CPUINFO_INT_INPUT_STATE + 1:               info->i = (m68k->virq_state >> 1) & 1;  break;
+		case CPUINFO_INT_INPUT_STATE + 2:               info->i = (m68k->virq_state >> 2) & 1;  break;
+		case CPUINFO_INT_INPUT_STATE + 3:               info->i = (m68k->virq_state >> 3) & 1;  break;
+		case CPUINFO_INT_INPUT_STATE + 4:               info->i = (m68k->virq_state >> 4) & 1;  break;
+		case CPUINFO_INT_INPUT_STATE + 5:               info->i = (m68k->virq_state >> 5) & 1;  break;
+		case CPUINFO_INT_INPUT_STATE + 6:               info->i = (m68k->virq_state >> 6) & 1;  break;
+		case CPUINFO_INT_INPUT_STATE + 7:               info->i = (m68k->virq_state >> 7) & 1;  break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(m68k);				break;
-		case CPUINFO_FCT_INIT:			/* set per-core */										break;
-		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(m68k);						break;
-		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(m68k);					break;
-		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(m68k);			break;
-		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(m68k);		break;
-		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(m68k);		break;
-		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(m68k);		break;
-		case CPUINFO_FCT_TRANSLATE:	    	info->translate = CPU_TRANSLATE_NAME(m68k);		break;
+		case CPUINFO_FCT_SET_INFO:      info->setinfo = CPU_SET_INFO_NAME(m68k);                break;
+		case CPUINFO_FCT_INIT:          /* set per-core */                                      break;
+		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(m68k);                     break;
+		case CPUINFO_FCT_EXECUTE:       info->execute = CPU_EXECUTE_NAME(m68k);                 break;
+		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(m68k);         break;
+		case CPUINFO_FCT_IMPORT_STATE:  info->import_state = CPU_IMPORT_STATE_NAME(m68k);       break;
+		case CPUINFO_FCT_EXPORT_STATE:  info->export_state = CPU_EXPORT_STATE_NAME(m68k);       break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(m68k);     break;
+		case CPUINFO_FCT_TRANSLATE:         info->translate = CPU_TRANSLATE_NAME(m68k);     break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &m68k->remaining_cycles; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							/* set per-core */						break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "4.95");				break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO+OG)"); break;
+		case CPUINFO_STR_NAME:                          /* set per-core */                      break;
+		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Motorola 68K");        break;
+		case CPUINFO_STR_VERSION:                   strcpy(info->s, "4.95");                break;
+		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO+OG)"); break;
 	}
 }
 
@@ -1260,7 +1260,7 @@ void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook)
 {
 	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
-    m68k->instruction_hook = ihook;
+	m68k->instruction_hook = ihook;
 }
 
 /****************************************************************************
@@ -1944,9 +1944,9 @@ static CPU_INIT( m68000 )
 	m68k->cyc_movem_l      = 3;
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
-	m68k->has_pmmu	       = 0;
-	m68k->has_hmmu	       = 0;
-	m68k->has_fpu	       = 0;
+	m68k->has_pmmu         = 0;
+	m68k->has_hmmu         = 0;
+	m68k->has_fpu          = 0;
 
 	define_state(device);
 }
@@ -1956,12 +1956,12 @@ CPU_GET_INFO( m68000 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68000);				break;
+		case CPUINFO_FCT_INIT:                      info->init = CPU_INIT_NAME(m68000);             break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68000");						break;
+		case CPUINFO_STR_NAME:                      strcpy(info->s, "68000");                       break;
 
-		default:									CPU_GET_INFO_CALL(m68k);						break;
+		default:                                    CPU_GET_INFO_CALL(m68k);                        break;
 	}
 }
 
@@ -1980,12 +1980,12 @@ CPU_GET_INFO( m68301 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68301);				break;
+		case CPUINFO_FCT_INIT:                      info->init = CPU_INIT_NAME(m68301);             break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68301");						break;
+		case CPUINFO_STR_NAME:                      strcpy(info->s, "68301");                       break;
 
-		default:									CPU_GET_INFO_CALL(m68k);						break;
+		default:                                    CPU_GET_INFO_CALL(m68k);                        break;
 	}
 }
 
@@ -2048,8 +2048,8 @@ static CPU_INIT( m68307 )
 	CPU_INIT_CALL(m68000);
 
 	/* basic CS logic, timers, mbus, serial logic
-       set via remappable register
-    */
+	   set via remappable register
+	*/
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init16_m68307(*m68k->program);
 
@@ -2108,10 +2108,10 @@ static WRITE16_HANDLER( m68307_internal_base_w )
 			base = (m68k->m68307_base & 0x0fff) << 12;
 			//mask = (m68k->m68307_base & 0xe000) >> 13;
 			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;
-        	m68k->internal->unmap_readwrite(base+0x000, base+0x04f);
-        	m68k->internal->unmap_readwrite(base+0x100, base+0x11f);
-        	m68k->internal->unmap_readwrite(base+0x120, base+0x13f);
-        	m68k->internal->unmap_readwrite(base+0x140, base+0x149);
+			m68k->internal->unmap_readwrite(base+0x000, base+0x04f);
+			m68k->internal->unmap_readwrite(base+0x100, base+0x11f);
+			m68k->internal->unmap_readwrite(base+0x120, base+0x13f);
+			m68k->internal->unmap_readwrite(base+0x140, base+0x149);
 
 			/* store new base address */
 			COMBINE_DATA(&m68k->m68307_base);
@@ -2149,18 +2149,18 @@ CPU_GET_INFO( m68307 )
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 24;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:    info->i = 24;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68307);				break;
+		case CPUINFO_FCT_INIT:                      info->init = CPU_INIT_NAME(m68307);             break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68307");						break;
+		case CPUINFO_STR_NAME:                      strcpy(info->s, "68307");                       break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m68307_internal_map); break;
 
 
-		default:									CPU_GET_INFO_CALL(m68k);						break;
+		default:                                    CPU_GET_INFO_CALL(m68k);                        break;
 	}
 }
 
@@ -2195,8 +2195,8 @@ static CPU_INIT( m68008 )
 	m68k->cyc_movem_l      = 3;
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
-	m68k->has_pmmu	       = 0;
-	m68k->has_fpu	       = 0;
+	m68k->has_pmmu         = 0;
+	m68k->has_fpu          = 0;
 
 	define_state(device);
 }
@@ -2206,16 +2206,16 @@ CPU_GET_INFO( m68008 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 20;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:    info->i = 20;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68008);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68008");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68008");               break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2224,16 +2224,16 @@ CPU_GET_INFO( m68008plcc )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 22;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                            break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:    info->i = 22;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68008);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68008");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68008");               break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2268,8 +2268,8 @@ static CPU_INIT( m68010 )
 	m68k->cyc_movem_l      = 3;
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 130;
-	m68k->has_pmmu	       = 0;
-	m68k->has_fpu	       = 0;
+	m68k->has_pmmu         = 0;
+	m68k->has_fpu          = 0;
 
 	define_state(device);
 }
@@ -2279,12 +2279,12 @@ CPU_GET_INFO( m68010 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68010);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68010);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68010");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68010");               break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2328,20 +2328,20 @@ CPU_GET_INFO( m68020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 20;                           break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 158;                          break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 32;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 32;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68020);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68020");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68020");               break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2352,8 +2352,8 @@ static CPU_INIT( m68020pmmu )
 
 	CPU_INIT_CALL(m68020);
 
-	m68k->has_pmmu	       = 1;
-	m68k->has_fpu	       = 1;
+	m68k->has_pmmu         = 1;
+	m68k->has_fpu          = 1;
 
 // hack alert: we use placement new to ensure we are properly initialized
 // because we live in the device state which is allocated as bytes
@@ -2367,12 +2367,12 @@ CPU_GET_INFO( m68020pmmu )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020pmmu);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68020pmmu);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68020, 68851");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68020, 68851");                break;
 
-		default:										CPU_GET_INFO_CALL(m68020);				break;
+		default:                                        CPU_GET_INFO_CALL(m68020);              break;
 	}
 }
 
@@ -2397,13 +2397,13 @@ CPU_GET_INFO( m68020hmmu )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:		info->init = CPU_INIT_NAME(m68020hmmu);			break;
-		case CPUINFO_FCT_TRANSLATE:	info->translate = CPU_TRANSLATE_NAME(m68khmmu);		break;
+		case CPUINFO_FCT_INIT:      info->init = CPU_INIT_NAME(m68020hmmu);         break;
+		case CPUINFO_FCT_TRANSLATE: info->translate = CPU_TRANSLATE_NAME(m68khmmu);     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:		strcpy(info->s, "68020, Apple HMMU");			break;
+		case CPUINFO_STR_NAME:      strcpy(info->s, "68020, Apple HMMU");           break;
 
-		default:			CPU_GET_INFO_CALL(m68020);				break;
+		default:            CPU_GET_INFO_CALL(m68020);              break;
 	}
 }
 
@@ -2437,8 +2437,8 @@ static CPU_INIT( m68ec020 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 0;
-	m68k->has_fpu	       = 0;
+	m68k->has_pmmu         = 0;
+	m68k->has_fpu          = 0;
 
 	define_state(device);
 }
@@ -2448,15 +2448,15 @@ CPU_GET_INFO( m68ec020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 24;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec020);					break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68ec020);                   break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC020");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68EC020");             break;
 
-		default:										CPU_GET_INFO_CALL(m68020);				break;
+		default:                                        CPU_GET_INFO_CALL(m68020);              break;
 	}
 }
 
@@ -2490,8 +2490,8 @@ static CPU_INIT( m68030 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 1;
-	m68k->has_fpu	       = 1;
+	m68k->has_pmmu         = 1;
+	m68k->has_fpu          = 1;
 
 	define_state(device);
 }
@@ -2501,20 +2501,20 @@ CPU_GET_INFO( m68030 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 20;                           break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 158;                          break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 32;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 32;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68030);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68030);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68030");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68030");               break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2549,8 +2549,8 @@ static CPU_INIT( m68ec030 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 0;		/* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
-	m68k->has_fpu	       = 1;
+	m68k->has_pmmu         = 0;     /* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
+	m68k->has_fpu          = 1;
 
 	define_state(device);
 }
@@ -2560,12 +2560,12 @@ CPU_GET_INFO( m68ec030 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec030);					break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68ec030);                   break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC030");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68EC030");             break;
 
-		default:										CPU_GET_INFO_CALL(m68030);				break;
+		default:                                        CPU_GET_INFO_CALL(m68030);              break;
 	}
 }
 
@@ -2599,8 +2599,8 @@ static CPU_INIT( m68040 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 1;
-	m68k->has_fpu	       = 1;
+	m68k->has_pmmu         = 1;
+	m68k->has_fpu          = 1;
 
 	define_state(device);
 }
@@ -2610,20 +2610,20 @@ CPU_GET_INFO( m68040 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 20;                           break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 158;                          break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 32;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 32;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68040);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68040);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68040");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68040");               break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2657,8 +2657,8 @@ static CPU_INIT( m68ec040 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 0;
-	m68k->has_fpu	       = 0;
+	m68k->has_pmmu         = 0;
+	m68k->has_fpu          = 0;
 
 	define_state(device);
 }
@@ -2668,12 +2668,12 @@ CPU_GET_INFO( m68ec040 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec040);					break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68ec040);                   break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC040");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68EC040");             break;
 
-		default:										CPU_GET_INFO_CALL(m68040);				break;
+		default:                                        CPU_GET_INFO_CALL(m68040);              break;
 	}
 }
 
@@ -2707,8 +2707,8 @@ static CPU_INIT( m68lc040 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 1;
-	m68k->has_fpu	       = 0;
+	m68k->has_pmmu         = 1;
+	m68k->has_fpu          = 0;
 
 	define_state(device);
 }
@@ -2718,12 +2718,12 @@ CPU_GET_INFO( m68lc040 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68lc040);					break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68lc040);                   break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "68LC040");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "68LC040");             break;
 
-		default:										CPU_GET_INFO_CALL(m68040);				break;
+		default:                                        CPU_GET_INFO_CALL(m68040);              break;
 	}
 }
 
@@ -2745,15 +2745,15 @@ CPU_GET_INFO( scc68070 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 32;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(scc68070);	break;
+		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(scc68070);   break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "SCC68070");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "SCC68070");            break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2872,22 +2872,22 @@ CPU_GET_INFO( m68340 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 20;                           break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 158;                          break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 32;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 32;                           break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(m68340_internal_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68340);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(m68340);                     break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Freescale 68340");				break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "Freescale 68340");             break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 
@@ -2931,20 +2931,20 @@ CPU_GET_INFO( mcf5206e )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 20;                           break;
+		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
+		case CPUINFO_INT_MAX_CYCLES:                    info->i = 158;                          break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 32;                           break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 32;                           break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(coldfire);						break;
+		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(coldfire);                       break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MCF5206E");			break;
+		case CPUINFO_STR_NAME:                          strcpy(info->s, "MCF5206E");            break;
 
-		default:										CPU_GET_INFO_CALL(m68k);				break;
+		default:                                        CPU_GET_INFO_CALL(m68k);                break;
 	}
 }
 

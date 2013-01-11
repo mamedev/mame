@@ -244,4 +244,3 @@ UINT32 cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32
 	output_set_value("pressed0", (~sw_option >> 11) & 1);
 	return 0;
 }
-

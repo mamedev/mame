@@ -167,8 +167,8 @@ maybe some sprite placement issues
 #include "sound/k054539.h"
 #include "includes/lethal.h"
 
-#define MAIN_CLOCK		XTAL_24MHz
-#define SOUND_CLOCK		XTAL_18_432MHz
+#define MAIN_CLOCK      XTAL_24MHz
+#define SOUND_CLOCK     XTAL_18_432MHz
 
 
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
@@ -179,13 +179,13 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 
 static const eeprom_interface eeprom_intf =
 {
-	7,			/* address bits */
-	8,			/* data bits */
-	"011000",		/* read command */
-	"011100",		/* write command */
-	"0100100000000",	/* erase command */
-	"0100000000000",	/* lock command */
-	"0100110000000" 	/* unlock command */
+	7,          /* address bits */
+	8,          /* data bits */
+	"011000",       /* read command */
+	"011100",       /* write command */
+	"0100100000000",    /* erase command */
+	"0100000000000",    /* lock command */
+	"0100110000000"     /* unlock command */
 };
 
 WRITE8_MEMBER(lethal_state::control2_w)
@@ -239,7 +239,7 @@ WRITE8_MEMBER(lethal_state::le_bankswitch_w)
 READ8_MEMBER(lethal_state::le_4800_r)
 {
 
-	if (m_cur_control2 & 0x10)	// RAM enable
+	if (m_cur_control2 & 0x10)  // RAM enable
 	{
 		return m_generic_paletteram_8[offset];
 	}
@@ -323,7 +323,7 @@ READ8_MEMBER(lethal_state::le_4800_r)
 WRITE8_MEMBER(lethal_state::le_4800_w)
 {
 
-	if (m_cur_control2 & 0x10)	// RAM enable
+	if (m_cur_control2 & 0x10)  // RAM enable
 	{
 		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	}
@@ -456,20 +456,20 @@ READ8_MEMBER(lethal_state::gunsaux_r)
 
 static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM				// work RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM             // work RAM
 	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE_LEGACY("k056832", k056832_w)
 	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE_LEGACY("k056832", k056832_b_w)
-	AM_RANGE(0x4080, 0x4080) AM_READNOP		// watchdog
+	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
 	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
-	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control)	// PCU1-PCU3 on the schematics
+	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control) // PCU1-PCU3 on the schematics
 	AM_RANGE(0x40d4, 0x40d7) AM_READ(guns_r)
 	AM_RANGE(0x40d8, 0x40d8) AM_READ_PORT("DSW")
 	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)		// top X bit of guns
+	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)     // top X bit of guns
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
-	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)		// BG color
+	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)     // BG color
 	AM_RANGE(0x4800, 0x7fff) AM_READWRITE(le_4800_r, le_4800_w) // bankswitched: RAM and registers
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
@@ -496,7 +496,7 @@ static INPUT_PORTS_START( lethalen )
 
 	PORT_START("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* it must be 1 ? */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* it must be 1 ? */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Language) )
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
 	MCFG_K053244_ADD("k053244", lethalej_k05324x_intf)
 MACHINE_CONFIG_END
 
-ROM_START( lethalen )	// US version UAE
+ROM_START( lethalen )   // US version UAE
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191uae01.u4",    0x10000,  0x40000,  CRC(dca340e3) SHA1(8efbba0e3a459bcfe23c75c584bf3a4ce25148bb) )
@@ -725,7 +725,7 @@ ROM_START( lethalen )	// US version UAE
 	ROM_LOAD( "lethalen.nv", 0x0000, 0x0080, CRC(6e7224e6) SHA1(86dea9262d55e58b573d397d0fea437c58728707) )
 ROM_END
 
-ROM_START( lethalenj )	// Japan version JAD
+ROM_START( lethalenj )  // Japan version JAD
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191jad01.u4",    0x10000,  0x40000, CRC(160a25c0) SHA1(1d3ed5a158e461a73c079fe24a8e9d5e2a87e126) )
@@ -762,7 +762,7 @@ ROM_START( lethalenj )	// Japan version JAD
 	ROM_LOAD( "lethalenj.nv", 0x0000, 0x0080, CRC(20b28f2f) SHA1(53d212f2c006729a01dfdb49cb36b67b9425172e) )
 ROM_END
 
-ROM_START( lethalenux )	// US version ?, proto / hack?, very different to other sets
+ROM_START( lethalenux ) // US version ?, proto / hack?, very different to other sets
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191xxx01.u4",    0x10000,  0x40000, CRC(a3b9e790) SHA1(868b422850be129952c8b11c3c4aa730d8ea1544) ) // hacked? fails rom test, verified on multiple boards
@@ -799,7 +799,7 @@ ROM_START( lethalenux )	// US version ?, proto / hack?, very different to other 
 	ROM_LOAD( "lethalenux.nv", 0x0000, 0x0080, CRC(5d69c39d) SHA1(e468df829ee5094792289f9166d7e39b638ab70d) )
 ROM_END
 
-ROM_START( lethaleneab )	// Euro ver. EAB
+ROM_START( lethaleneab )    // Euro ver. EAB
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191eab01.u4",    0x10000,  0x40000, CRC(d7ce111e) SHA1(e56137a0ba7664f09b5d05bb39ec6eb4d1e412c7) )
@@ -836,7 +836,7 @@ ROM_START( lethaleneab )	// Euro ver. EAB
 	ROM_LOAD( "lethaleneab.nv", 0x0000, 0x0080, CRC(4e9bb34d) SHA1(9502583bc9f5f6fc5bba333869398b24bf154b73) )
 ROM_END
 
-ROM_START( lethaleneae )	// Euro ver. EAE
+ROM_START( lethaleneae )    // Euro ver. EAE
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191eae01.u4",    0x10000,  0x40000, CRC(c6a3c6ac) SHA1(96a209a3a5b4af40af36bd7090c59a74f8c8df59) )
@@ -873,7 +873,7 @@ ROM_START( lethaleneae )	// Euro ver. EAE
 	ROM_LOAD( "lethaleneae.nv", 0x0000, 0x0080, CRC(eb369a67) SHA1(6c67294669614e96de5efb38372dbed435ee04d3) )
 ROM_END
 
-ROM_START( lethalenua )	// *might* be UAA (writes UA to Eeprom)
+ROM_START( lethalenua ) // *might* be UAA (writes UA to Eeprom)
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "6_usa.u4",    0x10000,  0x40000, CRC(ab6b8f16) SHA1(8de6c429a6e71144270e79d18ad47b5aad13fe04) )

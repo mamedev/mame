@@ -17,8 +17,8 @@ class pc4_state : public driver_device
 public:
 	pc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_beep(*this, BEEPER_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_beep(*this, BEEPER_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -65,4 +65,4 @@ public:
 	virtual void palette_init();
 };
 
-#endif	// _PC4_H_
+#endif  // _PC4_H_

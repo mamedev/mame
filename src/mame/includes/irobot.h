@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#define IR_TIMING				1		/* try to emulate MB and VG running time */
+#define IR_TIMING               1       /* try to emulate MB and VG running time */
 
 struct irmb_ops
 {
@@ -26,10 +26,10 @@ class irobot_state : public driver_device
 public:
 	irobot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") ,
+			m_nvram(*this, "nvram") ,
 		m_videoram(*this, "videoram"){ }
 
-	required_shared_ptr<UINT8>	m_nvram;
+	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_vg_clear;
 	UINT8 m_bufsel;

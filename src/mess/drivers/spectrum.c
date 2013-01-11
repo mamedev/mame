@@ -390,7 +390,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 	}
 
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
-    Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
+	Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
 	if (ioport("CONFIG")->read() & 0x80)
 		data ^= (0x40);
 
@@ -504,69 +504,69 @@ INPUT_PORTS_START( spectrum )
 	/* PORT_NAME =  KEY Mode    CAPS Mode    SYMBOL Mode   EXT Mode   EXT+Shift Mode   BASIC Mode  */
 	PORT_START("LINE0") /* 0xFEFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)		PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    \xC2\xA3   EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)	PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR('\xA3')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)		PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)		PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)     PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    \xC2\xA3   EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)    PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR('\xA3')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)     PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)      PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
 
 	PORT_START("LINE1") /* 0xFDFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a    A    STOP   READ      ~     NEW") PORT_CODE(KEYCODE_A)		PORT_CHAR('a') PORT_CHAR('A')// PORT_CHAR('~')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s    S    NOT    RESTORE   |     SAVE") PORT_CODE(KEYCODE_S)		PORT_CHAR('s') PORT_CHAR('S')// PORT_CHAR('|')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d    D    STEP   DATA      \\    DIM") PORT_CODE(KEYCODE_D)		PORT_CHAR('d') PORT_CHAR('D')// PORT_CHAR('\\')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f    F    TO     SGN       {     FOR") PORT_CODE(KEYCODE_F)		PORT_CHAR('f') PORT_CHAR('F')// PORT_CHAR('{')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g    G    THEN   ABS       }     GOTO") PORT_CODE(KEYCODE_G)		PORT_CHAR('g') PORT_CHAR('G')// PORT_CHAR('}')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a    A    STOP   READ      ~     NEW") PORT_CODE(KEYCODE_A)      PORT_CHAR('a') PORT_CHAR('A')// PORT_CHAR('~')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s    S    NOT    RESTORE   |     SAVE") PORT_CODE(KEYCODE_S)     PORT_CHAR('s') PORT_CHAR('S')// PORT_CHAR('|')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d    D    STEP   DATA      \\    DIM") PORT_CODE(KEYCODE_D)      PORT_CHAR('d') PORT_CHAR('D')// PORT_CHAR('\\')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f    F    TO     SGN       {     FOR") PORT_CODE(KEYCODE_F)      PORT_CHAR('f') PORT_CHAR('F')// PORT_CHAR('{')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g    G    THEN   ABS       }     GOTO") PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G')// PORT_CHAR('}')
 
 	PORT_START("LINE2") /* 0xFBFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q    Q    <=     SIN      ASN      PLOT") PORT_CODE(KEYCODE_Q)	PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w    W    <>     COS      ACS      DRAW") PORT_CODE(KEYCODE_W)	PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e    E    >=     TAN      ATN      REM") PORT_CODE(KEYCODE_E)	PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r    R    <      INT      VERIFY   RUN") PORT_CODE(KEYCODE_R)	PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR('<')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t    T    >      RND      MERGE    RAND") PORT_CODE(KEYCODE_T)	PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR('>')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q    Q    <=     SIN      ASN      PLOT") PORT_CODE(KEYCODE_Q)   PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w    W    <>     COS      ACS      DRAW") PORT_CODE(KEYCODE_W)   PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e    E    >=     TAN      ATN      REM") PORT_CODE(KEYCODE_E)    PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r    R    <      INT      VERIFY   RUN") PORT_CODE(KEYCODE_R)    PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR('<')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t    T    >      RND      MERGE    RAND") PORT_CODE(KEYCODE_T)   PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR('>')
 
 	/* interface II uses this port for joystick */
 	PORT_START("LINE3") /* 0xF7FE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   EDIT       !    BLUE     DEF FN") PORT_CODE(KEYCODE_1)	PORT_CHAR('1') PORT_CHAR('\xD7') PORT_CHAR('!')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN") PORT_CODE(KEYCODE_2)		PORT_CHAR('2') PORT_CHAR('\xD7') PORT_CHAR('@')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE") PORT_CODE(KEYCODE_3)		PORT_CHAR('3') PORT_CHAR('\xD7') PORT_CHAR('#')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   INV VID    $    GREEN    OPEN#") PORT_CODE(KEYCODE_4)	PORT_CHAR('4') PORT_CHAR('\xD7') PORT_CHAR('$')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Left       %    CYAN     CLOSE#") PORT_CODE(KEYCODE_5)	PORT_CHAR('5') PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CHAR('%')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   EDIT       !    BLUE     DEF FN") PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR('\xD7') PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN") PORT_CODE(KEYCODE_2)       PORT_CHAR('2') PORT_CHAR('\xD7') PORT_CHAR('@')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE") PORT_CODE(KEYCODE_3)     PORT_CHAR('3') PORT_CHAR('\xD7') PORT_CHAR('#')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   INV VID    $    GREEN    OPEN#") PORT_CODE(KEYCODE_4)    PORT_CHAR('4') PORT_CHAR('\xD7') PORT_CHAR('$')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Left       %    CYAN     CLOSE#") PORT_CODE(KEYCODE_5)   PORT_CHAR('5') PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CHAR('%')
 
 	/* protek clashes with interface II! uses 5 = left, 6 = down, 7 = up, 8 = right, 0 = fire */
 	PORT_START("LINE4") /* 0xEFFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   DEL        _    BLACK    FORMAT") PORT_CODE(KEYCODE_0)	PORT_CHAR('0') PORT_CHAR(8) PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   GRAPH      )             POINT") PORT_CODE(KEYCODE_9)	PORT_CHAR('9') PORT_CHAR('\xD7') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Right      (             CAT") PORT_CODE(KEYCODE_8)		PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR('(')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up         '    WHITE    ERASE") PORT_CODE(KEYCODE_7)	PORT_CHAR('7') PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('\'')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Down       &    YELLOW   MOVE") PORT_CODE(KEYCODE_6)		PORT_CHAR('6') PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR('&')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   DEL        _    BLACK    FORMAT") PORT_CODE(KEYCODE_0)   PORT_CHAR('0') PORT_CHAR(8) PORT_CHAR('_')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   GRAPH      )             POINT") PORT_CODE(KEYCODE_9)    PORT_CHAR('9') PORT_CHAR('\xD7') PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Right      (             CAT") PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR('(')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up         '    WHITE    ERASE") PORT_CODE(KEYCODE_7)    PORT_CHAR('7') PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('\'')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Down       &    YELLOW   MOVE") PORT_CODE(KEYCODE_6)     PORT_CHAR('6') PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR('&')
 
 	PORT_START("LINE5") /* 0xDFFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p    P    \"     TAB      (c)    PRINT") PORT_CODE(KEYCODE_P)	PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o    O    ;      PEEK     OUT    POKE") PORT_CODE(KEYCODE_O)		PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(';')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i    I    AT     CODE     IN     INPUT") PORT_CODE(KEYCODE_I)	PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u    U    OR     CHR$     ]      IF") PORT_CODE(KEYCODE_U)		PORT_CHAR('u') PORT_CHAR('U')// PORT_CHAR(']')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y    Y    AND    STR$     [      RETURN") PORT_CODE(KEYCODE_Y)	PORT_CHAR('y') PORT_CHAR('Y')// PORT_CHAR('[')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p    P    \"     TAB      (c)    PRINT") PORT_CODE(KEYCODE_P)    PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o    O    ;      PEEK     OUT    POKE") PORT_CODE(KEYCODE_O)     PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(';')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i    I    AT     CODE     IN     INPUT") PORT_CODE(KEYCODE_I)    PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u    U    OR     CHR$     ]      IF") PORT_CODE(KEYCODE_U)       PORT_CHAR('u') PORT_CHAR('U')// PORT_CHAR(']')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y    Y    AND    STR$     [      RETURN") PORT_CODE(KEYCODE_Y)   PORT_CHAR('y') PORT_CHAR('Y')// PORT_CHAR('[')
 
 	PORT_START("LINE6") /* 0xBFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l    L    =      USR      ATTR     LET") PORT_CODE(KEYCODE_L)	PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR('=')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k    K    +      LEN      SCREEN$  LIST") PORT_CODE(KEYCODE_K)	PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR('+')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j    J    -      VAL      VAL$     LOAD") PORT_CODE(KEYCODE_J)	PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR('-')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h    H    ^      SQR      CIRCLE   GOSUB") PORT_CODE(KEYCODE_H)	PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR('^')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l    L    =      USR      ATTR     LET") PORT_CODE(KEYCODE_L)    PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR('=')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k    K    +      LEN      SCREEN$  LIST") PORT_CODE(KEYCODE_K)   PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR('+')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j    J    -      VAL      VAL$     LOAD") PORT_CODE(KEYCODE_J)   PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR('-')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h    H    ^      SQR      CIRCLE   GOSUB") PORT_CODE(KEYCODE_H)  PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR('^')
 
 	PORT_START("LINE7") /* 0x7FFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SYMBOL SHIFT") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m    M    .      PI       INVERSE  PAUSE") PORT_CODE(KEYCODE_M)	PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR('.')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n    N    ,      INKEY$   OVER     NEXT") PORT_CODE(KEYCODE_N)	PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(',')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b    B    *      BIN      BRIGHT   BORDER") PORT_CODE(KEYCODE_B)	PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m    M    .      PI       INVERSE  PAUSE") PORT_CODE(KEYCODE_M)  PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR('.')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n    N    ,      INKEY$   OVER     NEXT") PORT_CODE(KEYCODE_N)   PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(',')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b    B    *      BIN      BRIGHT   BORDER") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
 
 	PORT_START("NMI")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x80, 0x00, "Hardware Version" )
-	PORT_CONFSETTING(	0x00, "Issue 2" )
-	PORT_CONFSETTING(	0x80, "Issue 3" )
+	PORT_CONFSETTING(   0x00, "Issue 2" )
+	PORT_CONFSETTING(   0x80, "Issue 3" )
 	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( spec_joys )
@@ -617,9 +617,9 @@ DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 
 	switch (machine().device<ram_device>(RAM_TAG)->size())
 	{
-	    case 48*1024:
+		case 48*1024:
 		space.install_ram(0x8000, 0xffff, NULL); // Fall through
-	    case 16*1024:
+		case 16*1024:
 		space.install_ram(0x5b00, 0x7fff, NULL);
 	}
 }
@@ -633,15 +633,15 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum)
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	96,                 /* 96 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( spectrum )
@@ -702,7 +702,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 
 	MCFG_SCREEN_RAW_PARAMS(X1 / 2, 448, 0, 352,  312, 0, 296)
@@ -740,10 +740,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED( spectrum, spectrum_common )
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)				// This configuration is verified only for the original ZX Spectrum.
-	MCFG_RAM_DEFAULT_SIZE("48K")		// It's likely, but still to be checked, that many clones were produced only
-	MCFG_RAM_EXTRA_OPTIONS("16K")		// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
-	MCFG_RAM_DEFAULT_VALUE(0xff)		// available via bankswitching.
+	MCFG_RAM_ADD(RAM_TAG)               // This configuration is verified only for the original ZX Spectrum.
+	MCFG_RAM_DEFAULT_SIZE("48K")        // It's likely, but still to be checked, that many clones were produced only
+	MCFG_RAM_EXTRA_OPTIONS("16K")       // in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
+	MCFG_RAM_DEFAULT_VALUE(0xff)        // available via bankswitching.
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -833,7 +833,7 @@ ROM_START(hc85)
 ROM_END
 
 ROM_START( hc88 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "hc88.bin", 0x0000, 0x0800, CRC(33be5134) SHA1(b15a6e7085710de8b818e42d329707cb737627e3))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
@@ -869,17 +869,17 @@ ROM_START(jet)
 ROM_END
 
 ROM_START( cobrasp )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "V1")
 	ROMX_LOAD( "boot64k_v1.bin", 0x0000, 0x0800, CRC(a54aae6d) SHA1(8f5134ce24aea59065ed166ad79e864e17ce812f), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS(1, "v2", "V2")
+	ROM_SYSTEM_BIOS(1, "v2", "V2")
 	ROMX_LOAD( "boot64k_v2.bin", 0x0000, 0x0800, CRC(ee91cc89) SHA1(37dea7fe0734068adf99b91fdcbf3119095c350d), ROM_BIOS(2))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( cobra80 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_SYSTEM_BIOS(0, "v1", "V1")
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "v1", "V1")
 	ROMX_LOAD( "boot80k_v1.bin", 0x0000, 0x0800, CRC(f42d2342) SHA1(8aa1b3b056e311674a051ffc6a49af60cae409f3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v2", "V2")
 	ROMX_LOAD( "boot80k_v2.bin", 0x0000, 0x0800, CRC(df6bd954) SHA1(5b858b59e697d0368ea631ead14f5b2aa7954ccd), ROM_BIOS(2))
@@ -1005,35 +1005,35 @@ ROM_START(zvezda)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1982, spectrum, 0,        0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Sinclair Research Ltd",	"ZX Spectrum" , 0)
-COMP( 1987, spec80k,  spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"ZX Spectrum 80K" , GAME_UNOFFICIAL)
-COMP( 1995, specide,  spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"ZX Spectrum IDE" , GAME_UNOFFICIAL)
-COMP( 1986, inves,    spectrum, 0,		spectrum,		spec_plus, spectrum_state,	spectrum,	"Investronica",	"Inves Spectrum 48K+" , 0)
-COMP( 1985, tk90x,    spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Micro Digital",	"TK 90X Color Computer" , 0)
-COMP( 1986, tk95,     spectrum, 0,		spectrum,		spec_plus, spectrum_state,	spectrum,	"Micro Digital",	"TK 95 Color Computer" , 0)
-COMP( 1985, hc85,     spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"ICE-Felix",	"HC-85" , 0)
-COMP( 1988, hc88,     spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"ICE-Felix",	"HC-88" , GAME_NOT_WORKING)
-COMP( 1990, hc90,     spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"ICE-Felix",	"HC-90" , 0)
-COMP( 1991, hc91,     spectrum, 0,		spectrum,		spec_plus, spectrum_state,	spectrum,	"ICE-Felix",	"HC-91" , 0)
-COMP( 1988, cobrasp,   spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"ITCI",	"Cobra (ITCI)" , GAME_NOT_WORKING)
-COMP( 1988, cobra80,  spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"ITCI",	"Cobra 80K (ITCI)" , GAME_NOT_WORKING)
-COMP( 1987, cip01,    spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Electronica",	"CIP-01" , 0)	// keyboard should be spectrum, but image was not clear
-COMP( 1988, cip03,    spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Electronica",	"CIP-03" , 0)	// keyboard should be spectrum, but image was not clear
-COMP( 1990, jet,      spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Electromagnetica",	"JET" , 0)	// keyboard should be spectrum, but image was not clear
-COMP( 1987, dgama87,  spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik Gama 87" , 0)
-COMP( 1988, dgama88,  spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik Gama 88" , 0)
-COMP( 1989, dgama89,  spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik Gama 89" , 0)
-COMP( 1990, didakt90, spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik 90" , 0)
-COMP( 1991, didakm91, spectrum, 0,		spectrum,		spec_plus, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik M 91" , 0)
-COMP( 1992, didakm92, spectrum, 0,		spectrum,		spec_plus, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik M 92" , 0)
-COMP( 1992, didaktk,  spectrum, 0,		spectrum,		spec_plus, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik Kompakt" , 0)
-COMP( 1993, didakm93, spectrum, 0,		spectrum,		spec_plus, spectrum_state,	spectrum,	"Didaktik Skalica",	"Didaktik M 93" , 0)
-COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"Amaterske RADIO",	"Mistrum" , 0)	// keyboard could be spectrum in some models (since it was a build-yourself design)
-COMP( 1990, blitzs,   spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Blic" , 0)		// no keyboard images found
-COMP( 1990, byte,     spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Byte" , 0)		// no keyboard images found
-COMP( 199?, orizon,   spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Orizon-Micro" , 0)		// no keyboard images found
-COMP( 1993, quorum48, spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Kvorum 48K" , GAME_NOT_WORKING)
-COMP( 1993, magic6,   spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Magic 6" , GAME_NOT_WORKING)	// keyboard should be spectrum, but image was not clear
-COMP( 1990, compani1, spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Kompanion 1" , 0)		// no keyboard images found
-COMP( 1990, spektrbk, spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Spektr BK-001" , 0)
-COMP( 1990, zvezda,   spectrum, 0,		spectrum,		spectrum, spectrum_state,	spectrum,	"<unknown>",	"Zvezda" , 0)
+COMP( 1982, spectrum, 0,        0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Sinclair Research Ltd",    "ZX Spectrum" , 0)
+COMP( 1987, spec80k,  spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "ZX Spectrum 80K" , GAME_UNOFFICIAL)
+COMP( 1995, specide,  spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "ZX Spectrum IDE" , GAME_UNOFFICIAL)
+COMP( 1986, inves,    spectrum, 0,      spectrum,       spec_plus, spectrum_state,  spectrum,   "Investronica", "Inves Spectrum 48K+" , 0)
+COMP( 1985, tk90x,    spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Micro Digital",    "TK 90X Color Computer" , 0)
+COMP( 1986, tk95,     spectrum, 0,      spectrum,       spec_plus, spectrum_state,  spectrum,   "Micro Digital",    "TK 95 Color Computer" , 0)
+COMP( 1985, hc85,     spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "ICE-Felix",    "HC-85" , 0)
+COMP( 1988, hc88,     spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "ICE-Felix",    "HC-88" , GAME_NOT_WORKING)
+COMP( 1990, hc90,     spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "ICE-Felix",    "HC-90" , 0)
+COMP( 1991, hc91,     spectrum, 0,      spectrum,       spec_plus, spectrum_state,  spectrum,   "ICE-Felix",    "HC-91" , 0)
+COMP( 1988, cobrasp,   spectrum, 0,     spectrum,       spectrum, spectrum_state,   spectrum,   "ITCI", "Cobra (ITCI)" , GAME_NOT_WORKING)
+COMP( 1988, cobra80,  spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "ITCI", "Cobra 80K (ITCI)" , GAME_NOT_WORKING)
+COMP( 1987, cip01,    spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Electronica",  "CIP-01" , 0)   // keyboard should be spectrum, but image was not clear
+COMP( 1988, cip03,    spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Electronica",  "CIP-03" , 0)   // keyboard should be spectrum, but image was not clear
+COMP( 1990, jet,      spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Electromagnetica", "JET" , 0)  // keyboard should be spectrum, but image was not clear
+COMP( 1987, dgama87,  spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Didaktik Skalica", "Didaktik Gama 87" , 0)
+COMP( 1988, dgama88,  spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Didaktik Skalica", "Didaktik Gama 88" , 0)
+COMP( 1989, dgama89,  spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Didaktik Skalica", "Didaktik Gama 89" , 0)
+COMP( 1990, didakt90, spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Didaktik Skalica", "Didaktik 90" , 0)
+COMP( 1991, didakm91, spectrum, 0,      spectrum,       spec_plus, spectrum_state,  spectrum,   "Didaktik Skalica", "Didaktik M 91" , 0)
+COMP( 1992, didakm92, spectrum, 0,      spectrum,       spec_plus, spectrum_state,  spectrum,   "Didaktik Skalica", "Didaktik M 92" , 0)
+COMP( 1992, didaktk,  spectrum, 0,      spectrum,       spec_plus, spectrum_state,  spectrum,   "Didaktik Skalica", "Didaktik Kompakt" , 0)
+COMP( 1993, didakm93, spectrum, 0,      spectrum,       spec_plus, spectrum_state,  spectrum,   "Didaktik Skalica", "Didaktik M 93" , 0)
+COMP( 1988, mistrum,  spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "Amaterske RADIO",  "Mistrum" , 0)  // keyboard could be spectrum in some models (since it was a build-yourself design)
+COMP( 1990, blitzs,   spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Blic" , 0)     // no keyboard images found
+COMP( 1990, byte,     spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Byte" , 0)     // no keyboard images found
+COMP( 199?, orizon,   spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Orizon-Micro" , 0)     // no keyboard images found
+COMP( 1993, quorum48, spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Kvorum 48K" , GAME_NOT_WORKING)
+COMP( 1993, magic6,   spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Magic 6" , GAME_NOT_WORKING)   // keyboard should be spectrum, but image was not clear
+COMP( 1990, compani1, spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Kompanion 1" , 0)      // no keyboard images found
+COMP( 1990, spektrbk, spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Spektr BK-001" , 0)
+COMP( 1990, zvezda,   spectrum, 0,      spectrum,       spectrum, spectrum_state,   spectrum,   "<unknown>",    "Zvezda" , 0)

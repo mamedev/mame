@@ -20,68 +20,68 @@
 WRITE8_HANDLER(pc1403_asic_write)
 {
 	pc1403_state *state = space.machine().driver_data<pc1403_state>();
-    state->m_asic[offset>>9]=data;
-    switch( (offset>>9) ){
-    case 0/*0x3800*/:
+	state->m_asic[offset>>9]=data;
+	switch( (offset>>9) ){
+	case 0/*0x3800*/:
 	// output
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
-    case 1/*0x3a00*/:
+	case 1/*0x3a00*/:
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
-    case 2/*0x3c00*/:
+	case 2/*0x3c00*/:
 	state->membank("bank1")->set_base(state->memregion("user1")->base()+((data&7)<<14));
 	logerror ("asic write %.4x %.2x\n",offset, data);
 	break;
-    case 3/*0x3e00*/: break;
-    }
+	case 3/*0x3e00*/: break;
+	}
 }
 
 READ8_HANDLER(pc1403_asic_read)
 {
 	pc1403_state *state = space.machine().driver_data<pc1403_state>();
-    UINT8 data=state->m_asic[offset>>9];
-    switch( (offset>>9) ){
-    case 0: case 1: case 2:
+	UINT8 data=state->m_asic[offset>>9];
+	switch( (offset>>9) ){
+	case 0: case 1: case 2:
 	logerror ("asic read %.4x %.2x\n",offset, data);
 	break;
-    }
-    return data;
+	}
+	return data;
 }
 
 void pc1403_outa(device_t *device, int data)
 {
 	pc1403_state *state = device->machine().driver_data<pc1403_state>();
-    state->m_outa=data;
+	state->m_outa=data;
 }
 
 int pc1403_ina(device_t *device)
 {
 	pc1403_state *state = device->machine().driver_data<pc1403_state>();
-    UINT8 data=state->m_outa;
+	UINT8 data=state->m_outa;
 
-    if (state->m_asic[3] & 0x01)
+	if (state->m_asic[3] & 0x01)
 		data |= device->machine().root_device().ioport("KEY0")->read();
 
-    if (state->m_asic[3] & 0x02)
+	if (state->m_asic[3] & 0x02)
 		data |= device->machine().root_device().ioport("KEY1")->read();
 
-    if (state->m_asic[3] & 0x04)
+	if (state->m_asic[3] & 0x04)
 		data |= device->machine().root_device().ioport("KEY2")->read();
 
-    if (state->m_asic[3] & 0x08)
+	if (state->m_asic[3] & 0x08)
 		data |= device->machine().root_device().ioport("KEY3")->read();
 
-    if (state->m_asic[3] & 0x10)
+	if (state->m_asic[3] & 0x10)
 		data |= device->machine().root_device().ioport("KEY4")->read();
 
-    if (state->m_asic[3] & 0x20)
+	if (state->m_asic[3] & 0x20)
 		data |= device->machine().root_device().ioport("KEY5")->read();
 
-    if (state->m_asic[3] & 0x40)
+	if (state->m_asic[3] & 0x40)
 		data |= device->machine().root_device().ioport("KEY6")->read();
 
-    if (state->m_outa & 0x01)
+	if (state->m_outa & 0x01)
 	{
 		data |= state->ioport("KEY7")->read();
 
@@ -90,25 +90,25 @@ int pc1403_ina(device_t *device)
 			data |= 0x02;
 	}
 
-    if (state->m_outa & 0x02)
+	if (state->m_outa & 0x02)
 		data |= device->machine().root_device().ioport("KEY8")->read();
 
-    if (state->m_outa & 0x04)
+	if (state->m_outa & 0x04)
 		data |= device->machine().root_device().ioport("KEY9")->read();
 
-    if (state->m_outa & 0x08)
+	if (state->m_outa & 0x08)
 		data |= device->machine().root_device().ioport("KEY10")->read();
 
-    if (state->m_outa & 0x10)
+	if (state->m_outa & 0x10)
 		data |= device->machine().root_device().ioport("KEY11")->read();
 
-    if (state->m_outa & 0x20)
+	if (state->m_outa & 0x20)
 		data |= device->machine().root_device().ioport("KEY12")->read();
 
-    if (state->m_outa & 0x40)
+	if (state->m_outa & 0x40)
 		data |= device->machine().root_device().ioport("KEY13")->read();
 
-    return data;
+	return data;
 }
 
 #if 0
@@ -127,7 +127,7 @@ int pc1403_inb(void)
 void pc1403_outc(device_t *device, int data)
 {
 	pc1403_state *state = device->machine().driver_data<pc1403_state>();
-    state->m_portc = data;
+	state->m_portc = data;
 //    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->machine().device("maincpu")->safe_pc(), data);
 }
 

@@ -145,7 +145,7 @@ INLINE void tst_di( konami_state *cpustate )
 /* $0E JMP direct ----- */
 INLINE void jmp_di( konami_state *cpustate )
 {
-    DIRECT(cpustate);
+	DIRECT(cpustate);
 	PCD=EAD;
 }
 
@@ -177,7 +177,7 @@ INLINE void sync( konami_state *cpustate )
 	cpustate->int_state |= KONAMI_SYNC;
 	check_irq_lines(cpustate);
 	/* if KONAMI_SYNC has not been cleared by check_irq_lines,
-     * stop execution until the interrupt lines change. */
+	 * stop execution until the interrupt lines change. */
 	if( (cpustate->int_state & KONAMI_SYNC) && cpustate->icount > 0 )
 		cpustate->icount = 0;
 }
@@ -225,7 +225,7 @@ INLINE void daa( konami_state *cpustate )
 	UINT16 t;
 	t = A;
 	if (CC & CC_H) t+=0x06;
-	if ((t&0x0f)>9) t+=0x06;		/* ASG -- this code is broken! $66+$99=$FF -> DAA should = $65, we get $05! */
+	if ((t&0x0f)>9) t+=0x06;        /* ASG -- this code is broken! $66+$99=$FF -> DAA should = $65, we get $05! */
 	if (CC & CC_C) t+=0x60;
 	if ((t&0xf0)>0x90) t+=0x60;
 	if (t&0x100) SEC;
@@ -300,7 +300,7 @@ INLINE void bra( konami_state *cpustate )
 }
 
 /* $21 BRN relative ----- */
-static UINT8 konami_brn_t;	// hack around GCC 4.6 error because we need the side effects of IMMBYTE
+static UINT8 konami_brn_t;  // hack around GCC 4.6 error because we need the side effects of IMMBYTE
 INLINE void brn( konami_state *cpustate )
 {
 	IMMBYTE(cpustate, konami_brn_t);
@@ -595,7 +595,7 @@ INLINE void rti( konami_state *cpustate )
 	PULLBYTE(cpustate, CC);
 	if( CC & CC_E ) /* entire state saved? */
 	{
-        cpustate->icount -= 9;
+		cpustate->icount -= 9;
 		PULLBYTE(cpustate, A);
 		PULLBYTE(cpustate, B);
 		PULLBYTE(cpustate, DP);
@@ -614,11 +614,11 @@ INLINE void cwai( konami_state *cpustate )
 	IMMBYTE(cpustate, t);
 	CC &= t;
 	/*
-     * CWAI stacks the entire machine state on the hardware stack,
-     * then waits for an interrupt; when the interrupt is taken
-     * later, the state is *not* saved again after CWAI.
-     */
-	CC |= CC_E; 		/* HJB 990225: save entire state */
+	 * CWAI stacks the entire machine state on the hardware stack,
+	 * then waits for an interrupt; when the interrupt is taken
+	 * later, the state is *not* saved again after CWAI.
+	 */
+	CC |= CC_E;         /* HJB 990225: save entire state */
 	PUSHWORD(cpustate, pPC);
 	PUSHWORD(cpustate, pU);
 	PUSHWORD(cpustate, pY);
@@ -647,7 +647,7 @@ INLINE void mul( konami_state *cpustate )
 /* $3F SWI (SWI2 SWI3) absolute indirect ----- */
 INLINE void swi( konami_state *cpustate )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(cpustate, pPC);
 	PUSHWORD(cpustate, pU);
 	PUSHWORD(cpustate, pY);
@@ -656,14 +656,14 @@ INLINE void swi( konami_state *cpustate )
 	PUSHBYTE(cpustate, B);
 	PUSHBYTE(cpustate, A);
 	PUSHBYTE(cpustate, CC);
-	CC |= CC_IF | CC_II;	/* inhibit FIRQ and IRQ */
+	CC |= CC_IF | CC_II;    /* inhibit FIRQ and IRQ */
 	PCD=RM16(cpustate, 0xfffa);
 }
 
 /* $103F SWI2 absolute indirect ----- */
 INLINE void swi2( konami_state *cpustate )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(cpustate, pPC);
 	PUSHWORD(cpustate, pU);
 	PUSHWORD(cpustate, pY);
@@ -671,14 +671,14 @@ INLINE void swi2( konami_state *cpustate )
 	PUSHBYTE(cpustate, DP);
 	PUSHBYTE(cpustate, B);
 	PUSHBYTE(cpustate, A);
-    PUSHBYTE(cpustate, CC);
+	PUSHBYTE(cpustate, CC);
 	PCD=RM16(cpustate, 0xfff4);
 }
 
 /* $113F SWI3 absolute indirect ----- */
 INLINE void swi3( konami_state *cpustate )
 {
-	CC |= CC_E; 			/* HJB 980225: save entire state */
+	CC |= CC_E;             /* HJB 980225: save entire state */
 	PUSHWORD(cpustate, pPC);
 	PUSHWORD(cpustate, pU);
 	PUSHWORD(cpustate, pY);
@@ -686,7 +686,7 @@ INLINE void swi3( konami_state *cpustate )
 	PUSHBYTE(cpustate, DP);
 	PUSHBYTE(cpustate, B);
 	PUSHBYTE(cpustate, A);
-    PUSHBYTE(cpustate, CC);
+	PUSHBYTE(cpustate, CC);
 	PCD=RM16(cpustate, 0xfff2);
 }
 
@@ -1165,7 +1165,7 @@ INLINE void suba_im( konami_state *cpustate )
 /* $81 CMPA immediate ?**** */
 INLINE void cmpa_im( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
@@ -1175,7 +1175,7 @@ INLINE void cmpa_im( konami_state *cpustate )
 /* $82 SBCA immediate ?**** */
 INLINE void sbca_im( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(cpustate, t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -1386,7 +1386,7 @@ INLINE void sty_im( konami_state *cpustate )
 /* $90 SUBA direct ?**** */
 INLINE void suba_di( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
@@ -1397,7 +1397,7 @@ INLINE void suba_di( konami_state *cpustate )
 /* $91 CMPA direct ?**** */
 INLINE void cmpa_di( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
@@ -1407,7 +1407,7 @@ INLINE void cmpa_di( konami_state *cpustate )
 /* $92 SBCA direct ?**** */
 INLINE void sbca_di( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(cpustate, t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -1635,7 +1635,7 @@ INLINE void cmpa_ix( konami_state *cpustate )
 /* $a2 SBCA indexed ?**** */
 INLINE void sbca_ix( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	t = RM(cpustate, EAD);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -1830,7 +1830,7 @@ INLINE void sty_ix( konami_state *cpustate )
 /* $b0 SUBA extended ?**** */
 INLINE void suba_ex( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
@@ -1841,7 +1841,7 @@ INLINE void suba_ex( konami_state *cpustate )
 /* $b1 CMPA extended ?**** */
 INLINE void cmpa_ex( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
@@ -1851,7 +1851,7 @@ INLINE void cmpa_ex( konami_state *cpustate )
 /* $b2 SBCA extended ?**** */
 INLINE void sbca_ex( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(cpustate, t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2057,7 +2057,7 @@ INLINE void sty_ex( konami_state *cpustate )
 /* $c0 SUBB immediate ?**** */
 INLINE void subb_im( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
@@ -2068,7 +2068,7 @@ INLINE void subb_im( konami_state *cpustate )
 /* $c1 CMPB immediate ?**** */
 INLINE void cmpb_im( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC; SET_FLAGS8(B,t,r);
@@ -2077,7 +2077,7 @@ INLINE void cmpb_im( konami_state *cpustate )
 /* $c2 SBCB immediate ?**** */
 INLINE void sbcb_im( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	IMMBYTE(cpustate, t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2194,7 +2194,7 @@ INLINE void std_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-    IMM16(cpustate);
+	IMM16(cpustate);
 	WM16(cpustate, EAD,&pD);
 }
 
@@ -2221,7 +2221,7 @@ INLINE void stu_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(U);
-    IMM16(cpustate);
+	IMM16(cpustate);
 	WM16(cpustate, EAD,&pU);
 }
 
@@ -2231,14 +2231,14 @@ INLINE void sts_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(S);
-    IMM16(cpustate);
+	IMM16(cpustate);
 	WM16(cpustate, EAD,&pS);
 }
 
 /* $d0 SUBB direct ?**** */
 INLINE void subb_di( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
@@ -2249,7 +2249,7 @@ INLINE void subb_di( konami_state *cpustate )
 /* $d1 CMPB direct ?**** */
 INLINE void cmpb_di( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
@@ -2259,7 +2259,7 @@ INLINE void cmpb_di( konami_state *cpustate )
 /* $d2 SBCB direct ?**** */
 INLINE void sbcb_di( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	DIRBYTE(cpustate, t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2374,7 +2374,7 @@ INLINE void std_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-    DIRECT(cpustate);
+	DIRECT(cpustate);
 	WM16(cpustate, EAD,&pD);
 }
 
@@ -2416,7 +2416,7 @@ INLINE void sts_di( konami_state *cpustate )
 /* $e0 SUBB indexed ?**** */
 INLINE void subb_ix( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	t = RM(cpustate, EAD);
 	r = B - t;
 	CLR_NZVC;
@@ -2427,7 +2427,7 @@ INLINE void subb_ix( konami_state *cpustate )
 /* $e1 CMPB indexed ?**** */
 INLINE void cmpb_ix( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	t = RM(cpustate, EAD);
 	r = B - t;
 	CLR_NZVC;
@@ -2437,7 +2437,7 @@ INLINE void cmpb_ix( konami_state *cpustate )
 /* $e2 SBCB indexed ?**** */
 INLINE void sbcb_ix( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	t = RM(cpustate, EAD);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2582,7 +2582,7 @@ INLINE void sts_ix( konami_state *cpustate )
 /* $f0 SUBB extended ?**** */
 INLINE void subb_ex( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
@@ -2593,7 +2593,7 @@ INLINE void subb_ex( konami_state *cpustate )
 /* $f1 CMPB extended ?**** */
 INLINE void cmpb_ex( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
@@ -2603,7 +2603,7 @@ INLINE void cmpb_ex( konami_state *cpustate )
 /* $f2 SBCB extended ?**** */
 INLINE void sbcb_ex( konami_state *cpustate )
 {
-	UINT16	  t,r;
+	UINT16    t,r;
 	EXTBYTE(cpustate, t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
@@ -2718,7 +2718,7 @@ INLINE void std_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-    EXTENDED(cpustate);
+	EXTENDED(cpustate);
 	WM16(cpustate, EAD,&pD);
 }
 
@@ -2795,7 +2795,7 @@ INLINE void setline_ex( konami_state *cpustate )
 
 INLINE void bmove( konami_state *cpustate )
 {
-	UINT8	t;
+	UINT8   t;
 
 	while( U != 0 ) {
 		t = RM(cpustate, Y);
@@ -2809,7 +2809,7 @@ INLINE void bmove( konami_state *cpustate )
 
 INLINE void move( konami_state *cpustate )
 {
-	UINT8	t;
+	UINT8   t;
 
 	t = RM(cpustate, Y);
 	WM(cpustate, X,t);
@@ -2906,8 +2906,8 @@ INLINE void asrd( konami_state *cpustate )
 /* ASLD immediate ?**** */
 INLINE void asld( konami_state *cpustate )
 {
-	UINT32	r;
-	UINT8	t;
+	UINT32  r;
+	UINT8   t;
 
 	IMMBYTE(cpustate,  t );
 
@@ -2951,13 +2951,13 @@ INLINE void decxjnz( konami_state *cpustate )
 {
 	--X;
 	CLR_NZV;
-	SET_NZ16(X);	/* should affect V as well? */
+	SET_NZ16(X);    /* should affect V as well? */
 	BRANCH(cpustate, !(CC&CC_Z) );
 }
 
 INLINE void bset( konami_state *cpustate )
 {
-	UINT8	t;
+	UINT8   t;
 
 	while( U != 0 ) {
 		t = A;
@@ -3442,8 +3442,8 @@ INLINE void asrd_di( konami_state *cpustate )
 /* ASLD direct ?**** */
 INLINE void asld_di( konami_state *cpustate )
 {
-	UINT32	r;
-	UINT8	t;
+	UINT32  r;
+	UINT8   t;
 
 	DIRBYTE(cpustate,  t );
 
@@ -3524,8 +3524,8 @@ INLINE void asrd_ix( konami_state *cpustate )
 /* ASLD indexed ?**** */
 INLINE void asld_ix( konami_state *cpustate )
 {
-	UINT32	r;
-	UINT8	t;
+	UINT32  r;
+	UINT8   t;
 
 	t=RM(cpustate, EA);
 
@@ -3606,8 +3606,8 @@ INLINE void asrd_ex( konami_state *cpustate )
 /* ASLD extended ?**** */
 INLINE void asld_ex( konami_state *cpustate )
 {
-	UINT32	r;
-	UINT8	t;
+	UINT32  r;
+	UINT8   t;
 
 	EXTBYTE(cpustate, t);
 
@@ -3653,7 +3653,7 @@ INLINE void opcode2( konami_state *cpustate )
 	case 0x07:
 		EAD=0;
 		(*konami_extended[cpustate->ireg])(cpustate);
-        cpustate->icount -= 2;
+		cpustate->icount -= 2;
 		return;
 //  case 0x08: EA=0; break; /* indirect - auto increment */
 //  case 0x09: EA=0; break; /* indirect - double auto increment */
@@ -3662,10 +3662,10 @@ INLINE void opcode2( konami_state *cpustate )
 //  case 0x0c: EA=0; break; /* indirect - postbyte offs */
 //  case 0x0d: EA=0; break; /* indirect - postword offs */
 //  case 0x0e: EA=0; break; /* indirect - normal */
-	case 0x0f:				/* indirect - extended */
+	case 0x0f:              /* indirect - extended */
 		IMMWORD(cpustate, cpustate->ea);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
 //  case 0x10: EA=0; break; /* auto increment */
 //  case 0x11: EA=0; break; /* double auto increment */
@@ -3685,158 +3685,158 @@ INLINE void opcode2( konami_state *cpustate )
 //  case 0x1f: EA=0; break; /* indirect - extended */
 
 /* base X */
-    case 0x20:              /* auto increment */
+	case 0x20:              /* auto increment */
 		EA=X;
 		X++;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x21:				/* double auto increment */
+	case 0x21:              /* double auto increment */
 		EA=X;
 		X+=2;
-        cpustate->icount-=3;
-        break;
-	case 0x22:				/* auto decrement */
+		cpustate->icount-=3;
+		break;
+	case 0x22:              /* auto decrement */
 		X--;
 		EA=X;
-        cpustate->icount-=2;
-        break;
-	case 0x23:				/* double auto decrement */
+		cpustate->icount-=2;
+		break;
+	case 0x23:              /* double auto decrement */
 		X-=2;
 		EA=X;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x24:				/* postbyte offs */
+	case 0x24:              /* postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=X+SIGNED(EA);
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x25:				/* postword offs */
+	case 0x25:              /* postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=X;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x26:				/* normal */
+	case 0x26:              /* normal */
 		EA=X;
 		break;
 //  case 0x27: EA=0; break; /* extended */
-	case 0x28:				/* indirect - auto increment */
+	case 0x28:              /* indirect - auto increment */
 		EA=X;
 		X++;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x29:				/* indirect - double auto increment */
+	case 0x29:              /* indirect - double auto increment */
 		EA=X;
 		X+=2;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x2a:				/* indirect - auto decrement */
+	case 0x2a:              /* indirect - auto decrement */
 		X--;
 		EA=X;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x2b:				/* indirect - double auto decrement */
+	case 0x2b:              /* indirect - double auto decrement */
 		X-=2;
 		EA=X;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x2c:				/* indirect - postbyte offs */
+	case 0x2c:              /* indirect - postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=X+SIGNED(EA);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x2d:				/* indirect - postword offs */
+	case 0x2d:              /* indirect - postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=X;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
-	case 0x2e:				/* indirect - normal */
+	case 0x2e:              /* indirect - normal */
 		EA=X;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
 //  case 0x2f: EA=0; break; /* indirect - extended */
 
 /* base Y */
-    case 0x30:              /* auto increment */
+	case 0x30:              /* auto increment */
 		EA=Y;
 		Y++;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x31:				/* double auto increment */
+	case 0x31:              /* double auto increment */
 		EA=Y;
 		Y+=2;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x32:				/* auto decrement */
+	case 0x32:              /* auto decrement */
 		Y--;
 		EA=Y;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x33:				/* double auto decrement */
+	case 0x33:              /* double auto decrement */
 		Y-=2;
 		EA=Y;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x34:				/* postbyte offs */
+	case 0x34:              /* postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=Y+SIGNED(EA);
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x35:				/* postword offs */
+	case 0x35:              /* postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=Y;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x36:				/* normal */
+	case 0x36:              /* normal */
 		EA=Y;
 		break;
 //  case 0x37: EA=0; break; /* extended */
-	case 0x38:				/* indirect - auto increment */
+	case 0x38:              /* indirect - auto increment */
 		EA=Y;
 		Y++;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x39:				/* indirect - double auto increment */
+	case 0x39:              /* indirect - double auto increment */
 		EA=Y;
 		Y+=2;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x3a:				/* indirect - auto decrement */
+	case 0x3a:              /* indirect - auto decrement */
 		Y--;
 		EA=Y;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x3b:				/* indirect - double auto decrement */
+	case 0x3b:              /* indirect - double auto decrement */
 		Y-=2;
 		EA=Y;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x3c:				/* indirect - postbyte offs */
+	case 0x3c:              /* indirect - postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=Y+SIGNED(EA);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x3d:				/* indirect - postword offs */
+	case 0x3d:              /* indirect - postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=Y;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
-	case 0x3e:				/* indirect - normal */
+	case 0x3e:              /* indirect - normal */
 		EA=Y;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
 //  case 0x3f: EA=0; break; /* indirect - extended */
 
@@ -3858,236 +3858,236 @@ INLINE void opcode2( konami_state *cpustate )
 //  case 0x4f: EA=0; break; /* indirect - extended */
 
 /* base U */
-    case 0x50:              /* auto increment */
+	case 0x50:              /* auto increment */
 		EA=U;
 		U++;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x51:				/* double auto increment */
+	case 0x51:              /* double auto increment */
 		EA=U;
 		U+=2;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x52:				/* auto decrement */
+	case 0x52:              /* auto decrement */
 		U--;
 		EA=U;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x53:				/* double auto decrement */
+	case 0x53:              /* double auto decrement */
 		U-=2;
 		EA=U;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x54:				/* postbyte offs */
+	case 0x54:              /* postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=U+SIGNED(EA);
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x55:				/* postword offs */
+	case 0x55:              /* postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=U;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x56:				/* normal */
+	case 0x56:              /* normal */
 		EA=U;
 		break;
 //  case 0x57: EA=0; break; /* extended */
-	case 0x58:				/* indirect - auto increment */
+	case 0x58:              /* indirect - auto increment */
 		EA=U;
 		U++;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x59:				/* indirect - double auto increment */
+	case 0x59:              /* indirect - double auto increment */
 		EA=U;
 		U+=2;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x5a:				/* indirect - auto decrement */
+	case 0x5a:              /* indirect - auto decrement */
 		U--;
 		EA=U;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x5b:				/* indirect - double auto decrement */
+	case 0x5b:              /* indirect - double auto decrement */
 		U-=2;
 		EA=U;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x5c:				/* indirect - postbyte offs */
+	case 0x5c:              /* indirect - postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=U+SIGNED(EA);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x5d:				/* indirect - postword offs */
+	case 0x5d:              /* indirect - postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=U;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
-	case 0x5e:				/* indirect - normal */
+	case 0x5e:              /* indirect - normal */
 		EA=U;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
 //  case 0x5f: EA=0; break; /* indirect - extended */
 
 /* base S */
-    case 0x60:              /* auto increment */
+	case 0x60:              /* auto increment */
 		EAD=SD;
 		S++;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x61:				/* double auto increment */
+	case 0x61:              /* double auto increment */
 		EAD=SD;
 		S+=2;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x62:				/* auto decrement */
+	case 0x62:              /* auto decrement */
 		S--;
 		EAD=SD;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x63:				/* double auto decrement */
+	case 0x63:              /* double auto decrement */
 		S-=2;
 		EAD=SD;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x64:				/* postbyte offs */
+	case 0x64:              /* postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=S+SIGNED(EA);
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x65:				/* postword offs */
+	case 0x65:              /* postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=S;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x66:				/* normal */
+	case 0x66:              /* normal */
 		EAD=SD;
 		break;
 //  case 0x67: EA=0; break; /* extended */
-	case 0x68:				/* indirect - auto increment */
+	case 0x68:              /* indirect - auto increment */
 		EAD=SD;
 		S++;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x69:				/* indirect - double auto increment */
+	case 0x69:              /* indirect - double auto increment */
 		EAD=SD;
 		S+=2;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x6a:				/* indirect - auto decrement */
+	case 0x6a:              /* indirect - auto decrement */
 		S--;
 		EAD=SD;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x6b:				/* indirect - double auto decrement */
+	case 0x6b:              /* indirect - double auto decrement */
 		S-=2;
 		EAD=SD;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x6c:				/* indirect - postbyte offs */
+	case 0x6c:              /* indirect - postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=S+SIGNED(EA);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x6d:				/* indirect - postword offs */
+	case 0x6d:              /* indirect - postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=S;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
-	case 0x6e:				/* indirect - normal */
+	case 0x6e:              /* indirect - normal */
 		EAD=SD;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
 //  case 0x6f: EA=0; break; /* indirect - extended */
 
 /* base PC */
-    case 0x70:              /* auto increment */
+	case 0x70:              /* auto increment */
 		EAD=PCD;
 		PC++;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x71:				/* double auto increment */
+	case 0x71:              /* double auto increment */
 		EAD=PCD;
 		PC+=2;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x72:				/* auto decrement */
+	case 0x72:              /* auto decrement */
 		PC--;
 		EAD=PCD;
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x73:				/* double auto decrement */
+	case 0x73:              /* double auto decrement */
 		PC-=2;
 		EAD=PCD;
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
-	case 0x74:				/* postbyte offs */
+	case 0x74:              /* postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=PC-1+SIGNED(EA);
-        cpustate->icount-=2;
+		cpustate->icount-=2;
 		break;
-	case 0x75:				/* postword offs */
+	case 0x75:              /* postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=PC-2;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x76:				/* normal */
+	case 0x76:              /* normal */
 		EAD=PCD;
 		break;
 //  case 0x77: EA=0; break; /* extended */
-	case 0x78:				/* indirect - auto increment */
+	case 0x78:              /* indirect - auto increment */
 		EAD=PCD;
 		PC++;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x79:				/* indirect - double auto increment */
+	case 0x79:              /* indirect - double auto increment */
 		EAD=PCD;
 		PC+=2;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x7a:				/* indirect - auto decrement */
+	case 0x7a:              /* indirect - auto decrement */
 		PC--;
 		EAD=PCD;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=5;
+		cpustate->icount-=5;
 		break;
-	case 0x7b:				/* indirect - double auto decrement */
+	case 0x7b:              /* indirect - double auto decrement */
 		PC-=2;
 		EAD=PCD;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=6;
+		cpustate->icount-=6;
 		break;
-	case 0x7c:				/* indirect - postbyte offs */
+	case 0x7c:              /* indirect - postbyte offs */
 		IMMBYTE(cpustate, EA);
 		EA=PC-1+SIGNED(EA);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0x7d:				/* indirect - postword offs */
+	case 0x7d:              /* indirect - postword offs */
 		IMMWORD(cpustate, cpustate->ea);
 		EA+=PC-2;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
-	case 0x7e:				/* indirect - normal */
+	case 0x7e:              /* indirect - normal */
 		EAD=PCD;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=3;
+		cpustate->icount-=3;
 		break;
 //  case 0x7f: EA=0; break; /* indirect - extended */
 
@@ -4123,79 +4123,79 @@ INLINE void opcode2( konami_state *cpustate )
 //  case 0x9d: EA=0; break; /* indirect - ???? */
 //  case 0x9e: EA=0; break; /* indirect - register d */
 //  case 0x9f: EA=0; break; /* indirect - ???? */
-	case 0xa0:				/* register a */
+	case 0xa0:              /* register a */
 		EA=X+SIGNED(A);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
-	case 0xa1:				/* register b */
+	case 0xa1:              /* register b */
 		EA=X+SIGNED(B);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
 //  case 0xa2: EA=0; break; /* ???? */
 //  case 0xa3: EA=0; break; /* ???? */
 //  case 0xa4: EA=0; break; /* ???? */
 //  case 0xa5: EA=0; break; /* ???? */
 //  case 0xa6: EA=0; break; /* ???? */
-	case 0xa7:				/* register d */
+	case 0xa7:              /* register d */
 		EA=X+D;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xa8:				/* indirect - register a */
+	case 0xa8:              /* indirect - register a */
 		EA=X+SIGNED(A);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xa9:				/* indirect - register b */
+	case 0xa9:              /* indirect - register b */
 		EA=X+SIGNED(B);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
 //  case 0xaa: EA=0; break; /* indirect - ???? */
 //  case 0xab: EA=0; break; /* indirect - ???? */
 //  case 0xac: EA=0; break; /* indirect - ???? */
 //  case 0xad: EA=0; break; /* indirect - ???? */
 //  case 0xae: EA=0; break; /* indirect - ???? */
-	case 0xaf:				/* indirect - register d */
+	case 0xaf:              /* indirect - register d */
 		EA=X+D;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
-	case 0xb0:				/* register a */
+	case 0xb0:              /* register a */
 		EA=Y+SIGNED(A);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
-	case 0xb1:				/* register b */
+	case 0xb1:              /* register b */
 		EA=Y+SIGNED(B);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
 //  case 0xb2: EA=0; break; /* ???? */
 //  case 0xb3: EA=0; break; /* ???? */
 //  case 0xb4: EA=0; break; /* ???? */
 //  case 0xb5: EA=0; break; /* ???? */
 //  case 0xb6: EA=0; break; /* ???? */
-	case 0xb7:				/* register d */
+	case 0xb7:              /* register d */
 		EA=Y+D;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xb8:				/* indirect - register a */
+	case 0xb8:              /* indirect - register a */
 		EA=Y+SIGNED(A);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xb9:				/* indirect - register b */
+	case 0xb9:              /* indirect - register b */
 		EA=Y+SIGNED(B);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
 //  case 0xba: EA=0; break; /* indirect - ???? */
 //  case 0xbb: EA=0; break; /* indirect - ???? */
 //  case 0xbc: EA=0; break; /* indirect - ???? */
 //  case 0xbd: EA=0; break; /* indirect - ???? */
 //  case 0xbe: EA=0; break; /* indirect - ???? */
-	case 0xbf:				/* indirect - register d */
+	case 0xbf:              /* indirect - register d */
 		EA=Y+D;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
 //  case 0xc0: EA=0; break; /* register a */
 //  case 0xc1: EA=0; break; /* register b */
@@ -4204,7 +4204,7 @@ INLINE void opcode2( konami_state *cpustate )
 	case 0xc4:
 		EAD=0;
 		(*konami_direct[cpustate->ireg])(cpustate);
-        cpustate->icount -= 1;
+		cpustate->icount -= 1;
 		return;
 //  case 0xc5: EA=0; break; /* ???? */
 //  case 0xc6: EA=0; break; /* ???? */
@@ -4213,127 +4213,127 @@ INLINE void opcode2( konami_state *cpustate )
 //  case 0xc9: EA=0; break; /* indirect - register b */
 //  case 0xca: EA=0; break; /* indirect - ???? */
 //  case 0xcb: EA=0; break; /* indirect - ???? */
-	case 0xcc:				/* indirect - direct */
+	case 0xcc:              /* indirect - direct */
 		DIRWORD(cpustate, cpustate->ea);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
 //  case 0xcd: EA=0; break; /* indirect - ???? */
 //  case 0xce: EA=0; break; /* indirect - register d */
 //  case 0xcf: EA=0; break; /* indirect - ???? */
-	case 0xd0:				/* register a */
+	case 0xd0:              /* register a */
 		EA=U+SIGNED(A);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
-	case 0xd1:				/* register b */
+	case 0xd1:              /* register b */
 		EA=U+SIGNED(B);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
 //  case 0xd2: EA=0; break; /* ???? */
 //  case 0xd3: EA=0; break; /* ???? */
 //  case 0xd4: EA=0; break; /* ???? */
 //  case 0xd5: EA=0; break; /* ???? */
 //  case 0xd6: EA=0; break; /* ???? */
-	case 0xd7:				/* register d */
+	case 0xd7:              /* register d */
 		EA=U+D;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xd8:				/* indirect - register a */
+	case 0xd8:              /* indirect - register a */
 		EA=U+SIGNED(A);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xd9:				/* indirect - register b */
+	case 0xd9:              /* indirect - register b */
 		EA=U+SIGNED(B);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
 //  case 0xda: EA=0; break; /* indirect - ???? */
 //  case 0xdb: EA=0; break; /* indirect - ???? */
 //  case 0xdc: EA=0; break; /* indirect - ???? */
 //  case 0xdd: EA=0; break; /* indirect - ???? */
 //  case 0xde: EA=0; break; /* indirect - ???? */
-	case 0xdf:				/* indirect - register d */
+	case 0xdf:              /* indirect - register d */
 		EA=U+D;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
-        break;
-	case 0xe0:				/* register a */
-		EA=S+SIGNED(A);
-        cpustate->icount-=1;
+		cpustate->icount-=7;
 		break;
-	case 0xe1:				/* register b */
+	case 0xe0:              /* register a */
+		EA=S+SIGNED(A);
+		cpustate->icount-=1;
+		break;
+	case 0xe1:              /* register b */
 		EA=S+SIGNED(B);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
 //  case 0xe2: EA=0; break; /* ???? */
 //  case 0xe3: EA=0; break; /* ???? */
 //  case 0xe4: EA=0; break; /* ???? */
 //  case 0xe5: EA=0; break; /* ???? */
 //  case 0xe6: EA=0; break; /* ???? */
-	case 0xe7:				/* register d */
+	case 0xe7:              /* register d */
 		EA=S+D;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xe8:				/* indirect - register a */
+	case 0xe8:              /* indirect - register a */
 		EA=S+SIGNED(A);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xe9:				/* indirect - register b */
+	case 0xe9:              /* indirect - register b */
 		EA=S+SIGNED(B);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
 //  case 0xea: EA=0; break; /* indirect - ???? */
 //  case 0xeb: EA=0; break; /* indirect - ???? */
 //  case 0xec: EA=0; break; /* indirect - ???? */
 //  case 0xed: EA=0; break; /* indirect - ???? */
 //  case 0xee: EA=0; break; /* indirect - ???? */
-	case 0xef:				/* indirect - register d */
+	case 0xef:              /* indirect - register d */
 		EA=S+D;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
-	case 0xf0:				/* register a */
+	case 0xf0:              /* register a */
 		EA=PC+SIGNED(A);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
-	case 0xf1:				/* register b */
+	case 0xf1:              /* register b */
 		EA=PC+SIGNED(B);
-        cpustate->icount-=1;
+		cpustate->icount-=1;
 		break;
 //  case 0xf2: EA=0; break; /* ???? */
 //  case 0xf3: EA=0; break; /* ???? */
 //  case 0xf4: EA=0; break; /* ???? */
 //  case 0xf5: EA=0; break; /* ???? */
 //  case 0xf6: EA=0; break; /* ???? */
-	case 0xf7:				/* register d */
+	case 0xf7:              /* register d */
 		EA=PC+D;
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xf8:				/* indirect - register a */
+	case 0xf8:              /* indirect - register a */
 		EA=PC+SIGNED(A);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
-	case 0xf9:				/* indirect - register b */
+	case 0xf9:              /* indirect - register b */
 		EA=PC+SIGNED(B);
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=4;
+		cpustate->icount-=4;
 		break;
 //  case 0xfa: EA=0; break; /* indirect - ???? */
 //  case 0xfb: EA=0; break; /* indirect - ???? */
 //  case 0xfc: EA=0; break; /* indirect - ???? */
 //  case 0xfd: EA=0; break; /* indirect - ???? */
 //  case 0xfe: EA=0; break; /* indirect - ???? */
-	case 0xff:				/* indirect - register d */
+	case 0xff:              /* indirect - register d */
 		EA=PC+D;
 		EA=RM16(cpustate, EAD);
-        cpustate->icount-=7;
+		cpustate->icount-=7;
 		break;
 	default:
 		logerror("KONAMI: Unknown/Invalid postbyte at PC = %04x\n", PC -1 );
-        EAD = 0;
+		EAD = 0;
 	}
 	(*konami_indexed[cpustate->ireg])(cpustate);
 }

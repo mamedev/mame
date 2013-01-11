@@ -123,88 +123,88 @@ static const rgb_t PALETTE[] =
 		} \
 	} while (0)
 
-#define IS_PAL					((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8565) || (m_variant == TYPE_8569))
-#define IS_VICIIE				((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
+#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8565) || (m_variant == TYPE_8569))
+#define IS_VICIIE               ((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 
 #define ROW25_YSTART      0x33
 #define ROW25_YSTOP       0xfb
 #define ROW24_YSTART      0x37
 #define ROW24_YSTOP       0xf7
 
-#define RASTERLINE_2_C64(a)		(a)
-#define C64_2_RASTERLINE(a)		(a)
-#define XPOS				(VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE) / 2)
-#define YPOS				(VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE) / 2 */)
-#define FIRSTCOLUMN			50
+#define RASTERLINE_2_C64(a)     (a)
+#define C64_2_RASTERLINE(a)     (a)
+#define XPOS                (VIC2_STARTVISIBLECOLUMNS + (VIC2_VISIBLECOLUMNS - VIC2_HSIZE) / 2)
+#define YPOS                (VIC2_STARTVISIBLELINES /* + (VIC2_VISIBLELINES - VIC2_VSIZE) / 2 */)
+#define FIRSTCOLUMN         50
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
-#define LIGHTPEN_BUTTON		(m_in_lightpen_button_func(0))
-#define LIGHTPEN_X_VALUE	(m_in_lightpen_x_func(0))
-#define LIGHTPEN_Y_VALUE	(m_in_lightpen_y_func(0))
+#define LIGHTPEN_BUTTON     (m_in_lightpen_button_func(0))
+#define LIGHTPEN_X_VALUE    (m_in_lightpen_x_func(0))
+#define LIGHTPEN_Y_VALUE    (m_in_lightpen_y_func(0))
 
 /* lightpen delivers values from internal counters; they do not start with the visual area or frame area */
-#define VIC2_MAME_XPOS			0
-#define VIC2_MAME_YPOS			0
-#define VIC6567_X_BEGIN			38
-#define VIC6567_Y_BEGIN			-6			   /* first 6 lines after retrace not for lightpen! */
-#define VIC6569_X_BEGIN			38
-#define VIC6569_Y_BEGIN			-6
-#define VIC2_X_BEGIN			(IS_PAL ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
-#define VIC2_Y_BEGIN			(IS_PAL ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
-#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE / 1.3) + 12)
-#define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE      ) + 10)
+#define VIC2_MAME_XPOS          0
+#define VIC2_MAME_YPOS          0
+#define VIC6567_X_BEGIN         38
+#define VIC6567_Y_BEGIN         -6             /* first 6 lines after retrace not for lightpen! */
+#define VIC6569_X_BEGIN         38
+#define VIC6569_Y_BEGIN         -6
+#define VIC2_X_BEGIN            (IS_PAL ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
+#define VIC2_Y_BEGIN            (IS_PAL ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
+#define VIC2_X_VALUE            ((LIGHTPEN_X_VALUE / 1.3) + 12)
+#define VIC2_Y_VALUE            ((LIGHTPEN_Y_VALUE      ) + 10)
 
 /* sprites 0 .. 7 */
-#define SPRITEON(nr)			(m_reg[0x15] & (1 << nr))
-#define SPRITE_Y_EXPAND(nr)		(m_reg[0x17] & (1 << nr))
-#define SPRITE_Y_SIZE(nr)		(SPRITE_Y_EXPAND(nr) ? 2 * 21 : 21)
-#define SPRITE_X_EXPAND(nr)		(m_reg[0x1d] & (1 << nr))
-#define SPRITE_X_SIZE(nr)		(SPRITE_X_EXPAND(nr) ? 2 * 24 : 24)
-#define SPRITE_X_POS(nr)		(m_reg[(nr) * 2] | (m_reg[0x10] & (1 << (nr)) ? 0x100 : 0))
-#define SPRITE_Y_POS(nr)		(m_reg[1 + 2 * (nr)])
-#define SPRITE_MULTICOLOR(nr)	(m_reg[0x1c] & (1 << nr))
-#define SPRITE_PRIORITY(nr)		(m_reg[0x1b] & (1 << nr))
-#define SPRITE_MULTICOLOR1		(m_reg[0x25] & 0x0f)
-#define SPRITE_MULTICOLOR2		(m_reg[0x26] & 0x0f)
-#define SPRITE_COLOR(nr)		(m_reg[0x27+nr] & 0x0f)
-#define SPRITE_ADDR(nr)			(m_videoaddr | 0x3f8 | nr)
-#define SPRITE_COLL				(m_reg[0x1e])
-#define SPRITE_BG_COLL			(m_reg[0x1f])
+#define SPRITEON(nr)            (m_reg[0x15] & (1 << nr))
+#define SPRITE_Y_EXPAND(nr)     (m_reg[0x17] & (1 << nr))
+#define SPRITE_Y_SIZE(nr)       (SPRITE_Y_EXPAND(nr) ? 2 * 21 : 21)
+#define SPRITE_X_EXPAND(nr)     (m_reg[0x1d] & (1 << nr))
+#define SPRITE_X_SIZE(nr)       (SPRITE_X_EXPAND(nr) ? 2 * 24 : 24)
+#define SPRITE_X_POS(nr)        (m_reg[(nr) * 2] | (m_reg[0x10] & (1 << (nr)) ? 0x100 : 0))
+#define SPRITE_Y_POS(nr)        (m_reg[1 + 2 * (nr)])
+#define SPRITE_MULTICOLOR(nr)   (m_reg[0x1c] & (1 << nr))
+#define SPRITE_PRIORITY(nr)     (m_reg[0x1b] & (1 << nr))
+#define SPRITE_MULTICOLOR1      (m_reg[0x25] & 0x0f)
+#define SPRITE_MULTICOLOR2      (m_reg[0x26] & 0x0f)
+#define SPRITE_COLOR(nr)        (m_reg[0x27+nr] & 0x0f)
+#define SPRITE_ADDR(nr)         (m_videoaddr | 0x3f8 | nr)
+#define SPRITE_COLL             (m_reg[0x1e])
+#define SPRITE_BG_COLL          (m_reg[0x1f])
 
-#define GFXMODE					((m_reg[0x11] & 0x60) | (m_reg[0x16] & 0x10)) >> 4
-#define SCREENON				(m_reg[0x11] & 0x10)
-#define YSCROLL					(m_reg[0x11] & 0x07)
-#define XSCROLL					(m_reg[0x16] & 0x07)
-#define ECMON					(m_reg[0x11] & 0x40)
-#define HIRESON					(m_reg[0x11] & 0x20)
-#define COLUMNS40				(m_reg[0x16] & 0x08)		   /* else 38 Columns */
+#define GFXMODE                 ((m_reg[0x11] & 0x60) | (m_reg[0x16] & 0x10)) >> 4
+#define SCREENON                (m_reg[0x11] & 0x10)
+#define YSCROLL                 (m_reg[0x11] & 0x07)
+#define XSCROLL                 (m_reg[0x16] & 0x07)
+#define ECMON                   (m_reg[0x11] & 0x40)
+#define HIRESON                 (m_reg[0x11] & 0x20)
+#define COLUMNS40               (m_reg[0x16] & 0x08)           /* else 38 Columns */
 
-#define VIDEOADDR				((m_reg[0x18] & 0xf0) << (10 - 4))
-#define CHARGENADDR				((m_reg[0x18] & 0x0e) << 10)
-#define BITMAPADDR				((data & 0x08) << 10)
+#define VIDEOADDR               ((m_reg[0x18] & 0xf0) << (10 - 4))
+#define CHARGENADDR             ((m_reg[0x18] & 0x0e) << 10)
+#define BITMAPADDR              ((data & 0x08) << 10)
 
-#define RASTERLINE				(((m_reg[0x11] & 0x80) << 1) | m_reg[0x12])
+#define RASTERLINE              (((m_reg[0x11] & 0x80) << 1) | m_reg[0x12])
 
-#define FRAMECOLOR				(m_reg[0x20] & 0x0f)
-#define BACKGROUNDCOLOR			(m_reg[0x21] & 0x0f)
-#define MULTICOLOR1				(m_reg[0x22] & 0x0f)
-#define MULTICOLOR2				(m_reg[0x23] & 0x0f)
-#define FOREGROUNDCOLOR			(m_reg[0x24] & 0x0f)
+#define FRAMECOLOR              (m_reg[0x20] & 0x0f)
+#define BACKGROUNDCOLOR         (m_reg[0x21] & 0x0f)
+#define MULTICOLOR1             (m_reg[0x22] & 0x0f)
+#define MULTICOLOR2             (m_reg[0x23] & 0x0f)
+#define FOREGROUNDCOLOR         (m_reg[0x24] & 0x0f)
 
-#define VIC2_LINES				(IS_PAL ? VIC6569_LINES : VIC6567_LINES)
-#define VIC2_FIRST_DMA_LINE		(IS_PAL ? VIC6569_FIRST_DMA_LINE : VIC6567_FIRST_DMA_LINE)
-#define VIC2_LAST_DMA_LINE		(IS_PAL ? VIC6569_LAST_DMA_LINE : VIC6567_LAST_DMA_LINE)
-#define VIC2_FIRST_DISP_LINE	(IS_PAL ? VIC6569_FIRST_DISP_LINE : VIC6567_FIRST_DISP_LINE)
-#define VIC2_LAST_DISP_LINE		(IS_PAL ? VIC6569_LAST_DISP_LINE : VIC6567_LAST_DISP_LINE)
-#define VIC2_RASTER_2_EMU(a)	(IS_PAL ? VIC6569_RASTER_2_EMU(a) : VIC6567_RASTER_2_EMU(a))
-#define VIC2_FIRSTCOLUMN		(IS_PAL ? VIC6569_FIRSTCOLUMN : VIC6567_FIRSTCOLUMN)
-#define VIC2_X_2_EMU(a)			(IS_PAL ? VIC6569_X_2_EMU(a) : VIC6567_X_2_EMU(a))
+#define VIC2_LINES              (IS_PAL ? VIC6569_LINES : VIC6567_LINES)
+#define VIC2_FIRST_DMA_LINE     (IS_PAL ? VIC6569_FIRST_DMA_LINE : VIC6567_FIRST_DMA_LINE)
+#define VIC2_LAST_DMA_LINE      (IS_PAL ? VIC6569_LAST_DMA_LINE : VIC6567_LAST_DMA_LINE)
+#define VIC2_FIRST_DISP_LINE    (IS_PAL ? VIC6569_FIRST_DISP_LINE : VIC6567_FIRST_DISP_LINE)
+#define VIC2_LAST_DISP_LINE     (IS_PAL ? VIC6569_LAST_DISP_LINE : VIC6567_LAST_DISP_LINE)
+#define VIC2_RASTER_2_EMU(a)    (IS_PAL ? VIC6569_RASTER_2_EMU(a) : VIC6567_RASTER_2_EMU(a))
+#define VIC2_FIRSTCOLUMN        (IS_PAL ? VIC6569_FIRSTCOLUMN : VIC6567_FIRSTCOLUMN)
+#define VIC2_X_2_EMU(a)         (IS_PAL ? VIC6569_X_2_EMU(a) : VIC6567_X_2_EMU(a))
 
-#define IRQ_RST					0x01
-#define IRQ_MBC					0x02
-#define IRQ_MMC					0x04
-#define IRQ_LP					0x08
+#define IRQ_RST                 0x01
+#define IRQ_MBC                 0x02
+#define IRQ_MMC                 0x04
+#define IRQ_LP                  0x08
 
 
 
@@ -573,26 +573,26 @@ inline void mos6566_device::draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, 
 //-------------------------------------------------
 
 mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MOS6566, "MOS6566", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_execute_interface(mconfig, *this),
-	  m_icount(0),
-	  m_variant(TYPE_6566),
-	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-	  m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map))
+	: device_t(mconfig, MOS6566, "MOS6566", tag, owner, clock),
+		device_memory_interface(mconfig, *this),
+		device_execute_interface(mconfig, *this),
+		m_icount(0),
+		m_variant(TYPE_6566),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map))
 {
 }
 
 mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  device_execute_interface(mconfig, *this),
-	  m_icount(0),
-	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-	  m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
-	  m_phi0(1),
-	  m_ba(ASSERT_LINE),
-	  m_aec(ASSERT_LINE)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_memory_interface(mconfig, *this),
+		device_execute_interface(mconfig, *this),
+		m_icount(0),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
+		m_phi0(1),
+		m_ba(ASSERT_LINE),
+		m_aec(ASSERT_LINE)
 {
 }
 
@@ -641,7 +641,7 @@ void mos6566_device::device_config_complete()
 		memset(&m_out_ba_cb, 0, sizeof(m_out_ba_cb));
 		memset(&m_out_aec_cb, 0, sizeof(m_out_aec_cb));
 		memset(&m_out_k_cb, 0, sizeof(m_out_k_cb));
-    }
+	}
 }
 
 
@@ -1487,7 +1487,7 @@ void mos6569_device::execute_run()
 			{
 				m_rasterline++;
 
-				m_draw_this_line =	((VIC2_RASTER_2_EMU(m_rasterline) >= VIC2_RASTER_2_EMU(VIC2_FIRST_DISP_LINE)) &&
+				m_draw_this_line =  ((VIC2_RASTER_2_EMU(m_rasterline) >= VIC2_RASTER_2_EMU(VIC2_FIRST_DISP_LINE)) &&
 							(VIC2_RASTER_2_EMU(m_rasterline ) <= VIC2_RASTER_2_EMU(VIC2_LAST_DISP_LINE)));
 			}
 
@@ -2473,7 +2473,7 @@ READ8_MEMBER( mos6566_device::read )
 		val = m_reg[offset] | 0x01;
 		break;
 
-	case 0x19:							/* interrupt flag register */
+	case 0x19:                          /* interrupt flag register */
 		/* clear_interrupt(0xf); */
 		val = m_reg[offset] | 0x70;
 		break;
@@ -2482,13 +2482,13 @@ READ8_MEMBER( mos6566_device::read )
 		val = m_reg[offset] | 0xf0;
 		break;
 
-	case 0x1e:							/* sprite to sprite collision detect */
+	case 0x1e:                          /* sprite to sprite collision detect */
 		val = m_reg[offset];
 		m_reg[offset] = 0;
 		clear_interrupt(4);
 		break;
 
-	case 0x1f:							/* sprite to background collision detect */
+	case 0x1f:                          /* sprite to background collision detect */
 		val = m_reg[offset];
 		m_reg[offset] = 0;
 		clear_interrupt(2);
@@ -2561,7 +2561,7 @@ READ8_MEMBER( mos6566_device::read )
 	case 0x3c:
 	case 0x3d:
 	case 0x3e:
-	case 0x3f:							/* not used */
+	case 0x3f:                          /* not used */
 		// val = m_reg[offset]; //
 		val = 0xff;
 		DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
@@ -2597,7 +2597,7 @@ WRITE8_MEMBER( mos6566_device::write )
 	case 0x0b:
 	case 0x0d:
 	case 0x0f:
-		m_reg[offset] = data;		/* sprite y positions */
+		m_reg[offset] = data;       /* sprite y positions */
 		break;
 
 	case 0x00:
@@ -2608,14 +2608,14 @@ WRITE8_MEMBER( mos6566_device::write )
 	case 0x0a:
 	case 0x0c:
 	case 0x0e:
-		m_reg[offset] = data;		/* sprite x positions */
+		m_reg[offset] = data;       /* sprite x positions */
 		break;
 
 	case 0x10:
-		m_reg[offset] = data;		/* sprite x positions */
+		m_reg[offset] = data;       /* sprite x positions */
 		break;
 
-	case 0x17:							/* sprite y size */
+	case 0x17:                          /* sprite y size */
 		m_spr_exp_y |= ~data;
 		if (m_reg[offset] != data)
 		{
@@ -2623,21 +2623,21 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x1d:							/* sprite x size */
+	case 0x1d:                          /* sprite x size */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
 		}
 		break;
 
-	case 0x1b:							/* sprite background priority */
+	case 0x1b:                          /* sprite background priority */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
 		}
 		break;
 
-	case 0x1c:							/* sprite multicolor mode select */
+	case 0x1c:                          /* sprite multicolor mode select */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
@@ -2659,7 +2659,7 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x25:							/* sprite multicolor */
+	case 0x25:                          /* sprite multicolor */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
@@ -2667,7 +2667,7 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x26:							/* sprite multicolor */
+	case 0x26:                          /* sprite multicolor */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
@@ -2679,9 +2679,9 @@ WRITE8_MEMBER( mos6566_device::write )
 		clear_interrupt(data & 0x0f);
 		break;
 
-	case 0x1a:							/* irq mask */
+	case 0x1a:                          /* irq mask */
 		m_reg[offset] = data;
-		set_interrupt(0);	// beamrider needs this
+		set_interrupt(0);   // beamrider needs this
 		break;
 
 	case 0x11:
@@ -2725,7 +2725,7 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x21:							/* background color */
+	case 0x21:                          /* background color */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
@@ -2733,7 +2733,7 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x22:							/* background color 1 */
+	case 0x22:                          /* background color 1 */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
@@ -2741,7 +2741,7 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x23:							/* background color 2 */
+	case 0x23:                          /* background color 2 */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
@@ -2749,7 +2749,7 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x24:							/* background color 3 */
+	case 0x24:                          /* background color 3 */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;
@@ -2757,7 +2757,7 @@ WRITE8_MEMBER( mos6566_device::write )
 		}
 		break;
 
-	case 0x20:							/* framecolor */
+	case 0x20:                          /* framecolor */
 		if (m_reg[offset] != data)
 		{
 			m_reg[offset] = data;

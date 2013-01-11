@@ -305,8 +305,8 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "includes/tumbleb.h"
 #include "video/decospr.h"
 
-#define TUMBLEP_HACK	0
-#define FNCYWLD_HACK	0
+#define TUMBLEP_HACK    0
+#define FNCYWLD_HACK    0
 
 
 
@@ -325,7 +325,7 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 		oki->write(space, 0, (data >> 8) & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
-    /* STUFF IN OTHER BYTE TOO..*/
+	/* STUFF IN OTHER BYTE TOO..*/
 }
 
 READ16_MEMBER(tumbleb_state::tumblepb_prot_r)
@@ -347,7 +347,7 @@ READ16_MEMBER(tumbleb_state::tumblepopb_controls_r)
 			return ioport("SYSTEM")->read();
 		case 10: /* ? */
 		case 12:
-        	return 0;
+			return 0;
 	}
 
 	return -0;
@@ -448,7 +448,7 @@ INTERRUPT_GEN_MEMBER(tumbleb_state::tumbleb2_interrupt)
 static const int tumbleb_sound_lookup[256] = {
 	/*0     1     2     3     4     5     6     7     8     9     a     b     c     d     e    f*/
 	0x00,  -2,  0x00, 0x00,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2, 0x00,   -2, /* 0 */
-	  -2, 0x00,   -2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 1 */
+		-2, 0x00,   -2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 1 */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, /* 2 */
 	0x19, 0x00, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, /* 3 */
 	0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, /* 4 */
@@ -514,7 +514,7 @@ static void process_tumbleb2_music_command( okim6295_device *oki, int data )
 	{
 		if (BIT(status, 3))
 		{
-			oki->write_command(0x40);		/* Stop playing music */
+			oki->write_command(0x40);       /* Stop playing music */
 			state->m_music_is_playing = 0;
 		}
 	}
@@ -630,7 +630,7 @@ WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
 static ADDRESS_MAP_START( tumblepopb_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 #if TUMBLEP_HACK
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	/* To write levels modifications */
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY   /* To write levels modifications */
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(tumblepb_prot_r, tumblepb_oki_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
@@ -652,7 +652,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 #if FNCYWLD_HACK
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITEONLY	/* To write levels modifications */
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITEONLY   /* To write levels modifications */
 #endif
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -693,7 +693,7 @@ static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_SHARE("pf1_data")
 	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_SHARE("pf2_data")
 	AM_RANGE(0x323000, 0x331fff) AM_NOP // metal saver writes there when clearing the above tilemaps, flaw in the program routine
-	AM_RANGE(0x341000, 0x342fff) AM_RAM				// Extra ram?
+	AM_RANGE(0x341000, 0x342fff) AM_RAM             // Extra ram?
 ADDRESS_MAP_END
 
 
@@ -875,7 +875,7 @@ static INPUT_PORTS_START( tumblepb )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -883,7 +883,7 @@ static INPUT_PORTS_START( tumblepb )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
@@ -897,7 +897,7 @@ static INPUT_PORTS_START( tumblepb )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
@@ -906,7 +906,7 @@ static INPUT_PORTS_START( tumblepb )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
@@ -915,41 +915,41 @@ static INPUT_PORTS_START( tumblepb )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0001, 0x0001, "2 Coins to Start, 1 to Continue" )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0001, 0x0001, "2 Coins to Start, 1 to Continue" )   PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x8000, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0xc000, "3" )
 	PORT_DIPSETTING(      0x4000, "4" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 #if TUMBLEP_HACK
-	PORT_DIPNAME( 0x0800, 0x0800, "Remove Monsters" )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x0800, 0x0800, "Remove Monsters" )   PORT_DIPLOCATION("SW2:5")
 #else
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:5")		// See notes
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW2:5")       // See notes
 #endif
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 #if TUMBLEP_HACK
-	PORT_DIPNAME( 0x0400, 0x0400, "Edit Levels" )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x0400, 0x0400, "Edit Levels" )       PORT_DIPLOCATION("SW2:6")
 #else
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:6")		// See notes
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW2:6")       // See notes
 #endif
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1049,7 +1049,7 @@ static INPUT_PORTS_START( suprtrio )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW")	/* Dip switches */
+	PORT_START("DSW")   /* Dip switches */
 	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW:8,7,6")
 	PORT_DIPSETTING(      0x0006, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 4C_1C ) )
@@ -1119,7 +1119,7 @@ static INPUT_PORTS_START( fncywld )
 	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )		// only seems to the title screen
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )     // only seems to the title screen
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )
@@ -1134,7 +1134,7 @@ static INPUT_PORTS_START( fncywld )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0xc000, "3" )
 	PORT_DIPSETTING(      0x4000, "4" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )	// to be confirmed
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )   // to be confirmed
 	PORT_DIPSETTING(      0x3000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
@@ -1143,14 +1143,14 @@ static INPUT_PORTS_START( fncywld )
 #if FNCYWLD_HACK
 	PORT_DIPNAME( 0x0800, 0x0800, "Remove Monsters" )
 #else
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unused ) )		// See notes
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unused ) )       // See notes
 #endif
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 #if FNCYWLD_HACK
 	PORT_DIPNAME( 0x0400, 0x0400, "Edit Levels" )
 #else
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ) )		// See notes
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ) )       // See notes
 #endif
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1170,7 +1170,7 @@ static INPUT_PORTS_START( htchctch )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -1178,7 +1178,7 @@ static INPUT_PORTS_START( htchctch )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
@@ -1232,7 +1232,7 @@ static INPUT_PORTS_START( cookbib )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -1240,7 +1240,7 @@ static INPUT_PORTS_START( cookbib )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
@@ -1294,7 +1294,7 @@ static INPUT_PORTS_START( chokchok )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -1302,7 +1302,7 @@ static INPUT_PORTS_START( chokchok )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 - unused */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* button 3 - unused */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
@@ -1316,35 +1316,35 @@ static INPUT_PORTS_START( chokchok )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Winning Rounds" )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0001, 0x0001, "Winning Rounds" )    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0001, "3" )
-	PORT_DIPNAME( 0x0006, 0x0006, "Ball Speed" )		PORT_DIPLOCATION("SW1:7,6")
+	PORT_DIPNAME( 0x0006, 0x0006, "Ball Speed" )        PORT_DIPLOCATION("SW1:7,6")
 	PORT_DIPSETTING(      0x0000, "Slow" )
 	PORT_DIPSETTING(      0x0006, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0002, "Fast" )
 	PORT_DIPSETTING(      0x0004, "Very Fast" )
-	PORT_DIPNAME( 0x0018, 0x0018, "Energy Decrease" )	PORT_DIPLOCATION("SW1:5,4")
+	PORT_DIPNAME( 0x0018, 0x0018, "Energy Decrease" )   PORT_DIPLOCATION("SW1:5,4")
 	PORT_DIPSETTING(      0x0000, "Very Small" )
 	PORT_DIPSETTING(      0x0010, "Small" )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, "Big" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0020, "60 Seconds" )
 	PORT_DIPSETTING(      0x0000, "90 Seconds" )
-	PORT_DIPNAME( 0x00c0, 0x00c0, "Starting Balls" )	PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Starting Balls" )    PORT_DIPLOCATION("SW1:2,1")
 	PORT_DIPSETTING(      0x0000, "3" )
 	PORT_DIPSETTING(      0x00c0, "4" )
 	PORT_DIPSETTING(      0x0040, "5" )
 	PORT_DIPSETTING(      0x0080, "6" )
 
 	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW2:8" )
-	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:7,6")
+	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:7,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW2:5,4,3")
+	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:5,4,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_1C ) )
@@ -1353,10 +1353,10 @@ static INPUT_PORTS_START( chokchok )
 	PORT_DIPSETTING(      0x2800, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Korean ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1392,15 +1392,15 @@ static INPUT_PORTS_START( magicbal )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW") /* Switch positions based on other games - needs to be verified on real hardware!! */
-	PORT_DIPNAME( 0x0003, 0x0003, "Game Time" )		PORT_DIPLOCATION("SW1:8,7") /* Only used if Game is Timed, does this control # of innings if not timed? */
+	PORT_DIPNAME( 0x0003, 0x0003, "Game Time" )     PORT_DIPLOCATION("SW1:8,7") /* Only used if Game is Timed, does this control # of innings if not timed? */
 	PORT_DIPSETTING(      0x0003, "5:00" )
 	PORT_DIPSETTING(      0x0001, "6:00" )
 	PORT_DIPSETTING(      0x0002, "7:00" )
 	PORT_DIPSETTING(      0x0000, "8:00" )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:5,4,3")
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:5,4,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
@@ -1409,35 +1409,35 @@ static INPUT_PORTS_START( magicbal )
 	PORT_DIPSETTING(      0x0028, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Timed Game" )		PORT_DIPLOCATION("SW1:2") /* Game is timed or by innings? */
+	PORT_DIPNAME( 0x0040, 0x0040, "Timed Game" )        PORT_DIPLOCATION("SW1:2") /* Game is timed or by innings? */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "2 Players Game" )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x0800, 0x0800, "2 Players Game" )    PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0000, "1 Credit" )
 	PORT_DIPSETTING(      0x0800, "2 Credits" )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1720,7 +1720,7 @@ static INPUT_PORTS_START( bcstory )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )	    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0200, IP_ACTIVE_LOW, "SW2:7" )                                 // See notes
@@ -1791,7 +1791,7 @@ static INPUT_PORTS_START( semibase )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )	    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0200, IP_ACTIVE_LOW, "SW2:7" )                                 // See notes
@@ -1863,7 +1863,7 @@ static INPUT_PORTS_START( dquizgo )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )	    PORT_DIPLOCATION("SW2:8")     // See notes
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW2:8")     // See notes
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0200, IP_ACTIVE_LOW, "SW2:7" )
@@ -1921,24 +1921,24 @@ static const gfx_layout suprtrio_tlayout =
 
 
 static GFXDECODE_START( tumbleb )
-	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 256, 16 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     512, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     256, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 256, 16 )  /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     512, 16 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     256, 16 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 16 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( suprtrio )
-	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout,		256, 16 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, suprtrio_tlayout,	512, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, suprtrio_tlayout,	256, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,    		  0, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout,        256, 16 )   /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, suprtrio_tlayout,   512, 16 )   /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, suprtrio_tlayout,   256, 16 )   /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,              0, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( fncywld )
-	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 0x400, 0x40 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     0x400, 0x40 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     0x200, 0x40 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,     0x000, 0x40 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 0x400, 0x40 )  /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     0x400, 0x40 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     0x200, 0x40 )  /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tlayout,     0x000, 0x40 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -2387,7 +2387,7 @@ ROM_START( jumpkids )
 ROM_END
 
 ROM_START( fncywld )
-	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "01_fw02.bin", 0x000000, 0x080000, CRC(ecb978c1) SHA1(68fbf93a81875f744c6f9820dc4c7d88e912e0a0) )
 	ROM_LOAD16_BYTE( "02_fw03.bin", 0x000001, 0x080000, CRC(2d233b42) SHA1(aebeb5d3e06e73d14f713f201b25466bcac97a68) )
 
@@ -2403,7 +2403,7 @@ ROM_START( fncywld )
 	ROM_LOAD16_BYTE( "10_fw11.bin", 0x80000, 0x40000, CRC(f21bab48) SHA1(84371b31487ca5abcbf57152a64f384959d19209) )
 	ROM_LOAD16_BYTE( "09_fw10.bin", 0x80001, 0x40000, CRC(6aea8e0f) SHA1(91e2eeef001351c73b1bfbc1a7840e37d3f89900) )
 
-	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "00_fw01.bin", 0x000000, 0x040000, CRC(b395fe01) SHA1(ac7f2e21413658f8d2a1abf3a76b7817a4e050c9) )
 ROM_END
 
@@ -3134,7 +3134,7 @@ ROM_START( semibase )
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
 	/* once the game has decrypted this it's almost identical to bcstory with several ram addresses being 0x4 higher than in bcstory
-     and 1200FE: andi.b  #$f, D1  instead of #$3  (unless bcstory data is wrong?) */
+	 and 1200FE: andi.b  #$f, D1  instead of #$3  (unless bcstory data is wrong?) */
 	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(ecbf2163) SHA1(634b366a8c4ba8699851861bf935b55850f93a7f) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -3178,7 +3178,7 @@ void tumblepb_patch_code(running_machine &machine, UINT16 offset)
 	/* A hack which enables all Dip Switches effects */
 	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
-	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
+	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
 }
 #endif
 
@@ -3239,7 +3239,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
-       of the 2 first "Unused" Dip Switch (see notes above). */
+	   of the 2 first "Unused" Dip Switch (see notes above). */
 	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	RAM[0x0005fa/2] = 0x4e71;
 	RAM[0x00060a/2] = 0x4e71;
@@ -3377,4 +3377,3 @@ GAME( 1997, bcstry,   0,       bcstory,     bcstory, tumbleb_state,  bcstory,  R
 GAME( 1997, bcstrya,  bcstry,  bcstory,     bcstory, tumbleb_state,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
 GAME( 1997, semibase, 0,       semibase,    semibase, tumbleb_state, bcstory,  ROT0, "SemiCom", "MuHanSeungBu (SemiCom Baseball) (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )// sprite offsets..
 GAME( 1998, dquizgo,  0,       cookbib,     dquizgo, tumbleb_state,  dquizgo,  ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // check layer offsets
-

@@ -14,7 +14,7 @@
 
 // ======================> rom_image_device
 
-class rom_image_device :	public device_t,
+class rom_image_device :    public device_t,
 							public device_image_interface
 {
 public:
@@ -41,7 +41,7 @@ public:
 
 protected:
 	// device-level overrides
-    virtual void device_config_complete() { update_names(); }
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start();
 
 private:
@@ -60,7 +60,7 @@ extern const device_type ROMSLOT;
 /*** ROM box device ***/
 
 class cpc_rom_device  : public device_t,
-					    public device_cpc_expansion_card_interface
+						public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -75,7 +75,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "cpc_rom"; }
+	virtual void device_config_complete() { m_shortname = "cpc_rom"; }
 
 private:
 	cpc_expansion_slot_device *m_slot;

@@ -116,4 +116,3 @@ DECLARE_READ16_HANDLER( slyspy_controls_r );
 
 extern void dec0_i8751_write(running_machine &machine, int data);
 extern void dec0_i8751_reset(running_machine &machine);
-

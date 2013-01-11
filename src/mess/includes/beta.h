@@ -11,10 +11,10 @@
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
-#define SCREEN_TAG		"screen"
-#define M6502_TAG		"m6502"
-#define M6532_TAG		"m6532"
-#define EPROM_TAG		"eprom"
+#define SCREEN_TAG      "screen"
+#define M6502_TAG       "m6502"
+#define M6532_TAG       "m6532"
+#define EPROM_TAG       "eprom"
 //#define SPEAKER_TAG       "b237"
 
 class beta_state : public driver_device
@@ -22,8 +22,8 @@ class beta_state : public driver_device
 public:
 	beta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, M6502_TAG),
-		  m_speaker(*this, SPEAKER_TAG)
+			m_maincpu(*this, M6502_TAG),
+			m_speaker(*this, SPEAKER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

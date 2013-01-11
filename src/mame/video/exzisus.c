@@ -80,7 +80,7 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 	/* ---------- 1st TC0010VCU ---------- */
 	sx = 0;
 	for (offs = 0 ; offs < m_objectram0.bytes() ; offs += 4)
-    {
+	{
 		int height;
 
 		/* Skip empty sprites. */
@@ -92,7 +92,7 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 		gfx_num = m_objectram0[offs + 1];
 		gfx_attr = m_objectram0[offs + 3];
 
-		if ((gfx_num & 0x80) == 0)	/* 16x16 sprites */
+		if ((gfx_num & 0x80) == 0)  /* 16x16 sprites */
 		{
 			gfx_offs = ((gfx_num & 0x7f) << 3);
 			height = 2;
@@ -100,12 +100,12 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 			sx = m_objectram0[offs + 2];
 			sx |= (gfx_attr & 0x40) << 2;
 		}
-		else	/* tilemaps (each sprite is a 16x256 column) */
+		else    /* tilemaps (each sprite is a 16x256 column) */
 		{
 			gfx_offs = ((gfx_num & 0x3f) << 7) + 0x0400;
 			height = 32;
 
-			if (gfx_num & 0x40)			/* Next column */
+			if (gfx_num & 0x40)         /* Next column */
 			{
 				sx += 16;
 			}
@@ -150,7 +150,7 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 	/* ---------- 2nd TC0010VCU ---------- */
 	sx = 0;
 	for (offs = 0 ; offs < m_objectram1.bytes() ; offs += 4)
-    {
+	{
 		int height;
 
 		/* Skip empty sprites. */
@@ -162,7 +162,7 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 		gfx_num = m_objectram1[offs + 1];
 		gfx_attr = m_objectram1[offs + 3];
 
-		if ((gfx_num & 0x80) == 0)	/* 16x16 sprites */
+		if ((gfx_num & 0x80) == 0)  /* 16x16 sprites */
 		{
 			gfx_offs = ((gfx_num & 0x7f) << 3);
 			height = 2;
@@ -170,12 +170,12 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 			sx = m_objectram1[offs + 2];
 			sx |= (gfx_attr & 0x40) << 2;
 		}
-		else	/* tilemaps (each sprite is a 16x256 column) */
+		else    /* tilemaps (each sprite is a 16x256 column) */
 		{
-			gfx_offs = ((gfx_num & 0x3f) << 7) + 0x0400;	///
+			gfx_offs = ((gfx_num & 0x3f) << 7) + 0x0400;    ///
 			height = 32;
 
-			if (gfx_num & 0x40)			/* Next column */
+			if (gfx_num & 0x40)         /* Next column */
 			{
 				sx += 16;
 			}

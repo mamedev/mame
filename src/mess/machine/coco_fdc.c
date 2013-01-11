@@ -80,10 +80,10 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_FDC					0
-#define WD_TAG					"wd17xx"
-#define DISTO_TAG				"disto"
-#define CLOUD9_TAG				"cloud9"
+#define LOG_FDC                 0
+#define WD_TAG                  "wd17xx"
+#define DISTO_TAG               "disto"
+#define CLOUD9_TAG              "cloud9"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -178,7 +178,7 @@ MACHINE_CONFIG_END
 
 ROM_START( coco_fdc )
 	ROM_REGION(0x4000,"eprom",ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL(	"disk10.rom",	0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
+	ROM_LOAD_OPTIONAL(  "disk10.rom",   0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
 ROM_END
 
 const device_type COCO_FDC = &device_creator<coco_fdc_device>;
@@ -188,12 +188,12 @@ const device_type COCO_FDC = &device_creator<coco_fdc_device>;
 //-------------------------------------------------
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_cococart_interface( mconfig, *this )
+		device_cococart_interface( mconfig, *this )
 {
 }
 
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock),
+		: device_t(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock),
 		device_cococart_interface( mconfig, *this )
 {
 }
@@ -205,12 +205,12 @@ coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag,
 void coco_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
-	m_drq           	= 1;
-	m_disto_msm6242		= subdevice<msm6242_device>(DISTO_TAG);
-	m_ds1315			= subdevice(CLOUD9_TAG);
-	m_wd17xx			= subdevice(WD_TAG);
-	m_dskreg			= 0x00;
-	m_intrq				= 0;
+	m_drq               = 1;
+	m_disto_msm6242     = subdevice<msm6242_device>(DISTO_TAG);
+	m_ds1315            = subdevice(CLOUD9_TAG);
+	m_wd17xx            = subdevice(WD_TAG);
+	m_dskreg            = 0x00;
+	m_intrq             = 0;
 	m_msm6242_rtc_address = 0;
 }
 
@@ -261,7 +261,7 @@ void coco_fdc_device::update_lines()
 {
 	/* clear HALT enable under certain circumstances */
 	if ((m_intrq != 0) && (m_dskreg & 0x20))
-		m_dskreg &= ~0x80;	/* clear halt enable */
+		m_dskreg &= ~0x80;  /* clear halt enable */
 
 	/* set the NMI line */
 	m_owner->cart_set_line(COCOCART_LINE_NMI,
@@ -297,11 +297,11 @@ void coco_fdc_device::dskreg_w(UINT8 data)
 	}
 
 	/* An email from John Kowalski informed me that if the DS3 is
-     * high, and one of the other drive bits is selected (DS0-DS2), then the
-     * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
-     * selected in other situations, then both drives are selected, and any
-     * read signals get yucky.
-     */
+	 * high, and one of the other drive bits is selected (DS0-DS2), then the
+	 * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
+	 * selected in other situations, then both drives are selected, and any
+	 * read signals get yucky.
+	 */
 
 	if (data & 0x04)
 		drive = 2;
@@ -362,22 +362,22 @@ READ8_MEMBER(coco_fdc_device::read)
 	/* other stuff for RTCs */
 	switch(offset)
 	{
-		case 0x10:	/* FF50 */
+		case 0x10:  /* FF50 */
 			if (real_time_clock() == RTC_DISTO)
 				result = m_disto_msm6242->read(space,m_msm6242_rtc_address);
 			break;
 
-		case 0x38:	/* FF78 */
+		case 0x38:  /* FF78 */
 			if (real_time_clock() == RTC_CLOUD9)
 				ds1315_r_0(m_ds1315, space, offset);
 			break;
 
-		case 0x39:	/* FF79 */
+		case 0x39:  /* FF79 */
 			if (real_time_clock() == RTC_CLOUD9)
 				ds1315_r_1(m_ds1315, space, offset);
 			break;
 
-		case 0x3C:	/* FF7C */
+		case 0x3C:  /* FF7C */
 			if (real_time_clock() == RTC_CLOUD9)
 				result = ds1315_r_data(m_ds1315, space, offset);
 			break;
@@ -416,12 +416,12 @@ WRITE8_MEMBER(coco_fdc_device::write)
 	/* other stuff for RTCs */
 	switch(offset)
 	{
-		case 0x10:	/* FF50 */
+		case 0x10:  /* FF50 */
 			if (real_time_clock() == RTC_DISTO)
 				m_disto_msm6242->write(space,m_msm6242_rtc_address, data);
 			break;
 
-		case 0x11:	/* FF51 */
+		case 0x11:  /* FF51 */
 			if (real_time_clock() == RTC_DISTO)
 				m_msm6242_rtc_address = data & 0x0f;
 			break;
@@ -454,7 +454,7 @@ dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type 
 {
 }
 dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : coco_fdc_device(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock)
+		: coco_fdc_device(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock)
 {
 }
 
@@ -465,10 +465,10 @@ dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, const char *
 void dragon_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
-	m_drq           	= 0;
-	m_wd17xx			= subdevice(WD_TAG);
-	m_dskreg			= 0x00;
-	m_intrq				= 0;
+	m_drq               = 0;
+	m_wd17xx            = subdevice(WD_TAG);
+	m_dskreg            = 0x00;
+	m_intrq             = 0;
 	m_msm6242_rtc_address = 0;
 }
 
@@ -625,7 +625,7 @@ const device_type SDTANDY_FDC = &device_creator<sdtandy_fdc_device>;
 //-------------------------------------------------
 
 sdtandy_fdc_device::sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : dragon_fdc_device(mconfig, SDTANDY_FDC, "SDTANDY FDC", tag, owner, clock)
+		: dragon_fdc_device(mconfig, SDTANDY_FDC, "SDTANDY FDC", tag, owner, clock)
 {
 }
 
@@ -655,7 +655,7 @@ const rom_entry *sdtandy_fdc_device::device_rom_region() const
 
 ROM_START( coco_fdc_v11 )
 	ROM_REGION(0x8000,"eprom",ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
+	ROM_LOAD_OPTIONAL(  "disk11.rom",   0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
 	ROM_RELOAD(0x2000, 0x2000)
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x6000, 0x2000)
@@ -668,7 +668,7 @@ const device_type COCO_FDC_V11 = &device_creator<coco_fdc_v11_device>;
 //-------------------------------------------------
 
 coco_fdc_v11_device::coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : coco_fdc_device(mconfig, COCO_FDC_V11, "CoCo FDC v1.1", tag, owner, clock)
+		: coco_fdc_device(mconfig, COCO_FDC_V11, "CoCo FDC v1.1", tag, owner, clock)
 {
 }
 
@@ -708,7 +708,7 @@ const device_type CP400_FDC = &device_creator<cp400_fdc_device>;
 //-------------------------------------------------
 
 cp400_fdc_device::cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : coco_fdc_device(mconfig, CP400_FDC, "CP400 FDC", tag, owner, clock)
+		: coco_fdc_device(mconfig, CP400_FDC, "CP400 FDC", tag, owner, clock)
 {
 }
 

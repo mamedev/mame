@@ -11,10 +11,10 @@
 #include "formats/mfi_dsk.h"
 #include "formats/kc85_dsk.h"
 
-#define Z80_TAG			"disk"
-#define Z80CTC_TAG		"z80ctc"
-#define UPD765_TAG		"upd765"
-#define IDE_TAG			"ide"
+#define Z80_TAG         "disk"
+#define Z80CTC_TAG      "z80ctc"
+#define UPD765_TAG      "upd765"
+#define IDE_TAG         "ide"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -22,7 +22,7 @@
 
 static ADDRESS_MAP_START(kc_d004_mem, AS_PROGRAM, 8, kc_d004_device)
 	AM_RANGE(0x0000, 0xfbff) AM_RAM
-	AM_RANGE(0xfc00, 0xffff) AM_RAM		AM_SHARE("koppelram")
+	AM_RANGE(0xfc00, 0xffff) AM_RAM     AM_SHARE("koppelram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc_d004_io, AS_IO, 8, kc_d004_device)
@@ -38,12 +38,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc_d004_gide_io, AS_IO, 8, kc_d004_gide_device)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00f0, 0x00f1) AM_MIRROR(0xff00)	AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0x00f2, 0x00f3) AM_MIRROR(0xff00)	AM_DEVREADWRITE(UPD765_TAG, upd765a_device, mdma_r, mdma_w)
-	AM_RANGE(0x00f4, 0x00f4) AM_MIRROR(0xff00)	AM_READ(hw_input_gate_r)
-	AM_RANGE(0x00f6, 0x00f7) AM_MIRROR(0xff00)	AM_WRITE(fdd_select_w)
-	AM_RANGE(0x00f8, 0x00f9) AM_MIRROR(0xff00)	AM_WRITE(hw_terminal_count_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_MIRROR(0xff00)	AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
+	AM_RANGE(0x00f0, 0x00f1) AM_MIRROR(0xff00)  AM_DEVICE(UPD765_TAG, upd765a_device, map)
+	AM_RANGE(0x00f2, 0x00f3) AM_MIRROR(0xff00)  AM_DEVREADWRITE(UPD765_TAG, upd765a_device, mdma_r, mdma_w)
+	AM_RANGE(0x00f4, 0x00f4) AM_MIRROR(0xff00)  AM_READ(hw_input_gate_r)
+	AM_RANGE(0x00f6, 0x00f7) AM_MIRROR(0xff00)  AM_WRITE(fdd_select_w)
+	AM_RANGE(0x00f8, 0x00f9) AM_MIRROR(0xff00)  AM_WRITE(hw_terminal_count_w)
+	AM_RANGE(0x00fc, 0x00ff) AM_MIRROR(0xff00)  AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
 ADDRESS_MAP_END
 
@@ -63,10 +63,10 @@ static const z80_daisy_config kc_d004_daisy_chain[] =
 
 static Z80CTC_INTERFACE( kc_d004_ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, 0),				/* interrupt callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg1),	/* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),	/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg3)	/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, 0),               /* interrupt callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg1),  /* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),  /* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg3)   /* ZC/TO2 callback */
 };
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004)
@@ -96,21 +96,21 @@ MACHINE_CONFIG_END
 
 ROM_START( kc_d004 )
 	ROM_REGION(0x2000, Z80_TAG, 0)
-	ROM_LOAD_OPTIONAL("d004v20.bin",	0x0000, 0x2000, CRC(4f3494f1) SHA1(66f476de78fb474d9ac61c6eaffce3354fd66776))
+	ROM_LOAD_OPTIONAL("d004v20.bin",    0x0000, 0x2000, CRC(4f3494f1) SHA1(66f476de78fb474d9ac61c6eaffce3354fd66776))
 ROM_END
 
 ROM_START( kc_d004_gide )
 	ROM_REGION(0x2000, Z80_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "v33_4", "ver 3.3 (KC 85/4)")
-	ROMX_LOAD("d004v33_4.bin",	0x0000, 0x2000, CRC(1451efd7) SHA1(9db201af408adb02254094dc7aa7185bf5a7b9b1), ROM_BIOS(1) )	// KC85/4-5
+	ROMX_LOAD("d004v33_4.bin",  0x0000, 0x2000, CRC(1451efd7) SHA1(9db201af408adb02254094dc7aa7185bf5a7b9b1), ROM_BIOS(1) ) // KC85/4-5
 	ROM_SYSTEM_BIOS(1, "v33_3", "ver 3.3 (KC 85/3)")
-	ROMX_LOAD( "d004v33_3.bin",	0x0000, 0x2000, CRC(945f3e4b) SHA1(cce5d9eea82582270660c8275336b15bf9906253), ROM_BIOS(2) )	// KC85/3
+	ROMX_LOAD( "d004v33_3.bin", 0x0000, 0x2000, CRC(945f3e4b) SHA1(cce5d9eea82582270660c8275336b15bf9906253), ROM_BIOS(2) ) // KC85/3
 	ROM_SYSTEM_BIOS(2, "v30", "ver 3.0")
-	ROMX_LOAD("d004v30.bin",	0x0000, 0x2000, CRC(6fe0a283) SHA1(5582b2541a34a90c7a9516a6a222d4961fc54fcf), ROM_BIOS(3) )	// KC85/4-5
+	ROMX_LOAD("d004v30.bin",    0x0000, 0x2000, CRC(6fe0a283) SHA1(5582b2541a34a90c7a9516a6a222d4961fc54fcf), ROM_BIOS(3) ) // KC85/4-5
 	ROM_SYSTEM_BIOS(3, "v31", "ver 3.1")
-	ROMX_LOAD("d004v31.bin",	0x0000, 0x2000, CRC(712547de) SHA1(38b3164dce23573375fc0237f348d9a699fc6f9f), ROM_BIOS(4) )	// KC85/4-5
+	ROMX_LOAD("d004v31.bin",    0x0000, 0x2000, CRC(712547de) SHA1(38b3164dce23573375fc0237f348d9a699fc6f9f), ROM_BIOS(4) ) // KC85/4-5
 	ROM_SYSTEM_BIOS(4, "v32", "ver 3.2")
-	ROMX_LOAD("d004v32.bin",	0x0000, 0x2000, CRC(9a3d3511) SHA1(8232adb5e5f0b25b52f9873cff14831da3a0398a), ROM_BIOS(5) )	// KC85/4-5
+	ROMX_LOAD("d004v32.bin",    0x0000, 0x2000, CRC(9a3d3511) SHA1(8232adb5e5f0b25b52f9873cff14831da3a0398a), ROM_BIOS(5) ) // KC85/4-5
 ROM_END
 
 
@@ -130,7 +130,7 @@ const device_type KC_D004_GIDE = &device_creator<kc_d004_gide_device>;
 //-------------------------------------------------
 
 kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, KC_D004, "D004 Floppy Disk Interface", tag, owner, clock),
+		: device_t(mconfig, KC_D004, "D004 Floppy Disk Interface", tag, owner, clock),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
 		m_fdc(*this, UPD765_TAG),
@@ -139,7 +139,7 @@ kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, d
 }
 
 kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, type, name, tag, owner, clock),
+		: device_t(mconfig, type, name, tag, owner, clock),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
 		m_fdc(*this, UPD765_TAG),
@@ -320,12 +320,12 @@ READ8_MEMBER(kc_d004_device::hw_input_gate_r)
 {
 	/*
 
-        bit 7: DMA Request (DRQ from FDC)
-        bit 6: Interrupt (INT from FDC)
-        bit 5: Drive Ready
-        bit 4: Index pulse from disc
+	    bit 7: DMA Request (DRQ from FDC)
+	    bit 6: Interrupt (INT from FDC)
+	    bit 5: Drive Ready
+	    bit 4: Index pulse from disc
 
-    */
+	*/
 
 	if (m_floppy->ready_r())
 		m_hw_input_gate |= 0x20;
@@ -389,8 +389,8 @@ void kc_d004_device::fdc_drq(bool state)
 //-------------------------------------------------
 
 kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk + GIDE Interface", tag, owner, clock),
-	    m_ide(*this, IDE_TAG)
+		: kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk + GIDE Interface", tag, owner, clock),
+		m_ide(*this, IDE_TAG)
 {
 }
 
@@ -421,8 +421,8 @@ void kc_d004_gide_device::device_reset()
 {
 	kc_d004_device::device_reset();
 
-	m_ide_data	= 0;
-	m_lh		= 0;
+	m_ide_data  = 0;
+	m_lh        = 0;
 }
 
 //-------------------------------------------------

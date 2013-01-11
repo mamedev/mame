@@ -724,7 +724,7 @@ ROM_END
 
 */
 
-ROM_START( bingor5 )	/* BellStar V3 */
+ROM_START( bingor5 )    /* BellStar V3 */
 	ROM_REGION( 0x20000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
 	ROM_LOAD16_BYTE( "bellstar_v3_v.3.6.02_l.bin", 0x010000, 0x08000, CRC(56b84a5d) SHA1(1bda4fb972b4f0f0575089b545bf15dfea859948) )
 	ROM_LOAD16_BYTE( "bellstar_v3_v.3.6.02_h.bin", 0x010001, 0x08000, CRC(d6945bb8) SHA1(b620f1b547be03c4609bff8d06111d0ea425bae8) )

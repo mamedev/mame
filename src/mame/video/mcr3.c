@@ -237,7 +237,7 @@ static void mcr3_update_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 		sy += dy;
 
 		/* sprites use color 0 for background pen and 8 for the 'under tile' pen.
-            The color 8 is used to cover over other sprites. */
+		    The color 8 is used to cover over other sprites. */
 		if (!mcr_cocktail_flip)
 		{
 			/* first draw the sprite, visible */

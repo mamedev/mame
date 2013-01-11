@@ -188,7 +188,7 @@ WRITE8_HANDLER( europc_pio_w )
 }
 
 
- READ8_HANDLER( europc_pio_r )
+	READ8_HANDLER( europc_pio_r )
 {
 	int data = 0;
 	switch (offset)
@@ -211,28 +211,28 @@ WRITE8_HANDLER( europc_pio_w )
 // realtime clock and nvram
 static struct {
 	/*
-       reg 0: seconds
-       reg 1: minutes
-       reg 2: hours
-       reg 3: day 1 based
-       reg 4: month 1 based
-       reg 5: year bcd (no century, values bigger 88? are handled as 1900, else 2000)
-       reg 6:
-       reg 7:
-       reg 8:
-       reg 9:
-       reg a:
-       reg b: 0x10 written
-        bit 0,1: 0 video startup mode: 0=specialadapter, 1=color40, 2=color80, 3=monochrom
-        bit 2: internal video on
-        bit 4: color
-        bit 6,7: clock
-       reg c:
-        bit 0,1: language/country
-       reg d: xor checksum
-       reg e:
-       reg 0f: 01 status ok, when not 01 written
-    */
+	   reg 0: seconds
+	   reg 1: minutes
+	   reg 2: hours
+	   reg 3: day 1 based
+	   reg 4: month 1 based
+	   reg 5: year bcd (no century, values bigger 88? are handled as 1900, else 2000)
+	   reg 6:
+	   reg 7:
+	   reg 8:
+	   reg 9:
+	   reg a:
+	   reg b: 0x10 written
+	    bit 0,1: 0 video startup mode: 0=specialadapter, 1=color40, 2=color80, 3=monochrom
+	    bit 2: internal video on
+	    bit 4: color
+	    bit 6,7: clock
+	   reg c:
+	    bit 0,1: language/country
+	   reg d: xor checksum
+	   reg e:
+	   reg 0f: 01 status ok, when not 01 written
+	*/
 	UINT8 data[0x10];
 	int reg;
 	int state;
@@ -297,7 +297,7 @@ void europc_rtc_init(running_machine &machine)
 	europc_rtc.timer->adjust(attotime::zero, 0, attotime(1,0));
 }
 
- READ8_HANDLER( europc_rtc_r )
+	READ8_HANDLER( europc_rtc_r )
 {
 	int data=0;
 	switch (europc_rtc.state)
@@ -362,4 +362,3 @@ NVRAM_HANDLER( europc_rtc )
 		europc_rtc_set_time(machine);
 	}
 }
-

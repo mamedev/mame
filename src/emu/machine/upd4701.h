@@ -58,4 +58,4 @@ extern DECLARE_READ8_DEVICE_HANDLER( upd4701_cf_r );
 extern DECLARE_READ8_DEVICE_HANDLER( upd4701_sf_r );
 
 
-#endif	/* __UPD4701_H__ */
+#endif  /* __UPD4701_H__ */

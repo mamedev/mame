@@ -25,27 +25,27 @@ struct mm58274c_t
 {
 	const mm58274c_interface *intf;
 
-	int status;		/* status register (*read* from address 0 = control register) */
-	int control;	/* control register (*write* to address 0) */
+	int status;     /* status register (*read* from address 0 = control register) */
+	int control;    /* control register (*write* to address 0) */
 
-	int clk_set;	/* clock setting register */
-	int int_ctl;	/* interrupt control register */
+	int clk_set;    /* clock setting register */
+	int int_ctl;    /* interrupt control register */
 
 
-	int wday;		/* day of the week (1-7 (1=day1 as set in init)) */
-	int years1;		/* years (BCD: 0-99) */
+	int wday;       /* day of the week (1-7 (1=day1 as set in init)) */
+	int years1;     /* years (BCD: 0-99) */
 	int years2;
-	int months1;	/* months (BCD: 1-12) */
+	int months1;    /* months (BCD: 1-12) */
 	int months2;
-	int days1;		/* days (BCD: 1-31) */
+	int days1;      /* days (BCD: 1-31) */
 	int days2;
-	int hours1;		/* hours (BCD : 0-23) */
+	int hours1;     /* hours (BCD : 0-23) */
 	int hours2;
-	int minutes1;	/* minutes (BCD : 0-59) */
+	int minutes1;   /* minutes (BCD : 0-59) */
 	int minutes2;
-	int seconds1;	/* seconds (BCD : 0-59) */
+	int seconds1;   /* seconds (BCD : 0-59) */
 	int seconds2;
-	int tenths;		/* tenths of second (BCD : 0-9) */
+	int tenths;     /* tenths of second (BCD : 0-9) */
 
 	emu_timer *increment_rtc;
 	emu_timer *interrupt_timer;
@@ -53,21 +53,21 @@ struct mm58274c_t
 
 enum
 {
-	st_dcf = 0x8,		/* data-changed flag */
-	st_if = 0x1,		/* interrupt flag */
+	st_dcf = 0x8,       /* data-changed flag */
+	st_if = 0x1,        /* interrupt flag */
 
-	ctl_test = 0x8,		/* test mode (0=normal, 1=test) (not emulated) */
-	ctl_clkstop = 0x4,	/* clock start/stop (0=run, 1=stop) */
-	ctl_intsel = 0x2,	/* interrupt select (0=clock setting register, 1=interrupt register) */
-	ctl_intstop = 0x1,	/* interrupt start stop (0=interrupt run, 1=interrupt stop) */
+	ctl_test = 0x8,     /* test mode (0=normal, 1=test) (not emulated) */
+	ctl_clkstop = 0x4,  /* clock start/stop (0=run, 1=stop) */
+	ctl_intsel = 0x2,   /* interrupt select (0=clock setting register, 1=interrupt register) */
+	ctl_intstop = 0x1,  /* interrupt start stop (0=interrupt run, 1=interrupt stop) */
 
-	clk_set_leap = 0xc,		/* leap year counter (0 indicates a leap year) */
-	clk_set_leap_inc = 0x4,	/* leap year increment */
-	clk_set_pm = 0x2,		/* am/pm indicator (0 = am, 1 = pm, 0 in 24-hour mode) */
-	clk_set_24 = 0x1,		/* 12/24-hour select bit (1= 24-hour mode) */
+	clk_set_leap = 0xc,     /* leap year counter (0 indicates a leap year) */
+	clk_set_leap_inc = 0x4, /* leap year increment */
+	clk_set_pm = 0x2,       /* am/pm indicator (0 = am, 1 = pm, 0 in 24-hour mode) */
+	clk_set_24 = 0x1,       /* 12/24-hour select bit (1= 24-hour mode) */
 
-	int_ctl_rpt = 0x8,		/* 1 for repeated interrupt */
-	int_ctl_dly = 0x7		/* 0 no interrupt, 1 = .1 second, 2=.5, 3=1, 4=5, 5=10, 6=30, 7=60 */
+	int_ctl_rpt = 0x8,      /* 1 for repeated interrupt */
+	int_ctl_dly = 0x7       /* 0 no interrupt, 1 = .1 second, 2=.5, 3=1, 4=5, 5=10, 6=30, 7=60 */
 };
 
 
@@ -83,14 +83,14 @@ static attotime interrupt_period_table(int val)
 {
 	switch(val)
 	{
-		case 0:	return attotime::from_msec(0);
-		case 1:	return attotime::from_msec(100);
-		case 2:	return attotime::from_msec(500);
-		case 3:	return attotime::from_seconds(1);
-		case 4:	return attotime::from_seconds(5);
-		case 5:	return attotime::from_seconds(10);
-		case 6:	return attotime::from_seconds(30);
-		case 7:	return attotime::from_seconds(60);
+		case 0: return attotime::from_msec(0);
+		case 1: return attotime::from_msec(100);
+		case 2: return attotime::from_msec(500);
+		case 3: return attotime::from_seconds(1);
+		case 4: return attotime::from_seconds(5);
+		case 5: return attotime::from_seconds(10);
+		case 6: return attotime::from_seconds(30);
+		case 7: return attotime::from_seconds(60);
 		default: fatalerror("out of range\n");
 	}
 };
@@ -104,73 +104,73 @@ READ8_DEVICE_HANDLER( mm58274c_r )
 
 	switch (offset)
 	{
-	case 0x0:	/* Control Register */
+	case 0x0:   /* Control Register */
 		reply = mm58274c->status;
 		mm58274c->status = 0;
 		break;
 
-	case 0x1:	/* Tenths of Seconds */
+	case 0x1:   /* Tenths of Seconds */
 		reply = mm58274c->tenths;
 		break;
 
-	case 0x2:	/* Units Seconds */
+	case 0x2:   /* Units Seconds */
 		reply = mm58274c->seconds2;
 		break;
 
-	case 0x3:	/* Tens Seconds */
+	case 0x3:   /* Tens Seconds */
 		reply = mm58274c->seconds1;
 		break;
 
-	case 0x04:	/* Units Minutes */
+	case 0x04:  /* Units Minutes */
 		reply = mm58274c->minutes2;
 		break;
 
-	case 0x5:	/* Tens Minutes */
+	case 0x5:   /* Tens Minutes */
 		reply = mm58274c->minutes1;
 		break;
 
-	case 0x6:	/* Units Hours */
+	case 0x6:   /* Units Hours */
 		reply = mm58274c->hours2;
 		break;
 
-	case 0x7:	/* Tens Hours */
+	case 0x7:   /* Tens Hours */
 		reply = mm58274c->hours1;
 		break;
 
-	case 0x8:	/* Units Days */
+	case 0x8:   /* Units Days */
 		reply = mm58274c->days2;
 		break;
 
-	case 0x9:	/* Tens Days */
+	case 0x9:   /* Tens Days */
 		reply = mm58274c->days1;
 		break;
 
-	case 0xA:	/* Units Months */
+	case 0xA:   /* Units Months */
 		reply = mm58274c->months2;
 		break;
 
-	case 0xB:	/* Tens Months */
+	case 0xB:   /* Tens Months */
 		reply = mm58274c->months1;
 		break;
 
-	case 0xC:	/* Units Years */
+	case 0xC:   /* Units Years */
 		reply = mm58274c->years2;
 		break;
 
-	case 0xD:	/* Tens Years */
+	case 0xD:   /* Tens Years */
 		reply = mm58274c->years1;
 		break;
 
-	case 0xE:	/* Day of Week */
+	case 0xE:   /* Day of Week */
 		reply = mm58274c->wday;
 		break;
 
-	case 0xF:	/* Clock Setting & Interrupt Registers */
+	case 0xF:   /* Clock Setting & Interrupt Registers */
 		if (mm58274c->control & ctl_intsel)
 			/* interrupt register */
 			reply = mm58274c->int_ctl;
 		else
-		{	/* clock setting register */
+		{   /* clock setting register */
 			if (mm58274c->clk_set & clk_set_24)
 				/* 24-hour mode */
 				reply = mm58274c->clk_set & ~clk_set_pm;
@@ -198,7 +198,7 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 
 	switch (offset)
 	{
-	case 0x0:	/* Control Register (test mode and interrupt not emulated) */
+	case 0x0:   /* Control Register (test mode and interrupt not emulated) */
 		if ((! (mm58274c->control & ctl_intstop)) && (data & ctl_intstop))
 			/* interrupt stop */
 			mm58274c->interrupt_timer->enable(0);
@@ -215,62 +215,62 @@ WRITE8_DEVICE_HANDLER (mm58274c_w)
 		mm58274c->control = data;
 		break;
 
-	case 0x1:	/* Tenths of Seconds: cannot be written */
+	case 0x1:   /* Tenths of Seconds: cannot be written */
 		break;
 
-	case 0x2:	/* Units Seconds */
+	case 0x2:   /* Units Seconds */
 		mm58274c->seconds2 = data;
 		break;
 
-	case 0x3:	/* Tens Seconds */
+	case 0x3:   /* Tens Seconds */
 		mm58274c->seconds1 = data;
 		break;
 
-	case 0x4:	/* Units Minutes */
+	case 0x4:   /* Units Minutes */
 		mm58274c->minutes2 = data;
 		break;
 
-	case 0x5:	/* Tens Minutes */
+	case 0x5:   /* Tens Minutes */
 		mm58274c->minutes1 = data;
 		break;
 
-	case 0x6:	/* Units Hours */
+	case 0x6:   /* Units Hours */
 		mm58274c->hours2 = data;
 		break;
 
-	case 0x7:	/* Tens Hours */
+	case 0x7:   /* Tens Hours */
 		mm58274c->hours1 = data;
 		break;
 
-	case 0x8:	/* Units Days */
+	case 0x8:   /* Units Days */
 		mm58274c->days2 = data;
 		break;
 
-	case 0x9:	/* Tens Days */
+	case 0x9:   /* Tens Days */
 		mm58274c->days1 = data;
 		break;
 
-	case 0xA:	/* Units Months */
+	case 0xA:   /* Units Months */
 		mm58274c->months2 = data;
 		break;
 
-	case 0xB:	/* Tens Months */
+	case 0xB:   /* Tens Months */
 		mm58274c->months1 = data;
 		break;
 
-	case 0xC:	/* Units Years */
+	case 0xC:   /* Units Years */
 		mm58274c->years2 = data;
 		break;
 
-	case 0xD:	/* Tens Years */
+	case 0xD:   /* Tens Years */
 		mm58274c->years1 = data;
 		break;
 
-	case 0xE:	/* Day of Week */
+	case 0xE:   /* Day of Week */
 		mm58274c->wday = data;
 		break;
 
-	case 0xF:	/* Clock Setting & Interrupt Registers */
+	case 0xF:   /* Clock Setting & Interrupt Registers */
 		if (mm58274c->control & ctl_intsel)
 		{
 			/* interrupt register (not emulated) */
@@ -550,5 +550,3 @@ void mm58274c_device::device_reset()
 {
 	DEVICE_RESET_NAME( mm58274c )(this);
 }
-
-

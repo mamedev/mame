@@ -175,4 +175,3 @@ void tms57002_device::decode_cat3(UINT32 opcode, unsigned short *op, cstate *cs)
 		break;
 	}
 }
-

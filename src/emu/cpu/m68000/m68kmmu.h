@@ -54,21 +54,21 @@ static UINT32 DECODE_EA_32(m68ki_cpu_core *m68k, int ea)
 
 	switch (mode)
 	{
-		case 2:		// (An)
+		case 2:     // (An)
 		{
 			return REG_A(m68k)[reg];
 		}
-		case 3:		// (An)+
+		case 3:     // (An)+
 		{
 			UINT32 ea = EA_AY_PI_32(m68k);
 			return ea;
 		}
-		case 5:		// (d16, An)
+		case 5:     // (d16, An)
 		{
 			UINT32 ea = EA_AY_DI_32(m68k);
 			return ea;
 		}
-		case 6:		// (An) + (Xn) + d8
+		case 6:     // (An) + (Xn) + d8
 		{
 			UINT32 ea = EA_AY_IX_32(m68k);
 			return ea;
@@ -77,28 +77,28 @@ static UINT32 DECODE_EA_32(m68ki_cpu_core *m68k, int ea)
 		{
 			switch (reg)
 			{
-				case 0:		// (xxx).W
+				case 0:     // (xxx).W
 				{
 					UINT32 ea = (UINT32)OPER_I_16(m68k);
 					return ea;
 				}
-				case 1:		// (xxx).L
+				case 1:     // (xxx).L
 				{
 					UINT32 d1 = OPER_I_16(m68k);
 					UINT32 d2 = OPER_I_16(m68k);
 					UINT32 ea = (d1 << 16) | d2;
 					return ea;
 				}
-				case 2:		// (d16, PC)
+				case 2:     // (d16, PC)
 				{
 					UINT32 ea = EA_PCDI_32(m68k);
 					return ea;
 				}
-				default:	fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC(m68k));
+				default:    fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC(m68k));
 			}
 			break;
 		}
-		default:	fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC(m68k));
+		default:    fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC(m68k));
 	}
 	return 0;
 }
@@ -148,7 +148,7 @@ void pmmu_atc_add(m68ki_cpu_core *m68k, UINT32 logical, UINT32 physical, int fc)
 	}
 
 	// add the entry
-    // printf("ATC[%2d] add: log %08x -> phys %08x (fc=%d)\n", found, (logical>>ps) << ps, (physical >> ps) << ps, fc);
+	// printf("ATC[%2d] add: log %08x -> phys %08x (fc=%d)\n", found, (logical>>ps) << ps, (physical >> ps) << ps, fc);
 	m68k->mmu_atc_tag[found] = atc_tag;
 	m68k->mmu_atc_data[found] = (physical >> ps) << (ps-8);
 
@@ -166,7 +166,7 @@ void pmmu_atc_add(m68ki_cpu_core *m68k, UINT32 logical, UINT32 physical, int fc)
 void pmmu_atc_flush(m68ki_cpu_core *m68k)
 {
 	int i;
-    // printf("ATC flush: pc=%08x\n", REG_PPC(m68k));
+	// printf("ATC flush: pc=%08x\n", REG_PPC(m68k));
 
 	for (i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
@@ -322,7 +322,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		root_aptr = m68k->mmu_srp_aptr;
 		root_limit = m68k->mmu_srp_limit;
 	}
-	else	// else use the CRP
+	else    // else use the CRP
 	{
 		root_aptr = m68k->mmu_crp_aptr;
 		root_limit = m68k->mmu_crp_limit;
@@ -344,16 +344,16 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 	// find out what format table A is
 	switch (root_limit & M68K_MMU_DF_DT)
 	{
-		case M68K_MMU_DF_DT0:	// invalid, will cause MMU exception
+		case M68K_MMU_DF_DT0:   // invalid, will cause MMU exception
 			m68k->mmu_tmp_sr |= M68K_MMU_SR_INVALID;
 			return root_aptr;
 
-		case M68K_MMU_DF_DT1:	// page descriptor, will cause direct mapping
+		case M68K_MMU_DF_DT1:   // page descriptor, will cause direct mapping
 			addr_out = tptr + addr_in;
 //          printf("PMMU: PC=%x root mode %d (addr_in %08x -> %08x)\n", m68k->ppc, M68K_MMU_DF_DT1, addr_in, addr_out);
 			return addr_out;
 
-		case M68K_MMU_DF_DT2:	// valid 4 byte descriptors
+		case M68K_MMU_DF_DT2:   // valid 4 byte descriptors
 			tofs *= 4;
 //          if (verbose) printf("PMMU: reading table A entry at %08x\n", tofs + tptr);
 			tbl_entry = get_dt2_table_entry(m68k,  tptr + tofs,  ptest);
@@ -403,7 +403,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 //          if (verbose) printf("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tbmode, tofs);
 			break;
 
-		case M68K_MMU_DF_DT1:	// early termination descriptor
+		case M68K_MMU_DF_DT1:   // early termination descriptor
 			tbl_entry &= (~0 << ps);
 
 			shift = is+abits;
@@ -423,7 +423,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 		switch (tbmode)
 		{
-			case M68K_MMU_DF_DT0:	// invalid, will cause MMU exception (but not for ptest)
+			case M68K_MMU_DF_DT0:   // invalid, will cause MMU exception (but not for ptest)
 				m68k->mmu_tmp_sr |= (M68K_MMU_SR_INVALID | M68K_MMU_SR_LEVEL_2);
 				// last valid pointer (for ptest)
 				addr_out = last_entry_ptr;
@@ -460,7 +460,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 	{
 		switch (tcmode)
 		{
-			case M68K_MMU_DF_DT0:	// invalid, will cause MMU exception (unless ptest)
+			case M68K_MMU_DF_DT0:   // invalid, will cause MMU exception (unless ptest)
 				m68k->mmu_tmp_sr |= (M68K_MMU_SR_INVALID | M68K_MMU_SR_LEVEL_3);
 				addr_out = tptr + tofs;
 				resolved = 1;
@@ -481,7 +481,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		}
 	}
 
-    if (!ptest)
+	if (!ptest)
 	{
 		if (m68k->mmu_tmp_sr & M68K_MMU_SR_INVALID)
 		{
@@ -536,12 +536,12 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 	// transparent translation registers are always in force even if the PMMU itself is disabled
 	// they don't do much in emulation because we never write out of order, but the write-protect and cache control features
 	// are emulatable, and apparently transparent translation regions skip the page table lookup.
-	if (fc & 1)	// data, use DTT0/DTT1
+	if (fc & 1) // data, use DTT0/DTT1
 	{
 		tt0 = m68k->mmu_dtt0;
 		tt1 = m68k->mmu_dtt1;
 	}
-	else if (fc & 2)	// program, use ITT0/ITT1
+	else if (fc & 2)    // program, use ITT0/ITT1
 	{
 		tt0 = m68k->mmu_itt0;
 		tt1 = m68k->mmu_itt1;
@@ -562,7 +562,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		if ((addr_in & mask) == (tt0 & mask) && (fc & fcmask[(tt0 >> 13) & 3]) == fcmatch[(tt0 >> 13) & 3])
 		{
 			//          fprintf(stderr, "TT0 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt0, mask);
-			if ((tt0 & 4) && !m68k->mmu_tmp_rw && !ptest)	// write protect?
+			if ((tt0 & 4) && !m68k->mmu_tmp_rw && !ptest)   // write protect?
 			{
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
@@ -587,7 +587,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		if ((addr_in & mask) == (tt1 & mask) && (fc & fcmask[(tt1 >> 13) & 3]) == fcmatch[(tt1 >> 13) & 3])
 		{
 			//          fprintf(stderr, "TT1 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt1, mask);
-			if ((tt1 & 4) && !m68k->mmu_tmp_rw && !ptest)	// write protect?
+			if ((tt1 & 4) && !m68k->mmu_tmp_rw && !ptest)   // write protect?
 			{
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
@@ -677,7 +677,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		}
 
 		// now do the page lookup
-		if (m68k->mmu_tc & 0x4000)	// 8k pages?
+		if (m68k->mmu_tc & 0x4000)  // 8k pages?
 		{
 			page_idx = (addr_in >> 13) & 0x1f;
 			page = addr_in & 0x1fff;
@@ -685,7 +685,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 			//          logerror("8k pages: index %x page %x\n", page_idx, page);
 		}
-		else	// 4k pages
+		else    // 4k pages
 		{
 			page_idx = (addr_in >> 12) & 0x3f;
 			page = addr_in & 0xfff;
@@ -720,7 +720,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 		switch (page_entry & 3)
 		{
-			case 0:	// invalid
+			case 0: // invalid
 //              fprintf(stderr, "Invalid page entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
 				if (!ptest)
 				{
@@ -735,8 +735,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 				return addr_in;
 
 			case 1:
-			case 3:	// normal
-				if (m68k->mmu_tc & 0x4000)	// 8k pages?
+			case 3: // normal
+				if (m68k->mmu_tc & 0x4000)  // 8k pages?
 				{
 					addr_out = (page_entry & ~0x1fff) | page;
 				}
@@ -748,7 +748,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 				break;
 
-			case 2:	// shouldn't happen
+			case 2: // shouldn't happen
 				fatalerror("68040: got indirect final page pointer, shouldn't be possible\n");
 				break;
 		}
@@ -810,14 +810,14 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 //      logerror("68040 pflush: pc=%08x ir=%04x opmode=%d register=%d\n", REG_PPC(m68k), m68k->ir, (m68k->ir >> 3) & 3, m68k->ir & 7);
 		pmmu_atc_flush(m68k);
 	}
-	else	// the rest are 1111000xxxXXXXXX where xxx is the instruction family
+	else    // the rest are 1111000xxxXXXXXX where xxx is the instruction family
 	{
 		switch ((m68k->ir>>9) & 0x7)
 		{
 			case 0:
 				modes = OPER_I_16(m68k);
 
-				if ((modes & 0xfde0) == 0x2000)	// PLOAD
+				if ((modes & 0xfde0) == 0x2000) // PLOAD
 				{
 					UINT32 ltmp = DECODE_EA_32(m68k, ea);
 					UINT32 ptmp;
@@ -840,27 +840,27 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 					pmmu_atc_add(m68k, ltmp, ptmp,  modes & 0x07);
 					return;
 				}
-				else if ((modes & 0xe200) == 0x2000)	// PFLUSH
+				else if ((modes & 0xe200) == 0x2000)    // PFLUSH
 				{
 					pmmu_atc_flush(m68k);
 					return;
 				}
-				else if (modes == 0xa000)	// PFLUSHR
+				else if (modes == 0xa000)   // PFLUSHR
 				{
 					pmmu_atc_flush(m68k);
 					return;
 				}
-				else if (modes == 0x2800)	// PVALID (FORMAT 1)
+				else if (modes == 0x2800)   // PVALID (FORMAT 1)
 				{
 					printf("680x0: unhandled PVALID1\n");
 					return;
 				}
-				else if ((modes & 0xfff8) == 0x2c00)	// PVALID (FORMAT 2)
+				else if ((modes & 0xfff8) == 0x2c00)    // PVALID (FORMAT 2)
 				{
 					printf("680x0: unhandled PVALID2\n");
 					return;
 				}
-				else if ((modes & 0xe000) == 0x8000)	// PTEST
+				else if ((modes & 0xe000) == 0x8000)    // PTEST
 				{
 					UINT32 v_addr = DECODE_EA_32(m68k,  ea);
 					UINT32 p_addr;
@@ -901,8 +901,8 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 				{
 					switch ((modes>>13) & 0x7)
 					{
-						case 0:	// MC68030/040 form with FD bit
-						case 2:	// MC68881 form, FD never set
+						case 0: // MC68030/040 form with FD bit
+						case 2: // MC68881 form, FD never set
 							if (modes & 0x200)
 							{
 									switch ((modes>>10) & 0x3f)
@@ -915,7 +915,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 											WRITE_EA_32(m68k, ea, m68k->mmu_tt1);
 //                                          printf("PMMU: pc=%x PMOVE from mmu_tt1=%08x\n", m68k->ppc, m68k->mmu_tt1);
 											break;
-										case 0x10:	// translation control register
+										case 0x10:  // translation control register
 											WRITE_EA_32(m68k, ea, m68k->mmu_tc);
 //                                          printf("PMMU: pc=%x PMOVE from mmu_tc=%08x\n", m68k->ppc, m68k->mmu_tc);
 											break;
@@ -936,7 +936,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 								}
 
 							}
-							else	// top 3 bits of modes: 010 for this, 011 for status, 000 for transparent translation regs
+							else    // top 3 bits of modes: 010 for this, 011 for status, 000 for transparent translation regs
 							{
 								switch ((modes>>13) & 7)
 								{
@@ -962,7 +962,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 									case 2:
 										switch ((modes>>10) & 7)
 										{
-											case 0:	// translation control register
+											case 0: // translation control register
 												m68k->mmu_tc = READ_EA_32(m68k, ea);
 //                                              printf("PMMU: TC = %08x\n", m68k->mmu_tc);
 
@@ -977,13 +977,13 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 //                                                  printf("PMMU disabled\n");
 												}
 
-												if (!(modes & 0x100))	// flush ATC on moves to TC, SRP, CRP with FD bit clear
+												if (!(modes & 0x100))   // flush ATC on moves to TC, SRP, CRP with FD bit clear
 												{
 													pmmu_atc_flush(m68k);
 												}
 												break;
 
-											case 2:	// supervisor root pointer
+											case 2: // supervisor root pointer
 												temp64 = READ_EA_64(m68k, ea);
 												m68k->mmu_srp_limit = (temp64>>32) & 0xffffffff;
 												m68k->mmu_srp_aptr = temp64 & 0xffffffff;
@@ -994,7 +994,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 												}
 												break;
 
-											case 3:	// CPU root pointer
+											case 3: // CPU root pointer
 												temp64 = READ_EA_64(m68k, ea);
 												m68k->mmu_crp_limit = (temp64>>32) & 0xffffffff;
 												m68k->mmu_crp_aptr = temp64 & 0xffffffff;
@@ -1025,7 +1025,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 										}
 										break;
 
-									case 3:	// MMU status
+									case 3: // MMU status
 										{
 											UINT32 temp = READ_EA_32(m68k, ea);
 											printf("680x0: unsupported PMOVE %x to MMU status, PC %x\n", temp, m68k->pc);
@@ -1035,7 +1035,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 							}
 							break;
 
-						case 3:	// MC68030 to/from status reg
+						case 3: // MC68030 to/from status reg
 							if (modes & 0x200)
 							{
 								WRITE_EA_16(m68k, ea, m68k->mmu_sr);
@@ -1074,23 +1074,23 @@ INLINE UINT32 hmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 	{
 		addr_out = addr_in & 0xffffff;
 	}
-	else if (m68k->hmmu_enabled == M68K_HMMU_ENABLE_II)	// the original II does a more complex translation
+	else if (m68k->hmmu_enabled == M68K_HMMU_ENABLE_II) // the original II does a more complex translation
 	{
 		addr_out = addr_in & 0xffffff;
 
 		if ((addr_out >= 0x800000) && (addr_out <= 0x8fffff))
 		{
-			addr_out |= 0x40000000;	// ROM
+			addr_out |= 0x40000000; // ROM
 		}
 		else if ((addr_out >= 0x900000) && (addr_out <= 0xefffff))
 		{
-			addr_out = 0xf0000000;	// NuBus
+			addr_out = 0xf0000000;  // NuBus
 			addr_out |= ((addr_in & 0xf00000)<<4);
 			addr_out |= (addr_in & 0xfffff);
 		}
 		else if (addr_out >= 0xf00000)
 		{
-			addr_out |= 0x50000000;	// I/O
+			addr_out |= 0x50000000; // I/O
 		}
 
 		// (RAM is at 0 and doesn't need special massaging)

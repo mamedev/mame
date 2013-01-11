@@ -8,22 +8,22 @@
 
 #include "sound/cem3394.h"
 
-#define BALSENTE_MASTER_CLOCK	(20000000)
-#define BALSENTE_CPU_CLOCK		(BALSENTE_MASTER_CLOCK / 16)
-#define BALSENTE_PIXEL_CLOCK	(BALSENTE_MASTER_CLOCK / 4)
-#define BALSENTE_HTOTAL			(0x140)
-#define BALSENTE_HBEND			(0x000)
-#define BALSENTE_HBSTART		(0x100)
-#define BALSENTE_VTOTAL			(0x108)
-#define BALSENTE_VBEND			(0x010)
-#define BALSENTE_VBSTART		(0x100)
+#define BALSENTE_MASTER_CLOCK   (20000000)
+#define BALSENTE_CPU_CLOCK      (BALSENTE_MASTER_CLOCK / 16)
+#define BALSENTE_PIXEL_CLOCK    (BALSENTE_MASTER_CLOCK / 4)
+#define BALSENTE_HTOTAL         (0x140)
+#define BALSENTE_HBEND          (0x000)
+#define BALSENTE_HBSTART        (0x100)
+#define BALSENTE_VTOTAL         (0x108)
+#define BALSENTE_VBEND          (0x010)
+#define BALSENTE_VBSTART        (0x100)
 
 
 #define POLY17_BITS 17
 #define POLY17_SIZE ((1 << POLY17_BITS) - 1)
-#define POLY17_SHL	7
-#define POLY17_SHR	10
-#define POLY17_ADD	0x18000
+#define POLY17_SHL  7
+#define POLY17_SHR  10
+#define POLY17_ADD  0x18000
 
 
 class balsente_state : public driver_device
@@ -31,14 +31,14 @@ class balsente_state : public driver_device
 public:
 	balsente_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_scanline_timer(*this, "scan_timer"),
-		  m_counter_0_timer(*this, "8253_0_timer"),
-		  m_cem1(*this, "cem1"),
-		  m_cem2(*this, "cem2"),
-		  m_cem3(*this, "cem3"),
-		  m_cem4(*this, "cem4"),
-		  m_cem5(*this, "cem5"),
-		  m_cem6(*this, "cem6") ,
+			m_scanline_timer(*this, "scan_timer"),
+			m_counter_0_timer(*this, "8253_0_timer"),
+			m_cem1(*this, "cem1"),
+			m_cem2(*this, "cem2"),
+			m_cem3(*this, "cem3"),
+			m_cem4(*this, "cem4"),
+			m_cem5(*this, "cem5"),
+			m_cem6(*this, "cem6") ,
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_shrike_io(*this, "shrike_io"),

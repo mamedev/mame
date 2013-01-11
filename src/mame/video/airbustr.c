@@ -72,15 +72,15 @@ WRITE8_MEMBER(airbustr_state::airbustr_colorram2_w)
 
 WRITE8_MEMBER(airbustr_state::airbustr_scrollregs_w)
 {
-	switch (offset)		// offset 0 <-> port 4
+	switch (offset)     // offset 0 <-> port 4
 	{
-		case 0x00:	m_fg_scrolly = data;	break;	// low 8 bits
-		case 0x02:	m_fg_scrollx = data;	break;
-		case 0x04:	m_bg_scrolly = data;	break;
-		case 0x06:	m_bg_scrollx = data;	break;
-		case 0x08:	m_highbits   = ~data;	break;	// complemented high bits
+		case 0x00:  m_fg_scrolly = data;    break;  // low 8 bits
+		case 0x02:  m_fg_scrollx = data;    break;
+		case 0x04:  m_bg_scrolly = data;    break;
+		case 0x06:  m_bg_scrollx = data;    break;
+		case 0x08:  m_highbits   = ~data;   break;  // complemented high bits
 
-		default:	logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, space.device().safe_pc());
+		default:    logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, space.device().safe_pc());
 	}
 
 	m_bg_tilemap->set_scrolly(0, ((m_highbits << 5) & 0x100) + m_bg_scrolly);
@@ -147,4 +147,3 @@ void airbustr_state::screen_eof_airbustr(screen_device &screen, bool state)
 		pandora_eof(m_pandora);
 	}
 }
-

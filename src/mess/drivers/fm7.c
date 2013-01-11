@@ -61,7 +61,7 @@ static void fm7_mmr_refresh(address_space&);
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
  * when kana is active.
  */
- // TODO: fill in shift,ctrl,graph and kana code
+	// TODO: fill in shift,ctrl,graph and kana code
 static const UINT16 fm7_key_list[0x60][7] =
 { // norm  shift ctrl  graph kana  sh.kana scan
 	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -845,7 +845,7 @@ static void fm7_update_psg(running_machine &machine)
 		}
 	}
 	else
-	{	// FM-77AV and later use a YM2203
+	{   // FM-77AV and later use a YM2203
 		switch(state->m_psg_regsel)
 		{
 			case 0x00:
@@ -1978,10 +1978,10 @@ static const ay8910_interface fm7_psg_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,	/* portA read */
-	DEVCB_NULL,	/* portB read */
-	DEVCB_NULL,					/* portA write */
-	DEVCB_NULL					/* portB write */
+	DEVCB_NULL, /* portA read */
+	DEVCB_NULL, /* portB read */
+	DEVCB_NULL,                 /* portA write */
+	DEVCB_NULL                  /* portB write */
 };
 
 static const ym2203_interface fm7_ym_intf =
@@ -1991,8 +1991,8 @@ static const ym2203_interface fm7_ym_intf =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_1_r),
 		DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_2_r),
-		DEVCB_NULL,					/* portA write */
-		DEVCB_NULL					/* portB write */
+		DEVCB_NULL,                 /* portA write */
+		DEVCB_NULL                  /* portB write */
 	},
 	DEVCB_LINE(fm77av_fmirq)
 };
@@ -2257,7 +2257,7 @@ ROM_END
 
 
 ROM_START( fmnew7 )
-	ROM_REGION( 0x40000, "maincpu", 0 )	// at 0x7ba5 there is the ID string 0302840301, meaning it's v3.02 from 1984/03/01
+	ROM_REGION( 0x40000, "maincpu", 0 ) // at 0x7ba5 there is the ID string 0302840301, meaning it's v3.02 from 1984/03/01
 	ROM_LOAD( "fbasic302.rom", 0x38000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
 
 	ROM_REGION( 0x20000, "sub", 0 )
@@ -2277,7 +2277,7 @@ ROM_START( fmnew7 )
 ROM_END
 
 ROM_START( fm7 )
-	ROM_REGION( 0x40000, "maincpu", 0 )	// at 0x7ba5 there is the ID string 0300820920, meaning it's v3.00 from 1982/09/20
+	ROM_REGION( 0x40000, "maincpu", 0 ) // at 0x7ba5 there is the ID string 0300820920, meaning it's v3.00 from 1982/09/20
 	ROM_LOAD( "fbasic300.rom", 0x38000,  0x7c00, CRC(87c98494) SHA1(d7e3603b0a2442c7632dad45f9704d9ad71968f5) )
 
 	ROM_REGION( 0x20000, "sub", 0 )

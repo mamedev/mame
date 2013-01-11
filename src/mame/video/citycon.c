@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(citycon_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(
 			0,
 			m_videoram[tile_index],
-			(tile_index & 0x03e0) >> 5,	/* color depends on scanline only */
+			(tile_index & 0x03e0) >> 5, /* color depends on scanline only */
 			0);
 }
 

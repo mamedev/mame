@@ -21,53 +21,53 @@ class crtc_ega_device;
 
 /* callback definitions */
 typedef void * (*crtc_ega_begin_update_func)(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
-#define CRTC_EGA_BEGIN_UPDATE(name)	void *name(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define CRTC_EGA_BEGIN_UPDATE(name) void *name(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 typedef void (*crtc_ega_update_row_func)(crtc_ega_device *device, bitmap_ind16 &bitmap,
-									   const rectangle &cliprect, UINT16 ma, UINT8 ra,
-									   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-#define CRTC_EGA_UPDATE_ROW(name)		void name(crtc_ega_device *device, bitmap_ind16 &bitmap,	\
-											  const rectangle &cliprect, UINT16 ma, UINT8 ra,					\
-											  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+										const rectangle &cliprect, UINT16 ma, UINT8 ra,
+										UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+#define CRTC_EGA_UPDATE_ROW(name)       void name(crtc_ega_device *device, bitmap_ind16 &bitmap,    \
+												const rectangle &cliprect, UINT16 ma, UINT8 ra,                 \
+												UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
 typedef void (*crtc_ega_end_update_func)(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect, void *param);
-#define CRTC_EGA_END_UPDATE(name)		void name(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect, void *param)
+#define CRTC_EGA_END_UPDATE(name)       void name(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect, void *param)
 
 
 /* interface */
 struct crtc_ega_interface
 {
-	const char *m_screen_tag;		/* screen we are acting on */
-	int m_hpixels_per_column;		/* number of pixels per video memory address */
+	const char *m_screen_tag;       /* screen we are acting on */
+	int m_hpixels_per_column;       /* number of pixels per video memory address */
 
 	/* if specified, this gets called before any pixel update,
-       optionally return a pointer that will be passed to the
-       update and tear down callbacks */
-	crtc_ega_begin_update_func		m_begin_update;
+	   optionally return a pointer that will be passed to the
+	   update and tear down callbacks */
+	crtc_ega_begin_update_func      m_begin_update;
 
 	/* this gets called for every row, the driver must output
-       x_count * hpixels_per_column pixels.
-       cursor_x indicates the character position where the cursor is, or -1
-       if there is no cursor on this row */
-	crtc_ega_update_row_func		m_update_row;
+	   x_count * hpixels_per_column pixels.
+	   cursor_x indicates the character position where the cursor is, or -1
+	   if there is no cursor on this row */
+	crtc_ega_update_row_func        m_update_row;
 
 	/* if specified, this gets called after all row updating is complete */
-	crtc_ega_end_update_func			m_end_update;
+	crtc_ega_end_update_func            m_end_update;
 
 	/* if specified, this gets called for every change of the disply enable signal */
-	devcb_write_line	m_out_de_func;
+	devcb_write_line    m_out_de_func;
 
 	/* if specified, this gets called for every change of the HSYNC signal */
-	devcb_write_line	m_out_hsync_func;
+	devcb_write_line    m_out_hsync_func;
 
 	/* if specified, this gets called for every change of the VSYNC signal */
-	devcb_write_line	m_out_vsync_func;
+	devcb_write_line    m_out_vsync_func;
 
-	devcb_write_line	m_out_vblank_func;
+	devcb_write_line    m_out_vblank_func;
 };
 
 
-class crtc_ega_device :	public device_t,
+class crtc_ega_device : public device_t,
 						public crtc_ega_interface
 {
 public:
@@ -113,70 +113,70 @@ protected:
 private:
 	screen_device *m_screen;
 
-	devcb_resolved_write_line	m_res_out_de_func;
-	devcb_resolved_write_line	m_res_out_cur_func;
-	devcb_resolved_write_line	m_res_out_hsync_func;
-	devcb_resolved_write_line	m_res_out_vsync_func;
-	devcb_resolved_write_line	m_res_out_vblank_func;
+	devcb_resolved_write_line   m_res_out_de_func;
+	devcb_resolved_write_line   m_res_out_cur_func;
+	devcb_resolved_write_line   m_res_out_hsync_func;
+	devcb_resolved_write_line   m_res_out_vsync_func;
+	devcb_resolved_write_line   m_res_out_vblank_func;
 
 	/* ega/vga register file */
-	UINT8	m_horiz_char_total;	/* 0x00 */
-	UINT8	m_horiz_disp;			/* 0x01 */
-	UINT8	m_horiz_blank_start;	/* 0x02 */
-	UINT8	m_horiz_blank_end;	/* 0x03/0x05 */
-	UINT8	m_ena_vert_access;	/* 0x03 */
-	UINT8	m_de_skew;			/* 0x03 */
-	UINT8	m_horiz_retr_start;	/* 0x04 */
-	UINT8	m_horiz_retr_end;		/* 0x05 */
-	UINT8	m_horiz_retr_skew;	/* 0x05 */
-	UINT16	m_vert_total;			/* 0x06/0x07 */
-	UINT8	m_preset_row_scan;	/* 0x08 */
-	UINT8	m_byte_panning;		/* 0x08 */
-	UINT8	m_max_ras_addr;		/* 0x09 */
-	UINT8	m_scan_doubling;		/* 0x09 */
-	UINT8	m_cursor_start_ras;	/* 0x0a */
-	UINT8	m_cursor_disable;		/* 0x0a */
-	UINT8	m_cursor_end_ras;		/* 0x0b */
-	UINT8	m_cursor_skew;		/* 0x0b */
-	UINT16	m_disp_start_addr;	/* 0x0c/0x0d */
-	UINT16	m_cursor_addr;		/* 0x0e/0x0f */
-	UINT16	m_light_pen_addr;		/* 0x10/0x11 */
-	UINT16	m_vert_retr_start;	/* 0x10/0x07 */
-	UINT8	m_vert_retr_end;		/* 0x11 */
-	UINT8	m_protect;			/* 0x11 */
-	UINT8	m_bandwidth;			/* 0x11 */
-	UINT16	m_vert_disp_end;		/* 0x12/0x07 */
-	UINT8	m_offset;				/* 0x13 */
-	UINT8	m_underline_loc;		/* 0x14 */
-	UINT16	m_vert_blank_start;	/* 0x15/0x07/0x09 */
-	UINT8	m_vert_blank_end;		/* 0x16 */
-	UINT8	m_mode_control;		/* 0x17 */
-	UINT16	m_line_compare;		/* 0x18/0x07/0x09 */
+	UINT8   m_horiz_char_total; /* 0x00 */
+	UINT8   m_horiz_disp;           /* 0x01 */
+	UINT8   m_horiz_blank_start;    /* 0x02 */
+	UINT8   m_horiz_blank_end;  /* 0x03/0x05 */
+	UINT8   m_ena_vert_access;  /* 0x03 */
+	UINT8   m_de_skew;          /* 0x03 */
+	UINT8   m_horiz_retr_start; /* 0x04 */
+	UINT8   m_horiz_retr_end;       /* 0x05 */
+	UINT8   m_horiz_retr_skew;  /* 0x05 */
+	UINT16  m_vert_total;           /* 0x06/0x07 */
+	UINT8   m_preset_row_scan;  /* 0x08 */
+	UINT8   m_byte_panning;     /* 0x08 */
+	UINT8   m_max_ras_addr;     /* 0x09 */
+	UINT8   m_scan_doubling;        /* 0x09 */
+	UINT8   m_cursor_start_ras; /* 0x0a */
+	UINT8   m_cursor_disable;       /* 0x0a */
+	UINT8   m_cursor_end_ras;       /* 0x0b */
+	UINT8   m_cursor_skew;      /* 0x0b */
+	UINT16  m_disp_start_addr;  /* 0x0c/0x0d */
+	UINT16  m_cursor_addr;      /* 0x0e/0x0f */
+	UINT16  m_light_pen_addr;       /* 0x10/0x11 */
+	UINT16  m_vert_retr_start;  /* 0x10/0x07 */
+	UINT8   m_vert_retr_end;        /* 0x11 */
+	UINT8   m_protect;          /* 0x11 */
+	UINT8   m_bandwidth;            /* 0x11 */
+	UINT16  m_vert_disp_end;        /* 0x12/0x07 */
+	UINT8   m_offset;               /* 0x13 */
+	UINT8   m_underline_loc;        /* 0x14 */
+	UINT16  m_vert_blank_start; /* 0x15/0x07/0x09 */
+	UINT8   m_vert_blank_end;       /* 0x16 */
+	UINT8   m_mode_control;     /* 0x17 */
+	UINT16  m_line_compare;     /* 0x18/0x07/0x09 */
 
 	/* other internal state */
-	UINT8	m_register_address_latch;
-	UINT8	m_hpixels_per_column;
-	bool	m_cursor_state;	/* 0 = off, 1 = on */
-	UINT8	m_cursor_blink_count;
+	UINT8   m_register_address_latch;
+	UINT8   m_hpixels_per_column;
+	bool    m_cursor_state; /* 0 = off, 1 = on */
+	UINT8   m_cursor_blink_count;
 
 	/* output signals */
-	int		m_cur;
-	int		m_hsync;
-	int		m_vsync;
-	int		m_vblank;
-	int		m_de;
+	int     m_cur;
+	int     m_hsync;
+	int     m_vsync;
+	int     m_vblank;
+	int     m_de;
 
 	/* internal counters */
-	UINT8	m_character_counter;
-	UINT8	m_hsync_width_counter;
-	UINT16	m_line_counter;
-	UINT8	m_raster_counter;
-	UINT8	m_vsync_width_counter;
-	bool	m_line_enable_ff;		/* Internal flip flop which is set when the line_counter is reset and reset when vert_disp is reached */
-	UINT8	m_vsync_ff;
-	UINT8	m_adjust_active;
-	UINT16	m_line_address;
-	INT16	m_cursor_x;
+	UINT8   m_character_counter;
+	UINT8   m_hsync_width_counter;
+	UINT16  m_line_counter;
+	UINT8   m_raster_counter;
+	UINT8   m_vsync_width_counter;
+	bool    m_line_enable_ff;       /* Internal flip flop which is set when the line_counter is reset and reset when vert_disp is reached */
+	UINT8   m_vsync_ff;
+	UINT8   m_adjust_active;
+	UINT16  m_line_address;
+	INT16   m_cursor_x;
 
 	/* timers */
 	static const device_timer_id TIMER_LINE = 0;
@@ -196,17 +196,17 @@ private:
 	emu_timer *m_light_pen_latch_timer;
 
 	/* computed values - do NOT state save these! */
-	UINT16	m_horiz_pix_total;
-	UINT16	m_vert_pix_total;
-	UINT16	m_max_visible_x;
-	UINT16	m_max_visible_y;
-	UINT16	m_hsync_on_pos;
-	UINT16	m_hsync_off_pos;
-	UINT16	m_vsync_on_pos;
-	UINT16	m_vsync_off_pos;
-	UINT16  m_current_disp_addr;	/* the display address currently drawn */
-	UINT8	m_light_pen_latched;
-	bool	m_has_valid_parameters;
+	UINT16  m_horiz_pix_total;
+	UINT16  m_vert_pix_total;
+	UINT16  m_max_visible_x;
+	UINT16  m_max_visible_y;
+	UINT16  m_hsync_on_pos;
+	UINT16  m_hsync_off_pos;
+	UINT16  m_vsync_on_pos;
+	UINT16  m_vsync_off_pos;
+	UINT16  m_current_disp_addr;    /* the display address currently drawn */
+	UINT8   m_light_pen_latched;
+	bool    m_has_valid_parameters;
 
 	void recompute_parameters(bool postload);
 	void update_counters();

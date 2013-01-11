@@ -322,4 +322,3 @@ ioport_constructor ti_pcode_card_device::device_input_ports() const
 }
 
 const device_type TI99_P_CODE = &device_creator<ti_pcode_card_device>;
-

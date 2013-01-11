@@ -339,8 +339,8 @@ WRITE32_MEMBER(skns_state::skns_v3_regs_w)
 		m_depthA = (m_v3_regs[0x0c/4] & 0x0001) << 1;
 		m_depthB = (m_v3_regs[0x0c/4] & 0x0100) >> 7;
 
-		if (old_depthA != m_depthA)	m_tilemap_A->mark_all_dirty();
-		if (old_depthB != m_depthB)	m_tilemap_B->mark_all_dirty();
+		if (old_depthA != m_depthA) m_tilemap_A->mark_all_dirty();
+		if (old_depthB != m_depthB) m_tilemap_B->mark_all_dirty();
 
 	}
 }
@@ -408,7 +408,7 @@ static void supernova_draw_a( running_machine &machine, bitmap_ind16 &bitmap, bi
 
 		columnscroll = (state->m_v3_regs[0x0c/4] >> 1) & 0x0001;
 
-		suprnova_draw_roz(bitmap,bitmap_flags,cliprect, state->m_tilemap_A, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_a, columnscroll, &state->m_v3slc_ram[0]);
+		suprnova_draw_roz(bitmap,bitmap_flags,cliprect, state->m_tilemap_A, startx << 8,starty << 8,    incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_a, columnscroll, &state->m_v3slc_ram[0]);
 		//tilemap_copy_bitmap(bitmap, state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower);
 	}
 }
@@ -437,7 +437,7 @@ static void supernova_draw_b( running_machine &machine, bitmap_ind16 &bitmap, bi
 		incxx  = state->m_v3_regs[0x48/4]&0x7ffff;
 		if (incxx&0x40000) incxx = incxx-0x80000;
 		columnscroll = (state->m_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
-		suprnova_draw_roz(bitmap,bitmap_flags, cliprect, state->m_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &state->m_v3slc_ram[0x1000/4]);
+		suprnova_draw_roz(bitmap,bitmap_flags, cliprect, state->m_tilemap_B, startx << 8,starty << 8,   incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &state->m_v3slc_ram[0x1000/4]);
 
 		//popmessage("%08x %08x %08x %08x %08x %08x", startx, starty, incxx, incyy, incxy, incyx);
 

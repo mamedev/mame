@@ -15,7 +15,7 @@
 // ======================> arcadia_sound_device
 
 class arcadia_sound_device : public device_t,
-							 public device_sound_interface
+								public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -28,8 +28,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	sound_stream *m_channel;
-    UINT8 m_reg[3];
-    int m_size, m_pos,m_tval,m_nval;
+	UINT8 m_reg[3];
+	int m_size, m_pos,m_tval,m_nval;
 	unsigned m_mode, m_omode;
 	unsigned m_volume;
 	unsigned m_lfsr;

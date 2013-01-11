@@ -26,7 +26,7 @@
 // ======================> vp590_device
 
 class vp590_device : public device_t,
-					 public device_vip_expansion_card_interface
+						public device_vip_expansion_card_interface
 {
 public:
 	// construction/destruction

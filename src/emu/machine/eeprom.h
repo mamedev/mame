@@ -47,15 +47,15 @@
 
 struct eeprom_interface
 {
-	UINT8		m_address_bits;			// EEPROM has 2^address_bits cells
-	UINT8		m_data_bits;			// every cell has this many bits (8 or 16)
-	const char *m_cmd_read;				//   read command string, e.g. "0110"
-	const char *m_cmd_write;			//  write command string, e.g. "0111"
-	const char *m_cmd_erase;			//  erase command string, or 0 if n/a
-	const char *m_cmd_lock;				//   lock command string, or 0 if n/a
-	const char *m_cmd_unlock;			// unlock command string, or 0 if n/a
-	bool		m_enable_multi_read;	// set to 1 to enable multiple values to be read from one read command
-	int			m_reset_delay;			// number of times eeprom_read_bit() should return 0 after a reset,
+	UINT8       m_address_bits;         // EEPROM has 2^address_bits cells
+	UINT8       m_data_bits;            // every cell has this many bits (8 or 16)
+	const char *m_cmd_read;             //   read command string, e.g. "0110"
+	const char *m_cmd_write;            //  write command string, e.g. "0111"
+	const char *m_cmd_erase;            //  erase command string, or 0 if n/a
+	const char *m_cmd_lock;             //   lock command string, or 0 if n/a
+	const char *m_cmd_unlock;           // unlock command string, or 0 if n/a
+	bool        m_enable_multi_read;    // set to 1 to enable multiple values to be read from one read command
+	int         m_reset_delay;          // number of times eeprom_read_bit() should return 0 after a reset,
 										// before starting to return 1.
 };
 
@@ -63,7 +63,7 @@ struct eeprom_interface
 
 // ======================> eeprom_device
 
-class eeprom_device :	public device_t,
+class eeprom_device :   public device_t,
 						public device_memory_interface,
 						public device_nvram_interface,
 						public eeprom_interface
@@ -105,23 +105,23 @@ protected:
 	static const int SERIAL_BUFFER_LENGTH = 40;
 
 	// configuration state
-	address_space_config	m_space_config;
-	generic_ptr				m_default_data;
-	int 					m_default_data_size;
-	UINT32					m_default_value;
+	address_space_config    m_space_config;
+	generic_ptr             m_default_data;
+	int                     m_default_data_size;
+	UINT32                  m_default_value;
 
 	// runtime state
-	int 					m_serial_count;
-	UINT8					m_serial_buffer[SERIAL_BUFFER_LENGTH];
-	int						m_data_buffer;
-	int 					m_read_address;
-	int 					m_clock_count;
-	int 					m_latch;
-	int						m_reset_line;
-	int						m_clock_line;
-	int						m_sending;
-	int 					m_locked;
-	int 					m_reset_counter;
+	int                     m_serial_count;
+	UINT8                   m_serial_buffer[SERIAL_BUFFER_LENGTH];
+	int                     m_data_buffer;
+	int                     m_read_address;
+	int                     m_clock_count;
+	int                     m_latch;
+	int                     m_reset_line;
+	int                     m_clock_line;
+	int                     m_sending;
+	int                     m_locked;
+	int                     m_reset_counter;
 };
 
 

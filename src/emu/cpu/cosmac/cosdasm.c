@@ -36,63 +36,63 @@ enum Adr
 };
 
 static const struct { const char *mnemonic; Adr adr; } table[]={
-	{ "IDL",	Imp }, { "LDN",	Imp2},{ 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "IDL",    Imp }, { "LDN", Imp2},{ 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "INC",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "INC",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "DEC",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "DEC",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
 
-	{ "BR",		Low	}, { "BQ",		Low }, { "BZ",		Low	}, { "BDF",		Low },
-	{ "B1",		Low	}, { "B2",		Low }, { "B3",		Low	}, { "B4",		Low },
-	{ "SKP",	Low	}, { "BNQ",		Low }, { "BNZ",		Low	}, { "BNF",		Low },
-	{ "BN1",	Low	}, { "BN2",		Low }, { "BN3",		Low	}, { "BN4",		Low },
+	{ "BR",     Low }, { "BQ",      Low }, { "BZ",      Low }, { "BDF",     Low },
+	{ "B1",     Low }, { "B2",      Low }, { "B3",      Low }, { "B4",      Low },
+	{ "SKP",    Low }, { "BNQ",     Low }, { "BNZ",     Low }, { "BNF",     Low },
+	{ "BN1",    Low }, { "BN2",     Low }, { "BN3",     Low }, { "BN4",     Low },
 
-	{ "LDA",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "LDA",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "STR",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "STR",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "IRX",	Imp } ,{ "OUT",	Imp3},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 },
-	{ 0 } ,{ "INP",	Imp3},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 },
+	{ "IRX",    Imp } ,{ "OUT", Imp3},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 },
+	{ 0 } ,{ "INP", Imp3},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 },
 
-	{ "RET",	Imp	}, { "DIS",		Imp }, { "LDXA",	Imp	}, { "STXD",	Imp },
-	{ "ADC",	Imp	}, { "SDB",		Imp }, { "SHRC",	Imp	}, { "SMB",		Imp },
-	{ "SAV",	Imp	}, { "MARK",	Imp }, { "REQ",		Imp	}, { "SEQ",		Imp },
-	{ "ADCI",	Imm	}, { "SDBI",	Imm }, { "SHLC",	Imp	}, { "SMBI",	Imm },
+	{ "RET",    Imp }, { "DIS",     Imp }, { "LDXA",    Imp }, { "STXD",    Imp },
+	{ "ADC",    Imp }, { "SDB",     Imp }, { "SHRC",    Imp }, { "SMB",     Imp },
+	{ "SAV",    Imp }, { "MARK",    Imp }, { "REQ",     Imp }, { "SEQ",     Imp },
+	{ "ADCI",   Imm }, { "SDBI",    Imm }, { "SHLC",    Imp }, { "SMBI",    Imm },
 
 
-	{ "GLO",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "GLO",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "GHI",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "GHI",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "PLO",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "PLO",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "PHI",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "PHI",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "LBR",	Abs	}, { "LBQ",		Abs }, { "LBZ",		Abs	}, { "LBDF",	Abs },
-	{ "NOP",	Imp	}, { "LSNQ",	Imp }, { "LSNZ",	Imp	}, { "LSNF",	Imp },
-	{ "LSKP",	Imp	}, { "LBNQ",	Abs }, { "LBNZ",	Abs	}, { "LBNF",	Abs },
-	{ "LSIE",	Imp	}, { "LSQ",		Imp }, { "LSZ",		Imp	}, { "LSDF",	Imp },
+	{ "LBR",    Abs }, { "LBQ",     Abs }, { "LBZ",     Abs }, { "LBDF",    Abs },
+	{ "NOP",    Imp }, { "LSNQ",    Imp }, { "LSNZ",    Imp }, { "LSNF",    Imp },
+	{ "LSKP",   Imp }, { "LBNQ",    Abs }, { "LBNZ",    Abs }, { "LBNF",    Abs },
+	{ "LSIE",   Imp }, { "LSQ",     Imp }, { "LSZ",     Imp }, { "LSDF",    Imp },
 
-	{ "SEP",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "SEP",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "SEX",	Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "SEX",    Imp2},{ 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 
-	{ "LDX",	Imp	}, { "OR",		Imp }, { "AND",		Imp	}, { "XOR",		Imp },
-	{ "ADD",	Imp	}, { "SD",		Imp }, { "SHR",		Imp	}, { "SM",		Imp },
-	{ "LDI",	Imm	}, { "ORI",		Imm }, { "ANI",		Imm	}, { "XRI",		Imm },
-	{ "ADI",	Imm	}, { "SDI",		Imm }, { "SHL",		Imp	}, { "SMI",		Imm },
+	{ "LDX",    Imp }, { "OR",      Imp }, { "AND",     Imp }, { "XOR",     Imp },
+	{ "ADD",    Imp }, { "SD",      Imp }, { "SHR",     Imp }, { "SM",      Imp },
+	{ "LDI",    Imm }, { "ORI",     Imm }, { "ANI",     Imm }, { "XRI",     Imm },
+	{ "ADI",    Imm }, { "SDI",     Imm }, { "SHL",     Imp }, { "SMI",     Imm },
 
 };
 

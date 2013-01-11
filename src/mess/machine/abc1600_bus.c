@@ -52,7 +52,7 @@ device_abc1600bus_card_interface::~device_abc1600bus_card_interface()
 //-------------------------------------------------
 
 abc1600bus_slot_device::abc1600bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ABC1600BUS_SLOT, "ABC 1600 bus slot", tag, owner, clock),
+		device_t(mconfig, ABC1600BUS_SLOT, "ABC 1600 bus slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_int(CLEAR_LINE),
 		m_pren(1),
@@ -84,14 +84,14 @@ void abc1600bus_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-    	memset(&m_out_pren_cb, 0, sizeof(m_out_pren_cb));
-    	memset(&m_out_trrq_cb, 0, sizeof(m_out_trrq_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-    	memset(&m_out_xint2_cb, 0, sizeof(m_out_xint2_cb));
-    	memset(&m_out_xint3_cb, 0, sizeof(m_out_xint3_cb));
-    	memset(&m_out_xint4_cb, 0, sizeof(m_out_xint4_cb));
-    	memset(&m_out_xint5_cb, 0, sizeof(m_out_xint5_cb));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_pren_cb, 0, sizeof(m_out_pren_cb));
+		memset(&m_out_trrq_cb, 0, sizeof(m_out_trrq_cb));
+		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+		memset(&m_out_xint2_cb, 0, sizeof(m_out_xint2_cb));
+		memset(&m_out_xint3_cb, 0, sizeof(m_out_xint3_cb));
+		memset(&m_out_xint4_cb, 0, sizeof(m_out_xint4_cb));
+		memset(&m_out_xint5_cb, 0, sizeof(m_out_xint5_cb));
 	}
 }
 

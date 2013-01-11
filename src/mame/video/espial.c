@@ -72,9 +72,9 @@ TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 	UINT8 col = m_colorram[tile_index];
 	UINT8 attr = m_attributeram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
-				  code | ((attr & 0x03) << 8),
-				  col & 0x3f,
-				  TILE_FLIPYX(attr >> 2));
+					code | ((attr & 0x03) << 8),
+					col & 0x3f,
+					TILE_FLIPYX(attr >> 2));
 }
 
 
@@ -188,7 +188,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			sy = 240 - sy;
 		}
 
-		if (state->m_spriteram_1[offs] & 1)	/* double height */
+		if (state->m_spriteram_1[offs] & 1) /* double height */
 		{
 			if (state->m_flipscreen)
 			{

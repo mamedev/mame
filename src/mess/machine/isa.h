@@ -73,22 +73,22 @@
 //**************************************************************************
 
 #define MCFG_ISA8_BUS_ADD(_tag, _cputag, _config) \
-    MCFG_DEVICE_ADD(_tag, ISA8, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
-    isa8_device::static_set_cputag(*device, _cputag); \
+	MCFG_DEVICE_ADD(_tag, ISA8, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
+	isa8_device::static_set_cputag(*device, _cputag); \
 
 #define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp, _fixed) \
-    MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
 	isa8_slot_device::static_set_isa8_slot(*device, owner, _isatag); \
 
 #define MCFG_ISA16_BUS_ADD(_tag, _cputag, _config) \
-    MCFG_DEVICE_ADD(_tag, ISA16, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
-    isa8_device::static_set_cputag(*device, _cputag); \
+	MCFG_DEVICE_ADD(_tag, ISA16, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
+	isa8_device::static_set_cputag(*device, _cputag); \
 
 #define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp, _fixed) \
-    MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
 	isa16_slot_device::static_set_isa16_slot(*device, owner, _isatag); \
 
@@ -99,7 +99,7 @@
 class isa8_device;
 
 class isa8_slot_device : public device_t,
-						 public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -109,8 +109,8 @@ public:
 	// device-level overrides
 	virtual void device_start();
 
-    // inline configuration
-    static void static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag);
+	// inline configuration
+	static void static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag);
 protected:
 	// configuration
 	device_t *m_owner;
@@ -124,21 +124,21 @@ extern const device_type ISA8_SLOT;
 
 struct isa8bus_interface
 {
-    devcb_write_line	m_out_irq2_cb;
-    devcb_write_line	m_out_irq3_cb;
-    devcb_write_line	m_out_irq4_cb;
-    devcb_write_line	m_out_irq5_cb;
-    devcb_write_line	m_out_irq6_cb;
-    devcb_write_line	m_out_irq7_cb;
-    devcb_write_line	m_out_drq1_cb;
-    devcb_write_line	m_out_drq2_cb;
-    devcb_write_line	m_out_drq3_cb;
+	devcb_write_line    m_out_irq2_cb;
+	devcb_write_line    m_out_irq3_cb;
+	devcb_write_line    m_out_irq4_cb;
+	devcb_write_line    m_out_irq5_cb;
+	devcb_write_line    m_out_irq6_cb;
+	devcb_write_line    m_out_irq7_cb;
+	devcb_write_line    m_out_drq1_cb;
+	devcb_write_line    m_out_drq2_cb;
+	devcb_write_line    m_out_drq3_cb;
 };
 
 class device_isa8_card_interface;
 // ======================> isa8_device
 class isa8_device : public device_t,
-                    public isa8bus_interface
+					public isa8bus_interface
 {
 public:
 	// construction/destruction
@@ -193,21 +193,21 @@ protected:
 	// internal state
 	cpu_device   *m_maincpu;
 
-	devcb_resolved_write_line	m_out_irq2_func;
-	devcb_resolved_write_line	m_out_irq3_func;
-	devcb_resolved_write_line	m_out_irq4_func;
-	devcb_resolved_write_line	m_out_irq5_func;
-	devcb_resolved_write_line	m_out_irq6_func;
-	devcb_resolved_write_line	m_out_irq7_func;
+	devcb_resolved_write_line   m_out_irq2_func;
+	devcb_resolved_write_line   m_out_irq3_func;
+	devcb_resolved_write_line   m_out_irq4_func;
+	devcb_resolved_write_line   m_out_irq5_func;
+	devcb_resolved_write_line   m_out_irq6_func;
+	devcb_resolved_write_line   m_out_irq7_func;
 
-	devcb_resolved_write_line	m_out_drq1_func;
-	devcb_resolved_write_line	m_out_drq2_func;
-	devcb_resolved_write_line	m_out_drq3_func;
+	devcb_resolved_write_line   m_out_drq1_func;
+	devcb_resolved_write_line   m_out_drq2_func;
+	devcb_resolved_write_line   m_out_drq3_func;
 
 	device_isa8_card_interface *m_dma_device[8];
-	bool						m_dma_eop[8];
-	const char				   *m_cputag;
-	bool						m_nmi_enabled;
+	bool                        m_dma_eop[8];
+	const char                 *m_cputag;
+	bool                        m_nmi_enabled;
 };
 
 
@@ -233,11 +233,11 @@ public:
 	virtual void dack_w(int line,UINT8 data);
 	virtual void eop_w(int state);
 
-    // inline configuration
-    static void static_set_isabus(device_t &device, device_t *isa_device);
+	// inline configuration
+	static void static_set_isabus(device_t &device, device_t *isa_device);
 public:
 	isa8_device  *m_isa;
-	device_t	 *m_isa_dev;
+	device_t     *m_isa_dev;
 	device_isa8_card_interface *m_next;
 };
 
@@ -245,26 +245,26 @@ public:
 
 struct isa16bus_interface
 {
-    devcb_write_line	m_out_irq2_cb; // this goes to IRQ 9 on pic
-    devcb_write_line	m_out_irq3_cb;
-    devcb_write_line	m_out_irq4_cb;
-    devcb_write_line	m_out_irq5_cb;
-    devcb_write_line	m_out_irq6_cb;
-    devcb_write_line	m_out_irq7_cb;
+	devcb_write_line    m_out_irq2_cb; // this goes to IRQ 9 on pic
+	devcb_write_line    m_out_irq3_cb;
+	devcb_write_line    m_out_irq4_cb;
+	devcb_write_line    m_out_irq5_cb;
+	devcb_write_line    m_out_irq6_cb;
+	devcb_write_line    m_out_irq7_cb;
 
-	devcb_write_line	m_out_irq10_cb;
-	devcb_write_line	m_out_irq11_cb;
-	devcb_write_line	m_out_irq12_cb;
-	devcb_write_line	m_out_irq14_cb;
-	devcb_write_line	m_out_irq15_cb;
+	devcb_write_line    m_out_irq10_cb;
+	devcb_write_line    m_out_irq11_cb;
+	devcb_write_line    m_out_irq12_cb;
+	devcb_write_line    m_out_irq14_cb;
+	devcb_write_line    m_out_irq15_cb;
 
-    devcb_write_line	m_out_drq0_cb;
-	devcb_write_line	m_out_drq1_cb;
-    devcb_write_line	m_out_drq2_cb;
-    devcb_write_line	m_out_drq3_cb;
-	devcb_write_line	m_out_drq5_cb;
-	devcb_write_line	m_out_drq6_cb;
-	devcb_write_line	m_out_drq7_cb;
+	devcb_write_line    m_out_drq0_cb;
+	devcb_write_line    m_out_drq1_cb;
+	devcb_write_line    m_out_drq2_cb;
+	devcb_write_line    m_out_drq3_cb;
+	devcb_write_line    m_out_drq5_cb;
+	devcb_write_line    m_out_drq6_cb;
+	devcb_write_line    m_out_drq7_cb;
 };
 
 class isa16_device;
@@ -277,8 +277,8 @@ public:
 		// device-level overrides
 	virtual void device_start();
 
-    // inline configuration
-    static void static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag);
+	// inline configuration
+	static void static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag);
 };
 
 
@@ -287,7 +287,7 @@ extern const device_type ISA16_SLOT;
 
 // ======================> isa16_device
 class isa16_device : public isa8_device,
-                     public isa16bus_interface
+						public isa16bus_interface
 {
 public:
 	// construction/destruction
@@ -318,16 +318,16 @@ protected:
 
 private:
 	// internal state
-	devcb_resolved_write_line	m_out_irq10_func;
-	devcb_resolved_write_line	m_out_irq11_func;
-	devcb_resolved_write_line	m_out_irq12_func;
-	devcb_resolved_write_line	m_out_irq14_func;
-	devcb_resolved_write_line	m_out_irq15_func;
+	devcb_resolved_write_line   m_out_irq10_func;
+	devcb_resolved_write_line   m_out_irq11_func;
+	devcb_resolved_write_line   m_out_irq12_func;
+	devcb_resolved_write_line   m_out_irq14_func;
+	devcb_resolved_write_line   m_out_irq15_func;
 
-	devcb_resolved_write_line	m_out_drq0_func;
-	devcb_resolved_write_line	m_out_drq5_func;
-	devcb_resolved_write_line	m_out_drq6_func;
-	devcb_resolved_write_line	m_out_drq7_func;
+	devcb_resolved_write_line   m_out_drq0_func;
+	devcb_resolved_write_line   m_out_drq5_func;
+	devcb_resolved_write_line   m_out_drq6_func;
+	devcb_resolved_write_line   m_out_drq7_func;
 };
 
 

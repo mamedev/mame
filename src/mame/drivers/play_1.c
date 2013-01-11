@@ -14,7 +14,7 @@ class play_1_state : public driver_device
 public:
 	play_1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -114,8 +114,8 @@ ROM_END
 
 
 /* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978,	bigtown,	0,		play_1,	play_1, play_1_state,	play_1,	ROT0,	"Playmatic",	"Big Town",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	chance,		0,		play_1,	play_1, play_1_state,	play_1,	ROT0,	"Playmatic",	"Chance",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	lastlap,	0,		play_1,	play_1, play_1_state,	play_1,	ROT0,	"Playmatic",	"Last Lap",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,	spcgambl,	0,		play_1,	play_1, play_1_state,	play_1,	ROT0,	"Playmatic",	"Space Gambler",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,	party,		0,		play_1,	play_1, play_1_state,	play_1,	ROT0,	"Playmatic",	"Party",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  bigtown,    0,      play_1, play_1, play_1_state,   play_1, ROT0,   "Playmatic",    "Big Town",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  chance,     0,      play_1, play_1, play_1_state,   play_1, ROT0,   "Playmatic",    "Chance",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  lastlap,    0,      play_1, play_1, play_1_state,   play_1, ROT0,   "Playmatic",    "Last Lap",             GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  spcgambl,   0,      play_1, play_1, play_1_state,   play_1, ROT0,   "Playmatic",    "Space Gambler",                GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  party,      0,      play_1, play_1, play_1_state,   play_1, ROT0,   "Playmatic",    "Party",                GAME_IS_SKELETON_MECHANICAL)

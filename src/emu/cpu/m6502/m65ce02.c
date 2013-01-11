@@ -110,13 +110,13 @@ void m65ce02_device::state_string_export(const device_state_entry &entry, astrin
 	case STATE_GENFLAGS:
 	case M6502_P:
 		string.printf("%c%c%c%c%c%c%c",
-					  P & F_N ? 'N' : '.',
-					  P & F_V ? 'V' : '.',
-					  P & F_E ? 'E' : '.',
-					  P & F_D ? 'D' : '.',
-					  P & F_I ? 'I' : '.',
-					  P & F_Z ? 'Z' : '.',
-					  P & F_C ? 'C' : '.');
+						P & F_N ? 'N' : '.',
+						P & F_V ? 'V' : '.',
+						P & F_E ? 'E' : '.',
+						P & F_D ? 'D' : '.',
+						P & F_I ? 'I' : '.',
+						P & F_Z ? 'Z' : '.',
+						P & F_C ? 'C' : '.');
 		break;
 	case M65CE02_B:
 		string.printf("%02x", B >> 8);

@@ -28,15 +28,15 @@ class vic1110_device :  public device_t,
 						public device_vic20_expansion_card_interface
 {
 public:
-    // construction/destruction
-    vic1110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	vic1110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
 protected:
-    // device-level overrides
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "vic1110"; }
 
 	// device_vic20_expansion_card_interface overrides

@@ -189,7 +189,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_IIIIx_table(BITSn(word0,0x0f00), BITSn(word0,0x0008),
-						   m_source, m_destination);
+							m_source, m_destination);
 
 		if (m_source == iINVALID)
 			return false;
@@ -204,7 +204,7 @@ public:
 			else if (opDestination() == iA)
 				m_destination = iB;
 			else
-				m_destination = iA;	/* In the case of no data ALU instruction */
+				m_destination = iA; /* In the case of no data ALU instruction */
 		}
 
 		// Don't return a failure, just let everything fall through (nop).

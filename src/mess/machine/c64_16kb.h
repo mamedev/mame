@@ -26,7 +26,7 @@
 // ======================> c64_16kb_cartridge_device
 
 class c64_16kb_cartridge_device : public device_t,
-								  public device_c64_expansion_card_interface
+									public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction

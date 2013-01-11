@@ -268,14 +268,14 @@ void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int para
 void tms9902_device::reload_interval_timer()
 {
 	if (m_TMR)
-	{	/* reset clock interval */
+	{   /* reset clock interval */
 		m_dectimer->adjust(
 						attotime::from_double((double) m_TMR / (m_clock_rate / ((m_CLK4M) ? 4. : 3.) / 64.)),
 						0,
 						attotime::from_double((double) m_TMR / (m_clock_rate / ((m_CLK4M) ? 4. : 3.) / 64.)));
 	}
 	else
-	{	/* clock interval == 0 -> no timer */
+	{   /* clock interval == 0 -> no timer */
 		m_dectimer->enable(0);
 	}
 }
@@ -519,23 +519,23 @@ void tms9902_device::reset_uart()
 	if (VERBOSE>1) LOG("TMS9902: resetting\n");
 
 	/*  disable all interrupts */
-	m_DSCENB = false;	// Data Set Change Interrupt Enable
-	m_TIMENB = false;	// Timer Interrupt Enable
-	m_XBIENB = false;	// Transmit Buffer Interrupt Enable
-	m_RIENB = false;		// Read Buffer Interrupt Enable
+	m_DSCENB = false;   // Data Set Change Interrupt Enable
+	m_TIMENB = false;   // Timer Interrupt Enable
+	m_XBIENB = false;   // Transmit Buffer Interrupt Enable
+	m_RIENB = false;        // Read Buffer Interrupt Enable
 
 	/* initialize transmitter */
-	m_XBRE = true;		// Transmit Buffer Register Empty
-	m_XSRE = true;		// Transmit Shift Register Empty
+	m_XBRE = true;      // Transmit Buffer Register Empty
+	m_XSRE = true;      // Transmit Shift Register Empty
 
 	/* initialize receiver */
-	m_RBRL = false;		// Read Buffer Register Loaded
+	m_RBRL = false;     // Read Buffer Register Loaded
 
 	/* clear RTS */
-	m_RTSON = false;		// Request-to-send on (flag)
-	m_RTSout = true;		// Note we are doing this to ensure the state is sent to the interface
+	m_RTSON = false;        // Request-to-send on (flag)
+	m_RTSout = true;        // Note we are doing this to ensure the state is sent to the interface
 	set_rts(CLEAR_LINE);
-	m_RTSout = false;	// what we actually want
+	m_RTSout = false;   // what we actually want
 
 	/* set all register load flags to 1 */
 	m_LDCTRL = true;
@@ -564,7 +564,7 @@ void tms9902_device::reset_uart()
 */
 WRITE8_MEMBER( tms9902_device::cruwrite )
 {
-	data &= 1;	/* clear extra bits */
+	data &= 1;  /* clear extra bits */
 
 	offset &= 0x1F;
 	if (VERBOSE>5) LOG("TMS9902: Setting bit %d = %02x\n", offset, data);
@@ -574,7 +574,7 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 		UINT16 mask = (1 << offset);
 
 		if (m_LDCTRL)
-		{	// Control Register mode. Values written to bits 0-7 are copied
+		{   // Control Register mode. Values written to bits 0-7 are copied
 			// into the control register.
 			switch (offset)
 			{
@@ -615,7 +615,7 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 			}
 		}
 		else if (m_LDIR)
-		{	// Interval Register mode. Values written to bits 0-7 are copied
+		{   // Interval Register mode. Values written to bits 0-7 are copied
 			// into the interval register.
 			if (offset <= 7)
 			{
@@ -632,7 +632,7 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 		else if (m_LRDR || m_LXDR)
 		{
 			if (m_LRDR)
-			{	// Receive rate register mode. Values written to bits 0-10 are copied
+			{   // Receive rate register mode. Values written to bits 0-10 are copied
 				// into the receive rate register.
 				if (offset < 10)
 				{
@@ -663,14 +663,14 @@ WRITE8_MEMBER( tms9902_device::cruwrite )
 			}
 		}
 		else
-		{	// LDCTRL=LDIR=LRDR=LXRD=0: Transmit buffer register mode. Values
+		{   // LDCTRL=LDIR=LRDR=LXRD=0: Transmit buffer register mode. Values
 			// written to bits 0-7 are transferred into the transmit buffer register.
 			if (offset <= 7)
 			{
 				set_bits8(&m_XBR, mask, (data!=0));
 
 				if (offset == 7)
-				{	/* transmit */
+				{   /* transmit */
 					m_XBRE = false;
 					// Spec: When the transmitter is active, the contents of the Transmit
 					// Buffer Register are transferred to the Transmit Shift Register
@@ -834,4 +834,3 @@ void tms9902_device::device_start()
 }
 
 const device_type TMS9902 = &device_creator<tms9902_device>;
-

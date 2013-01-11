@@ -791,7 +791,7 @@
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "audiocrypt", 0 ) \
-	ROM_LOAD( name, 	 0x00000, 0x80000, hash ) \
+	ROM_LOAD( name,      0x00000, 0x80000, hash ) \
 
 
 #define NO_DELTAT_REGION
@@ -3838,7 +3838,7 @@ ROM_END
 
 ROM_START( pbobblen ) /* MVS ONLY RELEASE */
 	/* This set uses CHA and PROG board from Power Spikes II. Six Power Spikes II prom's are replaced with
-    Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
+	Puzzle Bobble prom's. Confirmed on several original carts. Do other layouts also exist? */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "d96-07.ep1", 0x000000, 0x080000, CRC(6102ca14) SHA1(328429d11de5b327a0654ae0548da4d0025a2ae6) ) /* 27C240 */
 
@@ -6250,7 +6250,7 @@ ROM_END
 
 ROM_START( kof99e ) /* Original Version - Encrypted Code & GFX */
 	ROM_REGION( 0x900000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "ka.neo-sma", 0x0c0000, 0x040000, CRC(7766d09e) SHA1(4e0a49d1ad669a62676cb30f527c6590cde80194) )	/* stored in the custom chip */
+	ROM_LOAD16_WORD_SWAP( "ka.neo-sma", 0x0c0000, 0x040000, CRC(7766d09e) SHA1(4e0a49d1ad669a62676cb30f527c6590cde80194) )  /* stored in the custom chip */
 	/* Is the SMA for this set correct? A set with this layout and a SMA.KB is known */
 	ROM_LOAD16_WORD_SWAP( "251-ep1.p1", 0x100000, 0x200000, CRC(1e8d692d) SHA1(eea1aa8c0a17f089ac14831889c36535e559072c) )
 	ROM_LOAD16_WORD_SWAP( "251-ep2.p2", 0x300000, 0x200000, CRC(d6206e5a) SHA1(0e1100d03c40c6d5cfa899d009e319ae73fce6b8) )
@@ -6395,7 +6395,7 @@ ROM_END
 
 ROM_START( garou ) /* Original Version - Encrypted GFX */ /* MVS VERSION - later revision */
 	ROM_REGION( 0x900000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "kf.neo-sma", 0x0c0000, 0x040000, CRC(98bc93dc) SHA1(01fe3d18b50f770e131e8d8eeff4c630ba8c9551) )	/* stored in the custom chip */
+	ROM_LOAD16_WORD_SWAP( "kf.neo-sma", 0x0c0000, 0x040000, CRC(98bc93dc) SHA1(01fe3d18b50f770e131e8d8eeff4c630ba8c9551) )  /* stored in the custom chip */
 	ROM_LOAD16_WORD_SWAP( "253-ep1.p1", 0x100000, 0x200000, CRC(ea3171a4) SHA1(bbda40f652baa0dc5fc6a006c001a1bdb0df43f6) ) /* M27C160 */
 	ROM_LOAD16_WORD_SWAP( "253-ep2.p2", 0x300000, 0x200000, CRC(382f704b) SHA1(0ace9c84a8b8a0524fd9a503e7d872de1bf1bd52) ) /* M27C160 */
 	ROM_LOAD16_WORD_SWAP( "253-ep3.p3", 0x500000, 0x200000, CRC(e395bfdd) SHA1(6b50f5ac15bf66b7e4e9bff57594fd3d7530c831) ) /* M27C160 */
@@ -6404,7 +6404,7 @@ ROM_START( garou ) /* Original Version - Encrypted GFX */ /* MVS VERSION - later
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
+	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
@@ -6433,14 +6433,14 @@ ROM_END
 
 ROM_START( garouh ) /* Original Version - Encrypted GFX */ /* MVS AND AES VERSION - earlier revision */
 	ROM_REGION( 0x900000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "ke.neo-sma", 0x0c0000, 0x040000, CRC(96c72233) SHA1(29e19effd40fdf7e5144332396857f4ad0eff13e) )	/* stored in the custom chip */
+	ROM_LOAD16_WORD_SWAP( "ke.neo-sma", 0x0c0000, 0x040000, CRC(96c72233) SHA1(29e19effd40fdf7e5144332396857f4ad0eff13e) )  /* stored in the custom chip */
 	ROM_LOAD16_WORD_SWAP( "253-p1.p1",  0x100000, 0x400000, CRC(18ae5d7e) SHA1(bdb58ec9137d8653979b47132f2d10e1cc6aaa24) ) /* mask rom TC5332205 */
 	ROM_LOAD16_WORD_SWAP( "253-p2.p2",  0x500000, 0x400000, CRC(afffa779) SHA1(ac017986f02277fbcd656b8c02492a3f4216a90e) ) /* mask rom TC5332205 */
 
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
+	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
@@ -6584,7 +6584,7 @@ ROM_END
 
 ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 2000.4.1 */ /* MVS VERSION */
 	ROM_REGION( 0x900000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "neo-sma",    0x0c0000, 0x040000, CRC(9cd55736) SHA1(d6efb2b313127c2911d47d9324626b3f1e7c6ccb) )	/* stored in the custom chip */
+	ROM_LOAD16_WORD_SWAP( "neo-sma",    0x0c0000, 0x040000, CRC(9cd55736) SHA1(d6efb2b313127c2911d47d9324626b3f1e7c6ccb) )  /* stored in the custom chip */
 	/* The SMA for this release has a green colour marking; the older revision has a white colour marking */
 	ROM_LOAD16_WORD_SWAP( "256-pg1.p1", 0x100000, 0x400000, CRC(b07edfd5) SHA1(dcbd9e500bfae98d754e55cdbbbbf9401013f8ee) ) /* TC5332202 */
 	ROM_LOAD16_WORD_SWAP( "256-pg2.p2", 0x500000, 0x400000, CRC(6097c26b) SHA1(248ec29d21216f29dc6f5f3f0e1ad1601b3501b6) ) /* TC5332202 */
@@ -6674,7 +6674,7 @@ ROM_START( kof2000 ) /* Original Version, Encrypted Code + Sound + GFX Roms */ /
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
+	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
@@ -6709,7 +6709,7 @@ ROM_START( kof2000n ) /* Original Version, Encrypted Sound + GFX Roms */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
+	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
@@ -6961,8 +6961,8 @@ ROM_END
 
 ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 	/* There also exist carts where p1 label is pg1; the PG1 revision has a Japanese cart label, SN 02Jxxxxx
-    The P1 revision has a US/EUR cart label, SN 02Txxxxx ; Rom data on both is identical.
-    These carts were manufactured by Mega Enterprise, not SNK. */
+	The P1 revision has a US/EUR cart label, SN 02Txxxxx ; Rom data on both is identical.
+	These carts were manufactured by Mega Enterprise, not SNK. */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "263-p1.p1",  0x000000, 0x100000, CRC(27e4def3) SHA1(a08785e8145981bb6b5332a3b2df7eb321253cca) ) /* mask rom TC538200 */
 	ROM_LOAD16_WORD_SWAP( "263-p2.sp2", 0x100000, 0x400000, CRC(fdb7aed8) SHA1(dbeaec38f44e58ffedba99e70fa1439c2bf0dfa3) ) /* mask rom TC5332205 */
@@ -6970,7 +6970,7 @@ ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
+	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
@@ -7003,7 +7003,7 @@ ROM_START( mslug4h ) /* Original Version - Encrypted GFX */ /* AES VERSION */
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
-	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
+	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
@@ -9003,8 +9003,8 @@ static INPUT_PORTS_START( svcpcb )
 	/* the rom banking is tied directly to the dipswitch?, or is there a bank write somewhere? */
 	PORT_START("HARDDIP")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("HARDDIP:3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Asia ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
 INPUT_PORTS_END
 
 
@@ -9022,8 +9022,8 @@ static INPUT_PORTS_START( ms5pcb )
 	/* the rom banking is tied directly to the dipswitch?, or is there a bank write somewhere? */
 	PORT_START("HARDDIP")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("HARDDIP:3")
-	PORT_DIPSETTING(	0x00, DEF_STR( Asia ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
 INPUT_PORTS_END
 
 
@@ -9041,8 +9041,8 @@ static INPUT_PORTS_START( kog )
 	/* a jumper on the pcb overlays a ROM address, very strange but that's how it works. */
 	PORT_START("JUMPER")
 	PORT_DIPNAME( 0x0001, 0x0001, "Title Language" ) PORT_DIPLOCATION("CART-JUMPER:1")
-	PORT_DIPSETTING(	  0x0001, DEF_STR( English ) )
-	PORT_DIPSETTING(	  0x0000, "Non-English" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0000, "Non-English" )
 	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -9051,28 +9051,28 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjneogeo )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING(	  0x0000, "1?" )
-	PORT_DIPSETTING(	  0x0002, "2?" )
+	PORT_DIPSETTING(      0x0000, "1?" )
+	PORT_DIPSETTING(      0x0002, "2?" )
 	PORT_DIPNAME( 0x0004, 0x0000, "Mahjong Control Panel" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")
-	PORT_DIPSETTING(	  0x0018, "1" )
-	PORT_DIPSETTING(	  0x0008, "2" )
-	PORT_DIPSETTING(	  0x0010, "3" )
-	PORT_DIPSETTING(	  0x0000, "4" )
+	PORT_DIPSETTING(      0x0018, "1" )
+	PORT_DIPSETTING(      0x0008, "2" )
+	PORT_DIPSETTING(      0x0010, "3" )
+	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")
-	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")
-	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")
-	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,mahjong_controller_r, NULL)
 
 	STANDARD_IN1
@@ -9739,8 +9739,8 @@ DRIVER_INIT_MEMBER(neogeo_state,kf2k3pcb)
 	neogeo_cmc50_m1_decrypt(machine());
 
 	/* extra little swap on the m1 - this must be performed AFTER the m1 decrypt
-       or the m1 checksum (used to generate the key) for decrypting the m1 is
-       incorrect */
+	   or the m1 checksum (used to generate the key) for decrypting the m1 is
+	   incorrect */
 	{
 		int i;
 		UINT8* rom = memregion("audiocpu")->base();
@@ -9955,65 +9955,65 @@ void neogeo_state::mvs_install_protection(device_image_interface& image)
 	else
 	{
 		/* work out which Driver Init decryption function to call based on flag in softlist
-         - note this is called AFTER the regular DRIVER_INIT */
+		 - note this is called AFTER the regular DRIVER_INIT */
 
-		if(strcmp(crypt_feature,"mslugx_prot") == 0)		{ DRIVER_INIT_CALL(mslugx); }
+		if(strcmp(crypt_feature,"mslugx_prot") == 0)        { DRIVER_INIT_CALL(mslugx); }
 		else if(strcmp(crypt_feature,"fatfury2_prot") == 0) { DRIVER_INIT_CALL(fatfury2); }
-		else if(strcmp(crypt_feature,"kog_prot") == 0)		{ DRIVER_INIT_CALL(kog); }
-		else if(strcmp(crypt_feature,"kof97oro_prot") == 0)	{ DRIVER_INIT_CALL(kof97oro); }
-		else if(strcmp(crypt_feature,"kof98_prot") == 0)	{ DRIVER_INIT_CALL(kof98); }
-		else if(strcmp(crypt_feature,"kof99_prot") == 0)	{ DRIVER_INIT_CALL(kof99); }
-		else if(strcmp(crypt_feature,"kof99k_prot") == 0)	{ DRIVER_INIT_CALL(kof99k); }
-		else if(strcmp(crypt_feature,"garou_prot") == 0)	{ DRIVER_INIT_CALL(garou); }
-		else if(strcmp(crypt_feature,"garouh_prot") == 0)	{ DRIVER_INIT_CALL(garouh); }
-		else if(strcmp(crypt_feature,"garoubl_prot") == 0)	{ DRIVER_INIT_CALL(garoubl); }
-		else if(strcmp(crypt_feature,"mslug3_prot") == 0)	{ DRIVER_INIT_CALL(mslug3); }
-		else if(strcmp(crypt_feature,"mslug3h_prot") == 0)	{ DRIVER_INIT_CALL(mslug3h); }
-		else if(strcmp(crypt_feature,"mslug3b6_prot") == 0)	{ DRIVER_INIT_CALL(mslug3b6); }
-		else if(strcmp(crypt_feature,"kof2000_prot") == 0)	{ DRIVER_INIT_CALL(kof2000); }
-		else if(strcmp(crypt_feature,"kof2000n_prot") == 0)	{ DRIVER_INIT_CALL(kof2000n); }
-		else if(strcmp(crypt_feature,"sengoku3_prot") == 0)	{ DRIVER_INIT_CALL(sengoku3); }
-		else if(strcmp(crypt_feature,"zupapa_prot") == 0)	{ DRIVER_INIT_CALL(zupapa); }
-		else if(strcmp(crypt_feature,"kof2001_prot") == 0)	{ DRIVER_INIT_CALL(kof2001); }
-		else if(strcmp(crypt_feature,"cthd2003_prot") == 0)	{ DRIVER_INIT_CALL(cthd2003); }
-		else if(strcmp(crypt_feature,"ct2k3sp_prot") == 0)	{ DRIVER_INIT_CALL(ct2k3sp); }
-		else if(strcmp(crypt_feature,"ct2k3sa_prot") == 0)	{ DRIVER_INIT_CALL(ct2k3sa); }
-		else if(strcmp(crypt_feature,"kof2002_prot") == 0)	{ DRIVER_INIT_CALL(kof2002); }
-		else if(strcmp(crypt_feature,"kof2002b_prot") == 0)	{ DRIVER_INIT_CALL(kof2002b); }
-		else if(strcmp(crypt_feature,"kf2k2pls_prot") == 0)	{ DRIVER_INIT_CALL(kf2k2pls); }
-		else if(strcmp(crypt_feature,"kf2k2mp_prot") == 0)	{ DRIVER_INIT_CALL(kf2k2mp); }
-		else if(strcmp(crypt_feature,"kf2k2mp2_prot") == 0)	{ DRIVER_INIT_CALL(kf2k2mp2); }
-		else if(strcmp(crypt_feature,"kof10th_prot") == 0)	{ DRIVER_INIT_CALL(kof10th); }
-		else if(strcmp(crypt_feature,"kf10thep_prot") == 0)	{ DRIVER_INIT_CALL(kf10thep); }
-		else if(strcmp(crypt_feature,"kf2k5uni_prot") == 0)	{ DRIVER_INIT_CALL(kf2k5uni); }
-		else if(strcmp(crypt_feature,"kof2k4se_prot") == 0)	{ DRIVER_INIT_CALL(kof2k4se); }
-		else if(strcmp(crypt_feature,"mslug5_prot") == 0)	{ DRIVER_INIT_CALL(mslug5); }
-		else if(strcmp(crypt_feature,"ms5plus_prot") == 0)	{ DRIVER_INIT_CALL(ms5plus); }
-		else if(strcmp(crypt_feature,"svc_prot") == 0)		{ DRIVER_INIT_CALL(svc); }
-		else if(strcmp(crypt_feature,"svcboot_prot") == 0)	{ DRIVER_INIT_CALL(svcboot); }
-		else if(strcmp(crypt_feature,"svcplus_prot") == 0)	{ DRIVER_INIT_CALL(svcplus); }
-		else if(strcmp(crypt_feature,"svcplusa_prot") == 0)	{ DRIVER_INIT_CALL(svcplusa); }
-		else if(strcmp(crypt_feature,"svcsplus_prot") == 0)	{ DRIVER_INIT_CALL(svcsplus); }
-		else if(strcmp(crypt_feature,"samsho5_prot") == 0)	{ DRIVER_INIT_CALL(samsho5); }
-		else if(strcmp(crypt_feature,"samsho5b_prot") == 0)	{ DRIVER_INIT_CALL(samsho5b); }
-		else if(strcmp(crypt_feature,"kof2003_prot") == 0)	{ DRIVER_INIT_CALL(kof2003); }
-		else if(strcmp(crypt_feature,"kof2003h_prot") == 0)	{ DRIVER_INIT_CALL(kof2003h); }
-		else if(strcmp(crypt_feature,"kf2k3bl_prot") == 0)	{ DRIVER_INIT_CALL(kf2k3bl); }
-		else if(strcmp(crypt_feature,"kf2k3pl_prot") == 0)	{ DRIVER_INIT_CALL(kf2k3pl); }
-		else if(strcmp(crypt_feature,"kf2k3upl_prot") == 0)	{ DRIVER_INIT_CALL(kf2k3upl); }
-		else if(strcmp(crypt_feature,"samsh5sp_prot") == 0)	{ DRIVER_INIT_CALL(samsh5sp); }
-		else if(strcmp(crypt_feature,"preisle2_prot") == 0)	{ DRIVER_INIT_CALL(preisle2); }
-		else if(strcmp(crypt_feature,"nitd_prot") == 0)		{ DRIVER_INIT_CALL(nitd); }
-		else if(strcmp(crypt_feature,"s1945p_prot") == 0)	{ DRIVER_INIT_CALL(s1945p); }
-		else if(strcmp(crypt_feature,"lans2004_prot") == 0)	{ DRIVER_INIT_CALL(lans2004); }
-		else if(strcmp(crypt_feature,"pnyaa_prot") == 0)	{ DRIVER_INIT_CALL(pnyaa); }
-		else if(strcmp(crypt_feature,"ganryu_prot") == 0)	{ DRIVER_INIT_CALL(ganryu); }
-		else if(strcmp(crypt_feature,"bangbead_prot") == 0)	{ DRIVER_INIT_CALL(bangbead); }
-		else if(strcmp(crypt_feature,"mslug4_prot") == 0)	{ DRIVER_INIT_CALL(mslug4); }
-		else if(strcmp(crypt_feature,"ms4plus_prot") == 0)	{ DRIVER_INIT_CALL(ms4plus); }
-		else if(strcmp(crypt_feature,"rotd_prot") == 0)		{ DRIVER_INIT_CALL(rotd); }
-		else if(strcmp(crypt_feature,"matrim_prot") == 0)	{ DRIVER_INIT_CALL(matrim); }
-		else if(strcmp(crypt_feature,"matrimbl_prot") == 0)	{ DRIVER_INIT_CALL(matrimbl); }
+		else if(strcmp(crypt_feature,"kog_prot") == 0)      { DRIVER_INIT_CALL(kog); }
+		else if(strcmp(crypt_feature,"kof97oro_prot") == 0) { DRIVER_INIT_CALL(kof97oro); }
+		else if(strcmp(crypt_feature,"kof98_prot") == 0)    { DRIVER_INIT_CALL(kof98); }
+		else if(strcmp(crypt_feature,"kof99_prot") == 0)    { DRIVER_INIT_CALL(kof99); }
+		else if(strcmp(crypt_feature,"kof99k_prot") == 0)   { DRIVER_INIT_CALL(kof99k); }
+		else if(strcmp(crypt_feature,"garou_prot") == 0)    { DRIVER_INIT_CALL(garou); }
+		else if(strcmp(crypt_feature,"garouh_prot") == 0)   { DRIVER_INIT_CALL(garouh); }
+		else if(strcmp(crypt_feature,"garoubl_prot") == 0)  { DRIVER_INIT_CALL(garoubl); }
+		else if(strcmp(crypt_feature,"mslug3_prot") == 0)   { DRIVER_INIT_CALL(mslug3); }
+		else if(strcmp(crypt_feature,"mslug3h_prot") == 0)  { DRIVER_INIT_CALL(mslug3h); }
+		else if(strcmp(crypt_feature,"mslug3b6_prot") == 0) { DRIVER_INIT_CALL(mslug3b6); }
+		else if(strcmp(crypt_feature,"kof2000_prot") == 0)  { DRIVER_INIT_CALL(kof2000); }
+		else if(strcmp(crypt_feature,"kof2000n_prot") == 0) { DRIVER_INIT_CALL(kof2000n); }
+		else if(strcmp(crypt_feature,"sengoku3_prot") == 0) { DRIVER_INIT_CALL(sengoku3); }
+		else if(strcmp(crypt_feature,"zupapa_prot") == 0)   { DRIVER_INIT_CALL(zupapa); }
+		else if(strcmp(crypt_feature,"kof2001_prot") == 0)  { DRIVER_INIT_CALL(kof2001); }
+		else if(strcmp(crypt_feature,"cthd2003_prot") == 0) { DRIVER_INIT_CALL(cthd2003); }
+		else if(strcmp(crypt_feature,"ct2k3sp_prot") == 0)  { DRIVER_INIT_CALL(ct2k3sp); }
+		else if(strcmp(crypt_feature,"ct2k3sa_prot") == 0)  { DRIVER_INIT_CALL(ct2k3sa); }
+		else if(strcmp(crypt_feature,"kof2002_prot") == 0)  { DRIVER_INIT_CALL(kof2002); }
+		else if(strcmp(crypt_feature,"kof2002b_prot") == 0) { DRIVER_INIT_CALL(kof2002b); }
+		else if(strcmp(crypt_feature,"kf2k2pls_prot") == 0) { DRIVER_INIT_CALL(kf2k2pls); }
+		else if(strcmp(crypt_feature,"kf2k2mp_prot") == 0)  { DRIVER_INIT_CALL(kf2k2mp); }
+		else if(strcmp(crypt_feature,"kf2k2mp2_prot") == 0) { DRIVER_INIT_CALL(kf2k2mp2); }
+		else if(strcmp(crypt_feature,"kof10th_prot") == 0)  { DRIVER_INIT_CALL(kof10th); }
+		else if(strcmp(crypt_feature,"kf10thep_prot") == 0) { DRIVER_INIT_CALL(kf10thep); }
+		else if(strcmp(crypt_feature,"kf2k5uni_prot") == 0) { DRIVER_INIT_CALL(kf2k5uni); }
+		else if(strcmp(crypt_feature,"kof2k4se_prot") == 0) { DRIVER_INIT_CALL(kof2k4se); }
+		else if(strcmp(crypt_feature,"mslug5_prot") == 0)   { DRIVER_INIT_CALL(mslug5); }
+		else if(strcmp(crypt_feature,"ms5plus_prot") == 0)  { DRIVER_INIT_CALL(ms5plus); }
+		else if(strcmp(crypt_feature,"svc_prot") == 0)      { DRIVER_INIT_CALL(svc); }
+		else if(strcmp(crypt_feature,"svcboot_prot") == 0)  { DRIVER_INIT_CALL(svcboot); }
+		else if(strcmp(crypt_feature,"svcplus_prot") == 0)  { DRIVER_INIT_CALL(svcplus); }
+		else if(strcmp(crypt_feature,"svcplusa_prot") == 0) { DRIVER_INIT_CALL(svcplusa); }
+		else if(strcmp(crypt_feature,"svcsplus_prot") == 0) { DRIVER_INIT_CALL(svcsplus); }
+		else if(strcmp(crypt_feature,"samsho5_prot") == 0)  { DRIVER_INIT_CALL(samsho5); }
+		else if(strcmp(crypt_feature,"samsho5b_prot") == 0) { DRIVER_INIT_CALL(samsho5b); }
+		else if(strcmp(crypt_feature,"kof2003_prot") == 0)  { DRIVER_INIT_CALL(kof2003); }
+		else if(strcmp(crypt_feature,"kof2003h_prot") == 0) { DRIVER_INIT_CALL(kof2003h); }
+		else if(strcmp(crypt_feature,"kf2k3bl_prot") == 0)  { DRIVER_INIT_CALL(kf2k3bl); }
+		else if(strcmp(crypt_feature,"kf2k3pl_prot") == 0)  { DRIVER_INIT_CALL(kf2k3pl); }
+		else if(strcmp(crypt_feature,"kf2k3upl_prot") == 0) { DRIVER_INIT_CALL(kf2k3upl); }
+		else if(strcmp(crypt_feature,"samsh5sp_prot") == 0) { DRIVER_INIT_CALL(samsh5sp); }
+		else if(strcmp(crypt_feature,"preisle2_prot") == 0) { DRIVER_INIT_CALL(preisle2); }
+		else if(strcmp(crypt_feature,"nitd_prot") == 0)     { DRIVER_INIT_CALL(nitd); }
+		else if(strcmp(crypt_feature,"s1945p_prot") == 0)   { DRIVER_INIT_CALL(s1945p); }
+		else if(strcmp(crypt_feature,"lans2004_prot") == 0) { DRIVER_INIT_CALL(lans2004); }
+		else if(strcmp(crypt_feature,"pnyaa_prot") == 0)    { DRIVER_INIT_CALL(pnyaa); }
+		else if(strcmp(crypt_feature,"ganryu_prot") == 0)   { DRIVER_INIT_CALL(ganryu); }
+		else if(strcmp(crypt_feature,"bangbead_prot") == 0) { DRIVER_INIT_CALL(bangbead); }
+		else if(strcmp(crypt_feature,"mslug4_prot") == 0)   { DRIVER_INIT_CALL(mslug4); }
+		else if(strcmp(crypt_feature,"ms4plus_prot") == 0)  { DRIVER_INIT_CALL(ms4plus); }
+		else if(strcmp(crypt_feature,"rotd_prot") == 0)     { DRIVER_INIT_CALL(rotd); }
+		else if(strcmp(crypt_feature,"matrim_prot") == 0)   { DRIVER_INIT_CALL(matrim); }
+		else if(strcmp(crypt_feature,"matrimbl_prot") == 0) { DRIVER_INIT_CALL(matrimbl); }
 		else { fatalerror("unknown crypt type\n"); }
 	}
 }
@@ -10129,7 +10129,7 @@ GAME( 1999, mslugx,     neogeo,   neogeo,   neogeo, neogeo_state,   mslugx,   RO
 GAME( 1999, kof99,      neogeo,   neogeo,   neogeo, neogeo_state,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, kof99h,     kof99,    neogeo,   neogeo, neogeo_state,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGH-2510)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
 GAME( 1999, kof99e,     kof99,    neogeo,   neogeo, neogeo_state,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (earlier)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99k,     kof99,    neogeo,   neogeo, neogeo_state,   kof99k,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)" , GAME_SUPPORTS_SAVE )	/* Encrypted GFX */
+GAME( 1999, kof99k,     kof99,    neogeo,   neogeo, neogeo_state,   kof99k,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)" , GAME_SUPPORTS_SAVE )   /* Encrypted GFX */
 GAME( 1999, kof99p,     kof99,    neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1999, garou,      neogeo,   neogeo,   neogeo, neogeo_state,   garou,    ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, garouh,     garou,    neogeo,   neogeo, neogeo_state,   garouh,   ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)(NGH-2530)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
@@ -10140,8 +10140,8 @@ GAME( 2000, mslug3h,    mslug3,   neogeo,   neogeo, neogeo_state,   mslug3h,  RO
 GAME( 2000, mslug3b6,   mslug3,   neogeo,   neogeo, neogeo_state,   mslug3b6, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", GAME_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.c ;-) */
 GAME( 2000, kof2000,    neogeo,   neogeo,   neogeo, neogeo_state,   kof2000,  ROT0, "SNK", "The King of Fighters 2000 (NGM-2570) (NGH-2570)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 2000, kof2000n,   kof2000,  neogeo,   neogeo, neogeo_state,   kof2000n, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, zupapa,     neogeo,   neogeo,   neogeo, neogeo_state,   zupapa,   ROT0, "SNK", "Zupapa!" , GAME_SUPPORTS_SAVE )	/* Encrypted GFX */
-GAME( 2001, sengoku3,   neogeo,   neogeo,   neogeo, neogeo_state,   sengoku3, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001" , GAME_SUPPORTS_SAVE )	/* Encrypted GFX */
+GAME( 2001, zupapa,     neogeo,   neogeo,   neogeo, neogeo_state,   zupapa,   ROT0, "SNK", "Zupapa!" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, sengoku3,   neogeo,   neogeo,   neogeo, neogeo_state,   sengoku3, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, kof2001,    neogeo,   neogeo,   neogeo, neogeo_state,   kof2001,  ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGM-262?)" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, kof2001h,   kof2001,  neogeo,   neogeo, neogeo_state,   kof2001,  ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGH-2621)" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2003, cthd2003,   kof2001,  neogeo,   neogeo, neogeo_state,   cthd2003, ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)", GAME_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
@@ -10247,7 +10247,7 @@ GAME( 1996, mslug,      neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   RO
 GAME( 1994, zedblade,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "NMK", "Zed Blade / Operation Ragnarok", GAME_SUPPORTS_SAVE )
 
 /* Psikyo */
-GAME( 1999, s1945p,     neogeo,   neogeo,   neogeo, neogeo_state,   s1945p,   ROT0, "Psikyo", "Strikers 1945 Plus" , GAME_SUPPORTS_SAVE )	/* Encrypted GFX */
+GAME( 1999, s1945p,     neogeo,   neogeo,   neogeo, neogeo_state,   s1945p,   ROT0, "Psikyo", "Strikers 1945 Plus" , GAME_SUPPORTS_SAVE )   /* Encrypted GFX */
 
 /* Saurus */
 GAME( 1995, quizkof,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Saurus", "Quiz King of Fighters (SAM-080)(SAH-080)", GAME_SUPPORTS_SAVE )
@@ -10305,7 +10305,7 @@ GAME( 1997, puzzldpr,   puzzledp, neogeo,   neogeo, neogeo_state,   neogeo,   RO
 GAME( 1998, breakrev,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Visco", "Breakers Revenge", GAME_SUPPORTS_SAVE )
 GAME( 1998, flipshot,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Visco", "Battle Flip Shot", GAME_SUPPORTS_SAVE )
 GAME( 1999, ctomaday,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Visco", "Captain Tomaday", GAME_SUPPORTS_SAVE )
-GAME( 1999, ganryu,     neogeo,   neogeo,   neogeo, neogeo_state,   ganryu,   ROT0, "Visco", "Ganryu / Musashi Ganryuki" , GAME_SUPPORTS_SAVE )	/* Encrypted GFX */
+GAME( 1999, ganryu,     neogeo,   neogeo,   neogeo, neogeo_state,   ganryu,   ROT0, "Visco", "Ganryu / Musashi Ganryuki" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2000, bangbead,   neogeo,   neogeo,   neogeo, neogeo_state,   bangbead, ROT0, "Visco", "Bang Bead", GAME_SUPPORTS_SAVE )
 //GAME( 2000, bangbedp,   bangbead, neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Visco", "Bang Bead (prototype)", GAME_SUPPORTS_SAVE )
 

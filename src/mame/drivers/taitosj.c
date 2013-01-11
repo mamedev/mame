@@ -213,12 +213,12 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
-	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")         /* DSW1 */
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
-	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
+	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")          /* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD_LEGACY("ay1", ay8910_r)	/* DSW2 and DSW3 */
+	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD_LEGACY("ay1", ay8910_r)   /* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
@@ -253,12 +253,12 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
-	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")         /* DSW1 */
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
-	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
+	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")          /* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD_LEGACY("ay1", ay8910_r)	/* DSW2 and DSW3 */
+	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD_LEGACY("ay1", ay8910_r)   /* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
@@ -318,12 +318,12 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd404, 0xd404) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
-	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")         /* DSW1 */
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
-	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
+	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")          /* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40f) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD_LEGACY("ay1", ay8910_r)	/* DSW2 and DSW3 */
+	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD_LEGACY("ay1", ay8910_r) /* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_SHARE("gfxpointer")
 	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE_LEGACY("ay4", ay8910_address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD_LEGACY("ay4", ay8910_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM */
+	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM */
 ADDRESS_MAP_END
 
 
@@ -474,7 +474,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound CPU
 
 static INPUT_PORTS_START( spaceskr )
 	COMMON_IN0
@@ -487,7 +487,7 @@ static INPUT_PORTS_START( spaceskr )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -569,7 +569,7 @@ static INPUT_PORTS_START( spacecr )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -653,7 +653,7 @@ static INPUT_PORTS_START( junglek )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Finish Bonus" )
@@ -713,10 +713,10 @@ static INPUT_PORTS_START( piratpet )
 	/* If cabinet is upright -> only 1 set of controls -> only P1 Skip Next Level    */
 	/* If cabinet is cocktal -> 2 sets of controls -> both Skip Next Level bits work */
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1 Skip Next Level")	// Button 2 skips levels when Debug dips is on
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1 Skip Next Level") // Button 2 skips levels when Debug dips is on
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("P2 Skip Next Level")	// Button 2 skips levels when Debug dips is on
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("P2 Skip Next Level") // Button 2 skips levels when Debug dips is on
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x04, 0x04, "Debug Mode" )
@@ -749,7 +749,7 @@ static INPUT_PORTS_START( alpine )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL		// "Fast"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL      // "Fast"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -759,14 +759,14 @@ static INPUT_PORTS_START( alpine )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )				// "Fast"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                // "Fast"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x1e, 0x00, IPT_UNUSED )						/* protection read */
+	PORT_BIT( 0x1e, 0x00, IPT_UNUSED )                      /* protection read */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
@@ -775,7 +775,7 @@ static INPUT_PORTS_START( alpine )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Jump Bonus" )
@@ -834,7 +834,7 @@ static INPUT_PORTS_START( alpinea )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL		// "Fast"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL      // "Fast"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -844,13 +844,13 @@ static INPUT_PORTS_START( alpinea )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )				// "Fast"
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                // "Fast"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0f, 0x00, IPT_UNUSED )						/* protection read */
+	PORT_BIT( 0x0f, 0x00, IPT_UNUSED )                      /* protection read */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
@@ -860,7 +860,7 @@ static INPUT_PORTS_START( alpinea )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Jump Bonus" )
@@ -938,7 +938,7 @@ static INPUT_PORTS_START( timetunl )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
@@ -1001,7 +1001,7 @@ static INPUT_PORTS_START( wwestern )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1c, 0x18, IPT_UNUSED )					/* protection read, the game resets after a while without it */
+	PORT_BIT( 0x1c, 0x18, IPT_UNUSED )                  /* protection read, the game resets after a while without it */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
@@ -1138,7 +1138,7 @@ static INPUT_PORTS_START( elevator )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )    PORT_DIPLOCATION("SW1:1,2")
@@ -1221,7 +1221,7 @@ static INPUT_PORTS_START( tinstar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Bonus Life?" )
@@ -1304,7 +1304,7 @@ static INPUT_PORTS_START( waterski )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1393,7 +1393,7 @@ static INPUT_PORTS_START( bioatack )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")      /* d50a */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
@@ -1460,7 +1460,7 @@ static INPUT_PORTS_START( sfposeid )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1528,7 +1528,7 @@ static INPUT_PORTS_START( hwrace )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)	// from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, NULL)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1607,7 +1607,7 @@ static INPUT_PORTS_START( kikstart )
 	PORT_START("IN3")      /* Service */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,kikstart_gear_r, (void *)0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* needs to be 0, otherwise cannot shift */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* needs to be 0, otherwise cannot shift */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1616,7 +1616,7 @@ static INPUT_PORTS_START( kikstart )
 	PORT_START("IN4")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,kikstart_gear_r, (void *)1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* needs to be 0, otherwise cannot shift */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* needs to be 0, otherwise cannot shift */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -1629,10 +1629,10 @@ static INPUT_PORTS_START( kikstart )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME(0x18, 0x10, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(   0x18, DEF_STR( Easy ) )		/* 3:00 */
-	PORT_DIPSETTING(   0x10, DEF_STR( Normal ) )		/* 2:30 */
-	PORT_DIPSETTING(   0x08, DEF_STR( Difficult ) )		/* 2:00 */
-	PORT_DIPSETTING(   0x00, DEF_STR( Very_Difficult ) )	/* 1:30 */
+	PORT_DIPSETTING(   0x18, DEF_STR( Easy ) )      /* 3:00 */
+	PORT_DIPSETTING(   0x10, DEF_STR( Normal ) )        /* 2:30 */
+	PORT_DIPSETTING(   0x08, DEF_STR( Difficult ) )     /* 2:00 */
+	PORT_DIPSETTING(   0x00, DEF_STR( Very_Difficult ) )    /* 1:30 */
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -1760,8 +1760,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(taitosj_state,dac_out_w),	/* port Awrite */
-	DEVCB_DRIVER_MEMBER(taitosj_state,dac_vol_w)	/* port Bwrite */
+	DEVCB_DRIVER_MEMBER(taitosj_state,dac_out_w),   /* port Awrite */
+	DEVCB_DRIVER_MEMBER(taitosj_state,dac_vol_w)    /* port Bwrite */
 };
 
 static const ay8910_interface ay8910_interface_3 =
@@ -1781,7 +1781,7 @@ static const ay8910_interface ay8910_interface_4 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(taitosj_state,taitosj_sndnmi_msk_w)	/* port Bwrite */
+	DEVCB_DRIVER_MEMBER(taitosj_state,taitosj_sndnmi_msk_w) /* port Bwrite */
 };
 
 

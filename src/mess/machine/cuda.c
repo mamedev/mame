@@ -47,7 +47,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CUDA_CPU_TAG	"cuda"
+#define CUDA_CPU_TAG    "cuda"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -57,9 +57,9 @@ const device_type CUDA = &device_creator<cuda_device>;
 
 ROM_START( cuda )
 	ROM_REGION(0x4400, CUDA_CPU_TAG, 0)
-    ROM_LOAD( "341s0060.bin", 0x1100, 0x1100, CRC(0f5e7b4a) SHA1(972b3778146d9787b18c3a9874d505cf606b3e15) )
-    ROM_LOAD( "341s0788.bin", 0x2200, 0x1100, CRC(df6e1b43) SHA1(ec23cc6214c472d61b98964928c40589517a3172) )
-    ROM_LOAD( "341s0417.bin", 0x3300, 0x1100, CRC(571f24c9) SHA1(a2ae12492389a00e5f4b1ef19b267d6f3a8eadc3) )
+	ROM_LOAD( "341s0060.bin", 0x1100, 0x1100, CRC(0f5e7b4a) SHA1(972b3778146d9787b18c3a9874d505cf606b3e15) )
+	ROM_LOAD( "341s0788.bin", 0x2200, 0x1100, CRC(df6e1b43) SHA1(ec23cc6214c472d61b98964928c40589517a3172) )
+	ROM_LOAD( "341s0417.bin", 0x3300, 0x1100, CRC(571f24c9) SHA1(a2ae12492389a00e5f4b1ef19b267d6f3a8eadc3) )
 ROM_END
 
 //-------------------------------------------------
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( cuda_map, AS_PROGRAM, 8, cuda_device )
 	AM_RANGE(0x0008, 0x0008) AM_READWRITE(timer_ctrl_r, timer_ctrl_w)
 	AM_RANGE(0x0009, 0x0009) AM_READWRITE(timer_counter_r, timer_counter_w)
 	AM_RANGE(0x0012, 0x0012) AM_READWRITE(onesec_r, onesec_w)
-	AM_RANGE(0x0090, 0x00ff) AM_RAM							// work RAM and stack
+	AM_RANGE(0x0090, 0x00ff) AM_RAM                         // work RAM and stack
 	AM_RANGE(0x0100, 0x01ff) AM_READWRITE(pram_r, pram_w)
 	AM_RANGE(0x0f00, 0x1fff) AM_ROM AM_REGION(CUDA_CPU_TAG, 0)
 ADDRESS_MAP_END
@@ -83,7 +83,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cuda )
-	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)	// 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(cuda_map)
 MACHINE_CONFIG_END
 
@@ -113,7 +113,7 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
 	switch (offset)
 	{
-    case 0: // port A
+	case 0: // port A
 /*          printf("PORT A ADB:%d DFAC:%d PFW:%d\n",
                 (data & 0x80) ? 1 : 0,
                 (data & 0x10) ? 1 : 0,
@@ -130,9 +130,9 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
                     printf("CU ADB: 0->1 time %lld\n", machine().time().as_ticks(1000000) - last_adb_time);
                 }*/
 
-                adb_in = (data & 0x80) ? true : false;
+				adb_in = (data & 0x80) ? true : false;
 
-                m_adb_dtime = (int)(machine().time().as_ticks(1000000) - last_adb_time);
+				m_adb_dtime = (int)(machine().time().as_ticks(1000000) - last_adb_time);
 				m_out_adb_func(((data & 0x80) >> 7) ^ 1);
 
 				last_adb = data & 0x80;
@@ -140,33 +140,33 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			}
 			break;
 
-        case 1: // port B
-            {
+		case 1: // port B
+			{
 				if (treq != ((data>>1)&1))
 				{
 					#ifdef CUDA_SUPER_VERBOSE
-                    printf("CU-> TREQ: %d (PC=%x)\n", (data>>1)&1, m_maincpu->pc());
+					printf("CU-> TREQ: %d (PC=%x)\n", (data>>1)&1, m_maincpu->pc());
 					#endif
 					treq = (data>>1) & 1;
 				}
-                if (via_data != ((data>>5)&1))
-                {
+				if (via_data != ((data>>5)&1))
+				{
 					#ifdef CUDA_SUPER_VERBOSE
-                    printf("CU-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, m_maincpu->pc());
+					printf("CU-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, m_maincpu->pc());
 					#endif
 					via_data = (data>>5) & 1;
-                }
-                if (via_clock != ((data>>4)&1))
-                {
+				}
+				if (via_clock != ((data>>4)&1))
+				{
 					#ifdef CUDA_SUPER_VERBOSE
-                    printf("CU-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->pc());
+					printf("CU-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->pc());
 					#endif
 					via_clock = (data>>4) & 1;
 					via6522_device *via1 = machine().device<via6522_device>("via6522_0");
 					via1->write_cb1(via_clock);
-                }
-            }
-            break;
+				}
+			}
+			break;
 
 		case 2: // port C
 			if ((data & 8) != reset_line)
@@ -178,8 +178,8 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				// falling edge, should reset the machine too
 				if ((ports[2] & 8) && !(data&8))
 				{
-                    m_out_reset_func(ASSERT_LINE);
-                    m_out_reset_func(CLEAR_LINE);
+					m_out_reset_func(ASSERT_LINE);
+					m_out_reset_func(CLEAR_LINE);
 
 					// if PRAM's waiting to be loaded, transfer it now
 					if (!pram_loaded)
@@ -213,7 +213,7 @@ READ8_MEMBER( cuda_device::ports_r )
 
 	switch (offset)
 	{
-		case 0: 	// port A
+		case 0:     // port A
 			if (cuda_controls_power)
 			{
 				incoming = 0x20; // pull up + chassis switch (which is 0 = on)
@@ -223,30 +223,30 @@ READ8_MEMBER( cuda_device::ports_r )
 				incoming = 0x02 | 0x01;   // pull-up + PFW
 			}
 
-            if (adb_in)
-            {
-                incoming |= 0x40;
-            }
+			if (adb_in)
+			{
+				incoming |= 0x40;
+			}
 			break;
 
-        case 1:		// port B
+		case 1:     // port B
 //            printf("Read: byteack %d tip %d via_data %d\n", byteack, tip, via_data);
-            incoming |= 0x01;   // +5v sense
-            incoming |= byteack<<2;
-            incoming |= tip<<3;
-            incoming |= via_data<<5;
-			incoming |= 0xc0;	// show DFAC lines high
+			incoming |= 0x01;   // +5v sense
+			incoming |= byteack<<2;
+			incoming |= tip<<3;
+			incoming |= via_data<<5;
+			incoming |= 0xc0;   // show DFAC lines high
 			break;
 
-		case 2:		// port C
+		case 2:     // port C
 			if (cuda_controls_power)
 			{
 				incoming = 0x02 | 0x01; // soft power: trickle sense + pull-up
 			}
-            else
-            {
-                incoming = 0x02 | 0x01; // secure power: pull-up + file server
-            }
+			else
+			{
+				incoming = 0x02 | 0x01; // secure power: pull-up + file server
+			}
 			break;
 	}
 
@@ -255,11 +255,11 @@ READ8_MEMBER( cuda_device::ports_r )
 	// add in ddr-masked version of port writes
 	incoming |= (ports[offset] & ddrs[offset]);
 
-    // HACK: don't know how this works on h/w...
-    if (!offset)
-    {
-        incoming |= 0x01;
-    }
+	// HACK: don't know how this works on h/w...
+	if (!offset)
+	{
+		incoming |= 0x01;
+	}
 
 //    printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->pc());
 
@@ -302,38 +302,38 @@ READ8_MEMBER( cuda_device::timer_ctrl_r )
 
 WRITE8_MEMBER( cuda_device::timer_ctrl_w )
 {
-    static const attotime rates[4][5] =
-    {
-        { attotime::from_seconds(1), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f), attotime::from_msec(3.9f) },
-        { attotime::from_seconds(2), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f) },
-        { attotime::from_seconds(4), attotime::from_msec(125.0f), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f) },
-        { attotime::from_seconds(8), attotime::from_msec(250.0f), attotime::from_msec(125.1f), attotime::from_msec(62.5f), attotime::from_msec(31.3f) },
-    };
+	static const attotime rates[4][5] =
+	{
+		{ attotime::from_seconds(1), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f), attotime::from_msec(3.9f) },
+		{ attotime::from_seconds(2), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f) },
+		{ attotime::from_seconds(4), attotime::from_msec(125.0f), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f) },
+		{ attotime::from_seconds(8), attotime::from_msec(250.0f), attotime::from_msec(125.1f), attotime::from_msec(62.5f), attotime::from_msec(31.3f) },
+	};
 
 //    printf("%02x to timer control (PC=%x)\n", data, m_maincpu->pc());
 
-    if (data & 0x50)
-    {
-        m_prog_timer->adjust(rates[data & 3][(pll_ctrl&3)+1], 1, rates[data&3][(pll_ctrl&3)+1]);
-        ripple_counter = timer_counter;
-    }
-    else
-    {
-        m_prog_timer->adjust(attotime::never);
-    }
+	if (data & 0x50)
+	{
+		m_prog_timer->adjust(rates[data & 3][(pll_ctrl&3)+1], 1, rates[data&3][(pll_ctrl&3)+1]);
+		ripple_counter = timer_counter;
+	}
+	else
+	{
+		m_prog_timer->adjust(attotime::never);
+	}
 
 	if ((timer_ctrl & 0x80) && !(data & 0x80))
-    {
-        m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
-        timer_ctrl &= ~0x80;
-    }
+	{
+		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
+		timer_ctrl &= ~0x80;
+	}
 	else if ((timer_ctrl & 0x40) && !(data & 0x40))
-    {
-        m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
-        timer_ctrl &= ~0x40;
-    }
+	{
+		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
+		timer_ctrl &= ~0x40;
+	}
 
-    timer_ctrl &= 0xc0;
+	timer_ctrl &= 0xc0;
 	timer_ctrl |= (data & ~0xc0);
 }
 
@@ -346,7 +346,7 @@ WRITE8_MEMBER( cuda_device::timer_counter_w )
 {
 //    printf("%02x to timer counter (PC=%x)\n", data, m_maincpu->pc());
 	timer_counter = data;
-    ripple_counter = timer_counter;
+	ripple_counter = timer_counter;
 }
 
 READ8_MEMBER( cuda_device::onesec_r )
@@ -381,7 +381,7 @@ WRITE8_MEMBER( cuda_device::pram_w )
 //-------------------------------------------------
 
 cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CUDA, "Apple Cuda", tag, owner, clock),
+	: device_t(mconfig, CUDA, "Apple Cuda", tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_maincpu(*this, CUDA_CPU_TAG)
 {
@@ -404,11 +404,11 @@ void cuda_device::static_set_type(device_t &device, int type)
 
 void cuda_device::device_start()
 {
-    m_out_reset_func.resolve(m_out_reset_cb, *this);
-    m_out_adb_func.resolve(m_out_adb_cb, *this);
+	m_out_reset_func.resolve(m_out_reset_cb, *this);
+	m_out_adb_func.resolve(m_out_adb_cb, *this);
 
 	m_timer = timer_alloc(0, NULL);
-    m_prog_timer = timer_alloc(1, NULL);
+	m_prog_timer = timer_alloc(1, NULL);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));
@@ -427,7 +427,7 @@ void cuda_device::device_start()
 	save_item(NAME(via_clock));
 	save_item(NAME(adb_in));
 	save_item(NAME(reset_line));
-    save_item(NAME(m_adb_dtime));
+	save_item(NAME(m_adb_dtime));
 	save_item(NAME(pram_loaded));
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
@@ -435,10 +435,10 @@ void cuda_device::device_start()
 	astring tempstring;
 	UINT8 *rom = device().machine().root_device().memregion(device().subtag(tempstring, CUDA_CPU_TAG))->base();
 
-    if (rom)
-    {
-        memcpy(rom, rom+rom_offset, 0x1100);
-    }
+	if (rom)
+	{
+		memcpy(rom, rom+rom_offset, 0x1100);
+	}
 }
 
 
@@ -454,58 +454,58 @@ void cuda_device::device_reset()
 	m_timer->adjust(attotime::never);
 	m_prog_timer->adjust(attotime::never);
 
-	cuda_controls_power = false;	// set to hard power control
-	adb_in = true;	// line is pulled up to +5v, so nothing plugged in would read as "1"
+	cuda_controls_power = false;    // set to hard power control
+	adb_in = true;  // line is pulled up to +5v, so nothing plugged in would read as "1"
 	reset_line = 0;
-    tip = 0;
-    treq = 0;
-    byteack = 0;
-    via_data = 0;
-    via_clock = 0;
-    pll_ctrl = 0;
-    timer_ctrl = 0;
-    timer_counter = 32;
+	tip = 0;
+	treq = 0;
+	byteack = 0;
+	via_data = 0;
+	via_clock = 0;
+	pll_ctrl = 0;
+	timer_ctrl = 0;
+	timer_counter = 32;
 	last_adb_time = m_maincpu->total_cycles();
 }
 
 void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-    if (id == 0)
-    {
-        onesec |= 0x40;
+	if (id == 0)
+	{
+		onesec |= 0x40;
 
-        if (onesec & 0x10)
-        {
-            m_maincpu->set_input_line(M68HC05EG_INT_CPI, ASSERT_LINE);
-        }
-    }
-    else
-    {
-        timer_ctrl |= 0x80;
+		if (onesec & 0x10)
+		{
+			m_maincpu->set_input_line(M68HC05EG_INT_CPI, ASSERT_LINE);
+		}
+	}
+	else
+	{
+		timer_ctrl |= 0x80;
 
-        if (timer_ctrl & 0x20)
-        {
-            m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
-        }
+		if (timer_ctrl & 0x20)
+		{
+			m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
+		}
 
-        ripple_counter--;
-        if (ripple_counter <= 0)
-        {
-            timer_ctrl |= 0x40;
+		ripple_counter--;
+		if (ripple_counter <= 0)
+		{
+			timer_ctrl |= 0x40;
 
-            ripple_counter = timer_counter;
+			ripple_counter = timer_counter;
 
-            if (timer_ctrl & 0x10)
-            {
-                m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
-            }
-        }
-    }
+			if (timer_ctrl & 0x10)
+			{
+				m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
+			}
+		}
+	}
 }
 
 void cuda_device::device_config_complete()
 {
-    m_shortname = "cuda";
+	m_shortname = "cuda";
 
 	// inherit a copy of the static data
 	const cuda_interface *intf = reinterpret_cast<const cuda_interface *>(static_config());
@@ -547,11 +547,11 @@ void cuda_device::nvram_default()
 	pram[0x1e] = 0x63;
 	pram[0x4a] = 0x90;
 	pram[0x4b] = 0xc7;
-    pram[0x57] = 0x29;
-    pram[0x58] = 0x80;
-    pram[0x59] = 0x68;
-    pram[0x5a] = 0x80;
-    pram[0x5b] = 0x80;
+	pram[0x57] = 0x29;
+	pram[0x58] = 0x80;
+	pram[0x59] = 0x68;
+	pram[0x5a] = 0x80;
+	pram[0x5b] = 0x80;
 	pram[0x6f] = 0x28;
 	pram[0x77] = 0x01;
 	pram[0x78] = 0xff;

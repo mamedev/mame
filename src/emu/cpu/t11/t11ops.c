@@ -165,7 +165,7 @@
 #define BITB_R(s,d) int sreg, dreg, source, dest, result;     GET_SB_##s; GET_DB_##d; CLR_NZV; result = dest & source; SETB_NZ;
 #define BITB_M(s,d) int sreg, dreg, source, dest, result, ea; GET_SB_##s; GET_DB_##d; CLR_NZV; result = dest & source; SETB_NZ;
 /* BR: if (condition) branch */
-#define BR(c)		if (c) { cpustate->PC += 2 * (signed char)(op & 0xff); }
+#define BR(c)       if (c) { cpustate->PC += 2 * (signed char)(op & 0xff); }
 /* CLR: dst = 0 */
 #define CLR_R(d)    int dreg;     PUT_DW_##d(0); CLR_NZVC; SET_Z
 #define CLR_M(d)    int dreg, ea; PUT_DW_##d(0); CLR_NZVC; SET_Z
@@ -255,14 +255,14 @@ static void op_0000(t11_state *cpustate, UINT16 op)
 {
 	switch (op & 0x3f)
 	{
-		case 0x00:	/* HALT  */ halt(cpustate, op); break;
-		case 0x01:	/* WAIT  */ cpustate->icount = 0; cpustate->wait_state = 1; break;
-		case 0x02:	/* RTI   */ cpustate->icount -= 24; cpustate->PC = POP(cpustate); cpustate->PSW = POP(cpustate); t11_check_irqs(cpustate); break;
-		case 0x03:	/* BPT   */ cpustate->icount -= 48; PUSH(cpustate, cpustate->PSW); PUSH(cpustate, cpustate->PC); cpustate->PC = RWORD(cpustate, 0x0c); cpustate->PSW = RWORD(cpustate, 0x0e); t11_check_irqs(cpustate); break;
-		case 0x04:	/* IOT   */ cpustate->icount -= 48; PUSH(cpustate, cpustate->PSW); PUSH(cpustate, cpustate->PC); cpustate->PC = RWORD(cpustate, 0x10); cpustate->PSW = RWORD(cpustate, 0x12); t11_check_irqs(cpustate); break;
-		case 0x05:	/* RESET */ cpustate->icount -= 110; break;
-		case 0x06:	/* RTT   */ cpustate->icount -= 33; cpustate->PC = POP(cpustate); cpustate->PSW = POP(cpustate); t11_check_irqs(cpustate); break;
-		default:	illegal(cpustate, op); break;
+		case 0x00:  /* HALT  */ halt(cpustate, op); break;
+		case 0x01:  /* WAIT  */ cpustate->icount = 0; cpustate->wait_state = 1; break;
+		case 0x02:  /* RTI   */ cpustate->icount -= 24; cpustate->PC = POP(cpustate); cpustate->PSW = POP(cpustate); t11_check_irqs(cpustate); break;
+		case 0x03:  /* BPT   */ cpustate->icount -= 48; PUSH(cpustate, cpustate->PSW); PUSH(cpustate, cpustate->PC); cpustate->PC = RWORD(cpustate, 0x0c); cpustate->PSW = RWORD(cpustate, 0x0e); t11_check_irqs(cpustate); break;
+		case 0x04:  /* IOT   */ cpustate->icount -= 48; PUSH(cpustate, cpustate->PSW); PUSH(cpustate, cpustate->PC); cpustate->PC = RWORD(cpustate, 0x10); cpustate->PSW = RWORD(cpustate, 0x12); t11_check_irqs(cpustate); break;
+		case 0x05:  /* RESET */ cpustate->icount -= 110; break;
+		case 0x06:  /* RTT   */ cpustate->icount -= 33; cpustate->PC = POP(cpustate); cpustate->PSW = POP(cpustate); t11_check_irqs(cpustate); break;
+		default:    illegal(cpustate, op); break;
 	}
 }
 
@@ -312,8 +312,8 @@ static void rts(t11_state *cpustate, UINT16 op)
 	cpustate->REGW(dreg) = POP(cpustate);
 }
 
-static void ccc(t11_state *cpustate, UINT16 op)			{ cpustate->icount -= 18; { cpustate->PSW &= ~(op & 15); } }
-static void scc(t11_state *cpustate, UINT16 op)			{ cpustate->icount -= 18; { cpustate->PSW |=  (op & 15); } }
+static void ccc(t11_state *cpustate, UINT16 op)         { cpustate->icount -= 18; { cpustate->PSW &= ~(op & 15); } }
+static void scc(t11_state *cpustate, UINT16 op)         { cpustate->icount -= 18; { cpustate->PSW |=  (op & 15); } }
 
 static void swab_rg(t11_state *cpustate, UINT16 op)       { cpustate->icount -= 12; { SWAB_R(RG); } }
 static void swab_rgd(t11_state *cpustate, UINT16 op)      { cpustate->icount -= 21; { SWAB_M(RGD); } }

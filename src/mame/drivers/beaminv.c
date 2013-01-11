@@ -93,7 +93,7 @@ public:
 
 /* the interrupt scanlines are a guess */
 
-#define INTERRUPTS_PER_FRAME	(2)
+#define INTERRUPTS_PER_FRAME    (2)
 
 static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
 
@@ -208,8 +208,8 @@ READ8_MEMBER(beaminv_state::v128_r)
  *
  *************************************/
 
-#define P1_CONTROL_PORT_TAG	("CONTP1")
-#define P2_CONTROL_PORT_TAG	("CONTP2")
+#define P1_CONTROL_PORT_TAG ("CONTP1")
+#define P2_CONTROL_PORT_TAG ("CONTP2")
 
 
 WRITE8_MEMBER(beaminv_state::controller_select_w)
@@ -332,7 +332,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( beaminv, beaminv_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)	/* 2 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 

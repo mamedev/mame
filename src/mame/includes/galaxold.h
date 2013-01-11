@@ -25,13 +25,13 @@ class galaxold_state : public driver_device
 public:
 	galaxold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_videoram(*this,"videoram"),
-		  m_spriteram(*this,"spriteram"),
-		  m_spriteram2(*this,"spriteram2"),
-		  m_attributesram(*this,"attributesram"),
-		  m_bulletsram(*this,"bulletsram"),
-		  m_rockclim_videoram(*this,"rockclim_vram"),
-		  m_racknrol_tiles_bank(*this,"racknrol_tbank")
+			m_videoram(*this,"videoram"),
+			m_spriteram(*this,"spriteram"),
+			m_spriteram2(*this,"spriteram2"),
+			m_attributesram(*this,"attributesram"),
+			m_bulletsram(*this,"bulletsram"),
+			m_rockclim_videoram(*this,"rockclim_vram"),
+			m_racknrol_tiles_bank(*this,"racknrol_tbank")
 	{ }
 
 	required_shared_ptr<UINT8> m_videoram;
@@ -54,20 +54,20 @@ public:
 	UINT8 m_color_mask;
 	tilemap_t *m_dambustr_tilemap2;
 	UINT8 *m_dambustr_videoram2;
-	void (*m_modify_charcode)(running_machine &machine, UINT16 *code, UINT8 x);		/* function to call to do character banking */
-	void (*m_modify_spritecode)(running_machine &machine, UINT8 *spriteram, int*, int*, int*, int);	/* function to call to do sprite banking */
-	void (*m_modify_color)(UINT8 *color);	/* function to call to do modify how the color codes map to the PROM */
-	void (*m_modify_ypos)(UINT8*);	/* function to call to do modify how vertical positioning bits are connected */
+	void (*m_modify_charcode)(running_machine &machine, UINT16 *code, UINT8 x);     /* function to call to do character banking */
+	void (*m_modify_spritecode)(running_machine &machine, UINT8 *spriteram, int*, int*, int*, int); /* function to call to do sprite banking */
+	void (*m_modify_color)(UINT8 *color);   /* function to call to do modify how the color codes map to the PROM */
+	void (*m_modify_ypos)(UINT8*);  /* function to call to do modify how vertical positioning bits are connected */
 
 	UINT8 m_timer_adjusted;
 	UINT8 m_darkplnt_bullet_color;
-	void (*m_draw_bullets)(running_machine &,bitmap_ind16 &,const rectangle &, int, int, int);	/* function to call to draw a bullet */
+	void (*m_draw_bullets)(running_machine &,bitmap_ind16 &,const rectangle &, int, int, int);  /* function to call to draw a bullet */
 
 	UINT8 m_background_enable;
 	UINT8 m_background_red;
 	UINT8 m_background_green;
 	UINT8 m_background_blue;
-	void (*m_draw_background)(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);	/* function to call to draw the background */
+	void (*m_draw_background)(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);   /* function to call to draw the background */
 	UINT16 m_rockclim_v;
 	UINT16 m_rockclim_h;
 	int m_dambustr_bg_split_line;
@@ -77,7 +77,7 @@ public:
 	int m_dambustr_char_bank;
 	bitmap_ind16 *m_dambustr_tmpbitmap;
 
-	void (*m_draw_stars)(running_machine &machine, bitmap_ind16 &, const rectangle &);		/* function to call to draw the star layer */
+	void (*m_draw_stars)(running_machine &machine, bitmap_ind16 &, const rectangle &);      /* function to call to draw the star layer */
 	int m_stars_colors_start;
 	INT32 m_stars_scrollpos;
 	UINT8 m_stars_on;

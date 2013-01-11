@@ -25,14 +25,14 @@
 
 struct cass_data_t {
 	struct {
-		int length;		/* time cassette level is at input.level */
-		int level;		/* cassette level */
-		int bit;		/* bit being read */
+		int length;     /* time cassette level is at input.level */
+		int level;      /* cassette level */
+		int bit;        /* bit being read */
 	} input;
 	struct {
-		int length;		/* time cassette level is at output.level */
-		int level;		/* cassette level */
-		int bit;		/* bit to to output */
+		int length;     /* time cassette level is at output.level */
+		int level;      /* cassette level */
+		int bit;        /* bit to to output */
 	} output;
 };
 

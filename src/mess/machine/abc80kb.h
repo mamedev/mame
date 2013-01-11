@@ -22,7 +22,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define ABC80_KEYBOARD_TAG	"abc80kb"
+#define ABC80_KEYBOARD_TAG  "abc80kb"
 
 
 
@@ -31,7 +31,7 @@
 //**************************************************************************
 
 #define MCFG_ABC80_KEYBOARD_ADD(_config) \
-    MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0) \
+	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -48,18 +48,18 @@
 
 struct abc80_keyboard_interface
 {
-	devcb_write_line	m_out_keydown_cb;
+	devcb_write_line    m_out_keydown_cb;
 };
 
 
 // ======================> abc80_keyboard_device
 
 class abc80_keyboard_device :  public device_t,
-							   public abc80_keyboard_interface
+								public abc80_keyboard_interface
 {
 public:
-    // construction/destruction
-    abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -69,13 +69,13 @@ public:
 	UINT8 data_r();
 
 protected:
-    // device-level overrides
+	// device-level overrides
 	virtual void device_config_complete();
-    virtual void device_start();
+	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	devcb_resolved_write_line	m_out_keydown_func;
+	devcb_resolved_write_line   m_out_keydown_func;
 
 	required_device<cpu_device> m_maincpu;
 };

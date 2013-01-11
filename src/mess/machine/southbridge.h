@@ -57,7 +57,7 @@
 // ======================> southbridge_device
 
 class southbridge_device :
-	  public device_t
+		public device_t
 {
 public:
 		// construction/destruction
@@ -67,9 +67,9 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 public:
 
 		//static IRQ_CALLBACK(at_irq_callback);

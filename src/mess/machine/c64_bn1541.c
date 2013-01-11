@@ -102,7 +102,7 @@ void c64_bn1541_device::device_start()
 
 void c64_bn1541_device::parallel_data_w(UINT8 data)
 {
-    if (LOG) logerror("1541 parallel data %02x\n", data);
+	if (LOG) logerror("1541 parallel data %02x\n", data);
 
 	m_parallel_data = data;
 }
@@ -114,7 +114,7 @@ void c64_bn1541_device::parallel_data_w(UINT8 data)
 
 void c64_bn1541_device::parallel_strobe_w(int state)
 {
-    if (LOG) logerror("1541 parallel strobe %u\n", state);
+	if (LOG) logerror("1541 parallel strobe %u\n", state);
 
 	m_slot->flag2_w(state);
 }
@@ -136,7 +136,7 @@ UINT8 c64_bn1541_device::c64_pb_r(address_space &space, offs_t offset)
 
 void c64_bn1541_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data)
 {
-    if (LOG) logerror("C64 parallel data %02x\n", data);
+	if (LOG) logerror("C64 parallel data %02x\n", data);
 
 	if (m_other != NULL)
 	{
@@ -151,7 +151,7 @@ void c64_bn1541_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data
 
 void c64_bn1541_device::c64_pc2_w(int state)
 {
-    if (LOG) logerror("C64 parallel strobe %u\n", state);
+	if (LOG) logerror("C64 parallel strobe %u\n", state);
 
 	if (m_other != NULL)
 	{

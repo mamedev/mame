@@ -265,8 +265,8 @@ done:
 //============================================================
 
 HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char* windowname, DWORD style,
-							   int x, int y, int width, int height, HWND parent, HMENU menu,
-							   HINSTANCE instance, void* param)
+								int x, int y, int width, int height, HWND parent, HMENU menu,
+								HINSTANCE instance, void* param)
 {
 	TCHAR* t_classname = NULL;
 	TCHAR* t_windowname = NULL;

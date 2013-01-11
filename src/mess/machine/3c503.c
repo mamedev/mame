@@ -21,7 +21,7 @@ machine_config_constructor el2_3c503_device::device_mconfig_additions() const {
 }
 
 el2_3c503_device::el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-        : device_t(mconfig, EL2_3C503, "3C503 Network Adapter", tag, owner, clock),
+		: device_t(mconfig, EL2_3C503, "3C503 Network Adapter", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this),
 		m_dp8390(*this, "dp8390d") {
 }
@@ -304,4 +304,3 @@ void el2_3c503_device::el2_3c503_mem_write(offs_t offset, UINT8 data) {
 	if((offset < 8*1024) || (offset >= 16*1024)) return;
 	m_board_ram[offset - (8*1024)] = data;
 }
-

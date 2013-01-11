@@ -41,10 +41,10 @@ enum
 	TMS99110A_ID = 12
 };
 
-#define MCFG_TMS9995_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)		\
-	MCFG_DEVICE_ADD(_tag, _device, _clock / 4.0)		\
-	MCFG_DEVICE_PROGRAM_MAP(_prgmap)			\
-	MCFG_DEVICE_IO_MAP(_iomap)					\
+#define MCFG_TMS9995_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)       \
+	MCFG_DEVICE_ADD(_tag, _device, _clock / 4.0)        \
+	MCFG_DEVICE_PROGRAM_MAP(_prgmap)            \
+	MCFG_DEVICE_IO_MAP(_iomap)                  \
 	MCFG_DEVICE_CONFIG(_config)
 
 enum
@@ -62,13 +62,13 @@ enum
 */
 struct tms9995_config
 {
-	devcb_write8		external_callback;
-	devcb_write_line	iaq_line;
-	devcb_write_line	clock_out;
-	devcb_write_line	wait_line;
-	devcb_write_line	holda_line;
-	int					mode;
-	int					overflow;
+	devcb_write8        external_callback;
+	devcb_write_line    iaq_line;
+	devcb_write_line    clock_out;
+	devcb_write_line    wait_line;
+	devcb_write_line    holda_line;
+	int                 mode;
+	int                 overflow;
 };
 
 #define TMS9995_CONFIG(name) \
@@ -99,116 +99,116 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void		device_start();
-	virtual void		device_stop();
-	virtual void		device_reset();
+	virtual void        device_start();
+	virtual void        device_stop();
+	virtual void        device_reset();
 
 	// device_execute_interface overrides
-	virtual UINT32		execute_min_cycles() const;
-	virtual UINT32		execute_max_cycles() const;
-	virtual UINT32		execute_input_lines() const;
-	virtual void		execute_set_input(int irqline, int state);
-	virtual void		execute_run();
+	virtual UINT32      execute_min_cycles() const;
+	virtual UINT32      execute_max_cycles() const;
+	virtual UINT32      execute_input_lines() const;
+	virtual void        execute_set_input(int irqline, int state);
+	virtual void        execute_run();
 
 	// device_disasm_interface overrides
-	virtual UINT32		disasm_min_opcode_bytes() const;
-	virtual UINT32		disasm_max_opcode_bytes() const;
-	virtual offs_t		disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32      disasm_min_opcode_bytes() const;
+	virtual UINT32      disasm_max_opcode_bytes() const;
+	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	const address_space_config* memory_space_config(address_spacenum spacenum) const;
 
 private:
 	// State / debug management
-	UINT16	m_state_any;
+	UINT16  m_state_any;
 	static const char* s_statename[];
-	void	state_import(const device_state_entry &entry);
-	void	state_export(const device_state_entry &entry);
-	void	state_string_export(const device_state_entry &entry, astring &string);
-	UINT16	read_workspace_register_debug(int reg);
-	void	write_workspace_register_debug(int reg, UINT16 data);
+	void    state_import(const device_state_entry &entry);
+	void    state_export(const device_state_entry &entry);
+	void    state_string_export(const device_state_entry &entry, astring &string);
+	UINT16  read_workspace_register_debug(int reg);
+	void    write_workspace_register_debug(int reg, UINT16 data);
 
 	// TMS9995 hardware registers
-	UINT16	WP; 	// Workspace pointer
-	UINT16	PC; 	// Program counter
-	UINT16	ST; 	// Status register
+	UINT16  WP;     // Workspace pointer
+	UINT16  PC;     // Program counter
+	UINT16  ST;     // Status register
 
 	// The TMS9995 has a prefetch feature which causes a wrong display of the PC.
 	// We use this additional member for the debugger only.
-	UINT16	PC_debug;
+	UINT16  PC_debug;
 
 	// 256 bytes of onchip memory
-	UINT8	m_onchip_memory[256];
+	UINT8   m_onchip_memory[256];
 
-	const address_space_config		m_program_config;
-	const address_space_config		m_io_config;
-	address_space*					m_prgspace;
-	address_space*					m_cru;
+	const address_space_config      m_program_config;
+	const address_space_config      m_io_config;
+	address_space*                  m_prgspace;
+	address_space*                  m_cru;
 
 	// Variant of the TMS9995 without internal RAM and decrementer
-	bool	m_mp9537;
+	bool    m_mp9537;
 
 	// Processor states
-	bool	m_idle_state;
-	bool	m_nmi_state;
-	bool	m_irq_state;
-	bool	m_ready_state;
-	bool	m_wait_state;
-	bool	m_hold_state;
+	bool    m_idle_state;
+	bool    m_nmi_state;
+	bool    m_irq_state;
+	bool    m_ready_state;
+	bool    m_wait_state;
+	bool    m_hold_state;
 
 	// Auto-wait state generation
-	bool	m_auto_wait_state;
+	bool    m_auto_wait_state;
 
 	// Cycle counter
-	int 	m_icount;
+	int     m_icount;
 
 	// The next memory access will address the low byte
-	bool	m_lowbyte;
+	bool    m_lowbyte;
 
 	// Check the READY line?
-	bool	m_check_ready;
+	bool    m_check_ready;
 
 	// Check the HOLD line
-	bool	m_check_hold;
+	bool    m_check_hold;
 
 	// For multi-pass operations. For instance, memory word accesses are
 	// executed as two consecutive byte accesses. CRU accesses are repeated
 	// single-bit accesses.
-	int		m_pass;
+	int     m_pass;
 
 	// For parity operations
-	int		m_parity;
+	int     m_parity;
 
 	// For Format 1 instruction; determines whether the next operand address
 	// derivation is for the source or address operand
-	bool	m_get_destination;
+	bool    m_get_destination;
 
 	// Used for situations when a command is byte-oriented, but the memory access
 	// must be word-oriented. Example: MOVB *R1,R0; we must read the full word
 	// from R1 to get the address.
-	bool	m_word_access;
+	bool    m_word_access;
 
 	// Interrupt handling
-	bool	m_nmi_active;
-	bool	m_int1_active;
-	bool	m_int4_active;
-	bool	m_int_decrementer;
-	bool	m_int_overflow;
+	bool    m_nmi_active;
+	bool    m_int1_active;
+	bool    m_int4_active;
+	bool    m_int_decrementer;
+	bool    m_int_overflow;
 
-	bool	m_reset;
-	bool	m_mid_flag;
+	bool    m_reset;
+	bool    m_mid_flag;
 
 	// Flag field
-	int		m_int_pending;
+	int     m_int_pending;
 
 	// The TMS9995 is capable of raising an internal interrupt on
 	// arithmetic overflow, depending on the status register Overflow Enable bit.
 	// However, the specs also say that this feature is non-functional in the
 	// currently available chip. Thus we have an option to turn it off so that
 	// software will not change its behavior on overflows.
-	bool	m_check_overflow;
+	bool    m_check_overflow;
 
 	// Service pending interrupts
-	void	service_interrupt();
+	void    service_interrupt();
 
 	// Issue clock pulses. The TMS9995 uses one (output) clock cycle per machine cycle.
 	inline void pulse_clock(int count);
@@ -221,84 +221,84 @@ private:
 
 	// Only used for the DIV(S) operations. It seems sufficient to let the
 	// command terminate at this point, so this method just calls command_terminated.
-	void	abort_operation(void);
+	void    abort_operation(void);
 
 	// Decode the given 16-bit value which has been retrieved by a prefetch or
 	// during an X operation.
-	void	decode(UINT16 inst);
+	void    decode(UINT16 inst);
 
 	// Store the interrupt mask part of the ST. This is used when processing
 	// an interrupt, passing the new mask from the service_interrupt part to
 	// the program part.
-	int		m_intmask;
+	int     m_intmask;
 
 	// Stored address
-	UINT16	m_address;
+	UINT16  m_address;
 
 	// Stores the recently read word or the word to be written
-	UINT16	m_current_value;
+	UINT16  m_current_value;
 
 	// Stores the value of the source operand in multi-operand instructions
-	UINT16	m_source_value;
+	UINT16  m_source_value;
 
 	// During indexed addressing, this value is added to get the final address value.
-	UINT16	m_address_add;
+	UINT16  m_address_add;
 
 	// During indirect/auto-increment addressing, this copy of the address must
 	// be preserved while writing the new value to the register.
-	UINT16	m_address_saved;
+	UINT16  m_address_saved;
 
 	// Another copy of the address
-	UINT16	m_address_copy;
+	UINT16  m_address_copy;
 
 	// Copy of the value
-	UINT16	m_value_copy;
+	UINT16  m_value_copy;
 
 	// Stores the recent register number. Only used to pass the register
 	// number during the operand address derivation.
-	int		m_regnumber;
+	int     m_regnumber;
 
 	// Stores the number of bits or shift operations
-	int		m_count;
+	int     m_count;
 
 	// ============== Decrementer =======================
 	void trigger_decrementer();
 
 	// Start value
-	UINT16	m_starting_count_storage_register;
+	UINT16  m_starting_count_storage_register;
 
 	// Current decrementer value.
-	UINT16	m_decrementer_value;
+	UINT16  m_decrementer_value;
 
 	// ============== CRU support ======================
 
-	UINT16	m_cru_address;
-	UINT16	m_cru_value;
-	bool	m_cru_first_read;
-	int		m_cru_bits_left;
-	UINT32	m_cru_read;
+	UINT16  m_cru_address;
+	UINT16  m_cru_value;
+	bool    m_cru_first_read;
+	int     m_cru_bits_left;
+	UINT32  m_cru_read;
 
 	// CPU-internal CRU flags
-	bool	m_flag[16];
+	bool    m_flag[16];
 
 	// ============== Prefetch support =====================
 
 	struct decoded_instruction
 	{
-		UINT16			IR;
-		UINT16  		command;
-		const UINT8*	program;
-		bool			byteop;
-		int				state;
+		UINT16          IR;
+		UINT16          command;
+		const UINT8*    program;
+		bool            byteop;
+		int             state;
 	};
 
-	int		m_instindex;
+	int     m_instindex;
 
 	// We implement the prefetch mechanism by two separate datasets for
 	// the decoded commands. When the previous command has completed, the
 	// pointer is just switched to the other one.
-	tms9995_device::decoded_instruction 	m_decoded[2];
-	tms9995_device::decoded_instruction*	m_instruction;
+	tms9995_device::decoded_instruction     m_decoded[2];
+	tms9995_device::decoded_instruction*    m_instruction;
 
 	// ================ Microprogram support ========================
 
@@ -314,10 +314,10 @@ private:
 	// Opcode list entry
 	struct tms_instruction
 	{
-		UINT16				opcode;
-		int					id;
-		int					format;
-		microprogram		prog;		// Microprogram
+		UINT16              opcode;
+		int                 id;
+		int                 format;
+		microprogram        prog;       // Microprogram
 	};
 
 	// Lookup table entry
@@ -328,10 +328,10 @@ private:
 	};
 
 	// Pointer to the lookup table; the entry point for searching the command
-	lookup_entry*	m_command_lookup_table;
+	lookup_entry*   m_command_lookup_table;
 
 	// List of allocated tables (used for easy clean-up on exit)
-	lookup_entry*	m_lotables[32];
+	lookup_entry*   m_lotables[32];
 
 	// List of pointers for micro-operations
 	static const tms9995_device::ophandler s_microoperation[];
@@ -339,17 +339,17 @@ private:
 	static const tms9995_device::tms_instruction s_command[];
 
 	// Micro-operation program counter (as opposed to the program counter PC)
-	int 	MPC;
+	int     MPC;
 
 	// Calling microprogram (used when data derivation is called)
-	const UINT8*	m_caller;
-	int 			m_caller_MPC;
+	const UINT8*    m_caller;
+	int             m_caller_MPC;
 
 	// Table of microprograms
 	static const microprogram mp_table[];
 
 	// Used to display the number of consumed cycles in the log.
-	int		m_first_cycle;
+	int     m_first_cycle;
 
 	// Status register update
 	inline void set_status_bit(int bit, bool state);
@@ -423,22 +423,22 @@ private:
 	// We could realize this via the CRU access as well, but the data bus access
 	// is not that simple to emulate. For the sake of homogenity between the
 	// chip emulations we use a dedicated callback.
-	devcb_resolved_write8	m_external_operation;
+	devcb_resolved_write8   m_external_operation;
 
 	// Signal to the outside world that we are now getting an instruction (IAQ).
 	// In the real hardware this line is shared with the HOLDA line, and the
 	// /MEMEN line is used to decide which signal we have on the line. We do not
 	// emulate the /MEMEN line, so we have to use two separate lines.
-	devcb_resolved_write_line	m_iaq_line;
+	devcb_resolved_write_line   m_iaq_line;
 
 	// Clock output.
-	devcb_resolved_write_line	m_clock_out_line;
+	devcb_resolved_write_line   m_clock_out_line;
 
 	// Wait output. When asserted (high), the CPU is in a wait state.
-	devcb_resolved_write_line	m_wait_line;
+	devcb_resolved_write_line   m_wait_line;
 
 	// Asserted when the CPU is in a HOLD state
-	devcb_resolved_write_line	m_holda_line;
+	devcb_resolved_write_line   m_holda_line;
 };
 
 unsigned Dasm9900(char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram);

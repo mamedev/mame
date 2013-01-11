@@ -126,8 +126,8 @@ void tiamc1_state::video_start()
 
 	video_ram = auto_alloc_array_clear(machine(), UINT8, 0x3040);
 
-        m_charram = video_ram + 0x0800;     /* Ram is banked */
-        m_tileram = video_ram + 0x0000;
+		m_charram = video_ram + 0x0800;     /* Ram is banked */
+		m_tileram = video_ram + 0x0000;
 
 	m_spriteram_y = video_ram + 0x3000;
 	m_spriteram_x = video_ram + 0x3010;
@@ -137,10 +137,10 @@ void tiamc1_state::video_start()
 	state_save_register_global_pointer(machine(), video_ram, 0x3040);
 
 	m_bg_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_bg_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,
-		 8, 8, 32, 32);
+			8, 8, 32, 32);
 
 	m_bg_vshift = 0;
 	m_bg_hshift = 0;
@@ -204,4 +204,3 @@ UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &b
 
 	return 0;
 }
-

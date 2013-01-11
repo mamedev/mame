@@ -11,10 +11,10 @@
 #include "emu.h"
 #include "video/nubus_vikbw.h"
 
-#define VIKBW_SCREEN_NAME	"vikbw_screen"
-#define VIKBW_ROM_REGION	"vikbw_rom"
+#define VIKBW_SCREEN_NAME   "vikbw_screen"
+#define VIKBW_ROM_REGION    "vikbw_rom"
 
-#define VRAM_SIZE	(0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
+#define VRAM_SIZE   (0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
 
 MACHINE_CONFIG_FRAGMENT( vikbw )
 	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
@@ -64,14 +64,14 @@ const rom_entry *nubus_vikbw_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_VIKBW, "Moniterm Viking video card", tag, owner, clock),
+		device_t(mconfig, NUBUS_VIKBW, "Moniterm Viking video card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_vikbw";
 }
 
 nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_vikbw";
@@ -172,4 +172,3 @@ READ32_MEMBER( nubus_vikbw_device::viking_enable_r )
 	m_vbl_disable = 0;
 	return 0;
 }
-

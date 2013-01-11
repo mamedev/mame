@@ -212,73 +212,73 @@ void gfx_init(running_machine &machine)
 
 gfx_element::gfx_element(running_machine &machine)
 	: m_width(0),
-	  m_height(0),
-	  m_startx(0),
-	  m_starty(0),
-	  m_origwidth(0),
-	  m_origheight(0),
-	  m_total_elements(0),
-	  m_color_base(0),
-	  m_color_depth(0),
-	  m_color_granularity(0),
-	  m_total_colors(0),
-	  m_line_modulo(0),
-	  m_char_modulo(0),
-	  m_srcdata(NULL),
-	  m_dirtyseq(1),
-	  m_gfxdata(NULL),
-	  m_layout_is_raw(false),
-	  m_layout_planes(0),
-	  m_layout_charincrement(0),
-	  m_machine(machine)
+		m_height(0),
+		m_startx(0),
+		m_starty(0),
+		m_origwidth(0),
+		m_origheight(0),
+		m_total_elements(0),
+		m_color_base(0),
+		m_color_depth(0),
+		m_color_granularity(0),
+		m_total_colors(0),
+		m_line_modulo(0),
+		m_char_modulo(0),
+		m_srcdata(NULL),
+		m_dirtyseq(1),
+		m_gfxdata(NULL),
+		m_layout_is_raw(false),
+		m_layout_planes(0),
+		m_layout_charincrement(0),
+		m_machine(machine)
 {
 }
 
 gfx_element::gfx_element(running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity)
 	: m_width(width),
-	  m_height(height),
-	  m_startx(0),
-	  m_starty(0),
-	  m_origwidth(width),
-	  m_origheight(height),
-	  m_total_elements(1),
-	  m_color_base(color_base),
-	  m_color_depth(color_granularity),
-	  m_color_granularity(color_granularity),
-	  m_total_colors((machine.total_colors() - color_base) / color_granularity),
-	  m_line_modulo(rowbytes),
-	  m_char_modulo(0),
-	  m_srcdata(base),
-	  m_dirtyseq(1),
-	  m_gfxdata(base),
-	  m_layout_is_raw(true),
-	  m_layout_planes(0),
-	  m_layout_charincrement(0),
-	  m_machine(machine)
+		m_height(height),
+		m_startx(0),
+		m_starty(0),
+		m_origwidth(width),
+		m_origheight(height),
+		m_total_elements(1),
+		m_color_base(color_base),
+		m_color_depth(color_granularity),
+		m_color_granularity(color_granularity),
+		m_total_colors((machine.total_colors() - color_base) / color_granularity),
+		m_line_modulo(rowbytes),
+		m_char_modulo(0),
+		m_srcdata(base),
+		m_dirtyseq(1),
+		m_gfxdata(base),
+		m_layout_is_raw(true),
+		m_layout_planes(0),
+		m_layout_charincrement(0),
+		m_machine(machine)
 {
 }
 
 gfx_element::gfx_element(running_machine &machine, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
 	: m_width(0),
-	  m_height(0),
-	  m_startx(0),
-	  m_starty(0),
-	  m_origwidth(0),
-	  m_origheight(0),
-	  m_total_elements(0),
-	  m_color_base(color_base),
-	  m_color_depth(0),
-	  m_color_granularity(0),
-	  m_total_colors(total_colors),
-	  m_line_modulo(0),
-	  m_char_modulo(0),
-	  m_srcdata(NULL),
-	  m_dirtyseq(1),
-	  m_gfxdata(NULL),
-	  m_layout_is_raw(false),
-	  m_layout_planes(0),
-	  m_layout_charincrement(0),
-	  m_machine(machine)
+		m_height(0),
+		m_startx(0),
+		m_starty(0),
+		m_origwidth(0),
+		m_origheight(0),
+		m_total_elements(0),
+		m_color_base(color_base),
+		m_color_depth(0),
+		m_color_granularity(0),
+		m_total_colors(total_colors),
+		m_line_modulo(0),
+		m_char_modulo(0),
+		m_srcdata(NULL),
+		m_dirtyseq(1),
+		m_gfxdata(NULL),
+		m_layout_is_raw(false),
+		m_layout_planes(0),
+		m_layout_charincrement(0),
+		m_machine(machine)
 {
 	// set the layout
 	set_layout(gl, srcdata);
@@ -1817,14 +1817,14 @@ void copybitmap_trans(bitmap_rgb32 &dest, bitmap_rgb32 &src, int flipx, int flip
 void copyscrollbitmap(bitmap_ind16 &dest, bitmap_ind16 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
 {
 	// just call through to the transparent case as the underlying copybitmap will
-    // optimize for pen == 0xffffffff
+	// optimize for pen == 0xffffffff
 	copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, 0xffffffff);
 }
 
 void copyscrollbitmap(bitmap_rgb32 &dest, bitmap_rgb32 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
 {
 	// just call through to the transparent case as the underlying copybitmap will
-    // optimize for pen == 0xffffffff
+	// optimize for pen == 0xffffffff
 	copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, 0xffffffff);
 }
 
@@ -1878,7 +1878,7 @@ static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, _BitmapClas
 
 			// count consecutive columns scrolled by the same amount
 			for (groupcols = 1; col + groupcols < numcols; groupcols++)
-				 if (colscroll[col + groupcols] != yscroll)
+					if (colscroll[col + groupcols] != yscroll)
 					break;
 
 			// iterate over reps of the columns in question
@@ -1915,7 +1915,7 @@ static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, _BitmapClas
 
 			// count consecutive rows scrolled by the same amount
 			for (grouprows = 1; row + grouprows < numrows; grouprows++)
-				 if (rowscroll[row + grouprows] != xscroll)
+					if (rowscroll[row + grouprows] != xscroll)
 					break;
 
 			// iterate over reps of the rows in question

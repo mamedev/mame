@@ -61,7 +61,7 @@ UINT32 minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rgb3
 static ADDRESS_MAP_START( minivadr_map, AS_PROGRAM, 8, minivadr_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("INPUTS") AM_WRITENOP		// W - ???
+	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("INPUTS") AM_WRITENOP     // W - ???
 ADDRESS_MAP_END
 
 
@@ -81,7 +81,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( minivadr, minivadr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,24000000 / 6)		 /* 4 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80,24000000 / 6)        /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(minivadr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", minivadr_state,  irq0_line_hold)
 
@@ -105,7 +105,7 @@ MACHINE_CONFIG_END
 
 ROM_START( minivadr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d26-01.bin",	0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
+	ROM_LOAD( "d26-01.bin", 0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
 ROM_END
 
 

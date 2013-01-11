@@ -40,13 +40,13 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 
 	switch (space.device().safe_pc())
 	{
-		case 0x6066:	res = 0xa5;	break;
-		case 0x60dc:	res = 0x20;	break;	/* bits 0-3 unknown */
-		case 0x615d:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61b9:	res = 0x60|(machine().rand()&0x0f);	break;	/* bits 0-3 unknown */
-		case 0x6219:	res = 0x77;	break;
-		case 0x626c:	res = 0xb4;	break;
-		default:		res = 0xff; break;
+		case 0x6066:    res = 0xa5; break;
+		case 0x60dc:    res = 0x20; break;  /* bits 0-3 unknown */
+		case 0x615d:    res = 0x30; break;  /* bits 0-3 unknown */
+		case 0x61b9:    res = 0x60|(machine().rand()&0x0f); break;  /* bits 0-3 unknown */
+		case 0x6219:    res = 0x77; break;
+		case 0x626c:    res = 0xb4; break;
+		default:        res = 0xff; break;
 	}
 
 	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
@@ -59,13 +59,13 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 
 	switch (space.device().safe_pc())
 	{
-		case 0x6094:	res = 0xa5;	break;
-		case 0x6118:	res = 0x20;	break;	/* bits 0-3 unknown */
-		case 0x6199:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61f5:	res = 0x60|(machine().rand()&0x0f);	break;	/* bits 0-3 unknown */
-		case 0x6255:	res = 0x77;	break;
-		case 0x62a8:	res = 0xb4;	break;
-		default:		res = 0xff; break;
+		case 0x6094:    res = 0xa5; break;
+		case 0x6118:    res = 0x20; break;  /* bits 0-3 unknown */
+		case 0x6199:    res = 0x30; break;  /* bits 0-3 unknown */
+		case 0x61f5:    res = 0x60|(machine().rand()&0x0f); break;  /* bits 0-3 unknown */
+		case 0x6255:    res = 0x77; break;
+		case 0x62a8:    res = 0xb4; break;
+		default:        res = 0xff; break;
 	}
 
 	logerror("%04x: protection_r -> %02x\n",space.device().safe_pc(),res);
@@ -173,7 +173,7 @@ static INPUT_PORTS_START( strnskil )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("P1")		/* d804 */
+	PORT_START("P1")        /* d804 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
@@ -183,7 +183,7 @@ static INPUT_PORTS_START( strnskil )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 
-	PORT_START("P2")		/* d805 */
+	PORT_START("P2")        /* d805 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -193,7 +193,7 @@ static INPUT_PORTS_START( strnskil )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("SYSTEM")	/* d803 */
+	PORT_START("SYSTEM")    /* d803 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )
@@ -246,14 +246,14 @@ static INPUT_PORTS_START( banbam )
 	PORT_DIPNAME( 0x08, 0x00, "Second Practice" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )	/*  These four dips are unused according to the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )    /*  These four dips are unused according to the manual */
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPNAME( 0x80, 0x00, "Freeze" ) PORT_DIPLOCATION("SW2:8") //game stands in a tight loop at $14-$16 -> $866 if this is putted off
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("P1")		/* d804 */
+	PORT_START("P1")        /* d804 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( banbam )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 
-	PORT_START("P2")		/* d805 */
+	PORT_START("P2")        /* d805 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -273,7 +273,7 @@ static INPUT_PORTS_START( banbam )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("SYSTEM")	/* d803 */
+	PORT_START("SYSTEM")    /* d803 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )
@@ -342,7 +342,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -386,8 +386,8 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( banbam, strnskil )
-    MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
-    MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
+	MCFG_CPU_IO_MAP(mcu_io_map)
 MACHINE_CONFIG_END
 
 /****************************************************************************/

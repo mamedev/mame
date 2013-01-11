@@ -33,7 +33,7 @@ public:
 	UINT16      m_bg_scroll_y;
 	UINT16      m_fg_scroll_x;
 	UINT16      m_fg_scroll_y;
-	INT8		m_tx_offset_y;
+	INT8        m_tx_offset_y;
 	INT8        m_bg_offset_y;
 	INT8        m_fg_offset_y;
 	INT8        m_spr_offset_y;

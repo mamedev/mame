@@ -261,9 +261,9 @@ WRITE8_DEVICE_HANDLER( gomoku_sound2_w )
 
 		// oneshot frequency is hand tune...
 		if ((state->m_soundregs2[0x1d] & 0x0f) < 0x0c)
-			voice->frequency = 3000 / 16;			// ichi, ni, san, yon, go
+			voice->frequency = 3000 / 16;           // ichi, ni, san, yon, go
 		else
-			voice->frequency = 8000 / 16;			// shoot
+			voice->frequency = 8000 / 16;           // shoot
 
 		voice->volume = 8;
 		voice->counter = 0;
@@ -280,7 +280,7 @@ const device_type GOMOKU = &device_creator<gomoku_sound_device>;
 
 gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOMOKU, "Gomoku Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(gomoku_sound_state);
 }
@@ -313,5 +313,3 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

@@ -27,36 +27,36 @@
 /* Pointer to routine to upsample a single component */
 typedef JMETHOD(void, upsample1_ptr,
 		(j_decompress_ptr cinfo, jpeg_component_info * compptr,
-		 JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr));
+			JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr));
 
 /* Private subobject */
 
 typedef struct {
-  struct jpeg_upsampler pub;	/* public fields */
+	struct jpeg_upsampler pub;  /* public fields */
 
-  /* Color conversion buffer.  When using separate upsampling and color
-   * conversion steps, this buffer holds one upsampled row group until it
-   * has been color converted and output.
-   * Note: we do not allocate any storage for component(s) which are full-size,
-   * ie do not need rescaling.  The corresponding entry of color_buf[] is
-   * simply set to point to the input data array, thereby avoiding copying.
-   */
-  JSAMPARRAY color_buf[MAX_COMPONENTS];
+	/* Color conversion buffer.  When using separate upsampling and color
+	* conversion steps, this buffer holds one upsampled row group until it
+	* has been color converted and output.
+	* Note: we do not allocate any storage for component(s) which are full-size,
+	* ie do not need rescaling.  The corresponding entry of color_buf[] is
+	* simply set to point to the input data array, thereby avoiding copying.
+	*/
+	JSAMPARRAY color_buf[MAX_COMPONENTS];
 
-  /* Per-component upsampling method pointers */
-  upsample1_ptr methods[MAX_COMPONENTS];
+	/* Per-component upsampling method pointers */
+	upsample1_ptr methods[MAX_COMPONENTS];
 
-  int next_row_out;		/* counts rows emitted from color_buf */
-  JDIMENSION rows_to_go;	/* counts rows remaining in image */
+	int next_row_out;       /* counts rows emitted from color_buf */
+	JDIMENSION rows_to_go;  /* counts rows remaining in image */
 
-  /* Height of an input row group for each component. */
-  int rowgroup_height[MAX_COMPONENTS];
+	/* Height of an input row group for each component. */
+	int rowgroup_height[MAX_COMPONENTS];
 
-  /* These arrays save pixel expansion factors so that int_expand need not
-   * recompute them each time.  They are unused for other upsampling methods.
-   */
-  UINT8 h_expand[MAX_COMPONENTS];
-  UINT8 v_expand[MAX_COMPONENTS];
+	/* These arrays save pixel expansion factors so that int_expand need not
+	* recompute them each time.  They are unused for other upsampling methods.
+	*/
+	UINT8 h_expand[MAX_COMPONENTS];
+	UINT8 v_expand[MAX_COMPONENTS];
 } my_upsampler;
 
 typedef my_upsampler * my_upsample_ptr;
@@ -69,12 +69,12 @@ typedef my_upsampler * my_upsample_ptr;
 METHODDEF(void)
 start_pass_upsample (j_decompress_ptr cinfo)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr) cinfo->upsample;
+	my_upsample_ptr upsample = (my_upsample_ptr) cinfo->upsample;
 
-  /* Mark the conversion buffer empty */
-  upsample->next_row_out = cinfo->max_v_samp_factor;
-  /* Initialize total-height counter for detecting bottom of image */
-  upsample->rows_to_go = cinfo->output_height;
+	/* Mark the conversion buffer empty */
+	upsample->next_row_out = cinfo->max_v_samp_factor;
+	/* Initialize total-height counter for detecting bottom of image */
+	upsample->rows_to_go = cinfo->output_height;
 }
 
 
@@ -88,56 +88,56 @@ start_pass_upsample (j_decompress_ptr cinfo)
 
 METHODDEF(void)
 sep_upsample (j_decompress_ptr cinfo,
-	      JSAMPIMAGE input_buf, JDIMENSION *in_row_group_ctr,
-	      JDIMENSION in_row_groups_avail,
-	      JSAMPARRAY output_buf, JDIMENSION *out_row_ctr,
-	      JDIMENSION out_rows_avail)
+			JSAMPIMAGE input_buf, JDIMENSION *in_row_group_ctr,
+			JDIMENSION in_row_groups_avail,
+			JSAMPARRAY output_buf, JDIMENSION *out_row_ctr,
+			JDIMENSION out_rows_avail)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr) cinfo->upsample;
-  int ci;
-  jpeg_component_info * compptr;
-  JDIMENSION num_rows;
+	my_upsample_ptr upsample = (my_upsample_ptr) cinfo->upsample;
+	int ci;
+	jpeg_component_info * compptr;
+	JDIMENSION num_rows;
 
-  /* Fill the conversion buffer, if it's empty */
-  if (upsample->next_row_out >= cinfo->max_v_samp_factor) {
-    for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-	 ci++, compptr++) {
-      /* Invoke per-component upsample method.  Notice we pass a POINTER
-       * to color_buf[ci], so that fullsize_upsample can change it.
-       */
-      (*upsample->methods[ci]) (cinfo, compptr,
+	/* Fill the conversion buffer, if it's empty */
+	if (upsample->next_row_out >= cinfo->max_v_samp_factor) {
+	for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
+		ci++, compptr++) {
+		/* Invoke per-component upsample method.  Notice we pass a POINTER
+		* to color_buf[ci], so that fullsize_upsample can change it.
+		*/
+		(*upsample->methods[ci]) (cinfo, compptr,
 	input_buf[ci] + (*in_row_group_ctr * upsample->rowgroup_height[ci]),
 	upsample->color_buf + ci);
-    }
-    upsample->next_row_out = 0;
-  }
+	}
+	upsample->next_row_out = 0;
+	}
 
-  /* Color-convert and emit rows */
+	/* Color-convert and emit rows */
 
-  /* How many we have in the buffer: */
-  num_rows = (JDIMENSION) (cinfo->max_v_samp_factor - upsample->next_row_out);
-  /* Not more than the distance to the end of the image.  Need this test
-   * in case the image height is not a multiple of max_v_samp_factor:
-   */
-  if (num_rows > upsample->rows_to_go)
-    num_rows = upsample->rows_to_go;
-  /* And not more than what the client can accept: */
-  out_rows_avail -= *out_row_ctr;
-  if (num_rows > out_rows_avail)
-    num_rows = out_rows_avail;
+	/* How many we have in the buffer: */
+	num_rows = (JDIMENSION) (cinfo->max_v_samp_factor - upsample->next_row_out);
+	/* Not more than the distance to the end of the image.  Need this test
+	* in case the image height is not a multiple of max_v_samp_factor:
+	*/
+	if (num_rows > upsample->rows_to_go)
+	num_rows = upsample->rows_to_go;
+	/* And not more than what the client can accept: */
+	out_rows_avail -= *out_row_ctr;
+	if (num_rows > out_rows_avail)
+	num_rows = out_rows_avail;
 
-  (*cinfo->cconvert->color_convert) (cinfo, upsample->color_buf,
-				     (JDIMENSION) upsample->next_row_out,
-				     output_buf + *out_row_ctr,
-				     (int) num_rows);
+	(*cinfo->cconvert->color_convert) (cinfo, upsample->color_buf,
+						(JDIMENSION) upsample->next_row_out,
+						output_buf + *out_row_ctr,
+						(int) num_rows);
 
-  /* Adjust counts */
-  *out_row_ctr += num_rows;
-  upsample->rows_to_go -= num_rows;
-  upsample->next_row_out += num_rows;
-  /* When the buffer is emptied, declare this input row group consumed */
-  if (upsample->next_row_out >= cinfo->max_v_samp_factor)
-    (*in_row_group_ctr)++;
+	/* Adjust counts */
+	*out_row_ctr += num_rows;
+	upsample->rows_to_go -= num_rows;
+	upsample->next_row_out += num_rows;
+	/* When the buffer is emptied, declare this input row group consumed */
+	if (upsample->next_row_out >= cinfo->max_v_samp_factor)
+	(*in_row_group_ctr)++;
 }
 
 
@@ -156,9 +156,9 @@ sep_upsample (j_decompress_ptr cinfo,
 
 METHODDEF(void)
 fullsize_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
-		   JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
+			JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
 {
-  *output_data_ptr = input_data;
+	*output_data_ptr = input_data;
 }
 
 
@@ -169,9 +169,9 @@ fullsize_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 
 METHODDEF(void)
 noop_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
-	       JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
+			JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
 {
-  *output_data_ptr = NULL;	/* safety check */
+	*output_data_ptr = NULL;    /* safety check */
 }
 
 
@@ -188,40 +188,40 @@ noop_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 
 METHODDEF(void)
 int_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
-	      JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
+			JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
 {
-  my_upsample_ptr upsample = (my_upsample_ptr) cinfo->upsample;
-  JSAMPARRAY output_data = *output_data_ptr;
-  register JSAMPROW inptr, outptr;
-  register JSAMPLE invalue;
-  register int h;
-  JSAMPROW outend;
-  int h_expand, v_expand;
-  int inrow, outrow;
+	my_upsample_ptr upsample = (my_upsample_ptr) cinfo->upsample;
+	JSAMPARRAY output_data = *output_data_ptr;
+	register JSAMPROW inptr, outptr;
+	register JSAMPLE invalue;
+	register int h;
+	JSAMPROW outend;
+	int h_expand, v_expand;
+	int inrow, outrow;
 
-  h_expand = upsample->h_expand[compptr->component_index];
-  v_expand = upsample->v_expand[compptr->component_index];
+	h_expand = upsample->h_expand[compptr->component_index];
+	v_expand = upsample->v_expand[compptr->component_index];
 
-  inrow = outrow = 0;
-  while (outrow < cinfo->max_v_samp_factor) {
-    /* Generate one output row with proper horizontal expansion */
-    inptr = input_data[inrow];
-    outptr = output_data[outrow];
-    outend = outptr + cinfo->output_width;
-    while (outptr < outend) {
-      invalue = *inptr++;	/* don't need GETJSAMPLE() here */
-      for (h = h_expand; h > 0; h--) {
+	inrow = outrow = 0;
+	while (outrow < cinfo->max_v_samp_factor) {
+	/* Generate one output row with proper horizontal expansion */
+	inptr = input_data[inrow];
+	outptr = output_data[outrow];
+	outend = outptr + cinfo->output_width;
+	while (outptr < outend) {
+		invalue = *inptr++; /* don't need GETJSAMPLE() here */
+		for (h = h_expand; h > 0; h--) {
 	*outptr++ = invalue;
-      }
-    }
-    /* Generate any additional output rows by duplicating the first one */
-    if (v_expand > 1) {
-      jcopy_sample_rows(output_data, outrow, output_data, outrow+1,
+		}
+	}
+	/* Generate any additional output rows by duplicating the first one */
+	if (v_expand > 1) {
+		jcopy_sample_rows(output_data, outrow, output_data, outrow+1,
 			v_expand-1, cinfo->output_width);
-    }
-    inrow++;
-    outrow += v_expand;
-  }
+	}
+	inrow++;
+	outrow += v_expand;
+	}
 }
 
 
@@ -232,24 +232,24 @@ int_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 
 METHODDEF(void)
 h2v1_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
-	       JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
+			JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
 {
-  JSAMPARRAY output_data = *output_data_ptr;
-  register JSAMPROW inptr, outptr;
-  register JSAMPLE invalue;
-  JSAMPROW outend;
-  int outrow;
+	JSAMPARRAY output_data = *output_data_ptr;
+	register JSAMPROW inptr, outptr;
+	register JSAMPLE invalue;
+	JSAMPROW outend;
+	int outrow;
 
-  for (outrow = 0; outrow < cinfo->max_v_samp_factor; outrow++) {
-    inptr = input_data[outrow];
-    outptr = output_data[outrow];
-    outend = outptr + cinfo->output_width;
-    while (outptr < outend) {
-      invalue = *inptr++;	/* don't need GETJSAMPLE() here */
-      *outptr++ = invalue;
-      *outptr++ = invalue;
-    }
-  }
+	for (outrow = 0; outrow < cinfo->max_v_samp_factor; outrow++) {
+	inptr = input_data[outrow];
+	outptr = output_data[outrow];
+	outend = outptr + cinfo->output_width;
+	while (outptr < outend) {
+		invalue = *inptr++; /* don't need GETJSAMPLE() here */
+		*outptr++ = invalue;
+		*outptr++ = invalue;
+	}
+	}
 }
 
 
@@ -260,29 +260,29 @@ h2v1_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 
 METHODDEF(void)
 h2v2_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
-	       JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
+			JSAMPARRAY input_data, JSAMPARRAY * output_data_ptr)
 {
-  JSAMPARRAY output_data = *output_data_ptr;
-  register JSAMPROW inptr, outptr;
-  register JSAMPLE invalue;
-  JSAMPROW outend;
-  int inrow, outrow;
+	JSAMPARRAY output_data = *output_data_ptr;
+	register JSAMPROW inptr, outptr;
+	register JSAMPLE invalue;
+	JSAMPROW outend;
+	int inrow, outrow;
 
-  inrow = outrow = 0;
-  while (outrow < cinfo->max_v_samp_factor) {
-    inptr = input_data[inrow];
-    outptr = output_data[outrow];
-    outend = outptr + cinfo->output_width;
-    while (outptr < outend) {
-      invalue = *inptr++;	/* don't need GETJSAMPLE() here */
-      *outptr++ = invalue;
-      *outptr++ = invalue;
-    }
-    jcopy_sample_rows(output_data, outrow, output_data, outrow+1,
-		      1, cinfo->output_width);
-    inrow++;
-    outrow += 2;
-  }
+	inrow = outrow = 0;
+	while (outrow < cinfo->max_v_samp_factor) {
+	inptr = input_data[inrow];
+	outptr = output_data[outrow];
+	outend = outptr + cinfo->output_width;
+	while (outptr < outend) {
+		invalue = *inptr++; /* don't need GETJSAMPLE() here */
+		*outptr++ = invalue;
+		*outptr++ = invalue;
+	}
+	jcopy_sample_rows(output_data, outrow, output_data, outrow+1,
+				1, cinfo->output_width);
+	inrow++;
+	outrow += 2;
+	}
 }
 
 
@@ -293,69 +293,69 @@ h2v2_upsample (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 GLOBAL(void)
 jinit_upsampler (j_decompress_ptr cinfo)
 {
-  my_upsample_ptr upsample;
-  int ci;
-  jpeg_component_info * compptr;
-  boolean need_buffer;
-  int h_in_group, v_in_group, h_out_group, v_out_group;
+	my_upsample_ptr upsample;
+	int ci;
+	jpeg_component_info * compptr;
+	boolean need_buffer;
+	int h_in_group, v_in_group, h_out_group, v_out_group;
 
-  upsample = (my_upsample_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
+	upsample = (my_upsample_ptr)
+	(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(my_upsampler));
-  cinfo->upsample = (struct jpeg_upsampler *) upsample;
-  upsample->pub.start_pass = start_pass_upsample;
-  upsample->pub.upsample = sep_upsample;
-  upsample->pub.need_context_rows = FALSE; /* until we find out differently */
+	cinfo->upsample = (struct jpeg_upsampler *) upsample;
+	upsample->pub.start_pass = start_pass_upsample;
+	upsample->pub.upsample = sep_upsample;
+	upsample->pub.need_context_rows = FALSE; /* until we find out differently */
 
-  if (cinfo->CCIR601_sampling)	/* this isn't supported */
-    ERREXIT(cinfo, JERR_CCIR601_NOTIMPL);
+	if (cinfo->CCIR601_sampling)    /* this isn't supported */
+	ERREXIT(cinfo, JERR_CCIR601_NOTIMPL);
 
-  /* Verify we can handle the sampling factors, select per-component methods,
-   * and create storage as needed.
-   */
-  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-       ci++, compptr++) {
-    /* Compute size of an "input group" after IDCT scaling.  This many samples
-     * are to be converted to max_h_samp_factor * max_v_samp_factor pixels.
-     */
-    h_in_group = (compptr->h_samp_factor * compptr->DCT_h_scaled_size) /
-		 cinfo->min_DCT_h_scaled_size;
-    v_in_group = (compptr->v_samp_factor * compptr->DCT_v_scaled_size) /
-		 cinfo->min_DCT_v_scaled_size;
-    h_out_group = cinfo->max_h_samp_factor;
-    v_out_group = cinfo->max_v_samp_factor;
-    upsample->rowgroup_height[ci] = v_in_group; /* save for use later */
-    need_buffer = TRUE;
-    if (! compptr->component_needed) {
-      /* Don't bother to upsample an uninteresting component. */
-      upsample->methods[ci] = noop_upsample;
-      need_buffer = FALSE;
-    } else if (h_in_group == h_out_group && v_in_group == v_out_group) {
-      /* Fullsize components can be processed without any work. */
-      upsample->methods[ci] = fullsize_upsample;
-      need_buffer = FALSE;
-    } else if (h_in_group * 2 == h_out_group &&
-	       v_in_group == v_out_group) {
-      /* Special case for 2h1v upsampling */
-      upsample->methods[ci] = h2v1_upsample;
-    } else if (h_in_group * 2 == h_out_group &&
-	       v_in_group * 2 == v_out_group) {
-      /* Special case for 2h2v upsampling */
-      upsample->methods[ci] = h2v2_upsample;
-    } else if ((h_out_group % h_in_group) == 0 &&
-	       (v_out_group % v_in_group) == 0) {
-      /* Generic integral-factors upsampling method */
-      upsample->methods[ci] = int_upsample;
-      upsample->h_expand[ci] = (UINT8) (h_out_group / h_in_group);
-      upsample->v_expand[ci] = (UINT8) (v_out_group / v_in_group);
-    } else
-      ERREXIT(cinfo, JERR_FRACT_SAMPLE_NOTIMPL);
-    if (need_buffer) {
-      upsample->color_buf[ci] = (*cinfo->mem->alloc_sarray)
+	/* Verify we can handle the sampling factors, select per-component methods,
+	* and create storage as needed.
+	*/
+	for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
+		ci++, compptr++) {
+	/* Compute size of an "input group" after IDCT scaling.  This many samples
+	 * are to be converted to max_h_samp_factor * max_v_samp_factor pixels.
+	 */
+	h_in_group = (compptr->h_samp_factor * compptr->DCT_h_scaled_size) /
+			cinfo->min_DCT_h_scaled_size;
+	v_in_group = (compptr->v_samp_factor * compptr->DCT_v_scaled_size) /
+			cinfo->min_DCT_v_scaled_size;
+	h_out_group = cinfo->max_h_samp_factor;
+	v_out_group = cinfo->max_v_samp_factor;
+	upsample->rowgroup_height[ci] = v_in_group; /* save for use later */
+	need_buffer = TRUE;
+	if (! compptr->component_needed) {
+		/* Don't bother to upsample an uninteresting component. */
+		upsample->methods[ci] = noop_upsample;
+		need_buffer = FALSE;
+	} else if (h_in_group == h_out_group && v_in_group == v_out_group) {
+		/* Fullsize components can be processed without any work. */
+		upsample->methods[ci] = fullsize_upsample;
+		need_buffer = FALSE;
+	} else if (h_in_group * 2 == h_out_group &&
+			v_in_group == v_out_group) {
+		/* Special case for 2h1v upsampling */
+		upsample->methods[ci] = h2v1_upsample;
+	} else if (h_in_group * 2 == h_out_group &&
+			v_in_group * 2 == v_out_group) {
+		/* Special case for 2h2v upsampling */
+		upsample->methods[ci] = h2v2_upsample;
+	} else if ((h_out_group % h_in_group) == 0 &&
+			(v_out_group % v_in_group) == 0) {
+		/* Generic integral-factors upsampling method */
+		upsample->methods[ci] = int_upsample;
+		upsample->h_expand[ci] = (UINT8) (h_out_group / h_in_group);
+		upsample->v_expand[ci] = (UINT8) (v_out_group / v_in_group);
+	} else
+		ERREXIT(cinfo, JERR_FRACT_SAMPLE_NOTIMPL);
+	if (need_buffer) {
+		upsample->color_buf[ci] = (*cinfo->mem->alloc_sarray)
 	((j_common_ptr) cinfo, JPOOL_IMAGE,
-	 (JDIMENSION) jround_up((long) cinfo->output_width,
+		(JDIMENSION) jround_up((long) cinfo->output_width,
 				(long) cinfo->max_h_samp_factor),
-	 (JDIMENSION) cinfo->max_v_samp_factor);
-    }
-  }
+		(JDIMENSION) cinfo->max_v_samp_factor);
+	}
+	}
 }

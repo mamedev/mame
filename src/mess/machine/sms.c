@@ -21,7 +21,7 @@
 #define CF_JANGGUN_MAPPER          0x200
 #define CF_TVDRAW                  0x400
 #define CF_MAPPER_BITS             ( CF_CODEMASTERS_MAPPER | CF_KOREAN_MAPPER | CF_KOREAN_ZEMINA_MAPPER | \
-                                     CF_KOREAN_NOBANK_MAPPER | CF_4PAK_MAPPER | CF_JANGGUN_MAPPER )
+										CF_KOREAN_NOBANK_MAPPER | CF_4PAK_MAPPER | CF_JANGGUN_MAPPER )
 
 #define LGUN_RADIUS           6
 #define LGUN_X_INTERVAL       4
@@ -240,7 +240,7 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 	case 0:
 		switch (ioport("CTRLSEL")->read_safe(0x00) & 0x0f)
 		{
-		case 0x04:	/* Sports Pad */
+		case 0x04:  /* Sports Pad */
 			if (data != m_sports_pad_last_data_1)
 			{
 				UINT32 cpu_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
@@ -262,7 +262,7 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 	case 1:
 		switch (ioport("CTRLSEL")->read_safe(0x00) & 0xf0)
 		{
-		case 0x40:	/* Sports Pad */
+		case 0x40:  /* Sports Pad */
 			if (data != m_sports_pad_last_data_2)
 			{
 				UINT32 cpu_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
@@ -332,7 +332,7 @@ static int lgun_bright_aim_area( running_machine &machine, emu_timer *timer, int
 	int pos_changed = 0;
 	double dx_circ;
 
-    while (1)
+	while (1)
 	{
 		dy = abs(beam_y - lgun_y);
 
@@ -607,10 +607,10 @@ static void sms_get_inputs( address_space &space )
 			data = data >> 4;
 
 		state->m_input_port0 = (state->m_input_port0 & 0xc0) | (data & 0x0f) | (state->m_paddle_read_state & 0x20)
-		                | ((machine.root_device().ioport("CTRLIPT")->read() & 0x02) << 3);
+						| ((machine.root_device().ioport("CTRLIPT")->read() & 0x02) << 3);
 		break;
 
-	case 0x04:	/* Sega Sports Pad */
+	case 0x04:  /* Sega Sports Pad */
 		switch (state->m_sports_pad_state_1)
 		{
 		case 0:
@@ -633,7 +633,7 @@ static void sms_get_inputs( address_space &space )
 	/* Player 2 */
 	switch (machine.root_device().ioport("CTRLSEL")->read_safe(0x00)  & 0xf0)
 	{
-	case 0x00:	/* Joystick */
+	case 0x00:  /* Joystick */
 		data = machine.root_device().ioport("PORT_DC")->read();
 		state->m_input_port0 = (state->m_input_port0 & 0x3f) | (data & 0xc0);
 
@@ -649,7 +649,7 @@ static void sms_get_inputs( address_space &space )
 		state->m_input_port1 = (state->m_input_port1 & 0xf0) | (data & 0x0f);
 		break;
 
-	case 0x10:	/* Light Phaser */
+	case 0x10:  /* Light Phaser */
 		data = (machine.root_device().ioport("CTRLIPT")->read() & 0x10) >> 2;
 		if (!(data & 0x04))
 		{
@@ -661,7 +661,7 @@ static void sms_get_inputs( address_space &space )
 		state->m_input_port1 = (state->m_input_port1 & 0xf0) | (data & 0x0f);
 		break;
 
-	case 0x20:	/* Paddle Control */
+	case 0x20:  /* Paddle Control */
 		/* Get button A state */
 		data = machine.root_device().ioport("PADDLE1")->read();
 		if (state->m_paddle_read_state)
@@ -669,10 +669,10 @@ static void sms_get_inputs( address_space &space )
 
 		state->m_input_port0 = (state->m_input_port0 & 0x3f) | ((data & 0x03) << 6);
 		state->m_input_port1 = (state->m_input_port1 & 0xf0) | ((data & 0x0c) >> 2) | (state->m_paddle_read_state & 0x08)
-		                | ((machine.root_device().ioport("CTRLIPT")->read() & 0x20) >> 3);
+						| ((machine.root_device().ioport("CTRLIPT")->read() & 0x20) >> 3);
 		break;
 
-	case 0x40:	/* Sega Sports Pad */
+	case 0x40:  /* Sega Sports Pad */
 		switch (state->m_sports_pad_state_2)
 		{
 		case 0:
@@ -1014,7 +1014,7 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 			else
 			{
 				UINT8 *sram = NULL;
-				m_cartridge[m_current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
+				m_cartridge[m_current_cartridge].sram_save = 1;         /* SRAM should be saved on exit. */
 				if (data & 0x04)
 				{
 					sram = m_cartridge[m_current_cartridge].cartSRAM + 0x4000;
@@ -1093,7 +1093,7 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 				return;
 			}
 
-			if ( ! ( m_mapper[0] & 0x08 ) )		// Is RAM disabled
+			if ( ! ( m_mapper[0] & 0x08 ) )     // Is RAM disabled
 			{
 				if ( ! ( m_cartridge[m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 				{
@@ -1104,7 +1104,7 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 
 		if ( bios_selected )
 		{
-			if ( ! ( m_mapper[0] & 0x08 ) )		// Is RAM disabled
+			if ( ! ( m_mapper[0] & 0x08 ) )     // Is RAM disabled
 			{
 				map_bios_16k( 0x8000, data );
 			}
@@ -1507,7 +1507,7 @@ static int detect_korean_mapper( UINT8 *rom )
 	static const UINT8 signatures[2][16] =
 	{
 		{ 0x3e, 0x11, 0x32, 0x00, 0xa0, 0x78, 0xcd, 0x84, 0x85, 0x3e, 0x02, 0x32, 0x00, 0xa0, 0xc9, 0xff }, /* Dodgeball King */
-		{ 0x41, 0x48, 0x37, 0x37, 0x44, 0x37, 0x4e, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x20 },	/* Sangokushi 3 */
+		{ 0x41, 0x48, 0x37, 0x37, 0x44, 0x37, 0x4e, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x20 }, /* Sangokushi 3 */
 	};
 	int i;
 
@@ -1525,7 +1525,7 @@ static int detect_korean_mapper( UINT8 *rom )
 
 static int detect_tvdraw( UINT8 *rom )
 {
-	static const UINT8 terebi_oekaki[7] = { 0x61, 0x6e, 0x6e, 0x61, 0x6b, 0x6d, 0x6e };	// "annakmn"
+	static const UINT8 terebi_oekaki[7] = { 0x61, 0x6e, 0x6e, 0x61, 0x6b, 0x6d, 0x6e }; // "annakmn"
 
 	if (!memcmp(&rom[0x13b3], terebi_oekaki, 7))
 		return 1;
@@ -1784,7 +1784,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 				state->m_cartridge[index].features |= CF_KOREAN_ZEMINA_MAPPER;
 				// Check for special bank 0 signature
 				if ( size == 0x20000 && rom[0] == 0x00 && rom[1] == 0x00 && rom[2] == 0x00 &&
-				     rom[0x1e000] == 0xF3 && rom[0x1e001] == 0xED && rom[0x1e002] == 0x56 )
+						rom[0x1e000] == 0xF3 && rom[0x1e001] == 0xED && rom[0x1e002] == 0x56 )
 				{
 					state->m_cartridge[index].features |= CF_KOREAN_ZEMINA_NEMESIS;
 				}

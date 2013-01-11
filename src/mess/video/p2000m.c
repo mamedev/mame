@@ -48,8 +48,8 @@ UINT32 p2000t_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &b
 		{
 			for (loop = 0; loop < 12; loop++)
 			{
-				bitmap.pix16(sy + 18, sx + loop) = 0;	/* cursor */
-				bitmap.pix16(sy + 19, sx + loop) = 0;	/* cursor */
+				bitmap.pix16(sy + 18, sx + loop) = 0;   /* cursor */
+				bitmap.pix16(sy + 19, sx + loop) = 0;   /* cursor */
 			}
 		}
 	}

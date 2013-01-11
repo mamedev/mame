@@ -212,7 +212,7 @@ bool upd765_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 
 	switch (f.encoding)
 	{
-	case floppy_image::FM: 
+	case floppy_image::FM:
 		desc = get_desc_fm(f, current_size, end_gap_index);
 		break;
 	case floppy_image::MFM:
@@ -274,7 +274,7 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 		int candidates_count = 0;
 		for(int i=0; i != formats_count; i++) {
 			if(image->get_form_factor() == floppy_image::FF_UNKNOWN ||
-			   image->get_form_factor() == formats[i].form_factor) {
+				image->get_form_factor() == formats[i].form_factor) {
 				if(formats[i].cell_size == cur_cell_size)
 					candidates[candidates_count++] = i;
 				else if((!cur_cell_size || formats[i].cell_size < cur_cell_size) &&
@@ -381,7 +381,7 @@ void upd765_format::check_compatibility(floppy_image *image, int *candidates, in
 
 	switch (formats[candidates[0]].encoding)
 	{
-	case floppy_image::FM: 
+	case floppy_image::FM:
 		extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
 		break;
 	case floppy_image::MFM:
@@ -435,7 +435,7 @@ void upd765_format::extract_sectors(floppy_image *image, const format &f, desc_s
 
 	switch (f.encoding)
 	{
-	case floppy_image::FM: 
+	case floppy_image::FM:
 		extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
 		break;
 	case floppy_image::MFM:

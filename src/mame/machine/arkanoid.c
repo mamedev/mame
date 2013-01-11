@@ -185,7 +185,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
 
 	switch (m_bootleg_id)
 	{
-		case ARKANGC:	/* There are no reads from 0xf000 in these bootlegs */
+		case ARKANGC:   /* There are no reads from 0xf000 in these bootlegs */
 		case ARKBLOCK:
 		case ARKANGC2:
 		case ARKBLOC2:

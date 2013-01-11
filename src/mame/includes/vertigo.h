@@ -14,11 +14,11 @@
 
 struct am2901
 {
-	UINT32 ram[16];	  /* internal ram */
-	UINT32 d;		  /* direct data D input */
-	UINT32 q;		  /* Q register */
-	UINT32 f;		  /* F ALU result */
-	UINT32 y;		  /* Y output */
+	UINT32 ram[16];   /* internal ram */
+	UINT32 d;         /* direct data D input */
+	UINT32 q;         /* Q register */
+	UINT32 f;         /* F ALU result */
+	UINT32 y;         /* Y output */
 };
 
 class vector_generator
@@ -27,23 +27,23 @@ public:
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	void set_machine(running_machine &machine) { m_machine = &machine; }
 
-	UINT32 sreg;	  /* shift register */
-	UINT32 l1;		  /* latch 1 adder operand only */
-	UINT32 l2;		  /* latch 2 adder operand only */
-	UINT32 c_v;		  /* vertical position counter */
-	UINT32 c_h;		  /* horizontal position counter */
-	UINT32 c_l;		  /* length counter */
-	UINT32 adder_s;	  /* slope generator result and B input */
-	UINT32 adder_a;	  /* slope generator A input */
-	UINT32 color;	  /* color */
+	UINT32 sreg;      /* shift register */
+	UINT32 l1;        /* latch 1 adder operand only */
+	UINT32 l2;        /* latch 2 adder operand only */
+	UINT32 c_v;       /* vertical position counter */
+	UINT32 c_h;       /* horizontal position counter */
+	UINT32 c_l;       /* length counter */
+	UINT32 adder_s;   /* slope generator result and B input */
+	UINT32 adder_a;   /* slope generator A input */
+	UINT32 color;     /* color */
 	UINT32 intensity; /* intensity */
-	UINT32 brez;	  /* h/v-counters enable */
-	UINT32 vfin;	  /* drawing yes/no */
-	UINT32 hud1;	  /* h-counter up or down (stored in L1) */
-	UINT32 hud2;	  /* h-counter up or down (stored in L2) */
-	UINT32 vud1;	  /* v-counter up or down (stored in L1) */
-	UINT32 vud2;	  /* v-counter up or down (stored in L2) */
-	UINT32 hc1;		  /* use h- or v-counter in L1 mode */
+	UINT32 brez;      /* h/v-counters enable */
+	UINT32 vfin;      /* drawing yes/no */
+	UINT32 hud1;      /* h-counter up or down (stored in L1) */
+	UINT32 hud2;      /* h-counter up or down (stored in L2) */
+	UINT32 vud1;      /* v-counter up or down (stored in L1) */
+	UINT32 vud2;      /* v-counter up or down (stored in L2) */
+	UINT32 hc1;       /* use h- or v-counter in L1 mode */
 	UINT32 ven;       /* vector intensity enable */
 
 private:
@@ -74,9 +74,9 @@ struct vproc
 {
 	UINT16 sram[64]; /* external sram */
 	UINT16 ramlatch; /* latch between 2901 and sram */
-	UINT16 rom_adr;	 /* vector ROM/RAM address latch */
-	UINT32 pc;		 /* program counter */
-	UINT32 ret;		 /* return address */
+	UINT16 rom_adr;  /* vector ROM/RAM address latch */
+	UINT32 pc;       /* program counter */
+	UINT32 ret;      /* return address */
 
 };
 
@@ -86,7 +86,7 @@ class vertigo_state : public driver_device
 public:
 	vertigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vectorram(*this, "vectorram") { }
+			m_vectorram(*this, "vectorram") { }
 
 	required_shared_ptr<UINT16> m_vectorram;
 	device_t *m_ttl74148;

@@ -12,35 +12,35 @@
 #include "machine/cdp1852.h"
 #include "machine/nvram.h"
 
-#define SCREEN_TAG	"screen"
-#define CDP1802_TAG	"cdp1802"
-#define CDP1869_TAG	"cdp1869"
-#define COP402N_TAG	"cop402n"
-#define AY8910_TAG	"ay8910"
+#define SCREEN_TAG  "screen"
+#define CDP1802_TAG "cdp1802"
+#define CDP1869_TAG "cdp1869"
+#define COP402N_TAG "cop402n"
+#define AY8910_TAG  "ay8910"
 
-#define DESTRYER_CHR1	3579000.0 // unverified
-#define DESTRYER_CHR2	XTAL_5_7143MHz
-#define ALTAIR_CHR1		3579000.0 // unverified
-#define ALTAIR_CHR2		CDP1869_DOT_CLK_PAL // unverified
-#define DRACO_CHR1		XTAL_4_43361MHz
-#define DRACO_CHR2		CDP1869_DOT_CLK_PAL // unverified
-#define DRACO_SND_CHR1	XTAL_2_01216MHz
+#define DESTRYER_CHR1   3579000.0 // unverified
+#define DESTRYER_CHR2   XTAL_5_7143MHz
+#define ALTAIR_CHR1     3579000.0 // unverified
+#define ALTAIR_CHR2     CDP1869_DOT_CLK_PAL // unverified
+#define DRACO_CHR1      XTAL_4_43361MHz
+#define DRACO_CHR2      CDP1869_DOT_CLK_PAL // unverified
+#define DRACO_SND_CHR1  XTAL_2_01216MHz
 
-#define CIDELSA_PAGERAM_SIZE	0x400
-#define DRACO_PAGERAM_SIZE		0x800
-#define CIDELSA_CHARRAM_SIZE	0x800
+#define CIDELSA_PAGERAM_SIZE    0x400
+#define DRACO_PAGERAM_SIZE      0x800
+#define CIDELSA_CHARRAM_SIZE    0x800
 
-#define CIDELSA_PAGERAM_MASK	0x3ff
-#define DRACO_PAGERAM_MASK		0x7ff
-#define CIDELSA_CHARRAM_MASK	0x7ff
+#define CIDELSA_PAGERAM_MASK    0x3ff
+#define DRACO_PAGERAM_MASK      0x7ff
+#define CIDELSA_CHARRAM_MASK    0x7ff
 
 class cidelsa_state : public driver_device
 {
 public:
 	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_vis(*this, CDP1869_TAG)
+			m_maincpu(*this, CDP1802_TAG),
+			m_vis(*this, CDP1869_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -80,7 +80,7 @@ class draco_state : public cidelsa_state
 public:
 	draco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cidelsa_state(mconfig, type, tag),
-		  m_psg(*this, AY8910_TAG)
+			m_psg(*this, AY8910_TAG)
 	{ }
 
 	required_device<ay8910_device> m_psg;

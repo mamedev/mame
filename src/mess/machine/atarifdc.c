@@ -19,22 +19,22 @@
 #include "imagedev/flopdrv.h"
 #include "formats/atari_dsk.h"
 
-#define VERBOSE_SERIAL	0
-#define VERBOSE_CHKSUM	0
+#define VERBOSE_SERIAL  0
+#define VERBOSE_CHKSUM  0
 
 struct atari_drive
 {
-	UINT8 *image;		/* malloc'd image */
-	int type;			/* type of image (XFD, ATR, DSK) */
-	int mode;			/* 0 read only, != 0 read/write */
-	int density;		/* 0 SD, 1 MD, 2 DD */
-	int header_skip;	/* number of bytes in format header */
-	int tracks; 		/* number of tracks (35,40,77,80) */
-	int heads;			/* number of heads (1,2) */
-	int spt;			/* sectors per track (18,26) */
-	int seclen; 		/* sector length (128,256) */
-	int bseclen;		/* boot sector length (sectors 1..3) */
-	int sectors;		/* total sectors, ie. tracks x heads x spt */
+	UINT8 *image;       /* malloc'd image */
+	int type;           /* type of image (XFD, ATR, DSK) */
+	int mode;           /* 0 read only, != 0 read/write */
+	int density;        /* 0 SD, 1 MD, 2 DD */
+	int header_skip;    /* number of bytes in format header */
+	int tracks;         /* number of tracks (35,40,77,80) */
+	int heads;          /* number of heads (1,2) */
+	int spt;            /* sectors per track (18,26) */
+	int seclen;         /* sector length (128,256) */
+	int bseclen;        /* boot sector length (sectors 1..3) */
+	int sectors;        /* total sectors, ie. tracks x heads x spt */
 };
 
 struct atari_fdc_t
@@ -60,9 +60,9 @@ struct atari_fdc_t
  *
  *************************************/
 
-#define FORMAT_XFD	0
-#define FORMAT_ATR	1
-#define FORMAT_DSK	2
+#define FORMAT_XFD  0
+#define FORMAT_ATR  1
+#define FORMAT_DSK  2
 
 /*****************************************************************************
     INLINE FUNCTIONS
@@ -114,23 +114,23 @@ struct xfd_format
 /* here's a table of known xfd formats */
 static const xfd_format xfd_formats[] =
 {
-	{35 * 18 * 1 * 128, 				{0,35,1,0,18,0,0,0,128,255,0,0,0,13,"35 SS/SD"}},
-	{35 * 26 * 1 * 128, 				{1,35,1,0,26,0,4,0,128,255,0,0,0,13,"35 SS/MD"}},
+	{35 * 18 * 1 * 128,                 {0,35,1,0,18,0,0,0,128,255,0,0,0,13,"35 SS/SD"}},
+	{35 * 26 * 1 * 128,                 {1,35,1,0,26,0,4,0,128,255,0,0,0,13,"35 SS/MD"}},
 	{(35 * 18 * 1 - 3) * 256 + 3 * 128, {2,35,1,0,18,0,4,1,  0,255,0,0,0,13,"35 SS/DD"}},
-	{40 * 18 * 1 * 128, 				{0,40,1,0,18,0,0,0,128,255,0,0,0,13,"40 SS/SD"}},
-	{40 * 26 * 1 * 128, 				{1,40,1,0,26,0,4,0,128,255,0,0,0,13,"40 SS/MD"}},
+	{40 * 18 * 1 * 128,                 {0,40,1,0,18,0,0,0,128,255,0,0,0,13,"40 SS/SD"}},
+	{40 * 26 * 1 * 128,                 {1,40,1,0,26,0,4,0,128,255,0,0,0,13,"40 SS/MD"}},
 	{(40 * 18 * 1 - 3) * 256 + 3 * 128, {2,40,1,0,18,0,4,1,  0,255,0,0,0,13,"40 SS/DD"}},
-	{40 * 18 * 2 * 128, 				{0,40,1,0,18,1,0,0,128,255,0,0,0,13,"40 DS/SD"}},
-	{40 * 26 * 2 * 128, 				{1,40,1,0,26,1,4,0,128,255,0,0,0,13,"40 DS/MD"}},
+	{40 * 18 * 2 * 128,                 {0,40,1,0,18,1,0,0,128,255,0,0,0,13,"40 DS/SD"}},
+	{40 * 26 * 2 * 128,                 {1,40,1,0,26,1,4,0,128,255,0,0,0,13,"40 DS/MD"}},
 	{(40 * 18 * 2 - 3) * 256 + 3 * 128, {2,40,1,0,18,1,4,1,  0,255,0,0,0,13,"40 DS/DD"}},
-	{77 * 18 * 1 * 128, 				{0,77,1,0,18,0,0,0,128,255,0,0,0,13,"77 SS/SD"}},
-	{77 * 26 * 1 * 128, 				{1,77,1,0,26,0,4,0,128,255,0,0,0,13,"77 SS/MD"}},
+	{77 * 18 * 1 * 128,                 {0,77,1,0,18,0,0,0,128,255,0,0,0,13,"77 SS/SD"}},
+	{77 * 26 * 1 * 128,                 {1,77,1,0,26,0,4,0,128,255,0,0,0,13,"77 SS/MD"}},
 	{(77 * 18 * 1 - 3) * 256 + 3 * 128, {2,77,1,0,18,0,4,1,  0,255,0,0,0,13,"77 SS/DD"}},
-	{77 * 18 * 2 * 128, 				{0,77,1,0,18,1,0,0,128,255,0,0,0,13,"77 DS/SD"}},
-	{77 * 26 * 2 * 128, 				{1,77,1,0,26,1,4,0,128,255,0,0,0,13,"77 DS/MD"}},
+	{77 * 18 * 2 * 128,                 {0,77,1,0,18,1,0,0,128,255,0,0,0,13,"77 DS/SD"}},
+	{77 * 26 * 2 * 128,                 {1,77,1,0,26,1,4,0,128,255,0,0,0,13,"77 DS/MD"}},
 	{(77 * 18 * 2 - 3) * 256 + 3 * 128, {2,77,1,0,18,1,4,1,  0,255,0,0,0,13,"77 DS/DD"}},
-	{80 * 18 * 2 * 128, 				{0,80,1,0,18,1,0,0,128,255,0,0,0,13,"80 DS/SD"}},
-	{80 * 26 * 2 * 128, 				{1,80,1,0,26,1,4,0,128,255,0,0,0,13,"80 DS/MD"}},
+	{80 * 18 * 2 * 128,                 {0,80,1,0,18,1,0,0,128,255,0,0,0,13,"80 DS/SD"}},
+	{80 * 26 * 2 * 128,                 {1,80,1,0,26,1,4,0,128,255,0,0,0,13,"80 DS/MD"}},
 	{(80 * 18 * 2 - 3) * 256 + 3 * 128, {2,80,1,0,18,1,4,1,  0,255,0,0,0,13,"80 DS/DD"}},
 	{0, {0,}}
 };
@@ -176,41 +176,41 @@ static void atari_load_proc(device_image_interface &image)
 		return;
 	}
 	/* re allocate the buffer; we don't want to be too lazy ;) */
-    //fdc->drv[id].image = (UINT8*)image.image_realloc(fdc->drv[id].image, size);
+	//fdc->drv[id].image = (UINT8*)image.image_realloc(fdc->drv[id].image, size);
 
 	ext = image.filetype();
-    /* no extension: assume XFD format (no header) */
-    if (!ext)
-    {
-        fdc->drv[id].type = FORMAT_XFD;
-        fdc->drv[id].header_skip = 0;
-    }
-    else
-    /* XFD extension */
-    if( toupper(ext[0])=='X' && toupper(ext[1])=='F' && toupper(ext[2])=='D' )
-    {
-        fdc->drv[id].type = FORMAT_XFD;
-        fdc->drv[id].header_skip = 0;
-    }
-    else
-    /* ATR extension */
-    if( toupper(ext[0])=='A' && toupper(ext[1])=='T' && toupper(ext[2])=='R' )
-    {
-        fdc->drv[id].type = FORMAT_ATR;
-        fdc->drv[id].header_skip = 16;
-    }
-    else
-    /* DSK extension */
-    if( toupper(ext[0])=='D' && toupper(ext[1])=='S' && toupper(ext[2])=='K' )
-    {
-        fdc->drv[id].type = FORMAT_DSK;
-        fdc->drv[id].header_skip = sizeof(dsk_format);
-    }
-    else
-    {
+	/* no extension: assume XFD format (no header) */
+	if (!ext)
+	{
 		fdc->drv[id].type = FORMAT_XFD;
-        fdc->drv[id].header_skip = 0;
-    }
+		fdc->drv[id].header_skip = 0;
+	}
+	else
+	/* XFD extension */
+	if( toupper(ext[0])=='X' && toupper(ext[1])=='F' && toupper(ext[2])=='D' )
+	{
+		fdc->drv[id].type = FORMAT_XFD;
+		fdc->drv[id].header_skip = 0;
+	}
+	else
+	/* ATR extension */
+	if( toupper(ext[0])=='A' && toupper(ext[1])=='T' && toupper(ext[2])=='R' )
+	{
+		fdc->drv[id].type = FORMAT_ATR;
+		fdc->drv[id].header_skip = 16;
+	}
+	else
+	/* DSK extension */
+	if( toupper(ext[0])=='D' && toupper(ext[1])=='S' && toupper(ext[2])=='K' )
+	{
+		fdc->drv[id].type = FORMAT_DSK;
+		fdc->drv[id].header_skip = sizeof(dsk_format);
+	}
+	else
+	{
+		fdc->drv[id].type = FORMAT_XFD;
+		fdc->drv[id].header_skip = 0;
+	}
 
 	if( fdc->drv[id].type == FORMAT_ATR &&
 		(fdc->drv[id].image[0] != 0x96 || fdc->drv[id].image[1] != 0x02) )
@@ -471,7 +471,7 @@ static void a800_serial_command(device_t *device)
 
 		drive = fdc->serout_buff[0] - '1';   /* drive # */
 		/* sector # */
-		if (drive < 0 || drive > 3) 			/* ignore unknown drives */
+		if (drive < 0 || drive > 3)             /* ignore unknown drives */
 		{
 			logerror("atari unsupported drive #%d\n", drive+1);
 			atari_set_frame_message(device, "DRIVE #%d not supported", drive+1);
@@ -494,29 +494,29 @@ static void a800_serial_command(device_t *device)
 				if (!fdc->drv[drive].mode) /* read only mode ? */
 				{
 					if (fdc->drv[drive].spt == 26)
-						add_serin(device,0x80,1);	/* MD: 0x80 */
+						add_serin(device,0x80,1);   /* MD: 0x80 */
 					else
 					if (fdc->drv[drive].seclen == 128)
-						add_serin(device,0x00,1);	/* SD: 0x00 */
+						add_serin(device,0x00,1);   /* SD: 0x00 */
 					else
-						add_serin(device,0x20,1);	/* DD: 0x20 */
+						add_serin(device,0x20,1);   /* DD: 0x20 */
 				}
 				else
 				{
 					if (fdc->drv[drive].spt == 26)
-						add_serin(device,0x84,1);	/* MD: 0x84 */
+						add_serin(device,0x84,1);   /* MD: 0x84 */
 					else
 					if (fdc->drv[drive].seclen == 128)
-						add_serin(device,0x04,1);	/* SD: 0x04 */
+						add_serin(device,0x04,1);   /* SD: 0x04 */
 					else
-						add_serin(device,0x24,1);	/* DD: 0x24 */
+						add_serin(device,0x24,1);   /* DD: 0x24 */
 				}
 				if (fdc->drv[drive].image)
-					add_serin(device,0xff,1);	/* door closed: 0xff */
+					add_serin(device,0xff,1);   /* door closed: 0xff */
 				else
-					add_serin(device,0x7f,1);	/* door open: 0x7f */
-				add_serin(device,0xe0,1);	/* dunno */
-				add_serin(device,0x00,1);	/* dunno */
+					add_serin(device,0x7f,1);   /* door open: 0x7f */
+				add_serin(device,0xe0,1);   /* dunno */
+				add_serin(device,0x00,1);   /* dunno */
 				add_serin(device,fdc->serin_chksum,0);
 				break;
 
@@ -536,7 +536,7 @@ static void a800_serial_command(device_t *device)
 				}
 				add_serin(device,'A',0);   /* acknowledge */
 				add_serin(device,'C',0);   /* completed */
-				if (sector < 4) 	/* sector 1 .. 3 might be different length */
+				if (sector < 4)     /* sector 1 .. 3 might be different length */
 				{
 					atari_set_frame_message(device, "DRIVE #%d READ SECTOR #%3d - SD", drive+1, sector);
 					offset = (sector - 1) * fdc->drv[drive].bseclen + fdc->drv[drive].header_skip;
@@ -546,7 +546,7 @@ static void a800_serial_command(device_t *device)
 				else
 				{
 					atari_set_frame_message(device, "DRIVE #%d READ SECTOR #%3d - %cD", drive+1, sector, (fdc->drv[drive].seclen == 128) ? 'S' : 'D');
-                    offset = (sector - 1) * fdc->drv[drive].seclen + fdc->drv[drive].header_skip;
+					offset = (sector - 1) * fdc->drv[drive].seclen + fdc->drv[drive].header_skip;
 					for (i = 0; i < fdc->drv[drive].seclen; i++)
 						add_serin(device,fdc->drv[drive].image[offset++],1);
 				}
@@ -558,16 +558,16 @@ static void a800_serial_command(device_t *device)
 					logerror("atari write sector #%d\n", sector);
 
 				add_serin(device,'A',0);
-				if (sector < 4) 	/* sector 1 .. 3 might be different length */
+				if (sector < 4)     /* sector 1 .. 3 might be different length */
 				{
 					add_serout(device,fdc->drv[drive].bseclen);
 					atari_set_frame_message(device, "DRIVE #%d WRITE SECTOR #%3d - SD", drive+1, sector);
-                }
+				}
 				else
 				{
 					add_serout(device,fdc->drv[drive].seclen);
 					atari_set_frame_message(device, "DRIVE #%d WRITE SECTOR #%3d - %cD", drive+1, sector, (fdc->drv[drive].seclen == 128) ? 'S' : 'D');
-                }
+				}
 				break;
 
 			case 'P':   /* put sector (no verify) */
@@ -575,16 +575,16 @@ static void a800_serial_command(device_t *device)
 					logerror("atari put sector #%d\n", sector);
 
 				add_serin(device,'A',0);
-				if (sector < 4) 	/* sector 1 .. 3 might be different length */
+				if (sector < 4)     /* sector 1 .. 3 might be different length */
 				{
 					add_serout(device,fdc->drv[drive].bseclen);
 					atari_set_frame_message(device, "DRIVE #%d PUT SECTOR #%3d - SD", drive+1, sector);
-                }
+				}
 				else
 				{
 					add_serout(device,fdc->drv[drive].seclen);
 					atari_set_frame_message(device, "DRIVE #%d PUT SECTOR #%3d - %cD", drive+1, sector, (fdc->drv[drive].seclen == 128) ? 'S' : 'D');
-                }
+				}
 				break;
 
 			case '!':   /* SD format */
@@ -592,7 +592,7 @@ static void a800_serial_command(device_t *device)
 					logerror("atari format SD drive #%d\n", drive+1);
 
 				atari_set_frame_message(device, "DRIVE #%d FORMAT SD", drive+1);
-                add_serin(device,'A',0);   /* acknowledge */
+				add_serin(device,'A',0);   /* acknowledge */
 				add_serin(device,'C',0);   /* completed */
 				for (i = 0; i < 128; i++)
 					add_serin(device,0,1);
@@ -604,7 +604,7 @@ static void a800_serial_command(device_t *device)
 					logerror("atari format DD drive #%d\n", drive+1);
 
 				atari_set_frame_message(device, "DRIVE #%d FORMAT DD", drive+1);
-                add_serin(device,'A',0);   /* acknowledge */
+				add_serin(device,'A',0);   /* acknowledge */
 				add_serin(device,'C',0);   /* completed */
 				for (i = 0; i < 256; i++)
 					add_serin(device,0,1);
@@ -616,7 +616,7 @@ static void a800_serial_command(device_t *device)
 					logerror("atari unknown command #%c\n", fdc->serout_buff[1]);
 
 				atari_set_frame_message(device, "DRIVE #%d UNKNOWN CMD '%c'", drive+1, fdc->serout_buff[1]);
-                add_serin(device,'N',0);   /* negative acknowledge */
+				add_serin(device,'N',0);   /* negative acknowledge */
 		}
 	}
 	else
@@ -656,7 +656,7 @@ static void a800_serial_write(device_t *device)
 		{
 			/* extract sector number from the command buffer */
 			sector = fdc->serout_buff[2] + 256 * fdc->serout_buff[3];
-			if (sector < 4) 	/* sector 1 .. 3 might be different length */
+			if (sector < 4)     /* sector 1 .. 3 might be different length */
 			{
 				offset = (sector - 1) * fdc->drv[drive].bseclen + fdc->drv[drive].header_skip;
 
@@ -666,7 +666,7 @@ static void a800_serial_write(device_t *device)
 				for (i = 0; i < 128; i++)
 					fdc->drv[drive].image[offset++] = fdc->serout_buff[5+i];
 				atari_set_frame_message(device, "DRIVE #%d WROTE SECTOR #%3d - SD", drive+1, sector);
-            }
+			}
 			else
 			{
 				offset = (sector - 1) * fdc->drv[drive].seclen + fdc->drv[drive].header_skip;
@@ -677,7 +677,7 @@ static void a800_serial_write(device_t *device)
 				for (i = 0; i < fdc->drv[drive].seclen; i++)
 					fdc->drv[drive].image[offset++] = fdc->serout_buff[5+i];
 				atari_set_frame_message(device, "DRIVE #%d WROTE SECTOR #%3d - %cD", drive+1, sector, (fdc->drv[drive].seclen == 128) ? 'S' : 'D');
-            }
+			}
 			add_serin(device,'C',0);
 		}
 		else
@@ -857,5 +857,3 @@ machine_config_constructor atari_fdc_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( atari_fdc  );
 }
-
-

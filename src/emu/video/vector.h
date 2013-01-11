@@ -24,4 +24,3 @@ void vector_set_beam(float _beam);
 float vector_get_beam(void);
 
 #endif
-

@@ -25,18 +25,18 @@
 enum
 {
 	OTHER = 0,
-	WRITE,			// write register A3A2A1A0
-	READ,			// read register  A3A2A1A0
-	ERASE			// erase register A3A2A1A0
+	WRITE,          // write register A3A2A1A0
+	READ,           // read register  A3A2A1A0
+	ERASE           // erase register A3A2A1A0
 };
 
 // other instructions
 enum
 {
-	EWDS = 0,		// erase/write disable
-	WRAL,			// write all registers
-	ERAL,			// erase all registers
-	EWEN,			// erase/write enable
+	EWDS = 0,       // erase/write disable
+	WRAL,           // write all registers
+	ERAL,           // erase all registers
+	EWEN,           // erase/write enable
 };
 
 // states
@@ -106,9 +106,9 @@ inline void nmc9306_device::erase(offs_t offset)
 
 nmc9306_device::nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NMC9306, "NMC9306", tag, owner, clock),
-	  device_nvram_interface(mconfig, *this),
-	  m_state(STATE_IDLE),
-	  m_ewen(false)
+		device_nvram_interface(mconfig, *this),
+		m_state(STATE_IDLE),
+		m_ewen(false)
 {
 }
 

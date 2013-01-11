@@ -11,44 +11,44 @@
 
 static const char *const L_REG[] =
 {
-  "L0",  "L1",  "L2",  "L3",  "L4",  "L5",  "L6",  "L7",  "L8",  "L9",
-  "L10", "L11", "L12", "L13", "L14", "L15", "L16", "L17", "L18", "L19",
-  "L20", "L21", "L22", "L23", "L24", "L25", "L26", "L27", "L28", "L29",
-  "L30", "L31", "L32", "L33", "L34", "L35", "L36", "L37", "L38", "L39",
-  "L40", "L41", "L42", "L43", "L44", "L45", "L46", "L47", "L48", "L49",
-  "L50", "L51", "L52", "L53", "L54", "L55", "L56", "L57", "L58", "L59",
-  "L60", "L61", "L62", "L63"
+	"L0",  "L1",  "L2",  "L3",  "L4",  "L5",  "L6",  "L7",  "L8",  "L9",
+	"L10", "L11", "L12", "L13", "L14", "L15", "L16", "L17", "L18", "L19",
+	"L20", "L21", "L22", "L23", "L24", "L25", "L26", "L27", "L28", "L29",
+	"L30", "L31", "L32", "L33", "L34", "L35", "L36", "L37", "L38", "L39",
+	"L40", "L41", "L42", "L43", "L44", "L45", "L46", "L47", "L48", "L49",
+	"L50", "L51", "L52", "L53", "L54", "L55", "L56", "L57", "L58", "L59",
+	"L60", "L61", "L62", "L63"
 };
 
 static const char *const G_REG[] =
 {
-  "PC",  "SR",  "FER", "G03", "G04", "G05", "G06", "G07", "G08", "G09",
-  "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "SP",  "UB",
-  "BCR", "TPR", "TCR", "TR",  "WCR", "ISR", "FCR", "MCR", "G28", "G29",
-  "G30", "G31"
+	"PC",  "SR",  "FER", "G03", "G04", "G05", "G06", "G07", "G08", "G09",
+	"G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "SP",  "UB",
+	"BCR", "TPR", "TCR", "TR",  "WCR", "ISR", "FCR", "MCR", "G28", "G29",
+	"G30", "G31"
 };
 
 static const char *const SETxx[] =
 {
-  "SETADR",   "Reserved", "SET1",   "SET0",     "SETLE",  "SETGT",  "SETLT",  "SETGE",
-  "SETSE",    "SETHT",    "SETST",  "SETHE",    "SETE",   "SETNE",  "SETV",   "SETNV",
-  "Reserved", "Reserved", "SET1M",  "Reserved", "SETLEM", "SETGTM", "SETLTM", "SETGEM",
-  "SETSEM",   "SETTHM",   "SETSTM", "SETHEM",   "SETEM",  "SETNEM", "SETVM",  "SETNVM"
+	"SETADR",   "Reserved", "SET1",   "SET0",     "SETLE",  "SETGT",  "SETLT",  "SETGE",
+	"SETSE",    "SETHT",    "SETST",  "SETHE",    "SETE",   "SETNE",  "SETV",   "SETNV",
+	"Reserved", "Reserved", "SET1M",  "Reserved", "SETLEM", "SETGTM", "SETLTM", "SETGEM",
+	"SETSEM",   "SETTHM",   "SETSTM", "SETHEM",   "SETEM",  "SETNEM", "SETVM",  "SETNVM"
 };
 
-#define DESTCODE(op)			((op & 0x00f0) >> 4)
-#define SOURCECODE(op)			(op & 0x000f)
+#define DESTCODE(op)            ((op & 0x00f0) >> 4)
+#define SOURCECODE(op)          (op & 0x000f)
 
-#define SOURCEBIT(op)			((op & 0x100) >> 8)
-#define DESTBIT(op)				((op & 0x200) >> 9)
+#define SOURCEBIT(op)           ((op & 0x100) >> 8)
+#define DESTBIT(op)             ((op & 0x200) >> 9)
 
-#define N_VALUE(op)				((((op & 0x100) >> 8) << 4 ) | (op & 0x0f))
+#define N_VALUE(op)             ((((op & 0x100) >> 8) << 4 ) | (op & 0x0f))
 
 static int size, global_fp;
 
 static offs_t base_pc;
 static const UINT8 *base_oprom;
-#define READ_OP_DASM(p)			((base_oprom[(p) - base_pc] << 8) | base_oprom[(p) + 1 - base_pc])
+#define READ_OP_DASM(p)         ((base_oprom[(p) - base_pc] << 8) | base_oprom[(p) + 1 - base_pc])
 
 
 static void LL_format(char *source, char *dest, UINT16 op)
@@ -217,8 +217,8 @@ static INT32 Rimm_format(char *dest, UINT16 op, unsigned *pc, unsigned h_flag)
 
 	switch( n )
 	{
-		case 0:	case 1:  case 2:  case 3:  case 4:  case 5:  case 6:  case 7: case 8:
-		case 9:	case 10: case 11: case 12: case 13: case 14: case 15: case 16:
+		case 0: case 1:  case 2:  case 3:  case 4:  case 5:  case 6:  case 7: case 8:
+		case 9: case 10: case 11: case 12: case 13: case 14: case 15: case 16:
 			return n;
 
 		case 17:
@@ -247,10 +247,10 @@ static INT32 Rimm_format(char *dest, UINT16 op, unsigned *pc, unsigned h_flag)
 			return ret;
 
 		case 20:
-			return 32;	//bit 5 = 1, others = 0
+			return 32;  //bit 5 = 1, others = 0
 
 		case 21:
-			return 64;	//bit 6 = 1, others = 0
+			return 64;  //bit 6 = 1, others = 0
 
 		case 22:
 			return 128; //bit 7 = 1, others = 0

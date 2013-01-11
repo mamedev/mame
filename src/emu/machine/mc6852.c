@@ -37,49 +37,49 @@ const device_type MC6852 = &device_creator<mc6852_device>;
 #define LOG 0
 
 
-#define S_RDA			0x01
-#define S_TDRA			0x02
-#define S_DCD			0x04
-#define S_CTS			0x08
-#define S_TUF			0x10
-#define S_RX_OVRN		0x20
-#define S_PE			0x40
-#define S_IRQ			0x80
+#define S_RDA           0x01
+#define S_TDRA          0x02
+#define S_DCD           0x04
+#define S_CTS           0x08
+#define S_TUF           0x10
+#define S_RX_OVRN       0x20
+#define S_PE            0x40
+#define S_IRQ           0x80
 
 
-#define C1_RX_RS		0x01
-#define C1_TX_RS		0x02
-#define C1_STRIP_SYNC	0x04
-#define C1_CLEAR_SYNC	0x08
-#define C1_TIE			0x10
-#define C1_RIE			0x20
-#define C1_AC_MASK		0xc0
-#define C1_AC_C2		0x00
-#define C1_AC_C3		0x40
-#define C1_AC_SYNC		0x80
-#define C1_AC_TX_FIFO	0xc0
+#define C1_RX_RS        0x01
+#define C1_TX_RS        0x02
+#define C1_STRIP_SYNC   0x04
+#define C1_CLEAR_SYNC   0x08
+#define C1_TIE          0x10
+#define C1_RIE          0x20
+#define C1_AC_MASK      0xc0
+#define C1_AC_C2        0x00
+#define C1_AC_C3        0x40
+#define C1_AC_SYNC      0x80
+#define C1_AC_TX_FIFO   0xc0
 
 
-#define C2_PC1			0x01
-#define C2_PC2			0x02
-#define C2_1_2_BYTE		0x04
-#define C2_WS_MASK		0x38
-#define C2_WS_6_E		0x00
-#define C2_WS_6_O		0x08
-#define C2_WS_7			0x10
-#define C2_WS_8			0x18
-#define C2_WS_7_E		0x20
-#define C2_WS_7_O		0x28
-#define C2_WS_8_E		0x30
-#define C2_WS_8_O		0x38
-#define C2_TX_SYNC		0x40
-#define C2_EIE			0x80
+#define C2_PC1          0x01
+#define C2_PC2          0x02
+#define C2_1_2_BYTE     0x04
+#define C2_WS_MASK      0x38
+#define C2_WS_6_E       0x00
+#define C2_WS_6_O       0x08
+#define C2_WS_7         0x10
+#define C2_WS_8         0x18
+#define C2_WS_7_E       0x20
+#define C2_WS_7_O       0x28
+#define C2_WS_8_E       0x30
+#define C2_WS_8_O       0x38
+#define C2_TX_SYNC      0x40
+#define C2_EIE          0x80
 
 
-#define C3_E_I_SYNC		0x01
-#define C3_1_2_SYNC		0x02
-#define C3_CLEAR_CTS	0x04
-#define C3_CTUF			0x08
+#define C3_E_I_SYNC     0x01
+#define C3_1_2_SYNC     0x02
+#define C3_CLEAR_CTS    0x04
+#define C3_CTUF         0x08
 
 
 //**************************************************************************
@@ -105,7 +105,7 @@ inline void mc6852_device::transmit()
 //-------------------------------------------------
 
 mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MC6852, "MC6852", tag, owner, clock)
+	: device_t(mconfig, MC6852, "MC6852", tag, owner, clock)
 {
 }
 
@@ -272,10 +272,10 @@ WRITE8_MEMBER( mc6852_device::write )
 		if (data & C1_RX_RS)
 		{
 			/* When Rx Rs is set, it clears the receiver
-            control logic, sync logic, error logic, Rx Data FIFO Control,
-            Parity Error status bit, and DCD interrupt. The Receiver Shift
-            Register is set to ones.
-            */
+			control logic, sync logic, error logic, Rx Data FIFO Control,
+			Parity Error status bit, and DCD interrupt. The Receiver Shift
+			Register is set to ones.
+			*/
 
 			if (LOG) logerror("MC6852 '%s' Receiver Reset\n", tag());
 
@@ -287,11 +287,11 @@ WRITE8_MEMBER( mc6852_device::write )
 		if (data & C1_TX_RS)
 		{
 			/* When Tx Rs is set, it clears the transmitter
-            control section, Transmitter Shift Register, Tx Data FIFO
-            Control (the Tx Data FIFO can be reloaded after one E clock
-            pulse), the Transmitter Underflow status bit, and the CTS interrupt,
-            and inhibits the TDRA status bit (in the one-sync-character
-            and two-sync-character modes).*/
+			control section, Transmitter Shift Register, Tx Data FIFO
+			Control (the Tx Data FIFO can be reloaded after one E clock
+			pulse), the Transmitter Underflow status bit, and the CTS interrupt,
+			and inhibits the TDRA status bit (in the one-sync-character
+			and two-sync-character modes).*/
 
 			if (LOG) logerror("MC6852 '%s' Transmitter Reset\n", tag());
 

@@ -10,20 +10,20 @@
 ****************************************************************************/
 #include "emu.h"
 
-#define APPNAME					"MESS"
-#define APPNAME_LOWER			"mess"
-#define CONFIGNAME				"mess"
-#define APPLONGNAME				"M.E.S.S."
-#define FULLLONGNAME			"Multi Emulator Super System"
-#define CAPGAMENOUN				"SYSTEM"
-#define CAPSTARTGAMENOUN		"System"
-#define GAMENOUN				"system"
-#define GAMESNOUN				"systems"
-#define COPYRIGHT				"Copyright the MESS team\nhttp://mess.org"
-#define COPYRIGHT_INFO			"Copyright the MESS team\n\n" \
+#define APPNAME                 "MESS"
+#define APPNAME_LOWER           "mess"
+#define CONFIGNAME              "mess"
+#define APPLONGNAME             "M.E.S.S."
+#define FULLLONGNAME            "Multi Emulator Super System"
+#define CAPGAMENOUN             "SYSTEM"
+#define CAPSTARTGAMENOUN        "System"
+#define GAMENOUN                "system"
+#define GAMESNOUN               "systems"
+#define COPYRIGHT               "Copyright the MESS team\nhttp://mess.org"
+#define COPYRIGHT_INFO          "Copyright the MESS team\n\n" \
 								"MESS is based on MAME Source code\n" \
 								"Copyright Nicola Salmoria and the MAME team"
-#define DISCLAIMER				"MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"\
+#define DISCLAIMER              "MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"\
 								"several computer and console systems. But hardware is useless without software\n" \
 								"so a file dump of the ROM, cartridges, discs, and cassettes which run on that\n" \
 								"hardware is required. Such files, like any other commercial software, are\n" \
@@ -32,10 +32,10 @@
 								"files are not distributed together with MESS. Distribution of MESS together\n" \
 								"with these files is a violation of copyright law and should be promptly\n" \
 								"reported to the authors so that appropriate legal action can be taken.\n"
-#define USAGE					"Usage:  %s [%s] [media] [software] [options]"
-#define XML_ROOT			    "mess"
-#define XML_TOP 				"machine"
-#define STATE_MAGIC_NUM			"MESSSAVE"
+#define USAGE                   "Usage:  %s [%s] [media] [software] [options]"
+#define XML_ROOT                "mess"
+#define XML_TOP                 "machine"
+#define STATE_MAGIC_NUM         "MESSSAVE"
 
 const char * emulator_info::get_appname() { return APPNAME;}
 const char * emulator_info::get_appname_lower() { return APPNAME_LOWER;}

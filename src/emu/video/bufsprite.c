@@ -66,6 +66,3 @@ WRITE32_HANDLER( buffer_spriteram32_2_w ) { }
 /* perform the actual buffering */
 void buffer_spriteram(running_machine &machine, UINT8 *ptr, int length) { }
 void buffer_spriteram_2(running_machine &machine, UINT8 *ptr, int length) { }
-
-
-

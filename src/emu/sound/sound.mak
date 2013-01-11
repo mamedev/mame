@@ -62,7 +62,7 @@ ifneq ($(filter DISCRETE,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/discrete.o
 endif
 
-$(SOUNDOBJ)/discrete.o:	$(SOUNDSRC)/discrete.c \
+$(SOUNDOBJ)/discrete.o: $(SOUNDSRC)/discrete.c \
 						$(SOUNDSRC)/discrete.h \
 						$(SOUNDSRC)/disc_dev.c \
 						$(SOUNDSRC)/disc_sys.c \
@@ -483,8 +483,8 @@ ifneq ($(filter AICA,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/aica.o $(SOUNDOBJ)/aicadsp.o
 endif
 
-$(SOUNDOBJ)/scsp.o:	$(SOUNDSRC)/scsplfo.c
-$(SOUNDOBJ)/aica.o:	$(SOUNDSRC)/aicalfo.c
+$(SOUNDOBJ)/scsp.o: $(SOUNDSRC)/scsplfo.c
+$(SOUNDOBJ)/aica.o: $(SOUNDSRC)/aicalfo.c
 
 
 
@@ -630,8 +630,8 @@ ifneq ($(filter TMS5220,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/tms5220.o
 endif
 
-$(SOUNDOBJ)/tms5110.o:	$(SOUNDSRC)/tms5110r.c
-$(SOUNDOBJ)/tms5220.o:	$(SOUNDSRC)/tms5220r.c
+$(SOUNDOBJ)/tms5110.o:  $(SOUNDSRC)/tms5110r.c
+$(SOUNDOBJ)/tms5220.o:  $(SOUNDSRC)/tms5220r.c
 
 
 

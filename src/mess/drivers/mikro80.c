@@ -20,11 +20,11 @@
 /* Address maps */
 static ADDRESS_MAP_START(mikro80_mem, AS_PROGRAM, 8, mikro80_state )
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
-    AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
-    AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_SHARE("cursor_ram")// Video RAM
-    AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_SHARE("video_ram") // Video RAM
-    AM_RANGE( 0xd000, 0xf7ff ) AM_RAM  // RAM
-    AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
+	AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
+	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  AM_SHARE("cursor_ram")// Video RAM
+	AM_RANGE( 0xe800, 0xefff ) AM_RAM  AM_SHARE("video_ram") // Video RAM
+	AM_RANGE( 0xd000, 0xf7ff ) AM_RAM  // RAM
+	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mikro80_io , AS_IO, 8, mikro80_state )
@@ -154,15 +154,15 @@ static const cassette_interface mikro80_cassette_interface =
 /* F4 Character Displayer */
 static const gfx_layout mikro80_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( mikro80 )
@@ -230,13 +230,13 @@ ROM_START( radio99 )
 ROM_END
 
 ROM_START( kristall2 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "kristall-2.rom", 0xf800, 0x0800, CRC(e1b5c60f) SHA1(8ce5158def7fca91ec7e11efbb10aa5d70b7c36d))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD( "kristall-2.fnt", 0x0000, 0x0800, CRC(9661c9f5) SHA1(830c38735dcb1c8a271fa0027f94b4e034848fc8))
 ROM_END
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1983, mikro80,	 0, 	 0,	mikro80,	mikro80, mikro80_state,	mikro80, "<unknown>", "Mikro-80",	 0)
-COMP( 1993, radio99, mikro80,	 0,	radio99,	mikro80, mikro80_state,	radio99, "<unknown>", "Radio-99DM",	 0)
-COMP( 1987, kristall2, mikro80,	 0,	kristall,	mikro80, mikro80_state,	mikro80, "<unknown>", "Kristall-2",	 0)
+COMP( 1983, mikro80,     0,      0, mikro80,    mikro80, mikro80_state, mikro80, "<unknown>", "Mikro-80",    0)
+COMP( 1993, radio99, mikro80,    0, radio99,    mikro80, mikro80_state, radio99, "<unknown>", "Radio-99DM",  0)
+COMP( 1987, kristall2, mikro80,  0, kristall,   mikro80, mikro80_state, mikro80, "<unknown>", "Kristall-2",  0)

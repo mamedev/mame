@@ -91,4 +91,3 @@ UINT8 vcs_joystick_booster_device::vcs_pot_y_r()
 {
 	return ioport("POTY")->read();
 }
-

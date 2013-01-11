@@ -1,5 +1,5 @@
 
-#define	MAX_SAMPLES	0x2f		/* max samples */
+#define MAX_SAMPLES 0x2f        /* max samples */
 
 enum
 {
@@ -48,8 +48,8 @@ public:
 	int      m_bank1;
 	int      m_bank2;
 
-	UINT8*	 m_bankedram;
-	UINT8*	 m_ROM;
+	UINT8*   m_bankedram;
+	UINT8*   m_ROM;
 
 	/* devices */
 	cpu_device *m_audiocpu;

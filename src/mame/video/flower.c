@@ -39,29 +39,29 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		int xblock,yblock;
 		int sy = 256-32-source[0]+1;
-		int	sx = (source[4]|(source[5]<<8))-55;
+		int sx = (source[4]|(source[5]<<8))-55;
 		int code = source[1] & 0x3f;
 		int color = (source[6]>>4);
 
 		/*
-            Byte 0: Y
-            Byte 1:
-                0x80 - FlipY
-                0x40 - FlipX
-                0x3f - Tile
-            Byte 2:
-                0x08 - Tile MSB
-                0x01 - Tile MSB
-            Byte 3:
-                0x07 - X Zoom
-                0x08 - X Size
-                0x70 - Y Zoom
-                0x80 - Y Size
-            Byte 4: X LSB
-            Byte 5: X MSB
-            Byte 6:
-                0xf0 - Colour
-        */
+		    Byte 0: Y
+		    Byte 1:
+		        0x80 - FlipY
+		        0x40 - FlipX
+		        0x3f - Tile
+		    Byte 2:
+		        0x08 - Tile MSB
+		        0x01 - Tile MSB
+		    Byte 3:
+		        0x07 - X Zoom
+		        0x08 - X Size
+		        0x70 - Y Zoom
+		        0x80 - Y Size
+		    Byte 4: X LSB
+		    Byte 5: X MSB
+		    Byte 6:
+		        0xf0 - Colour
+		*/
 
 		int flipy = source[1] & 0x80;
 		int flipx = source[1] & 0x40;

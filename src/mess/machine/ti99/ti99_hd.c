@@ -61,7 +61,7 @@ bool mfm_harddisk_device::harddisk_chs_to_lba(hard_disk_file *hdfile, int cylind
 	{
 		info = hard_disk_get_info(hdfile);
 
-		if (	(cylinder >= info->cylinders) ||
+		if (    (cylinder >= info->cylinders) ||
 				(head >= info->heads) ||
 				(sector >= info->sectors))
 		return false;
@@ -425,7 +425,7 @@ void mfm_harddisk_device::seek(int direction)
 	const hard_disk_info *info;
 	hard_disk_file *file = m_drive->get_hard_disk_file();
 
-	if (file==NULL)	return;
+	if (file==NULL) return;
 
 	info = hard_disk_get_info(file);
 
@@ -501,4 +501,3 @@ machine_config_constructor mfm_harddisk_device::device_mconfig_additions() const
 }
 
 const device_type TI99_MFMHD = &device_creator<mfm_harddisk_device>;
-

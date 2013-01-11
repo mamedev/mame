@@ -17,7 +17,7 @@
 
 // t = R*C = 3.3K * 0.47uF * 40% Vtr = 792.2905424610516 usec
 // (3.3K pull-up on the EXROM line inside the C64, PLA Vih min = 2.0V = 40% of 5.0V)
-#define TIMER_PERIOD	792
+#define TIMER_PERIOD    792
 
 
 

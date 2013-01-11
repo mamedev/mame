@@ -12,23 +12,23 @@
 #include "video/mc6847.h"
 #include "sound/ay8910.h"
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"z80"
-#define AY8910_TAG		"ay8910"
-#define MC6847_TAG		"mc6847"
-#define CENTRONICS_TAG	"centronics"
+#define SCREEN_TAG      "screen"
+#define Z80_TAG         "z80"
+#define AY8910_TAG      "ay8910"
+#define MC6847_TAG      "mc6847"
+#define CENTRONICS_TAG  "centronics"
 
-#define PHC25_VIDEORAM_SIZE		0x1800
+#define PHC25_VIDEORAM_SIZE     0x1800
 
 class phc25_state : public driver_device
 {
 public:
 	phc25_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_vdg(*this, MC6847_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_vdg(*this, MC6847_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	,
 		m_video_ram(*this, "video_ram"){ }
 

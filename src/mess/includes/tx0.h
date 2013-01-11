@@ -57,14 +57,14 @@ enum irg_pos_t
 /* tape reader registers */
 struct tape_reader_t
 {
-	device_image_interface *fd;	/* file descriptor of tape image */
+	device_image_interface *fd; /* file descriptor of tape image */
 
-	int motor_on;	/* 1-bit reader motor on */
+	int motor_on;   /* 1-bit reader motor on */
 
-	int rcl;		/* 1-bit reader clutch */
-	int rc;			/* 2-bit reader counter */
+	int rcl;        /* 1-bit reader clutch */
+	int rc;         /* 2-bit reader counter */
 
-	emu_timer *timer;	/* timer to simulate reader timing */
+	emu_timer *timer;   /* timer to simulate reader timing */
 };
 
 
@@ -72,9 +72,9 @@ struct tape_reader_t
 /* tape puncher registers */
 struct tape_puncher_t
 {
-	device_image_interface *fd;	/* file descriptor of tape image */
+	device_image_interface *fd; /* file descriptor of tape image */
 
-	emu_timer *timer;	/* timer to generate completion pulses */
+	emu_timer *timer;   /* timer to generate completion pulses */
 };
 
 
@@ -82,7 +82,7 @@ struct tape_puncher_t
 /* typewriter registers */
 struct typewriter_t
 {
-	device_image_interface *fd;	/* file descriptor of output image */
+	device_image_interface *fd; /* file descriptor of output image */
 
 	emu_timer *prt_timer;/* timer to generate completion pulses */
 };
@@ -91,7 +91,7 @@ struct typewriter_t
 /* magnetic tape unit registers */
 struct magtape_t
 {
-	device_image_interface *img;		/* image descriptor */
+	device_image_interface *img;        /* image descriptor */
 
 	state_t state;
 
@@ -116,11 +116,11 @@ struct magtape_t
 	int sel_pending;
 	int cpy_pending;
 
-	irg_pos_t irg_pos;			/* position relative to inter-record gap */
+	irg_pos_t irg_pos;          /* position relative to inter-record gap */
 
 	int long_parity;
 
-	emu_timer *timer;	/* timer to simulate reader timing */
+	emu_timer *timer;   /* timer to simulate reader timing */
 };
 
 
@@ -173,19 +173,19 @@ void tx0_typewriter_drawchar(running_machine &machine, int character);
 enum
 {
 	/* bit numbers */
-	tx0_control_bit		= 0,
+	tx0_control_bit     = 0,
 
-	tx0_stop_c0_bit		= 1,
-	tx0_stop_c1_bit		= 2,
-	tx0_gbl_cm_sel_bit	= 3,
-	tx0_stop_bit		= 4,
-	tx0_restart_bit		= 5,
-	tx0_read_in_bit		= 6,
+	tx0_stop_c0_bit     = 1,
+	tx0_stop_c1_bit     = 2,
+	tx0_gbl_cm_sel_bit  = 3,
+	tx0_stop_bit        = 4,
+	tx0_restart_bit     = 5,
+	tx0_read_in_bit     = 6,
 
-	tx0_toggle_dn_bit	= 12,
-	tx0_toggle_up_bit	= 13,
-	tx0_cm_sel_bit		= 14,
-	tx0_lr_sel_bit		= 15,
+	tx0_toggle_dn_bit   = 12,
+	tx0_toggle_up_bit   = 13,
+	tx0_cm_sel_bit      = 14,
+	tx0_lr_sel_bit      = 15,
 
 	/* masks */
 	tx0_control = (1 << tx0_control_bit),
@@ -206,7 +206,7 @@ enum
 /* defines for our font */
 enum
 {
-	tx0_charnum = /*96*/128,	/* ASCII set + xx special characters */
+	tx0_charnum = /*96*/128,    /* ASCII set + xx special characters */
 									/* for whatever reason, 96 breaks some characters */
 
 	tx0_fontdata_size = 8 * tx0_charnum
@@ -246,7 +246,7 @@ enum
 };
 
 enum
-{	/* refresh rate in Hz: can be changed at will */
+{   /* refresh rate in Hz: can be changed at will */
 	refresh_rate = 60
 };
 
@@ -276,8 +276,8 @@ enum
 
 	/* color constants for typewriter */
 	pen_typewriter_bg = pen_white,
-	color_typewriter_black = 1,		/* palette 1 = black on white */
-	color_typewriter_red = 2,		/* palette 2 = red on white */
+	color_typewriter_black = 1,     /* palette 1 = black on white */
+	color_typewriter_red = 2,       /* palette 2 = red on white */
 
 	/* color constants used for light pen */
 	pen_lightpen_nonpressed = pen_red,

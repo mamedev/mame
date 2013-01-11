@@ -32,8 +32,8 @@
 #include "machine/nvram.h"
 
 
-#define MASTER_CLOCK_40MHz		(XTAL_40MHz)
-#define MASTER_CLOCK_25MHz		(XTAL_25MHz)
+#define MASTER_CLOCK_40MHz      (XTAL_40MHz)
+#define MASTER_CLOCK_25MHz      (XTAL_25MHz)
 
 
 /*************************************
@@ -166,12 +166,12 @@ static void ultennis_protection(running_machine &machine)
 	/* check the command byte */
 	switch (state->m_prot_input[0])
 	{
-		case 0x00:	/* reset */
+		case 0x00:  /* reset */
 			state->m_prot_input_index = state->m_prot_output_index = 0;
 			state->m_prot_output[0] = machine.rand();
 			break;
 
-		case 0x01:	/* 01 aaaa bbbb cccc dddd (xxxx) */
+		case 0x01:  /* 01 aaaa bbbb cccc dddd (xxxx) */
 			if (state->m_prot_input_index == 9)
 			{
 				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
@@ -192,20 +192,20 @@ static void ultennis_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x02:	/* 02 aaaa bbbb cccc (xxxxxxxx) */
+		case 0x02:  /* 02 aaaa bbbb cccc (xxxxxxxx) */
 			/*
-                Ultimate Tennis -- actual values from a board:
+			    Ultimate Tennis -- actual values from a board:
 
-                    hex                             decimal
-                    0041 0084 00c8 -> 00044142       65 132 200 -> 278850 = 65*65*66
-                    001e 0084 00fc -> 0000e808       30 132 252 ->  59400 = 30*30*66
-                    0030 007c 005f -> 00022e00       48 124  95 -> 142848 = 48*48*62
-                    0024 00dd 0061 -> 00022ce0       36 221  97 -> 142560 = 36*36*110
-                    0025 0096 005b -> 00019113       37 150  91 -> 102675 = 37*37*75
-                    0044 00c9 004c -> 00070e40       68 201  76 -> 462400 = 68*68*100
+			        hex                             decimal
+			        0041 0084 00c8 -> 00044142       65 132 200 -> 278850 = 65*65*66
+			        001e 0084 00fc -> 0000e808       30 132 252 ->  59400 = 30*30*66
+			        0030 007c 005f -> 00022e00       48 124  95 -> 142848 = 48*48*62
+			        0024 00dd 0061 -> 00022ce0       36 221  97 -> 142560 = 36*36*110
+			        0025 0096 005b -> 00019113       37 150  91 -> 102675 = 37*37*75
+			        0044 00c9 004c -> 00070e40       68 201  76 -> 462400 = 68*68*100
 
-                question is: what is the 3rd value doing there?
-            */
+			    question is: what is the 3rd value doing there?
+			*/
 			if (state->m_prot_input_index == 7)
 			{
 				UINT16 a = (INT16)(state->m_prot_input[1] | (state->m_prot_input[2] << 8));
@@ -222,7 +222,7 @@ static void ultennis_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x03:	/* 03 (xxxx) */
+		case 0x03:  /* 03 (xxxx) */
 			if (state->m_prot_input_index == 1)
 			{
 				UINT16 x = state->m_prot_save;
@@ -234,7 +234,7 @@ static void ultennis_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x04:	/* 04 aaaa */
+		case 0x04:  /* 04 aaaa */
 			if (state->m_prot_input_index == 3)
 			{
 				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
@@ -257,18 +257,18 @@ static void cheesech_protection(running_machine &machine)
 	/* check the command byte */
 	switch (state->m_prot_input[0])
 	{
-		case 0x00:	/* reset */
+		case 0x00:  /* reset */
 			state->m_prot_input_index = state->m_prot_output_index = 0;
 			state->m_prot_output[0] = machine.rand();
 			break;
 
-		case 0x01:	/* 01 aaaa bbbb (xxxx) */
+		case 0x01:  /* 01 aaaa bbbb (xxxx) */
 			if (state->m_prot_input_index == 5)
 			{
 				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
 				UINT16 b = state->m_prot_input[3] | (state->m_prot_input[4] << 8);
-				UINT16 c = 0x4000;		/* seems to be hard-coded */
-				UINT16 d = 0x00a0;		/* seems to be hard-coded */
+				UINT16 c = 0x4000;      /* seems to be hard-coded */
+				UINT16 d = 0x00a0;      /* seems to be hard-coded */
 				UINT16 x = a - b;
 				if ((INT16)x >= 0)
 					x = (x * c) >> 16;
@@ -283,7 +283,7 @@ static void cheesech_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x03:	/* 03 (xxxx) */
+		case 0x03:  /* 03 (xxxx) */
 			if (state->m_prot_input_index == 1)
 			{
 				UINT16 x = state->m_prot_save;
@@ -295,7 +295,7 @@ static void cheesech_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x04:	/* 04 aaaa */
+		case 0x04:  /* 04 aaaa */
 			if (state->m_prot_input_index == 3)
 			{
 				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
@@ -318,7 +318,7 @@ static void stonebal_protection(running_machine &machine)
 	/* check the command byte */
 	switch (state->m_prot_input[0])
 	{
-		case 0x01:	/* 01 aaaa bbbb cccc dddd (xxxx) */
+		case 0x01:  /* 01 aaaa bbbb cccc dddd (xxxx) */
 			if (state->m_prot_input_index == 9)
 			{
 				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
@@ -339,7 +339,7 @@ static void stonebal_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x02:	/* 02 aaaa (xx) */
+		case 0x02:  /* 02 aaaa (xx) */
 			if (state->m_prot_input_index == 3)
 			{
 				/*UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);*/
@@ -351,7 +351,7 @@ static void stonebal_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x03:	/* 03 (xxxx) */
+		case 0x03:  /* 03 (xxxx) */
 			if (state->m_prot_input_index == 1)
 			{
 				UINT16 x = state->m_prot_save;
@@ -363,7 +363,7 @@ static void stonebal_protection(running_machine &machine)
 				state->m_prot_input_index = 0;
 			break;
 
-		case 0x04:	/* 04 aaaa */
+		case 0x04:  /* 04 aaaa */
 			if (state->m_prot_input_index == 3)
 			{
 				UINT16 a = state->m_prot_input[1] | (state->m_prot_input[2] << 8);
@@ -487,15 +487,15 @@ ADDRESS_MAP_END
 
 static const tms34010_config tms_config =
 {
-	TRUE,							/* halt on reset */
-	"screen",						/* the screen operated on */
-	MASTER_CLOCK_40MHz/6,			/* pixel clock */
-	1,								/* pixels per clock */
-	NULL,							/* scanline update (indexed16) */
-	artmagic_scanline,				/* scanline update (rgb32) */
-	m68k_gen_int,					/* generate interrupt */
-	artmagic_to_shiftreg,			/* write to shiftreg function */
-	artmagic_from_shiftreg			/* read from shiftreg function */
+	TRUE,                           /* halt on reset */
+	"screen",                       /* the screen operated on */
+	MASTER_CLOCK_40MHz/6,           /* pixel clock */
+	1,                              /* pixels per clock */
+	NULL,                           /* scanline update (indexed16) */
+	artmagic_scanline,              /* scanline update (rgb32) */
+	m68k_gen_int,                   /* generate interrupt */
+	artmagic_to_shiftreg,           /* write to shiftreg function */
+	artmagic_from_shiftreg          /* read from shiftreg function */
 };
 
 
@@ -570,21 +570,21 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("300004")
-	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SWB:8" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x0006, 0x0004, DEF_STR( Language ) )		PORT_DIPLOCATION("SWB:6,7")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SWB:8" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x0006, 0x0004, DEF_STR( Language ) )     PORT_DIPLOCATION("SWB:6,7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Italian ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( German ) )
-	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ))			PORT_DIPLOCATION("SWB:4,5")
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ))         PORT_DIPLOCATION("SWB:4,5")
 	PORT_DIPSETTING(      0x0008, "3" )
 	PORT_DIPSETTING(      0x0018, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_DIPSETTING(      0x0010, "6" )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SWB:3")
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00c0, 0x0040, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SWB:1,2")
+	PORT_DIPNAME( 0x00c0, 0x0040, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(      0x00c0, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
@@ -592,7 +592,7 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("300006")
-	PORT_DIPNAME( 0x0007, 0x0007, "Right Coinage" )		PORT_DIPLOCATION("SWA:6,7,8")
+	PORT_DIPNAME( 0x0007, 0x0007, "Right Coinage" )     PORT_DIPLOCATION("SWA:6,7,8")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 6C_1C ))
 	PORT_DIPSETTING(      0x0006, DEF_STR( 5C_1C ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ))
@@ -601,7 +601,7 @@ static INPUT_PORTS_START( cheesech )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ))
-	PORT_DIPNAME( 0x0038, 0x0038, "Left Coinage"  )		PORT_DIPLOCATION("SWA:3,4,5")
+	PORT_DIPNAME( 0x0038, 0x0038, "Left Coinage"  )     PORT_DIPLOCATION("SWA:3,4,5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ))
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ))
@@ -610,7 +610,7 @@ static INPUT_PORTS_START( cheesech )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_4C ))
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_6C ))
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ))	PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play )) PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SWA:1" )
@@ -625,8 +625,8 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("30000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)	/* protection data */
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection ready */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)    /* protection data */
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -636,16 +636,16 @@ static INPUT_PORTS_START( ultennis )
 	PORT_INCLUDE(cheesech)
 
 	PORT_MODIFY("300004")
-	PORT_DIPNAME( 0x0001, 0x0001, "Button Layout" )			PORT_DIPLOCATION("SWB:8")
+	PORT_DIPNAME( 0x0001, 0x0001, "Button Layout" )         PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(      0x0001, "Triangular" )
 	PORT_DIPSETTING(      0x0000, "Linear" )
-	PORT_DIPNAME( 0x0002, 0x0002, "Start Set At" )			PORT_DIPLOCATION("SWB:7")
+	PORT_DIPNAME( 0x0002, 0x0002, "Start Set At" )          PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(      0x0000, "0-0" )
 	PORT_DIPSETTING(      0x0002, "4-4" )
-	PORT_DIPNAME( 0x0004, 0x0004, "Sets Per Match" )		PORT_DIPLOCATION("SWB:6")
+	PORT_DIPNAME( 0x0004, 0x0004, "Sets Per Match" )        PORT_DIPLOCATION("SWB:6")
 	PORT_DIPSETTING(      0x0004, "1" )
 	PORT_DIPSETTING(      0x0000, "3" )
-	PORT_DIPNAME( 0x0018, 0x0008, "Game Duratiob" )			PORT_DIPLOCATION("SWB:4,5")
+	PORT_DIPNAME( 0x0018, 0x0008, "Game Duratiob" )         PORT_DIPLOCATION("SWB:4,5")
 	PORT_DIPSETTING(      0x0018, "5 Lost Points" )
 	PORT_DIPSETTING(      0x0008, "6 Lost Points" )
 	PORT_DIPSETTING(      0x0010, "7 Lost Points" )
@@ -658,10 +658,10 @@ static INPUT_PORTS_START( stonebal )
 
 	PORT_MODIFY("300004")
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SWA:1" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Free_Play ))		PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Free_Play ))     PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x001c, 0x001c, "Left Coinage" )			PORT_DIPLOCATION("SWA:3,4,5")
+	PORT_DIPNAME( 0x001c, 0x001c, "Left Coinage" )          PORT_DIPLOCATION("SWA:3,4,5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ))
 	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ))
@@ -670,7 +670,7 @@ static INPUT_PORTS_START( stonebal )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_4C ))
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_6C ))
-	PORT_DIPNAME( 0x00e0, 0x00e0, "Right Coinage" )			PORT_DIPLOCATION("SWA:6,7,8")
+	PORT_DIPNAME( 0x00e0, 0x00e0, "Right Coinage" )         PORT_DIPLOCATION("SWA:6,7,8")
 	PORT_DIPSETTING(      0x0040, DEF_STR( 6C_1C ))
 	PORT_DIPSETTING(      0x0060, DEF_STR( 5C_1C ))
 	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ))
@@ -681,15 +681,15 @@ static INPUT_PORTS_START( stonebal )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ))
 
 	PORT_MODIFY("300006")
-	PORT_DIPNAME( 0x0003, 0x0002, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SWB:1,2")
+	PORT_DIPNAME( 0x0003, 0x0002, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(      0x0003, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SWB:3")
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0038, 0x0038, "Match Time" )			PORT_DIPLOCATION("SWB:4,5,6")
+	PORT_DIPNAME( 0x0038, 0x0038, "Match Time" )            PORT_DIPLOCATION("SWB:4,5,6")
 	PORT_DIPSETTING(      0x0030, "60s" )
 	PORT_DIPSETTING(      0x0028, "70s" )
 	PORT_DIPSETTING(      0x0020, "80s" )
@@ -698,10 +698,10 @@ static INPUT_PORTS_START( stonebal )
 	PORT_DIPSETTING(      0x0010, "110s" )
 	PORT_DIPSETTING(      0x0008, "120s" )
 	PORT_DIPSETTING(      0x0000, "130s" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Free Match Time" )		PORT_DIPLOCATION("SWB:7")
+	PORT_DIPNAME( 0x0040, 0x0040, "Free Match Time" )       PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Short" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Game Mode" )				PORT_DIPLOCATION("SWB:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Game Mode" )             PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(      0x0080, "4 Players" )
 	PORT_DIPSETTING(      0x0000, "2 Players" )
 
@@ -733,7 +733,7 @@ static INPUT_PORTS_START( stoneba2 )
 	PORT_INCLUDE(stonebal)
 
 	PORT_MODIFY("300006")
-	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SWB:8" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SWB:8" )        /* Listed as "Unused" */
 INPUT_PORTS_END
 
 
@@ -762,21 +762,21 @@ static INPUT_PORTS_START( shtstar )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("3c0004")
-	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SWB:8" )		/* Listed as "Unused" */
-	PORT_DIPNAME( 0x0006, 0x0004, DEF_STR( Language ) )		PORT_DIPLOCATION("SWB:6,7")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SWB:8" )        /* Listed as "Unused" */
+	PORT_DIPNAME( 0x0006, 0x0004, DEF_STR( Language ) )     PORT_DIPLOCATION("SWB:6,7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Italian ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( German ) )
-	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ))			PORT_DIPLOCATION("SWB:4,5")
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ))         PORT_DIPLOCATION("SWB:4,5")
 	PORT_DIPSETTING(      0x0008, "3" )
 	PORT_DIPSETTING(      0x0018, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_DIPSETTING(      0x0010, "6" )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SWB:3")
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00c0, 0x0040, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SWB:1,2")
+	PORT_DIPNAME( 0x00c0, 0x0040, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(      0x00c0, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
@@ -784,7 +784,7 @@ static INPUT_PORTS_START( shtstar )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("3c0006")
-	PORT_DIPNAME( 0x0007, 0x0007, "Right Coinage" )		PORT_DIPLOCATION("SWA:6,7,8")
+	PORT_DIPNAME( 0x0007, 0x0007, "Right Coinage" )     PORT_DIPLOCATION("SWA:6,7,8")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 6C_1C ))
 	PORT_DIPSETTING(      0x0006, DEF_STR( 5C_1C ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ))
@@ -793,7 +793,7 @@ static INPUT_PORTS_START( shtstar )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ))
-	PORT_DIPNAME( 0x0038, 0x0038, "Left Coinage"  )		PORT_DIPLOCATION("SWA:3,4,5")
+	PORT_DIPNAME( 0x0038, 0x0038, "Left Coinage"  )     PORT_DIPLOCATION("SWA:3,4,5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ))
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ))
@@ -802,7 +802,7 @@ static INPUT_PORTS_START( shtstar )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_4C ))
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_5C ))
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_6C ))
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ))	PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play )) PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SWA:1" )
@@ -817,8 +817,8 @@ static INPUT_PORTS_START( shtstar )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("3c000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)	/* protection data */
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection ready */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)    /* protection data */
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -905,7 +905,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( cheesech )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(1d6e07c5) SHA1(8650868cce47f685d22131aa28aad45033cb0a52) )
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(30ae9f95) SHA1(fede5d271aabb654c1efc077253d81ba23786f22) )
 
@@ -919,7 +919,7 @@ ROM_END
 
 
 ROM_START( ultennis )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "utu102.bin", 0x00000, 0x40000, CRC(ec31385e) SHA1(244e78619c549712d5541fb252656afeba639bb7) )
 	ROM_LOAD16_BYTE( "utu101.bin", 0x00001, 0x40000, CRC(08a7f655) SHA1(b8a4265472360b68bed71d6c175fc54dff088c1d) )
 
@@ -932,7 +932,7 @@ ROM_END
 
 
 ROM_START( ultennisj )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "a&m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) )
 	ROM_LOAD16_BYTE( "a&m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) )
 
@@ -985,7 +985,7 @@ u1601.bin     32M Mask       8642h  /  Gfx
 */
 
 ROM_START( stonebal )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(712feda1) SHA1(c5b385f425786566fa274fe166a7116615a8ce86) )
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(4f1656a9) SHA1(720717ae4166b3ec50bb572197a8c6c96b284648) )
 
@@ -999,7 +999,7 @@ ROM_END
 
 
 ROM_START( stonebal2 )
-	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "u102.bin", 0x00000, 0x40000, CRC(b3c4f64f) SHA1(6327e9f3cd9deb871a6910cf1f006c8ee143e859) )
 	ROM_LOAD16_BYTE( "u101.bin", 0x00001, 0x40000, CRC(fe373f74) SHA1(bafac4bbd1aae4ccc4ae16205309483f1bbdd464) )
 
@@ -1178,7 +1178,7 @@ DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 DRIVER_INIT_MEMBER(artmagic_state,stonebal)
 {
 	decrypt_ultennis(machine());
-	m_is_stoneball = 1;	/* blits 1 line high are NOT encrypted, also different first pixel decrypt */
+	m_is_stoneball = 1; /* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	m_protection_handler = stonebal_protection;
 }
 
@@ -1204,5 +1204,3 @@ GAME( 1994, cheesech, 0,        cheesech, cheesech, artmagic_state, cheesech, RO
 GAME( 1994, stonebal, 0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal2,stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1994, shtstar, 0, shtstar, shtstar, artmagic_state, shtstar, ROT0, "Nova", "Shooting Star", GAME_NOT_WORKING )
-
-

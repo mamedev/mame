@@ -2,18 +2,18 @@
 
 
 #define VERBOSE 1
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 #define M1_MASTER_CLOCK (XTAL_8MHz)
 #define M1_DUART_CLOCK  (XTAL_3_6864MHz)
 
 #include "cpu/m6809/m6809.h"
-#include "video/awpvid.h"		//Fruit Machines Only
+#include "video/awpvid.h"       //Fruit Machines Only
 #include "machine/6821pia.h"
 #include "machine/68681.h"
 #include "machine/meters.h"
-#include "machine/roc10937.h"	// vfd
-#include "machine/steppers.h"	// stepper motor
+#include "machine/roc10937.h"   // vfd
+#include "machine/steppers.h"   // stepper motor
 #include "sound/ay8910.h"
 #include "sound/2413intf.h"
 #include "sound/okim6376.h"
@@ -21,18 +21,18 @@
 
 struct i8279_state
 {
-	UINT8		command;
-	UINT8		mode;
-	UINT8		prescale;
-	UINT8		inhibit;
-	UINT8		clear;
-	UINT8		ram[16];
-	UINT8		read_sensor;
-	UINT8		write_display;
-	UINT8		sense_address;
-	UINT8		sense_auto_inc;
-	UINT8		disp_address;
-	UINT8		disp_auto_inc;
+	UINT8       command;
+	UINT8       mode;
+	UINT8       prescale;
+	UINT8       inhibit;
+	UINT8       clear;
+	UINT8       ram[16];
+	UINT8       read_sensor;
+	UINT8       write_display;
+	UINT8       sense_address;
+	UINT8       sense_auto_inc;
+	UINT8       disp_address;
+	UINT8       disp_auto_inc;
 };
 
 
@@ -41,7 +41,7 @@ class maygay1b_state : public driver_device
 public:
 	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vfd(*this, "vfd")
+			m_vfd(*this, "vfd")
 	{
 
 		m_NMIENABLE = 0;

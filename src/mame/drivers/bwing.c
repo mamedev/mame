@@ -202,51 +202,51 @@ INPUT_CHANGED_MEMBER(bwing_state::tilt_pressed)
 
 static INPUT_PORTS_START( bwing )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, "Diagnostics" )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Diagnostics" )       PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invincibility" )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Invincibility" )     PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Infinite ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Infinite ) )     PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:2,3") /* Listed as "Not Used" in the manual */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:2,3") /* Listed as "Not Used" in the manual */
 	PORT_DIPSETTING(    0x00, "40000" )
 	PORT_DIPSETTING(    0x02, "20000 80000" )
 	PORT_DIPSETTING(    0x04, "20000 60000" )
 	PORT_DIPSETTING(    0x06, "20000 40000" )
-	PORT_DIPNAME( 0x08, 0x08, "Enemy Crafts" )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Enemy Crafts" )      PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x10, 0x10, "Enemy Missiles" )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Enemy Missiles" )        PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x20, 0x20, "Freeze" )			PORT_DIPLOCATION("SW2:6") /* Listed as "Not Used" in the manual */
+	PORT_DIPNAME( 0x20, 0x20, "Freeze" )            PORT_DIPLOCATION("SW2:6") /* Listed as "Not Used" in the manual */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Country" )			PORT_DIPLOCATION("SW2:7") /* Listed as "Not Used" in the manual */
+	PORT_DIPNAME( 0x40, 0x00, "Country" )           PORT_DIPLOCATION("SW2:7") /* Listed as "Not Used" in the manual */
 	PORT_DIPSETTING(    0x00, "Japan/US" )
 	PORT_DIPSETTING(    0x40, "Japan Only" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:8") /* Listed as "Not Used" in the manual */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8") /* Listed as "Not Used" in the manual */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -317,7 +317,7 @@ static const gfx_layout spritelayout =
 	{ 0x40000, 0x20000, 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0, 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+		8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	32*8
 };
 
@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	MCFG_CPU_IO_MAP(bwp3_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bwing_state, bwp3_interrupt,  1000)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(18000))		// high enough?
+	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
 
 
 	// video hardware
@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))	// must be long enough for polling
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))   // must be long enough for polling
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bwing_state, screen_update_bwing)

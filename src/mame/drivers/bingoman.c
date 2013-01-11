@@ -246,7 +246,7 @@ class bingoman_state : public driver_device
 public:
 	bingoman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	// devices
@@ -403,13 +403,13 @@ ROM_START( bingoman )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ps.020.u51",   0x000000, 0x080000, CRC(0f40b10d) SHA1(96a24547a612ba7c2b33c84a0f3afecc9a7cc076) ) // wrong ...
 
-	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )	// banked
-	ROM_LOAD( "p03_036.015.u01", 0x000000, 0x080000, CRC(b78b7fca) SHA1(8e4147bb8351db5b17e2bf39bb12ca31cf02f3a6) )	// Game 1 (Gold Jackpot)
-	ROM_LOAD( "p03_tms.030.u02", 0x080000, 0x080000, CRC(94f0076e) SHA1(45d0379ad232ae7c5723c87a5fed9f9cc576aea2) )	// Game 1 (Gold Jackpot)
-	ROM_LOAD( "p07_036.010.u03", 0x100000, 0x080000, CRC(dda80fab) SHA1(4fb06ca94a8a03e5ee91d4cb4a24ac35863a82a1) )	// Game 2 (Turbo Game)
-	ROM_LOAD( "p07_tms.025.u04", 0x180000, 0x080000, CRC(6c4a84f8) SHA1(e683753eaf54fdedd1cdc64c4dd4591e3b48dc75) )	// Game 2 (Turbo Game)
-	ROM_LOAD( "p14_036.012.u05", 0x200000, 0x080000, CRC(a9f2c609) SHA1(0669aba100a8263b99373d7ac997ec4f1967bb1b) )	// Game 3 (Rolling Bingo - Joker Bonus)
-	ROM_LOAD( "p14_tms.030.u06", 0x280000, 0x080000, CRC(cdf60d47) SHA1(ef7e107f1713466fb18e940e90e7f46c781d4581) )	// Game 3 (Rolling Bingo - Joker Bonus)
+	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )    // banked
+	ROM_LOAD( "p03_036.015.u01", 0x000000, 0x080000, CRC(b78b7fca) SHA1(8e4147bb8351db5b17e2bf39bb12ca31cf02f3a6) ) // Game 1 (Gold Jackpot)
+	ROM_LOAD( "p03_tms.030.u02", 0x080000, 0x080000, CRC(94f0076e) SHA1(45d0379ad232ae7c5723c87a5fed9f9cc576aea2) ) // Game 1 (Gold Jackpot)
+	ROM_LOAD( "p07_036.010.u03", 0x100000, 0x080000, CRC(dda80fab) SHA1(4fb06ca94a8a03e5ee91d4cb4a24ac35863a82a1) ) // Game 2 (Turbo Game)
+	ROM_LOAD( "p07_tms.025.u04", 0x180000, 0x080000, CRC(6c4a84f8) SHA1(e683753eaf54fdedd1cdc64c4dd4591e3b48dc75) ) // Game 2 (Turbo Game)
+	ROM_LOAD( "p14_036.012.u05", 0x200000, 0x080000, CRC(a9f2c609) SHA1(0669aba100a8263b99373d7ac997ec4f1967bb1b) ) // Game 3 (Rolling Bingo - Joker Bonus)
+	ROM_LOAD( "p14_tms.030.u06", 0x280000, 0x080000, CRC(cdf60d47) SHA1(ef7e107f1713466fb18e940e90e7f46c781d4581) ) // Game 3 (Rolling Bingo - Joker Bonus)
 
 	ROM_REGION( 0x100000, "snd", ROMREGION_ERASE00 )
 	ROM_LOAD( "snd.u10.021.u10", 0x00000, 0x80000, CRC(676f7c4f) SHA1(acdec156cb2d7b880cc1668cce50268bb2b4ec72) )
@@ -432,13 +432,13 @@ ROM_START( bingomana )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ps.020.u51",   0x000000, 0x080000, CRC(0f40b10d) SHA1(96a24547a612ba7c2b33c84a0f3afecc9a7cc076) ) // wrong ...
 
-	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )	// banked
-	ROM_LOAD( "a03_037.013.u01", 0x000000, 0x080000, CRC(9c3ed8e9) SHA1(263431ed6db314bee64709bae16fa8c6d5adbd41) )	// Game 1 (Gold Jackpot)
-	ROM_LOAD( "a03_tms.010.u02", 0x080000, 0x080000, CRC(f4142b1a) SHA1(1a14865bd567d5e7bf9e0e0765f6443c8165f46b) )	// Game 1 (Gold Jackpot)
+	ROM_REGION( 0x300000, "tms", ROMREGION_ERASE00 )    // banked
+	ROM_LOAD( "a03_037.013.u01", 0x000000, 0x080000, CRC(9c3ed8e9) SHA1(263431ed6db314bee64709bae16fa8c6d5adbd41) ) // Game 1 (Gold Jackpot)
+	ROM_LOAD( "a03_tms.010.u02", 0x080000, 0x080000, CRC(f4142b1a) SHA1(1a14865bd567d5e7bf9e0e0765f6443c8165f46b) ) // Game 1 (Gold Jackpot)
 
 	ROM_REGION( 0x100000, "snd", ROMREGION_ERASE00 )
-	ROM_LOAD( "snd_u10.022.u10", 0x00000, 0x80000, CRC(216a9c4a) SHA1(f1eb5f6517d6b579bf977b8eb4dd3f3544b75796) )	// different revision
-	ROM_LOAD( "snd_u11.022.u11", 0x80000, 0x80000, CRC(c0bb0056) SHA1(c8bc3a618eb9be940e089ec00d88c0b92d42025c) )	// different revision
+	ROM_LOAD( "snd_u10.022.u10", 0x00000, 0x80000, CRC(216a9c4a) SHA1(f1eb5f6517d6b579bf977b8eb4dd3f3544b75796) )   // different revision
+	ROM_LOAD( "snd_u11.022.u11", 0x80000, 0x80000, CRC(c0bb0056) SHA1(c8bc3a618eb9be940e089ec00d88c0b92d42025c) )   // different revision
 
 	ROM_REGION( 0x10000, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "102u0530_gal16v8d.u05",   0x0000, 0x0892, CRC(3f0f57e5) SHA1(65383da38f4ad6c5ecaf84336eabea3a77db1307) )

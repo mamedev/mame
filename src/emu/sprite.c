@@ -45,17 +45,17 @@
 
 sparse_dirty_bitmap::sparse_dirty_bitmap(int granularity)
 	: m_width(0),
-	  m_height(0),
-	  m_granularity(granularity),
-	  m_rect_list_bounds(0, -1, 0, -1)
+		m_height(0),
+		m_granularity(granularity),
+		m_rect_list_bounds(0, -1, 0, -1)
 {
 }
 
 sparse_dirty_bitmap::sparse_dirty_bitmap(int width, int height, int granularity)
 	: m_width(0),
-	  m_height(0),
-	  m_granularity(granularity),
-	  m_rect_list_bounds(0, -1, 0, -1)
+		m_height(0),
+		m_granularity(granularity),
+		m_rect_list_bounds(0, -1, 0, -1)
 {
 	// resize to the specified width/height
 	resize(width, height);

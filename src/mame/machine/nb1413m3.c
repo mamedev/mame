@@ -15,7 +15,7 @@ Memo:
 #include "includes/nb1413m3.h"
 
 
-#define NB1413M3_DEBUG	0
+#define NB1413M3_DEBUG  0
 
 
 int nb1413m3_type;
@@ -27,7 +27,7 @@ int nb1413m3_busyflag;
 int nb1413m3_inputport;
 
 static int nb1413m3_74ls193_counter;
-static int nb1413m3_nmi_count;			// for debug
+static int nb1413m3_nmi_count;          // for debug
 static int nb1413m3_nmi_clock;
 static int nb1413m3_nmi_enable;
 static int nb1413m3_counter;
@@ -184,25 +184,25 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 		case NB1413M3_HYHOO2:
 			rombank = (nb1413m3_sndrombank1 & 0x01);
 			break;
-		case NB1413M3_APPAREL:		// no samples
-		case NB1413M3_NIGHTLOV:		// 0-1
-		case NB1413M3_SECOLOVE:		// 0-1
-		case NB1413M3_CITYLOVE:		// 0-1
-		case NB1413M3_MCITYLOV:		// 0-1
-		case NB1413M3_HOUSEMNQ:		// 0-1
-		case NB1413M3_HOUSEMN2:		// 0-1
-		case NB1413M3_LIVEGAL:		// 0-1
-		case NB1413M3_ORANGEC:		// 0-1
-		case NB1413M3_ORANGECI:		// 0-1
-		case NB1413M3_VIPCLUB:		// 0-1
-		case NB1413M3_KAGUYA:		// 0-3
-		case NB1413M3_KAGUYA2:		// 0-3 + 4-5 for protection
-		case NB1413M3_BIJOKKOY:		// 0-7
-		case NB1413M3_BIJOKKOG:		// 0-7
-		case NB1413M3_OTONANO:		// 0-7
-		case NB1413M3_MJCAMERA:		// 0 + 4-5 for protection
-		case NB1413M3_IDHIMITU:		// 0 + 4-5 for protection
-		case NB1413M3_KANATUEN:		// 0 + 6 for protection
+		case NB1413M3_APPAREL:      // no samples
+		case NB1413M3_NIGHTLOV:     // 0-1
+		case NB1413M3_SECOLOVE:     // 0-1
+		case NB1413M3_CITYLOVE:     // 0-1
+		case NB1413M3_MCITYLOV:     // 0-1
+		case NB1413M3_HOUSEMNQ:     // 0-1
+		case NB1413M3_HOUSEMN2:     // 0-1
+		case NB1413M3_LIVEGAL:      // 0-1
+		case NB1413M3_ORANGEC:      // 0-1
+		case NB1413M3_ORANGECI:     // 0-1
+		case NB1413M3_VIPCLUB:      // 0-1
+		case NB1413M3_KAGUYA:       // 0-3
+		case NB1413M3_KAGUYA2:      // 0-3 + 4-5 for protection
+		case NB1413M3_BIJOKKOY:     // 0-7
+		case NB1413M3_BIJOKKOG:     // 0-7
+		case NB1413M3_OTONANO:      // 0-7
+		case NB1413M3_MJCAMERA:     // 0 + 4-5 for protection
+		case NB1413M3_IDHIMITU:     // 0 + 4-5 for protection
+		case NB1413M3_KANATUEN:     // 0 + 6 for protection
 			rombank = nb1413m3_sndrombank1;
 			break;
 		case NB1413M3_TAIWANMB:
@@ -264,7 +264,7 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 WRITE8_HANDLER( nb1413m3_sndrombank1_w )
 {
 	// if (data & 0x02) coin counter ?
-	nb1413m3_outcoin_w(space, 0, data);				// (data & 0x04) >> 2;
+	nb1413m3_outcoin_w(space, 0, data);             // (data & 0x04) >> 2;
 	nb1413m3_nmi_enable = ((data & 0x20) >> 5);
 	nb1413m3_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
 }
@@ -331,10 +331,10 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 		case NB1413M3_HYHOO2:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x07)
 			{
-				case 0x01:	return root.ioport("IN0")->read();
-				case 0x02:	return root.ioport("IN1")->read();
-				case 0x04:	return 0xff;
-				default:	return 0xff;
+				case 0x01:  return root.ioport("IN0")->read();
+				case 0x02:  return root.ioport("IN1")->read();
+				case 0x04:  return 0xff;
+				default:    return 0xff;
 			}
 			break;
 		case NB1413M3_MSJIKEN:
@@ -343,12 +343,12 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 			{
 				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 				{
-					case 0x01:	return root.ioport("KEY0")->read();
-					case 0x02:	return root.ioport("KEY1")->read();
-					case 0x04:	return root.ioport("KEY2")->read();
-					case 0x08:	return root.ioport("KEY3")->read();
-					case 0x10:	return root.ioport("KEY4")->read();
-					default:	return (root.ioport("KEY0")->read() & root.ioport("KEY1")->read() & root.ioport("KEY2")->read()
+					case 0x01:  return root.ioport("KEY0")->read();
+					case 0x02:  return root.ioport("KEY1")->read();
+					case 0x04:  return root.ioport("KEY2")->read();
+					case 0x08:  return root.ioport("KEY3")->read();
+					case 0x10:  return root.ioport("KEY4")->read();
+					default:    return (root.ioport("KEY0")->read() & root.ioport("KEY1")->read() & root.ioport("KEY2")->read()
 										& root.ioport("KEY3")->read() & root.ioport("KEY4")->read());
 				}
 			}
@@ -362,12 +362,12 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return root.ioport("KEY0")->read();
-				case 0x02:	return root.ioport("KEY1")->read();
-				case 0x04:	return root.ioport("KEY2")->read();
-				case 0x08:	return root.ioport("KEY3")->read();
-				case 0x10:	return root.ioport("KEY4")->read();
-				default:	return (root.ioport("KEY0")->read() & root.ioport("KEY1")->read() & root.ioport("KEY2")->read()
+				case 0x01:  return root.ioport("KEY0")->read();
+				case 0x02:  return root.ioport("KEY1")->read();
+				case 0x04:  return root.ioport("KEY2")->read();
+				case 0x08:  return root.ioport("KEY3")->read();
+				case 0x10:  return root.ioport("KEY4")->read();
+				default:    return (root.ioport("KEY0")->read() & root.ioport("KEY1")->read() & root.ioport("KEY2")->read()
 									& root.ioport("KEY3")->read() & root.ioport("KEY4")->read());
 			}
 			break;
@@ -383,10 +383,10 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 		case NB1413M3_HYHOO2:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x07)
 			{
-				case 0x01:	return 0xff;
-				case 0x02:	return 0xff;
-				case 0x04:	return root.ioport("IN2")->read();
-				default:	return 0xff;
+				case 0x01:  return 0xff;
+				case 0x02:  return 0xff;
+				case 0x04:  return root.ioport("IN2")->read();
+				default:    return 0xff;
 			}
 			break;
 		case NB1413M3_MSJIKEN:
@@ -395,12 +395,12 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 			{
 				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 				{
-					case 0x01:	return root.ioport("KEY5")->read();
-					case 0x02:	return root.ioport("KEY6")->read();
-					case 0x04:	return root.ioport("KEY7")->read();
-					case 0x08:	return root.ioport("KEY8")->read();
-					case 0x10:	return root.ioport("KEY9")->read();
-					default:	return (root.ioport("KEY5")->read() & root.ioport("KEY6")->read() & root.ioport("KEY7")->read()
+					case 0x01:  return root.ioport("KEY5")->read();
+					case 0x02:  return root.ioport("KEY6")->read();
+					case 0x04:  return root.ioport("KEY7")->read();
+					case 0x08:  return root.ioport("KEY8")->read();
+					case 0x10:  return root.ioport("KEY9")->read();
+					default:    return (root.ioport("KEY5")->read() & root.ioport("KEY6")->read() & root.ioport("KEY7")->read()
 										& root.ioport("KEY8")->read() & root.ioport("KEY9")->read());
 				}
 			}
@@ -414,12 +414,12 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return root.ioport("KEY5")->read();
-				case 0x02:	return root.ioport("KEY6")->read();
-				case 0x04:	return root.ioport("KEY7")->read();
-				case 0x08:	return root.ioport("KEY8")->read();
-				case 0x10:	return root.ioport("KEY9")->read();
-				default:	return (root.ioport("KEY5")->read() & root.ioport("KEY6")->read() & root.ioport("KEY7")->read()
+				case 0x01:  return root.ioport("KEY5")->read();
+				case 0x02:  return root.ioport("KEY6")->read();
+				case 0x04:  return root.ioport("KEY7")->read();
+				case 0x08:  return root.ioport("KEY8")->read();
+				case 0x10:  return root.ioport("KEY9")->read();
+				default:    return (root.ioport("KEY5")->read() & root.ioport("KEY6")->read() & root.ioport("KEY7")->read()
 									& root.ioport("KEY8")->read() & root.ioport("KEY9")->read());
 			}
 			break;
@@ -485,9 +485,9 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 		case NB1413M3_QMHAYAKU:
 		case NB1413M3_MJGOTTUB:
 			return (((root.ioport("DSWB")->read() & 0x01) >> 0) | ((root.ioport("DSWB")->read() & 0x04) >> 1) |
-			        ((root.ioport("DSWB")->read() & 0x10) >> 2) | ((root.ioport("DSWB")->read() & 0x40) >> 3) |
-			        ((root.ioport("DSWA")->read() & 0x01) << 4) | ((root.ioport("DSWA")->read() & 0x04) << 3) |
-			        ((root.ioport("DSWA")->read() & 0x10) << 2) | ((root.ioport("DSWA")->read() & 0x40) << 1));
+					((root.ioport("DSWB")->read() & 0x10) >> 2) | ((root.ioport("DSWB")->read() & 0x40) >> 3) |
+					((root.ioport("DSWA")->read() & 0x01) << 4) | ((root.ioport("DSWA")->read() & 0x04) << 3) |
+					((root.ioport("DSWA")->read() & 0x10) << 2) | ((root.ioport("DSWA")->read() & 0x40) << 1));
 		default:
 			return space.machine().root_device().ioport("DSWA")->read();
 	}
@@ -529,9 +529,9 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 		case NB1413M3_QMHAYAKU:
 		case NB1413M3_MJGOTTUB:
 			return (((root.ioport("DSWB")->read() & 0x02) >> 1) | ((root.ioport("DSWB")->read() & 0x08) >> 2) |
-			        ((root.ioport("DSWB")->read() & 0x20) >> 3) | ((root.ioport("DSWB")->read() & 0x80) >> 4) |
-			        ((root.ioport("DSWA")->read() & 0x02) << 3) | ((root.ioport("DSWA")->read() & 0x08) << 2) |
-			        ((root.ioport("DSWA")->read() & 0x20) << 1) | ((root.ioport("DSWA")->read() & 0x80) << 0));
+					((root.ioport("DSWB")->read() & 0x20) >> 3) | ((root.ioport("DSWB")->read() & 0x80) >> 4) |
+					((root.ioport("DSWA")->read() & 0x02) << 3) | ((root.ioport("DSWA")->read() & 0x08) << 2) |
+					((root.ioport("DSWA")->read() & 0x20) << 1) | ((root.ioport("DSWA")->read() & 0x80) << 0));
 		default:
 			return space.machine().root_device().ioport("DSWB")->read();
 	}
@@ -585,7 +585,7 @@ WRITE8_HANDLER( nb1413m3_outcoin_w )
 			break;
 	}
 
-	set_led_status(space.machine(), 2, nb1413m3_outcoin_flag);		// out coin
+	set_led_status(space.machine(), 2, nb1413m3_outcoin_flag);      // out coin
 }
 
 WRITE8_HANDLER( nb1413m3_vcrctrl_w )
@@ -707,7 +707,7 @@ INPUT_PORTS_END
 /* Hanafuda controls share part of the mahjong panel. Notice that some of the remaining
 inputs are detected in Service Mode, even if we label them as IPT_UNKNOWN because they
 do not correspond to actual inputs */
-INPUT_PORTS_START( nbhf1_ctrl )	// used by gionbana, mgion, abunai
+INPUT_PORTS_START( nbhf1_ctrl ) // used by gionbana, mgion, abunai
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -809,7 +809,7 @@ INPUT_PORTS_START( nbhf1_ctrl )	// used by gionbana, mgion, abunai
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( nbhf2_ctrl )	// used by maiko, hanaoji, hnxmasev and hnageman
+INPUT_PORTS_START( nbhf2_ctrl ) // used by maiko, hanaoji, hnxmasev and hnageman
 	PORT_INCLUDE( nbhf1_ctrl )
 
 	PORT_MODIFY("KEY0")

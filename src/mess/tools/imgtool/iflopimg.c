@@ -260,19 +260,19 @@ static void imgtool_floppy_get_info(const imgtool_class *imgclass, UINT32 state,
 			sprintf(info->s = imgtool_temp_str(), "%s (%s)", format->description,
 				imgtool_get_info_string(&derived_class, IMGTOOLINFO_STR_DESCRIPTION));
 			break;
-		case IMGTOOLINFO_STR_FILE_EXTENSIONS:		strcpy(info->s = imgtool_temp_str(), format->extensions); break;
-		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:	info->p = (void*)format->param_guidelines; break;
+		case IMGTOOLINFO_STR_FILE_EXTENSIONS:       strcpy(info->s = imgtool_temp_str(), format->extensions); break;
+		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:   info->p = (void*)format->param_guidelines; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_OPEN:					info->open = imgtool_floppy_open; break;
-		case IMGTOOLINFO_PTR_CREATE:				info->create = imgtool_floppy_create; break;
-		case IMGTOOLINFO_PTR_CLOSE:					info->close = imgtool_floppy_close; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:	info->createimage_optguide = format->param_guidelines ? floppy_option_guide : NULL; break;
-		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:		info->get_sector_size = imgtool_floppy_get_sector_size; break;
-		case IMGTOOLINFO_PTR_READ_SECTOR:			info->read_sector = imgtool_floppy_read_sector; break;
-		case IMGTOOLINFO_PTR_WRITE_SECTOR:			info->write_sector = imgtool_floppy_write_sector; break;
+		case IMGTOOLINFO_PTR_OPEN:                  info->open = imgtool_floppy_open; break;
+		case IMGTOOLINFO_PTR_CREATE:                info->create = imgtool_floppy_create; break;
+		case IMGTOOLINFO_PTR_CLOSE:                 info->close = imgtool_floppy_close; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = format->param_guidelines ? floppy_option_guide : NULL; break;
+		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:       info->get_sector_size = imgtool_floppy_get_sector_size; break;
+		case IMGTOOLINFO_PTR_READ_SECTOR:           info->read_sector = imgtool_floppy_read_sector; break;
+		case IMGTOOLINFO_PTR_WRITE_SECTOR:          info->write_sector = imgtool_floppy_write_sector; break;
 
-		default:	imgclass->derived_get_info(imgclass, state, info); break;
+		default:    imgclass->derived_get_info(imgclass, state, info); break;
 	}
 }
 
@@ -331,7 +331,7 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *
 	else
 	{
 		stream_read(f, buffer, length);
-		err = floppy_write_sector(floppy, head, track, sector, offset, buffer, length, 0);	/* TODO: pass ddam argument from imgtool */
+		err = floppy_write_sector(floppy, head, track, sector, offset, buffer, length, 0);  /* TODO: pass ddam argument from imgtool */
 		if (err)
 			goto done;
 	}
@@ -366,6 +366,3 @@ void *imgtool_floppy_extrabytes(imgtool_image *img)
 	fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(img);
 	return fimg + 1;
 }
-
-
-

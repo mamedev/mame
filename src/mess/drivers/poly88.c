@@ -132,9 +132,9 @@ INPUT_PORTS_END
 
 static const struct CassetteOptions poly88_cassette_options =
 {
-	1,		/* channels */
-	16,		/* bits per sample */
-	7200	/* sample frequency */
+	1,      /* channels */
+	16,     /* bits per sample */
+	7200    /* sample frequency */
 };
 
 static const cassette_interface poly88_cassette_interface =
@@ -149,15 +149,15 @@ static const cassette_interface poly88_cassette_interface =
 /* F4 Character Displayer */
 static const gfx_layout poly88_charlayout =
 {
-	8, 16,					/* text = 7 x 9 */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 16,                  /* text = 7 x 9 */
+	128,                    /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( poly88 )
@@ -230,6 +230,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                   FULLNAME       FLAGS */
-COMP( 1976, poly88,  0,     0,		 poly88,	poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",	 0)
-COMP( 1977, poly8813,poly88,0,		 poly8813,	poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813",GAME_NOT_WORKING)
-
+COMP( 1976, poly88,  0,     0,       poly88,    poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",   0)
+COMP( 1977, poly8813,poly88,0,       poly8813,  poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813",GAME_NOT_WORKING)

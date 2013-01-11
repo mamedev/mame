@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #define DARIUS_VOL_MAX    (3*2 + 2)
-#define DARIUS_PAN_MAX    (2 + 2 + 1)	/* FM 2port + PSG 2port + DA 1port */
+#define DARIUS_PAN_MAX    (2 + 2 + 1)   /* FM 2port + PSG 2port + DA 1port */
 
 class darius_state : public driver_device
 {

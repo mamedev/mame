@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_scratchram;
-	UINT8 *m_charram;	/* prosoccr */
+	UINT8 *m_charram;   /* prosoccr */
 
 	UINT8 m_io_ram[16];
 

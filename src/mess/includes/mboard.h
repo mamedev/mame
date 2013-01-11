@@ -13,7 +13,7 @@
 
 enum
 {
-	EM,		/*No piece*/
+	EM,     /*No piece*/
 	BP,
 	BN,
 	BB,
@@ -28,8 +28,8 @@ enum
 	WK
 };
 
-#define NOT_VALID		99
-#define BORDER_PIECE	64
+#define NOT_VALID       99
+#define BORDER_PIECE    64
 
 
 /***************************************************************************

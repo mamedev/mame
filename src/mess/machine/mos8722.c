@@ -51,25 +51,25 @@ enum
 	CR_ROM_RAM
 };
 
-#define CR_IO			BIT(m_reg[CR], 0)
-#define CR_ROM_LO		BIT(m_reg[CR], 1)
-#define CR_ROM_MID		((m_reg[CR] >> 2) & 0x03)
-#define CR_ROM_HI		((m_reg[CR] >> 4) & 0x03)
-#define CR_A16			BIT(m_reg[CR], 6)
+#define CR_IO           BIT(m_reg[CR], 0)
+#define CR_ROM_LO       BIT(m_reg[CR], 1)
+#define CR_ROM_MID      ((m_reg[CR] >> 2) & 0x03)
+#define CR_ROM_HI       ((m_reg[CR] >> 4) & 0x03)
+#define CR_A16          BIT(m_reg[CR], 6)
 
 
 // mode configuration register
-#define MCR_8500		BIT(m_reg[MCR], 0)
-#define MCR_FSDIR		BIT(m_reg[MCR], 3)
-#define MCR_GAME		BIT(m_reg[MCR], 4)
-#define MCR_EXROM		BIT(m_reg[MCR], 5)
-#define MCR_C64			BIT(m_reg[MCR], 6)
-#define MCR_40_80		BIT(m_reg[MCR], 7)
+#define MCR_8500        BIT(m_reg[MCR], 0)
+#define MCR_FSDIR       BIT(m_reg[MCR], 3)
+#define MCR_GAME        BIT(m_reg[MCR], 4)
+#define MCR_EXROM       BIT(m_reg[MCR], 5)
+#define MCR_C64         BIT(m_reg[MCR], 6)
+#define MCR_40_80       BIT(m_reg[MCR], 7)
 
 
 // RAM configuration register
 static const offs_t RCR_BOTTOM_ADDRESS[4] = { 0x0400, 0x1000, 0x0400, 0x1000 };
-static const offs_t RCR_TOP_ADDRESS[4] =	{ 0xf000, 0xf000, 0xe000, 0xc000 };
+static const offs_t RCR_TOP_ADDRESS[4] =    { 0xf000, 0xf000, 0xe000, 0xc000 };
 
 enum
 {
@@ -79,18 +79,18 @@ enum
 	RCR_SHARE_16K
 };
 
-#define RCR_SHARE		(m_reg[RCR] & 0x03)
-#define RCR_BOTTOM		BIT(m_reg[RCR], 2)
-#define RCR_TOP			BIT(m_reg[RCR], 3)
-#define RCR_VA16		BIT(m_reg[RCR], 6)
+#define RCR_SHARE       (m_reg[RCR] & 0x03)
+#define RCR_BOTTOM      BIT(m_reg[RCR], 2)
+#define RCR_TOP         BIT(m_reg[RCR], 3)
+#define RCR_VA16        BIT(m_reg[RCR], 6)
 
 
 // page 0 pointer register
-#define P0H_A16			BIT(m_reg[P0H], 0)
+#define P0H_A16         BIT(m_reg[P0H], 0)
 
 
 // page 1 pointer register
-#define P1H_A16			BIT(m_reg[P1H], 0)
+#define P1H_A16         BIT(m_reg[P1H], 0)
 
 
 
@@ -110,7 +110,7 @@ const device_type MOS8722 = &device_creator<mos8722_device>;
 //-------------------------------------------------
 
 mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock)
+	: device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock)
 {
 }
 

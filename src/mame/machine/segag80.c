@@ -308,7 +308,7 @@ static UINT8 sega_decrypt82(offs_t pc, UINT8 lo)
 /****************************************************************************/
 static UINT8 sega_decrypt0(offs_t pc, UINT8 lo)
 {
-        return lo;
+		return lo;
 }
 
 /****************************************************************************/
@@ -334,5 +334,3 @@ segag80_decrypt_func segag80_security(int chip)
 			return sega_decrypt0;
 	}
 }
-
-

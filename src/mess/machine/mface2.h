@@ -22,14 +22,14 @@
 #include "machine/cpcexp.h"
 
 /* stop button has been pressed */
-#define MULTIFACE_STOP_BUTTON_PRESSED	0x0001
+#define MULTIFACE_STOP_BUTTON_PRESSED   0x0001
 /* ram/rom is paged into memory space */
-#define MULTIFACE_RAM_ROM_ENABLED		0x0002
+#define MULTIFACE_RAM_ROM_ENABLED       0x0002
 /* when visible OUT commands are performed! */
-#define MULTIFACE_VISIBLE				0x0004
+#define MULTIFACE_VISIBLE               0x0004
 
 
-class cpc_multiface2_device :	public device_t,
+class cpc_multiface2_device :   public device_t,
 								public device_cpc_expansion_card_interface
 {
 public:
@@ -50,7 +50,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "cpc_mf2"; }
+	virtual void device_config_complete() { m_shortname = "cpc_mf2"; }
 
 private:
 	cpc_expansion_slot_device *m_slot;

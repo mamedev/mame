@@ -427,7 +427,7 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.readdevice != NULL)
 			{
-			    m_helper.read8_device = desc.readdevice;
+				m_helper.read8_device = desc.readdevice;
 				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_read8device, desc.name, this);
 			}
 			else
@@ -439,7 +439,7 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-		    m_helper.read8_space = desc.readspace;
+			m_helper.read8_space = desc.readspace;
 			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_read8space, desc.name, this);
 			break;
 

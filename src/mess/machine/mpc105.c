@@ -10,7 +10,7 @@
 #include "mpc105.h"
 #include "machine/ram.h"
 
-#define LOG_MPC105		0
+#define LOG_MPC105      0
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -28,7 +28,7 @@ const device_type MPC105 = &device_creator<mpc105_device>;
 //-------------------------------------------------
 
 mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MPC105, "MPC105", tag, owner, clock),
+	: device_t(mconfig, MPC105, "MPC105", tag, owner, clock),
 	pci_device_interface( mconfig, *this ),
 	m_maincpu(NULL)
 {
@@ -72,7 +72,7 @@ void mpc105_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_cputag, 0, sizeof(m_cputag));
+		memset(&m_cputag, 0, sizeof(m_cputag));
 		m_bank_base_default = 0;
 
 	}
@@ -106,10 +106,10 @@ void mpc105_device::update_memory()
 		if (m_bank_enable & (1 << bank))
 		{
 			begin = (((m_bank_registers[(bank / 4) + 0] >> (bank % 4) * 8)) & 0xFF) << 20
-				|	(((m_bank_registers[(bank / 4) + 2] >> (bank % 4) * 8)) & 0x03) << 28;
+				|   (((m_bank_registers[(bank / 4) + 2] >> (bank % 4) * 8)) & 0x03) << 28;
 
 			end   = (((m_bank_registers[(bank / 4) + 4] >> (bank % 4) * 8)) & 0xFF) << 20
-				|	(((m_bank_registers[(bank / 4) + 6] >> (bank % 4) * 8)) & 0x03) << 28
+				|   (((m_bank_registers[(bank / 4) + 6] >> (bank % 4) * 8)) & 0x03) << 28
 				| 0x000FFFFF;
 
 			end = MIN(end, begin + machine().device<ram_device>(RAM_TAG)->size() - 1);
@@ -142,7 +142,7 @@ UINT32 mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset,
 
 	switch(offset)
 	{
-		case 0x00:	/* vendor/device ID */
+		case 0x00:  /* vendor/device ID */
 			result = 0x00011057;
 			break;
 
@@ -150,22 +150,22 @@ UINT32 mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset,
 			result = 0x06000000;
 			break;
 
-		case 0x80:	/* memory starting address 1 */
-		case 0x84:	/* memory starting address 2 */
-		case 0x88:	/* extended memory starting address 1 */
-		case 0x8C:	/* extended memory starting address 2 */
-		case 0x90:	/* memory ending address 1 */
-		case 0x94:	/* memory ending address 2 */
-		case 0x98:	/* extended memory ending address 1 */
-		case 0x9C:	/* extended memory ending address 2 */
+		case 0x80:  /* memory starting address 1 */
+		case 0x84:  /* memory starting address 2 */
+		case 0x88:  /* extended memory starting address 1 */
+		case 0x8C:  /* extended memory starting address 2 */
+		case 0x90:  /* memory ending address 1 */
+		case 0x94:  /* memory ending address 2 */
+		case 0x98:  /* extended memory ending address 1 */
+		case 0x9C:  /* extended memory ending address 2 */
 			result = m_bank_registers[(offset - 0x80) / 4];
 			break;
 
-		case 0xA0:	/* memory enable */
+		case 0xA0:  /* memory enable */
 			result = m_bank_enable;
 			break;
 
-		case 0xA8:	/* processor interface configuration 1 */
+		case 0xA8:  /* processor interface configuration 1 */
 			/* TODO: Fix me! */
 			switch(/*cpu_getactivecpu()*/0)
 			{
@@ -183,20 +183,20 @@ UINT32 mpc105_device::pci_read(pci_bus_device *pcibus, int function, int offset,
 			}
 			break;
 
-		case 0xAC:	/* processor interface configuration 1 */
+		case 0xAC:  /* processor interface configuration 1 */
 			result = 0x000C060C;
 			break;
 
-		case 0xF0:	/* memory control configuration 1 */
+		case 0xF0:  /* memory control configuration 1 */
 			result = 0xFF020000;
 			break;
-		case 0xF4:	/* memory control configuration 2 */
+		case 0xF4:  /* memory control configuration 2 */
 			result = 0x00000003;
 			break;
-		case 0xF8:	/* memory control configuration 3 */
+		case 0xF8:  /* memory control configuration 3 */
 			result = 0x00000000;
 			break;
-		case 0xFC:	/* memory control configuration 4 */
+		case 0xFC:  /* memory control configuration 4 */
 			result = 0x00100000;
 			break;
 
@@ -219,14 +219,14 @@ void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
 
 	switch(offset)
 	{
-		case 0x80:	/* memory starting address 1 */
-		case 0x84:	/* memory starting address 2 */
-		case 0x88:	/* extended memory starting address 1 */
-		case 0x8C:	/* extended memory starting address 2 */
-		case 0x90:	/* memory ending address 1 */
-		case 0x94:	/* memory ending address 2 */
-		case 0x98:	/* extended memory ending address 1 */
-		case 0x9C:	/* extended memory ending address 2 */
+		case 0x80:  /* memory starting address 1 */
+		case 0x84:  /* memory starting address 2 */
+		case 0x88:  /* extended memory starting address 1 */
+		case 0x8C:  /* extended memory starting address 2 */
+		case 0x90:  /* memory ending address 1 */
+		case 0x94:  /* memory ending address 2 */
+		case 0x98:  /* extended memory ending address 1 */
+		case 0x9C:  /* extended memory ending address 2 */
 			i = (offset - 0x80) / 4;
 			if (m_bank_registers[i] != data)
 			{
@@ -235,7 +235,7 @@ void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
 			}
 			break;
 
-		case 0xA0:	/* memory enable */
+		case 0xA0:  /* memory enable */
 			if (m_bank_enable != (UINT8) data)
 			{
 				m_bank_enable = (UINT8) data;
@@ -243,13 +243,13 @@ void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
 			}
 			break;
 
-		case 0xF0:	/* memory control configuration 1 */
-		case 0xF4:	/* memory control configuration 2 */
-		case 0xF8:	/* memory control configuration 3 */
-		case 0xFC:	/* memory control configuration 4 */
+		case 0xF0:  /* memory control configuration 1 */
+		case 0xF4:  /* memory control configuration 2 */
+		case 0xF8:  /* memory control configuration 3 */
+		case 0xFC:  /* memory control configuration 4 */
 			break;
 
-		case 0xA8:	/* processor interface configuration 1 */
+		case 0xA8:  /* processor interface configuration 1 */
 			//fatalerror("mpc105_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X\n", offset, data);
 			break;
 	}

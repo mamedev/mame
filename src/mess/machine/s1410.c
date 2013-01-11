@@ -95,7 +95,7 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define Z8400A_TAG			"z80"
+#define Z8400A_TAG          "z80"
 
 
 
@@ -204,7 +204,7 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : scsihd_device(mconfig, S1410, "Xebec S1410", tag, owner, clock)
+	: scsihd_device(mconfig, S1410, "Xebec S1410", tag, owner, clock)
 {
 }
 

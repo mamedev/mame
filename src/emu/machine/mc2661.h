@@ -58,24 +58,24 @@ struct mc2661_interface
 	int m_rxc;
 	int m_txc;
 
-	devcb_read_line		m_in_rxd_cb;
-	devcb_write_line	m_out_txd_cb;
+	devcb_read_line     m_in_rxd_cb;
+	devcb_write_line    m_out_txd_cb;
 
-	devcb_write_line	m_out_rxrdy_cb;
-	devcb_write_line	m_out_txrdy_cb;
-	devcb_write_line	m_out_rts_cb;
-	devcb_write_line	m_out_dtr_cb;
-	devcb_write_line	m_out_txemt_dschg_cb;
-	devcb_write_line	m_out_bkdet_cb;
-	devcb_write_line	m_out_xsync_cb;
+	devcb_write_line    m_out_rxrdy_cb;
+	devcb_write_line    m_out_txrdy_cb;
+	devcb_write_line    m_out_rts_cb;
+	devcb_write_line    m_out_dtr_cb;
+	devcb_write_line    m_out_txemt_dschg_cb;
+	devcb_write_line    m_out_bkdet_cb;
+	devcb_write_line    m_out_xsync_cb;
 };
 
 
 // ======================> mc2661_device
 
 class mc2661_device :  public device_t,
-					    public device_serial_interface,
-					    public mc2661_interface
+						public device_serial_interface,
+						public mc2661_interface
 {
 public:
 	// construction/destruction
@@ -114,16 +114,16 @@ private:
 		TIMER_TX
 	};
 
-	devcb_resolved_read_line	m_in_rxd_func;
-	devcb_resolved_write_line	m_out_txd_func;
+	devcb_resolved_read_line    m_in_rxd_func;
+	devcb_resolved_write_line   m_out_txd_func;
 
-	devcb_resolved_write_line	m_out_rxrdy_func;
-	devcb_resolved_write_line	m_out_txrdy_func;
-	devcb_resolved_write_line	m_out_rts_func;
-	devcb_resolved_write_line	m_out_dtr_func;
-	devcb_resolved_write_line	m_out_txemt_dschg_func;
-	devcb_resolved_write_line	m_out_bkdet_func;
-	devcb_resolved_write_line	m_out_xsync_func;
+	devcb_resolved_write_line   m_out_rxrdy_func;
+	devcb_resolved_write_line   m_out_txrdy_func;
+	devcb_resolved_write_line   m_out_rts_func;
+	devcb_resolved_write_line   m_out_dtr_func;
+	devcb_resolved_write_line   m_out_txemt_dschg_func;
+	devcb_resolved_write_line   m_out_bkdet_func;
+	devcb_resolved_write_line   m_out_xsync_func;
 
 	UINT8 m_rhr;
 	UINT8 m_thr;

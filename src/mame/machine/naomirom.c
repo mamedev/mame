@@ -36,4 +36,3 @@ void naomi_rom_board::board_advance(UINT32 size)
 {
 	rom_cur_address += size;
 }
-

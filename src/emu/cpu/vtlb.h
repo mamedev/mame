@@ -21,16 +21,16 @@
     CONSTANTS
 ***************************************************************************/
 
-#define VTLB_FLAGS_MASK				0xff
+#define VTLB_FLAGS_MASK             0xff
 
-#define VTLB_READ_ALLOWED			0x01		/* (1 << TRANSLATE_READ) */
-#define VTLB_WRITE_ALLOWED			0x02		/* (1 << TRANSLATE_WRITE) */
-#define VTLB_FETCH_ALLOWED			0x04		/* (1 << TRANSLATE_FETCH) */
-#define VTLB_FLAG_VALID				0x08
-#define VTLB_USER_READ_ALLOWED		0x10		/* (1 << TRANSLATE_READ_USER) */
-#define VTLB_USER_WRITE_ALLOWED		0x20		/* (1 << TRANSLATE_WRITE_USER) */
-#define VTLB_USER_FETCH_ALLOWED		0x40		/* (1 << TRANSLATE_FETCH_USER) */
-#define VTLB_FLAG_FIXED				0x80
+#define VTLB_READ_ALLOWED           0x01        /* (1 << TRANSLATE_READ) */
+#define VTLB_WRITE_ALLOWED          0x02        /* (1 << TRANSLATE_WRITE) */
+#define VTLB_FETCH_ALLOWED          0x04        /* (1 << TRANSLATE_FETCH) */
+#define VTLB_FLAG_VALID             0x08
+#define VTLB_USER_READ_ALLOWED      0x10        /* (1 << TRANSLATE_READ_USER) */
+#define VTLB_USER_WRITE_ALLOWED     0x20        /* (1 << TRANSLATE_WRITE_USER) */
+#define VTLB_USER_FETCH_ALLOWED     0x40        /* (1 << TRANSLATE_FETCH_USER) */
+#define VTLB_FLAG_FIXED             0x80
 
 
 

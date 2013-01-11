@@ -15,9 +15,9 @@
 
 struct slot_interface
 {
-	const char *	name;
+	const char *    name;
 	const device_type & devtype;
-	bool			internal;
+	bool            internal;
 };
 
 #define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
@@ -27,11 +27,11 @@ struct slot_interface
 	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_slot, DEVICE_INPUT_DEFAULTS_NAME(_def_inp), _def_config, _def_clock, _fixed);
 
 
-#define SLOT_INTERFACE_NAME(name)	slot_interface_##name
+#define SLOT_INTERFACE_NAME(name)   slot_interface_##name
 
-#define SLOT_INTERFACE_START(name)								\
-	const slot_interface slot_interface_##name[] =				\
-	{															\
+#define SLOT_INTERFACE_START(name)                              \
+	const slot_interface slot_interface_##name[] =              \
+	{                                                           \
 
 #define SLOT_INTERFACE(tag,device) \
 	{ tag, device, false }, \
@@ -40,7 +40,7 @@ struct slot_interface
 	{ tag, device, true }, \
 
 #define SLOT_INTERFACE_END \
-		{ NULL, NULL, false }							\
+		{ NULL, NULL, false }                           \
 	};
 
 #define SLOT_INTERFACE_EXTERN(name) extern const slot_interface slot_interface_##name[]

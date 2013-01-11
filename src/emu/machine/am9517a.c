@@ -52,28 +52,28 @@ enum
 };
 
 
-#define COMMAND_MEM_TO_MEM			BIT(m_command, 0)
-#define COMMAND_CH0_ADDRESS_HOLD	BIT(m_command, 1)
-#define COMMAND_DISABLE				BIT(m_command, 2)
-#define COMMAND_COMPRESSED_TIMING	BIT(m_command, 3)
-#define COMMAND_ROTATING_PRIORITY	BIT(m_command, 4)
-#define COMMAND_EXTENDED_WRITE		BIT(m_command, 5)
-#define COMMAND_DREQ_ACTIVE_LOW		BIT(m_command, 6)
-#define COMMAND_DACK_ACTIVE_HIGH	BIT(m_command, 7)
+#define COMMAND_MEM_TO_MEM          BIT(m_command, 0)
+#define COMMAND_CH0_ADDRESS_HOLD    BIT(m_command, 1)
+#define COMMAND_DISABLE             BIT(m_command, 2)
+#define COMMAND_COMPRESSED_TIMING   BIT(m_command, 3)
+#define COMMAND_ROTATING_PRIORITY   BIT(m_command, 4)
+#define COMMAND_EXTENDED_WRITE      BIT(m_command, 5)
+#define COMMAND_DREQ_ACTIVE_LOW     BIT(m_command, 6)
+#define COMMAND_DACK_ACTIVE_HIGH    BIT(m_command, 7)
 
 
-#define MODE_TRANSFER_MASK			(m_channel[m_current_channel].m_mode & 0x0c)
-#define MODE_TRANSFER_VERIFY		0x00
-#define MODE_TRANSFER_WRITE			0x04
-#define MODE_TRANSFER_READ			0x08
-#define MODE_TRANSFER_ILLEGAL		0x0c
-#define MODE_AUTOINITIALIZE			BIT(m_channel[m_current_channel].m_mode, 4)
-#define MODE_ADDRESS_DECREMENT		BIT(m_channel[m_current_channel].m_mode, 5)
-#define MODE_MASK					(m_channel[m_current_channel].m_mode & 0xc0)
-#define MODE_DEMAND					0x00
-#define MODE_SINGLE					0x40
-#define MODE_BLOCK					0x80
-#define MODE_CASCADE				0xc0
+#define MODE_TRANSFER_MASK          (m_channel[m_current_channel].m_mode & 0x0c)
+#define MODE_TRANSFER_VERIFY        0x00
+#define MODE_TRANSFER_WRITE         0x04
+#define MODE_TRANSFER_READ          0x08
+#define MODE_TRANSFER_ILLEGAL       0x0c
+#define MODE_AUTOINITIALIZE         BIT(m_channel[m_current_channel].m_mode, 4)
+#define MODE_ADDRESS_DECREMENT      BIT(m_channel[m_current_channel].m_mode, 5)
+#define MODE_MASK                   (m_channel[m_current_channel].m_mode & 0xc0)
+#define MODE_DEMAND                 0x00
+#define MODE_SINGLE                 0x40
+#define MODE_BLOCK                  0x80
+#define MODE_CASCADE                0xc0
 
 
 enum
@@ -372,11 +372,11 @@ inline void am9517a_device::end_of_process()
 //-------------------------------------------------
 
 am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock),
-	  device_execute_interface(mconfig, *this),
-	  m_icount(0),
-      m_hack(0),
-      m_ready(1)
+	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock),
+		device_execute_interface(mconfig, *this),
+		m_icount(0),
+		m_hack(0),
+		m_ready(1)
 {
 }
 
@@ -397,17 +397,17 @@ void am9517a_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_hreq_cb, 0, sizeof(m_out_hreq_cb));
-    	memset(&m_out_eop_cb, 0, sizeof(m_out_eop_cb));
-    	memset(&m_in_memr_cb, 0, sizeof(m_in_memr_cb));
-    	memset(&m_out_memw_cb, 0, sizeof(m_out_memw_cb));
+		memset(&m_out_hreq_cb, 0, sizeof(m_out_hreq_cb));
+		memset(&m_out_eop_cb, 0, sizeof(m_out_eop_cb));
+		memset(&m_in_memr_cb, 0, sizeof(m_in_memr_cb));
+		memset(&m_out_memw_cb, 0, sizeof(m_out_memw_cb));
 
 		for (int i = 0; i < 4; i++)
 		{
-	    	memset(&m_in_ior_cb[i], 0, sizeof(m_in_ior_cb[i]));
-	    	memset(&m_out_iow_cb[i], 0, sizeof(m_out_iow_cb[i]));
-	    	memset(&m_out_dack_cb[i], 0, sizeof(m_out_dack_cb[i]));
-	    }
+			memset(&m_in_ior_cb[i], 0, sizeof(m_in_ior_cb[i]));
+			memset(&m_out_iow_cb[i], 0, sizeof(m_out_iow_cb[i]));
+			memset(&m_out_dack_cb[i], 0, sizeof(m_out_dack_cb[i]));
+		}
 	}
 }
 

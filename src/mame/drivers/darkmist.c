@@ -116,7 +116,7 @@ static INPUT_PORTS_START( darkmist )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")	/* Listed as "ALWAYS ON" */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")    /* Listed as "ALWAYS ON" */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:8")
@@ -228,11 +228,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::darkmist_scanline)
 
 static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, darkmist_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
+	MCFG_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)   /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(t5182_map)
 	MCFG_CPU_IO_MAP(t5182_io)
 
@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)	/* 3.579545 MHz */
+	MCFG_YM2151_ADD("ymsnd", 14318180/4)    /* 3.579545 MHz */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<t5182_ym2151_irq_handler>))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

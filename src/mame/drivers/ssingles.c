@@ -179,14 +179,14 @@ public:
 //fake palette
 static const UINT8 ssingles_colors[NUM_PENS*3]=
 {
-	0x00,0x00,0x00,	0xff,0xff,0xff, 0xff,0x00,0x00,	0x80,0x00,0x00,
-	0x00,0x00,0x00,	0xf0,0xf0,0xf0,	0xff,0xff,0x00, 0x40,0x40,0x40,
-	0x00,0x00,0x00,	0xff,0xff,0xff,	0xff,0x00,0x00,	0xff,0xff,0x00,
-	0x00,0x00,0x00,	0xff,0xff,0x00,	0xd0,0x00,0x00,	0x80,0x00,0x00,
-	0x00,0x00,0x00,	0xff,0x00,0x00,	0xff,0xff,0x00,	0x80,0x80,0x00,
-	0x00,0x00,0x00,	0xff,0x00,0x00,	0x40,0x40,0x40,	0xd0,0xd0,0xd0,
-	0x00,0x00,0x00,	0x00,0x00,0xff,	0x60,0x40,0x30,	0xff,0xff,0x00,
-	0x00,0x00,0x00,	0xff,0x00,0xff,	0x80,0x00,0x80,	0x40,0x00,0x40
+	0x00,0x00,0x00, 0xff,0xff,0xff, 0xff,0x00,0x00, 0x80,0x00,0x00,
+	0x00,0x00,0x00, 0xf0,0xf0,0xf0, 0xff,0xff,0x00, 0x40,0x40,0x40,
+	0x00,0x00,0x00, 0xff,0xff,0xff, 0xff,0x00,0x00, 0xff,0xff,0x00,
+	0x00,0x00,0x00, 0xff,0xff,0x00, 0xd0,0x00,0x00, 0x80,0x00,0x00,
+	0x00,0x00,0x00, 0xff,0x00,0x00, 0xff,0xff,0x00, 0x80,0x80,0x00,
+	0x00,0x00,0x00, 0xff,0x00,0x00, 0x40,0x40,0x40, 0xd0,0xd0,0xd0,
+	0x00,0x00,0x00, 0x00,0x00,0xff, 0x60,0x40,0x30, 0xff,0xff,0x00,
+	0x00,0x00,0x00, 0xff,0x00,0xff, 0x80,0x00,0x80, 0x40,0x00,0x40
 };
 
 static MC6845_UPDATE_ROW( ssingles_update_row )
@@ -269,28 +269,28 @@ static const mc6845_interface ssingles_mc6845_intf =
 {
 	"screen",
 	8,
-	NULL,						/* before pixel update callback */
-	ssingles_update_row,		/* row update callback */
-	NULL,						/* after pixel update callback */
-	DEVCB_NULL,					/* callback for display state changes */
-	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_NULL,					/* HSYNC callback */
-	DEVCB_NULL,					/* VSYNC callback */
-	NULL						/* update address callback */
+	NULL,                       /* before pixel update callback */
+	ssingles_update_row,        /* row update callback */
+	NULL,                       /* after pixel update callback */
+	DEVCB_NULL,                 /* callback for display state changes */
+	DEVCB_NULL,                 /* callback for cursor state changes */
+	DEVCB_NULL,                 /* HSYNC callback */
+	DEVCB_NULL,                 /* VSYNC callback */
+	NULL                        /* update address callback */
 };
 
 static const mc6845_interface atamanot_mc6845_intf =
 {
 	"screen",
 	8,
-	NULL,						/* before pixel update callback */
-	atamanot_update_row,		/* row update callback */
-	NULL,						/* after pixel update callback */
-	DEVCB_NULL,					/* callback for display state changes */
-	DEVCB_NULL,					/* callback for cursor state changes */
-	DEVCB_NULL,					/* HSYNC callback */
-	DEVCB_NULL,					/* VSYNC callback */
-	NULL						/* update address callback */
+	NULL,                       /* before pixel update callback */
+	atamanot_update_row,        /* row update callback */
+	NULL,                       /* after pixel update callback */
+	DEVCB_NULL,                 /* callback for display state changes */
+	DEVCB_NULL,                 /* callback for cursor state changes */
+	DEVCB_NULL,                 /* HSYNC callback */
+	DEVCB_NULL,                 /* VSYNC callback */
+	NULL                        /* update address callback */
 };
 
 
@@ -344,7 +344,7 @@ WRITE8_MEMBER(ssingles_state::c001_w)
 CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
 {
 	int data = 7;
-	switch(ioport("EXTRA")->read())		//multiplexed
+	switch(ioport("EXTRA")->read())     //multiplexed
 	{
 		case 0x01: data = 1; break;
 		case 0x02: data = 2; break;
@@ -460,53 +460,53 @@ static INPUT_PORTS_START( ssingles )
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x04, 0x04, "Unk1" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x08, "Unk2" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x10, "Unk3" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "Unk4" ) //tested in game, every frame, could be difficulty related
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, "Unk5" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Unk 6" )
-	PORT_DIPSETTING(	0x01, "Pos 1" )
-	PORT_DIPSETTING(	0x03, "Pos 2" )
-	PORT_DIPSETTING(	0x00, "Pos 3" )
-	PORT_DIPSETTING(	0x02, "Pos 4" )
+	PORT_DIPSETTING(    0x01, "Pos 1" )
+	PORT_DIPSETTING(    0x03, "Pos 2" )
+	PORT_DIPSETTING(    0x00, "Pos 3" )
+	PORT_DIPSETTING(    0x02, "Pos 4" )
 	PORT_DIPNAME( 0x04, 0x04, "Unk7" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x08, "Unk8" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x10, "Unk9" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "UnkA" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "UnkB" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, "UnkC" )
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 /*
@@ -517,40 +517,40 @@ It looks "stolen" from an unknown Japanese computer?
 
 static const gfx_layout layout_8x8 =
 {
-    8,8,
-    RGN_FRAC(1,2),
-    2,
-    { RGN_FRAC(0,2), RGN_FRAC(1,2) },
-    { STEP8(0,1) },
-    { STEP8(0,8) },
-    8*8
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 
 static const gfx_layout layout_16x16 =
 {
-    16,16,
-    RGN_FRAC(1,4),
-    1,
-    { 0 },
-    { 0, 1, 2, 3, 4, 5, 6, 7,
-      RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+1, RGN_FRAC(1,4)+2, RGN_FRAC(1,4)+3, RGN_FRAC(1,4)+4, RGN_FRAC(1,4)+5, RGN_FRAC(1,4)+6, RGN_FRAC(1,4)+7 },
-    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-      RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
-    8*8
+	16,16,
+	RGN_FRAC(1,4),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+		RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+1, RGN_FRAC(1,4)+2, RGN_FRAC(1,4)+3, RGN_FRAC(1,4)+4, RGN_FRAC(1,4)+5, RGN_FRAC(1,4)+6, RGN_FRAC(1,4)+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+		RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
+	8*8
 };
 
 
 static const gfx_layout layout_8x16 =
 {
-    8,16,
-    RGN_FRAC(1,2),
-    1,
-    { 0 },
-    { 0, 1, 2, 3, 4, 5, 6, 7 },
-    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-      RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
-    8*8
+	8,16,
+	RGN_FRAC(1,2),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+		RGN_FRAC(2,4)+0*8, RGN_FRAC(2,4)+1*8, RGN_FRAC(2,4)+2*8, RGN_FRAC(2,4)+3*8, RGN_FRAC(2,4)+4*8, RGN_FRAC(2,4)+5*8, RGN_FRAC(2,4)+6*8, RGN_FRAC(2,4)+7*8 },
+	8*8
 };
 
 static GFXDECODE_START( ssingles )
@@ -559,20 +559,20 @@ GFXDECODE_END
 
 static GFXDECODE_START( atamanot )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8, 0, 8 )
-    GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
-    GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
-    GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
+	GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
+	GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
+	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
-	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ssingles_map)
 	MCFG_CPU_IO_MAP(ssingles_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssingles_state,  nmi_line_pulse)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(4) //guess
@@ -693,4 +693,3 @@ DRIVER_INIT_MEMBER(ssingles_state,ssingles)
 
 GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, ssingles, ROT90, "Entertainment Enterprises, Ltd.", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-

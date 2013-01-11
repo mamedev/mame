@@ -43,25 +43,25 @@ WRITE8_MEMBER(orbit_state::orbit_noise_rst_w)
 static const discrete_lfsr_desc orbit_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,			/* Bit Length */
-	0,			/* Reset Value */
-	0,			/* Use Bit 0 as XOR input 0 */
-	14,			/* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,		/* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,		/* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,	/* Feedback stage3 replaces the shifted register contents */
-	0x000001,		/* Everything is shifted into the first bit only */
-	0,			/* Output is already inverted by XNOR */
-	15			/* Output bit */
+	16,         /* Bit Length */
+	0,          /* Reset Value */
+	0,          /* Use Bit 0 as XOR input 0 */
+	14,         /* Use Bit 14 as XOR input 1 */
+	DISC_LFSR_XNOR,     /* Feedback stage1 is XNOR */
+	DISC_LFSR_OR,       /* Feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,  /* Feedback stage3 replaces the shifted register contents */
+	0x000001,       /* Everything is shifted into the first bit only */
+	0,          /* Output is already inverted by XNOR */
+	15          /* Output bit */
 };
 
 /* Nodes - Sounds */
-#define ORBIT_NOISE			NODE_10
-#define ORBIT_NOISE1_SND	NODE_11
-#define ORBIT_NOISE2_SND	NODE_12
-#define ORBIT_ANOTE1_SND	NODE_13
-#define ORBIT_ANOTE2_SND	NODE_14
-#define ORBIT_WARNING_SND	NODE_15
+#define ORBIT_NOISE         NODE_10
+#define ORBIT_NOISE1_SND    NODE_11
+#define ORBIT_NOISE2_SND    NODE_12
+#define ORBIT_ANOTE1_SND    NODE_13
+#define ORBIT_ANOTE2_SND    NODE_14
+#define ORBIT_WARNING_SND   NODE_15
 
 DISCRETE_SOUND_START(orbit)
 	/************************************************/
@@ -114,10 +114,10 @@ DISCRETE_SOUND_START(orbit)
 	/* When there is no music, the game sets the    */
 	/* oscillator to 0Hz.  (NOTELD = FF)            */
 	/************************************************/
-	DISCRETE_ADDER2(NODE_30, 1, ORBIT_NOTE_FREQ, 1)	/* To get values of 1 - 256 */
+	DISCRETE_ADDER2(NODE_30, 1, ORBIT_NOTE_FREQ, 1) /* To get values of 1 - 256 */
 	DISCRETE_DIVIDE(NODE_31, 1, 12096000.0/256/2, NODE_30)
-	DISCRETE_SQUAREWAVE(ORBIT_ANOTE1_SND, ORBIT_NOTE_FREQ, NODE_31, ORBIT_ANOTE1_AMP, 50.0, 0, 0.0)	/* NOTE=FF Disables audio */
-	DISCRETE_SQUAREWAVE(ORBIT_ANOTE2_SND, ORBIT_NOTE_FREQ, NODE_31, ORBIT_ANOTE2_AMP, 50.0, 0, 0.0)	/* NOTE=FF Disables audio */
+	DISCRETE_SQUAREWAVE(ORBIT_ANOTE1_SND, ORBIT_NOTE_FREQ, NODE_31, ORBIT_ANOTE1_AMP, 50.0, 0, 0.0) /* NOTE=FF Disables audio */
+	DISCRETE_SQUAREWAVE(ORBIT_ANOTE2_SND, ORBIT_NOTE_FREQ, NODE_31, ORBIT_ANOTE2_AMP, 50.0, 0, 0.0) /* NOTE=FF Disables audio */
 
 	/************************************************/
 	/* Final mix and output.                        */

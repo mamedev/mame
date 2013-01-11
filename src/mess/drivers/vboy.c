@@ -74,11 +74,11 @@ class vboy_state : public driver_device
 public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-          m_maintimer(*this, "timer_main"),
-		  m_maincpu(*this, "maincpu")
-		  { }
+			m_maintimer(*this, "timer_main"),
+			m_maincpu(*this, "maincpu")
+			{ }
 
-    required_device<timer_device> m_maintimer;
+	required_device<timer_device> m_maintimer;
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_READ32_MEMBER(io_r);
@@ -139,9 +139,9 @@ public:
 	void fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal);
 	void fill_bg_map(int num, UINT16 scx, UINT16 scy);
 	void draw_bg_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
-	                                       UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
+											UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
 	void draw_affine_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w,
-	                                           UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
+												UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
 	UINT8 display_world(int num, bitmap_ind16 &bitmap, bool right, int &cur_spt);
 	void m_set_brightness(void);
 	virtual void machine_start();
@@ -187,9 +187,9 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, int x, int y, UINT16 code, bool f
 	for (yi = 0; yi < 8; yi++)
 	{
 		if (!flipy)
-			 data = m_font[code * 8 + yi];
+				data = m_font[code * 8 + yi];
 		else
-			 data = m_font[code * 8 + (7-yi)];
+				data = m_font[code * 8 + (7-yi)];
 
 		for (xi = 0; xi < 8; xi++)
 		{
@@ -220,9 +220,9 @@ void vboy_state::put_char(int x, int y, UINT16 code, bool flipx, bool flipy, UIN
 	for (yi = 0; yi < 8; yi++)
 	{
 		if (!flipy)
-			 data = m_font[code * 8 + yi];
+				data = m_font[code * 8 + yi];
 		else
-			 data = m_font[code * 8 + (7-yi)];
+				data = m_font[code * 8 + (7-yi)];
 
 		for (xi = 0; xi < 8; xi++)
 		{
@@ -255,9 +255,9 @@ void vboy_state::fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal)
 	for (yi = 0; yi < 8; yi++)
 	{
 		if (!flipy)
-			 data = m_font[code * 8 + yi];
+				data = m_font[code * 8 + yi];
 		else
-			 data = m_font[code * 8 + (7-yi)];
+				data = m_font[code * 8 + (7-yi)];
 
 		for (xi = 0; xi < 8; xi++)
 		{
@@ -295,7 +295,7 @@ void vboy_state::fill_bg_map(int num, UINT16 scx, UINT16 scy)
 }
 
 void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
-                                                   UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
+													UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
 {
 	int x,y;
 
@@ -331,12 +331,12 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mo
 }
 
 void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w,
-                                                       UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
+														UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
 {
 	int x,y;
 
-    for(y=0;y<=h;y++)
-    {
+	for(y=0;y<=h;y++)
+	{
 		float h_skw = (INT16)vboy_paramtab[y*8+0] / 8.0;
 		float prlx = (INT16)vboy_paramtab[y*8+1] / 8.0;
 		float v_skw = (INT16)vboy_paramtab[y*8+2] / 8.0;
@@ -362,7 +362,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, in
 			else
 				pix = m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
 
-            if(pix != -1)
+			if(pix != -1)
 				if (y1>=0 && y1<224)
 					if (x1>=0 && x1<384)
 						bitmap.pix16(y1, x1) = machine().pens[pix & 3];
@@ -553,25 +553,25 @@ READ32_MEMBER( vboy_state::io_r )
 
 	switch ((offset << 2))
 	{
-		case 0x10:	// KLB (Keypad Low Byte)
-			value = m_vboy_regs.klb;	// 0x02 is always 1
+		case 0x10:  // KLB (Keypad Low Byte)
+			value = m_vboy_regs.klb;    // 0x02 is always 1
 			break;
-		case 0x14:	// KHB (Keypad High Byte)
+		case 0x14:  // KHB (Keypad High Byte)
 			value = m_vboy_regs.khb;
 			break;
-		case 0x18:	// TLB (Timer Low Byte)
+		case 0x18:  // TLB (Timer Low Byte)
 			value = m_vboy_regs.tlb;
 			break;
-		case 0x1c:	// THB (Timer High Byte)
+		case 0x1c:  // THB (Timer High Byte)
 			value = m_vboy_regs.thb;
 			break;
-		case 0x20:	// TCR (Timer Control Reg)
+		case 0x20:  // TCR (Timer Control Reg)
 			value = m_vboy_regs.tcr;
 			break;
-		case 0x24:	// WCR (Wait State Control Reg)
+		case 0x24:  // WCR (Wait State Control Reg)
 			value = m_vboy_regs.wcr;
 			break;
-		case 0x28:	// KCR (Keypad Control Reg)
+		case 0x28:  // KCR (Keypad Control Reg)
 			{
 //              attotime new_time = machine().time();
 
@@ -581,10 +581,10 @@ READ32_MEMBER( vboy_state::io_r )
 				value = m_vboy_regs.kcr | 0x4c;
 			}
 			break;
-		case 0x00:	// LPC (Link Port Control Reg)
-		case 0x04:	// LPC2 (Link Port Control Reg)
-		case 0x08:	// LPT (Link Port Transmit)
-		case 0x0c:	// LPR (Link Port Receive)
+		case 0x00:  // LPC (Link Port Control Reg)
+		case 0x04:  // LPC2 (Link Port Control Reg)
+		case 0x08:  // LPT (Link Port Transmit)
+		case 0x0c:  // LPR (Link Port Receive)
 		default:
 			logerror("Unemulated read: offset %08x\n", 0x02000000 + (offset << 2));
 			break;
@@ -596,62 +596,62 @@ WRITE32_MEMBER( vboy_state::io_w )
 {
 	switch (offset<<2)
 	{
-		case 0x0c:	// LPR (Link Port Receive)
-		case 0x10:	// KLB (Keypad Low Byte)
-		case 0x14:	// KHB (Keypad High Byte)
+		case 0x0c:  // LPR (Link Port Receive)
+		case 0x10:  // KLB (Keypad Low Byte)
+		case 0x14:  // KHB (Keypad High Byte)
 			//logerror("Ilegal write: offset %02x should be only read\n", offset);
 			break;
-        case 0x18:	// TLB (Timer Low Byte)
+		case 0x18:  // TLB (Timer Low Byte)
 			m_vboy_regs.tlb = data;
 			m_vboy_timer.latch = m_vboy_regs.tlb | (m_vboy_timer.latch & 0xff00);
 			break;
-		case 0x1c:	// THB (Timer High Byte)
+		case 0x1c:  // THB (Timer High Byte)
 			m_vboy_regs.thb = data;
 			m_vboy_timer.latch = (m_vboy_regs.thb<<8) | (m_vboy_timer.latch & 0xff);
 			break;
-		case 0x20:	// TCR (Timer Control Reg)
+		case 0x20:  // TCR (Timer Control Reg)
 			/*
-                111- ---- always 1
-                ---x ---- timer select (1=20 us, 0=100 us)
-                ---- x--- timer irq
-                ---- -x-- resets timer zero flag
-                ---- --x- timer is zero flag
-                ---- ---x enables timer
-            */
-            if (!(data & 0x08))
-            {
-                m_maincpu->set_input_line(1, CLEAR_LINE);
-            }
+			    111- ---- always 1
+			    ---x ---- timer select (1=20 us, 0=100 us)
+			    ---- x--- timer irq
+			    ---- -x-- resets timer zero flag
+			    ---- --x- timer is zero flag
+			    ---- ---x enables timer
+			*/
+			if (!(data & 0x08))
+			{
+				m_maincpu->set_input_line(1, CLEAR_LINE);
+			}
 
-            if (data & 1)
-            {
-                m_vboy_regs.tlb = m_vboy_timer.latch & 0xff;
-                m_vboy_regs.thb = m_vboy_timer.latch >> 8;
-                m_vboy_timer.count = m_vboy_timer.latch;
+			if (data & 1)
+			{
+				m_vboy_regs.tlb = m_vboy_timer.latch & 0xff;
+				m_vboy_regs.thb = m_vboy_timer.latch >> 8;
+				m_vboy_timer.count = m_vboy_timer.latch;
 
-                // only start timer if tcr & 1 is 1 and wasn't before?
-                if (!(m_vboy_regs.tcr & 1))
-                {
-                    if (data & 0x10)
-                    {
-                        m_maintimer->adjust(attotime::from_hz(50000));
-                    }
-                    else
-                    {
-                        m_maintimer->adjust(attotime::from_hz(10000));
-                    }
+				// only start timer if tcr & 1 is 1 and wasn't before?
+				if (!(m_vboy_regs.tcr & 1))
+				{
+					if (data & 0x10)
+					{
+						m_maintimer->adjust(attotime::from_hz(50000));
+					}
+					else
+					{
+						m_maintimer->adjust(attotime::from_hz(10000));
+					}
 
-                }
-            }
+				}
+			}
 
-            m_vboy_regs.tcr = (data & 0xfd) | (0xe4) | (m_vboy_regs.tcr & 2);	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
-            if(data & 4)
-                m_vboy_regs.tcr &= 0xfd;
+			m_vboy_regs.tcr = (data & 0xfd) | (0xe4) | (m_vboy_regs.tcr & 2);   // according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+			if(data & 4)
+				m_vboy_regs.tcr &= 0xfd;
 			break;
-		case 0x24:	// WCR (Wait State Control Reg)
-			m_vboy_regs.wcr = data | 0xfc;	// according to docs: bits 2 to 7 are unused and set to 1.
+		case 0x24:  // WCR (Wait State Control Reg)
+			m_vboy_regs.wcr = data | 0xfc;  // according to docs: bits 2 to 7 are unused and set to 1.
 			break;
-		case 0x28:	// KCR (Keypad Control Reg)
+		case 0x28:  // KCR (Keypad Control Reg)
 			if (data & 0x04 )
 			{
 				m_vboy_regs.klb = (ioport("INPUT")->read() & 0x00ff);
@@ -667,11 +667,11 @@ WRITE32_MEMBER( vboy_state::io_w )
 			}
 
 
-			m_vboy_regs.kcr = (data | 0x48) & 0xfd;	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
+			m_vboy_regs.kcr = (data | 0x48) & 0xfd; // according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
 			break;
-		case 0x00:	// LPC (Link Port Control Reg)
-		case 0x04:	// LPC2 (Link Port Control Reg)
-		case 0x08:	// LPT (Link Port Transmit)
+		case 0x00:  // LPC (Link Port Control Reg)
+		case 0x04:  // LPC2 (Link Port Control Reg)
+		case 0x08:  // LPT (Link Port Transmit)
 		default:
 			logerror("Unemulated write: offset %08x, data %04x\n", 0x02000000 + (offset << 2), data);
 			break;
@@ -712,11 +712,11 @@ void vboy_state::m_set_brightness(void)
 READ16_MEMBER( vboy_state::vip_r )
 {
 	switch(offset << 1) {
-		case 0x00:	//INTPND
+		case 0x00:  //INTPND
 					return m_vip_regs.INTPND;
-		case 0x02:	//INTENB
+		case 0x02:  //INTENB
 					return m_vip_regs.INTENB;
-		case 0x04:	//INTCLR
+		case 0x04:  //INTCLR
 					logerror("Error reading INTCLR\n");
 					break;
 /*
@@ -732,7 +732,7 @@ READ16_MEMBER( vboy_state::vip_r )
         ---- ---- --00 01-- LFB0
         ---- ---- ---- --x- DISP
 */
-		case 0x20:	//DPSTTS
+		case 0x20:  //DPSTTS
 		{
 			UINT16 res;
 
@@ -753,32 +753,32 @@ READ16_MEMBER( vboy_state::vip_r )
 			//printf("%04x\n",res);
 			return res;
 		}
-		case 0x22:	//DPCTRL
+		case 0x22:  //DPCTRL
 					return m_vip_regs.DPCTRL;
-		case 0x24:	//BRTA
+		case 0x24:  //BRTA
 					return m_vip_regs.BRTA;
-		case 0x26:	//BRTB
+		case 0x26:  //BRTB
 					return m_vip_regs.BRTB;
-		case 0x28:	//BRTC
+		case 0x28:  //BRTC
 					return m_vip_regs.BRTC;
-		case 0x2A:	//REST
+		case 0x2A:  //REST
 					return m_vip_regs.REST;
-		case 0x2E:	//FRMCYC
+		case 0x2E:  //FRMCYC
 					return m_vip_regs.FRMCYC;
-		case 0x30:	//CTA
+		case 0x30:  //CTA
 					printf("Read CTA\n");
 					return m_vip_regs.CTA;
-		case 0x40:	//XPSTTS, piXel Processor STaTuS
+		case 0x40:  //XPSTTS, piXel Processor STaTuS
 		{
 			/*
-            x--- ---- ---- ---- SBOUT
-            ---x xxxx ---- ---- SBCOUNT
-            ---- ---- ---x ---- OVERTIME (process overflow)
-            ---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
-            ---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
-            ---- ---- ---- --x- XPEN (starts drawing at beginning of game frame)
-            ---- ---- ---- ---x XPRST (force drawing process to idle)
-            */
+			x--- ---- ---- ---- SBOUT
+			---x xxxx ---- ---- SBCOUNT
+			---- ---- ---x ---- OVERTIME (process overflow)
+			---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
+			---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
+			---- ---- ---- --x- XPEN (starts drawing at beginning of game frame)
+			---- ---- ---- ---x XPRST (force drawing process to idle)
+			*/
 			UINT16 res;
 
 			//printf("%d\n",row_num);
@@ -794,36 +794,36 @@ READ16_MEMBER( vboy_state::vip_r )
 
 			return res;
 		}
-		case 0x42:	//XPCTRL
+		case 0x42:  //XPCTRL
 					return m_vip_regs.XPCTRL;
-		case 0x44:	//VER
+		case 0x44:  //VER
 					printf("%08x read VER\n",m_maincpu->pc());
 					return m_vip_regs.VER;
-		case 0x48:	//SPT0
+		case 0x48:  //SPT0
 					return m_vip_regs.SPT[0];
-		case 0x4A:	//SPT1
+		case 0x4A:  //SPT1
 					return m_vip_regs.SPT[1];
-		case 0x4C:	//SPT2
+		case 0x4C:  //SPT2
 					return m_vip_regs.SPT[2];
-		case 0x4E:	//SPT3
+		case 0x4E:  //SPT3
 					return m_vip_regs.SPT[3];
-		case 0x60:	//GPLT0
+		case 0x60:  //GPLT0
 					return m_vip_regs.GPLT[0];
-		case 0x62:	//GPLT1
+		case 0x62:  //GPLT1
 					return m_vip_regs.GPLT[1];
-		case 0x64:	//GPLT2
+		case 0x64:  //GPLT2
 					return m_vip_regs.GPLT[2];
-		case 0x66:	//GPLT3
+		case 0x66:  //GPLT3
 					return m_vip_regs.GPLT[3];
-		case 0x68:	//JPLT0
+		case 0x68:  //JPLT0
 					return m_vip_regs.JPLT[0];
-		case 0x6A:	//JPLT1
+		case 0x6A:  //JPLT1
 					return m_vip_regs.JPLT[1];
-		case 0x6C:	//JPLT2
+		case 0x6C:  //JPLT2
 					return m_vip_regs.JPLT[2];
-		case 0x6E:	//JPLT3
+		case 0x6E:  //JPLT3
 					return m_vip_regs.JPLT[3];
-		case 0x70:	//BKCOL
+		case 0x70:  //BKCOL
 					return m_vip_regs.BKCOL;
 		default:
 					logerror("Unemulated read: addr %08x\n", offset * 2 + 0x0005f800);
@@ -839,30 +839,30 @@ WRITE16_MEMBER( vboy_state::vip_w )
 
 	switch(offset << 1) {
 		/*
-            x--- ---- ---- ---- TIME_ERR
-            -x-- ---- ---- ---- XP_END
-            --x- ---- ---- ---- SB_HIT
-            ---- ---- ---x ---- FRAME_START
-            ---- ---- ---- x--- GAME_START
-            ---- ---- ---- -x-- RFB_END
-            ---- ---- ---- --x- LFB_END
-            ---- ---- ---- ---x SCAN_ERR
-        */
-		case 0x00:	//INTPND
+		    x--- ---- ---- ---- TIME_ERR
+		    -x-- ---- ---- ---- XP_END
+		    --x- ---- ---- ---- SB_HIT
+		    ---- ---- ---x ---- FRAME_START
+		    ---- ---- ---- x--- GAME_START
+		    ---- ---- ---- -x-- RFB_END
+		    ---- ---- ---- --x- LFB_END
+		    ---- ---- ---- ---x SCAN_ERR
+		*/
+		case 0x00:  //INTPND
 					logerror("Error writing INTPND\n");
 					break;
-		case 0x02:	//INTENB
+		case 0x02:  //INTENB
 					m_vip_regs.INTENB = data;
 					m_set_irq(0);
 					//printf("%04x ENB\n",data);
 					break;
-		case 0x04:	//INTCLR
+		case 0x04:  //INTCLR
 					m_vip_regs.INTPND &= ~data;
 					m_set_irq(0);
 					//else
 					//  printf("%04x\n",m_vip_regs.INTPND);
 					break;
-		case 0x20:	//DPSTTS
+		case 0x20:  //DPSTTS
 					logerror("Error writing DPSTTS\n");
 					break;
 /*
@@ -872,7 +872,7 @@ WRITE16_MEMBER( vboy_state::vip_w )
         ---- ---- ---- --x- DISP
         ---- ---- ---- ---x DPRST (Resets the VIP internal counter)
 */
-		case 0x22:	//DPCTRL
+		case 0x22:  //DPCTRL
 					m_vip_regs.DPCTRL = data & 0x0702;
 
 					if(data & 1)
@@ -881,40 +881,40 @@ WRITE16_MEMBER( vboy_state::vip_w )
 						m_set_irq(0);
 					}
 					break;
-		case 0x24:	//BRTA
+		case 0x24:  //BRTA
 					m_vip_regs.BRTA = data;
 					m_set_brightness();
 					break;
-		case 0x26:	//BRTB
+		case 0x26:  //BRTB
 					m_vip_regs.BRTB = data;
 					m_set_brightness();
 					break;
-		case 0x28:	//BRTC
+		case 0x28:  //BRTC
 					m_vip_regs.BRTC = data;
 					m_set_brightness();
 					break;
-		case 0x2A:	//REST
+		case 0x2A:  //REST
 					m_vip_regs.REST = data;
 					m_set_brightness();
 					if(data)
 						printf("%04x REST\n",data);
 					break;
-		case 0x2E:	//FRMCYC
+		case 0x2E:  //FRMCYC
 					//printf("%d\n",data);
 					m_vip_regs.FRMCYC = data;
 					break;
-		case 0x30:	//CTA
+		case 0x30:  //CTA
 					m_vip_regs.CTA = data;
 					printf("%04x CTA\n",data);
 					break;
-		case 0x40:	//XPSTTS
+		case 0x40:  //XPSTTS
 					logerror("Error writing XPSTTS\n");
 					break;
-		case 0x42:	//XPCTRL, w/o
+		case 0x42:  //XPCTRL, w/o
 					/*
-                    ---- ---- ---- --x-
-                    ---- ---- ---- ---x Reset Pixel Processor
-                    */
+					---- ---- ---- --x-
+					---- ---- ---- ---x Reset Pixel Processor
+					*/
 					m_vip_regs.XPCTRL = data & 0x1f02;
 
 					//if(data & 0x1f00)
@@ -926,46 +926,46 @@ WRITE16_MEMBER( vboy_state::vip_w )
 						m_set_irq(0);
 					}
 					break;
-		case 0x44:	//VER
+		case 0x44:  //VER
 					//m_vip_regs.VER = data;
 					break;
-		case 0x48:	//SPT0
+		case 0x48:  //SPT0
 					m_vip_regs.SPT[0] = data & 0x3ff;
 					break;
-		case 0x4A:	//SPT1
+		case 0x4A:  //SPT1
 					m_vip_regs.SPT[1] = data & 0x3ff;
 					break;
-		case 0x4C:	//SPT2
+		case 0x4C:  //SPT2
 					m_vip_regs.SPT[2] = data & 0x3ff;
 					break;
-		case 0x4E:	//SPT3
+		case 0x4E:  //SPT3
 					m_vip_regs.SPT[3] = data & 0x3ff;
 					break;
-		case 0x60:	//GPLT0
+		case 0x60:  //GPLT0
 					m_vip_regs.GPLT[0] = data;
 					break;
-		case 0x62:	//GPLT1
+		case 0x62:  //GPLT1
 					m_vip_regs.GPLT[1] = data;
 					break;
-		case 0x64:	//GPLT2
+		case 0x64:  //GPLT2
 					m_vip_regs.GPLT[2] = data;
 					break;
-		case 0x66:	//GPLT3
+		case 0x66:  //GPLT3
 					m_vip_regs.GPLT[3] = data;
 					break;
-		case 0x68:	//JPLT0
+		case 0x68:  //JPLT0
 					m_vip_regs.JPLT[0] = data & 0xfc;
 					break;
-		case 0x6A:	//JPLT1
+		case 0x6A:  //JPLT1
 					m_vip_regs.JPLT[1] = data & 0xfc;
 					break;
-		case 0x6C:	//JPLT2
+		case 0x6C:  //JPLT2
 					m_vip_regs.JPLT[2] = data & 0xfc;
 					break;
-		case 0x6E:	//JPLT3
+		case 0x6E:  //JPLT3
 					m_vip_regs.JPLT[3] = data & 0xfc;
 					break;
-		case 0x70:	//BKCOL
+		case 0x70:  //BKCOL
 					m_vip_regs.BKCOL = data & 3;
 					break;
 		default:
@@ -1183,44 +1183,44 @@ void vboy_state::machine_reset()
 	m_displayfb = 0;
 	m_drawfb = 0;
 
-    m_vboy_timer.count = 0;
-    m_maintimer->adjust(attotime::never);
+	m_vboy_timer.count = 0;
+	m_maintimer->adjust(attotime::never);
 }
 
 
 void vboy_state::m_timer_tick()
 {
-    if(m_vboy_timer.count > 0)
-    {
-        m_vboy_timer.count--;
-        m_vboy_regs.tlb = m_vboy_timer.count & 0xff;
-        m_vboy_regs.thb = m_vboy_timer.count >> 8;
-    }
+	if(m_vboy_timer.count > 0)
+	{
+		m_vboy_timer.count--;
+		m_vboy_regs.tlb = m_vboy_timer.count & 0xff;
+		m_vboy_regs.thb = m_vboy_timer.count >> 8;
+	}
 
-    if (m_vboy_timer.count == 0)
-    {
-        m_vboy_timer.count = m_vboy_timer.latch;
-        m_vboy_regs.tcr |= 0x02;
-        if(m_vboy_regs.tcr & 8)
-        {
-            m_maincpu->set_input_line(1, ASSERT_LINE);
-        }
-    }
+	if (m_vboy_timer.count == 0)
+	{
+		m_vboy_timer.count = m_vboy_timer.latch;
+		m_vboy_regs.tcr |= 0x02;
+		if(m_vboy_regs.tcr & 8)
+		{
+			m_maincpu->set_input_line(1, ASSERT_LINE);
+		}
+	}
 
-    if (m_vboy_regs.tcr & 0x10)
-    {
-        m_maintimer->adjust(attotime::from_hz(50000));
-    }
-    else
-    {
-        m_maintimer->adjust(attotime::from_hz(10000));
-    }
+	if (m_vboy_regs.tcr & 0x10)
+	{
+		m_maintimer->adjust(attotime::from_hz(50000));
+	}
+	else
+	{
+		m_maintimer->adjust(attotime::from_hz(10000));
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_main_tick)
 {
 
-    m_timer_tick();
+	m_timer_tick();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
@@ -1396,10 +1396,10 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_r", vboy_state, vboy_scanlineR, "3dright", 0, 1)
 
 
-    // programmable timer
+	// programmable timer
 	MCFG_TIMER_DRIVER_ADD("timer_main", vboy_state, timer_main_tick)
 
-    // pad ready, which should be once per VBL
+	// pad ready, which should be once per VBL
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_pad", vboy_state, timer_pad_tick, attotime::from_hz(50.038029f))
 
 	/* video hardware */

@@ -34,7 +34,7 @@
 
 // ======================> ym2151_device
 
-class ym2151_device :	public device_t,
+class ym2151_device :   public device_t,
 						public device_sound_interface
 {
 public:
@@ -68,12 +68,12 @@ private:
 	static void port_write_frontend(device_t *device, offs_t offset, UINT8 data);
 
 	// internal state
-	sound_stream *			m_stream;
-	emu_timer *				m_timer[2];
-	void *					m_chip;
-	UINT8					m_lastreg;
-	devcb2_write_line		m_irqhandler;
-	devcb2_write8			m_portwritehandler;
+	sound_stream *          m_stream;
+	emu_timer *             m_timer[2];
+	void *                  m_chip;
+	UINT8                   m_lastreg;
+	devcb2_write_line       m_irqhandler;
+	devcb2_write8           m_portwritehandler;
 };
 
 

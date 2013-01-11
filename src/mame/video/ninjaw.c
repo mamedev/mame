@@ -36,24 +36,24 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			continue;
 
 		data = spriteram[offs + 0];
-		x = (data - 32) & 0x3ff;	/* aligns sprites on rock outcrops and sewer hole */
+		x = (data - 32) & 0x3ff;    /* aligns sprites on rock outcrops and sewer hole */
 
 		data = spriteram[offs + 1];
 		y = (data - 0) & 0x1ff;
 
 		/*
-            The purpose of the bit at data&0x8 (below) is unknown, but it is set
-            on Darius explosions, some enemy missiles and at least 1 boss.
-            It is most likely another priority bit but as there are no obvious
-            visual problems it will need checked against the original pcb.
+		    The purpose of the bit at data&0x8 (below) is unknown, but it is set
+		    on Darius explosions, some enemy missiles and at least 1 boss.
+		    It is most likely another priority bit but as there are no obvious
+		    visual problems it will need checked against the original pcb.
 
-            There is a report this bit is set when the player intersects
-            the tank sprite in Ninja Warriors however I was unable to repro
-            this or find any use of this bit in that game.
+		    There is a report this bit is set when the player intersects
+		    the tank sprite in Ninja Warriors however I was unable to repro
+		    this or find any use of this bit in that game.
 
-            Bit&0x8000 is set on some sprites in later levels of Darius
-            but is again unknown, and there is no obvious visual problem.
-        */
+		    Bit&0x8000 is set on some sprites in later levels of Darius
+		    but is again unknown, and there is no obvious visual problem.
+		*/
 		data = spriteram[offs + 3];
 		flipx    = (data & 0x1);
 		flipy    = (data & 0x2) >> 1;
@@ -108,7 +108,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 	/* chip 0 does tilemaps on the left, chip 1 center, chip 2 the right */
 	// draw bottom layer
-	nodraw  = tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);	/* left */
+	nodraw  = tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);    /* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)

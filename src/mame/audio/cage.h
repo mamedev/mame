@@ -4,8 +4,8 @@
 
 ****************************************************************************/
 
-#define CAGE_IRQ_REASON_DATA_READY		(1)
-#define CAGE_IRQ_REASON_BUFFER_EMPTY	(2)
+#define CAGE_IRQ_REASON_DATA_READY      (1)
+#define CAGE_IRQ_REASON_BUFFER_EMPTY    (2)
 
 MACHINE_CONFIG_EXTERN( cage );
 MACHINE_CONFIG_EXTERN( cage_seattle );

@@ -79,23 +79,23 @@ enum
 
 
 // mode register
-#define MODE_MASK			0x03
-#define MODE_ALARM_EN		0x04
-#define MODE_TIMER_EN		0x08
+#define MODE_MASK           0x03
+#define MODE_ALARM_EN       0x04
+#define MODE_TIMER_EN       0x08
 
 
 // test register
-#define TEST_0				0x01
-#define TEST_1				0x02
-#define TEST_2				0x04
-#define TEST_3				0x08
+#define TEST_0              0x01
+#define TEST_1              0x02
+#define TEST_2              0x04
+#define TEST_3              0x08
 
 
 // reset register
-#define RESET_ALARM			0x01
-#define RESET_TIMER			0x02
-#define RESET_16_HZ			0x04
-#define RESET_1_HZ			0x08
+#define RESET_ALARM         0x01
+#define RESET_TIMER         0x02
+#define RESET_16_HZ         0x04
+#define RESET_1_HZ          0x08
 
 
 
@@ -174,12 +174,12 @@ inline void rp5c01_device::check_alarm()
 
 rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock),
-	  device_rtc_interface(mconfig, *this),
-	  device_nvram_interface(mconfig, *this),
-	  m_alarm(1),
-	  m_alarm_on(1),
-	  m_1hz(1),
-	  m_16hz(1)
+		device_rtc_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_alarm(1),
+		m_alarm_on(1),
+		m_1hz(1),
+		m_16hz(1)
 {
 }
 

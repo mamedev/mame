@@ -103,14 +103,14 @@ Notes:
 
 static const UINT8 sslam_snd_cmd[64] =
 {
-/*00*/	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-/*08*/	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
-/*10*/	0x72, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
-/*18*/	0x15, 0x16, 0x17, 0x18, 0x19, 0x73, 0x74, 0x75,
-/*20*/	0x76, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x63,
-/*28*/	0x64, 0x6b, 0xff, 0xff, 0x60, 0x20, 0x6c, 0x65,
-/*30*/	0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
-/*38*/	0x29, 0x2a, 0x2b, 0xff, 0x69, 0xff, 0x20, 0xff
+/*00*/  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+/*08*/  0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
+/*10*/  0x72, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+/*18*/  0x15, 0x16, 0x17, 0x18, 0x19, 0x73, 0x74, 0x75,
+/*20*/  0x76, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x63,
+/*28*/  0x64, 0x6b, 0xff, 0xff, 0x60, 0x20, 0x6c, 0x65,
+/*30*/  0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+/*38*/  0x29, 0x2a, 0x2b, 0xff, 0x69, 0xff, 0x20, 0xff
 };
 
 
@@ -126,14 +126,14 @@ static const UINT8 sslam_snd_cmd[64] =
 
 static const UINT8 sslam_snd_loop[8][19] =
 {
-/*NA*/	{ 0x00, 0x00 },	/* Not a loop - just a parking position for stopping track playback */
-/*60*/	{ 0x60, 0x60, 0x61, 0x61, 0x60, 0x60, 0x61, 0x62, 0xff },
-/*63*/	{ 0x63, 0x00 },
-/*64*/	{ 0x64, 0x00 },
-/*65*/	{ 0x65, 0x65, 0x66, 0x66, 0x65, 0x65, 0x66, 0x67, 0x67, 0x68, 0x65, 0x65, 0x67, 0x65, 0x66, 0x66, 0x67, 0x68, 0xff },
-/*69*/	{ 0x69, 0xff },
-/*6B*/	{ 0x6b, 0x6a, 0x6a, 0x6b, 0x6a, 0xff },
-/*6C*/	{ 0x6c, 0xff }
+/*NA*/  { 0x00, 0x00 }, /* Not a loop - just a parking position for stopping track playback */
+/*60*/  { 0x60, 0x60, 0x61, 0x61, 0x60, 0x60, 0x61, 0x62, 0xff },
+/*63*/  { 0x63, 0x00 },
+/*64*/  { 0x64, 0x00 },
+/*65*/  { 0x65, 0x65, 0x66, 0x66, 0x65, 0x65, 0x66, 0x67, 0x67, 0x68, 0x65, 0x65, 0x67, 0x65, 0x66, 0x66, 0x67, 0x68, 0xff },
+/*69*/  { 0x69, 0xff },
+/*6B*/  { 0x6b, 0x6a, 0x6a, 0x6b, 0x6a, 0xff },
+/*6C*/  { 0x6c, 0xff }
 };
 
 
@@ -224,7 +224,7 @@ TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 		pattern = sslam_snd_loop[m_melody][m_bar];
 
 		if (pattern) {
-			if (pattern == 0xff) {		/* Repeat track from first bar */
+			if (pattern == 0xff) {      /* Repeat track from first bar */
 				m_bar = 0;
 				pattern = sslam_snd_loop[m_melody][m_bar];
 			}
@@ -232,7 +232,7 @@ TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 			device->write_command(0x80 | pattern);
 			device->write_command(0x81);
 		}
-		else if (pattern == 0x00) {		/* Non-looped track. Stop playing it */
+		else if (pattern == 0x00) {     /* Non-looped track. Stop playing it */
 			m_track = 0;
 			m_melody = 0;
 			m_bar = 0;
@@ -263,7 +263,7 @@ static void sslam_play(device_t *device, int track, int data)
 					oki->write_command(0x40);
 				oki->write_command((0x80 | data));
 				oki->write_command(0x81);
-				state->m_music_timer->adjust(attotime::from_msec(4), 0, attotime::from_hz(250));	/* 250Hz for smooth sequencing */
+				state->m_music_timer->adjust(attotime::from_msec(4), 0, attotime::from_hz(250));    /* 250Hz for smooth sequencing */
 			}
 		}
 		else {
@@ -281,7 +281,7 @@ static void sslam_play(device_t *device, int track, int data)
 			}
 		}
 	}
-	else {		/* use above 0x80 to turn off channels */
+	else {      /* use above 0x80 to turn off channels */
 		if (track) {
 			state->m_music_timer->enable(false);
 			state->m_track = 0;
@@ -304,7 +304,7 @@ WRITE16_MEMBER(sslam_state::sslam_snd_w)
 			if (data == 0xfe) {
 				/* This should reset the sound MCU and stop audio playback, but here, it */
 				/* chops the first coin insert. So let's only stop any playing melodies. */
-				sslam_play(device, 1, (0x80 | 0x40));		/* Stop playing the melody */
+				sslam_play(device, 1, (0x80 | 0x40));       /* Stop playing the melody */
 			}
 			else {
 				logerror("Unknown command (%02x) sent to the Sound controller\n",data);
@@ -312,7 +312,7 @@ WRITE16_MEMBER(sslam_state::sslam_snd_w)
 			}
 		}
 		else if (data == 0) {
-			m_bar = 0;		/* Complete any current bars then stop sequencing */
+			m_bar = 0;      /* Complete any current bars then stop sequencing */
 			m_melody = 0;
 		}
 		else {
@@ -334,10 +334,10 @@ WRITE16_MEMBER(sslam_state::sslam_snd_w)
 				m_snd_bank = 2;
 				switch (m_sound)
 				{
-					case 0x69:	m_melody = 5; break;
-					case 0x6b:	m_melody = 6; break;
-					case 0x6c:	m_melody = 7; break;
-					default:	m_melody = 0; m_bar = 0; break;	/* Invalid */
+					case 0x69:  m_melody = 5; break;
+					case 0x6b:  m_melody = 6; break;
+					case 0x6c:  m_melody = 7; break;
+					default:    m_melody = 0; m_bar = 0; break; /* Invalid */
 				}
 				sslam_play(device, m_melody, m_sound);
 			}
@@ -354,10 +354,10 @@ WRITE16_MEMBER(sslam_state::sslam_snd_w)
 				m_snd_bank = 0;
 				switch (m_sound)
 				{
-					case 0x60:	m_melody = 1; break;
-					case 0x63:	m_melody = 2; break;
-					case 0x64:	m_melody = 3; break;
-					default:	m_melody = 0; m_bar = 0; break;	/* Invalid */
+					case 0x60:  m_melody = 1; break;
+					case 0x63:  m_melody = 2; break;
+					case 0x64:  m_melody = 3; break;
+					default:    m_melody = 0; m_bar = 0; break; /* Invalid */
 				}
 				sslam_play(device, m_melody, m_sound);
 			}
@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(sslam_snd_w)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM	  /* Main RAM */
+	AM_RANGE(0xf00000, 0xffffff) AM_RAM   /* Main RAM */
 
 	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 ADDRESS_MAP_END
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(powerbls_sound_w)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM	  /* Main RAM */
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM   /* Main RAM */
 ADDRESS_MAP_END
 
 
@@ -528,7 +528,7 @@ static INPUT_PORTS_START( sslam )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, "Coin(s) per Player" )	PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Coin(s) per Player" )    PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, "1" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "3" )
@@ -537,7 +537,7 @@ static INPUT_PORTS_START( sslam )
 	PORT_DIPSETTING(    0x02, "6" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x00, "8" )
-	PORT_DIPNAME( 0x38, 0x38, "Coin Multiplicator" )	PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, "Coin Multiplicator" )    PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x38, "*1" )
 	PORT_DIPSETTING(    0x30, "*2" )
 	PORT_DIPSETTING(    0x28, "*3" )
@@ -546,34 +546,34 @@ static INPUT_PORTS_START( sslam )
 	PORT_DIPSETTING(    0x10, "*6" )
 	PORT_DIPSETTING(    0x08, "*7" )
 	PORT_DIPSETTING(    0x00, "*8" )
-	PORT_DIPNAME( 0x40, 0x40, "On Time Up" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "On Time Up" )            PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "End After Point" )
 	PORT_DIPSETTING(    0x40, "End After Game" )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )            PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:1,2")	// 0x000522 = 0x00400e
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:1,2") // 0x000522 = 0x00400e
 	PORT_DIPSETTING(    0x03, "0" )
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x04, 0x04, "Singles Game Time" )		PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Singles Game Time" )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "180 Seconds" )
 	PORT_DIPSETTING(    0x00, "120 Seconds" )
-	PORT_DIPNAME( 0x08, 0x08, "Doubles Game Time" )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Doubles Game Time" )     PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "180 Seconds" )
 	PORT_DIPSETTING(    0x00, "120 Seconds" )
-	PORT_DIPNAME( 0x30, 0x30, "Starting Score" )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Starting Score" )        PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "4-4" )
 	PORT_DIPSETTING(    0x20, "3-4" )
 	PORT_DIPSETTING(    0x10, "3-3" )
 	PORT_DIPSETTING(    0x00, "0-0" )
-	PORT_DIPNAME( 0x40, 0x40, "Play Mode"	)			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Play Mode"   )           PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, "2 Players" )
 	PORT_DIPSETTING(    0x40, "4 Players" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -610,31 +610,31 @@ static INPUT_PORTS_START( powerbls )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Language ) )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Italian ) )
-	PORT_DIPNAME( 0x20, 0x00, "Weapon" )					PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, "Weapon" )                    PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )           PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
@@ -643,7 +643,7 @@ static INPUT_PORTS_START( powerbls )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
@@ -652,10 +652,10 @@ static INPUT_PORTS_START( powerbls )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -704,12 +704,12 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( sslam, sslam_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(sslam_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", I8051, 12000000)
-	MCFG_DEVICE_DISABLE()		/* Internal code is not dumped - 2 boards were protected */
+	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped - 2 boards were protected */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -734,11 +734,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( powerbls, sslam_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(powerbls_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I80C51, 12000000)		/* 83C751 */
+	MCFG_CPU_ADD("audiocpu", I80C51, 12000000)      /* 83C751 */
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
@@ -757,7 +757,7 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)	/* verified on original PCB */
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)   /* verified on original PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

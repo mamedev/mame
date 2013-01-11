@@ -290,11 +290,11 @@ static void bg_ctrl(int offset, int data, tilemap_t* tilemap)
 
 	switch (offset)
 	{
-		case 0:	scrollx = ((scrollx & 0x100) | data);        break;
-		case 1:	scrollx = ((scrollx & 0x0ff) | (data << 8)); break;
-		case 2:	scrolly = ((scrolly & 0x100) | data);        break;
-		case 3:	scrolly = ((scrolly & 0x0ff) | (data << 8)); break;
-		case 4:	tilemap->enable(data & 1); break;
+		case 0: scrollx = ((scrollx & 0x100) | data);        break;
+		case 1: scrollx = ((scrollx & 0x0ff) | (data << 8)); break;
+		case 2: scrolly = ((scrolly & 0x100) | data);        break;
+		case 3: scrolly = ((scrolly & 0x0ff) | (data << 8)); break;
+		case 4: tilemap->enable(data & 1); break;
 	}
 
 	tilemap->set_scrollx(0, scrollx);
@@ -345,14 +345,14 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap)
 	UINT8* sprptr = &state->m_spriteram[11];
 	int sprites_drawn = 0;
 
-    /* The sprite generator draws exactly 96 16x16 sprites per frame. When big
-       (32x32) sprites are drawn, this counts for 4 sprites drawn, so the sprite
-       list is reduced accordingly (i.e. three slots at the end of the list will
-       be ignored). Note that a disabled sprite, even if it is not drawn, still
-       counts as one sprite drawn.
-       This is proven by Mutant Night, which doesn't work correctly (leaves shots
-       on screen) if we don't take big sprites into account.
-    */
+	/* The sprite generator draws exactly 96 16x16 sprites per frame. When big
+	   (32x32) sprites are drawn, this counts for 4 sprites drawn, so the sprite
+	   list is reduced accordingly (i.e. three slots at the end of the list will
+	   be ignored). Note that a disabled sprite, even if it is not drawn, still
+	   counts as one sprite drawn.
+	   This is proven by Mutant Night, which doesn't work correctly (leaves shots
+	   on screen) if we don't take big sprites into account.
+	*/
 
 	for (;;)
 	{

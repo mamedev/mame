@@ -40,7 +40,7 @@ struct sidOperator
 	UINT16 curSIDfreq;
 	UINT16 curNoiseFreq;
 
-    UINT8 output;//, outputMask;
+	UINT8 output;//, outputMask;
 
 	char filtVoiceMask;
 	int filtEnabled;

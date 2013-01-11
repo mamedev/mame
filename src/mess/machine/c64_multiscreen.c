@@ -59,12 +59,12 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MC6802P_TAG		"m6802"
-#define MC6821P_0_TAG	"m6821_0"
-#define MC6821P_1_TAG	"m6821_1"
+#define MC6802P_TAG     "m6802"
+#define MC6821P_0_TAG   "m6821_0"
+#define MC6821P_1_TAG   "m6821_1"
 
 
-#define BANK_RAM		0x0d
+#define BANK_RAM        0x0d
 
 
 
@@ -81,7 +81,7 @@ const device_type C64_MULTISCREEN = &device_creator<c64_multiscreen_cartridge_de
 
 ROM_START( c64_multiscreen )
 	ROM_REGION( 0x2000, MC6802P_TAG, 0 )
-	ROM_LOAD( "1",	  0x0000, 0x1000, CRC(35be02a8) SHA1(5912bc3d8e0c0949c1e66c19116d6b71c7574e46) )
+	ROM_LOAD( "1",    0x0000, 0x1000, CRC(35be02a8) SHA1(5912bc3d8e0c0949c1e66c19116d6b71c7574e46) )
 	ROM_LOAD( "2 cr", 0x1000, 0x1000, CRC(76a9ac6d) SHA1(87e7335e626bdb73498b46c28c7baab72df38d1f) )
 ROM_END
 
@@ -107,18 +107,18 @@ ADDRESS_MAP_END
 
 static const pia6821_interface pia0_intf =
 {
-	DEVCB_NULL,		// input A
-	DEVCB_NULL,		// input B
-	DEVCB_NULL,		// input CA1
-	DEVCB_NULL,		// input CB1
-	DEVCB_NULL,		// input CA2
-	DEVCB_NULL,		// input CB2
-	DEVCB_NULL,		// output A
-	DEVCB_NULL,		// output B
-	DEVCB_NULL,		// output CA2
-	DEVCB_NULL,		// output CB2
-	DEVCB_NULL,		// irq A
-	DEVCB_NULL		// irq B
+	DEVCB_NULL,     // input A
+	DEVCB_NULL,     // input B
+	DEVCB_NULL,     // input CA1
+	DEVCB_NULL,     // input CB1
+	DEVCB_NULL,     // input CA2
+	DEVCB_NULL,     // input CB2
+	DEVCB_NULL,     // output A
+	DEVCB_NULL,     // output B
+	DEVCB_NULL,     // output CA2
+	DEVCB_NULL,     // output CB2
+	DEVCB_NULL,     // irq A
+	DEVCB_NULL      // irq B
 };
 
 
@@ -128,18 +128,18 @@ static const pia6821_interface pia0_intf =
 
 static const pia6821_interface pia1_intf =
 {
-	DEVCB_NULL,		// input A
-	DEVCB_NULL,		// input B
-	DEVCB_NULL,		// input CA1
-	DEVCB_NULL,		// input CB1
-	DEVCB_NULL,		// input CA2
-	DEVCB_NULL,		// input CB2
-	DEVCB_NULL,		// output A
-	DEVCB_NULL,		// output B
-	DEVCB_NULL,		// output CA2
-	DEVCB_NULL,		// output CB2
-	DEVCB_NULL,		// irq A
-	DEVCB_NULL		// irq B
+	DEVCB_NULL,     // input A
+	DEVCB_NULL,     // input B
+	DEVCB_NULL,     // input CA1
+	DEVCB_NULL,     // input CB1
+	DEVCB_NULL,     // input CA2
+	DEVCB_NULL,     // input CB2
+	DEVCB_NULL,     // output A
+	DEVCB_NULL,     // output B
+	DEVCB_NULL,     // output CA2
+	DEVCB_NULL,     // output CB2
+	DEVCB_NULL,     // irq A
+	DEVCB_NULL      // irq B
 };
 
 

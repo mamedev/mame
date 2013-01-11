@@ -41,7 +41,7 @@ int pasti_format::identify(io_generic *io, UINT32 form_factor)
 	io_generic_read(io, h, 0, 16);
 
 	if(!memcmp(h, "RSY\0\3\0", 6) &&
-	   (1 || (h[10] >= 80 && h[10] <= 82) || (h[10] >= 160 && h[10] <= 164)))
+		(1 || (h[10] >= 80 && h[10] <= 82) || (h[10] >= 160 && h[10] <= 164)))
 		return 100;
 
 	return 0;
@@ -113,8 +113,8 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			if(0) {
 				printf("Track %2d.%d: el=%d fl=%d sect=%d flags=%04x tlen=%d/%d tnum=%d flags2=%02x sync=%x\n",
-					   track, head,
-					   entry_len, fuzz_len, sect, flags, track_len, tsize, track_num, flags2, syncpos);
+						track, head,
+						entry_len, fuzz_len, sect, flags, track_len, tsize, track_num, flags2, syncpos);
 				hexdump(raw_track+16*sect, entry_len-16-16*sect);
 			}
 
@@ -124,8 +124,8 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				for(int i=0; i<tsize-8; i++) {
 					if(tdata[i] == 0xa1 && tdata[i+1] == 0xa1 && tdata[i+2] != 0xa1)
 						printf("  header %5d: %02x %02x %02x %02x %02x %02x %02x\n",
-							   i+2,
-							   tdata[i+2], tdata[i+3], tdata[i+4], tdata[i+5], tdata[i+6], tdata[i+7], tdata[i+8]);
+								i+2,
+								tdata[i+2], tdata[i+3], tdata[i+4], tdata[i+5], tdata[i+6], tdata[i+7], tdata[i+8]);
 				}
 			}
 
@@ -143,8 +143,8 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				obs.sectors[s].position   = s_pos/8-12;
 				if(0) {
 					printf("  sector %2d: off=%5d pos=%5d [%02x %02x] time=%04x flags=%04x id=%02x.%02x.%02x.%02x.%02x.%02x\n",
-						   s, s_off, s_pos, tdata ? tdata[s_pos/8] : 0x00, tdata ? tdata[s_pos/8+1] : 0x00, s_time, s_flags,
-						   sh[8], sh[9], sh[10], sh[11], sh[12], sh[13]);
+							s, s_off, s_pos, tdata ? tdata[s_pos/8] : 0x00, tdata ? tdata[s_pos/8+1] : 0x00, s_time, s_flags,
+							sh[8], sh[9], sh[10], sh[11], sh[12], sh[13]);
 					hexdump(bdata+s_off, 128<<(sh[11] & 3));
 				}
 			}
@@ -288,20 +288,20 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 		for(int i=0; i != obs.sector_count; i++) {
 			wd_sect_info *s = sect_infos + i;
 			printf("%2d: %5d-%5d %c %02x %02x|%02x %02x %5d-%5d %c %02x %02x|%02x %02x %f\n",
-				   i,
-				   s->hstart, s->hend, s->hsynced ? 'S' : '-',
-				   s->hstart == -1 ? 0 : obs.track_data[s->hstart],
-				   s->hstart == -1 ? 0 : obs.track_data[s->hstart+1],
-				   s->hend == -1 ? 0 : obs.track_data[s->hend],
-				   s->hend == -1 ? 0 : obs.track_data[s->hend+1],
+					i,
+					s->hstart, s->hend, s->hsynced ? 'S' : '-',
+					s->hstart == -1 ? 0 : obs.track_data[s->hstart],
+					s->hstart == -1 ? 0 : obs.track_data[s->hstart+1],
+					s->hend == -1 ? 0 : obs.track_data[s->hend],
+					s->hend == -1 ? 0 : obs.track_data[s->hend+1],
 
-				   s->dstart, s->dend, s->dsynced ? 'S' : '-',
-				   s->dstart == -1 ? 0 : obs.track_data[s->dstart],
-				   s->dstart == -1 ? 0 : obs.track_data[s->dstart+1],
-				   s->dend == -1 ? 0 : obs.track_data[s->dend],
-				   s->dend == -1 ? 0 : obs.track_data[s->dend+1],
+					s->dstart, s->dend, s->dsynced ? 'S' : '-',
+					s->dstart == -1 ? 0 : obs.track_data[s->dstart],
+					s->dstart == -1 ? 0 : obs.track_data[s->dstart+1],
+					s->dend == -1 ? 0 : obs.track_data[s->dend],
+					s->dend == -1 ? 0 : obs.track_data[s->dend+1],
 
-				   obs.sectors[i].time_ratio);
+					obs.sectors[i].time_ratio);
 		}
 
 	if(obs.sector_count) {
@@ -359,10 +359,10 @@ void pasti_format::wd_generate_track_from_sectors_only(int track, int head, flop
 			const wd_sect &s = obs.sectors[i];
 
 			printf("%2d: %02x.%02x.%02x.%02x.%02x.%02x %d %f\n",
-				   i,
-				   s.id[0], s.id[1], s.id[2], s.id[3], s.id[4], s.id[5],
-				   s.position,
-				   s.time_ratio);
+					i,
+					s.id[0], s.id[1], s.id[2], s.id[3], s.id[4], s.id[5],
+					s.position,
+					s.time_ratio);
 			if(track==10 && i==0)
 				hexdump(s.data, 512);
 		}
@@ -527,8 +527,8 @@ void pasti_format::map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos)
 
 	for(int i=0; i != tsize; i++)
 		if(tdata[i] == 0xa1 &&
-		   tdata[(i+1) % tsize] == 0xa1 &&
-		   (tdata[(i+2) % tsize] == 0xfe ||
+			tdata[(i+1) % tsize] == 0xa1 &&
+			(tdata[(i+2) % tsize] == 0xfe ||
 			tdata[(i+2) % tsize] == 0xff)) {
 
 			UINT8 hbyte = tdata[(i+2) % tsize];
@@ -560,12 +560,12 @@ void pasti_format::map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos)
 			if(best_bcount < 4) {
 				if(0)
 					printf("sector header at %x no match [%02x %02x %02x %02x %02x %02x]\n", i,
-						   tdata[hpos], tdata[hpos+1], tdata[hpos+2], tdata[hpos+3], tdata[hpos+4], tdata[hpos+5]);
+							tdata[hpos], tdata[hpos+1], tdata[hpos+2], tdata[hpos+3], tdata[hpos+4], tdata[hpos+5]);
 			} else {
 				if(0)
 					printf("sector header at %x matches %d [%02x %02x %02x %02x %02x %02x] [%02x] - %d %s\n", i, j,
-						   tdata[hpos], tdata[hpos+1], tdata[hpos+2], tdata[hpos+3], tdata[hpos+4], tdata[hpos+5], tdata[tend],
-						   obs.sectors[j].position, synced ? "synced" : "unsynced");
+							tdata[hpos], tdata[hpos+1], tdata[hpos+2], tdata[hpos+3], tdata[hpos+4], tdata[hpos+5], tdata[tend],
+							obs.sectors[j].position, synced ? "synced" : "unsynced");
 
 				sect_infos[j].hstart  = hpos - 4;
 				sect_infos[j].hend    = tend + (6-bcount);
@@ -575,9 +575,9 @@ void pasti_format::map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos)
 				if(obs.sectors[j].data)
 					for(int j=35; j<45; j++) {
 						if(tdata[(hpos+j) % tsize] == 0xa1 &&
-						   tdata[(hpos+j+1) % tsize] == 0xa1 &&
-						   tdata[(hpos+j+2) % tsize] >= 0xfa &&
-						   tdata[(hpos+j+2) % tsize] <= 0xfd) {
+							tdata[(hpos+j+1) % tsize] == 0xa1 &&
+							tdata[(hpos+j+2) % tsize] >= 0xfa &&
+							tdata[(hpos+j+2) % tsize] <= 0xfd) {
 							dpos = (hpos+j+3) % tsize;
 							break;
 						}

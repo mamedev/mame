@@ -225,19 +225,19 @@ static void trojan_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 			if (sy > 0xf8)
 				sy -= 0x100;
 			code = buffered_spriteram[offs] |
-				   ((buffered_spriteram[offs + 1] & 0x20) << 4) |
-				   ((buffered_spriteram[offs + 1] & 0x40) << 2) |
-				   ((buffered_spriteram[offs + 1] & 0x80) << 3);
+					((buffered_spriteram[offs + 1] & 0x20) << 4) |
+					((buffered_spriteram[offs + 1] & 0x40) << 2) |
+					((buffered_spriteram[offs + 1] & 0x80) << 3);
 			color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
 
 			if (state->m_bg2_avenger_hw)
 			{
-				flipx = 0;										/* Avengers */
+				flipx = 0;                                      /* Avengers */
 				flipy = ~buffered_spriteram[offs + 1] & 0x10;
 			}
 			else
 			{
-				flipx = buffered_spriteram[offs + 1] & 0x10;	/* Trojan */
+				flipx = buffered_spriteram[offs + 1] & 0x10;    /* Trojan */
 				flipy = 1;
 			}
 

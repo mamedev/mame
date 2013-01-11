@@ -188,18 +188,18 @@ WRITE8_MEMBER( bullet_state::exdsk_w )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   drive select 0
-        1                   drive select 1
-        2                   select 8" floppy
-        3       MSE         select software control of port
-        4       SIDE        select side 2
-        5       _MOTOR      disable 5" floppy spindle motors
-        6
-        7       WPRC        enable write precompensation
+	    0                   drive select 0
+	    1                   drive select 1
+	    2                   select 8" floppy
+	    3       MSE         select software control of port
+	    4       SIDE        select side 2
+	    5       _MOTOR      disable 5" floppy spindle motors
+	    6
+	    7       WPRC        enable write precompensation
 
-    */
+	*/
 
 	// drive select
 	m_floppy = NULL;
@@ -239,18 +239,18 @@ WRITE8_MEMBER( bullet_state::exdma_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       DMA ready source select 0
-        1       DMA ready source select 1
-        2       DMA ready source select 2
-        3       memory control 0
-        4       memory control 1
-        5
-        6
-        7
+	    0       DMA ready source select 0
+	    1       DMA ready source select 1
+	    2       DMA ready source select 2
+	    3       memory control 0
+	    4       memory control 1
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_exdma = data;
 
@@ -268,18 +268,18 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 {
 	/*
 
-        bit     signal  description
+	    bit     signal  description
 
-        0       PLO     phase lock oscillator
-        1       RCD     read clock frequency
-        2       EXC     MB8877 clock frequency
-        3       DEN     MB8877 density select
-        4               enable software control of mode
-        5
-        6
-        7
+	    0       PLO     phase lock oscillator
+	    1       RCD     read clock frequency
+	    2       EXC     MB8877 clock frequency
+	    3       DEN     MB8877 density select
+	    4               enable software control of mode
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	// FDC clock
 	m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL_16MHz/16 : XTAL_16MHz/8);
@@ -297,18 +297,18 @@ READ8_MEMBER( bullet_state::info_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0       SW1         DIP switch 1
-        1       SW2         DIP switch 2
-        2       SW3         DIP switch 3
-        3       SW4         DIP switch 4
-        4       HLDST       floppy disk head load status
-        5       *XDCG       floppy disk exchange (8" only)
-        6       FDIRQ       FDC interrupt request line
-        7       FDDRQ       FDC data request line
+	    0       SW1         DIP switch 1
+	    1       SW2         DIP switch 2
+	    2       SW3         DIP switch 3
+	    3       SW4         DIP switch 4
+	    4       HLDST       floppy disk head load status
+	    5       *XDCG       floppy disk exchange (8" only)
+	    6       FDIRQ       FDC interrupt request line
+	    7       FDDRQ       FDC data request line
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -402,18 +402,18 @@ WRITE8_MEMBER( bulletf_state::xdma0_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       device select (0=FDC, 1=SCSI)
-        1
-        2
-        3
-        4       DMB4        Source bank
-        5
-        6       DMB6        Destination bank
-        7
+	    0       device select (0=FDC, 1=SCSI)
+	    1
+	    2
+	    3
+	    4       DMB4        Source bank
+	    5
+	    6       DMB6        Destination bank
+	    7
 
-    */
+	*/
 
 	m_rome = 1;
 
@@ -429,18 +429,18 @@ WRITE8_MEMBER( bulletf_state::xfdc_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       Unit select number
-        1       Unit select number
-        2       Unit select number
-        3       Unit select number
-        4       Select side 2
-        5       Disable 3 & 5 inch spindle motors
-        6       Set for 1 MHz controller operation, reset for 2 MHz controller operation
-        7       Set to select single density
+	    0       Unit select number
+	    1       Unit select number
+	    2       Unit select number
+	    3       Unit select number
+	    4       Select side 2
+	    5       Disable 3 & 5 inch spindle motors
+	    6       Set for 1 MHz controller operation, reset for 2 MHz controller operation
+	    7       Set to select single density
 
-    */
+	*/
 
 	// drive select
 	m_floppy = NULL;
@@ -489,18 +489,18 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       Select active bank (0=bank 0, 1=bank 1)
-        1
-        2
-        3
-        4       Select system space overlay (0=no overlay, 1=overlay)
-        5
-        6
-        7
+	    0       Select active bank (0=bank 0, 1=bank 1)
+	    1
+	    2
+	    3
+	    4       Select system space overlay (0=no overlay, 1=overlay)
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_mbank = data;
 }
@@ -546,18 +546,18 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       CBUSY   Centronics busy
-        1       SW2     DIP switch 2
-        2       SW3     DIP switch 3
-        3       FD2S    *Floppy disk two sided
-        4       HLDST   Floppy disk head load status
-        5       XDCG    *Floppy disk exchange (8-inch only)
-        6       FDIRQ   FDC interrupt request line
-        7       FDDRQ   FDC data request line
+	    0       CBUSY   Centronics busy
+	    1       SW2     DIP switch 2
+	    2       SW3     DIP switch 3
+	    3       FD2S    *Floppy disk two sided
+	    4       HLDST   Floppy disk head load status
+	    5       XDCG    *Floppy disk exchange (8-inch only)
+	    6       FDIRQ   FDC interrupt request line
+	    7       FDDRQ   FDC data request line
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -728,10 +728,10 @@ WRITE_LINE_MEMBER(bullet_state::dart_rxtxca_w)
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dart_rxtxca_w),		// ZC/TO0 callback
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),	// ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)							// ZC/TO2 callback
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     // interrupt handler
+	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dart_rxtxca_w),      // ZC/TO0 callback
+	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),   // ZC/TO1 callback
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)                          // ZC/TO2 callback
 };
 
 
@@ -898,18 +898,18 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 {
 	/*
 
-        bit     signal      description
+	    bit     signal      description
 
-        0                   centronics busy
-        1                   centronics paper end
-        2                   centronics selected
-        3       *FAULT      centronics fault
-        4                   external vector
-        5       WBUSDIR     winchester bus direction
-        6       WCOMPLETE   winchester command complete
-        7       *WINRDY     winchester ready
+	    0                   centronics busy
+	    1                   centronics paper end
+	    2                   centronics selected
+	    3       *FAULT      centronics fault
+	    4                   external vector
+	    5       WBUSDIR     winchester bus direction
+	    6       WCOMPLETE   winchester command complete
+	    7       *WINRDY     winchester ready
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -948,18 +948,18 @@ READ8_MEMBER( bulletf_state::pio_pa_r )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0
-        1
-        2
-        3       BUSY
-        4       MSG
-        5       C/D
-        6       REQ
-        7       I/O
+	    0
+	    1
+	    2
+	    3       BUSY
+	    4       MSG
+	    5       C/D
+	    6       REQ
+	    7       I/O
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -976,18 +976,18 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
 {
 	/*
 
-        bit     signal
+	    bit     signal
 
-        0       ATN
-        1       RST
-        2       SEL
-        3
-        4
-        5
-        6
-        7
+	    0       ATN
+	    1       RST
+	    2       SEL
+	    3
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	m_scsibus->scsi_atn_w(BIT(data, 0));
 	m_scsibus->scsi_rst_w(BIT(data, 1));
@@ -1176,10 +1176,10 @@ void bulletf_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( bullet, bullet_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MCFG_CPU_PROGRAM_MAP(bullet_mem)
-    MCFG_CPU_IO_MAP(bullet_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(bullet_mem)
+	MCFG_CPU_IO_MAP(bullet_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices
@@ -1214,10 +1214,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( bulletf, bulletf_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
-    MCFG_CPU_PROGRAM_MAP(bulletf_mem)
-    MCFG_CPU_IO_MAP(bulletf_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(bulletf_mem)
+	MCFG_CPU_IO_MAP(bulletf_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	// devices
@@ -1264,7 +1264,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( wmbullet )
-    ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "sr70x.u8", 0x00, 0x20, CRC(d54b8a30) SHA1(65ff8753dd63c9dd1899bc9364a016225585d050) )
 ROM_END
 
@@ -1279,5 +1279,5 @@ ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME                FLAGS
 // the setname 'bullet' is used by Sega's Bullet in MAME.
-COMP( 1982, wmbullet,		0,			0,		bullet,		bullet, driver_device,	0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1984, wmbulletf,	wmbullet,		0,		bulletf,	bulletf, driver_device,	0,		"Wave Mate",	"Bullet (Revision F)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1982, wmbullet,       0,          0,      bullet,     bullet, driver_device,  0,      "Wave Mate",    "Bullet",               GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1984, wmbulletf,  wmbullet,       0,      bulletf,    bulletf, driver_device, 0,      "Wave Mate",    "Bullet (Revision F)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )

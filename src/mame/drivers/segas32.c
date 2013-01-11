@@ -350,21 +350,21 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
  *
  *************************************/
 
-#define MASTER_CLOCK		32215900
-#define RFC_CLOCK			XTAL_50MHz
-#define MULTI32_CLOCK		XTAL_40MHz
+#define MASTER_CLOCK        32215900
+#define RFC_CLOCK           XTAL_50MHz
+#define MULTI32_CLOCK       XTAL_40MHz
 
-#define TIMER_0_CLOCK		((MASTER_CLOCK/2)/2048)	/* confirmed */
-#define TIMER_1_CLOCK		((RFC_CLOCK/16)/256)	/* confirmed */
+#define TIMER_0_CLOCK       ((MASTER_CLOCK/2)/2048) /* confirmed */
+#define TIMER_1_CLOCK       ((RFC_CLOCK/16)/256)    /* confirmed */
 
-#define MAIN_IRQ_VBSTART	0
-#define MAIN_IRQ_VBSTOP		1
-#define MAIN_IRQ_SOUND		2
-#define MAIN_IRQ_TIMER0		3
-#define MAIN_IRQ_TIMER1		4
+#define MAIN_IRQ_VBSTART    0
+#define MAIN_IRQ_VBSTOP     1
+#define MAIN_IRQ_SOUND      2
+#define MAIN_IRQ_TIMER0     3
+#define MAIN_IRQ_TIMER1     4
 
-#define SOUND_IRQ_YM3438	0
-#define SOUND_IRQ_V60		1
+#define SOUND_IRQ_YM3438    0
+#define SOUND_IRQ_V60       1
 
 
 
@@ -458,26 +458,26 @@ static void int_control_w(address_space &space, int offset, UINT8 data)
 		case 1:
 		case 2:
 		case 3:
-		case 4:			/* vectors */
+		case 4:         /* vectors */
 			state->m_v60_irq_control[offset] = data;
 			break;
 
-		case 5:			/* unknown */
+		case 5:         /* unknown */
 			state->m_v60_irq_control[offset] = data;
 			break;
 
-		case 6:			/* mask */
+		case 6:         /* mask */
 			state->m_v60_irq_control[offset] = data;
 			update_irq_state(space.machine());
 			break;
 
-		case 7:			/* acknowledge */
+		case 7:         /* acknowledge */
 			state->m_v60_irq_control[offset] &= data;
 			update_irq_state(space.machine());
 			break;
 
 		case 8:
-		case 9:			/* timer 0 count */
+		case 9:         /* timer 0 count */
 			state->m_v60_irq_control[offset] = data;
 			duration = state->m_v60_irq_control[8] + ((state->m_v60_irq_control[9] << 8) & 0xf00);
 			if (duration)
@@ -488,7 +488,7 @@ static void int_control_w(address_space &space, int offset, UINT8 data)
 			break;
 
 		case 10:
-		case 11:		/* timer 1 count */
+		case 11:        /* timer 1 count */
 			state->m_v60_irq_control[offset] = data;
 			duration = state->m_v60_irq_control[10] + ((state->m_v60_irq_control[11] << 8) & 0xf00);
 			if (duration)
@@ -501,7 +501,7 @@ static void int_control_w(address_space &space, int offset, UINT8 data)
 		case 12:
 		case 13:
 		case 14:
-		case 15:		/* signal IRQ to sound CPU */
+		case 15:        /* signal IRQ to sound CPU */
 			signal_sound_irq(space.machine(), SOUND_IRQ_V60);
 			break;
 	}
@@ -722,7 +722,7 @@ WRITE16_MEMBER(segas32_state::io_chip_w)
 READ32_MEMBER(segas32_state::io_chip_0_r)
 {
 	return common_io_chip_r(space, 0, offset*2+0, mem_mask) |
-	      (common_io_chip_r(space, 0, offset*2+1, mem_mask >> 16) << 16);
+			(common_io_chip_r(space, 0, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
@@ -738,7 +738,7 @@ WRITE32_MEMBER(segas32_state::io_chip_0_w)
 READ32_MEMBER(segas32_state::io_chip_1_r)
 {
 	return common_io_chip_r(space, 1, offset*2+0, mem_mask) |
-	      (common_io_chip_r(space, 1, offset*2+1, mem_mask >> 16) << 16);
+			(common_io_chip_r(space, 1, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
@@ -785,7 +785,7 @@ READ32_MEMBER(segas32_state::io_expansion_0_r)
 {
 	if (!m_custom_io_r[0].isnull())
 		return (m_custom_io_r[0])(space, offset*2+0, mem_mask) |
-			  ((m_custom_io_r[0])(space, offset*2+1, mem_mask >> 16) << 16);
+				((m_custom_io_r[0])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", space.device().safe_pc(), offset);
 	return 0xffffffff;
@@ -823,7 +823,7 @@ READ32_MEMBER(segas32_state::io_expansion_1_r)
 {
 	if (!m_custom_io_r[1].isnull())
 		return (m_custom_io_r[1])(space, offset*2+0, mem_mask) |
-			  ((m_custom_io_r[1])(space, offset*2+1, mem_mask >> 16) << 16);
+				((m_custom_io_r[1])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", space.device().safe_pc(), offset);
 	return 0xffffffff;
@@ -1019,7 +1019,7 @@ WRITE16_MEMBER(segas32_state::shared_ram_16_w)
 READ32_MEMBER(segas32_state::shared_ram_32_r)
 {
 	return m_z80_shared_ram[offset*4+0] | (m_z80_shared_ram[offset*4+1] << 8) |
-	      (m_z80_shared_ram[offset*4+2] << 16) | (m_z80_shared_ram[offset*4+3] << 24);
+			(m_z80_shared_ram[offset*4+2] << 16) | (m_z80_shared_ram[offset*4+3] << 24);
 }
 
 
@@ -1183,7 +1183,7 @@ WRITE8_MEMBER(segas32_state::sound_dummy_w)
 static ADDRESS_MAP_START( system32_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM	AM_SHARE("workram")
+	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x300000, 0x31ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_videoram_r, system32_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_spriteram_r, system32_spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x500000, 0x50000f) AM_MIRROR(0x0ffff0) AM_READWRITE(system32_sprite_control_r, system32_sprite_control_w)
@@ -1327,8 +1327,8 @@ static INPUT_PORTS_START( system32_generic )
 
 	PORT_START("SERVICE34_A")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )	/* sometimes mirrors SERVICE1 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 )	/* tends to also work as a test switch */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )   /* sometimes mirrors SERVICE1 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 )   /* tends to also work as a test switch */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -1785,25 +1785,25 @@ static INPUT_PORTS_START( orunners )
 	PORT_INCLUDE( multi32_generic )
 
 	PORT_MODIFY("P1_A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_SPACE)	/* shift up */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LSHIFT)	/* shift down */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_SPACE)    /* shift up */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LSHIFT)   /* shift down */
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("P2_A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_Z)		/* DJ/music */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_X)		/* << */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_C)		/* >> */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_Z)        /* DJ/music */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_X)        /* << */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_C)        /* >> */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("P1_B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_Q)		/* shift up */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_W)		/* shift down */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_Q)        /* shift up */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_W)        /* shift down */
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("P2_B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)								/* DJ/music */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)								/* << */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)								/* >> */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)                             /* DJ/music */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)                             /* << */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)                             /* >> */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ANALOG1")
@@ -1912,15 +1912,15 @@ static INPUT_PORTS_START( scross )
 	PORT_INCLUDE( multi32_generic )
 
 	PORT_MODIFY("P1_A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_SPACE)		/* P1 Attack */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LSHIFT)		/* P1 Wheelie */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LALT)		/* P1 Brake */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_SPACE)        /* P1 Attack */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LSHIFT)      /* P1 Wheelie */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CODE(KEYCODE_LALT)     /* P1 Brake */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("P1_B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_Q)		/* P2 Attack */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_W)		/* P2 Wheelie */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_S)		/* P2 Brake */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_Q)        /* P2 Attack */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_W)       /* P2 Wheelie */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_S)        /* P2 Brake */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("P2_A")
@@ -2126,7 +2126,7 @@ static const gfx_layout bgcharlayout =
 	{ 0,1,2,3 },
 	{ 0, 4, 16, 20, 8, 12, 24, 28, 32, 36, 48, 52, 40, 44, 56, 60  },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-	  8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+		8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
 	16*64
 };
 
@@ -2656,9 +2656,9 @@ ROM_START( brivalj )
 	ROM_LOAD( "mpr-15625.ic24",    0x400000, 0x100000, CRC(3ce82932) SHA1(f2107bc2591f46a51c9f0d706933b1ae69db91f9) )
 
 	/* the 10 roms below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the roms
-       in the parent set, but Sega did change the part numbers so they might be correct, the others
-       are suspicious, the changes are very similar but the part numbers haven't changed.  We really
-       need a 3rd board to verify */
+	   in the parent set, but Sega did change the part numbers so they might be correct, the others
+	   are suspicious, the changes are very similar but the part numbers haven't changed.  We really
+	   need a 3rd board to verify */
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* Rom # matches tile rom # from Arabian Fight ??? */
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* Rom # matchrs tile rom # from Arabian Fight ??? */

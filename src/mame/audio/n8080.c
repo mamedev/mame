@@ -31,13 +31,13 @@ static const sn76477_interface sheriff_sn76477_interface =
 	CAP_N(47)  ,  /* 21 */
 	CAP_N(47)  ,  /* 23 */
 	RES_K(560) ,  /* 24 */
-	0,			  /* 22 vco */
-	0,			  /* 26 mixer A */
-	0,			  /* 25 mixer B */
-	0,			  /* 27 mixer C */
-	1,			  /* 1  envelope 1 */
-	0,			  /* 28 envelope 2 */
-	1			  /* 9  enable */
+	0,            /* 22 vco */
+	0,            /* 26 mixer A */
+	0,            /* 25 mixer B */
+	0,            /* 27 mixer C */
+	1,            /* 1  envelope 1 */
+	0,            /* 28 envelope 2 */
+	1             /* 9  enable */
 };
 
 
@@ -59,13 +59,13 @@ static const sn76477_interface spacefev_sn76477_interface =
 	CAP_N(47)  ,  /* 21 */
 	CAP_N(47)  ,  /* 23 */
 	RES_K(820) ,  /* 24 */
-	0,			  /* 22 vco */
-	0,			  /* 26 mixer A */
-	0,			  /* 25 mixer B */
-	0,			  /* 27 mixer C */
-	1,			  /* 1  envelope 1 */
-	0,			  /* 28 envelope 2 */
-	1			  /* 9  enable */
+	0,            /* 22 vco */
+	0,            /* 26 mixer A */
+	0,            /* 25 mixer B */
+	0,            /* 27 mixer C */
+	1,            /* 1  envelope 1 */
+	0,            /* 28 envelope 2 */
+	1             /* 9  enable */
 };
 
 

@@ -274,10 +274,10 @@ void dreamwld_state::video_start()
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
 	m_bg2_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap->set_scroll_rows(256);	// line scrolling
+	m_bg_tilemap->set_scroll_rows(256); // line scrolling
 	m_bg_tilemap->set_scroll_cols(1);
 
-	m_bg2_tilemap->set_scroll_rows(256);	// line scrolling
+	m_bg2_tilemap->set_scroll_rows(256);    // line scrolling
 	m_bg2_tilemap->set_scroll_cols(1);
 
 	m_spritebuf1 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
@@ -321,23 +321,23 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 #if 0
 	switch ((layer0_ctrl & 0x00c0) >> 6)
 	{
-	case 0:	tm0size = 1;	break;
-	case 1:	tm0size = 2;	break;
-	case 2:	tm0size = 3;	break;
-	default:	tm0size = 0;	break;
+	case 0: tm0size = 1;    break;
+	case 1: tm0size = 2;    break;
+	case 2: tm0size = 3;    break;
+	default:    tm0size = 0;    break;
 	}
 
 	switch ((layer1_ctrl & 0x00c0) >> 6)
 	{
-	case 0:	tm1size = 1;	break;
-	case 1:	tm1size = 2;	break;
-	case 2:	tm1size = 3;	break;
-	default:	tm1size = 0;	break;
+	case 0: tm1size = 1;    break;
+	case 1: tm1size = 2;    break;
+	case 2: tm1size = 3;    break;
+	default:    tm1size = 0;    break;
 	}
 #endif
 	//popmessage("sizes %d %d\n", tm0size, tm1size);
 
-	for (int i = 0; i < 256; i++)	/* 256 screen lines */
+	for (int i = 0; i < 256; i++)   /* 256 screen lines */
 	{
 		int x0 = 0, x1 = 0;
 
@@ -552,9 +552,9 @@ static const gfx_layout layout_16x16x4 =
 	4,
 	{0,1,2,3},
 	{2*4,3*4,0*4,1*4,6*4,7*4,4*4,5*4,
-	 10*4,11*4,8*4,9*4,14*4,15*4,12*4,13*4},
+		10*4,11*4,8*4,9*4,14*4,15*4,12*4,13*4},
 	{0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,
-	 8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64},
+		8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64},
 	16*16*4
 };
 
@@ -636,10 +636,10 @@ ROM_START( dreamwld )
 
 	ROM_REGION( 0x6c9, "user1", 0 ) /* Protection data  */
 	/* The MCU supplies this data.
-      The 68k reads it through a port, taking the size and destination write address from the level 1
-      and level 2 irq positions in the 68k vector table (there is code to check that they haven't been
-      modified!)  It then decodes the data using the rom checksum previously calculated and puts it in
-      ram.  The interrupt vectors point at the code placed in RAM. */
+	  The 68k reads it through a port, taking the size and destination write address from the level 1
+	  and level 2 irq positions in the 68k vector table (there is code to check that they haven't been
+	  modified!)  It then decodes the data using the rom checksum previously calculated and puts it in
+	  ram.  The interrupt vectors point at the code placed in RAM. */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 ,  CRC(f284b2fd) SHA1(9e8096c8aa8a288683f002311b38787b120748d1) ) /* extracted */
 
 	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip*/

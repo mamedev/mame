@@ -16,7 +16,7 @@
 #include "xmlfile.h"
 
 
-#define DEBUG_CONFIG		0
+#define DEBUG_CONFIG        0
 
 
 
@@ -26,10 +26,10 @@
 
 struct config_type
 {
-	config_type *			next;				/* next in line */
-	const char *			name;				/* node name */
-	config_saveload_delegate load;				/* load callback */
-	config_saveload_delegate save;				/* save callback */
+	config_type *           next;               /* next in line */
+	const char *            name;               /* node name */
+	config_saveload_delegate load;              /* load callback */
+	config_saveload_delegate save;              /* save callback */
 };
 
 

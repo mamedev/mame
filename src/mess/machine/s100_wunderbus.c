@@ -15,11 +15,11 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define I8259A_TAG		"13b"
-#define INS8250_1_TAG	"6d"
-#define INS8250_2_TAG	"5d"
-#define INS8250_3_TAG	"4d"
-#define UPD1990C_TAG	"12a"
+#define I8259A_TAG      "13b"
+#define INS8250_1_TAG   "6d"
+#define INS8250_2_TAG   "5d"
+#define INS8250_3_TAG   "4d"
+#define UPD1990C_TAG    "12a"
 
 
 
@@ -346,35 +346,35 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 			case 0: // DAISY 0 IN (STATUS)
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       End of Ribbon
-                    1       Paper Out
-                    2       Cover Open
-                    3       Paper Feed Ready
-                    4       Carriage Ready
-                    5       Print Wheel Ready
-                    6       Check
-                    7       Printer Ready
+				    0       End of Ribbon
+				    1       Paper Out
+				    2       Cover Open
+				    3       Paper Feed Ready
+				    4       Carriage Ready
+				    5       Print Wheel Ready
+				    6       Check
+				    7       Printer Ready
 
-                */
+				*/
 				break;
 
 			case 1: // Switch/Parallel port flags
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       FLAG1
-                    1       FLAG2
-                    2       10A S6
-                    3       10A S5
-                    4       10A S4
-                    5       10A S3
-                    6       10A S2
-                    7       10A S1
+				    0       FLAG1
+				    1       FLAG2
+				    2       10A S6
+				    3       10A S5
+				    4       10A S4
+				    5       10A S3
+				    6       10A S2
+				    7       10A S1
 
-                */
+				*/
 
 				data = BITSWAP8(m_10a->read(),0,1,2,3,4,5,6,7) & 0xfc;
 				break;
@@ -382,18 +382,18 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 			case 2: // R.T. Clock IN/RESET CLK. Int.
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       1990 Data Out
-                    1       1990 TP
-                    2
-                    3
-                    4
-                    5
-                    6
-                    7
+				    0       1990 Data Out
+				    1       1990 TP
+				    2
+				    3
+				    4
+				    5
+				    6
+				    7
 
-                */
+				*/
 
 				data |= m_rtc->data_out_r();
 				data |= m_rtc->tp_r() << 1;
@@ -457,52 +457,52 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UIN
 			case 0: // DAISY 0 OUT
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       Data Bit 9
-                    1       Data Bit 10
-                    2       Data Bit 11
-                    3       Data Bit 12
-                    4       Paper Feed Strobe
-                    5       Carriage Strobe
-                    6       Print Wheel Strobe
-                    7       Restore
+				    0       Data Bit 9
+				    1       Data Bit 10
+				    2       Data Bit 11
+				    3       Data Bit 12
+				    4       Paper Feed Strobe
+				    5       Carriage Strobe
+				    6       Print Wheel Strobe
+				    7       Restore
 
-                */
+				*/
 				break;
 
 			case 1: // DAISY 1 OUT
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       Data Bit 1
-                    1       Data Bit 2
-                    2       Data Bit 3
-                    3       Data Bit 4
-                    4       Data Bit 5
-                    5       Data Bit 6
-                    6       Data Bit 7
-                    7       Data Bit 8
+				    0       Data Bit 1
+				    1       Data Bit 2
+				    2       Data Bit 3
+				    3       Data Bit 4
+				    4       Data Bit 5
+				    5       Data Bit 6
+				    6       Data Bit 7
+				    7       Data Bit 8
 
-                */
+				*/
 				break;
 
 			case 2: // R.T. Clock OUT
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       1990 Data In
-                    1       1990 Clk
-                    2       1990 C0
-                    3       1990 C1
-                    4       1990 C2
-                    5       1990 STB
-                    6       Ribbon Lift
-                    7       Select
+				    0       1990 Data In
+				    1       1990 Clk
+				    2       1990 C0
+				    3       1990 C1
+				    4       1990 C2
+				    5       1990 STB
+				    6       Ribbon Lift
+				    7       Select
 
-                */
+				*/
 
 				m_rtc->data_in_w(BIT(data, 0));
 				m_rtc->clk_w(BIT(data, 1));
@@ -523,18 +523,18 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UIN
 			case 6: // Par. port cntrl.
 				/*
 
-                    bit     description
+				    bit     description
 
-                    0       POE
-                    1       _RST1
-                    2       _RST2
-                    3       _ATTN1
-                    4       _ATTN2
-                    5
-                    6
-                    7
+				    0       POE
+				    1       _RST1
+				    2       _RST2
+				    3       _ATTN1
+				    4       _ATTN2
+				    5
+				    6
+				    7
 
-                */
+				*/
 				break;
 			}
 			break;
@@ -553,4 +553,3 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UIN
 		}
 	}
 }
-

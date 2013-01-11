@@ -26,7 +26,7 @@ CPU_DISASSEMBLE( pdp1 )
 	md = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
 
 	y = md & 07777;
-	ib = (md >> 12) & 1;			   /* */
+	ib = (md >> 12) & 1;               /* */
 	switch (md >> 13)
 	{
 	case AND:

@@ -86,8 +86,8 @@ TILE_GET_INFO_MEMBER(scotrsht_state::scotrsht_get_bg_tile_info)
 	int color = (attr & 0x0f) + m_palette_bank * 16;
 	int flag = 0;
 
-	if(attr & 0x10)	flag |= TILE_FLIPX;
-	if(attr & 0x20)	flag |= TILE_FLIPY;
+	if(attr & 0x10) flag |= TILE_FLIPX;
+	if(attr & 0x20) flag |= TILE_FLIPY;
 
 	// data & 0x80 -> tile priority?
 
@@ -103,7 +103,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
 	{
-		int attr = spriteram[i + 1];	// attributes = ?tyxcccc
+		int attr = spriteram[i + 1];    // attributes = ?tyxcccc
 		int code = spriteram[i] + ((attr & 0x40) << 2);
 		int color = (attr & 0x0f) + state->m_palette_bank * 16;
 		int flipx = attr & 0x10;

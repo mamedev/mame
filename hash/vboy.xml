@@ -4,13 +4,13 @@
 <!--
 According to Planet Virtual Boy, the following undumped protos exist
 
-  - Dragon Hopper,
-  - Faceball,
-  - Mansion of Insmouse (USA),
-  - Polygo Block,
-  - Virtual Block,
-  - Virtual Fishing (USA),
-  - Zero Racers
+	- Dragon Hopper,
+	- Faceball,
+	- Mansion of Insmouse (USA),
+	- Polygo Block,
+	- Virtual Block,
+	- Virtual Fishing (USA),
+	- Zero Racers
 
 -->
 <softwarelist name="vboy" description="Nintendo Virtual Boy cartridges">

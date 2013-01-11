@@ -201,11 +201,11 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 	switch(offset)
 	{
 		case 0x26f: return 0xb1;
-		case 0x3e0:	return 0x9e;
+		case 0x3e0: return 0x9e;
 		case 0x5c8: return 0xf4;
 		case 0x94b: return 0x3a;
-		case 0xd1a:	return 0xc5;
-		case 0xfb7:	return 0x47;
+		case 0xd1a: return 0xc5;
+		case 0xfb7: return 0x47;
 	}
 
 	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
@@ -237,14 +237,14 @@ READ8_MEMBER(snesb_state::snesb_coin_r)
 
 
 static ADDRESS_MAP_START( snesb_map, AS_PROGRAM, 8, snesb_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)	/* used by Mode 20 DSP-1 */
+	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)    /* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)    /* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)                       /* ROM (and reserved in Mode 20) */
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)    /* used by Mode 20 DSP-1 */
 	AM_RANGE(0x700000, 0x7dffff) AM_READWRITE_LEGACY(snes_r_bank5, snes_w_bank5)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM										/* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)	/* Mirror and ROM */
-	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
+	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)    /* Mirror and ROM */
+	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)    /* Mirror and ROM */
 ADDRESS_MAP_END
 
 READ8_MEMBER(snesb_state::spc_ram_100_r)
@@ -260,8 +260,8 @@ WRITE8_MEMBER(snesb_state::spc_ram_100_w)
 }
 
 static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, snesb_state )
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w) /* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)   /* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
 ADDRESS_MAP_END
 
@@ -629,11 +629,11 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( kinstb, snesb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
+	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snesb_map)
 
 	/* audio CPU */
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
+	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -813,8 +813,8 @@ DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 
 	for (i =0; i < 0x80000 * 3; i++)
 	{
-	    	cipherText = src[i];
-	    	plainText = data_substitution0[cipherText & 0xf] | data_substitution1[cipherText >> 4];
+			cipherText = src[i];
+			plainText = data_substitution0[cipherText & 0xf] | data_substitution1[cipherText >> 4];
 		newAddress = (address_substitution_high[i >> 15] << 15) | (i & 0x7fc0) | (address_substitution_low[i & 0x3f]);
 
 		if (newAddress < 0x10000)
@@ -823,11 +823,11 @@ DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 		}
 		else if (newAddress < 0x20000)
 		{
-			plainText =	BITSWAP8(plainText, 4,0,7,6,3,1,2,5) ^ 0xff;
+			plainText = BITSWAP8(plainText, 4,0,7,6,3,1,2,5) ^ 0xff;
 		}
 		else if (newAddress < 0x30000)
 		{
-			plainText =	BITSWAP8(plainText, 5,7,6,1,4,3,0,2);
+			plainText = BITSWAP8(plainText, 5,7,6,1,4,3,0,2);
 		}
 		else if (newAddress < 0x40000)
 		{
@@ -979,9 +979,9 @@ ROM_START( endless )
 ROM_END
 
 
-GAME( 199?, kinstb,       0,     kinstb,	     kinstb, snesb_state,    kinstb,       ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, ffight2b,     0,     ffight2b,	     ffight2b, snesb_state,  ffight2b,     ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, iron,         0,     kinstb,	     iron, snesb_state,      iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib,      0,     kinstb,	     denseib, snesb_state,   denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sblast2b,     0,     kinstb,	     sblast2b, snesb_state,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
-GAME( 1996, endless,      0,     kinstb,	     endless, snesb_state,   endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, kinstb,       0,     kinstb,         kinstb, snesb_state,    kinstb,       ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, ffight2b,     0,     ffight2b,       ffight2b, snesb_state,  ffight2b,     ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, iron,         0,     kinstb,         iron, snesb_state,      iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib,      0,     kinstb,         denseib, snesb_state,   denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
+GAME( 1996, endless,      0,     kinstb,         endless, snesb_state,   endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

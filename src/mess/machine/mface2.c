@@ -41,17 +41,17 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 
 		pc = machine().device("maincpu")->safe_pc();
 		/* there are two places where CALL &0065 can be found
-        in the multiface rom. At this address there is a RET.
+		in the multiface rom. At this address there is a RET.
 
-        To disable the multiface from being detected, the multiface
-        stop button must be pressed, then the program that was stopped
-        must be returned to. When this is done, the multiface cannot
-        be detected and the out operations to page the multiface
-        ram/rom into the address space will not work! */
+		To disable the multiface from being detected, the multiface
+		stop button must be pressed, then the program that was stopped
+		must be returned to. When this is done, the multiface cannot
+		be detected and the out operations to page the multiface
+		ram/rom into the address space will not work! */
 
 		/* I assume that the hardware in the multiface detects
-        the PC set to 0x065 and uses this to enable/disable the multiface
-        */
+		the PC set to 0x065 and uses this to enable/disable the multiface
+		*/
 
 		/* I also use this to allow the stop button to be pressed again */
 		if (pc==0x0164)
@@ -61,16 +61,16 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 		}
 		else if (pc==0x0c98)
 		{
-		  /* second call */
+			/* second call */
 
-		  /* no longer visible */
-		  m_multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
+			/* no longer visible */
+			m_multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
 
-		  m_romdis=0;
-		  m_slot->romen_w(0);
+			m_romdis=0;
+			m_slot->romen_w(0);
 
-		 /* clear op base override */
-		 machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(cpc_multiface2_device::amstrad_default),this));
+			/* clear op base override */
+			machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(cpc_multiface2_device::amstrad_default),this));
 		}
 
 		return pc;
@@ -235,7 +235,7 @@ int cpc_multiface2_device::multiface_io_write(UINT16 offset, UINT8 data)
 							}
 							break;
 							default:
-					  break;
+						break;
 				}
 			}
 			break;
@@ -265,11 +265,11 @@ int cpc_multiface2_device::multiface_io_write(UINT16 offset, UINT8 data)
 			/* rom select */
 			case 0x0df:
 			{
-			   m_multiface_ram[0x01aac] = data;
+				m_multiface_ram[0x01aac] = data;
 			}
 			break;
 			default:
-			   break;
+				break;
 	}
 	return ret;
 }

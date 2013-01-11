@@ -20,23 +20,23 @@
 
 enum
 {
-	TWIN16_SCREEN_FLIPY		= 0x01,
-	TWIN16_SCREEN_FLIPX		= 0x02,	// confirmed: Hard Puncher Intro
-	TWIN16_UNKNOWN1			= 0x04,	// ? Hard Puncher uses this
-	TWIN16_PLANE_ORDER		= 0x08,	// confirmed: Devil Worlds
-	TWIN16_TILE_FLIPX		= 0x10,	// unused?
-	TWIN16_TILE_FLIPY		= 0x20	// confirmed? Vulcan Venture
+	TWIN16_SCREEN_FLIPY     = 0x01,
+	TWIN16_SCREEN_FLIPX     = 0x02, // confirmed: Hard Puncher Intro
+	TWIN16_UNKNOWN1         = 0x04, // ? Hard Puncher uses this
+	TWIN16_PLANE_ORDER      = 0x08, // confirmed: Devil Worlds
+	TWIN16_TILE_FLIPX       = 0x10, // unused?
+	TWIN16_TILE_FLIPY       = 0x20  // confirmed? Vulcan Venture
 };
 
 enum
 {
 	// user-defined priorities
-	TWIN16_BG_LAYER1			= 0x01,
-	TWIN16_SPRITE_PRI_L1		= 0x02,
-	TWIN16_BG_LAYER2			= 0x04,
-	TWIN16_SPRITE_PRI_L2		= 0x08,
-	TWIN16_SPRITE_OCCUPIED		= 0x10, // sprite on screen pixel
-	TWIN16_SPRITE_CAST_SHADOW	= 0x20
+	TWIN16_BG_LAYER1            = 0x01,
+	TWIN16_SPRITE_PRI_L1        = 0x02,
+	TWIN16_BG_LAYER2            = 0x04,
+	TWIN16_SPRITE_PRI_L2        = 0x08,
+	TWIN16_SPRITE_OCCUPIED      = 0x10, // sprite on screen pixel
+	TWIN16_SPRITE_CAST_SHADOW   = 0x20
 };
 
 
@@ -47,7 +47,7 @@ WRITE16_MEMBER(twin16_state::twin16_text_ram_w)
 }
 
 WRITE16_MEMBER(twin16_state::twin16_paletteram_word_w)
-{	// identical to tmnt_paletteram_w
+{   // identical to tmnt_paletteram_w
 	COMBINE_DATA(m_generic_paletteram_16 + offset);
 	offset &= ~1;
 
@@ -178,33 +178,33 @@ void twin16_spriteram_process( running_machine &machine )
 			UINT32 ypos = (0x10000*source[6])|source[7];
 
 			/* notes on uncertain attributes:
-            shadows: pen $F only (like other Konami hw), used in devilw, fround,
-             miaj? (shadows are solid in tmnt hw version),
-             gradius2? (ship exhaust)
+			shadows: pen $F only (like other Konami hw), used in devilw, fround,
+			 miaj? (shadows are solid in tmnt hw version),
+			 gradius2? (ship exhaust)
 
-            sprite-background priority: in devilw, most sprites look best at high priority,
-            in gradius2, most sprites look best at low priority. exceptions:
-            - devilw prologue: sprites behind crowd (maybe more, haven't completed the game)
-            - gradius2 intro showing earlier games: sprites above layers
+			sprite-background priority: in devilw, most sprites look best at high priority,
+			in gradius2, most sprites look best at low priority. exceptions:
+			- devilw prologue: sprites behind crowd (maybe more, haven't completed the game)
+			- gradius2 intro showing earlier games: sprites above layers
 
-            currently using (priority&0x200), broken:
-            - devilw prologue: sprites should be behind crowd
-            - gradius2 level 7: bosses should be behind portal (ok except brain boss and mouth boss)
-            - gradius2 ending: sun should be behind planet
+			currently using (priority&0x200), broken:
+			- devilw prologue: sprites should be behind crowd
+			- gradius2 level 7: bosses should be behind portal (ok except brain boss and mouth boss)
+			- gradius2 ending: sun should be behind planet
 
-            does TWIN16_PLANE_ORDER affect it?
+			does TWIN16_PLANE_ORDER affect it?
 
-            more?
-            devilw monster dens exploding monochrome, players fading to white in prologue, and trees in
-            the 1st level shrinking with a solid green color look odd, maybe alpha blended?
+			more?
+			devilw monster dens exploding monochrome, players fading to white in prologue, and trees in
+			the 1st level shrinking with a solid green color look odd, maybe alpha blended?
 
-            fround, hpuncher, miaj, cuebrickj, don't use the preprocessor. all sprites are expected
-            to be high priority, and shadows are enabled
-            */
-			UINT16 attributes = 0x8000|	// enabled
-				(source[2]&0x03ff)|	// scale,size,color
-				(source[2]&0x4000)>>4|	// no-shadow? (gradius2 level 7 boss sets this bit and appears to expect pen $F to be solid)
-				(priority&0x200)<<5;	// sprite-background priority?
+			fround, hpuncher, miaj, cuebrickj, don't use the preprocessor. all sprites are expected
+			to be high priority, and shadows are enabled
+			*/
+			UINT16 attributes = 0x8000| // enabled
+				(source[2]&0x03ff)| // scale,size,color
+				(source[2]&0x4000)>>4|  // no-shadow? (gradius2 level 7 boss sets this bit and appears to expect pen $F to be solid)
+				(priority&0x200)<<5;    // sprite-background priority?
 
 			dest[0] = source[3]; /* gfx data */
 			dest[1] = ((xpos>>8) - dx)&0xffff;
@@ -234,8 +234,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap )
 			int x,y;
 
 			int pal_base = ((attributes&0xf)+0x10)*16;
-			int height	= 16<<((attributes>>6)&0x3);
-			int width	= 16<<((attributes>>4)&0x3);
+			int height  = 16<<((attributes>>6)&0x3);
+			int width   = 16<<((attributes>>4)&0x3);
 			const UINT16 *pen_data = 0;
 			int flipy = attributes&0x0200;
 			int flipx = attributes&0x0100;
@@ -271,9 +271,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap )
 			}
 
 			/* some code masking */
-			if ((height&width) == 64) code &= ~8;		// gradius2 ending sequence 64*64
-			else if ((height&width) == 32) code &= ~3;	// devilw 32*32
-			else if ((height|width) == 48) code &= ~1;	// devilw 32*16 / 16*32
+			if ((height&width) == 64) code &= ~8;       // gradius2 ending sequence 64*64
+			else if ((height&width) == 32) code &= ~3;  // devilw 32*32
+			else if ((height|width) == 48) code &= ~1;  // devilw 32*16 / 16*32
 
 			pen_data += code*0x40;
 
@@ -419,10 +419,10 @@ static void draw_layer( running_machine &machine, bitmap_ind16 &bitmap, int opaq
 		{
 			int code = source[i];
 			/* fedcba9876543210
-               xxx------------- color
-               ---xx----------- tile bank
-               -----xxxxxxxxxxx tile number
-            */
+			   xxx------------- color
+			   ---xx----------- tile bank
+			   -----xxxxxxxxxxx tile number
+			*/
 			const UINT16 *gfx_data = gfx_base + (code&0x7ff)*16 + bank_table[(code>>11)&0x3]*0x8000;
 			int color = (code>>13);
 			int pal_base = 16*(0x20+color+8*palette);
@@ -475,11 +475,11 @@ TILE_GET_INFO_MEMBER(twin16_state::get_text_tile_info)
 	const UINT16 *source = m_text_ram;
 	int attr = source[tile_index];
 	/* fedcba9876543210
-       -x-------------- yflip
-       --x------------- xflip
-       ---xxxx--------- color
-       -------xxxxxxxxx tile number
-    */
+	   -x-------------- yflip
+	   --x------------- xflip
+	   ---xxxx--------- color
+	   -------xxxxxxxxx tile number
+	*/
 	int code = attr & 0x1ff;
 	int color = (attr >> 9) & 0x0f;
 	int flags=0;
@@ -541,8 +541,8 @@ void twin16_state::screen_eof_twin16(screen_device &screen, bool state)
 			m_need_process_spriteram = 1;
 
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
-            as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
-            more to it than that */
+			as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
+			more to it than that */
 			memcpy(&m_spriteram->buffer()[0x1800],m_sprite_buffer,0x800*sizeof(UINT16));
 			memcpy(m_sprite_buffer,&m_spriteram->live()[0x1800],0x800*sizeof(UINT16));
 		}
@@ -551,4 +551,3 @@ void twin16_state::screen_eof_twin16(screen_device &screen, bool state)
 		}
 	}
 }
-

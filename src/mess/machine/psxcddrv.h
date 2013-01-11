@@ -53,7 +53,7 @@ protected:
 	void cancel_io();
 	void set_native_sector_size(const unsigned int sz);
 	UINT32 timestamp_frequency;
-	cdrom_file	*m_cd;
+	cdrom_file  *m_cd;
 private:
 	running_machine *m_machine;
 
@@ -69,15 +69,15 @@ public:
 
 	void prefetch_sector(const unsigned int sec);
 	bool read_sector(const unsigned int sec,
-									 unsigned char *buf,
-									 const bool block=true);
+										unsigned char *buf,
+										const bool block=true);
 	unsigned char *get_prefetch_sector(const unsigned int pfsec,
-																		 unsigned int *sz);
+																			unsigned int *sz);
 
 	virtual unsigned int get_first_track() const=0;
 	virtual unsigned int get_num_tracks() const=0;
 	virtual bool get_track_address(const unsigned int track,
-																 unsigned char *address) const=0;
+																	unsigned char *address) const=0;
 	virtual tracktype get_track_type(const unsigned int track) const=0;
 	virtual unsigned int find_track(const unsigned int sector,
 																	unsigned int *start_sector=NULL,

@@ -62,7 +62,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 		goto done;
 	}
 	if (hunksize <= 0)
-		hunksize = 1024;	/* default value */
+		hunksize = 1024;    /* default value */
 
 	/* bail if we are read only */
 	if (stream_isreadonly(stream))
@@ -239,7 +239,7 @@ enum
 static OPTION_GUIDE_START( mess_hd_create_optionguide )
 	OPTION_INT(mess_hd_createopts_blocksize, "blocksize", "Sectors Per Block" )
 	OPTION_INT(mess_hd_createopts_cylinders, "cylinders", "Cylinders" )
-	OPTION_INT(mess_hd_createopts_heads, "heads",	"Heads" )
+	OPTION_INT(mess_hd_createopts_heads, "heads",   "Heads" )
 	OPTION_INT(mess_hd_createopts_sectors, "sectors", "Total Sectors" )
 	OPTION_INT(mess_hd_createopts_seclen, "seclen", "Sector Bytes" )
 OPTION_GUIDE_END
@@ -251,14 +251,14 @@ void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo 
 {
 	switch(state)
 	{
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "mess_hd"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "MESS hard disk image"); break;
-		case IMGTOOLINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = imgtool_temp_str(), "hd"); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "mess_hd"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "MESS hard disk image"); break;
+		case IMGTOOLINFO_STR_FILE_EXTENSIONS:               strcpy(info->s = imgtool_temp_str(), "hd"); break;
 
-		case IMGTOOLINFO_PTR_CREATE:						info->create = mess_hd_image_create; break;
+		case IMGTOOLINFO_PTR_CREATE:                        info->create = mess_hd_image_create; break;
 
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:			info->createimage_optguide = mess_hd_create_optionguide; break;
-		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:			strcpy(info->s = imgtool_temp_str(), mess_hd_create_optionspecs); break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = mess_hd_create_optionguide; break;
+		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:           strcpy(info->s = imgtool_temp_str(), mess_hd_create_optionspecs); break;
 	}
 }
 

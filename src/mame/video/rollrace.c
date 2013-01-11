@@ -3,9 +3,9 @@
 
 
 
-#define	RA_FGCHAR_BASE	0
-#define RA_BGCHAR_BASE	4
-#define RA_SP_BASE	5
+#define RA_FGCHAR_BASE  0
+#define RA_BGCHAR_BASE  4
+#define RA_SP_BASE  5
 
 /***************************************************************************
 
@@ -187,7 +187,7 @@ UINT32 rollrace_state::screen_update_rollrace(screen_device &screen, bitmap_ind1
 
 		if (!m_ra_flipy)
 		{
-		   scroll = (248 - scroll) % 256;
+			scroll = (248 - scroll) % 256;
 		}
 
 		if (m_ra_flipx) sx = 31 - sx;

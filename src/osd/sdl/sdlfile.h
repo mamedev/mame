@@ -28,9 +28,9 @@ enum
 
 struct osd_file
 {
-	int	handle;
-	int	type;
-	char	filename[1];
+	int handle;
+	int type;
+	char    filename[1];
 };
 
 //============================================================

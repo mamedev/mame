@@ -15,19 +15,19 @@ static const UINT8 chars_per_row_value[8] = { 20, 32, 40, 64, 72, 80, 96, 132 };
 static const UINT8 skew_bits_value[4] = { 0, 1, 2, 2 };
 
 
-#define HCOUNT(t)				((t)->reg[0] + 1)
-#define INTERLACED(t)			(((t)->reg[1] >> 7) & 0x01)
-#define HSYNC_WIDTH(t)			(((t)->reg[1] >> 4) & 0x0f)
-#define HSYNC_DELAY(t)			(((t)->reg[1] >> 0) & 0x07)
-#define SCANS_PER_DATA_ROW(t)	((((t)->reg[2] >> 3) & 0x0f) + 1)
-#define CHARS_PER_DATA_ROW(t)	(chars_per_row_value[((t)->reg[2] >> 0) & 0x07])
-#define SKEW_BITS(t)			(skew_bits_value[((t)->reg[3] >> 6) & 0x03])
-#define DATA_ROWS_PER_FRAME(t)	((((t)->reg[3] >> 0) & 0x3f) + 1)
-#define SCAN_LINES_PER_FRAME(t)	(((t)->reg[4] * 2) + 256)
-#define VERTICAL_DATA_START(t)	((t)->reg[5])
-#define LAST_DISP_DATA_ROW(t)	((t)->reg[6] & 0x3f)
-#define CURSOR_CHAR_ADDRESS(t)	((t)->reg[7])
-#define CURSOR_ROW_ADDRESS(t)	((t)->reg[8] & 0x3f)
+#define HCOUNT(t)               ((t)->reg[0] + 1)
+#define INTERLACED(t)           (((t)->reg[1] >> 7) & 0x01)
+#define HSYNC_WIDTH(t)          (((t)->reg[1] >> 4) & 0x0f)
+#define HSYNC_DELAY(t)          (((t)->reg[1] >> 0) & 0x07)
+#define SCANS_PER_DATA_ROW(t)   ((((t)->reg[2] >> 3) & 0x0f) + 1)
+#define CHARS_PER_DATA_ROW(t)   (chars_per_row_value[((t)->reg[2] >> 0) & 0x07])
+#define SKEW_BITS(t)            (skew_bits_value[((t)->reg[3] >> 6) & 0x03])
+#define DATA_ROWS_PER_FRAME(t)  ((((t)->reg[3] >> 0) & 0x3f) + 1)
+#define SCAN_LINES_PER_FRAME(t) (((t)->reg[4] * 2) + 256)
+#define VERTICAL_DATA_START(t)  ((t)->reg[5])
+#define LAST_DISP_DATA_ROW(t)   ((t)->reg[6] & 0x3f)
+#define CURSOR_CHAR_ADDRESS(t)  ((t)->reg[7])
+#define CURSOR_ROW_ADDRESS(t)   ((t)->reg[8] & 0x3f)
 
 
 struct tms9927_state
@@ -38,16 +38,16 @@ struct tms9927_state
 	const UINT8 *selfload;
 
 	/* live state */
-	UINT32	clock;
-	UINT8	reg[9];
-	UINT8	start_datarow;
-	UINT8	reset;
-	UINT8	hpixels_per_column;
+	UINT32  clock;
+	UINT8   reg[9];
+	UINT8   start_datarow;
+	UINT8   reset;
+	UINT8   hpixels_per_column;
 
 	/* derived state; no need to save */
-	UINT8	valid_config;
-	UINT16	total_hpix, total_vpix;
-	UINT16	visible_hpix, visible_vpix;
+	UINT8   valid_config;
+	UINT16  total_hpix, total_vpix;
+	UINT16  visible_hpix, visible_vpix;
 };
 
 
@@ -79,8 +79,8 @@ static void generic_access(device_t *device, address_space &space, offs_t offset
 
 	switch (offset)
 	{
-		case 0x07:	/* Processor Self Load */
-		case 0x0f:	/* Non-processor self-load */
+		case 0x07:  /* Processor Self Load */
+		case 0x0f:  /* Non-processor self-load */
 			if (tms->selfload != NULL)
 			{
 				int cur;
@@ -94,11 +94,11 @@ static void generic_access(device_t *device, address_space &space, offs_t offset
 				popmessage("tms9927: self-load initiated with no PROM!");
 
 			/* processor self-load waits with reset enabled;
-               non-processor just goes ahead */
+			   non-processor just goes ahead */
 			tms->reset = (offset == 0x07);
 			break;
 
-		case 0x0a:	/* Reset */
+		case 0x0a:  /* Reset */
 			if (!tms->reset)
 			{
 				tms->screen->update_now();
@@ -106,13 +106,13 @@ static void generic_access(device_t *device, address_space &space, offs_t offset
 			}
 			break;
 
-		case 0x0b:	/* Up scroll */
+		case 0x0b:  /* Up scroll */
 mame_printf_debug("Up scroll\n");
 			tms->screen->update_now();
 			tms->start_datarow = (tms->start_datarow + 1) % DATA_ROWS_PER_FRAME(tms);
 			break;
 
-		case 0x0e:	/* Start timing chain */
+		case 0x0e:  /* Start timing chain */
 			if (tms->reset)
 			{
 				tms->screen->update_now();
@@ -130,19 +130,19 @@ WRITE8_DEVICE_HANDLER( tms9927_w )
 
 	switch (offset)
 	{
-		case 0x00:	/* HORIZONTAL CHARACTER COUNT */
-		case 0x01:	/* INTERLACED / HSYNC WIDTH / HSYNC DELAY */
-		case 0x02:	/* SCANS PER DATA ROW / CHARACTERS PER DATA ROW */
-		case 0x03:	/* SKEW BITS / DATA ROWS PER FRAME */
-		case 0x04:	/* SCAN LINES / FRAME */
-		case 0x05:	/* VERTICAL DATA START */
-		case 0x06:	/* LAST DISPLAYED DATA ROW */
+		case 0x00:  /* HORIZONTAL CHARACTER COUNT */
+		case 0x01:  /* INTERLACED / HSYNC WIDTH / HSYNC DELAY */
+		case 0x02:  /* SCANS PER DATA ROW / CHARACTERS PER DATA ROW */
+		case 0x03:  /* SKEW BITS / DATA ROWS PER FRAME */
+		case 0x04:  /* SCAN LINES / FRAME */
+		case 0x05:  /* VERTICAL DATA START */
+		case 0x06:  /* LAST DISPLAYED DATA ROW */
 			tms->reg[offset] = data;
 			recompute_parameters(tms, FALSE);
 			break;
 
-		case 0x0c:	/* LOAD CURSOR CHARACTER ADDRESS */
-		case 0x0d:	/* LOAD CURSOR ROW ADDRESS */
+		case 0x0c:  /* LOAD CURSOR CHARACTER ADDRESS */
+		case 0x0d:  /* LOAD CURSOR ROW ADDRESS */
 mame_printf_debug("Cursor address changed\n");
 			tms->reg[offset - 0x0c + 7] = data;
 			recompute_parameters(tms, FALSE);
@@ -161,8 +161,8 @@ READ8_DEVICE_HANDLER( tms9927_r )
 
 	switch (offset)
 	{
-		case 0x08:	/* READ CURSOR CHARACTER ADDRESS */
-		case 0x09:	/* READ CURSOR ROW ADDRESS */
+		case 0x08:  /* READ CURSOR CHARACTER ADDRESS */
+		case 0x09:  /* READ CURSOR ROW ADDRESS */
 			return tms->reg[offset - 0x08 + 7];
 
 		default:
@@ -379,5 +379,3 @@ crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, d
 	: tms9927_device(mconfig, CRT5057, "CRT5057", tag, owner, clock)
 {
 }
-
-

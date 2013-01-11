@@ -18,11 +18,11 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
-	UINT8  *  m_fg_videoram;	// 8bits
+	UINT8  *  m_fg_videoram;    // 8bits
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_workram;
 	optional_shared_ptr<UINT16> m_spriteram_2;
-	required_shared_ptr<UINT8>  m_mcu_ram;  	// 8bits
+	required_shared_ptr<UINT8>  m_mcu_ram;      // 8bits
 //  UINT16 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
@@ -31,7 +31,7 @@ public:
 	int       m_fg_char_bank;
 	UINT8     m_bgcolor;
 	UINT16    m_splndrbt_bg_scrollx;
-	UINT16	  m_splndrbt_bg_scrolly;
+	UINT16    m_splndrbt_bg_scrolly;
 
 	/* misc */
 	int       m_sound_prom_address;
@@ -47,7 +47,7 @@ public:
 	float     m_cymvol;
 	float     m_hihatvol;
 	int       m_timer_count;
-	int       m_unknown_bit;	// Gekisou special handling
+	int       m_unknown_bit;    // Gekisou special handling
 #if POPDRUMKIT
 	int       m_hihat;
 	int       m_cymbal;

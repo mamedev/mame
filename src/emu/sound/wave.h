@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 class wave_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -28,8 +28,8 @@ private:
 extern const device_type WAVE;
 
 
-#define WAVE_TAG		"wave"
-#define WAVE2_TAG		"wave2"
+#define WAVE_TAG        "wave"
+#define WAVE2_TAG       "wave2"
 
 
 #define MCFG_SOUND_WAVE_ADD(_tag, _cass_tag) \

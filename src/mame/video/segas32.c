@@ -152,11 +152,11 @@
  *
  *************************************/
 
-#define SHOW_CLIPS				0
-#define QWERTY_LAYER_ENABLE		0
-#define PRINTF_MIXER_DATA		0
-#define SHOW_ALPHA				0
-#define LOG_SPRITES				0
+#define SHOW_CLIPS              0
+#define QWERTY_LAYER_ENABLE     0
+#define PRINTF_MIXER_DATA       0
+#define SHOW_ALPHA              0
+#define LOG_SPRITES             0
 
 
 
@@ -166,19 +166,19 @@
  *
  *************************************/
 
-#define MIXER_LAYER_TEXT		0
-#define MIXER_LAYER_NBG0		1
-#define MIXER_LAYER_NBG1		2
-#define MIXER_LAYER_NBG2		3
-#define MIXER_LAYER_NBG3		4
-#define MIXER_LAYER_BITMAP		5
-#define MIXER_LAYER_SPRITES		6
-#define MIXER_LAYER_BACKGROUND	7
-#define MIXER_LAYER_SPRITES_2	8	/* semi-kludge to have a frame buffer for sprite backlayer */
-#define MIXER_LAYER_MULTISPR	9
-#define MIXER_LAYER_MULTISPR_2	10
+#define MIXER_LAYER_TEXT        0
+#define MIXER_LAYER_NBG0        1
+#define MIXER_LAYER_NBG1        2
+#define MIXER_LAYER_NBG2        3
+#define MIXER_LAYER_NBG3        4
+#define MIXER_LAYER_BITMAP      5
+#define MIXER_LAYER_SPRITES     6
+#define MIXER_LAYER_BACKGROUND  7
+#define MIXER_LAYER_SPRITES_2   8   /* semi-kludge to have a frame buffer for sprite backlayer */
+#define MIXER_LAYER_MULTISPR    9
+#define MIXER_LAYER_MULTISPR_2  10
 
-#define TILEMAP_CACHE_SIZE		32
+#define TILEMAP_CACHE_SIZE      32
 
 
 
@@ -188,7 +188,7 @@
  *
  *************************************/
 
-#define SWAP_HALVES(x)			NATIVE_ENDIAN_VALUE_LE_BE(x, ((x) >> 16) | ((x) << 16))
+#define SWAP_HALVES(x)          NATIVE_ENDIAN_VALUE_LE_BE(x, ((x) >> 16) | ((x) << 16))
 
 
 
@@ -200,17 +200,17 @@
 
 struct extents_list
 {
-	UINT8					scan_extent[256];
-	UINT16					extent[32][16];
+	UINT8                   scan_extent[256];
+	UINT16                  extent[32][16];
 };
 
 
 struct cache_entry
 {
-	struct cache_entry *	next;
-	tilemap_t *				tmap;
-	UINT8					page;
-	UINT8					bank;
+	struct cache_entry *    next;
+	tilemap_t *             tmap;
+	UINT8                   page;
+	UINT8                   bank;
 };
 
 
@@ -448,7 +448,7 @@ WRITE16_MEMBER(segas32_state::system32_paletteram_w)
 READ32_MEMBER(segas32_state::multi32_paletteram_0_r)
 {
 	return common_paletteram_r(space, 0, offset*2+0) |
-	      (common_paletteram_r(space, 0, offset*2+1) << 16);
+			(common_paletteram_r(space, 0, offset*2+1) << 16);
 }
 
 
@@ -464,7 +464,7 @@ WRITE32_MEMBER(segas32_state::multi32_paletteram_0_w)
 READ32_MEMBER(segas32_state::multi32_paletteram_1_r)
 {
 	return common_paletteram_r(space, 1, offset*2+0) |
-	      (common_paletteram_r(space, 1, offset*2+1) << 16);
+			(common_paletteram_r(space, 1, offset*2+1) << 16);
 }
 
 
@@ -512,7 +512,7 @@ WRITE16_MEMBER(segas32_state::system32_videoram_w)
 READ32_MEMBER(segas32_state::multi32_videoram_r)
 {
 	return m_system32_videoram[offset*2+0] |
-	      (m_system32_videoram[offset*2+1] << 16);
+			(m_system32_videoram[offset*2+1] << 16);
 }
 
 
@@ -538,52 +538,52 @@ READ16_MEMBER(segas32_state::system32_sprite_control_r)
 	{
 		case 0:
 			/*  D1 : Seems to be '1' only during an erase in progress, this
-                     occurs very briefly though.
-                D0 : Selected frame buffer (0= A, 1= B) */
+			         occurs very briefly though.
+			    D0 : Selected frame buffer (0= A, 1= B) */
 			return 0xfffc | (int)(&m_layer_data[MIXER_LAYER_SPRITES].bitmap < &m_layer_data[MIXER_LAYER_SPRITES_2].bitmap);
 
 		case 1:
 			/*  D1 : ?
-                D0 : ?
+			    D0 : ?
 
-                Values seem to be:
+			    Values seem to be:
 
-                0 = Unknown (relates to *approaching* out of time condition)
-                1 = Normal status
-                2 = Overdraw (rendering time is over but end-of-list command not read yet)
-                3 = Never occurs
+			    0 = Unknown (relates to *approaching* out of time condition)
+			    1 = Normal status
+			    2 = Overdraw (rendering time is over but end-of-list command not read yet)
+			    3 = Never occurs
 
-                Condition 2 can occur during rendering or list processing. */
+			    Condition 2 can occur during rendering or list processing. */
 			return 0xfffc | 1;
 
 		case 2:
 			/*  D1 : 1= Vertical flip, 0= Normal orientation
-                D0 : 1= Horizontal flip, 0= Normal orientation */
+			    D0 : 1= Horizontal flip, 0= Normal orientation */
 			return 0xfffc | m_sprite_control_latched[2];
 
 		case 3:
 			/*  D1 : 1= Manual mode, 0= Automatic mode
-                D0 : 1= 30 Hz update, 0= 60 Hz update (automatic mode only) */
+			    D0 : 1= 30 Hz update, 0= 60 Hz update (automatic mode only) */
 			return 0xfffc | m_sprite_control_latched[3];
 
 		case 4:
 			/*  D1 : ?
-                D0 : ? */
+			    D0 : ? */
 			return 0xfffc | m_sprite_control_latched[4];
 
 		case 5:
 			/*  D1 : ?
-                D0 : ? */
+			    D0 : ? */
 			return 0xfffc | m_sprite_control_latched[5];
 
 		case 6:
 			/*  D0 : 1= 416 pixels
-                     0= 320 pixels */
+			         0= 320 pixels */
 			return 0xfffc | (m_sprite_control_latched[6] & 1);
 
 		case 7:
 			/*  D1 : ?
-                D0 : ? */
+			    D0 : ? */
 			return 0xfffc;
 	}
 	return 0xffff;
@@ -600,7 +600,7 @@ WRITE16_MEMBER(segas32_state::system32_sprite_control_w)
 READ32_MEMBER(segas32_state::multi32_sprite_control_r)
 {
 	return system32_sprite_control_r(space, offset*2+0, mem_mask) |
-	      (system32_sprite_control_r(space, offset*2+1, mem_mask >> 16) << 16);
+			(system32_sprite_control_r(space, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
@@ -640,7 +640,7 @@ WRITE16_MEMBER(segas32_state::system32_spriteram_w)
 READ32_MEMBER(segas32_state::multi32_spriteram_r)
 {
 	return m_system32_spriteram[offset*2+0] |
-	      (m_system32_spriteram[offset*2+1] << 16);
+			(m_system32_spriteram[offset*2+1] << 16);
 }
 
 
@@ -1594,62 +1594,62 @@ static void sprite_swap_buffers(segas32_state *state)
  *
  *******************************************************************************************/
 
-#define sprite_draw_pixel_16(trans)											\
-	/* only draw if onscreen, not 0 or 15 */								\
-	if (x >= clipin.min_x && x <= clipin.max_x &&							\
-		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&			\
-		pix != trans)														\
-	{																		\
-		if (!indirect)														\
-		{																	\
-			if (pix != 0)													\
-			{																\
-				if (!shadow)												\
-					dest[x] = color | pix;									\
-				else														\
-					dest[x] &= 0x7fff;										\
-			}																\
-		}																	\
-		else																\
-		{																	\
-			int indpix = indtable[pix];										\
-			if ((indpix & transmask) != transmask)							\
-			{																\
-				if (!shadow)												\
-					dest[x] = indpix;										\
-				else														\
-					dest[x] &= 0x7fff;										\
-			}																\
-		}																	\
+#define sprite_draw_pixel_16(trans)                                         \
+	/* only draw if onscreen, not 0 or 15 */                                \
+	if (x >= clipin.min_x && x <= clipin.max_x &&                           \
+		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&          \
+		pix != trans)                                                       \
+	{                                                                       \
+		if (!indirect)                                                      \
+		{                                                                   \
+			if (pix != 0)                                                   \
+			{                                                               \
+				if (!shadow)                                                \
+					dest[x] = color | pix;                                  \
+				else                                                        \
+					dest[x] &= 0x7fff;                                      \
+			}                                                               \
+		}                                                                   \
+		else                                                                \
+		{                                                                   \
+			int indpix = indtable[pix];                                     \
+			if ((indpix & transmask) != transmask)                          \
+			{                                                               \
+				if (!shadow)                                                \
+					dest[x] = indpix;                                       \
+				else                                                        \
+					dest[x] &= 0x7fff;                                      \
+			}                                                               \
+		}                                                                   \
 	}
 
-#define sprite_draw_pixel_256(trans)										\
-	/* only draw if onscreen, not 0 or 15 */								\
-	if (x >= clipin.min_x && x <= clipin.max_x &&							\
-		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&			\
-		pix != trans)														\
-	{																		\
-		if (!indirect)														\
-		{																	\
-			if (pix != 0)													\
-			{																\
-				if (!shadow)												\
-					dest[x] = color | pix;									\
-				else														\
-					dest[x] &= 0x7fff;										\
-			}																\
-		}																	\
-		else																\
-		{																	\
-			int indpix = (indtable[pix >> 4]) | (pix & 0x0f);				\
-			if ((indpix & transmask) != transmask)							\
-			{																\
-				if (!shadow)												\
-					dest[x] = indpix;										\
-				else														\
-					dest[x] &= 0x7fff;										\
-			}																\
-		}																	\
+#define sprite_draw_pixel_256(trans)                                        \
+	/* only draw if onscreen, not 0 or 15 */                                \
+	if (x >= clipin.min_x && x <= clipin.max_x &&                           \
+		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&          \
+		pix != trans)                                                       \
+	{                                                                       \
+		if (!indirect)                                                      \
+		{                                                                   \
+			if (pix != 0)                                                   \
+			{                                                               \
+				if (!shadow)                                                \
+					dest[x] = color | pix;                                  \
+				else                                                        \
+					dest[x] &= 0x7fff;                                      \
+			}                                                               \
+		}                                                                   \
+		else                                                                \
+		{                                                                   \
+			int indpix = (indtable[pix >> 4]) | (pix & 0x0f);               \
+			if ((indpix & transmask) != transmask)                          \
+			{                                                               \
+				if (!shadow)                                                \
+					dest[x] = indpix;                                       \
+				else                                                        \
+					dest[x] &= 0x7fff;                                      \
+			}                                                               \
+		}                                                                   \
 	}
 
 static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout)
@@ -1738,9 +1738,9 @@ static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, in
 	switch (adjustx)
 	{
 		case 0:
-		case 3:	xpos -= (dstw - 1) / 2; 	break;
-		case 1: xpos -= dstw - 1;			break;
-		case 2:								break;
+		case 3: xpos -= (dstw - 1) / 2;     break;
+		case 1: xpos -= dstw - 1;           break;
+		case 2:                             break;
 	}
 
 	/* adjust the starting Y position */
@@ -1749,9 +1749,9 @@ static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, in
 	switch (adjusty)
 	{
 		case 0:
-		case 3:	ypos -= (dsth - 1) / 2; 	break;
-		case 1: ypos -= dsth - 1;			break;
-		case 2:								break;
+		case 3: ypos -= (dsth - 1) / 2;     break;
+		case 1: ypos -= dsth - 1;           break;
+		case 2:                             break;
 	}
 
 	/* adjust for flipping */
@@ -1972,17 +1972,17 @@ INLINE UINT16 compute_sprite_blend(UINT8 encoding)
 	switch ((encoding >> 4) & 3)
 	{
 		/* blend if priority == value */
-		case 0:		return 1 << value;
+		case 0:     return 1 << value;
 
 		/* blend if priority <= value */
-		case 1:		return (1 << value) | ((1 << value) - 1);
+		case 1:     return (1 << value) | ((1 << value) - 1);
 
 		/* blend if priority >= value */
-		case 2:		return ~((1 << value) - 1) & 0xffff;
+		case 2:     return ~((1 << value) - 1) & 0xffff;
 
 		/* blend always */
 		default:
-		case 3:		return 0xffff;
+		case 3:     return 0xffff;
 	}
 }
 
@@ -1999,13 +1999,13 @@ static void mix_all_layers(segas32_state *state, int which, int xoffs, bitmap_rg
 	int blendfactor = (state->m_mixer_control[which][0x4e/2] >> 8) & 7;
 	struct mixer_layer_info
 	{
-		UINT16		palbase;			/* palette base from control reg */
-		UINT16		sprblendmask;		/* mask of sprite priorities this layer blends with */
-		UINT8		blendmask;			/* mask of layers this layer blends with */
-		UINT8		index;				/* index of this layer (MIXER_LAYER_XXX) */
-		UINT8		effpri;				/* effective priority = (priority << 3) | layer_priority */
-		UINT8		mixshift;			/* shift from control reg */
-		UINT8		coloroffs;			/* color offset index */
+		UINT16      palbase;            /* palette base from control reg */
+		UINT16      sprblendmask;       /* mask of sprite priorities this layer blends with */
+		UINT8       blendmask;          /* mask of layers this layer blends with */
+		UINT8       index;              /* index of this layer (MIXER_LAYER_XXX) */
+		UINT8       effpri;             /* effective priority = (priority << 3) | layer_priority */
+		UINT8       mixshift;           /* shift from control reg */
+		UINT8       coloroffs;          /* color offset index */
 	} layerorder[16][8], layersort[8];
 	struct layer_info temp_sprite_save = { 0 };
 	UINT8 sprgroup_shift, sprgroup_mask, sprgroup_or;
@@ -2039,25 +2039,25 @@ static void mix_all_layers(segas32_state *state, int which, int xoffs, bitmap_rg
 	switch (state->m_mixer_control[which][0x4c/2] & 0x0f)
 	{
 		default:
-		case 0x0:	sprgroup_shift = 14;	sprgroup_mask = 0x00;	sprgroup_or = 0x01;	break;
-		case 0x1:	sprgroup_shift = 14;	sprgroup_mask = 0x01;	sprgroup_or = 0x02;	break;
-		case 0x2:	sprgroup_shift = 13;	sprgroup_mask = 0x03;	sprgroup_or = 0x04;	break;
-		case 0x3:	sprgroup_shift = 12;	sprgroup_mask = 0x07;	sprgroup_or = 0x08;	break;
+		case 0x0:   sprgroup_shift = 14;    sprgroup_mask = 0x00;   sprgroup_or = 0x01; break;
+		case 0x1:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x02; break;
+		case 0x2:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x04; break;
+		case 0x3:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x08; break;
 
-		case 0x4:	sprgroup_shift = 14;	sprgroup_mask = 0x01;	sprgroup_or = 0x00;	break;
-		case 0x5:	sprgroup_shift = 13;	sprgroup_mask = 0x03;	sprgroup_or = 0x00;	break;
-		case 0x6:	sprgroup_shift = 12;	sprgroup_mask = 0x07;	sprgroup_or = 0x00;	break;
-		case 0x7:	sprgroup_shift = 11;	sprgroup_mask = 0x0f;	sprgroup_or = 0x00;	break;
+		case 0x4:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
+		case 0x5:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
+		case 0x6:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
+		case 0x7:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
 
-		case 0x8:	sprgroup_shift = 14;	sprgroup_mask = 0x01;	sprgroup_or = 0x00;	break;
-		case 0x9:	sprgroup_shift = 13;	sprgroup_mask = 0x03;	sprgroup_or = 0x00;	break;
-		case 0xa:	sprgroup_shift = 12;	sprgroup_mask = 0x07;	sprgroup_or = 0x00;	break;
-		case 0xb:	sprgroup_shift = 11;	sprgroup_mask = 0x0f;	sprgroup_or = 0x00;	break;
+		case 0x8:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
+		case 0x9:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
+		case 0xa:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
+		case 0xb:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
 
-		case 0xc:	sprgroup_shift = 13;	sprgroup_mask = 0x01;	sprgroup_or = 0x00;	break;
-		case 0xd:	sprgroup_shift = 12;	sprgroup_mask = 0x03;	sprgroup_or = 0x00;	break;
-		case 0xe:	sprgroup_shift = 11;	sprgroup_mask = 0x07;	sprgroup_or = 0x00;	break;
-		case 0xf:	sprgroup_shift = 10;	sprgroup_mask = 0x0f;	sprgroup_or = 0x00;	break;
+		case 0xc:   sprgroup_shift = 13;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
+		case 0xd:   sprgroup_shift = 12;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
+		case 0xe:   sprgroup_shift = 11;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
+		case 0xf:   sprgroup_shift = 10;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
 	}
 	sprshadowmask = (state->m_mixer_control[which][0x4c/2] & 0x04) ? 0x8000 : 0x0000;
 	sprpixmask = ((1 << sprgroup_shift) - 1) & 0x3fff;

@@ -96,35 +96,35 @@
 
 struct mc68328_interface
 {
-    const char *m68k_cpu_tag;
+	const char *m68k_cpu_tag;
 
-    devcb_write8  out_port_a_func;    /* 8-bit output */
-    devcb_write8  out_port_b_func;    /* 8-bit output */
-    devcb_write8  out_port_c_func;    /* 8-bit output */
-    devcb_write8  out_port_d_func;    /* 8-bit output */
-    devcb_write8  out_port_e_func;    /* 8-bit output */
-    devcb_write8  out_port_f_func;    /* 8-bit output */
-    devcb_write8  out_port_g_func;    /* 8-bit output */
-    devcb_write8  out_port_j_func;    /* 8-bit output */
-    devcb_write8  out_port_k_func;    /* 8-bit output */
-    devcb_write8  out_port_m_func;    /* 8-bit output */
+	devcb_write8  out_port_a_func;    /* 8-bit output */
+	devcb_write8  out_port_b_func;    /* 8-bit output */
+	devcb_write8  out_port_c_func;    /* 8-bit output */
+	devcb_write8  out_port_d_func;    /* 8-bit output */
+	devcb_write8  out_port_e_func;    /* 8-bit output */
+	devcb_write8  out_port_f_func;    /* 8-bit output */
+	devcb_write8  out_port_g_func;    /* 8-bit output */
+	devcb_write8  out_port_j_func;    /* 8-bit output */
+	devcb_write8  out_port_k_func;    /* 8-bit output */
+	devcb_write8  out_port_m_func;    /* 8-bit output */
 
-    devcb_read8   in_port_a_func;     /* 8-bit input */
-    devcb_read8   in_port_b_func;     /* 8-bit input */
-    devcb_read8   in_port_c_func;     /* 8-bit input */
-    devcb_read8   in_port_d_func;     /* 8-bit input */
-    devcb_read8   in_port_e_func;     /* 8-bit input */
-    devcb_read8   in_port_f_func;     /* 8-bit input */
-    devcb_read8   in_port_g_func;     /* 8-bit input */
-    devcb_read8   in_port_j_func;     /* 8-bit input */
-    devcb_read8   in_port_k_func;     /* 8-bit input */
-    devcb_read8   in_port_m_func;     /* 8-bit input */
+	devcb_read8   in_port_a_func;     /* 8-bit input */
+	devcb_read8   in_port_b_func;     /* 8-bit input */
+	devcb_read8   in_port_c_func;     /* 8-bit input */
+	devcb_read8   in_port_d_func;     /* 8-bit input */
+	devcb_read8   in_port_e_func;     /* 8-bit input */
+	devcb_read8   in_port_f_func;     /* 8-bit input */
+	devcb_read8   in_port_g_func;     /* 8-bit input */
+	devcb_read8   in_port_j_func;     /* 8-bit input */
+	devcb_read8   in_port_k_func;     /* 8-bit input */
+	devcb_read8   in_port_m_func;     /* 8-bit input */
 
-    devcb_write8  out_pwm_func;       /* 1-bit output */
+	devcb_write8  out_pwm_func;       /* 1-bit output */
 
-    devcb_write16 out_spim_func;      /* 16-bit output */
-    devcb_read16  in_spim_func;       /* 16-bit input */
-    void (*spim_xch_trigger)( device_t *device );    /* SPIM exchange trigger */
+	devcb_write16 out_spim_func;      /* 16-bit output */
+	devcb_read16  in_spim_func;       /* 16-bit input */
+	void (*spim_xch_trigger)( device_t *device );    /* SPIM exchange trigger */
 };
 #define MC68328_INTERFACE(name) const mc68328_interface (name)=
 
@@ -135,8 +135,8 @@ struct mc68328_interface
 ***************************************************************************/
 
 #define MCFG_MC68328_ADD(_intrf) \
-    MCFG_DEVICE_ADD("dragonball", MC68328, 0) \
-    MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_ADD("dragonball", MC68328, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 /*----------- defined in machine/mc68328.c -----------*/
 

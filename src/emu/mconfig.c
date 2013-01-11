@@ -52,17 +52,17 @@
 
 machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	: m_minimum_quantum(attotime::zero),
-	  m_watchdog_vblank_count(0),
-	  m_watchdog_time(attotime::zero),
-	  m_nvram_handler(NULL),
-	  m_memcard_handler(NULL),
-	  m_video_attributes(0),
-	  m_gfxdecodeinfo(NULL),
-	  m_total_colors(0),
-	  m_default_layout(NULL),
-	  m_gamedrv(gamedrv),
-	  m_options(options),
-	  m_root_device(NULL)
+		m_watchdog_vblank_count(0),
+		m_watchdog_time(attotime::zero),
+		m_nvram_handler(NULL),
+		m_memcard_handler(NULL),
+		m_video_attributes(0),
+		m_gfxdecodeinfo(NULL),
+		m_total_colors(0),
+		m_default_layout(NULL),
+		m_gamedrv(gamedrv),
+		m_options(options),
+		m_root_device(NULL)
 {
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL);
@@ -70,7 +70,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	bool is_selected_driver = strcmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
 	slot_interface_iterator slotiter(root_device());
-    for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
+	for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 	{
 		const slot_interface *intf = slot->get_slot_interfaces();
 		if (intf != NULL)
@@ -171,7 +171,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 				break;
 		if (!curdevice)
 			throw emu_fatalerror("Could not find %s when looking up path for device %s\n",
-								 part.cstr(), orig_tag);
+									part.cstr(), orig_tag);
 		owner = curdevice;
 		tag = next+1;
 	}

@@ -41,7 +41,7 @@ public:
 	int         m_m6295_bank;
 	UINT16      m_m6295_key_delay;
 
-	int	m_fg_base;
+	int m_fg_base;
 
 	int m_bg_base;
 	int m_bg_mask;

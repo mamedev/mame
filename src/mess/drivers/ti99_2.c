@@ -206,13 +206,13 @@ GFXDECODE_END
 */
 
 static ADDRESS_MAP_START( ti99_2_memmap, AS_PROGRAM, 8, ti99_2_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM		    /* system ROM */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")	/* system ROM, banked on 32kb ROMs protos */
-	AM_RANGE(0x6000, 0xdfff) AM_NOP		    /* free for expansion */
-	AM_RANGE(0xe000, 0xebff) AM_RAM		    /* system RAM */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* system ROM */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")    /* system ROM, banked on 32kb ROMs protos */
+	AM_RANGE(0x6000, 0xdfff) AM_NOP         /* free for expansion */
+	AM_RANGE(0xe000, 0xebff) AM_RAM         /* system RAM */
 	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xef00, 0xefff) AM_RAM		    /* system RAM */
-	AM_RANGE(0xf000, 0xffff) AM_NOP		    /* free for expansion (and internal processor RAM) */
+	AM_RANGE(0xef00, 0xefff) AM_RAM         /* system RAM */
+	AM_RANGE(0xf000, 0xffff) AM_NOP         /* free for expansion (and internal processor RAM) */
 ADDRESS_MAP_END
 
 
@@ -237,7 +237,7 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
 	}
 	/* now, we handle ROM paging */
 	if (m_ROM_paged)
-	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
+	{   /* if we have paged ROMs, page according to S0 keyboard interface line */
 		membank("bank1")->set_base((m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
@@ -367,7 +367,7 @@ static const struct tms9995reset_param ti99_2_processor_config =
 #if 0
 	"maincpu",/* region for processor RAM */
 	0xf000,     /* offset : this area is unused in our region, and matches the processor address */
-	0xf0fc,		/* offset for the LOAD vector */
+	0xf0fc,     /* offset for the LOAD vector */
 	NULL,       /* no IDLE callback */
 	1,          /* use fast IDLE */
 #endif
@@ -420,5 +420,5 @@ ROM_END
 /* None of these is supported (tape should be easy to emulate) */
 
 /*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        COMPANY                 FULLNAME */
-COMP(	1983,	ti99_224,	0,			0,	ti99_2,	ti99_2, ti99_2_state,	ti99_2_24,			"Texas Instruments",	"TI-99/2 BASIC Computer (24kb ROMs)" , GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP(	1983,	ti99_232,	ti99_224,	0,	ti99_2,	ti99_2, ti99_2_state,	ti99_2_32,			"Texas Instruments",	"TI-99/2 BASIC Computer (32kb ROMs)" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP(   1983,   ti99_224,   0,          0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_24,          "Texas Instruments",    "TI-99/2 BASIC Computer (24kb ROMs)" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP(   1983,   ti99_232,   ti99_224,   0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_32,          "Texas Instruments",    "TI-99/2 BASIC Computer (32kb ROMs)" , GAME_NOT_WORKING | GAME_NO_SOUND )

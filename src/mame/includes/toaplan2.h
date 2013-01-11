@@ -30,17 +30,17 @@ public:
 	gp9001vdp_device* m_vdp1;
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<UINT16> m_shared_ram16; 	// Really 8 bit RAM connected to Z180
+	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
 
 	device_t *m_main_cpu;
 	device_t *m_sub_cpu;
 
 	UINT16 m_mcu_data;
 	UINT16 m_video_status;
-	INT8 m_old_p1_paddle_h;	/* For Ghox */
+	INT8 m_old_p1_paddle_h; /* For Ghox */
 	INT8 m_old_p2_paddle_h;
-	UINT8 m_v25_reset_line;	/* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
-	UINT8 m_sndirq_line;		/* IRQ4 for batrider, IRQ2 for bbakraid */
+	UINT8 m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
+	UINT8 m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
 	UINT8 m_z80_busreq;
 
 	optional_shared_ptr<UINT16> m_txvideoram16;
@@ -53,7 +53,7 @@ public:
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 
-	tilemap_t *m_tx_tilemap;	/* Tilemap for extra-text-layer */
+	tilemap_t *m_tx_tilemap;    /* Tilemap for extra-text-layer */
 	UINT8 m_tx_flip;
 	DECLARE_READ16_MEMBER(video_count_r);
 	DECLARE_WRITE8_MEMBER(toaplan2_coin_w);

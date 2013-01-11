@@ -28,22 +28,22 @@ void rm380z_state::init_graphic_chars()
 	for (int c=0;c<0x3f;c++)
 	{
 		if (c&0x01) put_point(c,0,0,1);
-		else				put_point(c,0,0,0);
+		else                put_point(c,0,0,0);
 
 		if (c&0x02) put_point(c,3,0,1);
-		else				put_point(c,3,0,0);
+		else                put_point(c,3,0,0);
 
 		if (c&0x04) put_point(c,0,3,1);
-		else				put_point(c,0,3,0);
+		else                put_point(c,0,3,0);
 
 		if (c&0x08) put_point(c,3,3,1);
-		else				put_point(c,3,3,0);
+		else                put_point(c,3,3,0);
 
 		if (c&0x10) put_point(c,0,6,1);
-		else				put_point(c,0,6,0);
+		else                put_point(c,0,6,0);
 
 		if (c&0x20) put_point(c,3,6,1);
-		else				put_point(c,3,6,0);
+		else                put_point(c,3,6,0);
 	}
 }
 

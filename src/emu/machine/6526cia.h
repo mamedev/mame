@@ -81,16 +81,16 @@
 
 struct legacy_mos6526_interface
 {
-	devcb_write_line	m_out_irq_cb;
-	devcb_write_line	m_out_pc_cb;
-	devcb_write_line	m_out_cnt_cb;
-	devcb_write_line	m_out_sp_cb;
+	devcb_write_line    m_out_irq_cb;
+	devcb_write_line    m_out_pc_cb;
+	devcb_write_line    m_out_cnt_cb;
+	devcb_write_line    m_out_sp_cb;
 
-	devcb_read8			m_in_pa_cb;
-	devcb_write8		m_out_pa_cb;
+	devcb_read8         m_in_pa_cb;
+	devcb_write8        m_out_pa_cb;
 
-	devcb_read8			m_in_pb_cb;
-	devcb_write8		m_out_pb_cb;
+	devcb_read8         m_in_pb_cb;
+	devcb_write8        m_out_pb_cb;
 };
 
 
@@ -98,11 +98,11 @@ struct legacy_mos6526_interface
 // ======================> legacy_mos6526_device
 
 class legacy_mos6526_device :  public device_t,
-                        public legacy_mos6526_interface
+						public legacy_mos6526_interface
 {
 protected:
-    // construction/destruction
-    legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 public:
 	// inline configuration
@@ -139,12 +139,12 @@ public:
 	void set_port_mask_value(int port, int data);
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
-    virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_post_load() { }
+	virtual void device_clock_changed() { }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	static TIMER_CALLBACK( timer_proc );
@@ -157,7 +157,7 @@ private:
 		TIMER_TOD
 	};
 
-    inline attotime cycles_to_time(int c);
+	inline attotime cycles_to_time(int c);
 	void update_pc();
 	void update_interrupts();
 	void timer_bump(int timer);
@@ -173,24 +173,24 @@ private:
 		UINT16 get_count();
 		void update(int which, INT32 new_count);
 
-		UINT32			m_clock;
-		UINT16			m_latch;
-		UINT16			m_count;
-		UINT8			m_mode;
-		UINT8			m_irq;
-		emu_timer*		m_timer;
-		legacy_mos6526_device*	m_cia;
+		UINT32          m_clock;
+		UINT16          m_latch;
+		UINT16          m_count;
+		UINT8           m_mode;
+		UINT8           m_irq;
+		emu_timer*      m_timer;
+		legacy_mos6526_device*  m_cia;
 	};
 
 	struct cia_port
 	{
-		UINT8		m_ddr;
-		UINT8		m_latch;
-		UINT8		m_in;
-		UINT8		m_out;
-		devcb_resolved_read8	m_read;
-		devcb_resolved_write8	m_write;
-		UINT8		m_mask_value; /* in READ operation the value can be forced by a extern electric circuit */
+		UINT8       m_ddr;
+		UINT8       m_latch;
+		UINT8       m_in;
+		UINT8       m_out;
+		devcb_resolved_read8    m_read;
+		devcb_resolved_write8   m_write;
+		UINT8       m_mask_value; /* in READ operation the value can be forced by a extern electric circuit */
 	};
 
 	devcb_resolved_write_line m_out_irq_func;
@@ -198,30 +198,30 @@ private:
 	devcb_resolved_write_line m_out_cnt_func;
 	devcb_resolved_write_line m_out_sp_func;
 
-	cia_port		m_port[2];
-	cia_timer		m_timer[2];
+	cia_port        m_port[2];
+	cia_timer       m_timer[2];
 
 	/* Time Of the Day clock (TOD) */
-	int				m_tod_clock;
-	UINT32			m_tod;
-	UINT32			m_tod_latch;
-	UINT8			m_tod_latched;
-	UINT8			m_tod_running;
-	UINT32			m_alarm;
+	int             m_tod_clock;
+	UINT32          m_tod;
+	UINT32          m_tod_latch;
+	UINT8           m_tod_latched;
+	UINT8           m_tod_running;
+	UINT32          m_alarm;
 
 	/* Interrupts */
-	UINT8			m_icr;
-	UINT8			m_ics;
-	UINT8			m_irq;
-	int				m_flag;
+	UINT8           m_icr;
+	UINT8           m_ics;
+	UINT8           m_irq;
+	int             m_flag;
 
 	/* Serial */
-	UINT8			m_loaded;
-	UINT8			m_sdr;
-	UINT8			m_sp;
-	UINT8			m_cnt;
-	UINT8			m_shift;
-	UINT8			m_serial;
+	UINT8           m_loaded;
+	UINT8           m_sdr;
+	UINT8           m_sp;
+	UINT8           m_cnt;
+	UINT8           m_shift;
+	UINT8           m_serial;
 
 	emu_timer *m_pc_timer;
 	emu_timer *m_tod_timer;

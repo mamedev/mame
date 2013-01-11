@@ -11,21 +11,21 @@
 #include "includes/midvunit.h"
 
 
-#define WATCH_RENDER		(0)
-#define LOG_DMA				(0)
+#define WATCH_RENDER        (0)
+#define LOG_DMA             (0)
 
 
-#define DMA_CLOCK			40000000
+#define DMA_CLOCK           40000000
 
 
 /* for when we implement DMA timing */
-#define DMA_QUEUE_SIZE		273
-#define TIME_PER_PIXEL		41e-9
+#define DMA_QUEUE_SIZE      273
+#define TIME_PER_PIXEL      41e-9
 
 
 midvunit_renderer::midvunit_renderer(midvunit_state &state)
 	: poly_manager<float, midvunit_object_data, 2, 4000>(state.machine()),
-	  m_state(state) { }
+		m_state(state) { }
 
 
 /*************************************

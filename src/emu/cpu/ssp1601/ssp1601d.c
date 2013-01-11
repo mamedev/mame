@@ -58,15 +58,15 @@ static const char *const arith_ops[8] =
 };
 
 
-#define BIT_B				((op >> 8) & 1)
-#define RIJ					rij[(BIT_B << 2) + (op & 3)]
-#define RI(i)				rij[(i) & 3]
-#define RJ(i)				rij[((i) & 3) + 4]
-#define MODIFIER(mod,r3)	(((r3) == 3) ? modifier_sf[mod] : modifier[mod])
-#define MODIFIER_LOW		MODIFIER((op >> 2) & 3, op&3)
-#define MODIFIER_HIGH		MODIFIER((op >> 6) & 3, (op >> 4)&3)
+#define BIT_B               ((op >> 8) & 1)
+#define RIJ                 rij[(BIT_B << 2) + (op & 3)]
+#define RI(i)               rij[(i) & 3]
+#define RJ(i)               rij[((i) & 3) + 4]
+#define MODIFIER(mod,r3)    (((r3) == 3) ? modifier_sf[mod] : modifier[mod])
+#define MODIFIER_LOW        MODIFIER((op >> 2) & 3, op&3)
+#define MODIFIER_HIGH       MODIFIER((op >> 6) & 3, (op >> 4)&3)
 
-#define READ_OP_DASM(p)	((base_oprom[p] << 8) | base_oprom[(p) + 1])
+#define READ_OP_DASM(p) ((base_oprom[p] << 8) | base_oprom[(p) + 1])
 
 static char *get_cond(int op)
 {
@@ -294,5 +294,3 @@ CPU_DISASSEMBLE( ssp1601 )
 
 	return dasm_ssp1601(buffer, pc, oprom);
 }
-
-

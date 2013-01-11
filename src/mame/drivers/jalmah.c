@@ -567,9 +567,9 @@ WRITE16_MEMBER(jalmah_state::sc2_vram_w)
 WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
 {
 	/*
-     xxxx ---- fg bank (used by suchipi)
-     ---- xxxx Priority number (trusted,see mjzoomin)
-    */
+	 xxxx ---- fg bank (used by suchipi)
+	 ---- xxxx Priority number (trusted,see mjzoomin)
+	*/
 	//popmessage("Write to tilebank %02x",data);
 	if (ACCESSING_BITS_0_7)
 	{
@@ -595,9 +595,9 @@ WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
 	{
 		/*These 4 are just video regs,see mjzoomin test*/
 		/*
-            ---x ---- Always on with layer 3, 8x8 tiles switch?
-            ---- --xx RANGE registers
-        */
+		    ---x ---- Always on with layer 3, 8x8 tiles switch?
+		    ---- --xx RANGE registers
+		*/
 		case (0x24/2): jm_vregs[0] = data; break;
 		case (0x2c/2): jm_vregs[1] = data; break;
 		case (0x34/2): jm_vregs[2] = data; break;
@@ -649,7 +649,7 @@ WRITE16_MEMBER(jalmah_state::urashima_vregs_w)
 	//logerror("[%04x]<-%04x\n",(offset)*2,data);
 	switch(offset)
 	{
-		case 0x082/2: jm_vregs[0] = data;	  break; //sc0 plane enable
+		case 0x082/2: jm_vregs[0] = data;     break; //sc0 plane enable
 		case 0x084/2: jm_scrollram[0] = data; break; //sc0 x offset
 		case 0x086/2: jm_scrollram[4] = data; break; //sc0 y offset
 
@@ -661,20 +661,20 @@ WRITE16_MEMBER(jalmah_state::urashima_vregs_w)
 //      case 0x384/2: jm_scrollram[0] = data; break;
 //      case 0x386/2: jm_scrollram[4] = data; break;
 
-		case 0x882/2: jm_vregs[3] = data;	  break; //sc3 plane enable
+		case 0x882/2: jm_vregs[3] = data;     break; //sc3 plane enable
 		case 0x884/2: jm_scrollram[3] = data; break; //sc3 x offset
 		case 0x886/2: jm_scrollram[7] = data; break; //sc3 y offset
 
 		/*WRONG!*/
-		case 0x602/2: jm_vregs[0] = data;	  break;
+		case 0x602/2: jm_vregs[0] = data;     break;
 		case 0x604/2: jm_scrollram[0] = data; break;
 		case 0x606/2: jm_scrollram[4] = data; break;
 
-		case 0x77a/2: jm_vregs[0] = data;	  break; //sc0 plane enable,flip screen
+		case 0x77a/2: jm_vregs[0] = data;     break; //sc0 plane enable,flip screen
 		case 0x77c/2: jm_scrollram[0] = data; break; //sc0 x offset,flip screen
 		case 0x77e/2: jm_scrollram[4] = data; break; //sc0 y offset,flip screen
 
-		case 0xf7a/2: jm_vregs[3] = data;	  break; //sc3 plane enable,flip screen
+		case 0xf7a/2: jm_vregs[3] = data;     break; //sc3 plane enable,flip screen
 		case 0xf7c/2: jm_scrollram[3] = data; break; //sc3 x offset,flip screen
 		case 0xf7e/2: jm_scrollram[7] = data; break; //sc3 y offset,flip screen
 		default: break;
@@ -761,7 +761,7 @@ static void daireika_mcu_run(running_machine &machine)
 		daireika_palette_dma(machine,((jm_shared_ram[0x540/2] & 0x0f00) >> 8));
 	}
 
-	if(state->m_test_mode)	//service_mode
+	if(state->m_test_mode)  //service_mode
 	{
 		jm_shared_ram[0x000/2] = machine.root_device().ioport("KEY0")->read();
 		jm_shared_ram[0x002/2] = machine.root_device().ioport("KEY1")->read();
@@ -773,27 +773,27 @@ static void daireika_mcu_run(running_machine &machine)
 	else
 	{
 		jm_shared_ram[0x000/2] = 0x0000;
-		MCU_READ("KEY1", 0x0001, 0x000/2, 0x00);		/*FF*/
-		MCU_READ("KEY2", 0x0400, 0x000/2, 0x01);		/*A*/
-		MCU_READ("KEY2", 0x1000, 0x000/2, 0x02);		/*B*/
-		MCU_READ("KEY2", 0x0200, 0x000/2, 0x03);		/*C*/
-		MCU_READ("KEY2", 0x0800, 0x000/2, 0x04);		/*D*/
-		MCU_READ("KEY2", 0x0004, 0x000/2, 0x05);		/*E*/
-		MCU_READ("KEY2", 0x0010, 0x000/2, 0x06);		/*F*/
-		MCU_READ("KEY2", 0x0002, 0x000/2, 0x07);		/*G*/
-		MCU_READ("KEY2", 0x0008, 0x000/2, 0x08);		/*H*/
-		MCU_READ("KEY1", 0x0400, 0x000/2, 0x09);		/*I*/
-		MCU_READ("KEY1", 0x1000, 0x000/2, 0x0a);		/*J*/
-		MCU_READ("KEY1", 0x0200, 0x000/2, 0x0b);		/*K*/
-		MCU_READ("KEY1", 0x0800, 0x000/2, 0x0c);		/*L*/
-		MCU_READ("KEY1", 0x0004, 0x000/2, 0x0d);		/*M*/
-		MCU_READ("KEY1", 0x0010, 0x000/2, 0x0e);		/*N*/
-		MCU_READ("KEY0", 0x0200, 0x000/2, 0x0f);		/*RON   (trusted)*/
-		MCU_READ("KEY0", 0x1000, 0x000/2, 0x10);		/*REACH (trusted)*/
-		MCU_READ("KEY0", 0x0400, 0x000/2, 0x11);		/*KAN            */
-		MCU_READ("KEY1", 0x0008, 0x000/2, 0x12);		/*PON            */
-		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);		/*CHI   (trusted)*/
-		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);		/*START1*/
+		MCU_READ("KEY1", 0x0001, 0x000/2, 0x00);        /*FF*/
+		MCU_READ("KEY2", 0x0400, 0x000/2, 0x01);        /*A*/
+		MCU_READ("KEY2", 0x1000, 0x000/2, 0x02);        /*B*/
+		MCU_READ("KEY2", 0x0200, 0x000/2, 0x03);        /*C*/
+		MCU_READ("KEY2", 0x0800, 0x000/2, 0x04);        /*D*/
+		MCU_READ("KEY2", 0x0004, 0x000/2, 0x05);        /*E*/
+		MCU_READ("KEY2", 0x0010, 0x000/2, 0x06);        /*F*/
+		MCU_READ("KEY2", 0x0002, 0x000/2, 0x07);        /*G*/
+		MCU_READ("KEY2", 0x0008, 0x000/2, 0x08);        /*H*/
+		MCU_READ("KEY1", 0x0400, 0x000/2, 0x09);        /*I*/
+		MCU_READ("KEY1", 0x1000, 0x000/2, 0x0a);        /*J*/
+		MCU_READ("KEY1", 0x0200, 0x000/2, 0x0b);        /*K*/
+		MCU_READ("KEY1", 0x0800, 0x000/2, 0x0c);        /*L*/
+		MCU_READ("KEY1", 0x0004, 0x000/2, 0x0d);        /*M*/
+		MCU_READ("KEY1", 0x0010, 0x000/2, 0x0e);        /*N*/
+		MCU_READ("KEY0", 0x0200, 0x000/2, 0x0f);        /*RON   (trusted)*/
+		MCU_READ("KEY0", 0x1000, 0x000/2, 0x10);        /*REACH (trusted)*/
+		MCU_READ("KEY0", 0x0400, 0x000/2, 0x11);        /*KAN            */
+		MCU_READ("KEY1", 0x0008, 0x000/2, 0x12);        /*PON            */
+		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);        /*CHI   (trusted)*/
+		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);        /*START1*/
 	}
 	state->m_prg_prot++;
 	if(state->m_prg_prot > 0x10) { state->m_prg_prot = 0; }
@@ -805,7 +805,7 @@ static void mjzoomin_mcu_run(running_machine &machine)
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 
-	if(state->m_test_mode)	//service_mode
+	if(state->m_test_mode)  //service_mode
 	{
 		jm_shared_ram[0x000/2] = state->ioport("KEY0")->read();
 		jm_shared_ram[0x002/2] = state->ioport("KEY1")->read();
@@ -817,27 +817,27 @@ static void mjzoomin_mcu_run(running_machine &machine)
 	else
 	{
 		jm_shared_ram[0x000/2] = 0x0000;
-		MCU_READ("KEY1", 0x0001, 0x000/2, 0x00);		/*FF*/
-		MCU_READ("KEY2", 0x0400, 0x000/2, 0x01);		/*A*/
-		MCU_READ("KEY2", 0x1000, 0x000/2, 0x02);		/*B*/
-		MCU_READ("KEY2", 0x0200, 0x000/2, 0x03);		/*C*/
-		MCU_READ("KEY2", 0x0800, 0x000/2, 0x04);		/*D*/
-		MCU_READ("KEY2", 0x0004, 0x000/2, 0x05);		/*E*/
-		MCU_READ("KEY2", 0x0010, 0x000/2, 0x06);		/*F*/
-		MCU_READ("KEY2", 0x0002, 0x000/2, 0x07);		/*G*/
-		MCU_READ("KEY2", 0x0008, 0x000/2, 0x08);		/*H*/
-		MCU_READ("KEY1", 0x0400, 0x000/2, 0x09);		/*I*/
-		MCU_READ("KEY1", 0x1000, 0x000/2, 0x0a);		/*J*/
-		MCU_READ("KEY1", 0x0200, 0x000/2, 0x0b);		/*K*/
-		MCU_READ("KEY1", 0x0800, 0x000/2, 0x0c);		/*L*/
-		MCU_READ("KEY1", 0x0004, 0x000/2, 0x0d);		/*M*/
-		MCU_READ("KEY1", 0x0010, 0x000/2, 0x0e);		/*N*/
-		MCU_READ("KEY0", 0x0200, 0x000/2, 0x0f);		/*RON   (trusted)*/
-		MCU_READ("KEY0", 0x1000, 0x000/2, 0x10);		/*REACH (trusted)*/
-		MCU_READ("KEY0", 0x0400, 0x000/2, 0x11);		/*KAN            */
-		MCU_READ("KEY1", 0x0008, 0x000/2, 0x12);		/*PON            */
-		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);		/*CHI   (trusted)*/
-		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);		/*START1*/
+		MCU_READ("KEY1", 0x0001, 0x000/2, 0x00);        /*FF*/
+		MCU_READ("KEY2", 0x0400, 0x000/2, 0x01);        /*A*/
+		MCU_READ("KEY2", 0x1000, 0x000/2, 0x02);        /*B*/
+		MCU_READ("KEY2", 0x0200, 0x000/2, 0x03);        /*C*/
+		MCU_READ("KEY2", 0x0800, 0x000/2, 0x04);        /*D*/
+		MCU_READ("KEY2", 0x0004, 0x000/2, 0x05);        /*E*/
+		MCU_READ("KEY2", 0x0010, 0x000/2, 0x06);        /*F*/
+		MCU_READ("KEY2", 0x0002, 0x000/2, 0x07);        /*G*/
+		MCU_READ("KEY2", 0x0008, 0x000/2, 0x08);        /*H*/
+		MCU_READ("KEY1", 0x0400, 0x000/2, 0x09);        /*I*/
+		MCU_READ("KEY1", 0x1000, 0x000/2, 0x0a);        /*J*/
+		MCU_READ("KEY1", 0x0200, 0x000/2, 0x0b);        /*K*/
+		MCU_READ("KEY1", 0x0800, 0x000/2, 0x0c);        /*L*/
+		MCU_READ("KEY1", 0x0004, 0x000/2, 0x0d);        /*M*/
+		MCU_READ("KEY1", 0x0010, 0x000/2, 0x0e);        /*N*/
+		MCU_READ("KEY0", 0x0200, 0x000/2, 0x0f);        /*RON   (trusted)*/
+		MCU_READ("KEY0", 0x1000, 0x000/2, 0x10);        /*REACH (trusted)*/
+		MCU_READ("KEY0", 0x0400, 0x000/2, 0x11);        /*KAN            */
+		MCU_READ("KEY1", 0x0008, 0x000/2, 0x12);        /*PON            */
+		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);        /*CHI   (trusted)*/
+		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);        /*START1*/
 	}
 	jm_shared_ram[0x00c/2] = machine.rand() & 0xffff;
 	state->m_prg_prot++;
@@ -850,7 +850,7 @@ static void urashima_mcu_run(running_machine &machine)
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 
-	if(state->m_test_mode)	//service_mode
+	if(state->m_test_mode)  //service_mode
 	{
 		jm_shared_ram[0x300/2] = state->ioport("KEY0")->read();
 		jm_shared_ram[0x302/2] = state->ioport("KEY1")->read();
@@ -862,27 +862,27 @@ static void urashima_mcu_run(running_machine &machine)
 	else
 	{
 		jm_shared_ram[0x300/2] = 0x0000;
-		MCU_READ("KEY1", 0x0001, 0x300/2, 0x00);		/*FF*/
-		MCU_READ("KEY2", 0x0400, 0x300/2, 0x01);		/*A*/
-		MCU_READ("KEY2", 0x1000, 0x300/2, 0x02);		/*B*/
-		MCU_READ("KEY2", 0x0200, 0x300/2, 0x03);		/*C*/
-		MCU_READ("KEY2", 0x0800, 0x300/2, 0x04);		/*D*/
-		MCU_READ("KEY2", 0x0004, 0x300/2, 0x05);		/*E*/
-		MCU_READ("KEY2", 0x0010, 0x300/2, 0x06);		/*F*/
-		MCU_READ("KEY2", 0x0002, 0x300/2, 0x07);		/*G*/
-		MCU_READ("KEY2", 0x0008, 0x300/2, 0x08);		/*H*/
-		MCU_READ("KEY1", 0x0400, 0x300/2, 0x09);		/*I*/
-		MCU_READ("KEY1", 0x1000, 0x300/2, 0x0a);		/*J*/
-		MCU_READ("KEY1", 0x0200, 0x300/2, 0x0b);		/*K*/
-		MCU_READ("KEY1", 0x0800, 0x300/2, 0x0c);		/*L*/
-		MCU_READ("KEY1", 0x0004, 0x300/2, 0x0d);		/*M*/
-		MCU_READ("KEY1", 0x0010, 0x300/2, 0x0e);		/*N*/
-		MCU_READ("KEY0", 0x0200, 0x300/2, 0x0f);		/*RON   (trusted)*/
-		MCU_READ("KEY0", 0x1000, 0x300/2, 0x10);		/*REACH (trusted)*/
-		MCU_READ("KEY0", 0x0400, 0x300/2, 0x11);		/*KAN            */
-		MCU_READ("KEY1", 0x0008, 0x300/2, 0x12);		/*PON            */
-		MCU_READ("KEY1", 0x0002, 0x300/2, 0x13);		/*CHI   (trusted)*/
-		MCU_READ("KEY0", 0x0004, 0x300/2, 0x14);		/*START1*/
+		MCU_READ("KEY1", 0x0001, 0x300/2, 0x00);        /*FF*/
+		MCU_READ("KEY2", 0x0400, 0x300/2, 0x01);        /*A*/
+		MCU_READ("KEY2", 0x1000, 0x300/2, 0x02);        /*B*/
+		MCU_READ("KEY2", 0x0200, 0x300/2, 0x03);        /*C*/
+		MCU_READ("KEY2", 0x0800, 0x300/2, 0x04);        /*D*/
+		MCU_READ("KEY2", 0x0004, 0x300/2, 0x05);        /*E*/
+		MCU_READ("KEY2", 0x0010, 0x300/2, 0x06);        /*F*/
+		MCU_READ("KEY2", 0x0002, 0x300/2, 0x07);        /*G*/
+		MCU_READ("KEY2", 0x0008, 0x300/2, 0x08);        /*H*/
+		MCU_READ("KEY1", 0x0400, 0x300/2, 0x09);        /*I*/
+		MCU_READ("KEY1", 0x1000, 0x300/2, 0x0a);        /*J*/
+		MCU_READ("KEY1", 0x0200, 0x300/2, 0x0b);        /*K*/
+		MCU_READ("KEY1", 0x0800, 0x300/2, 0x0c);        /*L*/
+		MCU_READ("KEY1", 0x0004, 0x300/2, 0x0d);        /*M*/
+		MCU_READ("KEY1", 0x0010, 0x300/2, 0x0e);        /*N*/
+		MCU_READ("KEY0", 0x0200, 0x300/2, 0x0f);        /*RON   (trusted)*/
+		MCU_READ("KEY0", 0x1000, 0x300/2, 0x10);        /*REACH (trusted)*/
+		MCU_READ("KEY0", 0x0400, 0x300/2, 0x11);        /*KAN            */
+		MCU_READ("KEY1", 0x0008, 0x300/2, 0x12);        /*PON            */
+		MCU_READ("KEY1", 0x0002, 0x300/2, 0x13);        /*CHI   (trusted)*/
+		MCU_READ("KEY0", 0x0004, 0x300/2, 0x14);        /*START1*/
 	}
 	jm_shared_ram[0x30c/2] = machine.rand() & 0xffff;
 	state->m_prg_prot++;
@@ -894,7 +894,7 @@ static void second_mcu_run(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
-	if(state->m_test_mode)	//service_mode
+	if(state->m_test_mode)  //service_mode
 	{
 		jm_shared_ram[0x200/2] = state->ioport("KEY0")->read();
 		jm_shared_ram[0x202/2] = state->ioport("KEY1")->read();
@@ -903,27 +903,27 @@ static void second_mcu_run(running_machine &machine)
 	else
 	{
 		jm_shared_ram[0x200/2] = 0x0000;
-		MCU_READ("KEY1", 0x0001, 0x200/2, 0x00);		/*FF*/
-		MCU_READ("KEY2", 0x0400, 0x200/2, 0x01);		/*A*/
-		MCU_READ("KEY2", 0x1000, 0x200/2, 0x02);		/*B*/
-		MCU_READ("KEY2", 0x0200, 0x200/2, 0x03);		/*C*/
-		MCU_READ("KEY2", 0x0800, 0x200/2, 0x04);		/*D*/
-		MCU_READ("KEY2", 0x0004, 0x200/2, 0x05);		/*E*/
-		MCU_READ("KEY2", 0x0010, 0x200/2, 0x06);		/*F*/
-		MCU_READ("KEY2", 0x0002, 0x200/2, 0x07);		/*G*/
-		MCU_READ("KEY2", 0x0008, 0x200/2, 0x08);		/*H*/
-		MCU_READ("KEY1", 0x0400, 0x200/2, 0x09);		/*I*/
-		MCU_READ("KEY1", 0x1000, 0x200/2, 0x0a);		/*J*/
-		MCU_READ("KEY1", 0x0200, 0x200/2, 0x0b);		/*K*/
-		MCU_READ("KEY1", 0x0800, 0x200/2, 0x0c);		/*L*/
-		MCU_READ("KEY1", 0x0004, 0x200/2, 0x0d);		/*M*/
-		MCU_READ("KEY1", 0x0010, 0x200/2, 0x0e);		/*N*/
-		MCU_READ("KEY0", 0x0200, 0x200/2, 0x0f);		/*RON*/
-		MCU_READ("KEY0", 0x1000, 0x200/2, 0x10);		/*REACH*/
-		MCU_READ("KEY0", 0x0400, 0x200/2, 0x11);		/*KAN*/
-		MCU_READ("KEY1", 0x0008, 0x200/2, 0x12);		/*PON*/
-		MCU_READ("KEY1", 0x0002, 0x200/2, 0x13);		/*CHI*/
-		MCU_READ("KEY0", 0x0004, 0x200/2, 0x14);		/*START1*/
+		MCU_READ("KEY1", 0x0001, 0x200/2, 0x00);        /*FF*/
+		MCU_READ("KEY2", 0x0400, 0x200/2, 0x01);        /*A*/
+		MCU_READ("KEY2", 0x1000, 0x200/2, 0x02);        /*B*/
+		MCU_READ("KEY2", 0x0200, 0x200/2, 0x03);        /*C*/
+		MCU_READ("KEY2", 0x0800, 0x200/2, 0x04);        /*D*/
+		MCU_READ("KEY2", 0x0004, 0x200/2, 0x05);        /*E*/
+		MCU_READ("KEY2", 0x0010, 0x200/2, 0x06);        /*F*/
+		MCU_READ("KEY2", 0x0002, 0x200/2, 0x07);        /*G*/
+		MCU_READ("KEY2", 0x0008, 0x200/2, 0x08);        /*H*/
+		MCU_READ("KEY1", 0x0400, 0x200/2, 0x09);        /*I*/
+		MCU_READ("KEY1", 0x1000, 0x200/2, 0x0a);        /*J*/
+		MCU_READ("KEY1", 0x0200, 0x200/2, 0x0b);        /*K*/
+		MCU_READ("KEY1", 0x0800, 0x200/2, 0x0c);        /*L*/
+		MCU_READ("KEY1", 0x0004, 0x200/2, 0x0d);        /*M*/
+		MCU_READ("KEY1", 0x0010, 0x200/2, 0x0e);        /*N*/
+		MCU_READ("KEY0", 0x0200, 0x200/2, 0x0f);        /*RON*/
+		MCU_READ("KEY0", 0x1000, 0x200/2, 0x10);        /*REACH*/
+		MCU_READ("KEY0", 0x0400, 0x200/2, 0x11);        /*KAN*/
+		MCU_READ("KEY1", 0x0008, 0x200/2, 0x12);        /*PON*/
+		MCU_READ("KEY1", 0x0002, 0x200/2, 0x13);        /*CHI*/
+		MCU_READ("KEY0", 0x0004, 0x200/2, 0x14);        /*START1*/
 
 //      MCU_READ("KEY0", 0x0004, 0x7b8/2, 0x03);        /*START1(correct?)  */
 	}
@@ -936,13 +936,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::jalmah_mcu_sim)
 	switch(m_mcu_prg)
 	{
 		/*
-            #define DAIREIKA_MCU (0x11)
-            #define URASHIMA_MCU (0x12)
-            #define MJZOOMIN_MCU (0x13)
-            #define KAKUMEI_MCU  (0x21)
-            #define KAKUMEI2_MCU (0x22)
-            #define SUCHIPI_MCU  (0x23)
-        */
+		    #define DAIREIKA_MCU (0x11)
+		    #define URASHIMA_MCU (0x12)
+		    #define MJZOOMIN_MCU (0x13)
+		    #define KAKUMEI_MCU  (0x21)
+		    #define KAKUMEI2_MCU (0x22)
+		    #define SUCHIPI_MCU  (0x23)
+		*/
 			case MJZOOMIN_MCU: mjzoomin_mcu_run(machine()); break;
 			case DAIREIKA_MCU: daireika_mcu_run(machine()); break;
 			case URASHIMA_MCU: urashima_mcu_run(machine()); break;
@@ -1169,8 +1169,8 @@ static INPUT_PORTS_START( urashima )
 	PORT_DIPNAME( 0x1000, 0x1000, "Chip Added After Win" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x1000, "Less" )
 	PORT_DIPSETTING(      0x0000, "More" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:3" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:2" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:3" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:2" )   // Unused according to the manual
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1199,21 +1199,21 @@ static INPUT_PORTS_START( daireika )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Harder ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )   // Unused according to the manual
 	PORT_DIPNAME( 0x0040, 0x0040, "Pinfu with Tsumo" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Yes ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )   // Unused according to the manual
 	PORT_DIPNAME( 0x0300, 0x0300, "Number of Chips (Start - Continue)" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0300, "1 - 1" )
 	PORT_DIPSETTING(      0x0200, "1 - 2" )
 	PORT_DIPSETTING(      0x0100, "2 - 1" )
 	PORT_DIPSETTING(      0x0000, "2 - 2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )   // Unused according to the manual
 	/* SW1:8 should be "Switch Control Panel" off: no - on : yes -> likely to be controlled by the MCU. */
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
@@ -1241,14 +1241,14 @@ static INPUT_PORTS_START( mjzoomin )
 	PORT_DIPSETTING(      0x0200, "2" )
 	PORT_DIPSETTING(      0x0100, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )   // Unused according to the manual
 	PORT_DIPNAME( 0x2000, 0x2000, "Item Availability" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )   // Unused according to the manual
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kakumei )
@@ -1256,19 +1256,19 @@ static INPUT_PORTS_START( kakumei )
 	PORT_INCLUDE( ctrl_mj1 )
 
 	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop")	PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop")  PORT_CODE(KEYCODE_2)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )   // Unused according to the manual
 	PORT_SERVICE_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )   // Unused according to the manual
 	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
@@ -1277,15 +1277,15 @@ static INPUT_PORTS_START( kakumei )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )	// Free Play according to the manual
+	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )   // Free Play according to the manual
 	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x1800, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )   // Unused according to the manual
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kakumei2 )
@@ -1293,19 +1293,19 @@ static INPUT_PORTS_START( kakumei2 )
 	PORT_INCLUDE( ctrl_mj1 )
 
 	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop")	PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop")  PORT_CODE(KEYCODE_2)
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )   // Unused according to the manual
 	PORT_SERVICE_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )	// Unused according to the manual
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")	// Should default to OFF according to manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )   // Unused according to the manual
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")    // Should default to OFF according to manual
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )	// Unused according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )   // Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )   // Unused according to the manual
 	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
@@ -1314,13 +1314,13 @@ static INPUT_PORTS_START( kakumei2 )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )	// Free Play according to the manual
+	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )   // Free Play according to the manual
 	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )   // Unused according to the manual
 	PORT_DIPNAME( 0x4000, 0x4000, "Pinfu with Tsumo" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Yes ) )
@@ -1449,7 +1449,7 @@ Urashima Mahjong
 */
 
 ROM_START ( urashima )
-	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "um-2.15d",  0x00000, 0x20000, CRC(a90a47e3) SHA1(2f912001e9177cce8c3795f3d299115b80fdca4e) )
 	ROM_RELOAD(                   0x40000, 0x20000 )
 	ROM_LOAD16_BYTE( "um-1.15c",  0x00001, 0x20000, CRC(5f5c8f39) SHA1(cef663965c3112f87788d6a871e609c0b10ef9a2) )
@@ -1459,14 +1459,14 @@ ROM_START ( urashima )
 	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
-	ROM_LOAD( "um-3.22c",	   0x40000, 0x80000, CRC(9fd8c8fa) SHA1(0346f74c03a4daa7a84b64c9edf0e54297c82fd9) )
-	ROM_COPY( "oki" ,		   0x40000, 0x00000, 0x40000 )
+	ROM_LOAD( "um-3.22c",      0x40000, 0x80000, CRC(9fd8c8fa) SHA1(0346f74c03a4daa7a84b64c9edf0e54297c82fd9) )
+	ROM_COPY( "oki" ,          0x40000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "um-5.22j",		0x000000, 0x020000, CRC(991776a2) SHA1(56740553d7d26aaeb9bec8557727030950bb01f7) )	/* 8x8 tiles */
+	ROM_LOAD( "um-5.22j",       0x000000, 0x020000, CRC(991776a2) SHA1(56740553d7d26aaeb9bec8557727030950bb01f7) )  /* 8x8 tiles */
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) /* 16x16 Tiles */
-	ROM_LOAD( "um-6.2l",	0x000000, 0x080000, CRC(076be5b5) SHA1(77444025f149a960137d3c79abecf9b30defa341) )
+	ROM_LOAD( "um-6.2l",    0x000000, 0x080000, CRC(076be5b5) SHA1(77444025f149a960137d3c79abecf9b30defa341) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
 	ROM_LOAD( "um-7.4l",    0x000000, 0x080000, CRC(d2a68cfb) SHA1(eb6cb1fad306b697b2035a31ad48e8996722a032) )
@@ -1483,10 +1483,10 @@ ROM_START ( urashima )
 	ROM_COPY( "gfx3",  0x040000, 0x140000, 0x40000 )
 
 	ROM_REGION( 0x0240, "user1", 0 )
-	ROM_LOAD( "um-10.2b",      0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )	/* unknown */
-	ROM_LOAD( "um-11.2c",      0x0100, 0x0100, CRC(ff5660cf) SHA1(a4635dcf9d6dd637ea4f36f1ad233db0bd039731) )	/* unknown */
-	ROM_LOAD( "um-12.20c",     0x0200, 0x0020, CRC(bdb66b02) SHA1(8755244de638d7e835e35e08c62b0612958e6ca5) )	/* unknown */
-	ROM_LOAD( "um-13.10l",     0x0220, 0x0020, CRC(4ce07ec0) SHA1(5f5744ddc7f258307f036fde4c0a8e6271b2d1f9) )	/* unknown */
+	ROM_LOAD( "um-10.2b",      0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )   /* unknown */
+	ROM_LOAD( "um-11.2c",      0x0100, 0x0100, CRC(ff5660cf) SHA1(a4635dcf9d6dd637ea4f36f1ad233db0bd039731) )   /* unknown */
+	ROM_LOAD( "um-12.20c",     0x0200, 0x0020, CRC(bdb66b02) SHA1(8755244de638d7e835e35e08c62b0612958e6ca5) )   /* unknown */
+	ROM_LOAD( "um-13.10l",     0x0220, 0x0020, CRC(4ce07ec0) SHA1(5f5744ddc7f258307f036fde4c0a8e6271b2d1f9) )   /* unknown */
 ROM_END
 
 /*
@@ -1523,7 +1523,7 @@ ROM_START( daireika )
 	ROM_LOAD( "mj12.bin", 0x20000, 0x20000, CRC(236f809f) SHA1(9e15dd8a810a9d4f7f75f084d6bd277ea7d0e40a) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 ) /* BG1 */
-	ROM_COPY( "gfx1",	  0x10000, 0x00000, 0x10000 )/*mj12.bin*/
+	ROM_COPY( "gfx1",     0x10000, 0x00000, 0x10000 )/*mj12.bin*/
 
 	ROM_REGION( 0x220, "user1", 0 ) /* Proms */
 	ROM_LOAD( "mj15.bpr", 0x000, 0x100, CRC(ebac41f9) SHA1(9d1629d977849663392cbf03a3ddf76665f88608) )
@@ -1550,7 +1550,7 @@ ROM_START( mjzoomin )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "zoomin-3.bin", 0x40000, 0x80000, CRC(07d7b8cd) SHA1(e05ce80ffb945b04f93f8c49d0c840b0bff6310b) )
-	ROM_COPY( "oki" ,		  0x40000, 0x00000, 0x40000 )
+	ROM_COPY( "oki" ,         0x40000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
 	ROM_LOAD( "zoomin14.bin", 0x00000, 0x20000, CRC(4e32aa45) SHA1(450a3449ca8b4f0dfe8b62cceaee9366eaf3dc3d) )
@@ -1627,7 +1627,7 @@ ROM_START( kakumei2 )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
 	ROM_LOAD( "92000-01.3", 0x040000, 0x80000, CRC(4b0ed440) SHA1(11961d217a41f92b60d5083a5e346c245f7db620) )
-	ROM_COPY( "oki" ,		0x040000, 0x00000, 0x40000 )
+	ROM_COPY( "oki" ,       0x040000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
 	ROM_LOAD( "mj-8956.14", 0x00000, 0x20000, CRC(2b2fe999) SHA1(d9d601e2c008791f5bff6e7b1340f754dd094201) )
@@ -1744,7 +1744,7 @@ MCU code snippets
 
 READ16_MEMBER(jalmah_state::urashima_mcu_r)
 {
-	static const int resp[] = {	0x99, 0xd8, 0x00,
+	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
 							0x9c, 0xd8, 0x00,
 							0x2f, 0x6f, 0x00,
@@ -1774,8 +1774,8 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
-        1st M68k code uploaded by the MCU (sound prg)
-        *******************************************************/
+		1st M68k code uploaded by the MCU (sound prg)
+		*******************************************************/
 		jm_shared_ram[0x0320/2] = 0x4ef9;
 		jm_shared_ram[0x0322/2] = 0x0010;
 		jm_shared_ram[0x0324/2] = 0x2000;//jmp $102000
@@ -1800,8 +1800,8 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 		jm_mcu_code[0x2022/2] = 0x66f4;
 		jm_mcu_code[0x2024/2] = 0x4e75;
 		/*******************************************************
-        1st alt M68k code uploaded by the MCU (Input test mode)
-        *******************************************************/
+		1st alt M68k code uploaded by the MCU (Input test mode)
+		*******************************************************/
 		/*similar to mjzoomin but with offset summed with 0x300?*/
 		/*tx scrollx = $200*/
 		jm_shared_ram[0x03c6/2] = 0x6008;//bra $+10
@@ -1827,8 +1827,8 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 		jm_mcu_code[0x001e/2] = 0x4e75;//rts
 
 		/*******************************************************
-        2nd M68k code uploaded by the MCU (tile upload)
-        *******************************************************/
+		2nd M68k code uploaded by the MCU (tile upload)
+		*******************************************************/
 		jm_shared_ram[0x03ca/2] = 0x4ef9;
 		jm_shared_ram[0x03cc/2] = 0x0010;
 		jm_shared_ram[0x03ce/2] = 0x0800;//jmp $100800
@@ -1837,8 +1837,8 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 		jm_mcu_code[0x0804/2] = 0xfffc;
 		jm_mcu_code[0x0806/2] = 0x4e75;
 		/*******************************************************
-        3rd M68k code uploaded by the MCU (palette upload)
-        *******************************************************/
+		3rd M68k code uploaded by the MCU (palette upload)
+		*******************************************************/
 		jm_shared_ram[0x03c0/2] = 0x4ef9;
 		jm_shared_ram[0x03c2/2] = 0x0010;
 		jm_shared_ram[0x03c4/2] = 0x1000;//jmp $101000
@@ -1851,8 +1851,8 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 		jm_mcu_code[0x1008/2] = 0x8200;
 		jm_mcu_code[0x100a/2] = 0x673c;//beq :x//0x6d00;
 		jm_mcu_code[0x100c/2] = 0x4e71;//nop//0x003c;
-		jm_mcu_code[0x100e/2] = 0x33c2;		jm_mcu_code[0x1010/2] = 0x0010;		jm_mcu_code[0x1012/2] = 0x17fe; //move.w D2,$1017fe
-		jm_mcu_code[0x1014/2] = 0x33c1;		jm_mcu_code[0x1016/2] = 0x0010;		jm_mcu_code[0x1018/2] = 0x17fc; //move.w D1,$1017fc
+		jm_mcu_code[0x100e/2] = 0x33c2;     jm_mcu_code[0x1010/2] = 0x0010;     jm_mcu_code[0x1012/2] = 0x17fe; //move.w D2,$1017fe
+		jm_mcu_code[0x1014/2] = 0x33c1;     jm_mcu_code[0x1016/2] = 0x0010;     jm_mcu_code[0x1018/2] = 0x17fc; //move.w D1,$1017fc
 		jm_mcu_code[0x101a/2] = 0x720f;
 		jm_mcu_code[0x101c/2] = 0x740f; //moveq $07,D2
 		jm_mcu_code[0x101e/2] = 0x23c8;
@@ -1962,7 +1962,7 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 
 READ16_MEMBER(jalmah_state::daireika_mcu_r)
 {
-	static const int resp[] = {	0x99, 0xd8, 0x00,
+	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
 							0x9c, 0xd8, 0x00,
 							0x2f, 0x6f, 0x00,
@@ -1986,7 +1986,7 @@ READ16_MEMBER(jalmah_state::daireika_mcu_r)
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 static const UINT16 dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f,0x000c,0xda86,0x0245,
-									       0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
+											0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
 
 WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 {
@@ -1997,28 +1997,28 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
-        1st M68k code uploaded by the MCU.
-        random number generator (guess)
-        *******************************************************/
+		1st M68k code uploaded by the MCU.
+		random number generator (guess)
+		*******************************************************/
 		jm_shared_ram[0x0140/2] = 0x4ef9;
 		jm_shared_ram[0x0142/2] = 0x0010;
 		jm_shared_ram[0x0144/2] = 0x0800;
 
 		/*
-        33c5 0010 07fe move.w  D5, $1007fe.l
-        3A39 000F 000C move.w  $f000c, D5
-        da86           add.w   D6,D5
-        0245 003f      and.w   $3f,D5
-        33C5 000F 000C move.w  D5, $f000c.l
-        3a39 0010 07fe move.w  $1007fe, D5
-        4e75           rts
-        */
+		33c5 0010 07fe move.w  D5, $1007fe.l
+		3A39 000F 000C move.w  $f000c, D5
+		da86           add.w   D6,D5
+		0245 003f      and.w   $3f,D5
+		33C5 000F 000C move.w  D5, $f000c.l
+		3a39 0010 07fe move.w  $1007fe, D5
+		4e75           rts
+		*/
 		for(i=0;i<0x11;i++)
 			jm_mcu_code[(0x0800/2)+i] = dai_mcu_code[i];
 
 		/*******************************************************
-        2nd M68k code uploaded by the MCU.
-        *******************************************************/
+		2nd M68k code uploaded by the MCU.
+		*******************************************************/
 		jm_shared_ram[0x0020/2] = 0x4ef9;
 		jm_shared_ram[0x0022/2] = 0x0010;
 		jm_shared_ram[0x0024/2] = 0x2000;//jmp $102000
@@ -2042,12 +2042,12 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 		jm_mcu_code[0x2022/2] = 0x66f4;
 		jm_mcu_code[0x2024/2] = 0x4e75;
 		/*******************************************************
-        3rd M68k code uploaded by the MCU.
-        see mjzoomin_mcu_w
-        *******************************************************/
+		3rd M68k code uploaded by the MCU.
+		see mjzoomin_mcu_w
+		*******************************************************/
 		jm_shared_ram[0x00c6/2] = 0x6000;
 		jm_shared_ram[0x00c8/2] = 0x0008;//bra +$8,needed because we have only two bytes here
-		            			   //and we need three...
+									//and we need three...
 		jm_shared_ram[0x00d0/2] = 0x4ef9;
 		jm_shared_ram[0x00d2/2] = 0x0010;
 		jm_shared_ram[0x00d4/2] = 0x0000;//jmp $100000
@@ -2058,9 +2058,9 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 		jm_mcu_code[0x0006/2] = 0xfffc;//dbra D1,f00ca
 		jm_mcu_code[0x0008/2] = 0x4e75;//rts
 		/*******************************************************
-        4th M68k code uploaded by the MCU
-        They seem video code cleaning functions
-        *******************************************************/
+		4th M68k code uploaded by the MCU
+		They seem video code cleaning functions
+		*******************************************************/
 		//108800
 		jm_shared_ram[0x0100/2] = 0x4ef9;
 		jm_shared_ram[0x0102/2] = 0x0010;
@@ -2183,8 +2183,8 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
         jm_mcu_code[0x1022/2] = 0x0004;//adda.w $4,A0
         jm_mcu_code[0x1024/2] = 0x4e75;*/
 		/*******************************************************
-        5th M68k code uploaded by the MCU (palette upload)
-        *******************************************************/
+		5th M68k code uploaded by the MCU (palette upload)
+		*******************************************************/
 		jm_shared_ram[0x00c0/2] = 0x4ef9;
 		jm_shared_ram[0x00c2/2] = 0x0010;
 		jm_shared_ram[0x00c4/2] = 0x1000;//jmp $101000
@@ -2219,8 +2219,8 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 		jm_mcu_code[0x1036/2] = 0x17fc;
 		jm_mcu_code[0x1038/2] = 0x4e75;
 		/*******************************************************
-        6th M68k code uploaded by the MCU (tile upload)
-        *******************************************************/
+		6th M68k code uploaded by the MCU (tile upload)
+		*******************************************************/
 		jm_shared_ram[0x00ca/2] = 0x4ef9;
 		jm_shared_ram[0x00cc/2] = 0x0010;
 		jm_shared_ram[0x00ce/2] = 0x1800;//jmp $101800
@@ -2242,7 +2242,7 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 
 READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 {
-	static const int resp[] = {	0x9c, 0xd8, 0x00,
+	static const int resp[] = { 0x9c, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
 							0x99, 0xd8, 0x00,
 							0x2f, 0x6f, 0x00,
@@ -2271,15 +2271,15 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/******************************************************
-        1st M68k code uploaded by the MCU(Service Mode PC=2a56).
-        Program passes some parameters before entering into
-        the sub-routine (jsr)
-        D1 = 0xf
-        A0 = 1026e
-        A1 = 88600
-        (A0) is the vector number for take the real palette
-        address.
-        ******************************************************/
+		1st M68k code uploaded by the MCU(Service Mode PC=2a56).
+		Program passes some parameters before entering into
+		the sub-routine (jsr)
+		D1 = 0xf
+		A0 = 1026e
+		A1 = 88600
+		(A0) is the vector number for take the real palette
+		address.
+		******************************************************/
 		jm_shared_ram[0x00c6/2] = 0x4ef9;
 		jm_shared_ram[0x00c8/2] = 0x0010;
 		jm_shared_ram[0x00ca/2] = 0x0000;//jsr $100000
@@ -2290,9 +2290,9 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 		jm_mcu_code[0x0006/2] = 0xfffc;//dbra D1,f00ca
 		jm_mcu_code[0x0008/2] = 0x4e75;//rts
 		/*******************************************************
-        2nd M68k code uploaded by the MCU (Sound read/write)
-        (Note:copied from suchipi,check here the sound banking)
-        *******************************************************/
+		2nd M68k code uploaded by the MCU (Sound read/write)
+		(Note:copied from suchipi,check here the sound banking)
+		*******************************************************/
 		jm_shared_ram[0x0020/2] = 0x4ef9;
 		jm_shared_ram[0x0022/2] = 0x0010;
 		jm_shared_ram[0x0024/2] = 0x1800;//jmp $101800
@@ -2339,8 +2339,8 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 		//jm_mcu_code[0x1822/2] = 0x66f4;
 		//jm_mcu_code[0x1824/2] = 0x4e75;
 		/*******************************************************
-        3rd M68k code uploaded by the MCU(palette upload)
-        *******************************************************/
+		3rd M68k code uploaded by the MCU(palette upload)
+		*******************************************************/
 		jm_shared_ram[0x00c0/2] = 0x4ef9;
 		jm_shared_ram[0x00c2/2] = 0x0010;
 		jm_shared_ram[0x00c4/2] = 0x1000;//jmp $101000
@@ -2379,7 +2379,7 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 
 READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 {
-	static const int resp[] = {	0x8a, 0xd8, 0x00,
+	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
 							0x99, 0xd8, 0x00,
 							0x25, 0x65, 0x00,
@@ -2400,7 +2400,7 @@ READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 
 READ16_MEMBER(jalmah_state::suchipi_mcu_r)
 {
-	static const int resp[] = {	0x8a, 0xd8, 0x00,
+	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
 							0x99, 0xd8, 0x00,
 							0x25, 0x65, 0x00,

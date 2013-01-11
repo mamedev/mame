@@ -71,29 +71,29 @@ INLINE void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
 
 struct concept_vol_hdr_entry
 {
-	UINT16xE	first_block;
-	UINT16xE	next_block;
-	UINT16xE	ftype;
+	UINT16xE    first_block;
+	UINT16xE    next_block;
+	UINT16xE    ftype;
 
-	unsigned char	volname[8];
-	UINT16xE	last_block;
-	UINT16xE	num_files;
-	UINT16xE	last_boot;
-	UINT16xE	last_access;
-	char		mem_flipped;
-	char		disk_flipped;
-	UINT16xE	unused;
+	unsigned char   volname[8];
+	UINT16xE    last_block;
+	UINT16xE    num_files;
+	UINT16xE    last_boot;
+	UINT16xE    last_access;
+	char        mem_flipped;
+	char        disk_flipped;
+	UINT16xE    unused;
 };
 
 struct concept_file_dir_entry
 {
-	UINT16xE	first_block;
-	UINT16xE	next_block;
-	UINT16xE	ftype;
+	UINT16xE    first_block;
+	UINT16xE    next_block;
+	UINT16xE    ftype;
 
-	unsigned char	filename[16];
-	UINT16xE	last_byte;
-	UINT16xE	last_access;
+	unsigned char   filename[16];
+	UINT16xE    last_byte;
+	UINT16xE    last_access;
 };
 
 struct concept_dev_dir
@@ -108,8 +108,8 @@ struct concept_dev_dir
 */
 struct concept_image
 {
-	imgtool_stream *file_handle;		/* imgtool file handle */
-	concept_dev_dir dev_dir;	/* cached copy of device directory */
+	imgtool_stream *file_handle;        /* imgtool file handle */
+	concept_dev_dir dev_dir;    /* cached copy of device directory */
 };
 
 /*
@@ -118,7 +118,7 @@ struct concept_image
 struct concept_iterator
 {
 	concept_image *image;
-	int index;							/* current index */
+	int index;                          /* current index */
 };
 
 
@@ -141,27 +141,27 @@ void concept_get_info(const imgtool_class *imgclass, UINT32 state, union imgtool
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:				info->i = sizeof(concept_image); break;
-		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:				info->i = sizeof(concept_iterator); break;
+		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:             info->i = sizeof(concept_image); break;
+		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(concept_iterator); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "concept"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "Concept floppy disk image"); break;
-		case IMGTOOLINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = imgtool_temp_str(), "img"); break;
-		case IMGTOOLINFO_STR_EOLN:							strcpy(info->s = imgtool_temp_str(), "\r"); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "concept"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "Concept floppy disk image"); break;
+		case IMGTOOLINFO_STR_FILE_EXTENSIONS:               strcpy(info->s = imgtool_temp_str(), "img"); break;
+		case IMGTOOLINFO_STR_EOLN:                          strcpy(info->s = imgtool_temp_str(), "\r"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_OPEN:							info->open = concept_image_init; break;
-		case IMGTOOLINFO_PTR_CLOSE:							info->close = concept_image_exit; break;
-		case IMGTOOLINFO_PTR_INFO:							info->info = concept_image_info; break;
-		case IMGTOOLINFO_PTR_BEGIN_ENUM:					info->begin_enum = concept_image_beginenum; break;
-		case IMGTOOLINFO_PTR_NEXT_ENUM:						info->next_enum = concept_image_nextenum; break;
-		case IMGTOOLINFO_PTR_CLOSE_ENUM:					info->close_enum = concept_image_closeenum; break;
-		case IMGTOOLINFO_PTR_FREE_SPACE:					info->free_space = concept_image_freespace; break;
-		case IMGTOOLINFO_PTR_READ_FILE:						info->read_file = concept_image_readfile; break;
-		case IMGTOOLINFO_PTR_WRITE_FILE:					/* info->write_file = concept_image_writefile */; break;
-		case IMGTOOLINFO_PTR_DELETE_FILE:					/* info->delete_file = concept_image_deletefile */; break;
-		case IMGTOOLINFO_PTR_CREATE:						/* info->create = concept_image_create */; break;
+		case IMGTOOLINFO_PTR_OPEN:                          info->open = concept_image_init; break;
+		case IMGTOOLINFO_PTR_CLOSE:                         info->close = concept_image_exit; break;
+		case IMGTOOLINFO_PTR_INFO:                          info->info = concept_image_info; break;
+		case IMGTOOLINFO_PTR_BEGIN_ENUM:                    info->begin_enum = concept_image_beginenum; break;
+		case IMGTOOLINFO_PTR_NEXT_ENUM:                     info->next_enum = concept_image_nextenum; break;
+		case IMGTOOLINFO_PTR_CLOSE_ENUM:                    info->close_enum = concept_image_closeenum; break;
+		case IMGTOOLINFO_PTR_FREE_SPACE:                    info->free_space = concept_image_freespace; break;
+		case IMGTOOLINFO_PTR_READ_FILE:                     info->read_file = concept_image_readfile; break;
+		case IMGTOOLINFO_PTR_WRITE_FILE:                    /* info->write_file = concept_image_writefile */; break;
+		case IMGTOOLINFO_PTR_DELETE_FILE:                   /* info->delete_file = concept_image_deletefile */; break;
+		case IMGTOOLINFO_PTR_CREATE:                        /* info->create = concept_image_create */; break;
 	}
 }
 

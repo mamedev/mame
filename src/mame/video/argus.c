@@ -355,8 +355,8 @@ static void argus_write_dummy_rams(running_machine &machine, int dramoffs, int v
 	int voffs;
 	int offs;
 
-	UINT8 *VROM1 = state->memregion("user1")->base();		/* "ag_15.bin" */
-	UINT8 *VROM2 = state->memregion("user2")->base();		/* "ag_16.bin" */
+	UINT8 *VROM1 = state->memregion("user1")->base();       /* "ag_15.bin" */
+	UINT8 *VROM2 = state->memregion("user2")->base();       /* "ag_16.bin" */
 
 	/* offset in pattern data */
 	offs = VROM1[vromoffs] | (VROM1[vromoffs + 1] << 8);
@@ -522,7 +522,7 @@ WRITE8_MEMBER(argus_state::argus_paletteram_w)
 
 	m_paletteram[offset] = data;
 
-	if (offset <= 0x0ff)								/* sprite color */
+	if (offset <= 0x0ff)                                /* sprite color */
 	{
 		offset &= 0x07f;
 
@@ -537,7 +537,7 @@ WRITE8_MEMBER(argus_state::argus_paletteram_w)
 		}
 	}
 	else if ((offset >= 0x400 && offset <= 0x4ff) ||
-			 (offset >= 0x800 && offset <= 0x8ff))		/* BG0 color */
+				(offset >= 0x800 && offset <= 0x8ff))       /* BG0 color */
 	{
 		offs = offset & 0xff;
 		offset = offs | 0x400;
@@ -545,7 +545,7 @@ WRITE8_MEMBER(argus_state::argus_paletteram_w)
 		argus_change_bg_palette(machine(), offs + 0x080, offset, offset + 0x400);
 	}
 	else if ((offset >= 0x500 && offset <= 0x5ff) ||
-			 (offset >= 0x900 && offset <= 0x9ff))		/* BG1 color */
+				(offset >= 0x900 && offset <= 0x9ff))       /* BG1 color */
 	{
 		offs = offset & 0xff;
 		offset = offs | 0x500;
@@ -553,7 +553,7 @@ WRITE8_MEMBER(argus_state::argus_paletteram_w)
 		argus_change_palette(machine(), offs + 0x180, offset, offset + 0x400);
 	}
 	else if ((offset >= 0x700 && offset <= 0x7ff) ||
-			 (offset >= 0xb00 && offset <= 0xbff))		/* text color */
+				(offset >= 0xb00 && offset <= 0xbff))       /* text color */
 	{
 		offs = offset & 0xff;
 		offset = offs | 0x700;
@@ -566,7 +566,7 @@ WRITE8_MEMBER(argus_state::valtric_paletteram_w)
 {
 	m_paletteram[offset] = data;
 
-	if (offset <= 0x1ff)							/* Sprite color */
+	if (offset <= 0x1ff)                            /* Sprite color */
 	{
 		argus_change_palette(machine(), offset >> 1, offset & ~1, offset | 1);
 
@@ -580,11 +580,11 @@ WRITE8_MEMBER(argus_state::valtric_paletteram_w)
 				argus_change_bg_palette(machine(), ((offs & 0x1ff) >> 1) + 0x100, offs & ~1, offs | 1);
 		}
 	}
-	else if (offset >= 0x400 && offset <= 0x5ff)		/* BG color */
+	else if (offset >= 0x400 && offset <= 0x5ff)        /* BG color */
 	{
 		argus_change_bg_palette(machine(), ((offset & 0x1ff) >> 1) + 0x100, offset & ~1, offset | 1);
 	}
-	else if (offset >= 0x600 && offset <= 0x7ff)		/* Text color */
+	else if (offset >= 0x600 && offset <= 0x7ff)        /* Text color */
 	{
 		argus_change_palette(machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
 	}
@@ -594,32 +594,32 @@ WRITE8_MEMBER(argus_state::butasan_paletteram_w)
 {
 	m_paletteram[offset] = data;
 
-	if (offset <= 0x1ff)							/* BG0 color */
+	if (offset <= 0x1ff)                            /* BG0 color */
 	{
 		argus_change_palette(machine(), (offset >> 1) + 0x100, offset & ~1, offset | 1);
 	}
-	else if (offset <= 0x23f)						/* BG1 color */
+	else if (offset <= 0x23f)                       /* BG1 color */
 	{
 		argus_change_palette(machine(), ((offset & 0x3f) >> 1) + 0x0c0, offset & ~1, offset | 1);
 	}
-	else if (offset >= 0x400 && offset <= 0x47f)	/* Sprite color */
-	{												/* 16 colors */
+	else if (offset >= 0x400 && offset <= 0x47f)    /* Sprite color */
+	{                                               /* 16 colors */
 		argus_change_palette(machine(), (offset & 0x7f) >> 1, offset & ~1, offset | 1);
 	}
-	else if (offset >= 0x480 && offset <= 0x4ff)	/* Sprite color */
-	{												/* 8  colors */
+	else if (offset >= 0x480 && offset <= 0x4ff)    /* Sprite color */
+	{                                               /* 8  colors */
 		int offs = (offset & 0x070) | ((offset & 0x00f) >> 1);
 
 		argus_change_palette(machine(), offs + 0x040, offset & ~1, offset | 1);
 		argus_change_palette(machine(), offs + 0x048, offset & ~1, offset | 1);
 	}
-	else if (offset >= 0x600 && offset <= 0x7ff)	/* Text color */
+	else if (offset >= 0x600 && offset <= 0x7ff)    /* Text color */
 	{
 		argus_change_palette(machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
 	}
-	else if (offset >= 0x240 && offset <= 0x25f)	// dummy
+	else if (offset >= 0x240 && offset <= 0x25f)    // dummy
 		argus_change_palette(machine(), ((offset & 0x1f) >> 1) + 0xe0, offset & ~1, offset | 1);
-	else if (offset >= 0x500 && offset <= 0x51f)	// dummy
+	else if (offset >= 0x500 && offset <= 0x51f)    // dummy
 		argus_change_palette(machine(), ((offset & 0x1f) >> 1) + 0xf0, offset & ~1, offset | 1);
 }
 
@@ -1163,7 +1163,7 @@ UINT32 argus_state::screen_update_argus(screen_device &screen, bitmap_rgb32 &bit
 
 	m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 	argus_draw_sprites(machine(), bitmap, cliprect, 0);
-	if (m_bg_status & 1)	/* Backgound enable */
+	if (m_bg_status & 1)    /* Backgound enable */
 		m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	argus_draw_sprites(machine(), bitmap, cliprect, 1);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -1174,7 +1174,7 @@ UINT32 argus_state::screen_update_valtric(screen_device &screen, bitmap_rgb32 &b
 {
 	bg_setting(machine());
 
-	if (m_bg_status & 1)	/* Backgound enable */
+	if (m_bg_status & 1)    /* Backgound enable */
 		valtric_draw_mosaic(screen, bitmap, cliprect);
 	else
 		bitmap.fill(get_black_pen(machine()), cliprect);
@@ -1187,7 +1187,7 @@ UINT32 argus_state::screen_update_butasan(screen_device &screen, bitmap_rgb32 &b
 {
 	bg_setting(machine());
 
-	if (m_bg_status & 1)	/* Backgound enable */
+	if (m_bg_status & 1)    /* Backgound enable */
 		m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(machine()), cliprect);

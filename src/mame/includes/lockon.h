@@ -34,14 +34,14 @@ public:
 	required_shared_ptr<UINT16> m_object_ram;
 
 	/* video-related */
-	tilemap_t		*m_tilemap;
-	UINT8			m_ground_ctrl;
-	UINT16			m_scroll_h;
-	UINT16			m_scroll_v;
+	tilemap_t       *m_tilemap;
+	UINT8           m_ground_ctrl;
+	UINT16          m_scroll_h;
+	UINT16          m_scroll_v;
 	bitmap_ind16    *m_front_buffer;
 	bitmap_ind16    *m_back_buffer;
-	emu_timer		*m_bufend_timer;
-	emu_timer		*m_cursor_timer;
+	emu_timer       *m_bufend_timer;
+	emu_timer       *m_cursor_timer;
 
 	/* Rotation Control */
 	UINT16      m_xsal;
@@ -55,7 +55,7 @@ public:
 
 	/* Object palette RAM control */
 	UINT32      m_iden;
-	UINT8		*m_obj_pal_ram;
+	UINT8       *m_obj_pal_ram;
 	UINT32      m_obj_pal_latch;
 	UINT32      m_obj_pal_addr;
 

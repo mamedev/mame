@@ -33,9 +33,9 @@ Z80PIO_INTERFACE( senjyo_pio_intf )
 Z80CTC_INTERFACE( senjyo_ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("sub", INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),	/* ZC/TO0 callback */
-	DEVCB_NULL,													/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(senjyo_state, sound_line_clock)	/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),    /* ZC/TO0 callback */
+	DEVCB_NULL,                                                 /* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(senjyo_state, sound_line_clock)    /* ZC/TO2 callback */
 };
 
 WRITE_LINE_MEMBER(senjyo_state::sound_line_clock)

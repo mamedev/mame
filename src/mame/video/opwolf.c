@@ -56,4 +56,3 @@ UINT32 opwolf_state::screen_update_opwolf(screen_device &screen, bitmap_ind16 &b
 
 	return 0;
 }
-

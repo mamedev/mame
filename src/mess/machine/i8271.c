@@ -42,10 +42,10 @@ struct i8271_t
 	unsigned char CommandParameters[8];
 
 	/* current track for each drive */
-	unsigned long	CurrentTrack[2];
+	unsigned long   CurrentTrack[2];
 
 	/* 2 bad tracks for drive 0, followed by 2 bad tracks for drive 1 */
-	unsigned long	BadTracks[4];
+	unsigned long   BadTracks[4];
 
 	/* mode special register */
 	unsigned long Mode;
@@ -66,7 +66,7 @@ struct i8271_t
 	unsigned long HeadLoadTime;
 
 	/* id on disc to find */
-	int	ID_C;
+	int ID_C;
 	int ID_H;
 	int ID_R;
 	int ID_N;
@@ -96,25 +96,25 @@ enum I8271_STATE_t
 };
 
 /* commands accepted */
-#define I8271_COMMAND_SPECIFY										0x035
-#define I8271_COMMAND_SEEK											0x029
-#define I8271_COMMAND_READ_DRIVE_STATUS								0x02c
-#define I8271_COMMAND_READ_SPECIAL_REGISTER							0x03d
-#define	I8271_COMMAND_WRITE_SPECIAL_REGISTER						0x03a
-#define I8271_COMMAND_FORMAT										0x023
-#define I8271_COMMAND_READ_ID										0x01b
-#define I8271_COMMAND_READ_DATA_SINGLE_RECORD						0x012
-#define I8271_COMMAND_READ_DATA_AND_DELETED_DATA_SINGLE_RECORD		0x016
-#define I8271_COMMAND_WRITE_DATA_SINGLE_RECORD						0x00a
-#define I8271_COMMAND_WRITE_DELETED_DATA_SINGLE_RECORD				0x00e
-#define	I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_SINGLE_RECORD	0x01e
-#define I8271_COMMAND_READ_DATA_MULTI_RECORD						0x013
-#define I8271_COMMAND_READ_DATA_AND_DELETED_DATA_MULTI_RECORD		0x017
-#define I8271_COMMAND_WRITE_DATA_MULTI_RECORD						0x00b
-#define I8271_COMMAND_WRITE_DELETED_DATA_MULTI_RECORD				0x00f
-#define	I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_MULTI_RECORD		0x01f
-#define I8271_COMMAND_SCAN_DATA										0x000
-#define I8271_COMMAND_SCAN_DATA_AND_DELETED_DATA					0x004
+#define I8271_COMMAND_SPECIFY                                       0x035
+#define I8271_COMMAND_SEEK                                          0x029
+#define I8271_COMMAND_READ_DRIVE_STATUS                             0x02c
+#define I8271_COMMAND_READ_SPECIAL_REGISTER                         0x03d
+#define I8271_COMMAND_WRITE_SPECIAL_REGISTER                        0x03a
+#define I8271_COMMAND_FORMAT                                        0x023
+#define I8271_COMMAND_READ_ID                                       0x01b
+#define I8271_COMMAND_READ_DATA_SINGLE_RECORD                       0x012
+#define I8271_COMMAND_READ_DATA_AND_DELETED_DATA_SINGLE_RECORD      0x016
+#define I8271_COMMAND_WRITE_DATA_SINGLE_RECORD                      0x00a
+#define I8271_COMMAND_WRITE_DELETED_DATA_SINGLE_RECORD              0x00e
+#define I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_SINGLE_RECORD    0x01e
+#define I8271_COMMAND_READ_DATA_MULTI_RECORD                        0x013
+#define I8271_COMMAND_READ_DATA_AND_DELETED_DATA_MULTI_RECORD       0x017
+#define I8271_COMMAND_WRITE_DATA_MULTI_RECORD                       0x00b
+#define I8271_COMMAND_WRITE_DELETED_DATA_MULTI_RECORD               0x00f
+#define I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_MULTI_RECORD     0x01f
+#define I8271_COMMAND_SCAN_DATA                                     0x000
+#define I8271_COMMAND_SCAN_DATA_AND_DELETED_DATA                    0x004
 
 /*
 #define I8271_COMMAND_READ_OPERATION                            (1<<4)
@@ -125,32 +125,32 @@ enum I8271_STATE_t
 
 
 /* first parameter for specify command */
-#define I8271_SPECIFY_INITIALIZATION								0x0d
-#define I8271_SPECIFY_LOAD_BAD_TRACKS_SURFACE_0						0x010
-#define I8271_SPECIFY_LOAD_BAD_TRACKS_SURFACE_1						0x018
+#define I8271_SPECIFY_INITIALIZATION                                0x0d
+#define I8271_SPECIFY_LOAD_BAD_TRACKS_SURFACE_0                     0x010
+#define I8271_SPECIFY_LOAD_BAD_TRACKS_SURFACE_1                     0x018
 
 /* first parameter for read/write special register */
-#define I8271_SPECIAL_REGISTER_SCAN_SECTOR_NUMBER					0x06
-#define I8271_SPECIAL_REGISTER_SCAN_MSB_OF_COUNT					0x014
-#define I8271_SPECIAL_REGISTER_SCAN_LSB_OF_COUNT					0x013
-#define I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK				0x012
-#define I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK				0x01a
-#define I8271_SPECIAL_REGISTER_MODE_REGISTER						0x017
-#define I8271_SPECIAL_REGISTER_DRIVE_CONTROL_OUTPUT_PORT			0x023
-#define I8271_SPECIAL_REGISTER_DRIVE_CONTROL_INPUT_PORT				0x022
-#define I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1				0x010
-#define I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2				0x011
-#define I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_1				0x018
-#define I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_2				0x019
+#define I8271_SPECIAL_REGISTER_SCAN_SECTOR_NUMBER                   0x06
+#define I8271_SPECIAL_REGISTER_SCAN_MSB_OF_COUNT                    0x014
+#define I8271_SPECIAL_REGISTER_SCAN_LSB_OF_COUNT                    0x013
+#define I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK              0x012
+#define I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK              0x01a
+#define I8271_SPECIAL_REGISTER_MODE_REGISTER                        0x017
+#define I8271_SPECIAL_REGISTER_DRIVE_CONTROL_OUTPUT_PORT            0x023
+#define I8271_SPECIAL_REGISTER_DRIVE_CONTROL_INPUT_PORT             0x022
+#define I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1                0x010
+#define I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2                0x011
+#define I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_1                0x018
+#define I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_2                0x019
 
 
 /* status register bits */
-#define I8271_STATUS_COMMAND_BUSY	0x080
-#define I8271_STATUS_COMMAND_FULL	0x040
-#define I8271_STATUS_PARAMETER_FULL	0x020
-#define I8271_STATUS_RESULT_FULL	0x010
-#define I8271_STATUS_INT_REQUEST	0x008
-#define I8271_STATUS_NON_DMA_REQUEST	0x004
+#define I8271_STATUS_COMMAND_BUSY   0x080
+#define I8271_STATUS_COMMAND_FULL   0x040
+#define I8271_STATUS_PARAMETER_FULL 0x020
+#define I8271_STATUS_RESULT_FULL    0x010
+#define I8271_STATUS_INT_REQUEST    0x008
+#define I8271_STATUS_NON_DMA_REQUEST    0x004
 
 static void i8271_command_execute(device_t *device);
 static void i8271_command_continue(device_t *device);
@@ -206,7 +206,7 @@ static void i8271_seek_to_track(device_t *device,int track)
 		/* seek to track 0 */
 		unsigned char StepCount = 0x0ff;
 
-        /*logerror("step\n"); */
+		/*logerror("step\n"); */
 
 		/* track 0 not set, not seeked more than 255 tracks */
 		while (floppy_tk00_r(img) && (StepCount != 0))
@@ -529,10 +529,10 @@ static void i8271_command_complete(device_t *device,int result, int int_rq)
 	{
 		/* trigger an int */
 		i8271_set_irq_state(device,1);
-    }
+	}
 
 	/* correct?? */
-    i8271->drive_control_output &=~1;
+	i8271->drive_control_output &=~1;
 }
 
 
@@ -634,7 +634,7 @@ static void i8271_do_read(device_t *device)
 		floppy_drive_read_sector_data(current_image(device), i8271->side, i8271->data_id, i8271->pExecutionPhaseData, 1<<(i8271->ID_N+7));
 
 		/* initialise for reading */
-        i8271_initialise_execution_phase_read(device, 1<<(i8271->ID_N+7));
+		i8271_initialise_execution_phase_read(device, 1<<(i8271->ID_N+7));
 
 		/* update state - gets first byte and triggers a data request */
 		i8271_timed_data_request(device);
@@ -647,7 +647,7 @@ static void i8271_do_read(device_t *device)
 
 static void i8271_do_read_id(device_t *device)
 {
-	chrn_id	id;
+	chrn_id id;
 	i8271_t *i8271 = get_safe_token(device);
 
 	/* get next id from disc */
@@ -669,7 +669,7 @@ static void i8271_do_write(device_t *device)
 	if (i8271_find_sector(device))
 	{
 		/* initialise for reading */
-        i8271_initialise_execution_phase_write(device,1<<(i8271->ID_N+7));
+		i8271_initialise_execution_phase_write(device,1<<(i8271->ID_N+7));
 
 		/* update state - gets first byte and triggers a data request */
 		i8271_timed_data_request(device);
@@ -696,14 +696,14 @@ static int i8271_find_sector(device_t *device)
 
 	/* get sector id's */
 	do
-    {
+	{
 		chrn_id id;
 
 		/* get next id from disc */
 		if (floppy_drive_get_next_id(img, i8271->side,&id))
 		{
 			/* tested on Amstrad CPC - All bytes must match, otherwise
-            a NO DATA error is reported */
+			a NO DATA error is reported */
 			if (id.R == i8271->ID_R)
 			{
 				/* TODO: Is this correct? What about bad tracks? */
@@ -722,7 +722,7 @@ static int i8271_find_sector(device_t *device)
 			}
 		}
 
-		 /* index set? */
+			/* index set? */
 		if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_INDEX))
 		{
 			index_count++;
@@ -842,7 +842,7 @@ static void i8271_command_execute(device_t *device)
 					i8271_get_drive(device);
 
 					/* assumption: select bits reflect the select bits from the previous
-                    command. i.e. read drive status */
+					command. i.e. read drive status */
 					data = (i8271->drive_control_output & ~0x0c0)
 						| (i8271->CommandRegister & 0x0c0);
 
@@ -1002,7 +1002,7 @@ static void i8271_command_execute(device_t *device)
 					i8271->side = (i8271->CommandParameters[1]>>5) & 0x01;
 
 					/* load head - on mini-sized drives this turns on the disc motor,
-                    on standard-sized drives this loads the head and turns the motor on */
+					on standard-sized drives this loads the head and turns the motor on */
 					floppy_mon_w(img, !BIT(i8271->CommandParameters[1], 3));
 					floppy_drive_set_ready_state(img, 1, 1);
 
@@ -1193,7 +1193,7 @@ static void i8271_command_execute(device_t *device)
 
 			i8271_get_drive(device);
 
-            i8271->drive_control_output &=~1;
+			i8271->drive_control_output &=~1;
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
@@ -1213,7 +1213,7 @@ static void i8271_command_execute(device_t *device)
 				}
 				else
 				{
-                    i8271->drive_control_output |=1;
+					i8271->drive_control_output |=1;
 
 					i8271_seek_to_track(device,i8271->CommandParameters[0]);
 
@@ -1238,7 +1238,7 @@ static void i8271_command_execute(device_t *device)
 			LOG(("Sector Length: %02x bytes\n", 1<<(i8271->ID_N+7)));
 			i8271_get_drive(device);
 
-            i8271->drive_control_output &=~1;
+			i8271->drive_control_output &=~1;
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
@@ -1259,7 +1259,7 @@ static void i8271_command_execute(device_t *device)
 				else
 				{
 
-                    i8271->drive_control_output |=1;
+					i8271->drive_control_output |=1;
 
 					i8271_seek_to_track(device,i8271->CommandParameters[0]);
 
@@ -1505,7 +1505,7 @@ WRITE8_DEVICE_HANDLER(i8271_dack_w)
 	i8271_data_w(device, space, offset, data);
 }
 
- READ8_DEVICE_HANDLER(i8271_data_r)
+	READ8_DEVICE_HANDLER(i8271_data_r)
 {
 	i8271_t *i8271 = get_safe_token(device);
 
@@ -1513,7 +1513,7 @@ WRITE8_DEVICE_HANDLER(i8271_dack_w)
 
 	i8271_update_state(device);
 
-  //  logerror("I8271 R data: %02x\n",i8271->data);
+	//  logerror("I8271 R data: %02x\n",i8271->data);
 
 
 	return i8271->data;
@@ -1558,7 +1558,7 @@ static DEVICE_RESET( i8271 )
 {
 	i8271_t *i8271 = get_safe_token(device);
 
-	i8271->StatusRegister = 0;	//I8271_STATUS_INT_REQUEST | I8271_STATUS_NON_DMA_REQUEST;
+	i8271->StatusRegister = 0;  //I8271_STATUS_INT_REQUEST | I8271_STATUS_NON_DMA_REQUEST;
 	i8271->Mode = 0x0c0; /* bits 0, 1 are initialized to zero */
 	i8271->ParameterCountWritten = 0;
 	i8271->ParameterCount = 0;
@@ -1609,5 +1609,3 @@ void i8271_device::device_reset()
 {
 	DEVICE_RESET_NAME( i8271 )(this);
 }
-
-

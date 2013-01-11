@@ -107,8 +107,8 @@ WRITE8_MEMBER(cabaret_state::fg_color_w)
 
 void cabaret_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  32,	64, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,    8,  32, 64, 8);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabaret_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,    8,  8,  64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(64);
 }
@@ -146,14 +146,14 @@ WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(machine(), 3,		data & 0x10);	// coin m_out mech
+	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
+	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
+	coin_counter_w(machine(), 2,        data & 0x08);   // key in
+	coin_counter_w(machine(), 3,        data & 0x10);   // coin m_out mech
 
-	set_led_status(machine(), 6,		data & 0x40);	// led for coin m_out / hopper active
+	set_led_status(machine(), 6,        data & 0x40);   // led for coin m_out / hopper active
 
-	m_nmi_enable = data;	//  data & 0x80     // nmi enable?
+	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
 	m_out[0] = data;
 	show_out();
@@ -175,9 +175,9 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x0090, 0x0090 ) AM_READ_PORT( "BUTTONS1" )
 	AM_RANGE( 0x00a0, 0x00a0 ) AM_WRITE(cabaret_nmi_and_coins_w )
 
-	AM_RANGE( 0x00a1, 0x00a1 ) AM_READ_PORT("DSW1")			/* DSW1 */
-	AM_RANGE( 0x00a2, 0x00a2 ) AM_READ_PORT("DSW2")			/* DSW2 */
-	AM_RANGE( 0x00b0, 0x00b0 ) AM_READ_PORT("DSW3")			/* DSW3 */
+	AM_RANGE( 0x00a1, 0x00a1 ) AM_READ_PORT("DSW1")         /* DSW1 */
+	AM_RANGE( 0x00a2, 0x00a2 ) AM_READ_PORT("DSW2")         /* DSW2 */
+	AM_RANGE( 0x00b0, 0x00b0 ) AM_READ_PORT("DSW3")         /* DSW3 */
 
 	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
@@ -199,7 +199,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( cabaret )
-	PORT_START("DSW1")		// OK
+	PORT_START("DSW1")      // OK
 	PORT_DIPNAME( 0x07, 0x00, "Poke %" ) PORT_DIPLOCATION("SWA:1,2,3")
 	PORT_DIPSETTING(    0x07, "60%" )
 	PORT_DIPSETTING(    0x06, "65%" )
@@ -223,7 +223,7 @@ static INPUT_PORTS_START( cabaret )
 	PORT_DIPSETTING(    0x00, "Quick" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW2")		// OK
+	PORT_START("DSW2")      // OK
 	PORT_DIPNAME( 0x03, 0x00, "Limit" ) PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x03, "5000" )
 	PORT_DIPSETTING(    0x02, "10000" )
@@ -244,7 +244,7 @@ static INPUT_PORTS_START( cabaret )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear")	// stats, memory
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear") // stats, memory
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -288,8 +288,8 @@ static const gfx_layout layout_8x8x6 =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP8(0,2*8) },
 	8*8*2
@@ -301,8 +301,8 @@ static const gfx_layout layout_8x32x6i =
 	RGN_FRAC(1, 3),
 	6,
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
-	  RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
-	  RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
+		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,
+		RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0 },
 	{ STEP8(0,1) },
 	{ STEP32(0,2*8) },
 	8*32*2
@@ -322,12 +322,12 @@ GFXDECODE_END
 
 void cabaret_state::machine_reset()
 {
-	m_nmi_enable		=	0;
+	m_nmi_enable        =   0;
 }
 
 INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 {
-	 if (m_nmi_enable & 0x80)
+		if (m_nmi_enable & 0x80)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -382,7 +382,7 @@ DRIVER_INIT_MEMBER(cabaret_state,cabaret)
 }
 
 ROM_START( cabaret )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code */
 	ROM_LOAD( "cg-8v204.u97",  0x0000, 0x10000, CRC(44cebf77) SHA1(e3f4e4abf41388f0eed50cf9a0fd0b14aa2f8b93) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
@@ -396,7 +396,7 @@ ROM_START( cabaret )
 	ROM_LOAD( "cg-3.u42",  0x4000, 0x4000, CRC(7e1f821f) SHA1(b709d49f9d1890fe3b8ca7f90affc0017a0ad95e) )
 
 	ROM_REGION( 0x8000, "gfx3", 0 )
-	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )	/* background maps, read by the CPU */
+	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )   /* background maps, read by the CPU */
 ROM_END
 
 GAME( 1992, cabaret,  0, cabaret,  cabaret, cabaret_state, cabaret,  ROT0, "AMT Co. Ltd.", "Cabaret", GAME_NOT_WORKING )

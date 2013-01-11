@@ -2,9 +2,9 @@
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define CPU_CLOCK		(XTAL_40MHz / 2)		/* clock for 68020 */
-#define SOUND_CPU_CLOCK		(XTAL_12MHz / 2)		/* clock for Z80 sound CPU */
-#define FM_SOUND_CLOCK		(XTAL_33_8688MHz / 2)		/* FM clock */
+#define CPU_CLOCK       (XTAL_40MHz / 2)        /* clock for 68020 */
+#define SOUND_CPU_CLOCK     (XTAL_12MHz / 2)        /* clock for Z80 sound CPU */
+#define FM_SOUND_CLOCK      (XTAL_33_8688MHz / 2)       /* FM clock */
 
 /* NOTE: YMF278B_STD_CLOCK is defined in /src/emu/sound/ymf278b.h */
 

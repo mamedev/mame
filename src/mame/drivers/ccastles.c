@@ -125,11 +125,11 @@
 #include "includes/ccastles.h"
 
 
-#define MASTER_CLOCK	(10000000)
+#define MASTER_CLOCK    (10000000)
 
-#define PIXEL_CLOCK		(MASTER_CLOCK/2)
-#define HTOTAL			(320)
-#define VTOTAL			(256)
+#define PIXEL_CLOCK     (MASTER_CLOCK/2)
+#define HTOTAL          (320)
+#define VTOTAL          (256)
 
 
 
@@ -356,17 +356,17 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( ccastles )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, NULL)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )					/* 1p Jump, non-cocktail start1 */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		/* 2p Jump, non-cocktail start2 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )                    /* 1p Jump, non-cocktail start1 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)     /* 2p Jump, non-cocktail start2 */
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")   /* IN1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -376,8 +376,8 @@ static INPUT_PORTS_START( ccastles )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )				/* cocktail only */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )				/* cocktail only */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )             /* cocktail only */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )             /* cocktail only */
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)	/* will be adjusted later */
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)   /* will be adjusted later */
 	MCFG_SCREEN_UPDATE_DRIVER(ccastles_state, screen_update_ccastles)
 
 

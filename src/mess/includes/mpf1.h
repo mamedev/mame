@@ -16,21 +16,21 @@
 #include "sound/speaker.h"
 #include "sound/tms5220.h"
 
-#define Z80_TAG			"u1"
-#define Z80CTC_TAG		"u11"
-#define Z80PIO_TAG		"u10"
-#define I8255A_TAG		"u14"
-#define TMS5220_TAG		"tms5220"
+#define Z80_TAG         "u1"
+#define Z80CTC_TAG      "u11"
+#define Z80PIO_TAG      "u10"
+#define I8255A_TAG      "u14"
+#define TMS5220_TAG     "tms5220"
 
 class mpf1_state : public driver_device
 {
 public:
 	mpf1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_ctc(*this, Z80CTC_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_cassette(*this, CASSETTE_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_ctc(*this, Z80CTC_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

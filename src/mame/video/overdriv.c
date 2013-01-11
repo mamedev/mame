@@ -11,7 +11,7 @@
 void overdriv_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
 	overdriv_state *state = machine.driver_data<overdriv_state>();
-	int pri = (*color & 0xffe0) >> 5;	/* ??????? */
+	int pri = (*color & 0xffe0) >> 5;   /* ??????? */
 	if (pri)
 		*priority_mask = 0x02;
 	else

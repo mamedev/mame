@@ -66,10 +66,10 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define R6502_TAG		"u1"
-#define R6532_TAG		"u3"
-#define R6522_TAG		"u4"
-#define MC6850_TAG		"u5"
+#define R6502_TAG       "u1"
+#define R6532_TAG       "u3"
+#define R6522_TAG       "u4"
+#define MC6850_TAG      "u5"
 
 
 //**************************************************************************
@@ -227,13 +227,13 @@ machine_config_constructor interpod_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 interpod_device::interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, INTERPOD, "Interpod", tag, owner, clock),
-	  device_cbm_iec_interface(mconfig, *this),
-	  m_maincpu(*this, R6502_TAG),
-	  m_via(*this, R6522_TAG),
-	  m_riot(*this, R6532_TAG),
-	  m_acia(*this, MC6850_TAG),
-	  m_ieee(*this, IEEE488_TAG)
+	: device_t(mconfig, INTERPOD, "Interpod", tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this),
+		m_maincpu(*this, R6502_TAG),
+		m_via(*this, R6522_TAG),
+		m_riot(*this, R6532_TAG),
+		m_acia(*this, MC6850_TAG),
+		m_ieee(*this, IEEE488_TAG)
 {
 }
 

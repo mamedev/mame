@@ -69,7 +69,7 @@ public:
 
 	UINT8 m_bknd_col;
 	UINT8 m_port02_status;
-	UINT8 m_vbank;		/* video page select signal, likely for double buffering ?*/
+	UINT8 m_vbank;      /* video page select signal, likely for double buffering ?*/
 	UINT32 m_xpos;
 	UINT32 m_ypos;
 	UINT32 m_pix_xsize;
@@ -79,7 +79,7 @@ public:
 	UINT8 m_mode;
 	UINT8 m_plane;
 	UINT8 m_lookup_ram[0x100*4];
-	UINT32 m_gfx_rom_bank;	/* graphics ROMs are banked */
+	UINT32 m_gfx_rom_bank;  /* graphics ROMs are banked */
 
 	double m_weights_r[2];
 	double m_weights_g[3];
@@ -177,10 +177,10 @@ void mazerbla_state::palette_init()
 	static const int resistances_gb[3] = { 10000, 4700, 2200 };
 
 	/* just to calculate coefficients for later use */
-	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_gb,	m_weights_g,	3600,	0,
-			3,	resistances_gb,	m_weights_b,	3600,	0,
-			2,	resistances_r,	m_weights_r,	3600,	0);
+	compute_resistor_weights(0, 255,    -1.0,
+			3,  resistances_gb, m_weights_g,    3600,   0,
+			3,  resistances_gb, m_weights_b,    3600,   0,
+			2,  resistances_r,  m_weights_r,    3600,   0);
 
 }
 
@@ -217,7 +217,7 @@ UINT32 mazerbla_state::screen_update_test_vcu(screen_device &screen, bitmap_ind1
 	UINT32 color_base = 0;
 
 	if (m_game_id == MAZERBLA)
-		color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
+		color_base = 0x80;  /* 0x80 constant: matches Mazer Blazer movie */
 
 	if (m_game_id == GREATGUN)
 		color_base = 0x00;
@@ -243,32 +243,32 @@ UINT32 mazerbla_state::screen_update_test_vcu(screen_device &screen, bitmap_ind1
 
 	m_tmpbitmaps[0].fill(color_base);
 
-	if (machine().input().code_pressed_once(KEYCODE_1))	/* plane 1 */
+	if (machine().input().code_pressed_once(KEYCODE_1)) /* plane 1 */
 		planes_enabled[0] ^= 1;
 
-	if (machine().input().code_pressed_once(KEYCODE_2))	/* plane 2 */
+	if (machine().input().code_pressed_once(KEYCODE_2)) /* plane 2 */
 		planes_enabled[1] ^= 1;
 
-	if (machine().input().code_pressed_once(KEYCODE_3))	/* plane 3 */
+	if (machine().input().code_pressed_once(KEYCODE_3)) /* plane 3 */
 		planes_enabled[2] ^= 1;
 
-	if (machine().input().code_pressed_once(KEYCODE_4))	/* plane 4 */
+	if (machine().input().code_pressed_once(KEYCODE_4)) /* plane 4 */
 		planes_enabled[3] ^= 1;
 
-	if (machine().input().code_pressed_once(KEYCODE_I))	/* show/hide debug info */
+	if (machine().input().code_pressed_once(KEYCODE_I)) /* show/hide debug info */
 		m_dbg_info = !m_dbg_info;
 
-	if (machine().input().code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
+	if (machine().input().code_pressed_once(KEYCODE_G)) /* enable gfx area handling */
 		m_dbg_gfx_e = !m_dbg_gfx_e;
 
-	if (machine().input().code_pressed_once(KEYCODE_C))	/* enable color area handling */
+	if (machine().input().code_pressed_once(KEYCODE_C)) /* enable color area handling */
 		m_dbg_clr_e = !m_dbg_clr_e;
 
-	if (machine().input().code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
+	if (machine().input().code_pressed_once(KEYCODE_V)) /* draw only when vbank==dbg_vbank */
 		m_dbg_vbank ^= 1;
 
-	if (machine().input().code_pressed_once(KEYCODE_L))	/* showlookup ram */
-		m_dbg_lookup = (m_dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
+	if (machine().input().code_pressed_once(KEYCODE_L)) /* showlookup ram */
+		m_dbg_lookup = (m_dbg_lookup + 1) % 5;  //0,1,2,3, 4-off
 
 
 	if (m_dbg_info)
@@ -428,10 +428,10 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 	UINT8 color_base = 0;
 
 	if (m_game_id == MAZERBLA)
-		color_base = 0x80;	/* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
+		color_base = 0x80;  /* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
 
 	if (m_game_id == GREATGUN)
-		color_base = 0x00;	/* 0x00 - good for Great Guns: (both in game and CRT test mode) */
+		color_base = 0x00;  /* 0x00 - good for Great Guns: (both in game and CRT test mode) */
 /*
     if ((mode <= 0x07) || (mode >= 0x10))
     {
@@ -478,16 +478,16 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 					switch(data)
 					{
 						case 0:
-							col = color_base | ((m_color1 & 0x0f));		//background PEN
+							col = color_base | ((m_color1 & 0x0f));     //background PEN
 							break;
 						case 1:
-							col = color_base | ((m_color1 & 0xf0) >> 4);	//foreground PEN
+							col = color_base | ((m_color1 & 0xf0) >> 4);    //foreground PEN
 							break;
 						case 2:
-							col = color_base | ((m_color2 & 0x0f));	//background PEN2
+							col = color_base | ((m_color2 & 0x0f)); //background PEN2
 							break;
 						case 3:
-							col = color_base | ((m_color2 & 0xf0) >> 4);	//foreground PEN2
+							col = color_base | ((m_color2 & 0xf0) >> 4);    //foreground PEN2
 							break;
 					}
 
@@ -613,13 +613,13 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 		case 0x13: /* draws sprites?? in mazer blazer and ... wrong sprite in place of targeting-cross and UFO laser */
 		case 0x03:
 		/* ... this may proove that there is really only one area and that
-           the draw command/palette selector is done via the 'mode' only ... */
+		   the draw command/palette selector is done via the 'mode' only ... */
 		//if (m_dbg_clr_e)
 		{
 			offs = m_vcu_gfx_addr;
 
 			if (m_game_id == MAZERBLA)
-				color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
+				color_base = 0x80;  /* 0x80 constant: matches Mazer Blazer movie */
 
 			if (m_game_id == GREATGUN)
 				color_base = 0x00;
@@ -635,16 +635,16 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 					switch(data)
 					{
 						case 0:
-							col = color_base | ((m_color1 & 0x0f));		//background PEN
+							col = color_base | ((m_color1 & 0x0f));     //background PEN
 							break;
 						case 1:
-							col = color_base | ((m_color1 & 0xf0) >> 4);	//foreground PEN
+							col = color_base | ((m_color1 & 0xf0) >> 4);    //foreground PEN
 							break;
 						case 2:
-							col = color_base | ((m_color2 & 0x0f));	//background PEN2
+							col = color_base | ((m_color2 & 0x0f)); //background PEN2
 							break;
 						case 3:
-							col = color_base | ((m_color2 & 0xf0) >> 4);	//foreground PEN2
+							col = color_base | ((m_color2 & 0xf0) >> 4);    //foreground PEN2
 							break;
 					}
 
@@ -767,9 +767,9 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 WRITE8_MEMBER(mazerbla_state::cfb_zpu_int_req_set_w)
 {
 
-	m_zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
+	m_zpu_int_vector &= ~2; /* clear D1 on INTA (interrupt acknowledge) */
 
-	m_maincpu->set_input_line(0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	m_maincpu->set_input_line(0, ASSERT_LINE);  /* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 READ8_MEMBER(mazerbla_state::cfb_zpu_int_req_clr)
@@ -893,7 +893,7 @@ WRITE8_MEMBER(mazerbla_state::zpu_bcd_decoder_w)
 READ8_MEMBER(mazerbla_state::zpu_inputs_r)
 {
 	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y",
-	                                           "STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
+												"STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
 	UINT8 ret = 0;
 
@@ -1019,21 +1019,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                    /* GFX roms */
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(vcu_video_reg_w)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("cfb_ram")		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(vcu_set_cmd_param_r)	/* VCU command and parameters LOAD */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(vcu_set_gfx_addr_r)	/* gfx LOAD (blit) */
-	AM_RANGE(0xe000, 0xffff) AM_READ(vcu_set_clr_addr_r)	/* palette? LOAD */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("cfb_ram")     /* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
+	AM_RANGE(0xa000, 0xa7ff) AM_READ(vcu_set_cmd_param_r)   /* VCU command and parameters LOAD */
+	AM_RANGE(0xc000, 0xdfff) AM_READ(vcu_set_gfx_addr_r)    /* gfx LOAD (blit) */
+	AM_RANGE(0xe000, 0xffff) AM_READ(vcu_set_clr_addr_r)    /* palette? LOAD */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w) /* Read = VCU status ? */
 	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
+	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)  //visible/writable videopage select?
 ADDRESS_MAP_END
 
 
@@ -1058,10 +1058,10 @@ static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w) /* Read = VCU status ? */
 	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w_gg)
-	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
+	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)  //visible/writable videopage select?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
@@ -1082,7 +1082,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( mazerbla )
-	PORT_START("ZPU")	/* Strobe 0: ZPU Switches */
+	PORT_START("ZPU")   /* Strobe 0: ZPU Switches */
 	PORT_DIPNAME( 0x40, 0x40, "ZPU Switch 1" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1090,29 +1090,29 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW0")	/* Strobe 1: Dip Switches 28-35*/
+	PORT_START("DSW0")  /* Strobe 1: Dip Switches 28-35*/
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x03, "6" )
-	PORT_DIPSETTING(	0x02, "5" )
-	PORT_DIPSETTING(	0x01, "4" )
-	PORT_DIPSETTING(	0x00, "3" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPNAME( 0x0c, 0x00, "Freeze Time" )
-	PORT_DIPSETTING(	0x0c, "1.5 seconds" )
-	PORT_DIPSETTING(	0x08, "2.0 seconds" )
-	PORT_DIPSETTING(	0x04, "2.5 seconds" )
-	PORT_DIPSETTING(	0x00, "3.0 seconds" )
+	PORT_DIPSETTING(    0x0c, "1.5 seconds" )
+	PORT_DIPSETTING(    0x08, "2.0 seconds" )
+	PORT_DIPSETTING(    0x04, "2.5 seconds" )
+	PORT_DIPSETTING(    0x00, "3.0 seconds" )
 	PORT_DIPNAME( 0x30, 0x00, "Number of points for extra frezze & first life" )
-	PORT_DIPSETTING(	0x30, "20000" )
-	PORT_DIPSETTING(	0x20, "25000" )
-	PORT_DIPSETTING(	0x10, "30000" )
-	PORT_DIPSETTING(	0x00, "35000" )
+	PORT_DIPSETTING(    0x30, "20000" )
+	PORT_DIPSETTING(    0x20, "25000" )
+	PORT_DIPSETTING(    0x10, "30000" )
+	PORT_DIPSETTING(    0x00, "35000" )
 	PORT_DIPNAME( 0xc0, 0x00, "Number of points for extra life other than first" )
-	PORT_DIPSETTING(	0xc0, "40000" )
-	PORT_DIPSETTING(	0x80, "50000" )
-	PORT_DIPSETTING(	0x40, "60000" )
-	PORT_DIPSETTING(	0x00, "70000" )
+	PORT_DIPSETTING(    0xc0, "40000" )
+	PORT_DIPSETTING(    0x80, "50000" )
+	PORT_DIPSETTING(    0x40, "60000" )
+	PORT_DIPSETTING(    0x00, "70000" )
 
-	PORT_START("DSW1")	/* Strobe 2: Dip Switches 20-27*/
+	PORT_START("DSW1")  /* Strobe 2: Dip Switches 20-27*/
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
@@ -1149,7 +1149,7 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x80, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x70, "1 Coin/14 Credits" )
 
-	PORT_START("DSW2")	/* Strobe 3: Dip Switches 12-19*/
+	PORT_START("DSW2")  /* Strobe 3: Dip Switches 12-19*/
 	PORT_DIPNAME( 0x01, 0x01, "Service Index" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1168,40 +1168,40 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")	/* Strobe 4: Dip Switches 4-11 */
+	PORT_START("DSW3")  /* Strobe 4: Dip Switches 4-11 */
 	PORT_DIPNAME( 0x03, 0x02, "Number of Freezes" )
-	PORT_DIPSETTING(	0x03, "4" )
-	PORT_DIPSETTING(	0x02, "3" )
-	PORT_DIPSETTING(	0x01, "2" )
-	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPNAME( 0x04, 0x04, "Gun Knocker" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	//dips 7-11 - not listed in manual
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("BUTTONS")	/* Strobe 5: coin1&2, start1&2, fire */
+	PORT_START("BUTTONS")   /* Strobe 5: coin1&2, start1&2, fire */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1211,15 +1211,15 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("STICK0_X")	/* Strobe 6: horizontal movement of gun */
+	PORT_START("STICK0_X")  /* Strobe 6: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
-	PORT_START("STICK0_Y")	/* Strobe 7: vertical movement of gun */
+	PORT_START("STICK0_Y")  /* Strobe 7: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
 
 	/* Mazer Blazer cabinet has only one gun, really */
-	PORT_START("STICK1_X")	/* Strobe 8: horizontal movement of gun */
+	PORT_START("STICK1_X")  /* Strobe 8: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
-	PORT_START("STICK1_Y")	/* Strobe 9: vertical movement of gun */
+	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
 
 	PORT_START("UNUSED")
@@ -1227,7 +1227,7 @@ static INPUT_PORTS_START( mazerbla )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( greatgun )
-	PORT_START("ZPU")	/* Strobe 0: ZPU Switches */
+	PORT_START("ZPU")   /* Strobe 0: ZPU Switches */
 	PORT_DIPNAME( 0x40, 0x40, "ZPU Switch 1" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1235,34 +1235,34 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW0")	/* Strobe 1: Dip Switches 28-35*/
+	PORT_START("DSW0")  /* Strobe 1: Dip Switches 28-35*/
 	PORT_DIPNAME( 0x03, 0x00, "Starting Number of Bullets/Credit" )
-	PORT_DIPSETTING(	0x03, "60" )
-	PORT_DIPSETTING(	0x02, "70" )
-	PORT_DIPSETTING(	0x01, "80" )
-	PORT_DIPSETTING(	0x00, "90" )
+	PORT_DIPSETTING(    0x03, "60" )
+	PORT_DIPSETTING(    0x02, "70" )
+	PORT_DIPSETTING(    0x01, "80" )
+	PORT_DIPSETTING(    0x00, "90" )
 	PORT_DIPNAME( 0x0c, 0x00, "Target Size" )
-	PORT_DIPSETTING(	0x0c, "7 x 7" )
-	PORT_DIPSETTING(	0x08, "9 x 9" )
-	PORT_DIPSETTING(	0x04, "11x11" )
-	PORT_DIPSETTING(	0x00, "7 x 7" )
+	PORT_DIPSETTING(    0x0c, "7 x 7" )
+	PORT_DIPSETTING(    0x08, "9 x 9" )
+	PORT_DIPSETTING(    0x04, "11x11" )
+	PORT_DIPSETTING(    0x00, "7 x 7" )
 	PORT_DIPNAME( 0x70, 0x00, "Number of points for extra bullet" )
-	PORT_DIPSETTING(	0x70, "1000" )
-	PORT_DIPSETTING(	0x60, "2000" )
-	PORT_DIPSETTING(	0x50, "3000" )
-	PORT_DIPSETTING(	0x40, "4000" )
-	PORT_DIPSETTING(	0x30, "5000" )
-	PORT_DIPSETTING(	0x20, "6000" )
-	PORT_DIPSETTING(	0x10, "7000" )
-	PORT_DIPSETTING(	0x00, "8000" )
+	PORT_DIPSETTING(    0x70, "1000" )
+	PORT_DIPSETTING(    0x60, "2000" )
+	PORT_DIPSETTING(    0x50, "3000" )
+	PORT_DIPSETTING(    0x40, "4000" )
+	PORT_DIPSETTING(    0x30, "5000" )
+	PORT_DIPSETTING(    0x20, "6000" )
+	PORT_DIPSETTING(    0x10, "7000" )
+	PORT_DIPSETTING(    0x00, "8000" )
 	/* from manual:
-        "This switch is used when an optional coin return or ticket dispenser is used"
-    */
+	    "This switch is used when an optional coin return or ticket dispenser is used"
+	*/
 	PORT_DIPNAME( 0x80, 0x00, "Number of coins or tickets returned" )
-	PORT_DIPSETTING(	0x80, "1" )
-	PORT_DIPSETTING(	0x00, "2" )
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START("DSW1")	/* Strobe 2: Dip Switches 20-27*/
+	PORT_START("DSW1")  /* Strobe 2: Dip Switches 20-27*/
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
@@ -1299,7 +1299,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x80, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x70, "1 Coin/14 Credits" )
 
-	PORT_START("DSW2")	/* Strobe 3: Dip Switches 12-19*/
+	PORT_START("DSW2")  /* Strobe 3: Dip Switches 12-19*/
 	PORT_DIPNAME( 0x01, 0x01, "Service Index" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1318,21 +1318,21 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	//probably unused
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  //probably unused
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")	/* Strobe 4: Dip Switches 4-11 */
+	PORT_START("DSW3")  /* Strobe 4: Dip Switches 4-11 */
 	PORT_DIPNAME( 0x01, 0x01, "Free game/coin return" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	//dips 5-11 - not listed in manual
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1352,7 +1352,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("BUTTONS")	/* Strobe 5: coin1&2, start1&2, fire */
+	PORT_START("BUTTONS")   /* Strobe 5: coin1&2, start1&2, fire */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1362,14 +1362,14 @@ static INPUT_PORTS_START( greatgun )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START("STICK0_X")	/* Strobe 6: horizontal movement of gun */
+	PORT_START("STICK0_X")  /* Strobe 6: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
-	PORT_START("STICK0_Y")	/* Strobe 7: vertical movement of gun */
+	PORT_START("STICK0_Y")  /* Strobe 7: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
 
-	PORT_START("STICK1_X")	/* Strobe 8: horizontal movement of gun */
+	PORT_START("STICK1_X")  /* Strobe 8: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
-	PORT_START("STICK1_Y")	/* Strobe 9: vertical movement of gun */
+	PORT_START("STICK1_Y")  /* Strobe 9: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
 
 	PORT_START("UNUSED")
@@ -1410,15 +1410,15 @@ static IRQ_CALLBACK(irq_callback)
 	/* D2 is set to GND when INT comes from ZPU board - from 6850 on schematics (RS232 controller) */
 
 	/* resulting vectors:
-    1111 11000 (0xf8)
-    1111 11010 (0xfa)
-    1111 11100 (0xfc)
+	1111 11000 (0xf8)
+	1111 11010 (0xfa)
+	1111 11100 (0xfc)
 
-    note:
-    1111 11110 (0xfe) - cannot happen and is not handled by game */
+	note:
+	1111 11110 (0xfe) - cannot happen and is not handled by game */
 
 	mazerbla_state *state = device->machine().driver_data<mazerbla_state>();
-	return (state->m_zpu_int_vector & ~1);	/* D0->GND is performed on CFB board */
+	return (state->m_zpu_int_vector & ~1);  /* D0->GND is performed on CFB board */
 }
 
 /* frequency is 14.318 MHz/16/16/16/16 */
@@ -1510,16 +1510,16 @@ void mazerbla_state::machine_reset()
 static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_map)
 	MCFG_CPU_IO_MAP(mazerbla_io_map)
 
-	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)	/* 4 MHz, NMI, IM1 INT */
+	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)  /* 4 MHz, NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu2_map)
 	MCFG_CPU_IO_MAP(mazerbla_cpu2_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mazerbla_state, irq0_line_hold,  400) /* frequency in Hz */
 
-	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK)	/* 4 MHz, no  NMI, IM1 INT */
+	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK) /* 4 MHz, no  NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu3_map)
 	MCFG_CPU_IO_MAP(mazerbla_cpu3_io_map)
 /* (vblank related ??) int generated by a custom video processor
@@ -1548,15 +1548,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_map)
 	MCFG_CPU_IO_MAP(greatgun_io_map)
 
-	MCFG_CPU_ADD("sub", Z80, SOUND_CLOCK / 4)	/* 3.579500 MHz, NMI - caused by sound command write, periodic INT */
+	MCFG_CPU_ADD("sub", Z80, SOUND_CLOCK / 4)   /* 3.579500 MHz, NMI - caused by sound command write, periodic INT */
 	MCFG_CPU_PROGRAM_MAP(greatgun_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mazerbla_state, sound_interrupt,  (double)14318180/16/16/16/16 )
 
-	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK)	/* 4 MHz, no  NMI, IM1 INT */
+	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK) /* 4 MHz, no  NMI, IM1 INT */
 	MCFG_CPU_PROGRAM_MAP(mazerbla_cpu3_map)
 	MCFG_CPU_IO_MAP(greatgun_cpu3_io_map)
 /* (vblank related ??) int generated by a custom video processor

@@ -25,11 +25,11 @@
 // ======================> comx_pl80_device
 
 class comx_pl80_device :  public device_t,
-                          public device_centronics_peripheral_interface
+							public device_centronics_peripheral_interface
 {
 public:
-    // construction/destruction
-    comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -43,20 +43,20 @@ public:
 	DECLARE_READ8_MEMBER( pd_r );
 
 protected:
-    // device-level overrides
-    virtual void device_config_complete() { m_shortname = "comx_pl80"; }
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "comx_pl80"; }
+	virtual void device_start();
 	virtual void device_reset();
 
 private:
 	// PL-80 plotter state
-	UINT16 m_font_addr;			// font ROM pack address latch
-	UINT8 m_x_motor_phase;		// X motor phase
-	UINT8 m_y_motor_phase;		// Y motor phase
-	UINT8 m_z_motor_phase;		// Z motor phase
-	UINT8 m_plotter_data;		// plotter data bus
-	int m_plotter_ack;			// plotter acknowledge
-	int m_plotter_online;		// online LED
+	UINT16 m_font_addr;         // font ROM pack address latch
+	UINT8 m_x_motor_phase;      // X motor phase
+	UINT8 m_y_motor_phase;      // Y motor phase
+	UINT8 m_z_motor_phase;      // Z motor phase
+	UINT8 m_plotter_data;       // plotter data bus
+	int m_plotter_ack;          // plotter acknowledge
+	int m_plotter_online;       // online LED
 };
 
 

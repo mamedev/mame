@@ -118,10 +118,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			{
 				sx = (state->m_spriteram[offs + 3] - 256);
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-        				code,
-				        pal,
-				        flipx,flipy,
-					      sx,sy,15);
+						code,
+						pal,
+						flipx,flipy,
+							sx,sy,15);
 			}
 		}
 	}

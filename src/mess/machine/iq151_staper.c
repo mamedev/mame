@@ -50,7 +50,7 @@ const device_type IQ151_STAPER = &device_creator<iq151_staper_device>;
 //-------------------------------------------------
 
 iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, IQ151_STAPER, "IQ151 STAPER", tag, owner, clock),
+		: device_t(mconfig, IQ151_STAPER, "IQ151 STAPER", tag, owner, clock),
 		device_iq151cart_interface( mconfig, *this ),
 		m_ppi(*this, "ppi8255"),
 		m_printer(*this, "printer")
@@ -141,9 +141,9 @@ WRITE8_MEMBER( iq151_staper_device::ppi_portb_w )
 WRITE8_MEMBER( iq151_staper_device::ppi_portc_w )
 {
 	/*
-        x--- ----   printer select
-        -x-- ----   punchtape select
-    */
+	    x--- ----   printer select
+	    -x-- ----   punchtape select
+	*/
 
 	m_ppi_portc = data;
 }

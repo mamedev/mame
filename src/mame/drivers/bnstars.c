@@ -99,19 +99,19 @@ class bnstars_state : public driver_device
 public:
 	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ms32_tx0_ram(*this, "tx0_ram"),
-		  m_ms32_tx1_ram(*this, "tx1_ram"),
-		  m_ms32_bg0_ram(*this, "bg0_ram"),
-		  m_ms32_bg1_ram(*this, "bg1_ram"),
-		  m_ms32_roz0_ram(*this, "roz0_ram"),
-		  m_ms32_roz1_ram(*this, "roz1_ram"),
-		  m_ms32_pal_ram(*this, "pal_ram"),
-		  m_ms32_roz_ctrl(*this, "roz_ctrl"),
-		  m_ms32_spram(*this, "spram"),
-		  m_ms32_tx0_scroll(*this, "tx0_scroll"),
-		  m_ms32_bg0_scroll(*this, "bg0_scroll"),
-		  m_ms32_tx1_scroll(*this, "tx1_scroll"),
-		  m_ms32_bg1_scroll(*this, "bg1_scroll") { }
+			m_ms32_tx0_ram(*this, "tx0_ram"),
+			m_ms32_tx1_ram(*this, "tx1_ram"),
+			m_ms32_bg0_ram(*this, "bg0_ram"),
+			m_ms32_bg1_ram(*this, "bg1_ram"),
+			m_ms32_roz0_ram(*this, "roz0_ram"),
+			m_ms32_roz1_ram(*this, "roz1_ram"),
+			m_ms32_pal_ram(*this, "pal_ram"),
+			m_ms32_roz_ctrl(*this, "roz_ctrl"),
+			m_ms32_spram(*this, "spram"),
+			m_ms32_tx0_scroll(*this, "tx0_scroll"),
+			m_ms32_bg0_scroll(*this, "bg0_scroll"),
+			m_ms32_tx1_scroll(*this, "tx1_scroll"),
+			m_ms32_bg1_scroll(*this, "bg1_scroll") { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
@@ -235,57 +235,57 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
-	if (state->m_ms32_roz_ctrl[chip][0x5c/4] & 1)	/* "super" mode */
+	if (state->m_ms32_roz_ctrl[chip][0x5c/4] & 1)   /* "super" mode */
 	{
 		printf("no lineram!\n");
 		return;
 		/*
-        rectangle my_clip;
-        int y,maxy;
+		rectangle my_clip;
+		int y,maxy;
 
-        my_clip.min_x = cliprect.min_x;
-        my_clip.max_x = cliprect.max_x;
+		my_clip.min_x = cliprect.min_x;
+		my_clip.max_x = cliprect.max_x;
 
-        y = cliprect.min_y;
-        maxy = cliprect.max_y;
+		y = cliprect.min_y;
+		maxy = cliprect.max_y;
 
-        while (y <= maxy)
-        {
-            UINT32 *lineaddr = ms32_lineram + 8 * (y & 0xff);
+		while (y <= maxy)
+		{
+		    UINT32 *lineaddr = ms32_lineram + 8 * (y & 0xff);
 
-            int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
-            int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
-            int incxx  = (lineaddr[0x10/4] & 0xffff) | ((lineaddr[0x14/4] & 1) << 16);
-            int incxy  = (lineaddr[0x18/4] & 0xffff) | ((lineaddr[0x1c/4] & 1) << 16);
-            int startx = (state->m_ms32_roz_ctrl[0x00/4] & 0xffff) | ((state->m_ms32_roz_ctrl[0x04/4] & 3) << 16);
-            int starty = (state->m_ms32_roz_ctrl[0x08/4] & 0xffff) | ((state->m_ms32_roz_ctrl[0x0c/4] & 3) << 16);
-            int offsx  = state->m_ms32_roz_ctrl[0x30/4];
-            int offsy  = state->m_ms32_roz_ctrl[0x34/4];
+		    int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
+		    int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
+		    int incxx  = (lineaddr[0x10/4] & 0xffff) | ((lineaddr[0x14/4] & 1) << 16);
+		    int incxy  = (lineaddr[0x18/4] & 0xffff) | ((lineaddr[0x1c/4] & 1) << 16);
+		    int startx = (state->m_ms32_roz_ctrl[0x00/4] & 0xffff) | ((state->m_ms32_roz_ctrl[0x04/4] & 3) << 16);
+		    int starty = (state->m_ms32_roz_ctrl[0x08/4] & 0xffff) | ((state->m_ms32_roz_ctrl[0x0c/4] & 3) << 16);
+		    int offsx  = state->m_ms32_roz_ctrl[0x30/4];
+		    int offsy  = state->m_ms32_roz_ctrl[0x34/4];
 
-            my_clip.min_y = my_clip.max_y = y;
+		    my_clip.min_y = my_clip.max_y = y;
 
-            offsx += (state->m_ms32_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
-            offsy += (state->m_ms32_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+		    offsx += (state->m_ms32_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+		    offsy += (state->m_ms32_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
 
-            // extend sign
-            if (start2x & 0x20000) start2x |= ~0x3ffff;
-            if (start2y & 0x20000) start2y |= ~0x3ffff;
-            if (startx & 0x20000) startx |= ~0x3ffff;
-            if (starty & 0x20000) starty |= ~0x3ffff;
-            if (incxx & 0x10000) incxx |= ~0x1ffff;
-            if (incxy & 0x10000) incxy |= ~0x1ffff;
+		    // extend sign
+		    if (start2x & 0x20000) start2x |= ~0x3ffff;
+		    if (start2y & 0x20000) start2y |= ~0x3ffff;
+		    if (startx & 0x20000) startx |= ~0x3ffff;
+		    if (starty & 0x20000) starty |= ~0x3ffff;
+		    if (incxx & 0x10000) incxx |= ~0x1ffff;
+		    if (incxy & 0x10000) incxy |= ~0x1ffff;
 
-            state->m_ms32_roz_tilemap->draw_roz(bitmap, &my_clip,
-                    (start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
-                    incxx<<8, incxy<<8, 0, 0,
-                    1, // Wrap
-                    0, priority);
+		    state->m_ms32_roz_tilemap->draw_roz(bitmap, &my_clip,
+		            (start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
+		            incxx<<8, incxy<<8, 0, 0,
+		            1, // Wrap
+		            0, priority);
 
-            y++;
-        }
-        */
+		    y++;
+		}
+		*/
 	}
-	else	/* "simple" mode */
+	else    /* "simple" mode */
 	{
 		int startx = (state->m_ms32_roz_ctrl[chip][0x00/4] & 0xffff) | ((state->m_ms32_roz_ctrl[chip][0x04/4] & 3) << 16);
 		int starty = (state->m_ms32_roz_ctrl[chip][0x08/4] & 0xffff) | ((state->m_ms32_roz_ctrl[chip][0x0c/4] & 3) << 16);
@@ -296,8 +296,8 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 		int offsx  = state->m_ms32_roz_ctrl[chip][0x30/4];
 		int offsy  = state->m_ms32_roz_ctrl[chip][0x34/4];
 
-		offsx += (state->m_ms32_roz_ctrl[chip][0x38/4] & 1) * 0x400;	// ??? gratia, hayaosi1...
-		offsy += (state->m_ms32_roz_ctrl[chip][0x3c/4] & 1) * 0x400;	// ??? gratia, hayaosi1...
+		offsx += (state->m_ms32_roz_ctrl[chip][0x38/4] & 1) * 0x400;    // ??? gratia, hayaosi1...
+		offsy += (state->m_ms32_roz_ctrl[chip][0x3c/4] & 1) * 0x400;    // ??? gratia, hayaosi1...
 
 		/* extend sign */
 		if (startx & 0x20000) startx |= ~0x3ffff;
@@ -420,53 +420,53 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int code, attr, color, size, pri, pri_mask;
 	gfx_element *gfx = machine.gfx[region];
 
-	UINT32		*source	= sprram_top;
-	const UINT32	*finish	= sprram_top + (sprram_size - 0x10) / 4;
+	UINT32      *source = sprram_top;
+	const UINT32    *finish = sprram_top + (sprram_size - 0x10) / 4;
 
 
 	if (state->m_ms32_reverse_sprite_order == 1)
 	{
-		source	= sprram_top + (sprram_size - 0x10) / 4;
-		finish	= sprram_top;
+		source  = sprram_top + (sprram_size - 0x10) / 4;
+		finish  = sprram_top;
 	}
 
 
 	for (;state->m_ms32_reverse_sprite_order ? (source>=finish) : (source<finish); state->m_ms32_reverse_sprite_order ? (source-=4) : (source+=4))
 	{
-		attr	=	source[ 0 ];
+		attr    =   source[ 0 ];
 
-		if ((attr & 0x0004) == 0)			continue;
+		if ((attr & 0x0004) == 0)           continue;
 
-		flipx	=	attr & 1;
-		flipy	=	attr & 2;
+		flipx   =   attr & 1;
+		flipy   =   attr & 2;
 
 		pri = (attr >> 4)&0xf;
 
-		code	=	source[ 1 ];
-		color	=	source[ 2 ];
+		code    =   source[ 1 ];
+		color   =   source[ 2 ];
 
-		tx		=	(code >> 0) & 0xff;
-		ty		=	(code >> 8) & 0xff;
+		tx      =   (code >> 0) & 0xff;
+		ty      =   (code >> 8) & 0xff;
 
-		code	=	(color & 0x0fff);
+		code    =   (color & 0x0fff);
 
-		color	=	(color >> 12) & 0xf;
+		color   =   (color >> 12) & 0xf;
 
-		size	=	source[ 3 ];
+		size    =   source[ 3 ];
 
-		xsize	=	((size >> 0) & 0xff) + 1;
-		ysize	=	((size >> 8) & 0xff) + 1;
+		xsize   =   ((size >> 0) & 0xff) + 1;
+		ysize   =   ((size >> 8) & 0xff) + 1;
 
-		sy		=	source[ 4 ];
-		sx		=	source[ 5 ];
+		sy      =   source[ 4 ];
+		sx      =   source[ 5 ];
 
-		sx		=	(sx & 0x3ff) - (sx & 0x400);
-		sy		=	(sy & 0x1ff) - (sy & 0x200);
+		sx      =   (sx & 0x3ff) - (sx & 0x400);
+		sy      =   (sy & 0x1ff) - (sy & 0x200);
 
-		xzoom	=	(source[ 6 ]&0xffff);
-		yzoom	=	(source[ 7 ]&0xffff);
+		xzoom   =   (source[ 6 ]&0xffff);
+		yzoom   =   (source[ 7 ]&0xffff);
 
-		if (!yzoom || !xzoom)				continue;
+		if (!yzoom || !xzoom)               continue;
 
 		yzoom = 0x1000000/yzoom;
 		xzoom = 0x1000000/xzoom;
@@ -498,7 +498,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				flipx, flipy,
 				sx,sy,
 				xzoom, yzoom, machine.priority_bitmap,pri_mask, 0);
-	}	/* end sprite loop */
+	}   /* end sprite loop */
 }
 
 
@@ -538,7 +538,7 @@ UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_i
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap.fill(0, cliprect);	/* bg color */
+	bitmap.fill(0, cliprect);   /* bg color */
 
 
 	m_ms32_bg_tilemap[0]->set_scrollx(0, m_ms32_bg0_scroll[0x00/4] + m_ms32_bg0_scroll[0x08/4] + 0x10 );
@@ -562,7 +562,7 @@ UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap.fill(0x8000+0, cliprect);	/* bg color */
+	bitmap.fill(0x8000+0, cliprect);    /* bg color */
 
 
 	m_ms32_bg_tilemap[1]->set_scrollx(0, m_ms32_bg1_scroll[0x00/4] + m_ms32_bg1_scroll[0x08/4] + 0x10 );
@@ -1358,13 +1358,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(bnstars_state::ms32_interrupt)
 	if( scanline == 0 ) irq_raise(machine(), 10);
 	if( scanline == 8)  irq_raise(machine(), 9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
-       kirarast needs it too, at least 8 per frame, but waits for a variable amount
-       47pi2 needs ?? per frame (otherwise it hangs when you lose)
-       in different points. Could this be a raster interrupt?
-       Other games using it but not needing it to work:
-       desertwr
-       p47aces
-       */
+	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
+	   47pi2 needs ?? per frame (otherwise it hangs when you lose)
+	   in different points. Could this be a raster interrupt?
+	   Other games using it but not needing it to work:
+	   desertwr
+	   p47aces
+	   */
 	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(machine(), 0);
 }
 

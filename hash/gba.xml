@@ -2401,7 +2401,7 @@
 		<description>Aleck Bordon Adventure - Tower &amp; Shaft Advance (Jpn)</description>
 		<year>2004</year>
 		<publisher>Aruze</publisher>
-		<info name="serial" value="AGB-BABJ	"/>
+		<info name="serial" value="AGB-BABJ "/>
 		<info name="release" value="20041126"/>
 		<info name="alt_title" value="アレックボードンアドベンチャー タワー&amp;シャフト アドバンス"/>
 		<part name="cart" interface="gba_cart">
@@ -4994,7 +4994,7 @@
 		<description>Bouken-ou Beet - Busters Road (Jpn)</description>
 		<year>2004</year>
 		<publisher>Bandai</publisher>
-		<info name="serial" value="AGB-BOVJ	"/>
+		<info name="serial" value="AGB-BOVJ "/>
 		<info name="release" value="20050120"/>
 		<info name="alt_title" value="冒険王ビィト バスターズロード"/>
 		<part name="cart" interface="gba_cart">
@@ -8275,7 +8275,7 @@
 		<year>200?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb_type" value="GBA-EEPROM-4K" />	<!-- or 64K?? or none?? -->
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />   <!-- or 64K?? or none?? -->
 			<dataarea name="rom" size="12277472">
 				<rom name="diddy kong pilot.bin" size="12277472" crc="057dc388" sha1="0cb385781742c25bf9d4cbeae8e83f7750af48db" offset="000000" />
 			</dataarea>

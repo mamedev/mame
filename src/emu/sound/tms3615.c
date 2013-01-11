@@ -1,22 +1,22 @@
 #include "emu.h"
 #include "tms3615.h"
 
-#define VMIN	0x0000
-#define VMAX	0x7fff
+#define VMIN    0x0000
+#define VMAX    0x7fff
 
 #define TONES 13
 
 static const int divisor[TONES] = { 478, 451, 426, 402, 379, 358, 338, 319, 301, 284, 268, 253, 239 };
 
 struct tms_state {
-	sound_stream *channel;	/* returned by stream_create() */
-	int samplerate; 		/* output sample rate */
-	int basefreq;			/* chip's base frequency */
-	int counter8[TONES];	/* tone frequency counter for 8' */
-	int counter16[TONES];	/* tone frequency counter for 16'*/
-	int output8;			/* output signal bits for 8' */
-	int output16;			/* output signal bits for 16' */
-	int enable; 			/* mask which tones to play */
+	sound_stream *channel;  /* returned by stream_create() */
+	int samplerate;         /* output sample rate */
+	int basefreq;           /* chip's base frequency */
+	int counter8[TONES];    /* tone frequency counter for 8' */
+	int counter16[TONES];   /* tone frequency counter for 16'*/
+	int output8;            /* output signal bits for 8' */
+	int output16;           /* output signal bits for 16' */
+	int enable;             /* mask which tones to play */
 };
 
 INLINE tms_state *get_safe_token(device_t *device)
@@ -71,8 +71,8 @@ static STREAM_UPDATE( tms3615_sound_update )
 			}
 		}
 
-        *buffer8++ = sum8 / TONES;
-        *buffer16++ = sum16 / TONES;
+		*buffer8++ = sum8 / TONES;
+		*buffer16++ = sum16 / TONES;
 	}
 
 	tms->enable = 0;
@@ -97,7 +97,7 @@ const device_type TMS3615 = &device_creator<tms3615_device>;
 
 tms3615_device::tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS3615, "TMS3615", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tms_state);
 }
@@ -130,5 +130,3 @@ void tms3615_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

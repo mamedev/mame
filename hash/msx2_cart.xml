@@ -701,7 +701,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
-			<feature name="sram" value="CXK5864PN-12L" />	<!-- battery backed -->
+			<feature name="sram" value="CXK5864PN-12L" />   <!-- battery backed -->
 			<dataarea name="rom" size="524288">
 				<rom name="hn62404p" size="524288" crc="8bc34dca" sha1="6420d61002da325403fcb6f41afb1d348eeba3b4" offset="0" />
 			</dataarea>
@@ -1321,7 +1321,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="天国よいとこ" />
 		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TAS-1M008S" />	<!-- Also seen with TAS-1M016S with 16KB mapper? -->
+			<feature name="pcb" value="TAS-1M008S" />   <!-- Also seen with TAS-1M016S with 16KB mapper? -->
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh23109a" size="131072" crc="7e637801" sha1="00c70cf37c71cb8f99567ae407ff6dd52c4774c2" offset="0" />

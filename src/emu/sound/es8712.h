@@ -14,7 +14,7 @@ void es8712_set_frequency(device_t *device, int frequency);
 DECLARE_WRITE8_DEVICE_HANDLER( es8712_w );
 
 class es8712_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

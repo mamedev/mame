@@ -60,39 +60,39 @@ VIDEO_START_MEMBER(thunderj_state,thunderj)
 {
 	static const atarimo_desc modesc =
 	{
-		1,					/* index to which gfx system */
-		1,					/* number of motion object banks */
-		1,					/* are the entries linked? */
-		0,					/* are the entries split? */
-		1,					/* render in reverse order? */
-		0,					/* render in swapped X/Y order? */
-		0,					/* does the neighbor bit affect the next object? */
-		8,					/* pixels per SLIP entry (0 for no-slip) */
-		0,					/* pixel offset for SLIPs */
-		0,					/* maximum number of links to visit/scanline (0=all) */
+		1,                  /* index to which gfx system */
+		1,                  /* number of motion object banks */
+		1,                  /* are the entries linked? */
+		0,                  /* are the entries split? */
+		1,                  /* render in reverse order? */
+		0,                  /* render in swapped X/Y order? */
+		0,                  /* does the neighbor bit affect the next object? */
+		8,                  /* pixels per SLIP entry (0 for no-slip) */
+		0,                  /* pixel offset for SLIPs */
+		0,                  /* maximum number of links to visit/scanline (0=all) */
 
-		0x100,				/* base palette entry */
-		0x100,				/* maximum number of colors */
-		0,					/* transparent pen index */
+		0x100,              /* base palette entry */
+		0x100,              /* maximum number of colors */
+		0,                  /* transparent pen index */
 
-		{{ 0x03ff,0,0,0 }},	/* mask for the link */
-		{{ 0 }},			/* mask for the graphics bank */
-		{{ 0,0x7fff,0,0 }},	/* mask for the code index */
-		{{ 0 }},			/* mask for the upper code index */
-		{{ 0,0,0x000f,0 }},	/* mask for the color */
-		{{ 0,0,0xff80,0 }},	/* mask for the X position */
-		{{ 0,0,0,0xff80 }},	/* mask for the Y position */
-		{{ 0,0,0,0x0070 }},	/* mask for the width, in tiles*/
-		{{ 0,0,0,0x0007 }},	/* mask for the height, in tiles */
-		{{ 0,0x8000,0,0 }},	/* mask for the horizontal flip */
-		{{ 0 }},			/* mask for the vertical flip */
-		{{ 0,0,0x0070,0 }},	/* mask for the priority */
-		{{ 0 }},			/* mask for the neighbor */
-		{{ 0 }},			/* mask for absolute coordinates */
+		{{ 0x03ff,0,0,0 }}, /* mask for the link */
+		{{ 0 }},            /* mask for the graphics bank */
+		{{ 0,0x7fff,0,0 }}, /* mask for the code index */
+		{{ 0 }},            /* mask for the upper code index */
+		{{ 0,0,0x000f,0 }}, /* mask for the color */
+		{{ 0,0,0xff80,0 }}, /* mask for the X position */
+		{{ 0,0,0,0xff80 }}, /* mask for the Y position */
+		{{ 0,0,0,0x0070 }}, /* mask for the width, in tiles*/
+		{{ 0,0,0,0x0007 }}, /* mask for the height, in tiles */
+		{{ 0,0x8000,0,0 }}, /* mask for the horizontal flip */
+		{{ 0 }},            /* mask for the vertical flip */
+		{{ 0,0,0x0070,0 }}, /* mask for the priority */
+		{{ 0 }},            /* mask for the neighbor */
+		{{ 0 }},            /* mask for absolute coordinates */
 
-		{{ 0 }},			/* mask for the special value */
-		0,					/* resulting value to indicate "special" */
-		NULL				/* callback routine for special entries */
+		{{ 0 }},            /* mask for the special value */
+		0,                  /* resulting value to indicate "special" */
+		NULL                /* callback routine for special entries */
 	};
 
 	/* initialize the playfield */
@@ -148,63 +148,63 @@ UINT32 thunderj_state::screen_update_thunderj(screen_device &screen, bitmap_ind1
 				if (mo[x])
 				{
 					/* verified from the GALs on the real PCB; equations follow
-                     *
-                     *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
-                     *      PF/M=MPX0*!MPX1*!MPX2*!MPX3*!MPX4*!MPX5*!MPX6*!MPX7
-                     *          +PFX3*PFX8*PFX9*!MPR0
-                     *          +PFX3*PFX8*!MPR0*!MPR1
-                     *          +PFX3*PFX9*!MPR1
-                     *
-                     *      --- CS1 is 1 if the playfield should be displayed
-                     *      CS1=PF/M*!ALBG*!APIX0*!APIX1
-                     *         +!MPX0*!MPX1*!MPX2*!MPX3*!ALBG*!APIX0*!APIX1
-                     *
-                     *      --- CS0 is 1 if the MOs should be displayed
-                     *      CS0=!PF/M*MPX0*!ALBG*!APIX0*!APIX1
-                     *         +!PF/M*MPX1*!ALBG*!APIX0*!APIX1
-                     *         +!PF/M*MPX2*!ALBG*!APIX0*!APIX1
-                     *         +!PF/M*MPX3*!ALBG*!APIX0*!APIX1
-                     *
-                     *      --- CRA10 is the 0x200 bit of the color RAM index; set if pf is displayed
-                     *      CRA10:=CS1
-                     *
-                     *      --- CRA9 is the 0x100 bit of the color RAM index; set if mo is displayed
-                     *          or if the playfield selected is playfield #2
-                     *      CRA9:=PFXS*CS1
-                     *          +!CS1*CS0
-                     *
-                     *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
-                     *      CRA8:=CS1*PFX7
-                     *          +!CS1*MPX7*CS0
-                     *          +!CS1*!CS0*ALC4
-                     *
-                     *      CRA7:=CS1*PFX6
-                     *          +!CS1*MPX6*CS0
-                     *
-                     *      CRA6:=CS1*PFX5
-                     *          +MPX5*!CS1*CS0
-                     *          +!CS1*!CS0*ALC3
-                     *
-                     *      CRA5:=CS1*PFX4
-                     *          +MPX4*!CS1*CS0
-                     *          +!CS1*ALC2*!CS0
-                     *
-                     *      CRA4:=CS1*PFX3
-                     *          +!CS1*MPX3*CS0
-                     *          +!CS1*!CS0*ALC1
-                     *
-                     *      CRA3:=CS1*PFX2
-                     *          +MPX2*!CS1*CS0
-                     *          +!CS1*!CS0*ALC0
-                     *
-                     *      CRA2:=CS1*PFX1
-                     *          +MPX1*!CS1*CS0
-                     *          +!CS1*!CS0*APIX1
-                     *
-                     *      CRA1:=CS1*PFX0
-                     *          +MPX0*!CS1*CS0
-                     *          +!CS1*!CS0*APIX0
-                     */
+					 *
+					 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
+					 *      PF/M=MPX0*!MPX1*!MPX2*!MPX3*!MPX4*!MPX5*!MPX6*!MPX7
+					 *          +PFX3*PFX8*PFX9*!MPR0
+					 *          +PFX3*PFX8*!MPR0*!MPR1
+					 *          +PFX3*PFX9*!MPR1
+					 *
+					 *      --- CS1 is 1 if the playfield should be displayed
+					 *      CS1=PF/M*!ALBG*!APIX0*!APIX1
+					 *         +!MPX0*!MPX1*!MPX2*!MPX3*!ALBG*!APIX0*!APIX1
+					 *
+					 *      --- CS0 is 1 if the MOs should be displayed
+					 *      CS0=!PF/M*MPX0*!ALBG*!APIX0*!APIX1
+					 *         +!PF/M*MPX1*!ALBG*!APIX0*!APIX1
+					 *         +!PF/M*MPX2*!ALBG*!APIX0*!APIX1
+					 *         +!PF/M*MPX3*!ALBG*!APIX0*!APIX1
+					 *
+					 *      --- CRA10 is the 0x200 bit of the color RAM index; set if pf is displayed
+					 *      CRA10:=CS1
+					 *
+					 *      --- CRA9 is the 0x100 bit of the color RAM index; set if mo is displayed
+					 *          or if the playfield selected is playfield #2
+					 *      CRA9:=PFXS*CS1
+					 *          +!CS1*CS0
+					 *
+					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
+					 *      CRA8:=CS1*PFX7
+					 *          +!CS1*MPX7*CS0
+					 *          +!CS1*!CS0*ALC4
+					 *
+					 *      CRA7:=CS1*PFX6
+					 *          +!CS1*MPX6*CS0
+					 *
+					 *      CRA6:=CS1*PFX5
+					 *          +MPX5*!CS1*CS0
+					 *          +!CS1*!CS0*ALC3
+					 *
+					 *      CRA5:=CS1*PFX4
+					 *          +MPX4*!CS1*CS0
+					 *          +!CS1*ALC2*!CS0
+					 *
+					 *      CRA4:=CS1*PFX3
+					 *          +!CS1*MPX3*CS0
+					 *          +!CS1*!CS0*ALC1
+					 *
+					 *      CRA3:=CS1*PFX2
+					 *          +MPX2*!CS1*CS0
+					 *          +!CS1*!CS0*ALC0
+					 *
+					 *      CRA2:=CS1*PFX1
+					 *          +MPX1*!CS1*CS0
+					 *          +!CS1*!CS0*APIX1
+					 *
+					 *      CRA1:=CS1*PFX0
+					 *          +MPX0*!CS1*CS0
+					 *          +!CS1*!CS0*APIX0
+					 */
 					int mopriority = mo[x] >> ATARIMO_PRIORITY_SHIFT;
 					int pfm = 0;
 

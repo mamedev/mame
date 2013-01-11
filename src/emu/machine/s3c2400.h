@@ -16,8 +16,8 @@
 #define S3C2400_TAG "s3c2400"
 
 #define MCFG_S3C2400_ADD(_tag, _clock, _config) \
-    MCFG_DEVICE_ADD(_tag, S3C2400, _clock) \
-    MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_ADD(_tag, S3C2400, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define S3C2400_INTERFACE(name) \
 	const s3c2400_interface(name) =
@@ -372,19 +372,19 @@ void s3c2400_uart_fifo_w( device_t *device, int uart, UINT8 data);
 #define S3C24XX_INT_EINT1      1
 #define S3C24XX_INT_EINT0      0
 
-#define S3C24XX_BPPMODE_STN_01		0x00
-#define S3C24XX_BPPMODE_STN_02		0x01
-#define S3C24XX_BPPMODE_STN_04		0x02
-#define S3C24XX_BPPMODE_STN_08		0x03
-#define S3C24XX_BPPMODE_STN_12_P	0x04
-#define S3C24XX_BPPMODE_STN_12_U	0x05
-#define S3C24XX_BPPMODE_STN_16		0x06
-#define S3C24XX_BPPMODE_TFT_01		0x08
-#define S3C24XX_BPPMODE_TFT_02		0x09
-#define S3C24XX_BPPMODE_TFT_04		0x0A
-#define S3C24XX_BPPMODE_TFT_08		0x0B
-#define S3C24XX_BPPMODE_TFT_16		0x0C
-#define S3C24XX_BPPMODE_TFT_24		0x0D
+#define S3C24XX_BPPMODE_STN_01      0x00
+#define S3C24XX_BPPMODE_STN_02      0x01
+#define S3C24XX_BPPMODE_STN_04      0x02
+#define S3C24XX_BPPMODE_STN_08      0x03
+#define S3C24XX_BPPMODE_STN_12_P    0x04
+#define S3C24XX_BPPMODE_STN_12_U    0x05
+#define S3C24XX_BPPMODE_STN_16      0x06
+#define S3C24XX_BPPMODE_TFT_01      0x08
+#define S3C24XX_BPPMODE_TFT_02      0x09
+#define S3C24XX_BPPMODE_TFT_04      0x0A
+#define S3C24XX_BPPMODE_TFT_08      0x0B
+#define S3C24XX_BPPMODE_TFT_16      0x0C
+#define S3C24XX_BPPMODE_TFT_24      0x0D
 
 #define S3C24XX_PNRMODE_STN_04_DS  0
 #define S3C24XX_PNRMODE_STN_04_SS  1

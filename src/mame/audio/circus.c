@@ -13,7 +13,7 @@ static const char *const circus_sample_names[] =
 
 const samples_interface circus_samples_interface =
 {
-	3,	/* 3 channels */
+	3,  /* 3 channels */
 	circus_sample_names
 };
 
@@ -26,7 +26,7 @@ static const char *const crash_sample_names[] =
 
 const samples_interface crash_samples_interface =
 {
-	1,	/* 1 channel */
+	1,  /* 1 channel */
 	crash_sample_names
 };
 
@@ -42,7 +42,7 @@ static const char *const ripcord_sample_names[] =
 
 const samples_interface ripcord_samples_interface =
 {
-	4,	/* 4 channels */
+	4,  /* 4 channels */
 	ripcord_sample_names
 };
 
@@ -59,14 +59,14 @@ static const char *const robotbwl_sample_names[] =
 
 const samples_interface robotbwl_samples_interface =
 {
-	5,	/* 5 channels */
+	5,  /* 5 channels */
 	robotbwl_sample_names
 };
 
 /* Nodes - Inputs */
-#define CIRCUS_MUSIC_BIT	NODE_01
+#define CIRCUS_MUSIC_BIT    NODE_01
 /* Nodes - Sounds */
-#define CIRCUS_MUSIC_SND	NODE_10
+#define CIRCUS_MUSIC_SND    NODE_10
 
 DISCRETE_SOUND_START(circus)
 	/************************************************/
@@ -77,7 +77,7 @@ DISCRETE_SOUND_START(circus)
 	/************************************************/
 	/* Music is just a 1 bit DAC                    */
 	/************************************************/
-	DISCRETE_CRFILTER(CIRCUS_MUSIC_SND, CIRCUS_MUSIC_BIT, RES_K(50), CAP_U(.1))	/* 50K is just an average value */
+	DISCRETE_CRFILTER(CIRCUS_MUSIC_SND, CIRCUS_MUSIC_BIT, RES_K(50), CAP_U(.1)) /* 50K is just an average value */
 
 	DISCRETE_OUTPUT(CIRCUS_MUSIC_SND, 1)
 DISCRETE_SOUND_END
@@ -94,26 +94,26 @@ static const discrete_mixer_desc crash_mixer =
 static const discrete_555_desc crash_beeper_555m =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
 static const discrete_555_desc crash_beeper_555a =
 {
 	DISC_555_OUT_SQW | DISC_555_OUT_DC,
-	5,		// B+ voltage of 555
+	5,      // B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
 /* Nodes - Inputs */
-#define CRASH_MUSIC_BIT		NODE_01
-#define CRASH_BEEPER_EN		NODE_02
+#define CRASH_MUSIC_BIT     NODE_01
+#define CRASH_BEEPER_EN     NODE_02
 /* Nodes - Adjusters */
-#define CRASH_R63			NODE_10
-#define CRASH_R39			NODE_11
+#define CRASH_R63           NODE_10
+#define CRASH_R39           NODE_11
 /* Nodes - Sounds */
-#define CRASH_MUSIC_SND		NODE_20
-#define CRASH_BEEPER_SND	NODE_21
+#define CRASH_MUSIC_SND     NODE_20
+#define CRASH_BEEPER_SND    NODE_21
 
 DISCRETE_SOUND_START(crash)
 	/************************************************/
@@ -146,9 +146,9 @@ DISCRETE_SOUND_START(crash)
 DISCRETE_SOUND_END
 
 /* Nodes - Inputs */
-#define ROBOTBWL_MUSIC_BIT		NODE_01
+#define ROBOTBWL_MUSIC_BIT      NODE_01
 /* Nodes - Sounds */
-#define ROBOTBWL_MUSIC_SND		NODE_10
+#define ROBOTBWL_MUSIC_SND      NODE_10
 
 DISCRETE_SOUND_START(robotbwl)
 	/************************************************/
@@ -179,8 +179,8 @@ WRITE8_MEMBER(circus_state::circus_clown_z_w)
 	/* Bits 4-6 enable/disable trigger different events */
 	switch (m_game_id)
 	{
-		case 1:	/* circus */
-		case 4:	/* ripcord */
+		case 1: /* circus */
+		case 4: /* ripcord */
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
@@ -216,28 +216,28 @@ WRITE8_MEMBER(circus_state::circus_clown_z_w)
 			}
 			break;
 
-		case 2:	/* robotbwl */
-			discrete_sound_w(m_discrete, space, ROBOTBWL_MUSIC_BIT, data & 0x08);	/* Footsteps */
+		case 2: /* robotbwl */
+			discrete_sound_w(m_discrete, space, ROBOTBWL_MUSIC_BIT, data & 0x08);   /* Footsteps */
 
-			if (data & 0x40)	/* Hit */
+			if (data & 0x40)    /* Hit */
 				m_samples->start(0, 0);
 
-			if (data & 0x20)	/* Roll */
+			if (data & 0x20)    /* Roll */
 				m_samples->start(1, 1);
 
-			if (data & 0x10)	/* Ball Drop */
+			if (data & 0x10)    /* Ball Drop */
 				m_samples->start(2, 2);
 
-			if (data & 0x02)	/* Demerit */
+			if (data & 0x02)    /* Demerit */
 				m_samples->start(3, 3);
 
-			if (data & 0x01)	/* Reward */
+			if (data & 0x01)    /* Reward */
 				m_samples->start(4, 4);
 
 			// if (data & 0x04) /* Invert */
 			break;
 
-		case 3:	/* crash */
+		case 3: /* crash */
 			/* Only the crash can be done with a sample */
 			switch ((data & 0x70) >> 4)
 			{

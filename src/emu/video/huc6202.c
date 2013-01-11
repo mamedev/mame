@@ -75,7 +75,7 @@ READ16_MEMBER( huc6202_device::next_pixel )
 	}
 	else
 	{
-		UINT8	prio_index = m_prio_map[ m_map_index ];
+		UINT8   prio_index = m_prio_map[ m_map_index ];
 
 		if ( m_prio[ prio_index ].dev0_enabled && data_0 != huc6270_device::HUC6270_SPRITE )
 		{
@@ -83,11 +83,11 @@ READ16_MEMBER( huc6202_device::next_pixel )
 			{
 				switch ( m_prio[ prio_index ].prio_type )
 				{
-				case 0:		/* Back - BG1 SP1 BG0 SP0 - Front */
+				case 0:     /* Back - BG1 SP1 BG0 SP0 - Front */
 					data = ( data_0 & 0x0F ) ? data_0 : data_1;
 					break;
 
-				case 1:		/* Back - BG1 BG0 SP1 SP0 - Front */
+				case 1:     /* Back - BG1 BG0 SP1 SP0 - Front */
 					if ( data_0 > huc6270_device::HUC6270_SPRITE )
 					{
 						/* Device 0 sprite */
@@ -105,7 +105,7 @@ READ16_MEMBER( huc6202_device::next_pixel )
 					}
 					break;
 
-				case 2:		/* Back - BG0 + SP1 => BG0 - Front
+				case 2:     /* Back - BG0 + SP1 => BG0 - Front
                                       BG0 + BG1 => BG0
                                       BG1 + SP0 => BG1
                                       SP0 + SP1 => SP0
@@ -138,7 +138,7 @@ READ16_MEMBER( huc6202_device::next_pixel )
 					}
 					break;
 
-				case 3:		/* ?? */
+				case 3:     /* ?? */
 					break;
 				}
 			}
@@ -191,7 +191,7 @@ READ8_MEMBER( huc6202_device::read )
 
 	switch ( offset & 7 )
 	{
-		case 0x00:	/* Priority register #0 */
+		case 0x00:  /* Priority register #0 */
 			data = ( m_prio[0].prio_type << 2 ) |
 				( m_prio[0].dev0_enabled ? 0x01 : 0 ) |
 				( m_prio[0].dev1_enabled ? 0x02 : 0 ) |
@@ -200,7 +200,7 @@ READ8_MEMBER( huc6202_device::read )
 				( m_prio[1].dev1_enabled ? 0x20 : 0 );
 			break;
 
-		case 0x01:	/* Priority register #1 */
+		case 0x01:  /* Priority register #1 */
 			data = ( m_prio[2].prio_type << 2 ) |
 				( m_prio[2].dev0_enabled ? 0x01 : 0 ) |
 				( m_prio[2].dev1_enabled ? 0x02 : 0 ) |
@@ -209,19 +209,19 @@ READ8_MEMBER( huc6202_device::read )
 				( m_prio[3].dev1_enabled ? 0x20 : 0 );
 			break;
 
-		case 0x02:	/* Window 1 LSB */
+		case 0x02:  /* Window 1 LSB */
 			data = m_window1 & 0xFF;
 			break;
 
-		case 0x03:	/* Window 1 MSB */
+		case 0x03:  /* Window 1 MSB */
 			data = ( m_window1 >> 8 ) & 0xFF;
 			break;
 
-		case 0x04:	/* Window 2 LSB */
+		case 0x04:  /* Window 2 LSB */
 			data = m_window2 & 0xFF;
 			break;
 
-		case 0x05:	/* Window 2 MSB */
+		case 0x05:  /* Window 2 MSB */
 			data = ( m_window2 >> 8 ) & 0xFF;
 			break;
 	}
@@ -234,7 +234,7 @@ WRITE8_MEMBER( huc6202_device::write )
 {
 	switch ( offset & 7 )
 	{
-		case 0x00:	/* Priority register #0 */
+		case 0x00:  /* Priority register #0 */
 			m_prio[0].dev0_enabled = data & 0x01;
 			m_prio[0].dev1_enabled = data & 0x02;
 			m_prio[0].prio_type = ( data >> 2 ) & 0x03;
@@ -243,7 +243,7 @@ WRITE8_MEMBER( huc6202_device::write )
 			m_prio[1].prio_type = ( data >> 6 ) & 0x03;
 			break;
 
-		case 0x01:	/* Priority register #1 */
+		case 0x01:  /* Priority register #1 */
 			m_prio[2].dev0_enabled = data & 0x01;
 			m_prio[2].dev1_enabled = data & 0x02;
 			m_prio[2].prio_type = ( data >> 2 ) & 0x03;
@@ -252,27 +252,27 @@ WRITE8_MEMBER( huc6202_device::write )
 			m_prio[3].prio_type = ( data >> 6 ) & 0x03;
 			break;
 
-		case 0x02:	/* Window 1 LSB */
+		case 0x02:  /* Window 1 LSB */
 			m_window1 = ( m_window1 & 0xFF00 ) | data;
 			m_map_dirty = 1;
 			break;
 
-		case 0x03:	/* Window 1 MSB */
+		case 0x03:  /* Window 1 MSB */
 			m_window1 = ( ( m_window1 & 0x00FF ) | ( data << 8 ) ) & 0x3FF;
 			m_map_dirty = 1;
 			break;
 
-		case 0x04:	/* Window 2 LSB */
+		case 0x04:  /* Window 2 LSB */
 			m_window2 = ( m_window2 & 0xFF00 ) | data;
 			m_map_dirty = 1;
 			break;
 
-		case 0x05:	/* Window 2 MSB */
+		case 0x05:  /* Window 2 MSB */
 			m_window2 = ( ( m_window2 & 0x00FF ) | ( data << 8 ) ) & 0x3FF;
 			m_map_dirty = 1;
 			break;
 
-		case 0x06:	/* I/O select */
+		case 0x06:  /* I/O select */
 			m_io_device = data & 0x01;
 			break;
 	}
@@ -377,4 +377,3 @@ void huc6202_device::device_reset()
 	m_window2 = 0;
 	m_io_device = 0;
 }
-

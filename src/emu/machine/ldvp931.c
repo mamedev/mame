@@ -54,8 +54,8 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_COMMANDS				0
-#define LOG_PORTS					0
+#define LOG_COMMANDS                0
+#define LOG_PORTS                   0
 
 
 
@@ -64,8 +64,8 @@
 //**************************************************************************
 
 // scanning speeds
-#define SCAN_SPEED						(2000 / 30)			// 2000 frames/second
-#define SCAN_FAST_SPEED					(4000 / 30)			// 4000 frames/second
+#define SCAN_SPEED                      (2000 / 30)         // 2000 frames/second
+#define SCAN_FAST_SPEED                 (4000 / 30)         // 4000 frames/second
 
 
 
@@ -117,22 +117,22 @@ ROM_END
 
 phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, PHILLIPS_22VP931, "Phillips 22VP931", "22vp931", tag, owner, clock),
-	  m_i8049_cpu(*this, "vp931"),
-	  m_tracktimer(NULL),
-	  m_i8049_out0(0),
-	  m_i8049_out1(0),
-	  m_i8049_port1(0),
-	  m_daticval(0),
-	  m_daticerp(0),
-	  m_datastrobe(0),
-	  m_fromcontroller(0),
-	  m_fromcontroller_pending(false),
-	  m_tocontroller(0),
-	  m_tocontroller_pending(false),
-	  m_trackdir(0),
-	  m_trackstate(0),
-	  m_cmdcount(0),
-	  m_advanced(0)
+		m_i8049_cpu(*this, "vp931"),
+		m_tracktimer(NULL),
+		m_i8049_out0(0),
+		m_i8049_out1(0),
+		m_i8049_port1(0),
+		m_daticval(0),
+		m_daticerp(0),
+		m_datastrobe(0),
+		m_fromcontroller(0),
+		m_fromcontroller_pending(false),
+		m_tocontroller(0),
+		m_tocontroller_pending(false),
+		m_trackdir(0),
+		m_trackstate(0),
+		m_cmdcount(0),
+		m_advanced(0)
 {
 }
 
@@ -370,15 +370,15 @@ INT32 phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldn
 WRITE8_MEMBER( phillips_22vp931_device::i8049_output0_w )
 {
 	/*
-        $80 = n/c
-        $40 = LED (?) -> C335
-        $20 = LED (?)
-        $10 = LED (?) -> CX
-        $08 = EJECT
-        $04 = inverted -> AUDIO MUTE II
-        $02 = inverted -> AUDIO MUTE I
-        $01 = inverted -> VIDEO MUTE
-    */
+	    $80 = n/c
+	    $40 = LED (?) -> C335
+	    $20 = LED (?)
+	    $10 = LED (?) -> CX
+	    $08 = EJECT
+	    $04 = inverted -> AUDIO MUTE II
+	    $02 = inverted -> AUDIO MUTE I
+	    $01 = inverted -> VIDEO MUTE
+	*/
 
 	if (LOG_PORTS && (m_i8049_out0 ^ data) & 0xff)
 	{
@@ -408,15 +408,15 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output0_w )
 WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 {
 	/*
-        $80 = n/c
-        $40 = n/c
-        $20 = n/c
-        $10 = n/c
-        $08 = inverted -> SMS
-        $04 = inverted -> SSS
-        $02 = inverted -> SCAN CMD
-        $01 = OSM
-    */
+	    $80 = n/c
+	    $40 = n/c
+	    $20 = n/c
+	    $10 = n/c
+	    $08 = inverted -> SMS
+	    $04 = inverted -> SSS
+	    $02 = inverted -> SCAN CMD
+	    $01 = OSM
+	*/
 
 	INT32 speed = 0;
 
@@ -452,9 +452,9 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 WRITE8_MEMBER( phillips_22vp931_device::i8049_lcd_w )
 {
 	/*
-        Frame number is written as 5 digits here; however, it is not actually
-        connected
-    */
+	    Frame number is written as 5 digits here; however, it is not actually
+	    connected
+	*/
 }
 
 
@@ -477,16 +477,16 @@ READ8_MEMBER( phillips_22vp931_device::i8049_unknown_r )
 READ8_MEMBER( phillips_22vp931_device::i8049_keypad_r )
 {
 	/*
-        From the code, this is apparently a vestigial keypad with basic controls:
-            $01 = play
-            $02 = still
-            $04 = jump 25 frames backward
-            $08 = jump 25 frames forward
-            $10 = search for frame 50(?)
-            $20 = search for frame 350(?)
-            $40 = reset
-            $80 = play reverse
-    */
+	    From the code, this is apparently a vestigial keypad with basic controls:
+	        $01 = play
+	        $02 = still
+	        $04 = jump 25 frames backward
+	        $08 = jump 25 frames forward
+	        $10 = search for frame 50(?)
+	        $20 = search for frame 350(?)
+	        $40 = reset
+	        $80 = play reverse
+	*/
 	return 0x00;
 }
 
@@ -542,10 +542,10 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_to_controller_w )
 READ8_MEMBER( phillips_22vp931_device::i8049_port1_r )
 {
 	/*
-        $80 = P17 = (in) unsure
-        $40 = P16 = (in) /ERP from datic circuit
-        $20 = P15 = (in) D105
-    */
+	    $80 = P17 = (in) unsure
+	    $40 = P16 = (in) /ERP from datic circuit
+	    $20 = P15 = (in) D105
+	*/
 
 	UINT8 result = 0x00;
 	if (!m_daticerp)
@@ -561,12 +561,12 @@ READ8_MEMBER( phillips_22vp931_device::i8049_port1_r )
 WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
 {
 	/*
-        $10 = P14 = (out) D104 -> /SPEED
-        $08 = P13 = (out) D103 -> /TIMER ENABLE
-        $04 = P12 = (out) D102 -> /REV
-        $02 = P11 = (out) D101 -> /FORW
-        $01 = P10 = (out) D100 -> some op-amp then to C334, B56, B332
-    */
+	    $10 = P14 = (out) D104 -> /SPEED
+	    $08 = P13 = (out) D103 -> /TIMER ENABLE
+	    $04 = P12 = (out) D102 -> /REV
+	    $02 = P11 = (out) D101 -> /FORW
+	    $01 = P10 = (out) D100 -> some op-amp then to C334, B56, B332
+	*/
 
 	if (LOG_PORTS && (m_i8049_port1 ^ data) & 0x1f)
 	{
@@ -632,10 +632,10 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
 READ8_MEMBER( phillips_22vp931_device::i8049_port2_r )
 {
 	/*
-        $80 = P27 = (in) set/reset latch; set by FOC LS, reset by IGR
-        $20 = P25 = (in) D125 -> 0 when data written to controller is preset, reset to 1 when read
-        $10 = P24 = (in) D124 -> 0 when data from controller is present, reset to 1 on a read
-    */
+	    $80 = P27 = (in) set/reset latch; set by FOC LS, reset by IGR
+	    $20 = P25 = (in) D125 -> 0 when data written to controller is preset, reset to 1 when read
+	    $10 = P24 = (in) D124 -> 0 when data from controller is present, reset to 1 on a read
+	*/
 
 	UINT8 result = 0x00;
 	if (!m_tocontroller_pending)
@@ -653,9 +653,9 @@ READ8_MEMBER( phillips_22vp931_device::i8049_port2_r )
 WRITE8_MEMBER( phillips_22vp931_device::i8049_port2_w )
 {
 	/*
-        $40 = P26 = (out) cleared while data is sent back & forth; set afterwards
-                    [Not actually connected, but this is done in the code]
-    */
+	    $40 = P26 = (out) cleared while data is sent back & forth; set afterwards
+	                [Not actually connected, but this is done in the code]
+	*/
 }
 
 

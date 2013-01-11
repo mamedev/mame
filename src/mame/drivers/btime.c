@@ -154,16 +154,16 @@ A few notes:
 enum
 {
 	AUDIO_ENABLE_NONE,
-	AUDIO_ENABLE_DIRECT,		/* via direct address in memory map */
-	AUDIO_ENABLE_AY8910			/* via ay-8910 port A */
+	AUDIO_ENABLE_DIRECT,        /* via direct address in memory map */
+	AUDIO_ENABLE_AY8910         /* via ay-8910 port A */
 };
 
 
 WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 {
 	/* for most games, this serves as the NMI enable for the audio CPU; however,
-       lnc and disco use bit 0 of the first AY-8910's port A instead; many other
-       games also write there in addition to this address */
+	   lnc and disco use bit 0 of the first AY-8910's port A instead; many other
+	   games also write there in addition to this address */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_DIRECT)
 	{
 		m_audio_nmi_enabled = data & 1;
@@ -210,11 +210,11 @@ static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM							/* background? */
-	AM_RANGE(0xd100, 0xd3ff) AM_RAM							/* ? */
+	AM_RANGE(0xd000, 0xd0ff) AM_RAM                         /* background? */
+	AM_RANGE(0xd100, 0xd3ff) AM_RAM                         /* ? */
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("bnj_bgram")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1")	/* mirror address used on high score name entry */
+	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1")   /* mirror address used on high score name entry */
 													/* screen */
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
@@ -275,12 +275,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")		/* this is just here to initialize the pointer */
+	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")      /* this is just here to initialize the pointer */
 	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("lnc_charbank")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP	/* IRQ ack??? */
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP /* IRQ ack??? */
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE(audio_command_w)
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(mmonkey_protection_r, mmonkey_protection_w)
@@ -455,9 +455,9 @@ static INPUT_PORTS_START( btime )
 	PORT_DIPNAME( 0x10, 0x00, "End of Level Pepper" ) PORT_DIPLOCATION("14D:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "14D:6" )	/* it should be OFF according to the manual */
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "14D:7" )	/* it should be OFF according to the manual */
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "14D:8" )	/* it should be OFF according to the manual */
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "14D:6" )   /* it should be OFF according to the manual */
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "14D:7" )   /* it should be OFF according to the manual */
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "14D:8" )   /* it should be OFF according to the manual */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cookrace )
@@ -606,9 +606,9 @@ static INPUT_PORTS_START( zoar )
 	PORT_DIPNAME( 0x10, 0x00, "Weapon Select" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "Manual" )
 	PORT_DIPSETTING(    0x10, "Auto" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )	/* These 3 switches have something to do with coinage  */
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )	/* See code at $d234. Feel free to figure them out     */
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )	/* Manual says to leave them OFF                       */
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )   /* These 3 switches have something to do with coinage  */
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )   /* See code at $d234. Feel free to figure them out     */
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )   /* Manual says to leave them OFF                       */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lnc )
@@ -649,7 +649,7 @@ static INPUT_PORTS_START( lnc )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x30, 0x30, "Test Mode" ) PORT_DIPLOCATION("SW1:5,6")	/* Manual says these bits are unused */
+	PORT_DIPNAME( 0x30, 0x30, "Test Mode" ) PORT_DIPLOCATION("SW1:5,6") /* Manual says these bits are unused */
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, "RAM Test Only" )
 	PORT_DIPSETTING(    0x20, "Watchdog Test Only" )
@@ -674,10 +674,10 @@ static INPUT_PORTS_START( lnc )
 	PORT_DIPNAME( 0x08, 0x08, "Game Speed" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "Slow" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW2:5" )	/* it should be OFF according to the manual */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:6" )	/* it should be OFF according to the manual */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:7" )	/* it should be OFF according to the manual */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )	/* it should be OFF according to the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW2:5" )    /* it should be OFF according to the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:6" )    /* it should be OFF according to the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:7" )    /* it should be OFF according to the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )    /* it should be OFF according to the manual */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wtennis )
@@ -792,7 +792,7 @@ static INPUT_PORTS_START( mmonkey )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x20, 0x00 )	/* almost certainly unused */
+	PORT_DIPUNUSED( 0x20, 0x00 )    /* almost certainly unused */
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
@@ -815,8 +815,8 @@ static INPUT_PORTS_START( mmonkey )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, "Level Skip Mode (Cheat)")
-	PORT_DIPUNUSED( 0x20, 0x00 )	/* almost certainly unused */
-	PORT_DIPUNUSED( 0x40, 0x00 )	/* almost certainly unused */
+	PORT_DIPUNUSED( 0x20, 0x00 )    /* almost certainly unused */
+	PORT_DIPUNUSED( 0x40, 0x00 )    /* almost certainly unused */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -894,9 +894,9 @@ static INPUT_PORTS_START( bnj )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("7D:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "7D:6" )	/* it should be OFF according to the manual */
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "7D:7" )	/* it should be OFF according to the manual */
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "7D:8" )	/* it should be OFF according to the manual */
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "7D:6" )    /* it should be OFF according to the manual */
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "7D:7" )    /* it should be OFF according to the manual */
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "7D:8" )    /* it should be OFF according to the manual */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( disco )
@@ -1031,10 +1031,10 @@ static INPUT_PORTS_START( sdtennis )
 	PORT_DIPSETTING(    0x04, "2 Sets won" )
 	PORT_DIPSETTING(    0x02, "3 Sets won"  )
 	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		// Check code at 0xc55b
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      // Check code at 0xc55b
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		// Check code at 0xc5af
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      // Check code at 0xc5af
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xe0, 0xe0, "Copyright" )
@@ -1042,7 +1042,7 @@ static INPUT_PORTS_START( sdtennis )
 	PORT_DIPSETTING(    0xc0, "Data East USA" )
 	/* Other values are the same as 0xe0 */
 	/* 0x60 also gives a special coinage : COIN1 gives 3 credits and COIN2 gives 8 credits
-      whatever the coinage Dip Switch are (they are not read in this case) */
+	  whatever the coinage Dip Switch are (they are not read in this case) */
 INPUT_PORTS_END
 
 static const gfx_layout tile8layout =
@@ -1159,12 +1159,12 @@ static const ay8910_interface ay2_intf =
 static const discrete_mixer_desc btime_sound_mixer_desc =
 	{DISC_MIXER_IS_OP_AMP,
 		{RES_K(100), RES_K(100)},
-		{0,0},	/* no variable resistors   */
+		{0,0},  /* no variable resistors   */
 		{0,0},  /* no node capacitors      */
-		0,		/* no RI */
+		0,      /* no RI */
 		RES_K(10),
 		CAP_P(150),
-		0,		/* Modelled separately */
+		0,      /* Modelled separately */
 		0, 1};
 
 /* R49 has 4.7k in schematics, but listed as 47k in bill of material
@@ -1173,7 +1173,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
  * Anoid measured R49 to R52 on a Burger Time pcb. These are
  * listed below
  */
-#define BTIME_R49	RES_K(47)	/* pcb: 47.4k */
+#define BTIME_R49   RES_K(47)   /* pcb: 47.4k */
 
 /* The input divider R51 R50 is not independent of R52, which
  * also depends on ay internal resistance.
@@ -1192,9 +1192,9 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
  *
  */
 
-#define BTIME_R52	RES_K(1)	/* pcb: .912k = 1K || 11k */
-#define BTIME_R51	RES_K(5)	/* pcb: .923k = 1k || 11k schematics 1k */
-#define BTIME_R50	RES_K(10)	/* pcb: 1.667k = 10k || 2k */
+#define BTIME_R52   RES_K(1)    /* pcb: .912k = 1K || 11k */
+#define BTIME_R51   RES_K(5)    /* pcb: .923k = 1k || 11k schematics 1k */
+#define BTIME_R50   RES_K(10)   /* pcb: 1.667k = 10k || 2k */
 
 static const discrete_op_amp_filt_info btime_opamp_desc =
 	{BTIME_R51, 0, BTIME_R50, 0, BTIME_R49, CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
@@ -1221,14 +1221,14 @@ static DISCRETE_SOUND_START( btime_sound )
 	DISCRETE_CRFILTER(NODE_41, NODE_40, RES_K(10), CAP_U(10))
 
 	/* Amplifier is upc1181H3
-     *
-     * http://www.ic-ts-histo.de/fad/ics/upc1181/upc1181.htm
-     *
-     * A linear frequency response is mentioned as well as a lower
-     * edge frequency determined by cap on pin3, however no formula given.
-     *
-     * not modelled here
-     */
+	 *
+	 * http://www.ic-ts-histo.de/fad/ics/upc1181/upc1181.htm
+	 *
+	 * A linear frequency response is mentioned as well as a lower
+	 * edge frequency determined by cap on pin3, however no formula given.
+	 *
+	 * not modelled here
+	 */
 
 	/* Assuming a 4 Ohm impedance speaker */
 	DISCRETE_CRFILTER(NODE_43, NODE_41, 3.0, CAP_U(100))
@@ -1296,7 +1296,7 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 static MACHINE_CONFIG_START( btime, btime_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_CPU7, HCLK2)	/* seletable between H2/H4 via jumper */
+	MCFG_CPU_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
 	MCFG_CPU_PROGRAM_MAP(btime_map)
 
 	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
@@ -1503,7 +1503,7 @@ ROM_START( btime )
 	ROM_LOAD( "ab01.3b",      0x0800, 0x0800, CRC(25b49078) SHA1(4abdcbd4f3362c3e4463a1274731289f1a72d2e6) )
 	ROM_LOAD( "ab02.4b",      0x1000, 0x0800, CRC(b8ef56c3) SHA1(4a03bf011dc1fb2902f42587b1174b880cf06df1) )
 
-	ROM_REGION( 0x0800, "bg_map", 0 )	/* background tilemaps */
+	ROM_REGION( 0x0800, "bg_map", 0 )   /* background tilemaps */
 	ROM_LOAD( "ab03.6b",      0x0000, 0x0800, CRC(d26bc1f3) SHA1(737af6e264183a1f151f277a07cf250d6abb3fd8) )
 ROM_END
 
@@ -1531,7 +1531,7 @@ ROM_START( btime2 )
 	ROM_LOAD( "ab01.3b",      0x0800, 0x0800, CRC(25b49078) SHA1(4abdcbd4f3362c3e4463a1274731289f1a72d2e6) )
 	ROM_LOAD( "ab02.4b",      0x1000, 0x0800, CRC(b8ef56c3) SHA1(4a03bf011dc1fb2902f42587b1174b880cf06df1) )
 
-	ROM_REGION( 0x0800, "bg_map", 0 )	/* background tilemaps */
+	ROM_REGION( 0x0800, "bg_map", 0 )   /* background tilemaps */
 	ROM_LOAD( "ab03.6b",      0x0000, 0x0800, CRC(d26bc1f3) SHA1(737af6e264183a1f151f277a07cf250d6abb3fd8) )
 ROM_END
 
@@ -1559,7 +1559,7 @@ ROM_START( btimem )
 	ROM_LOAD( "ab01.3b",      0x0800, 0x0800, CRC(25b49078) SHA1(4abdcbd4f3362c3e4463a1274731289f1a72d2e6) )
 	ROM_LOAD( "ab02.4b",      0x1000, 0x0800, CRC(b8ef56c3) SHA1(4a03bf011dc1fb2902f42587b1174b880cf06df1) )
 
-	ROM_REGION( 0x0800, "bg_map", 0 )	/* background tilemaps */
+	ROM_REGION( 0x0800, "bg_map", 0 )   /* background tilemaps */
 	ROM_LOAD( "ab03.6b",      0x0000, 0x0800, CRC(d26bc1f3) SHA1(737af6e264183a1f151f277a07cf250d6abb3fd8) )
 ROM_END
 
@@ -1568,7 +1568,7 @@ ROM_START( cookrace )
 	/* code is in the range 0500-3fff, encrypted */
 	ROM_LOAD( "1f.1",         0x0000, 0x2000, CRC(68759d32) SHA1(2112a6f17b871aefdb39739e47d4a9f368a2eb3c) )
 	ROM_LOAD( "2f.2",         0x2000, 0x2000, CRC(be7d72d1) SHA1(232d108098cb490e7c828aa4524ad09d3866ae18) )
-	ROM_LOAD( "2k",           0xffe0, 0x0020, CRC(e2553b3d) SHA1(0a38929cdb3f37c6e4bacc5c3f94c049b4352858) )	/* reset/interrupt vectors */
+	ROM_LOAD( "2k",           0xffe0, 0x0020, CRC(e2553b3d) SHA1(0a38929cdb3f37c6e4bacc5c3f94c049b4352858) )    /* reset/interrupt vectors */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "6f.6",         0xe000, 0x1000, CRC(6b8e0272) SHA1(372a891b7b357aea0297ba9bcae752c3c9d8c1be) ) /* starts at 0000, not f000; 0000-01ff is RAM */
@@ -1587,8 +1587,8 @@ ROM_START( cookrace )
 	ROM_CONTINUE(             0x1000, 0x0800 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "f9.clr",       0x0000, 0x0020, CRC(c2348c1d) SHA1(a7cc4b499b6c89c5966711f8bb922026c2978e1a) )	/* palette */
-	ROM_LOAD( "b7",           0x0020, 0x0020, CRC(e4268fa6) SHA1(93f74e633c3a19755e78e0e2883109cd8ccde9a8) )	/* unknown */
+	ROM_LOAD( "f9.clr",       0x0000, 0x0020, CRC(c2348c1d) SHA1(a7cc4b499b6c89c5966711f8bb922026c2978e1a) )    /* palette */
+	ROM_LOAD( "b7",           0x0020, 0x0020, CRC(e4268fa6) SHA1(93f74e633c3a19755e78e0e2883109cd8ccde9a8) )    /* unknown */
 ROM_END
 
 ROM_START( tisland )
@@ -1649,8 +1649,8 @@ ROM_START( lnc )
 	ROM_LOAD( "s9-15m",       0x5000, 0x1000, CRC(87c8ee9a) SHA1(158019b18bc3e5104bebeb241c077a706bf72ff2) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "sc-5m",        0x0000, 0x0020, CRC(2a976ebe) SHA1(f3c1b0d98f431f9cd0d5fa009fafa1115aabe6e5) )	/* palette */
-	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )	/* RAS/CAS logic - not used */
+	ROM_LOAD( "sc-5m",        0x0000, 0x0020, CRC(2a976ebe) SHA1(f3c1b0d98f431f9cd0d5fa009fafa1115aabe6e5) )    /* palette */
+	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )    /* RAS/CAS logic - not used */
 ROM_END
 
 /*This one doesn't have the (c) deco and the "pro" word at the title screen so I'm assuming it's a bootleg.*/
@@ -1670,8 +1670,8 @@ ROM_START( protennb )
 	/* dynamically allocated */
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "82s123n.a8",    0x0000, 0x0020, CRC(6a0006ac) SHA1(72265bc472fb7610af190130560ef507244ce41c) )	/* palette */
-	ROM_LOAD( "82s123n.j10",   0x0020, 0x0020, CRC(27b004e3) SHA1(4b9960b99130281a3b07f44816001e5eabf7a6fc) )	/* RAS/CAS logic - not used */
+	ROM_LOAD( "82s123n.a8",    0x0000, 0x0020, CRC(6a0006ac) SHA1(72265bc472fb7610af190130560ef507244ce41c) )   /* palette */
+	ROM_LOAD( "82s123n.j10",   0x0020, 0x0020, CRC(27b004e3) SHA1(4b9960b99130281a3b07f44816001e5eabf7a6fc) )   /* RAS/CAS logic - not used */
 ROM_END
 
 ROM_START( wtennis )
@@ -1693,8 +1693,8 @@ ROM_START( wtennis )
 	ROM_LOAD( "t8",           0x5000, 0x1000, CRC(542ace7b) SHA1(b1423d39302ad7d98c9223d8b1d6d062b7676dd9) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "mb7051.m5",    0x0000, 0x0020, CRC(f051cb28) SHA1(6aebccd38ba7887caff248c8acddb8e14526f1e7) )	/* palette */
-	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )	/* RAS/CAS logic - not used */
+	ROM_LOAD( "mb7051.m5",    0x0000, 0x0020, CRC(f051cb28) SHA1(6aebccd38ba7887caff248c8acddb8e14526f1e7) )    /* palette */
+	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )    /* RAS/CAS logic - not used */
 ROM_END
 
 ROM_START( mmonkey )
@@ -1716,8 +1716,8 @@ ROM_START( mmonkey )
 	ROM_LOAD( "mmonkey.m14",  0x5000, 0x1000, CRC(f943e28c) SHA1(6ff536a21f34cbb958f6d0f84791102938966ff3) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "mmi6331.m5",   0x0000, 0x0020, CRC(55e28b32) SHA1(b73f85224738252dc8dbb38a54250dcfe1fc3ae3) )	/* palette */
-	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )	/* RAS/CAS logic - not used */
+	ROM_LOAD( "mmi6331.m5",   0x0000, 0x0020, CRC(55e28b32) SHA1(b73f85224738252dc8dbb38a54250dcfe1fc3ae3) )    /* palette */
+	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )    /* RAS/CAS logic - not used */
 ROM_END
 
 ROM_START( brubber )
@@ -1743,7 +1743,7 @@ ROM_END
 /*
     Bump 'n Jump (Data East USA)
 
-    Sound Board: 
+    Sound Board:
         CIS-1
         DATA EAST-0136
 
@@ -1753,7 +1753,7 @@ ROM_END
 */
 
 ROM_START( bnj )
- 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ad08.12b",     0xa000, 0x2000, CRC(8d649bd5) SHA1(83105718c2d18ef75ca18ae92b34545cb939bc02) )
 	ROM_LOAD( "ad07.12c",     0xc000, 0x2000, CRC(7a27f5f4) SHA1(f62d752bb7a995e120ed4d642793c543f0ef13ca) )
 	ROM_LOAD( "ad06.12d",     0xe000, 0x2000, CRC(f855a2d2) SHA1(f231ed008537aeeeacbec64f485e9a96ab3441e1) )
@@ -1813,8 +1813,8 @@ ROM_START( caractn )
 	ROM_LOAD( "c4.10f",  0x1000, 0x1000, CRC(a9ffacb4) SHA1(49d5f9c0b695f474197fbb761bacc065b6b5808a) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "tbp18s030.11a",   0x0000, 0x020, CRC(318d25b9) SHA1(9a82619c94f5911d01ddf6b85f7e30cdc6f1d0a3) )	/* palette */
-	ROM_LOAD( "tbp18s030.cpu",   0x0020, 0x020, CRC(6b0c2942) SHA1(7d25acc753923b265792fc78f8fc70175c0e0ec2) )	/* RAS/CAS logic - not used */
+	ROM_LOAD( "tbp18s030.11a",   0x0000, 0x020, CRC(318d25b9) SHA1(9a82619c94f5911d01ddf6b85f7e30cdc6f1d0a3) )  /* palette */
+	ROM_LOAD( "tbp18s030.cpu",   0x0020, 0x020, CRC(6b0c2942) SHA1(7d25acc753923b265792fc78f8fc70175c0e0ec2) )  /* RAS/CAS logic - not used */
 
 	ROM_REGION( 0x0140, "plds", 0 )
 	ROM_LOAD( "pal10l8.10k",   0x0000, 0x002c, CRC(dc72a65f) SHA1(d61c149d4df93a2074debf7c5e46557c6b06d10d) )
@@ -1848,7 +1848,7 @@ ROM_START( zoar )
 	ROM_LOAD( "z05.14l", 0x1000, 0x1000, CRC(05dc6b09) SHA1(197c720544a090e12980513b441a2b9cf04e212f) )
 	ROM_LOAD( "z08.15l", 0x2000, 0x1000, CRC(9a148551) SHA1(db92dd7552c6f76a062910f37a3fe3524fdffd38) )
 
-	ROM_REGION( 0x1000, "bg_map", 0 )	/* background tilemaps */
+	ROM_REGION( 0x1000, "bg_map", 0 )   /* background tilemaps */
 	ROM_LOAD( "z13.6b",  0x0000, 0x1000, CRC(8fefa960) SHA1(614026aa71703dd3898e470f45730e5c6934b31b) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
@@ -1913,8 +1913,8 @@ READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 	UINT8 *RAM = memregion("maincpu")->base();
 
 	/* Otherwise the game goes into test mode and there is no way out that I
-       can see.  I'm not sure how it can work, it probably somehow has to do
-       with the tape system */
+	   can see.  I'm not sure how it can work, it probably somehow has to do
+	   with the tape system */
 
 	RAM[0xfc30] = 0;
 
@@ -1931,9 +1931,9 @@ DRIVER_INIT_MEMBER(btime_state,zoar)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
-       implementing it given what opcode 0x23 should do, but it still didn't
-       work in demo mode. So this could be another protection or a bad ROM read.
-       I'm NOPing it out for now. */
+	   implementing it given what opcode 0x23 should do, but it still didn't
+	   work in demo mode. So this could be another protection or a bad ROM read.
+	   I'm NOPing it out for now. */
 	memset(&rom[0xd50a],0xea,8);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
@@ -1944,9 +1944,9 @@ DRIVER_INIT_MEMBER(btime_state,tisland)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
-       unmapped area that causes the game to fail in several circumstances.On the Cassette
-       version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-       wrong going on in the encryption scheme.*/
+	   unmapped area that causes the game to fail in several circumstances.On the Cassette
+	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
+	   wrong going on in the encryption scheme.*/
 	memset(&rom[0xa2b6],0x24,1);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;

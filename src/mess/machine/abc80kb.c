@@ -99,18 +99,18 @@ const device_type ABC80_KEYBOARD = &device_creator<abc80_keyboard_device>;
 
 void abc80_keyboard_device::device_config_complete()
 {
-    // inherit a copy of the static data
-    const abc80_keyboard_interface *intf = reinterpret_cast<const abc80_keyboard_interface *>(static_config());
-    if (intf != NULL)
-        *static_cast<abc80_keyboard_interface *>(this) = *intf;
+	// inherit a copy of the static data
+	const abc80_keyboard_interface *intf = reinterpret_cast<const abc80_keyboard_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<abc80_keyboard_interface *>(this) = *intf;
 
-    // or initialize to defaults if none provided
-    else
-    {
-        memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
-    }
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
+	}
 
-    m_shortname = "abc80kb";
+	m_shortname = "abc80kb";
 }
 
 
@@ -119,8 +119,8 @@ void abc80_keyboard_device::device_config_complete()
 //-------------------------------------------------
 
 ROM_START( abc80_keyboard )
-    ROM_REGION( 0x400, I8048_TAG, 0 )
-    ROM_LOAD( "053.z5", 0x0000, 0x0400, NO_DUMP )
+	ROM_REGION( 0x400, I8048_TAG, 0 )
+	ROM_LOAD( "053.z5", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 
@@ -147,9 +147,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc80_keyboard )
-    MCFG_CPU_ADD(I8048_TAG, I8048, 4000000)
-    MCFG_CPU_IO_MAP(abc80_keyboard_io)
-    MCFG_DEVICE_DISABLE()
+	MCFG_CPU_ADD(I8048_TAG, I8048, 4000000)
+	MCFG_CPU_IO_MAP(abc80_keyboard_io)
+	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 
@@ -192,8 +192,8 @@ ioport_constructor abc80_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock),
-      m_maincpu(*this, I8048_TAG)
+	: device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock),
+		m_maincpu(*this, I8048_TAG)
 {
 }
 
@@ -204,8 +204,8 @@ abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, cons
 
 void abc80_keyboard_device::device_start()
 {
-    // resolve callbacks
-    m_out_keydown_func.resolve(m_out_keydown_cb, *this);
+	// resolve callbacks
+	m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 }
 
 
@@ -224,5 +224,5 @@ void abc80_keyboard_device::device_reset()
 
 UINT8 abc80_keyboard_device::data_r()
 {
-    return 0;
+	return 0;
 }

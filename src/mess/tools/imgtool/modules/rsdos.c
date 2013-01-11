@@ -32,8 +32,8 @@ struct rsdos_direnum
 	int eof;
 };
 
-#define RSDOS_OPTIONS_FTYPE		'T'
-#define RSDOS_OPTIONS_ASCII		'M'
+#define RSDOS_OPTIONS_FTYPE     'T'
+#define RSDOS_OPTIONS_ASCII     'M'
 
 
 
@@ -41,7 +41,7 @@ struct rsdos_direnum
     Imgtool module code
 *********************************************************************/
 
-#define MAX_DIRENTS		((18-2)*(256/32))
+#define MAX_DIRENTS     ((18-2)*(256/32))
 static floperr_t get_rsdos_dirent(imgtool_image *f, int index_loc, struct rsdos_dirent *ent)
 {
 	return floppy_read_sector(imgtool_floppy(f), 0, 17, 3, index_loc * 32, (void *) ent, sizeof(*ent));
@@ -53,7 +53,7 @@ static floperr_t put_rsdos_dirent(imgtool_image *f, int index_loc, const struct 
 {
 	if (index_loc >= MAX_DIRENTS)
 		return (floperr_t)IMGTOOLERR_FILENOTFOUND;
-	return floppy_write_sector(imgtool_floppy(f), 0, 17, 3, index_loc * 32, (void *) ent, sizeof(*ent), 0);	/* TODO: pass ddam argument from imgtool */
+	return floppy_write_sector(imgtool_floppy(f), 0, 17, 3, index_loc * 32, (void *) ent, sizeof(*ent), 0); /* TODO: pass ddam argument from imgtool */
 }
 
 
@@ -123,7 +123,7 @@ static UINT8 get_granule_count(imgtool_image *img)
 	return (granules > 255) ? 255 : (UINT8) granules;
 }
 
-#define MAX_GRANULEMAP_SIZE	256
+#define MAX_GRANULEMAP_SIZE 256
 
 /* granule_map must be an array of MAX_GRANULEMAP_SIZE bytes */
 static floperr_t get_granule_map(imgtool_image *img, UINT8 *granule_map, UINT8 *granule_count)
@@ -141,7 +141,7 @@ static floperr_t get_granule_map(imgtool_image *img, UINT8 *granule_map, UINT8 *
 
 static floperr_t put_granule_map(imgtool_image *img, const UINT8 *granule_map, UINT8 granule_count)
 {
-	return floppy_write_sector(imgtool_floppy(img), 0, 17, 2, 0, granule_map, granule_count, 0);	/* TODO: pass ddam argument from imgtool */
+	return floppy_write_sector(imgtool_floppy(img), 0, 17, 2, 0, granule_map, granule_count, 0);    /* TODO: pass ddam argument from imgtool */
 }
 
 
@@ -185,7 +185,7 @@ static imgtoolerr_t process_rsdos_file(struct rsdos_dirent *ent, imgtool_image *
 	size_t s, lastgransize;
 	UINT8 granule_count;
 	unsigned char i = 0, granule;
-	UINT8 usedmap[MAX_GRANULEMAP_SIZE];	/* Used to detect infinite loops */
+	UINT8 usedmap[MAX_GRANULEMAP_SIZE]; /* Used to detect infinite loops */
 	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
 
 	ferr = get_granule_map(img, granule_map, &granule_count);
@@ -457,7 +457,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, cons
 		{
 			g++;
 			if ((g >= granule_count) || (g == 0))
-				return IMGTOOLERR_UNEXPECTED;	/* We should have already verified that there is enough space */
+				return IMGTOOLERR_UNEXPECTED;   /* We should have already verified that there is enough space */
 		}
 		*gptr = g;
 		gptr = &granule_map[g];
@@ -476,8 +476,8 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, cons
 	while(sz > 0);
 
 	/* Now that we are done with the file, we need to specify the final entry
-     * in the file allocation table
-     */
+	 * in the file allocation table
+	 */
 	*gptr = 0xc0 + ((i + 255) / 256);
 
 	/* Now we need to find an empty directory entry */
@@ -578,15 +578,15 @@ static imgtoolerr_t rsdos_diskimage_suggesttransfer(imgtool_partition *partition
 *********************************************************************/
 
 static OPTION_GUIDE_START( coco_rsdos_writefile_optionguide )
-	OPTION_ENUM_START(	RSDOS_OPTIONS_FTYPE, "ftype", "File type" )
-		OPTION_ENUM(	0,		"basic",		"Basic" )
-		OPTION_ENUM(	1,		"data",			"Data" )
-		OPTION_ENUM(	2,		"binary",		"Binary" )
-		OPTION_ENUM(	3,		"assembler",	"Assembler Source" )
+	OPTION_ENUM_START(  RSDOS_OPTIONS_FTYPE, "ftype", "File type" )
+		OPTION_ENUM(    0,      "basic",        "Basic" )
+		OPTION_ENUM(    1,      "data",         "Data" )
+		OPTION_ENUM(    2,      "binary",       "Binary" )
+		OPTION_ENUM(    3,      "assembler",    "Assembler Source" )
 	OPTION_ENUM_END
-	OPTION_ENUM_START(	RSDOS_OPTIONS_ASCII, "ascii", "Ascii flag" )
-		OPTION_ENUM(	0,		"ascii",		"Ascii" )
-		OPTION_ENUM(	1,		"binary",		"Binary" )
+	OPTION_ENUM_START(  RSDOS_OPTIONS_ASCII, "ascii", "Ascii flag" )
+		OPTION_ENUM(    0,      "ascii",        "Ascii" )
+		OPTION_ENUM(    1,      "binary",       "Binary" )
 	OPTION_ENUM_END
 OPTION_GUIDE_END
 
@@ -597,25 +597,25 @@ void rsdos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolin
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case IMGTOOLINFO_INT_PREFER_UCASE:					info->i = 1; break;
-		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:				info->i = sizeof(struct rsdos_direnum); break;
+		case IMGTOOLINFO_INT_PREFER_UCASE:                  info->i = 1; break;
+		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(struct rsdos_direnum); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "rsdos"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "RS-DOS format"); break;
-		case IMGTOOLINFO_STR_FILE:							strcpy(info->s = imgtool_temp_str(), __FILE__); break;
-		case IMGTOOLINFO_STR_EOLN:							strcpy(info->s = imgtool_temp_str(), "\r"); break;
-		case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:				strcpy(info->s = imgtool_temp_str(), "T0-[2]-3;M0-[1]"); break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "rsdos"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "RS-DOS format"); break;
+		case IMGTOOLINFO_STR_FILE:                          strcpy(info->s = imgtool_temp_str(), __FILE__); break;
+		case IMGTOOLINFO_STR_EOLN:                          strcpy(info->s = imgtool_temp_str(), "\r"); break;
+		case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:             strcpy(info->s = imgtool_temp_str(), "T0-[2]-3;M0-[1]"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_MAKE_CLASS:					info->make_class = imgtool_floppy_make_class; break;
-		case IMGTOOLINFO_PTR_NEXT_ENUM:						info->next_enum = rsdos_diskimage_nextenum; break;
-		case IMGTOOLINFO_PTR_FREE_SPACE:					info->free_space = rsdos_diskimage_freespace; break;
-		case IMGTOOLINFO_PTR_READ_FILE:						info->read_file = rsdos_diskimage_readfile; break;
-		case IMGTOOLINFO_PTR_WRITE_FILE:					info->write_file = rsdos_diskimage_writefile; break;
-		case IMGTOOLINFO_PTR_DELETE_FILE:					info->delete_file = rsdos_diskimage_deletefile; break;
-		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:				info->suggest_transfer = rsdos_diskimage_suggesttransfer; break;
-		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:			info->writefile_optguide = coco_rsdos_writefile_optionguide; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:					info->p = (void *) floppyoptions_coco; break;
+		case IMGTOOLINFO_PTR_MAKE_CLASS:                    info->make_class = imgtool_floppy_make_class; break;
+		case IMGTOOLINFO_PTR_NEXT_ENUM:                     info->next_enum = rsdos_diskimage_nextenum; break;
+		case IMGTOOLINFO_PTR_FREE_SPACE:                    info->free_space = rsdos_diskimage_freespace; break;
+		case IMGTOOLINFO_PTR_READ_FILE:                     info->read_file = rsdos_diskimage_readfile; break;
+		case IMGTOOLINFO_PTR_WRITE_FILE:                    info->write_file = rsdos_diskimage_writefile; break;
+		case IMGTOOLINFO_PTR_DELETE_FILE:                   info->delete_file = rsdos_diskimage_deletefile; break;
+		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = rsdos_diskimage_suggesttransfer; break;
+		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = coco_rsdos_writefile_optionguide; break;
+		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_coco; break;
 	}
 }

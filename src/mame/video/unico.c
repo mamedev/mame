@@ -58,18 +58,18 @@ WRITE16_MEMBER(unico_state::unico_palette_w)
 	data1 = m_generic_paletteram_16[offset & ~1];
 	data2 = m_generic_paletteram_16[offset |  1];
 	palette_set_color_rgb( machine(),offset/2,
-		 (data1 >> 8) & 0xFC,
-		 (data1 >> 0) & 0xFC,
-		 (data2 >> 8) & 0xFC	);
+			(data1 >> 8) & 0xFC,
+			(data1 >> 0) & 0xFC,
+			(data2 >> 8) & 0xFC );
 }
 
 WRITE32_MEMBER(unico_state::unico_palette32_w)
 {
 	UINT32 rgb0 = COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	palette_set_color_rgb( machine(),offset,
-		 (rgb0 >> 24) & 0xFC,
-		 (rgb0 >> 16) & 0xFC,
-		 (rgb0 >>  8) & 0xFC	);
+			(rgb0 >> 24) & 0xFC,
+			(rgb0 >> 16) & 0xFC,
+			(rgb0 >>  8) & 0xFC );
 }
 
 
@@ -134,13 +134,13 @@ WRITE32_MEMBER(unico_state::unico_vram32_w)
 VIDEO_START_MEMBER(unico_state,unico)
 {
 	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
-									16,16,	0x40, 0x40);
+									16,16,  0x40, 0x40);
 
 	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
-									16,16,	0x40, 0x40);
+									16,16,  0x40, 0x40);
 
 	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
-									16,16,	0x40, 0x40);
+									16,16,  0x40, 0x40);
 
 	m_tilemap[0]->set_user_data(&m_vram[0x8000/2]);
 	m_tilemap[1]->set_user_data(&m_vram[0x0000/2]);
@@ -165,13 +165,13 @@ VIDEO_START_MEMBER(unico_state,unico)
 VIDEO_START_MEMBER(unico_state,zeropnt2)
 {
 	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),this),TILEMAP_SCAN_ROWS,
-									16,16,	0x40, 0x40);
+									16,16,  0x40, 0x40);
 
 	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),this),TILEMAP_SCAN_ROWS,
-									16,16,	0x40, 0x40);
+									16,16,  0x40, 0x40);
 
 	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),this),TILEMAP_SCAN_ROWS,
-									16,16,	0x40, 0x40);
+									16,16,  0x40, 0x40);
 
 	m_tilemap[0]->set_user_data(&m_vram32[0x8000/4]);
 	m_tilemap[1]->set_user_data(&m_vram32[0x0000/4]);
@@ -228,46 +228,46 @@ static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 	{
 		int x, startx, endx, incx;
 
-		int	sx			=	spriteram16[ offs + 0 ];
-		int	sy			=	spriteram16[ offs + 1 ];
-		int	code		=	spriteram16[ offs + 2 ];
-		int	attr		=	spriteram16[ offs + 3 ];
+		int sx          =   spriteram16[ offs + 0 ];
+		int sy          =   spriteram16[ offs + 1 ];
+		int code        =   spriteram16[ offs + 2 ];
+		int attr        =   spriteram16[ offs + 3 ];
 
-		int	flipx		=	attr & 0x020;
-		int	flipy		=	attr & 0x040;	// not sure
+		int flipx       =   attr & 0x020;
+		int flipy       =   attr & 0x040;   // not sure
 
-		int dimx		=	((attr >> 8) & 0xf) + 1;
+		int dimx        =   ((attr >> 8) & 0xf) + 1;
 
-		int priority	=	((attr >> 12) & 0x3);
+		int priority    =   ((attr >> 12) & 0x3);
 		int pri_mask;
 
 		switch( priority )
 		{
-			case 0:		pri_mask = 0xfe;	break;	// below all
-			case 1:		pri_mask = 0xf0;	break;	// above layer 0
-			case 2:		pri_mask = 0xfc;	break;	// above layer 1
+			case 0:     pri_mask = 0xfe;    break;  // below all
+			case 1:     pri_mask = 0xf0;    break;  // above layer 0
+			case 2:     pri_mask = 0xfc;    break;  // above layer 1
 			default:
-			case 3:		pri_mask = 0x00;			// above all
+			case 3:     pri_mask = 0x00;            // above all
 		}
 
-		sx	+=	state->m_sprites_scrolldx;
-		sy	+=	state->m_sprites_scrolldy;
+		sx  +=  state->m_sprites_scrolldx;
+		sy  +=  state->m_sprites_scrolldy;
 
-		sx	=	(sx & 0x1ff) - (sx & 0x200);
-		sy	=	(sy & 0x1ff) - (sy & 0x200);
+		sx  =   (sx & 0x1ff) - (sx & 0x200);
+		sy  =   (sy & 0x1ff) - (sy & 0x200);
 
-		if (flipx)	{	startx = sx+(dimx-1)*16;	endx = sx-16;		incx = -16;	}
-		else		{	startx = sx;				endx = sx+dimx*16;	incx = +16;	}
+		if (flipx)  {   startx = sx+(dimx-1)*16;    endx = sx-16;       incx = -16; }
+		else        {   startx = sx;                endx = sx+dimx*16;  incx = +16; }
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx_transpen(	bitmap, cliprect, machine.gfx[0],
+			pdrawgfx_transpen(  bitmap, cliprect, machine.gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
 						machine.priority_bitmap,
-						pri_mask,0x00	);
+						pri_mask,0x00   );
 		}
 	}
 }
@@ -283,46 +283,46 @@ static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	{
 		int x, startx, endx, incx;
 
-		int	sx			=	spriteram32[ offs + 0 ] >> 16;
-		int	sy			=	spriteram32[ offs + 0 ] & 0xffff;
-		int	code		=	spriteram32[ offs + 1 ] >> 16;
-		int	attr		=	spriteram32[ offs + 1 ] & 0xffff;
+		int sx          =   spriteram32[ offs + 0 ] >> 16;
+		int sy          =   spriteram32[ offs + 0 ] & 0xffff;
+		int code        =   spriteram32[ offs + 1 ] >> 16;
+		int attr        =   spriteram32[ offs + 1 ] & 0xffff;
 
-		int	flipx		=	attr & 0x020;
-		int	flipy		=	attr & 0x040;	// not sure
+		int flipx       =   attr & 0x020;
+		int flipy       =   attr & 0x040;   // not sure
 
-		int dimx		=	((attr >> 8) & 0xf) + 1;
+		int dimx        =   ((attr >> 8) & 0xf) + 1;
 
-		int priority	=	((attr >> 12) & 0x3);
+		int priority    =   ((attr >> 12) & 0x3);
 		int pri_mask;
 
 		switch( priority )
 		{
-			case 0:		pri_mask = 0xfe;	break;	// below all
-			case 1:		pri_mask = 0xf0;	break;	// above layer 0
-			case 2:		pri_mask = 0xfc;	break;	// above layer 1
+			case 0:     pri_mask = 0xfe;    break;  // below all
+			case 1:     pri_mask = 0xf0;    break;  // above layer 0
+			case 2:     pri_mask = 0xfc;    break;  // above layer 1
 			default:
-			case 3:		pri_mask = 0x00;			// above all
+			case 3:     pri_mask = 0x00;            // above all
 		}
 
-		sx	+=	state->m_sprites_scrolldx;
-		sy	+=	state->m_sprites_scrolldy;
+		sx  +=  state->m_sprites_scrolldx;
+		sy  +=  state->m_sprites_scrolldy;
 
-		sx	=	(sx & 0x1ff) - (sx & 0x200);
-		sy	=	(sy & 0x1ff) - (sy & 0x200);
+		sx  =   (sx & 0x1ff) - (sx & 0x200);
+		sy  =   (sy & 0x1ff) - (sy & 0x200);
 
-		if (flipx)	{	startx = sx+(dimx-1)*16;	endx = sx-16;		incx = -16;	}
-		else		{	startx = sx;				endx = sx+dimx*16;	incx = +16;	}
+		if (flipx)  {   startx = sx+(dimx-1)*16;    endx = sx-16;       incx = -16; }
+		else        {   startx = sx;                endx = sx+dimx*16;  incx = +16; }
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx_transpen(	bitmap, cliprect, machine.gfx[0],
+			pdrawgfx_transpen(  bitmap, cliprect, machine.gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
 						machine.priority_bitmap,
-						pri_mask,0x00	);
+						pri_mask,0x00   );
 		}
 	}
 }
@@ -354,10 +354,10 @@ UINT32 unico_state::screen_update_unico(screen_device &screen, bitmap_ind16 &bit
 if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) )
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -366,12 +366,12 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	bitmap.fill(0x1f00, cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 
-	if (layers_ctrl & 1)	m_tilemap[0]->draw(bitmap, cliprect, 0,1);
-	if (layers_ctrl & 2)	m_tilemap[1]->draw(bitmap, cliprect, 0,2);
-	if (layers_ctrl & 4)	m_tilemap[2]->draw(bitmap, cliprect, 0,4);
+	if (layers_ctrl & 1)    m_tilemap[0]->draw(bitmap, cliprect, 0,1);
+	if (layers_ctrl & 2)    m_tilemap[1]->draw(bitmap, cliprect, 0,2);
+	if (layers_ctrl & 4)    m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	unico_draw_sprites(screen.machine(), bitmap,cliprect);
+	if (layers_ctrl & 8)    unico_draw_sprites(screen.machine(), bitmap,cliprect);
 
 	return 0;
 }
@@ -393,10 +393,10 @@ UINT32 unico_state::screen_update_zeropnt2(screen_device &screen, bitmap_ind16 &
 if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) )
 {
 	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -405,13 +405,12 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	bitmap.fill(0x1f00, cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (layers_ctrl & 1)	m_tilemap[0]->draw(bitmap, cliprect, 0,1);
-	if (layers_ctrl & 2)	m_tilemap[1]->draw(bitmap, cliprect, 0,2);
-	if (layers_ctrl & 4)	m_tilemap[2]->draw(bitmap, cliprect, 0,4);
+	if (layers_ctrl & 1)    m_tilemap[0]->draw(bitmap, cliprect, 0,1);
+	if (layers_ctrl & 2)    m_tilemap[1]->draw(bitmap, cliprect, 0,2);
+	if (layers_ctrl & 4)    m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	zeropnt2_draw_sprites(screen.machine(), bitmap,cliprect);
+	if (layers_ctrl & 8)    zeropnt2_draw_sprites(screen.machine(), bitmap,cliprect);
 
 	return 0;
 }
-

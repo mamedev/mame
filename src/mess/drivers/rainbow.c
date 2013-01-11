@@ -73,28 +73,28 @@ class rainbow_state : public driver_device
 public:
 	rainbow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-        m_crtc(*this, "vt100_video"),
-        m_i8088(*this, "maincpu"),
-        m_z80(*this, "subcpu"),
-        m_fdc(*this, "wd1793"),
-        m_kbd8251(*this, "kbdser"),
-        m_lk201(*this, LK201_TAG),
+		m_crtc(*this, "vt100_video"),
+		m_i8088(*this, "maincpu"),
+		m_z80(*this, "subcpu"),
+		m_fdc(*this, "wd1793"),
+		m_kbd8251(*this, "kbdser"),
+		m_lk201(*this, LK201_TAG),
 		m_p_ram(*this, "p_ram"),
-        m_shared(*this, "sh_ram")
-    { }
+		m_shared(*this, "sh_ram")
+	{ }
 
 
 	required_device<vt100_video_device> m_crtc;
-    required_device<cpu_device> m_i8088;
-    required_device<cpu_device> m_z80;
-    required_device<fd1793_device> m_fdc;
-    required_device<i8251_device> m_kbd8251;
-    required_device<lk201_device> m_lk201;
+	required_device<cpu_device> m_i8088;
+	required_device<cpu_device> m_z80;
+	required_device<fd1793_device> m_fdc;
+	required_device<i8251_device> m_kbd8251;
+	required_device<lk201_device> m_lk201;
 	required_shared_ptr<UINT8> m_p_ram;
 	required_shared_ptr<UINT8> m_shared;
 	UINT8 m_diagnostic;
 
-    virtual void machine_start();
+	virtual void machine_start();
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE8_MEMBER(clear_video_interrupt);
@@ -117,18 +117,18 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
-    DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
-    DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
+	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
+	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
-    bool m_zflip;                   // Z80 alternate memory map with A15 inverted
-    bool m_z80_halted;
-    bool m_kbd_tx_ready, m_kbd_rx_ready;
+	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
+	bool m_z80_halted;
+	bool m_kbd_tx_ready, m_kbd_rx_ready;
 
 private:
-    UINT8 m_z80_private[0x800];     // Z80 private 2K
-    UINT8 m_z80_mailbox, m_8088_mailbox;
+	UINT8 m_z80_private[0x800];     // Z80 private 2K
+	UINT8 m_z80_mailbox, m_8088_mailbox;
 
-    void update_kbd_irq();
+	void update_kbd_irq();
 	virtual void machine_reset();
 public:
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -138,21 +138,21 @@ public:
 
 void rainbow_state::machine_start()
 {
-    save_item(NAME(m_z80_private));
-    save_item(NAME(m_z80_mailbox));
-    save_item(NAME(m_8088_mailbox));
-    save_item(NAME(m_zflip));
-    save_item(NAME(m_kbd_tx_ready));
-    save_item(NAME(m_kbd_rx_ready));
+	save_item(NAME(m_z80_private));
+	save_item(NAME(m_z80_mailbox));
+	save_item(NAME(m_8088_mailbox));
+	save_item(NAME(m_zflip));
+	save_item(NAME(m_kbd_tx_ready));
+	save_item(NAME(m_kbd_rx_ready));
 }
 
 static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
-    AM_RANGE(0x10000, 0x1ffff) AM_RAM
-    AM_RANGE(0x20000, 0xdffff) AM_READ(floating_bus_r)  // test at f4e1c
-    AM_RANGE(0x20000, 0x3ffff) AM_RAM
-    AM_RANGE(0xec000, 0xedfff) AM_RAM
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	AM_RANGE(0x20000, 0xdffff) AM_READ(floating_bus_r)  // test at f4e1c
+	AM_RANGE(0x20000, 0x3ffff) AM_RAM
+	AM_RANGE(0xec000, 0xedfff) AM_RAM
 	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE (0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
+	AM_RANGE (0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
 	// 0x04 Video processor DC011
 	AM_RANGE (0x04, 0x04) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc011_w)
 
@@ -180,14 +180,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rainbowz80_io, AS_IO, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
-    AM_RANGE(0x20, 0x20) AM_WRITE(z80_diskdiag_read_w)
-    AM_RANGE(0x21, 0x21) AM_WRITE(z80_diskdiag_write_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(z80_diskdiag_read_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE(z80_diskdiag_write_w)
 
-    AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r, wd17xx_command_w)
-    AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r, wd17xx_track_w)
-    AM_RANGE(0x62, 0x62) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r, wd17xx_sector_w)
-    AM_RANGE(0x63, 0x63) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0x62, 0x62) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0x63, 0x63) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r, wd17xx_data_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -198,13 +198,13 @@ INPUT_PORTS_END
 void rainbow_state::machine_reset()
 {
 
-    m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-    m_zflip = true;
-    m_z80_halted = true;
-    m_kbd_tx_ready = m_kbd_rx_ready = false;
+	m_zflip = true;
+	m_z80_halted = true;
+	m_kbd_tx_ready = m_kbd_rx_ready = false;
 
-    m_kbd8251->input_callback(SERIAL_STATE_CTS); // raise clear to send
+	m_kbd8251->input_callback(SERIAL_STATE_CTS); // raise clear to send
 }
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -216,101 +216,101 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 
 READ8_MEMBER(rainbow_state::floating_bus_r)
 {
-    return (offset>>16) + 2;
+	return (offset>>16) + 2;
 }
 
 READ8_MEMBER(rainbow_state::share_z80_r)
 {
-    if (m_zflip)
-    {
-        if (offset < 0x8000)
-        {
-            return m_shared[offset + 0x8000];
-        }
-        else if (offset < 0x8800)
-        {
-            return m_z80_private[offset & 0x7ff];
-        }
+	if (m_zflip)
+	{
+		if (offset < 0x8000)
+		{
+			return m_shared[offset + 0x8000];
+		}
+		else if (offset < 0x8800)
+		{
+			return m_z80_private[offset & 0x7ff];
+		}
 
-        return m_shared[offset ^ 0x8000];
-    }
-    else
-    {
-        if (offset < 0x800)
-        {
-            return m_z80_private[offset];
-        }
+		return m_shared[offset ^ 0x8000];
+	}
+	else
+	{
+		if (offset < 0x800)
+		{
+			return m_z80_private[offset];
+		}
 
-        return m_shared[offset];
-    }
+		return m_shared[offset];
+	}
 
-    return 0xff;
+	return 0xff;
 }
 
 WRITE8_MEMBER(rainbow_state::share_z80_w)
 {
-    if (m_zflip)
-    {
-        if (offset < 0x8000)
-        {
-            m_shared[offset + 0x8000] = data;
-        }
-        else if (offset < 0x8800)
-        {
-            m_z80_private[offset & 0x7ff] = data;
-        }
+	if (m_zflip)
+	{
+		if (offset < 0x8000)
+		{
+			m_shared[offset + 0x8000] = data;
+		}
+		else if (offset < 0x8800)
+		{
+			m_z80_private[offset & 0x7ff] = data;
+		}
 
-        m_shared[offset ^ 0x8000] = data;
-    }
-    else
-    {
-        if (offset < 0x800)
-        {
-            m_z80_private[offset] = data;
-        }
-        else
-        {
-            m_shared[offset] = data;
-        }
-    }
+		m_shared[offset ^ 0x8000] = data;
+	}
+	else
+	{
+		if (offset < 0x800)
+		{
+			m_z80_private[offset] = data;
+		}
+		else
+		{
+			m_shared[offset] = data;
+		}
+	}
 }
 
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
 //    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
-    m_i8088->set_input_line(INPUT_LINE_INT1, CLEAR_LINE);
-    return m_8088_mailbox;
+	m_i8088->set_input_line(INPUT_LINE_INT1, CLEAR_LINE);
+	return m_8088_mailbox;
 }
 
 WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 {
 //    printf("%02x to Z80 mailbox\n", data);
-    m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7);
-    m_z80_mailbox = data;
+	m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7);
+	m_z80_mailbox = data;
 }
 
 READ8_MEMBER(rainbow_state::z80_latch_r)
 {
 //    printf("Read %02x from Z80 mailbox\n", m_z80_mailbox);
-    m_z80->set_input_line(0, CLEAR_LINE);
-    return m_z80_mailbox;
+	m_z80->set_input_line(0, CLEAR_LINE);
+	return m_z80_mailbox;
 }
 
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
 //    printf("%02x to 8088 mailbox\n", data);
-    m_i8088->set_input_line_and_vector(INPUT_LINE_INT1, ASSERT_LINE, 0x27);
-    m_8088_mailbox = data;
+	m_i8088->set_input_line_and_vector(INPUT_LINE_INT1, ASSERT_LINE, 0x27);
+	m_8088_mailbox = data;
 }
 
 WRITE8_MEMBER(rainbow_state::z80_diskdiag_read_w)
 {
-    m_zflip = true;
+	m_zflip = true;
 }
 
 WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 {
-    m_zflip = false;
+	m_zflip = false;
 }
 
 READ8_MEMBER( rainbow_state::read_video_ram_r )
@@ -320,12 +320,12 @@ READ8_MEMBER( rainbow_state::read_video_ram_r )
 
 INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 {
-    device.execute().set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x20);
+	device.execute().set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x20);
 }
 
 WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
 {
-    m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
+	m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
 }
 
 READ8_MEMBER( rainbow_state::diagnostic_r )
@@ -337,39 +337,39 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 {
 //    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
 
-    if (!(data & 1))
-    {
-        m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-        m_z80_halted = true;
-    }
+	if (!(data & 1))
+	{
+		m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_z80_halted = true;
+	}
 
-    if ((data & 1) && (m_z80_halted))
-    {
-        m_zflip = true;
-        m_z80_halted = false;
-        m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-        m_z80->reset();
-    }
+	if ((data & 1) && (m_z80_halted))
+	{
+		m_zflip = true;
+		m_z80_halted = false;
+		m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_z80->reset();
+	}
 
 	m_diagnostic = data;
 }
 
 void rainbow_state::update_kbd_irq()
 {
-    if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
-    {
-        m_i8088->set_input_line_and_vector(INPUT_LINE_INT2, ASSERT_LINE, 0x26);
-    }
-    else
-    {
-        m_i8088->set_input_line(INPUT_LINE_INT2, CLEAR_LINE);
-    }
+	if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
+	{
+		m_i8088->set_input_line_and_vector(INPUT_LINE_INT2, ASSERT_LINE, 0x26);
+	}
+	else
+	{
+		m_i8088->set_input_line(INPUT_LINE_INT2, CLEAR_LINE);
+	}
 }
 
 READ_LINE_MEMBER(rainbow_state::kbd_rx)
 {
 //    printf("read keyboard\n");
-    return 0x00;
+	return 0x00;
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
@@ -380,22 +380,22 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
 WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
 {
 //    printf("rxready %d\n", state);
-    m_kbd_rx_ready = (state == 1) ? true : false;
-    update_kbd_irq();
+	m_kbd_rx_ready = (state == 1) ? true : false;
+	update_kbd_irq();
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 {
 //    printf("txready %d\n", state);
-    m_kbd_tx_ready = (state == 1) ? true : false;
-    update_kbd_irq();
+	m_kbd_tx_ready = (state == 1) ? true : false;
+	update_kbd_irq();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 {
 
-    m_kbd8251->transmit_clock();
-    m_kbd8251->receive_clock();
+	m_kbd8251->transmit_clock();
+	m_kbd8251->receive_clock();
 }
 
 static const vt_video_interface video_interface =
@@ -409,15 +409,15 @@ static const vt_video_interface video_interface =
 /* F4 Character Displayer */
 static const gfx_layout rainbow_charlayout =
 {
-	8, 10,					/* 8 x 16 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 10,                  /* 8 x 16 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 15*8, 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( rainbow )
@@ -490,7 +490,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_I8251_ADD("kbdser", i8251_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800))
 
-    MCFG_LK201_ADD()
+	MCFG_LK201_ADD()
 MACHINE_CONFIG_END
 
 /* ROM definition */

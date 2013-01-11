@@ -728,7 +728,7 @@ READ32_MEMBER(namcos11_state::lightgun_r)
 }
 
 static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_SHARE("sharedram") /* shared ram with C76 */
 	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_SHARE("keycus") /* keycus */
 	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */

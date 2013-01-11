@@ -49,18 +49,18 @@ READ8_MEMBER( phc25_state::port40_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0
-        1
-        2
-        3
-        4       vertical sync
-        5       cassette read
-        6       centronics busy
-        7       horizontal sync
+	    0
+	    1
+	    2
+	    3
+	    4       vertical sync
+	    5       cassette read
+	    6       centronics busy
+	    7       horizontal sync
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -83,18 +83,18 @@ WRITE8_MEMBER( phc25_state::port40_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       cassette output
-        1       cassette motor
-        2       MC6847 INT/EXT
-        3       centronics strobe
-        4
-        5       MC6847 GM1
-        6       MC6847 GM0
-        7       MC6847 A/G
+	    0       cassette output
+	    1       cassette motor
+	    2       MC6847 INT/EXT
+	    3       centronics strobe
+	    4
+	    5       MC6847 GM1
+	    6       MC6847 GM0
+	    7       MC6847 A/G
 
-    */
+	*/
 
 	/* cassette output */
 	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);
@@ -283,17 +283,17 @@ static const mc6847_interface ntsc_vdg_intf =
 	SCREEN_TAG,
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 
-	DEVCB_NULL,											/* horizontal sync */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* field sync */
+	DEVCB_NULL,                                         /* horizontal sync */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     /* field sync */
 
-	DEVCB_NULL,											/* AG */
-	DEVCB_NULL,											/* GM2 */
-	DEVCB_NULL,											/* GM1 */
-	DEVCB_NULL,											/* GM0 */
-	DEVCB_NULL,											/* CSS */
-	DEVCB_NULL,											/* AS */
-	DEVCB_NULL,											/* INTEXT */
-	DEVCB_NULL,											/* INV */
+	DEVCB_NULL,                                         /* AG */
+	DEVCB_NULL,                                         /* GM2 */
+	DEVCB_NULL,                                         /* GM1 */
+	DEVCB_NULL,                                         /* GM0 */
+	DEVCB_NULL,                                         /* CSS */
+	DEVCB_NULL,                                         /* AS */
+	DEVCB_NULL,                                         /* INTEXT */
+	DEVCB_NULL,                                         /* INV */
 
 	&phc25_state::ntsc_char_rom_r
 };
@@ -303,17 +303,17 @@ static const mc6847_interface pal_vdg_intf =
 	SCREEN_TAG,
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 
-	DEVCB_NULL,											/* horizontal sync */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* field sync */
+	DEVCB_NULL,                                         /* horizontal sync */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     /* field sync */
 
-	DEVCB_NULL,											/* AG */
-	DEVCB_NULL,											/* GM2 */
-	DEVCB_NULL,											/* GM1 */
-	DEVCB_NULL,											/* GM0 */
-	DEVCB_NULL,											/* CSS */
-	DEVCB_NULL,											/* AS */
-	DEVCB_NULL,											/* INTEXT */
-	DEVCB_NULL,											/* INV */
+	DEVCB_NULL,                                         /* AG */
+	DEVCB_NULL,                                         /* GM2 */
+	DEVCB_NULL,                                         /* GM1 */
+	DEVCB_NULL,                                         /* GM0 */
+	DEVCB_NULL,                                         /* CSS */
+	DEVCB_NULL,                                         /* AS */
+	DEVCB_NULL,                                         /* INTEXT */
+	DEVCB_NULL,                                         /* INV */
 
 	&phc25_state::pal_char_rom_r
 };
@@ -352,9 +352,9 @@ static const cassette_interface phc25_cassette_interface =
 
 static MACHINE_CONFIG_START( phc25, phc25_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
-    MCFG_CPU_PROGRAM_MAP(phc25_mem)
-    MCFG_CPU_IO_MAP(phc25_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(phc25_mem)
+	MCFG_CPU_IO_MAP(phc25_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -372,13 +372,13 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, phc25 )
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, pal_vdg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, ntsc_vdg_intf)
 MACHINE_CONFIG_END
@@ -386,26 +386,26 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( phc25 )
-    ROM_REGION( 0x6000, Z80_TAG, 0 )
+	ROM_REGION( 0x6000, Z80_TAG, 0 )
 	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a))
 	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705))
 	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a))
 ROM_END
 
 ROM_START( phc25j )
-    ROM_REGION( 0x6000, Z80_TAG, 0 )
+	ROM_REGION( 0x6000, Z80_TAG, 0 )
 	ROM_LOAD( "phc25-11.0", 0x0000, 0x2000, CRC(287e83b0) SHA1(9fe960a8245f28efc04defeeeaceb1e5ec6793b8))
 	ROM_LOAD( "phc25-11.1", 0x2000, 0x2000, CRC(6223f945) SHA1(5d44b883b6264cb5d2e21b2269308630c62e0e56))
 	ROM_LOAD( "phc25-11.2", 0x4000, 0x2000, CRC(da859ae4) SHA1(6121e85947921e434d0157c378de3d81537f6b9f))
 	//ROM_LOAD( "022 00aa.ic", 0x0000, 0x2000, NO_DUMP )
 	//ROM_LOAD( "022 01aa.ic", 0x2000, 0x2000, NO_DUMP )
 	//ROM_LOAD( "022 02aa.ic", 0x4000, 0x2000, NO_DUMP )
-    //ROM_REGION( 0x1000, "chargen", 0 )
+	//ROM_REGION( 0x1000, "chargen", 0 )
 	//ROM_LOAD( "022 04a.ic", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1983, phc25,	0,		0,		pal,	phc25, driver_device,	0,		"Sanyo",	"PHC-25 (Europe)",	GAME_NOT_WORKING )
-COMP( 1983, phc25j,	phc25,	0,		ntsc,	phc25j, driver_device,	0,		"Sanyo",	"PHC-25 (Japan)",	GAME_NOT_WORKING )
+COMP( 1983, phc25,  0,      0,      pal,    phc25, driver_device,   0,      "Sanyo",    "PHC-25 (Europe)",  GAME_NOT_WORKING )
+COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,      "Sanyo",    "PHC-25 (Japan)",   GAME_NOT_WORKING )

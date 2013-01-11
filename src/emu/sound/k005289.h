@@ -13,7 +13,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( k005289_keylatch_A_w );
 DECLARE_WRITE8_DEVICE_HANDLER( k005289_keylatch_B_w );
 
 class k005289_device : public device_t,
-                                  public device_sound_interface
+									public device_sound_interface
 {
 public:
 	k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

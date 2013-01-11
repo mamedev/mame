@@ -1,4 +1,4 @@
-#define	VRAM_MAX	3
+#define VRAM_MAX    3
 
 class niyanpai_state : public driver_device
 {

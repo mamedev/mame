@@ -17,7 +17,7 @@ acb4070_device::acb4070_device(const machine_config &mconfig, const char *tag, d
 #define ACB4070_CMD_WRITE_DATA_BUFFER ( 0x13 )
 #define ACB4070_CMD_READ_DATA_BUFFER ( 0x14 )
 
-#define TRANSFERLENGTH_DATA_BUFFER	0x0400
+#define TRANSFERLENGTH_DATA_BUFFER  0x0400
 
 void acb4070_device::ExecCommand( int *transferLength )
 {

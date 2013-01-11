@@ -31,8 +31,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MCCS1850_ADD(_tag, _clock, _int_cb, _pse_cb, _nuc_cb)	\
-	MCFG_DEVICE_ADD(_tag, MCCS1850, _clock)	\
+#define MCFG_MCCS1850_ADD(_tag, _clock, _int_cb, _pse_cb, _nuc_cb)  \
+	MCFG_DEVICE_ADD(_tag, MCCS1850, _clock) \
 	downcast<mccs1850_device *>(device)->set_cb(_int_cb, _pse_cb, _nuc_cb);
 
 
@@ -42,13 +42,13 @@
 
 // ======================> mccs1850_device
 
-class mccs1850_device :	public device_t,
+class mccs1850_device : public device_t,
 						public device_rtc_interface,
 						public device_nvram_interface
 {
 public:
-    // construction/destruction
-    mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void set_cb(line_cb_t int_cb, line_cb_t pse_cb, line_cb_t nuc_cb);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
@@ -60,9 +60,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( test_w );
 
 protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_nvram_interface overrides
@@ -81,23 +81,23 @@ private:
 
 	line_cb_t int_cb, pse_cb, nuc_cb;
 
-	UINT8 m_ram[0x80];			// RAM
+	UINT8 m_ram[0x80];          // RAM
 
 	// power supply
-	int m_pse;					// power supply enable
+	int m_pse;                  // power supply enable
 
 	// counter
-	UINT32 m_counter;			// seconds counter
+	UINT32 m_counter;           // seconds counter
 
 	// serial interface
-	int m_ce;					// chip enable
-	int m_sck;					// serial clock
-	int m_sdo;					// serial data out
-	int m_sdi;					// serial data in
-	int m_state;				// serial interface state
-	UINT8 m_address;			// address counter
-	int m_bits;					// bit counter
-	UINT8 m_shift;				// shift register
+	int m_ce;                   // chip enable
+	int m_sck;                  // serial clock
+	int m_sdo;                  // serial data out
+	int m_sdi;                  // serial data in
+	int m_state;                // serial interface state
+	UINT8 m_address;            // address counter
+	int m_bits;                 // bit counter
+	UINT8 m_shift;              // shift register
 
 	// timers
 	emu_timer *m_clock_timer;

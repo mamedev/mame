@@ -68,18 +68,18 @@ struct palette_client;
 ***************************************************************************/
 
 /* macros to assemble rgb_t values */
-#define MAKE_ARGB(a,r,g,b)	((((rgb_t)(a) & 0xff) << 24) | (((rgb_t)(r) & 0xff) << 16) | (((rgb_t)(g) & 0xff) << 8) | ((rgb_t)(b) & 0xff))
-#define MAKE_RGB(r,g,b)		(MAKE_ARGB(255,r,g,b))
+#define MAKE_ARGB(a,r,g,b)  ((((rgb_t)(a) & 0xff) << 24) | (((rgb_t)(r) & 0xff) << 16) | (((rgb_t)(g) & 0xff) << 8) | ((rgb_t)(b) & 0xff))
+#define MAKE_RGB(r,g,b)     (MAKE_ARGB(255,r,g,b))
 
 /* macros to extract components from rgb_t values */
-#define RGB_ALPHA(rgb)		(((rgb) >> 24) & 0xff)
-#define RGB_RED(rgb)		(((rgb) >> 16) & 0xff)
-#define RGB_GREEN(rgb)		(((rgb) >> 8) & 0xff)
-#define RGB_BLUE(rgb)		((rgb) & 0xff)
+#define RGB_ALPHA(rgb)      (((rgb) >> 24) & 0xff)
+#define RGB_RED(rgb)        (((rgb) >> 16) & 0xff)
+#define RGB_GREEN(rgb)      (((rgb) >> 8) & 0xff)
+#define RGB_BLUE(rgb)       ((rgb) & 0xff)
 
 /* common colors */
-#define RGB_BLACK			(MAKE_ARGB(255,0,0,0))
-#define RGB_WHITE			(MAKE_ARGB(255,255,255,255))
+#define RGB_BLACK           (MAKE_ARGB(255,0,0,0))
+#define RGB_WHITE           (MAKE_ARGB(255,255,255,255))
 
 
 
@@ -369,4 +369,4 @@ inline rgb_t pal888(UINT32 data, UINT8 rshift, UINT8 gshift, UINT8 bshift)
 }
 
 
-#endif	/* __PALETTE_H__ */
+#endif  /* __PALETTE_H__ */

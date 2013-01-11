@@ -164,7 +164,7 @@ const device_type TRACKFLD_AUDIO = &device_creator<trackfld_audio_device>;
 
 trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TRACKFLD_AUDIO, "Track And Field Audio", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(trackfld_audio_state);
 }
@@ -206,5 +206,3 @@ void trackfld_audio_device::sound_stream_update(sound_stream &stream, stream_sam
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

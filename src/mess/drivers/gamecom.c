@@ -29,7 +29,7 @@ static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
 	AM_RANGE( 0x4000, 0x5FFF )  AM_ROMBANK("bank2")                                   /* External ROM/Flash. Controlled by MMU2 */
 	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK("bank3")                                   /* External ROM/Flash. Controlled by MMU3 */
 	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK("bank4")                                   /* External ROM/Flash. Controlled by MMU4 */
-	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_SHARE("p_videoram")			  /* VRAM */
+	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_SHARE("p_videoram")             /* VRAM */
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("p_nvram")// AM_SHARE("nvram")           /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
@@ -67,11 +67,11 @@ INPUT_PORTS_END
 
 static const unsigned char palette[] =
 {
-	0xDF, 0xFF, 0x8F,	/* White */
-	0x8F, 0xCF, 0x8F,	/* Gray 3 */
-	0x6F, 0x8F, 0x4F,	/* Gray 2 */
-	0x0F, 0x4F, 0x2F,	/* Gray 1 */
-	0x00, 0x00, 0x00,	/* Black */
+	0xDF, 0xFF, 0x8F,   /* White */
+	0x8F, 0xCF, 0x8F,   /* Gray 3 */
+	0x6F, 0x8F, 0x4F,   /* Gray 2 */
+	0x0F, 0x4F, 0x2F,   /* Gray 1 */
+	0x00, 0x00, 0x00,   /* Black */
 };
 
 void gamecom_state::palette_init()

@@ -232,12 +232,12 @@ READ32_MEMBER(deco_mlc_state::mlc_vram_r)
 READ32_MEMBER(deco_mlc_state::stadhr96_prot_146_r)
 {
 	/*
-        cpu #0 (PC=00041BD0): unmapped program memory dword write to 00708004 = 000F0000 & FFFFFFFF
-        cpu #0 (PC=00041BFC): unmapped program memory dword write to 0070F0C8 = 00028800 & FFFFFFFF
-        cpu #0 (PC=00041C08): unmapped program memory dword write to 0070F010 = 00081920 & FFFFFFFF
-        cpu #0 (PC=00041C14): unmapped program memory dword write to 0070F020 = 00040960 & FFFFFFFF
-        cpu #0 (PC=00041C20): unmapped program memory dword write to 0070F03C = 5A5A5A5A & FFFFFFFF
-    */
+	    cpu #0 (PC=00041BD0): unmapped program memory dword write to 00708004 = 000F0000 & FFFFFFFF
+	    cpu #0 (PC=00041BFC): unmapped program memory dword write to 0070F0C8 = 00028800 & FFFFFFFF
+	    cpu #0 (PC=00041C08): unmapped program memory dword write to 0070F010 = 00081920 & FFFFFFFF
+	    cpu #0 (PC=00041C14): unmapped program memory dword write to 0070F020 = 00040960 & FFFFFFFF
+	    cpu #0 (PC=00041C20): unmapped program memory dword write to 0070F03C = 5A5A5A5A & FFFFFFFF
+	*/
 	offset<<=1;
 
 	logerror("%08x:  Read prot %04x\n", space.device().safe_pc(), offset);
@@ -262,14 +262,14 @@ static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0200000, 0x020000f) AM_READNOP AM_MIRROR(0xff000000)/* IRQ control? */
 	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)	AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_SHARE("irq_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("mlc_clip_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0204000, 0x0206fff) AM_RAM_READ(mlc_spriteram_r) AM_SHARE("spriteram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0280000, 0x029ffff) AM_RAM_READ(mlc_vram_r) AM_SHARE("mlc_vram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_SHARE("paletteram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
+	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
@@ -703,11 +703,11 @@ static void descramble_sound( running_machine &machine )
 		UINT32 addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
-		                    19,18,17,16,
-		                    15,14,13,12,
-		                    11,10,9, 8,
-		                    7, 6, 5, 4,
-		                    3, 2, 1 );
+							19,18,17,16,
+							15,14,13,12,
+							11,10,9, 8,
+							7, 6, 5, 4,
+							3, 2, 1 );
 
 		buf1[addr] = rom[x];
 	}
@@ -744,8 +744,8 @@ DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
 {
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
-        effective clock rate here to compensate otherwise we have slowdowns in
-        Skull Fung where there probably shouldn't be. */
+	    effective clock rate here to compensate otherwise we have slowdowns in
+	    Skull Fung where there probably shouldn't be. */
 	machine().device("maincpu")->set_clock_scale(2.0f);
 	m_mainCpuIsArm = 1;
 	deco156_decrypt(machine());

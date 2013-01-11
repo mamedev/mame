@@ -26,8 +26,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MOS8580_TAG 	"mos8580"
-#define CONTROL1_TAG	"joy1"
+#define MOS8580_TAG     "mos8580"
+#define CONTROL1_TAG    "joy1"
 
 
 

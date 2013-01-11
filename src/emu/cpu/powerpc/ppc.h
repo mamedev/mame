@@ -23,17 +23,17 @@
 ***************************************************************************/
 
 /* general constants */
-#define PPC_MAX_FASTRAM			4
-#define PPC_MAX_HOTSPOTS		16
+#define PPC_MAX_FASTRAM         4
+#define PPC_MAX_HOTSPOTS        16
 
 
 /* interrupt types */
-#define PPC_IRQ					0		/* external IRQ */
-#define PPC_IRQ_LINE_0			0		/* (4XX) external IRQ0 */
-#define PPC_IRQ_LINE_1			1		/* (4XX) external IRQ1 */
-#define PPC_IRQ_LINE_2			2		/* (4XX) external IRQ2 */
-#define PPC_IRQ_LINE_3			3		/* (4XX) external IRQ3 */
-#define PPC_IRQ_LINE_4			4		/* (4XX) external IRQ4 */
+#define PPC_IRQ                 0       /* external IRQ */
+#define PPC_IRQ_LINE_0          0       /* (4XX) external IRQ0 */
+#define PPC_IRQ_LINE_1          1       /* (4XX) external IRQ1 */
+#define PPC_IRQ_LINE_2          2       /* (4XX) external IRQ2 */
+#define PPC_IRQ_LINE_3          3       /* (4XX) external IRQ3 */
+#define PPC_IRQ_LINE_4          4       /* (4XX) external IRQ4 */
 
 
 /* register enumeration */
@@ -147,14 +147,14 @@ enum
 
 
 /* compiler-specific options */
-#define PPCDRC_STRICT_VERIFY		0x0001			/* verify all instructions */
-#define PPCDRC_FLUSH_PC				0x0002			/* flush the PC value before each memory access */
-#define PPCDRC_ACCURATE_SINGLES		0x0004			/* do excessive rounding to make single-precision results "accurate" */
+#define PPCDRC_STRICT_VERIFY        0x0001          /* verify all instructions */
+#define PPCDRC_FLUSH_PC             0x0002          /* flush the PC value before each memory access */
+#define PPCDRC_ACCURATE_SINGLES     0x0004          /* do excessive rounding to make single-precision results "accurate" */
 
 
 /* common sets of options */
-#define PPCDRC_COMPATIBLE_OPTIONS	(PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
-#define PPCDRC_FASTEST_OPTIONS		(0)
+#define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
+#define PPCDRC_FASTEST_OPTIONS      (0)
 
 
 
@@ -166,9 +166,9 @@ typedef void (*ppc4xx_spu_tx_handler)(device_t *device, UINT8 data);
 
 struct powerpc_config
 {
-	UINT32		bus_frequency;
-	read32_device_func	dcr_read_func;
-	write32_device_func	dcr_write_func;
+	UINT32      bus_frequency;
+	read32_device_func  dcr_read_func;
+	write32_device_func dcr_write_func;
 };
 
 typedef void (*ppc_dcstore_handler)(device_t *device, UINT32 address);
@@ -206,4 +206,4 @@ DECLARE_LEGACY_CPU_DEVICE(PPC604, ppc604);
 DECLARE_LEGACY_CPU_DEVICE(MPC8240, mpc8240);
 
 
-#endif	/* __PPC_H__ */
+#endif  /* __PPC_H__ */

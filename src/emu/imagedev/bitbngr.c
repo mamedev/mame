@@ -23,7 +23,7 @@ const device_type BITBANGER = &device_creator<bitbanger_device>;
 
 bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BITBANGER, "Bitbanger", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this)
 {
 	m_output_timer = NULL;
 	m_input_timer = NULL;
@@ -128,7 +128,7 @@ bool bitbanger_device::dec_mode(bool test)
 const char *bitbanger_device::tune_string(void)
 {
 	static const char *const tunes[] = {"-2.0%", "-1.75%", "-1.5%", "-1.25%", "-1.0%", "-0.75%", "-0.5", "-0.25%", "\xc2\xb1""0%",
-                                 "+0.25%",  "+0.5%", "+0.75%", "+1.0%", "+1.25%", "+1.5%", "+1.75%", "+2.0%"};
+									"+0.25%",  "+0.5%", "+0.75%", "+1.0%", "+1.25%", "+1.5%", "+1.75%", "+2.0%"};
 	return tunes[m_tune];
 }
 
@@ -141,7 +141,7 @@ const char *bitbanger_device::tune_string(void)
 float bitbanger_device::tune_value(void)
 {
 	static const float tunes[] = {0.97f, 0.9825f, 0.985f, 0.9875f, 0.99f, 0.9925f, 0.995f, 0.9975f, 1.0f,
-                  1.0025f, 1.005f, 1.0075f, 1.01f, 1.0125f, 1.015f, 1.0175f, 1.02f};
+					1.0025f, 1.005f, 1.0075f, 1.01f, 1.0125f, 1.015f, 1.0175f, 1.02f};
 	return tunes[m_tune];
 }
 
@@ -154,7 +154,7 @@ float bitbanger_device::tune_value(void)
 UINT32 bitbanger_device::baud_value(void)
 {
 	static const float bauds[] = { 150.0f, 300.0f, 600.0f, 1200.0f, 2400.0f, 4800.0f, 9600.0f,
-            14400.0f, 19200.0f, 28800.0f, 38400.0f, 57600.0f, 115200.0f};
+			14400.0f, 19200.0f, 28800.0f, 38400.0f, 57600.0f, 115200.0f};
 	float result = tune_value() * bauds[m_baud];
 	return (UINT32)result;
 }
@@ -167,7 +167,7 @@ UINT32 bitbanger_device::baud_value(void)
 const char *bitbanger_device::baud_string(void)
 {
 	static const char *const bauds[] = { "150", "300", "600", "1200", "2400", "4800",
-                     "9600", "14400", "19200", "28800", "38400", "57600", "115200"};
+						"9600", "14400", "19200", "28800", "38400", "57600", "115200"};
 
 	return(bauds[m_baud]);
 }
@@ -455,10 +455,10 @@ void bitbanger_device::set_input_line(UINT8 line)
 
 void bitbanger_device::output(int value)
 {
-   attotime one_point_five_baud;
+	attotime one_point_five_baud;
 
-   if( m_build_count == 0 && m_output_value == 1 && value == 0 )
-   {
+	if( m_build_count == 0 && m_output_value == 1 && value == 0 )
+	{
 		/* we found our start bit */
 		/* eight bits of data, plus one of stop */
 		m_build_count = 9;
@@ -466,10 +466,10 @@ void bitbanger_device::output(int value)
 
 		one_point_five_baud = m_current_baud + m_current_baud / 2;
 		m_output_timer->adjust(one_point_five_baud, 0, m_current_baud);
-   }
+	}
 
-   //fprintf(stderr,"%s, %d\n", device->machine().time().as_string(9), value);
-   m_output_value = value;
+	//fprintf(stderr,"%s, %d\n", device->machine().time().as_string(9), value);
+	m_output_value = value;
 }
 
 
@@ -497,4 +497,3 @@ void bitbanger_device::call_unload(void)
 {
 	m_input_timer->enable(false);
 }
-

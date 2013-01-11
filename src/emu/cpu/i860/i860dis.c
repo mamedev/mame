@@ -64,7 +64,7 @@ static void int_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 static void int_i2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	/* Sign extend the 16-bit immediate.
-       Print as hex for the bitwise operations.  */
+	   Print as hex for the bitwise operations.  */
 	int upper_6bits = (insn >> 26) & 0x3f;
 	if (upper_6bits >= 0x30 && upper_6bits <= 0x3f)
 		sprintf(buf, "%s\t0x%04x,%%r%d,%%r%d", mnemonic,
@@ -122,8 +122,8 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	prefix_d = (insn & 0x200) ? "d." : "";
 
 	/* Special case: pf[m]am and pf[m]sm families are always pipelined, so they
-       do not have a prefix.  Also, for the pfmam and pfmsm families, replace
-       any 'a' in the mnemonic with 'm' and prepend an 'm'.  */
+	   do not have a prefix.  Also, for the pfmam and pfmsm families, replace
+	   any 'a' in the mnemonic with 'm' and prepend an 'm'.  */
 	if ((insn & 0x7f) < 0x20)
 	{
 		int is_pfam = insn & 0x400;
@@ -308,7 +308,7 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	const char *const piped_suff[2] = { "", "p" };
 	int upper_6bits = (insn >> 26) & 0x3f;
 	int is_load = (upper_6bits == 8 || upper_6bits == 9 || upper_6bits == 24
-				   || upper_6bits == 25);
+					|| upper_6bits == 25);
 
 	/* Bits 2 and 1 determine the operand size.  */
 	idx = ((insn >> 1) & 3);
@@ -316,10 +316,10 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 
 	/* There is no pipelined load quad on XR.  */
 	if (piped && size == 16)
-    {
+	{
 		sprintf (buf, ".long\t%#08x; *", insn);
 		return;
-    }
+	}
 
 	/* There is only a 64-bit pixel store.  */
 	if ((upper_6bits == 15) && size != 8)
@@ -377,14 +377,14 @@ enum
 struct decode_tbl_t
 {
 	/* Disassembly function for this opcode.
-       Call with buffer, mnemonic, pc, insn.  */
+	   Call with buffer, mnemonic, pc, insn.  */
 	void (*insn_dis)(char *, char *, UINT32, UINT32);
 
-    /* Flags for this opcode.  */
+	/* Flags for this opcode.  */
 	char flags;
 
-    /* Mnemonic of this opcode (sometimes partial when more decode is
-       done in disassembly routines-- e.g., loads and stores).  */
+	/* Mnemonic of this opcode (sometimes partial when more decode is
+	   done in disassembly routines-- e.g., loads and stores).  */
 	const char *mnemonic;
 };
 
@@ -393,8 +393,8 @@ struct decode_tbl_t
 static const decode_tbl_t decode_tbl[64] =
 {
 	/* A slight bit of decoding for loads and stores is done in the
-       execution routines (operand size and addressing mode), which
-       is why their respective entries are identical.  */
+	   execution routines (operand size and addressing mode), which
+	   is why their respective entries are identical.  */
 	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.b isrc1(isrc2),idest.  */
 	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.b #const(isrc2),idest.  */
 	{ int_1d,    DEC_DECODED, "ixfr"       }, /* ixfr isrc1ni,fdest.        */
@@ -480,10 +480,10 @@ static const decode_tbl_t core_esc_decode_tbl[8] =
 static const decode_tbl_t fp_decode_tbl[128] =
 {
 	/* Floating point instructions.  The least significant 7 bits are
-       the (extended) opcode and bits 10:7 are P,D,S,R respectively
-       ([p]ipelined, [d]ual, [s]ource prec., [r]esult prec.).
-       For some operations, I defer decoding the P,S,R bits to the
-       emulation routine for them.  */
+	   the (extended) opcode and bits 10:7 are P,D,S,R respectively
+	   ([p]ipelined, [d]ual, [s]ource prec., [r]esult prec.).
+	   For some operations, I defer decoding the P,S,R bits to the
+	   emulation routine for them.  */
 	{ flop_12d,  DEC_DECODED, "r2p1."     }, /* 0x00 pf[m]am */
 	{ flop_12d,  DEC_DECODED, "r2pt."     }, /* 0x01 pf[m]am */
 	{ flop_12d,  DEC_DECODED, "r2ap1."    }, /* 0x02 pf[m]am */

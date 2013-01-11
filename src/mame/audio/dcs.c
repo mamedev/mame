@@ -156,11 +156,11 @@
 #include "machine/midwayic.h"
 
 
-#define LOG_DCS_TRANSFERS			(0)
-#define LOG_DCS_IO					(0)
-#define LOG_BUFFER_FILLING			(0)
+#define LOG_DCS_TRANSFERS           (0)
+#define LOG_DCS_IO                  (0)
+#define LOG_BUFFER_FILLING          (0)
 
-#define ENABLE_HLE_TRANSFERS		(1)
+#define ENABLE_HLE_TRANSFERS        (1)
 
 
 
@@ -170,91 +170,91 @@
  *
  *************************************/
 
-#define LCTRL_OUTPUT_EMPTY			0x400
-#define LCTRL_INPUT_EMPTY			0x800
+#define LCTRL_OUTPUT_EMPTY          0x400
+#define LCTRL_INPUT_EMPTY           0x800
 
-#define IS_OUTPUT_EMPTY()			(dcs.latch_control & LCTRL_OUTPUT_EMPTY)
-#define IS_OUTPUT_FULL()			(!(dcs.latch_control & LCTRL_OUTPUT_EMPTY))
-#define SET_OUTPUT_EMPTY()			(dcs.latch_control |= LCTRL_OUTPUT_EMPTY)
-#define SET_OUTPUT_FULL()			(dcs.latch_control &= ~LCTRL_OUTPUT_EMPTY)
+#define IS_OUTPUT_EMPTY()           (dcs.latch_control & LCTRL_OUTPUT_EMPTY)
+#define IS_OUTPUT_FULL()            (!(dcs.latch_control & LCTRL_OUTPUT_EMPTY))
+#define SET_OUTPUT_EMPTY()          (dcs.latch_control |= LCTRL_OUTPUT_EMPTY)
+#define SET_OUTPUT_FULL()           (dcs.latch_control &= ~LCTRL_OUTPUT_EMPTY)
 
-#define IS_INPUT_EMPTY()			(dcs.latch_control & LCTRL_INPUT_EMPTY)
-#define IS_INPUT_FULL()				(!(dcs.latch_control & LCTRL_INPUT_EMPTY))
-#define SET_INPUT_EMPTY()			(dcs.latch_control |= LCTRL_INPUT_EMPTY)
-#define SET_INPUT_FULL()			(dcs.latch_control &= ~LCTRL_INPUT_EMPTY)
+#define IS_INPUT_EMPTY()            (dcs.latch_control & LCTRL_INPUT_EMPTY)
+#define IS_INPUT_FULL()             (!(dcs.latch_control & LCTRL_INPUT_EMPTY))
+#define SET_INPUT_EMPTY()           (dcs.latch_control |= LCTRL_INPUT_EMPTY)
+#define SET_INPUT_FULL()            (dcs.latch_control &= ~LCTRL_INPUT_EMPTY)
 
 
 /* These are the some of the control register, we dont use them all */
 enum
 {
-	IDMA_CONTROL_REG = 0,	/* 3fe0 */
-	BDMA_INT_ADDR_REG,		/* 3fe1 */
-	BDMA_EXT_ADDR_REG,		/* 3fe2 */
-	BDMA_CONTROL_REG,		/* 3fe3 */
-	BDMA_WORD_COUNT_REG,	/* 3fe4 */
-	PROG_FLAG_DATA_REG,		/* 3fe5 */
-	PROG_FLAG_CONTROL_REG,	/* 3fe6 */
+	IDMA_CONTROL_REG = 0,   /* 3fe0 */
+	BDMA_INT_ADDR_REG,      /* 3fe1 */
+	BDMA_EXT_ADDR_REG,      /* 3fe2 */
+	BDMA_CONTROL_REG,       /* 3fe3 */
+	BDMA_WORD_COUNT_REG,    /* 3fe4 */
+	PROG_FLAG_DATA_REG,     /* 3fe5 */
+	PROG_FLAG_CONTROL_REG,  /* 3fe6 */
 
-	S1_AUTOBUF_REG = 15,	/* 3fef */
-	S1_RFSDIV_REG,			/* 3ff0 */
-	S1_SCLKDIV_REG,			/* 3ff1 */
-	S1_CONTROL_REG,			/* 3ff2 */
-	S0_AUTOBUF_REG,			/* 3ff3 */
-	S0_RFSDIV_REG,			/* 3ff4 */
-	S0_SCLKDIV_REG,			/* 3ff5 */
-	S0_CONTROL_REG,			/* 3ff6 */
-	S0_MCTXLO_REG,			/* 3ff7 */
-	S0_MCTXHI_REG,			/* 3ff8 */
-	S0_MCRXLO_REG,			/* 3ff9 */
-	S0_MCRXHI_REG,			/* 3ffa */
-	TIMER_SCALE_REG,		/* 3ffb */
-	TIMER_COUNT_REG,		/* 3ffc */
-	TIMER_PERIOD_REG,		/* 3ffd */
-	WAITSTATES_REG,			/* 3ffe */
-	SYSCONTROL_REG			/* 3fff */
+	S1_AUTOBUF_REG = 15,    /* 3fef */
+	S1_RFSDIV_REG,          /* 3ff0 */
+	S1_SCLKDIV_REG,         /* 3ff1 */
+	S1_CONTROL_REG,         /* 3ff2 */
+	S0_AUTOBUF_REG,         /* 3ff3 */
+	S0_RFSDIV_REG,          /* 3ff4 */
+	S0_SCLKDIV_REG,         /* 3ff5 */
+	S0_CONTROL_REG,         /* 3ff6 */
+	S0_MCTXLO_REG,          /* 3ff7 */
+	S0_MCTXHI_REG,          /* 3ff8 */
+	S0_MCRXLO_REG,          /* 3ff9 */
+	S0_MCRXHI_REG,          /* 3ffa */
+	TIMER_SCALE_REG,        /* 3ffb */
+	TIMER_COUNT_REG,        /* 3ffc */
+	TIMER_PERIOD_REG,       /* 3ffd */
+	WAITSTATES_REG,         /* 3ffe */
+	SYSCONTROL_REG          /* 3fff */
 };
 
 
 /* these macros are used to reference the SDRC ASIC */
-#define SDRC_ROM_ST		((dcs.sdrc.reg[0] >> 0) & 3)	/* 0=0000, 1=3000, 2=3400, 3=none */
-#define SDRC_ROM_SZ		((dcs.sdrc.reg[0] >> 4) & 1)	/* 0=4k, 1=1k */
-#define SDRC_ROM_MS		((dcs.sdrc.reg[0] >> 5) & 1)	/* 0=/BMS, 1=/DMS */
-#define SDRC_ROM_PG		((dcs.sdrc.reg[0] >> 7) & 7)
-#define SDRC_SM_EN		((dcs.sdrc.reg[0] >> 11) & 1)
-#define SDRC_SM_BK		((dcs.sdrc.reg[0] >> 12) & 1)
-#define SDRC_SMODE		((dcs.sdrc.reg[0] >> 13) & 7)
+#define SDRC_ROM_ST     ((dcs.sdrc.reg[0] >> 0) & 3)    /* 0=0000, 1=3000, 2=3400, 3=none */
+#define SDRC_ROM_SZ     ((dcs.sdrc.reg[0] >> 4) & 1)    /* 0=4k, 1=1k */
+#define SDRC_ROM_MS     ((dcs.sdrc.reg[0] >> 5) & 1)    /* 0=/BMS, 1=/DMS */
+#define SDRC_ROM_PG     ((dcs.sdrc.reg[0] >> 7) & 7)
+#define SDRC_SM_EN      ((dcs.sdrc.reg[0] >> 11) & 1)
+#define SDRC_SM_BK      ((dcs.sdrc.reg[0] >> 12) & 1)
+#define SDRC_SMODE      ((dcs.sdrc.reg[0] >> 13) & 7)
 
-#define SDRC_DM_ST		((dcs.sdrc.reg[1] >> 0) & 3)	/* 0=none, 1=0000, 2=3000, 3=3400 */
-#define SDRC_DM_REF		((dcs.sdrc.reg[1] >> 4) & 3)
-#define SDRC_DM_3WS		((dcs.sdrc.reg[1] >> 7) & 1)
-#define SDRC_TFS_INV	((dcs.sdrc.reg[1] >> 8) & 1)
-#define SDRC_RES_TFS	((dcs.sdrc.reg[1] >> 10) & 3)
-#define SDRC_LED		((dcs.sdrc.reg[1] >> 13) & 1)
-#define SDRC_MUTE		((dcs.sdrc.reg[1] >> 14) & 1)
-#define SDRC_AREF_ACT	((dcs.sdrc.reg[1] >> 15) & 1)
+#define SDRC_DM_ST      ((dcs.sdrc.reg[1] >> 0) & 3)    /* 0=none, 1=0000, 2=3000, 3=3400 */
+#define SDRC_DM_REF     ((dcs.sdrc.reg[1] >> 4) & 3)
+#define SDRC_DM_3WS     ((dcs.sdrc.reg[1] >> 7) & 1)
+#define SDRC_TFS_INV    ((dcs.sdrc.reg[1] >> 8) & 1)
+#define SDRC_RES_TFS    ((dcs.sdrc.reg[1] >> 10) & 3)
+#define SDRC_LED        ((dcs.sdrc.reg[1] >> 13) & 1)
+#define SDRC_MUTE       ((dcs.sdrc.reg[1] >> 14) & 1)
+#define SDRC_AREF_ACT   ((dcs.sdrc.reg[1] >> 15) & 1)
 
-#define SDRC_DM_PG		((dcs.sdrc.reg[2] >> 0) & 0x7ff)
-#define SDRC_EPM_PG		((dcs.sdrc.reg[2] >> 0) & 0x1fff)
+#define SDRC_DM_PG      ((dcs.sdrc.reg[2] >> 0) & 0x7ff)
+#define SDRC_EPM_PG     ((dcs.sdrc.reg[2] >> 0) & 0x1fff)
 
 
 /* these macros are used to reference the DSIO ASIC */
-#define DSIO_EMPTY_FIFO	((dcs.dsio.reg[1] >> 0) & 1)
-#define DSIO_CUR_OUTPUT	((dcs.dsio.reg[1] >> 4) & 1)
-#define DSIO_RES_TFS	((dcs.dsio.reg[1] >> 10) & 1)
-#define DSIO_LED		((dcs.dsio.reg[1] >> 13) & 1)
-#define DSIO_MUTE		((dcs.dsio.reg[1] >> 14) & 1)
+#define DSIO_EMPTY_FIFO ((dcs.dsio.reg[1] >> 0) & 1)
+#define DSIO_CUR_OUTPUT ((dcs.dsio.reg[1] >> 4) & 1)
+#define DSIO_RES_TFS    ((dcs.dsio.reg[1] >> 10) & 1)
+#define DSIO_LED        ((dcs.dsio.reg[1] >> 13) & 1)
+#define DSIO_MUTE       ((dcs.dsio.reg[1] >> 14) & 1)
 
-#define DSIO_DM_PG		((dcs.dsio.reg[2] >> 0) & 0x7ff)
+#define DSIO_DM_PG      ((dcs.dsio.reg[2] >> 0) & 0x7ff)
 
 
 /* these macros are used to reference the DENVER ASIC */
-#define DENV_DSP_SPEED	((dcs.dsio.reg[1] >> 2) & 3)	/* read only: 1=33.33MHz */
-#define DENV_RES_TFS	((dcs.dsio.reg[1] >> 10) & 1)
-#define DENV_CHANNELS	((dcs.dsio.reg[1] >> 11) & 3)	/* 0=2ch, 1=4ch, 2=6ch */
-#define DENV_LED		((dcs.dsio.reg[1] >> 13) & 1)
-#define DENV_MUTE		((dcs.dsio.reg[1] >> 14) & 1)
+#define DENV_DSP_SPEED  ((dcs.dsio.reg[1] >> 2) & 3)    /* read only: 1=33.33MHz */
+#define DENV_RES_TFS    ((dcs.dsio.reg[1] >> 10) & 1)
+#define DENV_CHANNELS   ((dcs.dsio.reg[1] >> 11) & 3)   /* 0=2ch, 1=4ch, 2=6ch */
+#define DENV_LED        ((dcs.dsio.reg[1] >> 13) & 1)
+#define DENV_MUTE       ((dcs.dsio.reg[1] >> 14) & 1)
 
-#define DENV_DM_PG		((dcs.dsio.reg[2] >> 0) & 0x7ff)
+#define DENV_DM_PG      ((dcs.dsio.reg[2] >> 0) & 0x7ff)
 
 
 
@@ -266,31 +266,31 @@ enum
 
 struct sdrc_state
 {
-	UINT16		reg[4];
-	UINT8		seed;
+	UINT16      reg[4];
+	UINT8       seed;
 };
 
 
 struct dsio_state
 {
-	UINT16		reg[4];
-	UINT8		start_on_next_write;
-	UINT16		channelbits;
+	UINT16      reg[4];
+	UINT8       start_on_next_write;
+	UINT16      channelbits;
 };
 
 
 struct hle_transfer_state
 {
-	UINT8		hle_enabled;
-	INT32		dcs_state;
-	INT32		state;
-	INT32		start;
-	INT32		stop;
-	INT32		type;
-	INT32		temp;
-	INT32		writes_left;
-	UINT16		sum;
-	INT32		fifo_entries;
+	UINT8       hle_enabled;
+	INT32       dcs_state;
+	INT32       state;
+	INT32       start;
+	INT32       stop;
+	INT32       type;
+	INT32       temp;
+	INT32       writes_left;
+	UINT16      sum;
+	INT32       fifo_entries;
 	timer_device *watchdog;
 };
 
@@ -300,53 +300,53 @@ struct dcs_state
 	adsp21xx_device *cpu;
 	address_space *program;
 	address_space *data;
-	UINT8		rev;
-	offs_t		polling_offset;
-	UINT32		polling_count;
+	UINT8       rev;
+	offs_t      polling_offset;
+	UINT32      polling_count;
 
 	/* sound output */
-	UINT8		channels;
-	UINT16		size;
-	UINT16		incs;
+	UINT8       channels;
+	UINT16      size;
+	UINT16      incs;
 	dmadac_sound_device *dmadac[6];
 	timer_device *reg_timer;
 	timer_device *sport_timer;
 	timer_device *internal_timer;
-	INT32		ireg;
-	UINT16		ireg_base;
-	UINT16		control_regs[32];
+	INT32       ireg;
+	UINT16      ireg_base;
+	UINT16      control_regs[32];
 
 	/* memory access/booting */
-	UINT16 *	bootrom;
-	UINT32		bootrom_words;
-	UINT16 *	sounddata;
-	UINT32		sounddata_words;
-	UINT32		sounddata_banks;
-	UINT16		sounddata_bank;
+	UINT16 *    bootrom;
+	UINT32      bootrom_words;
+	UINT16 *    sounddata;
+	UINT32      sounddata_words;
+	UINT32      sounddata_banks;
+	UINT16      sounddata_bank;
 
 	/* I/O with the host */
-	UINT8		auto_ack;
-	UINT16		latch_control;
-	UINT16		input_data;
-	UINT16		output_data;
-	UINT16		output_control;
-	UINT64		output_control_cycles;
-	UINT8		last_output_full;
-	UINT8		last_input_empty;
-	UINT16		progflags;
-	void		(*output_full_cb)(running_machine &, int);
-	void		(*input_empty_cb)(running_machine &, int);
-	UINT16		(*fifo_data_r)(device_t *device);
-	UINT16		(*fifo_status_r)(device_t *device);
+	UINT8       auto_ack;
+	UINT16      latch_control;
+	UINT16      input_data;
+	UINT16      output_data;
+	UINT16      output_control;
+	UINT64      output_control_cycles;
+	UINT8       last_output_full;
+	UINT8       last_input_empty;
+	UINT16      progflags;
+	void        (*output_full_cb)(running_machine &, int);
+	void        (*input_empty_cb)(running_machine &, int);
+	UINT16      (*fifo_data_r)(device_t *device);
+	UINT16      (*fifo_status_r)(device_t *device);
 
 	/* timers */
-	UINT8		timer_enable;
-	UINT8		timer_ignore;
-	UINT64		timer_start_cycles;
-	UINT32		timer_start_count;
-	UINT32		timer_scale;
-	UINT32		timer_period;
-	UINT32		timers_fired;
+	UINT8       timer_enable;
+	UINT8       timer_ignore;
+	UINT64      timer_start_cycles;
+	UINT32      timer_start_count;
+	UINT32      timer_scale;
+	UINT32      timer_period;
+	UINT32      timers_fired;
 
 	UINT16 *sram;
 	UINT16 *polling_base;
@@ -449,9 +449,9 @@ static ADDRESS_MAP_START( dcs_2k_uart_data_map, AS_DATA, 16, driver_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
-	AM_RANGE(0x3400, 0x3402) AM_NOP								/* UART (ignored) */
+	AM_RANGE(0x3400, 0x3402) AM_NOP                             /* UART (ignored) */
 	AM_RANGE(0x3403, 0x3403) AM_READWRITE_LEGACY(input_latch_r, output_latch_w)
-	AM_RANGE(0x3404, 0x3405) AM_NOP								/* UART (ignored) */
+	AM_RANGE(0x3404, 0x3405) AM_NOP                             /* UART (ignored) */
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
@@ -483,12 +483,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs2_2115_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_SHARE("dcsint")
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs2_2104_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x01ff) AM_RAM	AM_SHARE("dcsint")
+	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
@@ -526,7 +526,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsio_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_SHARE("dcsint")
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
@@ -558,7 +558,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( denver_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_SHARE("dcsint")
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
@@ -590,9 +590,9 @@ ADDRESS_MAP_END
 
 static const adsp21xx_config adsp_config =
 {
-	NULL,					/* callback for serial receive */
-	sound_tx_callback,		/* callback for serial transmit */
-	timer_enable_callback	/* callback for timer fired */
+	NULL,                   /* callback for serial receive */
+	sound_tx_callback,      /* callback for serial transmit */
+	timer_enable_callback   /* callback for timer fired */
 };
 
 
@@ -1204,35 +1204,35 @@ static READ16_HANDLER( sdrc_r )
 		switch (SDRC_SMODE)
 		{
 			default:
-			case 0:	/* no-op */
+			case 0: /* no-op */
 				result = 0x5a81;
 				break;
 
-			case 1:	/* write seed */
+			case 1: /* write seed */
 				result = 0x5aa4;
 				break;
 
-			case 2:	/* read data */
+			case 2: /* read data */
 				result = 0x5a00 | ((sdrc.seed & 0x3f) << 1);
 				break;
 
-			case 3:	/* shift left */
+			case 3: /* shift left */
 				result = 0x5ab9;
 				break;
 
-			case 4:	/* add */
+			case 4: /* add */
 				result = 0x5a03;
 				break;
 
-			case 5:	/* xor */
+			case 5: /* xor */
 				result = 0x5a69;
 				break;
 
-			case 6:	/* prg */
+			case 6: /* prg */
 				result = 0x5a20;
 				break;
 
-			case 7:	/* invert */
+			case 7: /* invert */
 				result = 0x5aff;
 				break;
 		}
@@ -1277,31 +1277,31 @@ static WRITE16_HANDLER( sdrc_w )
 		case 3:
 			switch (SDRC_SMODE)
 			{
-				case 0:	/* no-op */
-				case 2:	/* read data */
+				case 0: /* no-op */
+				case 2: /* read data */
 					break;
 
-				case 1:	/* write seed */
+				case 1: /* write seed */
 					sdrc.seed = data & 0xff;
 					break;
 
-				case 3:	/* shift left */
+				case 3: /* shift left */
 					sdrc.seed = (sdrc.seed << 1) | 1;
 					break;
 
-				case 4:	/* add */
+				case 4: /* add */
 					sdrc.seed += sdrc.seed >> 1;
 					break;
 
-				case 5:	/* xor */
+				case 5: /* xor */
 					sdrc.seed ^= (sdrc.seed << 1) | 1;
 					break;
 
-				case 6:	/* prg */
+				case 6: /* prg */
 					sdrc.seed = (((sdrc.seed << 7) ^ (sdrc.seed << 5) ^ (sdrc.seed << 4) ^ (sdrc.seed << 3)) & 0x80) | (sdrc.seed >> 1);
 					break;
 
-				case 7:	/* invert */
+				case 7: /* invert */
 					sdrc.seed = ~sdrc.seed;
 					break;
 			}
@@ -1784,11 +1784,11 @@ static void reset_timer(running_machine &machine)
 	{
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
 
-		if (dcs.program->read_dword(0x18*4) == 0x0c0030 &&		/* ENA SEC_REG */
-			dcs.program->read_dword(0x19*4) == 0x804828 &&		/* SI = DM($0482) */
-			dcs.program->read_dword(0x1a*4) == 0x904828 &&		/* DM($0482) = SI */
-			dcs.program->read_dword(0x1b*4) == 0x0C0020 &&		/* DIS SEC_REG */
-			dcs.program->read_dword(0x1c*4) == 0x0A001F)			/* RTI */
+		if (dcs.program->read_dword(0x18*4) == 0x0c0030 &&      /* ENA SEC_REG */
+			dcs.program->read_dword(0x19*4) == 0x804828 &&      /* SI = DM($0482) */
+			dcs.program->read_dword(0x1a*4) == 0x904828 &&      /* DM($0482) = SI */
+			dcs.program->read_dword(0x1b*4) == 0x0C0020 &&      /* DIS SEC_REG */
+			dcs.program->read_dword(0x1c*4) == 0x0A001F)            /* RTI */
 		{
 			dcs.timer_ignore = TRUE;
 		}
@@ -2029,8 +2029,8 @@ static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
 		if (dcs.control_regs[S1_AUTOBUF_REG] & 0x0002) /* bit 1 */
 		{
 			/* get the autobuffer registers */
-			int		mreg, lreg;
-			UINT16	source;
+			int     mreg, lreg;
+			UINT16  source;
 
 			dcs.ireg = (dcs.control_regs[S1_AUTOBUF_REG] >> 9) & 7;
 			mreg = (dcs.control_regs[S1_AUTOBUF_REG] >> 7) & 3;

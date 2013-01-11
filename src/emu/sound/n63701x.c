@@ -31,8 +31,8 @@ struct voice
 struct namco_63701x
 {
 	voice voices[2];
-	sound_stream * stream;		/* channel assigned by the mixer */
-	UINT8 *rom;		/* pointer to sample ROM */
+	sound_stream * stream;      /* channel assigned by the mixer */
+	UINT8 *rom;     /* pointer to sample ROM */
 };
 
 
@@ -81,12 +81,12 @@ static STREAM_UPDATE( namco_63701x_update )
 				{
 					int data = base[(pos++) & 0xffff];
 
-					if (data == 0xff)	/* end of sample */
+					if (data == 0xff)   /* end of sample */
 					{
 						v->playing = 0;
 						break;
 					}
-					else if (data == 0x00)	/* silence compression */
+					else if (data == 0x00)  /* silence compression */
 					{
 						data = base[(pos++) & 0xffff];
 						v->silence_counter = data;
@@ -128,11 +128,11 @@ WRITE8_DEVICE_HANDLER( namco_63701x_w )
 	else
 	{
 		/*
-          should we stop the playing sample if voice_select[ch] == 0 ?
-          originally we were, but this makes us lose a sample in genpeitd,
-          after the continue counter reaches 0. Either we shouldn't stop
-          the sample, or genpeitd is returning to the title screen too soon.
-         */
+		  should we stop the playing sample if voice_select[ch] == 0 ?
+		  originally we were, but this makes us lose a sample in genpeitd,
+		  after the continue counter reaches 0. Either we shouldn't stop
+		  the sample, or genpeitd is returning to the title screen too soon.
+		 */
 		if (chip->voices[ch].select & 0x1f)
 		{
 			int rom_offs;
@@ -157,7 +157,7 @@ const device_type NAMCO_63701X = &device_creator<namco_63701x_device>;
 
 namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_63701X, "Namco 63701X", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(namco_63701x);
 }
@@ -190,5 +190,3 @@ void namco_63701x_device::sound_stream_update(sound_stream &stream, stream_sampl
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

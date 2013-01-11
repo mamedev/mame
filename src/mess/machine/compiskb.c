@@ -15,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8748_TAG		"i8748"
+#define I8748_TAG       "i8748"
 
 
 
@@ -290,8 +290,8 @@ ioport_constructor compis_keyboard_device::device_input_ports() const
 
 compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, COMPIS_KEYBOARD, "Compis Keyboard", tag, owner, clock),
-	  m_maincpu(*this, I8748_TAG),
-	  m_so(1)
+		m_maincpu(*this, I8748_TAG),
+		m_so(1)
 {
 }
 
@@ -303,7 +303,7 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 void compis_keyboard_device::device_start()
 {
 	// resolve callbacks
-    m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
 }
 
 

@@ -16,9 +16,9 @@ VIDEO_START_MEMBER(cninja_state,stoneage)
 {
 
 	/* The bootleg has broken scroll registers */
-	deco16ic_set_scrolldx(m_deco_tilegen1, 3, 0, -10, -10);	/* pf4 16x16 tilemap */
-	deco16ic_set_scrolldx(m_deco_tilegen1, 1, 0, -10, -10);	/* pf2 16x16 tilemap */
-	deco16ic_set_scrolldx(m_deco_tilegen1, 0, 1, 2, 2);	/* pf1 8x8 tilemap */
+	deco16ic_set_scrolldx(m_deco_tilegen1, 3, 0, -10, -10); /* pf4 16x16 tilemap */
+	deco16ic_set_scrolldx(m_deco_tilegen1, 1, 0, -10, -10); /* pf2 16x16 tilemap */
+	deco16ic_set_scrolldx(m_deco_tilegen1, 0, 1, 2, 2); /* pf1 8x8 tilemap */
 }
 
 /******************************************************************************/
@@ -76,7 +76,7 @@ static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		fx = y & 0x2000;
 		fy = y & 0x4000;
 
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
+		multi = (1 << ((y & 0x0600) >> 9)) - 1; /* 1x, 2x, 4x, 8x height */
 
 		y -= multi * 16; // changed on bootleg!
 		y += 4;
@@ -267,16 +267,16 @@ UINT32 cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &
 
 
 	/* There is no priority prom on this board, but there is a
-    priority control word, the only values used in game appear
-    to be 2, 6 & 7 though:
+	priority control word, the only values used in game appear
+	to be 2, 6 & 7 though:
 
-    Bit 0:  If set sprite chip 2 above sprite chip 1 else vice versa
-    Bit 1:  Always set?
-    Bit 2:  Almost always set  (Sometimes not set on screen transitions)
+	Bit 0:  If set sprite chip 2 above sprite chip 1 else vice versa
+	Bit 1:  Always set?
+	Bit 2:  Almost always set  (Sometimes not set on screen transitions)
 
-    The other bits may control alpha blend on the 2nd sprite chip, or
-    layer order.
-    */
+	The other bits may control alpha blend on the 2nd sprite chip, or
+	layer order.
+	*/
 	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 0);

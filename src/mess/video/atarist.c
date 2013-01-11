@@ -1176,4 +1176,3 @@ UINT32 st_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-

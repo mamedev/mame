@@ -65,18 +65,18 @@ public:
 
 	bool m_bank2_enabled;
 	bool m_bank3_enabled;
-	UINT8	*m_bank4_ptr;
-	UINT8	*m_empty_4K;
+	UINT8   *m_bank4_ptr;
+	UINT8   *m_empty_4K;
 	/* IRQ states */
 	bool m_pia_0_irq_state;
 	bool m_pia_1_irq_state;
 	/* video related */
-	UINT8	m_new_start_x;
-	UINT8	m_new_start_y;
+	UINT8   m_new_start_x;
+	UINT8   m_new_start_y;
 	emu_timer *m_video_timer;
-	UINT8	*m_p_chargen;
+	UINT8   *m_p_chargen;
 	/* bankswitch setting */
-	UINT8	m_bankswitch;
+	UINT8   m_bankswitch;
 	bool m_in_irq_handler;
 	bool m_beep_state;
 	DECLARE_DRIVER_INIT(osborne1);
@@ -97,7 +97,7 @@ extern const pia6821_interface osborne1_video_pia_config;
 
 // ======================> osborne1_daisy_device
 
-class osborne1_daisy_device :	public device_t,
+class osborne1_daisy_device :   public device_t,
 						public device_z80daisy_interface
 {
 public:

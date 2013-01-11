@@ -107,10 +107,10 @@ void wallc_state::palette_init()
 	static const int resistances_b[3] = { 655, 330, 220 };
 	double weights_r[2], weights_g[2], weights_b[3];
 
-	compute_resistor_weights(0,	255,	-1.0,
-			2,	resistances_rg,	weights_r,	330,	0,
-			2,	resistances_rg,	weights_g,	330,	0,
-			3,	resistances_b,	weights_b,	330,	655+220);
+	compute_resistor_weights(0, 255,    -1.0,
+			2,  resistances_rg, weights_r,  330,    0,
+			2,  resistances_rg, weights_g,  330,    0,
+			3,  resistances_b,  weights_b,  330,    655+220);
 
 	for (i = 0;i < machine().total_colors();i++)
 	{
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 
 void wallc_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,	8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,   8, 8, 32, 32);
 }
 
 UINT32 wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -167,8 +167,8 @@ WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")	/* 2114, 2114 */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM		/* 2114, 2114 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */
 
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb200, 0xb200) AM_READ_PORT("SYSTEM")
@@ -184,54 +184,54 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( wallc )
-	PORT_START("SYSTEM")	/* b200 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	//Right curve button; select current playfield in test mode
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	//not used ?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )	//service?? plays loud,high-pitched sound
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )	//Left curve button; browse playfields in test mode
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )	//ok
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )	//ok
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )	//ok
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )	//ok
+	PORT_START("SYSTEM")    /* b200 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )    //Right curve button; select current playfield in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    //not used ?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )   //service?? plays loud,high-pitched sound
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )    //Left curve button; browse playfields in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )  //ok
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  //ok
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )  //ok
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) //ok
 
-	PORT_START("DIAL")		/* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
+	PORT_START("DIAL")      /* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(3) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("DSW1")		/* b000 */
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(	0x03, "5" )
-	PORT_DIPSETTING(	0x02, "4" )
-	PORT_DIPSETTING(	0x01, "3" )
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life) )		PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(	0x0c, "100K/200K/400K/800K" )
-	PORT_DIPSETTING(	0x08, "80K/160K/320K/640K" )
-	PORT_DIPSETTING(	0x04, "60K/120K/240K/480K" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x00, "Curve Effect" )			PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(	0x10, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x00, "More" )
-	PORT_DIPNAME( 0x60, 0x60, "Timer Speed" )			PORT_DIPLOCATION("SW3:2,3")
-	PORT_DIPSETTING(	0x60, "Slow" )
-	PORT_DIPSETTING(	0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(	0x20, "Fast" )
-	PORT_DIPSETTING(	0x00, "Super Fast" )
-	PORT_DIPNAME( 0x80, 0x00, "Service" )				PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(	0x80, "Free Play With Level Select" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
+	PORT_START("DSW1")      /* b000 */
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life) )        PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x0c, "100K/200K/400K/800K" )
+	PORT_DIPSETTING(    0x08, "80K/160K/320K/640K" )
+	PORT_DIPSETTING(    0x04, "60K/120K/240K/480K" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x00, "Curve Effect" )          PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "More" )
+	PORT_DIPNAME( 0x60, 0x60, "Timer Speed" )           PORT_DIPLOCATION("SW3:2,3")
+	PORT_DIPSETTING(    0x60, "Slow" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, "Fast" )
+	PORT_DIPSETTING(    0x00, "Super Fast" )
+	PORT_DIPNAME( 0x80, 0x00, "Service" )               PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x80, "Free Play With Level Select" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 
-	PORT_START("DSW2")		/* b600 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_START("DSW2")      /* b600 */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x30, 0x00, "Coin C" )				PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Coin C" )                PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
@@ -244,9 +244,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
+	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,3),
-	3,	/* 3 bits per pixel */
+	3,  /* 3 bits per pixel */
 	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) }, /* the bitplanes are separated */
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -300,7 +300,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallca)
 
 static MACHINE_CONFIG_START( wallc, wallc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)	/* 3.072 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wallc_state,  irq0_line_hold)
 
@@ -334,9 +334,9 @@ ROM_START( wallc )
 	ROM_LOAD( "wac1-52.h6", 0x2000, 0x2000, CRC(988eaa6d) SHA1(d5e5dbee6e7e0488fdecfb864198c686cbd5d59c) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "wc1.e3",		0x0000, 0x1000, CRC(ca5c4b53) SHA1(5d2e14fe81cca4ec7dbe0c98eaa26890fca28e58) )
-	ROM_LOAD( "wc2.e2",		0x1000, 0x1000, CRC(b7f52a59) SHA1(737e7616d7295762057fbdb69d65c8c1edc773dc) )
-	ROM_LOAD( "wc3.e1",		0x2000, 0x1000, CRC(f6854b3a) SHA1(bc1e7f785c338c1afa4ab61c07c61397b3de0b01) )
+	ROM_LOAD( "wc1.e3",     0x0000, 0x1000, CRC(ca5c4b53) SHA1(5d2e14fe81cca4ec7dbe0c98eaa26890fca28e58) )
+	ROM_LOAD( "wc2.e2",     0x1000, 0x1000, CRC(b7f52a59) SHA1(737e7616d7295762057fbdb69d65c8c1edc773dc) )
+	ROM_LOAD( "wc3.e1",     0x2000, 0x1000, CRC(f6854b3a) SHA1(bc1e7f785c338c1afa4ab61c07c61397b3de0b01) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )

@@ -147,14 +147,14 @@ public:
 INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize)
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
-    /* fedcba98 76543210 fedcba98 76543210
-       x                                    color mask? how exactly does it relate to color bits?
-        xx                                  flip
-          x                                 depth
-           xxxx xxxx                        color
-                    xxxx                    bank
-                         xxxxxxxx xxxxxxxx  tile
-    */
+	/* fedcba98 76543210 fedcba98 76543210
+	   x                                    color mask? how exactly does it relate to color bits?
+	    xx                                  flip
+	      x                                 depth
+	       xxxx xxxx                        color
+	                xxxx                    bank
+	                     xxxxxxxx xxxxxxxx  tile
+	*/
 	int depth = (state->m_tilemap_ram[whichtilemap][tile_index]&0x10000000)>>28;
 	int tileno = state->m_tilemap_ram[whichtilemap][tile_index]&0xffff;
 	int bank = (state->m_tilemap_ram[whichtilemap][tile_index]&0x000f0000)>>16;
@@ -405,14 +405,14 @@ void rabbit_state::video_start()
 	m_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap3_tile_info),this),TILEMAP_SCAN_ROWS, 8,  8, 128,32);
 
 	/* the tilemaps mix 4bpp and 8bbp tiles, we split these into 2 groups, and set a different transpen for each group */
-    m_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    m_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    m_tilemap[1]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    m_tilemap[1]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    m_tilemap[2]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    m_tilemap[2]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    m_tilemap[3]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    m_tilemap[3]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[1]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[1]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[2]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[2]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[3]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+	m_tilemap[3]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
 	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(),0x1000,0x1000);
 	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
@@ -455,12 +455,12 @@ static void rabbit_drawtilemap( running_machine &machine, bitmap_ind16 &bitmap, 
 
 
 	/* incxx and incyy and standard zoom, 16.16, a value of 0x10000 means no zoom
-       startx/starty are also 16.16 scrolling
-      */
+	   startx/starty are also 16.16 scrolling
+	  */
 
 	state->m_tilemap[whichtilemap]->draw_roz(bitmap, cliprect, startx << 12,starty << 12,
 			incxx << 5,incxy << 8,incyx << 8,incyy << 5,
-			1,	/* wraparound */
+			1,  /* wraparound */
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 }
 
@@ -727,7 +727,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	// as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) // as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )

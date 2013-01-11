@@ -25,7 +25,7 @@ public:
 
 	/* sound-related */
 	int            m_pulse;
-	int            m_timer;	// kludge for ym3526 in mightguy
+	int            m_timer; // kludge for ym3526 in mightguy
 
 	/* devices */
 	cpu_device *m_maincpu;

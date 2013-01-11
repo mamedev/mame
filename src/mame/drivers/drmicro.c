@@ -27,7 +27,7 @@ INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
 {
 
 	if (m_nmi_enable)
-		 device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(drmicro_state::nmi_enable_w)
@@ -119,29 +119,29 @@ static INPUT_PORTS_START( drmicro )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x00, "30000 100000" )
 	PORT_DIPSETTING(    0x08, "50000 150000" )
 	PORT_DIPSETTING(    0x10, "70000 200000" )
 	PORT_DIPSETTING(    0x18, "100000 300000" )
-	PORT_SERVICE_DIPLOC(  0x20, IP_ACTIVE_HIGH, "SW1:!6" )	/* Service Mode shows as "X" */
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!7")
+	PORT_SERVICE_DIPLOC(  0x20, IP_ACTIVE_HIGH, "SW1:!6" )  /* Service Mode shows as "X" */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:!1,!2,!3")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
@@ -216,8 +216,8 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	pcm_w,			/* IRQ handler */
-	MSM5205_S64_4B	/* 6 KHz */
+	pcm_w,          /* IRQ handler */
+	MSM5205_S64_4B  /* 6 KHz */
 };
 
 
@@ -227,7 +227,7 @@ static const msm5205_interface msm5205_config =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -259,7 +259,7 @@ void drmicro_state::machine_reset()
 static MACHINE_CONFIG_START( drmicro, drmicro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MCLK/6)	/* 3.072MHz? */
+	MCFG_CPU_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
 	MCFG_CPU_PROGRAM_MAP(drmicro_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", drmicro_state,  drmicro_interrupt)
@@ -341,4 +341,3 @@ ROM_END
  *************************************/
 
 GAME( 1983, drmicro, 0, drmicro, drmicro, driver_device, 0, ROT270, "Sanritsu", "Dr. Micro", GAME_SUPPORTS_SAVE )
-

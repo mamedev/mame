@@ -87,7 +87,7 @@ const struct pit8253_config mz80k_pit8253_config =
 		/* clockin        gate        callback    */
 		{ XTAL_8MHz/  4,  DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mz80_state, pit_out0_changed) },
 		{ XTAL_8MHz/256,  DEVCB_NULL, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
-		{	      0,  DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mz80_state, pit_out2_changed) },
+		{         0,  DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mz80_state, pit_out2_changed) },
 	}
 };
 

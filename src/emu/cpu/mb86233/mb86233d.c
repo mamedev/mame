@@ -10,8 +10,8 @@ static char * COND(unsigned int cond)
 
 	bufindex &= 3;
 
-    switch(cond)
-    {
+	switch(cond)
+	{
 		case 0x16:
 			sprintf(buf,"always");
 			return buf;
@@ -39,9 +39,9 @@ static char * COND(unsigned int cond)
 		case 0x11:
 			sprintf(buf,"(--r13)!=0");
 			return buf;
-    }
+	}
 
-    sprintf(buf,"unk (%x)",cond);
+	sprintf(buf,"unk (%x)",cond);
 	return buf;
 }
 
@@ -50,18 +50,18 @@ static char * REGS( UINT32 reg, int IsSource )
 	static char bufs[4][256];
 	static int bufindex = 0;
 	char *buf = &bufs[bufindex++][0];
-	int			mode = (reg >> 6 ) & 0x07;
+	int         mode = (reg >> 6 ) & 0x07;
 
 	bufindex &= 3;
 
 	reg &= 0x3f;
 
 	if ( mode == 0 || mode == 1 || mode == 3 )
-    {
-        if ( reg < 0x10 )
+	{
+		if ( reg < 0x10 )
 		{
 			sprintf(buf,"r%d",reg);
-    	    return buf;
+			return buf;
 		}
 
 		switch(reg)
@@ -138,7 +138,7 @@ static char * REGS( UINT32 reg, int IsSource )
 				sprintf(buf,"Unkreg (%x)",reg);
 			break;
 		}
-    }
+	}
 	else if ( mode == 2 )
 	{
 		char *p = buf;
@@ -160,7 +160,7 @@ static char * REGS( UINT32 reg, int IsSource )
 			p += sprintf(p,"r3");
 		}
 	}
-    else if ( mode == 6 )
+	else if ( mode == 6 )
 	{
 		char *p = buf;
 
@@ -183,26 +183,26 @@ static char * REGS( UINT32 reg, int IsSource )
 			p += sprintf(p,"--%d", 0x20 - ( reg & 0x1f ) );
 		else
 			p += sprintf(p,"++%d", reg & 0x1f );
-    }
-    else
-    {
+	}
+	else
+	{
 		sprintf(buf,"UNKMOD %x (0x%x)", mode, reg);
-    }
+	}
 
 	return buf;
 }
 
 static char * INDIRECT( UINT32 reg, int IsSource )
 {
-    static char bufs[4][256];
+	static char bufs[4][256];
 	static int bufindex = 0;
 	char *buf = &bufs[bufindex++][0];
-	int			mode = ( reg >> 6 ) & 0x07;
+	int         mode = ( reg >> 6 ) & 0x07;
 
 	bufindex &= 3;
 
-    if ( mode == 0 || mode == 3 || mode == 1)
-    {
+	if ( mode == 0 || mode == 3 || mode == 1)
+	{
 		sprintf(buf,"0x%x",reg);
 	}
 	else if ( mode == 2 )
@@ -226,8 +226,8 @@ static char * INDIRECT( UINT32 reg, int IsSource )
 			p += sprintf(p,"r3");
 		}
 	}
-    else if ( mode == 6 || mode == 7 )
-    {
+	else if ( mode == 6 || mode == 7 )
+	{
 		char *p = buf;
 
 		if ( IsSource )
@@ -249,11 +249,11 @@ static char * INDIRECT( UINT32 reg, int IsSource )
 			p += sprintf(p,"--%d",0x20 - ( reg & 0x1f ));
 		else
 			p += sprintf(p,"++%d",reg & 0x1f);
-    }
-    else
-    {
+	}
+	else
+	{
 		sprintf(buf,"UNKMOD %x (0x%x)", mode, reg);
-    }
+	}
 
 	return buf;
 }
@@ -267,108 +267,108 @@ static char * ALU( UINT32 alu)
 
 	bufindex &= 3;
 
-    switch( alu )
-    {
+	switch( alu )
+	{
 		case 0x0:
 			buf[0] = 0;
-	    break;
+		break;
 
 		case 0x1:
 			sprintf(buf,"d=d&a");
-	    break;
+		break;
 
 		case 0x2:
 			sprintf(buf,"d=d|a");
-	    break;
+		break;
 
-	    case 0x3:
+		case 0x3:
 			sprintf(buf,"d=d^a");
-	    break;
+		break;
 
 		case 0x5:
 			sprintf(buf,"cmp d,a");
-	    break;
+		break;
 
 		case 0x6:
 			sprintf(buf,"d=d+a");
-	    break;
+		break;
 
 		case 0x7:
 			sprintf(buf,"d=d-a");
-	    break;
+		break;
 
 		case 0x8:
 			sprintf(buf,"p=a*b");
-	    break;
+		break;
 
 		case 0x9:
 			sprintf(buf,"d=d+p, p=a*b");
-	    break;
+		break;
 
 		case 0xa:
 			sprintf(buf,"d=d-p, p=a*b");
-	    break;
+		break;
 
 		case 0xb:
 			sprintf(buf,"d=fabs d");
-	    break;
+		break;
 
 		case 0xc:
 			sprintf(buf,"d=d+p");
-	    break;
+		break;
 
 		case 0xd:
 			sprintf(buf,"d=p, p=a*b");
-	    break;
+		break;
 
 		case 0xe:
 			sprintf(buf,"d=float(d)");
-	    break;
+		break;
 
 		case 0xf:
 			sprintf(buf,"d=int(d)");
-	    break;
+		break;
 
 		case 0x10:
 			sprintf(buf,"d=d/a");
-	    break;
+		break;
 
 		case 0x11:
 			sprintf(buf,"d=-d");
-	    break;
+		break;
 
-	    case 0x13:
+		case 0x13:
 			sprintf(buf,"d=a+b");
-	    break;
+		break;
 
 		case 0x14:
 			sprintf(buf,"d=b-a");
-	    break;
+		break;
 
 		case 0x16:
 			sprintf(buf,"d=(lsr d,shift)");
-	    break;
+		break;
 
 		case 0x17:
 			sprintf(buf,"d=(lsl d,shift)");
-	    break;
+		break;
 
 		case 0x18:
 			sprintf(buf,"d=(asr d,shift)");
-	    break;
+		break;
 
 		case 0x1a:
 			sprintf(buf,"d=d+a (int)");
-	    break;
+		break;
 
 		case 0x1b:
 			sprintf(buf,"d=d-a (int)");
-	    break;
+		break;
 
 		default:
 			sprintf(buf,"ALU UNK(%x)",alu);
-	    break;
-    }
+		break;
+	}
 
 	return buf;
 }
@@ -376,11 +376,11 @@ static char * ALU( UINT32 alu)
 static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 {
 	char *p = buffer;
-	UINT32	grp = ( opcode >> 26 ) & 0x3f;
+	UINT32  grp = ( opcode >> 26 ) & 0x3f;
 
 	switch( grp )
 	{
-		case 0x0:	/* Dual move */
+		case 0x0:   /* Dual move */
 		{
 			UINT32 r1=opcode & 0x1ff;
 			UINT32 r2=(opcode>>9) & 0x7f;
@@ -392,19 +392,19 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 			switch( op )
 			{
-				case 0x0c:	/* a = RAM[addr], b = BRAM[addr] */
+				case 0x0c:  /* a = RAM[addr], b = BRAM[addr] */
 					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(0x%x)->b",r1,r2);
 				break;
 
-				case 0x0d:	/* a = RAM[addr], b = BRAM[addr] */
+				case 0x0d:  /* a = RAM[addr], b = BRAM[addr] */
 					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(2<<6),0));
 				break;
 
-				case 0x0f:	/* a = RAM[addr], b = BRAM[reg] */
+				case 0x0f:  /* a = RAM[addr], b = BRAM[reg] */
 					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(6<<6),0));
 				break;
 
-				case 0x10:	/* a = BRAM[reg], b = RAM[addr] */
+				case 0x10:  /* a = BRAM[reg], b = RAM[addr] */
 					p += sprintf(p,"LAB BRAM(%s)->a,RAM(0x%x)->b",INDIRECT(r1,1),r2);
 				break;
 
@@ -415,9 +415,9 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 		}
 		break;
 
-	    case 0x7:	/* LD/MOV */
+		case 0x7:   /* LD/MOV */
 		{
-		    UINT32 r1=opcode & 0x1ff;
+			UINT32 r1=opcode & 0x1ff;
 			UINT32 r2=(opcode>>9) & 0x7f;
 			UINT32 alu=(opcode>>21) & 0x1f;
 			UINT32 op=(opcode>>16) & 0x1f;
@@ -430,35 +430,35 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 					p += sprintf(p, ", ");
 			}
 
-		    switch(op)
-		    {
-				case 0x03:	/* RAM->External Indirect */
+			switch(op)
+			{
+				case 0x03:  /* RAM->External Indirect */
 				{
 					p += sprintf(p,"MOV RAM(0x%x)->E(EB+%s)",r1,INDIRECT(r2|(6<<6),0));
 				}
 				break;
 
-				case 0x04:	/* MOV RAM->External */
+				case 0x04:  /* MOV RAM->External */
 				{
 					p += sprintf(p,"MOV RAM(0x%x)->E(EB+0x%x)",r1,r2);
 				}
 				break;
 
-				case 0x07:	/* RAMInd->External */
+				case 0x07:  /* RAMInd->External */
 				{
 					p += sprintf(p,"MOV RAM(%s)->E(EB+%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
 				}
-			    break;
+				break;
 
-				case 0x08:	/* External->RAM */
+				case 0x08:  /* External->RAM */
 				{
 					p += sprintf(p,"MOV EXT(EB+");
 					p += sprintf(p,"%s",INDIRECT(r1,1));
-				    p += sprintf(p,")->RAM(0x%x)",r2);
+					p += sprintf(p,")->RAM(0x%x)",r2);
 				}
-			    break;
+				break;
 
-				case 0x0b:	/* External->RAMInd */
+				case 0x0b:  /* External->RAMInd */
 				{
 					int mode = ( r1 >> 6 ) & 0x07;
 
@@ -472,23 +472,23 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 					if ( mode == 0 || mode == 3 || mode == 1)
 						p += sprintf(p,")");
 
-				    p += sprintf(p,")->RAM(%s)",INDIRECT(r2|(6<<6),0));
+					p += sprintf(p,")->RAM(%s)",INDIRECT(r2|(6<<6),0));
 				}
-			    break;
+				break;
 
-				case 0x0c:	/* MOV RAM->BRAM */
+				case 0x0c:  /* MOV RAM->BRAM */
 					p += sprintf(p,"MOV RAM(0x%x)->BRAM(0x%x)",r1,r2);
 				break;
 
-				case 0x0f:	/* MOV RAMInd->BRAMInd */
+				case 0x0f:  /* MOV RAMInd->BRAMInd */
 					p += sprintf(p,"MOV RAM(%s)->BRAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
 				break;
 
-				case 0x10:	/* MOV BRAMInd->RAM */
+				case 0x10:  /* MOV BRAMInd->RAM */
 					p += sprintf(p,"MOV BRAM(%s)->RAM(0x%x)",INDIRECT(r1,1),r2);
 				break;
 
-				case 0x13:	/* MOV BRAMInd->RAMInd */
+				case 0x13:  /* MOV BRAMInd->RAMInd */
 					p += sprintf(p,"MOV BRAM(%s)->RAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
 				break;
 
@@ -501,9 +501,9 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 					{
 						p += sprintf(p,"MOV %s->RAM(%s)",REGS(r2,1),INDIRECT(r1,0));
 					}
-			    break;
+				break;
 
-				case 0x1d:	/* MOV RAM->Reg */
+				case 0x1d:  /* MOV RAM->Reg */
 				{
 					if ( r1 & 0x180 )
 					{
@@ -514,16 +514,16 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 						p += sprintf(p,"MOV RAM(0x%x)->%s",r1,REGS(r2,0));
 					}
 				}
-			    break;
+				break;
 
-				case 0x1e:	/* External->Reg */
+				case 0x1e:  /* External->Reg */
 				{
-					int		mode2 = (r2 >> 6) & 1;
+					int     mode2 = (r2 >> 6) & 1;
 					p += sprintf(p,"MOV EXT(EB+%s)->%s",INDIRECT(r1,mode2),REGS(r2,0));
 				}
-			    break;
+				break;
 
-				case 0x1f:	/* MOV Reg->Reg */
+				case 0x1f:  /* MOV Reg->Reg */
 					if ( !(r1 == 0x10 && r2 == 0x0f) )
 					{
 						p += sprintf(p,"MOV %s->%s",REGS(r1,1),REGS(r2,0));
@@ -532,12 +532,12 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 				default:
 					p += sprintf(p,"UNKMV (0x%x)",op);
-			    break;
-		    }
+				break;
+			}
 		}
 		break;
 
-	    case 0x0e:	/* Load 24 bit val */
+		case 0x0e:  /* Load 24 bit val */
 		{
 			UINT32 sub=(opcode>>24)&0x3;
 			static const char regs[4] = { 'p', 'a', 'b', 'd' };
@@ -546,10 +546,10 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 		}
 		break;
 
-		case 0x0f:	/* repeat */
+		case 0x0f:  /* repeat */
 		{
-			UINT32	alu = ( opcode >> 20 ) & 0x1f;
-			UINT32	sub2 = ( opcode >> 16 ) & 0x0f;
+			UINT32  alu = ( opcode >> 20 ) & 0x1f;
+			UINT32  sub2 = ( opcode >> 16 ) & 0x0f;
 
 			if ( alu != 0 )
 				p += sprintf(p, "%s, ", ALU(alu) );
@@ -580,14 +580,14 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 		}
 		break;
 
-	    case 0x10:
+		case 0x10:
 		{
-		    UINT32	dst=(opcode>>24)&0xf;
-		    UINT32	imm=(opcode)&0xFFFF;
+			UINT32  dst=(opcode>>24)&0xf;
+			UINT32  imm=(opcode)&0xFFFF;
 
-		    if ( dst <= 3 )
+			if ( dst <= 3 )
 				p += sprintf(p,"LDIMM 0x%x->r%d",imm,dst);
-		    else
+			else
 				p += sprintf(p,"LDIMM 0x%x->UNKDST(0x%x)",imm,dst);
 		}
 		break;
@@ -596,7 +596,7 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 		{
 			UINT32 sub = ( opcode >> 24 ) & 0x03;
 
-		    p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
 
 			if ( sub == 0 ) p += sprintf(p,"r12");
 			else if ( sub == 1 ) p += sprintf(p,"r13");
@@ -621,7 +621,7 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 		{
 			UINT32 sub = ( opcode >> 24 ) & 0x03;
 
-		    p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
 
 			if ( sub == 0 ) p += sprintf(p,"b.exp");
 			else if ( sub == 1 ) p += sprintf(p,"b.e");
@@ -632,7 +632,7 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 		case 0x16:
 		{
-		    UINT32 sub = ( opcode >> 24 ) & 0x03;
+			UINT32 sub = ( opcode >> 24 ) & 0x03;
 
 			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
 
@@ -646,7 +646,7 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 		{
 			UINT32 sub = ( opcode >> 24 ) & 0x03;
 
-		    p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
 
 			if ( sub == 0x03 ) p += sprintf(p,"shift");
 			else p += sprintf(p,"UNKREG(%x)", sub);
@@ -664,17 +664,17 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 		}
 		break;
 
-	    case 0x2f:
+		case 0x2f:
 		{
-		    UINT32 cond = ( opcode >> 20 ) & 0x1f;
-		    UINT32 subtype = ( opcode >> 16 ) & 0x0f;
-		    UINT32 data = opcode & 0xffff;
+			UINT32 cond = ( opcode >> 20 ) & 0x1f;
+			UINT32 subtype = ( opcode >> 16 ) & 0x0f;
+			UINT32 data = opcode & 0xffff;
 
-		    switch( subtype )
-		    {
+			switch( subtype )
+			{
 				case 0:
 					p += sprintf(p,"BRIF %s 0x%X", COND(cond), data);
-			    break;
+				break;
 
 				case 2:
 					p += sprintf(p,"BRIF %s ", COND(cond));
@@ -682,11 +682,11 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 						p += sprintf(p,"%s",REGS(data&0x3f,0));
 					else
 						p += sprintf(p,"RAM(0x%x)",data);
-			    break;
+				break;
 
 				case 4:
 					p += sprintf(p,"BSIF %s 0x%X", COND(cond), data);
-			    break;
+				break;
 
 				case 0x6:
 					p += sprintf(p,"BSIF %s ", COND(cond));
@@ -698,7 +698,7 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 				case 0xa:
 					p += sprintf(p,"RTIF %s", COND(cond));
-			    break;
+				break;
 
 				case 0xc:
 					p += sprintf(p,"LDIF %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
@@ -706,26 +706,26 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 				case 0xe:
 					p += sprintf(p,"RIIF %s", COND(cond));
-			    break;
+				break;
 
 				default:
 					p += sprintf(p,"UNKG5 (%x cond %x)",subtype,cond);
-			    break;
-		    }
+				break;
+			}
 		}
 		break;
 
 		case 0x3f:
 		{
-		    UINT32 cond = ( opcode >> 20 ) & 0x1f;
-		    UINT32 subtype = ( opcode >> 16 ) & 0x0f;
-		    UINT32 data = opcode & 0xffff;
+			UINT32 cond = ( opcode >> 20 ) & 0x1f;
+			UINT32 subtype = ( opcode >> 16 ) & 0x0f;
+			UINT32 data = opcode & 0xffff;
 
-		    switch( subtype )
-		    {
+			switch( subtype )
+			{
 				case 0:
 					p += sprintf(p,"BRUL %s 0x%X", COND(cond), data);
-			    break;
+				break;
 
 				case 2:
 					p += sprintf(p,"BRUL %s ", COND(cond));
@@ -733,11 +733,11 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 						p += sprintf(p,"%s",REGS(data&0x3f,0));
 					else
 						p += sprintf(p,"RAM(0x%x)",data);
-			    break;
+				break;
 
 				case 4:
 					p += sprintf(p,"BSUL %s 0x%X", COND(cond), data);
-			    break;
+				break;
 
 				case 0x6:
 					p += sprintf(p,"BSUL %s ", COND(cond));
@@ -749,7 +749,7 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 				case 0xa:
 					p += sprintf(p,"RTUL %s", COND(cond));
-			    break;
+				break;
 
 				case 0xc:
 					p += sprintf(p,"LDUL %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
@@ -757,12 +757,12 @@ static unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 				case 0xe:
 					p += sprintf(p,"RIUL %s", COND(cond));
-			    break;
+				break;
 
 				default:
 					p += sprintf(p,"UNKG5 (%x cond %x)",subtype,cond);
-			    break;
-		    }
+				break;
+			}
 		}
 		break;
 

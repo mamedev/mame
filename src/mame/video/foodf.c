@@ -44,10 +44,10 @@ VIDEO_START_MEMBER(foodf_state,foodf)
 	save_item(NAME(m_playfield_flip));
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[0], m_rweights, 0, 0,
-			3,	&resistances[0], m_gweights, 0, 0,
-			2,	&resistances[1], m_bweights, 0, 0);
+	compute_resistor_weights(0, 255, -1.0,
+			3,  &resistances[0], m_rweights, 0, 0,
+			3,  &resistances[0], m_gweights, 0, 0,
+			2,  &resistances[1], m_bweights, 0, 0);
 }
 
 

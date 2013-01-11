@@ -142,4 +142,3 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_c_w)
 {
 	//logerror("%04x: MCU port_c write 0x%02x\n", space.device().safe_pc(), data);
 }
-

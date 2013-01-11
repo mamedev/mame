@@ -21,10 +21,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::higemaru_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h - vblank */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h - vblank */
 
 	if(scanline == 0) // unknown irq event, does various stuff like copying the spriteram
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h */
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h */
 }
 
 
@@ -160,7 +160,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( higemaru, higemaru_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)	/* 3 MHz Sharp LH0080A Z80A-CPU-D */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
 	MCFG_CPU_PROGRAM_MAP(higemaru_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", higemaru_state, higemaru_scanline, "screen", 0, 1)
 
@@ -200,18 +200,18 @@ ROM_START( higemaru )
 	ROM_LOAD( "hg7.m11", 0x6000, 0x2000, CRC(dc5d455d) SHA1(7d253d6680d35943792746da11d91d7be57367cc) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "hg3.m1", 0x0000, 0x2000, CRC(b37b88c8) SHA1(7933270969806154f0774d31fda75a5352cf26ad) )	/* characters */
+	ROM_LOAD( "hg3.m1", 0x0000, 0x2000, CRC(b37b88c8) SHA1(7933270969806154f0774d31fda75a5352cf26ad) )  /* characters */
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "hg1.c14", 0x0000, 0x2000, CRC(ef4c2f5d) SHA1(247ce819cdc4ed4ec99c25c9006bac1911354bc8) )	/* tiles */
+	ROM_LOAD( "hg1.c14", 0x0000, 0x2000, CRC(ef4c2f5d) SHA1(247ce819cdc4ed4ec99c25c9006bac1911354bc8) ) /* tiles */
 	ROM_LOAD( "hg2.e14", 0x2000, 0x2000, CRC(9133f804) SHA1(93661c028709a7134537321e52da85e3c0f917ba) )
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "hgb3.l6", 0x0000, 0x0020, CRC(629cebd8) SHA1(c28cd0f341f4f1c7be97f4d8c289860db8ac0857) )	/* palette */
-	ROM_LOAD( "hgb5.m4", 0x0020, 0x0100, CRC(dbaa4443) SHA1(cca2f9b187abd735f2309b38570edcd745042b3e) )	/* char lookup table */
-	ROM_LOAD( "hgb1.h7", 0x0120, 0x0100, CRC(07c607ce) SHA1(c048602d62f47129152bbc7ccd38627d78a4392f) )	/* sprite lookup table */
-	ROM_LOAD( "hgb4.l9", 0x0220, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )	/* interrupt timing (not used) */
-	ROM_LOAD( "hgb2.k7", 0x0320, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )	/* video timing? (not used) */
+	ROM_LOAD( "hgb3.l6", 0x0000, 0x0020, CRC(629cebd8) SHA1(c28cd0f341f4f1c7be97f4d8c289860db8ac0857) ) /* palette */
+	ROM_LOAD( "hgb5.m4", 0x0020, 0x0100, CRC(dbaa4443) SHA1(cca2f9b187abd735f2309b38570edcd745042b3e) ) /* char lookup table */
+	ROM_LOAD( "hgb1.h7", 0x0120, 0x0100, CRC(07c607ce) SHA1(c048602d62f47129152bbc7ccd38627d78a4392f) ) /* sprite lookup table */
+	ROM_LOAD( "hgb4.l9", 0x0220, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) ) /* interrupt timing (not used) */
+	ROM_LOAD( "hgb2.k7", 0x0320, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) ) /* video timing? (not used) */
 ROM_END
 
 

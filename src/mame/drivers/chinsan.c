@@ -61,7 +61,7 @@ public:
 	UINT8    m_port_select;
 	UINT32   m_adpcm_pos;
 	UINT8    m_adpcm_idle;
-	UINT8	 m_adpcm_data;
+	UINT8    m_adpcm_data;
 	UINT8    m_trigger;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(chinsan_port00_w);
@@ -161,13 +161,13 @@ WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 	m_port_select = data;
 
 	if (
-	   (data != 0x40) &&
-	   (data != 0x4f) &&
-	   (data != 0x53) &&
-	   (data != 0x57) &&
-	   (data != 0x5b) &&
-	   (data != 0x5d) &&
-	   (data != 0x5e))
+		(data != 0x40) &&
+		(data != 0x4f) &&
+		(data != 0x53) &&
+		(data != 0x57) &&
+		(data != 0x5b) &&
+		(data != 0x5d) &&
+		(data != 0x5e))
 		logerror("write port 00 %02x\n", data);
 
 }
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(chin_adpcm_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
+	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)   // ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 
 
@@ -566,8 +566,8 @@ static void chin_adpcm_int( device_t *device )
 
 static const msm5205_interface msm5205_config =
 {
-	chin_adpcm_int,	/* interrupt function */
-	MSM5205_S64_4B	/* 8kHz */
+	chin_adpcm_int, /* interrupt function */
+	MSM5205_S64_4B  /* 8kHz */
 };
 
 /*************************************
@@ -602,7 +602,7 @@ void chinsan_state::machine_reset()
 static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,10000000/2)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,10000000/2)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state,  irq0_line_hold)
@@ -646,7 +646,7 @@ MACHINE_CONFIG_END
 ROM_START( chinsan )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* encrypted code / data */
 	ROM_LOAD( "mm00.7d", 0x00000, 0x08000, CRC(f7a4414f) SHA1(f65223b2928f610ab97fda2f2c008806cf2420e5) )
-	ROM_CONTINUE(        0x00000, 0x08000 )	// first half is blank
+	ROM_CONTINUE(        0x00000, 0x08000 ) // first half is blank
 	ROM_LOAD( "mm01.8d", 0x10000, 0x10000, CRC(c69ddbf5) SHA1(9533365c1761b113174d53a2e23ce6a7baca7dfe) )
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */

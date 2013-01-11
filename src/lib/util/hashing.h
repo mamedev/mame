@@ -99,7 +99,7 @@ public:
 
 protected:
 	// internal state
-	struct sha1_ctx 	m_context;		// internal context
+	struct sha1_ctx     m_context;      // internal context
 };
 
 
@@ -149,7 +149,7 @@ public:
 
 protected:
 	// internal state
-	struct MD5Context	m_context;		// internal context
+	struct MD5Context   m_context;      // internal context
 };
 
 
@@ -195,7 +195,7 @@ public:
 
 protected:
 	// internal state
-	crc32_t 			m_accum;		// internal accumulator
+	crc32_t             m_accum;        // internal accumulator
 };
 
 
@@ -241,7 +241,7 @@ public:
 
 protected:
 	// internal state
-	crc16_t 			m_accum;		// internal accumulator
+	crc16_t             m_accum;        // internal accumulator
 };
 
 

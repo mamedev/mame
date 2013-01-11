@@ -25,12 +25,12 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void	crureadz(offs_t offset, UINT8 *value);
-	void	cruwrite(offs_t offset, UINT8 value);
+	void    crureadz(offs_t offset, UINT8 *value);
+	void    cruwrite(offs_t offset, UINT8 value);
 
-	void	do_inta(int state);
-	bool	m_ide_irq;
-	int 	m_cru_register;
+	void    do_inta(int state);
+	bool    m_ide_irq;
+	int     m_cru_register;
 
 	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
@@ -43,20 +43,20 @@ protected:
 	ioport_constructor device_input_ports() const;
 
 private:
-	rtc65271_device*	m_rtc;
-	device_t*			m_ide;
+	rtc65271_device*    m_rtc;
+	device_t*           m_ide;
 
-	bool	m_clk_irq;
-	bool	m_sram_enable;
-	bool	m_sram_enable_dip;
-	int		m_cur_page;
+	bool    m_clk_irq;
+	bool    m_sram_enable;
+	bool    m_sram_enable_dip;
+	int     m_cur_page;
 
-	bool	m_tms9995_mode;
+	bool    m_tms9995_mode;
 
-	UINT16	m_input_latch;
-	UINT16	m_output_latch;
+	UINT16  m_input_latch;
+	UINT16  m_output_latch;
 
-	UINT8	*m_ram;
+	UINT8   *m_ram;
 };
 
 #endif

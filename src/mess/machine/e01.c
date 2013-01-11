@@ -64,13 +64,13 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define R65C102_TAG		"r65c102"
-#define R6522_TAG		"ic21"
-#define WD2793_TAG		"ic20"
-#define MC6854_TAG		"mc6854"
-#define HD146818_TAG	"hd146818"
-#define CENTRONICS_TAG	"centronics"
-#define SCSIBUS_TAG		"scsi"
+#define R65C102_TAG     "r65c102"
+#define R6522_TAG       "ic21"
+#define WD2793_TAG      "ic20"
+#define MC6854_TAG      "mc6854"
+#define HD146818_TAG    "hd146818"
+#define CENTRONICS_TAG  "centronics"
+#define SCSIBUS_TAG     "scsi"
 
 
 
@@ -90,7 +90,7 @@ e01s_device::e01s_device(const machine_config &mconfig, const char *tag, device_
 //-------------------------------------------------
 
 ROM_START( e01 )
-    ROM_REGION( 0x10000, R65C102_TAG, 0 )
+	ROM_REGION( 0x10000, R65C102_TAG, 0 )
 	//ROM_DEFAULT_BIOS("v131")
 	//ROM_SYSTEM_BIOS( 0, "v131", "V 1.31" )
 	ROM_LOAD( "0254,205-04 e01 fs",  0x0000, 0x8000, CRC(ae666c76) SHA1(0954119eb5cd09cdbadf76d60d812aa845838d5a) )
@@ -103,7 +103,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( e01s )
-    ROM_REGION( 0x10000, R65C102_TAG, 0 )
+	ROM_REGION( 0x10000, R65C102_TAG, 0 )
 	//ROM_DEFAULT_BIOS("v140")
 	//ROM_SYSTEM_BIOS( 0, "v133", "V 1.33" ) // 0282,008-02 e01s rom
 	ROM_LOAD( "e01sv133.rom",  0x0000, 0x10000, CRC(2a4a0032) SHA1(54ad68ceae44992293ccdd64ec88ad8520deec22) ) // which label?
@@ -136,9 +136,9 @@ const rom_entry *e01_device::device_rom_region() const
 
 WRITE_LINE_MEMBER( e01_device::rtc_irq_w )
 {
-    m_rtc_irq = state;
+	m_rtc_irq = state;
 
-    update_interrupts();
+	update_interrupts();
 }
 
 static mc146818_interface rtc_intf =
@@ -153,9 +153,9 @@ static mc146818_interface rtc_intf =
 
 WRITE_LINE_MEMBER( e01_device::adlc_irq_w )
 {
-    m_adlc_irq = state;
+	m_adlc_irq = state;
 
-    update_interrupts();
+	update_interrupts();
 }
 
 READ_LINE_MEMBER( e01_device::econet_data_r )
@@ -297,9 +297,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( e01 )
-    // basic machine hardware
+	// basic machine hardware
 	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL_8MHz/4) // Rockwell R65C102P3
-    MCFG_CPU_PROGRAM_MAP(e01_mem)
+	MCFG_CPU_PROGRAM_MAP(e01_mem)
 
 	MCFG_MC146818_IRQ_ADD(HD146818_TAG, MC146818_STANDARD, rtc_intf)
 
@@ -413,49 +413,49 @@ inline void e01_device::hdc_irq_enable(int enabled)
 //-------------------------------------------------
 
 e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, E01, "Acorn FileStore E01", tag, owner, clock),
-      device_econet_interface(mconfig, *this),
-	  m_maincpu(*this, R65C102_TAG),
-	  m_fdc(*this, WD2793_TAG),
-	  m_adlc(*this, MC6854_TAG),
-	  m_rtc(*this, HD146818_TAG),
-	  m_ram(*this, RAM_TAG),
-	  m_scsibus(*this, SCSIBUS_TAG ":host"),
-	  m_floppy0(*this, WD2793_TAG":0"),
-	  m_floppy1(*this, WD2793_TAG":1"),
-	  m_adlc_ie(0),
-	  m_hdc_ie(0),
-	  m_rtc_irq(CLEAR_LINE),
-	  m_via_irq(CLEAR_LINE),
-	  m_hdc_irq(CLEAR_LINE),
-	  m_fdc_irq(CLEAR_LINE),
-	  m_fdc_drq(CLEAR_LINE),
-	  m_adlc_irq(CLEAR_LINE),
-	  m_clk_en(0)
+	: device_t(mconfig, E01, "Acorn FileStore E01", tag, owner, clock),
+		device_econet_interface(mconfig, *this),
+		m_maincpu(*this, R65C102_TAG),
+		m_fdc(*this, WD2793_TAG),
+		m_adlc(*this, MC6854_TAG),
+		m_rtc(*this, HD146818_TAG),
+		m_ram(*this, RAM_TAG),
+		m_scsibus(*this, SCSIBUS_TAG ":host"),
+		m_floppy0(*this, WD2793_TAG":0"),
+		m_floppy1(*this, WD2793_TAG":1"),
+		m_adlc_ie(0),
+		m_hdc_ie(0),
+		m_rtc_irq(CLEAR_LINE),
+		m_via_irq(CLEAR_LINE),
+		m_hdc_irq(CLEAR_LINE),
+		m_fdc_irq(CLEAR_LINE),
+		m_fdc_drq(CLEAR_LINE),
+		m_adlc_irq(CLEAR_LINE),
+		m_clk_en(0)
 {
 }
 
 
 e01_device::e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, type, name, tag, owner, clock),
-      device_econet_interface(mconfig, *this),
-	  m_maincpu(*this, R65C102_TAG),
-	  m_fdc(*this, WD2793_TAG),
-	  m_adlc(*this, MC6854_TAG),
-	  m_rtc(*this, HD146818_TAG),
-	  m_ram(*this, RAM_TAG),
-	  m_scsibus(*this, SCSIBUS_TAG ":host"),
-	  m_floppy0(*this, WD2793_TAG":0"),
-	  m_floppy1(*this, WD2793_TAG":1"),
-	  m_adlc_ie(0),
-	  m_hdc_ie(0),
-	  m_rtc_irq(CLEAR_LINE),
-	  m_via_irq(CLEAR_LINE),
-	  m_hdc_irq(CLEAR_LINE),
-	  m_fdc_irq(CLEAR_LINE),
-	  m_fdc_drq(CLEAR_LINE),
-	  m_adlc_irq(CLEAR_LINE),
-	  m_clk_en(0)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_econet_interface(mconfig, *this),
+		m_maincpu(*this, R65C102_TAG),
+		m_fdc(*this, WD2793_TAG),
+		m_adlc(*this, MC6854_TAG),
+		m_rtc(*this, HD146818_TAG),
+		m_ram(*this, RAM_TAG),
+		m_scsibus(*this, SCSIBUS_TAG ":host"),
+		m_floppy0(*this, WD2793_TAG":0"),
+		m_floppy1(*this, WD2793_TAG":1"),
+		m_adlc_ie(0),
+		m_hdc_ie(0),
+		m_rtc_irq(CLEAR_LINE),
+		m_via_irq(CLEAR_LINE),
+		m_hdc_irq(CLEAR_LINE),
+		m_fdc_irq(CLEAR_LINE),
+		m_fdc_drq(CLEAR_LINE),
+		m_adlc_irq(CLEAR_LINE),
+		m_clk_en(0)
 {
 }
 
@@ -572,18 +572,18 @@ WRITE8_MEMBER( e01_device::floppy_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       floppy 1 select
-        1       floppy 2 select
-        2       floppy side select
-        3       NVRAM select
-        4       floppy density
-        5       floppy master reset
-        6       floppy test
-        7       mode LED
+	    0       floppy 1 select
+	    1       floppy 2 select
+	    2       floppy side select
+	    3       NVRAM select
+	    4       floppy density
+	    5       floppy master reset
+	    6       floppy test
+	    7       mode LED
 
-    */
+	*/
 
 	// floppy select
 	floppy_image_device *floppy = NULL;
@@ -690,18 +690,18 @@ READ8_MEMBER( e01_device::hdc_status_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       MSG
-        1       BSY
-        2       0
-        3       0
-        4       NIRQ
-        5       REQ
-        6       I/O
-        7       C/D
+	    0       MSG
+	    1       BSY
+	    2       0
+	    3       0
+	    4       NIRQ
+	    5       REQ
+	    6       I/O
+	    7       C/D
 
-    */
+	*/
 
 	UINT8 data = 0;
 

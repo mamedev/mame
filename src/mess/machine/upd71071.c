@@ -108,9 +108,9 @@ struct upd71071_t
 	int transfer_size[4];
 	int base;
 	const upd71071_intf* intf;
-	devcb_resolved_write_line	m_out_hreq_func;
-	devcb_resolved_write_line	m_out_eop_func;
-	devcb_resolved_write_line	m_out_dack_func[4];
+	devcb_resolved_write_line   m_out_hreq_func;
+	devcb_resolved_write_line   m_out_eop_func;
+	devcb_resolved_write_line   m_out_dack_func[4];
 	int m_hreq;
 	int m_eop;
 };

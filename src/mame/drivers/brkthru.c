@@ -56,7 +56,7 @@
 #include "includes/brkthru.h"
 
 
-#define MASTER_CLOCK		XTAL_12MHz
+#define MASTER_CLOCK        XTAL_12MHz
 
 
 /*************************************
@@ -120,9 +120,9 @@ static ADDRESS_MAP_START( brkthru_map, AS_PROGRAM, 8, brkthru_state )
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("P2")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW2/COIN")
-	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)	/* bg scroll and color, ROM bank selection, flip screen */
+	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)   /* bg scroll and color, ROM bank selection, flip screen */
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(brkthru_soundlatch_w)
-	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)	/* NMI enable, + ? */
+	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)   /* NMI enable, + ? */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( brkthru )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")	/* used only by the self test */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")   /* used only by the self test */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
@@ -200,11 +200,11 @@ static INPUT_PORTS_START( brkthru )
 	PORT_DIPSETTING(    0x20, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x40, "1 Player" )
-	PORT_DIPSETTING(	0x00, "2 Players" )
+	PORT_DIPSETTING(    0x40, "1 Player" )
+	PORT_DIPSETTING(    0x00, "2 Players" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2/COIN")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
@@ -217,7 +217,7 @@ static INPUT_PORTS_START( brkthru )
 	PORT_DIPSETTING(    0x04, "10000/20000 Points" )
 	PORT_DIPSETTING(    0x0c, "20000/30000 Points" )
 	PORT_DIPSETTING(    0x08, "20000/40000 Points" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5")	/* Manual says ALWAYS OFF */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5") /* Manual says ALWAYS OFF */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	/* According to the manual, bit 5 should control Flip Screen */
@@ -241,16 +241,16 @@ static INPUT_PORTS_START( darwin )
 	PORT_INCLUDE( brkthru )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )	/* Manual says must be OFF */
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )   /* Manual says must be OFF */
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )	/* Manual says must be OFF */
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )   /* Manual says must be OFF */
 
-	PORT_MODIFY("DSW2/COIN")	/* modified by Shingo Suzuki 1999/11/02 */
+	PORT_MODIFY("DSW2/COIN")    /* modified by Shingo Suzuki 1999/11/02 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -281,57 +281,57 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 chars */
-	256,	/* 256 characters */
-	3,	/* 3 bits per pixel */
-	{ 512*8*8+4, 0, 4 },	/* plane offset */
+	8,8,    /* 8*8 chars */
+	256,    /* 256 characters */
+	3,  /* 3 bits per pixel */
+	{ 512*8*8+4, 0, 4 },    /* plane offset */
 	{ 256*8*8+0, 256*8*8+1, 256*8*8+2, 256*8*8+3, 0, 1, 2, 3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout1 =
 {
-	16,16,	/* 16*16 tiles */
-	128,	/* 128 tiles */
-	3,	/* 3 bits per pixel */
-	{ 0x4000*8+4, 0, 4 },	/* plane offset */
+	16,16,  /* 16*16 tiles */
+	128,    /* 128 tiles */
+	3,  /* 3 bits per pixel */
+	{ 0x4000*8+4, 0, 4 },   /* plane offset */
 	{ 0, 1, 2, 3, 1024*8*8+0, 1024*8*8+1, 1024*8*8+2, 1024*8*8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+1024*8*8+0, 16*8+1024*8*8+1, 16*8+1024*8*8+2, 16*8+1024*8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every tile takes 32 consecutive bytes */
+	32*8    /* every tile takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout2 =
 {
-	16,16,	/* 16*16 tiles */
-	128,	/* 128 tiles */
-	3,	/* 3 bits per pixel */
-	{ 0x3000*8+0, 0, 4 },	/* plane offset */
+	16,16,  /* 16*16 tiles */
+	128,    /* 128 tiles */
+	3,  /* 3 bits per pixel */
+	{ 0x3000*8+0, 0, 4 },   /* plane offset */
 	{ 0, 1, 2, 3, 1024*8*8+0, 1024*8*8+1, 1024*8*8+2, 1024*8*8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+1024*8*8+0, 16*8+1024*8*8+1, 16*8+1024*8*8+2, 16*8+1024*8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every tile takes 32 consecutive bytes */
+	32*8    /* every tile takes 32 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	1024,	/* 1024 sprites */
-	3,	/* 3 bits per pixel */
-	{ 2*1024*32*8, 1024*32*8, 0 },	/* plane offset */
+	16,16,  /* 16*16 sprites */
+	1024,   /* 1024 sprites */
+	3,  /* 3 bits per pixel */
+	{ 2*1024*32*8, 1024*32*8, 0 },  /* plane offset */
 	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
 			0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( brkthru )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x00,  1 )	/* use colors 0x00-0x07 */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout1,  0x80, 16 )	/* use colors 0x80-0xff */
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x00,  1 )  /* use colors 0x00-0x07 */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout1,  0x80, 16 )  /* use colors 0x80-0xff */
 	GFXDECODE_ENTRY( "gfx2", 0x01000, tilelayout2,  0x80, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, tilelayout1,  0x80, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x09000, tilelayout2,  0x80, 16 )
@@ -339,7 +339,7 @@ static GFXDECODE_START( brkthru )
 	GFXDECODE_ENTRY( "gfx2", 0x11000, tilelayout2,  0x80, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout1,  0x80, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x19000, tilelayout2,  0x80, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x40,  8 )	/* use colors 0x40-0x7f */
+	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x40,  8 )  /* use colors 0x40-0x7f */
 GFXDECODE_END
 
 
@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 	MCFG_CPU_PROGRAM_MAP(brkthru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", brkthru_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
+	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -431,7 +431,7 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
 	MCFG_CPU_PROGRAM_MAP(darwin_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", brkthru_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
+	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -442,17 +442,17 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	/* frames per second, vblank duration
-        Horizontal video frequency:
-            HSync = Dot Clock / Horizontal Frame Length
-                  = Xtal /2   / (HDisplay + HBlank)
-                  = 12MHz/2   / (240 + 144)
-                  = 15.625kHz
-        Vertical Video frequency:
-            VSync = HSync / Vertical Frame Length
-                  = HSync / (VDisplay + VBlank)
-                  = 15.625kHz / (240 + 32)
-                  = 57.444855Hz
-        tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
+	    Horizontal video frequency:
+	        HSync = Dot Clock / Horizontal Frame Length
+	              = Xtal /2   / (HDisplay + HBlank)
+	              = 12MHz/2   / (240 + 144)
+	              = 15.625kHz
+	    Vertical Video frequency:
+	        VSync = HSync / Vertical Frame Length
+	              = HSync / (VDisplay + VBlank)
+	              = 15.625kHz / (240 + 32)
+	              = 57.444855Hz
+	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
 
 
@@ -486,27 +486,27 @@ ROM_START( brkthru )
 	ROM_LOAD( "brkthru.3",    0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "brkthru.12",   0x00000, 0x2000, CRC(58c0b29b) SHA1(9dc075f8afae7e8fe164a9fe325e9948cdc7e4bb) )	/* characters */
+	ROM_LOAD( "brkthru.12",   0x00000, 0x2000, CRC(58c0b29b) SHA1(9dc075f8afae7e8fe164a9fe325e9948cdc7e4bb) )   /* characters */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
-	ROM_LOAD( "brkthru.7",    0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) )	/* bitplanes 1,2 for bank 1,2 */
-	ROM_CONTINUE(             0x08000, 0x4000 )				/* bitplanes 1,2 for bank 3,4 */
-	ROM_LOAD( "brkthru.6",    0x10000, 0x4000, CRC(fd3cee40) SHA1(3308b96bb69e0fa6dffbdff296273fafa16d5e70) )	/* bitplanes 1,2 for bank 5,6 */
-	ROM_CONTINUE(             0x18000, 0x4000 )				/* bitplanes 1,2 for bank 7,8 */
-	ROM_LOAD( "brkthru.8",    0x04000, 0x1000, CRC(f67ee64e) SHA1(75634bd481ae44b8aa02acb4f9b4d7ff973a4c71) )	/* bitplane 3 for bank 1,2 */
+	ROM_LOAD( "brkthru.7",    0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) )   /* bitplanes 1,2 for bank 1,2 */
+	ROM_CONTINUE(             0x08000, 0x4000 )             /* bitplanes 1,2 for bank 3,4 */
+	ROM_LOAD( "brkthru.6",    0x10000, 0x4000, CRC(fd3cee40) SHA1(3308b96bb69e0fa6dffbdff296273fafa16d5e70) )   /* bitplanes 1,2 for bank 5,6 */
+	ROM_CONTINUE(             0x18000, 0x4000 )             /* bitplanes 1,2 for bank 7,8 */
+	ROM_LOAD( "brkthru.8",    0x04000, 0x1000, CRC(f67ee64e) SHA1(75634bd481ae44b8aa02acb4f9b4d7ff973a4c71) )   /* bitplane 3 for bank 1,2 */
 	ROM_CONTINUE(             0x06000, 0x1000 )
-	ROM_CONTINUE(             0x0c000, 0x1000 )				/* bitplane 3 for bank 3,4 */
+	ROM_CONTINUE(             0x0c000, 0x1000 )             /* bitplane 3 for bank 3,4 */
 	ROM_CONTINUE(             0x0e000, 0x1000 )
-	ROM_CONTINUE(             0x14000, 0x1000 )				/* bitplane 3 for bank 5,6 */
+	ROM_CONTINUE(             0x14000, 0x1000 )             /* bitplane 3 for bank 5,6 */
 	ROM_CONTINUE(             0x16000, 0x1000 )
-	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
+	ROM_CONTINUE(             0x1c000, 0x1000 )             /* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
 	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )	/* sprites */
+	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )   /* sprites */
 	ROM_LOAD( "brkthru.10",   0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) )
 	ROM_LOAD( "brkthru.11",   0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) )
 
@@ -526,27 +526,27 @@ ROM_START( brkthruj )
 	ROM_LOAD( "brkthru.3",    0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "12",   0x00000, 0x2000, CRC(3d9a7003) SHA1(2e5de982eb75ac75312fb29bb4cb2ed12ec0fd56) )	/* characters */
+	ROM_LOAD( "12",   0x00000, 0x2000, CRC(3d9a7003) SHA1(2e5de982eb75ac75312fb29bb4cb2ed12ec0fd56) )   /* characters */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
-	ROM_LOAD( "brkthru.7",    0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) )	/* bitplanes 1,2 for bank 1,2 */
-	ROM_CONTINUE(             0x08000, 0x4000 )				/* bitplanes 1,2 for bank 3,4 */
-	ROM_LOAD( "6",            0x10000, 0x4000, CRC(cb47b395) SHA1(bf5459d696e863644f13c8b0786b8f45caf6ceb6) )	/* bitplanes 1,2 for bank 5,6 */
-	ROM_CONTINUE(             0x18000, 0x4000 )				/* bitplanes 1,2 for bank 7,8 */
-	ROM_LOAD( "8",            0x04000, 0x1000, CRC(5e5a2cd7) SHA1(f1782d67b924b4b89bcb6602e970c28fbeaab522) )	/* bitplane 3 for bank 1,2 */
+	ROM_LOAD( "brkthru.7",    0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) )   /* bitplanes 1,2 for bank 1,2 */
+	ROM_CONTINUE(             0x08000, 0x4000 )             /* bitplanes 1,2 for bank 3,4 */
+	ROM_LOAD( "6",            0x10000, 0x4000, CRC(cb47b395) SHA1(bf5459d696e863644f13c8b0786b8f45caf6ceb6) )   /* bitplanes 1,2 for bank 5,6 */
+	ROM_CONTINUE(             0x18000, 0x4000 )             /* bitplanes 1,2 for bank 7,8 */
+	ROM_LOAD( "8",            0x04000, 0x1000, CRC(5e5a2cd7) SHA1(f1782d67b924b4b89bcb6602e970c28fbeaab522) )   /* bitplane 3 for bank 1,2 */
 	ROM_CONTINUE(             0x06000, 0x1000 )
-	ROM_CONTINUE(             0x0c000, 0x1000 )				/* bitplane 3 for bank 3,4 */
+	ROM_CONTINUE(             0x0c000, 0x1000 )             /* bitplane 3 for bank 3,4 */
 	ROM_CONTINUE(             0x0e000, 0x1000 )
-	ROM_CONTINUE(             0x14000, 0x1000 )				/* bitplane 3 for bank 5,6 */
+	ROM_CONTINUE(             0x14000, 0x1000 )             /* bitplane 3 for bank 5,6 */
 	ROM_CONTINUE(             0x16000, 0x1000 )
-	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
+	ROM_CONTINUE(             0x1c000, 0x1000 )             /* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
 	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )	/* sprites */
+	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )   /* sprites */
 	ROM_LOAD( "brkthru.10",   0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) )
 	ROM_LOAD( "brkthru.11",   0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) )
 
@@ -567,27 +567,27 @@ ROM_START( forcebrk )
 	ROM_LOAD( "brkthru.3",    0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "12",           0x00000, 0x2000, CRC(3d9a7003) SHA1(2e5de982eb75ac75312fb29bb4cb2ed12ec0fd56) )	/* characters */
+	ROM_LOAD( "12",           0x00000, 0x2000, CRC(3d9a7003) SHA1(2e5de982eb75ac75312fb29bb4cb2ed12ec0fd56) )   /* characters */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
-	ROM_LOAD( "brkthru.7",    0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) )	/* bitplanes 1,2 for bank 1,2 */
-	ROM_CONTINUE(             0x08000, 0x4000 )				/* bitplanes 1,2 for bank 3,4 */
-	ROM_LOAD( "forcebrk6",    0x10000, 0x4000, CRC(08bca16a) SHA1(d5dcf5cf68a5090f467c076abb1b9cf0baffe272) )	/* bitplanes 1,2 for bank 5,6 */
-	ROM_CONTINUE(             0x18000, 0x4000 )				/* bitplanes 1,2 for bank 7,8 */
-	ROM_LOAD( "forcebrk8",    0x04000, 0x1000, CRC(a3a1131e) SHA1(e0b73c8b2c8ea6b31418bc642830875c5985f800) )	/* bitplane 3 for bank 1,2 */
+	ROM_LOAD( "brkthru.7",    0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) )   /* bitplanes 1,2 for bank 1,2 */
+	ROM_CONTINUE(             0x08000, 0x4000 )             /* bitplanes 1,2 for bank 3,4 */
+	ROM_LOAD( "forcebrk6",    0x10000, 0x4000, CRC(08bca16a) SHA1(d5dcf5cf68a5090f467c076abb1b9cf0baffe272) )   /* bitplanes 1,2 for bank 5,6 */
+	ROM_CONTINUE(             0x18000, 0x4000 )             /* bitplanes 1,2 for bank 7,8 */
+	ROM_LOAD( "forcebrk8",    0x04000, 0x1000, CRC(a3a1131e) SHA1(e0b73c8b2c8ea6b31418bc642830875c5985f800) )   /* bitplane 3 for bank 1,2 */
 	ROM_CONTINUE(             0x06000, 0x1000 )
-	ROM_CONTINUE(             0x0c000, 0x1000 )				/* bitplane 3 for bank 3,4 */
+	ROM_CONTINUE(             0x0c000, 0x1000 )             /* bitplane 3 for bank 3,4 */
 	ROM_CONTINUE(             0x0e000, 0x1000 )
-	ROM_CONTINUE(             0x14000, 0x1000 )				/* bitplane 3 for bank 5,6 */
+	ROM_CONTINUE(             0x14000, 0x1000 )             /* bitplane 3 for bank 5,6 */
 	ROM_CONTINUE(             0x16000, 0x1000 )
-	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
+	ROM_CONTINUE(             0x1c000, 0x1000 )             /* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
 	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )	/* sprites */
+	ROM_LOAD( "brkthru.9",    0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) )   /* sprites */
 	ROM_LOAD( "brkthru.10",   0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) )
 	ROM_LOAD( "brkthru.11",   0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) )
 
@@ -613,21 +613,21 @@ ROM_START( darwin )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
-	ROM_LOAD( "darw_03.rom",  0x00000, 0x4000, CRC(57d0350d) SHA1(6f904047485e669afb5f4b590818743111f010c6) )	/* bitplanes 1,2 for bank 1,2 */
-	ROM_CONTINUE(             0x08000, 0x4000 )				/* bitplanes 1,2 for bank 3,4 */
-	ROM_LOAD( "darw_02.rom",  0x10000, 0x4000, CRC(559a71ab) SHA1(a28de25e89e0d68332f4095b988827a9cb72c675) )	/* bitplanes 1,2 for bank 5,6 */
-	ROM_CONTINUE(             0x18000, 0x4000 )				/* bitplanes 1,2 for bank 7,8 */
-	ROM_LOAD( "darw_01.rom",  0x04000, 0x1000, CRC(15a16973) SHA1(5eb978a32be88176936e5d37b6ec18820d9720d8) )	/* bitplane 3 for bank 1,2 */
+	ROM_LOAD( "darw_03.rom",  0x00000, 0x4000, CRC(57d0350d) SHA1(6f904047485e669afb5f4b590818743111f010c6) )   /* bitplanes 1,2 for bank 1,2 */
+	ROM_CONTINUE(             0x08000, 0x4000 )             /* bitplanes 1,2 for bank 3,4 */
+	ROM_LOAD( "darw_02.rom",  0x10000, 0x4000, CRC(559a71ab) SHA1(a28de25e89e0d68332f4095b988827a9cb72c675) )   /* bitplanes 1,2 for bank 5,6 */
+	ROM_CONTINUE(             0x18000, 0x4000 )             /* bitplanes 1,2 for bank 7,8 */
+	ROM_LOAD( "darw_01.rom",  0x04000, 0x1000, CRC(15a16973) SHA1(5eb978a32be88176936e5d37b6ec18820d9720d8) )   /* bitplane 3 for bank 1,2 */
 	ROM_CONTINUE(             0x06000, 0x1000 )
-	ROM_CONTINUE(             0x0c000, 0x1000 )				/* bitplane 3 for bank 3,4 */
+	ROM_CONTINUE(             0x0c000, 0x1000 )             /* bitplane 3 for bank 3,4 */
 	ROM_CONTINUE(             0x0e000, 0x1000 )
-	ROM_CONTINUE(             0x14000, 0x1000 )				/* bitplane 3 for bank 5,6 */
+	ROM_CONTINUE(             0x14000, 0x1000 )             /* bitplane 3 for bank 5,6 */
 	ROM_CONTINUE(             0x16000, 0x1000 )
-	ROM_CONTINUE(             0x1c000, 0x1000 )				/* bitplane 3 for bank 7,8 */
+	ROM_CONTINUE(             0x1c000, 0x1000 )             /* bitplane 3 for bank 7,8 */
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
 	ROM_REGION( 0x18000, "gfx3", 0 )
-	ROM_LOAD( "darw_10.rom",  0x00000, 0x8000, CRC(487a014c) SHA1(c9543df8115088b02019e76a6473ecc5f645a836) )	/* sprites */
+	ROM_LOAD( "darw_10.rom",  0x00000, 0x8000, CRC(487a014c) SHA1(c9543df8115088b02019e76a6473ecc5f645a836) )   /* sprites */
 	ROM_LOAD( "darw_11.rom",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
 	ROM_LOAD( "darw_12.rom",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )
 

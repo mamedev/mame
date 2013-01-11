@@ -57,7 +57,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define NUM_TEMP_VARIABLES	10
+#define NUM_TEMP_VARIABLES  10
 
 enum
 {
@@ -77,28 +77,28 @@ struct debugcpu_private
 	device_t *visiblecpu;
 	device_t *breakcpu;
 
-	FILE *			source_file;				/* script source file */
+	FILE *          source_file;                /* script source file */
 
-	symbol_table *	symtable;					/* global symbol table */
+	symbol_table *  symtable;                   /* global symbol table */
 
-	bool			within_instruction_hook;
-	bool			vblank_occurred;
-	bool			memory_modified;
-	bool			debugger_access;
+	bool            within_instruction_hook;
+	bool            vblank_occurred;
+	bool            memory_modified;
+	bool            debugger_access;
 
-	int				execution_state;
-	device_t *		m_stop_when_not_device;		// stop execution when the device ceases to be this
+	int             execution_state;
+	device_t *      m_stop_when_not_device;     // stop execution when the device ceases to be this
 
-	UINT32			bpindex;
-	UINT32			wpindex;
+	UINT32          bpindex;
+	UINT32          wpindex;
 
-	UINT64			wpdata;
-	UINT64			wpaddr;
-	UINT64			tempvar[NUM_TEMP_VARIABLES];
+	UINT64          wpdata;
+	UINT64          wpaddr;
+	UINT64          tempvar[NUM_TEMP_VARIABLES];
 
-	osd_ticks_t 	last_periodic_update_time;
+	osd_ticks_t     last_periodic_update_time;
 
-	bool			comments_loaded;
+	bool            comments_loaded;
 };
 
 
@@ -199,8 +199,8 @@ void debug_cpu_configure_memory(running_machine &machine, symbol_table &table)
 void debug_cpu_flush_traces(running_machine &machine)
 {
 	/* this can be called on exit even when no debugging is enabled, so
-     make sure the devdebug is valid before proceeding */
-    device_iterator iter(machine.root_device());
+	 make sure the devdebug is valid before proceeding */
+	device_iterator iter(machine.root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		if (device->debug() != NULL)
 			device->debug()->trace_flush();
@@ -668,10 +668,10 @@ UINT64 debug_read_memory(address_space &space, offs_t address, int size, int app
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 	switch (size)
 	{
-		case 1:		result = debug_read_byte(space, address, apply_translation);	break;
-		case 2:		result = debug_read_word(space, address, apply_translation);	break;
-		case 4:		result = debug_read_dword(space, address, apply_translation);	break;
-		case 8:		result = debug_read_qword(space, address, apply_translation);	break;
+		case 1:     result = debug_read_byte(space, address, apply_translation);    break;
+		case 2:     result = debug_read_word(space, address, apply_translation);    break;
+		case 4:     result = debug_read_dword(space, address, apply_translation);   break;
+		case 8:     result = debug_read_qword(space, address, apply_translation);   break;
 	}
 	return result;
 }
@@ -875,10 +875,10 @@ void debug_write_memory(address_space &space, offs_t address, UINT64 data, int s
 {
 	switch (size)
 	{
-		case 1:		debug_write_byte(space, address, data, apply_translation);	break;
-		case 2:		debug_write_word(space, address, data, apply_translation);	break;
-		case 4:		debug_write_dword(space, address, data, apply_translation);	break;
-		case 8:		debug_write_qword(space, address, data, apply_translation);	break;
+		case 1:     debug_write_byte(space, address, data, apply_translation);  break;
+		case 2:     debug_write_word(space, address, data, apply_translation);  break;
+		case 4:     debug_write_dword(space, address, data, apply_translation); break;
+		case 8:     debug_write_qword(space, address, data, apply_translation); break;
 	}
 }
 
@@ -1633,28 +1633,28 @@ static UINT64 get_cpunum(symbol_table &table, void *ref)
 
 device_debug::device_debug(device_t &device)
 	: m_device(device),
-	  m_exec(NULL),
-	  m_memory(NULL),
-	  m_state(NULL),
-	  m_disasm(NULL),
-	  m_flags(0),
-	  m_symtable(&device, debug_cpu_get_global_symtable(device.machine())),
-	  m_instrhook(NULL),
-	  m_dasm_override(NULL),
-	  m_opwidth(0),
-	  m_stepaddr(0),
-	  m_stepsleft(0),
-	  m_stopaddr(0),
-	  m_stoptime(attotime::zero),
-	  m_stopirq(0),
-	  m_stopexception(0),
-	  m_endexectime(attotime::zero),
-	  m_pc_history_index(0),
-	  m_bplist(NULL),
-	  m_trace(NULL),
-	  m_hotspots(NULL),
-	  m_hotspot_count(0),
-	  m_hotspot_threshhold(0)
+		m_exec(NULL),
+		m_memory(NULL),
+		m_state(NULL),
+		m_disasm(NULL),
+		m_flags(0),
+		m_symtable(&device, debug_cpu_get_global_symtable(device.machine())),
+		m_instrhook(NULL),
+		m_dasm_override(NULL),
+		m_opwidth(0),
+		m_stepaddr(0),
+		m_stepsleft(0),
+		m_stopaddr(0),
+		m_stoptime(attotime::zero),
+		m_stopirq(0),
+		m_stopexception(0),
+		m_endexectime(attotime::zero),
+		m_pc_history_index(0),
+		m_bplist(NULL),
+		m_trace(NULL),
+		m_hotspots(NULL),
+		m_hotspot_count(0),
+		m_hotspot_threshhold(0)
 {
 	memset(m_pc_history, 0, sizeof(m_pc_history));
 	memset(m_wplist, 0, sizeof(m_wplist));
@@ -3138,11 +3138,11 @@ void device_debug::set_state(symbol_table &table, void *ref, UINT64 value)
 
 device_debug::breakpoint::breakpoint(symbol_table &symbols, int index, offs_t address, const char *condition, const char *action)
 	: m_next(NULL),
-	  m_index(index),
-	  m_enabled(true),
-	  m_address(address),
-	  m_condition(&symbols, (condition != NULL) ? condition : "1"),
-	  m_action((action != NULL) ? action : "")
+		m_index(index),
+		m_enabled(true),
+		m_address(address),
+		m_condition(&symbols, (condition != NULL) ? condition : "1"),
+		m_action((action != NULL) ? action : "")
 {
 }
 
@@ -3189,14 +3189,14 @@ bool device_debug::breakpoint::hit(offs_t pc)
 
 device_debug::watchpoint::watchpoint(symbol_table &symbols, int index, address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action)
 	: m_next(NULL),
-	  m_space(space),
-	  m_index(index),
-	  m_enabled(true),
-	  m_type(type),
-	  m_address(space.address_to_byte(address) & space.bytemask()),
-	  m_length(space.address_to_byte(length)),
-	  m_condition(&symbols, (condition != NULL) ? condition : "1"),
-	  m_action((action != NULL) ? action : "")
+		m_space(space),
+		m_index(index),
+		m_enabled(true),
+		m_type(type),
+		m_address(space.address_to_byte(address) & space.bytemask()),
+		m_length(space.address_to_byte(length)),
+		m_condition(&symbols, (condition != NULL) ? condition : "1"),
+		m_action((action != NULL) ? action : "")
 {
 }
 
@@ -3246,12 +3246,12 @@ bool device_debug::watchpoint::hit(int type, offs_t address, int size)
 
 device_debug::tracer::tracer(device_debug &debug, FILE &file, bool trace_over, const char *action)
 	: m_debug(debug),
-	  m_file(file),
-	  m_action((action != NULL) ? action : ""),
-	  m_loops(0),
-	  m_nextdex(0),
-	  m_trace_over(trace_over),
-	  m_trace_over_target(~0)
+		m_file(file),
+		m_action((action != NULL) ? action : ""),
+		m_loops(0),
+		m_nextdex(0),
+		m_trace_over(trace_over),
+		m_trace_over_target(~0)
 {
 	memset(m_history, 0, sizeof(m_history));
 }
@@ -3365,9 +3365,9 @@ void device_debug::tracer::flush()
 
 device_debug::dasm_comment::dasm_comment(const char *text, offs_t address, rgb_t color, UINT32 crc)
 	: m_next(NULL),
-	  m_address(address),
-	  m_color(color),
-	  m_crc(crc),
-	  m_text(text)
+		m_address(address),
+		m_color(color),
+		m_crc(crc),
+		m_text(text)
 {
 }

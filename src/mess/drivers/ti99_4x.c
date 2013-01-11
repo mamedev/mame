@@ -90,17 +90,17 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ti99_4ev_hblank_interrupt);
 
 	// Some values to keep
-	tms9900_device*		m_cpu;
-	tms9901_device*		m_tms9901;
-	gromport_device*	m_gromport;
-	peribox_device*		m_peribox;
-	joyport_device* 	m_joyport;
+	tms9900_device*     m_cpu;
+	tms9901_device*     m_tms9901;
+	gromport_device*    m_gromport;
+	peribox_device*     m_peribox;
+	joyport_device*     m_joyport;
 	ti99_datamux_device* m_datamux;
-	ti_video_device*	m_video;
+	ti_video_device*    m_video;
 
-	int		m_ready_line, m_ready_line_dmux;
+	int     m_ready_line, m_ready_line_dmux;
 
-	int 	m_firstjoy;			// First joystick. 6 for TI-99/4A, 5 for TI-99/4
+	int     m_firstjoy;         // First joystick. 6 for TI-99/4A, 5 for TI-99/4
 
 	// Connections with the system interface TMS9901
 	DECLARE_READ8_MEMBER(read_by_9901);
@@ -119,10 +119,10 @@ public:
 	DECLARE_MACHINE_RESET(ti99_4);
 	DECLARE_MACHINE_RESET(ti99_4a);
 private:
-	void	set_keyboard_column(int number, int data);
-	int		m_keyboard_column;
-	int		m_check_alphalock;
-	int		m_ready_prev;		// for debugging purposes only
+	void    set_keyboard_column(int number, int data);
+	int     m_keyboard_column;
+	int     m_check_alphalock;
+	int     m_ready_prev;       // for debugging purposes only
 };
 
 /*
@@ -173,7 +173,7 @@ ADDRESS_MAP_END
  ****************************************************************************/
 
 static INPUT_PORTS_START(ti99_4)
-	PORT_START("COL0")	// col 0
+	PORT_START("COL0")  // col 0
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q QUIT") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR(UCHAR_MAMEKEY(F12))
 		/* TI99/4 has a second space key which maps the same */
@@ -184,7 +184,7 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L =") PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('=')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
-	PORT_START("COL1")	// col 1
+	PORT_START("COL1")  // col 1
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W BEGIN") PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR(UCHAR_MAMEKEY(F5))
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A AID") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR(UCHAR_MAMEKEY(F7))
@@ -194,7 +194,7 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K /") PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('/')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", .") PORT_CODE(KEYCODE_STOP) PORT_CHAR(',') PORT_CHAR('.')
 
-	PORT_START("COL2")	// col 2
+	PORT_START("COL2")  // col 2
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E UP") PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR(UCHAR_MAMEKEY(UP))
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S LEFT") PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -204,7 +204,7 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J ^") PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('^')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M ;") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR(';')
 				/* col 3 */
-	PORT_START("COL3")	// col 3
+	PORT_START("COL3")  // col 3
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R REDO") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR(UCHAR_MAMEKEY(F8))
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D RIGHT") PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
@@ -214,7 +214,7 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H <") PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('<')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N :") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR(':')
 
-	PORT_START("COL4")	// col 4
+	PORT_START("COL4")  // col 4
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T ERASE") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR(UCHAR_MAMEKEY(F3))
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F DEL") PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR(UCHAR_MAMEKEY(DEL))
@@ -236,7 +236,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_START( "LOADINT ")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_4x_state, load_interrupt, 1)
 
-	PORT_START("COL0")	// col 0
+	PORT_START("COL0")  // col 0
 		PORT_BIT(0x88, IP_ACTIVE_LOW, IPT_UNUSED)
 		/* The original control key is located on the left, but we accept the right control key as well */
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")      PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
@@ -248,7 +248,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= + QUIT")  PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+') PORT_CHAR(UCHAR_MAMEKEY(F12))
 
-	PORT_START("COL1")	// col 1
+	PORT_START("COL1")  // col 1
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)     PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)     PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR('~')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)     PORT_CHAR('s') PORT_CHAR('S') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -258,7 +258,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')
 
-	PORT_START("COL2")	// col 2
+	PORT_START("COL2")  // col 2
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)     PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('`')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)     PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(UCHAR_MAMEKEY(UP))
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)     PORT_CHAR('d') PORT_CHAR('D') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
@@ -268,7 +268,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
-	PORT_START("COL3")	// col 3
+	PORT_START("COL3")  // col 3
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)     PORT_CHAR('v') PORT_CHAR('V')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)     PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR('[')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)     PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR('{')
@@ -278,7 +278,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)     PORT_CHAR('j') PORT_CHAR('J')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)     PORT_CHAR('m') PORT_CHAR('M')
 
-	PORT_START("COL4")	// col 4
+	PORT_START("COL4")  // col 4
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)     PORT_CHAR('b') PORT_CHAR('B')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)     PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(']')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR('}')
@@ -288,7 +288,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)     PORT_CHAR('h') PORT_CHAR('H')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)     PORT_CHAR('n') PORT_CHAR('N')
 
-	PORT_START("COL5")	// col 5
+	PORT_START("COL5")  // col 5
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)     PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR('\\')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)     PORT_CHAR('q') PORT_CHAR('Q')
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)     PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR('|')
@@ -298,7 +298,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('-')
 
-	PORT_START("ALPHA")	/* one more port for Alpha line */
+	PORT_START("ALPHA") /* one more port for Alpha line */
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 INPUT_PORTS_END
@@ -331,15 +331,15 @@ static GROMPORT_CONFIG(console_cartslot)
 
 static PERIBOX_CONFIG( peribox_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, extint),			// INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, notconnected),	// INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready),	// READY
-	0x70000												// Address bus prefix (AMA/AMB/AMC)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, extint),            // INTA
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, notconnected),  // INTB
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready), // READY
+	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
 };
 
 static TI_SOUND_CONFIG( sound_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready)	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready)  // READY
 };
 
 READ8_MEMBER( ti99_4x_state::cruread )
@@ -701,7 +701,7 @@ static TMS9928A_INTERFACE(ti99_4_tms9928a_interface)
 /* TMS9901 setup. */
 const tms9901_interface tms9901_wiring_ti99_4 =
 {
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC, /* only input pins whose state is always known */
 
 	// read handler
 	DEVCB_DRIVER_MEMBER(ti99_4x_state, read_by_9901),
@@ -796,13 +796,13 @@ static const dmux_device_list_entry dmux_devices_ev[] =
 
 static DMUX_CONFIG( datamux_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_dmux),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_dmux),    // READY
 	dmux_devices
 };
 
 static DMUX_CONFIG( datamux_conf_ev )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_dmux),	// READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_dmux),    // READY
 	dmux_devices_ev
 };
 
@@ -810,10 +810,10 @@ static TMS99xx_CONFIG( ti99_cpuconf )
 {
 	DEVCB_DRIVER_MEMBER(ti99_4x_state, external_operation),
 	DEVCB_DRIVER_MEMBER(ti99_4x_state, interrupt_level),
-	DEVCB_NULL,		// Instruction acquisition
+	DEVCB_NULL,     // Instruction acquisition
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, clock_out),
-	DEVCB_NULL,		// wait
-	DEVCB_NULL		// Hold acknowledge
+	DEVCB_NULL,     // wait
+	DEVCB_NULL      // Hold acknowledge
 };
 
 static JOYPORT_CONFIG( joyport4_60 )
@@ -1171,8 +1171,8 @@ ROM_START(ti99_4ev)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY             FULLNAME */
-COMP( 1979, ti99_4,   0,	   0,		ti99_4_60hz,  ti99_4, driver_device,   0,	"Texas Instruments", "TI99/4 Home Computer (US)" , 0)
-COMP( 1980, ti99_4e,  ti99_4,  0,		ti99_4_50hz,  ti99_4, driver_device,  0,	"Texas Instruments", "TI99/4 Home Computer (Europe)" , 0)
-COMP( 1981, ti99_4a,  0,	   0,		ti99_4a_60hz, ti99_4a, driver_device, 0,	"Texas Instruments", "TI99/4A Home Computer (US)" , 0)
-COMP( 1981, ti99_4ae, ti99_4a, 0,		ti99_4a_50hz, ti99_4a, driver_device, 0,	"Texas Instruments", "TI99/4A Home Computer (Europe)" , 0)
-COMP( 1994, ti99_4ev, ti99_4a, 0,		ti99_4ev_60hz,ti99_4a, driver_device, 0, "Texas Instruments", "TI99/4A Home Computer with EVPC" , 0)
+COMP( 1979, ti99_4,   0,       0,       ti99_4_60hz,  ti99_4, driver_device,   0,   "Texas Instruments", "TI99/4 Home Computer (US)" , 0)
+COMP( 1980, ti99_4e,  ti99_4,  0,       ti99_4_50hz,  ti99_4, driver_device,  0,    "Texas Instruments", "TI99/4 Home Computer (Europe)" , 0)
+COMP( 1981, ti99_4a,  0,       0,       ti99_4a_60hz, ti99_4a, driver_device, 0,    "Texas Instruments", "TI99/4A Home Computer (US)" , 0)
+COMP( 1981, ti99_4ae, ti99_4a, 0,       ti99_4a_50hz, ti99_4a, driver_device, 0,    "Texas Instruments", "TI99/4A Home Computer (Europe)" , 0)
+COMP( 1994, ti99_4ev, ti99_4a, 0,       ti99_4ev_60hz,ti99_4a, driver_device, 0, "Texas Instruments", "TI99/4A Home Computer with EVPC" , 0)

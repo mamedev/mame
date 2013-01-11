@@ -21,7 +21,7 @@ const device_type K056230 = &device_creator<k056230_device>;
 //-------------------------------------------------
 
 k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, K056230, "Konami 056230", tag, owner, clock)
+	: device_t(mconfig, K056230, "Konami 056230", tag, owner, clock)
 {
 
 }
@@ -76,7 +76,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_r)
 {
 	switch (offset)
 	{
-		case 0:		// Status register
+		case 0:     // Status register
 		{
 			return 0x08;
 		}
@@ -105,11 +105,11 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_w)
 {
 	switch(offset)
 	{
-		case 0:		// Mode register
+		case 0:     // Mode register
 		{
 			break;
 		}
-		case 1:		// Control register
+		case 1:     // Control register
 		{
 			if(data & 0x20)
 			{
@@ -127,7 +127,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_w)
 //              k056230->cpu->execute().set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
-		case 2:		// Sub ID register
+		case 2:     // Sub ID register
 		{
 			break;
 		}

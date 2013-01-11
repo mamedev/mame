@@ -30,7 +30,7 @@ public:
 	UINT16 m_roz_vram[0x800];
 
 	/* memory buffers */
-	UINT16 m_dsp56k_bank00_ram[2 * 8 * dsp56k_bank00_size];	/* 2 bank sets, 8 potential banks each */
+	UINT16 m_dsp56k_bank00_ram[2 * 8 * dsp56k_bank00_size]; /* 2 bank sets, 8 potential banks each */
 	UINT16 m_dsp56k_bank01_ram[2 * 8 * dsp56k_bank01_size];
 	UINT16 m_dsp56k_bank02_ram[2 * 8 * dsp56k_bank02_size];
 	UINT16 m_dsp56k_shared_ram_16[2 * 8 * dsp56k_shared_ram_16_size];

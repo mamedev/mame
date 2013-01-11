@@ -41,7 +41,7 @@ static UINT8 cc_port = 0;
 
 static const UINT8 superman_code[40] =
 {
-	0x48, 0xe7, 0x80, 0x80,	            /* MOVEM.L  D0/A0,-(A7)   ( Preserve Regs ) */
+	0x48, 0xe7, 0x80, 0x80,             /* MOVEM.L  D0/A0,-(A7)   ( Preserve Regs ) */
 	0x20, 0x6d, 0x1c, 0x40,             /* MOVEA.L  ($1C40,A5),A0 ( Load sound pointer in A0 ) */
 	0x30, 0x2f, 0x00, 0x0c,             /* MOVE.W   ($0C,A7),D0   ( Fetch sound number ) */
 	0x10, 0x80,                         /* MOVE.B   D0,(A0)       ( Store it on sound pointer ) */
@@ -50,8 +50,8 @@ static const UINT8 superman_code[40] =
 	0xb1, 0xc0,                         /* CMPA.L   D0,A0         ( Are we there yet? ) */
 	0x66, 0x04,                         /* BNE.S    *+$6          ( No, we arent, skip next line ) */
 	0x41, 0xed, 0x1c, 0x20,             /* LEA      ($1C20,A5),A0 ( Point to the start of the buffer ) */
-	0x2b, 0x48, 0x1c, 0x40,	            /* MOVE.L   A0,($1C40,A5) ( Store new sound pointer ) */
-	0x4c, 0xdf, 0x01, 0x01,	            /* MOVEM.L  (A7)+, D0/A0  ( Restore Regs ) */
+	0x2b, 0x48, 0x1c, 0x40,             /* MOVE.L   A0,($1C40,A5) ( Store new sound pointer ) */
+	0x4c, 0xdf, 0x01, 0x01,             /* MOVEM.L  (A7)+, D0/A0  ( Restore Regs ) */
 	0x4e, 0x75                          /* RTS                    ( Return ) */
 };
 
@@ -104,9 +104,9 @@ logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_p
 READ16_HANDLER( cchip1_ctrl_r )
 {
 	/*
-        Bit 2 = Error signal
-        Bit 0 = Ready signal
-    */
+	    Bit 2 = Error signal
+	    Bit 0 = Ready signal
+	*/
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
@@ -128,9 +128,9 @@ READ16_HANDLER( cchip1_ram_r )
 
 	if (current_bank == 1 && offset <= 0xff)
 	{
-		if (offset < 40)	/* our hack code is only 40 bytes long */
+		if (offset < 40)    /* our hack code is only 40 bytes long */
 			return superman_code[offset];
-		else	/* so pad with zeros */
+		else    /* so pad with zeros */
 			return 0;
 	}
 

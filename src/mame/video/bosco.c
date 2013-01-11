@@ -63,8 +63,8 @@ PALETTE_INIT_MEMBER(bosco_state,bosco)
 	/* characters / sprites */
 	for (i = 0;i < 64*4;i++)
 	{
-		colortable_entry_set_value(machine().colortable, i, (color_prom[i] & 0x0f) + 0x10);	/* chars */
-		colortable_entry_set_value(machine().colortable, i+64*4, color_prom[i] & 0x0f);	/* sprites */
+		colortable_entry_set_value(machine().colortable, i, (color_prom[i] & 0x0f) + 0x10); /* chars */
+		colortable_entry_set_value(machine().colortable, i+64*4, color_prom[i] & 0x0f); /* sprites */
 	}
 
 	/* bullets lookup table */
@@ -285,7 +285,7 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 {
 
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
-       the screen, and clip it to only the position where it is supposed to be shown */
+	   the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
 	if (flip_screen())

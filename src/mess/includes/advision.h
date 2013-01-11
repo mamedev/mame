@@ -9,18 +9,18 @@
 
 #include "sound/dac.h"
 
-#define SCREEN_TAG	"screen"
-#define I8048_TAG	"i8048"
-#define COP411_TAG	"cop411"
+#define SCREEN_TAG  "screen"
+#define I8048_TAG   "i8048"
+#define COP411_TAG  "cop411"
 
 class advision_state : public driver_device
 {
 public:
 	advision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8048_TAG),
-		  m_soundcpu(*this, COP411_TAG),
-		  m_dac(*this, "dac")
+			m_maincpu(*this, I8048_TAG),
+			m_soundcpu(*this, COP411_TAG),
+			m_dac(*this, "dac")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

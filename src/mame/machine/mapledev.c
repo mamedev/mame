@@ -78,4 +78,3 @@ void maple_device::reply_start(UINT8 code, UINT8 source, UINT8 size)
 	reply_size = size;
 	reply_partial = false;
 }
-

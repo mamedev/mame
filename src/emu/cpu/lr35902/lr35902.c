@@ -55,7 +55,7 @@ const device_type LR35902 = &device_creator<lr35902_cpu_device>;
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock),
-	 m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+		m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 {
 	c_regs = NULL;
 	c_features = 0;
@@ -243,16 +243,16 @@ void lr35902_cpu_device::check_interrupts()
 	}
 
 	/*
-       logerror("Attempting to process LR35902 Interrupt IRQ $%02X\n", irq);
-       logerror("Attempting to process LR35902 Interrupt IE $%02X\n", m_IE);
-       logerror("Attempting to process LR35902 Interrupt IF $%02X\n", m_IF);
-    */
+	   logerror("Attempting to process LR35902 Interrupt IRQ $%02X\n", irq);
+	   logerror("Attempting to process LR35902 Interrupt IE $%02X\n", m_IE);
+	   logerror("Attempting to process LR35902 Interrupt IF $%02X\n", m_IF);
+	*/
 	if (irq)
 	{
 		int irqline = 0;
 		/*
-           logerror("LR35902 Interrupt IRQ $%02X\n", irq);
-        */
+		   logerror("LR35902 Interrupt IRQ $%02X\n", irq);
+		*/
 
 		for( ; irqline < 5; irqline++ )
 		{
@@ -301,7 +301,7 @@ void lr35902_cpu_device::execute_run()
 	do
 	{
 		if ( m_execution_state ) {
-			UINT8	x;
+			UINT8   x;
 			/* Execute instruction */
 			switch( m_op ) {
 #include "opc_main.h"
@@ -350,4 +350,3 @@ void lr35902_cpu_device::set_speed( UINT8 speed_request )
 {
 	m_gb_speed_change_pending = speed_request & 0x01;
 }
-

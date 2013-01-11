@@ -293,7 +293,7 @@ static const s2636_interface astrowar_s2636_config =
 
 static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 2000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", S2650, 2000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(galaxia_mem_map)
 	MCFG_CPU_IO_MAP(galaxia_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state,  galaxia_interrupt)
@@ -333,7 +333,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 2000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", S2650, 2000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(astrowar_mem_map)
 	MCFG_CPU_IO_MAP(galaxia_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state,  galaxia_interrupt)

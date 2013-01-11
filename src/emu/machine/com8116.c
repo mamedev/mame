@@ -32,7 +32,7 @@ const device_type COM8116 = &device_creator<com8116_device>;
 //-------------------------------------------------
 
 com8116_device::com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, COM8116, "COM8116", tag, owner, clock)
+	: device_t(mconfig, COM8116, "COM8116", tag, owner, clock)
 {
 }
 

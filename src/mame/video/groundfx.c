@@ -73,7 +73,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	static const int primasks[4] = {0xffff, 0xfffc, 0xfff0, 0xff00 };
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
-       while processing sprite ram and then draw them all at the end */
+	   while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->m_spritelist;
 
 	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
@@ -95,7 +95,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		y =        (data & 0x000003ff);
 
 //      color |= (0x100 + (priority << 6));     /* priority bits select color bank */
-		color /= 2;		/* as sprites are 5bpp */
+		color /= 2;     /* as sprites are 5bpp */
 		flipy = !flipy;
 		y = (-y &0x3ff);
 
@@ -113,8 +113,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		x -= x_offs;
 
-		dimension = ((dblsize*2) + 2);	// 2 or 4
-		total_chunks = ((dblsize*3) + 1) << 2;	// 4 or 16
+		dimension = ((dblsize*2) + 2);  // 2 or 4
+		total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
 		map_offset = tilenum << 2;
 
 		{
@@ -145,8 +145,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				if (sprites_flipscreen)
 				{
 					/* -zx/y is there to fix zoomed sprite coords in screenflip.
-                       drawgfxzoom does not know to draw from flip-side of sprites when
-                       screen is flipped; so we must correct the coords ourselves. */
+					   drawgfxzoom does not know to draw from flip-side of sprites when
+					   screen is flipped; so we must correct the coords ourselves. */
 
 					curx = 320 - curx - zx;
 					cury = 256 - cury - zy;
@@ -209,10 +209,10 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
 
-	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
 	layer[2] = (priority & 0x00f0) >>  4;
-	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
+	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
 	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
@@ -220,27 +220,27 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 	pivlayer[2] = 2;
 
 	machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(0, cliprect);	/* wrong color? */
+	bitmap.fill(0, cliprect);   /* wrong color? */
 
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
 
 	/*  BIG HACK!
 
-        The rear view mirror is a big priority trick - the text
-        layer of TC0100SCN is used as a stencil to display
-        the bottom layer of TC0480SCP and a particular sprite
-        priority.  These never appear outside of the stencil.
+	    The rear view mirror is a big priority trick - the text
+	    layer of TC0100SCN is used as a stencil to display
+	    the bottom layer of TC0480SCP and a particular sprite
+	    priority.  These never appear outside of the stencil.
 
-        I'm not sure how the game turns this effect on/off
-        (the 480 layer is used normally in the frontend
-        of the game).
+	    I'm not sure how the game turns this effect on/off
+	    (the 480 layer is used normally in the frontend
+	    of the game).
 
-        I haven't implemented it properly yet, instead I'm
-        doing a hacky cliprect around the rearview and drawing
-        it's contents the usual way.
+	    I haven't implemented it properly yet, instead I'm
+	    doing a hacky cliprect around the rearview and drawing
+	    it's contents the usual way.
 
-    */
+	*/
 	if (tc0100scn_long_r(tc0100scn, space, 0x4090 / 4, 0xffffffff) ||
 			tc0480scp_long_r(tc0480scp, space, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
 	{
@@ -266,6 +266,6 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 		draw_sprites(machine(), bitmap, cliprect, 0, 44, -574);
 	}
 
-	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */
+	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 	return 0;
 }

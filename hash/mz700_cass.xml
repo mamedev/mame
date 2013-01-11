@@ -93,7 +93,7 @@ Easidata (English Version)
 	</software>
 
 <!-- This is a straight recording of the tape. The tape seems to have been destroyed by time and as such a possible bad dump. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation?
-     Side A of the dumped tape had been taped over, hence the nodump. -->
+		Side A of the dumped tape had been taped over, hence the nodump. -->
 	<software name="1z013b_a" cloneof="1z013b">
 		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A (Alt)</description>
 		<year>1983</year>
@@ -613,7 +613,7 @@ Easidata (English Version)
 		<description>PCGAID-700 V1.0 (Jpn)</description>
 		<year>19??</year>
 		<publisher>HAL Laboratory</publisher>
-        <info name="usage" value="PCG-700 required"/>
+		<info name="usage" value="PCG-700 required"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="4162">
 				<rom name="pcgaid.mzf" size="4162" crc="c34ef347" sha1="4319578cdf1aa0d21400c33627701774c0297de6" offset="0" />
@@ -625,7 +625,7 @@ Easidata (English Version)
 		<description>PCGAID-700 V1.0 (Euro)</description>
 		<year>19??</year>
 		<publisher>HAL Laboratory</publisher>
-        <info name="usage" value="PCG-700 required"/>
+		<info name="usage" value="PCG-700 required"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="4162">
 				<rom name="pcgaid_europe.mzf" size="4162" crc="40bf7069" sha1="4c528571f93f63e5b94421d4eac5880f2d5fffc1" offset="0" />
@@ -742,7 +742,7 @@ Easidata (English Version)
 		<description>Mole Attack</description>
 		<year>1982</year>
 		<publisher>HAL Laboratory</publisher>
-        <info name="usage" value="PCG-700 required"/>
+		<info name="usage" value="PCG-700 required"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="4146">
 				<rom name="moleatta.mzf" size="4146" crc="11c14b64" sha1="fbb3482690505748cd8193f6ec77794d9d8be942" offset="0" />
@@ -2056,7 +2056,7 @@ Easidata (English Version)
 		<description>Panique (Fra)</description>
 		<year>19??</year>
 		<publisher>Jean François Campan</publisher>
-        <info name="usage" value="Load from BASIC"/>
+		<info name="usage" value="Load from BASIC"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="6784">
 				<rom name="panique.mzf" size="6784" crc="20651b41" sha1="40cc592f430552f6aa7bdc9cc7434a9013756cf7" offset="0" />
@@ -2346,7 +2346,7 @@ Easidata (English Version)
 		<year>1982</year>
 		<publisher>Solo Software</publisher>
 		<info name="serial" value="MZ-7G100"/>
-        <info name="usage" value="Load from BASIC"/>
+		<info name="usage" value="Load from BASIC"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="15099">
 				<rom name="startrek.mzf" size="15099" crc="0214ccce" sha1="560e1bf2322ce647e00c39b4989349ae05241dd7" offset="0" />

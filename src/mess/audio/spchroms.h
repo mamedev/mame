@@ -3,7 +3,7 @@
 
 struct spchroms_interface
 {
-	const char *memory_region;			/* memory region where the speech ROM is.  NULL means no speech ROM */
+	const char *memory_region;          /* memory region where the speech ROM is.  NULL means no speech ROM */
 };
 
 void spchroms_config(running_machine &machine, const spchroms_interface *intf);

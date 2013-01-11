@@ -16,21 +16,21 @@ enum bitsModified {BM_NONE = 0x0, BM_LOW = 0x1, BM_MIDDLE = 0x2, BM_HIGH = 0x4};
 
 enum bfShift {BBB_UPPER, BBB_MIDDLE, BBB_LOWER, BBB_INVALID};
 enum reg_id {iX,  iX0, iX1,
-             iY,  iY0, iY1,
-             iA,  iA0, iA1, iA2,
-             iB,  iB0, iB1, iB2,
-             iR0, iR1, iR2, iR3,
-             iN0, iN1, iN2, iN3,
-             iM0, iM1, iM2, iM3,
-             iLC, iSR, iOMR, iSP, iSSH, iSSL, iLA, iMR, iCCR,
-             iF, iFHAT,
-             iINVALID, iWEIRD};
+				iY,  iY0, iY1,
+				iA,  iA0, iA1, iA2,
+				iB,  iB0, iB1, iB2,
+				iR0, iR1, iR2, iR3,
+				iN0, iN1, iN2, iN3,
+				iM0, iM1, iM2, iM3,
+				iLC, iSR, iOMR, iSP, iSSH, iSSL, iLA, iMR, iCCR,
+				iF, iFHAT,
+				iINVALID, iWEIRD};
 
 enum op_mnem {oCC, oGE, oNE, oPL,
-              oNN, oEC, oLC, oGT,
-              oCS, oLT, oEQ, oMI,
-              oNR, oES, oLS, oLE,
-              oSS, oSU, oUU, oINVALID};
+				oNN, oEC, oLC, oGT,
+				oCS, oLT, oEQ, oMI,
+				oNR, oES, oLS, oLE,
+				oSS, oSU, oUU, oINVALID};
 
 
 bfShift decode_BBB_table(UINT16 BBB);

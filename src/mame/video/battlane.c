@@ -105,24 +105,24 @@ TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
 TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
 {
 	/*
-            Tilemap Memory Organization
+	        Tilemap Memory Organization
 
-         0              15 16            31
-        +-----------------+----------------+
-        |0              15|256             |0
-        |                 |                |
-        |     screen 0    |    screen 1    |
-        |                 |                |
-        |240           255|             511|15
-        +-----------------+----------------+
-        |512              |768             |16
-        |                 |                |
-        |     screen 2    |    screen 3    |
-        |                 |                |
-        |              767|            1023|31
-        +-----------------+-----------------
+	     0              15 16            31
+	    +-----------------+----------------+
+	    |0              15|256             |0
+	    |                 |                |
+	    |     screen 0    |    screen 1    |
+	    |                 |                |
+	    |240           255|             511|15
+	    +-----------------+----------------+
+	    |512              |768             |16
+	    |                 |                |
+	    |     screen 2    |    screen 3    |
+	    |                 |                |
+	    |              767|            1023|31
+	    +-----------------+-----------------
 
-    */
+	*/
 
 	return (row & 0xf) * 16 + (col & 0xf) + (row & 0x10) * 32 + (col & 0x10) * 16;
 }
@@ -147,15 +147,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	for (offs = 0; offs < 0x100; offs += 4)
 	{
 		/*
-            0x80 = Bank 2
-            0x40 =
-            0x20 = Bank 1
-            0x10 = Y Double
-            0x08 = Color
-            0x04 = X Flip
-            0x02 = Y Flip
-            0x01 = Sprite Enable
-        */
+		    0x80 = Bank 2
+		    0x40 =
+		    0x20 = Bank 1
+		    0x10 = Y Double
+		    0x08 = Color
+		    0x04 = X Flip
+		    0x02 = Y Flip
+		    0x01 = Sprite Enable
+		*/
 
 		attr = state->m_spriteram[offs + 1];
 		code = state->m_spriteram[offs + 3];
@@ -174,7 +174,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = attr & 0x02;
 
 			if (!state->flip_screen())
-            {
+			{
 				sx = 240 - sx;
 				sy = 240 - sy;
 				flipx = !flipx;

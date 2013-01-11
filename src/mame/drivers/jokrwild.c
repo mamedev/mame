@@ -88,7 +88,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_8MHz	/* guess */
+#define MASTER_CLOCK    XTAL_8MHz   /* guess */
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -387,12 +387,12 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8, 8,
-	0x400,	/* tiles */
-	2,		/* 2 bpp */
+	0x400,  /* tiles */
+	2,      /* 2 bpp */
 	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8 /* every char takes 8 consecutive bytes */
 };
 
 
@@ -421,34 +421,34 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 
 static const pia6821_interface pia0_intf =
 {
-	DEVCB_INPUT_PORT("IN0"),		/* port A in */
-	DEVCB_INPUT_PORT("IN1"),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(jokrwild_state,testa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(jokrwild_state,testb_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_INPUT_PORT("IN0"),        /* port A in */
+	DEVCB_INPUT_PORT("IN1"),        /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(jokrwild_state,testa_w),        /* port A out */
+	DEVCB_DRIVER_MEMBER(jokrwild_state,testb_w),        /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 static const pia6821_interface pia1_intf =
 {
-	DEVCB_INPUT_PORT("IN2"),		/* port A in */
-	DEVCB_INPUT_PORT("IN3"),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_INPUT_PORT("IN2"),        /* port A in */
+	DEVCB_INPUT_PORT("IN3"),        /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_NULL,     /* port A out */
+	DEVCB_NULL,     /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -458,16 +458,16 @@ static const pia6821_interface pia1_intf =
 
 static const mc6845_interface mc6845_intf =
 {
-	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
-	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
-	NULL,		/* after pixel update callback */
-	DEVCB_NULL,	/* callback for display state changes */
-	DEVCB_NULL,	/* callback for cursor state changes */
-	DEVCB_NULL,	/* HSYNC callback */
-	DEVCB_NULL,	/* VSYNC callback */
-	NULL		/* update address callback */
+	"screen",   /* screen we are acting on */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
 };
 
 
@@ -478,7 +478,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)	/* guess */
+	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
 	MCFG_CPU_PROGRAM_MAP(jokrwild_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jokrwild_state,  nmi_line_pulse)
 
@@ -515,18 +515,18 @@ MACHINE_CONFIG_END
 */
 ROM_START( jokrwild )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jwild.7b",	0x8000, 0x4000, CRC(744cd029) SHA1(766faea330836344ffc6a1b4e1a64a679b9bf579) )
-	ROM_LOAD( "jwild.7a",	0xc000, 0x4000, CRC(ca8e4f58) SHA1(a4f682980fe562dcd8743890ce94619719cd1153) )
+	ROM_LOAD( "jwild.7b",   0x8000, 0x4000, CRC(744cd029) SHA1(766faea330836344ffc6a1b4e1a64a679b9bf579) )
+	ROM_LOAD( "jwild.7a",   0xc000, 0x4000, CRC(ca8e4f58) SHA1(a4f682980fe562dcd8743890ce94619719cd1153) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "jwild.2h",	0x0000, 0x0800, CRC(aed38e00) SHA1(9530078f6c22d67594606476c3698a75e052d1d6) )
-	ROM_LOAD( "jwild.2g",	0x1000, 0x0800, CRC(d635f025) SHA1(f70d5a837797e2250a7e581b96e60a704da25511) )
-	ROM_LOAD( "jwild.2f",	0x0800, 0x0800, CRC(9c1e057c) SHA1(23fd630aa20a4ffa5179d4a4fa32c6ee4b3f9c1b) )
-	ROM_LOAD( "jwild.2e",	0x1800, 0x0800, CRC(a66ae0a1) SHA1(8e6bfcb169148fdbcc36f4f35747c4805762ddd7) )
-	ROM_LOAD( "jwild.2d",	0x2000, 0x0800, CRC(76a0bcb4) SHA1(34c24ad63b1182166209074259e8f0aabe1ad331) )
-	ROM_LOAD( "jwild.2c",	0x3000, 0x0800, CRC(8d5e0b8f) SHA1(da6692d0c2074427f801b3f1861e3d03075963a2) )
-	ROM_LOAD( "jwild.2b",	0x2800, 0x0800, CRC(a264b0be) SHA1(a935dd3df8bbae9b7788d6c2a8c378fad07d2b43) )
-	ROM_LOAD( "jwild.2a",	0x3800, 0x0800, CRC(8084d0c2) SHA1(370f30f0138e2f7743a97df92379c7b879d90aed) )
+	ROM_LOAD( "jwild.2h",   0x0000, 0x0800, CRC(aed38e00) SHA1(9530078f6c22d67594606476c3698a75e052d1d6) )
+	ROM_LOAD( "jwild.2g",   0x1000, 0x0800, CRC(d635f025) SHA1(f70d5a837797e2250a7e581b96e60a704da25511) )
+	ROM_LOAD( "jwild.2f",   0x0800, 0x0800, CRC(9c1e057c) SHA1(23fd630aa20a4ffa5179d4a4fa32c6ee4b3f9c1b) )
+	ROM_LOAD( "jwild.2e",   0x1800, 0x0800, CRC(a66ae0a1) SHA1(8e6bfcb169148fdbcc36f4f35747c4805762ddd7) )
+	ROM_LOAD( "jwild.2d",   0x2000, 0x0800, CRC(76a0bcb4) SHA1(34c24ad63b1182166209074259e8f0aabe1ad331) )
+	ROM_LOAD( "jwild.2c",   0x3000, 0x0800, CRC(8d5e0b8f) SHA1(da6692d0c2074427f801b3f1861e3d03075963a2) )
+	ROM_LOAD( "jwild.2b",   0x2800, 0x0800, CRC(a264b0be) SHA1(a935dd3df8bbae9b7788d6c2a8c378fad07d2b43) )
+	ROM_LOAD( "jwild.2a",   0x3800, 0x0800, CRC(8084d0c2) SHA1(370f30f0138e2f7743a97df92379c7b879d90aed) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "prom.x", 0x0000, 0x0100, NO_DUMP )

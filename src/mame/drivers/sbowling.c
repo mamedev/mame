@@ -176,12 +176,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::sbw_interrupt)
 WRITE8_MEMBER(sbowling_state::system_w)
 {
 	/*
-        76543210
-        -------x flip screen/controls?
-        ------x- trackball x/y  select
-        -----x-- 1 ?
-        ----x--- flip screen/controls
-    */
+	    76543210
+	    -------x flip screen/controls?
+	    ------x- trackball x/y  select
+	    -----x-- 1 ?
+	    ----x--- flip screen/controls
+	*/
 
 
 	flip_screen_set(data&1);
@@ -198,12 +198,12 @@ WRITE8_MEMBER(sbowling_state::system_w)
 WRITE8_MEMBER(sbowling_state::graph_control_w)
 {
 	/*
-        76543210
-        -----xxx color PROM address lines A9,A8,A7
-        ----?--- nc ?
-        --xx---- background image select (address lines on tilemap rom)
-        xx------ color PROM address lines A4,A3
-    */
+	    76543210
+	    -----xxx color PROM address lines A9,A8,A7
+	    ----?--- nc ?
+	    --xx---- background image select (address lines on tilemap rom)
+	    xx------ color PROM address lines A4,A3
+	*/
 
 
 
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( sbowling )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1   )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,	IPT_TILT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -259,7 +259,7 @@ static INPUT_PORTS_START( sbowling )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,	IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( sbowling )
 	PORT_START("TRACKX")
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE
 
-	PORT_START("DSW0")	/* coin slots: A 4 LSB, B 4 MSB */
+	PORT_START("DSW0")  /* coin slots: A 4 LSB, B 4 MSB */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
@@ -351,10 +351,10 @@ void sbowling_state::palette_init()
 	double outputs_r[1<<3], outputs_g[1<<3], outputs_b[1<<2];
 
 	/* the game uses output collector PROMs type: NEC B406  */
-	compute_resistor_net_outputs(0, 255,	-1.0,
-		3,	resistances_rg, outputs_r,	0,	100,
-		3,	resistances_rg, outputs_g,	0,	100,
-		2,	resistances_b,  outputs_b,	0,	100);
+	compute_resistor_net_outputs(0, 255,    -1.0,
+		3,  resistances_rg, outputs_r,  0,  100,
+		3,  resistances_rg, outputs_g,  0,  100,
+		2,  resistances_b,  outputs_b,  0,  100);
 
 	for (i = 0;i < machine().total_colors();i++)
 	{
@@ -382,7 +382,7 @@ void sbowling_state::palette_init()
 }
 
 static MACHINE_CONFIG_START( sbowling, sbowling_state )
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)	/* ? */
+	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, sbw_interrupt, "screen", 0, 1)
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
+	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update_sbowling)
 
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_19_968MHz/16)	/* ? */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_19_968MHz/16)  /* ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

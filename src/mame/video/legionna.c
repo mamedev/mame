@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
 	int color=(tile>>12)&0xf;
 
 	tile &= 0xfff;
-	tile |= m_back_gfx_bank;		/* Heatbrl uses banking */
+	tile |= m_back_gfx_bank;        /* Heatbrl uses banking */
 
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
@@ -280,9 +280,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 			switch (cur_pri)
 			{
-				case 0:	pri_mask = -256; break; // gumdam swamp monster l2
-				case 1:	pri_mask = -256; break; // cupsoc
-				case 2:	pri_mask = -4; break; // masking effect for gundam l2 monster
+				case 0: pri_mask = -256; break; // gumdam swamp monster l2
+				case 1: pri_mask = -256; break; // cupsoc
+				case 2: pri_mask = -4; break; // masking effect for gundam l2 monster
 				case 3: pri_mask = -4; break; // cupsoc (not sure what..)
 				case 4: pri_mask = -32; break; // gundam level 2/3 player
 				//case 5: pri_mask = 0; break;
@@ -299,9 +299,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 			switch (cur_pri)
 			{
-				case 0:	pri_mask = 0xfffc; break; //?
-				case 1:	pri_mask = 0xfffc; break; //?
-				case 2:	pri_mask = 0xfffc; break; // player sprites in legionnaire
+				case 0: pri_mask = 0xfffc; break; //?
+				case 1: pri_mask = 0xfffc; break; //?
+				case 2: pri_mask = 0xfffc; break; // player sprites in legionnaire
 				case 3: pri_mask = 0xfffe; break; // stuff that goes behind the playfield (barriers on train level in legionnaire)
 			}
 
@@ -328,7 +328,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		x = spriteram16[offs+2];
 
 		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
-           this doesn't work on denjin makai as the visible area is larger */
+		   this doesn't work on denjin makai as the visible area is larger */
 		if (cliprect.max_x<(320-1))
 		{
 			x&=0x1ff;
@@ -422,7 +422,7 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
 	machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill(get_black_pen(machine()), cliprect);	/* wrong color? */
+	bitmap.fill(get_black_pen(machine()), cliprect);    /* wrong color? */
 
 	/* m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
@@ -497,4 +497,3 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 
 	return 0;
 }
-

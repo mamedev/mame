@@ -28,9 +28,9 @@ microtouch_device::microtouch_device(const machine_config &mconfig, const char *
 int microtouch_device::check_command( const char* commandtocheck, int command_len, UINT8* command_data )
 {
 	if ( (command_len == (strlen(commandtocheck) + 2)) &&
-		 (command_data[0] == 0x01) &&
-		 (strncmp(commandtocheck, (const char*)command_data + 1, strlen(commandtocheck)) == 0) &&
-		 (command_data[command_len-1] == 0x0d) )
+			(command_data[0] == 0x01) &&
+			(strncmp(commandtocheck, (const char*)command_data + 1, strlen(commandtocheck)) == 0) &&
+			(command_data[command_len-1] == 0x0d) )
 	{
 		return 1;
 	}
@@ -86,7 +86,7 @@ void microtouch_device::send_touch_packet()
 	int ty = ioport("TOUCH_Y")->read();
 
 	if ( m_out_touch_cb == NULL ||
-		 m_out_touch_cb( &tx, &ty ) != 0 )
+			m_out_touch_cb( &tx, &ty ) != 0 )
 	{
 		ty = 0x4000 - ty;
 
@@ -120,8 +120,8 @@ void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 
 	if ( (m_reset_done == 0) ||
-		 (m_format == FORMAT_UNKNOWN) ||
-		 (m_mode != MODE_STREAM))
+			(m_format == FORMAT_UNKNOWN) ||
+			(m_mode != MODE_STREAM))
 	{
 		return;
 	}
@@ -288,7 +288,7 @@ const device_type MICROTOUCH_SERIAL = &device_creator<microtouch_serial_device>;
 
 microtouch_serial_device::microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: microtouch_device(mconfig, MICROTOUCH_SERIAL, "Microtouch Serial Touchscreen", tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+		device_serial_interface(mconfig, *this)
 {
 }
 

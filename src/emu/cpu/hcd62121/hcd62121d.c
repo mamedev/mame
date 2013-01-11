@@ -6,37 +6,37 @@
 
 enum
 {
-	_REG=1,		/* register */
-	_REGREG,	/* register1, register2, or register2, register1 or register1, imm byte */
-	_IRG,		/* register indirect */
-	_IRGREG,	/* 2 register indirect */
-	_A16,		/* 16bit address */
-	_A24,		/* seg:address */
-	_F,			/* flag register */
-	_CS,		/* cs register */
-	_DS,		/* ds register */
-	_SS,		/* ss register */
-	_PC,		/* program counter */
-	_SP,		/* stack pointer */
-	_I8,		/* immediate 8 bit value */
-	_I16,		/* immediate 16 bit value */
-	_I64,		/* immediate 64 bit value */
-	_I80,		/* immediate 80 bit value */
-	_ILR,		/* indirect last address register access */
-	_LAR,		/* last address register */
-	_DSZ,		/* dsize register? */
-	_TIM,		/* timing related register? */
-	_KLO,		/* KO1 - KO8 output lines */
-	_KHI,		/* KO9 - KO14(?) output lines */
-	_KI,		/* K input lines */
-	_4,			/* for nibble shifts */
+	_REG=1,     /* register */
+	_REGREG,    /* register1, register2, or register2, register1 or register1, imm byte */
+	_IRG,       /* register indirect */
+	_IRGREG,    /* 2 register indirect */
+	_A16,       /* 16bit address */
+	_A24,       /* seg:address */
+	_F,         /* flag register */
+	_CS,        /* cs register */
+	_DS,        /* ds register */
+	_SS,        /* ss register */
+	_PC,        /* program counter */
+	_SP,        /* stack pointer */
+	_I8,        /* immediate 8 bit value */
+	_I16,       /* immediate 16 bit value */
+	_I64,       /* immediate 64 bit value */
+	_I80,       /* immediate 80 bit value */
+	_ILR,       /* indirect last address register access */
+	_LAR,       /* last address register */
+	_DSZ,       /* dsize register? */
+	_TIM,       /* timing related register? */
+	_KLO,       /* KO1 - KO8 output lines */
+	_KHI,       /* KO9 - KO14(?) output lines */
+	_KI,        /* K input lines */
+	_4,         /* for nibble shifts */
 };
 
 struct hcd62121_dasm
 {
 	const char *str;
-	UINT8		arg1;
-	UINT8		arg2;
+	UINT8       arg1;
+	UINT8       arg2;
 };
 
 
@@ -57,9 +57,9 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "orb",   _REGREG, 0 }, { "orw",   _REGREG, 0 }, { "orq",   _REGREG, 0 }, { "ort",   _REGREG, 0 },
 	{ "shlb",  _REG,    0 }, { "shlw",  _REG,    0 }, { "shlq",  _REG,    0 }, { "shlt",  _REG,    0 },
 	{ "andb",  _REGREG, 0 }, { "andw",  _REGREG, 0 }, { "andq",  _REGREG, 0 }, { "andt",  _REGREG, 0 },
-	{ "sbbb",  _REGREG, 0 }, { "sbbw",  _REGREG, 0 }, { "sbbq",  _REGREG, 0 }, { "sbbt",  _REGREG, 0 },		/* BCD SUB */
+	{ "sbbb",  _REGREG, 0 }, { "sbbw",  _REGREG, 0 }, { "sbbq",  _REGREG, 0 }, { "sbbt",  _REGREG, 0 },     /* BCD SUB */
 	{ "subb",  _REGREG, 0 }, { "subw",  _REGREG, 0 }, { "subq",  _REGREG, 0 }, { "subt",  _REGREG, 0 },
-	{ "adbb",  _REGREG, 0 }, { "adbw",  _REGREG, 0 }, { "adbq",  _REGREG, 0 }, { "adbt",  _REGREG, 0 },		/* BCD ADD */
+	{ "adbb",  _REGREG, 0 }, { "adbw",  _REGREG, 0 }, { "adbq",  _REGREG, 0 }, { "adbt",  _REGREG, 0 },     /* BCD ADD */
 	{ "addb",  _REGREG, 0 }, { "addw",  _REGREG, 0 }, { "addq",  _REGREG, 0 }, { "addt",  _REGREG, 0 },
 
 	/* 0x40 */
@@ -240,7 +240,7 @@ CPU_DISASSEMBLE( hcd62121 )
 		if ( ( op1 & 0x80 ) || ( op2 & 0x80 ) )
 		{
 			/* (lar),reg */
-			 buffer += sprintf( buffer, "(%slar%s),r%02x", (op1 & 0x20) ? ( (op1 & 0x40) ? "--" : "++" ) : "", (op1 & 0x20) ? "" : ( (op1 & 0x40) ? "--" : "++" ), op2 & 0x7f );
+				buffer += sprintf( buffer, "(%slar%s),r%02x", (op1 & 0x20) ? ( (op1 & 0x40) ? "--" : "++" ) : "", (op1 & 0x20) ? "" : ( (op1 & 0x40) ? "--" : "++" ), op2 & 0x7f );
 		}
 		else
 		{
@@ -349,4 +349,3 @@ CPU_DISASSEMBLE( hcd62121 )
 
 	return pos | DASMFLAG_SUPPORTED;
 }
-

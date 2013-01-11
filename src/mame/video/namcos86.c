@@ -75,7 +75,7 @@ void namcos86_state::palette_init()
 
 	/* color_prom now points to the beginning of the tile address decode PROM */
 
-	m_tile_address_prom = color_prom;	/* we'll need this at run time */
+	m_tile_address_prom = color_prom;   /* we'll need this at run time */
 }
 
 
@@ -272,7 +272,7 @@ sprite format:
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	namcos86_state *state = machine.driver_data<namcos86_state>();
-	const UINT8 *source = &state->m_spriteram[0x0800-0x20];	/* the last is NOT a sprite */
+	const UINT8 *source = &state->m_spriteram[0x0800-0x20]; /* the last is NOT a sprite */
 	const UINT8 *finish = &state->m_spriteram[0];
 	gfx_element *gfx = machine.gfx[2];
 
@@ -315,7 +315,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			flipy ^= 1;
 		}
 
-		sy++;	/* sprites are buffered and delayed by one scanline */
+		sy++;   /* sprites are buffered and delayed by one scanline */
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
 		pdrawgfx_transpen( bitmap, cliprect,gfx,

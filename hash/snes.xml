@@ -2,153 +2,153 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-  Credits:
-  - Maintainers : Fabio Priuli, Yakushi~Kabuto
-  - Cart profiles : Yakushi~Kabuto
-  - Documentation and redump (significant contributors):
-  - - Yakushi~Kabuto (~1160 carts)
-  - - byuu (149 carts)
-  - - badinsults (~350 carts)
-  - - JohnDie (~180 carts)
-  - - Zidanax (~130 carts)
-  - - Ecco and RedScorpion (72 carts)
-  - - d4s (extremely rare material)
+	Credits:
+	- Maintainers : Fabio Priuli, Yakushi~Kabuto
+	- Cart profiles : Yakushi~Kabuto
+	- Documentation and redump (significant contributors):
+	- - Yakushi~Kabuto (~1160 carts)
+	- - byuu (149 carts)
+	- - badinsults (~350 carts)
+	- - JohnDie (~180 carts)
+	- - Zidanax (~130 carts)
+	- - Ecco and RedScorpion (72 carts)
+	- - d4s (extremely rare material)
 -->
 
 <!--
 Undumped
 
- Confirmed?   Source     Title
+	Confirmed?   Source     Title
 
-  <Japan>
-          x   SV wikia   All Japan Super Bombliss Cup '95 (BS)
-          o   PCB pic    Clock Tower / Prototype with 3 sample games
-          o   PCB pic    Dai-3-Ji Super Robot Taisen / Revision C / C2941881
-          o   PCB pic    Doraemon - Nobita to Yousei no Kuni / Revision A / 55E44983
-          ?              Dragon Slayer - Eiyuu Densetsu II / Prototype
-          x   n/a        Eiga Shoukai Soft - Mizu no Tabinin
-          o   Wii VC     Gakkou de Atta Kowai Hanashi / Revision A
-          o   Cart pic   GAMARS Genuine Taiwan Mahjong 16 / Unlicensed
-          o   Cart pic   GAMARS Taiwan Chess / Unlicensed
-          o   Inter rev  Ganbare Goemon - Yuki Hime Kyuushutsu Emaki / Revision A
-          o   Inter rev  Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Riyuu / Revision A
-          o   PCB pic    Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame / Revision A / 458C473B
-          o   PCB pic    Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame / Revision B / AF984BC1
-          x   n/a        J.League Excite Stage '96 / Sample
-          o   Cart pic   Kunio-kun no Dodge Ball dayo Zenin Shuugou! Sample ROM くにおくんのドッジボールだよ 全員集合! サンプルロム / Not for sale
-          ?              Lethal Enforcers Famitsu Edition リーサルエンフォーサーズ　ファミ通版 / Not for sale
-          x   n/a        Little Master - Nijiiro no Maseki / Sample
-          o   Cart pic   Magical Drop 2 - Bunka Housou Special Version / SHVC-AOQJ-JPN / Not for sale
-          ?              Naughts &amp; Crosses / Prototype
-          o   Wii VC     Panel de Pon / Revision A
-          o   PCB pic    Pilotwings / Prototype 19901025
-          ?              Pro Action Replay - High Tech Option Series / Unlicensed
-          x   n/a        Pro Yakyuu Nettou Puzzle Stadium / Sample
-          ?              Saikyou - Takada Nobuhiko - Ucchan Nanchan Version
-          o   Inter rev  Satellaview BS-X (Japan) / Initial release prior to Rev A
-          o   PCB pic    Shin Chou Kouki / Revision A / 1A77CF3B
-          o   PCB pic    Shin Megami Tensei II / Revision A / 84268A75
-          o   PCB pic    Shodai Nekketsu Kouha Kunio-kun / Revision A / 5DF55465
-          o   Inter rev  Super Jinsei Game 2 / Revision A
-          o   Inter rev  Super Mahjong Taikai / Revision B
-          o   Wii VC     Super Nobunaga no Yabou - Zenkoku Ban / Revision A
-          o   PCB pic    Super Soukoban / Japan? Prototype
-          x   n/a        Super Street Fighter II / Sample
-          o   PCB pic    Tsukikomori (v1.1, NP) / F37C6726
-          o   PCB pic    Ultraman / Prototype
-          ?              Wild Trax / Demo
+	<Japan>
+			x   SV wikia   All Japan Super Bombliss Cup '95 (BS)
+			o   PCB pic    Clock Tower / Prototype with 3 sample games
+			o   PCB pic    Dai-3-Ji Super Robot Taisen / Revision C / C2941881
+			o   PCB pic    Doraemon - Nobita to Yousei no Kuni / Revision A / 55E44983
+			?              Dragon Slayer - Eiyuu Densetsu II / Prototype
+			x   n/a        Eiga Shoukai Soft - Mizu no Tabinin
+			o   Wii VC     Gakkou de Atta Kowai Hanashi / Revision A
+			o   Cart pic   GAMARS Genuine Taiwan Mahjong 16 / Unlicensed
+			o   Cart pic   GAMARS Taiwan Chess / Unlicensed
+			o   Inter rev  Ganbare Goemon - Yuki Hime Kyuushutsu Emaki / Revision A
+			o   Inter rev  Ganbare Goemon Kirakira Douchuu - Boku ga Dancer ni Natta Riyuu / Revision A
+			o   PCB pic    Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame / Revision A / 458C473B
+			o   PCB pic    Ganbare Goemon 3 - Shishi Juurokubei no Karakuri Manjigatame / Revision B / AF984BC1
+			x   n/a        J.League Excite Stage '96 / Sample
+			o   Cart pic   Kunio-kun no Dodge Ball dayo Zenin Shuugou! Sample ROM くにおくんのドッジボールだよ 全員集合! サンプルロム / Not for sale
+			?              Lethal Enforcers Famitsu Edition リーサルエンフォーサーズ　ファミ通版 / Not for sale
+			x   n/a        Little Master - Nijiiro no Maseki / Sample
+			o   Cart pic   Magical Drop 2 - Bunka Housou Special Version / SHVC-AOQJ-JPN / Not for sale
+			?              Naughts &amp; Crosses / Prototype
+			o   Wii VC     Panel de Pon / Revision A
+			o   PCB pic    Pilotwings / Prototype 19901025
+			?              Pro Action Replay - High Tech Option Series / Unlicensed
+			x   n/a        Pro Yakyuu Nettou Puzzle Stadium / Sample
+			?              Saikyou - Takada Nobuhiko - Ucchan Nanchan Version
+			o   Inter rev  Satellaview BS-X (Japan) / Initial release prior to Rev A
+			o   PCB pic    Shin Chou Kouki / Revision A / 1A77CF3B
+			o   PCB pic    Shin Megami Tensei II / Revision A / 84268A75
+			o   PCB pic    Shodai Nekketsu Kouha Kunio-kun / Revision A / 5DF55465
+			o   Inter rev  Super Jinsei Game 2 / Revision A
+			o   Inter rev  Super Mahjong Taikai / Revision B
+			o   Wii VC     Super Nobunaga no Yabou - Zenkoku Ban / Revision A
+			o   PCB pic    Super Soukoban / Japan? Prototype
+			x   n/a        Super Street Fighter II / Sample
+			o   PCB pic    Tsukikomori (v1.1, NP) / F37C6726
+			o   PCB pic    Ultraman / Prototype
+			?              Wild Trax / Demo
 
-  <USA>
-          o   PCB pic    1992 Nintendo Challenge / Competition, Japan, USA and Europe?
-          o   Screen pic 1992 Nintendo Campus Challenge / Competition, title screen variation of the former
-          o   PCB pic    1994 Nintendo PowerFest / Competition
-          o   PCB pic    Bio Metal / Prototype 19930716 | Activision
-          o   PCB pic    The Brainies / Prototype 19930522
-          o   Inter rev  Fighter's History / Initial release prior to Rev A
-          ?              Ignition Factor, The / Prototype
-          o   PCB pic    Jammit / Prototype 19940301 | GTE Entertainment
-          o   PCB pic    Mickey's Ultimate Challenge / Prototype 19931103
-          o   PCB pic    Natsume Championship Wrestling / Prototype
-          o   PCB pic    NFL Quarterback Club 96 / Alternate Prototype?
-          ?              PGA Tour Golf / Revision A
-          o   PCB pic    Speedy Gonzales in Los Gatos Bandidos / Prototype 19950125
-          o   Inter rev  Star Fox / Revision A
-          o   PCB pic    Sterling Sharpe - End 2 End / Prototype
-          o   Cart pic   Stunt Race FX / DIS-SNS-QC-USA Not for sale - Demo Only
-          o   PCB pic    Super Mario Kart / Earlier Prototype
-          o   PCB pic    Super Pinball - Behind the Mask / Prototype
-          o   Wii VC     Super Street Fighter II / Revision A
-          ?              Theme Park / USA? Prototype
-          o   Cart pic   X Band / Prototype
+	<USA>
+			o   PCB pic    1992 Nintendo Challenge / Competition, Japan, USA and Europe?
+			o   Screen pic 1992 Nintendo Campus Challenge / Competition, title screen variation of the former
+			o   PCB pic    1994 Nintendo PowerFest / Competition
+			o   PCB pic    Bio Metal / Prototype 19930716 | Activision
+			o   PCB pic    The Brainies / Prototype 19930522
+			o   Inter rev  Fighter's History / Initial release prior to Rev A
+			?              Ignition Factor, The / Prototype
+			o   PCB pic    Jammit / Prototype 19940301 | GTE Entertainment
+			o   PCB pic    Mickey's Ultimate Challenge / Prototype 19931103
+			o   PCB pic    Natsume Championship Wrestling / Prototype
+			o   PCB pic    NFL Quarterback Club 96 / Alternate Prototype?
+			?              PGA Tour Golf / Revision A
+			o   PCB pic    Speedy Gonzales in Los Gatos Bandidos / Prototype 19950125
+			o   Inter rev  Star Fox / Revision A
+			o   PCB pic    Sterling Sharpe - End 2 End / Prototype
+			o   Cart pic   Stunt Race FX / DIS-SNS-QC-USA Not for sale - Demo Only
+			o   PCB pic    Super Mario Kart / Earlier Prototype
+			o   PCB pic    Super Pinball - Behind the Mask / Prototype
+			o   Wii VC     Super Street Fighter II / Revision A
+			?              Theme Park / USA? Prototype
+			o   Cart pic   X Band / Prototype
 
-  <Europe>
-          ?              Biker Mice From Mars / Prototype
-          o   Inter rev  Donkey Kong Country 2 - Diddy's Kong Quest / Initial release prior to Rev A
+	<Europe>
+			?              Biker Mice From Mars / Prototype
+			o   Inter rev  Donkey Kong Country 2 - Diddy's Kong Quest / Initial release prior to Rev A
 
-  <Unknown region>
-          ?              Plok! (Prototype 19930403)
+	<Unknown region>
+			?              Plok! (Prototype 19930403)
 
-  Voice-Kun audio discs
-  The Voice-Kun, often called Voicer Kun,
-  is a device which connects to the second controller port and acts as a remote control for CD players.
-          o   WP         Angelique - Voice Fantasy (Japan)
-          o   Box pic    Emit Vol. 1 - Toki no Maigo (Japan) (2 discs?)
-          o   Box pic    Emit Vol. 2 - Inochigake no Tabi (Japan) (2 discs?)
-          o   Box pic    Emit Vol. 3 - Watashi ni Sayonara wo (Japan) (2 discs?)
-          x   WP         Emit Value Set (Vol. 1-3)
+	Voice-Kun audio discs
+	The Voice-Kun, often called Voicer Kun,
+	is a device which connects to the second controller port and acts as a remote control for CD players.
+			o   WP         Angelique - Voice Fantasy (Japan)
+			o   Box pic    Emit Vol. 1 - Toki no Maigo (Japan) (2 discs?)
+			o   Box pic    Emit Vol. 2 - Inochigake no Tabi (Japan) (2 discs?)
+			o   Box pic    Emit Vol. 3 - Watashi ni Sayonara wo (Japan) (2 discs?)
+			x   WP         Emit Value Set (Vol. 1-3)
 
-  Cancelled (most of these titles are probably lost forever)
+	Cancelled (most of these titles are probably lost forever)
 
-  - Asterix - USA, for 1993, Electro Brain
-  - Beastball - USA, for 1993, Millennium Interactive
-  - Boo! - Europe, for 1994, Micropose
-  - Bulls Vs. Lakers - USA, for 1992, Electronic Arts
-  - College Football - USA, for 1993, HAL America
-  - Comanche - USA, for 199?, Novalogic
-  - Daze Before Christmas - USA, for 1994, Funcom Productions
-  - Dominus - USA, for 1993, Visual Concepts
-  - Dream Probe - USA, for 1993, Riot
-  - Fables & Fiends: The Legend of Kyrandia - Europe, for 1992, Virgin Games
-  - Fido Dido - USA, for 1993, Kaneko
-  - Firehawk - USA, for 1993 or later, Sony
-  - Freeway Flyboys - USA, for 199?, unknown dev
-  - Future Zone - USA, for 1994, Electro Brain
-  - FX Fighter - USA, for 199?, Argonaut Software
-  - Gearheads - USA, for 1996, Philips Media
-  - Green Lantern - USA, 199?, Ocean Software
-  - Jaguar XJ220 - USA, for 199?, JVC
-  - Joe vs. The Wall - USA, 1992 or later, Ocean
-  - Lost Mission - USA, for 1993 or later, Vic Tokai
-  - Mountain Sports - USA, for 1993 or later, DTMC
-  - Moto-X - USA, for 1994, Software Creations
-  - Operation Alien - USA, for 1993 or later, THQ
-  - Pele! - USA, for 1993 or later, Accolade
-  - Pocahontas - USA, for 1996 or later, Funcom
-  - Popeye - USA, for 1993 or later, Technos
-  - Railroad Tycoon - USA, for 1993, MicroProse
-  - SGT. Saunder's Combat - USA, for 199?, Play Avenue/Chickenhead
-  - Shadowhawk - USA, for 1995 or later, Shadowline Studios
-  - Smurfs, The - USA, for 199?, Infogrames
-  - Socks the Cat Rocks the Hill - USA, for 1994, Kaneko
-  - Sound Fantasy - USA & Japan, for 1993 or later, Nintendo
-  - Spanky no Orifuru Puzzle - Japan, for 1995, Natsume
-  - Spot Goes To Hollywood - Europ, for 199?, Virgin
-  - Superman - USA, for 1993, Sunsoft
-  - Super Baseball Simulator 1.000 2 - USA, for 199?, unknown dev
-  - Super Hustler - Japan, for 199?, Opera House
-  - Taloon's Mystery Dungeon - USA, for 199?, Squaresoft
-  - Targa - Europe, for 1995, Virgin Interactive
-  - Tarzan - Unknown region, for 1993 or later, Gametek
-  - Thunder in Paradise - USA, for 1994 or later, Software Toolworks
-  - Time Killer - USA, for 1993 or later, T*HQ
-  - Tom and Jerry 2 - USA, for 199?, Hi Tech
-  - Toxic Crusaders - USA, for 1992 or later, Bandai
-  - Tweety and Sylvester - USA, for 1993 or later, TecMagik
-  - Ultrabots: Sanction Earth - USA, for 1992 or later, NovaLogic
-  - Warrior of Rome III - USA, for 1993 or later, Extreme
-  - Waterworld - USA, for 199?, unknown dev
-  - Whirlo - USA, for 199?, Namco
-  - Wile E Coyote's Revenge (later prototype) - USA, for 199?, Sunsoft
+	- Asterix - USA, for 1993, Electro Brain
+	- Beastball - USA, for 1993, Millennium Interactive
+	- Boo! - Europe, for 1994, Micropose
+	- Bulls Vs. Lakers - USA, for 1992, Electronic Arts
+	- College Football - USA, for 1993, HAL America
+	- Comanche - USA, for 199?, Novalogic
+	- Daze Before Christmas - USA, for 1994, Funcom Productions
+	- Dominus - USA, for 1993, Visual Concepts
+	- Dream Probe - USA, for 1993, Riot
+	- Fables & Fiends: The Legend of Kyrandia - Europe, for 1992, Virgin Games
+	- Fido Dido - USA, for 1993, Kaneko
+	- Firehawk - USA, for 1993 or later, Sony
+	- Freeway Flyboys - USA, for 199?, unknown dev
+	- Future Zone - USA, for 1994, Electro Brain
+	- FX Fighter - USA, for 199?, Argonaut Software
+	- Gearheads - USA, for 1996, Philips Media
+	- Green Lantern - USA, 199?, Ocean Software
+	- Jaguar XJ220 - USA, for 199?, JVC
+	- Joe vs. The Wall - USA, 1992 or later, Ocean
+	- Lost Mission - USA, for 1993 or later, Vic Tokai
+	- Mountain Sports - USA, for 1993 or later, DTMC
+	- Moto-X - USA, for 1994, Software Creations
+	- Operation Alien - USA, for 1993 or later, THQ
+	- Pele! - USA, for 1993 or later, Accolade
+	- Pocahontas - USA, for 1996 or later, Funcom
+	- Popeye - USA, for 1993 or later, Technos
+	- Railroad Tycoon - USA, for 1993, MicroProse
+	- SGT. Saunder's Combat - USA, for 199?, Play Avenue/Chickenhead
+	- Shadowhawk - USA, for 1995 or later, Shadowline Studios
+	- Smurfs, The - USA, for 199?, Infogrames
+	- Socks the Cat Rocks the Hill - USA, for 1994, Kaneko
+	- Sound Fantasy - USA & Japan, for 1993 or later, Nintendo
+	- Spanky no Orifuru Puzzle - Japan, for 1995, Natsume
+	- Spot Goes To Hollywood - Europ, for 199?, Virgin
+	- Superman - USA, for 1993, Sunsoft
+	- Super Baseball Simulator 1.000 2 - USA, for 199?, unknown dev
+	- Super Hustler - Japan, for 199?, Opera House
+	- Taloon's Mystery Dungeon - USA, for 199?, Squaresoft
+	- Targa - Europe, for 1995, Virgin Interactive
+	- Tarzan - Unknown region, for 1993 or later, Gametek
+	- Thunder in Paradise - USA, for 1994 or later, Software Toolworks
+	- Time Killer - USA, for 1993 or later, T*HQ
+	- Tom and Jerry 2 - USA, for 199?, Hi Tech
+	- Toxic Crusaders - USA, for 1992 or later, Bandai
+	- Tweety and Sylvester - USA, for 1993 or later, TecMagik
+	- Ultrabots: Sanction Earth - USA, for 1992 or later, NovaLogic
+	- Warrior of Rome III - USA, for 1993 or later, Extreme
+	- Waterworld - USA, for 199?, unknown dev
+	- Whirlo - USA, for 199?, Namco
+	- Wile E Coyote's Revenge (later prototype) - USA, for 199?, Sunsoft
 -->
 
 <!--
@@ -257,21 +257,21 @@ SNSN-006 : Standard Honk Kong cartridge
 Cartridges labels (W.I.P)
 
 - Japan catalogue product code:
-  From 1990 to 1994 Sept: the product code is SHVC-xy
-  x and y can be any letter or number, except 0 and 1 (to avoid confusion with O and I respectively)
-  From 1994 Sept onward: the product code is: SHVC-zxyJ-JPN
-  z = A, Non specific retail and demo releases
-  z = B, Nintendo Power specific releases, could be re-released on retail cartridges
-  z = T, NTT (Nippon Telegraph and Telephone) releases requiring a modem (serial: NDM24)
-  z = Z, BSX slotted cartridge (model SHVC-028 or SHVC-040)
+	From 1990 to 1994 Sept: the product code is SHVC-xy
+	x and y can be any letter or number, except 0 and 1 (to avoid confusion with O and I respectively)
+	From 1994 Sept onward: the product code is: SHVC-zxyJ-JPN
+	z = A, Non specific retail and demo releases
+	z = B, Nintendo Power specific releases, could be re-released on retail cartridges
+	z = T, NTT (Nippon Telegraph and Telephone) releases requiring a modem (serial: NDM24)
+	z = Z, BSX slotted cartridge (model SHVC-028 or SHVC-040)
 
 - US catalogue product code:
-  SNS-xy-USA, and later, SNS-AxyE-USA
-  Prefix M/ : Made in mexico
-  Prefix DIS- or suffix -DIS : Display (not for sale)
+	SNS-xy-USA, and later, SNS-AxyE-USA
+	Prefix M/ : Made in mexico
+	Prefix DIS- or suffix -DIS : Display (not for sale)
 
 - Europe catalogue product code:
-  SNSP-xy-suffix, and later, SNSP-AxyP-suffix
+	SNSP-xy-suffix, and later, SNSP-AxyP-suffix
 
 Front sticker suffix:
 -JPN      : Japan
@@ -299,8 +299,8 @@ Front sticker suffix:
 -UKV      : United Kingdom
 
 Notes: Front sticker labels can have the suffix -1, -2, etc... which indicates a label revision.
-       Label revisions are independant from cartridge or ROM revisions.
-       In the USA, PCMS (Players Choice Million Seller) re-releases come with a label update.
+		Label revisions are independant from cartridge or ROM revisions.
+		In the USA, PCMS (Players Choice Million Seller) re-releases come with a label update.
 
 Back sticker:
 901121               : Japan (first batch)
@@ -665,7 +665,7 @@ List of non retail cartridges
 	<software name="batblazp" cloneof="batblaz">
 		<!-- nesworld.com -->
 		<!-- Notes: the rom dump of the NES world prototype matched almost entirely the known one that was floating around except for a graphic
-                tile which was corrupt in the NES world dump, so the latter won't be included because it is most certainly just a corrupt dump -->
+				tile which was corrupt in the NES world dump, so the latter won't be included because it is most certainly just a corrupt dump -->
 		<description>Battle Blaze (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>American Sammy</publisher>
@@ -1490,7 +1490,7 @@ List of non retail cartridges
 	<software name="lilmagic">
 		<!-- MattyXB -->
 		<!-- Notes: hosted in a SHVC-006, the standard Japanese cartridge shell.
-		            Unlike the retail version, this prototype has full save capability -->
+					Unlike the retail version, this prototype has full save capability -->
 		<description>Little Magic (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>Altron</publisher> <!-- cancelled -->
@@ -1867,7 +1867,7 @@ List of non retail cartridges
 	<software name="pagemstrup3" cloneof="pagemstr">
 		<!-- nesworld.com -->
 		<!-- Notes: a sticker on the board says 'THE PAGEMASTER 8/29/94 Property of Fox Interactive'
-		            but for consistency with other undocumented prototypes of this title, the build date will be used -->
+					but for consistency with other undocumented prototypes of this title, the build date will be used -->
 		<description>The Pagemaster (USA, Prototype 19940825)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
@@ -2606,7 +2606,7 @@ List of non retail cartridges
 	<software name="smw2up" cloneof="smw2">
 		<!-- Van Halen -->
 		<!-- Notes: the rom is final but the board differs very significantly
-		            the coprocessor has its own allocated memory -->
+					the coprocessor has its own allocated memory -->
 		<description>Super Mario World 2 - Yoshi's Island (USA, Final Prototype)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -2716,7 +2716,7 @@ List of non retail cartridges
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="no shell" />
 			<dataarea name="rom" size="524288">
-			  <!- - sticker: sôkoban - ->
+				<!- - sticker: sôkoban - ->
 				<rom name="sfx super sokoban pack-in-video.u1" size="524288" crc="" sha1="" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
@@ -2964,7 +2964,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="batman">
 		<!-- Notes: never announced, unknown source, it isn't even known whether it is an image or a binary
-		            however Software Creations was indeed known for developing comic based video games -->
+					however Software Creations was indeed known for developing comic based video games -->
 		<description>Batman (USA, Prototype)</description>
 		<year>199?</year>
 		<publisher>Software Creations</publisher> <!-- cancelled -->
@@ -2979,7 +2979,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="bobbywld">
 		<!-- Notes: while it appears clear that this is a dumped rom image,
-		            there's still an ongoing debate about whether it was released or cancelled -->
+					there's still an ongoing debate about whether it was released or cancelled -->
 		<description>Bobby's World (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Hi-Tech Expressions</publisher> <!-- cancelled? -->
@@ -2993,7 +2993,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="bubsyup1" cloneof="bubsy">
 		<!-- Notes: this rom image was released by a bbs group in March 1993
-		            it is 23 bytes away from the final release so it is most certainly the final prototype -->
+					it is 23 bytes away from the final release so it is most certainly the final prototype -->
 		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Final Prototype)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
@@ -3176,7 +3176,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="mazingera" cloneof="mazinger">
 		<!-- Notes: removal recommended, floating rom with a good checksum, unknown source,
-		            could be a prototype, but could also be a hack or bad dump with a fixed checksum -->
+					could be a prototype, but could also be a hack or bad dump with a fixed checksum -->
 		<description>Mazinger Z (Jpn, Prototype?)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
@@ -3190,7 +3190,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="mickmack">
 		<!-- Notes: not much is known about this prototype, but it was shown during the Winter 1993 CES
-                the header was likely hacked with a bbs phone number -->
+				the header was likely hacked with a bbs phone number -->
 		<description>Mick &amp; Mack as the Global Gladiators (USA, Prototype Hacked)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher> <!-- cancelled -->
@@ -3203,7 +3203,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="mickeypa">
 		<!-- Notes: not much is known about the origin of this prototype,
-		            but one of the developers, Eric Browning, confirmed he worked on this game in an interview -->
+					but one of the developers, Eric Browning, confirmed he worked on this game in an interview -->
 		<description>Mickey's Playtown Adventure - A Day of Discovery! (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Hi-Tech Expressions</publisher> <!-- cancelled -->
@@ -3496,7 +3496,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="sylvestr">
 		<!-- Notes: this is the same rom as the 1993 Oct 11th prototype except it is padded, it might be an overdump,
-		            after documentation of the Oct 11th prototype is obtained, this one might be removed -->
+					after documentation of the Oct 11th prototype is obtained, this one might be removed -->
 		<description>Sylvester and Tweety (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Visual Concepts</publisher> <!-- cancelled -->
@@ -3545,7 +3545,7 @@ non retail roms which are not documented and/or with doubts on their legitimacy
 
 	<software name="wizapp" cloneof="wizap">
 		<!-- Notes: there were two versions in goodsnes differing only on two header bytes,
-		            one of them is probably hacked, the other is included but commented out untilk a redump is issued -->
+					one of them is probably hacked, the other is included but commented out untilk a redump is issued -->
 		<description>Wizap! - Ankoku no Ou (Jpn, Prototype, Hacked?)</description>
 		<year>1994</year>
 		<publisher>ASCII Entertainment</publisher>
@@ -3574,31 +3574,31 @@ List of pirate cartridges
 -->
 
 <!-- most common copy protection devices used in pirate cartridges,
-     thanks to d4s for these infos:
+		thanks to d4s for these infos:
 
-     Device A: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
-     a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-     the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345
-     - Aladdin 2000
-     - Bananas de Pijamas
-     - A Bug's Life
-     - Digimon Adventure
-     - King of Fighters 2000
-     - Pocket Monster
-     - Pokemon Gold Silver
-     - Pokemon Stadium
-     - Soul Edge Vs Samurai
-     - Street Fighter EX Plus Alpha
-     - X-Men vs. Street Fighter
+		Device A: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
+		a byte-sized value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+		the bits in the byte written are swapped around a bit, in the following order: 76543210 becomes 06712345
+		- Aladdin 2000
+		- Bananas de Pijamas
+		- A Bug's Life
+		- Digimon Adventure
+		- King of Fighters 2000
+		- Pocket Monster
+		- Pokemon Gold Silver
+		- Pokemon Stadium
+		- Soul Edge Vs Samurai
+		- Street Fighter EX Plus Alpha
+		- X-Men vs. Street Fighter
 
-		 Device B: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
-		 a byte-sized constant value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
-     - Soul Blade
+			Device B: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
+			a byte-sized constant value is written to $88:xxxx (or mirror thereof), then read back a byte from $80:xxxx (again, mirrored to some other places),
+		- Soul Blade
 
-		 Device C: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
-		 it seems to contain some kind of microcontroller and expects write sequences
-     details of the algorithm unknown at this time, all the values the game needs were bruteforced
-     - Tekken 2
+			Device C: the game program checks for the expected values after writing to this device and refuses to work if they don`t match up,
+			it seems to contain some kind of microcontroller and expects write sequences
+		details of the algorithm unknown at this time, all the values the game needs were bruteforced
+		- Tekken 2
 -->
 
 	<software name="aladdi2k" supported="no">
@@ -4107,7 +4107,7 @@ Known bad dumps, redump needed
 	<software name="estpoli2p" cloneof="lufia2">
 		<!- - Jackhead - ->
 		<!- - Notes: the first and second eproms are permanently corrupt (redumping isn't going to help)
-		              and the third eprom is good; it appears all bad bytes have a ROM adress of $xx:xx00 - ->
+						and the third eprom is good; it appears all bad bytes have a ROM adress of $xx:xx00 - ->
 		<description>Estpolis Denki II (Jpn, Prototype)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
@@ -4152,7 +4152,7 @@ Known bad dumps, redump needed
 	<software name="mariopntup" cloneof="mariopnt">
 		<!-- nintendoplayer.com -->
 		<!-- Notes: contains corrupt data,
-		            the sram is only 64Kibits instead of 256Kibits of the retail release -->
+					the sram is only 64Kibits instead of 256Kibits of the retail release -->
 		<description>Mario Paint (Prototype Ver. E-5)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -12447,7 +12447,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 			<feature name="pcb" value="SHVC-1J3B-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
@@ -14614,7 +14614,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 		<info name="serial" value="SNS-ZL-USA-1 (PCMS)" />
 		<info name="release" value="19920413" />
 		<part name="cart" interface="snes_cart">
@@ -17370,7 +17370,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 			<feature name="pcb" value="SHVC-1A3M-21" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
@@ -20610,7 +20610,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 		<info name="serial" value="SNSP-SC-NOE SFRG" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A5B-04" />
@@ -23899,7 +23899,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 		<info name="serial" value="SNSP-4M-FAH, SNSP-4M-NOE" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A3B-20" />
@@ -23964,7 +23964,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 		<info name="serial" value="M/SNS-4M-USA-1 (PCMS)" />
 		<info name="release" value="199308xx" />
 		<part name="cart" interface="snes_cart">
@@ -24349,7 +24349,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 		<info name="serial" value="SNS-MW-USA, SNS-MW-USA-1, SNS-MW-USA-2 (PCMS)" />
 		<info name="release" value="199108xx" />
 		<part name="cart" interface="snes_cart">
@@ -27323,7 +27323,7 @@ Alternate board (XL-1)
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 			<feature name="pcb" value="SHVC-2A3M-01" />
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
@@ -28226,8 +28226,8 @@ Alternate board (XL-1)
 
 	<software name="wildtrax" cloneof="stuntfx">
 		<!-- Notes: The initial cartridge release contains a v1.1 rom,
-		            the shvc-cq-0 rom almost certainly never hit the stores,
-		            it could also refer to the undumped demo -->
+					the shvc-cq-0 rom almost certainly never hit the stores,
+					it could also refer to the undumped demo -->
 		<description>Wild Trax (Jpn, v1.1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -28622,7 +28622,7 @@ Alternate board (XL-1)
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
 <!-- TODO: An alternate hardware board exists, with a different memory address decoder chip,
-     verify how it affects the SNES unit and decide if the sets have to be separately supported.
+		verify how it affects the SNES unit and decide if the sets have to be separately supported.
 			<feature name="pcb" value="SHVC-1A1B-06" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
@@ -29821,7 +29821,7 @@ List of verified retail cartridges rom dumps
 	<software name="mk">
 		<!-- single cartridge source: Badablek -->
 		<!-- Notes: this cartridge contains the version 1.1 of the rom and an overlay 32k patch which upgrades it to version 1.2
-		            we don't know if there is a revision which consists of the version 1.1 rom only, without the patch -->
+					we don't know if there is a revision which consists of the version 1.1 rom only, without the patch -->
 		<description>Mortal Kombat (Euro, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -32128,7 +32128,7 @@ List of unclassified roms
 		<publisher>KSS</publisher>
 		<info name="serial" value="SHVC-A3QJ-JPN" />
 		<info name="release" value="19960329" />
-		<info name="alt_title" value="美少女レスラー列伝	ブリザード Yuki 乱入!!" />
+		<info name="alt_title" value="美少女レスラー列伝   ブリザード Yuki 乱入!!" />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2621440">
 				<rom name="bishoujo wrestler retsuden - blizzard yuki rannyuu!! (japan).sfc" size="2621440" crc="f4d20413" sha1="de5fc2caae6803bfcb2eaf831a346b0e422a4e77" offset="0x000000" />
@@ -35670,7 +35670,7 @@ List of unclassified roms
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-AETJ-JPN" />
 		<info name="release" value="19950325" />
-		<info name="alt_title" value="エミットVol.3	私にさよならを" />
+		<info name="alt_title" value="エミットVol.3 私にさよならを" />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="emit vol. 3 - watashi ni sayonara o (japan).sfc" size="3145728" crc="cbc5da6d" sha1="07855124e58574bac2119608a2554b680df336eb" offset="0x000000" />
@@ -44189,7 +44189,7 @@ List of unclassified roms
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-QP" />
 		<info name="release" value="19931022" />
-		<info name="alt_title" value="ミラクルガールズ ともみとみかげの不思議世界の大冒険	" />
+		<info name="alt_title" value="ミラクルガールズ ともみとみかげの不思議世界の大冒険  " />
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="miracle girls (japan).sfc" size="1048576" crc="ab82ebbe" sha1="f62471127ca7e6ac834fc90bbf1058a9e4102256" offset="0x000000" />
@@ -50404,7 +50404,7 @@ List of unclassified roms
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="SHVC-XS" />
 		<info name="release" value="19941216" />
-		<info name="alt_title" value="スキーパラダイス WITH	スノーボート" />
+		<info name="alt_title" value="スキーパラダイス WITH スノーボート" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
@@ -51281,7 +51281,7 @@ List of unclassified roms
 	</software>
 
 <!-- removed for now since however interesting it may be, it is still homebrew material,
-     keeping it here quoted in case we'd want to reintegrate it for some reason
+		keeping it here quoted in case we'd want to reintegrate it for some reason
 	<software name="starfox2a" cloneof="starfox2">
 		<description>Star Fox 2 (Jpn, Hack)</description>
 		<year>1995</year>
@@ -61714,9 +61714,9 @@ List of unclassified roms
 	</software>
 
 
-    <!-- BS Unknow packs, to be sorted out once we emulate this properly! -->
+	<!-- BS Unknow packs, to be sorted out once we emulate this properly! -->
 
-    <!-- This pack returns a 'Error 41' message on a real unit, and it does not work further -->
+	<!-- This pack returns a 'Error 41' message on a real unit, and it does not work further -->
 	<software name="bsunk01" supported="no">
 		<description>BS Unknown Memory Pack 01 (Jpn)</description>
 		<!-- BS -->
@@ -61729,7 +61729,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-    <!-- These packs were released as an "Assorted set of data packs, which seem to be RPG Tsukuru and Sound Novel Tsukuru data" -->
+	<!-- These packs were released as an "Assorted set of data packs, which seem to be RPG Tsukuru and Sound Novel Tsukuru data" -->
 	<software name="bsunk02" supported="no">
 		<description>BS Unknown Memory Pack 02 (Jpn, ASCII MUSIC TOOL1995.11.02 V1.0)</description>
 		<!-- BS -->
@@ -61958,7 +61958,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-    <!-- This packs was dumped by ChronoMoogle and Ikari, but it does not work. Investigate if it contains corrupted or deleted data -->
+	<!-- This packs was dumped by ChronoMoogle and Ikari, but it does not work. Investigate if it contains corrupted or deleted data -->
 	<software name="bsunk21" supported="no">
 		<description>BS Unknown Memory Pack 21 (Jpn, ASCII MUSIC DATA, Bad?)</description>
 		<!-- BS -->
@@ -61971,7 +61971,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-    <!-- This packs was dumped by Ikari and has blank data banks. -->
+	<!-- This packs was dumped by Ikari and has blank data banks. -->
 	<software name="bsunk22" supported="no">
 		<description>BS Unknown Memory Pack 22 (Jpn, RPG Tsukuru Data Bad?)</description>
 		<!-- BS -->

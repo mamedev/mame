@@ -93,34 +93,34 @@ WRITE_LINE_MEMBER( nanos_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z1_w),	/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z2_w)		/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z0_w),    /* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z1_w),    /* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z2_w)     /* ZC/TO2 callback */
 };
 
 /* Z80-PIO Interface */
 
 static Z80PIO_INTERFACE( pio1_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( pio2_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* portA ready active callback */
-	DEVCB_NULL,						/* port B read callback */
-	DEVCB_NULL,						/* port B write callback */
-	DEVCB_NULL						/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),   /* callback when change interrupt status */
+	DEVCB_NULL,                     /* port A read callback */
+	DEVCB_NULL,                     /* port A write callback */
+	DEVCB_NULL,                     /* portA ready active callback */
+	DEVCB_NULL,                     /* port B read callback */
+	DEVCB_NULL,                     /* port B write callback */
+	DEVCB_NULL                      /* portB ready active callback */
 };
 
 /* Z80-SIO Interface */
@@ -132,12 +132,12 @@ WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
 
 static const z80sio_interface sio_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt),	/* interrupt handler */
-	DEVCB_NULL,				/* DTR changed handler */
-	DEVCB_NULL,				/* RTS changed handler */
-	DEVCB_NULL,				/* BREAK changed handler */
-	DEVCB_NULL,				/* transmit handler */
-	DEVCB_NULL				/* receive handler */
+	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt),  /* interrupt handler */
+	DEVCB_NULL,             /* DTR changed handler */
+	DEVCB_NULL,             /* RTS changed handler */
+	DEVCB_NULL,             /* BREAK changed handler */
+	DEVCB_NULL,             /* transmit handler */
+	DEVCB_NULL              /* receive handler */
 };
 
 /* Z80 Daisy Chain */
@@ -363,7 +363,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 	for(i = 0; i < 7; i++)
 	{
 
-		code =	machine().root_device().ioport(keynames[i])->read();
+		code =  machine().root_device().ioport(keynames[i])->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -454,7 +454,7 @@ void nanos_state::machine_reset()
 
 static Z80PIO_INTERFACE( nanos_z80pio_intf )
 {
-	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL, /* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(nanos_state,nanos_port_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -474,15 +474,15 @@ SLOT_INTERFACE_END
 /* F4 Character Displayer */
 static const gfx_layout nanos_charlayout =
 {
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	8, 8,                   /* 8 x 8 characters */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( nanos )

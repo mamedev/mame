@@ -7,25 +7,25 @@
 #include "machine/i8255.h"
 
 /* we scale horizontally by 3 to render stars correctly */
-#define GALAXIAN_XSCALE			3
+#define GALAXIAN_XSCALE         3
 
 /* master clocks */
-#define GALAXIAN_MASTER_CLOCK	(18432000)
-#define GALAXIAN_PIXEL_CLOCK	(GALAXIAN_XSCALE*GALAXIAN_MASTER_CLOCK/3)
+#define GALAXIAN_MASTER_CLOCK   (18432000)
+#define GALAXIAN_PIXEL_CLOCK    (GALAXIAN_XSCALE*GALAXIAN_MASTER_CLOCK/3)
 
 /* H counts from 128->511, HBLANK starts at 130 and ends at 250 */
 /* we normalize this here so that we count 0->383 with HBLANK */
 /* from 264-383 */
-#define GALAXIAN_HTOTAL			(384*GALAXIAN_XSCALE)
-#define GALAXIAN_HBEND			(0*GALAXIAN_XSCALE)
+#define GALAXIAN_HTOTAL         (384*GALAXIAN_XSCALE)
+#define GALAXIAN_HBEND          (0*GALAXIAN_XSCALE)
 //#define GALAXIAN_H0START      (6*GALAXIAN_XSCALE)
 //#define GALAXIAN_HBSTART      (264*GALAXIAN_XSCALE)
-#define GALAXIAN_H0START		(0*GALAXIAN_XSCALE)
-#define GALAXIAN_HBSTART		(256*GALAXIAN_XSCALE)
+#define GALAXIAN_H0START        (0*GALAXIAN_XSCALE)
+#define GALAXIAN_HBSTART        (256*GALAXIAN_XSCALE)
 
-#define GALAXIAN_VTOTAL			(264)
-#define GALAXIAN_VBEND			(16)
-#define GALAXIAN_VBSTART		(224+16)
+#define GALAXIAN_VTOTAL         (264)
+#define GALAXIAN_VBEND          (16)
+#define GALAXIAN_VBSTART        (224+16)
 
 /* video extension callbacks */
 typedef void (*galaxian_extend_tile_info_func)(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
@@ -39,11 +39,11 @@ class galaxian_state : public driver_device
 public:
 	galaxian_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ppi8255_0(*this, "ppi8255_0"),
-		  m_ppi8255_1(*this, "ppi8255_1"),
-		  m_ppi8255_2(*this, "ppi8255_2"),
-		  m_spriteram(*this, "spriteram"),
-		  m_videoram(*this, "videoram"){ }
+			m_ppi8255_0(*this, "ppi8255_0"),
+			m_ppi8255_1(*this, "ppi8255_1"),
+			m_ppi8255_2(*this, "ppi8255_2"),
+			m_spriteram(*this, "spriteram"),
+			m_videoram(*this, "videoram"){ }
 
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;

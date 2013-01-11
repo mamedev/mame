@@ -140,33 +140,33 @@ UINT8 comx_prn_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 UINT8 comx_prn_device::comx_io_r(address_space &space, offs_t offset)
 {
 	/*
-        Parallel:
+	    Parallel:
 
-        INP 2 for the printer status, where:
-        b0=1: Acknowledge Fault
-        b1=0: Device Busy
-        b2=0: Paper Empty
-        b3=1: Device Not Selected
+	    INP 2 for the printer status, where:
+	    b0=1: Acknowledge Fault
+	    b1=0: Device Busy
+	    b2=0: Paper Empty
+	    b3=1: Device Not Selected
 
-        Serial:
+	    Serial:
 
-        INP 2 for the printer status and to start a new range of bits for the next byte.
-    */
+	    INP 2 for the printer status and to start a new range of bits for the next byte.
+	*/
 
 	/*
 
-        bit     description
+	    bit     description
 
-        0       Acknowledge Fault
-        1       Device Busy
-        2       Paper Empty
-        3       Device Not Selected
-        4
-        5
-        6
-        7
+	    0       Acknowledge Fault
+	    1       Device Busy
+	    2       Paper Empty
+	    3       Device Not Selected
+	    4
+	    5
+	    6
+	    7
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -186,14 +186,14 @@ UINT8 comx_prn_device::comx_io_r(address_space &space, offs_t offset)
 void comx_prn_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 {
 	/*
-        Parallel:
+	    Parallel:
 
-        OUT 2 is used to send a byte to the printer
+	    OUT 2 is used to send a byte to the printer
 
-        Serial:
+	    Serial:
 
-        OUT 2 is used to send a bit to the printer
-    */
+	    OUT 2 is used to send a bit to the printer
+	*/
 
 	m_centronics->write(data);
 }

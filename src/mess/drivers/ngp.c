@@ -106,15 +106,15 @@ the Neogeo Pocket.
 
 enum flash_state
 {
-	F_READ,						/* xxxx F0 or 5555 AA 2AAA 55 5555 F0 */
+	F_READ,                     /* xxxx F0 or 5555 AA 2AAA 55 5555 F0 */
 	F_PROG1,
 	F_PROG2,
 	F_COMMAND,
-	F_ID_READ,					/* 5555 AA 2AAA 55 5555 90 */
-	F_AUTO_PROGRAM,				/* 5555 AA 2AAA 55 5555 A0 address data */
-	F_AUTO_CHIP_ERASE,			/* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 5555 10 */
-	F_AUTO_BLOCK_ERASE,			/* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 block_address 30 */
-	F_BLOCK_PROTECT,			/* 5555 AA 2AAA 55 5555 9A 5555 AA 2AAA 55 5555 9A */
+	F_ID_READ,                  /* 5555 AA 2AAA 55 5555 90 */
+	F_AUTO_PROGRAM,             /* 5555 AA 2AAA 55 5555 A0 address data */
+	F_AUTO_CHIP_ERASE,          /* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 5555 10 */
+	F_AUTO_BLOCK_ERASE,         /* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 block_address 30 */
+	F_BLOCK_PROTECT,            /* 5555 AA 2AAA 55 5555 9A 5555 AA 2AAA 55 5555 9A */
 };
 
 
@@ -138,13 +138,13 @@ public:
 	emu_timer* m_seconds_timer;
 
 	struct {
-		int		present;
-		UINT8	manufacturer_id;
-		UINT8	device_id;
-		UINT8	*data;
-		UINT8	org_data[16];
-		int		state;
-		UINT8	command[2];
+		int     present;
+		UINT8   manufacturer_id;
+		UINT8   device_id;
+		UINT8   *data;
+		UINT8   org_data[16];
+		int     state;
+		UINT8   command[2];
 	} m_flash_chip[2];
 
 	required_device<cpu_device> m_tlcs900;
@@ -216,7 +216,7 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 
 	switch( offset )
 	{
-	case 0x30:	/* Read controls */
+	case 0x30:  /* Read controls */
 		data = ioport( "Controls" )->read();
 		break;
 	case 0x31:
@@ -233,18 +233,18 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 {
 	switch( offset )
 	{
-	case 0x20:		/* t6w28 "right" */
-	case 0x21:		/* t6w28 "left" */
+	case 0x20:      /* t6w28 "right" */
+	case 0x21:      /* t6w28 "left" */
 		if ( m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA )
 		{
 			m_t6w28->write( space, 0, data );
 		}
 		break;
 
-	case 0x22:		/* DAC right */
+	case 0x22:      /* DAC right */
 		m_dac_r->write_unsigned8(data );
 		break;
-	case 0x23:		/* DAC left */
+	case 0x23:      /* DAC left */
 		m_dac_l->write_unsigned8(data );
 		break;
 
@@ -252,33 +252,33 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 	case 0x36:
 	case 0x37:
 		break;
-	case 0x38:	/* Sound enable/disable. */
+	case 0x38:  /* Sound enable/disable. */
 		switch( data )
 		{
-		case 0x55:		/* Enabled sound */
+		case 0x55:      /* Enabled sound */
 			m_t6w28->set_enable( true );
 			break;
-		case 0xAA:		/* Disable sound */
+		case 0xAA:      /* Disable sound */
 			m_t6w28->set_enable( false );
 			break;
 		}
 		break;
 
-	case 0x39:	/* Z80 enable/disable. */
+	case 0x39:  /* Z80 enable/disable. */
 		switch( data )
 		{
-		case 0x55:		/* Enable Z80 */
+		case 0x55:      /* Enable Z80 */
 			m_z80->resume(SUSPEND_REASON_HALT );
 			m_z80->reset();
 			m_z80->set_input_line(0, CLEAR_LINE );
 			break;
-		case 0xAA:		/* Disable Z80 */
+		case 0xAA:      /* Disable Z80 */
 			m_z80->suspend(SUSPEND_REASON_HALT, 1 );
 			break;
 		}
 		break;
 
-	case 0x3a:	/* Trigger Z80 NMI */
+	case 0x3a:  /* Trigger Z80 NMI */
 		m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 	}
@@ -309,7 +309,7 @@ void ngp_state::flash_w( int which, offs_t offset, UINT8 data )
 		{
 			if ( m_flash_chip[which].command[0] == 0x80 )
 			{
-				int	size = 0x10000;
+				int size = 0x10000;
 				UINT8 *block = m_flash_chip[which].data;
 
 				m_flash_chip[which].state = F_AUTO_BLOCK_ERASE;
@@ -510,14 +510,14 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 
 
 static ADDRESS_MAP_START( ngp_mem, AS_PROGRAM, 8, ngp_state )
-	AM_RANGE( 0x000080, 0x0000bf )	AM_READWRITE(ngp_io_r, ngp_io_w)							/* ngp/c specific i/o */
-	AM_RANGE( 0x004000, 0x006fff )	AM_RAM														/* work ram */
-	AM_RANGE( 0x007000, 0x007fff )	AM_RAM AM_SHARE("share1")									/* shared with sound cpu */
-	AM_RANGE( 0x008000, 0x0087ff )	AM_DEVREADWRITE_LEGACY("k1ge", k1ge_r, k1ge_w)						/* video registers */
-	AM_RANGE( 0x008800, 0x00bfff )	AM_RAM AM_REGION("vram", 0x800 )							/* Video RAM area */
-	AM_RANGE( 0x200000, 0x3fffff )	AM_ROM AM_WRITE(flash0_w) AM_REGION("cart", 0)				/* cart area #1 */
-	AM_RANGE( 0x800000, 0x9fffff )	AM_ROM AM_WRITE(flash1_w) AM_REGION("cart", 0x200000)		/* cart area #2 */
-	AM_RANGE( 0xff0000, 0xffffff )	AM_ROM AM_REGION("maincpu", 0)								/* system rom */
+	AM_RANGE( 0x000080, 0x0000bf )  AM_READWRITE(ngp_io_r, ngp_io_w)                            /* ngp/c specific i/o */
+	AM_RANGE( 0x004000, 0x006fff )  AM_RAM                                                      /* work ram */
+	AM_RANGE( 0x007000, 0x007fff )  AM_RAM AM_SHARE("share1")                                   /* shared with sound cpu */
+	AM_RANGE( 0x008000, 0x0087ff )  AM_DEVREADWRITE_LEGACY("k1ge", k1ge_r, k1ge_w)                      /* video registers */
+	AM_RANGE( 0x008800, 0x00bfff )  AM_RAM AM_REGION("vram", 0x800 )                            /* Video RAM area */
+	AM_RANGE( 0x200000, 0x3fffff )  AM_ROM AM_WRITE(flash0_w) AM_REGION("cart", 0)              /* cart area #1 */
+	AM_RANGE( 0x800000, 0x9fffff )  AM_ROM AM_WRITE(flash1_w) AM_REGION("cart", 0x200000)       /* cart area #2 */
+	AM_RANGE( 0xff0000, 0xffffff )  AM_ROM AM_REGION("maincpu", 0)                              /* system rom */
 ADDRESS_MAP_END
 
 
@@ -540,10 +540,10 @@ WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 
 
 static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
-	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE("share1")								/* shared with tlcs900 */
-	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE("t6w28", t6w28_device, write )					/* sound chip (right, left) */
-	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
-	AM_RANGE( 0xc000, 0xc000 )	AM_WRITE( ngp_z80_signal_main_w )				/* signal irq to main cpu */
+	AM_RANGE( 0x0000, 0x0FFF )  AM_RAM AM_SHARE("share1")                               /* shared with tlcs900 */
+	AM_RANGE( 0x4000, 0x4001 )  AM_DEVWRITE("t6w28", t6w28_device, write )                  /* sound chip (right, left) */
+	AM_RANGE( 0x8000, 0x8000 )  AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )  /* main-sound communication */
+	AM_RANGE( 0xc000, 0xc000 )  AM_WRITE( ngp_z80_signal_main_w )               /* signal irq to main cpu */
 ADDRESS_MAP_END
 
 
@@ -557,7 +557,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 
 
 static ADDRESS_MAP_START( z80_io, AS_IO, 8, ngp_state )
-	AM_RANGE( 0x0000, 0xffff )	AM_WRITE( ngp_z80_clear_irq )
+	AM_RANGE( 0x0000, 0xffff )  AM_WRITE( ngp_z80_clear_irq )
 ADDRESS_MAP_END
 
 
@@ -862,4 +862,3 @@ ROM_END
 
 CONS( 1998, ngp, 0, 0, ngp, ngp, driver_device, 0,  "SNK", "NeoGeo Pocket", 0 )
 CONS( 1999, ngpc, ngp, 0, ngpc, ngp, driver_device, 0, "SNK", "NeoGeo Pocket Color", 0 )
-

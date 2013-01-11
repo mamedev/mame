@@ -39,13 +39,13 @@ protected:
 
 private:
 
-	UINT8 *		m_rom;
-	INT16		m_posx;
-	INT16		m_posy;
-	UINT8		m_pen;
-	UINT8		m_control;
+	UINT8 *     m_rom;
+	INT16       m_posx;
+	INT16       m_posy;
+	UINT8       m_pen;
+	UINT8       m_control;
 
-	bitmap_ind16 *	m_paper;
+	bitmap_ind16 *  m_paper;
 };
 
 

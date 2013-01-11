@@ -404,4 +404,3 @@ CPU_DISASSEMBLE( arm_be )
 	UINT32 opcode = oprom[3] | (oprom[2] << 8) | (oprom[1] << 16) | (oprom[0] << 24);
 	return 4 | arm_disasm(buffer, pc, opcode);
 }
-

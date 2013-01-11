@@ -115,15 +115,15 @@ WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m79amb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x63ff) AM_RAM					/* ?? */
+	AM_RANGE(0x6000, 0x63ff) AM_RAM                 /* ?? */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_WRITE(m79amb_8000_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_SHARE("mask")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE(m79amb_8002_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(m79amb_8003_w)
 	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)
 	AM_RANGE(0x8005, 0x8005) AM_READ(gray5bit_controller1_r)
-	AM_RANGE(0xc000, 0xc07f) AM_RAM					/* ?? */
-	AM_RANGE(0xc200, 0xc27f) AM_RAM					/* ?? */
+	AM_RANGE(0xc000, 0xc07f) AM_RAM                 /* ?? */
+	AM_RANGE(0xc200, 0xc27f) AM_RAM                 /* ?? */
 ADDRESS_MAP_END
 
 
@@ -250,17 +250,17 @@ ROM_END
 */
 
 static const UINT8 lut_cross[0x20] = {
-     19,    20,    21,    23,    25,    27,    29,    37,
-     45,    53,    66,    82,    88,    95,   105,   111,
-    118,   130,   142,   149,   158,   165,   170,   177,
-    191,   203,   209,   218,   228,   243,   249,   255,
+		19,    20,    21,    23,    25,    27,    29,    37,
+		45,    53,    66,    82,    88,    95,   105,   111,
+	118,   130,   142,   149,   158,   165,   170,   177,
+	191,   203,   209,   218,   228,   243,   249,   255,
 };
 
 static const UINT8 lut_pos[0x20] = {
-    0x1f,  0x1e,  0x1c,  0x1d,  0x19,  0x18,  0x1a,  0x1b,
-    0x13,  0x12,  0x10,  0x11,  0x15,  0x14,  0x16,  0x17,
-    0x07,  0x06,  0x04,  0x05,  0x01,  0x00,  0x02,  0x03,
-    0x0b,  0x0a,  0x08,  0x09,  0x0d,  0x0c,  0x0e,  0x0f
+	0x1f,  0x1e,  0x1c,  0x1d,  0x19,  0x18,  0x1a,  0x1b,
+	0x13,  0x12,  0x10,  0x11,  0x15,  0x14,  0x16,  0x17,
+	0x07,  0x06,  0x04,  0x05,  0x01,  0x00,  0x02,  0x03,
+	0x0b,  0x0a,  0x08,  0x09,  0x0d,  0x0c,  0x0e,  0x0f
 };
 
 

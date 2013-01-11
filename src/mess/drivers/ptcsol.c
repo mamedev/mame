@@ -110,14 +110,14 @@
 
 struct cass_data_t {
 	struct {
-		int length;		/* time cassette level is at input.level */
-		int level;		/* cassette level */
-		int bit;		/* bit being read */
+		int length;     /* time cassette level is at input.level */
+		int level;      /* cassette level */
+		int bit;        /* bit being read */
 	} input;
 	struct {
-		int length;		/* time cassette level is at output.level */
-		int level;		/* cassette level */
-		int bit;		/* bit to to output */
+		int length;     /* time cassette level is at output.level */
+		int level;      /* cassette level */
+		int bit;        /* bit to to output */
 	} output;
 };
 
@@ -204,10 +204,10 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 	UINT8 cass_ws = 0;
 	switch (m_sol20_fa & 0x20)
 	{
-		case 0x20:				/* Cassette 300 baud */
+		case 0x20:              /* Cassette 300 baud */
 
 			/* loading a tape - this is basically the same as the super80.
-                           We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
+			               We convert the 1200/2400 Hz signal to a 0 or 1, and send it to the uart. */
 
 			m_cass_data.input.length++;
 
@@ -222,7 +222,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
-                           Synchronisation of the frequency pulses to the uart is extremely important. */
+			               Synchronisation of the frequency pulses to the uart is extremely important. */
 
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 0x1f))
@@ -239,13 +239,13 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			{
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 4)))
 				{
-					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
 					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
 
-		case 0x00:			/* Cassette 1200 baud */
+		case 0x00:          /* Cassette 1200 baud */
 			/* loading a tape */
 			m_cass_data.input.length++;
 
@@ -279,7 +279,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			{
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 8)))
 				{
-					m_cass_data.output.level ^= 1;			// toggle output this, except on 2nd half of low bit
+					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
 					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
@@ -406,11 +406,11 @@ WRITE8_MEMBER( sol20_state::sol20_fe_w )
 
 static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0X0800, 0Xbfff) AM_RAM	// optional s100 ram
+	AM_RANGE(0X0800, 0Xbfff) AM_RAM // optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0Xc800, 0Xcbff) AM_RAM	// system ram
-	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_SHARE("p_videoram")
-	AM_RANGE(0Xd000, 0Xffff) AM_RAM	// optional s100 ram
+	AM_RANGE(0Xc800, 0Xcbff) AM_RAM // system ram
+	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0Xd000, 0Xffff) AM_RAM // optional s100 ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sol20_io, AS_IO, 8, sol20_state)
@@ -687,15 +687,15 @@ UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 /* F4 Character Displayer */
 static const gfx_layout sol20_charlayout =
 {
-	7, 9,					/* 7 x 9 characters */
-	128*2,					/* 128 characters per rom */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	7, 9,                   /* 7 x 9 characters */
+	128*2,                  /* 128 characters per rom */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
-	8*16					/* every char takes 16 bytes */
+	8*16                    /* every char takes 16 bytes */
 };
 
 static GFXDECODE_START( sol20 )
@@ -736,9 +736,9 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass1 speaker
 	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, CASSETTE2_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass2 speaker
 
 	// devices
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, sol20_cassette_interface )
@@ -752,7 +752,7 @@ MACHINE_CONFIG_END
 ROM_START( sol20 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "SOLOS", "SOLOS")
-	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, BAD_DUMP CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(1) )	// from solace emu
+	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, BAD_DUMP CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(1) )    // from solace emu
 	ROM_SYSTEM_BIOS(1, "DPMON", "DPMON")
 	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "CONSOL", "CONSOL")

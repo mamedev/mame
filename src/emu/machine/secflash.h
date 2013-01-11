@@ -6,7 +6,7 @@
 #include "emu.h"
 
 class device_secure_serial_flash : public device_t,
-								   public device_nvram_interface
+									public device_nvram_interface
 {
 public:
 	void cs_w(bool cs);

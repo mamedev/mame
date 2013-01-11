@@ -172,7 +172,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			gfx = machine.gfx[3];
 		}
 
-		if (attributes & 8)	/* double size sprite */
+		if (attributes & 8) /* double size sprite */
 		{
 			switch (attributes & 3)
 			{

@@ -80,7 +80,7 @@
 #include "video/mc6845.h"
 #include "video/cgapal.h"
 
-#define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
+#define VERBOSE_CGA 0       /* CGA (Color Graphics Adapter) */
 
 #define CGA_LOG(N,M,A) \
 	do { \
@@ -182,15 +182,15 @@ static VIDEO_START( cga_mc1502 );
 
 static const mc6845_interface mc6845_cga_intf =
 {
-	CGA_SCREEN_NAME,	/* screen number */
-	8,					/* numbers of pixels per video memory address */
-	NULL,				/* begin_update */
-	cga_update_row,		/* update_row */
-	NULL,				/* end_update */
-	DEVCB_NULL,				/* on_de_changed */
-	DEVCB_NULL,				/* on_cur_changed */
-	DEVCB_LINE(cga_hsync_changed),	/* on_hsync_changed */
-	DEVCB_LINE(cga_vsync_changed),	/* on_vsync_changed */
+	CGA_SCREEN_NAME,    /* screen number */
+	8,                  /* numbers of pixels per video memory address */
+	NULL,               /* begin_update */
+	cga_update_row,     /* update_row */
+	NULL,               /* end_update */
+	DEVCB_NULL,             /* on_de_changed */
+	DEVCB_NULL,             /* on_cur_changed */
+	DEVCB_LINE(cga_hsync_changed),  /* on_hsync_changed */
+	DEVCB_LINE(cga_vsync_changed),  /* on_vsync_changed */
 	NULL
 };
 
@@ -253,21 +253,21 @@ MACHINE_CONFIG_END
 
 static struct
 {
-	UINT8 mode_control;	/* wo 0x3d8 */
-	UINT8 color_select;	/* wo 0x3d9 */
-	UINT8 status;		/* ro 0x3da */
-	UINT8 plantronics;	/* wo 0x3dd, ATI chipset only */
+	UINT8 mode_control; /* wo 0x3d8 */
+	UINT8 color_select; /* wo 0x3d9 */
+	UINT8 status;       /* ro 0x3da */
+	UINT8 plantronics;  /* wo 0x3dd, ATI chipset only */
 
 	UINT8 frame;
 
-	UINT8	*chr_gen;
+	UINT8   *chr_gen;
 
 	ioport_port *config_input_port;
 
-	mc6845_update_row_func	update_row;
-	UINT8	palette_lut_2bpp[4];
-	UINT8	vsync;
-	UINT8	hsync;
+	mc6845_update_row_func  update_row;
+	UINT8   palette_lut_2bpp[4];
+	UINT8   vsync;
+	UINT8   hsync;
 	UINT8   p3df;
 
 	size_t  videoram_size;
@@ -775,10 +775,10 @@ static const UINT8 yc_lut2[4] = { 0, 182, 71, 255 };
 
 static const UINT8 yc_lut[16][8] =
 {
-	{ 0, 0, 0, 0, 0, 0, 0, 0 },	/* black */
-	{ 0, 0, 0, 0, 1, 1, 1, 1 },	/* blue */
-	{ 0, 1, 1, 1, 1, 0, 0, 0 },	/* green */
-	{ 0, 0, 1, 1, 1, 1, 0, 0 },	/* cyan */
+	{ 0, 0, 0, 0, 0, 0, 0, 0 }, /* black */
+	{ 0, 0, 0, 0, 1, 1, 1, 1 }, /* blue */
+	{ 0, 1, 1, 1, 1, 0, 0, 0 }, /* green */
+	{ 0, 0, 1, 1, 1, 1, 0, 0 }, /* cyan */
 	{ 1, 1, 0, 0, 0, 0, 1, 1 }, /* red */
 	{ 1, 0, 0, 0, 0, 1, 1, 1 }, /* magenta */
 	{ 1, 1, 1, 1, 0, 0, 0, 0 }, /* yellow */
@@ -879,7 +879,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8	fg = cga.color_select & 0x0F;
+	UINT8   fg = cga.color_select & 0x0F;
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1120,7 +1120,7 @@ static void pc_cga_plantronics_w(running_machine &machine, int data)
 
 	if (CGA_CHIPSET != CGA_CHIPSET_ATI) return;
 
-	data &= 0x70;	/* Only bits 6-4 are used */
+	data &= 0x70;   /* Only bits 6-4 are used */
 	if (cga.plantronics == data) return;
 	cga.plantronics = data;
 }
@@ -1170,7 +1170,7 @@ static READ8_HANDLER( pc_cga8_r )
 		case 0x0f:
 			data = cga.p3df;
 			break;
-    }
+	}
 	return data;
 }
 
@@ -1445,10 +1445,10 @@ static const UINT8 mc6845_writeonce_register[31] =
 
 static struct
 {
-	UINT8	write;
-	UINT8	read;
-	UINT8	mc6845_address;
-	UINT8	mc6845_locked_register[31];
+	UINT8   write;
+	UINT8   read;
+	UINT8   mc6845_address;
+	UINT8   mc6845_locked_register[31];
 } pc1512;
 
 
@@ -1457,7 +1457,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 	UINT8 *videoram = cga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT16	offset_base = ra << 13;
+	UINT16  offset_base = ra << 13;
 	int j;
 	running_machine &machine = device->machine();
 
@@ -1672,5 +1672,3 @@ static SCREEN_UPDATE_RGB32( mc6845_pc1512 )
 
 	return 0;
 }
-
-

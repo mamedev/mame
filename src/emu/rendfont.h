@@ -79,12 +79,12 @@ private:
 	class glyph
 	{
 	public:
-		INT32				width;				// width from this character to the next
-		INT32				xoffs, yoffs;		// X and Y offset from baseline to top,left of bitmap
-		INT32				bmwidth, bmheight;	// width and height of bitmap
-		const char *		rawdata;			// pointer to the raw data for this one
-		bitmap_argb32		bitmap;				// pointer to the bitmap containing the raw data
-		render_texture *	texture;			// pointer to a texture for rendering and sizing
+		INT32               width;              // width from this character to the next
+		INT32               xoffs, yoffs;       // X and Y offset from baseline to top,left of bitmap
+		INT32               bmwidth, bmheight;  // width and height of bitmap
+		const char *        rawdata;            // pointer to the raw data for this one
+		bitmap_argb32       bitmap;             // pointer to the bitmap containing the raw data
+		render_texture *    texture;            // pointer to a texture for rendering and sizing
 	};
 
 	// internal format
@@ -105,21 +105,21 @@ private:
 	bool save_cached(const char *filename, UINT32 hash);
 
 	// internal state
-	render_manager &	m_manager;
-	format				m_format;			// format of font data
-	int					m_height;			// height of the font, from ascent to descent
-	int					m_yoffs;			// y offset from baseline to descent
-	float				m_scale;			// 1 / height precomputed
-	glyph *				m_glyphs[256];		// array of glyph subtables
-	const char *		m_rawdata;			// pointer to the raw data for the font
-	UINT64				m_rawsize;			// size of the raw font data
-	osd_font			m_osdfont;			// handle to the OSD font
+	render_manager &    m_manager;
+	format              m_format;           // format of font data
+	int                 m_height;           // height of the font, from ascent to descent
+	int                 m_yoffs;            // y offset from baseline to descent
+	float               m_scale;            // 1 / height precomputed
+	glyph *             m_glyphs[256];      // array of glyph subtables
+	const char *        m_rawdata;          // pointer to the raw data for the font
+	UINT64              m_rawsize;          // size of the raw font data
+	osd_font            m_osdfont;          // handle to the OSD font
 
 	// constants
-	static const int CACHED_CHAR_SIZE		= 12;
-	static const int CACHED_HEADER_SIZE		= 16;
-	static const int CACHED_BDF_HASH_SIZE	= 1024;
+	static const int CACHED_CHAR_SIZE       = 12;
+	static const int CACHED_HEADER_SIZE     = 16;
+	static const int CACHED_BDF_HASH_SIZE   = 1024;
 };
 
 
-#endif	/* __RENDFONT_H__ */
+#endif  /* __RENDFONT_H__ */

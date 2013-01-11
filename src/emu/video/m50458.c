@@ -173,8 +173,8 @@ inline void m50458_device::write_word(offs_t address, UINT16 data)
 
 m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, M50458, "m50458", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(m50458_vram))
+		device_memory_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(m50458_vram))
 {
 	m_shortname = "m50458";
 }
@@ -362,7 +362,7 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			int y_base = y;
 
 			if(y != 0 && m_scrr > 1) { y_base+=(m_scrr - 1); }
-			if(y_base > 11) 		 { y_base -= 11; }
+			if(y_base > 11)          { y_base -= 11; }
 			if(m_scrr && y == 11)    { y_base = 0; } /* Guess: repeat line 0 if scrolling is active */
 
 			tile = read_word(x+y_base*24);

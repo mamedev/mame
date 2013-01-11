@@ -24,7 +24,7 @@ INLINE void MMXPROLOG(i386_state *cpustate)
 	cpustate->x87_tw = 0; // tag word = 0
 }
 
-static void PENTIUMOP(rdmsr)(i386_state *cpustate)			// Opcode 0x0f 32
+static void PENTIUMOP(rdmsr)(i386_state *cpustate)          // Opcode 0x0f 32
 {
 	UINT64 data;
 	UINT8 valid_msr = 0;
@@ -39,7 +39,7 @@ static void PENTIUMOP(rdmsr)(i386_state *cpustate)			// Opcode 0x0f 32
 	CYCLES(cpustate,CYCLES_RDMSR);
 }
 
-static void PENTIUMOP(wrmsr)(i386_state *cpustate)			// Opcode 0x0f 30
+static void PENTIUMOP(wrmsr)(i386_state *cpustate)          // Opcode 0x0f 30
 {
 	UINT64 data;
 	UINT8 valid_msr = 0;
@@ -52,10 +52,10 @@ static void PENTIUMOP(wrmsr)(i386_state *cpustate)			// Opcode 0x0f 30
 	if(cpustate->CPL != 0 || valid_msr == 0) // if current privilege level isn't 0 or the register isn't recognized
 		FAULT(FAULT_GP,0) // ... throw a general exception fault
 
-	CYCLES(cpustate,1);		// TODO: correct cycle count (~30-45)
+	CYCLES(cpustate,1);     // TODO: correct cycle count (~30-45)
 }
 
-static void PENTIUMOP(rdtsc)(i386_state *cpustate)			// Opcode 0x0f 31
+static void PENTIUMOP(rdtsc)(i386_state *cpustate)          // Opcode 0x0f 31
 {
 	UINT64 ts = cpustate->tsc + (cpustate->base_cycles - cpustate->cycles);
 	REG32(EAX) = (UINT32)(ts);
@@ -64,14 +64,14 @@ static void PENTIUMOP(rdtsc)(i386_state *cpustate)			// Opcode 0x0f 31
 	CYCLES(cpustate,CYCLES_RDTSC);
 }
 
-static void I386OP(cyrix_unknown)(i386_state *cpustate)		// Opcode 0x0f 74
+static void I386OP(cyrix_unknown)(i386_state *cpustate)     // Opcode 0x0f 74
 {
 	logerror("Unemulated 0x0f 0x74 opcode called\n");
 
 	CYCLES(cpustate,1);
 }
 
-static void PENTIUMOP(cmpxchg8b_m64)(i386_state *cpustate)	// Opcode 0x0f c7
+static void PENTIUMOP(cmpxchg8b_m64)(i386_state *cpustate)  // Opcode 0x0f c7
 {
 	UINT8 modm = FETCH(cpustate);
 	if( modm >= 0xc0 ) {
@@ -106,7 +106,7 @@ INLINE void WRITEXMM(i386_state *cpustate,UINT32 ea,XMM_REG &r)
 	WRITE64(cpustate, ea+8, r.q[1]);
 }
 
-static void SSEOP(sse_group0fae)(i386_state *cpustate)	// Opcode 0f ae
+static void SSEOP(sse_group0fae)(i386_state *cpustate)  // Opcode 0f ae
 {
 	UINT8 modm = FETCH(cpustate);
 	if( modm == 0xf8 ) {
@@ -139,7 +139,7 @@ static void SSEOP(sse_group0fae)(i386_state *cpustate)	// Opcode 0f ae
 	}
 }
 
-static void PENTIUMOP(ud2)(i386_state *cpustate)	// Opcode 0x0f 0b
+static void PENTIUMOP(ud2)(i386_state *cpustate)    // Opcode 0x0f 0b
 {
 	i386_trap(cpustate, 6, 0, 0);
 }
@@ -156,7 +156,7 @@ static void SSEOP(cvttss2si)(i386_state *cpustate) // Opcode f3 0f 2c
 	}
 	STORE_REG32(modrm, (INT32)FPU_INT32_SINGLE(src));
 	// TODO
-	CYCLES(cpustate,1);		// TODO: correct cycle count
+	CYCLES(cpustate,1);     // TODO: correct cycle count
 }
 
 static void SSEOP(movaps_r128_rm128)(i386_state *cpustate) // Opcode 0f 28
@@ -255,5 +255,5 @@ static void MMXOP(emms)(i386_state *cpustate) // Opcode 0f 77
 {
 	cpustate->x87_tw = 0xffff; // tag word = 0xffff
 	// TODO
-	CYCLES(cpustate,1);		// TODO: correct cycle count
+	CYCLES(cpustate,1);     // TODO: correct cycle count
 }

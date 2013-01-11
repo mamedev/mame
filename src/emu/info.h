@@ -85,12 +85,12 @@ private:
 	const char *get_merge_name(const hash_collection &romhashes);
 
 	// internal state
-	FILE *					m_output;
-	driver_enumerator &		m_drivlist;
-	emu_options 			m_lookup_options;
+	FILE *                  m_output;
+	driver_enumerator &     m_drivlist;
+	emu_options             m_lookup_options;
 
 	static const char s_dtd_string[];
 };
 
 
-#endif	/* __INFO_H__ */
+#endif  /* __INFO_H__ */

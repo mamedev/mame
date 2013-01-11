@@ -15,9 +15,9 @@ Updated 3/1/10 : use real value for timing.
 #include "hect_tap.h"
 
 
-#define SMPLO	-32768
-#define SILENCE	0
-#define SMPHI	32767
+#define SMPLO   -32768
+#define SILENCE 0
+#define SMPHI   32767
 
 
 static int cas_size;
@@ -92,54 +92,54 @@ INLINE int hector_tap_synchro(INT16 *buffer, int sample_pos, int nb_synchro)
 
 static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 {
-	int	data_pos, sample_count/*, block_count*/;
-    int previous_block=0;
+	int data_pos, sample_count/*, block_count*/;
+	int previous_block=0;
 
 	data_pos = 0;
 	sample_count = 0;
-    /*block_count = 0;*/
-    previous_block = 0;
+	/*block_count = 0;*/
+	previous_block = 0;
 
 	/* First 768 cycle of synchro */
 	sample_count += hector_tap_synchro( buffer, sample_count, 768-4 );
 
 	/* on the entire file*/
-    while( data_pos < cas_size )
+	while( data_pos < cas_size )
 	{
-		UINT16	block_size;
+		UINT16  block_size;
 
-        if (previous_block == 0xFE)
-        	    /* Starting a block with 150 cycle of synchro to let time to Hector to do the job ! */
-	           sample_count += hector_tap_synchro( buffer, sample_count, 150 );
-        else
-                  /* Starting a block with 4 cycle of synchro */
-	           sample_count += hector_tap_synchro( buffer, sample_count, 4 );
+		if (previous_block == 0xFE)
+				/* Starting a block with 150 cycle of synchro to let time to Hector to do the job ! */
+				sample_count += hector_tap_synchro( buffer, sample_count, 150 );
+		else
+					/* Starting a block with 4 cycle of synchro */
+				sample_count += hector_tap_synchro( buffer, sample_count, 4 );
 
-       if (data_pos>1)
-                previous_block = casdata[data_pos-1];
+		if (data_pos>1)
+				previous_block = casdata[data_pos-1];
 
 		/* Handle block lenght on tape data */
 		block_size = casdata[data_pos] ;
 		if (block_size==0)
-		   block_size=256;
+			block_size=256;
 
 		/*block_count++;*/
-        sample_count += hector_tap_byte(buffer, sample_count, casdata[data_pos] );
-        data_pos++;
+		sample_count += hector_tap_byte(buffer, sample_count, casdata[data_pos] );
+		data_pos++;
 
 		/* Data samples */
 		for ( ; block_size ; data_pos++, block_size-- )
-        {
-		    /* Make sure there are enough bytes left */
-		    if ( data_pos > cas_size )
-			   return -1;
+		{
+			/* Make sure there are enough bytes left */
+			if ( data_pos > cas_size )
+				return -1;
 
 			sample_count += hector_tap_byte( buffer, sample_count, casdata[data_pos] );
 
-        }
-    }
-    /*Finish by a zero*/
-    sample_count += hector_tap_byte( buffer, sample_count, 0 );
+		}
+	}
+	/*Finish by a zero*/
+	sample_count += hector_tap_byte( buffer, sample_count, 0 );
 
 	return sample_count;
 }
@@ -150,25 +150,25 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
 static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
 {
-	int	data_pos, sample_count/*, block_count*/;
-    /*int previous_block=0;*/
+	int data_pos, sample_count/*, block_count*/;
+	/*int previous_block=0;*/
 
 	data_pos = 0;
 	sample_count = 0;
-    /*block_count = 0;*/
-    /*previous_block = 0;*/
+	/*block_count = 0;*/
+	/*previous_block = 0;*/
 
-    /* Out if len of file not modulo 822 octets    */
+	/* Out if len of file not modulo 822 octets    */
 	if ( (cas_size % 822) != 0 )
 		return -1;
 
 	/* on the entire file*/
-    while( data_pos < cas_size )
+	while( data_pos < cas_size )
 	{
-		UINT16	block_size;
+		UINT16  block_size;
 
-       /* Starting a block with 768 cycle of synchro*/
-       sample_count += hector_tap_synchro( buffer, sample_count, 768 );
+		/* Starting a block with 768 cycle of synchro*/
+		sample_count += hector_tap_synchro( buffer, sample_count, 768 );
 
 		/* Handle block lenght on tape data */
 		block_size = 822 ; /* Fixed size for the forth*/
@@ -177,18 +177,18 @@ static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
 
 		/* Data samples */
 		for ( ; block_size ; data_pos++, block_size-- )
-        {
-		    /* Make sure there are enough bytes left */
-		    if ( data_pos > cas_size )
-			   return -1;
+		{
+			/* Make sure there are enough bytes left */
+			if ( data_pos > cas_size )
+				return -1;
 
 			sample_count += hector_tap_byte( buffer, sample_count, casdata[data_pos] );
 
-        }
-    }
+		}
+	}
 
-    /*Finish by a zero*/
-    sample_count += hector_tap_byte( buffer, sample_count, 0 );
+	/*Finish by a zero*/
+	sample_count += hector_tap_byte( buffer, sample_count, 0 );
 
 	return sample_count;
 }
@@ -238,24 +238,24 @@ static int hector_tap_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller hector_legacy_fill_wave =
 {
-	hector_tap_fill_wave,					/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	hector_tap_to_wav_size,				    /* chunk_sample_calc */
-	44100,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	hector_tap_fill_wave,                   /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	hector_tap_to_wav_size,                 /* chunk_sample_calc */
+	44100,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 static const struct CassetteLegacyWaveFiller hector_forth_legacy_fill_wave =
 {
-	hector_tap_forth_fill_wave,				/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	hector_tap_forth_to_wav_size,		    /* chunk_sample_calc */
-	44100,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	hector_tap_forth_fill_wave,             /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	hector_tap_forth_to_wav_size,           /* chunk_sample_calc */
+	44100,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 

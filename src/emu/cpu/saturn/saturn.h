@@ -46,9 +46,9 @@ HP38G             09/??/95              1LT8             Yorke
 #define _SATURN_H
 
 
-#define SATURN_INT_NONE	0
-#define SATURN_INT_IRQ	1
-#define SATURN_INT_NMI	2
+#define SATURN_INT_NONE 0
+#define SATURN_INT_IRQ  1
+#define SATURN_INT_NMI  2
 
 struct saturn_cpu_core
 {

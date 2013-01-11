@@ -278,7 +278,7 @@ static INPUT_PORTS_START( thndzone )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )			// Adds 4 credits/coins !
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )           // Adds 4 credits/coins !
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -312,19 +312,19 @@ static INPUT_PORTS_START( thndzone )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )	/* OFF & Not to be changed, according to manual */
-	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )	/* OFF & Not to be changed, according to manual */
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )   /* OFF & Not to be changed, according to manual */
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )   /* OFF & Not to be changed, according to manual */
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )	/* OFF & Not to be changed, according to manual */
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )   /* OFF & Not to be changed, according to manual */
 	PORT_DIPNAME( 0x20, 0x20, "Max Players" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )	/* OFF & Not to be changed, according to manual */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")	// Check code at 0x001490
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )   /* OFF & Not to be changed, according to manual */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")    // Check code at 0x001490
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -436,11 +436,11 @@ static const gfx_layout tilelayout =
 
 static GFXDECODE_START( dassault )
 	/* "gfx1" is copied to "gfx2" at runtime */
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0,  32 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0,  32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   512,  32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  0/*1024*/,  64 )	/* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  0/*2048*/,  64 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0,  32 )    /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0,  32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   512,  32 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  0/*1024*/,  64 )   /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  0/*2048*/,  64 )   /* Sprites 16x16 */
 GFXDECODE_END
 
 /**********************************************************************************/
@@ -468,7 +468,7 @@ static const deco16ic_interface dassault_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
 	0x0f, 0x0f, /* color masks (default values) */
 	dassault_bank_callback,
@@ -480,9 +480,9 @@ static const deco16ic_interface dassault_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
-	0x0f, 0x0f,	/* color masks (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	dassault_bank_callback,
 	dassault_bank_callback,
 	0,2,
@@ -492,15 +492,15 @@ static const deco16ic_interface dassault_deco16ic_tilegen2_intf =
 static MACHINE_CONFIG_START( dassault, dassault_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)	/* 14MHz - Accurate */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_28MHz/2)	/* 14MHz - Accurate */
+	MCFG_CPU_ADD("sub", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/8)	/* Accurate */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/8)    /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
@@ -605,11 +605,11 @@ ROM_START( thndzone ) /* World rev 1 set, DSW selectable 2 or 4 players */
 	ROM_LOAD( "gt07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* Same data as GS07.H15 */
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x1000, "proms", 0 )
-	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Timing??  Unused */
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )   /* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Timing??  Unused */
 	/* Above prom also at 16s and 17s */
 
 	ROM_REGION( 0x1000, "plds", 0 )
@@ -671,13 +671,13 @@ ROM_START( thndzonea ) /* World set, DSW selectable 2 or 4 players */
 	ROM_LOAD( "gt07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* Same data as GS07.H15 */
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
-	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )   /* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused - Data identical for 3 proms! */
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -738,13 +738,13 @@ ROM_START( thndzone4 ) /* World set, 4 Player (shared credits) only English set 
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
-	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )   /* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused - Data identical for 3 proms! */
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -812,13 +812,13 @@ ROM_START( thndzonej ) /* Japan set, DSW selectable 2 or 4 players - Japanese la
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* REMOVE when MAL-07.H15 is dumped & added */
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
-	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )   /* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused - Data identical for 3 proms! */
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -879,13 +879,13 @@ ROM_START( dassault ) /* USA set, DSW selectable 2, 3 or 4 players */
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
-	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )   /* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused - Data identical for 3 proms! */
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -946,13 +946,13 @@ ROM_START( dassault4 ) /* USA set, 4 player only */
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
 	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
-	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )	/* banked */
+	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
-	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )	/* Priority?  Unused */
-	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused */
-	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )	/* Unknown,  Unused - Data identical for 3 proms! */
+	ROM_LOAD( "mb7128y.10m", 0x00000,  0x800,  CRC(bde780a2) SHA1(94ea9fe6c3a421e976d077e67f564ca5c37a5e88) )   /* Priority?  Unused */
+	ROM_LOAD( "mb7128y.16p", 0x00800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.16s", 0x01000,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused */
+	ROM_LOAD( "mb7128y.17s", 0x01800,  0x800,  CRC(c44d2751) SHA1(7c195650689d5cbbdccba696e0e7d3dc5bb7c506) )   /* Unknown,  Unused - Data identical for 3 proms! */
 
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16r8a 1h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -975,8 +975,8 @@ DRIVER_INIT_MEMBER(dassault_state,dassault)
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
-    by just copying the chars to both banks (if I just used a different gfx
-    bank then the colours would be wrong). */
+	by just copying the chars to both banks (if I just used a different gfx
+	bank then the colours would be wrong). */
 	memcpy(tmp + 0x000000, dst + 0x80000, 0x80000);
 	memcpy(dst + 0x090000, tmp + 0x00000, 0x80000);
 	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
@@ -992,8 +992,8 @@ DRIVER_INIT_MEMBER(dassault_state,thndzone)
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
-    by just copying the chars to both banks (if I just used a different gfx
-    bank then the colours would be wrong). */
+	by just copying the chars to both banks (if I just used a different gfx
+	bank then the colours would be wrong). */
 	memcpy(tmp + 0x000000, dst + 0x80000, 0x80000);
 	memcpy(dst + 0x090000, tmp + 0x00000, 0x80000);
 	memcpy(dst + 0x080000, src + 0x00000, 0x10000);

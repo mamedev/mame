@@ -78,11 +78,11 @@ READ8_MEMBER(drgnmst_state::drgnmst_snd_command_r)
 
 	switch (m_oki_control & 0x1f)
 	{
-		case 0x12:	data = (m_oki_2->read(space, 0) & 0x0f); break;
-		case 0x16:	data = (m_oki_1->read(space, 0) & 0x0f); break;
+		case 0x12:  data = (m_oki_2->read(space, 0) & 0x0f); break;
+		case 0x16:  data = (m_oki_1->read(space, 0) & 0x0f); break;
 		case 0x0b:
-		case 0x0f:	data = m_snd_command; break;
-		default:	break;
+		case 0x0f:  data = m_snd_command; break;
+		default:    break;
 	}
 
 	return data;
@@ -102,9 +102,9 @@ READ8_MEMBER(drgnmst_state::drgnmst_snd_flag_r)
 WRITE8_MEMBER(drgnmst_state::drgnmst_pcm_banksel_w)
 {
 	/*  This is a 4 bit port.
-        Each pair of bits is used in part of the OKI PCM ROM bank selectors.
-        See the Port 2 write handler below (drgnmst_snd_control_w) for details.
-    */
+	    Each pair of bits is used in part of the OKI PCM ROM bank selectors.
+	    See the Port 2 write handler below (drgnmst_snd_control_w) for details.
+	*/
 
 	m_pic16c5x_port0 = data;
 }
@@ -117,27 +117,27 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_oki_w)
 WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 {
 	/*  This port controls communications to and from the 68K, both OKI
-        devices, and part of the OKI PCM ROM bank selection.
+	    devices, and part of the OKI PCM ROM bank selection.
 
-        bit legend
-        7w  ROM bank select for OKI-1, bit 2. Bank bits 1 & 0 are on Port 0
-        6r  Flag from 68K to notify the PIC that a command is coming
-        5w  ROM bank select for OKI-0, bit 2. Bank bits 1 & 0 are on Port 0
-        4w  Set Port 1 to read sound to play command from 68K. (active low)
-        3w  OKI enable comms? (active low)
-        2w  OKI chip select? (0=OKI-1, 1=OKI-0)
-        1w  Latch write data to OKI? (active low)
-        0w  Activate read signal to OKI? (active low)
+	    bit legend
+	    7w  ROM bank select for OKI-1, bit 2. Bank bits 1 & 0 are on Port 0
+	    6r  Flag from 68K to notify the PIC that a command is coming
+	    5w  ROM bank select for OKI-0, bit 2. Bank bits 1 & 0 are on Port 0
+	    4w  Set Port 1 to read sound to play command from 68K. (active low)
+	    3w  OKI enable comms? (active low)
+	    2w  OKI chip select? (0=OKI-1, 1=OKI-0)
+	    1w  Latch write data to OKI? (active low)
+	    0w  Activate read signal to OKI? (active low)
 
-        The PCM ROM bank selects are 3 bits wide.
-        2 bits for each OKI BANK selects are on Port 0, and the third most
-        significant bit is here. The MSb is written here immediately after
-        writing to Port 0 so we handle the bank switching here.
-        The PIC16C55 only supports bank selections for:
-         OKI0 from 1 to 5  (Each bank selection switches the $20000-3ffff area)
-         OKI1 from 0 to 7  (Each bank selection switches the entire $40000 area)
-        The OKI0 banks are pre-configured below in the driver init.
-    */
+	    The PCM ROM bank selects are 3 bits wide.
+	    2 bits for each OKI BANK selects are on Port 0, and the third most
+	    significant bit is here. The MSb is written here immediately after
+	    writing to Port 0 so we handle the bank switching here.
+	    The PIC16C55 only supports bank selections for:
+	     OKI0 from 1 to 5  (Each bank selection switches the $20000-3ffff area)
+	     OKI1 from 0 to 7  (Each bank selection switches the entire $40000 area)
+	    The OKI0 banks are pre-configured below in the driver init.
+	*/
 
 	int oki_new_bank;
 	m_oki_control = data;
@@ -171,7 +171,7 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki0_bank, m_oki1_bank);
 					m_oki_1->write(space, 0, m_oki_command);
 					break;
-		default:	break;
+		default:    break;
 	}
 }
 
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(drgnmst_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(drgnmst_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x920000, 0x923fff) AM_RAM AM_SHARE("rowscrollram") // rowscroll ram
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_SHARE("spriteram")	// Sprites
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -216,7 +216,7 @@ ADDRESS_MAP_END
 	/* $000 - 01F  PIC16C55 Internal Data RAM */
 
 static ADDRESS_MAP_START( drgnmst_sound_io_map, AS_IO, 8, drgnmst_state )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(pic16c5x_port0_r, drgnmst_pcm_banksel_w)	/* 4 bit port */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(pic16c5x_port0_r, drgnmst_pcm_banksel_w)  /* 4 bit port */
 	AM_RANGE(0x01, 0x01) AM_READWRITE(drgnmst_snd_command_r, drgnmst_oki_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(drgnmst_snd_flag_r, drgnmst_snd_control_w)
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
@@ -254,7 +254,7 @@ static INPUT_PORTS_START( drgnmst )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1") /* Test mode screen shows 3 sets of dipswitches */
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3")
 /*  PORT_DIPSETTING(      0x0300, DEF_STR( Off ) ) */
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 3C_1C ) )
@@ -263,24 +263,24 @@ static INPUT_PORTS_START( drgnmst )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Two credits to start" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x2000, 0x2000, "Two credits to start" )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR ( Free_Play ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR ( Free_Play ) )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Game Pause" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Game Pause" )            PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0700, 0x0400, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0x0700, 0x0400, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0700, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( Easier ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( Easy ) )
@@ -289,16 +289,16 @@ static INPUT_PORTS_START( drgnmst )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Harder ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Language ) )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Game_Time ) )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Game_Time ) )        PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Short" )
-	PORT_DIPNAME( 0x2000, 0x2000, "Stage Skip" )			PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x2000, 0x2000, "Stage Skip" )            PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Spit Color" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x4000, 0x4000, "Spit Color" )            PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "Grey" )
 	PORT_DIPSETTING(      0x0000, "Red" )
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" )
@@ -336,7 +336,7 @@ static const gfx_layout drgnmst_char16x16_layout =
 	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+1,RGN_FRAC(1,2)+2,RGN_FRAC(1,2)+3,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+5,RGN_FRAC(1,2)+6,RGN_FRAC(1,2)+7,
 		0,1,2,3,4,5,6,7 },
 	{ 0*32,1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
+		8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
 	16*32
 };
 
@@ -348,13 +348,13 @@ static const gfx_layout drgnmst_char32x32_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ 24,8, 16,0 },
-	{	RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+1,RGN_FRAC(1,2)+2,RGN_FRAC(1,2)+3,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+5,RGN_FRAC(1,2)+6,RGN_FRAC(1,2)+7,
+	{   RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+1,RGN_FRAC(1,2)+2,RGN_FRAC(1,2)+3,RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+5,RGN_FRAC(1,2)+6,RGN_FRAC(1,2)+7,
 		0,1,2,3,4,5,6,7,
-	    RGN_FRAC(1,2)+32,RGN_FRAC(1,2)+33,RGN_FRAC(1,2)+34,RGN_FRAC(1,2)+35,RGN_FRAC(1,2)+36,RGN_FRAC(1,2)+37,RGN_FRAC(1,2)+38,RGN_FRAC(1,2)+39,
+		RGN_FRAC(1,2)+32,RGN_FRAC(1,2)+33,RGN_FRAC(1,2)+34,RGN_FRAC(1,2)+35,RGN_FRAC(1,2)+36,RGN_FRAC(1,2)+37,RGN_FRAC(1,2)+38,RGN_FRAC(1,2)+39,
 		32,33,34,35,36,37,38,39 },
 
-	{	 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		 8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64,
+	{    0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+			8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64,
 		16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
 		24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64 },
 	32*64
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	MCFG_CPU_PROGRAM_MAP(drgnmst_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C55, 32000000/8)	/* Confirmed */
+	MCFG_CPU_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
 	/* Program and Data Maps are internal to the MCU */
 	MCFG_CPU_IO_MAP(drgnmst_sound_io_map)
 
@@ -472,7 +472,7 @@ static UINT8 drgnmst_asciitohex( UINT8 data )
 	/* Convert ASCII data to HEX */
 
 	if ((data >= 0x30) && (data < 0x3a)) data -= 0x30;
-	data &= 0xdf;			/* remove case sensitivity */
+	data &= 0xdf;           /* remove case sensitivity */
 	if ((data >= 0x41) && (data < 0x5b)) data -= 0x37;
 
 	return data;
@@ -551,10 +551,10 @@ DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 
 			pic16c5x_set_config(machine().device("audiocpu"), data);
 
-			src_pos = 0x7fff;		/* Force Exit */
+			src_pos = 0x7fff;       /* Force Exit */
 		}
 		src_pos += 1;
-	} while (src_pos < 0x0b7b);		/* 0x0b7b is the size of the HEX rom loaded */
+	} while (src_pos < 0x0b7b);     /* 0x0b7b is the size of the HEX rom loaded */
 }
 
 

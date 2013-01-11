@@ -105,7 +105,7 @@ bool st_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		for(int head=0; head < head_count; head++) {
 			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
 			generate_track(atari_st_fcp_get_desc(track, head, head_count, sector_count),
-						   track, head, sectors, sector_count, 100000, image);
+							track, head, sectors, sector_count, 100000, image);
 		}
 	}
 
@@ -242,10 +242,10 @@ int msa_format::identify(io_generic *io, UINT32 form_factor)
 	read_header(io, sign, sect, head, strack, etrack);
 
 	if(sign == 0x0e0f &&
-	   (sect >= 9 && sect <= 11) &&
-	   (head == 0 || head == 1) &&
-	   strack <= etrack &&
-	   etrack < 82)
+		(sect >= 9 && sect <= 11) &&
+		(head == 0 || head == 1) &&
+		strack <= etrack &&
+		etrack < 82)
 		return 100;
 	return 0;
 }
@@ -279,7 +279,7 @@ bool msa_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					return false;
 			}
 			generate_track(atari_st_fcp_get_desc(track, head, head+1, sect),
-						   track, head, sectors, sect, 100000, image);
+							track, head, sectors, sect, 100000, image);
 		}
 	}
 

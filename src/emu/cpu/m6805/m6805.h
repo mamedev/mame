@@ -263,27 +263,27 @@ protected:
 	const address_space_config m_program_config;
 
 	// CPU registers
-	PAIR 	m_ea;			/* effective address */
+	PAIR    m_ea;           /* effective address */
 
-	UINT32	m_sp_mask;		/* Stack pointer address mask */
-	UINT32	m_sp_low; 		/* Stack pointer low water mark (or floor) */
-    PAIR    m_pc;			/* Program counter */
-	PAIR	m_s;			/* Stack pointer */
-	UINT8	m_a;			/* Accumulator */
-	UINT8	m_x;			/* Index register */
-	UINT8	m_cc; 			/* Condition codes */
+	UINT32  m_sp_mask;      /* Stack pointer address mask */
+	UINT32  m_sp_low;       /* Stack pointer low water mark (or floor) */
+	PAIR    m_pc;           /* Program counter */
+	PAIR    m_s;            /* Stack pointer */
+	UINT8   m_a;            /* Accumulator */
+	UINT8   m_x;            /* Index register */
+	UINT8   m_cc;           /* Condition codes */
 
-	UINT16	m_pending_interrupts; /* MB */
+	UINT16  m_pending_interrupts; /* MB */
 
-	int 	m_irq_state[9];	/* KW Additional lines for HD63705 */
-	int		m_nmi_state;
+	int     m_irq_state[9]; /* KW Additional lines for HD63705 */
+	int     m_nmi_state;
 
 	// other internal states
-    int 	m_icount;
+	int     m_icount;
 
 	// address spaces
-    address_space *m_program;
-    direct_read_data *m_direct;
+	address_space *m_program;
+	direct_read_data *m_direct;
 };
 
 // ======================> m6805_device
@@ -293,7 +293,7 @@ class m6805_device : public m6805_base_device
 public:
 	// construction/destruction
 	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : m6805_base_device(mconfig, tag, owner, clock, M6805, "M6805", 12) { }
+		: m6805_base_device(mconfig, tag, owner, clock, M6805, "M6805", 12) { }
 
 protected:
 	virtual void execute_set_input(int inputnum, int state);
@@ -306,7 +306,7 @@ class m68hc05eg_device : public m6805_base_device
 public:
 	// construction/destruction
 	m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : m6805_base_device(mconfig, tag, owner, clock, M68HC05EG, "M68HC05EG", 13) { }
+		: m6805_base_device(mconfig, tag, owner, clock, M68HC05EG, "M68HC05EG", 13) { }
 
 protected:
 	// device-level overrides
@@ -324,7 +324,7 @@ class m68705_device : public m6805_base_device
 public:
 	// construction/destruction
 	m68705_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : m6805_base_device(mconfig, tag, owner, clock, M68705, "M68705", 12) { }
+		: m6805_base_device(mconfig, tag, owner, clock, M68705, "M68705", 12) { }
 
 protected:
 	// device-level overrides
@@ -342,7 +342,7 @@ class hd63705_device : public m6805_base_device
 public:
 	// construction/destruction
 	hd63705_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : m6805_base_device(mconfig, tag, owner, clock, HD63705, "HD63705", 16) { }
+		: m6805_base_device(mconfig, tag, owner, clock, HD63705, "HD63705", 16) { }
 
 protected:
 	// device-level overrides
@@ -360,56 +360,56 @@ protected:
 
 enum { M6805_PC=1, M6805_S, M6805_CC, M6805_A, M6805_X, M6805_IRQ_STATE };
 
-#define M6805_IRQ_LINE		0
+#define M6805_IRQ_LINE      0
 
 /****************************************************************************
  * 68HC05EG section
  ****************************************************************************/
 
-#define M68HC05EG_INT_IRQ	(M6805_IRQ_LINE)
-#define M68HC05EG_INT_TIMER	(M6805_IRQ_LINE+1)
-#define M68HC05EG_INT_CPI	(M6805_IRQ_LINE+2)
+#define M68HC05EG_INT_IRQ   (M6805_IRQ_LINE)
+#define M68HC05EG_INT_TIMER (M6805_IRQ_LINE+1)
+#define M68HC05EG_INT_CPI   (M6805_IRQ_LINE+2)
 
 /****************************************************************************
  * 68705 section
  ****************************************************************************/
 
-#define M68705_A					M6805_A
-#define M68705_PC					M6805_PC
-#define M68705_S					M6805_S
-#define M68705_X					M6805_X
-#define M68705_CC					M6805_CC
-#define M68705_IRQ_STATE			M6805_IRQ_STATE
+#define M68705_A                    M6805_A
+#define M68705_PC                   M6805_PC
+#define M68705_S                    M6805_S
+#define M68705_X                    M6805_X
+#define M68705_CC                   M6805_CC
+#define M68705_IRQ_STATE            M6805_IRQ_STATE
 
-#define M68705_INT_MASK				0x03
-#define M68705_IRQ_LINE				M6805_IRQ_LINE
-#define M68705_INT_TIMER			0x01
+#define M68705_INT_MASK             0x03
+#define M68705_IRQ_LINE             M6805_IRQ_LINE
+#define M68705_INT_TIMER            0x01
 
 /****************************************************************************
  * HD63705 section
  ****************************************************************************/
 
-#define HD63705_A					M6805_A
-#define HD63705_PC					M6805_PC
-#define HD63705_S					M6805_S
-#define HD63705_X					M6805_X
-#define HD63705_CC					M6805_CC
-#define HD63705_NMI_STATE			M6805_IRQ_STATE
-#define HD63705_IRQ1_STATE			M6805_IRQ_STATE+1
-#define HD63705_IRQ2_STATE			M6805_IRQ_STATE+2
-#define HD63705_ADCONV_STATE		M6805_IRQ_STATE+3
+#define HD63705_A                   M6805_A
+#define HD63705_PC                  M6805_PC
+#define HD63705_S                   M6805_S
+#define HD63705_X                   M6805_X
+#define HD63705_CC                  M6805_CC
+#define HD63705_NMI_STATE           M6805_IRQ_STATE
+#define HD63705_IRQ1_STATE          M6805_IRQ_STATE+1
+#define HD63705_IRQ2_STATE          M6805_IRQ_STATE+2
+#define HD63705_ADCONV_STATE        M6805_IRQ_STATE+3
 
-#define HD63705_INT_MASK			0x1ff
+#define HD63705_INT_MASK            0x1ff
 
-#define HD63705_INT_IRQ1			0x00
-#define HD63705_INT_IRQ2			0x01
-#define	HD63705_INT_TIMER1			0x02
-#define	HD63705_INT_TIMER2			0x03
-#define	HD63705_INT_TIMER3			0x04
-#define	HD63705_INT_PCI				0x05
-#define	HD63705_INT_SCI				0x06
-#define	HD63705_INT_ADCONV			0x07
-#define HD63705_INT_NMI				0x08
+#define HD63705_INT_IRQ1            0x00
+#define HD63705_INT_IRQ2            0x01
+#define HD63705_INT_TIMER1          0x02
+#define HD63705_INT_TIMER2          0x03
+#define HD63705_INT_TIMER3          0x04
+#define HD63705_INT_PCI             0x05
+#define HD63705_INT_SCI             0x06
+#define HD63705_INT_ADCONV          0x07
+#define HD63705_INT_NMI             0x08
 
 CPU_DISASSEMBLE( m6805 );
 

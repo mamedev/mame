@@ -33,10 +33,10 @@ ADDRESS_MAP_END
 /* Physical memory map (21 bits) */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dietgo_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP		/* YM2203 - this board doesn't have one */
+	AM_RANGE(0x100000, 0x100001) AM_NOP     /* YM2203 - this board doesn't have one */
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_NOP		/* This board only has 1 oki chip */
+	AM_RANGE(0x130000, 0x130001) AM_NOP     /* This board only has 1 oki chip */
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
@@ -46,7 +46,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dietgo )
-	PORT_START("IN0")	/* Verified as 4 bit input port only */
+	PORT_START("IN0")   /* Verified as 4 bit input port only */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -150,14 +150,14 @@ static const gfx_layout spritelayout =
 	{ 24,8,16,0 },
 	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
 	32*32
 };
 
 static GFXDECODE_START( dietgo )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )	/* Tiles (8x8) */
-	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )	/* Tiles (16x16) */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 16 )	/* Sprites (16x16) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )    /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )    /* Tiles (16x16) */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 16 )    /* Sprites (16x16) */
 GFXDECODE_END
 
 static int dietgo_bank_callback(const int bank)
@@ -174,7 +174,7 @@ static const deco16ic_interface dietgo_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
-	0x0f, 0x0f,	/* trans masks (default values) */
+	0x0f, 0x0f, /* trans masks (default values) */
 	0, 16, /* color base (default values) */
 	0x0f, 0x0f, /* color masks (default values) */
 	dietgo_bank_callback,
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_CPU_PROGRAM_MAP(dietgo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 

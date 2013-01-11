@@ -24,10 +24,10 @@ static void generate_interrupt( running_machine &machine, int state )
 
 static const struct tms34061_interface tms34061intf =
 {
-	"screen",				/* the screen we are acting on */
-	8,						/* VRAM address is (row << rowshift) | col */
-	0x10000,				/* size of video RAM */
-	generate_interrupt		/* interrupt gen callback */
+	"screen",               /* the screen we are acting on */
+	8,                      /* VRAM address is (row << rowshift) | col */
+	0x10000,                /* size of video RAM */
+	generate_interrupt      /* interrupt gen callback */
 };
 
 
@@ -41,7 +41,7 @@ static const struct tms34061_interface tms34061intf =
 void capbowl_state::video_start()
 {
 	/* initialize TMS34061 emulation */
-    tms34061_start(machine(), &tms34061intf);
+	tms34061_start(machine(), &tms34061intf);
 }
 
 
@@ -58,7 +58,7 @@ WRITE8_MEMBER(capbowl_state::capbowl_tms34061_w)
 	int col = offset & 0xff;
 
 	/* Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted
-       during register access. CA8 is ignored */
+	   during register access. CA8 is ignored */
 	if (func == 0 || func == 2)
 		col ^= 2;
 
@@ -73,7 +73,7 @@ READ8_MEMBER(capbowl_state::capbowl_tms34061_r)
 	int col = offset & 0xff;
 
 	/* Column address (CA0-CA8) is hooked up the A0-A7, with A1 being inverted
-       during register access. CA8 is ignored */
+	   during register access. CA8 is ignored */
 	if (func == 0 || func == 2)
 		col ^= 2;
 
@@ -94,7 +94,7 @@ WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 
 	switch (offset)
 	{
-		case 0x08:	  /* Write address high byte (only 2 bits used) */
+		case 0x08:    /* Write address high byte (only 2 bits used) */
 			m_blitter_addr = (m_blitter_addr & ~0xff0000) | (data << 16);
 			break;
 
@@ -102,7 +102,7 @@ WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 			m_blitter_addr = (m_blitter_addr & ~0x00ff00) | (data << 8);
 			break;
 
-		case 0x18:	  /* Write Address low byte (8 bits)   */
+		case 0x18:    /* Write Address low byte (8 bits)   */
 			m_blitter_addr = (m_blitter_addr & ~0x0000ff) | (data << 0);
 			break;
 
@@ -121,14 +121,14 @@ READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
 	switch (offset)
 	{
 		/* Read Mask: Graphics data are 4bpp (2 pixels per byte).
-            This function returns 0's for new pixel data.
-            This allows data to be read as a mask, AND the mask with
-            the screen data, then OR new data read by read data command. */
+		    This function returns 0's for new pixel data.
+		    This allows data to be read as a mask, AND the mask with
+		    the screen data, then OR new data read by read data command. */
 		case 0:
 			if (!(data & 0xf0))
-				result |= 0xf0;		/* High nibble is transparent */
+				result |= 0xf0;     /* High nibble is transparent */
 			if (!(data & 0x0f))
-				result |= 0x0f;		/* Low nibble is transparent */
+				result |= 0x0f;     /* Low nibble is transparent */
 			break;
 
 		/* Read data and increment address */

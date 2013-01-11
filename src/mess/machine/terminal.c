@@ -189,15 +189,15 @@ void generic_terminal_device::term_write(UINT8 data)
 			case 0x07 : // bell
 					break;
 
-			case 0x08:	if (m_x_pos) m_x_pos--;
+			case 0x08:  if (m_x_pos) m_x_pos--;
 					break;
 
-			case 0x09:	m_x_pos = (m_x_pos & 0xf8) + 8;
+			case 0x09:  m_x_pos = (m_x_pos & 0xf8) + 8;
 					if (m_x_pos >= TERMINAL_WIDTH)
 						m_x_pos = TERMINAL_WIDTH-1;
 					break;
 
-			case 0x0a:	m_y_pos++;
+			case 0x0a:  m_y_pos++;
 					m_x_pos = 0;
 					if (m_y_pos >= TERMINAL_HEIGHT)
 					{
@@ -206,16 +206,16 @@ void generic_terminal_device::term_write(UINT8 data)
 					}
 					break;
 
-			case 0x0b:	if (m_y_pos) m_y_pos--;
+			case 0x0b:  if (m_y_pos) m_y_pos--;
 					break;
 
-			case 0x0c:	clear();
+			case 0x0c:  clear();
 					break;
 
-			case 0x0d:	m_x_pos = 0;
+			case 0x0d:  m_x_pos = 0;
 					break;
 
-			case 0x1e:	m_x_pos = 0;
+			case 0x1e:  m_x_pos = 0;
 					m_y_pos = 0;
 					break;
 		}
@@ -443,8 +443,8 @@ ioport_constructor serial_terminal_device::device_input_ports() const
 
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock),
-	  device_serial_interface(mconfig, *this),
-	  device_serial_port_interface(mconfig, *this)
+		device_serial_interface(mconfig, *this),
+		device_serial_port_interface(mconfig, *this)
 {
 }
 

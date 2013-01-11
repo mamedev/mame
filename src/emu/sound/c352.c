@@ -37,9 +37,9 @@ ADDRESS_MAP_END
 
 c352_device::c352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C352, "C352", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(c352))
+		device_sound_interface(mconfig, *this),
+		device_memory_interface(mconfig, *this),
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(c352))
 {
 }
 
@@ -88,8 +88,8 @@ void c352_device::mix_one_channel(unsigned long ch, long sample_count)
 	frequency = m_c352_ch[ch].pitch;
 	delta=frequency;
 
-	pos = m_c352_ch[ch].current_addr;	// sample pointer
-	offset = m_c352_ch[ch].pos;	// 16.16 fixed-point offset into the sample
+	pos = m_c352_ch[ch].current_addr;   // sample pointer
+	offset = m_c352_ch[ch].pos; // 16.16 fixed-point offset into the sample
 	flag = m_c352_ch[ch].flag;
 	bank = m_c352_ch[ch].bank << 16;
 
@@ -100,7 +100,7 @@ void c352_device::mix_one_channel(unsigned long ch, long sample_count)
 	{
 		offset += delta;
 		cnt = (offset>>16)&0x7fff;
-		if (cnt)			// if there is a whole sample part, chop it off now that it's been applied
+		if (cnt)            // if there is a whole sample part, chop it off now that it's been applied
 		{
 			offset &= 0xffff;
 		}
@@ -156,7 +156,7 @@ void c352_device::mix_one_channel(unsigned long ch, long sample_count)
 				}
 				else
 				{
-					sample = m_mulaw_table[0x7f];		// Nearest sound(s) is here.
+					sample = m_mulaw_table[0x7f];       // Nearest sound(s) is here.
 				}
 				noisebuf = 0;
 				noisecnt = ( flag & C352_FLG_FILTER ) ? 0 : 1;
@@ -305,7 +305,7 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 	for(i = 0 ; i < samples ; i++)
 	{
-	       m_channel_l[i] = m_channel_r[i] = m_channel_l2[i] = m_channel_r2[i] = 0;
+			m_channel_l[i] = m_channel_r[i] = m_channel_l2[i] = m_channel_r2[i] = 0;
 	}
 
 	for (j = 0 ; j < 32 ; j++)
@@ -324,8 +324,8 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 unsigned short c352_device::read_reg16(unsigned long address)
 {
-	unsigned long	chan;
-	unsigned short	val;
+	unsigned long   chan;
+	unsigned short  val;
 
 	m_stream->update();
 
@@ -350,7 +350,7 @@ unsigned short c352_device::read_reg16(unsigned long address)
 
 void c352_device::write_reg16(unsigned long address, unsigned short val)
 {
-	unsigned long	chan;
+	unsigned long   chan;
 	int i;
 
 	m_stream->update();
@@ -361,7 +361,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 	{
 		switch(address)
 		{
-			case 0x404:	// execute key-ons/offs
+			case 0x404: // execute key-ons/offs
 				for ( i = 0 ; i <= 31 ; i++ )
 				{
 					if ( m_c352_ch[i].flag & C352_FLG_KEYON )
@@ -470,14 +470,14 @@ void c352_device::device_start()
 	// generate mulaw table for mulaw format samples
 	for (i = 0; i < 256; i++)
 	{
-	      double y = (double) (i & 0x7f);
-	      double x = (exp (y / y_max * log (1.0 + u)) - 1.0) * x_max / u;
+			double y = (double) (i & 0x7f);
+			double x = (exp (y / y_max * log (1.0 + u)) - 1.0) * x_max / u;
 
-	      if (i & 0x80)
-	      {
-	        x = -x;
-	      }
-	      m_mulaw_table[i] = (short)x;
+			if (i & 0x80)
+			{
+			x = -x;
+			}
+			m_mulaw_table[i] = (short)x;
 	}
 
 	// register save state info

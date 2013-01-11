@@ -1,14 +1,14 @@
 /*********************************************************************
 
-	53c7xx.c
+    53c7xx.c
 
-	NCR 53C700 SCSI I/O Processor
+    NCR 53C700 SCSI I/O Processor
 
 
-	TODO:
-	* Low-level register accesses
-	* Remove arbitrary delays
-	* Add unimplemented SCRIPTS opcodes
+    TODO:
+    * Low-level register accesses
+    * Remove arbitrary delays
+    * Add unimplemented SCRIPTS opcodes
 
 *********************************************************************/
 
@@ -21,11 +21,11 @@
 //  DEBUGGERY
 //**************************************************************************
 
-#define DEBUG_LOG			1
-#define DEBUG_LEVEL			0
+#define DEBUG_LOG           1
+#define DEBUG_LEVEL         0
 
 #if DEBUG_LOG
-	#define VERBOSE_LOG(machine, level, ...)		verbose_log(machine, level, __VA_ARGS__)
+	#define VERBOSE_LOG(machine, level, ...)        verbose_log(machine, level, __VA_ARGS__)
 #else
 	#define VERBOSE_LOG(machine, level, ...)
 #endif
@@ -57,7 +57,7 @@ const device_type NCR53C7XX = &device_creator<ncr53c7xx_device>;
 //-------------------------------------------------
 
 ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:	nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock),
+	:   nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0)
 {
@@ -90,35 +90,35 @@ void ncr53c7xx_device::device_start()
 void ncr53c7xx_device::device_reset()
 {
 	// Reset registers to defaults
-	m_scntl[0]	= 3 << SCNTL0_ARB_SHIFT;
-	m_scntl[1]	= 0;
-	m_sdid		= 0;
-	m_sien		= 0;
-	m_scid		= 0;
-	m_sxfer		= 0;
-	m_sodl		= 0;
-	m_socl		= 0;
-	m_sfbr		= 0;
-	m_sidl		= 0;
-	m_sbdl		= 0;
-	m_sbcl		= 0;
-	m_dstat		= DSTAT_DFE;
-	m_sstat[0]	= 0;
-	m_sstat[1]	= 0;
-	m_sstat[2]	= 0;
-	m_ctest[0]	= 0;
-	m_ctest[1]	= 0xf0;
-	m_ctest[2]	= 0x21;
-	m_ctest[3]	= 0;
-	m_ctest[4]	= 0;
-	m_ctest[5]	= 0;
-	m_ctest[6]	= 0;
-	m_ctest[7]	= 0;
-	m_dfifo		= 0;
-	m_istat		= 0;//ISTAT_PRE;
-	m_dmode		= 0;
-	m_dien		= 0;
-	m_dcntl		= 0;
+	m_scntl[0]  = 3 << SCNTL0_ARB_SHIFT;
+	m_scntl[1]  = 0;
+	m_sdid      = 0;
+	m_sien      = 0;
+	m_scid      = 0;
+	m_sxfer     = 0;
+	m_sodl      = 0;
+	m_socl      = 0;
+	m_sfbr      = 0;
+	m_sidl      = 0;
+	m_sbdl      = 0;
+	m_sbcl      = 0;
+	m_dstat     = DSTAT_DFE;
+	m_sstat[0]  = 0;
+	m_sstat[1]  = 0;
+	m_sstat[2]  = 0;
+	m_ctest[0]  = 0;
+	m_ctest[1]  = 0xf0;
+	m_ctest[2]  = 0x21;
+	m_ctest[3]  = 0;
+	m_ctest[4]  = 0;
+	m_ctest[5]  = 0;
+	m_ctest[6]  = 0;
+	m_ctest[7]  = 0;
+	m_dfifo     = 0;
+	m_istat     = 0;//ISTAT_PRE;
+	m_dmode     = 0;
+	m_dien      = 0;
+	m_dcntl     = 0;
 
 	m_finished = false;
 	m_connected = false;
@@ -653,7 +653,7 @@ void ncr53c7xx_device::set_scsi_state(int state)
 
 //-------------------------------------------------
 //  delay - step the SCSI state machine following
-//	a time delay
+//  a time delay
 //-------------------------------------------------
 
 void ncr53c7xx_device::delay(const attotime &delay)
@@ -735,9 +735,9 @@ void ncr53c7xx_device::step(bool timeout)
 	{
 		set_scsi_state(FINISHED);
 		m_connected = false;
-//		istatus |= I_DISCONNECT;
-//		reset_disconnect();
-//		check_irq();
+//      istatus |= I_DISCONNECT;
+//      reset_disconnect();
+//      check_irq();
 	}
 
 	switch (m_scsi_state & SUB_MASK ? m_scsi_state & SUB_MASK : m_scsi_state & STATE_MASK)
@@ -1078,7 +1078,7 @@ void ncr53c7xx_device::step(bool timeout)
 //  SCSI SCRIPTS
 //**************************************************************************
 
-#define 	UNIMPLEMENTED	fatalerror("%s is unimplemented\n", __FUNCTION__)
+#define     UNIMPLEMENTED   fatalerror("%s is unimplemented\n", __FUNCTION__)
 
 //-------------------------------------------------
 //  set_scripts_state -
@@ -1557,8 +1557,8 @@ void ncr53c7xx_device::io_i_clear()
 
 void ncr53c7xx_device::tc_jump()
 {
-//	if (m_dbc & (1 << 16))
-//		printf("Must wait for valid phase?\n");
+//  if (m_dbc & (1 << 16))
+//      printf("Must wait for valid phase?\n");
 
 	bool jump = true;
 

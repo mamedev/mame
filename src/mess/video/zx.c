@@ -87,9 +87,9 @@ void zx_state::zx_ula_bkgnd(UINT8 color)
 TIMER_CALLBACK_MEMBER(zx_state::zx_ula_nmi)
 {
 	/*
-     * An NMI is issued on the ZX81 every 64us for the blanked
-     * scanlines at the top and bottom of the display.
-     */
+	 * An NMI is issued on the ZX81 every 64us for the blanked
+	 * scanlines at the top and bottom of the display.
+	 */
 	screen_device *screen = machine().first_screen();
 	int height = screen->height();
 	const rectangle& r1 = screen->visible_area();
@@ -108,10 +108,10 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_irq)
 {
 
 	/*
-     * An IRQ is issued on the ZX80/81 whenever the R registers
-     * bit 6 goes low. In MESS this IRQ timed from the first read
-     * from the copy of the DFILE in the upper 32K in zx_ula_r().
-     */
+	 * An IRQ is issued on the ZX80/81 whenever the R registers
+	 * bit 6 goes low. In MESS this IRQ timed from the first read
+	 * from the copy of the DFILE in the upper 32K in zx_ula_r().
+	 */
 	if (m_ula_irq_active)
 	{
 //      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) machine().device("maincpu")->state().state_int(Z80_R), (unsigned) machine().device("maincpu")->state().state_int(Z80_PC));

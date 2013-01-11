@@ -5,26 +5,26 @@
 
 #include "machine/ram.h"
 
-#define MC68000L10_TAG	"u50"
-#define MC6821_0_TAG	"u32"
-#define MC6821_1_TAG	"u33"
-#define MC6840_TAG		"u35"
-#define MC6850_0_TAG	"u34"
-#define MC6850_1_TAG	"u26"
-#define COM8116_TAG		"u56"
+#define MC68000L10_TAG  "u50"
+#define MC6821_0_TAG    "u32"
+#define MC6821_1_TAG    "u33"
+#define MC6840_TAG      "u35"
+#define MC6850_0_TAG    "u34"
+#define MC6850_1_TAG    "u26"
+#define COM8116_TAG     "u56"
 
 class ob68k1a_state : public driver_device
 {
 public:
 	ob68k1a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, MC68000L10_TAG),
-		  m_dbrg(*this, COM8116_TAG),
-		  m_acia0(*this, MC6850_0_TAG),
-		  m_pia0(*this, MC6821_0_TAG),
-		  m_pia1(*this, MC6821_1_TAG),
-		  m_terminal(*this, TERMINAL_TAG),
-		  m_ram(*this, RAM_TAG)
+			m_maincpu(*this, MC68000L10_TAG),
+			m_dbrg(*this, COM8116_TAG),
+			m_acia0(*this, MC6850_0_TAG),
+			m_pia0(*this, MC6821_0_TAG),
+			m_pia1(*this, MC6821_1_TAG),
+			m_terminal(*this, TERMINAL_TAG),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

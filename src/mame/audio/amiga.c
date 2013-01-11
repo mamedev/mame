@@ -30,7 +30,7 @@
  *
  *************************************/
 
-#define CLOCK_DIVIDER	16
+#define CLOCK_DIVIDER   16
 
 
 
@@ -42,30 +42,30 @@
 
 struct audio_channel
 {
-	emu_timer *	irq_timer;
-	UINT32			curlocation;
-	UINT16			curlength;
-	UINT16			curticks;
-	UINT8			index;
-	UINT8			dmaenabled;
-	UINT8			manualmode;
-	INT8			latched;
+	emu_timer * irq_timer;
+	UINT32          curlocation;
+	UINT16          curlength;
+	UINT16          curticks;
+	UINT8           index;
+	UINT8           dmaenabled;
+	UINT8           manualmode;
+	INT8            latched;
 };
 
 
 struct amiga_audio
 {
-	audio_channel	channel[4];
-	sound_stream *	stream;
+	audio_channel   channel[4];
+	sound_stream *  stream;
 };
 
 
 INLINE amiga_audio *get_safe_token( device_t *device )
 {
-        assert(device != NULL);
-        assert(device->type() == AMIGA);
+		assert(device != NULL);
+		assert(device->type() == AMIGA);
 
-        return (amiga_audio *)downcast<amiga_sound_device *>(device)->token();
+		return (amiga_audio *)downcast<amiga_sound_device *>(device)->token();
 }
 
 /*************************************
@@ -280,7 +280,7 @@ const device_type AMIGA = &device_creator<amiga_sound_device>;
 
 amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AMIGA, "Amiga Paula", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(amiga_audio);
 }
@@ -313,5 +313,3 @@ void amiga_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
-

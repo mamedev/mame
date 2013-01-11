@@ -1,7 +1,7 @@
 #include "kim1_cas.h"
 
-#define SMPLO	-32768
-#define SMPHI	32767
+#define SMPLO   -32768
+#define SMPHI   32767
 
 
 static int cas_size;
@@ -77,10 +77,10 @@ INLINE int kim1_output_byte( INT16 *buffer, int sample_pos, UINT8 byte )
 static int kim1_handle_kim(INT16 *buffer, const UINT8 *casdata)
 {
 	static const UINT8 encoding[16] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46 };
-	int	i, data_pos, sample_count;
+	int i, data_pos, sample_count;
 	UINT16 size, address, file_id, checksum;
 
-	if ( cas_size < 9 )	return -1;
+	if ( cas_size < 9 ) return -1;
 	if ( memcmp( casdata, "KIM1", 4 ) ) return -1;
 
 	address = casdata[4] | ( casdata[5] << 8 );
@@ -157,13 +157,13 @@ static int kim1_kim_to_wav_size(const UINT8 *casdata, int caslen)
 
 static const struct CassetteLegacyWaveFiller kim1_kim_legacy_fill_wave =
 {
-	kim1_kim_fill_wave,						/* fill_wave */
-	-1,										/* chunk_size */
-	0,										/* chunk_samples */
-	kim1_kim_to_wav_size,					/* chunk_sample_calc */
-	44100,									/* sample_frequency */
-	0,										/* header_samples */
-	0										/* trailer_samples */
+	kim1_kim_fill_wave,                     /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	kim1_kim_to_wav_size,                   /* chunk_sample_calc */
+	44100,                                  /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
 };
 
 
@@ -191,4 +191,3 @@ static const struct CassetteFormat kim1_kim_format =
 CASSETTE_FORMATLIST_START(kim1_cassette_formats)
 	CASSETTE_FORMAT(kim1_kim_format)
 CASSETTE_FORMATLIST_END
-

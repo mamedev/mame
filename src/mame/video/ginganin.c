@@ -112,8 +112,8 @@ WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
 /* Frontmost (text) Layer - Resides in RAM */
 
 #define TXT_GFX (2)
-#define TXT_NX	(32)
-#define TXT_NY	(32)
+#define TXT_NX  (32)
+#define TXT_NY  (32)
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 {
@@ -251,7 +251,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	if (machine().input().code_pressed(KEYCODE_Q)) { msk |= 0xfff1;}
 	if (machine().input().code_pressed(KEYCODE_W)) { msk |= 0xfff2;}
 	if (machine().input().code_pressed(KEYCODE_E)) { msk |= 0xfff4;}
-	if (machine().input().code_pressed(KEYCODE_A))	{ msk |= 0xfff8;}
+	if (machine().input().code_pressed(KEYCODE_A))  { msk |= 0xfff8;}
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
@@ -261,11 +261,11 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	m_fg_tilemap->set_scrolly(0, m_posy); \
 	popmessage("B>%04X:%04X F>%04X:%04X",m_posx%(BG_NX*16),m_posy%(BG_NY*16),m_posx%(FG_NX*16),m_posy%(FG_NY*16));
 
-	if (machine().input().code_pressed(KEYCODE_L))	{ m_posx +=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_J))	{ m_posx -=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_K))	{ m_posy +=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_I))	{ m_posy -=8; SETSCROLL }
-	if (machine().input().code_pressed(KEYCODE_H))	{ m_posx = m_posy = 0;	SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_L))  { m_posx +=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_J))  { m_posx -=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_K))  { m_posy +=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_I))  { m_posy -=8; SETSCROLL }
+	if (machine().input().code_pressed(KEYCODE_H))  { m_posx = m_posy = 0;  SETSCROLL }
 
 }
 #endif
@@ -285,4 +285,3 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	return 0;
 }
-

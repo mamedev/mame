@@ -14,12 +14,12 @@
 #include "emu.h"
 #include "spchroms.h"
 
-static UINT8 *speechrom_data = NULL;	/* pointer to speech ROM data */
-static unsigned long speechROMlen = 0;	/* length of data pointed by speechrom_data, from 0 to 2^18 */
-static unsigned long speechROMaddr;		/* 18 bit pointer in ROM */
-#define TMS5220_ADDRESS_MASK 0x3FFFFUL	/* 18-bit mask for tms5220 address */
-static int load_pointer = 0;			/* which 4-bit nibble will be affected by load address */
-static int ROM_bits_count;				/* current bit position in ROM */
+static UINT8 *speechrom_data = NULL;    /* pointer to speech ROM data */
+static unsigned long speechROMlen = 0;  /* length of data pointed by speechrom_data, from 0 to 2^18 */
+static unsigned long speechROMaddr;     /* 18 bit pointer in ROM */
+#define TMS5220_ADDRESS_MASK 0x3FFFFUL  /* 18-bit mask for tms5220 address */
+static int load_pointer = 0;            /* which 4-bit nibble will be affected by load address */
+static int ROM_bits_count;              /* current bit position in ROM */
 
 /*
     set the speech ROMs
@@ -27,12 +27,12 @@ static int ROM_bits_count;				/* current bit position in ROM */
 void spchroms_config(running_machine &machine, const spchroms_interface *intf)
 {
 	if (intf->memory_region == NULL)
-	{	/* no speech ROM */
+	{   /* no speech ROM */
 		speechrom_data = NULL;
 		speechROMlen = 0;
 	}
 	else
-	{	/* speech ROM */
+	{   /* speech ROM */
 		speechrom_data = machine.root_device().memregion(intf->memory_region)->base();
 		/* take region length */
 		speechROMlen = machine.root_device().memregion(intf->memory_region)->bytes();
@@ -47,7 +47,7 @@ int spchroms_read(device_t *device, int count)
 	int val;
 
 	if (load_pointer)
-	{	/* first read after load address is ignored */
+	{   /* first read after load address is ignored */
 		load_pointer = 0;
 		count--;
 	}
@@ -83,7 +83,7 @@ int spchroms_read(device_t *device, int count)
 void spchroms_load_address(device_t *device, int data)
 {
 	/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
-      This code does not care about this. */
+	  This code does not care about this. */
 	speechROMaddr = ( (speechROMaddr & ~(0xf << load_pointer))
 		| (((unsigned long) (data & 0xf)) << load_pointer) ) & TMS5220_ADDRESS_MASK;
 	load_pointer += 4;
@@ -96,7 +96,7 @@ void spchroms_load_address(device_t *device, int data)
 void spchroms_read_and_branch(device_t *device)
 {
 	/* tms5220 data sheet says that if more than one speech ROM (tms6100) is present,
-      there is a bus contention.  This code does not care about this. */
+	  there is a bus contention.  This code does not care about this. */
 	if (speechROMaddr < speechROMlen-1)
 		speechROMaddr = (speechROMaddr & 0x3c000UL)
 			| (((((unsigned long) speechrom_data[speechROMaddr]) << 8)

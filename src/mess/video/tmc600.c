@@ -124,15 +124,15 @@ void tmc600_state::video_start()
 
 static const gfx_layout tmc600_charlayout =
 {
-	6, 9,					// 6 x 9 characters
-	256,					// 256 characters
-	1,						// 1 bits per pixel
-	{ 0 },					// no bitplanes
+	6, 9,                   // 6 x 9 characters
+	256,                    // 256 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
 	// x offsets
 	{ 2, 3, 4, 5, 6, 7 },
 	// y offsets
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8 },
-	8*8						// every char takes 8 x 8 bytes
+	8*8                     // every char takes 8 x 8 bytes
 };
 
 static GFXDECODE_START( tmc600 )

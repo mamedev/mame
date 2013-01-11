@@ -35,9 +35,9 @@ as track map, with one bit for each sector used.
 
 */
 
-#define DATA_SIZE	(126)
-#define SECTOR_SIZE	(0x9b)
-#define MAX_DIRENTS	(15*8)
+#define DATA_SIZE   (126)
+#define SECTOR_SIZE (0x9b)
+#define MAX_DIRENTS (15*8)
 
 /* vzdos directry entry */
 struct vzdos_dirent
@@ -145,7 +145,7 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool_image *img, int track, int s
 	memcpy(buffer, data, DATA_SIZE + 2);
 	place_integer_le(buffer, DATA_SIZE + 2, 2, chksum16(data, DATA_SIZE + 2));
 
-	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer), 0);	/* TODO: pass ddam argument from imgtool */
+	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], data_start, buffer, sizeof(buffer), 0);  /* TODO: pass ddam argument from imgtool */
 	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
@@ -370,11 +370,11 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool_image *img, int track, 
 	memset(sector_data, 0x00, sizeof(sector_data));
 	memcpy(sector_data, sector_header, sizeof(sector_header));
 
-	sector_data[10] = (UINT8) track;			/* current track */
-	sector_data[11] = (UINT8) sector;			/* current sector */
-	sector_data[12] = (UINT8) track + sector;	/* checksum-8 */
+	sector_data[10] = (UINT8) track;            /* current track */
+	sector_data[11] = (UINT8) sector;           /* current sector */
+	sector_data[12] = (UINT8) track + sector;   /* checksum-8 */
 
-	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data), 0);	/* TODO: pass ddam argument from imgtool */
+	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data), 0); /* TODO: pass ddam argument from imgtool */
 	if (ret) return (imgtoolerr_t)ret;
 
 	return IMGTOOLERR_SUCCESS;
@@ -898,11 +898,11 @@ void filter_vzsnapshot_getinfo(UINT32 state, union filterinfo *info)
 {
 	switch(state)
 	{
-		case FILTINFO_STR_NAME:			info->s = "vzsnapshot"; break;
-		case FILTINFO_STR_HUMANNAME:	info->s = "VZ Snapshot"; break;
-		case FILTINFO_STR_EXTENSION:	info->s = "vz"; break;
-		case FILTINFO_PTR_READFILE:		info->read_file = vzsnapshot_readfile; break;
-		case FILTINFO_PTR_WRITEFILE:	info->write_file = vzsnapshot_writefile; break;
+		case FILTINFO_STR_NAME:         info->s = "vzsnapshot"; break;
+		case FILTINFO_STR_HUMANNAME:    info->s = "VZ Snapshot"; break;
+		case FILTINFO_STR_EXTENSION:    info->s = "vz"; break;
+		case FILTINFO_PTR_READFILE:     info->read_file = vzsnapshot_readfile; break;
+		case FILTINFO_PTR_WRITEFILE:    info->write_file = vzsnapshot_writefile; break;
 	}
 }
 
@@ -940,28 +940,28 @@ void vzdos_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolin
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case IMGTOOLINFO_INT_PREFER_UCASE:					info->i = 1; break;
-		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:				info->i = sizeof(vz_iterator); break;
+		case IMGTOOLINFO_INT_PREFER_UCASE:                  info->i = 1; break;
+		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(vz_iterator); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case IMGTOOLINFO_STR_NAME:							strcpy(info->s = imgtool_temp_str(), "vzdos"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION:					strcpy(info->s = imgtool_temp_str(), "VZ-DOS format"); break;
-		case IMGTOOLINFO_STR_FILE:							strcpy(info->s = imgtool_temp_str(), __FILE__); break;
-		case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:				strcpy(info->s = imgtool_temp_str(), "T[0]-2;F[0]-1"); break;
-		case IMGTOOLINFO_STR_EOLN:							info->s = NULL; break;
+		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "vzdos"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "VZ-DOS format"); break;
+		case IMGTOOLINFO_STR_FILE:                          strcpy(info->s = imgtool_temp_str(), __FILE__); break;
+		case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:             strcpy(info->s = imgtool_temp_str(), "T[0]-2;F[0]-1"); break;
+		case IMGTOOLINFO_STR_EOLN:                          info->s = NULL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case IMGTOOLINFO_PTR_MAKE_CLASS:					info->make_class = imgtool_floppy_make_class; break;
-		case IMGTOOLINFO_PTR_OPEN:							info->open = NULL; break;
-		case IMGTOOLINFO_PTR_BEGIN_ENUM:					info->begin_enum = vzdos_diskimage_beginenum; break;
-		case IMGTOOLINFO_PTR_NEXT_ENUM:						info->next_enum = vzdos_diskimage_nextenum; break;
-		case IMGTOOLINFO_PTR_FREE_SPACE:					info->free_space = vzdos_diskimage_freespace; break;
-		case IMGTOOLINFO_PTR_READ_FILE:						info->read_file = vzdos_diskimage_readfile; break;
-		case IMGTOOLINFO_PTR_WRITE_FILE:					info->write_file = vzdos_diskimage_writefile; break;
-		case IMGTOOLINFO_PTR_DELETE_FILE:					info->delete_file = vzdos_diskimage_deletefile; break;
-		case IMGTOOLINFO_PTR_FLOPPY_CREATE:					info->create = vzdos_diskimage_create; break;
-		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:			info->writefile_optguide = vzdos_writefile_optionguide; break;
-		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:				info->suggest_transfer = vzdos_diskimage_suggesttransfer; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:					info->p = (void *) floppyoptions_vz; break;
+		case IMGTOOLINFO_PTR_MAKE_CLASS:                    info->make_class = imgtool_floppy_make_class; break;
+		case IMGTOOLINFO_PTR_OPEN:                          info->open = NULL; break;
+		case IMGTOOLINFO_PTR_BEGIN_ENUM:                    info->begin_enum = vzdos_diskimage_beginenum; break;
+		case IMGTOOLINFO_PTR_NEXT_ENUM:                     info->next_enum = vzdos_diskimage_nextenum; break;
+		case IMGTOOLINFO_PTR_FREE_SPACE:                    info->free_space = vzdos_diskimage_freespace; break;
+		case IMGTOOLINFO_PTR_READ_FILE:                     info->read_file = vzdos_diskimage_readfile; break;
+		case IMGTOOLINFO_PTR_WRITE_FILE:                    info->write_file = vzdos_diskimage_writefile; break;
+		case IMGTOOLINFO_PTR_DELETE_FILE:                   info->delete_file = vzdos_diskimage_deletefile; break;
+		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = vzdos_diskimage_create; break;
+		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = vzdos_writefile_optionguide; break;
+		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = vzdos_diskimage_suggesttransfer; break;
+		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_vz; break;
 	}
 }

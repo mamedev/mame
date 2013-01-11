@@ -186,11 +186,11 @@
 
 ***************************************************************************/
 
-#define PS2_MOUSE_ON	1
-#define KEYBOARD_ON		1
+#define PS2_MOUSE_ON    1
+#define KEYBOARD_ON     1
 
-#define LOG_KEYBOARD	0
-#define LOG_ACCESSES	0
+#define LOG_KEYBOARD    0
+#define LOG_ACCESSES    0
 
 
 
@@ -478,15 +478,15 @@ WRITE8_HANDLER(kbdc8042_8_w)
 
 		case 1:
 			/* preceded by writing 0xD1 to port 60h
-             *  |7|6|5|4|3|2|1|0|  8042 Output Port
-             *   | | | | | | | `---- system reset line
-             *   | | | | | | `----- gate A20
-             *   | | | | `-------- undefined
-             *   | | | `--------- output buffer full
-             *   | | `---------- input buffer empty
-             *   | `----------- keyboard clock (output)
-             *   `------------ keyboard data (output)
-             */
+			 *  |7|6|5|4|3|2|1|0|  8042 Output Port
+			 *   | | | | | | | `---- system reset line
+			 *   | | | | | | `----- gate A20
+			 *   | | | | `-------- undefined
+			 *   | | | `--------- output buffer full
+			 *   | | `---------- input buffer empty
+			 *   | `----------- keyboard clock (output)
+			 *   `------------ keyboard data (output)
+			 */
 			at_8042_set_outport(space.machine(), data, 0);
 			break;
 
@@ -527,78 +527,78 @@ WRITE8_HANDLER(kbdc8042_8_w)
 
 		/* switch based on the command */
 		switch(data) {
-		case 0x20:	/* current 8042 command byte is placed on port 60h */
+		case 0x20:  /* current 8042 command byte is placed on port 60h */
 			kbdc8042.data = kbdc8042.command;
 			break;
-		case 0x60:	/* next data byte is placed in 8042 command byte */
+		case 0x60:  /* next data byte is placed in 8042 command byte */
 			kbdc8042.operation_write_state = 5;
 			kbdc8042.send_to_mouse = 0;
 			break;
-		case 0xa7:	/* disable auxilary interface */
+		case 0xa7:  /* disable auxilary interface */
 			kbdc8042.mouse.on = 0;
 			break;
-		case 0xa8:	/* enable auxilary interface */
+		case 0xa8:  /* enable auxilary interface */
 			kbdc8042.mouse.on = 1;
 			break;
-		case 0xa9:	/* test mouse */
+		case 0xa9:  /* test mouse */
 			at_8042_receive(space.machine(), PS2_MOUSE_ON ? 0x00 : 0xff);
 			break;
-		case 0xaa:	/* selftest */
+		case 0xaa:  /* selftest */
 			at_8042_receive(space.machine(), 0x55);
 			break;
-		case 0xab:	/* test keyboard */
+		case 0xab:  /* test keyboard */
 			at_8042_receive(space.machine(), KEYBOARD_ON ? 0x00 : 0xff);
 			break;
-		case 0xad:	/* disable keyboard interface */
+		case 0xad:  /* disable keyboard interface */
 			kbdc8042.keyboard.on = 0;
 			break;
-		case 0xae:	/* enable keyboard interface */
+		case 0xae:  /* enable keyboard interface */
 			kbdc8042.keyboard.on = 1;
 			break;
-		case 0xc0:	/* read input port */
+		case 0xc0:  /* read input port */
 			/*  |7|6|5|4|3 2 1 0|  8042 Input Port
-             *   | | | |    |
-             *   | | | |    `------- undefined
-             *   | | | |
-             *   | | | `--------- 1=enable 2nd 256k of Motherboard RAM
-             *   | | `---------- 1=manufacturing jumper installed
-             *   | `----------- 1=primary display is MDA, 0=CGA
-             *   `------------ 1=keyboard not inhibited; 0=inhibited
-             */
+			 *   | | | |    |
+			 *   | | | |    `------- undefined
+			 *   | | | |
+			 *   | | | `--------- 1=enable 2nd 256k of Motherboard RAM
+			 *   | | `---------- 1=manufacturing jumper installed
+			 *   | `----------- 1=primary display is MDA, 0=CGA
+			 *   `------------ 1=keyboard not inhibited; 0=inhibited
+			 */
 			at_8042_receive(space.machine(), kbdc8042.inport);
 			break;
-		case 0xc1:	/* read input port 3..0 until write to 0x60 */
+		case 0xc1:  /* read input port 3..0 until write to 0x60 */
 			kbdc8042.status_read_mode = 1;
 			break;
-		case 0xc2:	/* read input port 7..4 until write to 0x60 */
+		case 0xc2:  /* read input port 7..4 until write to 0x60 */
 			kbdc8042.status_read_mode = 2;
 			break;
-		case 0xd0:	/* read output port */
+		case 0xd0:  /* read output port */
 			at_8042_receive(space.machine(), kbdc8042.outport);
 			break;
 		case 0xd1:
 			/* write output port; next byte written to port 60h is placed on
-             * 8042 output port */
+			 * 8042 output port */
 			kbdc8042.operation_write_state = 1;
 			return; /* instant delivery */
 		case 0xd2:
 			/* write keyboard output register; on PS/2 systems next port 60h
-             * write is written to port 60h output register as if initiated
-             * by a device; invokes interrupt if enabled */
+			 * write is written to port 60h output register as if initiated
+			 * by a device; invokes interrupt if enabled */
 			kbdc8042.operation_write_state = 2;
 			kbdc8042.send_to_mouse = 0;
 			break;
 		case 0xd3:
 			/* write auxillary output register; on PS/2 systems next port 60h
-             * write is written to port 60h input register as if initiated
-             * by a device; invokes interrupt if enabled */
+			 * write is written to port 60h input register as if initiated
+			 * by a device; invokes interrupt if enabled */
 			kbdc8042.operation_write_state = 3;
 			kbdc8042.send_to_mouse = 1;
 			break;
 		case 0xd4:
 			/* write auxillary device; on PS/2 systems the next data byte
-             * written to input register a port at 60h is sent to the
-             * auxiliary device  */
+			 * written to input register a port at 60h is sent to the
+			 * auxiliary device  */
 			kbdc8042.operation_write_state = 4;
 			break;
 		case 0xe0:
@@ -615,10 +615,10 @@ WRITE8_HANDLER(kbdc8042_8_w)
 		case 0xfc:
 		case 0xfe:
 			/* Commands 0xF0...0xFF causes certain output lines to be pulsed
-             * low for six milliseconds.  The bits pulsed low correspond to
-             * the bits low set in the command byte.  The only pulse that has
-             * an effect currently is bit 0, which pulses the CPU's reset line
-             */
+			 * low for six milliseconds.  The bits pulsed low correspond to
+			 * the bits low set in the command byte.  The only pulse that has
+			 * an effect currently is bit 0, which pulses the CPU's reset line
+			 */
 			space.machine().firstcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			at_8042_set_outport(space.machine(), kbdc8042.outport | 0x02, 0);
 			break;

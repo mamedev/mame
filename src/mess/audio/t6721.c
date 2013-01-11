@@ -190,12 +190,12 @@ WRITE8_DEVICE_HANDLER( t6721_speech_w )
 		if (t6721->sample_index == sizeof(t6721->sample_data))
 		{
 			DBG_LOG(1,"t6721",("%.2x%.2x%.2x%.2x%.2x%.2x\n",
-							   t6721->sample_data[0],
-							   t6721->sample_data[1],
-							   t6721->sample_data[2],
-							   t6721->sample_data[3],
-							   t6721->sample_data[4],
-							   t6721->sample_data[5]));
+								t6721->sample_data[0],
+								t6721->sample_data[1],
+								t6721->sample_data[2],
+								t6721->sample_data[3],
+								t6721->sample_data[4],
+								t6721->sample_data[5]));
 			t6721->sample_index = 0;
 			/*t6721->end_of_sample = false; */
 			t6721->busy = 1;
@@ -318,5 +318,3 @@ void t6721_device::device_reset()
 {
 	DEVICE_RESET_NAME( t6721 )(this);
 }
-
-
